@@ -2,531 +2,242 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D977C6C1073
-	for <lists+kvm@lfdr.de>; Mon, 20 Mar 2023 12:13:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 53EBA6C112B
+	for <lists+kvm@lfdr.de>; Mon, 20 Mar 2023 12:51:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230428AbjCTLNV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Mar 2023 07:13:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60910 "EHLO
+        id S231157AbjCTLvS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Mar 2023 07:51:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33972 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230203AbjCTLM5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 Mar 2023 07:12:57 -0400
-X-Greylist: delayed 4984 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 20 Mar 2023 04:10:21 PDT
-Received: from 3.mo552.mail-out.ovh.net (3.mo552.mail-out.ovh.net [178.33.254.192])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3FBD115C9E
-        for <kvm@vger.kernel.org>; Mon, 20 Mar 2023 04:10:21 -0700 (PDT)
-Received: from mxplan5.mail.ovh.net (unknown [10.109.143.90])
-        by mo552.mail-out.ovh.net (Postfix) with ESMTPS id F1A262885B;
-        Mon, 20 Mar 2023 09:47:14 +0000 (UTC)
-Received: from kaod.org (37.59.142.95) by DAG4EX2.mxp5.local (172.16.2.32)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.23; Mon, 20 Mar
- 2023 10:47:14 +0100
-Authentication-Results: garm.ovh; auth=pass (GARM-95G001ddd99d05-2901-4ea5-a978-791736c006f1,
-                    F0E6F0E3EAC8DE216C47088D2AA2F9E7F08C2096) smtp.auth=clg@kaod.org
-X-OVh-ClientIp: 82.64.250.170
-Message-ID: <62fc117d-45a2-9aea-1a2f-973181395430@kaod.org>
-Date:   Mon, 20 Mar 2023 10:47:13 +0100
+        with ESMTP id S229809AbjCTLvR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 Mar 2023 07:51:17 -0400
+Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC1DB22A09
+        for <kvm@vger.kernel.org>; Mon, 20 Mar 2023 04:51:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1679313075; x=1710849075;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=5Ey6kyWQjZhMD/LX+cbwN1O1/dCtuO1SPWEh4sePT3k=;
+  b=FvrQTTf5FHTQUTXrULgmRpveUjBeoCKDDeCkl+KjQv7kEDrXhCAwzT0X
+   7/su7JwlLoSJ/6BHRL4TiuZI3A95A/9Rg/m2nwB4SL/cDKRrqAuQf5DbK
+   8rDBNVTbyMbWxtphLGiSBRXHNwsAVExWBR4LTxKrYlA/9EkqqzrrQ3wfo
+   +Hp4KkX4xLO66J8blb7i96esvsExcQhQDtjX73mnHl6lwFVX1+AOw706L
+   BcBbZW26+1ehQDAe6g6iR0KW5HwutscBT1eMt2Wp6GS4SkG1OaMvBifFs
+   t4sNGmHMmqYm8686OUNhRNhmqNAqDoqj+Ya+96VgJN985QF1Bu67flxzI
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10654"; a="401213682"
+X-IronPort-AV: E=Sophos;i="5.98,274,1673942400"; 
+   d="scan'208";a="401213682"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Mar 2023 04:51:15 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10654"; a="1010442257"
+X-IronPort-AV: E=Sophos;i="5.98,274,1673942400"; 
+   d="scan'208";a="1010442257"
+Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
+  by fmsmga005.fm.intel.com with ESMTP; 20 Mar 2023 04:51:14 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.21; Mon, 20 Mar 2023 04:51:04 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.21; Mon, 20 Mar 2023 04:51:04 -0700
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.21 via Frontend Transport; Mon, 20 Mar 2023 04:51:04 -0700
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.177)
+ by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.21; Mon, 20 Mar 2023 04:51:04 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Kq80w09/IMYpnKfYlB5vFcBgvDppmUzoqWC5NyN811p/76a0zIwmO2a6GePB/w26AQ74h9LHMLhN7I7ehMDAZkebvGf6viAeycYtd3ncCI25JiH1xfgg3jpHSvKioctxJ04W6xat7mPYI2LhC1mthWSqlu5QvVjuSsGUhUJ4PHyDWftB18eYYBBWpvSILHkXxH/M4nE7e0uKavExMGwJZbX/a1vxsSho5KXbXkwZmR2OOnsKbJQh0DRh59JU2rlZliZkwyZVrI5tHtrsuLsIQKMLDei8/ckuaWsGhOOnldZGmnfDmTM/J2DEqyy2lT+ZW6rY4g7IynKkSrS7uKaG1Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=o2hJW1N6+zax7M8368jpdC50p5f6yKaLmkU4NWJ6rn4=;
+ b=PtW2TigLh78lVuCGzv+NXqtVpporm3wA3InXg9SBmxy0AjpB4rn+Gx4fsLQiyYuu6I73T/hf0oRnGbI2jwTF+DXs3nTN+EY4yaBg9cFAF29mGcblNv7k/j6QOJSTXSKJQY43+1Ksy9t/sflm45AP3pQVyhQzF1Pq2scymA+e4aeh/nhiLQ8HbB/oxRjqZPngrF/nx3TEkLLJQQLuWXQDYr/8Tm8MYMRipCeP3gYNu3UG250vhVxAtZ+XzueilfKt4FkjeeqfCUbexVIsvoaJ6FUlqHyNt0JrSD/fR76QHAa88TtjzRWrsFS7QiqyLqL+YSq/980nXW0pWU9fP9Ojgg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from PH8PR11MB6780.namprd11.prod.outlook.com (2603:10b6:510:1cb::11)
+ by CY8PR11MB7136.namprd11.prod.outlook.com (2603:10b6:930:60::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6178.37; Mon, 20 Mar
+ 2023 11:50:57 +0000
+Received: from PH8PR11MB6780.namprd11.prod.outlook.com
+ ([fe80::5cb1:c8ce:6f60:4e09]) by PH8PR11MB6780.namprd11.prod.outlook.com
+ ([fe80::5cb1:c8ce:6f60:4e09%9]) with mapi id 15.20.6178.037; Mon, 20 Mar 2023
+ 11:51:01 +0000
+Date:   Mon, 20 Mar 2023 19:51:28 +0800
+From:   Chao Gao <chao.gao@intel.com>
+To:     Binbin Wu <binbin.wu@linux.intel.com>
+CC:     <kvm@vger.kernel.org>, <seanjc@google.com>, <pbonzini@redhat.com>,
+        <robert.hu@linux.intel.com>
+Subject: Re: [PATCH v6 6/7] KVM: x86: Untag address when LAM applicable
+Message-ID: <ZBhIwLfkBqwvas9d@gao-cwp>
+References: <20230319084927.29607-1-binbin.wu@linux.intel.com>
+ <20230319084927.29607-7-binbin.wu@linux.intel.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20230319084927.29607-7-binbin.wu@linux.intel.com>
+X-ClientProxiedBy: SG2P153CA0028.APCP153.PROD.OUTLOOK.COM (2603:1096:4:c7::15)
+ To PH8PR11MB6780.namprd11.prod.outlook.com (2603:10b6:510:1cb::11)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.8.0
-Subject: Re: [kvm-unit-tests v2 09/10] powerpc: Support powernv machine with
- QEMU TCG
-Content-Language: en-US
-To:     Nicholas Piggin <npiggin@gmail.com>, <kvm@vger.kernel.org>
-CC:     <linuxppc-dev@lists.ozlabs.org>,
-        Laurent Vivier <lvivier@redhat.com>,
-        Thomas Huth <thuth@redhat.com>
-References: <20230320070339.915172-1-npiggin@gmail.com>
- <20230320070339.915172-10-npiggin@gmail.com>
-From:   =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-In-Reply-To: <20230320070339.915172-10-npiggin@gmail.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [37.59.142.95]
-X-ClientProxiedBy: DAG2EX1.mxp5.local (172.16.2.11) To DAG4EX2.mxp5.local
- (172.16.2.32)
-X-Ovh-Tracer-GUID: cdb752b5-9f0a-46c2-9086-8071876d5310
-X-Ovh-Tracer-Id: 3144075492277324707
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedvhedrvdefkedgtdeiucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepkfffgggfuffvvehfhfgjtgfgihesthejredttdefjeenucfhrhhomhepveorughrihgtucfnvgcuifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpeeihfejteeugfeffeehudevkeduheegfeejieekueettddthfegtddtgfdvjedvjeenucffohhmrghinhepohhprghlqdgtrghllhhsrdhssgdptghsthgrrhhtieegrdhssgenucfkphepuddvjedrtddrtddruddpfeejrdehledrudegvddrleehnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepuddvjedrtddrtddruddpmhgrihhlfhhrohhmpeeotghlgheskhgrohgurdhorhhgqedpnhgspghrtghpthhtohepuddprhgtphhtthhopehnphhighhgihhnsehgmhgrihhlrdgtohhmpdhkvhhmsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhlihhnuhigphhptgdquggvvheslhhishhtshdrohiilhgrsghsrdhorhhgpdhlvhhivhhivghrsehrvgguhhgrthdrtghomhdpthhhuhhthhesrhgvughhrghtrdgtohhmpdfovfetjfhoshhtpehmohehhedvpdhmohguvgepshhmthhpohhuth
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH8PR11MB6780:EE_|CY8PR11MB7136:EE_
+X-MS-Office365-Filtering-Correlation-Id: 4d5e62a3-ab27-4c78-aaf7-08db29396064
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: CVYxeLTi61klUGkVumPhWWrWqxgIqe3EVO3NmMZO1zOMQp1ZUQi7xHhtj8/tfCbyJH8hZBPOa1gT7VoWwMNc5aNvY9xtjIsAy10MqZkm0nK1uEag/KS/AzfX24kbTNjLgJU0zP3tuFcSyFGhM7d54m91dYVgPI7a96JO1E2BE+OLFEOQhVYbbDQEcOJutc4fY27BLI01sQ0EgyR4vCXOBLRqRqUqPrwS0fVB/Cm44bqn/DDRzaoM60dBJodG8Gxd+j20xors9vitB8HMCyvrUdTSyPpM718YlKvzhB0rb++vZr++IHqPlxpyCvV5yQhYmPie9ovctiL1otU9TLQc9WVSaUF9l5NHBoRVQslXQPUfVWqgeKs6zyn3RbtBkPhPiLY27V/5CfFnB4ZZP9EIJ/UGlR4rZj8rAYqCZTv9wMU9X33IJYqmYm7iUAVXf8h3HcsMDKoU/Z3iYC7hvi3g7E1qvLwHdC8+Etx9mPOMC5kXCepi3Mlw2MJhA/ypiUgQNS7oS5LiuVRlST8wY91Hx9b8FK1QvxTD2JXdtcAaO8FLBPFcygvcNC6gZR3SqDUMD1PQW78t7/q6bONwKOpFuB5Jwx69KHUBiC2o7hhbOpwfcpAb2Ej0JG2TyJE2uLnFuQI9oZB2IdXGk7puD5b32A==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH8PR11MB6780.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(7916004)(376002)(366004)(136003)(346002)(39860400002)(396003)(451199018)(41300700001)(6666004)(44832011)(8936002)(6486002)(5660300002)(82960400001)(186003)(2906002)(478600001)(38100700002)(66556008)(316002)(6506007)(6512007)(86362001)(26005)(4326008)(9686003)(83380400001)(33716001)(66476007)(66946007)(6916009)(8676002);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?OfV9UT/qIUIvaXBM9+v+sdPoic5vuzxi9qpncETboOvaDyMsB+0NX//213IF?=
+ =?us-ascii?Q?JjtCtSAcT0VnaJZGwL+64jR7tsA/oqzaGDJDfCLnjttmagbtdGNV5SxBAApl?=
+ =?us-ascii?Q?g+sgzN/X5+j7TOE5K/Ledt9gauhIFzesLWTQCTzlG7p1NfXBAthJy2mRJ1My?=
+ =?us-ascii?Q?/L227jfkbA46ntKjEIwCkWhQSIxZL/JH7WImMUroY4+gO7f9M2zLd2CU49JN?=
+ =?us-ascii?Q?yBezh5mvYyNnzVh9VkwmApaiGGC2akjDT9NjetkQqtl+swH/jgdjGAzfLL1l?=
+ =?us-ascii?Q?Q+Mg602bvccnkLA4XlWRa0lDVZPxw29rXQsmiyih3kTH/QhG5H9gRUr5HWDx?=
+ =?us-ascii?Q?0KI6KB98xU1BYTVeyuh0L9YKcIziyMoMVJkmc7amGtZxLqST53FSeRNY+3OZ?=
+ =?us-ascii?Q?MuJMyDQ1503mO4BZTvF6TewuJjbOObX2DR1cBh6yExrzX2DLxHXteV33P/wA?=
+ =?us-ascii?Q?Im+nhfutjjdQ9QHZctCijlXXaC8WvHvhnsxkGT1QfYpZ3f6JEBD0T/4RZX9o?=
+ =?us-ascii?Q?yMj0CjGbtC8ViQ+nNrgngHNfnGmmBUJul/xJt4UZzwEotya3WdzuadpCRKFJ?=
+ =?us-ascii?Q?I4U6VO/NCWBGyFPBtznnoNrJqAM9kPdquUp6A+HooN44h29x9z6vR1giyG2E?=
+ =?us-ascii?Q?cXp5VF90c0no5WxnGg+XT1mS+0CR0Zbgd3eGnfxKlIwkJD70RJ8NRY26G8i4?=
+ =?us-ascii?Q?8AwcUhcCD8Ajn3CU5gx40HcM2rGsG5BwV1wkfJsmwOETc0wu5aFUke4Wq5aq?=
+ =?us-ascii?Q?hHP8w2aZY/AG9vR0+db6/poMEHHAFovbEgB7BWLbdvrPIM52LLq5Xkbe4tJD?=
+ =?us-ascii?Q?nR37pzBFXQ2ud6ELsBjheXbojHYcZ3SM0cw0NVEi4J8bXrVcB45l/kkj9Ac1?=
+ =?us-ascii?Q?91rYRMybviomyq7i0xV7ed6taZfUIPBikFChi/stNH++Zz2ERWVYQSL7/r2O?=
+ =?us-ascii?Q?gqsltHcjOTqadCkbxNzdYXvSiuQsuXD9x557Smt71SeAdNnMBUwc0/YjJhcj?=
+ =?us-ascii?Q?iJRlW0gekHPJcSKQmqcocH4Ar/xDa7mOydM1Eu0h/Cynin+jFETyclf4gknb?=
+ =?us-ascii?Q?y9obVLhfsLwVMU+Txrm8IVEx0P6HcLLon1LAfxv+DWHjfQ5ugrukRwxFr0+J?=
+ =?us-ascii?Q?3kbPBSOExXckcRfTJdHJbgA4EeTZBVRbaazscRrUZ1vtjGx25wWAs1Bd5vC6?=
+ =?us-ascii?Q?4+UEylt5mmkYwlTuKXYcM8tJnAFQF67Hs3i2hlaEKj9hnr1mtRuJtiONUeCC?=
+ =?us-ascii?Q?hUBxfMdJLpc57TN0x/BYOayR3sV1YpByi3YpRyxC7EfZqk2FZieAYb2G2/JL?=
+ =?us-ascii?Q?JdnVedw8+iQHIdYClI+HRksWMSb6bImOTTlERD3zcgfw1m2cyomqigoCcp+B?=
+ =?us-ascii?Q?dcYZDM8NwJgr92Gr6hxbdnm5PjqwSqR5BFoHLZzsr/AOfTgg1iv44NdkVflM?=
+ =?us-ascii?Q?MG8zghz3tbpUOVuq/WpRtntBlw7azdLHEEusyi2imHYzS/0Nb7hYIZXNCfSl?=
+ =?us-ascii?Q?Us/64Xokspa9h1EEIzYzpGp9fo9+KqsI3Uy2zs2+lCudTpSkq266JWfr1Ab9?=
+ =?us-ascii?Q?vOQw7JbNssA8c4zRr9CnznClrF0bmPYr1OP4U9jP?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4d5e62a3-ab27-4c78-aaf7-08db29396064
+X-MS-Exchange-CrossTenant-AuthSource: PH8PR11MB6780.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Mar 2023 11:51:01.2172
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: YVpH+6TFR1MRiOpJ6W9aEDMDG3NjviO9XQXBWJB1BYjLLN7/rG4TasSXYOjHSP93QGO8bvnUzSQb3+Z7Osyzrw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR11MB7136
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello Nick,
-
-On 3/20/23 08:03, Nicholas Piggin wrote:
-> This is a basic first pass at powernv support using OPAL (skiboot)
-> firmware.
+On Sun, Mar 19, 2023 at 04:49:26PM +0800, Binbin Wu wrote:
+>Untag address for 64-bit memory/mmio operand in instruction emulations
+>and vmexit handlers when LAM is applicable.
+>
+>For instruction emulation, untag address in __linearize() before
+>canonical check. LAM doesn't apply to instruction fetch and invlpg,
+>use KVM_X86_UNTAG_ADDR_SKIP_LAM to skip LAM untag.
+>
+>For vmexit handlings related to 64-bit linear address:
+>- Cases need to untag address
+>  Operand(s) of VMX instructions and INVPCID
+>  Operand(s) of SGX ENCLS
+>  Linear address in INVVPID descriptor.
+>- Cases LAM doesn't apply to (no change needed)
+>  Operand of INVLPG
+>  Linear address in INVPCID descriptor
+>
+>Co-developed-by: Robert Hoo <robert.hu@linux.intel.com>
+>Signed-off-by: Robert Hoo <robert.hu@linux.intel.com>
+>Signed-off-by: Binbin Wu <binbin.wu@linux.intel.com>
+>---
+> arch/x86/kvm/emulate.c    | 25 +++++++++++++++++--------
+> arch/x86/kvm/vmx/nested.c |  2 ++
+> arch/x86/kvm/vmx/sgx.c    |  1 +
+> arch/x86/kvm/x86.c        |  4 ++++
+> 4 files changed, 24 insertions(+), 8 deletions(-)
+>
+>diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
+>index a630c5db971c..c46f0162498e 100644
+>--- a/arch/x86/kvm/emulate.c
+>+++ b/arch/x86/kvm/emulate.c
+>@@ -688,7 +688,8 @@ static __always_inline int __linearize(struct x86_emulate_ctxt *ctxt,
+> 				       struct segmented_address addr,
+> 				       unsigned *max_size, unsigned size,
+> 				       bool write, bool fetch,
+>-				       enum x86emul_mode mode, ulong *linear)
+>+				       enum x86emul_mode mode, ulong *linear,
+>+				       u64 untag_flags)
+> {
+> 	struct desc_struct desc;
+> 	bool usable;
+>@@ -701,9 +702,10 @@ static __always_inline int __linearize(struct x86_emulate_ctxt *ctxt,
+> 	*max_size = 0;
+> 	switch (mode) {
+> 	case X86EMUL_MODE_PROT64:
+>-		*linear = la;
+>+		*linear = static_call(kvm_x86_untag_addr)(ctxt->vcpu, la, untag_flags);
+>+
+> 		va_bits = ctxt_virt_addr_bits(ctxt);
+>-		if (!__is_canonical_address(la, va_bits))
+>+		if (!__is_canonical_address(*linear, va_bits))
+> 			goto bad;
 > 
-> The ACCEL is a bit clunky, now defaulting to tcg for powernv machine.
-> It also does not yet run in the run_tests.sh batch process, more work
-> is needed to exclude certain tests (e.g., rtas) and adjust parameters
-> (e.g., increase memory size) to allow powernv to work. For now it
-> can run single test cases.
+> 		*max_size = min_t(u64, ~0u, (1ull << va_bits) - la);
+>@@ -757,8 +759,8 @@ static int linearize(struct x86_emulate_ctxt *ctxt,
+> 		     ulong *linear)
+> {
+> 	unsigned max_size;
+>-	return __linearize(ctxt, addr, &max_size, size, write, false,
+>-			   ctxt->mode, linear);
+>+	return __linearize(ctxt, addr, &max_size, size, false, false,
 
-Why do you need to load OPAL ? for the shutdown ? because the UART ops
-could be done directly using MMIOs on the LPC IO space.
+							^^^^^
+							Should be "write".
 
-> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
-> ---
->   lib/powerpc/asm/ppc_asm.h   |  5 +++
->   lib/powerpc/asm/processor.h | 14 ++++++++
->   lib/powerpc/hcall.c         |  4 +--
->   lib/powerpc/io.c            | 33 ++++++++++++++++--
->   lib/powerpc/io.h            |  6 ++++
->   lib/powerpc/processor.c     | 10 ++++++
->   lib/powerpc/setup.c         | 10 ++++--
->   lib/ppc64/asm/opal.h        | 11 ++++++
->   lib/ppc64/opal-calls.S      | 46 +++++++++++++++++++++++++
->   lib/ppc64/opal.c            | 67 +++++++++++++++++++++++++++++++++++++
->   powerpc/Makefile.ppc64      |  2 ++
->   powerpc/cstart64.S          |  7 ++++
->   powerpc/run                 | 30 ++++++++++++++---
->   13 files changed, 234 insertions(+), 11 deletions(-)
->   create mode 100644 lib/ppc64/asm/opal.h
->   create mode 100644 lib/ppc64/opal-calls.S
->   create mode 100644 lib/ppc64/opal.c
+>+			   ctxt->mode, linear, 0);
+> }
 > 
-> diff --git a/lib/powerpc/asm/ppc_asm.h b/lib/powerpc/asm/ppc_asm.h
-> index 6299ff5..5eec9d3 100644
-> --- a/lib/powerpc/asm/ppc_asm.h
-> +++ b/lib/powerpc/asm/ppc_asm.h
-> @@ -36,7 +36,12 @@
->   #endif /* __BYTE_ORDER__ */
->   
->   /* Machine State Register definitions: */
-> +#define MSR_LE_BIT	0
->   #define MSR_EE_BIT	15			/* External Interrupts Enable */
-> +#define MSR_HV_BIT	60			/* Hypervisor mode */
->   #define MSR_SF_BIT	63			/* 64-bit mode */
->   
-> +#define SPR_HSRR0	0x13A
-> +#define SPR_HSRR1	0x13B
-> +
->   #endif /* _ASMPOWERPC_PPC_ASM_H */
-> diff --git a/lib/powerpc/asm/processor.h b/lib/powerpc/asm/processor.h
-> index ebfeff2..8084787 100644
-> --- a/lib/powerpc/asm/processor.h
-> +++ b/lib/powerpc/asm/processor.h
-> @@ -3,12 +3,26 @@
->   
->   #include <libcflat.h>
->   #include <asm/ptrace.h>
-> +#include <asm/ppc_asm.h>
->   
->   #ifndef __ASSEMBLY__
->   void handle_exception(int trap, void (*func)(struct pt_regs *, void *), void *);
->   void do_handle_exception(struct pt_regs *regs);
->   #endif /* __ASSEMBLY__ */
->   
-> +/*
-> + * If this returns true on PowerNV / OPAL machines which run in hypervisor
-> + * mode. False on pseries / PAPR machines that run in guest mode.
-> + */
-> +static inline bool machine_is_powernv(void)
-> +{
-> +	uint64_t msr;
-> +
-> +	asm volatile ("mfmsr %[msr]" : [msr] "=r" (msr));
-> +
-> +	return !!(msr & (1ULL << MSR_HV_BIT));
-> +}
-> +
->   static inline uint64_t get_tb(void)
->   {
->   	uint64_t tb;
-> diff --git a/lib/powerpc/hcall.c b/lib/powerpc/hcall.c
-> index 711cb1b..37e52f5 100644
-> --- a/lib/powerpc/hcall.c
-> +++ b/lib/powerpc/hcall.c
-> @@ -25,7 +25,7 @@ int hcall_have_broken_sc1(void)
->   	return r3 == (unsigned long)H_PRIVILEGE;
->   }
->   
-> -void putchar(int c)
-> +void papr_putchar(int c)
->   {
->   	unsigned long vty = 0;		/* 0 == default */
->   	unsigned long nr_chars = 1;
-> @@ -34,7 +34,7 @@ void putchar(int c)
->   	hcall(H_PUT_TERM_CHAR, vty, nr_chars, chars);
->   }
->   
-> -int __getchar(void)
-> +int __papr_getchar(void)
->   {
->   	register unsigned long r3 asm("r3") = H_GET_TERM_CHAR;
->   	register unsigned long r4 asm("r4") = 0; /* 0 == default vty */
-> diff --git a/lib/powerpc/io.c b/lib/powerpc/io.c
-> index a381688..a3a64ce 100644
-> --- a/lib/powerpc/io.c
-> +++ b/lib/powerpc/io.c
-> @@ -9,13 +9,39 @@
->   #include <asm/spinlock.h>
->   #include <asm/rtas.h>
->   #include <asm/setup.h>
-> +#include <asm/processor.h>
->   #include "io.h"
->   
->   static struct spinlock print_lock;
->   
-> +struct opal {
-> +	uint64_t base;
-> +	uint64_t entry;
-> +};
-> +extern struct opal opal;
-> +
-> +void putchar(int c)
-> +{
-> +	if (machine_is_powernv())
-> +		opal_putchar(c);
-> +	else
-> +		papr_putchar(c);
-> +}
-> +
-> +int __getchar(void)
-> +{
-> +	if (machine_is_powernv())
-> +		return __opal_getchar();
-> +	else
-> +		return __papr_getchar();
-> +}
-> +
->   void io_init(void)
->   {
-> -	rtas_init();
-> +	if (machine_is_powernv())
-> +		opal_init();
-> +	else
-> +		rtas_init();
->   }
->   
->   void puts(const char *s)
-> @@ -38,7 +64,10 @@ void exit(int code)
->   // FIXME: change this print-exit/rtas-poweroff to chr_testdev_exit(),
->   //        maybe by plugging chr-testdev into a spapr-vty.
->   	printf("\nEXIT: STATUS=%d\n", ((code) << 1) | 1);
-> -	rtas_power_off();
-> +	if (machine_is_powernv())
-> +		opal_power_off();
-> +	else
-> +		rtas_power_off();
->   	halt(code);
->   	__builtin_unreachable();
->   }
-> diff --git a/lib/powerpc/io.h b/lib/powerpc/io.h
-> index d4f21ba..a2aed7b 100644
-> --- a/lib/powerpc/io.h
-> +++ b/lib/powerpc/io.h
-> @@ -8,6 +8,12 @@
->   #define _POWERPC_IO_H_
->   
->   extern void io_init(void);
-> +extern void opal_init(void);
-> +extern void opal_power_off(void);
->   extern void putchar(int c);
-> +extern void opal_putchar(int c);
-> +extern void papr_putchar(int c);
-> +extern int __opal_getchar(void);
-> +extern int __papr_getchar(void);
->   
->   #endif
-> diff --git a/lib/powerpc/processor.c b/lib/powerpc/processor.c
-> index e77a240..06f6db3 100644
-> --- a/lib/powerpc/processor.c
-> +++ b/lib/powerpc/processor.c
-> @@ -61,6 +61,16 @@ void sleep_tb(uint64_t cycles)
->   {
->   	uint64_t start, end, now;
->   
-> +	if (machine_is_powernv()) {
-> +		/*
-> +		 * Could use 'stop' to sleep here which would be interesting.
-> +		 * stop with ESL=0 should be simple enough, ESL=1 would require
-> +		 * SRESET based wakeup which is more involved.
-> +		 */
-> +		delay(cycles);
-> +		return;
-> +	}
-> +
->   	start = now = get_tb();
->   	end = start + cycles;
->   
-> diff --git a/lib/powerpc/setup.c b/lib/powerpc/setup.c
-> index 1be4c03..f327540 100644
-> --- a/lib/powerpc/setup.c
-> +++ b/lib/powerpc/setup.c
-> @@ -18,6 +18,7 @@
->   #include <argv.h>
->   #include <asm/setup.h>
->   #include <asm/page.h>
-> +#include <asm/processor.h>
->   #include <asm/hcall.h>
->   #include "io.h"
->   
-> @@ -97,12 +98,13 @@ static void cpu_init(void)
->   	tb_hz = params.tb_hz;
->   
->   	/* Interrupt Endianness */
-> -
-> +	if (!machine_is_powernv()) {
->   #if  __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-> -        hcall(H_SET_MODE, 1, 4, 0, 0);
-> +		hcall(H_SET_MODE, 1, 4, 0, 0);
->   #else
-> -        hcall(H_SET_MODE, 0, 4, 0, 0);
-> +		hcall(H_SET_MODE, 0, 4, 0, 0);
->   #endif
-> +	}
->   }
->   
->   static void mem_init(phys_addr_t freemem_start)
-> @@ -195,6 +197,8 @@ void setup(const void *fdt)
->   		freemem += initrd_size;
->   	}
->   
-> +	opal_init();
-> +
+> static inline int assign_eip(struct x86_emulate_ctxt *ctxt, ulong dst)
+>@@ -771,7 +773,9 @@ static inline int assign_eip(struct x86_emulate_ctxt *ctxt, ulong dst)
+> 
+> 	if (ctxt->op_bytes != sizeof(unsigned long))
+> 		addr.ea = dst & ((1UL << (ctxt->op_bytes << 3)) - 1);
+>-	rc = __linearize(ctxt, addr, &max_size, 1, false, true, ctxt->mode, &linear);
+>+	/* skip LAM untag for instruction */
 
-This opal_init() call seems redundant with io_init().
+I think it would be more accurate to quote the spec:
 
-C.
+LAM does not apply to addresses used for instruction fetches or to those
+that specify the targets of jump and call instructions
 
->   	/* call init functions */
->   	cpu_init();
->   
-> diff --git a/lib/ppc64/asm/opal.h b/lib/ppc64/asm/opal.h
-> new file mode 100644
-> index 0000000..243a3c6
-> --- /dev/null
-> +++ b/lib/ppc64/asm/opal.h
-> @@ -0,0 +1,11 @@
-> +/* SPDX-License-Identifier: GPL-2.0-or-later */
-> +#ifndef _ASMPPC64_HCALL_H_
-> +#define _ASMPPC64_HCALL_H_
-> +
-> +#define OPAL_SUCCESS				0
-> +
-> +#define OPAL_CONSOLE_WRITE			1
-> +#define OPAL_CONSOLE_READ			2
-> +#define OPAL_CEC_POWER_DOWN			5
-> +
-> +#endif
-> diff --git a/lib/ppc64/opal-calls.S b/lib/ppc64/opal-calls.S
-> new file mode 100644
-> index 0000000..1833358
-> --- /dev/null
-> +++ b/lib/ppc64/opal-calls.S
-> @@ -0,0 +1,46 @@
-> +/* SPDX-License-Identifier: GPL-2.0-or-later */
-> +/*
-> + * Copyright (c) 2016 IBM Corporation.
-> + */
-> +
-> +#include <asm/ppc_asm.h>
-> +
-> +	.text
-> +	.globl opal_call
-> +opal_call:
-> +	mr	r0,r3
-> +	mr	r3,r4
-> +	mr	r4,r5
-> +	mr	r5,r6
-> +	mr	r6,r7
-> +	mflr	r11
-> +	std	r11,16(r1)
-> +	mfcr	r12
-> +	stw	r12,8(r1)
-> +	mr	r13,r2
-> +
-> +	/* Set opal return address */
-> +	LOAD_REG_ADDR(r11, opal_return)
-> +	mtlr	r11
-> +	mfmsr	r12
-> +
-> +	/* switch to BE when we enter OPAL */
-> +	li	r11,(1 << MSR_LE_BIT)
-> +	andc	r12,r12,r11
-> +	mtspr	SPR_HSRR1,r12
-> +
-> +	/* load the opal call entry point and base */
-> +	LOAD_REG_ADDR(r11, opal)
-> +	ld	r12,8(r11)
-> +	ld	r2,0(r11)
-> +	mtspr	SPR_HSRR0,r12
-> +	hrfid
-> +
-> +opal_return:
-> +	FIXUP_ENDIAN
-> +	mr	r2,r13;
-> +	lwz	r11,8(r1);
-> +	ld	r12,16(r1)
-> +	mtcr	r11;
-> +	mtlr	r12
-> +	blr
-> diff --git a/lib/ppc64/opal.c b/lib/ppc64/opal.c
-> new file mode 100644
-> index 0000000..515e9ab
-> --- /dev/null
-> +++ b/lib/ppc64/opal.c
-> @@ -0,0 +1,67 @@
-> +/* SPDX-License-Identifier: GPL-2.0-or-later */
-> +/*
-> + * OPAL call helpers
-> + */
-> +#include <asm/opal.h>
-> +#include <libcflat.h>
-> +#include <libfdt/libfdt.h>
-> +#include <devicetree.h>
-> +//libfdt_env.h>
-> +#include <asm/io.h>
-> +#include "../powerpc/io.h"
-> +
-> +struct opal {
-> +	uint64_t base;
-> +	uint64_t entry;
-> +} opal;
-> +
-> +void opal_init(void)
-> +{
-> +	const struct fdt_property *prop;
-> +	int node, len;
-> +
-> +	node = fdt_path_offset(dt_fdt(), "/ibm,opal");
-> +	if (node < 0) {
-> +		return;// node;
-> +	}
-> +
-> +	prop = fdt_get_property(dt_fdt(), node, "opal-base-address", &len);
-> +	if (!prop)
-> +		return;// len;
-> +	opal.base = fdt64_to_cpu(*(uint64_t *)prop->data);
-> +
-> +	prop = fdt_get_property(dt_fdt(), node, "opal-entry-address", &len);
-> +	if (!prop)
-> +		return;// len;
-> +	opal.entry = fdt64_to_cpu(*(uint64_t *)prop->data);
-> +}
-> +
-> +extern int64_t opal_call(int64_t token, int64_t arg1, int64_t arg2, int64_t arg3);
-> +
-> +extern void opal_power_off(void)
-> +{
-> +	opal_call(OPAL_CEC_POWER_DOWN, 0, 0, 0);
-> +}
-> +
-> +void opal_putchar(int c)
-> +{
-> +	unsigned long vty = 0;		/* 0 == default */
-> +	unsigned long nr_chars = cpu_to_be64(1);
-> +	char ch = c;
-> +
-> +	opal_call(OPAL_CONSOLE_WRITE, (int64_t)vty, (int64_t)&nr_chars, (int64_t)&ch);
-> +}
-> +
-> +int __opal_getchar(void)
-> +{
-> +	unsigned long vty = 0;		/* 0 == default */
-> +	unsigned long nr_chars = cpu_to_be64(1);
-> +	char ch;
-> +	int rc;
-> +
-> +	rc = opal_call(OPAL_CONSOLE_READ, (int64_t)vty, (int64_t)&nr_chars, (int64_t)&ch);
-> +	if (rc != OPAL_SUCCESS)
-> +		return -1;
-> +
-> +	return ch;
-> +}
-> diff --git a/powerpc/Makefile.ppc64 b/powerpc/Makefile.ppc64
-> index b0ed2b1..06a7cf6 100644
-> --- a/powerpc/Makefile.ppc64
-> +++ b/powerpc/Makefile.ppc64
-> @@ -17,6 +17,8 @@ cstart.o = $(TEST_DIR)/cstart64.o
->   reloc.o  = $(TEST_DIR)/reloc64.o
->   
->   OBJDIRS += lib/ppc64
-> +cflatobjs += lib/ppc64/opal.o
-> +cflatobjs += lib/ppc64/opal-calls.o
->   
->   # ppc64 specific tests
->   tests = $(TEST_DIR)/spapr_vpa.elf
-> diff --git a/powerpc/cstart64.S b/powerpc/cstart64.S
-> index 069d991..b5b3ec7 100644
-> --- a/powerpc/cstart64.S
-> +++ b/powerpc/cstart64.S
-> @@ -92,6 +92,13 @@ start:
->   	sync
->   	isync
->   
-> +	/* powernv machine does not check broken_sc1 */
-> +	mfmsr	r3
-> +	li	r4,1
-> +	sldi	r4,r4,MSR_HV_BIT
-> +	and.	r3,r3,r4
-> +	bne	1f
-> +
->   	/* patch sc1 if needed */
->   	bl	hcall_have_broken_sc1
->   	cmpwi	r3, 0
-> diff --git a/powerpc/run b/powerpc/run
-> index ee38e07..2ec3df8 100755
-> --- a/powerpc/run
-> +++ b/powerpc/run
-> @@ -1,5 +1,14 @@
->   #!/usr/bin/env bash
->   
-> +get_qemu_machine ()
-> +{
-> +	if [ "$MACHINE" ]; then
-> +		echo $MACHINE
-> +	else
-> +		echo pseries
-> +	fi
-> +}
-> +
->   if [ -z "$KUT_STANDALONE" ]; then
->   	if [ ! -f config.mak ]; then
->   		echo "run ./configure && make first. See ./configure -h"
-> @@ -12,17 +21,30 @@ fi
->   ACCEL=$(get_qemu_accelerator) ||
->   	exit $?
->   
-> +MACHINE=$(get_qemu_machine) ||
-> +	exit $?
-> +
-> +if [ "$MACHINE" = "powernv" ] && [ "$ACCEL" = "kvm" ]; then
-> +	echo "powernv machine does not support KVM. ACCEL=tcg must be specified."
-> +	exit 2
-> +fi
-> +
->   qemu=$(search_qemu_binary) ||
->   	exit $?
->   
-> -if ! $qemu -machine '?' 2>&1 | grep 'pseries' > /dev/null; then
-> -	echo "$qemu doesn't support pSeries ('-machine pseries'). Exiting."
-> +if ! $qemu -machine '?' 2>&1 | grep $MACHINE > /dev/null; then
-> +	echo "$qemu doesn't support '-machine $MACHINE'. Exiting."
->   	exit 2
->   fi
->   
-> -M='-machine pseries'
-> +M="-machine $MACHINE"
->   M+=",accel=$ACCEL"
-> -command="$qemu -nodefaults $M -bios $FIRMWARE"
-> +B=""
-> +if [ "$MACHINE" = "pseries" ] ; then
-> +	B+="-bios $FIRMWARE"
-> +fi
-> +
-> +command="$qemu -nodefaults $M $B"
->   command+=" -display none -serial stdio -kernel"
->   command="$(migration_cmd) $(timeout_cmd) $command"
->   
+>+	rc = __linearize(ctxt, addr, &max_size, 1, false, true, ctxt->mode,
+>+		         &linear, KVM_X86_UNTAG_ADDR_SKIP_LAM);
+> 	if (rc == X86EMUL_CONTINUE)
+> 		ctxt->_eip = addr.ea;
+> 	return rc;
+>@@ -906,9 +910,11 @@ static int __do_insn_fetch_bytes(struct x86_emulate_ctxt *ctxt, int op_size)
+> 	 * __linearize is called with size 0 so that it does not do any
+> 	 * boundary check itself.  Instead, we use max_size to check
+> 	 * against op_size.
+>+	 *
+>+	 * skip LAM untag for instruction
 
+ditto
