@@ -2,29 +2,29 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7A11F6C2446
-	for <lists+kvm@lfdr.de>; Mon, 20 Mar 2023 23:10:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 717DD6C2445
+	for <lists+kvm@lfdr.de>; Mon, 20 Mar 2023 23:10:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229663AbjCTWK5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Mar 2023 18:10:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60952 "EHLO
+        id S229757AbjCTWK4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Mar 2023 18:10:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60796 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229736AbjCTWKw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 Mar 2023 18:10:52 -0400
-Received: from out-32.mta1.migadu.com (out-32.mta1.migadu.com [95.215.58.32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85E3710417
-        for <kvm@vger.kernel.org>; Mon, 20 Mar 2023 15:10:45 -0700 (PDT)
+        with ESMTP id S229453AbjCTWKx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 Mar 2023 18:10:53 -0400
+Received: from out-58.mta1.migadu.com (out-58.mta1.migadu.com [IPv6:2001:41d0:203:375::3a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E54B71CAE5
+        for <kvm@vger.kernel.org>; Mon, 20 Mar 2023 15:10:47 -0700 (PDT)
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1679350243;
+        t=1679350245;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=B0MAiZsfV73QQgFZs05G6PDxfuTA4GcVrU7YuXv0Sd0=;
-        b=N6LM1i/1hqJH+9DeuxVysgmXIxqUfgG+CQmuLBv63bH2gbmv2zevnOcgxk8220liRfemmr
-        bJAvgAJoQfawi988E+tyG4FStLoVN5mw4ibQYDG6suraDQ+bppB9nL9hP8+csXWcyLyPgF
-        4+c3/r/IJm/PyDmGpRJQwGAAr6IJDic=
+        bh=NX+zgnfJ/oGTbRu3KKYL4GZduU4JUJo9BDONnVgt4Kk=;
+        b=AyICnckkaqibJKNTaBdIicvy3XXrYFJ1pTlQ3o7HL+EalzqfVRJgRRgElabgg7k9Csdmv7
+        gq4lV2+ijnafIdGDviR/fd9RPf8tNtEaW9/sCgOGbs7w2iyvN07JWdbJizf4LLQCejBBnB
+        iuhK7Na9mih7b58pAar2JTlRgz6dUzE=
 From:   Oliver Upton <oliver.upton@linux.dev>
 To:     kvmarm@lists.linux.dev
 Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
@@ -35,9 +35,9 @@ Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
         Salil Mehta <salil.mehta@huawei.com>,
         Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH 08/11] KVM: arm64: Add support for KVM_EXIT_HYPERCALL
-Date:   Mon, 20 Mar 2023 22:09:59 +0000
-Message-Id: <20230320221002.4191007-9-oliver.upton@linux.dev>
+Subject: [PATCH 09/11] KVM: arm64: Indroduce support for userspace SMCCC filtering
+Date:   Mon, 20 Mar 2023 22:10:00 +0000
+Message-Id: <20230320221002.4191007-10-oliver.upton@linux.dev>
 In-Reply-To: <20230320221002.4191007-1-oliver.upton@linux.dev>
 References: <20230320221002.4191007-1-oliver.upton@linux.dev>
 MIME-Version: 1.0
@@ -52,147 +52,245 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-In anticipation of user hypercall filters, add the necessary plumbing to
-get SMCCC calls out to userspace. Even though the exit structure has
-space for KVM to pass register arguments, let's just avoid it altogether
-and let userspace poke at the registers via KVM_GET_ONE_REG.
+As the SMCCC (and related specifications) march towards an 'everything
+and the kitchen sink' interface for interacting with a system it becomes
+less likely that KVM will support every related feature. We could do
+better by letting userspace have a crack at it instead.
 
-This deliberately stretches the definition of a 'hypercall' to cover
-SMCs from EL1 in addition to the HVCs we know and love. KVM doesn't
-support EL1 calls into secure services, but now we can paint that as a
-userspace problem and be done with it.
-
-Finally, we need a flag to let userspace know what conduit instruction
-was used (i.e. SMC vs. HVC).
+Allow userspace to define an 'SMCCC filter' that applies to both HVCs
+and SMCs initiated by the guest. Supporting both conduits with this
+interface is important for a couple of reasons. Guest SMC usage is table
+stakes for a nested guest, as HVCs are always taken to the virtual EL2.
+Additionally, guests may want to interact with a service on the secure
+side which can now be proxied by userspace.
 
 Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- Documentation/virt/kvm/api.rst    | 24 +++++++++++++++++++++---
- arch/arm64/include/uapi/asm/kvm.h |  4 ++++
- arch/arm64/kvm/handle_exit.c      |  4 +++-
- arch/arm64/kvm/hypercalls.c       | 19 +++++++++++++++++++
- 4 files changed, 47 insertions(+), 4 deletions(-)
+ Documentation/virt/kvm/devices/vm.rst | 74 +++++++++++++++++++++++++++
+ arch/arm64/include/uapi/asm/kvm.h     | 11 ++++
+ arch/arm64/kvm/arm.c                  |  4 ++
+ arch/arm64/kvm/hypercalls.c           | 58 +++++++++++++++++++++
+ include/kvm/arm_hypercalls.h          |  3 ++
+ 5 files changed, 150 insertions(+)
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index 62de0768d6aa..3b43520003a2 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -6219,14 +6219,32 @@ to the byte array.
- 			__u64 args[6];
- 			__u64 ret;
- 			__u32 longmode;
--			__u32 pad;
-+			__u32 flags;
- 		} hypercall;
- 
--Unused.  This was once used for 'hypercall to userspace'.  To implement
--such functionality, use KVM_EXIT_IO (x86) or KVM_EXIT_MMIO (all except s390).
+diff --git a/Documentation/virt/kvm/devices/vm.rst b/Documentation/virt/kvm/devices/vm.rst
+index 147efec626e5..9bba8bacbd5d 100644
+--- a/Documentation/virt/kvm/devices/vm.rst
++++ b/Documentation/virt/kvm/devices/vm.rst
+@@ -321,3 +321,77 @@ Allows userspace to query the status of migration mode.
+ 	     if it is enabled
+ :Returns:   -EFAULT if the given address is not accessible from kernel space;
+ 	    0 in case of success.
 +
-+It is strongly recommended that userspace use ``KVM_EXIT_IO`` (x86) or
-+``KVM_EXIT_MMIO`` (all except s390) to implement functionality that
-+requires a guest to interact with host userpace.
- 
- .. note:: KVM_EXIT_IO is significantly faster than KVM_EXIT_MMIO.
- 
-+For arm64:
-+----------
++6. GROUP: KVM_ARM_VM_SMCCC_CTRL
++===============================
 +
-+SMCCC exits can be enabled depending on the configuration of the SMCCC
-+filter. See the Documentation/virt/kvm/devices/vm.rst
-+``KVM_ARM_SMCCC_FILTER`` for more details.
++:Architectures: arm64
 +
-+``nr`` contains the function ID of the guest's SMCCC call. Userspace is
-+expected to use the ``KVM_GET_ONE_REG`` ioctl to retrieve the call
-+parameters from the vCPU's GPRs.
++6.1. ATTRIBUTE: KVM_ARM_VM_SMCCC_FILTER (w/o)
++---------------------------------------------
 +
-+Definition of ``flags``:
-+ - ``KVM_HYPERCALL_EXIT_SMC``: Indicates that the guest used the SMC
-+   conduit to initiate the SMCCC call. If this bit is 0 then the guest
-+   used the HVC conduit for the SMCCC call.
++:Parameters: Pointer to a ``struct kvm_smccc_filter``
 +
- ::
- 
- 		/* KVM_EXIT_TPR_ACCESS */
++:Returns:
++
++        =======  ===========================================
++        -EPERM   Range intersects with a reserved range
++        -EEXIST  Range intersects with a previously inserted
++                 range
++        -EBUSY   A vCPU in the VM has already run
++        -EINVAL  Invalid filter configuration
++        -ENOMEM  Failed to allocate memory for the in-kernel
++                 representation of the SMCCC filter
++        =======  ===========================================
++
++Requests the installation of an SMCCC call filter described as follows::
++
++    enum kvm_smccc_filter_action {
++            KVM_SMCCC_FILTER_ALLOW = 0,
++            KVM_SMCCC_FILTER_DENY,
++            KVM_SMCCC_FILTER_FWD_TO_USER,
++    };
++
++    struct kvm_smccc_filter {
++            __u32 base;
++            __u32 nr_functions;
++            __u8 action;
++            __u8 pad[7];
++    };
++
++The filter is defined as a set of non-overlapping ranges. Each
++range defines an action to be applied to SMCCC calls within the range.
++Userspace can insert multiple ranges into the filter by using
++successive calls to this attribute.
++
++The default configuration of KVM is such that all implemented SMCCC
++calls are allowed. Thus, the SMCCC filter can be defined sparsely
++by userspace, only describing ranges that modify the default behavior.
++
++The range expressed by ``struct kvm_smccc_filter`` is
++[``base``, ``base + nr_functions``).
++
++The SMCCC filter applies to both SMC and HVC calls initiated by the
++guest.
++
++Actions:
++
++ - ``KVM_SMCCC_FILTER_ALLOW``: Allows the guest SMCCC call to be
++   handled in-kernel. It is strongly recommended that userspace *not*
++   explicitly describe the allowed SMCCC call ranges.
++
++ - ``KVM_SMCCC_FILTER_DENY``: Rejects the guest SMCCC call in-kernel
++   and returns to the guest.
++
++ - ``KVM_SMCCC_FILTER_FWD_TO_USER``: The guest SMCCC call is forwarded
++   to userspace with an exit reason of ``KVM_EXIT_HYPERCALL``.
++
++KVM reserves the 'Arm Architecture Calls' range of function IDs and
++will reject attempts to define a filter for any portion of these ranges:
++
++        =========== ===============
++        Start       End (inclusive)
++        =========== ===============
++        0x8000_0000 0x8000_FFFF
++        0xC000_0000 0xC000_FFFF
++        =========== ===============
 diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-index bbab92402510..1dabb7d05514 100644
+index 1dabb7d05514..ba188562b7e0 100644
 --- a/arch/arm64/include/uapi/asm/kvm.h
 +++ b/arch/arm64/include/uapi/asm/kvm.h
-@@ -472,12 +472,16 @@ enum {
- enum kvm_smccc_filter_action {
- 	KVM_SMCCC_FILTER_ALLOW = 0,
- 	KVM_SMCCC_FILTER_DENY,
-+	KVM_SMCCC_FILTER_FWD_TO_USER,
- 
- #ifdef __KERNEL__
- 	NR_SMCCC_FILTER_ACTIONS
+@@ -372,6 +372,10 @@ enum {
  #endif
  };
  
-+/* arm64-specific KVM_EXIT_HYPERCALL flags */
-+#define KVM_HYPERCALL_EXIT_SMC	(1U << 0)
++/* Device Control API on vm fd */
++#define KVM_ARM_VM_SMCCC_CTRL		0
++#define   KVM_ARM_VM_SMCCC_FILTER	0
 +
+ /* Device Control API: ARM VGIC */
+ #define KVM_DEV_ARM_VGIC_GRP_ADDR	0
+ #define KVM_DEV_ARM_VGIC_GRP_DIST_REGS	1
+@@ -479,6 +483,13 @@ enum kvm_smccc_filter_action {
  #endif
+ };
  
- #endif /* __ARM_KVM_H__ */
-diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-index 68f95dcd41a1..3f43e20c48b6 100644
---- a/arch/arm64/kvm/handle_exit.c
-+++ b/arch/arm64/kvm/handle_exit.c
-@@ -71,7 +71,9 @@ static int handle_smc(struct kvm_vcpu *vcpu)
- 	 * Trap exception, not a Secure Monitor Call exception [...]"
- 	 *
- 	 * We need to advance the PC after the trap, as it would
--	 * otherwise return to the same address...
-+	 * otherwise return to the same address. Furthermore, pre-incrementing
-+	 * the PC before potentially exiting to userspace maintains the same
-+	 * abstraction for both SMCs and HVCs.
- 	 */
- 	kvm_incr_pc(vcpu);
++struct kvm_smccc_filter {
++	__u32 base;
++	__u32 nr_functions;
++	__u8 action;
++	__u8 pad[7];
++};
++
+ /* arm64-specific KVM_EXIT_HYPERCALL flags */
+ #define KVM_HYPERCALL_EXIT_SMC	(1U << 0)
  
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 1202ac03bee0..efee032c9560 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -1444,6 +1444,8 @@ static int kvm_vm_ioctl_set_device_addr(struct kvm *kvm,
+ static int kvm_vm_has_attr(struct kvm *kvm, struct kvm_device_attr *attr)
+ {
+ 	switch (attr->group) {
++	case KVM_ARM_VM_SMCCC_CTRL:
++		return kvm_vm_smccc_has_attr(kvm, attr);
+ 	default:
+ 		return -ENXIO;
+ 	}
+@@ -1452,6 +1454,8 @@ static int kvm_vm_has_attr(struct kvm *kvm, struct kvm_device_attr *attr)
+ static int kvm_vm_set_attr(struct kvm *kvm, struct kvm_device_attr *attr)
+ {
+ 	switch (attr->group) {
++	case KVM_ARM_VM_SMCCC_CTRL:
++		return kvm_vm_smccc_set_attr(kvm, attr);
+ 	default:
+ 		return -ENXIO;
+ 	}
 diff --git a/arch/arm64/kvm/hypercalls.c b/arch/arm64/kvm/hypercalls.c
-index 76d39297ed18..2843c8493c8a 100644
+index 2843c8493c8a..e30c3d59f9d7 100644
 --- a/arch/arm64/kvm/hypercalls.c
 +++ b/arch/arm64/kvm/hypercalls.c
-@@ -180,6 +180,19 @@ static u8 kvm_smccc_get_action(struct kvm_vcpu *vcpu, u32 func_id)
- 	return KVM_SMCCC_FILTER_DENY;
+@@ -145,6 +145,42 @@ static void init_smccc_filter(struct kvm *kvm)
+ 	KVM_BUG_ON(r, kvm);
  }
  
-+static void kvm_prepare_hypercall_exit(struct kvm_vcpu *vcpu, u32 func_id)
++static int kvm_smccc_set_filter(struct kvm *kvm, struct kvm_smccc_filter __user *uaddr)
 +{
-+	u8 ec = ESR_ELx_EC(kvm_vcpu_get_esr(vcpu));
-+	struct kvm_run *run = vcpu->run;
++	struct kvm_smccc_filter filter;
++	unsigned long start, end;
++	int r;
 +
-+	run->exit_reason = KVM_EXIT_HYPERCALL;
-+	run->hypercall.nr = func_id;
-+	run->hypercall.flags = 0;
++	if (copy_from_user(&filter, uaddr, sizeof(filter)))
++		return -EFAULT;
 +
-+	if (ec == ESR_ELx_EC_SMC32 || ec == ESR_ELx_EC_SMC64)
-+		run->hypercall.flags |= KVM_HYPERCALL_EXIT_SMC;
++	mutex_lock(&kvm->lock);
++
++	if (kvm_vm_has_ran_once(kvm)) {
++		r = -EBUSY;
++		goto out_unlock;
++	}
++
++	if (!filter.nr_functions || filter.action >= NR_SMCCC_FILTER_ACTIONS) {
++		r = -EINVAL;
++		goto out_unlock;
++	}
++
++	start = filter.base;
++	end = start + filter.nr_functions - 1;
++
++	r = mtree_insert_range(&kvm->arch.smccc_filter, start, end,
++			       xa_mk_value(filter.action), GFP_KERNEL_ACCOUNT);
++	if (r)
++		goto out_unlock;
++
++	set_bit(KVM_ARCH_FLAG_SMCCC_FILTER_CONFIGURED, &kvm->arch.flags);
++
++out_unlock:
++	mutex_unlock(&kvm->lock);
++	return r;
 +}
 +
- int kvm_smccc_call_handler(struct kvm_vcpu *vcpu)
+ static u8 kvm_smccc_filter_get_action(struct kvm *kvm, u32 func_id)
  {
- 	struct kvm_smccc_features *smccc_feat = &vcpu->kvm->arch.smccc_feat;
-@@ -192,6 +205,10 @@ int kvm_smccc_call_handler(struct kvm_vcpu *vcpu)
- 	action = kvm_smccc_get_action(vcpu, func_id);
- 	if (action == KVM_SMCCC_FILTER_DENY)
- 		goto out;
-+	if (action == KVM_SMCCC_FILTER_FWD_TO_USER) {
-+		kvm_prepare_hypercall_exit(vcpu, func_id);
-+		return 0;
-+	}
+ 	unsigned long idx = func_id;
+@@ -566,3 +602,25 @@ int kvm_arm_set_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
  
- 	switch (func_id) {
- 	case ARM_SMCCC_VERSION_FUNC_ID:
-@@ -206,6 +223,8 @@ int kvm_smccc_call_handler(struct kvm_vcpu *vcpu)
- 				break;
- 			case SPECTRE_MITIGATED:
- 				val[0] = SMCCC_RET_SUCCESS;
-+	kvm_incr_pc(vcpu);
+ 	return -EINVAL;
+ }
 +
- 				break;
- 			case SPECTRE_UNAFFECTED:
- 				val[0] = SMCCC_ARCH_WORKAROUND_RET_UNAFFECTED;
++int kvm_vm_smccc_has_attr(struct kvm *kvm, struct kvm_device_attr *attr)
++{
++	switch (attr->attr) {
++	case KVM_ARM_VM_SMCCC_FILTER:
++		return 0;
++	default:
++		return -ENXIO;
++	}
++}
++
++int kvm_vm_smccc_set_attr(struct kvm *kvm, struct kvm_device_attr *attr)
++{
++	void __user *uaddr = (void __user *)attr->addr;
++
++	switch (attr->attr) {
++	case KVM_ARM_VM_SMCCC_FILTER:
++		return kvm_smccc_set_filter(kvm, uaddr);
++	default:
++		return -ENXIO;
++	}
++}
+diff --git a/include/kvm/arm_hypercalls.h b/include/kvm/arm_hypercalls.h
+index fe6c31575b05..2df152207ccd 100644
+--- a/include/kvm/arm_hypercalls.h
++++ b/include/kvm/arm_hypercalls.h
+@@ -49,4 +49,7 @@ int kvm_arm_copy_fw_reg_indices(struct kvm_vcpu *vcpu, u64 __user *uindices);
+ int kvm_arm_get_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg);
+ int kvm_arm_set_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg);
+ 
++int kvm_vm_smccc_has_attr(struct kvm *kvm, struct kvm_device_attr *attr);
++int kvm_vm_smccc_set_attr(struct kvm *kvm, struct kvm_device_attr *attr);
++
+ #endif
 -- 
 2.40.0.rc1.284.g88254d51c5-goog
 
