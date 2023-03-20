@@ -2,116 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 825B96C2112
-	for <lists+kvm@lfdr.de>; Mon, 20 Mar 2023 20:16:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7E1586C211C
+	for <lists+kvm@lfdr.de>; Mon, 20 Mar 2023 20:17:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231556AbjCTTQf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Mar 2023 15:16:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45872 "EHLO
+        id S231254AbjCTTRg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Mar 2023 15:17:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51224 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231418AbjCTTQM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 Mar 2023 15:16:12 -0400
-Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1nam02on2085.outbound.protection.outlook.com [40.107.96.85])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 427AA3B850;
-        Mon, 20 Mar 2023 12:08:10 -0700 (PDT)
+        with ESMTP id S231459AbjCTTRC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 Mar 2023 15:17:02 -0400
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2080.outbound.protection.outlook.com [40.107.93.80])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7A8618B12;
+        Mon, 20 Mar 2023 12:09:04 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=UFS0hxI4H1pf+i1Zw05LHATZAFSUkzQlnDJrnsAnDmWPL3+Tl8jkytnBbHqogMMTwEUE/U+x+FVkWZMMyo17R6EeI8ow+ybZLZ6wA+I0MTGjy4OT6TqorUCAPPqDN7hBUEITjBPwuhhq8JsjWWkjmFpcbKFhYt0n1CBYs4ghH6ka33vhlT4nlMQabhOz8cDXZuM+nsqs7ISPqMtE7A4HVzNCSKmgdWybHq7zOnOt1ZDPyv2bE97atvAO3+UBv5cvKu5YHCcylKyewr3UG+ySmq6ABK0iPWk/nYz++mZVc4zJopYWHFIjYVdYMZrFEtRHSoNdRTRRoSjqa7RtilBuqg==
+ b=im00wn4RtiihvtjNqes0NddaPIayDVxlGh0kva17tg3ns9CE6qg+rNSc9bviVRBCf14IoRNzwH8kSd8jEUkcTF0lhF9Yxe+M2iDDQ0XcCjKk6lX1autzh3PCy6razwmMtrMCSpa9zDOKAlGWL5ZokTbYx+4MvITqaeN8D4NPXWORxEAlWBw4so5DnS7+765u7Arv5ms6Yq0PiCg4JHjyWqm29rUUSUdpe/LoT0yJN/SgYDCTSz642tCFsEfiT7s0m04QYEwJEtdY4z+1ov9blUfJ1eVk47WIa7NCsY3msti3eKYhvLcGzG1RhHozptj/Ok69rSFoOecJ8chqEtdHKw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=vtkgITDDVN/UdhLiUfKsgQVzvCsf0t3AvaJh76R8lSk=;
- b=Aum6VLDu03PuP38JSNGstYK5Ni+ZyjWsY9hEPqFLX/pK1g/EINkKI2oAyu6MHKWOmYjnzo1dwCOlroaT0VKqRoV5mOOh7+MW7xQlpWZ9ohr9a+HQoJheHYTU+B8xfi8v7vB+ucf/Sot7JKIGSpjgMJzt/plY9O27XGEFl+ufuB+xNP0xdbmBgyNjOg9JkYwFE3yVHfYlv7N174hwHh9zqof2Q7m9byh71svj+nK9NLsDvPhbzosexStl+I3yoq5cOTDp3CAigv1zVL8W1ky5A2sb69arqEPkUVyosMA8B2L1Xj6lC/4/v10OxzqBs2vHcICPt3tlOAyF0O79CCMzXQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
+ bh=5NLlAPZwMiSazJEbO/+mgSBbKlTZVM+3pZVnxsQgw6U=;
+ b=bZBAu3a99pJ4HEVeyPbRx3O0guuFPmdv2/P61v87K2SUZ4XQ/zG4yp946JwIaKvJXegGRGhW+1tngTd8+oQPLunO1a61Oj/ln9AFysG0E5xBzckEjhHNu8IdRVIpkq8rhlKPydGT8lFlJuLSZrZ2dvWdQwPNvTmi+E6PoTLl6AYdUEsk8Zpkr7zDtC7x3/KYxVLWeET7mWRm9HsT0vDad5WG9bw8XSoBLV632Ro4q0UVmGhaQuXzac+xWGc6ZmwvNR3p+ZcrTOlBQ8GjD3EdS/vEgpkIVrdhB+6BA0VksTtjVap6cmFhz2BcuiQw92MXss3fkbsFJ+JIadfr+I/3Yg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=linux.intel.com smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=vtkgITDDVN/UdhLiUfKsgQVzvCsf0t3AvaJh76R8lSk=;
- b=Y/Dj3/8/INjMmYO+u/3H3QSx7DwpQ+JlF9bhfmIBErM9urMb2OqsAnlT+sTKKYodxUURq4Q65l4997XG7jm6vxdTf8oIIxiuthq1szjNwDJBru/UBHXlJKMpc4qNzu8cJXSfT0joi4r7x/c9kmNeiZ76npMKAV+5bUGsMvdbeoTqwHsE/TqbQ9oTlorX5c+OhKH+15jXTmMKB+4Moiy+jdI4eIZVBeQR0A52AaGAaLlTbHe1jr3wZEuXsLh/OlPZGSun/VU5zi5me0O9DWa34BRO2cqvhgDR2Qb7bBr5FYY5eYaiZPsOjbXG0arjKIJgZ1nnoicmuRy2lUHmWHyjpg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by MW3PR12MB4489.namprd12.prod.outlook.com (2603:10b6:303:5e::8) with
+ bh=5NLlAPZwMiSazJEbO/+mgSBbKlTZVM+3pZVnxsQgw6U=;
+ b=kXQcxgoQ4Txx7PnMIte47ih3PYC/NXw8L9Av1/I6He9bSUwqcn0VCBJei+OAa+lVwDWEKgbUVxX07cX4kbfZrhHqaKK4hGLZwNmdpJKjDO4HvV5Yl1GhPsMbO7GUiib7u2QbUub1KrqTtDyk4uqa3fT6WDlxxtsep+2bJe4x/R8=
+Received: from DM6PR02CA0089.namprd02.prod.outlook.com (2603:10b6:5:1f4::30)
+ by MW4PR12MB6731.namprd12.prod.outlook.com (2603:10b6:303:1eb::11) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6178.37; Mon, 20 Mar
- 2023 19:07:33 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::ef6d:fdf6:352f:efd1]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::ef6d:fdf6:352f:efd1%3]) with mapi id 15.20.6178.037; Mon, 20 Mar 2023
- 19:07:37 +0000
-Date:   Mon, 20 Mar 2023 16:07:35 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Yi Liu <yi.l.liu@intel.com>
-Cc:     alex.williamson@redhat.com, kevin.tian@intel.com, joro@8bytes.org,
-        robin.murphy@arm.com, cohuck@redhat.com, eric.auger@redhat.com,
-        nicolinc@nvidia.com, kvm@vger.kernel.org, mjrosato@linux.ibm.com,
-        chao.p.peng@linux.intel.com, yi.y.sun@linux.intel.com,
-        peterx@redhat.com, jasowang@redhat.com,
-        shameerali.kolothum.thodi@huawei.com, lulu@redhat.com,
-        suravee.suthikulpanit@amd.com, intel-gvt-dev@lists.freedesktop.org,
-        intel-gfx@lists.freedesktop.org, linux-s390@vger.kernel.org,
-        xudong.hao@intel.com, yan.y.zhao@intel.com, terrence.xu@intel.com
-Subject: Re: [PATCH 6/7] vfio: Accpet device file from vfio PCI hot reset path
-Message-ID: <ZBiu9+mVurbW0x5k@nvidia.com>
-References: <20230316124156.12064-1-yi.l.liu@intel.com>
- <20230316124156.12064-7-yi.l.liu@intel.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230316124156.12064-7-yi.l.liu@intel.com>
-X-ClientProxiedBy: MN2PR15CA0032.namprd15.prod.outlook.com
- (2603:10b6:208:1b4::45) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+ 2023 19:08:54 +0000
+Received: from DM6NAM11FT093.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:5:1f4:cafe::b4) by DM6PR02CA0089.outlook.office365.com
+ (2603:10b6:5:1f4::30) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6178.37 via Frontend
+ Transport; Mon, 20 Mar 2023 19:08:54 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ DM6NAM11FT093.mail.protection.outlook.com (10.13.172.235) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.6222.16 via Frontend Transport; Mon, 20 Mar 2023 19:08:54 +0000
+Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Mon, 20 Mar
+ 2023 14:08:53 -0500
+Date:   Mon, 20 Mar 2023 14:08:36 -0500
+From:   Michael Roth <michael.roth@amd.com>
+To:     "Nikunj A. Dadhania" <nikunj@amd.com>
+CC:     Chao Peng <chao.p.peng@linux.intel.com>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <linux-mm@kvack.org>,
+        <linux-fsdevel@vger.kernel.org>, <linux-arch@vger.kernel.org>,
+        <linux-api@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+        <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Naoya Horiguchi <naoya.horiguchi@nec.com>,
+        Miaohe Lin <linmiaohe@huawei.com>, <x86@kernel.org>,
+        "H . Peter Anvin" <hpa@zytor.com>, Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        <luto@kernel.org>, <jun.nakajima@intel.com>,
+        <dave.hansen@intel.com>, <ak@linux.intel.com>, <david@redhat.com>,
+        <aarcange@redhat.com>, <ddutile@redhat.com>, <dhildenb@redhat.com>,
+        Quentin Perret <qperret@google.com>, <tabba@google.com>,
+        <mhocko@suse.com>, <wei.w.wang@intel.com>
+Subject: Re: [PATCH v10 1/9] mm: Introduce memfd_restricted system call to
+ create restricted user memory
+Message-ID: <20230320190836.z2rqrhybke3egiuu@amd.com>
+References: <20221202061347.1070246-1-chao.p.peng@linux.intel.com>
+ <20221202061347.1070246-2-chao.p.peng@linux.intel.com>
+ <86d7cc82-8ff9-769b-f80f-ff18fe28f44d@amd.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <86d7cc82-8ff9-769b-f80f-ff18fe28f44d@amd.com>
+X-Originating-IP: [10.180.168.240]
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|MW3PR12MB4489:EE_
-X-MS-Office365-Filtering-Correlation-Id: 046aacf1-5586-4b19-b1e2-08db29765e73
+X-MS-TrafficTypeDiagnostic: DM6NAM11FT093:EE_|MW4PR12MB6731:EE_
+X-MS-Office365-Filtering-Correlation-Id: de5474ad-425d-4847-530e-08db29768c62
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: FvvEIcPqVr0fxXnRylbd8uu6OSQwMAzp5HLca9jzjs54guwS28I55Oe7/pzo8j+Hf5CRNrjFnq3JqUbHSFrShc+u3mgfaB04r5bjxf9JOb8DAUjJNojFbTVKVQeBZplLaaU/0pEXu32MFlM6jD5WRRlZ2lp2ds54PuelfuYT3Hd3JZIGF5HXdymPhvyqvGEUrsgtNzHqmYB6c79tSaIqF3yi+LzdgwbFV3noIi8bG9ioZ9dwOxcH+f1ORb8lRrVw6tvc6p87QCUeoEu7HCscatTMCkgpmdchK6/72oqufh8lYf8wU+1PdMTlJsHo22N5yh06AmnXjEdTtQ3XdE5+cI9m0s1jI1yYAl+0RHNi2lWG6hIJfFE3SgKcVqju9rnN6aKpnAVChdZP4PN2drY/giCBzrp8o/leknoEhh8G3Xp/vXrcIV9zNs5nQwxjZGgpi1RzKKR10mkFJgnKT1y3zqdd2M4U+ug5Ul/Dkez2dNQC77qQU0zQRe9CKi+JtTGrlUU9y/sn+vWrzHV7CdqwMXACoNtRfLqAhzqYsClXBqlt6V9hLNnzB0XyMbtGgoy7YJkc69JOP1RqUdvfj5eNx7ktxJ6D995irwW8dHsb1I4KyHvW5LyfHUhx0xYshxYNUyloALWDLeSR2LSH56D7QwJBCaWdSAmQXCtREQAcjUiNXoDzj+B8WQYpj5ThCR8H
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(39860400002)(396003)(376002)(346002)(136003)(366004)(451199018)(38100700002)(86362001)(4744005)(316002)(8676002)(478600001)(66946007)(66476007)(66556008)(36756003)(6916009)(41300700001)(8936002)(4326008)(7416002)(5660300002)(2906002)(83380400001)(2616005)(6506007)(26005)(6512007)(186003)(6486002)(67856001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?VE6XnuyqOHXHnIVAYCigLYncuQ6VwpNicRffB005ETGhBkaxAhACOSzfKwjX?=
- =?us-ascii?Q?cZi0qf5ToFH3xiKGOTELj5JddCxEnUbQLe4udSZEvYB3BiCP6POtBLmekGug?=
- =?us-ascii?Q?fm37/a4ylS3GpFZOcMwSNa/sPrWjPSMMxwIz2CdMRFW2/8nllttwoEvNyV/I?=
- =?us-ascii?Q?5b8bY5D+2yuWYwToil8fJKUO68HXEX+UeglyE3+EKUnH1Q+z8ZlAOV2wreio?=
- =?us-ascii?Q?1RXav3xgaxZahdFEKf7w3mrkmriqFUqYV58xcCsqqSPDI58KhJwxB0F+qAcG?=
- =?us-ascii?Q?dL697GqKaXI5Lv/dOgx8BqulRCORMqfNtbef3qeXK9GkSyrDXAPwBqJypntj?=
- =?us-ascii?Q?MBV9KXeR+VSZpian88sBWICDH4dqDNMSerjuW5/pUGzCsebIv59oOuMeKbvI?=
- =?us-ascii?Q?3xDgYU/mjuS4QdcJYZjCLOLVJcpLlHf5ZXJmjWhaRWL75gYqY22RFHG6dnWH?=
- =?us-ascii?Q?iSGZUXI1/6N4Ww3FDOBoKiOMM4YN1FuYVmBgUprZ25uuoEDTXjFRXgIl6DAt?=
- =?us-ascii?Q?j/r3OnAT5INajMgcn4nlZSmKR7xYH8Su0pJClFg9rO7/OYaA7hjdwemsMi5X?=
- =?us-ascii?Q?MKOkGNEwfhj33yVdY7KKwmtxmWhARVyVxt8W2FSu3ftcvCPv1vUOtpZGAFgC?=
- =?us-ascii?Q?bDRIIi/RM2oC0fn2WlIjvjiq96RnBPBKJm5yPK6QFqd2cxpAhETrpjHhv9mF?=
- =?us-ascii?Q?e3nysIMtMfA4M4Mn2QsQ5tC476OBcZP+s/7sCVi/EBeZva1zdKbS4Uv6glEi?=
- =?us-ascii?Q?hliCZy43r/dFYLydLtNty2qWpM5CIEAp7HJQ0H5WnrIkmlNUXazRY5IBlkXi?=
- =?us-ascii?Q?aq71vcREJOq4qyWMzcZaMv79w3tOsMBSwZpn41JB8t2RyoLKiGK9sFFWUcYg?=
- =?us-ascii?Q?wBw0yHo6uOor2xd233p4EXwFEt+HmuGVq+eJFn6unCpSmDNon8I3aJxb2GoL?=
- =?us-ascii?Q?HpN2rvjtkT2xNCjc2sDWYHebrhOBl4em/g4MYm4j1+zaCFLNgJkYfeaghVP9?=
- =?us-ascii?Q?fI3im96BbluWiuyYdSh1DB6vLSBarRecm70NLryY4IYHsuCvnlcjILpWXLqX?=
- =?us-ascii?Q?qB9y9elCXFI6YCWItZgnT3SGkfpv9Vfs/kWNZRYNKqg9W92/2iCcHvWpZwYT?=
- =?us-ascii?Q?GXz7x6CLLWY8hPTB92hsu5qxO3RAeJzg9WfJTV7UZS0nmQ6C0tJBEadJGLl7?=
- =?us-ascii?Q?ZYL4Daqsvk6dBrjqK5ZsRByZiLUvo/d5XgzNPmuneFO0AHkT9EtNYrYM0NEb?=
- =?us-ascii?Q?EXEM7NlcY3MQC+YGYETqeUImIK1BuMLCaqC0ReOeuSiT+5E9+tkuMMmE/QcX?=
- =?us-ascii?Q?QKNrU8akEWwahSB7aMG/y6zSYRIAatCkT6hxKYbbRsyxUBl0Dn1KLklwjvhk?=
- =?us-ascii?Q?qNQJ0JJlo91XSJSwyzFLrNkcCu/R4RAFiPbpOV477jP3CwhBdME0YT0kPs9T?=
- =?us-ascii?Q?0lYDbNr4oVKRw2+Ntn30tA93wnESkHdG/cNGdrdtR84xong2E232wsc94848?=
- =?us-ascii?Q?FwC+zkAZ89HCcCdn0OxKXFs4RGt+/jEps41GU/D+inh78SIGtnfTwQFt5s49?=
- =?us-ascii?Q?NSk2jn5XkMQCWPEja511Ql/B6WkP6ZUWhuuzKP5B?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 046aacf1-5586-4b19-b1e2-08db29765e73
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Mar 2023 19:07:37.2920
+X-Microsoft-Antispam-Message-Info: 6OSETOd3/d0/TdfWptG6EQZdZ2VsQ6H93+9cEYnqeDNTrUInSl5t+LAYRCKdh5V7eJ0VFJq6KJ5oG1zTxgs65+GIrM6iohaF/xnRIeDk4/l8D9Z3wpmGXKxJ7n6YvnoP3fNikk4TG85yP10434dCXMi2dsfar5FiL+EeIZlcXM0UT+PbkzpoXMPIJ1infiWVnl9fYrS8bi0Yz4U6BV+phE/1ukNxo1q6M+b03/CbNycJ3RVQ8pikrnV0lteV0+ZQp4EhaFRVGIpRApi0odLuvvlcaL+1WI9+BhMx1ilaYcm2UORWE63I6onSjCk0TrPErJquj7um8SKDhOdS7vbSAQK82+HLvrs8hM24ZmQgin3/bFWRBk5e8mMtarKMoWGcX8K7K5XHBaKi/VehHKokskRhHdhQKDYcemq5f139zJ7BfyNxYfeGnqdLbWFEjr+uNAPdo6uansTVyWMNmSOcSnIMiPmdzplE/2miVNxFFrkc0giHR0brQi+eKhbVop7ZB1XNeTaik8g1//ykBd2nHtPPXB4/V8300QvzWyrzwa+UWrsmOSxdmglcPMfKFYUTRW0erFvvHPqhDh1PyGikTP+F+Sa8B/xFY+3ajNwQLYgD8Qdhl3NhCFZ/onxsThUyZZo0jajx8mMQL1hjpHUN60MPUWA8ES8ON0Bc+ifI7edMMtfK69uSmpCTboMiHVQVz1bl5je1KWEnjKNLl/6n83TRDg3DCkYC34Olw+P12dI=
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230025)(4636009)(39860400002)(376002)(396003)(136003)(346002)(451199018)(40470700004)(46966006)(36840700001)(6862004)(7416002)(44832011)(5660300002)(7406005)(36860700001)(41300700001)(82310400005)(86362001)(356005)(40480700001)(8936002)(36756003)(82740400003)(40460700003)(81166007)(2906002)(6666004)(4326008)(966005)(336012)(83380400001)(478600001)(426003)(47076005)(2616005)(16526019)(186003)(1076003)(26005)(8676002)(37006003)(6636002)(316002)(54906003)(70586007)(70206006)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Mar 2023 19:08:54.0409
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: lKkmOdu5TfD6nrR7yLbqvQUKQydF7LtrKSwbF29c3Gku6qcCVAzisVxvjDXx8+/N
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW3PR12MB4489
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+X-MS-Exchange-CrossTenant-Network-Message-Id: de5474ad-425d-4847-530e-08db29768c62
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT093.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB6731
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
         RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -120,34 +130,79 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 16, 2023 at 05:41:55AM -0700, Yi Liu wrote:
-> This extends both vfio_file_is_valid() and vfio_file_has_dev() to accept
-> device file from the vfio PCI hot reset.
+On Thu, Feb 16, 2023 at 03:21:21PM +0530, Nikunj A. Dadhania wrote:
 > 
-> Signed-off-by: Yi Liu <yi.l.liu@intel.com>
-> ---
->  drivers/vfio/vfio_main.c | 23 +++++++++++++++++++----
->  1 file changed, 19 insertions(+), 4 deletions(-)
+> > +static struct file *restrictedmem_file_create(struct file *memfd)
+> > +{
+> > +	struct restrictedmem_data *data;
+> > +	struct address_space *mapping;
+> > +	struct inode *inode;
+> > +	struct file *file;
+> > +
+> > +	data = kzalloc(sizeof(*data), GFP_KERNEL);
+> > +	if (!data)
+> > +		return ERR_PTR(-ENOMEM);
+> > +
+> > +	data->memfd = memfd;
+> > +	mutex_init(&data->lock);
+> > +	INIT_LIST_HEAD(&data->notifiers);
+> > +
+> > +	inode = alloc_anon_inode(restrictedmem_mnt->mnt_sb);
+> > +	if (IS_ERR(inode)) {
+> > +		kfree(data);
+> > +		return ERR_CAST(inode);
+> > +	}
 > 
-> diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
-> index fe7446805afd..ebbb6b91a498 100644
-> --- a/drivers/vfio/vfio_main.c
-> +++ b/drivers/vfio/vfio_main.c
-> @@ -1154,13 +1154,23 @@ const struct file_operations vfio_device_fops = {
->  	.mmap		= vfio_device_fops_mmap,
->  };
->  
-> +static struct vfio_device *vfio_device_from_file(struct file *file)
-> +{
-> +	struct vfio_device *device = file->private_data;
+> alloc_anon_inode() uses new_pseudo_inode() to get the inode. As per the comment, new inode 
+> is not added to the superblock s_inodes list.
 
-Isn't this a df now?
+Another issue somewhat related to alloc_anon_inode() is that the shmem code
+in some cases assumes the inode struct was allocated via shmem_alloc_inode(),
+which allocates a struct shmem_inode_info, which is a superset of struct inode
+with additional fields for things like spinlocks.
 
-> +	if (file->f_op != &vfio_device_fops)
-> +		return NULL;
-> +	return device;
-> +}
+These additional fields don't get allocated/ininitialized in the case of
+restrictedmem, so when restrictedmem_getattr() tries to pass the inode on to
+shmem handler, it can cause a crash.
 
-The device has to be bound to be a security proof.
+For instance, the following trace was seen when executing 'sudo lsof' while a
+process/guest was running with an open memfd FD:
 
-Jason
+    [24393.121409] general protection fault, probably for non-canonical address 0xfe9fb182fea3f077: 0000 [#1] PREEMPT SMP NOPTI
+    [24393.133546] CPU: 2 PID: 590073 Comm: lsof Tainted: G            E      6.1.0-rc4-upm10b-host-snp-v8b+ #4
+    [24393.144125] Hardware name: AMD Corporation ETHANOL_X/ETHANOL_X, BIOS RXM1009B 05/14/2022
+    [24393.153150] RIP: 0010:native_queued_spin_lock_slowpath+0x3a3/0x3e0
+    [24393.160049] Code: f3 90 41 8b 04 24 85 c0 74 ea eb f4 c1 ea 12 83 e0 03 83 ea 01 48 c1 e0 05 48 63 d2 48 05 00 41 04 00 48 03 04 d5 e0 ea 8b 82 <48> 89 18 8b 43 08 85 c0 75 09 f3 90 8b 43 08 85 c0 74 f7 48 8b 13
+    [24393.181004] RSP: 0018:ffffc9006b6a3cf8 EFLAGS: 00010086
+    [24393.186832] RAX: fe9fb182fea3f077 RBX: ffff889fcc144100 RCX: 0000000000000000
+    [24393.194793] RDX: 0000000000003ffe RSI: ffffffff827acde9 RDI: ffffc9006b6a3cdf
+    [24393.202751] RBP: ffffc9006b6a3d20 R08: 0000000000000001 R09: 0000000000000000
+    [24393.210710] R10: 0000000000000000 R11: 000000000000ffff R12: ffff888179fa50e0
+    [24393.218670] R13: ffff889fcc144100 R14: 00000000000c0000 R15: 00000000000c0000
+    [24393.226629] FS:  00007f9440f45400(0000) GS:ffff889fcc100000(0000) knlGS:0000000000000000
+    [24393.235692] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+    [24393.242101] CR2: 000055c55a9cf088 CR3: 0008000220e9c003 CR4: 0000000000770ee0
+    [24393.250059] PKRU: 55555554
+    [24393.253073] Call Trace:
+    [24393.255797]  <TASK>
+    [24393.258133]  do_raw_spin_lock+0xc4/0xd0
+    [24393.262410]  _raw_spin_lock_irq+0x50/0x70
+    [24393.266880]  ? shmem_getattr+0x4c/0xf0
+    [24393.271060]  shmem_getattr+0x4c/0xf0
+    [24393.275044]  restrictedmem_getattr+0x34/0x40
+    [24393.279805]  vfs_getattr_nosec+0xbd/0xe0
+    [24393.284178]  vfs_getattr+0x37/0x50
+    [24393.287971]  vfs_statx+0xa0/0x150
+    [24393.291668]  vfs_fstatat+0x59/0x80
+    [24393.295462]  __do_sys_newstat+0x35/0x70
+    [24393.299739]  __x64_sys_newstat+0x16/0x20
+    [24393.304111]  do_syscall_64+0x3b/0x90
+    [24393.308098]  entry_SYSCALL_64_after_hwframe+0x63/0xcd
+
+As a workaround we've been doing the following, but it's probably not the
+proper fix:
+
+  https://github.com/AMDESE/linux/commit/0378116b5c4e373295c9101727f2cb5112d6b1f4
+
+-Mike
+
