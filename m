@@ -2,124 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E43FF6C24C1
-	for <lists+kvm@lfdr.de>; Mon, 20 Mar 2023 23:28:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0EFB06C243D
+	for <lists+kvm@lfdr.de>; Mon, 20 Mar 2023 23:10:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229679AbjCTW2K (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Mar 2023 18:28:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60768 "EHLO
+        id S229662AbjCTWKb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Mar 2023 18:10:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60258 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229601AbjCTW2J (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 Mar 2023 18:28:09 -0400
-X-Greylist: delayed 2318 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 20 Mar 2023 15:28:07 PDT
-Received: from mail.ilande.co.uk (mail.ilande.co.uk [IPv6:2001:41c9:1:41f::167])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 733A39004
-        for <kvm@vger.kernel.org>; Mon, 20 Mar 2023 15:28:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=ilande.co.uk; s=20220518; h=Subject:Content-Transfer-Encoding:Content-Type:
-        In-Reply-To:From:References:Cc:To:MIME-Version:Date:Message-ID:Sender:
-        Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender
-        :Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
-        List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=WyY8B4viD4bbQ+bFV2SBsFF2kC5CdxEpDJvMdyYf1TY=; b=PYiYoZPPC0ELlnHt8BthSJV1gJ
-        bgv5NzvfOCQ5tdjinwmuvyiHO1+sxSBq8XdbF4qIUT5FJ3Ge8+UmQah5ULiPmFxLxg6yHM8Oim7t4
-        IfbBSG1nm1vcsio6LifbGsPK468bwdGDDkx+tXS47wj8Y90SmbKtrBsERbNG42uvf8naHm24toyaC
-        zCb+VRgtIXTgbzNGJzClEPVTwfTve/DSxjz98L3JzUVUXtIht33PwB2D45ayI7OwuYX9ZRC6gz/Jp
-        0ZhjIFUC5J7hiUDU74IRv8ScYLLsSquUTEFLLlFe33mpXNGvt3ApZ4+/WLRw9avJr0fq6Ed//yMHi
-        FUQjqaY91JsAoVfnZOgv1GQxs6o+EPHLEa8DXWpRZydsWqOerrcxv68N5r974Tzl0lQeTRT7l3EMI
-        7bA28y0pi60+PU2xAEoYlIexaC9Tyk0mt71NWxacwCKvjiTLbCEBEXxvugduOdnD2bgRTV1SejvT7
-        oeP8WTcgcw8Euw7JUyxeE1w1bCeqUqI9zY7ZZElVgpr3/64QI3FrCW7Gq8fav2GMIBOu8idrCGBj3
-        06bCdtoP0ApohM69/QVHJFJYRDx8P6vsPZWJ9SNo91UYDNgqz8zL3ruApXl//f0/RWBmdMMtVzEn1
-        c94hFWqDjsU20i05fXyda9EKkPYOxPt9rRqea9keg=;
-Received: from [2a00:23c4:8bac:200:3870:f067:8488:5afb]
-        by mail.ilande.co.uk with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.92)
-        (envelope-from <mark.cave-ayland@ilande.co.uk>)
-        id 1peNMz-000B2U-8K; Mon, 20 Mar 2023 21:48:45 +0000
-Message-ID: <b971a675-065e-4e0a-a9bc-babc244ff21b@ilande.co.uk>
-Date:   Mon, 20 Mar 2023 21:49:22 +0000
+        with ESMTP id S229541AbjCTWK3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 Mar 2023 18:10:29 -0400
+Received: from out-9.mta1.migadu.com (out-9.mta1.migadu.com [IPv6:2001:41d0:203:375::9])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2E2DD51F
+        for <kvm@vger.kernel.org>; Mon, 20 Mar 2023 15:10:27 -0700 (PDT)
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1679350225;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=IdkcR+2C9TkNpkDTs4O6CTM2PZmQv4+noGiw54PYvos=;
+        b=o+6w+KUiqTo8XAhM98QKzVuZTNLZrK40BcC8TFDPPLYdOAEE3Rjzt/qPV+MzGJGimUNvY7
+        uZ3XUhDnjHsJsb+4+Ow4bhdobNBYWgYW6Bk+fCpjZyUrWTZPk0KrNzLKDSEzvjY7duWmTV
+        mftHdY+wNbx/v8WJG1SYtXrvisLQOIk=
+From:   Oliver Upton <oliver.upton@linux.dev>
+To:     kvmarm@lists.linux.dev
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Salil Mehta <salil.mehta@huawei.com>,
+        Oliver Upton <oliver.upton@linux.dev>
+Subject: [PATCH 00/11] KVM: arm64: Userspace SMCCC call filtering
+Date:   Mon, 20 Mar 2023 22:09:51 +0000
+Message-Id: <20230320221002.4191007-1-oliver.upton@linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.13.0
-Content-Language: en-US
-To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>,
-        quintela@redhat.com, qemu-devel <qemu-devel@nongnu.org>,
-        kvm-devel <kvm@vger.kernel.org>,
-        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
-        =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Bernhard Beschow <shentey@gmail.com>,
-        =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
-        BALATON Zoltan <balaton@eik.bme.hu>,
-        "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>,
-        Jiaxun Yang <jiaxun.yang@flygoat.com>,
-        "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-References: <87zg8aj5z3.fsf@secure.mitica>
- <393c8070-e126-70de-4e85-11ac41d6f6be@linaro.org>
-From:   Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-In-Reply-To: <393c8070-e126-70de-4e85-11ac41d6f6be@linaro.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a00:23c4:8bac:200:3870:f067:8488:5afb
-X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
+X-Migadu-Flow: FLOW_OUT
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
-X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
-Subject: Re: KVM call for agenda for 2023-03-21
-X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
-X-SA-Exim-Scanned: Yes (on mail.ilande.co.uk)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 20/03/2023 15:47, Philippe Mathieu-Daudé wrote:
+The Arm SMCCC is rather prescriptive in regards to the allocation of
+SMCCC function ID ranges. Many of the hypercall ranges have an
+associated specification from Arm (FF-A, PSCI, SDEI, etc.) with some
+room for vendor-specific implementations.
 
-> Hi Juan,
-> 
-> On 18/3/23 18:59, Juan Quintela wrote:
->>
->> Hi
->>
->> NOTE, NOTE, NOTE
->>
->> Remember that we are back in that crazy part of the year when daylight
->> saving applies.  Call is done on US timezone.  If you are anything else,
->> just doublecheck that it is working for you properly.
->>
->> NOTE, NOTE, NOTE
->>
->> Topics in the backburner:
->> - single qemu binary
->>    Philippe?
-> 
-> Well we wanted a slot to discuss a bit the design problems we have
-> around some PCI-to-ISA bridges like the PIIX and VIA south bridges.
-> 
-> One of the main problem is figure how to instantiate circular IRQs
-> with QOM. Ex:
-> 
->    devA exposes irqAo output
->         wires to irqAi input
-> 
->    devB exposes irqBo output
->         wires to irqBi input
-> 
-> How to wire irqAo -> irqBi *AND* irqBo -> irqAi?
-> 
-> However personally I was busy with debugging issues opened for the
-> 8.0 release, and it is probably very late to schedule with Mark and
-> Bernhard for tomorrow...
+The ever-expanding SMCCC surface leaves a lot of work within KVM for
+providing new features. Furthermore, KVM implements its own
+vendor-specific ABI, with little room for other implementations (like
+Hyper-V, for example). Rather than cramming it all into the kernel we
+should provide a way for userspace to handle hypercalls.
 
-Yeah unfortunately it's impossible for me to guarantee I'll be around for the call on 
-Tuesdays, but then I've also had an idea that models the hardware in a different way 
-so that circular IRQs aren't needed. I'm a bit backlogged with QEMU bits and pieces 
-this week, so it will take a little time to come up with a suitable proposal.
+It would appear that vCPU hotplug [*] has a legitimate use case for
+something like this, sending PSCI calls to userspace (where they
+should have gone in the first place).
+
+[*] https://lore.kernel.org/kvmarm/20230203135043.409192-1-james.morse@arm.com/
+
+=> We have these new hypercall bitmap registers, why not use that?
+
+The hypercall bitmap registers aren't necessarily aimed at the same
+problem. The bitmap registers allow a VMM to preserve the ABI the guest
+gets from KVM by default when migrating between hosts. By default KVM
+exposes the entire feature set to the guest, whereas user SMCCC calls
+need explicit opt-in from userspace.
+
+Applies to 6.3-rc3.
+
+RFCv2: https://lore.kernel.org/kvmarm/20230211013759.3556016-1-oliver.upton@linux.dev/
+
+RFCv2 -> v1:
+ - Redefine kvm_run::hypercall::longmode as a flags field (Sean)
+ - Handle SMCs from EL1
+ - Pre-increment PC before exiting to userspace for an SMC
+ - A test!
+
+Oliver Upton (11):
+  KVM: x86: Redefine 'longmode' as a flag for KVM_EXIT_HYPERCALL
+  KVM: arm64: Add a helper to check if a VM has ran once
+  KVM: arm64: Add vm fd device attribute accessors
+  KVM: arm64: Rename SMC/HVC call handler to reflect reality
+  KVM: arm64: Start handling SMCs from EL1
+  KVM: arm64: Refactor hvc filtering to support different actions
+  KVM: arm64: Use a maple tree to represent the SMCCC filter
+  KVM: arm64: Add support for KVM_EXIT_HYPERCALL
+  KVM: arm64: Indroduce support for userspace SMCCC filtering
+  KVM: selftests: Add a helper for SMCCC calls with SMC instruction
+  KVM: selftests: Add test for SMCCC filter
+
+ Documentation/virt/kvm/api.rst                |  24 ++-
+ Documentation/virt/kvm/devices/vm.rst         |  74 +++++++
+ arch/arm64/include/asm/kvm_host.h             |   8 +-
+ arch/arm64/include/uapi/asm/kvm.h             |  24 +++
+ arch/arm64/kvm/arm.c                          |  35 ++++
+ arch/arm64/kvm/handle_exit.c                  |  22 +-
+ arch/arm64/kvm/hypercalls.c                   | 155 +++++++++++++-
+ arch/arm64/kvm/pmu-emul.c                     |   4 +-
+ arch/x86/include/uapi/asm/kvm.h               |   9 +
+ arch/x86/kvm/x86.c                            |   5 +-
+ include/kvm/arm_hypercalls.h                  |   6 +-
+ include/uapi/linux/kvm.h                      |   9 +-
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../selftests/kvm/aarch64/smccc_filter.c      | 196 ++++++++++++++++++
+ .../selftests/kvm/include/aarch64/processor.h |  13 ++
+ .../selftests/kvm/lib/aarch64/processor.c     |  52 +++--
+ 16 files changed, 593 insertions(+), 44 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/aarch64/smccc_filter.c
 
 
-ATB,
+base-commit: e8d018dd0257f744ca50a729e3d042cf2ec9da65
+-- 
+2.40.0.rc1.284.g88254d51c5-goog
 
-Mark.
