@@ -2,29 +2,29 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3ECE46C2441
-	for <lists+kvm@lfdr.de>; Mon, 20 Mar 2023 23:10:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 09D146C2442
+	for <lists+kvm@lfdr.de>; Mon, 20 Mar 2023 23:10:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229731AbjCTWKm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Mar 2023 18:10:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60546 "EHLO
+        id S229656AbjCTWKn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Mar 2023 18:10:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60600 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229705AbjCTWKj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 Mar 2023 18:10:39 -0400
-Received: from out-18.mta1.migadu.com (out-18.mta1.migadu.com [95.215.58.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 15BD3DBDB
-        for <kvm@vger.kernel.org>; Mon, 20 Mar 2023 15:10:36 -0700 (PDT)
+        with ESMTP id S229743AbjCTWKl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 Mar 2023 18:10:41 -0400
+Received: from out-31.mta1.migadu.com (out-31.mta1.migadu.com [IPv6:2001:41d0:203:375::1f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66AB1DBD4
+        for <kvm@vger.kernel.org>; Mon, 20 Mar 2023 15:10:38 -0700 (PDT)
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1679350234;
+        t=1679350236;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Qn39SV60bthnosNPcz1/8GVV3c3K3hEe6P9niroVK0A=;
-        b=LIR2kF/Kjno+l8dx1Be3IATr/WXFO1YUv4q2TVOhfxmoUDfR51zUEXO02S9k5bTUuavTHW
-        qypzEHi1KEAabhBeY6+tMRB7WAv7yp8+V+l3GY8uRg3/T2xNaOkFIdEtSoBkC4aJq0vWac
-        td6OKCVFnPaH0UwvFE870M1qd/UUxBY=
+        bh=P0haxp6s2bYWowZcKEhtPBXhXLDzpCeO4GHkIg/q7VQ=;
+        b=lUKHBMXQMmD1aEkp7IyA1vbFMul8WWHgx+g4YxY3Nz/wIqaKzONe6lrosYx56aBmLJYgTh
+        hkCOgTcm5Fkq7VK3XY/cJeD/IBf8TPUuLYihbLZi01YK9Zv7in8EM3wtwmCmwkJEok9CHG
+        Lyn0Jm2pjsAbU/H84DNRsXu30I9FcH4=
 From:   Oliver Upton <oliver.upton@linux.dev>
 To:     kvmarm@lists.linux.dev
 Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
@@ -35,9 +35,9 @@ Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
         Salil Mehta <salil.mehta@huawei.com>,
         Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH 04/11] KVM: arm64: Rename SMC/HVC call handler to reflect reality
-Date:   Mon, 20 Mar 2023 22:09:55 +0000
-Message-Id: <20230320221002.4191007-5-oliver.upton@linux.dev>
+Subject: [PATCH 05/11] KVM: arm64: Start handling SMCs from EL1
+Date:   Mon, 20 Mar 2023 22:09:56 +0000
+Message-Id: <20230320221002.4191007-6-oliver.upton@linux.dev>
 In-Reply-To: <20230320221002.4191007-1-oliver.upton@linux.dev>
 References: <20230320221002.4191007-1-oliver.upton@linux.dev>
 MIME-Version: 1.0
@@ -52,69 +52,55 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-KVM handles SMCCC calls from virtual EL2 that use the SMC instruction
-since commit bd36b1a9eb5a ("KVM: arm64: nv: Handle SMCs taken from
-virtual EL2"). Thus, the function name of the handler no longer reflects
-reality.
+Whelp, the architecture gods have spoken and confirmed that the function
+ID space is common between SMCs and HVCs. Not only that, the expectation
+is that hypervisors handle calls to both SMC and HVC conduits. KVM
+recently picked up support for SMCCCs in commit bd36b1a9eb5a ("KVM:
+arm64: nv: Handle SMCs taken from virtual EL2") but scoped it only to a
+nested hypervisor.
 
-Normalize the name on SMCCC, since that's the only hypercall interface
-KVM supports in the first place. No fuctional change intended.
+Let's just open the floodgates and let EL1 access our SMCCC
+implementation with the SMC instruction as well.
 
 Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- arch/arm64/kvm/handle_exit.c | 4 ++--
- arch/arm64/kvm/hypercalls.c  | 2 +-
- include/kvm/arm_hypercalls.h | 2 +-
- 3 files changed, 4 insertions(+), 4 deletions(-)
+ arch/arm64/kvm/handle_exit.c | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
 diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-index a798c0b4d717..5e4f9737cbd5 100644
+index 5e4f9737cbd5..68f95dcd41a1 100644
 --- a/arch/arm64/kvm/handle_exit.c
 +++ b/arch/arm64/kvm/handle_exit.c
-@@ -52,7 +52,7 @@ static int handle_hvc(struct kvm_vcpu *vcpu)
+@@ -72,13 +72,15 @@ static int handle_smc(struct kvm_vcpu *vcpu)
+ 	 *
+ 	 * We need to advance the PC after the trap, as it would
+ 	 * otherwise return to the same address...
+-	 *
+-	 * Only handle SMCs from the virtual EL2 with an immediate of zero and
+-	 * skip it otherwise.
+ 	 */
+-	if (!vcpu_is_el2(vcpu) || kvm_vcpu_hvc_get_imm(vcpu)) {
++	kvm_incr_pc(vcpu);
++
++	/*
++	 * SMCs with a nonzero immediate are reserved according to DEN0028E 2.9
++	 * "SMC and HVC immediate value".
++	 */
++	if (kvm_vcpu_hvc_get_imm(vcpu)) {
+ 		vcpu_set_reg(vcpu, 0, ~0UL);
+-		kvm_incr_pc(vcpu);
  		return 1;
  	}
  
--	ret = kvm_hvc_call_handler(vcpu);
-+	ret = kvm_smccc_call_handler(vcpu);
- 	if (ret < 0) {
- 		vcpu_set_reg(vcpu, 0, ~0UL);
- 		return 1;
-@@ -89,7 +89,7 @@ static int handle_smc(struct kvm_vcpu *vcpu)
- 	 * at Non-secure EL1 is trapped to EL2 if HCR_EL2.TSC==1, rather than
- 	 * being treated as UNDEFINED.
- 	 */
--	ret = kvm_hvc_call_handler(vcpu);
-+	ret = kvm_smccc_call_handler(vcpu);
+@@ -93,8 +95,6 @@ static int handle_smc(struct kvm_vcpu *vcpu)
  	if (ret < 0)
  		vcpu_set_reg(vcpu, 0, ~0UL);
  
-diff --git a/arch/arm64/kvm/hypercalls.c b/arch/arm64/kvm/hypercalls.c
-index 5da884e11337..05e588948e5a 100644
---- a/arch/arm64/kvm/hypercalls.c
-+++ b/arch/arm64/kvm/hypercalls.c
-@@ -121,7 +121,7 @@ static bool kvm_hvc_call_allowed(struct kvm_vcpu *vcpu, u32 func_id)
- 	}
+-	kvm_incr_pc(vcpu);
+-
+ 	return ret;
  }
  
--int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
-+int kvm_smccc_call_handler(struct kvm_vcpu *vcpu)
- {
- 	struct kvm_smccc_features *smccc_feat = &vcpu->kvm->arch.smccc_feat;
- 	u32 func_id = smccc_get_function(vcpu);
-diff --git a/include/kvm/arm_hypercalls.h b/include/kvm/arm_hypercalls.h
-index 1188f116cf4e..8f4e33bc43e8 100644
---- a/include/kvm/arm_hypercalls.h
-+++ b/include/kvm/arm_hypercalls.h
-@@ -6,7 +6,7 @@
- 
- #include <asm/kvm_emulate.h>
- 
--int kvm_hvc_call_handler(struct kvm_vcpu *vcpu);
-+int kvm_smccc_call_handler(struct kvm_vcpu *vcpu);
- 
- static inline u32 smccc_get_function(struct kvm_vcpu *vcpu)
- {
 -- 
 2.40.0.rc1.284.g88254d51c5-goog
 
