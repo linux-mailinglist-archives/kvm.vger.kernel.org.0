@@ -2,155 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 64FB66C1421
-	for <lists+kvm@lfdr.de>; Mon, 20 Mar 2023 14:56:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2449B6C1437
+	for <lists+kvm@lfdr.de>; Mon, 20 Mar 2023 14:59:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231477AbjCTN4q (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Mar 2023 09:56:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42574 "EHLO
+        id S231351AbjCTN7c (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Mar 2023 09:59:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44992 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230127AbjCTN4a (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 Mar 2023 09:56:30 -0400
-Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B90A24707
-        for <kvm@vger.kernel.org>; Mon, 20 Mar 2023 06:56:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1679320579; x=1710856579;
-  h=message-id:date:mime-version:subject:from:to:cc:
-   references:in-reply-to:content-transfer-encoding;
-  bh=KJtZ1QCCHTUbkLuMTaLTYhAwwP+jbi68WXCNLjQe59o=;
-  b=M1hu2oOOfnEk+tGKHFhLqSj/FY8df7qBGW8BtNiD4Ep5p1xg04P++mlb
-   iKz6BthtijPRJ+KVZk2FE58WzsFZR7M5a49oErxFrLutcbmxfNnNwgcxw
-   jcX42CicgVwyOyruSOgKWOpLBFH6ywK91/+3o01D4aoIUgY1ujvI0Ryhh
-   9EeuvDqOaJ+qlr6claup729sKQL/clm3df2OImLoa4m0v84lys7lMT/uJ
-   Sl/IOsHJ5TLYHFbioVxJ/AhN6cKwL+Mko9H/amB8WnVix87+lchvwcQVO
-   aef80k197HUgp4n506q7zTeaWtt8UOk8sU2xXPGIBct6HFp0OK8JmFFAE
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10655"; a="366385441"
-X-IronPort-AV: E=Sophos;i="5.98,274,1673942400"; 
-   d="scan'208";a="366385441"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Mar 2023 06:56:18 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10655"; a="681073237"
-X-IronPort-AV: E=Sophos;i="5.98,274,1673942400"; 
-   d="scan'208";a="681073237"
-Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.249.172.177]) ([10.249.172.177])
-  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Mar 2023 06:56:17 -0700
-Message-ID: <4ff37ff4-b89e-8683-f6ea-865211ae01d2@linux.intel.com>
-Date:   Mon, 20 Mar 2023 21:56:15 +0800
+        with ESMTP id S231294AbjCTN7X (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 Mar 2023 09:59:23 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 474B714E91
+        for <kvm@vger.kernel.org>; Mon, 20 Mar 2023 06:58:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1679320700;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=xluQCIRM9KUg+iS1ks5cvU7xSezg5DUOPbgJwMPELqs=;
+        b=Sm9JlDfMdBi7ddhsh2/XN/JSHCDATjK/tsJpw7ocyuj4oRsQuoig/LpmpfmBc1tg6sWmzx
+        c9hJ8/w8y7LEYEAmYRwCTG4pyA9lvuKQHv2QDOIc/10qhDkEcdHeNhQf7YBaeSqkeTJiA5
+        OImKX+fnYFR7ZK29js7n4iHUrxeFamE=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-584-ZgHDCpTiPhua_MQ_ZHMvUQ-1; Mon, 20 Mar 2023 09:58:18 -0400
+X-MC-Unique: ZgHDCpTiPhua_MQ_ZHMvUQ-1
+Received: by mail-wr1-f69.google.com with SMTP id i11-20020a5d522b000000b002ceac3d4413so1463062wra.11
+        for <kvm@vger.kernel.org>; Mon, 20 Mar 2023 06:58:18 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1679320698;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xluQCIRM9KUg+iS1ks5cvU7xSezg5DUOPbgJwMPELqs=;
+        b=WjJNlFb8WaCc2uHMtFzTLrohdiBLDQxvVtgciQ/fG28cwY3TwugzGFBOUIXnRwVX/y
+         aXrCO2+PY/RHhEjisBuwyoUFWMQ0ZwVC/f6OKoIlmbu5tujHcdxrZDGof28cq/oB7y/T
+         woWJlQVq0mylOzRx+rBMdFvf2jYRXPkjTZJI7ry1ArgPsY3tc2CWgtotLnK3W9ZSKhyu
+         3ZcrAG3D0tLZOOkZ2ROp0JjOHP8kCevPEDmHArN0JZagsrHiVc8zVcom1CgbNMIHi5sk
+         LqJJRg1IuM4ZuZK2tTLN5Z8VkWiMNrW+h+tDyyDpEn2YWE8FadCb3jCOZtMQoXMQ8bO2
+         XOkg==
+X-Gm-Message-State: AO0yUKV4SxaSySAgu9IdlJ2MELNk4G5YcUut2g6uGaGaLx7C/jgHH3Nm
+        6spWBBeOymAcAaclmJ7Pud8vvB0DyzJbFA5D4xoOTBgQYi9K/Q7ItauccuZf8oQXG+3Dj7luTkH
+        X+O9XNUw9T6Nx
+X-Received: by 2002:adf:ce11:0:b0:2c7:851:c0bf with SMTP id p17-20020adfce11000000b002c70851c0bfmr13818702wrn.0.1679320697841;
+        Mon, 20 Mar 2023 06:58:17 -0700 (PDT)
+X-Google-Smtp-Source: AK7set+FUDvH/psBKoCx/B613vRQOYlndcOrSX0ahkGfyMMplDZBRpmL9wOqCuvTHwUfmOLfiNDOAg==
+X-Received: by 2002:adf:ce11:0:b0:2c7:851:c0bf with SMTP id p17-20020adfce11000000b002c70851c0bfmr13818684wrn.0.1679320697599;
+        Mon, 20 Mar 2023 06:58:17 -0700 (PDT)
+Received: from sgarzare-redhat (host-82-57-51-170.retail.telecomitalia.it. [82.57.51.170])
+        by smtp.gmail.com with ESMTPSA id s13-20020a5d510d000000b002c794495f6fsm5977998wrt.117.2023.03.20.06.58.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 20 Mar 2023 06:58:17 -0700 (PDT)
+Date:   Mon, 20 Mar 2023 14:58:14 +0100
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Arseniy Krasnov <avkrasnov@sberdevices.ru>
+Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Bobby Eshleman <bobby.eshleman@bytedance.com>,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kernel@sberdevices.ru, oxffffaa@gmail.com
+Subject: Re: [RFC PATCH v1] virtio/vsock: check transport before skb
+ allocation
+Message-ID: <20230320135814.jncpvznka56liu36@sgarzare-redhat>
+References: <47a7dbf6-1c63-3338-5102-122766e6378d@sberdevices.ru>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.9.0
-Subject: Re: [PATCH v5 2/5] [Trivial]KVM: x86: Explicitly cast ulong to bool
- in kvm_set_cr3()
-From:   Binbin Wu <binbin.wu@linux.intel.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Chao Gao <chao.gao@intel.com>,
-        Robert Hoo <robert.hu@linux.intel.com>, pbonzini@redhat.com,
-        kvm@vger.kernel.org
-References: <20230227084547.404871-1-robert.hu@linux.intel.com>
- <20230227084547.404871-3-robert.hu@linux.intel.com>
- <ZABPFII40v1nQ2EV@gao-cwp>
- <9db9bd3a2ade8c436a8b9ab6f61ee8dafa2e072a.camel@linux.intel.com>
- <ZAuRec2NkC3+4jvD@google.com>
- <75f628e3-9621-ac9e-a258-33efc7ce56af@linux.intel.com>
-In-Reply-To: <75f628e3-9621-ac9e-a258-33efc7ce56af@linux.intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <47a7dbf6-1c63-3338-5102-122766e6378d@sberdevices.ru>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-On 3/20/2023 8:05 PM, Binbin Wu wrote:
+On Fri, Mar 17, 2023 at 01:37:10PM +0300, Arseniy Krasnov wrote:
+>Pointer to transport could be checked before allocation of skbuff, thus
+>there is no need to free skbuff when this pointer is NULL.
 >
-> On 3/11/2023 4:22 AM, Sean Christopherson wrote:
->> As Chao pointed out, this does not belong in the LAM series.  And 
->> FWIW, I highly
->> recommend NOT tagging things as Trivial.  If you're wrong and the 
->> patch _isn't_
->> trivial, it only slows things down.  And if you're right, then 
->> expediting the
->> patch can't possibly be necessary.
->>
->> On Fri, Mar 03, 2023, Robert Hoo wrote:
->>> On Thu, 2023-03-02 at 15:24 +0800, Chao Gao wrote:
->>>>> -    bool pcid_enabled = kvm_read_cr4_bits(vcpu, X86_CR4_PCIDE);
->>>>> +    bool pcid_enabled = !!kvm_read_cr4_bits(vcpu, X86_CR4_PCIDE);
->>>>>
->>>>>     if (pcid_enabled) {
->>>>>         skip_tlb_flush = cr3 & X86_CR3_PCID_NOFLUSH;
->>>> pcid_enabled is used only once. You can drop it, i.e.,
->>>>
->>>>     if (kvm_read_cr4_bits(vcpu, X86_CR4_PCIDE)) {
->>>>
->>> Emm, that's actually another point.
->>> Though I won't object so, wouldn't this be compiler optimized?
->>>
->>> And my point was: honor bool type, though in C implemention it's 0 and
->>> !0, it has its own type value: true, false.
->>> Implicit type casting always isn't good habit.
->> I don't disagree, but I also don't particularly want to "fix" one 
->> case while
->> ignoring the many others, e.g. kvm_handle_invpcid() has the exact 
->> same "buggy"
->> pattern.
->>
->> I would be supportive of a patch that adds helpers and then converts 
->> all of the
->> relevant CR0/CR4 checks though...
->
-> Hi Sean, I can cook a patch by your suggesion and sent out the patch 
-> seperately.
+>Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
+>---
+> net/vmw_vsock/virtio_transport_common.c | 8 +++-----
+> 1 file changed, 3 insertions(+), 5 deletions(-)
 
-Sean, besides the call of kvm_read_cr0_bits() and kvm_read_cr4_bits(), 
-there are also a lot checks in if statement like
-if ( cr4 & X86_CR4_XXX )
-or
-if ( cr0 & X86_CR0_XXX )
-I suppose these usages are OK, right?
+LGTM, I think net-next is fine for this.
 
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+
+Thanks,
+Stefano
 
 >
+>diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+>index cda587196475..607149259e8b 100644
+>--- a/net/vmw_vsock/virtio_transport_common.c
+>+++ b/net/vmw_vsock/virtio_transport_common.c
+>@@ -867,6 +867,9 @@ static int virtio_transport_reset_no_sock(const struct virtio_transport *t,
+> 	if (le16_to_cpu(hdr->op) == VIRTIO_VSOCK_OP_RST)
+> 		return 0;
 >
->>
->> diff --git a/arch/x86/kvm/kvm_cache_regs.h 
->> b/arch/x86/kvm/kvm_cache_regs.h
->> index 4c91f626c058..6e3cb958afdd 100644
->> --- a/arch/x86/kvm/kvm_cache_regs.h
->> +++ b/arch/x86/kvm/kvm_cache_regs.h
->> @@ -157,6 +157,14 @@ static inline ulong kvm_read_cr0_bits(struct 
->> kvm_vcpu *vcpu, ulong mask)
->>          return vcpu->arch.cr0 & mask;
->>   }
->>   +static __always_inline bool kvm_is_cr0_bit_set(struct kvm_vcpu *vcpu,
->> +                                              unsigned long cr0_bit)
->> +{
->> +       BUILD_BUG_ON(!is_power_of_2(cr0_bit));
->> +
->> +       return !!kvm_read_cr0_bits(vcpu, cr0_bit);
->> +}
->> +
->>   static inline ulong kvm_read_cr0(struct kvm_vcpu *vcpu)
->>   {
->>          return kvm_read_cr0_bits(vcpu, ~0UL);
->> @@ -178,6 +186,14 @@ static inline ulong kvm_read_cr3(struct kvm_vcpu 
->> *vcpu)
->>          return vcpu->arch.cr3;
->>   }
->>   +static __always_inline bool kvm_is_cr4_bit_set(struct kvm_vcpu *vcpu,
->> +                                              unsigned long cr4_bit)
->> +{
->> +       BUILD_BUG_ON(!is_power_of_2(cr4_bit));
->> +
->> +       return !!kvm_read_cr4_bits(vcpu, cr4_bit);
->> +}
->> +
+>+	if (!t)
+>+		return -ENOTCONN;
+>+
+> 	reply = virtio_transport_alloc_skb(&info, 0,
+> 					   le64_to_cpu(hdr->dst_cid),
+> 					   le32_to_cpu(hdr->dst_port),
+>@@ -875,11 +878,6 @@ static int virtio_transport_reset_no_sock(const struct virtio_transport *t,
+> 	if (!reply)
+> 		return -ENOMEM;
+>
+>-	if (!t) {
+>-		kfree_skb(reply);
+>-		return -ENOTCONN;
+>-	}
+>-
+> 	return t->send_pkt(reply);
+> }
+>
+>-- 
+>2.25.1
+>
+
