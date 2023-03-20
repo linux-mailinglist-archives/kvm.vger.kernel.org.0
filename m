@@ -2,135 +2,220 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 34FE76C20B8
-	for <lists+kvm@lfdr.de>; Mon, 20 Mar 2023 20:03:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 27CD76C212B
+	for <lists+kvm@lfdr.de>; Mon, 20 Mar 2023 20:20:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231239AbjCTTDK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Mar 2023 15:03:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50692 "EHLO
+        id S231180AbjCTTTp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Mar 2023 15:19:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51874 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230327AbjCTTCt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 Mar 2023 15:02:49 -0400
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on20606.outbound.protection.outlook.com [IPv6:2a01:111:f400:7e8a::606])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE52F10AA7;
-        Mon, 20 Mar 2023 11:55:04 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=dT5lGvscH7xgZoNNfx0G5u0aLaAUF2skVx+RNpYFPtdDDYbJpK0jqytmdmXjHyV3EpXW3+T89zO11hxxm/BzSN+jyHOkekJLLroBg+viwDh1FLu6ymMkC1hQytUwC2X8QbQxSF1hx9e6JPUnWR1MNJAqT/1ugp2VNPXCjei/L7ZO3lukJPc52RGlXTabZ7tAaaBEG5sM2dbzRvjYeYjpHsqWw82l1TD742gzGRfS6ehmt84pzZhJ85A5FQzPYRjbLppG+aZVQvqrXAeljHvfSTeSJvscwOMlKMGoyP1H7t+CarUYb99UWCFntrUht3yx/tnBFr4Q1ibiEQeJv91b3g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=lfAf4qP5Co4sp8aj5O9p6/ASdyDmKkF1l/rF0fr0ZwU=;
- b=B1DRLgW7gdKq3PWUSr//dvi7AKuPqwtEyPpYu1Par9nqaSaAbRc8Nis0Q/U4+rZgcvIJUMvgvyEpnVywpR2vfiQLB2Zg7zSUPemudAkb+dLKLHLuMi15Ni6kddDj6pjh8aMjr51AIi4sdGdrIRsl1HVACYgFYvz1yvlT/pYUChDBgol1+T8V+XdQiaCA44mUdGr9Lbph77Zg464+lyfiZO+PonJ3Qz7keag6ml/cTrUIkhlVbydRZWskOXOGGZWycYR27pgGT9ZyYs53+4nUbbqQrd8QL9Cz6a0Tck2CHic4h+9i1A0FOfD4KIncuvIJdUU+CFwe49KbxpG1kthoIA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=lfAf4qP5Co4sp8aj5O9p6/ASdyDmKkF1l/rF0fr0ZwU=;
- b=A2XEcsJsSjyABN5+gdZkPKNSSPNkxp6Xso5C6+4OLrYryCfX4mSFPKwmtgwpcWeE6d7TevPs9MN+lSh71V1Uhe79Ht1A3T7mvHFMPSmjU/jqn50KHzec5QNdhsu6CQ3sdkYLV/WgECbqPWg/JglreFfDjFYlA2Mg6IGTTYG+IFQArE+tp49z+3Kvd77K0xVwAss3tOt6fAU8EcMn3oQSa+2xgmEADSXOJhiSJQU6JQdqSRak1meTTCTXyZ8ip//swfpsL0LCfJ82ojurKDItLk209CEUcKgtCLIx71MoVtHctm+oAUJVVN93JSSBb8jgFVA3uYaKRsSbJw8n7x7PPg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by MN0PR12MB6001.namprd12.prod.outlook.com (2603:10b6:208:37d::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6178.37; Mon, 20 Mar
- 2023 18:54:21 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::ef6d:fdf6:352f:efd1]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::ef6d:fdf6:352f:efd1%3]) with mapi id 15.20.6178.037; Mon, 20 Mar 2023
- 18:54:21 +0000
-Date:   Mon, 20 Mar 2023 15:54:19 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Yi Liu <yi.l.liu@intel.com>
-Cc:     alex.williamson@redhat.com, kevin.tian@intel.com, joro@8bytes.org,
-        robin.murphy@arm.com, cohuck@redhat.com, eric.auger@redhat.com,
-        nicolinc@nvidia.com, kvm@vger.kernel.org, mjrosato@linux.ibm.com,
-        chao.p.peng@linux.intel.com, yi.y.sun@linux.intel.com,
-        peterx@redhat.com, jasowang@redhat.com,
-        shameerali.kolothum.thodi@huawei.com, lulu@redhat.com,
-        suravee.suthikulpanit@amd.com, intel-gvt-dev@lists.freedesktop.org,
-        intel-gfx@lists.freedesktop.org, linux-s390@vger.kernel.org,
-        xudong.hao@intel.com, yan.y.zhao@intel.com, terrence.xu@intel.com
-Subject: Re: [PATCH 2/7] vfio/pci: Only check ownership of opened devices in
- hot reset
-Message-ID: <ZBir26zqGG2rCcsK@nvidia.com>
-References: <20230316124156.12064-1-yi.l.liu@intel.com>
- <20230316124156.12064-3-yi.l.liu@intel.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230316124156.12064-3-yi.l.liu@intel.com>
-X-ClientProxiedBy: BL1PR13CA0314.namprd13.prod.outlook.com
- (2603:10b6:208:2c1::19) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+        with ESMTP id S230320AbjCTTTW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 Mar 2023 15:19:22 -0400
+Received: from mx.sberdevices.ru (mx.sberdevices.ru [45.89.227.171])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1FDEEDBD7;
+        Mon, 20 Mar 2023 12:11:16 -0700 (PDT)
+Received: from s-lin-edge02.sberdevices.ru (localhost [127.0.0.1])
+        by mx.sberdevices.ru (Postfix) with ESMTP id 8CA315FD1B;
+        Mon, 20 Mar 2023 21:05:43 +0300 (MSK)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
+        s=mail; t=1679335543;
+        bh=ChXPnaWU9tioQBcItc3cTbZ8j7fWtooOfi6E3G+mq0A=;
+        h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+        b=R5Nxk4rPuF6DytMXjBFMyim/nVNu3nt5IJ0hPAlzLzL7ElpE+Obhs4RA+tVUMOpax
+         LWGwsNXyyAGvzduT7ONsz0GNkNytqv0xUV45ca4N7a0wTi5J33KXd/82U04Ai+5kg6
+         9hgqU8LM8hwMWZYcpnjq6vPNFzVE75HWohDp7x3kRC1zODNaxPSiKvDyptUtOSuKFW
+         qQB8XEdqIYQ65/9JpN3kvRYM9tRTkk+r3yWKJjpxdG1r+rgAvofWXlztRZ7Gd01a0S
+         XTpVeECA6WAc8nMPkf/Gmhz4/bBqpt1lH+8ZfeoN5ocn2X8NutwYRgyGOl5Ql/DqsF
+         gXH8FW70x02Vg==
+Received: from S-MS-EXCH01.sberdevices.ru (S-MS-EXCH01.sberdevices.ru [172.16.1.4])
+        by mx.sberdevices.ru (Postfix) with ESMTP;
+        Mon, 20 Mar 2023 21:05:40 +0300 (MSK)
+Message-ID: <2be688af-89a6-d903-017b-dafee3e48c33@sberdevices.ru>
+Date:   Mon, 20 Mar 2023 21:02:19 +0300
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|MN0PR12MB6001:EE_
-X-MS-Office365-Filtering-Correlation-Id: 696cbcfa-5b17-4a65-c8e5-08db297483e5
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: XiwFOZwE9yHc6IKbrZ5049zpd9ns3RI40KbF/ZBvDTEyTyPDNcDDi6D9TJcSqXslrnBLC5oyWFXRyzIy952zEJ2sjBoPGows4iWxAEPHyQ69BTzco8ZEW8dk38Gh23KKR+PhOePj7vX+DgYP0X5h3mRZ4mvJX87Rqd7JeNbnhQdBTvaSr/r8+OJgZbcC11P40LNW6MFDbQzgF34NQr0MHzSKzBtPZVenOqiEBsnIiSBAeTeWJzvwr1LMPnin6a9YfAydp/6Jo2ZDMv4/Ah3dbFHknNePuaCzfEZCm+H8Gou2CENjwEZYKG82aC6fMWgw18N0ZrsGApS8yahsjCWffFAmTaJZmwzG26mzRF4fUvxPYz+oeF/eb/JJolzuE1wW366WKjaE5DuDibNremojLvAQRG1LsqXGNAZGcpy1yqJ2Vl5+DIoDY7ol3FSYaYXJdMVEd+Jjh1TwgMIUIDY1KEJrDOq1fG5nuvyvIOiUbdtL7v0rxxDuqNl6Tbkhcj/l7wqNkpFGf18pyXzbSolVWUkMWgY21xc/ySPDHKPuqej0KG8uH9FHHu3Y5jkwHUtVKc6QzdQeYavD53UzJVxQDESkZfSt7+7a6rGKblwktdBdKc6AKnA/IfvCajLDN7DSUxpRHh1DIqf5UlKGdHEmpg==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(376002)(396003)(39860400002)(136003)(346002)(366004)(451199018)(6512007)(66556008)(7416002)(66946007)(66476007)(478600001)(6916009)(8936002)(4744005)(5660300002)(41300700001)(8676002)(4326008)(86362001)(36756003)(316002)(6506007)(186003)(6486002)(26005)(2616005)(2906002)(83380400001)(38100700002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?Q+I1Aw9RFKo94ULy1nSvYrc7apaApmV3yo1sd1kQWPplYD1PB4OiO1XHLg/I?=
- =?us-ascii?Q?RTyu5pLhd2fWTKBxvbxtaVMv8rX1MKemPLAm8gKsEYI71738qH+5IX9lFU7x?=
- =?us-ascii?Q?2+vU/0Bi7F+/TRQghPc5S+tuiql0pHp0AKVMXRn6hwDJQ1/pbH6gXyvgDvwb?=
- =?us-ascii?Q?QpOOZSQI81Hh2ZYul0cyjjs/6iP1sxDBh6huySRKEGnvXxgC1vtPUnKv8etH?=
- =?us-ascii?Q?tPoS4tJqvBaBModhLYtTswHfB0XMfmCIto3Azy1LmV+Vbhmn8ou92miediHk?=
- =?us-ascii?Q?2M+/uQVeJoJnucHE10rU1m1gErZMBpze02A32dmA24mpXdkxw2EVUfq14kFd?=
- =?us-ascii?Q?lfxbhHsOOdS5H0C724vrZU/GPrNH/kQm5Fc/RVpQ3WXnCvQ2vyM5ccX60d9z?=
- =?us-ascii?Q?bWfn4C2f/ossb+7UZsqIqIxEIVVObyY3hD3VAmDS/WpoZZIt4U2G1dXt+paq?=
- =?us-ascii?Q?7bpGs6pszo4wUmpLoo6FMt8gnh2rLOZq3EF/33Ib66uqFKcybQOzBkuKmIHF?=
- =?us-ascii?Q?/khTUbUHDGLxOvDYgdizqptlSkZNY7GCag5CriI8pY13opw4jqe982tdzpJ/?=
- =?us-ascii?Q?OBrFUmBOnXUT3QWvADJdAoudc01XtOQm9ZdTL2gHWd3ubq048jsX4Feb49m4?=
- =?us-ascii?Q?xJWygv90a7eSOS92NgsqviZMFUKBYT6ySUbgrEHfd5UhMp9iOLb1Lixfe7oD?=
- =?us-ascii?Q?3xpRKqo1oQe7qgGQ9ffeqWFESz/BDLpOgpDLwyYaqWNOlhwUnfE6comL9Bwz?=
- =?us-ascii?Q?8S3C9FxlIG4968RkTD+4rNknZ3c+R/D1P8dxODlUCxXkHKqlaqukcwlTt2ad?=
- =?us-ascii?Q?RJnqKohDJtm8nEVRHfH6pfSu9jvz0QxCZPPoo36rFQMVgi/ZK706xKPIME1H?=
- =?us-ascii?Q?NBR3KXzVdDFHMMWJvSLq8viCytv6MlEAcOJsJDUd1xrgIpcksTTppypQjr6I?=
- =?us-ascii?Q?5wrnm5TOvpIjunEDMWtwtDCpFc3TaM87t7qFUKkQAiS+B8/KjIxYaHtDoi/d?=
- =?us-ascii?Q?m6OWchtlZ0HyKMVX4FQhFe0kbc3gEsiaTFdyDGdGknYogrU4Deb1x+8INO04?=
- =?us-ascii?Q?9bOCkzteF0n44tifpngakjps/CaMMVdEaBzx8BugOX7GM5FXmgC0fJ8HFyAD?=
- =?us-ascii?Q?S404trhS2HrKku4usIi2ruF3+XXG8hgmG4R06A0862hGNLtuXyoml0t8yyKD?=
- =?us-ascii?Q?lnKzROjKePWFk2vdvszRxd4zQYqe790JUI/vMwa0GrAXvkQtpCMEEVvVd5Mv?=
- =?us-ascii?Q?vXRPnQsg7zT54jTtO+47VQO/T7zt+J6m4RixpXiyXNlIgHDhi7kodouI1zkQ?=
- =?us-ascii?Q?wF6h309/Qhs9flj+/eqn6MBjyB8cXt095QKYTqxvTLAy6K+iiIC8TIk9FU2P?=
- =?us-ascii?Q?CnC63vWJmW9GADmoO0aTK2N5GZ337ApxI1XvdAdhIHyfK4n0Q249hmu3QZiB?=
- =?us-ascii?Q?bZbONvblqqc0r4CwlwOdiJ+SrZy4dnOOBt0+rwrtfi+TwK1bE9kbeZPS0Tki?=
- =?us-ascii?Q?P0EjvTcPqVKc2wOXHCUCIVZ9rj0iYG/5o9twKQ+ZgFnUFhoKG6qqe/lGUrEd?=
- =?us-ascii?Q?ogb2OFlNZrLeXXvHjw2Lj1S0F9cgLXE3+IJ/r3Ge?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 696cbcfa-5b17-4a65-c8e5-08db297483e5
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Mar 2023 18:54:21.0752
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 1Rn0Fk6fhyrPbz/nEOvb2xsMegVN9JxJ5jJ5rW5MXqn7/SC0WBlpbpetW3XSV8J2
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR12MB6001
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        SPF_HELO_PASS,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.1
+Subject: Re: [RFC PATCH v2] virtio/vsock: allocate multiple skbuffs on tx
+Content-Language: en-US
+To:     Stefano Garzarella <sgarzare@redhat.com>
+CC:     Stefan Hajnoczi <stefanha@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Bobby Eshleman <bobby.eshleman@bytedance.com>,
+        <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
+        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <kernel@sberdevices.ru>, <oxffffaa@gmail.com>
+References: <ea5725eb-6cb5-cf15-2938-34e335a442fa@sberdevices.ru>
+ <20230320142959.2wwf474fiyp3ex5z@sgarzare-redhat>
+From:   Arseniy Krasnov <avkrasnov@sberdevices.ru>
+In-Reply-To: <20230320142959.2wwf474fiyp3ex5z@sgarzare-redhat>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [172.16.1.6]
+X-ClientProxiedBy: S-MS-EXCH02.sberdevices.ru (172.16.1.5) To
+ S-MS-EXCH01.sberdevices.ru (172.16.1.4)
+X-KSMG-Rule-ID: 4
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Status: not scanned, disabled by settings
+X-KSMG-AntiSpam-Interceptor-Info: not scanned
+X-KSMG-AntiPhishing: not scanned, disabled by settings
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 1.1.2.30, bases: 2023/03/20 09:56:00 #20977321
+X-KSMG-AntiVirus-Status: Clean, skipped
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 16, 2023 at 05:41:51AM -0700, Yi Liu wrote:
-> If the affected device is not opened by any user, it's safe to reset it
-> given it's not in use.
+
+
+On 20.03.2023 17:29, Stefano Garzarella wrote:
+> On Sun, Mar 19, 2023 at 09:46:10PM +0300, Arseniy Krasnov wrote:
+>> This adds small optimization for tx path: instead of allocating single
+>> skbuff on every call to transport, allocate multiple skbuff's until
+>> credit space allows, thus trying to send as much as possible data without
+>> return to af_vsock.c.
+>>
+>> Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
+>> ---
+>> Link to v1:
+>> https://lore.kernel.org/netdev/2c52aa26-8181-d37a-bccd-a86bd3cbc6e1@sberdevices.ru/
+>>
+>> Changelog:
+>> v1 -> v2:
+>> - If sent something, return number of bytes sent (even in
+>>   case of error). Return error only if failed to sent first
+>>   skbuff.
+>>
+>> net/vmw_vsock/virtio_transport_common.c | 53 ++++++++++++++++++-------
+>> 1 file changed, 39 insertions(+), 14 deletions(-)
+>>
+>> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+>> index 6564192e7f20..3fdf1433ec28 100644
+>> --- a/net/vmw_vsock/virtio_transport_common.c
+>> +++ b/net/vmw_vsock/virtio_transport_common.c
+>> @@ -196,7 +196,8 @@ static int virtio_transport_send_pkt_info(struct vsock_sock *vsk,
+>>     const struct virtio_transport *t_ops;
+>>     struct virtio_vsock_sock *vvs;
+>>     u32 pkt_len = info->pkt_len;
+>> -    struct sk_buff *skb;
+>> +    u32 rest_len;
+>> +    int ret;
+>>
+>>     info->type = virtio_transport_get_type(sk_vsock(vsk));
+>>
+>> @@ -216,10 +217,6 @@ static int virtio_transport_send_pkt_info(struct vsock_sock *vsk,
+>>
+>>     vvs = vsk->trans;
+>>
+>> -    /* we can send less than pkt_len bytes */
+>> -    if (pkt_len > VIRTIO_VSOCK_MAX_PKT_BUF_SIZE)
+>> -        pkt_len = VIRTIO_VSOCK_MAX_PKT_BUF_SIZE;
+>> -
+>>     /* virtio_transport_get_credit might return less than pkt_len credit */
+>>     pkt_len = virtio_transport_get_credit(vvs, pkt_len);
+>>
+>> @@ -227,17 +224,45 @@ static int virtio_transport_send_pkt_info(struct vsock_sock *vsk,
+>>     if (pkt_len == 0 && info->op == VIRTIO_VSOCK_OP_RW)
+>>         return pkt_len;
+>>
+>> -    skb = virtio_transport_alloc_skb(info, pkt_len,
+>> -                     src_cid, src_port,
+>> -                     dst_cid, dst_port);
+>> -    if (!skb) {
+>> -        virtio_transport_put_credit(vvs, pkt_len);
+>> -        return -ENOMEM;
+>> -    }
+>> +    ret = 0;
+>> +    rest_len = pkt_len;
+>> +
+>> +    do {
+>> +        struct sk_buff *skb;
+>> +        size_t skb_len;
+>> +
+>> +        skb_len = min_t(u32, VIRTIO_VSOCK_MAX_PKT_BUF_SIZE, rest_len);
+>> +
+>> +        skb = virtio_transport_alloc_skb(info, skb_len,
+>> +                         src_cid, src_port,
+>> +                         dst_cid, dst_port);
+>> +        if (!skb) {
+>> +            ret = -ENOMEM;
+>> +            break;
+>> +        }
+>> +
+>> +        virtio_transport_inc_tx_pkt(vvs, skb);
+>> +
+>> +        ret = t_ops->send_pkt(skb);
+>> +
+>> +        if (ret < 0)
+>> +            break;
+>>
+>> -    virtio_transport_inc_tx_pkt(vvs, skb);
+>> +        rest_len -= skb_len;
 > 
-> Reviewed-by: Kevin Tian <kevin.tian@intel.com>
-> Signed-off-by: Yi Liu <yi.l.liu@intel.com>
-> ---
->  drivers/vfio/pci/vfio_pci_core.c | 14 +++++++++++---
->  include/uapi/linux/vfio.h        |  8 ++++++++
->  2 files changed, 19 insertions(+), 3 deletions(-)
+> t_ops->send_pkt() is returning the number of bytes sent. Current
+> implementations always return `skb_len`, so there should be no problem,
+> but it would be better to put a comment here, or we should handle the
+> case where ret != skb_len to avoid future issues.
 
-Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
+Hello, thanks for review!
 
-Jason
+I see. I think i'll handle such partial sends (ret != skb_len) as error, as
+it is the only thing to do - we remove 'skb_len' from user's buffer, but
+'send_pkt()' returns another value, so it will be strange for me to continue
+this tx loop as everything is ok. Something like this:
++ 
++ if (ret < 0)
++    break;
++ 
++ if (ret != skb_len) {
++    ret = -EFAULT;//or may be -EIO
++    break;
++ }
+
+> 
+>> +    } while (rest_len);
+>>
+>> -    return t_ops->send_pkt(skb);
+>> +    /* Don't call this function with zero as argument:
+>> +     * it tries to acquire spinlock and such argument
+>> +     * makes this call useless.
+> 
+> Good point, can we do the same also for virtio_transport_get_credit()?
+> (Maybe in a separate patch)
+> 
+> I'm thinking if may be better to do it directly inside the functions,
+> but I don't have a strong opinion on that since we only call them here.
+> 
+
+I think in this patch i can call 'virtio_transport_put_credit()' without if, but
+i'll prepare separate patch which adds zero argument check to this function.
+As i see, the only function suitable for such 'if' condition is 'virtio_transport_put_credit()'.
+Anyway - for future use this check won't be bad.
+
+Thanks, Arseniy
+
+> Thanks,
+> Stefano
+> 
+>> +     */
+>> +    if (rest_len)
+>> +        virtio_transport_put_credit(vvs, rest_len);
+>> +
+>> +    /* Return number of bytes, if any data has been sent. */
+>> +    if (rest_len != pkt_len)
+>> +        ret = pkt_len - rest_len;
+>> +
+>> +    return ret;
+>> }
+>>
+>> static bool virtio_transport_inc_rx_pkt(struct virtio_vsock_sock *vvs,
+>> -- 
+>> 2.25.1
+>>
+> 
