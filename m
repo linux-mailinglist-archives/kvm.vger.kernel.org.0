@@ -2,92 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 894CC6C23F8
-	for <lists+kvm@lfdr.de>; Mon, 20 Mar 2023 22:38:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E43FF6C24C1
+	for <lists+kvm@lfdr.de>; Mon, 20 Mar 2023 23:28:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230129AbjCTVit (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Mar 2023 17:38:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41054 "EHLO
+        id S229679AbjCTW2K (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Mar 2023 18:28:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60768 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230110AbjCTVi2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 Mar 2023 17:38:28 -0400
-Received: from mail-wm1-x334.google.com (mail-wm1-x334.google.com [IPv6:2a00:1450:4864:20::334])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3EB133B3F9
-        for <kvm@vger.kernel.org>; Mon, 20 Mar 2023 14:37:42 -0700 (PDT)
-Received: by mail-wm1-x334.google.com with SMTP id fm20-20020a05600c0c1400b003ead37e6588so10004692wmb.5
-        for <kvm@vger.kernel.org>; Mon, 20 Mar 2023 14:37:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=grsecurity.net; s=grsec; t=1679348225;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=C+JBGNE71KIeNyxioxmJue3iSV7XIAmXSn9GD38nB+U=;
-        b=tKAMh9F8K5dc0nBmwa8/75WOpXNaVg6XjW9Vk6qOI/XkFYxkBT1kWB1u9MVvfZCQA8
-         f7ubGwmEekE/gjSVzv15oaojzMV2WmYTwuUQl0cRyg+MSyLgBhu4aZ7fCmkcetkVYKv/
-         +ciFs/C9MkMCbr07EzLv/cvMeVy1JJta0EvDkt9NOihXcyxkMebNS5pqWoJ1prtCZUcp
-         EyJaxZo00R1xfFoARV45b+tPcNN+ypketgxHRRscG5DDCXbBWhxh0676k1hz9MWcpomW
-         pvYeGD2IWY3UaKM/JhhO0/+Eyfl91eh1PWTAruCnFPWibt1NPlCxPTShqHglE0mzHR9p
-         +sXw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679348225;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=C+JBGNE71KIeNyxioxmJue3iSV7XIAmXSn9GD38nB+U=;
-        b=IZvgu7ikMPOWKttDfUu0ASirGw0YdGPXsaDA1F/Zix3XMHLjfusEclh7fKov34zYUG
-         efvx5DHbgANjV5um/0a+nlbnUOMfXLEHoB9QT+mO4ZOss3JOYnbqXEpjd51uR5H/MRei
-         BN7umVYQopT5CdHIXExt9sHKd9r/NMhzG/76+3A4JMNCBp7L8QfquUiOcWcOrX6t6U5C
-         TSrwfgiNcqz78I4YsNYs74WfcqrLKgn4C26X/ri61VsnKlDQza7JtWpREJFA3qGOZ4xt
-         Syjv/W/P7ibpd32/JWdojyJ7lh6ScaivAdkIBAvYrlkLYRA8Xh08/MXs//Wad8w3+tSg
-         DmvA==
-X-Gm-Message-State: AO0yUKViASEKw+xuvs2ZriI7NiTLnJhJ3GFsxl13v9m44lfC+c4aa1QD
-        4ETQtQh+Gy0ZtkE6MkDxPPCMnA==
-X-Google-Smtp-Source: AK7set+bRFlMGZkBgA0KDMiP6kPbOuZ7rPadME0mRoSdo6j/MS5HxwEp1K6zJjAJqy6AHtNEjHdztg==
-X-Received: by 2002:a05:600c:254:b0:3ed:253c:621b with SMTP id 20-20020a05600c025400b003ed253c621bmr713231wmj.21.1679348225369;
-        Mon, 20 Mar 2023 14:37:05 -0700 (PDT)
-Received: from ?IPV6:2003:f6:af11:1000:ea7:9b12:7b30:c669? (p200300f6af1110000ea79b127b30c669.dip0.t-ipconnect.de. [2003:f6:af11:1000:ea7:9b12:7b30:c669])
-        by smtp.gmail.com with ESMTPSA id s12-20020a05600c45cc00b003ee0eb4b45csm2487142wmo.24.2023.03.20.14.37.04
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 20 Mar 2023 14:37:05 -0700 (PDT)
-Message-ID: <b97698b9-1b90-5282-213c-0efe38cd7081@grsecurity.net>
-Date:   Mon, 20 Mar 2023 22:37:03 +0100
+        with ESMTP id S229601AbjCTW2J (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 Mar 2023 18:28:09 -0400
+X-Greylist: delayed 2318 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 20 Mar 2023 15:28:07 PDT
+Received: from mail.ilande.co.uk (mail.ilande.co.uk [IPv6:2001:41c9:1:41f::167])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 733A39004
+        for <kvm@vger.kernel.org>; Mon, 20 Mar 2023 15:28:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=ilande.co.uk; s=20220518; h=Subject:Content-Transfer-Encoding:Content-Type:
+        In-Reply-To:From:References:Cc:To:MIME-Version:Date:Message-ID:Sender:
+        Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender
+        :Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
+        List-Subscribe:List-Post:List-Owner:List-Archive;
+        bh=WyY8B4viD4bbQ+bFV2SBsFF2kC5CdxEpDJvMdyYf1TY=; b=PYiYoZPPC0ELlnHt8BthSJV1gJ
+        bgv5NzvfOCQ5tdjinwmuvyiHO1+sxSBq8XdbF4qIUT5FJ3Ge8+UmQah5ULiPmFxLxg6yHM8Oim7t4
+        IfbBSG1nm1vcsio6LifbGsPK468bwdGDDkx+tXS47wj8Y90SmbKtrBsERbNG42uvf8naHm24toyaC
+        zCb+VRgtIXTgbzNGJzClEPVTwfTve/DSxjz98L3JzUVUXtIht33PwB2D45ayI7OwuYX9ZRC6gz/Jp
+        0ZhjIFUC5J7hiUDU74IRv8ScYLLsSquUTEFLLlFe33mpXNGvt3ApZ4+/WLRw9avJr0fq6Ed//yMHi
+        FUQjqaY91JsAoVfnZOgv1GQxs6o+EPHLEa8DXWpRZydsWqOerrcxv68N5r974Tzl0lQeTRT7l3EMI
+        7bA28y0pi60+PU2xAEoYlIexaC9Tyk0mt71NWxacwCKvjiTLbCEBEXxvugduOdnD2bgRTV1SejvT7
+        oeP8WTcgcw8Euw7JUyxeE1w1bCeqUqI9zY7ZZElVgpr3/64QI3FrCW7Gq8fav2GMIBOu8idrCGBj3
+        06bCdtoP0ApohM69/QVHJFJYRDx8P6vsPZWJ9SNo91UYDNgqz8zL3ruApXl//f0/RWBmdMMtVzEn1
+        c94hFWqDjsU20i05fXyda9EKkPYOxPt9rRqea9keg=;
+Received: from [2a00:23c4:8bac:200:3870:f067:8488:5afb]
+        by mail.ilande.co.uk with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        (Exim 4.92)
+        (envelope-from <mark.cave-ayland@ilande.co.uk>)
+        id 1peNMz-000B2U-8K; Mon, 20 Mar 2023 21:48:45 +0000
+Message-ID: <b971a675-065e-4e0a-a9bc-babc244ff21b@ilande.co.uk>
+Date:   Mon, 20 Mar 2023 21:49:22 +0000
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.8.0
-Subject: Re: [PATCH v2 2/2] KVM: Shrink struct kvm_mmu_memory_cache
-Content-Language: en-US, de-DE
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>
-References: <20230217193336.15278-1-minipli@grsecurity.net>
- <20230217193336.15278-3-minipli@grsecurity.net> <ZBTtjTFPCRtK0Cy8@google.com>
-From:   Mathias Krause <minipli@grsecurity.net>
-In-Reply-To: <ZBTtjTFPCRtK0Cy8@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=no
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.13.0
+Content-Language: en-US
+To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>,
+        quintela@redhat.com, qemu-devel <qemu-devel@nongnu.org>,
+        kvm-devel <kvm@vger.kernel.org>,
+        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+        =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Bernhard Beschow <shentey@gmail.com>,
+        =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
+        BALATON Zoltan <balaton@eik.bme.hu>,
+        "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>,
+        Jiaxun Yang <jiaxun.yang@flygoat.com>,
+        "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+References: <87zg8aj5z3.fsf@secure.mitica>
+ <393c8070-e126-70de-4e85-11ac41d6f6be@linaro.org>
+From:   Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+In-Reply-To: <393c8070-e126-70de-4e85-11ac41d6f6be@linaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2a00:23c4:8bac:200:3870:f067:8488:5afb
+X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
+X-Spam-Level: 
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Subject: Re: KVM call for agenda for 2023-03-21
+X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
+X-SA-Exim-Scanned: Yes (on mail.ilande.co.uk)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 17.03.23 23:45, Sean Christopherson wrote:
-> On Fri, Feb 17, 2023, Mathias Krause wrote:
->> Move the 'capacity' member around to make use of the padding hole on 64
+On 20/03/2023 15:47, Philippe Mathieu-Daudé wrote:
+
+> Hi Juan,
 > 
-> Nit, 'nobjs' is the field that gets moved in this version.  No need for another
-> version, I can fix up when applying.
-
-Ahh, forgot to update the changelog after switching the layout. But as
-it was 'nobjs' next to 'capacity' for both variants, I wrongly thought
-there's no need to. But sure, you're right.
-
+> On 18/3/23 18:59, Juan Quintela wrote:
+>>
+>> Hi
+>>
+>> NOTE, NOTE, NOTE
+>>
+>> Remember that we are back in that crazy part of the year when daylight
+>> saving applies.  Call is done on US timezone.  If you are anything else,
+>> just doublecheck that it is working for you properly.
+>>
+>> NOTE, NOTE, NOTE
+>>
+>> Topics in the backburner:
+>> - single qemu binary
+>>    Philippe?
 > 
-> If no one objects, I'll plan on taking this through kvm-x86/generic.
+> Well we wanted a slot to discuss a bit the design problems we have
+> around some PCI-to-ISA bridges like the PIIX and VIA south bridges.
+> 
+> One of the main problem is figure how to instantiate circular IRQs
+> with QOM. Ex:
+> 
+>    devA exposes irqAo output
+>         wires to irqAi input
+> 
+>    devB exposes irqBo output
+>         wires to irqBi input
+> 
+> How to wire irqAo -> irqBi *AND* irqBo -> irqAi?
+> 
+> However personally I was busy with debugging issues opened for the
+> 8.0 release, and it is probably very late to schedule with Mark and
+> Bernhard for tomorrow...
 
-Thanks,
-Mathias
+Yeah unfortunately it's impossible for me to guarantee I'll be around for the call on 
+Tuesdays, but then I've also had an idea that models the hardware in a different way 
+so that circular IRQs aren't needed. I'm a bit backlogged with QEMU bits and pieces 
+this week, so it will take a little time to come up with a suitable proposal.
+
+
+ATB,
+
+Mark.
