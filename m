@@ -2,52 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 68FA66C14CA
-	for <lists+kvm@lfdr.de>; Mon, 20 Mar 2023 15:32:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8D94B6C14CB
+	for <lists+kvm@lfdr.de>; Mon, 20 Mar 2023 15:34:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229849AbjCTOck (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Mar 2023 10:32:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35082 "EHLO
+        id S230041AbjCTOeE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Mar 2023 10:34:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36794 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230082AbjCTOcg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 Mar 2023 10:32:36 -0400
-Received: from mail-wr1-x42f.google.com (mail-wr1-x42f.google.com [IPv6:2a00:1450:4864:20::42f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F149444BE
-        for <kvm@vger.kernel.org>; Mon, 20 Mar 2023 07:32:33 -0700 (PDT)
-Received: by mail-wr1-x42f.google.com with SMTP id h17so10552663wrt.8
-        for <kvm@vger.kernel.org>; Mon, 20 Mar 2023 07:32:33 -0700 (PDT)
+        with ESMTP id S229967AbjCTOeC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 Mar 2023 10:34:02 -0400
+Received: from mail-wr1-x436.google.com (mail-wr1-x436.google.com [IPv6:2a00:1450:4864:20::436])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9CE8F19F17
+        for <kvm@vger.kernel.org>; Mon, 20 Mar 2023 07:33:59 -0700 (PDT)
+Received: by mail-wr1-x436.google.com with SMTP id l27so2252965wrb.2
+        for <kvm@vger.kernel.org>; Mon, 20 Mar 2023 07:33:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rivosinc-com.20210112.gappssmtp.com; s=20210112; t=1679322752;
+        d=rivosinc-com.20210112.gappssmtp.com; s=20210112; t=1679322838;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=e4rw82ASEnMf9RFG0s9fYPBcw0wuC45MeHL9uAXE5Oc=;
-        b=10hkOaZM0dRnfpRnYbpcotfcniWBnn7MeeNk7ve+fXBfCT8IucgGYv3fNb5oU6fFQP
-         do0Jqar/zEt0CN1W2bXwEQY5vAZR2KJS4zecz8sYK3c4VE2bTp1zS/lOVhHmzU6iEupV
-         N5yDGXLdrt2b26HP/qXk4mhxFRAQvHZ932GJxSetB9MfE+amxov6uxghz51WGHW0ocWl
-         gl6yMrSixcw/B04uQGUmQK718brq9dsR73wXoeiVl122+QMp/m/tJ7EkPdjchflxTEWm
-         64WaNng1XEHmpc/hsI+AEDsKeHiwo+bHKzUv/rrdLwq10nzgfj2z8fGA06CoVXSiDRZy
-         n/uA==
+        bh=LeshOjQ5wnil/ack89MQX8RXsh/Ky/xoJOXHtxPP4ms=;
+        b=EBbcyEp1g2kgmV0YAg410pxMgPGtxdWQWtMtmoxXPKvk2kaTseaePkAFJQzJdU3HTb
+         6sIzAOibZ/mGIytDgMIhqCPPZ4LyavEueCre6HGrmU4un7Wipt0O3vtTPM0GRwuq3/nc
+         IN2kKYEz5Udm9VceTqUKIw3B/Q4vr823SgL6NwAXFdDMPK0XkEB1ZDoQCh7SLz4m03WW
+         qvDN35VVK1HGw9BBWEtQQBGQMLJfZ2nZH5kTrJvjndXbnIcMD0kXRHcVi8of4z7XvQCI
+         XAv7l//WF1LF2OeA+CR1nFlkqNsOTtr8DeN5knYNhKLi9Ch0xtY5Zy7KKCyZhzt/GKwj
+         TM5w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679322752;
+        d=1e100.net; s=20210112; t=1679322838;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=e4rw82ASEnMf9RFG0s9fYPBcw0wuC45MeHL9uAXE5Oc=;
-        b=aMd7S+x+Hbqq/pKkmNctfVP1qZ7PvgrUfWDiLCc6g2bvc9lMyq9jJb6rYg45Vcry3h
-         UH2yRK9zngCsBEzBhAiUqxXEKB4vi/6i1BT+TNBkyjoBWL0V8696RWbjudAm6xjLK9/q
-         xTvoFi2SIud44dDTi3jNS8/4rSojWqp3cB3Os5erJEJYi9y0ndC0dm4WvqalGn+bZ1ip
-         rimqYJLCPF54HxN9rmlz2zptzQc6uFJK+n+DCgQfz8qjWWkC5fG/zzh9nwuUMBP0O6zG
-         IEZRqjZ1bd93fdcoct1BemuXyZE+M6iGUCNMwO3Du+ij5F3KnvGkIGG1OMVT/cE32o0y
-         Zcfg==
-X-Gm-Message-State: AO0yUKXPS8WExBeY7GII8NSEcp1FtDpPvNTrJkIIY+ETg8p+28BlY/Ea
-        uBuQjN/0DgfTazkPLlL4zPr/Pw==
-X-Google-Smtp-Source: AK7set/oMj+FxFj7C+rpiMB9/7SiD/i9eGwAyP2JXmvf0oE+4xFEhnR7EgepeGSPtO3m6fn/nvar8A==
-X-Received: by 2002:a05:6000:505:b0:2d4:951:ef09 with SMTP id a5-20020a056000050500b002d40951ef09mr7623754wrf.48.1679322752388;
-        Mon, 20 Mar 2023 07:32:32 -0700 (PDT)
+        bh=LeshOjQ5wnil/ack89MQX8RXsh/Ky/xoJOXHtxPP4ms=;
+        b=csAfxEadHJ6kirte4vosEToex3+I4GKi3Js0w2zwjAxWFJP3XKpjdgAdHz/kq6dPR1
+         Fxfum3kU8RNgKy0g8Mau/C1DgGYdFJrW0K0/R6C9uYR6Q48MNMCfEpQRY2Nwu5u8vv7d
+         K1kDbbcWkdaG9UAWw6V+TczAL5EJhtj42RQGQ2VsOohCvXoYzoCNV+23zDUUw8blEoDr
+         tl3uMQsuwdEIl/kZHwWFwJXT9xLk1fd1JAowrFtJ4GhZSXNV1GABWI8xYP0aOhCLOTEC
+         Srs2QjBHnRkUbmvQQKpQfsOdlOjlerToDyXBAdz8K4aFiQdfsMnTGpD0YPTRFeuy8qEU
+         7rqg==
+X-Gm-Message-State: AO0yUKVWPxm6hjwXBRKsCYS5CoNMyitUqVeyo3ccTm/M/8RHPnWwl4KL
+        JUQnOoFmnOjSlZDb4zmIx5TUhA==
+X-Google-Smtp-Source: AK7set+X89qKhq2l3krQ430khzQoku5G3Ys1CmnNryz5wyYaRZswCovbIIW9Hn4lT5t0XC40/0wlGg==
+X-Received: by 2002:a5d:644b:0:b0:2cf:f3da:5b7f with SMTP id d11-20020a5d644b000000b002cff3da5b7fmr11406883wrw.2.1679322837986;
+        Mon, 20 Mar 2023 07:33:57 -0700 (PDT)
 Received: from localhost.localdomain (cpc98982-watf12-2-0-cust57.15-2.cable.virginm.net. [82.26.13.58])
-        by smtp.gmail.com with ESMTPSA id v6-20020a5d6106000000b002c55521903bsm9007953wrt.51.2023.03.20.07.32.31
+        by smtp.gmail.com with ESMTPSA id o10-20020a5d684a000000b002d89e113691sm10648wrw.52.2023.03.20.07.33.56
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 20 Mar 2023 07:32:31 -0700 (PDT)
+        Mon, 20 Mar 2023 07:33:57 -0700 (PDT)
 From:   Rajnesh Kanwal <rkanwal@rivosinc.com>
 To:     rkanwal@rivosinc.com
 Cc:     atishp@rivosinc.com, apatel@ventanamicro.com, kvm@vger.kernel.org,
@@ -55,8 +55,8 @@ Cc:     atishp@rivosinc.com, apatel@ventanamicro.com, kvm@vger.kernel.org,
         julien.thierry.kdev@gmail.com, maz@kernel.org,
         andre.przywara@arm.com, jean-philippe@linaro.org
 Subject: [PATCH kvmtool v3] Add virtio-transport option and deprecate force-pci and virtio-legacy.
-Date:   Mon, 20 Mar 2023 14:32:24 +0000
-Message-Id: <20230320143224.404220-1-rkanwal@rivosinc.com>
+Date:   Mon, 20 Mar 2023 14:33:44 +0000
+Message-Id: <20230320143344.404307-1-rkanwal@rivosinc.com>
 X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -83,6 +83,18 @@ Nothing changes for other architectures.
 
 Signed-off-by: Rajnesh Kanwal <rkanwal@rivosinc.com>
 ---
+v3:
+   - Given mmio and mmio-legacy transport is only supported by arm and
+     riscv archs, we conditionally print the help message to exclude
+     these options for other archs..
+
+V2: https://lore.kernel.org/all/20230315171238.300572-1-rkanwal@rivosinc.com/
+   - Removed VIRTIO_DEFAULT_TRANS macro.
+   - Replaced `[]` with `()` in cmdline arguments notes.
+   - Fixed virtio_tranport_parser -> virtio_transport_parser
+
+v1: https://lore.kernel.org/all/20230306120329.535320-1-rkanwal@rivosinc.com/
+
  arm/include/arm-common/kvm-arch.h        |  5 ----
  arm/include/arm-common/kvm-config-arch.h |  8 +++----
  builtin-run.c                            | 17 ++++++++++++--
