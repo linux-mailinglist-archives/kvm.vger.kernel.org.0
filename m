@@ -2,253 +2,237 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A423B6C13E6
-	for <lists+kvm@lfdr.de>; Mon, 20 Mar 2023 14:47:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E5F706C13EB
+	for <lists+kvm@lfdr.de>; Mon, 20 Mar 2023 14:48:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230022AbjCTNrg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Mar 2023 09:47:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59138 "EHLO
+        id S230395AbjCTNs0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Mar 2023 09:48:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60076 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229696AbjCTNre (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 Mar 2023 09:47:34 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 126311984;
-        Mon, 20 Mar 2023 06:47:32 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 9C76521B09;
-        Mon, 20 Mar 2023 13:47:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-        t=1679320051; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=JG1NfNYZbsuoe2pkjIqzOzgyiXaTYVCYng1U86OwRyg=;
-        b=r5hHLO1Itsa1NJ96zUobt9zQy0kJCfJkxmiPZSZ52fddtwYlB6cVpX9iPYkpG2+k8V+fn+
-        KTulba8lbtziKBZOKCrtLR6GOJlL1Vc2cCBpoROVBH2vIyq1uvQ54nGctxnl0yvabKHWKd
-        dfS+E9c+eqFThrrYPPkLqZt3xXubgJk=
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 47C6C13416;
-        Mon, 20 Mar 2023 13:47:31 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id VGKkD/NjGGSzCwAAMHmgww
-        (envelope-from <jgross@suse.com>); Mon, 20 Mar 2023 13:47:31 +0000
-Message-ID: <f9511025-f815-c8fa-f6e7-80501e8c839f@suse.com>
-Date:   Mon, 20 Mar 2023 14:47:30 +0100
+        with ESMTP id S230149AbjCTNsX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 Mar 2023 09:48:23 -0400
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CEFB54EC8
+        for <kvm@vger.kernel.org>; Mon, 20 Mar 2023 06:48:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1679320102; x=1710856102;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=Es3rcXxN/lX7M6BwzyQcaHplOsJJasp3CCy7wc6zULU=;
+  b=UqGCU+apfBbOQxhun/1cj/GxkF4+IC/VDiVpSHbl+8BZbgaH7FOcNF3W
+   EF4WFBZkblFWf1Y4DmieYG+p8JXnAWivws6NqaXbpVGvOieRCFMSxzVZ4
+   EBZr7qAx7GWfMEOXO6ckubpYc1nXy0oE9Ty8mppCICbGZfAFlf1aFjsKg
+   L/f9QdhMKOiFRsnGZXjPTLM68SkTkq7a9C28JmymhAEF3LoFmg3tAEsGE
+   IEc2dx9rDCW82kEVfNPpcvKvolYw3GhzwaYiI1WVskxvWJMe6/Q6UghJM
+   AOKpUciM5dlbZUq54tyIW6sw/ZnMfzUzc0PKVfyeWuEIwCJBZBVjUWcsB
+   w==;
+X-IronPort-AV: E=Sophos;i="5.98,274,1673938800"; 
+   d="asc'?scan'208";a="205909853"
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa5.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 20 Mar 2023 06:48:22 -0700
+Received: from chn-vm-ex02.mchp-main.com (10.10.85.144) by
+ chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.21; Mon, 20 Mar 2023 06:48:20 -0700
+Received: from wendy (10.10.115.15) by chn-vm-ex02.mchp-main.com
+ (10.10.85.144) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.21 via Frontend
+ Transport; Mon, 20 Mar 2023 06:48:18 -0700
+Date:   Mon, 20 Mar 2023 13:47:48 +0000
+From:   Conor Dooley <conor.dooley@microchip.com>
+To:     Nathan Chancellor <nathan@kernel.org>,
+        Andy Chiu <andy.chiu@sifive.com>
+CC:     Andy Chiu <andy.chiu@sifive.com>,
+        <linux-riscv@lists.infradead.org>, <palmer@dabbelt.com>,
+        <anup@brainfault.org>, <atishp@atishpatra.org>,
+        <kvm-riscv@lists.infradead.org>, <kvm@vger.kernel.org>,
+        <vineetg@rivosinc.com>, <greentime.hu@sifive.com>,
+        <guoren@linux.alibaba.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Tom Rix <trix@redhat.com>
+Subject: Re: [PATCH -next v15 19/19] riscv: Enable Vector code to be built
+Message-ID: <8dba167d-5b68-472c-992f-05b80404f557@spud>
+References: <20230317113538.10878-1-andy.chiu@sifive.com>
+ <20230317113538.10878-20-andy.chiu@sifive.com>
+ <20230317154658.GA1122384@dev-arch.thelio-3990X>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.8.0
-Content-Language: en-US
-To:     "Huang, Kai" <kai.huang@intel.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "x86@kernel.org" <x86@kernel.org>
-Cc:     "Christopherson,, Sean" <seanjc@google.com>,
-        "bp@alien8.de" <bp@alien8.de>,
-        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
-        "hpa@zytor.com" <hpa@zytor.com>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Yamahata, Isaku" <isaku.yamahata@intel.com>
-References: <20230306163425.8324-1-jgross@suse.com>
- <20230306163425.8324-4-jgross@suse.com>
- <9c02041e7ce91752ede17b7a5232f38aadbb3a70.camel@intel.com>
-From:   Juergen Gross <jgross@suse.com>
-Subject: Re: [PATCH v4 03/12] x86/mtrr: support setting MTRR state for
- software defined MTRRs
-In-Reply-To: <9c02041e7ce91752ede17b7a5232f38aadbb3a70.camel@intel.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="------------6ghO3BfwC7REkCj1ARA9WLsT"
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+        protocol="application/pgp-signature"; boundary="QnGsS1xIKGouiNsN"
+Content-Disposition: inline
+In-Reply-To: <20230317154658.GA1122384@dev-arch.thelio-3990X>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---------------6ghO3BfwC7REkCj1ARA9WLsT
-Content-Type: multipart/mixed; boundary="------------XdLW0iqN5FxuAMjX282ap0Q0";
- protected-headers="v1"
-From: Juergen Gross <jgross@suse.com>
-To: "Huang, Kai" <kai.huang@intel.com>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "x86@kernel.org" <x86@kernel.org>
-Cc: "Christopherson,, Sean" <seanjc@google.com>, "bp@alien8.de"
- <bp@alien8.de>, "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
- "hpa@zytor.com" <hpa@zytor.com>, "mingo@redhat.com" <mingo@redhat.com>,
- "tglx@linutronix.de" <tglx@linutronix.de>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "Yamahata, Isaku" <isaku.yamahata@intel.com>
-Message-ID: <f9511025-f815-c8fa-f6e7-80501e8c839f@suse.com>
-Subject: Re: [PATCH v4 03/12] x86/mtrr: support setting MTRR state for
- software defined MTRRs
-References: <20230306163425.8324-1-jgross@suse.com>
- <20230306163425.8324-4-jgross@suse.com>
- <9c02041e7ce91752ede17b7a5232f38aadbb3a70.camel@intel.com>
-In-Reply-To: <9c02041e7ce91752ede17b7a5232f38aadbb3a70.camel@intel.com>
-
---------------XdLW0iqN5FxuAMjX282ap0Q0
-Content-Type: multipart/mixed; boundary="------------EzSRQ9SXZS3miStFulFcoOrq"
-
---------------EzSRQ9SXZS3miStFulFcoOrq
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: base64
-
-T24gMjAuMDMuMjMgMTM6NTksIEh1YW5nLCBLYWkgd3JvdGU6DQo+IE9uIE1vbiwgMjAyMy0w
-My0wNiBhdCAxNzozNCArMDEwMCwgSnVlcmdlbiBHcm9zcyB3cm90ZToNCj4+IFdoZW4gcnVu
-bmluZyB2aXJ0dWFsaXplZCwgTVRSUiBhY2Nlc3MgY2FuIGJlIHJlZHVjZWQgKGUuZy4gaW4g
-WGVuIFBWDQo+PiBndWVzdHMgb3Igd2hlbiBydW5uaW5nIGFzIGEgU0VWLVNOUCBndWVzdCB1
-bmRlciBIeXBlci1WKS4gVHlwaWNhbGx5DQo+PiB0aGUgaHlwZXJ2aXNvciB3aWxsIHJlc2V0
-IHRoZSBNVFJSIGZlYXR1cmUgaW4gQ1BVSUQgZGF0YSwgcmVzdWx0aW5nDQo+PiBpbiBubyBN
-VFJSIG1lbW9yeSB0eXBlIGluZm9ybWF0aW9uIGJlaW5nIGF2YWlsYWJsZSBmb3IgdGhlIGtl
-cm5lbC4NCj4+DQo+PiBUaGlzIGhhcyB0dXJuZWQgb3V0IHRvIHJlc3VsdCBpbiBwcm9ibGVt
-czoNCj4+DQo+PiAtIEh5cGVyLVYgU0VWLVNOUCBndWVzdHMgdXNpbmcgdW5jYWNoZWQgbWFw
-cGluZ3Mgd2hlcmUgdGhleSBzaG91bGRuJ3QNCj4+IC0gWGVuIFBWIGRvbTAgbWFwcGluZyBt
-ZW1vcnkgYXMgV0Igd2hpY2ggc2hvdWxkIGJlIFVDLSBpbnN0ZWFkDQo+Pg0KPj4gU29sdmUg
-dGhvc2UgcHJvYmxlbXMgYnkgc3VwcG9ydGluZyB0byBzZXQgYSBzdGF0aWMgTVRSUiBzdGF0
-ZSwNCj4+IG92ZXJ3cml0aW5nIHRoZSBlbXB0eSBzdGF0ZSB1c2VkIHRvZGF5LiBJbiBjYXNl
-IHN1Y2ggYSBzdGF0ZSBoYXMgYmVlbg0KPj4gc2V0LCBkb24ndCBjYWxsIGdldF9tdHJyX3N0
-YXRlKCkgaW4gbXRycl9icF9pbml0KCkuIFRoZSBzZXQgc3RhdGUNCj4+IHdpbGwgb25seSBi
-ZSB1c2VkIGJ5IG10cnJfdHlwZV9sb29rdXAoKSwgYXMgaW4gYWxsIG90aGVyIGNhc2VzDQo+
-PiBtdHJyX2VuYWJsZWQoKSBpcyBiZWluZyBjaGVja2VkLCB3aGljaCB3aWxsIHJldHVybiBm
-YWxzZS4gQWNjZXB0IHRoZQ0KPj4gb3ZlcndyaXRlIGNhbGwgb25seSBmb3Igc2VsZWN0ZWQg
-Y2FzZXMgd2hlbiBydW5uaW5nIGFzIGEgZ3Vlc3QuDQo+PiBEaXNhYmxlIFg4Nl9GRUFUVVJF
-X01UUlIgaW4gb3JkZXIgdG8gYXZvaWQgYW55IE1UUlIgbW9kaWZpY2F0aW9ucyBieQ0KPj4g
-anVzdCByZWZ1c2luZyB0aGVtLg0KPj4NCj4+DQo+IFsuLi5dDQo+IA0KPj4gZGlmZiAtLWdp
-dCBhL2FyY2gveDg2L2tlcm5lbC9jcHUvbXRyci9nZW5lcmljLmMgYi9hcmNoL3g4Ni9rZXJu
-ZWwvY3B1L210cnIvZ2VuZXJpYy5jDQo+PiBpbmRleCBlZTA5ZDM1OWUwOGYuLjQ5YjRjYzky
-MzMxMiAxMDA2NDQNCj4+IC0tLSBhL2FyY2gveDg2L2tlcm5lbC9jcHUvbXRyci9nZW5lcmlj
-LmMNCj4+ICsrKyBiL2FyY2gveDg2L2tlcm5lbC9jcHUvbXRyci9nZW5lcmljLmMNCj4+IEBA
-IC04LDEwICs4LDEyIEBADQo+PiAgICNpbmNsdWRlIDxsaW51eC9pbml0Lmg+DQo+PiAgICNp
-bmNsdWRlIDxsaW51eC9pby5oPg0KPj4gICAjaW5jbHVkZSA8bGludXgvbW0uaD4NCj4+IC0N
-Cj4+ICsjaW5jbHVkZSA8bGludXgvY2NfcGxhdGZvcm0uaD4NCj4+ICAgI2luY2x1ZGUgPGFz
-bS9wcm9jZXNzb3ItZmxhZ3MuaD4NCj4+ICAgI2luY2x1ZGUgPGFzbS9jYWNoZWluZm8uaD4N
-Cj4+ICAgI2luY2x1ZGUgPGFzbS9jcHVmZWF0dXJlLmg+DQo+PiArI2luY2x1ZGUgPGFzbS9o
-eXBlcnZpc29yLmg+DQo+PiArI2luY2x1ZGUgPGFzbS9tc2h5cGVydi5oPg0KPiANCj4gSXMg
-PGFzbS9tc2h5cGVydi5oPiBuZWVkZWQgaGVyZT8NCg0KWWVzLCBmb3IgaHZfaXNfaXNvbGF0
-aW9uX3N1cHBvcnRlZCgpLg0KDQo+IA0KPj4gICAjaW5jbHVkZSA8YXNtL3RsYmZsdXNoLmg+
-DQo+PiAgICNpbmNsdWRlIDxhc20vbXRyci5oPg0KPj4gICAjaW5jbHVkZSA8YXNtL21zci5o
-Pg0KPj4gQEAgLTI0MCw2ICsyNDIsNDggQEAgc3RhdGljIHU4IG10cnJfdHlwZV9sb29rdXBf
-dmFyaWFibGUodTY0IHN0YXJ0LCB1NjQgZW5kLCB1NjQgKnBhcnRpYWxfZW5kLA0KPj4gICAJ
-cmV0dXJuIG10cnJfc3RhdGUuZGVmX3R5cGU7DQo+PiAgIH0NCj4+ICAgDQo+PiArLyoqDQo+
-PiArICogbXRycl9vdmVyd3JpdGVfc3RhdGUgLSBzZXQgc3RhdGljIE1UUlIgc3RhdGUNCj4+
-ICsgKg0KPj4gKyAqIFVzZWQgdG8gc2V0IE1UUlIgc3RhdGUgdmlhIGRpZmZlcmVudCBtZWFu
-cyAoZS5nLiB3aXRoIGRhdGEgb2J0YWluZWQgZnJvbQ0KPj4gKyAqIGEgaHlwZXJ2aXNvciku
-DQo+IA0KPiArS1ZNIGxpc3QgYW5kIEtWTSBtYWludGFpbmVycywNCj4gDQo+IElJVUMgaW4g
-dGhlIG5leHQgcGF0Y2gsIFNFVi1TTlAgZ3Vlc3Qgb25seSBzZXRzIGEgc3ludGhldGljIE1U
-UlIgdy9vIHRlbGxpbmcgdGhlDQo+IGh5cGVydmlzb3IgKGh5cGVydikuICBJIHRoaW5rIHRo
-aXMgd29ya3MgZm9yIFNFVi1TTlAgcnVubmluZyBvbiB0b3Agb2YgaHlwZXJ2DQo+IGJlY2F1
-c2UgdGhleSBoYXZlIG11dHVhbCB1bmRlcnN0YW5kaW5nPw0KPiANCj4gV2hhdCBhYm91dCB0
-aGUgU05QIGd1ZXN0IHJ1bm5pbmcgb24gb3RoZXIgaHlwZXJ2aXNvcnMgc3VjaCBhcyBLVk0/
-DQo+IA0KPiBTaW5jZSB0aGlzIGNvZGUgY292ZXJzIFREWCBndWVzdCB0b28sIEkgdGhpbmsg
-ZXZlbnR1YWxseSBpdCBtYWtlcyBzZW5zZSBmb3IgVERYDQo+IGd1ZXN0IHRvIHVzZSB0aGlz
-IGZ1bmN0aW9uIHRvbyAodG8gYXZvaWQgI1ZFIElJVUMpLiAgSWYgd2FudCB0byBkbyB0aGF0
-LCB0aGVuIEkNCj4gdGhpbmsgVERYIGd1ZXN0IHNob3VsZCBoYXZlIHRoZSBzYW1lIG11dHVh
-bCB1bmRlcnN0YW5kaW5nIHdpdGggKkFMTCogaHlwZXJ2aXNvciwNCj4gYXMgSSBhbSBub3Qg
-c3VyZSB3aGF0J3MgdGhlIHBvaW50IG9mIG1ha2luZyB0aGUgVERYIGd1ZXN0J3MgTVRSUiBi
-ZWhhdmlvdXINCj4gZGVwZW5kaW5nIG9uIHNwZWNpZmljIGh5cGVydmlzb3IuDQoNClRoaXMg
-c2VyaWVzIHRyaWVzIHRvIGZpeCB0aGUgY3VycmVudCBmYWxsb3V0Lg0KDQpCb3JpcyBQZXRr
-b3YgYXNrZWQgZm9yIHRoZSBoeXBlcnZpc29yIHNwZWNpZmljIHRlc3RzIHRvIGJlIGFkZGVk
-LCBzbyBJJ3ZlDQphZGRlZCB0aGVtIGFmdGVyIGRpc2N1c3NpbmcgdGhlIHRvcGljIHdpdGgg
-aGltIChoZSBpcyB0aGUgbWFpbnRhaW5lciBvZg0KdGhpcyBjb2RlIGFmdGVyIGFsbCkuDQoN
-Cj4gRm9yIG5vdyBJIGRvbid0IHNlZSB0aGVyZSdzIGFueSB1c2UgY2FzZSBmb3IgVERYIGd1
-ZXN0IHRvIHVzZSBub24tV0IgbWVtb3J5IHR5cGUNCj4gKGluIGZhY3QsIEtWTSBhbHdheXMg
-bWFwcyBndWVzdCBtZW1vcnkgYXMgV0IgaWYgdGhlcmUncyBubyBub24tY29oZXJlbnQgRE1B
-IHRvDQo+IHRoZSBndWVzdCBtZW1vcnkpLCBzbyB0byBtZSBpdCBzZWVtcyBpdCdzIE9LIHRv
-IG1ha2UgYSB1bml2ZXJzYWwgbXV0dWFsDQo+IHVuZGVyc3RhbmRpbmcgdGhhdCBURFggZ3Vl
-c3Qgd2lsbCBhbHdheXMgaGF2ZSBXQiBtZW1vcnkgdHlwZSBmb3IgYWxsIG1lbW9yeS4NCg0K
-SSBhZ3JlZS4NCg0KPiBCdXQsIEkgYW0gbm90IHN1cmUgd2hldGhlciBpdCdzIGJldHRlciB0
-byBoYXZlIGEgc3RhbmRhcmQgaHlwZXJjYWxsIGJldHdlZW4NCj4gZ3Vlc3QgJiBoeXBlcnZp
-c29yIGZvciB0aGlzIHB1cnBvc2Ugc28gdGhpbmdzIGNhbiBiZSBtb3JlIGZsZXhpYmxlPw0K
-DQpNYXliZS4gQnV0IGZvciBub3cgd2UgbmVlZCB0byBoYW5kbGUgdGhlIGN1cnJlbnQgc2l0
-dWF0aW9uLg0KDQoNCkp1ZXJnZW4NCg==
---------------EzSRQ9SXZS3miStFulFcoOrq
-Content-Type: application/pgp-keys; name="OpenPGP_0xB0DE9DD628BF132F.asc"
-Content-Disposition: attachment; filename="OpenPGP_0xB0DE9DD628BF132F.asc"
-Content-Description: OpenPGP public key
+--QnGsS1xIKGouiNsN
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
------BEGIN PGP PUBLIC KEY BLOCK-----
+On Fri, Mar 17, 2023 at 08:46:58AM -0700, Nathan Chancellor wrote:
+> On Fri, Mar 17, 2023 at 11:35:38AM +0000, Andy Chiu wrote:
+> > From: Guo Ren <guoren@linux.alibaba.com>
+> >=20
+> > This patch adds a config which enables vector feature from the kernel
+> > space.
+> >=20
+> > Support for RISC_V_ISA_V is limited to GNU-assembler for now, as LLVM
+> > has not acquired the functionality to selectively change the arch option
+> > in assembly code. This is still under review at
+> >     https://reviews.llvm.org/D123515
+> >=20
+> > Signed-off-by: Guo Ren <guoren@linux.alibaba.com>
+> > Co-developed-by: Greentime Hu <greentime.hu@sifive.com>
+> > Signed-off-by: Greentime Hu <greentime.hu@sifive.com>
+> > Suggested-by: Vineet Gupta <vineetg@rivosinc.com>
+> > Suggested-by: Atish Patra <atishp@atishpatra.org>
+> > Co-developed-by: Andy Chiu <andy.chiu@sifive.com>
+> > Signed-off-by: Andy Chiu <andy.chiu@sifive.com>
+> > ---
+> >  arch/riscv/Kconfig  | 20 ++++++++++++++++++++
+> >  arch/riscv/Makefile |  6 +++++-
+> >  2 files changed, 25 insertions(+), 1 deletion(-)
+> >=20
+> > diff --git a/arch/riscv/Kconfig b/arch/riscv/Kconfig
+> > index c736dc8e2593..bf9aba2f2811 100644
+> > --- a/arch/riscv/Kconfig
+> > +++ b/arch/riscv/Kconfig
+> > @@ -436,6 +436,26 @@ config RISCV_ISA_SVPBMT
+> > =20
+> >  	   If you don't know what to do here, say Y.
+> > =20
+> > +config TOOLCHAIN_HAS_V
+> > +	bool
+> > +	default y
+> > +	depends on !64BIT || $(cc-option,-mabi=3Dlp64 -march=3Drv64iv)
+> > +	depends on !32BIT || $(cc-option,-mabi=3Dilp32 -march=3Drv32iv)
+> > +	depends on LLD_VERSION >=3D 140000 || LD_VERSION >=3D 23800
+> > +	depends on AS_IS_GNU
+>=20
+> Consider hoisting this 'depends on AS_IS_GNU' into its own configuration
+> option, as the same dependency is present in CONFIG_TOOLCHAIN_HAS_ZBB
+> for the exact same reason, with no comment as to why. By having a shared
+> dependency configuration option, we can easily update it when that
+> change is merged into LLVM proper and gain access to the current and
+> future options that depend on it. I imagine something like:
+>=20
+> config AS_HAS_OPTION_ARCH
+>     bool
+>     default y
+>     # https://reviews.llvm.org/D123515
+>     depends on AS_IS_GNU
+>=20
+> config TOOLCHAIN_HAS_ZBB
+>     bool
+>     default y
+>     depends on !64BIT || $(cc-option,-mabi=3Dlp64 -march=3Drv64ima_zbb)
+>     depends on !32BIT || $(cc-option,-mabi=3Dilp32 -march=3Drv32ima_zbb)
+>     depends on LLD_VERSION >=3D 150000 || LD_VERSION >=3D 23900
+>     depends on AS_HAS_OPTION_ARCH
+>=20
+> config TOOLCHAIN_HAS_V
+>     bool
+>     default y
+>     depends on !64BIT || $(cc-option,-mabi=3Dlp64 -march=3Drv64iv)
+>     depends on !32BIT || $(cc-option,-mabi=3Dilp32 -march=3Drv32iv)
+>     depends on LLD_VERSION >=3D 140000 || LD_VERSION >=3D 23800
+>     depends on AS_HAS_OPTION_ARCH
+>=20
+> It would be nice if it was a hard error for LLVM like GCC so that we
+> could just dynamically check support via as-instr but a version check is
+> not the end of the world when we know the versions.
 
-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
-jR/i1DG86lem3iBDXzXsZDn8R38=3D
-=3D2wuH
------END PGP PUBLIC KEY BLOCK-----
+Yah, this is a good idea Nathan, since we may end up having to do the
+same thing for a decent number of extensions going forward. Could you
+please implement this Andy?
 
---------------EzSRQ9SXZS3miStFulFcoOrq--
+> > +config RISCV_ISA_V
+> > +	bool "VECTOR extension support"
+> > +	depends on TOOLCHAIN_HAS_V
+> > +	depends on FPU
+> > +	select DYNAMIC_SIGFRAME
+> > +	default y
+> > +	help
+> > +	  Say N here if you want to disable all vector related procedure
+> > +	  in the kernel.
+> > +
+> > +	  If you don't know what to do here, say Y.
+> > +
+> >  config TOOLCHAIN_HAS_ZBB
+> >  	bool
+> >  	default y
+> > diff --git a/arch/riscv/Makefile b/arch/riscv/Makefile
+> > index 6203c3378922..84a50cfaedf9 100644
+> > --- a/arch/riscv/Makefile
+> > +++ b/arch/riscv/Makefile
+> > @@ -56,6 +56,7 @@ riscv-march-$(CONFIG_ARCH_RV32I)	:=3D rv32ima
+> >  riscv-march-$(CONFIG_ARCH_RV64I)	:=3D rv64ima
+> >  riscv-march-$(CONFIG_FPU)		:=3D $(riscv-march-y)fd
+> >  riscv-march-$(CONFIG_RISCV_ISA_C)	:=3D $(riscv-march-y)c
+> > +riscv-march-$(CONFIG_RISCV_ISA_V)	:=3D $(riscv-march-y)v
+> > =20
+> >  # Newer binutils versions default to ISA spec version 20191213 which m=
+oves some
+> >  # instructions from the I extension to the Zicsr and Zifencei extensio=
+ns.
+> > @@ -65,7 +66,10 @@ riscv-march-$(toolchain-need-zicsr-zifencei) :=3D $(=
+riscv-march-y)_zicsr_zifencei
+> >  # Check if the toolchain supports Zihintpause extension
+> >  riscv-march-$(CONFIG_TOOLCHAIN_HAS_ZIHINTPAUSE) :=3D $(riscv-march-y)_=
+zihintpause
+> > =20
+> > -KBUILD_CFLAGS +=3D -march=3D$(subst fd,,$(riscv-march-y))
+> > +# Remove F,D,V from isa string for all. Keep extensions between "fd" a=
+nd "v" by
+> > +# keep non-v and multi-letter extensions out with the filter ([^v_]*)
+> > +KBUILD_CFLAGS +=3D -march=3D$(shell echo $(riscv-march-y) | sed  -E 's=
+/(rv32ima|rv64ima)fd([^v_]*)v?/\1\2/')
+                                                                 ^
+Is the extra space here intentional?
 
---------------XdLW0iqN5FxuAMjX282ap0Q0--
+It's a shame that this had to become so complicated, but thanks for
+adding a comment so that the rationale behind the complexity can be
+understood.
+Perhaps there's a case to be made for removing fd & v separately to make
+things more understandable, but I think the removal of v is going to
+look complex in both cases.
+I'm happy with doing it like this now, but if, in the future, we need to
+account for possibly having q too, I might advocate for the split rather
+than adding more complexity.
 
---------------6ghO3BfwC7REkCj1ARA9WLsT
-Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="OpenPGP_signature"
+With Nathan's suggestion of AS_HAS_OPTION_ARCH:
+Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
+
+Thanks,
+Conor.
+
+> > +
+> >  KBUILD_AFLAGS +=3D -march=3D$(riscv-march-y)
+> > =20
+> >  KBUILD_CFLAGS +=3D -mno-save-restore
+> > --=20
+> > 2.17.1
+> >=20
+>=20
+
+--QnGsS1xIKGouiNsN
+Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-wsB5BAABCAAjFiEEhRJncuj2BJSl0Jf3sN6d1ii/Ey8FAmQYY/IFAwAAAAAACgkQsN6d1ii/Ey9D
-Wwf/f3RfTC6okgNEgmL1mVuSGTHncOSe6foNwWkpYew7Ok2S1s62Vdao6pAKUmij/V16ksjWLF79
-scSVUNtLGJC0CO69CvVQRmi4ymGum15NezvIyCkLOxGk2NFqgKI4WzlB11KSpqumHNSsmCDvndNO
-myGbzHuMLZ5i/rkHzhqdHce39oRKVa6RQXv1Lgl4UbfFHIovT1eVoUxHFKvnNzA2FZ75BefYv8b9
-UWzInZKSgf4uIw2EPqPGwPjp0wXdKY8RDOvgglo1tIG/8UVuDNgr9Wbb+jSEZpao/H1JJOFIGWBp
-2d6Z7l3TKfKuMd5bqx7x1WeSEM7emZMTcOZ0tIH4lQ==
-=UeC8
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZBhkBAAKCRB4tDGHoIJi
+0p0AAP9vHKk++cVD6wJwjmlgy447P7odQwr5lgPkEZaW+wELCwD+KY9JofoNOmD6
+cLAhoKLTib3V2C/U9BKT1m1/WIvyxQk=
+=+x6z
 -----END PGP SIGNATURE-----
 
---------------6ghO3BfwC7REkCj1ARA9WLsT--
+--QnGsS1xIKGouiNsN--
