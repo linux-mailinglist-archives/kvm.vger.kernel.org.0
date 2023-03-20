@@ -2,80 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0A5756C1E8E
-	for <lists+kvm@lfdr.de>; Mon, 20 Mar 2023 18:51:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3A1426C1F0B
+	for <lists+kvm@lfdr.de>; Mon, 20 Mar 2023 19:07:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230407AbjCTRvb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Mar 2023 13:51:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40562 "EHLO
+        id S230345AbjCTSHw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Mar 2023 14:07:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42644 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230267AbjCTRvB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 Mar 2023 13:51:01 -0400
-Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4BB5E2DE78;
-        Mon, 20 Mar 2023 10:45:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=xHmOUL5c7d7/FrFtZQKw5S5y23ri0niwCk3/YRUyPWQ=; b=bnAymxi8xO8MJaRLCHQLkuVkuX
-        gxqbmObZ4bT0nmB/OiD+fyUXeCa5clslwnlIh/FE6Wjh+02GAkyZ4HEwhliG5nusQCGJsuDSyaQ1q
-        oAnsNwLIB/T82wkRxsGcwJmqJNNLYiUUeKPrzdpdBFpItkCh7I5Klifh2awagmUCkuOeA/6h1Xale
-        6jm/BEEdQS0fp78/G2pxnz7DxtRkEJWuX/FCBU3KBetGlKfRuQMxzRQFmYNz+Mveyw3v2Rl0NMwBi
-        83w5xBuh5eKp/yLlqnNnlh5PCaE0ZwQQv17itQN2TtKtK2ooH1rdv2U7w0YD+C3PfacDLIqcVrKAI
-        dXbjoV7w==;
-Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
-        by desiato.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-        id 1peIhj-003zqE-0F;
-        Mon, 20 Mar 2023 16:49:52 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        with ESMTP id S230017AbjCTSH0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 Mar 2023 14:07:26 -0400
+Received: from bird.elm.relay.mailchannels.net (bird.elm.relay.mailchannels.net [23.83.212.17])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82B406A7D;
+        Mon, 20 Mar 2023 11:01:33 -0700 (PDT)
+X-Sender-Id: dreamhost|x-authsender|dave@stgolabs.net
+Received: from relay.mailchannels.net (localhost [127.0.0.1])
+        by relay.mailchannels.net (Postfix) with ESMTP id 64594541B01;
+        Mon, 20 Mar 2023 17:36:03 +0000 (UTC)
+Received: from pdx1-sub0-mail-a273.dreamhost.com (unknown [127.0.0.6])
+        (Authenticated sender: dreamhost)
+        by relay.mailchannels.net (Postfix) with ESMTPA id AC63D541B75;
+        Mon, 20 Mar 2023 17:36:02 +0000 (UTC)
+ARC-Seal: i=1; s=arc-2022; d=mailchannels.net; t=1679333762; a=rsa-sha256;
+        cv=none;
+        b=PIAShpVwyvpJZnCyPWAogg0YGrBqfZEm4Q+ZadyqsY3jqC+TKlBiW7CiNi8HDs199z0HhL
+        UZDTTWMybXaSZdlpfS+b4rFyWxrRztP3AN3eA8eiNRYbCiUdeLGMf1i2JAQabBOv3zONQf
+        zqbcqYK6hJpBZc4l3ktthB66XdXX58AEkOatFAt4Xl9BlNMy7YEfCA9yRU5ZN0kXvF307a
+        KShaNtSfMOqOwbLTW+ati2ek3euuO5WO4Iu2Mjhq/l7JLRH/wJqsasnO4JEGOmvAlBNxvS
+        E0sXrMTkgDtlkxoH+RmDoRBvv+RPfUOtNIFSLO9OcqwL7jWFDJLrpgsKU4cG/A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=mailchannels.net;
+        s=arc-2022; t=1679333762;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references:dkim-signature;
+        bh=6cUWCy5BondAFKhr1G1eG0K7rK06l9QCNh+5bql75bQ=;
+        b=n2tZs5125yPkZ3CNlnlmBdUkXF+A6S55sIFIf1EIqfNvNGAwTVqkgl1tbc7k9PeZP0kXal
+        Qzd4+wzB8mc2cbswJjOJhKMOxUhCRt+mY8c6E2ef6iGeSf49rEYdYqDG/36qdnHFGQcjwf
+        /53eS7QniZWeYhUNWAgyYRRW2NwNIXzEpTosK1soXulqq7LSG/BKtUATMO4bUE7kHodfpi
+        QTaolxWC/XVJvnMhhyP9pH1q+HO2sd8ygbAMr3NhyjMD1yhIG/7rr1Ud1n7DyZWieKYC9O
+        uoz4OvRlwJ9010bLz6bjkMSvRmfEpa//K57cqegAgbxpu/y3oJgJDzNICU0PSA==
+ARC-Authentication-Results: i=1;
+        rspamd-59dbd69698-w6jh5;
+        auth=pass smtp.auth=dreamhost smtp.mailfrom=dave@stgolabs.net
+X-Sender-Id: dreamhost|x-authsender|dave@stgolabs.net
+X-MC-Relay: Neutral
+X-MailChannels-SenderId: dreamhost|x-authsender|dave@stgolabs.net
+X-MailChannels-Auth-Id: dreamhost
+X-Shelf-Vacuous: 42b4d09114e22d43_1679333763159_1412504491
+X-MC-Loop-Signature: 1679333763159:3813855172
+X-MC-Ingress-Time: 1679333763159
+Received: from pdx1-sub0-mail-a273.dreamhost.com (pop.dreamhost.com
+ [64.90.62.162])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384)
+        by 100.126.30.4 (trex/6.7.2);
+        Mon, 20 Mar 2023 17:36:03 +0000
+Received: from offworld (ip72-199-50-187.sd.sd.cox.net [72.199.50.187])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits))
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 8C7FF300137;
-        Mon, 20 Mar 2023 17:49:50 +0100 (CET)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id 75486200A76E5; Mon, 20 Mar 2023 17:49:50 +0100 (CET)
-Date:   Mon, 20 Mar 2023 17:49:50 +0100
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Lai Jiangshan <jiangshanlai@gmail.com>
-Cc:     "H. Peter Anvin" <hpa@zytor.com>, Xin Li <xin3.li@intel.com>,
-        linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, andrew.cooper3@citrix.com,
-        seanjc@google.com, pbonzini@redhat.com, ravi.v.shankar@intel.com
-Subject: Re: [PATCH v5 22/34] x86/fred: FRED initialization code
-Message-ID: <20230320164950.GR2194297@hirez.programming.kicks-ass.net>
-References: <20230307023946.14516-1-xin3.li@intel.com>
- <20230307023946.14516-23-xin3.li@intel.com>
- <CAJhGHyADXz-3PCFS3M_7TJ8qLGJ=4NcV9aBWrpjemuXB_SnMGg@mail.gmail.com>
- <5D679723-D84F-42F0-AD8A-8BD1A38FB6CD@zytor.com>
- <CAJhGHyC0_1xJD2R03-NoRVpMXFTHR4v8CdzyJOZe_k0rdv=NfQ@mail.gmail.com>
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        (Authenticated sender: dave@stgolabs.net)
+        by pdx1-sub0-mail-a273.dreamhost.com (Postfix) with ESMTPSA id 4PgMN11nK7z6n;
+        Mon, 20 Mar 2023 10:36:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=stgolabs.net;
+        s=dreamhost; t=1679333762;
+        bh=6cUWCy5BondAFKhr1G1eG0K7rK06l9QCNh+5bql75bQ=;
+        h=Date:From:To:Cc:Subject:Content-Type;
+        b=CwnkROYHSiF5vVjQxFm7PpBoKPLNDkWQ8TJ8eA7pIPE9Ucf0bc7rCMQwdsA9Wc2GW
+         MA3tMlJHZDdgqu5b6L+jlt2vZrwjZjLobaVg3Oetf3YaAE02W8lkNrhG63cbe1PRTl
+         yfZz/dB1D6oborELmDZLut8DQzgzx62Op6iFr6LSZ50rdai861KsrG5lwMaQYR3UzD
+         4GyA3XrQ2WhwCd/yNRXBVEzlJ/88/M43JoEWy2N9nQdIYoNGzG4OGcSUh9Ugqp+r2S
+         59ZjxvZrI5EuU/Zzyh5BIcHoN8LSFsK2LZ89+7u24DEfxDtK4WtX+TmfQcbvxwSS0L
+         bAKXtXDEneEWQ==
+Date:   Mon, 20 Mar 2023 10:06:14 -0700
+From:   Davidlohr Bueso <dave@stgolabs.net>
+To:     Boqun Feng <boqun.feng@gmail.com>
+Cc:     rcu@vger.kernel.org, Peter Zijlstra <peterz@infradead.org>,
+        Ingo Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>,
+        Waiman Long <longman@redhat.com>,
+        Lai Jiangshan <jiangshanlai@gmail.com>,
+        "Paul E. McKenney" <paulmck@kernel.org>,
+        Josh Triplett <josh@joshtriplett.org>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+        Frederic Weisbecker <frederic@kernel.org>,
+        Neeraj Upadhyay <quic_neeraju@quicinc.com>,
+        Joel Fernandes <joel@joelfernandes.org>,
+        Shuah Khan <shuah@kernel.org>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        seanjc@google.com, linux-kernel@vger.kernel.org,
+        linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH rcu 1/7] locking/lockdep: Introduce lock_sync()
+Message-ID: <20230320170614.ttnqyhemnelgmzgd@offworld>
+References: <20230317031339.10277-1-boqun.feng@gmail.com>
+ <20230317031339.10277-2-boqun.feng@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <CAJhGHyC0_1xJD2R03-NoRVpMXFTHR4v8CdzyJOZe_k0rdv=NfQ@mail.gmail.com>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <20230317031339.10277-2-boqun.feng@gmail.com>
+User-Agent: NeoMutt/20220429
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Mar 18, 2023 at 02:33:30PM +0800, Lai Jiangshan wrote:
-> If there is no other concrete reason other than overflowing for
-> assigning NMI and #DB with a stack level > 0, #VE should also
-> be assigned with a stack level > 0, and #BP too. #VE can happen
-> anytime and anywhere, so it is subject to overflowing too.
+On Thu, 16 Mar 2023, Boqun Feng wrote:
 
-So #BP needs the stack-gap (redzone) for text_poke_bp().
-
-#BP can end up in kprobes which can then end up in ftrace/perf,
-depending on how it's all wired up.
-
-#VE is currently a trainwreck vs NMI/MCE, but I think FRED solves the
-worst of that. I'm not exactly sure how deep the #VE handler goes.
-
-
+>+/*
+>+ * lock_sync() - A special annotation for synchronize_{s,}rcu()-like API.
+>+ *
+>+ * No actual critical section is created by the APIs annotated with this: these
+>+ * APIs are used to wait for one or multiple critical sections (on other CPUs
+>+ * or threads), and it means that calling these APIs inside these critical
+>+ * sections is potential deadlock.
+>+ *
+>+ * This annotation acts as an acqurie+release anontation pair with hardirqoff
+				^acquire
