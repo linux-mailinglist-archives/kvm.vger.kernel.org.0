@@ -2,101 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 221226C1D16
-	for <lists+kvm@lfdr.de>; Mon, 20 Mar 2023 18:01:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6A2486C1D1E
+	for <lists+kvm@lfdr.de>; Mon, 20 Mar 2023 18:03:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232956AbjCTRBN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Mar 2023 13:01:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36050 "EHLO
+        id S232041AbjCTRDK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Mar 2023 13:03:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40782 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232963AbjCTRAs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 Mar 2023 13:00:48 -0400
-Received: from mail-oi1-x22b.google.com (mail-oi1-x22b.google.com [IPv6:2607:f8b0:4864:20::22b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 846A211674
-        for <kvm@vger.kernel.org>; Mon, 20 Mar 2023 09:53:56 -0700 (PDT)
-Received: by mail-oi1-x22b.google.com with SMTP id a9so1688531oiw.2
-        for <kvm@vger.kernel.org>; Mon, 20 Mar 2023 09:53:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1679331168;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1e5Rkc1xXZveL9YUdD5abhg2y+JLZGAXin0mZccVnf4=;
-        b=gnrwM3rvK6ih7m2hFKr6/1HS4fFHd+7OczbqHtTjdR+JtNAAXC3z4igtpKPqyzQ9a9
-         /trz7ALGddy8zPVv6jGjZOHsKSwiA2ApBybwwu8oElO2uSgu3gA/l4F8gfPfaRM3r8FO
-         3xwMU04R9iIyQCLsPBsFxYtFQbjTk60+b8yObejJG+eW8aFemnsaWigr6yLs06pgGCR6
-         4Js2WeqnD4viBqbTecDW3U/0x/KyK7ykP6iXNkJGnlI5gK6i5lGU38mIqSzXWz/5NJoL
-         k2t6Szw3YaFqOfyTEXrJDxAehDmIu+VRpZyeEA2GG+WWbbnJ7QW9S9jwcNpOiot7jtpP
-         QQFQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679331168;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=1e5Rkc1xXZveL9YUdD5abhg2y+JLZGAXin0mZccVnf4=;
-        b=JcPqTAOwc6I3jjPsj1I+wxdjY6HgXZOh6OkGB/ngbxzlhjPKS/ComBzSo0TbgyD8o9
-         fQQgp7J+Bu3R02nnBG+ELlHTkklntUE41MnXhtw5/6Djn3Y5OZJD55sySEZqm2rVALbF
-         w8aoAIZujHGOOwNtqCeHqp2y9s1IBJEa1YzBGzsqmsQrDxZXFwIdg03xr7o2nTOefFpT
-         N4eJW5hv7rcn8PhbzvwnKT8SD616nhT0bZJBul/sRLh+c/RCpsTXTKOR5LnTBL8Cocko
-         6YPFa2ON5Zp4Jl1psvbdPKjvvbWPaeLBDBedQX8XzFMw9Tl0Ad4uXPaIyt21xEbEyt5Y
-         GBjw==
-X-Gm-Message-State: AO0yUKXMRjNfhKYfuaSQi6Cx2Sn0//OZgVoVi3tD3kZiFHPlm/Z3T+DK
-        7DWsnC5x0PaYroWt7Zqgj537ARzTP/rjdhGnH2za0hisXqNCp183Pjw=
-X-Google-Smtp-Source: AK7set8/xrKGP6VMJRGxUiZj3oCNJdRO+eVrkzyh8Cbf4EwHf1wuzOrN2vO5hdvEeEmad7EPGQ3SjWkVqUDaseF2zpI=
-X-Received: by 2002:aca:2b16:0:b0:384:27f0:bd0a with SMTP id
- i22-20020aca2b16000000b0038427f0bd0amr139057oik.9.1679331166593; Mon, 20 Mar
- 2023 09:52:46 -0700 (PDT)
+        with ESMTP id S231924AbjCTRCt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 Mar 2023 13:02:49 -0400
+Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 206511C310;
+        Mon, 20 Mar 2023 09:56:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=ss3pf4bw0TX+NsOEXdlAuLxz+g7l7ioANkWaEdO4Rho=; b=Syk0qamgSajvba6KPCkW3IFwxF
+        51I7q6SCzuEvk5g8fN4wxiSzwf340m5ARex+1lMcoyh35XGdgkGidX/vyvYl8cvgKs2t+qNpM8R5G
+        qWSL08Tch/Go0ZufM1mFChOncQjezMvd3t5kmZGHepXbdHO6kCGKpXJbJrKYeOoOnNnBcmdtK3wkJ
+        HrdgwuoB2EvwTWT3xe8URohshQe6cMQdeZSOFzBfgbC+Nygo1bRkyg7JGTdpo6c0mHlSdiUUCcXwH
+        H/DtxUhgR/xNVT6d63cpA6maGUixTxsXwoCoLMjy3kne0Z1yxznfSD2LtWIzA6xDtJZXMHlBh7pT3
+        zcmRVh6A==;
+Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
+        by desiato.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+        id 1peIlv-003zuP-3C;
+        Mon, 20 Mar 2023 16:54:12 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits))
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 89015300642;
+        Mon, 20 Mar 2023 17:54:11 +0100 (CET)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id 7B021200A76E5; Mon, 20 Mar 2023 17:54:11 +0100 (CET)
+Date:   Mon, 20 Mar 2023 17:54:11 +0100
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Xin Li <xin3.li@intel.com>
+Cc:     linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com, hpa@zytor.com,
+        andrew.cooper3@citrix.com, seanjc@google.com, pbonzini@redhat.com,
+        ravi.v.shankar@intel.com
+Subject: Re: [PATCH v5 25/34] x86/fred: disallow the swapgs instruction when
+ FRED is enabled
+Message-ID: <20230320165411.GT2194297@hirez.programming.kicks-ass.net>
+References: <20230307023946.14516-1-xin3.li@intel.com>
+ <20230307023946.14516-26-xin3.li@intel.com>
 MIME-Version: 1.0
-References: <20230201132905.549148-1-eesposit@redhat.com>
-In-Reply-To: <20230201132905.549148-1-eesposit@redhat.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Mon, 20 Mar 2023 09:52:35 -0700
-Message-ID: <CALMp9eTt3xzAEoQ038bJQ9LN0ZOXrSWsN7xnNUD+0SS=WwF7Pg@mail.gmail.com>
-Subject: Re: [PATCH 0/3] KVM: support the cpu feature FLUSH_L1D
-To:     Emanuele Giuseppe Esposito <eesposit@redhat.com>
-Cc:     kvm@vger.kernel.org, Ben Serebrin <serebrin@google.com>,
-        Peter Shier <pshier@google.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230307023946.14516-26-xin3.li@intel.com>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Feb 1, 2023 at 5:29=E2=80=AFAM Emanuele Giuseppe Esposito
-<eesposit@redhat.com> wrote:
->
-> As the title suggest, if the host cpu supports flush_l1d flag and
-> QEMU/userspace wants to boot a VM with the same flag (or emulate same
-> host features), KVM should be able to do so.
->
-> Patch 3 is the main fix, because if flush_l1d is not advertised by
-> KVM, a linux VM will erroneously mark
-> /sys/devices/system/cpu/vulnerabilities/mmio_stale_data
-> as vulnerable, even though it isn't since the host has the feature
-> and takes care of this. Not sure what would happen in the nested case tho=
-ugh.
->
-> Patch 1 and 2 are just taken and refactored from Jim Mattison's serie tha=
-t it
-> seems was lost a while ago:
-> https://patchwork.kernel.org/project/kvm/patch/20180814173049.21756-1-jma=
-ttson@google.com/
->
-> I thought it was worth re-posting them.
-
-What has changed since the patches were originally posted, and Konrad
-dissed them?
+On Mon, Mar 06, 2023 at 06:39:37PM -0800, Xin Li wrote:
+> From: "H. Peter Anvin (Intel)" <hpa@zytor.com>
+> 
+> The FRED architecture establishes the full supervisor/user through:
+> 1) FRED event delivery swaps the value of the GS base address and
+>    that of the IA32_KERNEL_GS_BASE MSR.
+> 2) ERETU swaps the value of the GS base address and that of the
+>    IA32_KERNEL_GS_BASE MSR.
+> Thus, the swapgs instruction is disallowed when FRED is enabled,
+> otherwise it cauess #UD.
+                 ^^^ --- new word :-)
