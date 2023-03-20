@@ -2,187 +2,531 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E7DC56C0C9B
-	for <lists+kvm@lfdr.de>; Mon, 20 Mar 2023 09:56:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D977C6C1073
+	for <lists+kvm@lfdr.de>; Mon, 20 Mar 2023 12:13:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231130AbjCTI44 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Mar 2023 04:56:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55950 "EHLO
+        id S230428AbjCTLNV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Mar 2023 07:13:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60910 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231127AbjCTI4y (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 Mar 2023 04:56:54 -0400
-Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 93BFD10A95
-        for <kvm@vger.kernel.org>; Mon, 20 Mar 2023 01:56:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1679302612; x=1710838612;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=CnKHabEaoaA0YdXcuFRI2a/FpJSZ8NFWx5Nbdz4iLWA=;
-  b=F5nkvasVfSSB7U7FQHf1lkTFOOxywob0osCuYGa0EiPkLrb5lz5uzQI8
-   tmX3HxwZS2vtelDzI1CdyS8qiGgWce8+CYSbdhHKwDKHVRwz+5oAcO5rH
-   zrqxHBxNouSxpDIr7GN26KAOzI5dguouG1Yavqx3EsDwvhBI+ifqz5QuA
-   caHatE2kaAzthu3SwTG6ehH7iA2k6SkTR/mhjYJqoye9gYwkbKgNAgKhe
-   chL6Ui694GZuEdtsCSIkdoYqC4i0PIpQU+fzO8OIm8E2Gm/RNN1eWnt/G
-   0Id7Fy+NmLCNAPi2XpVnPst78By4Qr4JubTYS/iNk/ua1xEd0Niml6w2X
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10654"; a="326979663"
-X-IronPort-AV: E=Sophos;i="5.98,274,1673942400"; 
-   d="scan'208";a="326979663"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Mar 2023 01:56:51 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10654"; a="791535041"
-X-IronPort-AV: E=Sophos;i="5.98,274,1673942400"; 
-   d="scan'208";a="791535041"
-Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
-  by fmsmga002.fm.intel.com with ESMTP; 20 Mar 2023 01:56:50 -0700
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.21; Mon, 20 Mar 2023 01:56:50 -0700
-Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.21 via Frontend Transport; Mon, 20 Mar 2023 01:56:50 -0700
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.106)
- by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.21; Mon, 20 Mar 2023 01:56:49 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=DcIRWigMhrk3jDD3jpPP7eaRwH9JU38QMXe4E1PDYZsZa2zAWW8urd27HAaNr35UJTDewLI69cKjaKQ3xs1wnnT0ECFL3oTvi2Gd5Yk+gXJ6W3WIsKzbkc0IKputKVN7YkShAnA+jRTNHiuxtYpTW25dRIuRIl/7ifI35HclLgDyAEqNmXuXvGmNRSjFpHq4EUa5TCQg0nwU7T6muJL/Bj67LNV0AHHWcPC9AvWWTp7Sd3Lj5i1jRfVmu0DJzbb6GoRIEiA/ZV/6hnkQxYb21S+Y1XE4FjdH5I3onzgAaVyKRvP08vbwtlha1NmJkvX/cfcS4eEkn3wcIiUzfnS2tw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=COll5wadid+K/TGlOgFAJgDr00CG8Pi8HNSQpifXTRc=;
- b=d/jfH/0LFxcPFZi97QIhdh6QmX1aZtJE9V2S5936FpCQlfQnpQQhToGKZGw5a4GCwy238320LJF/ZMk/ELgrsu6pwhkS0Ho4PdX2letClBkpSGAbAm8z4XtvnIaRO8yrYscD0pKOkye2HB5KBTEKOsV/YhrmZ7pJOTvZubYT9ezCCOQdKTX2CyfvgG3iTfQsU7FvnQwLYlFYmJ2S4+wGJKYRoR9c60h4vvJqiScCr1iiCBOqPNAfp9G3LDDzTOSkSbBVLAi2q+zSU5loR4ojCJIEx1wuL2QNEfnljfrR8opH7ql/IuiYCKzo5N6BT7Xg9UDXr+HhizhWFtJqIOxv0g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from PH8PR11MB6780.namprd11.prod.outlook.com (2603:10b6:510:1cb::11)
- by CH3PR11MB7896.namprd11.prod.outlook.com (2603:10b6:610:131::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6134.30; Mon, 20 Mar
- 2023 08:56:47 +0000
-Received: from PH8PR11MB6780.namprd11.prod.outlook.com
- ([fe80::5cb1:c8ce:6f60:4e09]) by PH8PR11MB6780.namprd11.prod.outlook.com
- ([fe80::5cb1:c8ce:6f60:4e09%9]) with mapi id 15.20.6178.037; Mon, 20 Mar 2023
- 08:56:47 +0000
-Date:   Mon, 20 Mar 2023 16:57:12 +0800
-From:   Chao Gao <chao.gao@intel.com>
-To:     Binbin Wu <binbin.wu@linux.intel.com>
-CC:     <kvm@vger.kernel.org>, <seanjc@google.com>, <pbonzini@redhat.com>,
-        <robert.hu@linux.intel.com>, Jingqi Liu <jingqi.liu@intel.com>
-Subject: Re: [PATCH v6 7/7] KVM: x86: Expose LAM feature to userspace VMM
-Message-ID: <ZBgf6Kj6veld5xkI@gao-cwp>
-References: <20230319084927.29607-1-binbin.wu@linux.intel.com>
- <20230319084927.29607-8-binbin.wu@linux.intel.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20230319084927.29607-8-binbin.wu@linux.intel.com>
-X-ClientProxiedBy: SG2PR06CA0212.apcprd06.prod.outlook.com
- (2603:1096:4:68::20) To PH8PR11MB6780.namprd11.prod.outlook.com
- (2603:10b6:510:1cb::11)
+        with ESMTP id S230203AbjCTLM5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 Mar 2023 07:12:57 -0400
+X-Greylist: delayed 4984 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 20 Mar 2023 04:10:21 PDT
+Received: from 3.mo552.mail-out.ovh.net (3.mo552.mail-out.ovh.net [178.33.254.192])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3FBD115C9E
+        for <kvm@vger.kernel.org>; Mon, 20 Mar 2023 04:10:21 -0700 (PDT)
+Received: from mxplan5.mail.ovh.net (unknown [10.109.143.90])
+        by mo552.mail-out.ovh.net (Postfix) with ESMTPS id F1A262885B;
+        Mon, 20 Mar 2023 09:47:14 +0000 (UTC)
+Received: from kaod.org (37.59.142.95) by DAG4EX2.mxp5.local (172.16.2.32)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.23; Mon, 20 Mar
+ 2023 10:47:14 +0100
+Authentication-Results: garm.ovh; auth=pass (GARM-95G001ddd99d05-2901-4ea5-a978-791736c006f1,
+                    F0E6F0E3EAC8DE216C47088D2AA2F9E7F08C2096) smtp.auth=clg@kaod.org
+X-OVh-ClientIp: 82.64.250.170
+Message-ID: <62fc117d-45a2-9aea-1a2f-973181395430@kaod.org>
+Date:   Mon, 20 Mar 2023 10:47:13 +0100
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH8PR11MB6780:EE_|CH3PR11MB7896:EE_
-X-MS-Office365-Filtering-Correlation-Id: 2896bb42-72d2-44e2-e04a-08db29210920
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: IK1uVMyQNKOfoXHlBxrEAKtgPLIvGfG24051VbMZGvdPC46qu+ckw15Jov/iMc0p+Gzh42T6fcQQo0a6Dh6A9BA3fzIT7e0pOUogZH5H0nCZU6lDx25VMzpO1+9eKBODmvy0nfIn8GEu0HBj58vqSIAWPhpHokyX4b35juyOZ29gsh0JS8j7ZQPjOIqXOfO/hL6ehb2aJWdMLG0en3Br7CJ2E2sAAfLPuABYu/F5AXRr9NGGXpIN2SiGUB1tt8W4IoLzWhp4jyIc13T9Bg3RzCBi06PQ+B9KyMcv+7ITPZOtZxKeBrBd+nz1BTScvvRMg0Rx/eLThhJJRnI1rFQ9ypFUWG+/XzY43iap/UFiPqC7AoT1PgC8TJHdEaJx6lsVmCDH2PiqO7OlMDwu2z0UBDHH9n5b+WhW3KC8gpg76ixd2dwSR1ZrYeMFlVwJ1Frmhcl/ZW+lIDeta5v3Ph8RnR7NeyqhOQj5x4LQ9WE9fWv8vEbi5shAlLWCvNJXAihFoN0ISspHDyXtzlDEukxeaRU9z12fx5ABHdWS3FljjUxDMEN+f2G7zardrOLkHGVAixsJWJVw1KUyTZJiMNqP/MRyqDRPndo6iccvNppJTsRKET0ENWeuU2PSKquzHvtr4nS3u+AwZ31mbHk/KpZ3hQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH8PR11MB6780.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(7916004)(376002)(396003)(346002)(39860400002)(366004)(136003)(451199018)(2906002)(26005)(82960400001)(33716001)(6512007)(186003)(38100700002)(6506007)(9686003)(44832011)(41300700001)(8936002)(5660300002)(6666004)(6486002)(86362001)(316002)(6916009)(66946007)(66476007)(66556008)(478600001)(83380400001)(8676002)(4326008);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?Uu1+4yiMB0mswnAix2DQhGTFtjgdRCeB1bXDezVuv9xXTxNuUpjd+/IgQ0VX?=
- =?us-ascii?Q?2656qP0wxIOqVhetpt2/zT4AwXgrPepkQXK+w7mKplTVFMfIdF2XUBqnZmiK?=
- =?us-ascii?Q?blpcTpAHwCHD1h1lf5Igck64sjLTMEBou2BKHhwmC49HhOmjXdU3GcVyeMKl?=
- =?us-ascii?Q?DJOaUHnorURfi8Vb/3AGzAu5oulOjbLt1wG4LdPiiEJrcoDxfypz54sRMxYV?=
- =?us-ascii?Q?i337zVFhUrvC/rXUn3nN6+u1p3J/htNcDyE7L+LPEbUcpwBNQkHzJCkQVW2u?=
- =?us-ascii?Q?hK61IEVhCdjMy7L2p4aJU0AUShX+DKIPiSj1laoRM/5yKyIVhWGrqyRGMxVG?=
- =?us-ascii?Q?0/NfyZLJeL6WNcX512hubfFoq3Vg1BefVBLOaWzdRmrJFKapi5c0beKh3aJ1?=
- =?us-ascii?Q?KPe0bVuKiXVAGYLCI3WiPoFGoypj6XLWkN+cPqFcgk88vA6gWNYoecKugAlL?=
- =?us-ascii?Q?Qff6ru15dO1fO8hMLsEmMA3uK/zdEQfUz6MDP9CaKtOTnv4fs8CJKvf1L0Sf?=
- =?us-ascii?Q?CEGxpy0hK+B6wHr9Rga5mN2Q90jU++DRVKx8vdIcR9wbFMSgwWOZBNdTw5AC?=
- =?us-ascii?Q?EDVPqwK+eLqGTt+GrfJVc9pnR4yDw5fgF6MrtxYiB37DMxPm4AX8/lcQEnIm?=
- =?us-ascii?Q?o9kvqrQMYyBOEio2Z+4WQKNG9FUPjw6bKYhzXINcRqlR72a7JfCNgL731In1?=
- =?us-ascii?Q?eUyTDdRvzrS7G7ubVzECpulTxnUVKbZVc7bLpBsCm2s9lTDB8w3BwVH6OT14?=
- =?us-ascii?Q?3X9RM/RppqiYgDlK+0J3BKfLfOlgSRLeU5r4G7smTppIO8R3+T7264zH9fx8?=
- =?us-ascii?Q?Em1vQUJMPzL/0jbiKrGWGK4HoBqfew6mLTryoBFJS5+AoW/bFXBqTczRwvmg?=
- =?us-ascii?Q?kGWfLTsqp5VnYAMrBCvpL2919paeWIWrb2zZ+FHImcZ3l8UN4WvqVfJMWZhq?=
- =?us-ascii?Q?Tq8Dt5oxD2QCBgx7KYERtwD+m5q8VL14MSn8EAKuOvimitQnb58JPBep7Sn4?=
- =?us-ascii?Q?suMMTZMavkHKQEKkn0XI6B1AErPe2UgyUMlGDsBiT5LNL1Dkee6QTAmoeK7h?=
- =?us-ascii?Q?VkhGljsn1VtQ6tF4LYYEcitC/Az8oCNuCqHSz1TIkaBqYfX21zwKySAqvt3n?=
- =?us-ascii?Q?s5pYFYas7Pxjq8RpSSH5iG8EgSQN/8iTS7fF/6Wl2ovKTRfmrtCa7M3JKLqH?=
- =?us-ascii?Q?dgXsH/xJE2CPImakQRqILSDRJ3pB8TP5DyQZrBUfjYfOMyvjyOJCn0XP0FYD?=
- =?us-ascii?Q?HJ9CSeGPrZb7HFWpT898T/yg1Ve75Zh7Ex8/N+dIXnDHKDObppm1cdeTs81W?=
- =?us-ascii?Q?U4C2wH0za9vT2bCCpzFfsiJ1WKV/qQ+dSGq97Cw9I/HG2wVQHhgfjcWQHymg?=
- =?us-ascii?Q?3nptWfz3gfdiYHO5KgROW8SdhptRnA5m5AZ2VCbHWjVdzWhGZxBTKxLXv15D?=
- =?us-ascii?Q?3mYml+4mYNmTrWk/JbImRsdzaQJHjs8LukchdsgYe6EKs2+HcAQXiKAWNZlU?=
- =?us-ascii?Q?WMgQy0E4QtWWCYMv7+CgLvVeAs7U1me+spVELIHpi+xnbzCuLPSu4xVhdGBs?=
- =?us-ascii?Q?68eCXc+eI2BnN9++nryzaMGNgf2Jep6ADoEz595b?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2896bb42-72d2-44e2-e04a-08db29210920
-X-MS-Exchange-CrossTenant-AuthSource: PH8PR11MB6780.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Mar 2023 08:56:46.8897
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: wDM54Iov2U4yS/PP0OcGO0C1fm0NhdUcnu30t5fgXmtYV6raTTr/NGBZWo9wOBaiBc1cVfK5MtANdlhiA1F74w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR11MB7896
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.8.0
+Subject: Re: [kvm-unit-tests v2 09/10] powerpc: Support powernv machine with
+ QEMU TCG
+Content-Language: en-US
+To:     Nicholas Piggin <npiggin@gmail.com>, <kvm@vger.kernel.org>
+CC:     <linuxppc-dev@lists.ozlabs.org>,
+        Laurent Vivier <lvivier@redhat.com>,
+        Thomas Huth <thuth@redhat.com>
+References: <20230320070339.915172-1-npiggin@gmail.com>
+ <20230320070339.915172-10-npiggin@gmail.com>
+From:   =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+In-Reply-To: <20230320070339.915172-10-npiggin@gmail.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [37.59.142.95]
+X-ClientProxiedBy: DAG2EX1.mxp5.local (172.16.2.11) To DAG4EX2.mxp5.local
+ (172.16.2.32)
+X-Ovh-Tracer-GUID: cdb752b5-9f0a-46c2-9086-8071876d5310
+X-Ovh-Tracer-Id: 3144075492277324707
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedvhedrvdefkedgtdeiucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepkfffgggfuffvvehfhfgjtgfgihesthejredttdefjeenucfhrhhomhepveorughrihgtucfnvgcuifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpeeihfejteeugfeffeehudevkeduheegfeejieekueettddthfegtddtgfdvjedvjeenucffohhmrghinhepohhprghlqdgtrghllhhsrdhssgdptghsthgrrhhtieegrdhssgenucfkphepuddvjedrtddrtddruddpfeejrdehledrudegvddrleehnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepuddvjedrtddrtddruddpmhgrihhlfhhrohhmpeeotghlgheskhgrohgurdhorhhgqedpnhgspghrtghpthhtohepuddprhgtphhtthhopehnphhighhgihhnsehgmhgrihhlrdgtohhmpdhkvhhmsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhlihhnuhigphhptgdquggvvheslhhishhtshdrohiilhgrsghsrdhorhhgpdhlvhhivhhivghrsehrvgguhhgrthdrtghomhdpthhhuhhthhesrhgvughhrghtrdgtohhmpdfovfetjfhoshhtpehmohehhedvpdhmohguvgepshhmthhpohhuth
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Mar 19, 2023 at 04:49:27PM +0800, Binbin Wu wrote:
->From: Robert Hoo <robert.hu@linux.intel.com>
->
->LAM feature is enumerated by CPUID.7.1:EAX.LAM[bit 26].
->Expose the feature to guest as the final step after the following
+Hello Nick,
 
-Nit: s/guest/userspace/. Because it is QEMU that decides whther or not
-to expose a feature to guests.
-
->supports:
->- CR4.LAM_SUP virtualization
->- CR3.LAM_U48 and CR3.LAM_U57 virtualization
->- Check and untag 64-bit linear address when LAM applies in instruction
->  emulations and vmexit handlers.
->
->Signed-off-by: Robert Hoo <robert.hu@linux.intel.com>
->Signed-off-by: Binbin Wu <binbin.wu@linux.intel.com>
->Reviewed-by: Jingqi Liu <jingqi.liu@intel.com>
-
-Reviewed-by: Chao Gao <chao.gao@intel.com>
-
->---
-> arch/x86/kvm/cpuid.c | 2 +-
-> 1 file changed, 1 insertion(+), 1 deletion(-)
->
->diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
->index 8f8edeaf8177..13840ef897c7 100644
->--- a/arch/x86/kvm/cpuid.c
->+++ b/arch/x86/kvm/cpuid.c
->@@ -670,7 +670,7 @@ void kvm_set_cpu_caps(void)
-> 	kvm_cpu_cap_mask(CPUID_7_1_EAX,
-> 		F(AVX_VNNI) | F(AVX512_BF16) | F(CMPCCXADD) |
-> 		F(FZRM) | F(FSRS) | F(FSRC) |
->-		F(AMX_FP16) | F(AVX_IFMA)
->+		F(AMX_FP16) | F(AVX_IFMA) | F(LAM)
-> 	);
+On 3/20/23 08:03, Nicholas Piggin wrote:
+> This is a basic first pass at powernv support using OPAL (skiboot)
+> firmware.
 > 
-> 	kvm_cpu_cap_init_kvm_defined(CPUID_7_1_EDX,
->-- 
->2.25.1
->
+> The ACCEL is a bit clunky, now defaulting to tcg for powernv machine.
+> It also does not yet run in the run_tests.sh batch process, more work
+> is needed to exclude certain tests (e.g., rtas) and adjust parameters
+> (e.g., increase memory size) to allow powernv to work. For now it
+> can run single test cases.
+
+Why do you need to load OPAL ? for the shutdown ? because the UART ops
+could be done directly using MMIOs on the LPC IO space.
+
+> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+> ---
+>   lib/powerpc/asm/ppc_asm.h   |  5 +++
+>   lib/powerpc/asm/processor.h | 14 ++++++++
+>   lib/powerpc/hcall.c         |  4 +--
+>   lib/powerpc/io.c            | 33 ++++++++++++++++--
+>   lib/powerpc/io.h            |  6 ++++
+>   lib/powerpc/processor.c     | 10 ++++++
+>   lib/powerpc/setup.c         | 10 ++++--
+>   lib/ppc64/asm/opal.h        | 11 ++++++
+>   lib/ppc64/opal-calls.S      | 46 +++++++++++++++++++++++++
+>   lib/ppc64/opal.c            | 67 +++++++++++++++++++++++++++++++++++++
+>   powerpc/Makefile.ppc64      |  2 ++
+>   powerpc/cstart64.S          |  7 ++++
+>   powerpc/run                 | 30 ++++++++++++++---
+>   13 files changed, 234 insertions(+), 11 deletions(-)
+>   create mode 100644 lib/ppc64/asm/opal.h
+>   create mode 100644 lib/ppc64/opal-calls.S
+>   create mode 100644 lib/ppc64/opal.c
+> 
+> diff --git a/lib/powerpc/asm/ppc_asm.h b/lib/powerpc/asm/ppc_asm.h
+> index 6299ff5..5eec9d3 100644
+> --- a/lib/powerpc/asm/ppc_asm.h
+> +++ b/lib/powerpc/asm/ppc_asm.h
+> @@ -36,7 +36,12 @@
+>   #endif /* __BYTE_ORDER__ */
+>   
+>   /* Machine State Register definitions: */
+> +#define MSR_LE_BIT	0
+>   #define MSR_EE_BIT	15			/* External Interrupts Enable */
+> +#define MSR_HV_BIT	60			/* Hypervisor mode */
+>   #define MSR_SF_BIT	63			/* 64-bit mode */
+>   
+> +#define SPR_HSRR0	0x13A
+> +#define SPR_HSRR1	0x13B
+> +
+>   #endif /* _ASMPOWERPC_PPC_ASM_H */
+> diff --git a/lib/powerpc/asm/processor.h b/lib/powerpc/asm/processor.h
+> index ebfeff2..8084787 100644
+> --- a/lib/powerpc/asm/processor.h
+> +++ b/lib/powerpc/asm/processor.h
+> @@ -3,12 +3,26 @@
+>   
+>   #include <libcflat.h>
+>   #include <asm/ptrace.h>
+> +#include <asm/ppc_asm.h>
+>   
+>   #ifndef __ASSEMBLY__
+>   void handle_exception(int trap, void (*func)(struct pt_regs *, void *), void *);
+>   void do_handle_exception(struct pt_regs *regs);
+>   #endif /* __ASSEMBLY__ */
+>   
+> +/*
+> + * If this returns true on PowerNV / OPAL machines which run in hypervisor
+> + * mode. False on pseries / PAPR machines that run in guest mode.
+> + */
+> +static inline bool machine_is_powernv(void)
+> +{
+> +	uint64_t msr;
+> +
+> +	asm volatile ("mfmsr %[msr]" : [msr] "=r" (msr));
+> +
+> +	return !!(msr & (1ULL << MSR_HV_BIT));
+> +}
+> +
+>   static inline uint64_t get_tb(void)
+>   {
+>   	uint64_t tb;
+> diff --git a/lib/powerpc/hcall.c b/lib/powerpc/hcall.c
+> index 711cb1b..37e52f5 100644
+> --- a/lib/powerpc/hcall.c
+> +++ b/lib/powerpc/hcall.c
+> @@ -25,7 +25,7 @@ int hcall_have_broken_sc1(void)
+>   	return r3 == (unsigned long)H_PRIVILEGE;
+>   }
+>   
+> -void putchar(int c)
+> +void papr_putchar(int c)
+>   {
+>   	unsigned long vty = 0;		/* 0 == default */
+>   	unsigned long nr_chars = 1;
+> @@ -34,7 +34,7 @@ void putchar(int c)
+>   	hcall(H_PUT_TERM_CHAR, vty, nr_chars, chars);
+>   }
+>   
+> -int __getchar(void)
+> +int __papr_getchar(void)
+>   {
+>   	register unsigned long r3 asm("r3") = H_GET_TERM_CHAR;
+>   	register unsigned long r4 asm("r4") = 0; /* 0 == default vty */
+> diff --git a/lib/powerpc/io.c b/lib/powerpc/io.c
+> index a381688..a3a64ce 100644
+> --- a/lib/powerpc/io.c
+> +++ b/lib/powerpc/io.c
+> @@ -9,13 +9,39 @@
+>   #include <asm/spinlock.h>
+>   #include <asm/rtas.h>
+>   #include <asm/setup.h>
+> +#include <asm/processor.h>
+>   #include "io.h"
+>   
+>   static struct spinlock print_lock;
+>   
+> +struct opal {
+> +	uint64_t base;
+> +	uint64_t entry;
+> +};
+> +extern struct opal opal;
+> +
+> +void putchar(int c)
+> +{
+> +	if (machine_is_powernv())
+> +		opal_putchar(c);
+> +	else
+> +		papr_putchar(c);
+> +}
+> +
+> +int __getchar(void)
+> +{
+> +	if (machine_is_powernv())
+> +		return __opal_getchar();
+> +	else
+> +		return __papr_getchar();
+> +}
+> +
+>   void io_init(void)
+>   {
+> -	rtas_init();
+> +	if (machine_is_powernv())
+> +		opal_init();
+> +	else
+> +		rtas_init();
+>   }
+>   
+>   void puts(const char *s)
+> @@ -38,7 +64,10 @@ void exit(int code)
+>   // FIXME: change this print-exit/rtas-poweroff to chr_testdev_exit(),
+>   //        maybe by plugging chr-testdev into a spapr-vty.
+>   	printf("\nEXIT: STATUS=%d\n", ((code) << 1) | 1);
+> -	rtas_power_off();
+> +	if (machine_is_powernv())
+> +		opal_power_off();
+> +	else
+> +		rtas_power_off();
+>   	halt(code);
+>   	__builtin_unreachable();
+>   }
+> diff --git a/lib/powerpc/io.h b/lib/powerpc/io.h
+> index d4f21ba..a2aed7b 100644
+> --- a/lib/powerpc/io.h
+> +++ b/lib/powerpc/io.h
+> @@ -8,6 +8,12 @@
+>   #define _POWERPC_IO_H_
+>   
+>   extern void io_init(void);
+> +extern void opal_init(void);
+> +extern void opal_power_off(void);
+>   extern void putchar(int c);
+> +extern void opal_putchar(int c);
+> +extern void papr_putchar(int c);
+> +extern int __opal_getchar(void);
+> +extern int __papr_getchar(void);
+>   
+>   #endif
+> diff --git a/lib/powerpc/processor.c b/lib/powerpc/processor.c
+> index e77a240..06f6db3 100644
+> --- a/lib/powerpc/processor.c
+> +++ b/lib/powerpc/processor.c
+> @@ -61,6 +61,16 @@ void sleep_tb(uint64_t cycles)
+>   {
+>   	uint64_t start, end, now;
+>   
+> +	if (machine_is_powernv()) {
+> +		/*
+> +		 * Could use 'stop' to sleep here which would be interesting.
+> +		 * stop with ESL=0 should be simple enough, ESL=1 would require
+> +		 * SRESET based wakeup which is more involved.
+> +		 */
+> +		delay(cycles);
+> +		return;
+> +	}
+> +
+>   	start = now = get_tb();
+>   	end = start + cycles;
+>   
+> diff --git a/lib/powerpc/setup.c b/lib/powerpc/setup.c
+> index 1be4c03..f327540 100644
+> --- a/lib/powerpc/setup.c
+> +++ b/lib/powerpc/setup.c
+> @@ -18,6 +18,7 @@
+>   #include <argv.h>
+>   #include <asm/setup.h>
+>   #include <asm/page.h>
+> +#include <asm/processor.h>
+>   #include <asm/hcall.h>
+>   #include "io.h"
+>   
+> @@ -97,12 +98,13 @@ static void cpu_init(void)
+>   	tb_hz = params.tb_hz;
+>   
+>   	/* Interrupt Endianness */
+> -
+> +	if (!machine_is_powernv()) {
+>   #if  __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+> -        hcall(H_SET_MODE, 1, 4, 0, 0);
+> +		hcall(H_SET_MODE, 1, 4, 0, 0);
+>   #else
+> -        hcall(H_SET_MODE, 0, 4, 0, 0);
+> +		hcall(H_SET_MODE, 0, 4, 0, 0);
+>   #endif
+> +	}
+>   }
+>   
+>   static void mem_init(phys_addr_t freemem_start)
+> @@ -195,6 +197,8 @@ void setup(const void *fdt)
+>   		freemem += initrd_size;
+>   	}
+>   
+> +	opal_init();
+> +
+
+This opal_init() call seems redundant with io_init().
+
+C.
+
+>   	/* call init functions */
+>   	cpu_init();
+>   
+> diff --git a/lib/ppc64/asm/opal.h b/lib/ppc64/asm/opal.h
+> new file mode 100644
+> index 0000000..243a3c6
+> --- /dev/null
+> +++ b/lib/ppc64/asm/opal.h
+> @@ -0,0 +1,11 @@
+> +/* SPDX-License-Identifier: GPL-2.0-or-later */
+> +#ifndef _ASMPPC64_HCALL_H_
+> +#define _ASMPPC64_HCALL_H_
+> +
+> +#define OPAL_SUCCESS				0
+> +
+> +#define OPAL_CONSOLE_WRITE			1
+> +#define OPAL_CONSOLE_READ			2
+> +#define OPAL_CEC_POWER_DOWN			5
+> +
+> +#endif
+> diff --git a/lib/ppc64/opal-calls.S b/lib/ppc64/opal-calls.S
+> new file mode 100644
+> index 0000000..1833358
+> --- /dev/null
+> +++ b/lib/ppc64/opal-calls.S
+> @@ -0,0 +1,46 @@
+> +/* SPDX-License-Identifier: GPL-2.0-or-later */
+> +/*
+> + * Copyright (c) 2016 IBM Corporation.
+> + */
+> +
+> +#include <asm/ppc_asm.h>
+> +
+> +	.text
+> +	.globl opal_call
+> +opal_call:
+> +	mr	r0,r3
+> +	mr	r3,r4
+> +	mr	r4,r5
+> +	mr	r5,r6
+> +	mr	r6,r7
+> +	mflr	r11
+> +	std	r11,16(r1)
+> +	mfcr	r12
+> +	stw	r12,8(r1)
+> +	mr	r13,r2
+> +
+> +	/* Set opal return address */
+> +	LOAD_REG_ADDR(r11, opal_return)
+> +	mtlr	r11
+> +	mfmsr	r12
+> +
+> +	/* switch to BE when we enter OPAL */
+> +	li	r11,(1 << MSR_LE_BIT)
+> +	andc	r12,r12,r11
+> +	mtspr	SPR_HSRR1,r12
+> +
+> +	/* load the opal call entry point and base */
+> +	LOAD_REG_ADDR(r11, opal)
+> +	ld	r12,8(r11)
+> +	ld	r2,0(r11)
+> +	mtspr	SPR_HSRR0,r12
+> +	hrfid
+> +
+> +opal_return:
+> +	FIXUP_ENDIAN
+> +	mr	r2,r13;
+> +	lwz	r11,8(r1);
+> +	ld	r12,16(r1)
+> +	mtcr	r11;
+> +	mtlr	r12
+> +	blr
+> diff --git a/lib/ppc64/opal.c b/lib/ppc64/opal.c
+> new file mode 100644
+> index 0000000..515e9ab
+> --- /dev/null
+> +++ b/lib/ppc64/opal.c
+> @@ -0,0 +1,67 @@
+> +/* SPDX-License-Identifier: GPL-2.0-or-later */
+> +/*
+> + * OPAL call helpers
+> + */
+> +#include <asm/opal.h>
+> +#include <libcflat.h>
+> +#include <libfdt/libfdt.h>
+> +#include <devicetree.h>
+> +//libfdt_env.h>
+> +#include <asm/io.h>
+> +#include "../powerpc/io.h"
+> +
+> +struct opal {
+> +	uint64_t base;
+> +	uint64_t entry;
+> +} opal;
+> +
+> +void opal_init(void)
+> +{
+> +	const struct fdt_property *prop;
+> +	int node, len;
+> +
+> +	node = fdt_path_offset(dt_fdt(), "/ibm,opal");
+> +	if (node < 0) {
+> +		return;// node;
+> +	}
+> +
+> +	prop = fdt_get_property(dt_fdt(), node, "opal-base-address", &len);
+> +	if (!prop)
+> +		return;// len;
+> +	opal.base = fdt64_to_cpu(*(uint64_t *)prop->data);
+> +
+> +	prop = fdt_get_property(dt_fdt(), node, "opal-entry-address", &len);
+> +	if (!prop)
+> +		return;// len;
+> +	opal.entry = fdt64_to_cpu(*(uint64_t *)prop->data);
+> +}
+> +
+> +extern int64_t opal_call(int64_t token, int64_t arg1, int64_t arg2, int64_t arg3);
+> +
+> +extern void opal_power_off(void)
+> +{
+> +	opal_call(OPAL_CEC_POWER_DOWN, 0, 0, 0);
+> +}
+> +
+> +void opal_putchar(int c)
+> +{
+> +	unsigned long vty = 0;		/* 0 == default */
+> +	unsigned long nr_chars = cpu_to_be64(1);
+> +	char ch = c;
+> +
+> +	opal_call(OPAL_CONSOLE_WRITE, (int64_t)vty, (int64_t)&nr_chars, (int64_t)&ch);
+> +}
+> +
+> +int __opal_getchar(void)
+> +{
+> +	unsigned long vty = 0;		/* 0 == default */
+> +	unsigned long nr_chars = cpu_to_be64(1);
+> +	char ch;
+> +	int rc;
+> +
+> +	rc = opal_call(OPAL_CONSOLE_READ, (int64_t)vty, (int64_t)&nr_chars, (int64_t)&ch);
+> +	if (rc != OPAL_SUCCESS)
+> +		return -1;
+> +
+> +	return ch;
+> +}
+> diff --git a/powerpc/Makefile.ppc64 b/powerpc/Makefile.ppc64
+> index b0ed2b1..06a7cf6 100644
+> --- a/powerpc/Makefile.ppc64
+> +++ b/powerpc/Makefile.ppc64
+> @@ -17,6 +17,8 @@ cstart.o = $(TEST_DIR)/cstart64.o
+>   reloc.o  = $(TEST_DIR)/reloc64.o
+>   
+>   OBJDIRS += lib/ppc64
+> +cflatobjs += lib/ppc64/opal.o
+> +cflatobjs += lib/ppc64/opal-calls.o
+>   
+>   # ppc64 specific tests
+>   tests = $(TEST_DIR)/spapr_vpa.elf
+> diff --git a/powerpc/cstart64.S b/powerpc/cstart64.S
+> index 069d991..b5b3ec7 100644
+> --- a/powerpc/cstart64.S
+> +++ b/powerpc/cstart64.S
+> @@ -92,6 +92,13 @@ start:
+>   	sync
+>   	isync
+>   
+> +	/* powernv machine does not check broken_sc1 */
+> +	mfmsr	r3
+> +	li	r4,1
+> +	sldi	r4,r4,MSR_HV_BIT
+> +	and.	r3,r3,r4
+> +	bne	1f
+> +
+>   	/* patch sc1 if needed */
+>   	bl	hcall_have_broken_sc1
+>   	cmpwi	r3, 0
+> diff --git a/powerpc/run b/powerpc/run
+> index ee38e07..2ec3df8 100755
+> --- a/powerpc/run
+> +++ b/powerpc/run
+> @@ -1,5 +1,14 @@
+>   #!/usr/bin/env bash
+>   
+> +get_qemu_machine ()
+> +{
+> +	if [ "$MACHINE" ]; then
+> +		echo $MACHINE
+> +	else
+> +		echo pseries
+> +	fi
+> +}
+> +
+>   if [ -z "$KUT_STANDALONE" ]; then
+>   	if [ ! -f config.mak ]; then
+>   		echo "run ./configure && make first. See ./configure -h"
+> @@ -12,17 +21,30 @@ fi
+>   ACCEL=$(get_qemu_accelerator) ||
+>   	exit $?
+>   
+> +MACHINE=$(get_qemu_machine) ||
+> +	exit $?
+> +
+> +if [ "$MACHINE" = "powernv" ] && [ "$ACCEL" = "kvm" ]; then
+> +	echo "powernv machine does not support KVM. ACCEL=tcg must be specified."
+> +	exit 2
+> +fi
+> +
+>   qemu=$(search_qemu_binary) ||
+>   	exit $?
+>   
+> -if ! $qemu -machine '?' 2>&1 | grep 'pseries' > /dev/null; then
+> -	echo "$qemu doesn't support pSeries ('-machine pseries'). Exiting."
+> +if ! $qemu -machine '?' 2>&1 | grep $MACHINE > /dev/null; then
+> +	echo "$qemu doesn't support '-machine $MACHINE'. Exiting."
+>   	exit 2
+>   fi
+>   
+> -M='-machine pseries'
+> +M="-machine $MACHINE"
+>   M+=",accel=$ACCEL"
+> -command="$qemu -nodefaults $M -bios $FIRMWARE"
+> +B=""
+> +if [ "$MACHINE" = "pseries" ] ; then
+> +	B+="-bios $FIRMWARE"
+> +fi
+> +
+> +command="$qemu -nodefaults $M $B"
+>   command+=" -display none -serial stdio -kernel"
+>   command="$(migration_cmd) $(timeout_cmd) $command"
+>   
+
