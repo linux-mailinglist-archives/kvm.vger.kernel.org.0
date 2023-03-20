@@ -2,121 +2,187 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A39466C2126
-	for <lists+kvm@lfdr.de>; Mon, 20 Mar 2023 20:19:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C14A06C2104
+	for <lists+kvm@lfdr.de>; Mon, 20 Mar 2023 20:14:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231559AbjCTTTl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Mar 2023 15:19:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53188 "EHLO
+        id S231491AbjCTTOe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Mar 2023 15:14:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44538 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231495AbjCTTTV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 Mar 2023 15:19:21 -0400
-Received: from mx.sberdevices.ru (mx.sberdevices.ru [45.89.227.171])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 21EBDEC53;
-        Mon, 20 Mar 2023 12:11:16 -0700 (PDT)
-Received: from s-lin-edge02.sberdevices.ru (localhost [127.0.0.1])
-        by mx.sberdevices.ru (Postfix) with ESMTP id 3EB1C5FD24;
-        Mon, 20 Mar 2023 21:14:05 +0300 (MSK)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
-        s=mail; t=1679336045;
-        bh=YB66nolKkjoVJU5evh+1HebsOHaQzQKU6oDfFomMopo=;
-        h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-        b=SuBDWnSq/ExcHfGMvBol5cflBae0kgkygILrfeU5AF3LapTEuqNog18ajLEmITCzD
-         +p1DeLidfqsVOexq6/24svD+4HjrRjBGUPehzCQfznvbSR7sW4Mcxve+hnVxJjOSnJ
-         RyxCMbt1IxUSr+vCbt20d+jUH+Fpw/XOCW7Mh9t5mqjvt7KdUTezv9P87sEnnRWoQe
-         TZtaLoVCjLh+CGO/wmkSfiaCyWRYw+27RuGnwTDPQSkayjTLOIlx2W0LjY94bxCTXl
-         oiMOWXhSajyhEco7E9YCmmlXKQF9egDDYlHczz4HHJ3PxD6tuqaQbBSy7AadXf5yIT
-         qWOFecjroSqhw==
-Received: from S-MS-EXCH01.sberdevices.ru (S-MS-EXCH01.sberdevices.ru [172.16.1.4])
-        by mx.sberdevices.ru (Postfix) with ESMTP;
-        Mon, 20 Mar 2023 21:14:05 +0300 (MSK)
-Message-ID: <37bef564-8f3e-aab3-a7d7-24e6c4caa318@sberdevices.ru>
-Date:   Mon, 20 Mar 2023 21:10:34 +0300
+        with ESMTP id S231346AbjCTTNu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 Mar 2023 15:13:50 -0400
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id ACADA59EE;
+        Mon, 20 Mar 2023 12:06:21 -0700 (PDT)
+Received: from vm02.corp.microsoft.com (unknown [167.220.197.27])
+        by linux.microsoft.com (Postfix) with ESMTPSA id AE27C20FAEF1;
+        Mon, 20 Mar 2023 11:52:02 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com AE27C20FAEF1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+        s=default; t=1679338324;
+        bh=P4awLpw/X0x2t72TtvT/y073iWhEjiFVTPr3bgWWreU=;
+        h=From:To:Cc:Subject:Date:From;
+        b=j3pVt5NkfHpd7YYIOo2ZiJG1nNe1yVyitay7fcotoJzk/5NlhKsRQdEqPdwJ4y248
+         dgt6OXzfi4QuTCPt07WdHtCAKKPtnS+TXSfoYFbxEFgOA28Wxc0xxw24Wq5Ap/WW5H
+         TmNun7CAVGIKyH6UBr6gbUrL7p2K3N7xIwXUD/kU=
+From:   Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>
+To:     linux-kernel@vger.kernel.org
+Cc:     Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Tianyu Lan <ltykernel@gmail.com>,
+        Michael Kelley <mikelley@microsoft.com>,
+        Sean Christopherson <seanjc@google.com>, stable@vger.kernel.org
+Subject: [PATCH] KVM: SVM: Flush Hyper-V TLB when required
+Date:   Mon, 20 Mar 2023 18:51:10 +0000
+Message-Id: <20230320185110.1346829-1-jpiotrowski@linux.microsoft.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
-Subject: Re: [RFC PATCH v1 2/3] virtio/vsock: add WARN() for invalid state of
- socket
-Content-Language: en-US
-To:     Stefano Garzarella <sgarzare@redhat.com>
-CC:     Stefan Hajnoczi <stefanha@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Bobby Eshleman <bobby.eshleman@bytedance.com>,
-        <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
-        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <kernel@sberdevices.ru>, <oxffffaa@gmail.com>
-References: <e141e6f1-00ae-232c-b840-b146bdb10e99@sberdevices.ru>
- <da93402d-920e-c248-a5a1-baf24b70ebee@sberdevices.ru>
- <20230320150715.twapgesp2gj6egua@sgarzare-redhat>
-From:   Arseniy Krasnov <avkrasnov@sberdevices.ru>
-In-Reply-To: <20230320150715.twapgesp2gj6egua@sgarzare-redhat>
-Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
-X-Originating-IP: [172.16.1.6]
-X-ClientProxiedBy: S-MS-EXCH02.sberdevices.ru (172.16.1.5) To
- S-MS-EXCH01.sberdevices.ru (172.16.1.4)
-X-KSMG-Rule-ID: 4
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Status: not scanned, disabled by settings
-X-KSMG-AntiSpam-Interceptor-Info: not scanned
-X-KSMG-AntiPhishing: not scanned, disabled by settings
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 1.1.2.30, bases: 2023/03/20 09:56:00 #20977321
-X-KSMG-AntiVirus-Status: Clean, skipped
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-19.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_MED,
+        SPF_HELO_PASS,SPF_PASS,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+The Hyper-V "EnlightenedNptTlb" enlightenment is always enabled when KVM
+is running on top of Hyper-V and Hyper-V exposes support for it (which
+is always). On AMD CPUs this enlightenment results in ASID invalidations
+not flushing TLB entries derived from the NPT. To force the underlying
+(L0) hypervisor to rebuild its shadow page tables, an explicit hypercall
+is needed.
 
+The original KVM implementation of Hyper-V's "EnlightenedNptTlb" on SVM
+only added remote TLB flush hooks. This worked out fine for a while, as
+sufficient remote TLB flushes where being issued in KVM to mask the
+problem. Since v5.17, changes in the TDP code reduced the number of
+flushes and the out-of-sync TLB prevents guests from booting
+successfully.
 
-On 20.03.2023 18:07, Stefano Garzarella wrote:
-> On Sun, Mar 19, 2023 at 09:52:19PM +0300, Arseniy Krasnov wrote:
->> This prints WARN() and returns from stream dequeue callback when socket's
->> queue is empty, but 'rx_bytes' still non-zero.
->>
->> Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
->> ---
->> net/vmw_vsock/virtio_transport_common.c | 7 +++++++
->> 1 file changed, 7 insertions(+)
->>
->> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
->> index 3c75986e16c2..c35b03adad8d 100644
->> --- a/net/vmw_vsock/virtio_transport_common.c
->> +++ b/net/vmw_vsock/virtio_transport_common.c
->> @@ -388,6 +388,13 @@ virtio_transport_stream_do_dequeue(struct vsock_sock *vsk,
->>     u32 free_space;
->>
->>     spin_lock_bh(&vvs->rx_lock);
->> +
->> +    if (skb_queue_empty(&vvs->rx_queue) && vvs->rx_bytes) {
->> +        WARN(1, "No skbuffs with non-zero 'rx_bytes'\n");
-> 
-> I would use WARN_ONCE, since we can't recover so we will flood the log.
-> 
-> And you can put the condition in the first argument, I mean something
-> like this:
->         if (WARN_ONCE(skb_queue_empty(&vvs->rx_queue) && vvs->rx_bytes,
->                       "rx_queue is empty, but rx_bytes is non-zero\n")) {
-I see, ok.
-> 
-> Thanks,
-> Stefano
-> 
->> +        spin_unlock_bh(&vvs->rx_lock);
->> +        return err;
->> +    }
->> +
->>     while (total < len && !skb_queue_empty(&vvs->rx_queue)) {
->>         skb = skb_peek(&vvs->rx_queue);
->>
->> -- 
->> 2.25.1
->>
-> 
+Split svm_flush_tlb_current() into separate callbacks for the 3 cases
+(guest/all/current), and issue the required Hyper-V hypercall when a
+Hyper-V TLB flush is needed. The most important case where the TLB flush
+was missing is when loading a new PGD, which is followed by what is now
+svm_flush_tlb_current(). Since the hypercall acts on all CPUs, cache the
+last flushed root in kvm_arch->hv_root_tdp. This prevents the shadow
+NPTs from being unnecessarily rebuilt for multiple vcpus and when the
+same root is flushed multiple times in a row on a single vcpu.
+
+Cc: stable@vger.kernel.org # v5.17+
+Fixes: 1e0c7d40758b ("KVM: SVM: hyper-v: Remote TLB flush for SVM")
+Link: https://lore.kernel.org/lkml/43980946-7bbf-dcef-7e40-af904c456250@linux.microsoft.com/
+Suggested-by: Sean Christopherson <seanjc@google.com>
+Signed-off-by: Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>
+---
+ arch/x86/kvm/kvm_onhyperv.c | 23 +++++++++++++++++++++++
+ arch/x86/kvm/kvm_onhyperv.h |  5 +++++
+ arch/x86/kvm/svm/svm.c      | 18 +++++++++++++++---
+ 3 files changed, 43 insertions(+), 3 deletions(-)
+
+diff --git a/arch/x86/kvm/kvm_onhyperv.c b/arch/x86/kvm/kvm_onhyperv.c
+index 482d6639ef88..036e04c0a161 100644
+--- a/arch/x86/kvm/kvm_onhyperv.c
++++ b/arch/x86/kvm/kvm_onhyperv.c
+@@ -94,6 +94,29 @@ int hv_remote_flush_tlb(struct kvm *kvm)
+ }
+ EXPORT_SYMBOL_GPL(hv_remote_flush_tlb);
+ 
++void hv_flush_tlb_current(struct kvm_vcpu *vcpu)
++{
++	struct kvm_arch *kvm_arch = &vcpu->kvm->arch;
++	hpa_t root_tdp = vcpu->arch.mmu->root.hpa;
++
++	if (kvm_x86_ops.tlb_remote_flush == hv_remote_flush_tlb && VALID_PAGE(root_tdp)) {
++		spin_lock(&kvm_arch->hv_root_tdp_lock);
++		if (kvm_arch->hv_root_tdp != root_tdp) {
++			hyperv_flush_guest_mapping(root_tdp);
++			kvm_arch->hv_root_tdp = root_tdp;
++		}
++		spin_unlock(&kvm_arch->hv_root_tdp_lock);
++	}
++}
++EXPORT_SYMBOL_GPL(hv_flush_tlb_current);
++
++void hv_flush_tlb_all(struct kvm_vcpu *vcpu)
++{
++	if (WARN_ON_ONCE(kvm_x86_ops.tlb_remote_flush == hv_remote_flush_tlb))
++		hv_remote_flush_tlb(vcpu->kvm);
++}
++EXPORT_SYMBOL_GPL(hv_flush_tlb_all);
++
+ void hv_track_root_tdp(struct kvm_vcpu *vcpu, hpa_t root_tdp)
+ {
+ 	struct kvm_arch *kvm_arch = &vcpu->kvm->arch;
+diff --git a/arch/x86/kvm/kvm_onhyperv.h b/arch/x86/kvm/kvm_onhyperv.h
+index 287e98ef9df3..f24d0ca41d2b 100644
+--- a/arch/x86/kvm/kvm_onhyperv.h
++++ b/arch/x86/kvm/kvm_onhyperv.h
+@@ -10,11 +10,16 @@
+ int hv_remote_flush_tlb_with_range(struct kvm *kvm,
+ 		struct kvm_tlb_range *range);
+ int hv_remote_flush_tlb(struct kvm *kvm);
++void hv_flush_tlb_current(struct kvm_vcpu *vcpu);
++void hv_flush_tlb_all(struct kvm_vcpu *vcpu);
+ void hv_track_root_tdp(struct kvm_vcpu *vcpu, hpa_t root_tdp);
+ #else /* !CONFIG_HYPERV */
+ static inline void hv_track_root_tdp(struct kvm_vcpu *vcpu, hpa_t root_tdp)
+ {
+ }
++
++static inline void hv_flush_tlb_current(struct kvm_vcpu *vcpu) { }
++static inline void hv_flush_tlb_all(struct kvm_vcpu *vcpu) { }
+ #endif /* !CONFIG_HYPERV */
+ 
+ #endif
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 252e7f37e4e2..8da6740ef595 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -3729,7 +3729,7 @@ static void svm_enable_nmi_window(struct kvm_vcpu *vcpu)
+ 	svm->vmcb->save.rflags |= (X86_EFLAGS_TF | X86_EFLAGS_RF);
+ }
+ 
+-static void svm_flush_tlb_current(struct kvm_vcpu *vcpu)
++static void svm_flush_tlb_asid(struct kvm_vcpu *vcpu)
+ {
+ 	struct vcpu_svm *svm = to_svm(vcpu);
+ 
+@@ -3753,6 +3753,18 @@ static void svm_flush_tlb_current(struct kvm_vcpu *vcpu)
+ 		svm->current_vmcb->asid_generation--;
+ }
+ 
++static void svm_flush_tlb_current(struct kvm_vcpu *vcpu)
++{
++	hv_flush_tlb_current(vcpu);
++	svm_flush_tlb_asid(vcpu);
++}
++
++static void svm_flush_tlb_all(struct kvm_vcpu *vcpu)
++{
++	hv_flush_tlb_all(vcpu);
++	svm_flush_tlb_asid(vcpu);
++}
++
+ static void svm_flush_tlb_gva(struct kvm_vcpu *vcpu, gva_t gva)
+ {
+ 	struct vcpu_svm *svm = to_svm(vcpu);
+@@ -4745,10 +4757,10 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
+ 	.set_rflags = svm_set_rflags,
+ 	.get_if_flag = svm_get_if_flag,
+ 
+-	.flush_tlb_all = svm_flush_tlb_current,
++	.flush_tlb_all = svm_flush_tlb_all,
+ 	.flush_tlb_current = svm_flush_tlb_current,
+ 	.flush_tlb_gva = svm_flush_tlb_gva,
+-	.flush_tlb_guest = svm_flush_tlb_current,
++	.flush_tlb_guest = svm_flush_tlb_asid,
+ 
+ 	.vcpu_pre_run = svm_vcpu_pre_run,
+ 	.vcpu_run = svm_vcpu_run,
+-- 
+2.37.2
+
