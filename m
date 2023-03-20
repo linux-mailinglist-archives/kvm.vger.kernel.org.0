@@ -2,255 +2,190 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B08056C0C06
-	for <lists+kvm@lfdr.de>; Mon, 20 Mar 2023 09:18:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DB3866C0C99
+	for <lists+kvm@lfdr.de>; Mon, 20 Mar 2023 09:56:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230327AbjCTISd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Mar 2023 04:18:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38242 "EHLO
+        id S231124AbjCTI4y (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Mar 2023 04:56:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55928 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229762AbjCTISb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 Mar 2023 04:18:31 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56716125B3;
-        Mon, 20 Mar 2023 01:18:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
-        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=H6WVj9Q0Yux+ITgTAq0BZKyYVV13T0pmNsA1DUzW45U=; b=vFSqsE03uLT+GW4OwaM5znMgOn
-        8tM/+tV/IqZYJGg2l/rR6ilqODPEsLY6+ew3Z4jPfoenStqJs82bZ0JxTj6SpQfoBRZbT/j73XrpQ
-        PmPYSE3XlD96E0kHkgKTXRFq6rjzCKrtkQ5LY4ft8jPXWiyIpA3J5XCFJKQAOhiFqthEWwdKflwPK
-        OwMIZHhoqF26nQ1ZDcwFhV1ZZk7rsGPZyvF5ma+UJFcnq7rMpX3Om8sSBpK4NjkINRiy7HsXgpJle
-        IqZuQPT/kGpJl/AdVN/+pwqg04G7XAWj4gC38Vx7cYBx7eUAINrA5EMa2PdUjI+TmVWMQZ5PRg5qn
-        9ptJvTzA==;
-Received: from [2001:8b0:10b:5:9f60:3325:ca17:b13] (helo=u3832b3a9db3152.ant.amazon.com)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1peAhv-000pjx-66; Mon, 20 Mar 2023 08:17:31 +0000
-Message-ID: <82674e57bc06a3e05e581bdf4e1b7413202e1ec7.camel@infradead.org>
-Subject: Re: [PATCH v15 02/12] cpu/hotplug: Move idle_thread_get() to
- <linux/smpboot.h>
-From:   David Woodhouse <dwmw2@infradead.org>
-To:     Borislav Petkov <bp@alien8.de>,
-        Usama Arif <usama.arif@bytedance.com>
-Cc:     tglx@linutronix.de, kim.phillips@amd.com, brgerst@gmail.com,
-        piotrgorski@cachyos.org, oleksandr@natalenko.name,
-        arjan@linux.intel.com, mingo@redhat.com,
-        dave.hansen@linux.intel.com, hpa@zytor.com, x86@kernel.org,
-        pbonzini@redhat.com, paulmck@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        rcu@vger.kernel.org, mimoja@mimoja.de, hewenliang4@huawei.com,
-        thomas.lendacky@amd.com, seanjc@google.com, pmenzel@molgen.mpg.de,
-        fam.zheng@bytedance.com, punit.agrawal@bytedance.com,
-        simon.evans@bytedance.com, liangma@liangbit.com,
-        gpiccoli@igalia.com
-Date:   Mon, 20 Mar 2023 08:17:29 +0000
-In-Reply-To: <20230319163409.GBZBc5gTU94IdrucNL@fat_crate.local>
-References: <20230316222109.1940300-1-usama.arif@bytedance.com>
-         <20230316222109.1940300-3-usama.arif@bytedance.com>
-         <20230319163409.GBZBc5gTU94IdrucNL@fat_crate.local>
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-        boundary="=-59e0oiOWyGgBsgY/lqpd"
-User-Agent: Evolution 3.44.4-0ubuntu1 
+        with ESMTP id S230520AbjCTI4x (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 Mar 2023 04:56:53 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC83511146;
+        Mon, 20 Mar 2023 01:56:50 -0700 (PDT)
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 32K88wAW010747;
+        Mon, 20 Mar 2023 08:56:50 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : content-transfer-encoding : mime-version; s=pp1;
+ bh=istdSc/C2kq9oGpltGPzxa5vuaH/tbn/Tp91/EzD+/k=;
+ b=h5FnHSnRMKSDhFGNqWB8ZnFTpcXXNYAJeSkmxvU6jUeOSZ6shvi6JhKvUdSd/2wjBmJm
+ Ig7GcfnehVDT6/hykIILp576A2sw1MdNLtF+xKzX6Gcrq9/rDNJsS4odBrPVCARuZYmz
+ qFdLqEdu9qLtaJUVurG8cvs1G0qJGGeP5urIUc+vL99UxiWcs2hRKjz76DQ3WoEDQys0
+ OaHaxqb1gS+VxM1R1uRK2slylGNII35kT2WLyE5sm4ZtIB6TPSKn7V+dbROKf6mjm1xy
+ 9RCT702yRebI4rRgTccEblkijzba77OR29rsFuXGUwKeStjR1EgtDUZynda0mBoDj+Tf TA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3pdq812kyd-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 20 Mar 2023 08:56:49 +0000
+Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 32K8qIhl027348;
+        Mon, 20 Mar 2023 08:56:49 GMT
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3pdq812kxp-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 20 Mar 2023 08:56:49 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 32K3mod9016541;
+        Mon, 20 Mar 2023 08:56:47 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+        by ppma04ams.nl.ibm.com (PPS) with ESMTPS id 3pd4x6ay3t-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 20 Mar 2023 08:56:47 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+        by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 32K8uhnT20120012
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 20 Mar 2023 08:56:44 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D6E8320043;
+        Mon, 20 Mar 2023 08:56:43 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 49C8D2004B;
+        Mon, 20 Mar 2023 08:56:43 +0000 (GMT)
+Received: from li-c6ac47cc-293c-11b2-a85c-d421c8e4747b.ibm.com.com (unknown [9.171.19.239])
+        by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Mon, 20 Mar 2023 08:56:43 +0000 (GMT)
+From:   Pierre Morel <pmorel@linux.ibm.com>
+To:     linux-s390@vger.kernel.org
+Cc:     frankja@linux.ibm.com, thuth@redhat.com, kvm@vger.kernel.org,
+        imbrenda@linux.ibm.com, david@redhat.com, nrb@linux.ibm.com,
+        nsg@linux.ibm.com
+Subject: [kvm-unit-tests PATCH v7 0/2] S390x: CPU Topology Information
+Date:   Mon, 20 Mar 2023 09:56:40 +0100
+Message-Id: <20230320085642.12251-1-pmorel@linux.ibm.com>
+X-Mailer: git-send-email 2.31.1
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 6zO9D7fSKZppTwp8cuAWkAHR0DI6Xb_g
+X-Proofpoint-ORIG-GUID: O0k8niJyHf4MAO32RqvLHLoIwpJarcsb
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
+ definitions=2023-03-20_04,2023-03-16_02,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0
+ priorityscore=1501 malwarescore=0 clxscore=1011 impostorscore=0 mlxscore=0
+ spamscore=0 bulkscore=0 mlxlogscore=999 lowpriorityscore=0 adultscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2303150002 definitions=main-2303200072
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi,
 
---=-59e0oiOWyGgBsgY/lqpd
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+new version of the kvm-unit-test s390x CPU topology series.
 
-On Sun, 2023-03-19 at 17:34 +0100, Borislav Petkov wrote:
-> Frankly, I don't think resetting shadow call stack and kasan state
-> belongs in a function which returns the idle thread. Even more so if you
-> have to add an @unpoison param which is false sometimes and sometimes
-> true, depending on where you call the function.
->=20
-> I think you should have a helper
->=20
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0tsk_reset_stacks(struct t=
-ask_struct *tsk);
->=20
-> or so which is called where @unpoison =3D=3D true instead of having a get=
-ter
-> function do something unrelated too.
+0. what is new in this new spin
+-------------------------------
 
-Yeah, I see that but my primary concern was that I didn't want callers
-to be able to *forget* it, which is what happened the first time.
+- Running the test on LPAR has been getestet on a46lp21
+- splitting big functions in small ones
+- better tests, reset before test
+- Diverse rephrasing and functions reordering
 
-I don't feel so bad about the getter function actually making the
-object *usable* as well as getting it. We don't have to remember to
-make a separate function call to unpoison a pointer newly returned from
-kmalloc either.
+1. what is done
+---------------
 
-I *think* the 'unpoison' arg is purely an optimisation anyway. Because
-those operations are, or at least *could* be, idempotent. It's just
-that it's a bit pointless doing them from the finish_cpu() call.
+- First part is checking PTF errors, for KVM and LPAR
 
-But actually, I think we can have it both ways. There's an early call
-to idle_thread_get(cpu) in _cpu_up(), with the comment /* Let it fail
-before we try to bring the cpu up */
+- Second part is checking PTF polarization change and STSI
+  with the cpu topology including drawers and books.
+  This tests are run for KVM only.
 
-With an adjustment to the comment, we could do the unpoison and reset
-the shadow call stack there =E2=80=94 in common code where no architecture =
-can
-forget to do it =E2=80=94 and still leave idle_thread_get() doing precisely
-just the 'get'.
+To run these tests under KVM successfully you need Linux 6.0
+and the QEMU patches you find at:
 
-In _cpu_up() the call to idle_thread_get() only happens if the CPU in
-question is starting from CPUHP_OFFLINE but I think that's sufficient?
+https://lists.gnu.org/archive/html/qemu-devel/2023-02/msg00081.html
 
-diff --git a/kernel/cpu.c b/kernel/cpu.c
-index 6c0a92ca6bb5..43e0a77f21e8 100644
---- a/kernel/cpu.c
-+++ b/kernel/cpu.c
-@@ -591,12 +591,6 @@ static int bringup_cpu(unsigned int cpu)
- 	struct task_struct *idle =3D idle_thread_get(cpu);
- 	int ret;
-=20
--	/*
--	 * Reset stale stack state from the last time this CPU was online.
--	 */
--	scs_task_reset(idle);
--	kasan_unpoison_task_stack(idle);
--
- 	/*
- 	 * Some architectures have to walk the irq descriptors to
- 	 * setup the vector space for the cpu which comes online.
-@@ -1383,6 +1377,12 @@ static int _cpu_up(unsigned int cpu, int tasks_froze=
-n, enum cpuhp_state target)
- 			ret =3D PTR_ERR(idle);
- 			goto out;
- 		}
-+
-+		/*
-+		 * Reset stale stack state from the last time this CPU was online.
-+		 */
-+		scs_task_reset(idle);
-+		kasan_unpoison_task_stack(idle);
- 	}
-=20
- 	cpuhp_tasks_frozen =3D tasks_frozen;
+Note that Fedora-35 already has the CPU Topology backport for Linux.
+
+To start the test in KVM just do:
+
+# ./run_tests.sh topology
+
+or something like:
+
+# ./s390x-run s390x/topology.elf \
+	-smp 5,drawers=3,books=3,sockets=4,cores=4,maxcpus=144 \
+	-append '-drawers 3 -books 3 -sockets 4 -cores 4'
+
+Of course the declaration of the number of socket and core must be
+coherent in -smp and -append arguments.
 
 
---=-59e0oiOWyGgBsgY/lqpd
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
+To start the tests in LPAR you need to define the loader entry.
+For example, under RedHat:
 
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
-ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
-EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
-FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
-aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
-EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
-VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
-aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
-AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
-ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
-QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
-rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
-ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
-U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
-DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
-BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
-dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
-BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
-QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
-CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
-xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
-IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
-kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
-eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
-KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
-1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
-OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
-x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
-5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
-DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
-VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
-UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
-MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
-ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
-oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
-SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
-xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
-RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
-bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
-NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
-KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
-5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
-C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
-gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
-VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
-MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
-by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
-b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
-BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
-QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
-c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
-AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
-qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
-v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
-Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
-tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
-Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
-YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
-ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
-IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
-ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
-GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
-h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
-9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
-P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
-2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
-BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
-7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
-lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
-lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
-AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
-Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
-FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
-BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
-cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
-aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
-LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
-BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
-cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
-Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
-lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
-WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
-hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
-IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
-dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
-NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
-xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMwMzIwMDgxNzI5WjAvBgkqhkiG9w0BCQQxIgQgYDjjxZmE
-lM+8GjwbuvWxLpdKthNcl0StqeBg7+YdBk8wgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
-A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
-dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
-DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
-MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
-Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgCAAgKzg50BO7JOyXH94/55uxapKfvzS6iL
-pVJJkP2PJPsiXxSTHfxmkMHjr99ltGjPl38kDcNK/C1ZSfhxnZkpO0zHarMOo1OX6h3WnUmXpt36
-T4lAGIe8Oy/WPxMAdg0wqsgXZGkKbXtTRX5gTSa5vjln3rTZIamFhHiifBCtAmukvsr+dCcvHjom
-hoxlZkfRp33MO+1PvoHHVVychED1BrwBUlSeOjLIABtjNLP9UAbr0MtoLLYX9LemWs+1yPN7zMSR
-GTClONLXdORyYaeZn7btGUukJRpmWNPjl4vc9lgKVZ9I3q4xwD+1Iu0L4nTmXt+jQ41YwjvvLA8+
-YzzPr0y/zNNMcyPl/1iLsSlbhU4BhuVUENoOe3+hnpuaw+baO8VuU3W6IiQLVpIrzigZHj6FD7HN
-O2W6y1BUBL/FFtAM/fJ0VW5MZzEo3BZ14kJS9OVWjqyFE7GWGRIUL0TfFKEScwrbyfiJ1JnbxgJe
-MeQLvqR3i7zsjnJVFtLoYfNl56dt9Xirw6QlerwTK1ycI/zEwUGV/oRycAXnUakASUM1hj07Ewb3
-XelUea9ORG2SePDNeq0wMW769Kf9UWf4LKICtOqF4QW3vDkC/8HHmjBIt/Wp6ofZ+xyqhRGDxnbO
-6WVfi25glUgnovSk9gFEFlSV2Q/MD3fWvMA+FLpYOwAAAAAAAA==
+	title topology
+	version topology.bin
+	linux /boot/topology.bin
+	initrd /boot/initramfs-topology.bin.img
+	options -drawers 4 -books 4 -sockets 2 -cores 8
+	id rhel-0-topology.bin
+	grub_users $grub_users
+	grub_arg --unrestricted
+	grub_class kernel
 
+Output of the test is done on the SCLP console.
 
---=-59e0oiOWyGgBsgY/lqpd--
+Regards,
+Pierre
+
+Pierre Morel (2):
+  s390x: topology: Check the Perform Topology Function
+  s390x: topology: Checking Configuration Topology Information
+
+ lib/s390x/sclp.c    |   5 +
+ lib/s390x/sclp.h    |   4 +-
+ lib/s390x/stsi.h    |  36 ++++
+ s390x/Makefile      |   1 +
+ s390x/topology.c    | 471 ++++++++++++++++++++++++++++++++++++++++++++
+ s390x/unittests.cfg |  11 ++
+ 6 files changed, 527 insertions(+), 1 deletion(-)
+ create mode 100644 s390x/topology.c
+
+-- 
+2.31.1
+
+new in v7:
+
+- better checks using device attributes on commandline
+  (Pierre)
+- use builtin to get the number of CPU in the TLE mask
+  (Thomas)
+- use Elvis (not dead)
+  (Thomas)
+- reset before tests
+  (Nina)
+- splitting test_ptf in small functions
+  (Thomas)
+- check every ptf function code for program check
+  (Nina)
+- Test made on LPAR
+  (Janosch)
+- use a single page for SYSIB
+  (Thomas)
+- abort on wrong parameter
+  (Thomas)
+- implement SYSIB check with a recursive funtion
+  (Nina)
+- diverse little changes (naming, clearer checks
+  (Nina, Thomas)
+
