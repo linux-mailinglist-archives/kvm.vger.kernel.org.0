@@ -2,59 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C898E6C3629
-	for <lists+kvm@lfdr.de>; Tue, 21 Mar 2023 16:49:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E3FB16C362D
+	for <lists+kvm@lfdr.de>; Tue, 21 Mar 2023 16:49:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231765AbjCUPtA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Mar 2023 11:49:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59766 "EHLO
+        id S231841AbjCUPtF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Mar 2023 11:49:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59830 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231478AbjCUPs7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Mar 2023 11:48:59 -0400
+        with ESMTP id S231478AbjCUPtC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Mar 2023 11:49:02 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5BBC94ECEE
-        for <kvm@vger.kernel.org>; Tue, 21 Mar 2023 08:48:13 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 807C74ECEF
+        for <kvm@vger.kernel.org>; Tue, 21 Mar 2023 08:48:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1679413692;
+        s=mimecast20190719; t=1679413694;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=5fZfqjM11oy2Vtn/lVIZfuetr5wAdozVuLjydoFPWVI=;
-        b=JYezWSuq2H3FLqpzknCDxl8AGwDieIecUcKkML0fqD6WCSLBIOEFcWgooZNljNO0prFmqg
-        FNAV/gdMb0EceWMBqguefq1ajTWauqVKgODRPS6IdNXophozxovnuC1/qeKZromIfE5i7G
-        60NA/wmu2BjzAl1jRh5PXYYdo1Tw0xw=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=/o0veKHzKEYhUDBvRKAwkdEIIqv4zRPguQPr09zvNuk=;
+        b=N+nqMQZIZEElZ1OuXNayfwCCQulCZV4luGMmm2cmKkYf/tbM2aABcLJQl47F7bUPJC/sLE
+        dz6ik9f3jyyovpYgEKUNIaVwOvaYaKb2HwDd/FVztE6HR7ZDnf+hK4EUdAh+YbHlNLtSM6
+        4s2UWvOUNd+MygEdD2fB1N3InM9tcd0=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-367--SWbHcVRNPm79ONGabrK7Q-1; Tue, 21 Mar 2023 11:48:10 -0400
-X-MC-Unique: -SWbHcVRNPm79ONGabrK7Q-1
-Received: by mail-wr1-f72.google.com with SMTP id c3-20020adfa303000000b002d5737d3835so801055wrb.21
-        for <kvm@vger.kernel.org>; Tue, 21 Mar 2023 08:48:10 -0700 (PDT)
+ us-mta-213-wRTdbjfyPwCAXTmNjZWCeg-1; Tue, 21 Mar 2023 11:48:12 -0400
+X-MC-Unique: wRTdbjfyPwCAXTmNjZWCeg-1
+Received: by mail-wm1-f69.google.com with SMTP id bi7-20020a05600c3d8700b003edecc610abso3512221wmb.7
+        for <kvm@vger.kernel.org>; Tue, 21 Mar 2023 08:48:12 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679413689;
+        d=1e100.net; s=20210112; t=1679413691;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=5fZfqjM11oy2Vtn/lVIZfuetr5wAdozVuLjydoFPWVI=;
-        b=M1Y6vAShHUj9WsNp/5nA67DwDZhoU9IFqveqA+UqLSuyjfUo2TfOTruruA9Eo1qMVe
-         6b45ofHa/0nn0mjpkMBoGPjjCqNP9BJTV5W0p5ZkF70xT+HbUgLzI2MAXZtcvHhO+lJj
-         T2uhOLN4sUzO7IQHK3B/PiDnjwhfoXwLvVyzk8H0bBIPjDXkFX9ekD8qa1ZRMaDZlL8I
-         NNhvXQy4ZaL4rZVPLwfqS1fFlT2Gjq+BhnydkrvcHGVHtvdLgp/HNZ4yNwyLfbF+DF4B
-         bA4rSTZYe5Twq69zedVatymN0Afv26pp6ze6vE/fYDIc43QSUIjRyBwmQXrFA72e4nO1
-         Pa+g==
-X-Gm-Message-State: AO0yUKU2uFkTs6Nh5W5vtfzPvSIUpWIbGoT9GW/p50cSgXk4DsPj+ndu
-        X13ZJY6i6A4BnPea2HdUxqnwfoPbp2ub5iJBHmMTF0rWG1i+3gJYesOoUFYmtiYwMNpwNrhh1Gq
-        mm1xXKnPDYvzj
-X-Received: by 2002:adf:fe07:0:b0:2cf:e343:b8b0 with SMTP id n7-20020adffe07000000b002cfe343b8b0mr2517580wrr.56.1679413689583;
-        Tue, 21 Mar 2023 08:48:09 -0700 (PDT)
-X-Google-Smtp-Source: AK7set+H3aD54i1Y3Lohtokw09es5cXqYDux9QaK4NnzMmJA80+x6PfFzAJ0zMnpeblLwpDY1gLteA==
-X-Received: by 2002:adf:fe07:0:b0:2cf:e343:b8b0 with SMTP id n7-20020adffe07000000b002cfe343b8b0mr2517561wrr.56.1679413689321;
-        Tue, 21 Mar 2023 08:48:09 -0700 (PDT)
+        bh=/o0veKHzKEYhUDBvRKAwkdEIIqv4zRPguQPr09zvNuk=;
+        b=qBn/BWyFlFnxAaCUfO4FyXCgfpZ1DaJU+246/1DLsx+aD/xXR4eQ58lZqUN0paVLS+
+         lHQx2XHAHOA3OTMIeCtIm6OiafPAWLvn5zWeUkG0Ami7wshc4DxqMk7K/zPQD3u/z7L3
+         OQCfkOyOD3fJBjy5FKCNsRqyZ+KWpKJI5uqPVFvvusYmwIgi+pAJecG7CSqUrPwNPJVD
+         OtGQG8p3LoXIzjiaDy4KMOsJErwbqQqzoApMsRjyTQlJnzCbHZu+uawQj8nFeUZF0Ypr
+         jYnegQNtl4171L6fwLMwBhVJeweZ/gskfroGpiowhXUpH6o394KTH5atJ2k7ZgUzReLX
+         280Q==
+X-Gm-Message-State: AO0yUKVku6SLNiOejW3wZ+zT1bQuOwOcK+H/Ix3Kr4cPpVJYMPKneBVK
+        iebmTFClCFiYbPJVXkDvF3ki0zsfV4DQg0aCQEEeSAeL3nV+NTYp6atWgiysn8OrKM9/ZZ09CfQ
+        77YM3XSCWEE0O
+X-Received: by 2002:a05:600c:220f:b0:3ed:9a09:183 with SMTP id z15-20020a05600c220f00b003ed9a090183mr2740480wml.2.1679413691499;
+        Tue, 21 Mar 2023 08:48:11 -0700 (PDT)
+X-Google-Smtp-Source: AK7set8YqhxDQpfS5NR1dT1A4CL5lP3K67FStlVUCkHzTbHZ4OmA894kPfK+s68ggo7GZKyrCyBFCQ==
+X-Received: by 2002:a05:600c:220f:b0:3ed:9a09:183 with SMTP id z15-20020a05600c220f00b003ed9a090183mr2740463wml.2.1679413691320;
+        Tue, 21 Mar 2023 08:48:11 -0700 (PDT)
 Received: from step1.redhat.com (host-82-57-51-170.retail.telecomitalia.it. [82.57.51.170])
-        by smtp.gmail.com with ESMTPSA id z15-20020a5d44cf000000b002ce9f0e4a8fsm11692694wrr.84.2023.03.21.08.48.07
+        by smtp.gmail.com with ESMTPSA id z15-20020a5d44cf000000b002ce9f0e4a8fsm11692694wrr.84.2023.03.21.08.48.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Mar 2023 08:48:08 -0700 (PDT)
+        Tue, 21 Mar 2023 08:48:10 -0700 (PDT)
 From:   Stefano Garzarella <sgarzare@redhat.com>
 To:     virtualization@lists.linux-foundation.org
 Cc:     Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org,
@@ -62,9 +62,9 @@ Cc:     Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org,
         eperezma@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>,
         Andrey Zhadchenko <andrey.zhadchenko@virtuozzo.com>,
         netdev@vger.kernel.org, Stefano Garzarella <sgarzare@redhat.com>
-Subject: [PATCH v3 6/8] vdpa_sim: use kthread worker
-Date:   Tue, 21 Mar 2023 16:48:02 +0100
-Message-Id: <20230321154804.184577-2-sgarzare@redhat.com>
+Subject: [PATCH v3 7/8] vdpa_sim: replace the spinlock with a mutex to protect the state
+Date:   Tue, 21 Mar 2023 16:48:03 +0100
+Message-Id: <20230321154804.184577-3-sgarzare@redhat.com>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230321154804.184577-1-sgarzare@redhat.com>
 References: <20230321154228.182769-1-sgarzare@redhat.com>
@@ -74,7 +74,7 @@ Content-type: text/plain
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -82,98 +82,209 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Let's use our own kthread to run device jobs.
-This allows us more flexibility, especially we can attach the kthread
-to the user address space when vDPA uses user's VA.
+The spinlock we use to protect the state of the simulator is sometimes
+held for a long time (for example, when devices handle requests).
 
+This also prevents us from calling functions that might sleep (such as
+kthread_flush_work() in the next patch), and thus having to release
+and retake the lock.
+
+For these reasons, let's replace the spinlock with a mutex that gives
+us more flexibility.
+
+Suggested-by: Jason Wang <jasowang@redhat.com>
 Acked-by: Jason Wang <jasowang@redhat.com>
 Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
 ---
-
-Notes:
-    v3:
-    - fix `dev` not initialized in the error path [Simon Horman]
-
- drivers/vdpa/vdpa_sim/vdpa_sim.h |  3 ++-
- drivers/vdpa/vdpa_sim/vdpa_sim.c | 19 +++++++++++++------
- 2 files changed, 15 insertions(+), 7 deletions(-)
+ drivers/vdpa/vdpa_sim/vdpa_sim.h     |  4 ++--
+ drivers/vdpa/vdpa_sim/vdpa_sim.c     | 34 ++++++++++++++--------------
+ drivers/vdpa/vdpa_sim/vdpa_sim_blk.c |  4 ++--
+ drivers/vdpa/vdpa_sim/vdpa_sim_net.c |  4 ++--
+ 4 files changed, 23 insertions(+), 23 deletions(-)
 
 diff --git a/drivers/vdpa/vdpa_sim/vdpa_sim.h b/drivers/vdpa/vdpa_sim/vdpa_sim.h
-index acee20faaf6a..ce83f9130a5d 100644
+index ce83f9130a5d..4774292fba8c 100644
 --- a/drivers/vdpa/vdpa_sim/vdpa_sim.h
 +++ b/drivers/vdpa/vdpa_sim/vdpa_sim.h
-@@ -57,7 +57,8 @@ struct vdpasim_dev_attr {
- struct vdpasim {
- 	struct vdpa_device vdpa;
- 	struct vdpasim_virtqueue *vqs;
--	struct work_struct work;
-+	struct kthread_worker *worker;
-+	struct kthread_work work;
+@@ -60,8 +60,8 @@ struct vdpasim {
+ 	struct kthread_worker *worker;
+ 	struct kthread_work work;
  	struct vdpasim_dev_attr dev_attr;
- 	/* spinlock to synchronize virtqueue state */
- 	spinlock_t lock;
+-	/* spinlock to synchronize virtqueue state */
+-	spinlock_t lock;
++	/* mutex to synchronize virtqueue state */
++	struct mutex mutex;
+ 	/* virtio config according to device type */
+ 	void *config;
+ 	struct vhost_iotlb *iommu;
 diff --git a/drivers/vdpa/vdpa_sim/vdpa_sim.c b/drivers/vdpa/vdpa_sim/vdpa_sim.c
-index f6329900e61a..1cfa56c52e5a 100644
+index 1cfa56c52e5a..ab4cfb82c237 100644
 --- a/drivers/vdpa/vdpa_sim/vdpa_sim.c
 +++ b/drivers/vdpa/vdpa_sim/vdpa_sim.c
-@@ -11,8 +11,8 @@
- #include <linux/module.h>
- #include <linux/device.h>
- #include <linux/kernel.h>
-+#include <linux/kthread.h>
- #include <linux/slab.h>
--#include <linux/sched.h>
- #include <linux/dma-map-ops.h>
- #include <linux/vringh.h>
- #include <linux/vdpa.h>
-@@ -127,7 +127,7 @@ static void vdpasim_do_reset(struct vdpasim *vdpasim)
- static const struct vdpa_config_ops vdpasim_config_ops;
- static const struct vdpa_config_ops vdpasim_batch_config_ops;
+@@ -178,7 +178,7 @@ struct vdpasim *vdpasim_create(struct vdpasim_dev_attr *dev_attr,
+ 	if (IS_ERR(vdpasim->worker))
+ 		goto err_iommu;
  
--static void vdpasim_work_fn(struct work_struct *work)
-+static void vdpasim_work_fn(struct kthread_work *work)
- {
- 	struct vdpasim *vdpasim = container_of(work, struct vdpasim, work);
- 
-@@ -170,11 +170,17 @@ struct vdpasim *vdpasim_create(struct vdpasim_dev_attr *dev_attr,
- 
- 	vdpasim = vdpa_to_sim(vdpa);
- 	vdpasim->dev_attr = *dev_attr;
--	INIT_WORK(&vdpasim->work, vdpasim_work_fn);
-+	dev = &vdpasim->vdpa.dev;
-+
-+	kthread_init_work(&vdpasim->work, vdpasim_work_fn);
-+	vdpasim->worker = kthread_create_worker(0, "vDPA sim worker: %s",
-+						dev_attr->name);
-+	if (IS_ERR(vdpasim->worker))
-+		goto err_iommu;
-+
- 	spin_lock_init(&vdpasim->lock);
+-	spin_lock_init(&vdpasim->lock);
++	mutex_init(&vdpasim->mutex);
  	spin_lock_init(&vdpasim->iommu_lock);
  
--	dev = &vdpasim->vdpa.dev;
  	dev->dma_mask = &dev->coherent_dma_mask;
- 	if (dma_set_mask_and_coherent(dev, DMA_BIT_MASK(64)))
- 		goto err_iommu;
-@@ -223,7 +229,7 @@ EXPORT_SYMBOL_GPL(vdpasim_create);
+@@ -286,13 +286,13 @@ static void vdpasim_set_vq_ready(struct vdpa_device *vdpa, u16 idx, bool ready)
+ 	struct vdpasim_virtqueue *vq = &vdpasim->vqs[idx];
+ 	bool old_ready;
  
- void vdpasim_schedule_work(struct vdpasim *vdpasim)
- {
--	schedule_work(&vdpasim->work);
-+	kthread_queue_work(vdpasim->worker, &vdpasim->work);
+-	spin_lock(&vdpasim->lock);
++	mutex_lock(&vdpasim->mutex);
+ 	old_ready = vq->ready;
+ 	vq->ready = ready;
+ 	if (vq->ready && !old_ready) {
+ 		vdpasim_queue_ready(vdpasim, idx);
+ 	}
+-	spin_unlock(&vdpasim->lock);
++	mutex_unlock(&vdpasim->mutex);
  }
- EXPORT_SYMBOL_GPL(vdpasim_schedule_work);
  
-@@ -623,7 +629,8 @@ static void vdpasim_free(struct vdpa_device *vdpa)
+ static bool vdpasim_get_vq_ready(struct vdpa_device *vdpa, u16 idx)
+@@ -310,9 +310,9 @@ static int vdpasim_set_vq_state(struct vdpa_device *vdpa, u16 idx,
+ 	struct vdpasim_virtqueue *vq = &vdpasim->vqs[idx];
+ 	struct vringh *vrh = &vq->vring;
+ 
+-	spin_lock(&vdpasim->lock);
++	mutex_lock(&vdpasim->mutex);
+ 	vrh->last_avail_idx = state->split.avail_index;
+-	spin_unlock(&vdpasim->lock);
++	mutex_unlock(&vdpasim->mutex);
+ 
+ 	return 0;
+ }
+@@ -409,9 +409,9 @@ static u8 vdpasim_get_status(struct vdpa_device *vdpa)
+ 	struct vdpasim *vdpasim = vdpa_to_sim(vdpa);
+ 	u8 status;
+ 
+-	spin_lock(&vdpasim->lock);
++	mutex_lock(&vdpasim->mutex);
+ 	status = vdpasim->status;
+-	spin_unlock(&vdpasim->lock);
++	mutex_unlock(&vdpasim->mutex);
+ 
+ 	return status;
+ }
+@@ -420,19 +420,19 @@ static void vdpasim_set_status(struct vdpa_device *vdpa, u8 status)
+ {
+ 	struct vdpasim *vdpasim = vdpa_to_sim(vdpa);
+ 
+-	spin_lock(&vdpasim->lock);
++	mutex_lock(&vdpasim->mutex);
+ 	vdpasim->status = status;
+-	spin_unlock(&vdpasim->lock);
++	mutex_unlock(&vdpasim->mutex);
+ }
+ 
+ static int vdpasim_reset(struct vdpa_device *vdpa)
+ {
+ 	struct vdpasim *vdpasim = vdpa_to_sim(vdpa);
+ 
+-	spin_lock(&vdpasim->lock);
++	mutex_lock(&vdpasim->mutex);
+ 	vdpasim->status = 0;
+ 	vdpasim_do_reset(vdpasim);
+-	spin_unlock(&vdpasim->lock);
++	mutex_unlock(&vdpasim->mutex);
+ 
+ 	return 0;
+ }
+@@ -441,9 +441,9 @@ static int vdpasim_suspend(struct vdpa_device *vdpa)
+ {
+ 	struct vdpasim *vdpasim = vdpa_to_sim(vdpa);
+ 
+-	spin_lock(&vdpasim->lock);
++	mutex_lock(&vdpasim->mutex);
+ 	vdpasim->running = false;
+-	spin_unlock(&vdpasim->lock);
++	mutex_unlock(&vdpasim->mutex);
+ 
+ 	return 0;
+ }
+@@ -453,7 +453,7 @@ static int vdpasim_resume(struct vdpa_device *vdpa)
  	struct vdpasim *vdpasim = vdpa_to_sim(vdpa);
  	int i;
  
--	cancel_work_sync(&vdpasim->work);
-+	kthread_cancel_work_sync(&vdpasim->work);
-+	kthread_destroy_worker(vdpasim->worker);
+-	spin_lock(&vdpasim->lock);
++	mutex_lock(&vdpasim->mutex);
+ 	vdpasim->running = true;
  
- 	for (i = 0; i < vdpasim->dev_attr.nvqs; i++) {
- 		vringh_kiov_cleanup(&vdpasim->vqs[i].out_iov);
+ 	if (vdpasim->pending_kick) {
+@@ -464,7 +464,7 @@ static int vdpasim_resume(struct vdpa_device *vdpa)
+ 		vdpasim->pending_kick = false;
+ 	}
+ 
+-	spin_unlock(&vdpasim->lock);
++	mutex_unlock(&vdpasim->mutex);
+ 
+ 	return 0;
+ }
+@@ -536,14 +536,14 @@ static int vdpasim_set_group_asid(struct vdpa_device *vdpa, unsigned int group,
+ 
+ 	iommu = &vdpasim->iommu[asid];
+ 
+-	spin_lock(&vdpasim->lock);
++	mutex_lock(&vdpasim->mutex);
+ 
+ 	for (i = 0; i < vdpasim->dev_attr.nvqs; i++)
+ 		if (vdpasim_get_vq_group(vdpa, i) == group)
+ 			vringh_set_iotlb(&vdpasim->vqs[i].vring, iommu,
+ 					 &vdpasim->iommu_lock);
+ 
+-	spin_unlock(&vdpasim->lock);
++	mutex_unlock(&vdpasim->mutex);
+ 
+ 	return 0;
+ }
+diff --git a/drivers/vdpa/vdpa_sim/vdpa_sim_blk.c b/drivers/vdpa/vdpa_sim/vdpa_sim_blk.c
+index eb4897c8541e..568119e1553f 100644
+--- a/drivers/vdpa/vdpa_sim/vdpa_sim_blk.c
++++ b/drivers/vdpa/vdpa_sim/vdpa_sim_blk.c
+@@ -290,7 +290,7 @@ static void vdpasim_blk_work(struct vdpasim *vdpasim)
+ 	bool reschedule = false;
+ 	int i;
+ 
+-	spin_lock(&vdpasim->lock);
++	mutex_lock(&vdpasim->mutex);
+ 
+ 	if (!(vdpasim->status & VIRTIO_CONFIG_S_DRIVER_OK))
+ 		goto out;
+@@ -321,7 +321,7 @@ static void vdpasim_blk_work(struct vdpasim *vdpasim)
+ 		}
+ 	}
+ out:
+-	spin_unlock(&vdpasim->lock);
++	mutex_unlock(&vdpasim->mutex);
+ 
+ 	if (reschedule)
+ 		vdpasim_schedule_work(vdpasim);
+diff --git a/drivers/vdpa/vdpa_sim/vdpa_sim_net.c b/drivers/vdpa/vdpa_sim/vdpa_sim_net.c
+index e61a9ecbfafe..7ab434592bfe 100644
+--- a/drivers/vdpa/vdpa_sim/vdpa_sim_net.c
++++ b/drivers/vdpa/vdpa_sim/vdpa_sim_net.c
+@@ -201,7 +201,7 @@ static void vdpasim_net_work(struct vdpasim *vdpasim)
+ 	u64 rx_drops = 0, rx_overruns = 0, rx_errors = 0, tx_errors = 0;
+ 	int err;
+ 
+-	spin_lock(&vdpasim->lock);
++	mutex_lock(&vdpasim->mutex);
+ 
+ 	if (!vdpasim->running)
+ 		goto out;
+@@ -264,7 +264,7 @@ static void vdpasim_net_work(struct vdpasim *vdpasim)
+ 	}
+ 
+ out:
+-	spin_unlock(&vdpasim->lock);
++	mutex_unlock(&vdpasim->mutex);
+ 
+ 	u64_stats_update_begin(&net->tx_stats.syncp);
+ 	net->tx_stats.pkts += tx_pkts;
 -- 
 2.39.2
 
