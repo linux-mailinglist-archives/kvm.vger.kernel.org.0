@@ -2,215 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 540536C2F38
-	for <lists+kvm@lfdr.de>; Tue, 21 Mar 2023 11:40:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E4E0F6C2FDB
+	for <lists+kvm@lfdr.de>; Tue, 21 Mar 2023 12:11:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230328AbjCUKkg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Mar 2023 06:40:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37648 "EHLO
+        id S229772AbjCULKi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Mar 2023 07:10:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47850 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229527AbjCUKkd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Mar 2023 06:40:33 -0400
-Received: from mx.sberdevices.ru (mx.sberdevices.ru [45.89.227.171])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9163112CC0;
-        Tue, 21 Mar 2023 03:40:27 -0700 (PDT)
-Received: from s-lin-edge02.sberdevices.ru (localhost [127.0.0.1])
-        by mx.sberdevices.ru (Postfix) with ESMTP id 568605FD2D;
-        Tue, 21 Mar 2023 13:40:23 +0300 (MSK)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
-        s=mail; t=1679395223;
-        bh=DD+yQxyiPVwCtYeMRrkjbgY0b9PL/Zx/D/E977JmgQw=;
-        h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-        b=mFS8Fy5nLw0tJQrnyVhfv9jfa23TLPKaDFRZdfqw58O0+Ui3QBJKWO3EMs90SQYvC
-         RYHkSj3fv9kL4VDQmfpz+rdeVwjJh1VlAWH4cPLfTr23J9xT0WTKWrUkSpUxR7DZ93
-         9hsZ4UbzujGm/eufC+/4pBiwXIJhRTlhe2zJwbQ8cVhJlCyDE0qlcZOGT2C+Hdi1/h
-         cT6iha9T3RdYT41bfypQXdEkvbfaGJchwp/GNFaDZBCN8W/EKf7iUaF1moJ/7Nn9Z4
-         ZHDFNHs1YX0ldBeeCz1u6YL+9SEY/ukqyIw/WopjFCq5i2WpFNM3WW7EYHBlnipXB/
-         djdz5xehenCeQ==
-Received: from S-MS-EXCH01.sberdevices.ru (S-MS-EXCH01.sberdevices.ru [172.16.1.4])
-        by mx.sberdevices.ru (Postfix) with ESMTP;
-        Tue, 21 Mar 2023 13:40:18 +0300 (MSK)
-Message-ID: <aedf06ce-15c1-b06a-daa0-507e288e4e29@sberdevices.ru>
-Date:   Tue, 21 Mar 2023 13:36:55 +0300
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
-Subject: Re: [RFC PATCH v3] virtio/vsock: allocate multiple skbuffs on tx
-Content-Language: en-US
-To:     Stefano Garzarella <sgarzare@redhat.com>
-CC:     Stefan Hajnoczi <stefanha@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Bobby Eshleman <bobby.eshleman@bytedance.com>,
-        <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
-        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <kernel@sberdevices.ru>, <oxffffaa@gmail.com>
-References: <f33ef593-982e-2b3f-0986-6d537a3aaf08@sberdevices.ru>
- <20230321084002.5anjcr3ikw3ynbse@sgarzare-redhat>
-From:   Arseniy Krasnov <avkrasnov@sberdevices.ru>
-In-Reply-To: <20230321084002.5anjcr3ikw3ynbse@sgarzare-redhat>
+        with ESMTP id S230510AbjCULKP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Mar 2023 07:10:15 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5EC847431
+        for <kvm@vger.kernel.org>; Tue, 21 Mar 2023 04:09:53 -0700 (PDT)
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 32LAtbl3016779;
+        Tue, 21 Mar 2023 11:09:46 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : reply-to : to : date : in-reply-to : references : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=IcVTfatXtXzF7BUgM+gClS/t5xUYcK0H+MNzBoUuoeA=;
+ b=ICEzFJCy9q051u9RljELUVjXAIYOZWInfm69iO1xZDondq2SJ/k6Wv4m1foo1zLruE5X
+ b/M0ta01huRixze1cJfP3r2btRcNLLfKj2XOhKOPnDaG1ZEkDAynGmxK4FRjvcuMQxtp
+ ZDcynoqsxaM/zc3LHhOjLoqOG79GIIGOc/3RhBZ3vJN5jVOUg0bF9cPKfoQ0+rFIlVoA
+ HjyHrakc4qUurrm19OjRMwQGdMNii0Iq72HPUuAhgJEPup6Ru14GTF7Shu+byarmibpG
+ CGNdbWnaX/9HnHGb8VPuddPAykQCu2ctXXCswyjW0+o9FOk2q4GZZfUtUies2hqj9QzY zA== 
+Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.10])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pfb8q8aet-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 21 Mar 2023 11:09:46 +0000
+Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
+        by ppma02dal.us.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 32LA9lDY025936;
+        Tue, 21 Mar 2023 11:09:45 GMT
+Received: from smtprelay03.dal12v.mail.ibm.com ([9.208.130.98])
+        by ppma02dal.us.ibm.com (PPS) with ESMTPS id 3pd4x7enev-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 21 Mar 2023 11:09:45 +0000
+Received: from smtpav01.dal12v.mail.ibm.com (smtpav01.dal12v.mail.ibm.com [10.241.53.100])
+        by smtprelay03.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 32LB9i1M13435596
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 21 Mar 2023 11:09:44 GMT
+Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3B8445807B;
+        Tue, 21 Mar 2023 11:09:44 +0000 (GMT)
+Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3201A58057;
+        Tue, 21 Mar 2023 11:09:42 +0000 (GMT)
+Received: from [172.20.3.173] (unknown [9.163.23.201])
+        by smtpav01.dal12v.mail.ibm.com (Postfix) with ESMTP;
+        Tue, 21 Mar 2023 11:09:42 +0000 (GMT)
+Message-ID: <66eee693371c11bbd2173ad5d91afc740aa17b46.camel@linux.ibm.com>
+Subject: Re: [ANNOUNCEMENT] COCONUT Secure VM Service Module for SEV-SNP
+From:   James Bottomley <jejb@linux.ibm.com>
+Reply-To: jejb@linux.ibm.com
+To:     =?ISO-8859-1?Q?J=F6rg_R=F6del?= <jroedel@suse.de>,
+        amd-sev-snp@lists.suse.com, linux-coco@lists.linux.dev,
+        kvm@vger.kernel.org
+Date:   Tue, 21 Mar 2023 07:09:40 -0400
+In-Reply-To: <ZBl4592947wC7WKI@suse.de>
+References: <ZBl4592947wC7WKI@suse.de>
 Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.42.4 
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: dok7lrnLE278hAVKT4pUWOr4ZCcZwI71
+X-Proofpoint-ORIG-GUID: dok7lrnLE278hAVKT4pUWOr4ZCcZwI71
 Content-Transfer-Encoding: 8bit
-X-Originating-IP: [172.16.1.6]
-X-ClientProxiedBy: S-MS-EXCH01.sberdevices.ru (172.16.1.4) To
- S-MS-EXCH01.sberdevices.ru (172.16.1.4)
-X-KSMG-Rule-ID: 4
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Status: not scanned, disabled by settings
-X-KSMG-AntiSpam-Interceptor-Info: not scanned
-X-KSMG-AntiPhishing: not scanned, disabled by settings
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 1.1.2.30, bases: 2023/03/21 07:59:00 #20981652
-X-KSMG-AntiVirus-Status: Clean, skipped
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,
-        SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+MIME-Version: 1.0
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
+ definitions=2023-03-21_08,2023-03-21_01,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 spamscore=0
+ bulkscore=0 malwarescore=0 priorityscore=1501 mlxscore=0 adultscore=0
+ suspectscore=0 lowpriorityscore=0 mlxlogscore=999 impostorscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2303150002 definitions=main-2303210078
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Tue, 2023-03-21 at 10:29 +0100, Jörg Rödel wrote:
+> Hi,
+> 
+> We are happy to announce that last week our secure VM service module
+> (SVSM) went public on GitHub for everyone to try it out and
+> participate in its further development. It is dual-licensed under the
+> MIT and APACHE-2.0 licenses.
+> 
+> The project is written in Rust and can be cloned from:
+> 
+>         https://github.com/coconut-svsm/svsm
+> 
+> There are also repositories in the github project with the Linux host
+> and guest, EDK2 and QEMU changes needed to run the SVSM and boot up a
+> full Linux guest.
+> 
+> The SVSM repository contains an installation guide in the INSTALL.md
+> file and contributor hints in CONTRIBUTING.md.
+> 
+> A blog entry with more details is here:
+> 
+>         
+> https://www.suse.com/c/suse-open-sources-secure-vm-service-module-
+> for-confidential-computing/
+> 
+> We also thank AMD for implementing and providing the necessary
+> changes to Linux and EDK2 to make an SVSM possible.
+
+Since this a fork of the AMD svsm code
+(https://github.com/AMDESE/linux-svsm/), is it intended to be a
+permanent fork, or are you going to be submitting your additions back
+upstream like we're trying to do for our initial vTPM prototype?  From
+the community point of view, having two different SVSM code bases and
+having to choose which one to develop against is going to be very
+confusing ...
+
+James
 
 
-On 21.03.2023 11:40, Stefano Garzarella wrote:
-> On Tue, Mar 21, 2023 at 12:31:48AM +0300, Arseniy Krasnov wrote:
->> This adds small optimization for tx path: instead of allocating single
->> skbuff on every call to transport, allocate multiple skbuff's until
->> credit space allows, thus trying to send as much as possible data without
->> return to af_vsock.c.
->>
->> Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
->> ---
->> Link to v1:
->> https://lore.kernel.org/netdev/2c52aa26-8181-d37a-bccd-a86bd3cbc6e1@sberdevices.ru/
->> Link to v2:
->> https://lore.kernel.org/netdev/ea5725eb-6cb5-cf15-2938-34e335a442fa@sberdevices.ru/
->>
->> Changelog:
->> v1 -> v2:
->> - If sent something, return number of bytes sent (even in
->>   case of error). Return error only if failed to sent first
->>   skbuff.
->>
->> v2 -> v3:
->> - Handle case when transport callback returns unexpected value which
->>   is not equal to 'skb->len'. Break loop.
->> - Don't check for zero value of 'rest_len' before calling
->>   'virtio_transport_put_credit()'. Decided to add this check directly
->>   to 'virtio_transport_put_credit()' in separate patch.
->>
->> net/vmw_vsock/virtio_transport_common.c | 59 +++++++++++++++++++------
->> 1 file changed, 45 insertions(+), 14 deletions(-)
->>
->> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
->> index 6564192e7f20..e0b2c6ecbe22 100644
->> --- a/net/vmw_vsock/virtio_transport_common.c
->> +++ b/net/vmw_vsock/virtio_transport_common.c
->> @@ -196,7 +196,8 @@ static int virtio_transport_send_pkt_info(struct vsock_sock *vsk,
->>     const struct virtio_transport *t_ops;
->>     struct virtio_vsock_sock *vvs;
->>     u32 pkt_len = info->pkt_len;
->> -    struct sk_buff *skb;
->> +    u32 rest_len;
->> +    int ret;
->>
->>     info->type = virtio_transport_get_type(sk_vsock(vsk));
->>
->> @@ -216,10 +217,6 @@ static int virtio_transport_send_pkt_info(struct vsock_sock *vsk,
->>
->>     vvs = vsk->trans;
->>
->> -    /* we can send less than pkt_len bytes */
->> -    if (pkt_len > VIRTIO_VSOCK_MAX_PKT_BUF_SIZE)
->> -        pkt_len = VIRTIO_VSOCK_MAX_PKT_BUF_SIZE;
->> -
->>     /* virtio_transport_get_credit might return less than pkt_len credit */
->>     pkt_len = virtio_transport_get_credit(vvs, pkt_len);
->>
->> @@ -227,17 +224,51 @@ static int virtio_transport_send_pkt_info(struct vsock_sock *vsk,
->>     if (pkt_len == 0 && info->op == VIRTIO_VSOCK_OP_RW)
->>         return pkt_len;
->>
->> -    skb = virtio_transport_alloc_skb(info, pkt_len,
->> -                     src_cid, src_port,
->> -                     dst_cid, dst_port);
->> -    if (!skb) {
->> -        virtio_transport_put_credit(vvs, pkt_len);
->> -        return -ENOMEM;
->> -    }
->> +    ret = 0;
->> +    rest_len = pkt_len;
->> +
->> +    do {
->> +        struct sk_buff *skb;
->> +        size_t skb_len;
->> +
->> +        skb_len = min_t(u32, VIRTIO_VSOCK_MAX_PKT_BUF_SIZE, rest_len);
->> +
->> +        skb = virtio_transport_alloc_skb(info, skb_len,
->> +                         src_cid, src_port,
->> +                         dst_cid, dst_port);
->> +        if (!skb) {
->> +            ret = -ENOMEM;
->> +            break;
->> +        }
->> +
->> +        virtio_transport_inc_tx_pkt(vvs, skb);
->>
->> -    virtio_transport_inc_tx_pkt(vvs, skb);
->> +        ret = t_ops->send_pkt(skb);
->>
->> -    return t_ops->send_pkt(skb);
->> +        if (ret < 0)
->> +            break;
->> +
->> +        /* Both virtio and vhost 'send_pkt()' returns 'skb_len',
->> +         * but for reliability use 'ret' instead of 'skb_len'.
->> +         * Also if partial send happens (e.g. 'ret' != 'skb_len')
->> +         * somehow, we break this loop, but account such returned
->> +         * value in 'virtio_transport_put_credit()'.
->> +         */
->> +        rest_len -= ret;
->> +
->> +        if (ret != skb_len) {
->> +            ret = -EFAULT;
-> 
-> Okay, but `ret` will be overwritten by the check we have before the
-> return ...
-> 
-Yes, you're right, this assignment has no effect, since 'rest_len' is already
-changed and ret will be changed. I'll fix it.
 
-Thanks, Arseniy
->> +            break;
->> +        }
->> +    } while (rest_len);
->> +
->> +    virtio_transport_put_credit(vvs, rest_len);
->> +
->> +    /* Return number of bytes, if any data has been sent. */
->> +    if (rest_len != pkt_len)
->> +        ret = pkt_len - rest_len;
-> 
-> ... here.
-> 
-> Since we don't expect this condition for now, perhaps we can avoid
-> setting ret with -EFAULT, but we can add a WARN_ONCE (interrupting the
-> loop as you did here).
-> 
-> This way we return the partial length as we did before.
-> 
-> Thanks,
-> Stefano
-> 
->> +
->> +    return ret;
->> }
->>
->> static bool virtio_transport_inc_rx_pkt(struct virtio_vsock_sock *vvs,
->> -- 
->> 2.25.1
->>
-> 
