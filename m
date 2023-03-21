@@ -2,267 +2,325 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8F31A6C3130
-	for <lists+kvm@lfdr.de>; Tue, 21 Mar 2023 13:03:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8ABC66C3194
+	for <lists+kvm@lfdr.de>; Tue, 21 Mar 2023 13:22:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231179AbjCUMC7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Mar 2023 08:02:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45858 "EHLO
+        id S231309AbjCUMWm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Mar 2023 08:22:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37514 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229822AbjCUMC6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Mar 2023 08:02:58 -0400
-Received: from mail-wr1-x42c.google.com (mail-wr1-x42c.google.com [IPv6:2a00:1450:4864:20::42c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85E8E4AFF2
-        for <kvm@vger.kernel.org>; Tue, 21 Mar 2023 05:02:49 -0700 (PDT)
-Received: by mail-wr1-x42c.google.com with SMTP id t15so13391213wrz.7
-        for <kvm@vger.kernel.org>; Tue, 21 Mar 2023 05:02:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=vrull.eu; s=google; t=1679400168;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OTVMP5CWDZSChcBlwLBScmxhwJu3q0YBdvBg2oyne9M=;
-        b=LvrQDE3nDrU8JnbtSn+F/ehFEi6zwZs8mQBjVwvaO38j1qJ7QAw5eHxQlNIoo2MwSm
-         TkL+BWWyR6imrqtw5RgTUZ7Ifj49yFYd5dTY0M0PWZfl9U3KOzOYyGXJyeUjebUPC8FE
-         pluW9hNAmWJesME+J61sqng4NyfBv9dkRMrfNu7R/s29/DbrSOpvudsZZWmaMJj8dl+j
-         nsDd5m9t5UT5ZFvYbfoetObelrWoa90iJvO365/UkQkbTOkDSmaoTE9+I+dAilDtEKj5
-         1fjkE7mngHxnBAOHv5eOfGu5QQJWreKJnWY8fT/P+exEtXRCrZJ9KZqs9XLv4MHGwsJ4
-         bQOA==
+        with ESMTP id S231234AbjCUMWN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Mar 2023 08:22:13 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 743013BC48
+        for <kvm@vger.kernel.org>; Tue, 21 Mar 2023 05:21:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1679401285;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=GMDhm7oWbKMcs8fLd7CUA3XQ+ASj5voQX4bYJAXGGj4=;
+        b=aigzOu1X3VmbRSE7LzNuD5ZkdMpXbumd2UrYodj6qh662pP50Xwsm5ZmCSrsg7pIgajnqL
+        Zk33gKF9z1MToT9NAjQvWilAPrcnS3WGZIS16A3m/+zg6RcGdwWffxFfVa+gD4d7nogsY7
+        HTF4cBLgPH5Pcm5hAhT8buPh5asHXcU=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-338-ANHsl_IcM5WzDmnUWtBFJg-1; Tue, 21 Mar 2023 08:21:24 -0400
+X-MC-Unique: ANHsl_IcM5WzDmnUWtBFJg-1
+Received: by mail-wm1-f71.google.com with SMTP id bi7-20020a05600c3d8700b003edecc610abso3235764wmb.7
+        for <kvm@vger.kernel.org>; Tue, 21 Mar 2023 05:21:24 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679400168;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=OTVMP5CWDZSChcBlwLBScmxhwJu3q0YBdvBg2oyne9M=;
-        b=48mNV6CFuoFvpLkArtCWIObH5FaKdjotrOCPgn2rgGSP7/cjV4KSV2/VBsszZ7sseP
-         ERUvtN3wQIOVcFD+KM8UiBr50iRx+SH16KNlRUMpIrv9Vn6VUZdOAO2kNgc8HjnmASnv
-         gcvsM4Y8BzUM0jJCz4nsWBDgaEAAZzvUKxMfCZTzyik2grn2+PjMQ20zRsFZLRVOMCdR
-         Xg5zUy/VbufBPp3H8rQAiqXD2o83Q5u8BELS+em1QoRyw/3c7bzK57mVgtPTAPazSU8h
-         fvxlOfYZ6f9FusjX9tbFg7p5RUXHWIQupdx6m3+3vS/nilloC4//5nvg4Ykaf9Y9V3Vn
-         CKLA==
-X-Gm-Message-State: AO0yUKX9qqg9ev2kSRZ9+CdVzn0ZY5Bly0opxGxtPeHlNDJWDJ/tDzgu
-        2xJ0uhX0WKCMC5a1LOlixN2qYUOAlLWXiVlBVCoVlg==
-X-Google-Smtp-Source: AK7set8mHb8tF1n0BLg6HeZ1BSpksACXCj0hD6C8cgZSIAg1bqRgTPWPq2QPyGHNT5vrf+J0kHmd2Tp2lgTRPOePDaU=
-X-Received: by 2002:a5d:58f2:0:b0:2d3:c90e:88c3 with SMTP id
- f18-20020a5d58f2000000b002d3c90e88c3mr563814wrd.13.1679400167991; Tue, 21 Mar
- 2023 05:02:47 -0700 (PDT)
+        d=1e100.net; s=20210112; t=1679401283;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=GMDhm7oWbKMcs8fLd7CUA3XQ+ASj5voQX4bYJAXGGj4=;
+        b=Z0zma40iTizTfjxjMCmwZAioIETNUBKxqA8KPocss6jAihpgiG5mAD0WkyZZW+scMu
+         q8BZ4xPHCbYmj40pFfzr4vj1IjRUPxjC5thgEkYl8Q/AN6phjWv7ROcgMJArAlXTdlzv
+         hkRDhMMFh52TbP8DgFjZNdAAQhHG93heLyuH3CydPWryleRT2KLpgS4gzJ1hiotMu+ga
+         2Cu15bws2I6U17WE8rASEDREiTWEkCAO6WHCt2I8tEpAov26zFu6On2+FafkN/KKMj/P
+         IHl3rAf8oHiCIlhsxUSMcaz3v/3hGJDN1BjRgmlwKaUNjWFA82lwKhWI1LYpbWZnHi3Q
+         MdHQ==
+X-Gm-Message-State: AO0yUKXtrGJhG/qhcRTQFYkoQg1eOw/HSFeDSEsLvw1XbG/ofx79a59a
+        9AInmVaT7/Nx93F/kuDsSfQBkcNMzmP8oHUENkkRmkzGyUDbEvi4byn0aUatrEMpn0qr5UnGGr/
+        yx6s/zbgivJL3
+X-Received: by 2002:adf:fd07:0:b0:2ce:bd2e:1fea with SMTP id e7-20020adffd07000000b002cebd2e1feamr1926126wrr.26.1679401283341;
+        Tue, 21 Mar 2023 05:21:23 -0700 (PDT)
+X-Google-Smtp-Source: AK7set/7q1jIBWVbFK8ZIqwoSFyF0nd8cPKwX9Gh1yHNDKwTY18wE+ZeGFVBR3jXTezG6HQ3+81gZA==
+X-Received: by 2002:adf:fd07:0:b0:2ce:bd2e:1fea with SMTP id e7-20020adffd07000000b002cebd2e1feamr1926103wrr.26.1679401282983;
+        Tue, 21 Mar 2023 05:21:22 -0700 (PDT)
+Received: from redhat.com ([2.52.1.105])
+        by smtp.gmail.com with ESMTPSA id c8-20020adfe708000000b002cde626cd96sm11136752wrm.65.2023.03.21.05.21.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 21 Mar 2023 05:21:22 -0700 (PDT)
+Date:   Tue, 21 Mar 2023 08:21:19 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Viktor Prutyanov <viktor@daynix.com>
+Cc:     jasowang@redhat.com, cohuck@redhat.com, pasic@linux.ibm.com,
+        farman@linux.ibm.com, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        linux-kernel@vger.kernel.org, yan@daynix.com
+Subject: Re: [PATCH v2] virtio: add VIRTIO_F_NOTIFICATION_DATA feature support
+Message-ID: <20230321082101-mutt-send-email-mst@kernel.org>
+References: <20230320232115.1940587-1-viktor@daynix.com>
+ <20230321050747-mutt-send-email-mst@kernel.org>
+ <CAPv0NP4bGi8o6fmZ93X==FEfBB6+NVDzyuoZNeX5TT3s8Trymg@mail.gmail.com>
 MIME-Version: 1.0
-References: <20230310091215.931644-1-lawrence.hunter@codethink.co.uk>
-In-Reply-To: <20230310091215.931644-1-lawrence.hunter@codethink.co.uk>
-From:   =?UTF-8?Q?Christoph_M=C3=BCllner?= <christoph.muellner@vrull.eu>
-Date:   Tue, 21 Mar 2023 13:02:36 +0100
-Message-ID: <CAEg0e7iXkPcqAhZH0xxbMyXVP6hnk5vvtUW52qT_2rFDK3PVcQ@mail.gmail.com>
-Subject: Re: [PATCH 00/45] Add RISC-V vector cryptographic instruction set support
-To:     Lawrence Hunter <lawrence.hunter@codethink.co.uk>
-Cc:     qemu-devel@nongnu.org, dickon.hood@codethink.co.uk,
-        nazar.kazakov@codethink.co.uk, kiran.ostrolenk@codethink.co.uk,
-        frank.chang@sifive.com, palmer@dabbelt.com,
-        alistair.francis@wdc.com, bin.meng@windriver.com,
-        pbonzini@redhat.com, philipp.tomsich@vrull.eu, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAPv0NP4bGi8o6fmZ93X==FEfBB6+NVDzyuoZNeX5TT3s8Trymg@mail.gmail.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Mar 10, 2023 at 10:16=E2=80=AFAM Lawrence Hunter
-<lawrence.hunter@codethink.co.uk> wrote:
->
-> This patchset provides an implementation for Zvkb, Zvkned, Zvknh, Zvksh, =
-Zvkg, and Zvksed of the draft RISC-V vector cryptography extensions as per =
-the 20230303 version of the specification(1) (1fcbb30). Please note that th=
-e Zvkt data-independent execution latency extension has not been implemente=
-d, and we would recommend not using these patches in an environment where t=
-iming attacks are an issue.
->
-> Work performed by Dickon, Lawrence, Nazar, Kiran, and William from Codeth=
-ink sponsored by SiFive, as well as Max Chou and Frank Chang from SiFive.
->
-> For convenience we have created a git repo with our patches on top of a r=
-ecent master. https://github.com/CodethinkLabs/qemu-ct
+On Tue, Mar 21, 2023 at 02:49:13PM +0300, Viktor Prutyanov wrote:
+> On Tue, Mar 21, 2023 at 12:23 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+> >
+> > On Tue, Mar 21, 2023 at 02:21:15AM +0300, Viktor Prutyanov wrote:
+> > > According to VirtIO spec v1.2, VIRTIO_F_NOTIFICATION_DATA feature
+> > > indicates that the driver passes extra data along with the queue
+> > > notifications.
+> > >
+> > > In a split queue case, the extra data is 16-bit available index. In a
+> > > packed queue case, the extra data is 1-bit wrap counter and 15-bit
+> > > available index.
+> > >
+> > > Add support for this feature for MMIO and PCI transports. Channel I/O
+> > > transport will not accept this feature.
+> > >
+> > > Signed-off-by: Viktor Prutyanov <viktor@daynix.com>
+> > > ---
+> > >
+> > >  v2: reject the feature in virtio_ccw, replace __le32 with u32
+> > >
+> > >  drivers/s390/virtio/virtio_ccw.c   |  4 +---
+> > >  drivers/virtio/virtio_mmio.c       | 15 ++++++++++++++-
+> > >  drivers/virtio/virtio_pci_common.c | 10 ++++++++++
+> > >  drivers/virtio/virtio_pci_common.h |  4 ++++
+> > >  drivers/virtio/virtio_pci_legacy.c |  2 +-
+> > >  drivers/virtio/virtio_pci_modern.c |  2 +-
+> > >  drivers/virtio/virtio_ring.c       | 17 +++++++++++++++++
+> > >  include/linux/virtio_ring.h        |  2 ++
+> > >  include/uapi/linux/virtio_config.h |  6 ++++++
+> > >  9 files changed, 56 insertions(+), 6 deletions(-)
+> > >
+> > > diff --git a/drivers/s390/virtio/virtio_ccw.c b/drivers/s390/virtio/virtio_ccw.c
+> > > index a10dbe632ef9..d72a59415527 100644
+> > > --- a/drivers/s390/virtio/virtio_ccw.c
+> > > +++ b/drivers/s390/virtio/virtio_ccw.c
+> > > @@ -789,9 +789,7 @@ static u64 virtio_ccw_get_features(struct virtio_device *vdev)
+> > >
+> > >  static void ccw_transport_features(struct virtio_device *vdev)
+> > >  {
+> > > -     /*
+> > > -      * Currently nothing to do here.
+> > > -      */
+> > > +     __virtio_clear_bit(vdev, VIRTIO_F_NOTIFICATION_DATA);
+> > >  }
+> > >
+> > >  static int virtio_ccw_finalize_features(struct virtio_device *vdev)
+> > > diff --git a/drivers/virtio/virtio_mmio.c b/drivers/virtio/virtio_mmio.c
+> > > index 3ff746e3f24a..0e13da17fe0a 100644
+> > > --- a/drivers/virtio/virtio_mmio.c
+> > > +++ b/drivers/virtio/virtio_mmio.c
+> > > @@ -285,6 +285,19 @@ static bool vm_notify(struct virtqueue *vq)
+> > >       return true;
+> > >  }
+> > >
+> > > +static bool vm_notify_with_data(struct virtqueue *vq)
+> > > +{
+> > > +     struct virtio_mmio_device *vm_dev = to_virtio_mmio_device(vq->vdev);
+> > > +     u32 data = vring_fill_notification_data(vq);
+> > > +
+> > > +     writel(data, vm_dev->base + VIRTIO_MMIO_QUEUE_NOTIFY);
+> > > +
+> > > +     return true;
+> > > +}
+> > > +
+> > > +#define VM_NOTIFY(vdev) (__virtio_test_bit((vdev), VIRTIO_F_NOTIFICATION_DATA) \
+> > > +     ? vm_notify_with_data : vm_notify)
+> > > +
+> > >  /* Notify all virtqueues on an interrupt. */
+> > >  static irqreturn_t vm_interrupt(int irq, void *opaque)
+> > >  {
+> > > @@ -397,7 +410,7 @@ static struct virtqueue *vm_setup_vq(struct virtio_device *vdev, unsigned int in
+> > >
+> > >       /* Create the vring */
+> > >       vq = vring_create_virtqueue(index, num, VIRTIO_MMIO_VRING_ALIGN, vdev,
+> > > -                              true, true, ctx, vm_notify, callback, name);
+> > > +                     true, true, ctx, VM_NOTIFY(vdev), callback, name);
+> >
+> > I don't see why is this macro useful.
+> >
+> >
+> >
+> > >       if (!vq) {
+> > >               err = -ENOMEM;
+> > >               goto error_new_virtqueue;
+> > > diff --git a/drivers/virtio/virtio_pci_common.c b/drivers/virtio/virtio_pci_common.c
+> > > index a6c86f916dbd..535263abc2bd 100644
+> > > --- a/drivers/virtio/virtio_pci_common.c
+> > > +++ b/drivers/virtio/virtio_pci_common.c
+> > > @@ -43,6 +43,16 @@ bool vp_notify(struct virtqueue *vq)
+> > >       /* we write the queue's selector into the notification register to
+> > >        * signal the other end */
+> > >       iowrite16(vq->index, (void __iomem *)vq->priv);
+> > > +
+> > > +     return true;
+> > > +}
+> > > +
+> > > +bool vp_notify_with_data(struct virtqueue *vq)
+> > > +{
+> > > +     u32 data = vring_fill_notification_data(vq);
+> > > +
+> > > +     iowrite32(data, (void __iomem *)vq->priv);
+> > > +
+> > >       return true;
+> > >  }
+> > >
+> > > diff --git a/drivers/virtio/virtio_pci_common.h b/drivers/virtio/virtio_pci_common.h
+> > > index 23112d84218f..9a7212dcbb32 100644
+> > > --- a/drivers/virtio/virtio_pci_common.h
+> > > +++ b/drivers/virtio/virtio_pci_common.h
+> > > @@ -105,6 +105,7 @@ static struct virtio_pci_device *to_vp_device(struct virtio_device *vdev)
+> > >  void vp_synchronize_vectors(struct virtio_device *vdev);
+> > >  /* the notify function used when creating a virt queue */
+> > >  bool vp_notify(struct virtqueue *vq);
+> > > +bool vp_notify_with_data(struct virtqueue *vq);
+> > >  /* the config->del_vqs() implementation */
+> > >  void vp_del_vqs(struct virtio_device *vdev);
+> > >  /* the config->find_vqs() implementation */
+> > > @@ -114,6 +115,9 @@ int vp_find_vqs(struct virtio_device *vdev, unsigned int nvqs,
+> > >               struct irq_affinity *desc);
+> > >  const char *vp_bus_name(struct virtio_device *vdev);
+> > >
+> > > +#define VP_NOTIFY(vdev) (__virtio_test_bit((vdev), VIRTIO_F_NOTIFICATION_DATA) \
+> > > +     ? vp_notify : vp_notify_with_data)
+> > > +
+> > >  /* Setup the affinity for a virtqueue:
+> > >   * - force the affinity for per vq vector
+> > >   * - OR over all affinities for shared MSI
+> > > diff --git a/drivers/virtio/virtio_pci_legacy.c b/drivers/virtio/virtio_pci_legacy.c
+> > > index 2257f1b3d8ae..b98e994cae48 100644
+> > > --- a/drivers/virtio/virtio_pci_legacy.c
+> > > +++ b/drivers/virtio/virtio_pci_legacy.c
+> > > @@ -131,7 +131,7 @@ static struct virtqueue *setup_vq(struct virtio_pci_device *vp_dev,
+> > >       vq = vring_create_virtqueue(index, num,
+> > >                                   VIRTIO_PCI_VRING_ALIGN, &vp_dev->vdev,
+> > >                                   true, false, ctx,
+> > > -                                 vp_notify, callback, name);
+> > > +                                 VP_NOTIFY(&vp_dev->vdev), callback, name);
+> > >       if (!vq)
+> > >               return ERR_PTR(-ENOMEM);
+> > >
+> > > diff --git a/drivers/virtio/virtio_pci_modern.c b/drivers/virtio/virtio_pci_modern.c
+> > > index 9e496e288cfa..7fcd8af5af7e 100644
+> > > --- a/drivers/virtio/virtio_pci_modern.c
+> > > +++ b/drivers/virtio/virtio_pci_modern.c
+> > > @@ -321,7 +321,7 @@ static struct virtqueue *setup_vq(struct virtio_pci_device *vp_dev,
+> > >       vq = vring_create_virtqueue(index, num,
+> > >                                   SMP_CACHE_BYTES, &vp_dev->vdev,
+> > >                                   true, true, ctx,
+> > > -                                 vp_notify, callback, name);
+> > > +                                 VP_NOTIFY(&vp_dev->vdev), callback, name);
+> > >       if (!vq)
+> > >               return ERR_PTR(-ENOMEM);
+> > >
+> > > diff --git a/drivers/virtio/virtio_ring.c b/drivers/virtio/virtio_ring.c
+> > > index 723c4e29e1d3..5e9e1800bb6e 100644
+> > > --- a/drivers/virtio/virtio_ring.c
+> > > +++ b/drivers/virtio/virtio_ring.c
+> > > @@ -2699,6 +2699,21 @@ void vring_del_virtqueue(struct virtqueue *_vq)
+> > >  }
+> > >  EXPORT_SYMBOL_GPL(vring_del_virtqueue);
+> > >
+> > > +u32 vring_fill_notification_data(struct virtqueue *_vq)
+> > > +{
+> > > +     struct vring_virtqueue *vq = to_vvq(_vq);
+> > > +     u16 next;
+> > > +
+> > > +     if (vq->packed_ring)
+> > > +             next = (vq->packed.next_avail_idx & ~(1 << 15)) |
+> > > +                     ((u16)vq->packed.avail_wrap_counter << 15);
+> >
+> > I don't think the cast is needed. Neither is () around << the second <<
+> > here (first is needed because gcc chooses to complain: apparently it
+> > considers bitwise and a math operation for some obscure reason).
+> >
+> > > +     else
+> > > +             next = virtio16_to_cpu(_vq->vdev, vq->split.vring.avail->idx);
+> > > +
+> > > +     return ((u32)next << 16) | _vq->index;
+> >
+> > I don't think the cast is needed. Neither is () around << needed.
+> >
+> > > +}
+> > > +EXPORT_SYMBOL_GPL(vring_fill_notification_data);
+> > > +
+> >
+> > I'd inline this - it's on data path ...
+> 
+> As far as I see, to be inlined in virtio_mmio.c, virtio_pci_common.c
+> and virtio_ccw.c, the function should be defined in some header, but
+> definitions such as vring_virtqueue, vring_virtqueue_split,
+> vring_virtqueue_packed will not be available, because they are in
+> virtio_ring.c. Looks like, they must be moved to a separate header
+> in this case, isn't it?
 
-I did test and review this patchset.
-Since most of my comments affect multiple patches I have summarized
-them here in one email.
-Observations that only affect a single patch will be sent in response
-to the corresponding email.
+Oh you are right. OK, sorry.
 
-I have tested this series with the OpenSSL PR for Zvk that can be found her=
-e:
-  https://github.com/openssl/openssl/pull/20149
-I ran with all Zvk* extensions enabled (using Zvkg for GCM) and with
-Zvkb only (using Zvkb for GCM).
-All tests succeed. Note, however, that the test coverage is limited
-(e.g. no .vv instructions, vstart is always zero).
+> >
+> > >  /* Manipulates transport-specific feature bits. */
+> > >  void vring_transport_features(struct virtio_device *vdev)
+> > >  {
+> >
+> > > @@ -2718,6 +2733,8 @@ void vring_transport_features(struct virtio_device *vdev)
+> > >                       break;
+> > >               case VIRTIO_F_ORDER_PLATFORM:
+> > >                       break;
+> > > +             case VIRTIO_F_NOTIFICATION_DATA:
+> > > +                     break;
+> > >               default:
+> > >                       /* We don't understand this bit. */
+> > >                       __virtio_clear_bit(vdev, i);
+> > > diff --git a/include/linux/virtio_ring.h b/include/linux/virtio_ring.h
+> > > index 8b8af1a38991..1f65d2f77012 100644
+> > > --- a/include/linux/virtio_ring.h
+> > > +++ b/include/linux/virtio_ring.h
+> > > @@ -101,4 +101,6 @@ void vring_del_virtqueue(struct virtqueue *vq);
+> > >  void vring_transport_features(struct virtio_device *vdev);
+> > >
+> > >  irqreturn_t vring_interrupt(int irq, void *_vq);
+> > > +
+> > > +u32 vring_fill_notification_data(struct virtqueue *_vq);
+> > >  #endif /* _LINUX_VIRTIO_RING_H */
+> > > diff --git a/include/uapi/linux/virtio_config.h b/include/uapi/linux/virtio_config.h
+> > > index 3c05162bc988..2c712c654165 100644
+> > > --- a/include/uapi/linux/virtio_config.h
+> > > +++ b/include/uapi/linux/virtio_config.h
+> > > @@ -99,6 +99,12 @@
+> > >   */
+> > >  #define VIRTIO_F_SR_IOV                      37
+> > >
+> > > +/*
+> > > + * This feature indicates that the driver passes extra data (besides
+> > > + * identifying the virtqueue) in its device notifications.
+> > > + */
+> > > +#define VIRTIO_F_NOTIFICATION_DATA   38
+> > > +
+> > >  /*
+> > >   * This feature indicates that the driver can reset a queue individually.
+> > >   */
+> > > --
+> > > 2.35.1
+> >
 
-When sending out a follow-up version (even if it just introduces a minimal =
-fix),
-then consider using patchset versioning (e.g. git format-patch -v2 ...).
-
-It might be a matter of taste, but I would prefer a series that groups
-and orders the commits differently:
-  a) independent changes to the existing code (refactoring only, but
-no new features) - one commit per topic
-  b) introduction of new functionality - one commit per extension
-A series using such a commit granularity and order would be easier to
-maintain and review (and not result in 45 patches).
-Also, the refactoring changes could land before Zvk freezes if
-maintainers decide to do so.
-
-So far all translation files in target/riscv/insn_trans/* contain
-multiple extensions if they are related.
-I think we should follow this pattern and use a common trans_zvk.c.inc file=
-.
-
-All patches to insn32.decode have comments of the form "RV64 Zvk*
-vector crypto extension".
-What is the point of the "RV64"? I would simply remove that.
-
-All instructions set "env->vstart =3D 0;" at the end.
-I don't think that this is correct (the specification does not require this=
-).
-
-The tests of the reserved encodings are not consistent:
-* Zvknh does a dynamic test (query tcg_gen_*())
-* Zvkned does a dynamic test (tcg_gen_*())
-* Zvkg does not test for (vl%EGS =3D=3D 0)
-The vl CSR can only be updated by the vset{i}vl{i} instructions.
-The same applies to the vstart CSR and the vtype CSR that holds vsew,
-vlmul and other fields.
-The current code tests the VSTART/SEW value using "s->vstart % 4 =3D=3D
-0"/"s->sew =3D=3D MO_32".
-Why is it not possible to do the same with VL, i.e. "s->vl % 4 =3D=3D 0"
-(after adding it to DisasContext)?
-Also, I would introduce named constants or macros for the EGS values
-to avoid magic constants in the code
-(some extensions do that - e.g. ZVKSED_EGS).
-
-BR
-Christoph
-
-
->
-> 1. https://github.com/riscv/riscv-crypto/releases
->
->
-> Dickon Hood (2):
->   qemu/bitops.h: Limit rotate amounts
->   target/riscv: Add vrol.[vv,vx] and vror.[vv,vx,vi] decoding,
->     translation and execution support
->
-> Kiran Ostrolenk (8):
->   target/riscv: Refactor some of the generic vector functionality
->   target/riscv: Refactor some of the generic vector functionality
->   target/riscv: Refactor some of the generic vector functionality
->   target/riscv: Refactor some of the generic vector functionality
->   target/riscv: Add vsha2ms.vv decoding, translation and execution
->     support
->   target/riscv: Add zvksh cpu property
->   target/riscv: Add vsm3c.vi decoding, translation and execution support
->   target/riscv: Expose zvksh cpu property
->
-> Lawrence Hunter (17):
->   target/riscv: Add vclmul.vv decoding, translation and execution
->     support
->   target/riscv: Add vclmul.vx decoding, translation and execution
->     support
->   target/riscv: Add vclmulh.vv decoding, translation and execution
->     support
->   target/riscv: Add vclmulh.vx decoding, translation and execution
->     support
->   target/riscv: Add vaesef.vv decoding, translation and execution
->     support
->   target/riscv: Add vaesef.vs decoding, translation and execution
->     support
->   target/riscv: Add vaesdf.vv decoding, translation and execution
->     support
->   target/riscv: Add vaesdf.vs decoding, translation and execution
->     support
->   target/riscv: Add vaesdm.vv decoding, translation and execution
->     support
->   target/riscv: Add vaesdm.vs decoding, translation and execution
->     support
->   target/riscv: Add vaesz.vs decoding, translation and execution support
->   target/riscv: Add vsha2c[hl].vv decoding, translation and execution
->     support
->   target/riscv: Add vsm3me.vv decoding, translation and execution
->     support
->   target/riscv: Add zvkg cpu property
->   target/riscv: Add vgmul.vv decoding, translation and execution support
->   target/riscv: Add vghsh.vv decoding, translation and execution support
->   target/riscv: Expose zvkg cpu property
->
-> Max Chou (5):
->   crypto: Create sm4_subword
->   crypto: Add SM4 constant parameter CK
->   target/riscv: Add zvksed cfg property
->   target/riscv: Add Zvksed support
->   target/riscv: Expose Zvksed property
->
-> Nazar Kazakov (10):
->   target/riscv: Add zvkb cpu property
->   target/riscv: Add vrev8.v decoding, translation and execution support
->   target/riscv: Add vandn.[vv,vx] decoding, translation and execution
->     support
->   target/riscv: Expose zvkb cpu property
->   target/riscv: Add zvkned cpu property
->   target/riscv: Add vaeskf1.vi decoding, translation and execution
->     support
->   target/riscv: Add vaeskf2.vi decoding, translation and execution
->     support
->   target/riscv: Expose zvkned cpu property
->   target/riscv: Add zvknh cpu properties
->   target/riscv: Expose zvknh cpu properties
->
-> William Salmon (3):
->   target/riscv: Add vbrev8.v decoding, translation and execution support
->   target/riscv: Add vaesem.vv decoding, translation and execution
->     support
->   target/riscv: Add vaesem.vs decoding, translation and execution
->     support
->
->  accel/tcg/tcg-runtime-gvec.c                 |   11 +
->  accel/tcg/tcg-runtime.h                      |    1 +
->  crypto/sm4.c                                 |   10 +
->  include/crypto/sm4.h                         |    9 +
->  include/qemu/bitops.h                        |   24 +-
->  target/arm/tcg/crypto_helper.c               |   10 +-
->  target/riscv/cpu.c                           |   36 +
->  target/riscv/cpu.h                           |    7 +
->  target/riscv/helper.h                        |   71 ++
->  target/riscv/insn32.decode                   |   49 +
->  target/riscv/insn_trans/trans_rvv.c.inc      |   93 +-
->  target/riscv/insn_trans/trans_rvzvkb.c.inc   |  220 ++++
->  target/riscv/insn_trans/trans_rvzvkg.c.inc   |   40 +
->  target/riscv/insn_trans/trans_rvzvkned.c.inc |  170 +++
->  target/riscv/insn_trans/trans_rvzvknh.c.inc  |   84 ++
->  target/riscv/insn_trans/trans_rvzvksed.c.inc |   57 +
->  target/riscv/insn_trans/trans_rvzvksh.c.inc  |   43 +
->  target/riscv/meson.build                     |    4 +-
->  target/riscv/op_helper.c                     |    5 +
->  target/riscv/translate.c                     |    6 +
->  target/riscv/vcrypto_helper.c                | 1001 ++++++++++++++++++
->  target/riscv/vector_helper.c                 |  240 +----
->  target/riscv/vector_internals.c              |   81 ++
->  target/riscv/vector_internals.h              |  222 ++++
->  24 files changed, 2192 insertions(+), 302 deletions(-)
->  create mode 100644 target/riscv/insn_trans/trans_rvzvkb.c.inc
->  create mode 100644 target/riscv/insn_trans/trans_rvzvkg.c.inc
->  create mode 100644 target/riscv/insn_trans/trans_rvzvkned.c.inc
->  create mode 100644 target/riscv/insn_trans/trans_rvzvknh.c.inc
->  create mode 100644 target/riscv/insn_trans/trans_rvzvksed.c.inc
->  create mode 100644 target/riscv/insn_trans/trans_rvzvksh.c.inc
->  create mode 100644 target/riscv/vcrypto_helper.c
->  create mode 100644 target/riscv/vector_internals.c
->  create mode 100644 target/riscv/vector_internals.h
->
-> --
-> 2.39.2
->
->
