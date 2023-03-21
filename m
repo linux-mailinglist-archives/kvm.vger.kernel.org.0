@@ -2,69 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D4E7A6C2940
-	for <lists+kvm@lfdr.de>; Tue, 21 Mar 2023 05:46:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 74F156C2A1D
+	for <lists+kvm@lfdr.de>; Tue, 21 Mar 2023 07:01:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229700AbjCUEqh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Mar 2023 00:46:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50590 "EHLO
+        id S230027AbjCUGBq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Mar 2023 02:01:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52514 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229579AbjCUEqg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Mar 2023 00:46:36 -0400
-Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BCC643019D
-        for <kvm@vger.kernel.org>; Mon, 20 Mar 2023 21:46:34 -0700 (PDT)
-Received: by mail-pg1-x531.google.com with SMTP id y35so6730844pgl.4
-        for <kvm@vger.kernel.org>; Mon, 20 Mar 2023 21:46:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1679373994;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=BhGL3xbHlmSsrTMqlxRLjWF69AkBjXCrnrIcNltlNQg=;
-        b=EcBpSv7MpJMWn3JI6z/2lJivevDcKsBOEFslRBjASM+IoMC/jCdaMAhXaN56JIO85N
-         Sxe2VCAyRLRSEi3KOflQCRL7SvgrQxGcNNabxejx7WGO/2V2j4vhy0YXAZRPiJIEFT72
-         1aOsJbxWFGgvtwdv/gOi1O2GH1fPnCwczv4Ro=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679373994;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=BhGL3xbHlmSsrTMqlxRLjWF69AkBjXCrnrIcNltlNQg=;
-        b=EPukaGL0DoZNnApPtpCHkdtqwRE3SbUI0JuDcPrYjtKEkXhJhh8a1rqgwnclz0EZAJ
-         p5EfdUt6k6oFJUchnNMD9lN6IjEfya7bcaxLehOpIEG4caVgN4UoecRQ2M7JdtcL+M4A
-         oOvsNkKbcM/qmGTdSCTf9qywijG0yRrjYvSfI8jrSHCfsShteiSIHnAOla7UL62wHN7j
-         qg/1GgSlMAM7dGZg/AAhOoNt6r27OFUNJk28OMALH00zYZBfbqHitesN5097Y5ECy6O2
-         IXpdF6nXeLMuvrcNicqAJXWr0qXXC+JdutCscO85+A3Op0iuI1r2KAzVlQVC7Dj77RXW
-         +vLw==
-X-Gm-Message-State: AO0yUKVEOxwt6NgEjnZ0yr7TsvO/ZMnWQ89xi5WYeaWMRLsP1ytp9RXc
-        2NVK0fQwvGHMQWTQoB5knI5iV/dsfN8tJwfdYk0iLw==
-X-Google-Smtp-Source: AK7set85UuvA1ff76s5RmjLxKjbEoATx1wJ1SXcb+MUc05m1MvZvVv6uKCJG89eB1JxpxNmUD2B0zgGDOhDHpPLrpxA=
-X-Received: by 2002:a65:644c:0:b0:50a:c1c3:54ff with SMTP id
- s12-20020a65644c000000b0050ac1c354ffmr272603pgv.3.1679373993923; Mon, 20 Mar
- 2023 21:46:33 -0700 (PDT)
+        with ESMTP id S229552AbjCUGBo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Mar 2023 02:01:44 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4BEED302BF;
+        Mon, 20 Mar 2023 23:01:42 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id AEFBC1FD6C;
+        Tue, 21 Mar 2023 06:01:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+        t=1679378501; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=gINzqdjAEnOoRBoZJLH600hthTlk9fdKFEY9Sr/KDZg=;
+        b=T3zjF6uyk0rdVGrp+/S6oMOQNskzCZFTy1FqZoIuwhtPdz4RBKXnKYZxrKIfh6UuklU03L
+        OggTkF8EHaqa+DnHeMl0jTKFbv9wWQdKl77uBxPZpfcDDo1HMxRsxwMIhVu4O5u6LGWhLX
+        QKE1Zc60EwY7JXh0vNNSw4Ut0Tc4pXc=
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 3A39113440;
+        Tue, 21 Mar 2023 06:01:41 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id YEOXDEVIGWQaTwAAMHmgww
+        (envelope-from <jgross@suse.com>); Tue, 21 Mar 2023 06:01:41 +0000
+Message-ID: <88238847-7598-19ad-9048-053387f5ee6c@suse.com>
+Date:   Tue, 21 Mar 2023 07:01:40 +0100
 MIME-Version: 1.0
-References: <08d61bef-0c11-c7f9-9266-cb2109070314@sberdevices.ru>
-In-Reply-To: <08d61bef-0c11-c7f9-9266-cb2109070314@sberdevices.ru>
-From:   Pavan Chebbi <pavan.chebbi@broadcom.com>
-Date:   Tue, 21 Mar 2023 10:16:22 +0530
-Message-ID: <CALs4sv1ntWLdo2oMRZcpJJHgHQ6DSf6poxduRJNcDkhFx2+Mcw@mail.gmail.com>
-Subject: Re: [PATCH net-next v1] virtio/vsock: check transport before skb allocation
-To:     Arseniy Krasnov <avkrasnov@sberdevices.ru>
-Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Bobby Eshleman <bobby.eshleman@bytedance.com>,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kernel@sberdevices.ru, oxffffaa@gmail.com
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-        boundary="00000000000061963405f761bad6"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.8.0
+Subject: Re: [PATCH v4 03/12] x86/mtrr: support setting MTRR state for
+ software defined MTRRs
+Content-Language: en-US
+To:     Borislav Petkov <bp@alien8.de>
+Cc:     "Huang, Kai" <kai.huang@intel.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "Christopherson,, Sean" <seanjc@google.com>,
+        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
+        "hpa@zytor.com" <hpa@zytor.com>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "Yamahata, Isaku" <isaku.yamahata@intel.com>
+References: <20230306163425.8324-1-jgross@suse.com>
+ <20230306163425.8324-4-jgross@suse.com>
+ <9c02041e7ce91752ede17b7a5232f38aadbb3a70.camel@intel.com>
+ <f9511025-f815-c8fa-f6e7-80501e8c839f@suse.com>
+ <20230320224256.GFZBjhcNIgnd7I02Qr@fat_crate.local>
+From:   Juergen Gross <jgross@suse.com>
+In-Reply-To: <20230320224256.GFZBjhcNIgnd7I02Qr@fat_crate.local>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="------------zJZVGgA0XDkZM9bzRlrqyG91"
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
         version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -72,137 +78,128 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
---00000000000061963405f761bad6
-Content-Type: text/plain; charset="UTF-8"
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--------------zJZVGgA0XDkZM9bzRlrqyG91
+Content-Type: multipart/mixed; boundary="------------b8fgoeqUWYQ08WeXw0iZ0dPa";
+ protected-headers="v1"
+From: Juergen Gross <jgross@suse.com>
+To: Borislav Petkov <bp@alien8.de>
+Cc: "Huang, Kai" <kai.huang@intel.com>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "x86@kernel.org" <x86@kernel.org>, "Christopherson,, Sean"
+ <seanjc@google.com>,
+ "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
+ "hpa@zytor.com" <hpa@zytor.com>, "mingo@redhat.com" <mingo@redhat.com>,
+ "tglx@linutronix.de" <tglx@linutronix.de>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "Yamahata, Isaku" <isaku.yamahata@intel.com>
+Message-ID: <88238847-7598-19ad-9048-053387f5ee6c@suse.com>
+Subject: Re: [PATCH v4 03/12] x86/mtrr: support setting MTRR state for
+ software defined MTRRs
+References: <20230306163425.8324-1-jgross@suse.com>
+ <20230306163425.8324-4-jgross@suse.com>
+ <9c02041e7ce91752ede17b7a5232f38aadbb3a70.camel@intel.com>
+ <f9511025-f815-c8fa-f6e7-80501e8c839f@suse.com>
+ <20230320224256.GFZBjhcNIgnd7I02Qr@fat_crate.local>
+In-Reply-To: <20230320224256.GFZBjhcNIgnd7I02Qr@fat_crate.local>
+
+--------------b8fgoeqUWYQ08WeXw0iZ0dPa
+Content-Type: multipart/mixed; boundary="------------Sd1pHV7X22dhsBs0MWnvh64j"
+
+--------------Sd1pHV7X22dhsBs0MWnvh64j
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: base64
+
+T24gMjAuMDMuMjMgMjM6NDIsIEJvcmlzbGF2IFBldGtvdiB3cm90ZToNCj4gT24gTW9uLCBN
+YXIgMjAsIDIwMjMgYXQgMDI6NDc6MzBQTSArMDEwMCwgSnVlcmdlbiBHcm9zcyB3cm90ZToN
+Cj4+PiBTaW5jZSB0aGlzIGNvZGUgY292ZXJzIFREWCBndWVzdCB0b28sIEkgdGhpbmsgZXZl
+bnR1YWxseSBpdCBtYWtlcyBzZW5zZSBmb3IgVERYDQo+Pj4gZ3Vlc3QgdG8gdXNlIHRoaXMg
+ZnVuY3Rpb24gdG9vICh0byBhdm9pZCAjVkUgSUlVQykuICBJZiB3YW50IHRvIGRvIHRoYXQs
+IHRoZW4gSQ0KPj4+IHRoaW5rIFREWCBndWVzdCBzaG91bGQgaGF2ZSB0aGUgc2FtZSBtdXR1
+YWwgdW5kZXJzdGFuZGluZyB3aXRoICpBTEwqIGh5cGVydmlzb3IsDQo+Pj4gYXMgSSBhbSBu
+b3Qgc3VyZSB3aGF0J3MgdGhlIHBvaW50IG9mIG1ha2luZyB0aGUgVERYIGd1ZXN0J3MgTVRS
+UiBiZWhhdmlvdXINCj4+PiBkZXBlbmRpbmcgb24gc3BlY2lmaWMgaHlwZXJ2aXNvci4NCj4+
+DQo+PiBUaGlzIHNlcmllcyB0cmllcyB0byBmaXggdGhlIGN1cnJlbnQgZmFsbG91dC4NCj4g
+DQo+IFdlIGNhbiByZWxheCB0aGUgY2hlY2sgc28gdGhhdCBpdCBydW5zIG9uIFREWCB0b28u
+IEFsb25nIHdpdGggYSBjb21tZW50DQo+IGFib3ZlIGl0IHdoeSBpdCBuZWVkcyB0byBydW4g
+b24gVERYLg0KPiANCg0KT2theSwgZmluZSB3aXRoIG1lLg0KDQoNCkp1ZXJnZW4NCg==
+--------------Sd1pHV7X22dhsBs0MWnvh64j
+Content-Type: application/pgp-keys; name="OpenPGP_0xB0DE9DD628BF132F.asc"
+Content-Disposition: attachment; filename="OpenPGP_0xB0DE9DD628BF132F.asc"
+Content-Description: OpenPGP public key
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Mar 20, 2023 at 11:25=E2=80=AFPM Arseniy Krasnov
-<avkrasnov@sberdevices.ru> wrote:
->
-> Pointer to transport could be checked before allocation of skbuff, thus
-> there is no need to free skbuff when this pointer is NULL.
->
-> Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
-> Reviewed-by: Bobby Eshleman <bobby.eshleman@bytedance.com>
-> Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
-> ---
+-----BEGIN PGP PUBLIC KEY BLOCK-----
 
-Looks good to me.
-Reviewed-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
+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
+jR/i1DG86lem3iBDXzXsZDn8R38=3D
+=3D2wuH
+-----END PGP PUBLIC KEY BLOCK-----
 
->  net/vmw_vsock/virtio_transport_common.c | 8 +++-----
->  1 file changed, 3 insertions(+), 5 deletions(-)
->
-> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virt=
-io_transport_common.c
-> index cda587196475..607149259e8b 100644
-> --- a/net/vmw_vsock/virtio_transport_common.c
-> +++ b/net/vmw_vsock/virtio_transport_common.c
-> @@ -867,6 +867,9 @@ static int virtio_transport_reset_no_sock(const struc=
-t virtio_transport *t,
->         if (le16_to_cpu(hdr->op) =3D=3D VIRTIO_VSOCK_OP_RST)
->                 return 0;
->
-> +       if (!t)
-> +               return -ENOTCONN;
-> +
->         reply =3D virtio_transport_alloc_skb(&info, 0,
->                                            le64_to_cpu(hdr->dst_cid),
->                                            le32_to_cpu(hdr->dst_port),
-> @@ -875,11 +878,6 @@ static int virtio_transport_reset_no_sock(const stru=
-ct virtio_transport *t,
->         if (!reply)
->                 return -ENOMEM;
->
-> -       if (!t) {
-> -               kfree_skb(reply);
-> -               return -ENOTCONN;
-> -       }
-> -
->         return t->send_pkt(reply);
->  }
->
-> --
-> 2.25.1
+--------------Sd1pHV7X22dhsBs0MWnvh64j--
 
---00000000000061963405f761bad6
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
+--------------b8fgoeqUWYQ08WeXw0iZ0dPa--
 
-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
-OltyqaGBuzv+bJTUL+bmV7E4QBLIqGt4jVr1R9hJdH6KxXwJdyfHZ9C6qXmoe2NQhiFUyBOJ0wgk
-dB9Z1IU7nCwvNKYg2JMoJs93tIgbhPJg/D7pqW8gabkCAwEAAaOCAdowggHWMA4GA1UdDwEB/wQE
-AwIFoDCBowYIKwYBBQUHAQEEgZYwgZMwTgYIKwYBBQUHMAKGQmh0dHA6Ly9zZWN1cmUuZ2xvYmFs
-c2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNydDBBBggrBgEFBQcw
-AYY1aHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAw
-TQYDVR0gBEYwRDBCBgorBgEEAaAyASgKMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8vd3d3Lmdsb2Jh
-bHNpZ24uY29tL3JlcG9zaXRvcnkvMAkGA1UdEwQCMAAwSQYDVR0fBEIwQDA+oDygOoY4aHR0cDov
-L2NybC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcmwwJAYDVR0R
-BB0wG4EZcGF2YW4uY2hlYmJpQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
-HSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQUEV6y/89alKPoFbKUaJXsvWu5
-fdowDQYJKoZIhvcNAQELBQADggEBAEHSIB6g652wVb+r2YCmfHW47Jo+5TuCBD99Hla8PYhaWGkd
-9HIyD3NPhb6Vb6vtMWJW4MFGQF42xYRrAS4LZj072DuMotr79rI09pbOiWg0FlRRFt6R9vgUgebu
-pWSH7kmwVXcPtY94XSMMak4b7RSKig2mKbHDpD4bC7eGlwl5RxzYkgrHtMNRmHmQor5Nvqe52cFJ
-25Azqtwvjt5nbrEd81iBmboNTEnLaKuxbbCtLaMEP8xKeDjAKnNOqHUMps0AsQT8c0EGq39YHpjp
-Wn1l67VU0rMShbEFsiUf9WYgE677oinpdm0t2mdCjxr35tryxptoTZXKHDxr/Yy6l6ExggJtMIIC
-aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
-EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgwV/XkICjVscn4SNZMw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIJrdCf9Q/GvS4fT4TfoZbTNUeNWU1TR0
-1e878ju1Gbu8MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMDMy
-MTA0NDYzNFowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
-SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQBb/mf5b5Kjael9Eyof1ZHVRM003koDGXkYfzLf5veZKG2VmREl
-NN8qWPXU6G+PvSeHU9vvuxSISY1KZEHEOPGQoVZ39tRcQlphwWYNGvHoWD3TU8/j0Tuc761IjUoS
-n6uvjNz+M6hDKpys3pmGplIinM4tsKAXT1v9dpB7UXf99Tm41sF9qD7tsKuQnouZW4/kLq3RkpGL
-NAuNdEHVqL+iE2YFV15qC7fRfySUPdYB5AVS0iaKkNEmNV2ULjfWsrwsWjJK6plJxHCceC4ELzZQ
-5eqCZlxGp3fNhipoOE8R8VR44wGslZoxiWr8WXFcbYmYey9xEdcPonpCyicbkaBD
---00000000000061963405f761bad6--
+--------------zJZVGgA0XDkZM9bzRlrqyG91
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature"
+
+-----BEGIN PGP SIGNATURE-----
+
+wsB5BAABCAAjFiEEhRJncuj2BJSl0Jf3sN6d1ii/Ey8FAmQZSEQFAwAAAAAACgkQsN6d1ii/Ey93
+4Qf+MddTvmJiI1WsBv1jC8pET+4fTAzZnnBCzMFvJdPtyg/qo2iiWmeemKc1YZs1GlDHbgqoZlJY
+wuICXDxx1nPzU/1jHgp3PMF1bYexYJmPuKksyamh7ulOZ9Ub+OSV8auA29cYOVFz/LzpuaEMh4lv
+UvRlVmilbgKL3zjut4rAV+6uhzHl4ZMeko0gm3MEnbANLbPtYOOh3D5ZdkFH4jGzsi086bmvGXxK
+MIM15GWvFnkAe9eCYWrnYsGHVn8h2RgD5nTUxrwqdtdnsy4cSxClvH+KRX2CV/26JYoljIgEjslS
+n9HtUYrI93B+5F3jFZyU8X456FmhG1Y2/sQniiGzHA==
+=85AR
+-----END PGP SIGNATURE-----
+
+--------------zJZVGgA0XDkZM9bzRlrqyG91--
