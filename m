@@ -2,126 +2,327 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E4E0F6C2FDB
-	for <lists+kvm@lfdr.de>; Tue, 21 Mar 2023 12:11:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0FA346C3041
+	for <lists+kvm@lfdr.de>; Tue, 21 Mar 2023 12:22:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229772AbjCULKi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Mar 2023 07:10:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47850 "EHLO
+        id S230184AbjCULWS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Mar 2023 07:22:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42458 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230510AbjCULKP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Mar 2023 07:10:15 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5EC847431
-        for <kvm@vger.kernel.org>; Tue, 21 Mar 2023 04:09:53 -0700 (PDT)
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 32LAtbl3016779;
-        Tue, 21 Mar 2023 11:09:46 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : reply-to : to : date : in-reply-to : references : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=IcVTfatXtXzF7BUgM+gClS/t5xUYcK0H+MNzBoUuoeA=;
- b=ICEzFJCy9q051u9RljELUVjXAIYOZWInfm69iO1xZDondq2SJ/k6Wv4m1foo1zLruE5X
- b/M0ta01huRixze1cJfP3r2btRcNLLfKj2XOhKOPnDaG1ZEkDAynGmxK4FRjvcuMQxtp
- ZDcynoqsxaM/zc3LHhOjLoqOG79GIIGOc/3RhBZ3vJN5jVOUg0bF9cPKfoQ0+rFIlVoA
- HjyHrakc4qUurrm19OjRMwQGdMNii0Iq72HPUuAhgJEPup6Ru14GTF7Shu+byarmibpG
- CGNdbWnaX/9HnHGb8VPuddPAykQCu2ctXXCswyjW0+o9FOk2q4GZZfUtUies2hqj9QzY zA== 
-Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.10])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pfb8q8aet-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 21 Mar 2023 11:09:46 +0000
-Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
-        by ppma02dal.us.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 32LA9lDY025936;
-        Tue, 21 Mar 2023 11:09:45 GMT
-Received: from smtprelay03.dal12v.mail.ibm.com ([9.208.130.98])
-        by ppma02dal.us.ibm.com (PPS) with ESMTPS id 3pd4x7enev-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 21 Mar 2023 11:09:45 +0000
-Received: from smtpav01.dal12v.mail.ibm.com (smtpav01.dal12v.mail.ibm.com [10.241.53.100])
-        by smtprelay03.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 32LB9i1M13435596
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 21 Mar 2023 11:09:44 GMT
-Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3B8445807B;
-        Tue, 21 Mar 2023 11:09:44 +0000 (GMT)
-Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3201A58057;
-        Tue, 21 Mar 2023 11:09:42 +0000 (GMT)
-Received: from [172.20.3.173] (unknown [9.163.23.201])
-        by smtpav01.dal12v.mail.ibm.com (Postfix) with ESMTP;
-        Tue, 21 Mar 2023 11:09:42 +0000 (GMT)
-Message-ID: <66eee693371c11bbd2173ad5d91afc740aa17b46.camel@linux.ibm.com>
-Subject: Re: [ANNOUNCEMENT] COCONUT Secure VM Service Module for SEV-SNP
-From:   James Bottomley <jejb@linux.ibm.com>
-Reply-To: jejb@linux.ibm.com
-To:     =?ISO-8859-1?Q?J=F6rg_R=F6del?= <jroedel@suse.de>,
-        amd-sev-snp@lists.suse.com, linux-coco@lists.linux.dev,
-        kvm@vger.kernel.org
-Date:   Tue, 21 Mar 2023 07:09:40 -0400
-In-Reply-To: <ZBl4592947wC7WKI@suse.de>
-References: <ZBl4592947wC7WKI@suse.de>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.42.4 
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: dok7lrnLE278hAVKT4pUWOr4ZCcZwI71
-X-Proofpoint-ORIG-GUID: dok7lrnLE278hAVKT4pUWOr4ZCcZwI71
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+        with ESMTP id S229574AbjCULWQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Mar 2023 07:22:16 -0400
+Received: from mail-lf1-x134.google.com (mail-lf1-x134.google.com [IPv6:2a00:1450:4864:20::134])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D19AD498B4;
+        Tue, 21 Mar 2023 04:21:41 -0700 (PDT)
+Received: by mail-lf1-x134.google.com with SMTP id j11so18600791lfg.13;
+        Tue, 21 Mar 2023 04:21:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112; t=1679397699; x=1681989699;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=uoj6FCTyIPYbsFB5rJ42Dq7STG9j1TgfTfZlYEk8Sgk=;
+        b=Jlq4oSD6AonPaeW/84Mh0G2R75J7skPB7leE2fkyeIQ3Z+LuE+DzxR2NHCq0cr72BJ
+         fa8weee6OgtFNlZgnWeztPNBsknxKtAe8LA72glyHGDk1Kjtzkf0VI9wWaHzR/6HT81X
+         wa7DtoRQEVBpF+PN9nc3c5hdnn94tRKUpYtkmAcwJpV9MinaSrg3rvl6jJSG/+OayG1e
+         stXojfFbTfajHJEFwu39eJacf//zjBiwTIozAmJmxOQlaZSZ9l0+9/ylDeJBcDsHIBJU
+         kSrMFxdSd2EQGfStequq70RCoV+zsORs64i9qDjtKioBqWQlatL4IbComMy07E2jQjlS
+         slng==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1679397699; x=1681989699;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=uoj6FCTyIPYbsFB5rJ42Dq7STG9j1TgfTfZlYEk8Sgk=;
+        b=3c0iSa7MaUeyJ9hoyZMlnTSZd5AKXaeh2BFSaKmKHjYe5v7BwNnVWAjRkV84aHbLw4
+         by5xfXNAeEVq4dHAm/hnsDCUhj5NyKUXxKtHtcDkLDfWLfUnza0YvP4iYLHZaVu6GUWN
+         EYabVG5d5JdodRIeKaILBpRlN6qOab358lq1y2aedpeCQUp9A3rrbivF6brV1V7H1FBa
+         AE+mXM3/xtdXXG8AX4O27BLGGJem69ewLbSvxUtxfES5fgz7pJ73J38ngTfkZsnjvWSE
+         kptedTSHKVxXwtkqiR1Bl0WgwNTL/YCJ/4dnDmZvOnFkHOvORqbY71AoWZ+kPiiz3tqB
+         Ol9Q==
+X-Gm-Message-State: AO0yUKWVXcxtUGSuNSAAPSphLjWpfoWjeGBv3IZFaMc2bQNHwwqCbaxp
+        oJLiZDqgcduGbBmhaUOiR0A=
+X-Google-Smtp-Source: AK7set9bY/lyZSGlVklHq9mvTnu5/lAB25Bco255g2AVLzu76Lg82+AplHYe7EPwKFdh0BWGqavn+Q==
+X-Received: by 2002:a19:5502:0:b0:4e7:ed3c:68ec with SMTP id n2-20020a195502000000b004e7ed3c68ecmr561246lfe.3.1679397698595;
+        Tue, 21 Mar 2023 04:21:38 -0700 (PDT)
+Received: from localhost (88-115-161-74.elisa-laajakaista.fi. [88.115.161.74])
+        by smtp.gmail.com with ESMTPSA id l12-20020a19c20c000000b004e9b42d778esm1217900lfc.26.2023.03.21.04.21.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 21 Mar 2023 04:21:38 -0700 (PDT)
+Date:   Tue, 21 Mar 2023 13:21:36 +0200
+From:   Zhi Wang <zhi.wang.linux@gmail.com>
+To:     Michael Roth <michael.roth@amd.com>
+Cc:     Isaku Yamahata <isaku.yamahata@gmail.com>, <kvm@vger.kernel.org>,
+        <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
+        <linux-crypto@vger.kernel.org>, <x86@kernel.org>,
+        <linux-kernel@vger.kernel.org>, <tglx@linutronix.de>,
+        <mingo@redhat.com>, <jroedel@suse.de>, <thomas.lendacky@amd.com>,
+        <hpa@zytor.com>, <ardb@kernel.org>, <pbonzini@redhat.com>,
+        <seanjc@google.com>, <vkuznets@redhat.com>, <jmattson@google.com>,
+        <luto@kernel.org>, <dave.hansen@linux.intel.com>, <slp@redhat.com>,
+        <pgonda@google.com>, <peterz@infradead.org>,
+        <srinivas.pandruvada@linux.intel.com>, <rientjes@google.com>,
+        <dovmurik@linux.ibm.com>, <tobin@ibm.com>, <bp@alien8.de>,
+        <vbabka@suse.cz>, <kirill@shutemov.name>, <ak@linux.intel.com>,
+        <tony.luck@intel.com>, <marcorr@google.com>,
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        <alpergun@google.com>, <dgilbert@redhat.com>, <jarkko@kernel.org>,
+        <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>
+Subject: Re: [PATCH RFC v8 02/56] KVM: x86: Add 'update_mem_attr' x86 op
+Message-ID: <20230321132136.00005234@gmail.com>
+In-Reply-To: <20230320180543.ly4jgu54hyamy2gl@amd.com>
+References: <20230220183847.59159-1-michael.roth@amd.com>
+        <20230220183847.59159-3-michael.roth@amd.com>
+        <20230318045611.GE408922@ls.amr.corp.intel.com>
+        <20230320180543.ly4jgu54hyamy2gl@amd.com>
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
- definitions=2023-03-21_08,2023-03-21_01,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 spamscore=0
- bulkscore=0 malwarescore=0 priorityscore=1501 mlxscore=0 adultscore=0
- suspectscore=0 lowpriorityscore=0 mlxlogscore=999 impostorscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2303150002 definitions=main-2303210078
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2023-03-21 at 10:29 +0100, Jörg Rödel wrote:
-> Hi,
-> 
-> We are happy to announce that last week our secure VM service module
-> (SVSM) went public on GitHub for everyone to try it out and
-> participate in its further development. It is dual-licensed under the
-> MIT and APACHE-2.0 licenses.
-> 
-> The project is written in Rust and can be cloned from:
-> 
->         https://github.com/coconut-svsm/svsm
-> 
-> There are also repositories in the github project with the Linux host
-> and guest, EDK2 and QEMU changes needed to run the SVSM and boot up a
-> full Linux guest.
-> 
-> The SVSM repository contains an installation guide in the INSTALL.md
-> file and contributor hints in CONTRIBUTING.md.
-> 
-> A blog entry with more details is here:
-> 
->         
-> https://www.suse.com/c/suse-open-sources-secure-vm-service-module-
-> for-confidential-computing/
-> 
-> We also thank AMD for implementing and providing the necessary
-> changes to Linux and EDK2 to make an SVSM possible.
+On Mon, 20 Mar 2023 13:05:43 -0500
+Michael Roth <michael.roth@amd.com> wrote:
 
-Since this a fork of the AMD svsm code
-(https://github.com/AMDESE/linux-svsm/), is it intended to be a
-permanent fork, or are you going to be submitting your additions back
-upstream like we're trying to do for our initial vTPM prototype?  From
-the community point of view, having two different SVSM code bases and
-having to choose which one to develop against is going to be very
-confusing ...
+> On Fri, Mar 17, 2023 at 09:56:11PM -0700, Isaku Yamahata wrote:
+> > On Mon, Feb 20, 2023 at 12:37:53PM -0600,
+> > Michael Roth <michael.roth@amd.com> wrote:
+> >   
+> > > This callback will do any platform-specific handling needed for
+> > > converting pages between shared/private.
+> > > 
+> > > Signed-off-by: Michael Roth <michael.roth@amd.com>
+> > > ---
+> > >  arch/x86/include/asm/kvm-x86-ops.h |  1 +
+> > >  arch/x86/include/asm/kvm_host.h    |  2 ++
+> > >  arch/x86/kvm/mmu/mmu.c             | 13 +++++++++++++
+> > >  include/linux/kvm_host.h           |  4 ++++
+> > >  virt/kvm/kvm_main.c                | 29 +++++++++++++++++++++++++++++
+> > >  5 files changed, 49 insertions(+)
+> > > 
+> > > diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
+> > > index 72183da010b8..a8aaf532c2ab 100644
+> > > --- a/arch/x86/include/asm/kvm-x86-ops.h
+> > > +++ b/arch/x86/include/asm/kvm-x86-ops.h
+> > > @@ -132,6 +132,7 @@ KVM_X86_OP(complete_emulated_msr)
+> > >  KVM_X86_OP(vcpu_deliver_sipi_vector)
+> > >  KVM_X86_OP_OPTIONAL_RET0(vcpu_get_apicv_inhibit_reasons);
+> > >  KVM_X86_OP_OPTIONAL_RET0(fault_is_private);
+> > > +KVM_X86_OP_OPTIONAL_RET0(update_mem_attr)
+> > >  
+> > >  #undef KVM_X86_OP
+> > >  #undef KVM_X86_OP_OPTIONAL
+> > > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> > > index f856d689dda0..2da3fb2d5d1b 100644
+> > > --- a/arch/x86/include/asm/kvm_host.h
+> > > +++ b/arch/x86/include/asm/kvm_host.h
+> > > @@ -1644,6 +1644,8 @@ struct kvm_x86_ops {
+> > >  	void (*load_mmu_pgd)(struct kvm_vcpu *vcpu, hpa_t root_hpa,
+> > >  			     int root_level);
+> > >  	bool (*fault_is_private)(struct kvm *kvm, gpa_t gpa, u64 error_code, bool *private_fault);
+> > > +	int (*update_mem_attr)(struct kvm_memory_slot *slot, unsigned int attr,
+> > > +			       gfn_t start, gfn_t end);
+> > >  
+> > >  	bool (*has_wbinvd_exit)(void);
+> > >  
+> > > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> > > index fb3f34b7391c..053bd77bbf52 100644
+> > > --- a/arch/x86/kvm/mmu/mmu.c
+> > > +++ b/arch/x86/kvm/mmu/mmu.c
+> > > @@ -7251,4 +7251,17 @@ void kvm_arch_set_memory_attributes(struct kvm *kvm,
+> > >  		linfo_update_mixed(gfn, slot, level, mixed);
+> > >  	}
+> > >  }
+> > > +
+> > > +void kvm_arch_post_set_memory_attributes(struct kvm *kvm,
+> > > +					 struct kvm_memory_slot *slot,
+> > > +					 unsigned long attrs,
+> > > +					 gfn_t start, gfn_t end)
+> > > +{
+> > > +	int ret;
+> > > +
+> > > +	ret = static_call(kvm_x86_update_mem_attr)(slot, attrs, start, end);
+> > > +	if (ret)
+> > > +		pr_warn_ratelimited("Failed to update GFN range 0x%llx-0x%llx with attributes 0x%lx. Ret: %d\n",
+> > > +				    start, end, attrs, ret);
+> > > +}
+> > >  #endif
+> > > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> > > index fdc59479b3e2..d200b8f45583 100644
+> > > --- a/include/linux/kvm_host.h
+> > > +++ b/include/linux/kvm_host.h
+> > > @@ -2330,6 +2330,10 @@ void kvm_arch_set_memory_attributes(struct kvm *kvm,
+> > >  				    struct kvm_memory_slot *slot,
+> > >  				    unsigned long attrs,
+> > >  				    gfn_t start, gfn_t end);
+> > > +void kvm_arch_post_set_memory_attributes(struct kvm *kvm,
+> > > +					 struct kvm_memory_slot *slot,
+> > > +					 unsigned long attrs,
+> > > +					 gfn_t start, gfn_t end);
+> > >  
+> > >  static inline bool kvm_mem_is_private(struct kvm *kvm, gfn_t gfn)
+> > >  {
+> > > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> > > index b68574ff6c30..8ec985f1c57d 100644
+> > > --- a/virt/kvm/kvm_main.c
+> > > +++ b/virt/kvm/kvm_main.c
+> > > @@ -2561,6 +2561,32 @@ static void kvm_mem_attrs_changed(struct kvm *kvm, unsigned long attrs,
+> > >  		kvm_flush_remote_tlbs(kvm);
+> > >  }
+> > >  
+> > > +static void kvm_post_mem_attrs_changed(struct kvm *kvm, unsigned long attrs,
+> > > +				       gfn_t start_orig, gfn_t end_orig)
+> > > +{
+> > > +	struct kvm_memory_slot *slot;
+> > > +	struct kvm_memslots *slots;
+> > > +	struct kvm_memslot_iter iter;
+> > > +	int i;
+> > > +
+> > > +	for (i = 0; i < kvm_arch_nr_memslot_as_ids(kvm); i++) {
+> > > +		slots = __kvm_memslots(kvm, i);
+> > > +
+> > > +		kvm_for_each_memslot_in_gfn_range(&iter, slots, start_orig, end_orig) {
+> > > +			gfn_t start, end;
+> > > +
+> > > +			slot = iter.slot;
+> > > +			start = max(start_orig, slot->base_gfn);
+> > > +			end = min(end_orig, slot->base_gfn + slot->npages);
+> > > +
+> > > +			if (start >= end)
+> > > +				continue;
+> > > +
+> > > +			kvm_arch_post_set_memory_attributes(kvm, slot, attrs, start, end);
+> > > +		}
+> > > +	}
+> > > +}
+> > > +
+> > >  static int kvm_vm_ioctl_set_mem_attributes(struct kvm *kvm,
+> > >  					   struct kvm_memory_attributes *attrs)
+> > >  {
+> > > @@ -2602,6 +2628,9 @@ static int kvm_vm_ioctl_set_mem_attributes(struct kvm *kvm,
+> > >  	kvm_mmu_invalidate_end(kvm);
+> > >  	KVM_MMU_UNLOCK(kvm);
+> > >  
+> > > +	if (i > start)
+> > > +		kvm_post_mem_attrs_changed(kvm, attrs->attributes, start, i);
+> > > +  
+> > 
+> > Doesn't kvm_arch_set_memory_attributes() work for you? i.e the following patch.
+> > The error check and pr_warn_ratelimited() can be pushed down into the callback.  
+> 
+> This is originally how I had but when CONFIG_PREEMPT_COUNT is set this
+> will generate warnings for this callback as well as the invalidation
+> callback as reported in v7 here:
+> 
+>   https://lore.kernel.org/lkml/Y80vhKwQyw8hS%2F22@notebook/
+> 
+> The main issue is that kvm_mem_attrs_changed() is called while holding
+> the KVM MMU lock, which disables preemption. But when updating
+> attributes for SNP, we also need to remove private pages from kernel
+> directmap, which involves acquiring a mutex which results in
+> "BUG: scheduling while atomic" warnings.
+> 
+> So that's why we ended up somewhat duplicating some of the logic and
+> using a separate callback chain that happens out of KVM MMU lock.
 
-James
+Let's split the things of changing memory attributes:
 
+1) Update the memory attributes in the xa array (Both TDX and SNP)
+2) Zapping the EPT/NPT mappings (Required by TDX)
+3) Update RMP table (Required by SNP)
+4) Update the directmap of kernel (SNP, but I guess TDX needs it as well)
 
+Does SNP really need to zap the NPT mappings when changing the memory
+attributes? (The new mappings will be created later in the fault). I don't
+find this requirement from APM.
+
+If yes, can we postpone the update of the RMP table in the later fault,
+like TDX? So that we can save this update_mem_attr x86 ops as things
+will be solved in the SNP-specific fault handler.
+
+If no, guess we need a x86 ops to tell if a zapping is required.
+
+Back to the lock, updating RMP table doesn't require a mutex. Taking
+the lock is required when updating the directmap. both TDX/SNP requires
+this update the directmap when changing memory attributes.
+
+Wouldn't it better to factor the touching directmap of kernel part out?
+
+Then you can call the x86 ops.update_mem_attr() in kvm_mem_attrs_changed().
+And update the direct kernel mapping for both TDX/SNP in the
+kvm_post_mem_attrs_changed().
+
+> 
+> -Mike
+> 
+> > 
+> > From 7c618c1f3c236c382e64680efcbe7d8a672aa870 Mon Sep 17 00:00:00 2001
+> > Message-Id: <7c618c1f3c236c382e64680efcbe7d8a672aa870.1679114841.git.isaku.yamahata@intel.com>
+> > In-Reply-To: <428a676face7a06a90e59dca1c32941c9b6ee001.1679114841.git.isaku.yamahata@intel.com>
+> > References: <428a676face7a06a90e59dca1c32941c9b6ee001.1679114841.git.isaku.yamahata@intel.com>
+> > From: Isaku Yamahata <isaku.yamahata@intel.com>
+> > Date: Fri, 17 Mar 2023 12:00:09 -0700
+> > Subject: [PATCH 4/4] KVM: x86: Add 'set_mem_attr' x86 op
+> > 
+> > This callback will do any platform-specific handling needed for
+> > converting pages between shared/private.
+> > 
+> > Originally-by: Michael Roth <michael.roth@amd.com>
+> > Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> > ---
+> >  arch/x86/include/asm/kvm-x86-ops.h | 1 +
+> >  arch/x86/include/asm/kvm_host.h    | 2 ++
+> >  arch/x86/kvm/mmu/mmu.c             | 1 +
+> >  3 files changed, 4 insertions(+)
+> > 
+> > diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
+> > index dc5f18ac0bd5..956db2ee25a5 100644
+> > --- a/arch/x86/include/asm/kvm-x86-ops.h
+> > +++ b/arch/x86/include/asm/kvm-x86-ops.h
+> > @@ -100,6 +100,7 @@ KVM_X86_OP_OPTIONAL_RET0(set_identity_map_addr)
+> >  KVM_X86_OP_OPTIONAL_RET0(get_mt_mask)
+> >  KVM_X86_OP(load_mmu_pgd)
+> >  KVM_X86_OP(fault_is_private)
+> > +KVM_X86_OP_OPTIONAL(set_mem_attr)
+> >  KVM_X86_OP_OPTIONAL(link_private_spt)
+> >  KVM_X86_OP_OPTIONAL(free_private_spt)
+> >  KVM_X86_OP_OPTIONAL(split_private_spt)
+> > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> > index 0382d236fbf4..88e11dd3afde 100644
+> > --- a/arch/x86/include/asm/kvm_host.h
+> > +++ b/arch/x86/include/asm/kvm_host.h
+> > @@ -1731,6 +1731,8 @@ struct kvm_x86_ops {
+> >  	void (*load_mmu_pgd)(struct kvm_vcpu *vcpu, hpa_t root_hpa,
+> >  			     int root_level);
+> >  	bool (*fault_is_private)(struct kvm *kvm, gpa_t gpa, u64 error_code);
+> > +	void (*set_mem_attr)(struct kvm *kvm, struct kvm_memory_slot *slot,
+> > +			     unsigned int attr, gfn_t start, gfn_t end);
+> >  
+> >  	int (*link_private_spt)(struct kvm *kvm, gfn_t gfn, enum pg_level level,
+> >  				void *private_spt);
+> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> > index 0ec94c72895c..329333486e64 100644
+> > --- a/arch/x86/kvm/mmu/mmu.c
+> > +++ b/arch/x86/kvm/mmu/mmu.c
+> > @@ -7908,6 +7908,7 @@ void kvm_arch_set_memory_attributes(struct kvm *kvm,
+> >  				    gfn_t start, gfn_t end)
+> >  {
+> >  	kvm_update_lpage_mixed_flag(kvm, slot, true, attrs, start, end);
+> > +	static_call(kvm_x86_set_mem_attr)(kvm, slot, attrs, start, end);
+> >  }
+> >  
+> >  void kvm_memory_attributes_create_memslot(struct kvm *kvm,
+> > -- 
+> > 2.25.1
+> > 
+> > -- 
+> > Isaku Yamahata <isaku.yamahata@gmail.com>  
 
