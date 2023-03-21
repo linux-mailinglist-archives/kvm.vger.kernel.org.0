@@ -2,59 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CE9476C3D43
-	for <lists+kvm@lfdr.de>; Tue, 21 Mar 2023 23:00:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A50DD6C3D47
+	for <lists+kvm@lfdr.de>; Tue, 21 Mar 2023 23:01:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229924AbjCUWA2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Mar 2023 18:00:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37332 "EHLO
+        id S229639AbjCUWAc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Mar 2023 18:00:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37410 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229958AbjCUWA1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Mar 2023 18:00:27 -0400
-Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31F0746BC
-        for <kvm@vger.kernel.org>; Tue, 21 Mar 2023 15:00:26 -0700 (PDT)
-Received: by mail-pl1-x64a.google.com with SMTP id x4-20020a170902ec8400b001a1a5f6f272so7999032plg.1
-        for <kvm@vger.kernel.org>; Tue, 21 Mar 2023 15:00:26 -0700 (PDT)
+        with ESMTP id S230026AbjCUWA3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Mar 2023 18:00:29 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6804F9755
+        for <kvm@vger.kernel.org>; Tue, 21 Mar 2023 15:00:28 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id 204-20020a250fd5000000b00b6d6655dc35so6309046ybp.6
+        for <kvm@vger.kernel.org>; Tue, 21 Mar 2023 15:00:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1679436025;
+        d=google.com; s=20210112; t=1679436027;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=r1QVmdvFEb28GS25TRtVN9nWQiQqhscO2NCp34L3b7o=;
-        b=opwJdvUDTbn5pEsZvmx7JbsvKQqX9DTDLTVcDZDneAgw2XeNuQfyqUfaJ8BDieFicc
-         htw/EvDpnUnSsWMjtRvCiQzu3936Zt4+eV68c9o64kQJdP0TBAGwuBj7Pchn2kfUN/Zw
-         qFbhd0xQ4EglTUg5q1IYu8kxZ2ViKx4lO9khc00I1Q5LxHxiFNx+JKmHe0KJ4V7/8lsQ
-         bHX13cqimtF55sdaL/xKd0LC3OrM4b5htPbDPIjWnJrfV9Q/irYTpivlzAogCf5yfPmC
-         H63FMbbXhcp294JYI7jYk8czBNUemSFKskQMYTim5y1C15NbuQPX64QSEzQw5v8k80jg
-         aKhQ==
+        bh=Z2pSG5VWmqJOQAcZFq9+VDplzIlr7FmeqQZuXEVRazw=;
+        b=CapADCaxZJSclql7XSUlwPtEzWodyt0ZlKgUzR1YZzbY+OoabPx9Io0xt3T2lMBg1d
+         nQau2muHFYgZjvDCXtTmgnDobeaSoFXW09jRj9UVq0c06edNe1fdboBQ/FhLBcnlXDNM
+         KR+YUT4rbgZ34eRrt5kd8HxvBPEqQSzk8e1IhsXxQM8nLsspr/TEWTI2tOtXbQBqQyjN
+         HEjAe3RIzenZOkWArXwtVjOUlHjTfPBGx6QROJ9e4pJ/tgr3hOXAmxogZ1QX0LOWYGx0
+         9VGUy+3Ht3swyuu/6GY/qco2c95BElcMOmdyc9ruIimjHS5kCbZwb/fG9MvgLAAwFZXt
+         j6Tw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679436025;
+        d=1e100.net; s=20210112; t=1679436027;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=r1QVmdvFEb28GS25TRtVN9nWQiQqhscO2NCp34L3b7o=;
-        b=jK9lp1tXX+MpL5StOzLClBVBozMEspJx94CwCNNAPmw4wQVQOCi/CcOYk5RZx7ZUeP
-         NimwDSmj6Bq66MqwLIeyTFYqyYRXR27isVCT3LpHUvjJCngYvnNqVx8ehpqFmhXNuFDV
-         m67xq5xnn5c4jDC/9wSIhciIodx1LMIfeNNtbvZgh7JXIeHqn4pMrhypWbke54GxSM1d
-         5C5NIRCrrNuAuh+UDW9pUWOSm3Hj5agY0MaC4e+gx9Z0qsNO2wp/SZqm2kYmHd1H2AdD
-         yOAchxM2y6ddrvI0PTfXYnDesWCrWXH27tYf9vGyyJ6MvwNDgznGpl99lZ5LElc1wMON
-         nkKg==
-X-Gm-Message-State: AO0yUKUJvSg32OoLJ5+RMrJt30ICvujti5PnGPF8LykBg+v4KqZXZUzg
-        2zDRPCzGUy+E+25gRHrY6DzJmjQ0lDE=
-X-Google-Smtp-Source: AK7set+sP72192khOTQtMN//XvLV9zi2fGU3FKezienBVDWGneZ4w86csLCQ1sCf17hxPcZGAiA/4gLFHLI=
+        bh=Z2pSG5VWmqJOQAcZFq9+VDplzIlr7FmeqQZuXEVRazw=;
+        b=6FP3phqnluw1n3hK4aJbAkqgT+UKGgJB/LduFSkfnKRsjyitAKYvyni3OlagRtsYnr
+         3dHdZ3SS0xZjEKEZC0gqLiMUvxGUA/eHZnK2Hq9MwVFk8bTqDHYkksEgJhYygnhIyekZ
+         x9nuywZbCRT9Oi1LEfH9q6P+1RRAuvJYqZr0vQL7JTqXcbGkUsdakWSCDD6A4XFTnI6c
+         uPesS7aS6EHWk/ba2he5zTEdTT5TR1UNO/uyMDkUN69m0fWyYCcBIobaSBLI7Th5bSGD
+         cYIJiPzvcKioLHt+kAVBfJTH7Ckku3GB9b3UXQWIPO9rKNhgkqq+DIyLkgVhzsESBF6o
+         2fBA==
+X-Gm-Message-State: AAQBX9dpczT2NM9vwuPIPPFDkFcIiOnm5gIey5YB00LiAzdpUZNPb2qM
+        gd4FdyoifuH94qXcnFIr4Njo+g2RtUY=
+X-Google-Smtp-Source: AKy350YQSQiwJABBg4LrQxgcwJuDItXoq3fvtBNLZ/fcyahwKCiYuVH0awsgCBzU/qICGrqlOVnO3noUKAM=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a65:4806:0:b0:50a:c1b3:ed55 with SMTP id
- h6-20020a654806000000b0050ac1b3ed55mr142164pgs.11.1679436025587; Tue, 21 Mar
- 2023 15:00:25 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a05:6902:18cd:b0:ad0:a82:7ef2 with SMTP id
+ ck13-20020a05690218cd00b00ad00a827ef2mr2161016ybb.8.1679436027667; Tue, 21
+ Mar 2023 15:00:27 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Tue, 21 Mar 2023 15:00:09 -0700
+Date:   Tue, 21 Mar 2023 15:00:10 -0700
 In-Reply-To: <20230321220021.2119033-1-seanjc@google.com>
 Mime-Version: 1.0
 References: <20230321220021.2119033-1-seanjc@google.com>
 X-Mailer: git-send-email 2.40.0.rc2.332.ga46443480c-goog
-Message-ID: <20230321220021.2119033-2-seanjc@google.com>
-Subject: [PATCH v4 01/13] KVM: x86/mmu: Add a helper function to check if an
- SPTE needs atomic write
+Message-ID: <20230321220021.2119033-3-seanjc@google.com>
+Subject: [PATCH v4 02/13] KVM: x86/mmu: Use kvm_ad_enabled() to determine if
+ TDP MMU SPTEs need wrprot
 From:   Sean Christopherson <seanjc@google.com>
 To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>
@@ -75,68 +75,58 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Vipin Sharma <vipinsh@google.com>
 
-Move conditions in kvm_tdp_mmu_write_spte() to check if an SPTE should
-be written atomically or not to a separate function.
+Use the constant-after-module-load kvm_ad_enabled() to check if SPTEs in
+the TDP MMU need to be write-protected when clearing accessed/dirty status
+instead of manually checking every SPTE.  The per-SPTE A/D enabling is
+specific to nested EPT MMUs, i.e. when KVM is using EPT A/D bits but L1 is
+not, and so cannot happen in the TDP MMU (which is non-nested only).
 
-This new function, kvm_tdp_mmu_spte_need_atomic_write(),  will be used
-in future commits to optimize clearing bits in SPTEs.
+Keep the original code as sanity checks buried under MMU_WARN_ON().
+MMU_WARN_ON() is more or less useless at the moment, but there are plans
+to change that.
 
+Link: https://lore.kernel.org/all/Yz4Qi7cn7TWTWQjj@google.com
 Signed-off-by: Vipin Sharma <vipinsh@google.com>
-Reviewed-by: David Matlack <dmatlack@google.com>
-Reviewed-by: Ben Gardon <bgardon@google.com>
+[sean: split to separate patch, apply to dirty path, write changelog]
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/mmu/tdp_iter.h | 34 ++++++++++++++++++++--------------
- 1 file changed, 20 insertions(+), 14 deletions(-)
+ arch/x86/kvm/mmu/tdp_mmu.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/kvm/mmu/tdp_iter.h b/arch/x86/kvm/mmu/tdp_iter.h
-index f0af385c56e0..c11c5d00b2c1 100644
---- a/arch/x86/kvm/mmu/tdp_iter.h
-+++ b/arch/x86/kvm/mmu/tdp_iter.h
-@@ -29,23 +29,29 @@ static inline void __kvm_tdp_mmu_write_spte(tdp_ptep_t sptep, u64 new_spte)
- 	WRITE_ONCE(*rcu_dereference(sptep), new_spte);
- }
+diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+index 7c25dbf32ecc..5a5642650c3e 100644
+--- a/arch/x86/kvm/mmu/tdp_mmu.c
++++ b/arch/x86/kvm/mmu/tdp_mmu.c
+@@ -1621,7 +1621,10 @@ static bool clear_dirty_gfn_range(struct kvm *kvm, struct kvm_mmu_page *root,
+ 		if (!is_shadow_present_pte(iter.old_spte))
+ 			continue;
  
-+/*
-+ * SPTEs must be modified atomically if they are shadow-present, leaf
-+ * SPTEs, and have volatile bits, i.e. has bits that can be set outside
-+ * of mmu_lock.  The Writable bit can be set by KVM's fast page fault
-+ * handler, and Accessed and Dirty bits can be set by the CPU.
-+ *
-+ * Note, non-leaf SPTEs do have Accessed bits and those bits are
-+ * technically volatile, but KVM doesn't consume the Accessed bit of
-+ * non-leaf SPTEs, i.e. KVM doesn't care if it clobbers the bit.  This
-+ * logic needs to be reassessed if KVM were to use non-leaf Accessed
-+ * bits, e.g. to skip stepping down into child SPTEs when aging SPTEs.
-+ */
-+static inline bool kvm_tdp_mmu_spte_need_atomic_write(u64 old_spte, int level)
-+{
-+	return is_shadow_present_pte(old_spte) &&
-+	       is_last_spte(old_spte, level) &&
-+	       spte_has_volatile_bits(old_spte);
-+}
+-		if (spte_ad_need_write_protect(iter.old_spte)) {
++		MMU_WARN_ON(kvm_ad_enabled() &&
++			    spte_ad_need_write_protect(iter.old_spte));
 +
- static inline u64 kvm_tdp_mmu_write_spte(tdp_ptep_t sptep, u64 old_spte,
- 					 u64 new_spte, int level)
- {
--	/*
--	 * Atomically write the SPTE if it is a shadow-present, leaf SPTE with
--	 * volatile bits, i.e. has bits that can be set outside of mmu_lock.
--	 * The Writable bit can be set by KVM's fast page fault handler, and
--	 * Accessed and Dirty bits can be set by the CPU.
--	 *
--	 * Note, non-leaf SPTEs do have Accessed bits and those bits are
--	 * technically volatile, but KVM doesn't consume the Accessed bit of
--	 * non-leaf SPTEs, i.e. KVM doesn't care if it clobbers the bit.  This
--	 * logic needs to be reassessed if KVM were to use non-leaf Accessed
--	 * bits, e.g. to skip stepping down into child SPTEs when aging SPTEs.
--	 */
--	if (is_shadow_present_pte(old_spte) && is_last_spte(old_spte, level) &&
--	    spte_has_volatile_bits(old_spte))
-+	if (kvm_tdp_mmu_spte_need_atomic_write(old_spte, level))
- 		return kvm_tdp_mmu_write_spte_atomic(sptep, new_spte);
++		if (!kvm_ad_enabled()) {
+ 			if (is_writable_pte(iter.old_spte))
+ 				new_spte = iter.old_spte & ~PT_WRITABLE_MASK;
+ 			else
+@@ -1685,13 +1688,16 @@ static void clear_dirty_pt_masked(struct kvm *kvm, struct kvm_mmu_page *root,
+ 		if (!mask)
+ 			break;
  
- 	__kvm_tdp_mmu_write_spte(sptep, new_spte);
++		MMU_WARN_ON(kvm_ad_enabled() &&
++			    spte_ad_need_write_protect(iter.old_spte));
++
+ 		if (iter.level > PG_LEVEL_4K ||
+ 		    !(mask & (1UL << (iter.gfn - gfn))))
+ 			continue;
+ 
+ 		mask &= ~(1UL << (iter.gfn - gfn));
+ 
+-		if (wrprot || spte_ad_need_write_protect(iter.old_spte)) {
++		if (wrprot || !kvm_ad_enabled()) {
+ 			if (is_writable_pte(iter.old_spte))
+ 				new_spte = iter.old_spte & ~PT_WRITABLE_MASK;
+ 			else
 -- 
 2.40.0.rc2.332.ga46443480c-goog
 
