@@ -2,165 +2,152 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 847386C3C63
-	for <lists+kvm@lfdr.de>; Tue, 21 Mar 2023 22:02:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E70216C3C64
+	for <lists+kvm@lfdr.de>; Tue, 21 Mar 2023 22:02:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229674AbjCUVCD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Mar 2023 17:02:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38622 "EHLO
+        id S230101AbjCUVCl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Mar 2023 17:02:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39762 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229916AbjCUVCC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Mar 2023 17:02:02 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CDD32574D7
-        for <kvm@vger.kernel.org>; Tue, 21 Mar 2023 14:01:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1679432476;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=I1KA6ZkpV3D+AmID9NMMP4J1e8acMfYHtrAK/R3ZyzU=;
-        b=CdbUbOQGzXOKOLE1q9V/eYopHtAEkVjnP32pUyhgBVvgt5vPrPfMr3UTUku8MoLIyHyQMH
-        kDoTzdwGKd0gLK1ng2nplPqAzullAlQi39aybA8rSrny60lC7i9++nGp8u/5t+9BlC331F
-        93+e1WZWXyBAM5RU8vrJjJSeP6tRDNE=
-Received: from mail-io1-f71.google.com (mail-io1-f71.google.com
- [209.85.166.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-475-CjJXpXYOMOe7dadvMl8PpA-1; Tue, 21 Mar 2023 17:01:15 -0400
-X-MC-Unique: CjJXpXYOMOe7dadvMl8PpA-1
-Received: by mail-io1-f71.google.com with SMTP id h198-20020a6bb7cf000000b00757eed38c2bso3782846iof.23
-        for <kvm@vger.kernel.org>; Tue, 21 Mar 2023 14:01:15 -0700 (PDT)
+        with ESMTP id S229871AbjCUVCk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Mar 2023 17:02:40 -0400
+Received: from mail-yb1-xb29.google.com (mail-yb1-xb29.google.com [IPv6:2607:f8b0:4864:20::b29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65216574DD;
+        Tue, 21 Mar 2023 14:02:39 -0700 (PDT)
+Received: by mail-yb1-xb29.google.com with SMTP id p203so18812614ybb.13;
+        Tue, 21 Mar 2023 14:02:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112; t=1679432558;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7KdYKeJhs6BlAbgaUy8umwaslI0fUCE3dBqVeYeDGa4=;
+        b=bjYjHDJStZi1r9+Dbh03/V+dKle/fh0I2f8dANFi6Z7Ffw6/6lEuAmi+EtVvshC8YO
+         0VZIzOm4z4XG1JwEsNe9uLN9RUWclnIsuy2EFe81Wywbjt/W9FQpXpJYu0+Wp9fb42Nc
+         G2m4V3Uuz5U223CYTzEkAuOWJeNEQ32rOv9DJAfonOuVpm7xfw3iI4tITYZyLgNglwaY
+         6buutuajtIpLZPQXUWIo4A6lEMIst8TWmsfkES/IzmzS2195lHLcnRaNV1Ng4Nvo3W89
+         uJKdgYowqcj+I7rmdzbWzxAN2mEYOFNbARgG5Mn1wGMKv1kr24hG62cpdHRXpE3h5+LU
+         AEIg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679432475;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20210112; t=1679432558;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=I1KA6ZkpV3D+AmID9NMMP4J1e8acMfYHtrAK/R3ZyzU=;
-        b=HO36ufakK7l8m9VLeuZmJf8n3JiQnnqlRuj8+kkMDD3F2IzSzAPPZvpLvPGDnvVL7H
-         kGOL/TWI+vIbSNI5BQIs7ArO+d8RXW+fV69zblVnVzj8WGcjXisHho2P/NbM/0zYMT0c
-         uobX9fUOxYYehXUuVukl95WVAsZprGkFY22gozOSCilZmrf9f0TXFFUgZbzmjFR1/z3Z
-         3SrCnFx6byDZ5RmGfJan8V0Gk+undw0/Un6VO4k1C8DC4zOy9vjysVMvtdqjjsr+7055
-         aaOB7nuAyLyg33WsiLeIWDRFRZaAnLwbosGe8+MrazCc7u6aXie/5V3ywoFJOOKHhgpK
-         LPjQ==
-X-Gm-Message-State: AO0yUKUyLGxOVV1CSguN1/D+qblgIvh1zwN4xvJtlYnjvEJSaPbjuwui
-        VisRHjtBcVKblSNnQ3ZbkOZEAzsK6LWMof92BLQn6bqR+fX+1sh/YiyhtuaqghHFFlamyR+eRvp
-        lDqz4751D5uk8
-X-Received: by 2002:a92:cf44:0:b0:325:bab7:cb17 with SMTP id c4-20020a92cf44000000b00325bab7cb17mr267822ilr.24.1679432474776;
-        Tue, 21 Mar 2023 14:01:14 -0700 (PDT)
-X-Google-Smtp-Source: AK7set/F7exqYQvOzCCmHLPB4uNfmmnepmhiUG7EPAgpEmj8wd8Iv128TRMF1l0+kK1w3FickMDApA==
-X-Received: by 2002:a92:cf44:0:b0:325:bab7:cb17 with SMTP id c4-20020a92cf44000000b00325bab7cb17mr267805ilr.24.1679432474496;
-        Tue, 21 Mar 2023 14:01:14 -0700 (PDT)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id q5-20020a056e02096500b003179ae2fb8fsm3892160ilt.2.2023.03.21.14.01.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Mar 2023 14:01:13 -0700 (PDT)
-Date:   Tue, 21 Mar 2023 15:01:12 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "jasowang@redhat.com" <jasowang@redhat.com>,
-        "Hao, Xudong" <xudong.hao@intel.com>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "Xu, Terrence" <terrence.xu@intel.com>,
-        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
-        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-        "Liu, Yi L" <yi.l.liu@intel.com>,
-        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
-        "lulu@redhat.com" <lulu@redhat.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
-        "Zhao, Yan Y" <yan.y.zhao@intel.com>,
-        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "intel-gvt-dev@lists.freedesktop.org" 
-        <intel-gvt-dev@lists.freedesktop.org>,
-        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "shameerali.kolothum.thodi@huawei.com" 
-        <shameerali.kolothum.thodi@huawei.com>,
-        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>
-Subject: Re: [PATCH v6 12/24] vfio/pci: Allow passing zero-length fd array
- in VFIO_DEVICE_PCI_HOT_RESET
-Message-ID: <20230321150112.1c482380.alex.williamson@redhat.com>
-In-Reply-To: <ZBoYgNq60eDpV9Un@nvidia.com>
-References: <BN9PR11MB5276300FCAAF8BF7B4E03BA48CBF9@BN9PR11MB5276.namprd11.prod.outlook.com>
-        <20230316124532.30839a94.alex.williamson@redhat.com>
-        <BN9PR11MB5276F7879E428080D2B214D98CBC9@BN9PR11MB5276.namprd11.prod.outlook.com>
-        <20230316182256.6659bbbd.alex.williamson@redhat.com>
-        <BN9PR11MB5276D5A71E43EA4CDD1C960A8CBD9@BN9PR11MB5276.namprd11.prod.outlook.com>
-        <20230317091557.196638a6.alex.williamson@redhat.com>
-        <ZBiUiEC8Xj9sOphr@nvidia.com>
-        <20230320165217.5b1019a4.alex.williamson@redhat.com>
-        <ZBjum1wQ1L2AIfhB@nvidia.com>
-        <20230321143122.632f7e63.alex.williamson@redhat.com>
-        <ZBoYgNq60eDpV9Un@nvidia.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
+        bh=7KdYKeJhs6BlAbgaUy8umwaslI0fUCE3dBqVeYeDGa4=;
+        b=Q8pnUb5p8QNob8kUSDJ94Rqe1+DMdX+o2btf+DJzo1fN29iEBDvwgKGWVXzonlxkU/
+         0s8A6Mz8DW7TogwnBj7/a/MrW1bCSMjsxirC1B1RBExfxRASq+9z2AUVD+fLGcXYfOjO
+         Udr51ScQnlIdIcRYoXkHKJZcInwVg28DfE4a++TUe7paGp7HZkgnM+w0zryeYq2OdXF3
+         J6T61RTpnGs5TKPtn0IHKtB+W2xGiF23+IFBiZYrPGmshstqSC+EgWmBzLuqOxdfs6ag
+         oo7DqDY8g+T5hFxaZaSAdulzWr0HXKkEKkDTo3642CfaJSnbC2L0iaTNWZ2/N2SRWOve
+         TnJg==
+X-Gm-Message-State: AAQBX9dMj4p16qP2KGV6EViE1BJrWVT8p15q6RhZcgVG0HSCr95xAr+J
+        pFQfmP+4m3TLKsV/1vTOD6rZW94R2EJgWohlMwYoyn25tw==
+X-Google-Smtp-Source: AKy350btW9WCm9AQmE3K1LLLcrTqOju2+M8P5TE4wmOswUXQ6vy6ttqgKH5L2NNJ1AHtqCpunxcZuuTWV1YXvemYS70=
+X-Received: by 2002:a05:6902:1208:b0:b6f:dcd:6cd2 with SMTP id
+ s8-20020a056902120800b00b6f0dcd6cd2mr2154016ybu.10.1679432558494; Tue, 21 Mar
+ 2023 14:02:38 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+References: <20230316222109.1940300-1-usama.arif@bytedance.com>
+ <20230316222109.1940300-10-usama.arif@bytedance.com> <CAMzpN2jMyLP9h5o_wwdThHipAns2_dx3Nf8JYhj5pEqaeWXqYg@mail.gmail.com>
+ <30efad7b8a5922cdaa48ab89a2dbaf425daf49a8.camel@infradead.org>
+In-Reply-To: <30efad7b8a5922cdaa48ab89a2dbaf425daf49a8.camel@infradead.org>
+From:   Brian Gerst <brgerst@gmail.com>
+Date:   Tue, 21 Mar 2023 17:02:27 -0400
+Message-ID: <CAMzpN2ijBZV0d+FjXpi8iP9rQ2gFgQ-9TtkZMB4xDizox1yW3g@mail.gmail.com>
+Subject: Re: [PATCH v15 09/12] x86/smpboot: Support parallel startup of
+ secondary CPUs
+To:     David Woodhouse <dwmw2@infradead.org>
+Cc:     Usama Arif <usama.arif@bytedance.com>, tglx@linutronix.de,
+        kim.phillips@amd.com, piotrgorski@cachyos.org,
+        oleksandr@natalenko.name, arjan@linux.intel.com, mingo@redhat.com,
+        bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com,
+        x86@kernel.org, pbonzini@redhat.com, paulmck@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        rcu@vger.kernel.org, mimoja@mimoja.de, hewenliang4@huawei.com,
+        thomas.lendacky@amd.com, seanjc@google.com, pmenzel@molgen.mpg.de,
+        fam.zheng@bytedance.com, punit.agrawal@bytedance.com,
+        simon.evans@bytedance.com, liangma@liangbit.com,
+        gpiccoli@igalia.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
+        DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 21 Mar 2023 17:50:08 -0300
-Jason Gunthorpe <jgg@nvidia.com> wrote:
+On Tue, Mar 21, 2023 at 3:12=E2=80=AFPM David Woodhouse <dwmw2@infradead.or=
+g> wrote:
+>
+> On Tue, 2023-03-21 at 14:28 -0400, Brian Gerst wrote:
+> >
+> > > @@ -264,6 +318,14 @@ SYM_INNER_LABEL(secondary_startup_64_no_verify, =
+SYM_L_GLOBAL)
+> > >          lgdt    (%rsp)
+> > >          addq    $16, %rsp
+> > >
+> > > +       /* Drop the realmode protection. For the boot CPU the pointer=
+ is NULL! */
+> > > +       movq    trampoline_lock(%rip), %rax
+> > > +       testq   %rax, %rax
+> > > +       jz      .Lsetup_data_segments
+> > > +       lock
+> > > +       btrl    $0, (%rax)
+> > > +
+> > > +.Lsetup_data_segments:
+> > >          /* set up data segments */
+> > >          xorl %eax,%eax
+> > >          movl %eax,%ds
+> >
+> > This can still go earlier, right after "movq TASK_threadsp(%rax),
+> > %rsp".  The GDT descriptor is placed on the idle thread stack, so it's
+> > safe to drop the lock before it.
+>
+>
+> --- a/arch/x86/kernel/head_64.S
+> +++ b/arch/x86/kernel/head_64.S
+> @@ -335,6 +335,17 @@ SYM_INNER_LABEL(secondary_startup_64_no_verify, SYM_=
+L_GLOBAL)
+>         movq    pcpu_hot + X86_current_task(%rdx), %rax
+>         movq    TASK_threadsp(%rax), %rsp
+>
+> +       /*
+> +        * Now that this CPU is running on its own stack, drop the realmo=
+de
+> +        * protection. For the boot CPU the pointer is NULL!
+> +        */
+> +       movq    trampoline_lock(%rip), %rax
+> +       testq   %rax, %rax
+> +       jz      .Lsetup_gdt
+> +       lock
+> +       btrl    $0, (%rax)
+> +
+> +.Lsetup_gdt:
+>         /*
+>          * We must switch to a new descriptor in kernel space for the GDT
+>          * because soon the kernel won't have access anymore to the users=
+pace
+> @@ -377,14 +388,6 @@ SYM_INNER_LABEL(secondary_startup_64_no_verify, SYM_=
+L_GLOBAL)
+>         shrq    $32, %rdx
+>         wrmsr
+>
+> -       /* Drop the realmode protection. For the boot CPU the pointer is =
+NULL! */
+> -       movq    trampoline_lock(%rip), %rax
+> -       testq   %rax, %rax
+> -       jz      .Lsetup_idt
+> -       lock
+> -       btrl    $0, (%rax)
+> -
+> -.Lsetup_idt:
+>         /* Setup and Load IDT */
+>         pushq   %rsi
+>         call    early_setup_idt
+>
 
-> On Tue, Mar 21, 2023 at 02:31:22PM -0600, Alex Williamson wrote:
-> 
-> > This just seems like nit-picking that the API could have accomplished
-> > this more concisely.  Probably that's true, but I think you've
-> > identified a gap above that amplifies the issue.  If the user cannot
-> > map BDFs to cdevs because the cdevs are passed as open fds to the user
-> > driver, the _INFO results become meaningless and by removing the fds
-> > array, that becomes the obvious choice that a user presented with this
-> > dilemma would take.  We're skipping past easier to misuse, difficult to
-> > use correctly, and circling around no obvious way to use correctly.  
-> 
-> No - this just isn't finished yet is all it means :(
-> 
-> I just noticed it just now, presumably Eric would have discovered this
-> when he tried to implement the FD pass and we would have made a new
-> _INFO at that point (or more ugly, have libvirt pass the BDF along
-> with the FD).
-> 
-> > Unfortunately the _INFO ioctl does presume that userspace knows the BDF
-> > to device mappings today, so if we are attempting to pre-enable a case
-> > with cdev support where that is not the case, then there must be
-> > something done with the _INFO ioctl to provide scope.  
-> 
-> Yes, something is required with _INFO before libvirt can use a FD
-> pass. I'm thinking of a new _INFO query that returns the iommufd
-> dev_ids for the reset group. Then qemu can match the dev_ids back to
-> cdev FDs and thus vPCI devices and do what it needs to do.
-> 
-> But for the current qemu setup it will open cdev directly and it will
-> know the BDF so it can still use the current _INFO.
-> 
-> Though it would be nice if qemu didn't need two implementations so Yi
-> I'd rather see a new info in this series as well and qemu can just
-> consistently use dev_id and never bdf in iommufd mode.
-
-We also need to consider how libvirt determines if QEMU has the kernel
-support it needs to pass file descriptors.  It'd be a lot cleaner if
-this aligned with the introduction of vfio cdevs.
- 
-> Anyhow, I don't see the two topics as really related, the intention is
-> not to discourage people from calling _INFO, it just to make the
-> security proof simpler and more logical.
-
-At a minimum, we need a new _INFO ioctl to get back to the point where
-it's only a discussion of whether we're checking the user on scope.  We
-can't remove the array while doing so opens up an obviously incorrect
-solution to an impossible to use API.  Thanks,
-
-Alex
-
+Looks good, thanks.
