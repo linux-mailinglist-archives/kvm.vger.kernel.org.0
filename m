@@ -2,141 +2,155 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 43A0C6C3B37
-	for <lists+kvm@lfdr.de>; Tue, 21 Mar 2023 21:06:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A38686C3B7C
+	for <lists+kvm@lfdr.de>; Tue, 21 Mar 2023 21:16:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229964AbjCUUGD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Mar 2023 16:06:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42658 "EHLO
+        id S230179AbjCUUQR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Mar 2023 16:16:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55970 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229841AbjCUUGB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Mar 2023 16:06:01 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C9D426A6
-        for <kvm@vger.kernel.org>; Tue, 21 Mar 2023 13:05:55 -0700 (PDT)
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 32LIXUd5016684;
-        Tue, 21 Mar 2023 20:05:41 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : reply-to : to : cc : date : in-reply-to : references : content-type
- : mime-version : content-transfer-encoding; s=pp1;
- bh=ixwo8rFfOE7dCM9YBZU/EfkMPgOIFTuk724F+quK0ZM=;
- b=P8wxjup4Jo/sYX592knQ/DTk0RTopR3f4qIFbZoc8G7Hd+FK/gKTsXzA98uzvCDxDUfL
- 47lWYsENsQYQ/IJkF9sgiA+n/f1vem2XON06Ldb852opPfv0QMlVYbdQ+cQs+UabWskL
- Ouz9mW/YOkuzCo03H96kYyPJOGnIc7BGa9wPu43TeuLuzM2yKDv2x528x1BcpDYJaRaM
- sZFEDcO9u1Do4NRcMB8f3/YiFT1yW1uOGP3Le3U9XmWF9xGHGKMUW6lK3hDbM9A8dgMS
- +zp3KBA762G8nr/p4BQcDBOYTFqtJBIQPJL08DRsQGFFyvUGJyx/L3kYsjKtlS48/6Jp fg== 
-Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com [169.53.41.122])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pf9249hjd-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 21 Mar 2023 20:05:41 +0000
-Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
-        by ppma04dal.us.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 32LJ8xJ8020743;
-        Tue, 21 Mar 2023 20:05:40 GMT
-Received: from smtprelay02.wdc07v.mail.ibm.com ([9.208.129.120])
-        by ppma04dal.us.ibm.com (PPS) with ESMTPS id 3pd4x79jd3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 21 Mar 2023 20:05:40 +0000
-Received: from smtpav01.dal12v.mail.ibm.com (smtpav01.dal12v.mail.ibm.com [10.241.53.100])
-        by smtprelay02.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 32LK5d3V18416188
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 21 Mar 2023 20:05:39 GMT
-Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 296A758065;
-        Tue, 21 Mar 2023 20:05:39 +0000 (GMT)
-Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 86F7D58061;
-        Tue, 21 Mar 2023 20:05:38 +0000 (GMT)
-Received: from nat-wireless-guest-reg-153-54.bu.edu (unknown [9.163.23.201])
-        by smtpav01.dal12v.mail.ibm.com (Postfix) with ESMTP;
-        Tue, 21 Mar 2023 20:05:38 +0000 (GMT)
-Message-ID: <7d615af4c6a9e5eeb0337d98c9e9ddca6d2cbdef.camel@linux.ibm.com>
-Subject: Re: [ANNOUNCEMENT] COCONUT Secure VM Service Module for SEV-SNP
-From:   James Bottomley <jejb@linux.ibm.com>
-Reply-To: jejb@linux.ibm.com
-To:     =?ISO-8859-1?Q?J=F6rg_R=F6del?= <jroedel@suse.de>
-Cc:     amd-sev-snp@lists.suse.com, linux-coco@lists.linux.dev,
-        kvm@vger.kernel.org
-Date:   Tue, 21 Mar 2023 16:05:35 -0400
-In-Reply-To: <ZBnJ6ZCuQJTVMM8h@suse.de>
-References: <ZBl4592947wC7WKI@suse.de>
-         <66eee693371c11bbd2173ad5d91afc740aa17b46.camel@linux.ibm.com>
-         <ZBmmjlNdBwVju6ib@suse.de>
-         <c2e8af835723c453adaba4b66db533a158076bbf.camel@linux.ibm.com>
-         <ZBnJ6ZCuQJTVMM8h@suse.de>
+        with ESMTP id S229747AbjCUUQO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Mar 2023 16:16:14 -0400
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD7CE584B3
+        for <kvm@vger.kernel.org>; Tue, 21 Mar 2023 13:15:44 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-540e3b152a3so165222827b3.2
+        for <kvm@vger.kernel.org>; Tue, 21 Mar 2023 13:15:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112; t=1679429743;
+        h=content-transfer-encoding:cc:to:from:subject:message-id
+         :mime-version:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=e2RhtQenWH6Mmh2njKfsOonde6iRcUbhqsfef2trssA=;
+        b=ClsvgBBQATzAxtG/gc1hzpVY/T+GSviFU2hQ3UKtZoAsyandd9FyD0yLb8NrYb4ht5
+         SjtxnaoAhF4efqeapcNFyLaolp7WuoQPSmenPl/8ik0fPXK6e1hl1CvxZlDyMrPane5r
+         fKwlNoMJeTEnq6d0rODj32nRgmEVAapEIm14QQbT2B15KQCKXBU8ZxvcGJRNsRJvZ4XJ
+         N7XPNKxQAOD73Y8xeXSFPjjlY/0SBVySAIzu81k2G9C9QAT2ZJCKSCBBuQ2KwvixcfrJ
+         ivc7vv8kYOIZBHtRp+n3DWGDyx9grB8qOG4vEqKagJpOh84jSbdFmOXnwsKkeo5zHbWB
+         s0ow==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1679429743;
+        h=content-transfer-encoding:cc:to:from:subject:message-id
+         :mime-version:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=e2RhtQenWH6Mmh2njKfsOonde6iRcUbhqsfef2trssA=;
+        b=3KYNGB4c+1YAfg/nY/fbIhPKbKN9pjt/85vqozOGw9aux/gPtE0b9RBw2V+y9NlxpY
+         PqvAzpf9W9X1ksUw5kruFsOo0HpuzcUon4NTEiv9a+d+gIDceT9T/Ra4q+eM+I3huyqV
+         MvQ4FD6W/7uMi42H2RW3AWQKNs6gjFDzmJ5r5jRs5KzGdmMSf6q7NdWm51vnM+ityzlD
+         Em3jxUffGRz897QAiYm7x2DTQVMM4ViJV7cUkbARgxTR5UGZLQ16wveRYVUcgDD0MO/M
+         3tvvWTd1Q2TAZwJdSKHprQ+85W+p1b5LLfofBVOA3RQWaMQhzc4IPbVEK8YKChGoBnJV
+         2u5A==
+X-Gm-Message-State: AO0yUKUIJv/XqrBEUiAnYaVcio8OoX/7HdebVJH5pN7ZkLsQTeh+aB4i
+        DmfQDRTJ5SMGI8MSD4X7Olv8M+skqKone+Yj5Z4Qr8kpFoZrHwGJwm6NnTirrg0PPYrCFb50nYW
+        CTFX+boDRRFjXip8DOdrhJS+tMVn8k6SYhN3jV35AmG5zetQXuqKIvmdzUprF7CWgK1rgsxk=
+X-Google-Smtp-Source: AK7set/rS/BOrm2SUEMWHr+PlfeqSewwcb3Q0X8SWpfhSHb/ZXYj5MKa4Pc4uyKe/dNqM06Z778BYQX2stVtaLtYJQ==
+X-Received: from ackerleytng-cloudtop.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1f5f])
+ (user=ackerleytng job=sendgmr) by 2002:a05:690c:d88:b0:544:bbd2:74be with
+ SMTP id da8-20020a05690c0d8800b00544bbd274bemr11229418ywb.4.1679429742690;
+ Tue, 21 Mar 2023 13:15:42 -0700 (PDT)
+Date:   Tue, 21 Mar 2023 20:15:31 +0000
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.40.0.rc2.332.ga46443480c-goog
+Message-ID: <cover.1679428901.git.ackerleytng@google.com>
+Subject: [RFC PATCH v2 0/2] Providing mount in memfd_restricted() syscall
+From:   Ackerley Tng <ackerleytng@google.com>
+To:     kvm@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-arch@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, qemu-devel@nongnu.org
+Cc:     aarcange@redhat.com, ak@linux.intel.com, akpm@linux-foundation.org,
+        arnd@arndb.de, bfields@fieldses.org, bp@alien8.de,
+        chao.p.peng@linux.intel.com, corbet@lwn.net, dave.hansen@intel.com,
+        david@redhat.com, ddutile@redhat.com, dhildenb@redhat.com,
+        hpa@zytor.com, hughd@google.com, jlayton@kernel.org,
+        jmattson@google.com, joro@8bytes.org, jun.nakajima@intel.com,
+        kirill.shutemov@linux.intel.com, linmiaohe@huawei.com,
+        luto@kernel.org, mail@maciej.szmigiero.name, mhocko@suse.com,
+        michael.roth@amd.com, mingo@redhat.com, naoya.horiguchi@nec.com,
+        pbonzini@redhat.com, qperret@google.com, rppt@kernel.org,
+        seanjc@google.com, shuah@kernel.org, steven.price@arm.com,
+        tabba@google.com, tglx@linutronix.de, vannapurve@google.com,
+        vbabka@suse.cz, vkuznets@redhat.com, wanpengli@tencent.com,
+        wei.w.wang@intel.com, x86@kernel.org, yu.c.zhang@linux.intel.com,
+        Ackerley Tng <ackerleytng@google.com>
 Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.42.4 
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: DxOMIW6msPBOJFKA97GFJXokRTIqj3ai
-X-Proofpoint-ORIG-GUID: DxOMIW6msPBOJFKA97GFJXokRTIqj3ai
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
- definitions=2023-03-21_11,2023-03-21_01,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 spamscore=0
- malwarescore=0 lowpriorityscore=0 bulkscore=0 phishscore=0 clxscore=1015
- impostorscore=0 mlxscore=0 priorityscore=1501 mlxlogscore=999
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2303150002 definitions=main-2303210159
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2023-03-21 at 16:14 +0100, Jörg Rödel wrote:
-> On Tue, Mar 21, 2023 at 09:43:48AM -0400, James Bottomley wrote:
-> > Could you describe these incompatible goals and explain why you
-> > think they are incompatible (as in why you and AMD don't think you
-> > can agree on it)?  That would help the rest of us understand where
-> > the two SVSM implementations fit in our ongoing plans.
-> 
-> The goal of COCONUT is to have an SVSM which has isolation
-> capabilities within itself. It already has percpu page-tables and in
-> the end it will be able to run services (like the TPM) as separate
-> processes in ring 3 using cooperative multitasking.
-> 
-> With the current linux-svsm code-base this is difficult to achieve
-> due to its reliance on the x86-64 crate. For supporting a user-space
-> like execution mode the crate has too many limitations, mainly in its
-> page-table and IDT implementations.
-> 
-> The IDT code from that crate, which is also used in linux-svsm,
-> relies on compiler-generated entry-code. This is not enough to
-> support a ring-3 execution mode with syscalls and several (possibly
-> nested) IST vectors. The next problem with the IDT code is that it
-> doesn't allow modification of return register state.  This makes it
-> impossible to implement exception fixups to guard RMPADJUST
-> instructions and VMPL1 memory accesses in general.
-> 
-> When we looked at the crate, the page-table implementation supported
-> basically a direct and an offset mapping, which will get us into
-> problems when support for non-contiguous mappings or sharing parts of
-> a page-table with another page-table is needed. So in the very
-> beginning of the project I decided to go with my own page-table
-> implementation.
+Hello,
 
-OK, so this doesn't sound like a problem with the AMD svsm, it sounds
-like a (solvable) issue with a particular crate in embedded rust.  I
-have to say that embedded rust is so new, it's really hard to tell if
-this is just because it was developed by someone who didn't think of
-all the OS implications or because it's a fundamental issue within the
-rust ecosystem.  Have you tried improving this crate? ... and also it's
-a nuisance we came to with our insistence on using rust; it certainly
-wouldn't have been an issue in C.  I suspect improving the crate would
-help everyone (although I note the linux kernel isn't yet using this
-crate either).
+This patchset builds upon the memfd_restricted() system call that was
+discussed in the 'KVM: mm: fd-based approach for supporting KVM' patch
+series, at
+https://lore.kernel.org/lkml/20221202061347.1070246-1-chao.p.peng@linux.int=
+el.com/T/#m7e944d7892afdd1d62a03a287bd488c56e377b0c
 
-> Of course we could start changing linux-svsm to support the same
-> goals, but I think the end result will not be very different from
-> what COCONUT looks now.
+The tree can be found at:
+https://github.com/googleprodkernel/linux-cc/tree/restrictedmem-provide-mou=
+nt-fd
 
-That's entirely possible, so what are the chances of combining the
-projects now so we don't get a split in community effort?
+In this patchset, a modification to the memfd_restricted() syscall is
+proposed, which allows userspace to provide a mount, on which the
+restrictedmem file will be created and returned from the
+memfd_restricted().
 
-James
+Allowing userspace to provide a mount allows userspace to control
+various memory binding policies via tmpfs mount options, such as
+Transparent HugePage memory allocation policy through
+'huge=3Dalways/never' and NUMA memory allocation policy through
+'mpol=3Dlocal/bind:*'.
 
+Changes since RFCv1:
++ Use fd to represent mount instead of path string, as Kirill
+  suggested. I believe using fds makes this syscall interface more
+  aligned with the other syscalls like fsopen(), fsconfig(), and
+  fsmount() in terms of using and passing around fds
++ Remove unused variable char *orig_shmem_enabled from selftests
+
+Dependencies:
++ Sean's iteration of the =E2=80=98KVM: mm: fd-based approach for supportin=
+g
+  KVM=E2=80=99 patch series at
+  https://github.com/sean-jc/linux/tree/x86/upm_base_support
++ Proposed fixes for these issues mentioned on the mailing list:
+    + https://lore.kernel.org/lkml/diqzzga0fv96.fsf@ackerleytng-cloudtop-sg=
+.c.googlers.com/
+
+Links to earlier patch series:
++ RFC v1:
+  https://lore.kernel.org/lkml/cover.1676507663.git.ackerleytng@google.com/=
+T/
+
+Ackerley Tng (2):
+  mm: restrictedmem: Allow userspace to specify mount for
+    memfd_restricted
+  selftests: restrictedmem: Check hugepage-ness of shmem file backing
+    restrictedmem fd
+
+ include/linux/syscalls.h                      |   2 +-
+ include/uapi/linux/restrictedmem.h            |   8 +
+ mm/restrictedmem.c                            |  63 ++-
+ tools/testing/selftests/Makefile              |   1 +
+ .../selftests/restrictedmem/.gitignore        |   3 +
+ .../testing/selftests/restrictedmem/Makefile  |  15 +
+ .../testing/selftests/restrictedmem/common.c  |   9 +
+ .../testing/selftests/restrictedmem/common.h  |   8 +
+ .../restrictedmem_hugepage_test.c             | 459 ++++++++++++++++++
+ 9 files changed, 561 insertions(+), 7 deletions(-)
+ create mode 100644 include/uapi/linux/restrictedmem.h
+ create mode 100644 tools/testing/selftests/restrictedmem/.gitignore
+ create mode 100644 tools/testing/selftests/restrictedmem/Makefile
+ create mode 100644 tools/testing/selftests/restrictedmem/common.c
+ create mode 100644 tools/testing/selftests/restrictedmem/common.h
+ create mode 100644 tools/testing/selftests/restrictedmem/restrictedmem_hug=
+epage_test.c
+
+--
+2.40.0.rc2.332.ga46443480c-goog
