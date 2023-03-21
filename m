@@ -2,54 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id ED4D06C3A0D
-	for <lists+kvm@lfdr.de>; Tue, 21 Mar 2023 20:14:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B82246C3A0F
+	for <lists+kvm@lfdr.de>; Tue, 21 Mar 2023 20:15:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229934AbjCUTOT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Mar 2023 15:14:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46310 "EHLO
+        id S230150AbjCUTPC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Mar 2023 15:15:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47538 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229453AbjCUTOR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Mar 2023 15:14:17 -0400
+        with ESMTP id S229574AbjCUTPA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Mar 2023 15:15:00 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDF8E20050;
-        Tue, 21 Mar 2023 12:13:23 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9958302B5;
+        Tue, 21 Mar 2023 12:14:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
         In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=E7E/6EPis9xiauc7xGz6qE4IMXgm00StHAAwQb2v/wA=; b=iLNMunuvgE3NoDuCxalyEB5vjz
-        LlXvagN7xxC9TWEgsxEhAYXnrd3w6r19hR28x2htpKwWD7LmtFmsPqe0S8j+TclRIG3HxP/GgG0hx
-        7FbSuCWHXLH2YVjiSztDKauq04zFAfBpWZMFYEjnnfW6JvpltOIq0T72eA+LFPqlbnjwnloaY/OvT
-        9zQxBWx2vZLHp0gwiAvre2Oc4LidkFQM4RBH51afDIq0jnMU8fRy+qh0j0kb3WY47rMDLlHH0TqSj
-        kWnSkZL4GLcRExeCglE2eA/R+D4BWhd3MCjXe/Eblgy3TPBkUpLAQdFVL9GpZUwbfrdjMhUARQis2
-        xMK44akw==;
+        bh=UOccFegRLXjmGiiR8Lw9P6bnKOC27596g/IWBxzHGpU=; b=SCM2vzdj9HVcu7JgkvGLBHEEng
+        /8INX2VhaY1mOwz9lYtyDyG+L4pcXMKX9qJIdEkYom9BdrekfqxqqaVTsOk6EGmUxicrzZai0xs0/
+        xiP4Wqi0/rRUqaP4X8ZsKdiGEkxT1og/9Nkm+ZI8nfLAs6S1XqnWNvlece2bA8EP0Ak4EvbbXT5kb
+        pR4WVyyKhkW5foF+geU9AABLiHawpjXC6fMalqLqL/UT/1x6mTLLtZf3vaOAq5qnCrBWjvFzcJ4TF
+        TAl13OcHFh75aXmBJVWy06Bluak1oetMUHPpMT0DHjY4biwPmhCaZVFM3tph9/tHU6tvfcb25I13Q
+        5HH6mJ8g==;
 Received: from [2001:8b0:10b:5:bb89:6ad7:7c5:e8e] (helo=u3832b3a9db3152.ant.amazon.com)
         by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pehOy-002IxN-Qj; Tue, 21 Mar 2023 19:12:08 +0000
-Message-ID: <30efad7b8a5922cdaa48ab89a2dbaf425daf49a8.camel@infradead.org>
-Subject: Re: [PATCH v15 09/12] x86/smpboot: Support parallel startup of
- secondary CPUs
+        id 1pehQv-002J2v-OX; Tue, 21 Mar 2023 19:14:09 +0000
+Message-ID: <9b0b8ff8c72ef2c08fac68cea99f5cba9a30feab.camel@infradead.org>
+Subject: Re: [PATCH v15 03/12] cpu/hotplug: Add dynamic parallel bringup
+ states before CPUHP_BRINGUP_CPU
 From:   David Woodhouse <dwmw2@infradead.org>
-To:     Brian Gerst <brgerst@gmail.com>,
-        Usama Arif <usama.arif@bytedance.com>
-Cc:     tglx@linutronix.de, kim.phillips@amd.com, piotrgorski@cachyos.org,
-        oleksandr@natalenko.name, arjan@linux.intel.com, mingo@redhat.com,
-        bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com,
-        x86@kernel.org, pbonzini@redhat.com, paulmck@kernel.org,
+To:     Thomas Gleixner <tglx@linutronix.de>,
+        Usama Arif <usama.arif@bytedance.com>, kim.phillips@amd.com,
+        brgerst@gmail.com
+Cc:     piotrgorski@cachyos.org, oleksandr@natalenko.name,
+        arjan@linux.intel.com, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com, hpa@zytor.com, x86@kernel.org,
+        pbonzini@redhat.com, paulmck@kernel.org,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         rcu@vger.kernel.org, mimoja@mimoja.de, hewenliang4@huawei.com,
         thomas.lendacky@amd.com, seanjc@google.com, pmenzel@molgen.mpg.de,
         fam.zheng@bytedance.com, punit.agrawal@bytedance.com,
         simon.evans@bytedance.com, liangma@liangbit.com,
         gpiccoli@igalia.com
-Date:   Tue, 21 Mar 2023 19:12:06 +0000
-In-Reply-To: <CAMzpN2jMyLP9h5o_wwdThHipAns2_dx3Nf8JYhj5pEqaeWXqYg@mail.gmail.com>
+Date:   Tue, 21 Mar 2023 19:14:07 +0000
+In-Reply-To: <87r0tja41b.ffs@tglx>
 References: <20230316222109.1940300-1-usama.arif@bytedance.com>
-         <20230316222109.1940300-10-usama.arif@bytedance.com>
-         <CAMzpN2jMyLP9h5o_wwdThHipAns2_dx3Nf8JYhj5pEqaeWXqYg@mail.gmail.com>
+         <20230316222109.1940300-4-usama.arif@bytedance.com> <87r0tja41b.ffs@tglx>
 Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-        boundary="=-GAuMbmdFfEn9Zklwy57I"
+        boundary="=-K0OlIlpysnnJoff42NwA"
 User-Agent: Evolution 3.44.4-0ubuntu1 
 MIME-Version: 1.0
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
@@ -63,83 +63,69 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
---=-GAuMbmdFfEn9Zklwy57I
+--=-K0OlIlpysnnJoff42NwA
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, 2023-03-21 at 14:28 -0400, Brian Gerst wrote:
+On Mon, 2023-03-20 at 15:30 +0100, Thomas Gleixner wrote:
 >=20
-> > @@ -264,6 +318,14 @@ SYM_INNER_LABEL(secondary_startup_64_no_verify, SY=
-M_L_GLOBAL)
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 lgdt=C2=A0=C2=A0=C2=A0=
- (%rsp)
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 addq=C2=A0=C2=A0=C2=A0=
- $16, %rsp
-> >=20
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* Drop the realmode protection. =
-For the boot CPU the pointer is NULL! */
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 movq=C2=A0=C2=A0=C2=A0 trampoline=
-_lock(%rip), %rax
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 testq=C2=A0=C2=A0 %rax, %rax
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 jz=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
-.Lsetup_data_segments
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 lock
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 btrl=C2=A0=C2=A0=C2=A0 $0, (%rax)
-> > +
-> > +.Lsetup_data_segments:
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* set up data segment=
-s */
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 xorl %eax,%eax
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 movl %eax,%ds
+> This causes a subtle issue. The bringup loop above moves all CPUs to
+> cpuhp_state =3D=3D CPUHP_BP_PARALLEL_DYN_END. So the serial bootup will
+> start from there and bring them fully up.
 >=20
-> This can still go earlier, right after "movq TASK_threadsp(%rax),
-> %rsp".=C2=A0 The GDT descriptor is placed on the idle thread stack, so it=
-'s
-> safe to drop the lock before it.
+> Now if a bringup fails, then the rollback will only go back down to
+> CPUHP_BP_PARALLEL_DYN_END, which means that the control CPU won't do any
+> cleanups below CPUHP_BP_PARALLEL_DYN_END.
+>=20
+> That 'fail' is a common case for SMT soft disable via the 'nosmt'
+> command line parameter. Due to the marvelous MCE broadcast 'feature' we
+> need to bringup the SMT siblings at least to the CPUHP_AP_ONLINE_IDLE
+> state once and then roll them back.
+>=20
+> While this is not necessarily a fatal problem, it's changing behaviour
+> and with quite some of the details hidden in the (then not issued)
+> teardown callbacks might cause some hard to decode subtle surprises.
+>=20
+> So that second for_each_present_cpu() loop needs to check the return
+> value of cpu_up() and issue a full rollback to CPUHP_OFFLINE in case of
+> fail.
 
-
---- a/arch/x86/kernel/head_64.S
-+++ b/arch/x86/kernel/head_64.S
-@@ -335,6 +335,17 @@ SYM_INNER_LABEL(secondary_startup_64_no_verify, SYM_L_=
-GLOBAL)
-        movq    pcpu_hot + X86_current_task(%rdx), %rax
-        movq    TASK_threadsp(%rax), %rsp
-=20
-+       /*
-+        * Now that this CPU is running on its own stack, drop the realmode
-+        * protection. For the boot CPU the pointer is NULL!
-+        */
-+       movq    trampoline_lock(%rip), %rax
-+       testq   %rax, %rax
-+       jz      .Lsetup_gdt
-+       lock
-+       btrl    $0, (%rax)
+@@ -1524,8 +1531,22 @@ void bringup_nonboot_cpus(unsigned int setup_max_cpu=
+s)
+        for_each_present_cpu(cpu) {
+                if (num_online_cpus() >=3D setup_max_cpus)
+                        break;
+-               if (!cpu_online(cpu))
+-                       cpu_up(cpu, CPUHP_ONLINE);
++               if (!cpu_online(cpu)) {
++                       int ret =3D cpu_up(cpu, CPUHP_ONLINE);
 +
-+.Lsetup_gdt:
-        /*
-         * We must switch to a new descriptor in kernel space for the GDT
-         * because soon the kernel won't have access anymore to the userspa=
-ce
-@@ -377,14 +388,6 @@ SYM_INNER_LABEL(secondary_startup_64_no_verify, SYM_L_=
-GLOBAL)
-        shrq    $32, %rdx
-        wrmsr
++                       /*
++                        * For the parallel bringup case, roll all the way =
+back
++                        * to CPUHP_OFFLINE on failure; don't leave them in=
+ the
++                        * parallel stages. This happens in the nosmt case =
+for
++                        * non-primary threads.
++                        */
++                       if (ret && cpuhp_hp_states[CPUHP_BP_PARALLEL_DYN].n=
+ame) {
++                               struct cpuhp_cpu_state *st =3D per_cpu_ptr(=
+&cpuhp_state, cpu);
++                               if (can_rollback_cpu(st))
++                                       WARN_ON(cpuhp_invoke_callback_range=
+(false, cpu, st,
++                                                                          =
+ CPUHP_OFFLINE));
++                       }
++               }
+        }
+ }
 =20
--       /* Drop the realmode protection. For the boot CPU the pointer is NU=
-LL! */
--       movq    trampoline_lock(%rip), %rax
--       testq   %rax, %rax
--       jz      .Lsetup_idt
--       lock
--       btrl    $0, (%rax)
--
--.Lsetup_idt:
-        /* Setup and Load IDT */
-        pushq   %rsi
-        call    early_setup_idt
 
 
---=-GAuMbmdFfEn9Zklwy57I
+--=-K0OlIlpysnnJoff42NwA
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -231,24 +217,24 @@ IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
 dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
 NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
 xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMwMzIxMTkxMjA2WjAvBgkqhkiG9w0BCQQxIgQgEqEV6jwW
-5j/sDiahJDRRw2japSJGMwx+XKBxkpnfingwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMwMzIxMTkxNDA3WjAvBgkqhkiG9w0BCQQxIgQgDsBYl5Wv
+XFwHvP6F3WBj8hbnOGCwgPLP5tysDSrrVAAwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
 BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
 A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
 dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
 DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
 MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
 Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgBUKLG5oy4TPETPGmhnDNlkHuxUvoh0UeMN
-xjV+9LYlEpi420/woK1iexJdT3gXqaHFOr9UdqINXNUNkMPv0OR/FbJKUWlw7Okzd81Q+dYVI5Sk
-hjIvaohvbG3qH2QAHv+2C0123FXXcdU3DKtaCABw3UQ1XPzFaz9CAj5Ixg0n+4REvmZ50SsK9mmW
-HZlFBqmC4HQ/ApJT0z39VlTgUKff/6/o3ZzcnTk3jtKz8h4dH4mpxuZgvlNr68O8UaV04tASu/+1
-fwkrUIqQZZVrJ+5RR6vDEGRqRbuabcaJ2mXmS4qdUT4RutyFaNfl+WbE16rAc6Rfa4pB/s0zcKst
-A2rkxsUP9WRPi+BIn6I6RDH3JwD+Pafoabg1qwK/nMTk7yHeTrg3xF7GqcVzNAJVkzcl1tTBFJEs
-SZFTJ9PdgjhYvpXOgE5D91J8x9PVT8EiSm/ow89F1XS9at06bBYwORr3+bQmLMhFkmPxZCwGAcsH
-m01iivW20GtRF+Ga+Q5mdWiLZFKMQPJnVUmEI47hIgoGPCdi0RT+/N1z+DcWFgD82QnGLni/ic9v
-TdzDhZyyRcOpwN8vJm9+xSnlm4uo1Vl+18CWqlfwdIbyg2ExRj8Bh75TLiUDrJNRLYREzdf7Uqw7
-9X/X8VcURoiEJBOEeMP1iwLfR7vl4RhmwcJGqMibjQAAAAAAAA==
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgBEdOr2uGa2FpFluZ/a2z+YtNB8UOWKLCMB
+9obzc3EA0hZICZJ5ZC3Db/N9edTXabuzRARqSyLfqjqmO5aLiPxsbXXPwGAsydurzYZ++jJ4fgtZ
+mIwPh3BmPbkclIvfbHAvGwYLFKXMA1B9NrSNM6ozZHwBwJ092Pt3Lg0IDZx0h10YdyELReO8bgpE
+MLDwIT28A+4bNbM5HgOJGJLyxAvXRwv31h2WRzWG7WbUXerxGCaT5o1Ja6/Ye05Prd+y+rkHzhX9
+T+8pvoB/Cz8NnpaiC2Gm68IOsa7IPnqE5rQEUniaryJbTHheuxdpxAOuQXV3S10Uo5Vwy9o0699O
+HsHNc3SQdkKUFpvdjR+EC9eV0M0KSZqo71P5lwH42TGnJvEZnFY3zgEh2tGyIWR4XoJCgRDhlnPq
+yVXzWtl5K3r1LMAEYEKYMhYr8Vi/QIc8TyGC7tycJuNih4QMuqJT530QDHR+Tr6qPZ5cE9Zpoobo
+yGDJ1WlCBWMcYSeGOhmKwHxqDqg+Uxu3eISI9u570B5V3aKGCADq4OCsIlGh5FStNdVzXQvmyUyG
+O4u7/Gzv1HiCDiAR4hDlBPiixJnrbWPyw+ytPUdGZ0Zhj+pfDq/G5+VhOK/XKR3C3x7tEAe8qnMz
+RlWa5ulYtCyeMwQipW0yW7G4/SHlpBNmYNu4sQHqQAAAAAAAAA==
 
 
---=-GAuMbmdFfEn9Zklwy57I--
+--=-K0OlIlpysnnJoff42NwA--
