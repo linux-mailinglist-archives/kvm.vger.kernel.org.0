@@ -2,72 +2,81 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 75EE36C3685
-	for <lists+kvm@lfdr.de>; Tue, 21 Mar 2023 17:04:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B080C6C3691
+	for <lists+kvm@lfdr.de>; Tue, 21 Mar 2023 17:05:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231623AbjCUQEH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Mar 2023 12:04:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57502 "EHLO
+        id S229525AbjCUQFm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Mar 2023 12:05:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59058 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231533AbjCUQEB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Mar 2023 12:04:01 -0400
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D49D5BA5
-        for <kvm@vger.kernel.org>; Tue, 21 Mar 2023 09:03:42 -0700 (PDT)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-5425c04765dso157205227b3.0
-        for <kvm@vger.kernel.org>; Tue, 21 Mar 2023 09:03:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1679414621;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=pYjBsqxFlPfy2OkA5/SypyMm9iSN5hAhbwnPSGTheM8=;
-        b=HD6LQWQQ3npuI9b9d5JwrPqwrR8NKrSMARKY8/koMg2raq8m7qzqe7UjSg3qhe8DE2
-         mcexmTG97/w7oDWXgur6AowTCzS65phvGXvJPEs60xGLaISQ+A9mGt1pSsu3brRZxlxC
-         CoW3SfZc9eJYjcu05QCs614mdiYlyUIRoO/nQO8+WDtTkkvKOE+ZO/oIwMgXC87Pot/D
-         RF9DuUNp1RyRhYGWgPLWYFIK6rhXySrOH7trltbc++4sYhfa6zKzpOEfiG+kdWMFPjPb
-         dOkb/IEHU4Fm0qLO9snuCsTVZSS/tjiudFw3AI4mKYNR23Uqk67OXG+Vxgkn9Xvj0ahh
-         5yxA==
+        with ESMTP id S229861AbjCUQFk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Mar 2023 12:05:40 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1967430E9A
+        for <kvm@vger.kernel.org>; Tue, 21 Mar 2023 09:04:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1679414686;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=lvuo6+gbLS66U9JgpxqS8Rw/48nBbSnJ5zKf6oE7jWc=;
+        b=PzVRwKOt8msBlVhJZdjZODQw/OokHVqNd0jmd2eLpvS57vxNq4WqNqyYSZdspwR50T00Zb
+        KwalmZQqDMyUpbg9/pp0a0cATA5ftDA9XuZe5X/2NuSGcaObDby0i7gLAB1fI/YrBTNOGL
+        0XzU0mlLBXBcQdU4Vw0RF1TVtZnT+xA=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-256-dKTYrvk5MGWVJXwU5GhG4w-1; Tue, 21 Mar 2023 12:04:45 -0400
+X-MC-Unique: dKTYrvk5MGWVJXwU5GhG4w-1
+Received: by mail-wr1-f72.google.com with SMTP id v30-20020adfa1de000000b002d557ec6d15so816064wrv.18
+        for <kvm@vger.kernel.org>; Tue, 21 Mar 2023 09:04:45 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679414621;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=pYjBsqxFlPfy2OkA5/SypyMm9iSN5hAhbwnPSGTheM8=;
-        b=RTyZINEAuZd4ARtjuR14Xi+7hqV2f/PBh+duV7pl3QaGSVjwe91NHz/q4pVN0NVQnt
-         fabsReLP4UDuCSfeVAW/Pxa28fccOTteDm6gYoCpnqonWEcxdpZoTZvWQHQrls67fVRZ
-         85q1E+QoSOQDWF7jn+fTjPKfEspjhjYKvdCciMqtuI2W76s5ADsQh75JHBvP8kaHTkyM
-         8EBpzl3oMqlIJEIvWU2fcAOhkB84vgiQDGsCEWWLXGkj/DqTmTY/bSkkmbcyFDdrGixy
-         mVoESzmp7/qwLuqrdf8k6d+Hx8aHHCUi0ihCOxLO32smsSoeM9yeDuEYtbLSBT8Yn+x0
-         CLKQ==
-X-Gm-Message-State: AAQBX9flYV0woIJpxmGrHRiCjtqUDQWUjySzmMcLOvxYbC5yju3STVS4
-        hG5XQtGELVfjC5NO94M/7IXVqNZMAvo=
-X-Google-Smtp-Source: AKy350ZQHy5lgSNEZQp18mSV+zlCqOMga2M5b6/q+MXgH5L2PwQSLnI6G6dmqo9OA2C1dpLzbYhj+cjGhoU=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:703:b0:b6a:3632:12fd with SMTP id
- k3-20020a056902070300b00b6a363212fdmr1876420ybt.2.1679414621681; Tue, 21 Mar
- 2023 09:03:41 -0700 (PDT)
-Date:   Tue, 21 Mar 2023 09:03:40 -0700
-In-Reply-To: <4ff37ff4-b89e-8683-f6ea-865211ae01d2@linux.intel.com>
-Mime-Version: 1.0
-References: <20230227084547.404871-1-robert.hu@linux.intel.com>
- <20230227084547.404871-3-robert.hu@linux.intel.com> <ZABPFII40v1nQ2EV@gao-cwp>
- <9db9bd3a2ade8c436a8b9ab6f61ee8dafa2e072a.camel@linux.intel.com>
- <ZAuRec2NkC3+4jvD@google.com> <75f628e3-9621-ac9e-a258-33efc7ce56af@linux.intel.com>
- <4ff37ff4-b89e-8683-f6ea-865211ae01d2@linux.intel.com>
-Message-ID: <ZBnVXGE45GjmwLDw@google.com>
-Subject: Re: [PATCH v5 2/5] [Trivial]KVM: x86: Explicitly cast ulong to bool
- in kvm_set_cr3()
-From:   Sean Christopherson <seanjc@google.com>
-To:     Binbin Wu <binbin.wu@linux.intel.com>
-Cc:     Chao Gao <chao.gao@intel.com>,
-        Robert Hoo <robert.hu@linux.intel.com>, pbonzini@redhat.com,
-        kvm@vger.kernel.org
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        d=1e100.net; s=20210112; t=1679414684;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=lvuo6+gbLS66U9JgpxqS8Rw/48nBbSnJ5zKf6oE7jWc=;
+        b=8ABO94EOVfVyVwKSpj8q/2EYulyBYmOUztBOCQo+hdf8HQNxgKAgROqV0fqukvEm4Z
+         IdT9HHymbosT6JpfeE7EU33Rk2dfdU/6EKQp42SgfoIrmNnkg4Tk3UEFleTxTgv4eojo
+         5EMwdo+T/37Gfdgv1VSiTKVFPJbZBpTCSJ2HtV07KEC7v12mRZY5EGSnxcUFM+tC9WsY
+         bO3k/+RQKUFOhd7zRCAMjOfQv6xsmGHSTdbxc66xG1vegAnnNobev5HZKIZCYnBBxLRq
+         k5qrtZD8wK+tI3MDHyZwWO3pH2p51F/idn4h2IowTkYPUb/NjzwOMz9N+R5UpgIvLdpd
+         90bQ==
+X-Gm-Message-State: AO0yUKW/Q+1AG5DxsJAwDeeTRr/myUorcGBEPAUfdSM6lrJuksNMb/Xh
+        UijMJFUaaby7X+Y9DT+XHqKujbioRE2LTOP8BpeGxt4vidN5u812BKdpO74kaaLCdZFgFFO9j7B
+        llMarihrycQNJ
+X-Received: by 2002:adf:ec44:0:b0:2c6:85ef:4086 with SMTP id w4-20020adfec44000000b002c685ef4086mr2641062wrn.32.1679414684065;
+        Tue, 21 Mar 2023 09:04:44 -0700 (PDT)
+X-Google-Smtp-Source: AK7set/qpBy5hLFiDKHRejykyhei5GGgmayXQki0xtcMTXtMaW6+qKHkyL/mZoulIXdg9Sh2mNKc+w==
+X-Received: by 2002:adf:ec44:0:b0:2c6:85ef:4086 with SMTP id w4-20020adfec44000000b002c685ef4086mr2641036wrn.32.1679414683733;
+        Tue, 21 Mar 2023 09:04:43 -0700 (PDT)
+Received: from redhat.com ([2.52.1.105])
+        by smtp.gmail.com with ESMTPSA id j10-20020a5d464a000000b002cea8f07813sm11737981wrs.81.2023.03.21.09.04.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 21 Mar 2023 09:04:43 -0700 (PDT)
+Date:   Tue, 21 Mar 2023 12:04:39 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     Viktor Prutyanov <viktor@daynix.com>, jasowang@redhat.com,
+        pasic@linux.ibm.com, farman@linux.ibm.com,
+        linux-s390@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        linux-kernel@vger.kernel.org, yan@daynix.com
+Subject: Re: [PATCH v3] virtio: add VIRTIO_F_NOTIFICATION_DATA feature support
+Message-ID: <20230321115854-mutt-send-email-mst@kernel.org>
+References: <20230321134410.2097163-1-viktor@daynix.com>
+ <87h6uem9qc.fsf@redhat.com>
+ <CAPv0NP6Ep4-B7cMc285E3d3vYjgwO7O1pq5sG3OYYAoZd3EAYQ@mail.gmail.com>
+ <87bkkmm89a.fsf@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <87bkkmm89a.fsf@redhat.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -75,70 +84,90 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Mar 20, 2023, Binbin Wu wrote:
->=20
-> On 3/20/2023 8:05 PM, Binbin Wu wrote:
-> >=20
-> > On 3/11/2023 4:22 AM, Sean Christopherson wrote:
-> > > As Chao pointed out, this does not belong in the LAM series.=EF=BF=BD=
- And
-> > > FWIW, I highly
-> > > recommend NOT tagging things as Trivial.=EF=BF=BD If you're wrong and=
- the
-> > > patch _isn't_
-> > > trivial, it only slows things down.=EF=BF=BD And if you're right, the=
-n
-> > > expediting the
-> > > patch can't possibly be necessary.
-> > >=20
-> > > On Fri, Mar 03, 2023, Robert Hoo wrote:
-> > > > On Thu, 2023-03-02 at 15:24 +0800, Chao Gao wrote:
-> > > > > > -=EF=BF=BD=EF=BF=BD=EF=BF=BD bool pcid_enabled =3D kvm_read_cr4=
-_bits(vcpu, X86_CR4_PCIDE);
-> > > > > > +=EF=BF=BD=EF=BF=BD=EF=BF=BD bool pcid_enabled =3D !!kvm_read_c=
-r4_bits(vcpu, X86_CR4_PCIDE);
-> > > > > >=20
-> > > > > > =EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BDif (pcid_enabled) {
-> > > > > > =EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=
- skip_tlb_flush =3D cr3 & X86_CR3_PCID_NOFLUSH;
-> > > > > pcid_enabled is used only once. You can drop it, i.e.,
-> > > > >=20
-> > > > > =EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BDif (kvm_read_cr4_bits(vcpu, X=
-86_CR4_PCIDE)) {
-> > > > >=20
-> > > > Emm, that's actually another point.
-> > > > Though I won't object so, wouldn't this be compiler optimized?
-> > > >=20
-> > > > And my point was: honor bool type, though in C implemention it's 0 =
-and
-> > > > !0, it has its own type value: true, false.
-> > > > Implicit type casting always isn't good habit.
-> > > I don't disagree, but I also don't particularly want to "fix" one
-> > > case while
-> > > ignoring the many others, e.g. kvm_handle_invpcid() has the exact
-> > > same "buggy"
-> > > pattern.
-> > >=20
-> > > I would be supportive of a patch that adds helpers and then converts
-> > > all of the
-> > > relevant CR0/CR4 checks though...
-> >=20
-> > Hi Sean, I can cook a patch by your suggesion and sent out the patch
-> > seperately.
->=20
-> Sean, besides the call of kvm_read_cr0_bits() and kvm_read_cr4_bits(), th=
-ere
-> are also a lot checks in if statement like
-> if ( cr4 & X86_CR4_XXX )
-> or
-> if ( cr0 & X86_CR0_XXX )
-> I suppose these usages are OK, right?
+On Tue, Mar 21, 2023 at 04:30:57PM +0100, Cornelia Huck wrote:
+> On Tue, Mar 21 2023, Viktor Prutyanov <viktor@daynix.com> wrote:
+> 
+> > On Tue, Mar 21, 2023 at 5:59 PM Cornelia Huck <cohuck@redhat.com> wrote:
+> >>
+> >> On Tue, Mar 21 2023, Viktor Prutyanov <viktor@daynix.com> wrote:
+> >>
+> >> > According to VirtIO spec v1.2, VIRTIO_F_NOTIFICATION_DATA feature
+> >> > indicates that the driver passes extra data along with the queue
+> >> > notifications.
+> >> >
+> >> > In a split queue case, the extra data is 16-bit available index. In a
+> >> > packed queue case, the extra data is 1-bit wrap counter and 15-bit
+> >> > available index.
+> >> >
+> >> > Add support for this feature for MMIO, PCI and channel I/O transports.
+> >> >
+> >> > Signed-off-by: Viktor Prutyanov <viktor@daynix.com>
+> >> > ---
+> >> >  v3: support feature in virtio_ccw, remove VM_NOTIFY, use avail_idx_shadow,
+> >> >     remove byte swap, rename to vring_notification_data
+> >> >  v2: reject the feature in virtio_ccw, replace __le32 with u32
+> >> >
+> >> >  drivers/s390/virtio/virtio_ccw.c   |  4 +++-
+> >> >  drivers/virtio/virtio_mmio.c       | 14 +++++++++++++-
+> >> >  drivers/virtio/virtio_pci_common.c | 10 ++++++++++
+> >> >  drivers/virtio/virtio_pci_common.h |  4 ++++
+> >> >  drivers/virtio/virtio_pci_legacy.c |  2 +-
+> >> >  drivers/virtio/virtio_pci_modern.c |  2 +-
+> >> >  drivers/virtio/virtio_ring.c       | 17 +++++++++++++++++
+> >> >  include/linux/virtio_ring.h        |  2 ++
+> >> >  include/uapi/linux/virtio_config.h |  6 ++++++
+> >> >  9 files changed, 57 insertions(+), 4 deletions(-)
+> >> >
+> >> > diff --git a/drivers/s390/virtio/virtio_ccw.c b/drivers/s390/virtio/virtio_ccw.c
+> >> > index 954fc31b4bc7..c33172c5b8d5 100644
+> >> > --- a/drivers/s390/virtio/virtio_ccw.c
+> >> > +++ b/drivers/s390/virtio/virtio_ccw.c
+> >> > @@ -396,13 +396,15 @@ static bool virtio_ccw_kvm_notify(struct virtqueue *vq)
+> >> >       struct virtio_ccw_vq_info *info = vq->priv;
+> >> >       struct virtio_ccw_device *vcdev;
+> >> >       struct subchannel_id schid;
+> >> > +     u32 data = __virtio_test_bit(vq->vdev, VIRTIO_F_NOTIFICATION_DATA) ?
+> >> > +                     vring_notification_data(vq) : vq->index;
+> >> >
+> >> >       vcdev = to_vc_device(info->vq->vdev);
+> >> >       ccw_device_get_schid(vcdev->cdev, &schid);
+> >> >       BUILD_BUG_ON(sizeof(struct subchannel_id) != sizeof(unsigned int));
+> >> >       info->cookie = kvm_hypercall3(KVM_S390_VIRTIO_CCW_NOTIFY,
+> >> >                                     *((unsigned int *)&schid),
+> >> > -                                   vq->index, info->cookie);
+> >> > +                                   data, info->cookie);
+> >> >       if (info->cookie < 0)
+> >> >               return false;
+> >> >       return true;
+> >> > diff --git a/drivers/virtio/virtio_mmio.c b/drivers/virtio/virtio_mmio.c
+> >> > index 3ff746e3f24a..7c16e622c33d 100644
+> >> > --- a/drivers/virtio/virtio_mmio.c
+> >> > +++ b/drivers/virtio/virtio_mmio.c
+> >> > @@ -285,6 +285,16 @@ static bool vm_notify(struct virtqueue *vq)
+> >> >       return true;
+> >> >  }
+> >> >
+> >> > +static bool vm_notify_with_data(struct virtqueue *vq)
+> >> > +{
+> >> > +     struct virtio_mmio_device *vm_dev = to_virtio_mmio_device(vq->vdev);
+> >> > +     u32 data = vring_notification_data(vq);
+> >> > +
+> >> > +     writel(data, vm_dev->base + VIRTIO_MMIO_QUEUE_NOTIFY);
+> >>
+> >> Can't you simply use the same method as for ccw, i.e. use one callback
+> >> function that simply writes one value or the other?
+> >
+> > The idea is to eliminate the conditional branch induced by feature bit
+> > testing from the notification function. Probably, this can be done in
+> > the same way in ccw.
+> 
+> Hm, how noticable is that branch? IOW, is it worth making the code less
+> readable for this?
 
-Generally speaking, yes.  Most flows of that nature use a local variable fo=
-r very
-good reasons.  The only one I would probably convert is this code in
-svm_can_emulate_instruction(). =20
+I'm not sure but these things add up. I'm with Viktor here let's just
+avoid the branch and not worry about whether it's important or not.
+So let's use the same thing here then? And we can use a subfunction
+to avoid code duplication.
 
-	cr4 =3D kvm_read_cr4(vcpu);
-	smep =3D cr4 & X86_CR4_SMEP;
-	smap =3D cr4 & X86_CR4_SMAP;
+> (In any case, all transports probably should use the same method.)
+
