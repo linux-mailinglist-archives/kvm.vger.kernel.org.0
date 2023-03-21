@@ -2,152 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E70216C3C64
-	for <lists+kvm@lfdr.de>; Tue, 21 Mar 2023 22:02:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 065506C3C92
+	for <lists+kvm@lfdr.de>; Tue, 21 Mar 2023 22:21:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230101AbjCUVCl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Mar 2023 17:02:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39762 "EHLO
+        id S229676AbjCUVVa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Mar 2023 17:21:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35524 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229871AbjCUVCk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Mar 2023 17:02:40 -0400
-Received: from mail-yb1-xb29.google.com (mail-yb1-xb29.google.com [IPv6:2607:f8b0:4864:20::b29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65216574DD;
-        Tue, 21 Mar 2023 14:02:39 -0700 (PDT)
-Received: by mail-yb1-xb29.google.com with SMTP id p203so18812614ybb.13;
-        Tue, 21 Mar 2023 14:02:39 -0700 (PDT)
+        with ESMTP id S229527AbjCUVV2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Mar 2023 17:21:28 -0400
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 774BF498AF
+        for <kvm@vger.kernel.org>; Tue, 21 Mar 2023 14:21:27 -0700 (PDT)
+Received: by mail-pl1-x649.google.com with SMTP id p9-20020a170902e74900b001a1c7b2e7afso4821130plf.0
+        for <kvm@vger.kernel.org>; Tue, 21 Mar 2023 14:21:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1679432558;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7KdYKeJhs6BlAbgaUy8umwaslI0fUCE3dBqVeYeDGa4=;
-        b=bjYjHDJStZi1r9+Dbh03/V+dKle/fh0I2f8dANFi6Z7Ffw6/6lEuAmi+EtVvshC8YO
-         0VZIzOm4z4XG1JwEsNe9uLN9RUWclnIsuy2EFe81Wywbjt/W9FQpXpJYu0+Wp9fb42Nc
-         G2m4V3Uuz5U223CYTzEkAuOWJeNEQ32rOv9DJAfonOuVpm7xfw3iI4tITYZyLgNglwaY
-         6buutuajtIpLZPQXUWIo4A6lEMIst8TWmsfkES/IzmzS2195lHLcnRaNV1Ng4Nvo3W89
-         uJKdgYowqcj+I7rmdzbWzxAN2mEYOFNbARgG5Mn1wGMKv1kr24hG62cpdHRXpE3h5+LU
-         AEIg==
+        d=google.com; s=20210112; t=1679433687;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=b8xazSPFBreaTPvX2LxkUqMerX9ehkqQaqTTGvhOdbk=;
+        b=WjXCu3ldKzqxRcIef3tLaIdf3wHhdouBc3crHTXHsK4bH5BZTVxQWab34ocAB/cIw7
+         rC3zsqPSThwPgt7CPqdYypLDquOQMY/MZ5MvOR44dRJSA9pUA966UaHYhcmPZzYgjrmI
+         i1AEm36tP8k/ansOfgEJzvq5QOnq8rQqnzEudyGeeIpVpWu2PxZI1eQm1DiDbunvmLez
+         Xjk56Zp7d48gGIKUn98s3TD9uQR1IVt6zbDBOtlF097wY0LaWLJ0547+uKrkBUdzow0P
+         Lz6p+B19A/LNyvf0eEhLC2trZ9yqtNsN1HqV0BbUVHzMVE+Z+yAkstK6kn6XGKwL0HSJ
+         mduw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679432558;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=7KdYKeJhs6BlAbgaUy8umwaslI0fUCE3dBqVeYeDGa4=;
-        b=Q8pnUb5p8QNob8kUSDJ94Rqe1+DMdX+o2btf+DJzo1fN29iEBDvwgKGWVXzonlxkU/
-         0s8A6Mz8DW7TogwnBj7/a/MrW1bCSMjsxirC1B1RBExfxRASq+9z2AUVD+fLGcXYfOjO
-         Udr51ScQnlIdIcRYoXkHKJZcInwVg28DfE4a++TUe7paGp7HZkgnM+w0zryeYq2OdXF3
-         J6T61RTpnGs5TKPtn0IHKtB+W2xGiF23+IFBiZYrPGmshstqSC+EgWmBzLuqOxdfs6ag
-         oo7DqDY8g+T5hFxaZaSAdulzWr0HXKkEKkDTo3642CfaJSnbC2L0iaTNWZ2/N2SRWOve
-         TnJg==
-X-Gm-Message-State: AAQBX9dMj4p16qP2KGV6EViE1BJrWVT8p15q6RhZcgVG0HSCr95xAr+J
-        pFQfmP+4m3TLKsV/1vTOD6rZW94R2EJgWohlMwYoyn25tw==
-X-Google-Smtp-Source: AKy350btW9WCm9AQmE3K1LLLcrTqOju2+M8P5TE4wmOswUXQ6vy6ttqgKH5L2NNJ1AHtqCpunxcZuuTWV1YXvemYS70=
-X-Received: by 2002:a05:6902:1208:b0:b6f:dcd:6cd2 with SMTP id
- s8-20020a056902120800b00b6f0dcd6cd2mr2154016ybu.10.1679432558494; Tue, 21 Mar
- 2023 14:02:38 -0700 (PDT)
-MIME-Version: 1.0
-References: <20230316222109.1940300-1-usama.arif@bytedance.com>
- <20230316222109.1940300-10-usama.arif@bytedance.com> <CAMzpN2jMyLP9h5o_wwdThHipAns2_dx3Nf8JYhj5pEqaeWXqYg@mail.gmail.com>
- <30efad7b8a5922cdaa48ab89a2dbaf425daf49a8.camel@infradead.org>
-In-Reply-To: <30efad7b8a5922cdaa48ab89a2dbaf425daf49a8.camel@infradead.org>
-From:   Brian Gerst <brgerst@gmail.com>
-Date:   Tue, 21 Mar 2023 17:02:27 -0400
-Message-ID: <CAMzpN2ijBZV0d+FjXpi8iP9rQ2gFgQ-9TtkZMB4xDizox1yW3g@mail.gmail.com>
-Subject: Re: [PATCH v15 09/12] x86/smpboot: Support parallel startup of
- secondary CPUs
-To:     David Woodhouse <dwmw2@infradead.org>
-Cc:     Usama Arif <usama.arif@bytedance.com>, tglx@linutronix.de,
-        kim.phillips@amd.com, piotrgorski@cachyos.org,
-        oleksandr@natalenko.name, arjan@linux.intel.com, mingo@redhat.com,
-        bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com,
-        x86@kernel.org, pbonzini@redhat.com, paulmck@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        rcu@vger.kernel.org, mimoja@mimoja.de, hewenliang4@huawei.com,
-        thomas.lendacky@amd.com, seanjc@google.com, pmenzel@molgen.mpg.de,
-        fam.zheng@bytedance.com, punit.agrawal@bytedance.com,
-        simon.evans@bytedance.com, liangma@liangbit.com,
-        gpiccoli@igalia.com
-Content-Type: text/plain; charset="UTF-8"
+        d=1e100.net; s=20210112; t=1679433687;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=b8xazSPFBreaTPvX2LxkUqMerX9ehkqQaqTTGvhOdbk=;
+        b=vCW1kvVOZuUWOyxDkKtzXhMc1Fm7FG8lzc3HJlfeJZvCsKOB/h0/ywUC5OfMtKqYUW
+         fQOOkE+F47vAQLYvsbSvDwwv2sgrW5btj9pamIqdZsG2EXzjBuwvFciN8yobePCXKYql
+         yGn7NhcB6wHZRTGYEu30F8+AnKg2RLS1j+C8X6xOIvpAg6lr/osuPQ2LUI5lr6w5kRTM
+         qIMw1CdcuGkz4PcUsoVMuV//ZZwWQzMb06MxnN2sy3V949kY5FI/NIpT47XVrDnYvUPc
+         j+4Q10Pq92xMIhYCtOuOg786RMf3//0dIyX6lTgnQF/MwE2NFRSPTr0DgpvlT2Jk1hxz
+         OC1w==
+X-Gm-Message-State: AO0yUKUmIIxJ5R6ux76Zvtq+IpBNFNJE34Q3qJgbb/LwlAO/0TekJGu+
+        XVRspuof17l33GdmLUMBBT1T3gACQ3g=
+X-Google-Smtp-Source: AK7set/wbYqwR7nGL/Fw3iPPQ6yW6+W1ThJ8mvAZRaF4HN8g0LlKHzXDpUJUX0TLfUlt14zWyvP1BrOiXf8=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:902:c404:b0:19f:29cf:3ed2 with SMTP id
+ k4-20020a170902c40400b0019f29cf3ed2mr244902plk.3.1679433687049; Tue, 21 Mar
+ 2023 14:21:27 -0700 (PDT)
+Date:   Tue, 21 Mar 2023 14:21:25 -0700
+In-Reply-To: <gsntedphdip9.fsf@coltonlewis-kvm.c.googlers.com>
+Mime-Version: 1.0
+References: <CAHVum0edWWs0cw6pTMFA_qnU++4qP=J88gyL6eSSYaLL-W9kxw@mail.gmail.com>
+ <gsntedphdip9.fsf@coltonlewis-kvm.c.googlers.com>
+Message-ID: <ZBof1SkJuo3wv3HW@google.com>
+Subject: Re: [PATCH v2 2/2] KVM: selftests: Print summary stats of memory
+ latency distribution
+From:   Sean Christopherson <seanjc@google.com>
+To:     Colton Lewis <coltonlewis@google.com>
+Cc:     Vipin Sharma <vipinsh@google.com>, pbonzini@redhat.com,
+        shuah@kernel.org, dmatlack@google.com, andrew.jones@linux.dev,
+        maz@kernel.org, bgardon@google.com, ricarkol@google.com,
+        oliver.upton@linux.dev, kvm@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
-        DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-        version=3.4.6
+X-Spam-Status: No, score=-7.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 21, 2023 at 3:12=E2=80=AFPM David Woodhouse <dwmw2@infradead.or=
-g> wrote:
->
-> On Tue, 2023-03-21 at 14:28 -0400, Brian Gerst wrote:
-> >
-> > > @@ -264,6 +318,14 @@ SYM_INNER_LABEL(secondary_startup_64_no_verify, =
-SYM_L_GLOBAL)
-> > >          lgdt    (%rsp)
-> > >          addq    $16, %rsp
-> > >
-> > > +       /* Drop the realmode protection. For the boot CPU the pointer=
- is NULL! */
-> > > +       movq    trampoline_lock(%rip), %rax
-> > > +       testq   %rax, %rax
-> > > +       jz      .Lsetup_data_segments
-> > > +       lock
-> > > +       btrl    $0, (%rax)
-> > > +
-> > > +.Lsetup_data_segments:
-> > >          /* set up data segments */
-> > >          xorl %eax,%eax
-> > >          movl %eax,%ds
-> >
-> > This can still go earlier, right after "movq TASK_threadsp(%rax),
-> > %rsp".  The GDT descriptor is placed on the idle thread stack, so it's
-> > safe to drop the lock before it.
->
->
-> --- a/arch/x86/kernel/head_64.S
-> +++ b/arch/x86/kernel/head_64.S
-> @@ -335,6 +335,17 @@ SYM_INNER_LABEL(secondary_startup_64_no_verify, SYM_=
-L_GLOBAL)
->         movq    pcpu_hot + X86_current_task(%rdx), %rax
->         movq    TASK_threadsp(%rax), %rsp
->
-> +       /*
-> +        * Now that this CPU is running on its own stack, drop the realmo=
-de
-> +        * protection. For the boot CPU the pointer is NULL!
-> +        */
-> +       movq    trampoline_lock(%rip), %rax
-> +       testq   %rax, %rax
-> +       jz      .Lsetup_gdt
-> +       lock
-> +       btrl    $0, (%rax)
-> +
-> +.Lsetup_gdt:
->         /*
->          * We must switch to a new descriptor in kernel space for the GDT
->          * because soon the kernel won't have access anymore to the users=
-pace
-> @@ -377,14 +388,6 @@ SYM_INNER_LABEL(secondary_startup_64_no_verify, SYM_=
-L_GLOBAL)
->         shrq    $32, %rdx
->         wrmsr
->
-> -       /* Drop the realmode protection. For the boot CPU the pointer is =
-NULL! */
-> -       movq    trampoline_lock(%rip), %rax
-> -       testq   %rax, %rax
-> -       jz      .Lsetup_idt
-> -       lock
-> -       btrl    $0, (%rax)
-> -
-> -.Lsetup_idt:
->         /* Setup and Load IDT */
->         pushq   %rsi
->         call    early_setup_idt
->
+On Tue, Mar 21, 2023, Colton Lewis wrote:
+> Vipin Sharma <vipinsh@google.com> writes:
+>=20
+> > On Thu, Mar 16, 2023 at 3:29=E2=80=AFPM Colton Lewis <coltonlewis@googl=
+e.com>
+> > wrote:
+> > > +       pr_info("Latency distribution (ns) =3D min:%6.0lf,
+> > > 50th:%6.0lf, 90th:%6.0lf, 99th:%6.0lf, max:%6.0lf\n",
+> > > +               cycles_to_ns(vcpus[0], (double)host_latency_samples[0=
+]),
+>=20
+> > I am not much aware of how tsc is set up and used. Will all vCPUs have
+> > the same tsc value? Can this change if vCPU gets scheduled to
+> > different pCPU on the host?
 
-Looks good, thanks.
+FWIW, if this test were run on older CPUs, there would be potential diverge=
+nce
+across pCPUs that would then bleed into vCPUs to some extent.  Older CPUs t=
+ied
+the TSC frequency to the core frequency, e.g. would change frequency depend=
+ing
+on the power/turbo state, and the TSC would even stop counting altogether a=
+t
+certain C-states.  KVM does its best to adjust the guest's perception of th=
+e TSC,
+but it can't be hidden completely.
+
+But for what this test is trying to do, IMO there's zero reason to worry ab=
+out
+that.
+=20
+> All vCPUs *in one VM* should have the same frequency. The alternative is
+> probably possible but so weird I can't imagine a reason for doing it.
+
+Somewhat related to Vipin's question, "host_latency_samples" is a confusing=
+ name.
+It's easy to miss that "host_latency_samples" are actually samples collecte=
+d in
+the guest, and thus to think that this code will depend on which pCPU it ru=
+ns on.
+
+I don't see any reason for such a verbose name, e.g. can't it just be "samp=
+les"?
