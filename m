@@ -2,81 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5581E6C3898
-	for <lists+kvm@lfdr.de>; Tue, 21 Mar 2023 18:49:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1758A6C38A6
+	for <lists+kvm@lfdr.de>; Tue, 21 Mar 2023 18:52:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230030AbjCURts (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Mar 2023 13:49:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43406 "EHLO
+        id S229657AbjCURw0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Mar 2023 13:52:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47714 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229496AbjCURtp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Mar 2023 13:49:45 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74B16DBCA
-        for <kvm@vger.kernel.org>; Tue, 21 Mar 2023 10:48:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1679420924;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=el/8FR11MSLB/EaEV+UrmVaTtTZHDQdY7hcD+HbWEAc=;
-        b=bKpWfug58qTj0cd0GY0cEy/AFugzVk1/Emh9yIwH6ZJ7gn1gZrWozdHt627BxpwHAG/7DY
-        yXP5RSppbjEadeFPnzu6+hbl2RdG2/e6ATCwkVSFOsBeqcGu1pPUkhiYjhtjimt453t7S+
-        4+KABZ7+03faYFm3qYkfGbcV+LmJaIo=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-600-2sEwNY6AM4WOIP2cKM0uFg-1; Tue, 21 Mar 2023 13:48:42 -0400
-X-MC-Unique: 2sEwNY6AM4WOIP2cKM0uFg-1
-Received: by mail-wm1-f69.google.com with SMTP id m27-20020a05600c3b1b00b003ee502f1b16so237408wms.9
-        for <kvm@vger.kernel.org>; Tue, 21 Mar 2023 10:48:42 -0700 (PDT)
+        with ESMTP id S229834AbjCURwY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Mar 2023 13:52:24 -0400
+Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4103C515FC
+        for <kvm@vger.kernel.org>; Tue, 21 Mar 2023 10:52:16 -0700 (PDT)
+Received: by mail-pf1-x44a.google.com with SMTP id b8-20020aa78708000000b005eaa50faa35so8105709pfo.20
+        for <kvm@vger.kernel.org>; Tue, 21 Mar 2023 10:52:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112; t=1679421136;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=oc4FgCEri3S+Q/rLlGwR1PDWQHAY0iPbQD6V77WfqXI=;
+        b=KK8os+s8Vk/xagM9igf2F6VD7beL5YkOexl/kpK1T6Xy78GupxHogOIqCIkVcuY382
+         GjIzuBeWtPgYdtYOwXk/TsQ/7vqUxDqU6e+rr0lwMgcAnO3/lK+ULLNkNqQ3jPc7PdK6
+         vh2wwwXqcBoVKL2QrHbP5msqhqHyIUgS6MTDkrcdZTzrXgAzfZ6LzHleV48J8JNQ/itv
+         bosJz4igyMa1OpVceDGjZSIZ/p34sME0YBfvD/tQQQwgSi6axIZtKyN/uUIHmAAZGzIB
+         mBavcPjXY68wHgJGA0uarBcwtulC0SI8RpwQNr/mGZM6x68mngMpGKoTo1EWhH+Teb+X
+         C3Ig==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679420921;
-        h=user-agent:in-reply-to:content-transfer-encoding
-         :content-disposition:mime-version:references:message-id:subject:cc
-         :to:from:date:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=el/8FR11MSLB/EaEV+UrmVaTtTZHDQdY7hcD+HbWEAc=;
-        b=SiGu3KbWX5Svw1DdHRxOZoP6Nbpbi/Qofb62W95usIjnisqD+i/Vje27tNoXaqwIiB
-         lrawvy7PqM8OUxWXLd3j+1le3YVYiDlMTaBZ8HYo/VXuhf0bd1hKs60slAk9We6cORai
-         IEWexk60BSYv4D+ynBhXHiEXJJP+hQu3W3YS2S7SRC3RGO2RaHbDvaT3egrucxHhkLcw
-         L1sm4rDvsJCqXGoJnCwufm+HJAPenWjs+xliUa4+AO5NHXwEUfd5k3+KKnoQBgfROHq2
-         rhTSNBT7CtPneEckoECXxTa1audhXPfS58+oeCKxqxhlfDi4/si3zglqlK92kKUBP2iJ
-         s1Jw==
-X-Gm-Message-State: AO0yUKUiPtSkQbmw6N6oeGlI+APou3y0e8qa1/K6k1L4UXwSY3vwKGmb
-        9VJ5ywb7ztNJc+sSONMJhC6MgO1kOEIbBSR4rOijTK+2wqt+KDkBXBBaRHjTEtc7jf7qdoHENK7
-        bd6ttCT20nIIx
-X-Received: by 2002:adf:e4c1:0:b0:2cf:4583:6335 with SMTP id v1-20020adfe4c1000000b002cf45836335mr2840886wrm.29.1679420921638;
-        Tue, 21 Mar 2023 10:48:41 -0700 (PDT)
-X-Google-Smtp-Source: AK7set9OOda5pv5UQz1phm2CNDWtqB9rsjhLqdMKwfCXvzHQEsETLuh6DP0BbmPolCqKTlKIo3zV0w==
-X-Received: by 2002:adf:e4c1:0:b0:2cf:4583:6335 with SMTP id v1-20020adfe4c1000000b002cf45836335mr2840872wrm.29.1679420921327;
-        Tue, 21 Mar 2023 10:48:41 -0700 (PDT)
-Received: from work-vm (ward-16-b2-v4wan-166627-cust863.vm18.cable.virginm.net. [81.97.203.96])
-        by smtp.gmail.com with ESMTPSA id q14-20020a05600000ce00b002be505ab59asm11799083wrx.97.2023.03.21.10.48.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Mar 2023 10:48:40 -0700 (PDT)
-Date:   Tue, 21 Mar 2023 17:48:38 +0000
-From:   "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To:     =?iso-8859-1?Q?J=F6rg_R=F6del?= <jroedel@suse.de>
-Cc:     James Bottomley <jejb@linux.ibm.com>, amd-sev-snp@lists.suse.com,
-        linux-coco@lists.linux.dev, kvm@vger.kernel.org
-Subject: Re: [ANNOUNCEMENT] COCONUT Secure VM Service Module for SEV-SNP
-Message-ID: <ZBnt9pbSfp/v1bWO@work-vm>
-References: <ZBl4592947wC7WKI@suse.de>
- <66eee693371c11bbd2173ad5d91afc740aa17b46.camel@linux.ibm.com>
- <ZBmmjlNdBwVju6ib@suse.de>
- <c2e8af835723c453adaba4b66db533a158076bbf.camel@linux.ibm.com>
- <ZBnJ6ZCuQJTVMM8h@suse.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <ZBnJ6ZCuQJTVMM8h@suse.de>
-User-Agent: Mutt/2.2.9 (2022-11-12)
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        d=1e100.net; s=20210112; t=1679421136;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=oc4FgCEri3S+Q/rLlGwR1PDWQHAY0iPbQD6V77WfqXI=;
+        b=vHDtbjnmWtJswGxsMONADRzgmCCnjppKE2cHCDWTiw2t3ncAIC1cUcKNyFSpC0yvso
+         AnGm/wx25XrQkowLOi1FoJJH13U+In7adCODQJT0lWZ6Zt6pBzOnt4sKWP35zskF6a6R
+         S8Pi+591Ea7RdpdobVUWMocQXGsy2CjS3BLuVhi3dqgg+KiwDStSmPn83GpvHmV3HsWG
+         JKphimNvvhspcoiUaKSUx67ZW1symXYOkmwngXSIE14PKjA3qewKAZdBCQC6cVKRIp5Q
+         7iqCJmuGs0ySWYc/WWGqytKvDHQKjd2Y+c+ogeJgUPzLVVUiKLm3IVd5Xsi0B8WKr9Un
+         n76w==
+X-Gm-Message-State: AO0yUKWkii/SafLxdxBKAniuejMoRLsljppKL4D0+M6fPks83AoREh67
+        mr42itqpmLsSEQWSXnjGwRcAzVgFlCU=
+X-Google-Smtp-Source: AK7set/2BmqZEOOc+PywTXtMotI9ShLno9e2Em5LlhM8/j+VVlLg9kuotBlFzxBwGIuQQO4GbUhu13i144A=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:902:ef86:b0:1a1:e48b:98b8 with SMTP id
+ iz6-20020a170902ef8600b001a1e48b98b8mr1001583plb.10.1679421135869; Tue, 21
+ Mar 2023 10:52:15 -0700 (PDT)
+Date:   Tue, 21 Mar 2023 10:52:14 -0700
+In-Reply-To: <20230119141946.585610-2-yu.c.zhang@linux.intel.com>
+Mime-Version: 1.0
+References: <20230119141946.585610-1-yu.c.zhang@linux.intel.com> <20230119141946.585610-2-yu.c.zhang@linux.intel.com>
+Message-ID: <ZBnuzoWuwAPoy0+N@google.com>
+Subject: Re: [PATCH v2 2/2] KVM: nVMX: Add helpers to setup VMX control msr configs
+From:   Sean Christopherson <seanjc@google.com>
+To:     Yu Zhang <yu.c.zhang@linux.intel.com>
+Cc:     pbonzini@redhat.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -84,60 +66,83 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-* Jörg Rödel (jroedel@suse.de) wrote:
-> On Tue, Mar 21, 2023 at 09:43:48AM -0400, James Bottomley wrote:
-> > Could you describe these incompatible goals and explain why you think
-> > they are incompatible (as in why you and AMD don't think you can agree
-> > on it)?  That would help the rest of us understand where the two SVSM
-> > implementations fit in our ongoing plans.
+On Thu, Jan 19, 2023, Yu Zhang wrote:
+> nested_vmx_setup_ctls_msrs() is used to set up the various VMX MSR
+> controls for nested VMX. But it is a bit lengthy, just add helpers
+> to setup the configuration of VMX MSRs.
 > 
-> The goal of COCONUT is to have an SVSM which has isolation capabilities
-> within itself. It already has percpu page-tables and in the end it will
-> be able to run services (like the TPM) as separate processes in ring 3
-> using cooperative multitasking.
+> Suggested-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Yu Zhang <yu.c.zhang@linux.intel.com>
+> ---
+>  arch/x86/kvm/vmx/nested.c | 129 +++++++++++++++++++++++++-------------
+>  1 file changed, 85 insertions(+), 44 deletions(-)
 > 
-> With the current linux-svsm code-base this is difficult to achieve due
-> to its reliance on the x86-64 crate. For supporting a user-space like
-> execution mode the crate has too many limitations, mainly in its
-> page-table and IDT implementations.
-> 
-> The IDT code from that crate, which is also used in linux-svsm, relies
-> on compiler-generated entry-code. This is not enough to support a
-> ring-3 execution mode with syscalls and several (possibly nested) IST
-> vectors. The next problem with the IDT code is that it doesn't allow
-> modification of return register state.  This makes it impossible to
-> implement exception fixups to guard RMPADJUST instructions and VMPL1
-> memory accesses in general.
+> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> index 81dfbffae575..98ed7631e810 100644
+> --- a/arch/x86/kvm/vmx/nested.c
+> +++ b/arch/x86/kvm/vmx/nested.c
+> @@ -6750,36 +6750,9 @@ static u64 nested_vmx_calc_vmcs_enum_msr(void)
+>  	return (u64)max_idx << VMCS_FIELD_INDEX_SHIFT;
+>  }
+>  
+> -/*
+> - * nested_vmx_setup_ctls_msrs() sets up variables containing the values to be
+> - * returned for the various VMX controls MSRs when nested VMX is enabled.
+> - * The same values should also be used to verify that vmcs12 control fields are
+> - * valid during nested entry from L1 to L2.
+> - * Each of these control msrs has a low and high 32-bit half: A low bit is on
+> - * if the corresponding bit in the (32-bit) control field *must* be on, and a
+> - * bit in the high half is on if the corresponding bit in the control field
+> - * may be on. See also vmx_control_verify().
+> - */
+> -void nested_vmx_setup_ctls_msrs(struct vmcs_config *vmcs_conf, u32 ept_caps)
+> +static inline void nested_vmx_setup_pinbased_ctls(struct vmcs_config *vmcs_conf,
 
-I'm curious why you're doing isolation using ring-3 stuff rather than
-another VMPL level?
+No need for the "inline", this isn't performance sensitive code, and odds are very,
+very good the compiler will inline the code anyways.
 
-Dave
+> @@ -6953,13 +6943,16 @@ void nested_vmx_setup_ctls_msrs(struct vmcs_config *vmcs_conf, u32 ept_caps)
+>  		VMX_MISC_ACTIVITY_HLT |
+>  		VMX_MISC_ACTIVITY_WAIT_SIPI;
+>  	msrs->misc_high = 0;
+> +}
+>  
+> -	/*
+> -	 * This MSR reports some information about VMX support. We
+> -	 * should return information about the VMX we emulate for the
+> -	 * guest, and the VMCS structure we give it - not about the
+> -	 * VMX support of the underlying hardware.
+> -	 */
+> +/*
+> + * VMX basic MSR reports some information about VMX support. We should
+> + * return information about the VMX we emulate for the guest, and the
+> + * VMCS structure we give it - not about the VMX support of the underlying
+> + * hardware.
+> + */
+> +static inline void nested_vmx_setup_basic(struct nested_vmx_msrs *msrs)
+> +{
+>  	msrs->basic =
+>  		VMCS12_REVISION |
+>  		VMX_BASIC_TRUE_CTLS |
+> @@ -6968,12 +6961,15 @@ void nested_vmx_setup_ctls_msrs(struct vmcs_config *vmcs_conf, u32 ept_caps)
+>  
+>  	if (cpu_has_vmx_basic_inout())
+>  		msrs->basic |= VMX_BASIC_INOUT;
+> +}
+>  
+> -	/*
+> -	 * These MSRs specify bits which the guest must keep fixed on
+> -	 * while L1 is in VMXON mode (in L1's root mode, or running an L2).
+> -	 * We picked the standard core2 setting.
+> -	 */
+> +/*
+> + * cr0_fixed & cr4_fixed MSRs specify bits which the guest must keep fixed
+> + * on while L1 is in VMXON mode (in L1's root mode, or running an L2).
+> + * We picked the standard core2 setting.
+> + */
 
-> When we looked at the crate, the page-table implementation supported
-> basically a direct and an offset mapping, which will get us into
-> problems when support for non-contiguous mappings or sharing parts of a
-> page-table with another page-table is needed. So in the very beginning
-> of the project I decided to go with my own page-table implementation.
-> 
-> Of course we could start changing linux-svsm to support the same goals,
-> but I think the end result will not be very different from what COCONUT
-> looks now.
-> 
-> Regards,
-> 
-> -- 
-> Jörg Rödel
-> jroedel@suse.de
-> 
-> SUSE Software Solutions Germany GmbH
-> Frankenstraße 146
-> 90461 Nürnberg
-> Germany
-> 
-> (HRB 36809, AG Nürnberg)
-> Geschäftsführer: Ivo Totev, Andrew Myers, Andrew McDonald, Boudien Moerman
-> 
--- 
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+This change is flawed, the comment is specific to the fixed0 MSRs, not to all
+flavors of fixed MSRs and thus not to the function as a whole.  As much as I want
+to clean up the comments, for this patch I think it's best to leave them alone.
 
+No need to send a v2, I'll fixup when applying.
