@@ -2,92 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 39E656C31B9
-	for <lists+kvm@lfdr.de>; Tue, 21 Mar 2023 13:30:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 15F706C31FD
+	for <lists+kvm@lfdr.de>; Tue, 21 Mar 2023 13:46:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230274AbjCUMaz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Mar 2023 08:30:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54706 "EHLO
+        id S230463AbjCUMqC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Mar 2023 08:46:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46442 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229524AbjCUMax (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Mar 2023 08:30:53 -0400
-Received: from xry111.site (xry111.site [IPv6:2001:470:683e::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F8BE211FF;
-        Tue, 21 Mar 2023 05:30:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=xry111.site;
-        s=default; t=1679401840;
-        bh=RIk1bW9UJ1N6hwpsv3iiYyeLz4E5i4Xo2Z7MHEEpqjw=;
-        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-        b=UrurL81bAtGJJ3vZF1m5JCqI4EOjAq6EMSwanOFS3UJhoPWGXuutALltE8o6kYvFf
-         KwIZslmJw9bw6RTmF+BlYodHgJPXwEd/QnWwXEeW33vnD7oE3xdEri+bAtmbZLWbcq
-         wvc+BcyytHLH0o7Y5nGdQySA2P/RCTJsMd3qMBLc=
-Received: from localhost.localdomain (xry111.site [IPv6:2001:470:683e::1])
+        with ESMTP id S229992AbjCUMp6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Mar 2023 08:45:58 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C27C39CDA
+        for <kvm@vger.kernel.org>; Tue, 21 Mar 2023 05:45:16 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature ECDSA (P-384) server-digest SHA384)
-        (Client did not present a certificate)
-        (Authenticated sender: xry111@xry111.site)
-        by xry111.site (Postfix) with ESMTPSA id F2CD46633A;
-        Tue, 21 Mar 2023 08:30:37 -0400 (EDT)
-Message-ID: <75f843b2780fc3c3dcc1d0d8f78f2b955956316b.camel@xry111.site>
-Subject: Re: [PATCH v4 05/29] LoongArch: KVM: Add vcpu related header files
-From:   Xi Ruoyao <xry111@xry111.site>
-To:     Tianrui Zhao <zhaotianrui@loongson.cn>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Huacai Chen <chenhuacai@kernel.org>,
-        WANG Xuerui <kernel@xen0n.name>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        loongarch@lists.linux.dev, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Mark Brown <broonie@kernel.org>,
-        Alex Deucher <alexander.deucher@amd.com>,
-        Oliver Upton <oliver.upton@linux.dev>, maobibo@loongson.cn
-Date:   Tue, 21 Mar 2023 20:30:36 +0800
-In-Reply-To: <20230321035651.598505-6-zhaotianrui@loongson.cn>
-References: <20230321035651.598505-1-zhaotianrui@loongson.cn>
-         <20230321035651.598505-6-zhaotianrui@loongson.cn>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4 
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 7D8582000D;
+        Tue, 21 Mar 2023 12:44:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1679402640; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=L+7qSU8PTZ7jb1QFaGzVCG7WQ11iWdZECtfo29qI5vI=;
+        b=dXudV0HgmOUDu0xMnbKEAgdDSpOJniYolzdcHftM2zWGzoSnrI2UiM8mL7EPcEOa9FT3b7
+        O8rg1AbUJ7AdpmngqScZvj9CCtywT+8XiZLFIgxpUwLyLdw6+ciDv8G6m2rRAyVz1WbmMZ
+        7IsMQ8mmTEK++BmKuyUI8HfGo4KdLmM=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1679402640;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=L+7qSU8PTZ7jb1QFaGzVCG7WQ11iWdZECtfo29qI5vI=;
+        b=tMhnkDDf8+E2ELrKJQwRowhJRRwOTCyQ3hXVGXpOldVY6gCE+/0Cz/RwpCn+v8tefuMlq5
+        74hocgPcTbtAYpBw==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 532F513440;
+        Tue, 21 Mar 2023 12:44:00 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id dDzeEpCmGWQeYgAAMHmgww
+        (envelope-from <jroedel@suse.de>); Tue, 21 Mar 2023 12:44:00 +0000
+Date:   Tue, 21 Mar 2023 13:43:58 +0100
+From:   =?iso-8859-1?Q?J=F6rg_R=F6del?= <jroedel@suse.de>
+To:     James Bottomley <jejb@linux.ibm.com>
+Cc:     amd-sev-snp@lists.suse.com, linux-coco@lists.linux.dev,
+        kvm@vger.kernel.org
+Subject: Re: [ANNOUNCEMENT] COCONUT Secure VM Service Module for SEV-SNP
+Message-ID: <ZBmmjlNdBwVju6ib@suse.de>
+References: <ZBl4592947wC7WKI@suse.de>
+ <66eee693371c11bbd2173ad5d91afc740aa17b46.camel@linux.ibm.com>
 MIME-Version: 1.0
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS,
-        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <66eee693371c11bbd2173ad5d91afc740aa17b46.camel@linux.ibm.com>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2023-03-21 at 11:56 +0800, Tianrui Zhao wrote:
-> +/* Tracepoints for VM exits */
-> +#define kvm_trace_symbol_exit_types=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0\
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0({ KVM_TRACE_EXIT_IDLE,=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0"IDLE" },=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0\
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0{ KVM_TRACE_EXIT_CACHE,=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0"CACHE" },=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0\
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0{ KVM_TRACE_EXIT_SIGNAL,=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0"Signal" })
+Hi James,
 
-Looks like there shouldn't be "(" and ")".
+On Tue, Mar 21, 2023 at 07:09:40AM -0400, James Bottomley wrote:
+> Since this a fork of the AMD svsm code
+> (https://github.com/AMDESE/linux-svsm/), is it intended to be a
+> permanent fork, or are you going to be submitting your additions back
+> upstream like we're trying to do for our initial vTPM prototype?  From
+> the community point of view, having two different SVSM code bases and
+> having to choose which one to develop against is going to be very
+> confusing ...
 
-> +#define kvm_trace_symbol_aux_op				\
-> +	({ KVM_TRACE_AUX_RESTORE,	"restore" },	\
-> +	{ KVM_TRACE_AUX_SAVE,		"save" },	\
-> +	{ KVM_TRACE_AUX_ENABLE,		"enable" },	\
-> +	{ KVM_TRACE_AUX_DISABLE,	"disable" },	\
-> +	{ KVM_TRACE_AUX_DISCARD,	"discard" })
+The COCONUT-SVSM was and is a separate project and not a fork of AMDs
+linux-svsm. Some code was ported from our code-base to linux-svsm in the
+past, namely the SpinLock implementation and the memory allocators.
 
-Likewise.
+What the project also shares with linux-svsm is the support code in the
+Linux kernel (host and guest) and the EDK2 changes needed to launch an
+SVSM.
 
-See the test robot report, and https://godbolt.org/z/bE8q97z1o.
+But besides that the two code-bases are different, using a different
+build approach and different launch protocol. The goals we have with our
+SVSM are hard to achieve with the linux-svsm code-base, so a merge does
+not make sense at this point.
 
-The lesson: if a text book claims "you should always wrap the content of
-a macro in ( ... )", we should burn it in the fire! :)
+Regards,
 
---=20
-Xi Ruoyao <xry111@xry111.site>
-School of Aerospace Science and Technology, Xidian University
+-- 
+Jörg Rödel
+jroedel@suse.de
+
+SUSE Software Solutions Germany GmbH
+Frankenstraße 146
+90461 Nürnberg
+Germany
+
+(HRB 36809, AG Nürnberg)
+Geschäftsführer: Ivo Totev, Andrew Myers, Andrew McDonald, Boudien Moerman
+
