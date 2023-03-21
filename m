@@ -2,130 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C63EE6C325A
-	for <lists+kvm@lfdr.de>; Tue, 21 Mar 2023 14:11:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5DA626C3275
+	for <lists+kvm@lfdr.de>; Tue, 21 Mar 2023 14:18:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229958AbjCUNLQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Mar 2023 09:11:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49340 "EHLO
+        id S229866AbjCUNSx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Mar 2023 09:18:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58952 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229744AbjCUNLO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Mar 2023 09:11:14 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68CE62D75
-        for <kvm@vger.kernel.org>; Tue, 21 Mar 2023 06:10:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1679404228;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=LHioC2Bz+LhXLt/kWCD/RKd45AYTVWaKEiEQ85K6IJk=;
-        b=hg3F0gFqQL1PcWZPBBqrA0iHsDKVvjoMZifHK9qS/sUF5fRltR2NiaNGW7Umm45ntr3UN+
-        DKDGOivJa4UssP2F+3wdAiqPnhviPYIM4HV7uQdY1pzDTRXDZWCklky1idg5oxznXWZKpi
-        nWMwLcR3UM4VtdIKNEAcMwwhd0NaphE=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-297-gQg3QGrOOUS7pjercg99cw-1; Tue, 21 Mar 2023 09:10:26 -0400
-X-MC-Unique: gQg3QGrOOUS7pjercg99cw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id BC75A96DC85;
-        Tue, 21 Mar 2023 13:10:25 +0000 (UTC)
-Received: from localhost (unknown [10.39.193.206])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 56696140E95F;
-        Tue, 21 Mar 2023 13:10:25 +0000 (UTC)
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     "Michael S. Tsirkin" <mst@redhat.com>,
-        Viktor Prutyanov <viktor@daynix.com>
-Cc:     Jason Wang <jasowang@redhat.com>, pasic@linux.ibm.com,
-        farman@linux.ibm.com, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        linux-kernel@vger.kernel.org, yan@daynix.com
-Subject: Re: [PATCH v2] virtio: add VIRTIO_F_NOTIFICATION_DATA feature support
-In-Reply-To: <20230321050719-mutt-send-email-mst@kernel.org>
-Organization: Red Hat GmbH
-References: <20230320232115.1940587-1-viktor@daynix.com>
- <CACGkMEu5qa2KUHti3w59DcXNxBdh8_ogZ9oW9bo1_PHwbNiCBg@mail.gmail.com>
- <CAPv0NP5wTMG=3kT_FX4xi9kGbX0Dah4qTQfFQPutWYsWvK1i-g@mail.gmail.com>
- <20230321050719-mutt-send-email-mst@kernel.org>
-User-Agent: Notmuch/0.37 (https://notmuchmail.org)
-Date:   Tue, 21 Mar 2023 14:10:23 +0100
-Message-ID: <87jzzamerk.fsf@redhat.com>
+        with ESMTP id S230296AbjCUNSu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Mar 2023 09:18:50 -0400
+Received: from raptorengineering.com (mail.raptorengineering.com [23.155.224.40])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A8691FED
+        for <kvm@vger.kernel.org>; Tue, 21 Mar 2023 06:18:22 -0700 (PDT)
+Received: from localhost (localhost [127.0.0.1])
+        by mail.rptsys.com (Postfix) with ESMTP id 77A6D37E3D7EC2;
+        Tue, 21 Mar 2023 08:18:08 -0500 (CDT)
+Received: from mail.rptsys.com ([127.0.0.1])
+        by localhost (vali.starlink.edu [127.0.0.1]) (amavisd-new, port 10032)
+        with ESMTP id q9EhFVho0S_M; Tue, 21 Mar 2023 08:18:07 -0500 (CDT)
+Received: from localhost (localhost [127.0.0.1])
+        by mail.rptsys.com (Postfix) with ESMTP id 0B1E437E3D7EBF;
+        Tue, 21 Mar 2023 08:18:07 -0500 (CDT)
+DKIM-Filter: OpenDKIM Filter v2.10.3 mail.rptsys.com 0B1E437E3D7EBF
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=raptorengineering.com; s=B8E824E6-0BE2-11E6-931D-288C65937AAD;
+        t=1679404687; bh=d+KfiuQw+r2aVQd5zwPmHFR3Xq9EQlwdzvw0iuxwCG4=;
+        h=Date:From:To:Message-ID:MIME-Version;
+        b=c/ZTxiCCMknCafA7ZPWQI/z6h+SoBvkaLqQPimZ+26pdDlJkF/qxnIQtGBQmwAYfZ
+         fjEH9UwX+XRsdRe1D+7cL5FwT3a9nJmVJ1wleLFUzG31rHR6l7b+UsXJmONa1rCfTM
+         JwuZtTh7yI47N5Lt6OCMvA4PkKq+p6iKKGaf7sY8=
+X-Virus-Scanned: amavisd-new at rptsys.com
+Received: from mail.rptsys.com ([127.0.0.1])
+        by localhost (vali.starlink.edu [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id F938flSUgb61; Tue, 21 Mar 2023 08:18:06 -0500 (CDT)
+Received: from vali.starlink.edu (localhost [127.0.0.1])
+        by mail.rptsys.com (Postfix) with ESMTP id D899E37E3D7EBC;
+        Tue, 21 Mar 2023 08:18:06 -0500 (CDT)
+Date:   Tue, 21 Mar 2023 08:18:05 -0500 (CDT)
+From:   Timothy Pearson <tpearson@raptorengineering.com>
+To:     Michael Ellerman <mpe@ellerman.id.au>
+Cc:     Timothy Pearson <tpearson@raptorengineering.com>,
+        kvm <kvm@vger.kernel.org>,
+        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>
+Message-ID: <1328231683.26510466.1679404685113.JavaMail.zimbra@raptorengineeringinc.com>
+In-Reply-To: <877cvav1ey.fsf@mpe.ellerman.id.au>
+References: <8398361.16996856.1678123793664.JavaMail.zimbra@raptorengineeringinc.com> <87bkl2ywz2.fsf@mpe.ellerman.id.au> <1816556668.17777469.1678390100763.JavaMail.zimbra@raptorengineeringinc.com> <2099448392.25626899.1679166370571.JavaMail.zimbra@raptorengineeringinc.com> <877cvav1ey.fsf@mpe.ellerman.id.au>
+Subject: Re: [PATCH v2 0/4] Reenable VFIO support on POWER systems
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 7bit
+X-Mailer: Zimbra 8.5.0_GA_3042 (ZimbraWebClient - GC111 (Linux)/8.5.0_GA_3042)
+Thread-Topic: Reenable VFIO support on POWER systems
+Thread-Index: u+SAJfydOwJ5efzlqhkmEisVoqlIvg==
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS,
+        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 21 2023, "Michael S. Tsirkin" <mst@redhat.com> wrote:
 
-> On Tue, Mar 21, 2023 at 12:00:42PM +0300, Viktor Prutyanov wrote:
->> On Tue, Mar 21, 2023 at 5:29=E2=80=AFAM Jason Wang <jasowang@redhat.com>=
- wrote:
->> >
->> > On Tue, Mar 21, 2023 at 7:21=E2=80=AFAM Viktor Prutyanov <viktor@dayni=
-x.com> wrote:
->> > >
->> > > According to VirtIO spec v1.2, VIRTIO_F_NOTIFICATION_DATA feature
->> > > indicates that the driver passes extra data along with the queue
->> > > notifications.
->> > >
->> > > In a split queue case, the extra data is 16-bit available index. In a
->> > > packed queue case, the extra data is 1-bit wrap counter and 15-bit
->> > > available index.
->> > >
->> > > Add support for this feature for MMIO and PCI transports. Channel I/O
->> > > transport will not accept this feature.
->> > >
->> > > Signed-off-by: Viktor Prutyanov <viktor@daynix.com>
->> > > ---
->> > >
->> > >  v2: reject the feature in virtio_ccw, replace __le32 with u32
->> > >
->> > >  drivers/s390/virtio/virtio_ccw.c   |  4 +---
->> > >  drivers/virtio/virtio_mmio.c       | 15 ++++++++++++++-
->> > >  drivers/virtio/virtio_pci_common.c | 10 ++++++++++
->> > >  drivers/virtio/virtio_pci_common.h |  4 ++++
->> > >  drivers/virtio/virtio_pci_legacy.c |  2 +-
->> > >  drivers/virtio/virtio_pci_modern.c |  2 +-
->> > >  drivers/virtio/virtio_ring.c       | 17 +++++++++++++++++
->> > >  include/linux/virtio_ring.h        |  2 ++
->> > >  include/uapi/linux/virtio_config.h |  6 ++++++
->> > >  9 files changed, 56 insertions(+), 6 deletions(-)
->> > >
->> > > diff --git a/drivers/s390/virtio/virtio_ccw.c b/drivers/s390/virtio/=
-virtio_ccw.c
->> > > index a10dbe632ef9..d72a59415527 100644
->> > > --- a/drivers/s390/virtio/virtio_ccw.c
->> > > +++ b/drivers/s390/virtio/virtio_ccw.c
->> > > @@ -789,9 +789,7 @@ static u64 virtio_ccw_get_features(struct virtio=
-_device *vdev)
->> > >
->> > >  static void ccw_transport_features(struct virtio_device *vdev)
->> > >  {
->> > > -       /*
->> > > -        * Currently nothing to do here.
->> > > -        */
->> > > +       __virtio_clear_bit(vdev, VIRTIO_F_NOTIFICATION_DATA);
->> >
->> > Is there any restriction that prevents us from implementing
->> > VIRTIO_F_NOTIFICATION_DATA? (Spec seems doesn't limit us from this)
->>=20
->> Most likely, nothing.
->
-> So pls code it up. It's the same format.
 
-FWIW, the notification data needs to go via the third parameter of
-kvm_hypercall3() in virtio_ccw_kvm_notify().
+----- Original Message -----
+> From: "Michael Ellerman" <mpe@ellerman.id.au>
+> To: "Timothy Pearson" <tpearson@raptorengineering.com>, "Timothy Pearson" <tpearson@raptorengineering.com>
+> Cc: "kvm" <kvm@vger.kernel.org>, "linuxppc-dev" <linuxppc-dev@lists.ozlabs.org>
+> Sent: Tuesday, March 21, 2023 5:33:57 AM
+> Subject: Re: [PATCH v2 0/4] Reenable VFIO support on POWER systems
 
+> Timothy Pearson <tpearson@raptorengineering.com> writes:
+>> ----- Original Message -----
+>>> From: "Timothy Pearson" <tpearson@raptorengineering.com>
+>>> To: "Michael Ellerman" <mpe@ellerman.id.au>
+>>> Cc: "Timothy Pearson" <tpearson@raptorengineering.com>, "kvm"
+>>> <kvm@vger.kernel.org>, "linuxppc-dev"
+>>> <linuxppc-dev@lists.ozlabs.org>
+>>> Sent: Thursday, March 9, 2023 1:28:20 PM
+>>> Subject: Re: [PATCH v2 0/4] Reenable VFIO support on POWER systems
+>>
+>>> ----- Original Message -----
+>>>> From: "Michael Ellerman" <mpe@ellerman.id.au>
+>>>> To: "Timothy Pearson" <tpearson@raptorengineering.com>, "kvm"
+>>>> <kvm@vger.kernel.org>
+>>>> Cc: "linuxppc-dev" <linuxppc-dev@lists.ozlabs.org>
+>>>> Sent: Thursday, March 9, 2023 5:40:01 AM
+>>>> Subject: Re: [PATCH v2 0/4] Reenable VFIO support on POWER systems
+>>> 
+>>>> Timothy Pearson <tpearson@raptorengineering.com> writes:
+>>>>> This patch series reenables VFIO support on POWER systems.  It
+>>>>> is based on Alexey Kardashevskiys's patch series, rebased and
+>>>>> successfully tested under QEMU with a Marvell PCIe SATA controller
+>>>>> on a POWER9 Blackbird host.
+>>>>>
+>>>>> Alexey Kardashevskiy (3):
+>>>>>   powerpc/iommu: Add "borrowing" iommu_table_group_ops
+>>>>>   powerpc/pci_64: Init pcibios subsys a bit later
+>>>>>   powerpc/iommu: Add iommu_ops to report capabilities and allow blocking
+>>>>>     domains
+>>>> 
+>>>> As sent the patches had lost Alexey's authorship (no From: line), I
+>>>> fixed it up when applying so the first 3 are authored by Alexey.
+>>>> 
+>>>> cheers
+>>> 
+>>> Thanks for catching that, it wasn't intentional.  Probably used a wrong Git
+>>> command...
+>>
+>> Just wanted to touch base on the patches, since they're still listed as Under
+>> Review on patchwork.  Are we good to go for the 6.4 merge window?
+> 
+> They've been in my next (and so linux-next), since last week. I just
+> haven't updated patchwork yet.
+> 
+> So yeah they are on track to go into mainline during the v6.4 merge window.
+> 
+> cheers
+
+Sounds great, thanks!  Saw them in the next tree but wasn't sure if the patchwork status was more reflective of overall status.
