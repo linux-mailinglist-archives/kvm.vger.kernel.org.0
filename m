@@ -2,63 +2,77 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1758A6C38A6
-	for <lists+kvm@lfdr.de>; Tue, 21 Mar 2023 18:52:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6B36D6C38B5
+	for <lists+kvm@lfdr.de>; Tue, 21 Mar 2023 18:56:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229657AbjCURw0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Mar 2023 13:52:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47714 "EHLO
+        id S230221AbjCUR4C (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Mar 2023 13:56:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51002 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229834AbjCURwY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Mar 2023 13:52:24 -0400
-Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4103C515FC
-        for <kvm@vger.kernel.org>; Tue, 21 Mar 2023 10:52:16 -0700 (PDT)
-Received: by mail-pf1-x44a.google.com with SMTP id b8-20020aa78708000000b005eaa50faa35so8105709pfo.20
-        for <kvm@vger.kernel.org>; Tue, 21 Mar 2023 10:52:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1679421136;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=oc4FgCEri3S+Q/rLlGwR1PDWQHAY0iPbQD6V77WfqXI=;
-        b=KK8os+s8Vk/xagM9igf2F6VD7beL5YkOexl/kpK1T6Xy78GupxHogOIqCIkVcuY382
-         GjIzuBeWtPgYdtYOwXk/TsQ/7vqUxDqU6e+rr0lwMgcAnO3/lK+ULLNkNqQ3jPc7PdK6
-         vh2wwwXqcBoVKL2QrHbP5msqhqHyIUgS6MTDkrcdZTzrXgAzfZ6LzHleV48J8JNQ/itv
-         bosJz4igyMa1OpVceDGjZSIZ/p34sME0YBfvD/tQQQwgSi6axIZtKyN/uUIHmAAZGzIB
-         mBavcPjXY68wHgJGA0uarBcwtulC0SI8RpwQNr/mGZM6x68mngMpGKoTo1EWhH+Teb+X
-         C3Ig==
+        with ESMTP id S230224AbjCURzz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Mar 2023 13:55:55 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B0D2515FC
+        for <kvm@vger.kernel.org>; Tue, 21 Mar 2023 10:55:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1679421304;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=6OO5ZIxJDvOympMMqka+XvitUlu/HzW9BC/npWTX1zg=;
+        b=eN1uR2+4YKxvJL1m89Tm/sgvxCyl/I0XytRgaiJPN6CQzFrDgIn//qCoPZgN99JvlWAL7m
+        Nk16K3HcX4EUAKaV62lGkwlZDaT7usIXjtChfg5WsYDODvIcQM8qtnOFdAN+SdeHnjf4/F
+        IHGxYnmA/eU38p3mhqqzqnLWNFm5Zqw=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-441-6Zas8NflPfSSKXoaMlTGPA-1; Tue, 21 Mar 2023 13:55:01 -0400
+X-MC-Unique: 6Zas8NflPfSSKXoaMlTGPA-1
+Received: by mail-wm1-f69.google.com with SMTP id ay12-20020a05600c1e0c00b003ed201dcf71so7460742wmb.4
+        for <kvm@vger.kernel.org>; Tue, 21 Mar 2023 10:55:01 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679421136;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=oc4FgCEri3S+Q/rLlGwR1PDWQHAY0iPbQD6V77WfqXI=;
-        b=vHDtbjnmWtJswGxsMONADRzgmCCnjppKE2cHCDWTiw2t3ncAIC1cUcKNyFSpC0yvso
-         AnGm/wx25XrQkowLOi1FoJJH13U+In7adCODQJT0lWZ6Zt6pBzOnt4sKWP35zskF6a6R
-         S8Pi+591Ea7RdpdobVUWMocQXGsy2CjS3BLuVhi3dqgg+KiwDStSmPn83GpvHmV3HsWG
-         JKphimNvvhspcoiUaKSUx67ZW1symXYOkmwngXSIE14PKjA3qewKAZdBCQC6cVKRIp5Q
-         7iqCJmuGs0ySWYc/WWGqytKvDHQKjd2Y+c+ogeJgUPzLVVUiKLm3IVd5Xsi0B8WKr9Un
-         n76w==
-X-Gm-Message-State: AO0yUKWkii/SafLxdxBKAniuejMoRLsljppKL4D0+M6fPks83AoREh67
-        mr42itqpmLsSEQWSXnjGwRcAzVgFlCU=
-X-Google-Smtp-Source: AK7set/2BmqZEOOc+PywTXtMotI9ShLno9e2Em5LlhM8/j+VVlLg9kuotBlFzxBwGIuQQO4GbUhu13i144A=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:ef86:b0:1a1:e48b:98b8 with SMTP id
- iz6-20020a170902ef8600b001a1e48b98b8mr1001583plb.10.1679421135869; Tue, 21
- Mar 2023 10:52:15 -0700 (PDT)
-Date:   Tue, 21 Mar 2023 10:52:14 -0700
-In-Reply-To: <20230119141946.585610-2-yu.c.zhang@linux.intel.com>
-Mime-Version: 1.0
-References: <20230119141946.585610-1-yu.c.zhang@linux.intel.com> <20230119141946.585610-2-yu.c.zhang@linux.intel.com>
-Message-ID: <ZBnuzoWuwAPoy0+N@google.com>
-Subject: Re: [PATCH v2 2/2] KVM: nVMX: Add helpers to setup VMX control msr configs
-From:   Sean Christopherson <seanjc@google.com>
-To:     Yu Zhang <yu.c.zhang@linux.intel.com>
-Cc:     pbonzini@redhat.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        d=1e100.net; s=20210112; t=1679421300;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6OO5ZIxJDvOympMMqka+XvitUlu/HzW9BC/npWTX1zg=;
+        b=XM84xuGbRujxlp61xa+YVQh1aiNHnEImM/uoeUIx0csZ/r8K5wp6xLYxwswwHricBS
+         o5dkUDhR6Zwa1Tc3JVZQL96Ihg3Dhrwia6OdOjUi0XJico2vUjpI058B7OrMnE61btUf
+         Jn6Vl+zuOU8B3GCKIXQXYVHjgYy0g4qtutfG221x6sNFnO+oFVM/gh5+BV4DlIGN5+vf
+         B1WYkJXIYeS7ZlYky82WpBV3oOE36GZvCPSnu7/nY21u5PyoC+ZoAsyvMnNWc1XhbuY8
+         7f0bEau82EJ3qmAywn0UIsQOdB+bbsB0kSsRrvAnRpoqzYRm+ZSz2ivl2yiMDtEqf3di
+         jeaA==
+X-Gm-Message-State: AO0yUKUrVVJ13zyXqmPfOGWI1LBXShpa/SoC3fJEOO8G9xHLoYGje1l5
+        +P+kSjpA78h3W+vFTwBhbrrFLQ7CwGJDSHhVSnlO5BK2CWZdqDF6dn56nd1U4/iDRT5P7UldfwP
+        LPzN8hiIL0l19
+X-Received: by 2002:a05:600c:2148:b0:3ed:de58:1559 with SMTP id v8-20020a05600c214800b003edde581559mr3453845wml.2.1679421300512;
+        Tue, 21 Mar 2023 10:55:00 -0700 (PDT)
+X-Google-Smtp-Source: AK7set9RelBID8PX2Oo4YRgLh3yCs4x5rXDJQ5I40J+dfydiTGBSMryWryZAvLCGcoPwCihyPe5BdA==
+X-Received: by 2002:a05:600c:2148:b0:3ed:de58:1559 with SMTP id v8-20020a05600c214800b003edde581559mr3453827wml.2.1679421300186;
+        Tue, 21 Mar 2023 10:55:00 -0700 (PDT)
+Received: from redhat.com ([2.52.1.105])
+        by smtp.gmail.com with ESMTPSA id y16-20020a056000109000b002c56013c07fsm11771399wrw.109.2023.03.21.10.54.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 21 Mar 2023 10:54:59 -0700 (PDT)
+Date:   Tue, 21 Mar 2023 13:54:55 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Mike Christie <michael.christie@oracle.com>
+Cc:     syzbot <syzbot+6b27b2d2aba1c80cc13b@syzkaller.appspotmail.com>,
+        brauner@kernel.org, jasowang@redhat.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+        syzkaller-bugs@googlegroups.com,
+        virtualization@lists.linux-foundation.org
+Subject: Re: [syzbot] [kernel?] general protection fault in vhost_task_start
+Message-ID: <20230321135427-mutt-send-email-mst@kernel.org>
+References: <0000000000005a60a305f76c07dc@google.com>
+ <2d976892-9914-5de0-62e0-c75f1c148259@oracle.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2d976892-9914-5de0-62e0-c75f1c148259@oracle.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -66,83 +80,62 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jan 19, 2023, Yu Zhang wrote:
-> nested_vmx_setup_ctls_msrs() is used to set up the various VMX MSR
-> controls for nested VMX. But it is a bit lengthy, just add helpers
-> to setup the configuration of VMX MSRs.
+On Tue, Mar 21, 2023 at 12:46:04PM -0500, Mike Christie wrote:
+> On 3/21/23 12:03 PM, syzbot wrote:
+> > RIP: 0010:vhost_task_start+0x22/0x40 kernel/vhost_task.c:115
+> > Code: 00 00 00 00 00 0f 1f 00 f3 0f 1e fa 53 48 89 fb e8 c3 67 2c 00 48 8d 7b 70 48 b8 00 00 00 00 00 fc ff df 48 89 fa 48 c1 ea 03 <80> 3c 02 00 75 0a 48 8b 7b 70 5b e9 fe bd 02 00 e8 79 ec 7e 00 eb
+> > RSP: 0018:ffffc90003a9fc38 EFLAGS: 00010207
+> > RAX: dffffc0000000000 RBX: fffffffffffffff4 RCX: 0000000000000000
+> > RDX: 000000000000000c RSI: ffffffff81564c8d RDI: 0000000000000064
+> > RBP: ffff88802b21dd40 R08: 0000000000000100 R09: ffffffff8c917cf3
+> > R10: 00000000fffffff4 R11: 0000000000000000 R12: fffffffffffffff4
+> > R13: ffff888075d000b0 R14: ffff888075d00000 R15: ffff888075d00008
+> > FS:  0000555556247300(0000) GS:ffff8880b9800000(0000) knlGS:0000000000000000
+> > CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> > CR2: 00007ffe3d8e5ff8 CR3: 00000000215d4000 CR4: 00000000003506f0
+> > DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> > DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> > Call Trace:
+> >  <TASK>
+> >  vhost_worker_create drivers/vhost/vhost.c:580 [inline]
 > 
-> Suggested-by: Sean Christopherson <seanjc@google.com>
-> Signed-off-by: Yu Zhang <yu.c.zhang@linux.intel.com>
+> The return value from vhost_task_create is incorrect if the kzalloc fails.
+> 
+> Christian, here is a fix for what's in your tree. Do you want me to submit
+> a follow up patch like this or a replacement patch for:
+> 
+> commit 77feab3c4156 ("vhost_task: Allow vhost layer to use copy_process")
+> 
+> with the fix rolled into it?
+> 
+
+
+
+> 
+> >From 0677ad6d77722f301ca35e8e0f8fd0cbd5ed8484 Mon Sep 17 00:00:00 2001
+> From: Mike Christie <michael.christie@oracle.com>
+> Date: Tue, 21 Mar 2023 12:39:39 -0500
+> Subject: [PATCH] vhost_task: Fix vhost_task_create return value
+> 
+> vhost_task_create is supposed to return the vhost_task or NULL on
+> failure. This fixes it to return the correct value when the allocation
+> of the struct fails.
 > ---
->  arch/x86/kvm/vmx/nested.c | 129 +++++++++++++++++++++++++-------------
->  1 file changed, 85 insertions(+), 44 deletions(-)
+>  kernel/vhost_task.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> index 81dfbffae575..98ed7631e810 100644
-> --- a/arch/x86/kvm/vmx/nested.c
-> +++ b/arch/x86/kvm/vmx/nested.c
-> @@ -6750,36 +6750,9 @@ static u64 nested_vmx_calc_vmcs_enum_msr(void)
->  	return (u64)max_idx << VMCS_FIELD_INDEX_SHIFT;
->  }
+> diff --git a/kernel/vhost_task.c b/kernel/vhost_task.c
+> index 4b8aff160640..b7cbd66f889e 100644
+> --- a/kernel/vhost_task.c
+> +++ b/kernel/vhost_task.c
+> @@ -88,7 +88,7 @@ struct vhost_task *vhost_task_create(int (*fn)(void *), void *arg,
 >  
-> -/*
-> - * nested_vmx_setup_ctls_msrs() sets up variables containing the values to be
-> - * returned for the various VMX controls MSRs when nested VMX is enabled.
-> - * The same values should also be used to verify that vmcs12 control fields are
-> - * valid during nested entry from L1 to L2.
-> - * Each of these control msrs has a low and high 32-bit half: A low bit is on
-> - * if the corresponding bit in the (32-bit) control field *must* be on, and a
-> - * bit in the high half is on if the corresponding bit in the control field
-> - * may be on. See also vmx_control_verify().
-> - */
-> -void nested_vmx_setup_ctls_msrs(struct vmcs_config *vmcs_conf, u32 ept_caps)
-> +static inline void nested_vmx_setup_pinbased_ctls(struct vmcs_config *vmcs_conf,
+>  	vtsk = kzalloc(sizeof(*vtsk), GFP_KERNEL);
+>  	if (!vtsk)
+> -		return ERR_PTR(-ENOMEM);
+> +		return NULL;
+>  	init_completion(&vtsk->exited);
+>  	vtsk->data = arg;
+>  	vtsk->fn = fn;
+> 
 
-No need for the "inline", this isn't performance sensitive code, and odds are very,
-very good the compiler will inline the code anyways.
-
-> @@ -6953,13 +6943,16 @@ void nested_vmx_setup_ctls_msrs(struct vmcs_config *vmcs_conf, u32 ept_caps)
->  		VMX_MISC_ACTIVITY_HLT |
->  		VMX_MISC_ACTIVITY_WAIT_SIPI;
->  	msrs->misc_high = 0;
-> +}
->  
-> -	/*
-> -	 * This MSR reports some information about VMX support. We
-> -	 * should return information about the VMX we emulate for the
-> -	 * guest, and the VMCS structure we give it - not about the
-> -	 * VMX support of the underlying hardware.
-> -	 */
-> +/*
-> + * VMX basic MSR reports some information about VMX support. We should
-> + * return information about the VMX we emulate for the guest, and the
-> + * VMCS structure we give it - not about the VMX support of the underlying
-> + * hardware.
-> + */
-> +static inline void nested_vmx_setup_basic(struct nested_vmx_msrs *msrs)
-> +{
->  	msrs->basic =
->  		VMCS12_REVISION |
->  		VMX_BASIC_TRUE_CTLS |
-> @@ -6968,12 +6961,15 @@ void nested_vmx_setup_ctls_msrs(struct vmcs_config *vmcs_conf, u32 ept_caps)
->  
->  	if (cpu_has_vmx_basic_inout())
->  		msrs->basic |= VMX_BASIC_INOUT;
-> +}
->  
-> -	/*
-> -	 * These MSRs specify bits which the guest must keep fixed on
-> -	 * while L1 is in VMXON mode (in L1's root mode, or running an L2).
-> -	 * We picked the standard core2 setting.
-> -	 */
-> +/*
-> + * cr0_fixed & cr4_fixed MSRs specify bits which the guest must keep fixed
-> + * on while L1 is in VMXON mode (in L1's root mode, or running an L2).
-> + * We picked the standard core2 setting.
-> + */
-
-This change is flawed, the comment is specific to the fixed0 MSRs, not to all
-flavors of fixed MSRs and thus not to the function as a whole.  As much as I want
-to clean up the comments, for this patch I think it's best to leave them alone.
-
-No need to send a v2, I'll fixup when applying.
