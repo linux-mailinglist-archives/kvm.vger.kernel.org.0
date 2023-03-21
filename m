@@ -2,37 +2,38 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 641ED6C35F8
-	for <lists+kvm@lfdr.de>; Tue, 21 Mar 2023 16:41:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 15DBF6C35F9
+	for <lists+kvm@lfdr.de>; Tue, 21 Mar 2023 16:41:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231421AbjCUPle (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Mar 2023 11:41:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50516 "EHLO
+        id S231546AbjCUPlf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Mar 2023 11:41:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50494 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231375AbjCUPlc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Mar 2023 11:41:32 -0400
-Received: from out-34.mta0.migadu.com (out-34.mta0.migadu.com [91.218.175.34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8966CDDB
-        for <kvm@vger.kernel.org>; Tue, 21 Mar 2023 08:41:27 -0700 (PDT)
+        with ESMTP id S231582AbjCUPld (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Mar 2023 11:41:33 -0400
+Received: from out-8.mta1.migadu.com (out-8.mta1.migadu.com [IPv6:2001:41d0:203:375::8])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4EBF313501
+        for <kvm@vger.kernel.org>; Tue, 21 Mar 2023 08:41:28 -0700 (PDT)
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1679413286;
+        t=1679413287;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Nu6AEzpkLDRpJUdYVJfCsu7tNGyF6kVZqp6PpNwWiyA=;
-        b=UlsPM1/EpPR2eQKlMS3xuy3JKBsxEgoxKdEhY8lnmeshrB1cyHoOvq1CxscKvXoWpzwC3A
-        MMGupx+j5N6ZdDjphn7Q8DKC+qTktN1kN15T2kwQ/iX9P4qcYYLul52S0909SXwjGc29wK
-        2qCYzB54DYr/0/9jZ0yUTFXuLbxscxE=
+        bh=QvxSsq7y3ApZDI5RYQ/vz56iD3el/CYc8dT0qIs1x4g=;
+        b=LhVW8jnewR5Veq+X+UClGyUaa9piY8SXqvgR9MowCRyL+1YrxQXosLdTansUI0BW++m2kk
+        LGU9MPmq25SXuI/8Zi6unFq29SBV2+c0bt1ow+v6kz0qKIRuK21eqZrpKFae0VMPoLzio9
+        100o8ga3OOX9k9YD0XtYCPuABFJD3RM=
 From:   Andrew Jones <andrew.jones@linux.dev>
 To:     Shaoqin Huang <shahuang@redhat.com>, kvmarm@lists.linux.dev
-Cc:     kvm@vger.kernel.org
-Subject: Re: [kvm-unit-tests PATCH v2 0/2] Clean up the arm/run script
-Date:   Tue, 21 Mar 2023 16:41:22 +0100
-Message-Id: <167940943515.820115.8164556248057369265.b4-ty@linux.dev>
-In-Reply-To: <20230303041052.176745-1-shahuang@redhat.com>
-References: <20230303041052.176745-1-shahuang@redhat.com>
+Cc:     "open list:ARM" <kvm@vger.kernel.org>,
+        Eric Auger <eric.auger@redhat.com>
+Subject: Re: [kvm-unit-tests PATCH v3 0/3] arm: Use gic_enable/disable_irq() macro to clean up code
+Date:   Tue, 21 Mar 2023 16:41:23 +0100
+Message-Id: <167940943514.820115.10265149359868996572.b4-ty@linux.dev>
+In-Reply-To: <20230303031148.162816-1-shahuang@redhat.com>
+References: <20230303031148.162816-1-shahuang@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
@@ -46,19 +47,14 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 2 Mar 2023 23:10:50 -0500, Shaoqin Huang wrote:
-> Using more simple bash command to clean up the arm/run script.
+On Thu, 2 Mar 2023 22:11:44 -0500, Shaoqin Huang wrote:
+> Some tests still use their own code to enable/disable irq, use
+> gic_enable/disable_irq() to clean up them.
 > 
-> Patch 1 replace the obsolete qemu script.
+> The first patch fixes a problem which will disable all irq when use
+> gic_disable_irq().
 > 
-> Patch 2 clean up the arm/run script to make the format consistent and simple.
-> 
-> Changelog:
-> ----------
-> v2:
->   - Add the oldest QEMU version for which -chardev ? work.
->   - use grep -q replace the grep > /dev/null.
->   - Add a new patch to clean up the arm/run.
+> The patch 2-3 clean up the code by using the macro.
 > 
 > [...]
 
