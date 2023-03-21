@@ -2,61 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 248DF6C38F5
-	for <lists+kvm@lfdr.de>; Tue, 21 Mar 2023 19:12:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DA6BF6C38FD
+	for <lists+kvm@lfdr.de>; Tue, 21 Mar 2023 19:16:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230134AbjCUSMc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Mar 2023 14:12:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45740 "EHLO
+        id S229990AbjCUSQI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Mar 2023 14:16:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52054 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229592AbjCUSMa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Mar 2023 14:12:30 -0400
-Received: from mail-yw1-x1133.google.com (mail-yw1-x1133.google.com [IPv6:2607:f8b0:4864:20::1133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3E1350996
-        for <kvm@vger.kernel.org>; Tue, 21 Mar 2023 11:12:29 -0700 (PDT)
-Received: by mail-yw1-x1133.google.com with SMTP id 00721157ae682-53d277c1834so294838827b3.10
-        for <kvm@vger.kernel.org>; Tue, 21 Mar 2023 11:12:29 -0700 (PDT)
+        with ESMTP id S229606AbjCUSQG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Mar 2023 14:16:06 -0400
+Received: from mail-lj1-x229.google.com (mail-lj1-x229.google.com [IPv6:2a00:1450:4864:20::229])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A082313DCE
+        for <kvm@vger.kernel.org>; Tue, 21 Mar 2023 11:16:02 -0700 (PDT)
+Received: by mail-lj1-x229.google.com with SMTP id f16so16432576ljq.10
+        for <kvm@vger.kernel.org>; Tue, 21 Mar 2023 11:16:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1679422349;
+        d=google.com; s=20210112; t=1679422561;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=FPozxaeZQPWyCpd0xbPfiSsnDcAAT2J9cKx1SPDRr9I=;
-        b=X9t0a1zypAz79SHi2UyDEpKSW9JBfcjPYiD8oK9gusW1icc07Zj6V1WcyR2NhnNLkv
-         +JnuaBSRbyDF0IaAkIMmzv4QMqQNh7s4bPg3190aJ6qFAyyK+iPm1ZSbtnji6gDniPQj
-         b5ZNiGkaUzdqa6HCFLXlwAtMPAjGGIqu2ZkSFzaVJ+X4rJ5/k7CXqlnSuqpB9oubYnpU
-         bCVb8Bhaf3upIUC1abbSypW8s800ThDEvG2l4VimVMpOt4oKD/dN/JgN3GefubgQ+qLf
-         kcFHWO+0TQcvYe208YDghTK72N7o2mP1vI2fw2EKKlXWD4piIAfFSV40i6CjxAf/Lg03
-         FKVw==
+        bh=BND2reZbrACVYlW63dB5E1+8EoTldLzcT8Xu9BiGX8g=;
+        b=e8kgqOlMiby4+JCWO/YjZYidyFAEopXLorFTy+IxbNxFfsRy9oxw9SLoXKG8cK93xQ
+         nvgLneU7bwPofLJXCm30FAD0JwMnE6gUubxxWm0N+ZOcsPadiegdRdH3nRoUGgCM8Jiy
+         MrbCmoN7glS+3ZOMueWBC3V1sBuVONcTgExbIClVHXYguKIFQ2ZNpNT5URyWazAqezmo
+         AyGNbEiMLmodfpUfL8/IkhznpBEmRXwnXNueml8ggmj7Q3w51Y+9lK0r5oXJ2OM9wC1e
+         UjGijPYxYRa2Lf7q8vLQq+6mOVpnBwkXzVn+OqUuzqiGLOjM8+7cKFt5lnJ95m522WMj
+         IscQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679422349;
+        d=1e100.net; s=20210112; t=1679422561;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=FPozxaeZQPWyCpd0xbPfiSsnDcAAT2J9cKx1SPDRr9I=;
-        b=bCNHR9Z5E51kKYjqviNzye8tqirXWGTbdm7eQfdJq8Iy6kC+89crQkG1CzkqbHvBZq
-         OHYbxGbhdHxKwytE9EEjE7RAN/F7Ig2IJ8aB8yB8yDFqkBIItvU6sulf5JPMapmNBCUs
-         oAUAh+ECW/r3VDv6TTCyjTH+QTiUZAnyAUZ6J5UuGZtlfn4+v64jdhM9jAV/au8MjG9Y
-         r4X0yoQJmu2RP2+3ZWbwDv/YLWzQdwYKY6AHAzy2rDkbwyhOhJZV5TmMzEajzT9hKF8D
-         lZxwFNIO1D6qoaWoslZhzzxL0e+etx9V+b4lLaeurlx6gzWgIpS2vki45hxro0dAd1f+
-         ifOg==
-X-Gm-Message-State: AAQBX9cXULSugdcuD029D05QVZ7kP7a4d46Kb79w5RJUCwAZUvpxySkZ
-        qo2u4gGes5oJmmZcKV21E60EcMMsoquazfN3BcYlgw==
-X-Google-Smtp-Source: AKy350a9AALo/UNCOhNQxiW/XrM+h7wC/4w+mnV5lmSryhb+xXp5pX4vZye1EgLkE5MKieToXDSBjJxyQKhUmAC3PKk=
-X-Received: by 2002:a81:a846:0:b0:541:69bc:8626 with SMTP id
- f67-20020a81a846000000b0054169bc8626mr1695407ywh.10.1679422348661; Tue, 21
- Mar 2023 11:12:28 -0700 (PDT)
+        bh=BND2reZbrACVYlW63dB5E1+8EoTldLzcT8Xu9BiGX8g=;
+        b=eULrTyXxxltGnHhx02C944uDwHTaspxqcA84AwByYrGCDS7a2zTk6wi5c9+XM6VGaW
+         5eZXSZtGICWiacNblMmDBRyNxdGKiTQJ8gJhecQEFsBmDpg+L9oGJONj4tN0KiaYyUaJ
+         9HRz+kwrVWaLY7/1AxCjxiEFU1qxw96oKjLMIWOhZIkSGBRBAiDMpFUDqP8eIzG9xFHF
+         mdJ2WWLkZhfJrA0LPO4TnqXX1QetMc4gqSLWMlb7sOTVvcM7bIyLMxVxZ2VlNDnQFX1X
+         ldw/glac0+nUam5sFSZVokZbJh6cgvDqBg1aE5ygOVtqe+uIawr+H9A94ssYhXQvNXPr
+         Tlhg==
+X-Gm-Message-State: AO0yUKVOx7nOv2nSC/bqY2oKZt6HumQSGCJ2qvDqXDr+skHSYzGME7X7
+        5exGL+PqD70tMVWp977f/zFvLZ2VIbgZAbemVmdxYuwQm1gsDsXut/E7fQ==
+X-Google-Smtp-Source: AK7set+JTIRGS0cX+zWO6juq5/jEsTljUy7Ju9GSgdu+MWk0/2cvL31/lPsBbGQI9z2swzjxv0AhLgdwG+lootPuLHQ=
+X-Received: by 2002:a2e:9c4c:0:b0:298:afbd:5aef with SMTP id
+ t12-20020a2e9c4c000000b00298afbd5aefmr1195371ljj.2.1679422560741; Tue, 21 Mar
+ 2023 11:16:00 -0700 (PDT)
 MIME-Version: 1.0
-References: <20230211014626.3659152-1-vipinsh@google.com> <ZBTwX5790zwl5721@google.com>
- <ZBj9L2VUjEbWbgcS@google.com>
-In-Reply-To: <ZBj9L2VUjEbWbgcS@google.com>
-From:   Vipin Sharma <vipinsh@google.com>
-Date:   Tue, 21 Mar 2023 11:11:52 -0700
-Message-ID: <CAHVum0feM8hnD-+dXF4jiug8tmpm9GBAh619Xf279LNSm=Jozw@mail.gmail.com>
-Subject: Re: [Patch v3 0/7] Optimize clear dirty log
+References: <20230320225159.92771-1-graf@amazon.com> <ZBnjZg6jxPtBPXc2@google.com>
+In-Reply-To: <ZBnjZg6jxPtBPXc2@google.com>
+From:   Peter Gonda <pgonda@google.com>
+Date:   Tue, 21 Mar 2023 12:15:47 -0600
+Message-ID: <CAMkAt6ozZ5LwvRNn+hP5-ZGOyrtDMmBUR+x5iJ37xVZyQk4kBw@mail.gmail.com>
+Subject: Re: [PATCH] KVM: x86: Allow restore of some sregs with protected state
 To:     Sean Christopherson <seanjc@google.com>
-Cc:     pbonzini@redhat.com, bgardon@google.com, dmatlack@google.com,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     Alexander Graf <graf@amazon.com>, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Borislav Petkov <bp@alien8.de>, x86@kernel.org,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Sabin Rapan <sabrapan@amazon.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
@@ -70,55 +73,115 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Mar 20, 2023 at 5:41=E2=80=AFPM Sean Christopherson <seanjc@google.=
-com> wrote:
+On Tue, Mar 21, 2023 at 11:03=E2=80=AFAM Sean Christopherson <seanjc@google=
+.com> wrote:
 >
-> On Fri, Mar 17, 2023, Sean Christopherson wrote:
-> > Did a cursory glance, looks good.  I'll do a more thorough pass next we=
-ek and get
-> > it queued up if all goes well.  No need for a v4 at this point, I'll fi=
-xup David's
-> > various nits when applying.
+> +Peter
 >
-> Ooof, that ended up being painful.  In hindsight, I should have asked for=
- a v4,
-> but damage done, and it's my fault for throwing you a big blob of code in=
- the
-> first place.
+> On Mon, Mar 20, 2023, Alexander Graf wrote:
+> > With protected state (like SEV-ES and SEV-SNP), KVM does not have direc=
+t
+> > access to guest registers. However, we deflect modifications to CR0,
 >
-> I ended up splitting the "interesting" patches into three each:
+> Please avoid pronouns in changelogs and comments.
 >
->   1. Switch to the atomic-AND
->   2. Drop the access-tracking / dirty-logging (as appropriate)
->   3. Drop the call to __handle_changed_spte()
+> > CR4 and EFER to the host. We also carry the apic_base register and lear=
+n
+> > about CR8 directly from a VMCB field.
+> >
+> > That means these bits of information do exist in the host's KVM data
+> > structures. If we ever want to resume consumption of an already
+> > initialized VMSA (guest state), we will need to also restore these
+> > additional bits of KVM state.
 >
-> because logically they are three different things (although obviously rel=
-ated).
+> For some definitions of "need".  I've looked at this code multiple times =
+in the
+> past, and even posted patches[1], but I'm still unconvinced that trapping
+> CR0, CR4, and EFER updates is necessary[2], which is partly why series to=
+ fix
+> this stalled out.
 >
-> I have pushed the result to kvm-x86/mmu, but haven't merged to kvm-x86/ne=
-xt or
-> sent thanks because it's not yet tested.  I'll do testing tomorrow, but i=
-f you
-> can take a look in the meantime to make sure I didn't do something comple=
-tely
-> boneheaded, it'd be much appreciated.
+>  : If KVM chugs along happily without these patches, I'd love to pivot an=
+d yank out
+>  : all of the CR0/4/8 and EFER trapping/tracking, and then make KVM_GET_S=
+REGS a nop
+>  : as well.
+>
+> [1] https://lore.kernel.org/all/20210507165947.2502412-1-seanjc@google.co=
+m
+> [2] https://lore.kernel.org/all/YJla8vpwqCxqgS8C@google.com
+
+Yea we are using similar patches to do intra-host migration for SNP VMs.
+
+I have dropped the ball on my AI from that thread. Let me look/test this pa=
+tch.
+
+>
+> > Prepare ourselves for such a world by allowing set_sregs to set the
+> > relevant fields. This way, it mirrors get_sregs properly that already
+> > exposes them to user space.
+> >
+> > Signed-off-by: Alexander Graf <graf@amazon.com>
+> > ---
+> >  arch/x86/kvm/x86.c | 16 ++++++++++++++--
+> >  1 file changed, 14 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> > index 7713420abab0..88fa8b657a2f 100644
+> > --- a/arch/x86/kvm/x86.c
+> > +++ b/arch/x86/kvm/x86.c
+> > @@ -11370,7 +11370,8 @@ static int __set_sregs_common(struct kvm_vcpu *=
+vcpu, struct kvm_sregs *sregs,
+> >       int idx;
+> >       struct desc_ptr dt;
+> >
+> > -     if (!kvm_is_valid_sregs(vcpu, sregs))
+> > +     if (!vcpu->arch.guest_state_protected &&
+> > +         !kvm_is_valid_sregs(vcpu, sregs))
+>
+> This is broken, userspace shouldn't be allowed to stuff complete garbage =
+just
+> because guest state is protected.
+
+Agreed, we've been using something like this:
+
+kvm_valid_sregs()
+-       if (sregs->fer & EFER_LME && !vcpu->arch.guest_state_protected) {
++       if (sregs->efer & EFER_LME) {
 
 
-Thanks for refactoring the patches. I reviewed the commits, no obvious
-red flags from my side. Few small nits I found:
-
-commit e534a94eac07 ("KVM: x86/mmu: Use kvm_ad_enabled() to determine
-if TDP MMU SPTEs need wrprot")
- - kvm_ad_enabled() should be outside the loop.
-
-commit 69032b5d71ef (" KVM: x86/mmu: Atomically clear SPTE dirty state
-in the clear-dirty-log flow")
- - MMU_WARN_ON(kvm_ad_enabled() &&
-spte_ad_need_write_protect(iter.old_spte) should be after
-if(iter.level > PG_LEVEL_4k...)
-
-commit 93c375bb6aea ("KVM: x86/mmu: Bypass __handle_changed_spte()
-when clearing TDP MMU dirty bits")
- - Needs new performance numbers. Adding MMU_WARN_ON() might change
-numbers. I will run a perf test on your mmu branch and see if
-something changes a lot.
+>
+> >               return -EINVAL;
+> >
+> >       apic_base_msr.data =3D sregs->apic_base;
+> > @@ -11378,8 +11379,19 @@ static int __set_sregs_common(struct kvm_vcpu =
+*vcpu, struct kvm_sregs *sregs,
+> >       if (kvm_set_apic_base(vcpu, &apic_base_msr))
+> >               return -EINVAL;
+> >
+> > -     if (vcpu->arch.guest_state_protected)
+> > +     if (vcpu->arch.guest_state_protected) {
+> > +             /*
+> > +              * While most actual guest state is hidden from us,
+> > +              * CR{0,4,8}, efer and apic_base still hold KVM state
+> > +              * with protection enabled, so let's allow restoring
+> > +              */
+> > +             kvm_set_cr8(vcpu, sregs->cr8);
+> > +             kvm_x86_ops.set_efer(vcpu, sregs->efer);
+> > +             kvm_x86_ops.set_cr0(vcpu, sregs->cr0);
+>
+> Use static_call().  This code is also broken in that it doesn't set mmu_r=
+eset_needed.
+> This patch also misses the problematic behavior in svm_set_cr0().
+>
+> And I don't like having a completely separate one-off flow for protected =
+guests.
+> It's more code and arguably uglier, but I would prefer to explicitly skip=
+ each
+> chunk as needed so that we aren't effectively maintaining multiple flows.
+>
+> Easiest thing is probably to just resurrect my aforementioned series, pen=
+ding the
+> result of the discussion on whether or not KVM should be trapping CR0/CR4=
+/EFER
+> writes in the first place.
