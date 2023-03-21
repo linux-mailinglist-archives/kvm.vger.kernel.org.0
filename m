@@ -2,66 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BA9F06C3C5E
-	for <lists+kvm@lfdr.de>; Tue, 21 Mar 2023 22:01:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 847386C3C63
+	for <lists+kvm@lfdr.de>; Tue, 21 Mar 2023 22:02:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229937AbjCUVBP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Mar 2023 17:01:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38522 "EHLO
+        id S229674AbjCUVCD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Mar 2023 17:02:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38622 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229674AbjCUVBO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Mar 2023 17:01:14 -0400
-Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC03E4782F
-        for <kvm@vger.kernel.org>; Tue, 21 Mar 2023 14:01:12 -0700 (PDT)
-Received: by mail-pf1-x449.google.com with SMTP id x3-20020a62fb03000000b00622df3f5d0cso8161258pfm.10
-        for <kvm@vger.kernel.org>; Tue, 21 Mar 2023 14:01:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1679432472;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=0N6t6sqV0oL0lRyqNWKd+/lniHULQdxKIneVfna8+og=;
-        b=ZqJHtTjsiIeKKxjCz9NhJNHM2mMf8frOgktsHErDp5xRAW4yXGhD9QFxDKkYYuisBM
-         Sckwo17qkGzfyvP57JuOq0a53QoTWhUyZsaAqabGq7xD37MTJckFW/g6MRQUK+lDew7X
-         se6f8dfb3XLiLYSq1KYetFMVqKd59CRX3sIGRMle1xag/YC4sTln0YrOfvMzfukJ+O7F
-         SS+gV+f6Qk9jROMXFGohx2K1DQWTLGMk3jXzUDZjWlprCwH7yPR7kS2zzmyoY+TNDkZI
-         e9fl88w5SeB/LViUNC8xlFXEcfTo5bzZ5hJdCTJCcswsBPdNb42+7fKI5G1D+UpWHEgZ
-         0R0Q==
+        with ESMTP id S229916AbjCUVCC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Mar 2023 17:02:02 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CDD32574D7
+        for <kvm@vger.kernel.org>; Tue, 21 Mar 2023 14:01:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1679432476;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=I1KA6ZkpV3D+AmID9NMMP4J1e8acMfYHtrAK/R3ZyzU=;
+        b=CdbUbOQGzXOKOLE1q9V/eYopHtAEkVjnP32pUyhgBVvgt5vPrPfMr3UTUku8MoLIyHyQMH
+        kDoTzdwGKd0gLK1ng2nplPqAzullAlQi39aybA8rSrny60lC7i9++nGp8u/5t+9BlC331F
+        93+e1WZWXyBAM5RU8vrJjJSeP6tRDNE=
+Received: from mail-io1-f71.google.com (mail-io1-f71.google.com
+ [209.85.166.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-475-CjJXpXYOMOe7dadvMl8PpA-1; Tue, 21 Mar 2023 17:01:15 -0400
+X-MC-Unique: CjJXpXYOMOe7dadvMl8PpA-1
+Received: by mail-io1-f71.google.com with SMTP id h198-20020a6bb7cf000000b00757eed38c2bso3782846iof.23
+        for <kvm@vger.kernel.org>; Tue, 21 Mar 2023 14:01:15 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679432472;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=0N6t6sqV0oL0lRyqNWKd+/lniHULQdxKIneVfna8+og=;
-        b=SXqnCjt2VwBzzfHbZ6xBayc1uBOELwkhQIr+pu/fA5r6BLC3WIj63L+pR9JYy7LXQJ
-         cL2Z5y5IOhps8bjwbDIvhPhKhuiVY4lILBMG4t0yBNVuwdnr7NmIqzQzcsJQnGKcd3vF
-         FhOYIh7iSyXhGeU2xXIJXcsmETy6vBckDoCMn+Nl0je5K1zLt9ml/oZWq++2U0iDDdfd
-         6vuAqC2brrCnhb844c+o/dUgOfgbJvV8O6krTcdXk+TIkNvCeeqJfYoajZoIdojPPw2g
-         TmX+p5pW6ZKKoFePuwhGp0WQ+F83w3mgiuJjRIxRm2aPd9RPTlJWTzEujZRKkgcUV8Gj
-         Zh7Q==
-X-Gm-Message-State: AO0yUKVOUf9akFVtyqEPOGte2MC8Mdbqb8yP9P0W5BVjgrgqdb+OU1L6
-        ASc8QyPGj+ceYzbTfY3Ji2hilmTv/LA=
-X-Google-Smtp-Source: AK7set9VRl2/QeHD3n8uLrf81WKmAudtbnGPGdryJ4VOIZem8IKUq69HaEEYveWcpeGuYTM81B79anBiYak=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90a:dac5:b0:23d:50c2:939a with SMTP id
- g5-20020a17090adac500b0023d50c2939amr440031pjx.1.1679432472396; Tue, 21 Mar
- 2023 14:01:12 -0700 (PDT)
-Date:   Tue, 21 Mar 2023 14:01:11 -0700
-In-Reply-To: <ZBoSKm3CUoBC0l5X@linux.dev>
-Mime-Version: 1.0
-References: <20230315021738.1151386-1-amoorthy@google.com> <20230315021738.1151386-10-amoorthy@google.com>
- <ZBS4o75PVHL4FQqw@linux.dev> <ZBTK0vzAoWqY1hDh@google.com>
- <ZBjckKb6eWx2vSin@linux.dev> <ZBnEO5l7hZMlhi/1@google.com> <ZBoSKm3CUoBC0l5X@linux.dev>
-Message-ID: <ZBobF0cGBOHd4VGw@google.com>
-Subject: Re: [WIP Patch v2 09/14] KVM: Introduce KVM_CAP_MEMORY_FAULT_NOWAIT
- without implementation
-From:   Sean Christopherson <seanjc@google.com>
-To:     Oliver Upton <oliver.upton@linux.dev>
-Cc:     Anish Moorthy <amoorthy@google.com>, jthoughton@google.com,
-        kvm@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-7.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+        d=1e100.net; s=20210112; t=1679432475;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=I1KA6ZkpV3D+AmID9NMMP4J1e8acMfYHtrAK/R3ZyzU=;
+        b=HO36ufakK7l8m9VLeuZmJf8n3JiQnnqlRuj8+kkMDD3F2IzSzAPPZvpLvPGDnvVL7H
+         kGOL/TWI+vIbSNI5BQIs7ArO+d8RXW+fV69zblVnVzj8WGcjXisHho2P/NbM/0zYMT0c
+         uobX9fUOxYYehXUuVukl95WVAsZprGkFY22gozOSCilZmrf9f0TXFFUgZbzmjFR1/z3Z
+         3SrCnFx6byDZ5RmGfJan8V0Gk+undw0/Un6VO4k1C8DC4zOy9vjysVMvtdqjjsr+7055
+         aaOB7nuAyLyg33WsiLeIWDRFRZaAnLwbosGe8+MrazCc7u6aXie/5V3ywoFJOOKHhgpK
+         LPjQ==
+X-Gm-Message-State: AO0yUKUyLGxOVV1CSguN1/D+qblgIvh1zwN4xvJtlYnjvEJSaPbjuwui
+        VisRHjtBcVKblSNnQ3ZbkOZEAzsK6LWMof92BLQn6bqR+fX+1sh/YiyhtuaqghHFFlamyR+eRvp
+        lDqz4751D5uk8
+X-Received: by 2002:a92:cf44:0:b0:325:bab7:cb17 with SMTP id c4-20020a92cf44000000b00325bab7cb17mr267822ilr.24.1679432474776;
+        Tue, 21 Mar 2023 14:01:14 -0700 (PDT)
+X-Google-Smtp-Source: AK7set/F7exqYQvOzCCmHLPB4uNfmmnepmhiUG7EPAgpEmj8wd8Iv128TRMF1l0+kK1w3FickMDApA==
+X-Received: by 2002:a92:cf44:0:b0:325:bab7:cb17 with SMTP id c4-20020a92cf44000000b00325bab7cb17mr267805ilr.24.1679432474496;
+        Tue, 21 Mar 2023 14:01:14 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id q5-20020a056e02096500b003179ae2fb8fsm3892160ilt.2.2023.03.21.14.01.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 21 Mar 2023 14:01:13 -0700 (PDT)
+Date:   Tue, 21 Mar 2023 15:01:12 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "Hao, Xudong" <xudong.hao@intel.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "Xu, Terrence" <terrence.xu@intel.com>,
+        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        "Liu, Yi L" <yi.l.liu@intel.com>,
+        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "lulu@redhat.com" <lulu@redhat.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
+        "Zhao, Yan Y" <yan.y.zhao@intel.com>,
+        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "shameerali.kolothum.thodi@huawei.com" 
+        <shameerali.kolothum.thodi@huawei.com>,
+        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>
+Subject: Re: [PATCH v6 12/24] vfio/pci: Allow passing zero-length fd array
+ in VFIO_DEVICE_PCI_HOT_RESET
+Message-ID: <20230321150112.1c482380.alex.williamson@redhat.com>
+In-Reply-To: <ZBoYgNq60eDpV9Un@nvidia.com>
+References: <BN9PR11MB5276300FCAAF8BF7B4E03BA48CBF9@BN9PR11MB5276.namprd11.prod.outlook.com>
+        <20230316124532.30839a94.alex.williamson@redhat.com>
+        <BN9PR11MB5276F7879E428080D2B214D98CBC9@BN9PR11MB5276.namprd11.prod.outlook.com>
+        <20230316182256.6659bbbd.alex.williamson@redhat.com>
+        <BN9PR11MB5276D5A71E43EA4CDD1C960A8CBD9@BN9PR11MB5276.namprd11.prod.outlook.com>
+        <20230317091557.196638a6.alex.williamson@redhat.com>
+        <ZBiUiEC8Xj9sOphr@nvidia.com>
+        <20230320165217.5b1019a4.alex.williamson@redhat.com>
+        <ZBjum1wQ1L2AIfhB@nvidia.com>
+        <20230321143122.632f7e63.alex.williamson@redhat.com>
+        <ZBoYgNq60eDpV9Un@nvidia.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -69,75 +111,56 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 21, 2023, Oliver Upton wrote:
-> On Tue, Mar 21, 2023 at 07:50:35AM -0700, Sean Christopherson wrote:
-> > On Mon, Mar 20, 2023, Oliver Upton wrote:
-> > > On Fri, Mar 17, 2023 at 01:17:22PM -0700, Sean Christopherson wrote:
-> > > > On Fri, Mar 17, 2023, Oliver Upton wrote:
-> > > > > I'm not a fan of this architecture-specific dependency. Userspace is already
-> > > > > explicitly opting in to this behavior by way of the memslot flag. These sort
-> > > > > of exits are entirely orthogonal to the -EFAULT conversion earlier in the
-> > > > > series.
-> > > > 
-> > > > Ya, yet another reason not to speculate on why KVM wasn't able to resolve a fault.
-> > > 
-> > > Regardless of what we name this memslot flag, we're already getting explicit
-> > > opt-in from userspace for new behavior. There seems to be zero value in
-> > > supporting memslot_flag && !MEMORY_FAULT_EXIT (i.e. returning EFAULT),
-> > > so why even bother?
-> > 
-> > Because there are use cases for MEMORY_FAULT_EXIT beyond fast-only gup.
-> 
-> To be abundantly clear -- I have no issue with (nor care about) the other
-> MEMORY_FAULT_EXIT changes. If we go the route of explicit user opt-in then
-> that deserves its own distinct bit of UAPI. None of my objection pertains
-> to the conversion of existing -EFAULT exits.
-> 
-> > We could have the memslot feature depend on the MEMORY_FAULT_EXIT capability,
-> > but I don't see how that adds value for either KVM or userspace.
-> 
-> That is exactly what I want to avoid! My issue was the language here:
-> 
->   +(*) NOTE: On x86, KVM_CAP_X86_MEMORY_FAULT_EXIT must be enabled for the
->   +KVM_MEMFAULT_REASON_ABSENT_MAPPING_reason: otherwise userspace will only receive
->   +a -EFAULT from KVM_RUN without any useful information.
-> 
-> Which sounds to me as though there are *two* UAPI bits for the whole fast-gup
-> failed interaction (flip a bit in the CAP and set a bit on the memslot, but
-> only for x86).
+On Tue, 21 Mar 2023 17:50:08 -0300
+Jason Gunthorpe <jgg@nvidia.com> wrote:
 
-It won't be x86 only.  Anish's proposed patch has it as x86 specific, but I think
-we're all in agreement that that is undesirable.  There will inevitably be per-arch
-enabling and enumeration, e.g. to actually fill information and kick out to
-userspace, but I don't see a sane way to avoid that since the common paths don't
-have the vCPU (largely by design).
-
-> What I'm asking for is this:
+> On Tue, Mar 21, 2023 at 02:31:22PM -0600, Alex Williamson wrote:
 > 
->  1) A capability advertising MEMORY_FAULT_EXIT to userspace. Either usurp
->    EFAULT or require userspace to enable this capability to convert
->    _existing_ EFAULT exits to the new way of the world.
+> > This just seems like nit-picking that the API could have accomplished
+> > this more concisely.  Probably that's true, but I think you've
+> > identified a gap above that amplifies the issue.  If the user cannot
+> > map BDFs to cdevs because the cdevs are passed as open fds to the user
+> > driver, the _INFO results become meaningless and by removing the fds
+> > array, that becomes the obvious choice that a user presented with this
+> > dilemma would take.  We're skipping past easier to misuse, difficult to
+> > use correctly, and circling around no obvious way to use correctly.  
 > 
->  2) A capability and a single memslot flag to enable the fast-gup-only
->    behavior (naming TBD). This does not depend on (1) in any way, i.e.
->    only setting (2) should still result in MEMORY_FAULT_EXITs when fast
->    gup fails. IOW, enabling (2) should always yield precise fault
->    information to userspace.
+> No - this just isn't finished yet is all it means :(
+> 
+> I just noticed it just now, presumably Eric would have discovered this
+> when he tried to implement the FD pass and we would have made a new
+> _INFO at that point (or more ugly, have libvirt pass the BDF along
+> with the FD).
+> 
+> > Unfortunately the _INFO ioctl does presume that userspace knows the BDF
+> > to device mappings today, so if we are attempting to pre-enable a case
+> > with cdev support where that is not the case, then there must be
+> > something done with the _INFO ioctl to provide scope.  
+> 
+> Yes, something is required with _INFO before libvirt can use a FD
+> pass. I'm thinking of a new _INFO query that returns the iommufd
+> dev_ids for the reset group. Then qemu can match the dev_ids back to
+> cdev FDs and thus vPCI devices and do what it needs to do.
+> 
+> But for the current qemu setup it will open cdev directly and it will
+> know the BDF so it can still use the current _INFO.
+> 
+> Though it would be nice if qemu didn't need two implementations so Yi
+> I'd rather see a new info in this series as well and qemu can just
+> consistently use dev_id and never bdf in iommufd mode.
 
-Ah, so 2.2, providing precise fault information on fast-gup-only failures, is the
-biggest (only?) point of contention.
+We also need to consider how libvirt determines if QEMU has the kernel
+support it needs to pass file descriptors.  It'd be a lot cleaner if
+this aligned with the introduction of vfio cdevs.
+ 
+> Anyhow, I don't see the two topics as really related, the intention is
+> not to discourage people from calling _INFO, it just to make the
+> security proof simpler and more logical.
 
-My objection to that behavior is that it's either going to annoyingly difficult to
-get right in KVM, and even more annoying to maintain, or we'll end up with "fuzzy"
-behavior that userspace will inevitably come to rely on, and then we'll be in a real
-pickle.  E.g. if KVM sets the information without checking if gup() itself actually
-failed, then KVM _might_ fill the info, depending on when KVM detects a problem.
+At a minimum, we need a new _INFO ioctl to get back to the point where
+it's only a discussion of whether we're checking the user on scope.  We
+can't remove the array while doing so opens up an obviously incorrect
+solution to an impossible to use API.  Thanks,
 
-Conversly, if KVM's contract is that it provides precise information if and only
-if gup() fails, then KVM needs to precisely propagate back up the stack that gup()
-failed.
+Alex
 
-To avoid spending more time going in circles, I propose we try to usurp -EFAULT
-and convert all userspace-exits-from-KVM_RUN -EFAULT paths on x86 (as a guinea pig)
-without requiring userspace to opt-in.  If that approach pans out, then this point
-of contention goes away because 2.2 Just Works.
