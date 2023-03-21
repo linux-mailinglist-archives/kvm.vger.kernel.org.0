@@ -2,182 +2,358 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EB7046C34ED
-	for <lists+kvm@lfdr.de>; Tue, 21 Mar 2023 16:00:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0443E6C34F8
+	for <lists+kvm@lfdr.de>; Tue, 21 Mar 2023 16:02:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231537AbjCUPAH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Mar 2023 11:00:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37574 "EHLO
+        id S231485AbjCUPC1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Mar 2023 11:02:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40226 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231530AbjCUPAD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Mar 2023 11:00:03 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BFA75D328
-        for <kvm@vger.kernel.org>; Tue, 21 Mar 2023 07:59:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1679410755;
+        with ESMTP id S231265AbjCUPC0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Mar 2023 11:02:26 -0400
+Received: from out-53.mta1.migadu.com (out-53.mta1.migadu.com [IPv6:2001:41d0:203:375::35])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C6A34ECE7
+        for <kvm@vger.kernel.org>; Tue, 21 Mar 2023 08:02:24 -0700 (PDT)
+Date:   Tue, 21 Mar 2023 16:02:20 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1679410941;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=qOIIbtRi2YdRi9h/kU7CZ7/kNGD+yuNaR6Y05A5vIGE=;
-        b=hOxN2pJ8Hqa3p1/MX6zR9empXu2UvbBELXRmo/guX+PvGgXvsxsT3XgZro6Bwor/PbMuAL
-        vX6ByUvRV8kjfTKI7dQ7duC70AaAS7OweRbRM8D9JuLoZY82V/BfX0R46WRrv5GnlwfTmS
-        qOJpDY8tHi+QZat1AqWnWQ/dnP9UK9Q=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-159-HVDIsSLjNDez1JOvl18iAg-1; Tue, 21 Mar 2023 10:59:10 -0400
-X-MC-Unique: HVDIsSLjNDez1JOvl18iAg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 63A5E2806042;
-        Tue, 21 Mar 2023 14:59:09 +0000 (UTC)
-Received: from localhost (unknown [10.39.193.206])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 15ACC40C6E67;
-        Tue, 21 Mar 2023 14:59:08 +0000 (UTC)
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Viktor Prutyanov <viktor@daynix.com>, mst@redhat.com,
-        jasowang@redhat.com
-Cc:     pasic@linux.ibm.com, farman@linux.ibm.com,
-        linux-s390@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        linux-kernel@vger.kernel.org, yan@daynix.com, viktor@daynix.com
-Subject: Re: [PATCH v3] virtio: add VIRTIO_F_NOTIFICATION_DATA feature support
-In-Reply-To: <20230321134410.2097163-1-viktor@daynix.com>
-Organization: Red Hat GmbH
-References: <20230321134410.2097163-1-viktor@daynix.com>
-User-Agent: Notmuch/0.37 (https://notmuchmail.org)
-Date:   Tue, 21 Mar 2023 15:59:07 +0100
-Message-ID: <87h6uem9qc.fsf@redhat.com>
+        bh=tzSEVJ2SDKpJ+vRTvYPOoMqo7Umkk1ArseN9prU8KHc=;
+        b=gO6RhQT/pkZpgZcwRBDzSLuAmpwO79ySxzswnnvc58peGEaSDjvnZvz/Py555DzUE8dUs7
+        UBuWyl2ai5Cb5YXUiwg6bHm2J+2fntJIlfNxrSob7sO1rmpZhyRxBcvcM01vfBo+B42i/w
+        LwBYJeA0tzFamoY7wrzXjrfP7dw4g3o=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From:   Andrew Jones <andrew.jones@linux.dev>
+To:     Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        qemu-devel@nongnu.org, Thomas Huth <thuth@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.linux.dev,
+        qemu-arm@nongnu.org, Mark Rutland <mark.rutland@arm.com>
+Subject: Re: [kvm-unit-tests PATCH v10 4/7] arm/tlbflush-code: TLB flush
+ during code execution
+Message-ID: <20230321150220.mfrvgxg3ebju5e6k@orel>
+References: <20230307112845.452053-1-alex.bennee@linaro.org>
+ <20230307112845.452053-5-alex.bennee@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20230307112845.452053-5-alex.bennee@linaro.org>
+X-Migadu-Flow: FLOW_OUT
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
+        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 21 2023, Viktor Prutyanov <viktor@daynix.com> wrote:
-
-> According to VirtIO spec v1.2, VIRTIO_F_NOTIFICATION_DATA feature
-> indicates that the driver passes extra data along with the queue
-> notifications.
->
-> In a split queue case, the extra data is 16-bit available index. In a
-> packed queue case, the extra data is 1-bit wrap counter and 15-bit
-> available index.
->
-> Add support for this feature for MMIO, PCI and channel I/O transports.
->
-> Signed-off-by: Viktor Prutyanov <viktor@daynix.com>
+On Tue, Mar 07, 2023 at 11:28:42AM +0000, Alex Bennée wrote:
+> This adds a fairly brain dead torture test for TLB flushes intended
+> for stressing the MTTCG QEMU build. It takes the usual -smp option for
+> multiple CPUs.
+> 
+> By default it CPU0 will do a TLBIALL flush after each cycle. You can
+> pass options via -append to control additional aspects of the test:
+> 
+>   - "page" flush each page in turn (one per function)
+>   - "self" do the flush after each computation cycle
+>   - "verbose" report progress on each computation cycle
+> 
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+> CC: Mark Rutland <mark.rutland@arm.com>
+> Message-Id: <20211118184650.661575-7-alex.bennee@linaro.org>
+> 
 > ---
->  v3: support feature in virtio_ccw, remove VM_NOTIFY, use avail_idx_shadow,
->     remove byte swap, rename to vring_notification_data
->  v2: reject the feature in virtio_ccw, replace __le32 with u32
->
->  drivers/s390/virtio/virtio_ccw.c   |  4 +++-
->  drivers/virtio/virtio_mmio.c       | 14 +++++++++++++-
->  drivers/virtio/virtio_pci_common.c | 10 ++++++++++
->  drivers/virtio/virtio_pci_common.h |  4 ++++
->  drivers/virtio/virtio_pci_legacy.c |  2 +-
->  drivers/virtio/virtio_pci_modern.c |  2 +-
->  drivers/virtio/virtio_ring.c       | 17 +++++++++++++++++
->  include/linux/virtio_ring.h        |  2 ++
->  include/uapi/linux/virtio_config.h |  6 ++++++
->  9 files changed, 57 insertions(+), 4 deletions(-)
->
-> diff --git a/drivers/s390/virtio/virtio_ccw.c b/drivers/s390/virtio/virtio_ccw.c
-> index 954fc31b4bc7..c33172c5b8d5 100644
-> --- a/drivers/s390/virtio/virtio_ccw.c
-> +++ b/drivers/s390/virtio/virtio_ccw.c
-> @@ -396,13 +396,15 @@ static bool virtio_ccw_kvm_notify(struct virtqueue *vq)
->  	struct virtio_ccw_vq_info *info = vq->priv;
->  	struct virtio_ccw_device *vcdev;
->  	struct subchannel_id schid;
-> +	u32 data = __virtio_test_bit(vq->vdev, VIRTIO_F_NOTIFICATION_DATA) ?
-> +			vring_notification_data(vq) : vq->index;
+> v9
+>   - move tests back into unittests.cfg (with nodefault mttcg)
+>   - replace printf with report_info
+>   - drop accel = tcg
+> ---
+>  arm/Makefile.common |   1 +
+>  arm/tlbflush-code.c | 209 ++++++++++++++++++++++++++++++++++++++++++++
+>  arm/unittests.cfg   |  25 ++++++
+>  3 files changed, 235 insertions(+)
+>  create mode 100644 arm/tlbflush-code.c
+> 
+> diff --git a/arm/Makefile.common b/arm/Makefile.common
+> index 16f8c6df..2c4aad38 100644
+> --- a/arm/Makefile.common
+> +++ b/arm/Makefile.common
+> @@ -12,6 +12,7 @@ tests-common += $(TEST_DIR)/gic.flat
+>  tests-common += $(TEST_DIR)/psci.flat
+>  tests-common += $(TEST_DIR)/sieve.flat
+>  tests-common += $(TEST_DIR)/pl031.flat
+> +tests-common += $(TEST_DIR)/tlbflush-code.flat
 >  
->  	vcdev = to_vc_device(info->vq->vdev);
->  	ccw_device_get_schid(vcdev->cdev, &schid);
->  	BUILD_BUG_ON(sizeof(struct subchannel_id) != sizeof(unsigned int));
->  	info->cookie = kvm_hypercall3(KVM_S390_VIRTIO_CCW_NOTIFY,
->  				      *((unsigned int *)&schid),
-> -				      vq->index, info->cookie);
-> +				      data, info->cookie);
->  	if (info->cookie < 0)
->  		return false;
->  	return true;
-> diff --git a/drivers/virtio/virtio_mmio.c b/drivers/virtio/virtio_mmio.c
-> index 3ff746e3f24a..7c16e622c33d 100644
-> --- a/drivers/virtio/virtio_mmio.c
-> +++ b/drivers/virtio/virtio_mmio.c
-> @@ -285,6 +285,16 @@ static bool vm_notify(struct virtqueue *vq)
->  	return true;
->  }
->  
-> +static bool vm_notify_with_data(struct virtqueue *vq)
+>  tests-all = $(tests-common) $(tests)
+>  all: directories $(tests-all)
+> diff --git a/arm/tlbflush-code.c b/arm/tlbflush-code.c
+> new file mode 100644
+> index 00000000..bf9eb111
+> --- /dev/null
+> +++ b/arm/tlbflush-code.c
+> @@ -0,0 +1,209 @@
+> +// SPDX-License-Identifier: GPL-2.0-or-later
+> +/*
+> + * TLB Flush Race Tests
+> + *
+> + * These tests are designed to test for incorrect TLB flush semantics
+> + * under emulation. The initial CPU will set all the others working a
+> + * compuation task and will then trigger TLB flushes across the
+
+computation
+
+> + * system. It doesn't actually need to re-map anything but the flushes
+> + * themselves will trigger QEMU's TCG self-modifying code detection
+> + * which will invalidate any generated  code causing re-translation.
+> + * Eventually the code buffer will fill and a general tb_lush() will
+> + * be triggered.
+> + *
+> + * Copyright (C) 2016-2021, Linaro, Alex Bennée <alex.bennee@linaro.org>
+> + *
+> + * This work is licensed under the terms of the GNU LGPL, version 2.
+> + */
+> +
+> +#include <libcflat.h>
+> +#include <asm/smp.h>
+> +#include <asm/cpumask.h>
+> +#include <asm/barrier.h>
+> +#include <asm/mmu.h>
+> +
+> +#define SEQ_LENGTH 10
+> +#define SEQ_HASH 0x7cd707fe
+> +
+> +static cpumask_t smp_test_complete;
+> +static int flush_count = 1000000;
+> +static bool flush_self;
+> +static bool flush_page;
+> +static bool flush_verbose;
+> +
+> +/*
+> + * Work functions
+> + *
+> + * These work functions need to be:
+> + *
+> + *  - page aligned, so we can flush one function at a time
+> + *  - have branches, so QEMU TCG generates multiple basic blocks
+> + *  - call across pages, so we exercise the TCG basic block slow path
+> + */
+> +
+> +/* Adler32 */
+> +__attribute__((aligned(PAGE_SIZE))) static
+> +uint32_t hash_array(const void *buf, size_t buflen)
 > +{
-> +	struct virtio_mmio_device *vm_dev = to_virtio_mmio_device(vq->vdev);
-> +	u32 data = vring_notification_data(vq);
+> +	const uint8_t *data = (uint8_t *) buf;
+> +	uint32_t s1 = 1;
+> +	uint32_t s2 = 0;
 > +
-> +	writel(data, vm_dev->base + VIRTIO_MMIO_QUEUE_NOTIFY);
-
-Can't you simply use the same method as for ccw, i.e. use one callback
-function that simply writes one value or the other?
-
-> +
-> +	return true;
+> +	for (size_t n = 0; n < buflen; n++) {
+> +		s1 = (s1 + data[n]) % 65521;
+> +		s2 = (s2 + s1) % 65521;
+> +	}
+> +	return (s2 << 16) | s1;
 > +}
 > +
->  /* Notify all virtqueues on an interrupt. */
->  static irqreturn_t vm_interrupt(int irq, void *opaque)
->  {
-> @@ -368,6 +378,8 @@ static struct virtqueue *vm_setup_vq(struct virtio_device *vdev, unsigned int in
->  	unsigned long flags;
->  	unsigned int num;
->  	int err;
-> +	bool (*notify)(struct virtqueue *vq) = __virtio_test_bit(vdev,
-> +		VIRTIO_F_NOTIFICATION_DATA) ? vm_notify_with_data : vm_notify;
->  
->  	if (!name)
->  		return NULL;
-> @@ -397,7 +409,7 @@ static struct virtqueue *vm_setup_vq(struct virtio_device *vdev, unsigned int in
->  
->  	/* Create the vring */
->  	vq = vring_create_virtqueue(index, num, VIRTIO_MMIO_VRING_ALIGN, vdev,
-> -				 true, true, ctx, vm_notify, callback, name);
-> +				 true, true, ctx, notify, callback, name);
->  	if (!vq) {
->  		err = -ENOMEM;
->  		goto error_new_virtqueue;
-> diff --git a/drivers/virtio/virtio_pci_common.c b/drivers/virtio/virtio_pci_common.c
-> index a6c86f916dbd..e915c22f2384 100644
-> --- a/drivers/virtio/virtio_pci_common.c
-> +++ b/drivers/virtio/virtio_pci_common.c
-> @@ -43,6 +43,16 @@ bool vp_notify(struct virtqueue *vq)
->  	/* we write the queue's selector into the notification register to
->  	 * signal the other end */
->  	iowrite16(vq->index, (void __iomem *)vq->priv);
+> +__attribute__((aligned(PAGE_SIZE))) static
+> +void create_fib_sequence(int length, unsigned int *array)
+> +{
+> +	int i;
 > +
-> +	return true;
+> +	/* first two values */
+> +	array[0] = 0;
+> +	array[1] = 1;
+> +	for (i = 2; i < length; i++)
+> +		array[i] = array[i-2] + array[i-1];
 > +}
 > +
-> +bool vp_notify_with_data(struct virtqueue *vq)
+> +__attribute__((aligned(PAGE_SIZE))) static
+> +unsigned long long factorial(unsigned int n)
 > +{
-> +	u32 data = vring_notification_data(vq);
+> +	unsigned int i;
+> +	unsigned long long fac = 1;
 > +
-> +	iowrite32(data, (void __iomem *)vq->priv);
-
-Same for pci.
-
+> +	for (i = 1; i <= n; i++)
+> +		fac = fac * i;
+> +	return fac;
+> +}
 > +
->  	return true;
->  }
->  
+> +__attribute__((aligned(PAGE_SIZE))) static
+> +void factorial_array(unsigned int n, unsigned int *input,
+> +		     unsigned long long *output)
+> +{
+> +	unsigned int i;
+> +
+> +	for (i = 0; i < n; i++)
+> +		output[i] = factorial(input[i]);
+> +}
+> +
+> +__attribute__((aligned(PAGE_SIZE))) static
+> +unsigned int do_computation(void)
+> +{
+> +	unsigned int fib_array[SEQ_LENGTH];
+> +	unsigned long long facfib_array[SEQ_LENGTH];
+> +	uint32_t fib_hash, facfib_hash;
+> +
+> +	create_fib_sequence(SEQ_LENGTH, &fib_array[0]);
+> +	fib_hash = hash_array(&fib_array[0], sizeof(fib_array));
+> +	factorial_array(SEQ_LENGTH, &fib_array[0], &facfib_array[0]);
+> +	facfib_hash = hash_array(&facfib_array[0], sizeof(facfib_array));
+> +
+> +	return (fib_hash ^ facfib_hash);
+> +}
+> +
+> +/* This provides a table of the work functions so we can flush each
+> + * page individually
+> + */
+> +static void *pages[] = {&hash_array, &create_fib_sequence, &factorial,
+> +			&factorial_array, &do_computation};
+> +
+> +static void do_flush(int i)
+> +{
+> +	if (flush_page)
+> +		flush_tlb_page((unsigned long)pages[i % ARRAY_SIZE(pages)]);
+> +	else
+> +		flush_tlb_all();
+> +}
+> +
+> +
+> +static void just_compute(void)
+> +{
+> +	int i, errors = 0;
+> +	int cpu = smp_processor_id();
+> +
+> +	uint32_t result;
+> +
+> +	report_info("CPU%d online", cpu);
+> +
+> +	for (i = 0 ; i < flush_count; i++) {
+> +		result = do_computation();
+> +
+> +		if (result != SEQ_HASH) {
+> +			errors++;
+> +			report_info("CPU%d: seq%d 0x%"PRIx32"!=0x%x",
+> +				    cpu, i, result, SEQ_HASH);
+> +		}
+> +
+> +		if (flush_verbose && (i % 1000) == 0)
+> +			report_info("CPU%d: seq%d", cpu, i);
+> +
+> +		if (flush_self)
+> +			do_flush(i);
+> +	}
+> +
+> +	report(errors == 0, "CPU%d: Done - Errors: %d", cpu, errors);
+> +
+> +	cpumask_set_cpu(cpu, &smp_test_complete);
+> +	if (cpu != 0)
+> +		halt();
+> +}
+> +
+> +static void just_flush(void)
+> +{
+> +	int cpu = smp_processor_id();
+> +	int i = 0;
+> +
+> +	/*
+> +	 * Set our CPU as done, keep flushing until everyone else
+> +	 * finished
+> +	 */
+> +	cpumask_set_cpu(cpu, &smp_test_complete);
+> +
+> +	while (!cpumask_full(&smp_test_complete))
+> +		do_flush(i++);
+> +
+> +	report_info("CPU%d: Done - Triggered %d flushes", cpu, i);
+> +}
+> +
+> +int main(int argc, char **argv)
+> +{
+> +	int cpu, i;
+> +	char prefix[100];
+> +
+> +	for (i = 0; i < argc; i++) {
+> +		char *arg = argv[i];
+> +
+> +		if (strcmp(arg, "page") == 0)
+> +			flush_page = true;
+> +
+> +		if (strcmp(arg, "self") == 0)
+> +			flush_self = true;
+> +
+> +		if (strcmp(arg, "verbose") == 0)
+> +			flush_verbose = true;
+> +	}
+> +
+> +	snprintf(prefix, sizeof(prefix), "tlbflush_%s_%s",
+> +		 flush_page ? "page" : "all",
+> +		 flush_self ? "self" : "other");
+> +	report_prefix_push(prefix);
+> +
+> +	for_each_present_cpu(cpu) {
+> +		if (cpu == 0)
+> +			continue;
+> +		smp_boot_secondary(cpu, just_compute);
+> +	}
+> +
+> +	if (flush_self)
+> +		just_compute();
+> +	else
+> +		just_flush();
+> +
+> +	while (!cpumask_full(&smp_test_complete))
+> +		cpu_relax();
+> +
+> +	return report_summary();
+> +}
+> diff --git a/arm/unittests.cfg b/arm/unittests.cfg
+> index 5e67b558..ee21aef4 100644
+> --- a/arm/unittests.cfg
+> +++ b/arm/unittests.cfg
+> @@ -275,3 +275,28 @@ file = debug.flat
+>  arch = arm64
+>  extra_params = -append 'ss-migration'
+>  groups = debug migration
+> +
+> +# TLB Torture Tests
+> +[tlbflush-code::all_other]
 
+It's better to use '-', '_', '.', or ',' than '::' because otherwise the
+standalone test will have a filename like tests/tlbflush-code::all_other
+which will be awkward for shells.
+
+BTW, have you tried running these tests as standalone? Since they're
+'nodefault' it'd be good if they work that way.
+
+> +file = tlbflush-code.flat
+> +smp = $(($MAX_SMP>4?4:$MAX_SMP))
+> +groups = nodefault mttcg
+> +
+> +[tlbflush-code::page_other]
+> +file = tlbflush-code.flat
+> +smp = $(($MAX_SMP>4?4:$MAX_SMP))
+> +extra_params = -append 'page'
+> +groups = nodefault mttcg
+> +
+> +[tlbflush-code::all_self]
+> +file = tlbflush-code.flat
+> +smp = $(($MAX_SMP>4?4:$MAX_SMP))
+> +extra_params = -append 'self'
+> +groups = nodefault mttcg
+> +
+> +[tlbflush-code::page_self]
+> +file = tlbflush-code.flat
+> +smp = $(($MAX_SMP>4?4:$MAX_SMP))
+> +extra_params = -append 'page self'
+> +groups = nodefault mttcg
+> +
+> -- 
+> 2.39.2
+>
+
+Thanks,
+drew
