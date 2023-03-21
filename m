@@ -2,105 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 34DD06C2DDC
-	for <lists+kvm@lfdr.de>; Tue, 21 Mar 2023 10:29:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6CEFA6C2E23
+	for <lists+kvm@lfdr.de>; Tue, 21 Mar 2023 10:42:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230107AbjCUJ3k (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Mar 2023 05:29:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59542 "EHLO
+        id S229886AbjCUJmi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Mar 2023 05:42:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48798 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229662AbjCUJ3i (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Mar 2023 05:29:38 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ACD525BB8
-        for <kvm@vger.kernel.org>; Tue, 21 Mar 2023 02:29:14 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 497F31FD6A;
-        Tue, 21 Mar 2023 09:29:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1679390953; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=yoH04eWd5UxBhyOEYXUi9WaWEaBHDCNrGzWfCwchho8=;
-        b=PMQGdG37ZFLuEhF5jkbBRnnoEoRwkzwd8PruvgRKKfb5DjgSiaEkV/UVAh2Ke01gCDAaQj
-        oz/Qip0ds6CsCkaDfEh38ElsZqJzMkbxPa03XAmxih0+DZUYNVKZ9Msuimy5lFgRg7nfKe
-        D0jQgGKSz0CD8RT46xVroZR5m8PGwb8=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1679390953;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=yoH04eWd5UxBhyOEYXUi9WaWEaBHDCNrGzWfCwchho8=;
-        b=KzYHp93Aj+DzS18wxTw5XXU4A+yLat97c2d2K306qrphexYVjEpsxajB9g+HnFq6wGO/4h
-        5tzqXQm0fqhkIJBQ==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 24B2113451;
-        Tue, 21 Mar 2023 09:29:13 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id MwiDB+l4GWTDCwAAMHmgww
-        (envelope-from <jroedel@suse.de>); Tue, 21 Mar 2023 09:29:13 +0000
-Date:   Tue, 21 Mar 2023 10:29:11 +0100
-From:   =?iso-8859-1?Q?J=F6rg_R=F6del?= <jroedel@suse.de>
-To:     amd-sev-snp@lists.suse.com, linux-coco@lists.linux.dev,
-        kvm@vger.kernel.org
-Subject: [ANNOUNCEMENT] COCONUT Secure VM Service Module for SEV-SNP
-Message-ID: <ZBl4592947wC7WKI@suse.de>
+        with ESMTP id S229833AbjCUJmf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Mar 2023 05:42:35 -0400
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id F0EA23E62D
+        for <kvm@vger.kernel.org>; Tue, 21 Mar 2023 02:42:30 -0700 (PDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A1BA3AD7;
+        Tue, 21 Mar 2023 02:43:14 -0700 (PDT)
+Received: from [10.57.53.10] (unknown [10.57.53.10])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3E4F53F766;
+        Tue, 21 Mar 2023 02:42:29 -0700 (PDT)
+Message-ID: <60fbd578-0391-98b1-d8d1-200a716e1500@arm.com>
+Date:   Tue, 21 Mar 2023 09:42:25 +0000
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.9.0
+Subject: Re: [PATCH 02/11] KVM: arm64: Add a helper to check if a VM has ran
+ once
+To:     Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Salil Mehta <salil.mehta@huawei.com>
+References: <20230320221002.4191007-1-oliver.upton@linux.dev>
+ <20230320221002.4191007-3-oliver.upton@linux.dev>
+From:   Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <20230320221002.4191007-3-oliver.upton@linux.dev>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+Hi Oliver,
 
-We are happy to announce that last week our secure VM service module
-(SVSM) went public on GitHub for everyone to try it out and participate
-in its further development. It is dual-licensed under the MIT and
-APACHE-2.0 licenses.
+On 20/03/2023 22:09, Oliver Upton wrote:
+> The test_bit(...) pattern is quite a lot of keystrokes. Replace
+> existing callsites with a helper.
+> 
+> No functional change intended.
+> 
+> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> ---
+>   arch/arm64/include/asm/kvm_host.h | 3 +++
+>   arch/arm64/kvm/pmu-emul.c         | 4 ++--
 
-The project is written in Rust and can be cloned from:
+There is one more instance in arch/arm64/kvm/hypercalls.c at
+kvm_arm_set_fw_reg_bmap(). Is there a reason why that can't be replaced ?
 
-	https://github.com/coconut-svsm/svsm
+Otherwise, looks good to me.
 
-There are also repositories in the github project with the Linux host and
-guest, EDK2 and QEMU changes needed to run the SVSM and boot up a full
-Linux guest.
-
-The SVSM repository contains an installation guide in the INSTALL.md
-file and contributor hints in CONTRIBUTING.md.
-
-A blog entry with more details is here:
-
-	https://www.suse.com/c/suse-open-sources-secure-vm-service-module-for-confidential-computing/
-
-We also thank AMD for implementing and providing the necessary changes
-to Linux and EDK2 to make an SVSM possible.
-
-Have a lot of fun!
-
--- 
-Jörg Rödel
-jroedel@suse.de
-
-SUSE Software Solutions Germany GmbH
-Frankenstraße 146
-90461 Nürnberg
-Germany
-
-(HRB 36809, AG Nürnberg)
-Geschäftsführer: Ivo Totev, Andrew Myers, Andrew McDonald, Boudien Moerman
+Suzuki
 
