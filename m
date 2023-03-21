@@ -2,93 +2,141 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 139D06C3B18
-	for <lists+kvm@lfdr.de>; Tue, 21 Mar 2023 20:58:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 43A0C6C3B37
+	for <lists+kvm@lfdr.de>; Tue, 21 Mar 2023 21:06:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229980AbjCUT6M (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Mar 2023 15:58:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60470 "EHLO
+        id S229964AbjCUUGD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Mar 2023 16:06:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42658 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229513AbjCUT6K (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Mar 2023 15:58:10 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69F81302B9;
-        Tue, 21 Mar 2023 12:57:50 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id ED058617EC;
-        Tue, 21 Mar 2023 19:57:47 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 277C9C433D2;
-        Tue, 21 Mar 2023 19:57:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1679428667;
-        bh=GKA4u3MPOorQTBHU2zQGSJnmsX+P8WaqFLKkzLHEvJE=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=H6lg/B/buJIb/LZoslCty46VUSmVDDjrCtozuQJtxilxcKJW1FN7HRJpPDnWFj5yI
-         01gu4iqeKf0OiAbVO4b97AkVsovIiQvCBUhA2LAcMoNgdQ0KX0cJRLuu9R648kL+SV
-         CYFx5jyb+Loasx8FS63wDUEWB8ZmI1TnP3XAvlvxTUd5O1vE285bIdDOS0E2jXNhXe
-         9FCP12eCMaMlHJNZcVMWQ+DdLYPFgTMkiEmnh+LDd35E4OVLoxg7+aOiJPBWiwyzGg
-         PVjfWnje6LJxZWNaLV9Y6yjE7ElgMnYqBhOgyQuDVQjgtZBeuGE2+4MoEulGMeaLVO
-         c1PdDFK3fgddw==
-Date:   Tue, 21 Mar 2023 20:57:42 +0100
-From:   Christian Brauner <brauner@kernel.org>
-To:     Mike Christie <michael.christie@oracle.com>
-Cc:     syzbot <syzbot+6b27b2d2aba1c80cc13b@syzkaller.appspotmail.com>,
-        jasowang@redhat.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, mst@redhat.com,
-        netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com,
-        virtualization@lists.linux-foundation.org
-Subject: Re: [syzbot] [kernel?] general protection fault in vhost_task_start
-Message-ID: <20230321195742.6b46syklc34es4cx@wittgenstein>
-References: <0000000000005a60a305f76c07dc@google.com>
- <2d976892-9914-5de0-62e0-c75f1c148259@oracle.com>
+        with ESMTP id S229841AbjCUUGB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Mar 2023 16:06:01 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C9D426A6
+        for <kvm@vger.kernel.org>; Tue, 21 Mar 2023 13:05:55 -0700 (PDT)
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 32LIXUd5016684;
+        Tue, 21 Mar 2023 20:05:41 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : reply-to : to : cc : date : in-reply-to : references : content-type
+ : mime-version : content-transfer-encoding; s=pp1;
+ bh=ixwo8rFfOE7dCM9YBZU/EfkMPgOIFTuk724F+quK0ZM=;
+ b=P8wxjup4Jo/sYX592knQ/DTk0RTopR3f4qIFbZoc8G7Hd+FK/gKTsXzA98uzvCDxDUfL
+ 47lWYsENsQYQ/IJkF9sgiA+n/f1vem2XON06Ldb852opPfv0QMlVYbdQ+cQs+UabWskL
+ Ouz9mW/YOkuzCo03H96kYyPJOGnIc7BGa9wPu43TeuLuzM2yKDv2x528x1BcpDYJaRaM
+ sZFEDcO9u1Do4NRcMB8f3/YiFT1yW1uOGP3Le3U9XmWF9xGHGKMUW6lK3hDbM9A8dgMS
+ +zp3KBA762G8nr/p4BQcDBOYTFqtJBIQPJL08DRsQGFFyvUGJyx/L3kYsjKtlS48/6Jp fg== 
+Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com [169.53.41.122])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pf9249hjd-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 21 Mar 2023 20:05:41 +0000
+Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
+        by ppma04dal.us.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 32LJ8xJ8020743;
+        Tue, 21 Mar 2023 20:05:40 GMT
+Received: from smtprelay02.wdc07v.mail.ibm.com ([9.208.129.120])
+        by ppma04dal.us.ibm.com (PPS) with ESMTPS id 3pd4x79jd3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 21 Mar 2023 20:05:40 +0000
+Received: from smtpav01.dal12v.mail.ibm.com (smtpav01.dal12v.mail.ibm.com [10.241.53.100])
+        by smtprelay02.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 32LK5d3V18416188
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 21 Mar 2023 20:05:39 GMT
+Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 296A758065;
+        Tue, 21 Mar 2023 20:05:39 +0000 (GMT)
+Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 86F7D58061;
+        Tue, 21 Mar 2023 20:05:38 +0000 (GMT)
+Received: from nat-wireless-guest-reg-153-54.bu.edu (unknown [9.163.23.201])
+        by smtpav01.dal12v.mail.ibm.com (Postfix) with ESMTP;
+        Tue, 21 Mar 2023 20:05:38 +0000 (GMT)
+Message-ID: <7d615af4c6a9e5eeb0337d98c9e9ddca6d2cbdef.camel@linux.ibm.com>
+Subject: Re: [ANNOUNCEMENT] COCONUT Secure VM Service Module for SEV-SNP
+From:   James Bottomley <jejb@linux.ibm.com>
+Reply-To: jejb@linux.ibm.com
+To:     =?ISO-8859-1?Q?J=F6rg_R=F6del?= <jroedel@suse.de>
+Cc:     amd-sev-snp@lists.suse.com, linux-coco@lists.linux.dev,
+        kvm@vger.kernel.org
+Date:   Tue, 21 Mar 2023 16:05:35 -0400
+In-Reply-To: <ZBnJ6ZCuQJTVMM8h@suse.de>
+References: <ZBl4592947wC7WKI@suse.de>
+         <66eee693371c11bbd2173ad5d91afc740aa17b46.camel@linux.ibm.com>
+         <ZBmmjlNdBwVju6ib@suse.de>
+         <c2e8af835723c453adaba4b66db533a158076bbf.camel@linux.ibm.com>
+         <ZBnJ6ZCuQJTVMM8h@suse.de>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.42.4 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <2d976892-9914-5de0-62e0-c75f1c148259@oracle.com>
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: DxOMIW6msPBOJFKA97GFJXokRTIqj3ai
+X-Proofpoint-ORIG-GUID: DxOMIW6msPBOJFKA97GFJXokRTIqj3ai
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
+ definitions=2023-03-21_11,2023-03-21_01,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 spamscore=0
+ malwarescore=0 lowpriorityscore=0 bulkscore=0 phishscore=0 clxscore=1015
+ impostorscore=0 mlxscore=0 priorityscore=1501 mlxlogscore=999
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2303150002 definitions=main-2303210159
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 21, 2023 at 12:46:04PM -0500, Mike Christie wrote:
-> On 3/21/23 12:03 PM, syzbot wrote:
-> > RIP: 0010:vhost_task_start+0x22/0x40 kernel/vhost_task.c:115
-> > Code: 00 00 00 00 00 0f 1f 00 f3 0f 1e fa 53 48 89 fb e8 c3 67 2c 00 48 8d 7b 70 48 b8 00 00 00 00 00 fc ff df 48 89 fa 48 c1 ea 03 <80> 3c 02 00 75 0a 48 8b 7b 70 5b e9 fe bd 02 00 e8 79 ec 7e 00 eb
-> > RSP: 0018:ffffc90003a9fc38 EFLAGS: 00010207
-> > RAX: dffffc0000000000 RBX: fffffffffffffff4 RCX: 0000000000000000
-> > RDX: 000000000000000c RSI: ffffffff81564c8d RDI: 0000000000000064
-> > RBP: ffff88802b21dd40 R08: 0000000000000100 R09: ffffffff8c917cf3
-> > R10: 00000000fffffff4 R11: 0000000000000000 R12: fffffffffffffff4
-> > R13: ffff888075d000b0 R14: ffff888075d00000 R15: ffff888075d00008
-> > FS:  0000555556247300(0000) GS:ffff8880b9800000(0000) knlGS:0000000000000000
-> > CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> > CR2: 00007ffe3d8e5ff8 CR3: 00000000215d4000 CR4: 00000000003506f0
-> > DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> > DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> > Call Trace:
-> >  <TASK>
-> >  vhost_worker_create drivers/vhost/vhost.c:580 [inline]
+On Tue, 2023-03-21 at 16:14 +0100, Jörg Rödel wrote:
+> On Tue, Mar 21, 2023 at 09:43:48AM -0400, James Bottomley wrote:
+> > Could you describe these incompatible goals and explain why you
+> > think they are incompatible (as in why you and AMD don't think you
+> > can agree on it)?  That would help the rest of us understand where
+> > the two SVSM implementations fit in our ongoing plans.
 > 
-> The return value from vhost_task_create is incorrect if the kzalloc fails.
+> The goal of COCONUT is to have an SVSM which has isolation
+> capabilities within itself. It already has percpu page-tables and in
+> the end it will be able to run services (like the TPM) as separate
+> processes in ring 3 using cooperative multitasking.
 > 
-> Christian, here is a fix for what's in your tree. Do you want me to submit
-> a follow up patch like this or a replacement patch for:
+> With the current linux-svsm code-base this is difficult to achieve
+> due to its reliance on the x86-64 crate. For supporting a user-space
+> like execution mode the crate has too many limitations, mainly in its
+> page-table and IDT implementations.
 > 
-> commit 77feab3c4156 ("vhost_task: Allow vhost layer to use copy_process")
+> The IDT code from that crate, which is also used in linux-svsm,
+> relies on compiler-generated entry-code. This is not enough to
+> support a ring-3 execution mode with syscalls and several (possibly
+> nested) IST vectors. The next problem with the IDT code is that it
+> doesn't allow modification of return register state.  This makes it
+> impossible to implement exception fixups to guard RMPADJUST
+> instructions and VMPL1 memory accesses in general.
+> 
+> When we looked at the crate, the page-table implementation supported
+> basically a direct and an offset mapping, which will get us into
+> problems when support for non-contiguous mappings or sharing parts of
+> a page-table with another page-table is needed. So in the very
+> beginning of the project I decided to go with my own page-table
+> implementation.
 
-Since this has been in linux-next my tendency is to just put this fix on
-top. So please slap a Fixes: tag on it and a Link to the syzbot report.
-I also tend to annotate such fixes with "# mainline only":
+OK, so this doesn't sound like a problem with the AMD svsm, it sounds
+like a (solvable) issue with a particular crate in embedded rust.  I
+have to say that embedded rust is so new, it's really hard to tell if
+this is just because it was developed by someone who didn't think of
+all the OS implications or because it's a fundamental issue within the
+rust ecosystem.  Have you tried improving this crate? ... and also it's
+a nuisance we came to with our insistence on using rust; it certainly
+wouldn't have been an issue in C.  I suspect improving the crate would
+help everyone (although I note the linux kernel isn't yet using this
+crate either).
 
-Fixes: 77feab3c4156 ("vhost_task: Allow vhost layer to use copy_process") # mainline only
+> Of course we could start changing linux-svsm to support the same
+> goals, but I think the end result will not be very different from
+> what COCONUT looks now.
 
-to prevent AUTOSEL from picking this up.
+That's entirely possible, so what are the chances of combining the
+projects now so we don't get a split in community effort?
 
-Thanks for taking care of this so quickly!
-Christian
+James
+
