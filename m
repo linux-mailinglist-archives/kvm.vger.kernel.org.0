@@ -2,64 +2,78 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0C8F56C3CC3
-	for <lists+kvm@lfdr.de>; Tue, 21 Mar 2023 22:35:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8C5686C3CD1
+	for <lists+kvm@lfdr.de>; Tue, 21 Mar 2023 22:37:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229565AbjCUVfh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Mar 2023 17:35:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53766 "EHLO
+        id S229934AbjCUVhS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Mar 2023 17:37:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54780 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229464AbjCUVfg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Mar 2023 17:35:36 -0400
-Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3744536FD2
-        for <kvm@vger.kernel.org>; Tue, 21 Mar 2023 14:35:36 -0700 (PDT)
-Received: by mail-pj1-x104a.google.com with SMTP id d5-20020a17090ac24500b0023cb04ec86fso5934978pjx.7
-        for <kvm@vger.kernel.org>; Tue, 21 Mar 2023 14:35:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1679434535;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=CT/htnnAn/ooG8ZLwPOFS8UzYgo6pm63UMG8YjSKlAI=;
-        b=hXl5d9DhNirXu45cFaB8nsrBMorOagxIDh97eJTbf388mqS5koHw82EJ3hZuXQw/wf
-         wLYjGWXLS69FGWNGQDqrga9loIY3rtdkG7M8+qPRMY9hqfkjm68wxSWqxDj3npYoO1y0
-         u1aSWnxjJrhvOPdf5uRVACQh8XgXxAdm3wVXe/o2AfeTLmXWErtxa7cdByNag+TOClzg
-         /sKUO+d1VXP27SA8oth/+9q2+bJRUa+qTWQPTLL3bOMIaQTYSHmon85AqLJVe95Ay8fV
-         KLmH4PAiG8kyj4CmcjMKvlvY8ulP0aIrxqe0X/x8ef16yaqO/BqqRv4rAFeq4RzY5YIl
-         6gcQ==
+        with ESMTP id S229819AbjCUVhQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Mar 2023 17:37:16 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CACB45709F
+        for <kvm@vger.kernel.org>; Tue, 21 Mar 2023 14:36:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1679434590;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=2/+8rQXESx0y7iJ/lWjYGgkO51bDoW36uXQ0ZIfOfDY=;
+        b=dOsGije4eIQJgfyacKCQt1ZNBgQeuOoRmC82lZah70v0VgDOCHLBB3a7YKUl/OjtZdFOMy
+        c/PjKZls8/ch4hXYB9Xhdi/ujnuvSh2OfhTb+GrqAVdbPtx4s5KJ11HTap+mlDyfxfEfZK
+        +a+yWxv3S2/Ykp7VZAMSTHuSme+5Kl4=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-576-QiBjBi6nN9yL9TIp0xCPPA-1; Tue, 21 Mar 2023 17:36:28 -0400
+X-MC-Unique: QiBjBi6nN9yL9TIp0xCPPA-1
+Received: by mail-wm1-f72.google.com with SMTP id e5-20020a05600c4e4500b003edc5824521so5138206wmq.0
+        for <kvm@vger.kernel.org>; Tue, 21 Mar 2023 14:36:28 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679434535;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=CT/htnnAn/ooG8ZLwPOFS8UzYgo6pm63UMG8YjSKlAI=;
-        b=sBQGNlGyatBs2HHDEmuBOjeS8pXfQpRYS5aAlhFqnA3ALq569twBdZ3qV/D7CsLk9R
-         yIVOH6794UlSCsI2Z/oGafD7hMQywS7NDDHCQJ7mdhJMtvRVdWM+PIqx7iO8LPIrIzOl
-         ivgwoqfehiwX+Paqk3zb2b0Nt67/mPBmAOnw/P594ZNu8PAhSblacfLJsunD6DIDup55
-         M6L3UOQ3P9+4dKxLdk/387Mv/QlVhICI7uqbp6uMfzv4BgaSzB8MTwY6DuwvBkOUeD/f
-         imHGfzDaIdBvM01oMMmMJYwFYJZiMarcdlM8dxdUCC8EI/SlbPhYHXUhfE8jVl1lWTzx
-         0p9g==
-X-Gm-Message-State: AO0yUKV5hNIVtBeGwWR4P3Tu26cgzmyrRxdctAjxk5xb9JubPKIw5XPX
-        oYwoqYtEDkoLE55hHKUFrFP1sq0LTpw=
-X-Google-Smtp-Source: AK7set+1ali7XG/Jw5iiNAhipgMe5z+e4sb6wW41QGd/XltoVqqTsfRBarUw+Jb5zof3DoaF1O1Dp5V/JVc=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:903:3293:b0:1a1:b3bb:cd5e with SMTP id
- jh19-20020a170903329300b001a1b3bbcd5emr191934plb.9.1679434535814; Tue, 21 Mar
- 2023 14:35:35 -0700 (PDT)
-Date:   Tue, 21 Mar 2023 14:35:34 -0700
-In-Reply-To: <ZBhTa6QSGDp2ZkGU@gao-cwp>
-Mime-Version: 1.0
-References: <20230319084927.29607-1-binbin.wu@linux.intel.com>
- <20230319084927.29607-3-binbin.wu@linux.intel.com> <ZBhTa6QSGDp2ZkGU@gao-cwp>
-Message-ID: <ZBojJgTG/SNFS+3H@google.com>
-Subject: Re: [PATCH v6 2/7] KVM: VMX: Use is_64_bit_mode() to check 64-bit mode
-From:   Sean Christopherson <seanjc@google.com>
-To:     Chao Gao <chao.gao@intel.com>
-Cc:     Binbin Wu <binbin.wu@linux.intel.com>, kvm@vger.kernel.org,
-        pbonzini@redhat.com, robert.hu@linux.intel.com
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-7.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+        d=1e100.net; s=20210112; t=1679434587;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2/+8rQXESx0y7iJ/lWjYGgkO51bDoW36uXQ0ZIfOfDY=;
+        b=6RnBSDhfyvr9EAVdVdOw/4MytVMmbLims/Nbc8jqF3rz5AkAHen3XImdFrZ/zdSc1Y
+         DUiq08FhZYoD+VZHKYGGvM1tLrLSnawezplhSwyHAhzk2KdX3vMpclMETl0mzPK3MKqH
+         Zr+SxBdRiIzSZcR4nueafusu2s184tLnbnyQompXOCs64HvpQkRFZ6yGuHPqf0aEvV5I
+         FmE0xFLFhW5QeOu+EaZYJG9la0dWZsHFhampp3ou3CCeQ+zvDT52bNS+j9i8HyS8Hbc1
+         dxrxr8pdde/k8F3Ii0rzUlbZW8lcXYB7ImLo+sXqsdm3HCoxIdqmkur8vspj0aiKFFrj
+         znRg==
+X-Gm-Message-State: AO0yUKXFzwu8U0VcCxVKAQo4BmNIxq7p9ARv//X0WAJoyMuFzyf3DEBo
+        Ae3bB8p8Mk4dqSSPQZw5QcHQHyNeq6dABncomoPqzyswAs+dgjj1HPmR9hN+ocdLCk5biPSnRiK
+        Vz+KaQOnlN342
+X-Received: by 2002:a5d:684a:0:b0:2c7:bb13:e23f with SMTP id o10-20020a5d684a000000b002c7bb13e23fmr3211669wrw.24.1679434587571;
+        Tue, 21 Mar 2023 14:36:27 -0700 (PDT)
+X-Google-Smtp-Source: AK7set84zvIxrLLTxMQYBkIMEBIwYe7FjxFCYBJQbGyp4XPILZvKxcuzUUAQAoPz/sC15CbsIQ9FYw==
+X-Received: by 2002:a5d:684a:0:b0:2c7:bb13:e23f with SMTP id o10-20020a5d684a000000b002c7bb13e23fmr3211658wrw.24.1679434587237;
+        Tue, 21 Mar 2023 14:36:27 -0700 (PDT)
+Received: from redhat.com ([2.52.1.105])
+        by smtp.gmail.com with ESMTPSA id k16-20020a5d6d50000000b002cff0e213ddsm12180342wri.14.2023.03.21.14.36.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 21 Mar 2023 14:36:26 -0700 (PDT)
+Date:   Tue, 21 Mar 2023 17:36:22 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Mike Christie <michael.christie@oracle.com>
+Cc:     syzbot <syzbot+6b27b2d2aba1c80cc13b@syzkaller.appspotmail.com>,
+        brauner@kernel.org, jasowang@redhat.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+        syzkaller-bugs@googlegroups.com,
+        virtualization@lists.linux-foundation.org
+Subject: Re: [syzbot] [kernel?] general protection fault in vhost_task_start
+Message-ID: <20230321173602-mutt-send-email-mst@kernel.org>
+References: <0000000000005a60a305f76c07dc@google.com>
+ <2d976892-9914-5de0-62e0-c75f1c148259@oracle.com>
+ <20230321135427-mutt-send-email-mst@kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230321135427-mutt-send-email-mst@kernel.org>
+X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -67,25 +81,65 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Mar 20, 2023, Chao Gao wrote:
-> On Sun, Mar 19, 2023 at 04:49:22PM +0800, Binbin Wu wrote:
-> >get_vmx_mem_address() and sgx_get_encls_gva() use is_long_mode()
-> >to check 64-bit mode. Should use is_64_bit_mode() instead.
-> >
-> >Fixes: f9eb4af67c9d ("KVM: nVMX: VMX instructions: add checks for #GP/#SS exceptions")
-> >Fixes: 70210c044b4e ("KVM: VMX: Add SGX ENCLS[ECREATE] handler to enforce CPUID restrictions")
+On Tue, Mar 21, 2023 at 01:55:00PM -0400, Michael S. Tsirkin wrote:
+> On Tue, Mar 21, 2023 at 12:46:04PM -0500, Mike Christie wrote:
+> > On 3/21/23 12:03 PM, syzbot wrote:
+> > > RIP: 0010:vhost_task_start+0x22/0x40 kernel/vhost_task.c:115
+> > > Code: 00 00 00 00 00 0f 1f 00 f3 0f 1e fa 53 48 89 fb e8 c3 67 2c 00 48 8d 7b 70 48 b8 00 00 00 00 00 fc ff df 48 89 fa 48 c1 ea 03 <80> 3c 02 00 75 0a 48 8b 7b 70 5b e9 fe bd 02 00 e8 79 ec 7e 00 eb
+> > > RSP: 0018:ffffc90003a9fc38 EFLAGS: 00010207
+> > > RAX: dffffc0000000000 RBX: fffffffffffffff4 RCX: 0000000000000000
+> > > RDX: 000000000000000c RSI: ffffffff81564c8d RDI: 0000000000000064
+> > > RBP: ffff88802b21dd40 R08: 0000000000000100 R09: ffffffff8c917cf3
+> > > R10: 00000000fffffff4 R11: 0000000000000000 R12: fffffffffffffff4
+> > > R13: ffff888075d000b0 R14: ffff888075d00000 R15: ffff888075d00008
+> > > FS:  0000555556247300(0000) GS:ffff8880b9800000(0000) knlGS:0000000000000000
+> > > CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> > > CR2: 00007ffe3d8e5ff8 CR3: 00000000215d4000 CR4: 00000000003506f0
+> > > DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> > > DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> > > Call Trace:
+> > >  <TASK>
+> > >  vhost_worker_create drivers/vhost/vhost.c:580 [inline]
+> > 
+> > The return value from vhost_task_create is incorrect if the kzalloc fails.
+> > 
+> > Christian, here is a fix for what's in your tree. Do you want me to submit
+> > a follow up patch like this or a replacement patch for:
+> > 
+> > commit 77feab3c4156 ("vhost_task: Allow vhost layer to use copy_process")
+> > 
+> > with the fix rolled into it?
+> > 
 > 
-> It is better to split this patch into two: one for nested and one for
-> SGX.
 > 
-> It is possible that there is a kernel release which has just one of
-> above two flawed commits, then this fix patch cannot be applied cleanly
-> to the release.
+> 
+> > 
+> > >From 0677ad6d77722f301ca35e8e0f8fd0cbd5ed8484 Mon Sep 17 00:00:00 2001
+> > From: Mike Christie <michael.christie@oracle.com>
+> > Date: Tue, 21 Mar 2023 12:39:39 -0500
+> > Subject: [PATCH] vhost_task: Fix vhost_task_create return value
+> > 
+> > vhost_task_create is supposed to return the vhost_task or NULL on
+> > failure. This fixes it to return the correct value when the allocation
+> > of the struct fails.
+> > ---
+> >  kernel/vhost_task.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > 
+> > diff --git a/kernel/vhost_task.c b/kernel/vhost_task.c
+> > index 4b8aff160640..b7cbd66f889e 100644
+> > --- a/kernel/vhost_task.c
+> > +++ b/kernel/vhost_task.c
+> > @@ -88,7 +88,7 @@ struct vhost_task *vhost_task_create(int (*fn)(void *), void *arg,
+> >  
+> >  	vtsk = kzalloc(sizeof(*vtsk), GFP_KERNEL);
+> >  	if (!vtsk)
+> > -		return ERR_PTR(-ENOMEM);
+> > +		return NULL;
+> >  	init_completion(&vtsk->exited);
+> >  	vtsk->data = arg;
+> >  	vtsk->fn = fn;
+> > 
 
-The nVMX code isn't buggy, VMX instructions #UD in compatibility mode, and except
-for VMCALL, that #UD has higher priority than VM-Exit interception.  So I'd say
-just drop the nVMX side of things.
+Sorry I had nothing to add here. Sent by mistake.
 
-I could have sworn ENCLS had the same behavior, but the SDM disagrees.  Though why
-on earth ENCLS is allowed in compatibility mode is beyond me.  ENCLU I can kinda
-sorta understand, but ENCLS?!?!!
