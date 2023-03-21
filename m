@@ -2,201 +2,682 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 897856C311F
-	for <lists+kvm@lfdr.de>; Tue, 21 Mar 2023 13:00:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C783D6C3131
+	for <lists+kvm@lfdr.de>; Tue, 21 Mar 2023 13:03:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230482AbjCUMAw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Mar 2023 08:00:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43496 "EHLO
+        id S229822AbjCUMDF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Mar 2023 08:03:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45874 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230182AbjCUMAu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Mar 2023 08:00:50 -0400
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2068.outbound.protection.outlook.com [40.107.243.68])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36F4F1AB;
-        Tue, 21 Mar 2023 05:00:48 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=kXkfZyD/lyN0+3+I3JyISRvcPD5OSPHzsZ/wylsTM4IANbnQwoQT0MFWiEcnR2EHyZA00KWTzEQnt16weFvjHXzUPQmoKeMkbMZekkV98felF25U/8asZx7RRXCFN7fbaAApn9F4J1OHXXASIV92wqggS6Ti9heTWwbMtGQFSNqyCr6E5qsKaPPod96ZOerEQZh17KKIUM/11Wgyb4sbSKKlccyAeqttAKTg3DEcrWRozYzfVu3TMSUouuchppRBmffjpElDYQmWLB/BNkvelOk0COdk3TuffdH/NbNmNpHnY2PH63voZjJbXFb6EecQgFJ2NbKQqjkffTL+S5I81Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ete283pTSRg7/MveVCdnN2a2jDYfqCdOnoNhsw1o5fU=;
- b=PkbeY7NveUCQj62gozZ7owIEaQ6NUdwuYHVHeJ8DgbERZ91EKak6P+RVOlsiC0gdkLcj6IHXyxRjKB1bOdjRUZSFRqu8WadJMrDy5zCu2jMB1iWz37bFTebPRxgcxqNahne51LcZ4lCsHgCEEO899PAble/SqKY/tQjk47GO0w4vWUZ2b1k0mRczqr59SZ5/UY4Lep27lfTqk+DZZrVpAZGoIt9YmwWLwdQcAYCWm+Diwgqf1ldiTDJVXB+rqw/Wet+8vwXuxw0o054m8XFENQLAB7hY6KZAdzDChMX8loxQItePB5dCTEpMWb+CZcLVbx+79IhH+OC60BaPFalhTQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ete283pTSRg7/MveVCdnN2a2jDYfqCdOnoNhsw1o5fU=;
- b=hEHaN5qAPYCoRyQ2aHeI/W/SIByFzcodvlfrbskgSU678zd8j6iLWTXdqF41irvHIyKsXVex4KxHxXntKU+xZG1srB+Ysb/i2nNN+mkZLySzO1TDRknzJA6pIBZ1G+i+GcLw4c9arLymcr2Cw3bsjCc9PSdYK9ZX+XTmkhli7/jSoJWajsuJOp+uJfqbk7hTKqJojUSPUhJl0b7qnFwgBBNQAJgBF7owtJ1GylxXTbffFFzn1G5O1jhm/UxFtgx5KxjjPB0HTFdwW8x2u3P6GB8zScpsURn/VS5twodO9TNDz68QMyfQQr5WKsgHxqokuGqkNlSJj9S7+GKR5D88Tw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by IA0PR12MB7723.namprd12.prod.outlook.com (2603:10b6:208:431::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6178.37; Tue, 21 Mar
- 2023 12:00:46 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::ef6d:fdf6:352f:efd1]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::ef6d:fdf6:352f:efd1%3]) with mapi id 15.20.6178.037; Tue, 21 Mar 2023
- 12:00:46 +0000
-Date:   Tue, 21 Mar 2023 09:00:44 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     "Tian, Kevin" <kevin.tian@intel.com>
-Cc:     "Liu, Yi L" <yi.l.liu@intel.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
-        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
-        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "jasowang@redhat.com" <jasowang@redhat.com>,
-        "shameerali.kolothum.thodi@huawei.com" 
-        <shameerali.kolothum.thodi@huawei.com>,
-        "lulu@redhat.com" <lulu@redhat.com>,
-        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
-        "intel-gvt-dev@lists.freedesktop.org" 
-        <intel-gvt-dev@lists.freedesktop.org>,
-        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
-        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-        "Hao, Xudong" <xudong.hao@intel.com>,
-        "Zhao, Yan Y" <yan.y.zhao@intel.com>,
-        "Xu, Terrence" <terrence.xu@intel.com>
-Subject: Re: [PATCH v6 21/24] vfio: Add VFIO_DEVICE_BIND_IOMMUFD
-Message-ID: <ZBmcbMuE4lyDIpT6@nvidia.com>
-References: <20230308132903.465159-1-yi.l.liu@intel.com>
- <20230308132903.465159-22-yi.l.liu@intel.com>
- <BN9PR11MB527665CA5753E413CB4291AE8CBA9@BN9PR11MB5276.namprd11.prod.outlook.com>
- <DS0PR11MB7529B3BFD999C9720836F049C3BA9@DS0PR11MB7529.namprd11.prod.outlook.com>
- <BN9PR11MB5276684B2C0CD076FA3CD0938CBA9@BN9PR11MB5276.namprd11.prod.outlook.com>
- <DS0PR11MB752922A0C9058583F677369EC3BF9@DS0PR11MB7529.namprd11.prod.outlook.com>
- <ZBhpNyrBr9nm5Ae+@nvidia.com>
- <9875e60c-68a7-b360-9d52-66d4915808a0@intel.com>
- <ZBiU8KoSmiM+JkAw@nvidia.com>
- <BN9PR11MB527605E6609222431DFB8AA58C819@BN9PR11MB5276.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <BN9PR11MB527605E6609222431DFB8AA58C819@BN9PR11MB5276.namprd11.prod.outlook.com>
-X-ClientProxiedBy: BL0PR02CA0110.namprd02.prod.outlook.com
- (2603:10b6:208:35::15) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+        with ESMTP id S230518AbjCUMC6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Mar 2023 08:02:58 -0400
+Received: from mail-wr1-x42e.google.com (mail-wr1-x42e.google.com [IPv6:2a00:1450:4864:20::42e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D41AD1ADE3
+        for <kvm@vger.kernel.org>; Tue, 21 Mar 2023 05:02:46 -0700 (PDT)
+Received: by mail-wr1-x42e.google.com with SMTP id d17so4958378wrb.11
+        for <kvm@vger.kernel.org>; Tue, 21 Mar 2023 05:02:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=vrull.eu; s=google; t=1679400165;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=No6GsNXikNsyLPm1p6Xx7U9s7yJRaxe7Q0AfqeDqth0=;
+        b=tLrglERRc7AUvszwBF0B81yQOjLho/G/KX6RlYVEEgcuRte++AG47DetrrYahSZuNO
+         44urCZmyrzt1I2QvVzkRhVVCjP5yuNstgRUcYZB74FbCPlbkg6nnBfoVrIu42r5k8xhe
+         I/RcQTks54cnbSgyBjfwsusaQbja1ulYHMm+bWZKrlmg12yYYB3CqXx55X3XIFRTUctX
+         F5Ed7tEs6Acn4ghhC0BecbNdn/JvueGo/5eH4c7N18ulloC7y3E4FQkakFWyLPEuoKcp
+         xy/BH7MZf2zRHSbhkJdlArUhcEW2AlqfSoRjzyNRb58iAKC/qsO6GpR0e/OldPgvGZEf
+         5Rvw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1679400165;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=No6GsNXikNsyLPm1p6Xx7U9s7yJRaxe7Q0AfqeDqth0=;
+        b=kMMhPlKEBHICVZJhxbiAFya9uHqD5mrcW8cDZ0mUL/nx9CPVOAiXMHeHtGIJw/W0Lp
+         KIzJZtmxuYCzMfR19htuwBCSY+7orfoVYq5SWZHiNrjm9J8kckLcsUIF+AXl71+95Iep
+         eEeZ6rcPjzsA37DA+Q5hbV6ieLey1J7CVfltzZpn7tZfHmCbJq9UqhajhzJ+TYbwnHdX
+         88HheRC8loSb5WzwRz1nIWvKtNUHkv2aQpSgGeuDO9FjLz6r387xxR7VM53zNgM5ysp/
+         TLQ9dScCgcwih2bN4ZXthIXqbpVCA+Dw+NtIjWrIwP2u2LjPo8LK69WDvSEbklE+dpw6
+         xiQg==
+X-Gm-Message-State: AO0yUKUhdGPpL6ggQUYISVgwFQ2zFZjtQnZ2UPiVRShU1ltPO7o8V2Sb
+        KgwT3DjYIXlU6p/VmKpuOlmczVGjg+2qZzp2Tmgyjg==
+X-Google-Smtp-Source: AK7set9JzmJib45q5Wb1VyPUCiObVrSSwD1PMc+oS/RsMdMdIgffVCHOqJpNhORg4bKnVL/ZClLIhPTxlmZr/QkFM8E=
+X-Received: by 2002:a5d:67c3:0:b0:2c7:3d2:fa20 with SMTP id
+ n3-20020a5d67c3000000b002c703d2fa20mr477077wrw.13.1679400165039; Tue, 21 Mar
+ 2023 05:02:45 -0700 (PDT)
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|IA0PR12MB7723:EE_
-X-MS-Office365-Filtering-Correlation-Id: 5ca8c3d5-ee5b-43ad-37ef-08db2a03e75f
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: p7YcyfDqAsMKzeSixtt76WMxTsh5KrVAjs0Owk98Asem3O8a8U+ZqYkVPn5lFKvBB3M0s5BkmGRQluA4j2Gprc01IQgygrQ180cclcf3qe9WoxQN/tFUtu/Ko+0j3MxVt7jrpwMnbzknkiN0tk25StEsOJzqRRZGhLfoj2bdk5Fwa644tDy/w5TrcLErQcSEQSKaxTZbAiX1LuSZYKdoe6rn9ci5nqO4rga/HvAToEKZ5Lb2OPX8JCB2huHmyTKY47WM2/wOKK/emMwK9jqfEM7MvLd+HB0tATdXMKXWba6wo4Aq4VokH94iH5kcJV8xLpzmsOJsR5P2oMobn8444wmLZFXg30OtxLP0eg4WIoYZkPqQ6GylIAWrRhDTIfcO+FTk24s9JWvdSR1LyvH9bfHAbGrYRkJydahu+1gRCxDbUgQdHn8t0cwHea0nsqQe214ZXF/xnXkMUk7eup3pHbkckuiFraq4j5Zy9hxgqiqc/zs+ji/17ISisbSc8HsuLJJBhgzIOMzed5ATk+VZ6l1thmesuXmDuJWNTMxSLOqQGeWmZtEt3sfvqy8bAb5+ymi0KK7w4mNkqEupKwpNMXe0wziSzVKF87J/fK5lCeqCNBOSW7kn+uh9BSyu3xPPKlSzGWiVk/i12zOXxaeM1g==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(346002)(39860400002)(396003)(366004)(136003)(376002)(451199018)(6486002)(2616005)(316002)(83380400001)(38100700002)(86362001)(6916009)(4326008)(36756003)(66476007)(66556008)(8676002)(41300700001)(66946007)(5660300002)(2906002)(8936002)(26005)(6512007)(186003)(54906003)(53546011)(7416002)(6506007)(478600001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?c28pF68VXqze8cBKtL6YVHHgu4GPRppuE2QKjIzUsoORojahIo8Pm/YCApgd?=
- =?us-ascii?Q?ghxNzJBADzCuJNTiTDCw+efBwBkUEorRAim9MbGJWIKYOKGIM9vCxeCnOaNs?=
- =?us-ascii?Q?o93QPnwLLLR62OjFn7GDD9VtD14G4yUzF1jjAAxTsxxdeKsgElu9s8kqRx1T?=
- =?us-ascii?Q?j7BYbIYcpv765Ze6uvr3eaqGWxwIONRYlhJRgs/gQYIfziVm8bMJS0kjUCge?=
- =?us-ascii?Q?6nP8Jn0gF4cKd8RkUWTSnEH2wsyd9wsvBWu8ByjK31ZKqWcdl8As5OGAxhRt?=
- =?us-ascii?Q?TF11Gc/QbtEkq4WVm9annboMrBNpMPpLWMmboO5ohXldHawm87iM6a2txuhZ?=
- =?us-ascii?Q?vn0dGwYXoYVMTUM4bcsJlocU5yKThDn9Wi/imMf4NHMBaxO9eV0+SlYhAMSD?=
- =?us-ascii?Q?5IMI1ouSORK0/6tGqUmalad9lurYGBOtHg6aTp4SD6UXhUsu/jiFA2cbZk7g?=
- =?us-ascii?Q?6Cbu9heM9ixmRmTl/AO1KxaGGCA85ZQzs77IfQzLn6ZYmZXheVqKDblxJBB7?=
- =?us-ascii?Q?lk9LdXQ5Ivrq6hJDmdPKfqTxQ68Hb4Vg9zeRNfv8URqNSeUiqdmxyEyRKim6?=
- =?us-ascii?Q?PqoCzFScT+GghI8E5Xmo81Ahy9T1AEW3gxbCdyjjnxb1vEanyfnn+/9oZ8Tm?=
- =?us-ascii?Q?itqQp00lc0+9uakcmprKcSyv2b2+PGKqwIZN9l7TXanZGMOPEmsuOMMjKa5v?=
- =?us-ascii?Q?EL7IdRq4zxfsEEniNRzmn4zqAOZWpeXjgDRmD5P0p8NKxnxzHK8v38CXdMfZ?=
- =?us-ascii?Q?bSGhCQ8SPTANax6U7xKU7hd9TveKBwGEnV6bAckIzT3+MEgjUTHkzBGN1Eul?=
- =?us-ascii?Q?dsN1BoQZ2VCBIgGCbVTz5JFZHWQuDEzgO1f2zEEQhcIYrnweOG2XLfJP9scW?=
- =?us-ascii?Q?b3xh6Ir55EDJW/B3lMevGRZyI03LsP1Qr0n1K2o4ByaZQ+8hovdNuI5QbBll?=
- =?us-ascii?Q?52QXxBz9iW1dMrv0b0ZB8tgznv0C8ffYmMzlRVunUmwcSL8cUZoQfQ6UBHes?=
- =?us-ascii?Q?rU1sQ4rhDjt2KkaXph7NiymAdFzTAfcZeV+P3Bo6dwfeAjy7RmXEbYIoOUza?=
- =?us-ascii?Q?4vVnuS1jmKQrE87T+9R3a2ypy1TiW0EEOJEWfXpdw9VKqVaBR0GQ0lPG9z8Z?=
- =?us-ascii?Q?pJmaelRAKAbAjbuZ0lAcYzaOiaQNjZ9BoErEZieesZSR7EzApLj0fTeDspYV?=
- =?us-ascii?Q?BNg6pNvOtHkEwZyhYRTHnSq9ywbgTxV8X294QrSVvmgtjo4gOsEw5bc5cTm6?=
- =?us-ascii?Q?9qpd5+u4V2bqy9zit6QNAmjNSPvq/Q/EVnQy/m3fkWCGsj0Fro51Tm1iQ9Eb?=
- =?us-ascii?Q?N0LayLle9hwTOJ9G8ethe4XkgIEVqkK6/27Rm2+F3Vgk3m40OfvvSF7adB0+?=
- =?us-ascii?Q?odpT5xTwSLhJETe3aRjMcpOK9RkZgxlVkwbAnJOR3gK09JBoDNyPTyM+hGyJ?=
- =?us-ascii?Q?UBhwHYLATPrXkyJuxxBOlVOhmUnNFCdGmZ8CBKMhcNG0o5lOnRabm1sBkRsU?=
- =?us-ascii?Q?8fJ355RDDcxzcynrfk7wEdLSsEYFA2X5Zv8CtftnnK/NS/dj89SedoW3OCLD?=
- =?us-ascii?Q?XALvS+frqk/JJCeqiDr5Q0v8+GSpbjwSUR38+cGB?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5ca8c3d5-ee5b-43ad-37ef-08db2a03e75f
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Mar 2023 12:00:45.9664
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: KdGrjBKvSCeF+RtB8y5gDD1oB5vJeZKau+BQzP7i2BmbI59qVHn03HPBqoAf+vY6
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB7723
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+References: <20230310160346.1193597-1-lawrence.hunter@codethink.co.uk> <20230310160346.1193597-3-lawrence.hunter@codethink.co.uk>
+In-Reply-To: <20230310160346.1193597-3-lawrence.hunter@codethink.co.uk>
+From:   =?UTF-8?Q?Christoph_M=C3=BCllner?= <christoph.muellner@vrull.eu>
+Date:   Tue, 21 Mar 2023 13:02:31 +0100
+Message-ID: <CAEg0e7j=yGrz6uSCZirthZB7FEF-BtB73e+D-UB_hXQTJEtmyw@mail.gmail.com>
+Subject: Re: [PATCH 02/45] target/riscv: Refactor some of the generic vector functionality
+To:     Lawrence Hunter <lawrence.hunter@codethink.co.uk>
+Cc:     qemu-devel@nongnu.org, dickon.hood@codethink.co.uk,
+        nazar.kazakov@codethink.co.uk, kiran.ostrolenk@codethink.co.uk,
+        frank.chang@sifive.com, palmer@dabbelt.com,
+        alistair.francis@wdc.com, bin.meng@windriver.com,
+        pbonzini@redhat.com, philipp.tomsich@vrull.eu, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 21, 2023 at 01:30:34AM +0000, Tian, Kevin wrote:
-> > From: Jason Gunthorpe <jgg@nvidia.com>
-> > Sent: Tuesday, March 21, 2023 1:17 AM
-> > 
-> > On Mon, Mar 20, 2023 at 10:31:53PM +0800, Yi Liu wrote:
-> > > On 2023/3/20 22:09, Jason Gunthorpe wrote:
-> > > > On Wed, Mar 15, 2023 at 04:40:19AM +0000, Liu, Yi L wrote:
-> > > >
-> > > > > # if IS_ENABLED(CONFIG_VFIO_GROUP)
-> > > > > static inline bool vfio_device_is_noiommu(struct vfio_device *vdev)
-> > > > > {
-> > > > >          return IS_ENABLED(CONFIG_VFIO_NOIOMMU) &&
-> > > > >                 vdev->group->type == VFIO_NO_IOMMU;
-> > > > > }
-> > > > > #else
-> > > > > static inline bool vfio_device_is_noiommu(struct vfio_device *vdev)
-> > > > > {
-> > > > >          struct iommu_group *iommu_group;
-> > > > >
-> > > > >          if (!IS_ENABLED(CONFIG_VFIO_NOIOMMU) || !vfio_noiommu)
-> > > > >                  return -EINVAL;
-> > > > >
-> > > > >          iommu_group = iommu_group_get(vdev->dev);
-> > > > >          if (iommu_group)
-> > > > >                  iommu_group_put(iommu_group);
-> > > > >
-> > > > >          return !iommu_group;
-> > > >
-> > > > If we don't have VFIO_GROUP then no-iommu is signaled by a NULL
-> > > > iommu_ctx pointer in the vdev, don't mess with groups
-> > >
-> > > yes, NULL iommufd_ctx pointer would be set in vdev and passed to the
-> > > vfio_device_open(). But here, we want to use this helper to check if
-> > > user can use noiommu mode. This is before calling vfio_device_open().
-> > > e.g. if the device is protected by iommu, then user cannot use noiommu
-> > > mode on it.
-> > 
-> > Why not allow it?
-> > 
-> > If the admin has enabled this mode we may as well let it be used.
-> > 
-> > You explicitly ask for no-iommu mode by passing -1 for the iommufd
-> > parameter. If the module parameter says it is allowed then that is all
-> > you need.
-> > 
-> 
-> IMHO we should disallow noiommu on a device which already has
-> a iommu group. This is how noiommu works with vfio group. I don't
-> think it's a good idea to further relax it in cdev.
+On Fri, Mar 10, 2023 at 5:06=E2=80=AFPM Lawrence Hunter
+<lawrence.hunter@codethink.co.uk> wrote:
+>
+> From: Kiran Ostrolenk <kiran.ostrolenk@codethink.co.uk>
+>
+> Summary of refactoring:
+>
+> * take some functions/macros out of `vector_helper` and put them in a
+> new module called `vector_internals`
+>
+> * factor the non SEW-specific stuff out of `GEN_OPIVV_TRANS` into
+> function `opivv_trans` (similar to `opivi_trans`)
 
-This isn't the same thing, this will trigger for mdevs and stuff that
-should not be noiommu as well.
+I think splitting this commit into two changes would be better.
+Besides that the two changes look reasonable and correct.
 
-If you want to copy what the group code does then noiommu needs to be
-statically determined at physical vfio device allocation time.
+BR
+Christoph
 
-Jason
+>
+> All this refactoring ensures more functions/macros can be used by both
+> vector and vector-crypto helpers (latter implemented in proceeding
+> commit).
+>
+> Signed-off-by: Kiran Ostrolenk <kiran.ostrolenk@codethink.co.uk>
+> ---
+>  target/riscv/insn_trans/trans_rvv.c.inc |  62 +++++-----
+>  target/riscv/meson.build                |   1 +
+>  target/riscv/vector_helper.c            | 155 +-----------------------
+>  target/riscv/vector_internals.c         |  57 +++++++++
+>  target/riscv/vector_internals.h         | 155 ++++++++++++++++++++++++
+>  5 files changed, 246 insertions(+), 184 deletions(-)
+>  create mode 100644 target/riscv/vector_internals.c
+>  create mode 100644 target/riscv/vector_internals.h
+>
+> diff --git a/target/riscv/insn_trans/trans_rvv.c.inc b/target/riscv/insn_=
+trans/trans_rvv.c.inc
+> index f2e3d38515..4106bd6994 100644
+> --- a/target/riscv/insn_trans/trans_rvv.c.inc
+> +++ b/target/riscv/insn_trans/trans_rvv.c.inc
+> @@ -1643,38 +1643,40 @@ GEN_OPIWX_WIDEN_TRANS(vwadd_wx)
+>  GEN_OPIWX_WIDEN_TRANS(vwsubu_wx)
+>  GEN_OPIWX_WIDEN_TRANS(vwsub_wx)
+>
+> +static bool opivv_trans(uint32_t vd, uint32_t vs1, uint32_t vs2, uint32_=
+t vm,
+> +                        gen_helper_gvec_4_ptr *fn, DisasContext *s)
+> +{
+> +    uint32_t data =3D 0;
+> +    TCGLabel *over =3D gen_new_label();
+> +    tcg_gen_brcondi_tl(TCG_COND_EQ, cpu_vl, 0, over);
+> +    tcg_gen_brcond_tl(TCG_COND_GEU, cpu_vstart, cpu_vl, over);
+> +
+> +    data =3D FIELD_DP32(data, VDATA, VM, vm);
+> +    data =3D FIELD_DP32(data, VDATA, LMUL, s->lmul);
+> +    data =3D FIELD_DP32(data, VDATA, VTA, s->vta);
+> +    data =3D FIELD_DP32(data, VDATA, VTA_ALL_1S, s->cfg_vta_all_1s);
+> +    data =3D FIELD_DP32(data, VDATA, VMA, s->vma);
+> +    tcg_gen_gvec_4_ptr(vreg_ofs(s, vd), vreg_ofs(s, 0), vreg_ofs(s, vs1)=
+,
+> +                       vreg_ofs(s, vs2), cpu_env, s->cfg_ptr->vlen / 8,
+> +                       s->cfg_ptr->vlen / 8, data, fn);
+> +    mark_vs_dirty(s);
+> +    gen_set_label(over);
+> +    return true;
+> +}
+> +
+>  /* Vector Integer Add-with-Carry / Subtract-with-Borrow Instructions */
+>  /* OPIVV without GVEC IR */
+> -#define GEN_OPIVV_TRANS(NAME, CHECK)                               \
+> -static bool trans_##NAME(DisasContext *s, arg_rmrr *a)             \
+> -{                                                                  \
+> -    if (CHECK(s, a)) {                                             \
+> -        uint32_t data =3D 0;                                         \
+> -        static gen_helper_gvec_4_ptr * const fns[4] =3D {            \
+> -            gen_helper_##NAME##_b, gen_helper_##NAME##_h,          \
+> -            gen_helper_##NAME##_w, gen_helper_##NAME##_d,          \
+> -        };                                                         \
+> -        TCGLabel *over =3D gen_new_label();                          \
+> -        tcg_gen_brcondi_tl(TCG_COND_EQ, cpu_vl, 0, over);          \
+> -        tcg_gen_brcond_tl(TCG_COND_GEU, cpu_vstart, cpu_vl, over); \
+> -                                                                   \
+> -        data =3D FIELD_DP32(data, VDATA, VM, a->vm);                 \
+> -        data =3D FIELD_DP32(data, VDATA, LMUL, s->lmul);             \
+> -        data =3D FIELD_DP32(data, VDATA, VTA, s->vta);               \
+> -        data =3D                                                     \
+> -            FIELD_DP32(data, VDATA, VTA_ALL_1S, s->cfg_vta_all_1s);\
+> -        data =3D FIELD_DP32(data, VDATA, VMA, s->vma);               \
+> -        tcg_gen_gvec_4_ptr(vreg_ofs(s, a->rd), vreg_ofs(s, 0),     \
+> -                           vreg_ofs(s, a->rs1),                    \
+> -                           vreg_ofs(s, a->rs2), cpu_env,           \
+> -                           s->cfg_ptr->vlen / 8,                   \
+> -                           s->cfg_ptr->vlen / 8, data,             \
+> -                           fns[s->sew]);                           \
+> -        mark_vs_dirty(s);                                          \
+> -        gen_set_label(over);                                       \
+> -        return true;                                               \
+> -    }                                                              \
+> -    return false;                                                  \
+> +#define GEN_OPIVV_TRANS(NAME, CHECK)                                    =
+ \
+> +static bool trans_##NAME(DisasContext *s, arg_rmrr *a)                  =
+ \
+> +{                                                                       =
+ \
+> +    if (CHECK(s, a)) {                                                  =
+ \
+> +        static gen_helper_gvec_4_ptr * const fns[4] =3D {               =
+   \
+> +            gen_helper_##NAME##_b, gen_helper_##NAME##_h,               =
+ \
+> +            gen_helper_##NAME##_w, gen_helper_##NAME##_d,               =
+ \
+> +        };                                                              =
+ \
+> +        return opivv_trans(a->rd, a->rs1, a->rs2, a->vm, fns[s->sew], s)=
+;\
+> +    }                                                                   =
+ \
+> +    return false;                                                       =
+ \
+>  }
+>
+>  /*
+> diff --git a/target/riscv/meson.build b/target/riscv/meson.build
+> index 5dee37a242..a94fc3f598 100644
+> --- a/target/riscv/meson.build
+> +++ b/target/riscv/meson.build
+> @@ -16,6 +16,7 @@ riscv_ss.add(files(
+>    'gdbstub.c',
+>    'op_helper.c',
+>    'vector_helper.c',
+> +  'vector_internals.c',
+>    'bitmanip_helper.c',
+>    'translate.c',
+>    'm128_helper.c',
+> diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
+> index 2423affe37..f0e8ceff80 100644
+> --- a/target/riscv/vector_helper.c
+> +++ b/target/riscv/vector_helper.c
+> @@ -26,6 +26,7 @@
+>  #include "fpu/softfloat.h"
+>  #include "tcg/tcg-gvec-desc.h"
+>  #include "internals.h"
+> +#include "vector_internals.h"
+>  #include <math.h>
+>
+>  target_ulong HELPER(vsetvl)(CPURISCVState *env, target_ulong s1,
+> @@ -75,68 +76,6 @@ target_ulong HELPER(vsetvl)(CPURISCVState *env, target=
+_ulong s1,
+>      return vl;
+>  }
+>
+> -/*
+> - * Note that vector data is stored in host-endian 64-bit chunks,
+> - * so addressing units smaller than that needs a host-endian fixup.
+> - */
+> -#if HOST_BIG_ENDIAN
+> -#define H1(x)   ((x) ^ 7)
+> -#define H1_2(x) ((x) ^ 6)
+> -#define H1_4(x) ((x) ^ 4)
+> -#define H2(x)   ((x) ^ 3)
+> -#define H4(x)   ((x) ^ 1)
+> -#define H8(x)   ((x))
+> -#else
+> -#define H1(x)   (x)
+> -#define H1_2(x) (x)
+> -#define H1_4(x) (x)
+> -#define H2(x)   (x)
+> -#define H4(x)   (x)
+> -#define H8(x)   (x)
+> -#endif
+> -
+> -static inline uint32_t vext_nf(uint32_t desc)
+> -{
+> -    return FIELD_EX32(simd_data(desc), VDATA, NF);
+> -}
+> -
+> -static inline uint32_t vext_vm(uint32_t desc)
+> -{
+> -    return FIELD_EX32(simd_data(desc), VDATA, VM);
+> -}
+> -
+> -/*
+> - * Encode LMUL to lmul as following:
+> - *     LMUL    vlmul    lmul
+> - *      1       000       0
+> - *      2       001       1
+> - *      4       010       2
+> - *      8       011       3
+> - *      -       100       -
+> - *     1/8      101      -3
+> - *     1/4      110      -2
+> - *     1/2      111      -1
+> - */
+> -static inline int32_t vext_lmul(uint32_t desc)
+> -{
+> -    return sextract32(FIELD_EX32(simd_data(desc), VDATA, LMUL), 0, 3);
+> -}
+> -
+> -static inline uint32_t vext_vta(uint32_t desc)
+> -{
+> -    return FIELD_EX32(simd_data(desc), VDATA, VTA);
+> -}
+> -
+> -static inline uint32_t vext_vma(uint32_t desc)
+> -{
+> -    return FIELD_EX32(simd_data(desc), VDATA, VMA);
+> -}
+> -
+> -static inline uint32_t vext_vta_all_1s(uint32_t desc)
+> -{
+> -    return FIELD_EX32(simd_data(desc), VDATA, VTA_ALL_1S);
+> -}
+> -
+>  /*
+>   * Get the maximum number of elements can be operated.
+>   *
+> @@ -155,21 +94,6 @@ static inline uint32_t vext_max_elems(uint32_t desc, =
+uint32_t log2_esz)
+>      return scale < 0 ? vlenb >> -scale : vlenb << scale;
+>  }
+>
+> -/*
+> - * Get number of total elements, including prestart, body and tail eleme=
+nts.
+> - * Note that when LMUL < 1, the tail includes the elements past VLMAX th=
+at
+> - * are held in the same vector register.
+> - */
+> -static inline uint32_t vext_get_total_elems(CPURISCVState *env, uint32_t=
+ desc,
+> -                                            uint32_t esz)
+> -{
+> -    uint32_t vlenb =3D simd_maxsz(desc);
+> -    uint32_t sew =3D 1 << FIELD_EX64(env->vtype, VTYPE, VSEW);
+> -    int8_t emul =3D ctzl(esz) - ctzl(sew) + vext_lmul(desc) < 0 ? 0 :
+> -                  ctzl(esz) - ctzl(sew) + vext_lmul(desc);
+> -    return (vlenb << emul) / esz;
+> -}
+> -
+>  static inline target_ulong adjust_addr(CPURISCVState *env, target_ulong =
+addr)
+>  {
+>      return (addr & env->cur_pmmask) | env->cur_pmbase;
+> @@ -202,20 +126,6 @@ static void probe_pages(CPURISCVState *env, target_u=
+long addr,
+>      }
+>  }
+>
+> -/* set agnostic elements to 1s */
+> -static void vext_set_elems_1s(void *base, uint32_t is_agnostic, uint32_t=
+ cnt,
+> -                              uint32_t tot)
+> -{
+> -    if (is_agnostic =3D=3D 0) {
+> -        /* policy undisturbed */
+> -        return;
+> -    }
+> -    if (tot - cnt =3D=3D 0) {
+> -        return;
+> -    }
+> -    memset(base + cnt, -1, tot - cnt);
+> -}
+> -
+>  static inline void vext_set_elem_mask(void *v0, int index,
+>                                        uint8_t value)
+>  {
+> @@ -225,18 +135,6 @@ static inline void vext_set_elem_mask(void *v0, int =
+index,
+>      ((uint64_t *)v0)[idx] =3D deposit64(old, pos, 1, value);
+>  }
+>
+> -/*
+> - * Earlier designs (pre-0.9) had a varying number of bits
+> - * per mask value (MLEN). In the 0.9 design, MLEN=3D1.
+> - * (Section 4.5)
+> - */
+> -static inline int vext_elem_mask(void *v0, int index)
+> -{
+> -    int idx =3D index / 64;
+> -    int pos =3D index  % 64;
+> -    return (((uint64_t *)v0)[idx] >> pos) & 1;
+> -}
+> -
+>  /* elements operations for load and store */
+>  typedef void vext_ldst_elem_fn(CPURISCVState *env, target_ulong addr,
+>                                 uint32_t idx, void *vd, uintptr_t retaddr=
+);
+> @@ -739,18 +637,11 @@ GEN_VEXT_ST_WHOLE(vs8r_v, int8_t, ste_b)
+>   *** Vector Integer Arithmetic Instructions
+>   */
+>
+> -/* expand macro args before macro */
+> -#define RVVCALL(macro, ...)  macro(__VA_ARGS__)
+> -
+>  /* (TD, T1, T2, TX1, TX2) */
+>  #define OP_SSS_B int8_t, int8_t, int8_t, int8_t, int8_t
+>  #define OP_SSS_H int16_t, int16_t, int16_t, int16_t, int16_t
+>  #define OP_SSS_W int32_t, int32_t, int32_t, int32_t, int32_t
+>  #define OP_SSS_D int64_t, int64_t, int64_t, int64_t, int64_t
+> -#define OP_UUU_B uint8_t, uint8_t, uint8_t, uint8_t, uint8_t
+> -#define OP_UUU_H uint16_t, uint16_t, uint16_t, uint16_t, uint16_t
+> -#define OP_UUU_W uint32_t, uint32_t, uint32_t, uint32_t, uint32_t
+> -#define OP_UUU_D uint64_t, uint64_t, uint64_t, uint64_t, uint64_t
+>  #define OP_SUS_B int8_t, uint8_t, int8_t, uint8_t, int8_t
+>  #define OP_SUS_H int16_t, uint16_t, int16_t, uint16_t, int16_t
+>  #define OP_SUS_W int32_t, uint32_t, int32_t, uint32_t, int32_t
+> @@ -774,16 +665,6 @@ GEN_VEXT_ST_WHOLE(vs8r_v, int8_t, ste_b)
+>  #define NOP_UUU_H uint16_t, uint16_t, uint32_t, uint16_t, uint32_t
+>  #define NOP_UUU_W uint32_t, uint32_t, uint64_t, uint32_t, uint64_t
+>
+> -/* operation of two vector elements */
+> -typedef void opivv2_fn(void *vd, void *vs1, void *vs2, int i);
+> -
+> -#define OPIVV2(NAME, TD, T1, T2, TX1, TX2, HD, HS1, HS2, OP)    \
+> -static void do_##NAME(void *vd, void *vs1, void *vs2, int i)    \
+> -{                                                               \
+> -    TX1 s1 =3D *((T1 *)vs1 + HS1(i));                             \
+> -    TX2 s2 =3D *((T2 *)vs2 + HS2(i));                             \
+> -    *((TD *)vd + HD(i)) =3D OP(s2, s1);                           \
+> -}
+>  #define DO_SUB(N, M) (N - M)
+>  #define DO_RSUB(N, M) (M - N)
+>
+> @@ -796,40 +677,6 @@ RVVCALL(OPIVV2, vsub_vv_h, OP_SSS_H, H2, H2, H2, DO_=
+SUB)
+>  RVVCALL(OPIVV2, vsub_vv_w, OP_SSS_W, H4, H4, H4, DO_SUB)
+>  RVVCALL(OPIVV2, vsub_vv_d, OP_SSS_D, H8, H8, H8, DO_SUB)
+>
+> -static void do_vext_vv(void *vd, void *v0, void *vs1, void *vs2,
+> -                       CPURISCVState *env, uint32_t desc,
+> -                       opivv2_fn *fn, uint32_t esz)
+> -{
+> -    uint32_t vm =3D vext_vm(desc);
+> -    uint32_t vl =3D env->vl;
+> -    uint32_t total_elems =3D vext_get_total_elems(env, desc, esz);
+> -    uint32_t vta =3D vext_vta(desc);
+> -    uint32_t vma =3D vext_vma(desc);
+> -    uint32_t i;
+> -
+> -    for (i =3D env->vstart; i < vl; i++) {
+> -        if (!vm && !vext_elem_mask(v0, i)) {
+> -            /* set masked-off elements to 1s */
+> -            vext_set_elems_1s(vd, vma, i * esz, (i + 1) * esz);
+> -            continue;
+> -        }
+> -        fn(vd, vs1, vs2, i);
+> -    }
+> -    env->vstart =3D 0;
+> -    /* set tail elements to 1s */
+> -    vext_set_elems_1s(vd, vta, vl * esz, total_elems * esz);
+> -}
+> -
+> -/* generate the helpers for OPIVV */
+> -#define GEN_VEXT_VV(NAME, ESZ)                            \
+> -void HELPER(NAME)(void *vd, void *v0, void *vs1,          \
+> -                  void *vs2, CPURISCVState *env,          \
+> -                  uint32_t desc)                          \
+> -{                                                         \
+> -    do_vext_vv(vd, v0, vs1, vs2, env, desc,               \
+> -               do_##NAME, ESZ);                           \
+> -}
+> -
+>  GEN_VEXT_VV(vadd_vv_b, 1)
+>  GEN_VEXT_VV(vadd_vv_h, 2)
+>  GEN_VEXT_VV(vadd_vv_w, 4)
+> diff --git a/target/riscv/vector_internals.c b/target/riscv/vector_intern=
+als.c
+> new file mode 100644
+> index 0000000000..95efaa79cb
+> --- /dev/null
+> +++ b/target/riscv/vector_internals.c
+> @@ -0,0 +1,57 @@
+> +/*
+> + * RISC-V Vector Extension Internals
+> + *
+> + * Copyright (c) 2020 T-Head Semiconductor Co., Ltd. All rights reserved=
+.
+> + *
+> + * This program is free software; you can redistribute it and/or modify =
+it
+> + * under the terms and conditions of the GNU General Public License,
+> + * version 2 or later, as published by the Free Software Foundation.
+> + *
+> + * This program is distributed in the hope it will be useful, but WITHOU=
+T
+> + * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+> + * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License=
+ for
+> + * more details.
+> + *
+> + * You should have received a copy of the GNU General Public License alo=
+ng with
+> + * this program.  If not, see <http://www.gnu.org/licenses/>.
+> + */
+> +
+> +#include "vector_internals.h"
+> +
+> +/* set agnostic elements to 1s */
+> +void vext_set_elems_1s(void *base, uint32_t is_agnostic, uint32_t cnt,
+> +                       uint32_t tot)
+> +{
+> +    if (is_agnostic =3D=3D 0) {
+> +        /* policy undisturbed */
+> +        return;
+> +    }
+> +    if (tot - cnt =3D=3D 0) {
+> +        return ;
+> +    }
+> +    memset(base + cnt, -1, tot - cnt);
+> +}
+> +
+> +void do_vext_vv(void *vd, void *v0, void *vs1, void *vs2,
+> +                CPURISCVState *env, uint32_t desc,
+> +                opivv2_fn *fn, uint32_t esz)
+> +{
+> +    uint32_t vm =3D vext_vm(desc);
+> +    uint32_t vl =3D env->vl;
+> +    uint32_t total_elems =3D vext_get_total_elems(env, desc, esz);
+> +    uint32_t vta =3D vext_vta(desc);
+> +    uint32_t vma =3D vext_vma(desc);
+> +    uint32_t i;
+> +
+> +    for (i =3D env->vstart; i < vl; i++) {
+> +        if (!vm && !vext_elem_mask(v0, i)) {
+> +            /* set masked-off elements to 1s */
+> +            vext_set_elems_1s(vd, vma, i * esz, (i + 1) * esz);
+> +            continue;
+> +        }
+> +        fn(vd, vs1, vs2, i);
+> +    }
+> +    env->vstart =3D 0;
+> +    /* set tail elements to 1s */
+> +    vext_set_elems_1s(vd, vta, vl * esz, total_elems * esz);
+> +}
+> diff --git a/target/riscv/vector_internals.h b/target/riscv/vector_intern=
+als.h
+> new file mode 100644
+> index 0000000000..a04b7321fb
+> --- /dev/null
+> +++ b/target/riscv/vector_internals.h
+> @@ -0,0 +1,155 @@
+> +/*
+> + * RISC-V Vector Extension Internals
+> + *
+> + * Copyright (c) 2020 T-Head Semiconductor Co., Ltd. All rights reserved=
+.
+> + *
+> + * This program is free software; you can redistribute it and/or modify =
+it
+> + * under the terms and conditions of the GNU General Public License,
+> + * version 2 or later, as published by the Free Software Foundation.
+> + *
+> + * This program is distributed in the hope it will be useful, but WITHOU=
+T
+> + * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+> + * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License=
+ for
+> + * more details.
+> + *
+> + * You should have received a copy of the GNU General Public License alo=
+ng with
+> + * this program.  If not, see <http://www.gnu.org/licenses/>.
+> + */
+> +
+> +#ifndef TARGET_RISCV_VECTOR_INTERNALS_H
+> +#define TARGET_RISCV_VECTOR_INTERNALS_H
+> +
+> +#include "qemu/osdep.h"
+> +#include "qemu/bitops.h"
+> +#include "cpu.h"
+> +#include "tcg/tcg-gvec-desc.h"
+> +#include "internals.h"
+> +
+> +static inline uint32_t vext_nf(uint32_t desc)
+> +{
+> +    return FIELD_EX32(simd_data(desc), VDATA, NF);
+> +}
+> +
+> +/*
+> + * Note that vector data is stored in host-endian 64-bit chunks,
+> + * so addressing units smaller than that needs a host-endian fixup.
+> + */
+> +#if HOST_BIG_ENDIAN
+> +#define H1(x)   ((x) ^ 7)
+> +#define H1_2(x) ((x) ^ 6)
+> +#define H1_4(x) ((x) ^ 4)
+> +#define H2(x)   ((x) ^ 3)
+> +#define H4(x)   ((x) ^ 1)
+> +#define H8(x)   ((x))
+> +#else
+> +#define H1(x)   (x)
+> +#define H1_2(x) (x)
+> +#define H1_4(x) (x)
+> +#define H2(x)   (x)
+> +#define H4(x)   (x)
+> +#define H8(x)   (x)
+> +#endif
+> +
+> +/*
+> + * Encode LMUL to lmul as following:
+> + *     LMUL    vlmul    lmul
+> + *      1       000       0
+> + *      2       001       1
+> + *      4       010       2
+> + *      8       011       3
+> + *      -       100       -
+> + *     1/8      101      -3
+> + *     1/4      110      -2
+> + *     1/2      111      -1
+> + */
+> +static inline int32_t vext_lmul(uint32_t desc)
+> +{
+> +    return sextract32(FIELD_EX32(simd_data(desc), VDATA, LMUL), 0, 3);
+> +}
+> +
+> +static inline uint32_t vext_vm(uint32_t desc)
+> +{
+> +    return FIELD_EX32(simd_data(desc), VDATA, VM);
+> +}
+> +
+> +static inline uint32_t vext_vma(uint32_t desc)
+> +{
+> +    return FIELD_EX32(simd_data(desc), VDATA, VMA);
+> +}
+> +
+> +static inline uint32_t vext_vta(uint32_t desc)
+> +{
+> +    return FIELD_EX32(simd_data(desc), VDATA, VTA);
+> +}
+> +
+> +static inline uint32_t vext_vta_all_1s(uint32_t desc)
+> +{
+> +    return FIELD_EX32(simd_data(desc), VDATA, VTA_ALL_1S);
+> +}
+> +
+> +/*
+> + * Earlier designs (pre-0.9) had a varying number of bits
+> + * per mask value (MLEN). In the 0.9 design, MLEN=3D1.
+> + * (Section 4.5)
+> + */
+> +static inline int vext_elem_mask(void *v0, int index)
+> +{
+> +    int idx =3D index / 64;
+> +    int pos =3D index  % 64;
+> +    return (((uint64_t *)v0)[idx] >> pos) & 1;
+> +}
+> +
+> +/*
+> + * Get number of total elements, including prestart, body and tail eleme=
+nts.
+> + * Note that when LMUL < 1, the tail includes the elements past VLMAX th=
+at
+> + * are held in the same vector register.
+> + */
+> +static inline uint32_t vext_get_total_elems(CPURISCVState *env, uint32_t=
+ desc,
+> +                                            uint32_t esz)
+> +{
+> +    uint32_t vlenb =3D simd_maxsz(desc);
+> +    uint32_t sew =3D 1 << FIELD_EX64(env->vtype, VTYPE, VSEW);
+> +    int8_t emul =3D ctzl(esz) - ctzl(sew) + vext_lmul(desc) < 0 ? 0 :
+> +                  ctzl(esz) - ctzl(sew) + vext_lmul(desc);
+> +    return (vlenb << emul) / esz;
+> +}
+> +
+> +/* set agnostic elements to 1s */
+> +void vext_set_elems_1s(void *base, uint32_t is_agnostic, uint32_t cnt,
+> +                       uint32_t tot);
+> +
+> +/* expand macro args before macro */
+> +#define RVVCALL(macro, ...)  macro(__VA_ARGS__)
+> +
+> +/* (TD, T1, T2, TX1, TX2) */
+> +#define OP_UUU_B uint8_t, uint8_t, uint8_t, uint8_t, uint8_t
+> +#define OP_UUU_H uint16_t, uint16_t, uint16_t, uint16_t, uint16_t
+> +#define OP_UUU_W uint32_t, uint32_t, uint32_t, uint32_t, uint32_t
+> +#define OP_UUU_D uint64_t, uint64_t, uint64_t, uint64_t, uint64_t
+> +
+> +/* operation of two vector elements */
+> +typedef void opivv2_fn(void *vd, void *vs1, void *vs2, int i);
+> +
+> +#define OPIVV2(NAME, TD, T1, T2, TX1, TX2, HD, HS1, HS2, OP)    \
+> +static void do_##NAME(void *vd, void *vs1, void *vs2, int i)    \
+> +{                                                               \
+> +    TX1 s1 =3D *((T1 *)vs1 + HS1(i));                             \
+> +    TX2 s2 =3D *((T2 *)vs2 + HS2(i));                             \
+> +    *((TD *)vd + HD(i)) =3D OP(s2, s1);                           \
+> +}
+> +
+> +void do_vext_vv(void *vd, void *v0, void *vs1, void *vs2,
+> +                CPURISCVState *env, uint32_t desc,
+> +                opivv2_fn *fn, uint32_t esz);
+> +
+> +/* generate the helpers for OPIVV */
+> +#define GEN_VEXT_VV(NAME, ESZ)                            \
+> +void HELPER(NAME)(void *vd, void *v0, void *vs1,          \
+> +                  void *vs2, CPURISCVState *env,          \
+> +                  uint32_t desc)                          \
+> +{                                                         \
+> +    do_vext_vv(vd, v0, vs1, vs2, env, desc,               \
+> +               do_##NAME, ESZ);                           \
+> +}
+> +
+> +#endif /* TARGET_RISCV_VECTOR_INTERNALS_H */
+> --
+> 2.39.2
+>
+>
