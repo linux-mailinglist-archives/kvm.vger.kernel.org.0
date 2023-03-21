@@ -2,23 +2,23 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F33DD6C28E2
-	for <lists+kvm@lfdr.de>; Tue, 21 Mar 2023 04:58:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F32966C28E7
+	for <lists+kvm@lfdr.de>; Tue, 21 Mar 2023 04:58:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230181AbjCUD6i (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Mar 2023 23:58:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49708 "EHLO
+        id S230222AbjCUD6r (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Mar 2023 23:58:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50038 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230008AbjCUD5j (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 Mar 2023 23:57:39 -0400
+        with ESMTP id S230027AbjCUD5s (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 Mar 2023 23:57:48 -0400
 Received: from loongson.cn (mail.loongson.cn [114.242.206.163])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4C25C3928C;
-        Mon, 20 Mar 2023 20:57:09 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 863C9392AA;
+        Mon, 20 Mar 2023 20:57:10 -0700 (PDT)
 Received: from loongson.cn (unknown [10.2.5.185])
-        by gateway (Coremail) with SMTP id _____8DxXNoTKxlk7jYPAA--.11040S3;
-        Tue, 21 Mar 2023 11:57:08 +0800 (CST)
+        by gateway (Coremail) with SMTP id _____8Dx_5cUKxlkADcPAA--.22809S3;
+        Tue, 21 Mar 2023 11:57:09 +0800 (CST)
 Received: from localhost.localdomain (unknown [10.2.5.185])
-        by localhost.localdomain (Coremail) with SMTP id AQAAf8DxD78EKxlkQB4IAA--.33942S27;
+        by localhost.localdomain (Coremail) with SMTP id AQAAf8DxD78EKxlkQB4IAA--.33942S28;
         Tue, 21 Mar 2023 11:57:07 +0800 (CST)
 From:   Tianrui Zhao <zhaotianrui@loongson.cn>
 To:     Paolo Bonzini <pbonzini@redhat.com>
@@ -31,19 +31,19 @@ Cc:     Huacai Chen <chenhuacai@kernel.org>,
         Alex Deucher <alexander.deucher@amd.com>,
         Oliver Upton <oliver.upton@linux.dev>, maobibo@loongson.cn,
         Xi Ruoyao <xry111@xry111.site>
-Subject: [PATCH v4 25/29] LoongArch: KVM: Implement handle fpu exception
-Date:   Tue, 21 Mar 2023 11:56:47 +0800
-Message-Id: <20230321035651.598505-26-zhaotianrui@loongson.cn>
+Subject: [PATCH v4 26/29] LoongArch: KVM: Implement kvm exception vector
+Date:   Tue, 21 Mar 2023 11:56:48 +0800
+Message-Id: <20230321035651.598505-27-zhaotianrui@loongson.cn>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20230321035651.598505-1-zhaotianrui@loongson.cn>
 References: <20230321035651.598505-1-zhaotianrui@loongson.cn>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: AQAAf8DxD78EKxlkQB4IAA--.33942S27
+X-CM-TRANSID: AQAAf8DxD78EKxlkQB4IAA--.33942S28
 X-CM-SenderInfo: p2kd03xldq233l6o00pqjv00gofq/
-X-Coremail-Antispam: 1Uk129KBjvJXoW7trWDZrW7uw1UtrW8JFWDArb_yoW8JFyxpF
-        WfAwnYkr48Wry7tanIy3WqqrsxC395Kry7Wr9Fk345Zw4Ut34rXF48KrWvgFy5Kr1rXa1S
-        qr13KFn8uF1UA3DanT9S1TB71UUUUjJqnTZGkaVYY2UrUUUUj1kv1TuYvTs0mT0YCTnIWj
+X-Coremail-Antispam: 1Uk129KBjvJXoW7Kw15tF1UurWUKF17uF4UJwb_yoW8ZFW8pF
+        yfA34Yyr48W342ya4akw1vgF13AayxKr17WrW7G345uw4jqryrtrWkK397JF43KryrZF1x
+        JFZ8tFn8uF4UG37anT9S1TB71UUUUjJqnTZGkaVYY2UrUUUUj1kv1TuYvTs0mT0YCTnIWj
         qI5I8CrVACY4xI64kE6c02F40Ex7xfYxn0WfASr-VFAUDa7-sFnT9fnUUIcSsGvfJTRUUU
         bx8Fc2x0x2IEx4CE42xK8VAvwI8IcIk0rVWrJVCq3wA2ocxC64kIII0Yj41l84x0c7CEw4
         AK67xGY2AK021l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF
@@ -65,47 +65,69 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Implement handle fpu exception, using kvm_own_fpu to enable fpu for
-guest.
+Implement kvm exception vector, using _kvm_fault_tables array to save
+the handle function pointer and it is used when vcpu handle exit.
 
 Signed-off-by: Tianrui Zhao <zhaotianrui@loongson.cn>
 ---
- arch/loongarch/kvm/exit.c | 26 ++++++++++++++++++++++++++
- 1 file changed, 26 insertions(+)
+ arch/loongarch/kvm/exit.c | 48 +++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 48 insertions(+)
 
 diff --git a/arch/loongarch/kvm/exit.c b/arch/loongarch/kvm/exit.c
-index 8a5d39285..fc2152e09 100644
+index fc2152e09..1f95189f6 100644
 --- a/arch/loongarch/kvm/exit.c
 +++ b/arch/loongarch/kvm/exit.c
-@@ -625,3 +625,29 @@ static int _kvm_handle_read_fault(struct kvm_vcpu *vcpu)
- {
- 	return _kvm_handle_mmu_fault(vcpu, false);
+@@ -651,3 +651,51 @@ static int _kvm_handle_fpu_disabled(struct kvm_vcpu *vcpu)
+ 	kvm_own_fpu(vcpu);
+ 	return RESUME_GUEST;
  }
 +
-+/**
-+ * _kvm_handle_fpu_disabled() - Guest used fpu however it is disabled at host
-+ * @vcpu:	Virtual CPU context.
-+ *
-+ * Handle when the guest attempts to use fpu which hasn't been allowed
-+ * by the root context.
++/*
++ * Loongarch KVM callback handling for not implemented guest exiting
 + */
-+static int _kvm_handle_fpu_disabled(struct kvm_vcpu *vcpu)
++static int _kvm_fault_ni(struct kvm_vcpu *vcpu)
 +{
-+	struct kvm_run *run = vcpu->run;
++	unsigned long estat, badv;
++	unsigned int exccode, inst;
 +
 +	/*
-+	 * If guest FPU not present, the FPU operation should have been
-+	 * treated as a reserved instruction!
-+	 * If FPU already in use, we shouldn't get this at all.
++	 *  Fetch the instruction.
 +	 */
-+	if (WARN_ON(vcpu->arch.aux_inuse & KVM_LARCH_FPU)) {
-+		kvm_err("%s internal error\n", __func__);
-+		run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
-+		return RESUME_HOST;
-+	}
++	badv = vcpu->arch.badv;
++	estat = vcpu->arch.host_estat;
++	exccode = (estat & CSR_ESTAT_EXC) >> CSR_ESTAT_EXC_SHIFT;
++	inst = vcpu->arch.badi;
++	kvm_err("Exccode: %d PC=%#lx inst=0x%08x BadVaddr=%#lx estat=%#llx\n",
++			exccode, vcpu->arch.pc, inst, badv, read_gcsr_estat());
++	kvm_arch_vcpu_dump_regs(vcpu);
++	vcpu->run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
 +
-+	kvm_own_fpu(vcpu);
-+	return RESUME_GUEST;
++	return RESUME_HOST;
++}
++
++static exit_handle_fn _kvm_fault_tables[EXCCODE_INT_START] = {
++	[EXCCODE_TLBL]		= _kvm_handle_read_fault,
++	[EXCCODE_TLBI]		= _kvm_handle_read_fault,
++	[EXCCODE_TLBNR]		= _kvm_handle_read_fault,
++	[EXCCODE_TLBNX]		= _kvm_handle_read_fault,
++	[EXCCODE_TLBS]		= _kvm_handle_write_fault,
++	[EXCCODE_TLBM]		= _kvm_handle_write_fault,
++	[EXCCODE_FPDIS]		= _kvm_handle_fpu_disabled,
++	[EXCCODE_GSPR]		= _kvm_handle_gspr,
++};
++
++int _kvm_handle_fault(struct kvm_vcpu *vcpu, int fault)
++{
++	return _kvm_fault_tables[fault](vcpu);
++}
++
++void _kvm_init_fault(void)
++{
++	int i;
++
++	for (i = 0; i < EXCCODE_INT_START; i++)
++		if (!_kvm_fault_tables[i])
++			_kvm_fault_tables[i] = _kvm_fault_ni;
 +}
 -- 
 2.31.1
