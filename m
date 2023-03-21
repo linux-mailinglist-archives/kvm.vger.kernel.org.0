@@ -2,148 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5B9256C3508
-	for <lists+kvm@lfdr.de>; Tue, 21 Mar 2023 16:05:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5B1DD6C3513
+	for <lists+kvm@lfdr.de>; Tue, 21 Mar 2023 16:07:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229981AbjCUPFr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Mar 2023 11:05:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45288 "EHLO
+        id S230219AbjCUPHM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Mar 2023 11:07:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45810 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229606AbjCUPFp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Mar 2023 11:05:45 -0400
-Received: from out-26.mta1.migadu.com (out-26.mta1.migadu.com [IPv6:2001:41d0:203:375::1a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6DA04D2BB
-        for <kvm@vger.kernel.org>; Tue, 21 Mar 2023 08:05:43 -0700 (PDT)
-Date:   Tue, 21 Mar 2023 16:05:41 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1679411142;
+        with ESMTP id S230250AbjCUPHK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Mar 2023 11:07:10 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27DC63B660
+        for <kvm@vger.kernel.org>; Tue, 21 Mar 2023 08:06:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1679411186;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=JyvQw2WBRS/YLRqGgensv+vuNhTLTecf55q+CfuCMpA=;
-        b=Dg7Lu5uJmd2wB6AmU7Llz8L584EHLEVAf793bPL4VUZ5t3eNaLIcBtz00PL34pqbj42uLX
-        UxvCu0T9yzj1CQMJtdSAvWyBhx16NjiDqHIQazvT4ld/b5JuaepEZ5A3VcGLHntsn9Nvqm
-        tNs3lf6bYG5vH+S5RPFwl8Pli1kodV0=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Andrew Jones <andrew.jones@linux.dev>
-To:     Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        qemu-devel@nongnu.org, Thomas Huth <thuth@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.linux.dev,
-        qemu-arm@nongnu.org
-Subject: Re: [kvm-unit-tests PATCH v10 5/7] arm/locking-tests: add
- comprehensive locking test
-Message-ID: <20230321150541.bkqkcoyc3hb443tj@orel>
-References: <20230307112845.452053-1-alex.bennee@linaro.org>
- <20230307112845.452053-6-alex.bennee@linaro.org>
+        bh=DeboSID+flODqx9I+nMKyoD3QHmIkeCvkLB5G/ItUBU=;
+        b=Xd0hCw0U5R8nooesi2sC1J62g7JCVT/LRJ1PgGwBkm9agiev+it5CbMcQpGmR2q2op1QNE
+        CclrHms/X759dU+CUT1RsSTRRVo4O20ltnicKPWa3P/E5ea9b/h04Nr0phQ/0OQ70puhO2
+        9BJnTi/DOpNXxp89Ns5nXasxegF1jDs=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-325-g8Tm9A9NM0qZI2jXbyZBtQ-1; Tue, 21 Mar 2023 11:06:25 -0400
+X-MC-Unique: g8Tm9A9NM0qZI2jXbyZBtQ-1
+Received: by mail-wm1-f69.google.com with SMTP id m27-20020a05600c3b1b00b003ee502f1b16so15368wms.9
+        for <kvm@vger.kernel.org>; Tue, 21 Mar 2023 08:06:24 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1679411183;
+        h=user-agent:in-reply-to:content-transfer-encoding
+         :content-disposition:mime-version:references:message-id:subject:cc
+         :to:from:date:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=DeboSID+flODqx9I+nMKyoD3QHmIkeCvkLB5G/ItUBU=;
+        b=ZQSjeqivwWF7Gnd88oDL9/+vnk+FyrH9ROMPQmvUXlOr9PJSEE6Rx3rO8JQ8iKhnPU
+         4QI/YGozoQ+k/4mlXNBZEo283tiL6PBi7kU9/FdYTKS5UucoqPCMyiQcRjmOGK097avc
+         zPlTuFt2S8GW1FCX7bZkujlwKgCIFYkbwSyhUOyn1HUG+7F7mR5w+c1cF4/MhkX0ZpyZ
+         HGhMslMhxXVcMaH6csPIbBXV3uF7v+sfHCbEPRo4sq+firMM3vVIvrek5T7cW05OtxFK
+         QGNKD6YWJ63p0dxWuzytQvbAWiE5c5ulrKMM+qiaH0a8S0m9xqhOk7FACxfRoP0UzY7C
+         slwQ==
+X-Gm-Message-State: AO0yUKXVH3QbDPrwwql524WdvJk8OsB/Fi0hB537xyEXMNRt24PyTdNu
+        N9aG9ADd2nxF2Qx4xVtnsaoLeOhc7w+628ihlX+YUwh6YeOt+T5FHWYEgHcTnz/SQeZf7a4/8ZU
+        yaJ2cPxBWuS0n
+X-Received: by 2002:a7b:cd08:0:b0:3e1:f8af:8772 with SMTP id f8-20020a7bcd08000000b003e1f8af8772mr2718084wmj.9.1679411183621;
+        Tue, 21 Mar 2023 08:06:23 -0700 (PDT)
+X-Google-Smtp-Source: AK7set8hETz/BgtfXVgzBVy6TDRDQShGyhMxRyf2swuVorF+Gi27ydHl0d6lLBUA6v0wHiItH64mag==
+X-Received: by 2002:a7b:cd08:0:b0:3e1:f8af:8772 with SMTP id f8-20020a7bcd08000000b003e1f8af8772mr2718060wmj.9.1679411183335;
+        Tue, 21 Mar 2023 08:06:23 -0700 (PDT)
+Received: from work-vm (ward-16-b2-v4wan-166627-cust863.vm18.cable.virginm.net. [81.97.203.96])
+        by smtp.gmail.com with ESMTPSA id e5-20020a05600c254500b003eb596cbc54sm14078799wma.0.2023.03.21.08.06.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 21 Mar 2023 08:06:22 -0700 (PDT)
+Date:   Tue, 21 Mar 2023 15:06:19 +0000
+From:   "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To:     =?iso-8859-1?Q?J=F6rg_R=F6del?= <jroedel@suse.de>
+Cc:     amd-sev-snp@lists.suse.com, linux-coco@lists.linux.dev,
+        kvm@vger.kernel.org
+Subject: Re: [ANNOUNCEMENT] COCONUT Secure VM Service Module for SEV-SNP
+Message-ID: <ZBnH600JIw1saZZ7@work-vm>
+References: <ZBl4592947wC7WKI@suse.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20230307112845.452053-6-alex.bennee@linaro.org>
-X-Migadu-Flow: FLOW_OUT
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
-        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <ZBl4592947wC7WKI@suse.de>
+User-Agent: Mutt/2.2.9 (2022-11-12)
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 07, 2023 at 11:28:43AM +0000, Alex Bennée wrote:
-> This test has been written mainly to stress multi-threaded TCG behaviour
-> but will demonstrate failure by default on real hardware. The test takes
-> the following parameters:
+* Jörg Rödel (jroedel@suse.de) wrote:
+> Hi,
 > 
->   - "lock" use GCC's locking semantics
->   - "atomic" use GCC's __atomic primitives
->   - "wfelock" use WaitForEvent sleep
->   - "excl" use load/store exclusive semantics
+> We are happy to announce that last week our secure VM service module
+> (SVSM) went public on GitHub for everyone to try it out and participate
+> in its further development. It is dual-licensed under the MIT and
+> APACHE-2.0 licenses.
 > 
-> Also two more options allow the test to be tweaked
+> The project is written in Rust and can be cloned from:
 > 
->   - "noshuffle" disables the memory shuffling
->   - "count=%ld" set your own per-CPU increment count
+> 	https://github.com/coconut-svsm/svsm
 > 
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-> Message-Id: <20211118184650.661575-8-alex.bennee@linaro.org>
+> There are also repositories in the github project with the Linux host and
+> guest, EDK2 and QEMU changes needed to run the SVSM and boot up a full
+> Linux guest.
 > 
-> ---
-> v9
->   - move back to unittests.cfg, drop accel=tcg
->   - s/printf/report_info
-> v10
->   - dropped spare extra line in shuffle_memory
-> ---
->  arm/Makefile.common |   2 +-
->  arm/locking-test.c  | 321 ++++++++++++++++++++++++++++++++++++++++++++
->  arm/spinlock-test.c |  87 ------------
->  arm/unittests.cfg   |  30 +++++
->  4 files changed, 352 insertions(+), 88 deletions(-)
->  create mode 100644 arm/locking-test.c
->  delete mode 100644 arm/spinlock-test.c
+> The SVSM repository contains an installation guide in the INSTALL.md
+> file and contributor hints in CONTRIBUTING.md.
 > 
-> diff --git a/arm/Makefile.common b/arm/Makefile.common
-> index 2c4aad38..3089e3bf 100644
-> --- a/arm/Makefile.common
-> +++ b/arm/Makefile.common
-> @@ -5,7 +5,6 @@
->  #
->  
->  tests-common  = $(TEST_DIR)/selftest.flat
-> -tests-common += $(TEST_DIR)/spinlock-test.flat
->  tests-common += $(TEST_DIR)/pci-test.flat
->  tests-common += $(TEST_DIR)/pmu.flat
->  tests-common += $(TEST_DIR)/gic.flat
-> @@ -13,6 +12,7 @@ tests-common += $(TEST_DIR)/psci.flat
->  tests-common += $(TEST_DIR)/sieve.flat
->  tests-common += $(TEST_DIR)/pl031.flat
->  tests-common += $(TEST_DIR)/tlbflush-code.flat
-> +tests-common += $(TEST_DIR)/locking-test.flat
->  
->  tests-all = $(tests-common) $(tests)
->  all: directories $(tests-all)
-> diff --git a/arm/locking-test.c b/arm/locking-test.c
-> new file mode 100644
-> index 00000000..a49c2fd1
-> --- /dev/null
-> +++ b/arm/locking-test.c
-> @@ -0,0 +1,321 @@
-> +// SPDX-License-Identifier: GPL-2.0-or-later
-> +/*
-> + * Locking Test
-> + *
-> + * This test allows us to stress the various atomic primitives of a VM
-> + * guest. A number of methods are available that use various patterns
-> + * to implement a lock.
-> + *
-> + * Copyright (C) 2017 Linaro
-> + * Author: Alex Bennée <alex.bennee@linaro.org>
-> + *
-> + * This program is free software; you can redistribute it and/or modify
-> + * it under the terms of the GNU General Public License version 2 as
-> + * published by the Free Software Foundation.
-> + */
-> +
-> +#include <libcflat.h>
-> +#include <asm/smp.h>
-> +#include <asm/cpumask.h>
-> +#include <asm/barrier.h>
-> +#include <asm/mmu.h>
-> +
-> +#include <prng.h>
-> +
-> +#define MAX_CPUS 8
-> +
-> +/* Test definition structure
-> + *
-> + * A simple structure that describes the test name, expected pass and
-> + * increment function.
-> + */
+> A blog entry with more details is here:
+> 
+> 	https://www.suse.com/c/suse-open-sources-secure-vm-service-module-for-confidential-computing/
+> 
+> We also thank AMD for implementing and providing the necessary changes
+> to Linux and EDK2 to make an SVSM possible.
 
-nit: This and many comment blocks below are missing their opening wings.
+Interesting; it would have been nice to have known about this a little
+earlier, some people have been working on stuff built on top of the AMD
+one for a while.
 
-Thanks,
-drew
+You mention two things that I wonder how they interact:
+
+  a) TPMs in the future at a higher ring
+  b) Making (almost) unmodified guests
+
+What interface do you expect the guest to see from the TPM - would it
+look like an existing TPM hardware interface or would you need some
+changes?
+
+Dave
+
+> Have a lot of fun!
+> 
+> -- 
+> Jörg Rödel
+> jroedel@suse.de
+> 
+> SUSE Software Solutions Germany GmbH
+> Frankenstraße 146
+> 90461 Nürnberg
+> Germany
+> 
+> (HRB 36809, AG Nürnberg)
+> Geschäftsführer: Ivo Totev, Andrew Myers, Andrew McDonald, Boudien Moerman
+> 
+-- 
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
