@@ -2,86 +2,151 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E47B16C476A
-	for <lists+kvm@lfdr.de>; Wed, 22 Mar 2023 11:20:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 00B076C47BC
+	for <lists+kvm@lfdr.de>; Wed, 22 Mar 2023 11:35:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230128AbjCVKUV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Mar 2023 06:20:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52654 "EHLO
+        id S230270AbjCVKe5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Mar 2023 06:34:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47698 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229791AbjCVKUT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Mar 2023 06:20:19 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 119425A939;
-        Wed, 22 Mar 2023 03:20:19 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id A0DBB61FFC;
-        Wed, 22 Mar 2023 10:20:18 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id F0773C433D2;
-        Wed, 22 Mar 2023 10:20:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1679480418;
-        bh=hGFxyred+az/fWlsQF8g7FJb3BwXQ/Rhotg83+zWI/w=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=R3k5g/IEE7lDZL8yEq/i5ep1mBZUrVY0/67xhjebU1ZoTc3G2syT7RoUngleIrAUg
-         DHvDGaB2+M/FdYT14UZXmttTSjukCP3YFrhSqck5phgRzrd7IObZcpyFKjSSUyRV/J
-         WlCnC2dARVhBSpHIllIr/UGDXMkM/Bu38FPAn75VChPQpzsnEnlfut4VAeG9aCtTnC
-         r9YnxFu3dSfndIgj/9g+chafjWxC49978zHBsuC+7XRHKHdqdfSY2iq8kCMp0eB7WV
-         gUVgfEjg4GSG0DzqKPF7X1rGVa7zkqBOoWdLITGJO/xWaurttB/60jFXzVNvbWNHMJ
-         e9GYqa2CZrkPQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D433BE66C8B;
-        Wed, 22 Mar 2023 10:20:17 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+        with ESMTP id S230274AbjCVKex (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Mar 2023 06:34:53 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B973A4347A
+        for <kvm@vger.kernel.org>; Wed, 22 Mar 2023 03:34:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1679481246;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=rVkLd1gXXSaNzOK+vQH5hpvFlsKrXbqvBvpTSZkuN40=;
+        b=NnLJlmfTbMW8M3xPx80bU6/PCsDO6qXHxDueRCsbRWg7kt8H0YQy7q0T0yOj8t+IFKU42k
+        ANft8+5ji2w3KJmpTQBv555i2Qjlr7uUZ91Xy7GFpZsXwzV+ZCnrnrHrKeOP4Gc6fHRO4P
+        +BBmkHnewKk7Evuq60ovRgPYM/3aWlE=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-324-b5iL3yxZNV26tN2GMOdBpw-1; Wed, 22 Mar 2023 06:34:05 -0400
+X-MC-Unique: b5iL3yxZNV26tN2GMOdBpw-1
+Received: by mail-wm1-f72.google.com with SMTP id ay12-20020a05600c1e0c00b003ed201dcf71so8527383wmb.4
+        for <kvm@vger.kernel.org>; Wed, 22 Mar 2023 03:34:05 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1679481244;
+        h=user-agent:in-reply-to:content-transfer-encoding
+         :content-disposition:mime-version:references:message-id:subject:cc
+         :to:from:date:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=rVkLd1gXXSaNzOK+vQH5hpvFlsKrXbqvBvpTSZkuN40=;
+        b=jYt6/cmW0uKFBTQqvnCVQD8I9XNMZHTR23Kd4VaYzhfD1y+Qe59l+z6cvLlj6m6mpC
+         fPxgUqEO1PdXDrQ9f+KOGgQkJMH4dCn6O52YeKbzaDJynCYtwXX9LWFJDrwpKsq3Xg4u
+         Ho9ar/T4eWodNln6uh8FchsAA0inXeMrI/equEK+690jjp4qKqUtuA5+bUm6qjyqC67i
+         0qD8xlB3NUejL1G6ZjNfwSGB7Hy8iBI2BfyIfsNZBQ98m9tW8wkYLa1sPJItiPPH1HFC
+         Ol2L0/q1QB68jN9gD09Dvg14lzpiAuDiryqTVQdgORdgxMFwvilLVZwPadnHb37u4Qj+
+         etKQ==
+X-Gm-Message-State: AO0yUKWKNW8vlVV2enz5gq9+dfs94oRa5p3UXAaEEZdKrALmF8r3p5L+
+        j/IBXJjrhbFXPnF7Jp0lFImOVTDpE1Hy0BwszDmYHKjp6YMHmxkbqFcWQbCjAtp6TKUGUwbtV2m
+        D9mRsg8yAhlMlx8Joi8q+
+X-Received: by 2002:a05:600c:cc5:b0:3ed:2346:44bd with SMTP id fk5-20020a05600c0cc500b003ed234644bdmr1267217wmb.19.1679481244576;
+        Wed, 22 Mar 2023 03:34:04 -0700 (PDT)
+X-Google-Smtp-Source: AK7set8Thq76pPmJGxOxWXjQQrmoDtwTU00agbKDE5V4x+4LtRlKY6qAlszC5c92Bor2YpNIrUHo5Q==
+X-Received: by 2002:a05:600c:cc5:b0:3ed:2346:44bd with SMTP id fk5-20020a05600c0cc500b003ed234644bdmr1267207wmb.19.1679481244334;
+        Wed, 22 Mar 2023 03:34:04 -0700 (PDT)
+Received: from work-vm (ward-16-b2-v4wan-166627-cust863.vm18.cable.virginm.net. [81.97.203.96])
+        by smtp.gmail.com with ESMTPSA id a10-20020a056000050a00b002d78a96cf5fsm6368842wrf.70.2023.03.22.03.34.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 22 Mar 2023 03:34:04 -0700 (PDT)
+Date:   Wed, 22 Mar 2023 10:34:01 +0000
+From:   "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To:     Alexander Graf <graf@amazon.com>
+Cc:     =?iso-8859-1?Q?J=F6rg_R=F6del?= <jroedel@suse.de>,
+        amd-sev-snp@lists.suse.com, linux-coco@lists.linux.dev,
+        kvm@vger.kernel.org
+Subject: Re: [ANNOUNCEMENT] COCONUT Secure VM Service Module for SEV-SNP
+Message-ID: <ZBrZmbfWXVQLND/E@work-vm>
+References: <ZBl4592947wC7WKI@suse.de>
+ <ZBnH600JIw1saZZ7@work-vm>
+ <ZBnMZsWMJMkxOelX@suse.de>
+ <ZBnhtEsMhuvwfY75@work-vm>
+ <ZBn/ZbFwT9emf5zw@suse.de>
+ <ZBoLVktt77F9paNV@work-vm>
+ <ZBrIFnlPeCsP0x2g@suse.de>
+ <444b0d8d-3a8c-8e6d-1df3-35f57046e58e@amazon.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v1] virtio/vsock: check transport before skb
- allocation
-From:   patchwork-bot+netdevbpf@kernel.org
-Message-Id: <167948041786.4306.1602330592289509193.git-patchwork-notify@kernel.org>
-Date:   Wed, 22 Mar 2023 10:20:17 +0000
-References: <08d61bef-0c11-c7f9-9266-cb2109070314@sberdevices.ru>
-In-Reply-To: <08d61bef-0c11-c7f9-9266-cb2109070314@sberdevices.ru>
-To:     Arseniy Krasnov <AVKrasnov@sberdevices.ru>
-Cc:     stefanha@redhat.com, sgarzare@redhat.com, davem@davemloft.net,
-        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-        bobby.eshleman@bytedance.com, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kernel@sberdevices.ru,
-        oxffffaa@gmail.com, avkrasnov@sberdevices.ru
-X-Spam-Status: No, score=-5.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,SPF_HELO_NONE,
-        SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.6
+In-Reply-To: <444b0d8d-3a8c-8e6d-1df3-35f57046e58e@amazon.com>
+User-Agent: Mutt/2.2.9 (2022-11-12)
+X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Mon, 20 Mar 2023 20:43:29 +0300 you wrote:
-> Pointer to transport could be checked before allocation of skbuff, thus
-> there is no need to free skbuff when this pointer is NULL.
+* Alexander Graf (graf@amazon.com) wrote:
+> Hi Jörg,
 > 
-> Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
-> Reviewed-by: Bobby Eshleman <bobby.eshleman@bytedance.com>
-> Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+> On 22.03.23 10:19, Jörg Rödel wrote:
 > 
-> [...]
+> > On Tue, Mar 21, 2023 at 07:53:58PM +0000, Dr. David Alan Gilbert wrote:
+> > > OK; the other thing that needs to get nailed down for the vTPM's is the
+> > > relationship between the vTPM attestation and the SEV attestation.
+> > > i.e. how to prove that the vTPM you're dealing with is from an SNP host.
+> > > (Azure have a hack of putting an SNP attestation report into the vTPM
+> > > NVRAM; see
+> > > https://github.com/Azure/confidential-computing-cvm-guest-attestation/blob/main/cvm-guest-attestation.md
+> > > )
+> > When using the SVSM TPM protocol it should be proven already that the
+> > vTPM is part of the SNP trusted base, no? The TPM communication is
+> > implicitly encrypted by the VMs memory key and the SEV attestation
+> > report proves that the correct vTPM is executing.
+> 
+> 
+> What you want to achieve eventually is to take a report from the vTPM and
+> submit only that to an external authorization entity that looks at it and
+> says "Yup, you ran in SEV-SNP, I trust your TCB, I trust your TPM
+> implementation, I also trust your PCR values" and based on that provides
+> access to whatever resource you want to access.
+> 
+> To do that, you need to link SEV-SNP and TPM measurements/reports together.
+> And the easiest way to do that is by providing the SEV-SNP report as part of
+> the TPM: You can then use the hash of the SEV-SNP report as signing key for
+> example.
 
-Here is the summary with links:
-  - [net-next,v1] virtio/vsock: check transport before skb allocation
-    https://git.kernel.org/netdev/net-next/c/4d1f51551777
+Yeh; I think the SVSM TPM protocol has some proof of that as well; the
+SVSM spec lists 'SVSM_ATTEST_SINGLE_SERVICE Manifest Data' that contains
+'TPMT_PUBLIC structure of the endorsement key'.
+So I *think* that's saying that the SEV attestation report contains
+something from the EK of the vTPM.
 
-You are awesome, thank you!
+> I think the key here is that you need to propagate that link to an external
+> party, not (only) to the VM.
+
+Yeh.
+
+Dave
+> 
+> 
+> Alex
+> 
+> 
+> 
+> 
+> 
+> Amazon Development Center Germany GmbH
+> Krausenstr. 38
+> 10117 Berlin
+> Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
+> Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
+> Sitz: Berlin
+> Ust-ID: DE 289 237 879
+> 
+> 
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
