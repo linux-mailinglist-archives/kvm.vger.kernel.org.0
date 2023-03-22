@@ -2,58 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 73F886C3F9F
-	for <lists+kvm@lfdr.de>; Wed, 22 Mar 2023 02:16:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 810B46C3FA2
+	for <lists+kvm@lfdr.de>; Wed, 22 Mar 2023 02:16:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230155AbjCVBQO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Mar 2023 21:16:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52294 "EHLO
+        id S230283AbjCVBQb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Mar 2023 21:16:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52332 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230150AbjCVBP4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Mar 2023 21:15:56 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F3A55A6F1
-        for <kvm@vger.kernel.org>; Tue, 21 Mar 2023 18:15:30 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id j11-20020a25230b000000b00b6871c296bdso10841368ybj.5
-        for <kvm@vger.kernel.org>; Tue, 21 Mar 2023 18:15:30 -0700 (PDT)
+        with ESMTP id S230179AbjCVBQD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Mar 2023 21:16:03 -0400
+Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 505815A18D
+        for <kvm@vger.kernel.org>; Tue, 21 Mar 2023 18:15:38 -0700 (PDT)
+Received: by mail-pg1-x54a.google.com with SMTP id b1-20020a63d301000000b0050726979a86so2616637pgg.4
+        for <kvm@vger.kernel.org>; Tue, 21 Mar 2023 18:15:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1679447724;
+        d=google.com; s=20210112; t=1679447726;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=WKp3cWIz4EB3TSxmAohTftvSjLswbqRY4EZ6PCZ/cQw=;
-        b=SZzJVjS73HjISYGSqDl5X10T5A6vxZwc8w9BaiTNsBSO0cSNyB4hlwaM9sKizC4ghB
-         YDRUGjRaM4MzLZ4G5+W5IAV2W19DJGyDRDcPXvhb3f3SqjoKsnvIYKT8KW8R/4xVV+H6
-         RSugV8g6sUBq5chuQC3PsCeCghkYlm+xXE0o4X6rHCbn6QvhYmjpw8YtsPRNt/suO3VU
-         gZfRSe1rwJCkvO3LNXWIp88QcFwDwTVMzZjFikJ6bDs9LRsjMr54Cf4DAC56UN7Ts3Vz
-         EtqGl2A2qZlAFhHKJw59aMgVCZDNFW6pplnwFeTCUoKrP2ES/9Yc5H5OuoP3UvGc5AGY
-         A8Hg==
+        bh=R3Ju8+L4fgF6abYzf02i1EjyBRNep0dilDxdCj7Ur6o=;
+        b=a2vwCmIpZZBVMlv8zgK50uxkIS0xyvGrcbb26ooiKRDtEuoeDMNLY6bOohAPGj6Wlx
+         2NnVJOjsLYTD3ZqBMs+ROUq33YaZWKwMLnjmyVbpvPv5gy89EbkBhZfD1r7vdOkSs+uv
+         zPrTSZw/8EF8Md12lugEYzIWbquJESphU/VIWTXHmjT+OUkKW4/UpTtYBK//8g/W8i0d
+         SGUWnmJU4A/AzbgvQXXygK4KrBVn+wkTWLRzSGy40vGVnlDmzLQJOJO/fDnZ3ED2hFES
+         Zk9QVxtFz8G+YTDi6az4IydhtKPbdd8AZbFiU22II4Psb5KaepFptGo6J0c2cVWyNbyr
+         SaYA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679447724;
+        d=1e100.net; s=20210112; t=1679447726;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=WKp3cWIz4EB3TSxmAohTftvSjLswbqRY4EZ6PCZ/cQw=;
-        b=77Y/SvMsZnuGjjg75oSnOUXdeP16IKeUp/GlLd3q6diWFKV3KJsG0yapbE209h2dpy
-         9y+dscTs84Qd0aaeIsvQigoQjrQC4YfBk7U7TbqrQhlVmysy89QZCvyujei2JpIrMuQL
-         4XlluDpHFx4izhcYxu0OhWdu/thsKKsR6fF0uuFxlsZTrfVEZ4NiHe2S5QbxUb81lAdD
-         wbZNv9kijTyoOKROve3JwvapBLizyUvLFvSP9SzYwvk29ixPM+cuBsu/fxFPOcDsNukL
-         GCqgbZjf5k7w18UBW1dwE6QwohkyCNSW68tsE+G9TP7tfa4Sbid6XvNB1JbtIZAgLCwi
-         tHhg==
-X-Gm-Message-State: AAQBX9dk5Jt56UbswmXAsQ1r2e+aJTlhHbnwTXeZIOsi/EA0F0PCwEwp
-        vhs2U94lwnUbDlnvl+fiKG5VZqa1d4M=
-X-Google-Smtp-Source: AKy350bODg0yg1Ds22N+XsPtajs1sxEVcp7uCpy/Qzri1NtkVKUYP4coiqPgFy52W7qxjc83WnVLcP6v3+8=
+        bh=R3Ju8+L4fgF6abYzf02i1EjyBRNep0dilDxdCj7Ur6o=;
+        b=ajWB7m7h5sAGGFiBotIcdqIgQkHB5GWr/wQ2YztttPUjFtRlqGClK6rVYp3yFPCoW4
+         FXgpAe9E/ME0nW0q/zAXSQk4HXCo3S+5srfDpe1wzmnvR2g2HnNophQ4hlk5pJD7rPQy
+         vsS7Z79/kB9RpKYF7UkVHv0s3YAeW9opS7Oze0IEjiq9u62qcrPE7+dyLYScUVwQbnSz
+         RlWqGXlbLOUfaeF0yxfc5C2fka1yVcAryNJgDIryoxDCsWIuoJtj9BJEKl6LEdtc45hc
+         H5+9vFKC3DggxQ3rw9QsaJETcI4XKN95tpzrSNec6sxm5gVPRqWZJ9YoqmLhcws9pvP8
+         MDlw==
+X-Gm-Message-State: AO0yUKXmBbXa9IUXqQW05YnKJBF42Q4hmvzopg2rPxxW9MDzSI2RwrNZ
+        ApkBf6XqpkkRK2RVpdlX2AKAon/F+qw=
+X-Google-Smtp-Source: AK7set8/rqQSOxX9RrLUOnnpg5r8vmhnjOz/0JynQasAjavBKAhr2J8mL71LNgEZ0KoBWyHP3YQsjBDlMSw=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:b285:0:b0:541:8291:5237 with SMTP id
- q127-20020a81b285000000b0054182915237mr352609ywh.0.1679447724562; Tue, 21 Mar
- 2023 18:15:24 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a17:90a:ca8d:b0:234:ac9c:5daf with SMTP id
+ y13-20020a17090aca8d00b00234ac9c5dafmr621856pjt.2.1679447726571; Tue, 21 Mar
+ 2023 18:15:26 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Tue, 21 Mar 2023 18:14:39 -0700
+Date:   Tue, 21 Mar 2023 18:14:40 -0700
 In-Reply-To: <20230322011440.2195485-1-seanjc@google.com>
 Mime-Version: 1.0
 References: <20230322011440.2195485-1-seanjc@google.com>
 X-Mailer: git-send-email 2.40.0.rc2.332.ga46443480c-goog
-Message-ID: <20230322011440.2195485-6-seanjc@google.com>
-Subject: [PATCH 5/6] KVM: x86: Virtualize FLUSH_L1D and passthrough MSR_IA32_FLUSH_CMD
+Message-ID: <20230322011440.2195485-7-seanjc@google.com>
+Subject: [PATCH 6/6] KVM: SVM: Return the local "r" variable from svm_set_msr()
 From:   Sean Christopherson <seanjc@google.com>
 To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>
@@ -73,142 +73,59 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Virtualize FLUSH_L1D so that the guest can use the performant L1D flush
-if one of the many mitigations might require a flush in the guest, e.g.
-Linux provides an option to flush the L1D when switching mms.
+Rename "r" to "ret" and actually return it from svm_set_msr() to reduce
+the probability of repeating the mistake of commit 723d5fb0ffe4 ("kvm:
+svm: Add IA32_FLUSH_CMD guest support"), which set "r" thinking that it
+would be propagated to the caller.
 
-Passthrough MSR_IA32_FLUSH_CMD for write when it's supported in hardware
-and exposed to the guest, i.e. always let the guest write it directly if
-FLUSH_L1D is fully supported.
+Alternatively, the declaration of "r" could be moved into the handling of
+MSR_TSC_AUX, but that risks variable shadowing in the future.  A wrapper
+for kvm_set_user_return_msr() would allow eliding a local variable, but
+that feels like delaying the inevitable.
 
-Forward writes to hardware in host context on the off chance that KVM
-ends up emulating a WRMSR, or in the really unlikely scenario where
-userspace wants to force a flush.  Restrict these forwarded WRMSRs to
-the known command out of an abundance of caution.  Passing through the
-MSR means the guest can throw any and all values at hardware, but doing
-so in host context is arguably a bit more dangerous.
+No functional change intended.
 
-Link: https://lkml.kernel.org/r/CALMp9eTt3xzAEoQ038bJQ9LN0ZOXrSWsN7xnNUD%2B0SS%3DWwF7Pg%40mail.gmail.com
-Link: https://lore.kernel.org/all/20230201132905.549148-2-eesposit@redhat.com
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/cpuid.c      |  2 +-
- arch/x86/kvm/svm/svm.c    |  5 +++++
- arch/x86/kvm/vmx/nested.c |  3 +++
- arch/x86/kvm/vmx/vmx.c    |  5 +++++
- arch/x86/kvm/vmx/vmx.h    |  2 +-
- arch/x86/kvm/x86.c        | 12 ++++++++++++
- 6 files changed, 27 insertions(+), 2 deletions(-)
+ arch/x86/kvm/svm/svm.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index 599aebec2d52..9583a110cf5f 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -653,7 +653,7 @@ void kvm_set_cpu_caps(void)
- 		F(SPEC_CTRL_SSBD) | F(ARCH_CAPABILITIES) | F(INTEL_STIBP) |
- 		F(MD_CLEAR) | F(AVX512_VP2INTERSECT) | F(FSRM) |
- 		F(SERIALIZE) | F(TSXLDTRK) | F(AVX512_FP16) |
--		F(AMX_TILE) | F(AMX_INT8) | F(AMX_BF16)
-+		F(AMX_TILE) | F(AMX_INT8) | F(AMX_BF16) | F(FLUSH_L1D)
- 	);
- 
- 	/* TSC_ADJUST and ARCH_CAPABILITIES are emulated in software. */
 diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 85bb535fc321..b32edaf5a74b 100644
+index b32edaf5a74b..57f241c5a371 100644
 --- a/arch/x86/kvm/svm/svm.c
 +++ b/arch/x86/kvm/svm/svm.c
-@@ -95,6 +95,7 @@ static const struct svm_direct_access_msrs {
- #endif
- 	{ .index = MSR_IA32_SPEC_CTRL,			.always = false },
- 	{ .index = MSR_IA32_PRED_CMD,			.always = false },
-+	{ .index = MSR_IA32_FLUSH_CMD,			.always = false },
- 	{ .index = MSR_IA32_LASTBRANCHFROMIP,		.always = false },
- 	{ .index = MSR_IA32_LASTBRANCHTOIP,		.always = false },
- 	{ .index = MSR_IA32_LASTINTFROMIP,		.always = false },
-@@ -4140,6 +4141,10 @@ static void svm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
- 		set_msr_interception(vcpu, svm->msrpm, MSR_IA32_PRED_CMD, 0,
- 				     !!guest_has_pred_cmd_msr(vcpu));
+@@ -2873,7 +2873,7 @@ static int svm_set_vm_cr(struct kvm_vcpu *vcpu, u64 data)
+ static int svm_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr)
+ {
+ 	struct vcpu_svm *svm = to_svm(vcpu);
+-	int r;
++	int ret = 0;
  
-+	if (boot_cpu_has(X86_FEATURE_FLUSH_L1D))
-+		set_msr_interception(vcpu, svm->msrpm, MSR_IA32_FLUSH_CMD, 0,
-+				     !!guest_cpuid_has(vcpu, X86_FEATURE_FLUSH_L1D));
-+
- 	/* For sev guests, the memory encryption bit is not reserved in CR3.  */
- 	if (sev_guest(vcpu->kvm)) {
- 		best = kvm_find_cpuid_entry(vcpu, 0x8000001F);
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 1bc2b80273c9..f63b28f46a71 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -654,6 +654,9 @@ static inline bool nested_vmx_prepare_msr_bitmap(struct kvm_vcpu *vcpu,
- 	nested_vmx_set_intercept_for_msr(vmx, msr_bitmap_l1, msr_bitmap_l0,
- 					 MSR_IA32_PRED_CMD, MSR_TYPE_W);
- 
-+	nested_vmx_set_intercept_for_msr(vmx, msr_bitmap_l1, msr_bitmap_l0,
-+					 MSR_IA32_FLUSH_CMD, MSR_TYPE_W);
-+
- 	kvm_vcpu_unmap(vcpu, &vmx->nested.msr_bitmap_map, false);
- 
- 	vmx->nested.force_msr_bitmap_recalc = false;
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 29807be219b9..56e0c7ae961d 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -164,6 +164,7 @@ module_param(allow_smaller_maxphyaddr, bool, S_IRUGO);
- static u32 vmx_possible_passthrough_msrs[MAX_POSSIBLE_PASSTHROUGH_MSRS] = {
- 	MSR_IA32_SPEC_CTRL,
- 	MSR_IA32_PRED_CMD,
-+	MSR_IA32_FLUSH_CMD,
- 	MSR_IA32_TSC,
- #ifdef CONFIG_X86_64
- 	MSR_FS_BASE,
-@@ -7720,6 +7721,10 @@ static void vmx_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
- 		vmx_set_intercept_for_msr(vcpu, MSR_IA32_PRED_CMD, MSR_TYPE_W,
- 					  !guest_has_pred_cmd_msr(vcpu));
- 
-+	if (boot_cpu_has(X86_FEATURE_FLUSH_L1D))
-+		vmx_set_intercept_for_msr(vcpu, MSR_IA32_FLUSH_CMD, MSR_TYPE_W,
-+					  !guest_cpuid_has(vcpu, X86_FEATURE_FLUSH_L1D));
-+
- 	set_cr4_guest_host_mask(vmx);
- 
- 	vmx_write_encls_bitmap(vcpu, NULL);
-diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-index 2acdc54bc34b..cb766f65a3eb 100644
---- a/arch/x86/kvm/vmx/vmx.h
-+++ b/arch/x86/kvm/vmx/vmx.h
-@@ -369,7 +369,7 @@ struct vcpu_vmx {
- 	struct lbr_desc lbr_desc;
- 
- 	/* Save desired MSR intercept (read: pass-through) state */
--#define MAX_POSSIBLE_PASSTHROUGH_MSRS	15
-+#define MAX_POSSIBLE_PASSTHROUGH_MSRS	16
- 	struct {
- 		DECLARE_BITMAP(read, MAX_POSSIBLE_PASSTHROUGH_MSRS);
- 		DECLARE_BITMAP(write, MAX_POSSIBLE_PASSTHROUGH_MSRS);
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index c83ec88da043..3c58dbae7b4c 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -3628,6 +3628,18 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 
- 		wrmsrl(MSR_IA32_PRED_CMD, PRED_CMD_IBPB);
- 		break;
-+	case MSR_IA32_FLUSH_CMD:
-+		if (!msr_info->host_initiated &&
-+		    !guest_cpuid_has(vcpu, X86_FEATURE_FLUSH_L1D))
-+			return 1;
-+
-+		if (!boot_cpu_has(X86_FEATURE_FLUSH_L1D) || (data & ~L1D_FLUSH))
-+			return 1;
-+		if (!data)
+ 	u32 ecx = msr->index;
+ 	u64 data = msr->data;
+@@ -2995,10 +2995,10 @@ static int svm_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr)
+ 		 * guest via direct_access_msrs, and switch it via user return.
+ 		 */
+ 		preempt_disable();
+-		r = kvm_set_user_return_msr(tsc_aux_uret_slot, data, -1ull);
++		ret = kvm_set_user_return_msr(tsc_aux_uret_slot, data, -1ull);
+ 		preempt_enable();
+-		if (r)
+-			return 1;
++		if (ret)
 +			break;
-+
-+		wrmsrl(MSR_IA32_FLUSH_CMD, L1D_FLUSH);
-+		break;
- 	case MSR_EFER:
- 		return set_efer(vcpu, msr_info);
- 	case MSR_K7_HWCR:
+ 
+ 		svm->tsc_aux = data;
+ 		break;
+@@ -3056,7 +3056,7 @@ static int svm_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr)
+ 	default:
+ 		return kvm_set_msr_common(vcpu, msr);
+ 	}
+-	return 0;
++	return ret;
+ }
+ 
+ static int msr_interception(struct kvm_vcpu *vcpu)
 -- 
 2.40.0.rc2.332.ga46443480c-goog
 
