@@ -2,32 +2,32 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1FB9B6C4A6D
+	by mail.lfdr.de (Postfix) with ESMTP id 45EA56C4A6E
 	for <lists+kvm@lfdr.de>; Wed, 22 Mar 2023 13:27:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230242AbjCVM1g (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Mar 2023 08:27:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57826 "EHLO
+        id S230319AbjCVM1i (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Mar 2023 08:27:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57852 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230288AbjCVM1c (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Mar 2023 08:27:32 -0400
+        with ESMTP id S230294AbjCVM1d (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Mar 2023 08:27:33 -0400
 Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9FA882DE5A
-        for <kvm@vger.kernel.org>; Wed, 22 Mar 2023 05:27:31 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BFFE3E1C2
+        for <kvm@vger.kernel.org>; Wed, 22 Mar 2023 05:27:32 -0700 (PDT)
 Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
         (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4PhSR72JStz4xFR;
-        Wed, 22 Mar 2023 23:27:31 +1100 (AEDT)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4PhSR65jqSz4xFW;
+        Wed, 22 Mar 2023 23:27:30 +1100 (AEDT)
 From:   Michael Ellerman <patch-notifications@ellerman.id.au>
 To:     kvm <kvm@vger.kernel.org>,
         Timothy Pearson <tpearson@raptorengineering.com>
 Cc:     linuxppc-dev <linuxppc-dev@lists.ozlabs.org>
-In-Reply-To: <2000135730.16998523.1678123860135.JavaMail.zimbra@raptorengineeringinc.com>
-References: <2000135730.16998523.1678123860135.JavaMail.zimbra@raptorengineeringinc.com>
-Subject: Re: [PATCH v2 3/4] powerpc/iommu: Add iommu_ops to report capabilities and
-Message-Id: <167948793435.559204.9498535193091997320.b4-ty@ellerman.id.au>
+In-Reply-To: <12303156.16998521.1678123842049.JavaMail.zimbra@raptorengineeringinc.com>
+References: <12303156.16998521.1678123842049.JavaMail.zimbra@raptorengineeringinc.com>
+Subject: Re: [PATCH v2 2/4] powerpc/pci_64: Init pcibios subsys a bit later
+Message-Id: <167948793435.559204.2135142042488392469.b4-ty@ellerman.id.au>
 Date:   Wed, 22 Mar 2023 23:25:34 +1100
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -40,21 +40,19 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 6 Mar 2023 11:31:00 -0600 (CST), Timothy Pearson wrote:
->  allow blocking domains
+On Mon, 6 Mar 2023 11:30:42 -0600 (CST), Timothy Pearson wrote:
+> The following patches are going to add dependency/use of iommu_ops which
+> is initialized in subsys_initcall as well.
 > 
-> Up until now PPC64 managed to avoid using iommu_ops. The VFIO driver
-> uses a SPAPR TCE sub-driver and all iommu_ops uses were kept in
-> the Type1 VFIO driver. Recent development added 2 uses of iommu_ops to
-> the generic VFIO which broke POWER:
-> - a coherency capability check;
-> - blocking IOMMU domain - iommu_group_dma_owner_claimed()/...
+> This moves pciobios_init() to the next initcall level.
+> 
+> This should not cause behavioral change.
 > 
 > [...]
 
 Applied to powerpc/next.
 
-[3/4] powerpc/iommu: Add iommu_ops to report capabilities and
-      https://git.kernel.org/powerpc/c/a940904443e432623579245babe63e2486ff327b
+[2/4] powerpc/pci_64: Init pcibios subsys a bit later
+      https://git.kernel.org/powerpc/c/76f351096c4516f38b9c901a21797fa958588e3a
 
 cheers
