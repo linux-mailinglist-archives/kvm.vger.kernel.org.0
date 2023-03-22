@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 87D8A6C52F8
-	for <lists+kvm@lfdr.de>; Wed, 22 Mar 2023 18:49:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 75E126C530C
+	for <lists+kvm@lfdr.de>; Wed, 22 Mar 2023 18:52:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230076AbjCVRtl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Mar 2023 13:49:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47146 "EHLO
+        id S230296AbjCVRwN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Mar 2023 13:52:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51534 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229843AbjCVRtk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Mar 2023 13:49:40 -0400
-Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 580C85679D
-        for <kvm@vger.kernel.org>; Wed, 22 Mar 2023 10:49:39 -0700 (PDT)
-Received: by mail-pg1-x54a.google.com with SMTP id s9-20020a634509000000b004fc1c14c9daso4930583pga.23
-        for <kvm@vger.kernel.org>; Wed, 22 Mar 2023 10:49:39 -0700 (PDT)
+        with ESMTP id S230182AbjCVRwI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Mar 2023 13:52:08 -0400
+Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4569B65455
+        for <kvm@vger.kernel.org>; Wed, 22 Mar 2023 10:52:03 -0700 (PDT)
+Received: by mail-pj1-x1049.google.com with SMTP id e8-20020a17090a118800b0023d35ae431eso6177196pja.8
+        for <kvm@vger.kernel.org>; Wed, 22 Mar 2023 10:52:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1679507379;
+        d=google.com; s=20210112; t=1679507523;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=dsyiAdjciLomvR7zo/rxP12/2llmHgaouRXJN9t17RQ=;
-        b=gunIUjyn90Zxg9Ds5jVzO7KrTCYCzCbMIhz+g0TVvHab4gIDGmfYMyiMjYKOR1Q4hF
-         Pd1YgmApASIt/7CpsdoWCQu3Q9Zncq7pEFP2Fbq5lymG0p1keukJV0HdYYfRkeMiaIX1
-         bzt1fxTxwum0Kr8b/qb1KnjTrF5/Ph+zsLwB/jFQn5Md+n+APIFOfqUoiEevOAgfBwgV
-         geyr2IsOXoYVedhKnfR14UhF4p9MnEmRH7Ict+li2Kejz++OjUnb8oQslPqrwi/1mLn5
-         dbdAjUlA51l3kzLHRRHzI+j+bmYeOokl2ziYsi4VipZ0xnVC+b0IjnpfWid7PzPEdTzJ
-         0cRA==
+        bh=iZTwETswiMkR6MsJjj+d7N8Pb7VPbOvVsKiiVr9TOhM=;
+        b=i5+mifpqoOF/KxF3sUQl2/YU4M7kOnSQCVi7BGq43pujy0oUUBe8hPcWfsLGYLtG2m
+         NSWswmC+HelxhvUeFVi96enYnxro0IrBcV1F8hUHYm6ihUptDyofwPVDeVmWnluPN4HP
+         HRf5b33RDynRy5Y+O3asK9iHxQHDn7pOA9FXeGaGkmvyvvYPcU+Xo0AqeWHb75LvpXHh
+         sEffnSPQ2LbrSDwhGGIpWGHUz6DtdDawZV5p6zKiRZT0zGS0Kv+JN6aMnb3fQ7nqDoyi
+         T9Tu517oJGvpdQBkdLcni99k6uilxYjJokNEdA1jOwVCRoACOawG30Jl92aK1QIYTxQW
+         +Arw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679507379;
+        d=1e100.net; s=20210112; t=1679507523;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=dsyiAdjciLomvR7zo/rxP12/2llmHgaouRXJN9t17RQ=;
-        b=w0aa4MU6iLOOSbxIbkRJ06letMxduWgkhiw8nIXbZQFiINNxmad5GoeSYeXiIFV/Rf
-         32i3WMBnBnnu7hlmlmhXomSxCGKU9s24qphLuqJ0EO/zQNboP3P3uYbjBkkb1IFjJ9E5
-         WaKYmoitmQckMYbp38Mzw8QIwfM6HSFpKIZo4J3QezpcxUJkbNU2BNuRbQ2arIz6Z/f2
-         6SzyN5AeN6jfL+EJuQXEGONgmTegWCes8lTojdKuPjaYppOLjqUz2fgvRT75LaFD2DnL
-         LSr/Pj8sypRfJIwvGpJRFZSZ0VUC4P7lU2l2SP3HUPz0AwBGObKcTAFdpdwngHJnRTG+
-         uR+Q==
-X-Gm-Message-State: AO0yUKVG+ucsrYvrt7OeZsAIv29ZER4Qq+PGNQH0Jje0O/AQsL+Dj5Jy
-        p2Ww/s/ekQySHGNc0tNNPmsaGBJ06p4=
-X-Google-Smtp-Source: AK7set8EUT+58AxbbTlVDSXdjZXe51CmACxL4CLRD1sdZ+gusQMK9722D6WWpg2gcfzXKrY13Ji8cdmYMwY=
+        bh=iZTwETswiMkR6MsJjj+d7N8Pb7VPbOvVsKiiVr9TOhM=;
+        b=YUZaX0XhBUKTwwH2tGoyDO6eEi6LKueCIQ9MIIhdWVcNkWN8a9+GxM/C+SyhORzWqp
+         bye9jDfd82ohEWDIxQIpay1Qm8FvBSLMgtD7T0W4Q4SMNgqaHcWd7bvQaJBUqPAH1Hjw
+         YLzJk4WPY4DSpdwCFsRYf3Pc7Ohc7lC+WXWSoBGWY3mcVo9FFsfRh+hH0eF+3FCD/MfH
+         e4JpQxTLxCPnlzXV+W69Y8Eu7mQ4lNgtWxq1ROwUVidr5YEgTenhAR16V2l8wR96c1C0
+         ftSE4qwZ3LoMaV+nu1Q6OJavxSqesRjjF59JhjXuSuz7T4sopwsp5ahiucN1BKuucbag
+         OPug==
+X-Gm-Message-State: AO0yUKUm3kS/+ycCZdQRp/ovdWPkYUFwsysREDgpLggM1N+5Lh7l/1Tt
+        l9OR6oFBaRI7BnP+yeVH+fAIw2hA7pc=
+X-Google-Smtp-Source: AK7set+RGHNA/eCwuNR2wbBn238UqLumF+xL7hx3F6oNRxE1rmepDqciOMOmxEg+y7rjgstoo1w3iS7S8xg=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:903:244f:b0:1a1:d366:b0bd with SMTP id
- l15-20020a170903244f00b001a1d366b0bdmr1425995pls.9.1679507378884; Wed, 22 Mar
- 2023 10:49:38 -0700 (PDT)
-Date:   Wed, 22 Mar 2023 10:49:37 -0700
-In-Reply-To: <20230307023946.14516-35-xin3.li@intel.com>
+ (user=seanjc job=sendgmr) by 2002:a17:903:22c1:b0:1a0:6b23:7b55 with SMTP id
+ y1-20020a17090322c100b001a06b237b55mr1415684plg.4.1679507522821; Wed, 22 Mar
+ 2023 10:52:02 -0700 (PDT)
+Date:   Wed, 22 Mar 2023 10:52:01 -0700
+In-Reply-To: <20230307023946.14516-6-xin3.li@intel.com>
 Mime-Version: 1.0
-References: <20230307023946.14516-1-xin3.li@intel.com> <20230307023946.14516-35-xin3.li@intel.com>
-Message-ID: <ZBs/sSJwr7zdOUsE@google.com>
-Subject: Re: [PATCH v5 34/34] KVM: x86/vmx: execute "int $2" to handle NMI in
- NMI caused VM exits when FRED is enabled
+References: <20230307023946.14516-1-xin3.li@intel.com> <20230307023946.14516-6-xin3.li@intel.com>
+Message-ID: <ZBtAQc8Jz5GWGrJr@google.com>
+Subject: Re: [PATCH v5 05/34] x86/traps: export external_interrupt() for VMX
+ IRQ reinjection
 From:   Sean Christopherson <seanjc@google.com>
 To:     Xin Li <xin3.li@intel.com>
 Cc:     linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org,
@@ -71,23 +71,49 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On Mon, Mar 06, 2023, Xin Li wrote:
-> Execute "int $2" to handle NMI in NMI caused VM exits when FRED is enabled.
+> To eliminate dispatching IRQ through the IDT, export external_interrupt()
+> for VMX IRQ reinjection.
 > 
-> Like IRET for IDT, ERETS/ERETU are required to end the NMI handler for FRED
-> to unblock NMI ASAP (w/ bit 28 of CS set).
-
-That's "CS" on the stack correct?  Is bit 28 set manually by software, or is it
-set automatically by hardware?  If it's set by hardware, does "int $2" actually
-set the bit since it's not a real NMI?
-
-> And there are 2 approaches to
-> invoke the FRED NMI handler:
-> 1) execute "int $2", let the h/w do the job.
-> 2) create a FRED NMI stack frame on the current kernel stack with ASM,
->    and then jump to fred_entrypoint_kernel in arch/x86/entry/entry_64_fred.S.
+> Tested-by: Shan Kang <shan.kang@intel.com>
+> Signed-off-by: Xin Li <xin3.li@intel.com>
+> ---
+>  arch/x86/include/asm/traps.h |  2 ++
+>  arch/x86/kernel/traps.c      | 14 ++++++++++++++
+>  2 files changed, 16 insertions(+)
 > 
-> 1) is preferred as we want less ASM.
+> diff --git a/arch/x86/include/asm/traps.h b/arch/x86/include/asm/traps.h
+> index 46f5e4e2a346..da4c21ed68b4 100644
+> --- a/arch/x86/include/asm/traps.h
+> +++ b/arch/x86/include/asm/traps.h
+> @@ -56,4 +56,6 @@ void __noreturn handle_stack_overflow(struct pt_regs *regs,
+>  	void f (struct pt_regs *regs)
+>  typedef DECLARE_SYSTEM_INTERRUPT_HANDLER((*system_interrupt_handler));
+>  
+> +int external_interrupt(struct pt_regs *regs, unsigned int vector);
+> +
+>  #endif /* _ASM_X86_TRAPS_H */
+> diff --git a/arch/x86/kernel/traps.c b/arch/x86/kernel/traps.c
+> index 31ad645be2fb..cebba1f49e19 100644
+> --- a/arch/x86/kernel/traps.c
+> +++ b/arch/x86/kernel/traps.c
+> @@ -1540,6 +1540,20 @@ int external_interrupt(struct pt_regs *regs, unsigned int vector)
+>  	return 0;
+>  }
+>  
+> +#if IS_ENABLED(CONFIG_KVM_INTEL)
+> +/*
+> + * KVM VMX reinjects IRQ on its current stack, it's a sync call
+> + * thus the values in the pt_regs structure are not used in
+> + * executing IRQ handlers, except cs.RPL and flags.IF, which
+> + * are both always 0 in the VMX IRQ reinjection context.
+> + *
+> + * However, the pt_regs structure is sometimes used in stack
+> + * dump, e.g., show_regs(). So let the caller, i.e., KVM VMX
+> + * decide how to initialize the input pt_regs structure.
+> + */
+> +EXPORT_SYMBOL_GPL(external_interrupt);
+> +#endif
 
-Who is "we", and how much assembly are we talking about?  E.g. I personally don't
-mind a trampoline in KVM if it's small and/or can share code with existing
-assembly subroutines.
+If the x86 maintainers don't object, I would prefer this to be squashed with the
+actual KVM usage, that way discussions on exactly what the exported API should be
+can be contained in a single thread.
