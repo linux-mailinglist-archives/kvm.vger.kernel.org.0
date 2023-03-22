@@ -2,137 +2,230 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 161DA6C4F37
-	for <lists+kvm@lfdr.de>; Wed, 22 Mar 2023 16:17:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 273D56C5060
+	for <lists+kvm@lfdr.de>; Wed, 22 Mar 2023 17:20:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231531AbjCVPRY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Mar 2023 11:17:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50986 "EHLO
+        id S230013AbjCVQU3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Mar 2023 12:20:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45678 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231483AbjCVPRX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Mar 2023 11:17:23 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0ACC67728;
-        Wed, 22 Mar 2023 08:17:21 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 239DBB81D0A;
-        Wed, 22 Mar 2023 15:17:20 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BC84EC433D2;
-        Wed, 22 Mar 2023 15:17:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1679498238;
-        bh=x14uXdcyN6NwgG+IiJ4mbAithUacI0jt05p67YoWCxo=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=vHu19ck37uJ0Noh8bpkiMcCiwaHGbeUk3AoCX1D9/uQoq+m7Jeuc8mcRjW+sjs9Lk
-         fbtSCGNHoVaCLkM+gy9b113QC3L9P3tPRFwAwXVYqne0L6m1WsStAc3vF68MVMmioy
-         DFgwckFmD9AIGERIB82AVK9Ky5AeChx0LNAwp/CFcXL7eda2sw3GF0mPer4I4lyLnp
-         gfkoc0/szZ4DO1Ledjhc2NLZDfgsL8NnB9ScltQ4AeiF9yhWDzy4Ovu7qZvWWgAy/5
-         u3d8cxwwZoaBPfWmkClx6UKw4Dc/iBmHk4ZwkcWBzuibER73j2ug9b6v5sdS8H50su
-         L4dbHUHyU98Zg==
-Date:   Wed, 22 Mar 2023 15:17:13 +0000
-From:   Conor Dooley <conor@kernel.org>
-To:     Andrew Jones <ajones@ventanamicro.com>
-Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Jisheng Zhang <jszhang@kernel.org>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Anup Patel <anup@brainfault.org>,
-        Atish Patra <atishp@atishpatra.org>,
-        Heiko Stuebner <heiko@sntech.de>,
-        Conor Dooley <conor.dooley@microchip.com>,
-        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
-        regressions@leemhuis.info, regressions@lists.linux.dev
-Subject: Re: [PATCH] riscv: require alternatives framework when selecting FPU
- support
-Message-ID: <1884bd96-2783-4556-bc57-8b733758baff@spud>
-References: <ZBruFRwt3rUVngPu@zx2c4.com>
- <20230322120907.2968494-1-Jason@zx2c4.com>
- <20230322124631.7p67thzeblrawsqj@orel>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="B7v5JtRVPQGXVgO3"
-Content-Disposition: inline
-In-Reply-To: <20230322124631.7p67thzeblrawsqj@orel>
-X-Spam-Status: No, score=-2.5 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.6
+        with ESMTP id S229556AbjCVQU1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Mar 2023 12:20:27 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2697E3A4D8
+        for <kvm@vger.kernel.org>; Wed, 22 Mar 2023 09:20:24 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id b124-20020a253482000000b00b72947f6a54so2291442yba.14
+        for <kvm@vger.kernel.org>; Wed, 22 Mar 2023 09:20:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112; t=1679502023;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=gW+4nkrtvrpqD1DYdSpd9Q5E1HZhIqm3BROgAyQCa7U=;
+        b=M8w/J5hwKrNpQJt4fou1FrsYAMsyxUuW7NVIZQGfzfyw3hUNoJHvatMCnH0lwXWjND
+         jitzGv7U/0Vz8ipDuUdWaYJ1SJO6/xoEpainNpchrKP2S2VBgXnaKIE3n2Xb4V/HhyF9
+         cRQ2NiI6AqWFIYWBhFMMnvv4LqGhbDW4+8UBHw5/nXG3lhhdRcc8DROeTupXkN8gjgCI
+         VagMCsjvT61O3Uyxqqfx4vFBlZ9VEHwic2PQ35DTVTubGiHUeQIvKTPm6lP2oMa8Dxwy
+         fpuqfJqugXRPPnboBvYnqOYYhPr0rfFN/jSAbqHbS7B/EnFuu0BO3VFLcXjgIzQym5gc
+         TbYQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1679502023;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=gW+4nkrtvrpqD1DYdSpd9Q5E1HZhIqm3BROgAyQCa7U=;
+        b=460dsSJjYwNRcfk6Hq+7v9lCapHzOfmbKRdFu7NBdGVfOJFhevAH7iP9uCu2/C/bvt
+         /2SyrV9iMLWrxlf8GtbvXN4emN+fGWnT92HClvP9R0097iJy3rPreqb37gT13uK6Asva
+         TKU4GAYwZ7S4AtOAJQGSp+Bxd8uA3ux0yzbRQ8yP7H/dxRxbjRhy9vgTv/+81aHboTcd
+         eH91hvJT/m7Bp0gKxTz8MOUUeg4x91z61gu2//mMoV7yP9fvN3coatXxrXFnqnBujPdb
+         V1cJk6uh9HXvESK/ap2wvyHyVEDimv+h+EuQ9esRAB3SuxETLAy6dH6/3SnIKVH7wwnL
+         SyXQ==
+X-Gm-Message-State: AAQBX9cjee6rWIXGVGGOo1ru1E5R+1ZoWDy1j6jKoVcyj5lx/ho1eZck
+        tUMWr9WB8bOVBoHmjQz1l6FU6hJs2Go=
+X-Google-Smtp-Source: AKy350bSMJy9P0JW71a8nrVsm2ruBEsdB6aubGOIi2r2ruMX0d/JVOnKBvzZTJIc0F5aif7z4y4sA664j3I=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:688:b0:b6e:850b:77d3 with SMTP id
+ i8-20020a056902068800b00b6e850b77d3mr284207ybt.0.1679502023402; Wed, 22 Mar
+ 2023 09:20:23 -0700 (PDT)
+Date:   Wed, 22 Mar 2023 09:20:21 -0700
+In-Reply-To: <20230320185110.1346829-1-jpiotrowski@linux.microsoft.com>
+Mime-Version: 1.0
+References: <20230320185110.1346829-1-jpiotrowski@linux.microsoft.com>
+Message-ID: <ZBsqxeRDh+iV8qmm@google.com>
+Subject: Re: [PATCH] KVM: SVM: Flush Hyper-V TLB when required
+From:   Sean Christopherson <seanjc@google.com>
+To:     Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>
+Cc:     linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        kvm@vger.kernel.org, Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Tianyu Lan <ltykernel@gmail.com>,
+        Michael Kelley <mikelley@microsoft.com>, stable@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-7.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Mon, Mar 20, 2023, Jeremi Piotrowski wrote:
+> ---
+>  arch/x86/kvm/kvm_onhyperv.c | 23 +++++++++++++++++++++++
+>  arch/x86/kvm/kvm_onhyperv.h |  5 +++++
+>  arch/x86/kvm/svm/svm.c      | 18 +++++++++++++++---
+>  3 files changed, 43 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/kvm_onhyperv.c b/arch/x86/kvm/kvm_onhyperv.c
+> index 482d6639ef88..036e04c0a161 100644
+> --- a/arch/x86/kvm/kvm_onhyperv.c
+> +++ b/arch/x86/kvm/kvm_onhyperv.c
+> @@ -94,6 +94,29 @@ int hv_remote_flush_tlb(struct kvm *kvm)
+>  }
+>  EXPORT_SYMBOL_GPL(hv_remote_flush_tlb);
+>  
+> +void hv_flush_tlb_current(struct kvm_vcpu *vcpu)
+> +{
+> +	struct kvm_arch *kvm_arch = &vcpu->kvm->arch;
+> +	hpa_t root_tdp = vcpu->arch.mmu->root.hpa;
+> +
+> +	if (kvm_x86_ops.tlb_remote_flush == hv_remote_flush_tlb && VALID_PAGE(root_tdp)) {
+> +		spin_lock(&kvm_arch->hv_root_tdp_lock);
+> +		if (kvm_arch->hv_root_tdp != root_tdp) {
+> +			hyperv_flush_guest_mapping(root_tdp);
+> +			kvm_arch->hv_root_tdp = root_tdp;
 
---B7v5JtRVPQGXVgO3
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+In a vacuum, accessing kvm_arch->hv_root_tdp in the flush path is wrong.  This
+likely fixes the issues you are seeing because the KVM bug only affects the case
+when KVM is loading a new root (that used to be valid), in which case hv_root_tdp
+is guaranteed to be different.  But KVM should not rely on that behavior, i.e. if
+KVM says flush, then we flush.  There might be scenarios where the flush is
+unnecessary, but those flushes should be elided by the code that knows the flush
+is unnecessary, not in this common code just because the target root is the
+globally shared root.
 
-On Wed, Mar 22, 2023 at 01:46:31PM +0100, Andrew Jones wrote:
-> On Wed, Mar 22, 2023 at 01:09:07PM +0100, Jason A. Donenfeld wrote:
-> > When moving switch_to's has_fpu() over to using riscv_has_extension_
-> > likely() rather than static branchs, the FPU code gained a dependency on
-> > the alternatives framework. If CONFIG_RISCV_ALTERNATIVE isn't selected
-> > when CONFIG_FPU is, then has_fpu() returns false, and switch_to does not
-> > work as intended. So select CONFIG_RISCV_ALTERNATIVE when CONFIG_FPU is
-> > selected.
-> >=20
-> > Fixes: 702e64550b12 ("riscv: fpu: switch has_fpu() to riscv_has_extensi=
-on_likely()")
-> > Link: https://lore.kernel.org/all/ZBruFRwt3rUVngPu@zx2c4.com/
-> > Cc: Jisheng Zhang <jszhang@kernel.org>
-> > Cc: Andrew Jones <ajones@ventanamicro.com>
-> > Cc: Heiko Stuebner <heiko@sntech.de>
-> > Cc: Conor Dooley <conor.dooley@microchip.com>
+Somewhat of a moot point, but setting hv_root_tdp to root_tdp is also wrong.  KVM's
+behavior is that hv_root_tdp points at a valid root if and only if all vCPUs share
+said root.  E.g. invoking this when vCPUs have different roots will "corrupt"
+hv_root_tdp and possibly cause a remote flush to do the wrong thing.
 
-Thanks for fixing it!
-Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
+> +		}
+> +		spin_unlock(&kvm_arch->hv_root_tdp_lock);
+> +	}
+> +}
+> +EXPORT_SYMBOL_GPL(hv_flush_tlb_current);
+> +
+> +void hv_flush_tlb_all(struct kvm_vcpu *vcpu)
+> +{
+> +	if (WARN_ON_ONCE(kvm_x86_ops.tlb_remote_flush == hv_remote_flush_tlb))
 
-> > Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
-> > ---
-> >  arch/riscv/Kconfig | 1 +
-> >  1 file changed, 1 insertion(+)
-> >=20
-> > diff --git a/arch/riscv/Kconfig b/arch/riscv/Kconfig
-> > index c5e42cc37604..0f59350c699d 100644
-> > --- a/arch/riscv/Kconfig
-> > +++ b/arch/riscv/Kconfig
-> > @@ -467,6 +467,7 @@ config TOOLCHAIN_HAS_ZIHINTPAUSE
-> >  config FPU
-> >  	bool "FPU support"
-> >  	default y
-> > +	select RISCV_ALTERNATIVE
-> >  	help
-> >  	  Say N here if you want to disable all floating-point related proced=
-ure
-> >  	  in the kernel.
-> > --=20
-> > 2.40.0
-> >
->=20
-> Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
->=20
-> I took a look to see if we missed anything else and see that we should
-> do the same patch for KVM. I'll send one.
->=20
-> (It's tempting to just select RISCV_ALTERNATIVE from RISCV, but maybe we
->  can defer that wedding a bit longer.)
+Hmm, looking at the KVM code, AFAICT KVM only enables enlightened_npt_tlb for L1
+(L1 from KVM's perspective) as svm_hv_init_vmcb() is only ever called with vmcb01,
+never with vmcb02.  I don't know if that's intentional, but I do think it means
+KVM can skip the Hyper-V flush for vmcb02 and instead rely on the ASID flush,
+i.e. KVM can do the Hyper-V iff enlightened_npt_tlb is set in the current VMCB.
+And that should continue to work if KVM does ever enabled enlightened_npt_tlb for L2.
 
-At that point, the config option should just go away entirely, no?
+> +		hv_remote_flush_tlb(vcpu->kvm);
+> +}
+> +EXPORT_SYMBOL_GPL(hv_flush_tlb_all);
 
---B7v5JtRVPQGXVgO3
-Content-Type: application/pgp-signature; name="signature.asc"
+I'd rather not add helpers to the common KVM code.  I do like minimizing the amount
+of #ifdeffery, but defining these as common helpers makes it seem like VMX-on-HyperV
+is broken, i.e. raises the question of why VMX doesn't use these helpers when running
+on Hyper-V.
 
------BEGIN PGP SIGNATURE-----
+I'm thinking this?
 
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZBsb2wAKCRB4tDGHoIJi
-0m+3AQCe8JDweaSMp3gkW9PkqtzV9SdMdFtfRNgo0IR/sPVzowD/brjdaYh5/LCw
-MO5YGP9cVuRb+cGX+RlJV2Skhb0lHgA=
-=pPeQ
------END PGP SIGNATURE-----
+---
+ arch/x86/kvm/svm/svm.c          | 39 ++++++++++++++++++++++++++++++---
+ arch/x86/kvm/svm/svm_onhyperv.h |  7 ++++++
+ 2 files changed, 43 insertions(+), 3 deletions(-)
 
---B7v5JtRVPQGXVgO3--
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 70183d2271b5..ab97fe8f1d81 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -3746,7 +3746,7 @@ static void svm_enable_nmi_window(struct kvm_vcpu *vcpu)
+ 	svm->vmcb->save.rflags |= (X86_EFLAGS_TF | X86_EFLAGS_RF);
+ }
+ 
+-static void svm_flush_tlb_current(struct kvm_vcpu *vcpu)
++static void svm_flush_tlb_asid(struct kvm_vcpu *vcpu)
+ {
+ 	struct vcpu_svm *svm = to_svm(vcpu);
+ 
+@@ -3770,6 +3770,39 @@ static void svm_flush_tlb_current(struct kvm_vcpu *vcpu)
+ 		svm->current_vmcb->asid_generation--;
+ }
+ 
++static void svm_flush_tlb_current(struct kvm_vcpu *vcpu)
++{
++#if IS_ENABLED(CONFIG_HYPERV)
++	hpa_t root_tdp = vcpu->arch.mmu->root.hpa;
++
++	/*
++	 * When running on Hyper-V with EnlightenedNptTlb enabled, explicitly
++	 * flush the NPT mappings via hypercall as flushing the ASID only
++	 * affects virtual to physical mappings, it does not invalidate guest
++	 * physical to host physical mappings.
++	 */
++	if (svm_hv_is_enlightened_tlb_enabled(vcpu) && VALID_PAGE(root_tdp))
++		hyperv_flush_guest_mapping(root_tdp);
++#endif
++	svm_flush_tlb_asid(vcpu);
++}
++
++static void svm_flush_tlb_all(struct kvm_vcpu *vcpu)
++{
++#if IS_ENABLED(CONFIG_HYPERV)
++	/*
++	 * When running on Hyper-V with EnlightenedNptTlb enabled, remote TLB
++	 * flushes should be routed to hv_remote_flush_tlb() without requesting
++	 * a "regular" remote flush.  Reaching this point means either there's
++	 * a KVM bug or a prior hv_remote_flush_tlb() call failed, both of
++	 * which might be fatal to the the guest.  Yell, but try to recover.
++	 */
++	if (WARN_ON_ONCE(svm_hv_is_enlightened_tlb_enabled(vcpu)))
++		hv_remote_flush_tlb(vcpu->kvm);
++#endif
++	svm_flush_tlb_asid(vcpu);
++}
++
+ static void svm_flush_tlb_gva(struct kvm_vcpu *vcpu, gva_t gva)
+ {
+ 	struct vcpu_svm *svm = to_svm(vcpu);
+@@ -4762,10 +4795,10 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
+ 	.set_rflags = svm_set_rflags,
+ 	.get_if_flag = svm_get_if_flag,
+ 
+-	.flush_tlb_all = svm_flush_tlb_current,
++	.flush_tlb_all = svm_flush_tlb_all,
+ 	.flush_tlb_current = svm_flush_tlb_current,
+ 	.flush_tlb_gva = svm_flush_tlb_gva,
+-	.flush_tlb_guest = svm_flush_tlb_current,
++	.flush_tlb_guest = svm_flush_tlb_asid,
+ 
+ 	.vcpu_pre_run = svm_vcpu_pre_run,
+ 	.vcpu_run = svm_vcpu_run,
+diff --git a/arch/x86/kvm/svm/svm_onhyperv.h b/arch/x86/kvm/svm/svm_onhyperv.h
+index cff838f15db5..d91e019fb7da 100644
+--- a/arch/x86/kvm/svm/svm_onhyperv.h
++++ b/arch/x86/kvm/svm/svm_onhyperv.h
+@@ -15,6 +15,13 @@ static struct kvm_x86_ops svm_x86_ops;
+ 
+ int svm_hv_enable_l2_tlb_flush(struct kvm_vcpu *vcpu);
+ 
++static inline bool svm_hv_is_enlightened_tlb_enabled(struct kvm_vcpu *vcpu)
++{
++	struct hv_vmcb_enlightenments *hve = &to_svm(vcpu)->vmcb->control.hv_enlightenments;
++
++	return !!hve->hv_enlightenments_control.enlightened_npt_tlb;
++}
++
+ static inline void svm_hv_init_vmcb(struct vmcb *vmcb)
+ {
+ 	struct hv_vmcb_enlightenments *hve = &vmcb->control.hv_enlightenments;
+
+base-commit: 50f13998451effea5c5fdc70fe576f8b435d6224
+-- 
+
