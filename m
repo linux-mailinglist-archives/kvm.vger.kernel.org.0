@@ -2,32 +2,32 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 45EA56C4A6E
-	for <lists+kvm@lfdr.de>; Wed, 22 Mar 2023 13:27:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 924106C4A6B
+	for <lists+kvm@lfdr.de>; Wed, 22 Mar 2023 13:27:42 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230319AbjCVM1i (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Mar 2023 08:27:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57852 "EHLO
+        id S230248AbjCVM1e (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Mar 2023 08:27:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57824 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230294AbjCVM1d (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Mar 2023 08:27:33 -0400
+        with ESMTP id S230287AbjCVM1c (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Mar 2023 08:27:32 -0400
 Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BFFE3E1C2
-        for <kvm@vger.kernel.org>; Wed, 22 Mar 2023 05:27:32 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8FE462CC57
+        for <kvm@vger.kernel.org>; Wed, 22 Mar 2023 05:27:31 -0700 (PDT)
 Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
         (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4PhSR65jqSz4xFW;
-        Wed, 22 Mar 2023 23:27:30 +1100 (AEDT)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4PhSR52qY4z4xFV;
+        Wed, 22 Mar 2023 23:27:29 +1100 (AEDT)
 From:   Michael Ellerman <patch-notifications@ellerman.id.au>
 To:     kvm <kvm@vger.kernel.org>,
         Timothy Pearson <tpearson@raptorengineering.com>
 Cc:     linuxppc-dev <linuxppc-dev@lists.ozlabs.org>
-In-Reply-To: <12303156.16998521.1678123842049.JavaMail.zimbra@raptorengineeringinc.com>
-References: <12303156.16998521.1678123842049.JavaMail.zimbra@raptorengineeringinc.com>
-Subject: Re: [PATCH v2 2/4] powerpc/pci_64: Init pcibios subsys a bit later
-Message-Id: <167948793435.559204.2135142042488392469.b4-ty@ellerman.id.au>
+In-Reply-To: <525438831.16998517.1678123820075.JavaMail.zimbra@raptorengineeringinc.com>
+References: <525438831.16998517.1678123820075.JavaMail.zimbra@raptorengineeringinc.com>
+Subject: Re: [PATCH v2 1/4] powerpc/iommu: Add "borrowing" iommu_table_group_ops
+Message-Id: <167948793435.559204.7948325972421120627.b4-ty@ellerman.id.au>
 Date:   Wed, 22 Mar 2023 23:25:34 +1100
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -40,19 +40,21 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 6 Mar 2023 11:30:42 -0600 (CST), Timothy Pearson wrote:
-> The following patches are going to add dependency/use of iommu_ops which
-> is initialized in subsys_initcall as well.
+On Mon, 6 Mar 2023 11:30:20 -0600 (CST), Timothy Pearson wrote:
+> PPC64 IOMMU API defines iommu_table_group_ops which handles DMA windows
+> for PEs: control the ownership, create/set/unset a table the hardware
+> for dynamic DMA windows (DDW). VFIO uses the API to implement support
+> on POWER.
 > 
-> This moves pciobios_init() to the next initcall level.
-> 
-> This should not cause behavioral change.
+> So far only PowerNV IODA2 (POWER8 and newer machines) implemented this and other cases (POWER7 or nested KVM) did not and instead reused
+> existing iommu_table structs. This means 1) no DDW 2) ownership transfer
+> is done directly in the VFIO SPAPR TCE driver.
 > 
 > [...]
 
 Applied to powerpc/next.
 
-[2/4] powerpc/pci_64: Init pcibios subsys a bit later
-      https://git.kernel.org/powerpc/c/76f351096c4516f38b9c901a21797fa958588e3a
+[1/4] powerpc/iommu: Add "borrowing" iommu_table_group_ops
+      https://git.kernel.org/powerpc/c/9d67c94335096311c0bc7556ad1022de7385790b
 
 cheers
