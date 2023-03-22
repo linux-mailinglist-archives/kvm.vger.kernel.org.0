@@ -2,97 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CE8D46C4E65
-	for <lists+kvm@lfdr.de>; Wed, 22 Mar 2023 15:48:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A6CA36C4EA3
+	for <lists+kvm@lfdr.de>; Wed, 22 Mar 2023 15:56:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231592AbjCVOsI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Mar 2023 10:48:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59348 "EHLO
+        id S230444AbjCVO4N (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Mar 2023 10:56:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59000 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231543AbjCVOrx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Mar 2023 10:47:53 -0400
-Received: from mail-ed1-x536.google.com (mail-ed1-x536.google.com [IPv6:2a00:1450:4864:20::536])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D42A21E5F3;
-        Wed, 22 Mar 2023 07:46:28 -0700 (PDT)
-Received: by mail-ed1-x536.google.com with SMTP id cn12so28334510edb.4;
-        Wed, 22 Mar 2023 07:46:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1679496334;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=rLmkUGsjVKN4NZf9Xwc68SFWMoDmXlx37mUEv+QwNDs=;
-        b=SfTs+c817QkFkmtH//ktryjgBJ3/o2Pj5C9ikp9Le++n2Ykm9Y5EQNgikfOy8eUjk9
-         RkSFSmqvIbvwxyEie+7wkWesrZg/vRENcgAklTF3n98xNsY07sQyR8LLMBnxMZyiLRrk
-         53zYL8EhW/C8FTySSs/JgyJk187s/eaRaxeBy3l0LeHqqHarwNFe5omlsia5W+B4H0Kv
-         P9BvilEYSsxjzbzibSNR/y0ejfGnV084SY8SSHCvRPTaztrKC7w8IvXDl5Zohvv/+ari
-         eekCiWFQqOjDlaww9HEm44n/ifgcTrcSPT0qczEeXFtRD3am2bdWiCQfX0dPy1QdzMd0
-         CGZw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679496334;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=rLmkUGsjVKN4NZf9Xwc68SFWMoDmXlx37mUEv+QwNDs=;
-        b=LeD0aT8RH6csZHe8xMs+n9Rz2KP8rq9ZdAt3pybg07VwjLiJqPb228PCK/4oWD5h/O
-         X3hzdLqEcQ9FvP8N1ikUCthITwtdWZ5rj++1iAnw+ZhTnj046oMFzV4+zxCgkjCAQIxK
-         RA/M66lgB907IEq68rVjo+hKo/6uUWLvyprjelOMFcsLZEegVudg59KWIl8qvRkaCYbL
-         kGXV74GqLFF9upSxHZvaO4Cbrid0Qq7HW+02yps4l19DsyTga+XOENYhFNAXg5n67X62
-         WzlkugRVLzh6D258+iPqut8PtYSqQyI0JtIpYs3/5viAC9UXi+CxxB0Qef8mchyBx8q3
-         bKSQ==
-X-Gm-Message-State: AO0yUKXCAFFZNd/026g75DWZnwHX9B2JbySNK4249+cAH5Y+FHuJbCqD
-        dPtqyiZdy0j8PSd+XfnqRLM=
-X-Google-Smtp-Source: AK7set/eNEzNh4JcOxymfhGwBqM5daoKmgX/0uSzD/XkdVZ0pb4jAN1GI3sQMn0JGiwqY3Zd5TaEyA==
-X-Received: by 2002:a17:906:209:b0:932:170:e07b with SMTP id 9-20020a170906020900b009320170e07bmr5657820ejd.7.1679496334548;
-        Wed, 22 Mar 2023 07:45:34 -0700 (PDT)
-Received: from ivan-HLYL-WXX9.. ([178.160.196.94])
-        by smtp.gmail.com with ESMTPSA id z26-20020a17090674da00b009310d4dece9sm7298268ejl.62.2023.03.22.07.45.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Mar 2023 07:45:34 -0700 (PDT)
-From:   Ivan Orlov <ivan.orlov0322@gmail.com>
-To:     pbonzini@redhat.com, shuah@kernel.org, seanjc@google.com,
-        dmatlack@google.com, vannapurve@google.com
-Cc:     Ivan Orlov <ivan.orlov0322@gmail.com>, kvm@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-        himadrispandya@gmail.com,
-        linux-kernel-mentees@lists.linuxfoundation.org
-Subject: [PATCH] selftests: kvm: Add 'malloc' failure check in vcpu_save_state
-Date:   Wed, 22 Mar 2023 18:45:28 +0400
-Message-Id: <20230322144528.704077-1-ivan.orlov0322@gmail.com>
-X-Mailer: git-send-email 2.34.1
+        with ESMTP id S230377AbjCVOzx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Mar 2023 10:55:53 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB94910F0;
+        Wed, 22 Mar 2023 07:55:27 -0700 (PDT)
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 32MEs5ck003579;
+        Wed, 22 Mar 2023 14:55:27 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
+ mime-version : content-transfer-encoding : in-reply-to : references : to :
+ from : cc : subject : message-id : date; s=pp1;
+ bh=5fDLLt8J1e7OHIx2ghp13uXRKz4Fe8cG9y/Q0tF7TLc=;
+ b=Dvi+JiY9J7pYkLCSQJIjHIf7UcOTV/pSkbDvxO+eiArX8dZUkRlzC90jd8evFFjOuANm
+ Q/SQ5Yna5sRe0fIkIlH4CtU1RKeq2N0MJ3q0iODQYekZAbcujECvWg/Vz5XH76u1zyKK
+ v1aSJH/5BktA/nlxk5U1RWI42fkJQCCWeFz+veGXni6j+Bl7K6aR7WHPCvR8vSWLEi9a
+ tZ59ReudySLUXsluHNKRA4DsLBJ+6nmvrFUZ2D4QXdggY4kJ+YHSzRsjjU6awNfPDG2G
+ bUOeMTHoGiW55cZ4rnI7SJW44dViXAAqGRjJkKqVeoVBTfy8CuFCIzkRZyB+0wvmAjBb Tw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pg3uj81c2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 22 Mar 2023 14:55:26 +0000
+Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 32MEsE76003918;
+        Wed, 22 Mar 2023 14:55:26 GMT
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pg3uj81b8-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 22 Mar 2023 14:55:26 +0000
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 32M16TLw006837;
+        Wed, 22 Mar 2023 14:55:24 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+        by ppma03fra.de.ibm.com (PPS) with ESMTPS id 3pd4x652t3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 22 Mar 2023 14:55:24 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+        by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 32MEtKVJ25690512
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 22 Mar 2023 14:55:20 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 920F62004B;
+        Wed, 22 Mar 2023 14:55:20 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 7781620043;
+        Wed, 22 Mar 2023 14:55:20 +0000 (GMT)
+Received: from t14-nrb (unknown [9.152.224.93])
+        by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Wed, 22 Mar 2023 14:55:20 +0000 (GMT)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=0.1 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
-        DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20230301132638.3336040-1-nsg@linux.ibm.com>
+References: <20230301132638.3336040-1-nsg@linux.ibm.com>
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
+        Thomas Huth <thuth@redhat.com>
+From:   Nico Boehr <nrb@linux.ibm.com>
+Cc:     Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org
+Subject: Re: [kvm-unit-tests PATCH v1] s390x: spec_ex: Add test for misaligned load
+Message-ID: <167949692024.87786.13003392018448803647@t14-nrb>
+User-Agent: alot/0.8.1
+Date:   Wed, 22 Mar 2023 15:55:20 +0100
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: Xo0wWEwgsdGlNE67Dz5HFCeub3mIoArH
+X-Proofpoint-ORIG-GUID: My_7x0e-gthnm9KwlWKnHZ1zCxWPiMXJ
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
+ definitions=2023-03-22_11,2023-03-22_01,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 spamscore=0
+ impostorscore=0 suspectscore=0 lowpriorityscore=0 mlxlogscore=999
+ phishscore=0 priorityscore=1501 clxscore=1015 adultscore=0 bulkscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2303150002 definitions=main-2303220106
+X-Spam-Status: No, score=-0.1 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
+        DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-There is a 'malloc' call in vcpu_save_state function, which can
-be unsuccessful. This patch will add the malloc failure checking
-to avoid possible null dereference and give more information
-about test fail reasons.
+Quoting Nina Schoetterl-Glausch (2023-03-01 14:26:38)
+> The operand of LOAD RELATIVE LONG must be word aligned, otherwise a
+> specification exception occurs. Test that this exception occurs.
+>=20
+> Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
 
-Signed-off-by: Ivan Orlov <ivan.orlov0322@gmail.com>
----
- tools/testing/selftests/kvm/lib/x86_64/processor.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-index c39a4353ba19..827647ff3d41 100644
---- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
-+++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-@@ -954,6 +954,7 @@ struct kvm_x86_state *vcpu_save_state(struct kvm_vcpu *vcpu)
- 	vcpu_run_complete_io(vcpu);
- 
- 	state = malloc(sizeof(*state) + msr_list->nmsrs * sizeof(state->msrs.entries[0]));
-+	TEST_ASSERT(state, "-ENOMEM when allocating kvm state");
- 
- 	vcpu_events_get(vcpu, &state->events);
- 	vcpu_mp_state_get(vcpu, &state->mp_state);
--- 
-2.34.1
-
+Reviewed-by: Nico Boehr <nrb@linux.ibm.com>
