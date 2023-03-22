@@ -2,135 +2,238 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 908A96C488D
-	for <lists+kvm@lfdr.de>; Wed, 22 Mar 2023 12:06:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CFD656C48F2
+	for <lists+kvm@lfdr.de>; Wed, 22 Mar 2023 12:20:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230313AbjCVLGb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Mar 2023 07:06:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45772 "EHLO
+        id S230009AbjCVLUK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Mar 2023 07:20:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38860 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230343AbjCVLG2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Mar 2023 07:06:28 -0400
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 7E1FF61504;
-        Wed, 22 Mar 2023 04:06:26 -0700 (PDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B4A8A4B3;
-        Wed, 22 Mar 2023 04:07:09 -0700 (PDT)
-Received: from FVFF77S0Q05N (unknown [10.57.53.3])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 98B983F67D;
-        Wed, 22 Mar 2023 04:06:21 -0700 (PDT)
-Date:   Wed, 22 Mar 2023 11:06:16 +0000
-From:   Mark Rutland <mark.rutland@arm.com>
-To:     Usama Arif <usama.arif@bytedance.com>
-Cc:     dwmw2@infradead.org, tglx@linutronix.de, kim.phillips@amd.com,
-        brgerst@gmail.com, piotrgorski@cachyos.org,
-        oleksandr@natalenko.name, arjan@linux.intel.com, mingo@redhat.com,
-        bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com,
-        x86@kernel.org, pbonzini@redhat.com, paulmck@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        rcu@vger.kernel.org, mimoja@mimoja.de, hewenliang4@huawei.com,
-        thomas.lendacky@amd.com, seanjc@google.com, pmenzel@molgen.mpg.de,
-        fam.zheng@bytedance.com, punit.agrawal@bytedance.com,
-        simon.evans@bytedance.com, liangma@liangbit.com,
-        gpiccoli@igalia.com, David Woodhouse <dwmw@amazon.co.uk>
-Subject: Re: [PATCH v16 2/8] cpu/hotplug: Reset task stack state in _cpu_up()
-Message-ID: <ZBrhKERLxvklAhiP@FVFF77S0Q05N>
-References: <20230321194008.785922-1-usama.arif@bytedance.com>
- <20230321194008.785922-3-usama.arif@bytedance.com>
+        with ESMTP id S229891AbjCVLUH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Mar 2023 07:20:07 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F46853734;
+        Wed, 22 Mar 2023 04:20:06 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id AEC6962022;
+        Wed, 22 Mar 2023 11:20:05 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B15FC433D2;
+        Wed, 22 Mar 2023 11:19:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1679484005;
+        bh=bh9WMot+PxfiYtF580dBl0Pw71rD7gR84+9GKsHMvq8=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=tgZr20L7g2MjqdIEtuHPR4MPveRDiYnDKxr+MqbztJHvnHJSoi13pTqMj6R5Pdrme
+         K2Np71e4bLyiocp7EzyEgeF5WXENJK8jRu6cQMnzsJaJNPQCDOLZ2cP/GhMfFyWeOZ
+         ktbPebv86ifJeb0TYSAuMaScrRBNTxWjvbJwqpxMis0ptMhdXOcJ65FnkmWAhmTMTX
+         97juHBb0Fs9YXKWZBZKfBKfX0VvO2U9FXitfqCfr5qvw/iIF9ULuejxtpPul+eZss7
+         cJhAa2HZQjVMOCxbXu2z+H279nb5Ri/J29y73qC1zyxsjqtSOZkxSUW64LkyanoFXS
+         OyAydZBtSLZQg==
+Date:   Wed, 22 Mar 2023 12:19:51 +0100
+From:   Christian Brauner <brauner@kernel.org>
+To:     Ackerley Tng <ackerleytng@google.com>
+Cc:     kvm@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-arch@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, qemu-devel@nongnu.org, aarcange@redhat.com,
+        ak@linux.intel.com, akpm@linux-foundation.org, arnd@arndb.de,
+        bfields@fieldses.org, bp@alien8.de, chao.p.peng@linux.intel.com,
+        corbet@lwn.net, dave.hansen@intel.com, david@redhat.com,
+        ddutile@redhat.com, dhildenb@redhat.com, hpa@zytor.com,
+        hughd@google.com, jlayton@kernel.org, jmattson@google.com,
+        joro@8bytes.org, jun.nakajima@intel.com,
+        kirill.shutemov@linux.intel.com, linmiaohe@huawei.com,
+        luto@kernel.org, mail@maciej.szmigiero.name, mhocko@suse.com,
+        michael.roth@amd.com, mingo@redhat.com, naoya.horiguchi@nec.com,
+        pbonzini@redhat.com, qperret@google.com, rppt@kernel.org,
+        seanjc@google.com, shuah@kernel.org, steven.price@arm.com,
+        tabba@google.com, tglx@linutronix.de, vannapurve@google.com,
+        vbabka@suse.cz, vkuznets@redhat.com, wanpengli@tencent.com,
+        wei.w.wang@intel.com, x86@kernel.org, yu.c.zhang@linux.intel.com
+Subject: Re: [RFC PATCH v2 1/2] mm: restrictedmem: Allow userspace to specify
+ mount for memfd_restricted
+Message-ID: <20230322111951.vfrm2xf4o5kmtte6@wittgenstein>
+References: <cover.1679428901.git.ackerleytng@google.com>
+ <6e800e069c7fc400841b75ea49d1227bd101c1cf.1679428901.git.ackerleytng@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20230321194008.785922-3-usama.arif@bytedance.com>
-X-Spam-Status: No, score=-2.3 required=5.0 tests=RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+In-Reply-To: <6e800e069c7fc400841b75ea49d1227bd101c1cf.1679428901.git.ackerleytng@google.com>
+X-Spam-Status: No, score=-2.5 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 21, 2023 at 07:40:02PM +0000, Usama Arif wrote:
-> From: David Woodhouse <dwmw@amazon.co.uk>
+On Tue, Mar 21, 2023 at 08:15:32PM +0000, Ackerley Tng wrote:
+> By default, the backing shmem file for a restrictedmem fd is created
+> on shmem's kernel space mount.
 > 
-> Commit dce1ca0525bf ("sched/scs: Reset task stack state in bringup_cpu()")
-> ensured that the shadow call stack and KASAN poisoning were removed from
-> a CPU's stack each time that CPU is brought up, not just once.
+> With this patch, an optional tmpfs mount can be specified via an fd,
+> which will be used as the mountpoint for backing the shmem file
+> associated with a restrictedmem fd.
 > 
-> This is not incorrect. However, with parallel bringup, an architecture
-> may obtain the idle thread for a new CPU from a pre-bringup stage, by
-> calling idle_thread_get() for itself. This would mean that the cleanup
-> in bringup_cpu() would be too late.
+> This change is modeled after how sys_open() can create an unnamed
+> temporary file in a given directory with O_TMPFILE.
 > 
-> Move the SCS/KASAN cleanup to the generic _cpu_up() function instead,
-> which already ensures that the new CPU's stack is available, purely to
-> allow for early failure. This occurs when the CPU to be brought up is
-> in the CPUHP_OFFLINE state, which should correctly do the cleanup any
-> time the CPU has been taken down to the point where such is needed.
+> This will help restrictedmem fds inherit the properties of the
+> provided tmpfs mounts, for example, hugepage allocation hints, NUMA
+> binding hints, etc.
 > 
-> Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
-
-This all sounds fine to me, and the patch itself looks good.
-
-I built an arm64 kernel with the first three patches from this series applied
-atop v6.3-rc3, with defconfig + CONFIG_SHADOW_CALL_STACK=y +
-CONFIG_KASAN_INLINE=y + CONFIG_KASAN_STACK=y. I then hotplugged a cpu with:
-
-  while true; do
-    echo 0 > /sys/devices/system/cpu/cpu1/online;
-    echo 1 > /sys/devices/system/cpu/cpu1/online;
-  done
-
-... and that was perfectly happy to run for minutes with no unexpected failures.
-
-To make sure I wasn't avoiding issues by chance, I also tried with each of
-scs_task_reset() and kasan_unpoison_task_stack() commented out. With
-scs_task_reset() commented out, cpu re-onlining fails after a few iterations,
-and with kasan_unpoison_task_stack() commented out I get a KASAN splat upon the
-first re-onlining. So that all looks good.
-
-FWIW, for the first three patches:
-
-Reviewed-by: Mark Rutland <mark.rutland@arm.com>
-Tested-by: Mark Rutland <mark.rutland@arm.com> [arm64]
-
-Mark.
-
+> Signed-off-by: Ackerley Tng <ackerleytng@google.com>
 > ---
->  kernel/cpu.c | 12 ++++++------
->  1 file changed, 6 insertions(+), 6 deletions(-)
+>  include/linux/syscalls.h           |  2 +-
+>  include/uapi/linux/restrictedmem.h |  8 ++++
+>  mm/restrictedmem.c                 | 63 +++++++++++++++++++++++++++---
+>  3 files changed, 66 insertions(+), 7 deletions(-)
+>  create mode 100644 include/uapi/linux/restrictedmem.h
 > 
-> diff --git a/kernel/cpu.c b/kernel/cpu.c
-> index 6c0a92ca6bb5..43e0a77f21e8 100644
-> --- a/kernel/cpu.c
-> +++ b/kernel/cpu.c
-> @@ -591,12 +591,6 @@ static int bringup_cpu(unsigned int cpu)
->  	struct task_struct *idle = idle_thread_get(cpu);
->  	int ret;
+> diff --git a/include/linux/syscalls.h b/include/linux/syscalls.h
+> index f9e9e0c820c5..a23c4c385cd3 100644
+> --- a/include/linux/syscalls.h
+> +++ b/include/linux/syscalls.h
+> @@ -1056,7 +1056,7 @@ asmlinkage long sys_memfd_secret(unsigned int flags);
+>  asmlinkage long sys_set_mempolicy_home_node(unsigned long start, unsigned long len,
+>  					    unsigned long home_node,
+>  					    unsigned long flags);
+> -asmlinkage long sys_memfd_restricted(unsigned int flags);
+> +asmlinkage long sys_memfd_restricted(unsigned int flags, int mount_fd);
 >  
-> -	/*
-> -	 * Reset stale stack state from the last time this CPU was online.
-> -	 */
-> -	scs_task_reset(idle);
-> -	kasan_unpoison_task_stack(idle);
-> -
->  	/*
->  	 * Some architectures have to walk the irq descriptors to
->  	 * setup the vector space for the cpu which comes online.
-> @@ -1383,6 +1377,12 @@ static int _cpu_up(unsigned int cpu, int tasks_frozen, enum cpuhp_state target)
->  			ret = PTR_ERR(idle);
->  			goto out;
->  		}
+>  /*
+>   * Architecture-specific system calls
+> diff --git a/include/uapi/linux/restrictedmem.h b/include/uapi/linux/restrictedmem.h
+> new file mode 100644
+> index 000000000000..9f108dd1ac4c
+> --- /dev/null
+> +++ b/include/uapi/linux/restrictedmem.h
+> @@ -0,0 +1,8 @@
+> +/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+> +#ifndef _UAPI_LINUX_RESTRICTEDMEM_H
+> +#define _UAPI_LINUX_RESTRICTEDMEM_H
 > +
-> +		/*
-> +		 * Reset stale stack state from the last time this CPU was online.
-> +		 */
-> +		scs_task_reset(idle);
-> +		kasan_unpoison_task_stack(idle);
->  	}
+> +/* flags for memfd_restricted */
+> +#define RMFD_TMPFILE		0x0001U
+> +
+> +#endif /* _UAPI_LINUX_RESTRICTEDMEM_H */
+> diff --git a/mm/restrictedmem.c b/mm/restrictedmem.c
+> index c5d869d8c2d8..4d83b949d84e 100644
+> --- a/mm/restrictedmem.c
+> +++ b/mm/restrictedmem.c
+> @@ -1,11 +1,12 @@
+>  // SPDX-License-Identifier: GPL-2.0
+> -#include "linux/sbitmap.h"
+> +#include <linux/namei.h>
+>  #include <linux/pagemap.h>
+>  #include <linux/pseudo_fs.h>
+>  #include <linux/shmem_fs.h>
+>  #include <linux/syscalls.h>
+>  #include <uapi/linux/falloc.h>
+>  #include <uapi/linux/magic.h>
+> +#include <uapi/linux/restrictedmem.h>
+>  #include <linux/restrictedmem.h>
 >  
->  	cpuhp_tasks_frozen = tasks_frozen;
-> -- 
-> 2.25.1
-> 
+>  struct restrictedmem {
+> @@ -189,19 +190,20 @@ static struct file *restrictedmem_file_create(struct file *memfd)
+>  	return file;
+>  }
+>  
+> -SYSCALL_DEFINE1(memfd_restricted, unsigned int, flags)
+> +static int restrictedmem_create(struct vfsmount *mount)
+>  {
+>  	struct file *file, *restricted_file;
+>  	int fd, err;
+>  
+> -	if (flags)
+> -		return -EINVAL;
+> -
+>  	fd = get_unused_fd_flags(0);
+>  	if (fd < 0)
+>  		return fd;
+>  
+> -	file = shmem_file_setup("memfd:restrictedmem", 0, VM_NORESERVE);
+> +	if (mount)
+> +		file = shmem_file_setup_with_mnt(mount, "memfd:restrictedmem", 0, VM_NORESERVE);
+> +	else
+> +		file = shmem_file_setup("memfd:restrictedmem", 0, VM_NORESERVE);
+> +
+>  	if (IS_ERR(file)) {
+>  		err = PTR_ERR(file);
+>  		goto err_fd;
+> @@ -223,6 +225,55 @@ SYSCALL_DEFINE1(memfd_restricted, unsigned int, flags)
+>  	return err;
+>  }
+>  
+> +static bool is_shmem_mount(struct vfsmount *mnt)
+> +{
+> +	return mnt && mnt->mnt_sb && mnt->mnt_sb->s_magic == TMPFS_MAGIC;
+> +}
+> +
+> +static int restrictedmem_create_from_file(int mount_fd)
+> +{
+> +	int ret;
+> +	struct fd f;
+> +	struct vfsmount *mnt;
+> +
+> +	f = fdget_raw(mount_fd);
+> +	if (!f.file)
+> +		return -EBADF;
+> +
+> +	mnt = f.file->f_path.mnt;
+> +	if (!is_shmem_mount(mnt)) {
+> +		ret = -EINVAL;
+> +		goto out;
+> +	}
+> +
+
+This looks like you can just pass in some tmpfs fd and you just use it
+to identify the mnt and then you create a restricted memfd area in that
+instance. So if I did:
+
+mount -t tmpfs tmpfs /mnt
+mknod /mnt/bla c 0 0
+fd = open("/mnt/bla")
+memfd_restricted(fd)
+
+then it would create a memfd restricted entry in the tmpfs instance
+using the arbitrary dummy device node to infer the tmpfs instance.
+
+Looking at the older thread briefly and the cover letter. Afaict, the
+new mount api shouldn't figure into the design of this. fsopen() returns
+fds referencing a VFS-internal fs_context object. They can't be used to
+create or lookup files or identify mounts. The mount doesn't exist at
+that time. Not even a superblock might exist at the time before
+fsconfig(FSCONFIG_CMD_CREATE).
+
+When fsmount() is called after superblock setup then it's similar to any
+other fd from open() or open_tree() or whatever (glossing over some
+details that are irrelevant here). Difference is that open_tree() and
+fsmount() would refer to the root of a mount.
+
+At first I wondered why this doesn't just use standard *at() semantics
+but I guess the restricted memfd is unlinked and doesn't show up in the
+tmpfs instance.
+
+So if you go down that route then I would suggest to enforce that the
+provided fd refer to the root of a tmpfs mount. IOW, it can't just be an
+arbitrary file descriptor in a tmpfs instance. That seems cleaner to me:
+
+sb = f_path->mnt->mnt_sb;
+sb->s_magic == TMPFS_MAGIC && f_path->mnt->mnt_root == sb->s_root
+
+and has much tigher semantics than just allowing any kind of fd.
+
+Another wrinkly I find odd but that's for you to judge is that this
+bypasses the permission model of the tmpfs instance. IOW, as long as you
+have a handle to the root of a tmpfs mount you can just create
+restricted memfds in there. So if I provided a completely sandboxed
+service - running in a user namespace or whatever - with an fd to the
+host's tmpfs instance they can just create restricted memfds in there no
+questions asked.
+
+Maybe that's fine but it's certainly something to spell out and think
+about the implications.
