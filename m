@@ -2,117 +2,197 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 14CB96C497B
-	for <lists+kvm@lfdr.de>; Wed, 22 Mar 2023 12:46:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E64BD6C49AD
+	for <lists+kvm@lfdr.de>; Wed, 22 Mar 2023 12:51:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230182AbjCVLqD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Mar 2023 07:46:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47692 "EHLO
+        id S230013AbjCVLv0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Mar 2023 07:51:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34686 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230175AbjCVLpy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Mar 2023 07:45:54 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A22A62366E
-        for <kvm@vger.kernel.org>; Wed, 22 Mar 2023 04:45:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1679485510;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=EGY3txy78KciG2pIM8V6D2wAg4dR0OW/SD5ifs6Nnsk=;
-        b=QSzVFmafFrb/4DUz40494099LUick3+7+H4WhWApMI7va3h2a1YG37rEwY8ETMpOJbIBW5
-        60vwzc53ig5NrgQpUcSzd4zWwixhWzqt/oK3q2QQFBt9oqX8Xxo02//c+xzl4X4ayS+0GZ
-        DnJvalE8rIkbnYzPPviXPmwcuMHJgsQ=
-Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
- [209.85.160.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-359-1ZJSo46ZOBqXaTXR5ut8Lg-1; Wed, 22 Mar 2023 07:45:07 -0400
-X-MC-Unique: 1ZJSo46ZOBqXaTXR5ut8Lg-1
-Received: by mail-qt1-f199.google.com with SMTP id u1-20020a05622a198100b003e12a0467easo5638600qtc.11
-        for <kvm@vger.kernel.org>; Wed, 22 Mar 2023 04:45:07 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679485507;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=EGY3txy78KciG2pIM8V6D2wAg4dR0OW/SD5ifs6Nnsk=;
-        b=MRVc30wA+TBU+4Lb3RcB1GcvaVMaKEZnQLH4T1BN8ZH90UAO3R7+AbOkU4H43HtVuR
-         7Xb4qpvagzSUuJCi71BGvqCME7yPp014XTUQ7UalklbZbjhJOj2FRtgBkFSQ5gGsGoey
-         3fZJ/Vwj+ZV/QzlF9C6wzrvXJiHwaIaRko3VIk3n5hi5flrQ20fNCFxx7Ye8kRz6fQmN
-         +Pqwhh8aLM7sC1EFkJiOAKKmnWqk3T/6kk0PLZ9L38SIHrN1dRtI7N0fBoL5U1lEjyTf
-         OYFwicuxP7dSU5Oh2gEzENQuNseuBZYCmrIeUbYjYMKF48LPUwL5JIXlyPNPRIp1pRH8
-         v3RA==
-X-Gm-Message-State: AO0yUKW5fkNTtnFK0/GPl8/tQNN/4GGLDH34u0E8QFMPkN+W+d7KgNrt
-        /aQv2j7qSSjHTRH9CUWzaGsINH5gftpdiv3QQ6WkxbIN0cekd9jfilTt7cPWPkBDsXpeDi5FoBJ
-        p2G1e3uD2I42X
-X-Received: by 2002:a05:622a:650:b0:3d7:b045:d39 with SMTP id a16-20020a05622a065000b003d7b0450d39mr4783499qtb.62.1679485507276;
-        Wed, 22 Mar 2023 04:45:07 -0700 (PDT)
-X-Google-Smtp-Source: AK7set/9ammCAP/s6lM4g8oRLriEtKlDgmHY2HuKKh3qD8fiIJlW+lvwd/fjxxh9mkVIGhgBQRZD/Q==
-X-Received: by 2002:a05:622a:650:b0:3d7:b045:d39 with SMTP id a16-20020a05622a065000b003d7b0450d39mr4783474qtb.62.1679485507046;
-        Wed, 22 Mar 2023 04:45:07 -0700 (PDT)
-Received: from [192.168.0.3] (ip-109-43-177-44.web.vodafone.de. [109.43.177.44])
-        by smtp.gmail.com with ESMTPSA id 139-20020a370591000000b00745a78b0b3asm7200113qkf.130.2023.03.22.04.45.05
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 22 Mar 2023 04:45:06 -0700 (PDT)
-Message-ID: <a8bbbfe8-0d8e-3f68-4c55-e0c102bdf3f3@redhat.com>
-Date:   Wed, 22 Mar 2023 12:45:04 +0100
+        with ESMTP id S229476AbjCVLvZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Mar 2023 07:51:25 -0400
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 1A6D2E6;
+        Wed, 22 Mar 2023 04:51:24 -0700 (PDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D06524B3;
+        Wed, 22 Mar 2023 04:52:07 -0700 (PDT)
+Received: from [10.57.53.137] (unknown [10.57.53.137])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B2E553F67D;
+        Wed, 22 Mar 2023 04:51:20 -0700 (PDT)
+Message-ID: <2a944bb7-23d0-7b49-90c2-5bcf8da694b0@arm.com>
+Date:   Wed, 22 Mar 2023 11:51:18 +0000
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.13.0
-Subject: Re: [kvm-unit-tests PATCH] MAINTAINERS: Add Nico as s390x Maintainer
- and make Thomas reviewer
-Content-Language: en-US
-To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org,
-        nrb@linux.ibm.com
-Cc:     pbonzini@redhat.com, andrew.jones@linux.dev,
-        imbrenda@linux.ibm.com, david@redhat.com, borntraeger@linux.ibm.com
-References: <20230322113400.1123378-1-frankja@linux.ibm.com>
-From:   Thomas Huth <thuth@redhat.com>
-In-Reply-To: <20230322113400.1123378-1-frankja@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.8.0
+Subject: Re: [RFC PATCH 15/28] KVM: arm64: Handle realm MMIO emulation
+Content-Language: en-GB
+To:     Zhi Wang <zhi.wang.linux@gmail.com>
+Cc:     kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        Joey Gouly <joey.gouly@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev
+References: <20230127112248.136810-1-suzuki.poulose@arm.com>
+ <20230127112932.38045-1-steven.price@arm.com>
+ <20230127112932.38045-16-steven.price@arm.com>
+ <20230306173751.000026d4@gmail.com>
+ <e0354676-e8cf-6ea0-3229-a55d90259f8e@arm.com>
+ <20230314174436.0000584d@gmail.com>
+From:   Steven Price <steven.price@arm.com>
+In-Reply-To: <20230314174436.0000584d@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.3 required=5.0 tests=NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 22/03/2023 12.34, Janosch Frank wrote:
-> The circle of life continues as we bring in Nico as a s390x
-> maintainer. Thomas moves from the maintainer position to reviewer but
-> he's a general maintainer of the project anyway.
+On 14/03/2023 15:44, Zhi Wang wrote:
+> On Fri, 10 Mar 2023 15:47:14 +0000
+> Steven Price <steven.price@arm.com> wrote:
 > 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> ---
->   MAINTAINERS | 3 ++-
->   1 file changed, 2 insertions(+), 1 deletion(-)
+>> On 06/03/2023 15:37, Zhi Wang wrote:
+>>> On Fri, 27 Jan 2023 11:29:19 +0000
+>>> Steven Price <steven.price@arm.com> wrote:
+>>>   
+>>>> MMIO emulation for a realm cannot be done directly with the VM's
+>>>> registers as they are protected from the host. However the RMM interface
+>>>> provides a structure member for providing the read/written value and  
+>>>
+>>> More details would be better for helping the review. I can only see the
+>>> emulated mmio value from the device model (kvmtool or kvm_io_bus) is put into
+>>> the GPRS[0] of the RecEntry object. But the rest of the flow is missing.  
+>>
+>> The commit message is out of date (sorry about that). A previous version
+>> of the spec had a dedicated member for the read/write value, but this
+>> was changed to just use GPRS[0] as you've spotted. I'll update the text.
+>>
+>>> I guess RMM copies the value in the RecEntry.GPRS[0] to the target GPR in the
+>>> guest context in RMI_REC_ENTER when seeing RMI_EMULATED_MMIO. This is for
+>>> the guest MMIO read path.  
+>>
+>> Yes, when entering the guest after an (emulatable) read data abort the
+>> value in GPRS[0] is loaded from the RecEntry structure into the
+>> appropriate register for the guest.
+>>
+>>> How about the MMIO write path? I don't see where the RecExit.GPRS[0] is loaded
+>>> to a varible and returned to the userspace.  
+>>
 > 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 649de509..bd1761db 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -85,11 +85,12 @@ F: lib/powerpc/
->   F: lib/ppc64/
->   
->   S390X
-> -M: Thomas Huth <thuth@redhat.com>
->   M: Janosch Frank <frankja@linux.ibm.com>
->   M: Claudio Imbrenda <imbrenda@linux.ibm.com>
-> +M: Nico Böhr <nrb@linux.ibm.com>
+> -----
+>> The RMM will populate GPRS[0] with the written value in this case (even
+>> if another register was actually used in the instruction). We then
+>> transfer that to the usual VCPU structure so that the normal fault
+>> handling logic works.
+>>
+> -----
+> 
+> Are these in this patch or another patch?
 
-Thanks for helping out, Nico!
+The RMM (not included in this particular series[1]) sets the first
+element of the 'GPRS' array which is in memory shared with the host.
 
->   S: Supported
->   R: David Hildenbrand <david@redhat.com>
-> +R: Thomas Huth <thuth@redhat.com>
->   L: kvm@vger.kernel.org
->   L: linux-s390@vger.kernel.org
->   F: s390x/
+The Linux half to populate the vcpu structure is in the previous patch:
 
-Acked-by: Thomas Huth <thuth@redhat.com>
++static int rec_exit_sync_dabt(struct kvm_vcpu *vcpu)
++{
++	struct rec *rec = &vcpu->arch.rec;
++
++	if (kvm_vcpu_dabt_iswrite(vcpu) && kvm_vcpu_dabt_isvalid(vcpu))
++		vcpu_set_reg(vcpu, kvm_vcpu_dabt_get_rd(vcpu),
++			     rec->run->exit.gprs[0]);
++
++	return kvm_handle_guest_abort(vcpu);
++}
+
+I guess it might make sense to pull the 'if' statement out of the
+previous patch and into this one to keep all the MMIO code together.
+
+Steve
+
+[1] This Linux code is written against the RMM specification and in
+theory could work with any RMM implementation. But the TF RMM is open
+source, so I can point you at the assignment in the latest commit here:
+https://git.trustedfirmware.org/TF-RMM/tf-rmm.git/tree/runtime/core/exit.c?id=d294b1b05e8d234d32684a982552aa2a17fb9157#n264
+
+>>>> we can transfer this to the appropriate VCPU's register entry and then
+>>>> depend on the generic MMIO handling code in KVM.
+>>>>
+>>>> Signed-off-by: Steven Price <steven.price@arm.com>
+>>>> ---
+>>>>  arch/arm64/kvm/mmio.c | 7 +++++++
+>>>>  1 file changed, 7 insertions(+)
+>>>>
+>>>> diff --git a/arch/arm64/kvm/mmio.c b/arch/arm64/kvm/mmio.c
+>>>> index 3dd38a151d2a..c4879fa3a8d3 100644
+>>>> --- a/arch/arm64/kvm/mmio.c
+>>>> +++ b/arch/arm64/kvm/mmio.c
+>>>> @@ -6,6 +6,7 @@
+>>>>  
+>>>>  #include <linux/kvm_host.h>
+>>>>  #include <asm/kvm_emulate.h>
+>>>> +#include <asm/rmi_smc.h>
+>>>>  #include <trace/events/kvm.h>
+>>>>  
+>>>>  #include "trace.h"
+>>>> @@ -109,6 +110,9 @@ int kvm_handle_mmio_return(struct kvm_vcpu *vcpu)
+>>>>  			       &data);
+>>>>  		data = vcpu_data_host_to_guest(vcpu, data, len);
+>>>>  		vcpu_set_reg(vcpu, kvm_vcpu_dabt_get_rd(vcpu), data);
+>>>> +
+>>>> +		if (vcpu_is_rec(vcpu))
+>>>> +			vcpu->arch.rec.run->entry.gprs[0] = data;  
+>>>
+>>> I think the guest context is maintained by RMM (while KVM can only touch
+>>> Rec{Entry, Exit} object) so that guest context in the legacy VHE mode is
+>>> unused.
+>>>
+>>> If yes, I guess here is should be:
+>>>
+>>> if (unlikely(vcpu_is_rec(vcpu)))
+>>> 	vcpu->arch.rec.run->entry.gprs[0] = data;
+>>> else
+>>> 	vcpu_set_reg(vcpu, kvm_vcpu_dabt_get_rd(vcpu), data);  
+>>
+>> Correct. Although there's no harm in updating with vcpu_set_reg(). But
+>> I'll make the change because it's clearer.
+>>
+>>>>  	}
+>>>>  
+>>>>  	/*
+>>>> @@ -179,6 +183,9 @@ int io_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa)
+>>>>  	run->mmio.len		= len;
+>>>>  	vcpu->mmio_needed	= 1;
+>>>>  
+>>>> +	if (vcpu_is_rec(vcpu))
+>>>> +		vcpu->arch.rec.run->entry.flags |= RMI_EMULATED_MMIO;
+>>>> +  
+>>>
+>>> Wouldn't it be better to set this in the kvm_handle_mmio_return where the MMIO
+>>> read emulation has been surely successful?  
+>>
+>> Yes, that makes sense - I'll move this.
+>>
+>> Thanks,
+>>
+>> Steve
+>>
+>>>>  	if (!ret) {
+>>>>  		/* We handled the access successfully in the kernel. */
+>>>>  		if (!is_write)  
+>>>   
+>>
+> 
 
