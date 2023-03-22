@@ -2,130 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 810B46C3FA2
-	for <lists+kvm@lfdr.de>; Wed, 22 Mar 2023 02:16:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3E89B6C3FBD
+	for <lists+kvm@lfdr.de>; Wed, 22 Mar 2023 02:29:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230283AbjCVBQb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Mar 2023 21:16:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52332 "EHLO
+        id S229639AbjCVB3n (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Mar 2023 21:29:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48202 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230179AbjCVBQD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Mar 2023 21:16:03 -0400
-Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 505815A18D
-        for <kvm@vger.kernel.org>; Tue, 21 Mar 2023 18:15:38 -0700 (PDT)
-Received: by mail-pg1-x54a.google.com with SMTP id b1-20020a63d301000000b0050726979a86so2616637pgg.4
-        for <kvm@vger.kernel.org>; Tue, 21 Mar 2023 18:15:38 -0700 (PDT)
+        with ESMTP id S229512AbjCVB3l (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Mar 2023 21:29:41 -0400
+Received: from mail-oa1-x36.google.com (mail-oa1-x36.google.com [IPv6:2001:4860:4864:20::36])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08BB7360BE
+        for <kvm@vger.kernel.org>; Tue, 21 Mar 2023 18:29:41 -0700 (PDT)
+Received: by mail-oa1-x36.google.com with SMTP id 586e51a60fabf-17671fb717cso18075481fac.8
+        for <kvm@vger.kernel.org>; Tue, 21 Mar 2023 18:29:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1679447726;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=R3Ju8+L4fgF6abYzf02i1EjyBRNep0dilDxdCj7Ur6o=;
-        b=a2vwCmIpZZBVMlv8zgK50uxkIS0xyvGrcbb26ooiKRDtEuoeDMNLY6bOohAPGj6Wlx
-         2NnVJOjsLYTD3ZqBMs+ROUq33YaZWKwMLnjmyVbpvPv5gy89EbkBhZfD1r7vdOkSs+uv
-         zPrTSZw/8EF8Md12lugEYzIWbquJESphU/VIWTXHmjT+OUkKW4/UpTtYBK//8g/W8i0d
-         SGUWnmJU4A/AzbgvQXXygK4KrBVn+wkTWLRzSGy40vGVnlDmzLQJOJO/fDnZ3ED2hFES
-         Zk9QVxtFz8G+YTDi6az4IydhtKPbdd8AZbFiU22II4Psb5KaepFptGo6J0c2cVWyNbyr
-         SaYA==
+        d=google.com; s=20210112; t=1679448580;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=NSCyyhzST23ex5r5AgFi+RlkaLf2K1PVz0O5N4A+Lbw=;
+        b=jzf02hDKsUrLyp3O5LE12aIO7p14qRl7n6B5pP2Vba01AI84MTd/duAFs38nhOlpy2
+         b6gKkomiMXft8nEsnwtW2nOXrXcs7CGM5h7d3V/vi3QYX8M1O28gNcsLeU2geT//PJb/
+         J3TwOhGyBvDPf+fgQl/2gKMJ73lNZAozmCOQBz9CXiQ+7eMIgDYK1UjpN2Skq84pCZMh
+         abD0ZeX+2thleQLRjVKr3gS5TpqEqKiuoHDlW/hTNS2ikvS/4LHElynzDKBlrjuW65iO
+         FRemaTLVSwXVN3utHWpPvCSVGv2xK/XWbm1AiyEBI8bHOqxGq0cS8BVXqOL9QvKIBFzJ
+         uD+w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679447726;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=R3Ju8+L4fgF6abYzf02i1EjyBRNep0dilDxdCj7Ur6o=;
-        b=ajWB7m7h5sAGGFiBotIcdqIgQkHB5GWr/wQ2YztttPUjFtRlqGClK6rVYp3yFPCoW4
-         FXgpAe9E/ME0nW0q/zAXSQk4HXCo3S+5srfDpe1wzmnvR2g2HnNophQ4hlk5pJD7rPQy
-         vsS7Z79/kB9RpKYF7UkVHv0s3YAeW9opS7Oze0IEjiq9u62qcrPE7+dyLYScUVwQbnSz
-         RlWqGXlbLOUfaeF0yxfc5C2fka1yVcAryNJgDIryoxDCsWIuoJtj9BJEKl6LEdtc45hc
-         H5+9vFKC3DggxQ3rw9QsaJETcI4XKN95tpzrSNec6sxm5gVPRqWZJ9YoqmLhcws9pvP8
-         MDlw==
-X-Gm-Message-State: AO0yUKXmBbXa9IUXqQW05YnKJBF42Q4hmvzopg2rPxxW9MDzSI2RwrNZ
-        ApkBf6XqpkkRK2RVpdlX2AKAon/F+qw=
-X-Google-Smtp-Source: AK7set8/rqQSOxX9RrLUOnnpg5r8vmhnjOz/0JynQasAjavBKAhr2J8mL71LNgEZ0KoBWyHP3YQsjBDlMSw=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90a:ca8d:b0:234:ac9c:5daf with SMTP id
- y13-20020a17090aca8d00b00234ac9c5dafmr621856pjt.2.1679447726571; Tue, 21 Mar
- 2023 18:15:26 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Tue, 21 Mar 2023 18:14:40 -0700
-In-Reply-To: <20230322011440.2195485-1-seanjc@google.com>
-Mime-Version: 1.0
-References: <20230322011440.2195485-1-seanjc@google.com>
-X-Mailer: git-send-email 2.40.0.rc2.332.ga46443480c-goog
-Message-ID: <20230322011440.2195485-7-seanjc@google.com>
-Subject: [PATCH 6/6] KVM: SVM: Return the local "r" variable from svm_set_msr()
-From:   Sean Christopherson <seanjc@google.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Nathan Chancellor <nathan@kernel.org>,
-        Emanuele Giuseppe Esposito <eesposit@redhat.com>,
-        Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
-        Jim Mattson <jmattson@google.com>
+        d=1e100.net; s=20210112; t=1679448580;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=NSCyyhzST23ex5r5AgFi+RlkaLf2K1PVz0O5N4A+Lbw=;
+        b=DLT8/gtRlzGhMLW5LyarGO5LJ/1yqNwg/e2+MoW4VkQR+A4aafawkxoh+ycqx5T/cY
+         D12tcK1dVcBq22s2yMIbPkGCT6fbvfkXDDdwqCm4Ys8oTcCmix3P6vDnWYv9CDLi5gKX
+         bflbVGGpKcEcvfXKAa2eMsmytdV3oK/kBGu0Ke8+2dh6DXImLxx5nhtYu9+RyFxczWIp
+         UTcd9sJdVAO7KySEMKPnDN7xBtg4S4dY2XXmUpAKedYt8Y294jzLtJPpN3/BFNgdTm5j
+         gZ2vxxhpCNvVxlPQxNIfp/zNSEDF6Uy6ZEJk8G1iLNnW/I6dyyH6XQd/wOpBm3YRpFNw
+         uoaQ==
+X-Gm-Message-State: AO0yUKUxC2oLz7ppbAZwymLkw4+rAMUMBYpWBHo5zqvDgiYfHNJ0UAIg
+        mMhsRTCt7v9bWLpgezd5mIvTSKeuCycj7XzaHSP1MYb3OYE5VjPVCS8=
+X-Google-Smtp-Source: AK7set/ysncTXzUcWP1joJZ3auqDbvvUbIdr0nTvGVzzXRrd9cUIMlK/G+vacoJa+sl7uH4lMvdqANYtbw21s3MGGJI=
+X-Received: by 2002:a05:6870:df97:b0:17b:f094:5478 with SMTP id
+ us23-20020a056870df9700b0017bf0945478mr390201oab.2.1679448580241; Tue, 21 Mar
+ 2023 18:29:40 -0700 (PDT)
+MIME-Version: 1.0
+References: <ZBl4592947wC7WKI@suse.de> <66eee693371c11bbd2173ad5d91afc740aa17b46.camel@linux.ibm.com>
+ <ZBmmjlNdBwVju6ib@suse.de> <c2e8af835723c453adaba4b66db533a158076bbf.camel@linux.ibm.com>
+ <ZBnJ6ZCuQJTVMM8h@suse.de> <7d615af4c6a9e5eeb0337d98c9e9ddca6d2cbdef.camel@linux.ibm.com>
+In-Reply-To: <7d615af4c6a9e5eeb0337d98c9e9ddca6d2cbdef.camel@linux.ibm.com>
+From:   Marc Orr <marcorr@google.com>
+Date:   Tue, 21 Mar 2023 18:29:29 -0700
+Message-ID: <CAA03e5F=Giy5pWbcc9M+O+=FTqL0rrCWSzcgr8V2s-xqjpxKJA@mail.gmail.com>
+Subject: Re: [ANNOUNCEMENT] COCONUT Secure VM Service Module for SEV-SNP
+To:     jejb@linux.ibm.com
+Cc:     =?UTF-8?B?SsO2cmcgUsO2ZGVs?= <jroedel@suse.de>,
+        amd-sev-snp@lists.suse.com, linux-coco@lists.linux.dev,
+        kvm@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-7.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-15.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,ENV_AND_HDR_SPF_MATCH,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL,
+        USER_IN_DEF_SPF_WL autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Rename "r" to "ret" and actually return it from svm_set_msr() to reduce
-the probability of repeating the mistake of commit 723d5fb0ffe4 ("kvm:
-svm: Add IA32_FLUSH_CMD guest support"), which set "r" thinking that it
-would be propagated to the caller.
+On Tue, Mar 21, 2023 at 1:05=E2=80=AFPM James Bottomley <jejb@linux.ibm.com=
+> wrote:
+>
+> > Of course we could start changing linux-svsm to support the same
+> > goals, but I think the end result will not be very different from
+> > what COCONUT looks now.
+>
+> That's entirely possible, so what are the chances of combining the
+> projects now so we don't get a split in community effort?
 
-Alternatively, the declaration of "r" could be moved into the handling of
-MSR_TSC_AUX, but that risks variable shadowing in the future.  A wrapper
-for kvm_set_user_return_msr() would allow eliding a local variable, but
-that feels like delaying the inevitable.
+Very cool to see this announcement and read the discussion!
 
-No functional change intended.
-
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/svm/svm.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
-
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index b32edaf5a74b..57f241c5a371 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -2873,7 +2873,7 @@ static int svm_set_vm_cr(struct kvm_vcpu *vcpu, u64 data)
- static int svm_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr)
- {
- 	struct vcpu_svm *svm = to_svm(vcpu);
--	int r;
-+	int ret = 0;
- 
- 	u32 ecx = msr->index;
- 	u64 data = msr->data;
-@@ -2995,10 +2995,10 @@ static int svm_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr)
- 		 * guest via direct_access_msrs, and switch it via user return.
- 		 */
- 		preempt_disable();
--		r = kvm_set_user_return_msr(tsc_aux_uret_slot, data, -1ull);
-+		ret = kvm_set_user_return_msr(tsc_aux_uret_slot, data, -1ull);
- 		preempt_enable();
--		if (r)
--			return 1;
-+		if (ret)
-+			break;
- 
- 		svm->tsc_aux = data;
- 		break;
-@@ -3056,7 +3056,7 @@ static int svm_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr)
- 	default:
- 		return kvm_set_msr_common(vcpu, msr);
- 	}
--	return 0;
-+	return ret;
- }
- 
- static int msr_interception(struct kvm_vcpu *vcpu)
--- 
-2.40.0.rc2.332.ga46443480c-goog
-
+One SVSM will be better for Google too. Specifically:
+- One hypervisor/SVSM startup sequence is easier for us to get working
+- One SVSM is easier to test/qualify/deploy
+- Generally speaking, things will be easier for us if all SNP VMs
+start running off of the same "first mutable code". I.e., the same
+SVSM, UEFI, etc.
