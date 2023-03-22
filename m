@@ -2,30 +2,30 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E64BD6C49AD
-	for <lists+kvm@lfdr.de>; Wed, 22 Mar 2023 12:51:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id ED67D6C49AE
+	for <lists+kvm@lfdr.de>; Wed, 22 Mar 2023 12:51:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230013AbjCVLv0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Mar 2023 07:51:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34686 "EHLO
+        id S230115AbjCVLv2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Mar 2023 07:51:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34698 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229476AbjCVLvZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Mar 2023 07:51:25 -0400
+        with ESMTP id S229897AbjCVLv0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Mar 2023 07:51:26 -0400
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 1A6D2E6;
-        Wed, 22 Mar 2023 04:51:24 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 25EF71BD2;
+        Wed, 22 Mar 2023 04:51:25 -0700 (PDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D06524B3;
-        Wed, 22 Mar 2023 04:52:07 -0700 (PDT)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D05F9AD7;
+        Wed, 22 Mar 2023 04:52:08 -0700 (PDT)
 Received: from [10.57.53.137] (unknown [10.57.53.137])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B2E553F67D;
-        Wed, 22 Mar 2023 04:51:20 -0700 (PDT)
-Message-ID: <2a944bb7-23d0-7b49-90c2-5bcf8da694b0@arm.com>
-Date:   Wed, 22 Mar 2023 11:51:18 +0000
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EDC243F93E;
+        Wed, 22 Mar 2023 04:51:21 -0700 (PDT)
+Message-ID: <3f4dcc1e-7679-0f7c-44ef-6b0824400259@arm.com>
+Date:   Wed, 22 Mar 2023 11:51:20 +0000
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.8.0
-Subject: Re: [RFC PATCH 15/28] KVM: arm64: Handle realm MMIO emulation
+Subject: Re: [RFC PATCH 16/28] arm64: RME: Allow populating initial contents
 Content-Language: en-GB
 To:     Zhi Wang <zhi.wang.linux@gmail.com>
 Cc:     kvm@vger.kernel.org, kvmarm@lists.linux.dev,
@@ -42,156 +42,122 @@ Cc:     kvm@vger.kernel.org, kvmarm@lists.linux.dev,
         Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev
 References: <20230127112248.136810-1-suzuki.poulose@arm.com>
  <20230127112932.38045-1-steven.price@arm.com>
- <20230127112932.38045-16-steven.price@arm.com>
- <20230306173751.000026d4@gmail.com>
- <e0354676-e8cf-6ea0-3229-a55d90259f8e@arm.com>
- <20230314174436.0000584d@gmail.com>
+ <20230127112932.38045-17-steven.price@arm.com>
+ <20230306193439.000048f2@gmail.com>
+ <6c6ff608-2314-a49a-84ee-fac883c4e227@arm.com>
+ <20230314173121.00006cfb@gmail.com>
 From:   Steven Price <steven.price@arm.com>
-In-Reply-To: <20230314174436.0000584d@gmail.com>
+In-Reply-To: <20230314173121.00006cfb@gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.3 required=5.0 tests=NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 14/03/2023 15:44, Zhi Wang wrote:
-> On Fri, 10 Mar 2023 15:47:14 +0000
+On 14/03/2023 15:31, Zhi Wang wrote:
+> On Fri, 10 Mar 2023 15:47:16 +0000
 > Steven Price <steven.price@arm.com> wrote:
 > 
->> On 06/03/2023 15:37, Zhi Wang wrote:
->>> On Fri, 27 Jan 2023 11:29:19 +0000
+>> On 06/03/2023 17:34, Zhi Wang wrote:
+>>> On Fri, 27 Jan 2023 11:29:20 +0000
 >>> Steven Price <steven.price@arm.com> wrote:
->>>   
->>>> MMIO emulation for a realm cannot be done directly with the VM's
->>>> registers as they are protected from the host. However the RMM interface
->>>> provides a structure member for providing the read/written value and  
+
+<snip>
+
+>>>> +	if (kvm_realm_state(kvm) != REALM_STATE_NEW)
+>>>> +		return -EBUSY;  
 >>>
->>> More details would be better for helping the review. I can only see the
->>> emulated mmio value from the device model (kvmtool or kvm_io_bus) is put into
->>> the GPRS[0] of the RecEntry object. But the rest of the flow is missing.  
+>>> Maybe -EINVAL? The realm hasn't been created (RMI_REALM_CREATE is not called
+>>> yet). The userspace shouldn't reach this path.  
 >>
->> The commit message is out of date (sorry about that). A previous version
->> of the spec had a dedicated member for the read/write value, but this
->> was changed to just use GPRS[0] as you've spotted. I'll update the text.
+>> Well user space can attempt to populate in the ACTIVE state - which is
+>> where the idea of 'busy' comes from. Admittedly it's a little confusing
+>> when RMI_REALM_CREATE hasn't been called.
 >>
->>> I guess RMM copies the value in the RecEntry.GPRS[0] to the target GPR in the
->>> guest context in RMI_REC_ENTER when seeing RMI_EMULATED_MMIO. This is for
->>> the guest MMIO read path.  
+>> I'm not particularly bothered about the return code, but it's useful to
+>> have a different code to -EINVAL as it's not an invalid argument, but
+>> calling at the wrong time. I can't immediately see a better error code
+>> though.
 >>
->> Yes, when entering the guest after an (emulatable) read data abort the
->> value in GPRS[0] is loaded from the RecEntry structure into the
->> appropriate register for the guest.
->>
->>> How about the MMIO write path? I don't see where the RecExit.GPRS[0] is loaded
->>> to a varible and returned to the userspace.  
->>
+> The reason why I feel -EBUSY is little bit off is EBUSY usually indicates
+> something is already initialized and currently running, then another
+> calling path wanna to operate it. 
 > 
-> -----
->> The RMM will populate GPRS[0] with the written value in this case (even
->> if another register was actually used in the instruction). We then
->> transfer that to the usual VCPU structure so that the normal fault
->> handling logic works.
->>
-> -----
+> I took a look on the ioctls in arch/arm64/kvm/arm.c. It seems people have
+> different opinions for calling execution path at a wrong time:
 > 
-> Are these in this patch or another patch?
+> For example:
+> 
+> long kvm_arch_vcpu_ioctl()
+> ...
+>         case KVM_GET_REG_LIST: {
+>                 struct kvm_reg_list __user *user_list = argp;
+>                 struct kvm_reg_list reg_list;
+>                 unsigned n;
+> 
+>                 r = -ENOEXEC;
+>                 if (unlikely(!kvm_vcpu_initialized(vcpu)))
+>                         break;
+> 
+>                 r = -EPERM;
+>                 if (!kvm_arm_vcpu_is_finalized(vcpu))
+>                         break;
+> 
+> If we have to choose one, I prefer -ENOEXEC as -EPERM is stranger. But
+> personally my vote goes to -EINVAL.
 
-The RMM (not included in this particular series[1]) sets the first
-element of the 'GPRS' array which is in memory shared with the host.
+Ok, I think you've convinced me - I'll change to -EINVAL. It is invalid
+use of the API and none of the other error codes seem a great fit.
 
-The Linux half to populate the vcpu structure is in the previous patch:
-
-+static int rec_exit_sync_dabt(struct kvm_vcpu *vcpu)
-+{
-+	struct rec *rec = &vcpu->arch.rec;
-+
-+	if (kvm_vcpu_dabt_iswrite(vcpu) && kvm_vcpu_dabt_isvalid(vcpu))
-+		vcpu_set_reg(vcpu, kvm_vcpu_dabt_get_rd(vcpu),
-+			     rec->run->exit.gprs[0]);
-+
-+	return kvm_handle_guest_abort(vcpu);
-+}
-
-I guess it might make sense to pull the 'if' statement out of the
-previous patch and into this one to keep all the MMIO code together.
+Although I do wish Linux had more descriptive error codes - I often end
+up peppering the kernel with a few printks when using a new API to find
+out what I'm doing wrong.
 
 Steve
 
-[1] This Linux code is written against the RMM specification and in
-theory could work with any RMM implementation. But the TF RMM is open
-source, so I can point you at the assignment in the latest commit here:
-https://git.trustedfirmware.org/TF-RMM/tf-rmm.git/tree/runtime/core/exit.c?id=d294b1b05e8d234d32684a982552aa2a17fb9157#n264
-
->>>> we can transfer this to the appropriate VCPU's register entry and then
->>>> depend on the generic MMIO handling code in KVM.
->>>>
->>>> Signed-off-by: Steven Price <steven.price@arm.com>
->>>> ---
->>>>  arch/arm64/kvm/mmio.c | 7 +++++++
->>>>  1 file changed, 7 insertions(+)
->>>>
->>>> diff --git a/arch/arm64/kvm/mmio.c b/arch/arm64/kvm/mmio.c
->>>> index 3dd38a151d2a..c4879fa3a8d3 100644
->>>> --- a/arch/arm64/kvm/mmio.c
->>>> +++ b/arch/arm64/kvm/mmio.c
->>>> @@ -6,6 +6,7 @@
->>>>  
->>>>  #include <linux/kvm_host.h>
->>>>  #include <asm/kvm_emulate.h>
->>>> +#include <asm/rmi_smc.h>
->>>>  #include <trace/events/kvm.h>
->>>>  
->>>>  #include "trace.h"
->>>> @@ -109,6 +110,9 @@ int kvm_handle_mmio_return(struct kvm_vcpu *vcpu)
->>>>  			       &data);
->>>>  		data = vcpu_data_host_to_guest(vcpu, data, len);
->>>>  		vcpu_set_reg(vcpu, kvm_vcpu_dabt_get_rd(vcpu), data);
->>>> +
->>>> +		if (vcpu_is_rec(vcpu))
->>>> +			vcpu->arch.rec.run->entry.gprs[0] = data;  
->>>
->>> I think the guest context is maintained by RMM (while KVM can only touch
->>> Rec{Entry, Exit} object) so that guest context in the legacy VHE mode is
->>> unused.
->>>
->>> If yes, I guess here is should be:
->>>
->>> if (unlikely(vcpu_is_rec(vcpu)))
->>> 	vcpu->arch.rec.run->entry.gprs[0] = data;
->>> else
->>> 	vcpu_set_reg(vcpu, kvm_vcpu_dabt_get_rd(vcpu), data);  
->>
->> Correct. Although there's no harm in updating with vcpu_set_reg(). But
->> I'll make the change because it's clearer.
->>
->>>>  	}
->>>>  
->>>>  	/*
->>>> @@ -179,6 +183,9 @@ int io_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa)
->>>>  	run->mmio.len		= len;
->>>>  	vcpu->mmio_needed	= 1;
->>>>  
->>>> +	if (vcpu_is_rec(vcpu))
->>>> +		vcpu->arch.rec.run->entry.flags |= RMI_EMULATED_MMIO;
->>>> +  
->>>
->>> Wouldn't it be better to set this in the kvm_handle_mmio_return where the MMIO
->>> read emulation has been surely successful?  
->>
->> Yes, that makes sense - I'll move this.
->>
->> Thanks,
->>
 >> Steve
 >>
->>>>  	if (!ret) {
->>>>  		/* We handled the access successfully in the kernel. */
->>>>  		if (!is_write)  
+>>>> +
+>>>> +	if (!IS_ALIGNED(args->populate_ipa_base, PAGE_SIZE) ||
+>>>> +	    !IS_ALIGNED(args->populate_ipa_size, PAGE_SIZE))
+>>>> +		return -EINVAL;
+>>>> +
+>>>> +	ipa_base = args->populate_ipa_base;
+>>>> +	ipa_end = ipa_base + args->populate_ipa_size;
+>>>> +
+>>>> +	if (ipa_end < ipa_base)
+>>>> +		return -EINVAL;
+>>>> +
+>>>> +	return populate_par_region(kvm, ipa_base, ipa_end);
+>>>> +}
+>>>> +
+>>>>  static int set_ipa_state(struct kvm_vcpu *vcpu,
+>>>>  			 unsigned long ipa,
+>>>>  			 unsigned long end,
+>>>> @@ -748,6 +1102,18 @@ int kvm_realm_enable_cap(struct kvm *kvm, struct kvm_enable_cap *cap)
+>>>>  		r = kvm_init_ipa_range_realm(kvm, &args);
+>>>>  		break;
+>>>>  	}
+>>>> +	case KVM_CAP_ARM_RME_POPULATE_REALM: {
+>>>> +		struct kvm_cap_arm_rme_populate_realm_args args;
+>>>> +		void __user *argp = u64_to_user_ptr(cap->args[1]);
+>>>> +
+>>>> +		if (copy_from_user(&args, argp, sizeof(args))) {
+>>>> +			r = -EFAULT;
+>>>> +			break;
+>>>> +		}
+>>>> +
+>>>> +		r = kvm_populate_realm(kvm, &args);
+>>>> +		break;
+>>>> +	}
+>>>>  	default:
+>>>>  		r = -EINVAL;
+>>>>  		break;  
 >>>   
 >>
 > 
