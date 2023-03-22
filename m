@@ -2,91 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3E89B6C3FBD
-	for <lists+kvm@lfdr.de>; Wed, 22 Mar 2023 02:29:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1702A6C3FD8
+	for <lists+kvm@lfdr.de>; Wed, 22 Mar 2023 02:35:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229639AbjCVB3n (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Mar 2023 21:29:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48202 "EHLO
+        id S230095AbjCVBf3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Mar 2023 21:35:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54700 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229512AbjCVB3l (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Mar 2023 21:29:41 -0400
-Received: from mail-oa1-x36.google.com (mail-oa1-x36.google.com [IPv6:2001:4860:4864:20::36])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08BB7360BE
-        for <kvm@vger.kernel.org>; Tue, 21 Mar 2023 18:29:41 -0700 (PDT)
-Received: by mail-oa1-x36.google.com with SMTP id 586e51a60fabf-17671fb717cso18075481fac.8
-        for <kvm@vger.kernel.org>; Tue, 21 Mar 2023 18:29:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1679448580;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NSCyyhzST23ex5r5AgFi+RlkaLf2K1PVz0O5N4A+Lbw=;
-        b=jzf02hDKsUrLyp3O5LE12aIO7p14qRl7n6B5pP2Vba01AI84MTd/duAFs38nhOlpy2
-         b6gKkomiMXft8nEsnwtW2nOXrXcs7CGM5h7d3V/vi3QYX8M1O28gNcsLeU2geT//PJb/
-         J3TwOhGyBvDPf+fgQl/2gKMJ73lNZAozmCOQBz9CXiQ+7eMIgDYK1UjpN2Skq84pCZMh
-         abD0ZeX+2thleQLRjVKr3gS5TpqEqKiuoHDlW/hTNS2ikvS/4LHElynzDKBlrjuW65iO
-         FRemaTLVSwXVN3utHWpPvCSVGv2xK/XWbm1AiyEBI8bHOqxGq0cS8BVXqOL9QvKIBFzJ
-         uD+w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679448580;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=NSCyyhzST23ex5r5AgFi+RlkaLf2K1PVz0O5N4A+Lbw=;
-        b=DLT8/gtRlzGhMLW5LyarGO5LJ/1yqNwg/e2+MoW4VkQR+A4aafawkxoh+ycqx5T/cY
-         D12tcK1dVcBq22s2yMIbPkGCT6fbvfkXDDdwqCm4Ys8oTcCmix3P6vDnWYv9CDLi5gKX
-         bflbVGGpKcEcvfXKAa2eMsmytdV3oK/kBGu0Ke8+2dh6DXImLxx5nhtYu9+RyFxczWIp
-         UTcd9sJdVAO7KySEMKPnDN7xBtg4S4dY2XXmUpAKedYt8Y294jzLtJPpN3/BFNgdTm5j
-         gZ2vxxhpCNvVxlPQxNIfp/zNSEDF6Uy6ZEJk8G1iLNnW/I6dyyH6XQd/wOpBm3YRpFNw
-         uoaQ==
-X-Gm-Message-State: AO0yUKUxC2oLz7ppbAZwymLkw4+rAMUMBYpWBHo5zqvDgiYfHNJ0UAIg
-        mMhsRTCt7v9bWLpgezd5mIvTSKeuCycj7XzaHSP1MYb3OYE5VjPVCS8=
-X-Google-Smtp-Source: AK7set/ysncTXzUcWP1joJZ3auqDbvvUbIdr0nTvGVzzXRrd9cUIMlK/G+vacoJa+sl7uH4lMvdqANYtbw21s3MGGJI=
-X-Received: by 2002:a05:6870:df97:b0:17b:f094:5478 with SMTP id
- us23-20020a056870df9700b0017bf0945478mr390201oab.2.1679448580241; Tue, 21 Mar
- 2023 18:29:40 -0700 (PDT)
+        with ESMTP id S230047AbjCVBfN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Mar 2023 21:35:13 -0400
+Received: from loongson.cn (mail.loongson.cn [114.242.206.163])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 8121F5A6DF;
+        Tue, 21 Mar 2023 18:34:57 -0700 (PDT)
+Received: from loongson.cn (unknown [10.20.42.120])
+        by gateway (Coremail) with SMTP id _____8Bxok44WxpkrskPAA--.12096S3;
+        Wed, 22 Mar 2023 09:34:48 +0800 (CST)
+Received: from [10.20.42.120] (unknown [10.20.42.120])
+        by localhost.localdomain (Coremail) with SMTP id AQAAf8BxX+Q2Wxpkt0MJAA--.37863S3;
+        Wed, 22 Mar 2023 09:34:46 +0800 (CST)
+Subject: Re: [PATCH v4 05/29] LoongArch: KVM: Add vcpu related header files
+To:     Xi Ruoyao <xry111@xry111.site>, Paolo Bonzini <pbonzini@redhat.com>
+References: <20230321035651.598505-1-zhaotianrui@loongson.cn>
+ <20230321035651.598505-6-zhaotianrui@loongson.cn>
+ <75f843b2780fc3c3dcc1d0d8f78f2b955956316b.camel@xry111.site>
+Cc:     Huacai Chen <chenhuacai@kernel.org>,
+        WANG Xuerui <kernel@xen0n.name>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        loongarch@lists.linux.dev, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Mark Brown <broonie@kernel.org>,
+        Alex Deucher <alexander.deucher@amd.com>,
+        Oliver Upton <oliver.upton@linux.dev>, maobibo@loongson.cn
+From:   Tianrui Zhao <zhaotianrui@loongson.cn>
+Message-ID: <554dc19a-cd94-0f94-7e81-9cdc137dac7d@loongson.cn>
+Date:   Wed, 22 Mar 2023 09:34:46 +0800
+User-Agent: Mozilla/5.0 (X11; Linux mips64; rv:45.0) Gecko/20100101
+ Thunderbird/45.4.0
 MIME-Version: 1.0
-References: <ZBl4592947wC7WKI@suse.de> <66eee693371c11bbd2173ad5d91afc740aa17b46.camel@linux.ibm.com>
- <ZBmmjlNdBwVju6ib@suse.de> <c2e8af835723c453adaba4b66db533a158076bbf.camel@linux.ibm.com>
- <ZBnJ6ZCuQJTVMM8h@suse.de> <7d615af4c6a9e5eeb0337d98c9e9ddca6d2cbdef.camel@linux.ibm.com>
-In-Reply-To: <7d615af4c6a9e5eeb0337d98c9e9ddca6d2cbdef.camel@linux.ibm.com>
-From:   Marc Orr <marcorr@google.com>
-Date:   Tue, 21 Mar 2023 18:29:29 -0700
-Message-ID: <CAA03e5F=Giy5pWbcc9M+O+=FTqL0rrCWSzcgr8V2s-xqjpxKJA@mail.gmail.com>
-Subject: Re: [ANNOUNCEMENT] COCONUT Secure VM Service Module for SEV-SNP
-To:     jejb@linux.ibm.com
-Cc:     =?UTF-8?B?SsO2cmcgUsO2ZGVs?= <jroedel@suse.de>,
-        amd-sev-snp@lists.suse.com, linux-coco@lists.linux.dev,
-        kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-15.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,ENV_AND_HDR_SPF_MATCH,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL,
-        USER_IN_DEF_SPF_WL autolearn=unavailable autolearn_force=no
+In-Reply-To: <75f843b2780fc3c3dcc1d0d8f78f2b955956316b.camel@xry111.site>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: AQAAf8BxX+Q2Wxpkt0MJAA--.37863S3
+X-CM-SenderInfo: p2kd03xldq233l6o00pqjv00gofq/
+X-Coremail-Antispam: 1Uk129KBjvdXoW7Xr18JrW8JryrtFyfurykKrg_yoWDZFb_Xr
+        s8JF15Ca1kWF4xtanIkFWrX347Gr43Zw15Aa1jqws0qr4rKry0qws3Krs2yrs3tw109F17
+        Cay5J3sIg3sxujkaLaAFLSUrUUUUnb8apTn2vfkv8UJUUUU8wcxFpf9Il3svdxBIdaVrn0
+        xqx4xG64xvF2IEw4CE5I8CrVC2j2Jv73VFW2AGmfu7bjvjm3AaLaJ3UjIYCTnIWjp_UUUO
+        17kC6x804xWl14x267AKxVWUJVW8JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0rVWrJVCq3w
+        AFIxvE14AKwVWUXVWUAwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK021l84ACjcxK
+        6xIIjxv20xvE14v26r4j6ryUM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j6F4UM28EF7
+        xvwVC2z280aVAFwI0_Cr0_Gr1UM28EF7xvwVC2z280aVCY1x0267AKxVW8JVW8Jr1ln4kS
+        14v26r126r1DM2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12xvs2x26I8E6xACxx
+        1l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r126r1DMcIj6I8E87Iv
+        67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lc7I2V7IY0VAS07
+        AlzVAYIcxG8wCY1x0262kKe7AKxVWUAVWUtwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE
+        7xkEbVWUJVW8JwCFI7km07C267AKxVWUAVWUtwC20s026c02F40E14v26r1j6r18MI8I3I
+        0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAI
+        cVC0I7IYx2IY67AKxVWUCVW8JwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcV
+        CF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIE
+        c7CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7IU8Dl1DUUUUU==
+X-Spam-Status: No, score=3.6 required=5.0 tests=NICE_REPLY_A,RCVD_IN_SBL_CSS,
+        SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
         version=3.4.6
+X-Spam-Level: ***
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 21, 2023 at 1:05=E2=80=AFPM James Bottomley <jejb@linux.ibm.com=
-> wrote:
->
-> > Of course we could start changing linux-svsm to support the same
-> > goals, but I think the end result will not be very different from
-> > what COCONUT looks now.
->
-> That's entirely possible, so what are the chances of combining the
-> projects now so we don't get a split in community effort?
 
-Very cool to see this announcement and read the discussion!
 
-One SVSM will be better for Google too. Specifically:
-- One hypervisor/SVSM startup sequence is easier for us to get working
-- One SVSM is easier to test/qualify/deploy
-- Generally speaking, things will be easier for us if all SNP VMs
-start running off of the same "first mutable code". I.e., the same
-SVSM, UEFI, etc.
+在 2023年03月21日 20:30, Xi Ruoyao 写道:
+> On Tue, 2023-03-21 at 11:56 +0800, Tianrui Zhao wrote:
+>> +/* Tracepoints for VM exits */
+>> +#define kvm_trace_symbol_exit_types                    \
+>> +       ({ KVM_TRACE_EXIT_IDLE,         "IDLE" },       \
+>> +       { KVM_TRACE_EXIT_CACHE,         "CACHE" },      \
+>> +       { KVM_TRACE_EXIT_SIGNAL,        "Signal" })
+> Looks like there shouldn't be "(" and ")".
+>
+>> +#define kvm_trace_symbol_aux_op				\
+>> +	({ KVM_TRACE_AUX_RESTORE,	"restore" },	\
+>> +	{ KVM_TRACE_AUX_SAVE,		"save" },	\
+>> +	{ KVM_TRACE_AUX_ENABLE,		"enable" },	\
+>> +	{ KVM_TRACE_AUX_DISABLE,	"disable" },	\
+>> +	{ KVM_TRACE_AUX_DISCARD,	"discard" })
+> Likewise.
+>
+> See the test robot report, and https://godbolt.org/z/bE8q97z1o.
+>
+> The lesson: if a text book claims "you should always wrap the content of
+> a macro in ( ... )", we should burn it in the fire! :)
+>
+
+Thanks, it should remove the "()" statement in the macros. The reason I 
+did this before because an error was triggered when I use checkpatch.py 
+to check it,  and now I know this error can be ignored.
+
+Thanks
+Tianrui Zhao
+
