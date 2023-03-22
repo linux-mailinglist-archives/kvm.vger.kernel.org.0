@@ -2,83 +2,77 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B77096C4069
-	for <lists+kvm@lfdr.de>; Wed, 22 Mar 2023 03:33:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2D2BB6C416A
+	for <lists+kvm@lfdr.de>; Wed, 22 Mar 2023 05:03:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229927AbjCVCdp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Mar 2023 22:33:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52146 "EHLO
+        id S230480AbjCVEDo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Mar 2023 00:03:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47098 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229744AbjCVCdn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Mar 2023 22:33:43 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10A3B24124
-        for <kvm@vger.kernel.org>; Tue, 21 Mar 2023 19:32:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1679452374;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=BzR3eLSpqoTMzxh2NgN0pV0oM+P8NH9sKNgtkW4tjlQ=;
-        b=IZi4b9wmRy2VokAZnpLkAKbkn5axwxhLgeVPtxgXzygCWcbs+UFiE1m/7dus1a2yL1JPG9
-        R/C4B3Vi0DbeVa9TzpUzMUWudO4sRywTZQ8x63hRwwVRfD7ofV+WLaSLsUa55IE+XHg3rM
-        IbyeFgD7Ac5J4+2JMimt7QWbKOKom40=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-635-AJJPDKxuNTOsKGeylAFHUA-1; Tue, 21 Mar 2023 22:32:53 -0400
-X-MC-Unique: AJJPDKxuNTOsKGeylAFHUA-1
-Received: by mail-wm1-f69.google.com with SMTP id iv18-20020a05600c549200b003ee21220fccso2345374wmb.1
-        for <kvm@vger.kernel.org>; Tue, 21 Mar 2023 19:32:52 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679452372;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=BzR3eLSpqoTMzxh2NgN0pV0oM+P8NH9sKNgtkW4tjlQ=;
-        b=s8E8b57RXVp7geH7B5pWol5LFcfeOcHHf1GccdaRkefoP188NBvZ9O+Lb5gXLLHENo
-         sfBVt3a0j6QuX5by+JQxwLckd6SXJYHGnvSTYFyHpFmep3vTh++aRVtbhVL/HauBz8q9
-         /MKZhcTdGtduYBWr9etm7gzxc4zrebuxEKnHbegavOIZ+PH+VJnlvSYbePpm/Ru10SwJ
-         ACgZqZx4G6CkkA9rqsqeOXjXYbgXQ3K9ogOU+AD+ZiDCjbE0SmB7XVfMDpk3+nSkFUNZ
-         pnZKJ2eahC943hx8fsNfCErqtO/yPXEKTyuSbuCo1yUYwVWbdyhPpuWQvao0bteHt4mD
-         UplA==
-X-Gm-Message-State: AO0yUKXb6eRS0U3QgUdiVrweKFCSat/JUKN6Z8CQ2glkKN9V+JyUmt5v
-        4hxj6iWcJJikdKLLASiwfMn1pY+Vda0CId2WO1nxQTkjT/8meQwRCAqOqTxePhHCA/SnGEQ/VlC
-        PNl3AzhP2vfJ5
-X-Received: by 2002:a5d:4521:0:b0:2cf:e827:b597 with SMTP id j1-20020a5d4521000000b002cfe827b597mr3982522wra.10.1679452371927;
-        Tue, 21 Mar 2023 19:32:51 -0700 (PDT)
-X-Google-Smtp-Source: AK7set+IAoeXaV5Ezy2+ySyjfqstu/owf9Mg6SdCShB52Q1gVgr7GbSGeNN3VY0ntYreU5GIBMrYUQ==
-X-Received: by 2002:a5d:4521:0:b0:2cf:e827:b597 with SMTP id j1-20020a5d4521000000b002cfe827b597mr3982509wra.10.1679452371580;
-        Tue, 21 Mar 2023 19:32:51 -0700 (PDT)
-Received: from redhat.com ([2.52.1.105])
-        by smtp.gmail.com with ESMTPSA id n1-20020a5d67c1000000b002cfe685bfd6sm12661630wrw.108.2023.03.21.19.32.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Mar 2023 19:32:51 -0700 (PDT)
-Date:   Tue, 21 Mar 2023 22:32:46 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Ross Zwisler <zwisler@chromium.org>
-Cc:     linux-kernel@vger.kernel.org, Ross Zwisler <zwisler@google.com>,
-        "Tobin C. Harding" <me@tobin.cc>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Jason Wang <jasowang@redhat.com>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Shuah Khan <shuah@kernel.org>,
-        Tycho Andersen <tycho@tycho.pizza>, kvm@vger.kernel.org,
-        linux-hardening@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-mm@kvack.org, virtualization@lists.linux-foundation.org,
-        linux-trace-kernel@vger.kernel.org,
-        Steven Rostedt <rostedt@goodmis.org>
-Subject: Re: [PATCH v2 0/6] use canonical ftrace path whenever possible
-Message-ID: <20230321223139-mutt-send-email-mst@kernel.org>
-References: <20230215223350.2658616-1-zwisler@google.com>
+        with ESMTP id S230436AbjCVEDT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Mar 2023 00:03:19 -0400
+Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5DFDF5BD95;
+        Tue, 21 Mar 2023 21:02:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1679457732; x=1710993732;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=7Hj7tRv4+Rc9UMP86VA4Ii4mE8aI+72mPUgX4/qzk3g=;
+  b=Iqh/a+UA/7ZFHwjluWsS/3q6Ihpk6MOMZdWQnSfXZS4Wk8xSJBTVlWja
+   Sfgaiy+SKiYE6se6Ga9IA5mJNoEs9hMquc0yKiv8UH6YB7sUQO/cGGBue
+   occeMexe+sSscZvzeebj5dT9OmF1Lw+pgP5ob5b1OWJ+UKbQvph6tYVIn
+   tMSdsFXRmbC43+6R02RZTLLW0Gi6IvRVsBiqb4oHe9ixCkqxALsLlLlGm
+   vCDb0lGEyYi/SPq7g1mpSxD98ngcchf0/nr52JIA+VD9eozr5L39QX2np
+   AdSHcvDNqrWklt8kSlOW1VdsWtNiXtNT7rBXRsAfXHFV1K9im07/ZpfVr
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10656"; a="341477218"
+X-IronPort-AV: E=Sophos;i="5.98,280,1673942400"; 
+   d="scan'208";a="341477218"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Mar 2023 21:01:19 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10656"; a="1011222409"
+X-IronPort-AV: E=Sophos;i="5.98,280,1673942400"; 
+   d="scan'208";a="1011222409"
+Received: from rhchan-mobl1.amr.corp.intel.com (HELO [10.212.217.72]) ([10.212.217.72])
+  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Mar 2023 21:01:18 -0700
+Message-ID: <7a3bf16a-5ad2-39b0-c68d-f36d40b8dfc4@intel.com>
+Date:   Tue, 21 Mar 2023 21:01:17 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230215223350.2658616-1-zwisler@google.com>
-X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.1
+Subject: Re: [PATCH v5 22/34] x86/fred: FRED initialization code
+Content-Language: en-US
+To:     "Li, Xin3" <xin3.li@intel.com>,
+        Lai Jiangshan <jiangshanlai@gmail.com>,
+        "H. Peter Anvin" <hpa@zytor.com>
+Cc:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "bp@alien8.de" <bp@alien8.de>,
+        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
+        "peterz@infradead.org" <peterz@infradead.org>,
+        "andrew.cooper3@citrix.com" <andrew.cooper3@citrix.com>,
+        "Christopherson,, Sean" <seanjc@google.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "Shankar, Ravi V" <ravi.v.shankar@intel.com>
+References: <20230307023946.14516-1-xin3.li@intel.com>
+ <20230307023946.14516-23-xin3.li@intel.com>
+ <CAJhGHyADXz-3PCFS3M_7TJ8qLGJ=4NcV9aBWrpjemuXB_SnMGg@mail.gmail.com>
+ <5D679723-D84F-42F0-AD8A-8BD1A38FB6CD@zytor.com>
+ <CAJhGHyC0_1xJD2R03-NoRVpMXFTHR4v8CdzyJOZe_k0rdv=NfQ@mail.gmail.com>
+ <SA1PR11MB673486AB91F77B468ED1BD82A8869@SA1PR11MB6734.namprd11.prod.outlook.com>
+From:   Dave Hansen <dave.hansen@intel.com>
+In-Reply-To: <SA1PR11MB673486AB91F77B468ED1BD82A8869@SA1PR11MB6734.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.5 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -86,73 +80,26 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Feb 15, 2023 at 03:33:44PM -0700, Ross Zwisler wrote:
-> Changes in v2:
->  * Dropped patches which were pulled into maintainer trees.
->  * Split BPF patches out into another series targeting bpf-next.
->  * trace-agent now falls back to debugfs if tracefs isn't present.
->  * Added Acked-by from mst@redhat.com to series.
->  * Added a typo fixup for the virtio-trace README.
+On 3/21/23 19:22, Li, Xin3 wrote:
+>> If there is no other concrete reason other than overflowing for assigning NMI and
+>> #DB with a stack level > 0, #VE should also be assigned with a stack level > 0, and
+>> #BP too. #VE can happen anytime and anywhere, so it is subject to overflowing too.
+> With IDT, both #VE and #BP do not use IST, but NMI, #DB, #MC and #DF do.
 > 
-> Steven, assuming there are no objections, would you feel comfortable
-> taking this series through your tree?
+> Let's keep this "secret" logic for now, i.e., not change the stack levels
+> for #VE and #BP at this point. We can do "optimization", i.e., change them
+> later 😄.
 
-for merging up to patch 5 through another tree:
+#VE also can't happen anywhere.  There is some documentation about it in
+here:
 
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
+	https://docs.kernel.org/x86/tdx.html#linux-ve-handler
 
-I'll merge patch 6, no problem.
+But, basically, the only halfway sane thing a guest might do to hit a
+#VE is touch some "MMIO".  The host can *not* cause them in arbitrary
+places because of the SEPT_VE_DISABLE attribute.
 
-
-> ---
-> The canonical location for the tracefs filesystem is at /sys/kernel/tracing.
-> 
-> But, from Documentation/trace/ftrace.rst:
-> 
->   Before 4.1, all ftrace tracing control files were within the debugfs
->   file system, which is typically located at /sys/kernel/debug/tracing.
->   For backward compatibility, when mounting the debugfs file system,
->   the tracefs file system will be automatically mounted at:
-> 
->   /sys/kernel/debug/tracing
-> 
-> There are many places where this older debugfs path is still used in
-> code comments, selftests, examples and tools, so let's update them to
-> avoid confusion.
-> 
-> I've broken up the series as best I could by maintainer or directory,
-> and I've only sent people the patches that I think they care about to
-> avoid spamming everyone.
-> 
-> Ross Zwisler (6):
->   tracing: always use canonical ftrace path
->   selftests: use canonical ftrace path
->   leaking_addresses: also skip canonical ftrace path
->   tools/kvm_stat: use canonical ftrace path
->   tools/virtio: use canonical ftrace path
->   tools/virtio: fix typo in README instructions
-> 
->  include/linux/kernel.h                        |  2 +-
->  include/linux/tracepoint.h                    |  4 ++--
->  kernel/trace/Kconfig                          | 20 +++++++++----------
->  kernel/trace/kprobe_event_gen_test.c          |  2 +-
->  kernel/trace/ring_buffer.c                    |  2 +-
->  kernel/trace/synth_event_gen_test.c           |  2 +-
->  kernel/trace/trace.c                          |  2 +-
->  samples/user_events/example.c                 |  4 ++--
->  scripts/leaking_addresses.pl                  |  1 +
->  scripts/tracing/draw_functrace.py             |  6 +++---
->  tools/kvm/kvm_stat/kvm_stat                   |  2 +-
->  tools/lib/api/fs/tracing_path.c               |  4 ++--
->  .../testing/selftests/user_events/dyn_test.c  |  2 +-
->  .../selftests/user_events/ftrace_test.c       | 10 +++++-----
->  .../testing/selftests/user_events/perf_test.c |  8 ++++----
->  tools/testing/selftests/vm/protection_keys.c  |  4 ++--
->  tools/tracing/latency/latency-collector.c     |  2 +-
->  tools/virtio/virtio-trace/README              |  4 ++--
->  tools/virtio/virtio-trace/trace-agent.c       | 12 +++++++----
->  19 files changed, 49 insertions(+), 44 deletions(-)
-> 
-> -- 
-> 2.39.1.637.g21b0678d19-goog
-
+#VE's also can't nest until after the guest retrieves the "VE info".
+That means that the #VE handler at _least_ reaches C code before it's
+subject to another #VE and that second one would still need to be
+induced by something the guest does explicitly.
