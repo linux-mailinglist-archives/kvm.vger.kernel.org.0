@@ -2,183 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 258056C5487
-	for <lists+kvm@lfdr.de>; Wed, 22 Mar 2023 20:09:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8C32B6C54DD
+	for <lists+kvm@lfdr.de>; Wed, 22 Mar 2023 20:26:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230090AbjCVTJ2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Mar 2023 15:09:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54426 "EHLO
+        id S230205AbjCVT0S (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Mar 2023 15:26:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54404 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229732AbjCVTJ1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Mar 2023 15:09:27 -0400
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 1B4703BC45
-        for <kvm@vger.kernel.org>; Wed, 22 Mar 2023 12:09:26 -0700 (PDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id AC6944B3;
-        Wed, 22 Mar 2023 12:10:09 -0700 (PDT)
-Received: from [10.57.53.198] (unknown [10.57.53.198])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CCD133F71E;
-        Wed, 22 Mar 2023 12:09:24 -0700 (PDT)
-Message-ID: <44df7485-7758-3f8f-1949-845ac4a89b38@arm.com>
-Date:   Wed, 22 Mar 2023 19:09:23 +0000
+        with ESMTP id S229909AbjCVT0Q (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Mar 2023 15:26:16 -0400
+Received: from mail-ed1-x52a.google.com (mail-ed1-x52a.google.com [IPv6:2a00:1450:4864:20::52a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5426362339
+        for <kvm@vger.kernel.org>; Wed, 22 Mar 2023 12:26:13 -0700 (PDT)
+Received: by mail-ed1-x52a.google.com with SMTP id x3so77279310edb.10
+        for <kvm@vger.kernel.org>; Wed, 22 Mar 2023 12:26:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1679513172;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=TC6eNLv6iVcM+dLqVd9h+kHjsMmIK0cHmLbQH5XvCQ4=;
+        b=YWt+tkLlfdne2Kd0Awx/G4k2qdpzdqxUYDyTBl1Ztnt2ciLuzV00hGhXgAwtJraOta
+         foR02SN4g6mrdL4klrVO+c7tFOawmQREXUGb39aqVJgplHebbVKbDKt4rfoJICjBvCMu
+         wBK2gDh8hkB0IAhJCytrzvJckPBgh5K8Bt8+sUhwVZuFARuNc2HPfnpZAWb/gZhAHBHq
+         kdsvBwn5zagJhUTI8/WriLqEs0UsqOBQ2L8AwQN8ZEYSgKvcT+c7MRTTgCRjZ+bdh0qB
+         sZ+7dpMJR+G+PGeubi3mV2QNhg22WsB2UIRYmJqmyL2COl0dZwD8v2RsGie0Xjj8WSpI
+         WVDQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1679513172;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=TC6eNLv6iVcM+dLqVd9h+kHjsMmIK0cHmLbQH5XvCQ4=;
+        b=XjqNn5vswDW1oHU4DmGrDSihMGbiZLtMup4u5niuA4pmuD/QgQyRmYGiR0UzJ/d6iz
+         xzqiQS5wotN/racJX+spW4cPLDNuCneTs/J7JzCBRfr2QAf4bXGQmx8ErqiBv8VNOqJk
+         ylNyc0BFTJJ6+BEugH5A2LRNYlnrebPwog3uPoR1lbhBbpw4TdnFmUX9xNpb//4TH0tO
+         LwtbY49HyrnGONiY+dIsH2I80pWZHfkWHmIMa096Isd9q/vYwx5nZBHVax0EE6rjYTkF
+         coC9oacZFczA0YxrHgXX6hLlrXsBkdWEWlqLirupqwpgIabnTmj3uLk2woj+Jhq3i1qK
+         RNTQ==
+X-Gm-Message-State: AO0yUKXg+eyTVOEJkBwZWejmKmPcnDp8zlWg6ek8qPS9Q9NJ3o2nT8kH
+        kwyHxLUXDXyuntbFByF97MOX3w==
+X-Google-Smtp-Source: AK7set/uwReF6l3N0b+QrVmoQo5JsU4Z8X/6Kjo6ne/T8bhKCGGJPKxX52G9T9KTbzd4uWztJ0Q8Ww==
+X-Received: by 2002:a17:906:c257:b0:932:6452:2396 with SMTP id bl23-20020a170906c25700b0093264522396mr7250972ejb.74.1679513171843;
+        Wed, 22 Mar 2023 12:26:11 -0700 (PDT)
+Received: from localhost (cst2-173-16.cust.vodafone.cz. [31.30.173.16])
+        by smtp.gmail.com with ESMTPSA id k19-20020a1709063fd300b00928de86245fsm7587557ejj.135.2023.03.22.12.26.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 22 Mar 2023 12:26:11 -0700 (PDT)
+Date:   Wed, 22 Mar 2023 20:26:10 +0100
+From:   Andrew Jones <ajones@ventanamicro.com>
+To:     Conor Dooley <conor@kernel.org>
+Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Jisheng Zhang <jszhang@kernel.org>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Anup Patel <anup@brainfault.org>,
+        Atish Patra <atishp@atishpatra.org>,
+        Heiko Stuebner <heiko@sntech.de>,
+        Conor Dooley <conor.dooley@microchip.com>,
+        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
+        regressions@leemhuis.info, regressions@lists.linux.dev
+Subject: Re: [PATCH] riscv: require alternatives framework when selecting FPU
+ support
+Message-ID: <20230322192610.sad42xau33ye5ayn@orel>
+References: <ZBruFRwt3rUVngPu@zx2c4.com>
+ <20230322120907.2968494-1-Jason@zx2c4.com>
+ <20230322124631.7p67thzeblrawsqj@orel>
+ <1884bd96-2783-4556-bc57-8b733758baff@spud>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.8.0
-Subject: Re: [PATCH v4 30/30] arm64: Add an efi/run script
-Content-Language: en-GB
-To:     Andrew Jones <andrew.jones@linux.dev>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.linux.dev, pbonzini@redhat.com,
-        alexandru.elisei@arm.com, ricarkol@google.com
-References: <20230213101759.2577077-1-nikos.nikoleris@arm.com>
- <20230213101759.2577077-31-nikos.nikoleris@arm.com>
- <20230321184158.phwwbsk5mv7qwhpa@orel>
- <07119162-55c9-cf86-ce55-651496dabb00@arm.com>
- <20230322112455.got7oypemataep2c@orel>
- <31ac48f6-c8d9-edb1-d013-551489a34740@arm.com>
- <20230322123213.xqddob4isz7ipwor@orel>
-From:   Nikos Nikoleris <nikos.nikoleris@arm.com>
-In-Reply-To: <20230322123213.xqddob4isz7ipwor@orel>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.3 required=5.0 tests=NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
-        autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1884bd96-2783-4556-bc57-8b733758baff@spud>
+X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
+        DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 22/03/2023 12:32, Andrew Jones wrote:
-> On Wed, Mar 22, 2023 at 11:57:17AM +0000, Nikos Nikoleris wrote:
->> On 22/03/2023 11:24, Andrew Jones wrote:
->>> On Wed, Mar 22, 2023 at 10:02:35AM +0000, Nikos Nikoleris wrote:
->>>> Hi Drew,
->>>>
->>>> On 21/03/2023 18:41, Andrew Jones wrote:
->>>>> On Mon, Feb 13, 2023 at 10:17:59AM +0000, Nikos Nikoleris wrote:
->>>>>> This change adds a efi/run script inspired by the one in x86. This
->>>>>> script will setup a folder with the test compiled as an EFI app and a
->>>>>> startup.nsh script. The script launches QEMU providing an image with
->>>>>> EDKII and the path to the folder with the test which is executed
->>>>>> automatically.
->>>>>>
->>>>>> For example:
->>>>>>
->>>>>> $> ./arm/efi/run ./arm/selftest.efi setup smp=2 mem=256
->>>>>
->>>>> This should be
->>>>>
->>>>> ./arm/efi/run ./arm/selftest.efi -append "setup smp=2 mem=256" -smp 2 -m 256
->>>>>
->>>>
->>>> Indeed, I will update the commit message.
->>>>
->>>>> but I can't get any tests to run through ./arm/efi/run. All of them
->>>>> immediately die with a DABT_EL1. I can get the tests to run (and pass) by
->>>>> manually booting into UEFI with the FAT partition pointing at the parent
->>>>> directory
->>>>>
->>>>
->>>> I suppose the DABT_EL1 is happening after the test has started and not while
->>>> the UEFI interactive shell starts?
->>>
->>> The countdown completes and the startup script runs (I can add an echo to
->>> check it). So it must be the test that fails.
->>>
->>>>
->>>>>     $QEMU -nodefaults -machine virt -accel tcg -cpu cortex-a57 \
->>>>>           -device pci-testdev -display none -serial stdio \
->>>>>           -bios /usr/share/edk2/aarch64/QEMU_EFI.silent.fd \
->>>>>           -drive file.dir=efi-tests/,file.driver=vvfat,file.rw=on,format=raw,if=virtio
->>>>>
->>>>
->>>> Do you hit the DABT_EL1 if you let it automatically start using the
->>>> startup.nsh prepared by the ./arm/efi/run script? Meaning change the above
->>>> command if you provided -drive file.dir=efi-tests/timer instead:
->>>>
->>>>    $QEMU -nodefaults -machine virt -accel tcg -cpu cortex-a57 \
->>>>          -device pci-testdev -display none -serial stdio \
->>>>          -bios /usr/share/edk2/aarch64/QEMU_EFI.silent.fd \
->>>>          -drive file.dir=efi
->>>> tests/timer,file.driver=vvfat,file.rw=on,format=raw,if=virtio
->>>
->>> Yes, this is what ./arm/efi/run does, and it doesn't help to use the
->>> command line directly.
->>>
->>>>
->>>> Thanks for reviewing this!
->>>>
->>>> Nikos
->>>>
->>>>> and then, for example for the timer test, doing
->>>>>
->>>>>     fs0:
->>>>>     cd timer
->>>>>     timer.efi
->>>
->>> This actually doesn't work. I was actually doing
->>>
->>>    fs0:
->>>    cd timer
->>>    ls
->>>    timer.efi
->>>
->>> and, believe it or not, without the 'ls' I get the dabt, with the 'ls' the
->>> test runs and passes. Adding an 'ls' to the startup script doesn't help
->>> the automatic execution though.
->>>
->>> Which versions of QEMU and edk2 are you using? And what file system do you
->>> have the efi-tests directory on?
->>>
->>
->> I am using the QEMU_EFI.fd image that comes with Ubuntu 20.04.6
->> (0~20191122.bd85bf54-2ubuntu3.4)
->> https://packages.ubuntu.com/focal-updates/qemu-efi-aarch64
->>
->> and I've tried two different versions of QEMU
->>
->> $> qemu-system-aarch64 --version
->>
->> QEMU emulator version 4.2.1 (Debian 1:4.2-3ubuntu6.24)
->> Copyright (c) 2003-2019 Fabrice Bellard and the QEMU Project developers
->>
->> $> ../qemu/build/qemu-system-aarch64 --version
->> QEMU emulator version 7.0.0 (v7.0.0-dirty)
->> Copyright (c) 2003-2022 Fabrice Bellard and the QEMU Project developers
->>
->> efi-tests is on ext4
->>
->> I am happy to have a closer look if you help me reproduce your environment.
+On Wed, Mar 22, 2023 at 03:17:13PM +0000, Conor Dooley wrote:
+> On Wed, Mar 22, 2023 at 01:46:31PM +0100, Andrew Jones wrote:
+> > On Wed, Mar 22, 2023 at 01:09:07PM +0100, Jason A. Donenfeld wrote:
+> > > When moving switch_to's has_fpu() over to using riscv_has_extension_
+> > > likely() rather than static branchs, the FPU code gained a dependency on
+> > > the alternatives framework. If CONFIG_RISCV_ALTERNATIVE isn't selected
+> > > when CONFIG_FPU is, then has_fpu() returns false, and switch_to does not
+> > > work as intended. So select CONFIG_RISCV_ALTERNATIVE when CONFIG_FPU is
+> > > selected.
+> > > 
+> > > Fixes: 702e64550b12 ("riscv: fpu: switch has_fpu() to riscv_has_extension_likely()")
+> > > Link: https://lore.kernel.org/all/ZBruFRwt3rUVngPu@zx2c4.com/
+> > > Cc: Jisheng Zhang <jszhang@kernel.org>
+> > > Cc: Andrew Jones <ajones@ventanamicro.com>
+> > > Cc: Heiko Stuebner <heiko@sntech.de>
+> > > Cc: Conor Dooley <conor.dooley@microchip.com>
 > 
-> I'm on Fedora 36 and the file system used for this is XFS. My QEMU version
-> was something pretty recent, but I didn't remember what, so I just updated
-> to latest master (which happens to be the same as v8.0.0-rc1 right now).
-> My edk2 is the one packaged with F36,
-> edk2-aarch64-20221117gitfff6d81270b5-14.fc36.noarch
+> Thanks for fixing it!
+> Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
 > 
-> The QEMU update to v8.0.0-rc1 didn't change anything for me (still same
-> failure and still same "fix" of running the test manually after doing
-> a manual 'ls').
+> > > Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+> > > ---
+> > >  arch/riscv/Kconfig | 1 +
+> > >  1 file changed, 1 insertion(+)
+> > > 
+> > > diff --git a/arch/riscv/Kconfig b/arch/riscv/Kconfig
+> > > index c5e42cc37604..0f59350c699d 100644
+> > > --- a/arch/riscv/Kconfig
+> > > +++ b/arch/riscv/Kconfig
+> > > @@ -467,6 +467,7 @@ config TOOLCHAIN_HAS_ZIHINTPAUSE
+> > >  config FPU
+> > >  	bool "FPU support"
+> > >  	default y
+> > > +	select RISCV_ALTERNATIVE
+> > >  	help
+> > >  	  Say N here if you want to disable all floating-point related procedure
+> > >  	  in the kernel.
+> > > -- 
+> > > 2.40.0
+> > >
+> > 
+> > Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
+> > 
+> > I took a look to see if we missed anything else and see that we should
+> > do the same patch for KVM. I'll send one.
+> > 
+> > (It's tempting to just select RISCV_ALTERNATIVE from RISCV, but maybe we
+> >  can defer that wedding a bit longer.)
 > 
+> At that point, the config option should just go away entirely, no?
 
-Thanks Drew!
-
-I managed to hit the DABT_EL1 when I switched to the F36 edk2. The 
-problem seems to be with the initialization of the page allocation 
-mechanism. mmu_idmap is allocated at 0x80000000 and phys_alloc_show() prints
-
-phys_alloc minimum alignment: 0x40
-0000000048000000-000000007c590fff [USED]
-000000007c591000-000000007c590fff [FREE]
-
-Am I wrong to expect that the address that page_alloc() returns for 
-mmu_idmap should be within the [USED] range?
-
-I'll have a closer look into this but I just wanted to check as I am not 
-sure I fully understand the code/logic of lib/alloc_page.{c,h}
+Ah, yes, and that makes the idea even more attractive, as we could remove
+several ifdefs.
 
 Thanks,
-
-Nikos
+drew
