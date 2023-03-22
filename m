@@ -2,59 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 644B36C4DCF
+	by mail.lfdr.de (Postfix) with ESMTP id 18F996C4DCE
 	for <lists+kvm@lfdr.de>; Wed, 22 Mar 2023 15:33:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231570AbjCVOdo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Mar 2023 10:33:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54556 "EHLO
+        id S231509AbjCVOdl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Mar 2023 10:33:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54570 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231556AbjCVOdh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Mar 2023 10:33:37 -0400
-Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F3D321974
+        with ESMTP id S231561AbjCVOdi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Mar 2023 10:33:38 -0400
+Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89C5486AB
         for <kvm@vger.kernel.org>; Wed, 22 Mar 2023 07:33:08 -0700 (PDT)
-Received: by mail-pl1-x64a.google.com with SMTP id k3-20020a170902ce0300b0019ca6e66303so10734300plg.18
+Received: by mail-pj1-x1049.google.com with SMTP id e8-20020a17090a118800b0023d35ae431eso6016970pja.8
         for <kvm@vger.kernel.org>; Wed, 22 Mar 2023 07:33:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1679495585;
+        d=google.com; s=20210112; t=1679495587;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=KHddjm9SvmO326/A0Q7jULC0QAh5K2TYnQIugXYVvT8=;
-        b=No31MRJt5QhKgYPLLBEr35zF5an//OlzoWQKh4HjGAEjmmTvKuMSC8hmZO7gm33iXI
-         3pC58nrLgUtZdQGy/xrhYwrkA9OAt31qAhDKlEv4rqg9n6p7kwoDBuVO2pX6xyFgV8XR
-         xvl3IoH7H2/i3YIsUq189uPfmzXC+eaaNgHuJIQAQ32QAFUUb9uQ5Mpu90XxQxGshhOn
-         bl4aBMN9POFzjbhHHwoFWYhOF7dzCF6nRML3HNLEWHq/p/Fcph7t6Ff+HJr/7aDvvxwS
-         Aw3thoKPZYSDZSI06mf0CKQ8kG0yiBZ3z47QvT9VVwtpixAzJ+VJ9fzrEr7K3uRmJfV1
-         TcQQ==
+        bh=mgjRw2vqD776E+w9tuKRfXvdxK+3w2cB2jqd6fV4eR0=;
+        b=FxiRswSYb1AXIBDrqHHb62YcKg8xEq7PkbC7KXQ7NdhkfeEZgZkBHFtRMe84W7vbi/
+         c9yBkEX6F18CjW3HPfDWUj1sLu8tNsHSVW04tKegTIAyJPII8StZnlEb+Ze7hyDRzATQ
+         BTC2i1j8vwKuJcvQzUnavrvLcnDoqVNaJVT4tw8gSdj36UuPOGf/o6OCInPoAPIUOXEG
+         iQP5UMebXnVilFniWBBqMzZxsinYhckqC5FB9agMR2ZWhPIo5YsTjuSykkkUzyLT1NJn
+         HGXMOnsJLUYBw/MBpU0vxAWU2MXhb1PnuhDNRC0APHyRywsrSga0bVAdmbHrMOH0pUbz
+         tYGw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679495585;
+        d=1e100.net; s=20210112; t=1679495587;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=KHddjm9SvmO326/A0Q7jULC0QAh5K2TYnQIugXYVvT8=;
-        b=2OUnXUdH8YvbiUb6yJtXLtN5a6l1+3xECArHBNX0uHxIwYNTuEHrESFhsOtQX5RgTi
-         lF5eXB1is9WzHNKiIcKiMb4UojWujHrOjTajgL26/O9154+uZIVb0xEX+hYQDge5l1Au
-         JWgchzUBO2V8ZQSMeWq6VC6FOJ+4X3GJWxmt38VahRwjl9r1tJu19L8nniRW29EDHOax
-         OAQ6kHxX+DtLpVeb3P05S9qeje4n62fxHVDEWkRERNTVNfq6jvLhpR0RAJmo/mw0Fq2v
-         Gq11RvoNwjyaKuo49X5i9uDhEg4cQybpaq73+mrg5IqgwlWce1hbdjfLTvTo0jz/7DfO
-         m2aA==
-X-Gm-Message-State: AAQBX9eNMVaDWD6OyzsSYPTJs1LD+ix0nqgnxBniQdE/vHU0QEH/LbKa
-        V/xzc+XKouphvFqmPNWoMW9QVH0V5Eg=
-X-Google-Smtp-Source: AKy350alMo6+Lkih/Ywrb2SG5XRKmM/2FcrkJhJGC/vIR6CCpVkrNxeblRuG0AxzJWq1COwntZ/VJ0Qp8Tk=
+        bh=mgjRw2vqD776E+w9tuKRfXvdxK+3w2cB2jqd6fV4eR0=;
+        b=iVvq05GeSuxH5NL9tSyrao8Vph4VR2Ny7enBTJmBP5trpu/gMJIuVGxqh8kvAF8W/X
+         0OKhmvyva0BtIU6iPQvawiXTrc9qtBxJ8XKfPm8joWQeD64MYB1Al8lig4/HNf6GEpPl
+         vVUkauHJgg04TtY+Zet/7XNrA3NcjX0P09HLv0M/ciSBBQIwZdVTKMEHfJcieUfLmw7h
+         /d0mVG0ZHeREZGGHsJjEI9PxlodGwcWOS5uP9Ms9yROZ9vKPqCPDwg+TyI6kB6oRYDhE
+         T+bDgavY0yOGa50NuBCped0rQkOdLGbn0hSIVUDId+votPMFurP3aPBAPUfthB3XmHxp
+         IK6A==
+X-Gm-Message-State: AO0yUKWQ5x3pPkIUCU1xpuM0Gt0KQa8wOSr0SIovBdstSP9AeFqIojbC
+        xxyH2X3J6uUAguInsSvDuuXUsRe9xFI=
+X-Google-Smtp-Source: AK7set/zopb4UnnO6BE7QGEU6opvZkEXwgsUFVCTUnw7s/gBLPACnvgnwmcq+NghzPXsWXnQf1j9QVq7x70=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90a:1f49:b0:236:a1f9:9a9d with SMTP id
- y9-20020a17090a1f4900b00236a1f99a9dmr970610pjy.2.1679495585023; Wed, 22 Mar
- 2023 07:33:05 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a65:5082:0:b0:503:916f:3c99 with SMTP id
+ r2-20020a655082000000b00503916f3c99mr833196pgp.10.1679495586826; Wed, 22 Mar
+ 2023 07:33:06 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Wed, 22 Mar 2023 07:32:59 -0700
+Date:   Wed, 22 Mar 2023 07:33:00 -0700
 In-Reply-To: <20230322143300.2209476-1-seanjc@google.com>
 Mime-Version: 1.0
 References: <20230322143300.2209476-1-seanjc@google.com>
 X-Mailer: git-send-email 2.40.0.rc2.332.ga46443480c-goog
-Message-ID: <20230322143300.2209476-2-seanjc@google.com>
-Subject: [PATCH 1/2] KVM: x86: Clear "has_error_code", not "error_code", for
- RM exception injection
+Message-ID: <20230322143300.2209476-3-seanjc@google.com>
+Subject: [PATCH 2/2] KVM: nVMX: Do not report error code when synthesizing
+ VM-Exit from Real Mode
 From:   Sean Christopherson <seanjc@google.com>
 To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>
@@ -71,50 +71,43 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When injecting an exception into a vCPU in Real Mode, suppress the error
-code by clearing the flag that tracks whether the error code is valid, not
-by clearing the error code itself.  The "typo" was introduced by recent
-fix for SVM's funky Paged Real Mode.
+Don't report an error code to L1 when synthesizing a nested VM-Exit and
+L2 is in Real Mode.  Per Intel's SDM, regarding the error code valid bit:
 
-Opportunistically hoist the logic above the tracepoint so that the trace
-is coherent with respect to what is actually injected (this was also the
-behavior prior to the buggy commit).
+  This bit is always 0 if the VM exit occurred while the logical processor
+  was in real-address mode (CR0.PE=0).
+
+The bug was introduced by a recent fix for AMD's Paged Real Mode, which
+moved the error code suppression from the common "queue exception" path
+to the "inject exception" path, but missed VMX's "synthesize VM-Exit"
+path.
 
 Fixes: b97f07458373 ("KVM: x86: determine if an exception has an error code only when injecting it.")
 Cc: stable@vger.kernel.org
 Cc: Maxim Levitsky <mlevitsk@redhat.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/x86.c | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
+ arch/x86/kvm/vmx/nested.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index f706621c35b8..e74aaf57eab5 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -9884,13 +9884,20 @@ int kvm_check_nested_events(struct kvm_vcpu *vcpu)
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index 7c4f5ca405c7..14be92b3f34c 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -3868,7 +3868,12 @@ static void nested_vmx_inject_exception_vmexit(struct kvm_vcpu *vcpu)
+ 		exit_qual = 0;
+ 	}
  
- static void kvm_inject_exception(struct kvm_vcpu *vcpu)
- {
+-	if (ex->has_error_code) {
 +	/*
-+	 * Suppress the error code if the vCPU is in Real Mode, as Real Mode
-+	 * exceptions don't report error codes.  The presence of an error code
-+	 * is carried with the exception and only stripped when the exception
-+	 * is injected as intercepted #PF VM-Exits for AMD's Paged Real Mode do
-+	 * report an error code despite the CPU being in Real Mode.
++	 * Unlike AMD's Paged Real Mode, which reports an error code on #PF
++	 * VM-Exits even if the CPU is in Real Mode, Intel VMX never sets the
++	 * "has error code" flags on VM-Exit if the CPU is in Real Mode.
 +	 */
-+	vcpu->arch.exception.has_error_code &= is_protmode(vcpu);
-+
- 	trace_kvm_inj_exception(vcpu->arch.exception.vector,
- 				vcpu->arch.exception.has_error_code,
- 				vcpu->arch.exception.error_code,
- 				vcpu->arch.exception.injected);
- 
--	if (vcpu->arch.exception.error_code && !is_protmode(vcpu))
--		vcpu->arch.exception.error_code = false;
- 	static_call(kvm_x86_inject_exception)(vcpu);
- }
- 
++	if (ex->has_error_code && is_protmode(vcpu)) {
+ 		/*
+ 		 * Intel CPUs do not generate error codes with bits 31:16 set,
+ 		 * and more importantly VMX disallows setting bits 31:16 in the
 -- 
 2.40.0.rc2.332.ga46443480c-goog
 
