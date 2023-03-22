@@ -2,302 +2,343 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 14DD56C580D
-	for <lists+kvm@lfdr.de>; Wed, 22 Mar 2023 21:48:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4D43D6C5875
+	for <lists+kvm@lfdr.de>; Wed, 22 Mar 2023 22:07:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231806AbjCVUsf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Mar 2023 16:48:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41064 "EHLO
+        id S229691AbjCVVHw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Mar 2023 17:07:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43400 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231229AbjCVUsF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Mar 2023 16:48:05 -0400
-Received: from mail-lj1-x230.google.com (mail-lj1-x230.google.com [IPv6:2a00:1450:4864:20::230])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F09273A842
-        for <kvm@vger.kernel.org>; Wed, 22 Mar 2023 13:44:52 -0700 (PDT)
-Received: by mail-lj1-x230.google.com with SMTP id s20so13098593ljp.1
-        for <kvm@vger.kernel.org>; Wed, 22 Mar 2023 13:44:52 -0700 (PDT)
+        with ESMTP id S229768AbjCVVHe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Mar 2023 17:07:34 -0400
+Received: from mail-ua1-x932.google.com (mail-ua1-x932.google.com [IPv6:2607:f8b0:4864:20::932])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD4684C1C
+        for <kvm@vger.kernel.org>; Wed, 22 Mar 2023 14:07:32 -0700 (PDT)
+Received: by mail-ua1-x932.google.com with SMTP id p2so13667939uap.1
+        for <kvm@vger.kernel.org>; Wed, 22 Mar 2023 14:07:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=semihalf.com; s=google; t=1679517888;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=google.com; s=20210112; t=1679519252;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=N5WX++OomFFbCnGkb2opqD/WzIItAH4+H5bIsVyobgU=;
-        b=m3B1+CBMCAHG0iFIw8Zwdad80/P7NZt1r3HUsZL2m5fTXSqBTjs+j5V+9rEKg2Ze+O
-         woLbTdaHRmtjVSWVzFbpdiaYmHM2fNkoBvBurhWtI9XKJKoaapBAh31hH2mqLZW2Wjrv
-         N4JKbZ7/3QLwVIqTDLUEKbxe0Qb7dYMoZQcyw0hI1l4sYbBwE3kv9kJtcM+UAXCmIslN
-         MlwuZuQAVwfLB3fsZjzJHZBsLJyuxFHUReH1lS+ZTUt7X/SS0RloBt7r8tOCl6x1dXaw
-         x/uagNRteOS3H0v4XuxFBdF5knQPg6dVvvhX8NGiridTw2jer6Uotb40ZaXFuK08ln8y
-         oBRA==
+        bh=E5TCoTHpgTZlxdts8IX0636SFjI9KXDqW+CMXjMZVtM=;
+        b=h+j9DnibdhqfoukM1ME09C/0AaEFlAqpYypAcXLkmXNwyM9ceD2JSr6/iRR6tIhvdN
+         Gb9XcFM+OVMVOlkkEWS9qD6Xm9tYhjCSNbar304/dA4PuU7335KS2I20yZAopw+aBuQL
+         D+sewRPOvSdcY8MghE34+dRIIsBi2SMQsf45mnLOCT/Xsw1pR0n1DlxjpFWm0k47+FKZ
+         Fdde4WO3xEdItUrXlRtJin4b1NyPH9aqnU7+P+6v2ZFALfphD+eK02BmXt2PM0/0tWes
+         jj3D5ZJHpn9fnbhv/lInMXur7LWpdonzoxRl2rTa9MOS7AUzJRIvJQsGX3Rm/ePBiLkx
+         5IyA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679517888;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20210112; t=1679519252;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=N5WX++OomFFbCnGkb2opqD/WzIItAH4+H5bIsVyobgU=;
-        b=1tFmIalpfkLeYhHFMgClyf2JVgreUV9r34gY/fPjZYJJDha4Fe/9nNtams7FXGGxIQ
-         zWMXTdrGoxX2VU9KWoxUgdcbyrrrPB/NzL+1b3BsTy3/TpB+9yzl0r+efGEsdlOaWJBX
-         ZyvsG5FbHaQAygSMdO+Ux/I7PK3kM6H4j81kpCz+ZxOreQTbc4UUCkuaUMO7cS9xaayi
-         psfXYYIFDo2dVtshFEZGFQAcMqEi2OldvcGOD4XjrhbJBvo4sj00RrVFWoh/YXesQZil
-         KBbig/OO8+fV6vMxZT0A35FDrlJs7FchRmBFV+2+nlPRo4WaUYEbHVXA9DMX3M9gpbHV
-         0+KQ==
-X-Gm-Message-State: AO0yUKW1rdqZsC2f/TgQbYk8mteV3NG4pJ+sjx9cF7IbGsqpxC9nlDNT
-        m/JdpRozDldHvmWMFLYK86mZJA==
-X-Google-Smtp-Source: AK7set/pj4yQrrouJ7QOWyef1QEm+W29PZ/k6c4+lFb12//CBnQIeLcL3xUWWDZupB9gQ34dmZAJug==
-X-Received: by 2002:a2e:8553:0:b0:299:ac61:dedd with SMTP id u19-20020a2e8553000000b00299ac61deddmr3107343ljj.40.1679517888495;
-        Wed, 22 Mar 2023 13:44:48 -0700 (PDT)
-Received: from dmaluka.office.semihalf.net ([83.142.187.84])
-        by smtp.gmail.com with ESMTPSA id d16-20020a2eb050000000b0029aa0b6b41asm2585686ljl.115.2023.03.22.13.44.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Mar 2023 13:44:48 -0700 (PDT)
-From:   Dmytro Maluka <dmy@semihalf.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
-        Marc Zyngier <maz@kernel.org>,
-        Eric Auger <eric.auger@redhat.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Rong L Liu <rong.l.liu@intel.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Tomasz Nowicki <tn@semihalf.com>,
-        Grzegorz Jaszczyk <jaz@semihalf.com>, upstream@semihalf.com,
-        Dmitry Torokhov <dtor@google.com>,
-        "Dong, Eddie" <eddie.dong@intel.com>,
-        Dmytro Maluka <dmy@semihalf.com>
-Subject: [PATCH v4 2/2] KVM: x86/ioapic: Resample the pending state of an IRQ when unmasking
-Date:   Wed, 22 Mar 2023 21:43:44 +0100
-Message-Id: <20230322204344.50138-3-dmy@semihalf.com>
-X-Mailer: git-send-email 2.40.0.348.gf938b09366-goog
-In-Reply-To: <20230322204344.50138-1-dmy@semihalf.com>
-References: <20230322204344.50138-1-dmy@semihalf.com>
+        bh=E5TCoTHpgTZlxdts8IX0636SFjI9KXDqW+CMXjMZVtM=;
+        b=EipFZbuIWotp3WtmVk3rzOL+acxtkm2WjgQOf/fhOKDNorREmahUOypXezfclsHnm2
+         AXZPdTyiUTdg8tJHaJyb8B6INdUu5CbDWo2j2uNv6d1RidWK5Kme75wdI0VayiOg7RF5
+         XiDlMis2a7orUfq1jcob2/mQnnJXQlasxzpoDeJBXdahhgHvXqvTUneuRTmLeqAAPRi2
+         bEbU6Ffndp1RBeCepo/h3LX25+DWg3RufOZNeIYLICcU6Pk1subTbEupQbJ8M2ZO+wIO
+         O+TQZCKUxmxdl0tGtRi4WC0T8RTL2tPVOFtgm4SncF3nha8jPXEuRTUeqCOIAsySvoGb
+         5I3A==
+X-Gm-Message-State: AO0yUKVAb/NjVQRtTLCqrEfYqOPywanZpkqhBzaMfgUCjHeHT/vVf12y
+        DHX2bwre8mbJbzz2FFh893Q+I0Zelce0IV9GkJsvjA==
+X-Google-Smtp-Source: AK7set9HQiDRXzeXRhcbLzSHEmOEcZPJAMOZFTBMfbXjdpFxiizhK4psYS1g0cPwoI/Saj7RwOuoAVfyn7CDB5YGyQ8=
+X-Received: by 2002:a1f:7ccb:0:b0:436:9f44:4e30 with SMTP id
+ x194-20020a1f7ccb000000b004369f444e30mr405367vkc.16.1679519251551; Wed, 22
+ Mar 2023 14:07:31 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
-        DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.6
+References: <20230315021738.1151386-1-amoorthy@google.com> <20230315021738.1151386-5-amoorthy@google.com>
+ <20230317000226.GA408922@ls.amr.corp.intel.com> <CAF7b7mrTa735kDaEsJQSHTt7gpWy_QZEtsgsnKoe6c21s0jDVw@mail.gmail.com>
+ <ZBTgnjXJvR8jtc4i@google.com> <CAF7b7mqnvLe8tw_6-cW1b2Bk8YB9qP=7BsOOJK3q-tAyDkarww@mail.gmail.com>
+ <ZBiBkwIF4YHnphPp@google.com> <CAF7b7mrVQ6zP6SLHm4QBfQLgaxQuMtxjhqU5YKjjKGkoND4MLw@mail.gmail.com>
+ <ZBnLaidtZEM20jMp@google.com> <CAF7b7mof8HkcaSthEO8Wu9kf8ZHjE9c1TDzQGAYDYv7FN9+k9w@mail.gmail.com>
+ <ZBoIzo8FGxSyUJ2I@google.com>
+In-Reply-To: <ZBoIzo8FGxSyUJ2I@google.com>
+From:   Anish Moorthy <amoorthy@google.com>
+Date:   Wed, 22 Mar 2023 14:06:55 -0700
+Message-ID: <CAF7b7mpWBCa9Y4xuNLbmgh=EQWOzU4bpSDxGjmRnpH3UEZkB3g@mail.gmail.com>
+Subject: Re: [WIP Patch v2 04/14] KVM: x86: Add KVM_CAP_X86_MEMORY_FAULT_EXIT
+ and associated kvm_run field
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Isaku Yamahata <isaku.yamahata@gmail.com>,
+        Marc Zyngier <maz@kernel.org>,
+        Oliver Upton <oliver.upton@linux.dev>, jthoughton@google.com,
+        kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-15.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,ENV_AND_HDR_SPF_MATCH,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL,
+        USER_IN_DEF_SPF_WL autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-KVM irqfd based emulation of level-triggered interrupts doesn't work
-quite correctly in some cases, particularly in the case of interrupts
-that are handled in a Linux guest as oneshot interrupts (IRQF_ONESHOT).
-Such an interrupt is acked to the device in its threaded irq handler,
-i.e. later than it is acked to the interrupt controller (EOI at the end
-of hardirq), not earlier.
+On Tue, Mar 21, 2023 at 12:43=E2=80=AFPM Sean Christopherson <seanjc@google=
+.com> wrote:
+>
+> On Tue, Mar 21, 2023, Anish Moorthy wrote:
+> > On Tue, Mar 21, 2023 at 8:21=E2=80=AFAM Sean Christopherson <seanjc@goo=
+gle.com> wrote:
+> > >
+> > > On Mon, Mar 20, 2023, Anish Moorthy wrote:
+> > > > On Mon, Mar 20, 2023 at 8:53=E2=80=AFAM Sean Christopherson <seanjc=
+@google.com> wrote:
+> > > > > Filling kvm_run::memory_fault but not exiting to userspace is ok =
+because userspace
+> > > > > never sees the data, i.e. userspace is completely unaware.  This =
+behavior is not
+> > > > > ideal from a KVM perspective as allowing KVM to fill the kvm_run =
+union without
+> > > > > exiting to userspace can lead to other bugs, e.g. effective corru=
+ption of the
+> > > > > kvm_run union, but at least from a uABI perspective, the behavior=
+ is acceptable.
+> > > >
+> > > > Actually, I don't think the idea of filling in kvm_run.memory_fault
+> > > > for -EFAULTs which don't make it to userspace works at all. Conside=
+r
+> > > > the direct_map function, which bubbles its -EFAULT to
+> > > > kvm_mmu_do_page_fault. kvm_mmu_do_page_fault is called from both
+> > > > kvm_arch_async_page_ready (which ignores the return value), and by
+> > > > kvm_mmu_page_fault (where the return value does make it to userspac=
+e).
+> > > > Populating kvm_run.memory_fault anywhere in or under
+> > > > kvm_mmu_do_page_fault seems an immediate no-go, because a wayward
+> > > > kvm_arch_async_page_ready could (presumably) overwrite/corrupt an
+> > > > already-set kvm_run.memory_fault / other kvm_run field.
+> > >
+> > > This particular case is a non-issue.  kvm_check_async_pf_completion()=
+ is called
+> > > only when the current task has control of the vCPU, i.e. is the curre=
+nt "running"
+> > > vCPU.  That's not a coincidence either, invoking kvm_mmu_do_page_faul=
+t() without
+> > > having control of the vCPU would be fraught with races, e.g. the enti=
+re KVM MMU
+> > > context would be unstable.
+> > >
+> > > That will hold true for all cases.  Using a vCPU that is not loaded (=
+not the
+> > > current "running" vCPU in KVM's misleading terminology) to access gue=
+st memory is
+> > > simply not safe, as the vCPU state is non-deterministic.  There are p=
+aths where
+> > > KVM accesses, and even modifies, vCPU state asynchronously, e.g. for =
+IRQ delivery
+> > > and making requests, but those are very controlled flows with dedicat=
+ed machinery
+> > > to make them SMP safe.
+> > >
+> > > That said, I agree that there's a risk that KVM could clobber vcpu->r=
+un_run by
+> > > hitting an -EFAULT without the vCPU loaded, but that's a solvable pro=
+blem, e.g.
+> > > the helper to fill KVM_EXIT_MEMORY_FAULT could be hardened to yell if=
+ called
+> > > without the target vCPU being loaded:
+> > >
+> > >         int kvm_handle_efault(struct kvm_vcpu *vcpu, ...)
+> > >         {
+> > >                 preempt_disable();
+> > >                 if (WARN_ON_ONCE(vcpu !=3D __this_cpu_read(kvm_runnin=
+g_vcpu)))
+> > >                         goto out;
+> > >
+> > >                 vcpu->run->exit_reason =3D KVM_EXIT_MEMORY_FAULT;
+> > >                 ...
+> > >         out:
+> > >                 preempt_enable();
+> > >                 return -EFAULT;
+> > >         }
+> > >
+> > > FWIW, I completely agree that filling KVM_EXIT_MEMORY_FAULT without g=
+uaranteeing
+> > > that KVM "immediately" exits to userspace isn't ideal, but given the =
+amount of
+> > > historical code that we need to deal with, it seems like the lesser o=
+f all evils.
+> > > Unless I'm misunderstanding the use cases, unnecessarily filling kvm_=
+run is a far
+> > > better failure mode than KVM not filling kvm_run when it should, i.e.=
+ false
+> > > positives are ok, false negatives are fatal.
+> >
+> > Don't you have this in reverse?
+>
+> No, I don't think so.
+>
+> > False negatives will just result in userspace not having useful extra
+> > information for the -EFAULT it receives from KVM_RUN, in which case use=
+rspace
+> > can do what you mentioned all VMMs do today and just terminate the VM.
+>
+> And that is _really_ bad behavior if we have any hope of userspace actual=
+ly being
+> able to rely on this functionality.  E.g. any false negative when userspa=
+ce is
+> trying to do postcopy demand paging will be fatal to the VM.
 
-Linux keeps such interrupt masked until its threaded handler finishes,
-to prevent the EOI from re-asserting an unacknowledged interrupt.
-However, with KVM + vfio (or whatever is listening on the resamplefd)
-we always notify resamplefd at the EOI, so vfio prematurely unmasks the
-host physical IRQ, thus a new physical interrupt is fired in the host.
-This extra interrupt in the host is not a problem per se. The problem is
-that it is unconditionally queued for injection into the guest, so the
-guest sees an extra bogus interrupt. [*]
+But since -EFAULTs from KVM_RUN today are already fatal, so there's no
+new failure introduced by an -EFAULT w/o a populated memory_fault
+field right? Obviously that's of no real use to userspace, but that
+seems like part of the point of starting with a partial conversion: to
+allow for filling holes in the implementation in the future.
 
-There are observed at least 2 user-visible issues caused by those
-extra erroneous interrupts for a oneshot irq in the guest:
+It seems like what you're really concerned about here is the
+interaction with the memslot fast-gup-only flag. Obviously, failing to
+populate kvm_run.memory_fault for new userspace-visible -EFAULTs
+caused by that flag would cause new fatal failures for the guest,
+which would make the feature actually harmful. But as far as I know
+(and please lmk if I'm wrong), the memslot flag only needs to be used
+by the kvm_handle_error_pfn (x86) and user_mem_abort (arm64)
+functions, meaning that those are the only places where we need to
+check/populate kvm_run.memory_fault for new userspace-visible
+-EFAULTs.
 
-1. System suspend aborted due to a pending wakeup interrupt from
-   ChromeOS EC (drivers/platform/chrome/cros_ec.c).
-2. Annoying "invalid report id data" errors from ELAN0000 touchpad
-   (drivers/input/mouse/elan_i2c_core.c), flooding the guest dmesg
-   every time the touchpad is touched.
+> > Whereas a false positive might cause a double-write to the KVM_RUN stru=
+ct,
+> > either putting incorrect information in kvm_run.memory_fault or
+>
+> Recording unused information on -EFAULT in kvm_run doesn't make the infor=
+mation
+> incorrect.
+>
+> > corrupting another member of the union.
+>
+> Only if KVM accesses guest memory after initiating an exit to userspace, =
+which
+> would be a KVM irrespective of kvm_run.memory_fault.
 
-The core issue here is that by the time when the guest unmasks the IRQ,
-the physical IRQ line is no longer asserted (since the guest has
-acked the interrupt to the device in the meantime), yet we
-unconditionally inject the interrupt queued into the guest by the
-previous resampling. So to fix the issue, we need a way to detect that
-the IRQ is no longer pending, and cancel the queued interrupt in this
-case.
+Ah good: I was concerned that this was a valid set of code paths in
+KVM. Although I'm assuming that "initiating an exit to userspace"
+includes the "returning -EFAULT from KVM_RUN" cases, because we
+wouldn't want EFAULTs to stomp on each other as well (the
+kvm_mmu_do_page_fault usages were supposed to be one such example,
+though I'm glad to know that they're not a problem).
 
-With IOAPIC we are not able to probe the physical IRQ line state
-directly (at least not if the underlying physical interrupt controller
-is an IOAPIC too), so in this patch we use irqfd resampler for that.
-Namely, instead of injecting the queued interrupt, we just notify the
-resampler that this interrupt is done. If the IRQ line is actually
-already deasserted, we are done. If it is still asserted, a new
-interrupt will be shortly triggered through irqfd and injected into the
-guest.
-
-In the case if there is no irqfd resampler registered for this IRQ, we
-cannot fix the issue, so we keep the existing behavior: immediately
-unconditionally inject the queued interrupt.
-
-This patch fixes the issue for x86 IOAPIC only. In the long run, we can
-fix it for other irqchips and other architectures too, possibly taking
-advantage of reading the physical state of the IRQ line, which is
-possible with some other irqchips (e.g. with arm64 GIC, maybe even with
-the legacy x86 PIC).
-
-[*] In this description we assume that the interrupt is a physical host
-    interrupt forwarded to the guest e.g. by vfio. Potentially the same
-    issue may occur also with a purely virtual interrupt from an
-    emulated device, e.g. if the guest handles this interrupt, again, as
-    a oneshot interrupt.
-
-Signed-off-by: Dmytro Maluka <dmy@semihalf.com>
-Link: https://lore.kernel.org/kvm/31420943-8c5f-125c-a5ee-d2fde2700083@semihalf.com/
-Link: https://lore.kernel.org/lkml/87o7wrug0w.wl-maz@kernel.org/
----
- arch/x86/kvm/ioapic.c    | 36 ++++++++++++++++++++++++++++++++---
- include/linux/kvm_host.h | 10 ++++++++++
- virt/kvm/eventfd.c       | 41 ++++++++++++++++++++++++++++++++++------
- 3 files changed, 78 insertions(+), 9 deletions(-)
-
-diff --git a/arch/x86/kvm/ioapic.c b/arch/x86/kvm/ioapic.c
-index 042dee556125..995eb5054360 100644
---- a/arch/x86/kvm/ioapic.c
-+++ b/arch/x86/kvm/ioapic.c
-@@ -368,9 +368,39 @@ static void ioapic_write_indirect(struct kvm_ioapic *ioapic, u32 val)
- 		mask_after = e->fields.mask;
- 		if (mask_before != mask_after)
- 			kvm_fire_mask_notifiers(ioapic->kvm, KVM_IRQCHIP_IOAPIC, index, mask_after);
--		if (e->fields.trig_mode == IOAPIC_LEVEL_TRIG
--		    && ioapic->irr & (1 << index))
--			ioapic_service(ioapic, index, false);
-+		if (e->fields.trig_mode == IOAPIC_LEVEL_TRIG &&
-+		    ioapic->irr & (1 << index) && !e->fields.mask && !e->fields.remote_irr) {
-+			/*
-+			 * Pending status in irr may be outdated: the IRQ line may have
-+			 * already been deasserted by a device while the IRQ was masked.
-+			 * This occurs, for instance, if the interrupt is handled in a
-+			 * Linux guest as a oneshot interrupt (IRQF_ONESHOT). In this
-+			 * case the guest acknowledges the interrupt to the device in
-+			 * its threaded irq handler, i.e. after the EOI but before
-+			 * unmasking, so at the time of unmasking the IRQ line is
-+			 * already down but our pending irr bit is still set. In such
-+			 * cases, injecting this pending interrupt to the guest is
-+			 * buggy: the guest will receive an extra unwanted interrupt.
-+			 *
-+			 * So we need to check here if the IRQ is actually still pending.
-+			 * As we are generally not able to probe the IRQ line status
-+			 * directly, we do it through irqfd resampler. Namely, we clear
-+			 * the pending status and notify the resampler that this interrupt
-+			 * is done, without actually injecting it into the guest. If the
-+			 * IRQ line is actually already deasserted, we are done. If it is
-+			 * still asserted, a new interrupt will be shortly triggered
-+			 * through irqfd and injected into the guest.
-+			 *
-+			 * If, however, it's not possible to resample (no irqfd resampler
-+			 * registered for this irq), then unconditionally inject this
-+			 * pending interrupt into the guest, so the guest will not miss
-+			 * an interrupt, although may get an extra unwanted interrupt.
-+			 */
-+			if (kvm_notify_irqfd_resampler(ioapic->kvm, KVM_IRQCHIP_IOAPIC, index))
-+				ioapic->irr &= ~(1 << index);
-+			else
-+				ioapic_service(ioapic, index, false);
-+		}
- 		if (e->fields.delivery_mode == APIC_DM_FIXED) {
- 			struct kvm_lapic_irq irq;
- 
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 9f508c8e66e1..a9adf75344be 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -1987,6 +1987,9 @@ int kvm_ioeventfd(struct kvm *kvm, struct kvm_ioeventfd *args);
- #ifdef CONFIG_HAVE_KVM_IRQFD
- int kvm_irqfd(struct kvm *kvm, struct kvm_irqfd *args);
- void kvm_irqfd_release(struct kvm *kvm);
-+bool kvm_notify_irqfd_resampler(struct kvm *kvm,
-+				unsigned int irqchip,
-+				unsigned int pin);
- void kvm_irq_routing_update(struct kvm *);
- #else
- static inline int kvm_irqfd(struct kvm *kvm, struct kvm_irqfd *args)
-@@ -1995,6 +1998,13 @@ static inline int kvm_irqfd(struct kvm *kvm, struct kvm_irqfd *args)
- }
- 
- static inline void kvm_irqfd_release(struct kvm *kvm) {}
-+
-+static inline bool kvm_notify_irqfd_resampler(struct kvm *kvm,
-+					      unsigned int irqchip,
-+					      unsigned int pin)
-+{
-+	return false;
-+}
- #endif
- 
- #else
-diff --git a/virt/kvm/eventfd.c b/virt/kvm/eventfd.c
-index 61aea70dd888..b0af834ffa95 100644
---- a/virt/kvm/eventfd.c
-+++ b/virt/kvm/eventfd.c
-@@ -55,6 +55,15 @@ irqfd_inject(struct work_struct *work)
- 			    irqfd->gsi, 1, false);
- }
- 
-+static void irqfd_resampler_notify(struct kvm_kernel_irqfd_resampler *resampler)
-+{
-+	struct kvm_kernel_irqfd *irqfd;
-+
-+	list_for_each_entry_srcu(irqfd, &resampler->list, resampler_link,
-+				 srcu_read_lock_held(&resampler->kvm->irq_srcu))
-+		eventfd_signal(irqfd->resamplefd, 1);
-+}
-+
- /*
-  * Since resampler irqfds share an IRQ source ID, we de-assert once
-  * then notify all of the resampler irqfds using this GSI.  We can't
-@@ -65,7 +74,6 @@ irqfd_resampler_ack(struct kvm_irq_ack_notifier *kian)
- {
- 	struct kvm_kernel_irqfd_resampler *resampler;
- 	struct kvm *kvm;
--	struct kvm_kernel_irqfd *irqfd;
- 	int idx;
- 
- 	resampler = container_of(kian,
-@@ -76,11 +84,7 @@ irqfd_resampler_ack(struct kvm_irq_ack_notifier *kian)
- 		    resampler->notifier.gsi, 0, false);
- 
- 	idx = srcu_read_lock(&kvm->irq_srcu);
--
--	list_for_each_entry_srcu(irqfd, &resampler->list, resampler_link,
--	    srcu_read_lock_held(&kvm->irq_srcu))
--		eventfd_signal(irqfd->resamplefd, 1);
--
-+	irqfd_resampler_notify(resampler);
- 	srcu_read_unlock(&kvm->irq_srcu, idx);
- }
- 
-@@ -648,6 +652,31 @@ void kvm_irq_routing_update(struct kvm *kvm)
- 	spin_unlock_irq(&kvm->irqfds.lock);
- }
- 
-+bool kvm_notify_irqfd_resampler(struct kvm *kvm,
-+				unsigned int irqchip,
-+				unsigned int pin)
-+{
-+	struct kvm_kernel_irqfd_resampler *resampler;
-+	int gsi, idx;
-+
-+	idx = srcu_read_lock(&kvm->irq_srcu);
-+	gsi = kvm_irq_map_chip_pin(kvm, irqchip, pin);
-+	if (gsi != -1) {
-+		list_for_each_entry_srcu(resampler,
-+					 &kvm->irqfds.resampler_list, link,
-+					 srcu_read_lock_held(&kvm->irq_srcu)) {
-+			if (resampler->notifier.gsi == gsi) {
-+				irqfd_resampler_notify(resampler);
-+				srcu_read_unlock(&kvm->irq_srcu, idx);
-+				return true;
-+			}
-+		}
-+	}
-+	srcu_read_unlock(&kvm->irq_srcu, idx);
-+
-+	return false;
-+}
-+
- /*
-  * create a host-wide workqueue for issuing deferred shutdown requests
-  * aggregated from all vm* instances. We need our own isolated
--- 
-2.40.0.348.gf938b09366-goog
-
+> And if we're really concerned about clobbering state, we could add harden=
+ing/auditing
+> code to ensure that KVM actually exits when kvm_run.exit_reason is set (t=
+hough there
+> are a non-zero number of exceptions, e.g. the aformentioned MMIO mess, ne=
+sted SVM/VMX
+> pages, and probably a few others).
+>
+> Prior to cleanups a few years back[2], emulation failures had issues simi=
+lar to
+> what we are discussing, where KVM would fail to exit to userspace, not fi=
+ll kvm_run,
+> etc.  Those are the types of bugs I want to avoid here.
+>
+> [1] https://lkml.kernel.org/r/ZBNrWZQhMX8AHzWM%40google.com
+> [2] https://lore.kernel.org/kvm/20190823010709.24879-1-sean.j.christopher=
+son@intel.com
+>
+> > > > That in turn looks problematic for the
+> > > > memory-fault-exit-on-fast-gup-failure part of this series, because
+> > > > there are at least a couple of cases for which kvm_mmu_do_page_faul=
+t
+> > > > will -EFAULT. One is the early-efault-on-fast-gup-failure case whic=
+h
+> > > > was the original purpose of this series. Another is a -EFAULT from
+> > > > FNAME(fetch) (passed up through FNAME(page_fault)). There might be
+> > > > other cases as well. But unless userspace can/should resolve *all*
+> > > > such -EFAULTs in the same manner, a kvm_run.memory_fault populated =
+in
+> > > > "kvm_mmu_page_fault" wouldn't be actionable.
+> > >
+> > > Killing the VM, which is what all VMMs do today in response to -EFAUL=
+T, is an
+> > > action.  As I've pointed out elsewhere in this thread, userspace need=
+s to be able
+> > > to identify "faults" that it (userspace) can resolve without a hint f=
+rom KVM.
+> > >
+> > > In other words, KVM is still returning -EFAULT (or a variant thereof)=
+, the _only_
+> > > difference, for all intents and purposes, is that userspace is given =
+a bit more
+> > > information about the source of the -EFAULT.
+> > >
+> > > > At least, not without a whole lot of plumbing code to make it so.
+> > >
+> > > Plumbing where?
+> >
+> > In this example, I meant plumbing code to get a kvm_run.memory_fault.fl=
+ags
+> > which is more specific than (eg) MEMFAULT_REASON_PAGE_FAULT_FAILURE fro=
+m the
+> > -EFAULT paths under kvm_mmu_page_fault. My idea for how userspace would
+> > distinguish fast-gup failures was that kvm_faultin_pfn would set a spec=
+ial
+> > bit in kvm_run.memory_fault.flags to indicate its failure. But (still
+> > assuming that we shouldn't have false-positive kvm_run.memory_fault fil=
+ls) if
+> > the memory_fault can only be populated from kvm_mmu_page_fault then eit=
+her
+> > failures from FNAME(page_fault) and kvm_faultin_pfn will be indistingui=
+shable
+> > to userspace, or those functions will need to plumb more specific exit
+> > reasons all the way up to kvm_mmu_page_fault.
+>
+> Setting a flag that essentially says "failure when handling a guest page =
+fault"
+> is problematic on multiple fronts.  Tying the ABI to KVM's internal imple=
+mentation
+> is not an option, i.e. the ABI would need to be defined as "on page fault=
+s from
+> the guest".  And then the resulting behavior would be non-deterministic, =
+e.g.
+> userspace would see different behavior if KVM accessed a "bad" gfn via em=
+ulation
+> instead of in response to a guest page fault.  And because of hardware TL=
+Bs, it
+> would even be possible for the behavior to be non-deterministic on the sa=
+me
+> platform running the same guest code (though this would be exteremly unli=
+klely
+> in practice).
+>
+> And even if userspace is ok with only handling guest page faults_today_, =
+I highly
+> doubt that will hold forever.  I.e. at some point there will be a use cas=
+e that
+> wants to react to uaccess failures on fast-only memslots.
+>
+> Ignoring all of those issues, simplify flagging "this -EFAULT occurred wh=
+en
+> handling a guest page fault" isn't precise enough for userspace to blindl=
+y resolve
+> the failure.  Even if KVM went through the trouble of setting information=
+ if and
+> only if get_user_page_fast_only() failed while handling a guest page faul=
+t,
+> userspace would still need/want a way to verify that the failure was expe=
+cted and
+> can be resolved, e.g. to guard against userspace bugs due to wrongly unma=
+pping
+> or mprotecting a page.
+>
+> > But, since you've made this point elsewhere, my guess is that your answ=
+er is
+> > that it's actually userspace's job to detect the "specific" reason for =
+the
+> > fault and resolve it.
+>
+> Yes, it's userspace's responsibity.  I simply don't see how KVM can provi=
+de
+> information that userspace doesn't already have without creating an unmai=
+ntainable
+> uABI, at least not without some deep, deep plumbing into gup().  I.e. unl=
+ess gup()
+> were changed to explicitly communicate that it failed because of a uffd e=
+quivalent,
+> at best a flag in kvm_run would be a hint that userspace _might_ be able =
+to resolve
+> the fault.  And even if we modified gup(), we'd still have all the open q=
+uestions
+> about what to do when KVM encounters a fault on a uaccess.
