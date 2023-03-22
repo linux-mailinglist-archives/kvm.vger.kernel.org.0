@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 75E126C530C
-	for <lists+kvm@lfdr.de>; Wed, 22 Mar 2023 18:52:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 914136C531C
+	for <lists+kvm@lfdr.de>; Wed, 22 Mar 2023 18:57:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230296AbjCVRwN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Mar 2023 13:52:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51534 "EHLO
+        id S230294AbjCVR5h (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Mar 2023 13:57:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59024 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230182AbjCVRwI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Mar 2023 13:52:08 -0400
-Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4569B65455
-        for <kvm@vger.kernel.org>; Wed, 22 Mar 2023 10:52:03 -0700 (PDT)
-Received: by mail-pj1-x1049.google.com with SMTP id e8-20020a17090a118800b0023d35ae431eso6177196pja.8
-        for <kvm@vger.kernel.org>; Wed, 22 Mar 2023 10:52:03 -0700 (PDT)
+        with ESMTP id S230081AbjCVR5g (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Mar 2023 13:57:36 -0400
+Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C4E46151F
+        for <kvm@vger.kernel.org>; Wed, 22 Mar 2023 10:57:33 -0700 (PDT)
+Received: by mail-pg1-x54a.google.com with SMTP id s9-20020a634509000000b004fc1c14c9daso4940287pga.23
+        for <kvm@vger.kernel.org>; Wed, 22 Mar 2023 10:57:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1679507523;
+        d=google.com; s=20210112; t=1679507852;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=iZTwETswiMkR6MsJjj+d7N8Pb7VPbOvVsKiiVr9TOhM=;
-        b=i5+mifpqoOF/KxF3sUQl2/YU4M7kOnSQCVi7BGq43pujy0oUUBe8hPcWfsLGYLtG2m
-         NSWswmC+HelxhvUeFVi96enYnxro0IrBcV1F8hUHYm6ihUptDyofwPVDeVmWnluPN4HP
-         HRf5b33RDynRy5Y+O3asK9iHxQHDn7pOA9FXeGaGkmvyvvYPcU+Xo0AqeWHb75LvpXHh
-         sEffnSPQ2LbrSDwhGGIpWGHUz6DtdDawZV5p6zKiRZT0zGS0Kv+JN6aMnb3fQ7nqDoyi
-         T9Tu517oJGvpdQBkdLcni99k6uilxYjJokNEdA1jOwVCRoACOawG30Jl92aK1QIYTxQW
-         +Arw==
+        bh=t4lediYx3DEhSpQl3gzYKlvCEJbXygtbU3i/RKlqt30=;
+        b=F5MCLmCiFBqbxNooctPDGa04IamkeYF3GV25R7x0cqsL1P35Zg4g6P22KPaCQrOh6b
+         pq3HX7mg+vDYT5sinhzj7NwNtCG0yvrpgPC7zR6C34i/ao1bJwjVLqjhF6GlA9vm+4DL
+         AbNAT4jBkpMalcOuzlXq6/Gd6QuBLL8TSSAFP9aBUtfapPNaJ1MmFAtRoK5QVCmmEjI5
+         A6WXymDdd4FWmdnr/y2PBt4UUHkbXId21E3i7Lme9EiJfjQ5hf77xoq2riR4jf0swPHu
+         hQkvTFP5bEOPe9dAvdMznIA5B7rG9p03QnMc8YKTgXKjSR81baj3NZVBBIYcL/gsg9it
+         kbCw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679507523;
+        d=1e100.net; s=20210112; t=1679507852;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=iZTwETswiMkR6MsJjj+d7N8Pb7VPbOvVsKiiVr9TOhM=;
-        b=YUZaX0XhBUKTwwH2tGoyDO6eEi6LKueCIQ9MIIhdWVcNkWN8a9+GxM/C+SyhORzWqp
-         bye9jDfd82ohEWDIxQIpay1Qm8FvBSLMgtD7T0W4Q4SMNgqaHcWd7bvQaJBUqPAH1Hjw
-         YLzJk4WPY4DSpdwCFsRYf3Pc7Ohc7lC+WXWSoBGWY3mcVo9FFsfRh+hH0eF+3FCD/MfH
-         e4JpQxTLxCPnlzXV+W69Y8Eu7mQ4lNgtWxq1ROwUVidr5YEgTenhAR16V2l8wR96c1C0
-         ftSE4qwZ3LoMaV+nu1Q6OJavxSqesRjjF59JhjXuSuz7T4sopwsp5ahiucN1BKuucbag
-         OPug==
-X-Gm-Message-State: AO0yUKUm3kS/+ycCZdQRp/ovdWPkYUFwsysREDgpLggM1N+5Lh7l/1Tt
-        l9OR6oFBaRI7BnP+yeVH+fAIw2hA7pc=
-X-Google-Smtp-Source: AK7set+RGHNA/eCwuNR2wbBn238UqLumF+xL7hx3F6oNRxE1rmepDqciOMOmxEg+y7rjgstoo1w3iS7S8xg=
+        bh=t4lediYx3DEhSpQl3gzYKlvCEJbXygtbU3i/RKlqt30=;
+        b=1fWg8WbcG3oHtvm1CGFuLaMSDD0skHM1/hzeTFnU+nMSeoNxu2vKkaymkcrWuzM0Fd
+         IyoOfnaZ+tm3c+A9m8U3o1otZDDOix+VJlm8sIKZHJSCUpy2wY22/o0dltoSbg4l0Bxa
+         APSXksttCRpHBy7YpKxZ9REvl6ADKx/4sIedgVQDme81cncAhPOG96hTt6UVUSNby4kp
+         CzXOGgoaLYsQhOHr3EbgEm7fb1uDsJMko0Pp0+9S8ZC/fNh5pDkBoWfvTReK1oOBoanE
+         jG4nzuhqI+XHJvMbuyxfanc0EUXrkxmv+43DxsGvlKp/bVtA4HUf33XZkPUby9r+iqhG
+         KJ7w==
+X-Gm-Message-State: AO0yUKW4QqdpdFyUl/YOcwW01jB3uyLFHkafLodnOrIjgg6+NbkzPEdL
+        hymkU2/Ui6q5jIKWKT63ru9f+3yKArQ=
+X-Google-Smtp-Source: AK7set9aBAH+U8K5EnQZmw/YKPlxH4leMMWRicdjeO4dtOsambf6PkNJpKhCNrbi3NDodtaR1odQjAiroOk=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:903:22c1:b0:1a0:6b23:7b55 with SMTP id
- y1-20020a17090322c100b001a06b237b55mr1415684plg.4.1679507522821; Wed, 22 Mar
- 2023 10:52:02 -0700 (PDT)
-Date:   Wed, 22 Mar 2023 10:52:01 -0700
-In-Reply-To: <20230307023946.14516-6-xin3.li@intel.com>
+ (user=seanjc job=sendgmr) by 2002:a17:902:c408:b0:19f:1c79:8b24 with SMTP id
+ k8-20020a170902c40800b0019f1c798b24mr1457989plk.7.1679507852624; Wed, 22 Mar
+ 2023 10:57:32 -0700 (PDT)
+Date:   Wed, 22 Mar 2023 10:57:31 -0700
+In-Reply-To: <20230307023946.14516-34-xin3.li@intel.com>
 Mime-Version: 1.0
-References: <20230307023946.14516-1-xin3.li@intel.com> <20230307023946.14516-6-xin3.li@intel.com>
-Message-ID: <ZBtAQc8Jz5GWGrJr@google.com>
-Subject: Re: [PATCH v5 05/34] x86/traps: export external_interrupt() for VMX
- IRQ reinjection
+References: <20230307023946.14516-1-xin3.li@intel.com> <20230307023946.14516-34-xin3.li@intel.com>
+Message-ID: <ZBtBizw+IuUKwztN@google.com>
+Subject: Re: [PATCH v5 33/34] KVM: x86/vmx: call external_interrupt() to
+ handle IRQ in IRQ caused VM exits
 From:   Sean Christopherson <seanjc@google.com>
 To:     Xin Li <xin3.li@intel.com>
 Cc:     linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org,
@@ -62,8 +62,8 @@ Cc:     linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org,
 Content-Type: text/plain; charset="us-ascii"
 X-Spam-Status: No, score=-7.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+        SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
@@ -71,49 +71,48 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On Mon, Mar 06, 2023, Xin Li wrote:
-> To eliminate dispatching IRQ through the IDT, export external_interrupt()
-> for VMX IRQ reinjection.
-> 
-> Tested-by: Shan Kang <shan.kang@intel.com>
-> Signed-off-by: Xin Li <xin3.li@intel.com>
-> ---
->  arch/x86/include/asm/traps.h |  2 ++
->  arch/x86/kernel/traps.c      | 14 ++++++++++++++
->  2 files changed, 16 insertions(+)
-> 
-> diff --git a/arch/x86/include/asm/traps.h b/arch/x86/include/asm/traps.h
-> index 46f5e4e2a346..da4c21ed68b4 100644
-> --- a/arch/x86/include/asm/traps.h
-> +++ b/arch/x86/include/asm/traps.h
-> @@ -56,4 +56,6 @@ void __noreturn handle_stack_overflow(struct pt_regs *regs,
->  	void f (struct pt_regs *regs)
->  typedef DECLARE_SYSTEM_INTERRUPT_HANDLER((*system_interrupt_handler));
+> @@ -6923,7 +6924,26 @@ static void handle_external_interrupt_irqoff(struct kvm_vcpu *vcpu)
+>  		return;
 >  
-> +int external_interrupt(struct pt_regs *regs, unsigned int vector);
+>  	kvm_before_interrupt(vcpu, KVM_HANDLING_IRQ);
+> -	vmx_do_interrupt_irqoff(gate_offset(desc));
+> +	if (cpu_feature_enabled(X86_FEATURE_FRED)) {
+> +		struct vcpu_vmx *vmx = to_vmx(vcpu);
+> +		struct pt_regs regs = {};
 > +
->  #endif /* _ASM_X86_TRAPS_H */
-> diff --git a/arch/x86/kernel/traps.c b/arch/x86/kernel/traps.c
-> index 31ad645be2fb..cebba1f49e19 100644
-> --- a/arch/x86/kernel/traps.c
-> +++ b/arch/x86/kernel/traps.c
-> @@ -1540,6 +1540,20 @@ int external_interrupt(struct pt_regs *regs, unsigned int vector)
->  	return 0;
->  }
->  
-> +#if IS_ENABLED(CONFIG_KVM_INTEL)
-> +/*
-> + * KVM VMX reinjects IRQ on its current stack, it's a sync call
-> + * thus the values in the pt_regs structure are not used in
-> + * executing IRQ handlers, except cs.RPL and flags.IF, which
-> + * are both always 0 in the VMX IRQ reinjection context.
-> + *
-> + * However, the pt_regs structure is sometimes used in stack
-> + * dump, e.g., show_regs(). So let the caller, i.e., KVM VMX
-> + * decide how to initialize the input pt_regs structure.
-> + */
-> +EXPORT_SYMBOL_GPL(external_interrupt);
-> +#endif
+> +		/*
+> +		 * Create an event return stack frame with the
+> +		 * host context immediately after a VM exit.
 
-If the x86 maintainers don't object, I would prefer this to be squashed with the
-actual KVM usage, that way discussions on exactly what the exported API should be
-can be contained in a single thread.
+Why snapshot the context immediately after VM-Exit?  It diverges from what is
+done in the non-FRED path, and it seems quite misleading and maybe even dangerous.
+The RSP and RIP values are long since gone, e.g. if something explodes, the stack
+trace will be outright wrong.
+
+> +		 *
+> +		 * All other fields of the pt_regs structure are
+> +		 * cleared to 0.
+> +		 */
+> +		regs.ss		= __KERNEL_DS;
+> +		regs.sp		= vmx->loaded_vmcs->host_state.rsp;
+> +		regs.flags	= X86_EFLAGS_FIXED;
+> +		regs.cs		= __KERNEL_CS;
+> +		regs.ip		= (unsigned long)vmx_vmexit;
+> +
+> +		external_interrupt(&regs, vector);
+
+I assume FRED still uses the stack, so why not do something similar to
+vmx_do_interrupt_irqoff() and build @regs after an explicit CALL?  Might even
+be possible to share some/all of VMX_DO_EVENT_IRQOFF.
+
+> +	} else
+
+Curly braces needed since the first half has 'em.
+
+> +		vmx_do_interrupt_irqoff(gate_offset(desc));
+>  	kvm_after_interrupt(vcpu);
+>  
+>  	vcpu->arch.at_instruction_boundary = true;
+> -- 
+> 2.34.1
+> 
