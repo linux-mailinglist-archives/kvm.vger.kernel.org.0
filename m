@@ -2,63 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DC0BE6C4D2D
-	for <lists+kvm@lfdr.de>; Wed, 22 Mar 2023 15:12:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 042BA6C4DCC
+	for <lists+kvm@lfdr.de>; Wed, 22 Mar 2023 15:33:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230187AbjCVOMg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Mar 2023 10:12:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39096 "EHLO
+        id S231569AbjCVOdj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Mar 2023 10:33:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54556 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229555AbjCVOMe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Mar 2023 10:12:34 -0400
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F5B261331
-        for <kvm@vger.kernel.org>; Wed, 22 Mar 2023 07:12:24 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-5411f21f849so189311177b3.16
-        for <kvm@vger.kernel.org>; Wed, 22 Mar 2023 07:12:24 -0700 (PDT)
+        with ESMTP id S231264AbjCVOdf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Mar 2023 10:33:35 -0400
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3C8A19F18
+        for <kvm@vger.kernel.org>; Wed, 22 Mar 2023 07:33:05 -0700 (PDT)
+Received: by mail-pl1-x649.google.com with SMTP id p9-20020a170902e74900b001a1c7b2e7afso6091498plf.0
+        for <kvm@vger.kernel.org>; Wed, 22 Mar 2023 07:33:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1679494343;
+        d=google.com; s=20210112; t=1679495583;
         h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=h3g8Rn77aV2QcyJGm9ePKuJvFxr4MQGLJYaNKJMKDWU=;
-        b=r3mX0acHgQFJ/12GN3ObmLvXudUkJrxw9cCmhw7vFuhOdavMwvBHJvlPQzoM9ZnLwg
-         MvwtnJVXs2hfUcZXcO4ksYztfpbTOdQtPxGfDGOu7ZKeA3KBKO5HgxS5D+oIvjUJZut5
-         YdZe0Fkq8vI1FqZp//uQpLX/+hvNC9g8yAp8rYj6poswJxK9Qe7fIYyAmWN/Ts7SCtrW
-         l/9hx6gJ+y3K29/RprDY2OpfnUqLLdinU1/+HANADLUpUJRRcMHNhrEoUT3E9DPucq4x
-         OZgeodp/IwCYc6WqkL4h46eiziMvO7xKLFNh2Ruh4CQiLEIeue98vW88tqjs4djKGlhQ
-         f3VA==
+        bh=yd5LHdKukK1pcNHstBXl6O3ULCGvo/RjlcU+fY8u3H8=;
+        b=EBUDuw5g01iFFCH1b88omE6dWIzcJJaRfXTxbZIzAYFmfNFThgOnrnl1Ubx3pgcNqq
+         8aZTv1erC/2+bXzaU26BCN4c+CX0AW5rRhKpZK23CUHzjjWb05rQzH1RYk95pfu9smIi
+         +7x+nkalSgZbPi00VPojdUmeut+2QiltxKWsPIHXr7Cs6orE3wW+oACzqYL0CQQLeF9y
+         SZm4gtjx4XB68qrTj4oSQ8DNVobr49+EtDWSTaPVwhfQFSghQD19aZA4AX74Uf7UTW/G
+         R/JIaxWnQY5y4OTvKR3p+U7IjbXRdQsyII7PH0KWeH4xKvOnrGhCtvR7xeMBFypyWT9V
+         4axA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679494343;
+        d=1e100.net; s=20210112; t=1679495583;
         h=cc:to:from:subject:message-id:mime-version:date:reply-to
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=h3g8Rn77aV2QcyJGm9ePKuJvFxr4MQGLJYaNKJMKDWU=;
-        b=R5wRO+7Vi2Dwpgec0PzPS+1ZwVhjAszDEc+v0kmNafHlIuCwGFHY+OkvVD2EpvTapP
-         DMj3lRc/07yUIVaQCdmQ3VgAJW/Q/ysqWLLdPQHdkDJRKU0U0a662lv6+X+6lkLe4OM7
-         k3+ncD5cI4528sZes3CkzXhSsv7NFZ/YyTv3oIl5sUOzL01U8T4BNu0e3mz/s7CNJEBt
-         E6oJmrmlyFmXEi6hZQPF6H6ATx5ua/hzJnUacS+IPAqUPlunoULz1b2QqEfPZ+HPhPoF
-         272VkATjgjBlVzkoOAiE4iBshU8GcD/9YJybrcbVkJXxiZGOzmoYrojgadrcka7xi2t7
-         Avcw==
-X-Gm-Message-State: AAQBX9fn5m7M3aMXz1wbz4QxQ7kJlU89vYLIkXD1pKkH3pUoSrNejCrP
-        0v1NQBFReUKS/iZTzqI8fy7N/LU6awk=
-X-Google-Smtp-Source: AKy350YjDBGga+E95xC44mu6eIl/sGGbUle3DeXTznmceO6Y5LmPpD76/SMxGXNVMpR7fsEKiLQl8FcjBo4=
+        bh=yd5LHdKukK1pcNHstBXl6O3ULCGvo/RjlcU+fY8u3H8=;
+        b=f2N6NCc7pmo8wNBfvOXlzys5xabIa1bCKVa6euVroEW+BAuoICHvppAqCvP99QNzVW
+         YKlfOaQ1l2EJkqUpwGjCLvM1SMtLoTcNBAZe4xhDetP1lyV9i6H/JStPd6VFnDbQIlJo
+         cWLUT3LaWI6eiy5nUGcNhtL41/4tStBFNHFzs5neV+q17WcpME3no02Mt8xCmazy9GRY
+         MyA0NWgY3GmquxeE/bpzm1Q2llv7D5LF+iTZmHs2KnkY7Fdse1W/C/7sq+urdhhMLYIv
+         FVgDFLdy/8vGSQY21uJBlnKpwxUufff5MB6h/h/Dq/2/rxdVMggP2zVjI/a0RMRbTKQj
+         3bwA==
+X-Gm-Message-State: AO0yUKWOlMC2Cc3KGo+ivbQhibCAqaKWjURmeWAVTf7/z+l1agfBfS2U
+        CeIA4oL1gXYyKA0pD1xZ+EDb7EedH3k=
+X-Google-Smtp-Source: AK7set/87QKITS8Y40wmXcpxGb+AX3dxnR9ULgLmuU7FyTi0h6U+3cH9nyOZXj02GHsJD7Hgr/t2MiiSq/8=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:1247:b0:a5f:0:bf12 with SMTP id
- t7-20020a056902124700b00a5f0000bf12mr3324492ybu.13.1679494343468; Wed, 22 Mar
- 2023 07:12:23 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:244f:b0:623:7446:7075 with SMTP id
+ d15-20020a056a00244f00b0062374467075mr1858312pfj.2.1679495583072; Wed, 22 Mar
+ 2023 07:33:03 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Wed, 22 Mar 2023 07:12:20 -0700
+Date:   Wed, 22 Mar 2023 07:32:58 -0700
 Mime-Version: 1.0
 X-Mailer: git-send-email 2.40.0.rc2.332.ga46443480c-goog
-Message-ID: <20230322141220.2206241-1-seanjc@google.com>
-Subject: [PATCH] KVM: x86: Suppress pending MMIO write exits if emulator
- detects exception
+Message-ID: <20230322143300.2209476-1-seanjc@google.com>
+Subject: [PATCH 0/2] KVM: x86: Fix RM exception injection bugs
 From:   Sean Christopherson <seanjc@google.com>
 To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>
 Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        zhangjianguo <zhangjianguo18@huawei.com>,
-        syzbot+760a73552f47a8cd0fd9@syzkaller.appspotmail.com,
-        syzbot+8accb43ddc6bd1f5713a@syzkaller.appspotmail.com
+        Maxim Levitsky <mlevitsk@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-7.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
@@ -70,71 +67,43 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Clear vcpu->mmio_needed when injecting an exception from the emulator to
-squash a (legitimate) warning about vcpu->mmio_needed being true at the
-start of KVM_RUN without a callback being registered to complete the
-userspace MMIO exit.  Suppressing the MMIO write exit is inarguably wrong
-from an architectural perspective, but it is the least awful hack-a-fix
-due to shortcomings in KVM's uAPI, not to mention that KVM already
-suppresses MMIO writes in this scenario.
+Fix two bugs introduced by a semi-recent fix for AMD's Page Real Mode.
 
-Outside of REP string instructions, KVM doesn't provide a way to resume
-an instruction at the exact point where it was "interrupted" if said
-instruction partially completed before encountering an MMIO access.  For
-MMIO reads, KVM immediately exits to userspace upon detecting MMIO as
-userspace provides the to-be-read value in a buffer, and so KVM can safely
-(more or less) restart the instruction from the beginning.  When the
-emulator re-encounters the MMIO read, KVM will service the MMIO by getting
-the value from the buffer instead of exiting to userspace, i.e. KVM won't
-put the vCPU into an infinite loop.
+Patch 1 was tested against the syzkaller testcase that exposed the bug[*].
 
-On an emulated MMIO write, KVM finishes the instruction before exiting to
-userspace, as exiting immediately would ultimately hang the vCPU due to
-the aforementioned shortcoming of KVM not being able to resume emulation
-in the middle of an instruction.
+Patch 2 was testing by enabling the VMware backdoor in L1 to turn on #GP
+interception, hacking L0 KVM to passthrough MSR_IA32_VMX_BASIC to L1
+and then writing the MSR from L2 while in Real Mode, thus forcing L0 KVM
+to emulate the WRMSR from L2 and synthesiz a #GP VM-Exit into L1.
+Confirmed that bad behavior in L1 with an assertion:
 
-For the vast majority of _emulated_ instructions, deferring the userspace
-exit doesn't cause problems as very few x86 instructions (again ignoring
-string operations) generate multiple writes.  But for instructions that
-generate multiple writes, e.g. PUSHA (multiple pushes onto the stack),
-deferring the exit effectively results in only the final write triggering
-an exit to userspace.  KVM does support multiple MMIO "fragments", but
-only for page splits; if an instruction performs multiple distinct MMIO
-writes, the number of fragments gets reset when the next MMIO write comes
-along and any previous MMIO writes are dropped.
-
-Circling back to the warning, if a deferred MMIO write coincides with an
-exception, e.g. in this case a #SS due to PUSHA underflowing the stack
-after queueing a write to an MMIO page on a previous push, KVM injects
-the exceptions and leaves the deferred MMIO pending without registering a
-callback, thus triggering the splat.
-
-Sweep the problem under the proverbial rug as dropping MMIO writes is not
-unique to the exception scenario (see above), i.e. instructions like PUSHA
-are fundamentally broken with respect to MMIO, and have been since KVM's
-inception.
-
-Reported-by: zhangjianguo <zhangjianguo18@huawei.com>
-Reported-by: syzbot+760a73552f47a8cd0fd9@syzkaller.appspotmail.com
-Reported-by: syzbot+8accb43ddc6bd1f5713a@syzkaller.appspotmail.com
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/x86.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index f706621c35b8..6a3e358a32a6 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -8881,6 +8881,8 @@ int x86_emulate_instruction(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
- 	}
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index bcac3efcde41..ef3bb5ab9654 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -5178,6 +5178,9 @@ static int handle_exception_nmi(struct kvm_vcpu *vcpu)
+        vect_info = vmx->idt_vectoring_info;
+        intr_info = vmx_get_intr_info(vcpu);
  
- 	if (ctxt->have_exception) {
-+		WARN_ON_ONCE(vcpu->mmio_needed && !vcpu->mmio_is_write);
-+		vcpu->mmio_needed = false;
- 		r = 1;
- 		inject_emulated_exception(vcpu);
- 	} else if (vcpu->arch.pio.count) {
++       WARN_ONCE((intr_info & INTR_INFO_DELIVER_CODE_MASK) && !is_protmode(vcpu),
++                 "Exception VM-Exit shouldn't report error code when CPU is in Real Mode");
++
+        /*
+         * Machine checks are handled by handle_exception_irqoff(), or by
+         * vmx_vcpu_run() if a #MC occurs on VM-Entry.  NMIs are handled by
+
+[*] https://lkml.kernel.org/r/ZBNrWZQhMX8AHzWM%40google.com
+
+Sean Christopherson (2):
+  KVM: x86: Clear "has_error_code", not "error_code", for RM exception
+    injection
+  KVM: nVMX: Do not report error code when synthesizing VM-Exit from
+    Real Mode
+
+ arch/x86/kvm/vmx/nested.c |  7 ++++++-
+ arch/x86/kvm/x86.c        | 11 +++++++++--
+ 2 files changed, 15 insertions(+), 3 deletions(-)
+
 
 base-commit: 45dd9bc75d9adc9483f0c7d662ba6e73ed698a0b
 -- 
