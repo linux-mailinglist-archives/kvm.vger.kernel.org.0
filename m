@@ -2,104 +2,188 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1702A6C3FD8
-	for <lists+kvm@lfdr.de>; Wed, 22 Mar 2023 02:35:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A60456C3FCA
+	for <lists+kvm@lfdr.de>; Wed, 22 Mar 2023 02:34:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230095AbjCVBf3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Mar 2023 21:35:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54700 "EHLO
+        id S229841AbjCVBed (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Mar 2023 21:34:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52752 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230047AbjCVBfN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Mar 2023 21:35:13 -0400
-Received: from loongson.cn (mail.loongson.cn [114.242.206.163])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 8121F5A6DF;
-        Tue, 21 Mar 2023 18:34:57 -0700 (PDT)
-Received: from loongson.cn (unknown [10.20.42.120])
-        by gateway (Coremail) with SMTP id _____8Bxok44WxpkrskPAA--.12096S3;
-        Wed, 22 Mar 2023 09:34:48 +0800 (CST)
-Received: from [10.20.42.120] (unknown [10.20.42.120])
-        by localhost.localdomain (Coremail) with SMTP id AQAAf8BxX+Q2Wxpkt0MJAA--.37863S3;
-        Wed, 22 Mar 2023 09:34:46 +0800 (CST)
-Subject: Re: [PATCH v4 05/29] LoongArch: KVM: Add vcpu related header files
-To:     Xi Ruoyao <xry111@xry111.site>, Paolo Bonzini <pbonzini@redhat.com>
-References: <20230321035651.598505-1-zhaotianrui@loongson.cn>
- <20230321035651.598505-6-zhaotianrui@loongson.cn>
- <75f843b2780fc3c3dcc1d0d8f78f2b955956316b.camel@xry111.site>
-Cc:     Huacai Chen <chenhuacai@kernel.org>,
-        WANG Xuerui <kernel@xen0n.name>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        loongarch@lists.linux.dev, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Mark Brown <broonie@kernel.org>,
-        Alex Deucher <alexander.deucher@amd.com>,
-        Oliver Upton <oliver.upton@linux.dev>, maobibo@loongson.cn
-From:   Tianrui Zhao <zhaotianrui@loongson.cn>
-Message-ID: <554dc19a-cd94-0f94-7e81-9cdc137dac7d@loongson.cn>
-Date:   Wed, 22 Mar 2023 09:34:46 +0800
-User-Agent: Mozilla/5.0 (X11; Linux mips64; rv:45.0) Gecko/20100101
- Thunderbird/45.4.0
+        with ESMTP id S229789AbjCVBea (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Mar 2023 21:34:30 -0400
+Received: from mail-ed1-x531.google.com (mail-ed1-x531.google.com [IPv6:2a00:1450:4864:20::531])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AEAF8574D5
+        for <kvm@vger.kernel.org>; Tue, 21 Mar 2023 18:34:28 -0700 (PDT)
+Received: by mail-ed1-x531.google.com with SMTP id ek18so66973703edb.6
+        for <kvm@vger.kernel.org>; Tue, 21 Mar 2023 18:34:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=grsecurity.net; s=grsec; t=1679448867;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=b2CIvia+ysoMzgOq7ln7L4piO+fXsxlfLSknqU78fQ8=;
+        b=gy8eg4eVkf7F9R4PCvXL29F38RM8L3sYXPWVchx8ef7eDJrdvpoXqYzMdvoNa23Rws
+         0BKrz39unk31nMtSekHyuySaA8ClRqgvbBdIdWcFvxYC3l0rrZGrwYOSeKRnRlepXl/8
+         7bLvcV7/0DMNlkTAhv+nKQFcSqkjgNhIAPZfMm35HGLvxDl7yKyJmnhG6pHXD/fIejWQ
+         lEOg2nU90LmiYOisDpHLtdqhMX4uCWkNWIoRMHti1iFNfVEEj2aT4HuGqO/UURvNegJJ
+         3W8DcnNnuyZMFd2gnDbIlg4YZqIVNxRPuXHlrxDwxGmWn4DF27iYwB90D/PqkgaSPqmc
+         r9BA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1679448867;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=b2CIvia+ysoMzgOq7ln7L4piO+fXsxlfLSknqU78fQ8=;
+        b=SGBrer04hFZsA4N9Urz3sOByG5/QXLASue1hPJ++3q7rXidThSnELaaEhYI7qiuhDo
+         b5naSxJTTy6XYMMGAxKiEdr8swsxX9TaYW+/vrq2l46mYlALHgfJCj9xqKzeVp8zcFml
+         lroFhikiowCx/rcOPUz0FgtW//rW9aMDgM5Ck8XWshICRGvrAuvNK7GPmqr/EgjiR7Es
+         5E8zVSm8npv78UEBbNIIxwo9/Oet1OMryqs9nleOxctG+qKy3zDPtMZCAMDFQcyk9vbn
+         pFsm5vdKfPYXvakQ2hm4wYmI/39XV0lKICo2Qox3Ga+ME5xYlbyTmNeYom8V0+J7tfYz
+         DcTA==
+X-Gm-Message-State: AO0yUKX/qej+4yAl/sI2JPTVlud0ge56E6g0u1BjsluSE84q7KuyAJgI
+        EsoHhbwSDCvm7MbfKjjXNXgE4n9NZXFhtRvK7lQ=
+X-Google-Smtp-Source: AK7set8/V0praTwRF4XPrGpz444uJtL4Oc25BCNaTyJpjGPzZ+/bBAMj59Kzk8SbKvodjAuXlrLAdA==
+X-Received: by 2002:a17:906:2cca:b0:93b:46f7:a716 with SMTP id r10-20020a1709062cca00b0093b46f7a716mr707383ejr.50.1679448866926;
+        Tue, 21 Mar 2023 18:34:26 -0700 (PDT)
+Received: from nuc.fritz.box (p200300f6af344e007f5e5982a136b54e.dip0.t-ipconnect.de. [2003:f6:af34:4e00:7f5e:5982:a136:b54e])
+        by smtp.gmail.com with ESMTPSA id w11-20020a1709067c8b00b009231714b3d4sm6356260ejo.151.2023.03.21.18.34.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 21 Mar 2023 18:34:26 -0700 (PDT)
+From:   Mathias Krause <minipli@grsecurity.net>
+To:     kvm@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org,
+        Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Mathias Krause <minipli@grsecurity.net>
+Subject: [PATCH v4 0/6] KVM: MMU: performance tweaks for heavy CR0.WP users
+Date:   Wed, 22 Mar 2023 02:37:25 +0100
+Message-Id: <20230322013731.102955-1-minipli@grsecurity.net>
+X-Mailer: git-send-email 2.39.2
 MIME-Version: 1.0
-In-Reply-To: <75f843b2780fc3c3dcc1d0d8f78f2b955956316b.camel@xry111.site>
-Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: AQAAf8BxX+Q2Wxpkt0MJAA--.37863S3
-X-CM-SenderInfo: p2kd03xldq233l6o00pqjv00gofq/
-X-Coremail-Antispam: 1Uk129KBjvdXoW7Xr18JrW8JryrtFyfurykKrg_yoWDZFb_Xr
-        s8JF15Ca1kWF4xtanIkFWrX347Gr43Zw15Aa1jqws0qr4rKry0qws3Krs2yrs3tw109F17
-        Cay5J3sIg3sxujkaLaAFLSUrUUUUnb8apTn2vfkv8UJUUUU8wcxFpf9Il3svdxBIdaVrn0
-        xqx4xG64xvF2IEw4CE5I8CrVC2j2Jv73VFW2AGmfu7bjvjm3AaLaJ3UjIYCTnIWjp_UUUO
-        17kC6x804xWl14x267AKxVWUJVW8JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0rVWrJVCq3w
-        AFIxvE14AKwVWUXVWUAwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK021l84ACjcxK
-        6xIIjxv20xvE14v26r4j6ryUM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j6F4UM28EF7
-        xvwVC2z280aVAFwI0_Cr0_Gr1UM28EF7xvwVC2z280aVCY1x0267AKxVW8JVW8Jr1ln4kS
-        14v26r126r1DM2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12xvs2x26I8E6xACxx
-        1l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r126r1DMcIj6I8E87Iv
-        67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lc7I2V7IY0VAS07
-        AlzVAYIcxG8wCY1x0262kKe7AKxVWUAVWUtwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE
-        7xkEbVWUJVW8JwCFI7km07C267AKxVWUAVWUtwC20s026c02F40E14v26r1j6r18MI8I3I
-        0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAI
-        cVC0I7IYx2IY67AKxVWUCVW8JwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcV
-        CF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIE
-        c7CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7IU8Dl1DUUUUU==
-X-Spam-Status: No, score=3.6 required=5.0 tests=NICE_REPLY_A,RCVD_IN_SBL_CSS,
-        SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+X-Spam-Status: No, score=0.2 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
+        DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
         version=3.4.6
-X-Spam-Level: ***
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+v3: https://lore.kernel.org/kvm/20230201194604.11135-1-minipli@grsecurity.net/
+
+This series is the fourth iteration of resurrecting the missing pieces of
+Paolo's previous attempt[1] to avoid needless MMU roots unloading.
+
+It's incorporating Sean's feedback to v3 and rebased on top of
+kvm-x86/next, namely commit d8708b80fa0e ("KVM: Change return type of
+kvm_arch_vm_ioctl() to "int"").
+
+The performance gap between TDP and legacy MMU is still existent,
+especially noticeable under grsecurity which implements kernel W^X by
+toggling CR0.WP, which happens very frequently. This series tries to fix
+this needless performance loss.
+
+Patch 1 is a v3 of [3], addressing Sean's feedback.
+
+Patch 2 implements Sean's feedback[2] to Paolo's original approach and
+skips unloading the MMU roots for CR0.WP toggling under TDP.
+
+Patch 3 further micro-optimizes this for non-paging guests -- anyone still
+running MS Singularity? ;)
+
+Sean was suggesting another change on top of v2 of this series (and then
+again a more elaborate version on top of v3), to skip intercepting CR0.WP
+writes completely for VMX[4]. That turned out to be yet another
+performance boost and is implemented in patch 6.
+
+Patches 2 and 6 are the most important ones, as they bring the big
+performance gains.
+
+I used 'ssdd 10 50000' from rt-tests[5] as a micro-benchmark, running on a
+grsecurity L1 VM. Below table shows the results (runtime in seconds, lower
+is better):
+
+                              legacy     TDP    shadow
+    kvm-x86/next@d8708b        8.43s    9.45s    70.3s
+    + patches 1-3              5.39s    5.63s    70.2s
+    + patches 4-6              3.51s    3.47s    67.8s
+
+I re-ran the benchmarks (again) and the numbers changed a little from the
+ones in v3. We got a better baseline which is likely caused by the rebase
+to a v6.3-rc2 based tree (was v6.2-rc3 based before).
+
+Patches 1, 4 and 5 didn't change from v3, beside minor changelog tweaks.
+
+Patches 2 and 6 have been rewritten.
+
+Patch 3 is new to this series.
+
+Bonus rant^Wbug report:
+
+Actually re-running the benchmarks took me a while because my VM was
+constantly crashing on me with a #GP during scheduling. Looking a little
+closer, I noticed it was for a IA32_PRED_CMD MSR write which was puzzling,
+as the VM's kernel didn't change for my tests (built it more than a month
+ago!), so the old test runs should have triggered that code path (and #GP)
+too! Digging through some kernel code let me see it's all tied to the x86
+feature flag X86_FEATURE_USE_IBPB which gets set when X86_FEATURE_IBPB is,
+i.e. the CPU supports IBPB.
+
+*head-scratching pause* 
+
+Foolish me probably did a system update of the host and got a microcode
+update that added IBPB support to my CPU. Yayyy... NOT! As this implies
+announcing IBPB support to the VM as well and, in turn, makes the guest
+kernel try to use it, I'm doomed to hit that bug. *bummer*
+
+Something must not be right with KVM / QEMU / the kernel, as this guest
+behaviour clearly shouldn't cause KVM to inject a #GP into the guest.
+
+The bugging call chain in the guest kernel is:
+  -> switch_mm_irqs_off()
+     -> cond_mitigation()
+        -> indirect_branch_prediction_barrier()
+           -> alternative_msr_write(MSR_IA32_PRED_CMD, val, X86_FEATURE_USE_IBPB))
+
+So far I'm working around this by passing 'clearcpuid=ibpb' on the kernel
+commandline. But this should probably be fixed, that's why I'm mentioning
+it. It's just too late here already to debug this further today. Well, for
+some definition of "today."
 
 
-在 2023年03月21日 20:30, Xi Ruoyao 写道:
-> On Tue, 2023-03-21 at 11:56 +0800, Tianrui Zhao wrote:
->> +/* Tracepoints for VM exits */
->> +#define kvm_trace_symbol_exit_types                    \
->> +       ({ KVM_TRACE_EXIT_IDLE,         "IDLE" },       \
->> +       { KVM_TRACE_EXIT_CACHE,         "CACHE" },      \
->> +       { KVM_TRACE_EXIT_SIGNAL,        "Signal" })
-> Looks like there shouldn't be "(" and ")".
->
->> +#define kvm_trace_symbol_aux_op				\
->> +	({ KVM_TRACE_AUX_RESTORE,	"restore" },	\
->> +	{ KVM_TRACE_AUX_SAVE,		"save" },	\
->> +	{ KVM_TRACE_AUX_ENABLE,		"enable" },	\
->> +	{ KVM_TRACE_AUX_DISABLE,	"disable" },	\
->> +	{ KVM_TRACE_AUX_DISCARD,	"discard" })
-> Likewise.
->
-> See the test robot report, and https://godbolt.org/z/bE8q97z1o.
->
-> The lesson: if a text book claims "you should always wrap the content of
-> a macro in ( ... )", we should burn it in the fire! :)
->
+Thanks,
+Mathias
 
-Thanks, it should remove the "()" statement in the macros. The reason I 
-did this before because an error was triggered when I use checkpatch.py 
-to check it,  and now I know this error can be ignored.
+[1] https://lore.kernel.org/kvm/20220217210340.312449-1-pbonzini@redhat.com/
+[2] https://lore.kernel.org/kvm/YhATewkkO%2Fl4P9UN@google.com/
+[3] https://lore.kernel.org/kvm/YhAB1d1%2FnQbx6yvk@google.com/
+[4] https://lore.kernel.org/kvm/Y8cTMnyBzNdO5dY3@google.com/
+[5] https://git.kernel.org/pub/scm/utils/rt-tests/rt-tests.git
 
-Thanks
-Tianrui Zhao
+
+Mathias Krause (5):
+  KVM: x86: Do not unload MMU roots when only toggling CR0.WP with TDP
+    enabled
+  KVM: x86: Ignore CR0.WP toggles in non-paging mode
+  KVM: x86: Make use of kvm_read_cr*_bits() when testing bits
+  KVM: x86/mmu: Fix comment typo
+  KVM: VMX: Make CR0.WP a guest owned bit
+
+Paolo Bonzini (1):
+  KVM: x86/mmu: Avoid indirect call for get_cr3
+
+ arch/x86/kvm/kvm_cache_regs.h  |  2 +-
+ arch/x86/kvm/mmu/mmu.c         | 31 ++++++++++++++++++++-----------
+ arch/x86/kvm/mmu/paging_tmpl.h |  2 +-
+ arch/x86/kvm/mmu/spte.c        |  2 +-
+ arch/x86/kvm/pmu.c             |  4 ++--
+ arch/x86/kvm/vmx/nested.c      |  4 ++--
+ arch/x86/kvm/vmx/vmx.c         |  6 +++---
+ arch/x86/kvm/vmx/vmx.h         | 18 ++++++++++++++++++
+ arch/x86/kvm/x86.c             | 18 ++++++++++++++++++
+ 9 files changed, 66 insertions(+), 21 deletions(-)
+
+-- 
+2.39.2
 
