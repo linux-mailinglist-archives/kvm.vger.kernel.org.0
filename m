@@ -2,85 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 00B076C47BC
-	for <lists+kvm@lfdr.de>; Wed, 22 Mar 2023 11:35:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AB6246C47C7
+	for <lists+kvm@lfdr.de>; Wed, 22 Mar 2023 11:37:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230270AbjCVKe5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Mar 2023 06:34:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47698 "EHLO
+        id S230321AbjCVKhf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Mar 2023 06:37:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51058 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230274AbjCVKex (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Mar 2023 06:34:53 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B973A4347A
-        for <kvm@vger.kernel.org>; Wed, 22 Mar 2023 03:34:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1679481246;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=rVkLd1gXXSaNzOK+vQH5hpvFlsKrXbqvBvpTSZkuN40=;
-        b=NnLJlmfTbMW8M3xPx80bU6/PCsDO6qXHxDueRCsbRWg7kt8H0YQy7q0T0yOj8t+IFKU42k
-        ANft8+5ji2w3KJmpTQBv555i2Qjlr7uUZ91Xy7GFpZsXwzV+ZCnrnrHrKeOP4Gc6fHRO4P
-        +BBmkHnewKk7Evuq60ovRgPYM/3aWlE=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-324-b5iL3yxZNV26tN2GMOdBpw-1; Wed, 22 Mar 2023 06:34:05 -0400
-X-MC-Unique: b5iL3yxZNV26tN2GMOdBpw-1
-Received: by mail-wm1-f72.google.com with SMTP id ay12-20020a05600c1e0c00b003ed201dcf71so8527383wmb.4
-        for <kvm@vger.kernel.org>; Wed, 22 Mar 2023 03:34:05 -0700 (PDT)
+        with ESMTP id S230310AbjCVKhc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Mar 2023 06:37:32 -0400
+Received: from mail-wm1-x330.google.com (mail-wm1-x330.google.com [IPv6:2a00:1450:4864:20::330])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EADF452F57;
+        Wed, 22 Mar 2023 03:37:31 -0700 (PDT)
+Received: by mail-wm1-x330.google.com with SMTP id p16so11178676wmq.5;
+        Wed, 22 Mar 2023 03:37:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112; t=1679481450;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cXY3dtEy0DFSpO9vMF3eqheQ80y59mk1IPKmUUcnHw4=;
+        b=ZvEImXvWLlZnHzB/uPkccpIeQrcbBMzUte9gqqBUQ9+aYAhQ2qUE2ce9TsDqpMKLd5
+         +mQ5+bFPecNmFOmpbQdlSxktsVH6WmLN6ZDqW4PSMSLfFpKFFucTyWauuNf59gY+YFMf
+         uk38VBQ9Q9jYVhPrK+iDkefM7U4YSr7woFga1RQnY/btMY8wHwaMWWzNydqI/+0Gwysh
+         HiYcyUQBDx49My68w4qmEQp4kAh7wUnas5DROGDlXRs0dHgz9OQsonY8EgvlplTTCUbD
+         Xv/8uCDwYciRSmjn/7OaagPTtoQN55L/NYKyLVsDYbaHp/hMn9iGmROCqGFAZM2a8EkK
+         7rnw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679481244;
-        h=user-agent:in-reply-to:content-transfer-encoding
-         :content-disposition:mime-version:references:message-id:subject:cc
-         :to:from:date:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=rVkLd1gXXSaNzOK+vQH5hpvFlsKrXbqvBvpTSZkuN40=;
-        b=jYt6/cmW0uKFBTQqvnCVQD8I9XNMZHTR23Kd4VaYzhfD1y+Qe59l+z6cvLlj6m6mpC
-         fPxgUqEO1PdXDrQ9f+KOGgQkJMH4dCn6O52YeKbzaDJynCYtwXX9LWFJDrwpKsq3Xg4u
-         Ho9ar/T4eWodNln6uh8FchsAA0inXeMrI/equEK+690jjp4qKqUtuA5+bUm6qjyqC67i
-         0qD8xlB3NUejL1G6ZjNfwSGB7Hy8iBI2BfyIfsNZBQ98m9tW8wkYLa1sPJItiPPH1HFC
-         Ol2L0/q1QB68jN9gD09Dvg14lzpiAuDiryqTVQdgORdgxMFwvilLVZwPadnHb37u4Qj+
-         etKQ==
-X-Gm-Message-State: AO0yUKWKNW8vlVV2enz5gq9+dfs94oRa5p3UXAaEEZdKrALmF8r3p5L+
-        j/IBXJjrhbFXPnF7Jp0lFImOVTDpE1Hy0BwszDmYHKjp6YMHmxkbqFcWQbCjAtp6TKUGUwbtV2m
-        D9mRsg8yAhlMlx8Joi8q+
-X-Received: by 2002:a05:600c:cc5:b0:3ed:2346:44bd with SMTP id fk5-20020a05600c0cc500b003ed234644bdmr1267217wmb.19.1679481244576;
-        Wed, 22 Mar 2023 03:34:04 -0700 (PDT)
-X-Google-Smtp-Source: AK7set8Thq76pPmJGxOxWXjQQrmoDtwTU00agbKDE5V4x+4LtRlKY6qAlszC5c92Bor2YpNIrUHo5Q==
-X-Received: by 2002:a05:600c:cc5:b0:3ed:2346:44bd with SMTP id fk5-20020a05600c0cc500b003ed234644bdmr1267207wmb.19.1679481244334;
-        Wed, 22 Mar 2023 03:34:04 -0700 (PDT)
-Received: from work-vm (ward-16-b2-v4wan-166627-cust863.vm18.cable.virginm.net. [81.97.203.96])
-        by smtp.gmail.com with ESMTPSA id a10-20020a056000050a00b002d78a96cf5fsm6368842wrf.70.2023.03.22.03.34.03
+        d=1e100.net; s=20210112; t=1679481450;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=cXY3dtEy0DFSpO9vMF3eqheQ80y59mk1IPKmUUcnHw4=;
+        b=K9PFkPz16yTnCgbns/bVe1aQIdQsTiDDPE4Qhcj1ZoxihcxA4+YiVwpX3taH2YK7uS
+         W0daA3gXuFnmlGpvvgsMhtbH3EElK7drCyrtDntvnmxE2UKO7rVZxmy/iQALiihnhLsn
+         WFX4KeYzBHaKnjwYJ0Lg95YD9uMJPqyglE/mQl2DvSQOmp0P+J0NyzJFBJHC+Xt4kfr/
+         3wTNdhys5QszkkLrS07uDPW8srHmeyFED36DvD9cuYBrrJAfYmudU7JJS56nwrxIMBhR
+         tnqok1XXogxEjJM1bcQ1Q7bnYqnEQ0yCi2rwrhYZ2vuG5jEEGyeefJgty7SfJZDeqckL
+         m2yA==
+X-Gm-Message-State: AO0yUKUc3iAyTws0tFM1NvXNZE8fFEv1E/UVMwMAWK0j1f/xrnNg3ZG8
+        Gu99h2PScTQzcthM0oU6epcTY0aDttE=
+X-Google-Smtp-Source: AK7set8wjyAhRAJKpG1wItEV/9Sq5pZ1JXf92nIEtT1nfDZDVi0BjLq3WaWUnFeNRo2qaU1X0sfJgA==
+X-Received: by 2002:a7b:cc95:0:b0:3ed:346d:4534 with SMTP id p21-20020a7bcc95000000b003ed346d4534mr1361845wma.0.1679481450218;
+        Wed, 22 Mar 2023 03:37:30 -0700 (PDT)
+Received: from suse.localnet (host-79-35-102-94.retail.telecomitalia.it. [79.35.102.94])
+        by smtp.gmail.com with ESMTPSA id f9-20020a05600c154900b003ede03e4369sm10839725wmg.33.2023.03.22.03.37.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Mar 2023 03:34:04 -0700 (PDT)
-Date:   Wed, 22 Mar 2023 10:34:01 +0000
-From:   "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To:     Alexander Graf <graf@amazon.com>
-Cc:     =?iso-8859-1?Q?J=F6rg_R=F6del?= <jroedel@suse.de>,
-        amd-sev-snp@lists.suse.com, linux-coco@lists.linux.dev,
-        kvm@vger.kernel.org
-Subject: Re: [ANNOUNCEMENT] COCONUT Secure VM Service Module for SEV-SNP
-Message-ID: <ZBrZmbfWXVQLND/E@work-vm>
-References: <ZBl4592947wC7WKI@suse.de>
- <ZBnH600JIw1saZZ7@work-vm>
- <ZBnMZsWMJMkxOelX@suse.de>
- <ZBnhtEsMhuvwfY75@work-vm>
- <ZBn/ZbFwT9emf5zw@suse.de>
- <ZBoLVktt77F9paNV@work-vm>
- <ZBrIFnlPeCsP0x2g@suse.de>
- <444b0d8d-3a8c-8e6d-1df3-35f57046e58e@amazon.com>
+        Wed, 22 Mar 2023 03:37:29 -0700 (PDT)
+From:   "Fabio M. De Francesco" <fmdefrancesco@gmail.com>
+To:     virtualization@lists.linux-foundation.org,
+        Stefano Garzarella <sgarzare@redhat.com>
+Cc:     stefanha@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>,
+        Andrey Zhadchenko <andrey.zhadchenko@virtuozzo.com>,
+        eperezma@redhat.com, netdev@vger.kernel.org,
+        Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Stefano Garzarella <sgarzare@redhat.com>, ira.weiny@intel.com
+Subject: Re: [PATCH v3 3/8] vringh: replace kmap_atomic() with kmap_local_page()
+Date:   Wed, 22 Mar 2023 11:37:27 +0100
+Message-ID: <4499457.LvFx2qVVIh@suse>
+In-Reply-To: <20230321154228.182769-4-sgarzare@redhat.com>
+References: <20230321154228.182769-1-sgarzare@redhat.com>
+ <20230321154228.182769-4-sgarzare@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <444b0d8d-3a8c-8e6d-1df3-35f57046e58e@amazon.com>
-User-Agent: Mutt/2.2.9 (2022-11-12)
-X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="iso-8859-1"
+X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
+        DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -88,65 +77,91 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-* Alexander Graf (graf@amazon.com) wrote:
-> Hi Jörg,
-> 
-> On 22.03.23 10:19, Jörg Rödel wrote:
-> 
-> > On Tue, Mar 21, 2023 at 07:53:58PM +0000, Dr. David Alan Gilbert wrote:
-> > > OK; the other thing that needs to get nailed down for the vTPM's is the
-> > > relationship between the vTPM attestation and the SEV attestation.
-> > > i.e. how to prove that the vTPM you're dealing with is from an SNP host.
-> > > (Azure have a hack of putting an SNP attestation report into the vTPM
-> > > NVRAM; see
-> > > https://github.com/Azure/confidential-computing-cvm-guest-attestation/blob/main/cvm-guest-attestation.md
-> > > )
-> > When using the SVSM TPM protocol it should be proven already that the
-> > vTPM is part of the SNP trusted base, no? The TPM communication is
-> > implicitly encrypted by the VMs memory key and the SEV attestation
-> > report proves that the correct vTPM is executing.
-> 
-> 
-> What you want to achieve eventually is to take a report from the vTPM and
-> submit only that to an external authorization entity that looks at it and
-> says "Yup, you ran in SEV-SNP, I trust your TCB, I trust your TPM
-> implementation, I also trust your PCR values" and based on that provides
-> access to whatever resource you want to access.
-> 
-> To do that, you need to link SEV-SNP and TPM measurements/reports together.
-> And the easiest way to do that is by providing the SEV-SNP report as part of
-> the TPM: You can then use the hash of the SEV-SNP report as signing key for
-> example.
+On marted=EC 21 marzo 2023 16:42:23 CET Stefano Garzarella wrote:
+> kmap_atomic() is deprecated in favor of kmap_local_page() since commit
+> f3ba3c710ac5 ("mm/highmem: Provide kmap_local*").
+>=20
+> With kmap_local_page() the mappings are per thread, CPU local, can take
+> page-faults, and can be called from any context (including interrupts).
+> Furthermore, the tasks can be preempted and, when they are scheduled to
+> run again, the kernel virtual addresses are restored and still valid.
+>=20
+> kmap_atomic() is implemented like a kmap_local_page() which also disables
+> page-faults and preemption (the latter only for !PREEMPT_RT kernels,
+> otherwise it only disables migration).
+>=20
+> The code within the mappings/un-mappings in getu16_iotlb() and
+> putu16_iotlb() don't depend on the above-mentioned side effects of
+> kmap_atomic(), so that mere replacements of the old API with the new one
+> is all that is required (i.e., there is no need to explicitly add calls
+> to pagefault_disable() and/or preempt_disable()).
+>=20
+> This commit reuses a "boiler plate" commit message from Fabio, who has
+> already did this change in several places.
+>=20
 
-Yeh; I think the SVSM TPM protocol has some proof of that as well; the
-SVSM spec lists 'SVSM_ATTEST_SINGLE_SERVICE Manifest Data' that contains
-'TPMT_PUBLIC structure of the endorsement key'.
-So I *think* that's saying that the SEV attestation report contains
-something from the EK of the vTPM.
+=46WIW, I can confirm that the conversions here are safe...
 
-> I think the key here is that you need to propagate that link to an external
-> party, not (only) to the VM.
+Reviewed-by: Fabio M. De Francesco <fmdefrancesco@gmail.com>
 
-Yeh.
+Thanks,
 
-Dave
-> 
-> 
-> Alex
-> 
-> 
-> 
-> 
-> 
-> Amazon Development Center Germany GmbH
-> Krausenstr. 38
-> 10117 Berlin
-> Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
-> Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
-> Sitz: Berlin
-> Ust-ID: DE 289 237 879
-> 
-> 
--- 
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+=46abio
+
+P.S.: I had to send this message again because my former contained HTML par=
+ts=20
+and so it was rejected by the mailing lists. I don't yet know how HTML crep=
+t=20
+into my text.
+
+> Cc: "Fabio M. De Francesco" <fmdefrancesco@gmail.com>
+> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+> ---
+>=20
+> Notes:
+>     v3:
+>     - credited Fabio for the commit message
+>     - added reference to the commit that deprecated kmap_atomic() [Jason]
+>     v2:
+>     - added this patch since checkpatch.pl complained about deprecation
+>       of kmap_atomic() touched by next patch
+>=20
+>  drivers/vhost/vringh.c | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
+>=20
+> diff --git a/drivers/vhost/vringh.c b/drivers/vhost/vringh.c
+> index a1e27da54481..0ba3ef809e48 100644
+> --- a/drivers/vhost/vringh.c
+> +++ b/drivers/vhost/vringh.c
+> @@ -1220,10 +1220,10 @@ static inline int getu16_iotlb(const struct vringh
+> *vrh, if (ret < 0)
+>  		return ret;
+>=20
+> -	kaddr =3D kmap_atomic(iov.bv_page);
+> +	kaddr =3D kmap_local_page(iov.bv_page);
+>  	from =3D kaddr + iov.bv_offset;
+>  	*val =3D vringh16_to_cpu(vrh, READ_ONCE(*(__virtio16 *)from));
+> -	kunmap_atomic(kaddr);
+> +	kunmap_local(kaddr);
+>=20
+>  	return 0;
+>  }
+> @@ -1241,10 +1241,10 @@ static inline int putu16_iotlb(const struct vringh
+> *vrh, if (ret < 0)
+>  		return ret;
+>=20
+> -	kaddr =3D kmap_atomic(iov.bv_page);
+> +	kaddr =3D kmap_local_page(iov.bv_page);
+>  	to =3D kaddr + iov.bv_offset;
+>  	WRITE_ONCE(*(__virtio16 *)to, cpu_to_vringh16(vrh, val));
+> -	kunmap_atomic(kaddr);
+> +	kunmap_local(kaddr);
+>=20
+>  	return 0;
+>  }
+> --
+> 2.39.2
+
+
+
 
