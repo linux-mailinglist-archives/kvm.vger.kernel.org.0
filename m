@@ -2,166 +2,141 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A67B26C4D7A
-	for <lists+kvm@lfdr.de>; Wed, 22 Mar 2023 15:22:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DC0BE6C4D2D
+	for <lists+kvm@lfdr.de>; Wed, 22 Mar 2023 15:12:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231443AbjCVOWp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Mar 2023 10:22:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34128 "EHLO
+        id S230187AbjCVOMg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Mar 2023 10:12:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39096 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231448AbjCVOWn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Mar 2023 10:22:43 -0400
-Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC56959ED;
-        Wed, 22 Mar 2023 07:22:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1679494946; x=1711030946;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=StLSUG9jSdG4qzMIdPRlmgOzudWc7UibT0yv+xP5TNI=;
-  b=lknA6XlkU4H+l8j21jG53FbM8/Pp292PGvpmqyKXQQA5/FRi5SCOksvP
-   zdLlrPQCO2MjnjwE9Cr6UJsMg/tRq2K7t2ojowYqwlIcj7GBb5A5VlHqw
-   74VEtHV7GxJxGQI66iBeJfKL3qlfVcYbELxw7CGcM+hwngjUJKV+gft3Z
-   kzCIz/kC62l9C2yZNZXksKElMWlobwO+D71hcjLc4nLavp2ZaZFXhh6jo
-   pB87uiAT5D10V9fS7UKQYG/mf2/CcB0pkcCgMY/jESIpug1Th5AUOKbco
-   xhyMvEI+lBg9B5dBECd7M8giV7SQPNFQT7xp+HDzGFZCe9OUPh/et7ysE
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10657"; a="340760576"
-X-IronPort-AV: E=Sophos;i="5.98,282,1673942400"; 
-   d="scan'208";a="340760576"
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Mar 2023 07:22:26 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10657"; a="927846116"
-X-IronPort-AV: E=Sophos;i="5.98,282,1673942400"; 
-   d="scan'208";a="927846116"
-Received: from yilunxu-optiplex-7050.sh.intel.com (HELO localhost) ([10.239.159.165])
-  by fmsmga006.fm.intel.com with ESMTP; 22 Mar 2023 07:22:20 -0700
-Date:   Wed, 22 Mar 2023 22:10:55 +0800
-From:   Xu Yilun <yilun.xu@intel.com>
-To:     Yi Liu <yi.l.liu@intel.com>
-Cc:     alex.williamson@redhat.com, jgg@nvidia.com, kevin.tian@intel.com,
-        joro@8bytes.org, robin.murphy@arm.com, cohuck@redhat.com,
-        eric.auger@redhat.com, nicolinc@nvidia.com, kvm@vger.kernel.org,
-        mjrosato@linux.ibm.com, chao.p.peng@linux.intel.com,
-        yi.y.sun@linux.intel.com, peterx@redhat.com, jasowang@redhat.com,
-        shameerali.kolothum.thodi@huawei.com, lulu@redhat.com,
-        suravee.suthikulpanit@amd.com, intel-gvt-dev@lists.freedesktop.org,
-        intel-gfx@lists.freedesktop.org, linux-s390@vger.kernel.org,
-        xudong.hao@intel.com, yan.y.zhao@intel.com, terrence.xu@intel.com
-Subject: Re: [PATCH v6 05/24] kvm/vfio: Accept vfio device file from userspace
-Message-ID: <ZBsMb3L4LmmK5tHW@yilunxu-OptiPlex-7050>
-References: <20230308132903.465159-1-yi.l.liu@intel.com>
- <20230308132903.465159-6-yi.l.liu@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230308132903.465159-6-yi.l.liu@intel.com>
-X-Spam-Status: No, score=-2.5 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.6
+        with ESMTP id S229555AbjCVOMe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Mar 2023 10:12:34 -0400
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F5B261331
+        for <kvm@vger.kernel.org>; Wed, 22 Mar 2023 07:12:24 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-5411f21f849so189311177b3.16
+        for <kvm@vger.kernel.org>; Wed, 22 Mar 2023 07:12:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112; t=1679494343;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=h3g8Rn77aV2QcyJGm9ePKuJvFxr4MQGLJYaNKJMKDWU=;
+        b=r3mX0acHgQFJ/12GN3ObmLvXudUkJrxw9cCmhw7vFuhOdavMwvBHJvlPQzoM9ZnLwg
+         MvwtnJVXs2hfUcZXcO4ksYztfpbTOdQtPxGfDGOu7ZKeA3KBKO5HgxS5D+oIvjUJZut5
+         YdZe0Fkq8vI1FqZp//uQpLX/+hvNC9g8yAp8rYj6poswJxK9Qe7fIYyAmWN/Ts7SCtrW
+         l/9hx6gJ+y3K29/RprDY2OpfnUqLLdinU1/+HANADLUpUJRRcMHNhrEoUT3E9DPucq4x
+         OZgeodp/IwCYc6WqkL4h46eiziMvO7xKLFNh2Ruh4CQiLEIeue98vW88tqjs4djKGlhQ
+         f3VA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1679494343;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=h3g8Rn77aV2QcyJGm9ePKuJvFxr4MQGLJYaNKJMKDWU=;
+        b=R5wRO+7Vi2Dwpgec0PzPS+1ZwVhjAszDEc+v0kmNafHlIuCwGFHY+OkvVD2EpvTapP
+         DMj3lRc/07yUIVaQCdmQ3VgAJW/Q/ysqWLLdPQHdkDJRKU0U0a662lv6+X+6lkLe4OM7
+         k3+ncD5cI4528sZes3CkzXhSsv7NFZ/YyTv3oIl5sUOzL01U8T4BNu0e3mz/s7CNJEBt
+         E6oJmrmlyFmXEi6hZQPF6H6ATx5ua/hzJnUacS+IPAqUPlunoULz1b2QqEfPZ+HPhPoF
+         272VkATjgjBlVzkoOAiE4iBshU8GcD/9YJybrcbVkJXxiZGOzmoYrojgadrcka7xi2t7
+         Avcw==
+X-Gm-Message-State: AAQBX9fn5m7M3aMXz1wbz4QxQ7kJlU89vYLIkXD1pKkH3pUoSrNejCrP
+        0v1NQBFReUKS/iZTzqI8fy7N/LU6awk=
+X-Google-Smtp-Source: AKy350YjDBGga+E95xC44mu6eIl/sGGbUle3DeXTznmceO6Y5LmPpD76/SMxGXNVMpR7fsEKiLQl8FcjBo4=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:1247:b0:a5f:0:bf12 with SMTP id
+ t7-20020a056902124700b00a5f0000bf12mr3324492ybu.13.1679494343468; Wed, 22 Mar
+ 2023 07:12:23 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Wed, 22 Mar 2023 07:12:20 -0700
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.40.0.rc2.332.ga46443480c-goog
+Message-ID: <20230322141220.2206241-1-seanjc@google.com>
+Subject: [PATCH] KVM: x86: Suppress pending MMIO write exits if emulator
+ detects exception
+From:   Sean Christopherson <seanjc@google.com>
+To:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        zhangjianguo <zhangjianguo18@huawei.com>,
+        syzbot+760a73552f47a8cd0fd9@syzkaller.appspotmail.com,
+        syzbot+8accb43ddc6bd1f5713a@syzkaller.appspotmail.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-7.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2023-03-08 at 05:28:44 -0800, Yi Liu wrote:
-> This defines KVM_DEV_VFIO_FILE* and make alias with KVM_DEV_VFIO_GROUP*.
-> Old userspace uses KVM_DEV_VFIO_GROUP* works as well.
-> 
-> Signed-off-by: Yi Liu <yi.l.liu@intel.com>
-> Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
-> Tested-by: Terrence Xu <terrence.xu@intel.com>
-> Tested-by: Nicolin Chen <nicolinc@nvidia.com>
-> Tested-by: Matthew Rosato <mjrosato@linux.ibm.com>
-> ---
->  Documentation/virt/kvm/devices/vfio.rst | 52 +++++++++++++++++--------
->  include/uapi/linux/kvm.h                | 16 ++++++--
->  virt/kvm/vfio.c                         | 16 ++++----
->  3 files changed, 55 insertions(+), 29 deletions(-)
-> 
-> diff --git a/Documentation/virt/kvm/devices/vfio.rst b/Documentation/virt/kvm/devices/vfio.rst
-> index 79b6811bb4f3..5b05b48abaab 100644
-> --- a/Documentation/virt/kvm/devices/vfio.rst
-> +++ b/Documentation/virt/kvm/devices/vfio.rst
-> @@ -9,24 +9,37 @@ Device types supported:
->    - KVM_DEV_TYPE_VFIO
->  
->  Only one VFIO instance may be created per VM.  The created device
-> -tracks VFIO groups in use by the VM and features of those groups
-> -important to the correctness and acceleration of the VM.  As groups
-> -are enabled and disabled for use by the VM, KVM should be updated
-> -about their presence.  When registered with KVM, a reference to the
-> -VFIO-group is held by KVM.
-> +tracks VFIO files (group or device) in use by the VM and features
-> +of those groups/devices important to the correctness and acceleration
-> +of the VM.  As groups/devices are enabled and disabled for use by the
-> +VM, KVM should be updated about their presence.  When registered with
-> +KVM, a reference to the VFIO file is held by KVM.
->  
->  Groups:
-> -  KVM_DEV_VFIO_GROUP
-> -
-> -KVM_DEV_VFIO_GROUP attributes:
-> -  KVM_DEV_VFIO_GROUP_ADD: Add a VFIO group to VFIO-KVM device tracking
-> -	kvm_device_attr.addr points to an int32_t file descriptor
-> -	for the VFIO group.
-> -  KVM_DEV_VFIO_GROUP_DEL: Remove a VFIO group from VFIO-KVM device tracking
-> -	kvm_device_attr.addr points to an int32_t file descriptor
-> -	for the VFIO group.
-> -  KVM_DEV_VFIO_GROUP_SET_SPAPR_TCE: attaches a guest visible TCE table
-> +  KVM_DEV_VFIO_FILE
-> +	alias: KVM_DEV_VFIO_GROUP
-> +
-> +KVM_DEV_VFIO_FILE attributes:
-> +  KVM_DEV_VFIO_FILE_ADD: Add a VFIO file (group/device) to VFIO-KVM device
-> +	tracking
-> +
-> +	alias: KVM_DEV_VFIO_GROUP_ADD
-> +
-> +	kvm_device_attr.addr points to an int32_t file descriptor for the
-> +	VFIO file.
+Clear vcpu->mmio_needed when injecting an exception from the emulator to
+squash a (legitimate) warning about vcpu->mmio_needed being true at the
+start of KVM_RUN without a callback being registered to complete the
+userspace MMIO exit.  Suppressing the MMIO write exit is inarguably wrong
+from an architectural perspective, but it is the least awful hack-a-fix
+due to shortcomings in KVM's uAPI, not to mention that KVM already
+suppresses MMIO writes in this scenario.
 
-A blank line here to be consistent with other attibutes.
+Outside of REP string instructions, KVM doesn't provide a way to resume
+an instruction at the exact point where it was "interrupted" if said
+instruction partially completed before encountering an MMIO access.  For
+MMIO reads, KVM immediately exits to userspace upon detecting MMIO as
+userspace provides the to-be-read value in a buffer, and so KVM can safely
+(more or less) restart the instruction from the beginning.  When the
+emulator re-encounters the MMIO read, KVM will service the MMIO by getting
+the value from the buffer instead of exiting to userspace, i.e. KVM won't
+put the vCPU into an infinite loop.
 
-> +  KVM_DEV_VFIO_FILE_DEL: Remove a VFIO file (group/device) from VFIO-KVM
-> +	device tracking
-> +
-> +	alias: KVM_DEV_VFIO_GROUP_DEL
-> +
-> +	kvm_device_attr.addr points to an int32_t file descriptor for the
-> +	VFIO file.
-> +
-> +  KVM_DEV_VFIO_FILE_SET_SPAPR_TCE: attaches a guest visible TCE table
->  	allocated by sPAPR KVM.
-> +
-> +	alias: KVM_DEV_VFIO_GROUP_SET_SPAPR_TCE
-> +
->  	kvm_device_attr.addr points to a struct::
->  
->  		struct kvm_vfio_spapr_tce {
-> @@ -40,9 +53,14 @@ KVM_DEV_VFIO_GROUP attributes:
->  	- @tablefd is a file descriptor for a TCE table allocated via
->  	  KVM_CREATE_SPAPR_TCE.
->  
-> +	only accepts vfio group file as SPAPR has no iommufd support
-> +
->  ::
->  
-> -The GROUP_ADD operation above should be invoked prior to accessing the
-> +The FILE/GROUP_ADD operation above should be invoked prior to accessing the
->  device file descriptor via VFIO_GROUP_GET_DEVICE_FD in order to support
->  drivers which require a kvm pointer to be set in their .open_device()
-> -callback.
-> +callback.  It is the same for device file descriptor via character device
-> +open which gets device access via VFIO_DEVICE_BIND_IOMMUFD.  For such file
-> +descriptors, FILE_ADD should be invoked before VFIO_DEVICE_BIND_IOMMUFD
-> +to support the drivers mentioned in piror sentence as well.
+On an emulated MMIO write, KVM finishes the instruction before exiting to
+userspace, as exiting immediately would ultimately hang the vCPU due to
+the aforementioned shortcoming of KVM not being able to resume emulation
+in the middle of an instruction.
 
-s/piror/prior
+For the vast majority of _emulated_ instructions, deferring the userspace
+exit doesn't cause problems as very few x86 instructions (again ignoring
+string operations) generate multiple writes.  But for instructions that
+generate multiple writes, e.g. PUSHA (multiple pushes onto the stack),
+deferring the exit effectively results in only the final write triggering
+an exit to userspace.  KVM does support multiple MMIO "fragments", but
+only for page splits; if an instruction performs multiple distinct MMIO
+writes, the number of fragments gets reset when the next MMIO write comes
+along and any previous MMIO writes are dropped.
 
-Thanks,
-Yilun
+Circling back to the warning, if a deferred MMIO write coincides with an
+exception, e.g. in this case a #SS due to PUSHA underflowing the stack
+after queueing a write to an MMIO page on a previous push, KVM injects
+the exceptions and leaves the deferred MMIO pending without registering a
+callback, thus triggering the splat.
+
+Sweep the problem under the proverbial rug as dropping MMIO writes is not
+unique to the exception scenario (see above), i.e. instructions like PUSHA
+are fundamentally broken with respect to MMIO, and have been since KVM's
+inception.
+
+Reported-by: zhangjianguo <zhangjianguo18@huawei.com>
+Reported-by: syzbot+760a73552f47a8cd0fd9@syzkaller.appspotmail.com
+Reported-by: syzbot+8accb43ddc6bd1f5713a@syzkaller.appspotmail.com
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kvm/x86.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index f706621c35b8..6a3e358a32a6 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -8881,6 +8881,8 @@ int x86_emulate_instruction(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
+ 	}
+ 
+ 	if (ctxt->have_exception) {
++		WARN_ON_ONCE(vcpu->mmio_needed && !vcpu->mmio_is_write);
++		vcpu->mmio_needed = false;
+ 		r = 1;
+ 		inject_emulated_exception(vcpu);
+ 	} else if (vcpu->arch.pio.count) {
+
+base-commit: 45dd9bc75d9adc9483f0c7d662ba6e73ed698a0b
+-- 
+2.40.0.rc2.332.ga46443480c-goog
+
