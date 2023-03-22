@@ -2,67 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 914136C531C
-	for <lists+kvm@lfdr.de>; Wed, 22 Mar 2023 18:57:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 766276C5324
+	for <lists+kvm@lfdr.de>; Wed, 22 Mar 2023 18:58:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230294AbjCVR5h (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Mar 2023 13:57:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59024 "EHLO
+        id S230081AbjCVR6x (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Mar 2023 13:58:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60530 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230081AbjCVR5g (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Mar 2023 13:57:36 -0400
-Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C4E46151F
-        for <kvm@vger.kernel.org>; Wed, 22 Mar 2023 10:57:33 -0700 (PDT)
-Received: by mail-pg1-x54a.google.com with SMTP id s9-20020a634509000000b004fc1c14c9daso4940287pga.23
-        for <kvm@vger.kernel.org>; Wed, 22 Mar 2023 10:57:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1679507852;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=t4lediYx3DEhSpQl3gzYKlvCEJbXygtbU3i/RKlqt30=;
-        b=F5MCLmCiFBqbxNooctPDGa04IamkeYF3GV25R7x0cqsL1P35Zg4g6P22KPaCQrOh6b
-         pq3HX7mg+vDYT5sinhzj7NwNtCG0yvrpgPC7zR6C34i/ao1bJwjVLqjhF6GlA9vm+4DL
-         AbNAT4jBkpMalcOuzlXq6/Gd6QuBLL8TSSAFP9aBUtfapPNaJ1MmFAtRoK5QVCmmEjI5
-         A6WXymDdd4FWmdnr/y2PBt4UUHkbXId21E3i7Lme9EiJfjQ5hf77xoq2riR4jf0swPHu
-         hQkvTFP5bEOPe9dAvdMznIA5B7rG9p03QnMc8YKTgXKjSR81baj3NZVBBIYcL/gsg9it
-         kbCw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679507852;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=t4lediYx3DEhSpQl3gzYKlvCEJbXygtbU3i/RKlqt30=;
-        b=1fWg8WbcG3oHtvm1CGFuLaMSDD0skHM1/hzeTFnU+nMSeoNxu2vKkaymkcrWuzM0Fd
-         IyoOfnaZ+tm3c+A9m8U3o1otZDDOix+VJlm8sIKZHJSCUpy2wY22/o0dltoSbg4l0Bxa
-         APSXksttCRpHBy7YpKxZ9REvl6ADKx/4sIedgVQDme81cncAhPOG96hTt6UVUSNby4kp
-         CzXOGgoaLYsQhOHr3EbgEm7fb1uDsJMko0Pp0+9S8ZC/fNh5pDkBoWfvTReK1oOBoanE
-         jG4nzuhqI+XHJvMbuyxfanc0EUXrkxmv+43DxsGvlKp/bVtA4HUf33XZkPUby9r+iqhG
-         KJ7w==
-X-Gm-Message-State: AO0yUKW4QqdpdFyUl/YOcwW01jB3uyLFHkafLodnOrIjgg6+NbkzPEdL
-        hymkU2/Ui6q5jIKWKT63ru9f+3yKArQ=
-X-Google-Smtp-Source: AK7set9aBAH+U8K5EnQZmw/YKPlxH4leMMWRicdjeO4dtOsambf6PkNJpKhCNrbi3NDodtaR1odQjAiroOk=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:c408:b0:19f:1c79:8b24 with SMTP id
- k8-20020a170902c40800b0019f1c798b24mr1457989plk.7.1679507852624; Wed, 22 Mar
- 2023 10:57:32 -0700 (PDT)
-Date:   Wed, 22 Mar 2023 10:57:31 -0700
-In-Reply-To: <20230307023946.14516-34-xin3.li@intel.com>
-Mime-Version: 1.0
-References: <20230307023946.14516-1-xin3.li@intel.com> <20230307023946.14516-34-xin3.li@intel.com>
-Message-ID: <ZBtBizw+IuUKwztN@google.com>
-Subject: Re: [PATCH v5 33/34] KVM: x86/vmx: call external_interrupt() to
- handle IRQ in IRQ caused VM exits
-From:   Sean Christopherson <seanjc@google.com>
-To:     Xin Li <xin3.li@intel.com>
-Cc:     linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, hpa@zytor.com, peterz@infradead.org,
-        andrew.cooper3@citrix.com, pbonzini@redhat.com,
-        ravi.v.shankar@intel.com
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-7.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+        with ESMTP id S229980AbjCVR6v (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Mar 2023 13:58:51 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85404A1
+        for <kvm@vger.kernel.org>; Wed, 22 Mar 2023 10:58:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1679507882;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=M64+Ax7Z1KLZxDdHoHWW0+vnpH6T6Y8a3gCnVFAODd8=;
+        b=ebvKMenETuWuGrY9C7/9HTYcCNUz48wSFOZJgxj4BfE2dZa+OF+CyUpZRJUVcajUL4+zAu
+        LvCYH8H4Qk79n042JLTMU5xfAZpVdaUnNQHCYDbBmfP0qGjBlqjyYlSQCsbdwZkcA7oNSL
+        snW6bgncoPwJqq1bYBHMJHZ//aQWxnQ=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-611-fB22SGmqPHKLTcSoRANu8Q-1; Wed, 22 Mar 2023 13:57:59 -0400
+X-MC-Unique: fB22SGmqPHKLTcSoRANu8Q-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 73D383C218A1;
+        Wed, 22 Mar 2023 17:57:58 +0000 (UTC)
+Received: from redhat.com (unknown [10.33.36.160])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 78C85492C13;
+        Wed, 22 Mar 2023 17:57:57 +0000 (UTC)
+Date:   Wed, 22 Mar 2023 17:57:55 +0000
+From:   Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To:     Marc Orr <marcorr@google.com>
+Cc:     jejb@linux.ibm.com, =?utf-8?B?SsO2cmcgUsO2ZGVs?= <jroedel@suse.de>,
+        amd-sev-snp@lists.suse.com, linux-coco@lists.linux.dev,
+        kvm@vger.kernel.org
+Subject: Re: [ANNOUNCEMENT] COCONUT Secure VM Service Module for SEV-SNP
+Message-ID: <ZBtBoy+KVo/TZ6pl@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <ZBl4592947wC7WKI@suse.de>
+ <66eee693371c11bbd2173ad5d91afc740aa17b46.camel@linux.ibm.com>
+ <ZBmmjlNdBwVju6ib@suse.de>
+ <c2e8af835723c453adaba4b66db533a158076bbf.camel@linux.ibm.com>
+ <ZBnJ6ZCuQJTVMM8h@suse.de>
+ <7d615af4c6a9e5eeb0337d98c9e9ddca6d2cbdef.camel@linux.ibm.com>
+ <CAA03e5F=Giy5pWbcc9M+O+=FTqL0rrCWSzcgr8V2s-xqjpxKJA@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAA03e5F=Giy5pWbcc9M+O+=FTqL0rrCWSzcgr8V2s-xqjpxKJA@mail.gmail.com>
+User-Agent: Mutt/2.2.9 (2022-11-12)
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
+X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
         autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -70,49 +71,39 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Mar 06, 2023, Xin Li wrote:
-> @@ -6923,7 +6924,26 @@ static void handle_external_interrupt_irqoff(struct kvm_vcpu *vcpu)
->  		return;
->  
->  	kvm_before_interrupt(vcpu, KVM_HANDLING_IRQ);
-> -	vmx_do_interrupt_irqoff(gate_offset(desc));
-> +	if (cpu_feature_enabled(X86_FEATURE_FRED)) {
-> +		struct vcpu_vmx *vmx = to_vmx(vcpu);
-> +		struct pt_regs regs = {};
-> +
-> +		/*
-> +		 * Create an event return stack frame with the
-> +		 * host context immediately after a VM exit.
-
-Why snapshot the context immediately after VM-Exit?  It diverges from what is
-done in the non-FRED path, and it seems quite misleading and maybe even dangerous.
-The RSP and RIP values are long since gone, e.g. if something explodes, the stack
-trace will be outright wrong.
-
-> +		 *
-> +		 * All other fields of the pt_regs structure are
-> +		 * cleared to 0.
-> +		 */
-> +		regs.ss		= __KERNEL_DS;
-> +		regs.sp		= vmx->loaded_vmcs->host_state.rsp;
-> +		regs.flags	= X86_EFLAGS_FIXED;
-> +		regs.cs		= __KERNEL_CS;
-> +		regs.ip		= (unsigned long)vmx_vmexit;
-> +
-> +		external_interrupt(&regs, vector);
-
-I assume FRED still uses the stack, so why not do something similar to
-vmx_do_interrupt_irqoff() and build @regs after an explicit CALL?  Might even
-be possible to share some/all of VMX_DO_EVENT_IRQOFF.
-
-> +	} else
-
-Curly braces needed since the first half has 'em.
-
-> +		vmx_do_interrupt_irqoff(gate_offset(desc));
->  	kvm_after_interrupt(vcpu);
->  
->  	vcpu->arch.at_instruction_boundary = true;
-> -- 
-> 2.34.1
+On Tue, Mar 21, 2023 at 06:29:29PM -0700, Marc Orr wrote:
+> On Tue, Mar 21, 2023 at 1:05 PM James Bottomley <jejb@linux.ibm.com> wrote:
+> >
+> > > Of course we could start changing linux-svsm to support the same
+> > > goals, but I think the end result will not be very different from
+> > > what COCONUT looks now.
+> >
+> > That's entirely possible, so what are the chances of combining the
+> > projects now so we don't get a split in community effort?
 > 
+> Very cool to see this announcement and read the discussion!
+> 
+> One SVSM will be better for Google too. Specifically:
+> - One hypervisor/SVSM startup sequence is easier for us to get working
+> - One SVSM is easier to test/qualify/deploy
+> - Generally speaking, things will be easier for us if all SNP VMs
+> start running off of the same "first mutable code". I.e., the same
+> SVSM, UEFI, etc.
+
+I agree with this from the Red Hat side. We would prefer there to
+be a standard / common SVSM used by all [OSS] hypervisors/clouds,
+to reduce permutations that guest OS vendors/tenants have to
+develop/test/deploy against.
+
+It looks like even developing one high quality feature rich SVSM
+is a non-trivial undertaking, so I agree with James that it is
+undesirable to divide community resources across many competing
+impls, without a compelling justification.
+
+With regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+
