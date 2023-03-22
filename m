@@ -2,105 +2,171 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0E9AE6C5255
-	for <lists+kvm@lfdr.de>; Wed, 22 Mar 2023 18:21:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 647A16C52A1
+	for <lists+kvm@lfdr.de>; Wed, 22 Mar 2023 18:37:42 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229648AbjCVRVv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Mar 2023 13:21:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47582 "EHLO
+        id S229727AbjCVRhj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Mar 2023 13:37:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48338 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229836AbjCVRVt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Mar 2023 13:21:49 -0400
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 559A61DBBC
-        for <kvm@vger.kernel.org>; Wed, 22 Mar 2023 10:21:27 -0700 (PDT)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-5417f156cb9so194924897b3.8
-        for <kvm@vger.kernel.org>; Wed, 22 Mar 2023 10:21:27 -0700 (PDT)
+        with ESMTP id S229745AbjCVRhh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Mar 2023 13:37:37 -0400
+Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F8EC64AB1
+        for <kvm@vger.kernel.org>; Wed, 22 Mar 2023 10:37:24 -0700 (PDT)
+Received: by mail-pf1-x436.google.com with SMTP id z11so11585948pfh.4
+        for <kvm@vger.kernel.org>; Wed, 22 Mar 2023 10:37:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1679505683;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=76O02WUE0g6eJOczr8cqfk1ma9BWKFaFBJ26R68A8wg=;
-        b=k7inNZWz7vd/OQCF1Z4fDIHKAdlxFRy3qWK9TuqXeo+KhaokHQVARHM+S0ZTtZIhyU
-         mSv7IAVJKzONelUwXnP4lJUL/f0+mV97k/0f7n2vsjSp1vQ+2cOW+44Hg58HcV/Uw3B5
-         N17vxLXKUyY6/0136SUIqFRqIp6bNmlAQaXKZ7mwnhsAJ0bpWsS3xq2H9HceSuHje4zz
-         EknGjj2qy26yf+8wjNxrENhzST3sXkeBdNr4ycaqXHURIjUzYatoGy4uC8H9pnrdGF9+
-         U14MkM6znsON/GpzzItOmbAIx+dVUXM1uNxkKThrCjpMtqIJ7RImwwkxkXFWjJCnHv/+
-         7xEw==
+        d=google.com; s=20210112; t=1679506644;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mxkuqRl/yb2T6GWS8Wq1Cnpb9WKuo9byFw6bPkoxxJg=;
+        b=dkEtYVS0qeye+8Xs/2B4QFy36XUZuVGmlq4hQjusWVCLJxtWjiDTNUFliYcu19cI+0
+         5AlM3Noz9VBwnZlf7vwUV8pbMTMJSVZVUEbpojJY/6xTnUBPrwHNuIt89EaxYx1EX5vA
+         RbNleqOa72FrzX0r+wRjPkE1kqyniO/esSpytB9bmzW4nB4NHs0+6RPpAxo5W9prK/2h
+         cN6tD2AlFZWqCIqltm3Rmn0Otbd1sxeHJggS8twXYsJHb1riZIDo2jm6X5KzLffB7wnq
+         iF8jM3LdgDXghR93zp30XlCshDnFHBYDdInupBh5nyJ6Vd6e4xVCpdd1zNIDHjopN7nj
+         d9VA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679505683;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=76O02WUE0g6eJOczr8cqfk1ma9BWKFaFBJ26R68A8wg=;
-        b=03odZOsAam0WxLj61QLVyWGS915OIJpa4uV/4CpBTdeva5MyyymWU88XSJALUP9XAv
-         gxmBenoRqWwYDmkCbilV1PZ55AP4F+/I0i22kUvoCrtetvO5bnMfOHeX94Kj+gvw1U98
-         KaZecQMvRlbHiJivlhV+a+i56+aHPOFfnRM7dEbu08gfoyGl4nkT33tZA4y9iDivPah5
-         jSjagZa0fOxDPbbQlRN24c60kgckXrL638kDSxve6C1V5Zf36bPPY2sKM69lh2kXaniR
-         ysutPYBq6Sq7CpzcGSuKXWR2Z/nnHkBo7NJJyMHC01IOdyDH0Wv35eVa853p96A6DgAF
-         fSJA==
-X-Gm-Message-State: AAQBX9did3QcMBdhrsmZcatdGItU+NMM8MSZ+6o4kQbaiBSOtsWEL7uA
-        80M2msFCuylVFH3gzOC92odgEwPXEM4=
-X-Google-Smtp-Source: AKy350bJEJhNLbUTpql+V2P2dh5ZRNTp0zjzWhBiiWZxxRPIx42ttF/hOxoPB3QRlQqpRBYU47o9eG5UvMM=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:a782:0:b0:541:a17f:c77d with SMTP id
- e124-20020a81a782000000b00541a17fc77dmr307985ywh.10.1679505683599; Wed, 22
- Mar 2023 10:21:23 -0700 (PDT)
-Date:   Wed, 22 Mar 2023 10:21:22 -0700
-In-Reply-To: <20230322045824.22970-3-binbin.wu@linux.intel.com>
-Mime-Version: 1.0
-References: <20230322045824.22970-1-binbin.wu@linux.intel.com> <20230322045824.22970-3-binbin.wu@linux.intel.com>
-Message-ID: <ZBs5Eh0LrN/TMErj@google.com>
-Subject: Re: [PATCH 2/4] KVM: x86: Replace kvm_read_{cr0,cr4}_bits() with kvm_is_{cr0,cr4}_bit_set()
-From:   Sean Christopherson <seanjc@google.com>
-To:     Binbin Wu <binbin.wu@linux.intel.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, robert.hu@linux.intel.com
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-7.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+        d=1e100.net; s=20210112; t=1679506644;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=mxkuqRl/yb2T6GWS8Wq1Cnpb9WKuo9byFw6bPkoxxJg=;
+        b=4ZUQKpFjUluUE7YUbUwMRn0bm+nKjoISJ8qifoMZyVsbEVldfjXzA6L00+f1qvKYlv
+         6rZSqOTTOUNprhZmHcwyXzvbpnwzqx8DlpYrDlAQmS8wX2r18QpjEphrXLV1tzSmKFdA
+         e3PBZwqKBDUiXwjQVfj25GTEBfld1KvelpLz5mhCqnZN8+7YftSFxk3SGAa8OibovMPi
+         FjSN57L0XZKQwHLBGwstpVBn8usH8cFvMK7eum05zy2duH+mfWQZNxvmJtFEjo6WR2ie
+         UBdFbk9R4nfAfDbYGqLaqJX0RyrWKfjCJjO4zUtHfU+V5je3Lra4FgLy0wkB5A8sPBY1
+         8lNg==
+X-Gm-Message-State: AO0yUKXfw3DF5ayFHu7g1e6huLqwMATE/Mtrrs5pcjtzmLl/FSpTa8Pt
+        HnTNMYWeipRF1f78v4KtWhZcLPSONqoD5WyobFRDCQ==
+X-Google-Smtp-Source: AK7set+XcaZPhkLLqvZc4ur3Bq35Ooy73YP6UnvJ3RONmIW+luTAhqB9kxdSi/24R1YteS0yYkxd+sl3lzJgD3EyRbc=
+X-Received: by 2002:aa7:88c9:0:b0:623:20a0:bf51 with SMTP id
+ k9-20020aa788c9000000b0062320a0bf51mr2341747pff.2.1679506643613; Wed, 22 Mar
+ 2023 10:37:23 -0700 (PDT)
+MIME-Version: 1.0
+References: <ZBl4592947wC7WKI@suse.de> <ZBnH600JIw1saZZ7@work-vm>
+ <ZBnMZsWMJMkxOelX@suse.de> <ZBnhtEsMhuvwfY75@work-vm> <ZBn/ZbFwT9emf5zw@suse.de>
+ <ZBoLVktt77F9paNV@work-vm> <ZBrIFnlPeCsP0x2g@suse.de> <444b0d8d-3a8c-8e6d-1df3-35f57046e58e@amazon.com>
+ <ZBrZmbfWXVQLND/E@work-vm>
+In-Reply-To: <ZBrZmbfWXVQLND/E@work-vm>
+From:   Dionna Amalie Glaze <dionnaglaze@google.com>
+Date:   Wed, 22 Mar 2023 10:37:11 -0700
+Message-ID: <CAAH4kHbYc+Wx5W_S8XFch+z1B19U_Zm=hFQr1fj1rv1S8QOvxg@mail.gmail.com>
+Subject: Re: [ANNOUNCEMENT] COCONUT Secure VM Service Module for SEV-SNP
+To:     "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc:     Alexander Graf <graf@amazon.com>,
+        =?UTF-8?B?SsO2cmcgUsO2ZGVs?= <jroedel@suse.de>,
+        amd-sev-snp@lists.suse.com, linux-coco@lists.linux.dev,
+        kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-15.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,ENV_AND_HDR_SPF_MATCH,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL,
+        USER_IN_DEF_SPF_WL autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 22, 2023, Binbin Wu wrote:
-> Replace kvm_read_{cr0,cr4}_bits() with kvm_is_{cr0,cr4}_bit_set() when only
-> one bit is checked and bool is preferred as return value type.
-> Also change the return value type from int to bool of is_pae(), is_pse() and
-> is_paging().
+On Wed, Mar 22, 2023 at 3:34=E2=80=AFAM Dr. David Alan Gilbert
+<dgilbert@redhat.com> wrote:
+>
+> * Alexander Graf (graf@amazon.com) wrote:
+> > Hi J=C3=B6rg,
+> >
+> > On 22.03.23 10:19, J=C3=B6rg R=C3=B6del wrote:
+> >
+> > > On Tue, Mar 21, 2023 at 07:53:58PM +0000, Dr. David Alan Gilbert wrot=
+e:
+> > > > OK; the other thing that needs to get nailed down for the vTPM's is=
+ the
+> > > > relationship between the vTPM attestation and the SEV attestation.
+> > > > i.e. how to prove that the vTPM you're dealing with is from an SNP =
+host.
+> > > > (Azure have a hack of putting an SNP attestation report into the vT=
+PM
+> > > > NVRAM; see
+> > > > https://github.com/Azure/confidential-computing-cvm-guest-attestati=
+on/blob/main/cvm-guest-attestation.md
+> > > > )
+> > > When using the SVSM TPM protocol it should be proven already that the
+> > > vTPM is part of the SNP trusted base, no? The TPM communication is
+> > > implicitly encrypted by the VMs memory key and the SEV attestation
+> > > report proves that the correct vTPM is executing.
+> >
+> >
+> > What you want to achieve eventually is to take a report from the vTPM a=
+nd
+> > submit only that to an external authorization entity that looks at it a=
+nd
+> > says "Yup, you ran in SEV-SNP, I trust your TCB, I trust your TPM
+> > implementation, I also trust your PCR values" and based on that provide=
+s
+> > access to whatever resource you want to access.
+> >
+> > To do that, you need to link SEV-SNP and TPM measurements/reports toget=
+her.
+> > And the easiest way to do that is by providing the SEV-SNP report as pa=
+rt of
+> > the TPM: You can then use the hash of the SEV-SNP report as signing key=
+ for
+> > example.
+>
+> Yeh; I think the SVSM TPM protocol has some proof of that as well; the
+> SVSM spec lists 'SVSM_ATTEST_SINGLE_SERVICE Manifest Data' that contains
+> 'TPMT_PUBLIC structure of the endorsement key'.
+> So I *think* that's saying that the SEV attestation report contains
+> something from the EK of the vTPM.
+>
+> > I think the key here is that you need to propagate that link to an exte=
+rnal
+> > party, not (only) to the VM.
+>
+> Yeh.
+>
 
-I'm going to squash the obvious/direct changes with the introduction of the helpers,
-and isolate is_{pae,pse,paging}() as those are more risky due to the multiple
-casts (ulong=>int=>bool), and because the end usage isn't visible in the patch.
+Excuse my perhaps naivete, but would it not be in the TCG's wheelhouse
+to specify how a TPM's firmware (SVSM) / bootloader (SEV-SNP) should
+be attested? The EK as well?
 
-Case in point, there is a benign but in svm_set_cr0() that would be silently
-fixed by converting is_paging() to return a bool:
+I think this might need to jump back to the vTPM protocol thread since
+this is about COCONUT, but I'm worried we're talking about
+AMD-specific long-term formats when perhaps the trusted computing
+group should be widening its scope to how a TPM should be virtualized.
+I appreciate that we're attempting to solve the problem in the short
+term, and certainly the SVSM will need attestation capabilities, but
+the linking to the TPM is dicey without that conversation with TCG,
+IMHO.
 
-	bool old_paging = is_paging(vcpu);
+> Dave
+> >
+> >
+> > Alex
+> >
+> >
+> >
+> >
+> >
+> > Amazon Development Center Germany GmbH
+> > Krausenstr. 38
+> > 10117 Berlin
+> > Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
+> > Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
+> > Sitz: Berlin
+> > Ust-ID: DE 289 237 879
+> >
+> >
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>
+>
 
-	...
 
-	vcpu->arch.cr0 = cr0;
-
-	if (!npt_enabled) {
-		hcr0 |= X86_CR0_PG | X86_CR0_WP;
-		if (old_paging != is_paging(vcpu))
-
-The "old_paging != is_paging(vcpu)" compares a bool (1/0) against an int that
-was an unsigned long (X86_CR0_PG/0), i.e. gets a false positive when paging is
-enabled.
-
-I'll post a fix and slot it in before this patch, both so that there's no silent
-fixes and so that this changelog can reference the commit.
-
-> ---
->  arch/x86/kvm/cpuid.c      |  4 ++--
->  arch/x86/kvm/mmu.h        |  2 +-
->  arch/x86/kvm/vmx/nested.c |  2 +-
->  arch/x86/kvm/vmx/vmx.c    |  2 +-
->  arch/x86/kvm/x86.c        | 20 ++++++++++----------
->  arch/x86/kvm/x86.h        | 16 ++++++++--------
-
-This misses a few conversions in kvm_pmu_rdpmc(), I'll fix those when applying too.
+--=20
+-Dionna Glaze, PhD (she/her)
