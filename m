@@ -2,343 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4D43D6C5875
-	for <lists+kvm@lfdr.de>; Wed, 22 Mar 2023 22:07:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 881346C590F
+	for <lists+kvm@lfdr.de>; Wed, 22 Mar 2023 22:53:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229691AbjCVVHw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Mar 2023 17:07:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43400 "EHLO
+        id S230027AbjCVVx3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Mar 2023 17:53:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59706 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229768AbjCVVHe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Mar 2023 17:07:34 -0400
-Received: from mail-ua1-x932.google.com (mail-ua1-x932.google.com [IPv6:2607:f8b0:4864:20::932])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD4684C1C
-        for <kvm@vger.kernel.org>; Wed, 22 Mar 2023 14:07:32 -0700 (PDT)
-Received: by mail-ua1-x932.google.com with SMTP id p2so13667939uap.1
-        for <kvm@vger.kernel.org>; Wed, 22 Mar 2023 14:07:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1679519252;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=E5TCoTHpgTZlxdts8IX0636SFjI9KXDqW+CMXjMZVtM=;
-        b=h+j9DnibdhqfoukM1ME09C/0AaEFlAqpYypAcXLkmXNwyM9ceD2JSr6/iRR6tIhvdN
-         Gb9XcFM+OVMVOlkkEWS9qD6Xm9tYhjCSNbar304/dA4PuU7335KS2I20yZAopw+aBuQL
-         D+sewRPOvSdcY8MghE34+dRIIsBi2SMQsf45mnLOCT/Xsw1pR0n1DlxjpFWm0k47+FKZ
-         Fdde4WO3xEdItUrXlRtJin4b1NyPH9aqnU7+P+6v2ZFALfphD+eK02BmXt2PM0/0tWes
-         jj3D5ZJHpn9fnbhv/lInMXur7LWpdonzoxRl2rTa9MOS7AUzJRIvJQsGX3Rm/ePBiLkx
-         5IyA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679519252;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=E5TCoTHpgTZlxdts8IX0636SFjI9KXDqW+CMXjMZVtM=;
-        b=EipFZbuIWotp3WtmVk3rzOL+acxtkm2WjgQOf/fhOKDNorREmahUOypXezfclsHnm2
-         AXZPdTyiUTdg8tJHaJyb8B6INdUu5CbDWo2j2uNv6d1RidWK5Kme75wdI0VayiOg7RF5
-         XiDlMis2a7orUfq1jcob2/mQnnJXQlasxzpoDeJBXdahhgHvXqvTUneuRTmLeqAAPRi2
-         bEbU6Ffndp1RBeCepo/h3LX25+DWg3RufOZNeIYLICcU6Pk1subTbEupQbJ8M2ZO+wIO
-         O+TQZCKUxmxdl0tGtRi4WC0T8RTL2tPVOFtgm4SncF3nha8jPXEuRTUeqCOIAsySvoGb
-         5I3A==
-X-Gm-Message-State: AO0yUKVAb/NjVQRtTLCqrEfYqOPywanZpkqhBzaMfgUCjHeHT/vVf12y
-        DHX2bwre8mbJbzz2FFh893Q+I0Zelce0IV9GkJsvjA==
-X-Google-Smtp-Source: AK7set9HQiDRXzeXRhcbLzSHEmOEcZPJAMOZFTBMfbXjdpFxiizhK4psYS1g0cPwoI/Saj7RwOuoAVfyn7CDB5YGyQ8=
-X-Received: by 2002:a1f:7ccb:0:b0:436:9f44:4e30 with SMTP id
- x194-20020a1f7ccb000000b004369f444e30mr405367vkc.16.1679519251551; Wed, 22
- Mar 2023 14:07:31 -0700 (PDT)
-MIME-Version: 1.0
-References: <20230315021738.1151386-1-amoorthy@google.com> <20230315021738.1151386-5-amoorthy@google.com>
- <20230317000226.GA408922@ls.amr.corp.intel.com> <CAF7b7mrTa735kDaEsJQSHTt7gpWy_QZEtsgsnKoe6c21s0jDVw@mail.gmail.com>
- <ZBTgnjXJvR8jtc4i@google.com> <CAF7b7mqnvLe8tw_6-cW1b2Bk8YB9qP=7BsOOJK3q-tAyDkarww@mail.gmail.com>
- <ZBiBkwIF4YHnphPp@google.com> <CAF7b7mrVQ6zP6SLHm4QBfQLgaxQuMtxjhqU5YKjjKGkoND4MLw@mail.gmail.com>
- <ZBnLaidtZEM20jMp@google.com> <CAF7b7mof8HkcaSthEO8Wu9kf8ZHjE9c1TDzQGAYDYv7FN9+k9w@mail.gmail.com>
- <ZBoIzo8FGxSyUJ2I@google.com>
-In-Reply-To: <ZBoIzo8FGxSyUJ2I@google.com>
-From:   Anish Moorthy <amoorthy@google.com>
-Date:   Wed, 22 Mar 2023 14:06:55 -0700
-Message-ID: <CAF7b7mpWBCa9Y4xuNLbmgh=EQWOzU4bpSDxGjmRnpH3UEZkB3g@mail.gmail.com>
-Subject: Re: [WIP Patch v2 04/14] KVM: x86: Add KVM_CAP_X86_MEMORY_FAULT_EXIT
- and associated kvm_run field
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Isaku Yamahata <isaku.yamahata@gmail.com>,
-        Marc Zyngier <maz@kernel.org>,
-        Oliver Upton <oliver.upton@linux.dev>, jthoughton@google.com,
-        kvm@vger.kernel.org
+        with ESMTP id S230016AbjCVVx2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Mar 2023 17:53:28 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0C6B158B2
+        for <kvm@vger.kernel.org>; Wed, 22 Mar 2023 14:53:25 -0700 (PDT)
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 32MLF863019027;
+        Wed, 22 Mar 2023 21:53:14 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : reply-to : to : cc : date : in-reply-to : references : content-type
+ : mime-version : content-transfer-encoding; s=pp1;
+ bh=mlXAo7Mm6ssh6l7Vk/LFp56jv79Zxm9clSndeogY8oY=;
+ b=i89t1XCD8YFPughcmS3eVvTEklPzOYfzxNeWz2+19mKNeyZttsHWvFochXV5BwDwIWwC
+ hertpMjLUG1sl+qzP5Ae4WF2nMVZWCTcUuWzxK3j0HOKHsKms4zejbDrOwqIxTwEX+ii
+ AMmJiztWyeQqr9QWy3KO45iJECtJBZiTU9uf/ful/0RP+z3s4vSIL5ubxAFcjurYEmp3
+ 0cfFOTNWVMnhyppNrN1mK0BFRVfCr8InxK1f8TY7np3YCa+yy9BXWQ6yveUIYlSZhxfr
+ i9wOtqqzIPaAYRWDQFOnbIpwRhEOJEeuuRhxPv1yPOBGf3F4kMJe3ljXxCRSMgtQtat9 jg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3pg9dt8qx7-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 22 Mar 2023 21:53:14 +0000
+Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 32MLrCUB022009;
+        Wed, 22 Mar 2023 21:53:13 GMT
+Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com [169.55.85.253])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3pg9dt8qx5-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 22 Mar 2023 21:53:13 +0000
+Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
+        by ppma01wdc.us.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 32MLj0Zv031919;
+        Wed, 22 Mar 2023 21:53:13 GMT
+Received: from smtprelay02.wdc07v.mail.ibm.com ([9.208.129.120])
+        by ppma01wdc.us.ibm.com (PPS) with ESMTPS id 3pd4x72gu3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 22 Mar 2023 21:53:13 +0000
+Received: from smtpav01.dal12v.mail.ibm.com (smtpav01.dal12v.mail.ibm.com [10.241.53.100])
+        by smtprelay02.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 32MLrB5g21431036
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 22 Mar 2023 21:53:12 GMT
+Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id BAE3758057;
+        Wed, 22 Mar 2023 21:53:11 +0000 (GMT)
+Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C1CF458059;
+        Wed, 22 Mar 2023 21:53:10 +0000 (GMT)
+Received: from [172.20.3.246] (unknown [9.163.23.201])
+        by smtpav01.dal12v.mail.ibm.com (Postfix) with ESMTP;
+        Wed, 22 Mar 2023 21:53:10 +0000 (GMT)
+Message-ID: <4f07f72da5c73d317bb00e6b3c41f47090c5240b.camel@linux.ibm.com>
+Subject: Re: [ANNOUNCEMENT] COCONUT Secure VM Service Module for SEV-SNP
+From:   James Bottomley <jejb@linux.ibm.com>
+Reply-To: jejb@linux.ibm.com
+To:     "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+        Dionna Amalie Glaze <dionnaglaze@google.com>
+Cc:     linux-coco@lists.linux.dev, kvm@vger.kernel.org,
+        amd-sev-snp@lists.suse.com
+Date:   Wed, 22 Mar 2023 17:53:08 -0400
+In-Reply-To: <ZBs/TX4eDuj5zc3+@work-vm>
+References: <ZBl4592947wC7WKI@suse.de> <ZBnH600JIw1saZZ7@work-vm>
+         <ZBnMZsWMJMkxOelX@suse.de> <ZBnhtEsMhuvwfY75@work-vm>
+         <ZBn/ZbFwT9emf5zw@suse.de> <ZBoLVktt77F9paNV@work-vm>
+         <ZBrIFnlPeCsP0x2g@suse.de>
+         <444b0d8d-3a8c-8e6d-1df3-35f57046e58e@amazon.com>
+         <ZBrZmbfWXVQLND/E@work-vm>
+         <CAAH4kHbYc+Wx5W_S8XFch+z1B19U_Zm=hFQr1fj1rv1S8QOvxg@mail.gmail.com>
+         <ZBs/TX4eDuj5zc3+@work-vm>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-15.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,ENV_AND_HDR_SPF_MATCH,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL,
-        USER_IN_DEF_SPF_WL autolearn=unavailable autolearn_force=no
-        version=3.4.6
+User-Agent: Evolution 3.42.4 
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: mCMeKRRmqF4AlFxd1xNsaS1o-wq2B75X
+X-Proofpoint-GUID: uymxaK8FyiJ2K8VPI79fXJOfykCCRjok
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
+ definitions=2023-03-22_18,2023-03-22_01,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ phishscore=0 mlxlogscore=970 impostorscore=0 bulkscore=0 spamscore=0
+ malwarescore=0 adultscore=0 suspectscore=0 lowpriorityscore=0 mlxscore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2303150002 definitions=main-2303220154
+X-Spam-Status: No, score=-0.1 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
+        DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 21, 2023 at 12:43=E2=80=AFPM Sean Christopherson <seanjc@google=
-.com> wrote:
->
-> On Tue, Mar 21, 2023, Anish Moorthy wrote:
-> > On Tue, Mar 21, 2023 at 8:21=E2=80=AFAM Sean Christopherson <seanjc@goo=
-gle.com> wrote:
-> > >
-> > > On Mon, Mar 20, 2023, Anish Moorthy wrote:
-> > > > On Mon, Mar 20, 2023 at 8:53=E2=80=AFAM Sean Christopherson <seanjc=
-@google.com> wrote:
-> > > > > Filling kvm_run::memory_fault but not exiting to userspace is ok =
-because userspace
-> > > > > never sees the data, i.e. userspace is completely unaware.  This =
-behavior is not
-> > > > > ideal from a KVM perspective as allowing KVM to fill the kvm_run =
-union without
-> > > > > exiting to userspace can lead to other bugs, e.g. effective corru=
-ption of the
-> > > > > kvm_run union, but at least from a uABI perspective, the behavior=
- is acceptable.
-> > > >
-> > > > Actually, I don't think the idea of filling in kvm_run.memory_fault
-> > > > for -EFAULTs which don't make it to userspace works at all. Conside=
-r
-> > > > the direct_map function, which bubbles its -EFAULT to
-> > > > kvm_mmu_do_page_fault. kvm_mmu_do_page_fault is called from both
-> > > > kvm_arch_async_page_ready (which ignores the return value), and by
-> > > > kvm_mmu_page_fault (where the return value does make it to userspac=
-e).
-> > > > Populating kvm_run.memory_fault anywhere in or under
-> > > > kvm_mmu_do_page_fault seems an immediate no-go, because a wayward
-> > > > kvm_arch_async_page_ready could (presumably) overwrite/corrupt an
-> > > > already-set kvm_run.memory_fault / other kvm_run field.
-> > >
-> > > This particular case is a non-issue.  kvm_check_async_pf_completion()=
- is called
-> > > only when the current task has control of the vCPU, i.e. is the curre=
-nt "running"
-> > > vCPU.  That's not a coincidence either, invoking kvm_mmu_do_page_faul=
-t() without
-> > > having control of the vCPU would be fraught with races, e.g. the enti=
-re KVM MMU
-> > > context would be unstable.
-> > >
-> > > That will hold true for all cases.  Using a vCPU that is not loaded (=
-not the
-> > > current "running" vCPU in KVM's misleading terminology) to access gue=
-st memory is
-> > > simply not safe, as the vCPU state is non-deterministic.  There are p=
-aths where
-> > > KVM accesses, and even modifies, vCPU state asynchronously, e.g. for =
-IRQ delivery
-> > > and making requests, but those are very controlled flows with dedicat=
-ed machinery
-> > > to make them SMP safe.
-> > >
-> > > That said, I agree that there's a risk that KVM could clobber vcpu->r=
-un_run by
-> > > hitting an -EFAULT without the vCPU loaded, but that's a solvable pro=
-blem, e.g.
-> > > the helper to fill KVM_EXIT_MEMORY_FAULT could be hardened to yell if=
- called
-> > > without the target vCPU being loaded:
-> > >
-> > >         int kvm_handle_efault(struct kvm_vcpu *vcpu, ...)
-> > >         {
-> > >                 preempt_disable();
-> > >                 if (WARN_ON_ONCE(vcpu !=3D __this_cpu_read(kvm_runnin=
-g_vcpu)))
-> > >                         goto out;
-> > >
-> > >                 vcpu->run->exit_reason =3D KVM_EXIT_MEMORY_FAULT;
-> > >                 ...
-> > >         out:
-> > >                 preempt_enable();
-> > >                 return -EFAULT;
-> > >         }
-> > >
-> > > FWIW, I completely agree that filling KVM_EXIT_MEMORY_FAULT without g=
-uaranteeing
-> > > that KVM "immediately" exits to userspace isn't ideal, but given the =
-amount of
-> > > historical code that we need to deal with, it seems like the lesser o=
-f all evils.
-> > > Unless I'm misunderstanding the use cases, unnecessarily filling kvm_=
-run is a far
-> > > better failure mode than KVM not filling kvm_run when it should, i.e.=
- false
-> > > positives are ok, false negatives are fatal.
-> >
-> > Don't you have this in reverse?
->
-> No, I don't think so.
->
-> > False negatives will just result in userspace not having useful extra
-> > information for the -EFAULT it receives from KVM_RUN, in which case use=
-rspace
-> > can do what you mentioned all VMMs do today and just terminate the VM.
->
-> And that is _really_ bad behavior if we have any hope of userspace actual=
-ly being
-> able to rely on this functionality.  E.g. any false negative when userspa=
-ce is
-> trying to do postcopy demand paging will be fatal to the VM.
+On Wed, 2023-03-22 at 17:47 +0000, Dr. David Alan Gilbert wrote:
+[...]
+> > I think this might need to jump back to the vTPM protocol thread
+> > since this is about COCONUT, but I'm worried we're talking about
+> > AMD-specific long-term formats when perhaps the trusted computing
+> > group should be widening its scope to how a TPM should be
+> > virtualized. I appreciate that we're attempting to solve the
+> > problem in the short term, and certainly the SVSM will need
+> > attestation capabilities, but the linking to the TPM is dicey
+> > without that conversation with TCG, IMHO.
+> 
+> Some standardisation of the link between the vTPM and the underlying
+> CoCo hardware would be great; there's at least 2 or 3 CoCo linked
+> vTPMs already and I don't think they're sharing any idea of that.
 
-But since -EFAULTs from KVM_RUN today are already fatal, so there's no
-new failure introduced by an -EFAULT w/o a populated memory_fault
-field right? Obviously that's of no real use to userspace, but that
-seems like part of the point of starting with a partial conversion: to
-allow for filling holes in the implementation in the future.
+Well, for SNP, it's easy: the VMPL0 labelled attestation report proves
+the SVSM and other components including OVMF and vTPM code
+implementation.  We insert a hash of the manufactured EK into the
+report and that gives proof from the trusted SVSM of the EK belonging
+to the vTPM (essentially binding the vTPM to the VM).  The same thing
+would work for other CoCo VM environments.
 
-It seems like what you're really concerned about here is the
-interaction with the memslot fast-gup-only flag. Obviously, failing to
-populate kvm_run.memory_fault for new userspace-visible -EFAULTs
-caused by that flag would cause new fatal failures for the guest,
-which would make the feature actually harmful. But as far as I know
-(and please lmk if I'm wrong), the memslot flag only needs to be used
-by the kvm_handle_error_pfn (x86) and user_mem_abort (arm64)
-functions, meaning that those are the only places where we need to
-check/populate kvm_run.memory_fault for new userspace-visible
--EFAULTs.
+If we do ephemeral vTPMs, the binding is one time and there's no
+persistent state security issue, so the SVSM-vTPM attestation is all
+you need to begin trusting the vTPM measurements.
 
-> > Whereas a false positive might cause a double-write to the KVM_RUN stru=
-ct,
-> > either putting incorrect information in kvm_run.memory_fault or
->
-> Recording unused information on -EFAULT in kvm_run doesn't make the infor=
-mation
-> incorrect.
->
-> > corrupting another member of the union.
->
-> Only if KVM accesses guest memory after initiating an exit to userspace, =
-which
-> would be a KVM irrespective of kvm_run.memory_fault.
+> Whether it's TCG I'm not sure; It doesn't seem to me to make sense
+> for them to specify the flow to bring the vTPM up or the details of
+> the underlying CoCo's attestation; but standardising how the two
+> processes are tied together might be possible.
 
-Ah good: I was concerned that this was a valid set of code paths in
-KVM. Although I'm assuming that "initiating an exit to userspace"
-includes the "returning -EFAULT from KVM_RUN" cases, because we
-wouldn't want EFAULTs to stomp on each other as well (the
-kvm_mmu_do_page_fault usages were supposed to be one such example,
-though I'm glad to know that they're not a problem).
+I think the TCG is probably not going to touch that because how you
+attest the code that will run as the SVSM and vTPM is very specific to
+each CoCo implementation.  However, they all provide a user data like
+field which allows you to add information from the to be verified as
+trusted SVSM, so you can use it for the EK, which is pretty identical
+to the above proposal.
 
-> And if we're really concerned about clobbering state, we could add harden=
-ing/auditing
-> code to ensure that KVM actually exits when kvm_run.exit_reason is set (t=
-hough there
-> are a non-zero number of exceptions, e.g. the aformentioned MMIO mess, ne=
-sted SVM/VMX
-> pages, and probably a few others).
->
-> Prior to cleanups a few years back[2], emulation failures had issues simi=
-lar to
-> what we are discussing, where KVM would fail to exit to userspace, not fi=
-ll kvm_run,
-> etc.  Those are the types of bugs I want to avoid here.
->
-> [1] https://lkml.kernel.org/r/ZBNrWZQhMX8AHzWM%40google.com
-> [2] https://lore.kernel.org/kvm/20190823010709.24879-1-sean.j.christopher=
-son@intel.com
->
-> > > > That in turn looks problematic for the
-> > > > memory-fault-exit-on-fast-gup-failure part of this series, because
-> > > > there are at least a couple of cases for which kvm_mmu_do_page_faul=
-t
-> > > > will -EFAULT. One is the early-efault-on-fast-gup-failure case whic=
-h
-> > > > was the original purpose of this series. Another is a -EFAULT from
-> > > > FNAME(fetch) (passed up through FNAME(page_fault)). There might be
-> > > > other cases as well. But unless userspace can/should resolve *all*
-> > > > such -EFAULTs in the same manner, a kvm_run.memory_fault populated =
-in
-> > > > "kvm_mmu_page_fault" wouldn't be actionable.
-> > >
-> > > Killing the VM, which is what all VMMs do today in response to -EFAUL=
-T, is an
-> > > action.  As I've pointed out elsewhere in this thread, userspace need=
-s to be able
-> > > to identify "faults" that it (userspace) can resolve without a hint f=
-rom KVM.
-> > >
-> > > In other words, KVM is still returning -EFAULT (or a variant thereof)=
-, the _only_
-> > > difference, for all intents and purposes, is that userspace is given =
-a bit more
-> > > information about the source of the -EFAULT.
-> > >
-> > > > At least, not without a whole lot of plumbing code to make it so.
-> > >
-> > > Plumbing where?
-> >
-> > In this example, I meant plumbing code to get a kvm_run.memory_fault.fl=
-ags
-> > which is more specific than (eg) MEMFAULT_REASON_PAGE_FAULT_FAILURE fro=
-m the
-> > -EFAULT paths under kvm_mmu_page_fault. My idea for how userspace would
-> > distinguish fast-gup failures was that kvm_faultin_pfn would set a spec=
-ial
-> > bit in kvm_run.memory_fault.flags to indicate its failure. But (still
-> > assuming that we shouldn't have false-positive kvm_run.memory_fault fil=
-ls) if
-> > the memory_fault can only be populated from kvm_mmu_page_fault then eit=
-her
-> > failures from FNAME(page_fault) and kvm_faultin_pfn will be indistingui=
-shable
-> > to userspace, or those functions will need to plumb more specific exit
-> > reasons all the way up to kvm_mmu_page_fault.
->
-> Setting a flag that essentially says "failure when handling a guest page =
-fault"
-> is problematic on multiple fronts.  Tying the ABI to KVM's internal imple=
-mentation
-> is not an option, i.e. the ABI would need to be defined as "on page fault=
-s from
-> the guest".  And then the resulting behavior would be non-deterministic, =
-e.g.
-> userspace would see different behavior if KVM accessed a "bad" gfn via em=
-ulation
-> instead of in response to a guest page fault.  And because of hardware TL=
-Bs, it
-> would even be possible for the behavior to be non-deterministic on the sa=
-me
-> platform running the same guest code (though this would be exteremly unli=
-klely
-> in practice).
->
-> And even if userspace is ok with only handling guest page faults_today_, =
-I highly
-> doubt that will hold forever.  I.e. at some point there will be a use cas=
-e that
-> wants to react to uaccess failures on fast-only memslots.
->
-> Ignoring all of those issues, simplify flagging "this -EFAULT occurred wh=
-en
-> handling a guest page fault" isn't precise enough for userspace to blindl=
-y resolve
-> the failure.  Even if KVM went through the trouble of setting information=
- if and
-> only if get_user_page_fast_only() failed while handling a guest page faul=
-t,
-> userspace would still need/want a way to verify that the failure was expe=
-cted and
-> can be resolved, e.g. to guard against userspace bugs due to wrongly unma=
-pping
-> or mprotecting a page.
->
-> > But, since you've made this point elsewhere, my guess is that your answ=
-er is
-> > that it's actually userspace's job to detect the "specific" reason for =
-the
-> > fault and resolve it.
->
-> Yes, it's userspace's responsibity.  I simply don't see how KVM can provi=
-de
-> information that userspace doesn't already have without creating an unmai=
-ntainable
-> uABI, at least not without some deep, deep plumbing into gup().  I.e. unl=
-ess gup()
-> were changed to explicitly communicate that it failed because of a uffd e=
-quivalent,
-> at best a flag in kvm_run would be a hint that userspace _might_ be able =
-to resolve
-> the fault.  And even if we modified gup(), we'd still have all the open q=
-uestions
-> about what to do when KVM encounters a fault on a uaccess.
+James
+
