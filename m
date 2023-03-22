@@ -2,70 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D505C6C5A2F
-	for <lists+kvm@lfdr.de>; Thu, 23 Mar 2023 00:17:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F12006C5ABC
+	for <lists+kvm@lfdr.de>; Thu, 23 Mar 2023 00:43:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229672AbjCVXR3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Mar 2023 19:17:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51132 "EHLO
+        id S230093AbjCVXns (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Mar 2023 19:43:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37510 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229614AbjCVXR1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Mar 2023 19:17:27 -0400
-Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E97B1911A
-        for <kvm@vger.kernel.org>; Wed, 22 Mar 2023 16:17:26 -0700 (PDT)
-Received: by mail-pj1-x1049.google.com with SMTP id ip12-20020a17090b314c00b0023f7dfb7d7fso3598867pjb.6
-        for <kvm@vger.kernel.org>; Wed, 22 Mar 2023 16:17:26 -0700 (PDT)
+        with ESMTP id S230238AbjCVXn0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Mar 2023 19:43:26 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99FEC32503
+        for <kvm@vger.kernel.org>; Wed, 22 Mar 2023 16:43:03 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id 3-20020a251103000000b00b732e362449so2581389ybr.0
+        for <kvm@vger.kernel.org>; Wed, 22 Mar 2023 16:43:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1679527046;
+        d=google.com; s=20210112; t=1679528581;
         h=content-transfer-encoding:cc:to:from:subject:message-id:references
          :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=WvxXaPbedDworVbjF5qPgHOjzI64Bsth2Wm19SmdDHs=;
-        b=VsVPTbnXKBxR8nCNNF8ELAkcZbnw774IuIaZG9KJgJWV7OkL1K4ue2f5fBWjW1Bo5M
-         9xVr4F2yw/GSM+u+UtYp3PRW9AekFVppVM/0UM4pho/SiuP1dGjwayce3UhQPZB+W/vl
-         R8NaRPHqbOAs805f8vFqvvgHnM51StbhNjj1v9ZoFCDkesYs2qk3jodySH29B0tbMaVA
-         ixiyskOooqSVlzGzBqyUToap64btA8ee5o5+2lWNNtYnLg8/42UVlHeBt/XXCzAzzkM7
-         cm3qx0aWJaXtKvXMWhlFp0HofyECZaI7pS/PNcGvHRY2lqFCc76qbI9NCTwrAzx3/ec/
-         my9Q==
+        bh=J/DUdifk67KM9ArIWEAHj/FFLKRCLqnXjBFIlNA9WLA=;
+        b=CfwU/TnHOqKIMZtcm5AVpkQrNDCKbR2jCK73YUnqC6soEdwARNh76usDlcKP/OMn2U
+         UDCINQ111/XLDPYV0aBfhCcbMPPY0lAlHAobv8hpRMpI1PcYP8mqn6fis7XvWape3pQ1
+         A2nfFkh5AQBuJypQIvfeaapWV/o6t+3Kp3Gz8zsQmgR72z7Sk8FKJD4A28pZw4eUiTW4
+         UlfKj31aZL96iwEKYnoJJhE2t2aI8nyxqUKpFvc6h/b4lJWW18Kh56acPLQHSr0CaZi0
+         4gPO9Eg/BkrsxqXQzpsx6Dpao7p7N7zNZPZ4hEujhFC31KeyR9Ws3q5/PWerG7qQfcYN
+         UV9A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679527046;
+        d=1e100.net; s=20210112; t=1679528581;
         h=content-transfer-encoding:cc:to:from:subject:message-id:references
          :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=WvxXaPbedDworVbjF5qPgHOjzI64Bsth2Wm19SmdDHs=;
-        b=UmlFdBw9GTrZGpBZWJrZA8Eeo8hmAIr+pGnca5igQwE75tVeGvO994yTQ4/9OLigXg
-         Ji1lCTlitSupanqEK/BBWM2YFjX0fLBXbqbbAEH5/ey4Qw4rOS/NblN371fZoY9bYXOs
-         pP/4+pXCh3lOg+y9IOJkcfE02hkXEu4HEmTEHD/n6qUUFyzvZC/DMhhHGoLLrERNcEus
-         HxxCYfPI4l2reGGl/nx+gB3zEs5gEO3cjY2Zjyc28rqlLV92+89VGehykNtj313VL2em
-         F8XlXXp+5z1JA0TSHDMF9/nQYfiKhDdg+4l00hc5jrmIDLVsmvWc81bU7TdzAUMrL96F
-         taMw==
-X-Gm-Message-State: AO0yUKU/2HEwwXhBUB3BPqptqkUXAL5MA9NlcP7QRPDRDhr6taADu9M+
-        fKTz+gNR6m87BOjmZmCS1aRRL+c+l5A=
-X-Google-Smtp-Source: AK7set/eLa11nV1rB5+B2BDOy1E/dTkhAlYaQGeXDqVPbNkOkwGJIztdMrgFWXy3kacSCMavXnP3sLYhyEY=
+        bh=J/DUdifk67KM9ArIWEAHj/FFLKRCLqnXjBFIlNA9WLA=;
+        b=pyuPb1jSKlW89cg45fXL+RMQnZYXBojvWQmDxnDb3xUDHoLi3b2P5lKGW5ltEpazZ2
+         FsGOy3KvVBo5O0t6QxUm6kcE8xImFAY0Ck+EFljCLAgBb8OtnD9xjqR5gt+zgRG0VhsS
+         lKwW1c2jSSvNxMLZn+AwfSOUrm7c4yqNCGa7IcJYvGdTRYCRRTQplWJ9kPjL4qhAq0mY
+         JwkdJUw2A+M2YuCHV65E7UE6AnkxLS8/TWkgpaawLwY7hYYa8KvfZlel3Ny10zyl0Xnn
+         SRVUmsGJb4W14Coz0/87RM2wyomt/nb/I3h5iMOQBPL67AONpH5sAm8OBdaw3R+jDqvR
+         o1RA==
+X-Gm-Message-State: AAQBX9f80wmwBRAVus7HI/gcwvPt7IW8rCcVCaLPI9XMTEUQ6ejfMSQN
+        Sfca2fscz+79+eYeMqFNTsU/VC4e6MI=
+X-Google-Smtp-Source: AKy350bwPl3fgCIkcTGctqYwXOP2RogL5Us+NUXeSGJ5mDgZZx9DLrTQheQyTvKz7gvIgafiSnBkCxfkd24=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:b58e:b0:19f:28f4:1db with SMTP id
- a14-20020a170902b58e00b0019f28f401dbmr1754471pls.8.1679527045941; Wed, 22 Mar
- 2023 16:17:25 -0700 (PDT)
-Date:   Wed, 22 Mar 2023 16:17:24 -0700
-In-Reply-To: <CAF7b7mpWBCa9Y4xuNLbmgh=EQWOzU4bpSDxGjmRnpH3UEZkB3g@mail.gmail.com>
+ (user=seanjc job=sendgmr) by 2002:a81:a743:0:b0:544:cd0e:2f80 with SMTP id
+ e64-20020a81a743000000b00544cd0e2f80mr834457ywh.8.1679528581317; Wed, 22 Mar
+ 2023 16:43:01 -0700 (PDT)
+Date:   Wed, 22 Mar 2023 16:42:59 -0700
+In-Reply-To: <c9abb017-0088-b96f-d19a-b25e54ad150d@citrix.com>
 Mime-Version: 1.0
-References: <20230317000226.GA408922@ls.amr.corp.intel.com>
- <CAF7b7mrTa735kDaEsJQSHTt7gpWy_QZEtsgsnKoe6c21s0jDVw@mail.gmail.com>
- <ZBTgnjXJvR8jtc4i@google.com> <CAF7b7mqnvLe8tw_6-cW1b2Bk8YB9qP=7BsOOJK3q-tAyDkarww@mail.gmail.com>
- <ZBiBkwIF4YHnphPp@google.com> <CAF7b7mrVQ6zP6SLHm4QBfQLgaxQuMtxjhqU5YKjjKGkoND4MLw@mail.gmail.com>
- <ZBnLaidtZEM20jMp@google.com> <CAF7b7mof8HkcaSthEO8Wu9kf8ZHjE9c1TDzQGAYDYv7FN9+k9w@mail.gmail.com>
- <ZBoIzo8FGxSyUJ2I@google.com> <CAF7b7mpWBCa9Y4xuNLbmgh=EQWOzU4bpSDxGjmRnpH3UEZkB3g@mail.gmail.com>
-Message-ID: <ZBuMhA8eOPC8HzkC@google.com>
-Subject: Re: [WIP Patch v2 04/14] KVM: x86: Add KVM_CAP_X86_MEMORY_FAULT_EXIT
- and associated kvm_run field
+References: <20230307023946.14516-1-xin3.li@intel.com> <20230307023946.14516-35-xin3.li@intel.com>
+ <ZBs/sSJwr7zdOUsE@google.com> <c9abb017-0088-b96f-d19a-b25e54ad150d@citrix.com>
+Message-ID: <ZBuSg+3jJpjA5S5P@google.com>
+Subject: Re: [PATCH v5 34/34] KVM: x86/vmx: execute "int $2" to handle NMI in
+ NMI caused VM exits when FRED is enabled
 From:   Sean Christopherson <seanjc@google.com>
-To:     Anish Moorthy <amoorthy@google.com>
-Cc:     Isaku Yamahata <isaku.yamahata@gmail.com>,
-        Marc Zyngier <maz@kernel.org>,
-        Oliver Upton <oliver.upton@linux.dev>, jthoughton@google.com,
-        kvm@vger.kernel.org
-Content-Type: text/plain; charset="utf-8"
+To:     andrew.cooper3@citrix.com
+Cc:     Xin Li <xin3.li@intel.com>, linux-kernel@vger.kernel.org,
+        x86@kernel.org, kvm@vger.kernel.org, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
+        hpa@zytor.com, peterz@infradead.org, pbonzini@redhat.com,
+        ravi.v.shankar@intel.com
+Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-7.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
@@ -77,135 +74,57 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 22, 2023, Anish Moorthy wrote:
-> On Tue, Mar 21, 2023 at 12:43=E2=80=AFPM Sean Christopherson <seanjc@goog=
-le.com> wrote:
-> >
-> > On Tue, Mar 21, 2023, Anish Moorthy wrote:
-> > > > FWIW, I completely agree that filling KVM_EXIT_MEMORY_FAULT without=
- guaranteeing
-> > > > that KVM "immediately" exits to userspace isn't ideal, but given th=
-e amount of
-> > > > historical code that we need to deal with, it seems like the lesser=
- of all evils.
-> > > > Unless I'm misunderstanding the use cases, unnecessarily filling kv=
-m_run is a far
-> > > > better failure mode than KVM not filling kvm_run when it should, i.=
-e. false
-> > > > positives are ok, false negatives are fatal.
-> > >
-> > > Don't you have this in reverse?
-> >
-> > No, I don't think so.
-> >
-> > > False negatives will just result in userspace not having useful extra
-> > > information for the -EFAULT it receives from KVM_RUN, in which case u=
-serspace
-> > > can do what you mentioned all VMMs do today and just terminate the VM=
-.
-> >
-> > And that is _really_ bad behavior if we have any hope of userspace actu=
-ally being
-> > able to rely on this functionality.  E.g. any false negative when users=
-pace is
-> > trying to do postcopy demand paging will be fatal to the VM.
+On Wed, Mar 22, 2023, andrew.cooper3@citrix.com wrote:
+> On 22/03/2023 5:49 pm, Sean Christopherson wrote:
+> > On Mon, Mar 06, 2023, Xin Li wrote:
+> >> Execute "int $2" to handle NMI in NMI caused VM exits when FRED is ena=
+bled.
+> >>
+> >> Like IRET for IDT, ERETS/ERETU are required to end the NMI handler for=
+ FRED
+> >> to unblock NMI ASAP (w/ bit 28 of CS set).
+> > That's "CS" on the stack correct?  Is bit 28 set manually by software, =
+or is it
+> > set automatically by hardware?  If it's set by hardware, does "int $2" =
+actually
+> > set the bit since it's not a real NMI?
 >=20
-> But since -EFAULTs from KVM_RUN today are already fatal, so there's no
-> new failure introduced by an -EFAULT w/o a populated memory_fault
-> field right?
-
-Yes, but it's a bit of a moot piont since the goal of the feature is to avo=
-id
-killing the VM.
-
-> Obviously that's of no real use to userspace, but that seems like part of=
- the
-> point of starting with a partial conversion: to allow for filling holes i=
-n
-> the implementation in the future.
-
-Yes, but I want a forcing function to reveal any holes we missed sooner tha=
-n
-later, otherwise the feature will languish since it won't be useful beyond =
-the
-fast-gup-only use case.
-
-> It seems like what you're really concerned about here is the interaction =
-with
-> the memslot fast-gup-only flag. Obviously, failing to populate
-> kvm_run.memory_fault for new userspace-visible -EFAULTs caused by that fl=
-ag
-> would cause new fatal failures for the guest, which would make the featur=
-e
-> actually harmful. But as far as I know (and please lmk if I'm wrong), the
-> memslot flag only needs to be used by the kvm_handle_error_pfn (x86) and
-> user_mem_abort (arm64) functions, meaning that those are the only places
-> where we need to check/populate kvm_run.memory_fault for new
-> userspace-visible -EFAULTs.
-
-No.  As you point out, the fast-gup-only case should be pretty easy to get =
-correct,
-i.e. this should all work just fine for _GCE's current_ use case.  I'm more=
- concerned
-with setting KVM up for success when future use cases come along that might=
- not be ok
-with unhandled faults in random guest accesses killing the VM.
-
-To be clear, I do not expect us to get this 100% correct on the first attem=
-pt,
-but I do want to have mechanisms in place that will detect any bugs/misses =
-so
-that we can fix the issues _before_ a use case comes along that needs 100%
-accuracy.
-
-> > > Whereas a false positive might cause a double-write to the KVM_RUN st=
-ruct,
-> > > either putting incorrect information in kvm_run.memory_fault or
-> >
-> > Recording unused information on -EFAULT in kvm_run doesn't make the inf=
-ormation
-> > incorrect.
-> >
-> > > corrupting another member of the union.
-> >
-> > Only if KVM accesses guest memory after initiating an exit to userspace=
-, which
-> > would be a KVM irrespective of kvm_run.memory_fault.
+> int $2 had better not set it...=EF=BF=BD This is the piece of state that =
+is
+> intended to cause everything which isn't a real NMI to nest properly
+> inside a real NMI.
 >=20
-> Ah good: I was concerned that this was a valid set of code paths in
-> KVM. Although I'm assuming that "initiating an exit to userspace"
-> includes the "returning -EFAULT from KVM_RUN" cases, because we
-> wouldn't want EFAULTs to stomp on each other as well (the
-> kvm_mmu_do_page_fault usages were supposed to be one such example,
-> though I'm glad to know that they're not a problem).
+> It is supposed to be set on delivery of an NMI, and act as the trigger
+> for ERET{U,S} to drop the latch.
+>=20
+> Software is can set it manually in a FRED-frame in order to explicitly
+> unblock NMIs.
 
-This one gets into a bit of a grey area.  The "rule" is really about the in=
-tent,
-i.e. once KVM intends to exit to userspace, it's a bug if KVM encounters so=
-mething
-else and runs into the weeds.
+Ah, found this in patch 19.  That hunk really belongs in this patch, becaus=
+e this
+patch is full of magic without that information.
 
-In no small part because of the myriad paths where KVM ignores what be fata=
-l errors
-in most flows, e.g. record_steal_time(), simply returning -EFAULT from some=
- low
-level helper doesn't necessarily signal an intent to exit all the way to us=
-erspace.
++       /*
++        * VM exits induced by NMIs keep NMI blocked, and we do
++        * "int $2" to reinject the NMI w/ NMI kept being blocked.
++        * However "int $2" doesn't set the nmi bit in the FRED
++        * stack frame, so we explicitly set it to make sure a
++        * later ERETS will unblock NMI immediately.
++        */
++       regs->nmi =3D 1;
 
-To be honest, I don't have a clear idea of how difficult it will be to dete=
-ct bugs.
-In most cases, failure to exit to userspace leads to a fatal error fairly q=
-uickly.
-With userspace faults, it's entirely possible that an exit could be missed =
-and
-nothing bad would happen.
+Organization aside, this seems to defeat the purpose of _not_ unconditional=
+ly
+unmasking NMIs on ERET since the kernel assumes any random "int $2" is comi=
+ng from
+KVM after an NMI VM-Exit.
 
-Hmm, one idea would be to have the initial -EFAULT detection fill kvm_run.m=
-emory_fault,
-but set kvm_run.exit_reason to some magic number, e.g. zero it out.  Then K=
-VM could
-WARN if something tries to overwrite kvm_run.exit_reason.  The WARN would n=
-eed to
-be buried by a Kconfig or something since kvm_run can be modified by usersp=
-ace,
-but other than that I think it would work.
+Eww, and "int $2" doesn't even go directly to fred_exc_nmi(), it trampoline=
+s
+through fred_sw_interrupt_kernel() first.  Looks like "int $2" from userspa=
+ce gets
+routed to a #GP, so at least that bit is handled.
+
+I'm not dead set against the proposed approach, but IMO it's not obviously =
+better
+than a bit of assembly to have a more direct call into the NMI handler.
