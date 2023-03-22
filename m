@@ -2,109 +2,246 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AA92E6C579A
-	for <lists+kvm@lfdr.de>; Wed, 22 Mar 2023 21:30:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B01A16C57E3
+	for <lists+kvm@lfdr.de>; Wed, 22 Mar 2023 21:42:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232271AbjCVUan (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Mar 2023 16:30:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35678 "EHLO
+        id S231336AbjCVUmn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Mar 2023 16:42:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34170 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230307AbjCVUa3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Mar 2023 16:30:29 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BFAE89AFCF;
-        Wed, 22 Mar 2023 13:21:14 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 97B7A622B1;
-        Wed, 22 Mar 2023 20:20:10 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7D548C4339C;
-        Wed, 22 Mar 2023 20:20:09 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="PIpcYJJX"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1679516405;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=z5+SwuPswYL3502uLq6hayJyZoDC1sf3E/Ormc16ROU=;
-        b=PIpcYJJX9hptjh826y5Zn1hijTEsvDVh/1kxhA5t7yY8jKbnkGW/3rbZoRKDCRTbCTys4P
-        3QZp7sJr5kpsH2zTiTTlMjtJqloSLUXN+PQif21I15YKfofGKoVtnBSR+AkwAO7vyKxz9L
-        MfjhDwRthXZ3JvuQdpcHb0/LNa2VkB8=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 0ebc3581 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-        Wed, 22 Mar 2023 20:20:05 +0000 (UTC)
-Received: by mail-yb1-f176.google.com with SMTP id x198so12782054ybe.9;
-        Wed, 22 Mar 2023 13:20:04 -0700 (PDT)
-X-Gm-Message-State: AAQBX9djBjCx14eZKEtWsV3hhRjPdd0gj18vCqaem6DxT20O9wZ7LhB9
-        4RxkkLy2BwwoWnhuzMNf1/S0bd57viisYcINlbI=
-X-Google-Smtp-Source: AKy350bWxTp/xybNZinLNHP3Psjfx3ze++rR/f/Zifi7U6qVfp5MpEnhwyDwi6qNcOLgfT72uieS4Q5S4dRvTCc87PU=
-X-Received: by 2002:a05:6902:1081:b0:b21:a3b8:45cd with SMTP id
- v1-20020a056902108100b00b21a3b845cdmr765321ybu.0.1679516401893; Wed, 22 Mar
- 2023 13:20:01 -0700 (PDT)
+        with ESMTP id S230072AbjCVUmT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Mar 2023 16:42:19 -0400
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2041.outbound.protection.outlook.com [40.107.236.41])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E351E85B34;
+        Wed, 22 Mar 2023 13:34:59 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ht0kuE4MPaurZE/nxr/VlzsN3Hmx3ZcF8y6OKvBusuWATz9h4G81C3hYz9xgZkoj3xF7PCB5a+jBPLyXCFdiPfn99e+LZRgdA45IPWVrJY363dp4Rvv50RqVMllQ9giUtDCDV9fyavCNAhT+q/r4VEMJuNRgrrS9rAYXef1oYds3svbXd9toYScKpvPKFBbxXrEexfnCwPiwzLY+D9/LAdcotWTz4AWE0TmIp2hEl3bvgSJ434OxAVCOZBWOJ8SD5lw7L3N3PRkf800hJKtvNKFtjZpKQD8FulL5poNggzs3uPmYEpre7+skhpLDA/uGiW5BA8M6gYLNMEEjEXw+lA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=5XghprXbshvX2FhxF4s8Pto7UaHr8h++Y2Nrw5ZTTKo=;
+ b=TNl8PWwV4OXFU4jnP5DHrsEmdTrsDNddoenjQbIIvF8pe6AynLcdi+smDh+B77PCJDh9xmZUmGHCvFuOlzgwivl4t5KTcVx4ED1auL93t8ZZSYOamzyzbv1bf0GVB590qL31pRZ0CAXT1f8UfEPCf0YeA40G4rfc6YU1UMNXL5jYjSgp/RXgd6n7LJnoOgiJmx1Mjv2pQDAeNaV0u1fkQ3cJo2TKwf/PtuCdlKw5Yi7FTtrFrlZPhbG40VglB+atMzMKO6XvCaWqa1UAnFWsPKRIFAGGwk4+QEmqqrps2tWP0PodzXbcW1DuCssI6s4u4PjGMvSoMBLb/MaAN3mNPw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=5XghprXbshvX2FhxF4s8Pto7UaHr8h++Y2Nrw5ZTTKo=;
+ b=qAIo/D6dtqlnYeQm4CPKOp6r1tgGmYb/TCE0ZFZt0lEJrPYMajXdg/1TMqfVsQ/dGjHOxwBtkhbw2n28FmvtCOZsnE3EePDHjYzt9Zt4TzJB7Q9dUFMJsyRqqdCsthXy8E98kOS+Wash5zRZMd21XQJ5mqFbXojxiSbe7EOjA04=
+Received: from BN0PR10CA0026.namprd10.prod.outlook.com (2603:10b6:408:143::21)
+ by MW4PR12MB7438.namprd12.prod.outlook.com (2603:10b6:303:219::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6178.37; Wed, 22 Mar
+ 2023 20:34:56 +0000
+Received: from BN8NAM11FT043.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:408:143:cafe::2a) by BN0PR10CA0026.outlook.office365.com
+ (2603:10b6:408:143::21) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6178.37 via Frontend
+ Transport; Wed, 22 Mar 2023 20:34:56 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ BN8NAM11FT043.mail.protection.outlook.com (10.13.177.218) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.6222.17 via Frontend Transport; Wed, 22 Mar 2023 20:34:56 +0000
+Received: from driver-dev1.pensando.io (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Wed, 22 Mar
+ 2023 15:34:55 -0500
+From:   Brett Creeley <brett.creeley@amd.com>
+To:     <kvm@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <alex.williamson@redhat.com>, <jgg@nvidia.com>,
+        <yishaih@nvidia.com>, <shameerali.kolothum.thodi@huawei.com>,
+        <kevin.tian@intel.com>
+CC:     <brett.creeley@amd.com>, <shannon.nelson@amd.com>,
+        <drviers@pensando.io>
+Subject: [PATCH v5 vfio 0/7] pds_vfio driver
+Date:   Wed, 22 Mar 2023 13:34:35 -0700
+Message-ID: <20230322203442.56169-1-brett.creeley@amd.com>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
-References: <ZBruFRwt3rUVngPu@zx2c4.com> <20230322120907.2968494-1-Jason@zx2c4.com>
- <20230322124631.7p67thzeblrawsqj@orel> <1884bd96-2783-4556-bc57-8b733758baff@spud>
- <20230322192610.sad42xau33ye5ayn@orel> <2a3b08ce-5ab1-41b6-ad58-edbeff7b1acb@spud>
- <ad445951-3d13-4644-94d9-e0989cda39c3@spud>
-In-Reply-To: <ad445951-3d13-4644-94d9-e0989cda39c3@spud>
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Wed, 22 Mar 2023 21:19:50 +0100
-X-Gmail-Original-Message-ID: <CAHmME9qEbUP7cq-iofN=ruSWhsHUva+qqavfEpNzDK_BjQVqxw@mail.gmail.com>
-Message-ID: <CAHmME9qEbUP7cq-iofN=ruSWhsHUva+qqavfEpNzDK_BjQVqxw@mail.gmail.com>
-Subject: Re: [PATCH] riscv: require alternatives framework when selecting FPU support
-To:     Conor Dooley <conor@kernel.org>
-Cc:     Andrew Jones <ajones@ventanamicro.com>,
-        Jisheng Zhang <jszhang@kernel.org>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Anup Patel <anup@brainfault.org>,
-        Atish Patra <atishp@atishpatra.org>,
-        Heiko Stuebner <heiko@sntech.de>,
-        Conor Dooley <conor.dooley@microchip.com>,
-        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
-        regressions@leemhuis.info, regressions@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
-        DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-Originating-IP: [10.180.168.240]
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN8NAM11FT043:EE_|MW4PR12MB7438:EE_
+X-MS-Office365-Filtering-Correlation-Id: c5923e83-0040-4575-14bb-08db2b14e635
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 1cHDn20esDD+ez+CzP5OYu3xEUMW6ZIjl4tQ9u0bn12niHuDtD1Zarp8StDsXFEJoIK+FcjC0FTPfYBMnnMsVbEGOFLlYKXBefhu+nLeLNePxRDiF9mdFtEYiuf000+XCFd5wLSLND3B6QRHiWBXirWXlZuQjn/Oq0Vs7e9E9BBQjw01SxUYgB3SXLWFLO5kCctpWIENodg5AGSCif9mQ9oSOvZvEBcBi/3VWjPv85Krmp7RseuaeqS4/AuIIjYUwZN/AYx84JWM6q1/jQkUo3eJx1vuqRxNCAuK3MTEmRkq23Z7dveI//TiMUWP44+y0DMEo9qY5RekgxAELJiQW31/PSCB3K/3k0MLarKl3SEOOT7aQIaMWqQWAnj8Whi4UbGcORntuSTAYcg67UiN7plagb+vF8syQCj/soDfQ2wvz/ENjoRabb1/RPSjulSwW30UdH8ka/ikRYJff8nonqTwGuYby1fh05sqRsced0bxHq2jH8TUv3HkeQuMae2mP+ftaYcHVoQmOAlu8sk4f2i/9SKVsXy6+v78xbrJkYuEeIuB0Rt6cV/93TO8yeZbhLUEJtrcADLaFVonWmcpOt+P4LspXcvXeuigY1EpwaQId7uX7eINjg66jsZNtejABYK9MD/LtdcOUZVag9mPE/TdZv0gbx4jxv1bjln1G3yB/6QnHMq2kbA81yA7uRozqm41Q1aNw8ioNxlsnbtrVbQTK3T5G5VJZN+UUko6WDVAz6KEQ8vq9Dh4jSGMQcDINgI9iP37RUeJHFIXw1thtg==
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230025)(4636009)(376002)(136003)(346002)(396003)(39860400002)(451199018)(46966006)(36840700001)(40470700004)(316002)(54906003)(966005)(6666004)(81166007)(4326008)(8676002)(70206006)(110136005)(478600001)(70586007)(336012)(47076005)(82740400003)(426003)(2906002)(2616005)(41300700001)(186003)(40460700003)(26005)(86362001)(16526019)(356005)(36860700001)(8936002)(83380400001)(36756003)(40480700001)(5660300002)(1076003)(44832011)(82310400005)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Mar 2023 20:34:56.3229
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: c5923e83-0040-4575-14bb-08db2b14e635
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT043.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB7438
+X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
+        DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,URIBL_BLOCKED
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 22, 2023 at 9:05=E2=80=AFPM Conor Dooley <conor@kernel.org> wro=
-te:
->
-> On Wed, Mar 22, 2023 at 07:44:13PM +0000, Conor Dooley wrote:
-> > On Wed, Mar 22, 2023 at 08:26:10PM +0100, Andrew Jones wrote:
-> > > On Wed, Mar 22, 2023 at 03:17:13PM +0000, Conor Dooley wrote:
-> > > > On Wed, Mar 22, 2023 at 01:46:31PM +0100, Andrew Jones wrote:
-> >
-> > > > > (It's tempting to just select RISCV_ALTERNATIVE from RISCV, but m=
-aybe we
-> > > > >  can defer that wedding a bit longer.)
-> > > >
-> > > > At that point, the config option should just go away entirely, no?
-> > >
-> > > Ah, yes, and that makes the idea even more attractive, as we could re=
-move
-> > > several ifdefs.
-> >
-> > I went and did the cursory check, it's not compatible with XIP_KERNEL s=
-o
-> > dropping the option entirely probably isn't a possibility :/
->
-> What I said is only now sinking in. We're now going to be disabling FPU
-> support on XIP kernels with this patch.
-> Well, technically not this patch since it wouldn't have built without
-> Jason's changes, but that doesn't seem like the right thing to do...
+This is a patchset for a new vendor specific VFIO driver
+(pds_vfio) for use with the AMD/Pensando Distributed Services Card
+(DSC). This driver makes use of the newly introduced pds_core
+driver, which the latest version can be referenced at:
 
-I suppose you could have riscv_has_extension_*() fall back to
-something that doesn't use alternatives on XIP kernels.
+https://lore.kernel.org/netdev/20230322185626.38758-1-shannon.nelson@amd.com/
+
+This driver will use the pds_core device's adminq as the VFIO
+control path to the DSC. In order to make adminq calls, the VFIO
+instance makes use of functions exported by the pds_core driver.
+
+In order to receive events from pds_core, the pds_vfio driver
+registers to a private notifier. This is needed for various events
+that come from the device.
+
+An ASCII diagram of a VFIO instance looks something like this and can
+be used with the VFIO subsystem to provide the VF device VFIO and live
+migration support.
+
+                               .------.  .-----------------------.
+                               | QEMU |--|  VM  .-------------.  |
+                               '......'  |      |   Eth VF    |  |
+                                  |      |      .-------------.  |
+                                  |      |      |  SR-IOV VF  |  |
+                                  |      |      '-------------'  |
+                                  |      '------------||---------'
+                               .--------------.       ||
+                               |/dev/<vfio_fd>|       ||
+                               '--------------'       ||
+Host Userspace                         |              ||
+===================================================   ||
+Host Kernel                            |              ||
+                                  .--------.          ||
+                                  |vfio-pci|          ||
+                                  '--------'          ||
+       .------------------.           ||              ||
+       |   | exported API |<----+     ||              ||
+       |   '--------------|     |     ||              ||
+       |                  |    .-------------.        ||
+       |     pds_core     |--->|   pds_vfio  |        ||
+       '------------------' |  '-------------'        ||
+               ||           |         ||              ||
+             09:00.0     notifier    09:00.1          ||
+== PCI ===============================================||=====
+               ||                     ||              ||
+          .----------.          .----------.          ||
+    ,-----|    PF    |----------|    VF    |-------------------,
+    |     '----------'          '----------'  |       VF       |
+    |                     DSC                 |  data/control  |
+    |                                         |      path      |
+    -----------------------------------------------------------
+
+
+The pds_vfio driver is targeted to reside in drivers/vfio/pci/pds.
+It makes use of and introduces new files in the common include/linux/pds
+include directory.
+
+Changes:
+v5:
+- Fix SPDX comments in .h files
+- Remove adminqcq argument from pdsc_post_adminq() uses
+- Unregister client on vfio_pci_core_register_device() failure
+- Other minor checkpatch issues
+
+v4:
+https://lore.kernel.org/netdev/20230308052450.13421-1-brett.creeley@amd.com/
+- Update cover letter ASCII diagram to reflect new driver architecture
+- Remove auxiliary driver implementation
+- Use pds_core's exported functions to communicate with the device
+- Implement and register notifier for events from the device/pds_core
+- Use module_pci_driver() macro since auxiliary driver configuration is
+  no longer needed in __init/__exit
+
+v3:
+https://lore.kernel.org/netdev/20230219083908.40013-1-brett.creeley@amd.com/
+- Update copyright year to 2023 and use "Advanced Micro Devices, Inc."
+  for the company name
+- Clarify the fact that AMD/Pensando's VFIO solution is device type
+  agnostic, which aligns with other current VFIO solutions
+- Add line in drivers/vfio/pci/Makefile to build pds_vfio
+- Move documentation to amd sub-directory
+- Remove some dead code due to the pds_core implementation of
+  listening to BIND/UNBIND events
+- Move a dev_dbg() to a previous patch in the series
+- Add implementation for vfio_migration_ops.migration_get_data_size to
+  return the maximum possible device state size
+
+RFC to v2:
+https://lore.kernel.org/all/20221214232136.64220-1-brett.creeley@amd.com/
+- Implement state transitions for VFIO_MIGRATION_P2P flag
+- Improve auxiliary driver probe by returning EPROBE_DEFER
+  when the PCI driver is not set up correctly
+- Add pointer to docs in
+  Documentation/networking/device_drivers/ethernet/index.rst
+
+RFC:
+https://lore.kernel.org/all/20221207010705.35128-1-brett.creeley@amd.com/
+
+Brett Creeley (7):
+  vfio: Commonize combine_ranges for use in other VFIO drivers
+  vfio/pds: Initial support for pds_vfio VFIO driver
+  vfio/pds: register with the pds_core PF
+  vfio/pds: Add VFIO live migration support
+  vfio/pds: Add support for dirty page tracking
+  vfio/pds: Add support for firmware recovery
+  vfio/pds: Add Kconfig and documentation
+
+ .../device_drivers/ethernet/amd/pds_vfio.rst  |  79 +++
+ .../device_drivers/ethernet/index.rst         |   1 +
+ MAINTAINERS                                   |   7 +
+ drivers/vfio/pci/Kconfig                      |   2 +
+ drivers/vfio/pci/Makefile                     |   2 +
+ drivers/vfio/pci/mlx5/cmd.c                   |  48 +-
+ drivers/vfio/pci/pds/Kconfig                  |  20 +
+ drivers/vfio/pci/pds/Makefile                 |  11 +
+ drivers/vfio/pci/pds/cmds.c                   | 529 +++++++++++++++++
+ drivers/vfio/pci/pds/cmds.h                   |  27 +
+ drivers/vfio/pci/pds/dirty.c                  | 540 ++++++++++++++++++
+ drivers/vfio/pci/pds/dirty.h                  |  45 ++
+ drivers/vfio/pci/pds/lm.c                     | 486 ++++++++++++++++
+ drivers/vfio/pci/pds/lm.h                     |  52 ++
+ drivers/vfio/pci/pds/pci_drv.c                | 212 +++++++
+ drivers/vfio/pci/pds/pci_drv.h                |   9 +
+ drivers/vfio/pci/pds/vfio_dev.c               | 235 ++++++++
+ drivers/vfio/pci/pds/vfio_dev.h               |  40 ++
+ drivers/vfio/vfio_main.c                      |  48 ++
+ include/linux/pds/pds_lm.h                    | 391 +++++++++++++
+ include/linux/vfio.h                          |   3 +
+ 21 files changed, 2740 insertions(+), 47 deletions(-)
+ create mode 100644 Documentation/networking/device_drivers/ethernet/amd/pds_vfio.rst
+ create mode 100644 drivers/vfio/pci/pds/Kconfig
+ create mode 100644 drivers/vfio/pci/pds/Makefile
+ create mode 100644 drivers/vfio/pci/pds/cmds.c
+ create mode 100644 drivers/vfio/pci/pds/cmds.h
+ create mode 100644 drivers/vfio/pci/pds/dirty.c
+ create mode 100644 drivers/vfio/pci/pds/dirty.h
+ create mode 100644 drivers/vfio/pci/pds/lm.c
+ create mode 100644 drivers/vfio/pci/pds/lm.h
+ create mode 100644 drivers/vfio/pci/pds/pci_drv.c
+ create mode 100644 drivers/vfio/pci/pds/pci_drv.h
+ create mode 100644 drivers/vfio/pci/pds/vfio_dev.c
+ create mode 100644 drivers/vfio/pci/pds/vfio_dev.h
+ create mode 100644 include/linux/pds/pds_lm.h
+
+-- 
+2.17.1
+
