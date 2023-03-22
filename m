@@ -2,127 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CA8186C5253
-	for <lists+kvm@lfdr.de>; Wed, 22 Mar 2023 18:21:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0E9AE6C5255
+	for <lists+kvm@lfdr.de>; Wed, 22 Mar 2023 18:21:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229672AbjCVRVu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Mar 2023 13:21:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47570 "EHLO
+        id S229648AbjCVRVv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Mar 2023 13:21:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47582 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229704AbjCVRVs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Mar 2023 13:21:48 -0400
-Received: from mail-lf1-x12b.google.com (mail-lf1-x12b.google.com [IPv6:2a00:1450:4864:20::12b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08D3A66D0B
-        for <kvm@vger.kernel.org>; Wed, 22 Mar 2023 10:21:26 -0700 (PDT)
-Received: by mail-lf1-x12b.google.com with SMTP id k37so11410282lfv.0
-        for <kvm@vger.kernel.org>; Wed, 22 Mar 2023 10:21:25 -0700 (PDT)
+        with ESMTP id S229836AbjCVRVt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Mar 2023 13:21:49 -0400
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 559A61DBBC
+        for <kvm@vger.kernel.org>; Wed, 22 Mar 2023 10:21:27 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-5417f156cb9so194924897b3.8
+        for <kvm@vger.kernel.org>; Wed, 22 Mar 2023 10:21:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=daynix-com.20210112.gappssmtp.com; s=20210112; t=1679505683;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZAMwytLDDPXOJZO7xVxuXg0wtjoShJg+clkvBywaXAo=;
-        b=NhEzhajgiO0scbd61FI+YDLNe/DDnEOiVT7Dn5D2fjex5xhRtPRBlBY+JxrearBLuR
-         yJ9WEWNww9OUPDpR/YugZQxUS1UBnqNP0yFExwUMGxUJfTrT5VYwaRDx/dh3CR7ZQNA2
-         vx2lB9ZbwxHli0lFXOQMAyw0cjcA/Xd+hLVE3EEINvbWDbasZXcbqnsOBWETKPt3zh/w
-         Hru80PEpNo5REJZ6HZnYvjhLcRbN8KcB13CqYlSzFrwKwd8vJ6KCyOZ6erFQiOPX9syh
-         mxJbXKk7u7WFt6XLNTRW3nNNA1AXT4BIzQLCVemnqXLgNO0IDfFvHQCKHA8HXAFU44bQ
-         X/AQ==
+        d=google.com; s=20210112; t=1679505683;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=76O02WUE0g6eJOczr8cqfk1ma9BWKFaFBJ26R68A8wg=;
+        b=k7inNZWz7vd/OQCF1Z4fDIHKAdlxFRy3qWK9TuqXeo+KhaokHQVARHM+S0ZTtZIhyU
+         mSv7IAVJKzONelUwXnP4lJUL/f0+mV97k/0f7n2vsjSp1vQ+2cOW+44Hg58HcV/Uw3B5
+         N17vxLXKUyY6/0136SUIqFRqIp6bNmlAQaXKZ7mwnhsAJ0bpWsS3xq2H9HceSuHje4zz
+         EknGjj2qy26yf+8wjNxrENhzST3sXkeBdNr4ycaqXHURIjUzYatoGy4uC8H9pnrdGF9+
+         U14MkM6znsON/GpzzItOmbAIx+dVUXM1uNxkKThrCjpMtqIJ7RImwwkxkXFWjJCnHv/+
+         7xEw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112; t=1679505683;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ZAMwytLDDPXOJZO7xVxuXg0wtjoShJg+clkvBywaXAo=;
-        b=2mrp8alClmcO0B7TdC6ASc9/Nr14aRG6Jb4jGUInIU26DXjcqdHZpyRi9mP1x/bvHT
-         r/ONOEMRsK0feQDzJjLxzbOT+wOg+qROQwgs4mrRQwuFnXbqjXAKKe58vcMDpiYuu02A
-         Jq256DlaDYxCJWaoX5pLsTyxfK/Pf5LixvwvXdwir+8WdSxlroveZu8C4rUstxnK3PlL
-         DHcvpBOSGufJN/hSnpzsxLJCgDL3gHNCXRKAbiHEbnB29cBQpo52IcsH6qKoK4ZZmhHl
-         RZc8bWiFdky2xXLclMfOF5v4I1Sne7g/vnL3b1GyKH0Ln1jlgDZe/Ay8S3c96orlwWet
-         qnsw==
-X-Gm-Message-State: AO0yUKWqTPISs+UTTYEXNOrIl130cYJsGbnMQo2SPM2UIXOjPrtNAmQz
-        amEGAXJzNk8iMr0DNReq3HQDFr+VP3elxM7SfN3dCw==
-X-Google-Smtp-Source: AK7set9MuRTtqaHAxup5npSc4ZVmoBivLmO5CzIRbhpGcr+n85AcT1Z7IBjQDmgArMu1eeNf2AWjeNPVP6I/j8eTD4w=
-X-Received: by 2002:ac2:5989:0:b0:4dd:a025:d8c with SMTP id
- w9-20020ac25989000000b004dda0250d8cmr2195562lfn.5.1679505682982; Wed, 22 Mar
- 2023 10:21:22 -0700 (PDT)
-MIME-Version: 1.0
-References: <20230322141031.2211141-1-viktor@daynix.com> <20230322123121-mutt-send-email-mst@kernel.org>
- <87mt44hh5f.fsf@redhat.com>
-In-Reply-To: <87mt44hh5f.fsf@redhat.com>
-From:   Viktor Prutyanov <viktor@daynix.com>
-Date:   Wed, 22 Mar 2023 20:21:12 +0300
-Message-ID: <CAPv0NP79iv=s-tdTWwb_3cWbucJSH7LTDYo0VxjdnWvpjguK3Q@mail.gmail.com>
-Subject: Re: [PATCH v4] virtio: add VIRTIO_F_NOTIFICATION_DATA feature support
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>, jasowang@redhat.com,
-        pasic@linux.ibm.com, farman@linux.ibm.com,
-        linux-s390@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        linux-kernel@vger.kernel.org, yan@daynix.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=0.0 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=76O02WUE0g6eJOczr8cqfk1ma9BWKFaFBJ26R68A8wg=;
+        b=03odZOsAam0WxLj61QLVyWGS915OIJpa4uV/4CpBTdeva5MyyymWU88XSJALUP9XAv
+         gxmBenoRqWwYDmkCbilV1PZ55AP4F+/I0i22kUvoCrtetvO5bnMfOHeX94Kj+gvw1U98
+         KaZecQMvRlbHiJivlhV+a+i56+aHPOFfnRM7dEbu08gfoyGl4nkT33tZA4y9iDivPah5
+         jSjagZa0fOxDPbbQlRN24c60kgckXrL638kDSxve6C1V5Zf36bPPY2sKM69lh2kXaniR
+         ysutPYBq6Sq7CpzcGSuKXWR2Z/nnHkBo7NJJyMHC01IOdyDH0Wv35eVa853p96A6DgAF
+         fSJA==
+X-Gm-Message-State: AAQBX9did3QcMBdhrsmZcatdGItU+NMM8MSZ+6o4kQbaiBSOtsWEL7uA
+        80M2msFCuylVFH3gzOC92odgEwPXEM4=
+X-Google-Smtp-Source: AKy350bJEJhNLbUTpql+V2P2dh5ZRNTp0zjzWhBiiWZxxRPIx42ttF/hOxoPB3QRlQqpRBYU47o9eG5UvMM=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a81:a782:0:b0:541:a17f:c77d with SMTP id
+ e124-20020a81a782000000b00541a17fc77dmr307985ywh.10.1679505683599; Wed, 22
+ Mar 2023 10:21:23 -0700 (PDT)
+Date:   Wed, 22 Mar 2023 10:21:22 -0700
+In-Reply-To: <20230322045824.22970-3-binbin.wu@linux.intel.com>
+Mime-Version: 1.0
+References: <20230322045824.22970-1-binbin.wu@linux.intel.com> <20230322045824.22970-3-binbin.wu@linux.intel.com>
+Message-ID: <ZBs5Eh0LrN/TMErj@google.com>
+Subject: Re: [PATCH 2/4] KVM: x86: Replace kvm_read_{cr0,cr4}_bits() with kvm_is_{cr0,cr4}_bit_set()
+From:   Sean Christopherson <seanjc@google.com>
+To:     Binbin Wu <binbin.wu@linux.intel.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, robert.hu@linux.intel.com
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-7.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 22, 2023 at 7:42=E2=80=AFPM Cornelia Huck <cohuck@redhat.com> w=
-rote:
->
-> On Wed, Mar 22 2023, "Michael S. Tsirkin" <mst@redhat.com> wrote:
->
-> > On Wed, Mar 22, 2023 at 05:10:31PM +0300, Viktor Prutyanov wrote:
-> >> According to VirtIO spec v1.2, VIRTIO_F_NOTIFICATION_DATA feature
-> >> indicates that the driver passes extra data along with the queue
-> >> notifications.
-> >>
-> >> In a split queue case, the extra data is 16-bit available index. In a
-> >> packed queue case, the extra data is 1-bit wrap counter and 15-bit
-> >> available index.
-> >>
-> >> Add support for this feature for MMIO, channel I/O and modern PCI
-> >> transports.
-> >>
-> >> Signed-off-by: Viktor Prutyanov <viktor@daynix.com>
-> >> ---
-> >>  v4: remove VP_NOTIFY macro and legacy PCI support, add
-> >>     virtio_ccw_kvm_notify_with_data to virtio_ccw
-> >>  v3: support feature in virtio_ccw, remove VM_NOTIFY, use avail_idx_sh=
-adow,
-> >>     remove byte swap, rename to vring_notification_data
-> >>  v2: reject the feature in virtio_ccw, replace __le32 with u32
-> >>
-> >>  Tested with disabled VIRTIO_F_NOTIFICATION_DATA on qemu-system-s390x
-> >>  (virtio-blk-ccw), qemu-system-riscv64 (virtio-blk-device,
-> >>  virtio-rng-device), qemu-system-x86_64 (virtio-blk-pci, virtio-net-pc=
-i)
-> >>  to make sure nothing is broken.
-> >>  Tested with enabled VIRTIO_F_NOTIFICATION_DATA on 64-bit RISC-V Linux
-> >>  and my hardware implementation of virtio-rng.
-> >
-> > what did you test? virtio pci? mmio? guessing not ccw...
-> >
-> > Cornelia could you hack up something to quickly test ccw?
->
-> Hm, I'm not entirely sure how notification data is supposed to be used
-> in real life -- Viktor, what is your virtio-rng implementation doing;
-> can this be hacked into all transports?
+On Wed, Mar 22, 2023, Binbin Wu wrote:
+> Replace kvm_read_{cr0,cr4}_bits() with kvm_is_{cr0,cr4}_bit_set() when only
+> one bit is checked and bool is preferred as return value type.
+> Also change the return value type from int to bool of is_pae(), is_pse() and
+> is_paging().
 
-In hardware implementation of split VirtIO queue, the notification data fea=
-ture
-saves time on a memory request to avail_idx from the device side. I can
-definitely say about MMIO, but most likely it is also useful for PCI.
-It is also written here that this feature was added for efficiency:
-https://www.mail-archive.com/virtio-dev@lists.oasis-open.org/msg02728.html
-Also DPDK has support for this feature in VirtIO PCI:
-https://github.com/DPDK/dpdk/commit/7e72f3ec1a8abefd9321a61e484846e16177f5b=
-1
+I'm going to squash the obvious/direct changes with the introduction of the helpers,
+and isolate is_{pae,pse,paging}() as those are more risky due to the multiple
+casts (ulong=>int=>bool), and because the end usage isn't visible in the patch.
 
->
-> (Also, if the other ccw folks have something handy, please speak up :)
->
+Case in point, there is a benign but in svm_set_cr0() that would be silently
+fixed by converting is_paging() to return a bool:
+
+	bool old_paging = is_paging(vcpu);
+
+	...
+
+	vcpu->arch.cr0 = cr0;
+
+	if (!npt_enabled) {
+		hcr0 |= X86_CR0_PG | X86_CR0_WP;
+		if (old_paging != is_paging(vcpu))
+
+The "old_paging != is_paging(vcpu)" compares a bool (1/0) against an int that
+was an unsigned long (X86_CR0_PG/0), i.e. gets a false positive when paging is
+enabled.
+
+I'll post a fix and slot it in before this patch, both so that there's no silent
+fixes and so that this changelog can reference the commit.
+
+> ---
+>  arch/x86/kvm/cpuid.c      |  4 ++--
+>  arch/x86/kvm/mmu.h        |  2 +-
+>  arch/x86/kvm/vmx/nested.c |  2 +-
+>  arch/x86/kvm/vmx/vmx.c    |  2 +-
+>  arch/x86/kvm/x86.c        | 20 ++++++++++----------
+>  arch/x86/kvm/x86.h        | 16 ++++++++--------
+
+This misses a few conversions in kvm_pmu_rdpmc(), I'll fix those when applying too.
