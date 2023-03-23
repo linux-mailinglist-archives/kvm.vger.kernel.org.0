@@ -2,185 +2,285 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B86D06C6B50
-	for <lists+kvm@lfdr.de>; Thu, 23 Mar 2023 15:43:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9126C6C6B5F
+	for <lists+kvm@lfdr.de>; Thu, 23 Mar 2023 15:45:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231631AbjCWOnU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Mar 2023 10:43:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41690 "EHLO
+        id S231848AbjCWOpL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Mar 2023 10:45:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42594 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231318AbjCWOnT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Mar 2023 10:43:19 -0400
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2050.outbound.protection.outlook.com [40.107.244.50])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A6A723A65;
-        Thu, 23 Mar 2023 07:43:18 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=T052fmcvVNLE3twz4KKsLSNMqh+WKbZLg2sFN78rWWGGKHMz8S/TuEZoPO0S0Rzo7PUtbSa/J6Ioc3fYnQT98TDY0CNuo+fRRNuTWSzINIsRALr04gM6U0OK+sqGkmAyfRiueK82sn0MBlOMR6uOqscY/N0d/YFfPKM5P0BJBvU17YoWFTJYRudjy266zqhRqfmKSqZ+CdgakaXr/xhuMO2CJTKdG72GGqHnNeBRaADHp3qznogJ+pF2PBkLSBaXr9aw7BwkkI+qXCj38IeLkRIE8LrunYRrbsydM9IwSjfcdJuKl3wN00pfFJi8tHLRFph8sy+wfVzugYHEVIQN2A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=xZQyarvGvVT+NVLhw504PPrq7LhzidR+gYwnKWibsUs=;
- b=Eu697J0G+p2Nq6j11OsaKWC3xhWp9JJnI564Was3gA/IM6ngTF+foTl4ehQfNEeJltWNogSeeyxlbTrIAz6tuEgIUUo/z6nM9AnAuIZoskjNVz2SS8z9Y1Re8lP0oMSpBmGcYgX/uaGtahO4tqb6w7VU4HXe0qYcZPzrNk3n+z7Mb3bwNg/IouESl9LrVnQA1b4Pq1R2Vc4/HbJKMVzZW1qWGAdZuCWNp5WI1rM6gacUEBl/Cx/lXsqOXnFw0K9CuzfjxKjLt2Vf1xjOs6MzI+ed1RFi7UsN0rkBWavp6/RiCcECEbG3PBM+QuJQKPJb3lQ8/H+FRK1teEzqtRjMxw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=xZQyarvGvVT+NVLhw504PPrq7LhzidR+gYwnKWibsUs=;
- b=Zfl2y9ylsJsykVNBteIVkvdHaxDXtFbtauuPwQLldBT/7PS6lGG5GHBfh4zWJTBbgho9DHDdYuQQPso/YlzIzSDGCzmXEGhMHNGHrYYEDXckeXFDAxBTtIAVAEPKXeoPBHGK/AbcqfdkvfAzlW7bg1kTFGTzch3DTliYXqrc9+ySNYpzP6KYaGz4poVj510iN+mU5wi+SjGNc5TweQTmZ6KA2sNcQhzHzHw34dk1NNcYsn+r7meBYOm0pvKnxHpxXZP/oktcJeXkfs9gkdC9Ui+2ENLNwAPJCOa156ML5za88t/slGYCa20VgAXfD+HPBZj6u4Ivb+5NZc0gNNXiqg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by CH0PR12MB5218.namprd12.prod.outlook.com (2603:10b6:610:d1::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6178.38; Thu, 23 Mar
- 2023 14:43:16 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::ef6d:fdf6:352f:efd1]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::ef6d:fdf6:352f:efd1%3]) with mapi id 15.20.6178.037; Thu, 23 Mar 2023
- 14:43:16 +0000
-Date:   Thu, 23 Mar 2023 11:43:14 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     "Liu, Yi L" <yi.l.liu@intel.com>
-Cc:     "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
-        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
-        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "jasowang@redhat.com" <jasowang@redhat.com>,
-        "shameerali.kolothum.thodi@huawei.com" 
-        <shameerali.kolothum.thodi@huawei.com>,
-        "lulu@redhat.com" <lulu@redhat.com>,
-        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
-        "intel-gvt-dev@lists.freedesktop.org" 
-        <intel-gvt-dev@lists.freedesktop.org>,
-        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
-        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-        "Hao, Xudong" <xudong.hao@intel.com>,
-        "Zhao, Yan Y" <yan.y.zhao@intel.com>,
-        "Xu, Terrence" <terrence.xu@intel.com>
-Subject: Re: [PATCH 6/7] vfio: Accpet device file from vfio PCI hot reset path
-Message-ID: <ZBxlgnpg9QzuoO56@nvidia.com>
-References: <20230316124156.12064-1-yi.l.liu@intel.com>
- <20230316124156.12064-7-yi.l.liu@intel.com>
- <ZBiu9+mVurbW0x5k@nvidia.com>
- <DS0PR11MB7529BEB87EC6941C19D56660C3879@DS0PR11MB7529.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <DS0PR11MB7529BEB87EC6941C19D56660C3879@DS0PR11MB7529.namprd11.prod.outlook.com>
-X-ClientProxiedBy: CH0PR03CA0415.namprd03.prod.outlook.com
- (2603:10b6:610:11b::26) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+        with ESMTP id S231784AbjCWOpB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Mar 2023 10:45:01 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6FB5B23A49
+        for <kvm@vger.kernel.org>; Thu, 23 Mar 2023 07:44:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1679582652;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=NrVA7uU+nRMqFw4cOUV9tVLaScyoHsXz3KJEw/B4yIU=;
+        b=iykAq50kKmPFl06b9WG734W/TkQf4eIEAI145ViXa4gtD9RCQ7IlXwleULZ9YE1I2qmUp9
+        GBiLxMZ/NCJy76nVFkz6n4DPf/3FJWmFqp/DLKGVX7+pO2z8HatkVeHXH7ddnC6nBmBPyj
+        xTqxg0cfd8FQYmDKzupI7Ur+AWG+MNA=
+Received: from mail-yb1-f199.google.com (mail-yb1-f199.google.com
+ [209.85.219.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-669-89oGFw6LNYiwChqpIQHZhw-1; Thu, 23 Mar 2023 10:44:11 -0400
+X-MC-Unique: 89oGFw6LNYiwChqpIQHZhw-1
+Received: by mail-yb1-f199.google.com with SMTP id d7-20020a25adc7000000b00953ffdfbe1aso23096267ybe.23
+        for <kvm@vger.kernel.org>; Thu, 23 Mar 2023 07:44:11 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1679582650;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=NrVA7uU+nRMqFw4cOUV9tVLaScyoHsXz3KJEw/B4yIU=;
+        b=OjBxEvk55T1igqAIkrhdkRfaljzEXiilE9dKKsvyzgWI5mn/kCB/rIqUUy8j4jTXtL
+         3y3oilpn1poGl2rehENWrKj1oQQMIAUDAHkxfeKtSkLebL0YWLsEIcBOCfp3wgmhoo4F
+         usu9BAEKRhGJnyS4jaUXsJWuGZxOpTaFHM32StLUhYbqG87YxHH3wboZ1zNy6R82YOQc
+         gagIYB4U1L87OnbJoD6kOKhZq+YxQR743ZmlpDoV4McvzarWGDMKQ8IM2/NOoibDI7Rp
+         8e9qEM5faQ54JrRNJyrHn56DbrhPLZSCa7Ob4SdZcHs/G73m/Moi0i2WnEVROITgRx3Y
+         500w==
+X-Gm-Message-State: AAQBX9dTiu5qEd0a0vQG3Yl8IkCvAJUoXokJ8PuhMd4W34QjcH1IYShL
+        spBeqhOeEwXUhEtLCboT9S+Jbt5LbAidcIDSLjums31IZREXtN+lb6/jLi6/lBYz0QBHWpMa0EH
+        z/C09DTj+xn28qyQgl8JRyQhT6WWT
+X-Received: by 2002:a25:b001:0:b0:b70:ad30:dacc with SMTP id q1-20020a25b001000000b00b70ad30daccmr1906301ybf.2.1679582650461;
+        Thu, 23 Mar 2023 07:44:10 -0700 (PDT)
+X-Google-Smtp-Source: AKy350Yp90qJTyafDDZI8Zx6KKeaVqtRTbdnVnhZPzCnb/pi2s126PXUI5QEyJvtGxI/gRHywVjAEr2ZJillufAyOvY=
+X-Received: by 2002:a25:b001:0:b0:b70:ad30:dacc with SMTP id
+ q1-20020a25b001000000b00b70ad30daccmr1906287ybf.2.1679582650156; Thu, 23 Mar
+ 2023 07:44:10 -0700 (PDT)
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|CH0PR12MB5218:EE_
-X-MS-Office365-Filtering-Correlation-Id: bdef4f76-69bf-4876-a1cb-08db2bacefbb
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: cvBc8vkb9YEE3Vf0/XGtca5duCsrdPCr4RcoLxVVFTt7s5aSGMdzLU43YT06daVl6gIojJv/g8wF1hFeSQDusEMZ0YiOHehNrcrbit6mH0a1IPF3LxBPFvHEUxef98fVi88eAD/31dHiHl9h/ez58kwvgKx50ruV0650ZY5vnirCeO6rEqUGDo3qs5qyz6MM/w5IeXyaXMfOSmm+K53nZYTUidZMHiADGYcQhRF0pijHQknWRhB+LnHqla1LgF1dHY5XwVzz2SF8bYvlDRR9DaQ0yJNg1wvHb2+nlmDc1VNrTp1ZhCbva2QG8fLsuEeRwAH12/In2Hfmjjfc6YYUmifljguu51BCobsm01q/8TjLINfTMrYWfxIXe8OrNhNCcf5fbLDkFMatSUUsN9yx8OvDhyCM29SelhVNapa5UVvvOtp1/3bkTta7mH/Ojtpy3+gEw4NB36P1YQF9xFl+yJCR3DywhUhrk8zurpzBQN9G1+YvqDcKdZvO+DZxid+gW4mVXN4I2bkYqVfAknWy3SONXaj4y2qMVdnqtVlN+xJWhAsaf5PBXbZtUFtikGFEblcdVGWnzQADe7mUQfmjvjF0HCE8YDSbrComyk4JMiPmt805dlf5w89OaW0RbrZ+4NXbfY5SxVCaCGZTQWcKtg==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(396003)(346002)(376002)(136003)(366004)(39860400002)(451199018)(8936002)(66946007)(66556008)(66476007)(41300700001)(6916009)(4326008)(8676002)(86362001)(36756003)(38100700002)(26005)(6512007)(6506007)(2616005)(83380400001)(186003)(316002)(478600001)(6486002)(54906003)(7416002)(2906002)(5660300002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?0ujSqp4DQ8Xjnt8sTTN0JTmt+iQA71M6Mgj5DbJ2AcNFc8jQqjOhOxLhCwf7?=
- =?us-ascii?Q?sDDh14r9USOKa3rGXi93V9qDMRFmB1/WS2yYlPS0hPQDbktzjWbnSb6QCPXq?=
- =?us-ascii?Q?9oFwWk3ORmeDUgEcWmlCQAtSAVTNWtPqjTyg38FNQDFmwX/uQdI1MOyjEenW?=
- =?us-ascii?Q?qjqRlbLxADy1GP2ewvDLdJ9UYB3iELXZR3RstwDmrF5bXmNKCulfyvJLbPfM?=
- =?us-ascii?Q?+58W342qcoiqEtT+Xd5xrgtfcQEvqcuvrnG/yUcyFSiDoR7GKAYBbJBdebMC?=
- =?us-ascii?Q?/w5m9C8iW2S6UTt2UyFvmsq3Y17NtbUlGPBYzgfj6JqaRUxzcGrxRV8ttCF1?=
- =?us-ascii?Q?ZEGN12GfkkgmMLfwgM4ickVaBZxMbHH+8oICL4LP50oS6+4lrdi35otrvnes?=
- =?us-ascii?Q?JQx1qVdhzpf+gw4ogWOCJbaLyFZC4eszF3iOu2B7QtLS89pi1m7gL3RyJv+l?=
- =?us-ascii?Q?3sLNTHxvqWeL9/qsO7qo4EpjzWMjTKSVOCDUHRhyaqd0pZLsRa+EyIONCsl8?=
- =?us-ascii?Q?xJgGHdldQrIaacNiSzHywHTlCe27sUAhmqhRo4qBRYGg7JRx0xCxzps8dXl3?=
- =?us-ascii?Q?MMAZ8vduGeuqQhK0uSlqQbUGKSxp0evCWN/Ubx6TS1inXAup1NqKX2Nnud0u?=
- =?us-ascii?Q?ZNDhpInjSZJkTsx9DX0ySwMS5Rtm55+AoVjQVGflRCPZTIG9w8I78QwSZcsw?=
- =?us-ascii?Q?KV4pO4UFUjBm3AxI0mLTD+uM7EzXYkSZ2FT4pBfbEb7Xbh8sQxXkirR4TBIL?=
- =?us-ascii?Q?ZYLX2ZVqsUQn3ZYvvWhwobtGJnICJBctqQP2YBgdvyvx7elNa6BWy8j2j67j?=
- =?us-ascii?Q?oDP950jr/Fcs3BFiCP2zm88SSjWpHC+hOEb1HeNnCnt9t5wApAfvPwsoEJLs?=
- =?us-ascii?Q?jaPStnxDyI27ZAiqjMeRqpOpmJadcesEx4FGp2x6MSK22t4RFBRSzqeb1tNc?=
- =?us-ascii?Q?W1r+nA3AG7PlJ/ligB+Z+QLwOrRfwwMc7PECmWqgR+RzHXf0IpFH9pfP5luG?=
- =?us-ascii?Q?1KCjDGZs6M7rCcfn7ERe5sW0C1aNotdgrBzw3qgwlDfrkuH73D0RnFquFNmZ?=
- =?us-ascii?Q?VWlxOb3as7JUfE8fFSqTh2Z59bLkappuCAfbdO/n3urRGFlmN3ttYxBr4zu+?=
- =?us-ascii?Q?zeulhGVapRdjm+fjGLhQHAPodQbKJpoXT0hmVtfX7FrjqWcVMzWGA02AvWJX?=
- =?us-ascii?Q?BmN0VspHUMp1HyKpYPV1HGbRKaFEgNAUCpa9P7F9M2PPENXXvjh+UADgMUhK?=
- =?us-ascii?Q?NI9MW5eK5PVwb7elvns0X4CsKhDoVeaA9qeMn1QE8DNrC76qAgr97H0kesCS?=
- =?us-ascii?Q?RuFJgVCqR/LppmmNevMJgJ1xxGT+I9F3AWFKodOJd/QZ+m/PoSfvVsjeIIMk?=
- =?us-ascii?Q?CdcdowINZtVSWixNvk2kBtITRtNL0oXyY3ptR6X+Nf5TN9zJdOjb/Tux99rZ?=
- =?us-ascii?Q?d4DqESG5gr4mOzVKMx4StdhrEArrI/1ba9t2cRyspUPmGQ8Y46NB4ePImR7W?=
- =?us-ascii?Q?4HwKbOYdMcxoj4cXTOsLOkvfaNcigsDypK85IKdy9b1G6SEGkEM8fp4VBUF8?=
- =?us-ascii?Q?8RBKhzYlU9xysZCBIIY2puuHh6IIQ8HuS6HD3t/l?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: bdef4f76-69bf-4876-a1cb-08db2bacefbb
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Mar 2023 14:43:16.2758
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: uQYigiGwzg57yrGHPG/8ymIAB6CtdfFIaIfZBAmRxKZO3ax4ykm2NLdmdS497O+b
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR12MB5218
+References: <20230321154228.182769-1-sgarzare@redhat.com> <20230321154228.182769-5-sgarzare@redhat.com>
+ <CAJaqyWcCwwu1UJ968A=s30GCezjLcwWKDhCFMsQ2EcGGgkiz7g@mail.gmail.com> <20230323104638.67hbwwbk7ayp4psq@sgarzare-redhat>
+In-Reply-To: <20230323104638.67hbwwbk7ayp4psq@sgarzare-redhat>
+From:   Eugenio Perez Martin <eperezma@redhat.com>
+Date:   Thu, 23 Mar 2023 15:43:34 +0100
+Message-ID: <CAJaqyWfSor5PKZn0iAOthCkeGDBc7+rjVXuSHMy1LWY+fV5o7A@mail.gmail.com>
+Subject: Re: [PATCH v3 4/8] vringh: support VA with iotlb
+To:     Stefano Garzarella <sgarzare@redhat.com>
+Cc:     virtualization@lists.linux-foundation.org, stefanha@redhat.com,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Andrey Zhadchenko <andrey.zhadchenko@virtuozzo.com>,
+        netdev@vger.kernel.org, Jason Wang <jasowang@redhat.com>,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 23, 2023 at 10:14:31AM +0000, Liu, Yi L wrote:
-> > From: Jason Gunthorpe <jgg@nvidia.com>
-> > Sent: Tuesday, March 21, 2023 3:08 AM
-> > 
-> > On Thu, Mar 16, 2023 at 05:41:55AM -0700, Yi Liu wrote:
-> > > This extends both vfio_file_is_valid() and vfio_file_has_dev() to accept
-> > > device file from the vfio PCI hot reset.
-> > >
-> > > Signed-off-by: Yi Liu <yi.l.liu@intel.com>
-> > > ---
-> > >  drivers/vfio/vfio_main.c | 23 +++++++++++++++++++----
-> > >  1 file changed, 19 insertions(+), 4 deletions(-)
-> > >
-> > > diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
-> > > index fe7446805afd..ebbb6b91a498 100644
-> > > --- a/drivers/vfio/vfio_main.c
-> > > +++ b/drivers/vfio/vfio_main.c
-> > > @@ -1154,13 +1154,23 @@ const struct file_operations vfio_device_fops
-> > = {
-> > >  	.mmap		= vfio_device_fops_mmap,
-> > >  };
-> > >
-> > > +static struct vfio_device *vfio_device_from_file(struct file *file)
-> > > +{
-> > > +	struct vfio_device *device = file->private_data;
-> > 
-> > Isn't this a df now?
-> 
-> Not yet. It is placed before the cdev series. So it is vfio_device here.
-> 
-> > > +	if (file->f_op != &vfio_device_fops)
-> > > +		return NULL;
-> > > +	return device;
-> > > +}
-> > 
-> > The device has to be bound to be a security proof.
-> 
-> I think it is because this helper is used by vfio_file_has_dev(). This
-> requires to be bound to security proof. For now, the device fd is
-> got via group. So as long s user can get it, it should have been bound.
-> 
-> In the later cdev series, the below helper is added to ensure
-> given device file has bound to security proof (a.k.a access_granted).
+On Thu, Mar 23, 2023 at 11:46=E2=80=AFAM Stefano Garzarella <sgarzare@redha=
+t.com> wrote:
+>
+> On Thu, Mar 23, 2023 at 09:09:14AM +0100, Eugenio Perez Martin wrote:
+> >On Tue, Mar 21, 2023 at 4:43=E2=80=AFPM Stefano Garzarella <sgarzare@red=
+hat.com> wrote:
+> >>
+> >> vDPA supports the possibility to use user VA in the iotlb messages.
+> >> So, let's add support for user VA in vringh to use it in the vDPA
+> >> simulators.
+> >>
+> >> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+> >> ---
+> >>
+> >> Notes:
+> >>     v3:
+> >>     - refactored avoiding code duplication [Eugenio]
+> >>     v2:
+> >>     - replace kmap_atomic() with kmap_local_page() [see previous patch=
+]
+> >>     - fix cast warnings when build with W=3D1 C=3D1
+> >>
+> >>  include/linux/vringh.h            |   5 +-
+> >>  drivers/vdpa/mlx5/net/mlx5_vnet.c |   2 +-
+> >>  drivers/vdpa/vdpa_sim/vdpa_sim.c  |   4 +-
+> >>  drivers/vhost/vringh.c            | 153 +++++++++++++++++++++++------=
+-
+> >>  4 files changed, 127 insertions(+), 37 deletions(-)
+> >>
+> >> diff --git a/include/linux/vringh.h b/include/linux/vringh.h
+> >> index 1991a02c6431..d39b9f2dcba0 100644
+> >> --- a/include/linux/vringh.h
+> >> +++ b/include/linux/vringh.h
+> >> @@ -32,6 +32,9 @@ struct vringh {
+> >>         /* Can we get away with weak barriers? */
+> >>         bool weak_barriers;
+> >>
+> >> +       /* Use user's VA */
+> >> +       bool use_va;
+> >> +
+> >>         /* Last available index we saw (ie. where we're up to). */
+> >>         u16 last_avail_idx;
+> >>
+> >> @@ -279,7 +282,7 @@ void vringh_set_iotlb(struct vringh *vrh, struct v=
+host_iotlb *iotlb,
+> >>                       spinlock_t *iotlb_lock);
+> >>
+> >>  int vringh_init_iotlb(struct vringh *vrh, u64 features,
+> >> -                     unsigned int num, bool weak_barriers,
+> >> +                     unsigned int num, bool weak_barriers, bool use_v=
+a,
+> >>                       struct vring_desc *desc,
+> >>                       struct vring_avail *avail,
+> >>                       struct vring_used *used);
+> >> diff --git a/drivers/vdpa/mlx5/net/mlx5_vnet.c b/drivers/vdpa/mlx5/net=
+/mlx5_vnet.c
+> >> index 520646ae7fa0..dfd0e000217b 100644
+> >> --- a/drivers/vdpa/mlx5/net/mlx5_vnet.c
+> >> +++ b/drivers/vdpa/mlx5/net/mlx5_vnet.c
+> >> @@ -2537,7 +2537,7 @@ static int setup_cvq_vring(struct mlx5_vdpa_dev =
+*mvdev)
+> >>
+> >>         if (mvdev->actual_features & BIT_ULL(VIRTIO_NET_F_CTRL_VQ))
+> >>                 err =3D vringh_init_iotlb(&cvq->vring, mvdev->actual_f=
+eatures,
+> >> -                                       MLX5_CVQ_MAX_ENT, false,
+> >> +                                       MLX5_CVQ_MAX_ENT, false, false=
+,
+> >>                                         (struct vring_desc *)(uintptr_=
+t)cvq->desc_addr,
+> >>                                         (struct vring_avail *)(uintptr=
+_t)cvq->driver_addr,
+> >>                                         (struct vring_used *)(uintptr_=
+t)cvq->device_addr);
+> >> diff --git a/drivers/vdpa/vdpa_sim/vdpa_sim.c b/drivers/vdpa/vdpa_sim/=
+vdpa_sim.c
+> >> index eea23c630f7c..47cdf2a1f5b8 100644
+> >> --- a/drivers/vdpa/vdpa_sim/vdpa_sim.c
+> >> +++ b/drivers/vdpa/vdpa_sim/vdpa_sim.c
+> >> @@ -60,7 +60,7 @@ static void vdpasim_queue_ready(struct vdpasim *vdpa=
+sim, unsigned int idx)
+> >>         struct vdpasim_virtqueue *vq =3D &vdpasim->vqs[idx];
+> >>         uint16_t last_avail_idx =3D vq->vring.last_avail_idx;
+> >>
+> >> -       vringh_init_iotlb(&vq->vring, vdpasim->features, vq->num, true=
+,
+> >> +       vringh_init_iotlb(&vq->vring, vdpasim->features, vq->num, true=
+, false,
+> >>                           (struct vring_desc *)(uintptr_t)vq->desc_add=
+r,
+> >>                           (struct vring_avail *)
+> >>                           (uintptr_t)vq->driver_addr,
+> >> @@ -92,7 +92,7 @@ static void vdpasim_vq_reset(struct vdpasim *vdpasim=
+,
+> >>         vq->cb =3D NULL;
+> >>         vq->private =3D NULL;
+> >>         vringh_init_iotlb(&vq->vring, vdpasim->dev_attr.supported_feat=
+ures,
+> >> -                         VDPASIM_QUEUE_MAX, false, NULL, NULL, NULL);
+> >> +                         VDPASIM_QUEUE_MAX, false, false, NULL, NULL,=
+ NULL);
+> >>
+> >>         vq->vring.notify =3D NULL;
+> >>  }
+> >> diff --git a/drivers/vhost/vringh.c b/drivers/vhost/vringh.c
+> >> index 0ba3ef809e48..72c88519329a 100644
+> >> --- a/drivers/vhost/vringh.c
+> >> +++ b/drivers/vhost/vringh.c
+> >> @@ -1094,10 +1094,18 @@ EXPORT_SYMBOL(vringh_need_notify_kern);
+> >>
+> >>  #if IS_REACHABLE(CONFIG_VHOST_IOTLB)
+> >>
+> >> +struct iotlb_vec {
+> >> +       union {
+> >> +               struct iovec *iovec;
+> >> +               struct bio_vec *bvec;
+> >> +       } iov;
+> >> +       size_t count;
+> >> +       bool is_iovec;
+> >> +};
+> >> +
+> >>  static int iotlb_translate(const struct vringh *vrh,
+> >>                            u64 addr, u64 len, u64 *translated,
+> >> -                          struct bio_vec iov[],
+> >> -                          int iov_size, u32 perm)
+> >> +                          struct iotlb_vec *ivec, u32 perm)
+> >>  {
+> >>         struct vhost_iotlb_map *map;
+> >>         struct vhost_iotlb *iotlb =3D vrh->iotlb;
+> >> @@ -1107,9 +1115,9 @@ static int iotlb_translate(const struct vringh *=
+vrh,
+> >>         spin_lock(vrh->iotlb_lock);
+> >>
+> >>         while (len > s) {
+> >> -               u64 size, pa, pfn;
+> >> +               u64 size;
+> >>
+> >> -               if (unlikely(ret >=3D iov_size)) {
+> >> +               if (unlikely(ret >=3D ivec->count)) {
+> >>                         ret =3D -ENOBUFS;
+> >>                         break;
+> >>                 }
+> >> @@ -1124,10 +1132,22 @@ static int iotlb_translate(const struct vringh=
+ *vrh,
+> >>                 }
+> >>
+> >>                 size =3D map->size - addr + map->start;
+> >> -               pa =3D map->addr + addr - map->start;
+> >> -               pfn =3D pa >> PAGE_SHIFT;
+> >> -               bvec_set_page(&iov[ret], pfn_to_page(pfn), min(len - s=
+, size),
+> >> -                             pa & (PAGE_SIZE - 1));
+> >> +               if (ivec->is_iovec) {
+> >> +                       struct iovec *iovec =3D ivec->iov.iovec;
+> >> +
+> >> +                       iovec[ret].iov_len =3D min(len - s, size);
+> >> +                       iovec[ret].iov_base =3D (void __user *)(unsign=
+ed long)
+> >
+> >s/unsigned long/uintptr_t ?
+> >
+>
+> yep, good catch!
+>
+> As I wrote to Jason, I think I'll take it out of the if and just declare
+> an uintptr_t variable, since I'm using it also in the else branch.
+>
+> >
+> >
+> >> +                                             (map->addr + addr - map-=
+>start);
+> >> +               } else {
+> >> +                       u64 pa =3D map->addr + addr - map->start;
+> >> +                       u64 pfn =3D pa >> PAGE_SHIFT;
+> >> +                       struct bio_vec *bvec =3D ivec->iov.bvec;
+> >> +
+> >> +                       bvec_set_page(&bvec[ret], pfn_to_page(pfn),
+> >> +                                     min(len - s, size),
+> >> +                                     pa & (PAGE_SIZE - 1));
+> >> +               }
+> >> +
+> >>                 s +=3D size;
+> >>                 addr +=3D size;
+> >>                 ++ret;
+> >> @@ -1141,26 +1161,42 @@ static int iotlb_translate(const struct vringh=
+ *vrh,
+> >>         return ret;
+> >>  }
+> >>
+> >> +#define IOTLB_IOV_SIZE 16
+> >
+> >I'm fine with defining here, but maybe it is better to isolate the
+> >change in a previous patch or reuse another well known macro?
+>
+> Yep, good point!
+>
+> Do you have any well known macro to suggest?
+>
 
-Yes OK that makes senese
+Not really, 16 seems like a convenience value here actually :). Maybe
+replace _SIZE with _STRIDE or similar?
 
-Jason
+I keep the Acked-by even if the final name is IOTLB_IOV_SIZE though.
+
+Thanks!
+
