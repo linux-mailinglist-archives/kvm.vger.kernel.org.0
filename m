@@ -2,66 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 427636C6BB3
-	for <lists+kvm@lfdr.de>; Thu, 23 Mar 2023 15:59:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5ECDC6C6BB5
+	for <lists+kvm@lfdr.de>; Thu, 23 Mar 2023 16:00:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230177AbjCWO7z (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Mar 2023 10:59:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37338 "EHLO
+        id S231890AbjCWPAD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Mar 2023 11:00:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37526 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231609AbjCWO7x (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Mar 2023 10:59:53 -0400
-Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29C051D93C
-        for <kvm@vger.kernel.org>; Thu, 23 Mar 2023 07:59:51 -0700 (PDT)
-Received: by mail-pl1-x62d.google.com with SMTP id kq3so10154979plb.13
-        for <kvm@vger.kernel.org>; Thu, 23 Mar 2023 07:59:51 -0700 (PDT)
+        with ESMTP id S231614AbjCWPAA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Mar 2023 11:00:00 -0400
+Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 452B62312B
+        for <kvm@vger.kernel.org>; Thu, 23 Mar 2023 07:59:56 -0700 (PDT)
+Received: by mail-pj1-x1033.google.com with SMTP id p3-20020a17090a74c300b0023f69bc7a68so2330072pjl.4
+        for <kvm@vger.kernel.org>; Thu, 23 Mar 2023 07:59:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sifive.com; s=google; t=1679583591;
+        d=sifive.com; s=google; t=1679583595;
         h=references:in-reply-to:message-id:date:subject:cc:to:from:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=PnQ1gM/aEBoZbxhfb57ZLXc6ZOM+cLTwn6NQvrPI9A8=;
-        b=in9L72Bq1wyyyCu5Us/d2fWoyH5i9lIDbJZuj0vsYeySOsINiL7P0D/RCfG5TfBXmj
-         S1OLjKNr+cT37kDSBYmYW4HtRGIr123Fm6izH4Cl6/LbPiuvZIDdoHAkhscgqRy6SIv4
-         FmEb3HsM5N2OVUfSrnPgRTsG3eE/JmLmgHehgDKxIT81xZc3eHOTLcYXzhCs8LLT833U
-         /YxuN07sT+10IrOGVr8Vchp9kmYDgXNIfTOeXmIfqoSdpSJUOky270eCw8KvkcN9Wf9Y
-         1kz8IDzvOmksd7cwqYAEzXcPwuld+70QohDxInOBcVHCv0LI5hxHaBw2SJnaOSeGTo0a
-         jQJg==
+        bh=CteMDAzkrOKUdcbIvPON419eHbnDZdFOKMS6mt0sWZE=;
+        b=YZmF4D5+ASu+0FbybKdp/QQW9kNTxyCx5YsT6ZvM2DG/OesJXHQ+aDXBJlPpA/hNuc
+         6Ok2Cqe/0ncNLp8Mo6vJqHdPzwEjZZW2E/qTUILb1ds/11rWsZLPg1ULU9sRZNlJtX0e
+         RLywUoQ2+Gk3ZsR0AtYjUYnMExlwFt7XFe5sx0VlC7XSB2iQuY7iwCXW4DcTDzLUXj8H
+         4VHAMluEY0zmLjuaXhhHMQqnsGuRw6fV7o5U6rpZZj8nBGQB7ctBlVTA5KmDh6fVFxec
+         rMpDpvayB6Y69AQ542RP4xGTxSXcMT1SghG8eEJIBMo5uCkewwP1Dk8B8xUg3VgHwOnc
+         L5mA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679583591;
+        d=1e100.net; s=20210112; t=1679583595;
         h=references:in-reply-to:message-id:date:subject:cc:to:from
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=PnQ1gM/aEBoZbxhfb57ZLXc6ZOM+cLTwn6NQvrPI9A8=;
-        b=NBHs0kpqHQpQPX3L6pKyRcv+39CXCvb4Bp8oQdNNzV3MJKt9s4FHyaUAQvzVeecUZ1
-         fVBe8yl46AALDWLdlA/8v3aoTS6q7TIdwf7NleBLnvj3oSha5+GFfxqx6dqA4IT3rq/L
-         CW7VAyCCWKVGz51SfbvCWL44AQ9IWpeDSXpXOsnSYwbtwljXtdo+vUqq1qqnW58Cs1zW
-         op64GAWQ2U/gUr0itY1GiWvVf50j+MVQrO1wxPmUaYtRr91dV6Z9QG0OZiiiFYBqFupa
-         zBG5Okmr6gY0LRlGF8juS6EewmvkSSXUBVYtmzOytH0EBY0HzwhcuG1rgfhWPNuoR4mT
-         qhnA==
-X-Gm-Message-State: AO0yUKV9M8XPgbMFYiP/xxT9nxJ0g0MBjozpb8gfneOVsB6sYWw9RHSz
-        gK7QXDuetZR17e7XoAOfJyxiNrCBAYYqze210lE=
-X-Google-Smtp-Source: AK7set/F8IoD8xsNa6gXIltPvxqTiGdqc94EgYvU4CAtCYhWyJCGJeZQfhZAwa4DW9aCaz6SjLNrCQ==
-X-Received: by 2002:a17:902:d1d1:b0:1a0:48c6:3b43 with SMTP id g17-20020a170902d1d100b001a048c63b43mr5334195plb.37.1679583591224;
-        Thu, 23 Mar 2023 07:59:51 -0700 (PDT)
+        bh=CteMDAzkrOKUdcbIvPON419eHbnDZdFOKMS6mt0sWZE=;
+        b=4vETwyK8gupQ98vOf6RRNeb36QAz7Y6S/p7q7tRMjUXAHoCOCteGP1cvrjVkwEsIfk
+         Pvii7f5FV/hVR0916xG+APn8NIp/8hdsRPz2WyFwCARyiMw4Fod57xVdnl9ns4rWWhPy
+         tHis/pzL2Om8P0+4KKQxKyIXRfaewKdJh+e92eges02SbmYB6Sz8kxIbR+U3jD243Ogd
+         pUQ5wt/PiciPUjGrRVjpbyX6GtxVhgsCMVHqwit6DTeYv+KiVbE25X/BlL0iRv4go0l6
+         QVtcJ3vhD3aXG3gOoXbOv+/DucPvAroaH23kMxCGg8gj5Vp/wjeN3AF9t7iduG6Jilo9
+         D8bg==
+X-Gm-Message-State: AO0yUKUUctxk+rTsE48GvAivFlxG75yacJr6nxRfTd9ZoyQNu/oVnP5J
+        Kbqq4DEemPsvigAijj47z7GtHA==
+X-Google-Smtp-Source: AK7set8A+aZ2M7mxzfToXXBNFwaoRnGD4RaT2KdE16M9huLbT1x0LNbyAUn8zoOUaP8wkbeGiMTSjw==
+X-Received: by 2002:a17:90b:38c4:b0:234:67ef:304b with SMTP id nn4-20020a17090b38c400b0023467ef304bmr8717993pjb.37.1679583595508;
+        Thu, 23 Mar 2023 07:59:55 -0700 (PDT)
 Received: from hsinchu25.internal.sifive.com (59-124-168-89.hinet-ip.hinet.net. [59.124.168.89])
-        by smtp.gmail.com with ESMTPSA id d9-20020a170902854900b0019f53e0f136sm12503965plo.232.2023.03.23.07.59.48
+        by smtp.gmail.com with ESMTPSA id d9-20020a170902854900b0019f53e0f136sm12503965plo.232.2023.03.23.07.59.52
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Mar 2023 07:59:50 -0700 (PDT)
+        Thu, 23 Mar 2023 07:59:54 -0700 (PDT)
 From:   Andy Chiu <andy.chiu@sifive.com>
 To:     linux-riscv@lists.infradead.org, palmer@dabbelt.com,
         anup@brainfault.org, atishp@atishpatra.org,
         kvm-riscv@lists.infradead.org, kvm@vger.kernel.org
 Cc:     vineetg@rivosinc.com, greentime.hu@sifive.com,
-        guoren@linux.alibaba.com, Vincent Chen <vincent.chen@sifive.com>,
-        Andy Chiu <andy.chiu@sifive.com>,
+        guoren@linux.alibaba.com, Andy Chiu <andy.chiu@sifive.com>,
         Paul Walmsley <paul.walmsley@sifive.com>,
         Albert Ou <aou@eecs.berkeley.edu>,
-        Anup Patel <apatel@ventanamicro.com>,
-        Guo Ren <guoren@kernel.org>, Atish Patra <atishp@rivosinc.com>,
-        Heiko Stuebner <heiko.stuebner@vrull.eu>
-Subject: [PATCH -next v16 03/20] riscv: Add new csr defines related to vector extension
-Date:   Thu, 23 Mar 2023 14:59:07 +0000
-Message-Id: <20230323145924.4194-4-andy.chiu@sifive.com>
+        Vincent Chen <vincent.chen@sifive.com>,
+        Conor Dooley <conor.dooley@microchip.com>,
+        Guo Ren <guoren@kernel.org>,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Alexandre Ghiti <alexandre.ghiti@canonical.com>
+Subject: [PATCH -next v16 04/20] riscv: Clear vector regfile on bootup
+Date:   Thu, 23 Mar 2023 14:59:08 +0000
+Message-Id: <20230323145924.4194-5-andy.chiu@sifive.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20230323145924.4194-1-andy.chiu@sifive.com>
 References: <20230323145924.4194-1-andy.chiu@sifive.com>
@@ -76,67 +77,62 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Greentime Hu <greentime.hu@sifive.com>
 
-Follow the riscv vector spec to add new csr numbers.
+clear vector registers on boot if kernel supports V.
 
-Acked-by: Guo Ren <guoren@kernel.org>
-Co-developed-by: Guo Ren <guoren@linux.alibaba.com>
-Signed-off-by: Guo Ren <guoren@linux.alibaba.com>
-Co-developed-by: Vincent Chen <vincent.chen@sifive.com>
-Signed-off-by: Vincent Chen <vincent.chen@sifive.com>
 Signed-off-by: Greentime Hu <greentime.hu@sifive.com>
-Reviewed-by: Palmer Dabbelt <palmer@rivosinc.com>
-Suggested-by: Vineet Gupta <vineetg@rivosinc.com>
+Signed-off-by: Vineet Gupta <vineetg@rivosinc.com>
 Signed-off-by: Andy Chiu <andy.chiu@sifive.com>
-Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
-Reviewed-by: Heiko Stuebner <heiko.stuebner@vrull.eu>
+Acked-by: Conor Dooley <conor.dooley@microchip.com>
 ---
- arch/riscv/include/asm/csr.h | 18 ++++++++++++++++--
- 1 file changed, 16 insertions(+), 2 deletions(-)
+ arch/riscv/kernel/head.S | 27 +++++++++++++++++++++++++--
+ 1 file changed, 25 insertions(+), 2 deletions(-)
 
-diff --git a/arch/riscv/include/asm/csr.h b/arch/riscv/include/asm/csr.h
-index 0e571f6483d9..c3b87a7d1241 100644
---- a/arch/riscv/include/asm/csr.h
-+++ b/arch/riscv/include/asm/csr.h
-@@ -24,16 +24,24 @@
- #define SR_FS_CLEAN	_AC(0x00004000, UL)
- #define SR_FS_DIRTY	_AC(0x00006000, UL)
+diff --git a/arch/riscv/kernel/head.S b/arch/riscv/kernel/head.S
+index 4bf6c449d78b..3fd6a4bd9c3e 100644
+--- a/arch/riscv/kernel/head.S
++++ b/arch/riscv/kernel/head.S
+@@ -392,7 +392,7 @@ ENTRY(reset_regs)
+ #ifdef CONFIG_FPU
+ 	csrr	t0, CSR_MISA
+ 	andi	t0, t0, (COMPAT_HWCAP_ISA_F | COMPAT_HWCAP_ISA_D)
+-	beqz	t0, .Lreset_regs_done
++	beqz	t0, .Lreset_regs_done_fpu
  
-+#define SR_VS		_AC(0x00000600, UL) /* Vector Status */
-+#define SR_VS_OFF	_AC(0x00000000, UL)
-+#define SR_VS_INITIAL	_AC(0x00000200, UL)
-+#define SR_VS_CLEAN	_AC(0x00000400, UL)
-+#define SR_VS_DIRTY	_AC(0x00000600, UL)
+ 	li	t1, SR_FS
+ 	csrs	CSR_STATUS, t1
+@@ -430,8 +430,31 @@ ENTRY(reset_regs)
+ 	fmv.s.x	f31, zero
+ 	csrw	fcsr, 0
+ 	/* note that the caller must clear SR_FS */
++.Lreset_regs_done_fpu:
+ #endif /* CONFIG_FPU */
+-.Lreset_regs_done:
 +
- #define SR_XS		_AC(0x00018000, UL) /* Extension Status */
- #define SR_XS_OFF	_AC(0x00000000, UL)
- #define SR_XS_INITIAL	_AC(0x00008000, UL)
- #define SR_XS_CLEAN	_AC(0x00010000, UL)
- #define SR_XS_DIRTY	_AC(0x00018000, UL)
- 
-+#define SR_FS_VS	(SR_FS | SR_VS) /* Vector and Floating-Point Unit */
++#ifdef CONFIG_RISCV_ISA_V
++	csrr	t0, CSR_MISA
++	li	t1, COMPAT_HWCAP_ISA_V
++	and	t0, t0, t1
++	beqz	t0, .Lreset_regs_done_vector
 +
- #ifndef CONFIG_64BIT
--#define SR_SD		_AC(0x80000000, UL) /* FS/XS dirty */
-+#define SR_SD		_AC(0x80000000, UL) /* FS/VS/XS dirty */
- #else
--#define SR_SD		_AC(0x8000000000000000, UL) /* FS/XS dirty */
-+#define SR_SD		_AC(0x8000000000000000, UL) /* FS/VS/XS dirty */
- #endif
- 
- #ifdef CONFIG_64BIT
-@@ -297,6 +305,12 @@
- #define CSR_MIMPID		0xf13
- #define CSR_MHARTID		0xf14
- 
-+#define CSR_VSTART		0x8
-+#define CSR_VCSR		0xf
-+#define CSR_VL			0xc20
-+#define CSR_VTYPE		0xc21
-+#define CSR_VLENB		0xc22
-+
- #ifdef CONFIG_RISCV_M_MODE
- # define CSR_STATUS	CSR_MSTATUS
- # define CSR_IE		CSR_MIE
++	/*
++	 * Clear vector registers and reset vcsr
++	 * VLMAX has a defined value, VLEN is a constant,
++	 * and this form of vsetvli is defined to set vl to VLMAX.
++	 */
++	li	t1, SR_VS
++	csrs	CSR_STATUS, t1
++	csrs	CSR_VCSR, x0
++	vsetvli t1, x0, e8, m8, ta, ma
++	vmv.v.i v0, 0
++	vmv.v.i v8, 0
++	vmv.v.i v16, 0
++	vmv.v.i v24, 0
++	/* note that the caller must clear SR_VS */
++.Lreset_regs_done_vector:
++#endif /* CONFIG_RISCV_ISA_V */
+ 	ret
+ END(reset_regs)
+ #endif /* CONFIG_RISCV_M_MODE */
 -- 
 2.17.1
 
