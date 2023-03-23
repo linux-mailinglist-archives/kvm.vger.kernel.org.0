@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id ADEBF6C6579
-	for <lists+kvm@lfdr.de>; Thu, 23 Mar 2023 11:44:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 340ED6C6577
+	for <lists+kvm@lfdr.de>; Thu, 23 Mar 2023 11:43:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231605AbjCWKoA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Mar 2023 06:44:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45776 "EHLO
+        id S231397AbjCWKn4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Mar 2023 06:43:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45630 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230402AbjCWKn1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S231201AbjCWKn1 (ORCPT <rfc822;kvm@vger.kernel.org>);
         Thu, 23 Mar 2023 06:43:27 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 169803B3C3
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2C0159F4
         for <kvm@vger.kernel.org>; Thu, 23 Mar 2023 03:40:28 -0700 (PDT)
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 32N9fqFl012681
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 32N9oNnS026483
         for <kvm@vger.kernel.org>; Thu, 23 Mar 2023 10:40:26 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding; s=pp1;
- bh=kEhPInzXBW0DTQjpzewSkyE6jdXSAatAYTYhUtMOGJ4=;
- b=lE3b4BWxbhyjjFeScApkx+L6ohTqHe/KbHqziUkbct9DfTGmj2miCK6DA6KP3OVipgb9
- hflaoVSfMNIC86evP9dBqOif/KytL+C7fdBucVlFlZGQcVBarzmGUGa0J82BgzeLxeAB
- GdY2oK7ufzEXJtswazyel7JRhX70BZI30lUzMNlLcWaZtRkg5x0XRSFvvowy00RVwLDA
- 4AAIss++gyt34t+JAj3yROYUXClMypi7527dn6ylPrv4YnyKUAm7CcO01ESXnMqVPO8D
- dZZjWZCKhDX7jC9LZyvQtGB1HhcD4dJYM1+9EKLLCkWu+cfKz9CsNg0Sidk6fK1MxLoi 4w== 
+ bh=BqwhAQtD8u7fdukYUz6qnkSPf+czkiCxB6OsRDwqtkU=;
+ b=PoGNp9g/d/JMzGRMvFH7Yjr6K75/lhWLEyd/y1tUyoaunxat8v1mLpyeN8YKtkNzg70x
+ F6H1ffcZBASO/9RPvHL8CBMUvYSA6skEeRmOKrUVuLeuEHuMYnOPfLnGgKLvaOgHuYGT
+ dhCeMhdzrJR/lj7Eql5whD2ve/3FzJKIVZuFBDDSdbWS7eLzIk1k3lg2il3ezkiRFvUV
+ LbnsxKWFgHCSUE3zXAyGHqsCpnCmpMN3AsEpFfC7xTxOEqmNRuHtEXLAy90wf6SqxPWn
+ OrJr2k5zEM+Q89O3hMjrjChb3QNhpvfoZPjSlXfgmlwp9cIYBmv3zLkkrB88Z7GBQeKy gg== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pgmc2hahj-1
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pgmg6h60t-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
         for <kvm@vger.kernel.org>; Thu, 23 Mar 2023 10:40:26 +0000
-Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 32NAXGRU019057
+Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 32NAQN9q009490
         for <kvm@vger.kernel.org>; Thu, 23 Mar 2023 10:40:26 GMT
-Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pgmc2hagt-1
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pgmg6h60e-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 23 Mar 2023 10:40:25 +0000
-Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
-        by ppma01fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 32MKG9nJ014689;
-        Thu, 23 Mar 2023 10:40:23 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-        by ppma01fra.de.ibm.com (PPS) with ESMTPS id 3pd4x6e1xq-1
+        Thu, 23 Mar 2023 10:40:26 +0000
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 32N8aKEl015024;
+        Thu, 23 Mar 2023 10:40:24 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+        by ppma06ams.nl.ibm.com (PPS) with ESMTPS id 3pd4jff7nn-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 23 Mar 2023 10:40:23 +0000
+        Thu, 23 Mar 2023 10:40:24 +0000
 Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-        by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 32NAeJcg28902012
+        by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 32NAeKpI14680784
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 23 Mar 2023 10:40:19 GMT
+        Thu, 23 Mar 2023 10:40:20 GMT
 Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C50CA2004E;
-        Thu, 23 Mar 2023 10:40:19 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 93CA72004B;
+        Thu, 23 Mar 2023 10:40:20 +0000 (GMT)
 Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3679620043;
+        by IMSVA (Postfix) with ESMTP id F05C720043;
         Thu, 23 Mar 2023 10:40:19 +0000 (GMT)
 Received: from linux6.. (unknown [9.114.12.104])
         by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
@@ -60,180 +60,71 @@ Received: from linux6.. (unknown [9.114.12.104])
 From:   Janosch Frank <frankja@linux.ibm.com>
 To:     kvm@vger.kernel.org, nrb@linux.ibm.com
 Cc:     thuth@redhat.com, imbrenda@linux.ibm.com
-Subject: [kvm-unit-tests PATCH 7/8] s390x: uv-host: Properly handle config creation errors
-Date:   Thu, 23 Mar 2023 10:39:12 +0000
-Message-Id: <20230323103913.40720-8-frankja@linux.ibm.com>
+Subject: [kvm-unit-tests PATCH 8/8] s390x: uv-host: Fence access checks when UV debug is enabled
+Date:   Thu, 23 Mar 2023 10:39:13 +0000
+Message-Id: <20230323103913.40720-9-frankja@linux.ibm.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230323103913.40720-1-frankja@linux.ibm.com>
 References: <20230323103913.40720-1-frankja@linux.ibm.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: LHUb_V1LqkX2I8uFuIgXCNsnVbZPJyZW
-X-Proofpoint-ORIG-GUID: T2vskfYMpEmBrJHh3pgajcvuR2YUWmlw
+X-Proofpoint-GUID: p42JaA6WmrbTAh0ZXzswzka31cdgrIt5
+X-Proofpoint-ORIG-GUID: ob3tDpE3qk5yePHQLBWRboOzI322ASdZ
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
  definitions=2023-03-22_21,2023-03-22_01,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 adultscore=0
- bulkscore=0 impostorscore=0 mlxscore=0 spamscore=0 malwarescore=0
- priorityscore=1501 mlxlogscore=999 phishscore=0 suspectscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 mlxlogscore=999 adultscore=0 suspectscore=0
+ lowpriorityscore=0 impostorscore=0 mlxscore=0 spamscore=0 phishscore=0
+ bulkscore=0 clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2303150002 definitions=main-2303230080
 X-Spam-Status: No, score=-0.1 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
-        DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-        autolearn_force=no version=3.4.6
+        DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-If the first bit is set on a error rc, the hypervisor will need to
-destroy the config before trying again. Let's properly handle those
-cases so we're not usign stale data.
+The debug print directly accesses the UV header which will result in a
+second accesses exception which will abort the test. Let's fence the
+access tests instead.
 
 Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
 ---
- lib/s390x/asm/uv.h |  1 +
- s390x/uv-host.c    | 52 ++++++++++++++++++++++++++++++++++++++--------
- 2 files changed, 44 insertions(+), 9 deletions(-)
+ s390x/uv-host.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-diff --git a/lib/s390x/asm/uv.h b/lib/s390x/asm/uv.h
-index 38920461..e9fb19af 100644
---- a/lib/s390x/asm/uv.h
-+++ b/lib/s390x/asm/uv.h
-@@ -24,6 +24,7 @@
- #define UVC_RC_NO_RESUME	0x0007
- #define UVC_RC_INV_GHANDLE	0x0020
- #define UVC_RC_INV_CHANDLE	0x0021
-+#define UVC_RC_DSTR_NEEDED_FLG	0x8000
- 
- #define UVC_CMD_QUI			0x0001
- #define UVC_CMD_INIT_UV			0x000f
 diff --git a/s390x/uv-host.c b/s390x/uv-host.c
-index d92571b5..b23d51c9 100644
+index b23d51c9..1f73034f 100644
 --- a/s390x/uv-host.c
 +++ b/s390x/uv-host.c
-@@ -370,6 +370,38 @@ static void test_cpu_create(void)
+@@ -164,6 +164,15 @@ static void test_access(void)
+ 
+ 	report_prefix_push("access");
+ 
++	/*
++	 * If debug is enabled info from the uv header is printed
++	 * which would lead to a second exception and a test abort.
++	 */
++	if (UVC_ERR_DEBUG) {
++		report_skip("Debug doesn't work with access tests");
++		goto out;
++	}
++
+ 	report_prefix_push("non-crossing");
+ 	protect_page(uvcb, PAGE_ENTRY_I);
+ 	for (i = 0; cmds[i].name; i++) {
+@@ -196,6 +205,7 @@ static void test_access(void)
+ 	uvcb += 1;
+ 	unprotect_page(uvcb, PAGE_ENTRY_I);
+ 
++out:
+ 	free_pages(pages);
  	report_prefix_pop();
  }
- 
-+/*
-+ * If the first bit of the rc is set we need to destroy the
-+ * configuration before testing other create config errors.
-+ */
-+static void cgc_destroy_if_needed(struct uv_cb_cgc *uvcb)
-+{
-+	uint16_t rc, rrc;
-+
-+	if (!(uvcb->header.rc & UVC_RC_DSTR_NEEDED_FLG))
-+		return;
-+
-+	assert(uvcb->guest_handle);
-+
-+	assert(!uv_cmd_nodata(uvcb->guest_handle, UVC_CMD_DESTROY_SEC_CONF,
-+			      &rc, &rrc));
-+}
-+
-+/* This function expects errors, not successes */
-+static bool cgc_check_data(struct uv_cb_cgc *uvcb, uint16_t rc_expected)
-+{
-+	cgc_destroy_if_needed(uvcb);
-+	/*
-+	 * We should only receive a handle when the rc is 1 or the
-+	 * first bit is set.
-+	 */
-+	if (!(uvcb->header.rc & UVC_RC_DSTR_NEEDED_FLG) && uvcb->guest_handle)
-+		return false;
-+	/* Now that we checked the handle, we need to zero it for the next test */
-+	uvcb->guest_handle = 0;
-+	return (uvcb->header.rc & ~UVC_RC_DSTR_NEEDED_FLG) == rc_expected;
-+}
-+
- static void test_config_create(void)
- {
- 	int rc;
-@@ -398,40 +430,40 @@ static void test_config_create(void)
- 
- 	uvcb_cgc.guest_stor_origin = uvcb_qui.max_guest_stor_addr + (1UL << 20) * 2 + 1;
- 	rc = uv_call(0, (uint64_t)&uvcb_cgc);
--	report(uvcb_cgc.header.rc == 0x101 && rc == 1,
-+	report(cgc_check_data(&uvcb_cgc, 0x101) && rc == 1,
- 	       "MSO > max guest addr");
- 	uvcb_cgc.guest_stor_origin = 0;
- 
- 	uvcb_cgc.guest_stor_origin = uvcb_qui.max_guest_stor_addr - (1UL << 20);
- 	rc = uv_call(0, (uint64_t)&uvcb_cgc);
--	report(uvcb_cgc.header.rc == 0x102 && rc == 1,
-+	report(cgc_check_data(&uvcb_cgc, 0x102) && rc == 1,
- 	       "MSO + MSL > max guest addr");
- 	uvcb_cgc.guest_stor_origin = 0;
- 
- 	uvcb_cgc.guest_asce &= ~ASCE_P;
- 	rc = uv_call(0, (uint64_t)&uvcb_cgc);
--	report(uvcb_cgc.header.rc == 0x105 && rc == 1,
-+	report(cgc_check_data(&uvcb_cgc, 0x105) && rc == 1,
- 	       "ASCE private bit missing");
- 	uvcb_cgc.guest_asce |= ASCE_P;
- 
- 	uvcb_cgc.guest_asce |= 0x20;
- 	rc = uv_call(0, (uint64_t)&uvcb_cgc);
--	report(uvcb_cgc.header.rc == 0x105 && rc == 1,
-+	report(cgc_check_data(&uvcb_cgc, 0x105) && rc == 1,
- 	       "ASCE bit 58 set");
- 	uvcb_cgc.guest_asce &= ~0x20;
- 
- 	tmp = uvcb_cgc.conf_base_stor_origin;
- 	uvcb_cgc.conf_base_stor_origin = get_max_ram_size() + 8;
- 	rc = uv_call(0, (uint64_t)&uvcb_cgc);
--	report(uvcb_cgc.header.rc == 0x108 && rc == 1,
-+	report(cgc_check_data(&uvcb_cgc, 0x108) && rc == 1,
- 	       "base storage origin > available memory");
- 	uvcb_cgc.conf_base_stor_origin = tmp;
- 
- 	tmp = uvcb_cgc.conf_base_stor_origin;
- 	uvcb_cgc.conf_base_stor_origin = 0x1000;
- 	rc = uv_call(0, (uint64_t)&uvcb_cgc);
--	report(uvcb_cgc.header.rc == 0x109 && rc == 1,
--	       "base storage origin contains lowcore");
-+	report(cgc_check_data(&uvcb_cgc, 0x109) && rc == 1,
-+	       "base storage origin contains lowcore %x",  uvcb_cgc.header.rc);
- 	uvcb_cgc.conf_base_stor_origin = tmp;
- 
- 	/*
-@@ -450,14 +482,14 @@ static void test_config_create(void)
- 	tmp = uvcb_cgc.guest_sca;
- 	uvcb_cgc.guest_sca = 0;
- 	rc = uv_call(0, (uint64_t)&uvcb_cgc);
--	report(uvcb_cgc.header.rc == 0x10c && rc == 1,
-+	report(cgc_check_data(&uvcb_cgc, 0x10c) && rc == 1,
- 	       "sca == 0");
- 	uvcb_cgc.guest_sca = tmp;
- 
- 	tmp = uvcb_cgc.guest_sca;
- 	uvcb_cgc.guest_sca = get_max_ram_size() + PAGE_SIZE * 4;
- 	rc = uv_call(0, (uint64_t)&uvcb_cgc);
--	report(uvcb_cgc.header.rc == 0x10d && rc == 1,
-+	report(cgc_check_data(&uvcb_cgc, 0x10d) && rc == 1,
- 	       "sca inaccessible");
- 	uvcb_cgc.guest_sca = tmp;
- 
-@@ -477,6 +509,7 @@ static void test_config_create(void)
- 	uvcb_cgc.guest_handle = 0;
- 	rc = uv_call(0, (uint64_t)&uvcb_cgc);
- 	report(uvcb_cgc.header.rc >= 0x100 && rc == 1, "reuse uvcb");
-+	cgc_destroy_if_needed(&uvcb_cgc);
- 	uvcb_cgc.guest_handle = tmp;
- 
- 	/* Copy over most data from uvcb_cgc, so we have the ASCE that was used. */
-@@ -494,6 +527,7 @@ static void test_config_create(void)
- 	rc = uv_call(0, (uint64_t)&uvcb);
- 	report(uvcb.header.rc >= 0x104 && rc == 1 && !uvcb.guest_handle,
- 	       "reuse ASCE");
-+	cgc_destroy_if_needed(&uvcb);
- 	free((void *)uvcb.conf_base_stor_origin);
- 	free((void *)uvcb.conf_var_stor_origin);
- 
 -- 
 2.34.1
 
