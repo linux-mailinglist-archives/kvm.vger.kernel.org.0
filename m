@@ -2,75 +2,79 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9126C6C6B5F
-	for <lists+kvm@lfdr.de>; Thu, 23 Mar 2023 15:45:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 64EC56C6B89
+	for <lists+kvm@lfdr.de>; Thu, 23 Mar 2023 15:50:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231848AbjCWOpL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Mar 2023 10:45:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42594 "EHLO
+        id S231921AbjCWOu1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Mar 2023 10:50:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53306 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231784AbjCWOpB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Mar 2023 10:45:01 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6FB5B23A49
-        for <kvm@vger.kernel.org>; Thu, 23 Mar 2023 07:44:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1679582652;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=NrVA7uU+nRMqFw4cOUV9tVLaScyoHsXz3KJEw/B4yIU=;
-        b=iykAq50kKmPFl06b9WG734W/TkQf4eIEAI145ViXa4gtD9RCQ7IlXwleULZ9YE1I2qmUp9
-        GBiLxMZ/NCJy76nVFkz6n4DPf/3FJWmFqp/DLKGVX7+pO2z8HatkVeHXH7ddnC6nBmBPyj
-        xTqxg0cfd8FQYmDKzupI7Ur+AWG+MNA=
-Received: from mail-yb1-f199.google.com (mail-yb1-f199.google.com
- [209.85.219.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-669-89oGFw6LNYiwChqpIQHZhw-1; Thu, 23 Mar 2023 10:44:11 -0400
-X-MC-Unique: 89oGFw6LNYiwChqpIQHZhw-1
-Received: by mail-yb1-f199.google.com with SMTP id d7-20020a25adc7000000b00953ffdfbe1aso23096267ybe.23
-        for <kvm@vger.kernel.org>; Thu, 23 Mar 2023 07:44:11 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679582650;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=NrVA7uU+nRMqFw4cOUV9tVLaScyoHsXz3KJEw/B4yIU=;
-        b=OjBxEvk55T1igqAIkrhdkRfaljzEXiilE9dKKsvyzgWI5mn/kCB/rIqUUy8j4jTXtL
-         3y3oilpn1poGl2rehENWrKj1oQQMIAUDAHkxfeKtSkLebL0YWLsEIcBOCfp3wgmhoo4F
-         usu9BAEKRhGJnyS4jaUXsJWuGZxOpTaFHM32StLUhYbqG87YxHH3wboZ1zNy6R82YOQc
-         gagIYB4U1L87OnbJoD6kOKhZq+YxQR743ZmlpDoV4McvzarWGDMKQ8IM2/NOoibDI7Rp
-         8e9qEM5faQ54JrRNJyrHn56DbrhPLZSCa7Ob4SdZcHs/G73m/Moi0i2WnEVROITgRx3Y
-         500w==
-X-Gm-Message-State: AAQBX9dTiu5qEd0a0vQG3Yl8IkCvAJUoXokJ8PuhMd4W34QjcH1IYShL
-        spBeqhOeEwXUhEtLCboT9S+Jbt5LbAidcIDSLjums31IZREXtN+lb6/jLi6/lBYz0QBHWpMa0EH
-        z/C09DTj+xn28qyQgl8JRyQhT6WWT
-X-Received: by 2002:a25:b001:0:b0:b70:ad30:dacc with SMTP id q1-20020a25b001000000b00b70ad30daccmr1906301ybf.2.1679582650461;
-        Thu, 23 Mar 2023 07:44:10 -0700 (PDT)
-X-Google-Smtp-Source: AKy350Yp90qJTyafDDZI8Zx6KKeaVqtRTbdnVnhZPzCnb/pi2s126PXUI5QEyJvtGxI/gRHywVjAEr2ZJillufAyOvY=
-X-Received: by 2002:a25:b001:0:b0:b70:ad30:dacc with SMTP id
- q1-20020a25b001000000b00b70ad30daccmr1906287ybf.2.1679582650156; Thu, 23 Mar
- 2023 07:44:10 -0700 (PDT)
+        with ESMTP id S231918AbjCWOuX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Mar 2023 10:50:23 -0400
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA3C310420;
+        Thu, 23 Mar 2023 07:49:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1679582999; x=1711118999;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=h4CS8S4czEwPAj/kAQo+lfzDYMoZ/HCv2kQL4ZKmB4I=;
+  b=2s5poOskN+TC41MEI7TcfzWTEmu9ZRAVbdsKfCWarv6dhRFc/IfmiSqU
+   utNHjcehkfyK5GHf8AG5T/+k4Kh1P4ix2UweMPN5HAq8CGNuMpA0ea91u
+   1pQc6ABOGUVpz8bE/koGQ2p1OSYkatQgtj5OWkBOURrAU9Br1EkNxKJlM
+   fntq9j8cBGBQWnE74D9i7eMKGIAPk6v0B5KiET7ZbULWP72lLYDpGcVSH
+   y37C4V3mOe1NH2SOMKk2s8nry60hHYZlaZMhLLuZhcyv2PjC/07HFZZR7
+   qqyk0Gc24Hi3B6seIcnHg43QPr61+7XpQfcqDABTGtElcTnGD3kVnB9jd
+   Q==;
+X-IronPort-AV: E=Sophos;i="5.98,285,1673938800"; 
+   d="asc'?scan'208";a="143542635"
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa6.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 23 Mar 2023 07:49:58 -0700
+Received: from chn-vm-ex02.mchp-main.com (10.10.87.72) by
+ chn-vm-ex02.mchp-main.com (10.10.87.72) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.21; Thu, 23 Mar 2023 07:49:56 -0700
+Received: from wendy (10.10.115.15) by chn-vm-ex02.mchp-main.com
+ (10.10.85.144) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.21 via Frontend
+ Transport; Thu, 23 Mar 2023 07:49:53 -0700
+Date:   Thu, 23 Mar 2023 14:49:34 +0000
+From:   Conor Dooley <conor.dooley@microchip.com>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Andrew Jones <ajones@ventanamicro.com>,
+        Jisheng Zhang <jszhang@kernel.org>
+CC:     Conor Dooley <conor@kernel.org>,
+        Andrew Jones <ajones@ventanamicro.com>,
+        Jisheng Zhang <jszhang@kernel.org>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Anup Patel <anup@brainfault.org>,
+        Atish Patra <atishp@atishpatra.org>,
+        Heiko Stuebner <heiko@sntech.de>,
+        <linux-riscv@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
+        <kvm@vger.kernel.org>, <kvm-riscv@lists.infradead.org>,
+        <regressions@leemhuis.info>, <regressions@lists.linux.dev>
+Subject: Re: [PATCH] riscv: require alternatives framework when selecting FPU
+ support
+Message-ID: <af690061-f962-498e-b2df-d2e6119292cf@spud>
+References: <ZBruFRwt3rUVngPu@zx2c4.com>
+ <20230322120907.2968494-1-Jason@zx2c4.com>
+ <20230322124631.7p67thzeblrawsqj@orel>
+ <1884bd96-2783-4556-bc57-8b733758baff@spud>
+ <20230322192610.sad42xau33ye5ayn@orel>
+ <2a3b08ce-5ab1-41b6-ad58-edbeff7b1acb@spud>
+ <ad445951-3d13-4644-94d9-e0989cda39c3@spud>
+ <CAHmME9qEbUP7cq-iofN=ruSWhsHUva+qqavfEpNzDK_BjQVqxw@mail.gmail.com>
 MIME-Version: 1.0
-References: <20230321154228.182769-1-sgarzare@redhat.com> <20230321154228.182769-5-sgarzare@redhat.com>
- <CAJaqyWcCwwu1UJ968A=s30GCezjLcwWKDhCFMsQ2EcGGgkiz7g@mail.gmail.com> <20230323104638.67hbwwbk7ayp4psq@sgarzare-redhat>
-In-Reply-To: <20230323104638.67hbwwbk7ayp4psq@sgarzare-redhat>
-From:   Eugenio Perez Martin <eperezma@redhat.com>
-Date:   Thu, 23 Mar 2023 15:43:34 +0100
-Message-ID: <CAJaqyWfSor5PKZn0iAOthCkeGDBc7+rjVXuSHMy1LWY+fV5o7A@mail.gmail.com>
-Subject: Re: [PATCH v3 4/8] vringh: support VA with iotlb
-To:     Stefano Garzarella <sgarzare@redhat.com>
-Cc:     virtualization@lists.linux-foundation.org, stefanha@redhat.com,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Andrey Zhadchenko <andrey.zhadchenko@virtuozzo.com>,
-        netdev@vger.kernel.org, Jason Wang <jasowang@redhat.com>,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="WAnLRcLV3Ph+ynOR"
+Content-Disposition: inline
+In-Reply-To: <CAHmME9qEbUP7cq-iofN=ruSWhsHUva+qqavfEpNzDK_BjQVqxw@mail.gmail.com>
+X-Spam-Status: No, score=-2.5 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -78,209 +82,145 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 23, 2023 at 11:46=E2=80=AFAM Stefano Garzarella <sgarzare@redha=
-t.com> wrote:
->
-> On Thu, Mar 23, 2023 at 09:09:14AM +0100, Eugenio Perez Martin wrote:
-> >On Tue, Mar 21, 2023 at 4:43=E2=80=AFPM Stefano Garzarella <sgarzare@red=
-hat.com> wrote:
-> >>
-> >> vDPA supports the possibility to use user VA in the iotlb messages.
-> >> So, let's add support for user VA in vringh to use it in the vDPA
-> >> simulators.
-> >>
-> >> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
-> >> ---
-> >>
-> >> Notes:
-> >>     v3:
-> >>     - refactored avoiding code duplication [Eugenio]
-> >>     v2:
-> >>     - replace kmap_atomic() with kmap_local_page() [see previous patch=
-]
-> >>     - fix cast warnings when build with W=3D1 C=3D1
-> >>
-> >>  include/linux/vringh.h            |   5 +-
-> >>  drivers/vdpa/mlx5/net/mlx5_vnet.c |   2 +-
-> >>  drivers/vdpa/vdpa_sim/vdpa_sim.c  |   4 +-
-> >>  drivers/vhost/vringh.c            | 153 +++++++++++++++++++++++------=
+--WAnLRcLV3Ph+ynOR
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Wed, Mar 22, 2023 at 09:19:50PM +0100, Jason A. Donenfeld wrote:
+> On Wed, Mar 22, 2023 at 9:05=E2=80=AFPM Conor Dooley <conor@kernel.org> w=
+rote:
+> >
+> > On Wed, Mar 22, 2023 at 07:44:13PM +0000, Conor Dooley wrote:
+> > > On Wed, Mar 22, 2023 at 08:26:10PM +0100, Andrew Jones wrote:
+> > > > On Wed, Mar 22, 2023 at 03:17:13PM +0000, Conor Dooley wrote:
+> > > > > On Wed, Mar 22, 2023 at 01:46:31PM +0100, Andrew Jones wrote:
+> > >
+> > > > > > (It's tempting to just select RISCV_ALTERNATIVE from RISCV, but=
+ maybe we
+> > > > > >  can defer that wedding a bit longer.)
+> > > > >
+> > > > > At that point, the config option should just go away entirely, no?
+> > > >
+> > > > Ah, yes, and that makes the idea even more attractive, as we could =
+remove
+> > > > several ifdefs.
+> > >
+> > > I went and did the cursory check, it's not compatible with XIP_KERNEL=
+ so
+> > > dropping the option entirely probably isn't a possibility :/
+> >
+> > What I said is only now sinking in. We're now going to be disabling FPU
+> > support on XIP kernels with this patch.
+> > Well, technically not this patch since it wouldn't have built without
+> > Jason's changes, but that doesn't seem like the right thing to do...
+>=20
+> I suppose you could have riscv_has_extension_*() fall back to
+> something that doesn't use alternatives on XIP kernels.
+
+Yah, something like the below I guess? Probably overlooking something
+silly & it's lost the benefit of the static branch that it used to have,
+but with the infra that we have at the moment this seemed like the
+sanest thing to do?
+
+This would requiring picking up your patch Jason, but with an
+"if !XIP_KERNEL" added to the select.
+
+It's only had the lightest of build tests, but I can go make it a real
+patch if there's not something obviously amiss.
+
+diff --git a/arch/riscv/include/asm/hwcap.h b/arch/riscv/include/asm/hwcap.h
+index e3021b2590de..6263a0de1c6a 100644
+--- a/arch/riscv/include/asm/hwcap.h
++++ b/arch/riscv/include/asm/hwcap.h
+@@ -57,18 +57,31 @@ struct riscv_isa_ext_data {
+ 	unsigned int isa_ext_id;
+ };
+=20
++unsigned long riscv_isa_extension_base(const unsigned long *isa_bitmap);
++
++#define riscv_isa_extension_mask(ext) BIT_MASK(RISCV_ISA_EXT_##ext)
++
++bool __riscv_isa_extension_available(const unsigned long *isa_bitmap, int =
+bit);
++#define riscv_isa_extension_available(isa_bitmap, ext)	\
++	__riscv_isa_extension_available(isa_bitmap, RISCV_ISA_EXT_##ext)
++
+ static __always_inline bool
+ riscv_has_extension_likely(const unsigned long ext)
+ {
+ 	compiletime_assert(ext < RISCV_ISA_EXT_MAX,
+ 			   "ext must be < RISCV_ISA_EXT_MAX");
+=20
+-	asm_volatile_goto(
+-	ALTERNATIVE("j	%l[l_no]", "nop", 0, %[ext], 1)
+-	:
+-	: [ext] "i" (ext)
+-	:
+-	: l_no);
++	if (IS_ENABLED(CONFIG_RISCV_ALTERNATIVE)) {
++		asm_volatile_goto(
++		ALTERNATIVE("j	%l[l_no]", "nop", 0, %[ext], 1)
++		:
++		: [ext] "i" (ext)
++		:
++		: l_no);
++	} else {
++		if (!__riscv_isa_extension_available(NULL, ext))
++			goto l_no;
++	}
+=20
+ 	return true;
+ l_no:
+@@ -81,26 +94,23 @@ riscv_has_extension_unlikely(const unsigned long ext)
+ 	compiletime_assert(ext < RISCV_ISA_EXT_MAX,
+ 			   "ext must be < RISCV_ISA_EXT_MAX");
+=20
+-	asm_volatile_goto(
+-	ALTERNATIVE("nop", "j	%l[l_yes]", 0, %[ext], 1)
+-	:
+-	: [ext] "i" (ext)
+-	:
+-	: l_yes);
++	if (IS_ENABLED(CONFIG_RISCV_ALTERNATIVE)) {
++		asm_volatile_goto(
++		ALTERNATIVE("nop", "j	%l[l_yes]", 0, %[ext], 1)
++		:
++		: [ext] "i" (ext)
++		:
++		: l_yes);
++	} else {
++		if (__riscv_isa_extension_available(NULL, ext))
++			goto l_yes;
++	}
+=20
+ 	return false;
+ l_yes:
+ 	return true;
+ }
+=20
+-unsigned long riscv_isa_extension_base(const unsigned long *isa_bitmap);
 -
-> >>  4 files changed, 127 insertions(+), 37 deletions(-)
-> >>
-> >> diff --git a/include/linux/vringh.h b/include/linux/vringh.h
-> >> index 1991a02c6431..d39b9f2dcba0 100644
-> >> --- a/include/linux/vringh.h
-> >> +++ b/include/linux/vringh.h
-> >> @@ -32,6 +32,9 @@ struct vringh {
-> >>         /* Can we get away with weak barriers? */
-> >>         bool weak_barriers;
-> >>
-> >> +       /* Use user's VA */
-> >> +       bool use_va;
-> >> +
-> >>         /* Last available index we saw (ie. where we're up to). */
-> >>         u16 last_avail_idx;
-> >>
-> >> @@ -279,7 +282,7 @@ void vringh_set_iotlb(struct vringh *vrh, struct v=
-host_iotlb *iotlb,
-> >>                       spinlock_t *iotlb_lock);
-> >>
-> >>  int vringh_init_iotlb(struct vringh *vrh, u64 features,
-> >> -                     unsigned int num, bool weak_barriers,
-> >> +                     unsigned int num, bool weak_barriers, bool use_v=
-a,
-> >>                       struct vring_desc *desc,
-> >>                       struct vring_avail *avail,
-> >>                       struct vring_used *used);
-> >> diff --git a/drivers/vdpa/mlx5/net/mlx5_vnet.c b/drivers/vdpa/mlx5/net=
-/mlx5_vnet.c
-> >> index 520646ae7fa0..dfd0e000217b 100644
-> >> --- a/drivers/vdpa/mlx5/net/mlx5_vnet.c
-> >> +++ b/drivers/vdpa/mlx5/net/mlx5_vnet.c
-> >> @@ -2537,7 +2537,7 @@ static int setup_cvq_vring(struct mlx5_vdpa_dev =
-*mvdev)
-> >>
-> >>         if (mvdev->actual_features & BIT_ULL(VIRTIO_NET_F_CTRL_VQ))
-> >>                 err =3D vringh_init_iotlb(&cvq->vring, mvdev->actual_f=
-eatures,
-> >> -                                       MLX5_CVQ_MAX_ENT, false,
-> >> +                                       MLX5_CVQ_MAX_ENT, false, false=
-,
-> >>                                         (struct vring_desc *)(uintptr_=
-t)cvq->desc_addr,
-> >>                                         (struct vring_avail *)(uintptr=
-_t)cvq->driver_addr,
-> >>                                         (struct vring_used *)(uintptr_=
-t)cvq->device_addr);
-> >> diff --git a/drivers/vdpa/vdpa_sim/vdpa_sim.c b/drivers/vdpa/vdpa_sim/=
-vdpa_sim.c
-> >> index eea23c630f7c..47cdf2a1f5b8 100644
-> >> --- a/drivers/vdpa/vdpa_sim/vdpa_sim.c
-> >> +++ b/drivers/vdpa/vdpa_sim/vdpa_sim.c
-> >> @@ -60,7 +60,7 @@ static void vdpasim_queue_ready(struct vdpasim *vdpa=
-sim, unsigned int idx)
-> >>         struct vdpasim_virtqueue *vq =3D &vdpasim->vqs[idx];
-> >>         uint16_t last_avail_idx =3D vq->vring.last_avail_idx;
-> >>
-> >> -       vringh_init_iotlb(&vq->vring, vdpasim->features, vq->num, true=
-,
-> >> +       vringh_init_iotlb(&vq->vring, vdpasim->features, vq->num, true=
-, false,
-> >>                           (struct vring_desc *)(uintptr_t)vq->desc_add=
-r,
-> >>                           (struct vring_avail *)
-> >>                           (uintptr_t)vq->driver_addr,
-> >> @@ -92,7 +92,7 @@ static void vdpasim_vq_reset(struct vdpasim *vdpasim=
-,
-> >>         vq->cb =3D NULL;
-> >>         vq->private =3D NULL;
-> >>         vringh_init_iotlb(&vq->vring, vdpasim->dev_attr.supported_feat=
-ures,
-> >> -                         VDPASIM_QUEUE_MAX, false, NULL, NULL, NULL);
-> >> +                         VDPASIM_QUEUE_MAX, false, false, NULL, NULL,=
- NULL);
-> >>
-> >>         vq->vring.notify =3D NULL;
-> >>  }
-> >> diff --git a/drivers/vhost/vringh.c b/drivers/vhost/vringh.c
-> >> index 0ba3ef809e48..72c88519329a 100644
-> >> --- a/drivers/vhost/vringh.c
-> >> +++ b/drivers/vhost/vringh.c
-> >> @@ -1094,10 +1094,18 @@ EXPORT_SYMBOL(vringh_need_notify_kern);
-> >>
-> >>  #if IS_REACHABLE(CONFIG_VHOST_IOTLB)
-> >>
-> >> +struct iotlb_vec {
-> >> +       union {
-> >> +               struct iovec *iovec;
-> >> +               struct bio_vec *bvec;
-> >> +       } iov;
-> >> +       size_t count;
-> >> +       bool is_iovec;
-> >> +};
-> >> +
-> >>  static int iotlb_translate(const struct vringh *vrh,
-> >>                            u64 addr, u64 len, u64 *translated,
-> >> -                          struct bio_vec iov[],
-> >> -                          int iov_size, u32 perm)
-> >> +                          struct iotlb_vec *ivec, u32 perm)
-> >>  {
-> >>         struct vhost_iotlb_map *map;
-> >>         struct vhost_iotlb *iotlb =3D vrh->iotlb;
-> >> @@ -1107,9 +1115,9 @@ static int iotlb_translate(const struct vringh *=
-vrh,
-> >>         spin_lock(vrh->iotlb_lock);
-> >>
-> >>         while (len > s) {
-> >> -               u64 size, pa, pfn;
-> >> +               u64 size;
-> >>
-> >> -               if (unlikely(ret >=3D iov_size)) {
-> >> +               if (unlikely(ret >=3D ivec->count)) {
-> >>                         ret =3D -ENOBUFS;
-> >>                         break;
-> >>                 }
-> >> @@ -1124,10 +1132,22 @@ static int iotlb_translate(const struct vringh=
- *vrh,
-> >>                 }
-> >>
-> >>                 size =3D map->size - addr + map->start;
-> >> -               pa =3D map->addr + addr - map->start;
-> >> -               pfn =3D pa >> PAGE_SHIFT;
-> >> -               bvec_set_page(&iov[ret], pfn_to_page(pfn), min(len - s=
-, size),
-> >> -                             pa & (PAGE_SIZE - 1));
-> >> +               if (ivec->is_iovec) {
-> >> +                       struct iovec *iovec =3D ivec->iov.iovec;
-> >> +
-> >> +                       iovec[ret].iov_len =3D min(len - s, size);
-> >> +                       iovec[ret].iov_base =3D (void __user *)(unsign=
-ed long)
-> >
-> >s/unsigned long/uintptr_t ?
-> >
->
-> yep, good catch!
->
-> As I wrote to Jason, I think I'll take it out of the if and just declare
-> an uintptr_t variable, since I'm using it also in the else branch.
->
-> >
-> >
-> >> +                                             (map->addr + addr - map-=
->start);
-> >> +               } else {
-> >> +                       u64 pa =3D map->addr + addr - map->start;
-> >> +                       u64 pfn =3D pa >> PAGE_SHIFT;
-> >> +                       struct bio_vec *bvec =3D ivec->iov.bvec;
-> >> +
-> >> +                       bvec_set_page(&bvec[ret], pfn_to_page(pfn),
-> >> +                                     min(len - s, size),
-> >> +                                     pa & (PAGE_SIZE - 1));
-> >> +               }
-> >> +
-> >>                 s +=3D size;
-> >>                 addr +=3D size;
-> >>                 ++ret;
-> >> @@ -1141,26 +1161,42 @@ static int iotlb_translate(const struct vringh=
- *vrh,
-> >>         return ret;
-> >>  }
-> >>
-> >> +#define IOTLB_IOV_SIZE 16
-> >
-> >I'm fine with defining here, but maybe it is better to isolate the
-> >change in a previous patch or reuse another well known macro?
->
-> Yep, good point!
->
-> Do you have any well known macro to suggest?
->
+-#define riscv_isa_extension_mask(ext) BIT_MASK(RISCV_ISA_EXT_##ext)
+-
+-bool __riscv_isa_extension_available(const unsigned long *isa_bitmap, int =
+bit);
+-#define riscv_isa_extension_available(isa_bitmap, ext)	\
+-	__riscv_isa_extension_available(isa_bitmap, RISCV_ISA_EXT_##ext)
+-
+ #endif
+=20
+ #endif /* _ASM_RISCV_HWCAP_H */
 
-Not really, 16 seems like a convenience value here actually :). Maybe
-replace _SIZE with _STRIDE or similar?
+--WAnLRcLV3Ph+ynOR
+Content-Type: application/pgp-signature; name="signature.asc"
 
-I keep the Acked-by even if the final name is IOTLB_IOV_SIZE though.
+-----BEGIN PGP SIGNATURE-----
 
-Thanks!
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZBxm/gAKCRB4tDGHoIJi
+0iuPAQCj0oB2PJm3sAnzQn4lJ3P3IQyfftDTZrZVctDQipZ9xwD8DCL8PQqFHGGb
+iqK+RMu43c4MOpwgWxlM+qkjCjCdTQg=
+=RGLC
+-----END PGP SIGNATURE-----
 
+--WAnLRcLV3Ph+ynOR--
