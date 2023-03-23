@@ -2,55 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A3BB46C5B89
-	for <lists+kvm@lfdr.de>; Thu, 23 Mar 2023 01:50:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1CA356C5B8F
+	for <lists+kvm@lfdr.de>; Thu, 23 Mar 2023 01:54:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229842AbjCWAuy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Mar 2023 20:50:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42962 "EHLO
+        id S229739AbjCWAyp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Mar 2023 20:54:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46296 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229496AbjCWAuw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Mar 2023 20:50:52 -0400
-Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24E1D6A5D
-        for <kvm@vger.kernel.org>; Wed, 22 Mar 2023 17:50:52 -0700 (PDT)
-Received: by mail-pg1-x54a.google.com with SMTP id d22-20020a63d716000000b00502e3fb8ff3so5205257pgg.10
-        for <kvm@vger.kernel.org>; Wed, 22 Mar 2023 17:50:52 -0700 (PDT)
+        with ESMTP id S229543AbjCWAyn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Mar 2023 20:54:43 -0400
+Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71B6A72A8
+        for <kvm@vger.kernel.org>; Wed, 22 Mar 2023 17:54:42 -0700 (PDT)
+Received: by mail-pf1-x44a.google.com with SMTP id a188-20020a621ac5000000b00627e6740be6so6348672pfa.21
+        for <kvm@vger.kernel.org>; Wed, 22 Mar 2023 17:54:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1679532651;
+        d=google.com; s=20210112; t=1679532882;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Bg9TeeVKkErrMDSSNpFE3ne7ONBcnLKyWNyzaJuM2w0=;
-        b=CvV09UaLS1MaIVXKzJLiAeUHeM59IKQp5eEgx+Zc2m2g+vLpSRhWJXdCziRLX6+ZwM
-         f/GIOGBRPWGtZ6O6A1uuItZnk7pOLSjlJyt7hVvKCxqLYJxSNp9J55u15M9QHzviDI36
-         iIQ8cRL/tMrksrliEsU+Jne7qj90aWMuA+Ux9CAq0o5cu2NYOsj80exFpbJaQyb6wqNZ
-         LH7cXBrF40I/aw8qStOLgk9kPScVHDOa3uFto2fdJiIwrFPrupAP2Q/PIve530PzV94U
-         5gaShGzvfmKjmwvrn7CxX6n74xh8MlqGm1FsnFAttfMzUIZuy6Eq5GaaP8B4GPNI20zg
-         oDmA==
+        bh=xXt/uuEZJiPd6iCKnzBzoxs3VQRz86+IAZiKKn1lWnc=;
+        b=jCUeVx3HhY1WoJNqMWF2eL9NfPhq/5nSlf2hpdVptxkjn9Bxw24093lSJ9deBBOLGy
+         hw4KqVl9ksGF08YMs2SQYWLnXihK8ODu1YKBESxbLqaOfZ7VpBYGe9Hl/IzoA7q9h2pB
+         cpObCEoOlHPtF6cDoOjLS7S/jc3gpTdjUB9FdJJjoC1BC37M+lRYy5zTkfk6oAYZW7hz
+         zMbGwrpnK+e7W53Lxq7kUgt8GHPi+f8Oa7dDZMRgJO8pVO+RC3JP9LCSsQAwKyhIHBKA
+         Nk3ThC5tLjasask/L1rJcKSuwfhudWpek9Ty38Oz7Cgef2zN6sAWT6OO/ggujDb8GO6S
+         zGNQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679532651;
+        d=1e100.net; s=20210112; t=1679532882;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Bg9TeeVKkErrMDSSNpFE3ne7ONBcnLKyWNyzaJuM2w0=;
-        b=i6H2GdpEj/YOVEVanH2uOh+RvK/jvYfzgtzw76bl3pIKi1AL80MiOmcef5mpQpQPQj
-         sjKBI1X/aeoBuxz5v1fUFxJQLa+/8F3C4ZgAiC1AHIE5e2kyjZXE3xZlNORHtpQuTSPm
-         EjZSmXJIDVdg9Y1F9FyQwsOQttQGdtEU/5vIy35GbWOTDOWgAjMogansvUOYIzDGWOMb
-         fjIuLxn+x8Mhv8WfuUR1BBZ3A0FI7xZLGKoZIkXXXhPkSFsf+nuit6Zz6UOe2xEyZW6Y
-         YuCnZNwp+CtNAVJNT1sRSNVXIVjqLxNBtvBpT63Qq8bU5pdV4R7UsJo6Lw3DU9aHdORU
-         8gaA==
-X-Gm-Message-State: AO0yUKVBqn5O4KKSAsJEWxxffAXLwCvq7kbiT8ERQoZUIyQv6GeyFNTr
-        PS5rsotFyC3sIg5TockWKWuXpc2GvxM=
-X-Google-Smtp-Source: AK7set8mOU8bL6IapPjdKA2xGh3uPZvtLoYb4cohsTVOk1EmmY66y+kP6LMHgQpnrOii4CAlSATC7MGiuGo=
+        bh=xXt/uuEZJiPd6iCKnzBzoxs3VQRz86+IAZiKKn1lWnc=;
+        b=k0m2w6yOOugjHOhNpqT756elCrB+5RAi1El5vBsDPh/YFV3meGu5dhfsJs1BaYR27L
+         57v67gB5Jy9YHnB9C56CY0jWDE8GNN7gnafRwvgVT9vCFsJqwJ9sUIAnI8jXq4byU16K
+         V387QNx/J0KMv17IgRt4pHjirOuzgxRAaOTBppdZHm6qdDBvD+JSSUTH78kDUTU/k4PL
+         c09EcsieiLG6Ql+USxXh7A0YDDGQZzYYntObjqcKi0f1FvXkDD8pgRw7ZDmvY9I2/Btk
+         eX60uNaSB5vWhOjnaf0VTEgRdYHPv/9QbRkgNt9ugR1TX/a1Vp+QRuYZvM3C5bx4MwUM
+         0sMw==
+X-Gm-Message-State: AO0yUKUqocSHHW2JMSwZDVUuXminM7n98sQTWQF21PoPxKw7qUJlH6gy
+        wzVS4UXRWReoRMLFYXN1MT0JkZlsq1k=
+X-Google-Smtp-Source: AK7set/E+ZqnkdfjykckT1v1ak0rvsbe0mOtVRJntajXMcnHlawxOH1WXDm26dVTsGg2Ug5nFHES00jJQcs=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a65:63d8:0:b0:502:e4df:5f3f with SMTP id
- n24-20020a6563d8000000b00502e4df5f3fmr1356957pgv.6.1679532651750; Wed, 22 Mar
- 2023 17:50:51 -0700 (PDT)
-Date:   Wed, 22 Mar 2023 17:50:50 -0700
-In-Reply-To: <20230227084016.3368-12-santosh.shukla@amd.com>
+ (user=seanjc job=sendgmr) by 2002:a17:90a:6784:b0:23b:32c0:7cc8 with SMTP id
+ o4-20020a17090a678400b0023b32c07cc8mr1716026pjj.7.1679532881981; Wed, 22 Mar
+ 2023 17:54:41 -0700 (PDT)
+Date:   Wed, 22 Mar 2023 17:54:40 -0700
+In-Reply-To: <20230227084016.3368-10-santosh.shukla@amd.com>
 Mime-Version: 1.0
-References: <20230227084016.3368-1-santosh.shukla@amd.com> <20230227084016.3368-12-santosh.shukla@amd.com>
-Message-ID: <ZBuialNlrCbDmJaX@google.com>
-Subject: Re: [PATCHv4 11/11] KVM: nSVM: implement support for nested VNMI
+References: <20230227084016.3368-1-santosh.shukla@amd.com> <20230227084016.3368-10-santosh.shukla@amd.com>
+Message-ID: <ZBujUGXG0JlOLEBh@google.com>
+Subject: Re: [PATCHv4 09/11] KVM: SVM: Add VNMI bit definition
 From:   Sean Christopherson <seanjc@google.com>
 To:     Santosh Shukla <santosh.shukla@amd.com>
 Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, jmattson@google.com,
@@ -69,30 +69,31 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On Mon, Feb 27, 2023, Santosh Shukla wrote:
-> Allows L1 to use vNMI to accelerate its injection of NMI
-> to L2 by passing through vNMI int_ctl bits from vmcb12
-> to/from vmcb02.
-> 
-> In case of L1 and L2 both using VNMI- Copy VNMI bits from vmcb12 to
-> vmcb02 during entry and vice-versa during exit.
-> And in case of L1 uses VNMI and L2 doesn't- Copy VNMI bits from vmcb01 to
-> vmcb02 during entry and vice-versa during exit.
+> VNMI exposes 3 capability bits (V_NMI, V_NMI_MASK, and V_NMI_ENABLE) to
+> virtualize NMI and NMI_MASK, Those capability bits are part of
+> VMCB::intr_ctrl -
+> V_NMI_PENDING_MASK(11) - Indicates whether a virtual NMI is pending in the
+> guest.
+> V_NMI_BLOCKING_MASK(12) - Indicates whether virtual NMI is masked in the
+> guest.
+> V_NMI_ENABLE_MASK(26) - Enables the NMI virtualization feature for the
+> guest.
 
-This changelog is again stale, as it does not match the code.  Or maybe it never
-matched the code.  The code looks correct though.
+This is way harder to read than it needs to be.  The intent of the various rules
+for line length and whatnot is to make code/changelogs easier to read.  That intent
+is lost if code/changelogs are written without actually considering the rules.
+In other words, don't write changeloges, comments, etc. without thinking about how
+the result will look when the line length rules apply.
 
-    KVM: nSVM: Implement support for nested VNMI
+    Add defines for three new bits in VMVC::int_ctrl that are part of SVM's
+    Virtual NMI (vNMI) support:
     
-    Allow L1 to use vNMI to accelerate its injection of NMI to L2 by
-    propagating vNMI int_ctl bits from/to vmcb12 to/from vmcb02.
+      V_NMI_PENDING_MASK(11)  - Virtual NMI is pending
+      V_NMI_BLOCKING_MASK(12) - Virtual NMI is masked
+      V_NMI_ENABLE_MASK(26)   - Enable NMI virtualization
     
-    To handle both the case where vNMI is enabled for L1 and L2, and where
-    vNMI is enabled for L1 but _not_ L2, move pending L1 vNMIs to nmi_pending
-    on nested VM-Entry and raise KVM_REQ_EVENT, i.e. rely on existing code to
-    route the NMI to the correct domain.
-    
-    On nested VM-Exit, reverse the process and set/clear V_NMI_PENDING for L1
-    based one whether nmi_pending is zero or non-zero.  There is no need to
-    consider vmcb02 in this case, as V_NMI_PENDING can be set in vmcb02 if
-    vNMI is disabled for L2, and if vNMI is enabled for L2, then L1 and L2
-    have different NMI contexts.
+    To "inject" an NMI, the hypervisor (KVM) sets V_NMI_PENDING.  When the
+    CPU services the pending vNMI, hardware clears V_NMI_PENDING and sets
+    V_NMI_BLOCKING, e.g. to indicate that the vCPU is handling an NMI.
+    Hardware clears V_NMI_BLOCKING upon successful execution of IRET, or if a
+    VM-Exit occurs while delivering the virtual NMI.
