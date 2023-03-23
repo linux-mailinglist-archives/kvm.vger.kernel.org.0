@@ -2,96 +2,284 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 914F16C6549
-	for <lists+kvm@lfdr.de>; Thu, 23 Mar 2023 11:39:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3710F6C655A
+	for <lists+kvm@lfdr.de>; Thu, 23 Mar 2023 11:41:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229800AbjCWKjP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Mar 2023 06:39:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34546 "EHLO
+        id S230506AbjCWKl1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Mar 2023 06:41:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59940 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231181AbjCWKiv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Mar 2023 06:38:51 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC62D38446
-        for <kvm@vger.kernel.org>; Thu, 23 Mar 2023 03:36:34 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 52F45625D8
-        for <kvm@vger.kernel.org>; Thu, 23 Mar 2023 10:36:34 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 42BD0C4339B;
-        Thu, 23 Mar 2023 10:36:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1679567793;
-        bh=AiS8dSPCKWDsq3eZ7fJAM1zTxXlSdU85APs6cGWwkyg=;
-        h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-        b=cVnnpvtmKuYQMh/yj6cr0af33CLhHRsXcDRuRSd76QGIYurwcQUkte+v4WREomm3g
-         fgQyT4SZLJzK/fs3yR/hCVZQSp0mpWLfewImPfsTHQi2vUC7ehslg9EdLZVUTyzCPg
-         eB6UIuoglmfKWsIpO5pEIKYYg9YSsKRcrxLhyR3YQ98/BPWvZ+cAoCcLArSBrDqBlr
-         wCKe949/sLk/kqe6uy1zAJRU1Sx8Zw4i88jGllm+5lUnPHOmw/ok8m8cSA4HTK1+aW
-         tiiDVYNXWDRN8lpim397S6y/RZ8zgWOhD/unmkAik2KIQm+e54TO6LLb/xUhe7dSXk
-         hZoS+1PsJhoow==
-From:   =?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>
-To:     Andy Chiu <andy.chiu@sifive.com>, linux-riscv@lists.infradead.org,
-        palmer@dabbelt.com, anup@brainfault.org, atishp@atishpatra.org,
-        kvm-riscv@lists.infradead.org, kvm@vger.kernel.org
-Cc:     Kefeng Wang <wangkefeng.wang@huawei.com>, guoren@linux.alibaba.com,
-        Kees Cook <keescook@chromium.org>,
-        Nick Knight <nick.knight@sifive.com>,
-        Andrew Bresticker <abrestic@rivosinc.com>,
-        vineetg@rivosinc.com, Al Viro <viro@zeniv.linux.org.uk>,
-        Vincent Chen <vincent.chen@sifive.com>,
-        Conor Dooley <conor.dooley@microchip.com>,
-        Albert Ou <aou@eecs.berkeley.edu>, Guo Ren <guoren@kernel.org>,
-        Eric Biederman <ebiederm@xmission.com>,
-        Andy Chiu <andy.chiu@sifive.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        greentime.hu@sifive.com, Zong Li <zong.li@sifive.com>,
-        Heiko Stuebner <heiko@sntech.de>
-Subject: Re: [PATCH -next v15 14/19] riscv: signal: Report signal frame size
- to userspace via auxv
-In-Reply-To: <20230317113538.10878-15-andy.chiu@sifive.com>
-References: <20230317113538.10878-1-andy.chiu@sifive.com>
- <20230317113538.10878-15-andy.chiu@sifive.com>
-Date:   Thu, 23 Mar 2023 11:36:31 +0100
-Message-ID: <87a6034uvk.fsf@all.your.base.are.belong.to.us>
+        with ESMTP id S230321AbjCWKlK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Mar 2023 06:41:10 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 978411CAFA
+        for <kvm@vger.kernel.org>; Thu, 23 Mar 2023 03:37:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1679567838;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=EpnQQ3G7hcvDGrM22xg98YnMqqv0RfyTzwV5l3OM/5c=;
+        b=HoQ/D/QaXZdFwkfNZoyDwWYc8oDKA9bYOo30yuGIfjFIhIjfW1ClUVp2ghcBdD2Mh/Qok9
+        Iw7hLKYXNlLROfHdTAsJT9s0GZc2WDLnSIXalPljgeonM1CvFa4cUbNLe0zfhFWCDWPFVq
+        WxJG43RJ+nNvCHn5P3QingAemLfqkMg=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-263-t_wm2TsoPLqWhq-ZWfB6LA-1; Thu, 23 Mar 2023 06:37:16 -0400
+X-MC-Unique: t_wm2TsoPLqWhq-ZWfB6LA-1
+Received: by mail-wm1-f70.google.com with SMTP id o7-20020a05600c4fc700b003edf85f6bb1so808881wmq.3
+        for <kvm@vger.kernel.org>; Thu, 23 Mar 2023 03:37:16 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1679567834;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=EpnQQ3G7hcvDGrM22xg98YnMqqv0RfyTzwV5l3OM/5c=;
+        b=DsbOIFkJ8eHsIwcoBpPui5FfcLmkAlf3WNV1vu8fYb2x9T8dccs77shzSIIJ3NFDQ4
+         BVKSiZ0NoeoYZBcQh/K1WAbg9TMw7ZJ6oa26TW259wNTi7JWYOB2warsYoIIzoh8s85l
+         Hmfni61ctvFCCLLpW8Eb5hgweGCNlGIP2mOAocLCMjEe4Qcz1gdBYcT1ZeJZrtyqLvaW
+         /Wb5bA0z4IVq8vVmwG5g7WEcok6k7/SJlRRKCXz76yBwKbwGusPQduvdAS5ctXB6EEb1
+         0sx8JrwfLNez9/duw88czTWl11aI7I+xMtBqr1RvjK0ZGfKRlQy9zag1mHrkZtIx5zhV
+         phbg==
+X-Gm-Message-State: AO0yUKWjEfB92TCdFNZg9HcodCa//tQPssyAM/f6RlJbYXgem7VgucDq
+        jk4xU74VMJlUCJ5qS0vs+5T7dCW5x/ijo57JBk1hc9T7zFO0Cz/xX8EJ3ivVf7/1SsGAasIiOLG
+        zJsnWwkzGc4no
+X-Received: by 2002:a05:600c:2256:b0:3ee:5754:f14b with SMTP id a22-20020a05600c225600b003ee5754f14bmr2034980wmm.3.1679567834565;
+        Thu, 23 Mar 2023 03:37:14 -0700 (PDT)
+X-Google-Smtp-Source: AK7set+gpzAA7wqFypGZYurRSrxux98xhwtHxoigh9D6yMe4Wr4EW4I56QepTLL6+hAsj2ePNI94IA==
+X-Received: by 2002:a05:600c:2256:b0:3ee:5754:f14b with SMTP id a22-20020a05600c225600b003ee5754f14bmr2034963wmm.3.1679567834201;
+        Thu, 23 Mar 2023 03:37:14 -0700 (PDT)
+Received: from sgarzare-redhat (host-82-53-134-98.retail.telecomitalia.it. [82.53.134.98])
+        by smtp.gmail.com with ESMTPSA id z21-20020a1cf415000000b003ee3e075d1csm1483544wma.22.2023.03.23.03.37.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 23 Mar 2023 03:37:13 -0700 (PDT)
+Date:   Thu, 23 Mar 2023 11:37:11 +0100
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     virtualization@lists.linux-foundation.org, stefanha@redhat.com,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Andrey Zhadchenko <andrey.zhadchenko@virtuozzo.com>,
+        eperezma@redhat.com, netdev@vger.kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 4/8] vringh: support VA with iotlb
+Message-ID: <20230323103711.sobptckmgr22lwxj@sgarzare-redhat>
+References: <20230321154228.182769-1-sgarzare@redhat.com>
+ <20230321154228.182769-5-sgarzare@redhat.com>
+ <CACGkMEs3G+O3Jo7yNPSOZ9wiEbq_nudU9HrVNzhqtkGoRVesYA@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.5 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CACGkMEs3G+O3Jo7yNPSOZ9wiEbq_nudU9HrVNzhqtkGoRVesYA@mail.gmail.com>
+X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Andy Chiu <andy.chiu@sifive.com> writes:
+On Thu, Mar 23, 2023 at 11:36:28AM +0800, Jason Wang wrote:
+>On Tue, Mar 21, 2023 at 11:43 PM Stefano Garzarella <sgarzare@redhat.com> wrote:
+>>
+>> vDPA supports the possibility to use user VA in the iotlb messages.
+>> So, let's add support for user VA in vringh to use it in the vDPA
+>> simulators.
+>>
+>> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+>> ---
+>>
+>> Notes:
+>>     v3:
+>>     - refactored avoiding code duplication [Eugenio]
+>>     v2:
+>>     - replace kmap_atomic() with kmap_local_page() [see previous patch]
+>>     - fix cast warnings when build with W=1 C=1
+>>
+>>  include/linux/vringh.h            |   5 +-
+>>  drivers/vdpa/mlx5/net/mlx5_vnet.c |   2 +-
+>>  drivers/vdpa/vdpa_sim/vdpa_sim.c  |   4 +-
+>>  drivers/vhost/vringh.c            | 153 +++++++++++++++++++++++-------
+>>  4 files changed, 127 insertions(+), 37 deletions(-)
+>>
+>> diff --git a/include/linux/vringh.h b/include/linux/vringh.h
+>> index 1991a02c6431..d39b9f2dcba0 100644
+>> --- a/include/linux/vringh.h
+>> +++ b/include/linux/vringh.h
+>> @@ -32,6 +32,9 @@ struct vringh {
+>>         /* Can we get away with weak barriers? */
+>>         bool weak_barriers;
+>>
+>> +       /* Use user's VA */
+>> +       bool use_va;
+>> +
+>>         /* Last available index we saw (ie. where we're up to). */
+>>         u16 last_avail_idx;
+>>
+>> @@ -279,7 +282,7 @@ void vringh_set_iotlb(struct vringh *vrh, struct vhost_iotlb *iotlb,
+>>                       spinlock_t *iotlb_lock);
+>>
+>>  int vringh_init_iotlb(struct vringh *vrh, u64 features,
+>> -                     unsigned int num, bool weak_barriers,
+>> +                     unsigned int num, bool weak_barriers, bool use_va,
+>>                       struct vring_desc *desc,
+>>                       struct vring_avail *avail,
+>>                       struct vring_used *used);
+>> diff --git a/drivers/vdpa/mlx5/net/mlx5_vnet.c b/drivers/vdpa/mlx5/net/mlx5_vnet.c
+>> index 520646ae7fa0..dfd0e000217b 100644
+>> --- a/drivers/vdpa/mlx5/net/mlx5_vnet.c
+>> +++ b/drivers/vdpa/mlx5/net/mlx5_vnet.c
+>> @@ -2537,7 +2537,7 @@ static int setup_cvq_vring(struct mlx5_vdpa_dev *mvdev)
+>>
+>>         if (mvdev->actual_features & BIT_ULL(VIRTIO_NET_F_CTRL_VQ))
+>>                 err = vringh_init_iotlb(&cvq->vring, mvdev->actual_features,
+>> -                                       MLX5_CVQ_MAX_ENT, false,
+>> +                                       MLX5_CVQ_MAX_ENT, false, false,
+>
+>To avoid those changes, would it be better to introduce
+>vringh_init_iotlb_va() so vringh_init_iotlb() can stick to pa.
 
-> From: Vincent Chen <vincent.chen@sifive.com>
->
-> The vector register belongs to the signal context. They need to be stored
-> and restored as entering and leaving the signal handler. According to the
-> V-extension specification, the maximum length of the vector registers can
-> be 2^(XLEN-1). Hence, if userspace refers to the MINSIGSTKSZ to create a
-> sigframe, it may not be enough. To resolve this problem, this patch refers
-> to the commit 94b07c1f8c39c
-> ("arm64: signal: Report signal frame size to userspace via auxv") to enab=
-le
-> userspace to know the minimum required sigframe size through the auxiliary
-> vector and use it to allocate enough memory for signal context.
->
-> Note that auxv always reports size of the sigframe as if V exists for
-> all starting processes, whenever the kernel has CONFIG_RISCV_ISA_V. The
-> reason is that users usually reference this value to allocate an
-> alternative signal stack, and the user may use V anytime. So the user
-> must reserve a space for V-context in sigframe in case that the signal
-> handler invokes after the kernel allocating V.
->
-> Signed-off-by: Greentime Hu <greentime.hu@sifive.com>
-> Signed-off-by: Vincent Chen <vincent.chen@sifive.com>
-> Signed-off-by: Andy Chiu <andy.chiu@sifive.com>
-> Acked-by: Conor Dooley <conor.dooley@microchip.com>
+Okay, I don't have a strong opinion, I'll add vringh_init_iotlb_va().
 
-Reviewed-by: Bj=C3=B6rn T=C3=B6pel <bjorn@rivosinc.com>
+>
+>>                                         (struct vring_desc *)(uintptr_t)cvq->desc_addr,
+>>                                         (struct vring_avail *)(uintptr_t)cvq->driver_addr,
+>>                                         (struct vring_used *)(uintptr_t)cvq->device_addr);
+>> diff --git a/drivers/vdpa/vdpa_sim/vdpa_sim.c b/drivers/vdpa/vdpa_sim/vdpa_sim.c
+>> index eea23c630f7c..47cdf2a1f5b8 100644
+>> --- a/drivers/vdpa/vdpa_sim/vdpa_sim.c
+>> +++ b/drivers/vdpa/vdpa_sim/vdpa_sim.c
+>> @@ -60,7 +60,7 @@ static void vdpasim_queue_ready(struct vdpasim *vdpasim, unsigned int idx)
+>>         struct vdpasim_virtqueue *vq = &vdpasim->vqs[idx];
+>>         uint16_t last_avail_idx = vq->vring.last_avail_idx;
+>>
+>> -       vringh_init_iotlb(&vq->vring, vdpasim->features, vq->num, true,
+>> +       vringh_init_iotlb(&vq->vring, vdpasim->features, vq->num, true, false,
+>>                           (struct vring_desc *)(uintptr_t)vq->desc_addr,
+>>                           (struct vring_avail *)
+>>                           (uintptr_t)vq->driver_addr,
+>> @@ -92,7 +92,7 @@ static void vdpasim_vq_reset(struct vdpasim *vdpasim,
+>>         vq->cb = NULL;
+>>         vq->private = NULL;
+>>         vringh_init_iotlb(&vq->vring, vdpasim->dev_attr.supported_features,
+>> -                         VDPASIM_QUEUE_MAX, false, NULL, NULL, NULL);
+>> +                         VDPASIM_QUEUE_MAX, false, false, NULL, NULL, NULL);
+>>
+>>         vq->vring.notify = NULL;
+>>  }
+>> diff --git a/drivers/vhost/vringh.c b/drivers/vhost/vringh.c
+>> index 0ba3ef809e48..72c88519329a 100644
+>> --- a/drivers/vhost/vringh.c
+>> +++ b/drivers/vhost/vringh.c
+>> @@ -1094,10 +1094,18 @@ EXPORT_SYMBOL(vringh_need_notify_kern);
+>>
+>>  #if IS_REACHABLE(CONFIG_VHOST_IOTLB)
+>>
+>> +struct iotlb_vec {
+>> +       union {
+>> +               struct iovec *iovec;
+>> +               struct bio_vec *bvec;
+>> +       } iov;
+>> +       size_t count;
+>> +       bool is_iovec;
+>
+>I wonder if this is needed (if vringh is passed to every iotlb_vec helper).
+
+Yep, I can use vringh->use_va.
+
+>
+>> +};
+>> +
+>>  static int iotlb_translate(const struct vringh *vrh,
+>>                            u64 addr, u64 len, u64 *translated,
+>> -                          struct bio_vec iov[],
+>> -                          int iov_size, u32 perm)
+>> +                          struct iotlb_vec *ivec, u32 perm)
+>>  {
+>>         struct vhost_iotlb_map *map;
+>>         struct vhost_iotlb *iotlb = vrh->iotlb;
+>> @@ -1107,9 +1115,9 @@ static int iotlb_translate(const struct vringh *vrh,
+>>         spin_lock(vrh->iotlb_lock);
+>>
+>>         while (len > s) {
+>> -               u64 size, pa, pfn;
+>> +               u64 size;
+>>
+>> -               if (unlikely(ret >= iov_size)) {
+>> +               if (unlikely(ret >= ivec->count)) {
+>>                         ret = -ENOBUFS;
+>>                         break;
+>>                 }
+>> @@ -1124,10 +1132,22 @@ static int iotlb_translate(const struct vringh *vrh,
+>>                 }
+>>
+>>                 size = map->size - addr + map->start;
+>> -               pa = map->addr + addr - map->start;
+>> -               pfn = pa >> PAGE_SHIFT;
+>> -               bvec_set_page(&iov[ret], pfn_to_page(pfn), min(len - s, size),
+>> -                             pa & (PAGE_SIZE - 1));
+>> +               if (ivec->is_iovec) {
+>> +                       struct iovec *iovec = ivec->iov.iovec;
+>> +
+>> +                       iovec[ret].iov_len = min(len - s, size);
+>> +                       iovec[ret].iov_base = (void __user *)(unsigned long)
+>> +                                             (map->addr + addr - map->start);
+>
+>map->addr - map->start to avoid overflow?
+
+Right, it was pre-existing, but I'll fix since I'm here (also in the
+else branch).
+And since it's duplicate code, I'll declare it outside!
+
+>
+>> +               } else {
+>> +                       u64 pa = map->addr + addr - map->start;
+>> +                       u64 pfn = pa >> PAGE_SHIFT;
+>> +                       struct bio_vec *bvec = ivec->iov.bvec;
+>> +
+>> +                       bvec_set_page(&bvec[ret], pfn_to_page(pfn),
+>> +                                     min(len - s, size),
+>> +                                     pa & (PAGE_SIZE - 1));
+>> +               }
+>> +
+>>                 s += size;
+>>                 addr += size;
+>>                 ++ret;
+>> @@ -1141,26 +1161,42 @@ static int iotlb_translate(const struct vringh *vrh,
+>>         return ret;
+>>  }
+>>
+>> +#define IOTLB_IOV_SIZE 16
+>> +
+>>  static inline int copy_from_iotlb(const struct vringh *vrh, void *dst,
+>>                                   void *src, size_t len)
+>>  {
+>> +       struct iotlb_vec ivec;
+>> +       union {
+>> +               struct iovec iovec[IOTLB_IOV_SIZE];
+>> +               struct bio_vec bvec[IOTLB_IOV_SIZE];
+>> +       } iov;
+>>         u64 total_translated = 0;
+>>
+>> +       ivec.iov.iovec = iov.iovec;
+>
+>ivc.iov = iov ?
+
+I tried, but they are both anonymous unions, so I cannot assign them.
+
+Also, this inner union I need to allocate space in the stack to hold
+both arrays, while the union in iotlb_vec to carry both pointers.
+
+I don't know whether to add a third field (e.g. `void *raw`) to both and
+assign it.
+
+>
+>Others look good.
+
+Thanks,
+Stefano
+
