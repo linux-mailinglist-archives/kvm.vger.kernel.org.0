@@ -2,124 +2,151 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CE28F6C6906
-	for <lists+kvm@lfdr.de>; Thu, 23 Mar 2023 14:01:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B708E6C6B36
+	for <lists+kvm@lfdr.de>; Thu, 23 Mar 2023 15:38:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231468AbjCWNBO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Mar 2023 09:01:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49832 "EHLO
+        id S231589AbjCWOir (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Mar 2023 10:38:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35734 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229729AbjCWNBL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Mar 2023 09:01:11 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32F3B31E2D
-        for <kvm@vger.kernel.org>; Thu, 23 Mar 2023 06:01:08 -0700 (PDT)
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 32NBUra3026376
-        for <kvm@vger.kernel.org>; Thu, 23 Mar 2023 13:01:07 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
- mime-version : content-transfer-encoding : in-reply-to : references : cc :
- to : from : subject : message-id : date; s=pp1;
- bh=VGhqfuCzr9cR22Ri6MlCGw+rcUHAMO4c+A75kzp8/OI=;
- b=mXGRkxSDHv13nVoFsXo2VuWApEspBBPlqRYsxeK1Qvz4vOCZCYOOEk34ccg3YSJ8VTTe
- QlXnpRuExdaJc2yMfN9rcZQDoyUJO9TTznWwh/e0hpT7QahjDj07T34mwcMc/g4Z3mAg
- x9YqcjVhgOdqSgfVjg2+kjLs8jQuK4+1w1+K7D8lxmKFo/TQByZ0kMF6+EfHFHqguSfo
- QK+uMuF8Z46/ieienPeYNGUpG0CUWyryrzq2mm7V9Fr/1y5AZWM9m56nZM4djDVal7ua
- 91pt7h4Oly1W8zhrTeWaNYI1nITYx4gR1Dqv9bsVs9YIYlkFcyIhItzHzOd2UgyiXhGI nw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pgmg6mans-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Thu, 23 Mar 2023 13:01:07 +0000
-Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 32NApaqq009005
-        for <kvm@vger.kernel.org>; Thu, 23 Mar 2023 13:01:06 GMT
+        with ESMTP id S231220AbjCWOio (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Mar 2023 10:38:44 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F5D6E062;
+        Thu, 23 Mar 2023 07:38:41 -0700 (PDT)
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 32NEJ0Kx012528;
+        Thu, 23 Mar 2023 14:38:38 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=gDXwwDTli8az66jfGCLHiYuLr5u5tT6/V28b/Ru4pc4=;
+ b=nxqpuzEurfoJ18b/h0aFL7mQkU4ccuKH4f2jgVswS5ysRoIrQKE/D47orwhHc+9aCewW
+ HUz8z0rdljhxCdpflvO7O5bbGEt3fO87bfEKKakq1snewdBa0IK7SnyDzjgj7az8+sLT
+ /YwjLT97t/UKDrNt7/cKff+2E14dwZ2mvqCJusXfM1TxY7MsNNKKhewgffP2nf1txWev
+ DC+2zq/8MDsj8V7XrnUposnlaZV9XU/QcTTEhPT5vf40uhmMC34GaY7cOzwSygYrgTfX
+ dp7VIeLBHDotGVoi1IE47Gc08MzB/MsZO8vTHIrgCLiPpyf6fCq8R/PD2Zmib2lmE1MS gg== 
 Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pgmg6mams-1
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pgmc2qb9u-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 23 Mar 2023 13:01:06 +0000
+        Thu, 23 Mar 2023 14:38:38 +0000
 Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 32N8Pihl016519;
-        Thu, 23 Mar 2023 13:01:04 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-        by ppma04ams.nl.ibm.com (PPS) with ESMTPS id 3pd4x6fc6w-1
+        by ppma04ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 32N9QcNj017248;
+        Thu, 23 Mar 2023 14:38:35 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+        by ppma04ams.nl.ibm.com (PPS) with ESMTPS id 3pd4x6ffrw-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 23 Mar 2023 13:01:04 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-        by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 32ND11bU38142370
+        Thu, 23 Mar 2023 14:38:35 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+        by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 32NEcW3549545700
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 23 Mar 2023 13:01:01 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 075852004B;
-        Thu, 23 Mar 2023 13:01:01 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D98DB20040;
-        Thu, 23 Mar 2023 13:01:00 +0000 (GMT)
-Received: from t14-nrb (unknown [9.171.6.128])
-        by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Thu, 23 Mar 2023 13:01:00 +0000 (GMT)
-Content-Type: text/plain; charset="utf-8"
+        Thu, 23 Mar 2023 14:38:32 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 41B742004D;
+        Thu, 23 Mar 2023 14:38:32 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id EFE0A2004B;
+        Thu, 23 Mar 2023 14:38:31 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.152.224.56])
+        by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Thu, 23 Mar 2023 14:38:31 +0000 (GMT)
+Date:   Thu, 23 Mar 2023 13:36:17 +0100
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Nico Boehr <nrb@linux.ibm.com>
+Cc:     borntraeger@linux.ibm.com, frankja@linux.ibm.com, shuah@kernel.org,
+        kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH v1 2/2] KVM: s390: fix KVM_S390_GET_CMMA_BITS for GFNs
+ in memslot holes
+Message-ID: <20230323133617.4e8b3696@p-imbrenda>
+In-Reply-To: <20230208144827.131300-2-nrb@linux.ibm.com>
+References: <20230208144827.131300-1-nrb@linux.ibm.com>
+        <20230208144827.131300-2-nrb@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20230323103913.40720-7-frankja@linux.ibm.com>
-References: <20230323103913.40720-1-frankja@linux.ibm.com> <20230323103913.40720-7-frankja@linux.ibm.com>
-Cc:     thuth@redhat.com, imbrenda@linux.ibm.com
-To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
-From:   Nico Boehr <nrb@linux.ibm.com>
-Subject: Re: [kvm-unit-tests PATCH 6/8] s390x: uv-host: Fix create guest variable storage prefix check
-Message-ID: <167957646059.13757.6545237796999072562@t14-nrb>
-User-Agent: alot/0.8.1
-Date:   Thu, 23 Mar 2023 14:01:00 +0100
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: YNwTB8FOU27IcKTP1eYWhrjH7Q_t8Wpi
-X-Proofpoint-ORIG-GUID: PV-y4120fuhr-nHZmI8MoX_RdzsDVL1b
+X-Proofpoint-GUID: hywSHiTFg4IWfvS6A2D_GFKVnTb6sZ1p
+X-Proofpoint-ORIG-GUID: hywSHiTFg4IWfvS6A2D_GFKVnTb6sZ1p
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
- definitions=2023-03-22_21,2023-03-22_01,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 mlxlogscore=999 adultscore=0 suspectscore=0
- lowpriorityscore=0 impostorscore=0 mlxscore=0 spamscore=0 phishscore=0
- bulkscore=0 clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2303150002 definitions=main-2303230094
+ definitions=2023-03-22_21,2023-03-23_02,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 adultscore=0
+ bulkscore=0 impostorscore=0 mlxscore=0 spamscore=0 malwarescore=0
+ priorityscore=1501 mlxlogscore=999 phishscore=0 suspectscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2303150002 definitions=main-2303230109
 X-Spam-Status: No, score=-0.1 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
-        DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Quoting Janosch Frank (2023-03-23 11:39:11)
-> We want more than one cpu and the rc is 10B, not 109.
-                                                     ^
-Code says 10e        --------------------------------|
+On Wed,  8 Feb 2023 15:48:26 +0100
+Nico Boehr <nrb@linux.ibm.com> wrote:
 
->=20
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> The KVM_S390_GET_CMMA_BITS ioctl may return incorrect values when userspace
+> specifies a start_gfn outside of memslots.
+> 
+> This can occur when a VM has multiple memslots with a hole in between:
+> 
+> +-----+----------+--------+--------+
+> | ... | Slot N-1 | <hole> | Slot N |
+> +-----+----------+--------+--------+
+>       ^          ^        ^        ^
+>       |          |        |        |
+> GFN   A          A+B      |        |
+>                           A+B+C    |
+> 			           A+B+C+D
+> 
+> When userspace specifies a GFN in [A+B, A+B+C), it would expect to get the
+> CMMA values of the first dirty page in Slot N. However, userspace may get a
+> start_gfn of A+B+C+D with a count of 0, hence completely skipping over any
+> dirty pages in slot N.
+> 
+> The error is in kvm_s390_next_dirty_cmma(), which assumes
+> gfn_to_memslot_approx() will return the memslot _below_ the specified GFN
+> when the specified GFN lies outside a memslot. In reality it may return
+> either the memslot below or above the specified GFN.
+> 
+> When a memslot above the specified GFN is returned this happens:
+> 
+> - ofs is calculated, but since the memslot's base_gfn is larger than the
+>   specified cur_gfn, ofs will underflow to a huge number.
+> - ofs is passed to find_next_bit(). Since ofs will exceed the memslot's
+>   number of pages, the number of pages in the memslot is returned,
+>   completely skipping over all bits in the memslot userspace would be
+>   interested in.
+> 
+> Fix this by resetting ofs to zero when a memslot _above_ cur_gfn is
+> returned (cur_gfn < ms->base_gfn).
+> 
+> Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
+
+Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+
 > ---
->  s390x/uv-host.c | 8 ++++++--
->  1 file changed, 6 insertions(+), 2 deletions(-)
->=20
-> diff --git a/s390x/uv-host.c b/s390x/uv-host.c
-> index 42ea2a53..d92571b5 100644
-> --- a/s390x/uv-host.c
-> +++ b/s390x/uv-host.c
-> @@ -434,11 +434,15 @@ static void test_config_create(void)
->                "base storage origin contains lowcore");
->         uvcb_cgc.conf_base_stor_origin =3D tmp;
-> =20
-> -       if (smp_query_num_cpus() =3D=3D 1) {
-> +       /*
-> +        * Let's not make it too easy and use a second cpu to set a
-> +        * non-zero prefix.
-> +        */
-> +       if (smp_query_num_cpus() > 1) {
->                 sigp_retry(1, SIGP_SET_PREFIX,
->                            uvcb_cgc.conf_var_stor_origin + PAGE_SIZE, NUL=
-L);
+>  arch/s390/kvm/kvm-s390.c | 4 ++++
+>  1 file changed, 4 insertions(+)
+> 
+> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> index e4890e04b210..a171a66681b4 100644
+> --- a/arch/s390/kvm/kvm-s390.c
+> +++ b/arch/s390/kvm/kvm-s390.c
+> @@ -2158,6 +2158,10 @@ static unsigned long kvm_s390_next_dirty_cmma(struct kvm_memslots *slots,
+>  		ms = container_of(mnode, struct kvm_memory_slot, gfn_node[slots->node_idx]);
+>  		ofs = 0;
+>  	}
+> +
+> +	if (cur_gfn < ms->base_gfn)
+> +		ofs = 0;
+> +
+>  	ofs = find_next_bit(kvm_second_dirty_bitmap(ms), ms->npages, ofs);
+>  	while (ofs >= ms->npages && (mnode = rb_next(mnode))) {
+>  		ms = container_of(mnode, struct kvm_memory_slot, gfn_node[slots->node_idx]);
 
-While at it, this should be smp_sigp, no?
-
-With the commit message fixup:
-
-Reviewed-by: Nico Boehr <nrb@linux.ibm.com>
