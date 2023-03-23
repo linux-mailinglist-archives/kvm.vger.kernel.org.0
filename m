@@ -2,243 +2,180 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D8FA76C60BA
-	for <lists+kvm@lfdr.de>; Thu, 23 Mar 2023 08:28:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B3B3F6C60D4
+	for <lists+kvm@lfdr.de>; Thu, 23 Mar 2023 08:32:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231308AbjCWH2f (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Mar 2023 03:28:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57892 "EHLO
+        id S231217AbjCWHcZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Mar 2023 03:32:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45730 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231314AbjCWH2S (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Mar 2023 03:28:18 -0400
-Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDC02BDEA;
-        Thu, 23 Mar 2023 00:27:55 -0700 (PDT)
-Received: by mail-pj1-x102a.google.com with SMTP id p13-20020a17090a284d00b0023d2e945aebso2999323pjf.0;
-        Thu, 23 Mar 2023 00:27:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1679556474;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=MpR+pmbBUcpBxRC4D9f6Nuj/vtE19mF8uVxyBNDq7rI=;
-        b=gnWVaAicvw+VkBIP0gSVlRtXs+k1NsGetuuwDBzkE75aC0DcqwYEjyUuf2xs1ZrCVC
-         XthvHXECOFTGlbf66P+CK3x10SKjr5P/JakLQV7MnS88L1irt17CKIGhveMFoKTxgRxc
-         ghKH/m4HWJsd+Ue+bNkpkePqFyJFv16jSunC7pdmoFuLiyNAIG16yDZkuIVVj0ahPgs+
-         GUqHlITSnMJyyrcfJ1p2qe1Jau0clDIGlfN2MhzqoJWcW8Br2SbzV+kNY+Snp/CSev5l
-         gZ7yFet3Kwfqs02jvxUkK4RLmMC7Td4gS1fEQ246ImlZ+f5sAyvZ9nIsSeuVwxJgVsx6
-         Qnyg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679556474;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=MpR+pmbBUcpBxRC4D9f6Nuj/vtE19mF8uVxyBNDq7rI=;
-        b=CG/dGQF+gck8K3lk8XdhQ/M4p3NpHPtw9PTwqibga4JFDLHp9QsipSADD3EGHqy/Zo
-         3oVME0vTPOiHDCyj40lFJJCCbmpAp1FwTsTl7pipmQiXYnM3ZCYEjSpgns4YuyGiqfuu
-         OtSDFTQ9CVo52RNd6qu4S1Zytr31AzhLmX5xIdWNsCxQwi7uyln5BkKdtOGkSKjtk0AA
-         KgVfgODAevw/nePwXAc/3lVhRMYx3hPn0nqHirLj5GO+zGVVPZOAHnCK0JMk/ihQOyaM
-         LqyTbjVgcCpSqA/7ydr1tQak817SQyQzX63ZValTJUlaWHDVMLEf7r10oanbq2aRDpbq
-         KxLg==
-X-Gm-Message-State: AAQBX9dytpFGbDkB9Vbjg4/WKQi90HwkScLlnW4VOFLzYVytagNboBQf
-        9IAigUxQSxf8N44lnWVQ5rjFqWfmKiixrWWD
-X-Google-Smtp-Source: AKy350bD5E+H6UUYwuM5pIKh1o8qPdO2g3Oxc2RHmnGHXc5w5iNKMrcgiPiWvdD0kYeYt1/Qnb1Hkg==
-X-Received: by 2002:a17:903:2291:b0:1a1:a727:a802 with SMTP id b17-20020a170903229100b001a1a727a802mr4803157plh.19.1679556474704;
-        Thu, 23 Mar 2023 00:27:54 -0700 (PDT)
-Received: from localhost.localdomain ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id 13-20020a170902c24d00b0017a032d7ae4sm11645447plg.104.2023.03.23.00.27.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Mar 2023 00:27:54 -0700 (PDT)
-From:   Like Xu <like.xu.linux@gmail.com>
-X-Google-Original-From: Like Xu <likexu@tencent.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Jinrong Liang <cloudliang@tencent.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: [PATCH 7/7] KVM: selftests: Test Intel counters' bit width emulation
-Date:   Thu, 23 Mar 2023 15:27:14 +0800
-Message-Id: <20230323072714.82289-8-likexu@tencent.com>
-X-Mailer: git-send-email 2.40.0
-In-Reply-To: <20230323072714.82289-1-likexu@tencent.com>
-References: <20230323072714.82289-1-likexu@tencent.com>
+        with ESMTP id S231136AbjCWHcT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Mar 2023 03:32:19 -0400
+Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79F6918B3B;
+        Thu, 23 Mar 2023 00:32:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1679556738; x=1711092738;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=773tNWodRdGm8We6Ud2YRszkkZ+mdL7hzm6O6hNHTIU=;
+  b=b5ZzmZIDaBuis9dWbY7paj19kUS3R3yk2zAyUdL+MTdNBxlMySGZ08Cf
+   aZyi3G72wP+fxF9+a4dBCD/6oJC6rctfvSduMO7O6oUdZjkdKgt/7ollq
+   iPHD8HggZwJ3lVRV/h6D/Iz3C1j3CtUK/pW1mlOv8ZYcYOwh+wgneAGMs
+   lTUXjUAf9qOmcTUmRGZcuNlAu0SrnJWFzkueSOU89eDm0z5S0maP/Q0g2
+   PjZ9nG6YqfNqe2OjcScMbsx13MV4pTqRFWG/z7ZeNheYvMuvOHFq37o12
+   Sl/QlIlLRE6tFq1nwhmyjF9gSEblGgJfJrssvSLNFtJ2xhRudKmRNFJMc
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10657"; a="401987652"
+X-IronPort-AV: E=Sophos;i="5.98,283,1673942400"; 
+   d="scan'208";a="401987652"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Mar 2023 00:31:20 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10657"; a="1011682150"
+X-IronPort-AV: E=Sophos;i="5.98,283,1673942400"; 
+   d="scan'208";a="1011682150"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by fmsmga005.fm.intel.com with ESMTP; 23 Mar 2023 00:31:06 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.21; Thu, 23 Mar 2023 00:31:06 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.21 via Frontend Transport; Thu, 23 Mar 2023 00:31:05 -0700
+Received: from NAM02-BN1-obe.outbound.protection.outlook.com (104.47.51.47) by
+ edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.21; Thu, 23 Mar 2023 00:31:05 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=doZAZMVecH28JFyfmL0plT8qRIe44ZVaLEg1cJi1pyXs6zBWbnQ4b20M/9UQadJ+tzb4vJPL39BSUqHRCbEgYm8IhT1s8IIijtJ5o45xIELDVA+G/uqU/piEPHcli08D64zzKYa6N7UYeo+iry56OBITfZjAwHVtJAgtSlI29M/MliuQ0sbb1MxZum3OhSMXSzBVbBCqeus8Cqb1YgvrRwQZyTttlrM4uvu56Vh4iVoFFGH+by/g53xj20wyCqzJjpxkQrUyN0aOpzwR7svkll/3cCOauYY4lzHwqAV0aIulftPiEqdWkHgTJh4Ek5wzEGWOUNoedDWvpAYn2mZveg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=HQ8gqYdiJ0Ed/XnXIN/H/EFSCpUfXLnAgr19MgorNZg=;
+ b=TbWudOEu1IA3HBOrgEqhxbYtqFJkwCXklbNH98LNNavCEsM09AwCJGPa3CaxdtFu+X9OnMxzWCJZzt9hcGzL3eAtGRowyuDjuOQ4BEEtr/ny2J4G+Qxfjgdm4BEm905s7Gz+xykSblb8XPCwSE4BYSqVrIy//l1dQ2KI5GfAqNl+uLp4vbGYj4WIEWQGZyi38NotKjj+By3MKBaAPmk6djPAibtDEmpQ28R8QIZzmZcOOjlK9OeR4vSefKNmbsffmg1AC3cTkWukwW8TfgzZn0UamXJK/Ld6uNi0XhQ9WlJLbIuT5wTYbq84seE7c3wGxUUgVa03Rgw99KFcaScZXw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
+ by SA2PR11MB5017.namprd11.prod.outlook.com (2603:10b6:806:11e::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6178.38; Thu, 23 Mar
+ 2023 07:31:03 +0000
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::1aac:b695:f7c5:bcac]) by BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::1aac:b695:f7c5:bcac%8]) with mapi id 15.20.6178.038; Thu, 23 Mar 2023
+ 07:31:03 +0000
+From:   "Tian, Kevin" <kevin.tian@intel.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>,
+        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>
+CC:     Lu Baolu <baolu.lu@linux.intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Nicolin Chen <nicolinc@nvidia.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>
+Subject: RE: [PATCH v3 12/17] iommufd: Add iommufd_device_replace()
+Thread-Topic: [PATCH v3 12/17] iommufd: Add iommufd_device_replace()
+Thread-Index: AQHZXCmQLfVu+4pznkeqY9jbKuj//68H+ZjA
+Date:   Thu, 23 Mar 2023 07:31:02 +0000
+Message-ID: <BN9PR11MB5276B73DF56654BEA4EA51AA8C879@BN9PR11MB5276.namprd11.prod.outlook.com>
+References: <0-v3-61d41fd9e13e+1f5-iommufd_alloc_jgg@nvidia.com>
+ <12-v3-61d41fd9e13e+1f5-iommufd_alloc_jgg@nvidia.com>
+In-Reply-To: <12-v3-61d41fd9e13e+1f5-iommufd_alloc_jgg@nvidia.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BN9PR11MB5276:EE_|SA2PR11MB5017:EE_
+x-ms-office365-filtering-correlation-id: a716d7a9-f44e-4f72-6d54-08db2b708e6e
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: EBqNAojsY2Zwogiy/pi3D5CJ57QHZdC5iSVKoB+cnMDzfTRw9XxsLNgCXbv1M7xkZND7ekeAcZOuL5QtYt3DCXbsZ3D20CDWjlL0vUU9YCoHv8vaCjv3xzXyXu/xr52Ob8f7WSzmkDBLzNuhlgWBCjMRK7qz8DdWiOMyaA+amqk77A+0oRfrbhx3PCHVGBG+6JzDE20Qp/gnajnHOPEGDc0HgOEBBUrZ0IlKIfy5MybDPUhy+MV7GFphyz+eclKut8cH7ykODB58sVrMjPft1Vp44owZscbn4Rj/WgOHeb/j9bArSkTTBPDhCyH+t859VWdTUfBAMsGpkQ0eVtBRKiQ/vgbHgSOS1pf71d5mwHDqfc9UzCWKEQLXHDh6Ga2gfc/uM3DTemVzyBa17zf6J4yx6HLZ7iauNL+rWAX9gvHzNefvyb2XYA/w2syt2kSbGC+vc5JoIBIP2g7Ah638iTShiAU+vDSMBqQrpc//EYmxw1hKIcNzfhYJjZcPxUp1gRh39OfLz7adGeQD7DKyd/SGGmLhTCOXjkLJYWk6HvJiytvDm66iOjjIwRxdd7dY5MC5VU1zOQ/335auUV7nNdhrzMeCaWwN9OnPH8JxZ+NL5g4W634/CopGexHyaoD9cYwSl6/wG/Xeo68kykzSZ4my5udkGcQv6tLvpyH6/uMkZCbFrwRPoWLW2J/uJjtriO8jGaqMAIXJeGPbzy1Q3Q==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(346002)(39860400002)(366004)(136003)(376002)(396003)(451199018)(86362001)(33656002)(82960400001)(38070700005)(122000001)(38100700002)(2906002)(64756008)(4744005)(41300700001)(66476007)(4326008)(66446008)(8676002)(5660300002)(52536014)(8936002)(66556008)(55016003)(66946007)(186003)(9686003)(83380400001)(6506007)(54906003)(110136005)(76116006)(478600001)(316002)(26005)(7696005)(71200400001)(66899018);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?2stCqR6sGG7DKAhkHNj1wHqU90Bwz6T8NoIKOYSb6r60SwE3uljZhwl1HDrp?=
+ =?us-ascii?Q?q+Psg3nXLnrLH6iWdizBkkLDGRmw2eCd55PTVSBqVF83Na0yZI5K51NATzzU?=
+ =?us-ascii?Q?MB+/qkLuwevYHjtF+cW8TITWjrD9lbiYlrf1/hrZaRzBh34C9DWB5OXa1W7m?=
+ =?us-ascii?Q?g3OXLUpP3F3E0F0BPbv2fvRtkIPZ94n41bbgev+hxqTIEnxPefgMt2hyl3ul?=
+ =?us-ascii?Q?0ttQVPJCorIXNzGdgyJJaAzF8UPgmqRu+JPdEwmi/2hcyvtTXkrVozCzKU4D?=
+ =?us-ascii?Q?n2ZUtt1Xdjj9eSM7ZXSo7+itlzW46MDKCXxK4+RjdEehXdH/NDhDID+tPX49?=
+ =?us-ascii?Q?JWKurL9YeOeldpecLge8Nvj7puAFvP5TwubCNupcczcfewwPidFC/6KEVnXR?=
+ =?us-ascii?Q?j2GJSY4V5aGvaf5YGl+TpMBax9sP9YSOBqDVYSjWPXXbfDqwFWak7fJXC0up?=
+ =?us-ascii?Q?bciOaPCIkrccmRmNM+m9YKpF6dV2SlNNVORA9ZG4CPp62UqJIwzTMv6q3INR?=
+ =?us-ascii?Q?zLRMeEjYSb/xAfnqEVPEQ0R9W11OTrLYQ1UyxqWde/9/PdDSVwm6xLcuqHHu?=
+ =?us-ascii?Q?QUkk4L3uj6ilqy5GEI3+HCnQfUIeSuQobqKDJfThfVheVxwlG/RNQYRLMNXq?=
+ =?us-ascii?Q?dBWS3cB8YjrD68O3KL5Q48vOZ8M519zJ23dMg9rnVwZ83oAGknO9WMJNefIh?=
+ =?us-ascii?Q?RJ2w8DoVrOvBBm38pi8fHqAqM0i35lHWW6UYCxbon+oPvEdvJqW3JE4jY6Ay?=
+ =?us-ascii?Q?dHNto3ByxW/mli+08Pcpg+9b7Yw1YDjhTCyslM9I6hxsfBNc/OfK3D+zajLX?=
+ =?us-ascii?Q?zM2AggnGsoraumaT8QSbPy10AUHTMgSR4SeH1bJ8yaTWWxaJ6J1B9qQQt+jE?=
+ =?us-ascii?Q?sizsFtAMOx6ES2q+dKFU19Vd2kgsQnlIJFJcZ33QmvVKlZBwPPtFGIZ1q1/O?=
+ =?us-ascii?Q?jgyoBCtBLfUQ4QjRDHQp+SnC3FUDpyrdDd25Yehg9qMj8hyBSSpIAty4RRE0?=
+ =?us-ascii?Q?pqg+RRilmu3sUHEIooqa5L4pq+66ev9s9UZ+0geFXQ30Z1qDR8zy9DcdQWZW?=
+ =?us-ascii?Q?UJVjSED5XhYTnN0uY+U/X3CNWTaxTJIvNgBGkRgZ+yU576/vq2+ukLlbiWy7?=
+ =?us-ascii?Q?YNJydhAw5RMIYugDA3918/iBP2P1iLm94aw+36EZ5/mEi2BjS5pIEfWsi4Sg?=
+ =?us-ascii?Q?+RmxL5oa8SBsQ3mmfu5/JSaXdkQjGgtKyaQzn+k4NF6CuazvLWOWykfHv3YP?=
+ =?us-ascii?Q?Yh6aYq18Qi0NA31TP4IqlL75upcvOYGPgb6uflY5wVeQ3LOF4hICyqKN3iz2?=
+ =?us-ascii?Q?xMFmaPq4DvwD+S+XRrqfFbF01Ee0PAYUbdjOenPAu50UEX7YaAggRmJGjIda?=
+ =?us-ascii?Q?IFkSa3VH0P2qgFbKq5ZFZq90RfkBH+ehy++RN735PF8k8BTzNEPs4Gq3cgQ1?=
+ =?us-ascii?Q?1Fg5Bo9t198KfjpbhO6HH5aswkmdernI5dYljiywpg6lURsXaskg2eN+dUNg?=
+ =?us-ascii?Q?v4q8uGs6EZqeDg3pekb/fQmMLCVjxKEBqOne7ayONSWBsYwnImGmeSxfnhaO?=
+ =?us-ascii?Q?t9IShieOBhm9sdms4eW8zD9n7FboPkIiScbOnkh2?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
-        DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-        version=3.4.6
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a716d7a9-f44e-4f72-6d54-08db2b708e6e
+X-MS-Exchange-CrossTenant-originalarrivaltime: 23 Mar 2023 07:31:02.8834
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: TW3J5kB9bNcxXovt27uCkx89zuTlp2fB3YiRxvka1ww5eOEHWS9/woWBlHQaB6GOhnNP87l4HpGEc7irCIDpeA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA2PR11MB5017
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-2.5 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Like Xu <likexu@tencent.com>
+> From: Jason Gunthorpe <jgg@nvidia.com>
+> Sent: Wednesday, March 22, 2023 3:15 AM
+> +
+> +	mutex_lock(&idev->igroup->lock);
+> +
+> +	if (igroup->hwpt =3D=3D NULL) {
+> +		rc =3D -EINVAL;
+> +		goto err_unlock;
+> +	}
+> +
+> +	if (hwpt =3D=3D igroup->hwpt) {
+> +		mutex_unlock(&idev->igroup->lock);
+> +		return NULL;
+> +	}
 
-Add tests to cover Intel counters' bit-width emulation. When the VM has
-FW_WRITES bit, the bitwidth of the gp and fixed counters will be specified
-by the CPUID (no less than 32 bits and no greater than the host bitwidth)
-and accessing bits that are not within the bitwidth will generate #GP.
-However, when it does not have FW_WRITES bit, only the low 32-bits
-signed data will be in effect and naturally #GP will not be generated.
+goto err_unlock;
 
-Co-developed-by: Jinrong Liang <cloudliang@tencent.com>
-Signed-off-by: Jinrong Liang <cloudliang@tencent.com>
-Signed-off-by: Like Xu <likexu@tencent.com>
----
- .../selftests/kvm/x86_64/pmu_cpuid_test.c     | 105 ++++++++++++++++++
- 1 file changed, 105 insertions(+)
+> +
+> +	/* Move the refcounts held by the device_list to the new hwpt */
+> +	refcount_add(num_devices, &hwpt->obj.users);
+> +	if (num_devices > 1)
+> +		WARN_ON(refcount_sub_and_test(num_devices - 1,
+> +					      &old_hwpt->obj.users));
 
-diff --git a/tools/testing/selftests/kvm/x86_64/pmu_cpuid_test.c b/tools/testing/selftests/kvm/x86_64/pmu_cpuid_test.c
-index caf0d98079c7..e7465b01178a 100644
---- a/tools/testing/selftests/kvm/x86_64/pmu_cpuid_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/pmu_cpuid_test.c
-@@ -29,6 +29,10 @@
- #define INTEL_PMC_IDX_FIXED 32
- #define RDPMC_FIXED_BASE BIT_ULL(30)
- #define FIXED_CTR_NUM_MASK GENMASK_ULL(4, 0)
-+#define GP_WIDTH_OFS_BIT 16
-+#define GP_WIDTH_MASK GENMASK_ULL(23, GP_WIDTH_OFS_BIT)
-+#define FIXED_WIDTH_OFS_BIT 5
-+#define FIXED_WIDTH_MASK GENMASK_ULL(12, FIXED_WIDTH_OFS_BIT)
- 
- #define ARCH_EVENT(select, umask) (((select) & 0xff) | ((umask) & 0xff) << 8)
- 
-@@ -62,6 +66,16 @@ static const uint64_t perf_caps[] = {
-  */
- #define MSR_INTEL_ARCH_PMU_GPCTR (MSR_IA32_PERFCTR0 + 2)
- 
-+static const uint32_t msr_bases[] = {
-+	MSR_INTEL_ARCH_PMU_GPCTR,
-+	MSR_IA32_PMC0,
-+	MSR_CORE_PERF_FIXED_CTR0,
-+};
-+
-+static const uint64_t bit_widths[] = {
-+	0, 1, 31, 32, 47, 48, 63, 64,
-+};
-+
- static uint64_t evt_code_for_fixed_ctr(uint8_t idx)
- {
- 	return arch_events[fixed_events[idx]];
-@@ -99,6 +113,22 @@ static uint32_t kvm_max_pmu_version(void)
- 	return kvm_entry->eax & PMU_VERSION_MASK;
- }
- 
-+static uint32_t kvm_gp_ctr_bit_width(void)
-+{
-+	const struct kvm_cpuid_entry2 *kvm_entry;
-+
-+	kvm_entry = get_cpuid_entry(kvm_get_supported_cpuid(), 0xa, 0);
-+	return (kvm_entry->eax & GP_WIDTH_MASK) >> GP_WIDTH_OFS_BIT;
-+}
-+
-+static uint32_t kvm_fixed_ctr_bit_width(void)
-+{
-+	const struct kvm_cpuid_entry2 *kvm_entry;
-+
-+	kvm_entry = get_cpuid_entry(kvm_get_supported_cpuid(), 0xa, 0);
-+	return (kvm_entry->edx & FIXED_WIDTH_MASK) >> FIXED_WIDTH_OFS_BIT;
-+}
-+
- static struct kvm_vcpu *new_vcpu(void *guest_code)
- {
- 	struct kvm_vm *vm;
-@@ -381,6 +411,50 @@ static void test_pmu_version_setup(struct kvm_vcpu *vcpu, uint8_t version)
- 	vm_install_exception_handler(vcpu->vm, GP_VECTOR, guest_gp_handler);
- }
- 
-+static uint64_t test_ctrs_bit_width_setup(struct kvm_vcpu *vcpu,
-+					  uint8_t bit_width,
-+					  uint64_t perf_cap,
-+					  uint32_t msr_base)
-+{
-+	struct kvm_cpuid_entry2 *entry;
-+	bool fw_wr = perf_cap & PMU_CAP_FW_WRITES;
-+	uint64_t kvm_width;
-+	uint64_t value;
-+
-+	entry = vcpu_get_cpuid_entry(vcpu, 0xa);
-+	if (msr_base != MSR_CORE_PERF_FIXED_CTR0) {
-+		kvm_width = kvm_gp_ctr_bit_width();
-+		entry->eax = (entry->eax & ~GP_WIDTH_MASK) |
-+			(bit_width << GP_WIDTH_OFS_BIT);
-+	} else {
-+		kvm_width = kvm_fixed_ctr_bit_width();
-+		entry->edx = (entry->edx & ~FIXED_WIDTH_MASK) |
-+			(bit_width << FIXED_WIDTH_OFS_BIT);
-+	}
-+	TEST_REQUIRE(kvm_width > 31);
-+
-+	vcpu_set_cpuid(vcpu);
-+	vcpu_set_msr(vcpu, MSR_IA32_PERF_CAPABILITIES, perf_cap);
-+
-+	/* No less than 32 bits and no greater than the host bitwidth */
-+	bit_width = fw_wr ? max_t(int, 32, bit_width) : 32;
-+	bit_width = min_t(int, bit_width, kvm_width);
-+
-+	/* Unconditionally set signed bit 31 for the case w/o FW_WRITES */
-+	value = BIT_ULL(bit_width) | 0x1234567ull | BIT_ULL(31);
-+	vcpu_args_set(vcpu, 4, msr_base, value, 1, 1);
-+
-+	if (fw_wr && msr_base != MSR_INTEL_ARCH_PMU_GPCTR) {
-+		vm_install_exception_handler(vcpu->vm, GP_VECTOR,
-+					     guest_gp_handler);
-+		return GP_VECTOR;
-+	} else if (msr_base == MSR_INTEL_ARCH_PMU_GPCTR) {
-+		value = (s32)(value & (BIT_ULL(32) - 1));
-+	}
-+
-+	return value & (BIT_ULL(bit_width) - 1);
-+}
-+
- static void intel_check_arch_event_is_unavl(uint8_t idx)
- {
- 	const char *msg = "Unavailable arch event is counting.";
-@@ -497,12 +571,43 @@ static void intel_test_pmu_version(void)
- 	}
- }
- 
-+static void vcpu_run_bit_width(uint8_t bit_width, uint64_t perf_cap,
-+			       uint32_t msr_base)
-+{
-+	const char *msg = "Fail to emulate counters' bit width.";
-+	struct kvm_vcpu *vcpu;
-+	uint64_t ret;
-+
-+	vcpu = new_vcpu(guest_wr_and_rd_msrs);
-+	ret = test_ctrs_bit_width_setup(vcpu, bit_width, perf_cap, msr_base);
-+	run_vcpu(vcpu, msg, first_uc_arg_equals, (void *)ret);
-+	free_vcpu(vcpu);
-+}
-+
-+static void intel_test_counters_bit_width(void)
-+{
-+	uint8_t i, j, k;
-+
-+	for (i = 0; i < ARRAY_SIZE(perf_caps); i++) {
-+		for (j = 0; j < ARRAY_SIZE(msr_bases); j++) {
-+			if (!(perf_caps[i] & PMU_CAP_FW_WRITES) &&
-+			    msr_bases[j] == MSR_IA32_PMC0)
-+				continue;
-+
-+			for (k = 0; k < ARRAY_SIZE(bit_widths); k++)
-+				vcpu_run_bit_width(bit_widths[k], perf_caps[i],
-+						   msr_bases[j]);
-+		}
-+	}
-+}
-+
- static void intel_test_pmu_cpuid(void)
- {
- 	intel_test_arch_events();
- 	intel_test_counters_num();
- 	intel_test_fixed_counters();
- 	intel_test_pmu_version();
-+	intel_test_counters_bit_width();
- }
- 
- int main(int argc, char *argv[])
--- 
-2.40.0
+A comment is welcomed to match "caller must destroy old_hwpt".
 
+Otherwise looks good.
+
+Reviewed-by: Kevin Tian <kevin.tian@intel.com>
