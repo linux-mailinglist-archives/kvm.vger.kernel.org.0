@@ -2,78 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 10BCB6C67B4
-	for <lists+kvm@lfdr.de>; Thu, 23 Mar 2023 13:13:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 098616C6871
+	for <lists+kvm@lfdr.de>; Thu, 23 Mar 2023 13:35:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229791AbjCWMNN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Mar 2023 08:13:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47774 "EHLO
+        id S231625AbjCWMf3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Mar 2023 08:35:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35288 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229499AbjCWMNL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Mar 2023 08:13:11 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97FFB2410B
-        for <kvm@vger.kernel.org>; Thu, 23 Mar 2023 05:12:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1679573543;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=47IZCbNDSGg7hhxdLu0FQ8d8WHV90o4g2qwBwc+O/G8=;
-        b=Ln0VVTKTL0L/XPi324YMOEtcsDN6+yv0lFk0dW4EkStzHPjp4EpqKr+dqTRopLsQZeVeoG
-        GY+z5alLOR9lhmAxSlmlP2dI0iF3VD+ZVPu2j8PJc31Zt+St7dHirN1JvVm5X/wKhDhcBJ
-        rbDgerXFuaYbotfSjBEFRCPU7/EVFtE=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-507-e8h8YcijMaaIuMeY3CwMEA-1; Thu, 23 Mar 2023 08:12:20 -0400
-X-MC-Unique: e8h8YcijMaaIuMeY3CwMEA-1
-Received: by mail-wm1-f71.google.com with SMTP id iv18-20020a05600c549200b003ee21220fccso4553872wmb.1
-        for <kvm@vger.kernel.org>; Thu, 23 Mar 2023 05:12:20 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679573539;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=47IZCbNDSGg7hhxdLu0FQ8d8WHV90o4g2qwBwc+O/G8=;
-        b=YAjYELCstx7W1025fh6f0PItQEBHKPorPtU26gTEaMZm05uILoY630du2h5yoyYcr1
-         E05knNNhkU3xAoZ6QXuHi6u7/uHZS2ctysWmFHuHnZ44iQDaoKaphLXQqj+4LJft3HTn
-         4L64PAPT5vothyy6YDLpe0fSycihPI9AZAwr2R85TpuLHCx2obsvzY+ymFZS6vhVuAlc
-         IcBW1FNI9KneeOFAwg/DzwAgXs/sFmwY7pSVYD5IVquXU0wzojVi0PcRjWcGe5jz62kb
-         GMyD9u5zDX9663O5jFJJ3L2y2sZvTsAzvQGMklphASHqnhU4h4j3gqs8XJxLm7OQvfso
-         MhgQ==
-X-Gm-Message-State: AO0yUKUejL6anZ8Kdqm7eUWde7e8n/2e7WPUVwogN7t1Ss6jjpv6yEMP
-        1VZBrUDvTJukO6+E3GtWq8Q8vEpG8a67jpnF/iBBJZ0rZxMPDDJNkDuYx0bcWDOtjIWAK/Sloxm
-        +q9tI9DnPYYaanuYWVUNcQUs=
-X-Received: by 2002:a1c:7512:0:b0:3ee:9909:acc8 with SMTP id o18-20020a1c7512000000b003ee9909acc8mr728904wmc.32.1679573539687;
-        Thu, 23 Mar 2023 05:12:19 -0700 (PDT)
-X-Google-Smtp-Source: AK7set/9iEyxce5NHUdHspeWWBLcGBNstlDq/wdzeMG5S5aJQ+Gtr/kX09u0bOWRqllPlg5DVjy8xg==
-X-Received: by 2002:a1c:7512:0:b0:3ee:9909:acc8 with SMTP id o18-20020a1c7512000000b003ee9909acc8mr728889wmc.32.1679573539350;
-        Thu, 23 Mar 2023 05:12:19 -0700 (PDT)
-Received: from [192.168.0.3] (ip-109-43-179-146.web.vodafone.de. [109.43.179.146])
-        by smtp.gmail.com with ESMTPSA id o9-20020a05600c510900b003ed793d9de0sm6272651wms.1.2023.03.23.05.12.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 23 Mar 2023 05:12:18 -0700 (PDT)
-Message-ID: <de36dbe8-de4a-ba05-12f7-2b8a37ef552a@redhat.com>
-Date:   Thu, 23 Mar 2023 13:12:17 +0100
+        with ESMTP id S230078AbjCWMf2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Mar 2023 08:35:28 -0400
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53D0C1B2F8;
+        Thu, 23 Mar 2023 05:35:27 -0700 (PDT)
+Received: from kwepemm600003.china.huawei.com (unknown [172.30.72.57])
+        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4Pj46f6NSwzKmj9;
+        Thu, 23 Mar 2023 20:15:22 +0800 (CST)
+Received: from [10.174.179.79] (10.174.179.79) by
+ kwepemm600003.china.huawei.com (7.193.23.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.21; Thu, 23 Mar 2023 20:15:44 +0800
+Subject: Re: [PATCH v2] vhost/vdpa: Add MSI translation tables to iommu for
+ software-managed MSI
+To:     Jason Gunthorpe <jgg@nvidia.com>
+CC:     "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>, <joro@8bytes.org>,
+        <will@kernel.org>, <robin.murphy@arm.com>, <iommu@lists.linux.dev>,
+        <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
+        <virtualization@lists.linux-foundation.org>,
+        <netdev@vger.kernel.org>, <wangrong68@huawei.com>,
+        Cindy Lu <lulu@redhat.com>
+References: <20230207120843.1580403-1-sunnanyong@huawei.com>
+ <Y+7G+tiBCjKYnxcZ@nvidia.com> <20230217051158-mutt-send-email-mst@kernel.org>
+ <Y+92c9us3HVjO2Zq@nvidia.com>
+ <CACGkMEsVBhxtpUFs7TrQzAecO8kK_NR+b1EvD2H7MjJ+2aEKJw@mail.gmail.com>
+ <20230310034101-mutt-send-email-mst@kernel.org>
+ <CACGkMEsr3xSa=1WtU35CepWSJ8CK9g4nGXgmHS_9D09LHi7H8g@mail.gmail.com>
+ <20230310045100-mutt-send-email-mst@kernel.org> <ZAskNjP3d9ipki4k@nvidia.com>
+ <c6e60ed9-6de2-2f4a-7bd1-52c53ed57a28@huawei.com>
+ <ZBw4hGj8oGARaKhW@nvidia.com>
+From:   Nanyong Sun <sunnanyong@huawei.com>
+Message-ID: <b2c24e31-a708-8556-0029-93c0aa22a6ef@huawei.com>
+Date:   Thu, 23 Mar 2023 20:15:44 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.13.0
-Subject: Re: [kvm-unit-tests v2 03/10] powerpc: abstract H_CEDE calls into a
- sleep functions
-Content-Language: en-US
-To:     Nicholas Piggin <npiggin@gmail.com>, kvm@vger.kernel.org
-Cc:     linuxppc-dev@lists.ozlabs.org, Laurent Vivier <lvivier@redhat.com>
-References: <20230320070339.915172-1-npiggin@gmail.com>
- <20230320070339.915172-4-npiggin@gmail.com>
-From:   Thomas Huth <thuth@redhat.com>
-In-Reply-To: <20230320070339.915172-4-npiggin@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+In-Reply-To: <ZBw4hGj8oGARaKhW@nvidia.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.174.179.79]
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ kwepemm600003.china.huawei.com (7.193.23.202)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-2.3 required=5.0 tests=NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -81,153 +62,30 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 20/03/2023 08.03, Nicholas Piggin wrote:
-> This consolidates several implementations, and it no longer leaves
-> MSR[EE] enabled after the decrementer interrupt is handled, but
-> rather disables it on return.
-> 
-> The handler no longer allows a continuous ticking, but rather dec
-> has to be re-armed and EE re-enabled (e.g., via H_CEDE hcall) each
-> time.
-> 
-> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
-> ---
->   lib/powerpc/asm/handlers.h  |  2 +-
->   lib/powerpc/asm/ppc_asm.h   |  1 +
->   lib/powerpc/asm/processor.h |  7 +++++++
->   lib/powerpc/handlers.c      | 10 ++++-----
->   lib/powerpc/processor.c     | 42 +++++++++++++++++++++++++++++++++++++
->   powerpc/sprs.c              |  6 +-----
->   powerpc/tm.c                | 20 +-----------------
->   7 files changed, 57 insertions(+), 31 deletions(-)
-> 
-> diff --git a/lib/powerpc/asm/handlers.h b/lib/powerpc/asm/handlers.h
-> index 64ba727..e4a0cd4 100644
-> --- a/lib/powerpc/asm/handlers.h
-> +++ b/lib/powerpc/asm/handlers.h
-> @@ -3,6 +3,6 @@
->   
->   #include <asm/ptrace.h>
->   
-> -void dec_except_handler(struct pt_regs *regs, void *data);
-> +void dec_handler_oneshot(struct pt_regs *regs, void *data);
->   
->   #endif /* _ASMPOWERPC_HANDLERS_H_ */
-> diff --git a/lib/powerpc/asm/ppc_asm.h b/lib/powerpc/asm/ppc_asm.h
-> index 1b85f6b..6299ff5 100644
-> --- a/lib/powerpc/asm/ppc_asm.h
-> +++ b/lib/powerpc/asm/ppc_asm.h
-> @@ -36,6 +36,7 @@
->   #endif /* __BYTE_ORDER__ */
->   
->   /* Machine State Register definitions: */
-> +#define MSR_EE_BIT	15			/* External Interrupts Enable */
->   #define MSR_SF_BIT	63			/* 64-bit mode */
->   
->   #endif /* _ASMPOWERPC_PPC_ASM_H */
-> diff --git a/lib/powerpc/asm/processor.h b/lib/powerpc/asm/processor.h
-> index ac001e1..ebfeff2 100644
-> --- a/lib/powerpc/asm/processor.h
-> +++ b/lib/powerpc/asm/processor.h
-> @@ -20,6 +20,8 @@ static inline uint64_t get_tb(void)
->   
->   extern void delay(uint64_t cycles);
->   extern void udelay(uint64_t us);
-> +extern void sleep_tb(uint64_t cycles);
-> +extern void usleep(uint64_t us);
->   
->   static inline void mdelay(uint64_t ms)
->   {
-> @@ -27,4 +29,9 @@ static inline void mdelay(uint64_t ms)
->   		udelay(1000);
->   }
->   
-> +static inline void msleep(uint64_t ms)
-> +{
-> +	usleep(ms * 1000);
-> +}
-> +
->   #endif /* _ASMPOWERPC_PROCESSOR_H_ */
-> diff --git a/lib/powerpc/handlers.c b/lib/powerpc/handlers.c
-> index c8721e0..296f14f 100644
-> --- a/lib/powerpc/handlers.c
-> +++ b/lib/powerpc/handlers.c
-> @@ -9,15 +9,13 @@
->   #include <libcflat.h>
->   #include <asm/handlers.h>
->   #include <asm/ptrace.h>
-> +#include <asm/ppc_asm.h>
->   
->   /*
->    * Generic handler for decrementer exceptions (0x900)
-> - * Just reset the decrementer back to the value specified when registering the
-> - * handler
-> + * Return with MSR[EE] disabled.
->    */
-> -void dec_except_handler(struct pt_regs *regs __unused, void *data)
-> +void dec_handler_oneshot(struct pt_regs *regs, void *data)
->   {
-> -	uint64_t dec = *((uint64_t *) data);
-> -
-> -	asm volatile ("mtdec %0" : : "r" (dec));
-> +	regs->msr &= ~(1UL << MSR_EE_BIT);
->   }
-> diff --git a/lib/powerpc/processor.c b/lib/powerpc/processor.c
-> index ec85b9d..e77a240 100644
-> --- a/lib/powerpc/processor.c
-> +++ b/lib/powerpc/processor.c
-> @@ -10,6 +10,8 @@
->   #include <asm/ptrace.h>
->   #include <asm/setup.h>
->   #include <asm/barrier.h>
-> +#include <asm/hcall.h>
-> +#include <asm/handlers.h>
->   
->   static struct {
->   	void (*func)(struct pt_regs *, void *data);
-> @@ -54,3 +56,43 @@ void udelay(uint64_t us)
->   {
->   	delay((us * tb_hz) / 1000000);
->   }
-> +
-> +void sleep_tb(uint64_t cycles)
-> +{
-> +	uint64_t start, end, now;
-> +
-> +	start = now = get_tb();
-> +	end = start + cycles;
-> +
-> +	while (end > now) {
-> +		uint64_t left = end - now;
-> +
-> +		/* Could support large decrementer */
-> +		if (left > 0x7fffffff)
-> +			left = 0x7fffffff;
-> +
-> +		asm volatile ("mtdec %0" : : "r" (left));
-> +		handle_exception(0x900, &dec_handler_oneshot, NULL);
+On 2023/3/23 19:31, Jason Gunthorpe wrote:
 
-Wouldn't it be better to first call handle_exception() before moving 
-something into the decrementer?
+> On Thu, Mar 23, 2023 at 05:22:36PM +0800, Nanyong Sun wrote:
+>>> A patch to export that function is alread posted:
+>>>
+>>> https://lore.kernel.org/linux-iommu/BN9PR11MB52760E9705F2985EACCD5C4A8CBA9@BN9PR11MB5276.namprd11.prod.outlook.com/T/#u
+>>>
+>>> But I do not want VDPA to mis-use it unless it also implements all the
+>>> ownership stuff properly.
+>>>
+>> I want to confirm if we need to introduce iommu group logic to vdpa, as "all
+>> the ownership stuff" ?
+> You have to call iommu_device_claim_dma_owner()
+>
+> But again, this is all pointless, iommufd takes are of all of this and
+> VDPA should switch to it instead of more hacking.
+>
+> Jason
+> .
+Yeah,  thanks for your suggestion，but as Michael and Jason Wang said, 
+before iommufd is ready, we may need to make vDPA work well on software 
+managed MSI platforms.
+To achieve that, basically we have two ways:
 
-> +		/*
-> +		 * H_CEDE is called with MSR[EE] clear and enables it as part
-> +		 * of the hcall, returning with EE enabled. The dec interrupt
-> +		 * is then taken immediately and the handler disables EE.
-> +		 *
-> +		 * If H_CEDE returned for any other interrupt than dec
-> +		 * expiring, that is considered an unhandled interrupt and
-> +		 * the test case would be stopped.
-> +		 */
-> +		if (hcall(H_CEDE) != H_SUCCESS) {
-> +			printf("H_CEDE failed\n");
-> +			abort();
-> +		}
-> +		handle_exception(0x900, NULL, NULL);
-> +
-> +		now = get_tb();
-> +	}
-> +}
-
-  Thomas
-
+1. export iommu_get_resv_regions, and get regions device by device.
+2. introduce iommu group, get regions by iommu_get_group_resv_regions, 
+which already exported.
