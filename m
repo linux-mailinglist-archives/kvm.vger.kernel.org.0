@@ -2,76 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D32AF6C7350
-	for <lists+kvm@lfdr.de>; Thu, 23 Mar 2023 23:50:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 319986C7351
+	for <lists+kvm@lfdr.de>; Thu, 23 Mar 2023 23:51:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231504AbjCWWu6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Mar 2023 18:50:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46548 "EHLO
+        id S231513AbjCWWvK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Mar 2023 18:51:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46982 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231473AbjCWWuy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Mar 2023 18:50:54 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6689D44B8
-        for <kvm@vger.kernel.org>; Thu, 23 Mar 2023 15:50:52 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id g5-20020a25a485000000b009419f64f6afso187082ybi.2
-        for <kvm@vger.kernel.org>; Thu, 23 Mar 2023 15:50:52 -0700 (PDT)
+        with ESMTP id S231228AbjCWWvI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Mar 2023 18:51:08 -0400
+Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 351E27AA7
+        for <kvm@vger.kernel.org>; Thu, 23 Mar 2023 15:51:06 -0700 (PDT)
+Received: by mail-pj1-x104a.google.com with SMTP id qa18-20020a17090b4fd200b002400d8a8d1dso1475378pjb.7
+        for <kvm@vger.kernel.org>; Thu, 23 Mar 2023 15:51:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1679611851;
+        d=google.com; s=20210112; t=1679611865;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=74Bca3+J0Cb4vQ6fen5CaUBDEj5b5vV7i4MEot6v9Ds=;
-        b=YH7MTbm9mvyot6ZU2+XkcDSlj10Nsc7kiE+CaqrEGoRHP+5Wp1aXsacMGgUuC+9V/C
-         WVpEYg6CLbPyr+dvSfXfFo9SzojYnPgv2zPNeoMiLzTDGGi4AOX40qM/0GVJy3TDdzri
-         /A1NFKBZszV6ih13Bp4d8BSvUXewKzg6VmXODUInfnB0TEN6hYV85WwJX+9wI/qq4era
-         0a3SNXpZRFkv2GXJSpRTaAfqAeuXeGfauq4Kc6Df39oJSG3g/+pwfT0MoMzqhhdMMan2
-         GnM5KMzJNUIZtfs56MGTlzzcI0yeX13rZ0t+OMLFxMcw4SONq0Zz6RyW2BIHRmVknLv5
-         Kafg==
+        bh=AqFc8A4lyhPY/42dCbIU0IYFB1GySYWnAocQAi1+h4Q=;
+        b=BPiGWjMeDRpQTgZB97UOimTIL3OYBXSDT/6fJgZVC6gQgZ5fCzvw1lRDNKKawrXLv2
+         E4PvzehXk27nt/drVvcaTHR9RfvY1ewNnFoU10fr+1Bw5wJGJAEvr9IlV+tYUIe1jSLS
+         go12kdYqwO37wrDkww5Pk4Sg28nsUokR0/t6+6HxBHhBgfvCdRRiq82yIPmJWwekGzv5
+         7hiF3kgoFEvlUc2wb11M9OqS7XWiI6j6q12XRxrhO9zaDi8/tNMkKP01RUNiQlh4ugyh
+         6GgqD3giutQ3Oy505lN1UgV0cSUu3sK69NQGcsNXXvMU0zCcFLrIZTwUHA23JZUJ87hE
+         wwbA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679611851;
+        d=1e100.net; s=20210112; t=1679611865;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=74Bca3+J0Cb4vQ6fen5CaUBDEj5b5vV7i4MEot6v9Ds=;
-        b=E59UyTUGhZUaGPUaFXtUAcPcS9n6XC757db9nlVhJuJ3clICqU14RAiU+nR4aWL1vj
-         LVZLdPJGnbXV1WCeabXZv8pqukSCcsabIm0JpTCeHbltzvw6/otphl9zdLaCm0xDp2Kk
-         q85hCd80P9PhZeHSQpJm8cGNr3D4eahiYGSALKeJhz0b7rXHftIezL8lZB5RJHmF/uNE
-         V/Nr0hcK/bcSHuMvIW5mUZj2GWVq54u5eCoO7Jpuw8LAVUg56+OftgEg+4IlvDjgyDbG
-         KBh/Vdtxmoe3PKti33aBkF7bQUpAIwKTX1/PjnxctkEySSV4/QUd7p57c4Sw2hmdFMb5
-         tSdQ==
-X-Gm-Message-State: AAQBX9f+i+1EWKGnXqP/MC4y6RJhEjxOdbsz+Doo8Iy9CpHZHqNQGF1Q
-        glD3CpnuqbnPRIi/kFR1JyFvU4HEY3w=
-X-Google-Smtp-Source: AKy350ZsIJuSNQoMPlJ5+eoOr2kgPIQRx9B3zNmq76T9BVO+0ZLsWEOoUS4XgvR/h7pV3ogslqbmAO1mcEk=
+        bh=AqFc8A4lyhPY/42dCbIU0IYFB1GySYWnAocQAi1+h4Q=;
+        b=5eRe198ctP28MqbTJfIxFRYBUunr6W3UF719jzywquxIsw3eLTjr2qBTpQnvKmL8Yh
+         2OwkhGI3J6sU9fv7k9lJE2CDGm4uxRFNfr9FpDWijN1HlPQty7xsxiYYXhW6XelXi41l
+         hswWlLrmPnEerq5hTsh/8ACuQbBVewzHqkePfRvEVpuhQT/PZ716lNihsN042FxQLh2q
+         Zr47AGEEkiOUlZUTtDSU2n6UWKfg2677sOfsFu+OPDELo+tS+6FeJPz/sj4OfgdsHo/G
+         vpmm8jsftEPzh8xOhl3DqQBtNzm8Umb3D6Cx7eN7Xv36L3NQJXZ5hwLkjSUDTK12xmeB
+         1XAg==
+X-Gm-Message-State: AO0yUKU7opJrrJEdBhE+hqcu20TXDU9eJtWEpZgCWLzvW8a5UrseCJ9p
+        6S1r4Pv++z6thpBPUaG6kE4e3eDj9Fw=
+X-Google-Smtp-Source: AK7set+c5Oe8EOFfr51iU86OvsiSeB7dYNOcFLpSUDdYqdgPEt9K+BfSwaK38fcJtMRO5Wf6VIN+Mei8mGY=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:4426:0:b0:544:5aa0:e212 with SMTP id
- r38-20020a814426000000b005445aa0e212mr87638ywa.6.1679611851706; Thu, 23 Mar
- 2023 15:50:51 -0700 (PDT)
-Date:   Thu, 23 Mar 2023 15:50:28 -0700
-In-Reply-To: <20230126184025.2294823-1-dmatlack@google.com>
+ (user=seanjc job=sendgmr) by 2002:aa7:8891:0:b0:5a8:daec:c325 with SMTP id
+ z17-20020aa78891000000b005a8daecc325mr3364999pfe.1.1679611865307; Thu, 23 Mar
+ 2023 15:51:05 -0700 (PDT)
+Date:   Thu, 23 Mar 2023 15:50:30 -0700
+In-Reply-To: <20230113122910.672417-1-jiangshanlai@gmail.com>
 Mime-Version: 1.0
-References: <20230126184025.2294823-1-dmatlack@google.com>
+References: <20230113122910.672417-1-jiangshanlai@gmail.com>
 X-Mailer: git-send-email 2.40.0.348.gf938b09366-goog
-Message-ID: <167934082066.1939558.14724526021018063522.b4-ty@google.com>
-Subject: Re: [PATCH v2 0/7] KVM: Add a common API for range-based TLB invalidation
+Message-ID: <167934153606.1941128.1026865175616779306.b4-ty@google.com>
+Subject: Re: [PATCH] kvm: x86/mmu: Simplify pte_list_{add|remove}
 From:   Sean Christopherson <seanjc@google.com>
 To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        David Matlack <dmatlack@google.com>
-Cc:     Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Anup Patel <anup@brainfault.org>,
-        Atish Patra <atishp@atishpatra.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org,
-        kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
-        linux-riscv@lists.infradead.org,
-        Raghavendra Rao Ananta <rananta@google.com>
+        linux-kernel@vger.kernel.org,
+        Lai Jiangshan <jiangshanlai@gmail.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Lai Jiangshan <jiangshan.ljs@antgroup.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org
 Content-Type: text/plain; charset="utf-8"
 X-Spam-Status: No, score=-7.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
@@ -83,28 +73,25 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 26 Jan 2023 10:40:18 -0800, David Matlack wrote:
-> This series introduces a common API for performing range-based TLB
-> invalidation. This is then used to supplant
-> kvm_arch_flush_remote_tlbs_memslot() and pave the way for two other
-> patch series:
+On Fri, 13 Jan 2023 20:29:10 +0800, Lai Jiangshan wrote:
+> Simplify pte_list_{add|remove} by ensuring all the non-head pte_list_desc
+> to be full and addition/removal actions being performed on the head.
 > 
-> 1. https://lore.kernel.org/kvm/20230109215347.3119271-1-rananta@google.com/
+> To make pte_list_add() return a count as before, @tail_count is also
+> added to the struct pte_list_desc.
+> 
+> No visible performace is changed in tests.  But pte_list_add() is no longer
+> shown in the perf result for the COWed pages even the guest forks millions
+> of tasks.
 > 
 > [...]
 
-Applied the x86 specific cleanups to kvm-x86 mmu.  They're good changes on their
-own, I'm quite confident that this series a whole won't be going into 6.4, and I
-suspect/hope that getting these into 6.4 will make David's life easier (there are
-more cleanups in the related x86 code that I want to get into 6.4).  David, if
-I'm wrong, you'll have plenty of time to think of an appropriate punishment ;-)
+Applied to kvm-x86 mmu, thanks!  I added quite a few comments and a BUG_ON() to
+sanity check that the head is never empty when trying to remove an entry, but I
+didn't make anything changes to the code itself.
 
-[3/7] KVM: x86/mmu: Collapse kvm_flush_remote_tlbs_with_{range,address}() together
-      https://github.com/kvm-x86/linux/commit/28e4b4597d65
-[4/7] KVM: x86/mmu: Rename kvm_flush_remote_tlbs_with_address()
-      https://github.com/kvm-x86/linux/commit/8c63e8c21765
-[5/7] KVM: x86/MMU: Use gfn_t in kvm_flush_remote_tlbs_range()
-      https://github.com/kvm-x86/linux/commit/9d4655da1a4c
+[1/1] kvm: x86/mmu: Simplify pte_list_{add|remove}
+      https://github.com/kvm-x86/linux/commit/141705b78381
 
 --
 https://github.com/kvm-x86/linux/tree/next
