@@ -2,91 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D99F76C6E81
-	for <lists+kvm@lfdr.de>; Thu, 23 Mar 2023 18:15:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C12326C6E59
+	for <lists+kvm@lfdr.de>; Thu, 23 Mar 2023 18:04:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231149AbjCWRPX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Mar 2023 13:15:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46558 "EHLO
+        id S231604AbjCWREA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Mar 2023 13:04:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60104 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230021AbjCWRPW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Mar 2023 13:15:22 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58673233D0;
-        Thu, 23 Mar 2023 10:15:20 -0700 (PDT)
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 32NH8E94008644;
-        Thu, 23 Mar 2023 17:15:20 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=JYF/h0ZJR8wVzhPO3x4yH6w5rHSVqYekPGE4cV3n/y8=;
- b=d7SPiAmjPZ92kUHVIiFGqWSIZ3Ox8dWt+QlHyufoS7dQljJ1cp6Wd+Roy/mjP7nfKYww
- /0l4Q9BHjZKhLSvT4V2IIeGcn5yy/b2OYwcoejkS7DMBn7i4/guQ9gE2DeD2T83yMSGv
- tLXNZrqnYpDn/J2SUhhEd6k3cKLkKAPbJzvm3tKcgFelys9iI34QpJmfG4C7P2III+UO
- VKQXe9xVl5fCDpgTPphBoX+vUMS4+T3MVomEkJw6k7yBmCVWspPuFsDeAiRW7mXqdKfB
- zu/3c/lpVVlvNzmu/NV5JyCj70ZjdZzrPF+GBkLR7Odw0JTFBPSk95yqn2+2+w/JzvZy 4w== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pgk22m9qh-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 23 Mar 2023 17:15:19 +0000
-Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 32NH987Q014543;
-        Thu, 23 Mar 2023 17:15:19 GMT
-Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pgk22m9p2-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 23 Mar 2023 17:15:19 +0000
-Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
-        by ppma05fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 32NDlMaG014687;
-        Thu, 23 Mar 2023 17:15:16 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-        by ppma05fra.de.ibm.com (PPS) with ESMTPS id 3pd4x6ee7e-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 23 Mar 2023 17:15:16 +0000
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-        by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 32NHFDeX61800764
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 23 Mar 2023 17:15:13 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 07ECF20043;
-        Thu, 23 Mar 2023 17:15:13 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C43292004E;
-        Thu, 23 Mar 2023 17:15:12 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.152.224.56])
-        by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Thu, 23 Mar 2023 17:15:12 +0000 (GMT)
-Date:   Thu, 23 Mar 2023 16:45:12 +0100
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Pierre Morel <pmorel@linux.ibm.com>
-Cc:     linux-s390@vger.kernel.org, frankja@linux.ibm.com,
-        thuth@redhat.com, kvm@vger.kernel.org, david@redhat.com,
-        nrb@linux.ibm.com, nsg@linux.ibm.com
-Subject: Re: [kvm-unit-tests PATCH v7 1/2] s390x: topology: Check the
- Perform Topology Function
-Message-ID: <20230323164512.4cdf985e@p-imbrenda>
-In-Reply-To: <20230320085642.12251-2-pmorel@linux.ibm.com>
-References: <20230320085642.12251-1-pmorel@linux.ibm.com>
-        <20230320085642.12251-2-pmorel@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
+        with ESMTP id S229773AbjCWRD6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Mar 2023 13:03:58 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC8D89004
+        for <kvm@vger.kernel.org>; Thu, 23 Mar 2023 10:03:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1679590982;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=cglotdbZ9kvOmjiiA3xfBy0x7OKBSKTg0p62tpcUq34=;
+        b=Q25uFBrQ09ucTL2QBePvWNRJ/rBmGsde7BeLG253T116aUVHZLNtYrdB3do9S2KTLk4YIY
+        AHjzvl8tKJLRVCS0lJW67mBnHVG11Ax4SisbUO2MaD4U5hxzaV8BxSXPZty6jsdw+Q2wC8
+        vanX98uGgKro+UO04aTpc9+wEZnfEaM=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-655-Mlj9LUpeNYa2F7SRdT2vgg-1; Thu, 23 Mar 2023 13:03:01 -0400
+X-MC-Unique: Mlj9LUpeNYa2F7SRdT2vgg-1
+Received: by mail-wm1-f71.google.com with SMTP id o37-20020a05600c512500b003edd119ec9eso7177682wms.0
+        for <kvm@vger.kernel.org>; Thu, 23 Mar 2023 10:02:59 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1679590979;
+        h=content-transfer-encoding:in-reply-to:organization:from:references
+         :cc:to:content-language:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=cglotdbZ9kvOmjiiA3xfBy0x7OKBSKTg0p62tpcUq34=;
+        b=dnVi4MnSmc/9+bw64JK9XMv54RRvIiTqCF7eOHvcNMHtMdYfpdC3y3gq5pNeVI74VB
+         HIyzT7b99CsqYSeUcg7fjOj3+ngGjnF1g2WkD2GQJQD1qZ1xgECv1xmZEK51u4i01GSZ
+         VHUSKiCldKviiyhoqs+kReoq5oK0BkIRkc9NJ7POCTL17UHOWIsfOEdk12YTdnj0W8np
+         UJtz1ccb7kgqHNng22wiaiE/qBuBLA1U2m1+ZQkWB+0fIaFDkpwn1gqfAOK/geK9ip7J
+         VuKjXxyD7LH2uw4iX397KqoWM0suz1ugcDQT45F2vMRTKVLHN9ouBq3K1LTTv7pSQ0uO
+         6lDQ==
+X-Gm-Message-State: AO0yUKXMGOBV7BIk/eHDrAuiWprRG8Bm9uo5LwNxXZOY6pmOp6Nsutv0
+        g/HQj6FnQr75zg0hbFX/VBgCPEqk9UNOJCs8KwqZ5TguV4sMq4LleAATtCEr4LwkgXMIg9ar4sM
+        MWUwutaaHMzD7
+X-Received: by 2002:a1c:7406:0:b0:3ed:320a:3721 with SMTP id p6-20020a1c7406000000b003ed320a3721mr281073wmc.22.1679590978971;
+        Thu, 23 Mar 2023 10:02:58 -0700 (PDT)
+X-Google-Smtp-Source: AK7set/2X0vV6gTyBSJOJJGL1Fdh0QWcbOfAS0eHPNeVmmhuLkrzvxlO/MiBZ4ftHK9wZ9NuLSr74Q==
+X-Received: by 2002:a1c:7406:0:b0:3ed:320a:3721 with SMTP id p6-20020a1c7406000000b003ed320a3721mr281045wmc.22.1679590978561;
+        Thu, 23 Mar 2023 10:02:58 -0700 (PDT)
+Received: from ?IPV6:2003:cb:c704:e500:5cdf:c280:4b31:4016? (p200300cbc704e5005cdfc2804b314016.dip0.t-ipconnect.de. [2003:cb:c704:e500:5cdf:c280:4b31:4016])
+        by smtp.gmail.com with ESMTPSA id fk6-20020a05600c0cc600b003ee7169d57dsm2353857wmb.40.2023.03.23.10.02.57
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 23 Mar 2023 10:02:57 -0700 (PDT)
+Message-ID: <3dd0e43d-36f7-3325-7680-33779e9b0a55@redhat.com>
+Date:   Thu, 23 Mar 2023 18:02:56 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.9.0
+Subject: Re: [PATCH v10 02/16] x86/virt/tdx: Detect TDX during kernel boot
+Content-Language: en-US
+To:     "Huang, Kai" <kai.huang@intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Cc:     "Hansen, Dave" <dave.hansen@intel.com>,
+        "Luck, Tony" <tony.luck@intel.com>,
+        "bagasdotme@gmail.com" <bagasdotme@gmail.com>,
+        "ak@linux.intel.com" <ak@linux.intel.com>,
+        "Wysocki, Rafael J" <rafael.j.wysocki@intel.com>,
+        "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
+        "Christopherson,, Sean" <seanjc@google.com>,
+        "Chatre, Reinette" <reinette.chatre@intel.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "peterz@infradead.org" <peterz@infradead.org>,
+        "Shahar, Sagi" <sagis@google.com>,
+        "imammedo@redhat.com" <imammedo@redhat.com>,
+        "Gao, Chao" <chao.gao@intel.com>,
+        "Brown, Len" <len.brown@intel.com>,
+        "sathyanarayanan.kuppuswamy@linux.intel.com" 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        "Huang, Ying" <ying.huang@intel.com>,
+        "Williams, Dan J" <dan.j.williams@intel.com>
+References: <cover.1678111292.git.kai.huang@intel.com>
+ <35a2421ca97d9e8dd938dcd744674602f4faa617.1678111292.git.kai.huang@intel.com>
+ <90f6a15c-0dec-4a19-7a21-b18b73932a21@redhat.com>
+ <e8cc32a3f374e494bc6b93dad31367d8b093f9c8.camel@intel.com>
+From:   David Hildenbrand <david@redhat.com>
+Organization: Red Hat
+In-Reply-To: <e8cc32a3f374e494bc6b93dad31367d8b093f9c8.camel@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: PbJECSW63UBAwpX9nOUuc6otWAyy2fM4
-X-Proofpoint-GUID: z4aVAubROBbya34Lj-ETTTvlFgddgbcQ
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
- definitions=2023-03-22_21,2023-03-23_02,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 mlxscore=0
- mlxlogscore=999 impostorscore=0 priorityscore=1501 lowpriorityscore=0
- bulkscore=0 malwarescore=0 adultscore=0 spamscore=0 phishscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2303150002 definitions=main-2303230124
-X-Spam-Status: No, score=-0.1 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
-        DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -94,249 +106,194 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 20 Mar 2023 09:56:41 +0100
-Pierre Morel <pmorel@linux.ibm.com> wrote:
+On 16.03.23 23:37, Huang, Kai wrote:
+> On Thu, 2023-03-16 at 13:48 +0100, David Hildenbrand wrote:
+>> On 06.03.23 15:13, Kai Huang wrote:
+>>> Intel Trust Domain Extensions (TDX) protects guest VMs from malicious
+>>> host and certain physical attacks.  A CPU-attested software module
+>>> called 'the TDX module' runs inside a new isolated memory range as a
+>>> trusted hypervisor to manage and run protected VMs.
+>>>
+>>> Pre-TDX Intel hardware has support for a memory encryption architecture
+>>> called MKTME.  The memory encryption hardware underpinning MKTME is also
+>>> used for Intel TDX.  TDX ends up "stealing" some of the physical address
+>>> space from the MKTME architecture for crypto-protection to VMs.  The
+>>> BIOS is responsible for partitioning the "KeyID" space between legacy
+>>> MKTME and TDX.  The KeyIDs reserved for TDX are called 'TDX private
+>>> KeyIDs' or 'TDX KeyIDs' for short.
+>>>
+>>> TDX doesn't trust the BIOS.  During machine boot, TDX verifies the TDX
+>>> private KeyIDs are consistently and correctly programmed by the BIOS
+>>> across all CPU packages before it enables TDX on any CPU core.  A valid
+>>> TDX private KeyID range on BSP indicates TDX has been enabled by the
+>>> BIOS, otherwise the BIOS is buggy.
+>>
 
-> We check that the PTF instruction is working correctly when
-> the cpu topology facility is available.
+Sorry for the late reply!
+
+>> So we don't trust the BIOS, but trust the BIOS that it won't hot-remove
+>> physical memory or hotplug physical CPUS (if I understood the cover
+>> letter correctly)? :)
 > 
-> For KVM only, we test changing of the polarity between horizontal
-> and vertical and that a reset set the horizontal polarity.
+> The "trust" in this context means security, but not functionality.  BIOS needs
+> to do the right thing in order to make things work correctly in terms of
+> functionality.
 > 
-> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
-> ---
->  s390x/Makefile      |   1 +
->  s390x/topology.c    | 180 ++++++++++++++++++++++++++++++++++++++++++++
->  s390x/unittests.cfg |   3 +
->  3 files changed, 184 insertions(+)
->  create mode 100644 s390x/topology.c
+> For physical memory hotplug or CPU hotplug, we don't have patch to _explicitly_
+> distinguish them (from logical memory hotplug and logical cpu online/offline),
+> but actually they are kinda also handled:  For memory hotplug, and hot-added
+> memory is rejected to go online (because they cannot be in TDX's convertible
+> memory ranges).  For CPU hotplug, we have a function to do per-cpu
+> initialization (tdx_cpu_enable() in patch 5), and it will return error for hot-
+> added physical cpu.
+
+Make sense, thanks!
+
 > 
-> diff --git a/s390x/Makefile b/s390x/Makefile
-> index e94b720..05dac04 100644
-> --- a/s390x/Makefile
-> +++ b/s390x/Makefile
-> @@ -40,6 +40,7 @@ tests += $(TEST_DIR)/panic-loop-pgm.elf
->  tests += $(TEST_DIR)/migration-sck.elf
->  tests += $(TEST_DIR)/exittime.elf
->  tests += $(TEST_DIR)/ex.elf
-> +tests += $(TEST_DIR)/topology.elf
->  
->  pv-tests += $(TEST_DIR)/pv-diags.elf
->  
-> diff --git a/s390x/topology.c b/s390x/topology.c
-> new file mode 100644
-> index 0000000..ce248f1
-> --- /dev/null
-> +++ b/s390x/topology.c
-> @@ -0,0 +1,180 @@
-> +/* SPDX-License-Identifier: GPL-2.0-only */
-> +/*
-> + * CPU Topology
-> + *
-> + * Copyright IBM Corp. 2022
-> + *
-> + * Authors:
-> + *  Pierre Morel <pmorel@linux.ibm.com>
-> + */
-> +
-> +#include <libcflat.h>
-> +#include <asm/page.h>
-> +#include <asm/asm-offsets.h>
-> +#include <asm/interrupt.h>
-> +#include <asm/facility.h>
-> +#include <smp.h>
-> +#include <sclp.h>
-> +#include <s390x/hardware.h>
-> +
-> +#define PTF_REQ_HORIZONTAL	0
-> +#define PTF_REQ_VERTICAL	1
-> +#define PTF_REQ_CHECK		2
-> +
-> +#define PTF_ERR_NO_REASON	0
-> +#define PTF_ERR_ALRDY_POLARIZED	1
-> +#define PTF_ERR_IN_PROGRESS	2
-> +
-> +extern int diag308_load_reset(u64);
-> +
-> +static int ptf(unsigned long fc, unsigned long *rc)
-> +{
-> +	int cc;
-> +
-> +	asm volatile(
-> +		"	ptf	%1	\n"
-> +		"       ipm     %0	\n"
-> +		"       srl     %0,28	\n"
-> +		: "=d" (cc), "+d" (fc)
-> +		:
-> +		: "cc");
-> +
-> +	*rc = fc >> 8;
-> +	return cc;
-> +}
-> +
-> +static void check_privilege(int fc)
-> +{
-> +	unsigned long rc;
-> +
-> +	report_prefix_push("Privilege");
-> +	report_info("function code %d", fc);
-> +	enter_pstate();
-> +	expect_pgm_int();
-> +	ptf(fc, &rc);
-> +	check_pgm_int_code(PGM_INT_CODE_PRIVILEGED_OPERATION);
-> +	report_prefix_pop();
-> +}
-> +
-> +static void check_function_code(void)
-> +{
-> +	unsigned long rc;
-> +
-> +	report_prefix_push("Undefined fc");
-> +	expect_pgm_int();
-> +	ptf(0xff, &rc);
+>>
+>>>
+>>> The TDX module is expected to be loaded by the BIOS when it enables TDX,
+>>> but the kernel needs to properly initialize it before it can be used to
+>>> create and run any TDX guests.  The TDX module will be initialized by
+>>> the KVM subsystem when KVM wants to use TDX.
+>>>
+>>> Add a new early_initcall(tdx_init) to detect the TDX by detecting TDX
+>>> private KeyIDs.  Also add a function to report whether TDX is enabled by
+>>> the BIOS.  Similar to AMD SME, kexec() will use it to determine whether
+>>> cache flush is needed.
+>>>
+>>> The TDX module itself requires one TDX KeyID as the 'TDX global KeyID'
+>>> to protect its metadata.  Each TDX guest also needs a TDX KeyID for its
+>>> own protection.  Just use the first TDX KeyID as the global KeyID and
+>>> leave the rest for TDX guests.  If no TDX KeyID is left for TDX guests,
+>>> disable TDX as initializing the TDX module alone is useless.
+>>
+>> Does that really happen in practice that we care about that at all?
+>> Seems weird and rather like a broken firmware or sth like that ...
+> 
+> No it doesn't happen in practice, because the BIOS is sane enough.
+> 
+> But since the public spec doesn't explicitly say it is guaranteed this doesn't
+> happen when TDX is enabled, I just added this sanity check.
 
-please don't use magic numbers, add a new macro PTF_INVALID_FUNCTION
-(or something like that)
+Okay!
 
-> +	check_pgm_int_code(PGM_INT_CODE_SPECIFICATION);
-> +	report_prefix_pop();
-> +}
-> +
-> +static void check_reserved_bits(void)
-> +{
-> +	unsigned long rc;
-> +
-> +	report_prefix_push("Reserved bits");
-> +	expect_pgm_int();
-> +	ptf(0xffffffffffffff00UL, &rc);
+> 
+>>
+>>>
+>>> To start to support TDX, create a new arch/x86/virt/vmx/tdx/tdx.c for
+>>> TDX host kernel support.  Add a new Kconfig option CONFIG_INTEL_TDX_HOST
+>>> to opt-in TDX host kernel support (to distinguish with TDX guest kernel
+>>> support).  So far only KVM uses TDX.  Make the new config option depend
+>>> on KVM_INTEL.
+>>>
+>>> Signed-off-by: Kai Huang <kai.huang@intel.com>
+>>> Reviewed-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+>>
+>>
+>> [...]
+>>
+>>> ---
+>>>    arch/x86/Kconfig                 |  12 ++++
+>>>    arch/x86/Makefile                |   2 +
+>>>    arch/x86/include/asm/msr-index.h |   3 +
+>>>    arch/x86/include/asm/tdx.h       |   7 +++
+>>>    arch/x86/virt/Makefile           |   2 +
+>>>    arch/x86/virt/vmx/Makefile       |   2 +
+>>>    arch/x86/virt/vmx/tdx/Makefile   |   2 +
+>>>    arch/x86/virt/vmx/tdx/tdx.c      | 105 +++++++++++++++++++++++++++++++
+>>>    8 files changed, 135 insertions(+)
+>>>    create mode 100644 arch/x86/virt/Makefile
+>>>    create mode 100644 arch/x86/virt/vmx/Makefile
+>>>    create mode 100644 arch/x86/virt/vmx/tdx/Makefile
+>>>    create mode 100644 arch/x86/virt/vmx/tdx/tdx.c
+>>>
+>>> diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
+>>> index 3604074a878b..fc010973a6ff 100644
+>>> --- a/arch/x86/Kconfig
+>>> +++ b/arch/x86/Kconfig
+>>> @@ -1952,6 +1952,18 @@ config X86_SGX
+>>>    
+>>>    	  If unsure, say N.
+>>>    
+>>> +config INTEL_TDX_HOST
+>>> +	bool "Intel Trust Domain Extensions (TDX) host support"
+>>> +	depends on CPU_SUP_INTEL
+>>> +	depends on X86_64
+>>> +	depends on KVM_INTEL
+>>> +	help
+>>> +	  Intel Trust Domain Extensions (TDX) protects guest VMs from malicious
+>>> +	  host and certain physical attacks.  This option enables necessary TDX
+>>> +	  support in host kernel to run protected VMs.
+>>
+>> s/in host/in the host/ ?
+> 
+> Sure.
+> 
+>>
+>> Also, is "protected VMs" the right term to use here? "Encrypted VMs",
+>> "Confidential VMs" ... ?
+> 
+> "Encrypted VM" perhaps is not a good choice, because there are more things than
+> encryption.  I am also OK with "Confidential VMs", but "protected VMs" is also
+> used in the KVM series (not upstreamed yet), and also used by s390 by looking at
+> the git log.
+> 
+> So both "protected VM" and "confidential VM" work for me.
+> 
+> Not sure anyone else wants to comment?
 
-I would like every single bit to be tested, since all of them are
-required to be zero.
+I'm fine as long as it's used consistently. "Protected VM" would have 
+been the one out of the 3 alternatives that I have heard least frequently.
 
-make a loop and test each, but please report success of failure only
-once at the end. 
-use a report_info in case of failure to indicate which bit failed
-
-> +	check_pgm_int_code(PGM_INT_CODE_SPECIFICATION);
-> +	report_prefix_pop();
-> +}
-> +
-> +static void check_mtcr_pending(void)
-> +{
-> +	unsigned long rc;
-> +	int cc;
-> +
-> +	report_prefix_push("Topology Report pending");
-> +	/*
-> +	 * At this moment the topology may already have changed
-> +	 * since the VM has been started.
-> +	 * However, we can test if a second PTF instruction
-> +	 * reports that the topology did not change since the
-> +	 * preceding PFT instruction.
-> +	 */
-> +	ptf(PTF_REQ_CHECK, &rc);
-> +	cc = ptf(PTF_REQ_CHECK, &rc);
-> +	report(cc == 0, "PTF check should clear topology report");
-> +	report_prefix_pop();
-> +}
-> +
-> +static void check_polarization_change(void)
-> +{
-> +	unsigned long rc;
-> +	int cc;
-> +
-> +	report_prefix_push("Topology polarization check");
-> +
-> +	/* We expect a clean state through reset */
-> +	report(diag308_load_reset(1), "load normal reset done");
-> +
-> +	/*
-> +	 * Set vertical polarization to verify that RESET sets
-> +	 * horizontal polarization back.
-> +	 */
-> +	cc = ptf(PTF_REQ_VERTICAL, &rc);
-> +	report(cc == 0, "Set vertical polarization.");
-> +
-> +	report(diag308_load_reset(1), "load normal reset done");
-> +
-> +	cc = ptf(PTF_REQ_CHECK, &rc);
-> +	report(cc == 0, "Reset should clear topology report");
-> +
-> +	cc = ptf(PTF_REQ_HORIZONTAL, &rc);
-> +	report(cc == 2 && rc == PTF_ERR_ALRDY_POLARIZED,
-> +	       "After RESET polarization is horizontal");
-> +
-> +	/* Flip between vertical and horizontal polarization */
-> +	cc = ptf(PTF_REQ_VERTICAL, &rc);
-> +	report(cc == 0, "Change to vertical polarization.");
-
-either here or in a new block, test that setting vertical twice in
-a row will also result in a cc == 2 && rc == PTF_ERR_ALRDY_POLARIZED
-
-> +
-> +	cc = ptf(PTF_REQ_CHECK, &rc);
-> +	report(cc == 1, "Polarization change should set topology report");
-> +
-> +	cc = ptf(PTF_REQ_HORIZONTAL, &rc);
-> +	report(cc == 0, "Change to horizontal polarization.");
-
-it cannot hurt to add here another check for pending reports
-
-> +
-> +	report_prefix_pop();
-> +}
-> +
-> +static void test_ptf(void)
-> +{
-> +	check_privilege(PTF_REQ_HORIZONTAL);
-> +	check_privilege(PTF_REQ_VERTICAL);
-> +	check_privilege(PTF_REQ_CHECK);
-> +	check_function_code();
-> +	check_reserved_bits();
-> +	check_mtcr_pending();
-> +	check_polarization_change();
-> +}
-> +
-> +static struct {
-> +	const char *name;
-> +	void (*func)(void);
-> +} tests[] = {
-> +	{ "PTF", test_ptf},
-> +	{ NULL, NULL }
-> +};
-> +
-> +int main(int argc, char *argv[])
-> +{
-> +	int i;
-> +
-> +	report_prefix_push("CPU Topology");
-> +
-> +	if (!test_facility(11)) {
-> +		report_skip("Topology facility not present");
-> +		goto end;
+> 
+>>
+> [...]
+> 
+>>> +static u32 tdx_global_keyid __ro_after_init;
+>>> +static u32 tdx_guest_keyid_start __ro_after_init;
+>>> +static u32 tdx_nr_guest_keyids __ro_after_init;
+>>> +
+>>> +/*
+>>> + * Use tdx_global_keyid to indicate that TDX is uninitialized.
+>>> + * This is used in TDX initialization error paths to take it from
+>>> + * initialized -> uninitialized.
+>>> + */
+>>> +static void __init clear_tdx(void)
+>>> +{
+>>> +	tdx_global_keyid = 0;
+>>> +}
+>>
+>> Why not set "tdx_global_keyid" last, such that you don't have to clear
+>> when anything goes wrong before that? Seems more straight forward.
+> 
+> My thinking was by reserving the global keyid and taking it out first, I can
+> check the remaining keyids for TDX guests easily:
+> 
+> 
+> +	if (!nr_tdx_keyids) {
+> +		pr_info("initialization failed: too few private KeyIDs
+> available.\n");
+> +		goto no_tdx;
 > +	}
-> +
-> +	report_info("Virtual machine level %ld", stsi_get_fc());
-> +
-> +	for (i = 0; tests[i].name; i++) {
-> +		report_prefix_push(tests[i].name);
-> +		tests[i].func();
-> +		report_prefix_pop();
-> +	}
-> +
-> +end:
-> +	report_prefix_pop();
-> +	return report_summary();
-> +}
-> diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
-> index 453ee9c..d0ac683 100644
-> --- a/s390x/unittests.cfg
-> +++ b/s390x/unittests.cfg
-> @@ -233,3 +233,6 @@ extra_params = -append '--parallel'
->  
->  [execute]
->  file = ex.elf
-> +
-> +[topology]
-> +file = topology.elf
+> 
+> Otherwise need to do:
+> 
+> 	if (nr_tdx_keyids < 2) {
+> 		...
+> 	}
+> 
+> Also, in the later patch to handle memory hotplug we will add an additional step
+> to register_memory_notifier() which can also fail, so I just introduced
+> clear_tdx() here.
+> 
+> But nothing is big deal, and yes we can set the global keyid at last and remove
+> clear_tdx().
+
+Good, that simplifies things, thanks!
+
+-- 
+Thanks,
+
+David / dhildenb
 
