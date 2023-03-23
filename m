@@ -2,58 +2,61 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0B57E6C64C1
-	for <lists+kvm@lfdr.de>; Thu, 23 Mar 2023 11:23:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6B8826C6523
+	for <lists+kvm@lfdr.de>; Thu, 23 Mar 2023 11:33:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231149AbjCWKXo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Mar 2023 06:23:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40448 "EHLO
+        id S231545AbjCWKc7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Mar 2023 06:32:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54928 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230459AbjCWKXn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Mar 2023 06:23:43 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B17C272D
-        for <kvm@vger.kernel.org>; Thu, 23 Mar 2023 03:23:42 -0700 (PDT)
+        with ESMTP id S231315AbjCWKc1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Mar 2023 06:32:27 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DAFEB1C7F5
+        for <kvm@vger.kernel.org>; Thu, 23 Mar 2023 03:29:42 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 2F9D7625B8
-        for <kvm@vger.kernel.org>; Thu, 23 Mar 2023 10:23:42 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 19965C4339B;
-        Thu, 23 Mar 2023 10:23:41 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 70BDCB81EBD
+        for <kvm@vger.kernel.org>; Thu, 23 Mar 2023 10:29:41 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A8D47C433D2;
+        Thu, 23 Mar 2023 10:29:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1679567021;
-        bh=+pnutHbgPZ/gsCS7OxYK0FsgMPJ0cSQbPnMM0pRkjSk=;
-        h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-        b=Yk6QASA9PUP1MTPJaXTYUMe5W+wOgsu370892y+k0ZgVc9h6CvOxLdz3nMR/hkwnU
-         D/3lF/ZZKJPiVxtCKXr5MGUvVESG8IMHSQ4Lc2GC9zTPn0mTO+ucGBDA/dVtbbXVwP
-         QF4/IiyygNzAhSM4JEweGU1tB7cPSccz2CLRktTLkPsoVtRHTJj/nxhYzmlE+9ifff
-         xJB9KlbN5PfCCeyg6/clK582c/nB8w2ylXcbgVzuCBFZ1m7qAc+BY6hYruYHbzT/ts
-         VlZ69Sv44rUOKlxjRWe5o10Gm7ULkj+3R3O2OUpa3xAfdCyIHDYHBTSy94WFz5Yc+S
-         DzkdFU1+oyVJg==
+        s=k20201202; t=1679567380;
+        bh=fDcF61tjo8q8qHagQMk3UpbEV6iDDR23l7YEGst1DbA=;
+        h=From:To:Cc:Subject:In-Reply-To:Date:From;
+        b=n6QIicGg7E0gminwcg/q/adbTOOQgBbPAKLqEQ1UE71B7Wf+/FNk+s3SsPov1noLU
+         9Uy5iTtQU8C11P44+jeeKePKM42eWGDr4RpOHKRsQGQsojdWnWN3IYz7r6PfM1+qKv
+         U+tquSHVVsDhENd1Q1raVbXJJmRZfPXwL1k+y4eOiUQZ5L7HOmoQZ1MHh9jvxvRJVt
+         0Mw5Cg3FSs6c1oG8CfdAYLbP+ZfjmFgR1xBj3iQo+Q8rbNtKHZSkcyqQ9MJUyGnqmm
+         5edNc2VyVOwlys6jqtbSvmQKRqBZzhIOB/rXuvmm28o/DOM/qlZqaEkxnEDtaDugvv
+         FN++C8+NMHoVA==
 From:   =?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>
 To:     Andy Chiu <andy.chiu@sifive.com>, linux-riscv@lists.infradead.org,
         palmer@dabbelt.com, anup@brainfault.org, atishp@atishpatra.org,
         kvm-riscv@lists.infradead.org, kvm@vger.kernel.org
-Cc:     Kefeng Wang <wangkefeng.wang@huawei.com>, guoren@linux.alibaba.com,
-        Jisheng Zhang <jszhang@kernel.org>,
-        Nick Knight <nick.knight@sifive.com>,
-        Peter Zijlstra <peterz@infradead.org>, vineetg@rivosinc.com,
-        "Eric W. Biederman" <ebiederm@xmission.com>,
-        Vincent Chen <vincent.chen@sifive.com>,
-        Conor Dooley <conor.dooley@microchip.com>,
-        Albert Ou <aou@eecs.berkeley.edu>, Guo Ren <guoren@kernel.org>,
-        Ruinland Tsai <ruinland.tsai@sifive.com>,
-        Andy Chiu <andy.chiu@sifive.com>,
+Cc:     vineetg@rivosinc.com, greentime.hu@sifive.com,
+        guoren@linux.alibaba.com, Andy Chiu <andy.chiu@sifive.com>,
         Paul Walmsley <paul.walmsley@sifive.com>,
-        greentime.hu@sifive.com, Dmitry Vyukov <dvyukov@google.com>,
-        Heiko Stuebner <heiko@sntech.de>
-Subject: Re: [PATCH -next v15 09/19] riscv: Add task switch support for vector
-In-Reply-To: <20230317113538.10878-10-andy.chiu@sifive.com>
-References: <20230317113538.10878-1-andy.chiu@sifive.com>
- <20230317113538.10878-10-andy.chiu@sifive.com>
-Date:   Thu, 23 Mar 2023 11:23:39 +0100
-Message-ID: <87355vwytw.fsf@all.your.base.are.belong.to.us>
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Andrew Jones <ajones@ventanamicro.com>,
+        Heiko Stuebner <heiko.stuebner@vrull.eu>,
+        Conor Dooley <conor.dooley@microchip.com>,
+        Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>,
+        Liao Chang <liaochang1@huawei.com>,
+        Jisheng Zhang <jszhang@kernel.org>,
+        Vincent Chen <vincent.chen@sifive.com>,
+        Guo Ren <guoren@kernel.org>,
+        =?utf-8?B?Qmo=?= =?utf-8?B?w7ZybiBUw7ZwZWw=?= 
+        <bjorn@rivosinc.com>,
+        Xianting Tian <xianting.tian@linux.alibaba.com>,
+        Mattias Nissler <mnissler@rivosinc.com>,
+        Richard Henderson <richard.henderson@linaro.org>
+Subject: Re: [PATCH -next v15 10/19] riscv: Allocate user's vector context
+ in the first-use trap
+In-Reply-To: <20230317113538.10878-11-andy.chiu@sifive.com>
+Date:   Thu, 23 Mar 2023 11:29:37 +0100
+Message-ID: <87edpf4v72.fsf@all.your.base.are.belong.to.us>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
@@ -68,22 +71,14 @@ X-Mailing-List: kvm@vger.kernel.org
 
 Andy Chiu <andy.chiu@sifive.com> writes:
 
-> From: Greentime Hu <greentime.hu@sifive.com>
+> Vector unit is disabled by default for all user processes. Thus, a
+> process will take a trap (illegal instruction) into kernel at the first
+> time when it uses Vector. Only after then, the kernel allocates V
+> context and starts take care of the context for that user process.
 >
-> This patch adds task switch support for vector. It also supports all
-> lengths of vlen.
->
-> Suggested-by: Andrew Waterman <andrew@sifive.com>
-> Co-developed-by: Nick Knight <nick.knight@sifive.com>
-> Signed-off-by: Nick Knight <nick.knight@sifive.com>
-> Co-developed-by: Guo Ren <guoren@linux.alibaba.com>
-> Signed-off-by: Guo Ren <guoren@linux.alibaba.com>
-> Co-developed-by: Vincent Chen <vincent.chen@sifive.com>
-> Signed-off-by: Vincent Chen <vincent.chen@sifive.com>
-> Co-developed-by: Ruinland Tsai <ruinland.tsai@sifive.com>
-> Signed-off-by: Ruinland Tsai <ruinland.tsai@sifive.com>
-> Signed-off-by: Greentime Hu <greentime.hu@sifive.com>
-> Signed-off-by: Vineet Gupta <vineetg@rivosinc.com>
+> Suggested-by: Richard Henderson <richard.henderson@linaro.org>
+> Link: https://lore.kernel.org/r/3923eeee-e4dc-0911-40bf-84c34aee962d@lina=
+ro.org
 > Signed-off-by: Andy Chiu <andy.chiu@sifive.com>
 
 Reviewed-by: Bj=C3=B6rn T=C3=B6pel <bjorn@rivosinc.com>
