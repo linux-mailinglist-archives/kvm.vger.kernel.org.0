@@ -2,82 +2,76 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8EF246C6639
-	for <lists+kvm@lfdr.de>; Thu, 23 Mar 2023 12:12:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A37456C6673
+	for <lists+kvm@lfdr.de>; Thu, 23 Mar 2023 12:24:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231519AbjCWLMN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Mar 2023 07:12:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51968 "EHLO
+        id S231225AbjCWLYt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Mar 2023 07:24:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40392 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230498AbjCWLMG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Mar 2023 07:12:06 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7B2E132CC
-        for <kvm@vger.kernel.org>; Thu, 23 Mar 2023 04:11:19 -0700 (PDT)
+        with ESMTP id S231166AbjCWLYs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Mar 2023 07:24:48 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C68951912F
+        for <kvm@vger.kernel.org>; Thu, 23 Mar 2023 04:24:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1679569878;
+        s=mimecast20190719; t=1679570644;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=BchtG9wKeZ97oxXjhrm96XFjZ5ZGtPrJx2tGt2VfOfg=;
-        b=MixwL05+8bIr4KefEaQhkgOm7bFc9mIU2qBm2V07yVr+kDzipG2elyP+jFS11ZRl7yJAkp
-        cJY+Mk+EYvMN8iJOcps7a5KFCQiFCJVojTztvSuwiXZZGXU1vPw5KhkVuU90ESsAHaTs78
-        LJwc4+b9XuZj7KI+dS2n4GAI4kDKCss=
-Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
- [209.85.160.198]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=3N+CKRtfUVJAYw78KROWLKzIsho1cqPaJZ2vvMVYpHM=;
+        b=QOuLeGnfhVd0R+wQb18SaKwL21WdgPtbbc2OFUROeDg9g089+CMdDu6fExSzREfTzMPIHX
+        ag8kOvJD4+VDIdOpgwDWi1yzTG0NZpIhx8UTKjlybWN0fejw+sd0QwLPSjtqagvF9GiE5U
+        45t4fJVjO/VPdzCCIq0I7WJnTVdTKoc=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-321-iwBF23FQMiitysy71q3jsA-1; Thu, 23 Mar 2023 07:11:17 -0400
-X-MC-Unique: iwBF23FQMiitysy71q3jsA-1
-Received: by mail-qt1-f198.google.com with SMTP id p22-20020a05622a00d600b003e38f7f800bso1937208qtw.9
-        for <kvm@vger.kernel.org>; Thu, 23 Mar 2023 04:11:17 -0700 (PDT)
+ us-mta-622-eHT3IU9wMT-9o_Go7vUFFQ-1; Thu, 23 Mar 2023 07:24:02 -0400
+X-MC-Unique: eHT3IU9wMT-9o_Go7vUFFQ-1
+Received: by mail-wm1-f71.google.com with SMTP id bh19-20020a05600c3d1300b003ee93fac4a9so499847wmb.2
+        for <kvm@vger.kernel.org>; Thu, 23 Mar 2023 04:24:02 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679569876;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=BchtG9wKeZ97oxXjhrm96XFjZ5ZGtPrJx2tGt2VfOfg=;
-        b=mMJhQXyxUh3SbxFIi4ABZuvoq1VresobuvpZR1spI3jFy7hBmLFuYVceBKklMOohsT
-         TcEoWcctYJbeTbUTYIgPP4WqecZppuoAo+bWC8qFwfPhZiVPfFKhrS3Ien9xZkCXIjy1
-         nMSFfoIiJID7c1fJw1f4dYO+TROgRGj0hJlWWQs+d/60EeqsUx6ux0e6IZPmGJfomXEK
-         QOAO9sAWAaTYxRntaNbd4U71OfrvEYhlF+wZDkSvyQc0KeTwfM/1Qd6B9Je+SQHam1NI
-         YOG8exjG2XFbvwz/LX8jxWVo2y/KzrqJsS8wxe1xpMeMnC26WfEZVSAoX5x2opJii2mJ
-         ME9w==
-X-Gm-Message-State: AO0yUKWX7SnURpibPceT9h30fk5FB8VVpxMB0988ORdY9zosvm/M9A25
-        f9uTRLJht1+UacT56uRqWXRbN4LldbuojMms/ZrXcxaVIlXh1bzXcBiSR8Omob3xlHTUHomFCd1
-        p3E0ynYDpz0as
-X-Received: by 2002:a05:622a:15d3:b0:3e3:791e:72cf with SMTP id d19-20020a05622a15d300b003e3791e72cfmr10008565qty.26.1679569876170;
-        Thu, 23 Mar 2023 04:11:16 -0700 (PDT)
-X-Google-Smtp-Source: AK7set/KaamBvlgMtErYI/M4H7LuQVV0ilEhCcyJ2CVaFr2tiTj0CxZrISYp/ghNz4Mfs3oe/NjWig==
-X-Received: by 2002:a05:622a:15d3:b0:3e3:791e:72cf with SMTP id d19-20020a05622a15d300b003e3791e72cfmr10008542qty.26.1679569875838;
-        Thu, 23 Mar 2023 04:11:15 -0700 (PDT)
-Received: from sgarzare-redhat (host-82-53-134-98.retail.telecomitalia.it. [82.53.134.98])
-        by smtp.gmail.com with ESMTPSA id p17-20020a374211000000b007428e743508sm13015960qka.70.2023.03.23.04.11.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Mar 2023 04:11:15 -0700 (PDT)
-Date:   Thu, 23 Mar 2023 12:11:10 +0100
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Arseniy Krasnov <avkrasnov@sberdevices.ru>
-Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Bobby Eshleman <bobby.eshleman@bytedance.com>,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kernel@sberdevices.ru, oxffffaa@gmail.com
-Subject: Re: [RFC PATCH v5 0/2] allocate multiple skbuffs on tx
-Message-ID: <20230323111110.gb4vlaqaf7icymv3@sgarzare-redhat>
-References: <f0b283a1-cc63-dc3d-cc0c-0da7f684d4d2@sberdevices.ru>
- <2e06387d-036b-dde2-5ddc-734c65a2f50d@sberdevices.ru>
- <20230323104800.odrkkiuxi3o2l37q@sgarzare-redhat>
- <15e9ac56-bedc-b444-6d9a-8a1355e32eaf@sberdevices.ru>
+        d=1e100.net; s=20210112; t=1679570641;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=3N+CKRtfUVJAYw78KROWLKzIsho1cqPaJZ2vvMVYpHM=;
+        b=ZbLLZXvFKv5Uks9kSkEsb+fjWHNbn46sgstBYFO14958reSr5b28fsSi5/BzQtLd2X
+         aN85qVypj/gRst854ET5mYOvcXTKgyVyk6Jbfp3lQigg93t7THCzQoymBP6Y8YposLJL
+         fq5Xhb4LdKF5o8SrkfKG4YqVEOdzY4PdHAsmWeLBc7UMen/ksPkd1X8HRBzcmmKSD5Eq
+         Fs+/SyejRIHUZSlPWVwBpV0PGnhKGJuaXVlE4Im2BOAyXUM77Og8LwU/Kpog7i3R7W/5
+         4qq643TQEckbaiCL5yPEIBAiwQ3Wqa8wbW5egc/CLht+Tp03RaIwo36/w2e83N2GKAfX
+         wGtg==
+X-Gm-Message-State: AAQBX9eueRXZqkjdVgtGHhwk5AHWH6M1032uqFe58F2IKH6ifG6yM2Ca
+        a3QPJLvlrx2wB75KinjfAHEBj0jKzOIhJ5Bqkmn33eNqMMxzZAlPLqjxREEQ9LS0Eg6ec5RBny8
+        ej4co7Ga+8x9QZcUK1fEbFts=
+X-Received: by 2002:a5d:4848:0:b0:2d2:3b59:cbd4 with SMTP id n8-20020a5d4848000000b002d23b59cbd4mr1989626wrs.12.1679570641661;
+        Thu, 23 Mar 2023 04:24:01 -0700 (PDT)
+X-Google-Smtp-Source: AKy350bvcuszABwhnciDhZmUHoYcWm5BDwzo6Ssfedx3Ofwchw0V4Xwy8PJwJe8IGH0zzAZyKxkT5g==
+X-Received: by 2002:a5d:4848:0:b0:2d2:3b59:cbd4 with SMTP id n8-20020a5d4848000000b002d23b59cbd4mr1989617wrs.12.1679570641433;
+        Thu, 23 Mar 2023 04:24:01 -0700 (PDT)
+Received: from [192.168.0.3] (ip-109-43-179-146.web.vodafone.de. [109.43.179.146])
+        by smtp.gmail.com with ESMTPSA id n16-20020adffe10000000b002cfe63ded49sm15962459wrr.26.2023.03.23.04.24.00
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 23 Mar 2023 04:24:00 -0700 (PDT)
+Message-ID: <a99184db-430e-624f-5c6b-44f773aab6d4@redhat.com>
+Date:   Thu, 23 Mar 2023 12:23:59 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <15e9ac56-bedc-b444-6d9a-8a1355e32eaf@sberdevices.ru>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.13.0
+Subject: Re: [kvm-unit-tests v2 01/10] MAINTAINERS: Update powerpc list
+Content-Language: en-US
+To:     Nicholas Piggin <npiggin@gmail.com>, kvm@vger.kernel.org
+Cc:     linuxppc-dev@lists.ozlabs.org, Laurent Vivier <lvivier@redhat.com>
+References: <20230320070339.915172-1-npiggin@gmail.com>
+ <20230320070339.915172-2-npiggin@gmail.com>
+From:   Thomas Huth <thuth@redhat.com>
+In-Reply-To: <20230320070339.915172-2-npiggin@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
         RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -86,45 +80,29 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 23, 2023 at 01:53:40PM +0300, Arseniy Krasnov wrote:
->
->
->On 23.03.2023 13:48, Stefano Garzarella wrote:
->> On Thu, Mar 23, 2023 at 01:01:40PM +0300, Arseniy Krasnov wrote:
->>> Hello Stefano,
->>>
->>> thanks for review!
->>
->> You're welcome!
->>
->>>
->>> Since both patches are R-b, i can wait for a few days, then send this
->>> as 'net-next'?
->>
->> Yep, maybe even this series could have been directly without RFC ;-)
->
->"directly", You mean 'net' tag? Of just without RFC, like [PATCH v5]. In this case
->it will be merged to 'net' right?
+On 20/03/2023 08.03, Nicholas Piggin wrote:
+> KVM development on powerpc has moved to the Linux on Power mailing list,
+> as per linux.git commit 19b27f37ca97d ("MAINTAINERS: Update powerpc KVM
+> entry").
+> 
+> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+> ---
+>   MAINTAINERS | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 649de50..b545a45 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -79,7 +79,7 @@ M: Laurent Vivier <lvivier@redhat.com>
+>   M: Thomas Huth <thuth@redhat.com>
+>   S: Maintained
+>   L: kvm@vger.kernel.org
+> -L: kvm-ppc@vger.kernel.org
+> +L: linuxppc-dev@lists.ozlabs.org
+>   F: powerpc/
+>   F: lib/powerpc/
+>   F: lib/ppc64/
 
-Sorry for the confusion. I meant without RFC but with net-next.
-
-Being enhancements and not fixes this is definitely net-next material,
-so even in RFCs you can already use the net-next tag, so the reviewer
-knows which branch to apply them to. (It's not super important since
-being RFCs it's expected that it's not complete, but it's definitely an
-help for the reviewer).
-
-Speaking of the RFC, we usually use it for patches that we don't think
-are ready to be merged. But when they reach a good state (like this
-series for example), we can start publishing them already without the
-RFC tag.
-
-Anyway, if you are not sure, use RFC and then when a maintainer has
-reviewed them all, surely you can remove the RFC tag.
-
-Hope this helps, at least that's what I usually do, so don't take that
-as a strict rule ;-)
-
-Thanks,
-Stefano
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 
