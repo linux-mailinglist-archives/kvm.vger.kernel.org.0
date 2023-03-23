@@ -2,57 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9A3926C633F
-	for <lists+kvm@lfdr.de>; Thu, 23 Mar 2023 10:23:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 158FA6C63B1
+	for <lists+kvm@lfdr.de>; Thu, 23 Mar 2023 10:33:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231599AbjCWJXc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Mar 2023 05:23:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46530 "EHLO
+        id S231145AbjCWJdx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Mar 2023 05:33:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58544 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231628AbjCWJWq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Mar 2023 05:22:46 -0400
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0040A1A95B;
-        Thu, 23 Mar 2023 02:22:40 -0700 (PDT)
-Received: from kwepemm600003.china.huawei.com (unknown [172.30.72.55])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4Pj0CM5ChTzSm34;
-        Thu, 23 Mar 2023 17:19:11 +0800 (CST)
-Received: from [10.174.179.79] (10.174.179.79) by
- kwepemm600003.china.huawei.com (7.193.23.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.21; Thu, 23 Mar 2023 17:22:37 +0800
-Subject: Re: [PATCH v2] vhost/vdpa: Add MSI translation tables to iommu for
- software-managed MSI
-To:     Jason Gunthorpe <jgg@nvidia.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>
-CC:     Jason Wang <jasowang@redhat.com>, <joro@8bytes.org>,
-        <will@kernel.org>, <robin.murphy@arm.com>, <iommu@lists.linux.dev>,
-        <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
-        <virtualization@lists.linux-foundation.org>,
-        <netdev@vger.kernel.org>, <wangrong68@huawei.com>,
-        Cindy Lu <lulu@redhat.com>
-References: <20230207120843.1580403-1-sunnanyong@huawei.com>
- <Y+7G+tiBCjKYnxcZ@nvidia.com> <20230217051158-mutt-send-email-mst@kernel.org>
- <Y+92c9us3HVjO2Zq@nvidia.com>
- <CACGkMEsVBhxtpUFs7TrQzAecO8kK_NR+b1EvD2H7MjJ+2aEKJw@mail.gmail.com>
- <20230310034101-mutt-send-email-mst@kernel.org>
- <CACGkMEsr3xSa=1WtU35CepWSJ8CK9g4nGXgmHS_9D09LHi7H8g@mail.gmail.com>
- <20230310045100-mutt-send-email-mst@kernel.org> <ZAskNjP3d9ipki4k@nvidia.com>
-From:   Nanyong Sun <sunnanyong@huawei.com>
-Message-ID: <c6e60ed9-6de2-2f4a-7bd1-52c53ed57a28@huawei.com>
-Date:   Thu, 23 Mar 2023 17:22:36 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.1
+        with ESMTP id S231162AbjCWJdZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Mar 2023 05:33:25 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96B431D93C
+        for <kvm@vger.kernel.org>; Thu, 23 Mar 2023 02:29:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1679563755;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=fH6RVdKUD2qMc5iJ7El8bayWDBifjWMzYWs3C5XGkao=;
+        b=ZAKmfFKNfVMwsJwc8+GOAA/JJP8sHbDGummGxCbREMzmw4iyBo/dD8oOU8zdr82LwDqTXF
+        QJq4ikwjiHVebQ4aW4SaA+AkJHC8NffVzhCrvwB5ZglD0HFVCagfuh3c+LZveKMOs64Ecr
+        gb0cFi95GdreVGubqTOkhhUwv3OoL5o=
+Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
+ [209.85.160.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-616-6UZPuN2OOrm5og-IKsm1IQ-1; Thu, 23 Mar 2023 05:29:14 -0400
+X-MC-Unique: 6UZPuN2OOrm5og-IKsm1IQ-1
+Received: by mail-qt1-f198.google.com with SMTP id r4-20020ac867c4000000b003bfefb6dd58so12574404qtp.2
+        for <kvm@vger.kernel.org>; Thu, 23 Mar 2023 02:29:13 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1679563753;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fH6RVdKUD2qMc5iJ7El8bayWDBifjWMzYWs3C5XGkao=;
+        b=c4TASdtCGswD1wUxhufd0np1DG+JsYwMKNBKes5//lRFKfviB81H5Ww7ToS/2lXFPD
+         AyLTZ/Ujvxwj11y/bNpMANxkLpKmZzVxTJ8sNHGeY3kYDGeHu4i3naa7R9nm0/KZRUgW
+         ES50jPYRPk2H2sYae2VKRUoO+lJvZ3LigsZAT+5tr58jaXfhcW9STsSw77/sZzOE8t3J
+         Ekg4Mm3tBcJ6SMDYVq78af++59edtrXIhUMHykqnEZH55eYkwq0r+smgVhkwNPnNdySV
+         YIAe+vva2tzdWlEmMEVzKvMWSUQxarz/OCShYOjqBLAfHB0OuRAQdhZ1W2ypJcxBxO9A
+         oBAg==
+X-Gm-Message-State: AO0yUKXh+RTLSW3GWhRWNhKxK9URjK+JWuFsuNtnealSJxdE+OPx0+G6
+        xQXnbSlLvRB7Atf4XG2Xi/m79rexrnUQeIGJZpPrY8XnaU/8FXFdMDD/vJT9q8SokNhCOXUZyp+
+        fFNbqpNRmCOCYHpCPfZXz
+X-Received: by 2002:a05:622a:34e:b0:3e1:9557:123c with SMTP id r14-20020a05622a034e00b003e19557123cmr9437367qtw.52.1679563753150;
+        Thu, 23 Mar 2023 02:29:13 -0700 (PDT)
+X-Google-Smtp-Source: AK7set+dTXZSkoRXA666MxWsVBLAIywm8KzMAVacD1thH1ce+YO4OCqSzCTtD2lH0cRCelCFnUU+cQ==
+X-Received: by 2002:a05:622a:34e:b0:3e1:9557:123c with SMTP id r14-20020a05622a034e00b003e19557123cmr9437356qtw.52.1679563752860;
+        Thu, 23 Mar 2023 02:29:12 -0700 (PDT)
+Received: from sgarzare-redhat (host-82-53-134-98.retail.telecomitalia.it. [82.53.134.98])
+        by smtp.gmail.com with ESMTPSA id o10-20020a05620a228a00b007441b675e81sm12893452qkh.22.2023.03.23.02.29.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 23 Mar 2023 02:29:12 -0700 (PDT)
+Date:   Thu, 23 Mar 2023 10:29:05 +0100
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Arseniy Krasnov <avkrasnov@sberdevices.ru>
+Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Bobby Eshleman <bobby.eshleman@bytedance.com>,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kernel@sberdevices.ru, oxffffaa@gmail.com
+Subject: Re: [RFC PATCH v5 2/2] virtio/vsock: check argument to avoid no
+ effect call
+Message-ID: <20230323092905.fpsiiaca2ba2wug3@sgarzare-redhat>
+References: <f0b283a1-cc63-dc3d-cc0c-0da7f684d4d2@sberdevices.ru>
+ <50bb0210-1ed7-42fb-b5f6-8d97247209b5@sberdevices.ru>
 MIME-Version: 1.0
-In-Reply-To: <ZAskNjP3d9ipki4k@nvidia.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.174.179.79]
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- kwepemm600003.china.huawei.com (7.193.23.202)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-2.3 required=5.0 tests=NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <50bb0210-1ed7-42fb-b5f6-8d97247209b5@sberdevices.ru>
+X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -60,58 +85,43 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Wed, Mar 22, 2023 at 09:36:24PM +0300, Arseniy Krasnov wrote:
+>Both of these functions have no effect when input argument is 0, so to
+>avoid useless spinlock access, check argument before it.
+>
+>Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
+>---
+> net/vmw_vsock/virtio_transport_common.c | 6 ++++++
+> 1 file changed, 6 insertions(+)
 
-On 2023/3/10 20:36, Jason Gunthorpe wrote:
-> On Fri, Mar 10, 2023 at 04:53:42AM -0500, Michael S. Tsirkin wrote:
->> On Fri, Mar 10, 2023 at 05:45:46PM +0800, Jason Wang wrote:
->>> On Fri, Mar 10, 2023 at 4:41 PM Michael S. Tsirkin <mst@redhat.com> wrote:
->>>> On Mon, Feb 20, 2023 at 10:37:18AM +0800, Jason Wang wrote:
->>>>> On Fri, Feb 17, 2023 at 8:43 PM Jason Gunthorpe <jgg@nvidia.com> wrote:
->>>>>> On Fri, Feb 17, 2023 at 05:12:29AM -0500, Michael S. Tsirkin wrote:
->>>>>>> On Thu, Feb 16, 2023 at 08:14:50PM -0400, Jason Gunthorpe wrote:
->>>>>>>> On Tue, Feb 07, 2023 at 08:08:43PM +0800, Nanyong Sun wrote:
->>>>>>>>> From: Rong Wang <wangrong68@huawei.com>
->>>>>>>>>
->>>>>>>>> Once enable iommu domain for one device, the MSI
->>>>>>>>> translation tables have to be there for software-managed MSI.
->>>>>>>>> Otherwise, platform with software-managed MSI without an
->>>>>>>>> irq bypass function, can not get a correct memory write event
->>>>>>>>> from pcie, will not get irqs.
->>>>>>>>> The solution is to obtain the MSI phy base address from
->>>>>>>>> iommu reserved region, and set it to iommu MSI cookie,
->>>>>>>>> then translation tables will be created while request irq.
->>>>>>>> Probably not what anyone wants to hear, but I would prefer we not add
->>>>>>>> more uses of this stuff. It looks like we have to get rid of
->>>>>>>> iommu_get_msi_cookie() :\
->>>>>>>>
->>>>>>>> I'd like it if vdpa could move to iommufd not keep copying stuff from
->>>>>>>> it..
->>>>>>> Absolutely but when is that happening?
->>>>>> Don't know, I think it has to come from the VDPA maintainers, Nicolin
->>>>>> made some drafts but wasn't able to get it beyond that.
->>>>> Cindy (cced) will carry on the work.
->>>>>
->>>>> Thanks
->>>> Hmm didn't see anything yet. Nanyong Sun maybe you can take a look?
->>> Just to clarify, Cindy will work on the iommufd conversion for
->>> vhost-vDPA, the changes are non-trivial and may take time. Before we
->>> are able to achieve that,  I think we still need something like this
->>> patch to make vDPA work on software managed MSI platforms.
->>>
->>> Maybe Nanyong can post a new version that addresses the comment so far?
->>>
->>> Thanks
->> Maybe but an ack from iommu maintainers will be needed anyway. Let's see
->> that version, maybe split the export to a patch by itself to make the
->> need for that ack clear.
-> A patch to export that function is alread posted:
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+
 >
-> https://lore.kernel.org/linux-iommu/BN9PR11MB52760E9705F2985EACCD5C4A8CBA9@BN9PR11MB5276.namprd11.prod.outlook.com/T/#u
+>diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+>index 9e87c7d4d7cf..312658c176bd 100644
+>--- a/net/vmw_vsock/virtio_transport_common.c
+>+++ b/net/vmw_vsock/virtio_transport_common.c
+>@@ -302,6 +302,9 @@ u32 virtio_transport_get_credit(struct virtio_vsock_sock *vvs, u32 credit)
+> {
+> 	u32 ret;
 >
-> But I do not want VDPA to mis-use it unless it also implements all the
-> ownership stuff properly.
+>+	if (!credit)
+>+		return 0;
+>+
+> 	spin_lock_bh(&vvs->tx_lock);
+> 	ret = vvs->peer_buf_alloc - (vvs->tx_cnt - vvs->peer_fwd_cnt);
+> 	if (ret > credit)
+>@@ -315,6 +318,9 @@ EXPORT_SYMBOL_GPL(virtio_transport_get_credit);
 >
-> Jason
-> .
-I want to confirm if we need to introduce iommu group logic to vdpa, as 
-"all the ownership stuff" ?
+> void virtio_transport_put_credit(struct virtio_vsock_sock *vvs, u32 credit)
+> {
+>+	if (!credit)
+>+		return;
+>+
+> 	spin_lock_bh(&vvs->tx_lock);
+> 	vvs->tx_cnt -= credit;
+> 	spin_unlock_bh(&vvs->tx_lock);
+>-- 
+>2.25.1
+>
+
