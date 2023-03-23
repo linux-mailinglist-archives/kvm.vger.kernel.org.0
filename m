@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EED836C6BD1
-	for <lists+kvm@lfdr.de>; Thu, 23 Mar 2023 16:02:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 167306C6BD2
+	for <lists+kvm@lfdr.de>; Thu, 23 Mar 2023 16:02:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231905AbjCWPCm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Mar 2023 11:02:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42172 "EHLO
+        id S231946AbjCWPCq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Mar 2023 11:02:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42236 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231841AbjCWPCk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Mar 2023 11:02:40 -0400
-Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6E5C3403F
-        for <kvm@vger.kernel.org>; Thu, 23 Mar 2023 08:01:26 -0700 (PDT)
-Received: by mail-pj1-x102c.google.com with SMTP id fy10-20020a17090b020a00b0023b4bcf0727so2373778pjb.0
-        for <kvm@vger.kernel.org>; Thu, 23 Mar 2023 08:01:26 -0700 (PDT)
+        with ESMTP id S231841AbjCWPCo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Mar 2023 11:02:44 -0400
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2624D28E74
+        for <kvm@vger.kernel.org>; Thu, 23 Mar 2023 08:01:28 -0700 (PDT)
+Received: by mail-pj1-x102b.google.com with SMTP id j3-20020a17090adc8300b0023d09aea4a6so2189363pjv.5
+        for <kvm@vger.kernel.org>; Thu, 23 Mar 2023 08:01:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sifive.com; s=google; t=1679583684;
+        d=sifive.com; s=google; t=1679583687;
         h=references:in-reply-to:message-id:date:subject:cc:to:from:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=BYoTKoh2oaNxCYlsCt/bFwPgHo97od34r6h8Ka1Tses=;
-        b=DqXgOrNCmgxCkO3fN35n3mAne+CXZvia4w/MJIDLeN/j4ng68vuqyGlut4wg/LgD65
-         FMoBupViafdgAxEwWtpxM1jGxDs8Eq5TfJH39bZPjjy4XjPw6oJYMPdWqcNAI+Lr72a+
-         z+vlDU1MLIVbrE25YIrwwYOY4qyhqpSTOjqrvVVUUjpmD5khBvkAhYAEQIq57s9yRQbS
-         96R+DnB4++T9fg/aa+CjPJj+RhwLcORGIxw///qvNgt6pZ/tXodW9FicF4J3RR2Htfhk
-         l+VMx+IsicS05FfKuYe/EDLu6mjD0IsUdCUPUuUOGxXWD0atth/9Uj3ugHrtUxbJOJ1S
-         Ja4g==
+        bh=vtoGGjKeMirMGWzivkA2ddkX532xxY9JlIIZ7C9ExVA=;
+        b=LP/ip08TU4mj5NiGXR+IDitS9xcZ1lrJxRBqmYgILXm/2WMj6AuS7ovyakecDS9cah
+         l0rkl15XxJiJfG1UqvnRw/+BAWAnppVdkzjFU8Zu8FVB+lWTZHWgY6SDKFGSsxUUOOMB
+         0VHGRGiOwcQgNzEJaa9LaNYMT8BxDNaZ9rKXpzIP1asHGkFMWOEAqk8waZgrOnvDa7Sx
+         vkmJVjA/9CRO6gv0aj4oTv6lTWMaE2psbeTBGXEZwk84BAGsOg+MWHoKzwX7aGv+NyAj
+         RM+gRv7r8HOGdqyjLhWxOFhB1OmPgkdg++IDwfqJH9h03f7By9rIQUiCclMhLICHBFiS
+         iAhw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679583684;
+        d=1e100.net; s=20210112; t=1679583687;
         h=references:in-reply-to:message-id:date:subject:cc:to:from
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=BYoTKoh2oaNxCYlsCt/bFwPgHo97od34r6h8Ka1Tses=;
-        b=ttpowa8LpNkIplAb6i/gN2AucTgsrAAnpZoXL91ZrStkGA3O1WMD4TcghSJpmiETjr
-         etjyaXdin3HUQ9cnh00dXzkR7GJdLK1Hcyl8e4mvABHfVzXMnoLBHyWp22H0QjRekjuR
-         l5LFs/jVsGxG8d0YKJ/APMk6us7Bw/l/tUr4QQwmEQA7vmJs6heEaZGBpyM+JrM1C/Bq
-         CyDxbslBvKOEQ9piNH7mBFkevz74oa+sFAko4uWDL/ZYJzQATQK1V7eSlAbzz0o4kSCK
-         dVn/1OzJ/O8NX+GBypPk2bSt9Ut0U9XkQ0NESjOHMslj94PM92wcGdj1VKn7Yg55BvQ5
-         +wQA==
-X-Gm-Message-State: AO0yUKVi5ssW/woIXz1b8v/mSu/xootUmxiOiAAwhfjoUKBcrcDFFeL3
-        HBfj3l0lr6Megf/z60tb+CDL09wpvfFNJC0UvmI=
-X-Google-Smtp-Source: AK7set/RqhPy57RVMl+b0k//9zMeEBHGG9QTpL++qz91v0jRmKZ3Kkxa9Cz2bI1AWk/Tldw55GeoLQ==
-X-Received: by 2002:a17:903:288c:b0:1a1:9842:2020 with SMTP id ku12-20020a170903288c00b001a198422020mr5872275plb.43.1679583684117;
-        Thu, 23 Mar 2023 08:01:24 -0700 (PDT)
+        bh=vtoGGjKeMirMGWzivkA2ddkX532xxY9JlIIZ7C9ExVA=;
+        b=Ykm92MfrKp8dsolHi/4HSzbtgNs9WxidiyMA92dk3gMuexIirAlWxgbRrKtacBO/U/
+         +z8TKHB7gROvaGVvquyLwEm4Al3V4oFr2pOaHgjf7hmxYHov31n/Oos5rowIucH5etm1
+         oQqBMFTrOB6dZam9UG14lqRyYUwnFH7GYIT8QAd6EtqZER1oFM8w9z6618sI+WH+HbMu
+         S2VMPpYcP93bVYtiB0xW532VZEf3JNPDpXeuBXpL6uuiZ8tpOcIwHlq6hldUAwV4xeon
+         H7ovDsXwKc43CHQCMJhelujI+Hlf1PT67XUE1zA88Nmthd09W+Je3YjXY76zg9UWR0Kq
+         qZ1g==
+X-Gm-Message-State: AO0yUKXEvC3B6G5HNMm8GN4VAvGd/tkCzVWSxD5lhJQrhVHGs/LcbcER
+        xjwE4/ncqoBPM2df5psyzTdBxg==
+X-Google-Smtp-Source: AK7set8RGVbK2oSYU+p7FyEM2ztkMqRmYkTbXOwkaqPpCfw5FseydH8YU6eaCSf0Vcc60jPrXr193A==
+X-Received: by 2002:a17:903:2846:b0:19a:a9d8:e48a with SMTP id kq6-20020a170903284600b0019aa9d8e48amr5745288plb.22.1679583687163;
+        Thu, 23 Mar 2023 08:01:27 -0700 (PDT)
 Received: from hsinchu25.internal.sifive.com (59-124-168-89.hinet-ip.hinet.net. [59.124.168.89])
-        by smtp.gmail.com with ESMTPSA id d9-20020a170902854900b0019f53e0f136sm12503965plo.232.2023.03.23.08.01.21
+        by smtp.gmail.com with ESMTPSA id d9-20020a170902854900b0019f53e0f136sm12503965plo.232.2023.03.23.08.01.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Mar 2023 08:01:23 -0700 (PDT)
+        Thu, 23 Mar 2023 08:01:26 -0700 (PDT)
 From:   Andy Chiu <andy.chiu@sifive.com>
 To:     linux-riscv@lists.infradead.org, palmer@dabbelt.com,
         anup@brainfault.org, atishp@atishpatra.org,
@@ -54,13 +54,10 @@ To:     linux-riscv@lists.infradead.org, palmer@dabbelt.com,
 Cc:     vineetg@rivosinc.com, greentime.hu@sifive.com,
         guoren@linux.alibaba.com, Andy Chiu <andy.chiu@sifive.com>,
         Paul Walmsley <paul.walmsley@sifive.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Tom Rix <trix@redhat.com>
-Subject: [PATCH -next v16 19/20] riscv: detect assembler support for .option arch
-Date:   Thu, 23 Mar 2023 14:59:23 +0000
-Message-Id: <20230323145924.4194-20-andy.chiu@sifive.com>
+        Albert Ou <aou@eecs.berkeley.edu>
+Subject: [PATCH -next v16 20/20] riscv: Enable Vector code to be built
+Date:   Thu, 23 Mar 2023 14:59:24 +0000
+Message-Id: <20230323145924.4194-21-andy.chiu@sifive.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20230323145924.4194-1-andy.chiu@sifive.com>
 References: <20230323145924.4194-1-andy.chiu@sifive.com>
@@ -73,50 +70,79 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Some extensions use .option arch directive to selectively enable certain
-extensions in parts of its assembly code. For example, Zbb uses it to
-inform assmebler to emit bit manipulation instructions. However,
-supporting of this directive only exist on GNU assembler and has not
-landed on clang at the moment, making TOOLCHAIN_HAS_ZBB depend on
-AS_IS_GNU.
+From: Guo Ren <guoren@linux.alibaba.com>
 
-While it is still under review at https://reviews.llvm.org/D123515, the
-upcoming Vector patch also requires this feature in assembler. Thus,
-provide Kconfig AS_HAS_OPTION_ARCH to detect such feature. Then
-TOOLCHAIN_HAS_XXX will be turned on automatically when the feature land.
+This patch adds a config which enables vector feature from the kernel
+space.
 
-Suggested-by: Nathan Chancellor <nathan@kernel.org>
+Signed-off-by: Guo Ren <guoren@linux.alibaba.com>
+Co-developed-by: Greentime Hu <greentime.hu@sifive.com>
+Signed-off-by: Greentime Hu <greentime.hu@sifive.com>
+Suggested-by: Vineet Gupta <vineetg@rivosinc.com>
+Suggested-by: Atish Patra <atishp@atishpatra.org>
+Co-developed-by: Andy Chiu <andy.chiu@sifive.com>
 Signed-off-by: Andy Chiu <andy.chiu@sifive.com>
+Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
 ---
- arch/riscv/Kconfig | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+ arch/riscv/Kconfig  | 20 ++++++++++++++++++++
+ arch/riscv/Makefile |  6 +++++-
+ 2 files changed, 25 insertions(+), 1 deletion(-)
 
 diff --git a/arch/riscv/Kconfig b/arch/riscv/Kconfig
-index 36a5b6fed0d3..4f8fd4002f1d 100644
+index 4f8fd4002f1d..0e0377b5319c 100644
 --- a/arch/riscv/Kconfig
 +++ b/arch/riscv/Kconfig
-@@ -244,6 +244,12 @@ config RISCV_DMA_NONCOHERENT
- config AS_HAS_INSN
- 	def_bool $(as-instr,.insn r 51$(comma) 0$(comma) 0$(comma) t0$(comma) t0$(comma) zero)
+@@ -442,6 +442,26 @@ config RISCV_ISA_SVPBMT
  
-+config AS_HAS_OPTION_ARCH
-+	# https://reviews.llvm.org/D123515
-+	def_bool y
-+	depends on $(as-instr, .option arch$(comma) +m)
-+	depends on !$(as-instr, .option arch$(comma) -i)
-+
- source "arch/riscv/Kconfig.socs"
- source "arch/riscv/Kconfig.errata"
+ 	   If you don't know what to do here, say Y.
  
-@@ -442,7 +448,7 @@ config TOOLCHAIN_HAS_ZBB
- 	depends on !64BIT || $(cc-option,-mabi=lp64 -march=rv64ima_zbb)
- 	depends on !32BIT || $(cc-option,-mabi=ilp32 -march=rv32ima_zbb)
- 	depends on LLD_VERSION >= 150000 || LD_VERSION >= 23900
--	depends on AS_IS_GNU
++config TOOLCHAIN_HAS_V
++	bool
++	default y
++	depends on !64BIT || $(cc-option,-mabi=lp64 -march=rv64iv)
++	depends on !32BIT || $(cc-option,-mabi=ilp32 -march=rv32iv)
++	depends on LLD_VERSION >= 140000 || LD_VERSION >= 23800
 +	depends on AS_HAS_OPTION_ARCH
++
++config RISCV_ISA_V
++	bool "VECTOR extension support"
++	depends on TOOLCHAIN_HAS_V
++	depends on FPU
++	select DYNAMIC_SIGFRAME
++	default y
++	help
++	  Say N here if you want to disable all vector related procedure
++	  in the kernel.
++
++	  If you don't know what to do here, say Y.
++
+ config TOOLCHAIN_HAS_ZBB
+ 	bool
+ 	default y
+diff --git a/arch/riscv/Makefile b/arch/riscv/Makefile
+index 6203c3378922..6f32c0ab32e3 100644
+--- a/arch/riscv/Makefile
++++ b/arch/riscv/Makefile
+@@ -56,6 +56,7 @@ riscv-march-$(CONFIG_ARCH_RV32I)	:= rv32ima
+ riscv-march-$(CONFIG_ARCH_RV64I)	:= rv64ima
+ riscv-march-$(CONFIG_FPU)		:= $(riscv-march-y)fd
+ riscv-march-$(CONFIG_RISCV_ISA_C)	:= $(riscv-march-y)c
++riscv-march-$(CONFIG_RISCV_ISA_V)	:= $(riscv-march-y)v
  
- config RISCV_ISA_ZBB
- 	bool "Zbb extension support for bit manipulation instructions"
+ # Newer binutils versions default to ISA spec version 20191213 which moves some
+ # instructions from the I extension to the Zicsr and Zifencei extensions.
+@@ -65,7 +66,10 @@ riscv-march-$(toolchain-need-zicsr-zifencei) := $(riscv-march-y)_zicsr_zifencei
+ # Check if the toolchain supports Zihintpause extension
+ riscv-march-$(CONFIG_TOOLCHAIN_HAS_ZIHINTPAUSE) := $(riscv-march-y)_zihintpause
+ 
+-KBUILD_CFLAGS += -march=$(subst fd,,$(riscv-march-y))
++# Remove F,D,V from isa string for all. Keep extensions between "fd" and "v" by
++# matching non-v and non-multi-letter extensions out with the filter ([^v_]*)
++KBUILD_CFLAGS += -march=$(shell echo $(riscv-march-y) | sed -E 's/(rv32ima|rv64ima)fd([^v_]*)v?/\1\2/')
++
+ KBUILD_AFLAGS += -march=$(riscv-march-y)
+ 
+ KBUILD_CFLAGS += -mno-save-restore
 -- 
 2.17.1
 
