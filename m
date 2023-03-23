@@ -2,72 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E9EAA6C66CB
-	for <lists+kvm@lfdr.de>; Thu, 23 Mar 2023 12:38:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A93746C66B3
+	for <lists+kvm@lfdr.de>; Thu, 23 Mar 2023 12:35:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231405AbjCWLiM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Mar 2023 07:38:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59194 "EHLO
+        id S229917AbjCWLfJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Mar 2023 07:35:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56094 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229518AbjCWLiJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Mar 2023 07:38:09 -0400
-Received: from mx.sberdevices.ru (mx.sberdevices.ru [45.89.227.171])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32D77193F0;
-        Thu, 23 Mar 2023 04:38:04 -0700 (PDT)
-Received: from s-lin-edge02.sberdevices.ru (localhost [127.0.0.1])
-        by mx.sberdevices.ru (Postfix) with ESMTP id 277F75FD0A;
-        Thu, 23 Mar 2023 14:38:02 +0300 (MSK)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
-        s=mail; t=1679571482;
-        bh=7lZi752yaidVYn1I7MsqCySIdC2Vy7xBMR/W3J+6ogU=;
-        h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-        b=c8GcqIsVoN/ou8o+y4TgdM7++0urDlRBiw8kOscr5GSl8eIYcuk5nFyEA9a4uChQ2
-         FV6LBxYoJp0c4J0hBBJgOzc+/rbMpNV+3rrSleFjPtE5BEt6mdctkRspkHXqSPlDqZ
-         0G7gEOqGr/RagIdwUCaKkrforW/YpRAQtE7l+EYmy9y2la1h1SJBzLjn5QoZ41LoAl
-         75VNB+glS1T8kknmxsEJ3uqNb4lgnERFwBH2GjXt25lltEGSm1v63T2JxU9cBWZNPN
-         kPUpn0RQTMjfFb/xSTKLvXiTycNGO6kTgmMeQ3r9W1JWh6WPfQcZDVAzafYjGr6mCv
-         n2xbMCeU/374w==
-Received: from S-MS-EXCH01.sberdevices.ru (S-MS-EXCH01.sberdevices.ru [172.16.1.4])
-        by mx.sberdevices.ru (Postfix) with ESMTP;
-        Thu, 23 Mar 2023 14:37:56 +0300 (MSK)
-Message-ID: <11b36ca2-4f0a-5fe4-bd84-d93eb0fa34c5@sberdevices.ru>
-Date:   Thu, 23 Mar 2023 14:34:44 +0300
+        with ESMTP id S229615AbjCWLfI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Mar 2023 07:35:08 -0400
+Received: from imap5.colo.codethink.co.uk (imap5.colo.codethink.co.uk [78.40.148.171])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 306036A58
+        for <kvm@vger.kernel.org>; Thu, 23 Mar 2023 04:35:07 -0700 (PDT)
+Received: from [78.40.148.178] (helo=webmail.codethink.co.uk)
+        by imap5.colo.codethink.co.uk with esmtpsa  (Exim 4.94.2 #2 (Debian))
+        id 1pfJDV-006ckN-I3; Thu, 23 Mar 2023 11:34:49 +0000
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
-Subject: Re: [RFC PATCH v5 0/2] allocate multiple skbuffs on tx
-Content-Language: en-US
-To:     Stefano Garzarella <sgarzare@redhat.com>
-CC:     Stefan Hajnoczi <stefanha@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Bobby Eshleman <bobby.eshleman@bytedance.com>,
-        <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
-        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <kernel@sberdevices.ru>, <oxffffaa@gmail.com>
-References: <f0b283a1-cc63-dc3d-cc0c-0da7f684d4d2@sberdevices.ru>
- <2e06387d-036b-dde2-5ddc-734c65a2f50d@sberdevices.ru>
- <20230323104800.odrkkiuxi3o2l37q@sgarzare-redhat>
- <15e9ac56-bedc-b444-6d9a-8a1355e32eaf@sberdevices.ru>
- <20230323111110.gb4vlaqaf7icymv3@sgarzare-redhat>
-From:   Arseniy Krasnov <avkrasnov@sberdevices.ru>
-In-Reply-To: <20230323111110.gb4vlaqaf7icymv3@sgarzare-redhat>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [172.16.1.6]
-X-ClientProxiedBy: S-MS-EXCH01.sberdevices.ru (172.16.1.4) To
- S-MS-EXCH01.sberdevices.ru (172.16.1.4)
-X-KSMG-Rule-ID: 4
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Status: not scanned, disabled by settings
-X-KSMG-AntiSpam-Interceptor-Info: not scanned
-X-KSMG-AntiPhishing: not scanned, disabled by settings
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 1.1.2.30, bases: 2023/03/23 09:00:00 #20997914
-X-KSMG-AntiVirus-Status: Clean, skipped
-X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
-        DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS
+Date:   Thu, 23 Mar 2023 11:34:49 +0000
+From:   Lawrence Hunter <lawrence.hunter@codethink.co.uk>
+To:     =?UTF-8?Q?Christoph_M=C3=BCllner?= <christoph.muellner@vrull.eu>
+Cc:     qemu-devel@nongnu.org, dickon.hood@codethink.co.uk,
+        nazar.kazakov@codethink.co.uk, kiran.ostrolenk@codethink.co.uk,
+        frank.chang@sifive.com, palmer@dabbelt.com,
+        alistair.francis@wdc.com, bin.meng@windriver.com,
+        pbonzini@redhat.com, philipp.tomsich@vrull.eu, kvm@vger.kernel.org
+Subject: Re: [PATCH 00/45] Add RISC-V vector cryptographic instruction set
+ support
+In-Reply-To: <CAEg0e7iXkPcqAhZH0xxbMyXVP6hnk5vvtUW52qT_2rFDK3PVcQ@mail.gmail.com>
+References: <20230310091215.931644-1-lawrence.hunter@codethink.co.uk>
+ <CAEg0e7iXkPcqAhZH0xxbMyXVP6hnk5vvtUW52qT_2rFDK3PVcQ@mail.gmail.com>
+Message-ID: <4b21e3316c50763d0fbe273a59bc985c@codethink.co.uk>
+X-Sender: lawrence.hunter@codethink.co.uk
+Content-Type: text/plain; charset=UTF-8;
+ format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-0.0 required=5.0 tests=SPF_HELO_PASS,SPF_PASS
         autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -75,53 +44,113 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 21/03/2023 12:02, Christoph Müllner wrote:
+> On Fri, Mar 10, 2023 at 10:16 AM Lawrence Hunter
+> <lawrence.hunter@codethink.co.uk> wrote:
+>> 
+>> This patchset provides an implementation for Zvkb, Zvkned, Zvknh, 
+>> Zvksh, Zvkg, and Zvksed of the draft RISC-V vector cryptography 
+>> extensions as per the 20230303 version of the specification(1) 
+>> (1fcbb30). Please note that the Zvkt data-independent execution 
+>> latency extension has not been implemented, and we would recommend not 
+>> using these patches in an environment where timing attacks are an 
+>> issue.
+>> 
+>> Work performed by Dickon, Lawrence, Nazar, Kiran, and William from 
+>> Codethink sponsored by SiFive, as well as Max Chou and Frank Chang 
+>> from SiFive.
+>> 
+>> For convenience we have created a git repo with our patches on top of 
+>> a recent master. https://github.com/CodethinkLabs/qemu-ct
+> 
+> I did test and review this patchset.
+> Since most of my comments affect multiple patches I have summarized
+> them here in one email.
+> Observations that only affect a single patch will be sent in response
+> to the corresponding email.
+> 
+> I have tested this series with the OpenSSL PR for Zvk that can be found 
+> here:
+>    https://github.com/openssl/openssl/pull/20149
+> I ran with all Zvk* extensions enabled (using Zvkg for GCM) and with
+> Zvkb only (using Zvkb for GCM).
+> All tests succeed. Note, however, that the test coverage is limited
+> (e.g. no .vv instructions, vstart is always zero).
+> 
+> When sending out a follow-up version (even if it just introduces a 
+> minimal fix),
+> then consider using patchset versioning (e.g. git format-patch -v2 
+> ...).
 
+Ok, will do
 
-On 23.03.2023 14:11, Stefano Garzarella wrote:
-> On Thu, Mar 23, 2023 at 01:53:40PM +0300, Arseniy Krasnov wrote:
->>
->>
->> On 23.03.2023 13:48, Stefano Garzarella wrote:
->>> On Thu, Mar 23, 2023 at 01:01:40PM +0300, Arseniy Krasnov wrote:
->>>> Hello Stefano,
->>>>
->>>> thanks for review!
->>>
->>> You're welcome!
->>>
->>>>
->>>> Since both patches are R-b, i can wait for a few days, then send this
->>>> as 'net-next'?
->>>
->>> Yep, maybe even this series could have been directly without RFC ;-)
->>
->> "directly", You mean 'net' tag? Of just without RFC, like [PATCH v5]. In this case
->> it will be merged to 'net' right?
-> 
-> Sorry for the confusion. I meant without RFC but with net-next.
-> 
-> Being enhancements and not fixes this is definitely net-next material,
-> so even in RFCs you can already use the net-next tag, so the reviewer
-> knows which branch to apply them to. (It's not super important since
-> being RFCs it's expected that it's not complete, but it's definitely an
-> help for the reviewer).
-> 
-> Speaking of the RFC, we usually use it for patches that we don't think
-> are ready to be merged. But when they reach a good state (like this
-> series for example), we can start publishing them already without the
-> RFC tag.
-> 
-> Anyway, if you are not sure, use RFC and then when a maintainer has
-> reviewed them all, surely you can remove the RFC tag.
-> 
-> Hope this helps, at least that's what I usually do, so don't take that
-> as a strict rule ;-)
+> It might be a matter of taste, but I would prefer a series that groups
+> and orders the commits differently:
+>    a) independent changes to the existing code (refactoring only, but
+> no new features) - one commit per topic
+>    b) introduction of new functionality - one commit per extension
+> A series using such a commit granularity and order would be easier to
+> maintain and review (and not result in 45 patches).
+> Also, the refactoring changes could land before Zvk freezes if
+> maintainers decide to do so.
 
-Ah ok, I see now, thanks for details
+Makes sense, will do
 
-Thanks, Arseniy
+> So far all translation files in target/riscv/insn_trans/* contain
+> multiple extensions if they are related.
+> I think we should follow this pattern and use a common trans_zvk.c.inc 
+> file.
 
-> 
-> Thanks,
-> Stefano
-> 
+Agree, will do
+
+> All patches to insn32.decode have comments of the form "RV64 Zvk*
+> vector crypto extension".
+> What is the point of the "RV64"? I would simply remove that.
+
+Ok, will remove it
+
+> All instructions set "env->vstart = 0;" at the end.
+> I don't think that this is correct (the specification does not require 
+> this).
+
+That's from vector spec: "All vector instructions are defined to begin 
+execution with the element number given in the vstart CSR, leaving 
+earlier elements in the destination vector undisturbed, and to reset the 
+vstart CSR to zero at the end of execution." - from "3.7. Vector Start 
+Index CSR vstart"
+
+> The tests of the reserved encodings are not consistent:
+> * Zvknh does a dynamic test (query tcg_gen_*())
+> * Zvkned does a dynamic test (tcg_gen_*())
+> * Zvkg does not test for (vl%EGS == 0)
+
+Zvkg also does dynamic test, by calling macros GEN_V_UNMASKED_TRANS and 
+GEN_VV_UNMASKED_TRANS
+
+> The vl CSR can only be updated by the vset{i}vl{i} instructions.
+> The same applies to the vstart CSR and the vtype CSR that holds vsew,
+> vlmul and other fields.
+> The current code tests the VSTART/SEW value using "s->vstart % 4 ==
+> 0"/"s->sew == MO_32".
+> Why is it not possible to do the same with VL, i.e. "s->vl % 4 == 0"
+> (after adding it to DisasContext)?
+
+vl can also be updated by another instruction - from vector spec "3.5. 
+Vector Length Register vl" - "The XLEN-bit-wide read-only vl CSR can 
+only be updated by the vset{i}vl{i} instructions, and the 
+fault-only-first vector load instruction variants." So just because of 
+that fault-only-first instruction we need dynamic checks.
+
+vstart is just another CSR -- software can write to it, but probably 
+shouldn't.  Whether that's ever going to be useful outside testing ISA 
+conformance tests or not I don't know, but it's clearly read-write (also 
+section 3.7).
+
+> Also, I would introduce named constants or macros for the EGS values
+> to avoid magic constants in the code
+> (some extensions do that - e.g. ZVKSED_EGS).
+
+Makes sense, will do
+
+Best,
+Lawrence
