@@ -2,129 +2,142 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 340ED6C6577
-	for <lists+kvm@lfdr.de>; Thu, 23 Mar 2023 11:43:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 571996C6591
+	for <lists+kvm@lfdr.de>; Thu, 23 Mar 2023 11:47:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231397AbjCWKn4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Mar 2023 06:43:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45630 "EHLO
+        id S231596AbjCWKrn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Mar 2023 06:47:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55478 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231201AbjCWKn1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Mar 2023 06:43:27 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2C0159F4
-        for <kvm@vger.kernel.org>; Thu, 23 Mar 2023 03:40:28 -0700 (PDT)
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 32N9oNnS026483
-        for <kvm@vger.kernel.org>; Thu, 23 Mar 2023 10:40:26 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=BqwhAQtD8u7fdukYUz6qnkSPf+czkiCxB6OsRDwqtkU=;
- b=PoGNp9g/d/JMzGRMvFH7Yjr6K75/lhWLEyd/y1tUyoaunxat8v1mLpyeN8YKtkNzg70x
- F6H1ffcZBASO/9RPvHL8CBMUvYSA6skEeRmOKrUVuLeuEHuMYnOPfLnGgKLvaOgHuYGT
- dhCeMhdzrJR/lj7Eql5whD2ve/3FzJKIVZuFBDDSdbWS7eLzIk1k3lg2il3ezkiRFvUV
- LbnsxKWFgHCSUE3zXAyGHqsCpnCmpMN3AsEpFfC7xTxOEqmNRuHtEXLAy90wf6SqxPWn
- OrJr2k5zEM+Q89O3hMjrjChb3QNhpvfoZPjSlXfgmlwp9cIYBmv3zLkkrB88Z7GBQeKy gg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pgmg6h60t-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Thu, 23 Mar 2023 10:40:26 +0000
-Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 32NAQN9q009490
-        for <kvm@vger.kernel.org>; Thu, 23 Mar 2023 10:40:26 GMT
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pgmg6h60e-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 23 Mar 2023 10:40:26 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 32N8aKEl015024;
-        Thu, 23 Mar 2023 10:40:24 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-        by ppma06ams.nl.ibm.com (PPS) with ESMTPS id 3pd4jff7nn-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 23 Mar 2023 10:40:24 +0000
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-        by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 32NAeKpI14680784
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 23 Mar 2023 10:40:20 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 93CA72004B;
-        Thu, 23 Mar 2023 10:40:20 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id F05C720043;
-        Thu, 23 Mar 2023 10:40:19 +0000 (GMT)
-Received: from linux6.. (unknown [9.114.12.104])
-        by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Thu, 23 Mar 2023 10:40:19 +0000 (GMT)
-From:   Janosch Frank <frankja@linux.ibm.com>
-To:     kvm@vger.kernel.org, nrb@linux.ibm.com
-Cc:     thuth@redhat.com, imbrenda@linux.ibm.com
-Subject: [kvm-unit-tests PATCH 8/8] s390x: uv-host: Fence access checks when UV debug is enabled
-Date:   Thu, 23 Mar 2023 10:39:13 +0000
-Message-Id: <20230323103913.40720-9-frankja@linux.ibm.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230323103913.40720-1-frankja@linux.ibm.com>
-References: <20230323103913.40720-1-frankja@linux.ibm.com>
+        with ESMTP id S231591AbjCWKr0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Mar 2023 06:47:26 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70E2522A2C
+        for <kvm@vger.kernel.org>; Thu, 23 Mar 2023 03:44:58 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id E666D625A8
+        for <kvm@vger.kernel.org>; Thu, 23 Mar 2023 10:44:57 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D4336C433EF;
+        Thu, 23 Mar 2023 10:44:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1679568297;
+        bh=FC284fe1reOFExtyK7FiUWEHEjvzt4Zx9HsDnW61qPk=;
+        h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+        b=fKuzo6CpZnPgIL5G4ThNKt9biwu09hhGZp2K8qRTYo5cUktc74MPnFoIRBIG0WPq6
+         SJ9swzV0Xhz7ltvvtqcZxKP+XssAUUwSpASyWyqn7J0/vsoW9jLNv4GY0/RTsICUYJ
+         a5Va/67NYD9t6RiaxopNusxwus9WOXcRNHECher7PICjw3F5vOCZW2l6ThCbkUZGyE
+         XYL6VgRqPkUbPX/xfOcZJ3WCuo3I0SC7hVHReqHS5dz+T0/+s1r5UtiQ7FZn+fQM/Q
+         h5lkhQgN7ULebrzVUoyo1fwWMuVZx43j0fF4+eME60RUR3xQV4KQ3nT7zym8B0X3l8
+         PMPgHIex2tLKA==
+From:   =?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>
+To:     Andy Chiu <andy.chiu@sifive.com>, linux-riscv@lists.infradead.org,
+        palmer@dabbelt.com, anup@brainfault.org, atishp@atishpatra.org,
+        kvm-riscv@lists.infradead.org, kvm@vger.kernel.org
+Cc:     vineetg@rivosinc.com, greentime.hu@sifive.com,
+        guoren@linux.alibaba.com, Andy Chiu <andy.chiu@sifive.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Tom Rix <trix@redhat.com>
+Subject: Re: [PATCH -next v15 00/19] riscv: Add vector ISA support
+In-Reply-To: <20230317113538.10878-1-andy.chiu@sifive.com>
+References: <20230317113538.10878-1-andy.chiu@sifive.com>
+Date:   Thu, 23 Mar 2023 11:44:54 +0100
+Message-ID: <874jqb4uhl.fsf@all.your.base.are.belong.to.us>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: p42JaA6WmrbTAh0ZXzswzka31cdgrIt5
-X-Proofpoint-ORIG-GUID: ob3tDpE3qk5yePHQLBWRboOzI322ASdZ
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
- definitions=2023-03-22_21,2023-03-22_01,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 mlxlogscore=999 adultscore=0 suspectscore=0
- lowpriorityscore=0 impostorscore=0 mlxscore=0 spamscore=0 phishscore=0
- bulkscore=0 clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2303150002 definitions=main-2303230080
-X-Spam-Status: No, score=-0.1 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
-        DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-        autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-5.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,SPF_HELO_NONE,
+        SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The debug print directly accesses the UV header which will result in a
-second accesses exception which will abort the test. Let's fence the
-access tests instead.
+Andy Chiu <andy.chiu@sifive.com> writes:
 
-Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
----
- s390x/uv-host.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+> This patchset is implemented based on vector 1.0 spec to add vector suppo=
+rt
+> in riscv Linux kernel. There are some assumptions for this implementation=
+s.
+>
+> 1. We assume all harts has the same ISA in the system.
+> 2. We disable vector in both kernel andy user space [1] by default. Only
+>    enable an user's vector after an illegal instruction trap where it
+>    actually starts executing vector (the first-use trap [2]).
+> 3. We detect "riscv,isa" to determine whether vector is support or not.
+>
+> We defined a new structure __riscv_v_ext_state in struct thread_struct to
+> save/restore the vector related registers. It is used for both kernel spa=
+ce
+> and user space.
+>  - In kernel space, the datap pointer in __riscv_v_ext_state will be
+>    allocated to save vector registers.
+>  - In user space,
+> 	- In signal handler of user space, the structure is placed
+> 	  right after __riscv_ctx_hdr, which is embedded in fp reserved
+> 	  aera. This is required to avoid ABI break [2]. And datap points
+> 	  to the end of __riscv_v_ext_state.
+> 	- In ptrace, the data will be put in ubuf in which we use
+> 	  riscv_vr_get()/riscv_vr_set() to get or set the
+> 	  __riscv_v_ext_state data structure from/to it, datap pointer
+> 	  would be zeroed and vector registers will be copied to the
+> 	  address right after the __riscv_v_ext_state structure in ubuf.
+>
+> This patchset is rebased to v6.3-rc1 and it is tested by running several
+> vector programs simultaneously. It delivers signals correctly in a test
+> where we can see a valid ucontext_t in a signal handler, and a correct V
+> context returing back from it. And the ptrace interface is tested by
+> PTRACE_{GET,SET}REGSET. Lastly, KVM is tested by running above tests in
+> a guest using the same kernel image. All tests are done on an rv64gcv
+> virt QEMU.
+>
+> Note: please apply the patch at [4] due to a regression introduced by
+> commit 596ff4a09b89 ("cpumask: re-introduce constant-sized cpumask
+> optimizations") before testing the series.
+>
+> Specail thanks to Conor and Vineet for kindly giving help on- and off-lis=
+t.
+>
+> Source tree:
+> https://github.com/sifive/riscv-linux/tree/riscv/for-next/vector-v15
+>
+> Links:
+>  - [1] https://lore.kernel.org/all/20220921214439.1491510-17-stillson@riv=
+osinc.com/
+>  - [2] https://lore.kernel.org/all/73c0124c-4794-6e40-460c-b26df407f322@r=
+ivosinc.com/T/#u
+>  - [3] https://lore.kernel.org/all/20230128082847.3055316-1-apatel@ventan=
+amicro.com/
+>  - [4] https://lore.kernel.org/all/CAHk-=3DwiAxtKyxs6BPEzirrXw1kXJ-7ZyGpg=
+OrbzhmC=3Dud-6jBA@mail.gmail.com/
+> ---
+> Changelog V15
+>  - Rebase to risc-v -next (v6.3-rc1)
+>  - Make V depend on FD in Kconfig according to the spec and shut off v
+>    properly.
+>  - Fix a syntax error for clang build. But mark RISCV_ISA_V GAS only due
+>    to https://reviews.llvm.org/D123515
+>  - Use scratch reg in inline asm instead of t4.
+>  - Refine code.
+>  - Cleanup per-patch changelogs.
 
-diff --git a/s390x/uv-host.c b/s390x/uv-host.c
-index b23d51c9..1f73034f 100644
---- a/s390x/uv-host.c
-+++ b/s390x/uv-host.c
-@@ -164,6 +164,15 @@ static void test_access(void)
- 
- 	report_prefix_push("access");
- 
-+	/*
-+	 * If debug is enabled info from the uv header is printed
-+	 * which would lead to a second exception and a test abort.
-+	 */
-+	if (UVC_ERR_DEBUG) {
-+		report_skip("Debug doesn't work with access tests");
-+		goto out;
-+	}
-+
- 	report_prefix_push("non-crossing");
- 	protect_page(uvcb, PAGE_ENTRY_I);
- 	for (i = 0; cmds[i].name; i++) {
-@@ -196,6 +205,7 @@ static void test_access(void)
- 	uvcb += 1;
- 	unprotect_page(uvcb, PAGE_ENTRY_I);
- 
-+out:
- 	free_pages(pages);
- 	report_prefix_pop();
- }
--- 
-2.34.1
+Andy, I think the series is in a good shape! Thanks for the hard work!
 
+To summarize; AFAIU the outstanding issues are:
+
+ * sparse, patch 13
+ * Anup's KVM comments, patch 18
+ * Nathan's suggestion, patch 19
+
+Anything else? If not, it would be amazing for a quick v16 turnaround,
+addressing the points above. Hopefully the next version can land in the
+upcoming release.
+
+
+Bj=C3=B6rn
