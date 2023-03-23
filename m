@@ -2,37 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B7D1F6C5BCB
-	for <lists+kvm@lfdr.de>; Thu, 23 Mar 2023 02:22:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5A4526C5BDC
+	for <lists+kvm@lfdr.de>; Thu, 23 Mar 2023 02:28:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229885AbjCWBW3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Mar 2023 21:22:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42486 "EHLO
+        id S229976AbjCWB2D (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Mar 2023 21:28:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48620 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229480AbjCWBW2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Mar 2023 21:22:28 -0400
-Received: from out30-100.freemail.mail.aliyun.com (out30-100.freemail.mail.aliyun.com [115.124.30.100])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FACB2ED62;
-        Wed, 22 Mar 2023 18:22:26 -0700 (PDT)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R181e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046049;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=11;SR=0;TI=SMTPD_---0VeS87rx_1679534542;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0VeS87rx_1679534542)
-          by smtp.aliyun-inc.com;
-          Thu, 23 Mar 2023 09:22:22 +0800
-Message-ID: <1679534465.5760474-1-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH v4] virtio: add VIRTIO_F_NOTIFICATION_DATA feature support
-Date:   Thu, 23 Mar 2023 09:21:05 +0800
-From:   Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To:     Viktor Prutyanov <viktor@daynix.com>
-Cc:     cohuck@redhat.com, pasic@linux.ibm.com, farman@linux.ibm.com,
-        linux-s390@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        linux-kernel@vger.kernel.org, yan@daynix.com, viktor@daynix.com,
-        mst@redhat.com, jasowang@redhat.com
-References: <20230322141031.2211141-1-viktor@daynix.com>
-In-Reply-To: <20230322141031.2211141-1-viktor@daynix.com>
-X-Spam-Status: No, score=-8.0 required=5.0 tests=ENV_AND_HDR_SPF_MATCH,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-        UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL autolearn=unavailable
+        with ESMTP id S229436AbjCWB2B (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Mar 2023 21:28:01 -0400
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2052.outbound.protection.outlook.com [40.107.244.52])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7EE681B5;
+        Wed, 22 Mar 2023 18:27:59 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Dx8Z0uObm40mi3yuk8K1nHaWFE2bo2nQI5GSk0uc7gLBY4D3afw91ZeTr73O2YUoTlib3SbvfirkMfuwrjn3zCAXunElunospOORb46L3KShcdDU1hoUdTfoA7SoH8PVYZsNak4XvmFyAvKN+HGSBQeizWRZ7C4NHUrHOnEOCppMwEJg9yxq/s6l8d6bD0znNPajX/LAj6vzlczZlJPwW8ybfXgDD9tGX9M605RACOCd7vYfbErkd8nByyH+HrNFXVZ2z4HXgLJPYNdpHzowkH+85+e55xFeOL1Gb7r6qqCgUO/VsDUd+voJ2CS+Z33H/wjHGLRGUFJS2AFuEgYiiQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Jx0LCcrl0zhtbGtyYthgXkwmDL7Ey5uollXMP76ypVQ=;
+ b=ISOIssF6qWEsvwMPt/nal2OHvseWPNezvQtyMejinG5aaRCluWoImar2FvQIqAI+bXPMpMkuY0WrMNB4R1WOPON7/VNBcek6m9WZtkqTzMyi6aJFa6yBnY59ZiP4EgBWHg4HlwY8ZN90S8w6BAJgooAOJnmfzA+Hn43+45kb+gr1NlivK+1nac0x62efuTA9788tPeUtAUdOWX3mIvSifpY0t3FZfJCqxAxfRodxzZviByTiPVa6npOqMW0gWXzvzi3xCd6AeLBlFbHzIedkl4/ocI70oMGPslUEdMxrOvWeJazHBK8KlCXfuqFsclfnEQCDm3Y4AEguQwMaMT79eQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=linux.intel.com smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Jx0LCcrl0zhtbGtyYthgXkwmDL7Ey5uollXMP76ypVQ=;
+ b=pa8dn0jsDfbm9tpQREmymVcwoTNcI8YYC4qm+zy6vCpsBTijJ2acWva7hbfqpzyj6UTahvanAgSa2CHY3wwK37dileayrx4aA6acoMg77L5JfHC28kOy7W8faj9w6px/kdwVRHV7sUM6YmQQAQrXQplja+0/LGlE/X/iWN7FUlM=
+Received: from MN2PR15CA0059.namprd15.prod.outlook.com (2603:10b6:208:237::28)
+ by SA0PR12MB4463.namprd12.prod.outlook.com (2603:10b6:806:92::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6178.38; Thu, 23 Mar
+ 2023 01:27:56 +0000
+Received: from BL02EPF0000EE3C.namprd05.prod.outlook.com
+ (2603:10b6:208:237:cafe::f1) by MN2PR15CA0059.outlook.office365.com
+ (2603:10b6:208:237::28) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6178.37 via Frontend
+ Transport; Thu, 23 Mar 2023 01:27:56 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ BL02EPF0000EE3C.mail.protection.outlook.com (10.167.241.132) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.6178.30 via Frontend Transport; Thu, 23 Mar 2023 01:27:54 +0000
+Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Wed, 22 Mar
+ 2023 20:27:54 -0500
+Date:   Wed, 22 Mar 2023 20:27:37 -0500
+From:   Michael Roth <michael.roth@amd.com>
+To:     Chao Peng <chao.p.peng@linux.intel.com>
+CC:     Sean Christopherson <seanjc@google.com>,
+        Isaku Yamahata <isaku.yamahata@gmail.com>,
+        <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-mm@kvack.org>, <linux-fsdevel@vger.kernel.org>,
+        <linux-arch@vger.kernel.org>, <linux-api@vger.kernel.org>,
+        <linux-doc@vger.kernel.org>, <qemu-devel@nongnu.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Naoya Horiguchi <naoya.horiguchi@nec.com>,
+        Miaohe Lin <linmiaohe@huawei.com>, <x86@kernel.org>,
+        "H . Peter Anvin" <hpa@zytor.com>, Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        <luto@kernel.org>, <jun.nakajima@intel.com>,
+        <dave.hansen@intel.com>, <ak@linux.intel.com>, <david@redhat.com>,
+        <aarcange@redhat.com>, <ddutile@redhat.com>, <dhildenb@redhat.com>,
+        Quentin Perret <qperret@google.com>, <tabba@google.com>,
+        <mhocko@suse.com>, <wei.w.wang@intel.com>
+Subject: Re: [PATCH v10 0/9] KVM: mm: fd-based approach for supporting KVM
+Message-ID: <20230323012737.7vn4ynsbfz7c2ch4@amd.com>
+References: <20221202061347.1070246-1-chao.p.peng@linux.intel.com>
+ <Y8H5Z3e4hZkFxAVS@google.com>
+ <20230119111308.GC2976263@ls.amr.corp.intel.com>
+ <Y8lg1G2lRIrI/hld@google.com>
+ <20230119223704.GD2976263@ls.amr.corp.intel.com>
+ <Y880FiYF7YCtsw/i@google.com>
+ <20230213130102.two7q3kkcf254uof@amd.com>
+ <20230221121135.GA1595130@chaop.bj.intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20230221121135.GA1595130@chaop.bj.intel.com>
+X-Originating-IP: [10.180.168.240]
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL02EPF0000EE3C:EE_|SA0PR12MB4463:EE_
+X-MS-Office365-Filtering-Correlation-Id: 62866689-2cda-4b67-8414-08db2b3dd3c3
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: LMAXdBDFqtDpIFu82ZPHqUkd4fl7aS4dBZQjtL/hw6oW3BaJcSWalbXjEJJre0jRwXcOI4cEd45XlDjpTRAmX8qhXYZPMNxe1HUUn5LIUd/9cBFCz0Anc2TR+O6K26xEpy6AT94syR4zQpvxoFzLtmMwCy97e/zAyKPX8YTr9e4H25rwOzwIjAxZqCLSXMVEDbBz/RacrPMbvcem2DvkzBuo8ETuOEOxBfY6y6eh3Lz5EiFEBoBJ6wycIxHp9b9D9xrrshnOYs+4AhzvylzKLo/zwLrC6dlONWVizJFEGGLE6vlm1X68vEgi6xxwEc/f3GUx3MoBQgfh3JsQO5Ft1EUJwb/YfZE8axCmfItrOh6gddG+qinxFRDnTHfh9TWdHa1ue5C2l7/RbEKsaEV7M3qyWEwqmcKk7hgvq9znDIUvASCcqaxUqpi2SGkqDVYYaSlzCFS9C988vxI8bXnFTDnL+i3zjncqom92OuZRI0yKv4zhC1620iEGMLDpDVGW+oPMjJdyFoYYlEoax8ikci6WaFwcgkY3anGH2IbP5BWQMLpnKTNzSXvaH1l0H4yZtsvko6h7CYqPlOyg7vVc0eRWUAGfjMXP9g4RD1PAtQzuV4myf4A2SFd9zPoAiHiuExt+HM739KerY92e5IZFRd5uOQfzz4oYyFvdq8I56vDyRjsn6DrvEYY3XuZ7FSOnS3MwjCMj313DmL8+3cNMTi9/Y3dRSk3YO2Ff+9dlVuM=
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230025)(4636009)(39860400002)(396003)(376002)(136003)(346002)(451199018)(46966006)(36840700001)(40470700004)(1076003)(26005)(82310400005)(336012)(6666004)(36756003)(426003)(47076005)(40460700003)(16526019)(186003)(40480700001)(316002)(81166007)(2906002)(356005)(54906003)(41300700001)(36860700001)(8936002)(8676002)(4326008)(6916009)(70586007)(70206006)(2616005)(44832011)(82740400003)(7416002)(7406005)(5660300002)(83380400001)(966005)(86362001)(478600001)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Mar 2023 01:27:54.7925
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 62866689-2cda-4b67-8414-08db2b3dd3c3
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource: BL02EPF0000EE3C.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4463
+X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
+        DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -40,243 +135,125 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 22 Mar 2023 17:10:31 +0300, Viktor Prutyanov <viktor@daynix.com> wrote:
-> According to VirtIO spec v1.2, VIRTIO_F_NOTIFICATION_DATA feature
-> indicates that the driver passes extra data along with the queue
-> notifications.
->
-> In a split queue case, the extra data is 16-bit available index. In a
-> packed queue case, the extra data is 1-bit wrap counter and 15-bit
-> available index.
->
-> Add support for this feature for MMIO, channel I/O and modern PCI
-> transports.
->
-> Signed-off-by: Viktor Prutyanov <viktor@daynix.com>
-> ---
->  v4: remove VP_NOTIFY macro and legacy PCI support, add
->     virtio_ccw_kvm_notify_with_data to virtio_ccw
->  v3: support feature in virtio_ccw, remove VM_NOTIFY, use avail_idx_shadow,
->     remove byte swap, rename to vring_notification_data
->  v2: reject the feature in virtio_ccw, replace __le32 with u32
->
->  Tested with disabled VIRTIO_F_NOTIFICATION_DATA on qemu-system-s390x
->  (virtio-blk-ccw), qemu-system-riscv64 (virtio-blk-device,
->  virtio-rng-device), qemu-system-x86_64 (virtio-blk-pci, virtio-net-pci)
->  to make sure nothing is broken.
->  Tested with enabled VIRTIO_F_NOTIFICATION_DATA on 64-bit RISC-V Linux
->  and my hardware implementation of virtio-rng.
->
->  drivers/s390/virtio/virtio_ccw.c   | 19 ++++++++++++++++---
->  drivers/virtio/virtio_mmio.c       | 14 +++++++++++++-
->  drivers/virtio/virtio_pci_modern.c | 13 ++++++++++++-
->  drivers/virtio/virtio_ring.c       | 17 +++++++++++++++++
->  include/linux/virtio_ring.h        |  2 ++
->  include/uapi/linux/virtio_config.h |  6 ++++++
->  6 files changed, 66 insertions(+), 5 deletions(-)
->
-> diff --git a/drivers/s390/virtio/virtio_ccw.c b/drivers/s390/virtio/virtio_ccw.c
-> index 954fc31b4bc7..3619676effb8 100644
-> --- a/drivers/s390/virtio/virtio_ccw.c
-> +++ b/drivers/s390/virtio/virtio_ccw.c
-> @@ -391,7 +391,7 @@ static void virtio_ccw_drop_indicator(struct virtio_ccw_device *vcdev,
->  	ccw_device_dma_free(vcdev->cdev, thinint_area, sizeof(*thinint_area));
->  }
->
-> -static bool virtio_ccw_kvm_notify(struct virtqueue *vq)
-> +static inline bool virtio_ccw_do_kvm_notify(struct virtqueue *vq, u32 data)
->  {
->  	struct virtio_ccw_vq_info *info = vq->priv;
->  	struct virtio_ccw_device *vcdev;
-> @@ -402,12 +402,22 @@ static bool virtio_ccw_kvm_notify(struct virtqueue *vq)
->  	BUILD_BUG_ON(sizeof(struct subchannel_id) != sizeof(unsigned int));
->  	info->cookie = kvm_hypercall3(KVM_S390_VIRTIO_CCW_NOTIFY,
->  				      *((unsigned int *)&schid),
-> -				      vq->index, info->cookie);
-> +				      data, info->cookie);
->  	if (info->cookie < 0)
->  		return false;
->  	return true;
->  }
->
-> +static bool virtio_ccw_kvm_notify(struct virtqueue *vq)
-> +{
-> +	return virtio_ccw_do_kvm_notify(vq, vq->index);
-> +}
-> +
-> +static bool virtio_ccw_kvm_notify_with_data(struct virtqueue *vq)
-> +{
-> +	return virtio_ccw_do_kvm_notify(vq, vring_notification_data(vq));
-> +}
-> +
->  static int virtio_ccw_read_vq_conf(struct virtio_ccw_device *vcdev,
->  				   struct ccw1 *ccw, int index)
->  {
-> @@ -501,6 +511,9 @@ static struct virtqueue *virtio_ccw_setup_vq(struct virtio_device *vdev,
->  	u64 queue;
->  	unsigned long flags;
->  	bool may_reduce;
-> +	bool (*notify)(struct virtqueue *vq) = __virtio_test_bit(vdev,
-> +		VIRTIO_F_NOTIFICATION_DATA) ?
-> +		virtio_ccw_kvm_notify_with_data : virtio_ccw_kvm_notify;
->
->  	/* Allocate queue. */
->  	info = kzalloc(sizeof(struct virtio_ccw_vq_info), GFP_KERNEL);
-> @@ -524,7 +537,7 @@ static struct virtqueue *virtio_ccw_setup_vq(struct virtio_device *vdev,
->  	may_reduce = vcdev->revision > 0;
->  	vq = vring_create_virtqueue(i, info->num, KVM_VIRTIO_CCW_RING_ALIGN,
->  				    vdev, true, may_reduce, ctx,
-> -				    virtio_ccw_kvm_notify, callback, name);
-> +				    notify, callback, name);
->
->  	if (!vq) {
->  		/* For now, we fail if we can't get the requested size. */
-> diff --git a/drivers/virtio/virtio_mmio.c b/drivers/virtio/virtio_mmio.c
-> index 3ff746e3f24a..7c16e622c33d 100644
-> --- a/drivers/virtio/virtio_mmio.c
-> +++ b/drivers/virtio/virtio_mmio.cv
-> @@ -285,6 +285,16 @@ static bool vm_notify(struct virtqueue *vq)
->  	return true;
->  }
->
-> +static bool vm_notify_with_data(struct virtqueue *vq)
-> +{
-> +	struct virtio_mmio_device *vm_dev = to_virtio_mmio_device(vq->vdev);
-> +	u32 data = vring_notification_data(vq);
-> +
-> +	writel(data, vm_dev->base + VIRTIO_MMIO_QUEUE_NOTIFY);
-> +
-> +	return true;
-> +}
-> +
->  /* Notify all virtqueues on an interrupt. */
->  static irqreturn_t vm_interrupt(int irq, void *opaque)
->  {
-> @@ -368,6 +378,8 @@ static struct virtqueue *vm_setup_vq(struct virtio_device *vdev, unsigned int in
->  	unsigned long flags;
->  	unsigned int num;
->  	int err;
-> +	bool (*notify)(struct virtqueue *vq) = __virtio_test_bit(vdev,
-> +		VIRTIO_F_NOTIFICATION_DATA) ? vm_notify_with_data : vm_notify;
+On Tue, Feb 21, 2023 at 08:11:35PM +0800, Chao Peng wrote:
+> > Hi Sean,
+> > 
+> > We've rebased the SEV+SNP support onto your updated UPM base support
+> > tree and things seem to be working okay, but we needed some fixups on
+> > top of the base support get things working, along with 1 workaround
+> > for an issue that hasn't been root-caused yet:
+> > 
+> >   https://github.com/mdroth/linux/commits/upmv10b-host-snp-v8-wip
+> > 
+> >   *stash (upm_base_support): mm: restrictedmem: Kirill's pinning implementation
+> >   *workaround (use_base_support): mm: restrictedmem: loosen exclusivity check
+> 
+> What I'm seeing is Slot#3 gets added first and then deleted. When it's
+> gets added, Slot#0 already has the same range bound to restrictedmem so
+> trigger the exclusive check. This check is exactly the current code for.
 
+With the following change in QEMU, we no longer trigger this check:
 
-Can we optimize this line?
+  diff --git a/hw/pci-host/q35.c b/hw/pci-host/q35.c
+  index 20da121374..849b5de469 100644
+  --- a/hw/pci-host/q35.c
+  +++ b/hw/pci-host/q35.c
+  @@ -588,9 +588,9 @@ static void mch_realize(PCIDevice *d, Error **errp)
+       memory_region_init_alias(&mch->open_high_smram, OBJECT(mch), "smram-open-high",
+                                mch->ram_memory, MCH_HOST_BRIDGE_SMRAM_C_BASE,
+                                MCH_HOST_BRIDGE_SMRAM_C_SIZE);
+  +    memory_region_set_enabled(&mch->open_high_smram, false);
+       memory_region_add_subregion_overlap(mch->system_memory, 0xfeda0000,
+                                           &mch->open_high_smram, 1);
+  -    memory_region_set_enabled(&mch->open_high_smram, false);
 
-Thanks.
+I'm not sure if QEMU is actually doing something wrong here though or if
+this check is putting tighter restrictions on userspace than what was
+expected before. Will look into it more.
 
->
->  	if (!name)
->  		return NULL;
-> @@ -397,7 +409,7 @@ static struct virtqueue *vm_setup_vq(struct virtio_device *vdev, unsigned int in
->
->  	/* Create the vring */
->  	vq = vring_create_virtqueue(index, num, VIRTIO_MMIO_VRING_ALIGN, vdev,
-> -				 true, true, ctx, vm_notify, callback, name);
-> +				 true, true, ctx, notify, callback, name);
->  	if (!vq) {
->  		err = -ENOMEM;
->  		goto error_new_virtqueue;
-> diff --git a/drivers/virtio/virtio_pci_modern.c b/drivers/virtio/virtio_pci_modern.c
-> index 9e496e288cfa..9cc56f463dba 100644
-> --- a/drivers/virtio/virtio_pci_modern.c
-> +++ b/drivers/virtio/virtio_pci_modern.c
-> @@ -288,6 +288,15 @@ static u16 vp_config_vector(struct virtio_pci_device *vp_dev, u16 vector)
->  	return vp_modern_config_vector(&vp_dev->mdev, vector);
+> 
+> >   *fixup (upm_base_support): KVM: use inclusive ranges for restrictedmem binding/unbinding
+> >   *fixup (upm_base_support): mm: restrictedmem: use inclusive ranges for issuing invalidations
+> 
+> As many kernel APIs treat 'end' as exclusive, I would rather keep using
+> exclusive 'end' for these APIs(restrictedmem_bind/restrictedmem_unbind
+> and notifier callbacks) but fix it internally in the restrictedmem. E.g.
+> all the places where xarray API needs a 'last'/'max' we use 'end - 1'.
+> See below for the change.
+
+Yes I did feel like I was fighting the kernel a bit on that; your
+suggestion seems like it would be a better fit.
+
+> 
+> >   *fixup (upm_base_support): KVM: fix restrictedmem GFN range calculations
+> 
+> Subtracting slot->restrictedmem.index for start/end in
+> restrictedmem_get_gfn_range() is the correct fix.
+> 
+> >   *fixup (upm_base_support): KVM: selftests: CoCo compilation fixes
+> > 
+> > We plan to post an updated RFC for v8 soon, but also wanted to share
+> > the staging tree in case you end up looking at the UPM integration aspects
+> > before then.
+> > 
+> > -Mike
+> 
+> This is the restrictedmem fix to solve 'end' being stored and checked in xarray:
+
+Looks good.
+
+Thanks!
+
+-Mike
+
+> 
+> --- a/mm/restrictedmem.c
+> +++ b/mm/restrictedmem.c
+> @@ -46,12 +46,12 @@ static long restrictedmem_punch_hole(struct restrictedmem *rm, int mode,
+>          */
+>         down_read(&rm->lock);
+>  
+> -       xa_for_each_range(&rm->bindings, index, notifier, start, end)
+> +       xa_for_each_range(&rm->bindings, index, notifier, start, end - 1)
+>                 notifier->ops->invalidate_start(notifier, start, end);
+>  
+>         ret = memfd->f_op->fallocate(memfd, mode, offset, len);
+>  
+> -       xa_for_each_range(&rm->bindings, index, notifier, start, end)
+> +       xa_for_each_range(&rm->bindings, index, notifier, start, end - 1)
+>                 notifier->ops->invalidate_end(notifier, start, end);
+>  
+>         up_read(&rm->lock);
+> @@ -224,7 +224,7 @@ static int restricted_error_remove_page(struct address_space *mapping,
+>                 }
+>                 spin_unlock(&inode->i_lock);
+>  
+> -               xa_for_each_range(&rm->bindings, index, notifier, start, end)
+> +               xa_for_each_range(&rm->bindings, index, notifier, start, end - 1)
+>                         notifier->ops->error(notifier, start, end);
+>                 break;
+>         }
+> @@ -301,11 +301,12 @@ int restrictedmem_bind(struct file *file, pgoff_t start, pgoff_t end,
+>                 if (exclusive != rm->exclusive)
+>                         goto out_unlock;
+>  
+> -               if (exclusive && xa_find(&rm->bindings, &start, end, XA_PRESENT))
+> +               if (exclusive &&
+> +                   xa_find(&rm->bindings, &start, end - 1, XA_PRESENT))
+>                         goto out_unlock;
+>         }
+>  
+> -       xa_store_range(&rm->bindings, start, end, notifier, GFP_KERNEL);
+> +       xa_store_range(&rm->bindings, start, end - 1, notifier, GFP_KERNEL);
+>         rm->exclusive = exclusive;
+>         ret = 0;
+>  out_unlock:
+> @@ -320,7 +321,7 @@ void restrictedmem_unbind(struct file *file, pgoff_t start, pgoff_t end,
+>         struct restrictedmem *rm = file->f_mapping->private_data;
+>  
+>         down_write(&rm->lock);
+> -       xa_store_range(&rm->bindings, start, end, NULL, GFP_KERNEL);
+> +       xa_store_range(&rm->bindings, start, end - 1, NULL, GFP_KERNEL);
+>         synchronize_rcu();
+>         up_write(&rm->lock);
 >  }
->
-> +static bool vp_notify_with_data(struct virtqueue *vq)
-> +{
-> +	u32 data = vring_notification_data(vq);
-> +
-> +	iowrite32(data, (void __iomem *)vq->priv);
-> +
-> +	return true;
-> +}
-> +
->  static struct virtqueue *setup_vq(struct virtio_pci_device *vp_dev,
->  				  struct virtio_pci_vq_info *info,
->  				  unsigned int index,
-> @@ -301,6 +310,8 @@ static struct virtqueue *setup_vq(struct virtio_pci_device *vp_dev,
->  	struct virtqueue *vq;
->  	u16 num;
->  	int err;
-> +	bool (*notify)(struct virtqueue *vq) = __virtio_test_bit(&vp_dev->vdev,
-> +		VIRTIO_F_NOTIFICATION_DATA) ? vp_notify_with_data : vp_notify;
->
->  	if (index >= vp_modern_get_num_queues(mdev))
->  		return ERR_PTR(-EINVAL);
-> @@ -321,7 +332,7 @@ static struct virtqueue *setup_vq(struct virtio_pci_device *vp_dev,
->  	vq = vring_create_virtqueue(index, num,
->  				    SMP_CACHE_BYTES, &vp_dev->vdev,
->  				    true, true, ctx,
-> -				    vp_notify, callback, name);
-> +				    notify, callback, name);
->  	if (!vq)
->  		return ERR_PTR(-ENOMEM);
->
-> diff --git a/drivers/virtio/virtio_ring.c b/drivers/virtio/virtio_ring.c
-> index 4c3bb0ddeb9b..837875cc3190 100644
-> --- a/drivers/virtio/virtio_ring.c
-> +++ b/drivers/virtio/virtio_ring.c
-> @@ -2752,6 +2752,21 @@ void vring_del_virtqueue(struct virtqueue *_vq)
->  }
->  EXPORT_SYMBOL_GPL(vring_del_virtqueue);
->
-> +u32 vring_notification_data(struct virtqueue *_vq)
-> +{
-> +	struct vring_virtqueue *vq = to_vvq(_vq);
-> +	u16 next;
-> +
-> +	if (vq->packed_ring)
-> +		next = (vq->packed.next_avail_idx & ~(1 << 15)) |
-> +			vq->packed.avail_wrap_counter << 15;
-> +	else
-> +		next = vq->split.avail_idx_shadow;
-> +
-> +	return next << 16 | _vq->index;
-> +}
-> +EXPORT_SYMBOL_GPL(vring_notification_data);
-> +
->  /* Manipulates transport-specific feature bits. */
->  void vring_transport_features(struct virtio_device *vdev)
->  {
-> @@ -2771,6 +2786,8 @@ void vring_transport_features(struct virtio_device *vdev)
->  			break;
->  		case VIRTIO_F_ORDER_PLATFORM:
->  			break;
-> +		case VIRTIO_F_NOTIFICATION_DATA:
-> +			break;
->  		default:
->  			/* We don't understand this bit. */
->  			__virtio_clear_bit(vdev, i);
-> diff --git a/include/linux/virtio_ring.h b/include/linux/virtio_ring.h
-> index 8b95b69ef694..2550c9170f4f 100644
-> --- a/include/linux/virtio_ring.h
-> +++ b/include/linux/virtio_ring.h
-> @@ -117,4 +117,6 @@ void vring_del_virtqueue(struct virtqueue *vq);
->  void vring_transport_features(struct virtio_device *vdev);
->
->  irqreturn_t vring_interrupt(int irq, void *_vq);
-> +
-> +u32 vring_notification_data(struct virtqueue *_vq);
->  #endif /* _LINUX_VIRTIO_RING_H */
-> diff --git a/include/uapi/linux/virtio_config.h b/include/uapi/linux/virtio_config.h
-> index 3c05162bc988..2c712c654165 100644
-> --- a/include/uapi/linux/virtio_config.h
-> +++ b/include/uapi/linux/virtio_config.h
-> @@ -99,6 +99,12 @@
->   */
->  #define VIRTIO_F_SR_IOV			37
->
-> +/*
-> + * This feature indicates that the driver passes extra data (besides
-> + * identifying the virtqueue) in its device notifications.
-> + */
-> +#define VIRTIO_F_NOTIFICATION_DATA	38
-> +
->  /*
->   * This feature indicates that the driver can reset a queue individually.
->   */
-> --
-> 2.35.1
->
