@@ -2,89 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3D11C6C6DED
-	for <lists+kvm@lfdr.de>; Thu, 23 Mar 2023 17:41:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D99F76C6E81
+	for <lists+kvm@lfdr.de>; Thu, 23 Mar 2023 18:15:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232387AbjCWQli (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Mar 2023 12:41:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39540 "EHLO
+        id S231149AbjCWRPX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Mar 2023 13:15:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46558 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229553AbjCWQlO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Mar 2023 12:41:14 -0400
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF1E638B4A
-        for <kvm@vger.kernel.org>; Thu, 23 Mar 2023 09:39:11 -0700 (PDT)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-54352648c1eso223399487b3.9
-        for <kvm@vger.kernel.org>; Thu, 23 Mar 2023 09:39:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1679589543;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=HMDeQk5W8bWVLr99LDZ65KEOIjRuVjx2NV9NCNVytV0=;
-        b=dKIqE29TCIqkXyZ2R0Ym+XZjJzyR6FoGiLUvXfVBgS90+qYgIWwCd/D0T6CiOwY17l
-         1zaopVitBBJBfJW1TaqlY4J1s8hwi11GPKMKnyUMHct9V3j6c61SgUEiG2AoX2EmGJOQ
-         5HKWewSRRu5F1Yhs962cVQbrTW71d5OgcAB6dmH1kq+2dZslHvBe5c8Vp0q9HbsRFZTN
-         XsXpdrtRyfPfbBd9rqPsRJEdpCmbcq2H04nJDKfRUG2MGSl8ekCHmhQ1uV7J5W8qtOIs
-         SZK9hwIEo77SRpVDaZAWW/M+tDGbARJb+1BhTiWDjjR1lNidDCEIKNSiQzCdV6+QVu4n
-         g5mg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679589543;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=HMDeQk5W8bWVLr99LDZ65KEOIjRuVjx2NV9NCNVytV0=;
-        b=UyS0mWAk4BvKI5fgx8GxN8+st5cWgWQ53PCQQzvkAId6K/5pAaYGHVVmVvUlDJIg6T
-         LKelFGZNx+/Szq/VcDnAo84QBwKFvCdvtQVMGwlRUKCWGFG89TSdOubvkgVWdc4L/DUE
-         /r4JIu+kK5L9E2NPTufk9GzeaMxNroMMkoCNcoSMQQMHKg0MNuq+5D/Wh5b7AG7PxaPb
-         7dCVg2Z8Kf/3QzH2xoN8flTmO/vGXAJ1DDYPZexu+VejdySMN9zkgpSSQBb6VzaGIhSC
-         2rVTWRiplWs3KdAHyRJJ745XXYIifYCVADZolUS8DzCTZWoFgpOlJMbNz0FRJfyGL60p
-         A/fQ==
-X-Gm-Message-State: AAQBX9c09+J6jI/JHyXRHg/5Kgm/Tniu13SYb5+yb5lxOsj3PBS/6Qku
-        xf7M0znQ9uBDqxgC+F877W0pJkRwKJY=
-X-Google-Smtp-Source: AKy350YhFvlX0ioOFgsAp70+MxQCivy/XMWeY+Go2PaiF2Ynhk6lYUQmwlsbYihK9T3FrUMTnI73XW5E/fw=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:a782:0:b0:541:a17f:c77d with SMTP id
- e124-20020a81a782000000b00541a17fc77dmr2136221ywh.10.1679589543734; Thu, 23
- Mar 2023 09:39:03 -0700 (PDT)
-Date:   Thu, 23 Mar 2023 09:39:02 -0700
-In-Reply-To: <3b3a9ebc-b02e-a365-7f68-3da9189d062a@amd.com>
-Mime-Version: 1.0
-References: <20230120031047.628097-1-aik@amd.com> <20230120031047.628097-3-aik@amd.com>
- <Y9nL8iqhiL5+ALa2@google.com> <3b3a9ebc-b02e-a365-7f68-3da9189d062a@amd.com>
-Message-ID: <ZByAptUXE+VMpn2x@google.com>
-Subject: Re: [PATCH kernel v3 2/3] KVM: SEV: Enable data breakpoints in SEV-ES
-From:   Sean Christopherson <seanjc@google.com>
-To:     Alexey Kardashevskiy <aik@amd.com>
-Cc:     kvm@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org,
-        Yury Norov <yury.norov@gmail.com>,
-        Venu Busireddy <venu.busireddy@oracle.com>,
-        Tony Luck <tony.luck@intel.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Sandipan Das <sandipan.das@amd.com>,
-        Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Mario Limonciello <mario.limonciello@amd.com>,
-        Kim Phillips <kim.phillips@amd.com>,
-        Kees Cook <keescook@chromium.org>,
-        Juergen Gross <jgross@suse.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Daniel Sneddon <daniel.sneddon@linux.intel.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Arnaldo Carvalho de Melo <acme@redhat.com>,
-        Andrew Cooper <andrew.cooper3@citrix.com>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        "Peter Zijlstra (Intel)" <peterz@infradead.org>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        "H. Peter Anvin" <hpa@zytor.com>
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-7.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+        with ESMTP id S230021AbjCWRPW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Mar 2023 13:15:22 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58673233D0;
+        Thu, 23 Mar 2023 10:15:20 -0700 (PDT)
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 32NH8E94008644;
+        Thu, 23 Mar 2023 17:15:20 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=JYF/h0ZJR8wVzhPO3x4yH6w5rHSVqYekPGE4cV3n/y8=;
+ b=d7SPiAmjPZ92kUHVIiFGqWSIZ3Ox8dWt+QlHyufoS7dQljJ1cp6Wd+Roy/mjP7nfKYww
+ /0l4Q9BHjZKhLSvT4V2IIeGcn5yy/b2OYwcoejkS7DMBn7i4/guQ9gE2DeD2T83yMSGv
+ tLXNZrqnYpDn/J2SUhhEd6k3cKLkKAPbJzvm3tKcgFelys9iI34QpJmfG4C7P2III+UO
+ VKQXe9xVl5fCDpgTPphBoX+vUMS4+T3MVomEkJw6k7yBmCVWspPuFsDeAiRW7mXqdKfB
+ zu/3c/lpVVlvNzmu/NV5JyCj70ZjdZzrPF+GBkLR7Odw0JTFBPSk95yqn2+2+w/JzvZy 4w== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pgk22m9qh-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 23 Mar 2023 17:15:19 +0000
+Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 32NH987Q014543;
+        Thu, 23 Mar 2023 17:15:19 GMT
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pgk22m9p2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 23 Mar 2023 17:15:19 +0000
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+        by ppma05fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 32NDlMaG014687;
+        Thu, 23 Mar 2023 17:15:16 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+        by ppma05fra.de.ibm.com (PPS) with ESMTPS id 3pd4x6ee7e-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 23 Mar 2023 17:15:16 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+        by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 32NHFDeX61800764
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 23 Mar 2023 17:15:13 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 07ECF20043;
+        Thu, 23 Mar 2023 17:15:13 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C43292004E;
+        Thu, 23 Mar 2023 17:15:12 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.152.224.56])
+        by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Thu, 23 Mar 2023 17:15:12 +0000 (GMT)
+Date:   Thu, 23 Mar 2023 16:45:12 +0100
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Pierre Morel <pmorel@linux.ibm.com>
+Cc:     linux-s390@vger.kernel.org, frankja@linux.ibm.com,
+        thuth@redhat.com, kvm@vger.kernel.org, david@redhat.com,
+        nrb@linux.ibm.com, nsg@linux.ibm.com
+Subject: Re: [kvm-unit-tests PATCH v7 1/2] s390x: topology: Check the
+ Perform Topology Function
+Message-ID: <20230323164512.4cdf985e@p-imbrenda>
+In-Reply-To: <20230320085642.12251-2-pmorel@linux.ibm.com>
+References: <20230320085642.12251-1-pmorel@linux.ibm.com>
+        <20230320085642.12251-2-pmorel@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: PbJECSW63UBAwpX9nOUuc6otWAyy2fM4
+X-Proofpoint-GUID: z4aVAubROBbya34Lj-ETTTvlFgddgbcQ
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
+ definitions=2023-03-22_21,2023-03-23_02,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 mlxscore=0
+ mlxlogscore=999 impostorscore=0 priorityscore=1501 lowpriorityscore=0
+ bulkscore=0 malwarescore=0 adultscore=0 spamscore=0 phishscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2303150002 definitions=main-2303230124
+X-Spam-Status: No, score=-0.1 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
+        DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -92,98 +94,249 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Feb 03, 2023, Alexey Kardashevskiy wrote:
-> > Follow-up question: does KVM _have_ to wait until KVM_SEV_LAUNCH_UPDATE_VMSA to
-> > set the flag?
+On Mon, 20 Mar 2023 09:56:41 +0100
+Pierre Morel <pmorel@linux.ibm.com> wrote:
+
+> We check that the PTF instruction is working correctly when
+> the cpu topology facility is available.
 > 
-> Nope. Will repost soon as a reply to this mail.
-
-Please, please do not post new versions In-Reply-To the previous version, and
-especially not In-Reply-To a random mail buried deep in the thread.  b4, which
-is imperfect but makes my life sooo much easier, gets confused by all the threading
-and partial rerolls.  The next version also buries _this_ reply, which is partly
-why I haven't responded until now.  I simply missed this the below questions because
-I saw v4 and assumed all my feedback was addressed, i.e. that I could handle this
-in the context of 6.4 and not earlier.
-
-Continuing on that topic, please do not post a new version until open questions
-from the previous version are resolved.  Posting a new version when there are
-unresolved questions might feel like it helps things move faster, but more often
-than not it has the comlete opposite effect.
-
-> > > +/* enable/disable SEV-ES DebugSwap support */
-> > > +static bool sev_es_debug_swap_enabled = true;
-> > > +module_param_named(debug_swap, sev_es_debug_swap_enabled, bool, 0644);
-> > 
-> > Module param needs 0444 permissions, i.e. shouldn't be writable after KVM is
-> > loaded.  Though I don't know that providing a module param is warranted in this
-> > case.
-> > KVM provides module params for SEV and SEV-ES because there are legitimate
-> > reasons to turn them off, but at a glance, I don't see why we'd want that for this
-> > feature.
+> For KVM only, we test changing of the polarity between horizontal
+> and vertical and that a reset set the horizontal polarity.
 > 
+> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+> ---
+>  s390x/Makefile      |   1 +
+>  s390x/topology.c    | 180 ++++++++++++++++++++++++++++++++++++++++++++
+>  s390x/unittests.cfg |   3 +
+>  3 files changed, 184 insertions(+)
+>  create mode 100644 s390x/topology.c
 > 
-> /me confused. You suggested this in the first place for (I think) for the
-> case if the feature is found to be broken later on so admins can disable it.
+> diff --git a/s390x/Makefile b/s390x/Makefile
+> index e94b720..05dac04 100644
+> --- a/s390x/Makefile
+> +++ b/s390x/Makefile
+> @@ -40,6 +40,7 @@ tests += $(TEST_DIR)/panic-loop-pgm.elf
+>  tests += $(TEST_DIR)/migration-sck.elf
+>  tests += $(TEST_DIR)/exittime.elf
+>  tests += $(TEST_DIR)/ex.elf
+> +tests += $(TEST_DIR)/topology.elf
+>  
+>  pv-tests += $(TEST_DIR)/pv-diags.elf
+>  
+> diff --git a/s390x/topology.c b/s390x/topology.c
+> new file mode 100644
+> index 0000000..ce248f1
+> --- /dev/null
+> +++ b/s390x/topology.c
+> @@ -0,0 +1,180 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +/*
+> + * CPU Topology
+> + *
+> + * Copyright IBM Corp. 2022
+> + *
+> + * Authors:
+> + *  Pierre Morel <pmorel@linux.ibm.com>
+> + */
+> +
+> +#include <libcflat.h>
+> +#include <asm/page.h>
+> +#include <asm/asm-offsets.h>
+> +#include <asm/interrupt.h>
+> +#include <asm/facility.h>
+> +#include <smp.h>
+> +#include <sclp.h>
+> +#include <s390x/hardware.h>
+> +
+> +#define PTF_REQ_HORIZONTAL	0
+> +#define PTF_REQ_VERTICAL	1
+> +#define PTF_REQ_CHECK		2
+> +
+> +#define PTF_ERR_NO_REASON	0
+> +#define PTF_ERR_ALRDY_POLARIZED	1
+> +#define PTF_ERR_IN_PROGRESS	2
+> +
+> +extern int diag308_load_reset(u64);
+> +
+> +static int ptf(unsigned long fc, unsigned long *rc)
+> +{
+> +	int cc;
+> +
+> +	asm volatile(
+> +		"	ptf	%1	\n"
+> +		"       ipm     %0	\n"
+> +		"       srl     %0,28	\n"
+> +		: "=d" (cc), "+d" (fc)
+> +		:
+> +		: "cc");
+> +
+> +	*rc = fc >> 8;
+> +	return cc;
+> +}
+> +
+> +static void check_privilege(int fc)
+> +{
+> +	unsigned long rc;
+> +
+> +	report_prefix_push("Privilege");
+> +	report_info("function code %d", fc);
+> +	enter_pstate();
+> +	expect_pgm_int();
+> +	ptf(fc, &rc);
+> +	check_pgm_int_code(PGM_INT_CODE_PRIVILEGED_OPERATION);
+> +	report_prefix_pop();
+> +}
+> +
+> +static void check_function_code(void)
+> +{
+> +	unsigned long rc;
+> +
+> +	report_prefix_push("Undefined fc");
+> +	expect_pgm_int();
+> +	ptf(0xff, &rc);
 
-Hrm, so I did.  Right, IIUC, this has guest visible effects, i.e. guest can
-read/write DRs, and so the admin might want the ability to disable the feature.
+please don't use magic numbers, add a new macro PTF_INVALID_FUNCTION
+(or something like that)
 
-Speaking of past me, no one answered my question about how this will interact
-with SNP, where the VM can maniuplate the VMSA.
+> +	check_pgm_int_code(PGM_INT_CODE_SPECIFICATION);
+> +	report_prefix_pop();
+> +}
+> +
+> +static void check_reserved_bits(void)
+> +{
+> +	unsigned long rc;
+> +
+> +	report_prefix_push("Reserved bits");
+> +	expect_pgm_int();
+> +	ptf(0xffffffffffffff00UL, &rc);
 
-  : > @@ -604,6 +607,9 @@ static int sev_es_sync_vmsa(struct vcpu_svm *svm)
-  : >       save->xss  = svm->vcpu.arch.ia32_xss;
-  : >       save->dr6  = svm->vcpu.arch.dr6;
-  : > 
-  : > +     if (sev->debug_swap)
-  : > +             save->sev_features |= SVM_SEV_FEAT_DEBUG_SWAP;
-  : 
-  : Resurrecting my objection to "AP Creation NAE event"[*], what happens if a hypervisor
-  : supports GHCB_HV_FT_SNP_AP_CREATION but not DebugSwap?  IIUC, a guest can corrupt
-  : host DRs by enabling DebugSwap in the VMSA of an AP vCPU, e.g. the CPU will load
-  : zeros on VM-Exit if the host hasn't stuffed the host save area fields.
-  : 
-  : KVM can obviously just make sure to save its DRs if hardware supports DebugSwap,
-  : but what if DebugSwap is buggy and needs to be disabled?  And what about the next
-  : feature that can apparently be enabled by the guest?
-  : 
-  : [*] https://lore.kernel.org/all/YWnbfCet84Vup6q9@google.com
+I would like every single bit to be tested, since all of them are
+required to be zero.
 
-> And I was using it to verify "x86/debug: Fix stack recursion caused by DR7
-> accesses" which is convenient but it is a minor thing.
+make a loop and test each, but please report success of failure only
+once at the end. 
+use a report_info in case of failure to indicate which bit failed
 
-...
+> +	check_pgm_int_code(PGM_INT_CODE_SPECIFICATION);
+> +	report_prefix_pop();
+> +}
+> +
+> +static void check_mtcr_pending(void)
+> +{
+> +	unsigned long rc;
+> +	int cc;
+> +
+> +	report_prefix_push("Topology Report pending");
+> +	/*
+> +	 * At this moment the topology may already have changed
+> +	 * since the VM has been started.
+> +	 * However, we can test if a second PTF instruction
+> +	 * reports that the topology did not change since the
+> +	 * preceding PFT instruction.
+> +	 */
+> +	ptf(PTF_REQ_CHECK, &rc);
+> +	cc = ptf(PTF_REQ_CHECK, &rc);
+> +	report(cc == 0, "PTF check should clear topology report");
+> +	report_prefix_pop();
+> +}
+> +
+> +static void check_polarization_change(void)
+> +{
+> +	unsigned long rc;
+> +	int cc;
+> +
+> +	report_prefix_push("Topology polarization check");
+> +
+> +	/* We expect a clean state through reset */
+> +	report(diag308_load_reset(1), "load normal reset done");
+> +
+> +	/*
+> +	 * Set vertical polarization to verify that RESET sets
+> +	 * horizontal polarization back.
+> +	 */
+> +	cc = ptf(PTF_REQ_VERTICAL, &rc);
+> +	report(cc == 0, "Set vertical polarization.");
+> +
+> +	report(diag308_load_reset(1), "load normal reset done");
+> +
+> +	cc = ptf(PTF_REQ_CHECK, &rc);
+> +	report(cc == 0, "Reset should clear topology report");
+> +
+> +	cc = ptf(PTF_REQ_HORIZONTAL, &rc);
+> +	report(cc == 2 && rc == PTF_ERR_ALRDY_POLARIZED,
+> +	       "After RESET polarization is horizontal");
+> +
+> +	/* Flip between vertical and horizontal polarization */
+> +	cc = ptf(PTF_REQ_VERTICAL, &rc);
+> +	report(cc == 0, "Change to vertical polarization.");
 
-> > > diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> > > index 60c7c880266b..6c54a3c9d442 100644
-> > > --- a/arch/x86/kvm/svm/svm.c
-> > > +++ b/arch/x86/kvm/svm/svm.c
-> > > @@ -1190,7 +1190,8 @@ static void init_vmcb(struct kvm_vcpu *vcpu)
-> > >   	set_exception_intercept(svm, UD_VECTOR);
-> > >   	set_exception_intercept(svm, MC_VECTOR);
-> > >   	set_exception_intercept(svm, AC_VECTOR);
-> > > -	set_exception_intercept(svm, DB_VECTOR);
-> > > +	if (!sev_es_is_debug_swap_enabled())
-> > > +		set_exception_intercept(svm, DB_VECTOR);
-> > 
-> > This is wrong.  KVM needs to intercept #DBs when debugging non-SEV-ES VMs.
-> 
-> Sorry, not following. The #DB intercept for non-SEV-ES is enabled here.
+either here or in a new block, test that setting vertical twice in
+a row will also result in a cc == 2 && rc == PTF_ERR_ALRDY_POLARIZED
 
-The helper in this version (v3) just queries whether or not the feature is enabled,
-it doesn't differentiate between SEV-ES and other VM types.  I.e. loading KVM with
-SEV-ES and DebugSwap enabled would break non-SEV-ES VMs running on the same host.
+> +
+> +	cc = ptf(PTF_REQ_CHECK, &rc);
+> +	report(cc == 1, "Polarization change should set topology report");
+> +
+> +	cc = ptf(PTF_REQ_HORIZONTAL, &rc);
+> +	report(cc == 0, "Change to horizontal polarization.");
 
- +bool sev_es_is_debug_swap_enabled(void)
- +{
- +     return sev_es_debug_swap_enabled;
- +}
+it cannot hurt to add here another check for pending reports
 
-Looks like this was fixed in v4.
+> +
+> +	report_prefix_pop();
+> +}
+> +
+> +static void test_ptf(void)
+> +{
+> +	check_privilege(PTF_REQ_HORIZONTAL);
+> +	check_privilege(PTF_REQ_VERTICAL);
+> +	check_privilege(PTF_REQ_CHECK);
+> +	check_function_code();
+> +	check_reserved_bits();
+> +	check_mtcr_pending();
+> +	check_polarization_change();
+> +}
+> +
+> +static struct {
+> +	const char *name;
+> +	void (*func)(void);
+> +} tests[] = {
+> +	{ "PTF", test_ptf},
+> +	{ NULL, NULL }
+> +};
+> +
+> +int main(int argc, char *argv[])
+> +{
+> +	int i;
+> +
+> +	report_prefix_push("CPU Topology");
+> +
+> +	if (!test_facility(11)) {
+> +		report_skip("Topology facility not present");
+> +		goto end;
+> +	}
+> +
+> +	report_info("Virtual machine level %ld", stsi_get_fc());
+> +
+> +	for (i = 0; tests[i].name; i++) {
+> +		report_prefix_push(tests[i].name);
+> +		tests[i].func();
+> +		report_prefix_pop();
+> +	}
+> +
+> +end:
+> +	report_prefix_pop();
+> +	return report_summary();
+> +}
+> diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
+> index 453ee9c..d0ac683 100644
+> --- a/s390x/unittests.cfg
+> +++ b/s390x/unittests.cfg
+> @@ -233,3 +233,6 @@ extra_params = -append '--parallel'
+>  
+>  [execute]
+>  file = ex.elf
+> +
+> +[topology]
+> +file = topology.elf
 
-> > This _could_ be tied to X86_FEATURE_NO_NESTED_DATA_BP, but the KVM would need to
-> > toggle the intercept depending on whether or not userspace wants to debug the
-> > guest.
-> > 
-> > Similar to the DR7 interception, can this check sev_features directly?
