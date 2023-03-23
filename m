@@ -2,133 +2,153 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B8B206C5E63
-	for <lists+kvm@lfdr.de>; Thu, 23 Mar 2023 06:08:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 931AB6C5EC6
+	for <lists+kvm@lfdr.de>; Thu, 23 Mar 2023 06:29:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229993AbjCWFIR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Mar 2023 01:08:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54500 "EHLO
+        id S229903AbjCWF3o (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Mar 2023 01:29:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56552 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229951AbjCWFIO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Mar 2023 01:08:14 -0400
-Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B4A013D5D;
-        Wed, 22 Mar 2023 22:08:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1679548088; x=1711084088;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=FdONquWcPrciSMSG9VJ10s8v+lY1FDG1spblU1KxGJg=;
-  b=jqtzag3zyrzp5WEFJJ6TN0cUGIsh9NTfEm0DR6O8z8rNRgUHGaZ0ZD0V
-   DFocpW1D4ICpgniUwHXHRYjwwAO++hpPNrdmtUP83Z3nIKV0MS47FNsfT
-   uXD2xn12lavqrYT0wv4+4ZkChC/ZsyfemheqaotlTu2TZZ26twH8ZZSZg
-   AGKQQMeMcJfX/iGNtz4v01wDMkc6F5HU0h3isnQntUmccGmDzok3IPnhc
-   7qNSOhM+uQE1HeyVGsfLdFMRKXP4oGr8FAZ4FuprXvmINRCDlg7oubIcJ
-   /0zNL4Zpwbnb37OolgFSh5fdhWGFsB6o8q033r1/2kKwIV8pnuMBcdP5r
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10657"; a="319787348"
-X-IronPort-AV: E=Sophos;i="5.98,283,1673942400"; 
-   d="scan'208";a="319787348"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Mar 2023 22:08:07 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10657"; a="825684119"
-X-IronPort-AV: E=Sophos;i="5.98,283,1673942400"; 
-   d="scan'208";a="825684119"
-Received: from jmichaud-mobl.amr.corp.intel.com (HELO desk) ([10.252.131.127])
-  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Mar 2023 22:08:07 -0700
-Date:   Wed, 22 Mar 2023 22:07:53 -0700
-From:   Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Nathan Chancellor <nathan@kernel.org>,
-        Emanuele Giuseppe Esposito <eesposit@redhat.com>,
-        Jim Mattson <jmattson@google.com>
-Subject: Re: [PATCH 5/6] KVM: x86: Virtualize FLUSH_L1D and passthrough
- MSR_IA32_FLUSH_CMD
-Message-ID: <20230323050753.rufixzrzt2sf3avv@desk>
-References: <20230322011440.2195485-1-seanjc@google.com>
- <20230322011440.2195485-6-seanjc@google.com>
+        with ESMTP id S229517AbjCWF3n (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Mar 2023 01:29:43 -0400
+Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB8CD1E1E0
+        for <kvm@vger.kernel.org>; Wed, 22 Mar 2023 22:29:41 -0700 (PDT)
+Received: by mail-pl1-x631.google.com with SMTP id le6so21288302plb.12
+        for <kvm@vger.kernel.org>; Wed, 22 Mar 2023 22:29:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112; t=1679549381;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=dClqQIcuf7R3eW9pGWVcMwJ53uA3LgBf03DG2n4TMgk=;
+        b=OvvMifh3GPgoXCwK0t9PVEra8hGxbOrnymGpGWknTvFfQAoWfVg9xHEOLoQT1+bkoe
+         c7gsSV+KAnwsDhu0nfn8CbXaqhUds9P8atmHcgoEqVcRDVB8Wsqbu/3FcFIqRVf/LRo5
+         eN4N7MJ0iHz2Q3Pj9F2RlfN5cksbRQZzeFlWUaLvGe0kyab4bkDScwXZe3/ppK+Pf58I
+         2MCsvj51Ltc/ygX7b/Fya7yGiE40FJ6I8GqABck9Ib5JRPmX/zixQ1YmbYrrXjtv8zrM
+         0enjnD3SZwTpodkBtlYtNRXqS0YC1Se1ZV/FxNlCphCgzigPCMHeDfs4LNvyPU40Zdgb
+         a8Uw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1679549381;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=dClqQIcuf7R3eW9pGWVcMwJ53uA3LgBf03DG2n4TMgk=;
+        b=5EI7IhkYamWnwr2lU4XfERRmX5jUEzf1eMk2DftVuOSdfsehWQMMSfLkk6TfIM0ohn
+         uynsQfZx/bF8Pcyduh/0MhifwPMx80hGA0mJcDUUXpUJfROmkjkB7OMw/4DpDhov2WnO
+         CTvdmwBQpolkK5EV0vZclzgLbXG7OSG1sCe5vxlNrqpcPJmYeuuRiNotzYeyD2Fg8J3S
+         FIQtQRrRd9yLlBTT4qZTfSPf0fHwiwxyeLx5jhZ0raj9x7Uvt2aZMriHOQzbunoXM6sd
+         GkuzRcsS86orn4wDpOaXGe3F2Yf7+Rzf58LJclfxrA9cTh/+yz/xvnXTy1H896o3dxHV
+         jyRg==
+X-Gm-Message-State: AO0yUKWWkeeRdDYumdFEbiHF1iO7l0Yb0h453nWC5KDa6rMyJhCynqHS
+        MPvcdH0rd3LP4y5pPKVdbg8=
+X-Google-Smtp-Source: AK7set81UMgrkGZdNmPQRp61GqSqtcnk49PPSWO5x/DKL5eMUuPAW4fonH4vWXGtuhtChdG64cJAjg==
+X-Received: by 2002:a17:902:ce91:b0:19f:2dff:2199 with SMTP id f17-20020a170902ce9100b0019f2dff2199mr6334539plg.68.1679549380970;
+        Wed, 22 Mar 2023 22:29:40 -0700 (PDT)
+Received: from fedlinux.. ([106.84.129.82])
+        by smtp.gmail.com with ESMTPSA id r18-20020a63ce52000000b00502f4c62fd3sm3302965pgi.33.2023.03.22.22.29.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 22 Mar 2023 22:29:40 -0700 (PDT)
+From:   Sam Li <faithilikerun@gmail.com>
+To:     qemu-devel@nongnu.org
+Cc:     Kevin Wolf <kwolf@redhat.com>,
+        Raphael Norwitz <raphael.norwitz@nutanix.com>,
+        qemu-block@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>,
+        damien.lemoal@opensource.wdc.com, kvm@vger.kernel.org,
+        hare@suse.de, Paolo Bonzini <pbonzini@redhat.com>,
+        dmitry.fomichev@wdc.com, Hanna Reitz <hreitz@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Markus Armbruster <armbru@redhat.com>,
+        Eric Blake <eblake@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Sam Li <faithilikerun@gmail.com>
+Subject: [PATCH v8 0/4] Add zoned storage emulation to virtio-blk driver
+Date:   Thu, 23 Mar 2023 13:28:24 +0800
+Message-Id: <20230323052828.6545-1-faithilikerun@gmail.com>
+X-Mailer: git-send-email 2.39.2
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230322011440.2195485-6-seanjc@google.com>
-X-Spam-Status: No, score=-2.4 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
+        DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 21, 2023 at 06:14:39PM -0700, Sean Christopherson wrote:
-> Virtualize FLUSH_L1D so that the guest can use the performant L1D flush
-> if one of the many mitigations might require a flush in the guest, e.g.
-> Linux provides an option to flush the L1D when switching mms.
-> 
-> Passthrough MSR_IA32_FLUSH_CMD for write when it's supported in hardware
-> and exposed to the guest, i.e. always let the guest write it directly if
-> FLUSH_L1D is fully supported.
-> 
-> Forward writes to hardware in host context on the off chance that KVM
-> ends up emulating a WRMSR, or in the really unlikely scenario where
-> userspace wants to force a flush.  Restrict these forwarded WRMSRs to
-> the known command out of an abundance of caution.  Passing through the
-> MSR means the guest can throw any and all values at hardware, but doing
-> so in host context is arguably a bit more dangerous.
-> 
-> Link: https://lkml.kernel.org/r/CALMp9eTt3xzAEoQ038bJQ9LN0ZOXrSWsN7xnNUD%2B0SS%3DWwF7Pg%40mail.gmail.com
-> Link: https://lore.kernel.org/all/20230201132905.549148-2-eesposit@redhat.com
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  arch/x86/kvm/cpuid.c      |  2 +-
->  arch/x86/kvm/svm/svm.c    |  5 +++++
->  arch/x86/kvm/vmx/nested.c |  3 +++
->  arch/x86/kvm/vmx/vmx.c    |  5 +++++
->  arch/x86/kvm/vmx/vmx.h    |  2 +-
->  arch/x86/kvm/x86.c        | 12 ++++++++++++
->  6 files changed, 27 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> index 599aebec2d52..9583a110cf5f 100644
-> --- a/arch/x86/kvm/cpuid.c
-> +++ b/arch/x86/kvm/cpuid.c
-> @@ -653,7 +653,7 @@ void kvm_set_cpu_caps(void)
->  		F(SPEC_CTRL_SSBD) | F(ARCH_CAPABILITIES) | F(INTEL_STIBP) |
->  		F(MD_CLEAR) | F(AVX512_VP2INTERSECT) | F(FSRM) |
->  		F(SERIALIZE) | F(TSXLDTRK) | F(AVX512_FP16) |
-> -		F(AMX_TILE) | F(AMX_INT8) | F(AMX_BF16)
-> +		F(AMX_TILE) | F(AMX_INT8) | F(AMX_BF16) | F(FLUSH_L1D)
->  	);
->  
->  	/* TSC_ADJUST and ARCH_CAPABILITIES are emulated in software. */
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index 85bb535fc321..b32edaf5a74b 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -95,6 +95,7 @@ static const struct svm_direct_access_msrs {
->  #endif
->  	{ .index = MSR_IA32_SPEC_CTRL,			.always = false },
->  	{ .index = MSR_IA32_PRED_CMD,			.always = false },
-> +	{ .index = MSR_IA32_FLUSH_CMD,			.always = false },
->  	{ .index = MSR_IA32_LASTBRANCHFROMIP,		.always = false },
->  	{ .index = MSR_IA32_LASTBRANCHTOIP,		.always = false },
->  	{ .index = MSR_IA32_LASTINTFROMIP,		.always = false },
-> @@ -4140,6 +4141,10 @@ static void svm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
->  		set_msr_interception(vcpu, svm->msrpm, MSR_IA32_PRED_CMD, 0,
->  				     !!guest_has_pred_cmd_msr(vcpu));
->  
-> +	if (boot_cpu_has(X86_FEATURE_FLUSH_L1D))
+This patch adds zoned storage emulation to the virtio-blk driver.
 
-Just curious, will this ever be true on AMD hardware? AFAIK,
-X86_FEATURE_FLUSH_L1D is Intel-defined CPU feature.
+The patch implements the virtio-blk ZBD support standardization that is
+recently accepted by virtio-spec. The link to related commit is at
 
-> +		set_msr_interception(vcpu, svm->msrpm, MSR_IA32_FLUSH_CMD, 0,
-> +				     !!guest_cpuid_has(vcpu, X86_FEATURE_FLUSH_L1D));
-> +
->  	/* For sev guests, the memory encryption bit is not reserved in CR3.  */
->  	if (sev_guest(vcpu->kvm)) {
->  		best = kvm_find_cpuid_entry(vcpu, 0x8000001F);
+https://github.com/oasis-tcs/virtio-spec/commit/b4e8efa0fa6c8d844328090ad15db65af8d7d981
+
+The Linux zoned device code that implemented by Dmitry Fomichev has been
+released at the latest Linux version v6.3-rc1.
+
+Aside: adding zoned=on alike options to virtio-blk device will be
+considered in following-up plan.
+
+v7:
+- address Stefan's review comments
+  * rm aio_context_acquire/release in handle_req
+  * rename function return type
+  * rename BLOCK_ACCT_APPEND to BLOCK_ACCT_ZONE_APPEND for clarity
+
+v6:
+- update headers to v6.3-rc1
+
+v5:
+- address Stefan's review comments
+  * restore the way writing zone append result to buffer
+  * fix error checking case and other errands
+
+v4:
+- change the way writing zone append request result to buffer
+- change zone state, zone type value of virtio_blk_zone_descriptor
+- add trace events for new zone APIs
+
+v3:
+- use qemuio_from_buffer to write status bit [Stefan]
+- avoid using req->elem directly [Stefan]
+- fix error checkings and memory leak [Stefan]
+
+v2:
+- change units of emulated zone op coresponding to block layer APIs
+- modify error checking cases [Stefan, Damien]
+
+v1:
+- add zoned storage emulation
+
+Sam Li (4):
+  include: update virtio_blk headers to v6.3-rc1
+  virtio-blk: add zoned storage emulation for zoned devices
+  block: add accounting for zone append operation
+  virtio-blk: add some trace events for zoned emulation
+
+ block/qapi-sysemu.c                          |  11 +
+ block/qapi.c                                 |  18 +
+ hw/block/trace-events                        |   7 +
+ hw/block/virtio-blk-common.c                 |   2 +
+ hw/block/virtio-blk.c                        | 405 +++++++++++++++++++
+ include/block/accounting.h                   |   1 +
+ include/standard-headers/drm/drm_fourcc.h    |  12 +
+ include/standard-headers/linux/ethtool.h     |  48 ++-
+ include/standard-headers/linux/fuse.h        |  45 ++-
+ include/standard-headers/linux/pci_regs.h    |   1 +
+ include/standard-headers/linux/vhost_types.h |   2 +
+ include/standard-headers/linux/virtio_blk.h  | 105 +++++
+ linux-headers/asm-arm64/kvm.h                |   1 +
+ linux-headers/asm-x86/kvm.h                  |  34 +-
+ linux-headers/linux/kvm.h                    |   9 +
+ linux-headers/linux/vfio.h                   |  15 +-
+ linux-headers/linux/vhost.h                  |   8 +
+ qapi/block-core.json                         |  62 ++-
+ qapi/block.json                              |   4 +
+ 19 files changed, 769 insertions(+), 21 deletions(-)
+
+-- 
+2.39.2
+
