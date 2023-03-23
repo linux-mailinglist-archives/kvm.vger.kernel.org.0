@@ -2,64 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1276C6C72E4
-	for <lists+kvm@lfdr.de>; Thu, 23 Mar 2023 23:17:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 53DE56C72EB
+	for <lists+kvm@lfdr.de>; Thu, 23 Mar 2023 23:19:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231486AbjCWWRy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Mar 2023 18:17:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44584 "EHLO
+        id S231516AbjCWWTZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Mar 2023 18:19:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47094 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231254AbjCWWRw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Mar 2023 18:17:52 -0400
-Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 047201E1DA
-        for <kvm@vger.kernel.org>; Thu, 23 Mar 2023 15:17:52 -0700 (PDT)
-Received: by mail-pf1-x449.google.com with SMTP id x3-20020a62fb03000000b00622df3f5d0cso95454pfm.10
-        for <kvm@vger.kernel.org>; Thu, 23 Mar 2023 15:17:51 -0700 (PDT)
+        with ESMTP id S231241AbjCWWTX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Mar 2023 18:19:23 -0400
+Received: from mail-io1-xd4a.google.com (mail-io1-xd4a.google.com [IPv6:2607:f8b0:4864:20::d4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8CB832007C
+        for <kvm@vger.kernel.org>; Thu, 23 Mar 2023 15:19:22 -0700 (PDT)
+Received: by mail-io1-xd4a.google.com with SMTP id g7-20020a056602242700b00758e7dbd0dbso67525iob.16
+        for <kvm@vger.kernel.org>; Thu, 23 Mar 2023 15:19:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1679609871;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=TIiBp5BGNgFTIRnkHm2xY3d1SyVAPfDW94ZyxK04aC4=;
-        b=ckajWlyMg++jM+H8gI52Unc8CjT3H8X+4PNZvTjyJNSuh1Emp0jmob87xU9DFaE12F
-         GTgXIKFjKHM8NnvsDag2XVSLWucdAnCUwhFFKErqmYfc21QjdkKzwHYWljXOvcv5MAXs
-         swHD/Ut1PwQJUbqJl8f2b1aKYTmxawpXa+2nMQ//gBBkdATc+ZSbwPPNHXfzput4uCJI
-         mfp5lt0G5UJwxDoHPH+JJMYBfkmIqSDhRi/Egd4HFukhvv5EfGuZuAVO1k710D6DLb71
-         1uy5bt9L30fiJGrdEr4MZNP3s4BrkKdpaTGE392tkSa/oMndDkKBHF7UTbU1zeXC2nix
-         v1EQ==
+        d=google.com; s=20210112; t=1679609962;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=rxAZ+kxQPGWQc3YGGq+yage7hrM7pnvCTwm028DTm6Y=;
+        b=NW0m8Ir4zOOM8A86pYqspbfj+W72uBiCxIRgqtLKK2lWS88B47VXSBzd5ZxD35rL1r
+         ItLwIHZzfLaQRMyKX16p0bpW5Rz0RXbuYrnb74e+zXW9S9argS1YyJ0ccjEjQdU9lsKY
+         6dlouhnggOah86WzS6fleOtxscdQNumx7N3cZTFtRdLSkpLDPsPN3fF5sjkVvhmMo0UG
+         j4ZUvAGUyRWorAQzCkpMduFMSbEokIT5z5J+WmUyUd4i925biPh76p8dSry2h4pVPdhK
+         grW8obmsxiqkls9II71+GorlG//Tz45R2nTon96hdQ1q93Ox8z1pCv2ClCSZ3ubRwVNk
+         1VCg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679609871;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=TIiBp5BGNgFTIRnkHm2xY3d1SyVAPfDW94ZyxK04aC4=;
-        b=k6jT6mf6s4oVaVS5+vOCnDfPQYj05Ygnd2sARtpe2ZaTitauHnKyJtMbjSzuQvcOvy
-         UgMPnB8SNZL7tsUjTKvInW2VaZHjsqZ1fQUpUEKqyUtCshGoY6o/x9qEqFKnGLD+b5CA
-         Bko0JCjGE3zhwWuhbIXzpez7fEMXxUzyt2+p3ccOYGuR2lWaN4TFDT8Zng4l8rqpSL+s
-         t9uvtuDx8oCVqm7TnMepMEC29WD6BNdN812P0aaKwb4Yg6HDn7aP7bgg5y69XLhVtRBj
-         n8gToj9AUYStCOarciSq+tJPnyhXohmJZA6m2HdMjHy4PKMy/Qx+t/tyPCJTiE6V3MfU
-         4WuA==
-X-Gm-Message-State: AAQBX9fkTHQ3IeymDspM1lh2cNb2KNe1DO2NP9C5SOigAnfh00h97s4q
-        /eUtwtftghcOCNQ8fgGs5o5ZR2PYh70=
-X-Google-Smtp-Source: AKy350bVfRkMqMfjU/A868W81C1TxjgdzKx0787lHE5UD9xmdPOaCkB3jN5vH8vUKBRVGNQODCtlk7MMmkw=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a63:4920:0:b0:50b:cf00:7d2e with SMTP id
- w32-20020a634920000000b0050bcf007d2emr4779pga.11.1679609871543; Thu, 23 Mar
- 2023 15:17:51 -0700 (PDT)
-Date:   Thu, 23 Mar 2023 15:17:50 -0700
-In-Reply-To: <20230323050753.rufixzrzt2sf3avv@desk>
+        d=1e100.net; s=20210112; t=1679609962;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=rxAZ+kxQPGWQc3YGGq+yage7hrM7pnvCTwm028DTm6Y=;
+        b=q1Kj7riJtEAPdN00QrHlZe4tBODHZomx68DiQvRwNeL0xfzYgHMg9bxFUpN2JNfCQU
+         Yzqi7DSUEQGl+DIugmvUzCdGZCHzgEeUgAmRCqYypLRdu+PJK9pWgK0fbHlEMJm2qQvB
+         u8XmOSVMsbC2pMqlEOZ2//Vv8unLH2rGDpC4pNCbnS0sydOVGN/If+/aEOIhUevgpJnC
+         N1yCZ2GmdZ4libBsFxS6i0kvfr8CJULj+/rCKmuWWv9E47zznKqubeyx6b2SmfZF8Y/K
+         1JpkNTcmoZL4HR6W9Gk0e0yjtAmBUvQyvLvxegj/Zlfs/KmROsc9G5GzMVE+yarR5acU
+         FRCA==
+X-Gm-Message-State: AO0yUKWu/agbc46lwLNrVztHT/mp1AvC6S6B2imvGGqd5DbT8jZHz62Z
+        EMO/4lYUdmYxapOx6IW5IkPuyysawN/JN1k3Jw==
+X-Google-Smtp-Source: AK7set+7z+U+rkzFtkXD/4bTtoGCn6aSxcDEVTE8Vnn+drCicOJE7RRqBO7O9kzJvihAK7pbF/li/oTAcNNJVadRqw==
+X-Received: from coltonlewis-kvm.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:14ce])
+ (user=coltonlewis job=sendgmr) by 2002:a05:6638:4984:b0:406:37fb:43eb with
+ SMTP id cv4-20020a056638498400b0040637fb43ebmr5255573jab.1.1679609961976;
+ Thu, 23 Mar 2023 15:19:21 -0700 (PDT)
+Date:   Thu, 23 Mar 2023 22:19:21 +0000
+In-Reply-To: <20230313124837.2264882-1-maz@kernel.org> (message from Marc
+ Zyngier on Mon, 13 Mar 2023 12:48:18 +0000)
 Mime-Version: 1.0
-References: <20230322011440.2195485-1-seanjc@google.com> <20230322011440.2195485-6-seanjc@google.com>
- <20230323050753.rufixzrzt2sf3avv@desk>
-Message-ID: <ZBzQDv9gIHIhOP8Y@google.com>
-Subject: Re: [PATCH 5/6] KVM: x86: Virtualize FLUSH_L1D and passthrough MSR_IA32_FLUSH_CMD
-From:   Sean Christopherson <seanjc@google.com>
-To:     Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Nathan Chancellor <nathan@kernel.org>,
-        Emanuele Giuseppe Esposito <eesposit@redhat.com>,
-        Jim Mattson <jmattson@google.com>
-Content-Type: text/plain; charset="us-ascii"
+Message-ID: <gsntbkkjcdqu.fsf@coltonlewis-kvm.c.googlers.com>
+Subject: Re: [PATCH v2 00/19] KVM: arm64: Rework timer offsetting for fun and profit
+From:   Colton Lewis <coltonlewis@google.com>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, james.morse@arm.com,
+        suzuki.poulose@arm.com, oliver.upton@linux.dev,
+        yuzenghui@huawei.com, ricarkol@google.com, sveith@amazon.de,
+        reijiw@google.com, joey.gouly@arm.com, dwmw2@infradead.org
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
 X-Spam-Status: No, score=-7.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
@@ -70,28 +69,28 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 22, 2023, Pawan Gupta wrote:
-> On Tue, Mar 21, 2023 at 06:14:39PM -0700, Sean Christopherson wrote:
-> > diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> > index 85bb535fc321..b32edaf5a74b 100644
-> > --- a/arch/x86/kvm/svm/svm.c
-> > +++ b/arch/x86/kvm/svm/svm.c
-> > @@ -95,6 +95,7 @@ static const struct svm_direct_access_msrs {
-> >  #endif
-> >  	{ .index = MSR_IA32_SPEC_CTRL,			.always = false },
-> >  	{ .index = MSR_IA32_PRED_CMD,			.always = false },
-> > +	{ .index = MSR_IA32_FLUSH_CMD,			.always = false },
-> >  	{ .index = MSR_IA32_LASTBRANCHFROMIP,		.always = false },
-> >  	{ .index = MSR_IA32_LASTBRANCHTOIP,		.always = false },
-> >  	{ .index = MSR_IA32_LASTINTFROMIP,		.always = false },
-> > @@ -4140,6 +4141,10 @@ static void svm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
-> >  		set_msr_interception(vcpu, svm->msrpm, MSR_IA32_PRED_CMD, 0,
-> >  				     !!guest_has_pred_cmd_msr(vcpu));
-> >  
-> > +	if (boot_cpu_has(X86_FEATURE_FLUSH_L1D))
-> 
-> Just curious, will this ever be true on AMD hardware? AFAIK,
-> X86_FEATURE_FLUSH_L1D is Intel-defined CPU feature.
+Hello Marc,
 
-Don't know myself, but I assume/home there was actual motivation behind adding
-support for AMD.
+I had thought I sent this earlier but our conversation today made me
+aware I hadn't.
+
+Marc Zyngier <maz@kernel.org> writes:
+
+> way. Colton reported some other issues with this test, but I cannot
+> reproduce them here, making me think this might be related to CNTPOFF
+> (but again, I don't have such HW at hand).
+
+I can no longer reproduce any issues on any platform with this version.
+
+Two minor comments:
+
+- I'm not sure you ever addressed my comment from v1 asking if you
+   should add CNTPOFF_EL2 to vcpu_sysreg in
+   arch/arm64/include/asm/kvm_host.h
+
+- You left the capital O flag in your selftest changes even though it is
+   no longer used.
+
+Otherwise,
+
+Reviewed-by: Colton Lewis <coltonlewis@google.com>
