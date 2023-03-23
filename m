@@ -2,80 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3710F6C655A
-	for <lists+kvm@lfdr.de>; Thu, 23 Mar 2023 11:41:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D7E8E6C6571
+	for <lists+kvm@lfdr.de>; Thu, 23 Mar 2023 11:43:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230506AbjCWKl1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Mar 2023 06:41:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59940 "EHLO
+        id S231190AbjCWKnp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Mar 2023 06:43:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46922 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230321AbjCWKlK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Mar 2023 06:41:10 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 978411CAFA
-        for <kvm@vger.kernel.org>; Thu, 23 Mar 2023 03:37:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1679567838;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=EpnQQ3G7hcvDGrM22xg98YnMqqv0RfyTzwV5l3OM/5c=;
-        b=HoQ/D/QaXZdFwkfNZoyDwWYc8oDKA9bYOo30yuGIfjFIhIjfW1ClUVp2ghcBdD2Mh/Qok9
-        Iw7hLKYXNlLROfHdTAsJT9s0GZc2WDLnSIXalPljgeonM1CvFa4cUbNLe0zfhFWCDWPFVq
-        WxJG43RJ+nNvCHn5P3QingAemLfqkMg=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-263-t_wm2TsoPLqWhq-ZWfB6LA-1; Thu, 23 Mar 2023 06:37:16 -0400
-X-MC-Unique: t_wm2TsoPLqWhq-ZWfB6LA-1
-Received: by mail-wm1-f70.google.com with SMTP id o7-20020a05600c4fc700b003edf85f6bb1so808881wmq.3
-        for <kvm@vger.kernel.org>; Thu, 23 Mar 2023 03:37:16 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679567834;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=EpnQQ3G7hcvDGrM22xg98YnMqqv0RfyTzwV5l3OM/5c=;
-        b=DsbOIFkJ8eHsIwcoBpPui5FfcLmkAlf3WNV1vu8fYb2x9T8dccs77shzSIIJ3NFDQ4
-         BVKSiZ0NoeoYZBcQh/K1WAbg9TMw7ZJ6oa26TW259wNTi7JWYOB2warsYoIIzoh8s85l
-         Hmfni61ctvFCCLLpW8Eb5hgweGCNlGIP2mOAocLCMjEe4Qcz1gdBYcT1ZeJZrtyqLvaW
-         /Wb5bA0z4IVq8vVmwG5g7WEcok6k7/SJlRRKCXz76yBwKbwGusPQduvdAS5ctXB6EEb1
-         0sx8JrwfLNez9/duw88czTWl11aI7I+xMtBqr1RvjK0ZGfKRlQy9zag1mHrkZtIx5zhV
-         phbg==
-X-Gm-Message-State: AO0yUKWjEfB92TCdFNZg9HcodCa//tQPssyAM/f6RlJbYXgem7VgucDq
-        jk4xU74VMJlUCJ5qS0vs+5T7dCW5x/ijo57JBk1hc9T7zFO0Cz/xX8EJ3ivVf7/1SsGAasIiOLG
-        zJsnWwkzGc4no
-X-Received: by 2002:a05:600c:2256:b0:3ee:5754:f14b with SMTP id a22-20020a05600c225600b003ee5754f14bmr2034980wmm.3.1679567834565;
-        Thu, 23 Mar 2023 03:37:14 -0700 (PDT)
-X-Google-Smtp-Source: AK7set+gpzAA7wqFypGZYurRSrxux98xhwtHxoigh9D6yMe4Wr4EW4I56QepTLL6+hAsj2ePNI94IA==
-X-Received: by 2002:a05:600c:2256:b0:3ee:5754:f14b with SMTP id a22-20020a05600c225600b003ee5754f14bmr2034963wmm.3.1679567834201;
-        Thu, 23 Mar 2023 03:37:14 -0700 (PDT)
-Received: from sgarzare-redhat (host-82-53-134-98.retail.telecomitalia.it. [82.53.134.98])
-        by smtp.gmail.com with ESMTPSA id z21-20020a1cf415000000b003ee3e075d1csm1483544wma.22.2023.03.23.03.37.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Mar 2023 03:37:13 -0700 (PDT)
-Date:   Thu, 23 Mar 2023 11:37:11 +0100
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     virtualization@lists.linux-foundation.org, stefanha@redhat.com,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Andrey Zhadchenko <andrey.zhadchenko@virtuozzo.com>,
-        eperezma@redhat.com, netdev@vger.kernel.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 4/8] vringh: support VA with iotlb
-Message-ID: <20230323103711.sobptckmgr22lwxj@sgarzare-redhat>
-References: <20230321154228.182769-1-sgarzare@redhat.com>
- <20230321154228.182769-5-sgarzare@redhat.com>
- <CACGkMEs3G+O3Jo7yNPSOZ9wiEbq_nudU9HrVNzhqtkGoRVesYA@mail.gmail.com>
+        with ESMTP id S231222AbjCWKnY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Mar 2023 06:43:24 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78C1D3B3EA
+        for <kvm@vger.kernel.org>; Thu, 23 Mar 2023 03:40:25 -0700 (PDT)
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 32N8pNoF022777
+        for <kvm@vger.kernel.org>; Thu, 23 Mar 2023 10:40:21 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=uq1A1Eo3w1m6OPhOjlEBUB/WO6Ldy1yFDgXzuAUo8gg=;
+ b=Su9tKtEQ+bwRY0hL3ya4TxC126IZGt1gIByabLw3GgYbG3NYJBTXtgz1JLQ0DaBtp3XG
+ +KZclNhINdULQVUXVQTH1oMXkpH8Yr2wCsyfUebVN807uEaLxzTY7f9+PgWTMPwhWXuy
+ jvHOW400MNLjT4JsyEppq23s5MW/inqqSuExBB9lFgS39pV2tcKr45lU2GHxcseXzfn2
+ IjepCRu0WYYh51t9u80GpETS/mn3iqST87Rif28XJfwwgsJCb8dtTJwSc7LV1t48FdK4
+ QtYK6lxTBfXsIWGYVf0VuTQKMBSlXwsN3/pPyTG+33n8B5Qgn/5cypGUABz30vK56aMk Lw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pge77hrg6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Thu, 23 Mar 2023 10:40:20 +0000
+Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 32N8a2Fv007598
+        for <kvm@vger.kernel.org>; Thu, 23 Mar 2023 10:40:20 GMT
+Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pge77hrff-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 23 Mar 2023 10:40:20 +0000
+Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
+        by ppma01fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 32MKG9nI014689;
+        Thu, 23 Mar 2023 10:40:18 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+        by ppma01fra.de.ibm.com (PPS) with ESMTPS id 3pd4x6e1xm-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 23 Mar 2023 10:40:17 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+        by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 32NAeE4x39911946
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 23 Mar 2023 10:40:14 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3AE742008F;
+        Thu, 23 Mar 2023 10:40:14 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 9645120088;
+        Thu, 23 Mar 2023 10:40:13 +0000 (GMT)
+Received: from linux6.. (unknown [9.114.12.104])
+        by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Thu, 23 Mar 2023 10:40:13 +0000 (GMT)
+From:   Janosch Frank <frankja@linux.ibm.com>
+To:     kvm@vger.kernel.org, nrb@linux.ibm.com
+Cc:     thuth@redhat.com, imbrenda@linux.ibm.com
+Subject: [kvm-unit-tests PATCH 0/8] s390x: uv-host: Fixups and extensions part 1
+Date:   Thu, 23 Mar 2023 10:39:05 +0000
+Message-Id: <20230323103913.40720-1-frankja@linux.ibm.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CACGkMEs3G+O3Jo7yNPSOZ9wiEbq_nudU9HrVNzhqtkGoRVesYA@mail.gmail.com>
-X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 8m7DENHiBxT8Bw40mdKO9UJMIGAFBn3A
+X-Proofpoint-ORIG-GUID: wSz3eCBQGb61ymTU73D_EYGXUQFDap3Z
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
+ definitions=2023-03-22_21,2023-03-22_01,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 mlxscore=0
+ clxscore=1015 adultscore=0 spamscore=0 impostorscore=0 lowpriorityscore=0
+ malwarescore=0 priorityscore=1501 suspectscore=0 mlxlogscore=999
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2303150002 definitions=main-2303230080
+X-Spam-Status: No, score=-0.1 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
+        DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -83,203 +85,35 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 23, 2023 at 11:36:28AM +0800, Jason Wang wrote:
->On Tue, Mar 21, 2023 at 11:43 PM Stefano Garzarella <sgarzare@redhat.com> wrote:
->>
->> vDPA supports the possibility to use user VA in the iotlb messages.
->> So, let's add support for user VA in vringh to use it in the vDPA
->> simulators.
->>
->> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
->> ---
->>
->> Notes:
->>     v3:
->>     - refactored avoiding code duplication [Eugenio]
->>     v2:
->>     - replace kmap_atomic() with kmap_local_page() [see previous patch]
->>     - fix cast warnings when build with W=1 C=1
->>
->>  include/linux/vringh.h            |   5 +-
->>  drivers/vdpa/mlx5/net/mlx5_vnet.c |   2 +-
->>  drivers/vdpa/vdpa_sim/vdpa_sim.c  |   4 +-
->>  drivers/vhost/vringh.c            | 153 +++++++++++++++++++++++-------
->>  4 files changed, 127 insertions(+), 37 deletions(-)
->>
->> diff --git a/include/linux/vringh.h b/include/linux/vringh.h
->> index 1991a02c6431..d39b9f2dcba0 100644
->> --- a/include/linux/vringh.h
->> +++ b/include/linux/vringh.h
->> @@ -32,6 +32,9 @@ struct vringh {
->>         /* Can we get away with weak barriers? */
->>         bool weak_barriers;
->>
->> +       /* Use user's VA */
->> +       bool use_va;
->> +
->>         /* Last available index we saw (ie. where we're up to). */
->>         u16 last_avail_idx;
->>
->> @@ -279,7 +282,7 @@ void vringh_set_iotlb(struct vringh *vrh, struct vhost_iotlb *iotlb,
->>                       spinlock_t *iotlb_lock);
->>
->>  int vringh_init_iotlb(struct vringh *vrh, u64 features,
->> -                     unsigned int num, bool weak_barriers,
->> +                     unsigned int num, bool weak_barriers, bool use_va,
->>                       struct vring_desc *desc,
->>                       struct vring_avail *avail,
->>                       struct vring_used *used);
->> diff --git a/drivers/vdpa/mlx5/net/mlx5_vnet.c b/drivers/vdpa/mlx5/net/mlx5_vnet.c
->> index 520646ae7fa0..dfd0e000217b 100644
->> --- a/drivers/vdpa/mlx5/net/mlx5_vnet.c
->> +++ b/drivers/vdpa/mlx5/net/mlx5_vnet.c
->> @@ -2537,7 +2537,7 @@ static int setup_cvq_vring(struct mlx5_vdpa_dev *mvdev)
->>
->>         if (mvdev->actual_features & BIT_ULL(VIRTIO_NET_F_CTRL_VQ))
->>                 err = vringh_init_iotlb(&cvq->vring, mvdev->actual_features,
->> -                                       MLX5_CVQ_MAX_ENT, false,
->> +                                       MLX5_CVQ_MAX_ENT, false, false,
->
->To avoid those changes, would it be better to introduce
->vringh_init_iotlb_va() so vringh_init_iotlb() can stick to pa.
+The uv-host test has a lot of historical growth problems which have
+largely been overlooked since running it is harder than running a KVM
+(guest 2) based test.
 
-Okay, I don't have a strong opinion, I'll add vringh_init_iotlb_va().
+This series fixes up smaler problems but still leaves the test with
+fails when running create config base and variable storage
+tests. Those problems will either be fixed up with the second series
+or with a firmware fix since I'm unsure on which side of the os/fw
+fence the problem exists.
 
->
->>                                         (struct vring_desc *)(uintptr_t)cvq->desc_addr,
->>                                         (struct vring_avail *)(uintptr_t)cvq->driver_addr,
->>                                         (struct vring_used *)(uintptr_t)cvq->device_addr);
->> diff --git a/drivers/vdpa/vdpa_sim/vdpa_sim.c b/drivers/vdpa/vdpa_sim/vdpa_sim.c
->> index eea23c630f7c..47cdf2a1f5b8 100644
->> --- a/drivers/vdpa/vdpa_sim/vdpa_sim.c
->> +++ b/drivers/vdpa/vdpa_sim/vdpa_sim.c
->> @@ -60,7 +60,7 @@ static void vdpasim_queue_ready(struct vdpasim *vdpasim, unsigned int idx)
->>         struct vdpasim_virtqueue *vq = &vdpasim->vqs[idx];
->>         uint16_t last_avail_idx = vq->vring.last_avail_idx;
->>
->> -       vringh_init_iotlb(&vq->vring, vdpasim->features, vq->num, true,
->> +       vringh_init_iotlb(&vq->vring, vdpasim->features, vq->num, true, false,
->>                           (struct vring_desc *)(uintptr_t)vq->desc_addr,
->>                           (struct vring_avail *)
->>                           (uintptr_t)vq->driver_addr,
->> @@ -92,7 +92,7 @@ static void vdpasim_vq_reset(struct vdpasim *vdpasim,
->>         vq->cb = NULL;
->>         vq->private = NULL;
->>         vringh_init_iotlb(&vq->vring, vdpasim->dev_attr.supported_features,
->> -                         VDPASIM_QUEUE_MAX, false, NULL, NULL, NULL);
->> +                         VDPASIM_QUEUE_MAX, false, false, NULL, NULL, NULL);
->>
->>         vq->vring.notify = NULL;
->>  }
->> diff --git a/drivers/vhost/vringh.c b/drivers/vhost/vringh.c
->> index 0ba3ef809e48..72c88519329a 100644
->> --- a/drivers/vhost/vringh.c
->> +++ b/drivers/vhost/vringh.c
->> @@ -1094,10 +1094,18 @@ EXPORT_SYMBOL(vringh_need_notify_kern);
->>
->>  #if IS_REACHABLE(CONFIG_VHOST_IOTLB)
->>
->> +struct iotlb_vec {
->> +       union {
->> +               struct iovec *iovec;
->> +               struct bio_vec *bvec;
->> +       } iov;
->> +       size_t count;
->> +       bool is_iovec;
->
->I wonder if this is needed (if vringh is passed to every iotlb_vec helper).
+The series is based on my other series that introduces pv-ipl and
+pv-icpt. The memory allocation fix will be added to the new version of
+that series so all G1 tests are fixed.
 
-Yep, I can use vringh->use_va.
+Janosch Frank (8):
+  s390x: uv-host: Fix UV init test memory allocation
+  s390x: uv-host: Check for sufficient amount of memory
+  s390x: Add PV tests to unittests.cfg
+  s390x: uv-host: Beautify code
+  s390x: uv-host: Add cpu number check
+  s390x: uv-host: Fix create guest variable storage prefix check
+  s390x: uv-host: Properly handle config creation errors
+  s390x: uv-host: Fence access checks when UV debug is enabled
 
->
->> +};
->> +
->>  static int iotlb_translate(const struct vringh *vrh,
->>                            u64 addr, u64 len, u64 *translated,
->> -                          struct bio_vec iov[],
->> -                          int iov_size, u32 perm)
->> +                          struct iotlb_vec *ivec, u32 perm)
->>  {
->>         struct vhost_iotlb_map *map;
->>         struct vhost_iotlb *iotlb = vrh->iotlb;
->> @@ -1107,9 +1115,9 @@ static int iotlb_translate(const struct vringh *vrh,
->>         spin_lock(vrh->iotlb_lock);
->>
->>         while (len > s) {
->> -               u64 size, pa, pfn;
->> +               u64 size;
->>
->> -               if (unlikely(ret >= iov_size)) {
->> +               if (unlikely(ret >= ivec->count)) {
->>                         ret = -ENOBUFS;
->>                         break;
->>                 }
->> @@ -1124,10 +1132,22 @@ static int iotlb_translate(const struct vringh *vrh,
->>                 }
->>
->>                 size = map->size - addr + map->start;
->> -               pa = map->addr + addr - map->start;
->> -               pfn = pa >> PAGE_SHIFT;
->> -               bvec_set_page(&iov[ret], pfn_to_page(pfn), min(len - s, size),
->> -                             pa & (PAGE_SIZE - 1));
->> +               if (ivec->is_iovec) {
->> +                       struct iovec *iovec = ivec->iov.iovec;
->> +
->> +                       iovec[ret].iov_len = min(len - s, size);
->> +                       iovec[ret].iov_base = (void __user *)(unsigned long)
->> +                                             (map->addr + addr - map->start);
->
->map->addr - map->start to avoid overflow?
+ lib/s390x/asm/uv.h  |   1 +
+ s390x/unittests.cfg |  16 +++++++
+ s390x/uv-host.c     | 101 +++++++++++++++++++++++++++++++++++---------
+ 3 files changed, 99 insertions(+), 19 deletions(-)
 
-Right, it was pre-existing, but I'll fix since I'm here (also in the
-else branch).
-And since it's duplicate code, I'll declare it outside!
-
->
->> +               } else {
->> +                       u64 pa = map->addr + addr - map->start;
->> +                       u64 pfn = pa >> PAGE_SHIFT;
->> +                       struct bio_vec *bvec = ivec->iov.bvec;
->> +
->> +                       bvec_set_page(&bvec[ret], pfn_to_page(pfn),
->> +                                     min(len - s, size),
->> +                                     pa & (PAGE_SIZE - 1));
->> +               }
->> +
->>                 s += size;
->>                 addr += size;
->>                 ++ret;
->> @@ -1141,26 +1161,42 @@ static int iotlb_translate(const struct vringh *vrh,
->>         return ret;
->>  }
->>
->> +#define IOTLB_IOV_SIZE 16
->> +
->>  static inline int copy_from_iotlb(const struct vringh *vrh, void *dst,
->>                                   void *src, size_t len)
->>  {
->> +       struct iotlb_vec ivec;
->> +       union {
->> +               struct iovec iovec[IOTLB_IOV_SIZE];
->> +               struct bio_vec bvec[IOTLB_IOV_SIZE];
->> +       } iov;
->>         u64 total_translated = 0;
->>
->> +       ivec.iov.iovec = iov.iovec;
->
->ivc.iov = iov ?
-
-I tried, but they are both anonymous unions, so I cannot assign them.
-
-Also, this inner union I need to allocate space in the stack to hold
-both arrays, while the union in iotlb_vec to carry both pointers.
-
-I don't know whether to add a third field (e.g. `void *raw`) to both and
-assign it.
-
->
->Others look good.
-
-Thanks,
-Stefano
+-- 
+2.34.1
 
