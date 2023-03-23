@@ -2,91 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F1D756C72D2
-	for <lists+kvm@lfdr.de>; Thu, 23 Mar 2023 23:13:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C0FB16C72DA
+	for <lists+kvm@lfdr.de>; Thu, 23 Mar 2023 23:15:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231303AbjCWWNk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Mar 2023 18:13:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37624 "EHLO
+        id S231387AbjCWWP2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Mar 2023 18:15:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40968 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230435AbjCWWNi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Mar 2023 18:13:38 -0400
-Received: from mail.skyhub.de (mail.skyhub.de [5.9.137.197])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F5537D9B;
-        Thu, 23 Mar 2023 15:13:25 -0700 (PDT)
-Received: from [127.0.0.1] (dynamic-046-114-209-225.46.114.pool.telefonica.de [46.114.209.225])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 4DDEE1EC063F;
-        Thu, 23 Mar 2023 23:13:23 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1679609603;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=1rG8Vo4uESEgIx6SljIpoKKCeAOrhkkAIKpnzeWXL7Q=;
-        b=iPuzgHJVUpBL5WXk4EVNvM5/Y2kYnz6B/KvW1lguZhVDRAWBHwCJRS1mNsBn5uFmsfy4tI
-        lHrVnIk5xoFbkNCn/uc2rm0k4zGAgUugzFit6aQS0LJakDs5tvWfS/DF8un8OUnuyFwp7Z
-        CJ/hNYhTyXd7JvC7BEQfZecCVBK6Yf4=
-Date:   Thu, 23 Mar 2023 23:13:22 +0100
-From:   Borislav Petkov <bp@alien8.de>
-To:     Tom Lendacky <thomas.lendacky@amd.com>,
-        "Woodhouse, David" <dwmw@amazon.co.uk>,
-        "usama.arif@bytedance.com" <usama.arif@bytedance.com>
-CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "brgerst@gmail.com" <brgerst@gmail.com>,
-        "arjan@linux.intel.com" <arjan@linux.intel.com>,
-        "hewenliang4@huawei.com" <hewenliang4@huawei.com>,
-        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
-        "simon.evans@bytedance.com" <simon.evans@bytedance.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "oleksandr@natalenko.name" <oleksandr@natalenko.name>,
-        "kim.phillips@amd.com" <kim.phillips@amd.com>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "fam.zheng@bytedance.com" <fam.zheng@bytedance.com>,
-        "mimoja@mimoja.de" <mimoja@mimoja.de>,
-        "seanjc@google.com" <seanjc@google.com>,
-        "liangma@liangbit.com" <liangma@liangbit.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "hpa@zytor.com" <hpa@zytor.com>,
-        "punit.agrawal@bytedance.com" <punit.agrawal@bytedance.com>,
-        "pmenzel@molgen.mpg.de" <pmenzel@molgen.mpg.de>,
-        "piotrgorski@cachyos.org" <piotrgorski@cachyos.org>,
-        "gpiccoli@igalia.com" <gpiccoli@igalia.com>,
-        "paulmck@kernel.org" <paulmck@kernel.org>,
-        "Rapan, Sabin" <sabrapan@amazon.com>,
-        "rcu@vger.kernel.org" <rcu@vger.kernel.org>,
-        "x86@kernel.org" <x86@kernel.org>
-Subject: Re: [PATCH v16 8/8] x86/smpboot: Allow parallel bringup for SEV-ES
-User-Agent: K-9 Mail for Android
-In-Reply-To: <19ec60aa-fa11-c44e-a6d1-9583f2e7707a@amd.com>
-References: <20230321194008.785922-1-usama.arif@bytedance.com> <20230321194008.785922-9-usama.arif@bytedance.com> <20230322224735.GAZBuFh9ld6FuYEyoH@fat_crate.local> <2c3dd773-31ca-d4b1-78a2-b39f3785c7c5@amd.com> <751f572f940220775054dc09324b20b929d7d66d.camel@amazon.co.uk> <19ec60aa-fa11-c44e-a6d1-9583f2e7707a@amd.com>
-Message-ID: <5D59D19F-8085-4638-96A2-4DCE00D2217E@alien8.de>
+        with ESMTP id S229870AbjCWWP0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Mar 2023 18:15:26 -0400
+Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA988B2
+        for <kvm@vger.kernel.org>; Thu, 23 Mar 2023 15:15:25 -0700 (PDT)
+Received: by mail-pj1-x1033.google.com with SMTP id p3-20020a17090a74c300b0023f69bc7a68so3508360pjl.4
+        for <kvm@vger.kernel.org>; Thu, 23 Mar 2023 15:15:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112; t=1679609725;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=o+ylr/mOA4BODFKJbYlALqz8w1nJ4f5MeaN1bApR/jE=;
+        b=ATX4N5q3l1nX9PV91evb3WU0STr9/jdM/snusO6wBEcteYunulqcsKnOIwjro/gSJF
+         GKC6SNXvys0zWLlP0TePikbn/Wbx8LKggQ96aO+SoDGfbi+yVxm6WIo8Zri9kHB3Cf+/
+         FiBqwY0VADKV0Suyb2GNxFk5IqBl24KTMApGjnRHm5iJuFk0Ubn7zHZNdr92YemH+I0i
+         vbq9izWJHeeVI/Y+KSdX0wwHSPdbQ4cmOEyBN/90C1EWARLATmMHa4h2WduQe4Xyacq6
+         HbyEPnhnLLBQT2gWz0/9iHBh4c1OZrivrObggg7eDgZST47l47laRXxFVSZOLjFAWysS
+         IQVQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1679609725;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=o+ylr/mOA4BODFKJbYlALqz8w1nJ4f5MeaN1bApR/jE=;
+        b=FiDHPfHTEDh9CaQTdlCsb/mOPJVOXe3Di59oLYPQZwYYs8X1pVHGobWT3OEnUxrPaH
+         NoMCnnrvjChfX/c+A91ve7rOFK/FH+jKEZ3cHqdOl0ApUE1M3MZzrnM0XA4Rr7Y1aC2G
+         5e+ZjbZpRX0PL/vYBvDv5SUnjjrmcL2DpgbfI8ua4pOCiug3p9j4FHwYp2EwPfSaZJ9X
+         YYAjdqJx1gZr/MAU8XXsYBDQH407l9jsLGY5roTlXC9JqrEwrvTMyY+bz9nhXG6QdGTA
+         0E3tQNixp2Bt55r4MyJyjf830S0rmsUIBRJeBCsVGzkq1NSPmvTSLauFr9koKQQ2V3Q5
+         yQ7w==
+X-Gm-Message-State: AAQBX9c4dD1ksTtWL63Hl02gRww08A+ygotwaJvzIqLmY4UeK4hKi9+b
+        Sk/Z5oKseJ5qqvvuRFvFxL7KqQ==
+X-Google-Smtp-Source: AKy350akhAgaOXgQONm7ST17i7vfpiD194fM49OYzlB12+MvnMGdHfOrKKPod7Cmc5024KoJROYD+A==
+X-Received: by 2002:a17:903:32cc:b0:1a1:f5dd:2dde with SMTP id i12-20020a17090332cc00b001a1f5dd2ddemr383893plr.44.1679609725156;
+        Thu, 23 Mar 2023 15:15:25 -0700 (PDT)
+Received: from google.com (223.103.125.34.bc.googleusercontent.com. [34.125.103.223])
+        by smtp.gmail.com with ESMTPSA id m16-20020a170902bb9000b0019e88d9bed3sm12733395pls.210.2023.03.23.15.15.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 23 Mar 2023 15:15:24 -0700 (PDT)
+Date:   Thu, 23 Mar 2023 15:15:20 -0700
+From:   David Matlack <dmatlack@google.com>
+To:     Vipin Sharma <vipinsh@google.com>
+Cc:     seanjc@google.com, pbonzini@redhat.com, bgardon@google.com,
+        jmattson@google.com, mizhang@google.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [Patch v4 12/18] KVM: x86/mmu: Allocate NUMA aware page tables
+ on TDP huge page splits
+Message-ID: <ZBzPeETL7/R1Qwwe@google.com>
+References: <20230306224127.1689967-1-vipinsh@google.com>
+ <20230306224127.1689967-13-vipinsh@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
-        DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
-        autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230306224127.1689967-13-vipinsh@google.com>
+X-Spam-Status: No, score=-15.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,ENV_AND_HDR_SPF_MATCH,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL,
+        USER_IN_DEF_SPF_WL autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On March 23, 2023 7:28:38 PM GMT+01:00, Tom Lendacky <thomas=2Elendacky@amd=
-=2Ecom> wrote:
->
->I agree=2E But once it's there, someone somewhere in the future may look =
-and go, oh, I can call this=2E So I think it either needs a nice comment ab=
-ove it about how it is currently used/called and what to do if it needs to =
-be called from someplace other than head_64=2ES or the MSR needs to be save=
-d/restored=2E
+On Mon, Mar 06, 2023 at 02:41:21PM -0800, Vipin Sharma wrote:
+> +
+> +void *kvm_mmu_get_free_page(gfp_t gfp, int nid)
+> +{
+> +#ifdef CONFIG_NUMA
 
-Or it could be __init and get discarded when the system is up=2E
+Is this #ifdef necessary? alloc_pages_node() is defined regardless of
+CONFIG_NUMA.
 
---=20
-Sent from a small device: formatting sucks and brevity is inevitable=2E 
+> +	struct page *page;
+> +
+> +	if (nid != NUMA_NO_NODE) {
+> +		page = alloc_pages_node(nid, gfp, 0);
+> +		if (!page)
+> +			return (void *)0;
+> +		return page_address(page);
+> +	}
+> +#endif /* CONFIG_NUMA */
+> +	return (void *)__get_free_page(gfp);
+> +}
+> +
