@@ -2,310 +2,163 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5665D6C5D5D
-	for <lists+kvm@lfdr.de>; Thu, 23 Mar 2023 04:43:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CF85B6C5DE9
+	for <lists+kvm@lfdr.de>; Thu, 23 Mar 2023 05:26:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229889AbjCWDnM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Mar 2023 23:43:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54794 "EHLO
+        id S229889AbjCWE02 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Mar 2023 00:26:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57040 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229992AbjCWDnI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Mar 2023 23:43:08 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65FB8279BB
-        for <kvm@vger.kernel.org>; Wed, 22 Mar 2023 20:42:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1679542941;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=XUIZFR6eucu+OIs0TWLjII9inPt9aJzgG/Q5lo//Jeo=;
-        b=FfzrE4pSdn/a7HGHtI3S96yiaJHGeblolExLDi+JyaHkqn+M0KIAtMGS3Mei39R5hXBqwl
-        Efc7+jlgr11cywXw53gigNa/desWjn2Ph/tpLh+7DBT6hk943cOd1t8mlW6k0iqEmCnBPo
-        EpqqNtz3LBVVLv/smRBt5zuHnIeyDQ0=
-Received: from mail-oa1-f71.google.com (mail-oa1-f71.google.com
- [209.85.160.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-201-u4A4YwyiPQmI7IKxh_a3lA-1; Wed, 22 Mar 2023 23:42:20 -0400
-X-MC-Unique: u4A4YwyiPQmI7IKxh_a3lA-1
-Received: by mail-oa1-f71.google.com with SMTP id 586e51a60fabf-17e11dd9a3dso6366485fac.10
-        for <kvm@vger.kernel.org>; Wed, 22 Mar 2023 20:42:20 -0700 (PDT)
+        with ESMTP id S229796AbjCWE00 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Mar 2023 00:26:26 -0400
+Received: from mail-qt1-x82e.google.com (mail-qt1-x82e.google.com [IPv6:2607:f8b0:4864:20::82e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 275C7231D9;
+        Wed, 22 Mar 2023 21:26:25 -0700 (PDT)
+Received: by mail-qt1-x82e.google.com with SMTP id g19so179173qts.9;
+        Wed, 22 Mar 2023 21:26:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112; t=1679545584;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:feedback-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=m71zsVivzHPhz262MIZjHPWFUGOi4WzXmXh+VaxIc18=;
+        b=EQ7QLeeZLlMbUuGH4tbDcR8oO3gMKAKXndJmeoi/zamjx6Q7lu6TOTPL/NyiWOvKf8
+         9RHo2WaKrNHyEQmd4GU27KCfAZZ2eREglSsYislMDmVBT55AxmtqQkOTwlF2sAQM2KeN
+         Hm0s61Qv6fxqwTD3vqP+PRS6h0Ksmpsqy6ow3pOJP7m6PfL7MxSzXl/L5eSOSuJIGYL6
+         WyvtmW5r3e1QGs9KLnqcIq3z/NjnAfRp5ucZzn1WF0tmaqv5ANiPPRPfxzMSUYUfy+wD
+         OMr7SvtzmtocGHZABYRMWVk34AVMXkQ8gQyXjS8jeT58XT3nU5SE3dms6w8/S0I+o6Zo
+         oZbg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679542939;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=XUIZFR6eucu+OIs0TWLjII9inPt9aJzgG/Q5lo//Jeo=;
-        b=BhhA+uVIf0Tuw0waFrGXVRWLOomzR4Tew36SsRTgGXjfKDULzwh99TmqC7h9iaWtqu
-         wDeBwyrwqD5FjKBZVDXoaawn6KN3wc8ChGSN2Q5EBN70V82dQ4UcdDKOBZxG3ToBcF2t
-         51xqIVtTUpMv37mluX7CmFwfgrQqKaTwqMYmpTeTinCJ7MXDbn6RWquvekbUVAoUm5vt
-         vhYN27LWcYd843L2h4et1Yvw0OT1BZ1K7xS04jM5z9geqGyBpQU1lD90bNziSUDu6Z/q
-         lkIiXzWzVMDXq83aUaezXm6BDzWgr0bwqZS7Y8i+BpnSbjfqa/gYaIRcnDvtSATjedWM
-         BLfA==
-X-Gm-Message-State: AO0yUKW4G1/C/tzjkrN7RsoOMmo0gijFEw6iVWSIY88XLl2P1y9UKf4x
-        YZ1NF/8ZcbBxrxffptHXfGwmmcdLhoKczXyRtEw+UhZoVBlubG1hjfhVpgGyh3TqvDmPSZ6KABy
-        gplw7LXCb2lYjJsYKlfQjy+rOoHpD
-X-Received: by 2002:a05:6808:1a1d:b0:383:fef9:6cac with SMTP id bk29-20020a0568081a1d00b00383fef96cacmr1819907oib.9.1679542938857;
-        Wed, 22 Mar 2023 20:42:18 -0700 (PDT)
-X-Google-Smtp-Source: AK7set/mXp63nDLW0b7iGBzyRXlYGsaP/rHpglo4tTf5G/0Ar5AWw4s9TVxEiIat3siEObH+eUeSB9APmekJJ290fu0=
-X-Received: by 2002:a05:6808:1a1d:b0:383:fef9:6cac with SMTP id
- bk29-20020a0568081a1d00b00383fef96cacmr1819900oib.9.1679542938572; Wed, 22
- Mar 2023 20:42:18 -0700 (PDT)
+        d=1e100.net; s=20210112; t=1679545584;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:feedback-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=m71zsVivzHPhz262MIZjHPWFUGOi4WzXmXh+VaxIc18=;
+        b=dVX7Z6VEUZ8yqFPVlF92WlQgKbS8T/XkVDO+CT9wtUQ1rIRcY964mxmAidE7oxJhc2
+         tQ7V0NUcUpfWY8dc6GH4cIpoQR81C5BDLFC/l2i0DyUh5uPyEGgD4wR3eY5sKfdUYPwx
+         zTPtlAxyZUIqCLk11vkKMPvH724vy77KEwx+OPcv66BzTh9DmANPOR0+A6/r8Rd7wFlq
+         vH6bYqQQ3QKPTaIHvy3eAsow4XsP0ncX/36icf4giX5QyNCppsSku7jK2fzBCFfymkaS
+         zj1trJ9wRUL9bVuObGMFipY/buaF2gWqqpz5GyICXGjowBkMip+gxUhOUE7maliZrNxc
+         921g==
+X-Gm-Message-State: AO0yUKVbtsJhbglw9TTscBfQbaSt81FOzBSksY9iFemMU8v01xPrTifB
+        bH4+PYcmCeHNXAtNu6kMyUZIcXXtfEM=
+X-Google-Smtp-Source: AK7set/hFPEBgjbu1OY/J8kGibdPA87T8WbPpJKO967sCI2Gs34meqq8uz8VOjyIRQ0syTkjxas1jA==
+X-Received: by 2002:a05:622a:49:b0:3e3:7ed6:3db with SMTP id y9-20020a05622a004900b003e37ed603dbmr9925908qtw.29.1679545584311;
+        Wed, 22 Mar 2023 21:26:24 -0700 (PDT)
+Received: from auth1-smtp.messagingengine.com (auth1-smtp.messagingengine.com. [66.111.4.227])
+        by smtp.gmail.com with ESMTPSA id p11-20020a05620a22ab00b0074357fa9e15sm12596448qkh.42.2023.03.22.21.26.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 22 Mar 2023 21:26:23 -0700 (PDT)
+Received: from compute3.internal (compute3.nyi.internal [10.202.2.43])
+        by mailauth.nyi.internal (Postfix) with ESMTP id 016C527C0054;
+        Thu, 23 Mar 2023 00:26:22 -0400 (EDT)
+Received: from mailfrontend2 ([10.202.2.163])
+  by compute3.internal (MEProxy); Thu, 23 Mar 2023 00:26:23 -0400
+X-ME-Sender: <xms:7tQbZNm4H_vZ8ibV5yORE8QkYKcUhHk8ktwhm99aH0FNznVM-TcsXQ>
+    <xme:7tQbZI3GlkrFAVsHUqVQoY4v_z8XPCu_2158m55yX8dblEaQ8_Ge9ByFrpdFjtwkO
+    Bd62OMBB_rEFRtj7g>
+X-ME-Received: <xmr:7tQbZDqQ8X8_qMHNCFDFlu4IEcmVf6OM2ZLNwIVurvVW2qMNxvN3n_96y1fWf8Lm-lrwq3YzJXq1u5dmqOGRNwpMZFVSGK_S250>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedrvdegfedgieelucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhephffvvefufffkofgggfestdekredtredttdenucfhrhhomhepuehoqhhunhcu
+    hfgvnhhguceosghoqhhunhdrfhgvnhhgsehgmhgrihhlrdgtohhmqeenucggtffrrghtth
+    gvrhhnpeeggeeukeeghfevudektdevjeehhfekffevueefudeivdelteeltdekheejgfei
+    veenucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecuvehluhhsthgvrhfuihiivgeptd
+    enucfrrghrrghmpehmrghilhhfrhhomhepsghoqhhunhdomhgvshhmthhprghuthhhphgv
+    rhhsohhnrghlihhthidqieelvdeghedtieegqddujeejkeehheehvddqsghoqhhunhdrfh
+    gvnhhgpeepghhmrghilhdrtghomhesfhhigihmvgdrnhgrmhgv
+X-ME-Proxy: <xmx:7tQbZNnwyQf3QxDax3Eojlqyy0zuxO4U-p7tvocODglkP6PI5c6qjQ>
+    <xmx:7tQbZL1GrjF9j_-zPUtyWA2wc2CvzCfBheZ7GkMeG2sJHcpK0VHZ0g>
+    <xmx:7tQbZMuI5Ff-yvR9qIj74c8QigWZQv2597ZaI2x7YPDjYGT9WaKcmA>
+    <xmx:7tQbZNWrQ14jmmG7-rOPz7zxObs0iSFXPBI9hdukbcTFibCYohnxzw>
+Feedback-ID: iad51458e:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 23 Mar 2023 00:26:22 -0400 (EDT)
+From:   Boqun Feng <boqun.feng@gmail.com>
+To:     rcu@vger.kernel.org
+Cc:     Peter Zijlstra <peterz@infradead.org>,
+        Ingo Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>,
+        Waiman Long <longman@redhat.com>,
+        Boqun Feng <boqun.feng@gmail.com>,
+        Lai Jiangshan <jiangshanlai@gmail.com>,
+        "Paul E. McKenney" <paulmck@kernel.org>,
+        Josh Triplett <josh@joshtriplett.org>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+        Davidlohr Bueso <dave@stgolabs.net>,
+        Frederic Weisbecker <frederic@kernel.org>,
+        Neeraj Upadhyay <quic_neeraju@quicinc.com>,
+        Joel Fernandes <joel@joelfernandes.org>,
+        Shuah Khan <shuah@kernel.org>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        seanjc@google.com, linux-kernel@vger.kernel.org,
+        linux-kselftest@vger.kernel.org
+Subject: [PATCH rcu v2 0/7] RCU-related lockdep changes for v6.4
+Date:   Wed, 22 Mar 2023 21:26:07 -0700
+Message-Id: <20230323042614.1191120-1-boqun.feng@gmail.com>
+X-Mailer: git-send-email 2.38.1
 MIME-Version: 1.0
-References: <20230321154228.182769-1-sgarzare@redhat.com> <20230321154804.184577-1-sgarzare@redhat.com>
- <20230321154804.184577-4-sgarzare@redhat.com>
-In-Reply-To: <20230321154804.184577-4-sgarzare@redhat.com>
-From:   Jason Wang <jasowang@redhat.com>
-Date:   Thu, 23 Mar 2023 11:42:07 +0800
-Message-ID: <CACGkMEtbrt3zuqy9YdhNyE90HHUT1R=HF-YRAQ6b4KnW_SdZ-w@mail.gmail.com>
-Subject: Re: [PATCH v3 8/8] vdpa_sim: add support for user VA
-To:     Stefano Garzarella <sgarzare@redhat.com>
-Cc:     virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        stefanha@redhat.com, linux-kernel@vger.kernel.org,
-        eperezma@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>,
-        Andrey Zhadchenko <andrey.zhadchenko@virtuozzo.com>,
-        netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
+        DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 21, 2023 at 11:48=E2=80=AFPM Stefano Garzarella <sgarzare@redha=
-t.com> wrote:
->
-> The new "use_va" module parameter (default: true) is used in
-> vdpa_alloc_device() to inform the vDPA framework that the device
-> supports VA.
->
-> vringh is initialized to use VA only when "use_va" is true and the
-> user's mm has been bound. So, only when the bus supports user VA
-> (e.g. vhost-vdpa).
->
-> vdpasim_mm_work_fn work is used to serialize the binding to a new
-> address space when the .bind_mm callback is invoked, and unbinding
-> when the .unbind_mm callback is invoked.
->
-> Call mmget_not_zero()/kthread_use_mm() inside the worker function
-> to pin the address space only as long as needed, following the
-> documentation of mmget() in include/linux/sched/mm.h:
->
->   * Never use this function to pin this address space for an
->   * unbounded/indefinite amount of time.
+Hi,
 
-I wonder if everything would be simplified if we just allow the parent
-to advertise whether or not it requires the address space.
+Another week, another version ;-)
 
-Then when vhost-vDPA probes the device it can simply advertise
-use_work as true so vhost core can use get_task_mm() in this case?
+Previous versions:
 
-Thanks
+v1: https://lore.kernel.org/rcu/20230317031339.10277-1-boqun.feng@gmail.com/
 
->
-> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
-> ---
->
-> Notes:
->     v3:
->     - called mmget_not_zero() before kthread_use_mm() [Jason]
->       As the documentation of mmget() in include/linux/sched/mm.h says:
->
->       * Never use this function to pin this address space for an
->       * unbounded/indefinite amount of time.
->
->       I moved mmget_not_zero/kthread_use_mm inside the worker function,
->       this way we pin the address space only as long as needed.
->       This is similar to what vfio_iommu_type1_dma_rw_chunk() does in
->       drivers/vfio/vfio_iommu_type1.c
->     - simplified the mm bind/unbind [Jason]
->     - renamed vdpasim_worker_change_mm_sync() [Jason]
->     - fix commit message (s/default: false/default: true)
->     v2:
->     - `use_va` set to true by default [Eugenio]
->     - supported the new unbind_mm callback [Jason]
->     - removed the unbind_mm call in vdpasim_do_reset() [Jason]
->     - avoided to release the lock while call kthread_flush_work() since w=
-e
->       are now using a mutex to protect the device state
->
->  drivers/vdpa/vdpa_sim/vdpa_sim.h |  1 +
->  drivers/vdpa/vdpa_sim/vdpa_sim.c | 80 +++++++++++++++++++++++++++++++-
->  2 files changed, 79 insertions(+), 2 deletions(-)
->
-> diff --git a/drivers/vdpa/vdpa_sim/vdpa_sim.h b/drivers/vdpa/vdpa_sim/vdp=
-a_sim.h
-> index 4774292fba8c..3a42887d05d9 100644
-> --- a/drivers/vdpa/vdpa_sim/vdpa_sim.h
-> +++ b/drivers/vdpa/vdpa_sim/vdpa_sim.h
-> @@ -59,6 +59,7 @@ struct vdpasim {
->         struct vdpasim_virtqueue *vqs;
->         struct kthread_worker *worker;
->         struct kthread_work work;
-> +       struct mm_struct *mm_bound;
->         struct vdpasim_dev_attr dev_attr;
->         /* mutex to synchronize virtqueue state */
->         struct mutex mutex;
-> diff --git a/drivers/vdpa/vdpa_sim/vdpa_sim.c b/drivers/vdpa/vdpa_sim/vdp=
-a_sim.c
-> index ab4cfb82c237..23c891cdcd54 100644
-> --- a/drivers/vdpa/vdpa_sim/vdpa_sim.c
-> +++ b/drivers/vdpa/vdpa_sim/vdpa_sim.c
-> @@ -35,10 +35,44 @@ module_param(max_iotlb_entries, int, 0444);
->  MODULE_PARM_DESC(max_iotlb_entries,
->                  "Maximum number of iotlb entries for each address space.=
- 0 means unlimited. (default: 2048)");
->
-> +static bool use_va =3D true;
-> +module_param(use_va, bool, 0444);
-> +MODULE_PARM_DESC(use_va, "Enable/disable the device's ability to use VA"=
-);
-> +
->  #define VDPASIM_QUEUE_ALIGN PAGE_SIZE
->  #define VDPASIM_QUEUE_MAX 256
->  #define VDPASIM_VENDOR_ID 0
->
-> +struct vdpasim_mm_work {
-> +       struct kthread_work work;
-> +       struct vdpasim *vdpasim;
-> +       struct mm_struct *mm_to_bind;
-> +       int ret;
-> +};
-> +
-> +static void vdpasim_mm_work_fn(struct kthread_work *work)
-> +{
-> +       struct vdpasim_mm_work *mm_work =3D
-> +               container_of(work, struct vdpasim_mm_work, work);
-> +       struct vdpasim *vdpasim =3D mm_work->vdpasim;
-> +
-> +       mm_work->ret =3D 0;
-> +
-> +       //TODO: should we attach the cgroup of the mm owner?
-> +       vdpasim->mm_bound =3D mm_work->mm_to_bind;
-> +}
-> +
-> +static void vdpasim_worker_change_mm_sync(struct vdpasim *vdpasim,
-> +                                         struct vdpasim_mm_work *mm_work=
-)
-> +{
-> +       struct kthread_work *work =3D &mm_work->work;
-> +
-> +       kthread_init_work(work, vdpasim_mm_work_fn);
-> +       kthread_queue_work(vdpasim->worker, work);
-> +
-> +       kthread_flush_work(work);
-> +}
-> +
->  static struct vdpasim *vdpa_to_sim(struct vdpa_device *vdpa)
->  {
->         return container_of(vdpa, struct vdpasim, vdpa);
-> @@ -59,8 +93,10 @@ static void vdpasim_queue_ready(struct vdpasim *vdpasi=
-m, unsigned int idx)
->  {
->         struct vdpasim_virtqueue *vq =3D &vdpasim->vqs[idx];
->         uint16_t last_avail_idx =3D vq->vring.last_avail_idx;
-> +       bool va_enabled =3D use_va && vdpasim->mm_bound;
->
-> -       vringh_init_iotlb(&vq->vring, vdpasim->features, vq->num, true, f=
-alse,
-> +       vringh_init_iotlb(&vq->vring, vdpasim->features, vq->num, true,
-> +                         va_enabled,
->                           (struct vring_desc *)(uintptr_t)vq->desc_addr,
->                           (struct vring_avail *)
->                           (uintptr_t)vq->driver_addr,
-> @@ -130,8 +166,20 @@ static const struct vdpa_config_ops vdpasim_batch_co=
-nfig_ops;
->  static void vdpasim_work_fn(struct kthread_work *work)
->  {
->         struct vdpasim *vdpasim =3D container_of(work, struct vdpasim, wo=
-rk);
-> +       struct mm_struct *mm =3D vdpasim->mm_bound;
-> +
-> +       if (mm) {
-> +               if (!mmget_not_zero(mm))
-> +                       return;
-> +               kthread_use_mm(mm);
-> +       }
->
->         vdpasim->dev_attr.work_fn(vdpasim);
-> +
-> +       if (mm) {
-> +               kthread_unuse_mm(mm);
-> +               mmput(mm);
-> +       }
->  }
->
->  struct vdpasim *vdpasim_create(struct vdpasim_dev_attr *dev_attr,
-> @@ -162,7 +210,7 @@ struct vdpasim *vdpasim_create(struct vdpasim_dev_att=
-r *dev_attr,
->         vdpa =3D __vdpa_alloc_device(NULL, ops,
->                                    dev_attr->ngroups, dev_attr->nas,
->                                    dev_attr->alloc_size,
-> -                                  dev_attr->name, false);
-> +                                  dev_attr->name, use_va);
->         if (IS_ERR(vdpa)) {
->                 ret =3D PTR_ERR(vdpa);
->                 goto err_alloc;
-> @@ -582,6 +630,30 @@ static int vdpasim_set_map(struct vdpa_device *vdpa,=
- unsigned int asid,
->         return ret;
->  }
->
-> +static int vdpasim_bind_mm(struct vdpa_device *vdpa, struct mm_struct *m=
-m)
-> +{
-> +       struct vdpasim *vdpasim =3D vdpa_to_sim(vdpa);
-> +       struct vdpasim_mm_work mm_work;
-> +
-> +       mm_work.vdpasim =3D vdpasim;
-> +       mm_work.mm_to_bind =3D mm;
-> +
-> +       vdpasim_worker_change_mm_sync(vdpasim, &mm_work);
-> +
-> +       return mm_work.ret;
-> +}
-> +
-> +static void vdpasim_unbind_mm(struct vdpa_device *vdpa)
-> +{
-> +       struct vdpasim *vdpasim =3D vdpa_to_sim(vdpa);
-> +       struct vdpasim_mm_work mm_work;
-> +
-> +       mm_work.vdpasim =3D vdpasim;
-> +       mm_work.mm_to_bind =3D NULL;
-> +
-> +       vdpasim_worker_change_mm_sync(vdpasim, &mm_work);
-> +}
-> +
->  static int vdpasim_dma_map(struct vdpa_device *vdpa, unsigned int asid,
->                            u64 iova, u64 size,
->                            u64 pa, u32 perm, void *opaque)
-> @@ -678,6 +750,8 @@ static const struct vdpa_config_ops vdpasim_config_op=
-s =3D {
->         .set_group_asid         =3D vdpasim_set_group_asid,
->         .dma_map                =3D vdpasim_dma_map,
->         .dma_unmap              =3D vdpasim_dma_unmap,
-> +       .bind_mm                =3D vdpasim_bind_mm,
-> +       .unbind_mm              =3D vdpasim_unbind_mm,
->         .free                   =3D vdpasim_free,
->  };
->
-> @@ -712,6 +786,8 @@ static const struct vdpa_config_ops vdpasim_batch_con=
-fig_ops =3D {
->         .get_iova_range         =3D vdpasim_get_iova_range,
->         .set_group_asid         =3D vdpasim_set_group_asid,
->         .set_map                =3D vdpasim_set_map,
-> +       .bind_mm                =3D vdpasim_bind_mm,
-> +       .unbind_mm              =3D vdpasim_unbind_mm,
->         .free                   =3D vdpasim_free,
->  };
->
-> --
-> 2.39.2
->
+Changes since v1:
+
+*	Minor typo fixes
+*	Apply Acked-by tags
+*	Add license and copyright headers for srcu_lockdep.sh
+
+Thank you all for helping improve this!
+
+You can also find this series at
+
+	https://github/fbq/linux rcu/lockdep.2023.03.22a
+
+top commit is:
+
+	450ef54e199f
+
+List of changes:
+
+Boqun Feng (4):
+  locking/lockdep: Introduce lock_sync()
+  rcu: Annotate SRCU's update-side lockdep dependencies
+  locking: Reduce the number of locks in ww_mutex stress tests
+  locking/lockdep: Improve the deadlock scenario print for sync and read
+    lock
+
+Paul E. McKenney (3):
+  rcutorture: Add SRCU deadlock scenarios
+  rcutorture: Add RCU Tasks Trace and SRCU deadlock scenarios
+  rcutorture: Add srcu_lockdep.sh
+
+ include/linux/lockdep.h                       |   8 +-
+ include/linux/srcu.h                          |  34 +++-
+ kernel/locking/lockdep.c                      |  64 +++++-
+ kernel/locking/test-ww_mutex.c                |   2 +-
+ kernel/rcu/rcutorture.c                       | 185 ++++++++++++++++++
+ kernel/rcu/srcutiny.c                         |   2 +
+ kernel/rcu/srcutree.c                         |   2 +
+ .../selftests/rcutorture/bin/srcu_lockdep.sh  |  78 ++++++++
+ 8 files changed, 364 insertions(+), 11 deletions(-)
+ create mode 100755 tools/testing/selftests/rcutorture/bin/srcu_lockdep.sh
+
+-- 
+2.38.1
 
