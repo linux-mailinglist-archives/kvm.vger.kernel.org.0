@@ -2,59 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4B62A6C61D7
-	for <lists+kvm@lfdr.de>; Thu, 23 Mar 2023 09:35:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4ED576C61C8
+	for <lists+kvm@lfdr.de>; Thu, 23 Mar 2023 09:34:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231602AbjCWIfJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Mar 2023 04:35:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42214 "EHLO
+        id S231488AbjCWIeI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Mar 2023 04:34:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40348 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231454AbjCWIej (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Mar 2023 04:34:39 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B011411168;
-        Thu, 23 Mar 2023 01:34:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
-        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=c1df69K17FXpkAzRapSl7Wj8dTgXLgUCfCjKhSgSRjY=; b=da0PAncoO0I1y7/1tcUBLZx9rC
-        TA3Yp+nhgYwYLR7D3sfMDsN85DbYZWwOZP5nY8PXahJmBnrPDh73UsZKBhYM3tDiloc5oDqcxD2e+
-        QTUtwjPZPKxnDPBmmbFPcswUc+IUnAn+dhHjrI7QtEjsbyZh05CC3wWbOFZbfNgDBiDJAkk7zO83f
-        BUmRac2A4PI0qjLIsdX3dX9fFky9P8rVj6/dhi67x5kldGhgqSvjEfxuwaCO+FHALVOox7gtX00yt
-        4tScg5iVg1HGOefF3I1hDI9hYd3M5S8Cq3+fElSw8heQsgVTlSsfAGpB7tBtL1eQyrjhnsnsxzDzI
-        s7dzRm9w==;
-Received: from [2001:8b0:10b:5:b3d4:e39d:531b:642a] (helo=u3832b3a9db3152.ant.amazon.com)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pfGNS-003niM-8N; Thu, 23 Mar 2023 08:32:54 +0000
-Message-ID: <70628793e6777d07f27f43152df497e780925d18.camel@infradead.org>
-Subject: Re: [PATCH v16 8/8] x86/smpboot: Allow parallel bringup for SEV-ES
-From:   David Woodhouse <dwmw2@infradead.org>
-To:     Borislav Petkov <bp@alien8.de>,
-        Usama Arif <usama.arif@bytedance.com>
-Cc:     tglx@linutronix.de, kim.phillips@amd.com, brgerst@gmail.com,
-        piotrgorski@cachyos.org, oleksandr@natalenko.name,
-        arjan@linux.intel.com, mingo@redhat.com,
-        dave.hansen@linux.intel.com, hpa@zytor.com, x86@kernel.org,
-        pbonzini@redhat.com, paulmck@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        rcu@vger.kernel.org, mimoja@mimoja.de, hewenliang4@huawei.com,
-        thomas.lendacky@amd.com, seanjc@google.com, pmenzel@molgen.mpg.de,
-        fam.zheng@bytedance.com, punit.agrawal@bytedance.com,
-        simon.evans@bytedance.com, liangma@liangbit.com,
-        gpiccoli@igalia.com, Sabin Rapan <sabrapan@amazon.com>
-Date:   Thu, 23 Mar 2023 08:32:49 +0000
-In-Reply-To: <20230322224735.GAZBuFh9ld6FuYEyoH@fat_crate.local>
-References: <20230321194008.785922-1-usama.arif@bytedance.com>
-         <20230321194008.785922-9-usama.arif@bytedance.com>
-         <20230322224735.GAZBuFh9ld6FuYEyoH@fat_crate.local>
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-        boundary="=-OfhDvGzWdTo/3DFBTABU"
-User-Agent: Evolution 3.44.4-0ubuntu1 
+        with ESMTP id S231407AbjCWIdw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Mar 2023 04:33:52 -0400
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2050.outbound.protection.outlook.com [40.107.243.50])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF0CF49D1;
+        Thu, 23 Mar 2023 01:33:41 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=JQ9r4/tE7DqV+uYgzGvTwkZG04w5yZdmhCb8cAzfvZRygUHr6cYSoWbl4kzQ4A9pSNTFBG0LCH1jkb8vpi9KNlrBKNFEmfYTmwjgUUUci1Cw6I6XZf052lF6GJHczORi2uPAed9hKWBNrMKYfssyckmGrgupnZ56Nuz28I8KNpY2W5/YcuOUF0/ob03nWWlcYP8r8m3j4136Sdt2ZZy7+Q1bD+FjKr7t6Caeow1BgoipfLkjpa8Rhc8MZLIoZGuLpVsFheGagLYVG3wm1zGd0zGpGNKtpj46ih9PTvg1qDYBc2MjrBNgGPIEMz8grG0tAdA4NMs1dEV80qbjb1KmZg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=YtBi/jtx/KpnB4MrTZ/CvpLfTQ2Oz6+k512U7C6ios4=;
+ b=fZilF2pgkpWLZfGG0v72A2cegEjQUzXzDZqv3yZ4yY5Qfbl5pH20op6JQZXxn5kVrD2Bp5qj58fs9eytDlQmfJJz405cYDVO4QA929tKSgJGqwgGLdNfzpm/fw8HGOzbit79HaCpeoIyCpBfEknZiWDfwWiXmdKnwMPCrEPTYu7jG2uHrn+wC5K6Ul5bze6sfCPRKamj1731k1RJ3ZATGoQt9BUylMvrnSexkKN3HDCxTlVFb3BgJlGs+RLBZqluEz0DRKomqLGJDYssYvWAcrj41DtkmWa6xdrjU8Qbjd1fp7B3OHjGcrWu45yqIkJx8228pLP/FTFUTv2jFY3b8w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=intel.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=YtBi/jtx/KpnB4MrTZ/CvpLfTQ2Oz6+k512U7C6ios4=;
+ b=DISbUo2RCtE+Q8h85bhJ7SZn0EO5RI7N1VnqM+ZdZbe9O1EPhFAVxPc+cgXk9KsK4HFRsoXXY9wBDM+yIUeFcPhgnQaMdQ/aN5XEQFFneLIy/7ft7H/qPMLY0hr5u7U4pwGVKBxy8Nc3wKYQrlylwvSzJdoOrp41v8CynqrnLH3/aJx5b9vSoFMNKC/rXrueqkQlT656QtlfWbbaOE/Okt0FZBKlVX0ovnsevq09r9K3h/1FC0DvnQX7wCvgkaK0nABpGEJles2z6gds06aZKskEdG0bgV6R+1S3xGNoypLjlRMuY2tP/HNfpOhXLSDxuiFhjpe2FHD7S9CWtnym7g==
+Received: from BN0PR04CA0014.namprd04.prod.outlook.com (2603:10b6:408:ee::19)
+ by BL3PR12MB6474.namprd12.prod.outlook.com (2603:10b6:208:3ba::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6156.27; Thu, 23 Mar
+ 2023 08:33:39 +0000
+Received: from BL02EPF000108E9.namprd05.prod.outlook.com
+ (2603:10b6:408:ee:cafe::de) by BN0PR04CA0014.outlook.office365.com
+ (2603:10b6:408:ee::19) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6178.38 via Frontend
+ Transport; Thu, 23 Mar 2023 08:33:39 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ BL02EPF000108E9.mail.protection.outlook.com (10.167.241.202) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6178.30 via Frontend Transport; Thu, 23 Mar 2023 08:33:38 +0000
+Received: from rnnvmail204.nvidia.com (10.129.68.6) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5; Thu, 23 Mar 2023
+ 01:33:23 -0700
+Received: from rnnvmail205.nvidia.com (10.129.68.10) by rnnvmail204.nvidia.com
+ (10.129.68.6) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.37; Thu, 23 Mar
+ 2023 01:33:23 -0700
+Received: from Asurada-Nvidia.nvidia.com (10.127.8.9) by mail.nvidia.com
+ (10.129.68.10) with Microsoft SMTP Server id 15.2.986.5 via Frontend
+ Transport; Thu, 23 Mar 2023 01:33:22 -0700
+From:   Nicolin Chen <nicolinc@nvidia.com>
+To:     <jgg@nvidia.com>, <kevin.tian@intel.com>, <joro@8bytes.org>,
+        <will@kernel.org>, <robin.murphy@arm.com>,
+        <alex.williamson@redhat.com>, <shuah@kernel.org>
+CC:     <yi.l.liu@intel.com>, <linux-kernel@vger.kernel.org>,
+        <iommu@lists.linux.dev>, <kvm@vger.kernel.org>,
+        <linux-kselftest@vger.kernel.org>, <mjrosato@linux.ibm.com>,
+        <farman@linux.ibm.com>
+Subject: [PATCH v5 0/4] cover-letter: Add IO page table replacement support
+Date:   Thu, 23 Mar 2023 01:33:01 -0700
+Message-ID: <cover.1679559476.git.nicolinc@nvidia.com>
+X-Mailer: git-send-email 2.40.0
 MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
-X-Spam-Status: No, score=-2.5 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
-        DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL02EPF000108E9:EE_|BL3PR12MB6474:EE_
+X-MS-Office365-Filtering-Correlation-Id: b6e5ec9e-d6bc-4d90-c7c9-08db2b794d31
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: aUEveUyTldzucnRwTdLzuxcV8vUyMyo6KGsuk7uFbA8wTTGD4t21UR3AYERdnU+alt+fIiG4ce7K9sgnpVZ8wE+boZz3cATUuhYOgCZFsmdxfAwGbw3P62sdJ/6y8GAXCloq6tr7Jvji8QNfq2/BIG25EOgLGcEPumTLCD1ukON7A3rNhLjANIViO4BG0F/7o7F6TAm2mtzGzAGmkZpfH1eMftDPpTo+OQi15MMBScCNE9tzs+32Cd/UaWw2qWeEQRB1s9iU55h9OpuvlGsoDB00NWIDG5qE5yzohTEcLiGdw1uDN580FrnQM05rHRNAsi+22k7rQisITXfqzxSnlBmVwuvY9cPj4MyUE4OwQuZdVScVRVFnPLJDxNHrYTvlYq+FIaChKmIXHVT3oawek14nQpm0DCRXS1o+3LXfz/5UI5yIFD98CUE3yauYa8TMw2m6CkbeuDcHPWa2GKknSv5DcDclCRIA/eGddKfARpk5e0pMmxh7S1kkUszbXrRp1JvVI+yzWvPVYIMqCR2t8Jb8Ms3BihzcKtJw447pwJ/lQTHq+4U7DC+GMmw/QkFQ2NLHBDqLdiBPt8Q+dxQ4lEqms3whgnTNb9fgpj5klI1/f5D/6pn15AZC79F4CV/rEeS+PM+B1arpWSTneNQ09/5pIoViQbEiPAi409P518PQgMsEpWf4t5ewGsYi/r4KZWrsiWHDTlhuLc1KPl7gGAXXMLQFk9xO55mtZLmtDSXAb5spPbY+33vyBVMOQIXZ0OI+qpaHKJP1zJBDhQULKnxQcufmca5ZPYjxcAIOEZ2rtgRI0mKVvKE7JEmHsxe3rSPYRg5ulIx71om6xPn0+Q==
+X-Forefront-Antispam-Report: CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230025)(4636009)(136003)(39860400002)(346002)(376002)(396003)(451199018)(36840700001)(46966006)(40470700004)(478600001)(36860700001)(2616005)(41300700001)(426003)(966005)(6666004)(82740400003)(82310400005)(7636003)(86362001)(40460700003)(336012)(26005)(186003)(47076005)(83380400001)(36756003)(40480700001)(356005)(8676002)(5660300002)(70586007)(316002)(54906003)(2906002)(4326008)(8936002)(70206006)(7416002)(7696005)(110136005);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Mar 2023 08:33:38.7171
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: b6e5ec9e-d6bc-4d90-c7c9-08db2b794d31
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: BL02EPF000108E9.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL3PR12MB6474
+X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
         autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -62,153 +105,103 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+[ This series depends on VFIO device cdev series ]
 
---=-OfhDvGzWdTo/3DFBTABU
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: base64
+Changelog
+v5:
+ * Kept the cmd->id in the iommufd_test_create_access() so the access can
+   be created with an ioas by default. Then, renamed the previous ioctl
+   IOMMU_TEST_OP_ACCESS_SET_IOAS to IOMMU_TEST_OP_ACCESS_REPLACE_IOAS, so
+   it would be used to replace an access->ioas pointer.
+ * Added iommufd_access_replace() API after the introductions of the other
+   two APIs iommufd_access_attach() and iommufd_access_detach().
+ * Since vdev->iommufd_attached is also set in emulated pathway too, call
+   iommufd_access_update(), similar to the physical pathway.
+v4:
+ https://lore.kernel.org/linux-iommu/cover.1678284812.git.nicolinc@nvidia.com/
+ * Rebased on top of Jason's series adding replace() and hwpt_alloc()
+ https://lore.kernel.org/linux-iommu/0-v2-51b9896e7862+8a8c-iommufd_alloc_jgg@nvidia.com/
+ * Rebased on top of cdev series v6
+ https://lore.kernel.org/kvm/20230308132903.465159-1-yi.l.liu@intel.com/
+ * Dropped the patch that's moved to cdev series.
+ * Added unmap function pointer sanity before calling it.
+ * Added "Reviewed-by" from Kevin and Yi.
+ * Added back the VFIO change updating the ATTACH uAPI.
+v3:
+ https://lore.kernel.org/linux-iommu/cover.1677288789.git.nicolinc@nvidia.com/
+ * Rebased on top of Jason's iommufd_hwpt branch:
+ https://lore.kernel.org/linux-iommu/0-v2-406f7ac07936+6a-iommufd_hwpt_jgg@nvidia.com/
+ * Dropped patches from this series accordingly. There were a couple of
+   VFIO patches that will be submitted after the VFIO cdev series. Also,
+   renamed the series to be "emulated".
+ * Moved dma_unmap sanity patch to the first in the series.
+ * Moved dma_unmap sanity to cover both VFIO and IOMMUFD pathways.
+ * Added Kevin's "Reviewed-by" to two of the patches.
+ * Fixed a NULL pointer bug in vfio_iommufd_emulated_bind().
+ * Moved unmap() call to the common place in iommufd_access_set_ioas().
+v2:
+ https://lore.kernel.org/linux-iommu/cover.1675802050.git.nicolinc@nvidia.com/
+ * Rebased on top of vfio_device cdev v2 series.
+ * Update the kdoc and commit message of iommu_group_replace_domain().
+ * Dropped revert-to-core-domain part in iommu_group_replace_domain().
+ * Dropped !ops->dma_unmap check in vfio_iommufd_emulated_attach_ioas().
+ * Added missing rc value in vfio_iommufd_emulated_attach_ioas() from the
+   iommufd_access_set_ioas() call.
+ * Added a new patch in vfio_main to deny vfio_pin/unpin_pages() calls if
+   vdev->ops->dma_unmap is not implemented.
+ * Added a __iommmufd_device_detach helper and let the replace routine do
+   a partial detach().
+ * Added restriction on auto_domains to use the replace feature.
+ * Added the patch "iommufd/device: Make hwpt_list list_add/del symmetric"
+   from the has_group removal series.
+v1:
+ https://lore.kernel.org/linux-iommu/cover.1675320212.git.nicolinc@nvidia.com/
 
-T24gV2VkLCAyMDIzLTAzLTIyIGF0IDIzOjQ3ICswMTAwLCBCb3Jpc2xhdiBQZXRrb3Ygd3JvdGU6
-Cj4gCj4gKy5MdXNlX3Nldl9jcHVpZF8wYjoKPiArwqDCoMKgwqDCoMKgwqBjYWxsIHNldl9nZXRf
-Y3B1aWRfMGIKPiArwqDCoMKgwqDCoMKgwqB0ZXN0ICVlYXgsICVlYXgKPiArwqDCoMKgwqDCoMKg
-wqBqeiAxZgo+ICvCoMKgwqDCoMKgwqDCoG1vdmwgJWVheCwgJWVkeAo+ICvCoMKgwqDCoMKgwqDC
-oGptcCAuTHNldHVwX0FQCj4gKwoKQ2FuIHRoaXMgY29kZSBwYXRoIG5ldmVyIGJlIHRha2VuIGZv
-ciBicmluZ2luZyB1cCBDUFUwIGV2ZW4gYWZ0ZXIgYQpob3RwbHVnPyBJJ2QgcmF0aGVyIGhhdmUg
-LTEgYXMgdGhlIGVycm9yIGluZGljYXRpb24uCgo+IMKgLkx1c2VfY3B1aWRfMGI6Cj4gwqDCoMKg
-wqDCoMKgwqDCoG1vdsKgwqDCoMKgwqAkMHgwQiwgJWVheAo+IMKgwqDCoMKgwqDCoMKgwqB4b3Js
-wqDCoMKgwqAlZWN4LCAlZWN4Cj4gZGlmZiAtLWdpdCBhL2FyY2gveDg2L2tlcm5lbC9zZXYuYyBi
-L2FyY2gveDg2L2tlcm5lbC9zZXYuYwo+IGluZGV4IGNlMzcxZjYyMTY3Yi4uOTZmZjYzY2I1NjIy
-IDEwMDY0NAo+IC0tLSBhL2FyY2gveDg2L2tlcm5lbC9zZXYuYwo+ICsrKyBiL2FyY2gveDg2L2tl
-cm5lbC9zZXYuYwo+IEBAIC0xMTQyLDYgKzExNDIsMjQgQEAgdm9pZCBzbnBfc2V0X3dha2V1cF9z
-ZWNvbmRhcnlfY3B1KHZvaWQpCj4gwqDCoMKgwqDCoMKgwqDCoGFwaWMtPndha2V1cF9zZWNvbmRh
-cnlfY3B1ID0gd2FrZXVwX2NwdV92aWFfdm1nZXhpdDsKPiDCoH0KPiDCoAo+ICt1MzIgc2V2X2dl
-dF9jcHVpZF8wYih2b2lkKQo+ICt7Cj4gK8KgwqDCoMKgwqDCoMKgdTMyIGVheCwgZWR4Owo+ICsK
-PiArwqDCoMKgwqDCoMKgwqAvKiBSZXF1ZXN0IENQVUlEIDB4Ql9FRFggdGhyb3VnaCBHSENCIHBy
-b3RvY29sICovCj4gK8KgwqDCoMKgwqDCoMKgbmF0aXZlX3dybXNyKE1TUl9BTUQ2NF9TRVZfRVNf
-R0hDQiwKPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgKEdIQ0JfQ1BV
-SURfUkVRX0VEWCA8PCAzMCkgfCBHSENCX01TUl9DUFVJRF9SRVEsCj4gK8KgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIDB4Yik7Cj4gK8KgwqDCoMKgwqDCoMKgVk1HRVhJVCgp
-Owo+ICsKPiArwqDCoMKgwqDCoMKgwqBuYXRpdmVfcmRtc3IoTVNSX0FNRDY0X1NFVl9FU19HSENC
-LCBlYXgsIGVkeCk7Cj4gKwo+ICvCoMKgwqDCoMKgwqDCoGlmICgoZWF4ICYgR0hDQl9NU1JfSU5G
-T19NQVNLKSA9PSBHSENCX01TUl9DUFVJRF9SRVNQKQo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqByZXR1cm4gZWR4Owo+ICsKPiArwqDCoMKgwqDCoMKgwqByZXR1cm4gMDsKPiArfQo+
-ICsKPiDCoGludCBfX2luaXQgc2V2X2VzX3NldHVwX2FwX2p1bXBfdGFibGUoc3RydWN0IHJlYWxf
-bW9kZV9oZWFkZXIgKnJtaCkKPiDCoHsKClBlcmhhcHMgcHV0IHRoaXMgaW4gaGVhZDY0LmMgc28g
-aXQgZ2V0cyBidWlsdCB3aXRoIC1wZyB3aGVuIG5lZWRlZD8gQW5kCnRoZW4geW91J2xsIHNwb3Qg
-dGhhdCB0aGUgb3RoZXIgZnVuY3Rpb25zIGluIHRoZXJlIGFyZSBtYXJrZWQgX19oZWFkIHRvCnB1
-dCB0aGVtIGluIC5oZWFkLnRleHQsIGFuZCBtYXliZSBmaW5kIHNvbWUgb3RoZXIgc3R1ZmYgdG8g
-Y2FyZ28tY3VsdAp0byBtYWtlIGl0IHNhZmUgdG8gcnVuIEMgY29kZSB0aGF0IGVhcmx5Li4uCg==
+Hi all,
 
+The existing IOMMU APIs provide a pair of functions: iommu_attach_group()
+for callers to attach a device from the default_domain (NULL if not being
+supported) to a given iommu domain, and iommu_detach_group() for callers
+to detach a device from a given domain to the default_domain. Internally,
+the detach_dev op is deprecated for the newer drivers with default_domain.
+This means that those drivers likely can switch an attaching domain to
+another one, without stagging the device at a blocking or default domain,
+for use cases such as:
+1) vPASID mode, when a guest wants to replace a single pasid (PASID=0)
+   table with a larger table (PASID=N)
+2) Nesting mode, when switching the attaching device from an S2 domain
+   to an S1 domain, or when switching between relevant S1 domains.
 
---=-OfhDvGzWdTo/3DFBTABU
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
+This series is rebased on top of Jason Gunthorpe's series that introduces
+iommu_group_replace_domain API and IOMMUFD infrastructure for the IOMMUFD
+"physical" devices. The IOMMUFD "emulated" deivces will need some extra
+steps to replace the access->ioas object and its iopt pointer.
 
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
-ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
-EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
-FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
-aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
-EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
-VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
-aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
-AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
-ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
-QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
-rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
-ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
-U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
-DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
-BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
-dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
-BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
-QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
-CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
-xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
-IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
-kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
-eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
-KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
-1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
-OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
-x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
-5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
-DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
-VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
-UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
-MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
-ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
-oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
-SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
-xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
-RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
-bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
-NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
-KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
-5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
-C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
-gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
-VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
-MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
-by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
-b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
-BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
-QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
-c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
-AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
-qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
-v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
-Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
-tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
-Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
-YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
-ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
-IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
-ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
-GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
-h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
-9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
-P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
-2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
-BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
-7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
-lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
-lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
-AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
-Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
-FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
-BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
-cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
-aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
-LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
-BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
-cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
-Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
-lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
-WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
-hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
-IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
-dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
-NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
-xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMwMzIzMDgzMjQ5WjAvBgkqhkiG9w0BCQQxIgQguZMb8mt3
-0myHSMwFx6GvSt8Hz9fVZELmlH4FtyEzbhgwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
-A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
-dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
-DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
-MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
-Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgAnLjtWQW63x4dwXQK4kMah7IX2DCpS1H1G
-E+E6394qz51y1hQN179OccNGTEpXopldsJZWams0D31FMe4nO4ZRtc+c2hDB59OlPR/sYe8Bz6hX
-ryZs6g1pXoSc9UcyaQgZ0MTIpfQP7uJP75wt4S+PvXBwfiD2eqE9D/WmQEhIWRlC0NAnE0QgQOxn
-5yBYuT44IJ5ufgqO8IW437hntVWWBV1oqE0lzOTjfce8rEsg5Uex3nMMSPDlSRb6hP27L6fBw2DV
-wBKOgy2R+NvLdTIaQVHYEfe8zUQthELKvej8zxKrXCr2wcwsFfcNXIL++lnxg9o1HsahSf36zVrU
-xoJinYI6aaSshI3t1tOOxbzx0rlHd4RVg/SLPD/sj9hX+xoVJ0mcInd5FyF4zwq7rGho9hMPXtdD
-AoAtV3vFcfH9dLz6feY0T3MjWemKmZsGaW4EQ5hALsxyEZewyuNHjvrcLoqGtFZ69IiYJsxitUDR
-0Ug9S5Dc6FnwylOquborC1AqZgvUlGc7tP8tikERDH/MuWelYB/u/igpj6E+dIViolOshxjIteXK
-L28PEsch70nUkPu21SEFQHof7uFfGbGHZtvw9IzyUdXYxKy7TzhdhL5CZhlN6GfPXdJJMK18X2gh
-TVlpGTbLC6sHyq9j5fl7Kn9TUFA0JITibdBTUCJLdAAAAAAAAA==
+You can also find this series on Github:
+https://github.com/nicolinc/iommufd/commits/iommu_group_replace_domain-v5
 
+Thank you
+Nicolin Chen
 
---=-OfhDvGzWdTo/3DFBTABU--
+Nicolin Chen (4):
+  vfio: Do not allow !ops->dma_unmap in vfio_pin/unpin_pages()
+  iommufd: Add iommufd_access_replace() API
+  iommufd/selftest: Add IOMMU_TEST_OP_ACCESS_REPLACE_IOAS coverage
+  vfio: Support IO page table replacement
+
+ drivers/iommu/iommufd/device.c                | 60 +++++++++++++++----
+ drivers/iommu/iommufd/iommufd_test.h          |  4 ++
+ drivers/iommu/iommufd/selftest.c              | 19 ++++++
+ drivers/vfio/iommufd.c                        | 11 ++--
+ drivers/vfio/vfio_main.c                      |  4 ++
+ include/linux/iommufd.h                       |  1 +
+ include/uapi/linux/vfio.h                     |  6 ++
+ tools/testing/selftests/iommu/iommfd*.c       |  0
+ tools/testing/selftests/iommu/iommufd.c       | 29 ++++++++-
+ tools/testing/selftests/iommu/iommufd_utils.h | 19 ++++++
+ 10 files changed, 135 insertions(+), 18 deletions(-)
+ create mode 100644 tools/testing/selftests/iommu/iommfd*.c
+
+-- 
+2.40.0
+
