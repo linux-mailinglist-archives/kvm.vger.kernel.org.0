@@ -2,178 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 928356C732D
-	for <lists+kvm@lfdr.de>; Thu, 23 Mar 2023 23:37:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A6DAD6C7334
+	for <lists+kvm@lfdr.de>; Thu, 23 Mar 2023 23:40:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231382AbjCWWhD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Mar 2023 18:37:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53884 "EHLO
+        id S229708AbjCWWks (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Mar 2023 18:40:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34518 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230369AbjCWWhB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Mar 2023 18:37:01 -0400
-Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 762CC25971;
-        Thu, 23 Mar 2023 15:36:58 -0700 (PDT)
-From:   Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1679611016;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=22ZydMyEuf14Xznb4V9gZs4EGpNlBOHEmuOl6UIfBtU=;
-        b=imtkstIPgIE5LCrnkFaOXqO+3pmbX0fP2De+OV53Ac6gfpuLuBN/SL6B5bZTybVZ6MtvEd
-        I4+YazIMEc40rEmEGJ/x2JBueX7ZrM1bLqbx88m3Yguaxrz3YgMPaXBU99btML8CR/glw9
-        Gfe5RBIvF0u1A2vCMGj5JEc6ZFzxvnjSEYcFSCplzXbGWUodPU+GT3FiZVPcjDb0GaU22q
-        XCGNGrqcybi0FQHsom1yUgeleS9Ugp1Y0gYArkk0ZFU85RrqsBbhMyUb66yrSPGBLVW8eV
-        uaVNmomI6JFrd7q66IniSvNRiLIw0nkpNPi/CLBx8A8yUT1TkTpbinDAIv6q1Q==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1679611016;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=22ZydMyEuf14Xznb4V9gZs4EGpNlBOHEmuOl6UIfBtU=;
-        b=ebhsEA4aZ3rzDQcyfCoUGKndamTysLpWVyyfgv8GYE+QSBVNFahuhLD5yicB01AGa0yEOB
-        jbI3UHuOeArX0hBA==
-To:     Usama Arif <usama.arif@bytedance.com>, dwmw2@infradead.org,
-        kim.phillips@amd.com, brgerst@gmail.com
-Cc:     piotrgorski@cachyos.org, oleksandr@natalenko.name,
-        arjan@linux.intel.com, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, hpa@zytor.com, x86@kernel.org,
-        pbonzini@redhat.com, paulmck@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        rcu@vger.kernel.org, mimoja@mimoja.de, hewenliang4@huawei.com,
-        thomas.lendacky@amd.com, seanjc@google.com, pmenzel@molgen.mpg.de,
-        fam.zheng@bytedance.com, punit.agrawal@bytedance.com,
-        simon.evans@bytedance.com, liangma@liangbit.com,
-        gpiccoli@igalia.com, David Woodhouse <dwmw@amazon.co.uk>,
-        Usama Arif <usama.arif@bytedance.com>
-Subject: Re: [PATCH v16 3/8] cpu/hotplug: Add dynamic parallel bringup
- states before CPUHP_BRINGUP_CPU
-In-Reply-To: <20230321194008.785922-4-usama.arif@bytedance.com>
-References: <20230321194008.785922-1-usama.arif@bytedance.com>
- <20230321194008.785922-4-usama.arif@bytedance.com>
-Date:   Thu, 23 Mar 2023 23:36:55 +0100
-Message-ID: <874jqb8588.ffs@tglx>
-MIME-Version: 1.0
-Content-Type: text/plain
-X-Spam-Status: No, score=-2.5 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
-        DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_PASS
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        with ESMTP id S229499AbjCWWkr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Mar 2023 18:40:47 -0400
+Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7FDC2A994
+        for <kvm@vger.kernel.org>; Thu, 23 Mar 2023 15:40:45 -0700 (PDT)
+Received: by mail-pg1-x549.google.com with SMTP id m12-20020a6562cc000000b0050bdfabc8e2so41388pgv.9
+        for <kvm@vger.kernel.org>; Thu, 23 Mar 2023 15:40:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112; t=1679611245;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=8XoTZrf94ZBsnWSyZ+lkp+CIoXfUT01p6Wf9xa/ROag=;
+        b=jCi8FWu8GLdThcksFWY2lfxOhMGbvyCfPyYPBYzIwEJFqL1P6fyTg+Yt37rm4WPUau
+         yFW2QKZgvz+GS1U8i4QpyqC3IQUmxoUGogdGRkwgSKie3okaCYVoCzEGlJ1GWddRnhU3
+         FZc4O/qYEd8Wc2gmkMlMmZHRscKtxN4FPCqEAHcBlMZ4ihZDP7LXYPDUKUkZkgz+VVmJ
+         mDyFyZ+MD4vldIJd75MNsnq8gsIMzykHnwjtXnDjtA7OWIOIaXISJDfcyvyb+WfEENKS
+         hlBAHhcC33eNmbNHUJosqqR/UAPPwhSDmNQ1FuWQaQbkkSNhYMq5J6ojLOGdwLRlGml/
+         XfnQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1679611245;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=8XoTZrf94ZBsnWSyZ+lkp+CIoXfUT01p6Wf9xa/ROag=;
+        b=cEp+/AAap6yXa6meOUo3H2WmpIp8NoGhhd+JgWEdcBjjEX4x3RXsYCO02DOsWoyIhV
+         uwTO53PeffvTqPGOf5Le3lfTfVR113uJW9+sRazo6U49iuxfJgFGEqj78mSOV3wUYHu7
+         GOfT/viRTQvJfU/e2CLUWb04qHzld2eTstOn+4hAda70K4z5MdgccCC9d1WPmleu0r4k
+         jdpopuaN5PMTZxex1QKc43k6O+fU4fznbprGwBVhGYz+nIThtzAJ6oM8UgMLpbut7ia0
+         1hNkAC23nIiXB2xlpEJ3XxR2O2z2TEdXIcsazcpg6Ioq3Y30bqj42Zg4Hai2h9KVU7EN
+         3Yww==
+X-Gm-Message-State: AAQBX9fPQKFgL5BhLV7f6s7oOLmwpHirDFoE6Cbohk+lRHcSCXq7Qpij
+        LYyN40TqIBgHCigbqQyh+HqkCJcQoAs=
+X-Google-Smtp-Source: AKy350Y8hlJZNpF8D6tl2r1QvQdDlk9R9g2mFJsvhoy7FdTUPuqStlMOE9EpkEc/f7iNNshNz+vnpVNNI3c=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:2e9f:b0:628:1e57:afd7 with SMTP id
+ fd31-20020a056a002e9f00b006281e57afd7mr579049pfb.0.1679611245013; Thu, 23 Mar
+ 2023 15:40:45 -0700 (PDT)
+Date:   Thu, 23 Mar 2023 15:40:43 -0700
+In-Reply-To: <48616deee4861976f7960f60caf59cbe37a85f1e.camel@intel.com>
+Mime-Version: 1.0
+References: <1679555884-32544-1-git-send-email-lirongqing@baidu.com>
+ <ZBxf+ewCimtHY2XO@google.com> <48616deee4861976f7960f60caf59cbe37a85f1e.camel@intel.com>
+Message-ID: <ZBzU6pa7eOgVf0Kf@google.com>
+Subject: Re: [PATCH] KVM: x86/mmu: Don't create kvm-nx-lpage-re kthread if not itlb_multihit
+From:   Sean Christopherson <seanjc@google.com>
+To:     Kai Huang <kai.huang@intel.com>
+Cc:     Rongqing Li <lirongqing@baidu.com>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "x86@kernel.org" <x86@kernel.org>, "bp@alien8.de" <bp@alien8.de>,
+        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-7.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 21 2023 at 19:40, Usama Arif wrote:
->  void bringup_nonboot_cpus(unsigned int setup_max_cpus)
->  {
-> +	unsigned int n = setup_max_cpus - num_online_cpus();
->  	unsigned int cpu;
->  
-> +	/*
-> +	 * An architecture may have registered parallel pre-bringup states to
-> +	 * which each CPU may be brought in parallel. For each such state,
-> +	 * bring N CPUs to it in turn before the final round of bringing them
-> +	 * online.
-> +	 */
-> +	if (n > 0) {
-> +		enum cpuhp_state st = CPUHP_BP_PARALLEL_DYN;
-> +
-> +		while (st <= CPUHP_BP_PARALLEL_DYN_END && cpuhp_hp_states[st].name) {
+On Thu, Mar 23, 2023, Huang, Kai wrote:
+> On Thu, 2023-03-23 at 07:20 -0700, Sean Christopherson wrote:
+> > On Thu, Mar 23, 2023, lirongqing@baidu.com wrote:
+> > > From: Li RongQing <lirongqing@baidu.com>
+> > >=20
+> > > if CPU has not X86_BUG_ITLB_MULTIHIT bug, kvm-nx-lpage-re kthread
+> > > is not needed to create
+> >=20
+> > Unless userspace forces the mitigation to be enabled, which can be done=
+ while KVM
+> > is running. =EF=BF=BD
+> >=20
+>=20
+> Wondering why does userspace want to force the mitigation to be enabled i=
+f CPU
+> doesn't have such bug?
 
-
-There is no point in special casing this. All architectures can invoke
-the CPUHP_BP_* states before CPUHP_BRINGUP_CPU for each to be brought up
-CPU first. So this can be made unconditional and common exercised code.
-
-Aside of that this dynamic state range is pretty pointless. There is
-really nothing dynamic here and there is no real good reason to have
-four dynamic parallel states just because.
-
-The only interesting thing after CPUHP_BP_PREPARE_DYN_END and before
-CPUHP_BP_BRINGUP is a state which kicks the AP into life, i.e. we can
-just hardcode that as CPUHP_BP_PARALLEL_STARTUP.
-
-Thanks,
-
-        tglx
----
---- a/include/linux/cpuhotplug.h
-+++ b/include/linux/cpuhotplug.h
-@@ -133,6 +133,20 @@ enum cpuhp_state {
- 	CPUHP_MIPS_SOC_PREPARE,
- 	CPUHP_BP_PREPARE_DYN,
- 	CPUHP_BP_PREPARE_DYN_END		= CPUHP_BP_PREPARE_DYN + 20,
-+	/*
-+	 * This is an optional state if the architecture supports parallel
-+	 * startup. It's used to send the startup IPI so that the APs can
-+	 * run in parallel through the low level startup code instead of
-+	 * sending the IPIs one by one in CPUHP_BRINGUP_CPU. This avoids
-+	 * waiting for the AP to react and shortens the serialized bringup.
-+	 */
-+	CPUHP_BP_PARALLEL_STARTUP,
-+
-+	/*
-+	 * Fully per AP serialized bringup from here on. If the
-+	 * architecture does no register the CPUHP_BP_PARALLEL_STARTUP
-+	 * state, this step sends the startup IPI first.
-+	 */
- 	CPUHP_BRINGUP_CPU,
- 
- 	/*
---- a/kernel/cpu.c
-+++ b/kernel/cpu.c
-@@ -1504,13 +1504,49 @@ int bringup_hibernate_cpu(unsigned int s
- 
- void bringup_nonboot_cpus(unsigned int setup_max_cpus)
- {
--	unsigned int cpu;
-+	unsigned int cpu, n = 1;
- 
-+	/*
-+	 * All CHUHP_BP* states are invoked on the control CPU (BP). There
-+	 * is no requirement that these states need to be invoked
-+	 * sequentially for a particular CPU. They can be invoked state by
-+	 * state for each to be onlined CPU.
-+	 *
-+	 * On architectures which have setup the CPUHP_BP_PARALLEL_STARTUP
-+	 * state, this sends the startup IPI to each of the to be onlined
-+	 * APs. This avoids waiting for each AP to respond to the startup
-+	 * IPI in CPUHP_BRINGUP_CPU. The APs proceed through the low level
-+	 * bringup code and then wait for the control CPU to release them
-+	 * one by one for the final onlining procedure in the loop below.
-+	 *
-+	 * For architectures which do not support parallel bringup the
-+	 * CPUHP_BP_PARALLEL_STARTUP state is a NOOP and the actual startup
-+	 * happens in the CPUHP_BRINGUP_CPU state which is fully serialized
-+	 * per CPU in the loop below.
-+	 */
-+	for_each_present_cpu(cpu) {
-+		if (n++ >= setup_max_cpus)
-+			break;
-+		cpu_up(cpu, CPUHP_BP_PARALLEL_STARTUP);
-+	}
-+
-+	/* Do the per CPU serialized bringup to ONLINE state */
- 	for_each_present_cpu(cpu) {
- 		if (num_online_cpus() >= setup_max_cpus)
- 			break;
--		if (!cpu_online(cpu))
--			cpu_up(cpu, CPUHP_ONLINE);
-+
-+		if (!cpu_online(cpu)) {
-+			struct cpuhp_cpu_state *st = per_cpu_ptr(&cpuhp_state, cpu);
-+			int ret = cpu_up(cpu, CPUHP_ONLINE);
-+
-+			/*
-+			 * Due to the above preparation loop a failed online attempt
-+			 * has only rolled back to CPUHP_BP_PARALLEL_STARTUP. Do the
-+			 * remaining cleanups.
-+			 */
-+			if (ret && can_rollback_cpu(st))
-+				WARN_ON(cpuhp_invoke_callback_range(false, cpu, st, CPUHP_OFFLINE));
-+		}
- 	}
- }
- 
+It's definitely useful for testing, but the real motivation is so that the
+mitgation can be enabled without a kernel reboot (or reloading KVM), i.e. w=
+ithout
+having to drain VMs off the host, if it turns out that the host CPU actuall=
+y is
+vulnerable.  I.e. to guard against "Nope, not vulnerable!  Oh, wait, just k=
+idding!".
