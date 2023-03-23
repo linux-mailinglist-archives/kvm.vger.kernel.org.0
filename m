@@ -2,480 +2,353 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9982E6C6158
-	for <lists+kvm@lfdr.de>; Thu, 23 Mar 2023 09:10:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7410E6C615E
+	for <lists+kvm@lfdr.de>; Thu, 23 Mar 2023 09:12:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231205AbjCWIKm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Mar 2023 04:10:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33302 "EHLO
+        id S230409AbjCWIMY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Mar 2023 04:12:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37090 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230216AbjCWIKk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Mar 2023 04:10:40 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91F4355B3
-        for <kvm@vger.kernel.org>; Thu, 23 Mar 2023 01:09:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1679558993;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=EwNJuTQzZa68E+uwGkDROnOU0eGSdGgfEOhZyYP5hIQ=;
-        b=Jsf86t0Kg6rmcQJDClp5LRxU5SqpWtwiVxYuIyyp2oCwxM0Wcc0gw3DYvyiW0HVNxj4IQT
-        btCxKUnBGW2LKrwLrx83vBI/rACnSn1YYptOpV85jOFWlGB2n3HEqukhqcqBgMNTOeSkjC
-        joBls82jVs6Pj2WJgkvf27/VTSpj9CI=
-Received: from mail-yw1-f197.google.com (mail-yw1-f197.google.com
- [209.85.128.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-396-FAC16LAvMyGwTfMHoUTrBg-1; Thu, 23 Mar 2023 04:09:52 -0400
-X-MC-Unique: FAC16LAvMyGwTfMHoUTrBg-1
-Received: by mail-yw1-f197.google.com with SMTP id 00721157ae682-5446a91c40cso214206977b3.18
-        for <kvm@vger.kernel.org>; Thu, 23 Mar 2023 01:09:52 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679558991;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=EwNJuTQzZa68E+uwGkDROnOU0eGSdGgfEOhZyYP5hIQ=;
-        b=MUPX8/p1pYx7D53OXf0gHUHrKQNwcLAhzqfI5mcNQ8zyWfvlQ37j18QYfiY9AG/jmD
-         xsQfebbQ8dRDO+0N+3HecStXEjQVrguEbUE0k40m+WHgy5uNhLO7T2gEVUb3+hZbRHaW
-         WmAQ2SQ/FSN8bzSlRISG5pQrfnYVRyRr/FIET/jJv2d1DTFUcQbjF1N66kjQOoNcHQJi
-         3GY+BTF02HQ5ThSCs0snWopeqHjd/r/dSnoEB6ogCyo53NTCL7WJZQdukuZcrGUbbn1/
-         7/061DK8UallHv+5vIi1P7N0FC9geMxyMDiIOX1elOLMU5SExmMAScFbPe/djgGJpsDU
-         DlkA==
-X-Gm-Message-State: AAQBX9dEtpykqljwAvNs13SYWWE9kTZ5kpJmHmcjOxHQdqCQRDJLs9++
-        fyNwEzqky+QiYh1VnoBVyJt00d7RCqbnDnV11McnVKdkQvc5N9055CIQIb+okAS6/iCvLda2fGC
-        yAeSkAHkg9r1AT/Dcty8hR+h/RDDI
-X-Received: by 2002:a25:81c5:0:b0:b6a:2590:6c63 with SMTP id n5-20020a2581c5000000b00b6a25906c63mr1540649ybm.2.1679558991007;
-        Thu, 23 Mar 2023 01:09:51 -0700 (PDT)
-X-Google-Smtp-Source: AKy350YEdA5g/M24d+xdNdb8u9nUwF+a4wIVM3Rn+E4/TIXzeIZaWYUzywXTk8fMMt/V8zCAMqGWFgu8zalgu1VOl+I=
-X-Received: by 2002:a25:81c5:0:b0:b6a:2590:6c63 with SMTP id
- n5-20020a2581c5000000b00b6a25906c63mr1540638ybm.2.1679558990627; Thu, 23 Mar
- 2023 01:09:50 -0700 (PDT)
+        with ESMTP id S229729AbjCWIMW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Mar 2023 04:12:22 -0400
+Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A5C320A12;
+        Thu, 23 Mar 2023 01:12:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1679559141; x=1711095141;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=xMkFHctrcHQp/KWaSOgccQzFpJSof6OSOJPSQEcU+XA=;
+  b=fOuVchrXNwHbDUBkp1JirziRRAGbEVy1XDidKtwvivH5jVuLKJQg1hch
+   NzQ6N7nl3Clj7YhT1YwNR4tzcePTKd5HYv9OcafBqhN0kmb7erKEZywkW
+   AHBcQp+iEFiCu4jsO4eYl3R4D3tKcTbyVGnIdrF/GrCbAN3mJ8J7gSkFk
+   W15y0qjoxAHkr54XryWMfS8ff9DDffVGwXmre9W4YJQfuSRNB5VJAkl23
+   zDaJYtilOLCNikGJHII/1bxVOsCjSOm1A6RG0+5XfGbnJH4Bw356trBpI
+   ucJ+PBVMalqXrLvxKqYGPAKdR7RPHC7jJLhy7cHbK/KQNNgPdUO1lHpj+
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10657"; a="336928558"
+X-IronPort-AV: E=Sophos;i="5.98,283,1673942400"; 
+   d="scan'208";a="336928558"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Mar 2023 01:11:52 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10657"; a="632304347"
+X-IronPort-AV: E=Sophos;i="5.98,283,1673942400"; 
+   d="scan'208";a="632304347"
+Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
+  by orsmga003.jf.intel.com with ESMTP; 23 Mar 2023 01:11:52 -0700
+Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.21; Thu, 23 Mar 2023 01:11:51 -0700
+Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.21; Thu, 23 Mar 2023 01:11:51 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.21 via Frontend Transport; Thu, 23 Mar 2023 01:11:51 -0700
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.177)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.21; Thu, 23 Mar 2023 01:11:50 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=bVYLBBU+hj4qCf5REtaCSkxyprYFkq82NPPK3+BM2CsUJ51ZWPITSwDhJTdM5Q+8sfkMu3EVqJIy2bWql2GkRxJ4c77EUsEWOKbfByeunkQm7zn7NukbMYa1wy0OaNxnh56LJqMvmrlsgNs4ytsoOhdPe6T5xr3htZLaoVE6pc/oEb0z8xBR8LfWQMaZJKBwq2N9meATj9Os8E7DA9ylmUTdtzRgiX9XBSRF/v44kw+mwFMmh/WE51F8xYFhGfC83hq1mMyNhbCMqY+9PHy7aGfPb8hZRp2qYmoVlywmiYrXO5/3rJ3lQG4zNvzDXe8yHapW2wBMGF14iWTDm06C/Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=xMkFHctrcHQp/KWaSOgccQzFpJSof6OSOJPSQEcU+XA=;
+ b=kxqMHWWzDSPlz5jXqplEIlOgDym5653bqEmg9NHVVRPQu937keSw7qROq5ZCYF8O9RudTnDcsdBM84/c963XnHlo/PPJWw2O4V9qUYNvDlAL7WZgKbBipNqlGaZRamRKTU5eutYhEtldK0Kvcq9sDSVqnUXEJ/uj6Br1Rlro+00xeHZ9YADzA+9yqngKXddKzuZUDRnCdHm69qK1OFLzNezkCq+mMMlMNlmtxYGVbGoDqtFHGKIlfbPgLxHq7j7+SB95LEIGHKo0d1U5Vy0pbv7xxkGMywxRDtQjMM0SCTgbFZv5nttaX2tGvQMJHFdFi1VnLdstzsM5AtFYnP6XzQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from DS0PR11MB7529.namprd11.prod.outlook.com (2603:10b6:8:141::20)
+ by CYYPR11MB8330.namprd11.prod.outlook.com (2603:10b6:930:b8::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6178.38; Thu, 23 Mar
+ 2023 08:11:48 +0000
+Received: from DS0PR11MB7529.namprd11.prod.outlook.com
+ ([fe80::6f7:944a:aaad:301f]) by DS0PR11MB7529.namprd11.prod.outlook.com
+ ([fe80::6f7:944a:aaad:301f%8]) with mapi id 15.20.6178.037; Thu, 23 Mar 2023
+ 08:11:48 +0000
+From:   "Liu, Yi L" <yi.l.liu@intel.com>
+To:     Baolu Lu <baolu.lu@linux.intel.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "jgg@nvidia.com" <jgg@nvidia.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>
+CC:     "cohuck@redhat.com" <cohuck@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
+        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "shameerali.kolothum.thodi@huawei.com" 
+        <shameerali.kolothum.thodi@huawei.com>,
+        "lulu@redhat.com" <lulu@redhat.com>,
+        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
+        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>
+Subject: RE: [PATCH 06/12] iommufd: IOMMU_HWPT_ALLOC allocation with user data
+Thread-Topic: [PATCH 06/12] iommufd: IOMMU_HWPT_ALLOC allocation with user
+ data
+Thread-Index: AQHZUl5+Xwf0Y6ZcG0awNjw0BgcSa67zVK4AgBTD8ZA=
+Date:   Thu, 23 Mar 2023 08:11:48 +0000
+Message-ID: <DS0PR11MB7529230A7938A12CD9106284C3879@DS0PR11MB7529.namprd11.prod.outlook.com>
+References: <20230309080910.607396-1-yi.l.liu@intel.com>
+ <20230309080910.607396-7-yi.l.liu@intel.com>
+ <a388e79e-2547-a1f3-9e7f-4959c9ccb4e1@linux.intel.com>
+In-Reply-To: <a388e79e-2547-a1f3-9e7f-4959c9ccb4e1@linux.intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DS0PR11MB7529:EE_|CYYPR11MB8330:EE_
+x-ms-office365-filtering-correlation-id: 13ecba4d-1173-425a-47fc-08db2b763fe1
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: RVAJCZHRiCdo2ocBsm1wsSYv9ViZs+Ig8sdogvJOyoOc6DqJgLZU5a/3tJjJm9Mr6B1uxDPJ61aOsjK0wxP3K3R1rqQ0JICGlUTs5WfL7NcU09eTNsHOd5h/EcXEIHnsq3jXCvXajEfh4cAYI5nOQU31Jliwa2cLOlbJ+Gjv5PPpzKpstwNwy0Z+cTGU+ehI3d1FPANZmLQq88xIu1fSCO9f/Ip1ePLwbzg+mVlqa/HEc5Eyaq4Yd6m7GeGXEp8hFT/w7tcy2XhX0XKUZFMxOB7omnAo2Ay4cng2c74kfkKVqaa3yf3FtnLScZ20iYKUM1HxBtoPzgEa4u/ZXN1owlpOjKXB5LLjpKCvshzyHdHoKzi1G4zBy1iYGSookbt9Bb41+d1x/cm71mdC6smts0Znkc7SvtcKGn+bA/2C8Kwk6gVnPXPu7IDj8QAKOyHwZyzfSv8FyN4+AEjBmK4psMwLb82pVWDAFskIpU0oTeSEhtTBX6AGgtpyndamkSrP+K7Z2LbvjNryRXKg65sjNHl/kH68ecqwYNCl5/ulhrlTj0nBbo79dlzJQ6/+i0GRp7CRRWuJcTIe+1wesbtfZOu7qdGrAwYQBYh3R4GG1JVpbDZwyn6i1DVoJtPlVnqEIjcqiuDR1y1igAQrALKAUrsGuzK0AT5qTgzUKZE9jbhIh8mLhNtd+JHS9nnfs1s29mclsJOL7D9/C/9PpDqiZw==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB7529.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(136003)(376002)(39860400002)(366004)(346002)(396003)(451199018)(71200400001)(38100700002)(82960400001)(38070700005)(54906003)(66476007)(76116006)(66556008)(66946007)(66446008)(2906002)(33656002)(86362001)(478600001)(110136005)(8676002)(316002)(64756008)(4326008)(55016003)(26005)(186003)(7696005)(122000001)(41300700001)(52536014)(5660300002)(9686003)(6506007)(83380400001)(7416002)(8936002)(53546011);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?QlVQcmtUcllzRVBRaW1wNVUrSjRPdzRoN3psUDVGckl4UUJXVEM3ZEJUNXVt?=
+ =?utf-8?B?Z0xUS29YblZHN05oMUg3YnI1cUtvODMvUTkxUFRLazdRR0MxTkVQY3RJNERE?=
+ =?utf-8?B?bVpUZWtkYzVQTmprbFN5RjZKdXZxTVdXR0dnQmoxVTEycUNyUGVMRWtSNS95?=
+ =?utf-8?B?dmFwTGJyRVMvSkFFZWc3aWpVNFR2S2dFcVlxT3hVRHF2MEVPZm9EM25Ya3gr?=
+ =?utf-8?B?a2MxZzROR0lGdHluaDFjcWdGWDhndWdPcjFkYnlWYVJoTUsrMVlOT2p6SlRP?=
+ =?utf-8?B?RUNieDBXUUxmSnNuVStLNGJCZFFDUnZWY05HbExWZ2FUMFpzMnpzTDliRHNZ?=
+ =?utf-8?B?dWpxd0srajNaRDdiOE9uZ0FnTWxPKzhlNndQeklFYTRPUFB2Q0toanZRZGJP?=
+ =?utf-8?B?NitYS2s5NFZNVjljNDBtQW81d1BUekk3ZnJYVHNPVWsrNnZQSm1MTDJ5VzIx?=
+ =?utf-8?B?bitJN2dEUXlyaEtFRUVHa2xnSXJ2N05lUWQrR2tzWnk0R3RrazlVZSs0RG1L?=
+ =?utf-8?B?bmtWTWRkb0JGQmRVbVIrYnJWZFlGakxUcVVkb3pWdnkxTjMvc3dQVEk2NEkv?=
+ =?utf-8?B?bmY2a29INm5yZDhyaUR6UHN1am9JcGlMSEpKVzNIRTdOdUs1MytJZXNabUp5?=
+ =?utf-8?B?NEJiTnRhWmNuNmxPZlpkV2NvYTBEcDY5OExrY2pFSnNKVmN3R2pVMHk2a0Zu?=
+ =?utf-8?B?VHNUaCtkVjNObDBWaWxiSkxWcGtnak1UaDBndFY2czd3UHVBT2VEOUlXc2Fo?=
+ =?utf-8?B?bmNjc1BFYkxuNTIrSVk4d0xLWk5vWTlTZUROSzh4T01zalZLOE9kYTJsM3R3?=
+ =?utf-8?B?eklhbXVLVlFmbDJFVDArWGREZ0tnZW84UW9ibTVSRVBUUmZqdnZOVG5LclpY?=
+ =?utf-8?B?YUhRK2N1d2V1V1R4RHRobUdoeTNuNHV6UzVKSkhnSDBldEhjdEpWTkgxUE5z?=
+ =?utf-8?B?RWMxeTBOdldZMGIzQjdhU2VnUVB1VjVJS2VWcXRjaUU0MVhNcTBWRm9IMkcw?=
+ =?utf-8?B?UjR3TjdXQXdYODN2SzVkYjdWMWRFTW1xR01RWUVXVTQ3aWFMN3p1UTF0VDFD?=
+ =?utf-8?B?dG8rekUvNTZ5N3dabjAwOHhpZDFYTENJR0NkNWgwVmtzVk9oS2dyTE5XYjln?=
+ =?utf-8?B?QnVhN2x6WTQxWkErdmxJbm1TWkJ2eXdUblpDY0VMUDVXVDVOb2c3Y0dLTW9H?=
+ =?utf-8?B?YXNKYkhoUTIyTWt4YzB2L1hBMkluTnBkelZLLzdFWXZpbWZiQThlM3RUQzNo?=
+ =?utf-8?B?Z1prYWVzS0RsckJiK2l0Mys3REgzUDZnL2FoQ2lkWlcrWjVTTFlTT0h0QVNM?=
+ =?utf-8?B?VDg5ZUx3VDdJcG50VzBVMUhXTU9tK2hQRVJIckVPeklVOUxQYXltT1pJcUJW?=
+ =?utf-8?B?VnIvK3pQN00zUFNnWUo5czRvQXpoR3ZSRjBsQkRIV1B3RGJHWGdLbzVzbzhW?=
+ =?utf-8?B?YTM3TUN5R1pPUklJd3UxWHJKV2VIWjhwMkQyclFvcVY5QlljMmJWUDZXRXlq?=
+ =?utf-8?B?eUxObGxNbHJ0OU9TVURUcVkxcENrNm53a1lFUTdyUHZZOTF5TVh6WFh4NTRB?=
+ =?utf-8?B?cGlEOUdDNGs0L3ZtaFpnQ1RmQUJBUHhIL0VpTjNqRUM0K0pRRStYSUtVbk9I?=
+ =?utf-8?B?bE9JQVdlcGJrWm1IemFzRXRVbmIwTnIzVERRL09OaURVbmdWenozUlFHUkJl?=
+ =?utf-8?B?SjFMKzJZK0RQSjdiQ1RTN0pmYmdWV2lSbDMzQ1QySkt3Z2FvaitMSmcxdG9o?=
+ =?utf-8?B?U05UVytLdCt5eVJLVGZXby9GUC81Q1lOeWY0QTh2NHpKQitac2NCM0FqaG5G?=
+ =?utf-8?B?WEJwOHJRQjRBalJtT0xHY1ZVQWhKYjBVejZPMW9SYVpsYWlISSs2cDRrMU45?=
+ =?utf-8?B?eUx3R2RScmI5enhVZFpCRDZLa2JXMU5IRUgwYTVGMUZIa1gzVllkaUlZSUl6?=
+ =?utf-8?B?dnZyNS81cjVTUzYxNkh1T2RqV1lXSm93bFk2YWVxdU1nNmhXRGZyZ1N0UXlZ?=
+ =?utf-8?B?bDdDMUVMOElGSlhDM0hoOGdXSSs5Q1p6R0ZXc3N4NDd0UUh6NDlxbjk4dlY5?=
+ =?utf-8?B?MGJYYUNtckhEenk5V3JGelZZeVRHbndNUEloV1FNRGp3bHB5R1VOWE9hTzls?=
+ =?utf-8?Q?umoJT9wC0IPGH87IZ+qI/54hS?=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-References: <20230321154228.182769-1-sgarzare@redhat.com> <20230321154228.182769-5-sgarzare@redhat.com>
-In-Reply-To: <20230321154228.182769-5-sgarzare@redhat.com>
-From:   Eugenio Perez Martin <eperezma@redhat.com>
-Date:   Thu, 23 Mar 2023 09:09:14 +0100
-Message-ID: <CAJaqyWcCwwu1UJ968A=s30GCezjLcwWKDhCFMsQ2EcGGgkiz7g@mail.gmail.com>
-Subject: Re: [PATCH v3 4/8] vringh: support VA with iotlb
-To:     Stefano Garzarella <sgarzare@redhat.com>
-Cc:     virtualization@lists.linux-foundation.org, stefanha@redhat.com,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Andrey Zhadchenko <andrey.zhadchenko@virtuozzo.com>,
-        netdev@vger.kernel.org, Jason Wang <jasowang@redhat.com>,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB7529.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 13ecba4d-1173-425a-47fc-08db2b763fe1
+X-MS-Exchange-CrossTenant-originalarrivaltime: 23 Mar 2023 08:11:48.0452
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: HsAKLdhV2nhXlSNXHDIFdq8DjSQ3ACT71xfy1QY+cyaWgVUBYwx30XioR+8zU8C/+dqyz14ln4v/21/eWGkV3w==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CYYPR11MB8330
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-2.5 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 21, 2023 at 4:43=E2=80=AFPM Stefano Garzarella <sgarzare@redhat=
-.com> wrote:
->
-> vDPA supports the possibility to use user VA in the iotlb messages.
-> So, let's add support for user VA in vringh to use it in the vDPA
-> simulators.
->
-> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
-> ---
->
-> Notes:
->     v3:
->     - refactored avoiding code duplication [Eugenio]
->     v2:
->     - replace kmap_atomic() with kmap_local_page() [see previous patch]
->     - fix cast warnings when build with W=3D1 C=3D1
->
->  include/linux/vringh.h            |   5 +-
->  drivers/vdpa/mlx5/net/mlx5_vnet.c |   2 +-
->  drivers/vdpa/vdpa_sim/vdpa_sim.c  |   4 +-
->  drivers/vhost/vringh.c            | 153 +++++++++++++++++++++++-------
->  4 files changed, 127 insertions(+), 37 deletions(-)
->
-> diff --git a/include/linux/vringh.h b/include/linux/vringh.h
-> index 1991a02c6431..d39b9f2dcba0 100644
-> --- a/include/linux/vringh.h
-> +++ b/include/linux/vringh.h
-> @@ -32,6 +32,9 @@ struct vringh {
->         /* Can we get away with weak barriers? */
->         bool weak_barriers;
->
-> +       /* Use user's VA */
-> +       bool use_va;
-> +
->         /* Last available index we saw (ie. where we're up to). */
->         u16 last_avail_idx;
->
-> @@ -279,7 +282,7 @@ void vringh_set_iotlb(struct vringh *vrh, struct vhos=
-t_iotlb *iotlb,
->                       spinlock_t *iotlb_lock);
->
->  int vringh_init_iotlb(struct vringh *vrh, u64 features,
-> -                     unsigned int num, bool weak_barriers,
-> +                     unsigned int num, bool weak_barriers, bool use_va,
->                       struct vring_desc *desc,
->                       struct vring_avail *avail,
->                       struct vring_used *used);
-> diff --git a/drivers/vdpa/mlx5/net/mlx5_vnet.c b/drivers/vdpa/mlx5/net/ml=
-x5_vnet.c
-> index 520646ae7fa0..dfd0e000217b 100644
-> --- a/drivers/vdpa/mlx5/net/mlx5_vnet.c
-> +++ b/drivers/vdpa/mlx5/net/mlx5_vnet.c
-> @@ -2537,7 +2537,7 @@ static int setup_cvq_vring(struct mlx5_vdpa_dev *mv=
-dev)
->
->         if (mvdev->actual_features & BIT_ULL(VIRTIO_NET_F_CTRL_VQ))
->                 err =3D vringh_init_iotlb(&cvq->vring, mvdev->actual_feat=
-ures,
-> -                                       MLX5_CVQ_MAX_ENT, false,
-> +                                       MLX5_CVQ_MAX_ENT, false, false,
->                                         (struct vring_desc *)(uintptr_t)c=
-vq->desc_addr,
->                                         (struct vring_avail *)(uintptr_t)=
-cvq->driver_addr,
->                                         (struct vring_used *)(uintptr_t)c=
-vq->device_addr);
-> diff --git a/drivers/vdpa/vdpa_sim/vdpa_sim.c b/drivers/vdpa/vdpa_sim/vdp=
-a_sim.c
-> index eea23c630f7c..47cdf2a1f5b8 100644
-> --- a/drivers/vdpa/vdpa_sim/vdpa_sim.c
-> +++ b/drivers/vdpa/vdpa_sim/vdpa_sim.c
-> @@ -60,7 +60,7 @@ static void vdpasim_queue_ready(struct vdpasim *vdpasim=
-, unsigned int idx)
->         struct vdpasim_virtqueue *vq =3D &vdpasim->vqs[idx];
->         uint16_t last_avail_idx =3D vq->vring.last_avail_idx;
->
-> -       vringh_init_iotlb(&vq->vring, vdpasim->features, vq->num, true,
-> +       vringh_init_iotlb(&vq->vring, vdpasim->features, vq->num, true, f=
-alse,
->                           (struct vring_desc *)(uintptr_t)vq->desc_addr,
->                           (struct vring_avail *)
->                           (uintptr_t)vq->driver_addr,
-> @@ -92,7 +92,7 @@ static void vdpasim_vq_reset(struct vdpasim *vdpasim,
->         vq->cb =3D NULL;
->         vq->private =3D NULL;
->         vringh_init_iotlb(&vq->vring, vdpasim->dev_attr.supported_feature=
-s,
-> -                         VDPASIM_QUEUE_MAX, false, NULL, NULL, NULL);
-> +                         VDPASIM_QUEUE_MAX, false, false, NULL, NULL, NU=
-LL);
->
->         vq->vring.notify =3D NULL;
->  }
-> diff --git a/drivers/vhost/vringh.c b/drivers/vhost/vringh.c
-> index 0ba3ef809e48..72c88519329a 100644
-> --- a/drivers/vhost/vringh.c
-> +++ b/drivers/vhost/vringh.c
-> @@ -1094,10 +1094,18 @@ EXPORT_SYMBOL(vringh_need_notify_kern);
->
->  #if IS_REACHABLE(CONFIG_VHOST_IOTLB)
->
-> +struct iotlb_vec {
-> +       union {
-> +               struct iovec *iovec;
-> +               struct bio_vec *bvec;
-> +       } iov;
-> +       size_t count;
-> +       bool is_iovec;
-> +};
-> +
->  static int iotlb_translate(const struct vringh *vrh,
->                            u64 addr, u64 len, u64 *translated,
-> -                          struct bio_vec iov[],
-> -                          int iov_size, u32 perm)
-> +                          struct iotlb_vec *ivec, u32 perm)
->  {
->         struct vhost_iotlb_map *map;
->         struct vhost_iotlb *iotlb =3D vrh->iotlb;
-> @@ -1107,9 +1115,9 @@ static int iotlb_translate(const struct vringh *vrh=
-,
->         spin_lock(vrh->iotlb_lock);
->
->         while (len > s) {
-> -               u64 size, pa, pfn;
-> +               u64 size;
->
-> -               if (unlikely(ret >=3D iov_size)) {
-> +               if (unlikely(ret >=3D ivec->count)) {
->                         ret =3D -ENOBUFS;
->                         break;
->                 }
-> @@ -1124,10 +1132,22 @@ static int iotlb_translate(const struct vringh *v=
-rh,
->                 }
->
->                 size =3D map->size - addr + map->start;
-> -               pa =3D map->addr + addr - map->start;
-> -               pfn =3D pa >> PAGE_SHIFT;
-> -               bvec_set_page(&iov[ret], pfn_to_page(pfn), min(len - s, s=
-ize),
-> -                             pa & (PAGE_SIZE - 1));
-> +               if (ivec->is_iovec) {
-> +                       struct iovec *iovec =3D ivec->iov.iovec;
-> +
-> +                       iovec[ret].iov_len =3D min(len - s, size);
-> +                       iovec[ret].iov_base =3D (void __user *)(unsigned =
-long)
-
-s/unsigned long/uintptr_t ?
-
-
-
-> +                                             (map->addr + addr - map->st=
-art);
-> +               } else {
-> +                       u64 pa =3D map->addr + addr - map->start;
-> +                       u64 pfn =3D pa >> PAGE_SHIFT;
-> +                       struct bio_vec *bvec =3D ivec->iov.bvec;
-> +
-> +                       bvec_set_page(&bvec[ret], pfn_to_page(pfn),
-> +                                     min(len - s, size),
-> +                                     pa & (PAGE_SIZE - 1));
-> +               }
-> +
->                 s +=3D size;
->                 addr +=3D size;
->                 ++ret;
-> @@ -1141,26 +1161,42 @@ static int iotlb_translate(const struct vringh *v=
-rh,
->         return ret;
->  }
->
-> +#define IOTLB_IOV_SIZE 16
-
-I'm fine with defining here, but maybe it is better to isolate the
-change in a previous patch or reuse another well known macro?
-
-Other looks good, and I agree with Jason's comments so even if the
-macro declaration is not moved:
-
-Acked-by: Eugenio P=C3=A9rez <eperezma@redhat.com>
-
-> +
->  static inline int copy_from_iotlb(const struct vringh *vrh, void *dst,
->                                   void *src, size_t len)
->  {
-> +       struct iotlb_vec ivec;
-> +       union {
-> +               struct iovec iovec[IOTLB_IOV_SIZE];
-> +               struct bio_vec bvec[IOTLB_IOV_SIZE];
-> +       } iov;
->         u64 total_translated =3D 0;
->
-> +       ivec.iov.iovec =3D iov.iovec;
-> +       ivec.count =3D IOTLB_IOV_SIZE;
-> +       ivec.is_iovec =3D vrh->use_va;
-> +
->         while (total_translated < len) {
-> -               struct bio_vec iov[16];
->                 struct iov_iter iter;
->                 u64 translated;
->                 int ret;
->
->                 ret =3D iotlb_translate(vrh, (u64)(uintptr_t)src,
->                                       len - total_translated, &translated=
-,
-> -                                     iov, ARRAY_SIZE(iov), VHOST_MAP_RO)=
-;
-> +                                     &ivec, VHOST_MAP_RO);
->                 if (ret =3D=3D -ENOBUFS)
-> -                       ret =3D ARRAY_SIZE(iov);
-> +                       ret =3D IOTLB_IOV_SIZE;
->                 else if (ret < 0)
->                         return ret;
->
-> -               iov_iter_bvec(&iter, ITER_SOURCE, iov, ret, translated);
-> +               if (ivec.is_iovec) {
-> +                       iov_iter_init(&iter, ITER_SOURCE, ivec.iov.iovec,=
- ret,
-> +                                     translated);
-> +               } else {
-> +                       iov_iter_bvec(&iter, ITER_SOURCE, ivec.iov.bvec, =
-ret,
-> +                                     translated);
-> +               }
->
->                 ret =3D copy_from_iter(dst, translated, &iter);
->                 if (ret < 0)
-> @@ -1177,23 +1213,37 @@ static inline int copy_from_iotlb(const struct vr=
-ingh *vrh, void *dst,
->  static inline int copy_to_iotlb(const struct vringh *vrh, void *dst,
->                                 void *src, size_t len)
->  {
-> +       struct iotlb_vec ivec;
-> +       union {
-> +               struct iovec iovec[IOTLB_IOV_SIZE];
-> +               struct bio_vec bvec[IOTLB_IOV_SIZE];
-> +       } iov;
->         u64 total_translated =3D 0;
->
-> +       ivec.iov.iovec =3D iov.iovec;
-> +       ivec.count =3D IOTLB_IOV_SIZE;
-> +       ivec.is_iovec =3D vrh->use_va;
-> +
->         while (total_translated < len) {
-> -               struct bio_vec iov[16];
->                 struct iov_iter iter;
->                 u64 translated;
->                 int ret;
->
->                 ret =3D iotlb_translate(vrh, (u64)(uintptr_t)dst,
->                                       len - total_translated, &translated=
-,
-> -                                     iov, ARRAY_SIZE(iov), VHOST_MAP_WO)=
-;
-> +                                     &ivec, VHOST_MAP_WO);
->                 if (ret =3D=3D -ENOBUFS)
-> -                       ret =3D ARRAY_SIZE(iov);
-> +                       ret =3D IOTLB_IOV_SIZE;
->                 else if (ret < 0)
->                         return ret;
->
-> -               iov_iter_bvec(&iter, ITER_DEST, iov, ret, translated);
-> +               if (ivec.is_iovec) {
-> +                       iov_iter_init(&iter, ITER_DEST, ivec.iov.iovec, r=
-et,
-> +                                     translated);
-> +               } else {
-> +                       iov_iter_bvec(&iter, ITER_DEST, ivec.iov.bvec, re=
-t,
-> +                                     translated);
-> +               }
->
->                 ret =3D copy_to_iter(src, translated, &iter);
->                 if (ret < 0)
-> @@ -1210,20 +1260,37 @@ static inline int copy_to_iotlb(const struct vrin=
-gh *vrh, void *dst,
->  static inline int getu16_iotlb(const struct vringh *vrh,
->                                u16 *val, const __virtio16 *p)
->  {
-> -       struct bio_vec iov;
-> -       void *kaddr, *from;
-> +       struct iotlb_vec ivec;
-> +       union {
-> +               struct iovec iovec[1];
-> +               struct bio_vec bvec[1];
-> +       } iov;
-> +       __virtio16 tmp;
->         int ret;
->
-> +       ivec.iov.iovec =3D iov.iovec;
-> +       ivec.count =3D 1;
-> +       ivec.is_iovec =3D vrh->use_va;
-> +
->         /* Atomic read is needed for getu16 */
-> -       ret =3D iotlb_translate(vrh, (u64)(uintptr_t)p, sizeof(*p), NULL,
-> -                             &iov, 1, VHOST_MAP_RO);
-> +       ret =3D iotlb_translate(vrh, (u64)(uintptr_t)p, sizeof(*p),
-> +                             NULL, &ivec, VHOST_MAP_RO);
->         if (ret < 0)
->                 return ret;
->
-> -       kaddr =3D kmap_local_page(iov.bv_page);
-> -       from =3D kaddr + iov.bv_offset;
-> -       *val =3D vringh16_to_cpu(vrh, READ_ONCE(*(__virtio16 *)from));
-> -       kunmap_local(kaddr);
-> +       if (ivec.is_iovec) {
-> +               ret =3D __get_user(tmp, (__virtio16 __user *)ivec.iov.iov=
-ec[0].iov_base);
-> +               if (ret)
-> +                       return ret;
-> +       } else {
-> +               void *kaddr =3D kmap_local_page(ivec.iov.bvec[0].bv_page)=
-;
-> +               void *from =3D kaddr + ivec.iov.bvec[0].bv_offset;
-> +
-> +               tmp =3D READ_ONCE(*(__virtio16 *)from);
-> +               kunmap_local(kaddr);
-> +       }
-> +
-> +       *val =3D vringh16_to_cpu(vrh, tmp);
->
->         return 0;
->  }
-> @@ -1231,20 +1298,37 @@ static inline int getu16_iotlb(const struct vring=
-h *vrh,
->  static inline int putu16_iotlb(const struct vringh *vrh,
->                                __virtio16 *p, u16 val)
->  {
-> -       struct bio_vec iov;
-> -       void *kaddr, *to;
-> +       struct iotlb_vec ivec;
-> +       union {
-> +               struct iovec iovec;
-> +               struct bio_vec bvec;
-> +       } iov;
-> +       __virtio16 tmp;
->         int ret;
->
-> +       ivec.iov.iovec =3D &iov.iovec;
-> +       ivec.count =3D 1;
-> +       ivec.is_iovec =3D vrh->use_va;
-> +
->         /* Atomic write is needed for putu16 */
-> -       ret =3D iotlb_translate(vrh, (u64)(uintptr_t)p, sizeof(*p), NULL,
-> -                             &iov, 1, VHOST_MAP_WO);
-> +       ret =3D iotlb_translate(vrh, (u64)(uintptr_t)p, sizeof(*p),
-> +                             NULL, &ivec, VHOST_MAP_RO);
->         if (ret < 0)
->                 return ret;
->
-> -       kaddr =3D kmap_local_page(iov.bv_page);
-> -       to =3D kaddr + iov.bv_offset;
-> -       WRITE_ONCE(*(__virtio16 *)to, cpu_to_vringh16(vrh, val));
-> -       kunmap_local(kaddr);
-> +       tmp =3D cpu_to_vringh16(vrh, val);
-> +
-> +       if (ivec.is_iovec) {
-> +               ret =3D __put_user(tmp, (__virtio16 __user *)ivec.iov.iov=
-ec[0].iov_base);
-> +               if (ret)
-> +                       return ret;
-> +       } else {
-> +               void *kaddr =3D kmap_local_page(ivec.iov.bvec[0].bv_page)=
-;
-> +               void *to =3D kaddr + ivec.iov.bvec[0].bv_offset;
-> +
-> +               WRITE_ONCE(*(__virtio16 *)to, tmp);
-> +               kunmap_local(kaddr);
-> +       }
->
->         return 0;
->  }
-> @@ -1306,6 +1390,7 @@ static inline int putused_iotlb(const struct vringh=
- *vrh,
->   * @features: the feature bits for this ring.
->   * @num: the number of elements.
->   * @weak_barriers: true if we only need memory barriers, not I/O.
-> + * @use_va: true if IOTLB contains user VA
->   * @desc: the userpace descriptor pointer.
->   * @avail: the userpace avail pointer.
->   * @used: the userpace used pointer.
-> @@ -1313,11 +1398,13 @@ static inline int putused_iotlb(const struct vrin=
-gh *vrh,
->   * Returns an error if num is invalid.
->   */
->  int vringh_init_iotlb(struct vringh *vrh, u64 features,
-> -                     unsigned int num, bool weak_barriers,
-> +                     unsigned int num, bool weak_barriers, bool use_va,
->                       struct vring_desc *desc,
->                       struct vring_avail *avail,
->                       struct vring_used *used)
->  {
-> +       vrh->use_va =3D use_va;
-> +
->         return vringh_init_kern(vrh, features, num, weak_barriers,
->                                 desc, avail, used);
->  }
-> --
-> 2.39.2
->
-
+PiBGcm9tOiBCYW9sdSBMdSA8YmFvbHUubHVAbGludXguaW50ZWwuY29tPg0KPiBTZW50OiBGcmlk
+YXksIE1hcmNoIDEwLCAyMDIzIDExOjAyIEFNDQo+IA0KPiBPbiAzLzkvMjMgNDowOSBQTSwgWWkg
+TGl1IHdyb3RlOg0KPiA+IElPTU1VX0hXUFRfQUxMT0MgYWxyZWFkeSBzdXBwb3J0cyBpb21tdV9k
+b21haW4gYWxsb2NhdGlvbiBmb3INCj4gdXNlcnNhcGNlLg0KPiA+IEJ1dCBpdCBjYW4gb25seSBh
+bGxvY2F0ZSBod19wYWdldGFibGVzIGxpbmtlZCB3aXRoIElPQVMuIFRoZXJlIGFyZSBuZWVkcw0K
+PiA+IHRvIHN1cHBvcnQgaHdfcGFnZXRhYmxlIGFsbG9jYXRpb24gd2l0aCBwYXJhbWV0ZXJzIHNw
+ZWNpZmllZCBieSB1c2VyLiBGb3INCj4gPiBleGFtcGxlLCBpbiBuZXN0ZWQgdHJhbnNsYXRpb24s
+IHVzZXIgbmVlZHMgdG8gYWxsb2NhdGUgaHdfcGFnZXRhYmxlIGZvcg0KPiA+IHRoZSBzdGFnZS0x
+IHRyYW5zbGF0aW9uIChlLmcuIGEgc2luZ2xlIEkvTyBwYWdlIHRhYmxlIG9yIGEgc2V0IG9mIEkv
+TyBwYWdlDQo+ID4gdGFibGVzKSB3aXRoIHVzZXIgZGF0YS4gSXQgYWxzbyBuZWVkcyBwcm92aWRl
+IGEgc3RhZ2UtMiBod19wYWdldGFibGUNCj4gd2hpY2gNCj4gPiBpcyBsaW5rZWQgdG8gdGhlIEdQ
+QSBJT0FTLg0KPiA+DQo+ID4gVGhpcyBleHRlbmRzIElPTU1VX0hXUFRfQUxMT0MgdG8gYWNjZXB0
+IHVzZXIgc3BlY2lmaWVkIHBhcmFtZXRlcg0KPiBhbmQgaHdwdA0KPiA+IElEIGluIEBwdF9pZCBm
+aWVsZC4gU3VjaCBhcyB0aGUgdXNlci1tYW5hZ2VkIHN0YWdlLTEgaHdwdCwgd2hpY2ggcmVxdWly
+ZXMNCj4gPiBhIHBhcmVudCBod3B0IHRvIHBvaW50IHRvIHN0YWdlLTIgdHJhbnNsYXRpb24uDQo+
+ID4NCj4gPiBlbnVtIGlvbW11X2h3cHRfdHlwZSBpcyBkZWZpbmVkIHRvIGRpZmZlcmVudGlhdGUg
+dGhlIHVzZXIgcGFyYW1ldGVycw0KPiB1c2UNCj4gPiBieSBkaWZmZXJlbnQgdXNhZ2VzLiBGb3Ig
+dGhlIGFsbG9jYXRpb25zIHRoYXQgZG9uJ3QgcmVxdWlyZSB1c2VyIHBhcmFtZXRlciwNCj4gPiBJ
+T01NVV9IV1BUX1RZUEVfREVGQVVMVCBpcyBkZWZpbmVkIGZvciBiYWNrd2FyZCBjb21wYXRpYmls
+aXR5Lg0KPiBPdGhlciB0eXBlcw0KPiA+IHdvdWxkIGJlIGFkZGVkIGJ5IGZ1dHVyZSBpb21tdSB2
+ZW5kb3IgZHJpdmVyIGV4dGVuc2lvbnMuDQo+ID4NCj4gPiBDby1kZXZlbG9wZWQtYnk6IE5pY29s
+aW4gQ2hlbiA8bmljb2xpbmNAbnZpZGlhLmNvbT4NCj4gPiBTaWduZWQtb2ZmLWJ5OiBOaWNvbGlu
+IENoZW4gPG5pY29saW5jQG52aWRpYS5jb20+DQo+ID4gU2lnbmVkLW9mZi1ieTogWWkgTGl1IDx5
+aS5sLmxpdUBpbnRlbC5jb20+DQo+ID4gLS0tDQo+ID4gICBkcml2ZXJzL2lvbW11L2lvbW11ZmQv
+aHdfcGFnZXRhYmxlLmMgfCA5NA0KPiArKysrKysrKysrKysrKysrKysrKysrKysrLS0tDQo+ID4g
+ICBkcml2ZXJzL2lvbW11L2lvbW11ZmQvbWFpbi5jICAgICAgICAgfCAgMiArLQ0KPiA+ICAgaW5j
+bHVkZS91YXBpL2xpbnV4L2lvbW11ZmQuaCAgICAgICAgIHwgMzAgKysrKysrKysrDQo+ID4gICAz
+IGZpbGVzIGNoYW5nZWQsIDExNSBpbnNlcnRpb25zKCspLCAxMSBkZWxldGlvbnMoLSkNCj4gPg0K
+PiA+IGRpZmYgLS1naXQgYS9kcml2ZXJzL2lvbW11L2lvbW11ZmQvaHdfcGFnZXRhYmxlLmMNCj4g
+Yi9kcml2ZXJzL2lvbW11L2lvbW11ZmQvaHdfcGFnZXRhYmxlLmMNCj4gPiBpbmRleCA2ZTQ1ZWMw
+YTY2ZmEuLjY0ZTdjZjcxNDJlMSAxMDA2NDQNCj4gPiAtLS0gYS9kcml2ZXJzL2lvbW11L2lvbW11
+ZmQvaHdfcGFnZXRhYmxlLmMNCj4gPiArKysgYi9kcml2ZXJzL2lvbW11L2lvbW11ZmQvaHdfcGFn
+ZXRhYmxlLmMNCj4gPiBAQCAtMTY1LDM0ICsxNjUsMTA2IEBAIGlvbW11ZmRfaHdfcGFnZXRhYmxl
+X2FsbG9jKHN0cnVjdA0KPiBpb21tdWZkX2N0eCAqaWN0eCwgc3RydWN0IGlvbW11ZmRfaW9hcyAq
+aW9hcywNCj4gPiAgIAlyZXR1cm4gRVJSX1BUUihyYyk7DQo+ID4gICB9DQo+ID4NCj4gPiArLyoN
+Cj4gPiArICogc2l6ZSBvZiBwYWdlIHRhYmxlIHR5cGUgc3BlY2lmaWMgZGF0YSwgaW5kZXhlZCBi
+eQ0KPiA+ICsgKiBlbnVtIGlvbW11X2h3cHRfdHlwZS4NCj4gPiArICovDQo+ID4gK3N0YXRpYyBj
+b25zdCBzaXplX3QgaW9tbXVmZF9od3B0X2FsbG9jX2RhdGFfc2l6ZVtdID0gew0KPiA+ICsJW0lP
+TU1VX0hXUFRfVFlQRV9ERUZBVUxUXSA9IDAsDQo+ID4gK307DQo+ID4gKw0KPiA+ICAgaW50IGlv
+bW11ZmRfaHdwdF9hbGxvYyhzdHJ1Y3QgaW9tbXVmZF91Y21kICp1Y21kKQ0KPiA+ICAgew0KPiA+
+ICAgCXN0cnVjdCBpb21tdV9od3B0X2FsbG9jICpjbWQgPSB1Y21kLT5jbWQ7DQo+ID4gLQlzdHJ1
+Y3QgaW9tbXVmZF9od19wYWdldGFibGUgKmh3cHQ7DQo+ID4gKwlzdHJ1Y3QgaW9tbXVmZF9od19w
+YWdldGFibGUgKmh3cHQsICpwYXJlbnQgPSBOVUxMOw0KPiA+ICsJc3RydWN0IGlvbW11ZmRfb2Jq
+ZWN0ICpwdF9vYmo7DQo+ID4gICAJc3RydWN0IGlvbW11ZmRfZGV2aWNlICppZGV2Ow0KPiA+ICAg
+CXN0cnVjdCBpb21tdWZkX2lvYXMgKmlvYXM7DQo+ID4gKwljb25zdCBzdHJ1Y3QgaW9tbXVfb3Bz
+ICpvcHM7DQo+ID4gKwl2b2lkICpkYXRhID0gTlVMTDsNCj4gPiArCXUzMiBrbGVuOw0KPiA+ICAg
+CWludCByYzsNCj4gDQo+IFJldmVyc2UgQ2hyaXN0bWFzIHRyZWUgZm9ybWF0LiBEaXR0byB0byBv
+dGhlciBwbGFjZXMgaW4gdGhpcyBmaWxlLg0KDQpHb3QgaXQuDQoNCj4gPg0KPiA+IC0JaWYgKGNt
+ZC0+ZmxhZ3MpDQo+ID4gKwlpZiAoY21kLT5fX3Jlc2VydmVkIHx8IGNtZC0+ZmxhZ3MpDQo+ID4g
+ICAJCXJldHVybiAtRU9QTk9UU1VQUDsNCj4gPg0KPiA+ICAgCWlkZXYgPSBpb21tdWZkX2dldF9k
+ZXZpY2UodWNtZCwgY21kLT5kZXZfaWQpOw0KPiA+ICAgCWlmIChJU19FUlIoaWRldikpDQo+ID4g
+ICAJCXJldHVybiBQVFJfRVJSKGlkZXYpOw0KPiA+DQo+ID4gLQlpb2FzID0gaW9tbXVmZF9nZXRf
+aW9hcyh1Y21kLCBjbWQtPnB0X2lkKTsNCj4gPiAtCWlmIChJU19FUlIoaW9hcykpIHsNCj4gPiAt
+CQlyYyA9IFBUUl9FUlIoaW9hcyk7DQo+ID4gKwlvcHMgPSBkZXZfaW9tbXVfb3BzKGlkZXYtPmRl
+dik7DQo+ID4gKwlpZiAoIW9wcykgew0KPiA+ICsJCXJjID0gLUVPUE5PVFNVUFA7DQo+ID4gICAJ
+CWdvdG8gb3V0X3B1dF9pZGV2Ow0KPiA+ICAgCX0NCj4gDQo+IE5vIG5lZWQgdG8gY2hlY2suIGRl
+dl9pb21tdV9vcHMoKSB3aWxsIG5ldmVyIHJldHVybnMgYSBOVUxMLg0KDQpHb3QgaXQuDQoNCj4g
+Pg0KPiA+ICsJLyogT25seSBzdXBwb3J0IElPTU1VX0hXUFRfVFlQRV9ERUZBVUxUIGZvciBub3cg
+Ki8NCj4gPiArCWlmIChjbWQtPmRhdGFfdHlwZSAhPSBJT01NVV9IV1BUX1RZUEVfREVGQVVMVCkg
+ew0KPiA+ICsJCXJjID0gLUVJTlZBTDsNCj4gPiArCQlnb3RvIG91dF9wdXRfaWRldjsNCj4gPiAr
+CX0NCj4gPiArDQo+ID4gKwlwdF9vYmogPSBpb21tdWZkX2dldF9vYmplY3QodWNtZC0+aWN0eCwg
+Y21kLT5wdF9pZCwNCj4gSU9NTVVGRF9PQkpfQU5ZKTsNCj4gPiArCWlmIChJU19FUlIocHRfb2Jq
+KSkgew0KPiA+ICsJCXJjID0gLUVJTlZBTDsNCj4gPiArCQlnb3RvIG91dF9wdXRfaWRldjsNCj4g
+PiArCX0NCj4gPiArDQo+ID4gKwlzd2l0Y2ggKHB0X29iai0+dHlwZSkgew0KPiA+ICsJY2FzZSBJ
+T01NVUZEX09CSl9JT0FTOg0KPiA+ICsJCWlvYXMgPSBjb250YWluZXJfb2YocHRfb2JqLCBzdHJ1
+Y3QgaW9tbXVmZF9pb2FzLCBvYmopOw0KPiA+ICsJCWJyZWFrOw0KPiA+ICsJY2FzZSBJT01NVUZE
+X09CSl9IV19QQUdFVEFCTEU6DQo+ID4gKwkJLyogcHRfaWQgcG9pbnRzIEhXUFQgb25seSB3aGVu
+IGRhdGFfdHlwZQ0KPiBpcyAhSU9NTVVfSFdQVF9UWVBFX0RFRkFVTFQgKi8NCj4gPiArCQlpZiAo
+Y21kLT5kYXRhX3R5cGUgPT0gSU9NTVVfSFdQVF9UWVBFX0RFRkFVTFQpIHsNCj4gPiArCQkJcmMg
+PSAtRUlOVkFMOw0KPiA+ICsJCQlnb3RvIG91dF9wdXRfcHQ7DQo+ID4gKwkJfQ0KPiA+ICsNCj4g
+PiArCQlwYXJlbnQgPSBjb250YWluZXJfb2YocHRfb2JqLCBzdHJ1Y3QNCj4gaW9tbXVmZF9od19w
+YWdldGFibGUsIG9iaik7DQo+ID4gKwkJLyoNCj4gPiArCQkgKiBDYW5ub3QgYWxsb2NhdGUgdXNl
+ci1tYW5hZ2VkIGh3cHQgbGlua2luZyB0bw0KPiBhdXRvX2NyZWF0ZWQNCj4gPiArCQkgKiBod3B0
+LiBJZiB0aGUgcGFyZW50IGh3cHQgaXMgYWxyZWFkeSBhIHVzZXItbWFuYWdlZCBod3B0LA0KPiA+
+ICsJCSAqIGRvbid0IGFsbG9jYXRlIGFub3RoZXIgdXNlci1tYW5hZ2VkIGh3cHQgbGlua2luZyB0
+byBpdC4NCj4gPiArCQkgKi8NCj4gPiArCQlpZiAocGFyZW50LT5hdXRvX2RvbWFpbiB8fCBwYXJl
+bnQtPnBhcmVudCkgew0KPiA+ICsJCQlyYyA9IC1FSU5WQUw7DQo+ID4gKwkJCWdvdG8gb3V0X3B1
+dF9wdDsNCj4gPiArCQl9DQo+ID4gKwkJaW9hcyA9IHBhcmVudC0+aW9hczsNCj4gPiArCQlicmVh
+azsNCj4gPiArCWRlZmF1bHQ6DQo+ID4gKwkJcmMgPSAtRUlOVkFMOw0KPiA+ICsJCWdvdG8gb3V0
+X3B1dF9wdDsNCj4gPiArCX0NCj4gPiArDQo+ID4gKwlrbGVuID0gaW9tbXVmZF9od3B0X2FsbG9j
+X2RhdGFfc2l6ZVtjbWQtPmRhdGFfdHlwZV07DQo+ID4gKwlpZiAoa2xlbikgew0KPiA+ICsJCWlm
+ICghY21kLT5kYXRhX2xlbikgew0KPiA+ICsJCQlyYyA9IC1FSU5WQUw7DQo+ID4gKwkJCWdvdG8g
+b3V0X3B1dF9wdDsNCj4gPiArCQl9DQo+IA0KPiBJcyB0aGUgdXNlcl9kYXRhIHN0aWxsIHZhbGlk
+IGlmIChjbWQtPmRhdGFfbGVuIDwga2xlbik/DQoNClllcywgb25lIGRheSBpZiBrZXJuZWwgaGFz
+IG5ldyBmaWVsZHMgYWRkZWQgaW4gdGhlIGVuZCBvZiB0aGUgdWFwaQ0Kc3RydWN0dXJlIGJ1dCBx
+ZW11IGlzIHVzaW5nIGFuIG9sZCB1YXBpIGhlYWRlci4gSW4gc3VjaCBjYXNlLCB0aGUNCmV4dHJh
+IGJ5dGUgc2hvdWxkIGJlIHplcm9lZC4NCg0KPiANCj4gPiArDQo+ID4gKwkJZGF0YSA9IGt6YWxs
+b2Moa2xlbiwgR0ZQX0tFUk5FTCk7DQo+ID4gKwkJaWYgKCFkYXRhKSB7DQo+ID4gKwkJCXJjID0g
+LUVOT01FTTsNCj4gPiArCQkJZ290byBvdXRfcHV0X3B0Ow0KPiA+ICsJCX0NCj4gPiArDQo+ID4g
+KwkJcmMgPSBjb3B5X3N0cnVjdF9mcm9tX3VzZXIoZGF0YSwga2xlbiwNCj4gPiArCQkJCQkgICB1
+NjRfdG9fdXNlcl9wdHIoY21kLT5kYXRhX3VwdHIpLA0KPiA+ICsJCQkJCSAgIGNtZC0+ZGF0YV9s
+ZW4pOw0KPiA+ICsJCWlmIChyYykNCj4gPiArCQkJZ290byBvdXRfZnJlZV9kYXRhOw0KPiA+ICsJ
+fQ0KPiA+ICsNCj4gPiAgIAltdXRleF9sb2NrKCZpb2FzLT5tdXRleCk7DQo+ID4gICAJaHdwdCA9
+IGlvbW11ZmRfaHdfcGFnZXRhYmxlX2FsbG9jKHVjbWQtPmljdHgsIGlvYXMsIGlkZXYsDQo+ID4g
+LQkJCQkJICBOVUxMLCBOVUxMLCBmYWxzZSk7DQo+ID4gKwkJCQkJICBwYXJlbnQsIGRhdGEsIGZh
+bHNlKTsNCj4gPiAgIAltdXRleF91bmxvY2soJmlvYXMtPm11dGV4KTsNCj4gPiAgIAlpZiAoSVNf
+RVJSKGh3cHQpKSB7DQo+ID4gICAJCXJjID0gUFRSX0VSUihod3B0KTsNCj4gPiAtCQlnb3RvIG91
+dF9wdXRfaW9hczsNCj4gPiArCQlnb3RvIG91dF9mcmVlX2RhdGE7DQo+ID4gICAJfQ0KPiA+DQo+
+ID4gICAJY21kLT5vdXRfaHdwdF9pZCA9IGh3cHQtPm9iai5pZDsNCj4gPiBAQCAtMjAwLDEyICsy
+NzIsMTQgQEAgaW50IGlvbW11ZmRfaHdwdF9hbGxvYyhzdHJ1Y3QgaW9tbXVmZF91Y21kDQo+ICp1
+Y21kKQ0KPiA+ICAgCWlmIChyYykNCj4gPiAgIAkJZ290byBvdXRfaHdwdDsNCj4gPiAgIAlpb21t
+dWZkX29iamVjdF9maW5hbGl6ZSh1Y21kLT5pY3R4LCAmaHdwdC0+b2JqKTsNCj4gPiAtCWdvdG8g
+b3V0X3B1dF9pb2FzOw0KPiA+ICsJZ290byBvdXRfZnJlZV9kYXRhOw0KPiA+DQo+ID4gICBvdXRf
+aHdwdDoNCj4gPiAgIAlpb21tdWZkX29iamVjdF9hYm9ydF9hbmRfZGVzdHJveSh1Y21kLT5pY3R4
+LCAmaHdwdC0+b2JqKTsNCj4gPiAtb3V0X3B1dF9pb2FzOg0KPiA+IC0JaW9tbXVmZF9wdXRfb2Jq
+ZWN0KCZpb2FzLT5vYmopOw0KPiA+ICtvdXRfZnJlZV9kYXRhOg0KPiA+ICsJa2ZyZWUoZGF0YSk7
+DQo+ID4gK291dF9wdXRfcHQ6DQo+ID4gKwlpb21tdWZkX3B1dF9vYmplY3QocHRfb2JqKTsNCj4g
+PiAgIG91dF9wdXRfaWRldjoNCj4gPiAgIAlpb21tdWZkX3B1dF9vYmplY3QoJmlkZXYtPm9iaik7
+DQo+ID4gICAJcmV0dXJuIHJjOw0KPiA+IGRpZmYgLS1naXQgYS9kcml2ZXJzL2lvbW11L2lvbW11
+ZmQvbWFpbi5jDQo+IGIvZHJpdmVycy9pb21tdS9pb21tdWZkL21haW4uYw0KPiA+IGluZGV4IGYw
+NzljMGJkYTQ2Yi4uN2FiMWUyYzYzOGExIDEwMDY0NA0KPiA+IC0tLSBhL2RyaXZlcnMvaW9tbXUv
+aW9tbXVmZC9tYWluLmMNCj4gPiArKysgYi9kcml2ZXJzL2lvbW11L2lvbW11ZmQvbWFpbi5jDQo+
+ID4gQEAgLTI5NSw3ICsyOTUsNyBAQCBzdHJ1Y3QgaW9tbXVmZF9pb2N0bF9vcCB7DQo+ID4gICBz
+dGF0aWMgY29uc3Qgc3RydWN0IGlvbW11ZmRfaW9jdGxfb3AgaW9tbXVmZF9pb2N0bF9vcHNbXSA9
+IHsNCj4gPiAgIAlJT0NUTF9PUChJT01NVV9ERVNUUk9ZLCBpb21tdWZkX2Rlc3Ryb3ksIHN0cnVj
+dA0KPiBpb21tdV9kZXN0cm95LCBpZCksDQo+ID4gICAJSU9DVExfT1AoSU9NTVVfSFdQVF9BTExP
+QywgaW9tbXVmZF9od3B0X2FsbG9jLCBzdHJ1Y3QNCj4gaW9tbXVfaHdwdF9hbGxvYywNCj4gPiAt
+CQkgX19yZXNlcnZlZCksDQo+ID4gKwkJIGRhdGFfdXB0ciksDQo+ID4gICAJSU9DVExfT1AoSU9N
+TVVfREVWSUNFX0dFVF9IV19JTkZPLA0KPiBpb21tdWZkX2RldmljZV9nZXRfaHdfaW5mbywNCj4g
+PiAgIAkJIHN0cnVjdCBpb21tdV9od19pbmZvLCBfX3Jlc2VydmVkKSwNCj4gPiAgIAlJT0NUTF9P
+UChJT01NVV9JT0FTX0FMTE9DLCBpb21tdWZkX2lvYXNfYWxsb2NfaW9jdGwsDQo+ID4gZGlmZiAt
+LWdpdCBhL2luY2x1ZGUvdWFwaS9saW51eC9pb21tdWZkLmggYi9pbmNsdWRlL3VhcGkvbGludXgv
+aW9tbXVmZC5oDQo+ID4gaW5kZXggNGFjNTI1ODk3YjgyLi40ODc4MWZmNDBhMzcgMTAwNjQ0DQo+
+ID4gLS0tIGEvaW5jbHVkZS91YXBpL2xpbnV4L2lvbW11ZmQuaA0KPiA+ICsrKyBiL2luY2x1ZGUv
+dWFwaS9saW51eC9pb21tdWZkLmgNCj4gPiBAQCAtMzQ3LDYgKzM0NywxNCBAQCBzdHJ1Y3QgaW9t
+bXVfdmZpb19pb2FzIHsNCj4gPiAgIH07DQo+ID4gICAjZGVmaW5lIElPTU1VX1ZGSU9fSU9BUyBf
+SU8oSU9NTVVGRF9UWVBFLA0KPiBJT01NVUZEX0NNRF9WRklPX0lPQVMpDQo+ID4NCj4gPiArLyoq
+DQo+ID4gKyAqIGVudW0gaW9tbXVfaHdwdF90eXBlIC0gSU9NTVUgSFdQVCBUeXBlDQo+ID4gKyAq
+IEBJT01NVV9IV1BUX1RZUEVfREVGQVVMVDogZGVmYXVsdA0KPiA+ICsgKi8NCj4gPiArZW51bSBp
+b21tdV9od3B0X3R5cGUgew0KPiA+ICsJSU9NTVVfSFdQVF9UWVBFX0RFRkFVTFQsDQo+ID4gK307
+DQo+ID4gKw0KPiA+ICAgLyoqDQo+ID4gICAgKiBzdHJ1Y3QgaW9tbXVfaHdwdF9hbGxvYyAtIGlv
+Y3RsKElPTU1VX0hXUFRfQUxMT0MpDQo+ID4gICAgKiBAc2l6ZTogc2l6ZW9mKHN0cnVjdCBpb21t
+dV9od3B0X2FsbG9jKQ0KPiA+IEBAIC0zNTUsMTIgKzM2MywzMSBAQCBzdHJ1Y3QgaW9tbXVfdmZp
+b19pb2FzIHsNCj4gPiAgICAqIEBwdF9pZDogVGhlIElPQVMgdG8gY29ubmVjdCB0aGlzIEhXUFQg
+dG8NCj4gPiAgICAqIEBvdXRfaHdwdF9pZDogVGhlIElEIG9mIHRoZSBuZXcgSFdQVA0KPiA+ICAg
+ICogQF9fcmVzZXJ2ZWQ6IE11c3QgYmUgMA0KPiA+ICsgKiBAZGF0YV90eXBlOiBPbmUgb2YgZW51
+bSBpb21tdV9od3B0X3R5cGUNCj4gPiArICogQGRhdGFfbGVuOiBMZW5ndGggb2YgdGhlIHR5cGUg
+c3BlY2lmaWMgZGF0YQ0KPiA+ICsgKiBAZGF0YV91cHRyOiBVc2VyIHBvaW50ZXIgdG8gdGhlIHR5
+cGUgc3BlY2lmaWMgZGF0YQ0KPiA+ICAgICoNCj4gPiAgICAqIEV4cGxpY2l0bHkgYWxsb2NhdGUg
+YSBoYXJkd2FyZSBwYWdlIHRhYmxlIG9iamVjdC4gVGhpcyBpcyB0aGUgc2FtZQ0KPiBvYmplY3QN
+Cj4gPiAgICAqIHR5cGUgdGhhdCBpcyByZXR1cm5lZCBieSBpb21tdWZkX2RldmljZV9hdHRhY2go
+KSBhbmQgcmVwcmVzZW50cyB0aGUNCj4gPiAgICAqIHVuZGVybHlpbmcgaW9tbXUgZHJpdmVyJ3Mg
+aW9tbXVfZG9tYWluIGtlcm5lbCBvYmplY3QuDQo+ID4gICAgKg0KPiA+ICAgICogQSBub3JtYWwg
+SFdQVCB3aWxsIGJlIGNyZWF0ZWQgd2l0aCB0aGUgbWFwcGluZ3MgZnJvbSB0aGUgZ2l2ZW4gSU9B
+Uy4NCj4gPiArICogVGhlIEBkYXRhX3R5cGUgZm9yIGl0cyBhbGxvY2F0aW9uIGNhbiBiZSBzZXQg
+dG8NCj4gSU9NTVVfSFdQVF9UWVBFX0RFRkFVTFQsIG9yDQo+ID4gKyAqIGFub3RoZXIgdHlwZSAo
+YmVpbmcgbGlzdGVkIGJlbG93KSB0byBzcGVjaWFsaXplIGEga2VybmVsLW1hbmFnZWQNCj4gSFdQ
+VC4NCj4gPiArICoNCj4gPiArICogQSB1c2VyLW1hbmFnZWQgSFdQVCB3aWxsIGJlIGNyZWF0ZWQg
+ZnJvbSBhIGdpdmVuIHBhcmVudCBIV1BUIHZpYQ0KPiBAcHRfaWQsIGluDQo+ID4gKyAqIHdoaWNo
+IHRoZSBwYXJlbnQgSFdQVCBtdXN0IGJlIGFsbG9jYXRlZCBwcmV2aW91c2x5IHZpYSB0aGUgc2Ft
+ZSBpb2N0bA0KPiBmcm9tIGENCj4gPiArICogZ2l2ZW4gSU9BUy4gVGhlIEBkYXRhX3R5cGUgbXVz
+dCBub3QgYmUgc2V0IHRvDQo+IElPTU1VX0hXUFRfVFlQRV9ERUZBVUxUIGJ1dCBhDQo+ID4gKyAq
+IHByZS1kZWZpbmVkIHR5cGUgY29ycmVzcG9uZGluZyB0byB0aGUgdW5kZXJseWluZyBJT01NVSBo
+YXJkd2FyZS4NCj4gPiArICoNCj4gPiArICogSWYgdGhlIEBkYXRhX3R5cGUgaXMgc2V0IHRvIElP
+TU1VX0hXUFRfVFlQRV9ERUZBVUxULCBib3RoIHRoZQ0KPiBAZGF0YV9sZW4gYW5kDQo+ID4gKyAq
+IHRoZSBAZGF0YV91cHRyIHdpbGwgYmUgaWdub3JlZC4gT3RoZXJ3aXNlLCBib3RoIG9mIHRoZW0g
+bXVzdCBiZQ0KPiBnaXZlbi4NCj4gPiArICoNCj4gPiArICoNCj4gKz09PT09PT09PT09PT09PT09
+PT09PT09PT09PT09PSs9PT09PT09PT09PT09PT09PT09PT09PT09PT09PQ0KPiA9PT09PT09PSs9
+PT09PT09PT09PSsNCj4gPiArICogfCBAZGF0YV90eXBlICAgICAgICAgICAgICAgICAgIHwgICAg
+RGF0YSBzdHJ1Y3R1cmUgaW4gQGRhdGFfdXB0ciAgICAgfCAgIEBwdF9pZA0KPiB8DQo+ID4gKyAq
+ICstLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0rLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLSstLS0tLS0tLS0tLSsNCj4gPiArICogfCBJT01NVV9IV1BUX1RZUEVfREVG
+QVVMVCAgICAgIHwgICAgICAgICAgICAgICBOL0EgICAgICAgICAgICAgICAgICAgfCAgICBJT0FT
+DQo+IHwNCj4gPiArICogKy0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLSstLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tKy0tLS0tLS0tLS0tKw0KPiA+ICAgICovDQo+ID4g
+ICBzdHJ1Y3QgaW9tbXVfaHdwdF9hbGxvYyB7DQo+ID4gICAJX191MzIgc2l6ZTsNCj4gPiBAQCAt
+MzY5LDYgKzM5Niw5IEBAIHN0cnVjdCBpb21tdV9od3B0X2FsbG9jIHsNCj4gPiAgIAlfX3UzMiBw
+dF9pZDsNCj4gPiAgIAlfX3UzMiBvdXRfaHdwdF9pZDsNCj4gPiAgIAlfX3UzMiBfX3Jlc2VydmVk
+Ow0KPiA+ICsJX191MzIgZGF0YV90eXBlOw0KPiA+ICsJX191MzIgZGF0YV9sZW47DQo+ID4gKwlf
+X2FsaWduZWRfdTY0IGRhdGFfdXB0cjsNCj4gPiAgIH07DQo+ID4gICAjZGVmaW5lIElPTU1VX0hX
+UFRfQUxMT0MgX0lPKElPTU1VRkRfVFlQRSwNCj4gSU9NTVVGRF9DTURfSFdQVF9BTExPQykNCj4g
+DQo+IEJlc3QgcmVnYXJkcywNCj4gYmFvbHUNCg==
