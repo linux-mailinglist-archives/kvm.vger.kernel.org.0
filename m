@@ -2,66 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 319986C7351
-	for <lists+kvm@lfdr.de>; Thu, 23 Mar 2023 23:51:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 00C6E6C7363
+	for <lists+kvm@lfdr.de>; Thu, 23 Mar 2023 23:53:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231513AbjCWWvK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Mar 2023 18:51:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46982 "EHLO
+        id S231152AbjCWWxn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Mar 2023 18:53:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51508 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231228AbjCWWvI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Mar 2023 18:51:08 -0400
-Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 351E27AA7
-        for <kvm@vger.kernel.org>; Thu, 23 Mar 2023 15:51:06 -0700 (PDT)
-Received: by mail-pj1-x104a.google.com with SMTP id qa18-20020a17090b4fd200b002400d8a8d1dso1475378pjb.7
-        for <kvm@vger.kernel.org>; Thu, 23 Mar 2023 15:51:06 -0700 (PDT)
+        with ESMTP id S231737AbjCWWxT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Mar 2023 18:53:19 -0400
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9EEF52ED48
+        for <kvm@vger.kernel.org>; Thu, 23 Mar 2023 15:53:03 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-536a4eba107so564197b3.19
+        for <kvm@vger.kernel.org>; Thu, 23 Mar 2023 15:53:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1679611865;
+        d=google.com; s=20210112; t=1679611982;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=AqFc8A4lyhPY/42dCbIU0IYFB1GySYWnAocQAi1+h4Q=;
-        b=BPiGWjMeDRpQTgZB97UOimTIL3OYBXSDT/6fJgZVC6gQgZ5fCzvw1lRDNKKawrXLv2
-         E4PvzehXk27nt/drVvcaTHR9RfvY1ewNnFoU10fr+1Bw5wJGJAEvr9IlV+tYUIe1jSLS
-         go12kdYqwO37wrDkww5Pk4Sg28nsUokR0/t6+6HxBHhBgfvCdRRiq82yIPmJWwekGzv5
-         7hiF3kgoFEvlUc2wb11M9OqS7XWiI6j6q12XRxrhO9zaDi8/tNMkKP01RUNiQlh4ugyh
-         6GgqD3giutQ3Oy505lN1UgV0cSUu3sK69NQGcsNXXvMU0zCcFLrIZTwUHA23JZUJ87hE
-         wwbA==
+        bh=W6+Qn6EJMHI+3I/L2O6DcxdAJ0N7a/1zdIIWx5jxJMI=;
+        b=lPRzXXsmxANtqW5g73lEWfTE9t87KJhwBulJ2jb4CXk1fhH834elw1IMt+G2RURXet
+         uS2wvECcsZveg4IYcaPYOJKetzv9Figak4PRmehi0PaUJ8oFmgOi3kylQRF0ELdh/GKi
+         xmAsx0GT54177CJ1ns9ILiUH+rowuFK+5N8+l3XEoO7xDB006uypOuUYK0qFKP1d0qyi
+         nP7pFMSVzP68WM1fuLgJmJlePpq+r4YABvtBxXg+UlVFHJLmsWGlgrqft3CZO2gsXznf
+         DrREFzhQte4JrGxlovC6qHX0nLzs4RtFEsANSt/CKLgnHgLcnydvfTSE78QgKaojbTM+
+         PFVQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679611865;
+        d=1e100.net; s=20210112; t=1679611982;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=AqFc8A4lyhPY/42dCbIU0IYFB1GySYWnAocQAi1+h4Q=;
-        b=5eRe198ctP28MqbTJfIxFRYBUunr6W3UF719jzywquxIsw3eLTjr2qBTpQnvKmL8Yh
-         2OwkhGI3J6sU9fv7k9lJE2CDGm4uxRFNfr9FpDWijN1HlPQty7xsxiYYXhW6XelXi41l
-         hswWlLrmPnEerq5hTsh/8ACuQbBVewzHqkePfRvEVpuhQT/PZ716lNihsN042FxQLh2q
-         Zr47AGEEkiOUlZUTtDSU2n6UWKfg2677sOfsFu+OPDELo+tS+6FeJPz/sj4OfgdsHo/G
-         vpmm8jsftEPzh8xOhl3DqQBtNzm8Umb3D6Cx7eN7Xv36L3NQJXZ5hwLkjSUDTK12xmeB
-         1XAg==
-X-Gm-Message-State: AO0yUKU7opJrrJEdBhE+hqcu20TXDU9eJtWEpZgCWLzvW8a5UrseCJ9p
-        6S1r4Pv++z6thpBPUaG6kE4e3eDj9Fw=
-X-Google-Smtp-Source: AK7set+c5Oe8EOFfr51iU86OvsiSeB7dYNOcFLpSUDdYqdgPEt9K+BfSwaK38fcJtMRO5Wf6VIN+Mei8mGY=
+        bh=W6+Qn6EJMHI+3I/L2O6DcxdAJ0N7a/1zdIIWx5jxJMI=;
+        b=b+0K1XFp670MgRBm4M0uOG1jCcIDgy5i80uHl2qtP5O0bPSe/3fo2zhLcwoDW+qL9Y
+         a9lfJ43wvRa0MXI4WWtpkdtJIAqhbW9caaha8znooKIKd6cinyQO/5pH+c6j0HVeCnHh
+         MixNSfHt01oe3mF6/Ig6pFG9TUpS8amVRVI9NdDwkmpSYNNAWJIajTTvHKVLw/BnUrYB
+         Ee80yMDpx47YIUKXDNxeP2oP1HYjxBYTiwnDZyCwa1QsQpArt6yUErgq+pxWXb8Md0Fc
+         1rOxnTrC3MiCsyOV8uGf7vMYLBBBk3fan7KZy57V/kLXeobD809sH1Wj7neCUvQDwNzf
+         k+UQ==
+X-Gm-Message-State: AAQBX9dkNcY3TD9sOpsJY3Y5elPfKR2g18qiSMFVCdlFIaLNqRlsFS8Z
+        BcHuKqZ4tikut9+R4oGREHBJwGnsz90=
+X-Google-Smtp-Source: AKy350aD3v+u24+02eF93jNscPBMXl81ZfnIUCEHD8aAAK+EKBKMkSSJWX59LqWYUu8CYTMAdDRJuuk3J2A=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:aa7:8891:0:b0:5a8:daec:c325 with SMTP id
- z17-20020aa78891000000b005a8daecc325mr3364999pfe.1.1679611865307; Thu, 23 Mar
- 2023 15:51:05 -0700 (PDT)
-Date:   Thu, 23 Mar 2023 15:50:30 -0700
-In-Reply-To: <20230113122910.672417-1-jiangshanlai@gmail.com>
+ (user=seanjc job=sendgmr) by 2002:a81:af5d:0:b0:541:8285:b25 with SMTP id
+ x29-20020a81af5d000000b0054182850b25mr78379ywj.10.1679611981974; Thu, 23 Mar
+ 2023 15:53:01 -0700 (PDT)
+Date:   Thu, 23 Mar 2023 15:50:34 -0700
+In-Reply-To: <20230322013731.102955-1-minipli@grsecurity.net>
 Mime-Version: 1.0
-References: <20230113122910.672417-1-jiangshanlai@gmail.com>
+References: <20230322013731.102955-1-minipli@grsecurity.net>
 X-Mailer: git-send-email 2.40.0.348.gf938b09366-goog
-Message-ID: <167934153606.1941128.1026865175616779306.b4-ty@google.com>
-Subject: Re: [PATCH] kvm: x86/mmu: Simplify pte_list_{add|remove}
+Message-ID: <167949641597.2215962.13042575709754610384.b4-ty@google.com>
+Subject: Re: [PATCH v4 0/6] KVM: MMU: performance tweaks for heavy CR0.WP users
 From:   Sean Christopherson <seanjc@google.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        linux-kernel@vger.kernel.org,
-        Lai Jiangshan <jiangshanlai@gmail.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Lai Jiangshan <jiangshan.ljs@antgroup.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org
+To:     Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
+        Mathias Krause <minipli@grsecurity.net>
+Cc:     linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
 Content-Type: text/plain; charset="utf-8"
 X-Spam-Status: No, score=-7.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
@@ -73,25 +67,32 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 13 Jan 2023 20:29:10 +0800, Lai Jiangshan wrote:
-> Simplify pte_list_{add|remove} by ensuring all the non-head pte_list_desc
-> to be full and addition/removal actions being performed on the head.
+On Wed, 22 Mar 2023 02:37:25 +0100, Mathias Krause wrote:
+> v3: https://lore.kernel.org/kvm/20230201194604.11135-1-minipli@grsecurity.net/
 > 
-> To make pte_list_add() return a count as before, @tail_count is also
-> added to the struct pte_list_desc.
+> This series is the fourth iteration of resurrecting the missing pieces of
+> Paolo's previous attempt[1] to avoid needless MMU roots unloading.
 > 
-> No visible performace is changed in tests.  But pte_list_add() is no longer
-> shown in the perf result for the COWed pages even the guest forks millions
-> of tasks.
+> It's incorporating Sean's feedback to v3 and rebased on top of
+> kvm-x86/next, namely commit d8708b80fa0e ("KVM: Change return type of
+> kvm_arch_vm_ioctl() to "int"").
 > 
 > [...]
 
-Applied to kvm-x86 mmu, thanks!  I added quite a few comments and a BUG_ON() to
-sanity check that the head is never empty when trying to remove an entry, but I
-didn't make anything changes to the code itself.
+Applied 1 and 5 to kvm-x86 mmu, and the rest to kvm-x86 misc, thanks!
 
-[1/1] kvm: x86/mmu: Simplify pte_list_{add|remove}
-      https://github.com/kvm-x86/linux/commit/141705b78381
+[1/6] KVM: x86/mmu: Avoid indirect call for get_cr3
+      https://github.com/kvm-x86/linux/commit/2fdcc1b32418
+[2/6] KVM: x86: Do not unload MMU roots when only toggling CR0.WP with TDP enabled
+      https://github.com/kvm-x86/linux/commit/01b31714bd90
+[3/6] KVM: x86: Ignore CR0.WP toggles in non-paging mode
+      https://github.com/kvm-x86/linux/commit/e40bcf9f3a18
+[4/6] KVM: x86: Make use of kvm_read_cr*_bits() when testing bits
+      https://github.com/kvm-x86/linux/commit/74cdc836919b
+[5/6] KVM: x86/mmu: Fix comment typo
+      https://github.com/kvm-x86/linux/commit/50f13998451e
+[6/6] KVM: VMX: Make CR0.WP a guest owned bit
+      https://github.com/kvm-x86/linux/commit/fb509f76acc8
 
 --
 https://github.com/kvm-x86/linux/tree/next
