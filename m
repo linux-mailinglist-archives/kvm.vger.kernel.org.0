@@ -2,66 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6B8826C6523
-	for <lists+kvm@lfdr.de>; Thu, 23 Mar 2023 11:33:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 914F16C6549
+	for <lists+kvm@lfdr.de>; Thu, 23 Mar 2023 11:39:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231545AbjCWKc7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Mar 2023 06:32:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54928 "EHLO
+        id S229800AbjCWKjP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Mar 2023 06:39:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34546 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231315AbjCWKc1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Mar 2023 06:32:27 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DAFEB1C7F5
-        for <kvm@vger.kernel.org>; Thu, 23 Mar 2023 03:29:42 -0700 (PDT)
+        with ESMTP id S231181AbjCWKiv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Mar 2023 06:38:51 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC62D38446
+        for <kvm@vger.kernel.org>; Thu, 23 Mar 2023 03:36:34 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 70BDCB81EBD
-        for <kvm@vger.kernel.org>; Thu, 23 Mar 2023 10:29:41 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A8D47C433D2;
-        Thu, 23 Mar 2023 10:29:39 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 52F45625D8
+        for <kvm@vger.kernel.org>; Thu, 23 Mar 2023 10:36:34 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 42BD0C4339B;
+        Thu, 23 Mar 2023 10:36:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1679567380;
-        bh=fDcF61tjo8q8qHagQMk3UpbEV6iDDR23l7YEGst1DbA=;
-        h=From:To:Cc:Subject:In-Reply-To:Date:From;
-        b=n6QIicGg7E0gminwcg/q/adbTOOQgBbPAKLqEQ1UE71B7Wf+/FNk+s3SsPov1noLU
-         9Uy5iTtQU8C11P44+jeeKePKM42eWGDr4RpOHKRsQGQsojdWnWN3IYz7r6PfM1+qKv
-         U+tquSHVVsDhENd1Q1raVbXJJmRZfPXwL1k+y4eOiUQZ5L7HOmoQZ1MHh9jvxvRJVt
-         0Mw5Cg3FSs6c1oG8CfdAYLbP+ZfjmFgR1xBj3iQo+Q8rbNtKHZSkcyqQ9MJUyGnqmm
-         5edNc2VyVOwlys6jqtbSvmQKRqBZzhIOB/rXuvmm28o/DOM/qlZqaEkxnEDtaDugvv
-         FN++C8+NMHoVA==
+        s=k20201202; t=1679567793;
+        bh=AiS8dSPCKWDsq3eZ7fJAM1zTxXlSdU85APs6cGWwkyg=;
+        h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+        b=cVnnpvtmKuYQMh/yj6cr0af33CLhHRsXcDRuRSd76QGIYurwcQUkte+v4WREomm3g
+         fgQyT4SZLJzK/fs3yR/hCVZQSp0mpWLfewImPfsTHQi2vUC7ehslg9EdLZVUTyzCPg
+         eB6UIuoglmfKWsIpO5pEIKYYg9YSsKRcrxLhyR3YQ98/BPWvZ+cAoCcLArSBrDqBlr
+         wCKe949/sLk/kqe6uy1zAJRU1Sx8Zw4i88jGllm+5lUnPHOmw/ok8m8cSA4HTK1+aW
+         tiiDVYNXWDRN8lpim397S6y/RZ8zgWOhD/unmkAik2KIQm+e54TO6LLb/xUhe7dSXk
+         hZoS+1PsJhoow==
 From:   =?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>
 To:     Andy Chiu <andy.chiu@sifive.com>, linux-riscv@lists.infradead.org,
         palmer@dabbelt.com, anup@brainfault.org, atishp@atishpatra.org,
         kvm-riscv@lists.infradead.org, kvm@vger.kernel.org
-Cc:     vineetg@rivosinc.com, greentime.hu@sifive.com,
-        guoren@linux.alibaba.com, Andy Chiu <andy.chiu@sifive.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Andrew Jones <ajones@ventanamicro.com>,
-        Heiko Stuebner <heiko.stuebner@vrull.eu>,
-        Conor Dooley <conor.dooley@microchip.com>,
-        Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>,
-        Liao Chang <liaochang1@huawei.com>,
-        Jisheng Zhang <jszhang@kernel.org>,
+Cc:     Kefeng Wang <wangkefeng.wang@huawei.com>, guoren@linux.alibaba.com,
+        Kees Cook <keescook@chromium.org>,
+        Nick Knight <nick.knight@sifive.com>,
+        Andrew Bresticker <abrestic@rivosinc.com>,
+        vineetg@rivosinc.com, Al Viro <viro@zeniv.linux.org.uk>,
         Vincent Chen <vincent.chen@sifive.com>,
-        Guo Ren <guoren@kernel.org>,
-        =?utf-8?B?Qmo=?= =?utf-8?B?w7ZybiBUw7ZwZWw=?= 
-        <bjorn@rivosinc.com>,
-        Xianting Tian <xianting.tian@linux.alibaba.com>,
-        Mattias Nissler <mnissler@rivosinc.com>,
-        Richard Henderson <richard.henderson@linaro.org>
-Subject: Re: [PATCH -next v15 10/19] riscv: Allocate user's vector context
- in the first-use trap
-In-Reply-To: <20230317113538.10878-11-andy.chiu@sifive.com>
-Date:   Thu, 23 Mar 2023 11:29:37 +0100
-Message-ID: <87edpf4v72.fsf@all.your.base.are.belong.to.us>
+        Conor Dooley <conor.dooley@microchip.com>,
+        Albert Ou <aou@eecs.berkeley.edu>, Guo Ren <guoren@kernel.org>,
+        Eric Biederman <ebiederm@xmission.com>,
+        Andy Chiu <andy.chiu@sifive.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        greentime.hu@sifive.com, Zong Li <zong.li@sifive.com>,
+        Heiko Stuebner <heiko@sntech.de>
+Subject: Re: [PATCH -next v15 14/19] riscv: signal: Report signal frame size
+ to userspace via auxv
+In-Reply-To: <20230317113538.10878-15-andy.chiu@sifive.com>
+References: <20230317113538.10878-1-andy.chiu@sifive.com>
+ <20230317113538.10878-15-andy.chiu@sifive.com>
+Date:   Thu, 23 Mar 2023 11:36:31 +0100
+Message-ID: <87a6034uvk.fsf@all.your.base.are.belong.to.us>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-5.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,SPF_HELO_NONE,
+X-Spam-Status: No, score=-2.5 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
         SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -71,14 +69,29 @@ X-Mailing-List: kvm@vger.kernel.org
 
 Andy Chiu <andy.chiu@sifive.com> writes:
 
-> Vector unit is disabled by default for all user processes. Thus, a
-> process will take a trap (illegal instruction) into kernel at the first
-> time when it uses Vector. Only after then, the kernel allocates V
-> context and starts take care of the context for that user process.
+> From: Vincent Chen <vincent.chen@sifive.com>
 >
-> Suggested-by: Richard Henderson <richard.henderson@linaro.org>
-> Link: https://lore.kernel.org/r/3923eeee-e4dc-0911-40bf-84c34aee962d@lina=
-ro.org
+> The vector register belongs to the signal context. They need to be stored
+> and restored as entering and leaving the signal handler. According to the
+> V-extension specification, the maximum length of the vector registers can
+> be 2^(XLEN-1). Hence, if userspace refers to the MINSIGSTKSZ to create a
+> sigframe, it may not be enough. To resolve this problem, this patch refers
+> to the commit 94b07c1f8c39c
+> ("arm64: signal: Report signal frame size to userspace via auxv") to enab=
+le
+> userspace to know the minimum required sigframe size through the auxiliary
+> vector and use it to allocate enough memory for signal context.
+>
+> Note that auxv always reports size of the sigframe as if V exists for
+> all starting processes, whenever the kernel has CONFIG_RISCV_ISA_V. The
+> reason is that users usually reference this value to allocate an
+> alternative signal stack, and the user may use V anytime. So the user
+> must reserve a space for V-context in sigframe in case that the signal
+> handler invokes after the kernel allocating V.
+>
+> Signed-off-by: Greentime Hu <greentime.hu@sifive.com>
+> Signed-off-by: Vincent Chen <vincent.chen@sifive.com>
 > Signed-off-by: Andy Chiu <andy.chiu@sifive.com>
+> Acked-by: Conor Dooley <conor.dooley@microchip.com>
 
 Reviewed-by: Bj=C3=B6rn T=C3=B6pel <bjorn@rivosinc.com>
