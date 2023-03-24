@@ -2,81 +2,48 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 988AC6C803B
-	for <lists+kvm@lfdr.de>; Fri, 24 Mar 2023 15:48:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F1D106C805A
+	for <lists+kvm@lfdr.de>; Fri, 24 Mar 2023 15:53:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232202AbjCXOr6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Mar 2023 10:47:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36924 "EHLO
+        id S232124AbjCXOxD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Mar 2023 10:53:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48834 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232217AbjCXOrw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Mar 2023 10:47:52 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53523196B1
-        for <kvm@vger.kernel.org>; Fri, 24 Mar 2023 07:47:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1679669223;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=AuOjQOzMJu7jhalrvIVzIXLam0VRoOPHkDU+QEY7YhI=;
-        b=gkmf1zbq6bQV7ABVdmpbP65Iu3Fdif3EFYsApnmGRHdgUMqnQ4HIAXbzyQLRiAqo75bKGd
-        WsX0Mc/WMn2AwEhmQl2Vfsb9RAD0RF5qQqEdLba7UZiKj2yHdQe1BedYwN2v2+Du3ErewG
-        X7onXIQTbSUfq+D5tI1XhkZqRBBenoc=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-648-jz_aR90CPgmFnw0n11_48A-1; Fri, 24 Mar 2023 10:47:02 -0400
-X-MC-Unique: jz_aR90CPgmFnw0n11_48A-1
-Received: by mail-ed1-f70.google.com with SMTP id c11-20020a509f8b000000b00501e2facf47so3522006edf.16
-        for <kvm@vger.kernel.org>; Fri, 24 Mar 2023 07:47:01 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679669220;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=AuOjQOzMJu7jhalrvIVzIXLam0VRoOPHkDU+QEY7YhI=;
-        b=Nj6lxkNOAuRyX4qjxQ8pl4GwahJLfyNZzpTxpP8jv1DAOprrB9EckvlFyYb4zBvUIs
-         yvRw936PSKNDmwkYLD9QsYaL/Hcc860gY80bwC5AKY4EB8u4aOQgcA9sXcbPPzebkP+1
-         tHoUSgJUJgov46CJV6tTqncNEjtMIJKRdcherWmjAjyPV4aHrmhhn+Ifyo+hrojrrpfk
-         QmQaNd4ek26EPbSCEnbC99wP2JAwDQFarkGEEK9eRfo0EXvvI4LtcgI2NPPpMeRnEAOi
-         OpnkZLUNITELGjrOzJOgk/CiVZdvNSvmCjogNcsojbWBPM1cU3VVKF8d4L7GX/rSUKuI
-         R5eg==
-X-Gm-Message-State: AAQBX9ctbQrFvjimrbb8US7JnbIutPuDJ+wBkDlh9t1TkmqBqw7u3wMA
-        dHlfOeSe7ZZwgYR/GJXkF+DuZTkjboyag9lONriKe7ndVpD/zgn5xBSEpTQrErw49IkvRFbJBMU
-        53Ljv5ctv9Fuyt07/vv+O
-X-Received: by 2002:a17:906:fa1b:b0:922:2ba3:2348 with SMTP id lo27-20020a170906fa1b00b009222ba32348mr2995762ejb.7.1679669220707;
-        Fri, 24 Mar 2023 07:47:00 -0700 (PDT)
-X-Google-Smtp-Source: AKy350ZmfFJPCyGmiPR7O9KckKD9I87Kx7AyWLHRPUqCBRX1gMg+6qZWwdI6wSPtk2G3zOFrDNdJyA==
-X-Received: by 2002:a17:906:fa1b:b0:922:2ba3:2348 with SMTP id lo27-20020a170906fa1b00b009222ba32348mr2995743ejb.7.1679669220454;
-        Fri, 24 Mar 2023 07:47:00 -0700 (PDT)
-Received: from sgarzare-redhat (host-82-53-134-98.retail.telecomitalia.it. [82.53.134.98])
-        by smtp.gmail.com with ESMTPSA id c14-20020a509f8e000000b005003fd12eafsm10711203edf.63.2023.03.24.07.46.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 24 Mar 2023 07:46:59 -0700 (PDT)
-Date:   Fri, 24 Mar 2023 15:46:57 +0100
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        stefanha@redhat.com, linux-kernel@vger.kernel.org,
-        eperezma@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>,
-        Andrey Zhadchenko <andrey.zhadchenko@virtuozzo.com>,
-        netdev@vger.kernel.org
-Subject: Re: [PATCH v3 8/8] vdpa_sim: add support for user VA
-Message-ID: <qrnz6o73374x5hio4jkgpj7et4ihym2wniob25so2zbsyjxagp@lwprqyc5xp7n>
-References: <20230321154228.182769-1-sgarzare@redhat.com>
- <20230321154804.184577-1-sgarzare@redhat.com>
- <20230321154804.184577-4-sgarzare@redhat.com>
- <78c7511a-deab-7e95-fde1-5317a568cf97@redhat.com>
+        with ESMTP id S232151AbjCXOxB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Mar 2023 10:53:01 -0400
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id DD10CBA;
+        Fri, 24 Mar 2023 07:53:00 -0700 (PDT)
+Received: from localhost.localdomain (77-166-152-30.fixed.kpn.net [77.166.152.30])
+        by linux.microsoft.com (Postfix) with ESMTPSA id B308E20FC3DB;
+        Fri, 24 Mar 2023 07:52:58 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com B308E20FC3DB
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+        s=default; t=1679669580;
+        bh=XF1vbq7gokzNKZoPuMKmB97h2a+RXc+m3lJbm+yiyvc=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=GiSQbslBY0MTgFojIIhCGjaD1vg4TqycSGXd306uujyvRdb42251/imGyyDxsPXqi
+         +dBTPdc2kP7cEp4S7D9O07hLsIO/1Nw9Awq+5/wHhYESQimxHNkvvQiVPzZnRZyflv
+         KeQ3JQBfLtPhevXFRUk5eQ3QOCuL0FcKM8XiQVeg=
+From:   jpiotrowski@linux.microsoft.com
+To:     linux-kernel@vger.kernel.org
+Cc:     Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Tianyu Lan <ltykernel@gmail.com>,
+        Michael Kelley <mikelley@microsoft.com>,
+        Sean Christopherson <seanjc@google.com>, stable@vger.kernel.org
+Subject: [RESEND PATCH v2] KVM: SVM: Flush Hyper-V TLB when required
+Date:   Fri, 24 Mar 2023 15:52:33 +0100
+Message-Id: <20230324145233.4585-1-jpiotrowski@linux.microsoft.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20230324144500.4216-1-jpiotrowski@microsoft.com>
+References: <20230324144500.4216-1-jpiotrowski@microsoft.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <78c7511a-deab-7e95-fde1-5317a568cf97@redhat.com>
-X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+X-Spam-Status: No, score=-17.9 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
+        DKIM_VALID_AU,ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_MED,SPF_HELO_PASS,
+        SPF_PASS,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -84,145 +51,170 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Mar 24, 2023 at 11:49:32AM +0800, Jason Wang wrote:
->
->在 2023/3/21 23:48, Stefano Garzarella 写道:
->>The new "use_va" module parameter (default: true) is used in
->>vdpa_alloc_device() to inform the vDPA framework that the device
->>supports VA.
->>
->>vringh is initialized to use VA only when "use_va" is true and the
->>user's mm has been bound. So, only when the bus supports user VA
->>(e.g. vhost-vdpa).
->>
->>vdpasim_mm_work_fn work is used to serialize the binding to a new
->>address space when the .bind_mm callback is invoked, and unbinding
->>when the .unbind_mm callback is invoked.
->>
->>Call mmget_not_zero()/kthread_use_mm() inside the worker function
->>to pin the address space only as long as needed, following the
->>documentation of mmget() in include/linux/sched/mm.h:
->>
->>   * Never use this function to pin this address space for an
->>   * unbounded/indefinite amount of time.
->>
->>Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
->>---
->>
->>Notes:
->>     v3:
->>     - called mmget_not_zero() before kthread_use_mm() [Jason]
->>       As the documentation of mmget() in include/linux/sched/mm.h says:
->>       * Never use this function to pin this address space for an
->>       * unbounded/indefinite amount of time.
->>       I moved mmget_not_zero/kthread_use_mm inside the worker function,
->>       this way we pin the address space only as long as needed.
->>       This is similar to what vfio_iommu_type1_dma_rw_chunk() does in
->>       drivers/vfio/vfio_iommu_type1.c
->>     - simplified the mm bind/unbind [Jason]
->>     - renamed vdpasim_worker_change_mm_sync() [Jason]
->>     - fix commit message (s/default: false/default: true)
->>     v2:
->>     - `use_va` set to true by default [Eugenio]
->>     - supported the new unbind_mm callback [Jason]
->>     - removed the unbind_mm call in vdpasim_do_reset() [Jason]
->>     - avoided to release the lock while call kthread_flush_work() since we
->>       are now using a mutex to protect the device state
->>
->>  drivers/vdpa/vdpa_sim/vdpa_sim.h |  1 +
->>  drivers/vdpa/vdpa_sim/vdpa_sim.c | 80 +++++++++++++++++++++++++++++++-
->>  2 files changed, 79 insertions(+), 2 deletions(-)
->>
->>diff --git a/drivers/vdpa/vdpa_sim/vdpa_sim.h b/drivers/vdpa/vdpa_sim/vdpa_sim.h
->>index 4774292fba8c..3a42887d05d9 100644
->>--- a/drivers/vdpa/vdpa_sim/vdpa_sim.h
->>+++ b/drivers/vdpa/vdpa_sim/vdpa_sim.h
->>@@ -59,6 +59,7 @@ struct vdpasim {
->>  	struct vdpasim_virtqueue *vqs;
->>  	struct kthread_worker *worker;
->>  	struct kthread_work work;
->>+	struct mm_struct *mm_bound;
->>  	struct vdpasim_dev_attr dev_attr;
->>  	/* mutex to synchronize virtqueue state */
->>  	struct mutex mutex;
->>diff --git a/drivers/vdpa/vdpa_sim/vdpa_sim.c b/drivers/vdpa/vdpa_sim/vdpa_sim.c
->>index ab4cfb82c237..23c891cdcd54 100644
->>--- a/drivers/vdpa/vdpa_sim/vdpa_sim.c
->>+++ b/drivers/vdpa/vdpa_sim/vdpa_sim.c
->>@@ -35,10 +35,44 @@ module_param(max_iotlb_entries, int, 0444);
->>  MODULE_PARM_DESC(max_iotlb_entries,
->>  		 "Maximum number of iotlb entries for each address space. 0 means unlimited. (default: 2048)");
->>+static bool use_va = true;
->>+module_param(use_va, bool, 0444);
->>+MODULE_PARM_DESC(use_va, "Enable/disable the device's ability to use VA");
->>+
->>  #define VDPASIM_QUEUE_ALIGN PAGE_SIZE
->>  #define VDPASIM_QUEUE_MAX 256
->>  #define VDPASIM_VENDOR_ID 0
->>+struct vdpasim_mm_work {
->>+	struct kthread_work work;
->>+	struct vdpasim *vdpasim;
->>+	struct mm_struct *mm_to_bind;
->>+	int ret;
->>+};
->>+
->>+static void vdpasim_mm_work_fn(struct kthread_work *work)
->>+{
->>+	struct vdpasim_mm_work *mm_work =
->>+		container_of(work, struct vdpasim_mm_work, work);
->>+	struct vdpasim *vdpasim = mm_work->vdpasim;
->>+
->>+	mm_work->ret = 0;
->>+
->>+	//TODO: should we attach the cgroup of the mm owner?
->>+	vdpasim->mm_bound = mm_work->mm_to_bind;
->>+}
->>+
->>+static void vdpasim_worker_change_mm_sync(struct vdpasim *vdpasim,
->>+					  struct vdpasim_mm_work *mm_work)
->>+{
->>+	struct kthread_work *work = &mm_work->work;
->>+
->>+	kthread_init_work(work, vdpasim_mm_work_fn);
->>+	kthread_queue_work(vdpasim->worker, work);
->>+
->>+	kthread_flush_work(work);
->>+}
->>+
->>  static struct vdpasim *vdpa_to_sim(struct vdpa_device *vdpa)
->>  {
->>  	return container_of(vdpa, struct vdpasim, vdpa);
->>@@ -59,8 +93,10 @@ static void vdpasim_queue_ready(struct vdpasim *vdpasim, unsigned int idx)
->>  {
->>  	struct vdpasim_virtqueue *vq = &vdpasim->vqs[idx];
->>  	uint16_t last_avail_idx = vq->vring.last_avail_idx;
->>+	bool va_enabled = use_va && vdpasim->mm_bound;
->>-	vringh_init_iotlb(&vq->vring, vdpasim->features, vq->num, true, false,
->>+	vringh_init_iotlb(&vq->vring, vdpasim->features, vq->num, true,
->>+			  va_enabled,
->>  			  (struct vring_desc *)(uintptr_t)vq->desc_addr,
->>  			  (struct vring_avail *)
->>  			  (uintptr_t)vq->driver_addr,
->>@@ -130,8 +166,20 @@ static const struct vdpa_config_ops vdpasim_batch_config_ops;
->>  static void vdpasim_work_fn(struct kthread_work *work)
->>  {
->>  	struct vdpasim *vdpasim = container_of(work, struct vdpasim, work);
->>+	struct mm_struct *mm = vdpasim->mm_bound;
->>+
->>+	if (mm) {
->>+		if (!mmget_not_zero(mm))
->>+			return;
->
->
->Do we need to check use_va here.
+From: Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>
 
-Yep, right!
+The Hyper-V "EnlightenedNptTlb" enlightenment is always enabled when KVM
+is running on top of Hyper-V and Hyper-V exposes support for it (which
+is always). On AMD CPUs this enlightenment results in ASID invalidations
+not flushing TLB entries derived from the NPT. To force the underlying
+(L0) hypervisor to rebuild its shadow page tables, an explicit hypercall
+is needed.
 
->
->Other than this
->
->Acked-by: Jason Wang <jasowang@redhat.com>
+The original KVM implementation of Hyper-V's "EnlightenedNptTlb" on SVM
+only added remote TLB flush hooks. This worked out fine for a while, as
+sufficient remote TLB flushes where being issued in KVM to mask the
+problem. Since v5.17, changes in the TDP code reduced the number of
+flushes and the out-of-sync TLB prevents guests from booting
+successfully.
 
-Thanks for the reviews,
-Stefano
+Split svm_flush_tlb_current() into separate callbacks for the 3 cases
+(guest/all/current), and issue the required Hyper-V hypercall when a
+Hyper-V TLB flush is needed. The most important case where the TLB flush
+was missing is when loading a new PGD, which is followed by what is now
+svm_flush_tlb_current().
+
+Cc: stable@vger.kernel.org # v5.17+
+Fixes: 1e0c7d40758b ("KVM: SVM: hyper-v: Remote TLB flush for SVM")
+Link: https://lore.kernel.org/lkml/43980946-7bbf-dcef-7e40-af904c456250@linux.microsoft.com/
+Suggested-by: Sean Christopherson <seanjc@google.com>
+Signed-off-by: Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>
+---
+Resending because I accidentally used the wrong "From:" address and it bounced
+from some recipients.
+
+Changes since v1:
+- lookup enlightened_npt_tlb in vmcb to determine whether to do the
+  flush
+- when KVM wants a hyperv_flush_guest_mapping() call, don't try to
+  optimize it out
+- don't hide hyperv flush behind helper, make it visible in
+  svm.c
+
+ arch/x86/kvm/kvm_onhyperv.h     |  5 +++++
+ arch/x86/kvm/svm/svm.c          | 37 ++++++++++++++++++++++++++++++---
+ arch/x86/kvm/svm/svm_onhyperv.h | 15 +++++++++++++
+ 3 files changed, 54 insertions(+), 3 deletions(-)
+
+diff --git a/arch/x86/kvm/kvm_onhyperv.h b/arch/x86/kvm/kvm_onhyperv.h
+index 287e98ef9df3..67b53057e41c 100644
+--- a/arch/x86/kvm/kvm_onhyperv.h
++++ b/arch/x86/kvm/kvm_onhyperv.h
+@@ -12,6 +12,11 @@ int hv_remote_flush_tlb_with_range(struct kvm *kvm,
+ int hv_remote_flush_tlb(struct kvm *kvm);
+ void hv_track_root_tdp(struct kvm_vcpu *vcpu, hpa_t root_tdp);
+ #else /* !CONFIG_HYPERV */
++static inline int hv_remote_flush_tlb(struct kvm *kvm)
++{
++	return -1;
++}
++
+ static inline void hv_track_root_tdp(struct kvm_vcpu *vcpu, hpa_t root_tdp)
+ {
+ }
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 252e7f37e4e2..f25bc3cbb250 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -3729,7 +3729,7 @@ static void svm_enable_nmi_window(struct kvm_vcpu *vcpu)
+ 	svm->vmcb->save.rflags |= (X86_EFLAGS_TF | X86_EFLAGS_RF);
+ }
+ 
+-static void svm_flush_tlb_current(struct kvm_vcpu *vcpu)
++static void svm_flush_tlb_asid(struct kvm_vcpu *vcpu)
+ {
+ 	struct vcpu_svm *svm = to_svm(vcpu);
+ 
+@@ -3753,6 +3753,37 @@ static void svm_flush_tlb_current(struct kvm_vcpu *vcpu)
+ 		svm->current_vmcb->asid_generation--;
+ }
+ 
++static void svm_flush_tlb_current(struct kvm_vcpu *vcpu)
++{
++	hpa_t root_tdp = vcpu->arch.mmu->root.hpa;
++
++	/*
++	 * When running on Hyper-V with EnlightenedNptTlb enabled, explicitly
++	 * flush the NPT mappings via hypercall as flushing the ASID only
++	 * affects virtual to physical mappings, it does not invalidate guest
++	 * physical to host physical mappings.
++	 */
++	if (svm_hv_is_enlightened_tlb_enabled(vcpu) && VALID_PAGE(root_tdp))
++		hyperv_flush_guest_mapping(root_tdp);
++
++	svm_flush_tlb_asid(vcpu);
++}
++
++static void svm_flush_tlb_all(struct kvm_vcpu *vcpu)
++{
++	/*
++	 * When running on Hyper-V with EnlightenedNptTlb enabled, remote TLB
++	 * flushes should be routed to hv_remote_flush_tlb() without requesting
++	 * a "regular" remote flush.  Reaching this point means either there's
++	 * a KVM bug or a prior hv_remote_flush_tlb() call failed, both of
++	 * which might be fatal to the guest.  Yell, but try to recover.
++	 */
++	if (WARN_ON_ONCE(svm_hv_is_enlightened_tlb_enabled(vcpu)))
++		hv_remote_flush_tlb(vcpu->kvm);
++
++	svm_flush_tlb_asid(vcpu);
++}
++
+ static void svm_flush_tlb_gva(struct kvm_vcpu *vcpu, gva_t gva)
+ {
+ 	struct vcpu_svm *svm = to_svm(vcpu);
+@@ -4745,10 +4776,10 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
+ 	.set_rflags = svm_set_rflags,
+ 	.get_if_flag = svm_get_if_flag,
+ 
+-	.flush_tlb_all = svm_flush_tlb_current,
++	.flush_tlb_all = svm_flush_tlb_all,
+ 	.flush_tlb_current = svm_flush_tlb_current,
+ 	.flush_tlb_gva = svm_flush_tlb_gva,
+-	.flush_tlb_guest = svm_flush_tlb_current,
++	.flush_tlb_guest = svm_flush_tlb_asid,
+ 
+ 	.vcpu_pre_run = svm_vcpu_pre_run,
+ 	.vcpu_run = svm_vcpu_run,
+diff --git a/arch/x86/kvm/svm/svm_onhyperv.h b/arch/x86/kvm/svm/svm_onhyperv.h
+index cff838f15db5..786d46d73a8e 100644
+--- a/arch/x86/kvm/svm/svm_onhyperv.h
++++ b/arch/x86/kvm/svm/svm_onhyperv.h
+@@ -6,6 +6,8 @@
+ #ifndef __ARCH_X86_KVM_SVM_ONHYPERV_H__
+ #define __ARCH_X86_KVM_SVM_ONHYPERV_H__
+ 
++#include <asm/mshyperv.h>
++
+ #if IS_ENABLED(CONFIG_HYPERV)
+ 
+ #include "kvm_onhyperv.h"
+@@ -15,6 +17,14 @@ static struct kvm_x86_ops svm_x86_ops;
+ 
+ int svm_hv_enable_l2_tlb_flush(struct kvm_vcpu *vcpu);
+ 
++static inline bool svm_hv_is_enlightened_tlb_enabled(struct kvm_vcpu *vcpu)
++{
++	struct hv_vmcb_enlightenments *hve = &to_svm(vcpu)->vmcb->control.hv_enlightenments;
++
++	return ms_hyperv.nested_features & HV_X64_NESTED_ENLIGHTENED_TLB &&
++	       !!hve->hv_enlightenments_control.enlightened_npt_tlb;
++}
++
+ static inline void svm_hv_init_vmcb(struct vmcb *vmcb)
+ {
+ 	struct hv_vmcb_enlightenments *hve = &vmcb->control.hv_enlightenments;
+@@ -80,6 +90,11 @@ static inline void svm_hv_update_vp_id(struct vmcb *vmcb, struct kvm_vcpu *vcpu)
+ }
+ #else
+ 
++static inline bool svm_hv_is_enlightened_tlb_enabled(struct kvm_vcpu *vcpu)
++{
++	return false;
++}
++
+ static inline void svm_hv_init_vmcb(struct vmcb *vmcb)
+ {
+ }
+-- 
+2.37.2
 
