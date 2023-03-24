@@ -2,185 +2,161 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 16F1C6C8090
-	for <lists+kvm@lfdr.de>; Fri, 24 Mar 2023 15:59:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 83FE36C80A7
+	for <lists+kvm@lfdr.de>; Fri, 24 Mar 2023 16:02:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232259AbjCXO7u (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Mar 2023 10:59:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43570 "EHLO
+        id S232319AbjCXPCu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Mar 2023 11:02:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48098 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232230AbjCXO7o (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Mar 2023 10:59:44 -0400
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12olkn2058.outbound.protection.outlook.com [40.92.22.58])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7DE4196BA
-        for <kvm@vger.kernel.org>; Fri, 24 Mar 2023 07:59:43 -0700 (PDT)
+        with ESMTP id S232283AbjCXPCs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Mar 2023 11:02:48 -0400
+Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam04on2072.outbound.protection.outlook.com [40.107.101.72])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2EB01A669;
+        Fri, 24 Mar 2023 08:02:47 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=j+6fdDvyAs7tSMQiD0MQRRSuOkywSDuiw1zUK6bxPjeubCJxVZrGRN9+cAVrFFRg7OTyCmu379nd81DR5qFK+vSonULao2jzp4+xYTeof14QYQfc0GJDgVgqVpoEGLByC8zvAnc5Fu1QGQafa0JyHWq6BsA+bIMI27fj7qAlUlPWrtJCg/FVvjCqevTz8b3ogyiBh1BY6MEy25jsf/sjLubyF62wlHAbJDS67sJ8wwatoDtrOxfgVhPRPlHd/M/mj5dlVpbCHvSZLOOdq/mOV+EYF7s9M+CYDSrbDPov10d+89UX67f6PvN2Zid/jsQlGlmjD9uzpXx+XX1qwadmWg==
+ b=epwFUcKaES1lVxW75anRIQ6U055JVCY48S9x6sFmCCodSPjVe7lqy4V1hkxaj4sRl4GsUy2f5tTXOFMu+I5Q2ChrlA11IdaodjJDd5itTQlDp+o9vgK+d1NsVs0kNuwyj/HZwLrMgE+VtRWEo7oOBHenLzFTQqkUTAPBA0QNEeqzIYxKT7+JMKqAWFrKZhhRM376W3ebtTnr6h9GH0HPQgVcM27UUG0hvDeu9t+NBVvNSNn8l/RhVNcLkBP9y3XJPdykiFddjB3AKRHm02IvoWhIb2HWk0G75mPwDcdMU7RoyY3d2pFq2VOBxk41XmECIe/XbcMuNiHERxYGTrLwag==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ngjVp2+jy0DAbIOCd6VQ46lAZHPPCBj2FLJJw/zJhYk=;
- b=j1CEZnYAbSAvgAdVb0EcBvcGCRQD8QaO7Jy+DiuW+W2J4RH/tCLN44qFum/NCsumyYjSKpc2xLCd9eWtDXqzn/EmaRYJALCZQCpflfwJLWXPJEezY5UgHqvzh0avVKDGze63K5WKO1XQh/UdgQtYi3Pwah+QDPO3MGhNulJm1gxOcFuotL8lRFEQEtZj8REQVg6Qu8z4PdVzK+mBB/tvrz7MGfT8LTwDudf84/23xRZcaEJE8Y+cudKjdPgHybVp3CD13ScwovsvJyrC0KheQp9bG9jR/zeEf9dXqnYD7bfKmls+Y+Xrtq1xWrKEciw/MjK/sHxCsifHkmZinMdiGw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
- s=selector1;
+ bh=3Hl/4dQaKckbhoFe/+2JxxgSH6/DtUTV7RGVfFCyVzc=;
+ b=dxm7E16cTI1G1VVV+rXhcZOeYvR12wTEqDz8Wx5NWuqw0yf5PxNjj96Ioyxo6XuT51+72o6cbsEIuCAo6zJZ4EufAkIBdyWvnsBxr75sQukoeAaJaOoD9Lvl+E/ranNWlnenM2pxWXnFcmGDVf7qANen8j2tjeNEZnJO4kJRttDjIL0N/3t8BffW47Y5iHlNjxBJb8OiNR3YMwDdKKyp/oJCry1BKNN6QnxiDpIhCTntKnSowleJ35wGmebG4i4DXGjNkFQjybAXcaYIHc+uTHoyl2yg4V4H3kyRqi/ltWDeC21mbEPpJ2nPGzzcIkmdG0RNjIAoZSt0UI2rAjFJ6Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ngjVp2+jy0DAbIOCd6VQ46lAZHPPCBj2FLJJw/zJhYk=;
- b=LJ4fynF+jOYw+4D4iepAUkgWfPR4KAg9cFGxDNqvVFfkC5WC/Y8ojQZipA9WFnHcd2hDz9ZJ/tAxmTmyo4VD3zeSZaCDam6dkIn3slwQxY4GQm+fot1SrYIAypfIBJuidko3FGGLKsG5Fmi+zVOtzsQ9dwlOYi2VuJ/MuqEZzo2xq6/EixDSYxuB6ZUUvzVeBDmtzZWZ8uXLpvEkYrkslmwI8kxksWOxi7nHQNG7I/kiIHVSSLRQmkG/lSN9RZMuDXAiiYqOr520u2BCPYEOg10ZS+pOjw8dQlNiCTSq3CXOPN4QWEhgAfsWmNoAn5D1uYbixoceMHoK+p7Gv7LPDw==
-Received: from BYAPR12MB3014.namprd12.prod.outlook.com (2603:10b6:a03:d8::11)
- by LV2PR12MB5750.namprd12.prod.outlook.com (2603:10b6:408:17e::6) with
+ bh=3Hl/4dQaKckbhoFe/+2JxxgSH6/DtUTV7RGVfFCyVzc=;
+ b=dCXF3Xd4lU4J9GiwuSQ9l8A9IaWuFY0r7UiyRZ6egqdzW8MmripRp13ZYa+WgITLT51fSFUne3W1iJFQvA25f8IbrwReQPc5Qar9lqpSvlvYnRDIm6zAcOVXahGBHisx+KIqoGVyfJc23FV+hVeNlYa0dFVjb6umnyeoc/hJ3DmBKXkKEMM5eIKs/lvgoIvuEr3WKFOqSNQbZmA2x6EEtG9f37AenP/zQXc9lrSDChfJfwKcLqH2u/XGL00nHY+hYoBjVDg5WjxhPFAp2Z82XNKgC+8za/+JbMyUsQqcIpT2UVVgHVPejHzkfEXhgrWD5MX9Ly6mzf+wRWpl7oocuA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by MW4PR12MB6873.namprd12.prod.outlook.com (2603:10b6:303:20c::17) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6178.38; Fri, 24 Mar
- 2023 14:59:42 +0000
-Received: from BYAPR12MB3014.namprd12.prod.outlook.com
- ([fe80::9d3:d006:8433:da86]) by BYAPR12MB3014.namprd12.prod.outlook.com
- ([fe80::9d3:d006:8433:da86%7]) with mapi id 15.20.6178.039; Fri, 24 Mar 2023
- 14:59:42 +0000
-Message-ID: <BYAPR12MB30142EE0C695F6BB4C6B84DDA0849@BYAPR12MB3014.namprd12.prod.outlook.com>
-Date:   Fri, 24 Mar 2023 15:59:36 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.9.0
-Subject: Re: Nested virtualization not working with hyperv guest/windows 11
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org
-References: <MN2PR12MB3023F67FF37889AB3E8885F2A0849@MN2PR12MB3023.namprd12.prod.outlook.com>
- <ZB22ZbhyneWevHJo@google.com>
-From:   =?UTF-8?Q?Micha=c5=82_Zegan?= <webczat@outlook.com>
-In-Reply-To: <ZB22ZbhyneWevHJo@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-TMN:  [VngG3uQzgw3c+a6vWpPbSdWqhs/uK0SS]
-X-ClientProxiedBy: BE1P281CA0238.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:b10:8c::11) To BYAPR12MB3014.namprd12.prod.outlook.com
- (2603:10b6:a03:d8::11)
-X-Microsoft-Original-Message-ID: <a054ea77-e53c-8207-1e25-1081e4ecbb50@outlook.com>
+ 2023 15:02:45 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::ef6d:fdf6:352f:efd1]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::ef6d:fdf6:352f:efd1%3]) with mapi id 15.20.6178.037; Fri, 24 Mar 2023
+ 15:02:45 +0000
+Date:   Fri, 24 Mar 2023 12:02:41 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     "Tian, Kevin" <kevin.tian@intel.com>
+Cc:     "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Nicolin Chen <nicolinc@nvidia.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>
+Subject: Re: [PATCH v3 03/17] iommufd: Replace the hwpt->devices list with
+ iommufd_group
+Message-ID: <ZB27ke/vQxsCngtC@nvidia.com>
+References: <0-v3-61d41fd9e13e+1f5-iommufd_alloc_jgg@nvidia.com>
+ <3-v3-61d41fd9e13e+1f5-iommufd_alloc_jgg@nvidia.com>
+ <BN9PR11MB5276E42B629C3E5AF019B6748C879@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <ZBxg9cRIpsozB15G@nvidia.com>
+ <BN9PR11MB52767DA03C240F040929A2398C849@BN9PR11MB5276.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <BN9PR11MB52767DA03C240F040929A2398C849@BN9PR11MB5276.namprd11.prod.outlook.com>
+X-ClientProxiedBy: BYAPR01CA0058.prod.exchangelabs.com (2603:10b6:a03:94::35)
+ To LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BYAPR12MB3014:EE_|LV2PR12MB5750:EE_
-X-MS-Office365-Filtering-Correlation-Id: d4cffaad-6d87-4859-333c-08db2c786598
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|MW4PR12MB6873:EE_
+X-MS-Office365-Filtering-Correlation-Id: 48e92ea2-360f-4b3d-dda2-08db2c78d2dd
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: oTujmCcfEm4kzSRY2zeUhTKjq7SpnPghldKmyNs2+A6UoLVE3wAwT8kcoicdxhMBfBXvC5ewRjSJ5J0wYo1M8Po3WJ5jCIhsLTYAZPHG0W7R6wUUBSuQ4ywIpFxkuohdfT6Pu/HLY8e4IocF4gIQEg9vl2VgZv9+uSYdn3JXp3+6SziaqT271E7IvQwsBAme8sQp2QO5Lvl+ggfgllYOn6dv9Fuf8CjwGCjU2lEwbIVNaQrKKek4XwupcgV1MKmS9lPIdzzdVilYd0Dh4ljwfkmrBZrxswL37Fuow5H3HEp5giNBlhNOcBgw4tRRkj6M9+2sVfNyCIn21TNBwGpfTUTzcO3SUuecuaarTohJ7O0awL82edlgHvo5nABOfeEmCe4TDrdn7/wLM/wvBQI2Ef0UaJlvfKP6CfOLP2oO+FzFf1YOgz/+UT56eYYwNR16jlr/EabNwlkSPWuhxAUAnf6NX2oOrp1N10KNZ4Gft/Ud3NQ9uobAECmiKZhKruu5mylv4yaihi0+b6OCZZQYbx13jPgvZGtsUePKafSw1NlDY80OedwBeC7VtC6rDr/jh88Kyeq9vGrPJW+XwNfuEGb1egT7WQ9FgAyZXUb8X4CxScZ9EPbIxVgEPvWd0pqOb3CcscKde5uKp54x1gx8Wg==
+X-Microsoft-Antispam-Message-Info: k7C3pejkQtljnXrfLF0N6FtLwxi3x9BhLzYi+cKFfmr7HLXqBdEqJ3ejoNSfdaI4SKeK9KuoriptGA+6JqzMwXgG+jE75AHHsJCWd0i3Uod3BYMq8v96LHo2ipFV5VWLpGV7W2ebrQ7b/L0Q+yGDm898N8eY9fYYmwS/ziwl5jM/5LqUICw2q1KXZViNtGj0nKkvMPcjvpujtvc/BHxa9vhhf+a5Uw2nFyCFcm4sEq7Z/We3J1LAKkDrXCu7chlXajqSP5endDpoMt7fq4USVMFGfb/+gy3upKPEkfpyFfePMf7YEEw6b0nRbUwjygN2Z5PT1xnmcKDut3B2VTV0c0S02kcPdkripsePxq0cmuSA8splD+kSof02vO3nCLKGJk8am6+p68AbOjuv4epMonwIb3SWkkXn9LHXRF7gb+j7EqHW0eKHhMTDGLhnH15JYYpuK3ATiHktFGQg7GQHTDoN3A273YgB4jnqsuXYX+Ze0hbzx9PRlxa1E/py1PTpuH7C5GAc79R4/2B0M9eUUTFJmtGJEpGP/mn3+7MFZrX4FwiEO7frWOR7An+hczIK
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(366004)(39860400002)(136003)(376002)(396003)(346002)(451199018)(36756003)(66946007)(8676002)(66476007)(4326008)(8936002)(41300700001)(66556008)(6916009)(6486002)(316002)(478600001)(54906003)(5660300002)(2906002)(86362001)(38100700002)(6506007)(83380400001)(6512007)(186003)(26005)(6666004)(2616005);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?ZW5ZRytUdWlXaklpTi9kUWVQblhZTzVIdG1KWU9IWHhuSWNJUWtzanlXYjdR?=
- =?utf-8?B?K0xTZnFOZzlrd3orUm5MeFpJZ1MwYUpIM1NSbElqWnFDSlFEM0FwWmJ3S216?=
- =?utf-8?B?SmhQN1BGaFJEdk5BV0xsYnBYTVIxWmovbEt0c0twaVNsaFUrSFZSb21VcktI?=
- =?utf-8?B?VUxYcVgvdHl5cUZuQmc1elVNd00vYWdSdlhwRVgrUEZQaStEc0NYWklwNzVO?=
- =?utf-8?B?QUpMWnhrWjJaZ3NYYkw1TWw2alJOQTZkbXMwMHJtbjlBVVNnTmtLcVFYUGNq?=
- =?utf-8?B?SmZnUzVldmQ2c2dKWGEreXlsVXN5ZjRJYXZjcTFhVHExNTVHQ1VDdzBQaVVs?=
- =?utf-8?B?WFZjdGZuOC9OVHpxelFiTk1uSE9VM0lDZE5aZzFSaVhNcGtwdXRIVE9NWnNx?=
- =?utf-8?B?NUUyeVQzTlNFYzVzZ21PNEp3RzZzOEI5Y1ZSdTBoQUs0Q0dIZVlFZG5ranor?=
- =?utf-8?B?Snk0V2Q3SnJvTnhBRjNFN3ZCWlBYeXdGRGY5aHJOQTBPVmdqeDhPR1pMMzFx?=
- =?utf-8?B?MzVVZkk1M3VUb2RYcnhLSTV3S2t6MUZ0WHAxWFlUT1VwK25EWjNqbElRMUNR?=
- =?utf-8?B?MU4vZmFwSWNHbEQ5RWNlSzBTdnpsL2ozRHlseUZnVVdoOTNsdEdCSjVURGV3?=
- =?utf-8?B?RU0vNkg4NWpOS28wdEQvYkpMdXluLzJUc1djcStiS2tRem5qUkdKeWg3UWZR?=
- =?utf-8?B?WHZYbHNCV28rZXF4bjZGaE9FdFllRElhUk1sU3I1OGpPT3dSZlJXREdCd01j?=
- =?utf-8?B?RzFSK3hDbkYxMjRyRjNOd0NuRXJ4aVRPaGJpQUJCVUl2Y2d5NTJLc2hTNGZv?=
- =?utf-8?B?bXA1bFFPNjk0b3pmaG14VEZ5ZlV1L2U0dlZOUk1QNlZydHRXUFBxMFJJcVJu?=
- =?utf-8?B?NlEralF3NVIvQWdEampSZlI3cEZuTURJWUhtMlAvKzhTYmFmNTllWlQxZ0px?=
- =?utf-8?B?WEQ5MDlvVGw1eWlrMmx4dUtCUGR0SWJvb0JadDRNYW1CVy91aXNrNXFyWFpZ?=
- =?utf-8?B?U08xQzJUR1NGbkJobGZnYjE3em5OUU1jMVgyOU5oVCtXbTUwM0ZHcG9kRksy?=
- =?utf-8?B?QmVTN25Zak5LSVQ0ajRCTmN3SmRxMFA5M2diN1RlbUJvc2grLzRVaC94YmVx?=
- =?utf-8?B?Z2xaRmtKNlRranNKalUrbE1vSEMwY0JtL0ZCZW81NmNVLzQ4N0xHZEkvN2Y3?=
- =?utf-8?B?ckVsSDhIRW5TYXR5b3J1ZXhuN0dkdW9GSHcwOGlkZHFKK29WRzZPZGNqalFQ?=
- =?utf-8?B?S0JMeXlhUkdvZ1lqRWwwcWwwQmNRV1F0dXJCNlZHbkQ0bTVad1ZPcW8ydm5L?=
- =?utf-8?B?WVhTZ2w5bytsdU5BK2R0MGJTSDZlb3FYSkdaaTlHMHVWQlhrTUdBUklLTW41?=
- =?utf-8?B?MGFTdlJYODZvaGJUUWIyeC84bXpBNmRZeHB3YWF6ajFLckxpZHJML3Z5RWpz?=
- =?utf-8?B?SjVYTjdBSWxrZWxoQndlSjZFNlc1Y1pESjYrNGk2WFovTWltMHA3SjU5bUdR?=
- =?utf-8?B?OWc3aXBRWVR5anVwMjRKRFBrcjRqUVNIRHpKRDdUek5kRGI2MXhZcHFRZXdo?=
- =?utf-8?B?RWZ1WGVMN0xGTnRyWUE3RmVOVlBxNmR2NEhRWlN4blBJVERneXRnWFBHUm1P?=
- =?utf-8?B?MEFQL3kzQ3pRVDdCVjZKZmlMaUVUaGVTRHUwRW9lVDR5SmdlaVlSWjA3TXRX?=
- =?utf-8?B?NnNtYnJzaWtCUTVMYlJ5UnkyQ2lCSHB3RnVkeXQwSURWZVU3VDlHYVVBPT0=?=
-X-OriginatorOrg: outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d4cffaad-6d87-4859-333c-08db2c786598
-X-MS-Exchange-CrossTenant-AuthSource: BYAPR12MB3014.namprd12.prod.outlook.com
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?aelACDCOgPWtwM3esJIUTSY3hputRmUbj0wt2sOyE08Uwq0WLYcJZTiROtRI?=
+ =?us-ascii?Q?l36M265DmJSbNe98rwtmLUrm0iM09jkSD7wfXoqCcPRVJeS8Vh02ciLOTMhB?=
+ =?us-ascii?Q?ote5yg4faPPVhWf4mIV37eU8gim5Gt7zlhyQ1qCWzelPOg2DRgDIrfsmh/0Y?=
+ =?us-ascii?Q?AuWkmmX0ieFOYt9niP7t+ZGd0OKJqnzjahMdMqn2vCGqD+RJY9FUhdRkh5EC?=
+ =?us-ascii?Q?bXoD+DBo4oYYFx6AkF7EqsRagZHi5jEOPKtNSRR8yeSAC+q3Wch9lnx1ojy0?=
+ =?us-ascii?Q?5kbwRAUkp3SZwxcBW48tmQ6TiRSAFUa04DiXuMQ3KozIjPQiMfJvHcTvuW3O?=
+ =?us-ascii?Q?X6tOJCxHhEvJm7booMxFekn2I2acebarZ5xrgaKpJoOQozxZ5KQilGPKJ40N?=
+ =?us-ascii?Q?yIRtKwrJJunhq3KJlycfdJROs4le1LI2c9wWwzJPyNqUVjK+wqSSNPPqL26U?=
+ =?us-ascii?Q?In84+y706HXgkUAtbKCIUlzngVXZYfdJHy2cFRxqjO01HLwKxPIKa/IpNYnG?=
+ =?us-ascii?Q?1V/kzt8+lzB4OUNTvuB7zEFRHVt+T7PpQBlKNHSVLKvjCgNyRy+pxjsd9OaO?=
+ =?us-ascii?Q?VSQqyB7r6UwDrPEi0ZwgbRIuaWHzkn/XNrN+rfpq47i8dn363BfjjRdFS8nM?=
+ =?us-ascii?Q?7LN47iyYl89EnUFF5UBDXz58Y45KiapaeZKA0sNYthCFSoKg+trQr+6JZnVh?=
+ =?us-ascii?Q?AONdjRW5jaNkKFVuiwhHosN4ZwaBpZ9R4JYr1RCijUc7wbu7N9EahMwVYZ8m?=
+ =?us-ascii?Q?hBQ4XAbbVPviS5tDB6WsIFM/9d65ko81A05+Uh48kD4NfYfkHOfHJJMNRrZO?=
+ =?us-ascii?Q?muQxUljJHR4SsL55oF56MWtsoj7xIKvvseuwqZe2HoxXCGZxvMe02zvm0Xnq?=
+ =?us-ascii?Q?YVhYBKpSoaGwflpxSU8LYV57dg+FKtwD7ZaZDSx7Lcl5t39jg8qz44yRA7vn?=
+ =?us-ascii?Q?ShST6g6FTrGjKMsrjh0iYqOo1t1p70Ndz/+H9dNzyzu5pFF2dc7YG67u+kMv?=
+ =?us-ascii?Q?9A8m4Xkjjg+coleyjaQsRUqZ+nwtlfhkGfSLFpzJh6Cz+4K84JQbdPnjUg/q?=
+ =?us-ascii?Q?4T7bVhAgCUDKB3cOqBA7JJnNrWUdS0a0fwLZ38JJzrNtJIH+hNpE7/ofVw82?=
+ =?us-ascii?Q?Yi3zDtEHRYpyOkxY0VsuezFwL/drUmIP5ZppV1myFErqlMtfm0Q69KbB8UZD?=
+ =?us-ascii?Q?/lW0aDDoVtnf57XxrMNWu2Yl1WY8Isu5VV93hRcPkcSwg1ASV4OJN5j3ArN+?=
+ =?us-ascii?Q?eMaHKgisKP0znVkhXACDSLui9wCd5ZK42nacit50ZZn0ruYPb5cXTf/N5LW2?=
+ =?us-ascii?Q?Nw07XAsm6crIqdxodonssgZllxM8pkfH5lbBizg431GGCr6S5wRjjTE34QQN?=
+ =?us-ascii?Q?QyDJa+v6fUUZ4iSyYaz1XLrKyIvwT1ce7bpyYtpsOFU7BDkThzTB2gZE20Lf?=
+ =?us-ascii?Q?CiD6Tt8fPP+XiF+3hbFuJJ2WaKaoyvXJMUTWZBN9oSYmhKDFgkJCvlqV7XxG?=
+ =?us-ascii?Q?4Wzo6pMdVYhlT3ksGlpzm2CoG+dPsBw9d8j6RkcZUXybTLmmwMmgOqYbuDcY?=
+ =?us-ascii?Q?/BNUfTZdc2KRlB42u10Ly/wrbp4bi0b/sXTZuzGJ?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 48e92ea2-360f-4b3d-dda2-08db2c78d2dd
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Mar 2023 14:59:41.9602
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Mar 2023 15:02:45.0697
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg: 00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV2PR12MB5750
-X-Spam-Status: No, score=1.4 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
-        DKIM_VALID_AU,DKIM_VALID_EF,FORGED_MUA_MOZILLA,FREEMAIL_FROM,
-        NICE_REPLY_A,RCVD_IN_DNSWL_NONE,SPF_HELO_PASS,SPF_PASS autolearn=no
-        autolearn_force=no version=3.4.6
-X-Spam-Level: *
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: QNEwThg0Sd4k0DV8n2y9jehr2HwKXTKvRMZl15r5xy2tpom+H85JOWe0U8tMuw7V
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB6873
+X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello,
+On Fri, Mar 24, 2023 at 01:37:51AM +0000, Tian, Kevin wrote:
 
-Thanks for the reply.
+> If vfio races attach/detach then lots of things are messed.
+> 
+> e.g. iommufd_device_detach() directly calls list_del(&idev->group_item)
+> w/o checking whether the device has been attached.
 
-doesn't qemu actually panic on entry failure? note i don't have crashes 
-nor anything in logs, I've tried to enable ignore_msrs in kvm parameters 
-to see if maybe this will report something, but no luck.
+Yeah, you obviously can't race attach/detach or detach/replace
 
-Tracing data are here: https://transfer.sh/1lfnMc/kvmtrace.gz
+> And with that race UAF could occur if we narrow down the lock scope
+> to iommufd_hw_pagetable_attach():
+> 
+>               cpu0                                cpu1
+> vfio_iommufd_attach()
+>   iommufd_device_attach()
+>     iommufd_device_auto_get_domain()
+>       mutex_lock(&ioas->mutex);
+>       iommufd_hw_pagetable_alloc()
+>         hwpt = iommufd_object_alloc() //hwpt.users=1
+>         hwpt->domain = iommu_domain_alloc(idev->dev->bus);
+>         iommufd_hw_pagetable_attach() //hwpt.users=2
+>                                           vfio_iommufd_detach()
+>                                             iommufd_device_detach()
+>                                               mutex_lock(&idev->igroup->lock);
+>                                               hwpt = iommufd_hw_pagetable_detach()
+>                                               mutex_unlock(&idev->igroup->lock);
+>                                               iommufd_hw_pagetable_put(hwpt)
+>                                                 iommufd_object_destroy_user(hwpt) //hwpt.users=0
+>                                                   iommufd_hw_pagetable_destroy(hwpt)
+>                                                     iommu_domain_free(hwpt->domain);
+>         iopt_table_add_domain(&hwpt->ioas->iopt, hwpt->domain); //UAF
 
-Also unsure if I didn't lose some data in the process, although if this 
-was actually three reboots, not just instantly going to recovery, it 
-shouldn't matter.
+You didn't balance the refcounts properly, the cpu1 put will get to
+hwpt.users=1
 
-I definitely cannot get anything useful from it.
+There is a refcount_inc in iommufd_hw_pagetable_attach(), the
+iommufd_hw_pagetable_alloc() retains its reference and so the domain
+is guarenteed valid
 
-W dniu 24.03.2023 o 15:40, Sean Christopherson pisze:
-> On Fri, Mar 24, 2023, Michał Zegan wrote:
->> Hi,
->>
->> I've sent this some time ago, but was not subscribed here, so unsure if I
->> didn't get a reply or maybe missed it, so repeating:
->>
->> I have a linux host with cpu intel core i7 12700h, kernel currently 6.2,
->> fedora37.
->>
->> I have a kvm/qemu/libvirt virtual machine, cpu model set to host, machine
->> type q35, uefi with secureboot enabled, smm on.
->>
->> The kvm_intel module has nested=y set in parameters so nested virtualization
->> is enabled on host.
->>
->> The virtual machine has windows11 pro guest installed.
->>
->> When I install hyperv/virtualization platform/other similar functions, after
->> reboot, the windows does not boot. Namely it reboots three times and then
->> goes to recovery.
-> This is going to be nearly impossible to debug without more information.  Assuming
-> you can't extract more information from the guest, can you try enabling KVM
-> tracepoints?  E.g. to see if KVM is injecting an exception or a nested VM-Entry
-> failure that leads to the reboot.
->
-> I.e. enable tracing
->
->      echo 1 > /sys/kernel/debug/tracing/tracing_on
->
-> and then to get the full blast from the trace firehose:
->
->      echo 1 > /sys/kernel/debug/tracing/events/kvm/enable
->
-> or to get slightly less noisy log:
->
->      echo 1 > /sys/kernel/debug/tracing/events/kvm/kvm_entry/enable
->      echo 1 > /sys/kernel/debug/tracing/events/kvm/kvm_exit/enable
->      echo 1 > /sys/kernel/debug/tracing/events/kvm/kvm_inj_exception/enable
->      echo 1 > /sys/kernel/debug/tracing/events/kvm/kvm_nested_intercepts/enable
->      echo 1 > /sys/kernel/debug/tracing/events/kvm/kvm_nested_intr_vmexit/enable
->      echo 1 > /sys/kernel/debug/tracing/events/kvm/kvm_nested_vmenter_failed/enable
->      echo 1 > /sys/kernel/debug/tracing/events/kvm/kvm_nested_vmexit/enable
->      echo 1 > /sys/kernel/debug/tracing/events/kvm/kvm_nested_vmexit_inject/enable
->      echo 1 > /sys/kernel/debug/tracing/events/kvm/kvm_nested_vmenter/enable
->
-> To capture something useful, you may need to (significantly) increase the size of
-> the buffer,
->
->      echo 131072 > /sys/kernel/debug/tracing/buffer_size_kb
->
-> The log itself can be found at
->
->      /sys/kernel/debug/tracing/trace
+Jason
