@@ -2,50 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A28F96C7F03
-	for <lists+kvm@lfdr.de>; Fri, 24 Mar 2023 14:42:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E67966C7F2C
+	for <lists+kvm@lfdr.de>; Fri, 24 Mar 2023 14:57:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231887AbjCXNmn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Mar 2023 09:42:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50070 "EHLO
+        id S231874AbjCXN5S (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Mar 2023 09:57:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49028 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231444AbjCXNml (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Mar 2023 09:42:41 -0400
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4333B22CAE;
-        Fri, 24 Mar 2023 06:42:34 -0700 (PDT)
-Received: from [192.168.2.41] (77-166-152-30.fixed.kpn.net [77.166.152.30])
-        by linux.microsoft.com (Postfix) with ESMTPSA id D9C2320FC0F4;
-        Fri, 24 Mar 2023 06:42:31 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com D9C2320FC0F4
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-        s=default; t=1679665353;
-        bh=3VmvwDnyZDj00X2K5h4ET9mKtkFs5KXH1uhyiV8j9oc=;
-        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-        b=olblbITm9AAKyCGEw5DWI6TL+Ek/dKIeyI/kHSDPl6G3X/5aA0o7+3lQ5EzsX/lhA
-         welEMeO/NIfvMwaI3wv8gDK6yG4V+glTL5ooIpy+ZHD1jcBdSja1Xvv0VOAx8ac0fO
-         gz0W0Rzuc39GURTsCg01gQZ1IYVfjywUTzE7tDlo=
-Message-ID: <0a9ba6e6-d976-c3fa-372e-81fba85210ab@linux.microsoft.com>
-Date:   Fri, 24 Mar 2023 14:42:30 +0100
+        with ESMTP id S231215AbjCXN5Q (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Mar 2023 09:57:16 -0400
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B89C913DC6;
+        Fri, 24 Mar 2023 06:57:15 -0700 (PDT)
+From:   Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1679666234;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=+bCDnKyHBfH5uaHBerUDgkfOFS79H0YqmcZygZ+KPUM=;
+        b=AWOi3eKo9uXJG0SFpvXBnN2WYWwX4FNTIG/wg8Vuu9o/wXtgJ2TKdWQPvR2lPJK/pNGqUA
+        tvsoeCiSGH1ekHfZc/jSCK63/RjFAdvpVFZXcifwB310gMMbXzxg7erN5xj9XQbtNLDEoW
+        iACz2oyclzw2kTZFhZykELkZJ210W8VXzyeGYGzoUWlUXmDGVUdcHjNk+KrySSe/ATY8lJ
+        427OWG3p9Ct1G02F2mkDIXFrmtyDCHeCfi1hBBiAWMCZ5ddFHJ4BqfvaNp3v8c7zRIfF4H
+        eoJd9Vcrlq08i3jQYv7kkWG+iUF3eayAvNp9m1W7nsfJ+SDpvY9kiwGv4mFCww==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1679666234;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=+bCDnKyHBfH5uaHBerUDgkfOFS79H0YqmcZygZ+KPUM=;
+        b=LcKwElBt4eA0itX1DQMxtokViIfHroeNNSZ8/0EHCixCMcHjEV2iohM1OYqOCy1Y9iE3nK
+        jTkD9fibk5WVE0BA==
+To:     David Woodhouse <dwmw2@infradead.org>,
+        Usama Arif <usama.arif@bytedance.com>, kim.phillips@amd.com,
+        brgerst@gmail.com
+Cc:     piotrgorski@cachyos.org, oleksandr@natalenko.name,
+        arjan@linux.intel.com, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com, hpa@zytor.com, x86@kernel.org,
+        pbonzini@redhat.com, paulmck@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        rcu@vger.kernel.org, mimoja@mimoja.de, hewenliang4@huawei.com,
+        thomas.lendacky@amd.com, seanjc@google.com, pmenzel@molgen.mpg.de,
+        fam.zheng@bytedance.com, punit.agrawal@bytedance.com,
+        simon.evans@bytedance.com, liangma@liangbit.com,
+        gpiccoli@igalia.com
+Subject: Re: [PATCH v16 3/8] cpu/hotplug: Add dynamic parallel bringup
+ states before CPUHP_BRINGUP_CPU
+In-Reply-To: <115b39e0226915b8f69ea0cce2487588f6010995.camel@infradead.org>
+References: <20230321194008.785922-1-usama.arif@bytedance.com>
+ <20230321194008.785922-4-usama.arif@bytedance.com> <874jqb8588.ffs@tglx>
+ <871qlf83wj.ffs@tglx>
+ <8dff6ae5ffaebfbcc55a01c04420fd478070b830.camel@infradead.org>
+ <87v8ir6j96.ffs@tglx>
+ <115b39e0226915b8f69ea0cce2487588f6010995.camel@infradead.org>
+Date:   Fri, 24 Mar 2023 14:57:13 +0100
+Message-ID: <87pm8y6yme.ffs@tglx>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.9.0
-Subject: Re: [PATCH] KVM: SVM: Flush Hyper-V TLB when required
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        kvm@vger.kernel.org, Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Tianyu Lan <ltykernel@gmail.com>,
-        Michael Kelley <mikelley@microsoft.com>, stable@vger.kernel.org
-References: <20230320185110.1346829-1-jpiotrowski@linux.microsoft.com>
- <ZBsqxeRDh+iV8qmm@google.com>
-From:   Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>
-In-Reply-To: <ZBsqxeRDh+iV8qmm@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-17.9 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
-        DKIM_VALID_AU,ENV_AND_HDR_SPF_MATCH,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
-        SPF_HELO_PASS,SPF_PASS,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+Content-Type: text/plain
+X-Spam-Status: No, score=-2.5 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
+        DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_PASS
         autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -53,208 +69,96 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 3/22/2023 5:20 PM, Sean Christopherson wrote:
-> On Mon, Mar 20, 2023, Jeremi Piotrowski wrote:
->> ---
->>  arch/x86/kvm/kvm_onhyperv.c | 23 +++++++++++++++++++++++
->>  arch/x86/kvm/kvm_onhyperv.h |  5 +++++
->>  arch/x86/kvm/svm/svm.c      | 18 +++++++++++++++---
->>  3 files changed, 43 insertions(+), 3 deletions(-)
->>
->> diff --git a/arch/x86/kvm/kvm_onhyperv.c b/arch/x86/kvm/kvm_onhyperv.c
->> index 482d6639ef88..036e04c0a161 100644
->> --- a/arch/x86/kvm/kvm_onhyperv.c
->> +++ b/arch/x86/kvm/kvm_onhyperv.c
->> @@ -94,6 +94,29 @@ int hv_remote_flush_tlb(struct kvm *kvm)
->>  }
->>  EXPORT_SYMBOL_GPL(hv_remote_flush_tlb);
->>  
->> +void hv_flush_tlb_current(struct kvm_vcpu *vcpu)
->> +{
->> +	struct kvm_arch *kvm_arch = &vcpu->kvm->arch;
->> +	hpa_t root_tdp = vcpu->arch.mmu->root.hpa;
->> +
->> +	if (kvm_x86_ops.tlb_remote_flush == hv_remote_flush_tlb && VALID_PAGE(root_tdp)) {
->> +		spin_lock(&kvm_arch->hv_root_tdp_lock);
->> +		if (kvm_arch->hv_root_tdp != root_tdp) {
->> +			hyperv_flush_guest_mapping(root_tdp);
->> +			kvm_arch->hv_root_tdp = root_tdp;
-> 
-> In a vacuum, accessing kvm_arch->hv_root_tdp in the flush path is wrong.  This
-> likely fixes the issues you are seeing because the KVM bug only affects the case
-> when KVM is loading a new root (that used to be valid), in which case hv_root_tdp
-> is guaranteed to be different.  But KVM should not rely on that behavior, i.e. if
-> KVM says flush, then we flush.  There might be scenarios where the flush is
-> unnecessary, but those flushes should be elided by the code that knows the flush
-> is unnecessary, not in this common code just because the target root is the
-> globally shared root> 
+On Fri, Mar 24 2023 at 09:31, David Woodhouse wrote:
+> On Fri, 2023-03-24 at 02:16 +0100, Thomas Gleixner wrote:
+>> So the proper thing is to split CPUHP_BRINGUP_CPU, which is the bridging
+>> state between AP and BP today, into a set of synchronization points
+>> between BP and AP.
+>
+> I feel we're talking past each other a little bit. Because I'd have
+> said that's *exactly* what this patch set is doing.
+>
+> The existing x86 CPUHP_BRINGUP_CPU step in native_cpu_up() has a bunch
+> of back-and-forth between BP and AP, which you've enumerated below and
+> which I cleaned up and commented in the 'Split up native_cpu_up into
+> separate phases and document them' patch.
+>
+> This patch set literally introduces the new PARALLEL_DYN states to be
+> "a set of synchronization points between BP and AP", and then makes the
+> x86 code utilise that for the *first* of its back-and-forth exchanges
+> between BP and AP.
 
-That's fair, and I'm fine with doing the flush unconditionally to fix the issue at
-this time.
+It provides a dynamic space which is absolutely unspecified and just
+opens the door for tinkering.
 
-But eliding the flushes higher up will require bubbling up more knowledge about
-the enlightened TLB and the fact that hyperv_flush_guest_mapping() already acts
-across all cpus. And we would still want to call svm_flush_tlb_asid() anyway, right?
+This first step does not even contain a synchronization point. All it
+does is to kick the AP into gear. Not more, not less. Naming this
+obscurely as PARALLEL_DYN is a tasteless bandaid.
 
-> Somewhat of a moot point, but setting hv_root_tdp to root_tdp is also wrong.  KVM's
-> behavior is that hv_root_tdp points at a valid root if and only if all vCPUs share
-> said root.  E.g. invoking this when vCPUs have different roots will "corrupt"
-> hv_root_tdp and possibly cause a remote flush to do the wrong thing.> 
+If you go and look at all __cpu_up() implementations, then you'll notice
+that these are very similar. All of them do
 
-Oh, that's right. I'm dropping this for now.
+   1) Kick AP
+   2) Synchronize at least once between BP and AP
 
->> +		}
->> +		spin_unlock(&kvm_arch->hv_root_tdp_lock);
->> +	}
->> +}
->> +EXPORT_SYMBOL_GPL(hv_flush_tlb_current);
->> +
->> +void hv_flush_tlb_all(struct kvm_vcpu *vcpu)
->> +{
->> +	if (WARN_ON_ONCE(kvm_x86_ops.tlb_remote_flush == hv_remote_flush_tlb))
-> 
-> Hmm, looking at the KVM code, AFAICT KVM only enables enlightened_npt_tlb for L1
-> (L1 from KVM's perspective) as svm_hv_init_vmcb() is only ever called with vmcb01,
-> never with vmcb02.  I don't know if that's intentional, but I do think it means
-> KVM can skip the Hyper-V flush for vmcb02 and instead rely on the ASID flush,
-> i.e. KVM can do the Hyper-V iff enlightened_npt_tlb is set in the current VMCB.
-> And that should continue to work if KVM does ever enabled enlightened_npt_tlb for L2.
-> 
->> +		hv_remote_flush_tlb(vcpu->kvm);
->> +}
->> +EXPORT_SYMBOL_GPL(hv_flush_tlb_all);
-> 
-> I'd rather not add helpers to the common KVM code.  I do like minimizing the amount
-> of #ifdeffery, but defining these as common helpers makes it seem like VMX-on-HyperV
-> is broken, i.e. raises the question of why VMX doesn't use these helpers when running
-> on Hyper-V.
-> 
-> I'm thinking this?
-> 
+There is nothing x86 specific about this. So instead of hiding this
+behind a misnomed dynamic space, the obviously correct solution is to
+make this an explicit mechanism in the core code and convert _all_
+architectures over to this scheme. That's in the first place completely
+independent of parallel bringup.
 
-I have the #ifdef version ready to send out, but what do you think about this:
+It has a value on it's own as it consolidates the zoo of synchronization
+mechanisms (cpumasks, completions, random variables) into one shared
+mechanism in the core code.
 
-diff --git a/arch/x86/kvm/kvm_onhyperv.h b/arch/x86/kvm/kvm_onhyperv.h
-index 287e98ef9df3..b3ee0bb7e95f 100644
---- a/arch/x86/kvm/kvm_onhyperv.h
-+++ b/arch/x86/kvm/kvm_onhyperv.h
-@@ -12,6 +12,11 @@ int hv_remote_flush_tlb_with_range(struct kvm *kvm,
- int hv_remote_flush_tlb(struct kvm *kvm);
- void hv_track_root_tdp(struct kvm_vcpu *vcpu, hpa_t root_tdp);
- #else /* !CONFIG_HYPERV */
-+static inline int hv_remote_flush_tlb(struct kvm *kvm)
-+{
-+	return -1;
-+}
-+
- static inline void hv_track_root_tdp(struct kvm_vcpu *vcpu, hpa_t root_tdp)
- {
- }
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 252e7f37e4e2..e707511a91e3 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -3729,7 +3729,7 @@ static void svm_enable_nmi_window(struct kvm_vcpu *vcpu)
- 	svm->vmcb->save.rflags |= (X86_EFLAGS_TF | X86_EFLAGS_RF);
- }
- 
--static void svm_flush_tlb_current(struct kvm_vcpu *vcpu)
-+static void svm_flush_tlb_asid(struct kvm_vcpu *vcpu)
- {
- 	struct vcpu_svm *svm = to_svm(vcpu);
- 
-@@ -3753,6 +3753,39 @@ static void svm_flush_tlb_current(struct kvm_vcpu *vcpu)
- 		svm->current_vmcb->asid_generation--;
- }
- 
-+static void svm_flush_tlb_current(struct kvm_vcpu *vcpu)
-+{
-+	hpa_t root_tdp = vcpu->arch.mmu->root.hpa;
-+
-+	/*
-+	 * When running on Hyper-V with EnlightenedNptTlb enabled, explicitly
-+	 * flush the NPT mappings via hypercall as flushing the ASID only
-+	 * affects virtual to physical mappings, it does not invalidate guest
-+	 * physical to host physical mappings.
-+	 */
-+	if (IS_ENABLED(CONFIG_HYPERV) &&
-+	    svm_hv_is_enlightened_tlb_enabled(vcpu) &&
-+	    VALID_PAGE(root_tdp))
-+		hyperv_flush_guest_mapping(root_tdp);
-+
-+	svm_flush_tlb_asid(vcpu);
-+}
-+
-+static void svm_flush_tlb_all(struct kvm_vcpu *vcpu)
-+{
-+	/*
-+	 * When running on Hyper-V with EnlightenedNptTlb enabled, remote TLB
-+	 * flushes should be routed to hv_remote_flush_tlb() without requesting
-+	 * a "regular" remote flush.  Reaching this point means either there's
-+	 * a KVM bug or a prior hv_remote_flush_tlb() call failed, both of
-+	 * which might be fatal to the guest.  Yell, but try to recover.
-+	 */
-+	if (IS_ENABLED(CONFIG_HYPERV) && WARN_ON_ONCE(svm_hv_is_enlightened_tlb_enabled(vcpu)))
-+		hv_remote_flush_tlb(vcpu->kvm);
-+
-+	svm_flush_tlb_asid(vcpu);
-+}
-+
- static void svm_flush_tlb_gva(struct kvm_vcpu *vcpu, gva_t gva)
- {
- 	struct vcpu_svm *svm = to_svm(vcpu);
-@@ -4745,10 +4778,10 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
- 	.set_rflags = svm_set_rflags,
- 	.get_if_flag = svm_get_if_flag,
- 
--	.flush_tlb_all = svm_flush_tlb_current,
-+	.flush_tlb_all = svm_flush_tlb_all,
- 	.flush_tlb_current = svm_flush_tlb_current,
- 	.flush_tlb_gva = svm_flush_tlb_gva,
--	.flush_tlb_guest = svm_flush_tlb_current,
-+	.flush_tlb_guest = svm_flush_tlb_asid,
- 
- 	.vcpu_pre_run = svm_vcpu_pre_run,
- 	.vcpu_run = svm_vcpu_run,
-diff --git a/arch/x86/kvm/svm/svm_onhyperv.h b/arch/x86/kvm/svm/svm_onhyperv.h
-index cff838f15db5..4c9e0d4ba3dd 100644
---- a/arch/x86/kvm/svm/svm_onhyperv.h
-+++ b/arch/x86/kvm/svm/svm_onhyperv.h
-@@ -6,6 +6,8 @@
- #ifndef __ARCH_X86_KVM_SVM_ONHYPERV_H__
- #define __ARCH_X86_KVM_SVM_ONHYPERV_H__
+That's very much different from what your patch is doing. And there is a
+very good reason aside of consolidation to do so:
 
-+#include <asm/mshyperv.h>
-+
- #if IS_ENABLED(CONFIG_HYPERV)
+This prepares to handle the parallelism requirements in the core code
+instead of letting each architecture come up with its own set of
+magic. Which in turn is a prerequisite for allowing the STARTING
+callbacks or later the threaded AP states to execute in parallel.
 
- #include "kvm_onhyperv.h"
-@@ -15,6 +17,14 @@ static struct kvm_x86_ops svm_x86_ops;
- 
- int svm_hv_enable_l2_tlb_flush(struct kvm_vcpu *vcpu);
- 
-+static inline bool svm_hv_is_enlightened_tlb_enabled(struct kvm_vcpu *vcpu)
-+{
-+	struct hv_vmcb_enlightenments *hve = &to_svm(vcpu)->vmcb->control.hv_enlightenments;
-+
-+	return ms_hyperv.nested_features & HV_X64_NESTED_ENLIGHTENED_TLB &&
-+		!!hve->hv_enlightenments_control.enlightened_npt_tlb;
-+}
-+
- static inline void svm_hv_init_vmcb(struct vmcb *vmcb)
- {
- 	struct hv_vmcb_enlightenments *hve = &vmcb->control.hv_enlightenments;
-@@ -80,6 +90,11 @@ static inline void svm_hv_update_vp_id(struct vmcb *vmcb, struct kvm_vcpu *vcpu)
- }
- #else
- 
-+static inline bool svm_hv_is_enlightened_tlb_enabled(struct kvm_vcpu *vcpu)
-+{
-+	return false;
-+}
-+
- static inline void svm_hv_init_vmcb(struct vmcb *vmcb)
- {
- }
+Why? Simply because of this:
 
+  BP			AP              state
+  kick()                                BRINGUP_CPU
+                        startup()                      
+  sync()                sync() 
+                        starting()      advances to AP_ONLINE
+  sync()                sync()
+  TSC_sync()            TSC_sync()
+  wait_for_online()     set_online()
+                        cpu_startup_entry() AP_ONLINE_IDLE
+  wait_for_completion() complete()
 
+This works correctly today because bringup_cpu() does not modify state
+and excpects the state to be advanced by the AP once the completion is
+done.
+
+So you _cannot_ just throw some magic dynamic states before BRINGUP_CPU
+and then expect that the state machine is consistent when the AP is
+allowed to run the starting callbacks in parallel.
+
+The sync point after the starting callbacks simply cannot be in that
+dynamic state space. It has to be _after_ the AP starting states.
+
+That needs a fundamental change in the way how the state management
+at this point works and this needs to be done upfront. Aside of the
+general serialization aspects this needs some deep thought whether the
+BP control can stay single threaded or if it's required to spawn a
+control thread per AP.
+
+The kick CPU into life state is completely independent of the above and
+can be moved just before BRINGUP_CPU without violating anything. But
+that's where the easy to solve part stops hard.
+
+You might find my wording offensive, but I perceive your "let's use a
+few dynamic states and see what sticks" approach offensive too.
+
+The analysis of all this is not rocket science and could have been done
+long ago by yourself.
+
+Thanks,
+
+        tglx
