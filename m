@@ -2,72 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AF26A6C7FE7
-	for <lists+kvm@lfdr.de>; Fri, 24 Mar 2023 15:32:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BE9746C8014
+	for <lists+kvm@lfdr.de>; Fri, 24 Mar 2023 15:40:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230131AbjCXOcB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Mar 2023 10:32:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41716 "EHLO
+        id S232069AbjCXOkp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Mar 2023 10:40:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53128 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229551AbjCXOb7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Mar 2023 10:31:59 -0400
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7722514235
-        for <kvm@vger.kernel.org>; Fri, 24 Mar 2023 07:31:57 -0700 (PDT)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-544539a729cso20268027b3.5
-        for <kvm@vger.kernel.org>; Fri, 24 Mar 2023 07:31:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1679668316;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ty3wse5DF2ys6PoInqEvitG3vpIktmR+SFLR6U/ysFc=;
-        b=KrvNTV+VwvF0CjZfmGIp7CnP7o0W8sxb7gs0MBkMD8ZiGSZMvSNH59YtWyLSriVv75
-         cgruU2EOipD92w4i5Q7i03b7I3mEEtTpvjnmuHgVcjPgFvwTLCasowWJTqQSeHOE1A3K
-         bpwILXupYeXhBvnmhVCFcCP+hOJpt6upQXRXeUXeqEjzPoLo2VkyGeevEW1H/dL4f7sh
-         DrywnkrjwATzOEwagnfUwQOqQGEV9BqoDlFZrFUmrZFhPl7LAgczSqKx82m0ojVHCjTA
-         pDK4T7uH4fGDa70GCuwVREq1Gz3Ogn6KtVU+i7hkE0cZVMtxKhsGw0yx+0wPAMaHQSnY
-         vfFg==
+        with ESMTP id S231723AbjCXOkk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Mar 2023 10:40:40 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F64DD7
+        for <kvm@vger.kernel.org>; Fri, 24 Mar 2023 07:39:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1679668797;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=TMmYpV/LQ/c9lboloM+FB9+ISpjrbEj6iQBO9Iln0u8=;
+        b=ai2kKu2X76EupkD53icnRM2dKJwKZrZi1v+ghn1h6Z+IC3RF79SPN8StS7LHjQSLVCl7zS
+        YXUZqF5Mq3B0y32NKca1K8bM8zDlDLZx7Eqa46qawzmwJLJwQeZ8xxGuvMO+AInLj+WCFY
+        w2lxGhNVNTFi5/IdtkcslPdzFmQY9io=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-253-NtmQtfLgNieUVQFnIMTy_g-1; Fri, 24 Mar 2023 10:39:56 -0400
+X-MC-Unique: NtmQtfLgNieUVQFnIMTy_g-1
+Received: by mail-ed1-f71.google.com with SMTP id b1-20020aa7dc01000000b004ad062fee5eso3447615edu.17
+        for <kvm@vger.kernel.org>; Fri, 24 Mar 2023 07:39:56 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679668316;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ty3wse5DF2ys6PoInqEvitG3vpIktmR+SFLR6U/ysFc=;
-        b=260o9QuYoxGr/rDcyWy7xVukvvRlXRdK630/eVNI9djLGWoSBTGt9vqOF1/ZDlvTeO
-         Ne8PB3co6S73nQPHlSIQupIPA2Kby5LD5n2H2KlRVlYyWik/JVU4H8V4jkW2zqBjou/W
-         6zlgaceMqp8xsWC3FiFDAxKAAEPFgiQ0ZfRwax0LdHYDMbD6ogiES5l6CiyUQj1Qt58Q
-         2/f2Zq6TeYbKaiUfCZS/RCzuWRK9Z0HydM5zBDsz5r7qdykQXbUcYbRzK5MIHtIw5OGA
-         ELgF9wZBN3cCtXAveOiEGWxX1vO27vGLynBPa8QxpLMUBVEsCwOyd3GsFKOHj+dyFYfW
-         fxvg==
-X-Gm-Message-State: AAQBX9db7HuvZos1+SgaVg5mwU7FB8DOjRZuGzg+JbafVJqxI8hO5l+e
-        AciAOl5K+wo6cWYb0PRQmOmmAb9V9VU=
-X-Google-Smtp-Source: AKy350b/nn/R+ZOxHwMrUoKAuwzV0OlisAA4vPdStZV49dEt07t6trWRHl4OtpI5R6SD0zZLsf9Wf51b9fw=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:bd4d:0:b0:541:359c:103a with SMTP id
- n13-20020a81bd4d000000b00541359c103amr1122172ywk.8.1679668316732; Fri, 24 Mar
- 2023 07:31:56 -0700 (PDT)
-Date:   Fri, 24 Mar 2023 07:31:55 -0700
-In-Reply-To: <655ac0f7-223b-9440-1bcb-e93af8915bfa@oracle.com>
-Mime-Version: 1.0
-References: <20230316200219.42673-1-joao.m.martins@oracle.com>
- <20230316200219.42673-2-joao.m.martins@oracle.com> <ZBODjjANx6pkq5iq@google.com>
- <655ac0f7-223b-9440-1bcb-e93af8915bfa@oracle.com>
-Message-ID: <ZB20W14VzVZZz+nI@google.com>
-Subject: Re: [PATCH v2 1/2] iommu/amd: Don't block updates to GATag if guest
- mode is on
-From:   Sean Christopherson <seanjc@google.com>
-To:     Joao Martins <joao.m.martins@oracle.com>
-Cc:     iommu@lists.linux.dev, Joerg Roedel <joro@8bytes.org>,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        Vasant Hegde <vasant.hegde@amd.com>,
-        Will Deacon <will@kernel.org>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        Alejandro Jimenez <alejandro.j.jimenez@oracle.com>,
-        kvm@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-7.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+        d=1e100.net; s=20210112; t=1679668793;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=TMmYpV/LQ/c9lboloM+FB9+ISpjrbEj6iQBO9Iln0u8=;
+        b=PVX5XsKonZ0rVl1K+3gMCcLKL8leg08HFW4GZYUcLIR9kHl2uwYR1AcymyPW4kvQtp
+         n5ArGVOgfsLlbwBABWR4MyXZiaMeLmDHNLZHJP1YsH6gHZVZ6bLn9Lx0nocX8+G/grQX
+         XtvCObbVe/aa7TUQ3S5lxTQ4WeLt7hIaST4KmGiJ9j/cXO6yuLr8aEsRvCiSYZxzPtTd
+         EAhxNHKDYATIu4obrfwQNd//21ZLO3LbDgIRhDG3P+nGiC7VyMuCy3eNmJv7SZImOAbR
+         Zm1tmGqdc42fLtkN+jYiOApVJoXKcYb76+t1fh7Gld6EfXfSFW9M4Zw0M+OPH4BPIFEl
+         Z1Wg==
+X-Gm-Message-State: AAQBX9dnBU+v3SCS4C8Vjv3tvSciJkPuUu5FsID5jO11/YR8wvCelsa1
+        JQYUhb52g71o7ryPqEsltaJQCaevdPC5UUws803gVfqRxh0tFAdAzNN5KD86LGC2YPLar8WIJQC
+        2VWTTDJXc9W9M
+X-Received: by 2002:a17:906:e112:b0:933:1b05:8851 with SMTP id gj18-20020a170906e11200b009331b058851mr2845610ejb.16.1679668793613;
+        Fri, 24 Mar 2023 07:39:53 -0700 (PDT)
+X-Google-Smtp-Source: AKy350Y4yRoRccUD6nI6QABMFjTLkWl/XWytdR65GGNlDWyNT8S11dQr5KKX4NxzjLSJru2A56ABJA==
+X-Received: by 2002:a17:906:e112:b0:933:1b05:8851 with SMTP id gj18-20020a170906e11200b009331b058851mr2845585ejb.16.1679668793333;
+        Fri, 24 Mar 2023 07:39:53 -0700 (PDT)
+Received: from sgarzare-redhat (host-82-53-134-98.retail.telecomitalia.it. [82.53.134.98])
+        by smtp.gmail.com with ESMTPSA id b4-20020a17090630c400b0092b5384d6desm10339713ejb.153.2023.03.24.07.39.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 24 Mar 2023 07:39:52 -0700 (PDT)
+Date:   Fri, 24 Mar 2023 15:39:50 +0100
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Eugenio Perez Martin <eperezma@redhat.com>
+Cc:     virtualization@lists.linux-foundation.org, stefanha@redhat.com,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Andrey Zhadchenko <andrey.zhadchenko@virtuozzo.com>,
+        netdev@vger.kernel.org, Jason Wang <jasowang@redhat.com>,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 4/8] vringh: support VA with iotlb
+Message-ID: <xjhkyuurmxoispl2ndpeq4w3zsivq56lq4siw3cv3k5ucf7i43@e2ydqxiyxglc>
+References: <20230321154228.182769-1-sgarzare@redhat.com>
+ <20230321154228.182769-5-sgarzare@redhat.com>
+ <CAJaqyWcCwwu1UJ968A=s30GCezjLcwWKDhCFMsQ2EcGGgkiz7g@mail.gmail.com>
+ <20230323104638.67hbwwbk7ayp4psq@sgarzare-redhat>
+ <CAJaqyWfSor5PKZn0iAOthCkeGDBc7+rjVXuSHMy1LWY+fV5o7A@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAJaqyWfSor5PKZn0iAOthCkeGDBc7+rjVXuSHMy1LWY+fV5o7A@mail.gmail.com>
+X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -75,55 +85,194 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 16, 2023, Joao Martins wrote:
-> On 16/03/2023 21:01, Sean Christopherson wrote:
-> > Is there any harm in giving deactivate the same treatement?  If the worst case
-> > scenario is a few wasted cycles, having symmetric flows and eliminating benign
-> > bugs seems like a worthwhile tradeoff (assuming this is indeed a relatively slow
-> > path like I think it is).
-> > 
-> 
-> I wanna say there's no harm, but initially I had such a patch, and on testing it
-> broke the classic interrupt remapping case but I didn't investigate further --
-> my suspicion is that the only case that should care is the updates (not the
-> actual deactivation of guest-mode).
+On Thu, Mar 23, 2023 at 03:43:34PM +0100, Eugenio Perez Martin wrote:
+>On Thu, Mar 23, 2023 at 11:46 AM Stefano Garzarella <sgarzare@redhat.com> wrote:
+>>
+>> On Thu, Mar 23, 2023 at 09:09:14AM +0100, Eugenio Perez Martin wrote:
+>> >On Tue, Mar 21, 2023 at 4:43 PM Stefano Garzarella <sgarzare@redhat.com> wrote:
+>> >>
+>> >> vDPA supports the possibility to use user VA in the iotlb messages.
+>> >> So, let's add support for user VA in vringh to use it in the vDPA
+>> >> simulators.
+>> >>
+>> >> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+>> >> ---
+>> >>
+>> >> Notes:
+>> >>     v3:
+>> >>     - refactored avoiding code duplication [Eugenio]
+>> >>     v2:
+>> >>     - replace kmap_atomic() with kmap_local_page() [see previous patch]
+>> >>     - fix cast warnings when build with W=1 C=1
+>> >>
+>> >>  include/linux/vringh.h            |   5 +-
+>> >>  drivers/vdpa/mlx5/net/mlx5_vnet.c |   2 +-
+>> >>  drivers/vdpa/vdpa_sim/vdpa_sim.c  |   4 +-
+>> >>  drivers/vhost/vringh.c            | 153 +++++++++++++++++++++++-------
+>> >>  4 files changed, 127 insertions(+), 37 deletions(-)
+>> >>
+>> >> diff --git a/include/linux/vringh.h b/include/linux/vringh.h
+>> >> index 1991a02c6431..d39b9f2dcba0 100644
+>> >> --- a/include/linux/vringh.h
+>> >> +++ b/include/linux/vringh.h
+>> >> @@ -32,6 +32,9 @@ struct vringh {
+>> >>         /* Can we get away with weak barriers? */
+>> >>         bool weak_barriers;
+>> >>
+>> >> +       /* Use user's VA */
+>> >> +       bool use_va;
+>> >> +
+>> >>         /* Last available index we saw (ie. where we're up to). */
+>> >>         u16 last_avail_idx;
+>> >>
+>> >> @@ -279,7 +282,7 @@ void vringh_set_iotlb(struct vringh *vrh, struct vhost_iotlb *iotlb,
+>> >>                       spinlock_t *iotlb_lock);
+>> >>
+>> >>  int vringh_init_iotlb(struct vringh *vrh, u64 features,
+>> >> -                     unsigned int num, bool weak_barriers,
+>> >> +                     unsigned int num, bool weak_barriers, bool use_va,
+>> >>                       struct vring_desc *desc,
+>> >>                       struct vring_avail *avail,
+>> >>                       struct vring_used *used);
+>> >> diff --git a/drivers/vdpa/mlx5/net/mlx5_vnet.c b/drivers/vdpa/mlx5/net/mlx5_vnet.c
+>> >> index 520646ae7fa0..dfd0e000217b 100644
+>> >> --- a/drivers/vdpa/mlx5/net/mlx5_vnet.c
+>> >> +++ b/drivers/vdpa/mlx5/net/mlx5_vnet.c
+>> >> @@ -2537,7 +2537,7 @@ static int setup_cvq_vring(struct mlx5_vdpa_dev *mvdev)
+>> >>
+>> >>         if (mvdev->actual_features & BIT_ULL(VIRTIO_NET_F_CTRL_VQ))
+>> >>                 err = vringh_init_iotlb(&cvq->vring, mvdev->actual_features,
+>> >> -                                       MLX5_CVQ_MAX_ENT, false,
+>> >> +                                       MLX5_CVQ_MAX_ENT, false, false,
+>> >>                                         (struct vring_desc *)(uintptr_t)cvq->desc_addr,
+>> >>                                         (struct vring_avail *)(uintptr_t)cvq->driver_addr,
+>> >>                                         (struct vring_used *)(uintptr_t)cvq->device_addr);
+>> >> diff --git a/drivers/vdpa/vdpa_sim/vdpa_sim.c b/drivers/vdpa/vdpa_sim/vdpa_sim.c
+>> >> index eea23c630f7c..47cdf2a1f5b8 100644
+>> >> --- a/drivers/vdpa/vdpa_sim/vdpa_sim.c
+>> >> +++ b/drivers/vdpa/vdpa_sim/vdpa_sim.c
+>> >> @@ -60,7 +60,7 @@ static void vdpasim_queue_ready(struct vdpasim *vdpasim, unsigned int idx)
+>> >>         struct vdpasim_virtqueue *vq = &vdpasim->vqs[idx];
+>> >>         uint16_t last_avail_idx = vq->vring.last_avail_idx;
+>> >>
+>> >> -       vringh_init_iotlb(&vq->vring, vdpasim->features, vq->num, true,
+>> >> +       vringh_init_iotlb(&vq->vring, vdpasim->features, vq->num, true, false,
+>> >>                           (struct vring_desc *)(uintptr_t)vq->desc_addr,
+>> >>                           (struct vring_avail *)
+>> >>                           (uintptr_t)vq->driver_addr,
+>> >> @@ -92,7 +92,7 @@ static void vdpasim_vq_reset(struct vdpasim *vdpasim,
+>> >>         vq->cb = NULL;
+>> >>         vq->private = NULL;
+>> >>         vringh_init_iotlb(&vq->vring, vdpasim->dev_attr.supported_features,
+>> >> -                         VDPASIM_QUEUE_MAX, false, NULL, NULL, NULL);
+>> >> +                         VDPASIM_QUEUE_MAX, false, false, NULL, NULL, NULL);
+>> >>
+>> >>         vq->vring.notify = NULL;
+>> >>  }
+>> >> diff --git a/drivers/vhost/vringh.c b/drivers/vhost/vringh.c
+>> >> index 0ba3ef809e48..72c88519329a 100644
+>> >> --- a/drivers/vhost/vringh.c
+>> >> +++ b/drivers/vhost/vringh.c
+>> >> @@ -1094,10 +1094,18 @@ EXPORT_SYMBOL(vringh_need_notify_kern);
+>> >>
+>> >>  #if IS_REACHABLE(CONFIG_VHOST_IOTLB)
+>> >>
+>> >> +struct iotlb_vec {
+>> >> +       union {
+>> >> +               struct iovec *iovec;
+>> >> +               struct bio_vec *bvec;
+>> >> +       } iov;
+>> >> +       size_t count;
+>> >> +       bool is_iovec;
+>> >> +};
+>> >> +
+>> >>  static int iotlb_translate(const struct vringh *vrh,
+>> >>                            u64 addr, u64 len, u64 *translated,
+>> >> -                          struct bio_vec iov[],
+>> >> -                          int iov_size, u32 perm)
+>> >> +                          struct iotlb_vec *ivec, u32 perm)
+>> >>  {
+>> >>         struct vhost_iotlb_map *map;
+>> >>         struct vhost_iotlb *iotlb = vrh->iotlb;
+>> >> @@ -1107,9 +1115,9 @@ static int iotlb_translate(const struct vringh *vrh,
+>> >>         spin_lock(vrh->iotlb_lock);
+>> >>
+>> >>         while (len > s) {
+>> >> -               u64 size, pa, pfn;
+>> >> +               u64 size;
+>> >>
+>> >> -               if (unlikely(ret >= iov_size)) {
+>> >> +               if (unlikely(ret >= ivec->count)) {
+>> >>                         ret = -ENOBUFS;
+>> >>                         break;
+>> >>                 }
+>> >> @@ -1124,10 +1132,22 @@ static int iotlb_translate(const struct vringh *vrh,
+>> >>                 }
+>> >>
+>> >>                 size = map->size - addr + map->start;
+>> >> -               pa = map->addr + addr - map->start;
+>> >> -               pfn = pa >> PAGE_SHIFT;
+>> >> -               bvec_set_page(&iov[ret], pfn_to_page(pfn), min(len - s, size),
+>> >> -                             pa & (PAGE_SIZE - 1));
+>> >> +               if (ivec->is_iovec) {
+>> >> +                       struct iovec *iovec = ivec->iov.iovec;
+>> >> +
+>> >> +                       iovec[ret].iov_len = min(len - s, size);
+>> >> +                       iovec[ret].iov_base = (void __user *)(unsigned long)
+>> >
+>> >s/unsigned long/uintptr_t ?
+>> >
+>>
+>> yep, good catch!
+>>
+>> As I wrote to Jason, I think I'll take it out of the if and just declare
+>> an uintptr_t variable, since I'm using it also in the else branch.
+>>
+>> >
+>> >
+>> >> +                                             (map->addr + addr - map->start);
+>> >> +               } else {
+>> >> +                       u64 pa = map->addr + addr - map->start;
+>> >> +                       u64 pfn = pa >> PAGE_SHIFT;
+>> >> +                       struct bio_vec *bvec = ivec->iov.bvec;
+>> >> +
+>> >> +                       bvec_set_page(&bvec[ret], pfn_to_page(pfn),
+>> >> +                                     min(len - s, size),
+>> >> +                                     pa & (PAGE_SIZE - 1));
+>> >> +               }
+>> >> +
+>> >>                 s += size;
+>> >>                 addr += size;
+>> >>                 ++ret;
+>> >> @@ -1141,26 +1161,42 @@ static int iotlb_translate(const struct vringh *vrh,
+>> >>         return ret;
+>> >>  }
+>> >>
+>> >> +#define IOTLB_IOV_SIZE 16
+>> >
+>> >I'm fine with defining here, but maybe it is better to isolate the
+>> >change in a previous patch or reuse another well known macro?
+>>
+>> Yep, good point!
+>>
+>> Do you have any well known macro to suggest?
+>>
+>
+>Not really, 16 seems like a convenience value here actually :). Maybe
+>replace _SIZE with _STRIDE or similar?
 
-Ugh, I bet this is due to KVM invoking irq_set_vcpu_affinity() with garbage when
-AVIC is enabled, but KVM can't use a posted interrupt due to the how the IRQ is
-configured.  I vaguely recall a bug report about uninitialized data in "pi" being
-consumed, but I can't find it at the moment.
+Ack, I will add IOTLB_IOV_STRIDE in a preparation patch before this
+one.
 
-	if (!get_pi_vcpu_info(kvm, e, &vcpu_info, &svm) && set &&
-		    kvm_vcpu_apicv_active(&svm->vcpu)) {
+>
+>I keep the Acked-by even if the final name is IOTLB_IOV_SIZE though.
 
-		...
+Thanks,
+I changed a bit this patch following Jason's and your suggestions.
 
-	} else {
-			/* Use legacy mode in IRTE */
-			struct amd_iommu_pi_data pi;
+I'd like an explicit Acked-by on the next version if it is okay with 
+you.
 
-			/**
-			 * Here, pi is used to:
-			 * - Tell IOMMU to use legacy mode for this interrupt.
-			 * - Retrieve ga_tag of prior interrupt remapping data.
-			 */
-			pi.prev_ga_tag = 0;
-			pi.is_guest_mode = false;
-			ret = irq_set_vcpu_affinity(host_irq, &pi);
-	}
+Thanks,
+Stefano
 
-
-> > Any chance you (or anyone) would want to create a follow-up series to rename and/or
-> > rework these flows to make it more obvious that the helpers handle updates as well
-> > as transitions between "guest mode" and "host mode"?  E.g. I can see KVM getting
-> > clever and skipping the "activation" when KVM knows AVIC is already active (though
-> > I can't tell for certain whether or not that would actually be problematic).
-> > 
-> 
-> To be honest, I think the function naming is correct.
-
-After looking more closely at the KVM code, I agree.  I was thinking KVM invoked
-the (de)activate helpers somewhat spuriously, but that's not actually the case,
-KVM just has a few less-than-perfect names due to conflicting requirements.
-
-Thanks!
