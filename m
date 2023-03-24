@@ -2,68 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 26C786C877F
-	for <lists+kvm@lfdr.de>; Fri, 24 Mar 2023 22:30:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3C8EF6C8782
+	for <lists+kvm@lfdr.de>; Fri, 24 Mar 2023 22:33:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231841AbjCXVas (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Mar 2023 17:30:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38800 "EHLO
+        id S231522AbjCXVdM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Mar 2023 17:33:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40444 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231877AbjCXVap (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Mar 2023 17:30:45 -0400
-Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2748319F35
-        for <kvm@vger.kernel.org>; Fri, 24 Mar 2023 14:30:44 -0700 (PDT)
-Received: by mail-pj1-x104a.google.com with SMTP id qa18-20020a17090b4fd200b002400d8a8d1dso2781067pjb.7
-        for <kvm@vger.kernel.org>; Fri, 24 Mar 2023 14:30:44 -0700 (PDT)
+        with ESMTP id S229674AbjCXVdL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Mar 2023 17:33:11 -0400
+Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBF051A4AB
+        for <kvm@vger.kernel.org>; Fri, 24 Mar 2023 14:33:08 -0700 (PDT)
+Received: by mail-pf1-x44a.google.com with SMTP id 16-20020a056a00071000b00627e9b4871eso1573998pfl.11
+        for <kvm@vger.kernel.org>; Fri, 24 Mar 2023 14:33:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1679693443;
+        d=google.com; s=20210112; t=1679693588;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=qqk3VIkkZ+eaNmKFC4g7qKHFQk1Ktr5Ri5CUqa6GS3c=;
-        b=gMpJrqX5gNp9x920VhyvpRim8i6UjML4yBPIpJp24QgT0d/OeZow853g+1kfIgvoae
-         U9lCbSo55IdjffXIqOt7I/Oqmjny3fp5cQg5k+JuW1pz+QrrSyBaH5Nw4FuIfr2o9ws2
-         k1507WSZNJXUyEFW8KjpUvmgG65OukFruUk3vEaSUtvOddVixNBluj3al8mbV5LDN+2M
-         Kdx5jYiXYGVYRGNHl2Tz8zdM4q0bJsdAj8Or6cglaOH0HmGtAF80HtKZeKkcBHVUqWX+
-         PD2L02yoAjQMavN0syyIfdg7zczvDQTLcRn50T3xQ3a7AyJkMPvdmmZkoelJSKt7kyoP
-         PfrQ==
+        bh=IwqIwv/tqLiASfdNBOtwEIEJYiaaWmQZ93Bhvs67JGQ=;
+        b=OIPfQ5hZVDJHUQ1cSW77jctoIXVTpbXLH1is/tZE2O1XfProT+a3dvD8u1FzOEf5ZV
+         JFU9CPp78hu4VYiSgoy029WjYqW36ZtPrMWPxAsT7DixBtPhRdWw4vEZjL9sEEzPdjYb
+         Bu0ZOw44UuqO9JBpIlpZxPKvSvJAodiHrgTWqhM3fPwckbpT1XIwSjR93eegagK2oQqm
+         4ZY1zTnoOATBSmFspDxOhLhOzGTMKg2nzVMkEhGcTZ9E6BSU+SsG7WzyQbkk9TT8G0Df
+         sQCm3IeUWa6dZXbmf9R5WEBCbhw7wQaOKReZnC0x1Q/TSW3eGv6+xLk1+NAQ8hTPSH4c
+         1hJA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679693443;
+        d=1e100.net; s=20210112; t=1679693588;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=qqk3VIkkZ+eaNmKFC4g7qKHFQk1Ktr5Ri5CUqa6GS3c=;
-        b=EATt+VpRCqXnoNS9yDxFM6rKOjFbXrfvwUufD7ywKmYafB9IPi7v5OPVQP/SbXqbrg
-         b4mMLAvS2jBdWD/KS77sxwlbrn8wKhG6EOnOJfybArq85cOReuOePNkxf3EJoQfdiHlo
-         xCZMoO7XciVXX62tn/c3aXki2claVnStCpenX60BLjviFfmXT0jc4vsgESkxfx6v0+0f
-         i2hdFsSP6Oymda9Lvx6Z3n4643tO91pYldiyommN5GaMiz1XA8KMbD7HPbzvoVF28wJY
-         imZoar1T+ajOY5gsX8zWvBKrLBHcHUKtSN/vTRIm8vU+FmVBuu4WTFKtFf+eGGQfOrH7
-         UuHg==
-X-Gm-Message-State: AAQBX9cNz5MOUUO/Pk5TU48vbgl+IudvC4Bml/js2U1R0sv29wv0CwvK
-        Ej2paFc5DJ23z4O33PG9NL6mT27SkhE=
-X-Google-Smtp-Source: AKy350blyyifafkda063U/S/0uYv8jmG3MBHoNiQ+CQtG/xbECNu7KE46no7R2/W/LjITOLoUNNvUfq24Yk=
+        bh=IwqIwv/tqLiASfdNBOtwEIEJYiaaWmQZ93Bhvs67JGQ=;
+        b=ku2ssqhVPNaNRuHYMaCtb2F15/Xne2XKIoBAIoHtiubOJm6BxJVuFGsFxlzrOs9H4f
+         AVdrkpq9+Nx8chFJChMFBV59b0q9qWNQeC7xueXNJvU20xSrpWxb88zzIA4LCOqgQEZU
+         aT2xt5/d2j/MovnYGRZgEmm/nUcsa+5KbwCYcxg062H/JrVUW+bhWqoyTAFr2JEtbZJ5
+         6/K8akK+blvYHZOv4hI6K4rxIvBTwUKo0vYkrDIfD2l42dw8aDGG8RYtQAehAolFidjU
+         0Oq3zkZRgaDqKIT3ENWgBkfj+Dq7h2ZiVSFaHEf+h19+zia9o01FeYyl2ECyrYtNv6KU
+         2bxQ==
+X-Gm-Message-State: AAQBX9cc/Cwq/eFKMcsmYUPigv18J0Vy504cLtLJZCOLs6NrabDxQKHG
+        e7K0aElp3Z+Yy4sgS3bXh2Ezn3LehRs=
+X-Google-Smtp-Source: AKy350aQM1Ru4OKWaay1ah7w1ErMxIg9e8pk6GVoOvCFEK9Q8i70sf+Y+u16TQBCc2MBGtY74ApaJs2UeT0=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:e74b:b0:1a1:b440:3767 with SMTP id
- p11-20020a170902e74b00b001a1b4403767mr1583993plf.3.1679693443732; Fri, 24 Mar
- 2023 14:30:43 -0700 (PDT)
-Date:   Fri, 24 Mar 2023 14:30:42 -0700
-In-Reply-To: <ZB4PqcsZlE8cOo0C@google.com>
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:2385:b0:5aa:310c:e65b with SMTP id
+ f5-20020a056a00238500b005aa310ce65bmr2334505pfc.2.1679693588421; Fri, 24 Mar
+ 2023 14:33:08 -0700 (PDT)
+Date:   Fri, 24 Mar 2023 14:32:48 -0700
+In-Reply-To: <20230322144528.704077-1-ivan.orlov0322@gmail.com>
 Mime-Version: 1.0
-References: <20230221163655.920289-1-mizhang@google.com> <167969137429.2756469.2347841728687804486.b4-ty@google.com>
- <ZB4PqcsZlE8cOo0C@google.com>
-Message-ID: <ZB4WglXwnOe7HFb1@google.com>
-Subject: Re: [PATCH v3 00/13] Overhauling amx_test
+References: <20230322144528.704077-1-ivan.orlov0322@gmail.com>
+X-Mailer: git-send-email 2.40.0.348.gf938b09366-goog
+Message-ID: <167969290615.2764662.14384745948331970319.b4-ty@google.com>
+Subject: Re: [PATCH] selftests: kvm: Add 'malloc' failure check in vcpu_save_state
 From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Mingwei Zhang <mizhang@google.com>
-Cc:     "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        Jim Mattson <jmattson@google.com>,
-        Venkatesh Srinivas <venkateshs@google.com>,
-        Aaron Lewis <aaronlewis@google.com>,
-        "Chang S. Bae" <chang.seok.bae@intel.com>,
-        Chao Gao <chao.gao@intel.com>
-Content-Type: text/plain; charset="us-ascii"
+To:     Sean Christopherson <seanjc@google.com>, pbonzini@redhat.com,
+        shuah@kernel.org, dmatlack@google.com, vannapurve@google.com,
+        Ivan Orlov <ivan.orlov0322@gmail.com>
+Cc:     kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        linux-kernel@vger.kernel.org, himadrispandya@gmail.com,
+        linux-kernel-mentees@lists.linuxfoundation.org
+Content-Type: text/plain; charset="utf-8"
 X-Spam-Status: No, score=-7.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
@@ -74,50 +70,19 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Mar 24, 2023, Sean Christopherson wrote:
-> On Fri, Mar 24, 2023, Sean Christopherson wrote:
-> > On Tue, 21 Feb 2023 16:36:42 +0000, Mingwei Zhang wrote:
-> > > In this version, I have integrated Aaron's changes to the amx_test. In
-> > > addition, we also integrated one fix patch for a kernel warning due to
-> > > xsave address issue.
-> > > 
-> > > Patch 1:
-> > > Fix a host FPU kernel warning due to missing XTILEDATA in xinit.
-> > > 
-> > > [...]
-> > 
-> > Applied everything except patch 7 to kvm-x86 selftests.  Please holler if I
-> > missed something subtle about patch 7 (using & vs. ==).  This is at the head
-> > of kvm-x86/selftests, i.e. I can fix it up if necessary.
-> > 
-> > [01/13] x86/fpu/xstate: Avoid getting xstate address of init_fpstate if fpstate contains the component
-> >         (no commit info)
+On Wed, 22 Mar 2023 18:45:28 +0400, Ivan Orlov wrote:
+> There is a 'malloc' call in vcpu_save_state function, which can
+> be unsuccessful. This patch will add the malloc failure checking
+> to avoid possible null dereference and give more information
+> about test fail reasons.
 > 
-> *sigh*  And by "everything" I meant "all of the selftests patches".
+> 
 
-Continuing my circus of goofs, I already force pushed selftests due to an unrelated
-mixup.  New hashes below (the comment above still stands in case another overwrite
-is necessary).
+Applied to kvm-x86 selftests, thanks!
 
-       [1/11] KVM: selftests: Add a fully functional "struct xstate" for x86
-             https://github.com/kvm-x86/linux/commit/5de4a3765b7e
-       [2/11] KVM: selftests: Fix an error in comment of amx_test
-             https://github.com/kvm-x86/linux/commit/bec357a4af55
-       [3/11] KVM: selftests: Enable checking on xcomp_bv in amx_test
-             https://github.com/kvm-x86/linux/commit/48ad4222c43c
-       [4/11] KVM: selftests: Add check of CR0.TS in the #NM handler in amx_test
-             https://github.com/kvm-x86/linux/commit/0aeb9729486a
-       [5/11] KVM: selftests: Assert that XTILE_DATA is set in IA32_XFD on #NM
-             https://github.com/kvm-x86/linux/commit/9cbd9aaa670f
-       [6/11] KVM: selftests: Verify XTILE_DATA in XSTATE isn't affected by IA32_XFD
-             https://github.com/kvm-x86/linux/commit/bfc5afc37c9d
-       [7/11] KVM: selftests: Assert that XTILE is XSAVE-enabled
-             https://github.com/kvm-x86/linux/commit/7e1075f05078
-       [8/11] KVM: selftests: Assert that both XTILE{CFG,DATA} are XSAVE-enabled
-             https://github.com/kvm-x86/linux/commit/2ab3991b0b9b
-       [9/11] KVM: selftests: Move XSAVE and OSXSAVE CPUID checks into AMX's init_regs()
-             https://github.com/kvm-x86/linux/commit/d01d4a4f7bd2
-       [10/11] KVM: selftests: Check that the palette table exists before using it
-             https://github.com/kvm-x86/linux/commit/d32fb0714293
-       [11/11] KVM: selftests: Check that XTILEDATA supports XFD
-             https://github.com/kvm-x86/linux/commit/d563164eaeb1
+[1/1] selftests: kvm: Add 'malloc' failure check in vcpu_save_state
+      https://github.com/kvm-x86/linux/commit/735b0e0f2d00
+
+--
+https://github.com/kvm-x86/linux/tree/next
+https://github.com/kvm-x86/linux/tree/fixes
