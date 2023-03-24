@@ -2,443 +2,355 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E3E0B6C76E0
-	for <lists+kvm@lfdr.de>; Fri, 24 Mar 2023 06:13:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6127B6C7765
+	for <lists+kvm@lfdr.de>; Fri, 24 Mar 2023 06:32:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231277AbjCXFNY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Mar 2023 01:13:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52442 "EHLO
+        id S231466AbjCXFcP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Mar 2023 01:32:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49584 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231248AbjCXFNW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Mar 2023 01:13:22 -0400
-Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD5C328E5C;
-        Thu, 23 Mar 2023 22:13:20 -0700 (PDT)
-Received: by mail-pl1-x62f.google.com with SMTP id k2so849523pll.8;
-        Thu, 23 Mar 2023 22:13:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1679634800;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HMbssvDMLyns5p8kQxq1qVkm3pP21bbXYOYPLMoBLMo=;
-        b=mOe28GRpbv6TlePBknRWEkQhY88KZqudO8N8/A9loC+3mqUy3fCDyTjJALgb7xm/EN
-         2vXkPPJLwLKLKHNNYgUf72T+QZFckaxHVAla+Kr12lkr97lPFQ+tzFckoLY0+WTq0Fh7
-         QVE4B29LT+501IqYk1ERC6Q+yQOLN//3SDr5Uzp9UcGQK83kYvVYKsanN51dJ2HmC7Ta
-         GTU9Y5k767nqsKllMFHJZJM2HbFDaTKGOV5eAsDZ9yoGYN/m8j8R8BZAwjUuDjABwZ54
-         DejzHkXNFx5803YzyM58hRHh/ZKenM92ji3LYXLo9UnP0Acr7V7G21NSHEA2EFTKLbn3
-         hSJw==
+        with ESMTP id S229794AbjCXFcH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Mar 2023 01:32:07 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 934A28F
+        for <kvm@vger.kernel.org>; Thu, 23 Mar 2023 22:31:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1679635878;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=N2a1xvUOUTDa8qNXVZtHHs2/wy9h/5BrtN8IXVy3fEQ=;
+        b=Khec35JNVB66AkW4liSV3eU8cK1K/3AgeSUmZ874Qt6pjbStXQIyzUh9WSJpj507wnLuP0
+        mftPRBmZBXhJ5YHW1/laWnpgWQF2Rxs52kKMs+QRDVs2X5jATdfkigTrbcJDykBNlziJHi
+        BtwtKwBblf+O4EnFV/ZeKGB46610J1Y=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-578-kcpDXhIOO0eK4GeNGakuNg-1; Fri, 24 Mar 2023 01:31:17 -0400
+X-MC-Unique: kcpDXhIOO0eK4GeNGakuNg-1
+Received: by mail-wm1-f72.google.com with SMTP id p10-20020a05600c358a00b003edf7d484d4so291772wmq.0
+        for <kvm@vger.kernel.org>; Thu, 23 Mar 2023 22:31:16 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679634800;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=HMbssvDMLyns5p8kQxq1qVkm3pP21bbXYOYPLMoBLMo=;
-        b=t7ZoT5qTdiTuhNzvP/uvQ4EEfMHoGllfKqSkyv9HglAd74EtHtqa02j1QC7svo+4kP
-         txaj+x9x8MdxkiPPEhI7VSR9v1ym9fVDa6eZvGDoX+Rtkbs8cRk/YX0fuEUN8tsaXlYK
-         yTCN5XvHFYBuQgcU3hv7eSloJHkom4RFGhi0IxNMfkzULhhM6lj6sq93T+28b/fHsX3/
-         vcMWDMEKAO93hfxrnxdgU/d6ACbqqQWjymsNmFR/a+jmYa+hbuTl+uCSPrnN809o7/NU
-         LHRiTtwEX4YVI6yrpCF8Ha33t3Pkz2iarr5hX4VkvcqSMwQc3/hCDbwputUZxH7BKKE7
-         AClw==
-X-Gm-Message-State: AAQBX9fQLiXf9DHG5TTPbt5AYbffSNn/FQ5D/CzeHNb9oKdamC/CTKDr
-        QrTPBhd5wx8MHEFdi4iqEYI=
-X-Google-Smtp-Source: AKy350aXuHY5aB+ukFywiQb3yy/4TIQSZAFzLUO9yRat2dYms7Mp5ukskoPcW4ebdJq97METoANZCw==
-X-Received: by 2002:a17:903:234c:b0:1a1:b9e6:28a8 with SMTP id c12-20020a170903234c00b001a1b9e628a8mr1744283plh.45.1679634800073;
-        Thu, 23 Mar 2023 22:13:20 -0700 (PDT)
-Received: from bobo.ibm.com ([124.170.18.191])
-        by smtp.gmail.com with ESMTPSA id l4-20020a170902eb0400b0019a70a85e8fsm13169774plb.220.2023.03.23.22.13.17
+        d=1e100.net; s=20210112; t=1679635876;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=N2a1xvUOUTDa8qNXVZtHHs2/wy9h/5BrtN8IXVy3fEQ=;
+        b=wQeRdSac3g+w2jyTZ3DhV4TedQzb45TJmzfVmW4gtr/OUMKNc1MBFIoDRkpSLeDOq9
+         tibXIYpTSuLk+C554FPYF8Pls5NROG66nXqT8TOxZvMjNWHYK4SFQLKXfqgrnL5Kxjdl
+         G2CfHjLYBEzAjhefGeaXKgoLpGrZr5vHZbTUYmMh+UvhV9OPM+MLgnE6YDTu9SF9aeFu
+         motTAbCeT3yvyBULvyoe/lxxf+O+mrjdqRK2gItvZxBTYkwJglhSJUMrvEodSrBf//gi
+         m5CE9U7CClyXDAK6FTWYeBObEEzpuSdmX+25NaMVJIcXke/eTbRCNbXkBg68n1HsuXyF
+         X09A==
+X-Gm-Message-State: AAQBX9ecePPOi/cOTK/2tSMAHGkPEyAGdkNbNNaDwQP7lLckXFwTYJvO
+        j4atkagIdwOqpWcNe+hFH3o6HFDtScr0BE894I+pEQZ4+H5rcR0heE0ANsSdoFJLWICtC3ItzCa
+        51IXr4j3XQdvM
+X-Received: by 2002:a5d:6b8b:0:b0:2ce:ad08:ca4 with SMTP id n11-20020a5d6b8b000000b002cead080ca4mr989245wrx.35.1679635875955;
+        Thu, 23 Mar 2023 22:31:15 -0700 (PDT)
+X-Google-Smtp-Source: AKy350b3Mx7v295xk69JlKaVftSlan8v8qU7rb+a8DZjWnx7PlsPog3Ko+6oMYE2zmGyg7YJu5D+BQ==
+X-Received: by 2002:a5d:6b8b:0:b0:2ce:ad08:ca4 with SMTP id n11-20020a5d6b8b000000b002cead080ca4mr989228wrx.35.1679635875586;
+        Thu, 23 Mar 2023 22:31:15 -0700 (PDT)
+Received: from redhat.com ([2.52.12.190])
+        by smtp.gmail.com with ESMTPSA id e23-20020a5d5957000000b002cfefa50a8esm17502567wri.98.2023.03.23.22.31.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Mar 2023 22:13:19 -0700 (PDT)
-From:   Nicholas Piggin <npiggin@gmail.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Nicholas Piggin <npiggin@gmail.com>, Shuah Khan <shuah@kernel.org>,
-        linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
-        linux-kselftest@vger.kernel.org
-Subject: [PATCH v2 2/2] KVM: PPC: selftests: basic sanity tests
-Date:   Fri, 24 Mar 2023 15:12:54 +1000
-Message-Id: <20230324051254.1894918-3-npiggin@gmail.com>
-X-Mailer: git-send-email 2.37.2
-In-Reply-To: <20230324051254.1894918-1-npiggin@gmail.com>
-References: <20230324051254.1894918-1-npiggin@gmail.com>
+        Thu, 23 Mar 2023 22:31:14 -0700 (PDT)
+Date:   Fri, 24 Mar 2023 01:31:11 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     Viktor Prutyanov <viktor@daynix.com>, cohuck@redhat.com,
+        pasic@linux.ibm.com, farman@linux.ibm.com,
+        linux-s390@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        linux-kernel@vger.kernel.org, yan@daynix.com
+Subject: Re: [PATCH v5] virtio: add VIRTIO_F_NOTIFICATION_DATA feature support
+Message-ID: <20230324011454-mutt-send-email-mst@kernel.org>
+References: <20230323085551.2346411-1-viktor@daynix.com>
+ <CACGkMEsTpdES6Gzsx7eobJsac8a1V0dqfRm3vExrd1e+TJ_bVg@mail.gmail.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
-        DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-        version=3.4.6
+In-Reply-To: <CACGkMEsTpdES6Gzsx7eobJsac8a1V0dqfRm3vExrd1e+TJ_bVg@mail.gmail.com>
+X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add tests that exercise basic functions of the kvm selftests framework,
-guest creation, ucalls, hcalls, copying data between guest and host,
-interrupts and page faults.
+On Fri, Mar 24, 2023 at 11:09:19AM +0800, Jason Wang wrote:
+> On Thu, Mar 23, 2023 at 4:56 PM Viktor Prutyanov <viktor@daynix.com> wrote:
+> >
+> > According to VirtIO spec v1.2, VIRTIO_F_NOTIFICATION_DATA feature
+> > indicates that the driver passes extra data along with the queue
+> > notifications.
+> >
+> > In a split queue case, the extra data is 16-bit available index. In a
+> > packed queue case, the extra data is 1-bit wrap counter and 15-bit
+> > available index.
+> >
+> > Add support for this feature for MMIO, channel I/O and modern PCI
+> > transports.
+> >
+> > Signed-off-by: Viktor Prutyanov <viktor@daynix.com>
+> > ---
+> >  v5: replace ternary operator with if-else
+> >  v4: remove VP_NOTIFY macro and legacy PCI support, add
+> >     virtio_ccw_kvm_notify_with_data to virtio_ccw
+> >  v3: support feature in virtio_ccw, remove VM_NOTIFY, use avail_idx_shadow,
+> >     remove byte swap, rename to vring_notification_data
+> >  v2: reject the feature in virtio_ccw, replace __le32 with u32
+> >
+> >  Tested with disabled VIRTIO_F_NOTIFICATION_DATA on qemu-system-s390x
+> >  (virtio-blk-ccw), qemu-system-riscv64 (virtio-blk-device,
+> >  virtio-rng-device), qemu-system-x86_64 (virtio-blk-pci, virtio-net-pci)
+> >  to make sure nothing is broken.
+> >  Tested with enabled VIRTIO_F_NOTIFICATION_DATA on 64-bit RISC-V Linux
+> >  and my hardware implementation of virtio-rng with MMIO.
+> >
+> >  drivers/s390/virtio/virtio_ccw.c   | 22 +++++++++++++++++++---
+> >  drivers/virtio/virtio_mmio.c       | 18 +++++++++++++++++-
+> >  drivers/virtio/virtio_pci_modern.c | 17 ++++++++++++++++-
+> >  drivers/virtio/virtio_ring.c       | 17 +++++++++++++++++
+> >  include/linux/virtio_ring.h        |  2 ++
+> >  include/uapi/linux/virtio_config.h |  6 ++++++
+> >  6 files changed, 77 insertions(+), 5 deletions(-)
+> >
+> > diff --git a/drivers/s390/virtio/virtio_ccw.c b/drivers/s390/virtio/virtio_ccw.c
+> > index 954fc31b4bc7..9a9c5d34454c 100644
+> > --- a/drivers/s390/virtio/virtio_ccw.c
+> > +++ b/drivers/s390/virtio/virtio_ccw.c
+> > @@ -391,7 +391,7 @@ static void virtio_ccw_drop_indicator(struct virtio_ccw_device *vcdev,
+> >         ccw_device_dma_free(vcdev->cdev, thinint_area, sizeof(*thinint_area));
+> >  }
+> >
+> > -static bool virtio_ccw_kvm_notify(struct virtqueue *vq)
+> > +static inline bool virtio_ccw_do_kvm_notify(struct virtqueue *vq, u32 data)
+> >  {
+> >         struct virtio_ccw_vq_info *info = vq->priv;
+> >         struct virtio_ccw_device *vcdev;
+> > @@ -402,12 +402,22 @@ static bool virtio_ccw_kvm_notify(struct virtqueue *vq)
+> >         BUILD_BUG_ON(sizeof(struct subchannel_id) != sizeof(unsigned int));
+> >         info->cookie = kvm_hypercall3(KVM_S390_VIRTIO_CCW_NOTIFY,
+> >                                       *((unsigned int *)&schid),
+> > -                                     vq->index, info->cookie);
+> > +                                     data, info->cookie);
+> >         if (info->cookie < 0)
+> >                 return false;
+> >         return true;
+> >  }
+> >
+> > +static bool virtio_ccw_kvm_notify(struct virtqueue *vq)
+> > +{
+> > +       return virtio_ccw_do_kvm_notify(vq, vq->index);
+> > +}
+> > +
+> > +static bool virtio_ccw_kvm_notify_with_data(struct virtqueue *vq)
+> > +{
+> > +       return virtio_ccw_do_kvm_notify(vq, vring_notification_data(vq));
+> > +}
+> > +
+> >  static int virtio_ccw_read_vq_conf(struct virtio_ccw_device *vcdev,
+> >                                    struct ccw1 *ccw, int index)
+> >  {
+> > @@ -501,6 +511,12 @@ static struct virtqueue *virtio_ccw_setup_vq(struct virtio_device *vdev,
+> >         u64 queue;
+> >         unsigned long flags;
+> >         bool may_reduce;
+> > +       bool (*notify)(struct virtqueue *vq);
+> > +
+> > +       if (__virtio_test_bit(vdev, VIRTIO_F_NOTIFICATION_DATA))
+> > +               notify = virtio_ccw_kvm_notify_with_data;
+> > +       else
+> > +               notify = virtio_ccw_kvm_notify;
+> >
+> >         /* Allocate queue. */
+> >         info = kzalloc(sizeof(struct virtio_ccw_vq_info), GFP_KERNEL);
+> > @@ -524,7 +540,7 @@ static struct virtqueue *virtio_ccw_setup_vq(struct virtio_device *vdev,
+> >         may_reduce = vcdev->revision > 0;
+> >         vq = vring_create_virtqueue(i, info->num, KVM_VIRTIO_CCW_RING_ALIGN,
+> >                                     vdev, true, may_reduce, ctx,
+> > -                                   virtio_ccw_kvm_notify, callback, name);
+> > +                                   notify, callback, name);
+> >
+> >         if (!vq) {
+> >                 /* For now, we fail if we can't get the requested size. */
+> > diff --git a/drivers/virtio/virtio_mmio.c b/drivers/virtio/virtio_mmio.c
+> > index 3ff746e3f24a..7e87f745f68d 100644
+> > --- a/drivers/virtio/virtio_mmio.c
+> > +++ b/drivers/virtio/virtio_mmio.c
+> > @@ -285,6 +285,16 @@ static bool vm_notify(struct virtqueue *vq)
+> >         return true;
+> >  }
+> >
+> > +static bool vm_notify_with_data(struct virtqueue *vq)
+> > +{
+> > +       struct virtio_mmio_device *vm_dev = to_virtio_mmio_device(vq->vdev);
+> > +       u32 data = vring_notification_data(vq);
+> > +
+> > +       writel(data, vm_dev->base + VIRTIO_MMIO_QUEUE_NOTIFY);
+> > +
+> > +       return true;
+> > +}
+> > +
+> >  /* Notify all virtqueues on an interrupt. */
+> >  static irqreturn_t vm_interrupt(int irq, void *opaque)
+> >  {
+> > @@ -368,6 +378,12 @@ static struct virtqueue *vm_setup_vq(struct virtio_device *vdev, unsigned int in
+> >         unsigned long flags;
+> >         unsigned int num;
+> >         int err;
+> > +       bool (*notify)(struct virtqueue *vq);
+> > +
+> > +       if (__virtio_test_bit(vdev, VIRTIO_F_NOTIFICATION_DATA))
+> > +               notify = vm_notify_with_data;
+> > +       else
+> > +               notify = vm_notify;
+> >
+> >         if (!name)
+> >                 return NULL;
+> > @@ -397,7 +413,7 @@ static struct virtqueue *vm_setup_vq(struct virtio_device *vdev, unsigned int in
+> >
+> >         /* Create the vring */
+> >         vq = vring_create_virtqueue(index, num, VIRTIO_MMIO_VRING_ALIGN, vdev,
+> > -                                true, true, ctx, vm_notify, callback, name);
+> > +                                true, true, ctx, notify, callback, name);
+> >         if (!vq) {
+> >                 err = -ENOMEM;
+> >                 goto error_new_virtqueue;
+> > diff --git a/drivers/virtio/virtio_pci_modern.c b/drivers/virtio/virtio_pci_modern.c
+> > index 9e496e288cfa..3bfc368b279e 100644
+> > --- a/drivers/virtio/virtio_pci_modern.c
+> > +++ b/drivers/virtio/virtio_pci_modern.c
+> > @@ -288,6 +288,15 @@ static u16 vp_config_vector(struct virtio_pci_device *vp_dev, u16 vector)
+> >         return vp_modern_config_vector(&vp_dev->mdev, vector);
+> >  }
+> >
+> > +static bool vp_notify_with_data(struct virtqueue *vq)
+> > +{
+> > +       u32 data = vring_notification_data(vq);
+> > +
+> > +       iowrite32(data, (void __iomem *)vq->priv);
+> > +
+> > +       return true;
+> > +}
+> > +
+> >  static struct virtqueue *setup_vq(struct virtio_pci_device *vp_dev,
+> >                                   struct virtio_pci_vq_info *info,
+> >                                   unsigned int index,
+> > @@ -301,6 +310,12 @@ static struct virtqueue *setup_vq(struct virtio_pci_device *vp_dev,
+> >         struct virtqueue *vq;
+> >         u16 num;
+> >         int err;
+> > +       bool (*notify)(struct virtqueue *vq);
+> > +
+> > +       if (__virtio_test_bit(&vp_dev->vdev, VIRTIO_F_NOTIFICATION_DATA))
+> > +               notify = vp_notify_with_data;
+> > +       else
+> > +               notify = vp_notify;
+> >
+> >         if (index >= vp_modern_get_num_queues(mdev))
+> >                 return ERR_PTR(-EINVAL);
+> > @@ -321,7 +336,7 @@ static struct virtqueue *setup_vq(struct virtio_pci_device *vp_dev,
+> >         vq = vring_create_virtqueue(index, num,
+> >                                     SMP_CACHE_BYTES, &vp_dev->vdev,
+> >                                     true, true, ctx,
+> > -                                   vp_notify, callback, name);
+> > +                                   notify, callback, name);
+> >         if (!vq)
+> >                 return ERR_PTR(-ENOMEM);
+> >
+> > diff --git a/drivers/virtio/virtio_ring.c b/drivers/virtio/virtio_ring.c
+> > index 4c3bb0ddeb9b..837875cc3190 100644
+> > --- a/drivers/virtio/virtio_ring.c
+> > +++ b/drivers/virtio/virtio_ring.c
+> > @@ -2752,6 +2752,21 @@ void vring_del_virtqueue(struct virtqueue *_vq)
+> >  }
+> >  EXPORT_SYMBOL_GPL(vring_del_virtqueue);
+> >
+> > +u32 vring_notification_data(struct virtqueue *_vq)
+> > +{
+> > +       struct vring_virtqueue *vq = to_vvq(_vq);
+> > +       u16 next;
+> > +
+> > +       if (vq->packed_ring)
+> > +               next = (vq->packed.next_avail_idx & ~(1 << 15)) |
+> > +                       vq->packed.avail_wrap_counter << 15;
+> 
+> Nit: We have VRING_PACKED_EVENT_F_WRAP_CTR which could be used for
+> replacing 15 here.
+> 
+> And we have many places for packing them into u16, it might be better
+> to introduce a helper.
 
-These don't stress KVM so much as being useful when developing support
-for powerpc.
+Not sure about a helper, I'd leave that for a future cleanup.
 
-Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
----
- tools/testing/selftests/kvm/Makefile          |   2 +
- .../selftests/kvm/include/powerpc/hcall.h     |   2 +
- .../testing/selftests/kvm/powerpc/null_test.c | 166 ++++++++++++++++++
- .../selftests/kvm/powerpc/rtas_hcall.c        | 146 +++++++++++++++
- 4 files changed, 316 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/powerpc/null_test.c
- create mode 100644 tools/testing/selftests/kvm/powerpc/rtas_hcall.c
+However I would use
 
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index 908602a9f513..d4052eccaaee 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -181,6 +181,8 @@ TEST_GEN_PROGS_riscv += kvm_page_table_test
- TEST_GEN_PROGS_riscv += set_memory_region_test
- TEST_GEN_PROGS_riscv += kvm_binary_stats_test
- 
-+TEST_GEN_PROGS_powerpc += powerpc/null_test
-+TEST_GEN_PROGS_powerpc += powerpc/rtas_hcall
- TEST_GEN_PROGS_powerpc += demand_paging_test
- TEST_GEN_PROGS_powerpc += dirty_log_test
- TEST_GEN_PROGS_powerpc += kvm_create_max_vcpus
-diff --git a/tools/testing/selftests/kvm/include/powerpc/hcall.h b/tools/testing/selftests/kvm/include/powerpc/hcall.h
-index 4eb9ad635402..cbcaf180c427 100644
---- a/tools/testing/selftests/kvm/include/powerpc/hcall.h
-+++ b/tools/testing/selftests/kvm/include/powerpc/hcall.h
-@@ -13,6 +13,8 @@
- #define UCALL_R4_EXCPT	0x1b0f // other exception, r5 contains vector, r6,7 SRRs
- #define UCALL_R4_SIMPLE	0x0000 // simple exit usable by asm with no ucall data
- 
-+#define H_RTAS		0xf000
-+
- int64_t hcall0(uint64_t token);
- int64_t hcall1(uint64_t token, uint64_t arg1);
- int64_t hcall2(uint64_t token, uint64_t arg1, uint64_t arg2);
-diff --git a/tools/testing/selftests/kvm/powerpc/null_test.c b/tools/testing/selftests/kvm/powerpc/null_test.c
-new file mode 100644
-index 000000000000..31db0b6becd6
---- /dev/null
-+++ b/tools/testing/selftests/kvm/powerpc/null_test.c
-@@ -0,0 +1,166 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Tests for guest creation, run, ucall, interrupt, and vm dumping.
-+ */
-+
-+#define _GNU_SOURCE /* for program_invocation_short_name */
-+#include <fcntl.h>
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <string.h>
-+#include <sys/ioctl.h>
-+
-+#include "test_util.h"
-+#include "kvm_util.h"
-+#include "kselftest.h"
-+#include "processor.h"
-+#include "helpers.h"
-+
-+extern void guest_code_asm(void);
-+asm(".global guest_code_asm");
-+asm(".balign 4");
-+asm("guest_code_asm:");
-+asm("li 3,0"); // H_UCALL
-+asm("li 4,0"); // UCALL_R4_SIMPLE
-+asm("sc 1");
-+
-+static void test_asm(void)
-+{
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_vm *vm;
-+
-+	vm = vm_create_with_one_vcpu(&vcpu, guest_code_asm);
-+
-+	vcpu_run(vcpu);
-+	handle_ucall(vcpu, UCALL_NONE);
-+
-+	kvm_vm_free(vm);
-+}
-+
-+static void guest_code_ucall(void)
-+{
-+	GUEST_DONE();
-+}
-+
-+static void test_ucall(void)
-+{
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_vm *vm;
-+
-+	vm = vm_create_with_one_vcpu(&vcpu, guest_code_ucall);
-+
-+	vcpu_run(vcpu);
-+	handle_ucall(vcpu, UCALL_DONE);
-+
-+	kvm_vm_free(vm);
-+}
-+
-+static void trap_handler(struct ex_regs *regs)
-+{
-+	GUEST_SYNC(1);
-+	regs->nia += 4;
-+}
-+
-+static void guest_code_trap(void)
-+{
-+	GUEST_SYNC(0);
-+	asm volatile("trap");
-+	GUEST_DONE();
-+}
-+
-+static void test_trap(void)
-+{
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_vm *vm;
-+
-+	vm = vm_create_with_one_vcpu(&vcpu, guest_code_trap);
-+	vm_install_exception_handler(vm, 0x700, trap_handler);
-+
-+	vcpu_run(vcpu);
-+	host_sync(vcpu, 0);
-+	vcpu_run(vcpu);
-+	host_sync(vcpu, 1);
-+	vcpu_run(vcpu);
-+	handle_ucall(vcpu, UCALL_DONE);
-+
-+	vm_install_exception_handler(vm, 0x700, NULL);
-+
-+	kvm_vm_free(vm);
-+}
-+
-+static void dsi_handler(struct ex_regs *regs)
-+{
-+	GUEST_SYNC(1);
-+	regs->nia += 4;
-+}
-+
-+static void guest_code_dsi(void)
-+{
-+	GUEST_SYNC(0);
-+	asm volatile("stb %r0,0(0)");
-+	GUEST_DONE();
-+}
-+
-+static void test_dsi(void)
-+{
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_vm *vm;
-+
-+	vm = vm_create_with_one_vcpu(&vcpu, guest_code_dsi);
-+	vm_install_exception_handler(vm, 0x300, dsi_handler);
-+
-+	vcpu_run(vcpu);
-+	host_sync(vcpu, 0);
-+	vcpu_run(vcpu);
-+	host_sync(vcpu, 1);
-+	vcpu_run(vcpu);
-+	handle_ucall(vcpu, UCALL_DONE);
-+
-+	vm_install_exception_handler(vm, 0x300, NULL);
-+
-+	kvm_vm_free(vm);
-+}
-+
-+static void test_dump(void)
-+{
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_vm *vm;
-+
-+	vm = vm_create_with_one_vcpu(&vcpu, guest_code_ucall);
-+
-+	vcpu_run(vcpu);
-+	handle_ucall(vcpu, UCALL_DONE);
-+
-+	printf("Testing vm_dump...\n");
-+	vm_dump(stderr, vm, 2);
-+
-+	kvm_vm_free(vm);
-+}
-+
-+
-+struct testdef {
-+	const char *name;
-+	void (*test)(void);
-+} testlist[] = {
-+	{ "null asm test", test_asm},
-+	{ "null ucall test", test_ucall},
-+	{ "trap test", test_trap},
-+	{ "page fault test", test_dsi},
-+	{ "vm dump test", test_dump},
-+};
-+
-+int main(int argc, char *argv[])
-+{
-+	int idx;
-+
-+	ksft_print_header();
-+
-+	ksft_set_plan(ARRAY_SIZE(testlist));
-+
-+	for (idx = 0; idx < ARRAY_SIZE(testlist); idx++) {
-+		testlist[idx].test();
-+		ksft_test_result_pass("%s\n", testlist[idx].name);
-+	}
-+
-+	ksft_finished();	/* Print results and exit() accordingly */
-+}
-diff --git a/tools/testing/selftests/kvm/powerpc/rtas_hcall.c b/tools/testing/selftests/kvm/powerpc/rtas_hcall.c
-new file mode 100644
-index 000000000000..4d5532eac650
---- /dev/null
-+++ b/tools/testing/selftests/kvm/powerpc/rtas_hcall.c
-@@ -0,0 +1,146 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Test the KVM H_RTAS hcall and copying buffers between guest and host.
-+ */
-+
-+#define _GNU_SOURCE /* for program_invocation_short_name */
-+#include <fcntl.h>
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <string.h>
-+#include <sys/ioctl.h>
-+
-+#include "test_util.h"
-+#include "kvm_util.h"
-+#include "kselftest.h"
-+#include "hcall.h"
-+
-+struct rtas_args {
-+	__be32 token;
-+	__be32 nargs;
-+	__be32 nret;
-+	__be32 args[16];
-+        __be32 *rets;     /* Pointer to return values in args[]. */
-+};
-+
-+static void guest_code(void)
-+{
-+	struct rtas_args r;
-+	int64_t rc;
-+
-+	r.token = cpu_to_be32(0xdeadbeef);
-+	r.nargs = cpu_to_be32(3);
-+	r.nret = cpu_to_be32(2);
-+	r.rets = &r.args[3];
-+	r.args[0] = cpu_to_be32(0x1000);
-+	r.args[1] = cpu_to_be32(0x1001);
-+	r.args[2] = cpu_to_be32(0x1002);
-+	rc = hcall1(H_RTAS, (uint64_t)&r);
-+	GUEST_ASSERT(rc == 0);
-+	GUEST_ASSERT_1(be32_to_cpu(r.rets[0]) == 0xabc, be32_to_cpu(r.rets[0]));
-+	GUEST_ASSERT_1(be32_to_cpu(r.rets[1]) == 0x123, be32_to_cpu(r.rets[1]));
-+
-+	GUEST_DONE();
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	struct kvm_regs regs;
-+	struct rtas_args *r;
-+	vm_vaddr_t rtas_vaddr;
-+	struct ucall uc;
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_vm *vm;
-+	uint64_t tmp;
-+	int ret;
-+
-+	ksft_print_header();
-+
-+	ksft_set_plan(1);
-+
-+	/* Create VM */
-+	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
-+
-+	printf("Running H_RTAS guest vcpu.\n");
-+
-+	ret = _vcpu_run(vcpu);
-+	TEST_ASSERT(ret == 0, "vcpu_run failed: %d\n", ret);
-+	switch ((tmp = get_ucall(vcpu, &uc))) {
-+	case UCALL_NONE:
-+		break; // good
-+	case UCALL_DONE:
-+		TEST_FAIL("Unexpected final guest exit %lu\n", tmp);
-+		break;
-+	case UCALL_ABORT:
-+		REPORT_GUEST_ASSERT_N(uc, "values: %lu (0x%lx)\n",
-+				      GUEST_ASSERT_ARG(uc, 0),
-+				      GUEST_ASSERT_ARG(uc, 0));
-+		break;
-+	default:
-+		TEST_FAIL("Unexpected guest exit %lu\n", tmp);
-+	}
-+
-+	TEST_ASSERT(vcpu->run->exit_reason == KVM_EXIT_PAPR_HCALL,
-+		    "Expected PAPR_HCALL exit, got %s\n",
-+		    exit_reason_str(vcpu->run->exit_reason));
-+	TEST_ASSERT(vcpu->run->papr_hcall.nr == H_RTAS,
-+		    "Expected H_RTAS exit, got %lld\n",
-+		    vcpu->run->papr_hcall.nr);
-+
-+	printf("Got H_RTAS exit.\n");
-+
-+	vcpu_regs_get(vcpu, &regs);
-+	rtas_vaddr = regs.gpr[4];
-+	printf("H_RTAS rtas_args at gEA=0x%lx\n", rtas_vaddr);
-+
-+	r = addr_gva2hva(vm, rtas_vaddr);
-+
-+	TEST_ASSERT(r->token == cpu_to_be32(0xdeadbeef),
-+		    "Expected RTAS token 0xdeadbeef, got 0x%x\n",
-+		    be32_to_cpu(r->token));
-+	TEST_ASSERT(r->nargs == cpu_to_be32(3),
-+		    "Expected RTAS nargs 3, got %u\n",
-+		    be32_to_cpu(r->nargs));
-+	TEST_ASSERT(r->nret == cpu_to_be32(2),
-+		    "Expected RTAS nret 2, got %u\n",
-+		    be32_to_cpu(r->nret));
-+	TEST_ASSERT(r->args[0] == cpu_to_be32(0x1000),
-+		    "Expected args[0] to be 0x1000, got 0x%x\n",
-+		    be32_to_cpu(r->args[0]));
-+	TEST_ASSERT(r->args[1] == cpu_to_be32(0x1001),
-+		    "Expected args[1] to be 0x1001, got 0x%x\n",
-+		    be32_to_cpu(r->args[1]));
-+	TEST_ASSERT(r->args[2] == cpu_to_be32(0x1002),
-+		    "Expected args[2] to be 0x1002, got 0x%x\n",
-+		    be32_to_cpu(r->args[2]));
-+
-+	printf("Guest rtas_args is correct, setting rets.\n");
-+
-+	r->args[3] = cpu_to_be32(0xabc);
-+	r->args[4] = cpu_to_be32(0x123);
-+
-+	regs.gpr[3] = 0;
-+	vcpu_regs_set(vcpu, &regs);
-+
-+	printf("Running H_RTAS guest vcpu again (hcall return H_SUCCESS).\n");
-+
-+	ret = _vcpu_run(vcpu);
-+	TEST_ASSERT(ret == 0, "vcpu_run failed: %d\n", ret);
-+	switch ((tmp = get_ucall(vcpu, &uc))) {
-+	case UCALL_DONE:
-+		printf("Got final guest exit.\n");
-+		break;
-+	case UCALL_ABORT:
-+		REPORT_GUEST_ASSERT_N(uc, "values: %lu (0x%lx)\n",
-+				      GUEST_ASSERT_ARG(uc, 0),
-+				      GUEST_ASSERT_ARG(uc, 0));
-+		break;
-+	default:
-+		TEST_FAIL("Unexpected guest exit %lu\n", tmp);
-+	}
-+
-+	kvm_vm_free(vm);
-+
-+	ksft_test_result_pass("%s\n", "rtas test");
-+	ksft_finished();	/* Print results and exit() accordingly */
-+}
--- 
-2.37.2
+& (-(1 << VRING_PACKED_EVENT_F_WRAP_CTR))
+
+that's more robust - works for any value of VRING_PACKED_EVENT_F_WRAP_CTR
+giving low bits 0 to VRING_PACKED_EVENT_F_WRAP_CTR,
+and will keep working if someone copypasted it and changed
+counter to a value different from 15.
+
+
+> Acked-by: Jason Wang <jasowang@redhat.com>
+> 
+> Thanks
+> 
+> > +       else
+> > +               next = vq->split.avail_idx_shadow;
+> > +
+> > +       return next << 16 | _vq->index;
+> > +}
+> > +EXPORT_SYMBOL_GPL(vring_notification_data);
+> > +
+> >  /* Manipulates transport-specific feature bits. */
+> >  void vring_transport_features(struct virtio_device *vdev)
+> >  {
+> > @@ -2771,6 +2786,8 @@ void vring_transport_features(struct virtio_device *vdev)
+> >                         break;
+> >                 case VIRTIO_F_ORDER_PLATFORM:
+> >                         break;
+> > +               case VIRTIO_F_NOTIFICATION_DATA:
+> > +                       break;
+> >                 default:
+> >                         /* We don't understand this bit. */
+> >                         __virtio_clear_bit(vdev, i);
+> > diff --git a/include/linux/virtio_ring.h b/include/linux/virtio_ring.h
+> > index 8b95b69ef694..2550c9170f4f 100644
+> > --- a/include/linux/virtio_ring.h
+> > +++ b/include/linux/virtio_ring.h
+> > @@ -117,4 +117,6 @@ void vring_del_virtqueue(struct virtqueue *vq);
+> >  void vring_transport_features(struct virtio_device *vdev);
+> >
+> >  irqreturn_t vring_interrupt(int irq, void *_vq);
+> > +
+> > +u32 vring_notification_data(struct virtqueue *_vq);
+> >  #endif /* _LINUX_VIRTIO_RING_H */
+> > diff --git a/include/uapi/linux/virtio_config.h b/include/uapi/linux/virtio_config.h
+> > index 3c05162bc988..2c712c654165 100644
+> > --- a/include/uapi/linux/virtio_config.h
+> > +++ b/include/uapi/linux/virtio_config.h
+> > @@ -99,6 +99,12 @@
+> >   */
+> >  #define VIRTIO_F_SR_IOV                        37
+> >
+> > +/*
+> > + * This feature indicates that the driver passes extra data (besides
+> > + * identifying the virtqueue) in its device notifications.
+> > + */
+> > +#define VIRTIO_F_NOTIFICATION_DATA     38
+> > +
+> >  /*
+> >   * This feature indicates that the driver can reset a queue individually.
+> >   */
+> > --
+> > 2.35.1
+> >
 
