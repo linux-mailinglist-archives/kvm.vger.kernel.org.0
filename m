@@ -2,249 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 48D486C75DD
-	for <lists+kvm@lfdr.de>; Fri, 24 Mar 2023 03:30:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C61C46C7609
+	for <lists+kvm@lfdr.de>; Fri, 24 Mar 2023 03:55:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231346AbjCXCav (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Mar 2023 22:30:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42946 "EHLO
+        id S230004AbjCXCzn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Mar 2023 22:55:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33490 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231228AbjCXCas (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Mar 2023 22:30:48 -0400
-Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35E0B1BFA;
-        Thu, 23 Mar 2023 19:30:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1679625010; x=1711161010;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=oy8mubAbGW7aEEiEACVBMeJ0i6tLotYmTR7hadVY4RY=;
-  b=TtZGJZIfMdwLKOjOqDI2JYLD4D5UJCWx+sU7eAB26U1FCAXJ9RFqCXGN
-   kwIQDO+mFIooYRSLPvzZGvUdb3PBewkQRSg91+FQuGAFNNpOBatfWOyjJ
-   m+RJSckei4nEmQWfHddaK7Wkwj3PRmdKdv8mKXDL61Nih95tIGQXVYBB7
-   GoGSSGKx+nyI0b7/D21loRLVINQMrM4tvun/ZWWQHCTwKFQpflqwuyZ+Q
-   392dL4jGnWstvURmUi+/Uv9FzhNIge0rXuMnjaDkEKkfSKvbNxrXOR5fk
-   JA1Q/DMGQsur3Nqy/nc1MuYMcfUDBGL2+gcanZHdKnIUyMEDvUV4RKqas
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10658"; a="402261123"
-X-IronPort-AV: E=Sophos;i="5.98,286,1673942400"; 
-   d="scan'208";a="402261123"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Mar 2023 19:29:42 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10658"; a="1012079715"
-X-IronPort-AV: E=Sophos;i="5.98,286,1673942400"; 
-   d="scan'208";a="1012079715"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.255.30.216]) ([10.255.30.216])
-  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Mar 2023 19:29:28 -0700
-Message-ID: <6cf365a3-dddc-8b74-4d74-04666fbeb53d@intel.com>
-Date:   Fri, 24 Mar 2023 10:29:25 +0800
+        with ESMTP id S229945AbjCXCzk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Mar 2023 22:55:40 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5EA7993E3
+        for <kvm@vger.kernel.org>; Thu, 23 Mar 2023 19:54:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1679626493;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=+uAUlOWmnaNVo/VWoXQNmQTS2u7vnkE353p3vcNlNhc=;
+        b=Yi1EsPyVBvI0hkrRYM3GszLSgDJNbK2UFGDw2WxUtIObPLdEME6sbKDoEsk12gAEYCc8pA
+        VCPitFti9zLqjMRdgdqdQyp5wqPPDNlMNE+aDnxJ+FF5lgOYiGeMW5aC/sA0rG0F3kuc33
+        2OAn1mD5TRVxycVcC33yekc39qelhoA=
+Received: from mail-oa1-f72.google.com (mail-oa1-f72.google.com
+ [209.85.160.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-161-Emj_pbI0N1OGTXoLySrv1g-1; Thu, 23 Mar 2023 22:54:51 -0400
+X-MC-Unique: Emj_pbI0N1OGTXoLySrv1g-1
+Received: by mail-oa1-f72.google.com with SMTP id 586e51a60fabf-17afa2c993cso283832fac.2
+        for <kvm@vger.kernel.org>; Thu, 23 Mar 2023 19:54:51 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1679626491;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=+uAUlOWmnaNVo/VWoXQNmQTS2u7vnkE353p3vcNlNhc=;
+        b=dnMv+yU4DvDaiiKkEwEn/eh5IPRLR1ybkTDV/2wI8kgTsPaCZEfB9NKhFV7jfc9v2P
+         Ms3WQNMtqSOLM1vNz/aPpTR+7wOX37n0iBplwQ6kra6+bmiTW9iuiwTlyFztLrTIuS7F
+         oHPAQ3+nRgpMbXNovqVj6eGjJHfz8yEskDyYRwHzBD95omx5zkMLjVXgSr7QQ5l5tnLZ
+         b2KPz1zX7zUhxOBtNRQgZsAH51CRZlvs6wD2ZXDIgGUamhzog3vjYhSQItGQEQiDI/1m
+         kZTl2clH7XuXIJdndwwz3cJbetswH7CCcXzm8E0vue6HergC32OV5A0guEByPNFO1MCk
+         is5g==
+X-Gm-Message-State: AO0yUKWdaV+LDvkdUCYBo5G35Q+HJPwXQ3eJIWPFWXgtS3TIdMxf1eJm
+        Us2AOuV5USqYx9XbKUGUFD+q9fqqgvuMN3JuaH91ouSYUqcmycTr3NPO5BBmFHQcQCqqdB5Fa0Q
+        BO4YMGiMyTzkmMHYmIxHb+A7hFm4l
+X-Received: by 2002:a05:6871:b19b:b0:177:9f9c:dc5 with SMTP id an27-20020a056871b19b00b001779f9c0dc5mr512926oac.9.1679626491037;
+        Thu, 23 Mar 2023 19:54:51 -0700 (PDT)
+X-Google-Smtp-Source: AK7set9fm4WXoQhc8oPxzAxZzgWX14feJUPEMiSJPQgN0rubtFNZsrLMc1kcr+QSYvWg5YQ6SKRhX2omEeiDY+P3wck=
+X-Received: by 2002:a05:6871:b19b:b0:177:9f9c:dc5 with SMTP id
+ an27-20020a056871b19b00b001779f9c0dc5mr512917oac.9.1679626490818; Thu, 23 Mar
+ 2023 19:54:50 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Firefox/102.0 Thunderbird/102.9.0
-Subject: Re: [PATCH v10 9/9] KVM: Enable and expose KVM_MEM_PRIVATE
-Content-Language: en-US
-To:     Chao Peng <chao.p.peng@linux.intel.com>,
-        Isaku Yamahata <isaku.yamahata@gmail.com>
-Cc:     Ackerley Tng <ackerleytng@google.com>, seanjc@google.com,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-        linux-arch@vger.kernel.org, linux-api@vger.kernel.org,
-        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
-        pbonzini@redhat.com, corbet@lwn.net, vkuznets@redhat.com,
-        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, arnd@arndb.de,
-        naoya.horiguchi@nec.com, linmiaohe@huawei.com, x86@kernel.org,
-        hpa@zytor.com, hughd@google.com, jlayton@kernel.org,
-        bfields@fieldses.org, akpm@linux-foundation.org, shuah@kernel.org,
-        rppt@kernel.org, steven.price@arm.com, mail@maciej.szmigiero.name,
-        vbabka@suse.cz, vannapurve@google.com, yu.c.zhang@linux.intel.com,
-        kirill.shutemov@linux.intel.com, luto@kernel.org,
-        jun.nakajima@intel.com, dave.hansen@intel.com, ak@linux.intel.com,
-        david@redhat.com, aarcange@redhat.com, ddutile@redhat.com,
-        dhildenb@redhat.com, qperret@google.com, tabba@google.com,
-        michael.roth@amd.com, mhocko@suse.com, wei.w.wang@intel.com
-References: <20230128140030.GB700688@chaop.bj.intel.com>
- <diqz5ybc3xsr.fsf@ackerleytng-cloudtop.c.googlers.com>
- <20230308074026.GA2183207@chaop.bj.intel.com>
- <20230323004131.GA214881@ls.amr.corp.intel.com>
- <20230324021029.GA2774613@chaop.bj.intel.com>
-From:   Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <20230324021029.GA2774613@chaop.bj.intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-0.5 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,HK_RANDOM_ENVFROM,
-        HK_RANDOM_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+References: <20230321154804.184577-1-sgarzare@redhat.com> <20230321154804.184577-4-sgarzare@redhat.com>
+ <CACGkMEtbrt3zuqy9YdhNyE90HHUT1R=HF-YRAQ6b4KnW_SdZ-w@mail.gmail.com> <20230323095006.jvbbdjvkdvhzcehz@sgarzare-redhat>
+In-Reply-To: <20230323095006.jvbbdjvkdvhzcehz@sgarzare-redhat>
+From:   Jason Wang <jasowang@redhat.com>
+Date:   Fri, 24 Mar 2023 10:54:39 +0800
+Message-ID: <CACGkMEveMGEzX7bCPuQuqm=9q7Ut-k=MLrRYM3Bq6cMpaw9fVQ@mail.gmail.com>
+Subject: Re: [PATCH v3 8/8] vdpa_sim: add support for user VA
+To:     Stefano Garzarella <sgarzare@redhat.com>
+Cc:     virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        stefanha@redhat.com, linux-kernel@vger.kernel.org,
+        eperezma@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>,
+        Andrey Zhadchenko <andrey.zhadchenko@virtuozzo.com>,
+        netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 3/24/2023 10:10 AM, Chao Peng wrote:
-> On Wed, Mar 22, 2023 at 05:41:31PM -0700, Isaku Yamahata wrote:
->> On Wed, Mar 08, 2023 at 03:40:26PM +0800,
->> Chao Peng <chao.p.peng@linux.intel.com> wrote:
->>
->>> On Wed, Mar 08, 2023 at 12:13:24AM +0000, Ackerley Tng wrote:
->>>> Chao Peng <chao.p.peng@linux.intel.com> writes:
->>>>
->>>>> On Sat, Jan 14, 2023 at 12:01:01AM +0000, Sean Christopherson wrote:
->>>>>> On Fri, Dec 02, 2022, Chao Peng wrote:
->>>>> ...
->>>>>> Strongly prefer to use similar logic to existing code that detects wraps:
->>>>
->>>>>> 		mem->restricted_offset + mem->memory_size < mem->restricted_offset
->>>>
->>>>>> This is also where I'd like to add the "gfn is aligned to offset"
->>>>>> check, though
->>>>>> my brain is too fried to figure that out right now.
->>>>
->>>>> Used count_trailing_zeros() for this TODO, unsure we have other better
->>>>> approach.
->>>>
->>>>> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
->>>>> index afc8c26fa652..fd34c5f7cd2f 100644
->>>>> --- a/virt/kvm/kvm_main.c
->>>>> +++ b/virt/kvm/kvm_main.c
->>>>> @@ -56,6 +56,7 @@
->>>>>    #include <asm/processor.h>
->>>>>    #include <asm/ioctl.h>
->>>>>    #include <linux/uaccess.h>
->>>>> +#include <linux/count_zeros.h>
->>>>
->>>>>    #include "coalesced_mmio.h"
->>>>>    #include "async_pf.h"
->>>>> @@ -2087,6 +2088,19 @@ static bool kvm_check_memslot_overlap(struct
->>>>> kvm_memslots *slots, int id,
->>>>>    	return false;
->>>>>    }
->>>>
->>>>> +/*
->>>>> + * Return true when ALIGNMENT(offset) >= ALIGNMENT(gpa).
->>>>> + */
->>>>> +static bool kvm_check_rmem_offset_alignment(u64 offset, u64 gpa)
->>>>> +{
->>>>> +	if (!offset)
->>>>> +		return true;
->>>>> +	if (!gpa)
->>>>> +		return false;
->>>>> +
->>>>> +	return !!(count_trailing_zeros(offset) >= count_trailing_zeros(gpa));
->>
->> This check doesn't work expected. For example, offset = 2GB, gpa=4GB
->> this check fails.
-> 
-> This case is expected to fail as Sean initially suggested[*]:
->    I would rather reject memslot if the gfn has lesser alignment than
->    the offset. I'm totally ok with this approach _if_ there's a use case.
->    Until such a use case presents itself, I would rather be conservative
->    from a uAPI perspective.
-> 
-> I understand that we put tighter restriction on this but if you see such
-> restriction is really a big issue for real usage, instead of a
-> theoretical problem, then we can loosen the check here. But at that time
-> below code is kind of x86 specific and may need improve.
-> 
-> BTW, in latest code, I replaced count_trailing_zeros() with fls64():
->    return !!(fls64(offset) >= fls64(gpa));
+On Thu, Mar 23, 2023 at 5:50=E2=80=AFPM Stefano Garzarella <sgarzare@redhat=
+.com> wrote:
+>
+> On Thu, Mar 23, 2023 at 11:42:07AM +0800, Jason Wang wrote:
+> >On Tue, Mar 21, 2023 at 11:48=E2=80=AFPM Stefano Garzarella <sgarzare@re=
+dhat.com> wrote:
+> >>
+> >> The new "use_va" module parameter (default: true) is used in
+> >> vdpa_alloc_device() to inform the vDPA framework that the device
+> >> supports VA.
+> >>
+> >> vringh is initialized to use VA only when "use_va" is true and the
+> >> user's mm has been bound. So, only when the bus supports user VA
+> >> (e.g. vhost-vdpa).
+> >>
+> >> vdpasim_mm_work_fn work is used to serialize the binding to a new
+> >> address space when the .bind_mm callback is invoked, and unbinding
+> >> when the .unbind_mm callback is invoked.
+> >>
+> >> Call mmget_not_zero()/kthread_use_mm() inside the worker function
+> >> to pin the address space only as long as needed, following the
+> >> documentation of mmget() in include/linux/sched/mm.h:
+> >>
+> >>   * Never use this function to pin this address space for an
+> >>   * unbounded/indefinite amount of time.
+> >
+> >I wonder if everything would be simplified if we just allow the parent
+> >to advertise whether or not it requires the address space.
+> >
+> >Then when vhost-vDPA probes the device it can simply advertise
+> >use_work as true so vhost core can use get_task_mm() in this case?
+>
+> IIUC set user_worker to true, it also creates the kthread in the vhost
+> core (but we can add another variable to avoid this).
+>
+> My biggest concern is the comment in include/linux/sched/mm.h.
+> get_task_mm() uses mmget(), but in the documentation they advise against
+> pinning the address space indefinitely, so I preferred in keeping
+> mmgrab() in the vhost core, then call mmget_not_zero() in the worker
+> only when it is running.
 
-wouldn't it be !!(ffs64(offset) <= ffs64(gpa)) ?
+Ok.
 
-> [*] https://lore.kernel.org/all/Y8HldeHBrw+OOZVm@google.com/
-> 
-> Chao
->> I come up with the following.
->>
->> >From ec87e25082f0497431b732702fae82c6a05071bf Mon Sep 17 00:00:00 2001
->> Message-Id: <ec87e25082f0497431b732702fae82c6a05071bf.1679531995.git.isaku.yamahata@intel.com>
->> From: Isaku Yamahata <isaku.yamahata@intel.com>
->> Date: Wed, 22 Mar 2023 15:32:56 -0700
->> Subject: [PATCH] KVM: Relax alignment check for restricted mem
->>
->> kvm_check_rmem_offset_alignment() only checks based on offset alignment
->> and GPA alignment.  However, the actual alignment for offset depends
->> on architecture.  For x86 case, it can be 1G, 2M or 4K.  So even if
->> GPA is aligned for 1G+, only 1G-alignment is required for offset.
->>
->> Without this patch, gpa=4G, offset=2G results in failure of memory slot
->> creation.
->>
->> Fixes: edc8814b2c77 ("KVM: Require gfn be aligned with restricted offset")
->> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
->> ---
->>   arch/x86/include/asm/kvm_host.h | 15 +++++++++++++++
->>   virt/kvm/kvm_main.c             |  9 ++++++++-
->>   2 files changed, 23 insertions(+), 1 deletion(-)
->>
->> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
->> index 88e11dd3afde..03af44650f24 100644
->> --- a/arch/x86/include/asm/kvm_host.h
->> +++ b/arch/x86/include/asm/kvm_host.h
->> @@ -16,6 +16,7 @@
->>   #include <linux/irq_work.h>
->>   #include <linux/irq.h>
->>   #include <linux/workqueue.h>
->> +#include <linux/count_zeros.h>
->>   
->>   #include <linux/kvm.h>
->>   #include <linux/kvm_para.h>
->> @@ -143,6 +144,20 @@
->>   #define KVM_HPAGE_MASK(x)	(~(KVM_HPAGE_SIZE(x) - 1))
->>   #define KVM_PAGES_PER_HPAGE(x)	(KVM_HPAGE_SIZE(x) / PAGE_SIZE)
->>   
->> +#define kvm_arch_required_alignment	kvm_arch_required_alignment
->> +static inline int kvm_arch_required_alignment(u64 gpa)
->> +{
->> +	int zeros = count_trailing_zeros(gpa);
->> +
->> +	WARN_ON_ONCE(!PAGE_ALIGNED(gpa));
->> +	if (zeros >= KVM_HPAGE_SHIFT(PG_LEVEL_1G))
->> +		return KVM_HPAGE_SHIFT(PG_LEVEL_1G);
->> +	else if (zeros >= KVM_HPAGE_SHIFT(PG_LEVEL_2M))
->> +		return KVM_HPAGE_SHIFT(PG_LEVEL_2M);
->> +
->> +	return PAGE_SHIFT;
->> +}
->> +
->>   #define KVM_MEMSLOT_PAGES_TO_MMU_PAGES_RATIO 50
->>   #define KVM_MIN_ALLOC_MMU_PAGES 64UL
->>   #define KVM_MMU_HASH_SHIFT 12
->> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
->> index c9c4eef457b0..f4ff96171d24 100644
->> --- a/virt/kvm/kvm_main.c
->> +++ b/virt/kvm/kvm_main.c
->> @@ -2113,6 +2113,13 @@ static bool kvm_check_memslot_overlap(struct kvm_memslots *slots, int id,
->>   	return false;
->>   }
->>   
->> +#ifndef kvm_arch_required_alignment
->> +__weak int kvm_arch_required_alignment(u64 gpa)
->> +{
->> +	return PAGE_SHIFT
->> +}
->> +#endif
->> +
->>   /*
->>    * Return true when ALIGNMENT(offset) >= ALIGNMENT(gpa).
->>    */
->> @@ -2123,7 +2130,7 @@ static bool kvm_check_rmem_offset_alignment(u64 offset, u64 gpa)
->>   	if (!gpa)
->>   		return false;
->>   
->> -	return !!(count_trailing_zeros(offset) >= count_trailing_zeros(gpa));
->> +	return !!(count_trailing_zeros(offset) >= kvm_arch_required_alignment(gpa));
->>   }
->>   
->>   /*
->> -- 
->> 2.25.1
->>
->>
->>
->> -- 
->> Isaku Yamahata <isaku.yamahata@gmail.com>
+>
+> In the future maybe mm will be used differently from parent if somehow
+> it is supported by iommu, so I would leave it to the parent to handle
+> this.
+
+This should be possible, I was told by Intel that their IOMMU can
+access the process page table for shared virtual memory.
+
+Thanks
+
+>
+> Thanks,
+> Stefano
+>
 
