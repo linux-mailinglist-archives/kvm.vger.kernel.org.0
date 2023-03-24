@@ -2,86 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AD0076C7E35
-	for <lists+kvm@lfdr.de>; Fri, 24 Mar 2023 13:42:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8DE8C6C7E47
+	for <lists+kvm@lfdr.de>; Fri, 24 Mar 2023 13:49:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231961AbjCXMmM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Mar 2023 08:42:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57804 "EHLO
+        id S229522AbjCXMtf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Mar 2023 08:49:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36956 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231960AbjCXMmJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Mar 2023 08:42:09 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 033341556C
-        for <kvm@vger.kernel.org>; Fri, 24 Mar 2023 05:42:08 -0700 (PDT)
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 32OBEXe4022118
-        for <kvm@vger.kernel.org>; Fri, 24 Mar 2023 12:42:08 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
- mime-version : content-transfer-encoding : in-reply-to : references : cc :
- from : to : subject : message-id : date; s=pp1;
- bh=wBXXZzRIuoOjzza/+1hndB+zKBj3LJNpcjnM+zK1qtA=;
- b=pNDWa5sH+i+JVnTZM8TEbJkcPrbVSUbBDDzWttT7yDbK+xyD5uEO7ltYemm5jZ32l+I1
- qvHw5DARBjHShbM7mNo9HQSfGMkJd0pMMnEnu+Yi85xVInw1cjqch4h82RZGenMeLbA8
- PMXZVmil7X0nSavhgl84fe/LB9yZL5v0vZ0glQos+Rm6b5VOxkk4WZMxCiFwFpYKyrXK
- +r3azLg3ZX9u6eNiL12PDt+F5iqcHK+z5vttSyNJl2Sf/QxbiuJV4RWUpYu6sOb3a4Id
- 5Y80pRqkNQG82kYBn7oXRNlUzljEWShrQV5IJURryH1fhFZMx6Ln+hLNPUIqS9vI6TXJ bw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pgxsssrhr-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Fri, 24 Mar 2023 12:42:07 +0000
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 32OBsISQ015461
-        for <kvm@vger.kernel.org>; Fri, 24 Mar 2023 12:42:07 GMT
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pgxsssrh3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 24 Mar 2023 12:42:07 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 32NLatF7010797;
-        Fri, 24 Mar 2023 12:42:05 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-        by ppma06ams.nl.ibm.com (PPS) with ESMTPS id 3pgxua8u53-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 24 Mar 2023 12:42:05 +0000
-Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-        by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 32OCg1wG16646682
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 24 Mar 2023 12:42:01 GMT
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7AEB620043;
-        Fri, 24 Mar 2023 12:42:01 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 58B6820040;
-        Fri, 24 Mar 2023 12:42:01 +0000 (GMT)
-Received: from t14-nrb (unknown [9.179.14.197])
-        by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Fri, 24 Mar 2023 12:42:01 +0000 (GMT)
-Content-Type: text/plain; charset="utf-8"
+        with ESMTP id S230366AbjCXMte (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Mar 2023 08:49:34 -0400
+Received: from mail-wr1-x42c.google.com (mail-wr1-x42c.google.com [IPv6:2a00:1450:4864:20::42c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB3011FCB
+        for <kvm@vger.kernel.org>; Fri, 24 Mar 2023 05:49:31 -0700 (PDT)
+Received: by mail-wr1-x42c.google.com with SMTP id l12so1679642wrm.10
+        for <kvm@vger.kernel.org>; Fri, 24 Mar 2023 05:49:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1679662170;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=7kOxe7EBPXmceOaVUQDFqzV8NWrK5YbiyHazBA1WrHg=;
+        b=NYKcQwoezBYHeqcMKTaDC+q47PTXWcxwfnpiC5/cPBg4PXWGQkaM4HZ1XFfLXx5Qnc
+         afbsEXMTz0DC/QvoIDqQf9a5CPOdMOPb3aG3bddsItKKfkzgB3lyJcyjBp+CSBPSdQde
+         bFpT0suxKiEGi09N9qfcqWe9rpoVvfe7ZFAakZsqyPjxDUwleEYibq73c8IxmEMrl8xC
+         UjZDmltA9Ss3nsIiVoS8q4XqCrMs7dxMxYiHUwqnOnYJgKQJMAoEwqJHlhF83BRnDFqD
+         H35i7PXCE5J69cCeTN6PnpTUsYgZPH8y6dUIlKVPhAfKFvLn9AGKGUFGOCwMB5G3kKL7
+         Kqjg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1679662170;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7kOxe7EBPXmceOaVUQDFqzV8NWrK5YbiyHazBA1WrHg=;
+        b=vnP4OVHg2C279jY55LJ8GIbm5uNVDVQGX19CdawCiRx+szsNy7XxJWtqgJXrl5VMcg
+         c5hNv8ZcbQjbaqqGAdSxFT3a/DHYozFrYGMuNXFth/wJy8oqp2aCSE2XPdlfLhn5RAGa
+         NVmFU3G33Vr9QZU4gcaJkbQhhDfbgRk6VmhsVyv+0ytvvVmy3o3rUtG0hTigvQh4mVp7
+         1pYwRfVokWlFD8txR1pfOokBp3NxEfC7gtgROO59zB8mciYqY1w3RFj3zk6BNxR6D0/Y
+         zv3lmqxwXEE0jekdwSWXscoBV2yw2V95IgUfHdZ6iT2xn3E1evb9Ti+EFxcQ+0GaeqOn
+         asrA==
+X-Gm-Message-State: AAQBX9eFgvhiT22mBRC76kzT6xLn3qDaDenuMxGitW/8sM6B/kyq5weA
+        yXwMBbDqLMlcWm/oGZGwVUvFXQ==
+X-Google-Smtp-Source: AKy350ZAg1S8d+rI81fXey9mavkDFjsIZWH/m9UGelVes0TnmB9/9u5yuEtw6ODPnr3ODVH/9g5Q4A==
+X-Received: by 2002:a5d:46d2:0:b0:2d8:97c7:713d with SMTP id g18-20020a5d46d2000000b002d897c7713dmr1636987wrs.38.1679662170440;
+        Fri, 24 Mar 2023 05:49:30 -0700 (PDT)
+Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
+        by smtp.gmail.com with ESMTPSA id h10-20020adffa8a000000b002ce3d3d17e5sm18526410wrr.79.2023.03.24.05.49.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 24 Mar 2023 05:49:30 -0700 (PDT)
+Date:   Fri, 24 Mar 2023 13:49:29 +0100
+From:   Andrew Jones <ajones@ventanamicro.com>
+To:     David Matlack <dmatlack@google.com>
+Cc:     Anup Patel <anup@brainfault.org>,
+        Atish Patra <atishp@atishpatra.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Alexander Graf <graf@amazon.com>, kvm@vger.kernel.org,
+        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+        stable@vger.kernel.org
+Subject: Re: [PATCH] KVM: RISC-V: Retry fault if vma_lookup() results become
+ invalid
+Message-ID: <20230324124929.6epv73escdcwq44e@orel>
+References: <20230317211106.1234484-1-dmatlack@google.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20230324121724.1627-9-frankja@linux.ibm.com>
-References: <20230324121724.1627-1-frankja@linux.ibm.com> <20230324121724.1627-9-frankja@linux.ibm.com>
-Cc:     thuth@redhat.com, imbrenda@linux.ibm.com
-From:   Nico Boehr <nrb@linux.ibm.com>
-To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
-Subject: Re: [kvm-unit-tests PATCH v2 8/9] s390x: uv-host: Properly handle config creation errors
-Message-ID: <167966172104.41638.6215057938642660953@t14-nrb>
-User-Agent: alot/0.8.1
-Date:   Fri, 24 Mar 2023 13:42:01 +0100
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: WlL3OCHnom4u3o-vdYSRhR1GGkDG-j1V
-X-Proofpoint-GUID: USt1PVlwa5DcVDMSWa9ITB41HD1qwvom
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
- definitions=2023-03-24_06,2023-03-24_01,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 bulkscore=0
- suspectscore=0 malwarescore=0 mlxscore=0 phishscore=0 impostorscore=0
- priorityscore=1501 mlxlogscore=841 spamscore=0 adultscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2303200000 definitions=main-2303240102
-X-Spam-Status: No, score=-0.1 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
-        DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230317211106.1234484-1-dmatlack@google.com>
+X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
+        DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS
         autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -89,11 +77,98 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Quoting Janosch Frank (2023-03-24 13:17:23)
-> If the first bit is set on a error rc, the hypervisor will need to
-> destroy the config before trying again. Let's properly handle those
-> cases so we're not usign stale data.
->=20
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+On Fri, Mar 17, 2023 at 02:11:06PM -0700, David Matlack wrote:
+> Read mmu_invalidate_seq before dropping the mmap_lock so that KVM can
+> detect if the results of vma_lookup() (e.g. vma_shift) become stale
+> before it acquires kvm->mmu_lock. This fixes a theoretical bug where a
+> VMA could be changed by userspace after vma_lookup() and before KVM
+> reads the mmu_invalidate_seq, causing KVM to install page table entries
+> based on a (possibly) no-longer-valid vma_shift.
+> 
+> Re-order the MMU cache top-up to earlier in user_mem_abort() so that it
 
-Reviewed-by: Nico Boehr <nrb@linux.ibm.com>
+s/user_mem_abort/kvm_riscv_gstage_map/
+
+> is not done after KVM has read mmu_invalidate_seq (i.e. so as to avoid
+> inducing spurious fault retries).
+> 
+> It's unlikely that any sane userspace currently modifies VMAs in such a
+> way as to trigger this race. And even with directed testing I was unable
+> to reproduce it. But a sufficiently motivated host userspace might be
+> able to exploit this race.
+> 
+> Note KVM/ARM had the same bug and was fixed in a separate, near
+> identical patch (see Link).
+> 
+> Link: https://lore.kernel.org/kvm/20230313235454.2964067-1-dmatlack@google.com/
+> Fixes: 9955371cc014 ("RISC-V: KVM: Implement MMU notifiers")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: David Matlack <dmatlack@google.com>
+> ---
+> Note: Compile-tested only.
+> 
+>  arch/riscv/kvm/mmu.c | 25 ++++++++++++++++---------
+>  1 file changed, 16 insertions(+), 9 deletions(-)
+> 
+> diff --git a/arch/riscv/kvm/mmu.c b/arch/riscv/kvm/mmu.c
+> index 78211aed36fa..46d692995830 100644
+> --- a/arch/riscv/kvm/mmu.c
+> +++ b/arch/riscv/kvm/mmu.c
+> @@ -628,6 +628,13 @@ int kvm_riscv_gstage_map(struct kvm_vcpu *vcpu,
+>  			!(memslot->flags & KVM_MEM_READONLY)) ? true : false;
+>  	unsigned long vma_pagesize, mmu_seq;
+>  
+> +	/* We need minimum second+third level pages */
+> +	ret = kvm_mmu_topup_memory_cache(pcache, gstage_pgd_levels);
+> +	if (ret) {
+> +		kvm_err("Failed to topup G-stage cache\n");
+> +		return ret;
+> +	}
+> +
+>  	mmap_read_lock(current->mm);
+>  
+>  	vma = vma_lookup(current->mm, hva);
+> @@ -648,6 +655,15 @@ int kvm_riscv_gstage_map(struct kvm_vcpu *vcpu,
+>  	if (vma_pagesize == PMD_SIZE || vma_pagesize == PUD_SIZE)
+>  		gfn = (gpa & huge_page_mask(hstate_vma(vma))) >> PAGE_SHIFT;
+>  
+> +	/*
+> +	 * Read mmu_invalidate_seq so that KVM can detect if the results of
+> +	 * vma_lookup() or gfn_to_pfn_prot() become stale priort to acquiring
+
+s/priort/prior/
+
+> +	 * kvm->mmu_lock.
+> +	 *
+> +	 * Rely on mmap_read_unlock() for an implicit smp_rmb(), which pairs
+> +	 * with the smp_wmb() in kvm_mmu_invalidate_end().
+> +	 */
+> +	mmu_seq = kvm->mmu_invalidate_seq;
+>  	mmap_read_unlock(current->mm);
+>  
+>  	if (vma_pagesize != PUD_SIZE &&
+> @@ -657,15 +673,6 @@ int kvm_riscv_gstage_map(struct kvm_vcpu *vcpu,
+>  		return -EFAULT;
+>  	}
+>  
+> -	/* We need minimum second+third level pages */
+> -	ret = kvm_mmu_topup_memory_cache(pcache, gstage_pgd_levels);
+> -	if (ret) {
+> -		kvm_err("Failed to topup G-stage cache\n");
+> -		return ret;
+> -	}
+> -
+> -	mmu_seq = kvm->mmu_invalidate_seq;
+> -
+>  	hfn = gfn_to_pfn_prot(kvm, gfn, is_write, &writable);
+>  	if (hfn == KVM_PFN_ERR_HWPOISON) {
+>  		send_sig_mceerr(BUS_MCEERR_AR, (void __user *)hva,
+> 
+> base-commit: eeac8ede17557680855031c6f305ece2378af326
+> -- 
+> 2.40.0.rc2.332.ga46443480c-goog
+> 
+>
+
+Thanks,
+drew
