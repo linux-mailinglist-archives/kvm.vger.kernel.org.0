@@ -2,210 +2,227 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6E9F86C8036
-	for <lists+kvm@lfdr.de>; Fri, 24 Mar 2023 15:47:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 988AC6C803B
+	for <lists+kvm@lfdr.de>; Fri, 24 Mar 2023 15:48:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231499AbjCXOrb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Mar 2023 10:47:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37226 "EHLO
+        id S232202AbjCXOr6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Mar 2023 10:47:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36924 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232134AbjCXOrX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Mar 2023 10:47:23 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F35719C47
-        for <kvm@vger.kernel.org>; Fri, 24 Mar 2023 07:47:22 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 4551F62B57
-        for <kvm@vger.kernel.org>; Fri, 24 Mar 2023 14:47:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 16334C433D2;
-        Fri, 24 Mar 2023 14:47:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1679669241;
-        bh=5Kc1DeiECXFve5qrwndTRAp5x8mMzJ0oDiaKUUZY16k=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=nKpFu9Y5+izJ1hA8cYZBYKr4ijooJrgMr2GO7fKRys2J4QpR6CmOISMfOewigkqI5
-         QNpTvTtcRRJ33EZpyXlbbsrF03KJzjRaJ5NeoF/F2by2Jdkf79jsGYkHvjfgz6ge2v
-         tYdk30Mo2xp1ADMdyfJcq8mG9rprPV4zz951KnY3sUQF+WkQe85WNdqSmvHctj+kKv
-         qvXjWUsaAmE9gxyo3EnFPgKZTcJqUeJJjwJTc4ciBpftrj073CNVkKHaUUMyAqp/Pm
-         GddieyPkPXYvHZTcS+r0aMeHAbcgm3IbxZCrlfcvjBTfE7YRjfv6kzUyH6kOL2tS0i
-         IkshC4X1soLlQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.95)
-        (envelope-from <maz@kernel.org>)
-        id 1pfihL-002qBP-3v;
-        Fri, 24 Mar 2023 14:47:19 +0000
-From:   Marc Zyngier <maz@kernel.org>
-To:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org
-Cc:     James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Simon Veith <sveith@amazon.de>,
-        Reiji Watanabe <reijiw@google.com>,
-        Colton Lewis <coltonlewis@google.com>,
-        Joey Gouly <joey.gouly@arm.com>, dwmw2@infradead.org
-Subject: [PATCH v3 09/18] KVM: arm64: timers: Rationalise per-vcpu timer init
-Date:   Fri, 24 Mar 2023 14:46:55 +0000
-Message-Id: <20230324144704.4193635-10-maz@kernel.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230324144704.4193635-1-maz@kernel.org>
-References: <20230324144704.4193635-1-maz@kernel.org>
+        with ESMTP id S232217AbjCXOrw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Mar 2023 10:47:52 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53523196B1
+        for <kvm@vger.kernel.org>; Fri, 24 Mar 2023 07:47:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1679669223;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=AuOjQOzMJu7jhalrvIVzIXLam0VRoOPHkDU+QEY7YhI=;
+        b=gkmf1zbq6bQV7ABVdmpbP65Iu3Fdif3EFYsApnmGRHdgUMqnQ4HIAXbzyQLRiAqo75bKGd
+        WsX0Mc/WMn2AwEhmQl2Vfsb9RAD0RF5qQqEdLba7UZiKj2yHdQe1BedYwN2v2+Du3ErewG
+        X7onXIQTbSUfq+D5tI1XhkZqRBBenoc=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-648-jz_aR90CPgmFnw0n11_48A-1; Fri, 24 Mar 2023 10:47:02 -0400
+X-MC-Unique: jz_aR90CPgmFnw0n11_48A-1
+Received: by mail-ed1-f70.google.com with SMTP id c11-20020a509f8b000000b00501e2facf47so3522006edf.16
+        for <kvm@vger.kernel.org>; Fri, 24 Mar 2023 07:47:01 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1679669220;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=AuOjQOzMJu7jhalrvIVzIXLam0VRoOPHkDU+QEY7YhI=;
+        b=Nj6lxkNOAuRyX4qjxQ8pl4GwahJLfyNZzpTxpP8jv1DAOprrB9EckvlFyYb4zBvUIs
+         yvRw936PSKNDmwkYLD9QsYaL/Hcc860gY80bwC5AKY4EB8u4aOQgcA9sXcbPPzebkP+1
+         tHoUSgJUJgov46CJV6tTqncNEjtMIJKRdcherWmjAjyPV4aHrmhhn+Ifyo+hrojrrpfk
+         QmQaNd4ek26EPbSCEnbC99wP2JAwDQFarkGEEK9eRfo0EXvvI4LtcgI2NPPpMeRnEAOi
+         OpnkZLUNITELGjrOzJOgk/CiVZdvNSvmCjogNcsojbWBPM1cU3VVKF8d4L7GX/rSUKuI
+         R5eg==
+X-Gm-Message-State: AAQBX9ctbQrFvjimrbb8US7JnbIutPuDJ+wBkDlh9t1TkmqBqw7u3wMA
+        dHlfOeSe7ZZwgYR/GJXkF+DuZTkjboyag9lONriKe7ndVpD/zgn5xBSEpTQrErw49IkvRFbJBMU
+        53Ljv5ctv9Fuyt07/vv+O
+X-Received: by 2002:a17:906:fa1b:b0:922:2ba3:2348 with SMTP id lo27-20020a170906fa1b00b009222ba32348mr2995762ejb.7.1679669220707;
+        Fri, 24 Mar 2023 07:47:00 -0700 (PDT)
+X-Google-Smtp-Source: AKy350ZmfFJPCyGmiPR7O9KckKD9I87Kx7AyWLHRPUqCBRX1gMg+6qZWwdI6wSPtk2G3zOFrDNdJyA==
+X-Received: by 2002:a17:906:fa1b:b0:922:2ba3:2348 with SMTP id lo27-20020a170906fa1b00b009222ba32348mr2995743ejb.7.1679669220454;
+        Fri, 24 Mar 2023 07:47:00 -0700 (PDT)
+Received: from sgarzare-redhat (host-82-53-134-98.retail.telecomitalia.it. [82.53.134.98])
+        by smtp.gmail.com with ESMTPSA id c14-20020a509f8e000000b005003fd12eafsm10711203edf.63.2023.03.24.07.46.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 24 Mar 2023 07:46:59 -0700 (PDT)
+Date:   Fri, 24 Mar 2023 15:46:57 +0100
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        stefanha@redhat.com, linux-kernel@vger.kernel.org,
+        eperezma@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>,
+        Andrey Zhadchenko <andrey.zhadchenko@virtuozzo.com>,
+        netdev@vger.kernel.org
+Subject: Re: [PATCH v3 8/8] vdpa_sim: add support for user VA
+Message-ID: <qrnz6o73374x5hio4jkgpj7et4ihym2wniob25so2zbsyjxagp@lwprqyc5xp7n>
+References: <20230321154228.182769-1-sgarzare@redhat.com>
+ <20230321154804.184577-1-sgarzare@redhat.com>
+ <20230321154804.184577-4-sgarzare@redhat.com>
+ <78c7511a-deab-7e95-fde1-5317a568cf97@redhat.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, ricarkol@google.com, sveith@amazon.de, reijiw@google.com, coltonlewis@google.com, joey.gouly@arm.com, dwmw2@infradead.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-5.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,SPF_HELO_NONE,
-        SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.6
+In-Reply-To: <78c7511a-deab-7e95-fde1-5317a568cf97@redhat.com>
+X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The way we initialise our timer contexts may be satisfactory
-for two timers, but will be getting pretty annoying with four.
+On Fri, Mar 24, 2023 at 11:49:32AM +0800, Jason Wang wrote:
+>
+>在 2023/3/21 23:48, Stefano Garzarella 写道:
+>>The new "use_va" module parameter (default: true) is used in
+>>vdpa_alloc_device() to inform the vDPA framework that the device
+>>supports VA.
+>>
+>>vringh is initialized to use VA only when "use_va" is true and the
+>>user's mm has been bound. So, only when the bus supports user VA
+>>(e.g. vhost-vdpa).
+>>
+>>vdpasim_mm_work_fn work is used to serialize the binding to a new
+>>address space when the .bind_mm callback is invoked, and unbinding
+>>when the .unbind_mm callback is invoked.
+>>
+>>Call mmget_not_zero()/kthread_use_mm() inside the worker function
+>>to pin the address space only as long as needed, following the
+>>documentation of mmget() in include/linux/sched/mm.h:
+>>
+>>   * Never use this function to pin this address space for an
+>>   * unbounded/indefinite amount of time.
+>>
+>>Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+>>---
+>>
+>>Notes:
+>>     v3:
+>>     - called mmget_not_zero() before kthread_use_mm() [Jason]
+>>       As the documentation of mmget() in include/linux/sched/mm.h says:
+>>       * Never use this function to pin this address space for an
+>>       * unbounded/indefinite amount of time.
+>>       I moved mmget_not_zero/kthread_use_mm inside the worker function,
+>>       this way we pin the address space only as long as needed.
+>>       This is similar to what vfio_iommu_type1_dma_rw_chunk() does in
+>>       drivers/vfio/vfio_iommu_type1.c
+>>     - simplified the mm bind/unbind [Jason]
+>>     - renamed vdpasim_worker_change_mm_sync() [Jason]
+>>     - fix commit message (s/default: false/default: true)
+>>     v2:
+>>     - `use_va` set to true by default [Eugenio]
+>>     - supported the new unbind_mm callback [Jason]
+>>     - removed the unbind_mm call in vdpasim_do_reset() [Jason]
+>>     - avoided to release the lock while call kthread_flush_work() since we
+>>       are now using a mutex to protect the device state
+>>
+>>  drivers/vdpa/vdpa_sim/vdpa_sim.h |  1 +
+>>  drivers/vdpa/vdpa_sim/vdpa_sim.c | 80 +++++++++++++++++++++++++++++++-
+>>  2 files changed, 79 insertions(+), 2 deletions(-)
+>>
+>>diff --git a/drivers/vdpa/vdpa_sim/vdpa_sim.h b/drivers/vdpa/vdpa_sim/vdpa_sim.h
+>>index 4774292fba8c..3a42887d05d9 100644
+>>--- a/drivers/vdpa/vdpa_sim/vdpa_sim.h
+>>+++ b/drivers/vdpa/vdpa_sim/vdpa_sim.h
+>>@@ -59,6 +59,7 @@ struct vdpasim {
+>>  	struct vdpasim_virtqueue *vqs;
+>>  	struct kthread_worker *worker;
+>>  	struct kthread_work work;
+>>+	struct mm_struct *mm_bound;
+>>  	struct vdpasim_dev_attr dev_attr;
+>>  	/* mutex to synchronize virtqueue state */
+>>  	struct mutex mutex;
+>>diff --git a/drivers/vdpa/vdpa_sim/vdpa_sim.c b/drivers/vdpa/vdpa_sim/vdpa_sim.c
+>>index ab4cfb82c237..23c891cdcd54 100644
+>>--- a/drivers/vdpa/vdpa_sim/vdpa_sim.c
+>>+++ b/drivers/vdpa/vdpa_sim/vdpa_sim.c
+>>@@ -35,10 +35,44 @@ module_param(max_iotlb_entries, int, 0444);
+>>  MODULE_PARM_DESC(max_iotlb_entries,
+>>  		 "Maximum number of iotlb entries for each address space. 0 means unlimited. (default: 2048)");
+>>+static bool use_va = true;
+>>+module_param(use_va, bool, 0444);
+>>+MODULE_PARM_DESC(use_va, "Enable/disable the device's ability to use VA");
+>>+
+>>  #define VDPASIM_QUEUE_ALIGN PAGE_SIZE
+>>  #define VDPASIM_QUEUE_MAX 256
+>>  #define VDPASIM_VENDOR_ID 0
+>>+struct vdpasim_mm_work {
+>>+	struct kthread_work work;
+>>+	struct vdpasim *vdpasim;
+>>+	struct mm_struct *mm_to_bind;
+>>+	int ret;
+>>+};
+>>+
+>>+static void vdpasim_mm_work_fn(struct kthread_work *work)
+>>+{
+>>+	struct vdpasim_mm_work *mm_work =
+>>+		container_of(work, struct vdpasim_mm_work, work);
+>>+	struct vdpasim *vdpasim = mm_work->vdpasim;
+>>+
+>>+	mm_work->ret = 0;
+>>+
+>>+	//TODO: should we attach the cgroup of the mm owner?
+>>+	vdpasim->mm_bound = mm_work->mm_to_bind;
+>>+}
+>>+
+>>+static void vdpasim_worker_change_mm_sync(struct vdpasim *vdpasim,
+>>+					  struct vdpasim_mm_work *mm_work)
+>>+{
+>>+	struct kthread_work *work = &mm_work->work;
+>>+
+>>+	kthread_init_work(work, vdpasim_mm_work_fn);
+>>+	kthread_queue_work(vdpasim->worker, work);
+>>+
+>>+	kthread_flush_work(work);
+>>+}
+>>+
+>>  static struct vdpasim *vdpa_to_sim(struct vdpa_device *vdpa)
+>>  {
+>>  	return container_of(vdpa, struct vdpasim, vdpa);
+>>@@ -59,8 +93,10 @@ static void vdpasim_queue_ready(struct vdpasim *vdpasim, unsigned int idx)
+>>  {
+>>  	struct vdpasim_virtqueue *vq = &vdpasim->vqs[idx];
+>>  	uint16_t last_avail_idx = vq->vring.last_avail_idx;
+>>+	bool va_enabled = use_va && vdpasim->mm_bound;
+>>-	vringh_init_iotlb(&vq->vring, vdpasim->features, vq->num, true, false,
+>>+	vringh_init_iotlb(&vq->vring, vdpasim->features, vq->num, true,
+>>+			  va_enabled,
+>>  			  (struct vring_desc *)(uintptr_t)vq->desc_addr,
+>>  			  (struct vring_avail *)
+>>  			  (uintptr_t)vq->driver_addr,
+>>@@ -130,8 +166,20 @@ static const struct vdpa_config_ops vdpasim_batch_config_ops;
+>>  static void vdpasim_work_fn(struct kthread_work *work)
+>>  {
+>>  	struct vdpasim *vdpasim = container_of(work, struct vdpasim, work);
+>>+	struct mm_struct *mm = vdpasim->mm_bound;
+>>+
+>>+	if (mm) {
+>>+		if (!mmget_not_zero(mm))
+>>+			return;
+>
+>
+>Do we need to check use_va here.
 
-Cleanup the whole thing by removing the code duplication and
-getting rid of unused IRQ configuration elements.
+Yep, right!
 
-Reviewed-by: Colton Lewis <coltonlewis@google.com>
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/kvm/arch_timer.c  | 73 +++++++++++++++++++-----------------
- include/kvm/arm_arch_timer.h |  1 -
- 2 files changed, 39 insertions(+), 35 deletions(-)
+>
+>Other than this
+>
+>Acked-by: Jason Wang <jasowang@redhat.com>
 
-diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
-index 25625e1d6d89..edd851e3b169 100644
---- a/arch/arm64/kvm/arch_timer.c
-+++ b/arch/arm64/kvm/arch_timer.c
-@@ -30,14 +30,9 @@ static u32 host_ptimer_irq_flags;
- 
- static DEFINE_STATIC_KEY_FALSE(has_gic_active_state);
- 
--static const struct kvm_irq_level default_ptimer_irq = {
--	.irq	= 30,
--	.level	= 1,
--};
--
--static const struct kvm_irq_level default_vtimer_irq = {
--	.irq	= 27,
--	.level	= 1,
-+static const u8 default_ppi[] = {
-+	[TIMER_PTIMER]  = 30,
-+	[TIMER_VTIMER]  = 27,
- };
- 
- static bool kvm_timer_irq_can_fire(struct arch_timer_context *timer_ctx);
-@@ -820,12 +815,14 @@ int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu)
- 	 * resets the timer to be disabled and unmasked and is compliant with
- 	 * the ARMv7 architecture.
- 	 */
--	timer_set_ctl(vcpu_vtimer(vcpu), 0);
--	timer_set_ctl(vcpu_ptimer(vcpu), 0);
-+	for (int i = 0; i < NR_KVM_TIMERS; i++)
-+		timer_set_ctl(vcpu_get_timer(vcpu, i), 0);
-+
- 
- 	if (timer->enabled) {
--		kvm_timer_update_irq(vcpu, false, vcpu_vtimer(vcpu));
--		kvm_timer_update_irq(vcpu, false, vcpu_ptimer(vcpu));
-+		for (int i = 0; i < NR_KVM_TIMERS; i++)
-+			kvm_timer_update_irq(vcpu, false,
-+					     vcpu_get_timer(vcpu, i));
- 
- 		if (irqchip_in_kernel(vcpu->kvm)) {
- 			kvm_vgic_reset_mapped_irq(vcpu, map.direct_vtimer->irq.irq);
-@@ -840,39 +837,47 @@ int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu)
- 	return 0;
- }
- 
-+static void timer_context_init(struct kvm_vcpu *vcpu, int timerid)
-+{
-+	struct arch_timer_context *ctxt = vcpu_get_timer(vcpu, timerid);
-+	struct kvm *kvm = vcpu->kvm;
-+
-+	ctxt->vcpu = vcpu;
-+
-+	if (timerid == TIMER_VTIMER)
-+		ctxt->offset.vm_offset = &kvm->arch.timer_data.voffset;
-+	else
-+		ctxt->offset.vm_offset = &kvm->arch.timer_data.poffset;
-+
-+	hrtimer_init(&ctxt->hrtimer, CLOCK_MONOTONIC, HRTIMER_MODE_ABS_HARD);
-+	ctxt->hrtimer.function = kvm_hrtimer_expire;
-+	ctxt->irq.irq = default_ppi[timerid];
-+
-+	switch (timerid) {
-+	case TIMER_PTIMER:
-+		ctxt->host_timer_irq = host_ptimer_irq;
-+		break;
-+	case TIMER_VTIMER:
-+		ctxt->host_timer_irq = host_vtimer_irq;
-+		break;
-+	}
-+}
-+
- void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu)
- {
- 	struct arch_timer_cpu *timer = vcpu_timer(vcpu);
--	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
--	struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
- 
--	vtimer->vcpu = vcpu;
--	vtimer->offset.vm_offset = &vcpu->kvm->arch.timer_data.voffset;
--	ptimer->vcpu = vcpu;
--	ptimer->offset.vm_offset = &vcpu->kvm->arch.timer_data.poffset;
-+	for (int i = 0; i < NR_KVM_TIMERS; i++)
-+		timer_context_init(vcpu, i);
- 
- 	/* Synchronize offsets across timers of a VM if not already provided */
- 	if (!test_bit(KVM_ARCH_FLAG_VM_COUNTER_OFFSET, &vcpu->kvm->arch.flags)) {
--		timer_set_offset(vtimer, kvm_phys_timer_read());
--		timer_set_offset(ptimer, 0);
-+		timer_set_offset(vcpu_vtimer(vcpu), kvm_phys_timer_read());
-+		timer_set_offset(vcpu_ptimer(vcpu), 0);
- 	}
- 
- 	hrtimer_init(&timer->bg_timer, CLOCK_MONOTONIC, HRTIMER_MODE_ABS_HARD);
- 	timer->bg_timer.function = kvm_bg_timer_expire;
--
--	hrtimer_init(&vtimer->hrtimer, CLOCK_MONOTONIC, HRTIMER_MODE_ABS_HARD);
--	hrtimer_init(&ptimer->hrtimer, CLOCK_MONOTONIC, HRTIMER_MODE_ABS_HARD);
--	vtimer->hrtimer.function = kvm_hrtimer_expire;
--	ptimer->hrtimer.function = kvm_hrtimer_expire;
--
--	vtimer->irq.irq = default_vtimer_irq.irq;
--	ptimer->irq.irq = default_ptimer_irq.irq;
--
--	vtimer->host_timer_irq = host_vtimer_irq;
--	ptimer->host_timer_irq = host_ptimer_irq;
--
--	vtimer->host_timer_irq_flags = host_vtimer_irq_flags;
--	ptimer->host_timer_irq_flags = host_ptimer_irq_flags;
- }
- 
- void kvm_timer_cpu_up(void)
-diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
-index 2dd0fd2406fb..c746ef64220b 100644
---- a/include/kvm/arm_arch_timer.h
-+++ b/include/kvm/arm_arch_timer.h
-@@ -59,7 +59,6 @@ struct arch_timer_context {
- 
- 	/* Duplicated state from arch_timer.c for convenience */
- 	u32				host_timer_irq;
--	u32				host_timer_irq_flags;
- };
- 
- struct timer_map {
--- 
-2.34.1
+Thanks for the reviews,
+Stefano
 
