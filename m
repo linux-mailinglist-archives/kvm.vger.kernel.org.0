@@ -2,124 +2,173 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4654D6C7DDE
-	for <lists+kvm@lfdr.de>; Fri, 24 Mar 2023 13:18:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0648B6C7DE4
+	for <lists+kvm@lfdr.de>; Fri, 24 Mar 2023 13:18:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231569AbjCXMS3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Mar 2023 08:18:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38128 "EHLO
+        id S231834AbjCXMSc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Mar 2023 08:18:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38138 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231278AbjCXMS2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Mar 2023 08:18:28 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6B957ECD
-        for <kvm@vger.kernel.org>; Fri, 24 Mar 2023 05:18:14 -0700 (PDT)
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 32OB31Dv026373
+        with ESMTP id S231387AbjCXMS3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Mar 2023 08:18:29 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6C238A55
+        for <kvm@vger.kernel.org>; Fri, 24 Mar 2023 05:18:15 -0700 (PDT)
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 32OBLLJH026438
         for <kvm@vger.kernel.org>; Fri, 24 Mar 2023 12:18:14 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : mime-version : content-transfer-encoding; s=pp1;
- bh=3gJubOlqxRJDfZEsUD6XCHcs1ZeFo+gk4x/sWGiVzTM=;
- b=qcXUYRjVySwj2kTRmegYR7121AjwPEI3HjpAO97SHUdcqNc1Ck0eeEg6d7LXRodOOofo
- SMfwKmYRN1lAprnkeR4rVbNPJyqtA3n7a4Raojqm7PMoRl0pS0lvS0ecNIHKshbaQs2n
- uC7JHvNLH4mJJ82wbxN2mHfCYb17+ShtvJ+v+NTyU/tdA2CLHt3+WStWM2XdrIesCUaW
- pgmwl7j7jJorO+axY/IkqRTY8gznzDPDz8QXaXbVt0Psoz5Ux8Ze2S8D+sk8ADVDRA/S
- AU1MpPSP/bgYLO2QmFrprzaIGBQ47dpx3bGd69r1CRsjPp4u4UQGB+Rv9r4HXvYoVoq0 Uw== 
+ : date : message-id : in-reply-to : references : mime-version :
+ content-transfer-encoding; s=pp1;
+ bh=GPj7esa3htFjLmzvuBdpb5S4onKRLFu5wCFEevGTd0A=;
+ b=EA1OGiQYT69bm8G48qYChY/1rOyuihmv8VFo3FTXiT6V9CErv8E20acLis93kYNKR5cj
+ q9i5189lOdPVGAz8lS4MvIXcJ9JA8IgJHQa14vFf16qCLHNjd0Xxc+VP7fls6LrTF6ZA
+ JGSotbPL/scjqYGfyBbul4KLQQ6KH1hCynjgjO7OAqrjgqMfGPudqHDv9rd0aU9LVP7D
+ Xn68tHEQxq3+1T3JkC9ebYpm/P/cYD/b65c5zpC0faRncaPCV8pD56U/3ywZIYV/mqRu
+ iWfyNIb8Hx6DLRd9N+y0yanN06FOJQKoSdTUY7U1PjepoQxoRU1bYr5A901kLHBhUnXf rA== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ph84udmv8-1
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3phawuh9m6-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
         for <kvm@vger.kernel.org>; Fri, 24 Mar 2023 12:18:14 +0000
-Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 32OCFJY3005080
-        for <kvm@vger.kernel.org>; Fri, 24 Mar 2023 12:18:13 GMT
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ph84udmun-1
+Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 32OBQUE6009808
+        for <kvm@vger.kernel.org>; Fri, 24 Mar 2023 12:18:14 GMT
+Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3phawuh9kn-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 24 Mar 2023 12:18:13 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 32NLKcqn024767;
-        Fri, 24 Mar 2023 12:18:11 GMT
+        Fri, 24 Mar 2023 12:18:14 +0000
+Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
+        by ppma04fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 32NM7AND000464;
+        Fri, 24 Mar 2023 12:18:12 GMT
 Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-        by ppma03ams.nl.ibm.com (PPS) with ESMTPS id 3pgxkrrttb-1
+        by ppma04fra.de.ibm.com (PPS) with ESMTPS id 3pgy9cgng3-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 24 Mar 2023 12:18:11 +0000
+        Fri, 24 Mar 2023 12:18:12 +0000
 Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-        by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 32OCI8C228115496
+        by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 32OCI8ri5046990
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 24 Mar 2023 12:18:08 GMT
+        Fri, 24 Mar 2023 12:18:09 GMT
 Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1B03220071;
+        by IMSVA (Postfix) with ESMTP id D456C2004E;
         Fri, 24 Mar 2023 12:18:08 +0000 (GMT)
 Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 78A212004E;
-        Fri, 24 Mar 2023 12:18:07 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 48A1320063;
+        Fri, 24 Mar 2023 12:18:08 +0000 (GMT)
 Received: from linux6.. (unknown [9.114.12.104])
         by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Fri, 24 Mar 2023 12:18:07 +0000 (GMT)
+        Fri, 24 Mar 2023 12:18:08 +0000 (GMT)
 From:   Janosch Frank <frankja@linux.ibm.com>
 To:     kvm@vger.kernel.org
 Cc:     thuth@redhat.com, imbrenda@linux.ibm.com, nrb@linux.ibm.com
-Subject: [kvm-unit-tests PATCH v2 0/9] s390x: uv-host: Fixups and extensions part 1
-Date:   Fri, 24 Mar 2023 12:17:15 +0000
-Message-Id: <20230324121724.1627-1-frankja@linux.ibm.com>
+Subject: [kvm-unit-tests PATCH v2 1/9] s390x: uv-host: Fix UV init test memory allocation
+Date:   Fri, 24 Mar 2023 12:17:16 +0000
+Message-Id: <20230324121724.1627-2-frankja@linux.ibm.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20230324121724.1627-1-frankja@linux.ibm.com>
+References: <20230324121724.1627-1-frankja@linux.ibm.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: pbovufDaZyRNBhV85fu1R64BBO2F4r7I
-X-Proofpoint-ORIG-GUID: Wbx2WRqr59vNNxL5361T4wdYVrAhVTD3
+X-Proofpoint-ORIG-GUID: wxxBw-Bx_4X4zbSxcoA_4e6mrCtaFK4J
+X-Proofpoint-GUID: RG82qdfrVOG9ewd874Yo9KcZyy0vQE8E
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
  definitions=2023-03-24_06,2023-03-24_01,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- bulkscore=0 phishscore=0 clxscore=1015 adultscore=0 spamscore=0
- malwarescore=0 mlxlogscore=982 suspectscore=0 lowpriorityscore=0
- impostorscore=0 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2303200000 definitions=main-2303240099
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 mlxlogscore=999
+ mlxscore=0 bulkscore=0 impostorscore=0 lowpriorityscore=0 suspectscore=0
+ spamscore=0 priorityscore=1501 malwarescore=0 clxscore=1015 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2303200000
+ definitions=main-2303240099
 X-Spam-Status: No, score=-0.1 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
-        DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-        autolearn_force=no version=3.4.6
+        DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The uv-host test has a lot of historical growth problems which have
-largely been overlooked since running it is harder than running a KVM
-(guest 2) based test.
+The init memory has to be above 2G and 1M aligned but we're currently
+aligning on 2G which means the allocations need a lot of unused
+memory.
 
-This series fixes up smaler problems but still leaves the test with
-fails when running create config base and variable storage
-tests. Those problems will either be fixed up with the second series
-or with a firmware fix since I'm unsure on which side of the os/fw
-fence the problem exists.
+Also the second block of memory was never actually used for the double
+init test since its address is never put into the uvcb.
 
-The series is based on my other series that introduces pv-ipl and
-pv-icpt. The memory allocation fix will be added to the new version of
-that series so all G1 tests are fixed.
+Let's fix that.
 
-v2:
-	- Added patch that exchanges sigp_retry with the smp variant
-	- Re-worked the create config test handling
-	- Minor fixups
+Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+---
+ s390x/uv-host.c | 23 ++++++++++++++---------
+ 1 file changed, 14 insertions(+), 9 deletions(-)
 
-Janosch Frank (9):
-  s390x: uv-host: Fix UV init test memory allocation
-  s390x: uv-host: Check for sufficient amount of memory
-  s390x: Add PV tests to unittests.cfg
-  s390x: uv-host: Beautify code
-  s390x: uv-host: Add cpu number check
-  s390x: uv-host: Fix create guest variable storage prefix check
-  s390x: uv-host: Switch to smp_sigp
-  s390x: uv-host: Properly handle config creation errors
-  s390x: uv-host: Fence access checks when UV debug is enabled
-
- lib/s390x/asm/uv.h  |   1 +
- s390x/unittests.cfg |  17 ++++++
- s390x/uv-host.c     | 140 +++++++++++++++++++++++++++++++++++---------
- 3 files changed, 129 insertions(+), 29 deletions(-)
-
+diff --git a/s390x/uv-host.c b/s390x/uv-host.c
+index 33e6eec6..9dfaebd7 100644
+--- a/s390x/uv-host.c
++++ b/s390x/uv-host.c
+@@ -500,14 +500,17 @@ static void test_config_create(void)
+ static void test_init(void)
+ {
+ 	int rc;
+-	uint64_t mem;
++	uint64_t tmp;
+ 
+-	/* Donated storage needs to be over 2GB */
+-	mem = (uint64_t)memalign_pages_flags(SZ_1M, uvcb_qui.uv_base_stor_len, AREA_NORMAL);
++	/*
++	 * Donated storage needs to be over 2GB, AREA_NORMAL does that
++	 * on s390x.
++	 */
++	tmp = (uint64_t)memalign_pages_flags(SZ_1M, uvcb_qui.uv_base_stor_len, AREA_NORMAL);
+ 
+ 	uvcb_init.header.len = sizeof(uvcb_init);
+ 	uvcb_init.header.cmd = UVC_CMD_INIT_UV;
+-	uvcb_init.stor_origin = mem;
++	uvcb_init.stor_origin = tmp;
+ 	uvcb_init.stor_len = uvcb_qui.uv_base_stor_len;
+ 
+ 	report_prefix_push("init");
+@@ -528,14 +531,14 @@ static void test_init(void)
+ 	rc = uv_call(0, (uint64_t)&uvcb_init);
+ 	report(rc == 1 && (uvcb_init.header.rc == 0x104 || uvcb_init.header.rc == 0x105),
+ 	       "storage origin invalid");
+-	uvcb_init.stor_origin = mem;
++	uvcb_init.stor_origin = tmp;
+ 
+ 	if (uvcb_init.stor_len >= HPAGE_SIZE) {
+ 		uvcb_init.stor_origin = get_max_ram_size() - HPAGE_SIZE;
+ 		rc = uv_call(0, (uint64_t)&uvcb_init);
+ 		report(rc == 1 && uvcb_init.header.rc == 0x105,
+ 		       "storage + length invalid");
+-		uvcb_init.stor_origin = mem;
++		uvcb_init.stor_origin = tmp;
+ 	} else {
+ 		report_skip("storage + length invalid, stor_len < HPAGE_SIZE");
+ 	}
+@@ -544,7 +547,7 @@ static void test_init(void)
+ 	rc = uv_call(0, (uint64_t)&uvcb_init);
+ 	report(rc == 1 && uvcb_init.header.rc == 0x108,
+ 	       "storage below 2GB");
+-	uvcb_init.stor_origin = mem;
++	uvcb_init.stor_origin = tmp;
+ 
+ 	smp_cpu_setup(1, PSW_WITH_CUR_MASK(cpu_loop));
+ 	rc = uv_call(0, (uint64_t)&uvcb_init);
+@@ -555,10 +558,12 @@ static void test_init(void)
+ 	rc = uv_call(0, (uint64_t)&uvcb_init);
+ 	report(rc == 0 && uvcb_init.header.rc == UVC_RC_EXECUTED, "successful");
+ 
+-	mem = (uint64_t)memalign(1UL << 31, uvcb_qui.uv_base_stor_len);
++	tmp = uvcb_init.stor_origin;
++	uvcb_init.stor_origin =	(uint64_t)memalign_pages_flags(HPAGE_SIZE, uvcb_qui.uv_base_stor_len, AREA_NORMAL);
+ 	rc = uv_call(0, (uint64_t)&uvcb_init);
+ 	report(rc == 1 && uvcb_init.header.rc == 0x101, "double init");
+-	free((void *)mem);
++	free((void *)uvcb_init.stor_origin);
++	uvcb_init.stor_origin = tmp;
+ 
+ 	report_prefix_pop();
+ }
 -- 
 2.34.1
 
