@@ -2,355 +2,295 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6127B6C7765
-	for <lists+kvm@lfdr.de>; Fri, 24 Mar 2023 06:32:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 240BD6C7912
+	for <lists+kvm@lfdr.de>; Fri, 24 Mar 2023 08:41:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231466AbjCXFcP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Mar 2023 01:32:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49584 "EHLO
+        id S230382AbjCXHlZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Mar 2023 03:41:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46234 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229794AbjCXFcH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Mar 2023 01:32:07 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 934A28F
-        for <kvm@vger.kernel.org>; Thu, 23 Mar 2023 22:31:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1679635878;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=N2a1xvUOUTDa8qNXVZtHHs2/wy9h/5BrtN8IXVy3fEQ=;
-        b=Khec35JNVB66AkW4liSV3eU8cK1K/3AgeSUmZ874Qt6pjbStXQIyzUh9WSJpj507wnLuP0
-        mftPRBmZBXhJ5YHW1/laWnpgWQF2Rxs52kKMs+QRDVs2X5jATdfkigTrbcJDykBNlziJHi
-        BtwtKwBblf+O4EnFV/ZeKGB46610J1Y=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-578-kcpDXhIOO0eK4GeNGakuNg-1; Fri, 24 Mar 2023 01:31:17 -0400
-X-MC-Unique: kcpDXhIOO0eK4GeNGakuNg-1
-Received: by mail-wm1-f72.google.com with SMTP id p10-20020a05600c358a00b003edf7d484d4so291772wmq.0
-        for <kvm@vger.kernel.org>; Thu, 23 Mar 2023 22:31:16 -0700 (PDT)
+        with ESMTP id S229870AbjCXHlY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Mar 2023 03:41:24 -0400
+Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53CB719C50
+        for <kvm@vger.kernel.org>; Fri, 24 Mar 2023 00:41:23 -0700 (PDT)
+Received: by mail-pl1-x62f.google.com with SMTP id d9443c01a7336-19f3449bf02so145165ad.1
+        for <kvm@vger.kernel.org>; Fri, 24 Mar 2023 00:41:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112; t=1679643683;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=UNF2BYfc/eUF16ojRHfHm/WuPO82GBqOTkKROijHv4Q=;
+        b=M/4Zcr5p/D3klYJ9dobMZBLso6pNrrLkgVbmupVuQuQKedCszhQjR/DGcu2C5TA7b0
+         vNoOG6Ae2XZflL5VTznIL8dE1P1dz+dDR2Lcyn0nkLy/B9SYbIofxMk+bdmvm30cIumI
+         Dlz1KikgIS8KyPo6Sw1lOHJYmb6GgOOuBNT3vdUABkb4Imrc5EPSvQezeaiUn0Yyd6Xm
+         AJmC95mKZ2udDxsIo5QBMOZ9fGpFcGK/V/c8WJxX+p2T4wmsTUPuLEtoMyJlktW1qP/e
+         fg3xvihVFH5YcfW6FjE+FULSx6gLaRBoZu1XzbhNoWnSlmhRbi9xPtvyoU+dqCtVJgKy
+         36DA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679635876;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=N2a1xvUOUTDa8qNXVZtHHs2/wy9h/5BrtN8IXVy3fEQ=;
-        b=wQeRdSac3g+w2jyTZ3DhV4TedQzb45TJmzfVmW4gtr/OUMKNc1MBFIoDRkpSLeDOq9
-         tibXIYpTSuLk+C554FPYF8Pls5NROG66nXqT8TOxZvMjNWHYK4SFQLKXfqgrnL5Kxjdl
-         G2CfHjLYBEzAjhefGeaXKgoLpGrZr5vHZbTUYmMh+UvhV9OPM+MLgnE6YDTu9SF9aeFu
-         motTAbCeT3yvyBULvyoe/lxxf+O+mrjdqRK2gItvZxBTYkwJglhSJUMrvEodSrBf//gi
-         m5CE9U7CClyXDAK6FTWYeBObEEzpuSdmX+25NaMVJIcXke/eTbRCNbXkBg68n1HsuXyF
-         X09A==
-X-Gm-Message-State: AAQBX9ecePPOi/cOTK/2tSMAHGkPEyAGdkNbNNaDwQP7lLckXFwTYJvO
-        j4atkagIdwOqpWcNe+hFH3o6HFDtScr0BE894I+pEQZ4+H5rcR0heE0ANsSdoFJLWICtC3ItzCa
-        51IXr4j3XQdvM
-X-Received: by 2002:a5d:6b8b:0:b0:2ce:ad08:ca4 with SMTP id n11-20020a5d6b8b000000b002cead080ca4mr989245wrx.35.1679635875955;
-        Thu, 23 Mar 2023 22:31:15 -0700 (PDT)
-X-Google-Smtp-Source: AKy350b3Mx7v295xk69JlKaVftSlan8v8qU7rb+a8DZjWnx7PlsPog3Ko+6oMYE2zmGyg7YJu5D+BQ==
-X-Received: by 2002:a5d:6b8b:0:b0:2ce:ad08:ca4 with SMTP id n11-20020a5d6b8b000000b002cead080ca4mr989228wrx.35.1679635875586;
-        Thu, 23 Mar 2023 22:31:15 -0700 (PDT)
-Received: from redhat.com ([2.52.12.190])
-        by smtp.gmail.com with ESMTPSA id e23-20020a5d5957000000b002cfefa50a8esm17502567wri.98.2023.03.23.22.31.13
+        d=1e100.net; s=20210112; t=1679643683;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=UNF2BYfc/eUF16ojRHfHm/WuPO82GBqOTkKROijHv4Q=;
+        b=zCD620SyW+oPa5XZmaGAkXljFrWbHXuojM3SYQ0pEh9AqlLtXCVin8G4DR+fWFQbMg
+         B1P3vV+yiCeAK/ZOUA9Pchcrv4hvBUKLVTtAb2P3F8EL2YL4i8Pqnos2t8IsA3QSfxb+
+         vU+kR9N8ZhhqZN/f1QINcn169q5QVAVwhEn6K1TR8+TKQa3mZ0HUZoEJkMxMZkN5zAZ/
+         VnYK9WNcR4D3GD9hTuJAkh8UYcUF2vyNENL3TkRrzD7GxEafAvabOY9X7og2PoF9HIHz
+         FmspWDjwZVBBhQRtrvnlxgtS6tpHNRTV9CYHt01ytTz8hzNifKMfeg7iDPHtC64c/m+/
+         LmbA==
+X-Gm-Message-State: AAQBX9d5bFj+gCKfrJiGNf/gZ0E0TDAsuua9f4+LEFKvxDUNXe0BKyKW
+        VHegQJrs3sqqZjtiG9glBobu+Q==
+X-Google-Smtp-Source: AKy350Y1M7+uUFn+dIQEoNALnRQhnSZsxvDkHH5iq38PFzkOQPLA7tTx+bmKGinufKoQ7ObK68sbZQ==
+X-Received: by 2002:a17:902:a60f:b0:19a:f15a:5b2f with SMTP id u15-20020a170902a60f00b0019af15a5b2fmr89461plq.19.1679643682563;
+        Fri, 24 Mar 2023 00:41:22 -0700 (PDT)
+Received: from google.com (220.181.82.34.bc.googleusercontent.com. [34.82.181.220])
+        by smtp.gmail.com with ESMTPSA id x15-20020a63f70f000000b0051303d3e3c5sm3043053pgh.42.2023.03.24.00.41.21
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Mar 2023 22:31:14 -0700 (PDT)
-Date:   Fri, 24 Mar 2023 01:31:11 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     Viktor Prutyanov <viktor@daynix.com>, cohuck@redhat.com,
-        pasic@linux.ibm.com, farman@linux.ibm.com,
-        linux-s390@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        linux-kernel@vger.kernel.org, yan@daynix.com
-Subject: Re: [PATCH v5] virtio: add VIRTIO_F_NOTIFICATION_DATA feature support
-Message-ID: <20230324011454-mutt-send-email-mst@kernel.org>
-References: <20230323085551.2346411-1-viktor@daynix.com>
- <CACGkMEsTpdES6Gzsx7eobJsac8a1V0dqfRm3vExrd1e+TJ_bVg@mail.gmail.com>
+        Fri, 24 Mar 2023 00:41:22 -0700 (PDT)
+Date:   Fri, 24 Mar 2023 00:41:18 -0700
+From:   Ricardo Koller <ricarkol@google.com>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     pbonzini@redhat.com, oupton@google.com, yuzenghui@huawei.com,
+        dmatlack@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+        qperret@google.com, catalin.marinas@arm.com,
+        andrew.jones@linux.dev, seanjc@google.com,
+        alexandru.elisei@arm.com, suzuki.poulose@arm.com,
+        eric.auger@redhat.com, gshan@redhat.com, reijiw@google.com,
+        rananta@google.com, bgardon@google.com, ricarkol@gmail.com,
+        Oliver Upton <oliver.upton@linux.dev>
+Subject: Re: [PATCH v6 08/12] KVM: arm64: Add
+ KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE
+Message-ID: <ZB1UHrLFSOeVWhaV@google.com>
+References: <20230307034555.39733-1-ricarkol@google.com>
+ <20230307034555.39733-9-ricarkol@google.com>
+ <877cvm5gk4.wl-maz@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CACGkMEsTpdES6Gzsx7eobJsac8a1V0dqfRm3vExrd1e+TJ_bVg@mail.gmail.com>
-X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+In-Reply-To: <877cvm5gk4.wl-maz@kernel.org>
+X-Spam-Status: No, score=-15.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,ENV_AND_HDR_SPF_MATCH,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL,
+        USER_IN_DEF_SPF_WL autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Mar 24, 2023 at 11:09:19AM +0800, Jason Wang wrote:
-> On Thu, Mar 23, 2023 at 4:56 PM Viktor Prutyanov <viktor@daynix.com> wrote:
-> >
-> > According to VirtIO spec v1.2, VIRTIO_F_NOTIFICATION_DATA feature
-> > indicates that the driver passes extra data along with the queue
-> > notifications.
-> >
-> > In a split queue case, the extra data is 16-bit available index. In a
-> > packed queue case, the extra data is 1-bit wrap counter and 15-bit
-> > available index.
-> >
-> > Add support for this feature for MMIO, channel I/O and modern PCI
-> > transports.
-> >
-> > Signed-off-by: Viktor Prutyanov <viktor@daynix.com>
+On Sun, Mar 12, 2023 at 11:56:27AM +0000, Marc Zyngier wrote:
+> On Tue, 07 Mar 2023 03:45:51 +0000,
+> Ricardo Koller <ricarkol@google.com> wrote:
+> > 
+> > Add a capability for userspace to specify the eager split chunk size.
+> > The chunk size specifies how many pages to break at a time, using a
+> > single allocation. Bigger the chunk size, more pages need to be
+> > allocated ahead of time.
+> > 
+> > Suggested-by: Oliver Upton <oliver.upton@linux.dev>
+> > Signed-off-by: Ricardo Koller <ricarkol@google.com>
 > > ---
-> >  v5: replace ternary operator with if-else
-> >  v4: remove VP_NOTIFY macro and legacy PCI support, add
-> >     virtio_ccw_kvm_notify_with_data to virtio_ccw
-> >  v3: support feature in virtio_ccw, remove VM_NOTIFY, use avail_idx_shadow,
-> >     remove byte swap, rename to vring_notification_data
-> >  v2: reject the feature in virtio_ccw, replace __le32 with u32
-> >
-> >  Tested with disabled VIRTIO_F_NOTIFICATION_DATA on qemu-system-s390x
-> >  (virtio-blk-ccw), qemu-system-riscv64 (virtio-blk-device,
-> >  virtio-rng-device), qemu-system-x86_64 (virtio-blk-pci, virtio-net-pci)
-> >  to make sure nothing is broken.
-> >  Tested with enabled VIRTIO_F_NOTIFICATION_DATA on 64-bit RISC-V Linux
-> >  and my hardware implementation of virtio-rng with MMIO.
-> >
-> >  drivers/s390/virtio/virtio_ccw.c   | 22 +++++++++++++++++++---
-> >  drivers/virtio/virtio_mmio.c       | 18 +++++++++++++++++-
-> >  drivers/virtio/virtio_pci_modern.c | 17 ++++++++++++++++-
-> >  drivers/virtio/virtio_ring.c       | 17 +++++++++++++++++
-> >  include/linux/virtio_ring.h        |  2 ++
-> >  include/uapi/linux/virtio_config.h |  6 ++++++
-> >  6 files changed, 77 insertions(+), 5 deletions(-)
-> >
-> > diff --git a/drivers/s390/virtio/virtio_ccw.c b/drivers/s390/virtio/virtio_ccw.c
-> > index 954fc31b4bc7..9a9c5d34454c 100644
-> > --- a/drivers/s390/virtio/virtio_ccw.c
-> > +++ b/drivers/s390/virtio/virtio_ccw.c
-> > @@ -391,7 +391,7 @@ static void virtio_ccw_drop_indicator(struct virtio_ccw_device *vcdev,
-> >         ccw_device_dma_free(vcdev->cdev, thinint_area, sizeof(*thinint_area));
-> >  }
-> >
-> > -static bool virtio_ccw_kvm_notify(struct virtqueue *vq)
-> > +static inline bool virtio_ccw_do_kvm_notify(struct virtqueue *vq, u32 data)
-> >  {
-> >         struct virtio_ccw_vq_info *info = vq->priv;
-> >         struct virtio_ccw_device *vcdev;
-> > @@ -402,12 +402,22 @@ static bool virtio_ccw_kvm_notify(struct virtqueue *vq)
-> >         BUILD_BUG_ON(sizeof(struct subchannel_id) != sizeof(unsigned int));
-> >         info->cookie = kvm_hypercall3(KVM_S390_VIRTIO_CCW_NOTIFY,
-> >                                       *((unsigned int *)&schid),
-> > -                                     vq->index, info->cookie);
-> > +                                     data, info->cookie);
-> >         if (info->cookie < 0)
-> >                 return false;
-> >         return true;
-> >  }
-> >
-> > +static bool virtio_ccw_kvm_notify(struct virtqueue *vq)
-> > +{
-> > +       return virtio_ccw_do_kvm_notify(vq, vq->index);
-> > +}
+> >  Documentation/virt/kvm/api.rst    | 26 ++++++++++++++++++++++++++
+> >  arch/arm64/include/asm/kvm_host.h | 19 +++++++++++++++++++
+> >  arch/arm64/kvm/arm.c              | 22 ++++++++++++++++++++++
+> >  arch/arm64/kvm/mmu.c              |  3 +++
+> >  include/uapi/linux/kvm.h          |  1 +
+> >  5 files changed, 71 insertions(+)
+> > 
+> > diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> > index 62de0768d6aa..872dae7cfbe0 100644
+> > --- a/Documentation/virt/kvm/api.rst
+> > +++ b/Documentation/virt/kvm/api.rst
+> > @@ -8380,6 +8380,32 @@ structure.
+> >  When getting the Modified Change Topology Report value, the attr->addr
+> >  must point to a byte where the value will be stored or retrieved from.
+> >  
+> > +8.40 KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE
+> > +---------------------------------------
 > > +
-> > +static bool virtio_ccw_kvm_notify_with_data(struct virtqueue *vq)
-> > +{
-> > +       return virtio_ccw_do_kvm_notify(vq, vring_notification_data(vq));
-> > +}
-> > +
-> >  static int virtio_ccw_read_vq_conf(struct virtio_ccw_device *vcdev,
-> >                                    struct ccw1 *ccw, int index)
-> >  {
-> > @@ -501,6 +511,12 @@ static struct virtqueue *virtio_ccw_setup_vq(struct virtio_device *vdev,
-> >         u64 queue;
-> >         unsigned long flags;
-> >         bool may_reduce;
-> > +       bool (*notify)(struct virtqueue *vq);
-> > +
-> > +       if (__virtio_test_bit(vdev, VIRTIO_F_NOTIFICATION_DATA))
-> > +               notify = virtio_ccw_kvm_notify_with_data;
-> > +       else
-> > +               notify = virtio_ccw_kvm_notify;
-> >
-> >         /* Allocate queue. */
-> >         info = kzalloc(sizeof(struct virtio_ccw_vq_info), GFP_KERNEL);
-> > @@ -524,7 +540,7 @@ static struct virtqueue *virtio_ccw_setup_vq(struct virtio_device *vdev,
-> >         may_reduce = vcdev->revision > 0;
-> >         vq = vring_create_virtqueue(i, info->num, KVM_VIRTIO_CCW_RING_ALIGN,
-> >                                     vdev, true, may_reduce, ctx,
-> > -                                   virtio_ccw_kvm_notify, callback, name);
-> > +                                   notify, callback, name);
-> >
-> >         if (!vq) {
-> >                 /* For now, we fail if we can't get the requested size. */
-> > diff --git a/drivers/virtio/virtio_mmio.c b/drivers/virtio/virtio_mmio.c
-> > index 3ff746e3f24a..7e87f745f68d 100644
-> > --- a/drivers/virtio/virtio_mmio.c
-> > +++ b/drivers/virtio/virtio_mmio.c
-> > @@ -285,6 +285,16 @@ static bool vm_notify(struct virtqueue *vq)
-> >         return true;
-> >  }
-> >
-> > +static bool vm_notify_with_data(struct virtqueue *vq)
-> > +{
-> > +       struct virtio_mmio_device *vm_dev = to_virtio_mmio_device(vq->vdev);
-> > +       u32 data = vring_notification_data(vq);
-> > +
-> > +       writel(data, vm_dev->base + VIRTIO_MMIO_QUEUE_NOTIFY);
-> > +
-> > +       return true;
-> > +}
-> > +
-> >  /* Notify all virtqueues on an interrupt. */
-> >  static irqreturn_t vm_interrupt(int irq, void *opaque)
-> >  {
-> > @@ -368,6 +378,12 @@ static struct virtqueue *vm_setup_vq(struct virtio_device *vdev, unsigned int in
-> >         unsigned long flags;
-> >         unsigned int num;
-> >         int err;
-> > +       bool (*notify)(struct virtqueue *vq);
-> > +
-> > +       if (__virtio_test_bit(vdev, VIRTIO_F_NOTIFICATION_DATA))
-> > +               notify = vm_notify_with_data;
-> > +       else
-> > +               notify = vm_notify;
-> >
-> >         if (!name)
-> >                 return NULL;
-> > @@ -397,7 +413,7 @@ static struct virtqueue *vm_setup_vq(struct virtio_device *vdev, unsigned int in
-> >
-> >         /* Create the vring */
-> >         vq = vring_create_virtqueue(index, num, VIRTIO_MMIO_VRING_ALIGN, vdev,
-> > -                                true, true, ctx, vm_notify, callback, name);
-> > +                                true, true, ctx, notify, callback, name);
-> >         if (!vq) {
-> >                 err = -ENOMEM;
-> >                 goto error_new_virtqueue;
-> > diff --git a/drivers/virtio/virtio_pci_modern.c b/drivers/virtio/virtio_pci_modern.c
-> > index 9e496e288cfa..3bfc368b279e 100644
-> > --- a/drivers/virtio/virtio_pci_modern.c
-> > +++ b/drivers/virtio/virtio_pci_modern.c
-> > @@ -288,6 +288,15 @@ static u16 vp_config_vector(struct virtio_pci_device *vp_dev, u16 vector)
-> >         return vp_modern_config_vector(&vp_dev->mdev, vector);
-> >  }
-> >
-> > +static bool vp_notify_with_data(struct virtqueue *vq)
-> > +{
-> > +       u32 data = vring_notification_data(vq);
-> > +
-> > +       iowrite32(data, (void __iomem *)vq->priv);
-> > +
-> > +       return true;
-> > +}
-> > +
-> >  static struct virtqueue *setup_vq(struct virtio_pci_device *vp_dev,
-> >                                   struct virtio_pci_vq_info *info,
-> >                                   unsigned int index,
-> > @@ -301,6 +310,12 @@ static struct virtqueue *setup_vq(struct virtio_pci_device *vp_dev,
-> >         struct virtqueue *vq;
-> >         u16 num;
-> >         int err;
-> > +       bool (*notify)(struct virtqueue *vq);
-> > +
-> > +       if (__virtio_test_bit(&vp_dev->vdev, VIRTIO_F_NOTIFICATION_DATA))
-> > +               notify = vp_notify_with_data;
-> > +       else
-> > +               notify = vp_notify;
-> >
-> >         if (index >= vp_modern_get_num_queues(mdev))
-> >                 return ERR_PTR(-EINVAL);
-> > @@ -321,7 +336,7 @@ static struct virtqueue *setup_vq(struct virtio_pci_device *vp_dev,
-> >         vq = vring_create_virtqueue(index, num,
-> >                                     SMP_CACHE_BYTES, &vp_dev->vdev,
-> >                                     true, true, ctx,
-> > -                                   vp_notify, callback, name);
-> > +                                   notify, callback, name);
-> >         if (!vq)
-> >                 return ERR_PTR(-ENOMEM);
-> >
-> > diff --git a/drivers/virtio/virtio_ring.c b/drivers/virtio/virtio_ring.c
-> > index 4c3bb0ddeb9b..837875cc3190 100644
-> > --- a/drivers/virtio/virtio_ring.c
-> > +++ b/drivers/virtio/virtio_ring.c
-> > @@ -2752,6 +2752,21 @@ void vring_del_virtqueue(struct virtqueue *_vq)
-> >  }
-> >  EXPORT_SYMBOL_GPL(vring_del_virtqueue);
-> >
-> > +u32 vring_notification_data(struct virtqueue *_vq)
-> > +{
-> > +       struct vring_virtqueue *vq = to_vvq(_vq);
-> > +       u16 next;
-> > +
-> > +       if (vq->packed_ring)
-> > +               next = (vq->packed.next_avail_idx & ~(1 << 15)) |
-> > +                       vq->packed.avail_wrap_counter << 15;
+> > +:Capability: KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE
+> > +:Architectures: arm64
+> > +:Type: vm
+> > +:Parameters: arg[0] is the new chunk size.
 > 
-> Nit: We have VRING_PACKED_EVENT_F_WRAP_CTR which could be used for
-> replacing 15 here.
+> split chunk size?
 > 
-> And we have many places for packing them into u16, it might be better
-> to introduce a helper.
-
-Not sure about a helper, I'd leave that for a future cleanup.
-
-However I would use
-
-& (-(1 << VRING_PACKED_EVENT_F_WRAP_CTR))
-
-that's more robust - works for any value of VRING_PACKED_EVENT_F_WRAP_CTR
-giving low bits 0 to VRING_PACKED_EVENT_F_WRAP_CTR,
-and will keep working if someone copypasted it and changed
-counter to a value different from 15.
-
-
-> Acked-by: Jason Wang <jasowang@redhat.com>
+> > +:Returns: 0 on success, -EINVAL if any memslot has been created.
 > 
-> Thanks
+> nit: if any memslot was *already* created.
 > 
-> > +       else
-> > +               next = vq->split.avail_idx_shadow;
 > > +
-> > +       return next << 16 | _vq->index;
-> > +}
-> > +EXPORT_SYMBOL_GPL(vring_notification_data);
+> > +This capability sets the chunk size used in Eager Page Splitting.
 > > +
-> >  /* Manipulates transport-specific feature bits. */
-> >  void vring_transport_features(struct virtio_device *vdev)
-> >  {
-> > @@ -2771,6 +2786,8 @@ void vring_transport_features(struct virtio_device *vdev)
-> >                         break;
-> >                 case VIRTIO_F_ORDER_PLATFORM:
-> >                         break;
-> > +               case VIRTIO_F_NOTIFICATION_DATA:
-> > +                       break;
-> >                 default:
-> >                         /* We don't understand this bit. */
-> >                         __virtio_clear_bit(vdev, i);
-> > diff --git a/include/linux/virtio_ring.h b/include/linux/virtio_ring.h
-> > index 8b95b69ef694..2550c9170f4f 100644
-> > --- a/include/linux/virtio_ring.h
-> > +++ b/include/linux/virtio_ring.h
-> > @@ -117,4 +117,6 @@ void vring_del_virtqueue(struct virtqueue *vq);
-> >  void vring_transport_features(struct virtio_device *vdev);
-> >
-> >  irqreturn_t vring_interrupt(int irq, void *_vq);
-> > +
-> > +u32 vring_notification_data(struct virtqueue *_vq);
-> >  #endif /* _LINUX_VIRTIO_RING_H */
-> > diff --git a/include/uapi/linux/virtio_config.h b/include/uapi/linux/virtio_config.h
-> > index 3c05162bc988..2c712c654165 100644
-> > --- a/include/uapi/linux/virtio_config.h
-> > +++ b/include/uapi/linux/virtio_config.h
-> > @@ -99,6 +99,12 @@
-> >   */
-> >  #define VIRTIO_F_SR_IOV                        37
-> >
-> > +/*
-> > + * This feature indicates that the driver passes extra data (besides
-> > + * identifying the virtqueue) in its device notifications.
-> > + */
-> > +#define VIRTIO_F_NOTIFICATION_DATA     38
-> > +
-> >  /*
-> >   * This feature indicates that the driver can reset a queue individually.
-> >   */
-> > --
-> > 2.35.1
-> >
+> > +Eager Page Splitting improves the performance of dirty-logging (used
+> > +in live migrations) when guest memory is backed by huge-pages.  This
+> > +optimization is enabled by default on arm64.
+> 
+> Why enabled by default? It means that systems that do not want to pay
+> the extra memory for this have to do an explicit call to disable it.
+> I'd rather see this as a buy-in option.
+>
 
+Will disable by default.
+
+> > It avoids splitting
+> > +huge-pages (into PAGE_SIZE pages) on fault, by doing it eagerly when
+> > +enabling dirty logging (with the KVM_MEM_LOG_DIRTY_PAGES flag for a
+> > +memory region), or when using KVM_CLEAR_DIRTY_LOG.
+> > +
+> > +The chunk size specifies how many pages to break at a time, using a
+> > +single allocation for each chunk. Bigger the chunk size, more pages
+> > +need to be allocated ahead of time. A good heuristic is to pick the
+> > +size of the huge-pages as the chunk size.
+> 
+> How about making this a requirement rather than a heuristic? 
+
+Sounds good. Planning to return EINVAL for anything that's not a
+supported block size. 
+
+> You could
+> also tell userspace what are the block sizes that are acceptable (1G,
+> 512M, 2M, 64K...) by exposing a 64bit bitmap (each bit describing a
+> block size).
+
+Good idea, I'm thinking of using a new KVM_CAP_ARM_SUPPORTED_BLOCK_SIZES
+capability to return this bitmap.
+
+> 
+> > +
+> > +If the chunk size (arg[0]) is zero, then no eager page splitting is
+> > +performed. The default value PMD size (e.g., 2M when PAGE_SIZE is 4K).
+> 
+> I really dislike exposing the notion of PMD to userspace. Not only
+> this is a concept that is mostly foreign to the arm64 architecture,
+> this isn't a userspace concept at all. Another reason to talk about
+> block sizes (but I really want this to default to 0 and keep the
+> current behaviour as the default).
+> 
+> > +
+> >  9. Known KVM API problems
+> >  =========================
+> >  
+> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> > index a1892a8f6032..b7755d0cbd4d 100644
+> > --- a/arch/arm64/include/asm/kvm_host.h
+> > +++ b/arch/arm64/include/asm/kvm_host.h
+> > @@ -158,6 +158,25 @@ struct kvm_s2_mmu {
+> >  	/* The last vcpu id that ran on each physical CPU */
+> >  	int __percpu *last_vcpu_ran;
+> >  
+> > +#define KVM_ARM_EAGER_SPLIT_CHUNK_SIZE_DEFAULT	PMD_SIZE
+> > +	/*
+> > +	 * Memory cache used to split
+> > +	 * KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE worth of huge pages. It
+> > +	 * is used to allocate stage2 page tables while splitting huge
+> > +	 * pages. Note that the choice of EAGER_PAGE_SPLIT_CHUNK_SIZE
+> > +	 * influences both the capacity of the split page cache, and
+> > +	 * how often KVM reschedules. Be wary of raising CHUNK_SIZE
+> > +	 * too high.
+> > +	 *
+> > +	 * A good heuristic to pick CHUNK_SIZE is that it should be
+> > +	 * the size of the huge-pages backing guest memory. If not
+> > +	 * known, the PMD size (usually 2M) is a good guess.
+> 
+> This is a 4kB-ness. Nothing "usual" about it (and my 16kB hosts
+> definitely object!).
+> 
+> > +	 *
+> > +	 * Protected by kvm->slots_lock.
+> > +	 */
+> > +	struct kvm_mmu_memory_cache split_page_cache;
+> 
+> If this is living in kvm_s2_mmu, and that this is a proper memcache,
+> why does patch #4 have this horrible 'struct stage2_split_data' that
+> uses a 'void *' and carries a kvm_s2_mmu pointer?
+> 
+> Surely, passing the memcache around should be enough (and container_of
+> is your forever friend).
+> 
+
+This simplified things quite a bit.
+
+> > +	uint64_t split_page_chunk_size;
+> > +
+> >  	struct kvm_arch *arch;
+> >  };
+> >  
+> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> > index 3bd732eaf087..3468fee223ae 100644
+> > --- a/arch/arm64/kvm/arm.c
+> > +++ b/arch/arm64/kvm/arm.c
+> > @@ -91,6 +91,22 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+> >  		r = 0;
+> >  		set_bit(KVM_ARCH_FLAG_SYSTEM_SUSPEND_ENABLED, &kvm->arch.flags);
+> >  		break;
+> > +	case KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE:
+> > +		mutex_lock(&kvm->lock);
+> > +		mutex_lock(&kvm->slots_lock);
+> > +		/*
+> > +		 * To keep things simple, allow changing the chunk
+> > +		 * size only if there are no memslots created.
+> > +		 */
+> > +		if (!kvm_are_all_memslots_empty(kvm)) {
+> > +			r = -EINVAL;
+> > +		} else {
+> > +			r = 0;
+> > +			kvm->arch.mmu.split_page_chunk_size = cap->args[0];
+> > +		}
+> > +		mutex_unlock(&kvm->slots_lock);
+> > +		mutex_unlock(&kvm->lock);
+> > +		break;
+> >  	default:
+> >  		r = -EINVAL;
+> >  		break;
+> > @@ -288,6 +304,12 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+> >  	case KVM_CAP_ARM_PTRAUTH_GENERIC:
+> >  		r = system_has_full_ptr_auth();
+> >  		break;
+> > +	case KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE:
+> > +		if (kvm)
+> > +			r = kvm->arch.mmu.split_page_chunk_size;
+> > +		else
+> > +			r = KVM_ARM_EAGER_SPLIT_CHUNK_SIZE_DEFAULT;
+> > +		break;
+> >  	default:
+> >  		r = 0;
+> >  	}
+> > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> > index a2800e5c4271..898985b09321 100644
+> > --- a/arch/arm64/kvm/mmu.c
+> > +++ b/arch/arm64/kvm/mmu.c
+> > @@ -756,6 +756,9 @@ int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu, unsigned long t
+> >  	for_each_possible_cpu(cpu)
+> >  		*per_cpu_ptr(mmu->last_vcpu_ran, cpu) = -1;
+> >  
+> > +	mmu->split_page_cache.gfp_zero = __GFP_ZERO;
+> > +	mmu->split_page_chunk_size = KVM_ARM_EAGER_SPLIT_CHUNK_SIZE_DEFAULT;
+> > +
+> >  	mmu->pgt = pgt;
+> >  	mmu->pgd_phys = __pa(pgt->pgd);
+> >  	return 0;
+> > diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> > index d77aef872a0a..af43acdc7901 100644
+> > --- a/include/uapi/linux/kvm.h
+> > +++ b/include/uapi/linux/kvm.h
+> > @@ -1184,6 +1184,7 @@ struct kvm_ppc_resize_hpt {
+> >  #define KVM_CAP_S390_PROTECTED_ASYNC_DISABLE 224
+> >  #define KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP 225
+> >  #define KVM_CAP_PMU_EVENT_MASKED_EVENTS 226
+> > +#define KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE 227
+> >  
+> >  #ifdef KVM_CAP_IRQ_ROUTING
+> >  
+> 
+> Thanks,
+> 
+> 	M.
+> 
+> -- 
+> Without deviation from the norm, progress is not possible.
+
+Thanks,
+Ricardo
