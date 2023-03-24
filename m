@@ -2,146 +2,234 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B06E36C80AA
-	for <lists+kvm@lfdr.de>; Fri, 24 Mar 2023 16:03:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A05E86C80C6
+	for <lists+kvm@lfdr.de>; Fri, 24 Mar 2023 16:10:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232283AbjCXPDq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Mar 2023 11:03:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49208 "EHLO
+        id S232107AbjCXPKz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Mar 2023 11:10:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57076 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231927AbjCXPDp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Mar 2023 11:03:45 -0400
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2064.outbound.protection.outlook.com [40.107.244.64])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6CA4CCDFE;
-        Fri, 24 Mar 2023 08:03:44 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=MEjnVaQnSQ5YqoCLz6QVA75AwdDdwigMFhG6tD8ziInuqaXqI9HCXnYV88Oc+DJ8wGY6oxolLIaMWyOXFS4pczpOY9D+lbCFYOIiJdtj16VAOn7hl7lBUiXiWGbZe/Khg5qjEfGniWNIHgs6nljD7bNnDC1mAieJxQHkMFXYhNzs8vPlRpW0GvvPOZ0c7g3TeygA7PtOu1A+0+tNj7KhIvBwd9Tw2JN2rW7AOYsRJ0xo8LTMPPMAQeE9vaa9DNSFVhbC7s8YJKZGgWlPu6Blb3o0gwCY9dWaN2lCgsWG+OC1Doux9cDE3uy859lLNo9hzOYhmXldC44XvjhkypGr3A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=AiJFlQlpQWPPZE9OI2H23xlr4o8eGiw4V+0q5FINrm8=;
- b=Z3pM1IoEHxUDa/kyJUmltJCVoexDPuCDuMkEnCDLYgk1rbW3u/CnAbDWB3H2hUvIl9NIkxdT3BZUfl9oIj7Rcedn0vA3MrzwZlcpO73NOHgYbWrkZtdqQwnGhny2+79r9Aadms2+Skp96aTD+dXame/fANiIQ5cNCal3N5NFJWBnaENGP1NSsRkU4RBDUJUj7WzJ2kq/iUL/GKtbTygGh3ciQ4qIrSGBId4u0kKAhbtuewKuLjWBEIIaGQtrHJoEMm2DE20Hckcv06UjsIcFR+iDeM87aT/CVI/hEJYKn6Zx+hR2qJjcqjQjj73ruWx7oFErtsTdLiSKfM27CQEAlQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=AiJFlQlpQWPPZE9OI2H23xlr4o8eGiw4V+0q5FINrm8=;
- b=p1GhlFJQlr+d32lOryrdBGP4tQBxjPuxeHlGIJ6fKWRB22Rbho8i7DZTrz26tKNOspOcfqZYClIMKTFWyj8KfBEki4vzVGkitxlcgbxbG6+P6MBHPo4Pm1SP8lEU1qejByou+zpt9KzMB1B0FcHHrEM0Jla4QKN1a6BubkTy8Bos0aXx95DiepOi5EJBQIok/1zZUI7OGNiHi3XQemMxNfZpivb8kWtNgTEJATZ2au2dSTO9F0zd/yEK3BaKxNVrOkZS992xznPWjJzGSjJpVzmGyM57yvFl/q4bhghPabyqj4kf/2oMOGEvtTtsXwMKisOR4Cc3AgwgMPe9Rp9MwA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by DM6PR12MB5008.namprd12.prod.outlook.com (2603:10b6:5:1b7::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6178.38; Fri, 24 Mar
- 2023 15:03:42 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::ef6d:fdf6:352f:efd1]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::ef6d:fdf6:352f:efd1%3]) with mapi id 15.20.6178.037; Fri, 24 Mar 2023
- 15:03:42 +0000
-Date:   Fri, 24 Mar 2023 12:03:39 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     "Tian, Kevin" <kevin.tian@intel.com>
-Cc:     "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
-        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-        Lu Baolu <baolu.lu@linux.intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Nicolin Chen <nicolinc@nvidia.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>
-Subject: Re: [PATCH v3 12/17] iommufd: Add iommufd_device_replace()
-Message-ID: <ZB27y2WsrYr9KLFr@nvidia.com>
-References: <0-v3-61d41fd9e13e+1f5-iommufd_alloc_jgg@nvidia.com>
- <12-v3-61d41fd9e13e+1f5-iommufd_alloc_jgg@nvidia.com>
- <BN9PR11MB5276B73DF56654BEA4EA51AA8C879@BN9PR11MB5276.namprd11.prod.outlook.com>
- <ZBxioEDUtPMro+ew@nvidia.com>
- <BN9PR11MB5276B41014B2A28952B626B58C849@BN9PR11MB5276.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <BN9PR11MB5276B41014B2A28952B626B58C849@BN9PR11MB5276.namprd11.prod.outlook.com>
-X-ClientProxiedBy: SJ0PR03CA0015.namprd03.prod.outlook.com
- (2603:10b6:a03:33a::20) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+        with ESMTP id S232351AbjCXPKx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Mar 2023 11:10:53 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8FA3A12CEE
+        for <kvm@vger.kernel.org>; Fri, 24 Mar 2023 08:10:52 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 0781B62B78
+        for <kvm@vger.kernel.org>; Fri, 24 Mar 2023 15:10:52 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6B3E2C433D2;
+        Fri, 24 Mar 2023 15:10:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1679670651;
+        bh=QJJSwi5e1oeu9Bd6VboaEK9LtbvIBMbmsotUQ60GHSA=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=AS9zXNMHjzZV/eutOis6fcgKwELBphGptGdzokP4Y6D6CSx+RD03DwBQR6nnm7lDk
+         fhj613TqBh6H7+zPQMl1kWramAC22pIdNPNcN/nXSa3CsJqoShHr7HYHpf9nPiEPKl
+         2YBm7AR/c3hCX+HmfK0AQtA34dnxxVKbNXC7tvDbmRh9yhCqU28k+9bNRfQXXwq4or
+         /yGGOPepxyQeBP6UY3thlvRXnFWzQiHFOWlqepYzBP6ujMUJKb04GFGMn/2SwvKdpC
+         8toGLg0a9J5FT3jlkI5exVfL46JjuLuzhDuyclRshby3AJNhgI7fVptKTrp3jr4zN+
+         q+dgaDflpYe4g==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1pfihL-002qBP-CI;
+        Fri, 24 Mar 2023 14:47:19 +0000
+From:   Marc Zyngier <maz@kernel.org>
+To:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org
+Cc:     James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Simon Veith <sveith@amazon.de>,
+        Reiji Watanabe <reijiw@google.com>,
+        Colton Lewis <coltonlewis@google.com>,
+        Joey Gouly <joey.gouly@arm.com>, dwmw2@infradead.org
+Subject: [PATCH v3 10/18] KVM: arm64: timers: Abstract per-timer IRQ access
+Date:   Fri, 24 Mar 2023 14:46:56 +0000
+Message-Id: <20230324144704.4193635-11-maz@kernel.org>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20230324144704.4193635-1-maz@kernel.org>
+References: <20230324144704.4193635-1-maz@kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|DM6PR12MB5008:EE_
-X-MS-Office365-Filtering-Correlation-Id: df2fa76e-f77e-485a-b0f3-08db2c78f4e1
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: dW/iPWUR70lJgW+b2yUtRFr20CtNEjy6/eZv8ZDghasULmx0o8/L1XA0PdY1Z/hBlbLFyz4xBRf4EeOsGGqVb7B8ISG3tHeROK3kaP5giIDiM7JJjGZz/351NUqV1zGQpqHCLSkD+09ENhvrx1RL/cf+uzmq1BHlxt0vb5ibObPJ1CHSWHDGxZW7XN+ct9iURNWQRuDkaWslhhoo0ytsh4n0UwOkuYNyOUJiHLTMfwoI9GwMcXn3lu407x1iBkfB7of2jJ91MQeXoYPFkQTkW7toJOGsWGFG63WVRgMjT++cwW+S8dgMZdO1WCACPL0fLjJP6y2DQB+JxEfW2+OKlQuwCNPzX8H/E4a37cJsnk9J9vFp8uhAyT1pT0RAP6mUTbYG4LDuB7wj0OCmnw44bXK2PWVZ/GprwTAeCXaefl+mQbRatDb2iyvDJ2AUwtX7JkSYTxOV2samBDDQ2gYOl8B6jCraEnI3VH7Ma739PASF479x8tDgJoHn13hiMw96PVxqvPf2uKATZ6Dz0HfAOu2ckKQU7lU5lLQiZQqwvo8BLLzb1wm2br88ltpiu6w5
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(376002)(39860400002)(136003)(366004)(396003)(346002)(451199018)(36756003)(8936002)(6916009)(4326008)(8676002)(86362001)(66476007)(41300700001)(66946007)(66556008)(6486002)(54906003)(316002)(478600001)(2906002)(5660300002)(4744005)(6666004)(6512007)(38100700002)(6506007)(26005)(186003)(2616005)(66899018);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?yeSAaSenr+9874yKCPJP6YYPWM/1orlmjyd6rxnLkJ1RHb50DQKm/Ihqw7Mr?=
- =?us-ascii?Q?oaAPqIRJkedcoWp0gatRR+nB4VWonNQvpw2hNrPH1j0zDSaG0rhDkHa4fWIu?=
- =?us-ascii?Q?+jOtA4JaGYo6AUefguqh7++uALkTIlr3LSNtrW1sjFg1yhRw50mkJ3GUbOIG?=
- =?us-ascii?Q?qVFtUXcTHURWKExpIleT2d4HzeB03MejNIW1W4VT7AzbiJ41kSZZ1LaLWyff?=
- =?us-ascii?Q?vftAzPUFguOwdGV9+PGufaaNTe3NQEK3NM9al4tfYf6CSzde4stJGD8/3n+r?=
- =?us-ascii?Q?u89PZHERvZPRHUb3gOUmasRgCa2Vks/byGiRf4h8MlbXVovyY+sW+Kq3H3Z7?=
- =?us-ascii?Q?cbinseuIUHAr1yA+dFojIj8BGmhC6Fy3UEPsPuU3X34psx33oOIWAoHJl88h?=
- =?us-ascii?Q?2/R2HqqKDInJkSF6bvYfmmxD0W8g06ChYfcrXqP2FgJsDI3XVPESz5nW1HcT?=
- =?us-ascii?Q?6/VLz4f/uMuGYEu04jWAkuk6Wcnkphh1mrTefg6fu5BSytN4p3AEEOuVTttF?=
- =?us-ascii?Q?zPIENhARxvACjQUD8SxVcoGRuxmhn43xrl+4lBSbt0thXtapYI6M7zv6/QK1?=
- =?us-ascii?Q?cwYQAVmib8BnGBXQfdOCEvzeOwvLPyeuO4dLuwZqOOcoB2+9tEn8UeYzRaah?=
- =?us-ascii?Q?eFfeU3KsUrUJ1k6mCqbxUYVI8zGOtpjQX8CM3QmsrwHLAzjrSsUzpoLqrAE/?=
- =?us-ascii?Q?FvNUFR7/bkO1zSAwoeGqjVci0GijLk/nWHOyTXgRP1Ag123DPRbPTtMsrVDw?=
- =?us-ascii?Q?cXe7ymwPXA0nbB6iAieI50fjbPv75QYn4RLsgS4Lym+B7UJJwh7YCFMhPAQq?=
- =?us-ascii?Q?Yt0eQIk2IcyuVQn1ZVVkeYPqlMfrtbAOFbRh9DgPEBKpFIVT9x2hV3lALaek?=
- =?us-ascii?Q?mq2lA07JCcwYGIuc1LSY83k82fpVFK2QU4cVnY5ivghlTnMHnwEx29Lu9xVI?=
- =?us-ascii?Q?4Eqh190hh47OzVgslC7d2LOkkxBHFSDetEJs9BxZIdjRlogr4szTusQ79G4G?=
- =?us-ascii?Q?2iT4sSjE+HgLS5US5uqIiizNl0eF03NWNr3fD1HcirFazPUhEc2MSxEpMuUs?=
- =?us-ascii?Q?CmNLNTE4d4baPPFxm2vke1aeOcr4NZgfP5hkOIX+QpUmusz0ytJY5rMgQl6l?=
- =?us-ascii?Q?5EaX72m8y7pDRdzNAhVFJ3t60glsZ3+qAu/+UPCPaN2UX8S4WQNK0k6HQ/IJ?=
- =?us-ascii?Q?6eDtHeyrIVA7YVQUUiWNfQbYO4cpgt+NSdIGto6N5w9igmHO3zrZ629fcSkE?=
- =?us-ascii?Q?h1r85fqTMNL01XE68vcTJblyILdKBRgjF8hk9ETr2esTugBF38ofJ0CckD4C?=
- =?us-ascii?Q?PmHLpTqjAbCMROFVMf9va6pQlAZzmN0IDbClQVFI8iarc/xP/1Yeg274pJOT?=
- =?us-ascii?Q?FzA3qZ+dZdJFIRRe7joGJT2ztIBVmKS6DnyTU39jn7NnXa3aIk+Qa681nUN2?=
- =?us-ascii?Q?JsgubQRJSg7G8TtYdnFwEWTrx8/GSbAwpPgPUN+X8URkHt2Pr9lEtGReYypI?=
- =?us-ascii?Q?YqfPeDdzYgakfmjOJf+Yf47eXlMLKtyJ3JC3DRkKUjorf14u2PpnDDC26vtZ?=
- =?us-ascii?Q?+E78S1Az4dx+vH9Xm6tqB+rFA3oZ29Jp0enQZD0J?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: df2fa76e-f77e-485a-b0f3-08db2c78f4e1
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Mar 2023 15:03:42.1217
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 1r7iGd9v5vpYj16DMkrm+x62JCV9z/9W0sjRGjqKnDsyfhY1T04k/nYZlzV0Sk8b
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB5008
-X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, ricarkol@google.com, sveith@amazon.de, reijiw@google.com, coltonlewis@google.com, joey.gouly@arm.com, dwmw2@infradead.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-2.5 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Mar 24, 2023 at 01:42:58AM +0000, Tian, Kevin wrote:
+As we are about to move the location of the per-timer IRQ into
+the VM structure, abstract the location of the IRQ behind an
+accessor. This will make the repainting sligntly less painful.
 
-> > > > +	/* Move the refcounts held by the device_list to the new hwpt */
-> > > > +	refcount_add(num_devices, &hwpt->obj.users);
-> > > > +	if (num_devices > 1)
-> > > > +		WARN_ON(refcount_sub_and_test(num_devices - 1,
-> > > > +					      &old_hwpt->obj.users));
-> > >
-> > > A comment is welcomed to match "caller must destroy old_hwpt".
-> > 
-> > ??
-> > 
-> 
-> It's not intuitive when moving the refcnt why we subtract num_devices
-> from the old_hwpt only when it's greater than 1. It's really about
-> the destroy must be done by the caller.
+Reviewed-by: Colton Lewis <coltonlewis@google.com>
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/kvm/arch_timer.c  | 38 ++++++++++++++++++------------------
+ include/kvm/arm_arch_timer.h |  2 ++
+ 2 files changed, 21 insertions(+), 19 deletions(-)
 
+diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
+index edd851e3b169..7cd0b0947454 100644
+--- a/arch/arm64/kvm/arch_timer.c
++++ b/arch/arm64/kvm/arch_timer.c
+@@ -392,12 +392,12 @@ static void kvm_timer_update_irq(struct kvm_vcpu *vcpu, bool new_level,
+ 	int ret;
+ 
+ 	timer_ctx->irq.level = new_level;
+-	trace_kvm_timer_update_irq(vcpu->vcpu_id, timer_ctx->irq.irq,
++	trace_kvm_timer_update_irq(vcpu->vcpu_id, timer_irq(timer_ctx),
+ 				   timer_ctx->irq.level);
+ 
+ 	if (!userspace_irqchip(vcpu->kvm)) {
+ 		ret = kvm_vgic_inject_irq(vcpu->kvm, vcpu->vcpu_id,
+-					  timer_ctx->irq.irq,
++					  timer_irq(timer_ctx),
+ 					  timer_ctx->irq.level,
+ 					  timer_ctx);
+ 		WARN_ON(ret);
+@@ -607,7 +607,7 @@ static void kvm_timer_vcpu_load_gic(struct arch_timer_context *ctx)
+ 	kvm_timer_update_irq(ctx->vcpu, kvm_timer_should_fire(ctx), ctx);
+ 
+ 	if (irqchip_in_kernel(vcpu->kvm))
+-		phys_active = kvm_vgic_map_is_active(vcpu, ctx->irq.irq);
++		phys_active = kvm_vgic_map_is_active(vcpu, timer_irq(ctx));
+ 
+ 	phys_active |= ctx->irq.level;
+ 
+@@ -825,9 +825,9 @@ int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu)
+ 					     vcpu_get_timer(vcpu, i));
+ 
+ 		if (irqchip_in_kernel(vcpu->kvm)) {
+-			kvm_vgic_reset_mapped_irq(vcpu, map.direct_vtimer->irq.irq);
++			kvm_vgic_reset_mapped_irq(vcpu, timer_irq(map.direct_vtimer));
+ 			if (map.direct_ptimer)
+-				kvm_vgic_reset_mapped_irq(vcpu, map.direct_ptimer->irq.irq);
++				kvm_vgic_reset_mapped_irq(vcpu, timer_irq(map.direct_ptimer));
+ 		}
+ 	}
+ 
+@@ -851,7 +851,7 @@ static void timer_context_init(struct kvm_vcpu *vcpu, int timerid)
+ 
+ 	hrtimer_init(&ctxt->hrtimer, CLOCK_MONOTONIC, HRTIMER_MODE_ABS_HARD);
+ 	ctxt->hrtimer.function = kvm_hrtimer_expire;
+-	ctxt->irq.irq = default_ppi[timerid];
++	timer_irq(ctxt) = default_ppi[timerid];
+ 
+ 	switch (timerid) {
+ 	case TIMER_PTIMER:
+@@ -1295,19 +1295,19 @@ static bool timer_irqs_are_valid(struct kvm_vcpu *vcpu)
+ 	int vtimer_irq, ptimer_irq, ret;
+ 	unsigned long i;
+ 
+-	vtimer_irq = vcpu_vtimer(vcpu)->irq.irq;
++	vtimer_irq = timer_irq(vcpu_vtimer(vcpu));
+ 	ret = kvm_vgic_set_owner(vcpu, vtimer_irq, vcpu_vtimer(vcpu));
+ 	if (ret)
+ 		return false;
+ 
+-	ptimer_irq = vcpu_ptimer(vcpu)->irq.irq;
++	ptimer_irq = timer_irq(vcpu_ptimer(vcpu));
+ 	ret = kvm_vgic_set_owner(vcpu, ptimer_irq, vcpu_ptimer(vcpu));
+ 	if (ret)
+ 		return false;
+ 
+ 	kvm_for_each_vcpu(i, vcpu, vcpu->kvm) {
+-		if (vcpu_vtimer(vcpu)->irq.irq != vtimer_irq ||
+-		    vcpu_ptimer(vcpu)->irq.irq != ptimer_irq)
++		if (timer_irq(vcpu_vtimer(vcpu)) != vtimer_irq ||
++		    timer_irq(vcpu_ptimer(vcpu)) != ptimer_irq)
+ 			return false;
+ 	}
+ 
+@@ -1322,9 +1322,9 @@ bool kvm_arch_timer_get_input_level(int vintid)
+ 	if (WARN(!vcpu, "No vcpu context!\n"))
+ 		return false;
+ 
+-	if (vintid == vcpu_vtimer(vcpu)->irq.irq)
++	if (vintid == timer_irq(vcpu_vtimer(vcpu)))
+ 		timer = vcpu_vtimer(vcpu);
+-	else if (vintid == vcpu_ptimer(vcpu)->irq.irq)
++	else if (vintid == timer_irq(vcpu_ptimer(vcpu)))
+ 		timer = vcpu_ptimer(vcpu);
+ 	else
+ 		BUG();
+@@ -1358,7 +1358,7 @@ int kvm_timer_enable(struct kvm_vcpu *vcpu)
+ 
+ 	ret = kvm_vgic_map_phys_irq(vcpu,
+ 				    map.direct_vtimer->host_timer_irq,
+-				    map.direct_vtimer->irq.irq,
++				    timer_irq(map.direct_vtimer),
+ 				    &arch_timer_irq_ops);
+ 	if (ret)
+ 		return ret;
+@@ -1366,7 +1366,7 @@ int kvm_timer_enable(struct kvm_vcpu *vcpu)
+ 	if (map.direct_ptimer) {
+ 		ret = kvm_vgic_map_phys_irq(vcpu,
+ 					    map.direct_ptimer->host_timer_irq,
+-					    map.direct_ptimer->irq.irq,
++					    timer_irq(map.direct_ptimer),
+ 					    &arch_timer_irq_ops);
+ 	}
+ 
+@@ -1391,8 +1391,8 @@ static void set_timer_irqs(struct kvm *kvm, int vtimer_irq, int ptimer_irq)
+ 	unsigned long i;
+ 
+ 	kvm_for_each_vcpu(i, vcpu, kvm) {
+-		vcpu_vtimer(vcpu)->irq.irq = vtimer_irq;
+-		vcpu_ptimer(vcpu)->irq.irq = ptimer_irq;
++		timer_irq(vcpu_vtimer(vcpu)) = vtimer_irq;
++		timer_irq(vcpu_ptimer(vcpu)) = ptimer_irq;
+ 	}
+ }
+ 
+@@ -1417,10 +1417,10 @@ int kvm_arm_timer_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+ 
+ 	switch (attr->attr) {
+ 	case KVM_ARM_VCPU_TIMER_IRQ_VTIMER:
+-		set_timer_irqs(vcpu->kvm, irq, ptimer->irq.irq);
++		set_timer_irqs(vcpu->kvm, irq, timer_irq(ptimer));
+ 		break;
+ 	case KVM_ARM_VCPU_TIMER_IRQ_PTIMER:
+-		set_timer_irqs(vcpu->kvm, vtimer->irq.irq, irq);
++		set_timer_irqs(vcpu->kvm, timer_irq(vtimer), irq);
+ 		break;
+ 	default:
+ 		return -ENXIO;
+@@ -1446,7 +1446,7 @@ int kvm_arm_timer_get_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+ 		return -ENXIO;
+ 	}
+ 
+-	irq = timer->irq.irq;
++	irq = timer_irq(timer);
+ 	return put_user(irq, uaddr);
+ }
+ 
+diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
+index c746ef64220b..27cada09f588 100644
+--- a/include/kvm/arm_arch_timer.h
++++ b/include/kvm/arm_arch_timer.h
+@@ -109,6 +109,8 @@ bool kvm_arch_timer_get_input_level(int vintid);
+ 
+ #define arch_timer_ctx_index(ctx)	((ctx) - vcpu_timer((ctx)->vcpu)->timers)
+ 
++#define timer_irq(ctx)			((ctx)->irq.irq)
++
+ u64 kvm_arm_timer_read_sysreg(struct kvm_vcpu *vcpu,
+ 			      enum kvm_arch_timers tmr,
+ 			      enum kvm_arch_timer_regs treg);
+-- 
+2.34.1
 
-	/*
-	 * Move the refcounts held by the device_list to the new hwpt. Retain a
-	 * refcount for this thread as the caller will free it.
-	 */
-
-
-Jason
