@@ -2,79 +2,78 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1617D6C7D27
-	for <lists+kvm@lfdr.de>; Fri, 24 Mar 2023 12:23:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DDD006C7D8D
+	for <lists+kvm@lfdr.de>; Fri, 24 Mar 2023 12:59:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231522AbjCXLX3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Mar 2023 07:23:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43146 "EHLO
+        id S230369AbjCXL7V (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Mar 2023 07:59:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36612 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229830AbjCXLX2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Mar 2023 07:23:28 -0400
+        with ESMTP id S229681AbjCXL7U (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Mar 2023 07:59:20 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6632B25B90
-        for <kvm@vger.kernel.org>; Fri, 24 Mar 2023 04:22:39 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF71423C62
+        for <kvm@vger.kernel.org>; Fri, 24 Mar 2023 04:58:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1679656958;
+        s=mimecast20190719; t=1679659114;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=y31Rz44TEwSQC9KX97iibt6OL6RtzpKo/j/apW3i2Tc=;
-        b=jS8NDhfPoO71kgJWu4KrUmHBwNdQFR46UUSrsu9AnlMqtbw4Gf/4b4BlClRgLby+R1hbCD
-        egdRP17dO74J27yS1yJGli7CdveO5zk+mLBbJbWQuWswHNq68cnH0kUD0I3/UqpZg4nlEx
-        1x/O7IcW+fUW5Py17GSxp/WxnuUl2zI=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=WFRhAEW+lBgl4z20TkQtu5IaRn9JzQcLohklOWmxl9I=;
+        b=PtMTO9gBRo8V4gQHZwyA/+8c3LBY0K8RHW+qF9ujoHMDeskKtURbLHPTty0SRRVTvIaPAL
+        tRX641d33tPc3A9T5hkBI2+hYca1qt8IvzzD+09tBoktmGp93QfKK4l2Tw4kgRbV/nCWSW
+        ZGnU2yZiyUjpSW89cwmtshmpdOa3QJg=
+Received: from mail-yw1-f197.google.com (mail-yw1-f197.google.com
+ [209.85.128.197]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-104-_IZDBWegOzu7JrF-dXBADg-1; Fri, 24 Mar 2023 07:22:37 -0400
-X-MC-Unique: _IZDBWegOzu7JrF-dXBADg-1
-Received: by mail-ed1-f71.google.com with SMTP id k30-20020a50ce5e000000b00500544ebfb1so2742707edj.7
-        for <kvm@vger.kernel.org>; Fri, 24 Mar 2023 04:22:37 -0700 (PDT)
+ us-mta-90-w8oGE1UePGKzVvuYPr_wFw-1; Fri, 24 Mar 2023 07:58:32 -0400
+X-MC-Unique: w8oGE1UePGKzVvuYPr_wFw-1
+Received: by mail-yw1-f197.google.com with SMTP id 00721157ae682-544781e30easo16244287b3.1
+        for <kvm@vger.kernel.org>; Fri, 24 Mar 2023 04:58:32 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679656956;
-        h=content-transfer-encoding:in-reply-to:subject:from:references:cc:to
-         :content-language:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=y31Rz44TEwSQC9KX97iibt6OL6RtzpKo/j/apW3i2Tc=;
-        b=LcCR1qoB5e+5PE2e2h504cgtsPTZnQe5I+7ZbTxvV5MTDPCkkGnJzIkgIXJjmB3Up2
-         U6li78LEkqJaPrIJjUhboarFduSH1Ygrxg/wuio9ZxiNoCcKnb/mKqWukz3o1fFITLVI
-         rmoTYaDjIMB47gea3yfHNvR4dx9FVBDQ0u/LMAeIijUCSHBZjAHmd707jYwRKlLLMotF
-         lzuINz4zqk7YGmJtq2O9G6rGnU9X/p1uIVMFuEzNQ5S93VqkvejHj6ExAsaUvsT2XyYP
-         EyAT6vsE2Pj4yR+m0ffM/ZcHGm/JloC8R8Up41sbV1sRt4NbaeSY/tmkQSKd0EXv4SZr
-         lfeg==
-X-Gm-Message-State: AAQBX9eq71HLC4+JaFk0KlRpK+xYI58UfVuplFHH6NCjYByK2/GTPDiR
-        RTIg6BlBsTIsHmj2WSaNZhcLpll14R++rPyOUMTk4Zd3dPGUwPr5/wX4wY1I3iw+prRr9w7SBWC
-        v/l1QOU8ARwr6
-X-Received: by 2002:a05:6402:6c1:b0:4fb:4354:ab2e with SMTP id n1-20020a05640206c100b004fb4354ab2emr2452274edy.28.1679656956136;
-        Fri, 24 Mar 2023 04:22:36 -0700 (PDT)
-X-Google-Smtp-Source: AKy350Z6fyfd5gCMg/7AcVDCAIEh81DrDIzmgBAv1m67pEiILxvBRDCw/izCGtzBehGd1wRQT7d5qg==
-X-Received: by 2002:a05:6402:6c1:b0:4fb:4354:ab2e with SMTP id n1-20020a05640206c100b004fb4354ab2emr2452254edy.28.1679656955824;
-        Fri, 24 Mar 2023 04:22:35 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
-        by smtp.googlemail.com with ESMTPSA id s30-20020a50ab1e000000b004c5d1a15bd5sm10469869edc.69.2023.03.24.04.22.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 24 Mar 2023 04:22:34 -0700 (PDT)
-Message-ID: <723bf800-9666-dfb6-e7cc-653adb0203b4@redhat.com>
-Date:   Fri, 24 Mar 2023 12:22:32 +0100
+        d=1e100.net; s=20210112; t=1679659112;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=WFRhAEW+lBgl4z20TkQtu5IaRn9JzQcLohklOWmxl9I=;
+        b=WW2BvLP9ML/DFYM3HRUusIJjZhFDBnTJaBys7XdL3pGRle8PIc6T4aRhaq8iJpEIA2
+         8Ve5qW5VpW+ZYtPRVoetT8RdgDIWM9aKVZ7HNTJNodCSkKQnr5NBNGSHR1N+WvyjvBMV
+         UwrBdtIN33me6W2GYIMXeBdcfLrEZ/ogaPgot4eX8l3EYuJanZA8zcPeH3CR3+4Bfn72
+         uLNcsBm42mIwucYp39VoTYJ6ZsOuTI11riprwhNE8ZAKICGJwFseBSLiHLrD7RlGUm3w
+         Qovb1aW/uvLBFq9P28INOFlewV21ysn2/FHqDjL9AO3mJD1g158NbFbWxQx4vWsYezcF
+         eOOQ==
+X-Gm-Message-State: AAQBX9dCWP4Z92WmMD1ci87q7CaNm/bR/au4L1mylQNF+2kYtmZGv4uB
+        Y4yYjnoPyg7kfT6nUES8bIjyFE/1BD74zGjrvHzgQe5cPrStYGfkC6XchyL+Uun4WPdnz3hRZK1
+        ucOXvcQcG/jXzfTVx+byhqSHPV7XA
+X-Received: by 2002:a81:ed08:0:b0:545:624a:874f with SMTP id k8-20020a81ed08000000b00545624a874fmr1127706ywm.3.1679659112406;
+        Fri, 24 Mar 2023 04:58:32 -0700 (PDT)
+X-Google-Smtp-Source: AKy350ZqTA4xw2AJ7nh6DTMfcKRQq3tCXDjfqRBOsmdfigLt1Fagj6zEUmXaVvwqLo5wUZNoPZiX6cX52rWCA91hRqI=
+X-Received: by 2002:a81:ed08:0:b0:545:624a:874f with SMTP id
+ k8-20020a81ed08000000b00545624a874fmr1127700ywm.3.1679659112185; Fri, 24 Mar
+ 2023 04:58:32 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.8.0
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>,
-        Simon Veith <sveith@amazon.de>
-Cc:     dwmw2@infradead.org, dff@amazon.com, jmattson@google.com,
-        joro@8bytes.org, kvm@vger.kernel.org, oupton@google.com,
-        tglx@linutronix.de, vkuznets@redhat.com, wanpengli@tencent.com
-References: <f3a957786a82bdd41fe558c40ec93c3fb9ea2ee2.camel@infradead.org>
- <20230202165950.483430-1-sveith@amazon.de> <ZBIjImc+xEMhJkQM@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v2] KVM: x86: add KVM_VCPU_TSC_VALUE attribute
-In-Reply-To: <ZBIjImc+xEMhJkQM@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <000000000000708b1005f79acf5c@google.com> <CAGxU2F4ZiNEyrZzEJnYjYDz6CxniPGNW7AwyMLPLTxA2UbBWhA@mail.gmail.com>
+ <CAGxU2F6m4KWXwOF8StjWbb=S6HRx=GhV_ONDcZxCZsDkvuaeUg@mail.gmail.com> <CAGxU2F7XjdKgdKwfZMT-sdJ+JK10p_2zNdaQeGBwm3jpEe1Xaw@mail.gmail.com>
+In-Reply-To: <CAGxU2F7XjdKgdKwfZMT-sdJ+JK10p_2zNdaQeGBwm3jpEe1Xaw@mail.gmail.com>
+From:   Stefano Garzarella <sgarzare@redhat.com>
+Date:   Fri, 24 Mar 2023 12:58:20 +0100
+Message-ID: <CAGxU2F5Q09wFbhfoGB-Wa_0xQFoP8Ah34vqf4gG3DRFdPny1fQ@mail.gmail.com>
+Subject: Re: [syzbot] [kvm?] [net?] [virt?] general protection fault in virtio_transport_purge_skbs
+To:     syzbot <syzbot+befff0a9536049e7902e@syzkaller.appspotmail.com>,
+        Bobby Eshleman <bobby.eshleman@bytedance.com>,
+        Bobby Eshleman <bobby.eshleman@gmail.com>
+Cc:     davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        netdev@vger.kernel.org, pabeni@redhat.com, stefanha@redhat.com,
+        syzkaller-bugs@googlegroups.com,
+        virtualization@lists.linux-foundation.org,
+        Krasnov Arseniy <oxffffaa@gmail.com>,
+        Krasnov Arseniy Vladimirovich <AVKrasnov@sberdevices.ru>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -83,27 +82,29 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 3/15/23 20:57, Sean Christopherson wrote:
->> In the case of live migration, using the KVM_VCPU_TSC_OFFSET approach to
->> preserve the TSC value and apply a known offset would require
->> duplicating the TSC scaling computations in userspace to account for
->> frequency differences between source and destination TSCs.
->>
->> Hence, if userspace wants to set the TSC to some known value without
->> having to deal with TSC scaling, and while also being resilient against
->> scheduling delays, neither KVM_SET_MSRS nor KVM_VCPU_TSC_VALUE are
->> suitable options.
+On Fri, Mar 24, 2023 at 10:06=E2=80=AFAM Stefano Garzarella <sgarzare@redha=
+t.com> wrote:
 >
-> Requiring userspace to handle certain aspects of TSC scaling doesn't seem
-> particularly onerous, at least not relative to all the other time insanity.  In
-> other words, why should KVM take on more complexity and a mostly-redundant uAPI?
+> On Fri, Mar 24, 2023 at 9:55=E2=80=AFAM Stefano Garzarella <sgarzare@redh=
+at.com> wrote:
+> >
+> > On Fri, Mar 24, 2023 at 9:31=E2=80=AFAM Stefano Garzarella <sgarzare@re=
+dhat.com> wrote:
+> > >
+> > > Hi Bobby,
+> > > can you take a look at this report?
+> > >
+> > > It seems related to the changes we made to support skbuff.
+> >
+> > Could it be a problem of concurrent access to pkt_queue ?
+> >
+> > IIUC we should hold pkt_queue.lock when we call skb_queue_splice_init()
+> > and remove pkt_list_lock. (or hold pkt_list_lock when calling
+> > virtio_transport_purge_skbs, but pkt_list_lock seems useless now that
+> > we use skbuff)
+> >
+>
 
-Yeah, it seems like the problem is that KVM_GET_CLOCK return host 
-unscaled TSC units (which was done because the guest TSC frequency is at 
-least in theory per-CPU, and KVM_GET_CLOCK is a vm ioctl)?
-
-Perhaps it's more important (uAPI-wise) for KVM to return the precise 
-guest/host TSC ratio via a vcpu device attribute?
-
-Paolo
+Patch posted here:
+https://lore.kernel.org/netdev/20230324115450.11268-1-sgarzare@redhat.com/
 
