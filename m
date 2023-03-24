@@ -2,60 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 156E56C876F
-	for <lists+kvm@lfdr.de>; Fri, 24 Mar 2023 22:25:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4BFE46C8776
+	for <lists+kvm@lfdr.de>; Fri, 24 Mar 2023 22:27:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231719AbjCXVZb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Mar 2023 17:25:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33352 "EHLO
+        id S231826AbjCXV1U (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Mar 2023 17:27:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35370 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230157AbjCXVZ3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Mar 2023 17:25:29 -0400
+        with ESMTP id S231215AbjCXV1S (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Mar 2023 17:27:18 -0400
 Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E5D6BDFC
-        for <kvm@vger.kernel.org>; Fri, 24 Mar 2023 14:25:28 -0700 (PDT)
-Received: by mail-pl1-x649.google.com with SMTP id k17-20020a170902d59100b0019abcf45d75so1809116plh.8
-        for <kvm@vger.kernel.org>; Fri, 24 Mar 2023 14:25:28 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0AC7199D7
+        for <kvm@vger.kernel.org>; Fri, 24 Mar 2023 14:27:17 -0700 (PDT)
+Received: by mail-pl1-x649.google.com with SMTP id n13-20020a170902d2cd00b001a22d27406bso81597plc.13
+        for <kvm@vger.kernel.org>; Fri, 24 Mar 2023 14:27:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1679693128;
+        d=google.com; s=20210112; t=1679693237;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=zodHA9qFwPM7FM3/i/LVmpVkVaDmmsdXQrDcFc+B+NY=;
-        b=hEVJMNMvymwu0rssShTLoH4LK8MacXdJdWKhEBNGJ5fJmoH82ZlGrK/Fk+T0pxgaUu
-         OtAWRqA1yFkoSBC368Issjgg7M1VImQne2uReDy1xBqgjvBIR8A2QGlS8UtvfArOQq9n
-         QzrftqFhKr8L6HefQ3S75AS8Z6g4gaoSqeXxf/ZqtYiygrdmviICH90PcpgSlZY5+m+X
-         KbZaC42xMHN5UEGht661mPxeYuAeU1fia7xZbnIRzCvJosppj+jZ3b+yXuqNqKJd3CpF
-         Sy6dMWLAMXBwNv3R2cQRi0iSfYxISHUgUr4shwVBCcIR/W65oggGf8tb7QKL+cFZ7kfw
-         PD1g==
+        bh=6zePKddV/iwqym9bgYlEazTH1FsVa1YzF3bKPGXvyUE=;
+        b=TPLvUusFr04aY1T8sG+B11UMeVGSvt3rYDLfC+ZDclob/dEbEDc+HS2AMxlgy8GJ6c
+         yF9p4G8EY3b9xXqA0mjA6XXvfzwxsYOsZw4QCZBQ1X/FKmrGmKg6i39HGfImcXuJJoTy
+         EdPIGSymDbNdzX1EA0vaAZm4KiQZbUZgaoOTMFRMBPmfzbSHimw4Fhg76gxYdRLg+o5y
+         0WHD5fLeSOQ41C41WYtOoow8OZioEc/lbQGhWf+hXCZOjxn8CA8k/0JBLVpyz7sCHsYK
+         HDY7xVfSswAjRVXv4O3AhGyB6LcCDgyDikHDD6AJRCrxMB53rBbzFR+cFmgLuPPCvzkP
+         qjrg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679693128;
+        d=1e100.net; s=20210112; t=1679693237;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=zodHA9qFwPM7FM3/i/LVmpVkVaDmmsdXQrDcFc+B+NY=;
-        b=OnTZD1B8Zc6NcflfXS7FpWN8WCoM4iPiHtxEjRR/G283pvGEqDR3gK4w5t/QYBMwtr
-         /h8/UL9hOCTTGXp+hFZb3D2oC6JcHPl/6scSftaPdeBiOWjmGcf2qCHsNUDEHx2pqVB0
-         7ggaCZobgfXNnuo4Vyw7EvfdFAaeoQIghw2/DFjs6MssMklp0YOdXOBOBwWhuHF5h4qQ
-         hnHxQvQOTpSFrPlFDRDioYecXkZcRRfHMj/PLZ7z7oEwQsOsllZm8/dCMExZrmPljAFT
-         9ieLT3n5KSBwxSUZG3wydgWu7XuOZwISClxK4QlosP3leAznOJMqQuOoDl/ORlZMbsuN
-         AFPw==
-X-Gm-Message-State: AAQBX9elrMfMUyzU+swNw3MeWN8qIiojB1Y+ZW6pxSjkBZ33zN3TGHZu
-        zxsGoSbFCFKhTW87WPVHdBAjp3RHInk=
-X-Google-Smtp-Source: AKy350aBPofblWh3QIw6tmKvOGplsa5ky59fnNaATx62FJsqq1sXA7XckNvwaTfDCQUwZiU1gGyuGKJyujU=
+        bh=6zePKddV/iwqym9bgYlEazTH1FsVa1YzF3bKPGXvyUE=;
+        b=RKvgRK+FvjQ/EJYOYA0k4yTqGWXXj8kaLupCEBhwWyKrx/6btLwgkilebYaDzm7qnB
+         gyl0E5I4a0ZYnTwvfFYAJzosdkc+tV9IITftKtSREVqSZXovBftUX3Sx3DtsMdyG22i7
+         4AGwbv5xfJGCMAiH6xLsKlLGXjP/Dmymp2TKZViYx/cE7vME6jxcQYH+Cti4NdaqeMvc
+         9j0K0ZEQRA2IxIfccnGn7HV3rhTqNAhTatvbbuGqw8aMp0M6VSg8Z5vRSkvQbYVOZM4h
+         zyjeT19/80eKuSy4/SR2lZJ6aOSDRJU9YRTMynBL8dGOSVJZBpSwU4S+AI5ILXIS+tbK
+         p6+g==
+X-Gm-Message-State: AAQBX9elk3coQ0dG3OAZa9MFO++VqbtGGQK93TG3fK5CmjXSsUiow6ce
+        iRzskRefZ6AWDNOV8x9hDhWEYxmXCUY=
+X-Google-Smtp-Source: AKy350aqGWsdWjWwegqoLWfvcdbn6k4rDZFiOq/lDmEEoy5VQtVIcuZTzkPUDGTRpSoVgjf+URb5P6CmVQ4=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:aa7:88c9:0:b0:5f1:b1:6dc4 with SMTP id
- k9-20020aa788c9000000b005f100b16dc4mr2211266pff.3.1679693127931; Fri, 24 Mar
- 2023 14:25:27 -0700 (PDT)
-Date:   Fri, 24 Mar 2023 14:25:26 -0700
-In-Reply-To: <167969136143.2756283.9405259236021680651.b4-ty@google.com>
+ (user=seanjc job=sendgmr) by 2002:a17:90a:fa12:b0:23b:3426:bc5e with SMTP id
+ cm18-20020a17090afa1200b0023b3426bc5emr1279659pjb.4.1679693237539; Fri, 24
+ Mar 2023 14:27:17 -0700 (PDT)
+Date:   Fri, 24 Mar 2023 14:27:16 -0700
+In-Reply-To: <167969137156.2756401.15618241992481271147.b4-ty@google.com>
 Mime-Version: 1.0
-References: <20230214084920.59787-1-likexu@tencent.com> <167969136143.2756283.9405259236021680651.b4-ty@google.com>
-Message-ID: <ZB4VRvjUP75kpw71@google.com>
-Subject: Re: [PATCH 0/2] KVM: selftests: Report enable_pmu module value when
- test is skipped
+References: <20230227180601.104318-1-ackerleytng@google.com> <167969137156.2756401.15618241992481271147.b4-ty@google.com>
+Message-ID: <ZB4VtIPZjDGwuPOc@google.com>
+Subject: Re: [PATCH v2 1/1] KVM: selftests: Adjust VM's initial stack address
+ to align with SysV ABI spec
 From:   Sean Christopherson <seanjc@google.com>
-To:     Like Xu <like.xu.linux@gmail.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
+To:     pbonzini@redhat.com, shuah@kernel.org, dmatlack@google.com,
+        kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Ackerley Tng <ackerleytng@google.com>
+Cc:     erdemaktas@google.com, vannapurve@google.com, sagis@google.com,
+        mail@maciej.szmigiero.name
 Content-Type: text/plain; charset="us-ascii"
 X-Spam-Status: No, score=-7.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
@@ -68,27 +70,22 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On Fri, Mar 24, 2023, Sean Christopherson wrote:
-> On Tue, 14 Feb 2023 16:49:18 +0800, Like Xu wrote:
-> > Adequate info can help developers quickly distinguish whether the cause
-> > is a code flaw or a platform limitation when a test fails or is skipped,
-> > and this minor patch-set is doing a little work in that direction.
-> > 
-> > Base: kvm-x86/next
-> > 
-> > Like Xu (2):
-> >   KVM: selftests: Add a helper to read kvm boolean module parameters
-> >   KVM: selftests: Report enable_pmu module value when test is skipped
+> On Mon, 27 Feb 2023 18:06:01 +0000, Ackerley Tng wrote:
+> > Align the guest stack to match calling sequence requirements in
+> > section "The Stack Frame" of the System V ABI AMD64 Architecture
+> > Processor Supplement, which requires the value (%rsp + 8), NOT %rsp,
+> > to be a multiple of 16 when control is transferred to the function
+> > entry point. I.e. in a normal function call, %rsp needs to be 16-byte
+> > aligned _before_ CALL, not after.
 > > 
 > > [...]
 > 
 > Applied to kvm-x86 selftests, thanks!
 > 
-> [1/2] KVM: selftests: Add a helper to read kvm boolean module parameters
->       https://github.com/kvm-x86/linux/commit/d14d9139c023
-> [2/2] KVM: selftests: Report enable_pmu module value when test is skipped
->       https://github.com/kvm-x86/linux/commit/6cf332e8eca6
+> [1/1] KVM: selftests: Adjust VM's initial stack address to align with SysV ABI spec
+>       https://github.com/kvm-x86/linux/commit/1982754bd2a7
 
-Replaced patch 2 with your v2:
+Force pushed to selftests 'cause I had a goof, this now:
 
-  KVM: selftests: Report enable_pmu module value when test is skipped
-  https://github.com/kvm-x86/linux/commit/5b1abc285a08
+        KVM: selftests: Adjust VM's initial stack address to align with SysV ABI spec
+        https://github.com/kvm-x86/linux/commit/8264e85560e5
