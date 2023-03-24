@@ -2,137 +2,170 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 81B7A6C74C1
-	for <lists+kvm@lfdr.de>; Fri, 24 Mar 2023 01:52:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6FB6F6C74F1
+	for <lists+kvm@lfdr.de>; Fri, 24 Mar 2023 02:17:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231357AbjCXAww (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Mar 2023 20:52:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36694 "EHLO
+        id S230471AbjCXBQ6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Mar 2023 21:16:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41860 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230377AbjCXAwp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Mar 2023 20:52:45 -0400
-Received: from mail-io1-f71.google.com (mail-io1-f71.google.com [209.85.166.71])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06FED2B600
-        for <kvm@vger.kernel.org>; Thu, 23 Mar 2023 17:52:42 -0700 (PDT)
-Received: by mail-io1-f71.google.com with SMTP id b12-20020a6bb20c000000b007585c93862aso273506iof.4
-        for <kvm@vger.kernel.org>; Thu, 23 Mar 2023 17:52:41 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679619161;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=/hAShd89GEZikhKuBQycIJOs6lEcmAdTPXt/QcfCjj4=;
-        b=0Zoz6mqotbE/32VcRJTvo7jmPxm9ZFGWXs/IkMpWXKkPOI6uimStVe+ZVQSEEYDSyp
-         GCHynj9xOXEAkE6FyUGgv3/QlMnNJHYFE9S2MCPXy0eGlgwlVpjZH9k2Qsm1VmqY9WzO
-         kKJwnSKr4jzZLrHLuza4BiXOeHd65a1khdYDV4GI3ccXAA3zSaMbl+M8j2g4BYiMjx9y
-         I21q0Vys4FJFolDyonb/7fExI8MSBskleDdB22K/9+F2tI+RvztI7i5y420WCmx84h3s
-         fq8mFA7B8zSQW1JUfQfmX7FChgWoSOjb4rL/xFQJmE6OBxPTQB4AKL+As7wtmyNmyPbh
-         FA2A==
-X-Gm-Message-State: AO0yUKV1lECwVIGUufxGrKcxnTHfrgREaH06eJQsrRwdPE8I0fKbto18
-        qEMmlsL/5OPUXCiMOzzyjN9+LhpLtW3tlSW36CZHtEgwL/MO
-X-Google-Smtp-Source: AK7set9JoYvBiZIzf069gVgf2T3f5ztOyf0ealGZ04ZbUzxgosLYIW3AWoXihW5BiWGofNOFxd0YFakzzgrumIVpEFwOp320Kt+2
+        with ESMTP id S229830AbjCXBQ5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Mar 2023 21:16:57 -0400
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 353E512051;
+        Thu, 23 Mar 2023 18:16:56 -0700 (PDT)
+From:   Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1679620613;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=AI8etHPrIx3jNkAoUDUVMeNijSPSKzEAm2IfFhSlIbE=;
+        b=fIFHx9yH4O/aC/t1AkkNkpjVHdQIt60hJsQu8ylHND7K0tq1kfKoXAcVqd++UX0SRSZXjt
+        5xp37iwlL4Qi4FHMXWo4q7EJzHCuLlG9Nio8MBsxIPNAWUOggysRRF5XqPMZ+nLScHLHal
+        W051YPgip373z9q9fD6MTjdn2lzswQPRf3eDQxZNLuka8CR3azfUyYR2IxCE8HKTV0ZoPA
+        +2mX0nL/+nOkBNBOlQNrbreMxezl7yp7qu3fTb6yVsLyloakmyCHosIpUvjC5LcAjSqQ0E
+        2l9CpLq2HlfV1/1PkQAed2Rpqf/sZARg8NN/9V+Kth8CdWux4e+TspKDO0UCIg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1679620613;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=AI8etHPrIx3jNkAoUDUVMeNijSPSKzEAm2IfFhSlIbE=;
+        b=F6o/tiXXGWoGBRzOeewpITW3gHudiy7QzOC1tZDoe5XNrho6enQKB5rjHXJtfQmSmlhgeF
+        lWyDJKJ6ZpLtq7BA==
+To:     David Woodhouse <dwmw2@infradead.org>,
+        Usama Arif <usama.arif@bytedance.com>, kim.phillips@amd.com,
+        brgerst@gmail.com
+Cc:     piotrgorski@cachyos.org, oleksandr@natalenko.name,
+        arjan@linux.intel.com, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com, hpa@zytor.com, x86@kernel.org,
+        pbonzini@redhat.com, paulmck@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        rcu@vger.kernel.org, mimoja@mimoja.de, hewenliang4@huawei.com,
+        thomas.lendacky@amd.com, seanjc@google.com, pmenzel@molgen.mpg.de,
+        fam.zheng@bytedance.com, punit.agrawal@bytedance.com,
+        simon.evans@bytedance.com, liangma@liangbit.com,
+        gpiccoli@igalia.com
+Subject: Re: [PATCH v16 3/8] cpu/hotplug: Add dynamic parallel bringup
+ states before CPUHP_BRINGUP_CPU
+In-Reply-To: <8dff6ae5ffaebfbcc55a01c04420fd478070b830.camel@infradead.org>
+References: <20230321194008.785922-1-usama.arif@bytedance.com>
+ <20230321194008.785922-4-usama.arif@bytedance.com> <874jqb8588.ffs@tglx>
+ <871qlf83wj.ffs@tglx>
+ <8dff6ae5ffaebfbcc55a01c04420fd478070b830.camel@infradead.org>
+Date:   Fri, 24 Mar 2023 02:16:53 +0100
+Message-ID: <87v8ir6j96.ffs@tglx>
 MIME-Version: 1.0
-X-Received: by 2002:a6b:500e:0:b0:751:96ce:ed7d with SMTP id
- e14-20020a6b500e000000b0075196ceed7dmr4426762iob.1.1679619161175; Thu, 23 Mar
- 2023 17:52:41 -0700 (PDT)
-Date:   Thu, 23 Mar 2023 17:52:41 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000075bebb05f79acfde@google.com>
-Subject: [syzbot] [net?] [virt?] [io-uring?] [kvm?] BUG: soft lockup in vsock_connect
-From:   syzbot <syzbot+0bc015ebddc291a97116@syzkaller.appspotmail.com>
-To:     axboe@kernel.dk, davem@davemloft.net, edumazet@google.com,
-        io-uring@vger.kernel.org, kuba@kernel.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-        pabeni@redhat.com, sgarzare@redhat.com, stefanha@redhat.com,
-        syzkaller-bugs@googlegroups.com,
-        virtualization@lists.linux-foundation.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=3.1 required=5.0 tests=FROM_LOCAL_HEX,
-        HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,
-        SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-        version=3.4.6
-X-Spam-Level: ***
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.5 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
+        DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_PASS
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello,
+On Thu, Mar 23 2023 at 23:12, David Woodhouse wrote:
+> On Fri, 2023-03-24 at 00:05 +0100, Thomas Gleixner wrote:
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (re=
+t && can_rollback_cpu(st))
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0WARN_ON(cpuhp_invoke_callback_ran=
+ge(false, cpu, st, CPUHP_OFFLINE));
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0}
+>
+> And I'll take doing this bit unconditionally (it's basically a no-op if
+> they already got rolled all the way back to CPUHP_OFFLINE, right?).
+>
+> But the additional complexity of having multiple steps is fairly
+> minimal, and I'm already planning to *use* another one even in x86, as
+> discussed.
 
-syzbot found the following issue on:
+It's not about the "complexity". That's a general design question and
+I'm not agreeing with your approach of putting AP specifics into the BP
+state space.
 
-HEAD commit:    fe15c26ee26e Linux 6.3-rc1
-git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git for-kernelci
-console output: https://syzkaller.appspot.com/x/log.txt?x=1577c97ec80000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=7573cbcd881a88c9
-dashboard link: https://syzkaller.appspot.com/bug?extid=0bc015ebddc291a97116
-compiler:       Debian clang version 15.0.7, GNU ld (GNU Binutils for Debian) 2.35.2
-userspace arch: arm64
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1077c996c80000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=17e38929c80000
+The BP only phase ends at the point where the AP is woken up via
+SIPI/INIT/whatever. Period.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/89d41abd07bd/disk-fe15c26e.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/fa75f5030ade/vmlinux-fe15c26e.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/590d0f5903ee/Image-fe15c26e.gz.xz
+And no, we are not making this special just because it's the easiest way
+to get it done. I have _zero_ interest in this kind of hackery which
+just slaps stuff into the code where its conveniant without even
+thinking about proper separations
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+0bc015ebddc291a97116@syzkaller.appspotmail.com
+We went a great length to separate things clearly and it takes more than
+"oh let's reserve a few special states" to keep this separation
+intact. That's a matter of correctness, maintainability and taste.
 
-watchdog: BUG: soft lockup - CPU#0 stuck for 27s! [syz-executor244:6747]
-Modules linked in:
-irq event stamp: 6033
-hardirqs last  enabled at (6032): [<ffff8000124604ac>] __exit_to_kernel_mode arch/arm64/kernel/entry-common.c:84 [inline]
-hardirqs last  enabled at (6032): [<ffff8000124604ac>] exit_to_kernel_mode+0xe8/0x118 arch/arm64/kernel/entry-common.c:94
-hardirqs last disabled at (6033): [<ffff80001245e188>] __el1_irq arch/arm64/kernel/entry-common.c:468 [inline]
-hardirqs last disabled at (6033): [<ffff80001245e188>] el1_interrupt+0x24/0x68 arch/arm64/kernel/entry-common.c:486
-softirqs last  enabled at (616): [<ffff80001066ca80>] spin_unlock_bh include/linux/spinlock.h:395 [inline]
-softirqs last  enabled at (616): [<ffff80001066ca80>] lock_sock_nested+0xe8/0x138 net/core/sock.c:3480
-softirqs last disabled at (618): [<ffff8000122dbcfc>] spin_lock_bh include/linux/spinlock.h:355 [inline]
-softirqs last disabled at (618): [<ffff8000122dbcfc>] virtio_transport_purge_skbs+0x11c/0x500 net/vmw_vsock/virtio_transport_common.c:1372
-CPU: 0 PID: 6747 Comm: syz-executor244 Not tainted 6.3.0-rc1-syzkaller-gfe15c26ee26e #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/02/2023
-pstate: 80400005 (Nzcv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
-pc : __sanitizer_cov_trace_pc+0xc/0x8c kernel/kcov.c:203
-lr : virtio_transport_purge_skbs+0x19c/0x500 net/vmw_vsock/virtio_transport_common.c:1374
-sp : ffff80001e787890
-x29: ffff80001e7879e0 x28: 1ffff00003cf0f2a x27: ffff80001a487a60
-x26: ffff80001e787950 x25: ffff0000ce2d3b80 x24: ffff80001a487a78
-x23: 1ffff00003490f4c x22: ffff80001a29c1a8 x21: dfff800000000000
-x20: ffff80001a487a60 x19: ffff80001e787940 x18: 1fffe000368951b6
-x17: ffff800015cdd000 x16: ffff8000085110b0 x15: 0000000000000000
-x14: 1ffff00002b9c0b2 x13: dfff800000000000 x12: ffff700003cf0efc
-x11: ff808000122dbee8 x10: 0000000000000000 x9 : ffff8000122dbee8
-x8 : ffff0000ce511b40 x7 : ffff8000122dbcfc x6 : 0000000000000000
-x5 : 0000000000000000 x4 : 0000000000000001 x3 : ffff80000832d758
-x2 : 0000000000000001 x1 : 0000000000000000 x0 : 0000000000000000
-Call trace:
- get_current arch/arm64/include/asm/current.h:19 [inline]
- __sanitizer_cov_trace_pc+0xc/0x8c kernel/kcov.c:206
- vsock_loopback_cancel_pkt+0x28/0x3c net/vmw_vsock/vsock_loopback.c:48
- vsock_transport_cancel_pkt net/vmw_vsock/af_vsock.c:1284 [inline]
- vsock_connect+0x6b8/0xaec net/vmw_vsock/af_vsock.c:1426
- __sys_connect_file net/socket.c:2004 [inline]
- __sys_connect+0x268/0x290 net/socket.c:2021
- __do_sys_connect net/socket.c:2031 [inline]
- __se_sys_connect net/socket.c:2028 [inline]
- __arm64_sys_connect+0x7c/0x94 net/socket.c:2028
- __invoke_syscall arch/arm64/kernel/syscall.c:38 [inline]
- invoke_syscall+0x98/0x2c0 arch/arm64/kernel/syscall.c:52
- el0_svc_common+0x138/0x258 arch/arm64/kernel/syscall.c:142
- do_el0_svc+0x64/0x198 arch/arm64/kernel/syscall.c:193
- el0_svc+0x58/0x168 arch/arm64/kernel/entry-common.c:637
- el0t_64_sync_handler+0x84/0xf0 arch/arm64/kernel/entry-common.c:655
- el0t_64_sync+0x190/0x194 arch/arm64/kernel/entry.S:591
+That microcode thing on X86 has absolutely no business in the pre
+bringup DYN states. It's an AP problem and it can be solved completely
+without BP interaction.
 
+And before you start drooling over further great parallelism, can you
+please take a step back and come up with a sensible design for the
+actual real world requirments?
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+The point is that after an AP comes out of lala land and starts
+executing there are mandatory synchronization points which need to be
+handled by design. The number of synchronization points is architecture
+and platform specific and might be 0, but thats a detail.
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-syzbot can test patches for this issue, for details see:
-https://goo.gl/tpsmEJ#testing-patches
+So the proper thing is to split CPUHP_BRINGUP_CPU, which is the bridging
+state between AP and BP today, into a set of synchronization points
+between BP and AP.
+
+But that's non-trivial because if you look at bringup_cpu() then you'll
+notice that this state has an implicit protection against interrupt
+allocation/free and quite some architectures rely on this for their
+early bringup code and possibly their STARTING state callbacks.
+
+That aside. Let's just look at x86 as of today from the BP side:
+
+    1) Wakeup AP
+    2) Wait until there is sign of life
+    3) Let AP proceed
+    5) Wait until AP is done with init
+    6) TSC synchronization
+    7) Wait until it is online
+
+and on the AP side:
+
+    1) Do low level init
+    2) Report life
+    3) Wait until BP allows to proceed
+    4) Do init
+    5) Report done
+    6) TSC synchronization
+    7) Report online
+
+So surely you could claim that up to #6 (TSC sync) nothing needs to
+synchronize.
+
+But that's simply not true because topology information is implicitely
+serialized by CPU hotplug and your attempt to serialize that in patch
+7/8 is not cutting it at all because AP #4 (STARTING) callbacks rely
+implicitely on the immutability of the topology information and so do
+some of the later (threaded) AP callbacks too.
+
+As I said before 5 out of 10 callbacks I looked at are not ready for
+this.
+
+Just because it did not explode in your face yet, does not make any of
+your wet dreams more correct.
+
+Again: I'm not interested in this kind of "works for me" nonsense at
+all. I wasted enough time already to make CPU hotplug reliable and
+understandable. I have no intention to waste more time on it just
+because.
+
+Thanks,
+
+        tglx
