@@ -2,219 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F1D106C805A
-	for <lists+kvm@lfdr.de>; Fri, 24 Mar 2023 15:53:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 258656C8067
+	for <lists+kvm@lfdr.de>; Fri, 24 Mar 2023 15:54:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232124AbjCXOxD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Mar 2023 10:53:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48834 "EHLO
+        id S232272AbjCXOyk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Mar 2023 10:54:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55136 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232151AbjCXOxB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Mar 2023 10:53:01 -0400
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id DD10CBA;
-        Fri, 24 Mar 2023 07:53:00 -0700 (PDT)
-Received: from localhost.localdomain (77-166-152-30.fixed.kpn.net [77.166.152.30])
-        by linux.microsoft.com (Postfix) with ESMTPSA id B308E20FC3DB;
-        Fri, 24 Mar 2023 07:52:58 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com B308E20FC3DB
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-        s=default; t=1679669580;
-        bh=XF1vbq7gokzNKZoPuMKmB97h2a+RXc+m3lJbm+yiyvc=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=GiSQbslBY0MTgFojIIhCGjaD1vg4TqycSGXd306uujyvRdb42251/imGyyDxsPXqi
-         +dBTPdc2kP7cEp4S7D9O07hLsIO/1Nw9Awq+5/wHhYESQimxHNkvvQiVPzZnRZyflv
-         KeQ3JQBfLtPhevXFRUk5eQ3QOCuL0FcKM8XiQVeg=
-From:   jpiotrowski@linux.microsoft.com
-To:     linux-kernel@vger.kernel.org
-Cc:     Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Tianyu Lan <ltykernel@gmail.com>,
-        Michael Kelley <mikelley@microsoft.com>,
-        Sean Christopherson <seanjc@google.com>, stable@vger.kernel.org
-Subject: [RESEND PATCH v2] KVM: SVM: Flush Hyper-V TLB when required
-Date:   Fri, 24 Mar 2023 15:52:33 +0100
-Message-Id: <20230324145233.4585-1-jpiotrowski@linux.microsoft.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20230324144500.4216-1-jpiotrowski@microsoft.com>
-References: <20230324144500.4216-1-jpiotrowski@microsoft.com>
+        with ESMTP id S232284AbjCXOyi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Mar 2023 10:54:38 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 008814EDE;
+        Fri, 24 Mar 2023 07:54:33 -0700 (PDT)
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 32OELsQ1005719;
+        Fri, 24 Mar 2023 14:54:30 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=z7pokYLoD51PbCRwEi+WaTVuf+LZfBzExfGlrYiJvxg=;
+ b=rbybVeqGS0WSM7EEhp+Ha8186yM7MysUVPKmi4q2XyfM5eq2z8GVo7vdfvEhVboJFpBR
+ 5ydu2sDPbxA4HMwWyKBLB/+aJzwi8CyA0Aqk7IJblVWalmsRylAuAn/nYV9YqewkFOEn
+ K2wv5aGKTfakfTaCedcjWQ66Gzokd7XXCE2lIRI6lFQBv342Bs6pcHDUhbRMTOBkjqN9
+ 4QcXHIGWonmmsOKJpn07+C87UHjJghLqjEngqGKwoTJI0gsn3NAS96yA+K3NietgRRFP
+ 3/KxwJxMmGo9lCpcwJdW9jDcH/fcpuufnaI1duvXJcp5cArWkEsKa7nVfOUQtFuiSYNB Gw== 
+Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3phdjegrk9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 24 Mar 2023 14:54:30 +0000
+Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
+        by ppma01fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 32NLcpAo015828;
+        Fri, 24 Mar 2023 14:54:28 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+        by ppma01fra.de.ibm.com (PPS) with ESMTPS id 3pgxv8gsy4-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 24 Mar 2023 14:54:28 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+        by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 32OEsPcZ18219302
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 24 Mar 2023 14:54:25 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 000F22004E;
+        Fri, 24 Mar 2023 14:54:24 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 997A120040;
+        Fri, 24 Mar 2023 14:54:24 +0000 (GMT)
+Received: from t35lp63.lnxne.boe (unknown [9.152.108.100])
+        by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Fri, 24 Mar 2023 14:54:24 +0000 (GMT)
+From:   Nico Boehr <nrb@linux.ibm.com>
+To:     borntraeger@linux.ibm.com, frankja@linux.ibm.com,
+        imbrenda@linux.ibm.com, shuah@kernel.org
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-kselftest@vger.kernel.org
+Subject: [PATCH v2 0/2] KVM: s390: CMMA migration selftest and small bugfix
+Date:   Fri, 24 Mar 2023 15:54:22 +0100
+Message-Id: <20230324145424.293889-1-nrb@linux.ibm.com>
+X-Mailer: git-send-email 2.39.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-17.9 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
-        DKIM_VALID_AU,ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_MED,SPF_HELO_PASS,
-        SPF_PASS,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: ZTg-HLazEU_AG9AHivkdXHbN-n9mhVPx
+X-Proofpoint-ORIG-GUID: ZTg-HLazEU_AG9AHivkdXHbN-n9mhVPx
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
+ definitions=2023-03-24_08,2023-03-24_01,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 bulkscore=0
+ priorityscore=1501 suspectscore=0 lowpriorityscore=0 spamscore=0
+ impostorscore=0 clxscore=1015 adultscore=0 phishscore=0 malwarescore=0
+ mlxlogscore=897 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2303200000 definitions=main-2303240117
+X-Spam-Status: No, score=-0.1 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
+        DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>
-
-The Hyper-V "EnlightenedNptTlb" enlightenment is always enabled when KVM
-is running on top of Hyper-V and Hyper-V exposes support for it (which
-is always). On AMD CPUs this enlightenment results in ASID invalidations
-not flushing TLB entries derived from the NPT. To force the underlying
-(L0) hypervisor to rebuild its shadow page tables, an explicit hypercall
-is needed.
-
-The original KVM implementation of Hyper-V's "EnlightenedNptTlb" on SVM
-only added remote TLB flush hooks. This worked out fine for a while, as
-sufficient remote TLB flushes where being issued in KVM to mask the
-problem. Since v5.17, changes in the TDP code reduced the number of
-flushes and the out-of-sync TLB prevents guests from booting
-successfully.
-
-Split svm_flush_tlb_current() into separate callbacks for the 3 cases
-(guest/all/current), and issue the required Hyper-V hypercall when a
-Hyper-V TLB flush is needed. The most important case where the TLB flush
-was missing is when loading a new PGD, which is followed by what is now
-svm_flush_tlb_current().
-
-Cc: stable@vger.kernel.org # v5.17+
-Fixes: 1e0c7d40758b ("KVM: SVM: hyper-v: Remote TLB flush for SVM")
-Link: https://lore.kernel.org/lkml/43980946-7bbf-dcef-7e40-af904c456250@linux.microsoft.com/
-Suggested-by: Sean Christopherson <seanjc@google.com>
-Signed-off-by: Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>
+v2:
 ---
-Resending because I accidentally used the wrong "From:" address and it bounced
-from some recipients.
+* swap order of patches (thanks Claudio)
+* add r-b
+* add comment why memslots are zeroed
 
-Changes since v1:
-- lookup enlightened_npt_tlb in vmcb to determine whether to do the
-  flush
-- when KVM wants a hyperv_flush_guest_mapping() call, don't try to
-  optimize it out
-- don't hide hyperv flush behind helper, make it visible in
-  svm.c
+Add a new selftest for CMMA migration. Also fix a small issue found during
+development of the test.
 
- arch/x86/kvm/kvm_onhyperv.h     |  5 +++++
- arch/x86/kvm/svm/svm.c          | 37 ++++++++++++++++++++++++++++++---
- arch/x86/kvm/svm/svm_onhyperv.h | 15 +++++++++++++
- 3 files changed, 54 insertions(+), 3 deletions(-)
+Nico Boehr (2):
+  KVM: s390: fix KVM_S390_GET_CMMA_BITS for GFNs in memslot holes
+  KVM: s390: selftests: add selftest for CMMA migration
 
-diff --git a/arch/x86/kvm/kvm_onhyperv.h b/arch/x86/kvm/kvm_onhyperv.h
-index 287e98ef9df3..67b53057e41c 100644
---- a/arch/x86/kvm/kvm_onhyperv.h
-+++ b/arch/x86/kvm/kvm_onhyperv.h
-@@ -12,6 +12,11 @@ int hv_remote_flush_tlb_with_range(struct kvm *kvm,
- int hv_remote_flush_tlb(struct kvm *kvm);
- void hv_track_root_tdp(struct kvm_vcpu *vcpu, hpa_t root_tdp);
- #else /* !CONFIG_HYPERV */
-+static inline int hv_remote_flush_tlb(struct kvm *kvm)
-+{
-+	return -1;
-+}
-+
- static inline void hv_track_root_tdp(struct kvm_vcpu *vcpu, hpa_t root_tdp)
- {
- }
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 252e7f37e4e2..f25bc3cbb250 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -3729,7 +3729,7 @@ static void svm_enable_nmi_window(struct kvm_vcpu *vcpu)
- 	svm->vmcb->save.rflags |= (X86_EFLAGS_TF | X86_EFLAGS_RF);
- }
- 
--static void svm_flush_tlb_current(struct kvm_vcpu *vcpu)
-+static void svm_flush_tlb_asid(struct kvm_vcpu *vcpu)
- {
- 	struct vcpu_svm *svm = to_svm(vcpu);
- 
-@@ -3753,6 +3753,37 @@ static void svm_flush_tlb_current(struct kvm_vcpu *vcpu)
- 		svm->current_vmcb->asid_generation--;
- }
- 
-+static void svm_flush_tlb_current(struct kvm_vcpu *vcpu)
-+{
-+	hpa_t root_tdp = vcpu->arch.mmu->root.hpa;
-+
-+	/*
-+	 * When running on Hyper-V with EnlightenedNptTlb enabled, explicitly
-+	 * flush the NPT mappings via hypercall as flushing the ASID only
-+	 * affects virtual to physical mappings, it does not invalidate guest
-+	 * physical to host physical mappings.
-+	 */
-+	if (svm_hv_is_enlightened_tlb_enabled(vcpu) && VALID_PAGE(root_tdp))
-+		hyperv_flush_guest_mapping(root_tdp);
-+
-+	svm_flush_tlb_asid(vcpu);
-+}
-+
-+static void svm_flush_tlb_all(struct kvm_vcpu *vcpu)
-+{
-+	/*
-+	 * When running on Hyper-V with EnlightenedNptTlb enabled, remote TLB
-+	 * flushes should be routed to hv_remote_flush_tlb() without requesting
-+	 * a "regular" remote flush.  Reaching this point means either there's
-+	 * a KVM bug or a prior hv_remote_flush_tlb() call failed, both of
-+	 * which might be fatal to the guest.  Yell, but try to recover.
-+	 */
-+	if (WARN_ON_ONCE(svm_hv_is_enlightened_tlb_enabled(vcpu)))
-+		hv_remote_flush_tlb(vcpu->kvm);
-+
-+	svm_flush_tlb_asid(vcpu);
-+}
-+
- static void svm_flush_tlb_gva(struct kvm_vcpu *vcpu, gva_t gva)
- {
- 	struct vcpu_svm *svm = to_svm(vcpu);
-@@ -4745,10 +4776,10 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
- 	.set_rflags = svm_set_rflags,
- 	.get_if_flag = svm_get_if_flag,
- 
--	.flush_tlb_all = svm_flush_tlb_current,
-+	.flush_tlb_all = svm_flush_tlb_all,
- 	.flush_tlb_current = svm_flush_tlb_current,
- 	.flush_tlb_gva = svm_flush_tlb_gva,
--	.flush_tlb_guest = svm_flush_tlb_current,
-+	.flush_tlb_guest = svm_flush_tlb_asid,
- 
- 	.vcpu_pre_run = svm_vcpu_pre_run,
- 	.vcpu_run = svm_vcpu_run,
-diff --git a/arch/x86/kvm/svm/svm_onhyperv.h b/arch/x86/kvm/svm/svm_onhyperv.h
-index cff838f15db5..786d46d73a8e 100644
---- a/arch/x86/kvm/svm/svm_onhyperv.h
-+++ b/arch/x86/kvm/svm/svm_onhyperv.h
-@@ -6,6 +6,8 @@
- #ifndef __ARCH_X86_KVM_SVM_ONHYPERV_H__
- #define __ARCH_X86_KVM_SVM_ONHYPERV_H__
- 
-+#include <asm/mshyperv.h>
-+
- #if IS_ENABLED(CONFIG_HYPERV)
- 
- #include "kvm_onhyperv.h"
-@@ -15,6 +17,14 @@ static struct kvm_x86_ops svm_x86_ops;
- 
- int svm_hv_enable_l2_tlb_flush(struct kvm_vcpu *vcpu);
- 
-+static inline bool svm_hv_is_enlightened_tlb_enabled(struct kvm_vcpu *vcpu)
-+{
-+	struct hv_vmcb_enlightenments *hve = &to_svm(vcpu)->vmcb->control.hv_enlightenments;
-+
-+	return ms_hyperv.nested_features & HV_X64_NESTED_ENLIGHTENED_TLB &&
-+	       !!hve->hv_enlightenments_control.enlightened_npt_tlb;
-+}
-+
- static inline void svm_hv_init_vmcb(struct vmcb *vmcb)
- {
- 	struct hv_vmcb_enlightenments *hve = &vmcb->control.hv_enlightenments;
-@@ -80,6 +90,11 @@ static inline void svm_hv_update_vp_id(struct vmcb *vmcb, struct kvm_vcpu *vcpu)
- }
- #else
- 
-+static inline bool svm_hv_is_enlightened_tlb_enabled(struct kvm_vcpu *vcpu)
-+{
-+	return false;
-+}
-+
- static inline void svm_hv_init_vmcb(struct vmcb *vmcb)
- {
- }
+ arch/s390/kvm/kvm-s390.c                      |   4 +
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ tools/testing/selftests/kvm/s390x/cmma_test.c | 680 ++++++++++++++++++
+ 3 files changed, 685 insertions(+)
+ create mode 100644 tools/testing/selftests/kvm/s390x/cmma_test.c
+
 -- 
-2.37.2
+2.39.1
 
