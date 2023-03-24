@@ -2,199 +2,240 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 85C3A6C752A
-	for <lists+kvm@lfdr.de>; Fri, 24 Mar 2023 02:43:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 209366C757F
+	for <lists+kvm@lfdr.de>; Fri, 24 Mar 2023 03:18:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229948AbjCXBnF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Mar 2023 21:43:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59424 "EHLO
+        id S231426AbjCXCST (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Mar 2023 22:18:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53338 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229499AbjCXBnD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Mar 2023 21:43:03 -0400
-Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13281558A;
-        Thu, 23 Mar 2023 18:43:03 -0700 (PDT)
+        with ESMTP id S229773AbjCXCSS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Mar 2023 22:18:18 -0400
+Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EBBBF3C03;
+        Thu, 23 Mar 2023 19:18:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1679622183; x=1711158183;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=B8HwopsDg7NEqLEyyDBVedK1NYgOUJ8vWfZ9q+JkOzY=;
-  b=SW11OUuSs2NejKP2jMH9QgKRwhk+kTbxXI8veH9W7QlHqQtk/0T8NIzO
-   MrpO27NKm6/Mw0uU+SdN1eLITfGkGmZOjP5CqX30RzLflFZk+ShN/jkHb
-   XcKp/bH5jLfE3fHeZnnX0MAcR3eWHQpxNzoY4nPda37TG8pi/bQm2Th3D
-   Ac9vT2IjEPGd28rMDcF87ofuBTgXCgPIyhcJhA5ibKgC9ZjLKpjKQl4mH
-   MyfpJZj5UBWJGc+6vVYAbvmt9clygapAyXmlILf0OXJVVQvuO+3bJKQdT
-   dRGnhu/gp71CMWCJukLJBh5Hx3GcN+rcJswS0wgp1KpG5bp/Ps3WqdlLJ
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10658"; a="337179359"
+  t=1679624296; x=1711160296;
+  h=date:from:to:cc:subject:message-id:reply-to:references:
+   mime-version:in-reply-to;
+  bh=M4FQzDrjs+QeI9XLnd+NfZpr2fRqKi1DscOllLq4wCk=;
+  b=O5J5yxn+c8Ta89rb3pUkoeWY+46g0XRjZ03kQFZPf6iup6EbzEHqfb0J
+   F7zZFa1gH8Ht/kZFyKV3y3FqVZ8q8yI7U7O6qz2jRIc+W/FEvqkKZxL3f
+   FQVm1/rny7bH+iu1mfyHGGxIu+qRJamAWDt+UHEsGWjP5vJT62VU5CWNB
+   pJ/pGMo4c9fb6391lBDXpAC3+X8T5zO5Kk7tAr2mtZDDGfUcm+Gfk9yo3
+   0NPlPVZcW2eNuUHbP6/uS24jZzoD2XGubDM71sMUkfDDexncdUVzDuizc
+   dWec/VdPUBqz0NJyt0mdDqAWnbrgWzwVf2KHvrQb8dFexm/0TzbYSvXFu
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10658"; a="338400943"
 X-IronPort-AV: E=Sophos;i="5.98,286,1673942400"; 
-   d="scan'208";a="337179359"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Mar 2023 18:43:02 -0700
+   d="scan'208";a="338400943"
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Mar 2023 19:18:15 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10658"; a="826059232"
+X-IronPort-AV: E=McAfee;i="6600,9927,10658"; a="659886402"
 X-IronPort-AV: E=Sophos;i="5.98,286,1673942400"; 
-   d="scan'208";a="826059232"
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
-  by fmsmga001.fm.intel.com with ESMTP; 23 Mar 2023 18:43:02 -0700
-Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
- ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.21; Thu, 23 Mar 2023 18:43:02 -0700
-Received: from orsmsx603.amr.corp.intel.com (10.22.229.16) by
- ORSMSX612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.21; Thu, 23 Mar 2023 18:43:01 -0700
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.21 via Frontend Transport; Thu, 23 Mar 2023 18:43:01 -0700
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.175)
- by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.21; Thu, 23 Mar 2023 18:43:00 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=DcJYK/5v6Is6j9TQUamyfvfjt9iqJtCUhsJszqNJophlg+XC7uYw4HMAQatf1XXSvYauVjmBu5qH2YAXokJ6TU5CQJeWHBOA040iojj9yq7BXWb2dGoH66VzASwoGMkXFl6iam5OD7ulRTF4hWEVX2qBmaaey2mNNzkphb54j64nct4bYtlmcqq/h14Nb3ZGfpFn9VakvS2bq6kZbBSALDFTDXwubuBgiNujfUS1jCz6w5bENBArghk9Ie3QS5NVHL5mfTzLkeyzrpRztsmb0m5hIJdWbB5zrMwS2lToCSqD8PWpHu0V+j0Yx4domKfI6x0t5DEnZFx5ulS0tOL7KA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=OhFWoieqFiIgHV3Qa1GtkOe8mA3NC/EoWXEWENdI2X4=;
- b=MYgbXbovSN0iMHqUbv7CiPKZKt0pN/GfBh8Mem9jUuKBHzDRIY8CExHIfZoyUQCw9JxSAMv0i/3iMrRyggR29xZ6kfwd4Sm1+S3vd6eCouTdo2o0d6MLOWY+FgIFC4qR+VqkjtD0Y7+wersVz20wmqzhI8b4OdWMuKp/tdqAuC+3X5KWIsrnVsoK04AmdAnPnUa5UfdGu8Bxf0eHdZTXa5KKaXjyqvsNc2YFgSZi9u5/XJhv88Mp1LUmHdQ/4kZSe1mtzhA7MU6RMM0muLF1O6lp4jy3hY1U2f0NOPHeSwUX8mJXdcyhVCZk5FqnCHIdIMQXgfF+jAyp2rOePSlisQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
- by MW6PR11MB8337.namprd11.prod.outlook.com (2603:10b6:303:248::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6178.38; Fri, 24 Mar
- 2023 01:42:58 +0000
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::1aac:b695:f7c5:bcac]) by BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::1aac:b695:f7c5:bcac%8]) with mapi id 15.20.6178.038; Fri, 24 Mar 2023
- 01:42:58 +0000
-From:   "Tian, Kevin" <kevin.tian@intel.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-CC:     "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
-        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-        Lu Baolu <baolu.lu@linux.intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Nicolin Chen <nicolinc@nvidia.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>
-Subject: RE: [PATCH v3 12/17] iommufd: Add iommufd_device_replace()
-Thread-Topic: [PATCH v3 12/17] iommufd: Add iommufd_device_replace()
-Thread-Index: AQHZXCmQLfVu+4pznkeqY9jbKuj//68H+ZjAgAB2PQCAALp6AA==
-Date:   Fri, 24 Mar 2023 01:42:58 +0000
-Message-ID: <BN9PR11MB5276B41014B2A28952B626B58C849@BN9PR11MB5276.namprd11.prod.outlook.com>
-References: <0-v3-61d41fd9e13e+1f5-iommufd_alloc_jgg@nvidia.com>
- <12-v3-61d41fd9e13e+1f5-iommufd_alloc_jgg@nvidia.com>
- <BN9PR11MB5276B73DF56654BEA4EA51AA8C879@BN9PR11MB5276.namprd11.prod.outlook.com>
- <ZBxioEDUtPMro+ew@nvidia.com>
-In-Reply-To: <ZBxioEDUtPMro+ew@nvidia.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BN9PR11MB5276:EE_|MW6PR11MB8337:EE_
-x-ms-office365-filtering-correlation-id: a7e84a6d-07e9-431a-303b-08db2c0918b9
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 0lL8MhlWR4M6PFlFv50HrNGiXXEZRPawUt05r4Wh9fjC7UKHUogGPFicnGB1a5FWDw+/Q+LTGgHIkYipHoSCPvCBdRMghfmnUbmn17nNOclUwL16WMI/JvmiM7OgpG1QCCJ8uH2S9qgzVduIiOHr3McqaxyXfebxS7oYb2+H7zUrzS3BMonjFi075SgxI6rQRL3e5UMX2J43c/gZuTOOrFikg0ZAaTkAKpB1YBhABo9WqYrhwCeCXIBjphRr0j0alsVsar1YuxLhFoK2Hyj3v+Wq84PtWzUdLCZ8A8lGkSEqnUBv5W9khtml6PhBR3Jq1Buq6JCSZY0cOL342By2Yv+USBQolSDfGinbxyWmueY44O0ouE8RKCRdAXlmED9TSZWIJ8tAhoriTOGuk51Arg35XWFvzhp1MQHgZCdl6cf3wytxNId2meF8IGNaI7aGk9zOH2oGu0N0tpWFcjEnO+RNq4eArtFaQaWoJc5OLv8+ZeJdz8D+5UKE5HbnVtlHhXJ6tBlsus+G15JOcNuz3/2NLo4IzJb+CDc6ywVp3QWFyWTj0x7coFmUPasfj0c1zvXxKGCrqlYwA6SY9aiw4/347KCcHEWyptB19iFw/B9dc7i9fNdx3Av+xkeQanqiXtAiLITbuAiyR5kz+C3sIT+dfccgasVm44bKShV9zzVfdGEbLNv3E+tZG/dfuXwQjpm+A0jCqAknILQkHt7HLg==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(366004)(376002)(346002)(396003)(39860400002)(136003)(451199018)(66899018)(33656002)(316002)(83380400001)(478600001)(54906003)(9686003)(186003)(26005)(7696005)(6506007)(71200400001)(38070700005)(55016003)(38100700002)(82960400001)(86362001)(52536014)(64756008)(66556008)(8936002)(66446008)(66476007)(6916009)(76116006)(2906002)(66946007)(5660300002)(8676002)(4326008)(41300700001)(122000001);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?9UI9UWjDMZ0RjBRRjD8lCR+ZWYtktNkO4uoxqZr/NpNs6lvLvTBemOoLlHc9?=
- =?us-ascii?Q?+vUNk7AKWk7D/HL8y1FLDdWFr5LglfyocjAc+ICRRuri8DCh/1MKjug09omB?=
- =?us-ascii?Q?qQgi3Op73g7eqxKnj7jelDc4YWEW/4/MsdJyinsNKWq4cgvWiW4NnoLxWMvi?=
- =?us-ascii?Q?/a0ZERlhcUkjY+Iu3VGq//CFQvFzNlgwHYJ7MvoueJUBOKML68AVg289Q1Y7?=
- =?us-ascii?Q?Q6x41xbDwYqgj2VGzBaONW9/iiDufhic7Rk9WurIfMFrbRhof/vrsgGxVTOC?=
- =?us-ascii?Q?jriHPhyB2Nh9IDsuYT5cdaqdO2XT4SUxEBhnZnz89OG1HZ5kqhT//P7yyVID?=
- =?us-ascii?Q?zH0/1ALd4ypUHzEcqUm1GnUEjqR0YkX6HViBaYP49/oN7YmorkLOpSO4Y3tI?=
- =?us-ascii?Q?xgH4eSQX4uCTq4z/HZs909h0/HSR4cY/vZCDyKticGSIeBe+T6bRv7p5U0He?=
- =?us-ascii?Q?KL/r1OH3cSnmW7uzfaPMS28miq7hh7V1v1TElfsgK7+J/QU3d11vcn9Dx7D5?=
- =?us-ascii?Q?InX2sFgNX08mpk4jCTR2yoUp+bZCTAt8F6Sf8ZsVVUqTBhFzZ5kr7Vrkf7XJ?=
- =?us-ascii?Q?u0QAjuEaPvAlC4medEV48gYL1owUjpHZwsBh0jLpyMQ7IxZzhe9hgKMJPyPO?=
- =?us-ascii?Q?xgEJl8yyK28TuHs2JUhOendLMXpF++Zui0MmI7RM7KP0GR+TL6rA+mLcX8Ic?=
- =?us-ascii?Q?l+AKX/rVjrPGDXQPcloVmq6Lqv1NNOEONW/qmLOrxaz87KnpwbdNqnff+qmH?=
- =?us-ascii?Q?T0m1KVgtTTfrRi9r2YIenb3Zw6DOGid6NaHgg2Tv7a42rAvJkzc6OWK8jPiV?=
- =?us-ascii?Q?vX1M1vYV3EY+9IHmPfbi+4wRaT7RQIKvTunhAP/0vUKPIsNLip5hRchcVJ0j?=
- =?us-ascii?Q?adhhdLg+id2sNcNji/l70Sc0IAoFuMrp0yAoUAoEgHzjglrqxHzd8jvPnmzU?=
- =?us-ascii?Q?kaOJcTrzps9dF5TU42Pkwz9zKYZwgWH4uL0TF1bhXu7MyOqSkviXR3CkdtCY?=
- =?us-ascii?Q?8y35O0NMT4S5eu9AI8Hr3oQenhFOcLMs1uxxLFXOwlVyWg3+9vrg/pzucMAA?=
- =?us-ascii?Q?MRMX6Umxdsc4eK5vR/KQNcD7UCNts1X6JKklh5X0vqIlyjcvNfHnvkx6v7JR?=
- =?us-ascii?Q?1YR6zMySNYIMD2SPlcDhJu7FsS5M4wHkAyBn220zJKr1cErpGIezVHJDVxUk?=
- =?us-ascii?Q?f7jvHdYPc3Su6OGqL3Q9m5cAlMw/19+u2jVWl3kBoXyMtVi9rpFrYvB2CPBO?=
- =?us-ascii?Q?XXn+f2SpBLqo2Zno4QBIquWJO9HWPPiG4lHNNPuGXe1DMELS0JDTmLGG5agD?=
- =?us-ascii?Q?3iVScZDM1VrDjG46EZ9/i0vWH+ASGWmMWhDnN5B8bUtHsbDm7IbbybqkEXr/?=
- =?us-ascii?Q?rQkjO9bBISrZhbq3ga98NBH8MpIsf2IWHG81whJhNh6vAbbaprTGxLrAhY6v?=
- =?us-ascii?Q?ynMHtyVJfXt9J9rO5KfPeK4mKzbbbOJxC7jJpV9FHftnl0Xckp+ohUnqPipR?=
- =?us-ascii?Q?wsUtICtdE1Oz8HmehzNpwSSkl1IW0TX9/KCZyQYvdsLsZupvkpGHTpRrGjuA?=
- =?us-ascii?Q?54RGnpIf4pD4pt9bf//09QYLwbDokWbScnJDjP/e?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+   d="scan'208";a="659886402"
+Received: from chaop.bj.intel.com (HELO localhost) ([10.240.192.105])
+  by orsmga006.jf.intel.com with ESMTP; 23 Mar 2023 19:18:04 -0700
+Date:   Fri, 24 Mar 2023 10:10:29 +0800
+From:   Chao Peng <chao.p.peng@linux.intel.com>
+To:     Isaku Yamahata <isaku.yamahata@gmail.com>
+Cc:     Ackerley Tng <ackerleytng@google.com>, seanjc@google.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+        linux-arch@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
+        pbonzini@redhat.com, corbet@lwn.net, vkuznets@redhat.com,
+        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, arnd@arndb.de,
+        naoya.horiguchi@nec.com, linmiaohe@huawei.com, x86@kernel.org,
+        hpa@zytor.com, hughd@google.com, jlayton@kernel.org,
+        bfields@fieldses.org, akpm@linux-foundation.org, shuah@kernel.org,
+        rppt@kernel.org, steven.price@arm.com, mail@maciej.szmigiero.name,
+        vbabka@suse.cz, vannapurve@google.com, yu.c.zhang@linux.intel.com,
+        kirill.shutemov@linux.intel.com, luto@kernel.org,
+        jun.nakajima@intel.com, dave.hansen@intel.com, ak@linux.intel.com,
+        david@redhat.com, aarcange@redhat.com, ddutile@redhat.com,
+        dhildenb@redhat.com, qperret@google.com, tabba@google.com,
+        michael.roth@amd.com, mhocko@suse.com, wei.w.wang@intel.com
+Subject: Re: [PATCH v10 9/9] KVM: Enable and expose KVM_MEM_PRIVATE
+Message-ID: <20230324021029.GA2774613@chaop.bj.intel.com>
+Reply-To: Chao Peng <chao.p.peng@linux.intel.com>
+References: <20230128140030.GB700688@chaop.bj.intel.com>
+ <diqz5ybc3xsr.fsf@ackerleytng-cloudtop.c.googlers.com>
+ <20230308074026.GA2183207@chaop.bj.intel.com>
+ <20230323004131.GA214881@ls.amr.corp.intel.com>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a7e84a6d-07e9-431a-303b-08db2c0918b9
-X-MS-Exchange-CrossTenant-originalarrivaltime: 24 Mar 2023 01:42:58.3862
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: v+MZTe+KDWYynGpJmFUF2euJWP5f6ZhRhm9R7GT3Hbox1GrC+zOWg0VQVn2+N9KW3YaaXcrxNrn6nRCsSueK9g==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW6PR11MB8337
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-2.5 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230323004131.GA214881@ls.amr.corp.intel.com>
+X-Spam-Status: No, score=-2.4 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> From: Jason Gunthorpe <jgg@nvidia.com>
-> Sent: Thursday, March 23, 2023 10:31 PM
->=20
-> On Thu, Mar 23, 2023 at 07:31:02AM +0000, Tian, Kevin wrote:
-> > > From: Jason Gunthorpe <jgg@nvidia.com>
-> > > Sent: Wednesday, March 22, 2023 3:15 AM
-> > > +
-> > > +	mutex_lock(&idev->igroup->lock);
-> > > +
-> > > +	if (igroup->hwpt =3D=3D NULL) {
-> > > +		rc =3D -EINVAL;
-> > > +		goto err_unlock;
-> > > +	}
-> > > +
-> > > +	if (hwpt =3D=3D igroup->hwpt) {
-> > > +		mutex_unlock(&idev->igroup->lock);
-> > > +		return NULL;
-> > > +	}
-> >
-> > goto err_unlock;
->=20
-> No, this is a success path, it should not jumpt to an err label or use
->=20
->   return ERR_PTR(0)
+On Wed, Mar 22, 2023 at 05:41:31PM -0700, Isaku Yamahata wrote:
+> On Wed, Mar 08, 2023 at 03:40:26PM +0800,
+> Chao Peng <chao.p.peng@linux.intel.com> wrote:
+> 
+> > On Wed, Mar 08, 2023 at 12:13:24AM +0000, Ackerley Tng wrote:
+> > > Chao Peng <chao.p.peng@linux.intel.com> writes:
+> > > 
+> > > > On Sat, Jan 14, 2023 at 12:01:01AM +0000, Sean Christopherson wrote:
+> > > > > On Fri, Dec 02, 2022, Chao Peng wrote:
+> > > > ...
+> > > > > Strongly prefer to use similar logic to existing code that detects wraps:
+> > > 
+> > > > > 		mem->restricted_offset + mem->memory_size < mem->restricted_offset
+> > > 
+> > > > > This is also where I'd like to add the "gfn is aligned to offset"
+> > > > > check, though
+> > > > > my brain is too fried to figure that out right now.
+> > > 
+> > > > Used count_trailing_zeros() for this TODO, unsure we have other better
+> > > > approach.
+> > > 
+> > > > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> > > > index afc8c26fa652..fd34c5f7cd2f 100644
+> > > > --- a/virt/kvm/kvm_main.c
+> > > > +++ b/virt/kvm/kvm_main.c
+> > > > @@ -56,6 +56,7 @@
+> > > >   #include <asm/processor.h>
+> > > >   #include <asm/ioctl.h>
+> > > >   #include <linux/uaccess.h>
+> > > > +#include <linux/count_zeros.h>
+> > > 
+> > > >   #include "coalesced_mmio.h"
+> > > >   #include "async_pf.h"
+> > > > @@ -2087,6 +2088,19 @@ static bool kvm_check_memslot_overlap(struct
+> > > > kvm_memslots *slots, int id,
+> > > >   	return false;
+> > > >   }
+> > > 
+> > > > +/*
+> > > > + * Return true when ALIGNMENT(offset) >= ALIGNMENT(gpa).
+> > > > + */
+> > > > +static bool kvm_check_rmem_offset_alignment(u64 offset, u64 gpa)
+> > > > +{
+> > > > +	if (!offset)
+> > > > +		return true;
+> > > > +	if (!gpa)
+> > > > +		return false;
+> > > > +
+> > > > +	return !!(count_trailing_zeros(offset) >= count_trailing_zeros(gpa));
+> 
+> This check doesn't work expected. For example, offset = 2GB, gpa=4GB
+> this check fails.
 
-My bad.
+This case is expected to fail as Sean initially suggested[*]:
+  I would rather reject memslot if the gfn has lesser alignment than
+  the offset. I'm totally ok with this approach _if_ there's a use case.
+  Until such a use case presents itself, I would rather be conservative
+  from a uAPI perspective.
 
->=20
-> > > +	/* Move the refcounts held by the device_list to the new hwpt */
-> > > +	refcount_add(num_devices, &hwpt->obj.users);
-> > > +	if (num_devices > 1)
-> > > +		WARN_ON(refcount_sub_and_test(num_devices - 1,
-> > > +					      &old_hwpt->obj.users));
-> >
-> > A comment is welcomed to match "caller must destroy old_hwpt".
->=20
-> ??
->=20
+I understand that we put tighter restriction on this but if you see such
+restriction is really a big issue for real usage, instead of a
+theoretical problem, then we can loosen the check here. But at that time
+below code is kind of x86 specific and may need improve.
 
-It's not intuitive when moving the refcnt why we subtract num_devices
-from the old_hwpt only when it's greater than 1. It's really about
-the destroy must be done by the caller.
+BTW, in latest code, I replaced count_trailing_zeros() with fls64():
+  return !!(fls64(offset) >= fls64(gpa));
+
+[*] https://lore.kernel.org/all/Y8HldeHBrw+OOZVm@google.com/
+
+Chao
+> I come up with the following.
+> 
+> >From ec87e25082f0497431b732702fae82c6a05071bf Mon Sep 17 00:00:00 2001
+> Message-Id: <ec87e25082f0497431b732702fae82c6a05071bf.1679531995.git.isaku.yamahata@intel.com>
+> From: Isaku Yamahata <isaku.yamahata@intel.com>
+> Date: Wed, 22 Mar 2023 15:32:56 -0700
+> Subject: [PATCH] KVM: Relax alignment check for restricted mem
+> 
+> kvm_check_rmem_offset_alignment() only checks based on offset alignment
+> and GPA alignment.  However, the actual alignment for offset depends
+> on architecture.  For x86 case, it can be 1G, 2M or 4K.  So even if
+> GPA is aligned for 1G+, only 1G-alignment is required for offset.
+> 
+> Without this patch, gpa=4G, offset=2G results in failure of memory slot
+> creation.
+> 
+> Fixes: edc8814b2c77 ("KVM: Require gfn be aligned with restricted offset")
+> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> ---
+>  arch/x86/include/asm/kvm_host.h | 15 +++++++++++++++
+>  virt/kvm/kvm_main.c             |  9 ++++++++-
+>  2 files changed, 23 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 88e11dd3afde..03af44650f24 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -16,6 +16,7 @@
+>  #include <linux/irq_work.h>
+>  #include <linux/irq.h>
+>  #include <linux/workqueue.h>
+> +#include <linux/count_zeros.h>
+>  
+>  #include <linux/kvm.h>
+>  #include <linux/kvm_para.h>
+> @@ -143,6 +144,20 @@
+>  #define KVM_HPAGE_MASK(x)	(~(KVM_HPAGE_SIZE(x) - 1))
+>  #define KVM_PAGES_PER_HPAGE(x)	(KVM_HPAGE_SIZE(x) / PAGE_SIZE)
+>  
+> +#define kvm_arch_required_alignment	kvm_arch_required_alignment
+> +static inline int kvm_arch_required_alignment(u64 gpa)
+> +{
+> +	int zeros = count_trailing_zeros(gpa);
+> +
+> +	WARN_ON_ONCE(!PAGE_ALIGNED(gpa));
+> +	if (zeros >= KVM_HPAGE_SHIFT(PG_LEVEL_1G))
+> +		return KVM_HPAGE_SHIFT(PG_LEVEL_1G);
+> +	else if (zeros >= KVM_HPAGE_SHIFT(PG_LEVEL_2M))
+> +		return KVM_HPAGE_SHIFT(PG_LEVEL_2M);
+> +
+> +	return PAGE_SHIFT;
+> +}
+> +
+>  #define KVM_MEMSLOT_PAGES_TO_MMU_PAGES_RATIO 50
+>  #define KVM_MIN_ALLOC_MMU_PAGES 64UL
+>  #define KVM_MMU_HASH_SHIFT 12
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index c9c4eef457b0..f4ff96171d24 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -2113,6 +2113,13 @@ static bool kvm_check_memslot_overlap(struct kvm_memslots *slots, int id,
+>  	return false;
+>  }
+>  
+> +#ifndef kvm_arch_required_alignment
+> +__weak int kvm_arch_required_alignment(u64 gpa)
+> +{
+> +	return PAGE_SHIFT
+> +}
+> +#endif
+> +
+>  /*
+>   * Return true when ALIGNMENT(offset) >= ALIGNMENT(gpa).
+>   */
+> @@ -2123,7 +2130,7 @@ static bool kvm_check_rmem_offset_alignment(u64 offset, u64 gpa)
+>  	if (!gpa)
+>  		return false;
+>  
+> -	return !!(count_trailing_zeros(offset) >= count_trailing_zeros(gpa));
+> +	return !!(count_trailing_zeros(offset) >= kvm_arch_required_alignment(gpa));
+>  }
+>  
+>  /*
+> -- 
+> 2.25.1
+> 
+> 
+> 
+> -- 
+> Isaku Yamahata <isaku.yamahata@gmail.com>
