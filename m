@@ -2,206 +2,198 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 274886C802B
-	for <lists+kvm@lfdr.de>; Fri, 24 Mar 2023 15:45:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 811846C8031
+	for <lists+kvm@lfdr.de>; Fri, 24 Mar 2023 15:47:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231393AbjCXOpZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Mar 2023 10:45:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34406 "EHLO
+        id S232043AbjCXOrZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Mar 2023 10:47:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37306 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231508AbjCXOpX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Mar 2023 10:45:23 -0400
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 23F4523112;
-        Fri, 24 Mar 2023 07:45:13 -0700 (PDT)
-Received: from localhost.localdomain (77-166-152-30.fixed.kpn.net [77.166.152.30])
-        by linux.microsoft.com (Postfix) with ESMTPSA id E308820FC442;
-        Fri, 24 Mar 2023 07:45:10 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com E308820FC442
-From:   Jeremi Piotrowski <jpiotrowski@microsoft.com>
-To:     linux-kernel@vger.kernel.org
-Cc:     Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Tianyu Lan <ltykernel@gmail.com>,
-        Michael Kelley <mikelley@microsoft.com>,
-        Sean Christopherson <seanjc@google.com>, stable@vger.kernel.org
-Subject: [PATCH v2] KVM: SVM: Flush Hyper-V TLB when required
-Date:   Fri, 24 Mar 2023 15:45:00 +0100
-Message-Id: <20230324144500.4216-1-jpiotrowski@microsoft.com>
-X-Mailer: git-send-email 2.30.2
+        with ESMTP id S232122AbjCXOrW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Mar 2023 10:47:22 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF01B19C50
+        for <kvm@vger.kernel.org>; Fri, 24 Mar 2023 07:47:20 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 0AF4E62B49
+        for <kvm@vger.kernel.org>; Fri, 24 Mar 2023 14:47:20 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 525F5C4339B;
+        Fri, 24 Mar 2023 14:47:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1679669239;
+        bh=4vzJyqVj/H07YElh4j3pruZHL47TVlCStjVfQtrNMdE=;
+        h=From:To:Cc:Subject:Date:From;
+        b=IDvge/7lLxRYtULrvMDW/hnoWgQ1tDHIvgxTbKJNQMKBPT9HqUYvKf7BU6J1eMGqO
+         If+qjlJjWk7/Mjx51r6cUYXO9E1OmVYchzsRyA0OaryysYi3T6YDh5HkdfzbSXdJWE
+         YOmDgsvamr6Q7XAW+oxmKWyQydRJBkBH/of8Ym2OnXdtzNROJ9Zgp4HJfeksMDu0Ak
+         wROSFgMBaXdoyblf6SoEnViRkg+bqbQkfkGaYTLUrkVW+GZUq2IHfYbZRN+B/D0yXa
+         MMeF0r6ajjOHaAxBaNhFqGYfWsx+aJyBGXF7KnQpa+z0JYUt4MAjFIYoPVWnwKGH6c
+         8HkIesC61ofvw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1pfihI-002qBP-Un;
+        Fri, 24 Mar 2023 14:47:17 +0000
+From:   Marc Zyngier <maz@kernel.org>
+To:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org
+Cc:     James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Simon Veith <sveith@amazon.de>,
+        Reiji Watanabe <reijiw@google.com>,
+        Colton Lewis <coltonlewis@google.com>,
+        Joey Gouly <joey.gouly@arm.com>, dwmw2@infradead.org
+Subject: [PATCH v3 00/18] KVM: arm64: Rework timer offsetting for fun and profit
+Date:   Fri, 24 Mar 2023 14:46:46 +0000
+Message-Id: <20230324144704.4193635-1-maz@kernel.org>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.3 required=5.0 tests=RCVD_IN_DNSWL_MED,
-        SPF_HELO_PASS,SPF_NONE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, ricarkol@google.com, sveith@amazon.de, reijiw@google.com, coltonlewis@google.com, joey.gouly@arm.com, dwmw2@infradead.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-2.5 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>
+This series aims at satisfying multiple goals:
 
-The Hyper-V "EnlightenedNptTlb" enlightenment is always enabled when KVM
-is running on top of Hyper-V and Hyper-V exposes support for it (which
-is always). On AMD CPUs this enlightenment results in ASID invalidations
-not flushing TLB entries derived from the NPT. To force the underlying
-(L0) hypervisor to rebuild its shadow page tables, an explicit hypercall
-is needed.
+- allow a VMM to atomically restore a timer offset for a whole VM
+  instead of updating the offset each time a vcpu get its counter
+  written
 
-The original KVM implementation of Hyper-V's "EnlightenedNptTlb" on SVM
-only added remote TLB flush hooks. This worked out fine for a while, as
-sufficient remote TLB flushes where being issued in KVM to mask the
-problem. Since v5.17, changes in the TDP code reduced the number of
-flushes and the out-of-sync TLB prevents guests from booting
-successfully.
+- allow a VMM to save/restore the physical timer context, something
+  that we cannot do at the moment due to the lack of offsetting
 
-Split svm_flush_tlb_current() into separate callbacks for the 3 cases
-(guest/all/current), and issue the required Hyper-V hypercall when a
-Hyper-V TLB flush is needed. The most important case where the TLB flush
-was missing is when loading a new PGD, which is followed by what is now
-svm_flush_tlb_current().
+- provide a framework that is suitable for NV support, where we get
+  both global and per timer, per vcpu offsetting, and manage
+  interrupts in a less braindead way.
 
-Cc: stable@vger.kernel.org # v5.17+
-Fixes: 1e0c7d40758b ("KVM: SVM: hyper-v: Remote TLB flush for SVM")
-Link: https://lore.kernel.org/lkml/43980946-7bbf-dcef-7e40-af904c456250@linux.microsoft.com/
-Suggested-by: Sean Christopherson <seanjc@google.com>
-Signed-off-by: Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>
----
-Changes since v1:
-- lookup enlightened_npt_tlb in vmcb to determine whether to do the
-  flush
-- when KVM wants a hyperv_flush_guest_mapping() call, don't try to
-  optimize it out
-- don't hide hyperv flush behind helper, make it visible in
-  svm.c
+We fix a couple of issues along the way, both from a stylistic and
+correctness perspective. This results in a new per VM KVM API that
+allows a global offset to be set at any point in time, overriding both
+of the timer counter writebacks.
 
- arch/x86/kvm/kvm_onhyperv.h     |  5 +++++
- arch/x86/kvm/svm/svm.c          | 37 ++++++++++++++++++++++++++++++---
- arch/x86/kvm/svm/svm_onhyperv.h | 15 +++++++++++++
- 3 files changed, 54 insertions(+), 3 deletions(-)
+We also take this opportunity to rework the way IRQs are associated
+with timers, something that was always a bit dodgy. This relies on a
+new lock, which should disappear once Oliver's lock ordering series is
+merged (we can reuse the config_lock for this).
 
-diff --git a/arch/x86/kvm/kvm_onhyperv.h b/arch/x86/kvm/kvm_onhyperv.h
-index 287e98ef9df3..67b53057e41c 100644
---- a/arch/x86/kvm/kvm_onhyperv.h
-+++ b/arch/x86/kvm/kvm_onhyperv.h
-@@ -12,6 +12,11 @@ int hv_remote_flush_tlb_with_range(struct kvm *kvm,
- int hv_remote_flush_tlb(struct kvm *kvm);
- void hv_track_root_tdp(struct kvm_vcpu *vcpu, hpa_t root_tdp);
- #else /* !CONFIG_HYPERV */
-+static inline int hv_remote_flush_tlb(struct kvm *kvm)
-+{
-+	return -1;
-+}
-+
- static inline void hv_track_root_tdp(struct kvm_vcpu *vcpu, hpa_t root_tdp)
- {
- }
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 252e7f37e4e2..f25bc3cbb250 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -3729,7 +3729,7 @@ static void svm_enable_nmi_window(struct kvm_vcpu *vcpu)
- 	svm->vmcb->save.rflags |= (X86_EFLAGS_TF | X86_EFLAGS_RF);
- }
- 
--static void svm_flush_tlb_current(struct kvm_vcpu *vcpu)
-+static void svm_flush_tlb_asid(struct kvm_vcpu *vcpu)
- {
- 	struct vcpu_svm *svm = to_svm(vcpu);
- 
-@@ -3753,6 +3753,37 @@ static void svm_flush_tlb_current(struct kvm_vcpu *vcpu)
- 		svm->current_vmcb->asid_generation--;
- }
- 
-+static void svm_flush_tlb_current(struct kvm_vcpu *vcpu)
-+{
-+	hpa_t root_tdp = vcpu->arch.mmu->root.hpa;
-+
-+	/*
-+	 * When running on Hyper-V with EnlightenedNptTlb enabled, explicitly
-+	 * flush the NPT mappings via hypercall as flushing the ASID only
-+	 * affects virtual to physical mappings, it does not invalidate guest
-+	 * physical to host physical mappings.
-+	 */
-+	if (svm_hv_is_enlightened_tlb_enabled(vcpu) && VALID_PAGE(root_tdp))
-+		hyperv_flush_guest_mapping(root_tdp);
-+
-+	svm_flush_tlb_asid(vcpu);
-+}
-+
-+static void svm_flush_tlb_all(struct kvm_vcpu *vcpu)
-+{
-+	/*
-+	 * When running on Hyper-V with EnlightenedNptTlb enabled, remote TLB
-+	 * flushes should be routed to hv_remote_flush_tlb() without requesting
-+	 * a "regular" remote flush.  Reaching this point means either there's
-+	 * a KVM bug or a prior hv_remote_flush_tlb() call failed, both of
-+	 * which might be fatal to the guest.  Yell, but try to recover.
-+	 */
-+	if (WARN_ON_ONCE(svm_hv_is_enlightened_tlb_enabled(vcpu)))
-+		hv_remote_flush_tlb(vcpu->kvm);
-+
-+	svm_flush_tlb_asid(vcpu);
-+}
-+
- static void svm_flush_tlb_gva(struct kvm_vcpu *vcpu, gva_t gva)
- {
- 	struct vcpu_svm *svm = to_svm(vcpu);
-@@ -4745,10 +4776,10 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
- 	.set_rflags = svm_set_rflags,
- 	.get_if_flag = svm_get_if_flag,
- 
--	.flush_tlb_all = svm_flush_tlb_current,
-+	.flush_tlb_all = svm_flush_tlb_all,
- 	.flush_tlb_current = svm_flush_tlb_current,
- 	.flush_tlb_gva = svm_flush_tlb_gva,
--	.flush_tlb_guest = svm_flush_tlb_current,
-+	.flush_tlb_guest = svm_flush_tlb_asid,
- 
- 	.vcpu_pre_run = svm_vcpu_pre_run,
- 	.vcpu_run = svm_vcpu_run,
-diff --git a/arch/x86/kvm/svm/svm_onhyperv.h b/arch/x86/kvm/svm/svm_onhyperv.h
-index cff838f15db5..786d46d73a8e 100644
---- a/arch/x86/kvm/svm/svm_onhyperv.h
-+++ b/arch/x86/kvm/svm/svm_onhyperv.h
-@@ -6,6 +6,8 @@
- #ifndef __ARCH_X86_KVM_SVM_ONHYPERV_H__
- #define __ARCH_X86_KVM_SVM_ONHYPERV_H__
- 
-+#include <asm/mshyperv.h>
-+
- #if IS_ENABLED(CONFIG_HYPERV)
- 
- #include "kvm_onhyperv.h"
-@@ -15,6 +17,14 @@ static struct kvm_x86_ops svm_x86_ops;
- 
- int svm_hv_enable_l2_tlb_flush(struct kvm_vcpu *vcpu);
- 
-+static inline bool svm_hv_is_enlightened_tlb_enabled(struct kvm_vcpu *vcpu)
-+{
-+	struct hv_vmcb_enlightenments *hve = &to_svm(vcpu)->vmcb->control.hv_enlightenments;
-+
-+	return ms_hyperv.nested_features & HV_X64_NESTED_ENLIGHTENED_TLB &&
-+	       !!hve->hv_enlightenments_control.enlightened_npt_tlb;
-+}
-+
- static inline void svm_hv_init_vmcb(struct vmcb *vmcb)
- {
- 	struct hv_vmcb_enlightenments *hve = &vmcb->control.hv_enlightenments;
-@@ -80,6 +90,11 @@ static inline void svm_hv_update_vp_id(struct vmcb *vmcb, struct kvm_vcpu *vcpu)
- }
- #else
- 
-+static inline bool svm_hv_is_enlightened_tlb_enabled(struct kvm_vcpu *vcpu)
-+{
-+	return false;
-+}
-+
- static inline void svm_hv_init_vmcb(struct vmcb *vmcb)
- {
- }
+This has been tested with nVHE, VHE and NV. I do not have access to
+CNTPOFF-aware HW, but Colton managed to give it a go. Note that the
+NV patches in this series are here to give a perspective on how this
+gets used.
+
+I've updated the arch_timer selftest to allow an offset to be provided
+from the command line, and fixed a couple of glaring issues along the
+way.
+
+Note that this is at best 6.4 material. I have a branch stashed at [0]
+and based on 6.3-rc3, as well as a minimal example of the use of the
+API at [3] based on kvmtool.
+
+Simon: I'd appreciate some feedback as whether this change fits your
+requirements, given that you brought this up the first place.
+
+Thanks,
+
+	M.
+
+* From v2 [2]:
+
+  - Fixed 32bit handling of the physical counter when the offset is
+    non-zero
+
+  - Dropped unused -O option from the selftest
+
+  - Added lockdep_assert_held() to (un)lock_all_vcpus()
+
+  - Reordered the last two patches
+
+  - Added Colton's RBs, with thanks
+
+  - Dropped the initial patch which has been merged
+
+  - Rebased on 6.3-rc3
+
+* From v1 [1]:
+
+  - Switched from a dual offset to a single one which gets applied to
+    both virtual and physical counters. Which means that NV doesn't
+    behave oddly anymore by ignoring the virtual offset.
+
+  - Some cosmetic repainting of the UAPI symbols
+
+  - Added patches to rework the IRQ mapping to timers
+
+  - Patch #1 on its way to Paolo
+
+  - Rebased on 6.3-rc1
+
+[0] https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=kvm-arm64/timer-vm-offsets
+[1] https://lore.kernel.org/r/20230216142123.2638675-1-maz@kernel.org
+[2] https://lore.kernel.org/r/20230313124837.2264882-5-maz@kernel.org
+[3] https://git.kernel.org/pub/scm/linux/kernel/git/maz/kvmtool.git/commit/?h=zero-offset&id=3b1253073ee57c0d92baf7b214362829b487b8d5
+
+Marc Zyngier (18):
+  KVM: arm64: timers: Use a per-vcpu, per-timer accumulator for
+    fractional ns
+  arm64: Add CNTPOFF_EL2 register definition
+  arm64: Add HAS_ECV_CNTPOFF capability
+  KVM: arm64: timers: Use CNTPOFF_EL2 to offset the physical timer
+  KVM: arm64: timers: Allow physical offset without CNTPOFF_EL2
+  KVM: arm64: Expose {un,}lock_all_vcpus() to the rest of KVM
+  KVM: arm64: timers: Allow userspace to set the global counter offset
+  KVM: arm64: timers: Allow save/restoring of the physical timer
+  KVM: arm64: timers: Rationalise per-vcpu timer init
+  KVM: arm64: timers: Abstract per-timer IRQ access
+  KVM: arm64: timers: Move the timer IRQs into arch_timer_vm_data
+  KVM: arm64: Abstract the number of valid timers per vcpu
+  KVM: arm64: Document KVM_ARM_SET_CNT_OFFSETS and co
+  KVM: arm64: nv: timers: Add a per-timer, per-vcpu offset
+  KVM: arm64: nv: timers: Support hyp timer emulation
+  KVM: arm64: selftests: Add physical timer registers to the sysreg list
+  KVM: arm64: selftests: Deal with spurious timer interrupts
+  KVM: arm64: selftests: Augment existing timer test to handle variable
+    offset
+
+ Documentation/virt/kvm/api.rst                |  38 ++
+ arch/arm64/include/asm/kvm_host.h             |  13 +
+ arch/arm64/include/asm/sysreg.h               |   2 +
+ arch/arm64/include/uapi/asm/kvm.h             |  11 +
+ arch/arm64/kernel/cpufeature.c                |  11 +
+ arch/arm64/kvm/arch_timer.c                   | 539 ++++++++++++++----
+ arch/arm64/kvm/arm.c                          |  53 ++
+ arch/arm64/kvm/guest.c                        |  29 +-
+ arch/arm64/kvm/hyp/nvhe/timer-sr.c            |  18 +-
+ arch/arm64/kvm/hypercalls.c                   |   2 +-
+ arch/arm64/kvm/sys_regs.c                     |   9 +
+ arch/arm64/kvm/trace_arm.h                    |   6 +-
+ arch/arm64/kvm/vgic/vgic-kvm-device.c         |  38 --
+ arch/arm64/kvm/vgic/vgic.c                    |  15 +
+ arch/arm64/kvm/vgic/vgic.h                    |   3 -
+ arch/arm64/tools/cpucaps                      |   1 +
+ arch/arm64/tools/sysreg                       |   4 +
+ include/clocksource/arm_arch_timer.h          |   1 +
+ include/kvm/arm_arch_timer.h                  |  36 +-
+ include/kvm/arm_vgic.h                        |   1 +
+ include/uapi/linux/kvm.h                      |   3 +
+ .../selftests/kvm/aarch64/arch_timer.c        |  56 +-
+ .../selftests/kvm/aarch64/get-reg-list.c      |   5 +-
+ 23 files changed, 690 insertions(+), 204 deletions(-)
+
 -- 
-2.37.2
+2.34.1
 
