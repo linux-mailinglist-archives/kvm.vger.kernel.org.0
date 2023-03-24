@@ -2,60 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E07DB6C8726
-	for <lists+kvm@lfdr.de>; Fri, 24 Mar 2023 21:59:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2E13A6C8727
+	for <lists+kvm@lfdr.de>; Fri, 24 Mar 2023 21:59:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231387AbjCXU7O (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Mar 2023 16:59:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33504 "EHLO
+        id S231667AbjCXU73 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Mar 2023 16:59:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34128 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230404AbjCXU7M (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Mar 2023 16:59:12 -0400
-Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D66915BA7
-        for <kvm@vger.kernel.org>; Fri, 24 Mar 2023 13:59:10 -0700 (PDT)
-Received: by mail-pl1-x649.google.com with SMTP id j18-20020a170902da9200b001a055243657so1801520plx.19
-        for <kvm@vger.kernel.org>; Fri, 24 Mar 2023 13:59:10 -0700 (PDT)
+        with ESMTP id S231520AbjCXU71 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Mar 2023 16:59:27 -0400
+Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BEC419C5D
+        for <kvm@vger.kernel.org>; Fri, 24 Mar 2023 13:59:23 -0700 (PDT)
+Received: by mail-pj1-x1049.google.com with SMTP id ip12-20020a17090b314c00b0023f7dfb7d7fso934665pjb.6
+        for <kvm@vger.kernel.org>; Fri, 24 Mar 2023 13:59:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1679691550;
+        d=google.com; s=20210112; t=1679691562;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=p9HVc9ROAwxj1T5XSwSM6jTJhWsZF2YjsZMLagutpAk=;
-        b=nG+ns6HOKK9IFiuCCbFFXuKgKoM5+4wxnff/E81xdQ9GmY43qhPtjkaZ53NyDXmV/g
-         NI7j2o61b8wjKHNY8GQF4YnVO42ZJqPsoAtl38QME2qD4PCsJZHQ3oyvTzU3/g+lVPiH
-         tSavc+MJFmCXtZt/e8ZpcNYzFObAQlv06GYcGyRdvxemnLahdmPIfNhCHT3usOt+jpHt
-         e4m6tsNvhkhpQ6ZkABuLAK+L37wwS7S8f7vRlRnnNhLk+SQ5tYn6E9s9Ih1egFQSakG9
-         DxDuBzqP9fQhpprXRqCdHHlkFqL8hTmRoknipDPVVgBV8ZKJ0P5/ejO/cYYTxO4L0/FU
-         4eUA==
+        bh=/wfEpo5f5kAfQ9Hdkj7UPSkqYUR2PzHtc4Ov0QKsgjY=;
+        b=VlNJxFJ4zcwTRL3ROh0NjLc7Ggh1aIRu8ujdGALp6iBzVYn/rAPpVy0b15WcD5HBDK
+         eC1/exh0aNZZq0uvM9ap95WAPTTKAHkO1aAS45Lfmc6Op8rAbX7T60s6gAwmmWzBcTR7
+         8ZQv24o5Trp/fgu1OUqioL+CVIY53+gysyFsZ2CmAkljgKzHRYMKeXpHJ4GrdExgs4DR
+         T3P9Iombc0Pv9V8Z4RNaF/9r0kM7omSitIoefJUU90F6Wjv1Lx9M/QiLCQd6mToGWqOV
+         S/kksN3XmylHOTzTUDfyTW+Nxf/zEXYwkKQDpnHMudHaFwuklAbeUKhp+vcQGnCfLwgI
+         RG4g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679691550;
+        d=1e100.net; s=20210112; t=1679691562;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=p9HVc9ROAwxj1T5XSwSM6jTJhWsZF2YjsZMLagutpAk=;
-        b=QGZcWKzrzqSCoQc1Hql/8ryiVzOoAHSsxXF/C3Xr2bmAktw1cI16iftxrgGfq/jlGB
-         Pwq6X72Pt86kzdKwoXOX9VervtpA0hl8LbS0/mYst42R3gJBTBR/qHhMDa3vrY1ng70S
-         3a1I/tEMJarXeMO9L8aILBhQk9MQUYQ8WtOCLDBdpQs2QbHmaqUuDte1z9EH/HbnC85K
-         rIG3ErdaDe+porqzaIwwzQkvoiBdyCYQvhMXPdSCB6bUqvutOsF0qQPOqXpIuJDQ6ZZB
-         JuKJw5BgJTbVFjKaTTwPeTohHofQTEdjGSthcEV61mAeOttMwK0yTIj4puA+5gg60ptr
-         DuvQ==
-X-Gm-Message-State: AAQBX9dJrzd8JFw6TCzWSuMdcVyNS3o3QrBdriEIMagULylWXb4zqeVJ
-        ETGYwEL5f3fiST+GGGEkgAlfp4t6cP0=
-X-Google-Smtp-Source: AKy350YzPAVVOPgI8VKU2bnl+Wyxr3EsAYeZ7LM9dEPiq3iWHBsFwsxfIepC+EA3/f2ixatSqc9+nSPKsLk=
+        bh=/wfEpo5f5kAfQ9Hdkj7UPSkqYUR2PzHtc4Ov0QKsgjY=;
+        b=4AauXjmWe58I6RvQmuymEtyXdW/D5UqNC1jfq1zBJVq3RYImw6e8lEZ7d2swDGRzqH
+         9sTcDp3iw0H3i8jJgyJY2rpB4fkcIxPKCMDJxq+XDDfYaS+kFI620XhTDKITe4T5UBmc
+         r61bIarstl3fFR32MgUmGUut3o8x1RBxAyEPFFua+sKquK5A7EQdYw6fNf/JeAXVS10v
+         YbMcOcSiQOUJea7RVgWQ3+QIROhF5Iro+MuWzjG4eKV9khzlfZmXxv7rRKn2pRGWj5H1
+         2y4ozlQ5WnorEu0A2vgbA7rNuaXvKmVsJHp8i9bdRuurLr+NjxqDaph9ZgOmhSSgy0Yv
+         4kjQ==
+X-Gm-Message-State: AAQBX9dQ4IXJZJ/V6kbMw5afpSWydlI9d//RBmU/4gFx2PVu4pfncs7q
+        mjWenlJ2Cq+WnRwEXIZEMW67N2eRCp0=
+X-Google-Smtp-Source: AKy350ZfKKHxq8j6AEi0IBVVpk3Ikw1f0Uaj0olPDDuVsMLhagm/rB2pq+hzWTSujtrhUMWXIEbZdI5pAV0=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:ec04:b0:19c:d14b:ee20 with SMTP id
- l4-20020a170902ec0400b0019cd14bee20mr1400609pld.8.1679691550230; Fri, 24 Mar
- 2023 13:59:10 -0700 (PDT)
-Date:   Fri, 24 Mar 2023 13:58:48 -0700
-In-Reply-To: <20230223001805.2971237-1-amoorthy@google.com>
+ (user=seanjc job=sendgmr) by 2002:a17:902:eb09:b0:1a1:ffc6:de9b with SMTP id
+ l9-20020a170902eb0900b001a1ffc6de9bmr1365950plb.6.1679691562679; Fri, 24 Mar
+ 2023 13:59:22 -0700 (PDT)
+Date:   Fri, 24 Mar 2023 13:58:50 -0700
+In-Reply-To: <20230214084920.59787-1-likexu@tencent.com>
 Mime-Version: 1.0
-References: <20230223001805.2971237-1-amoorthy@google.com>
+References: <20230214084920.59787-1-likexu@tencent.com>
 X-Mailer: git-send-email 2.40.0.348.gf938b09366-goog
-Message-ID: <167969136798.2756350.4823760762125530813.b4-ty@google.com>
-Subject: Re: [PATCH v3] KVM: selftests: Fix nsec to sec conversion in demand_paging_test.
+Message-ID: <167969136143.2756283.9405259236021680651.b4-ty@google.com>
+Subject: Re: [PATCH 0/2] KVM: selftests: Report enable_pmu module value when
+ test is skipped
 From:   Sean Christopherson <seanjc@google.com>
-To:     Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
-        Anish Moorthy <amoorthy@google.com>
-Cc:     oliver.upton@linux.dev, James Houghton <jthoughton@google.com>
+To:     Sean Christopherson <seanjc@google.com>,
+        Like Xu <like.xu.linux@gmail.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="utf-8"
 X-Spam-Status: No, score=-7.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
@@ -67,17 +69,25 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 23 Feb 2023 00:18:05 +0000, Anish Moorthy wrote:
-> demand_paging_test uses 1E8 as the denominator to convert nanoseconds to
-> seconds, which is wrong. Use NSEC_PER_SEC instead to fix the issue and
-> make the conversion obvious.
+On Tue, 14 Feb 2023 16:49:18 +0800, Like Xu wrote:
+> Adequate info can help developers quickly distinguish whether the cause
+> is a code flaw or a platform limitation when a test fails or is skipped,
+> and this minor patch-set is doing a little work in that direction.
 > 
+> Base: kvm-x86/next
 > 
+> Like Xu (2):
+>   KVM: selftests: Add a helper to read kvm boolean module parameters
+>   KVM: selftests: Report enable_pmu module value when test is skipped
+> 
+> [...]
 
 Applied to kvm-x86 selftests, thanks!
 
-[1/1] KVM: selftests: Fix nsec to sec conversion in demand_paging_test.
-      https://github.com/kvm-x86/linux/commit/f6baabdcadd1
+[1/2] KVM: selftests: Add a helper to read kvm boolean module parameters
+      https://github.com/kvm-x86/linux/commit/d14d9139c023
+[2/2] KVM: selftests: Report enable_pmu module value when test is skipped
+      https://github.com/kvm-x86/linux/commit/6cf332e8eca6
 
 --
 https://github.com/kvm-x86/linux/tree/next
