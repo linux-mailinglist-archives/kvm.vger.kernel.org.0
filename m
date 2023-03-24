@@ -2,311 +2,259 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B20566C7EDB
-	for <lists+kvm@lfdr.de>; Fri, 24 Mar 2023 14:33:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A28F96C7F03
+	for <lists+kvm@lfdr.de>; Fri, 24 Mar 2023 14:42:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231572AbjCXNdj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Mar 2023 09:33:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34714 "EHLO
+        id S231887AbjCXNmn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Mar 2023 09:42:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50070 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229908AbjCXNdi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Mar 2023 09:33:38 -0400
-Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 881011BEE;
-        Fri, 24 Mar 2023 06:33:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1679664816; x=1711200816;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=YqhkrQUxyTWkx9pSy5n8V1+rHO70CUSTZdPyNQsTxpc=;
-  b=B45cIVWkAyrDCIWvMOBJSQ6o9fWjDxOIlf3+QQuackUnHKSWZ9vly80k
-   ujAydDPkUc2hnR8bJRam3APw4dFRO34/rKfS7zsYq/+bmVnQyViIevqkO
-   RXpWyFkJepZf47JklW20b+1Iu/qzr/eiFcd/wUuHtQDVbK0mwZkJvQ+bc
-   1O1ES8XF1RFAROGCgsQ6ja1SeB3Az8O3QDG2pqy8I1pMaeuX+UzQHgclp
-   BIOKEvMnuNb0jZ/i/hwSXIZJp3DfzLYkv8uaDaXdKvG/um60NmYjpG2vr
-   Z4/64BYhRHL1RqbgYwFbZuyMPN6NhSDZnanUYZ0HJPIUxYJ0nV4IJP4SP
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10659"; a="337280261"
-X-IronPort-AV: E=Sophos;i="5.98,288,1673942400"; 
-   d="scan'208";a="337280261"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Mar 2023 06:33:36 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10659"; a="1012249036"
-X-IronPort-AV: E=Sophos;i="5.98,288,1673942400"; 
-   d="scan'208";a="1012249036"
-Received: from linux.intel.com ([10.54.29.200])
-  by fmsmga005.fm.intel.com with ESMTP; 24 Mar 2023 06:33:35 -0700
-Received: from [10.255.231.167] (kliang2-mobl1.ccr.corp.intel.com [10.255.231.167])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by linux.intel.com (Postfix) with ESMTPS id D2258580CD3;
-        Fri, 24 Mar 2023 06:33:33 -0700 (PDT)
-Message-ID: <e60623a4-57e1-dde6-1c76-d9c7f956d3f1@linux.intel.com>
-Date:   Fri, 24 Mar 2023 09:33:19 -0400
+        with ESMTP id S231444AbjCXNml (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Mar 2023 09:42:41 -0400
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4333B22CAE;
+        Fri, 24 Mar 2023 06:42:34 -0700 (PDT)
+Received: from [192.168.2.41] (77-166-152-30.fixed.kpn.net [77.166.152.30])
+        by linux.microsoft.com (Postfix) with ESMTPSA id D9C2320FC0F4;
+        Fri, 24 Mar 2023 06:42:31 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com D9C2320FC0F4
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+        s=default; t=1679665353;
+        bh=3VmvwDnyZDj00X2K5h4ET9mKtkFs5KXH1uhyiV8j9oc=;
+        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+        b=olblbITm9AAKyCGEw5DWI6TL+Ek/dKIeyI/kHSDPl6G3X/5aA0o7+3lQ5EzsX/lhA
+         welEMeO/NIfvMwaI3wv8gDK6yG4V+glTL5ooIpy+ZHD1jcBdSja1Xvv0VOAx8ac0fO
+         gz0W0Rzuc39GURTsCg01gQZ1IYVfjywUTzE7tDlo=
+Message-ID: <0a9ba6e6-d976-c3fa-372e-81fba85210ab@linux.microsoft.com>
+Date:   Fri, 24 Mar 2023 14:42:30 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
  Thunderbird/102.9.0
-Subject: Re: [PATCH v3] perf/x86: use hexidecimal value for cpuid
+Subject: Re: [PATCH] KVM: SVM: Flush Hyper-V TLB when required
 Content-Language: en-US
-To:     Zhenyu Wang <zhenyuw@linux.intel.com>, linux-kernel@vger.kernel.org
-Cc:     kvm@vger.kernel.org, Peter Zijlstra <peterz@infradead.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Jiri Olsa <jolsa@kernel.org>,
-        Namhyung Kim <namhyung@kernel.org>,
-        CodyYao-oc <CodyYao-oc@zhaoxin.com>
-References: <20230312132633.228006-1-zhenyuw@linux.intel.com>
- <20230322053746.4888-1-zhenyuw@linux.intel.com>
-From:   "Liang, Kan" <kan.liang@linux.intel.com>
-In-Reply-To: <20230322053746.4888-1-zhenyuw@linux.intel.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        kvm@vger.kernel.org, Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Tianyu Lan <ltykernel@gmail.com>,
+        Michael Kelley <mikelley@microsoft.com>, stable@vger.kernel.org
+References: <20230320185110.1346829-1-jpiotrowski@linux.microsoft.com>
+ <ZBsqxeRDh+iV8qmm@google.com>
+From:   Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>
+In-Reply-To: <ZBsqxeRDh+iV8qmm@google.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.4 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE autolearn=unavailable autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-17.9 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
+        DKIM_VALID_AU,ENV_AND_HDR_SPF_MATCH,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
+        SPF_HELO_PASS,SPF_PASS,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 2023-03-22 1:37 a.m., Zhenyu Wang wrote:
-> It's easier to use hexidecimal value instead of decimal for reading
-> and following with SDM doc, also align with other cpuid calls. As new
-> cpuid leaf would be added in future, this tries to convert current
-> forms and would take it as convention for new leaf definition.
+On 3/22/2023 5:20 PM, Sean Christopherson wrote:
+> On Mon, Mar 20, 2023, Jeremi Piotrowski wrote:
+>> ---
+>>  arch/x86/kvm/kvm_onhyperv.c | 23 +++++++++++++++++++++++
+>>  arch/x86/kvm/kvm_onhyperv.h |  5 +++++
+>>  arch/x86/kvm/svm/svm.c      | 18 +++++++++++++++---
+>>  3 files changed, 43 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/arch/x86/kvm/kvm_onhyperv.c b/arch/x86/kvm/kvm_onhyperv.c
+>> index 482d6639ef88..036e04c0a161 100644
+>> --- a/arch/x86/kvm/kvm_onhyperv.c
+>> +++ b/arch/x86/kvm/kvm_onhyperv.c
+>> @@ -94,6 +94,29 @@ int hv_remote_flush_tlb(struct kvm *kvm)
+>>  }
+>>  EXPORT_SYMBOL_GPL(hv_remote_flush_tlb);
+>>  
+>> +void hv_flush_tlb_current(struct kvm_vcpu *vcpu)
+>> +{
+>> +	struct kvm_arch *kvm_arch = &vcpu->kvm->arch;
+>> +	hpa_t root_tdp = vcpu->arch.mmu->root.hpa;
+>> +
+>> +	if (kvm_x86_ops.tlb_remote_flush == hv_remote_flush_tlb && VALID_PAGE(root_tdp)) {
+>> +		spin_lock(&kvm_arch->hv_root_tdp_lock);
+>> +		if (kvm_arch->hv_root_tdp != root_tdp) {
+>> +			hyperv_flush_guest_mapping(root_tdp);
+>> +			kvm_arch->hv_root_tdp = root_tdp;
 > 
-> This changes name for both cpuid type and cpuid calls.
+> In a vacuum, accessing kvm_arch->hv_root_tdp in the flush path is wrong.  This
+> likely fixes the issues you are seeing because the KVM bug only affects the case
+> when KVM is loading a new root (that used to be valid), in which case hv_root_tdp
+> is guaranteed to be different.  But KVM should not rely on that behavior, i.e. if
+> KVM says flush, then we flush.  There might be scenarios where the flush is
+> unnecessary, but those flushes should be elided by the code that knows the flush
+> is unnecessary, not in this common code just because the target root is the
+> globally shared root> 
 
-It seems the patch touches 3 CPUIDs, 0xa, 0x1c and 0x14, right?
-The patch also crosses several different subsystems and drivers.
-I think it may be better to divide the patch by CPUID. Each patch to
-handle one CPUID. It's easier for review.
+That's fair, and I'm fine with doing the flush unconditionally to fix the issue at
+this time.
 
-Also, can you please add a macro for the CPUID leaf number?
-Please refer ARCH_PERFMON_EXT_LEAF (0x23).
+But eliding the flushes higher up will require bubbling up more knowledge about
+the enlightened TLB and the fact that hyperv_flush_guest_mapping() already acts
+across all cpus. And we would still want to call svm_flush_tlb_asid() anyway, right?
 
-Thanks,
-Kan
+> Somewhat of a moot point, but setting hv_root_tdp to root_tdp is also wrong.  KVM's
+> behavior is that hv_root_tdp points at a valid root if and only if all vCPUs share
+> said root.  E.g. invoking this when vCPUs have different roots will "corrupt"
+> hv_root_tdp and possibly cause a remote flush to do the wrong thing.> 
 
+Oh, that's right. I'm dropping this for now.
+
+>> +		}
+>> +		spin_unlock(&kvm_arch->hv_root_tdp_lock);
+>> +	}
+>> +}
+>> +EXPORT_SYMBOL_GPL(hv_flush_tlb_current);
+>> +
+>> +void hv_flush_tlb_all(struct kvm_vcpu *vcpu)
+>> +{
+>> +	if (WARN_ON_ONCE(kvm_x86_ops.tlb_remote_flush == hv_remote_flush_tlb))
 > 
-> Cc: Peter Zijlstra <peterz@infradead.org>
-> Cc: Ingo Molnar <mingo@redhat.com>
-> Cc: Arnaldo Carvalho de Melo <acme@kernel.org>
-> Cc: Mark Rutland <mark.rutland@arm.com>
-> Cc: Alexander Shishkin <alexander.shishkin@linux.intel.com>
-> Cc: Jiri Olsa <jolsa@kernel.org>
-> Cc: Namhyung Kim <namhyung@kernel.org>
-> Cc: Kan Liang <kan.liang@linux.intel.com>
-> Cc: CodyYao-oc <CodyYao-oc@zhaoxin.com>
-> Signed-off-by: Zhenyu Wang <zhenyuw@linux.intel.com>
-> ---
-> v3:
-> - add more explanation in commit message for purpose of this
-> - use lowercase number in call to align with current code
+> Hmm, looking at the KVM code, AFAICT KVM only enables enlightened_npt_tlb for L1
+> (L1 from KVM's perspective) as svm_hv_init_vmcb() is only ever called with vmcb01,
+> never with vmcb02.  I don't know if that's intentional, but I do think it means
+> KVM can skip the Hyper-V flush for vmcb02 and instead rely on the ASID flush,
+> i.e. KVM can do the Hyper-V iff enlightened_npt_tlb is set in the current VMCB.
+> And that should continue to work if KVM does ever enabled enlightened_npt_tlb for L2.
 > 
-> v2:
-> - rename in cpuid data type as well
+>> +		hv_remote_flush_tlb(vcpu->kvm);
+>> +}
+>> +EXPORT_SYMBOL_GPL(hv_flush_tlb_all);
 > 
->  arch/x86/events/intel/core.c      | 10 +++++-----
->  arch/x86/events/intel/lbr.c       |  8 ++++----
->  arch/x86/events/intel/pt.c        |  2 +-
->  arch/x86/events/zhaoxin/core.c    |  8 ++++----
->  arch/x86/include/asm/perf_event.h | 12 ++++++------
->  arch/x86/kvm/cpuid.c              |  4 ++--
->  arch/x86/kvm/vmx/pmu_intel.c      |  4 ++--
->  7 files changed, 24 insertions(+), 24 deletions(-)
+> I'd rather not add helpers to the common KVM code.  I do like minimizing the amount
+> of #ifdeffery, but defining these as common helpers makes it seem like VMX-on-HyperV
+> is broken, i.e. raises the question of why VMX doesn't use these helpers when running
+> on Hyper-V.
 > 
-> diff --git a/arch/x86/events/intel/core.c b/arch/x86/events/intel/core.c
-> index a3fb996a86a1..5487a39d4975 100644
-> --- a/arch/x86/events/intel/core.c
-> +++ b/arch/x86/events/intel/core.c
-> @@ -5170,7 +5170,7 @@ static __init void intel_arch_events_quirk(void)
->  
->  static __init void intel_nehalem_quirk(void)
->  {
-> -	union cpuid10_ebx ebx;
-> +	union cpuid_0xa_ebx ebx;
->  
->  	ebx.full = x86_pmu.events_maskl;
->  	if (ebx.split.no_branch_misses_retired) {
-> @@ -5878,9 +5878,9 @@ __init int intel_pmu_init(void)
->  	struct attribute **td_attr    = &empty_attrs;
->  	struct attribute **mem_attr   = &empty_attrs;
->  	struct attribute **tsx_attr   = &empty_attrs;
-> -	union cpuid10_edx edx;
-> -	union cpuid10_eax eax;
-> -	union cpuid10_ebx ebx;
-> +	union cpuid_0xa_edx edx;
-> +	union cpuid_0xa_eax eax;
-> +	union cpuid_0xa_ebx ebx;
->  	unsigned int fixed_mask;
->  	bool pmem = false;
->  	int version, i;
-> @@ -5903,7 +5903,7 @@ __init int intel_pmu_init(void)
->  	 * Check whether the Architectural PerfMon supports
->  	 * Branch Misses Retired hw_event or not.
->  	 */
-> -	cpuid(10, &eax.full, &ebx.full, &fixed_mask, &edx.full);
-> +	cpuid(0xa, &eax.full, &ebx.full, &fixed_mask, &edx.full);
->  	if (eax.split.mask_length < ARCH_PERFMON_EVENTS_COUNT)
->  		return -ENODEV;
->  
-> diff --git a/arch/x86/events/intel/lbr.c b/arch/x86/events/intel/lbr.c
-> index c3b0d15a9841..616a6904af03 100644
-> --- a/arch/x86/events/intel/lbr.c
-> +++ b/arch/x86/events/intel/lbr.c
-> @@ -1497,16 +1497,16 @@ static bool is_arch_lbr_xsave_available(void)
->  void __init intel_pmu_arch_lbr_init(void)
->  {
->  	struct pmu *pmu = x86_get_pmu(smp_processor_id());
-> -	union cpuid28_eax eax;
-> -	union cpuid28_ebx ebx;
-> -	union cpuid28_ecx ecx;
-> +	union cpuid_0x1c_eax eax;
-> +	union cpuid_0x1c_ebx ebx;
-> +	union cpuid_0x1c_ecx ecx;
->  	unsigned int unused_edx;
->  	bool arch_lbr_xsave;
->  	size_t size;
->  	u64 lbr_nr;
->  
->  	/* Arch LBR Capabilities */
-> -	cpuid(28, &eax.full, &ebx.full, &ecx.full, &unused_edx);
-> +	cpuid(0x1c, &eax.full, &ebx.full, &ecx.full, &unused_edx);
->  
->  	lbr_nr = fls(eax.split.lbr_depth_mask) * 8;
->  	if (!lbr_nr)
-> diff --git a/arch/x86/events/intel/pt.c b/arch/x86/events/intel/pt.c
-> index 42a55794004a..da3c5d748365 100644
-> --- a/arch/x86/events/intel/pt.c
-> +++ b/arch/x86/events/intel/pt.c
-> @@ -235,7 +235,7 @@ static int __init pt_pmu_hw_init(void)
->  	}
->  
->  	for (i = 0; i < PT_CPUID_LEAVES; i++) {
-> -		cpuid_count(20, i,
-> +		cpuid_count(0x14, i,
->  			    &pt_pmu.caps[CPUID_EAX + i*PT_CPUID_REGS_NUM],
->  			    &pt_pmu.caps[CPUID_EBX + i*PT_CPUID_REGS_NUM],
->  			    &pt_pmu.caps[CPUID_ECX + i*PT_CPUID_REGS_NUM],
-> diff --git a/arch/x86/events/zhaoxin/core.c b/arch/x86/events/zhaoxin/core.c
-> index 3e9acdaeed1e..1d071974f4db 100644
-> --- a/arch/x86/events/zhaoxin/core.c
-> +++ b/arch/x86/events/zhaoxin/core.c
-> @@ -504,9 +504,9 @@ static __init void zhaoxin_arch_events_quirk(void)
->  
->  __init int zhaoxin_pmu_init(void)
->  {
-> -	union cpuid10_edx edx;
-> -	union cpuid10_eax eax;
-> -	union cpuid10_ebx ebx;
-> +	union cpuid_0xa_edx edx;
-> +	union cpuid_0xa_eax eax;
-> +	union cpuid_0xa_ebx ebx;
->  	struct event_constraint *c;
->  	unsigned int unused;
->  	int version;
-> @@ -517,7 +517,7 @@ __init int zhaoxin_pmu_init(void)
->  	 * Check whether the Architectural PerfMon supports
->  	 * hw_event or not.
->  	 */
-> -	cpuid(10, &eax.full, &ebx.full, &unused, &edx.full);
-> +	cpuid(0xa, &eax.full, &ebx.full, &unused, &edx.full);
->  
->  	if (eax.split.mask_length < ARCH_PERFMON_EVENTS_COUNT - 1)
->  		return -ENODEV;
-> diff --git a/arch/x86/include/asm/perf_event.h b/arch/x86/include/asm/perf_event.h
-> index 8fc15ed5e60b..0d2d735c8167 100644
-> --- a/arch/x86/include/asm/perf_event.h
-> +++ b/arch/x86/include/asm/perf_event.h
-> @@ -125,7 +125,7 @@
->   * Intel "Architectural Performance Monitoring" CPUID
->   * detection/enumeration details:
->   */
-> -union cpuid10_eax {
-> +union cpuid_0xa_eax {
->  	struct {
->  		unsigned int version_id:8;
->  		unsigned int num_counters:8;
-> @@ -135,7 +135,7 @@ union cpuid10_eax {
->  	unsigned int full;
->  };
->  
-> -union cpuid10_ebx {
-> +union cpuid_0xa_ebx {
->  	struct {
->  		unsigned int no_unhalted_core_cycles:1;
->  		unsigned int no_instructions_retired:1;
-> @@ -148,7 +148,7 @@ union cpuid10_ebx {
->  	unsigned int full;
->  };
->  
-> -union cpuid10_edx {
-> +union cpuid_0xa_edx {
->  	struct {
->  		unsigned int num_counters_fixed:5;
->  		unsigned int bit_width_fixed:8;
-> @@ -170,7 +170,7 @@ union cpuid10_edx {
->  /*
->   * Intel Architectural LBR CPUID detection/enumeration details:
->   */
-> -union cpuid28_eax {
-> +union cpuid_0x1c_eax {
->  	struct {
->  		/* Supported LBR depth values */
->  		unsigned int	lbr_depth_mask:8;
-> @@ -183,7 +183,7 @@ union cpuid28_eax {
->  	unsigned int		full;
->  };
->  
-> -union cpuid28_ebx {
-> +union cpuid_0x1c_ebx {
->  	struct {
->  		/* CPL Filtering Supported */
->  		unsigned int    lbr_cpl:1;
-> @@ -195,7 +195,7 @@ union cpuid28_ebx {
->  	unsigned int            full;
->  };
->  
-> -union cpuid28_ecx {
-> +union cpuid_0x1c_ecx {
->  	struct {
->  		/* Mispredict Bit Supported */
->  		unsigned int    lbr_mispred:1;
-> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> index 599aebec2d52..57f43dc87538 100644
-> --- a/arch/x86/kvm/cpuid.c
-> +++ b/arch/x86/kvm/cpuid.c
-> @@ -967,8 +967,8 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
->  		}
->  		break;
->  	case 0xa: { /* Architectural Performance Monitoring */
-> -		union cpuid10_eax eax;
-> -		union cpuid10_edx edx;
-> +		union cpuid_0xa_eax eax;
-> +		union cpuid_0xa_edx edx;
->  
->  		if (!static_cpu_has(X86_FEATURE_ARCH_PERFMON)) {
->  			entry->eax = entry->ebx = entry->ecx = entry->edx = 0;
-> diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
-> index e8a3be0b9df9..f4b165667ca9 100644
-> --- a/arch/x86/kvm/vmx/pmu_intel.c
-> +++ b/arch/x86/kvm/vmx/pmu_intel.c
-> @@ -512,8 +512,8 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
->  	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
->  	struct lbr_desc *lbr_desc = vcpu_to_lbr_desc(vcpu);
->  	struct kvm_cpuid_entry2 *entry;
-> -	union cpuid10_eax eax;
-> -	union cpuid10_edx edx;
-> +	union cpuid_0xa_eax eax;
-> +	union cpuid_0xa_edx edx;
->  	u64 perf_capabilities;
->  	u64 counter_mask;
->  	int i;
+> I'm thinking this?
+> 
+
+I have the #ifdef version ready to send out, but what do you think about this:
+
+diff --git a/arch/x86/kvm/kvm_onhyperv.h b/arch/x86/kvm/kvm_onhyperv.h
+index 287e98ef9df3..b3ee0bb7e95f 100644
+--- a/arch/x86/kvm/kvm_onhyperv.h
++++ b/arch/x86/kvm/kvm_onhyperv.h
+@@ -12,6 +12,11 @@ int hv_remote_flush_tlb_with_range(struct kvm *kvm,
+ int hv_remote_flush_tlb(struct kvm *kvm);
+ void hv_track_root_tdp(struct kvm_vcpu *vcpu, hpa_t root_tdp);
+ #else /* !CONFIG_HYPERV */
++static inline int hv_remote_flush_tlb(struct kvm *kvm)
++{
++	return -1;
++}
++
+ static inline void hv_track_root_tdp(struct kvm_vcpu *vcpu, hpa_t root_tdp)
+ {
+ }
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 252e7f37e4e2..e707511a91e3 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -3729,7 +3729,7 @@ static void svm_enable_nmi_window(struct kvm_vcpu *vcpu)
+ 	svm->vmcb->save.rflags |= (X86_EFLAGS_TF | X86_EFLAGS_RF);
+ }
+ 
+-static void svm_flush_tlb_current(struct kvm_vcpu *vcpu)
++static void svm_flush_tlb_asid(struct kvm_vcpu *vcpu)
+ {
+ 	struct vcpu_svm *svm = to_svm(vcpu);
+ 
+@@ -3753,6 +3753,39 @@ static void svm_flush_tlb_current(struct kvm_vcpu *vcpu)
+ 		svm->current_vmcb->asid_generation--;
+ }
+ 
++static void svm_flush_tlb_current(struct kvm_vcpu *vcpu)
++{
++	hpa_t root_tdp = vcpu->arch.mmu->root.hpa;
++
++	/*
++	 * When running on Hyper-V with EnlightenedNptTlb enabled, explicitly
++	 * flush the NPT mappings via hypercall as flushing the ASID only
++	 * affects virtual to physical mappings, it does not invalidate guest
++	 * physical to host physical mappings.
++	 */
++	if (IS_ENABLED(CONFIG_HYPERV) &&
++	    svm_hv_is_enlightened_tlb_enabled(vcpu) &&
++	    VALID_PAGE(root_tdp))
++		hyperv_flush_guest_mapping(root_tdp);
++
++	svm_flush_tlb_asid(vcpu);
++}
++
++static void svm_flush_tlb_all(struct kvm_vcpu *vcpu)
++{
++	/*
++	 * When running on Hyper-V with EnlightenedNptTlb enabled, remote TLB
++	 * flushes should be routed to hv_remote_flush_tlb() without requesting
++	 * a "regular" remote flush.  Reaching this point means either there's
++	 * a KVM bug or a prior hv_remote_flush_tlb() call failed, both of
++	 * which might be fatal to the guest.  Yell, but try to recover.
++	 */
++	if (IS_ENABLED(CONFIG_HYPERV) && WARN_ON_ONCE(svm_hv_is_enlightened_tlb_enabled(vcpu)))
++		hv_remote_flush_tlb(vcpu->kvm);
++
++	svm_flush_tlb_asid(vcpu);
++}
++
+ static void svm_flush_tlb_gva(struct kvm_vcpu *vcpu, gva_t gva)
+ {
+ 	struct vcpu_svm *svm = to_svm(vcpu);
+@@ -4745,10 +4778,10 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
+ 	.set_rflags = svm_set_rflags,
+ 	.get_if_flag = svm_get_if_flag,
+ 
+-	.flush_tlb_all = svm_flush_tlb_current,
++	.flush_tlb_all = svm_flush_tlb_all,
+ 	.flush_tlb_current = svm_flush_tlb_current,
+ 	.flush_tlb_gva = svm_flush_tlb_gva,
+-	.flush_tlb_guest = svm_flush_tlb_current,
++	.flush_tlb_guest = svm_flush_tlb_asid,
+ 
+ 	.vcpu_pre_run = svm_vcpu_pre_run,
+ 	.vcpu_run = svm_vcpu_run,
+diff --git a/arch/x86/kvm/svm/svm_onhyperv.h b/arch/x86/kvm/svm/svm_onhyperv.h
+index cff838f15db5..4c9e0d4ba3dd 100644
+--- a/arch/x86/kvm/svm/svm_onhyperv.h
++++ b/arch/x86/kvm/svm/svm_onhyperv.h
+@@ -6,6 +6,8 @@
+ #ifndef __ARCH_X86_KVM_SVM_ONHYPERV_H__
+ #define __ARCH_X86_KVM_SVM_ONHYPERV_H__
+
++#include <asm/mshyperv.h>
++
+ #if IS_ENABLED(CONFIG_HYPERV)
+
+ #include "kvm_onhyperv.h"
+@@ -15,6 +17,14 @@ static struct kvm_x86_ops svm_x86_ops;
+ 
+ int svm_hv_enable_l2_tlb_flush(struct kvm_vcpu *vcpu);
+ 
++static inline bool svm_hv_is_enlightened_tlb_enabled(struct kvm_vcpu *vcpu)
++{
++	struct hv_vmcb_enlightenments *hve = &to_svm(vcpu)->vmcb->control.hv_enlightenments;
++
++	return ms_hyperv.nested_features & HV_X64_NESTED_ENLIGHTENED_TLB &&
++		!!hve->hv_enlightenments_control.enlightened_npt_tlb;
++}
++
+ static inline void svm_hv_init_vmcb(struct vmcb *vmcb)
+ {
+ 	struct hv_vmcb_enlightenments *hve = &vmcb->control.hv_enlightenments;
+@@ -80,6 +90,11 @@ static inline void svm_hv_update_vp_id(struct vmcb *vmcb, struct kvm_vcpu *vcpu)
+ }
+ #else
+ 
++static inline bool svm_hv_is_enlightened_tlb_enabled(struct kvm_vcpu *vcpu)
++{
++	return false;
++}
++
+ static inline void svm_hv_init_vmcb(struct vmcb *vmcb)
+ {
+ }
+
+
