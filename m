@@ -2,132 +2,148 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3FF816C8017
-	for <lists+kvm@lfdr.de>; Fri, 24 Mar 2023 15:40:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D6B316C801A
+	for <lists+kvm@lfdr.de>; Fri, 24 Mar 2023 15:41:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232080AbjCXOkt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Mar 2023 10:40:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54546 "EHLO
+        id S232088AbjCXOla (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Mar 2023 10:41:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56122 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231899AbjCXOkp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Mar 2023 10:40:45 -0400
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F50CA5E2
-        for <kvm@vger.kernel.org>; Fri, 24 Mar 2023 07:40:39 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-54161af1984so20649337b3.3
-        for <kvm@vger.kernel.org>; Fri, 24 Mar 2023 07:40:39 -0700 (PDT)
+        with ESMTP id S230196AbjCXOl3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Mar 2023 10:41:29 -0400
+Received: from smtp-fw-6002.amazon.com (smtp-fw-6002.amazon.com [52.95.49.90])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DCC5D5FD6;
+        Fri, 24 Mar 2023 07:41:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1679668838;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=SWD3cJxn2SkFPUZgdDBk5dQiYHPrb9vKrni6NgDQ89U=;
-        b=T4yA0v/Mqz9nVblO2vdOd+Ig6IKL1rsDD+kvqZSombbGj68Jh6VRsiYXw+7zWJMR2c
-         Xu8I+jzi3HMGqRxaFdsQR8AyiygLnuydtBg16CS7wQeP3b+XRL8UYjq0A7tNbH9RrfHQ
-         WGVXhE/kX032X7JMNSGlbDtOl8BlMHDdlwzexqrUUb08PBQwwgiNx+LKUKRnRsYlOp0l
-         4yhMytvV/36Wu+0WFVVQZbjFrK1lzwY9n/NVBLlZUbU1J7Rf13Ijghd47XppQrIWeTzx
-         ANZaDQeJl7Cd+iNQ3lfsYuCn+4Bi7slo63eP4wcrjSmS4h0cHO69boDEQupZeuEymcBM
-         MMnQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679668838;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=SWD3cJxn2SkFPUZgdDBk5dQiYHPrb9vKrni6NgDQ89U=;
-        b=E9cBn8B0pkwovNbZbnlmLDnO7HQ803If1hFLqo54fCzUOZeOggNoupoBg469ZneLIS
-         ZKfJNvWp7WnC+rXlYhMqjQohnd1r1yfB/gcM6LZZLelUyZ+VmrerO4uaWLV5ecBNSCLk
-         gDuXkntBzKE85JAXF9cp9rM8HpuwZCWqh5aUipRbj6CW4bhSH2ji1hNwzYrLOpKnWaVU
-         kcPnX4AqSsBElHjY1yrIQTEG/lIH3mA7f1xLa5CZG2bqw3yhIzQF6GWp96kVxvzuaB9w
-         O7gNwWimJ6HwZ23L1ew49JGGPSVIpfxUyK/KDPuOr0Uy+J69wrLUJB6ovetxSuiW0cCW
-         7rdQ==
-X-Gm-Message-State: AAQBX9d7jVWTcrJLIvbFwbnXLVwPka4ERcR+8TehGlaDrjhGhBQ9ZWaw
-        QQwg2mGA5r296H3+y80bTX6LyiytacE=
-X-Google-Smtp-Source: AKy350a/gwP4fslejnndwPGcp5igbgiXIpP3dS7Wx5U5pvveEYUy7YuDjNxNXJfl+pB3rFXj0UvqtJBq960=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:4426:0:b0:53d:2772:65d with SMTP id
- r38-20020a814426000000b0053d2772065dmr1168775ywa.9.1679668838445; Fri, 24 Mar
- 2023 07:40:38 -0700 (PDT)
-Date:   Fri, 24 Mar 2023 07:40:37 -0700
-In-Reply-To: <MN2PR12MB3023F67FF37889AB3E8885F2A0849@MN2PR12MB3023.namprd12.prod.outlook.com>
-Mime-Version: 1.0
-References: <MN2PR12MB3023F67FF37889AB3E8885F2A0849@MN2PR12MB3023.namprd12.prod.outlook.com>
-Message-ID: <ZB22ZbhyneWevHJo@google.com>
-Subject: Re: Nested virtualization not working with hyperv guest/windows 11
-From:   Sean Christopherson <seanjc@google.com>
-To:     "=?utf-8?Q?Micha=C5=82?= Zegan" <webczat@outlook.com>
-Cc:     kvm@vger.kernel.org
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-7.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1679668876; x=1711204876;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=djdDyOQEhRpjTdDX9E9eh9RPf/+S/Hlq/oRhX87DyXg=;
+  b=HhuS9rrAWm+0UXI54GPkWb9CF9kVVnLlMLKmOXdNP7cAPu/hffCcGJay
+   jXZsluMDJyUNZVOSKCTK0Hu6iKhcNJLM2r2yOjfdZD/PhwVBOn2TXTY8w
+   NFABLiYkMIspZ7zmaidJ7WrYJ5gEmB11XZVRhc+vnK7ll8I7gxSmWRy0F
+   4=;
+X-IronPort-AV: E=Sophos;i="5.98,288,1673913600"; 
+   d="scan'208";a="310968051"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-iad-1a-m6i4x-bbc6e425.us-east-1.amazon.com) ([10.43.8.6])
+  by smtp-border-fw-6002.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Mar 2023 14:41:13 +0000
+Received: from EX19MTAUWC001.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan3.iad.amazon.com [10.40.163.38])
+        by email-inbound-relay-iad-1a-m6i4x-bbc6e425.us-east-1.amazon.com (Postfix) with ESMTPS id 740A884CE6;
+        Fri, 24 Mar 2023 14:41:01 +0000 (UTC)
+Received: from EX19D020UWC004.ant.amazon.com (10.13.138.149) by
+ EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.25; Fri, 24 Mar 2023 14:40:58 +0000
+Received: from [0.0.0.0] (10.253.83.51) by EX19D020UWC004.ant.amazon.com
+ (10.13.138.149) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.26; Fri, 24 Mar
+ 2023 14:40:47 +0000
+Message-ID: <6b841d82-ad94-561a-3175-469b5e45eb47@amazon.com>
+Date:   Fri, 24 Mar 2023 15:40:45 +0100
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.9.0
+Subject: Re: [PATCH RFC v8 36/56] KVM: SVM: Add KVM_SEV_SNP_LAUNCH_FINISH
+ command
+Content-Language: en-US
+To:     Michael Roth <michael.roth@amd.com>, <kvm@vger.kernel.org>
+CC:     <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
+        <linux-crypto@vger.kernel.org>, <x86@kernel.org>,
+        <linux-kernel@vger.kernel.org>, <tglx@linutronix.de>,
+        <mingo@redhat.com>, <jroedel@suse.de>, <thomas.lendacky@amd.com>,
+        <hpa@zytor.com>, <ardb@kernel.org>, <pbonzini@redhat.com>,
+        <seanjc@google.com>, <vkuznets@redhat.com>, <jmattson@google.com>,
+        <luto@kernel.org>, <dave.hansen@linux.intel.com>, <slp@redhat.com>,
+        <pgonda@google.com>, <peterz@infradead.org>,
+        <srinivas.pandruvada@linux.intel.com>, <rientjes@google.com>,
+        <dovmurik@linux.ibm.com>, <tobin@ibm.com>, <bp@alien8.de>,
+        <vbabka@suse.cz>, <kirill@shutemov.name>, <ak@linux.intel.com>,
+        <tony.luck@intel.com>, <marcorr@google.com>,
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        <alpergun@google.com>, <dgilbert@redhat.com>, <jarkko@kernel.org>,
+        <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        "Harald Hoyer" <harald@profian.com>
+References: <20230220183847.59159-1-michael.roth@amd.com>
+ <20230220183847.59159-37-michael.roth@amd.com>
+From:   Alexander Graf <graf@amazon.com>
+In-Reply-To: <20230220183847.59159-37-michael.roth@amd.com>
+X-Originating-IP: [10.253.83.51]
+X-ClientProxiedBy: EX19D036UWC004.ant.amazon.com (10.13.139.205) To
+ EX19D020UWC004.ant.amazon.com (10.13.138.149)
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Transfer-Encoding: base64
+X-Spam-Status: No, score=-2.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Mar 24, 2023, Micha=C5=82 Zegan wrote:
-> Hi,
->=20
-> I've sent this some time ago, but was not subscribed here, so unsure if I
-> didn't get a reply or maybe missed it, so repeating:
->=20
-> I have a linux host with cpu intel core i7 12700h, kernel currently 6.2,
-> fedora37.
->=20
-> I have a kvm/qemu/libvirt virtual machine, cpu model set to host, machine
-> type q35, uefi with secureboot enabled, smm on.
->=20
-> The kvm_intel module has nested=3Dy set in parameters so nested virtualiz=
-ation
-> is enabled on host.
->=20
-> The virtual machine has windows11 pro guest installed.
->=20
-> When I install hyperv/virtualization platform/other similar functions, af=
-ter
-> reboot, the windows does not boot. Namely it reboots three times and then
-> goes to recovery.
+T24gMjAuMDIuMjMgMTk6MzgsIE1pY2hhZWwgUm90aCB3cm90ZToKPiBGcm9tOiBCcmlqZXNoIFNp
+bmdoIDxicmlqZXNoLnNpbmdoQGFtZC5jb20+Cj4KPiBUaGUgS1ZNX1NFVl9TTlBfTEFVTkNIX0ZJ
+TklTSCBmaW5hbGl6ZSB0aGUgY3J5cHRvZ3JhcGhpYyBkaWdlc3QgYW5kIHN0b3Jlcwo+IGl0IGFz
+IHRoZSBtZWFzdXJlbWVudCBvZiB0aGUgZ3Vlc3QgYXQgbGF1bmNoLgo+Cj4gV2hpbGUgZmluYWxp
+emluZyB0aGUgbGF1bmNoIGZsb3csIGl0IGFsc28gaXNzdWVzIHRoZSBMQVVOQ0hfVVBEQVRFIGNv
+bW1hbmQKPiB0byBlbmNyeXB0IHRoZSBWTVNBIHBhZ2VzLgo+Cj4gSWYgaXRzIGFuIFNOUCBndWVz
+dCwgdGhlbiBWTVNBIHdhcyBhZGRlZCBpbiB0aGUgUk1QIGVudHJ5IGFzCj4gYSBndWVzdCBvd25l
+ZCBwYWdlIGFuZCBhbHNvIHJlbW92ZWQgZnJvbSB0aGUga2VybmVsIGRpcmVjdCBtYXAKPiBzbyBm
+bHVzaCBpdCBsYXRlciBhZnRlciBpdCBpcyB0cmFuc2l0aW9uZWQgYmFjayB0byBoeXBlcnZpc29y
+Cj4gc3RhdGUgYW5kIHJlc3RvcmVkIGluIHRoZSBkaXJlY3QgbWFwLgo+Cj4gU2lnbmVkLW9mZi1i
+eTogQnJpamVzaCBTaW5naCA8YnJpamVzaC5zaW5naEBhbWQuY29tPgo+IFNpZ25lZC1vZmYtYnk6
+IEhhcmFsZCBIb3llciA8aGFyYWxkQHByb2ZpYW4uY29tPgo+IFNpZ25lZC1vZmYtYnk6IEFzaGlz
+aCBLYWxyYSA8YXNoaXNoLmthbHJhQGFtZC5jb20+Cj4gU2lnbmVkLW9mZi1ieTogTWljaGFlbCBS
+b3RoIDxtaWNoYWVsLnJvdGhAYW1kLmNvbT4KPiAtLS0KPiAgIC4uLi92aXJ0L2t2bS94ODYvYW1k
+LW1lbW9yeS1lbmNyeXB0aW9uLnJzdCAgICB8ICAyMyArKysrCj4gICBhcmNoL3g4Ni9rdm0vc3Zt
+L3Nldi5jICAgICAgICAgICAgICAgICAgICAgICAgfCAxMjIgKysrKysrKysrKysrKysrKysrCj4g
+ICBpbmNsdWRlL3VhcGkvbGludXgva3ZtLmggICAgICAgICAgICAgICAgICAgICAgfCAgMTQgKysK
+PiAgIDMgZmlsZXMgY2hhbmdlZCwgMTU5IGluc2VydGlvbnMoKykKPgpbLi4uXQoKCj4gZGlmZiAt
+LWdpdCBhL2FyY2gveDg2L2t2bS9zdm0vc2V2LmMgYi9hcmNoL3g4Ni9rdm0vc3ZtL3Nldi5jCj4g
+aW5kZXggMDNkZDIyN2Y2MDkwLi41MTVlMjJkMGRjMzAgMTAwNjQ0Cj4gLS0tIGEvYXJjaC94ODYv
+a3ZtL3N2bS9zZXYuYwo+ICsrKyBiL2FyY2gveDg2L2t2bS9zdm0vc2V2LmMKPiBAQCAtMjI4MCw2
+ICsyMjgwLDEwOSBAQCBzdGF0aWMgaW50IHNucF9sYXVuY2hfdXBkYXRlKHN0cnVjdCBrdm0gKmt2
+bSwgc3RydWN0IGt2bV9zZXZfY21kICphcmdwKQo+ICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgIHNucF9sYXVuY2hfdXBkYXRlX2dmbl9oYW5kbGVyLCBhcmdwKTsKPiAgIH0K
+Pgo+ICtzdGF0aWMgaW50IHNucF9sYXVuY2hfdXBkYXRlX3Ztc2Eoc3RydWN0IGt2bSAqa3ZtLCBz
+dHJ1Y3Qga3ZtX3Nldl9jbWQgKmFyZ3ApCj4gK3sKPiArICAgICAgIHN0cnVjdCBrdm1fc2V2X2lu
+Zm8gKnNldiA9ICZ0b19rdm1fc3ZtKGt2bSktPnNldl9pbmZvOwo+ICsgICAgICAgc3RydWN0IHNl
+dl9kYXRhX3NucF9sYXVuY2hfdXBkYXRlIGRhdGEgPSB7fTsKPiArICAgICAgIHN0cnVjdCBrdm1f
+dmNwdSAqdmNwdTsKPiArICAgICAgIHVuc2lnbmVkIGxvbmcgaTsKPiArICAgICAgIGludCByZXQ7
+Cj4gKwo+ICsgICAgICAgZGF0YS5nY3R4X3BhZGRyID0gX19wc3BfcGEoc2V2LT5zbnBfY29udGV4
+dCk7Cj4gKyAgICAgICBkYXRhLnBhZ2VfdHlwZSA9IFNOUF9QQUdFX1RZUEVfVk1TQTsKPiArCj4g
+KyAgICAgICBrdm1fZm9yX2VhY2hfdmNwdShpLCB2Y3B1LCBrdm0pIHsKPiArICAgICAgICAgICAg
+ICAgc3RydWN0IHZjcHVfc3ZtICpzdm0gPSB0b19zdm0odmNwdSk7Cj4gKyAgICAgICAgICAgICAg
+IHU2NCBwZm4gPSBfX3BhKHN2bS0+c2V2X2VzLnZtc2EpID4+IFBBR0VfU0hJRlQ7Cj4gKwo+ICsg
+ICAgICAgICAgICAgICAvKiBQZXJmb3JtIHNvbWUgcHJlLWVuY3J5cHRpb24gY2hlY2tzIGFnYWlu
+c3QgdGhlIFZNU0EgKi8KPiArICAgICAgICAgICAgICAgcmV0ID0gc2V2X2VzX3N5bmNfdm1zYShz
+dm0pOwo+ICsgICAgICAgICAgICAgICBpZiAocmV0KQo+ICsgICAgICAgICAgICAgICAgICAgICAg
+IHJldHVybiByZXQ7Cj4gKwo+ICsgICAgICAgICAgICAgICAvKiBUcmFuc2l0aW9uIHRoZSBWTVNB
+IHBhZ2UgdG8gYSBmaXJtd2FyZSBzdGF0ZS4gKi8KPiArICAgICAgICAgICAgICAgcmV0ID0gcm1w
+X21ha2VfcHJpdmF0ZShwZm4sIC0xLCBQR19MRVZFTF80Sywgc2V2LT5hc2lkLCB0cnVlKTsKPiAr
+ICAgICAgICAgICAgICAgaWYgKHJldCkKPiArICAgICAgICAgICAgICAgICAgICAgICByZXR1cm4g
+cmV0Owo+ICsKPiArICAgICAgICAgICAgICAgLyogSXNzdWUgdGhlIFNOUCBjb21tYW5kIHRvIGVu
+Y3J5cHQgdGhlIFZNU0EgKi8KPiArICAgICAgICAgICAgICAgZGF0YS5hZGRyZXNzID0gX19zbWVf
+cGEoc3ZtLT5zZXZfZXMudm1zYSk7Cj4gKyAgICAgICAgICAgICAgIHJldCA9IF9fc2V2X2lzc3Vl
+X2NtZChhcmdwLT5zZXZfZmQsIFNFVl9DTURfU05QX0xBVU5DSF9VUERBVEUsCj4gKyAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAmZGF0YSwgJmFyZ3AtPmVycm9yKTsKCgpUaGVy
+ZSBpcyBubyBjb250cmFjdCBpbiBLVk0gdGhhdCBkaWN0YXRlcyB0aGF0IHRoZSBmaXJzdCBlbnRy
+eSBpbiB0aGUgCnZjcHUgbGlzdCBuZWVkcyB0byBiZSB2Y3B1X2lkPT0wIChCU1ApLiBUaGF0IG1l
+YW5zIGlmIHlvdSB1c2UgYSB1c2VyIApzcGFjZSB0aGF0IHNwYXducyB2Q1BVcyBpbiBwYXJhbGxl
+bCBvbiBpbml0LCB5b3Ugd2lsbCBlbmQgdXAgd2l0aCB0aGUgCkJTUCBiZWhpbmQgQVBzIGluIHRo
+ZSBMQVVOQ0hfVVBEQVRFIG9yZGVyLgoKVGhpcyBpcyBhIHByb2JsZW0gYmVjYXVzZSBmb3IgTEFV
+TkNIX1VQREFURSwgdGhlIG9yZGVyIG1hdHRlcnMuIEJTUCBhbmQgCkFQIHZDUFVzIGhhdmUgZGlm
+ZmVyZW50IGluaXRpYWwgc3RhdGUgYW5kIHNvIGlmIHlvdSB3YW50IHRvIHJlY29uc3RydWN0IAp0
+aGUgbGF1bmNoIGRpZ2VzdCwgeW91IG5lZWQgdG8gZW5zdXJlIHRoYXQgdGhlIGd1ZXN0IGtub3dz
+IHRoZSBvcmRlci4KClRoZSBlYXNpZXN0IHdheSBJIGNhbiB0aGluayBvZiB0byBmaXggdGhpcyBp
+cyB0byBjYWxsIApzbnBfbGF1bmNoX3VwZGF0ZV92bXNhIHR3aWNlOiBPbmNlIGZpbHRlcmluZyBm
+b3IgdmNwdV9pZCA9PSAwIGFuZCBvbmNlIApmb3IgdmNwdV9pZCAhPSAwLgoKClRoYW5rcywKCkFs
+ZXgKCgoKCgpBbWF6b24gRGV2ZWxvcG1lbnQgQ2VudGVyIEdlcm1hbnkgR21iSApLcmF1c2Vuc3Ry
+LiAzOAoxMDExNyBCZXJsaW4KR2VzY2hhZWZ0c2Z1ZWhydW5nOiBDaHJpc3RpYW4gU2NobGFlZ2Vy
+LCBKb25hdGhhbiBXZWlzcwpFaW5nZXRyYWdlbiBhbSBBbXRzZ2VyaWNodCBDaGFybG90dGVuYnVy
+ZyB1bnRlciBIUkIgMTQ5MTczIEIKU2l0ejogQmVybGluClVzdC1JRDogREUgMjg5IDIzNyA4NzkK
+Cgo=
 
-This is going to be nearly impossible to debug without more information.  A=
-ssuming
-you can't extract more information from the guest, can you try enabling KVM
-tracepoints?  E.g. to see if KVM is injecting an exception or a nested VM-E=
-ntry
-failure that leads to the reboot.
-
-I.e. enable tracing
-
-    echo 1 > /sys/kernel/debug/tracing/tracing_on
-
-and then to get the full blast from the trace firehose:
-
-    echo 1 > /sys/kernel/debug/tracing/events/kvm/enable
-
-or to get slightly less noisy log:
-
-    echo 1 > /sys/kernel/debug/tracing/events/kvm/kvm_entry/enable
-    echo 1 > /sys/kernel/debug/tracing/events/kvm/kvm_exit/enable
-    echo 1 > /sys/kernel/debug/tracing/events/kvm/kvm_inj_exception/enable
-    echo 1 > /sys/kernel/debug/tracing/events/kvm/kvm_nested_intercepts/ena=
-ble
-    echo 1 > /sys/kernel/debug/tracing/events/kvm/kvm_nested_intr_vmexit/en=
-able
-    echo 1 > /sys/kernel/debug/tracing/events/kvm/kvm_nested_vmenter_failed=
-/enable
-    echo 1 > /sys/kernel/debug/tracing/events/kvm/kvm_nested_vmexit/enable
-    echo 1 > /sys/kernel/debug/tracing/events/kvm/kvm_nested_vmexit_inject/=
-enable
-    echo 1 > /sys/kernel/debug/tracing/events/kvm/kvm_nested_vmenter/enable
-
-To capture something useful, you may need to (significantly) increase the s=
-ize of
-the buffer,=20
-
-    echo 131072 > /sys/kernel/debug/tracing/buffer_size_kb
-
-The log itself can be found at
-
-    /sys/kernel/debug/tracing/trace
