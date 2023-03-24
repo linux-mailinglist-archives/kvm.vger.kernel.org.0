@@ -2,72 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3CCCA6C762A
-	for <lists+kvm@lfdr.de>; Fri, 24 Mar 2023 04:10:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 158A56C7660
+	for <lists+kvm@lfdr.de>; Fri, 24 Mar 2023 04:50:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230316AbjCXDKf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Mar 2023 23:10:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49932 "EHLO
+        id S231189AbjCXDub (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Mar 2023 23:50:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38664 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231384AbjCXDKU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Mar 2023 23:10:20 -0400
+        with ESMTP id S230430AbjCXDu3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Mar 2023 23:50:29 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 119D328E5F
-        for <kvm@vger.kernel.org>; Thu, 23 Mar 2023 20:09:33 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9649510F7
+        for <kvm@vger.kernel.org>; Thu, 23 Mar 2023 20:49:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1679627373;
+        s=mimecast20190719; t=1679629786;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=qtI2juFUeoRnDkwFmiyqwzGFUaIQAQe0cDkr2MscuyA=;
-        b=Hmc4ttG0x0G/27ep6uiWya7IyZM2M6iZWaYB7ewBLGFh+dFYpXa/VwIAfgSlfti2cThZqS
-        igScyRfTwHxCFGtS5leA79/1svta+XGClQOpomwjkycAa/qX1CqLuPhEnxmGgvVeE4Dp4W
-        15l+9Tq86imSASjFFUATsYw0/kTcN0o=
-Received: from mail-oa1-f69.google.com (mail-oa1-f69.google.com
- [209.85.160.69]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=tvUYLbQ5ItZ7YGhfcbwRlMUBJivNVLYqKMadR4fNk5g=;
+        b=RG+1BLtWSqvPsEXgXopS7TorjGLwIVLn5+lxULrusXHJHKLdkVI/xmlesHXplbHvYm6wO5
+        0MQOu+j+szbJKwQgGN0tcabCMGLBMYcWQsgVHXV5oflabDNhipqMVOsvIyQ3dVi7hq/Cy+
+        hnhQ8QiSZd4n1X3AVq1kj5QJu60OR1s=
+Received: from mail-pl1-f198.google.com (mail-pl1-f198.google.com
+ [209.85.214.198]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-583-KnBVijNJMy6i8O0h25Iydg-1; Thu, 23 Mar 2023 23:09:31 -0400
-X-MC-Unique: KnBVijNJMy6i8O0h25Iydg-1
-Received: by mail-oa1-f69.google.com with SMTP id 586e51a60fabf-17a03f26ff8so286593fac.8
-        for <kvm@vger.kernel.org>; Thu, 23 Mar 2023 20:09:31 -0700 (PDT)
+ us-mta-177-Yku8FumZM9WP71IPGTrXFQ-1; Thu, 23 Mar 2023 23:49:45 -0400
+X-MC-Unique: Yku8FumZM9WP71IPGTrXFQ-1
+Received: by mail-pl1-f198.google.com with SMTP id s11-20020a170902a50b00b001a1f8fc0d2cso487326plq.15
+        for <kvm@vger.kernel.org>; Thu, 23 Mar 2023 20:49:45 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679627371;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=qtI2juFUeoRnDkwFmiyqwzGFUaIQAQe0cDkr2MscuyA=;
-        b=NszgelghiSiC+WqavgvUgEoWwkPM5mxCSoPaMvWxmRKYHGaMRwUbcAVGEsyM0SMKQ6
-         CXnmIHShCJz9XA945tqAJntbAgz5Z5BVMC4aJawRhGBSjzgOfCtYLPO6EnNSUY0CioXW
-         vcm4yB9fCp4A+nsGwlozcYVuF0MTe+t+sf+j5bj6+2oJuH8vThbeAPJ+We3RjzMS77Pn
-         sCuBbWpKXRPR2/fEbv79n0ssoOJ3N1l+DQXJoxg+pE1+4F/rHk6jspO3rPlJ4DqhJC1x
-         u9IzKtoPQ5YhIQ6Y0pQbmAAE8dKjFd9aKgXel+nEipEIqW7OYkQDjPbjhACPxVNP24Y1
-         fSzQ==
-X-Gm-Message-State: AAQBX9cmcNmqD8ddi222B9QBwwNi4yPgWdOlZktSjqBcefGvfJ63j+ey
-        mSIszY3/Sz2/lVmE6uW4csizp7278N7cYY+3fAV+roIZr2Qm6JF7nfBmfPcbvPzgkNiQClXH83Y
-        Tn/OfBdFK7P18B4Gq6vkp/NUP0x+B
-X-Received: by 2002:a05:6870:10d4:b0:17e:255e:b1 with SMTP id 20-20020a05687010d400b0017e255e00b1mr502510oar.9.1679627370942;
-        Thu, 23 Mar 2023 20:09:30 -0700 (PDT)
-X-Google-Smtp-Source: AK7set+LnuKvSHKHAHgt2Eh7blZvjlwMurDf3B/v6VZFRw2wkwwsN54YFbLfhB516kRTf46wDFjWbQjLS5ngm+tAKvs=
-X-Received: by 2002:a05:6870:10d4:b0:17e:255e:b1 with SMTP id
- 20-20020a05687010d400b0017e255e00b1mr502500oar.9.1679627370630; Thu, 23 Mar
- 2023 20:09:30 -0700 (PDT)
+        d=1e100.net; s=20210112; t=1679629784;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=tvUYLbQ5ItZ7YGhfcbwRlMUBJivNVLYqKMadR4fNk5g=;
+        b=ehEfol/qFfedoFqPsRFiye+con/h0IShs/BXre2HItCNSJJuRNWHADfY0hji9bMw7U
+         SlH4g3tgk7TEu+STm9Lez9Qlqxe2YkA7JnA/udXGmLiviVkCokrztHlfOYGawHi+ajpS
+         IsVJIPPbdxdj7v/FzDPiEhfrxQDQ28+M0ArdaBvWKVU0E5gow7uSyRIECT/qzwkmIlDb
+         +gRmdMfnkvP1eE4F2BwutJ0iWvWFtHyWoSbjT/wXkWPT5olo3avnarWp5TmB4XWsjN/D
+         CCFM6DDWgfPzT90tmA7sOkFaRt4j2HdvKczUhlbxECr72876ZPKopbYrxeAjsqm4WTMN
+         hgvw==
+X-Gm-Message-State: AO0yUKV3gH8/PRZrdKrWNa7kF0pIdq3TPfLKOthvne95of0DweY5v3lV
+        6GW1mTwowOcPmYHXfA0InDdPpSl9UgtHN1cbzT37LVDxzS9Dtr2bSD+n+5DC8zhXmXeDdtOQMev
+        kU94ow8rHFM3n
+X-Received: by 2002:a05:6a20:131c:b0:d9:c0fe:17ca with SMTP id g28-20020a056a20131c00b000d9c0fe17camr1377710pzh.16.1679629784226;
+        Thu, 23 Mar 2023 20:49:44 -0700 (PDT)
+X-Google-Smtp-Source: AK7set9jvo39PB6TeNlOHJ5XW5HW9YLQwg1N6J3rrirOctyXgU8nBNprbs5zVYrlhDXL7BhSRGvnhw==
+X-Received: by 2002:a05:6a20:131c:b0:d9:c0fe:17ca with SMTP id g28-20020a056a20131c00b000d9c0fe17camr1377695pzh.16.1679629783909;
+        Thu, 23 Mar 2023 20:49:43 -0700 (PDT)
+Received: from [10.72.13.198] ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id q8-20020a656848000000b005034a57b963sm12467895pgt.58.2023.03.23.20.49.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 23 Mar 2023 20:49:43 -0700 (PDT)
+Message-ID: <78c7511a-deab-7e95-fde1-5317a568cf97@redhat.com>
+Date:   Fri, 24 Mar 2023 11:49:32 +0800
 MIME-Version: 1.0
-References: <20230323085551.2346411-1-viktor@daynix.com>
-In-Reply-To: <20230323085551.2346411-1-viktor@daynix.com>
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.9.0
+Subject: Re: [PATCH v3 8/8] vdpa_sim: add support for user VA
+Content-Language: en-US
+To:     Stefano Garzarella <sgarzare@redhat.com>,
+        virtualization@lists.linux-foundation.org
+Cc:     kvm@vger.kernel.org, stefanha@redhat.com,
+        linux-kernel@vger.kernel.org, eperezma@redhat.com,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Andrey Zhadchenko <andrey.zhadchenko@virtuozzo.com>,
+        netdev@vger.kernel.org
+References: <20230321154228.182769-1-sgarzare@redhat.com>
+ <20230321154804.184577-1-sgarzare@redhat.com>
+ <20230321154804.184577-4-sgarzare@redhat.com>
 From:   Jason Wang <jasowang@redhat.com>
-Date:   Fri, 24 Mar 2023 11:09:19 +0800
-Message-ID: <CACGkMEsTpdES6Gzsx7eobJsac8a1V0dqfRm3vExrd1e+TJ_bVg@mail.gmail.com>
-Subject: Re: [PATCH v5] virtio: add VIRTIO_F_NOTIFICATION_DATA feature support
-To:     Viktor Prutyanov <viktor@daynix.com>
-Cc:     mst@redhat.com, cohuck@redhat.com, pasic@linux.ibm.com,
-        farman@linux.ibm.com, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        linux-kernel@vger.kernel.org, yan@daynix.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20230321154804.184577-4-sgarzare@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
         RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -76,288 +86,217 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 23, 2023 at 4:56=E2=80=AFPM Viktor Prutyanov <viktor@daynix.com=
-> wrote:
+
+在 2023/3/21 23:48, Stefano Garzarella 写道:
+> The new "use_va" module parameter (default: true) is used in
+> vdpa_alloc_device() to inform the vDPA framework that the device
+> supports VA.
 >
-> According to VirtIO spec v1.2, VIRTIO_F_NOTIFICATION_DATA feature
-> indicates that the driver passes extra data along with the queue
-> notifications.
+> vringh is initialized to use VA only when "use_va" is true and the
+> user's mm has been bound. So, only when the bus supports user VA
+> (e.g. vhost-vdpa).
 >
-> In a split queue case, the extra data is 16-bit available index. In a
-> packed queue case, the extra data is 1-bit wrap counter and 15-bit
-> available index.
+> vdpasim_mm_work_fn work is used to serialize the binding to a new
+> address space when the .bind_mm callback is invoked, and unbinding
+> when the .unbind_mm callback is invoked.
 >
-> Add support for this feature for MMIO, channel I/O and modern PCI
-> transports.
+> Call mmget_not_zero()/kthread_use_mm() inside the worker function
+> to pin the address space only as long as needed, following the
+> documentation of mmget() in include/linux/sched/mm.h:
 >
-> Signed-off-by: Viktor Prutyanov <viktor@daynix.com>
+>    * Never use this function to pin this address space for an
+>    * unbounded/indefinite amount of time.
+>
+> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
 > ---
->  v5: replace ternary operator with if-else
->  v4: remove VP_NOTIFY macro and legacy PCI support, add
->     virtio_ccw_kvm_notify_with_data to virtio_ccw
->  v3: support feature in virtio_ccw, remove VM_NOTIFY, use avail_idx_shado=
-w,
->     remove byte swap, rename to vring_notification_data
->  v2: reject the feature in virtio_ccw, replace __le32 with u32
 >
->  Tested with disabled VIRTIO_F_NOTIFICATION_DATA on qemu-system-s390x
->  (virtio-blk-ccw), qemu-system-riscv64 (virtio-blk-device,
->  virtio-rng-device), qemu-system-x86_64 (virtio-blk-pci, virtio-net-pci)
->  to make sure nothing is broken.
->  Tested with enabled VIRTIO_F_NOTIFICATION_DATA on 64-bit RISC-V Linux
->  and my hardware implementation of virtio-rng with MMIO.
+> Notes:
+>      v3:
+>      - called mmget_not_zero() before kthread_use_mm() [Jason]
+>        As the documentation of mmget() in include/linux/sched/mm.h says:
+>      
+>        * Never use this function to pin this address space for an
+>        * unbounded/indefinite amount of time.
+>      
+>        I moved mmget_not_zero/kthread_use_mm inside the worker function,
+>        this way we pin the address space only as long as needed.
+>        This is similar to what vfio_iommu_type1_dma_rw_chunk() does in
+>        drivers/vfio/vfio_iommu_type1.c
+>      - simplified the mm bind/unbind [Jason]
+>      - renamed vdpasim_worker_change_mm_sync() [Jason]
+>      - fix commit message (s/default: false/default: true)
+>      v2:
+>      - `use_va` set to true by default [Eugenio]
+>      - supported the new unbind_mm callback [Jason]
+>      - removed the unbind_mm call in vdpasim_do_reset() [Jason]
+>      - avoided to release the lock while call kthread_flush_work() since we
+>        are now using a mutex to protect the device state
 >
->  drivers/s390/virtio/virtio_ccw.c   | 22 +++++++++++++++++++---
->  drivers/virtio/virtio_mmio.c       | 18 +++++++++++++++++-
->  drivers/virtio/virtio_pci_modern.c | 17 ++++++++++++++++-
->  drivers/virtio/virtio_ring.c       | 17 +++++++++++++++++
->  include/linux/virtio_ring.h        |  2 ++
->  include/uapi/linux/virtio_config.h |  6 ++++++
->  6 files changed, 77 insertions(+), 5 deletions(-)
+>   drivers/vdpa/vdpa_sim/vdpa_sim.h |  1 +
+>   drivers/vdpa/vdpa_sim/vdpa_sim.c | 80 +++++++++++++++++++++++++++++++-
+>   2 files changed, 79 insertions(+), 2 deletions(-)
 >
-> diff --git a/drivers/s390/virtio/virtio_ccw.c b/drivers/s390/virtio/virti=
-o_ccw.c
-> index 954fc31b4bc7..9a9c5d34454c 100644
-> --- a/drivers/s390/virtio/virtio_ccw.c
-> +++ b/drivers/s390/virtio/virtio_ccw.c
-> @@ -391,7 +391,7 @@ static void virtio_ccw_drop_indicator(struct virtio_c=
-cw_device *vcdev,
->         ccw_device_dma_free(vcdev->cdev, thinint_area, sizeof(*thinint_ar=
-ea));
->  }
->
-> -static bool virtio_ccw_kvm_notify(struct virtqueue *vq)
-> +static inline bool virtio_ccw_do_kvm_notify(struct virtqueue *vq, u32 da=
-ta)
->  {
->         struct virtio_ccw_vq_info *info =3D vq->priv;
->         struct virtio_ccw_device *vcdev;
-> @@ -402,12 +402,22 @@ static bool virtio_ccw_kvm_notify(struct virtqueue =
-*vq)
->         BUILD_BUG_ON(sizeof(struct subchannel_id) !=3D sizeof(unsigned in=
-t));
->         info->cookie =3D kvm_hypercall3(KVM_S390_VIRTIO_CCW_NOTIFY,
->                                       *((unsigned int *)&schid),
-> -                                     vq->index, info->cookie);
-> +                                     data, info->cookie);
->         if (info->cookie < 0)
->                 return false;
->         return true;
->  }
->
-> +static bool virtio_ccw_kvm_notify(struct virtqueue *vq)
+> diff --git a/drivers/vdpa/vdpa_sim/vdpa_sim.h b/drivers/vdpa/vdpa_sim/vdpa_sim.h
+> index 4774292fba8c..3a42887d05d9 100644
+> --- a/drivers/vdpa/vdpa_sim/vdpa_sim.h
+> +++ b/drivers/vdpa/vdpa_sim/vdpa_sim.h
+> @@ -59,6 +59,7 @@ struct vdpasim {
+>   	struct vdpasim_virtqueue *vqs;
+>   	struct kthread_worker *worker;
+>   	struct kthread_work work;
+> +	struct mm_struct *mm_bound;
+>   	struct vdpasim_dev_attr dev_attr;
+>   	/* mutex to synchronize virtqueue state */
+>   	struct mutex mutex;
+> diff --git a/drivers/vdpa/vdpa_sim/vdpa_sim.c b/drivers/vdpa/vdpa_sim/vdpa_sim.c
+> index ab4cfb82c237..23c891cdcd54 100644
+> --- a/drivers/vdpa/vdpa_sim/vdpa_sim.c
+> +++ b/drivers/vdpa/vdpa_sim/vdpa_sim.c
+> @@ -35,10 +35,44 @@ module_param(max_iotlb_entries, int, 0444);
+>   MODULE_PARM_DESC(max_iotlb_entries,
+>   		 "Maximum number of iotlb entries for each address space. 0 means unlimited. (default: 2048)");
+>   
+> +static bool use_va = true;
+> +module_param(use_va, bool, 0444);
+> +MODULE_PARM_DESC(use_va, "Enable/disable the device's ability to use VA");
+> +
+>   #define VDPASIM_QUEUE_ALIGN PAGE_SIZE
+>   #define VDPASIM_QUEUE_MAX 256
+>   #define VDPASIM_VENDOR_ID 0
+>   
+> +struct vdpasim_mm_work {
+> +	struct kthread_work work;
+> +	struct vdpasim *vdpasim;
+> +	struct mm_struct *mm_to_bind;
+> +	int ret;
+> +};
+> +
+> +static void vdpasim_mm_work_fn(struct kthread_work *work)
 > +{
-> +       return virtio_ccw_do_kvm_notify(vq, vq->index);
+> +	struct vdpasim_mm_work *mm_work =
+> +		container_of(work, struct vdpasim_mm_work, work);
+> +	struct vdpasim *vdpasim = mm_work->vdpasim;
+> +
+> +	mm_work->ret = 0;
+> +
+> +	//TODO: should we attach the cgroup of the mm owner?
+> +	vdpasim->mm_bound = mm_work->mm_to_bind;
 > +}
 > +
-> +static bool virtio_ccw_kvm_notify_with_data(struct virtqueue *vq)
+> +static void vdpasim_worker_change_mm_sync(struct vdpasim *vdpasim,
+> +					  struct vdpasim_mm_work *mm_work)
 > +{
-> +       return virtio_ccw_do_kvm_notify(vq, vring_notification_data(vq));
+> +	struct kthread_work *work = &mm_work->work;
+> +
+> +	kthread_init_work(work, vdpasim_mm_work_fn);
+> +	kthread_queue_work(vdpasim->worker, work);
+> +
+> +	kthread_flush_work(work);
 > +}
 > +
->  static int virtio_ccw_read_vq_conf(struct virtio_ccw_device *vcdev,
->                                    struct ccw1 *ccw, int index)
->  {
-> @@ -501,6 +511,12 @@ static struct virtqueue *virtio_ccw_setup_vq(struct =
-virtio_device *vdev,
->         u64 queue;
->         unsigned long flags;
->         bool may_reduce;
-> +       bool (*notify)(struct virtqueue *vq);
+>   static struct vdpasim *vdpa_to_sim(struct vdpa_device *vdpa)
+>   {
+>   	return container_of(vdpa, struct vdpasim, vdpa);
+> @@ -59,8 +93,10 @@ static void vdpasim_queue_ready(struct vdpasim *vdpasim, unsigned int idx)
+>   {
+>   	struct vdpasim_virtqueue *vq = &vdpasim->vqs[idx];
+>   	uint16_t last_avail_idx = vq->vring.last_avail_idx;
+> +	bool va_enabled = use_va && vdpasim->mm_bound;
+>   
+> -	vringh_init_iotlb(&vq->vring, vdpasim->features, vq->num, true, false,
+> +	vringh_init_iotlb(&vq->vring, vdpasim->features, vq->num, true,
+> +			  va_enabled,
+>   			  (struct vring_desc *)(uintptr_t)vq->desc_addr,
+>   			  (struct vring_avail *)
+>   			  (uintptr_t)vq->driver_addr,
+> @@ -130,8 +166,20 @@ static const struct vdpa_config_ops vdpasim_batch_config_ops;
+>   static void vdpasim_work_fn(struct kthread_work *work)
+>   {
+>   	struct vdpasim *vdpasim = container_of(work, struct vdpasim, work);
+> +	struct mm_struct *mm = vdpasim->mm_bound;
 > +
-> +       if (__virtio_test_bit(vdev, VIRTIO_F_NOTIFICATION_DATA))
-> +               notify =3D virtio_ccw_kvm_notify_with_data;
-> +       else
-> +               notify =3D virtio_ccw_kvm_notify;
->
->         /* Allocate queue. */
->         info =3D kzalloc(sizeof(struct virtio_ccw_vq_info), GFP_KERNEL);
-> @@ -524,7 +540,7 @@ static struct virtqueue *virtio_ccw_setup_vq(struct v=
-irtio_device *vdev,
->         may_reduce =3D vcdev->revision > 0;
->         vq =3D vring_create_virtqueue(i, info->num, KVM_VIRTIO_CCW_RING_A=
-LIGN,
->                                     vdev, true, may_reduce, ctx,
-> -                                   virtio_ccw_kvm_notify, callback, name=
-);
-> +                                   notify, callback, name);
->
->         if (!vq) {
->                 /* For now, we fail if we can't get the requested size. *=
-/
-> diff --git a/drivers/virtio/virtio_mmio.c b/drivers/virtio/virtio_mmio.c
-> index 3ff746e3f24a..7e87f745f68d 100644
-> --- a/drivers/virtio/virtio_mmio.c
-> +++ b/drivers/virtio/virtio_mmio.c
-> @@ -285,6 +285,16 @@ static bool vm_notify(struct virtqueue *vq)
->         return true;
->  }
->
-> +static bool vm_notify_with_data(struct virtqueue *vq)
-> +{
-> +       struct virtio_mmio_device *vm_dev =3D to_virtio_mmio_device(vq->v=
-dev);
-> +       u32 data =3D vring_notification_data(vq);
-> +
-> +       writel(data, vm_dev->base + VIRTIO_MMIO_QUEUE_NOTIFY);
-> +
-> +       return true;
-> +}
-> +
->  /* Notify all virtqueues on an interrupt. */
->  static irqreturn_t vm_interrupt(int irq, void *opaque)
->  {
-> @@ -368,6 +378,12 @@ static struct virtqueue *vm_setup_vq(struct virtio_d=
-evice *vdev, unsigned int in
->         unsigned long flags;
->         unsigned int num;
->         int err;
-> +       bool (*notify)(struct virtqueue *vq);
-> +
-> +       if (__virtio_test_bit(vdev, VIRTIO_F_NOTIFICATION_DATA))
-> +               notify =3D vm_notify_with_data;
-> +       else
-> +               notify =3D vm_notify;
->
->         if (!name)
->                 return NULL;
-> @@ -397,7 +413,7 @@ static struct virtqueue *vm_setup_vq(struct virtio_de=
-vice *vdev, unsigned int in
->
->         /* Create the vring */
->         vq =3D vring_create_virtqueue(index, num, VIRTIO_MMIO_VRING_ALIGN=
-, vdev,
-> -                                true, true, ctx, vm_notify, callback, na=
-me);
-> +                                true, true, ctx, notify, callback, name)=
-;
->         if (!vq) {
->                 err =3D -ENOMEM;
->                 goto error_new_virtqueue;
-> diff --git a/drivers/virtio/virtio_pci_modern.c b/drivers/virtio/virtio_p=
-ci_modern.c
-> index 9e496e288cfa..3bfc368b279e 100644
-> --- a/drivers/virtio/virtio_pci_modern.c
-> +++ b/drivers/virtio/virtio_pci_modern.c
-> @@ -288,6 +288,15 @@ static u16 vp_config_vector(struct virtio_pci_device=
- *vp_dev, u16 vector)
->         return vp_modern_config_vector(&vp_dev->mdev, vector);
->  }
->
-> +static bool vp_notify_with_data(struct virtqueue *vq)
-> +{
-> +       u32 data =3D vring_notification_data(vq);
-> +
-> +       iowrite32(data, (void __iomem *)vq->priv);
-> +
-> +       return true;
-> +}
-> +
->  static struct virtqueue *setup_vq(struct virtio_pci_device *vp_dev,
->                                   struct virtio_pci_vq_info *info,
->                                   unsigned int index,
-> @@ -301,6 +310,12 @@ static struct virtqueue *setup_vq(struct virtio_pci_=
-device *vp_dev,
->         struct virtqueue *vq;
->         u16 num;
->         int err;
-> +       bool (*notify)(struct virtqueue *vq);
-> +
-> +       if (__virtio_test_bit(&vp_dev->vdev, VIRTIO_F_NOTIFICATION_DATA))
-> +               notify =3D vp_notify_with_data;
-> +       else
-> +               notify =3D vp_notify;
->
->         if (index >=3D vp_modern_get_num_queues(mdev))
->                 return ERR_PTR(-EINVAL);
-> @@ -321,7 +336,7 @@ static struct virtqueue *setup_vq(struct virtio_pci_d=
-evice *vp_dev,
->         vq =3D vring_create_virtqueue(index, num,
->                                     SMP_CACHE_BYTES, &vp_dev->vdev,
->                                     true, true, ctx,
-> -                                   vp_notify, callback, name);
-> +                                   notify, callback, name);
->         if (!vq)
->                 return ERR_PTR(-ENOMEM);
->
-> diff --git a/drivers/virtio/virtio_ring.c b/drivers/virtio/virtio_ring.c
-> index 4c3bb0ddeb9b..837875cc3190 100644
-> --- a/drivers/virtio/virtio_ring.c
-> +++ b/drivers/virtio/virtio_ring.c
-> @@ -2752,6 +2752,21 @@ void vring_del_virtqueue(struct virtqueue *_vq)
->  }
->  EXPORT_SYMBOL_GPL(vring_del_virtqueue);
->
-> +u32 vring_notification_data(struct virtqueue *_vq)
-> +{
-> +       struct vring_virtqueue *vq =3D to_vvq(_vq);
-> +       u16 next;
-> +
-> +       if (vq->packed_ring)
-> +               next =3D (vq->packed.next_avail_idx & ~(1 << 15)) |
-> +                       vq->packed.avail_wrap_counter << 15;
+> +	if (mm) {
+> +		if (!mmget_not_zero(mm))
+> +			return;
 
-Nit: We have VRING_PACKED_EVENT_F_WRAP_CTR which could be used for
-replacing 15 here.
 
-And we have many places for packing them into u16, it might be better
-to introduce a helper.
+Do we need to check use_va here.
+
+Other than this
 
 Acked-by: Jason Wang <jasowang@redhat.com>
 
 Thanks
 
-> +       else
-> +               next =3D vq->split.avail_idx_shadow;
+
+> +		kthread_use_mm(mm);
+> +	}
+>   
+>   	vdpasim->dev_attr.work_fn(vdpasim);
 > +
-> +       return next << 16 | _vq->index;
+> +	if (mm) {
+> +		kthread_unuse_mm(mm);
+> +		mmput(mm);
+> +	}
+>   }
+>   
+>   struct vdpasim *vdpasim_create(struct vdpasim_dev_attr *dev_attr,
+> @@ -162,7 +210,7 @@ struct vdpasim *vdpasim_create(struct vdpasim_dev_attr *dev_attr,
+>   	vdpa = __vdpa_alloc_device(NULL, ops,
+>   				   dev_attr->ngroups, dev_attr->nas,
+>   				   dev_attr->alloc_size,
+> -				   dev_attr->name, false);
+> +				   dev_attr->name, use_va);
+>   	if (IS_ERR(vdpa)) {
+>   		ret = PTR_ERR(vdpa);
+>   		goto err_alloc;
+> @@ -582,6 +630,30 @@ static int vdpasim_set_map(struct vdpa_device *vdpa, unsigned int asid,
+>   	return ret;
+>   }
+>   
+> +static int vdpasim_bind_mm(struct vdpa_device *vdpa, struct mm_struct *mm)
+> +{
+> +	struct vdpasim *vdpasim = vdpa_to_sim(vdpa);
+> +	struct vdpasim_mm_work mm_work;
+> +
+> +	mm_work.vdpasim = vdpasim;
+> +	mm_work.mm_to_bind = mm;
+> +
+> +	vdpasim_worker_change_mm_sync(vdpasim, &mm_work);
+> +
+> +	return mm_work.ret;
 > +}
-> +EXPORT_SYMBOL_GPL(vring_notification_data);
 > +
->  /* Manipulates transport-specific feature bits. */
->  void vring_transport_features(struct virtio_device *vdev)
->  {
-> @@ -2771,6 +2786,8 @@ void vring_transport_features(struct virtio_device =
-*vdev)
->                         break;
->                 case VIRTIO_F_ORDER_PLATFORM:
->                         break;
-> +               case VIRTIO_F_NOTIFICATION_DATA:
-> +                       break;
->                 default:
->                         /* We don't understand this bit. */
->                         __virtio_clear_bit(vdev, i);
-> diff --git a/include/linux/virtio_ring.h b/include/linux/virtio_ring.h
-> index 8b95b69ef694..2550c9170f4f 100644
-> --- a/include/linux/virtio_ring.h
-> +++ b/include/linux/virtio_ring.h
-> @@ -117,4 +117,6 @@ void vring_del_virtqueue(struct virtqueue *vq);
->  void vring_transport_features(struct virtio_device *vdev);
->
->  irqreturn_t vring_interrupt(int irq, void *_vq);
+> +static void vdpasim_unbind_mm(struct vdpa_device *vdpa)
+> +{
+> +	struct vdpasim *vdpasim = vdpa_to_sim(vdpa);
+> +	struct vdpasim_mm_work mm_work;
 > +
-> +u32 vring_notification_data(struct virtqueue *_vq);
->  #endif /* _LINUX_VIRTIO_RING_H */
-> diff --git a/include/uapi/linux/virtio_config.h b/include/uapi/linux/virt=
-io_config.h
-> index 3c05162bc988..2c712c654165 100644
-> --- a/include/uapi/linux/virtio_config.h
-> +++ b/include/uapi/linux/virtio_config.h
-> @@ -99,6 +99,12 @@
->   */
->  #define VIRTIO_F_SR_IOV                        37
->
-> +/*
-> + * This feature indicates that the driver passes extra data (besides
-> + * identifying the virtqueue) in its device notifications.
-> + */
-> +#define VIRTIO_F_NOTIFICATION_DATA     38
+> +	mm_work.vdpasim = vdpasim;
+> +	mm_work.mm_to_bind = NULL;
 > +
->  /*
->   * This feature indicates that the driver can reset a queue individually=
-.
->   */
-> --
-> 2.35.1
->
+> +	vdpasim_worker_change_mm_sync(vdpasim, &mm_work);
+> +}
+> +
+>   static int vdpasim_dma_map(struct vdpa_device *vdpa, unsigned int asid,
+>   			   u64 iova, u64 size,
+>   			   u64 pa, u32 perm, void *opaque)
+> @@ -678,6 +750,8 @@ static const struct vdpa_config_ops vdpasim_config_ops = {
+>   	.set_group_asid         = vdpasim_set_group_asid,
+>   	.dma_map                = vdpasim_dma_map,
+>   	.dma_unmap              = vdpasim_dma_unmap,
+> +	.bind_mm		= vdpasim_bind_mm,
+> +	.unbind_mm		= vdpasim_unbind_mm,
+>   	.free                   = vdpasim_free,
+>   };
+>   
+> @@ -712,6 +786,8 @@ static const struct vdpa_config_ops vdpasim_batch_config_ops = {
+>   	.get_iova_range         = vdpasim_get_iova_range,
+>   	.set_group_asid         = vdpasim_set_group_asid,
+>   	.set_map                = vdpasim_set_map,
+> +	.bind_mm		= vdpasim_bind_mm,
+> +	.unbind_mm		= vdpasim_unbind_mm,
+>   	.free                   = vdpasim_free,
+>   };
+>   
 
