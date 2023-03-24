@@ -2,306 +2,276 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 000136C818F
-	for <lists+kvm@lfdr.de>; Fri, 24 Mar 2023 16:41:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 66B046C8221
+	for <lists+kvm@lfdr.de>; Fri, 24 Mar 2023 17:07:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232561AbjCXPlQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Mar 2023 11:41:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48926 "EHLO
+        id S231520AbjCXQHi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Mar 2023 12:07:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40398 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232172AbjCXPlC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Mar 2023 11:41:02 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 268862D55
-        for <kvm@vger.kernel.org>; Fri, 24 Mar 2023 08:40:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1679672413;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=gKYp+kOgUX/GJB2EDtARo8NYPrwRtHr03kQCkOwXG8g=;
-        b=cBn5KOpGpqpUIbnmaszgQntT2hvc7oAfIxyBdGz9rIy1VuYX7EHhLX7UCyvgkeBfsw4c2k
-        H6TNYkTCf2sBQ/alI3InMAZWynIH8kcTKEr1/ZUCwSU8821XYmW5paXohhAzh+zH1uRv3S
-        HFVm8Ig95mSTObl79IiKjaPJI4RIoCA=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-331-f4xkHU7sMluUC7rVk9M2iw-1; Fri, 24 Mar 2023 11:40:12 -0400
-X-MC-Unique: f4xkHU7sMluUC7rVk9M2iw-1
-Received: by mail-ed1-f72.google.com with SMTP id p36-20020a056402502400b004bb926a3d54so3760278eda.2
-        for <kvm@vger.kernel.org>; Fri, 24 Mar 2023 08:40:11 -0700 (PDT)
+        with ESMTP id S229441AbjCXQHg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Mar 2023 12:07:36 -0400
+Received: from mail-wr1-x431.google.com (mail-wr1-x431.google.com [IPv6:2a00:1450:4864:20::431])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 01CA220D2B
+        for <kvm@vger.kernel.org>; Fri, 24 Mar 2023 09:07:35 -0700 (PDT)
+Received: by mail-wr1-x431.google.com with SMTP id o7so2348469wrg.5
+        for <kvm@vger.kernel.org>; Fri, 24 Mar 2023 09:07:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1679674053;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=lUDdiwAuIPFKcvA70Pl7E1sK8+JHbzowZ6cZGusJm8g=;
+        b=E1+S/wYUQ2SQDq/rSTN/JDr0A7vS7FLITKgGwacGROv3tYOiwc9NYsBmaS+gE7aGI+
+         rGz83YIeGBI8X+epKBJI7juU1drVXq356yM7RIeyXG9TY7FmFdZmavFbhKuBde0LUPjH
+         IYTYKFQIbGEjMLfI+yUNTdJ4YbM4BYfazpbhD0VOXeP0qrcts/BJRG6AWHV36zZJWWV/
+         /yvO+rYrcwRqoy+bQWUZ8GjhVtvYTd8ZdCM99pOWbRioMdYUqBqiUsTRPzczKykHZxXu
+         w727zIWxKHYdlAx6QqEemhdABTf7pQotN/UphirB2wFVk43hoEuIl04e2RlSZtC2JVHJ
+         L4gQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679672411;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=gKYp+kOgUX/GJB2EDtARo8NYPrwRtHr03kQCkOwXG8g=;
-        b=UnZfbunN20f4z5geWoqBcEIOZ4MMrb1EXBBcjMyAVL61P1FKlP0DDwPrhhOQjOY5zj
-         /Ju4Hp9zkSwyaAqXISWfl7o+yFzUY4cTMDesgWPvvSA23VQt4BRitW3m3Z80Nn9gd+qo
-         /d6WHOR5a7P4yMnfJX9uq9WoXLks4YLl9CPdg91RvdFxcvKaYcnB9QVbBMe1W/ZRnqaZ
-         pceEBAsLnMiWzOsorC0BpRGV08v53wi/uLAAyeFpj1qZEjjy3HNUiz2A2dPFAbTrHF2E
-         LrFrgxgaq6WoKlnnou3U+lRNe/O8hFenuqMf9eDJdXVoDXH8eKcA6Uu6nzwl5cYdqMnH
-         94JA==
-X-Gm-Message-State: AAQBX9e4rFcfnuvVuGCKs0MUJRFVyylQvzeWH5u/6aSKuiDWJySrNgQx
-        7OhfxVk3U7Sk84h2IVinKhGDsT4IhzmGv0cnLkikLauNz4L/SFHksKe5sjEe5sHtR6/OoMPptcG
-        Eoukpcjk/NDPj
-X-Received: by 2002:a17:907:161f:b0:932:7f5c:4bb2 with SMTP id hb31-20020a170907161f00b009327f5c4bb2mr3662672ejc.75.1679672410843;
-        Fri, 24 Mar 2023 08:40:10 -0700 (PDT)
-X-Google-Smtp-Source: AKy350bOoCuwJSj7M6y3xIb2GqOaJXnqsAm1iiu9XIoxjTNWkiXIxcyzzt0vuR0WGchtmVY+X6sMOg==
-X-Received: by 2002:a17:907:161f:b0:932:7f5c:4bb2 with SMTP id hb31-20020a170907161f00b009327f5c4bb2mr3662649ejc.75.1679672410627;
-        Fri, 24 Mar 2023 08:40:10 -0700 (PDT)
-Received: from localhost.localdomain (host-82-53-134-98.retail.telecomitalia.it. [82.53.134.98])
-        by smtp.gmail.com with ESMTPSA id rk28-20020a170907215c00b00933b38505f9sm7857073ejb.152.2023.03.24.08.40.09
+        d=1e100.net; s=20210112; t=1679674053;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=lUDdiwAuIPFKcvA70Pl7E1sK8+JHbzowZ6cZGusJm8g=;
+        b=Rjqb9blhGekE3iJkDeD8hbTlk8oEEIscGtE3/LUXG86HXy859Vhj5x39dZ4OsHhwOa
+         2VhDM8uRwNVDq8Gbbm2xIXotBzsV0tgSSLAacpoXd3LESIVHZFW06e0ryr0kxrTmZnPz
+         aMWC7svx1RKxJKALWGTFgYmN9lBC0LhL1af5ByA9bO+h/dOtyXSRLw7ispwrK4JdeaaV
+         rXRDWqVLdOSw2y2wiw1f9rAaODB7NKfLUNUmnA5xMb4oVNK4Sov/b7SBbZBm3My7nxij
+         8hreVaHAH3AV9tgRErMlSqUUw52IVWTtHjOmKoZUrD7S2eu7R5yDNbUvykWBLkAorMNT
+         HWuA==
+X-Gm-Message-State: AAQBX9cY0VzbIdekDOYOm+N9YRwg2zmeVqFSQs+CJMkFIpHu7OlqmdwK
+        2KS6UNFbshPjg/ICwnSPW2JXDg==
+X-Google-Smtp-Source: AKy350bBAXOEsJD8rotVsR6h9fuErP32PI6BYgQjoZEU+S/FLQK9KnxkdKq5CgZZzHaUrzuKpDAfdg==
+X-Received: by 2002:a5d:6284:0:b0:2d4:493c:81ad with SMTP id k4-20020a5d6284000000b002d4493c81admr2474756wru.5.1679674053400;
+        Fri, 24 Mar 2023 09:07:33 -0700 (PDT)
+Received: from zen.linaroharston ([85.9.250.243])
+        by smtp.gmail.com with ESMTPSA id m15-20020a05600c3b0f00b003ee91eda67bsm231739wms.12.2023.03.24.09.07.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 24 Mar 2023 08:40:09 -0700 (PDT)
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     virtualization@lists.linux-foundation.org
-Cc:     Andrey Zhadchenko <andrey.zhadchenko@virtuozzo.com>,
-        Jason Wang <jasowang@redhat.com>, eperezma@redhat.com,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-        kvm@vger.kernel.org, stefanha@redhat.com,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>
-Subject: [PATCH v4 9/9] vdpa_sim: add support for user VA
-Date:   Fri, 24 Mar 2023 16:40:00 +0100
-Message-Id: <20230324154000.47809-1-sgarzare@redhat.com>
+        Fri, 24 Mar 2023 09:07:33 -0700 (PDT)
+Received: from zen.lan (localhost [127.0.0.1])
+        by zen.linaroharston (Postfix) with ESMTP id A26D01FFB7;
+        Fri, 24 Mar 2023 16:07:32 +0000 (GMT)
+From:   =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To:     qemu-devel@nongnu.org
+Cc:     David Woodhouse <dwmw@amazon.co.uk>,
+        =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+        Cleber Rosa <crosa@redhat.com>,
+        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+        Wainer dos Santos Moschetta <wainersm@redhat.com>,
+        Beraldo Leal <bleal@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        kvm@vger.kernel.org (open list:Overall KVM CPUs)
+Subject: [RFC PATCH] tests/avocado: Test Xen guest support under KVM
+Date:   Fri, 24 Mar 2023 16:07:19 +0000
+Message-Id: <20230324160719.1790792-1-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230324153607.46836-1-sgarzare@redhat.com>
-References: <20230324153607.46836-1-sgarzare@redhat.com>
 MIME-Version: 1.0
-Content-type: text/plain
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
+        DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The new "use_va" module parameter (default: true) is used in
-vdpa_alloc_device() to inform the vDPA framework that the device
-supports VA.
+From: David Woodhouse <dwmw@amazon.co.uk>
 
-vringh is initialized to use VA only when "use_va" is true and the
-user's mm has been bound. So, only when the bus supports user VA
-(e.g. vhost-vdpa).
+Exercise guests with a few different modes for interrupt delivery. In
+particular we want to cover:
 
-vdpasim_mm_work_fn work is used to serialize the binding to a new
-address space when the .bind_mm callback is invoked, and unbinding
-when the .unbind_mm callback is invoked.
+ • Xen event channel delivery via GSI to the I/O APIC
+ • Xen event channel delivery via GSI to the i8259 PIC
+ • MSIs routed to PIRQ event channels
+ • GSIs routed to PIRQ event channels
 
-Call mmget_not_zero()/kthread_use_mm() inside the worker function
-to pin the address space only as long as needed, following the
-documentation of mmget() in include/linux/sched/mm.h:
+As well as some variants of normal non-Xen stuff like MSI to vAPIC and
+PCI INTx going to the I/O APIC and PIC, which ought to still work even
+in Xen mode.
 
-  * Never use this function to pin this address space for an
-  * unbounded/indefinite amount of time.
+Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 
-Acked-by: Jason Wang <jasowang@redhat.com>
-Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
 ---
+v2 (ajb)
+  - switch to plain QemuSystemTest + LinuxSSHMixIn
+  - switch from fedora to custom kernel and buildroot
+  - removed some unused code
+TODO:
+  - properly probe for host support to skip test
+---
+ tests/avocado/kvm_xen_guest.py | 160 +++++++++++++++++++++++++++++++++
+ 1 file changed, 160 insertions(+)
+ create mode 100644 tests/avocado/kvm_xen_guest.py
 
-Notes:
-    v4:
-    - checked `use_va` in vdpasim_work_fn() [Jason]
-    - removed `va_enabled` variable now used only in the if condition
-    v3:
-    - called mmget_not_zero() before kthread_use_mm() [Jason]
-      As the documentation of mmget() in include/linux/sched/mm.h says:
-    
-      * Never use this function to pin this address space for an
-      * unbounded/indefinite amount of time.
-    
-      I moved mmget_not_zero/kthread_use_mm inside the worker function,
-      this way we pin the address space only as long as needed.
-      This is similar to what vfio_iommu_type1_dma_rw_chunk() does in
-      drivers/vfio/vfio_iommu_type1.c
-    - simplified the mm bind/unbind [Jason]
-    - renamed vdpasim_worker_change_mm_sync() [Jason]
-    - fix commit message (s/default: false/default: true)
-    v2:
-    - `use_va` set to true by default [Eugenio]
-    - supported the new unbind_mm callback [Jason]
-    - removed the unbind_mm call in vdpasim_do_reset() [Jason]
-    - avoided to release the lock while call kthread_flush_work() since we
-      are now using a mutex to protect the device state
-
- drivers/vdpa/vdpa_sim/vdpa_sim.h |  1 +
- drivers/vdpa/vdpa_sim/vdpa_sim.c | 97 +++++++++++++++++++++++++++++---
- 2 files changed, 90 insertions(+), 8 deletions(-)
-
-diff --git a/drivers/vdpa/vdpa_sim/vdpa_sim.h b/drivers/vdpa/vdpa_sim/vdpa_sim.h
-index 4774292fba8c..3a42887d05d9 100644
---- a/drivers/vdpa/vdpa_sim/vdpa_sim.h
-+++ b/drivers/vdpa/vdpa_sim/vdpa_sim.h
-@@ -59,6 +59,7 @@ struct vdpasim {
- 	struct vdpasim_virtqueue *vqs;
- 	struct kthread_worker *worker;
- 	struct kthread_work work;
-+	struct mm_struct *mm_bound;
- 	struct vdpasim_dev_attr dev_attr;
- 	/* mutex to synchronize virtqueue state */
- 	struct mutex mutex;
-diff --git a/drivers/vdpa/vdpa_sim/vdpa_sim.c b/drivers/vdpa/vdpa_sim/vdpa_sim.c
-index 2b2e439a66f7..2c706bb18897 100644
---- a/drivers/vdpa/vdpa_sim/vdpa_sim.c
-+++ b/drivers/vdpa/vdpa_sim/vdpa_sim.c
-@@ -35,10 +35,44 @@ module_param(max_iotlb_entries, int, 0444);
- MODULE_PARM_DESC(max_iotlb_entries,
- 		 "Maximum number of iotlb entries for each address space. 0 means unlimited. (default: 2048)");
- 
-+static bool use_va = true;
-+module_param(use_va, bool, 0444);
-+MODULE_PARM_DESC(use_va, "Enable/disable the device's ability to use VA");
+diff --git a/tests/avocado/kvm_xen_guest.py b/tests/avocado/kvm_xen_guest.py
+new file mode 100644
+index 0000000000..1b4524d31c
+--- /dev/null
++++ b/tests/avocado/kvm_xen_guest.py
+@@ -0,0 +1,160 @@
++# KVM Xen guest functional tests
++#
++# Copyright © 2021 Red Hat, Inc.
++# Copyright © 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
++#
++# Author:
++#  David Woodhouse <dwmw2@infradead.org>
++#  Alex Bennée <alex.bennee@linaro.org>
++#
++# SPDX-License-Identifier: GPL-2.0-or-later
 +
- #define VDPASIM_QUEUE_ALIGN PAGE_SIZE
- #define VDPASIM_QUEUE_MAX 256
- #define VDPASIM_VENDOR_ID 0
- 
-+struct vdpasim_mm_work {
-+	struct kthread_work work;
-+	struct vdpasim *vdpasim;
-+	struct mm_struct *mm_to_bind;
-+	int ret;
-+};
++import os
 +
-+static void vdpasim_mm_work_fn(struct kthread_work *work)
-+{
-+	struct vdpasim_mm_work *mm_work =
-+		container_of(work, struct vdpasim_mm_work, work);
-+	struct vdpasim *vdpasim = mm_work->vdpasim;
++from avocado_qemu import LinuxSSHMixIn
++from avocado_qemu import QemuSystemTest
++from avocado_qemu import wait_for_console_pattern
 +
-+	mm_work->ret = 0;
++class KVMXenGuest(QemuSystemTest, LinuxSSHMixIn):
++    """
++    :avocado: tags=arch:x86_64
++    :avocado: tags=machine:q35
++    :avocado: tags=accel:kvm
++    :avocado: tags=kvm_xen_guest
++    """
 +
-+	//TODO: should we attach the cgroup of the mm owner?
-+	vdpasim->mm_bound = mm_work->mm_to_bind;
-+}
++    KERNEL_DEFAULT = 'printk.time=0 root=/dev/xvda console=ttyS0'
 +
-+static void vdpasim_worker_change_mm_sync(struct vdpasim *vdpasim,
-+					  struct vdpasim_mm_work *mm_work)
-+{
-+	struct kthread_work *work = &mm_work->work;
++    kernel_path = None
++    kernel_params = None
 +
-+	kthread_init_work(work, vdpasim_mm_work_fn);
-+	kthread_queue_work(vdpasim->worker, work);
++    # Fetch assets from the kvm-xen-guest subdir of my shared test
++    # images directory on fileserver.linaro.org where you can find
++    # build instructions for how they where assembled.
++    def get_asset(self, name, sha1):
++        base_url = ('https://fileserver.linaro.org/s/'
++                    'kE4nCFLdQcoBF9t/download?'
++                    'path=%2Fkvm-xen-guest&files=' )
++        url = base_url + name
++        # use explicit name rather than failing to neatly parse the
++        # URL into a unique one
++        return self.fetch_asset(name=name, locations=(url), asset_hash=sha1)
 +
-+	kthread_flush_work(work);
-+}
++    def common_vm_setup(self):
 +
- static struct vdpasim *vdpa_to_sim(struct vdpa_device *vdpa)
- {
- 	return container_of(vdpa, struct vdpasim, vdpa);
-@@ -59,13 +93,20 @@ static void vdpasim_queue_ready(struct vdpasim *vdpasim, unsigned int idx)
- {
- 	struct vdpasim_virtqueue *vq = &vdpasim->vqs[idx];
- 	uint16_t last_avail_idx = vq->vring.last_avail_idx;
--
--	vringh_init_iotlb(&vq->vring, vdpasim->features, vq->num, true,
--			  (struct vring_desc *)(uintptr_t)vq->desc_addr,
--			  (struct vring_avail *)
--			  (uintptr_t)vq->driver_addr,
--			  (struct vring_used *)
--			  (uintptr_t)vq->device_addr);
-+	struct vring_desc *desc = (struct vring_desc *)
-+				  (uintptr_t)vq->desc_addr;
-+	struct vring_avail *avail = (struct vring_avail *)
-+				    (uintptr_t)vq->driver_addr;
-+	struct vring_used *used = (struct vring_used *)
-+				  (uintptr_t)vq->device_addr;
++        # TODO: we also need to check host kernel version/support
++        self.require_accelerator("kvm")
 +
-+	if (use_va && vdpasim->mm_bound) {
-+		vringh_init_iotlb_va(&vq->vring, vdpasim->features, vq->num,
-+				     true, desc, avail, used);
-+	} else {
-+		vringh_init_iotlb(&vq->vring, vdpasim->features, vq->num,
-+				  true, desc, avail, used);
-+	}
- 
- 	vq->vring.last_avail_idx = last_avail_idx;
- 
-@@ -130,8 +171,20 @@ static const struct vdpa_config_ops vdpasim_batch_config_ops;
- static void vdpasim_work_fn(struct kthread_work *work)
- {
- 	struct vdpasim *vdpasim = container_of(work, struct vdpasim, work);
-+	struct mm_struct *mm = vdpasim->mm_bound;
++        self.vm.set_console()
 +
-+	if (use_va && mm) {
-+		if (!mmget_not_zero(mm))
-+			return;
-+		kthread_use_mm(mm);
-+	}
- 
- 	vdpasim->dev_attr.work_fn(vdpasim);
++        self.vm.add_args("-accel", "kvm,xen-version=0x4000a,kernel-irqchip=split")
++        self.vm.add_args("-smp", "2")
 +
-+	if (use_va && mm) {
-+		kthread_unuse_mm(mm);
-+		mmput(mm);
-+	}
- }
- 
- struct vdpasim *vdpasim_create(struct vdpasim_dev_attr *dev_attr,
-@@ -162,7 +215,7 @@ struct vdpasim *vdpasim_create(struct vdpasim_dev_attr *dev_attr,
- 	vdpa = __vdpa_alloc_device(NULL, ops,
- 				   dev_attr->ngroups, dev_attr->nas,
- 				   dev_attr->alloc_size,
--				   dev_attr->name, false);
-+				   dev_attr->name, use_va);
- 	if (IS_ERR(vdpa)) {
- 		ret = PTR_ERR(vdpa);
- 		goto err_alloc;
-@@ -582,6 +635,30 @@ static int vdpasim_set_map(struct vdpa_device *vdpa, unsigned int asid,
- 	return ret;
- }
- 
-+static int vdpasim_bind_mm(struct vdpa_device *vdpa, struct mm_struct *mm)
-+{
-+	struct vdpasim *vdpasim = vdpa_to_sim(vdpa);
-+	struct vdpasim_mm_work mm_work;
++        self.kernel_path = self.get_asset("bzImage",
++                                          "367962983d0d32109998a70b45dcee4672d0b045")
++        self.rootfs = self.get_asset("rootfs.ext4",
++                                     "f1478401ea4b3fa2ea196396be44315bab2bb5e4")
 +
-+	mm_work.vdpasim = vdpasim;
-+	mm_work.mm_to_bind = mm;
++    def run_and_check(self):
++        self.vm.add_args('-kernel', self.kernel_path,
++                         '-append', self.kernel_params,
++                         '-drive',  f"file={self.rootfs},if=none,id=drv0",
++                         '-device', 'xen-disk,drive=drv0,vdev=xvda',
++                         '-device', 'virtio-net-pci,netdev=unet',
++                         '-netdev', 'user,id=unet,hostfwd=:127.0.0.1:0-:22')
 +
-+	vdpasim_worker_change_mm_sync(vdpasim, &mm_work);
++        self.vm.launch()
++        self.log.info('VM launched, waiting for sshd')
++        console_pattern = 'Starting dropbear sshd: OK'
++        wait_for_console_pattern(self, console_pattern, 'Oops')
++        self.log.info('sshd ready')
++        self.ssh_connect('root', '', False)
 +
-+	return mm_work.ret;
-+}
++        self.ssh_command('cat /proc/cmdline')
++        self.ssh_command('dmesg | grep -e "Grant table initialized"')
 +
-+static void vdpasim_unbind_mm(struct vdpa_device *vdpa)
-+{
-+	struct vdpasim *vdpasim = vdpa_to_sim(vdpa);
-+	struct vdpasim_mm_work mm_work;
++    def test_kvm_xen_guest(self):
++        """
++        :avocado: tags=kvm_xen_guest
++        """
 +
-+	mm_work.vdpasim = vdpasim;
-+	mm_work.mm_to_bind = NULL;
++        self.common_vm_setup()
 +
-+	vdpasim_worker_change_mm_sync(vdpasim, &mm_work);
-+}
++        self.kernel_params = (self.KERNEL_DEFAULT +
++                              ' xen_emul_unplug=ide-disks')
++        self.run_and_check()
++        self.ssh_command('grep xen-pirq.*msi /proc/interrupts')
 +
- static int vdpasim_dma_map(struct vdpa_device *vdpa, unsigned int asid,
- 			   u64 iova, u64 size,
- 			   u64 pa, u32 perm, void *opaque)
-@@ -678,6 +755,8 @@ static const struct vdpa_config_ops vdpasim_config_ops = {
- 	.set_group_asid         = vdpasim_set_group_asid,
- 	.dma_map                = vdpasim_dma_map,
- 	.dma_unmap              = vdpasim_dma_unmap,
-+	.bind_mm		= vdpasim_bind_mm,
-+	.unbind_mm		= vdpasim_unbind_mm,
- 	.free                   = vdpasim_free,
- };
- 
-@@ -712,6 +791,8 @@ static const struct vdpa_config_ops vdpasim_batch_config_ops = {
- 	.get_iova_range         = vdpasim_get_iova_range,
- 	.set_group_asid         = vdpasim_set_group_asid,
- 	.set_map                = vdpasim_set_map,
-+	.bind_mm		= vdpasim_bind_mm,
-+	.unbind_mm		= vdpasim_unbind_mm,
- 	.free                   = vdpasim_free,
- };
- 
++    def test_kvm_xen_guest_nomsi(self):
++        """
++        :avocado: tags=kvm_xen_guest_nomsi
++        """
++
++        self.common_vm_setup()
++
++        self.kernel_params = (self.KERNEL_DEFAULT +
++                              ' xen_emul_unplug=ide-disks pci=nomsi')
++        self.run_and_check()
++        self.ssh_command('grep xen-pirq.* /proc/interrupts')
++
++    def test_kvm_xen_guest_noapic_nomsi(self):
++        """
++        :avocado: tags=kvm_xen_guest_noapic_nomsi
++        """
++
++        self.common_vm_setup()
++
++        self.kernel_params = (self.KERNEL_DEFAULT +
++                              ' xen_emul_unplug=ide-disks noapic pci=nomsi')
++        self.run_and_check()
++        self.ssh_command('grep xen-pirq /proc/interrupts')
++
++    def test_kvm_xen_guest_vapic(self):
++        """
++        :avocado: tags=kvm_xen_guest_vapic
++        """
++
++        self.common_vm_setup()
++        self.vm.add_args('-cpu', 'host,+xen-vapic')
++        self.kernel_params = (self.KERNEL_DEFAULT +
++                              ' xen_emul_unplug=ide-disks')
++        self.run_and_check()
++        self.ssh_command('grep xen-pirq /proc/interrupts')
++        self.ssh_command('grep PCI-MSI /proc/interrupts')
++
++    def test_kvm_xen_guest_novector(self):
++        """
++        :avocado: tags=kvm_xen_guest_novector
++        """
++
++        self.common_vm_setup()
++        self.kernel_params = (self.KERNEL_DEFAULT +
++                              ' xen_emul_unplug=ide-disks' +
++                              ' xen_no_vector_callback')
++        self.run_and_check()
++        self.ssh_command('grep xen-platform-pci /proc/interrupts')
++
++    def test_kvm_xen_guest_novector_nomsi(self):
++        """
++        :avocado: tags=kvm_xen_guest_novector_nomsi
++        """
++
++        self.common_vm_setup()
++
++        self.kernel_params = (self.KERNEL_DEFAULT +
++                              ' xen_emul_unplug=ide-disks pci=nomsi' +
++                              ' xen_no_vector_callback')
++        self.run_and_check()
++        self.ssh_command('grep xen-platform-pci /proc/interrupts')
++
++    def test_kvm_xen_guest_novector_noapic(self):
++        """
++        :avocado: tags=kvm_xen_guest_novector_noapic
++        """
++
++        self.common_vm_setup()
++        self.kernel_params = (self.KERNEL_DEFAULT +
++                              ' xen_emul_unplug=ide-disks' +
++                              ' xen_no_vector_callback noapic')
++        self.run_and_check()
++        self.ssh_command('grep xen-platform-pci /proc/interrupts')
 -- 
 2.39.2
 
