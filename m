@@ -2,124 +2,144 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 111E66C806F
-	for <lists+kvm@lfdr.de>; Fri, 24 Mar 2023 15:54:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EAFCC6C808F
+	for <lists+kvm@lfdr.de>; Fri, 24 Mar 2023 15:59:42 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232285AbjCXOyi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Mar 2023 10:54:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55136 "EHLO
+        id S232210AbjCXO7l (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Mar 2023 10:59:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43278 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232265AbjCXOyf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Mar 2023 10:54:35 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F45D55A3
-        for <kvm@vger.kernel.org>; Fri, 24 Mar 2023 07:54:32 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id b124-20020a253482000000b00b72947f6a54so2001488yba.14
-        for <kvm@vger.kernel.org>; Fri, 24 Mar 2023 07:54:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1679669671;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=1tdduUjnbl5Irm88tn5dVUB6CbalAoO8z08+lwGIaDg=;
-        b=CEflalfNT5WbsGFeoH8gg6VEAAadHtcYs8WYSCXURFrBKwsheHe3zB2potVnwjx43e
-         +fALJ2qsZIsVKKeXkp2EVUfB/baquLYOM4oOUPIviLywV4O+0rKe5pTgBr2Yu889FgUs
-         bM4afylwOdYAIZ1GK04FPsAn6bAQmz8uQ0tK+JHIw+o+JWyBmyauBi20mi+UARrCK9iY
-         ZAKcROIHdF8Nyq3ezfHfcLHR5ZU8WY3tKjixpo4D+nCDVibvCYWYRV5lBcd5paaNr0h8
-         vRB9kmq26m+maOHFCERXbZXPlfjyxBPwwVHXM9NNeMY9vpcHwpX22RkBEXUgW7L7I967
-         CQLg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679669671;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=1tdduUjnbl5Irm88tn5dVUB6CbalAoO8z08+lwGIaDg=;
-        b=CA/n3u3moYrOBwYZ+AaMi/XLOQ83KAkpnlU5HR0UND4ibZ2CzJj0IL1JPIsk6veP+N
-         MY9p+R5+QfH5aKzXcHs5GoYIuyC/zLS9K2FlGuHKdnib3WhjF8e+ghivuHKDELb68pVC
-         UpQAm7XbapJSC/UkMC2CP4rWtlVJKFGD9IVT1g0YoWEEiDSlgrv+QtTMlXewVY1HI8uI
-         ctCx9qZNSn0d/gQ5TY323hT0XIKEBoQEZiw23Ma6K3rTTWCNs79QxVOENpLW3XTxhr3T
-         kyyUwl5okKJX3eAL20elHVCMSkbYK6uU/ZEbN8jRjs+w+QR+rceZyDDDWuJt/C30wn1C
-         1xvw==
-X-Gm-Message-State: AAQBX9d3Bo2R58p50MevTMCCkBgQSmUnCbjGZWKQEs5kiGmR9GGWHnNw
-        ctxscYT4gKnfvcOIGbW7rUd4Pq51l18=
-X-Google-Smtp-Source: AKy350aJfEGvkZPhmfJLRXnNK4rQPK8XcItoEz+NEjg78U9SdF52B0KpfQ0EEBavmZctl90sz8X/nsCpexY=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:1586:b0:b69:fab9:de39 with SMTP id
- k6-20020a056902158600b00b69fab9de39mr1289438ybu.2.1679669671419; Fri, 24 Mar
- 2023 07:54:31 -0700 (PDT)
-Date:   Fri, 24 Mar 2023 07:54:29 -0700
-In-Reply-To: <20230223052851.1054799-1-jun.miao@intel.com>
-Mime-Version: 1.0
-References: <20230223052851.1054799-1-jun.miao@intel.com>
-Message-ID: <ZB25pR7cv3mjnn4s@google.com>
-Subject: Re: [PATCH v2] KVM: Fix comments that refer to the non-existent install_new_memslots()
-From:   Sean Christopherson <seanjc@google.com>
-To:     Jun Miao <jun.miao@intel.com>
-Cc:     pbonzini@redhat.com, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-7.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+        with ESMTP id S231499AbjCXO7j (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Mar 2023 10:59:39 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B2C219133
+        for <kvm@vger.kernel.org>; Fri, 24 Mar 2023 07:59:38 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id E969262B56
+        for <kvm@vger.kernel.org>; Fri, 24 Mar 2023 14:59:37 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8DE63C433EF;
+        Fri, 24 Mar 2023 14:59:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1679669977;
+        bh=aexf8QVQjdHKISgbnuUhwIekCSwlym0VJvtrs/KGRe4=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=mmYaye+CACf4OUVvRpKgvl35z0ZQb07hfSSTQ9ooEi98ZvxSwIv8rTO3y43Xyq6xe
+         iEDDUOCMKx5CaoPK+s7AhNx+8v7G3JLA3gtBuMxwI9klDe/9lai+y27HELU4yMA9JS
+         dSpbfAIMknlKwnzU32da5+8vRyLkbCF+enN9V9boJxFg1LVGhSuAywK5XXql8E2oR5
+         2Ht6a6CGUuxpEIK6W6uzf4iBVwYYERtfcNfgaVGWtfIlwpCLLvDkgRQduqoRtbXae9
+         OR/MErSFUwl+dcZZrgiYUB+bvtBqsUGf1VQmE8S12flt0WpoqQlCZ42dtRsjtpk64H
+         QchEMU7ECve9Q==
+Date:   Fri, 24 Mar 2023 07:59:34 -0700
+From:   Nathan Chancellor <nathan@kernel.org>
+To:     Conor Dooley <conor.dooley@microchip.com>
+Cc:     Andy Chiu <andy.chiu@sifive.com>, linux-riscv@lists.infradead.org,
+        palmer@dabbelt.com, anup@brainfault.org, atishp@atishpatra.org,
+        kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
+        vineetg@rivosinc.com, greentime.hu@sifive.com,
+        guoren@linux.alibaba.com, Paul Walmsley <paul.walmsley@sifive.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Tom Rix <trix@redhat.com>
+Subject: Re: [PATCH -next v16 19/20] riscv: detect assembler support for
+ .option arch
+Message-ID: <20230324145934.GB428955@dev-arch.thelio-3990X>
+References: <20230323145924.4194-1-andy.chiu@sifive.com>
+ <20230323145924.4194-20-andy.chiu@sifive.com>
+ <04cc3420-26a7-4263-b120-677c758eabea@spud>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <04cc3420-26a7-4263-b120-677c758eabea@spud>
+X-Spam-Status: No, score=-5.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,SPF_HELO_NONE,
+        SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Feb 23, 2023, Jun Miao wrote:
-> The function of install_new_memslots() was replaced by kvm_swap_active_memslots().
-> In order to avoid confusion, fix the comments that refer the non-existent name of
-> install_new_memslots which always be ignored.
+On Thu, Mar 23, 2023 at 03:26:14PM +0000, Conor Dooley wrote:
+> On Thu, Mar 23, 2023 at 02:59:23PM +0000, Andy Chiu wrote:
+> > Some extensions use .option arch directive to selectively enable certain
+> > extensions in parts of its assembly code. For example, Zbb uses it to
+> > inform assmebler to emit bit manipulation instructions. However,
+> > supporting of this directive only exist on GNU assembler and has not
+> > landed on clang at the moment, making TOOLCHAIN_HAS_ZBB depend on
+> > AS_IS_GNU.
+> > 
+> > While it is still under review at https://reviews.llvm.org/D123515, the
+> > upcoming Vector patch also requires this feature in assembler. Thus,
+> > provide Kconfig AS_HAS_OPTION_ARCH to detect such feature. Then
+> > TOOLCHAIN_HAS_XXX will be turned on automatically when the feature land.
+> > 
+> > Suggested-by: Nathan Chancellor <nathan@kernel.org>
+> > Signed-off-by: Andy Chiu <andy.chiu@sifive.com>
+> > ---
+> >  arch/riscv/Kconfig | 8 +++++++-
+> >  1 file changed, 7 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/arch/riscv/Kconfig b/arch/riscv/Kconfig
+> > index 36a5b6fed0d3..4f8fd4002f1d 100644
+> > --- a/arch/riscv/Kconfig
+> > +++ b/arch/riscv/Kconfig
+> > @@ -244,6 +244,12 @@ config RISCV_DMA_NONCOHERENT
+> >  config AS_HAS_INSN
+> >  	def_bool $(as-instr,.insn r 51$(comma) 0$(comma) 0$(comma) t0$(comma) t0$(comma) zero)
+> >  
+> > +config AS_HAS_OPTION_ARCH
+> > +	# https://reviews.llvm.org/D123515
+> > +	def_bool y
+> > +	depends on $(as-instr, .option arch$(comma) +m)
+> > +	depends on !$(as-instr, .option arch$(comma) -i)
 > 
-> Fixes: a54d806688fe ("KVM: Keep memslots in tree-based structures instead of array-based ones")
-> Signed-off-by: Jun Miao <jun.miao@intel.com>
+> Oh cool, I didn't expect this to work given what Nathan said in his
+> mail, but I gave it a whirl and it does seem to.
 
-Two nits, but I'll fix them up when applying.  Thanks!
+The second line is the clever part of this option that I had not
+considered, as it checks for something that should error in addition to
+something that shouldn't::
 
-> ---
->  Documentation/virt/kvm/locking.rst |  2 +-
->  include/linux/kvm_host.h           |  4 ++--
->  virt/kvm/kvm_main.c                | 10 +++++-----
->  3 files changed, 8 insertions(+), 8 deletions(-)
+$ echo '.option arch, -i' | riscv64-linux-gcc -c -o /dev/null -x assembler -
+{standard input}: Assembler messages:
+{standard input}:1: Error: cannot + or - base extension `i' in .option arch `-i'
+
+Looking at D123515, I see this same option test is present and appears
+to error in the same manner so this should work when that change is
+merged.
+
+Reviewed-by: Nathan Chancellor <nathan@kernel.org>
+
+> I suppose:
+> Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
 > 
-> diff --git a/Documentation/virt/kvm/locking.rst b/Documentation/virt/kvm/locking.rst
-> index 14c4e9fa501d..6e03ad853c27 100644
-> --- a/Documentation/virt/kvm/locking.rst
-> +++ b/Documentation/virt/kvm/locking.rst
-> @@ -21,7 +21,7 @@ The acquisition orders for mutexes are as follows:
->  - kvm->mn_active_invalidate_count ensures that pairs of
->    invalidate_range_start() and invalidate_range_end() callbacks
->    use the same memslots array.  kvm->slots_lock and kvm->slots_arch_lock
-> -  are taken on the waiting side in install_new_memslots, so MMU notifiers
-> +  are taken on the waiting side in kvm_swap_active_memslots(), so MMU notifiers
+> I'd rather it be this way so that it is "hands off", as opposed to the
+> version check that would need updating in the future. And I guess it
+> means that support for V & IAS will automatically turn on for stable
+> kernels too once the LLVM change lands, which is nice ;)
 
-This isn't accurate, kvm_swap_active_memslots() isn't what actually acquires
-those locks.  I don't see any reason to be super precise, the key takeaway is
-that modifying memslots takes the locks _and_ is the waiter.  I'll tweak this to:
+Very much agreed!
 
-  are taken on the waiting side when modifying memslots, so MMU notifiers
-
-> @@ -1810,11 +1810,11 @@ static int kvm_set_memslot(struct kvm *kvm,
->  	int r;
->  
->  	/*
-> -	 * Released in kvm_swap_active_memslots.
-> +	 * Released in kvm_swap_active_memslots().
->  	 *
->  	 * Must be held from before the current memslots are copied until
->  	 * after the new memslots are installed with rcu_assign_pointer,
-> -	 * then released before the synchronize srcu in kvm_swap_active_memslots.
-> +	 * then released before the synchronize srcu in kvm_swap_active_memslots().
-
-This block can be massaged slightly to avoid running past 80 chars:
-
-	 * Must be held from before the current memslots are copied until after
-	 * the new memslots are installed with rcu_assign_pointer, then
-	 * released before the synchronize srcu in kvm_swap_active_memslots().
-
->  	 *
->  	 * When modifying memslots outside of the slots_lock, must be held
->  	 * before reading the pointer to the current memslots until after all
-> -- 
-> 2.32.0
+> Thanks Andy!
 > 
+> > +
+> >  source "arch/riscv/Kconfig.socs"
+> >  source "arch/riscv/Kconfig.errata"
+> >  
+> > @@ -442,7 +448,7 @@ config TOOLCHAIN_HAS_ZBB
+> >  	depends on !64BIT || $(cc-option,-mabi=lp64 -march=rv64ima_zbb)
+> >  	depends on !32BIT || $(cc-option,-mabi=ilp32 -march=rv32ima_zbb)
+> >  	depends on LLD_VERSION >= 150000 || LD_VERSION >= 23900
+> > -	depends on AS_IS_GNU
+> > +	depends on AS_HAS_OPTION_ARCH
+> >  
+> >  config RISCV_ISA_ZBB
+> >  	bool "Zbb extension support for bit manipulation instructions"
+> > -- 
+> > 2.17.1
+> > 
+> > 
+
+
