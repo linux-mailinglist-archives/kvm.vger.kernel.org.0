@@ -2,73 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6031E6C8609
-	for <lists+kvm@lfdr.de>; Fri, 24 Mar 2023 20:39:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 06E5C6C8631
+	for <lists+kvm@lfdr.de>; Fri, 24 Mar 2023 20:50:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231596AbjCXTjU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Mar 2023 15:39:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42252 "EHLO
+        id S231899AbjCXTuv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Mar 2023 15:50:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55246 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231384AbjCXTjS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Mar 2023 15:39:18 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B21C14983
-        for <kvm@vger.kernel.org>; Fri, 24 Mar 2023 12:39:17 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id x15-20020a25accf000000b00b3b4535c48dso2745410ybd.7
-        for <kvm@vger.kernel.org>; Fri, 24 Mar 2023 12:39:17 -0700 (PDT)
+        with ESMTP id S231891AbjCXTut (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Mar 2023 15:50:49 -0400
+Received: from mail-lf1-x129.google.com (mail-lf1-x129.google.com [IPv6:2a00:1450:4864:20::129])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2CC7619C4C
+        for <kvm@vger.kernel.org>; Fri, 24 Mar 2023 12:50:38 -0700 (PDT)
+Received: by mail-lf1-x129.google.com with SMTP id br6so3584128lfb.11
+        for <kvm@vger.kernel.org>; Fri, 24 Mar 2023 12:50:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1679686756;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=tHFLM9u2tW1dB+QLTD/yCWI9MP1t6zTpNuPsL12SzBA=;
-        b=nNBpNB/m+AGT/iTH7cXM98onEB/i7P3sP/z7FMxwTHGwskN7P8XV1ttfg4vWQptqWH
-         5N9EhO6KxNBVAe1edIf++87SLur3PhER5vw8NzkVPycF8LhRUOmkBqkqXeu5vJ9yYHHs
-         jYfcyuxwZ32Pbb4cllfVulKSwFuPiqI1u1fjC+RHModlzpWCeTJHyFvYWmpZFD8D9JQv
-         EL+lJ1SVJdytws5iM2l9bxmDVmuO0fS5F/oQGyL+mKSylZGtXZ/nlQZWiytShaKaBWaw
-         fc4lMUYi+Aaf2Lcz2HqCW20/RJXAnw8DFi/nOsVW7qSrKMH0cU+10vtQhGrlw4tWHs59
-         Ugng==
+        d=daynix-com.20210112.gappssmtp.com; s=20210112; t=1679687436;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=2Yw8aFsO52nF+rCwkiyobvl69eUncIFVtLSBaTu9azE=;
+        b=j6jff6epBcmgpWZzr6Mt4fo1JsP01f32arVrxjAkaSC5wFGzaZyAdq2zMj7mb/PTdh
+         0OzYz9mESkbBxCpeuK39NQJTQI+dhTUDSv+8GC/8lLDOxF1+Jg5Ef7gbjlwjJQssNkZ4
+         s8Z8OM1IC1AJv+yrkTyviHWcDBDADHX1czDoDx2Wn3QdQZXptwIqe6mzmvhibgvSvsOd
+         g0XtmqMsoGc/N7Bi3bGtaZ8WSHMq79vDh6/U6MVgA4pUeIXfu2TI1SIg3+GqEF/WIIl0
+         Qyul0WtoCGDrbnBp+grjJ0yXNO9ra71E2CxyFvxLOMbGdOWbzOj6lLaQpOEMbaiv3Gea
+         DGJw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679686756;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=tHFLM9u2tW1dB+QLTD/yCWI9MP1t6zTpNuPsL12SzBA=;
-        b=osEMcwtJ6S7x4jNwFtGtgYPpelpjy/hN6NRqQphOL0m3Gl59AFnOzJtz1r2YX2rpib
-         jhC0F5k010so83m92DXXZQP5j/PrSJmzM5Zj78rjw7tJXmgz5qUPcowtPJpWL6vqsUmu
-         ssqb95RTW+aTpETTWniG80ttbEt3Pd93+xBiSnf1REfQhMzzDQW4YZwKWU3hWwycradS
-         yG1HaWDqF8eOQzSMp5sBJo0KhCLw7YegNy3iga7TTPqiKUePNYf4Sw4ZUbT/on89HnuY
-         TrgkfDyEz5m2zr7oMj3dnX6XK+Gyeo//QzzI4gmu7Bn12uJQXF+pOj9hcrHRpfAC2QVN
-         YXQQ==
-X-Gm-Message-State: AAQBX9dxk2gu2OmSt5oPFkQcjMtlqo7qVWmPdhZOCqbOf/zf4MHoTDRQ
-        M02RMoXiSTxnbI4Rdq7K0KqaZS0JiIU=
-X-Google-Smtp-Source: AKy350a1ioMkSJJqDbkXWX9+7xK8isrZrsY7LWa8ep0ySPAQa5UdgsF9zyuGcR6TXUND6zPo79ynSutd+gY=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:ad5d:0:b0:544:cd0e:2f80 with SMTP id
- l29-20020a81ad5d000000b00544cd0e2f80mr1576908ywk.8.1679686756669; Fri, 24 Mar
- 2023 12:39:16 -0700 (PDT)
-Date:   Fri, 24 Mar 2023 12:39:15 -0700
-In-Reply-To: <CAL715W+a=og5f-v1o+56wTDmLJr1HitgFzmvL276BuomZvS7YA@mail.gmail.com>
-Mime-Version: 1.0
-References: <20230113122910.672417-1-jiangshanlai@gmail.com>
- <167934153606.1941128.1026865175616779306.b4-ty@google.com> <CAL715W+a=og5f-v1o+56wTDmLJr1HitgFzmvL276BuomZvS7YA@mail.gmail.com>
-Message-ID: <ZB38Y2HpvD+aD9fm@google.com>
-Subject: Re: [PATCH] kvm: x86/mmu: Simplify pte_list_{add|remove}
-From:   Sean Christopherson <seanjc@google.com>
-To:     Mingwei Zhang <mizhang@google.com>
-Cc:     linux-kernel@vger.kernel.org,
-        Lai Jiangshan <jiangshanlai@gmail.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Lai Jiangshan <jiangshan.ljs@antgroup.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-7.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+        d=1e100.net; s=20210112; t=1679687436;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=2Yw8aFsO52nF+rCwkiyobvl69eUncIFVtLSBaTu9azE=;
+        b=AuMcJ1Fhkd9oa4WLxdmf0cqntbtxOPh8lF2xQOk5PcLJ5sF8g4X6OXNZCzaMwbfgWA
+         JgP557U7QJ1WBoy/gAgvudC+OZSrmJKjgw0zGBV1rPaO53NxqU5diDl2QKv3vR2t4lSf
+         1axiEfVelhY/5XzQff0r5Gc7Fs/StoQVHBqUizGDkKVk1ElTRE8ivdutm3904YZu9wQ1
+         mj5MQOXtLTz+qZm1giZdv6MImqOp9z109GWin5y3o17UQXZo+iHKNHlVmxX3x1Ien1pr
+         mOv/dSE4Ep04WNLkRmCnQvrT66zvvtsot+jMbA6hHsfmd/x+MniR6FXTYFU6KTOadGVv
+         co8A==
+X-Gm-Message-State: AAQBX9exYNGjkCDLtYQnhLL9H4qk81cFfTY29/qvcdA08hMa1DyI5AGz
+        JOJGJtxJ+2mPtXTLlPrTRnYfrA==
+X-Google-Smtp-Source: AKy350bUox4jMX8WDd8OT9XknY5+QOLfcn69cZ0KHubEUzso4Fj26uq9efyRVcRKrDtp9MOWavheWA==
+X-Received: by 2002:ac2:4c13:0:b0:4e9:2c0e:c39d with SMTP id t19-20020ac24c13000000b004e92c0ec39dmr879285lfq.41.1679687436084;
+        Fri, 24 Mar 2023 12:50:36 -0700 (PDT)
+Received: from vp-pc.. (109-252-122-203.nat.spd-mgts.ru. [109.252.122.203])
+        by smtp.gmail.com with ESMTPSA id 15-20020ac2484f000000b004eaf6d7228bsm1136021lfy.110.2023.03.24.12.50.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 24 Mar 2023 12:50:35 -0700 (PDT)
+From:   Viktor Prutyanov <viktor@daynix.com>
+To:     mst@redhat.com, jasowang@redhat.com
+Cc:     cohuck@redhat.com, pasic@linux.ibm.com, farman@linux.ibm.com,
+        linux-s390@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        linux-kernel@vger.kernel.org, yan@daynix.com, viktor@daynix.com
+Subject: [PATCH v6] virtio: add VIRTIO_F_NOTIFICATION_DATA feature support
+Date:   Fri, 24 Mar 2023 22:50:29 +0300
+Message-Id: <20230324195029.2410503-1-viktor@daynix.com>
+X-Mailer: git-send-email 2.35.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=0.0 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -76,81 +69,270 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Mar 24, 2023, Mingwei Zhang wrote:
-> On Thu, Mar 23, 2023 at 3:51=E2=80=AFPM Sean Christopherson <seanjc@googl=
-e.com> wrote:
-> >
-> > On Fri, 13 Jan 2023 20:29:10 +0800, Lai Jiangshan wrote:
-> > > Simplify pte_list_{add|remove} by ensuring all the non-head pte_list_=
-desc
-> > > to be full and addition/removal actions being performed on the head.
-> > >
-> > > To make pte_list_add() return a count as before, @tail_count is also
-> > > added to the struct pte_list_desc.
-> > >
-> > > No visible performace is changed in tests.  But pte_list_add() is no =
-longer
-> > > shown in the perf result for the COWed pages even the guest forks mil=
-lions
-> > > of tasks.
-> > >
-> > > [...]
-> >
-> > Applied to kvm-x86 mmu, thanks!  I added quite a few comments and a BUG=
-_ON() to
-> > sanity check that the head is never empty when trying to remove an entr=
-y, but I
-> > didn't make anything changes to the code itself.
-> >
-> > [1/1] kvm: x86/mmu: Simplify pte_list_{add|remove}
-> >       https://github.com/kvm-x86/linux/commit/141705b78381
-> >
->=20
-> I am not sure if it is possible, but now spte_count is u32 so does
-> tail_count. I wonder if an attacker could use the potential integer
-> overflow to trigger this? E.g,: creating a huge number of little L1
-> EPTs with the many nGPA-> one GPA? hmm, I think it could overflow
-> tail_count? Please double check.
+According to VirtIO spec v1.2, VIRTIO_F_NOTIFICATION_DATA feature
+indicates that the driver passes extra data along with the queue
+notifications.
 
-Heh, I had the same reaction and even started reworking the patch, but conv=
-inced
-myself that there are no new issues as __rmap_add() artificially limits the=
- number
-of rmap entries to 1000.  But looking again, mmu_page_add_parent_pte() does=
-n't
-have the same safeguard, so in theory, a VM could overflow tail_count.
+In a split queue case, the extra data is 16-bit available index. In a
+packed queue case, the extra data is 1-bit wrap counter and 15-bit
+available index.
 
-I'll stare at this some more next week, I'd really prefer to avoid taking o=
-n any
-amount of complexity in KVM to handle something that should never occur in
-practice.  But being buried deep in __link_shadow_page() makes the error ha=
-ndling
-annoying.
+Add support for this feature for MMIO, channel I/O and modern PCI
+transports.
 
-> spte_count is u32, but assigned to an (signed) int j and BUG_ON(j <
-> 0)? Please don't add more BUG_ON in KVM mmu... and please change
-> either 'spte_count' to 'int' or 'j' to u32.
+Signed-off-by: Viktor Prutyanov <viktor@daynix.com>
+Acked-by: Jason Wang <jasowang@redhat.com>
+Reviewed-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+---
+ v6: use VRING_PACKED_EVENT_F_WRAP_CTR
+ v5: replace ternary operator with if-else
+ v4: remove VP_NOTIFY macro and legacy PCI support, add
+    virtio_ccw_kvm_notify_with_data to virtio_ccw
+ v3: support feature in virtio_ccw, remove VM_NOTIFY, use avail_idx_shadow,
+    remove byte swap, rename to vring_notification_data
+ v2: reject the feature in virtio_ccw, replace __le32 with u32
 
-Why?  signed vs. unsigned doesn't change anything.  spte_count is can't be =
-greater
-than PTE_LIST_EXT, so overflow is not a concern.  The BUG_ON() is purely to=
- ensure
-there's no underflow, i.e. that spte_count > 0, so that the array can be sa=
-fely
-accessed.
+ Tested with disabled VIRTIO_F_NOTIFICATION_DATA on qemu-system-s390x
+ (virtio-blk-ccw), qemu-system-riscv64 (virtio-blk-device,
+ virtio-rng-device), qemu-system-x86_64 (virtio-blk-pci, virtio-net-pci)
+ to make sure nothing is broken.
+ Tested with enabled VIRTIO_F_NOTIFICATION_DATA on 64-bit RISC-V Linux
+ and my hardware implementation of virtio-rng with MMIO.
 
-> In general, please, no BUG_ON(), at least no more BUG_ON() on our nested =
-MMU...
+ drivers/s390/virtio/virtio_ccw.c   | 22 +++++++++++++++++++---
+ drivers/virtio/virtio_mmio.c       | 18 +++++++++++++++++-
+ drivers/virtio/virtio_pci_modern.c | 17 ++++++++++++++++-
+ drivers/virtio/virtio_ring.c       | 19 +++++++++++++++++++
+ include/linux/virtio_ring.h        |  2 ++
+ include/uapi/linux/virtio_config.h |  6 ++++++
+ 6 files changed, 79 insertions(+), 5 deletions(-)
 
-In this case, the alternative is worse, as writing "head_desc->sptes[j]" wi=
-th
-"j < 0", i.e. a very large value if j is stored as an unsigned, would write
-arbitrary kernel memory.
+diff --git a/drivers/s390/virtio/virtio_ccw.c b/drivers/s390/virtio/virtio_ccw.c
+index 954fc31b4bc7..02922768b129 100644
+--- a/drivers/s390/virtio/virtio_ccw.c
++++ b/drivers/s390/virtio/virtio_ccw.c
+@@ -391,7 +391,7 @@ static void virtio_ccw_drop_indicator(struct virtio_ccw_device *vcdev,
+ 	ccw_device_dma_free(vcdev->cdev, thinint_area, sizeof(*thinint_area));
+ }
+ 
+-static bool virtio_ccw_kvm_notify(struct virtqueue *vq)
++static inline bool virtio_ccw_do_kvm_notify(struct virtqueue *vq, u32 data)
+ {
+ 	struct virtio_ccw_vq_info *info = vq->priv;
+ 	struct virtio_ccw_device *vcdev;
+@@ -402,12 +402,22 @@ static bool virtio_ccw_kvm_notify(struct virtqueue *vq)
+ 	BUILD_BUG_ON(sizeof(struct subchannel_id) != sizeof(unsigned int));
+ 	info->cookie = kvm_hypercall3(KVM_S390_VIRTIO_CCW_NOTIFY,
+ 				      *((unsigned int *)&schid),
+-				      vq->index, info->cookie);
++				      data, info->cookie);
+ 	if (info->cookie < 0)
+ 		return false;
+ 	return true;
+ }
+ 
++static bool virtio_ccw_kvm_notify(struct virtqueue *vq)
++{
++	return virtio_ccw_do_kvm_notify(vq, vq->index);
++}
++
++static bool virtio_ccw_kvm_notify_with_data(struct virtqueue *vq)
++{
++	return virtio_ccw_do_kvm_notify(vq, vring_notification_data(vq));
++}
++
+ static int virtio_ccw_read_vq_conf(struct virtio_ccw_device *vcdev,
+ 				   struct ccw1 *ccw, int index)
+ {
+@@ -495,6 +505,7 @@ static struct virtqueue *virtio_ccw_setup_vq(struct virtio_device *vdev,
+ 					     struct ccw1 *ccw)
+ {
+ 	struct virtio_ccw_device *vcdev = to_vc_device(vdev);
++	bool (*notify)(struct virtqueue *vq);
+ 	int err;
+ 	struct virtqueue *vq = NULL;
+ 	struct virtio_ccw_vq_info *info;
+@@ -502,6 +513,11 @@ static struct virtqueue *virtio_ccw_setup_vq(struct virtio_device *vdev,
+ 	unsigned long flags;
+ 	bool may_reduce;
+ 
++	if (__virtio_test_bit(vdev, VIRTIO_F_NOTIFICATION_DATA))
++		notify = virtio_ccw_kvm_notify_with_data;
++	else
++		notify = virtio_ccw_kvm_notify;
++
+ 	/* Allocate queue. */
+ 	info = kzalloc(sizeof(struct virtio_ccw_vq_info), GFP_KERNEL);
+ 	if (!info) {
+@@ -524,7 +540,7 @@ static struct virtqueue *virtio_ccw_setup_vq(struct virtio_device *vdev,
+ 	may_reduce = vcdev->revision > 0;
+ 	vq = vring_create_virtqueue(i, info->num, KVM_VIRTIO_CCW_RING_ALIGN,
+ 				    vdev, true, may_reduce, ctx,
+-				    virtio_ccw_kvm_notify, callback, name);
++				    notify, callback, name);
+ 
+ 	if (!vq) {
+ 		/* For now, we fail if we can't get the requested size. */
+diff --git a/drivers/virtio/virtio_mmio.c b/drivers/virtio/virtio_mmio.c
+index 3ff746e3f24a..dd4424c14233 100644
+--- a/drivers/virtio/virtio_mmio.c
++++ b/drivers/virtio/virtio_mmio.c
+@@ -285,6 +285,16 @@ static bool vm_notify(struct virtqueue *vq)
+ 	return true;
+ }
+ 
++static bool vm_notify_with_data(struct virtqueue *vq)
++{
++	struct virtio_mmio_device *vm_dev = to_virtio_mmio_device(vq->vdev);
++	u32 data = vring_notification_data(vq);
++
++	writel(data, vm_dev->base + VIRTIO_MMIO_QUEUE_NOTIFY);
++
++	return true;
++}
++
+ /* Notify all virtqueues on an interrupt. */
+ static irqreturn_t vm_interrupt(int irq, void *opaque)
+ {
+@@ -363,12 +373,18 @@ static struct virtqueue *vm_setup_vq(struct virtio_device *vdev, unsigned int in
+ 				  const char *name, bool ctx)
+ {
+ 	struct virtio_mmio_device *vm_dev = to_virtio_mmio_device(vdev);
++	bool (*notify)(struct virtqueue *vq);
+ 	struct virtio_mmio_vq_info *info;
+ 	struct virtqueue *vq;
+ 	unsigned long flags;
+ 	unsigned int num;
+ 	int err;
+ 
++	if (__virtio_test_bit(vdev, VIRTIO_F_NOTIFICATION_DATA))
++		notify = vm_notify_with_data;
++	else
++		notify = vm_notify;
++
+ 	if (!name)
+ 		return NULL;
+ 
+@@ -397,7 +413,7 @@ static struct virtqueue *vm_setup_vq(struct virtio_device *vdev, unsigned int in
+ 
+ 	/* Create the vring */
+ 	vq = vring_create_virtqueue(index, num, VIRTIO_MMIO_VRING_ALIGN, vdev,
+-				 true, true, ctx, vm_notify, callback, name);
++				 true, true, ctx, notify, callback, name);
+ 	if (!vq) {
+ 		err = -ENOMEM;
+ 		goto error_new_virtqueue;
+diff --git a/drivers/virtio/virtio_pci_modern.c b/drivers/virtio/virtio_pci_modern.c
+index 9e496e288cfa..05deba5153bd 100644
+--- a/drivers/virtio/virtio_pci_modern.c
++++ b/drivers/virtio/virtio_pci_modern.c
+@@ -288,6 +288,15 @@ static u16 vp_config_vector(struct virtio_pci_device *vp_dev, u16 vector)
+ 	return vp_modern_config_vector(&vp_dev->mdev, vector);
+ }
+ 
++static bool vp_notify_with_data(struct virtqueue *vq)
++{
++	u32 data = vring_notification_data(vq);
++
++	iowrite32(data, (void __iomem *)vq->priv);
++
++	return true;
++}
++
+ static struct virtqueue *setup_vq(struct virtio_pci_device *vp_dev,
+ 				  struct virtio_pci_vq_info *info,
+ 				  unsigned int index,
+@@ -298,10 +307,16 @@ static struct virtqueue *setup_vq(struct virtio_pci_device *vp_dev,
+ {
+ 
+ 	struct virtio_pci_modern_device *mdev = &vp_dev->mdev;
++	bool (*notify)(struct virtqueue *vq);
+ 	struct virtqueue *vq;
+ 	u16 num;
+ 	int err;
+ 
++	if (__virtio_test_bit(&vp_dev->vdev, VIRTIO_F_NOTIFICATION_DATA))
++		notify = vp_notify_with_data;
++	else
++		notify = vp_notify;
++
+ 	if (index >= vp_modern_get_num_queues(mdev))
+ 		return ERR_PTR(-EINVAL);
+ 
+@@ -321,7 +336,7 @@ static struct virtqueue *setup_vq(struct virtio_pci_device *vp_dev,
+ 	vq = vring_create_virtqueue(index, num,
+ 				    SMP_CACHE_BYTES, &vp_dev->vdev,
+ 				    true, true, ctx,
+-				    vp_notify, callback, name);
++				    notify, callback, name);
+ 	if (!vq)
+ 		return ERR_PTR(-ENOMEM);
+ 
+diff --git a/drivers/virtio/virtio_ring.c b/drivers/virtio/virtio_ring.c
+index 4c3bb0ddeb9b..f9c6604352b4 100644
+--- a/drivers/virtio/virtio_ring.c
++++ b/drivers/virtio/virtio_ring.c
+@@ -2752,6 +2752,23 @@ void vring_del_virtqueue(struct virtqueue *_vq)
+ }
+ EXPORT_SYMBOL_GPL(vring_del_virtqueue);
+ 
++u32 vring_notification_data(struct virtqueue *_vq)
++{
++	struct vring_virtqueue *vq = to_vvq(_vq);
++	u16 next;
++
++	if (vq->packed_ring)
++		next = (vq->packed.next_avail_idx &
++				~(-(1 << VRING_PACKED_EVENT_F_WRAP_CTR))) |
++			vq->packed.avail_wrap_counter <<
++				VRING_PACKED_EVENT_F_WRAP_CTR;
++	else
++		next = vq->split.avail_idx_shadow;
++
++	return next << 16 | _vq->index;
++}
++EXPORT_SYMBOL_GPL(vring_notification_data);
++
+ /* Manipulates transport-specific feature bits. */
+ void vring_transport_features(struct virtio_device *vdev)
+ {
+@@ -2771,6 +2788,8 @@ void vring_transport_features(struct virtio_device *vdev)
+ 			break;
+ 		case VIRTIO_F_ORDER_PLATFORM:
+ 			break;
++		case VIRTIO_F_NOTIFICATION_DATA:
++			break;
+ 		default:
+ 			/* We don't understand this bit. */
+ 			__virtio_clear_bit(vdev, i);
+diff --git a/include/linux/virtio_ring.h b/include/linux/virtio_ring.h
+index 8b95b69ef694..2550c9170f4f 100644
+--- a/include/linux/virtio_ring.h
++++ b/include/linux/virtio_ring.h
+@@ -117,4 +117,6 @@ void vring_del_virtqueue(struct virtqueue *vq);
+ void vring_transport_features(struct virtio_device *vdev);
+ 
+ irqreturn_t vring_interrupt(int irq, void *_vq);
++
++u32 vring_notification_data(struct virtqueue *_vq);
+ #endif /* _LINUX_VIRTIO_RING_H */
+diff --git a/include/uapi/linux/virtio_config.h b/include/uapi/linux/virtio_config.h
+index 3c05162bc988..2c712c654165 100644
+--- a/include/uapi/linux/virtio_config.h
++++ b/include/uapi/linux/virtio_config.h
+@@ -99,6 +99,12 @@
+  */
+ #define VIRTIO_F_SR_IOV			37
+ 
++/*
++ * This feature indicates that the driver passes extra data (besides
++ * identifying the virtqueue) in its device notifications.
++ */
++#define VIRTIO_F_NOTIFICATION_DATA	38
++
+ /*
+  * This feature indicates that the driver can reset a queue individually.
+  */
+-- 
+2.35.1
 
-I completely agree that the BUG_ON() is gross, but that's an existing issue=
- that
-needs to be remedied.  And to do that, I really want to resurrect and utili=
-ze
-the KVM_BUG_ON_DATA_CORRUPTION() idea[*].
-
-[*] https://lore.kernel.org/all/Y5dax8XJV0F5adUw@google.com
