@@ -2,134 +2,167 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0BEA76C7C45
-	for <lists+kvm@lfdr.de>; Fri, 24 Mar 2023 11:11:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3EB516C7C4A
+	for <lists+kvm@lfdr.de>; Fri, 24 Mar 2023 11:14:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231630AbjCXKLb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Mar 2023 06:11:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43166 "EHLO
+        id S231513AbjCXKOJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Mar 2023 06:14:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49138 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231602AbjCXKL3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Mar 2023 06:11:29 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 206D626CEB;
-        Fri, 24 Mar 2023 03:11:18 -0700 (PDT)
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 32O8noOg023807;
-        Fri, 24 Mar 2023 10:11:18 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
- mime-version : content-transfer-encoding : in-reply-to : references : cc :
- from : to : subject : message-id : date; s=pp1;
- bh=FNofbkM5/he4zVHJN8MD3GM+MKom8lsiALn0ZYbs7CY=;
- b=nFyBrUHYzDapMBKNdCLaOJlMJIil1sguEIA3wWn47SXtLCxsKxgfSUxYLzXZeMhlrdHB
- eeGD3Qr3pPnGQv2s6otgyCHC9+mOjzHUIdwzSOdKp+pfljaW2rBMsU7kdvCyFDFkXHej
- UcQcGUE+0CiBhfIJ/sJid3aKO/Hvc2PkXbeb69M/pXgoUmB8E8nBsW2BTW5hb/4SNV4U
- Pw08dGtF3sL4Tas6gOMxWbynjfW5TzdfmTeVUHH2osOZ3Z990VP0FcmXekJvVaj5jaYR
- pgSZGmXOesVFQZ3oFRdtejqQh20vKKiBSiCOhD5WrzTGt9i2+JiDYfK5OP6a32O/InAv Ew== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3ph8pu1wk0-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 24 Mar 2023 10:11:18 +0000
-Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 32OA6IBX017623;
-        Fri, 24 Mar 2023 10:11:17 GMT
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3ph8pu1wj3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 24 Mar 2023 10:11:17 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 32NLKhFG024778;
-        Fri, 24 Mar 2023 10:11:15 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-        by ppma03ams.nl.ibm.com (PPS) with ESMTPS id 3pgxkrrpcg-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 24 Mar 2023 10:11:15 +0000
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-        by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 32OABClu41878246
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 24 Mar 2023 10:11:12 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1973B201DF;
-        Fri, 24 Mar 2023 10:11:12 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E6DB0201DC;
-        Fri, 24 Mar 2023 10:11:11 +0000 (GMT)
-Received: from t14-nrb (unknown [9.179.14.197])
-        by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Fri, 24 Mar 2023 10:11:11 +0000 (GMT)
+        with ESMTP id S231281AbjCXKOH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Mar 2023 06:14:07 -0400
+Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 276EF5275
+        for <kvm@vger.kernel.org>; Fri, 24 Mar 2023 03:14:06 -0700 (PDT)
+Received: by mail-pf1-x434.google.com with SMTP id l14so910618pfc.11
+        for <kvm@vger.kernel.org>; Fri, 24 Mar 2023 03:14:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112; t=1679652845;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=N6Vxj015pqt1W0XnDOUHqu9GT8QgN1kOUZXj43n+nL4=;
+        b=aNXD+gPhl0LovONOf1Ciny+jDjKrI0XAnkljSuC+eo9XKlqfr0dZKJYb5r0UgZSOfS
+         3ety6MLjXWM+LIySBBeCcpijAJlS4obf2d1Kg1Bp0ymqOG50Vq/6opk7tIZS6Ir8tT6a
+         Mvy92qYBhhC7n3FnAbZgPKUP+RUIaYV0u/AA5I7XrGPcd+mBWuyT3xyqOT78CWrDZEPu
+         WCEPFZl53V+7/NmSzqR6W5jdtcHxlx4HAdEInQKtKumAxXI/awGeGYm/We7/+8m4Znbl
+         7vzEGT9rc0tUaalANdeSdu/1hW4Ysii51+mgU0IG67YLmf1vNYoqmUuqwpPuoeHGvlUb
+         Q+JA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1679652845;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=N6Vxj015pqt1W0XnDOUHqu9GT8QgN1kOUZXj43n+nL4=;
+        b=aPAJFJ2tReMhHyCCYWmLUvCsBVGS4vKPT7MZ2My92htF4QdIXBluQ/4dbSJPDZWlXh
+         cBdgnJZZK6fkmOmbyJCSu8epcZQlrZKSiBMxzuqJiaMTS4ZacFx8f8d3whCLTySSdwtL
+         bjnuBm5HMJm3Ns7SaOGrNxp7G9KD/8Fj8kQJEfUZSFtKETvc4JS31gEBG0wtNey1yh5q
+         tVQmTluRXMu8w/IGqsDjr4/VsRceBB+KJCuKjhhslyAfvQW8aGSiKsXtf86AOyibpEuV
+         C3+gdKYI8EhxOCY1QuWwtHGUM7GhHFtHNjRw5YK74+OvEFqNLns7NXgZMIFORXLm/SZU
+         2QtQ==
+X-Gm-Message-State: AAQBX9fOnie6LrMDIxhb6OgLrz1Pp+dfT8oD2FMWXIldpV27nnIZIB8F
+        I49/PSAe+2gbv/6Vff2K7cE=
+X-Google-Smtp-Source: AKy350YVnV5iibdqwKaOIdDBk44LbQ0nGJPEal8htAtmGVh3WGiP7GDTSfJcPSuPsuOnQfkztwY10A==
+X-Received: by 2002:aa7:9f8f:0:b0:628:9b4:a6a2 with SMTP id z15-20020aa79f8f000000b0062809b4a6a2mr2370516pfr.15.1679652845009;
+        Fri, 24 Mar 2023 03:14:05 -0700 (PDT)
+Received: from fedlinux.. ([106.84.130.185])
+        by smtp.gmail.com with ESMTPSA id h24-20020a63df58000000b0050f85ef50d1sm8282421pgj.26.2023.03.24.03.14.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 24 Mar 2023 03:14:04 -0700 (PDT)
+From:   Sam Li <faithilikerun@gmail.com>
+To:     qemu-devel@nongnu.org
+Cc:     stefanha@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>,
+        hare@suse.de, Cornelia Huck <cohuck@redhat.com>,
+        dmitry.fomichev@wdc.com, qemu-block@nongnu.org,
+        Markus Armbruster <armbru@redhat.com>,
+        damien.lemoal@opensource.wdc.com,
+        Raphael Norwitz <raphael.norwitz@nutanix.com>,
+        Hanna Reitz <hreitz@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Kevin Wolf <kwolf@redhat.com>, kvm@vger.kernel.org,
+        Eric Blake <eblake@redhat.com>,
+        Sam Li <faithilikerun@gmail.com>
+Subject: [PATCH v9 0/5] Add zoned storage emulation to virtio-blk driver
+Date:   Fri, 24 Mar 2023 18:13:52 +0800
+Message-Id: <20230324101357.2717-1-faithilikerun@gmail.com>
+X-Mailer: git-send-email 2.39.2
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20230320085642.12251-2-pmorel@linux.ibm.com>
-References: <20230320085642.12251-1-pmorel@linux.ibm.com> <20230320085642.12251-2-pmorel@linux.ibm.com>
-Cc:     frankja@linux.ibm.com, thuth@redhat.com, kvm@vger.kernel.org,
-        imbrenda@linux.ibm.com, david@redhat.com, nsg@linux.ibm.com
-From:   Nico Boehr <nrb@linux.ibm.com>
-To:     Pierre Morel <pmorel@linux.ibm.com>, linux-s390@vger.kernel.org
-Subject: Re: [kvm-unit-tests PATCH v7 1/2] s390x: topology: Check the Perform Topology Function
-Message-ID: <167965267156.41638.18125355247583778957@t14-nrb>
-User-Agent: alot/0.8.1
-Date:   Fri, 24 Mar 2023 11:11:11 +0100
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: cQcRyIPPUGCo7dxoR_3pxXw04E7_CqQk
-X-Proofpoint-ORIG-GUID: eNdmFc7qomPXFcS7AaEfmHbOskP43TG3
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
- definitions=2023-03-24_05,2023-03-23_02,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 clxscore=1015
- bulkscore=0 spamscore=0 suspectscore=0 malwarescore=0 mlxscore=0
- priorityscore=1501 adultscore=0 lowpriorityscore=0 impostorscore=0
- mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2303200000 definitions=main-2303240079
-X-Spam-Status: No, score=-0.1 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
-        DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-        autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
+        DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Quoting Pierre Morel (2023-03-20 09:56:41)
-[...]
-> diff --git a/s390x/topology.c b/s390x/topology.c
-> new file mode 100644
-> index 0000000..ce248f1
-> --- /dev/null
-> +++ b/s390x/topology.c
-> @@ -0,0 +1,180 @@
-> +/* SPDX-License-Identifier: GPL-2.0-only */
-> +/*
-> + * CPU Topology
-> + *
-> + * Copyright IBM Corp. 2022
-> + *
-> + * Authors:
-> + *  Pierre Morel <pmorel@linux.ibm.com>
-> + */
-> +
-> +#include <libcflat.h>
-> +#include <asm/page.h>
-> +#include <asm/asm-offsets.h>
-> +#include <asm/interrupt.h>
-> +#include <asm/facility.h>
-> +#include <smp.h>
-> +#include <sclp.h>
-> +#include <s390x/hardware.h>
-> +
-> +#define PTF_REQ_HORIZONTAL     0
-> +#define PTF_REQ_VERTICAL       1
-> +#define PTF_REQ_CHECK          2
+This patch adds zoned storage emulation to the virtio-blk driver.
 
-These are all function codes, so how about we name these defines PTF_FC_...
+The patch implements the virtio-blk ZBD support standardization that is
+recently accepted by virtio-spec. The link to related commit is at
 
-and since PTF_REQ_CHECK doesn't request anything we should rename to PTF_FC=
-_CHECK
+https://github.com/oasis-tcs/virtio-spec/commit/b4e8efa0fa6c8d844328090ad15db65af8d7d981
 
-[...]
-> +static struct {
-> +       const char *name;
-> +       void (*func)(void);
-> +} tests[] =3D {
-> +       { "PTF", test_ptf},
-missing space              ^
+The Linux zoned device code that implemented by Dmitry Fomichev has been
+released at the latest Linux version v6.3-rc1.
+
+Aside: adding zoned=on alike options to virtio-blk device will be
+considered in following-up plan.
+
+v9:
+- address review comments
+  * add docs for zoned emulation use case [Matias]
+  * add the zoned feature bit to qmp monitor [Matias]
+  * add the version number for newly added configs of accounting [Markus]
+
+v8:
+- address Stefan's review comments
+  * rm aio_context_acquire/release in handle_req
+  * rename function return type
+  * rename BLOCK_ACCT_APPEND to BLOCK_ACCT_ZONE_APPEND for clarity
+
+v7:
+- update headers to v6.3-rc1
+
+v6:
+- address Stefan's review comments
+  * add accounting for zone append operation
+  * fix in_iov usage in handle_request, error handling and typos
+
+v5:
+- address Stefan's review comments
+  * restore the way writing zone append result to buffer
+  * fix error checking case and other errands
+
+v4:
+- change the way writing zone append request result to buffer
+- change zone state, zone type value of virtio_blk_zone_descriptor
+- add trace events for new zone APIs
+
+v3:
+- use qemuio_from_buffer to write status bit [Stefan]
+- avoid using req->elem directly [Stefan]
+- fix error checkings and memory leak [Stefan]
+
+v2:
+- change units of emulated zone op coresponding to block layer APIs
+- modify error checking cases [Stefan, Damien]
+
+v1:
+- add zoned storage emulation
+
+Sam Li (5):
+  include: update virtio_blk headers to v6.3-rc1
+  virtio-blk: add zoned storage emulation for zoned devices
+  block: add accounting for zone append operation
+  virtio-blk: add some trace events for zoned emulation
+  docs/zoned-storage:add zoned emulation use case
+
+ block/qapi-sysemu.c                          |  11 +
+ block/qapi.c                                 |  18 +
+ docs/devel/zoned-storage.rst                 |  17 +
+ hw/block/trace-events                        |   7 +
+ hw/block/virtio-blk-common.c                 |   2 +
+ hw/block/virtio-blk.c                        | 405 +++++++++++++++++++
+ hw/virtio/virtio-qmp.c                       |   2 +
+ include/block/accounting.h                   |   1 +
+ include/standard-headers/drm/drm_fourcc.h    |  12 +
+ include/standard-headers/linux/ethtool.h     |  48 ++-
+ include/standard-headers/linux/fuse.h        |  45 ++-
+ include/standard-headers/linux/pci_regs.h    |   1 +
+ include/standard-headers/linux/vhost_types.h |   2 +
+ include/standard-headers/linux/virtio_blk.h  | 105 +++++
+ linux-headers/asm-arm64/kvm.h                |   1 +
+ linux-headers/asm-x86/kvm.h                  |  34 +-
+ linux-headers/linux/kvm.h                    |   9 +
+ linux-headers/linux/vfio.h                   |  15 +-
+ linux-headers/linux/vhost.h                  |   8 +
+ qapi/block-core.json                         |  68 +++-
+ qapi/block.json                              |   4 +
+ 21 files changed, 794 insertions(+), 21 deletions(-)
+
+-- 
+2.39.2
+
