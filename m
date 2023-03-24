@@ -2,624 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CA9656C7CEF
-	for <lists+kvm@lfdr.de>; Fri, 24 Mar 2023 11:59:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1617D6C7D27
+	for <lists+kvm@lfdr.de>; Fri, 24 Mar 2023 12:23:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229945AbjCXK7e (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Mar 2023 06:59:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51422 "EHLO
+        id S231522AbjCXLX3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Mar 2023 07:23:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43146 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230213AbjCXK7b (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Mar 2023 06:59:31 -0400
-Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 205AF244A6
-        for <kvm@vger.kernel.org>; Fri, 24 Mar 2023 03:59:30 -0700 (PDT)
-Received: by mail-pl1-x631.google.com with SMTP id kc4so1449971plb.10
-        for <kvm@vger.kernel.org>; Fri, 24 Mar 2023 03:59:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1679655569;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=DrzF0vDTto0xuqyb7Vf47oN2UnXwHNqODGgyz6+yxfw=;
-        b=iTSTvgvZs1a8ENwpK28YwNyDRekl1ICD7llePoaoSPH3Anz3BwVjXU4/2DcNLN52to
-         xnMSHVIsee2x5+KbUdMw8ppatL1IRZ+tD3QQvWvydcwSVt7e8nX93vWAdxiMBpcaENhp
-         UuRQCZjN25jMFjdt7zM7Mbfuu51UXya5ecM7fq//sKVkiBUGLDIhdPi4gwzfDDqH6rHv
-         kcfXpF/1vVRwlSelhzZ3+Hyg1/rxhsYjUIhKFn0jLcRv1Jrw1dAHHZMeIjdr0wggx6D2
-         5sUP11u+W7gTjtI1OXrQRlGLvpWbKNNRt5Bp8tSR/BJb5krf+c7OTSEieoWe1Q6KaVjE
-         i+7g==
+        with ESMTP id S229830AbjCXLX2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Mar 2023 07:23:28 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6632B25B90
+        for <kvm@vger.kernel.org>; Fri, 24 Mar 2023 04:22:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1679656958;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=y31Rz44TEwSQC9KX97iibt6OL6RtzpKo/j/apW3i2Tc=;
+        b=jS8NDhfPoO71kgJWu4KrUmHBwNdQFR46UUSrsu9AnlMqtbw4Gf/4b4BlClRgLby+R1hbCD
+        egdRP17dO74J27yS1yJGli7CdveO5zk+mLBbJbWQuWswHNq68cnH0kUD0I3/UqpZg4nlEx
+        1x/O7IcW+fUW5Py17GSxp/WxnuUl2zI=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-104-_IZDBWegOzu7JrF-dXBADg-1; Fri, 24 Mar 2023 07:22:37 -0400
+X-MC-Unique: _IZDBWegOzu7JrF-dXBADg-1
+Received: by mail-ed1-f71.google.com with SMTP id k30-20020a50ce5e000000b00500544ebfb1so2742707edj.7
+        for <kvm@vger.kernel.org>; Fri, 24 Mar 2023 04:22:37 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679655569;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=DrzF0vDTto0xuqyb7Vf47oN2UnXwHNqODGgyz6+yxfw=;
-        b=CpzcJ593Db2ytpfQtFT7/Z1oeARa6fLX2nDQwJciY1CYzO1hN97DHF8O3EAqvDLQMn
-         Pb4bRsJTwpGCnu8lfPMOmHRdb52EZXrD/3XAaoxdfBi2iFzKQHucP00JFcgCHywBa11s
-         ux6QtW4uhxkj+rD7AquEIQ2sN14PyQtozMVJQImylBRNpMB16++W99CwHGEek8r3jKsr
-         4+sSdtvcsiYpkDWyblPEFsLLSL/hPQ2pBZEEf8n9ntUuZLhbVHipHagmaJoE5/iHQpRm
-         UlXmt/FErniczEcEbtR3IzeXk1/129EjJ3y2hwKQkHVguPe2K+gsjTkGd+tjHPTaxHFq
-         3/cw==
-X-Gm-Message-State: AAQBX9fnH9F6oq5xh5xCoJQcN+Ko3bHbE97TtmU4HlZuKRdjRnURO9KD
-        pMKAS3/PokkPnOxsx6B1H1I=
-X-Google-Smtp-Source: AKy350bky3yj/PufZAoKL9s42Jg7emXaq3WZ+cxU2OaPtA9N8aQpKvT3QLPL0DhjvGmXbU+k5q+EvQ==
-X-Received: by 2002:a17:902:f546:b0:19c:be57:9c82 with SMTP id h6-20020a170902f54600b0019cbe579c82mr2795661plf.65.1679655569051;
-        Fri, 24 Mar 2023 03:59:29 -0700 (PDT)
-Received: from fedlinux.. ([106.84.130.185])
-        by smtp.gmail.com with ESMTPSA id l21-20020a656815000000b004eecc3080f8sm13264344pgt.29.2023.03.24.03.59.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 24 Mar 2023 03:59:28 -0700 (PDT)
-From:   Sam Li <faithilikerun@gmail.com>
-To:     qemu-devel@nongnu.org
-Cc:     Raphael Norwitz <raphael.norwitz@nutanix.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>, dmitry.fomichev@wdc.com,
-        damien.lemoal@opensource.wdc.com, kvm@vger.kernel.org,
-        Markus Armbruster <armbru@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>, qemu-block@nongnu.org,
-        hare@suse.de, Cornelia Huck <cohuck@redhat.com>,
-        Hanna Reitz <hreitz@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>,
-        Sam Li <faithilikerun@gmail.com>
-Subject: [PATCH v9 1/5] include: update virtio_blk headers to v6.3-rc1
-Date:   Fri, 24 Mar 2023 18:59:16 +0800
-Message-Id: <20230324105916.3910-1-faithilikerun@gmail.com>
-X-Mailer: git-send-email 2.39.2
+        d=1e100.net; s=20210112; t=1679656956;
+        h=content-transfer-encoding:in-reply-to:subject:from:references:cc:to
+         :content-language:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=y31Rz44TEwSQC9KX97iibt6OL6RtzpKo/j/apW3i2Tc=;
+        b=LcCR1qoB5e+5PE2e2h504cgtsPTZnQe5I+7ZbTxvV5MTDPCkkGnJzIkgIXJjmB3Up2
+         U6li78LEkqJaPrIJjUhboarFduSH1Ygrxg/wuio9ZxiNoCcKnb/mKqWukz3o1fFITLVI
+         rmoTYaDjIMB47gea3yfHNvR4dx9FVBDQ0u/LMAeIijUCSHBZjAHmd707jYwRKlLLMotF
+         lzuINz4zqk7YGmJtq2O9G6rGnU9X/p1uIVMFuEzNQ5S93VqkvejHj6ExAsaUvsT2XyYP
+         EyAT6vsE2Pj4yR+m0ffM/ZcHGm/JloC8R8Up41sbV1sRt4NbaeSY/tmkQSKd0EXv4SZr
+         lfeg==
+X-Gm-Message-State: AAQBX9eq71HLC4+JaFk0KlRpK+xYI58UfVuplFHH6NCjYByK2/GTPDiR
+        RTIg6BlBsTIsHmj2WSaNZhcLpll14R++rPyOUMTk4Zd3dPGUwPr5/wX4wY1I3iw+prRr9w7SBWC
+        v/l1QOU8ARwr6
+X-Received: by 2002:a05:6402:6c1:b0:4fb:4354:ab2e with SMTP id n1-20020a05640206c100b004fb4354ab2emr2452274edy.28.1679656956136;
+        Fri, 24 Mar 2023 04:22:36 -0700 (PDT)
+X-Google-Smtp-Source: AKy350Z6fyfd5gCMg/7AcVDCAIEh81DrDIzmgBAv1m67pEiILxvBRDCw/izCGtzBehGd1wRQT7d5qg==
+X-Received: by 2002:a05:6402:6c1:b0:4fb:4354:ab2e with SMTP id n1-20020a05640206c100b004fb4354ab2emr2452254edy.28.1679656955824;
+        Fri, 24 Mar 2023 04:22:35 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
+        by smtp.googlemail.com with ESMTPSA id s30-20020a50ab1e000000b004c5d1a15bd5sm10469869edc.69.2023.03.24.04.22.33
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 24 Mar 2023 04:22:34 -0700 (PDT)
+Message-ID: <723bf800-9666-dfb6-e7cc-653adb0203b4@redhat.com>
+Date:   Fri, 24 Mar 2023 12:22:32 +0100
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
-        DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-        version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.8.0
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>,
+        Simon Veith <sveith@amazon.de>
+Cc:     dwmw2@infradead.org, dff@amazon.com, jmattson@google.com,
+        joro@8bytes.org, kvm@vger.kernel.org, oupton@google.com,
+        tglx@linutronix.de, vkuznets@redhat.com, wanpengli@tencent.com
+References: <f3a957786a82bdd41fe558c40ec93c3fb9ea2ee2.camel@infradead.org>
+ <20230202165950.483430-1-sveith@amazon.de> <ZBIjImc+xEMhJkQM@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH v2] KVM: x86: add KVM_VCPU_TSC_VALUE attribute
+In-Reply-To: <ZBIjImc+xEMhJkQM@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Use scripts/update-linux-headers.sh to update headers to 6.3-rc1.
+On 3/15/23 20:57, Sean Christopherson wrote:
+>> In the case of live migration, using the KVM_VCPU_TSC_OFFSET approach to
+>> preserve the TSC value and apply a known offset would require
+>> duplicating the TSC scaling computations in userspace to account for
+>> frequency differences between source and destination TSCs.
+>>
+>> Hence, if userspace wants to set the TSC to some known value without
+>> having to deal with TSC scaling, and while also being resilient against
+>> scheduling delays, neither KVM_SET_MSRS nor KVM_VCPU_TSC_VALUE are
+>> suitable options.
+>
+> Requiring userspace to handle certain aspects of TSC scaling doesn't seem
+> particularly onerous, at least not relative to all the other time insanity.  In
+> other words, why should KVM take on more complexity and a mostly-redundant uAPI?
 
-Signed-off-by: Sam Li <faithilikerun@gmail.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Reviewed-by: Dmitry Fomichev <dmitry.fomichev@wdc.com>
----
- include/standard-headers/drm/drm_fourcc.h    |  12 +++
- include/standard-headers/linux/ethtool.h     |  48 ++++++++-
- include/standard-headers/linux/fuse.h        |  45 +++++++-
- include/standard-headers/linux/pci_regs.h    |   1 +
- include/standard-headers/linux/vhost_types.h |   2 +
- include/standard-headers/linux/virtio_blk.h  | 105 +++++++++++++++++++
- linux-headers/asm-arm64/kvm.h                |   1 +
- linux-headers/asm-x86/kvm.h                  |  34 +++++-
- linux-headers/linux/kvm.h                    |   9 ++
- linux-headers/linux/vfio.h                   |  15 +--
- linux-headers/linux/vhost.h                  |   8 ++
- 11 files changed, 270 insertions(+), 10 deletions(-)
+Yeah, it seems like the problem is that KVM_GET_CLOCK return host 
+unscaled TSC units (which was done because the guest TSC frequency is at 
+least in theory per-CPU, and KVM_GET_CLOCK is a vm ioctl)?
 
-diff --git a/include/standard-headers/drm/drm_fourcc.h b/include/standard-headers/drm/drm_fourcc.h
-index 69cab17b38..dc3e6112c1 100644
---- a/include/standard-headers/drm/drm_fourcc.h
-+++ b/include/standard-headers/drm/drm_fourcc.h
-@@ -87,6 +87,18 @@ extern "C" {
-  *
-  * The authoritative list of format modifier codes is found in
-  * `include/uapi/drm/drm_fourcc.h`
-+ *
-+ * Open Source User Waiver
-+ * -----------------------
-+ *
-+ * Because this is the authoritative source for pixel formats and modifiers
-+ * referenced by GL, Vulkan extensions and other standards and hence used both
-+ * by open source and closed source driver stacks, the usual requirement for an
-+ * upstream in-kernel or open source userspace user does not apply.
-+ *
-+ * To ensure, as much as feasible, compatibility across stacks and avoid
-+ * confusion with incompatible enumerations stakeholders for all relevant driver
-+ * stacks should approve additions.
-  */
- 
- #define fourcc_code(a, b, c, d) ((uint32_t)(a) | ((uint32_t)(b) << 8) | \
-diff --git a/include/standard-headers/linux/ethtool.h b/include/standard-headers/linux/ethtool.h
-index 87176ab075..99fcddf04f 100644
---- a/include/standard-headers/linux/ethtool.h
-+++ b/include/standard-headers/linux/ethtool.h
-@@ -711,6 +711,24 @@ enum ethtool_stringset {
- 	ETH_SS_COUNT
- };
- 
-+/**
-+ * enum ethtool_mac_stats_src - source of ethtool MAC statistics
-+ * @ETHTOOL_MAC_STATS_SRC_AGGREGATE:
-+ *	if device supports a MAC merge layer, this retrieves the aggregate
-+ *	statistics of the eMAC and pMAC. Otherwise, it retrieves just the
-+ *	statistics of the single (express) MAC.
-+ * @ETHTOOL_MAC_STATS_SRC_EMAC:
-+ *	if device supports a MM layer, this retrieves the eMAC statistics.
-+ *	Otherwise, it retrieves the statistics of the single (express) MAC.
-+ * @ETHTOOL_MAC_STATS_SRC_PMAC:
-+ *	if device supports a MM layer, this retrieves the pMAC statistics.
-+ */
-+enum ethtool_mac_stats_src {
-+	ETHTOOL_MAC_STATS_SRC_AGGREGATE,
-+	ETHTOOL_MAC_STATS_SRC_EMAC,
-+	ETHTOOL_MAC_STATS_SRC_PMAC,
-+};
-+
- /**
-  * enum ethtool_module_power_mode_policy - plug-in module power mode policy
-  * @ETHTOOL_MODULE_POWER_MODE_POLICY_HIGH: Module is always in high power mode.
-@@ -779,6 +797,31 @@ enum ethtool_podl_pse_pw_d_status {
- 	ETHTOOL_PODL_PSE_PW_D_STATUS_ERROR,
- };
- 
-+/**
-+ * enum ethtool_mm_verify_status - status of MAC Merge Verify function
-+ * @ETHTOOL_MM_VERIFY_STATUS_UNKNOWN:
-+ *	verification status is unknown
-+ * @ETHTOOL_MM_VERIFY_STATUS_INITIAL:
-+ *	the 802.3 Verify State diagram is in the state INIT_VERIFICATION
-+ * @ETHTOOL_MM_VERIFY_STATUS_VERIFYING:
-+ *	the Verify State diagram is in the state VERIFICATION_IDLE,
-+ *	SEND_VERIFY or WAIT_FOR_RESPONSE
-+ * @ETHTOOL_MM_VERIFY_STATUS_SUCCEEDED:
-+ *	indicates that the Verify State diagram is in the state VERIFIED
-+ * @ETHTOOL_MM_VERIFY_STATUS_FAILED:
-+ *	the Verify State diagram is in the state VERIFY_FAIL
-+ * @ETHTOOL_MM_VERIFY_STATUS_DISABLED:
-+ *	verification of preemption operation is disabled
-+ */
-+enum ethtool_mm_verify_status {
-+	ETHTOOL_MM_VERIFY_STATUS_UNKNOWN,
-+	ETHTOOL_MM_VERIFY_STATUS_INITIAL,
-+	ETHTOOL_MM_VERIFY_STATUS_VERIFYING,
-+	ETHTOOL_MM_VERIFY_STATUS_SUCCEEDED,
-+	ETHTOOL_MM_VERIFY_STATUS_FAILED,
-+	ETHTOOL_MM_VERIFY_STATUS_DISABLED,
-+};
-+
- /**
-  * struct ethtool_gstrings - string set for data tagging
-  * @cmd: Command number = %ETHTOOL_GSTRINGS
-@@ -1183,7 +1226,7 @@ struct ethtool_rxnfc {
- 		uint32_t			rule_cnt;
- 		uint32_t			rss_context;
- 	};
--	uint32_t				rule_locs[0];
-+	uint32_t				rule_locs[];
- };
- 
- 
-@@ -1741,6 +1784,9 @@ enum ethtool_link_mode_bit_indices {
- 	ETHTOOL_LINK_MODE_800000baseDR8_2_Full_BIT	 = 96,
- 	ETHTOOL_LINK_MODE_800000baseSR8_Full_BIT	 = 97,
- 	ETHTOOL_LINK_MODE_800000baseVR8_Full_BIT	 = 98,
-+	ETHTOOL_LINK_MODE_10baseT1S_Full_BIT		 = 99,
-+	ETHTOOL_LINK_MODE_10baseT1S_Half_BIT		 = 100,
-+	ETHTOOL_LINK_MODE_10baseT1S_P2MP_Half_BIT	 = 101,
- 
- 	/* must be last entry */
- 	__ETHTOOL_LINK_MODE_MASK_NBITS
-diff --git a/include/standard-headers/linux/fuse.h b/include/standard-headers/linux/fuse.h
-index a1af78d989..35c131a107 100644
---- a/include/standard-headers/linux/fuse.h
-+++ b/include/standard-headers/linux/fuse.h
-@@ -201,6 +201,11 @@
-  *  7.38
-  *  - add FUSE_EXPIRE_ONLY flag to fuse_notify_inval_entry
-  *  - add FOPEN_PARALLEL_DIRECT_WRITES
-+ *  - add total_extlen to fuse_in_header
-+ *  - add FUSE_MAX_NR_SECCTX
-+ *  - add extension header
-+ *  - add FUSE_EXT_GROUPS
-+ *  - add FUSE_CREATE_SUPP_GROUP
-  */
- 
- #ifndef _LINUX_FUSE_H
-@@ -358,6 +363,8 @@ struct fuse_file_lock {
-  * FUSE_SECURITY_CTX:	add security context to create, mkdir, symlink, and
-  *			mknod
-  * FUSE_HAS_INODE_DAX:  use per inode DAX
-+ * FUSE_CREATE_SUPP_GROUP: add supplementary group info to create, mkdir,
-+ *			symlink and mknod (single group that matches parent)
-  */
- #define FUSE_ASYNC_READ		(1 << 0)
- #define FUSE_POSIX_LOCKS	(1 << 1)
-@@ -394,6 +401,7 @@ struct fuse_file_lock {
- /* bits 32..63 get shifted down 32 bits into the flags2 field */
- #define FUSE_SECURITY_CTX	(1ULL << 32)
- #define FUSE_HAS_INODE_DAX	(1ULL << 33)
-+#define FUSE_CREATE_SUPP_GROUP	(1ULL << 34)
- 
- /**
-  * CUSE INIT request/reply flags
-@@ -499,6 +507,17 @@ struct fuse_file_lock {
-  */
- #define FUSE_EXPIRE_ONLY		(1 << 0)
- 
-+/**
-+ * extension type
-+ * FUSE_MAX_NR_SECCTX: maximum value of &fuse_secctx_header.nr_secctx
-+ * FUSE_EXT_GROUPS: &fuse_supp_groups extension
-+ */
-+enum fuse_ext_type {
-+	/* Types 0..31 are reserved for fuse_secctx_header */
-+	FUSE_MAX_NR_SECCTX	= 31,
-+	FUSE_EXT_GROUPS		= 32,
-+};
-+
- enum fuse_opcode {
- 	FUSE_LOOKUP		= 1,
- 	FUSE_FORGET		= 2,  /* no reply */
-@@ -882,7 +901,8 @@ struct fuse_in_header {
- 	uint32_t	uid;
- 	uint32_t	gid;
- 	uint32_t	pid;
--	uint32_t	padding;
-+	uint16_t	total_extlen; /* length of extensions in 8byte units */
-+	uint16_t	padding;
- };
- 
- struct fuse_out_header {
-@@ -1043,4 +1063,27 @@ struct fuse_secctx_header {
- 	uint32_t	nr_secctx;
- };
- 
-+/**
-+ * struct fuse_ext_header - extension header
-+ * @size: total size of this extension including this header
-+ * @type: type of extension
-+ *
-+ * This is made compatible with fuse_secctx_header by using type values >
-+ * FUSE_MAX_NR_SECCTX
-+ */
-+struct fuse_ext_header {
-+	uint32_t	size;
-+	uint32_t	type;
-+};
-+
-+/**
-+ * struct fuse_supp_groups - Supplementary group extension
-+ * @nr_groups: number of supplementary groups
-+ * @groups: flexible array of group IDs
-+ */
-+struct fuse_supp_groups {
-+	uint32_t	nr_groups;
-+	uint32_t	groups[];
-+};
-+
- #endif /* _LINUX_FUSE_H */
-diff --git a/include/standard-headers/linux/pci_regs.h b/include/standard-headers/linux/pci_regs.h
-index 85ab127881..dc2000e0fe 100644
---- a/include/standard-headers/linux/pci_regs.h
-+++ b/include/standard-headers/linux/pci_regs.h
-@@ -693,6 +693,7 @@
- #define  PCI_EXP_LNKCTL2_TX_MARGIN	0x0380 /* Transmit Margin */
- #define  PCI_EXP_LNKCTL2_HASD		0x0020 /* HW Autonomous Speed Disable */
- #define PCI_EXP_LNKSTA2		0x32	/* Link Status 2 */
-+#define  PCI_EXP_LNKSTA2_FLIT		0x0400 /* Flit Mode Status */
- #define PCI_CAP_EXP_ENDPOINT_SIZEOF_V2	0x32	/* end of v2 EPs w/ link */
- #define PCI_EXP_SLTCAP2		0x34	/* Slot Capabilities 2 */
- #define  PCI_EXP_SLTCAP2_IBPD	0x00000001 /* In-band PD Disable Supported */
-diff --git a/include/standard-headers/linux/vhost_types.h b/include/standard-headers/linux/vhost_types.h
-index c41a73fe36..88600e2d9f 100644
---- a/include/standard-headers/linux/vhost_types.h
-+++ b/include/standard-headers/linux/vhost_types.h
-@@ -163,5 +163,7 @@ struct vhost_vdpa_iova_range {
- #define VHOST_BACKEND_F_IOTLB_ASID  0x3
- /* Device can be suspended */
- #define VHOST_BACKEND_F_SUSPEND  0x4
-+/* Device can be resumed */
-+#define VHOST_BACKEND_F_RESUME  0x5
- 
- #endif
-diff --git a/include/standard-headers/linux/virtio_blk.h b/include/standard-headers/linux/virtio_blk.h
-index e81715cd70..7155b1a470 100644
---- a/include/standard-headers/linux/virtio_blk.h
-+++ b/include/standard-headers/linux/virtio_blk.h
-@@ -41,6 +41,7 @@
- #define VIRTIO_BLK_F_DISCARD	13	/* DISCARD is supported */
- #define VIRTIO_BLK_F_WRITE_ZEROES	14	/* WRITE ZEROES is supported */
- #define VIRTIO_BLK_F_SECURE_ERASE	16 /* Secure Erase is supported */
-+#define VIRTIO_BLK_F_ZONED		17	/* Zoned block device */
- 
- /* Legacy feature bits */
- #ifndef VIRTIO_BLK_NO_LEGACY
-@@ -135,6 +136,16 @@ struct virtio_blk_config {
- 	/* Secure erase commands must be aligned to this number of sectors. */
- 	__virtio32 secure_erase_sector_alignment;
- 
-+	/* Zoned block device characteristics (if VIRTIO_BLK_F_ZONED) */
-+	struct virtio_blk_zoned_characteristics {
-+		uint32_t zone_sectors;
-+		uint32_t max_open_zones;
-+		uint32_t max_active_zones;
-+		uint32_t max_append_sectors;
-+		uint32_t write_granularity;
-+		uint8_t model;
-+		uint8_t unused2[3];
-+	} zoned;
- } QEMU_PACKED;
- 
- /*
-@@ -172,6 +183,27 @@ struct virtio_blk_config {
- /* Secure erase command */
- #define VIRTIO_BLK_T_SECURE_ERASE	14
- 
-+/* Zone append command */
-+#define VIRTIO_BLK_T_ZONE_APPEND    15
-+
-+/* Report zones command */
-+#define VIRTIO_BLK_T_ZONE_REPORT    16
-+
-+/* Open zone command */
-+#define VIRTIO_BLK_T_ZONE_OPEN      18
-+
-+/* Close zone command */
-+#define VIRTIO_BLK_T_ZONE_CLOSE     20
-+
-+/* Finish zone command */
-+#define VIRTIO_BLK_T_ZONE_FINISH    22
-+
-+/* Reset zone command */
-+#define VIRTIO_BLK_T_ZONE_RESET     24
-+
-+/* Reset All zones command */
-+#define VIRTIO_BLK_T_ZONE_RESET_ALL 26
-+
- #ifndef VIRTIO_BLK_NO_LEGACY
- /* Barrier before this op. */
- #define VIRTIO_BLK_T_BARRIER	0x80000000
-@@ -191,6 +223,72 @@ struct virtio_blk_outhdr {
- 	__virtio64 sector;
- };
- 
-+/*
-+ * Supported zoned device models.
-+ */
-+
-+/* Regular block device */
-+#define VIRTIO_BLK_Z_NONE      0
-+/* Host-managed zoned device */
-+#define VIRTIO_BLK_Z_HM        1
-+/* Host-aware zoned device */
-+#define VIRTIO_BLK_Z_HA        2
-+
-+/*
-+ * Zone descriptor. A part of VIRTIO_BLK_T_ZONE_REPORT command reply.
-+ */
-+struct virtio_blk_zone_descriptor {
-+	/* Zone capacity */
-+	uint64_t z_cap;
-+	/* The starting sector of the zone */
-+	uint64_t z_start;
-+	/* Zone write pointer position in sectors */
-+	uint64_t z_wp;
-+	/* Zone type */
-+	uint8_t z_type;
-+	/* Zone state */
-+	uint8_t z_state;
-+	uint8_t reserved[38];
-+};
-+
-+struct virtio_blk_zone_report {
-+	uint64_t nr_zones;
-+	uint8_t reserved[56];
-+	struct virtio_blk_zone_descriptor zones[];
-+};
-+
-+/*
-+ * Supported zone types.
-+ */
-+
-+/* Conventional zone */
-+#define VIRTIO_BLK_ZT_CONV         1
-+/* Sequential Write Required zone */
-+#define VIRTIO_BLK_ZT_SWR          2
-+/* Sequential Write Preferred zone */
-+#define VIRTIO_BLK_ZT_SWP          3
-+
-+/*
-+ * Zone states that are available for zones of all types.
-+ */
-+
-+/* Not a write pointer (conventional zones only) */
-+#define VIRTIO_BLK_ZS_NOT_WP       0
-+/* Empty */
-+#define VIRTIO_BLK_ZS_EMPTY        1
-+/* Implicitly Open */
-+#define VIRTIO_BLK_ZS_IOPEN        2
-+/* Explicitly Open */
-+#define VIRTIO_BLK_ZS_EOPEN        3
-+/* Closed */
-+#define VIRTIO_BLK_ZS_CLOSED       4
-+/* Read-Only */
-+#define VIRTIO_BLK_ZS_RDONLY       13
-+/* Full */
-+#define VIRTIO_BLK_ZS_FULL         14
-+/* Offline */
-+#define VIRTIO_BLK_ZS_OFFLINE      15
-+
- /* Unmap this range (only valid for write zeroes command) */
- #define VIRTIO_BLK_WRITE_ZEROES_FLAG_UNMAP	0x00000001
- 
-@@ -217,4 +315,11 @@ struct virtio_scsi_inhdr {
- #define VIRTIO_BLK_S_OK		0
- #define VIRTIO_BLK_S_IOERR	1
- #define VIRTIO_BLK_S_UNSUPP	2
-+
-+/* Error codes that are specific to zoned block devices */
-+#define VIRTIO_BLK_S_ZONE_INVALID_CMD     3
-+#define VIRTIO_BLK_S_ZONE_UNALIGNED_WP    4
-+#define VIRTIO_BLK_S_ZONE_OPEN_RESOURCE   5
-+#define VIRTIO_BLK_S_ZONE_ACTIVE_RESOURCE 6
-+
- #endif /* _LINUX_VIRTIO_BLK_H */
-diff --git a/linux-headers/asm-arm64/kvm.h b/linux-headers/asm-arm64/kvm.h
-index a7cfefb3a8..d7e7bb885e 100644
---- a/linux-headers/asm-arm64/kvm.h
-+++ b/linux-headers/asm-arm64/kvm.h
-@@ -109,6 +109,7 @@ struct kvm_regs {
- #define KVM_ARM_VCPU_SVE		4 /* enable SVE for this CPU */
- #define KVM_ARM_VCPU_PTRAUTH_ADDRESS	5 /* VCPU uses address authentication */
- #define KVM_ARM_VCPU_PTRAUTH_GENERIC	6 /* VCPU uses generic authentication */
-+#define KVM_ARM_VCPU_HAS_EL2		7 /* Support nested virtualization */
- 
- struct kvm_vcpu_init {
- 	__u32 target;
-diff --git a/linux-headers/asm-x86/kvm.h b/linux-headers/asm-x86/kvm.h
-index 2747d2ce14..2937e7bf69 100644
---- a/linux-headers/asm-x86/kvm.h
-+++ b/linux-headers/asm-x86/kvm.h
-@@ -9,6 +9,7 @@
- 
- #include <linux/types.h>
- #include <linux/ioctl.h>
-+#include <linux/stddef.h>
- 
- #define KVM_PIO_PAGE_OFFSET 1
- #define KVM_COALESCED_MMIO_PAGE_OFFSET 2
-@@ -505,8 +506,8 @@ struct kvm_nested_state {
- 	 * KVM_{GET,PUT}_NESTED_STATE ioctl values.
- 	 */
- 	union {
--		struct kvm_vmx_nested_state_data vmx[0];
--		struct kvm_svm_nested_state_data svm[0];
-+		__DECLARE_FLEX_ARRAY(struct kvm_vmx_nested_state_data, vmx);
-+		__DECLARE_FLEX_ARRAY(struct kvm_svm_nested_state_data, svm);
- 	} data;
- };
- 
-@@ -523,6 +524,35 @@ struct kvm_pmu_event_filter {
- #define KVM_PMU_EVENT_ALLOW 0
- #define KVM_PMU_EVENT_DENY 1
- 
-+#define KVM_PMU_EVENT_FLAG_MASKED_EVENTS BIT(0)
-+#define KVM_PMU_EVENT_FLAGS_VALID_MASK (KVM_PMU_EVENT_FLAG_MASKED_EVENTS)
-+
-+/*
-+ * Masked event layout.
-+ * Bits   Description
-+ * ----   -----------
-+ * 7:0    event select (low bits)
-+ * 15:8   umask match
-+ * 31:16  unused
-+ * 35:32  event select (high bits)
-+ * 36:54  unused
-+ * 55     exclude bit
-+ * 63:56  umask mask
-+ */
-+
-+#define KVM_PMU_ENCODE_MASKED_ENTRY(event_select, mask, match, exclude) \
-+	(((event_select) & 0xFFULL) | (((event_select) & 0XF00ULL) << 24) | \
-+	(((mask) & 0xFFULL) << 56) | \
-+	(((match) & 0xFFULL) << 8) | \
-+	((__u64)(!!(exclude)) << 55))
-+
-+#define KVM_PMU_MASKED_ENTRY_EVENT_SELECT \
-+	(GENMASK_ULL(7, 0) | GENMASK_ULL(35, 32))
-+#define KVM_PMU_MASKED_ENTRY_UMASK_MASK		(GENMASK_ULL(63, 56))
-+#define KVM_PMU_MASKED_ENTRY_UMASK_MATCH	(GENMASK_ULL(15, 8))
-+#define KVM_PMU_MASKED_ENTRY_EXCLUDE		(BIT_ULL(55))
-+#define KVM_PMU_MASKED_ENTRY_UMASK_MASK_SHIFT	(56)
-+
- /* for KVM_{GET,SET,HAS}_DEVICE_ATTR */
- #define KVM_VCPU_TSC_CTRL 0 /* control group for the timestamp counter (TSC) */
- #define   KVM_VCPU_TSC_OFFSET 0 /* attribute for the TSC offset */
-diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
-index 1e2c16cfe3..599de3c6e3 100644
---- a/linux-headers/linux/kvm.h
-+++ b/linux-headers/linux/kvm.h
-@@ -581,6 +581,8 @@ struct kvm_s390_mem_op {
- 		struct {
- 			__u8 ar;	/* the access register number */
- 			__u8 key;	/* access key, ignored if flag unset */
-+			__u8 pad1[6];	/* ignored */
-+			__u64 old_addr;	/* ignored if cmpxchg flag unset */
- 		};
- 		__u32 sida_offset; /* offset into the sida */
- 		__u8 reserved[32]; /* ignored */
-@@ -593,11 +595,17 @@ struct kvm_s390_mem_op {
- #define KVM_S390_MEMOP_SIDA_WRITE	3
- #define KVM_S390_MEMOP_ABSOLUTE_READ	4
- #define KVM_S390_MEMOP_ABSOLUTE_WRITE	5
-+#define KVM_S390_MEMOP_ABSOLUTE_CMPXCHG	6
-+
- /* flags for kvm_s390_mem_op->flags */
- #define KVM_S390_MEMOP_F_CHECK_ONLY		(1ULL << 0)
- #define KVM_S390_MEMOP_F_INJECT_EXCEPTION	(1ULL << 1)
- #define KVM_S390_MEMOP_F_SKEY_PROTECTION	(1ULL << 2)
- 
-+/* flags specifying extension support via KVM_CAP_S390_MEM_OP_EXTENSION */
-+#define KVM_S390_MEMOP_EXTENSION_CAP_BASE	(1 << 0)
-+#define KVM_S390_MEMOP_EXTENSION_CAP_CMPXCHG	(1 << 1)
-+
- /* for KVM_INTERRUPT */
- struct kvm_interrupt {
- 	/* in */
-@@ -1173,6 +1181,7 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_DIRTY_LOG_RING_ACQ_REL 223
- #define KVM_CAP_S390_PROTECTED_ASYNC_DISABLE 224
- #define KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP 225
-+#define KVM_CAP_PMU_EVENT_MASKED_EVENTS 226
- 
- #ifdef KVM_CAP_IRQ_ROUTING
- 
-diff --git a/linux-headers/linux/vfio.h b/linux-headers/linux/vfio.h
-index c59692ce0b..4a534edbdc 100644
---- a/linux-headers/linux/vfio.h
-+++ b/linux-headers/linux/vfio.h
-@@ -49,7 +49,11 @@
- /* Supports VFIO_DMA_UNMAP_FLAG_ALL */
- #define VFIO_UNMAP_ALL			9
- 
--/* Supports the vaddr flag for DMA map and unmap */
-+/*
-+ * Supports the vaddr flag for DMA map and unmap.  Not supported for mediated
-+ * devices, so this capability is subject to change as groups are added or
-+ * removed.
-+ */
- #define VFIO_UPDATE_VADDR		10
- 
- /*
-@@ -1343,8 +1347,7 @@ struct vfio_iommu_type1_info_dma_avail {
-  * Map process virtual addresses to IO virtual addresses using the
-  * provided struct vfio_dma_map. Caller sets argsz. READ &/ WRITE required.
-  *
-- * If flags & VFIO_DMA_MAP_FLAG_VADDR, update the base vaddr for iova, and
-- * unblock translation of host virtual addresses in the iova range.  The vaddr
-+ * If flags & VFIO_DMA_MAP_FLAG_VADDR, update the base vaddr for iova. The vaddr
-  * must have previously been invalidated with VFIO_DMA_UNMAP_FLAG_VADDR.  To
-  * maintain memory consistency within the user application, the updated vaddr
-  * must address the same memory object as originally mapped.  Failure to do so
-@@ -1395,9 +1398,9 @@ struct vfio_bitmap {
-  * must be 0.  This cannot be combined with the get-dirty-bitmap flag.
-  *
-  * If flags & VFIO_DMA_UNMAP_FLAG_VADDR, do not unmap, but invalidate host
-- * virtual addresses in the iova range.  Tasks that attempt to translate an
-- * iova's vaddr will block.  DMA to already-mapped pages continues.  This
-- * cannot be combined with the get-dirty-bitmap flag.
-+ * virtual addresses in the iova range.  DMA to already-mapped pages continues.
-+ * Groups may not be added to the container while any addresses are invalid.
-+ * This cannot be combined with the get-dirty-bitmap flag.
-  */
- struct vfio_iommu_type1_dma_unmap {
- 	__u32	argsz;
-diff --git a/linux-headers/linux/vhost.h b/linux-headers/linux/vhost.h
-index f9f115a7c7..92e1b700b5 100644
---- a/linux-headers/linux/vhost.h
-+++ b/linux-headers/linux/vhost.h
-@@ -180,4 +180,12 @@
-  */
- #define VHOST_VDPA_SUSPEND		_IO(VHOST_VIRTIO, 0x7D)
- 
-+/* Resume a device so it can resume processing virtqueue requests
-+ *
-+ * After the return of this ioctl the device will have restored all the
-+ * necessary states and it is fully operational to continue processing the
-+ * virtqueue descriptors.
-+ */
-+#define VHOST_VDPA_RESUME		_IO(VHOST_VIRTIO, 0x7E)
-+
- #endif
--- 
-2.39.2
+Perhaps it's more important (uAPI-wise) for KVM to return the precise 
+guest/host TSC ratio via a vcpu device attribute?
+
+Paolo
 
