@@ -2,137 +2,196 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C61C46C7609
-	for <lists+kvm@lfdr.de>; Fri, 24 Mar 2023 03:55:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 921366C7617
+	for <lists+kvm@lfdr.de>; Fri, 24 Mar 2023 04:03:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230004AbjCXCzn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Mar 2023 22:55:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33490 "EHLO
+        id S231235AbjCXDC7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Mar 2023 23:02:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40620 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229945AbjCXCzk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Mar 2023 22:55:40 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5EA7993E3
-        for <kvm@vger.kernel.org>; Thu, 23 Mar 2023 19:54:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1679626493;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=+uAUlOWmnaNVo/VWoXQNmQTS2u7vnkE353p3vcNlNhc=;
-        b=Yi1EsPyVBvI0hkrRYM3GszLSgDJNbK2UFGDw2WxUtIObPLdEME6sbKDoEsk12gAEYCc8pA
-        VCPitFti9zLqjMRdgdqdQyp5wqPPDNlMNE+aDnxJ+FF5lgOYiGeMW5aC/sA0rG0F3kuc33
-        2OAn1mD5TRVxycVcC33yekc39qelhoA=
-Received: from mail-oa1-f72.google.com (mail-oa1-f72.google.com
- [209.85.160.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-161-Emj_pbI0N1OGTXoLySrv1g-1; Thu, 23 Mar 2023 22:54:51 -0400
-X-MC-Unique: Emj_pbI0N1OGTXoLySrv1g-1
-Received: by mail-oa1-f72.google.com with SMTP id 586e51a60fabf-17afa2c993cso283832fac.2
-        for <kvm@vger.kernel.org>; Thu, 23 Mar 2023 19:54:51 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679626491;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=+uAUlOWmnaNVo/VWoXQNmQTS2u7vnkE353p3vcNlNhc=;
-        b=dnMv+yU4DvDaiiKkEwEn/eh5IPRLR1ybkTDV/2wI8kgTsPaCZEfB9NKhFV7jfc9v2P
-         Ms3WQNMtqSOLM1vNz/aPpTR+7wOX37n0iBplwQ6kra6+bmiTW9iuiwTlyFztLrTIuS7F
-         oHPAQ3+nRgpMbXNovqVj6eGjJHfz8yEskDyYRwHzBD95omx5zkMLjVXgSr7QQ5l5tnLZ
-         b2KPz1zX7zUhxOBtNRQgZsAH51CRZlvs6wD2ZXDIgGUamhzog3vjYhSQItGQEQiDI/1m
-         kZTl2clH7XuXIJdndwwz3cJbetswH7CCcXzm8E0vue6HergC32OV5A0guEByPNFO1MCk
-         is5g==
-X-Gm-Message-State: AO0yUKWdaV+LDvkdUCYBo5G35Q+HJPwXQ3eJIWPFWXgtS3TIdMxf1eJm
-        Us2AOuV5USqYx9XbKUGUFD+q9fqqgvuMN3JuaH91ouSYUqcmycTr3NPO5BBmFHQcQCqqdB5Fa0Q
-        BO4YMGiMyTzkmMHYmIxHb+A7hFm4l
-X-Received: by 2002:a05:6871:b19b:b0:177:9f9c:dc5 with SMTP id an27-20020a056871b19b00b001779f9c0dc5mr512926oac.9.1679626491037;
-        Thu, 23 Mar 2023 19:54:51 -0700 (PDT)
-X-Google-Smtp-Source: AK7set9fm4WXoQhc8oPxzAxZzgWX14feJUPEMiSJPQgN0rubtFNZsrLMc1kcr+QSYvWg5YQ6SKRhX2omEeiDY+P3wck=
-X-Received: by 2002:a05:6871:b19b:b0:177:9f9c:dc5 with SMTP id
- an27-20020a056871b19b00b001779f9c0dc5mr512917oac.9.1679626490818; Thu, 23 Mar
- 2023 19:54:50 -0700 (PDT)
-MIME-Version: 1.0
-References: <20230321154804.184577-1-sgarzare@redhat.com> <20230321154804.184577-4-sgarzare@redhat.com>
- <CACGkMEtbrt3zuqy9YdhNyE90HHUT1R=HF-YRAQ6b4KnW_SdZ-w@mail.gmail.com> <20230323095006.jvbbdjvkdvhzcehz@sgarzare-redhat>
-In-Reply-To: <20230323095006.jvbbdjvkdvhzcehz@sgarzare-redhat>
-From:   Jason Wang <jasowang@redhat.com>
-Date:   Fri, 24 Mar 2023 10:54:39 +0800
-Message-ID: <CACGkMEveMGEzX7bCPuQuqm=9q7Ut-k=MLrRYM3Bq6cMpaw9fVQ@mail.gmail.com>
-Subject: Re: [PATCH v3 8/8] vdpa_sim: add support for user VA
-To:     Stefano Garzarella <sgarzare@redhat.com>
-Cc:     virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        stefanha@redhat.com, linux-kernel@vger.kernel.org,
-        eperezma@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>,
-        Andrey Zhadchenko <andrey.zhadchenko@virtuozzo.com>,
-        netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+        with ESMTP id S230196AbjCXDC4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Mar 2023 23:02:56 -0400
+Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0052D1F935;
+        Thu, 23 Mar 2023 20:02:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1679626975; x=1711162975;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=45YSsr5FZh4nrZ0AkVxpo4SYAwFqNK8zwzrE4p6M2oc=;
+  b=Q6d/byM6I8dFaLAzSheV+ienl5IdQ2S4sFUqrMSDKkZpNq/URF8xiqt/
+   evToOs+gGVyixLYjleQUOKgV/7ssze2mcdctzpsTeVqVs6dqw/dVIQCx2
+   /Nc+dVL9fG359uQyvDmrrvGH3HC+jor19bHAV17tQRI6h198Uk2BYI2y2
+   B9y3HApGLVbSelVydmNwX8TOEz6mYb2KBYmpAmncMLtU25z/haKCWFBBx
+   Imi3EW7cVHisHvQPSDIIiF7sgmoZFEjZx6n1NGs3kC5Ewf6sKKa3soKra
+   CSFvhGiFbLoK5JjjXVY7NlnKig62f5w1KzedxynsLRkulovcdGn33n/5k
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10658"; a="328093189"
+X-IronPort-AV: E=Sophos;i="5.98,286,1673942400"; 
+   d="scan'208";a="328093189"
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Mar 2023 20:02:54 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10658"; a="856717166"
+X-IronPort-AV: E=Sophos;i="5.98,286,1673942400"; 
+   d="scan'208";a="856717166"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by orsmga005.jf.intel.com with ESMTP; 23 Mar 2023 20:02:54 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.21; Thu, 23 Mar 2023 20:02:53 -0700
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.21 via Frontend Transport; Thu, 23 Mar 2023 20:02:53 -0700
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.169)
+ by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.21; Thu, 23 Mar 2023 20:02:53 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Rr2HMlNelaq9VEmyZqSTaoHLmGzGjrv35jb13mU+ZSM58XRejRu3rucxBcM8kh4WiIiTolFACEKEBaHeibW6q4z9wqzC4CU2oxcYD495+bUOWQfNPnVm3iuxthoEyJrXfSJ9zbKIMQmv1HO/Hjb1bzVaJOT7S1VBEtOawlyzwN1grhNOtRlnJ/VDp78r4JWN78rb/I0yaY2W7uHd1b2y+je4gEhmmELNdYO2qRr4ljno382ldFAzOwdhDJCMWvgT/b1DoEFAKt2IG+6EDjtVzp9bGG7x5u6jByRRh6CMSNbMeYhCLa1GG7coE5ssLuJzKE2hJwdw+lLRDikVxuzBFg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=1P67CFysvJRKEXc02k6s+Z62SRaUV7g6WjfbOufOIVg=;
+ b=LL7RYed8Tyxm877b3uXJ2GJ58Fny64lVmOktQVD/MAZqTLq9u/ttvxs/N4OoaoAKuZlhlMmy+bBCAq47w2VFqLO58m0ZzEWpPVBQqlRsVYnaQohz4TrBe/GrQooJ5SHSm21W82XJ9IUVsO5B+S7hYs5n+OaTRy+zGJhJq00e6JNUETVhUwm8wnnFApmMNdggyxTFpambV1317sIJFgNx9uD4M8ctGorjQc+PidggodD2AxXnk3T4YKjPZ7CMvSjjdofto+f9AXs8TQwxY9LABRUaACG1woAlXD9DHryn5ySM2F2FumLyPYSZzhaxqmp9yV5cYPh25I4C/DCkB1puqA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
+ by BN9PR11MB5484.namprd11.prod.outlook.com (2603:10b6:408:105::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6178.38; Fri, 24 Mar
+ 2023 03:02:46 +0000
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::1aac:b695:f7c5:bcac]) by BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::1aac:b695:f7c5:bcac%8]) with mapi id 15.20.6178.038; Fri, 24 Mar 2023
+ 03:02:46 +0000
+From:   "Tian, Kevin" <kevin.tian@intel.com>
+To:     Nicolin Chen <nicolinc@nvidia.com>,
+        "jgg@nvidia.com" <jgg@nvidia.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "will@kernel.org" <will@kernel.org>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "shuah@kernel.org" <shuah@kernel.org>
+CC:     "Liu, Yi L" <yi.l.liu@intel.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "farman@linux.ibm.com" <farman@linux.ibm.com>
+Subject: RE: [PATCH v5 2/4] iommufd: Add iommufd_access_replace() API
+Thread-Topic: [PATCH v5 2/4] iommufd: Add iommufd_access_replace() API
+Thread-Index: AQHZXWJDldgoqUitjkeDxppFDShhiK8JPIaw
+Date:   Fri, 24 Mar 2023 03:02:46 +0000
+Message-ID: <BN9PR11MB5276E7E2BA88DD54DC5EE99A8C849@BN9PR11MB5276.namprd11.prod.outlook.com>
+References: <cover.1679559476.git.nicolinc@nvidia.com>
+ <2c3fa7a21373ee10af7cc9f8c370945a08341930.1679559476.git.nicolinc@nvidia.com>
+In-Reply-To: <2c3fa7a21373ee10af7cc9f8c370945a08341930.1679559476.git.nicolinc@nvidia.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BN9PR11MB5276:EE_|BN9PR11MB5484:EE_
+x-ms-office365-filtering-correlation-id: 0865fa13-e5b2-4089-5af6-08db2c143e84
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: P17y/0KHtAUJuKuvW756QpqFTGeBc+hpd9QjohtyK8dj6ur1QfTk9x/gto5X+Wy+pc/ZEEwDj9QTnBkpNKPVNuWtEnUwAJfOFCAseqUlmdTOilf4dPknk4fv3YBY55XEZhwjiCSda4yrr4kOaDaUi4SP5SaG35S7Hp1ub4+jKBOyZ6V4jiAMehgzrZcPya9QihtTGO0wm/wmUlbr+cdLfsinHw2qoGYGrfevM31I4B9hiuf/lqPGwT1VZY5fsswSofHkCxm7JGZckEOwOxzKwRpZepM6a/QKC4RPnANn/Hw0MW/nm+4Ud6YHO2Ii/WncU8EWQ7G0NQMiA7DsSGoqVPF0Ri9LBukwfGQzbHfX2YeJOrqTbTvsX7PjZ1Q7kkx0agkcd1LlOFdtHv3//uhOgtpvUDCMULJQJGAycB4TC16J3J6tDMy4VH0j8g0pGk2hun/xrq0OZp0L/MyhQpNLYOImQ0L8BI+M1ncRG/VyHd+77SgPggnZk/Rb0CRezZlqB6B1oj18l0LwWNLloUwFp1yic4cj9vuIp/jc0gLBYKa1EGUiKXup2IG5bd5g5H3YttpCvW2q4uNIxOY5j3077ebR5EysWvRRMBMng81mmZiVg/LyZv3FMnsTCjuVfi6WspSlXEIQn5j64+KX5G4p4e/ImugsWNgLrMwKyCLWmGKFoV4xjsS3uJDu/+Uo+F8eGPJEbkJXHChi8zF+H1r28A==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(376002)(346002)(39860400002)(136003)(366004)(396003)(451199018)(82960400001)(316002)(54906003)(110136005)(33656002)(122000001)(83380400001)(41300700001)(38070700005)(8936002)(2906002)(71200400001)(4326008)(478600001)(66446008)(86362001)(8676002)(7696005)(64756008)(38100700002)(66946007)(52536014)(186003)(66556008)(66476007)(76116006)(5660300002)(4744005)(9686003)(6506007)(26005)(55016003)(7416002);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?oH8RQGKLBX1si9ZuRMmM2g6kuWDOIm32bI76dDlDKYqw14Lbgh9+/BcNck23?=
+ =?us-ascii?Q?KisgilQ/psxJ+z4/UEx037/J1+Sv0AWLc8nxRU/j/fujFJqmGWI9kSNsX0OC?=
+ =?us-ascii?Q?DNmlGZw+el5iCUIISuzqmYFRVHFcj6uhLi2YC+OrDeoVsJkug8GX7y2Z+7eK?=
+ =?us-ascii?Q?Se8ul491fT1HE8/suvtADXPuhT0VLHohXXxRlCE/o38CQeANCnvyTCevRUkF?=
+ =?us-ascii?Q?Qv9LVgMt5zRnj6GvVIpsAwxVfcF68QBzW0u1moX55N1Z7UUBa+ov6g3yXUem?=
+ =?us-ascii?Q?g2oVzlyS6Na9KWvveXfqLJ4fTw+gXEKjTu57cy0OCXUjyWYPQpOMoHHmlyEd?=
+ =?us-ascii?Q?kY+niugFEw4miJARFhCmXPQy+wTUMX5JxyzO8cDvTEefT079k91QCGl8ji2o?=
+ =?us-ascii?Q?xQNQ3gxdNWlovWhc4uhiJhgdlKJaGP+64Hpivs7+2ixT6YjoxjReD2j64uFd?=
+ =?us-ascii?Q?ayndoLnZm3XR08/JIG1ssxAhw8P95L2vWOPnGUlsmk/tZ5HgWVl0m6SVR7vT?=
+ =?us-ascii?Q?vbZoMDtg1+j4zbaEODAygBEa9W5NeXc63gGVI5ExACZy2O8KjjZpYsM3as9Q?=
+ =?us-ascii?Q?ZRgT0pEDr84N7irJAZpO6lD1AT/kB7BU8EOswlMqvVMRUxne0zn8+fFziTe9?=
+ =?us-ascii?Q?ozUHBu2k5bXGZ3shgMo145/GWCA1f5sj9Pk1P2uR6WXezo/BfhIJNBEYEQDZ?=
+ =?us-ascii?Q?hxi8ac9cKk47yxz8/2unBGhYampDb1xpzxYtnA7Bs7FGEcnoBdx4B9rD+0+c?=
+ =?us-ascii?Q?Z2ZrvncEFjeZyXnkQ07pjzO/Uv2XUmw8ZeUKhpDDbMZlWLkdnVxIrNNkIEQM?=
+ =?us-ascii?Q?kUoQM5MP/KO5/NWG5Hopk5VxkWkLQMWBaQRn9vTY3zohpUtuK1MQdwL7G7x+?=
+ =?us-ascii?Q?3cXCcL+R26XsZa99T30YZvBzJ+SoCrypIiZbau6XfHyxq6yls4BnlXxFis7f?=
+ =?us-ascii?Q?dE0Bg6ePoqAFEdxDzTWcFOWUoyyAAQI4+bY6xTqyTt9CUYWYowYSIev800rk?=
+ =?us-ascii?Q?DZr5U9LIFNL7xCMte2ImWdYohw1XAs3PSgHFLnqEuSalXqaSj+MD0lMErDwZ?=
+ =?us-ascii?Q?LBLfESRaW0T1hb1LFW4mT97WEV3+qnjxp02DEZQZwGf71BgNToUEHSz+j7Bo?=
+ =?us-ascii?Q?wt1R8KDfuONth7ca9DX/4mH8RfDPJb+U2O9WlvAw/N4Lg18IIeCzha47TJSf?=
+ =?us-ascii?Q?gjKgEOFHJS9P6EmVTs9G/julebIA/OADGV+dkEIC4WN+t3K7LAudnIANFlEs?=
+ =?us-ascii?Q?EvmQSDNME1m4cOvR8k0Gc3+sgcvoiJTHHjVs86jLj8AYfS8jH5guG94SJ6dj?=
+ =?us-ascii?Q?Bp69dwAqFtLoC2wPd0q3Yf++Nq+j0dOzjp+i489Ovpurl0qATka4IirT2+7Z?=
+ =?us-ascii?Q?Kkn52N/eNJtAI5gNx8+zEvF59Gbx1Kufn6hF5yUX+mOfIo524OOqjgfItG8+?=
+ =?us-ascii?Q?guPLT4irJyxXmLxBb3YQhXqvUuk6JmXBJcG6xINqsKgCv44g2/e7nFzgpx59?=
+ =?us-ascii?Q?Gh5UHpNNZCh/1/dlnOx46ykXJ8d9NbG7rqVoI9fxf3lKejcbD6v580frnIQ/?=
+ =?us-ascii?Q?UBKbLcjAz7SpRb9KDRyNiRdCEqsCH5TDWrAfLhqj?=
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+MIME-Version: 1.0
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0865fa13-e5b2-4089-5af6-08db2c143e84
+X-MS-Exchange-CrossTenant-originalarrivaltime: 24 Mar 2023 03:02:46.2730
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: G1P/9TkUKcCzSqmjh9cM4ZvxMIm3OnU4Pu6KxkRAUB/wcz5mtNiRc5rjnch/28jvPq2lFvniBIKuUnnpvg52MQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN9PR11MB5484
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-2.5 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 23, 2023 at 5:50=E2=80=AFPM Stefano Garzarella <sgarzare@redhat=
-.com> wrote:
->
-> On Thu, Mar 23, 2023 at 11:42:07AM +0800, Jason Wang wrote:
-> >On Tue, Mar 21, 2023 at 11:48=E2=80=AFPM Stefano Garzarella <sgarzare@re=
-dhat.com> wrote:
-> >>
-> >> The new "use_va" module parameter (default: true) is used in
-> >> vdpa_alloc_device() to inform the vDPA framework that the device
-> >> supports VA.
-> >>
-> >> vringh is initialized to use VA only when "use_va" is true and the
-> >> user's mm has been bound. So, only when the bus supports user VA
-> >> (e.g. vhost-vdpa).
-> >>
-> >> vdpasim_mm_work_fn work is used to serialize the binding to a new
-> >> address space when the .bind_mm callback is invoked, and unbinding
-> >> when the .unbind_mm callback is invoked.
-> >>
-> >> Call mmget_not_zero()/kthread_use_mm() inside the worker function
-> >> to pin the address space only as long as needed, following the
-> >> documentation of mmget() in include/linux/sched/mm.h:
-> >>
-> >>   * Never use this function to pin this address space for an
-> >>   * unbounded/indefinite amount of time.
-> >
-> >I wonder if everything would be simplified if we just allow the parent
-> >to advertise whether or not it requires the address space.
-> >
-> >Then when vhost-vDPA probes the device it can simply advertise
-> >use_work as true so vhost core can use get_task_mm() in this case?
->
-> IIUC set user_worker to true, it also creates the kthread in the vhost
-> core (but we can add another variable to avoid this).
->
-> My biggest concern is the comment in include/linux/sched/mm.h.
-> get_task_mm() uses mmget(), but in the documentation they advise against
-> pinning the address space indefinitely, so I preferred in keeping
-> mmgrab() in the vhost core, then call mmget_not_zero() in the worker
-> only when it is running.
+> From: Nicolin Chen <nicolinc@nvidia.com>
+> Sent: Thursday, March 23, 2023 4:33 PM
+>=20
+> +int iommufd_access_replace(struct iommufd_access *access, u32 ioas_id)
+> +{
+> +	struct iommufd_ioas *new_ioas;
+> +
+> +	mutex_lock(&access->ioas_lock);
+> +	if (!access->ioas) {
+>  		mutex_unlock(&access->ioas_lock);
+> -		iommufd_put_object(obj);
+> -		return rc;
+> +		return -ENOENT;
+> +	}
+> +	if (access->ioas->obj.id =3D=3D ioas_id) {
+> +		mutex_unlock(&access->ioas_lock);
+> +		return 0;
+>  	}
+> -	iommufd_ref_to_users(obj);
+>=20
+> +	new_ioas =3D iommufd_access_change_pt(access, ioas_id);
+> +	if (IS_ERR(new_ioas)) {
+> +		mutex_unlock(&access->ioas_lock);
+> +		return PTR_ERR(new_ioas);
+> +	}
+> +	__iommufd_access_detach(access);
+>  	access->ioas =3D new_ioas;
+>  	access->ioas_unpin =3D new_ioas;
 
-Ok.
+Above three lines can be moved into iommufd_access_change_pt():
 
->
-> In the future maybe mm will be used differently from parent if somehow
-> it is supported by iommu, so I would leave it to the parent to handle
-> this.
+	If (access->ioas)
+		__iommufd_access_detach(access);
+	access->ioas =3D new_ioas;
+	access->ioas_unpin =3D new_ioas;
 
-This should be possible, I was told by Intel that their IOMMU can
-access the process page table for shared virtual memory.
-
-Thanks
-
->
-> Thanks,
-> Stefano
->
-
+Then both attach/replace can end by calling the common function.
