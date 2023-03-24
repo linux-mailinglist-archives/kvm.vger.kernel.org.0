@@ -2,258 +2,159 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 19BD26C7457
-	for <lists+kvm@lfdr.de>; Fri, 24 Mar 2023 01:07:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 043686C74BC
+	for <lists+kvm@lfdr.de>; Fri, 24 Mar 2023 01:52:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230456AbjCXAHq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Mar 2023 20:07:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47220 "EHLO
+        id S231228AbjCXAwr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Mar 2023 20:52:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36664 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229660AbjCXAHp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Mar 2023 20:07:45 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB2512C668;
-        Thu, 23 Mar 2023 17:07:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
-        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=ArREC0aplMc3sRqY1wWGmf0we2habZxwsoX+362K2Tw=; b=qJSn5BcG0x25hyCGAV7kHMRSYm
-        wUFyya1qJgRfasVZplFp0KgueDngQel0e7Mn3o82zvY4sNjQC50LzMtrL6kYD6LcF/0bTybaByoAW
-        bWCO9fTg1nqPXxfBAmatyftbDcA1QWKgFTd6WXJQyoCDpJSlAIMH2lZStkp+TUllYf5Evqe4Vp2bO
-        n3Oji1S6oJsZ/SEXcSCX4QybFsjiho4afZihrFBUFjOxjjaGGVOHUJNiUzPqK5XKHx/tsxKjxQVEX
-        dD63d0oBHmT1fkHATebvJy3NAn9ICPkPx78Cj2g6s7Nb1ImOB81JN4zVc9fI0Jb3Nx1fxDb7t8eV6
-        2St/Uu2w==;
-Received: from [2001:8b0:10b:5:b3d4:e39d:531b:642a] (helo=u3832b3a9db3152.ant.amazon.com)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pfUxM-004NvX-12; Fri, 24 Mar 2023 00:06:56 +0000
-Message-ID: <03fb7bc9e23245a0fe5e0fd5c373d950d1363a69.camel@infradead.org>
-Subject: Re: [PATCH v16 3/8] cpu/hotplug: Add dynamic parallel bringup
- states before CPUHP_BRINGUP_CPU
-From:   David Woodhouse <dwmw2@infradead.org>
-To:     Thomas Gleixner <tglx@linutronix.de>,
-        Usama Arif <usama.arif@bytedance.com>, kim.phillips@amd.com,
-        brgerst@gmail.com
-Cc:     piotrgorski@cachyos.org, oleksandr@natalenko.name,
-        arjan@linux.intel.com, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, hpa@zytor.com, x86@kernel.org,
-        pbonzini@redhat.com, paulmck@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        rcu@vger.kernel.org, mimoja@mimoja.de, hewenliang4@huawei.com,
-        thomas.lendacky@amd.com, seanjc@google.com, pmenzel@molgen.mpg.de,
-        fam.zheng@bytedance.com, punit.agrawal@bytedance.com,
-        simon.evans@bytedance.com, liangma@liangbit.com,
-        gpiccoli@igalia.com
-Date:   Fri, 24 Mar 2023 00:06:53 +0000
-In-Reply-To: <87y1nn6nc9.ffs@tglx>
-References: <20230321194008.785922-1-usama.arif@bytedance.com>
-         <20230321194008.785922-4-usama.arif@bytedance.com> <874jqb8588.ffs@tglx>
-         <47150207bfb76bb98aff678cf7c91f245e9f5dd9.camel@infradead.org>
-         <87y1nn6nc9.ffs@tglx>
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-        boundary="=-OMipOYie2Wbib0dxJCN3"
-User-Agent: Evolution 3.44.4-0ubuntu1 
+        with ESMTP id S230004AbjCXAwn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Mar 2023 20:52:43 -0400
+Received: from mail-io1-f69.google.com (mail-io1-f69.google.com [209.85.166.69])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 924852B2A3
+        for <kvm@vger.kernel.org>; Thu, 23 Mar 2023 17:52:41 -0700 (PDT)
+Received: by mail-io1-f69.google.com with SMTP id s3-20020a056602240300b007589413aea0so266307ioa.5
+        for <kvm@vger.kernel.org>; Thu, 23 Mar 2023 17:52:41 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1679619161;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=NbLgZ+ma1ZfiOVBSImtXnwlwTbasrfu4yCbRLpGR2oA=;
+        b=ngl7CVlO2C2qhc6hqGwB1Ft/oOIIj/xu9shz1RuJLQSOd2rpFBZ6nnaa/BZuAAg2As
+         d8Ers6/gHQwdfRz/pBw2+aHJeGLj7wr/ApLhFJw3F8mi8R06UkL2rQbySQkDvS8r5hqO
+         7HyvOvg3701rILP5YnSgyF8p8tvyDQBZ1BNekSOzMyEOQetDOLUzSWLV1EY7SAcC/9Xf
+         RLAATKQvVxp4BeJy/ybrAEJlalOtJDEsg5UdAAPYRevr/r8O6N1Hsmz/Z9DtoP/4WcS2
+         l9z477kB/QYYSw0k+GjojQDmOquH0poqvrR8XdJCx+QYA0DsEOrKFiW/mFVRT/OiLOdA
+         kUwA==
+X-Gm-Message-State: AO0yUKUJwVOO8xLNu6VwUiAXhhO/lGtTWeOlGyG4pGIM5dQR7ctwgFWM
+        RQsFuVk6bu5/ocz/63MVwIsgdINTb+HYsQCqRMP5QuKP1Vff
+X-Google-Smtp-Source: AK7set8LnygjG5RALTEKJa+rFuaxrdlQBozjX737gRU2FulKQ3Sy72CSddg5sjWT6V7nkHk1DUzoaYDwuwDaITDZVgjUcBBPeMTA
 MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
-X-Spam-Status: No, score=-2.5 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
-        DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+X-Received: by 2002:a02:6203:0:b0:3c5:19e6:b532 with SMTP id
+ d3-20020a026203000000b003c519e6b532mr283859jac.6.1679619160834; Thu, 23 Mar
+ 2023 17:52:40 -0700 (PDT)
+Date:   Thu, 23 Mar 2023 17:52:40 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000708b1005f79acf5c@google.com>
+Subject: [syzbot] [kvm?] [net?] [virt?] general protection fault in virtio_transport_purge_skbs
+From:   syzbot <syzbot+befff0a9536049e7902e@syzkaller.appspotmail.com>
+To:     davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        netdev@vger.kernel.org, pabeni@redhat.com, sgarzare@redhat.com,
+        stefanha@redhat.com, syzkaller-bugs@googlegroups.com,
+        virtualization@lists.linux-foundation.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=3.1 required=5.0 tests=FROM_LOCAL_HEX,
+        HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,
+        SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+        version=3.4.6
+X-Spam-Level: ***
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hello,
 
---=-OMipOYie2Wbib0dxJCN3
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+syzbot found the following issue on:
 
-On Fri, 2023-03-24 at 00:48 +0100, Thomas Gleixner wrote:
-> On Thu, Mar 23 2023 at 22:49, David Woodhouse wrote:
-> > On Thu, 2023-03-23 at 23:36 +0100, Thomas Gleixner wrote:
-> > > There is no point in special casing this. All architectures can invok=
-e
-> > > the CPUHP_BP_* states before CPUHP_BRINGUP_CPU for each to be brought=
- up
-> > > CPU first. So this can be made unconditional and common exercised cod=
-e.
-> > >=20
-> >=20
-> > There were three paragraphs in the commit message explaining why I
-> > didn't want to do that. It didn't work for x86 before I started, and I
-> > haven't reviewed *every* other architecture to ensure that it will work
-> > there. It was opt-in for a reason. :)
->=20
-> I noticed myself before reading your reply :)
->=20
-> > > Aside of that this dynamic state range is pretty pointless. There is
-> > > really nothing dynamic here and there is no real good reason to have
-> > > four dynamic parallel states just because.
-> >=20
-> > The original patch set did use more than one state; the plan to do
-> > microcode updates in parallel does involve doing at least one more, I
-> > believe.
->=20
-> I don't think so. The micro code muck can completely serialize itself
-> and does not need control CPU assistance if done right. If we go there
-> we have to fix that mess and not just proliferatng it with moar duct tape=
-.
->=20
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/*
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * Fully per AP serialized=
- bringup from here on. If the
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * architecture does no re=
-gister the CPUHP_BP_PARALLEL_STARTUP
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * state, this step sends =
-the startup IPI first.
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 */
-> >=20
-> > Not sure I'd conceded that yet; the APs do their *own* bringup from
-> > here, and that really ought to be able to run in parallel.
->=20
-> Somewhere in the distance future once we've
->=20
-> =C2=A0 1) sorted the mandatory synchronization points, e.g. TSC sync in t=
-he
-> =C2=A0=C2=A0=C2=A0=C2=A0 early bootup phase.
+HEAD commit:    fff5a5e7f528 Merge tag 'for-linus' of git://git.armlinux.o..
+git tree:       upstream
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=1136e97ac80000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=aaa4b45720ca0519
+dashboard link: https://syzkaller.appspot.com/bug?extid=befff0a9536049e7902e
+compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=14365781c80000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=12eebc66c80000
 
-That's why we have four of them... :)
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/997791f5f9e1/disk-fff5a5e7.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/0b0155b5eac1/vmlinux-fff5a5e7.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/8d98dd2ba6b6/bzImage-fff5a5e7.xz
 
-> =C2=A0 2) audited _all_ AP state callbacks that they are able to cope wit=
-h
-> =C2=A0=C2=A0=C2=A0=C2=A0 parallel bringup.
->=20
-> =C2=A0=C2=A0=C2=A0=C2=A0 That's a long road as there are tons of assumpti=
-ons about the
-> =C2=A0=C2=A0=C2=A0=C2=A0 implicit CPU hotplug serialization in those call=
-backs.
->=20
-> =C2=A0=C2=A0=C2=A0=C2=A0 Just because it did not explode in your face yet=
- does not mean this
-> =C2=A0=C2=A0=C2=A0=C2=A0 is safe.
->=20
-> =C2=A0=C2=A0=C2=A0=C2=A0 I just looked at 10 randomly picked AP online ca=
-llbacks and found 5
-> =C2=A0=C2=A0=C2=A0=C2=A0 of them being not ready :)
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+befff0a9536049e7902e@syzkaller.appspotmail.com
 
-Oh, it's totally hosed, absolutely. I don't think even my most
-ambitious hacks had even tried it yet. But I want to, so I wasn't about
-to add a comment saying the opposite.
-
-But it's fine; removing the comment is the *least* of the work to be
-done in making that bit actually work in parallel :)
-
---=-OMipOYie2Wbib0dxJCN3
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
-
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
-ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
-EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
-FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
-aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
-EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
-VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
-aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
-AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
-ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
-QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
-rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
-ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
-U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
-DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
-BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
-dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
-BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
-QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
-CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
-xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
-IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
-kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
-eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
-KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
-1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
-OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
-x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
-5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
-DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
-VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
-UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
-MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
-ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
-oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
-SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
-xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
-RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
-bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
-NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
-KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
-5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
-C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
-gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
-VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
-MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
-by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
-b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
-BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
-QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
-c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
-AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
-qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
-v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
-Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
-tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
-Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
-YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
-ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
-IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
-ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
-GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
-h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
-9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
-P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
-2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
-BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
-7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
-lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
-lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
-AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
-Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
-FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
-BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
-cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
-aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
-LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
-BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
-cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
-Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
-lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
-WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
-hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
-IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
-dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
-NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
-xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMwMzI0MDAwNjUzWjAvBgkqhkiG9w0BCQQxIgQgyJdunEAW
-FZvzx3AhtiMOsmiTSR4ARk990d8bAjlESPowgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
-A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
-dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
-DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
-MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
-Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgBFO/uiZjnIiravHDdMBXaQcYUIuRkroy5s
-pREGJjUIaLmR76bsgCiOKzChrUTdMOIDk36tgoYgkGPSITzKCrfu1M7UZ6X2VvSYKj9CNEnpKNqq
-Y4Zm0PJF8967slfjXTGs1UpIC5HGQb6NFuIqS2YWD1IgrT28s6F40pcNgAADNepkHp5VvW08E2z+
-+QNcNiBvti6pSIuCJ4zAkOYFXQKCqXKUJ0Pjf+UaZC1jfQH8vtDdHzph+Luldf5PSiLPW0udOhUE
-asEr+GPwtxFj6kKplNDGmN67d9zD4i950/ZvMkzQlwb9Wp8uIrYWVxQzc+e1Yrj9YMQN8X9HLqMj
-n1Qf61vkJhbiXEnqH/93/1pHLWgFH7Ii5SZjzBUQG4HlO4cJl7DEah10Bl9AQSRNmJkEu2UPb2ef
-T1ehOIuYqQI1kz5rc/hiME0bDuwkH+1oOcBvlruT0xPkGQ/Kbk6TJNVv8Q/OW5/7CIen77fsrkbZ
-pg/JNVmSXhbpdB+koIzUG0sM0E5TNUf89iluLxulMapYKrOdKl5mTdzwe9d5GKZnY35dHwckhdUI
-vRU+zS+KSlYJQNzRdagRL3wqonmnZwWwr9CQUgljhfB7M3Y1TJyQ9pyj7TNatlI/3AGJbhakiBgg
-RlNXxT1STVXAk/mT4bdcL7h7b/v/VLQshLbZfvUfQAAAAAAAAA==
+general protection fault, probably for non-canonical address 0xdffffc0000000000: 0000 [#1] PREEMPT SMP KASAN
+KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007]
+CPU: 0 PID: 8759 Comm: syz-executor379 Not tainted 6.3.0-rc3-syzkaller-00026-gfff5a5e7f528 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/02/2023
+RIP: 0010:virtio_transport_purge_skbs+0x139/0x4c0 net/vmw_vsock/virtio_transport_common.c:1370
+Code: 00 00 00 00 fc ff df 48 89 c2 48 89 44 24 28 48 c1 ea 03 48 8d 04 1a 48 89 44 24 10 eb 29 e8 ee 27 a3 f7 48 89 e8 48 c1 e8 03 <80> 3c 18 00 0f 85 a6 02 00 00 49 39 ec 48 8b 55 00 49 89 ef 0f 84
+RSP: 0018:ffffc90006427b48 EFLAGS: 00010256
+RAX: 0000000000000000 RBX: dffffc0000000000 RCX: 0000000000000000
+RDX: ffff8880211157c0 RSI: ffffffff89dfbd12 RDI: ffff88802c11a018
+RBP: 0000000000000000 R08: 0000000000000001 R09: 0000000000000003
+R10: fffff52000c84f5b R11: 0000000000000000 R12: ffffffff92179188
+R13: ffffc90006427ba0 R14: ffff88801e0f1100 R15: ffff88802c11a000
+FS:  00007f01fdd51700(0000) GS:ffff8880b9800000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f01fdd30718 CR3: 000000002a3f9000 CR4: 0000000000350ef0
+Call Trace:
+ <TASK>
+ vsock_loopback_cancel_pkt+0x1c/0x20 net/vmw_vsock/vsock_loopback.c:48
+ vsock_transport_cancel_pkt net/vmw_vsock/af_vsock.c:1284 [inline]
+ vsock_connect+0x852/0xcc0 net/vmw_vsock/af_vsock.c:1426
+ __sys_connect_file+0x153/0x1a0 net/socket.c:2001
+ __sys_connect+0x165/0x1a0 net/socket.c:2018
+ __do_sys_connect net/socket.c:2028 [inline]
+ __se_sys_connect net/socket.c:2025 [inline]
+ __x64_sys_connect+0x73/0xb0 net/socket.c:2025
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x39/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x63/0xcd
+RIP: 0033:0x7f01fdda0159
+Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 41 15 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f01fdd51308 EFLAGS: 00000246 ORIG_RAX: 000000000000002a
+RAX: ffffffffffffffda RBX: 00007f01fde28428 RCX: 00007f01fdda0159
+RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000004
+RBP: 00007f01fde28420 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 00007f01fddf606c
+R13: 0000000000000000 R14: 00007f01fdd51400 R15: 0000000000022000
+ </TASK>
+Modules linked in:
+---[ end trace 0000000000000000 ]---
+RIP: 0010:virtio_transport_purge_skbs+0x139/0x4c0 net/vmw_vsock/virtio_transport_common.c:1370
+Code: 00 00 00 00 fc ff df 48 89 c2 48 89 44 24 28 48 c1 ea 03 48 8d 04 1a 48 89 44 24 10 eb 29 e8 ee 27 a3 f7 48 89 e8 48 c1 e8 03 <80> 3c 18 00 0f 85 a6 02 00 00 49 39 ec 48 8b 55 00 49 89 ef 0f 84
+RSP: 0018:ffffc90006427b48 EFLAGS: 00010256
+RAX: 0000000000000000 RBX: dffffc0000000000 RCX: 0000000000000000
+RDX: ffff8880211157c0 RSI: ffffffff89dfbd12 RDI: ffff88802c11a018
+RBP: 0000000000000000 R08: 0000000000000001 R09: 0000000000000003
+R10: fffff52000c84f5b R11: 0000000000000000 R12: ffffffff92179188
+R13: ffffc90006427ba0 R14: ffff88801e0f1100 R15: ffff88802c11a000
+FS:  00007f01fdd51700(0000) GS:ffff8880b9800000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f01fdd30718 CR3: 000000002a3f9000 CR4: 0000000000350ef0
+----------------
+Code disassembly (best guess), 6 bytes skipped:
+   0:	df 48 89             	fisttps -0x77(%rax)
+   3:	c2 48 89             	retq   $0x8948
+   6:	44 24 28             	rex.R and $0x28,%al
+   9:	48 c1 ea 03          	shr    $0x3,%rdx
+   d:	48 8d 04 1a          	lea    (%rdx,%rbx,1),%rax
+  11:	48 89 44 24 10       	mov    %rax,0x10(%rsp)
+  16:	eb 29                	jmp    0x41
+  18:	e8 ee 27 a3 f7       	callq  0xf7a3280b
+  1d:	48 89 e8             	mov    %rbp,%rax
+  20:	48 c1 e8 03          	shr    $0x3,%rax
+* 24:	80 3c 18 00          	cmpb   $0x0,(%rax,%rbx,1) <-- trapping instruction
+  28:	0f 85 a6 02 00 00    	jne    0x2d4
+  2e:	49 39 ec             	cmp    %rbp,%r12
+  31:	48 8b 55 00          	mov    0x0(%rbp),%rdx
+  35:	49 89 ef             	mov    %rbp,%r15
+  38:	0f                   	.byte 0xf
+  39:	84                   	.byte 0x84
 
 
---=-OMipOYie2Wbib0dxJCN3--
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+syzbot can test patches for this issue, for details see:
+https://goo.gl/tpsmEJ#testing-patches
