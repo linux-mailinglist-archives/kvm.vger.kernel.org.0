@@ -2,104 +2,170 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F06B96C7F84
-	for <lists+kvm@lfdr.de>; Fri, 24 Mar 2023 15:07:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 91B506C7F8B
+	for <lists+kvm@lfdr.de>; Fri, 24 Mar 2023 15:10:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230259AbjCXOHz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Mar 2023 10:07:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39540 "EHLO
+        id S231949AbjCXOKN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Mar 2023 10:10:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45526 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231895AbjCXOHt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Mar 2023 10:07:49 -0400
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DAF61B578;
-        Fri, 24 Mar 2023 07:07:44 -0700 (PDT)
-From:   Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1679666863;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=trN8ws+yoWkPCst62r6wYhEGrbcVOPdAkjJjmaanEKw=;
-        b=ZLXH65Z7U58be+jPXNuYmmP0lbqCTLdvjOlJzYyQ9fzn7gzL9FSRWkPAyiPK6gaP+hGRp2
-        7eiBo1x8a0geJpJeVuZ/c1ELrPQR7C+WVSdgEhoa+L5Z18rP9UHszgqMJE+QZJPVfUPekb
-        6f0izA4k/hh1e/9dI41TTb953EM1qvX+VsawxmkZmPpFK9Ny77uL6KsckJb4EwYlW1rX1A
-        EGOQOZu4PgqpmWyrPzDtOlYxHPuPIeUk5/Tcff54QKz3iuhOyFo9s29TJ6OKnzYcQaDIGV
-        VIJiMTFucn7JVrHY6AcSp9JLmcEkc/Ub1+xDJ8TP57Kd0N8dKyU3J5UVl2GS7w==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1679666863;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=trN8ws+yoWkPCst62r6wYhEGrbcVOPdAkjJjmaanEKw=;
-        b=1YvIv0U8tNVjazSbCdzpIVSj62NO8eICVmhI8XpO/rp2QXFrZb4lW0h8AQVp0e0IPlu22B
-        WbSNr7y+8rrgPeAA==
-To:     David Woodhouse <dwmw2@infradead.org>,
-        Usama Arif <usama.arif@bytedance.com>, kim.phillips@amd.com,
-        brgerst@gmail.com
-Cc:     piotrgorski@cachyos.org, oleksandr@natalenko.name,
-        arjan@linux.intel.com, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, hpa@zytor.com, x86@kernel.org,
-        pbonzini@redhat.com, paulmck@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        rcu@vger.kernel.org, mimoja@mimoja.de, hewenliang4@huawei.com,
-        thomas.lendacky@amd.com, seanjc@google.com, pmenzel@molgen.mpg.de,
-        fam.zheng@bytedance.com, punit.agrawal@bytedance.com,
-        simon.evans@bytedance.com, liangma@liangbit.com,
-        gpiccoli@igalia.com
-Subject: Re: [PATCH v16 3/8] cpu/hotplug: Add dynamic parallel bringup
- states before CPUHP_BRINGUP_CPU
-In-Reply-To: <115b39e0226915b8f69ea0cce2487588f6010995.camel@infradead.org>
-References: <20230321194008.785922-1-usama.arif@bytedance.com>
- <20230321194008.785922-4-usama.arif@bytedance.com> <874jqb8588.ffs@tglx>
- <871qlf83wj.ffs@tglx>
- <8dff6ae5ffaebfbcc55a01c04420fd478070b830.camel@infradead.org>
- <87v8ir6j96.ffs@tglx>
- <115b39e0226915b8f69ea0cce2487588f6010995.camel@infradead.org>
-Date:   Fri, 24 Mar 2023 15:07:42 +0100
-Message-ID: <87lejm6y4x.ffs@tglx>
-MIME-Version: 1.0
-Content-Type: text/plain
-X-Spam-Status: No, score=-2.5 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
-        DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_PASS
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        with ESMTP id S231236AbjCXOKL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Mar 2023 10:10:11 -0400
+Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2DA28B2
+        for <kvm@vger.kernel.org>; Fri, 24 Mar 2023 07:10:10 -0700 (PDT)
+Received: by mail-pf1-x449.google.com with SMTP id i26-20020aa796fa000000b006261da7aeceso1083529pfq.5
+        for <kvm@vger.kernel.org>; Fri, 24 Mar 2023 07:10:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112; t=1679667009;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=CWpcOYM2XWdXOX3DlpY8mPmjLbjuakzNMgAVwLPKkxc=;
+        b=APuFpvTRs+G0tqYU6GjklJqvlwAO/FbYF6pULMa9UiTV3xhuR6XFgLpwP/3AS0fDnL
+         1VJ/oQ46lFeA/ngjf7/D6y1xFH/wrwjMhiTsezesbRerWK51sUaTsFfjaPPoNSZifhS9
+         AC8QidsSsOA5Oh+KEw9OF81JPQb2YCGk2nI5Xko9+ViIPuc1eOBXByEgtCJkM3CrOGlS
+         q+xe/6X+x7mi22t2Xri+niSlETuU7kIB/SzfGcWLLnj5KFZXYmtR0dtoCazsaLz+VJlu
+         6nTt85/2YeP0g7X/VNtEoydsPbhomrPv/1Rmh2WUYHEn5YrgQPlKHAVKTI6/q3RjLro4
+         HDZQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1679667009;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=CWpcOYM2XWdXOX3DlpY8mPmjLbjuakzNMgAVwLPKkxc=;
+        b=uRpS9v+cxTO5ppKKRl8cDFpBicH3CcwjYImHcwLeBy5BzBaq5n68UTZc9TRoKTpqdr
+         eb1aKC1CFAhhCV+jpC+dLmk09k+j3ONAvaDB81WsxJRX+uUHDvWojU4PpZx5yoLcNXBH
+         3ZU6ZkMVzo2Eiwab8zBEumP1bWUu+ANDB+SYMKZslrEMwzARF2o9u26SRfsAb6RB6nrs
+         3Yl7VDcuLCgWCoSuWgydmf7yOtgNCqtJlyroyGR6fyOfEZHjtNmIsUsk24D4r9rKHlqy
+         Lqy2ESo6OTP7YCtcLpXBG6GnBFEd8at0FKlPAGURVNP2FILf8m4rQZ2bwVAU5ZmPkEim
+         /Qjg==
+X-Gm-Message-State: AAQBX9fvhkps+2eWrFsPApB11+cz/JK/0720/v6H6XPx7O0M3fv8eEsl
+        T40S9/rHtQCfo/zL3ip1pxUhsr64c/Q=
+X-Google-Smtp-Source: AKy350ZUuFkmCA3HcKPpAu99ntzkTrfHSFERhqOOxLfptgWxyXdemoDjpqd3FxcKPMV0XHd7ES5TaPj1rVo=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:902:c101:b0:1a1:e48b:98b8 with SMTP id
+ 1-20020a170902c10100b001a1e48b98b8mr1028100pli.10.1679667009722; Fri, 24 Mar
+ 2023 07:10:09 -0700 (PDT)
+Date:   Fri, 24 Mar 2023 07:10:08 -0700
+In-Reply-To: <0a9ba6e6-d976-c3fa-372e-81fba85210ab@linux.microsoft.com>
+Mime-Version: 1.0
+References: <20230320185110.1346829-1-jpiotrowski@linux.microsoft.com>
+ <ZBsqxeRDh+iV8qmm@google.com> <0a9ba6e6-d976-c3fa-372e-81fba85210ab@linux.microsoft.com>
+Message-ID: <ZB2vQHl0tSbhsDao@google.com>
+Subject: Re: [PATCH] KVM: SVM: Flush Hyper-V TLB when required
+From:   Sean Christopherson <seanjc@google.com>
+To:     Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>
+Cc:     linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        kvm@vger.kernel.org, Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Tianyu Lan <ltykernel@gmail.com>,
+        Michael Kelley <mikelley@microsoft.com>, stable@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-7.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Mar 24 2023 at 09:31, David Woodhouse wrote:
-> On Fri, 2023-03-24 at 02:16 +0100, Thomas Gleixner wrote:
->> But that's non-trivial because if you look at bringup_cpu() then you'll
->> notice that this state has an implicit protection against interrupt
->> allocation/free and quite some architectures rely on this for their
->> early bringup code and possibly their STARTING state callbacks.
->
-> I literally pointed that out in 2021 (in one of the messages I
-> reference below).
->
-> For x86 I don't believe that's going to be an issue yet, if at all. I
-> think it matters for the lapic_online() call which happens near the end
-> of start_secondary(); it's almost the last thing it does before going
-> into the generic AP startup thread. It's *also* preceded by a comment
-> that at least *suggests* it ought to be fine anyway, although we should
-> never entirely trust such comments.
->
->         /*
->          * Lock vector_lock, set CPU online and bring the vector
->          * allocator online. Online must be set with vector_lock held
->          * to prevent a concurrent irq setup/teardown from seeing a
->          * half valid vector space.
+On Fri, Mar 24, 2023, Jeremi Piotrowski wrote:
+> I have the #ifdef version ready to send out, but what do you think about this:
 
-That setup/teardown wording is misleading as that's already covered by
-sparse_irq_lock.
+Oh, nice!  Yeah, that works, I didn't see the stub for hyperv_flush_guest_mapping().
 
-This is purely x86 specific. Setting the CPU online and onlining the CPU
-in the matrix allocator has to be atomic vs. concurrent allocations from
-the matrix allocator, which can happen via request/free_irq() and
-affinity changes independent of interrupt setup/teardown (e.g. MSI enable).
+> @@ -3753,6 +3753,39 @@ static void svm_flush_tlb_current(struct kvm_vcpu *vcpu)
+>  		svm->current_vmcb->asid_generation--;
+>  }
+>  
+> +static void svm_flush_tlb_current(struct kvm_vcpu *vcpu)
+> +{
+> +	hpa_t root_tdp = vcpu->arch.mmu->root.hpa;
+> +
+> +	/*
+> +	 * When running on Hyper-V with EnlightenedNptTlb enabled, explicitly
+> +	 * flush the NPT mappings via hypercall as flushing the ASID only
+> +	 * affects virtual to physical mappings, it does not invalidate guest
+> +	 * physical to host physical mappings.
+> +	 */
+> +	if (IS_ENABLED(CONFIG_HYPERV) &&
 
-Thanks,
+No need for the IS_ENABLED(CONFIG_HYPERV) check here, the svm_hv_is_enlightened_tlb_enabled()
+stub that's provided for CONFIG_HYPERV=n will guard this properly
 
-        tglx
+	if (svm_hv_is_enlightened_tlb_enabled(vcpu) && VALID_PAGE(root_tdp))
+		hyperv_flush_guest_mapping(root_tdp);
+
+> +	    svm_hv_is_enlightened_tlb_enabled(vcpu) &&
+> +	    VALID_PAGE(root_tdp))
+> +		hyperv_flush_guest_mapping(root_tdp);
+> +
+> +	svm_flush_tlb_asid(vcpu);
+> +}
+> +
+> +static void svm_flush_tlb_all(struct kvm_vcpu *vcpu)
+> +{
+> +	/*
+> +	 * When running on Hyper-V with EnlightenedNptTlb enabled, remote TLB
+> +	 * flushes should be routed to hv_remote_flush_tlb() without requesting
+> +	 * a "regular" remote flush.  Reaching this point means either there's
+> +	 * a KVM bug or a prior hv_remote_flush_tlb() call failed, both of
+> +	 * which might be fatal to the guest.  Yell, but try to recover.
+> +	 */
+> +	if (IS_ENABLED(CONFIG_HYPERV) && WARN_ON_ONCE(svm_hv_is_enlightened_tlb_enabled(vcpu)))
+> +		hv_remote_flush_tlb(vcpu->kvm);
+
+And then
+
+	if (WARN_ON_ONCE(svm_hv_is_enlightened_tlb_enabled(vcpu)))
+		hv_remote_flush_tlb(vcpu->kvm);
+
+
+> +
+> +	svm_flush_tlb_asid(vcpu);
+> +}
+> +
+>  static void svm_flush_tlb_gva(struct kvm_vcpu *vcpu, gva_t gva)
+>  {
+>  	struct vcpu_svm *svm = to_svm(vcpu);
+> @@ -4745,10 +4778,10 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
+>  	.set_rflags = svm_set_rflags,
+>  	.get_if_flag = svm_get_if_flag,
+>  
+> -	.flush_tlb_all = svm_flush_tlb_current,
+> +	.flush_tlb_all = svm_flush_tlb_all,
+>  	.flush_tlb_current = svm_flush_tlb_current,
+>  	.flush_tlb_gva = svm_flush_tlb_gva,
+> -	.flush_tlb_guest = svm_flush_tlb_current,
+> +	.flush_tlb_guest = svm_flush_tlb_asid,
+>  
+>  	.vcpu_pre_run = svm_vcpu_pre_run,
+>  	.vcpu_run = svm_vcpu_run,
+> diff --git a/arch/x86/kvm/svm/svm_onhyperv.h b/arch/x86/kvm/svm/svm_onhyperv.h
+> index cff838f15db5..4c9e0d4ba3dd 100644
+> --- a/arch/x86/kvm/svm/svm_onhyperv.h
+> +++ b/arch/x86/kvm/svm/svm_onhyperv.h
+> @@ -6,6 +6,8 @@
+>  #ifndef __ARCH_X86_KVM_SVM_ONHYPERV_H__
+>  #define __ARCH_X86_KVM_SVM_ONHYPERV_H__
+> 
+> +#include <asm/mshyperv.h>
+> +
+>  #if IS_ENABLED(CONFIG_HYPERV)
+> 
+>  #include "kvm_onhyperv.h"
+> @@ -15,6 +17,14 @@ static struct kvm_x86_ops svm_x86_ops;
+>  
+>  int svm_hv_enable_l2_tlb_flush(struct kvm_vcpu *vcpu);
+>  
+> +static inline bool svm_hv_is_enlightened_tlb_enabled(struct kvm_vcpu *vcpu)
+> +{
+> +	struct hv_vmcb_enlightenments *hve = &to_svm(vcpu)->vmcb->control.hv_enlightenments;
+> +
+> +	return ms_hyperv.nested_features & HV_X64_NESTED_ENLIGHTENED_TLB &&
+> +		!!hve->hv_enlightenments_control.enlightened_npt_tlb;
+
+Uber nit, align the indentation (7 spaces instead of 1 tab):
+
+	return ms_hyperv.nested_features & HV_X64_NESTED_ENLIGHTENED_TLB &&
+	       !!hve->hv_enlightenments_control.enlightened_npt_tlb;
