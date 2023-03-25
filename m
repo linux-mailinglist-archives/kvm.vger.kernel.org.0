@@ -2,77 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C3FDD6C89CE
-	for <lists+kvm@lfdr.de>; Sat, 25 Mar 2023 02:12:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 28A9D6C8CBD
+	for <lists+kvm@lfdr.de>; Sat, 25 Mar 2023 09:43:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231248AbjCYBMH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Mar 2023 21:12:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54964 "EHLO
+        id S231840AbjCYInN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 25 Mar 2023 04:43:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47102 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229805AbjCYBMG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Mar 2023 21:12:06 -0400
-Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14BB3196AC;
-        Fri, 24 Mar 2023 18:12:04 -0700 (PDT)
-Received: by mail-pl1-x62a.google.com with SMTP id k2so3395799pll.8;
-        Fri, 24 Mar 2023 18:12:04 -0700 (PDT)
+        with ESMTP id S229600AbjCYInM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 25 Mar 2023 04:43:12 -0400
+Received: from mail-lj1-x236.google.com (mail-lj1-x236.google.com [IPv6:2a00:1450:4864:20::236])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14E6049E1;
+        Sat, 25 Mar 2023 01:43:10 -0700 (PDT)
+Received: by mail-lj1-x236.google.com with SMTP id f16so3943429ljq.10;
+        Sat, 25 Mar 2023 01:43:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1679706723;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=KDRsEzG2Gk9MVUw3sxbw395ksH9vrtegGd0MF8IuTp0=;
-        b=Brbfd01VH/Aqm3LRGBm6H/CwQe+gekjCCqXgm64Ozg8Wh2iFRoYenX8cmH7fUhhWrB
-         EUWvcsxuy8PXfGfQ3qZkDo82kQLfcdj4hfWmKMhYqtZ0uB9b2hTByiVcGClV4QrKI+0h
-         5IEeMBqDrTrRZc/WrSHbDLCk77ERcXIzl5Ww2cC/qNX7e6UVb0wGrd+dmFqP1FvcDxCc
-         vH5Qxr/bDFIERpPufFFFu0Ocbb5UA3I98VFB9w7umf11S7cFSGay+xzp4P6brWSIA6SQ
-         0XNe9Y73p3kKSZUaEcfOQ1ioAtD4EILIOTES4C0zZ/WedUfjWnQq70qBt8rRDt820Ier
-         JnIg==
+        d=gmail.com; s=20210112; t=1679733788; x=1682325788;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9jv3VvZnU7w2nlR9bNM+GCMAVdcW1eyjXRIWESm7qpA=;
+        b=cYt/+QKdRPxgmai3qQ7Z9DYbV+0GouKOWZ9bBlPaTDHy2/sMdJj2Z2Lrxb/FkHay6e
+         1dfc/ydVWPHjBz8Z7olawvATXEbe/luJ3em8ID7ux5gShYbX44v/rXvjpT3tOJtrvdZJ
+         MbVBWYkcTb9wOEuh2Og8MCgACVNZv7unExJrkybdhwlG8BXYR3DueQ/r7+Xvyu2x0DjW
+         iVrae6dZiO05Vr+nQ7xbJkm5fGkwqmWNRgCUB0oe34oLDVA2lWLvXeaaZS9crdBVl6yw
+         /OCDSAmuasFowr/83MC9TOSvgFHM5UjrMeIVnzlCsCi8cNW9tnuMqSgArA8Gf/dqMKi9
+         NXUA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679706723;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=KDRsEzG2Gk9MVUw3sxbw395ksH9vrtegGd0MF8IuTp0=;
-        b=Xpfp4wkDZHK9bEJ8HTaS0qflhF+WGfTyiDS3wo9pLpN2t+1cx0dyaLrH4K0l0EFFRs
-         F1NTgwVlY2xU56QfSLRGcxrdCqYUK77+hIGLD4hJbNi3YZlBKkXoeY385bDie+DNT1PZ
-         Ed8MZ4NBDo36znmWz+c+zs+ep9DBerVPywSuw+kZK3XR/kRag8XaFksCT3H0uXwA0pID
-         Bg/Jf7xK73i379GGT32sEBkhUsNex12gyCDmHExAEhHaKkT+nD0xiHwX5p4fnlWx9iRh
-         jD7zwcQiIPkY8e0StSmQ2FKl0JAqYhIKYwLa9Se4Ws/rAlL3Sl1lmicla80DKBs8TH0p
-         +i8A==
-X-Gm-Message-State: AAQBX9ejW+xoSpmt+iGCbqMDXF90H9+f5kDgkPsG3r3JTcaaLF9FQ8Bp
-        YX6hSnBqTqmBvfODtLm0FeY=
-X-Google-Smtp-Source: AKy350Z06rgw09P8p9ZsWJIkVfksVckS3SRti5wDZ0Xr4+3/k0zqqKodOZ1fram+KVsPx4oi7y3Zqw==
-X-Received: by 2002:a17:902:ec8c:b0:19e:8566:ea86 with SMTP id x12-20020a170902ec8c00b0019e8566ea86mr5299020plg.62.1679706723237;
-        Fri, 24 Mar 2023 18:12:03 -0700 (PDT)
-Received: from localhost ([192.55.54.55])
-        by smtp.gmail.com with ESMTPSA id x5-20020a1709028ec500b001a04d37a4acsm14827032plo.9.2023.03.24.18.12.01
+        d=1e100.net; s=20210112; t=1679733788; x=1682325788;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=9jv3VvZnU7w2nlR9bNM+GCMAVdcW1eyjXRIWESm7qpA=;
+        b=zNQhc75U5Y9UOrwkoWE2pHjeQQBobOZ2QKwOCkCyyGrQ1vzS9Qq2Ta2ihRZjAvyMEB
+         ZE6gOCksyG8GIRj0scnEEbA25NkizF0soEIGPhjRxgIzlL3lOxlEYg0PsrNPGWNqvxul
+         Sk8AMFhXmuYQQzdNX2TFl5cfs3bioLn3V0G1TqGiSDkY8WlCMk2RDCIQDYAFsvCSny5G
+         hX89QMeKKAN1RuyTSZvHaQjgu/5p6GehjXkGNLHGGYlcQc/KDvZsEqaHkG75fkDG5eBX
+         EtmiNDI+p4V0TX/uFOuqz9Gu2hJvy5+B2RY/sduZFBPziTLWg1dStnpKCm9TlFqHD83L
+         eNnw==
+X-Gm-Message-State: AAQBX9eGQs5tpxcZjEIOXLBjC9NAhOlbGfyZoT5Er1+r786kBWtl6GXv
+        V7Jn/lLRDRjn+O9TmN1qAbY=
+X-Google-Smtp-Source: AKy350b/LDe3dr65putzORzBvJqfZ9vVcJ5/pleYaK8HgQvdWbR9LxB44CWCl1KZ/KHUcvLDaxwnJA==
+X-Received: by 2002:a05:651c:b0b:b0:295:9c3f:e30c with SMTP id b11-20020a05651c0b0b00b002959c3fe30cmr1998595ljr.1.1679733787922;
+        Sat, 25 Mar 2023 01:43:07 -0700 (PDT)
+Received: from localhost (88-113-32-99.elisa-laajakaista.fi. [88.113.32.99])
+        by smtp.gmail.com with ESMTPSA id p5-20020a2e8045000000b0029f7d27b78bsm1697425ljg.110.2023.03.25.01.43.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 24 Mar 2023 18:12:02 -0700 (PDT)
-Date:   Fri, 24 Mar 2023 18:12:00 -0700
-From:   Isaku Yamahata <isaku.yamahata@gmail.com>
-To:     "Huang, Kai" <kai.huang@intel.com>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
-        "zhi.wang.linux@gmail.com" <zhi.wang.linux@gmail.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "Shahar, Sagi" <sagis@google.com>,
-        "Aktas, Erdem" <erdemaktas@google.com>,
-        "isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
-        "dmatlack@google.com" <dmatlack@google.com>,
-        "Christopherson,, Sean" <seanjc@google.com>
-Subject: Re: [PATCH v13 057/113] KVM: TDX: MTRR: implement get_mt_mask() for
- TDX
-Message-ID: <20230325011200.GB214881@ls.amr.corp.intel.com>
+        Sat, 25 Mar 2023 01:43:07 -0700 (PDT)
+Date:   Sat, 25 Mar 2023 10:43:06 +0200
+From:   Zhi Wang <zhi.wang.linux@gmail.com>
+To:     isaku.yamahata@intel.com
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
+        erdemaktas@google.com, Sean Christopherson <seanjc@google.com>,
+        Sagi Shahar <sagis@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Kai Huang <kai.huang@intel.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Subject: Re: [PATCH v13 016/113] KVM: TDX: x86: Add ioctl to get TDX
+ systemwide parameters
+Message-ID: <20230325104306.00004585@gmail.com>
+In-Reply-To: <cb0ae8b4941aaa45e1e5856dde644f9b2f53d9a6.1678643052.git.isaku.yamahata@intel.com>
 References: <cover.1678643051.git.isaku.yamahata@intel.com>
- <cbfaedb652dad85f4020a2dcd74ac4abb5c14ac5.1678643052.git.isaku.yamahata@intel.com>
- <b3198a621a39d4c277ddf540e7a492953dc3637d.camel@intel.com>
+        <cb0ae8b4941aaa45e1e5856dde644f9b2f53d9a6.1678643052.git.isaku.yamahata@intel.com>
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <b3198a621a39d4c277ddf540e7a492953dc3637d.camel@intel.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
         DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
@@ -83,295 +79,280 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 16, 2023 at 10:38:02AM +0000,
-"Huang, Kai" <kai.huang@intel.com> wrote:
+On Sun, 12 Mar 2023 10:55:40 -0700
+isaku.yamahata@intel.com wrote:
 
-> On Sun, 2023-03-12 at 10:56 -0700, isaku.yamahata@intel.com wrote:
-> > From: Isaku Yamahata <isaku.yamahata@intel.com>
-> > 
-> > Because TDX virtualize cpuid[0x1].EDX[MTRR: bit 12] to fixed 1, guest TD
-> > thinks MTRR is supported.  Although TDX supports only WB for private GPA,
-> > it's desirable to support MTRR for shared GPA.  As guest access to MTRR
-> > MSRs causes #VE and KVM/x86 tracks the values of MTRR MSRs, the remining
-> > part is to implement get_mt_mask method for TDX for shared GPA.
-> > 
-> > Pass around shared bit from kvm fault handler to get_mt_mask method so that
-> > it can determine if the gfn is shared or private.  
-> > 
+Does this have to be a new generic ioctl with a dedicated new x86_ops? SNP
+does not use it at all and all the system-scoped ioctl of SNP going through
+the CCP driver. So getting system-scope information of TDX/SNP will end up
+differently.
+
+Any thought, Sean? Moving getting SNP system-wide information to
+KVM dev ioctl seems not ideal and TDX does not have a dedicated driver like
+CCP. Maybe make this ioctl TDX-specific? KVM_TDX_DEV_OP?
+
+> From: Sean Christopherson <sean.j.christopherson@intel.com>
 > 
-> I think we have an Xarray to query whether a given GFN is shared or private?
-> Can we use that?
+> Implement a system-scoped ioctl to get system-wide parameters for TDX.
 > 
-> > Implement get_mt_mask()
-> > following vmx case for shared GPA and return WB for private GPA.
-> > the existing vmx_get_mt_mask() can't be directly used as CPU state(CR0.CD)
-> > is protected.  GFN passed to kvm_mtrr_check_gfn_range_consistency() should
-> > include shared bit.
-> > 
-> > Suggested-by: Kai Huang <kai.huang@intel.com>
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> ---
+>  arch/x86/include/asm/kvm-x86-ops.h    |  1 +
+>  arch/x86/include/asm/kvm_host.h       |  1 +
+>  arch/x86/include/uapi/asm/kvm.h       | 48 +++++++++++++++++++++++++
+>  arch/x86/kvm/vmx/main.c               |  2 ++
+>  arch/x86/kvm/vmx/tdx.c                | 51 +++++++++++++++++++++++++++
+>  arch/x86/kvm/vmx/x86_ops.h            |  2 ++
+>  arch/x86/kvm/x86.c                    |  6 ++++
+>  tools/arch/x86/include/uapi/asm/kvm.h | 48 +++++++++++++++++++++++++
+>  8 files changed, 159 insertions(+)
 > 
-> I am not sure what is suggested by me?
-> 
-> I thought what I suggested is we should have a dedicated patch to handle MTRR
-> for TDX putting all related things together.
+> diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
+> index eac4b65d1b01..b46dcac078b2 100644
+> --- a/arch/x86/include/asm/kvm-x86-ops.h
+> +++ b/arch/x86/include/asm/kvm-x86-ops.h
+> @@ -117,6 +117,7 @@ KVM_X86_OP(enter_smm)
+>  KVM_X86_OP(leave_smm)
+>  KVM_X86_OP(enable_smi_window)
+>  #endif
+> +KVM_X86_OP_OPTIONAL(dev_mem_enc_ioctl)
+>  KVM_X86_OP_OPTIONAL(mem_enc_ioctl)
+>  KVM_X86_OP_OPTIONAL(mem_enc_register_region)
+>  KVM_X86_OP_OPTIONAL(mem_enc_unregister_region)
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 00c25f6ab871..49e3ca89aced 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -1719,6 +1719,7 @@ struct kvm_x86_ops {
+>  	void (*enable_smi_window)(struct kvm_vcpu *vcpu);
+>  #endif
+>  
+> +	int (*dev_mem_enc_ioctl)(void __user *argp);
+>  	int (*mem_enc_ioctl)(struct kvm *kvm, void __user *argp);
+>  	int (*mem_enc_register_region)(struct kvm *kvm, struct kvm_enc_region *argp);
+>  	int (*mem_enc_unregister_region)(struct kvm *kvm, struct kvm_enc_region *argp);
+> diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
+> index 6afbfbb32d56..af4c5bd0af1c 100644
+> --- a/arch/x86/include/uapi/asm/kvm.h
+> +++ b/arch/x86/include/uapi/asm/kvm.h
+> @@ -562,4 +562,52 @@ struct kvm_pmu_event_filter {
+>  #define KVM_X86_DEFAULT_VM	0
+>  #define KVM_X86_PROTECTED_VM	1
+>  
+> +/* Trust Domain eXtension sub-ioctl() commands. */
+> +enum kvm_tdx_cmd_id {
+> +	KVM_TDX_CAPABILITIES = 0,
+> +
+> +	KVM_TDX_CMD_NR_MAX,
+> +};
+> +
+> +struct kvm_tdx_cmd {
+> +	/* enum kvm_tdx_cmd_id */
+> +	__u32 id;
+> +	/* flags for sub-commend. If sub-command doesn't use this, set zero. */
+> +	__u32 flags;
+> +	/*
+> +	 * data for each sub-command. An immediate or a pointer to the actual
+> +	 * data in process virtual address.  If sub-command doesn't use it,
+> +	 * set zero.
+> +	 */
+> +	__u64 data;
+> +	/*
+> +	 * Auxiliary error code.  The sub-command may return TDX SEAMCALL
+> +	 * status code in addition to -Exxx.
+> +	 * Defined for consistency with struct kvm_sev_cmd.
+> +	 */
+> +	__u64 error;
+> +	/* Reserved: Defined for consistency with struct kvm_sev_cmd. */
+> +	__u64 unused;
+> +};
+> +
+> +struct kvm_tdx_cpuid_config {
+> +	__u32 leaf;
+> +	__u32 sub_leaf;
+> +	__u32 eax;
+> +	__u32 ebx;
+> +	__u32 ecx;
+> +	__u32 edx;
+> +};
+> +
+> +struct kvm_tdx_capabilities {
+> +	__u64 attrs_fixed0;
+> +	__u64 attrs_fixed1;
+> +	__u64 xfam_fixed0;
+> +	__u64 xfam_fixed1;
+> +
+> +	__u32 nr_cpuid_configs;
+> +	__u32 padding;
+> +	struct kvm_tdx_cpuid_config cpuid_configs[0];
+> +};
+> +
+>  #endif /* _ASM_X86_KVM_H */
+> diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
+> index c8548004802a..6a5d0c7a2950 100644
+> --- a/arch/x86/kvm/vmx/main.c
+> +++ b/arch/x86/kvm/vmx/main.c
+> @@ -201,6 +201,8 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
+>  	.complete_emulated_msr = kvm_complete_insn_gp,
+>  
+>  	.vcpu_deliver_sipi_vector = kvm_vcpu_deliver_sipi_vector,
+> +
+> +	.dev_mem_enc_ioctl = tdx_dev_ioctl,
+>  };
+>  
+>  struct kvm_x86_init_ops vt_init_ops __initdata = {
+> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+> index e9b7aa5654e9..b59d3081d061 100644
+> --- a/arch/x86/kvm/vmx/tdx.c
+> +++ b/arch/x86/kvm/vmx/tdx.c
+> @@ -21,6 +21,57 @@ int tdx_hardware_enable(void)
+>  	return tdx_cpu_enable();
+>  }
+>  
+> +int tdx_dev_ioctl(void __user *argp)
+> +{
+> +	struct kvm_tdx_capabilities __user *user_caps;
+> +	const struct tdsysinfo_struct *tdsysinfo;
+> +	struct kvm_tdx_capabilities caps;
+> +	struct kvm_tdx_cmd cmd;
+> +
+> +	BUILD_BUG_ON(sizeof(struct kvm_tdx_cpuid_config) !=
+> +		     sizeof(struct tdx_cpuid_config));
+> +
+> +	if (copy_from_user(&cmd, argp, sizeof(cmd)))
+> +		return -EFAULT;
+> +	if (cmd.flags || cmd.error || cmd.unused)
+> +		return -EINVAL;
+> +	/*
+> +	 * Currently only KVM_TDX_CAPABILITIES is defined for system-scoped
+> +	 * mem_enc_ioctl().
+> +	 */
+> +	if (cmd.id != KVM_TDX_CAPABILITIES)
+> +		return -EINVAL;
+> +
+> +	tdsysinfo = tdx_get_sysinfo();
+> +	if (!tdsysinfo)
+> +		return -ENOTSUPP;
+> +
+> +	user_caps = (void __user *)cmd.data;
+> +	if (copy_from_user(&caps, user_caps, sizeof(caps)))
+> +		return -EFAULT;
+> +
+> +	if (caps.nr_cpuid_configs < tdsysinfo->num_cpuid_config)
+> +		return -E2BIG;
+> +
+> +	caps = (struct kvm_tdx_capabilities) {
+> +		.attrs_fixed0 = tdsysinfo->attributes_fixed0,
+> +		.attrs_fixed1 = tdsysinfo->attributes_fixed1,
+> +		.xfam_fixed0 = tdsysinfo->xfam_fixed0,
+> +		.xfam_fixed1 = tdsysinfo->xfam_fixed1,
+> +		.nr_cpuid_configs = tdsysinfo->num_cpuid_config,
+> +		.padding = 0,
+> +	};
+> +
+> +	if (copy_to_user(user_caps, &caps, sizeof(caps)))
+> +		return -EFAULT;
+> +	if (copy_to_user(user_caps->cpuid_configs, &tdsysinfo->cpuid_configs,
+> +			 tdsysinfo->num_cpuid_config *
+> +			 sizeof(struct tdx_cpuid_config)))
+> +		return -EFAULT;
+> +
+> +	return 0;
+> +}
+> +
+>  static int __init tdx_module_setup(void)
+>  {
+>  	const struct tdsysinfo_struct *tdsysinfo;
+> diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
+> index b2c74c1b5bbd..78c5537e23a1 100644
+> --- a/arch/x86/kvm/vmx/x86_ops.h
+> +++ b/arch/x86/kvm/vmx/x86_ops.h
+> @@ -141,10 +141,12 @@ void vmx_setup_mce(struct kvm_vcpu *vcpu);
+>  int __init tdx_hardware_setup(struct kvm_x86_ops *x86_ops);
+>  int tdx_hardware_enable(void);
+>  bool tdx_is_vm_type_supported(unsigned long type);
+> +int tdx_dev_ioctl(void __user *argp);
+>  #else
+>  static inline int tdx_hardware_setup(struct kvm_x86_ops *x86_ops) { return -ENOSYS; }
+>  static inline int tdx_hardware_enable(void) { return -EOPNOTSUPP; }
+>  static inline bool tdx_is_vm_type_supported(unsigned long type) { return false; }
+> +static inline int tdx_dev_ioctl(void __user *argp) { return -EOPNOTSUPP; };
+>  #endif
+>  
+>  #endif /* __KVM_X86_VMX_X86_OPS_H */
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 27ab684f8374..a3dc32e33aca 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -4718,6 +4718,12 @@ long kvm_arch_dev_ioctl(struct file *filp,
+>  		r = kvm_x86_dev_has_attr(&attr);
+>  		break;
+>  	}
+> +	case KVM_MEMORY_ENCRYPT_OP:
+> +		r = -EINVAL;
+> +		if (!kvm_x86_ops.dev_mem_enc_ioctl)
+> +			goto out;
+> +		r = static_call(kvm_x86_dev_mem_enc_ioctl)(argp);
+> +		break;
+>  	default:
+>  		r = -EINVAL;
+>  		break;
+> diff --git a/tools/arch/x86/include/uapi/asm/kvm.h b/tools/arch/x86/include/uapi/asm/kvm.h
+> index 6afbfbb32d56..af4c5bd0af1c 100644
+> --- a/tools/arch/x86/include/uapi/asm/kvm.h
+> +++ b/tools/arch/x86/include/uapi/asm/kvm.h
+> @@ -562,4 +562,52 @@ struct kvm_pmu_event_filter {
+>  #define KVM_X86_DEFAULT_VM	0
+>  #define KVM_X86_PROTECTED_VM	1
+>  
+> +/* Trust Domain eXtension sub-ioctl() commands. */
+> +enum kvm_tdx_cmd_id {
+> +	KVM_TDX_CAPABILITIES = 0,
+> +
+> +	KVM_TDX_CMD_NR_MAX,
+> +};
+> +
+> +struct kvm_tdx_cmd {
+> +	/* enum kvm_tdx_cmd_id */
+> +	__u32 id;
+> +	/* flags for sub-commend. If sub-command doesn't use this, set zero. */
+> +	__u32 flags;
+> +	/*
+> +	 * data for each sub-command. An immediate or a pointer to the actual
+> +	 * data in process virtual address.  If sub-command doesn't use it,
+> +	 * set zero.
+> +	 */
+> +	__u64 data;
+> +	/*
+> +	 * Auxiliary error code.  The sub-command may return TDX SEAMCALL
+> +	 * status code in addition to -Exxx.
+> +	 * Defined for consistency with struct kvm_sev_cmd.
+> +	 */
+> +	__u64 error;
+> +	/* Reserved: Defined for consistency with struct kvm_sev_cmd. */
+> +	__u64 unused;
+> +};
+> +
+> +struct kvm_tdx_cpuid_config {
+> +	__u32 leaf;
+> +	__u32 sub_leaf;
+> +	__u32 eax;
+> +	__u32 ebx;
+> +	__u32 ecx;
+> +	__u32 edx;
+> +};
+> +
+> +struct kvm_tdx_capabilities {
+> +	__u64 attrs_fixed0;
+> +	__u64 attrs_fixed1;
+> +	__u64 xfam_fixed0;
+> +	__u64 xfam_fixed1;
+> +
+> +	__u32 nr_cpuid_configs;
+> +	__u32 padding;
+> +	struct kvm_tdx_cpuid_config cpuid_configs[0];
+> +};
+> +
+>  #endif /* _ASM_X86_KVM_H */
 
-Sure. After looking at the specs, my conclusion is that guest TD can't update
-MTRR reliably.  Because MTRR update requires to disable cache(CR0.CR=1), cache
-flush, and tlb flush. (SDM 3a 12.11.7: MTRR maintenance programming interface)
-Linux implements MTRR update logic according to it.
-
-While TDX enforces CR0.CD=0, trying to set CR0.CD=1 results in #GP.  At the
-same time, it reports that MTRR is available via cpuid.  So I come up with the
-followings.
-
-- MTRRCap(RO): report no feature available
-  SMRR=0: SMRR interface unsupported
-  WC=0: write combining unsupported
-  FIX=0: Fixed range registers unsupported
-  VCNT=0: number of variable range regitsers = 0
-
-- MTRRDefType(R/W): Only writeback even with reset state.
-  E=1: enable MTRR (E=0 means all memory is UC.)
-  FE=0: disable fixed range MTRRs
-  type: default memory type=writeback
-  Accept write this value. Other value results in #GP.
-
-- Fixed range MTRR
-  #GP as fixed range MTRRs is reported as unsupported
-
-- Variable range MTRRs
-  #GP as the number of variable range MTRRs is reported as zero
- 
-
-> > +u8 tdx_get_mt_mask(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio)
-> > +{
-> > +	/* TDX private GPA is always WB. */
-> > +	if (!(gfn & kvm_gfn_shared_mask(vcpu->kvm))) {
-> > +		/* MMIO is only for shared GPA. */
-> > +		WARN_ON_ONCE(is_mmio);
-> > +		return  MTRR_TYPE_WRBACK << VMX_EPT_MT_EPTE_SHIFT;
-> > +	}
-> > +
-> > +	/* Drop shared bit as MTRR doesn't know about shared bit. */
-> > +	gfn = kvm_gfn_to_private(vcpu->kvm, gfn);
-> > +
-> > +	/* As TDX enforces CR0.CD to 0, pass check_cr0_cd = false. */
-> > +	return __vmx_get_mt_mask(vcpu, gfn, is_mmio, false);
-> > +}
-> 
-> 
-> Do you know whether there's any use case of non-coherent device assignment to
-> TDX guest?
-> 
-> IMHO, we should just disallow TDX guest to support non-coherent device
-> assignment, so that we can just return WB for both private and shared.
-> 
-> If we support non-coherent device assignment, then if guest sets private memory
-> to non-WB memory, it believes the memory type is non-WB, but in fact TDX always
-> map private memory as WB.
-> 
-> Will this be a problem, i.e. if assigned device can DMA to private memory
-> directly in the future?
-
-MTRR is legacy feature and PAT replaced it.  We can rely on guest to use PAT.
-Here is the new patch for MTRR.
-
---- a/arch/x86/kvm/vmx/main.c
-+++ b/arch/x86/kvm/vmx/main.c
-@@ -229,6 +229,14 @@ static void vt_load_mmu_pgd(struct kvm_vcpu *vcpu, hpa_t root_hpa,
- 	vmx_load_mmu_pgd(vcpu, root_hpa, pgd_level);
- }
- 
-+static u8 vt_get_mt_mask(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio)
-+{
-+	if (is_td_vcpu(vcpu))
-+		return tdx_get_mt_mask(vcpu, gfn, is_mmio);
-+
-+	return vmx_get_mt_mask(vcpu, gfn, is_mmio);
-+}
-+
- static int vt_mem_enc_ioctl(struct kvm *kvm, void __user *argp)
- {
- 	if (!is_td(kvm))
-@@ -349,7 +357,7 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
- 
- 	.set_tss_addr = vmx_set_tss_addr,
- 	.set_identity_map_addr = vmx_set_identity_map_addr,
--	.get_mt_mask = vmx_get_mt_mask,
-+	.get_mt_mask = vt_get_mt_mask,
- 
- 	.get_exit_info = vmx_get_exit_info,
- 
-diff -u b/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
---- b/arch/x86/kvm/vmx/tdx.c
-+++ b/arch/x86/kvm/vmx/tdx.c
-@@ -347,6 +347,25 @@
- 	return 0;
- }
- 
-+u8 tdx_get_mt_mask(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio)
-+{
-+	/* TDX private GPA is always WB. */
-+	if (!(gfn & kvm_gfn_shared_mask(vcpu->kvm))) {
-+		/* MMIO is only for shared GPA. */
-+		WARN_ON_ONCE(is_mmio);
-+		return  MTRR_TYPE_WRBACK << VMX_EPT_MT_EPTE_SHIFT;
-+	}
-+
-+	if (is_mmio)
-+		return MTRR_TYPE_UNCACHABLE << VMX_EPT_MT_EPTE_SHIFT;
-+
-+	if (!kvm_arch_has_noncoherent_dma(vcpu->kvm))
-+		return (MTRR_TYPE_WRBACK << VMX_EPT_MT_EPTE_SHIFT) | VMX_EPT_IPAT_BIT;
-+
-+	/* TDX enforces CR0.CD = 0 and KVM MTRR emulation enforces writeback. */
-+	return MTRR_TYPE_WRBACK << VMX_EPT_MT_EPTE_SHIFT;
-+}
-+
- int tdx_vcpu_create(struct kvm_vcpu *vcpu)
- {
- 	/*
-@@ -1256,6 +1275,45 @@
- 	return ret;
- }
- 
-+static int tdx_vcpu_init_mtrr(struct kvm_vcpu *vcpu)
-+{
-+	struct msr_data msr;
-+	int ret;
-+	int i;
-+
-+	/*
-+	 * To avoid confusion with reporting VNCT = 0, explicitly disable
-+	 * vaiale-range reisters.
-+	 */
-+	for (i = 0; i < KVM_NR_VAR_MTRR; i++) {
-+		/* phymask */
-+		msr = (struct msr_data) {
-+			.host_initiated = true,
-+			.index = 0x200 + 2 * i + 1,
-+			.data = 0,	/* valid = 0 to disable. */
-+		};
-+		ret = kvm_set_msr_common(vcpu, &msr);
-+		if (ret)
-+			return -EINVAL;
-+	}
-+
-+	/* Set MTRR to use writeback on reset. */
-+	msr = (struct msr_data) {
-+		.host_initiated = true,
-+		.index = MSR_MTRRdefType,
-+		/*
-+		 * Set E(enable MTRR)=1, FE(enable fixed range MTRR)=0, default
-+		 * type=writeback on reset to avoid UC.  Note E=0 means all
-+		 * memory is UC.
-+		 */
-+		.data = (1 << 11) | MTRR_TYPE_WRBACK,
-+	};
-+	ret = kvm_set_msr_common(vcpu, &msr);
-+	if (ret)
-+		return -EINVAL;
-+	return 0;
-+}
-+
- int tdx_vcpu_ioctl(struct kvm_vcpu *vcpu, void __user *argp)
- {
- 	struct msr_data apic_base_msr;
-@@ -1293,6 +1351,10 @@
- 	if (kvm_set_apic_base(vcpu, &apic_base_msr))
- 		return -EINVAL;
- 
-+	ret = tdx_vcpu_init_mtrr(vcpu);
-+	if (ret)
-+		return ret;
-+
- 	ret = tdx_td_vcpu_init(vcpu, (u64)cmd.data);
- 	if (ret)
- 		return ret;
-@@ -1676,7 +1738,9 @@
- 	case MSR_IA32_UCODE_REV:
- 	case MSR_IA32_ARCH_CAPABILITIES:
- 	case MSR_IA32_POWER_CTL:
-+	case MSR_MTRRcap:
- 	case MSR_IA32_CR_PAT:
-+	case MSR_MTRRdefType:
- 	case MSR_IA32_TSC_DEADLINE:
- 	case MSR_IA32_MISC_ENABLE:
- 	case MSR_PLATFORM_INFO:
-@@ -1718,16 +1782,47 @@
- 
- int tdx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr)
- {
--	if (tdx_has_emulated_msr(msr->index, false))
--		return kvm_get_msr_common(vcpu, msr);
--	return 1;
-+	switch (msr->index) {
-+	case MSR_MTRRcap:
-+		/*
-+		 * Override kvm_mtrr_get_msr() which hardcodes the value.
-+		 * Report SMRR = 0, WC = 0, FIX = 0 VCNT = 0 to disable MTRR
-+		 * effectively.
-+		 */
-+		msr->data = 0;
-+		return 0;
-+	default:
-+		if (tdx_has_emulated_msr(msr->index, false))
-+			return kvm_get_msr_common(vcpu, msr);
-+		return 1;
-+	}
- }
- 
- int tdx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr)
- {
--	if (tdx_has_emulated_msr(msr->index, true))
-+	switch (msr->index) {
-+	case MSR_MTRRdefType:
-+		/*
-+		 * Allow writeback only for all memory.
-+		 * Because it's reported that fixed range MTRR isn't supported
-+		 * and VCNT=0, enforce MTRRDefType.FE = 0 and don't care
-+		 * variable range MTRRs. Only default memory type matters.
-+		 *
-+		 * bit 11 E: MTRR enable/disable
-+		 * bit 12 FE: Fixed-range MTRRs enable/disable
-+		 * (E, FE) = (1, 1): enable MTRR and Fixed range MTRR
-+		 * (E, FE) = (1, 0): enable MTRR, disable Fixed range MTRR
-+		 * (E, FE) = (0, *): disable all MTRRs.  all physical memory
-+		 *                   is UC
-+		 */
-+		if (msr->data != ((1 << 11) | MTRR_TYPE_WRBACK))
-+			return 1;
- 		return kvm_set_msr_common(vcpu, msr);
--	return 1;
-+	default:
-+		if (tdx_has_emulated_msr(msr->index, true))
-+			return kvm_set_msr_common(vcpu, msr);
-+		return 1;
-+	}
- }
- 
- int tdx_dev_ioctl(void __user *argp)
-unchanged:
---- a/arch/x86/kvm/vmx/x86_ops.h
-+++ b/arch/x86/kvm/vmx/x86_ops.h
-@@ -152,6 +152,7 @@ int tdx_vm_ioctl(struct kvm *kvm, void __user *argp);
- int tdx_vcpu_create(struct kvm_vcpu *vcpu);
- void tdx_vcpu_free(struct kvm_vcpu *vcpu);
- void tdx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event);
-+u8 tdx_get_mt_mask(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio);
- 
- int tdx_vcpu_ioctl(struct kvm_vcpu *vcpu, void __user *argp);
- 
-@@ -176,6 +177,7 @@ static inline int tdx_vm_ioctl(struct kvm *kvm, void __user *argp) { return -EOP
- static inline int tdx_vcpu_create(struct kvm_vcpu *vcpu) { return -EOPNOTSUPP; }
- static inline void tdx_vcpu_free(struct kvm_vcpu *vcpu) {}
- static inline void tdx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event) {}
-+static inline u8 tdx_get_mt_mask(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio) { return 0; }
- 
- static inline int tdx_vcpu_ioctl(struct kvm_vcpu *vcpu, void __user *argp) { return -EOPNOTSUPP; }
- 
-
-
-
--- 
-Isaku Yamahata <isaku.yamahata@gmail.com>
