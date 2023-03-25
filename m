@@ -2,229 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EDE646C8CE0
-	for <lists+kvm@lfdr.de>; Sat, 25 Mar 2023 10:05:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0F5706C8D84
+	for <lists+kvm@lfdr.de>; Sat, 25 Mar 2023 12:40:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232160AbjCYJF5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 25 Mar 2023 05:05:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60960 "EHLO
+        id S229460AbjCYLkD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 25 Mar 2023 07:40:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56706 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231196AbjCYJFz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 25 Mar 2023 05:05:55 -0400
-Received: from mail-lj1-x22c.google.com (mail-lj1-x22c.google.com [IPv6:2a00:1450:4864:20::22c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80ED7AF33;
-        Sat, 25 Mar 2023 02:05:54 -0700 (PDT)
-Received: by mail-lj1-x22c.google.com with SMTP id s20so4009941ljp.1;
-        Sat, 25 Mar 2023 02:05:54 -0700 (PDT)
+        with ESMTP id S229588AbjCYLkC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 25 Mar 2023 07:40:02 -0400
+Received: from mail-ed1-x535.google.com (mail-ed1-x535.google.com [IPv6:2a00:1450:4864:20::535])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0607649EE
+        for <kvm@vger.kernel.org>; Sat, 25 Mar 2023 04:40:01 -0700 (PDT)
+Received: by mail-ed1-x535.google.com with SMTP id y4so17635201edo.2
+        for <kvm@vger.kernel.org>; Sat, 25 Mar 2023 04:40:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1679735153; x=1682327153;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jhbpEFk67D6hUVRHgU7NUb/AIOHjm0RIrXkV1zDsaxg=;
-        b=H+qwl/kGKIjc5XQX8FKXhNDx7e6bQu+pgMxBq5iw3Ijmt8KALRDudsLNCdtLwAmT5N
-         595dCnCg9/DwCCA8Lnpur7D9FWTypnrDJthfxq54Lv+dgQiG08q8aoKnrti8yBGlh1Q0
-         CEeY5YWZjZQ5KYe/6JGh3ZsuVXkn16zupEyG9i4i5uMqwYvPyYmqD5cKDFJ4rBssKl3s
-         xXDSTBoNilpS46j0HZAKx+LIOvCLFboLP8OQucDlQCQUY4rtCJDbgqchpk9rgNVdvzYd
-         CJ9osxzuxVjJ+zsyxGee+UxCyD/84cbcteK2zf2+vAdpZtNL7e3T6Rtnq0YRARN7Xga6
-         Rgow==
+        d=grsecurity.net; s=grsec; t=1679744399;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Wd22/vWONbk3WUNNM+gvXjr7Gccl9dW9XU0Mq3slivY=;
+        b=r6s2yXd2bBH1EqHJYdtcDsuBLBQKjFL9x6YLEJzvx09P836Eqj40BGf64OzxddtJZW
+         d5nuh84qpxIRYVLeqGuv0yChoVP9l3qXyV0KPsKE0yW+82V245yx5He1OyRpbgfM+Jrs
+         aS/eRroy0GJmMCx7A8UdmlWu/zuG1+ivol8YBHsIcxryI+z+2AA9XUx0ZZ6SXh+H/Nqj
+         die29i/NzZ7Trd7oaklZU08XA6hty6eE732H4cVbAhygnexRKA//+p3NEmmvUtqtiYQb
+         a0j1c8Tn1mnwE/12x7KJffMG6otQbExpIRaCvZpXmjM5d9M0LQsrG4uPLUhySbcbJ5Cv
+         +uJw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679735153; x=1682327153;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=jhbpEFk67D6hUVRHgU7NUb/AIOHjm0RIrXkV1zDsaxg=;
-        b=l3ILKb1j14oF0dlR8z6lXzFZtv2i/NtrIkpceRN4mqBzgBKTLMmNDPJl3lWaCM1xfk
-         Yr/K8qXx4rCVJyUdsYhsNoubCnj66PspuGAS9Rr63dlmGyxSNjKKC3MjRsfwmJkn5TeE
-         rKQAg8B+lhgFJ++IBBCkK6NPJsPVeTsXCjc592PFPUAE0/7OeIgBAho++l2y8wZuEwy0
-         E1VkD9VdOFwEAmvGHIlplC9WiCBj3+1Io2SY7u2IdoYGMWITqUvwPxrunDTdt51Bn6XY
-         KYGeYuS3+08JAR0H+df/61ozHOiQOBq6/Yw+W/P9Ta91GHxwooZUiDWjIhnAEDj7fRYJ
-         83pw==
-X-Gm-Message-State: AAQBX9dfFWy253ci33E8JgkkJ2X63uXGZfMST2Q1OY0EqVHUsHqwK4cN
-        YJ3dViK7YyB0OYeBu6goYgA=
-X-Google-Smtp-Source: AKy350Y+cC01kcLJ6U/wnucin3pcXJjxfbMjhtuA3lMThBuj/UxwPB5DhjVi2mQsB3YkqmUpPUQH+Q==
-X-Received: by 2002:a2e:4a11:0:b0:298:b32d:6bea with SMTP id x17-20020a2e4a11000000b00298b32d6beamr1457955lja.5.1679735152396;
-        Sat, 25 Mar 2023 02:05:52 -0700 (PDT)
-Received: from localhost (88-113-32-99.elisa-laajakaista.fi. [88.113.32.99])
-        by smtp.gmail.com with ESMTPSA id y1-20020a2eb001000000b002986854f27dsm3705931ljk.23.2023.03.25.02.05.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 25 Mar 2023 02:05:52 -0700 (PDT)
-Date:   Sat, 25 Mar 2023 11:05:50 +0200
-From:   Zhi Wang <zhi.wang.linux@gmail.com>
-To:     isaku.yamahata@intel.com
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
-        erdemaktas@google.com, Sean Christopherson <seanjc@google.com>,
-        Sagi Shahar <sagis@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Kai Huang <kai.huang@intel.com>
-Subject: Re: [PATCH v13 017/113] KVM: TDX: Add place holder for TDX VM
- specific mem_enc_op ioctl
-Message-ID: <20230325110550.00006091@gmail.com>
-In-Reply-To: <7cdfc307ea8717849e71063ceebf1e328448e773.1678643052.git.isaku.yamahata@intel.com>
-References: <cover.1678643051.git.isaku.yamahata@intel.com>
-        <7cdfc307ea8717849e71063ceebf1e328448e773.1678643052.git.isaku.yamahata@intel.com>
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
+        d=1e100.net; s=20210112; t=1679744399;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Wd22/vWONbk3WUNNM+gvXjr7Gccl9dW9XU0Mq3slivY=;
+        b=bzbbcTeujRCAcsjEoc5pkNdVzgcLBc1H/wBgMfGn9+41R029Rhb+u3k8ooWobSiqxo
+         hqMBaxXx3zoEYm8b++fTWqeAkZkZIP7Zmaq8Ye9ZkOyo8sjYlK2C+iYoEzl7Madz9GhO
+         iCui2es+TjYO8dYdH7Y6XhgSFiPtobY1PvkDt53WzSQpSaGkZfCFT7LSb8tssx0574v7
+         zqIFnYEAoY3dohw06JlEShMrur/+mSEm6540UhTxNR4VbPEX1L1fWy4Th0rLSG91CCM6
+         t1jLXvYVP9iw8up9JOIovK6zB6sJoQcKG14u7Nhsd3lbQzM2PZSTbZHQdHr9SJ1gQ46B
+         X3hQ==
+X-Gm-Message-State: AO0yUKWscwvLJPW5QU20W2a12lFHm9mCC8Ltj6y9yplN9fnHFWcUvsxm
+        Wae/rW4n03ei6n7GV2xHChcz9ArVyrEIKT1ol3o=
+X-Google-Smtp-Source: AK7set/I3OX5IAinZfWSdKlR+CGDrxYPIiN3UgRjXO7KTuweqEtrJjU2Neg3OqKsbrcFLO/tnj893w==
+X-Received: by 2002:a05:6402:5d87:b0:4af:740d:fde with SMTP id if7-20020a0564025d8700b004af740d0fdemr10673310edb.20.1679744399470;
+        Sat, 25 Mar 2023 04:39:59 -0700 (PDT)
+Received: from ?IPV6:2003:f6:af27:200:4bd7:14cf:98bf:224e? (p200300f6af2702004bd714cf98bf224e.dip0.t-ipconnect.de. [2003:f6:af27:200:4bd7:14cf:98bf:224e])
+        by smtp.gmail.com with ESMTPSA id v1-20020a50d581000000b0050234b3fecesm492649edi.73.2023.03.25.04.39.58
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 25 Mar 2023 04:39:59 -0700 (PDT)
+Message-ID: <190509c8-0f05-d05c-831c-596d2c9664ac@grsecurity.net>
+Date:   Sat, 25 Mar 2023 12:39:59 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.8.0
+Subject: Re: [PATCH v4 0/6] KVM: MMU: performance tweaks for heavy CR0.WP
+ users
+Content-Language: en-US, de-DE
+To:     Sean Christopherson <seanjc@google.com>, Greg KH <greg@kroah.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        stable@vger.kernel.org
+References: <20230322013731.102955-1-minipli@grsecurity.net>
+ <167949641597.2215962.13042575709754610384.b4-ty@google.com>
+From:   Mathias Krause <minipli@grsecurity.net>
+In-Reply-To: <167949641597.2215962.13042575709754610384.b4-ty@google.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
-        DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-        version=3.4.6
+X-Spam-Status: No, score=0.1 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
+        DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=no
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, 12 Mar 2023 10:55:41 -0700
-isaku.yamahata@intel.com wrote:
-
-> From: Isaku Yamahata <isaku.yamahata@intel.com>
+On 23.03.23 23:50, Sean Christopherson wrote:
+> On Wed, 22 Mar 2023 02:37:25 +0100, Mathias Krause wrote:
+>> v3: https://lore.kernel.org/kvm/20230201194604.11135-1-minipli@grsecurity.net/
+>>
+>> This series is the fourth iteration of resurrecting the missing pieces of
+>> Paolo's previous attempt[1] to avoid needless MMU roots unloading.
+>>
+>> It's incorporating Sean's feedback to v3 and rebased on top of
+>> kvm-x86/next, namely commit d8708b80fa0e ("KVM: Change return type of
+>> kvm_arch_vm_ioctl() to "int"").
+>>
+>> [...]
 > 
-> Add a place holder function for TDX specific VM-scoped ioctl as mem_enc_op.
-> TDX specific sub-commands will be added to retrieve/pass TDX specific
-> parameters.  Make mem_enc_ioctl non-optional as it's not optional now.
-                                                        ^ it is optional now.
+> Applied 1 and 5 to kvm-x86 mmu, and the rest to kvm-x86 misc, thanks!
 > 
-> KVM_MEMORY_ENCRYPT_OP was introduced for VM-scoped operations specific for
-> guest state-protected VM.  It defined subcommands for technology-specific
-> operations under KVM_MEMORY_ENCRYPT_OP.  Despite its name, the subcommands
-> are not limited to memory encryption, but various technology-specific
-> operations are defined.  It's natural to repurpose KVM_MEMORY_ENCRYPT_OP
-> for TDX specific operations and define subcommands.
-> 
-> TDX requires VM-scoped TDX-specific operations for device model, for
-> example, qemu.  Getting system-wide parameters, TDX-specific VM
-> initialization.
+> [1/6] KVM: x86/mmu: Avoid indirect call for get_cr3
+>       https://github.com/kvm-x86/linux/commit/2fdcc1b32418
+> [2/6] KVM: x86: Do not unload MMU roots when only toggling CR0.WP with TDP enabled
+>       https://github.com/kvm-x86/linux/commit/01b31714bd90
+> [3/6] KVM: x86: Ignore CR0.WP toggles in non-paging mode
+>       https://github.com/kvm-x86/linux/commit/e40bcf9f3a18
+> [4/6] KVM: x86: Make use of kvm_read_cr*_bits() when testing bits
+>       https://github.com/kvm-x86/linux/commit/74cdc836919b
+> [5/6] KVM: x86/mmu: Fix comment typo
+>       https://github.com/kvm-x86/linux/commit/50f13998451e
+> [6/6] KVM: VMX: Make CR0.WP a guest owned bit
+>       https://github.com/kvm-x86/linux/commit/fb509f76acc8
 
-^ Above two paragraphs are the "background" paragraphs, they should be in
-the beginning of the patch comments.
+Thanks a lot, Sean!
 
-> 
-> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> ---
->  arch/x86/include/asm/kvm-x86-ops.h |  2 +-
->  arch/x86/kvm/vmx/main.c            |  9 +++++++++
->  arch/x86/kvm/vmx/tdx.c             | 26 ++++++++++++++++++++++++++
->  arch/x86/kvm/vmx/x86_ops.h         |  4 ++++
->  arch/x86/kvm/x86.c                 |  4 ----
->  5 files changed, 40 insertions(+), 5 deletions(-)
-> 
-> diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
-> index b46dcac078b2..58fbaa05fc8c 100644
-> --- a/arch/x86/include/asm/kvm-x86-ops.h
-> +++ b/arch/x86/include/asm/kvm-x86-ops.h
-> @@ -117,7 +117,7 @@ KVM_X86_OP(enter_smm)
->  KVM_X86_OP(leave_smm)
->  KVM_X86_OP(enable_smi_window)
->  #endif
-> -KVM_X86_OP_OPTIONAL(dev_mem_enc_ioctl)
-> +KVM_X86_OP(dev_mem_enc_ioctl)
+As this is a huge performance fix for us, we'd like to get it integrated
+into current stable kernels as well -- not without having the changes
+get some wider testing, of course, i.e. not before they end up in a
+non-rc version released by Linus. But I already did a backport to 5.4 to
+get a feeling how hard it would be and for the impact it has on older
+kernels.
 
-I guess it should be KVM_X86_OP(mem_enc_ioctl) here.
+Using the 'ssdd 10 50000' test I used before, I get promising results
+there as well. Without the patches it takes 9.31s, while with them we're
+down to 4.64s. Taking into account that this is the runtime of a
+workload in a VM that gets cut in half, I hope this qualifies as stable
+material, as it's a huge performance fix.
 
->  KVM_X86_OP_OPTIONAL(mem_enc_ioctl)
->  KVM_X86_OP_OPTIONAL(mem_enc_register_region)
->  KVM_X86_OP_OPTIONAL(mem_enc_unregister_region)
-> diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
-> index 6a5d0c7a2950..8ddd263eeabc 100644
-> --- a/arch/x86/kvm/vmx/main.c
-> +++ b/arch/x86/kvm/vmx/main.c
-> @@ -50,6 +50,14 @@ static int vt_vm_init(struct kvm *kvm)
->  	return vmx_vm_init(kvm);
->  }
->  
-> +static int vt_mem_enc_ioctl(struct kvm *kvm, void __user *argp)
-> +{
-> +	if (!is_td(kvm))
-> +		return -ENOTTY;
-> +
-> +	return tdx_vm_ioctl(kvm, argp);
-> +}
-> +
->  #define VMX_REQUIRED_APICV_INHIBITS		       \
->  (						       \
->         BIT(APICV_INHIBIT_REASON_DISABLE)|	       \
-> @@ -203,6 +211,7 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
->  	.vcpu_deliver_sipi_vector = kvm_vcpu_deliver_sipi_vector,
->  
->  	.dev_mem_enc_ioctl = tdx_dev_ioctl,
-> +	.mem_enc_ioctl = vt_mem_enc_ioctl,
->  };
->  
->  struct kvm_x86_init_ops vt_init_ops __initdata = {
-> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-> index b59d3081d061..d759028a698e 100644
-> --- a/arch/x86/kvm/vmx/tdx.c
-> +++ b/arch/x86/kvm/vmx/tdx.c
-> @@ -72,6 +72,32 @@ int tdx_dev_ioctl(void __user *argp)
->  	return 0;
->  }
->  
-> +int tdx_vm_ioctl(struct kvm *kvm, void __user *argp)
-> +{
-> +	struct kvm_tdx_cmd tdx_cmd;
-> +	int r;
-> +
-> +	if (copy_from_user(&tdx_cmd, argp, sizeof(struct kvm_tdx_cmd)))
-> +		return -EFAULT;
-> +	if (tdx_cmd.error || tdx_cmd.unused)
-> +		return -EINVAL;
-> +
-> +	mutex_lock(&kvm->lock);
-> +
-> +	switch (tdx_cmd.id) {
-> +	default:
-> +		r = -EINVAL;
-> +		goto out;
-> +	}
-> +
-> +	if (copy_to_user(argp, &tdx_cmd, sizeof(struct kvm_tdx_cmd)))
-> +		r = -EFAULT;
-> +
-> +out:
-> +	mutex_unlock(&kvm->lock);
-> +	return r;
-> +}
-> +
->  static int __init tdx_module_setup(void)
->  {
->  	const struct tdsysinfo_struct *tdsysinfo;
-> diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
-> index 78c5537e23a1..c70749114e9e 100644
-> --- a/arch/x86/kvm/vmx/x86_ops.h
-> +++ b/arch/x86/kvm/vmx/x86_ops.h
-> @@ -142,11 +142,15 @@ int __init tdx_hardware_setup(struct kvm_x86_ops *x86_ops);
->  int tdx_hardware_enable(void);
->  bool tdx_is_vm_type_supported(unsigned long type);
->  int tdx_dev_ioctl(void __user *argp);
-> +
-> +int tdx_vm_ioctl(struct kvm *kvm, void __user *argp);
->  #else
->  static inline int tdx_hardware_setup(struct kvm_x86_ops *x86_ops) { return -ENOSYS; }
->  static inline int tdx_hardware_enable(void) { return -EOPNOTSUPP; }
->  static inline bool tdx_is_vm_type_supported(unsigned long type) { return false; }
->  static inline int tdx_dev_ioctl(void __user *argp) { return -EOPNOTSUPP; };
-> +
-> +static inline int tdx_vm_ioctl(struct kvm *kvm, void __user *argp) { return -EOPNOTSUPP; }
->  #endif
->  
->  #endif /* __KVM_X86_VMX_X86_OPS_H */
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index a3dc32e33aca..8687623929c3 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -6978,10 +6978,6 @@ long kvm_arch_vm_ioctl(struct file *filp,
->  		goto out;
->  	}
->  	case KVM_MEMORY_ENCRYPT_OP: {
-> -		r = -ENOTTY;
-> -		if (!kvm_x86_ops.mem_enc_ioctl)
-> -			goto out;
-> -
->  		r = static_call(kvm_x86_mem_enc_ioctl)(kvm, argp);
->  		break;
->  	}
+Greg, what's your opinion on it? Original series here:
+https://lore.kernel.org/kvm/20230322013731.102955-1-minipli@grsecurity.net/
 
+Thanks,
+Mathias
