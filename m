@@ -2,41 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8BEFF6C912E
-	for <lists+kvm@lfdr.de>; Sat, 25 Mar 2023 23:13:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2E5236C9134
+	for <lists+kvm@lfdr.de>; Sat, 25 Mar 2023 23:15:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231840AbjCYWNh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 25 Mar 2023 18:13:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57304 "EHLO
+        id S231869AbjCYWPa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 25 Mar 2023 18:15:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59228 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229460AbjCYWNf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 25 Mar 2023 18:13:35 -0400
+        with ESMTP id S229460AbjCYWP2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 25 Mar 2023 18:15:28 -0400
 Received: from mx.sberdevices.ru (mx.sberdevices.ru [45.89.227.171])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AEF1140E3;
-        Sat, 25 Mar 2023 15:13:33 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69A3DCDC1;
+        Sat, 25 Mar 2023 15:15:27 -0700 (PDT)
 Received: from s-lin-edge02.sberdevices.ru (localhost [127.0.0.1])
-        by mx.sberdevices.ru (Postfix) with ESMTP id 17E2B5FD02;
-        Sun, 26 Mar 2023 01:13:32 +0300 (MSK)
+        by mx.sberdevices.ru (Postfix) with ESMTP id C40E85FD02;
+        Sun, 26 Mar 2023 01:15:25 +0300 (MSK)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
-        s=mail; t=1679782412;
-        bh=kiXMleL3+A1HmDIHmrLuyeNiMWpJOWtwJnJgV0xtAgs=;
+        s=mail; t=1679782525;
+        bh=blzS4++pYQHNhtF7NyjyEqKRhpH86CYY7XtCWadbAsw=;
         h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type;
-        b=JznA0B3nuGi8+Adr1mU6MkuUdx98fnuVk0+lriFmsqEkNmZeiy9236vE+nA96KXL1
-         VoDmJ9QmHsiAwOyTiz9F9QJp4vsZSF385JqdDDsS/HtbU9PlMH7t8wjg8vLscUHDyE
-         exR7J4nJkrxpNo+4y0LAPNU/25qsaeTBmFx8uKpGmtlBNV/NJIwr9tgzVUI2soIrvf
-         GRwImZwlGrxUazWkCw0DKUnna/cjLn3FlNkCVlBRFMg04mNENchFtFRZL1P5A0wMpC
-         qKv+Yv0UpccklWVzMF2VeqUJrvAncS8bRHyzlyLTGliL6uEJz+ibv4QtMkz+F52YEk
-         Z11GwDSynveHw==
+        b=r/Nol64Cw5hi1wTIoMUJklQnY+1478LXOuWhXWFTkVg956xDytgMpetXUX3n7keAP
+         sVOGX4u35yO92jJKmCwDWaEgtmpDJiFCJTHNDE7lrkKyGsZFgo5I0KJZaNnkAmapFB
+         ae1a5HaSA1PSGIq6vqIWMlbpholD/h02zQdC7aXXyA6DfplrJkEGW59utosRwaEhVG
+         5DjKII5VYukK+Fkthojd1iTK/oN1xaRjBncLWgTTHrHJihBfkslALsxCbrd+o2F2MH
+         BJdWsU78rmK6J911pNtd9TI9n/4Ppoy9ZDN7hgVFi9cV/05yamhkSS3KgCq099cxu2
+         SuUGkUmjMVoFQ==
 Received: from S-MS-EXCH01.sberdevices.ru (S-MS-EXCH01.sberdevices.ru [172.16.1.4])
         by mx.sberdevices.ru (Postfix) with ESMTP;
-        Sun, 26 Mar 2023 01:13:31 +0300 (MSK)
-Message-ID: <776a30e8-3cd5-35ba-5187-63c9b83eaa44@sberdevices.ru>
-Date:   Sun, 26 Mar 2023 01:10:16 +0300
+        Sun, 26 Mar 2023 01:15:25 +0300 (MSK)
+Message-ID: <97f19214-ba04-c47e-7486-72e8aa16c690@sberdevices.ru>
+Date:   Sun, 26 Mar 2023 01:12:09 +0300
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.7.1
 Content-Language: en-US
-In-Reply-To: <728181e9-6b35-0092-3d01-3d7aff4521b6@sberdevices.ru>
 To:     Stefan Hajnoczi <stefanha@redhat.com>,
         Stefano Garzarella <sgarzare@redhat.com>,
         "David S. Miller" <davem@davemloft.net>,
@@ -49,11 +48,11 @@ CC:     <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
         <kernel@sberdevices.ru>, <oxffffaa@gmail.com>,
         <avkrasnov@sberdevices.ru>
 From:   Arseniy Krasnov <avkrasnov@sberdevices.ru>
-Subject: [RFC PATCH v2 3/3] test/vsock: new skbuff appending test
+Subject: [RFC PATCH v1 0/2] return errors other than -ENOMEM to socket
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
 X-Originating-IP: [172.16.1.6]
-X-ClientProxiedBy: S-MS-EXCH02.sberdevices.ru (172.16.1.5) To
+X-ClientProxiedBy: S-MS-EXCH01.sberdevices.ru (172.16.1.4) To
  S-MS-EXCH01.sberdevices.ru (172.16.1.4)
 X-KSMG-Rule-ID: 4
 X-KSMG-Message-Action: clean
@@ -71,126 +70,23 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This adds test which checks case when data of newly received skbuff is
-appended to the last skbuff in the socket's queue. It looks like simple
-test with 'send()' and 'recv()', but internally it triggers logic which
-appends one received skbuff to another. Test checks that this feature
-works correctly.
+Hello,
 
-This test is actual only for virtio transport.
+this patchset removes behaviour, where error code returned from any
+transport was always switched to ENOMEM. This works in the same way as
+patch from Bobby Eshleman:
+commit c43170b7e157 ("vsock: return errors other than -ENOMEM to socket"),
+but for receive calls.
 
-Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
----
- tools/testing/vsock/vsock_test.c | 90 ++++++++++++++++++++++++++++++++
- 1 file changed, 90 insertions(+)
+vsock_test suite is also updated.
 
-diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
-index 3de10dbb50f5..12b97c92fbb2 100644
---- a/tools/testing/vsock/vsock_test.c
-+++ b/tools/testing/vsock/vsock_test.c
-@@ -968,6 +968,91 @@ static void test_seqpacket_inv_buf_server(const struct test_opts *opts)
- 	test_inv_buf_server(opts, false);
- }
- 
-+#define HELLO_STR "HELLO"
-+#define WORLD_STR "WORLD"
-+
-+static void test_stream_virtio_skb_merge_client(const struct test_opts *opts)
-+{
-+	ssize_t res;
-+	int fd;
-+
-+	fd = vsock_stream_connect(opts->peer_cid, 1234);
-+	if (fd < 0) {
-+		perror("connect");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	/* Send first skbuff. */
-+	res = send(fd, HELLO_STR, strlen(HELLO_STR), 0);
-+	if (res != strlen(HELLO_STR)) {
-+		fprintf(stderr, "unexpected send(2) result %zi\n", res);
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	control_writeln("SEND0");
-+	/* Peer reads part of first skbuff. */
-+	control_expectln("REPLY0");
-+
-+	/* Send second skbuff, it will be appended to the first. */
-+	res = send(fd, WORLD_STR, strlen(WORLD_STR), 0);
-+	if (res != strlen(WORLD_STR)) {
-+		fprintf(stderr, "unexpected send(2) result %zi\n", res);
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	control_writeln("SEND1");
-+	/* Peer reads merged skbuff packet. */
-+	control_expectln("REPLY1");
-+
-+	close(fd);
-+}
-+
-+static void test_stream_virtio_skb_merge_server(const struct test_opts *opts)
-+{
-+	unsigned char buf[64];
-+	ssize_t res;
-+	int fd;
-+
-+	fd = vsock_stream_accept(VMADDR_CID_ANY, 1234, NULL);
-+	if (fd < 0) {
-+		perror("accept");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	control_expectln("SEND0");
-+
-+	/* Read skbuff partially. */
-+	res = recv(fd, buf, 2, 0);
-+	if (res != 2) {
-+		fprintf(stderr, "expected recv(2) returns 2 bytes, got %zi\n", res);
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	control_writeln("REPLY0");
-+	control_expectln("SEND1");
-+
-+	res = recv(fd, buf + 2, sizeof(buf) - 2, 0);
-+	if (res != 8) {
-+		fprintf(stderr, "expected recv(2) returns 8 bytes, got %zi\n", res);
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	res = recv(fd, buf, sizeof(buf) - 8 - 2, MSG_DONTWAIT);
-+	if (res != -1) {
-+		fprintf(stderr, "expected recv(2) failure, got %zi\n", res);
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	if (memcmp(buf, HELLO_STR WORLD_STR, strlen(HELLO_STR WORLD_STR))) {
-+		fprintf(stderr, "pattern mismatch\n");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	control_writeln("REPLY1");
-+
-+	close(fd);
-+}
-+
- static struct test_case test_cases[] = {
- 	{
- 		.name = "SOCK_STREAM connection reset",
-@@ -1038,6 +1123,11 @@ static struct test_case test_cases[] = {
- 		.run_client = test_seqpacket_inv_buf_client,
- 		.run_server = test_seqpacket_inv_buf_server,
- 	},
-+	{
-+		.name = "SOCK_STREAM virtio skb merge",
-+		.run_client = test_stream_virtio_skb_merge_client,
-+		.run_server = test_stream_virtio_skb_merge_server,
-+	},
- 	{},
- };
- 
+Arseniy Krasnov (2):
+  vsock: return errors other than -ENOMEM to socket
+  vsock/test: update expected return values
+
+ net/vmw_vsock/af_vsock.c         | 4 ++--
+ tools/testing/vsock/vsock_test.c | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
 -- 
 2.25.1
