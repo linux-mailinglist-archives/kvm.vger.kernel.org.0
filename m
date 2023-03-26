@@ -2,112 +2,84 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5082E6C9799
-	for <lists+kvm@lfdr.de>; Sun, 26 Mar 2023 21:20:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 795E86C9890
+	for <lists+kvm@lfdr.de>; Mon, 27 Mar 2023 00:46:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231839AbjCZTUh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 26 Mar 2023 15:20:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55436 "EHLO
+        id S229710AbjCZWp3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 26 Mar 2023 18:45:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53478 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229596AbjCZTUg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 26 Mar 2023 15:20:36 -0400
-Received: from mail-yb1-xb32.google.com (mail-yb1-xb32.google.com [IPv6:2607:f8b0:4864:20::b32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99FDC5263;
-        Sun, 26 Mar 2023 12:20:35 -0700 (PDT)
-Received: by mail-yb1-xb32.google.com with SMTP id p203so7914285ybb.13;
-        Sun, 26 Mar 2023 12:20:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1679858435;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=oG/w6m6QtpmYcph7ogXNw2Cb+L528y4HO8hE3WHqySk=;
-        b=RuYjs/StRoPkkDWrvmwXiGOQ4iyHBLQ/oUc4LBwsJU954HQ34/la6MiLmEMMLNjbqa
-         ZiUeOh17f/1xc5lpEgOWba9hMrolYNI2qlhsq4ilNa1fsdj763IHQLcbbtmWlRouvS+U
-         dSrhFSfzFxbzx8uTZEIfCUeszCpSx4HsO84dNQebYcswk4G/8jz7sbQ3dA0ol3PQ+waP
-         iB4UqDUppIJIX1r2twnkAJr8idV7fWN8MV3e85gpPvi18qlrTsFtoHk6k71NHG36rprB
-         swGIloWRV55T8523Do1MGQ3E2dVOcCW0XtgX2jKeLiU0qmhKETcks2Xzm46REysaFt5s
-         Evhg==
+        with ESMTP id S229471AbjCZWp1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 26 Mar 2023 18:45:27 -0400
+Received: from mail-io1-f69.google.com (mail-io1-f69.google.com [209.85.166.69])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D31C59D3
+        for <kvm@vger.kernel.org>; Sun, 26 Mar 2023 15:45:26 -0700 (PDT)
+Received: by mail-io1-f69.google.com with SMTP id p128-20020a6b8d86000000b007583ebb18fdso4453555iod.19
+        for <kvm@vger.kernel.org>; Sun, 26 Mar 2023 15:45:26 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679858435;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=oG/w6m6QtpmYcph7ogXNw2Cb+L528y4HO8hE3WHqySk=;
-        b=SitwAuNnrUXK5/XvvQboxos8yY8/RtcRC4khWBhH9F7onDyKDNp/P5s+X39jnTjiGn
-         ozuJW5szbo0kvgA47lHTkLk1UjETFm0xKCGziXoCwkNb8mb6u6qVcLUGvZZdBFOte2Qm
-         PtQSRMAhn2H/qxQME5aNEh4xuQp00eaVX5VSsfWpvkL+ipcT/mOwemxDHDHmso9iYpt+
-         dVqvSmLpjFkiBq/R09snLDAtYdWC1ikA8K6g29uCI3+z6sZns2h/55NciPzCtip0QpIS
-         XOzemTXUuJdpc+96y0YW7hR3v7CrPhVu7xO0xSl2D4x9uam2eXd9yox7UrsrYcFytX1i
-         lR5g==
-X-Gm-Message-State: AAQBX9fa9DgrjOKwsW8ChczYsu1WDKcIBw3TZsyXqpHQAChNUmMPMPEl
-        uqoDU7BpV4e9csMqTraWoJw=
-X-Google-Smtp-Source: AKy350ZX9Q/+0ojpsMuhWZXN3EJq3mCPftR76gOQ189+2+0EJNrC6JBFXYC2V/t/39GIYgzP3Km5zA==
-X-Received: by 2002:a25:2650:0:b0:b65:f335:2875 with SMTP id m77-20020a252650000000b00b65f3352875mr9567454ybm.37.1679858434757;
-        Sun, 26 Mar 2023 12:20:34 -0700 (PDT)
-Received: from localhost ([2600:1700:65a0:ab60:2049:9ff4:d425:1853])
-        by smtp.gmail.com with ESMTPSA id 64-20020a250643000000b00b7767ca749esm1874211ybg.59.2023.03.26.12.20.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 26 Mar 2023 12:20:34 -0700 (PDT)
-Date:   Sun, 26 Mar 2023 12:20:33 -0700
-From:   Cong Wang <xiyou.wangcong@gmail.com>
-To:     Bobby Eshleman <bobbyeshleman@gmail.com>
-Cc:     Stefano Garzarella <sgarzare@redhat.com>,
-        Bobby Eshleman <bobby.eshleman@bytedance.com>,
-        Bobby Eshleman <bobby.eshleman@gmail.com>,
-        syzbot <syzbot+0bc015ebddc291a97116@syzkaller.appspotmail.com>,
-        axboe@kernel.dk, davem@davemloft.net, edumazet@google.com,
-        io-uring@vger.kernel.org, kuba@kernel.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-        pabeni@redhat.com, stefanha@redhat.com,
-        syzkaller-bugs@googlegroups.com,
-        virtualization@lists.linux-foundation.org,
-        Krasnov Arseniy <oxffffaa@gmail.com>,
-        Krasnov Arseniy Vladimirovich <AVKrasnov@sberdevices.ru>
-Subject: Re: [syzbot] [net?] [virt?] [io-uring?] [kvm?] BUG: soft lockup in
- vsock_connect
-Message-ID: <ZCCbATwov4U+GBUv@pop-os.localdomain>
-References: <00000000000075bebb05f79acfde@google.com>
- <CAGxU2F4jxdzK8Y-jaoKRaX_bDhoMtomOT6TyMek+un-Bp8RX3g@mail.gmail.com>
- <ZBUGp5bvNuE3sK5g@bullseye>
+        d=1e100.net; s=20210112; t=1679870726;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=9lEspjiua93c9Wx+emjhT6RG2FrOB+aKkQEh7PcYsd8=;
+        b=f/8XP7EkeZ8haC2nDKWOcUHJqRfBd2I1in9bbsQKN8Rfy2Jgmim+H4www0l+GSrI02
+         SwS72qzVddLEnI0VCE+b+5JzH13TcnVeoToidJCqtbFwgF4EnOWWirrcHtSp8futLUB5
+         KAhDUEqZ49jJPGBCGP2JDDsJMzzvXn15Qv2k7KRMOxgq6F1Sm52MuPVkH2f2dR6RoYJu
+         52Ow53cASWQVtBbwHhiK8oH1kmKAcC6icjuO6DlB56rWsP31SAq8sF2PMMgNcBrcF1al
+         KRjjEGaR65aEvPiGeFbXOGeInlqXNaA/JZg6bSc6NrIItC3RtZ1n+/YJSSffEDhCKNJV
+         e5nw==
+X-Gm-Message-State: AO0yUKVEHBdflBObziNEvIod7ibQkfLxsSmYrF07xen4dSR4jz/dWcOZ
+        xU5CdO+/zb4e3gRqUKNBRzCRg0XoIKNKRcFKyVONBlnQG9b7
+X-Google-Smtp-Source: AK7set96XIPJAXYQwUsGkxnwQBaDfPEB0m4BfUlp93WMIYVCACD6qwJf3nIhLrGieN+ju2bZ7Avb4F/kKUh9Msv9+YADHiF9f6nL
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZBUGp5bvNuE3sK5g@bullseye>
-X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
-        DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+X-Received: by 2002:a02:2941:0:b0:3ec:dc1f:12d8 with SMTP id
+ p62-20020a022941000000b003ecdc1f12d8mr3845812jap.4.1679870725894; Sun, 26 Mar
+ 2023 15:45:25 -0700 (PDT)
+Date:   Sun, 26 Mar 2023 15:45:25 -0700
+In-Reply-To: <000000000000708b1005f79acf5c@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000e2bdb505f7d5612e@google.com>
+Subject: Re: [syzbot] [kvm?] [net?] [virt?] general protection fault in virtio_transport_purge_skbs
+From:   syzbot <syzbot+befff0a9536049e7902e@syzkaller.appspotmail.com>
+To:     avkrasnov@sberdevices.ru, bobby.eshleman@bytedance.com,
+        bobby.eshleman@gmail.com, bobbyeshleman@gmail.com,
+        davem@davemloft.net, deshantm@xen.org, edumazet@google.com,
+        hdanton@sina.com, kuba@kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+        oxffffaa@gmail.com, pabeni@redhat.com, sgarzare@redhat.com,
+        stefanha@redhat.com, syzkaller-bugs@googlegroups.com,
+        virtualization@lists.linux-foundation.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=3.1 required=5.0 tests=FROM_LOCAL_HEX,
+        HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,
+        SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
         version=3.4.6
+X-Spam-Level: ***
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Mar 18, 2023 at 12:32:39AM +0000, Bobby Eshleman wrote:
-> On Fri, Mar 24, 2023 at 09:38:38AM +0100, Stefano Garzarella wrote:
-> > Hi Bobby,
-> > FYI we have also this one, but it seems related to
-> > syzbot+befff0a9536049e7902e@syzkaller.appspotmail.com
-> > 
-> > Thanks,
-> > Stefano
-> > 
-> 
-> Got it, I'll look into it.
-> 
+syzbot has bisected this issue to:
 
-It seems you forgot to set skb->sk??
+commit 71dc9ec9ac7d3eee785cdc986c3daeb821381e20
+Author: Bobby Eshleman <bobby.eshleman@bytedance.com>
+Date:   Fri Jan 13 22:21:37 2023 +0000
 
-diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
-index 957cdc01c8e8..d47ad27b409d 100644
---- a/net/vmw_vsock/virtio_transport_common.c
-+++ b/net/vmw_vsock/virtio_transport_common.c
-@@ -236,6 +236,7 @@ static int virtio_transport_send_pkt_info(struct vsock_sock *vsk,
-        }
+    virtio/vsock: replace virtio_vsock_pkt with sk_buff
 
-        virtio_transport_inc_tx_pkt(vvs, skb);
-+       skb_set_owner_w(skb, sk_vsock(vsk));
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=12661f29c80000
+start commit:   fff5a5e7f528 Merge tag 'for-linus' of git://git.armlinux.o..
+git tree:       upstream
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=11661f29c80000
+console output: https://syzkaller.appspot.com/x/log.txt?x=16661f29c80000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=aaa4b45720ca0519
+dashboard link: https://syzkaller.appspot.com/bug?extid=befff0a9536049e7902e
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=14365781c80000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=12eebc66c80000
 
-        return t_ops->send_pkt(skb);
- }
+Reported-by: syzbot+befff0a9536049e7902e@syzkaller.appspotmail.com
+Fixes: 71dc9ec9ac7d ("virtio/vsock: replace virtio_vsock_pkt with sk_buff")
 
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
