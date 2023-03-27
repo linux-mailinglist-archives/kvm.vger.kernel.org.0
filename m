@@ -2,144 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 232E56CAC09
-	for <lists+kvm@lfdr.de>; Mon, 27 Mar 2023 19:44:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 76DE16CAC2C
+	for <lists+kvm@lfdr.de>; Mon, 27 Mar 2023 19:48:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229862AbjC0RoA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Mar 2023 13:44:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47344 "EHLO
+        id S232378AbjC0RsZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Mar 2023 13:48:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52638 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229934AbjC0Rn6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Mar 2023 13:43:58 -0400
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB454170C
-        for <kvm@vger.kernel.org>; Mon, 27 Mar 2023 10:43:57 -0700 (PDT)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-545d3b026a8so45248307b3.7
-        for <kvm@vger.kernel.org>; Mon, 27 Mar 2023 10:43:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1679939037;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=XlpSa++Ck7W+hH+1OiuQ4wL4Keih2CLgElX+Jr8IDOg=;
-        b=NRewYmivbp7xrd5bl7JWEYaQ9BEiQxehXzYs4JPD27Ag/vs1+EGoigQA/eGrdDVwpI
-         6HrxgSZwown5PltC2Waeqpp6KGdrJb/dSApcJ1OUEukUIu3e0Ezq/NVjnhkAzin2oeIi
-         XSws12m/6pB4Il8LiHkXWqb8AJMCdtVH2B+cO5e4Nti183f4YVeFl+atpkWvaCwSlrLh
-         LmtRmg6bJTE0Nq9XTncpVNfM5/aW7PEvzyPI3l+G5UFhZ8iI/LdGA8oPEpZSPXw4sf/Y
-         oWbVtkgHQtAjTuo6pRD+inMv48nJ8KN5jmFbZAnYg8/yiZPVZ9a4faH4l6132Clgz6B7
-         ZpZw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679939037;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=XlpSa++Ck7W+hH+1OiuQ4wL4Keih2CLgElX+Jr8IDOg=;
-        b=0ya8P2CggIJUdmPbkL7yjnfaZ6Bc+Muu51yxzY+X/IhYbDh3BAGl4uQeGCk+bC8k6s
-         XBTl3NhLDt95nULIfBaOBIl4DFb+/NIpALVeU2MSbybkBDva4LbRuBnUEWX3wjr81Y/3
-         ZKIebbRxbxUJLlH2l4Mg4byevlg3AXWVAXG+dJ9v40lSdfB1BQ7N18WpvhhYbw1hB5p8
-         X/kfR0/emSRMneScdzELutxv/2N7tCWZc2Ywqqukv6RTzqeACXEOw11p1EsV2N3irovh
-         tKt5UGOaTFu2z+Bsd/UCbYIj4cWWWtmKNJWaEPqzVR1TZtIfWrWOU4CyVUDtX6sa66ma
-         CMcg==
-X-Gm-Message-State: AAQBX9dm7gExxZd6YBFsExUtvoZpstF/WiKzJAi6/rirKpr3StU6V2fi
-        /TdYO3HP4r7K5b+OD8k1ksubZpPeyzA=
-X-Google-Smtp-Source: AKy350YnFdRnDAztI/QAWGplLtVR70FJRJ184l6fxPJaxU9DXrlOhocThQPENwgRN3HxnQV8PG1Jwq59fUM=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:1141:b0:b73:caa7:f06f with SMTP id
- p1-20020a056902114100b00b73caa7f06fmr7834435ybu.5.1679939037193; Mon, 27 Mar
- 2023 10:43:57 -0700 (PDT)
-Date:   Mon, 27 Mar 2023 10:43:55 -0700
-In-Reply-To: <CRGX867PJCBF.1MV46YLYXMBYZ@bobo>
-Mime-Version: 1.0
-References: <20230316031732.3591455-1-npiggin@gmail.com> <87ilf0nc95.fsf@mpe.ellerman.id.au>
- <ZBs9tGkI5OQqtIqs@google.com> <CRGX867PJCBF.1MV46YLYXMBYZ@bobo>
-Message-ID: <ZCHV20oFkFzp/AZs@google.com>
-Subject: Re: [PATCH 0/2] KVM: PPC: support kvm selftests
-From:   Sean Christopherson <seanjc@google.com>
-To:     Nicholas Piggin <npiggin@gmail.com>
-Cc:     Michael Ellerman <mpe@ellerman.id.au>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Shuah Khan <shuah@kernel.org>, linuxppc-dev@lists.ozlabs.org,
-        kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
+        with ESMTP id S231925AbjC0RsL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Mar 2023 13:48:11 -0400
+Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04on2044.outbound.protection.outlook.com [40.107.100.44])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE7FF2710;
+        Mon, 27 Mar 2023 10:48:07 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Pd22+xbYpNK8+I1EBQWA/7hAFEJXsBwfU3ql7S2gJ+FhjWJzz/VrCBoMZO0XlVJImqAt1Cztru6jPYCXzsyRnvNlysmDhhCAsqCo24glUVYuCBuKYNStdzKna6scfJrYO//P49R8XudiLcyFwkaYfv7cZ8l2zl2iGW+IRKUHBMt/vdpxTIBFmcm64Sr6yhgN5wWIt9ZjiOep1MANkk+JOPCx6vnDW30yuyfX4u+xCM6XBffhYn0dd1F0aJFZr5hIKtobmPauxg9Ga/2wGUR0icfrqwcHTIUn0l05VpClsResZm7XM4iTULeNlnftPvtu9T6DV9SXM+wvKkd0E+bJNw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=BS0W4+p/GxnxDD0HoRO5curc19+HXURdpQjlIWFmLn8=;
+ b=JBlMY/3L2UmemEksH4q0wtyAcsoN6E/kkwChOnpOKYr94uVWs5CDhGLI8n0WuzC5TvW7jrOP0V+Tmg7Q+X0XHxsEQlajjKbWW+jsfU7wq6Lcp7z+LP6ClxCzqQOZTTcjcEERQJeLhbqW7UiuAZcc1WF/CRPSIuj1IZG0bWQY4kvoILhhLgLCXy7CJIqdrh0NClKCRob80e9Hs/kL2qA/eTNCgvbtQKljIwXTen0Vg/DOv7NC7BQ3Xban2+2H+ra3RHRfz+ZYqrhXphlKU9nnPVM4NHaW7fEMFgptX89g9+Ps+syA9m12OAC6zjgmjstPKqsgOV+mzNM8QHFZr24+og==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=intel.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=BS0W4+p/GxnxDD0HoRO5curc19+HXURdpQjlIWFmLn8=;
+ b=Z2Ak+g1v+oDzQbxk3QzflvP/WDIk+LTKAwQSugNjFWHhnXWLwbi0hWHiPwHn1GmrEhifgRbUidp1hr2BF4vCPEvbB+KW15fdu8yJcP/vASPT0MMXdNGUJjgHaWhfApsyay1bMXkzUY2Z+/vwSRzxIXQM/dSqS2aYOjf0apNFk9JP1WW64ZUTXkq/2+6qM6ZHfYq5IMPf7bNff+gmHdcY6QTPjVFynjIe6gsJZfKy0zs+fBD9Prd36nN31Guaac5lsaF8ESEyxQkeIog1GfSBcJo0vZKuvpdVKNNQqraEtkabPTIPF5WcWueWGT4Tb8mXDTAjLWRml/mfgyaUZitIOw==
+Received: from BN9PR03CA0657.namprd03.prod.outlook.com (2603:10b6:408:13b::32)
+ by IA1PR12MB6354.namprd12.prod.outlook.com (2603:10b6:208:3e2::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6222.29; Mon, 27 Mar
+ 2023 17:48:05 +0000
+Received: from BL02EPF000108EB.namprd05.prod.outlook.com
+ (2603:10b6:408:13b:cafe::3a) by BN9PR03CA0657.outlook.office365.com
+ (2603:10b6:408:13b::32) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6178.41 via Frontend
+ Transport; Mon, 27 Mar 2023 17:48:05 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ BL02EPF000108EB.mail.protection.outlook.com (10.167.241.200) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6178.30 via Frontend Transport; Mon, 27 Mar 2023 17:48:04 +0000
+Received: from rnnvmail202.nvidia.com (10.129.68.7) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5; Mon, 27 Mar 2023
+ 10:47:40 -0700
+Received: from rnnvmail202.nvidia.com (10.129.68.7) by rnnvmail202.nvidia.com
+ (10.129.68.7) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.37; Mon, 27 Mar
+ 2023 10:47:40 -0700
+Received: from Asurada-Nvidia (10.127.8.11) by mail.nvidia.com (10.129.68.7)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5 via Frontend
+ Transport; Mon, 27 Mar 2023 10:47:38 -0700
+Date:   Mon, 27 Mar 2023 10:47:37 -0700
+From:   Nicolin Chen <nicolinc@nvidia.com>
+To:     Yi Liu <yi.l.liu@intel.com>
+CC:     <alex.williamson@redhat.com>, <jgg@nvidia.com>,
+        <kevin.tian@intel.com>, <joro@8bytes.org>, <robin.murphy@arm.com>,
+        <cohuck@redhat.com>, <eric.auger@redhat.com>,
+        <kvm@vger.kernel.org>, <mjrosato@linux.ibm.com>,
+        <chao.p.peng@linux.intel.com>, <yi.y.sun@linux.intel.com>,
+        <peterx@redhat.com>, <jasowang@redhat.com>,
+        <shameerali.kolothum.thodi@huawei.com>, <lulu@redhat.com>,
+        <suravee.suthikulpanit@amd.com>,
+        <intel-gvt-dev@lists.freedesktop.org>,
+        <intel-gfx@lists.freedesktop.org>, <linux-s390@vger.kernel.org>,
+        <xudong.hao@intel.com>, <yan.y.zhao@intel.com>,
+        <terrence.xu@intel.com>, <yanting.jiang@intel.com>
+Subject: Re: [PATCH v3 0/6] vfio: Make emulated devices prepared for vfio
+ device cdev
+Message-ID: <ZCHWuTJJ6kHHPPYq@Asurada-Nvidia>
+References: <20230327093351.44505-1-yi.l.liu@intel.com>
+MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-7.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+Content-Disposition: inline
+In-Reply-To: <20230327093351.44505-1-yi.l.liu@intel.com>
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL02EPF000108EB:EE_|IA1PR12MB6354:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0cb0273f-d790-455e-734d-08db2eeb6af4
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: NlT9wcQEOAiEutVyxLMf9I00tCaoYIZlwxJ7dlk9/tQUgPGOcXicAslOgAE862DC0VfU0sh9MU/n3nBrYZX4OPRZx2oRf4Ks6oso51H2SyWrCvyL0hNcovehnTUSQe946bCUoNmzoJX2asGg97+HB/X9okrR5R5y7vFRgEXYG7am2ey+UtQRDu9kR8/+WEQRqe2EapwVG/kvjV6P4VqgAo5AzTLjjLDPb2cHSU5vOu7KmcF9ySdDRDzzJz5cRB0Y3TjmirGdxedRcNBLh33UGUAFkeTChpLYnGwHPHy5s3Usk6olJTpmpdCM6kM48cSp1BIUVVJU8eJ4VmK8u0ivPMGfRXTG2N++Wq6TIbZ48SJRPo+x+llLZYR7ibsdBUDV9O7xCfmveXICDDOoleYHQPuEFOVl4kWtqOQk6/Fw8RA2SuZSRs8eWTeQq068nC2uIJ4CHJeeEUksb18aVOAmGKAMg3OWSaKuRG3jxEvaRTzR+50lmtSae6B9lPqCfjne/jX6nGV3zslXQAg/Dh+HdezVlMv0x6CbNV0Q0lqmbhRFvigkrt/MrgTFWY3F5QBUM/05CdjUiUOHhr9XUtO+bCHRMXW7sgnPSBylusF2dN2utqMIna3c4l6hFP7/Uv/4ektXWPbcw4Bv8teynq4lMRvpCaLwenXlp/uuTjsuZZ1/hbP/deeHaxpuzvYhgheMmMvxyE/RNx9nJa+VOKeJH3ij8DS8UCpn8cWO71PHCKcFCFdBXrBOmkCXsvNqz6SUvqh1jB4rb6B0aCVMKOW/CQWtOmVWkb2xMJS34i91mII=
+X-Forefront-Antispam-Report: CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230028)(4636009)(396003)(376002)(136003)(346002)(39860400002)(451199021)(40470700004)(46966006)(36840700001)(47076005)(83380400001)(426003)(336012)(8676002)(70586007)(2906002)(70206006)(4326008)(6916009)(54906003)(966005)(478600001)(9686003)(316002)(186003)(26005)(55016003)(82310400005)(40480700001)(7416002)(86362001)(33716001)(36860700001)(41300700001)(7636003)(356005)(8936002)(82740400003)(40460700003)(5660300002);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Mar 2023 17:48:04.6373
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0cb0273f-d790-455e-734d-08db2eeb6af4
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: BL02EPF000108EB.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB6354
+X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Mar 27, 2023, Nicholas Piggin wrote:
-> On Thu Mar 23, 2023 at 3:41 AM AEST, Sean Christopherson wrote:
-> > On Thu, Mar 16, 2023, Michael Ellerman wrote:
-> > > Nicholas Piggin <npiggin@gmail.com> writes:
-> > > > Hi,
-> > > >
-> > > > This series adds initial KVM selftests support for powerpc
-> > > > (64-bit, BookS).
-> > > 
-> > > Awesome.
-> > >  
-> > > > It spans 3 maintainers but it does not really
-> > > > affect arch/powerpc, and it is well contained in selftests
-> > > > code, just touches some makefiles and a tiny bit headers so
-> > > > conflicts should be unlikely and trivial.
-> > > >
-> > > > I guess Paolo is the best point to merge these, if no comments
-> > > > or objections?
-> > > 
-> > > Yeah. If it helps:
-> > > 
-> > > Acked-by: Michael Ellerman <mpe@ellerman.id.au> (powerpc)
-> >
-> > What is the long term plan for KVM PPC maintenance?  I was under the impression
-> > that KVM PPC was trending toward "bug fixes only", but the addition of selftests
-> > support suggests otherwise.
+On Mon, Mar 27, 2023 at 02:33:45AM -0700, Yi Liu wrote:
+> External email: Use caution opening links or attachments
 > 
-> We plan to continue maintaining it. New support and features has been a
-> bit low in the past couple of years, hopefully that will pick up a bit
-> though.
-
-Partly out of curiosity, but also to get a general feel for what types of changes
-we might see, what are the main use cases for KVM PPC these days?  E.g. is it mainly
-a vehicle for developing and testing, hosting VMs in the cloud, something else?
-
-> > I ask primarily because routing KVM PPC patches through the PPC tree is going to
-> > be problematic if KVM PPC sees signficiant development.  The current situation is
-> > ok because the volume of patches is low and KVM PPC isn't trying to drive anything
-> > substantial into common KVM code, but if that changes... 
 > 
-> Michael has done KVM topic branches to pull from a few times when such
-> conflicts came up (at smaller scale). If we end up with larger changes
-> or regular conflicts we might start up a kvm-ppc tree again I guess.
-
-A wait-and-see approach works for me.  I don't have any complaints with the current
-process, I was just caught off guard.
-
-> > My other concern is that for selftests specifically, us KVM folks are taking on
-> > more maintenance burden by supporting PPC.  AFAIK, none of the people that focus
-> > on KVM selftests in any meaningful capacity have access to PPC hardware, let alone
-> > know enough about the architecture to make intelligent code changes.
-> >
-> > Don't get me wrong, I'm very much in favor of more testing, I just don't want KVM
-> > to get left holding the bag.
+> The .bind_iommufd op of vfio emulated devices are either empty or does
+> nothing. This is different with the vfio physical devices, to add vfio
+> device cdev, need to make them act the same.
 > 
-> Understood. I'll be happy to maintain powerpc part of kvm selftests and
-> do any fixes that are needed for core code changes.If support fell away
-> you could leave it broken (or rm -rf it if you prefer) -- I wouldn't ask
-> anybody to work on archs they don't know or aren't paid to.
+> This series first makes the .bind_iommufd op of vfio emulated devices
+> to create iommufd_access, this introduces a new iommufd API. Then let
+> the driver that does not provide .bind_iommufd op to use the vfio emulated
+> iommufd op set. This makes all vfio device drivers have consistent iommufd
+> operations, which is good for adding new device uAPIs in the device cdev
+> series.
 > 
-> Not sure if anything more can be done to help your process or ease your
-> mind. It (KVM and kvm-selftests) can run in QEMU at least.
+> Change log:
+> 
+> v3:
+>  - Use iommufd_get_ioas() for ioas get, hence patch 01 is added to modify
+>    the input parameter of iommufd_get_ioas(). (Jason)
+>  - Add r-b from Jason and Kevin
+>  - Add t-b from Terrence Xu
 
-Updating the KVM/powerpc to include selftests would be very helpful, e.g
+This runs well with iommufd selftest on x86 and QEMU sanity on
+ARM64, applying nesting series on top of this and cdev series:
+https://github.com/nicolinc/iommufd/commits/wip/iommufd_nesting-03272023
 
-  F:	tools/testing/selftests/kvm/*/powerpc/
-  F:	tools/testing/selftests/kvm/powerpc/
-
-and ideally there would be one or more M: (and R:) entries as well.  I'm not
-all that concerned about the selftests support being abandoned, but the lack of
-specific contacts makes it look like KVM PPC is in maintenance-only mode, and it
-sounds like that's not the case.
-
-Thanks!
+Tested-by: Nicolin Chen <nicolinc@nvidia.com>
