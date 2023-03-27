@@ -2,61 +2,61 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9A7936CA46C
-	for <lists+kvm@lfdr.de>; Mon, 27 Mar 2023 14:46:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ECDFC6CA46E
+	for <lists+kvm@lfdr.de>; Mon, 27 Mar 2023 14:46:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232550AbjC0MqU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Mar 2023 08:46:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41368 "EHLO
+        id S232654AbjC0MqY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Mar 2023 08:46:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41324 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232542AbjC0MqP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Mar 2023 08:46:15 -0400
-Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17D3F40F9
-        for <kvm@vger.kernel.org>; Mon, 27 Mar 2023 05:46:06 -0700 (PDT)
-Received: by mail-pl1-x62d.google.com with SMTP id kc4so8288181plb.10
-        for <kvm@vger.kernel.org>; Mon, 27 Mar 2023 05:46:06 -0700 (PDT)
+        with ESMTP id S232692AbjC0MqS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Mar 2023 08:46:18 -0400
+Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CDB034680
+        for <kvm@vger.kernel.org>; Mon, 27 Mar 2023 05:46:08 -0700 (PDT)
+Received: by mail-pl1-x630.google.com with SMTP id k2so8300310pll.8
+        for <kvm@vger.kernel.org>; Mon, 27 Mar 2023 05:46:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1679921165;
+        d=gmail.com; s=20210112; t=1679921168;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=/Jy6p6ZgvLWaGCNqcDbzzpAS+I4C9QxVLtT76Pj/K4Y=;
-        b=iLeMnTaMkLSU+O0HeCiBgZsLnjNNbzGQCR5AkrBB1p3WgluDTMGzP8dIhB/ZAm62OF
-         dXlsvHHjr339/u1S5VtsW+UJ76f1AGUtSrwS9LhhprCgVoDi8/wEeGxQmVlKR/IIc2Yu
-         BWyXjLVbmZLAgzK2EiJusqvxbXgmygwAoQs9d+HMBtDmQHGBuVQC8boZgl7SSjhyVseA
-         Gfwj21zJ6prDOzj5JhqSQ67Y76KAdjTUc1VUvl4T4zqE5MUqkSyOmYhrotuSBZ6zB3uY
-         XdTLVVXCQQsViz3RrqEYCCobtt+w5b3jhCUcWYVAJvdCP+WYuVBG0seA3SN9O4gLnKhd
-         BJ4A==
+        bh=ZGvXnBWeVAPA+YvFBPv6t4bCGTRX/pABDiDPF8FC0Js=;
+        b=kfETIGrfuV3d8Y6aAjlRXgB5WE+WnHhIBTddC0oEYBOPPINJSKcxtfUTmXtRscVBlL
+         DMCROekv7FHcwy/fmFy92iXxKJoVDPxaF8WGwOKzbGfkWE9p6rVt4O4XOysnJQDb5Hy1
+         khTPtqi8J2Jw0+WrdYEk2qS/dDGLmocSGuIR/rc3t9/befrOupovz4V2WmBpFbR9PImN
+         y1d5s2Q8vJEDLOnXrNdf12YHcWvAsZyxmuEjjRIzh9Oh0x4KKz/KOqMUlIfc1gPjrlLY
+         ZHSjJ94x04U5SsRqmmdJEhtvdhQMEXQpU5J0d8xNwTRiLufgcWTgR5HefAqJAiajJRgW
+         5L6w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679921165;
+        d=1e100.net; s=20210112; t=1679921168;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=/Jy6p6ZgvLWaGCNqcDbzzpAS+I4C9QxVLtT76Pj/K4Y=;
-        b=AL4KbeGa9FKXfUgU1QAtIh1YAHrMzQVnSfMbXVK/0CpTih++zUmTAFZVywKJk92R7i
-         SeNOZyrprHbCRLgIbZ4E/akwMf5nZuhjivi/xM2LRPjK+drWZ3Rb2g7Wr9laD1BtUmX1
-         GTFcavofrTWyTJC6TUjNZEbzRKmzltxAFZRM8fvSBljSkmbu1lPPg6m2adQ73nrUL7l4
-         JBAxElb0Hkorf5IFMLMzVfqIo/410IYj7GPy7RBw97QJgtVJlcy2OP/P8EBVHsXBFiKi
-         pgFDTHrFUetHLvLg8yoDDbyXfWBCzOSyqc9BK69vBveZe3697JZyn1TLM+Y4yIx2lAI7
-         HuLQ==
-X-Gm-Message-State: AAQBX9fyYQ/2A8swx1GPcV8HxemAHA3EtpzLJ/4vRAGSj1ej8pfnpFek
-        aBrc+gRBQF4GmcA9Qg/lLtxrsjdwb9o=
-X-Google-Smtp-Source: AKy350YNW2E/HGL0Q0iH2ePO7Sx11fRsProFJzpX7G9DqYcnA89sOZcNkBITL6Gv8lL6ixaDoDX6SA==
-X-Received: by 2002:a17:903:41cd:b0:19a:a9d8:e47f with SMTP id u13-20020a17090341cd00b0019aa9d8e47fmr15750546ple.36.1679921164893;
-        Mon, 27 Mar 2023 05:46:04 -0700 (PDT)
+        bh=ZGvXnBWeVAPA+YvFBPv6t4bCGTRX/pABDiDPF8FC0Js=;
+        b=T4H3aLwU6qEg73Yf6OKHE/K4EgiTbPpgD/5sGbOHgBWR7LtDlTrQ9cZAmgKIKDwMHq
+         V6AHRAZMFsMATVa01r7VabHbtN0ANjuEpkHe1zQuwAhYgNysr2VpKzSxUiQwxrjU2Btv
+         tXap0AhLlQne45to7oMpW1ZM+pQpQQ9+dHrXxiJ7xJOj1vSC4oM2+r0vqHmLy5Ys90/U
+         4MucaClJOj1oD7RQDS1OMu3dy4WzfETdK/QPllTF4uIi4RzNjnfYTVJgx7Z8TKWf6/DH
+         OfFHVaUUe4FeVOThi6rK2p/Eag0EppYJpMNNJlrL29JjdJ1090hWsCG3hEozgs409+n1
+         hf/g==
+X-Gm-Message-State: AAQBX9eAxTOFq0gFj3zgKYF8BAm06yOzzC/aliv+Dgevf3aZph+Qjh4s
+        Al8p2Ju4rfRex93K8c8N/mXqyeHus0Q=
+X-Google-Smtp-Source: AKy350ZYLBwh3J8d7Z6a4Xlkx6jIFEg7PR4hxhwenxcI6D3NmC2DmteNwcYn4LDpPrV1ffAMlYuecQ==
+X-Received: by 2002:a17:902:ebcf:b0:19f:7977:c9d6 with SMTP id p15-20020a170902ebcf00b0019f7977c9d6mr9997127plg.28.1679921168042;
+        Mon, 27 Mar 2023 05:46:08 -0700 (PDT)
 Received: from bobo.ozlabs.ibm.com ([203.221.180.225])
-        by smtp.gmail.com with ESMTPSA id ay6-20020a1709028b8600b0019a997bca5csm19053965plb.121.2023.03.27.05.46.02
+        by smtp.gmail.com with ESMTPSA id ay6-20020a1709028b8600b0019a997bca5csm19053965plb.121.2023.03.27.05.46.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Mar 2023 05:46:04 -0700 (PDT)
+        Mon, 27 Mar 2023 05:46:07 -0700 (PDT)
 From:   Nicholas Piggin <npiggin@gmail.com>
 To:     kvm@vger.kernel.org
 Cc:     Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org,
         Laurent Vivier <lvivier@redhat.com>,
         Thomas Huth <thuth@redhat.com>
-Subject: [kvm-unit-tests v3 10/13] powerpc: Add support for more interrupts including HV interrupts
-Date:   Mon, 27 Mar 2023 22:45:17 +1000
-Message-Id: <20230327124520.2707537-11-npiggin@gmail.com>
+Subject: [kvm-unit-tests v3 11/13] powerpc: Discover runtime load address dynamically
+Date:   Mon, 27 Mar 2023 22:45:18 +1000
+Message-Id: <20230327124520.2707537-12-npiggin@gmail.com>
 X-Mailer: git-send-email 2.37.2
 In-Reply-To: <20230327124520.2707537-1-npiggin@gmail.com>
 References: <20230327124520.2707537-1-npiggin@gmail.com>
@@ -72,143 +72,62 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Interrupt vectors were not being populated for all architected
-interrupt types, which could lead to crashes rather than a message for
-unhandled interrupts.
-
-0x20 sized vectors require some reworking of the code to fit. This
-also adds support for HV / HSRR type interrupts which will be used in
-a later change.
+The next change will load the kernels at different addresses depending
+on test options, so this needs to be reverted back to dynamic
+discovery.
 
 Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 ---
- powerpc/cstart64.S | 79 ++++++++++++++++++++++++++++++++++++++--------
- 1 file changed, 65 insertions(+), 14 deletions(-)
+ powerpc/cstart64.S | 19 ++++++++++++++-----
+ 1 file changed, 14 insertions(+), 5 deletions(-)
 
 diff --git a/powerpc/cstart64.S b/powerpc/cstart64.S
-index 34e3934..1bd0437 100644
+index 1bd0437..0592e03 100644
 --- a/powerpc/cstart64.S
 +++ b/powerpc/cstart64.S
-@@ -184,14 +184,6 @@ call_handler:
- 	mfcr	r0
+@@ -33,9 +33,14 @@ start:
+ 	 * We were loaded at QEMU's kernel load address, but we're not
+ 	 * allowed to link there due to how QEMU deals with linker VMAs,
+ 	 * so we just linked at zero. This means the first thing to do is
+-	 * to find our stack and toc, and then do a relocate.
++	 * to find our stack and toc, and then do a relocate. powernv and
++	 * pseries load addreses are not the same, so find the address
++	 * dynamically:
+ 	 */
+-	LOAD_REG_IMMEDIATE(r31, SPAPR_KERNEL_LOAD_ADDR)
++	bl	0f
++0:	mflr	r31
++	subi	r31, r31, 0b - start	/* QEMU's kernel load address */
++
+ 	ld	r1, (p_stack - start)(r31)
+ 	ld	r2, (p_toc - start)(r31)
+ 	add	r1, r1, r31
+@@ -114,8 +119,11 @@ p_toc:		.llong  tocptr
+ p_dyn:		.llong  dynamic_start
+ 
+ .text
++start_text:
+ .align 3
++p_toc_text:	.llong	tocptr
+ 
++.align 3
+ .globl hcall
+ hcall:
+ 	sc	1
+@@ -185,9 +193,10 @@ call_handler:
  	std	r0,_CCR(r1)
  
--	/* nip and msr */
--
--	mfsrr0	r0
--	std	r0, _NIP(r1)
--
--	mfsrr1	r0
--	std	r0, _MSR(r1)
--
  	/* restore TOC pointer */
- 
- 	LOAD_REG_IMMEDIATE(r31, SPAPR_KERNEL_LOAD_ADDR)
-@@ -238,6 +230,7 @@ call_handler:
- 
- .section .text.ex
- 
-+/* [H]VECTOR must not be more than 8 instructions to fit in 0x20 vectors */
- .macro VECTOR vec
- 	. = \vec
- 
-@@ -246,19 +239,28 @@ call_handler:
- 	subi	r1,r1, INT_FRAME_SIZE
- 
- 	/* save r0 and ctr to call generic handler */
 -
- 	SAVE_GPR(0,r1)
+-	LOAD_REG_IMMEDIATE(r31, SPAPR_KERNEL_LOAD_ADDR)
+-	ld	r2, (p_toc - start)(r31)
++	bl	0f
++0:	mflr	r31
++	subi	r31, r31, 0b - start_text
++	ld	r2, (p_toc_text - start_text)(r31)
  
--	mfctr	r0
--	std	r0,_CTR(r1)
-+	li	r0,\vec
-+	std	r0,_TRAP(r1)
+ 	/* FIXME: build stack frame */
  
--	ld	r0, P_HANDLER(0)
--	mtctr	r0
-+	b	handler_trampoline
-+.endm
-+
-+.macro HVECTOR vec
-+	. = \vec
-+
-+	mtsprg1	r1	/* save r1 */
-+	mfsprg0	r1	/* get exception stack address */
-+	subi	r1,r1, INT_FRAME_SIZE
-+
-+	/* save r0 and ctr to call generic handler */
-+	SAVE_GPR(0,r1)
- 
- 	li	r0,\vec
- 	std	r0,_TRAP(r1)
- 
--	bctr
-+	b	handler_htrampoline
- .endm
- 
- 	. = 0x100
-@@ -268,12 +270,61 @@ __start_interrupts:
- VECTOR(0x100)
- VECTOR(0x200)
- VECTOR(0x300)
-+VECTOR(0x380)
- VECTOR(0x400)
-+VECTOR(0x480)
- VECTOR(0x500)
- VECTOR(0x600)
- VECTOR(0x700)
- VECTOR(0x800)
- VECTOR(0x900)
-+HVECTOR(0x980)
-+VECTOR(0xa00)
-+VECTOR(0xc00)
-+VECTOR(0xd00)
-+HVECTOR(0xe00)
-+HVECTOR(0xe20)
-+HVECTOR(0xe40)
-+HVECTOR(0xe60)
-+HVECTOR(0xe80)
-+HVECTOR(0xea0)
-+VECTOR(0xf00)
-+VECTOR(0xf20)
-+VECTOR(0xf40)
-+VECTOR(0xf60)
-+HVECTOR(0xf80)
-+
-+handler_trampoline:
-+	mfctr	r0
-+	std	r0,_CTR(r1)
-+
-+	ld	r0, P_HANDLER(0)
-+	mtctr	r0
-+
-+	/* nip and msr */
-+	mfsrr0	r0
-+	std	r0, _NIP(r1)
-+
-+	mfsrr1	r0
-+	std	r0, _MSR(r1)
-+
-+	bctr
-+
-+handler_htrampoline:
-+	mfctr	r0
-+	std	r0,_CTR(r1)
-+
-+	ld	r0, P_HANDLER(0)
-+	mtctr	r0
-+
-+	/* nip and msr */
-+	mfhsrr0	r0
-+	std	r0, _NIP(r1)
-+
-+	mfhsrr1	r0
-+	std	r0, _MSR(r1)
-+
-+	bctr
- 
- 	.align 7
- 	.globl __end_interrupts
 -- 
 2.37.2
 
