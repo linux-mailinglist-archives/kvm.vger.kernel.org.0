@@ -2,74 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 09E226CABB9
-	for <lists+kvm@lfdr.de>; Mon, 27 Mar 2023 19:19:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BA8446CABEB
+	for <lists+kvm@lfdr.de>; Mon, 27 Mar 2023 19:36:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232562AbjC0RTi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Mar 2023 13:19:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50942 "EHLO
+        id S232476AbjC0Rgk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Mar 2023 13:36:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38520 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230386AbjC0RTh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Mar 2023 13:19:37 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7035C35A7
-        for <kvm@vger.kernel.org>; Mon, 27 Mar 2023 10:18:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1679937529;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=ubqrrysriR6ooyEAZSZJ2qRop495K3eTRpiST4S6wI0=;
-        b=SBk1OD5UuYE2gQzhzY3i3iqMDF5QLzJztoXZSuNsLkQjSW3ipIFxhOLTpdHXlIDt/7qcQM
-        rM9pUD2qfpljfs/P/O13mXYAmzx5KjoV0sBq8DubyS5LSCdf/2uYyb3QWp/vMOHbCEAwrE
-        pQdlKk5OLB3Qt70DNmqwJkodOyAFZ+0=
-Received: from mail-yw1-f197.google.com (mail-yw1-f197.google.com
- [209.85.128.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-595-89t55vtgOsSuc6vbyznE1g-1; Mon, 27 Mar 2023 13:18:48 -0400
-X-MC-Unique: 89t55vtgOsSuc6vbyznE1g-1
-Received: by mail-yw1-f197.google.com with SMTP id 00721157ae682-5458dde029bso95092517b3.13
-        for <kvm@vger.kernel.org>; Mon, 27 Mar 2023 10:18:48 -0700 (PDT)
+        with ESMTP id S232433AbjC0Rgi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Mar 2023 13:36:38 -0400
+Received: from mail-ed1-x52f.google.com (mail-ed1-x52f.google.com [IPv6:2a00:1450:4864:20::52f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA42E40CB
+        for <kvm@vger.kernel.org>; Mon, 27 Mar 2023 10:36:36 -0700 (PDT)
+Received: by mail-ed1-x52f.google.com with SMTP id h8so39374154ede.8
+        for <kvm@vger.kernel.org>; Mon, 27 Mar 2023 10:36:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=brainfault-org.20210112.gappssmtp.com; s=20210112; t=1679938595;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hSATOuP6ZP1FqSuSN1CJjKHXrNE2Dfr3DEmtzL0kCY0=;
+        b=S8kBf4Pt4yB1UwMWzqtsnZduMf/zvjP88S1Wrr93lVPoEL7SA98e4ZqosqKNTtafl+
+         QIiqCWYHLqJS9Ekqznsjl9eRnc1ZJgtUu0Mh87ChYPXrRB0IzSi8P2aMEfPA8fXaXdQv
+         iK183TYbtqwO3XmqOGLEXjr4cUj4mrafIK4QDoeO2uY5sY6oOf7Sj9POD849SB5CjlaB
+         2k92fHmhH/wyHNYY7wsJPXsVv1jha9Kgu8sTMXslNK9qtoDo7WHxpvStFoe0SdAopdnt
+         oAvvvpBFMsjQKxw4ba9qWNjNITskTlXFNa5Nubw+xXwdm1ZsVk8jHMusHLbIEO6wNto2
+         gY0g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679937527;
+        d=1e100.net; s=20210112; t=1679938595;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=ubqrrysriR6ooyEAZSZJ2qRop495K3eTRpiST4S6wI0=;
-        b=IHfjJ8tYOYg4vU1+tnt5FC4SytyrUK6OSuduxm82gntWg50p1Ls6VQGuu2VfcJmCMu
-         cpmLtLCPpzo+B/WXq1Req5YDkQZJBpj+D3ZwfoHAkkrnGVaFSumfQfvFiZjtu2LiOKaZ
-         Ax5sBSUauoP/jPYISNT/NlFBwAu8HKarDlbhtw5J0vnQ8O8B5f5bipyveqS33KGQsfpY
-         uWq2zSqUdxLmJSiD29s9yREaCJ6haV/DQXdQ3AYeE+5O8fvVaNjtDT6264cQ4qjM4NTK
-         CbRRbBS8009xh5C1QlBfOsAZVPEeDgkf1sDip8/UP7/MWr9+/loK8rqyndbtzCJIAGRL
-         AhuA==
-X-Gm-Message-State: AAQBX9dZXau4bGiigGCAIv55XbCqghTebp2BaRJcAT9dNztd95q4BwvZ
-        H9TWZB1A4j144Ygal4pwCiS7MfoMbEi16XUM3P3SWWRw9h8/YgnX9m6nd7p70CDVd4gF678EWWi
-        JVqRo4bZKOAjaf4BDp0JXoYKn/aWM
-X-Received: by 2002:a81:ad5d:0:b0:540:e744:13ae with SMTP id l29-20020a81ad5d000000b00540e74413aemr4681776ywk.3.1679937527481;
-        Mon, 27 Mar 2023 10:18:47 -0700 (PDT)
-X-Google-Smtp-Source: AKy350Yd7McE8XOBG2bQacJRvvlLa/Vo8/drmrjv9gNxqEJ3S/Gvy+CHn6mTiR/Xm4rI5eQGHVGdmIE/X42Kumj2Cjs=
-X-Received: by 2002:a81:ad5d:0:b0:540:e744:13ae with SMTP id
- l29-20020a81ad5d000000b00540e74413aemr4681759ywk.3.1679937527087; Mon, 27 Mar
- 2023 10:18:47 -0700 (PDT)
+        bh=hSATOuP6ZP1FqSuSN1CJjKHXrNE2Dfr3DEmtzL0kCY0=;
+        b=oVwjJ4CV9KqGPsNM5tgAfNveSkD1BVq4tVVSZXsKZ3CjvTiZM3aow021BJVVLPffwY
+         4+UExamiLecqPaliJUiBFRrwPK1Dr3NNMCFwRMPLgp0VMJjK37aImU6BOfAyn+JQGQAc
+         hQrXKBCtD56tIhgZRyYGXjyulAn0UHOkihBdwfxmNUbaT5ZTc61pXBJqqUbBVqzBCsnu
+         cDtiUIcFbzm2kRxZZWK05VqRVwsRDHhuiOIo+ZAAr5phaw2LMAtFPms7iOhYKgoNz6ZX
+         TVDBXdQjgC+nLD+hXJH2QlECydxY1Dn1s8bAw2O5/hfSx0G2C9B2iqW5mb/8Gy555pcy
+         R1jw==
+X-Gm-Message-State: AAQBX9f36O56uxd25V9cBjGulYBF9rQpRY+IRSfHo8LKPg6YvAW8i+5s
+        9mbxSkph3J3aaJPRbNNqq9D/1llvdGn/GRQkKhnkkg==
+X-Google-Smtp-Source: AKy350byGQHmMsV9vJeUEUR1vOuaVeVo1Sk3VSzkZxBeXa2swRjBFsoX7eDh4HisUplPH29tmGfbOLwZMalOBMeThTA=
+X-Received: by 2002:a17:906:524a:b0:933:3fba:b978 with SMTP id
+ y10-20020a170906524a00b009333fbab978mr5387796ejm.13.1679938595076; Mon, 27
+ Mar 2023 10:36:35 -0700 (PDT)
 MIME-Version: 1.0
-References: <20230324153607.46836-1-sgarzare@redhat.com> <20230324153919.47633-1-sgarzare@redhat.com>
-In-Reply-To: <20230324153919.47633-1-sgarzare@redhat.com>
-From:   Eugenio Perez Martin <eperezma@redhat.com>
-Date:   Mon, 27 Mar 2023 19:18:10 +0200
-Message-ID: <CAJaqyWdng_m95nruPAA8ALBz82g1ZpU9ox2xJuS_qCJ0ueZoPQ@mail.gmail.com>
-Subject: Re: [PATCH v4 5/9] vringh: support VA with iotlb
-To:     Stefano Garzarella <sgarzare@redhat.com>
-Cc:     virtualization@lists.linux-foundation.org,
-        Andrey Zhadchenko <andrey.zhadchenko@virtuozzo.com>,
-        Jason Wang <jasowang@redhat.com>, linux-kernel@vger.kernel.org,
-        netdev@vger.kernel.org, kvm@vger.kernel.org, stefanha@redhat.com,
-        "Michael S. Tsirkin" <mst@redhat.com>
+References: <20230327164941.20491-1-andy.chiu@sifive.com> <20230327164941.20491-19-andy.chiu@sifive.com>
+In-Reply-To: <20230327164941.20491-19-andy.chiu@sifive.com>
+From:   Anup Patel <anup@brainfault.org>
+Date:   Mon, 27 Mar 2023 23:06:23 +0530
+Message-ID: <CAAhSdy3xq_yK-_GXFcw_OVkhpqz==guYQkDo3u7Wzf7+Gd_tGQ@mail.gmail.com>
+Subject: Re: [PATCH -next v17 18/20] riscv: KVM: Add vector lazy save/restore support
+To:     Andy Chiu <andy.chiu@sifive.com>
+Cc:     linux-riscv@lists.infradead.org, palmer@dabbelt.com,
+        atishp@atishpatra.org, kvm-riscv@lists.infradead.org,
+        kvm@vger.kernel.org, vineetg@rivosinc.com, greentime.hu@sifive.com,
+        guoren@linux.alibaba.com, Vincent Chen <vincent.chen@sifive.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Albert Ou <aou@eecs.berkeley.edu>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+X-Spam-Status: No, score=0.0 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -77,366 +71,481 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Mar 24, 2023 at 4:39=E2=80=AFPM Stefano Garzarella <sgarzare@redhat=
-.com> wrote:
+On Mon, Mar 27, 2023 at 10:21=E2=80=AFPM Andy Chiu <andy.chiu@sifive.com> w=
+rote:
 >
-> vDPA supports the possibility to use user VA in the iotlb messages.
-> So, let's add support for user VA in vringh to use it in the vDPA
-> simulators.
+> From: Vincent Chen <vincent.chen@sifive.com>
 >
-> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+> This patch adds vector context save/restore for guest VCPUs. To reduce th=
+e
+> impact on KVM performance, the implementation imitates the FP context
+> switch mechanism to lazily store and restore the vector context only when
+> the kernel enters/exits the in-kernel run loop and not during the KVM
+> world switch.
+>
+> Signed-off-by: Vincent Chen <vincent.chen@sifive.com>
+> Signed-off-by: Greentime Hu <greentime.hu@sifive.com>
+> Signed-off-by: Andy Chiu <andy.chiu@sifive.com>
 
-Acked-by: Eugenio P=C3=A9rez <eperezma@redhat.com>
+Looks good to me.
 
-Thanks!
+Reviewed-by: Anup Patel <anup@brainfault.org>
+Acked-by: Anup Patel <anup@brainfault.org>
+
+Regards,
+Anup
 
 > ---
+>  arch/riscv/include/asm/kvm_host.h        |   2 +
+>  arch/riscv/include/asm/kvm_vcpu_vector.h |  82 ++++++++++
+>  arch/riscv/include/uapi/asm/kvm.h        |   7 +
+>  arch/riscv/kvm/Makefile                  |   1 +
+>  arch/riscv/kvm/vcpu.c                    |  22 +++
+>  arch/riscv/kvm/vcpu_vector.c             | 186 +++++++++++++++++++++++
+>  6 files changed, 300 insertions(+)
+>  create mode 100644 arch/riscv/include/asm/kvm_vcpu_vector.h
+>  create mode 100644 arch/riscv/kvm/vcpu_vector.c
 >
-> Notes:
->     v4:
->     - used uintptr_t for `io_addr` [Eugenio]
->     - added `io_addr` and `io_len` variables in iotlb_translate
->     - avoided overflow doing `map->addr - map->start + addr` [Jason]
->     - removed `is_iovec` field from struct iotlb_vec [Jason]
->     - added vringh_init_iotlb_va() [Jason]
->     v3:
->     - refactored avoiding code duplication [Eugenio]
->     v2:
->     - replace kmap_atomic() with kmap_local_page() [see previous patch]
->     - fix cast warnings when build with W=3D1 C=3D1
+> diff --git a/arch/riscv/include/asm/kvm_host.h b/arch/riscv/include/asm/k=
+vm_host.h
+> index cc7da66ee0c0..7e7e23272d32 100644
+> --- a/arch/riscv/include/asm/kvm_host.h
+> +++ b/arch/riscv/include/asm/kvm_host.h
+> @@ -14,6 +14,7 @@
+>  #include <linux/kvm_types.h>
+>  #include <linux/spinlock.h>
+>  #include <asm/hwcap.h>
+> +#include <asm/ptrace.h>
+>  #include <asm/kvm_vcpu_fp.h>
+>  #include <asm/kvm_vcpu_insn.h>
+>  #include <asm/kvm_vcpu_sbi.h>
+> @@ -141,6 +142,7 @@ struct kvm_cpu_context {
+>         unsigned long sstatus;
+>         unsigned long hstatus;
+>         union __riscv_fp_state fp;
+> +       struct __riscv_v_ext_state vector;
+>  };
 >
->  include/linux/vringh.h |   9 +++
->  drivers/vhost/vringh.c | 171 +++++++++++++++++++++++++++++++++--------
->  2 files changed, 148 insertions(+), 32 deletions(-)
->
-> diff --git a/include/linux/vringh.h b/include/linux/vringh.h
-> index 1991a02c6431..b4edfadf5479 100644
-> --- a/include/linux/vringh.h
-> +++ b/include/linux/vringh.h
-> @@ -32,6 +32,9 @@ struct vringh {
->         /* Can we get away with weak barriers? */
->         bool weak_barriers;
->
-> +       /* Use user's VA */
-> +       bool use_va;
-> +
->         /* Last available index we saw (ie. where we're up to). */
->         u16 last_avail_idx;
->
-> @@ -284,6 +287,12 @@ int vringh_init_iotlb(struct vringh *vrh, u64 featur=
-es,
->                       struct vring_avail *avail,
->                       struct vring_used *used);
->
-> +int vringh_init_iotlb_va(struct vringh *vrh, u64 features,
-> +                        unsigned int num, bool weak_barriers,
-> +                        struct vring_desc *desc,
-> +                        struct vring_avail *avail,
-> +                        struct vring_used *used);
-> +
->  int vringh_getdesc_iotlb(struct vringh *vrh,
->                          struct vringh_kiov *riov,
->                          struct vringh_kiov *wiov,
-> diff --git a/drivers/vhost/vringh.c b/drivers/vhost/vringh.c
-> index 4aee230f7622..771c2aba8aac 100644
-> --- a/drivers/vhost/vringh.c
-> +++ b/drivers/vhost/vringh.c
-> @@ -1094,10 +1094,17 @@ EXPORT_SYMBOL(vringh_need_notify_kern);
->
->  #if IS_REACHABLE(CONFIG_VHOST_IOTLB)
->
-> +struct iotlb_vec {
-> +       union {
-> +               struct iovec *iovec;
-> +               struct bio_vec *bvec;
-> +       } iov;
-> +       size_t count;
-> +};
-> +
->  static int iotlb_translate(const struct vringh *vrh,
->                            u64 addr, u64 len, u64 *translated,
-> -                          struct bio_vec iov[],
-> -                          int iov_size, u32 perm)
-> +                          struct iotlb_vec *ivec, u32 perm)
->  {
->         struct vhost_iotlb_map *map;
->         struct vhost_iotlb *iotlb =3D vrh->iotlb;
-> @@ -1107,9 +1114,11 @@ static int iotlb_translate(const struct vringh *vr=
-h,
->         spin_lock(vrh->iotlb_lock);
->
->         while (len > s) {
-> -               u64 size, pa, pfn;
-> +               uintptr_t io_addr;
-> +               size_t io_len;
-> +               u64 size;
->
-> -               if (unlikely(ret >=3D iov_size)) {
-> +               if (unlikely(ret >=3D ivec->count)) {
->                         ret =3D -ENOBUFS;
->                         break;
->                 }
-> @@ -1124,10 +1133,22 @@ static int iotlb_translate(const struct vringh *v=
-rh,
->                 }
->
->                 size =3D map->size - addr + map->start;
-> -               pa =3D map->addr + addr - map->start;
-> -               pfn =3D pa >> PAGE_SHIFT;
-> -               bvec_set_page(&iov[ret], pfn_to_page(pfn), min(len - s, s=
-ize),
-> -                             pa & (PAGE_SIZE - 1));
-> +               io_len =3D min(len - s, size);
-> +               io_addr =3D map->addr - map->start + addr;
-> +
-> +               if (vrh->use_va) {
-> +                       struct iovec *iovec =3D ivec->iov.iovec;
-> +
-> +                       iovec[ret].iov_len =3D io_len;
-> +                       iovec[ret].iov_base =3D (void __user *)io_addr;
-> +               } else {
-> +                       u64 pfn =3D io_addr >> PAGE_SHIFT;
-> +                       struct bio_vec *bvec =3D ivec->iov.bvec;
-> +
-> +                       bvec_set_page(&bvec[ret], pfn_to_page(pfn), io_le=
-n,
-> +                                     io_addr & (PAGE_SIZE - 1));
-> +               }
-> +
->                 s +=3D size;
->                 addr +=3D size;
->                 ++ret;
-> @@ -1146,23 +1167,36 @@ static int iotlb_translate(const struct vringh *v=
-rh,
->  static inline int copy_from_iotlb(const struct vringh *vrh, void *dst,
->                                   void *src, size_t len)
->  {
-> +       struct iotlb_vec ivec;
-> +       union {
-> +               struct iovec iovec[IOTLB_IOV_STRIDE];
-> +               struct bio_vec bvec[IOTLB_IOV_STRIDE];
-> +       } iov;
->         u64 total_translated =3D 0;
->
-> +       ivec.iov.iovec =3D iov.iovec;
-> +       ivec.count =3D IOTLB_IOV_STRIDE;
-> +
->         while (total_translated < len) {
-> -               struct bio_vec iov[IOTLB_IOV_STRIDE];
->                 struct iov_iter iter;
->                 u64 translated;
->                 int ret;
->
->                 ret =3D iotlb_translate(vrh, (u64)(uintptr_t)src,
->                                       len - total_translated, &translated=
-,
-> -                                     iov, ARRAY_SIZE(iov), VHOST_MAP_RO)=
-;
-> +                                     &ivec, VHOST_MAP_RO);
->                 if (ret =3D=3D -ENOBUFS)
-> -                       ret =3D ARRAY_SIZE(iov);
-> +                       ret =3D IOTLB_IOV_STRIDE;
->                 else if (ret < 0)
->                         return ret;
->
-> -               iov_iter_bvec(&iter, ITER_SOURCE, iov, ret, translated);
-> +               if (vrh->use_va) {
-> +                       iov_iter_init(&iter, ITER_SOURCE, ivec.iov.iovec,=
- ret,
-> +                                     translated);
-> +               } else {
-> +                       iov_iter_bvec(&iter, ITER_SOURCE, ivec.iov.bvec, =
-ret,
-> +                                     translated);
-> +               }
->
->                 ret =3D copy_from_iter(dst, translated, &iter);
->                 if (ret < 0)
-> @@ -1179,23 +1213,36 @@ static inline int copy_from_iotlb(const struct vr=
-ingh *vrh, void *dst,
->  static inline int copy_to_iotlb(const struct vringh *vrh, void *dst,
->                                 void *src, size_t len)
->  {
-> +       struct iotlb_vec ivec;
-> +       union {
-> +               struct iovec iovec[IOTLB_IOV_STRIDE];
-> +               struct bio_vec bvec[IOTLB_IOV_STRIDE];
-> +       } iov;
->         u64 total_translated =3D 0;
->
-> +       ivec.iov.iovec =3D iov.iovec;
-> +       ivec.count =3D IOTLB_IOV_STRIDE;
-> +
->         while (total_translated < len) {
-> -               struct bio_vec iov[IOTLB_IOV_STRIDE];
->                 struct iov_iter iter;
->                 u64 translated;
->                 int ret;
->
->                 ret =3D iotlb_translate(vrh, (u64)(uintptr_t)dst,
->                                       len - total_translated, &translated=
-,
-> -                                     iov, ARRAY_SIZE(iov), VHOST_MAP_WO)=
-;
-> +                                     &ivec, VHOST_MAP_WO);
->                 if (ret =3D=3D -ENOBUFS)
-> -                       ret =3D ARRAY_SIZE(iov);
-> +                       ret =3D IOTLB_IOV_STRIDE;
->                 else if (ret < 0)
->                         return ret;
->
-> -               iov_iter_bvec(&iter, ITER_DEST, iov, ret, translated);
-> +               if (vrh->use_va) {
-> +                       iov_iter_init(&iter, ITER_DEST, ivec.iov.iovec, r=
-et,
-> +                                     translated);
-> +               } else {
-> +                       iov_iter_bvec(&iter, ITER_DEST, ivec.iov.bvec, re=
-t,
-> +                                     translated);
-> +               }
->
->                 ret =3D copy_to_iter(src, translated, &iter);
->                 if (ret < 0)
-> @@ -1212,20 +1259,36 @@ static inline int copy_to_iotlb(const struct vrin=
-gh *vrh, void *dst,
->  static inline int getu16_iotlb(const struct vringh *vrh,
->                                u16 *val, const __virtio16 *p)
->  {
-> -       struct bio_vec iov;
-> -       void *kaddr, *from;
-> +       struct iotlb_vec ivec;
-> +       union {
-> +               struct iovec iovec[1];
-> +               struct bio_vec bvec[1];
-> +       } iov;
-> +       __virtio16 tmp;
->         int ret;
->
-> +       ivec.iov.iovec =3D iov.iovec;
-> +       ivec.count =3D 1;
-> +
->         /* Atomic read is needed for getu16 */
-> -       ret =3D iotlb_translate(vrh, (u64)(uintptr_t)p, sizeof(*p), NULL,
-> -                             &iov, 1, VHOST_MAP_RO);
-> +       ret =3D iotlb_translate(vrh, (u64)(uintptr_t)p, sizeof(*p),
-> +                             NULL, &ivec, VHOST_MAP_RO);
->         if (ret < 0)
->                 return ret;
->
-> -       kaddr =3D kmap_local_page(iov.bv_page);
-> -       from =3D kaddr + iov.bv_offset;
-> -       *val =3D vringh16_to_cpu(vrh, READ_ONCE(*(__virtio16 *)from));
-> -       kunmap_local(kaddr);
-> +       if (vrh->use_va) {
-> +               ret =3D __get_user(tmp, (__virtio16 __user *)ivec.iov.iov=
-ec[0].iov_base);
-> +               if (ret)
-> +                       return ret;
-> +       } else {
-> +               void *kaddr =3D kmap_local_page(ivec.iov.bvec[0].bv_page)=
-;
-> +               void *from =3D kaddr + ivec.iov.bvec[0].bv_offset;
-> +
-> +               tmp =3D READ_ONCE(*(__virtio16 *)from);
-> +               kunmap_local(kaddr);
-> +       }
-> +
-> +       *val =3D vringh16_to_cpu(vrh, tmp);
->
->         return 0;
->  }
-> @@ -1233,20 +1296,36 @@ static inline int getu16_iotlb(const struct vring=
-h *vrh,
->  static inline int putu16_iotlb(const struct vringh *vrh,
->                                __virtio16 *p, u16 val)
->  {
-> -       struct bio_vec iov;
-> -       void *kaddr, *to;
-> +       struct iotlb_vec ivec;
-> +       union {
-> +               struct iovec iovec;
-> +               struct bio_vec bvec;
-> +       } iov;
-> +       __virtio16 tmp;
->         int ret;
->
-> +       ivec.iov.iovec =3D &iov.iovec;
-> +       ivec.count =3D 1;
-> +
->         /* Atomic write is needed for putu16 */
-> -       ret =3D iotlb_translate(vrh, (u64)(uintptr_t)p, sizeof(*p), NULL,
-> -                             &iov, 1, VHOST_MAP_WO);
-> +       ret =3D iotlb_translate(vrh, (u64)(uintptr_t)p, sizeof(*p),
-> +                             NULL, &ivec, VHOST_MAP_RO);
->         if (ret < 0)
->                 return ret;
->
-> -       kaddr =3D kmap_local_page(iov.bv_page);
-> -       to =3D kaddr + iov.bv_offset;
-> -       WRITE_ONCE(*(__virtio16 *)to, cpu_to_vringh16(vrh, val));
-> -       kunmap_local(kaddr);
-> +       tmp =3D cpu_to_vringh16(vrh, val);
-> +
-> +       if (vrh->use_va) {
-> +               ret =3D __put_user(tmp, (__virtio16 __user *)ivec.iov.iov=
-ec[0].iov_base);
-> +               if (ret)
-> +                       return ret;
-> +       } else {
-> +               void *kaddr =3D kmap_local_page(ivec.iov.bvec[0].bv_page)=
-;
-> +               void *to =3D kaddr + ivec.iov.bvec[0].bv_offset;
-> +
-> +               WRITE_ONCE(*(__virtio16 *)to, tmp);
-> +               kunmap_local(kaddr);
-> +       }
->
->         return 0;
->  }
-> @@ -1320,11 +1399,39 @@ int vringh_init_iotlb(struct vringh *vrh, u64 fea=
-tures,
->                       struct vring_avail *avail,
->                       struct vring_used *used)
->  {
-> +       vrh->use_va =3D false;
-> +
->         return vringh_init_kern(vrh, features, num, weak_barriers,
->                                 desc, avail, used);
->  }
->  EXPORT_SYMBOL(vringh_init_iotlb);
->
-> +/**
-> + * vringh_init_iotlb_va - initialize a vringh for a ring with IOTLB cont=
-aining
-> + *                        user VA.
-> + * @vrh: the vringh to initialize.
-> + * @features: the feature bits for this ring.
-> + * @num: the number of elements.
-> + * @weak_barriers: true if we only need memory barriers, not I/O.
-> + * @desc: the userpace descriptor pointer.
-> + * @avail: the userpace avail pointer.
-> + * @used: the userpace used pointer.
+>  struct kvm_vcpu_csr {
+> diff --git a/arch/riscv/include/asm/kvm_vcpu_vector.h b/arch/riscv/includ=
+e/asm/kvm_vcpu_vector.h
+> new file mode 100644
+> index 000000000000..ff994fdd6d0d
+> --- /dev/null
+> +++ b/arch/riscv/include/asm/kvm_vcpu_vector.h
+> @@ -0,0 +1,82 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +/*
+> + * Copyright (C) 2022 SiFive
 > + *
-> + * Returns an error if num is invalid.
+> + * Authors:
+> + *     Vincent Chen <vincent.chen@sifive.com>
+> + *     Greentime Hu <greentime.hu@sifive.com>
 > + */
-> +int vringh_init_iotlb_va(struct vringh *vrh, u64 features,
-> +                        unsigned int num, bool weak_barriers,
-> +                        struct vring_desc *desc,
-> +                        struct vring_avail *avail,
-> +                        struct vring_used *used)
+> +
+> +#ifndef __KVM_VCPU_RISCV_VECTOR_H
+> +#define __KVM_VCPU_RISCV_VECTOR_H
+> +
+> +#include <linux/types.h>
+> +
+> +#ifdef CONFIG_RISCV_ISA_V
+> +#include <asm/vector.h>
+> +#include <asm/kvm_host.h>
+> +
+> +static __always_inline void __kvm_riscv_vector_save(struct kvm_cpu_conte=
+xt *context)
 > +{
-> +       vrh->use_va =3D true;
-> +
-> +       return vringh_init_kern(vrh, features, num, weak_barriers,
-> +                               desc, avail, used);
+> +       __riscv_v_vstate_save(&context->vector, context->vector.datap);
 > +}
-> +EXPORT_SYMBOL(vringh_init_iotlb_va);
 > +
->  /**
->   * vringh_set_iotlb - initialize a vringh for a ring with IOTLB.
->   * @vrh: the vring
-> --
-> 2.39.2
+> +static __always_inline void __kvm_riscv_vector_restore(struct kvm_cpu_co=
+ntext *context)
+> +{
+> +       __riscv_v_vstate_restore(&context->vector, context->vector.datap)=
+;
+> +}
+> +
+> +void kvm_riscv_vcpu_vector_reset(struct kvm_vcpu *vcpu);
+> +void kvm_riscv_vcpu_guest_vector_save(struct kvm_cpu_context *cntx,
+> +                                     unsigned long *isa);
+> +void kvm_riscv_vcpu_guest_vector_restore(struct kvm_cpu_context *cntx,
+> +                                        unsigned long *isa);
+> +void kvm_riscv_vcpu_host_vector_save(struct kvm_cpu_context *cntx);
+> +void kvm_riscv_vcpu_host_vector_restore(struct kvm_cpu_context *cntx);
+> +int kvm_riscv_vcpu_alloc_vector_context(struct kvm_vcpu *vcpu,
+> +                                       struct kvm_cpu_context *cntx);
+> +void kvm_riscv_vcpu_free_vector_context(struct kvm_vcpu *vcpu);
+> +#else
+> +
+> +struct kvm_cpu_context;
+> +
+> +static inline void kvm_riscv_vcpu_vector_reset(struct kvm_vcpu *vcpu)
+> +{
+> +}
+> +
+> +static inline void kvm_riscv_vcpu_guest_vector_save(struct kvm_cpu_conte=
+xt *cntx,
+> +                                                   unsigned long *isa)
+> +{
+> +}
+> +
+> +static inline void kvm_riscv_vcpu_guest_vector_restore(struct kvm_cpu_co=
+ntext *cntx,
+> +                                                      unsigned long *isa=
+)
+> +{
+> +}
+> +
+> +static inline void kvm_riscv_vcpu_host_vector_save(struct kvm_cpu_contex=
+t *cntx)
+> +{
+> +}
+> +
+> +static inline void kvm_riscv_vcpu_host_vector_restore(struct kvm_cpu_con=
+text *cntx)
+> +{
+> +}
+> +
+> +static inline int kvm_riscv_vcpu_alloc_vector_context(struct kvm_vcpu *v=
+cpu,
+> +                                                     struct kvm_cpu_cont=
+ext *cntx)
+> +{
+> +       return 0;
+> +}
+> +
+> +static inline void kvm_riscv_vcpu_free_vector_context(struct kvm_vcpu *v=
+cpu)
+> +{
+> +}
+> +#endif
+> +
+> +int kvm_riscv_vcpu_get_reg_vector(struct kvm_vcpu *vcpu,
+> +                                 const struct kvm_one_reg *reg,
+> +                                 unsigned long rtype);
+> +int kvm_riscv_vcpu_set_reg_vector(struct kvm_vcpu *vcpu,
+> +                                 const struct kvm_one_reg *reg,
+> +                                 unsigned long rtype);
+> +#endif
+> diff --git a/arch/riscv/include/uapi/asm/kvm.h b/arch/riscv/include/uapi/=
+asm/kvm.h
+> index d562dcb929ea..0955f9460447 100644
+> --- a/arch/riscv/include/uapi/asm/kvm.h
+> +++ b/arch/riscv/include/uapi/asm/kvm.h
+> @@ -155,6 +155,13 @@ enum KVM_RISCV_ISA_EXT_ID {
+>  /* ISA Extension registers are mapped as type 7 */
+>  #define KVM_REG_RISCV_ISA_EXT          (0x07 << KVM_REG_RISCV_TYPE_SHIFT=
+)
 >
-
+> +/* V extension registers are mapped as type 8 */
+> +#define KVM_REG_RISCV_VECTOR           (0x08 << KVM_REG_RISCV_TYPE_SHIFT=
+)
+> +#define KVM_REG_RISCV_VECTOR_CSR_REG(name)     \
+> +               (offsetof(struct __riscv_v_ext_state, name) / sizeof(unsi=
+gned long))
+> +#define KVM_REG_RISCV_VECTOR_REG(n)    \
+> +               ((n) + sizeof(struct __riscv_v_ext_state) / sizeof(unsign=
+ed long))
+> +
+>  #endif
+>
+>  #endif /* __LINUX_KVM_RISCV_H */
+> diff --git a/arch/riscv/kvm/Makefile b/arch/riscv/kvm/Makefile
+> index 278e97c06e0a..f29854333cf2 100644
+> --- a/arch/riscv/kvm/Makefile
+> +++ b/arch/riscv/kvm/Makefile
+> @@ -17,6 +17,7 @@ kvm-y +=3D mmu.o
+>  kvm-y +=3D vcpu.o
+>  kvm-y +=3D vcpu_exit.o
+>  kvm-y +=3D vcpu_fp.o
+> +kvm-y +=3D vcpu_vector.o
+>  kvm-y +=3D vcpu_insn.o
+>  kvm-y +=3D vcpu_switch.o
+>  kvm-y +=3D vcpu_sbi.o
+> diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
+> index bfdd5b73d462..c495ae1a8091 100644
+> --- a/arch/riscv/kvm/vcpu.c
+> +++ b/arch/riscv/kvm/vcpu.c
+> @@ -22,6 +22,8 @@
+>  #include <asm/cacheflush.h>
+>  #include <asm/hwcap.h>
+>  #include <asm/sbi.h>
+> +#include <asm/vector.h>
+> +#include <asm/kvm_vcpu_vector.h>
+>
+>  const struct _kvm_stats_desc kvm_vcpu_stats_desc[] =3D {
+>         KVM_GENERIC_VCPU_STATS(),
+> @@ -135,6 +137,8 @@ static void kvm_riscv_reset_vcpu(struct kvm_vcpu *vcp=
+u)
+>
+>         kvm_riscv_vcpu_fp_reset(vcpu);
+>
+> +       kvm_riscv_vcpu_vector_reset(vcpu);
+> +
+>         kvm_riscv_vcpu_timer_reset(vcpu);
+>
+>         WRITE_ONCE(vcpu->arch.irqs_pending, 0);
+> @@ -192,6 +196,9 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+>         cntx->hstatus |=3D HSTATUS_SPVP;
+>         cntx->hstatus |=3D HSTATUS_SPV;
+>
+> +       if (kvm_riscv_vcpu_alloc_vector_context(vcpu, cntx))
+> +               return -ENOMEM;
+> +
+>         /* By default, make CY, TM, and IR counters accessible in VU mode=
+ */
+>         reset_csr->scounteren =3D 0x7;
+>
+> @@ -227,6 +234,9 @@ void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
+>
+>         /* Free unused pages pre-allocated for G-stage page table mapping=
+s */
+>         kvm_mmu_free_memory_cache(&vcpu->arch.mmu_page_cache);
+> +
+> +       /* Free vector context space for host and guest kernel */
+> +       kvm_riscv_vcpu_free_vector_context(vcpu);
+>  }
+>
+>  int kvm_cpu_has_pending_timer(struct kvm_vcpu *vcpu)
+> @@ -610,6 +620,9 @@ static int kvm_riscv_vcpu_set_reg(struct kvm_vcpu *vc=
+pu,
+>                                                  KVM_REG_RISCV_FP_D);
+>         case KVM_REG_RISCV_ISA_EXT:
+>                 return kvm_riscv_vcpu_set_reg_isa_ext(vcpu, reg);
+> +       case KVM_REG_RISCV_VECTOR:
+> +               return kvm_riscv_vcpu_set_reg_vector(vcpu, reg,
+> +                                                KVM_REG_RISCV_VECTOR);
+>         default:
+>                 break;
+>         }
+> @@ -637,6 +650,9 @@ static int kvm_riscv_vcpu_get_reg(struct kvm_vcpu *vc=
+pu,
+>                                                  KVM_REG_RISCV_FP_D);
+>         case KVM_REG_RISCV_ISA_EXT:
+>                 return kvm_riscv_vcpu_get_reg_isa_ext(vcpu, reg);
+> +       case KVM_REG_RISCV_VECTOR:
+> +               return kvm_riscv_vcpu_get_reg_vector(vcpu, reg,
+> +                                                KVM_REG_RISCV_VECTOR);
+>         default:
+>                 break;
+>         }
+> @@ -906,6 +922,9 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cp=
+u)
+>         kvm_riscv_vcpu_host_fp_save(&vcpu->arch.host_context);
+>         kvm_riscv_vcpu_guest_fp_restore(&vcpu->arch.guest_context,
+>                                         vcpu->arch.isa);
+> +       kvm_riscv_vcpu_host_vector_save(&vcpu->arch.host_context);
+> +       kvm_riscv_vcpu_guest_vector_restore(&vcpu->arch.guest_context,
+> +                                           vcpu->arch.isa);
+>
+>         vcpu->cpu =3D cpu;
+>  }
+> @@ -921,6 +940,9 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
+>         kvm_riscv_vcpu_host_fp_restore(&vcpu->arch.host_context);
+>
+>         kvm_riscv_vcpu_timer_save(vcpu);
+> +       kvm_riscv_vcpu_guest_vector_save(&vcpu->arch.guest_context,
+> +                                        vcpu->arch.isa);
+> +       kvm_riscv_vcpu_host_vector_restore(&vcpu->arch.host_context);
+>
+>         csr->vsstatus =3D csr_read(CSR_VSSTATUS);
+>         csr->vsie =3D csr_read(CSR_VSIE);
+> diff --git a/arch/riscv/kvm/vcpu_vector.c b/arch/riscv/kvm/vcpu_vector.c
+> new file mode 100644
+> index 000000000000..edd2eecbddc2
+> --- /dev/null
+> +++ b/arch/riscv/kvm/vcpu_vector.c
+> @@ -0,0 +1,186 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * Copyright (C) 2022 SiFive
+> + *
+> + * Authors:
+> + *     Vincent Chen <vincent.chen@sifive.com>
+> + *     Greentime Hu <greentime.hu@sifive.com>
+> + */
+> +
+> +#include <linux/errno.h>
+> +#include <linux/err.h>
+> +#include <linux/kvm_host.h>
+> +#include <linux/uaccess.h>
+> +#include <asm/hwcap.h>
+> +#include <asm/kvm_vcpu_vector.h>
+> +#include <asm/vector.h>
+> +
+> +#ifdef CONFIG_RISCV_ISA_V
+> +void kvm_riscv_vcpu_vector_reset(struct kvm_vcpu *vcpu)
+> +{
+> +       unsigned long *isa =3D vcpu->arch.isa;
+> +       struct kvm_cpu_context *cntx =3D &vcpu->arch.guest_context;
+> +
+> +       cntx->sstatus &=3D ~SR_VS;
+> +       if (riscv_isa_extension_available(isa, v)) {
+> +               cntx->sstatus |=3D SR_VS_INITIAL;
+> +               WARN_ON(!cntx->vector.datap);
+> +               memset(cntx->vector.datap, 0, riscv_v_vsize);
+> +       } else {
+> +               cntx->sstatus |=3D SR_VS_OFF;
+> +       }
+> +}
+> +
+> +static void kvm_riscv_vcpu_vector_clean(struct kvm_cpu_context *cntx)
+> +{
+> +       cntx->sstatus &=3D ~SR_VS;
+> +       cntx->sstatus |=3D SR_VS_CLEAN;
+> +}
+> +
+> +void kvm_riscv_vcpu_guest_vector_save(struct kvm_cpu_context *cntx,
+> +                                     unsigned long *isa)
+> +{
+> +       if ((cntx->sstatus & SR_VS) =3D=3D SR_VS_DIRTY) {
+> +               if (riscv_isa_extension_available(isa, v))
+> +                       __kvm_riscv_vector_save(cntx);
+> +               kvm_riscv_vcpu_vector_clean(cntx);
+> +       }
+> +}
+> +
+> +void kvm_riscv_vcpu_guest_vector_restore(struct kvm_cpu_context *cntx,
+> +                                        unsigned long *isa)
+> +{
+> +       if ((cntx->sstatus & SR_VS) !=3D SR_VS_OFF) {
+> +               if (riscv_isa_extension_available(isa, v))
+> +                       __kvm_riscv_vector_restore(cntx);
+> +               kvm_riscv_vcpu_vector_clean(cntx);
+> +       }
+> +}
+> +
+> +void kvm_riscv_vcpu_host_vector_save(struct kvm_cpu_context *cntx)
+> +{
+> +       /* No need to check host sstatus as it can be modified outside */
+> +       if (riscv_isa_extension_available(NULL, v))
+> +               __kvm_riscv_vector_save(cntx);
+> +}
+> +
+> +void kvm_riscv_vcpu_host_vector_restore(struct kvm_cpu_context *cntx)
+> +{
+> +       if (riscv_isa_extension_available(NULL, v))
+> +               __kvm_riscv_vector_restore(cntx);
+> +}
+> +
+> +int kvm_riscv_vcpu_alloc_vector_context(struct kvm_vcpu *vcpu,
+> +                                       struct kvm_cpu_context *cntx)
+> +{
+> +       cntx->vector.datap =3D kmalloc(riscv_v_vsize, GFP_KERNEL);
+> +       if (!cntx->vector.datap)
+> +               return -ENOMEM;
+> +
+> +       vcpu->arch.host_context.vector.datap =3D kzalloc(riscv_v_vsize, G=
+FP_KERNEL);
+> +       if (!vcpu->arch.host_context.vector.datap)
+> +               return -ENOMEM;
+> +
+> +       return 0;
+> +}
+> +
+> +void kvm_riscv_vcpu_free_vector_context(struct kvm_vcpu *vcpu)
+> +{
+> +       kfree(vcpu->arch.guest_reset_context.vector.datap);
+> +       kfree(vcpu->arch.host_context.vector.datap);
+> +}
+> +#endif
+> +
+> +static void *kvm_riscv_vcpu_vreg_addr(struct kvm_vcpu *vcpu,
+> +                                     unsigned long reg_num,
+> +                                     size_t reg_size)
+> +{
+> +       struct kvm_cpu_context *cntx =3D &vcpu->arch.guest_context;
+> +       void *reg_val;
+> +       size_t vlenb =3D riscv_v_vsize / 32;
+> +
+> +       if (reg_num < KVM_REG_RISCV_VECTOR_REG(0)) {
+> +               if (reg_size !=3D sizeof(unsigned long))
+> +                       return NULL;
+> +               switch (reg_num) {
+> +               case KVM_REG_RISCV_VECTOR_CSR_REG(vstart):
+> +                       reg_val =3D &cntx->vector.vstart;
+> +                       break;
+> +               case KVM_REG_RISCV_VECTOR_CSR_REG(vl):
+> +                       reg_val =3D &cntx->vector.vl;
+> +                       break;
+> +               case KVM_REG_RISCV_VECTOR_CSR_REG(vtype):
+> +                       reg_val =3D &cntx->vector.vtype;
+> +                       break;
+> +               case KVM_REG_RISCV_VECTOR_CSR_REG(vcsr):
+> +                       reg_val =3D &cntx->vector.vcsr;
+> +                       break;
+> +               case KVM_REG_RISCV_VECTOR_CSR_REG(datap):
+> +               default:
+> +                       return NULL;
+> +               }
+> +       } else if (reg_num <=3D KVM_REG_RISCV_VECTOR_REG(31)) {
+> +               if (reg_size !=3D vlenb)
+> +                       return NULL;
+> +               reg_val =3D cntx->vector.datap
+> +                         + (reg_num - KVM_REG_RISCV_VECTOR_REG(0)) * vle=
+nb;
+> +       } else {
+> +               return NULL;
+> +       }
+> +
+> +       return reg_val;
+> +}
+> +
+> +int kvm_riscv_vcpu_get_reg_vector(struct kvm_vcpu *vcpu,
+> +                                 const struct kvm_one_reg *reg,
+> +                                 unsigned long rtype)
+> +{
+> +       unsigned long *isa =3D vcpu->arch.isa;
+> +       unsigned long __user *uaddr =3D
+> +                       (unsigned long __user *)(unsigned long)reg->addr;
+> +       unsigned long reg_num =3D reg->id & ~(KVM_REG_ARCH_MASK |
+> +                                           KVM_REG_SIZE_MASK |
+> +                                           rtype);
+> +       void *reg_val =3D NULL;
+> +       size_t reg_size =3D KVM_REG_SIZE(reg->id);
+> +
+> +       if (rtype =3D=3D KVM_REG_RISCV_VECTOR &&
+> +           riscv_isa_extension_available(isa, v)) {
+> +               reg_val =3D kvm_riscv_vcpu_vreg_addr(vcpu, reg_num, reg_s=
+ize);
+> +       }
+> +
+> +       if (!reg_val)
+> +               return -EINVAL;
+> +
+> +       if (copy_to_user(uaddr, reg_val, reg_size))
+> +               return -EFAULT;
+> +
+> +       return 0;
+> +}
+> +
+> +int kvm_riscv_vcpu_set_reg_vector(struct kvm_vcpu *vcpu,
+> +                                 const struct kvm_one_reg *reg,
+> +                                 unsigned long rtype)
+> +{
+> +       unsigned long *isa =3D vcpu->arch.isa;
+> +       unsigned long __user *uaddr =3D
+> +                       (unsigned long __user *)(unsigned long)reg->addr;
+> +       unsigned long reg_num =3D reg->id & ~(KVM_REG_ARCH_MASK |
+> +                                           KVM_REG_SIZE_MASK |
+> +                                           rtype);
+> +       void *reg_val =3D NULL;
+> +       size_t reg_size =3D KVM_REG_SIZE(reg->id);
+> +
+> +       if (rtype =3D=3D KVM_REG_RISCV_VECTOR &&
+> +           riscv_isa_extension_available(isa, v)) {
+> +               reg_val =3D kvm_riscv_vcpu_vreg_addr(vcpu, reg_num, reg_s=
+ize);
+> +       }
+> +
+> +       if (!reg_val)
+> +               return -EINVAL;
+> +
+> +       if (copy_from_user(reg_val, uaddr, reg_size))
+> +               return -EFAULT;
+> +
+> +       return 0;
+> +}
+> --
+> 2.17.1
+>
