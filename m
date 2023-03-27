@@ -2,56 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F189A6CA723
-	for <lists+kvm@lfdr.de>; Mon, 27 Mar 2023 16:13:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F0A5A6CA74B
+	for <lists+kvm@lfdr.de>; Mon, 27 Mar 2023 16:17:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233011AbjC0ONB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Mar 2023 10:13:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44120 "EHLO
+        id S233028AbjC0ORy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Mar 2023 10:17:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55148 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232209AbjC0OMT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Mar 2023 10:12:19 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C92B530F6
-        for <kvm@vger.kernel.org>; Mon, 27 Mar 2023 07:11:09 -0700 (PDT)
+        with ESMTP id S232869AbjC0ORe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Mar 2023 10:17:34 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C4107D9F
+        for <kvm@vger.kernel.org>; Mon, 27 Mar 2023 07:15:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1679926269;
+        s=mimecast20190719; t=1679926422;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=NvwxuKB1KAG0ACmsYDpkw14eOr4deO3U9ffm3RLnhIQ=;
-        b=NMxaw98kv245bmyqI88ndHWacEao0ui4dIe+4jZMCaDoRoGQExjX4omfFf/QAAs/heVYZ7
-        LgSTzsRsPT4L+0TBERVUUIZrvswVZfbcNA+h9D11Z9zs3yF+bddYh6pTnMp7KcHY4uVE7t
-        wjSWaBYicwSADsK8hOCA3CeoDuoV9Xg=
+        bh=cyh9GNwkSeiWX8VVWJet6cmrStrv1Y1BhHYKMAKCy08=;
+        b=Dabk0TyVO2SEMBS7O9GPkVH20RURosApNgBbJWd+KV+Wcfd8bzmwqvfFfj9DdiUDUaUITz
+        7XGZRtoHaeVsT+e9D0KVXXB3MTgI8dSQkYH6p0pvYKAHCQeq6+eZrkp9nyRrCaRA9sB2fk
+        aK/XD+ns0gg7gKKeF9YmrO5NgApPyU4=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-498-j5kkvBeQMhWBAHJx14T-Gw-1; Mon, 27 Mar 2023 10:11:05 -0400
-X-MC-Unique: j5kkvBeQMhWBAHJx14T-Gw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+ us-mta-85--YcWfJfvN5iJJkzgfBw30Q-1; Mon, 27 Mar 2023 10:13:38 -0400
+X-MC-Unique: -YcWfJfvN5iJJkzgfBw30Q-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 13E05884EC8;
-        Mon, 27 Mar 2023 14:11:05 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8FE82803499;
+        Mon, 27 Mar 2023 14:13:37 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D1EB42027040;
-        Mon, 27 Mar 2023 14:11:04 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id C0421140E949;
+        Mon, 27 Mar 2023 14:13:36 +0000 (UTC)
 From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     jpiotrowski@linux.microsoft.com
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Tianyu Lan <ltykernel@gmail.com>,
-        Michael Kelley <mikelley@microsoft.com>,
-        Sean Christopherson <seanjc@google.com>, stable@vger.kernel.org
-Subject: Re: [RESEND PATCH v2] KVM: SVM: Flush Hyper-V TLB when required
-Date:   Mon, 27 Mar 2023 10:10:40 -0400
-Message-Id: <20230327141039.3751076-1-pbonzini@redhat.com>
-In-Reply-To: <20230324145233.4585-1-jpiotrowski@linux.microsoft.com>
+To:     Dmytro Maluka <dmy@semihalf.com>
+Cc:     Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H . Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
+        Marc Zyngier <maz@kernel.org>,
+        Eric Auger <eric.auger@redhat.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Rong L Liu <rong.l.liu@intel.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Tomasz Nowicki <tn@semihalf.com>,
+        Grzegorz Jaszczyk <jaz@semihalf.com>, upstream@semihalf.com,
+        Dmitry Torokhov <dtor@google.com>, Dong@vger.kernel.org,
+        Eddie <eddie.dong@intel.com>, Dmytro Maluka <dmaluka@google.com>
+Subject: Re: [PATCH v4 0/2] KVM: x86/ioapic: Fix oneshot interrupts forwarding
+Date:   Mon, 27 Mar 2023 10:13:34 -0400
+Message-Id: <20230327141334.3751567-1-pbonzini@redhat.com>
+In-Reply-To: <20230322204344.50138-1-dmy@semihalf.com>
 References: 
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
 X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
@@ -62,13 +71,7 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Split svm_flush_tlb_current() into separate callbacks for the 3 cases
-(guest/all/current), and issue the required Hyper-V hypercall when a
-Hyper-V TLB flush is needed. The most important case where the TLB flush
-was missing is when loading a new PGD, which is followed by what is now
-svm_flush_tlb_current().
-
-Queued, thanks.  I changed the return value to -EOPNOTSUPP.
+Queued, thanks.
 
 Paolo
 
