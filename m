@@ -2,100 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1C7BD6CA670
-	for <lists+kvm@lfdr.de>; Mon, 27 Mar 2023 15:49:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4C4946CA6B4
+	for <lists+kvm@lfdr.de>; Mon, 27 Mar 2023 16:01:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232787AbjC0Ntx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Mar 2023 09:49:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40198 "EHLO
+        id S229983AbjC0OBQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Mar 2023 10:01:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59328 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232642AbjC0Ntj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Mar 2023 09:49:39 -0400
-Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A082A5FED;
-        Mon, 27 Mar 2023 06:48:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1679924895; x=1711460895;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=nbbS8eaOoKnfWK3qJQXC2Lo0AgeSijaaJ8+C3KuWbcw=;
-  b=SAo8PQvB9+GCkIFEKBDAtp3KmvQN59/uyRzVNA0WTkjqGqr0MHYqHO5q
-   OSXNJXYH3Gm0oO7g/38nH3tmfFDI391LGmYZOPxGGBuyYsflDMvvt0YYT
-   0o2AGGt69nPjq3tkkaaHlk3SgpHvHBpB9diGxJM2Fgfnile2Kg291Lyww
-   w9behfqATMpn3DImOCAqpAjnOQl4j+uxiDHoQYHmjkmN2r8t8ur08v6Ek
-   lC+FkBz/flRPPLbPi/ZAAQyZ+vCLLGMXuhuQxoa69q4FQzEcoRYt0uzqm
-   xnETGtaV+3hvi2GQonaYXRKKBOTCiQtUU5KNgBxtQGmwpBAzdfuVF9OY9
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10662"; a="405190174"
-X-IronPort-AV: E=Sophos;i="5.98,294,1673942400"; 
-   d="scan'208";a="405190174"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Mar 2023 06:48:06 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10662"; a="716077950"
-X-IronPort-AV: E=Sophos;i="5.98,294,1673942400"; 
-   d="scan'208";a="716077950"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.249.174.244]) ([10.249.174.244])
-  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Mar 2023 06:48:05 -0700
-Message-ID: <9b81cfa8-1e36-cbed-3399-c178f7388067@intel.com>
-Date:   Mon, 27 Mar 2023 21:48:01 +0800
+        with ESMTP id S232861AbjC0OAc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Mar 2023 10:00:32 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8880B5FC8
+        for <kvm@vger.kernel.org>; Mon, 27 Mar 2023 06:59:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1679925563;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=ib1Sbmeg5wn9T9cMjoPs94Ttz/AXNygGsYMj5t3rfL0=;
+        b=CRhej7xCjHzbreEHlh1YDwp5eQLDRmE7fdh74HFbALhk4ZkP/rtJ3efquQLJWLuvkYve9/
+        77vca4tckAX+PCw4mWoUTbiWeHiqNLRUcLfwwL/RA2rKLYuVdhvyMDvLwohznX992w8ZFL
+        OBAWXfraRRNx0yhNrOHyfyJZIP/heFU=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-217-etKO0HpfNtancde121vZ6g-1; Mon, 27 Mar 2023 09:59:22 -0400
+X-MC-Unique: etKO0HpfNtancde121vZ6g-1
+Received: by mail-ed1-f70.google.com with SMTP id t26-20020a50d71a000000b005003c5087caso12716197edi.1
+        for <kvm@vger.kernel.org>; Mon, 27 Mar 2023 06:59:22 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1679925561;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ib1Sbmeg5wn9T9cMjoPs94Ttz/AXNygGsYMj5t3rfL0=;
+        b=uq8hwwdCo0hG/mkLyh7cX4QFyqHOJcAq4i1U0dW8vsNmB0CjKMtIVUd2c6af8JGIv0
+         bdvhtMmti4UQ0+ZUFHQCtejjjTlug/a96QeHEAfQonGME9dMqHKdnPuVrI+j2h2bukGd
+         Wzonn44+7duvYftZLRyIUBTHjGth8RNzVdxbmycTZsmCHl663RhxpHhzyF9duFCXK7Cp
+         aYhk87hPl+WP1bKtHO8AkKCv3y9b4PhytqaUsrqwhusCY0mYj0xxIDirMFHt+4Y9Yt6/
+         3ID8x+nGc6CgR6g6GNbE5ywcvLisGJohjzBPlHH0dt1Y5Bpx+t/vsDvjgHLnBCig0rId
+         OwUg==
+X-Gm-Message-State: AAQBX9dvrsrSKw72R1y7TtGSsAz23iT3erjgzcW66ZrTRI0O3KLPKDTj
+        c2tERCiIfrNLjrJARiTKoWdgW3lXCAyhCbUFN/JunqecQ/UsmNBEom03SfhMyeyb8KiLpMoyBZA
+        2sKobqudVtXqD
+X-Received: by 2002:a50:fe94:0:b0:4f9:9e56:84bf with SMTP id d20-20020a50fe94000000b004f99e5684bfmr11332084edt.10.1679925561232;
+        Mon, 27 Mar 2023 06:59:21 -0700 (PDT)
+X-Google-Smtp-Source: AKy350bnOgenmvlJK/KfZzoCNV2Y22c0JxxStJEq6tgQdOSRmSq0EomzPpCWswApUOVHdn7LueBBXg==
+X-Received: by 2002:a50:fe94:0:b0:4f9:9e56:84bf with SMTP id d20-20020a50fe94000000b004f99e5684bfmr11332072edt.10.1679925560982;
+        Mon, 27 Mar 2023 06:59:20 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
+        by smtp.googlemail.com with ESMTPSA id 15-20020a508e4f000000b004fa99a22c3bsm14659319edx.61.2023.03.27.06.59.19
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 27 Mar 2023 06:59:20 -0700 (PDT)
+Message-ID: <49385a34-6ad7-255d-68d9-6b41a76f01df@redhat.com>
+Date:   Mon, 27 Mar 2023 15:59:19 +0200
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Firefox/102.0 Thunderbird/102.9.0
-Subject: Re: [PATCH v4 6/6] KVM: VMX: Make CR0.WP a guest owned bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.8.0
+Subject: Re: [GIT PULL] KVM/arm64 fixes for 6.3, part #2
 Content-Language: en-US
-To:     Mathias Krause <minipli@grsecurity.net>, kvm@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org,
-        Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-References: <20230322013731.102955-1-minipli@grsecurity.net>
- <20230322013731.102955-7-minipli@grsecurity.net>
- <9261e319-084b-b6fe-550e-31b3683776c4@intel.com>
- <814c8975-17ad-f1bb-3b26-2175d79a1153@grsecurity.net>
-From:   Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <814c8975-17ad-f1bb-3b26-2175d79a1153@grsecurity.net>
+To:     Marc Zyngier <maz@kernel.org>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Will Deacon <will@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>
+Cc:     reijiw@google.com, dmatlack@google.com, james.morse@arm.com,
+        suzuki.poulose@arm.com, yuzenghui@huawei.com,
+        kvmarm@lists.linux.dev, kvm@vger.kernel.org
+References: <ZBPZ4D9MIsaCNDh6@thinky-boi> <ZB3o/jsQIwS+4g4E@linux.dev>
+ <86v8imwhi1.wl-maz@kernel.org>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <86v8imwhi1.wl-maz@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-0.5 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,HK_RANDOM_ENVFROM,
-        HK_RANDOM_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H2,
-        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 3/27/2023 4:37 PM, Mathias Krause wrote:
-> On 27.03.23 10:33, Xiaoyao Li wrote:
->> On 3/22/2023 9:37 AM, Mathias Krause wrote:
->>> Guests like grsecurity that make heavy use of CR0.WP to implement kernel
->>> level W^X will suffer from the implied VMEXITs.
->>>
->>> With EPT there is no need to intercept a guest change of CR0.WP, so
->>> simply make it a guest owned bit if we can do so.
+On 3/27/23 13:39, Marc Zyngier wrote:
+>> Paolo,
 >>
->> I'm interested in the performance gain. Do you have data like Patch 2?
-> 
-> It's mentioned in the cover letter[1], quoted below:
+>> Pinging this PR in case you missed it, the issues around host page table walks
+>> are particularly urgent as the race on host page table teardown has been
+>> reproduced on some setups.
+> If we don't hear from Paolo shortly, I suggest we route this via the
+> arm64 tree.
 
-Sorry I missed it. The data of not intercepting CR0.WP looks great as well.
+It missed the pull request I sent on March 17th by a few hours.  I have 
+queued it now and will send it to Linus later today.
 
-> [1]
-> https://lore.kernel.org/kvm/20230322013731.102955-1-minipli@grsecurity.net/
-> 
-> : I used 'ssdd 10 50000' from rt-tests[5] as a micro-benchmark, running on a
-> : grsecurity L1 VM. Below table shows the results (runtime in seconds, lower
-> : is better):
-> :
-> :                               legacy     TDP    shadow
-> :     kvm-x86/next@d8708b        8.43s    9.45s    70.3s
-> :     + patches 1-3              5.39s    5.63s    70.2s
-> :     + patches 4-6              3.51s    3.47s    67.8s
-> 
-> 
-> Thanks,
-> Mathias
+Paolo
 
