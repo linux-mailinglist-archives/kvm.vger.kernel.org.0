@@ -2,163 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4A8696CACD0
-	for <lists+kvm@lfdr.de>; Mon, 27 Mar 2023 20:16:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 69BCD6CAD00
+	for <lists+kvm@lfdr.de>; Mon, 27 Mar 2023 20:26:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231958AbjC0SQN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Mar 2023 14:16:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56248 "EHLO
+        id S232489AbjC0S0E (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Mar 2023 14:26:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37884 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229808AbjC0SQL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Mar 2023 14:16:11 -0400
-Received: from mail-ed1-x534.google.com (mail-ed1-x534.google.com [IPv6:2a00:1450:4864:20::534])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B51830E3
-        for <kvm@vger.kernel.org>; Mon, 27 Mar 2023 11:16:07 -0700 (PDT)
-Received: by mail-ed1-x534.google.com with SMTP id t10so39721482edd.12
-        for <kvm@vger.kernel.org>; Mon, 27 Mar 2023 11:16:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=grsecurity.net; s=grsec; t=1679940966;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pgCb2fD5/3eMjp/r7Z39wtlcsNNhW6d832f3xFbu6z0=;
-        b=Zy5ZYYDpVCTsv7jGGUVpvVKXsTpTCs98UuI8a0zYES7g0HoozlytNhDZBv0W5v8mXS
-         uPN9UwalCtoR6FlE/vE+9RU3EBv1sCC4d+E5PgZBarJb18E0evrEff1OVjWRkImGpUOv
-         eqq2P+5YhTpmS3O41xua/aKIzFFBTBzir1ec5VWdOaWS72KE+UOzlS+Emu60DSHoJUrl
-         mQJlSFwoE/6S7EQJGOD8Gwjrpj4KlyIx3pUau9NRDdWnC6EQHHmZu97rZGLGVO4WcCO8
-         2MLafTVk4TZsxkGRMX5oZnfMtiBqSrPWBlxnjVRAFQgAMNKjJ11OAL8MyxdG5cER8C0s
-         jj9A==
+        with ESMTP id S232159AbjC0SZ6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Mar 2023 14:25:58 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CFD6F2D59
+        for <kvm@vger.kernel.org>; Mon, 27 Mar 2023 11:25:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1679941515;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=/sArzJWw5iWwIUzUeDPltEnck8V+Nc5emccaqlU7aVM=;
+        b=RM00e+lNjPH4FtLolNaTG6lM3rOf0bY7YsT0KVZ7j8AAXFuQ3Vh0GidZi7BX8JwDkIkhzP
+        HNjV1DLWymVgq0gNHPFLOCTAvTyXk0+9sceyhJC0ch3n0eT4lj2WlE8lnqDvs5tYT1agDp
+        yix86Bjjh8C/emydl6RWAxvPd6vQJFQ=
+Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
+ [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-253-iEymTRCzNgmwK55Wg4wq5A-1; Mon, 27 Mar 2023 14:25:13 -0400
+X-MC-Unique: iEymTRCzNgmwK55Wg4wq5A-1
+Received: by mail-qv1-f71.google.com with SMTP id e1-20020a0cd641000000b005b47df84f6eso3998920qvj.0
+        for <kvm@vger.kernel.org>; Mon, 27 Mar 2023 11:25:13 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679940966;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=pgCb2fD5/3eMjp/r7Z39wtlcsNNhW6d832f3xFbu6z0=;
-        b=ukwUwZLO0rVZqvHRuOfRjRxZaWAbAHvpd8LrFDYEACmjOKGaEsvDcSBAjWDPj8YtlZ
-         LchcZpw6GkSGXw3+RM0j+Z7G54CLTsp4TAH4ZHC/Z8Ld7OJk9WaWvmQrCDd4JjMuGrqs
-         TDNIOSk3vcKFqvolt5cOlOy0TdKuDTyfCC4jQwTEvjViWkKJgFYk9Q+QEjzsz3AKzE0A
-         y2i+VaEBAkVqsCARCy97K8DwnyzH3YtDame38BKQy4WC1C3NaMK3tp9beR/ojsn/PATI
-         BwyKpcgSThhfjCyepEUqfh+wrnBJnhPtN0vHrxkiHT7MrY5cL1uungOnJCTMVwsTd2xD
-         XTqw==
-X-Gm-Message-State: AAQBX9dCsyGkZYarb9qpkhaZbztgNNa3sTljLvPKg8+skz0jZgkBMr13
-        QJ1uHmZF2yPngmruU/SvmXeo60kM6uINOLHSplDbiA==
-X-Google-Smtp-Source: AKy350Yh9SbDjDjICbd2mkUgfqkheXum97qedyuLYEO4GuV1MroSAJjDvJhRWLN/cbMXDTUUUgByMA==
-X-Received: by 2002:a17:906:b24e:b0:930:21a:c80 with SMTP id ce14-20020a170906b24e00b00930021a0c80mr13715716ejb.47.1679940965953;
-        Mon, 27 Mar 2023 11:16:05 -0700 (PDT)
-Received: from localhost.localdomain (p4ffe007e.dip0.t-ipconnect.de. [79.254.0.126])
-        by smtp.gmail.com with ESMTPSA id 22-20020a170906309600b0092f289b6fdbsm14245396ejv.181.2023.03.27.11.16.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Mar 2023 11:16:05 -0700 (PDT)
-From:   Mathias Krause <minipli@grsecurity.net>
-To:     kvm@vger.kernel.org
-Cc:     Mathias Krause <minipli@grsecurity.net>
-Subject: [kvm-unit-tests PATCH 2/2] x86/access: CR0.WP toggling write access test
-Date:   Mon, 27 Mar 2023 20:19:11 +0200
-Message-Id: <20230327181911.51655-3-minipli@grsecurity.net>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230327181911.51655-1-minipli@grsecurity.net>
-References: <20230327181911.51655-1-minipli@grsecurity.net>
+        d=1e100.net; s=20210112; t=1679941513;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=/sArzJWw5iWwIUzUeDPltEnck8V+Nc5emccaqlU7aVM=;
+        b=ZGcjFFe27zszviGNwsNziJvW/CsSz88c2W2zR6HGUjeI89Tgtmc/d2nylGvh8NAzBk
+         /Xvd5h9OVr/N2pjbr1qiHl/YrmqCPjPm5DRtmYJm59aUlMTmVbhnf66HVlb9eqS9AIkU
+         dTTa4VkZCK7+jiDP7SJEu7QAio87o85W9nVunizdrDEpnC4EYpRXqj7KDBTFLYOZJSAw
+         fNt/brgDZ5N7izqoG9tz5oVVNVZdqi7hQofuihRQbhC0IIX9+bsN8StUYA2IufnlLUsN
+         RFe75o/b5qtnGfLBev4RRPssNLk3+USgFJ6+Wz85KU9GKrl0IK/iGftIImwVkR8KdkeR
+         2VEw==
+X-Gm-Message-State: AAQBX9cMeZ/2HEiT10OG4ZewXfd15JopUEvaFrmWpYLGVEFsPSTwswFa
+        DMATsAumyu+AafI/97bYSDgBusi/bMA2aM6X2SqQCHh8hXOya3PQQZexlYXFjZZlcWzP/07xU69
+        scX3mC7ReSS/G
+X-Received: by 2002:a05:6214:dc9:b0:5ad:d8f9:63bf with SMTP id 9-20020a0562140dc900b005add8f963bfmr26636139qvt.0.1679941513213;
+        Mon, 27 Mar 2023 11:25:13 -0700 (PDT)
+X-Google-Smtp-Source: AKy350bJKKDLVvr9aH5bzFkb5xrc73EcAcyl/5jc7xZ6chcol0D4u4jhQvqi/wox6cn3S5EOalPLRA==
+X-Received: by 2002:a05:6214:dc9:b0:5ad:d8f9:63bf with SMTP id 9-20020a0562140dc900b005add8f963bfmr26636120qvt.0.1679941512996;
+        Mon, 27 Mar 2023 11:25:12 -0700 (PDT)
+Received: from [192.168.8.106] (tmo-097-40.customers.d1-online.com. [80.187.97.40])
+        by smtp.gmail.com with ESMTPSA id ks10-20020a056214310a00b005dd8b934573sm3165431qvb.11.2023.03.27.11.25.11
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 27 Mar 2023 11:25:12 -0700 (PDT)
+Message-ID: <929e32fe-c011-4bbd-3a52-6d9e7b89d460@redhat.com>
+Date:   Mon, 27 Mar 2023 20:25:09 +0200
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=0.1 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
-        DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.13.0
+Subject: Re: [kvm-unit-tests PATCH] compiler.h: Make __always_inline match
+ glibc definition, preventing redefine error
+Content-Language: en-US
+To:     Nicholas Piggin <npiggin@gmail.com>, kvm@vger.kernel.org
+Cc:     Laurent Vivier <lvivier@redhat.com>
+References: <20230327122248.2693856-1-npiggin@gmail.com>
+From:   Thomas Huth <thuth@redhat.com>
+In-Reply-To: <20230327122248.2693856-1-npiggin@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-We already have tests that verify a write access to an r/o page is
-successful when CR0.WP=0, but we lack a test that explicitly verifies
-that the same access will fail after we set CR0.WP=1 without flushing
-any associated TLB entries either explicitly (INVLPG) or implicitly
-(write to CR3). Add such a test.
+On 27/03/2023 14.22, Nicholas Piggin wrote:
+> This makes __always_inline match glibc's cdefs.h file, which prevents
+> redefinition errors which can happen e.g., if glibc limits.h is included
+> before kvm-unit-tests compiler.h.
+> 
+> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+> ---
+> I ran into this with some powerpc patches. I since changed include
+> ordering in that series so it no longer depends on this change, but it
+> might be good to have this to be less fragile.
+> 
+> Thanks,
+> Nick
+> 
+>   lib/linux/compiler.h | 9 ++++++++-
+>   1 file changed, 8 insertions(+), 1 deletion(-)
+> 
+> diff --git a/lib/linux/compiler.h b/lib/linux/compiler.h
+> index 6f565e4..bf3313b 100644
+> --- a/lib/linux/compiler.h
+> +++ b/lib/linux/compiler.h
+> @@ -45,7 +45,14 @@
+>   
+>   #define barrier()	asm volatile("" : : : "memory")
+>   
+> -#define __always_inline	inline __attribute__((always_inline))
+> +/*
+> + * As glibc's sys/cdefs.h does, this undefines __always_inline because
+> + * Linux's stddef.h kernel header also defines it in an incompatible
+> + * way.
+> + */
+> +#undef __always_inline
+> +#define __always_inline __inline __attribute__ ((__always_inline__))
+> +
+>   #define noinline __attribute__((noinline))
+>   #define __unused __attribute__((__unused__))
+>   
 
-Signed-off-by: Mathias Krause <minipli@grsecurity.net>
----
- x86/access.c | 46 ++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 44 insertions(+), 2 deletions(-)
+Thanks, applied.
 
-diff --git a/x86/access.c b/x86/access.c
-index 203353a3f74f..5fe2a89ddfa9 100644
---- a/x86/access.c
-+++ b/x86/access.c
-@@ -575,9 +575,10 @@ fault:
- 		at->expected_error &= ~PFERR_FETCH_MASK;
- }
- 
--static void ac_set_expected_status(ac_test_t *at)
-+static void __ac_set_expected_status(ac_test_t *at, bool flush)
- {
--	invlpg(at->virt);
-+	if (flush)
-+		invlpg(at->virt);
- 
- 	if (at->ptep)
- 		at->expected_pte = *at->ptep;
-@@ -599,6 +600,11 @@ static void ac_set_expected_status(ac_test_t *at)
- 	ac_emulate_access(at, at->flags);
- }
- 
-+static void ac_set_expected_status(ac_test_t *at)
-+{
-+	__ac_set_expected_status(at, true);
-+}
-+
- static pt_element_t ac_get_pt(ac_test_t *at, int i, pt_element_t *ptep)
- {
- 	pt_element_t pte;
-@@ -1061,6 +1067,41 @@ err:
- 	return 0;
- }
- 
-+static int check_write_cr0wp(ac_pt_env_t *pt_env)
-+{
-+	ac_test_t at1;
-+
-+	ac_test_init(&at1, 0xffff923042007000ul, pt_env);
-+
-+	at1.flags = AC_PDE_PRESENT_MASK | AC_PTE_PRESENT_MASK |
-+		    AC_PDE_ACCESSED_MASK | AC_PTE_ACCESSED_MASK |
-+		    AC_CPU_CR0_WP_MASK |
-+		    AC_ACCESS_WRITE_MASK;
-+	ac_test_setup_ptes(&at1);
-+
-+	/*
-+	 * Write to r/o page with cr0.wp=0, then try again
-+	 * with cr0.wp=1 and expect a page fault to happen.
-+	 */
-+	if (!ac_test_do_access(&at1)) {
-+		printf("%s: CR0.WP=0 r/o write fail\n", __FUNCTION__);
-+		goto err;
-+	}
-+
-+	at1.flags &= ~AC_CPU_CR0_WP_MASK;
-+	__ac_set_expected_status(&at1, false);
-+
-+	if (!ac_test_do_access(&at1)) {
-+		printf("%s: CR0.WP=1 r/o write deny fail\n", __FUNCTION__);
-+		goto err;
-+	}
-+
-+	return 1;
-+
-+err:
-+	return 0;
-+}
-+
- static int check_effective_sp_permissions(ac_pt_env_t *pt_env)
- {
- 	unsigned long ptr1 = 0xffff923480000000;
-@@ -1150,6 +1191,7 @@ const ac_test_fn ac_test_cases[] =
- 	check_pfec_on_prefetch_pte,
- 	check_large_pte_dirty_for_nowp,
- 	check_smep_andnot_wp,
-+	check_write_cr0wp,
- 	check_effective_sp_permissions,
- };
- 
--- 
-2.39.2
+  Thomas
 
