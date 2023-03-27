@@ -2,216 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6C9DC6C9AE9
-	for <lists+kvm@lfdr.de>; Mon, 27 Mar 2023 07:39:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 85B106C9B54
+	for <lists+kvm@lfdr.de>; Mon, 27 Mar 2023 08:21:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230309AbjC0FjS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Mar 2023 01:39:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41208 "EHLO
+        id S231976AbjC0GVb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Mar 2023 02:21:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42090 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229985AbjC0FjQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Mar 2023 01:39:16 -0400
-Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8935F4C07
-        for <kvm@vger.kernel.org>; Sun, 26 Mar 2023 22:39:11 -0700 (PDT)
-Received: by mail-pl1-x62d.google.com with SMTP id c18so7297061ple.11
-        for <kvm@vger.kernel.org>; Sun, 26 Mar 2023 22:39:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1679895551;
-        h=in-reply-to:references:to:from:subject:cc:message-id:date
-         :content-transfer-encoding:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=u6RQjB5AQU67VhsjUHIEE77so4M91TfQuFLRA4PW0yk=;
-        b=lS3ZQ0h8ZFGpvKXr2Ja5VCoFYF+tri8nncZ2njg/TckYYTyfj7mjp/T6O7xr2lUmDs
-         dra8EyIJSkYGErjN9MmcQ8fXGSyGD6G02jEVHsc871M+kDATnWcm8O/MSwK/SQ2PTxoY
-         QZmLVBb7exCaq8oSTyvZoantl58x6voAeJHid0a2mMYWd4fkW1+IOIj+39dUppZkGBOp
-         FFvbF2fU7PFghPAR2C9hb8g3/Sys8L2RnizAkQJ8qayzwJGgZcJqwKaEDoMUTDTreODz
-         f5falHjY1R5RaPvTmOohL6oGP1Q2piB95zPDP/EYOqvh3b8iIUr8wzv5gLmzKY5VuuZx
-         0RlA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679895551;
-        h=in-reply-to:references:to:from:subject:cc:message-id:date
-         :content-transfer-encoding:mime-version:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=u6RQjB5AQU67VhsjUHIEE77so4M91TfQuFLRA4PW0yk=;
-        b=fXluebtqlewcjt7DFnKJi9bUwecoNHPjBkBSEJHjB8XZkPIvDjF9iCORohXvkcZqlB
-         JwoOP9eZsr651dsTfpG6eEVNbXATs23XuwwEebxjVBpIqffNhaizeTHAQ4zCCSXi3uky
-         wtLrc/UwseyctYw0xjM2/HEd7uez85tNzjqOp9JnCOh953YjQ+93Mh6o2J9VSplg0qZC
-         LaWCCsosLLlM6IHrQBmUbHieWB935WBHUSWtiR1Lo7VtsOD3jMd8yH9zSd3Rz4yO3+XC
-         oQcWfzb2pzEUj8HI6OWeUf7Vy3ZQyRHl2aZp2Zhz80my7OFGQNVmdAyTFD0ZGYL4ZFi3
-         6xqw==
-X-Gm-Message-State: AO0yUKWIh9WmmtcsdV2S86dEnyvskcLAvQeCbA6i/BSDUEVIMqmHRyJT
-        t4dMGDuujJuNckGn3t9bFZDN1D7j8EA=
-X-Google-Smtp-Source: AK7set96Mple3307x12nOAs4ZV9sKCWYqBvaAlJNNetHDhAKMT3lYyDC1cWXzzkKC3+5vIL7ca0M2w==
-X-Received: by 2002:a05:6a20:1221:b0:d9:5a7c:b1c5 with SMTP id v33-20020a056a20122100b000d95a7cb1c5mr9849309pzf.11.1679895551023;
-        Sun, 26 Mar 2023 22:39:11 -0700 (PDT)
-Received: from localhost ([203.221.180.225])
-        by smtp.gmail.com with ESMTPSA id u20-20020aa78494000000b005d296facfa3sm18048021pfn.36.2023.03.26.22.39.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 26 Mar 2023 22:39:10 -0700 (PDT)
-Mime-Version: 1.0
+        with ESMTP id S229771AbjC0GV3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Mar 2023 02:21:29 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2DE4422B
+        for <kvm@vger.kernel.org>; Sun, 26 Mar 2023 23:21:28 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 7346FB80DAE
+        for <kvm@vger.kernel.org>; Mon, 27 Mar 2023 06:21:27 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8B863C433D2;
+        Mon, 27 Mar 2023 06:21:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1679898086;
+        bh=FXVSNvSgX3uY/taNLPW6RtwU4c/uJBp2AcWeLUkYJKA=;
+        h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+        b=d8FuAv65ijDpdS/TwqDPgn9gSP8cC9iI0r+FST1M20K6Vzd7JPNpQhKLCAOfeSx7N
+         lQ0P/cZ5qdi0TUSxEKTk9VZrc1X4zPnGsv8BrYrnC8ZrohiGg6/Hco9h/XXlLn42AV
+         QyHDtpuvykOHw428qDQYICj67MlbaLhs1+Z2eDse7sZ1/+S4O1JHL/u/YZMA9EdZiJ
+         LFCk/hHtAQyF1YZG0L4nCuFYpw3QRHlykj30+BzCwigST9ZW1So/HNQXJrSFmjqd9P
+         HeE6qXHNjYVif966JwrcR3/cpdPq/TN0cY2qh7dp9hyNRDFMM7JL6V3sZly8KGgBf5
+         Uxn0q3pc230fQ==
+From:   =?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>
+To:     Andy Chiu <andy.chiu@sifive.com>, linux-riscv@lists.infradead.org,
+        palmer@dabbelt.com, anup@brainfault.org, atishp@atishpatra.org,
+        kvm-riscv@lists.infradead.org, kvm@vger.kernel.org
+Cc:     vineetg@rivosinc.com, greentime.hu@sifive.com,
+        guoren@linux.alibaba.com, Andy Chiu <andy.chiu@sifive.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Tom Rix <trix@redhat.com>
+Subject: Re: [PATCH -next v16 00/20] riscv: Add vector ISA support
+In-Reply-To: <20230323145924.4194-1-andy.chiu@sifive.com>
+References: <20230323145924.4194-1-andy.chiu@sifive.com>
+Date:   Mon, 27 Mar 2023 08:21:22 +0200
+Message-ID: <87tty6ww7x.fsf@all.your.base.are.belong.to.us>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date:   Mon, 27 Mar 2023 15:39:06 +1000
-Message-Id: <CRGX9S9AO7V0.3LM275UZQB6CZ@bobo>
-Cc:     <linuxppc-dev@lists.ozlabs.org>,
-        "Laurent Vivier" <lvivier@redhat.com>
-Subject: Re: [kvm-unit-tests v2 03/10] powerpc: abstract H_CEDE calls into a
- sleep functions
-From:   "Nicholas Piggin" <npiggin@gmail.com>
-To:     "Thomas Huth" <thuth@redhat.com>, <kvm@vger.kernel.org>
-X-Mailer: aerc 0.13.0
-References: <20230320070339.915172-1-npiggin@gmail.com>
- <20230320070339.915172-4-npiggin@gmail.com>
- <de36dbe8-de4a-ba05-12f7-2b8a37ef552a@redhat.com>
-In-Reply-To: <de36dbe8-de4a-ba05-12f7-2b8a37ef552a@redhat.com>
-X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
-        DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-        version=3.4.6
+X-Spam-Status: No, score=-5.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,SPF_HELO_NONE,
+        SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu Mar 23, 2023 at 10:12 PM AEST, Thomas Huth wrote:
-> On 20/03/2023 08.03, Nicholas Piggin wrote:
-> > This consolidates several implementations, and it no longer leaves
-> > MSR[EE] enabled after the decrementer interrupt is handled, but
-> > rather disables it on return.
-> >=20
-> > The handler no longer allows a continuous ticking, but rather dec
-> > has to be re-armed and EE re-enabled (e.g., via H_CEDE hcall) each
-> > time.
-> >=20
-> > Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
-> > ---
-> >   lib/powerpc/asm/handlers.h  |  2 +-
-> >   lib/powerpc/asm/ppc_asm.h   |  1 +
-> >   lib/powerpc/asm/processor.h |  7 +++++++
-> >   lib/powerpc/handlers.c      | 10 ++++-----
-> >   lib/powerpc/processor.c     | 42 ++++++++++++++++++++++++++++++++++++=
-+
-> >   powerpc/sprs.c              |  6 +-----
-> >   powerpc/tm.c                | 20 +-----------------
-> >   7 files changed, 57 insertions(+), 31 deletions(-)
-> >=20
-> > diff --git a/lib/powerpc/asm/handlers.h b/lib/powerpc/asm/handlers.h
-> > index 64ba727..e4a0cd4 100644
-> > --- a/lib/powerpc/asm/handlers.h
-> > +++ b/lib/powerpc/asm/handlers.h
-> > @@ -3,6 +3,6 @@
-> >  =20
-> >   #include <asm/ptrace.h>
-> >  =20
-> > -void dec_except_handler(struct pt_regs *regs, void *data);
-> > +void dec_handler_oneshot(struct pt_regs *regs, void *data);
-> >  =20
-> >   #endif /* _ASMPOWERPC_HANDLERS_H_ */
-> > diff --git a/lib/powerpc/asm/ppc_asm.h b/lib/powerpc/asm/ppc_asm.h
-> > index 1b85f6b..6299ff5 100644
-> > --- a/lib/powerpc/asm/ppc_asm.h
-> > +++ b/lib/powerpc/asm/ppc_asm.h
-> > @@ -36,6 +36,7 @@
-> >   #endif /* __BYTE_ORDER__ */
-> >  =20
-> >   /* Machine State Register definitions: */
-> > +#define MSR_EE_BIT	15			/* External Interrupts Enable */
-> >   #define MSR_SF_BIT	63			/* 64-bit mode */
-> >  =20
-> >   #endif /* _ASMPOWERPC_PPC_ASM_H */
-> > diff --git a/lib/powerpc/asm/processor.h b/lib/powerpc/asm/processor.h
-> > index ac001e1..ebfeff2 100644
-> > --- a/lib/powerpc/asm/processor.h
-> > +++ b/lib/powerpc/asm/processor.h
-> > @@ -20,6 +20,8 @@ static inline uint64_t get_tb(void)
-> >  =20
-> >   extern void delay(uint64_t cycles);
-> >   extern void udelay(uint64_t us);
-> > +extern void sleep_tb(uint64_t cycles);
-> > +extern void usleep(uint64_t us);
-> >  =20
-> >   static inline void mdelay(uint64_t ms)
-> >   {
-> > @@ -27,4 +29,9 @@ static inline void mdelay(uint64_t ms)
-> >   		udelay(1000);
-> >   }
-> >  =20
-> > +static inline void msleep(uint64_t ms)
-> > +{
-> > +	usleep(ms * 1000);
-> > +}
-> > +
-> >   #endif /* _ASMPOWERPC_PROCESSOR_H_ */
-> > diff --git a/lib/powerpc/handlers.c b/lib/powerpc/handlers.c
-> > index c8721e0..296f14f 100644
-> > --- a/lib/powerpc/handlers.c
-> > +++ b/lib/powerpc/handlers.c
-> > @@ -9,15 +9,13 @@
-> >   #include <libcflat.h>
-> >   #include <asm/handlers.h>
-> >   #include <asm/ptrace.h>
-> > +#include <asm/ppc_asm.h>
-> >  =20
-> >   /*
-> >    * Generic handler for decrementer exceptions (0x900)
-> > - * Just reset the decrementer back to the value specified when registe=
-ring the
-> > - * handler
-> > + * Return with MSR[EE] disabled.
-> >    */
-> > -void dec_except_handler(struct pt_regs *regs __unused, void *data)
-> > +void dec_handler_oneshot(struct pt_regs *regs, void *data)
-> >   {
-> > -	uint64_t dec =3D *((uint64_t *) data);
-> > -
-> > -	asm volatile ("mtdec %0" : : "r" (dec));
-> > +	regs->msr &=3D ~(1UL << MSR_EE_BIT);
-> >   }
-> > diff --git a/lib/powerpc/processor.c b/lib/powerpc/processor.c
-> > index ec85b9d..e77a240 100644
-> > --- a/lib/powerpc/processor.c
-> > +++ b/lib/powerpc/processor.c
-> > @@ -10,6 +10,8 @@
-> >   #include <asm/ptrace.h>
-> >   #include <asm/setup.h>
-> >   #include <asm/barrier.h>
-> > +#include <asm/hcall.h>
-> > +#include <asm/handlers.h>
-> >  =20
-> >   static struct {
-> >   	void (*func)(struct pt_regs *, void *data);
-> > @@ -54,3 +56,43 @@ void udelay(uint64_t us)
-> >   {
-> >   	delay((us * tb_hz) / 1000000);
-> >   }
-> > +
-> > +void sleep_tb(uint64_t cycles)
-> > +{
-> > +	uint64_t start, end, now;
-> > +
-> > +	start =3D now =3D get_tb();
-> > +	end =3D start + cycles;
-> > +
-> > +	while (end > now) {
-> > +		uint64_t left =3D end - now;
-> > +
-> > +		/* Could support large decrementer */
-> > +		if (left > 0x7fffffff)
-> > +			left =3D 0x7fffffff;
-> > +
-> > +		asm volatile ("mtdec %0" : : "r" (left));
-> > +		handle_exception(0x900, &dec_handler_oneshot, NULL);
+Andy Chiu <andy.chiu@sifive.com> writes:
+
+> This patchset is implemented based on vector 1.0 spec to add vector suppo=
+rt
+> in riscv Linux kernel. There are some assumptions for this implementation=
+s.
 >
-> Wouldn't it be better to first call handle_exception() before moving=20
-> something into the decrementer?
+> 1. We assume all harts has the same ISA in the system.
+> 2. We disable vector in both kernel andy user space [1] by default. Only
+>    enable an user's vector after an illegal instruction trap where it
+>    actually starts executing vector (the first-use trap [2]).
+> 3. We detect "riscv,isa" to determine whether vector is support or not.
+>
+> We defined a new structure __riscv_v_ext_state in struct thread_struct to
+> save/restore the vector related registers. It is used for both kernel spa=
+ce
+> and user space.
+>  - In kernel space, the datap pointer in __riscv_v_ext_state will be
+>    allocated to save vector registers.
+>  - In user space,
+> 	- In signal handler of user space, the structure is placed
+> 	  right after __riscv_ctx_hdr, which is embedded in fp reserved
+> 	  aera. This is required to avoid ABI break [2]. And datap points
+> 	  to the end of __riscv_v_ext_state.
+> 	- In ptrace, the data will be put in ubuf in which we use
+> 	  riscv_vr_get()/riscv_vr_set() to get or set the
+> 	  __riscv_v_ext_state data structure from/to it, datap pointer
+> 	  would be zeroed and vector registers will be copied to the
+> 	  address right after the __riscv_v_ext_state structure in ubuf.
+>
+> This patchset is rebased to v6.3-rc1 and it is tested by running several
+> vector programs simultaneously. It delivers signals correctly in a test
+> where we can see a valid ucontext_t in a signal handler, and a correct V
+> context returing back from it. And the ptrace interface is tested by
+> PTRACE_{GET,SET}REGSET. Lastly, KVM is tested by running above tests in
+> a guest using the same kernel image. All tests are done on an rv64gcv
+> virt QEMU.
+>
+> Note: please apply the patch at [4] due to a regression introduced by
+> commit 596ff4a09b89 ("cpumask: re-introduce constant-sized cpumask
+> optimizations") before testing the series.
+>
+> Specail thanks to Conor and Vineet for kindly giving help on- and off-lis=
+t.
+>
+> Source tree:
+> https://github.com/sifive/riscv-linux/tree/riscv/for-next/vector-v16
+>
+> Links:
+>  - [1] https://lore.kernel.org/all/20220921214439.1491510-17-stillson@riv=
+osinc.com/
+>  - [2] https://lore.kernel.org/all/73c0124c-4794-6e40-460c-b26df407f322@r=
+ivosinc.com/T/#u
+>  - [3] https://lore.kernel.org/all/20230128082847.3055316-1-apatel@ventan=
+amicro.com/
+>  - [4] https://lore.kernel.org/all/CAHk-=3DwiAxtKyxs6BPEzirrXw1kXJ-7ZyGpg=
+OrbzhmC=3Dud-6jBA@mail.gmail.com/
+> ---
+> Changelog V16
+>  - Rebase to the latest for-next:
+>    - Solve conflicts at 7, and 17
+>  - Use as-instr to detect if assembler supports .option arch directive
+>    and remove dependency from GAS, for both ZBB and V.
+>  - Cleanup code in KVM vector
+>  - Address issue reported by sparse
+>  - Refine code:
+>    - Fix a mixed-use of space/tab
+>    - Remove new lines at the end of file
 
-It shouldn't really matter, the drecrementer could be anything here
-(probably it's already -ve here if it starts at zero). It only matters
-when MSR[EE]=3D1 or we make the H_CEDE call.
+Andy,
 
-I'll add a comment at least.
+The generic entry series was applied to for-next, which conflicts with
+yours. One more spin... :-(
 
-Thanks,
-Nick
+https://patchwork.kernel.org/project/linux-riscv/patch/20230323145924.4194-=
+2-andy.chiu@sifive.com/
+
+
+Bj=C3=B6rn
