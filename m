@@ -2,43 +2,43 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AA1836CA109
-	for <lists+kvm@lfdr.de>; Mon, 27 Mar 2023 12:15:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E37F36CA17F
+	for <lists+kvm@lfdr.de>; Mon, 27 Mar 2023 12:32:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233538AbjC0KPL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Mar 2023 06:15:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48848 "EHLO
+        id S232424AbjC0KcM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Mar 2023 06:32:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39362 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233506AbjC0KPK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Mar 2023 06:15:10 -0400
+        with ESMTP id S233203AbjC0KcB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Mar 2023 06:32:01 -0400
 Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 868D44C1B
-        for <kvm@vger.kernel.org>; Mon, 27 Mar 2023 03:15:08 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49404D3
+        for <kvm@vger.kernel.org>; Mon, 27 Mar 2023 03:32:00 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 361E6B81072
-        for <kvm@vger.kernel.org>; Mon, 27 Mar 2023 10:15:07 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DF152C433EF;
-        Mon, 27 Mar 2023 10:15:05 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id C60B2B81059
+        for <kvm@vger.kernel.org>; Mon, 27 Mar 2023 10:31:58 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 685FEC433D2;
+        Mon, 27 Mar 2023 10:31:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1679912105;
-        bh=13hrWAgfZQrYOohFgk5p4rU9Mu8DpOU4EbMcrSeixb4=;
+        s=k20201202; t=1679913117;
+        bh=MlpEMVtZm9xABJeNo1kOsmKkPC8mViqn4p6/qu0y3Kw=;
         h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=Ag12dtK2/YfA79qJcvu9s3Cpeb74e+71dT+1Jzo3ZDSmCT7i+rW+9WigNJqHcFGW9
-         msRe8r9aFkfKnBEDUMNhBo43XmzNyRKm9+GGSL9gdLzpK0iDIk2bEEahC5HyR9lOLY
-         aS5lkrzVPs2HLniU4Ni8znXQSykUjTVob7S0S6goVAKPL6UjaHrWADCUwvF4ZiDl35
-         W6AK4d1GheL2It7IQvbvNAKkFioKlX6HtJRwrjdPw1T/Qc8rKPWINBQ1kwJ78UPY2w
-         K7eS19dlMpFislOOhATPAixGk3NOun03gRkszkvQSmezZIHoXIZ48H7w2tKMZvdCvP
-         lRhcXW7R3qBfg==
+        b=RdLmQrbBDTaomLSwZZq5NXO23K4m1/zxBlXIRpA/h2lL+m114wpM3vVComBRYSnJ5
+         m4i6PFevZfq4aITQ7uPMjAIO1ILy3b7HG0b3nw3X85qXn6REt9jfX44Hk4XYm3ugzX
+         vYdj27INzEdoK/2vYQlab/AYgr1Ll/HBez+E/ubII9WfUNFU89nMfKZGSy8bKcftl+
+         fWHRsutoREg5a59KQF82qwV1oIpPO8+9m2m2gk2y4OdoyWoDOj5kpsj+RR52OAy3ek
+         OrAMaDYvxayJwuibTUJ5XVlQAnN833jh3MlewtruxXx+aJRj6q9bWeZgYtInxR9xwE
+         Lr1Wrw3+Kl1eA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1pgjsV-003Pfd-IH;
-        Mon, 27 Mar 2023 11:15:03 +0100
-Date:   Mon, 27 Mar 2023 11:15:03 +0100
-Message-ID: <861qlaxzyw.wl-maz@kernel.org>
+        id 1pgk8p-003Pum-1L;
+        Mon, 27 Mar 2023 11:31:55 +0100
+Date:   Mon, 27 Mar 2023 11:31:54 +0100
+Message-ID: <86zg7ywkmd.wl-maz@kernel.org>
 From:   Marc Zyngier <maz@kernel.org>
 To:     Jing Zhang <jingzhangos@google.com>
 Cc:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>,
@@ -53,10 +53,10 @@ Cc:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>,
         Reiji Watanabe <reijiw@google.com>,
         Ricardo Koller <ricarkol@google.com>,
         Raghavendra Rao Ananta <rananta@google.com>
-Subject: Re: [PATCH v4 2/6] KVM: arm64: Save ID registers' sanitized value per guest
-In-Reply-To: <20230317050637.766317-3-jingzhangos@google.com>
+Subject: Re: [PATCH v4 3/6] KVM: arm64: Use per guest ID register for ID_AA64PFR0_EL1.[CSV2|CSV3]
+In-Reply-To: <20230317050637.766317-4-jingzhangos@google.com>
 References: <20230317050637.766317-1-jingzhangos@google.com>
-        <20230317050637.766317-3-jingzhangos@google.com>
+        <20230317050637.766317-4-jingzhangos@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -75,151 +75,167 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 17 Mar 2023 05:06:33 +0000,
+On Fri, 17 Mar 2023 05:06:34 +0000,
 Jing Zhang <jingzhangos@google.com> wrote:
 > 
-> From: Reiji Watanabe <reijiw@google.com>
-> 
-> Introduce id_regs[] in kvm_arch as a storage of guest's ID registers,
-> and save ID registers' sanitized value in the array at KVM_CREATE_VM.
-> Use the saved ones when ID registers are read by the guest or
-> userspace (via KVM_GET_ONE_REG).
+> With per guest ID registers, ID_AA64PFR0_EL1.[CSV2|CSV3] settings from
+> userspace can be stored in its corresponding ID register.
 > 
 > No functional change intended.
 > 
-> Signed-off-by: Reiji Watanabe <reijiw@google.com>
-> Co-developed-by: Jing Zhang <jingzhangos@google.com>
 > Signed-off-by: Jing Zhang <jingzhangos@google.com>
 > ---
->  arch/arm64/include/asm/kvm_host.h | 11 ++++++++
->  arch/arm64/kvm/arm.c              |  1 +
->  arch/arm64/kvm/id_regs.c          | 44 ++++++++++++++++++++++++-------
->  arch/arm64/kvm/sys_regs.c         |  2 +-
->  arch/arm64/kvm/sys_regs.h         |  1 +
->  5 files changed, 49 insertions(+), 10 deletions(-)
+>  arch/arm64/include/asm/kvm_host.h  |  2 --
+>  arch/arm64/kvm/arm.c               | 19 +------------------
+>  arch/arm64/kvm/hyp/nvhe/sys_regs.c |  7 +++----
+>  arch/arm64/kvm/id_regs.c           | 30 ++++++++++++++++++++++--------
+>  4 files changed, 26 insertions(+), 32 deletions(-)
 > 
 > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index a1892a8f6032..fb6b50b1f111 100644
+> index fb6b50b1f111..e926ea91a73c 100644
 > --- a/arch/arm64/include/asm/kvm_host.h
 > +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -245,6 +245,15 @@ struct kvm_arch {
->  	 * the associated pKVM instance in the hypervisor.
->  	 */
->  	struct kvm_protected_vm pkvm;
-> +
-> +	/*
-> +	 * Save ID registers for the guest in id_regs[].
-> +	 * (Op0, Op1, CRn, CRm, Op2) of the ID registers to be saved in it
-> +	 * is (3, 0, 0, crm, op2), where 1<=crm<8, 0<=op2<8.
-> +	 */
-> +#define KVM_ARM_ID_REG_NUM	56
-> +#define IDREG_IDX(id)		(((sys_reg_CRm(id) - 1) << 3) | sys_reg_Op2(id))
-> +	u64 id_regs[KVM_ARM_ID_REG_NUM];
-
-Place these registers in their own structure, and place this structure
-*before* the pvm structure. Document what guards these registers when
-updated (my hunch is that this should rely on Oliver's locking fixes
-if the update comes from a vcpu).
-
->  };
+> @@ -230,8 +230,6 @@ struct kvm_arch {
 >  
->  struct kvm_vcpu_fault_info {
-> @@ -1005,6 +1014,8 @@ int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
->  long kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
->  				struct kvm_arm_copy_mte_tags *copy_tags);
+>  	cpumask_var_t supported_cpus;
 >  
-> +void kvm_arm_set_default_id_regs(struct kvm *kvm);
-> +
->  /* Guest/host FPSIMD coordination helpers */
->  int kvm_arch_vcpu_run_map_fp(struct kvm_vcpu *vcpu);
->  void kvm_arch_vcpu_load_fp(struct kvm_vcpu *vcpu);
+> -	u8 pfr0_csv2;
+> -	u8 pfr0_csv3;
+>  	struct {
+>  		u8 imp:4;
+>  		u8 unimp:4;
 > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 3bd732eaf087..4579c878ab30 100644
+> index 4579c878ab30..c78d68d011cb 100644
 > --- a/arch/arm64/kvm/arm.c
 > +++ b/arch/arm64/kvm/arm.c
-> @@ -153,6 +153,7 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+> @@ -104,22 +104,6 @@ static int kvm_arm_default_max_vcpus(void)
+>  	return vgic_present ? kvm_vgic_get_max_vcpus() : KVM_MAX_VCPUS;
+>  }
 >  
->  	set_default_spectre(kvm);
->  	kvm_arm_init_hypercalls(kvm);
-> +	kvm_arm_set_default_id_regs(kvm);
+> -static void set_default_spectre(struct kvm *kvm)
+> -{
+> -	/*
+> -	 * The default is to expose CSV2 == 1 if the HW isn't affected.
+> -	 * Although this is a per-CPU feature, we make it global because
+> -	 * asymmetric systems are just a nuisance.
+> -	 *
+> -	 * Userspace can override this as long as it doesn't promise
+> -	 * the impossible.
+> -	 */
+> -	if (arm64_get_spectre_v2_state() == SPECTRE_UNAFFECTED)
+> -		kvm->arch.pfr0_csv2 = 1;
+> -	if (arm64_get_meltdown_state() == SPECTRE_UNAFFECTED)
+> -		kvm->arch.pfr0_csv3 = 1;
+> -}
+> -
+>  /**
+>   * kvm_arch_init_vm - initializes a VM data structure
+>   * @kvm:	pointer to the KVM struct
+> @@ -151,9 +135,8 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+>  	/* The maximum number of VCPUs is limited by the host's GIC model */
+>  	kvm->max_vcpus = kvm_arm_default_max_vcpus();
+>  
+> -	set_default_spectre(kvm);
+> -	kvm_arm_init_hypercalls(kvm);
+>  	kvm_arm_set_default_id_regs(kvm);
+> +	kvm_arm_init_hypercalls(kvm);
+
+Please document the ordering dependency between idregs and hypercalls.
+
 >  
 >  	/*
 >  	 * Initialise the default PMUver before there is a chance to
+> diff --git a/arch/arm64/kvm/hyp/nvhe/sys_regs.c b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
+> index 08d2b004f4b7..0e1988740a65 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/sys_regs.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
+> @@ -93,10 +93,9 @@ static u64 get_pvm_id_aa64pfr0(const struct kvm_vcpu *vcpu)
+>  		PVM_ID_AA64PFR0_RESTRICT_UNSIGNED);
+>  
+>  	/* Spectre and Meltdown mitigation in KVM */
+> -	set_mask |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV2),
+> -			       (u64)kvm->arch.pfr0_csv2);
+> -	set_mask |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV3),
+> -			       (u64)kvm->arch.pfr0_csv3);
+> +	set_mask |= vcpu->kvm->arch.id_regs[IDREG_IDX(SYS_ID_AA64PFR0_EL1)] &
+
+This really want an accessor.
+
+> +		(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV2) |
+> +			ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV3));
+>  
+>  	return (id_aa64pfr0_el1_sys_val & allow_mask) | set_mask;
+>  }
 > diff --git a/arch/arm64/kvm/id_regs.c b/arch/arm64/kvm/id_regs.c
-> index 08b738852955..e393b5730557 100644
+> index e393b5730557..b60ca1058301 100644
 > --- a/arch/arm64/kvm/id_regs.c
 > +++ b/arch/arm64/kvm/id_regs.c
-> @@ -52,16 +52,9 @@ static u8 pmuver_to_perfmon(u8 pmuver)
->  	}
->  }
->  
-> -/* Read a sanitised cpufeature ID register by sys_reg_desc */
-> -static u64 read_id_reg(const struct kvm_vcpu *vcpu, struct sys_reg_desc const *r)
-> +u64 kvm_arm_read_id_reg(const struct kvm_vcpu *vcpu, u32 id)
+> @@ -61,12 +61,6 @@ u64 kvm_arm_read_id_reg(const struct kvm_vcpu *vcpu, u32 id)
+>  		if (!vcpu_has_sve(vcpu))
+>  			val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_SVE);
+>  		val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_AMU);
+> -		val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV2);
+> -		val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV2),
+> -				  (u64)vcpu->kvm->arch.pfr0_csv2);
+> -		val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV3);
+> -		val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV3),
+> -				  (u64)vcpu->kvm->arch.pfr0_csv3);
+>  		if (kvm_vgic_global_state.type == VGIC_V3) {
+>  			val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_GIC);
+>  			val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_GIC), 1);
+> @@ -201,6 +195,7 @@ static int set_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
+>  			       u64 val)
 >  {
-> -	u32 id = reg_to_encoding(r);
-> -	u64 val;
-> -
-> -	if (sysreg_visible_as_raz(vcpu, r))
-> -		return 0;
-> -
-> -	val = read_sanitised_ftr_reg(id);
-> +	u64 val = vcpu->kvm->arch.id_regs[IDREG_IDX(id)];
+>  	u8 csv2, csv3;
+> +	u64 sval = val;
 >  
->  	switch (id) {
->  	case SYS_ID_AA64PFR0_EL1:
-> @@ -126,6 +119,14 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu, struct sys_reg_desc const *r
->  	return val;
+>  	/*
+>  	 * Allow AA64PFR0_EL1.CSV2 to be set from userspace as long as
+> @@ -225,8 +220,7 @@ static int set_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
+>  	if (val)
+>  		return -EINVAL;
+>  
+> -	vcpu->kvm->arch.pfr0_csv2 = csv2;
+> -	vcpu->kvm->arch.pfr0_csv3 = csv3;
+> +	vcpu->kvm->arch.id_regs[IDREG_IDX(reg_to_encoding(rd))] = sval;
+
+Accessor needed here to.
+
+>
+>  	return 0;
 >  }
->  
-> +static u64 read_id_reg(const struct kvm_vcpu *vcpu, struct sys_reg_desc const *r)
-> +{
-> +	if (sysreg_visible_as_raz(vcpu, r))
-> +		return 0;
-> +
-> +	return kvm_arm_read_id_reg(vcpu, reg_to_encoding(r));
-> +}
-> +
->  /* cpufeature ID register access trap handlers */
->  
->  static bool access_id_reg(struct kvm_vcpu *vcpu,
-> @@ -504,3 +505,28 @@ int kvm_arm_walk_id_regs(struct kvm_vcpu *vcpu, u64 __user *uind)
+> @@ -529,4 +523,24 @@ void kvm_arm_set_default_id_regs(struct kvm *kvm)
+>  		val = read_sanitised_ftr_reg(id);
+>  		kvm->arch.id_regs[IDREG_IDX(id)] = val;
 >  	}
->  	return total;
->  }
-> +
-> +/*
-> + * Set the guest's ID registers that are defined in id_reg_descs[]
-> + * with ID_SANITISED() to the host's sanitized value.
-> + */
-> +void kvm_arm_set_default_id_regs(struct kvm *kvm)
-> +{
-> +	int i;
-> +	u32 id;
-> +	u64 val;
-> +
-> +	for (i = 0; i < ARRAY_SIZE(id_reg_descs); i++) {
-> +		id = reg_to_encoding(&id_reg_descs[i]);
-> +		if (WARN_ON_ONCE(!is_id_reg(id)))
-> +			/* Shouldn't happen */
-> +			continue;
-> +
-> +		if (id_reg_descs[i].visibility == raz_visibility)
-> +			/* Hidden or reserved ID register */
-> +			continue;
+> +	/*
 
-Relying on function pointer comparison is really fragile. If I wrap
-raz_visibility() in another function, this won't catch it. It also
-doesn't bode well with your 'inline' definition of this function.
+Add a blank line after the closing bracket.
 
-More importantly, why do we care about checking for visibility at all?
-We can happily populate the array and rely on the runtime visibility.
+> +	 * The default is to expose CSV2 == 1 if the HW isn't affected.
+> +	 * Although this is a per-CPU feature, we make it global because
+> +	 * asymmetric systems are just a nuisance.
+> +	 *
+> +	 * Userspace can override this as long as it doesn't promise
+> +	 * the impossible.
+> +	 */
+> +	val = kvm->arch.id_regs[IDREG_IDX(SYS_ID_AA64PFR0_EL1)];
+
+Accessor.
 
 > +
-> +		val = read_sanitised_ftr_reg(id);
-> +		kvm->arch.id_regs[IDREG_IDX(id)] = val;
+> +	if (arm64_get_spectre_v2_state() == SPECTRE_UNAFFECTED) {
+> +		val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV2);
+> +		val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV2), 1);
 > +	}
-> +}
+> +	if (arm64_get_meltdown_state() == SPECTRE_UNAFFECTED) {
+> +		val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV3);
+> +		val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV3), 1);
+> +	}
+> +
+> +	kvm->arch.id_regs[IDREG_IDX(SYS_ID_AA64PFR0_EL1)] = val;
+
+Accessor.
 
 Thanks,
 
