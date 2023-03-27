@@ -2,295 +2,247 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BB2AE6CB519
-	for <lists+kvm@lfdr.de>; Tue, 28 Mar 2023 05:49:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0B2A86CB56F
+	for <lists+kvm@lfdr.de>; Tue, 28 Mar 2023 06:37:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232719AbjC1Dsw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Mar 2023 23:48:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55568 "EHLO
+        id S230452AbjC1EhH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Mar 2023 00:37:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50634 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232840AbjC1Dsg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Mar 2023 23:48:36 -0400
-Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0AA1A198D;
-        Mon, 27 Mar 2023 20:48:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1679975301; x=1711511301;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=DSe7cwCFqUkotgsTLZL5vBouehG9crofUqo+7GubI1s=;
-  b=cFVcWMjPm9V4pvusAneMmofBYCf3sCPYv72UVOk2/NB2cw5ApGDn3/YC
-   oc4h1W1nMyMgHBVdIlQGAsQZ1tnu1u1Xl70MiOA6uKuU8tHbiSxb/HwER
-   9maQ2iuKhhytPFIyEFNOOuZlVV9Qg4sr+rInRysQCyo3NDujuGEIukLyM
-   fYhLW85GA+iZdgh+Mi948oMzUUg+WC3ASu1ZxZHmj8JhVExSZW2KWmlH+
-   fkX0/JCYytI8jmcYq0AuqqjM2fwROZg7bvT7JGxTiyUniuWjFAzjCZSkO
-   XD4cZ7M7EHvWMkcT41fh4zLrPe6XKrFHUoloZTKImS2BQbIUC+hL66gCh
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10662"; a="320114890"
-X-IronPort-AV: E=Sophos;i="5.98,296,1673942400"; 
-   d="scan'208";a="320114890"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Mar 2023 20:48:20 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10662"; a="686229131"
-X-IronPort-AV: E=Sophos;i="5.98,296,1673942400"; 
-   d="scan'208";a="686229131"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by fmsmga007.fm.intel.com with ESMTP; 27 Mar 2023 20:48:20 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.21; Mon, 27 Mar 2023 20:48:19 -0700
-Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
- ORSMSX610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.21; Mon, 27 Mar 2023 20:48:19 -0700
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.21 via Frontend Transport; Mon, 27 Mar 2023 20:48:19 -0700
-Received: from NAM02-BN1-obe.outbound.protection.outlook.com (104.47.51.41) by
- edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.21; Mon, 27 Mar 2023 20:48:17 -0700
+        with ESMTP id S229631AbjC1EhE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Mar 2023 00:37:04 -0400
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2076.outbound.protection.outlook.com [40.107.220.76])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E1261BFE;
+        Mon, 27 Mar 2023 21:37:03 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=jSUlvmIf3lbhCPsbsipSwmvVYud2Kw4yz9zMB1tQBqfDCbCNtfQ2IEipyBhv6k5rS6QwjW5fhZVTGc7MTdPs8bcN+V4ojFIGvdCavpwFvF2jOt8VhF9LewvdEdD2vGWxr2xtdpqQ+m7b/UWgv/r0e8gG4NUIAS3X6RnZZkx+fqTBtmlOR0Qbzxn+jGUvTc1DOuoKiwMUS4FhxrmAFkWpTe+9sfI1vsLBLyewxEvSz8scEZPsvg+ImQGkHgr3Xflt9+RWpYGyRM8Os2twZJ17BPIJZy1qUAEG5jVwuqcfTKNWziBHlTSLctwIDxis1ZWttVlyfcUf1KYtRk2Y6llLNA==
+ b=gFgyxsssZ9z3WB+L3o/ww8rvl+2Su1UOd8ghkWJKpLnHBl20Bvcd6qK6asfZ0EaZPZ7YIfFMwKzfVkLCbx9QauZ3TdNkVy2zJb1r2rbv7eFZ22njECg5YQalSzzvUuOic19pmNnGJE9fD7bojYKXwMTzsYSp59mj+R0UpbTmkVYaLGxfMsR2Iy3FxlGNZsP/SVUdKdR5n6qzjOHXDfTpkqEWb9uCmTUymHpXmtpHqZx3nnYUYPrPFXdiVHfbFYoF2eVHq+Xk04FRddpe/HctFAd5HTJB7NafzbJZnjwb5PqfxQQAgtjb+q61G5mEXzzOhxQg7/sc3Ba8p0TsTjGNvA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=bUVU/gAfE1z/6aJxJUJlXhApowSJb1kP6vhdyDZ9UVA=;
- b=Ic6xGr3SRkhbQ3MO2hIoNBghtn2WKXXvKPvtRtmT4pFtfRPTL9b1FbZJqMgzgCbsmuMm3k5+wpluXlJjfTWJdr0uzlzKgSPIrWtw+6l0G83mrz2AgVkgZj3gve6rpDCd21H7Zauaa5k6rrJQXc5pF5NeXp/q+L5gNAjtUzl77ycwQtU5OuS9xfun22yQgcv395IE4xs+e+A4XInkjB2/SFdxUXSNvFdGAwy5RCXDXNTJCQqvyA1QdK5IeVP9QgbbhnvJBi8LZm0RVhrPkDtXWOwq+5eYnFJhCTqEGcEZsH0QpxQYBojvUsYRU5YlkLKsLI6aT39zJTxnGPsF0vTy3g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from DS0PR11MB7529.namprd11.prod.outlook.com (2603:10b6:8:141::20)
- by SA1PR11MB6893.namprd11.prod.outlook.com (2603:10b6:806:2b4::20) with
+ bh=3J8frjIr6485c7Gf013vbZBEvA9yK2He1jMNUdniOXk=;
+ b=KizAKTHX0SR8KsS7HVA9YXUQPOW6Nr+YfkbxaTBvbKqwqW/JisVRZA/3buTIdegXKp2ZeEHxp6Dp5PqQuy9Ab5VTlgna6+/Qs3K7JSOxsqPaBlM4MlhV58NZeh1WMGMWr56xeT00krcZCtNRJmZ8Jfbfnoc5EH8GLfKbB5q1dds3Hs2KrQQGbkwbZAQex4+QfQfeE7bIG0flAdty059DLTXyuRRgsglJaFSuAiix5JxqTHbD/PCUAnKIslvD5hJIEXxvolpmh/z9E6s3DAnwWdM8xGwgsIMBoOzIpV7UfDrYajOMzGZEFVMTTfIHMR0cUpcTI1x8xg3k3WfZ2yyJBw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=gmail.com smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=3J8frjIr6485c7Gf013vbZBEvA9yK2He1jMNUdniOXk=;
+ b=FJsafA+bre9XYmUdgRLJbo+Qcps45IuPuuDvEUN63yPNjejW3MksDvNcxeBYgW2p1RiA7qKpYbe8GQbr3LPiBbnjJheAwgL62PcdpP97RufBHaOwyRS74UAYAWQJg9v2xNEhz6tEdT6z08ymLFWW9DM4yu9ZvcDHsA2eprLwcAY=
+Received: from MW4PR04CA0072.namprd04.prod.outlook.com (2603:10b6:303:6b::17)
+ by PH8PR12MB7028.namprd12.prod.outlook.com (2603:10b6:510:1bf::15) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6222.32; Tue, 28 Mar
- 2023 03:48:15 +0000
-Received: from DS0PR11MB7529.namprd11.prod.outlook.com
- ([fe80::6f7:944a:aaad:301f]) by DS0PR11MB7529.namprd11.prod.outlook.com
- ([fe80::6f7:944a:aaad:301f%8]) with mapi id 15.20.6178.041; Tue, 28 Mar 2023
- 03:48:15 +0000
-From:   "Liu, Yi L" <yi.l.liu@intel.com>
-To:     "Xu, Yilun" <yilun.xu@intel.com>
-CC:     "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "jgg@nvidia.com" <jgg@nvidia.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
-        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
-        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "jasowang@redhat.com" <jasowang@redhat.com>,
-        "shameerali.kolothum.thodi@huawei.com" 
-        <shameerali.kolothum.thodi@huawei.com>,
-        "lulu@redhat.com" <lulu@redhat.com>,
-        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
-        "intel-gvt-dev@lists.freedesktop.org" 
-        <intel-gvt-dev@lists.freedesktop.org>,
-        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
-        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-        "Hao, Xudong" <xudong.hao@intel.com>,
-        "Zhao, Yan Y" <yan.y.zhao@intel.com>,
-        "Xu, Terrence" <terrence.xu@intel.com>
-Subject: RE: [PATCH v6 05/24] kvm/vfio: Accept vfio device file from userspace
-Thread-Topic: [PATCH v6 05/24] kvm/vfio: Accept vfio device file from
- userspace
-Thread-Index: AQHZXMm/9Fa4v1v3kUOQKgn/7OF4qa8Ple6A
-Date:   Tue, 28 Mar 2023 03:48:15 +0000
-Message-ID: <DS0PR11MB7529357DA6D37BCC48ED95B6C3889@DS0PR11MB7529.namprd11.prod.outlook.com>
-References: <20230308132903.465159-1-yi.l.liu@intel.com>
- <20230308132903.465159-6-yi.l.liu@intel.com>
- <ZBsMb3L4LmmK5tHW@yilunxu-OptiPlex-7050>
-In-Reply-To: <ZBsMb3L4LmmK5tHW@yilunxu-OptiPlex-7050>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DS0PR11MB7529:EE_|SA1PR11MB6893:EE_
-x-ms-office365-filtering-correlation-id: e85477a0-cb24-4a44-d20e-08db2f3f42cd
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 9TuzIGbVJ5BC6AFIKjwuD/U5FN4HeT3/6bJkvgcne4IfrcMoZVH1syu0KpGS/8I7NBB/SxgLdHbuTs9ky0Gfql3x0k44AnXvSeFcyUxcWy7h6pySLMQvmTJPDVviWhotNMAvZTVFYdYgJUiJ6bEMdJpmzSPaVxx+hmMaBpUtZVDIml/5FGi3ahLw17FeCZeLGiIFc24rcCJXY/k0z/MWxZC3bTnvtOfLctk+GZ6muH7gL/IKPUck2xJ+Z+lzo2160jNTzH4gslMYRq7BkYYgUYOS8EkxDuf04uTimRLNKbMQuUClSq/MZFWS9xwh5MQgOwu1Gm5FNCehuRTKDZYj9z0mIyHVsEPn+5S+S9s/01rJujw0th5xnGLKCAWqsXVAeKHAdW57hLnZePWStGqRIPq288sUSqk3sXs1Kqmj3HTH9Ok57lAFBDPz64lC+vQAZVjCktogy5Rz6w6M4+IyQaz8s+IuvB3MnbLzvHQ8aHJNRrlIECbXj/vKmpIXjUorQbVatIGmiyBqTa26LNOXJe1C5tR/letf/zwEcNI2TMPgUUWWQr4pPdMo5IUUVcl8OQDlwpAIEjUg3qsknNunJEaHMJsKxcvJRyW6BY00dGiIHtYNuRrZ3klF3vLR+POL
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB7529.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(39860400002)(366004)(136003)(346002)(396003)(376002)(451199021)(66946007)(66556008)(66476007)(66446008)(64756008)(122000001)(4326008)(8676002)(76116006)(5660300002)(54906003)(316002)(6506007)(8936002)(82960400001)(6636002)(6862004)(7416002)(41300700001)(26005)(52536014)(478600001)(186003)(9686003)(7696005)(83380400001)(71200400001)(966005)(53546011)(38070700005)(33656002)(86362001)(2906002)(38100700002)(55016003)(13296009);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?5GlfqGMO9aNLhVVyfKDa2Wr/xvlADJnTb8VE0gwteiouikXoGvf6o3/E6qPU?=
- =?us-ascii?Q?Rykxcf+Oex+/qRZDsGFri8TkNdomz3lQpuo1BGF51//kY+C24tFqYn29VoYu?=
- =?us-ascii?Q?XQewRMKhux9TYEa281J4fpjgJfmqcdK9MLuMaKWlp165t4RpcauPqW+6n9Sz?=
- =?us-ascii?Q?bXvw1VVRyfXTYldcBPru2hFkY8RelLuC0HU/a8kvTJwowwQwBaZusC8OhWDQ?=
- =?us-ascii?Q?HfGyHW9NqnxZLxQ/kGBK1noa6LUVpt0mr5cR1+OIWDnPqR0s2rVJIDyCLjYq?=
- =?us-ascii?Q?ZyCAmg+wO0mXXbSjG6jdkleETVRyQuPQ5X/cxy90nG8TG+DSOU4sMasPFNd0?=
- =?us-ascii?Q?Y2DrRKn2AsIZbl9cWku7YeTEuuGIWAhL2d95F9n8KbCNDv2zo9GrJmOWDN8e?=
- =?us-ascii?Q?A2Xb/7qpupqeG3cLE4r98fd2LGN7aAr2zjsbD5X1chydo/Z/Pb3kKi4I2AvU?=
- =?us-ascii?Q?Y3TLpLcusFwzXQDzE1EwrWQTixA/3mpSpG8mDEqh6QkX6eQmT8JMddx8S4C/?=
- =?us-ascii?Q?vAmFHoSOICh1KL8RNz+O1gJ9wsth51LOHn7OZ/ZF4k00/FhpgIrSLMyu/tKJ?=
- =?us-ascii?Q?oQ3ccRxvUcWA7sjf+XLVdnEmKKG1TLrjk7vIbqRHuIyDnmf0RUkLgeqTdrrx?=
- =?us-ascii?Q?UNfLxnS6UgsVul/g9n7FViXj4eOjirn292BWmyMFEzLdmfmVFIOgGqpR5pa7?=
- =?us-ascii?Q?F1XsLcQyHRElXkrP03+K9IAh0cKRUbidGd5DigcrBJwLyF/XdnjGmMw/1kCF?=
- =?us-ascii?Q?Oa97IouwPtj/BPyBeT8JyzqO5YK1c/jU5kxL0IW3sboo+NcjcUCmPyS7b29T?=
- =?us-ascii?Q?nSc2aDDZxKtL4jHAtPGtU2zKE3hYcAHrgIOcrVezLMO0icASWhzh2k/oYvQ/?=
- =?us-ascii?Q?s4V6R1rQRQXBcsv/tAjPx72FYmE9tF10Xa2/73vmOLu3od2PcaUHq62v+63K?=
- =?us-ascii?Q?vNuMjf/evvp5olXRiSe2/ghucScg7gnm70udC6of6w6q/bVrJ7Tc8XaYxlQN?=
- =?us-ascii?Q?2X86p/3DWnvqHEHldjXiQt5x6+g+1mVM5c8kY0AjLN6j495t6dommAyuz+Ap?=
- =?us-ascii?Q?tL8nMzpO/4EVTq4C1rvsjqTibLf0XmsYHFeyqd2sKL3cRo6blIBjMTJHJ7ZY?=
- =?us-ascii?Q?D7kndRF6XIBLDWm6ZxKQhW/JW6fCwoz/dTY5YlZHt6zJUPyn/bOsetK9fJR+?=
- =?us-ascii?Q?FI05KpBwLTrwJz5RPZ69TnRn695YyWlyTsUlGLEsqL8b0ywyVNZvBsvkhSSm?=
- =?us-ascii?Q?bvdL5uVD2A/E1xBgudrIH4lPzWyy9ikjJVp+WOndjg8fO9dTRicir123Ducl?=
- =?us-ascii?Q?hOC0CEG8dWMme6ml6hY3CZJPFw/VMPrJfXCpL6NnFL+j2ff1zUshPx1Ley/1?=
- =?us-ascii?Q?sFUMxfW9oZVSffsizRJcjuIRMVsnoymCmtLc1ng2yPvNKLd4WVMtM2Mo2SsT?=
- =?us-ascii?Q?3PO6ejVoIM4d5jNbDSOVBccwivsjtS4xmk06zOLTU2eOemGmdLx7pFFZvHZs?=
- =?us-ascii?Q?TUJ0voNvAbvaODg9VLEYMLHBuyqgynCwka+1Gzqv3Wib+YN1Kfw913GBPro5?=
- =?us-ascii?Q?fNS5idv/UXQ8jCkHtQkeDgr+pxvivv1b1vAv2ML0?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6178.41; Tue, 28 Mar
+ 2023 04:36:59 +0000
+Received: from CO1NAM11FT060.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:303:6b:cafe::82) by MW4PR04CA0072.outlook.office365.com
+ (2603:10b6:303:6b::17) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6178.42 via Frontend
+ Transport; Tue, 28 Mar 2023 04:36:59 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ CO1NAM11FT060.mail.protection.outlook.com (10.13.175.132) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.6222.21 via Frontend Transport; Tue, 28 Mar 2023 04:36:59 +0000
+Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Mon, 27 Mar
+ 2023 23:36:55 -0500
+Date:   Sun, 26 Mar 2023 19:34:44 -0500
+From:   Michael Roth <michael.roth@amd.com>
+To:     Zhi Wang <zhi.wang.linux@gmail.com>
+CC:     <kvm@vger.kernel.org>, <linux-coco@lists.linux.dev>,
+        <linux-mm@kvack.org>, <linux-crypto@vger.kernel.org>,
+        <x86@kernel.org>, <linux-kernel@vger.kernel.org>,
+        <tglx@linutronix.de>, <mingo@redhat.com>, <jroedel@suse.de>,
+        <thomas.lendacky@amd.com>, <hpa@zytor.com>, <ardb@kernel.org>,
+        <pbonzini@redhat.com>, <seanjc@google.com>, <vkuznets@redhat.com>,
+        <jmattson@google.com>, <luto@kernel.org>,
+        <dave.hansen@linux.intel.com>, <slp@redhat.com>,
+        <pgonda@google.com>, <peterz@infradead.org>,
+        <srinivas.pandruvada@linux.intel.com>, <rientjes@google.com>,
+        <dovmurik@linux.ibm.com>, <tobin@ibm.com>, <bp@alien8.de>,
+        <vbabka@suse.cz>, <kirill@shutemov.name>, <ak@linux.intel.com>,
+        <tony.luck@intel.com>, <marcorr@google.com>,
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        <alpergun@google.com>, <dgilbert@redhat.com>, <jarkko@kernel.org>,
+        <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>,
+        Vishal Annapurve <vannapurve@google.com>
+Subject: Re: [PATCH RFC v8 04/56] KVM: Add HVA range operator
+Message-ID: <20230327003444.lqfrididd4gavomb@amd.com>
+References: <20230220183847.59159-1-michael.roth@amd.com>
+ <20230220183847.59159-5-michael.roth@amd.com>
+ <20230220233709.00006dfc@gmail.com>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB7529.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e85477a0-cb24-4a44-d20e-08db2f3f42cd
-X-MS-Exchange-CrossTenant-originalarrivaltime: 28 Mar 2023 03:48:15.3130
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20230220233709.00006dfc@gmail.com>
+X-Originating-IP: [10.180.168.240]
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1NAM11FT060:EE_|PH8PR12MB7028:EE_
+X-MS-Office365-Filtering-Correlation-Id: 9fd2d84f-b972-45e5-181a-08db2f4611a6
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: Gqb6NWudd8KWmtEcTZtARy0n73fFtSBVVYpBeWRaMDP9in1uZFo4AeJTxap5Yr2Z7dwAA5Dbu0e6CpQUNtolnu82n9U9CYCBluV0+i8n9VSh/2Rl7dH30op5FJ7Tyo6QTMaMMtHNM6g00NfnumKXVMgDnworJmFK9GoRlsZuLB0x/0Ajj3+l2EMG6kMfJlmTNWBR/DmtVJqrWTPwTdJchrde8X/p0IjjjJyD9c1Q1GzZUOt+qrQPi89KXRHQRY60JsQ69oj0dk+DJnNq3tbwei4IGTHjwToyt4PXrL+a2RoUovd/vxD444oQUMtsA4FhbLnqB5wElufvfcyL89KSK2jASBpJ8hgIgmxLaJJARPjZrnN0G44fdB8/1BOf3eeeBUNzv4VluW3Be6cPPuWEHXA105NGJZr+VZN7lOKdWI+4TPbmItuDKVDJVUeKXHiEAV5r+kD19vH9uYQSpNwdlfnPbtxXZifd9usFTYrgpPs+6GH40HTiVGPYTZ5lPl5HkuOw+Gj/IIcDm43GQO1UuP3oPjmB6bn1spyZpfQBUb/YyAub9JDsyj/t7gY2ni6NCOpwRIUF6O1UEeaZAOXdcFNEUeE7Wm9ucCObXxlGXKxpP5fXvst1kcFkQDAPCFOs2mY3wY1+QUdjs6xqRfvd9QPiz3xGJABorDHuJWtxWNFegY5/izpxQD2olW5koxFuWu+g0zD+zdPVRo1guUsUaaEEkAU/eVvGmygS7faPNro=
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230028)(4636009)(136003)(39860400002)(396003)(376002)(346002)(451199021)(40470700004)(46966006)(36840700001)(54906003)(44832011)(70586007)(316002)(5660300002)(7406005)(2906002)(7416002)(8936002)(81166007)(478600001)(426003)(356005)(2616005)(82740400003)(70206006)(36860700001)(6916009)(66899021)(336012)(41300700001)(8676002)(4326008)(40460700003)(47076005)(16526019)(966005)(86362001)(40480700001)(6666004)(82310400005)(83380400001)(26005)(186003)(36756003)(1076003)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Mar 2023 04:36:59.1808
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 13VrpgUpL5AQaqkO5uj9RfvCtmzQ3Decpc1VCHKyYZyn77D1OKbxgmWKUH2xjUARB+qwbsZMEUyji65QQKTAOg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR11MB6893
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-2.5 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_PASS,
-        SPF_NONE autolearn=unavailable autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9fd2d84f-b972-45e5-181a-08db2f4611a6
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT060.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR12MB7028
+X-Spam-Status: No, score=0.3 required=5.0 tests=DATE_IN_PAST_24_48,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> From: Xu, Yilun <yilun.xu@intel.com>
-> Sent: Wednesday, March 22, 2023 10:11 PM
->=20
-> On 2023-03-08 at 05:28:44 -0800, Yi Liu wrote:
-> > This defines KVM_DEV_VFIO_FILE* and make alias with
-> KVM_DEV_VFIO_GROUP*.
-> > Old userspace uses KVM_DEV_VFIO_GROUP* works as well.
-> >
-> > Signed-off-by: Yi Liu <yi.l.liu@intel.com>
-> > Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
-> > Tested-by: Terrence Xu <terrence.xu@intel.com>
-> > Tested-by: Nicolin Chen <nicolinc@nvidia.com>
-> > Tested-by: Matthew Rosato <mjrosato@linux.ibm.com>
+On Mon, Feb 20, 2023 at 11:37:09PM +0200, Zhi Wang wrote:
+> On Mon, 20 Feb 2023 12:37:55 -0600
+> Michael Roth <michael.roth@amd.com> wrote:
+> 
+> > From: Vishal Annapurve <vannapurve@google.com>
+> > 
+> > Introduce HVA range operator so that other KVM subsystems
+> > can operate on HVA range.
+> > 
+> > Signed-off-by: Vishal Annapurve <vannapurve@google.com>
+> > [mdr: minor checkpatch alignment fixups]
+> > Signed-off-by: Michael Roth <michael.roth@amd.com>
 > > ---
-> >  Documentation/virt/kvm/devices/vfio.rst | 52 +++++++++++++++++--------
-> >  include/uapi/linux/kvm.h                | 16 ++++++--
-> >  virt/kvm/vfio.c                         | 16 ++++----
-> >  3 files changed, 55 insertions(+), 29 deletions(-)
-> >
-> > diff --git a/Documentation/virt/kvm/devices/vfio.rst
-> b/Documentation/virt/kvm/devices/vfio.rst
-> > index 79b6811bb4f3..5b05b48abaab 100644
-> > --- a/Documentation/virt/kvm/devices/vfio.rst
-> > +++ b/Documentation/virt/kvm/devices/vfio.rst
-> > @@ -9,24 +9,37 @@ Device types supported:
-> >    - KVM_DEV_TYPE_VFIO
-> >
-> >  Only one VFIO instance may be created per VM.  The created device
-> > -tracks VFIO groups in use by the VM and features of those groups
-> > -important to the correctness and acceleration of the VM.  As groups
-> > -are enabled and disabled for use by the VM, KVM should be updated
-> > -about their presence.  When registered with KVM, a reference to the
-> > -VFIO-group is held by KVM.
-> > +tracks VFIO files (group or device) in use by the VM and features
-> > +of those groups/devices important to the correctness and acceleration
-> > +of the VM.  As groups/devices are enabled and disabled for use by the
-> > +VM, KVM should be updated about their presence.  When registered
-> with
-> > +KVM, a reference to the VFIO file is held by KVM.
-> >
-> >  Groups:
-> > -  KVM_DEV_VFIO_GROUP
-> > -
-> > -KVM_DEV_VFIO_GROUP attributes:
-> > -  KVM_DEV_VFIO_GROUP_ADD: Add a VFIO group to VFIO-KVM device
-> tracking
-> > -	kvm_device_attr.addr points to an int32_t file descriptor
-> > -	for the VFIO group.
-> > -  KVM_DEV_VFIO_GROUP_DEL: Remove a VFIO group from VFIO-KVM
-> device tracking
-> > -	kvm_device_attr.addr points to an int32_t file descriptor
-> > -	for the VFIO group.
-> > -  KVM_DEV_VFIO_GROUP_SET_SPAPR_TCE: attaches a guest visible TCE
-> table
-> > +  KVM_DEV_VFIO_FILE
-> > +	alias: KVM_DEV_VFIO_GROUP
+> >  include/linux/kvm_host.h |  6 +++++
+> >  virt/kvm/kvm_main.c      | 48 ++++++++++++++++++++++++++++++++++++++++
+> >  2 files changed, 54 insertions(+)
+> > 
+> > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> > index 4d542060cd93..c615650ed256 100644
+> > --- a/include/linux/kvm_host.h
+> > +++ b/include/linux/kvm_host.h
+> > @@ -1402,6 +1402,12 @@ void kvm_mmu_invalidate_begin(struct kvm *kvm);
+> >  void kvm_mmu_invalidate_range_add(struct kvm *kvm, gfn_t start, gfn_t end);
+> >  void kvm_mmu_invalidate_end(struct kvm *kvm);
+> >  
+> > +typedef int (*kvm_hva_range_op_t)(struct kvm *kvm,
+> > +				struct kvm_gfn_range *range, void *data);
 > > +
-> > +KVM_DEV_VFIO_FILE attributes:
-> > +  KVM_DEV_VFIO_FILE_ADD: Add a VFIO file (group/device) to VFIO-KVM
-> device
-> > +	tracking
+> > +int kvm_vm_do_hva_range_op(struct kvm *kvm, unsigned long hva_start,
+> > +			   unsigned long hva_end, kvm_hva_range_op_t handler, void *data);
 > > +
-> > +	alias: KVM_DEV_VFIO_GROUP_ADD
-> > +
-> > +	kvm_device_attr.addr points to an int32_t file descriptor for the
-> > +	VFIO file.
->=20
-> A blank line here to be consistent with other attibutes.
->=20
-> > +  KVM_DEV_VFIO_FILE_DEL: Remove a VFIO file (group/device) from
-> VFIO-KVM
-> > +	device tracking
-> > +
-> > +	alias: KVM_DEV_VFIO_GROUP_DEL
-> > +
-> > +	kvm_device_attr.addr points to an int32_t file descriptor for the
-> > +	VFIO file.
-> > +
-> > +  KVM_DEV_VFIO_FILE_SET_SPAPR_TCE: attaches a guest visible TCE
-> table
-> >  	allocated by sPAPR KVM.
-> > +
-> > +	alias: KVM_DEV_VFIO_GROUP_SET_SPAPR_TCE
-> > +
-> >  	kvm_device_attr.addr points to a struct::
-> >
-> >  		struct kvm_vfio_spapr_tce {
-> > @@ -40,9 +53,14 @@ KVM_DEV_VFIO_GROUP attributes:
-> >  	- @tablefd is a file descriptor for a TCE table allocated via
-> >  	  KVM_CREATE_SPAPR_TCE.
-> >
-> > +	only accepts vfio group file as SPAPR has no iommufd support
-> > +
-> >  ::
-> >
-> > -The GROUP_ADD operation above should be invoked prior to accessing
-> the
-> > +The FILE/GROUP_ADD operation above should be invoked prior to
-> accessing the
-> >  device file descriptor via VFIO_GROUP_GET_DEVICE_FD in order to
-> support
-> >  drivers which require a kvm pointer to be set in their .open_device()
-> > -callback.
-> > +callback.  It is the same for device file descriptor via character dev=
-ice
-> > +open which gets device access via VFIO_DEVICE_BIND_IOMMUFD.  For
-> such file
-> > +descriptors, FILE_ADD should be invoked before
-> VFIO_DEVICE_BIND_IOMMUFD
-> > +to support the drivers mentioned in piror sentence as well.
->=20
-> s/piror/prior
+> >  long kvm_arch_dev_ioctl(struct file *filp,
+> >  			unsigned int ioctl, unsigned long arg);
+> >  long kvm_arch_vcpu_ioctl(struct file *filp,
+> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> > index f7e00593cc5d..4ccd655dd5af 100644
+> > --- a/virt/kvm/kvm_main.c
+> > +++ b/virt/kvm/kvm_main.c
+> > @@ -642,6 +642,54 @@ static __always_inline int __kvm_handle_hva_range(struct kvm *kvm,
+> >  	return (int)ret;
+> >  }
+> >  
+> 
+> Below function seems a reduced duplicate of __kvm_handle_hva_range()
+> in virt/kvm/kvm_main.c. It would be nice to factor __kvm_handle_hva_range().
 
-Fixed in v8, thanks.
+A few differences make it difficult to refactor this clearly:
 
-https://lore.kernel.org/kvm/ZCHW%2FQIKQVhBjg%2Fx@Asurada-Nvidia/T/#m7c076d3=
-b9450c9de62b99a6fcefcc31c8ae3f8da
+  - This handler is mainly used for loading initial contents into guest
+    image before booting and doesn't rely on the MMU lock being held. It
+    also *can't* be called with MMU lock held because it suffers from the
+    same issue with mem_attr_update() hook where it needs to take a
+    mutex as part of unmapping from directmap when transitioning page to
+    private state in RMP table
+  - This handler wants to return an error code, as opposed to existing
+    handlers which return a true/false values which are passed along to
+    MMU notifier call-site and handled differently.
+  - This handler wants to terminate iterating through memslots as soon
+    as it encounters the first failure, whereas the existing handlers
+    expect to be called for each slot regardless of return value.
 
+So it's a pretty different use-case that adds enough complexity to
+__kvm_handle_hva_range() that it might need be worth refactoring it,
+since it complicates some bits that are closely tied to dealing with
+invalidations where the extra complexity probably needs to be
+well-warranted.
 
+I took a stab at it here for reference, but even with what seems to be
+the minimal set of changes it doesn't save on any code and ultimately I
+think it makes it harder to make sense of what going on:
+
+  https://github.com/mdroth/linux/commit/976c5fb708f7babe899fd80e27e19f8ba3f6818d
+
+Is there a better approach?
+
+Thanks,
+
+-Mike
+
+> 
+> > +int kvm_vm_do_hva_range_op(struct kvm *kvm, unsigned long hva_start,
+> > +			   unsigned long hva_end, kvm_hva_range_op_t handler, void *data)
+> > +{
+> > +	int ret = 0;
+> > +	struct kvm_gfn_range gfn_range;
+> > +	struct kvm_memory_slot *slot;
+> > +	struct kvm_memslots *slots;
+> > +	int i, idx;
+> > +
+> > +	if (WARN_ON_ONCE(hva_end <= hva_start))
+> > +		return -EINVAL;
+> > +
+> > +	idx = srcu_read_lock(&kvm->srcu);
+> > +
+> > +	for (i = 0; i < kvm_arch_nr_memslot_as_ids(kvm); i++) {
+> > +		struct interval_tree_node *node;
+> > +
+> > +		slots = __kvm_memslots(kvm, i);
+> > +		kvm_for_each_memslot_in_hva_range(node, slots,
+> > +						  hva_start, hva_end - 1) {
+> > +			unsigned long start, end;
+> > +
+> > +			slot = container_of(node, struct kvm_memory_slot,
+> > +					    hva_node[slots->node_idx]);
+> > +			start = max(hva_start, slot->userspace_addr);
+> > +			end = min(hva_end, slot->userspace_addr +
+> > +						  (slot->npages << PAGE_SHIFT));
+> > +
+> > +			/*
+> > +			 * {gfn(page) | page intersects with [hva_start, hva_end)} =
+> > +			 * {gfn_start, gfn_start+1, ..., gfn_end-1}.
+> > +			 */
+> > +			gfn_range.start = hva_to_gfn_memslot(start, slot);
+> > +			gfn_range.end = hva_to_gfn_memslot(end + PAGE_SIZE - 1, slot);
+> > +			gfn_range.slot = slot;
+> > +
+> > +			ret = handler(kvm, &gfn_range, data);
+> > +			if (ret)
+> > +				goto e_ret;
+> > +		}
+> > +	}
+> > +
+> > +e_ret:
+> > +	srcu_read_unlock(&kvm->srcu, idx);
+> > +
+> > +	return ret;
+> > +}
+> > +
+> >  static __always_inline int kvm_handle_hva_range(struct mmu_notifier *mn,
+> >  						unsigned long start,
+> >  						unsigned long end,
+> 
