@@ -2,65 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2DCE66CA75C
-	for <lists+kvm@lfdr.de>; Mon, 27 Mar 2023 16:19:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4A0746CA749
+	for <lists+kvm@lfdr.de>; Mon, 27 Mar 2023 16:17:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233018AbjC0OTJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Mar 2023 10:19:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55532 "EHLO
+        id S232734AbjC0ORv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Mar 2023 10:17:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55270 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230347AbjC0OS2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Mar 2023 10:18:28 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D56A483C8
-        for <kvm@vger.kernel.org>; Mon, 27 Mar 2023 07:16:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1679926543;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=cyh9GNwkSeiWX8VVWJet6cmrStrv1Y1BhHYKMAKCy08=;
-        b=QmIhtRXJZm00q+qJ/De2xLRpSxGNKAtJxAMuKIw2/7RPcWydNe5aAr3SDtq+/lmQ87ZR9c
-        UV9SbJMRJjz+kjryCLTDSg3zdulCf8UusQ03y7WZLj+To4YReDmM4ndgQy7UbE1mJmznJm
-        1yXIwVmYC3oFzoOHDUVAdB+NeKSPkdk=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-569-S9tmptFLOcCMJWqyR-_tXg-1; Mon, 27 Mar 2023 10:15:40 -0400
-X-MC-Unique: S9tmptFLOcCMJWqyR-_tXg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        with ESMTP id S232692AbjC0ORb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Mar 2023 10:17:31 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82F537EC6
+        for <kvm@vger.kernel.org>; Mon, 27 Mar 2023 07:15:54 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 1FA70802C15;
-        Mon, 27 Mar 2023 14:15:35 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id F23DA3542A;
-        Mon, 27 Mar 2023 14:15:34 +0000 (UTC)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Maxim Levitsky <mlevitsk@redhat.com>
-Subject: Re: [PATCH 0/2] KVM: x86: Fix RM exception injection bugs
-Date:   Mon, 27 Mar 2023 10:15:34 -0400
-Message-Id: <20230327141534.3752052-1-pbonzini@redhat.com>
-In-Reply-To: <20230322143300.2209476-1-seanjc@google.com>
-References: 
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
-X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+        by ams.source.kernel.org (Postfix) with ESMTPS id CB33AB815E0
+        for <kvm@vger.kernel.org>; Mon, 27 Mar 2023 14:15:42 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 74373C433D2;
+        Mon, 27 Mar 2023 14:15:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1679926541;
+        bh=8qdLHBb0hK6367RANOmLIJ7Ck6E1QUyJmXSsCsattb0=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=lrKM7CoSqfD937g9qcYnLtzSuspJUqMtuGjdxU7pXsT4Ez5A35hXtK3RNnpbSaHUu
+         gXwBPdtQAuYmiyxPOmkf+blAxQVJl0JJwwO/Skn6EGGPsgpLikUhtRtgrHiKo2ed5M
+         Ap3fXDH7DjncKzobiCprNkAZH3Ihzg9qTS5y6LTYbjiZR1Fba3+H/l5P9VvOM0DXpi
+         rE5Ow5KZgoxCQvD/FshA8m43wLDw5tdBUkzS4+kAwZHW5qHkOb7zEQX3RsZH5gv2dx
+         yy+JUJmgG34i1O1a+rCOYXsYHmfwx6nIROlONavtTGs5tCxAarAJ0JCMX4PYHhqJig
+         v9qnbvbpuEA3g==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1pgndL-003TqE-3Q;
+        Mon, 27 Mar 2023 15:15:39 +0100
+Date:   Mon, 27 Mar 2023 15:15:38 +0100
+Message-ID: <86sfdqwa9h.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Oliver Upton <oliver.upton@linux.dev>,
+        Will Deacon <will@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>, reijiw@google.com,
+        dmatlack@google.com, james.morse@arm.com, suzuki.poulose@arm.com,
+        yuzenghui@huawei.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org
+Subject: Re: [GIT PULL] KVM/arm64 fixes for 6.3, part #2
+In-Reply-To: <49385a34-6ad7-255d-68d9-6b41a76f01df@redhat.com>
+References: <ZBPZ4D9MIsaCNDh6@thinky-boi>
+        <ZB3o/jsQIwS+4g4E@linux.dev>
+        <86v8imwhi1.wl-maz@kernel.org>
+        <49385a34-6ad7-255d-68d9-6b41a76f01df@redhat.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: pbonzini@redhat.com, oliver.upton@linux.dev, will@kernel.org, catalin.marinas@arm.com, reijiw@google.com, dmatlack@google.com, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-2.5 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Queued, thanks.
+On Mon, 27 Mar 2023 14:59:19 +0100,
+Paolo Bonzini <pbonzini@redhat.com> wrote:
+> 
+> On 3/27/23 13:39, Marc Zyngier wrote:
+> >> Paolo,
+> >> 
+> >> Pinging this PR in case you missed it, the issues around host page table walks
+> >> are particularly urgent as the race on host page table teardown has been
+> >> reproduced on some setups.
+> > If we don't hear from Paolo shortly, I suggest we route this via the
+> > arm64 tree.
+> 
+> It missed the pull request I sent on March 17th by a few hours.  I
+> have queued it now and will send it to Linus later today.
 
-Paolo
+Maybe you could help us here and state what is your schedule when it
+comes to sending these pull requests? It would certainly help
+coordinate and avoid wasting 10+ days to get things merged.
 
+I appreciate that you don't need nor want to wait for us to send
+something to Linus, but if we know when the train is departing, we can
+make sure we're standing on the platform early enough.
 
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
