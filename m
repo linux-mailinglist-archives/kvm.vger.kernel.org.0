@@ -2,171 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 212146CA472
-	for <lists+kvm@lfdr.de>; Mon, 27 Mar 2023 14:46:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F0AF86CA577
+	for <lists+kvm@lfdr.de>; Mon, 27 Mar 2023 15:20:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229619AbjC0Mqb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Mar 2023 08:46:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41700 "EHLO
+        id S232193AbjC0NUo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Mar 2023 09:20:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59758 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232689AbjC0MqZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Mar 2023 08:46:25 -0400
-Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC6F449EB
-        for <kvm@vger.kernel.org>; Mon, 27 Mar 2023 05:46:15 -0700 (PDT)
-Received: by mail-pj1-x102b.google.com with SMTP id r7-20020a17090b050700b002404be7920aso7659849pjz.5
-        for <kvm@vger.kernel.org>; Mon, 27 Mar 2023 05:46:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1679921174;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zsaua7blaj4slx6G/pjAPsZzllQw2eT67bEuq+/vhBQ=;
-        b=g8nZvqhQ81DeWCAYCmHwXEWwlZ8oG143q7tCezhLiol6BeuJT0o04oteNXda+H/6h4
-         lXDEXnGBxGTV/FnWlDzBiF2Cdb3lkGpiBy4aM2C+wJiVWmtlglKRa6GAKpVNJUnztRSX
-         PEMTz9T+0GHD++ivGp6hWcC5Uwe2DKuR9GVo8fkfwCOyB2x2NA1f5SlmUY9n+xpOKwa+
-         +p4GpButq2nsLe/U48JpdOOyaYBUF6lAZBiT+MjQbNicyH+8aA3KnyJSVUxDyelVeaG8
-         9PaZ78ft0jQly+8ZjpItSYEkqWTBRih9fer58PdU5fbDxu4zht9N114I3JNDqxMi6hgH
-         6qvw==
+        with ESMTP id S231932AbjC0NUm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Mar 2023 09:20:42 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89D722128
+        for <kvm@vger.kernel.org>; Mon, 27 Mar 2023 06:19:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1679923192;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+        bh=fp97bd4egAyMlz94O+W8oRAJLsbe6t9my51Gm91T/aM=;
+        b=a6La+48uF1wwhBHmYLfNCk0mzYxOeFLRbpl738We7+ghtDeFwY4/9d0UVQb4pLDyKMxaNK
+        8bpMCVmT1CpP3huJtpgGayE+qX1iQsT+CMUK3HU6MIh8KaLzg+ZpXrc3o8xPm+jA3ZM6Uu
+        XJSBBxxiGgnBs2Hl/pIABbAmHbWEj6I=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-629-AXFtj9bANBCk2BRgKk-HxQ-1; Mon, 27 Mar 2023 09:19:51 -0400
+X-MC-Unique: AXFtj9bANBCk2BRgKk-HxQ-1
+Received: by mail-wm1-f70.google.com with SMTP id bd16-20020a05600c1f1000b003ee895f6201so5672046wmb.9
+        for <kvm@vger.kernel.org>; Mon, 27 Mar 2023 06:19:51 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679921174;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=zsaua7blaj4slx6G/pjAPsZzllQw2eT67bEuq+/vhBQ=;
-        b=zOV2EUL3MGLK2G9YWtQ0NczSj/v62H7o5AWLhJQLXARNd1VwGsH8I9oOcyXAUQ/4LS
-         RkD23BZYJEAJtbk8iPnSIxOw3tDJAiL13dgypzgFL5AxCvJ4R6bVhrP1g1t+Q8mHSkg5
-         rpBnuuKbdqBzeNmbXi+IGbyPVHOF6QLpdKIhccxAKOVYbrGrG5Rnw62ImBHQTlgGygx6
-         OzYxHJolcLK5g3KjQdPRywBjjWlTNEo8zBqmo+9G7VyDIKo7M5pNOoJAfDBVo3cKc0TQ
-         ZQP9wRnmpFp+NkCTtrME1pp+ycMMFABjIS829wM61Pz0yvGxsvy1IZu2ir4x+6ky3nLX
-         +L6w==
-X-Gm-Message-State: AAQBX9dWf/V/EIvjIMK7ppXYaDN2VonHxO40pzUNq3MBgB5i1oaSsiSr
-        HrxGv9YCXtVIxh9PnWQ74MyvkX+Gh+4=
-X-Google-Smtp-Source: AKy350ZqqCNhdHy5dN7TneKop3XAUuoIVIYVPdueQWnxdb6dRGyf+T+HmPK9JaTmoSlKRtvf+OA9fw==
-X-Received: by 2002:a17:902:cf47:b0:1a1:a830:cef8 with SMTP id e7-20020a170902cf4700b001a1a830cef8mr10258979plg.27.1679921174465;
-        Mon, 27 Mar 2023 05:46:14 -0700 (PDT)
-Received: from bobo.ozlabs.ibm.com ([203.221.180.225])
-        by smtp.gmail.com with ESMTPSA id ay6-20020a1709028b8600b0019a997bca5csm19053965plb.121.2023.03.27.05.46.11
+        d=1e100.net; s=20210112; t=1679923190;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=fp97bd4egAyMlz94O+W8oRAJLsbe6t9my51Gm91T/aM=;
+        b=8Q9E6umz/PcNKvN+0RPpypq9ylgquh137YJOj/yIhRZQwbtwiZLCwHPNjxGrU1QwKd
+         4sDHhQE0Y1vWoPql95dzZzscA+FpAbJDw/cmSaI7aLbgysVxQDN5tGHDtuA17VAhY3Gj
+         1eBQYXHqMcy9ITYyy1JaMkwXk8pcf7siGYPOnQ6H1Yi4V8eTDaQqSZaW0AiqlAjvH8Se
+         JoPFL6xJUKoQaT0w/J3oIikvsZ1+WwzwOyjaf1i215jkjTvM1byEzoxQPzhyqzGa+8OB
+         QE/1jMXn5nBwOlobwslouI/CZXx2TdFe+BDDbh644Iy9bO+0v++LjV5w4AMrfhIhVPKc
+         83RA==
+X-Gm-Message-State: AO0yUKW+hnieSoF1rHFyzHyK/oK/i9ai3RALFLn6vupeM/AFsu0QYYjE
+        Bch2Gn09MW0TgQy52ucLbPsm/PNxnofCoHPJ/jWOP658++4nIJj3qxL3a9/kW4PSJAQMcDX3hrf
+        rFHqBiy2by+tA
+X-Received: by 2002:a1c:7c1a:0:b0:3ee:6d88:774a with SMTP id x26-20020a1c7c1a000000b003ee6d88774amr8075073wmc.14.1679923190461;
+        Mon, 27 Mar 2023 06:19:50 -0700 (PDT)
+X-Google-Smtp-Source: AK7set+a3nlhZjRZvrUa3ZYlE0VCFu21NVVFHGZYCsteCubT34r2yrI5XsBkcW+x/td8mODOzUHdhw==
+X-Received: by 2002:a1c:7c1a:0:b0:3ee:6d88:774a with SMTP id x26-20020a1c7c1a000000b003ee6d88774amr8075048wmc.14.1679923190202;
+        Mon, 27 Mar 2023 06:19:50 -0700 (PDT)
+Received: from redhat.com ([2.52.153.142])
+        by smtp.gmail.com with ESMTPSA id p5-20020a05600c358500b003ef6f87118dsm2752456wmq.42.2023.03.27.06.19.48
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Mar 2023 05:46:13 -0700 (PDT)
-From:   Nicholas Piggin <npiggin@gmail.com>
-To:     kvm@vger.kernel.org
-Cc:     Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org,
-        Laurent Vivier <lvivier@redhat.com>,
-        Thomas Huth <thuth@redhat.com>
-Subject: [kvm-unit-tests v3 13/13] powerpc/sprs: Test hypervisor registers on powernv machine
-Date:   Mon, 27 Mar 2023 22:45:20 +1000
-Message-Id: <20230327124520.2707537-14-npiggin@gmail.com>
-X-Mailer: git-send-email 2.37.2
-In-Reply-To: <20230327124520.2707537-1-npiggin@gmail.com>
-References: <20230327124520.2707537-1-npiggin@gmail.com>
+        Mon, 27 Mar 2023 06:19:49 -0700 (PDT)
+Date:   Mon, 27 Mar 2023 09:19:47 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        elic@nvidia.com, mst@redhat.com
+Subject: [GIT PULL] vdpa: bugfix
+Message-ID: <20230327091947-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
-        DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Mutt-Fcc: =sent
+X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This enables HV privilege registers to be tested with the powernv
-machine.
+The following changes since commit e8d018dd0257f744ca50a729e3d042cf2ec9da65:
 
-Acked-by: Thomas Huth <thuth@redhat.com>
-Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
----
- powerpc/sprs.c | 33 +++++++++++++++++++++++++--------
- 1 file changed, 25 insertions(+), 8 deletions(-)
+  Linux 6.3-rc3 (2023-03-19 13:27:55 -0700)
 
-diff --git a/powerpc/sprs.c b/powerpc/sprs.c
-index d566420..07a4e75 100644
---- a/powerpc/sprs.c
-+++ b/powerpc/sprs.c
-@@ -199,16 +199,16 @@ static const struct spr sprs_power_common[1024] = {
- [190] = {"HFSCR",	64,	HV_RW, },
- [256] = {"VRSAVE",	32,	RW, },
- [259] = {"SPRG3",	64,	RO, },
--[284] = {"TBL",		32,	HV_WO, },
--[285] = {"TBU",		32,	HV_WO, },
--[286] = {"TBU40",	64,	HV_WO, },
-+[284] = {"TBL",		32,	HV_WO, }, /* Things can go a bit wonky with */
-+[285] = {"TBU",		32,	HV_WO, }, /* Timebase changing. Should save */
-+[286] = {"TBU40",	64,	HV_WO, }, /* and restore it. */
- [304] = {"HSPRG0",	64,	HV_RW, },
- [305] = {"HSPRG1",	64,	HV_RW, },
- [306] = {"HDSISR",	32,	HV_RW,		SPR_INT, },
- [307] = {"HDAR",	64,	HV_RW,		SPR_INT, },
- [308] = {"SPURR",	64,	HV_RW | OS_RO,	SPR_ASYNC, },
- [309] = {"PURR",	64,	HV_RW | OS_RO,	SPR_ASYNC, },
--[313] = {"HRMOR",	64,	HV_RW, },
-+[313] = {"HRMOR",	64,	HV_RW,		SPR_HARNESS, }, /* Harness can't cope with HRMOR changing */
- [314] = {"HSRR0",	64,	HV_RW,		SPR_INT, },
- [315] = {"HSRR1",	64,	HV_RW,		SPR_INT, },
- [318] = {"LPCR",	64,	HV_RW, },
-@@ -306,7 +306,7 @@ static const struct spr sprs_power9_10[1024] = {
- [921] = {"TSCR",	32,	HV_RW, },
- [922] = {"TTR",		64,	HV_RW, },
- [1006]= {"TRACE",	64,	WO, },
--[1008]= {"HID",		64,	HV_RW, },
-+[1008]= {"HID",		64,	HV_RW,		SPR_HARNESS, }, /* At least HILE would be unhelpful to change */
- };
- 
- /* This covers POWER8 and POWER9 PMUs */
-@@ -350,6 +350,22 @@ static const struct spr sprs_power10_pmu[1024] = {
- 
- static struct spr sprs[1024];
- 
-+static bool spr_read_perms(int spr)
-+{
-+	if (machine_is_powernv())
-+		return !!(sprs[spr].access & SPR_HV_READ);
-+	else
-+		return !!(sprs[spr].access & SPR_OS_READ);
-+}
-+
-+static bool spr_write_perms(int spr)
-+{
-+	if (machine_is_powernv())
-+		return !!(sprs[spr].access & SPR_HV_WRITE);
-+	else
-+		return !!(sprs[spr].access & SPR_OS_WRITE);
-+}
-+
- static void setup_sprs(void)
- {
- 	uint32_t pvr = mfspr(287);	/* Processor Version Register */
-@@ -466,7 +482,7 @@ static void get_sprs(uint64_t *v)
- 	int i;
- 
- 	for (i = 0; i < 1024; i++) {
--		if (!(sprs[i].access & SPR_OS_READ))
-+		if (!spr_read_perms(i))
- 			continue;
- 		v[i] = __mfspr(i);
- 	}
-@@ -477,8 +493,9 @@ static void set_sprs(uint64_t val)
- 	int i;
- 
- 	for (i = 0; i < 1024; i++) {
--		if (!(sprs[i].access & SPR_OS_WRITE))
-+		if (!spr_write_perms(i))
- 			continue;
-+
- 		if (sprs[i].type & SPR_HARNESS)
- 			continue;
- 		if (!strcmp(sprs[i].name, "MMCR0")) {
-@@ -550,7 +567,7 @@ int main(int argc, char **argv)
- 	for (i = 0; i < 1024; i++) {
- 		bool pass = true;
- 
--		if (!(sprs[i].access & SPR_OS_READ))
-+		if (!spr_read_perms(i))
- 			continue;
- 
- 		if (sprs[i].width == 32) {
--- 
-2.37.2
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
+
+for you to fetch changes up to 8fc9ce051f22581f60325fd87a0fd0f37a7b70c3:
+
+  vdpa/mlx5: Remove debugfs file after device unregister (2023-03-21 16:39:02 -0400)
+
+----------------------------------------------------------------
+vdpa: bugfix
+
+An error handling fix in mlx5.
+
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+
+----------------------------------------------------------------
+Eli Cohen (1):
+      vdpa/mlx5: Remove debugfs file after device unregister
+
+ drivers/vdpa/mlx5/net/mlx5_vnet.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
