@@ -2,70 +2,77 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 99E716CA7BB
-	for <lists+kvm@lfdr.de>; Mon, 27 Mar 2023 16:32:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9C1376CA7DE
+	for <lists+kvm@lfdr.de>; Mon, 27 Mar 2023 16:39:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232795AbjC0OcN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Mar 2023 10:32:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58166 "EHLO
+        id S230380AbjC0Oj4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Mar 2023 10:39:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41282 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233020AbjC0OcF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Mar 2023 10:32:05 -0400
+        with ESMTP id S233073AbjC0Ojz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Mar 2023 10:39:55 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6CE5930FE
-        for <kvm@vger.kernel.org>; Mon, 27 Mar 2023 07:30:50 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87538358B
+        for <kvm@vger.kernel.org>; Mon, 27 Mar 2023 07:39:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1679927421;
+        s=mimecast20190719; t=1679927948;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=b9eLalqstdpKeNqF0JPU3M2QxGoZ4TRTo+/fHn6qaXM=;
-        b=W5RrRHfimNJGpq7IZPMo5sB6oA2OYWGF3er+UCIsIoXrWZmRo/dwiUTGBkRfOz2avMwQC/
-        YN/+yCgdGURXCk2nBSkh0g2tgQM4+ClcUcWKT1LDdB7AIex+z2IAXYV5L5vf5ObjWiigIK
-        J92XkX27T86AAuUqYzGVFZfv/8rZcYM=
-Received: from mail-ua1-f69.google.com (mail-ua1-f69.google.com
- [209.85.222.69]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=XoDLXhYZX6z7BtIjLUpiIi7lTU4JmFeBrYERY2LWfk0=;
+        b=NwYdjZN5xaKKJ3/+9FJMMRk2/m6cu4cyCipO7i+2+bUE1i4K5VrTl7/GDdsbvlaZ4rRgdb
+        t658V60eajZ+xkPFgXUMpy8T1NmKLKSsuVWnBk0THaIWuZtJyK8bUQxekWIn8sT5h6cEXx
+        kWuExuWZD70Q8ksHvKTPGNctvQ6TvgM=
+Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
+ [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-472-yF0VdhMXO1-m6bTjOVNVLg-1; Mon, 27 Mar 2023 10:30:20 -0400
-X-MC-Unique: yF0VdhMXO1-m6bTjOVNVLg-1
-Received: by mail-ua1-f69.google.com with SMTP id y14-20020ab020ae000000b0074fa36da8adso4252965ual.19
-        for <kvm@vger.kernel.org>; Mon, 27 Mar 2023 07:30:20 -0700 (PDT)
+ us-mta-342-D8joogq7NTG1k_XlOAn-fQ-1; Mon, 27 Mar 2023 10:39:05 -0400
+X-MC-Unique: D8joogq7NTG1k_XlOAn-fQ-1
+Received: by mail-qk1-f200.google.com with SMTP id d72-20020ae9ef4b000000b007467a30076fso4075053qkg.18
+        for <kvm@vger.kernel.org>; Mon, 27 Mar 2023 07:39:05 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679927419;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=b9eLalqstdpKeNqF0JPU3M2QxGoZ4TRTo+/fHn6qaXM=;
-        b=UQZ2lszksC2B2FU4KPn96jJMPdQTtwdq0Jo2g766/4L52qIklnyBdGgjjHK+7H8WTP
-         T13Dvw03nwuoqLzUrB8GdIUiTBG1Ywh02vr31gkgRuNBwn5O0A0ZAwZoFSS3HAKFgJJq
-         gGRdq8KgumRBRBzsV/44xsD7vt12PrT+ywDLD0rYVTlpSTqPYccWqlrXuBA6irRj0X9Z
-         2mgh/+UEBFDS9Cg+9Yzr1pjBlYxVnjYRjrhFRGKVKVlQDmdXczO8ddQIU+DHZk11Xpdh
-         Mci0gPY67oaQnyUQSCrjXrKgla12umCXgmy/N4hc01Zkvu26UN0/ScX8hFuVZYO7oK32
-         MHIQ==
-X-Gm-Message-State: AAQBX9flMZPzWoIgG63+bc/G88hrCK7cznz6FNiV6nMmeoUA+RkULneG
-        poTF7mVB2iedw9PJckXrvA+ZVQP24gLasAeUdLeED++ESmHtJ+IjexoQc6b9+2ZlD7OMeW6CojM
-        LU8+IXfBHNoQKn84eqhxk0+EREUoU
-X-Received: by 2002:a67:d38a:0:b0:425:f1d7:79f7 with SMTP id b10-20020a67d38a000000b00425f1d779f7mr4978432vsj.1.1679927419560;
-        Mon, 27 Mar 2023 07:30:19 -0700 (PDT)
-X-Google-Smtp-Source: AKy350ZBJzcBuNyKB0YgU78aQbtfnHpOo/1hx3Lod2lhUFlL73sSXMO7lEsmWLpjRWYdHAzSDPiCPFwRZXYUZy02d0Q=
-X-Received: by 2002:a67:d38a:0:b0:425:f1d7:79f7 with SMTP id
- b10-20020a67d38a000000b00425f1d779f7mr4978424vsj.1.1679927419307; Mon, 27 Mar
- 2023 07:30:19 -0700 (PDT)
+        d=1e100.net; s=20210112; t=1679927945;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=XoDLXhYZX6z7BtIjLUpiIi7lTU4JmFeBrYERY2LWfk0=;
+        b=moi8rIdWun0FqVeazt1FIVwd2ZxNQUOMwP7BSyupMm95UupwoYFkclCvg8HbJ/QPBD
+         Y8rgLIuV8yc+Pqm/Z2hNohdHF2fQwqK10UjHLWnsEsxXzVnRlmZK1CFfj+MlDnoz7Azz
+         i3GcpIjqmkKk5OKDoLk8dVEsfYysu1KQz2PmwzYD0k9RyFPi5yTQdSAMxaj6RE9rhLkI
+         fMHJdKGh3zj7z8kp1V3uyWOaVXjGnz9t/mCg5vRM6xutseHoUVgyYgP6xHXqDg6T/Dhf
+         8rJBbLnwUQu6chXGMxfC1Tivfq+2Rby+RL8609KX7YDcXk503Qsyslt+8vMqg7GlcuJj
+         hOWA==
+X-Gm-Message-State: AO0yUKWU5LAaWOmR98bnAc2pUHgz6WtkDymOrYiGqBF1Bk3V6xza0F3I
+        EWa/MQbTs+qq44oYlSq7eo/NL7D3kZgIZPUTOULSp20RekmerRp5kO7sH9D0frVkbmZgA1EfWxd
+        rV3AnnXbzC13V
+X-Received: by 2002:a05:622a:1648:b0:3b8:6ae9:b10d with SMTP id y8-20020a05622a164800b003b86ae9b10dmr20414132qtj.2.1679927944793;
+        Mon, 27 Mar 2023 07:39:04 -0700 (PDT)
+X-Google-Smtp-Source: AK7set+AIVfKyZ43ZdQzZE7WjGbMC2MuGN2mWA2dKyIEH1RqiiXs9Z6es282UQxXRqnv8qSeMs3zsw==
+X-Received: by 2002:a05:622a:1648:b0:3b8:6ae9:b10d with SMTP id y8-20020a05622a164800b003b86ae9b10dmr20414102qtj.2.1679927944544;
+        Mon, 27 Mar 2023 07:39:04 -0700 (PDT)
+Received: from [192.168.0.3] (ip-109-43-177-5.web.vodafone.de. [109.43.177.5])
+        by smtp.gmail.com with ESMTPSA id y3-20020a37f603000000b0074382b756c2sm16747347qkj.14.2023.03.27.07.39.01
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 27 Mar 2023 07:39:03 -0700 (PDT)
+Message-ID: <229dd5e2-b757-d28b-b9db-0d9efce4c5d1@redhat.com>
+Date:   Mon, 27 Mar 2023 16:39:00 +0200
 MIME-Version: 1.0
-References: <20230322093117.48335-1-likexu@tencent.com>
-In-Reply-To: <20230322093117.48335-1-likexu@tencent.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Date:   Mon, 27 Mar 2023 16:30:08 +0200
-Message-ID: <CABgObfYfiUDf4zY=izcg_32yGCbUxxVc+JAkHGHwiQ0VmGdOgA@mail.gmail.com>
-Subject: Re: [PATCH v2] KVM: x86/pmu: Fix emulation on Intel counters' bit width
-To:     Like Xu <like.xu.linux@gmail.com>
-Cc:     Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.13.0
+Subject: Re: [kvm-unit-tests v3 03/13] powerpc: Add some checking to exception
+ handler install
+Content-Language: en-US
+To:     Nicholas Piggin <npiggin@gmail.com>, kvm@vger.kernel.org
+Cc:     linuxppc-dev@lists.ozlabs.org, Laurent Vivier <lvivier@redhat.com>
+References: <20230327124520.2707537-1-npiggin@gmail.com>
+ <20230327124520.2707537-4-npiggin@gmail.com>
+From:   Thomas Huth <thuth@redhat.com>
+In-Reply-To: <20230327124520.2707537-4-npiggin@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
         RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -74,20 +81,56 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 22, 2023 at 10:31=E2=80=AFAM Like Xu <like.xu.linux@gmail.com> =
-wrote:
->
-> From: Like Xu <likexu@tencent.com>
->
-> Per Intel SDM, the bit width of a PMU counter is specified via CPUID
-> only if the vCPU has FW_WRITE[bit 13] on IA32_PERF_CAPABILITIES.
-> When the FW_WRITE bit is not set, only EAX is valid and out-of-bounds
-> bits accesses do not generate #GP. Conversely when this bit is set, #GP
-> for out-of-bounds bits accesses will also appear on the fixed counters.
-> vPMU currently does not support emulation of bit widths lower than 32
-> bits or higher than its host capability.
+On 27/03/2023 14.45, Nicholas Piggin wrote:
+> Check to ensure exception handlers are not being overwritten or
+> invalid exception numbers are used.
+> 
+> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+> ---
+> Since v2:
+> - New patch
+> 
+>   lib/powerpc/processor.c | 12 ++++++++++++
+>   1 file changed, 12 insertions(+)
+> 
+> diff --git a/lib/powerpc/processor.c b/lib/powerpc/processor.c
+> index ec85b9d..70391aa 100644
+> --- a/lib/powerpc/processor.c
+> +++ b/lib/powerpc/processor.c
+> @@ -19,11 +19,23 @@ static struct {
+>   void handle_exception(int trap, void (*func)(struct pt_regs *, void *),
+>   		      void * data)
+>   {
+> +	if (trap & 0xff) {
 
-Can you please point out the date and paragraph of the SDM?
+You could check for the other "invalid exception handler" condition here 
+already, i.e. if (trap & ~0xf00) ...
 
-Paolo
+I'd maybe simply do an "assert(!(trap & ~0xf00))" here.
+
+> +		printf("invalid exception handler %#x\n", trap);
+> +		abort();
+> +	}
+> +
+>   	trap >>= 8;
+>   
+>   	if (trap < 16) {
+
+... then you could get rid of the if-statement here and remove one level of 
+indentation in the code below.
+
+> +		if (func && handlers[trap].func) {
+> +			printf("exception handler installed twice %#x\n", trap);
+> +			abort();
+> +		}
+>   		handlers[trap].func = func;
+>   		handlers[trap].data = data;
+> +	} else {
+> +		printf("invalid exception handler %#x\n", trap);
+> +		abort();
+>   	}
+>   }
+>   
+
+  Thomas
 
