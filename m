@@ -2,61 +2,61 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C8F036CA46B
-	for <lists+kvm@lfdr.de>; Mon, 27 Mar 2023 14:46:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9A7936CA46C
+	for <lists+kvm@lfdr.de>; Mon, 27 Mar 2023 14:46:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232601AbjC0MqT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Mar 2023 08:46:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41616 "EHLO
+        id S232550AbjC0MqU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Mar 2023 08:46:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41368 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232456AbjC0MqP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S232542AbjC0MqP (ORCPT <rfc822;kvm@vger.kernel.org>);
         Mon, 27 Mar 2023 08:46:15 -0400
-Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C89C4216
-        for <kvm@vger.kernel.org>; Mon, 27 Mar 2023 05:46:02 -0700 (PDT)
-Received: by mail-pl1-x62c.google.com with SMTP id ix20so8321087plb.3
-        for <kvm@vger.kernel.org>; Mon, 27 Mar 2023 05:46:02 -0700 (PDT)
+Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17D3F40F9
+        for <kvm@vger.kernel.org>; Mon, 27 Mar 2023 05:46:06 -0700 (PDT)
+Received: by mail-pl1-x62d.google.com with SMTP id kc4so8288181plb.10
+        for <kvm@vger.kernel.org>; Mon, 27 Mar 2023 05:46:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1679921162;
+        d=gmail.com; s=20210112; t=1679921165;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=7Ob1Ka1GDo4kUszz8YMerJdsHwWFQwfeKAyOzlxkgMc=;
-        b=c+YEwJEVLECEtmPkN75tqIWyoibov+g4LcIPV+9zj5LMyqwtXXuLGuhrvMxetIJEz2
-         gsiHpp+BLhj8TMEH+wSgL8xweD/mdqJ6VsNJ//stewOaNLCBnxVPn5IF340ShFycHK+v
-         0fFA/E9ZAvLWtyYiWVKpDt99jHMcza7lj5War+XENswOEu21FHEblUhm/7ogbLQkUkyL
-         02G7SNlRjP17Y9M2XBTKeXqt8dZbX8kybtKmBpzNiiUyepc+fsSmnHK03OwU6ZEl+CeM
-         ZeQLge+7Cn0zEsKmTTQm2wscM2lyEj8szWqacgQrYVbTdNaKtZ1UNM6SYJJDsReyVnqr
-         o1qw==
+        bh=/Jy6p6ZgvLWaGCNqcDbzzpAS+I4C9QxVLtT76Pj/K4Y=;
+        b=iLeMnTaMkLSU+O0HeCiBgZsLnjNNbzGQCR5AkrBB1p3WgluDTMGzP8dIhB/ZAm62OF
+         dXlsvHHjr339/u1S5VtsW+UJ76f1AGUtSrwS9LhhprCgVoDi8/wEeGxQmVlKR/IIc2Yu
+         BWyXjLVbmZLAgzK2EiJusqvxbXgmygwAoQs9d+HMBtDmQHGBuVQC8boZgl7SSjhyVseA
+         Gfwj21zJ6prDOzj5JhqSQ67Y76KAdjTUc1VUvl4T4zqE5MUqkSyOmYhrotuSBZ6zB3uY
+         XdTLVVXCQQsViz3RrqEYCCobtt+w5b3jhCUcWYVAJvdCP+WYuVBG0seA3SN9O4gLnKhd
+         BJ4A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679921162;
+        d=1e100.net; s=20210112; t=1679921165;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=7Ob1Ka1GDo4kUszz8YMerJdsHwWFQwfeKAyOzlxkgMc=;
-        b=y/TzWt9p6HKCGQtkC+ND8snfter6GemZLtGILiLkA+dYI2KRkPATc7CsdWQa62dUD6
-         8w0Y8V8Jkfib3oePpEGOmE7AcyEagWxhB0OSKQySbfsRvttOA7RPOivA6Sw3KhsR3pee
-         KYkan15nvgV2Sr55g2+DJXWosP8f/GY1f7IGHU5GS/f0NdoL8YJKe1aJMRSB76FbJACx
-         380uKedGc6uPFlIIYoo5p7WMkBX8gA1U3JwlLgOtcOWyuuIOCfpR+0UG4Vaplm8EILPI
-         UkQJ+UoChuKkw3WGd32Kf8wWXi59yLswh1kmGFSFd1DBoo5jq9GobvH2w0vYALUDWRYt
-         8HZg==
-X-Gm-Message-State: AAQBX9f/eKZdceNfNWOfPiA2YdZtzSnkrQiA6rXgaPY9GFBifzWkQq8s
-        gkNMER9rhekzMnSTXFeaesTsKsSX9JI=
-X-Google-Smtp-Source: AKy350aohabTNCzw6Ebj8r5zR6Y2fQGuegq50HCZBGegiiJ+lkjUzKO7o8TJ5w/jDAfxApx+luidgw==
-X-Received: by 2002:a17:902:cec5:b0:19c:bcb1:d8c3 with SMTP id d5-20020a170902cec500b0019cbcb1d8c3mr14637115plg.54.1679921161694;
-        Mon, 27 Mar 2023 05:46:01 -0700 (PDT)
+        bh=/Jy6p6ZgvLWaGCNqcDbzzpAS+I4C9QxVLtT76Pj/K4Y=;
+        b=AL4KbeGa9FKXfUgU1QAtIh1YAHrMzQVnSfMbXVK/0CpTih++zUmTAFZVywKJk92R7i
+         SeNOZyrprHbCRLgIbZ4E/akwMf5nZuhjivi/xM2LRPjK+drWZ3Rb2g7Wr9laD1BtUmX1
+         GTFcavofrTWyTJC6TUjNZEbzRKmzltxAFZRM8fvSBljSkmbu1lPPg6m2adQ73nrUL7l4
+         JBAxElb0Hkorf5IFMLMzVfqIo/410IYj7GPy7RBw97QJgtVJlcy2OP/P8EBVHsXBFiKi
+         pgFDTHrFUetHLvLg8yoDDbyXfWBCzOSyqc9BK69vBveZe3697JZyn1TLM+Y4yIx2lAI7
+         HuLQ==
+X-Gm-Message-State: AAQBX9fyYQ/2A8swx1GPcV8HxemAHA3EtpzLJ/4vRAGSj1ej8pfnpFek
+        aBrc+gRBQF4GmcA9Qg/lLtxrsjdwb9o=
+X-Google-Smtp-Source: AKy350YNW2E/HGL0Q0iH2ePO7Sx11fRsProFJzpX7G9DqYcnA89sOZcNkBITL6Gv8lL6ixaDoDX6SA==
+X-Received: by 2002:a17:903:41cd:b0:19a:a9d8:e47f with SMTP id u13-20020a17090341cd00b0019aa9d8e47fmr15750546ple.36.1679921164893;
+        Mon, 27 Mar 2023 05:46:04 -0700 (PDT)
 Received: from bobo.ozlabs.ibm.com ([203.221.180.225])
-        by smtp.gmail.com with ESMTPSA id ay6-20020a1709028b8600b0019a997bca5csm19053965plb.121.2023.03.27.05.45.58
+        by smtp.gmail.com with ESMTPSA id ay6-20020a1709028b8600b0019a997bca5csm19053965plb.121.2023.03.27.05.46.02
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Mar 2023 05:46:01 -0700 (PDT)
+        Mon, 27 Mar 2023 05:46:04 -0700 (PDT)
 From:   Nicholas Piggin <npiggin@gmail.com>
 To:     kvm@vger.kernel.org
 Cc:     Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org,
         Laurent Vivier <lvivier@redhat.com>,
         Thomas Huth <thuth@redhat.com>
-Subject: [kvm-unit-tests v3 09/13] powerpc: Expand exception handler vector granularity
-Date:   Mon, 27 Mar 2023 22:45:16 +1000
-Message-Id: <20230327124520.2707537-10-npiggin@gmail.com>
+Subject: [kvm-unit-tests v3 10/13] powerpc: Add support for more interrupts including HV interrupts
+Date:   Mon, 27 Mar 2023 22:45:17 +1000
+Message-Id: <20230327124520.2707537-11-npiggin@gmail.com>
 X-Mailer: git-send-email 2.37.2
 In-Reply-To: <20230327124520.2707537-1-npiggin@gmail.com>
 References: <20230327124520.2707537-1-npiggin@gmail.com>
@@ -72,64 +72,143 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Exception handlers are currently indexed in units of 0x100, but
-powerpc can have vectors that are aligned to as little as 0x20
-bytes. Increase granularity of the handler functions before
-adding support for thse vectors.
+Interrupt vectors were not being populated for all architected
+interrupt types, which could lead to crashes rather than a message for
+unhandled interrupts.
+
+0x20 sized vectors require some reworking of the code to fit. This
+also adds support for HV / HSRR type interrupts which will be used in
+a later change.
 
 Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 ---
-Since v2:
-- New patch
+ powerpc/cstart64.S | 79 ++++++++++++++++++++++++++++++++++++++--------
+ 1 file changed, 65 insertions(+), 14 deletions(-)
 
- lib/powerpc/processor.c | 17 +++++++++++------
- 1 file changed, 11 insertions(+), 6 deletions(-)
-
-diff --git a/lib/powerpc/processor.c b/lib/powerpc/processor.c
-index f8b7905..411e013 100644
---- a/lib/powerpc/processor.c
-+++ b/lib/powerpc/processor.c
-@@ -16,19 +16,24 @@
- static struct {
- 	void (*func)(struct pt_regs *, void *data);
- 	void *data;
--} handlers[16];
-+} handlers[128];
+diff --git a/powerpc/cstart64.S b/powerpc/cstart64.S
+index 34e3934..1bd0437 100644
+--- a/powerpc/cstart64.S
++++ b/powerpc/cstart64.S
+@@ -184,14 +184,6 @@ call_handler:
+ 	mfcr	r0
+ 	std	r0,_CCR(r1)
  
-+/*
-+ * Exception handlers span from 0x100 to 0x1000 and can have a granularity
-+ * of 0x20 bytes in some cases. Indexing spans 0-0x1000 with 0x20 increments
-+ * resulting in 128 slots.
-+ */
- void handle_exception(int trap, void (*func)(struct pt_regs *, void *),
- 		      void * data)
- {
--	if (trap & 0xff) {
-+	if (trap & 0x1f) {
- 		printf("invalid exception handler %#x\n", trap);
- 		abort();
- 	}
+-	/* nip and msr */
+-
+-	mfsrr0	r0
+-	std	r0, _NIP(r1)
+-
+-	mfsrr1	r0
+-	std	r0, _MSR(r1)
+-
+ 	/* restore TOC pointer */
  
--	trap >>= 8;
-+	trap >>= 5;
+ 	LOAD_REG_IMMEDIATE(r31, SPAPR_KERNEL_LOAD_ADDR)
+@@ -238,6 +230,7 @@ call_handler:
  
--	if (trap < 16) {
-+	if (trap < 128) {
- 		if (func && handlers[trap].func) {
- 			printf("exception handler installed twice %#x\n", trap);
- 			abort();
-@@ -45,9 +50,9 @@ void do_handle_exception(struct pt_regs *regs)
- {
- 	unsigned char v;
+ .section .text.ex
  
--	v = regs->trap >> 8;
-+	v = regs->trap >> 5;
++/* [H]VECTOR must not be more than 8 instructions to fit in 0x20 vectors */
+ .macro VECTOR vec
+ 	. = \vec
  
--	if (v < 16 && handlers[v].func) {
-+	if (v < 128 && handlers[v].func) {
- 		handlers[v].func(regs, handlers[v].data);
- 		return;
- 	}
+@@ -246,19 +239,28 @@ call_handler:
+ 	subi	r1,r1, INT_FRAME_SIZE
+ 
+ 	/* save r0 and ctr to call generic handler */
+-
+ 	SAVE_GPR(0,r1)
+ 
+-	mfctr	r0
+-	std	r0,_CTR(r1)
++	li	r0,\vec
++	std	r0,_TRAP(r1)
+ 
+-	ld	r0, P_HANDLER(0)
+-	mtctr	r0
++	b	handler_trampoline
++.endm
++
++.macro HVECTOR vec
++	. = \vec
++
++	mtsprg1	r1	/* save r1 */
++	mfsprg0	r1	/* get exception stack address */
++	subi	r1,r1, INT_FRAME_SIZE
++
++	/* save r0 and ctr to call generic handler */
++	SAVE_GPR(0,r1)
+ 
+ 	li	r0,\vec
+ 	std	r0,_TRAP(r1)
+ 
+-	bctr
++	b	handler_htrampoline
+ .endm
+ 
+ 	. = 0x100
+@@ -268,12 +270,61 @@ __start_interrupts:
+ VECTOR(0x100)
+ VECTOR(0x200)
+ VECTOR(0x300)
++VECTOR(0x380)
+ VECTOR(0x400)
++VECTOR(0x480)
+ VECTOR(0x500)
+ VECTOR(0x600)
+ VECTOR(0x700)
+ VECTOR(0x800)
+ VECTOR(0x900)
++HVECTOR(0x980)
++VECTOR(0xa00)
++VECTOR(0xc00)
++VECTOR(0xd00)
++HVECTOR(0xe00)
++HVECTOR(0xe20)
++HVECTOR(0xe40)
++HVECTOR(0xe60)
++HVECTOR(0xe80)
++HVECTOR(0xea0)
++VECTOR(0xf00)
++VECTOR(0xf20)
++VECTOR(0xf40)
++VECTOR(0xf60)
++HVECTOR(0xf80)
++
++handler_trampoline:
++	mfctr	r0
++	std	r0,_CTR(r1)
++
++	ld	r0, P_HANDLER(0)
++	mtctr	r0
++
++	/* nip and msr */
++	mfsrr0	r0
++	std	r0, _NIP(r1)
++
++	mfsrr1	r0
++	std	r0, _MSR(r1)
++
++	bctr
++
++handler_htrampoline:
++	mfctr	r0
++	std	r0,_CTR(r1)
++
++	ld	r0, P_HANDLER(0)
++	mtctr	r0
++
++	/* nip and msr */
++	mfhsrr0	r0
++	std	r0, _NIP(r1)
++
++	mfhsrr1	r0
++	std	r0, _MSR(r1)
++
++	bctr
+ 
+ 	.align 7
+ 	.globl __end_interrupts
 -- 
 2.37.2
 
