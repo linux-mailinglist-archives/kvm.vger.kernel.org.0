@@ -2,71 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3005F6CA785
-	for <lists+kvm@lfdr.de>; Mon, 27 Mar 2023 16:25:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DF5886CA78B
+	for <lists+kvm@lfdr.de>; Mon, 27 Mar 2023 16:26:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232691AbjC0OZO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Mar 2023 10:25:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39538 "EHLO
+        id S232943AbjC0O0m (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Mar 2023 10:26:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41256 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233147AbjC0OYv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Mar 2023 10:24:51 -0400
+        with ESMTP id S232918AbjC0O01 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Mar 2023 10:26:27 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73BF97DB2
-        for <kvm@vger.kernel.org>; Mon, 27 Mar 2023 07:22:28 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5D027690
+        for <kvm@vger.kernel.org>; Mon, 27 Mar 2023 07:24:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1679926947;
+        s=mimecast20190719; t=1679927065;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=vyn1Z4Cm3Qnn1B5gjs0PMw218V0pgoJF2q9YZrci5IA=;
-        b=dfxq7n3PnTXeg3Efz7F3Hi7lcQv+dDfdqIBSurLjvDdZ3zhg3DpHRi26SYtyBieCcH7sFx
-        Tx5tRFPFc4VoxANfBL1BFsuzzSyOORWzEw//xqhzuargqaSVKIkUuOWtS57nJqGNyS+6T5
-        Lz2o3CDX1R3W9rcQeIGpk/aGHD2phdE=
-Received: from mail-ua1-f70.google.com (mail-ua1-f70.google.com
- [209.85.222.70]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=HCb5CYARt/ke0PXUaZENV1Zy7rv4z1suyv4cHWiEzRY=;
+        b=FEsrlDTBKnCdpzcc9dVJltK0BTCgCABlqPigis6xjD9VgPY6I7uyUhj582cArbkGoA5ve0
+        oKMH1IoUFDFgZWOBVFLJuyU1JL2nskxTR5Mu8CSuEn81YVD90gXbo2ZipYtxxVVhC00hZn
+        KxiAeBoaWkW20R9/wNXeyxSE1G43yTk=
+Received: from mail-ua1-f72.google.com (mail-ua1-f72.google.com
+ [209.85.222.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-19-BLiNIsRrPIyvJlw-wbbkQA-1; Mon, 27 Mar 2023 10:22:25 -0400
-X-MC-Unique: BLiNIsRrPIyvJlw-wbbkQA-1
-Received: by mail-ua1-f70.google.com with SMTP id y14-20020ab020ae000000b0074fa36da8adso4243622ual.19
-        for <kvm@vger.kernel.org>; Mon, 27 Mar 2023 07:22:25 -0700 (PDT)
+ us-mta-371-xc06ov46Mj6XNaNbCjhUvw-1; Mon, 27 Mar 2023 10:24:24 -0400
+X-MC-Unique: xc06ov46Mj6XNaNbCjhUvw-1
+Received: by mail-ua1-f72.google.com with SMTP id cg20-20020a0561300c1400b007654e97787cso995327uab.17
+        for <kvm@vger.kernel.org>; Mon, 27 Mar 2023 07:24:23 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679926945;
+        d=1e100.net; s=20210112; t=1679927062;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=vyn1Z4Cm3Qnn1B5gjs0PMw218V0pgoJF2q9YZrci5IA=;
-        b=q2CIw3X4ISKhpwB8ft8GsdP3b7yWrjU68oq7PKo7tGOc9uok5MiWbmJCrO//EOsHfu
-         aE/XaVtKx6XvNjxk/NnN3dlUFaGcBegP3c+coGdXkesukcX3r/rAi1i7Q3luEQK2lgRC
-         zGA/mB30govzV+EawH2PrG9qOIiVdcMtFBTcjFN+4/yDu7Pnkc9h0k2ZWfVtvwkEeZF9
-         dIkEHGE2Fqin3BvV8by08L4gQcbRsRqgNMHNbhlP+tE8M2pvLRC5hnPB0WftKyGmUh15
-         Une1ZvFYECMmd7QMnJYpeF6J5CNcdZgTacL6w3DdzS1SmiRcZ0GY6Hr22kF35DUmR7Pa
-         W5Tg==
-X-Gm-Message-State: AAQBX9dcIyQJRQORWi/fYQ/UHSx+KqdmnERlYSdv6M17PNw6WZMw/EZU
-        rQhyjTVe6ATOCqKkhvrbW/9UCNSnQV2GO599+Kudry5txuR+VrPqyiy4P4ItRIz31SOJzpDKMbe
-        aaOCGwYzuzzzyPGDx6KzlNKJkbDh7
-X-Received: by 2002:a67:ca87:0:b0:425:d255:dd38 with SMTP id a7-20020a67ca87000000b00425d255dd38mr6251391vsl.1.1679926945218;
-        Mon, 27 Mar 2023 07:22:25 -0700 (PDT)
-X-Google-Smtp-Source: AKy350bl07pHGy/zP3d2BdHOczsEcEI97K10LYgkyXfU7tsU+NpG6dVmvmQkJy6N40BAAu9eE9DlNDALHagepcKfrtM=
-X-Received: by 2002:a67:ca87:0:b0:425:d255:dd38 with SMTP id
- a7-20020a67ca87000000b00425d255dd38mr6251374vsl.1.1679926944945; Mon, 27 Mar
- 2023 07:22:24 -0700 (PDT)
+        bh=HCb5CYARt/ke0PXUaZENV1Zy7rv4z1suyv4cHWiEzRY=;
+        b=tbIIpQWoeuJbGyVulPUA+ifdQ8HprSnatZX13ZGNkBREEnEN4/hGINbIQOY2mXSxYR
+         laz1WIK2rFIrESALCRSvf0o541ODFgeMzpl2p4pFIIf43mBXhGuxlryFvOlUbI79AkIy
+         dnoYLlj5Ct+Bs76zk0sbvPntJz2gzDW2LqJk3k+qAHOKSgISntDxgLc5iRPHoARR0VxN
+         M3XSqPOTGCtfjG8YzFupxSR+A1xR3CifqkogIwv2wnppcHMVMNSbg7YTrxI1n5M8a56d
+         lr4AD+jBQAKedXmk34fRMNT7WfFxYsdqYsKi7NzmpliEWM4QQJ0b+Ez0Htlk1N4a4HY4
+         Pmgg==
+X-Gm-Message-State: AAQBX9f/QWVZqZRjXi80wTc7bq2f3qspFkqulWoioGvLcugD4f9E9FAc
+        1ZoW+Tk+r+i5mIy8OO275MBkaBvlsugC2E68H4fGZpYCFzt2NDfcBmkwNcy+Hp3KtVcUtjD3xzR
+        hDl+86yLiaphufrHwOkctYz0VfAYg42dKb19KkBs=
+X-Received: by 2002:a05:6130:c91:b0:68b:94c5:7683 with SMTP id ch17-20020a0561300c9100b0068b94c57683mr8105352uab.0.1679927062160;
+        Mon, 27 Mar 2023 07:24:22 -0700 (PDT)
+X-Google-Smtp-Source: AKy350ZKtMex/tpaadhC7/A3kbiPaqwpdCTnb7TmvYuHGDG5Er/ULTE+vcIozX5oGSBN+/KNP3M3qgRvXJabwVIbX7U=
+X-Received: by 2002:a05:6130:c91:b0:68b:94c5:7683 with SMTP id
+ ch17-20020a0561300c9100b0068b94c57683mr8105338uab.0.1679927061918; Mon, 27
+ Mar 2023 07:24:21 -0700 (PDT)
 MIME-Version: 1.0
-References: <ZBPZ4D9MIsaCNDh6@thinky-boi> <ZB3o/jsQIwS+4g4E@linux.dev>
- <86v8imwhi1.wl-maz@kernel.org> <49385a34-6ad7-255d-68d9-6b41a76f01df@redhat.com>
- <86sfdqwa9h.wl-maz@kernel.org>
-In-Reply-To: <86sfdqwa9h.wl-maz@kernel.org>
+References: <CAAhSdy320bsv7=EBLcdiXyJcO6NWUFK9_XUvwF_KvFF8v91RpA@mail.gmail.com>
+In-Reply-To: <CAAhSdy320bsv7=EBLcdiXyJcO6NWUFK9_XUvwF_KvFF8v91RpA@mail.gmail.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Date:   Mon, 27 Mar 2023 16:22:13 +0200
-Message-ID: <CABgObfYYxznmrV1_ooDvjnDwXvL5EY=xF59Fs2stQOgnaF8Y5A@mail.gmail.com>
-Subject: Re: [GIT PULL] KVM/arm64 fixes for 6.3, part #2
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     Oliver Upton <oliver.upton@linux.dev>,
-        Will Deacon <will@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>, reijiw@google.com,
-        dmatlack@google.com, james.morse@arm.com, suzuki.poulose@arm.com,
-        yuzenghui@huawei.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org
+Date:   Mon, 27 Mar 2023 16:24:10 +0200
+Message-ID: <CABgObfaCR0NDj7ipZg2YYHnv4vQbOW4yz9140e+nyZBnF0QgyA@mail.gmail.com>
+Subject: Re: [GIT PULL] KVM/riscv fixes for 6.3, take #1
+To:     anup@brainfault.org
+Cc:     Palmer Dabbelt <palmer@dabbelt.com>,
+        Atish Patra <atishp@atishpatra.org>,
+        KVM General <kvm@vger.kernel.org>,
+        "open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" 
+        <kvm-riscv@lists.infradead.org>,
+        linux-riscv <linux-riscv@lists.infradead.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
@@ -79,28 +78,47 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Mar 27, 2023 at 4:15=E2=80=AFPM Marc Zyngier <maz@kernel.org> wrote=
-:
-> > It missed the pull request I sent on March 17th by a few hours.  I
-> > have queued it now and will send it to Linus later today.
->
-> Maybe you could help us here and state what is your schedule when it
-> comes to sending these pull requests? It would certainly help
-> coordinate and avoid wasting 10+ days to get things merged.
->
-> I appreciate that you don't need nor want to wait for us to send
-> something to Linus, but if we know when the train is departing, we can
-> make sure we're standing on the platform early enough.
-
-In general, sending the pull request to me on or before Thursday will
-work best, though I have no problem sending stuff to Linus on Sunday
-morning (so that architectures don't need to time their request too
-carefully).
-
-These weeks my Friday afternoon was more free than usual due to all
-meetings with American people moving one hour earlier, and that
-translated into different family plans for Friday itself and over the
-weekend.
+Pulled, thanks.
 
 Paolo
+
+On Fri, Mar 17, 2023 at 12:33=E2=80=AFPM Anup Patel <anup@brainfault.org> w=
+rote:
+>
+> Hi Paolo,
+>
+> We have one KVM RISC-V fix for 6.3:
+> 1) Fix VM hang in case of timer delta being zero
+>
+> Please pull.
+>
+> Regards,
+> Anup
+>
+> The following changes since commit eeac8ede17557680855031c6f305ece2378af3=
+26:
+>
+>   Linux 6.3-rc2 (2023-03-12 16:36:44 -0700)
+>
+> are available in the Git repository at:
+>
+>   https://github.com/kvm-riscv/linux.git tags/kvm-riscv-fixes-6.3-1
+>
+> for you to fetch changes up to 6eff38048944cadc3cddcf117acfa5199ec32490:
+>
+>   riscv/kvm: Fix VM hang in case of timer delta being zero.
+> (2023-03-17 13:32:54 +0530)
+>
+> ----------------------------------------------------------------
+> KVM/riscv fixes for 6.3, take #1
+>
+> - Fix VM hang in case of timer delta being zero
+>
+> ----------------------------------------------------------------
+> Rajnesh Kanwal (1):
+>       riscv/kvm: Fix VM hang in case of timer delta being zero.
+>
+>  arch/riscv/kvm/vcpu_timer.c | 6 ++----
+>  1 file changed, 2 insertions(+), 4 deletions(-)
+>
 
