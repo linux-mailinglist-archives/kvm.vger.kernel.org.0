@@ -2,59 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 503856CACD3
-	for <lists+kvm@lfdr.de>; Mon, 27 Mar 2023 20:16:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4A8696CACD0
+	for <lists+kvm@lfdr.de>; Mon, 27 Mar 2023 20:16:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231977AbjC0SQP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Mar 2023 14:16:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56246 "EHLO
+        id S231958AbjC0SQN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Mar 2023 14:16:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56248 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231871AbjC0SQL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S229808AbjC0SQL (ORCPT <rfc822;kvm@vger.kernel.org>);
         Mon, 27 Mar 2023 14:16:11 -0400
-Received: from mail-ed1-x533.google.com (mail-ed1-x533.google.com [IPv6:2a00:1450:4864:20::533])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2A0230E2
-        for <kvm@vger.kernel.org>; Mon, 27 Mar 2023 11:16:06 -0700 (PDT)
-Received: by mail-ed1-x533.google.com with SMTP id r11so39843489edd.5
-        for <kvm@vger.kernel.org>; Mon, 27 Mar 2023 11:16:06 -0700 (PDT)
+Received: from mail-ed1-x534.google.com (mail-ed1-x534.google.com [IPv6:2a00:1450:4864:20::534])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B51830E3
+        for <kvm@vger.kernel.org>; Mon, 27 Mar 2023 11:16:07 -0700 (PDT)
+Received: by mail-ed1-x534.google.com with SMTP id t10so39721482edd.12
+        for <kvm@vger.kernel.org>; Mon, 27 Mar 2023 11:16:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=grsecurity.net; s=grsec; t=1679940965;
+        d=grsecurity.net; s=grsec; t=1679940966;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=XE1yojV/hoOkVZOn9CEqppzBj+fchtb54t/c0FawRuY=;
-        b=u1Jr5RiRE42G8NsiUzQyhJYggtGgkVOXibiv3Z+HqQvJf9s4/OqX/0oGT/UYqMEU1T
-         3rgQzBDHNVlj0t2a+HrnMjYUevletNW/z8BF98/OqmIlWdPNvg7EmOpdhBDR8stSJHxR
-         +0mRIkyYN87cPAo9axO2MT7/xQpWNtEqHS649hvCU6LC8ID1QZ5B7vugDaAYMI1NY9mL
-         a8/Gah9B8pq6tpRRXTecv/Qk6XkWSYwUHDJpmnxuDeS7AtJGAnQimu8xXFvaKG3O6vTv
-         Yw00UMDFLzbqHu2TbTx+5wpEpzOORSBD1FjVt3unPfI+wIzlQz0BQrHbGnmhXEIHvL3k
-         1IdQ==
+        bh=pgCb2fD5/3eMjp/r7Z39wtlcsNNhW6d832f3xFbu6z0=;
+        b=Zy5ZYYDpVCTsv7jGGUVpvVKXsTpTCs98UuI8a0zYES7g0HoozlytNhDZBv0W5v8mXS
+         uPN9UwalCtoR6FlE/vE+9RU3EBv1sCC4d+E5PgZBarJb18E0evrEff1OVjWRkImGpUOv
+         eqq2P+5YhTpmS3O41xua/aKIzFFBTBzir1ec5VWdOaWS72KE+UOzlS+Emu60DSHoJUrl
+         mQJlSFwoE/6S7EQJGOD8Gwjrpj4KlyIx3pUau9NRDdWnC6EQHHmZu97rZGLGVO4WcCO8
+         2MLafTVk4TZsxkGRMX5oZnfMtiBqSrPWBlxnjVRAFQgAMNKjJ11OAL8MyxdG5cER8C0s
+         jj9A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679940965;
+        d=1e100.net; s=20210112; t=1679940966;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=XE1yojV/hoOkVZOn9CEqppzBj+fchtb54t/c0FawRuY=;
-        b=g3FK4ogld1DLNgpW9TjYVen6+4lqO1bW+OJIMWG8JRGiwwn1/RsxtIuNZS4Na+RLRK
-         Rk9npNfb8Tos+QRLlvrq4oFTYzKhHJomakTGWTIFlcRVaSG/8RSppdZay9eUsq5u4V4b
-         2LdX18l7CgA0JG4XYsUo7xA4KT9GUdAfKFlNhAUJ5NOPfpPEqj6uXVsufVBxXqooU6yX
-         OPyKkOSuqXKKkGehzAm0QtarDlKxFbBK/DAd8rEFwlRWnb+d7i0OQPKccNFC8zBMc22l
-         PgkNJ38DWeqEKJYhzPPBTuNDyDqFzkt+Bi6HQhbfDE9rp++giuaM3OyBJOjXAYJa/ITX
-         tFjg==
-X-Gm-Message-State: AAQBX9dzAUyvDk2K3y3QRHlBslliel2Bwi2jzahn2+Fk0pjkz5pSJVJC
-        voUUj7hLQtqEc8hD/VFPJ12P9eS3oMTdguirBEk=
-X-Google-Smtp-Source: AKy350Y+u7M0q20dYPiHHAELdOelMKlBd8+qD+X46E1E0nV8ljJe4fTcqnD8wcnzO9wtbnDWYkRmqA==
-X-Received: by 2002:a17:906:bcec:b0:926:8992:4310 with SMTP id op12-20020a170906bcec00b0092689924310mr13865482ejb.38.1679940965251;
+        bh=pgCb2fD5/3eMjp/r7Z39wtlcsNNhW6d832f3xFbu6z0=;
+        b=ukwUwZLO0rVZqvHRuOfRjRxZaWAbAHvpd8LrFDYEACmjOKGaEsvDcSBAjWDPj8YtlZ
+         LchcZpw6GkSGXw3+RM0j+Z7G54CLTsp4TAH4ZHC/Z8Ld7OJk9WaWvmQrCDd4JjMuGrqs
+         TDNIOSk3vcKFqvolt5cOlOy0TdKuDTyfCC4jQwTEvjViWkKJgFYk9Q+QEjzsz3AKzE0A
+         y2i+VaEBAkVqsCARCy97K8DwnyzH3YtDame38BKQy4WC1C3NaMK3tp9beR/ojsn/PATI
+         BwyKpcgSThhfjCyepEUqfh+wrnBJnhPtN0vHrxkiHT7MrY5cL1uungOnJCTMVwsTd2xD
+         XTqw==
+X-Gm-Message-State: AAQBX9dCsyGkZYarb9qpkhaZbztgNNa3sTljLvPKg8+skz0jZgkBMr13
+        QJ1uHmZF2yPngmruU/SvmXeo60kM6uINOLHSplDbiA==
+X-Google-Smtp-Source: AKy350Yh9SbDjDjICbd2mkUgfqkheXum97qedyuLYEO4GuV1MroSAJjDvJhRWLN/cbMXDTUUUgByMA==
+X-Received: by 2002:a17:906:b24e:b0:930:21a:c80 with SMTP id ce14-20020a170906b24e00b00930021a0c80mr13715716ejb.47.1679940965953;
         Mon, 27 Mar 2023 11:16:05 -0700 (PDT)
 Received: from localhost.localdomain (p4ffe007e.dip0.t-ipconnect.de. [79.254.0.126])
-        by smtp.gmail.com with ESMTPSA id 22-20020a170906309600b0092f289b6fdbsm14245396ejv.181.2023.03.27.11.16.04
+        by smtp.gmail.com with ESMTPSA id 22-20020a170906309600b0092f289b6fdbsm14245396ejv.181.2023.03.27.11.16.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Mar 2023 11:16:04 -0700 (PDT)
+        Mon, 27 Mar 2023 11:16:05 -0700 (PDT)
 From:   Mathias Krause <minipli@grsecurity.net>
 To:     kvm@vger.kernel.org
 Cc:     Mathias Krause <minipli@grsecurity.net>
-Subject: [kvm-unit-tests PATCH 1/2] x86: Use existing CR0.WP / CR4.SMEP bit definitions
-Date:   Mon, 27 Mar 2023 20:19:10 +0200
-Message-Id: <20230327181911.51655-2-minipli@grsecurity.net>
+Subject: [kvm-unit-tests PATCH 2/2] x86/access: CR0.WP toggling write access test
+Date:   Mon, 27 Mar 2023 20:19:11 +0200
+Message-Id: <20230327181911.51655-3-minipli@grsecurity.net>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230327181911.51655-1-minipli@grsecurity.net>
 References: <20230327181911.51655-1-minipli@grsecurity.net>
@@ -69,101 +69,95 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Use the existing bit definitions from x86/processor.h instead of
-defining our own.
+We already have tests that verify a write access to an r/o page is
+successful when CR0.WP=0, but we lack a test that explicitly verifies
+that the same access will fail after we set CR0.WP=1 without flushing
+any associated TLB entries either explicitly (INVLPG) or implicitly
+(write to CR3). Add such a test.
 
 Signed-off-by: Mathias Krause <minipli@grsecurity.net>
 ---
- x86/access.c | 11 ++++-------
- x86/pks.c    |  5 ++---
- x86/pku.c    |  5 ++---
- 3 files changed, 8 insertions(+), 13 deletions(-)
+ x86/access.c | 46 ++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 44 insertions(+), 2 deletions(-)
 
 diff --git a/x86/access.c b/x86/access.c
-index 4dfec23073f7..203353a3f74f 100644
+index 203353a3f74f..5fe2a89ddfa9 100644
 --- a/x86/access.c
 +++ b/x86/access.c
-@@ -20,9 +20,6 @@ static int invalid_mask;
- #define PT_BASE_ADDR_MASK ((pt_element_t)((((pt_element_t)1 << 36) - 1) & PAGE_MASK))
- #define PT_PSE_BASE_ADDR_MASK (PT_BASE_ADDR_MASK & ~(1ull << 21))
- 
--#define CR0_WP_MASK (1UL << 16)
--#define CR4_SMEP_MASK (1UL << 20)
--
- #define PFERR_PRESENT_MASK (1U << 0)
- #define PFERR_WRITE_MASK (1U << 1)
- #define PFERR_USER_MASK (1U << 2)
-@@ -239,9 +236,9 @@ static void set_cr0_wp(int wp)
- {
- 	unsigned long cr0 = shadow_cr0;
- 
--	cr0 &= ~CR0_WP_MASK;
-+	cr0 &= ~X86_CR0_WP;
- 	if (wp)
--		cr0 |= CR0_WP_MASK;
-+		cr0 |= X86_CR0_WP;
- 	if (cr0 != shadow_cr0) {
- 		write_cr0(cr0);
- 		shadow_cr0 = cr0;
-@@ -272,9 +269,9 @@ static unsigned set_cr4_smep(ac_test_t *at, int smep)
- 	unsigned long cr4 = shadow_cr4;
- 	unsigned r;
- 
--	cr4 &= ~CR4_SMEP_MASK;
-+	cr4 &= ~X86_CR4_SMEP;
- 	if (smep)
--		cr4 |= CR4_SMEP_MASK;
-+		cr4 |= X86_CR4_SMEP;
- 	if (cr4 == shadow_cr4)
- 		return 0;
- 
-diff --git a/x86/pks.c b/x86/pks.c
-index ef95fb96c597..bda15efc546d 100644
---- a/x86/pks.c
-+++ b/x86/pks.c
-@@ -5,7 +5,6 @@
- #include "x86/vm.h"
- #include "x86/msr.h"
- 
--#define CR0_WP_MASK      (1UL << 16)
- #define PTE_PKEY_BIT     59
- #define SUPER_BASE        (1 << 23)
- #define SUPER_VAR(v)      (*((__typeof__(&(v))) (((unsigned long)&v) + SUPER_BASE)))
-@@ -18,9 +17,9 @@ static void set_cr0_wp(int wp)
- {
-     unsigned long cr0 = read_cr0();
- 
--    cr0 &= ~CR0_WP_MASK;
-+    cr0 &= ~X86_CR0_WP;
-     if (wp)
--        cr0 |= CR0_WP_MASK;
-+        cr0 |= X86_CR0_WP;
-     write_cr0(cr0);
+@@ -575,9 +575,10 @@ fault:
+ 		at->expected_error &= ~PFERR_FETCH_MASK;
  }
  
-diff --git a/x86/pku.c b/x86/pku.c
-index 51ff412cef82..6c0d72cc6f81 100644
---- a/x86/pku.c
-+++ b/x86/pku.c
-@@ -5,7 +5,6 @@
- #include "x86/vm.h"
- #include "x86/msr.h"
- 
--#define CR0_WP_MASK      (1UL << 16)
- #define PTE_PKEY_BIT     59
- #define USER_BASE        (1 << 23)
- #define USER_VAR(v)      (*((__typeof__(&(v))) (((unsigned long)&v) + USER_BASE)))
-@@ -18,9 +17,9 @@ static void set_cr0_wp(int wp)
+-static void ac_set_expected_status(ac_test_t *at)
++static void __ac_set_expected_status(ac_test_t *at, bool flush)
  {
-     unsigned long cr0 = read_cr0();
+-	invlpg(at->virt);
++	if (flush)
++		invlpg(at->virt);
  
--    cr0 &= ~CR0_WP_MASK;
-+    cr0 &= ~X86_CR0_WP;
-     if (wp)
--        cr0 |= CR0_WP_MASK;
-+        cr0 |= X86_CR0_WP;
-     write_cr0(cr0);
+ 	if (at->ptep)
+ 		at->expected_pte = *at->ptep;
+@@ -599,6 +600,11 @@ static void ac_set_expected_status(ac_test_t *at)
+ 	ac_emulate_access(at, at->flags);
  }
+ 
++static void ac_set_expected_status(ac_test_t *at)
++{
++	__ac_set_expected_status(at, true);
++}
++
+ static pt_element_t ac_get_pt(ac_test_t *at, int i, pt_element_t *ptep)
+ {
+ 	pt_element_t pte;
+@@ -1061,6 +1067,41 @@ err:
+ 	return 0;
+ }
+ 
++static int check_write_cr0wp(ac_pt_env_t *pt_env)
++{
++	ac_test_t at1;
++
++	ac_test_init(&at1, 0xffff923042007000ul, pt_env);
++
++	at1.flags = AC_PDE_PRESENT_MASK | AC_PTE_PRESENT_MASK |
++		    AC_PDE_ACCESSED_MASK | AC_PTE_ACCESSED_MASK |
++		    AC_CPU_CR0_WP_MASK |
++		    AC_ACCESS_WRITE_MASK;
++	ac_test_setup_ptes(&at1);
++
++	/*
++	 * Write to r/o page with cr0.wp=0, then try again
++	 * with cr0.wp=1 and expect a page fault to happen.
++	 */
++	if (!ac_test_do_access(&at1)) {
++		printf("%s: CR0.WP=0 r/o write fail\n", __FUNCTION__);
++		goto err;
++	}
++
++	at1.flags &= ~AC_CPU_CR0_WP_MASK;
++	__ac_set_expected_status(&at1, false);
++
++	if (!ac_test_do_access(&at1)) {
++		printf("%s: CR0.WP=1 r/o write deny fail\n", __FUNCTION__);
++		goto err;
++	}
++
++	return 1;
++
++err:
++	return 0;
++}
++
+ static int check_effective_sp_permissions(ac_pt_env_t *pt_env)
+ {
+ 	unsigned long ptr1 = 0xffff923480000000;
+@@ -1150,6 +1191,7 @@ const ac_test_fn ac_test_cases[] =
+ 	check_pfec_on_prefetch_pte,
+ 	check_large_pte_dirty_for_nowp,
+ 	check_smep_andnot_wp,
++	check_write_cr0wp,
+ 	check_effective_sp_permissions,
+ };
  
 -- 
 2.39.2
