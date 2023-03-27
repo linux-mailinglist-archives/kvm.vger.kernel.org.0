@@ -2,135 +2,169 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9C1376CA7DE
-	for <lists+kvm@lfdr.de>; Mon, 27 Mar 2023 16:39:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 84D6C6CA80E
+	for <lists+kvm@lfdr.de>; Mon, 27 Mar 2023 16:46:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230380AbjC0Oj4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Mar 2023 10:39:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41282 "EHLO
+        id S232531AbjC0OqO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Mar 2023 10:46:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49248 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233073AbjC0Ojz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Mar 2023 10:39:55 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87538358B
-        for <kvm@vger.kernel.org>; Mon, 27 Mar 2023 07:39:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1679927948;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=XoDLXhYZX6z7BtIjLUpiIi7lTU4JmFeBrYERY2LWfk0=;
-        b=NwYdjZN5xaKKJ3/+9FJMMRk2/m6cu4cyCipO7i+2+bUE1i4K5VrTl7/GDdsbvlaZ4rRgdb
-        t658V60eajZ+xkPFgXUMpy8T1NmKLKSsuVWnBk0THaIWuZtJyK8bUQxekWIn8sT5h6cEXx
-        kWuExuWZD70Q8ksHvKTPGNctvQ6TvgM=
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
- [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-342-D8joogq7NTG1k_XlOAn-fQ-1; Mon, 27 Mar 2023 10:39:05 -0400
-X-MC-Unique: D8joogq7NTG1k_XlOAn-fQ-1
-Received: by mail-qk1-f200.google.com with SMTP id d72-20020ae9ef4b000000b007467a30076fso4075053qkg.18
-        for <kvm@vger.kernel.org>; Mon, 27 Mar 2023 07:39:05 -0700 (PDT)
+        with ESMTP id S232488AbjC0OqL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Mar 2023 10:46:11 -0400
+Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2EDB43C0F
+        for <kvm@vger.kernel.org>; Mon, 27 Mar 2023 07:46:07 -0700 (PDT)
+Received: by mail-pj1-x1029.google.com with SMTP id p3-20020a17090a74c300b0023f69bc7a68so9078259pjl.4
+        for <kvm@vger.kernel.org>; Mon, 27 Mar 2023 07:46:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112; t=1679928367;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=WyO156dQOa4nrRRrp9o61JeRohlnTbUgCnQnaqzKKFI=;
+        b=MWxe8tDNfZkZmP+j8FlP+iAP6YkXjhiJOU8ZThJz7vpDT/1ROeHFd0Rg5by5dzjwr/
+         lG5UanLOkyRDkT/V+boBeTts6mrFEjoVkLsW39sYC9DK5o+FWRoubkyYUCCOIHAVFbBq
+         BoBCLeNAfE6iyqVsm1s74lOOQ3sFRzbimAc6Eb/icnJ5nmSh7n0hp2FgulsSc36P14Qe
+         RcqHBcr9XU2FXrPUFHqu9mUVjRJTM9VGrdl0c3DlTSUlRpHnWJ3ARqEhsApNkWR5xqgb
+         Gnx6K6epkJRBdPN4dbsEvkMODX8p1abQErl3wVUk9Kw023jKpslOy+hpq2sOlYcN8NbH
+         smuQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679927945;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=XoDLXhYZX6z7BtIjLUpiIi7lTU4JmFeBrYERY2LWfk0=;
-        b=moi8rIdWun0FqVeazt1FIVwd2ZxNQUOMwP7BSyupMm95UupwoYFkclCvg8HbJ/QPBD
-         Y8rgLIuV8yc+Pqm/Z2hNohdHF2fQwqK10UjHLWnsEsxXzVnRlmZK1CFfj+MlDnoz7Azz
-         i3GcpIjqmkKk5OKDoLk8dVEsfYysu1KQz2PmwzYD0k9RyFPi5yTQdSAMxaj6RE9rhLkI
-         fMHJdKGh3zj7z8kp1V3uyWOaVXjGnz9t/mCg5vRM6xutseHoUVgyYgP6xHXqDg6T/Dhf
-         8rJBbLnwUQu6chXGMxfC1Tivfq+2Rby+RL8609KX7YDcXk503Qsyslt+8vMqg7GlcuJj
-         hOWA==
-X-Gm-Message-State: AO0yUKWU5LAaWOmR98bnAc2pUHgz6WtkDymOrYiGqBF1Bk3V6xza0F3I
-        EWa/MQbTs+qq44oYlSq7eo/NL7D3kZgIZPUTOULSp20RekmerRp5kO7sH9D0frVkbmZgA1EfWxd
-        rV3AnnXbzC13V
-X-Received: by 2002:a05:622a:1648:b0:3b8:6ae9:b10d with SMTP id y8-20020a05622a164800b003b86ae9b10dmr20414132qtj.2.1679927944793;
-        Mon, 27 Mar 2023 07:39:04 -0700 (PDT)
-X-Google-Smtp-Source: AK7set+AIVfKyZ43ZdQzZE7WjGbMC2MuGN2mWA2dKyIEH1RqiiXs9Z6es282UQxXRqnv8qSeMs3zsw==
-X-Received: by 2002:a05:622a:1648:b0:3b8:6ae9:b10d with SMTP id y8-20020a05622a164800b003b86ae9b10dmr20414102qtj.2.1679927944544;
-        Mon, 27 Mar 2023 07:39:04 -0700 (PDT)
-Received: from [192.168.0.3] (ip-109-43-177-5.web.vodafone.de. [109.43.177.5])
-        by smtp.gmail.com with ESMTPSA id y3-20020a37f603000000b0074382b756c2sm16747347qkj.14.2023.03.27.07.39.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 27 Mar 2023 07:39:03 -0700 (PDT)
-Message-ID: <229dd5e2-b757-d28b-b9db-0d9efce4c5d1@redhat.com>
-Date:   Mon, 27 Mar 2023 16:39:00 +0200
+        d=1e100.net; s=20210112; t=1679928367;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=WyO156dQOa4nrRRrp9o61JeRohlnTbUgCnQnaqzKKFI=;
+        b=jZiPoBW6vLF8bT9ORePlQuBawTSnfEecroo4HAg3ssR6S3gxCyqhO2W9mBkiSPWZwR
+         AXB6HqTazcAewRXqpov8xvLXDbHQY3yrBmdk5tWZg7SFwZ6MX9HNOCDARMmio9WpCl0Q
+         clvR4VhlvzfjnM4EzOZG5d9V/6fWMdSGm9LT8wceptTkd1SCFtt4sQbIOeNAxSmVpinL
+         ND50W75a62KRQ74SDPSrP026O2XEy09fesLpzsaCQwXz+s6wPWq5vZnKenFoT2gCBCFg
+         tVSHIogl/asxIuEorbWPeTi2uoNXbHgxbvbw7aB98hUAq5bqbTDfJlXHqVByL1b/LaRC
+         npbA==
+X-Gm-Message-State: AAQBX9dnpXvAc/QLU1VOg+dhgIieTzCCf6azkZHZk2oV9KvTStpRnV55
+        wtuyv25olhj/ALu4pFRaEcY=
+X-Google-Smtp-Source: AKy350Yr+ALjPHrl3lCIju8vOpbTMlRt8F29e0yc28+rRemcldzgFDYCgDKAffOoNqH4LY8l/xrTbg==
+X-Received: by 2002:a17:902:f906:b0:1a1:a7b6:e31e with SMTP id kw6-20020a170902f90600b001a1a7b6e31emr10608452plb.7.1679928366845;
+        Mon, 27 Mar 2023 07:46:06 -0700 (PDT)
+Received: from fedlinux.. ([106.84.130.102])
+        by smtp.gmail.com with ESMTPSA id s21-20020a170902b19500b00183c6784704sm17368276plr.291.2023.03.27.07.45.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 27 Mar 2023 07:46:06 -0700 (PDT)
+From:   Sam Li <faithilikerun@gmail.com>
+To:     qemu-devel@nongnu.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Eric Blake <eblake@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Markus Armbruster <armbru@redhat.com>,
+        Raphael Norwitz <raphael.norwitz@nutanix.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Hanna Reitz <hreitz@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>, dmitry.fomichev@wdc.com,
+        kvm@vger.kernel.org, damien.lemoal@opensource.wdc.com,
+        hare@suse.de, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
+        Sam Li <faithilikerun@gmail.com>
+Subject: [PATCH v9 0/5] Add zoned storage emulation to virtio-blk driver
+Date:   Mon, 27 Mar 2023 22:45:48 +0800
+Message-Id: <20230327144553.4315-1-faithilikerun@gmail.com>
+X-Mailer: git-send-email 2.39.2
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.13.0
-Subject: Re: [kvm-unit-tests v3 03/13] powerpc: Add some checking to exception
- handler install
-Content-Language: en-US
-To:     Nicholas Piggin <npiggin@gmail.com>, kvm@vger.kernel.org
-Cc:     linuxppc-dev@lists.ozlabs.org, Laurent Vivier <lvivier@redhat.com>
-References: <20230327124520.2707537-1-npiggin@gmail.com>
- <20230327124520.2707537-4-npiggin@gmail.com>
-From:   Thomas Huth <thuth@redhat.com>
-In-Reply-To: <20230327124520.2707537-4-npiggin@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
+        DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 27/03/2023 14.45, Nicholas Piggin wrote:
-> Check to ensure exception handlers are not being overwritten or
-> invalid exception numbers are used.
-> 
-> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
-> ---
-> Since v2:
-> - New patch
-> 
->   lib/powerpc/processor.c | 12 ++++++++++++
->   1 file changed, 12 insertions(+)
-> 
-> diff --git a/lib/powerpc/processor.c b/lib/powerpc/processor.c
-> index ec85b9d..70391aa 100644
-> --- a/lib/powerpc/processor.c
-> +++ b/lib/powerpc/processor.c
-> @@ -19,11 +19,23 @@ static struct {
->   void handle_exception(int trap, void (*func)(struct pt_regs *, void *),
->   		      void * data)
->   {
-> +	if (trap & 0xff) {
+This patch adds zoned storage emulation to the virtio-blk driver. It
+implements the virtio-blk ZBD support standardization that is
+recently accepted by virtio-spec. The link to related commit is at
 
-You could check for the other "invalid exception handler" condition here 
-already, i.e. if (trap & ~0xf00) ...
+https://github.com/oasis-tcs/virtio-spec/commit/b4e8efa0fa6c8d844328090ad15db65af8d7d981
 
-I'd maybe simply do an "assert(!(trap & ~0xf00))" here.
+The Linux zoned device code that implemented by Dmitry Fomichev has been
+released at the latest Linux version v6.3-rc1.
 
-> +		printf("invalid exception handler %#x\n", trap);
-> +		abort();
-> +	}
-> +
->   	trap >>= 8;
->   
->   	if (trap < 16) {
+Aside: adding zoned=on alike options to virtio-blk device will be
+considered in following-up plan.
 
-... then you could get rid of the if-statement here and remove one level of 
-indentation in the code below.
+Note: Sorry to send it again because of the previous incoherent patches caused
+by network error.
 
-> +		if (func && handlers[trap].func) {
-> +			printf("exception handler installed twice %#x\n", trap);
-> +			abort();
-> +		}
->   		handlers[trap].func = func;
->   		handlers[trap].data = data;
-> +	} else {
-> +		printf("invalid exception handler %#x\n", trap);
-> +		abort();
->   	}
->   }
->   
+v9:
+- address review comments
+  * add docs for zoned emulation use case [Matias]
+  * add the zoned feature bit to qmp monitor [Matias]
+  * add the version number for newly added configs of accounting [Markus]
 
-  Thomas
+v8:
+- address Stefan's review comments
+  * rm aio_context_acquire/release in handle_req
+  * rename function return type
+  * rename BLOCK_ACCT_APPEND to BLOCK_ACCT_ZONE_APPEND for clarity
+
+v7:
+- update headers to v6.3-rc1
+
+v6:
+- address Stefan's review comments
+  * add accounting for zone append operation
+  * fix in_iov usage in handle_request, error handling and typos
+
+v5:
+- address Stefan's review comments
+  * restore the way writing zone append result to buffer
+  * fix error checking case and other errands
+
+v4:
+- change the way writing zone append request result to buffer
+- change zone state, zone type value of virtio_blk_zone_descriptor
+- add trace events for new zone APIs
+
+v3:
+- use qemuio_from_buffer to write status bit [Stefan]
+- avoid using req->elem directly [Stefan]
+- fix error checkings and memory leak [Stefan]
+
+v2:
+- change units of emulated zone op coresponding to block layer APIs
+- modify error checking cases [Stefan, Damien]
+
+v1:
+- add zoned storage emulation
+
+Sam Li (5):
+  include: update virtio_blk headers to v6.3-rc1
+  virtio-blk: add zoned storage emulation for zoned devices
+  block: add accounting for zone append operation
+  virtio-blk: add some trace events for zoned emulation
+  docs/zoned-storage:add zoned emulation use case
+
+ block/qapi-sysemu.c                          |  11 +
+ block/qapi.c                                 |  18 +
+ docs/devel/zoned-storage.rst                 |  17 +
+ hw/block/trace-events                        |   7 +
+ hw/block/virtio-blk-common.c                 |   2 +
+ hw/block/virtio-blk.c                        | 405 +++++++++++++++++++
+ hw/virtio/virtio-qmp.c                       |   2 +
+ include/block/accounting.h                   |   1 +
+ include/standard-headers/drm/drm_fourcc.h    |  12 +
+ include/standard-headers/linux/ethtool.h     |  48 ++-
+ include/standard-headers/linux/fuse.h        |  45 ++-
+ include/standard-headers/linux/pci_regs.h    |   1 +
+ include/standard-headers/linux/vhost_types.h |   2 +
+ include/standard-headers/linux/virtio_blk.h  | 105 +++++
+ linux-headers/asm-arm64/kvm.h                |   1 +
+ linux-headers/asm-x86/kvm.h                  |  34 +-
+ linux-headers/linux/kvm.h                    |   9 +
+ linux-headers/linux/vfio.h                   |  15 +-
+ linux-headers/linux/vhost.h                  |   8 +
+ qapi/block-core.json                         |  68 +++-
+ qapi/block.json                              |   4 +
+ 21 files changed, 794 insertions(+), 21 deletions(-)
+
+-- 
+2.39.2
 
