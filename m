@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DF68C6C9D8B
-	for <lists+kvm@lfdr.de>; Mon, 27 Mar 2023 10:21:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F289F6C9D8E
+	for <lists+kvm@lfdr.de>; Mon, 27 Mar 2023 10:21:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232972AbjC0IVc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Mar 2023 04:21:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54848 "EHLO
+        id S233020AbjC0IVf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Mar 2023 04:21:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54852 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232750AbjC0IV1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Mar 2023 04:21:27 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2303E2D6B;
+        with ESMTP id S232334AbjC0IV2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Mar 2023 04:21:28 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 618762D7F;
         Mon, 27 Mar 2023 01:21:26 -0700 (PDT)
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 32R8Jrev019876;
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 32R6Z62S029211;
         Mon, 27 Mar 2023 08:21:25 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding; s=pp1;
- bh=Nu2vmP304KYlYB7OsbUwR46x3wWsyvpZuGgqCP3TdyI=;
- b=nbE2HXVcUA/TsYJNzBITqDSuyNpaIUFGrxErrWyLkaBf4hMeHx7u6PmA0zTSh5avTwt7
- uhp1nI0ZSBv7pfuNvSKgR3eCXYAiIqL3ojUkEabKFOpOeB6LJ6fj7AXF5B8gITuWDmZC
- riA/nGuey35tk6N61lPvCi7i91q1ahDyCExJCoTR85USm70hiJ+D4Ex4Kl0MnNNgOGN6
- JYfRdYODTwhsAUQRP+ukretioAyeKLhHZC9yFqTMrMg/Gxzu+saOgaq3U9ZQxeqL38zh
- ZDB8LdoyWf6PzCAbCkL+pBIlB/2aIIa9rsU8L7gXk/6FsqleCYXIyDz8RUlNOu+Q2bdF Qw== 
+ bh=XW7sKwX/Oza22nYpsoQQ/e9KAEw08QyqBicX3+xcjAo=;
+ b=HSZKBgMIaaiEortqs6QMpC5sMhUaDrJxTJLqRLTrSLoK5rHZJBM/+D9RPrOyqjJ4eoCC
+ oLpEQT25u007GDHrREFwtLTcMed2PrZjkt/XZzzh/xXkKa9kwdNAC+7gRExEjwgSc47O
+ 8dtIoRmyTC7YRz2s+qGZYDs4WQ2cDWLU46IprlsXd/d0DDBiL4JP5wMpLIKhms4L0RaW
+ A2veZt0oZbVRKNDaM+j1tih+QRpha/wduinKn4ZWtG8BtZ/IqYu//ujhK1UFPtRiFNmB
+ n26OvSBl1KfHQ0U+psgkcw3m8mi2YkXhitickZdj7DWWhhzoPKrlPJbFFI3BQG6+wKnd SA== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3pjahs9sd8-1
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pjatr9de7-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Mon, 27 Mar 2023 08:21:25 +0000
-Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 32R8LO0W005947;
-        Mon, 27 Mar 2023 08:21:24 GMT
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3pjahs9sck-1
+Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 32R7t1Oh010497;
+        Mon, 27 Mar 2023 08:21:25 GMT
+Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pjatr9ddt-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Mon, 27 Mar 2023 08:21:24 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 32QH1Hg4019202;
-        Mon, 27 Mar 2023 08:21:22 GMT
+Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
+        by ppma01fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 32QM9pj5015060;
+        Mon, 27 Mar 2023 08:21:23 GMT
 Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-        by ppma03ams.nl.ibm.com (PPS) with ESMTPS id 3phrk6jgt6-1
+        by ppma01fra.de.ibm.com (PPS) with ESMTPS id 3phrk6j6sx-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 27 Mar 2023 08:21:22 +0000
+        Mon, 27 Mar 2023 08:21:23 +0000
 Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-        by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 32R8LJbi46006686
+        by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 32R8LJm346006688
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
         Mon, 27 Mar 2023 08:21:19 GMT
 Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 66CC72004D;
+        by IMSVA (Postfix) with ESMTP id 8B3E12004B;
         Mon, 27 Mar 2023 08:21:19 +0000 (GMT)
 Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 472D42004E;
+        by IMSVA (Postfix) with ESMTP id 6BEFF2004F;
         Mon, 27 Mar 2023 08:21:19 +0000 (GMT)
 Received: from t35lp63.lnxne.boe (unknown [9.152.108.100])
         by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
@@ -60,25 +60,25 @@ Received: from t35lp63.lnxne.boe (unknown [9.152.108.100])
 From:   Nico Boehr <nrb@linux.ibm.com>
 To:     frankja@linux.ibm.com, imbrenda@linux.ibm.com, thuth@redhat.com
 Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org
-Subject: [kvm-unit-tests PATCH v1 3/4] s390x: lib: sie: don't reenter SIE on pgm int
-Date:   Mon, 27 Mar 2023 10:21:17 +0200
-Message-Id: <20230327082118.2177-4-nrb@linux.ibm.com>
+Subject: [kvm-unit-tests PATCH v1 4/4] s390x: add a test for SIE without MSO/MSL
+Date:   Mon, 27 Mar 2023 10:21:18 +0200
+Message-Id: <20230327082118.2177-5-nrb@linux.ibm.com>
 X-Mailer: git-send-email 2.39.1
 In-Reply-To: <20230327082118.2177-1-nrb@linux.ibm.com>
 References: <20230327082118.2177-1-nrb@linux.ibm.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 13XIcrQu9_gwWhv4cazIZI397esK2lp4
-X-Proofpoint-ORIG-GUID: LsKibp6gkhwIK4F4jgOVs6ewzU9YxtPg
+X-Proofpoint-ORIG-GUID: gm7-e5A9oAD0c483ltYM0PgM5ZVptky6
+X-Proofpoint-GUID: HGQwP9ntuJghLXcuX0fIAZmoBX9nZaZ5
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
  definitions=2023-03-24_11,2023-03-24_01,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 suspectscore=0
- phishscore=0 adultscore=0 lowpriorityscore=0 bulkscore=0 mlxscore=0
- clxscore=1015 spamscore=0 priorityscore=1501 impostorscore=0
- mlxlogscore=995 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2303200000 definitions=main-2303270065
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 impostorscore=0
+ mlxlogscore=999 priorityscore=1501 adultscore=0 spamscore=0 mlxscore=0
+ phishscore=0 bulkscore=0 malwarescore=0 suspectscore=0 lowpriorityscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2303200000
+ definitions=main-2303270065
 X-Spam-Status: No, score=-0.1 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
         DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
         autolearn=unavailable autolearn_force=no version=3.4.6
@@ -88,91 +88,241 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-At the moment, when a PGM int occurs while in SIE, we will just reenter
-SIE after the interrupt handler was called.
-
-This is because sie() has a loop which checks icptcode and re-enters SIE
-if it is zero.
-
-However, this behaviour is quite undesirable for SIE tests, since it
-doesn't give the host the chance to assert on the PGM int. Instead, we
-will just re-enter SIE, on nullifing conditions even causing the
-exception again.
-
-Add a flag PROG_PGM_IN_SIE set by the pgm int fixup which indicates a
-program interrupt has occured in SIE. Check for the flag in sie() and if
-it's set return from sie() to give the host the ability to react on the
-exception. The host may check if a PGM int has occured in the guest
-using the new function sie_had_pgm_int().
+Since we now have the ability to run guests without MSO/MSL, add a test
+to make sure this doesn't break.
 
 Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
 ---
- lib/s390x/interrupt.c |  6 ++++++
- lib/s390x/sie.c       | 10 +++++++++-
- lib/s390x/sie.h       |  1 +
- 3 files changed, 16 insertions(+), 1 deletion(-)
+ s390x/Makefile             |   2 +
+ s390x/sie-dat.c            | 121 +++++++++++++++++++++++++++++++++++++
+ s390x/snippets/c/sie-dat.c |  58 ++++++++++++++++++
+ s390x/unittests.cfg        |   3 +
+ 4 files changed, 184 insertions(+)
+ create mode 100644 s390x/sie-dat.c
+ create mode 100644 s390x/snippets/c/sie-dat.c
 
-diff --git a/lib/s390x/interrupt.c b/lib/s390x/interrupt.c
-index eb3d6a9b701d..9baf7a003f52 100644
---- a/lib/s390x/interrupt.c
-+++ b/lib/s390x/interrupt.c
-@@ -106,10 +106,16 @@ void register_ext_cleanup_func(void (*f)(struct stack_frame_int *))
+diff --git a/s390x/Makefile b/s390x/Makefile
+index 97a616111680..e27650d7811b 100644
+--- a/s390x/Makefile
++++ b/s390x/Makefile
+@@ -39,6 +39,7 @@ tests += $(TEST_DIR)/panic-loop-extint.elf
+ tests += $(TEST_DIR)/panic-loop-pgm.elf
+ tests += $(TEST_DIR)/migration-sck.elf
+ tests += $(TEST_DIR)/exittime.elf
++tests += $(TEST_DIR)/sie-dat.elf
  
- static void fixup_pgm_int(struct stack_frame_int *stack)
- {
-+	struct kvm_s390_sie_block *sblk;
+ pv-tests += $(TEST_DIR)/pv-diags.elf
+ 
+@@ -114,6 +115,7 @@ snippet_lib = $(snippet_asmlib) lib/auxinfo.o
+ # perquisites (=guests) for the snippet hosts.
+ # $(TEST_DIR)/<snippet-host>.elf: snippets = $(SNIPPET_DIR)/<c/asm>/<snippet>.gbin
+ $(TEST_DIR)/mvpg-sie.elf: snippets = $(SNIPPET_DIR)/c/mvpg-snippet.gbin
++$(TEST_DIR)/sie-dat.elf: snippets = $(SNIPPET_DIR)/c/sie-dat.gbin
+ $(TEST_DIR)/spec_ex-sie.elf: snippets = $(SNIPPET_DIR)/c/spec_ex.gbin
+ 
+ $(TEST_DIR)/pv-diags.elf: pv-snippets += $(SNIPPET_DIR)/asm/snippet-pv-diag-yield.gbin
+diff --git a/s390x/sie-dat.c b/s390x/sie-dat.c
+new file mode 100644
+index 000000000000..37e46386181c
+--- /dev/null
++++ b/s390x/sie-dat.c
+@@ -0,0 +1,121 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++/*
++ * Tests SIE with paging.
++ *
++ * Copyright 2023 IBM Corp.
++ *
++ * Authors:
++ *    Nico Boehr <nrb@linux.ibm.com>
++ */
++#include <libcflat.h>
++#include <vmalloc.h>
++#include <asm/asm-offsets.h>
++#include <asm-generic/barrier.h>
++#include <asm/pgtable.h>
++#include <mmu.h>
++#include <asm/page.h>
++#include <asm/facility.h>
++#include <asm/interrupt.h>
++#include <asm/mem.h>
++#include <alloc_page.h>
++#include <sclp.h>
++#include <sie.h>
++#include <snippet.h>
 +
- 	/* If we have an error on SIE we directly move to sie_exit */
- 	if (lowcore.pgm_old_psw.addr >= (uint64_t)&sie_entry &&
- 	    lowcore.pgm_old_psw.addr <= (uint64_t)&sie_exit) {
- 		lowcore.pgm_old_psw.addr = (uint64_t)&sie_exit;
++static struct vm vm;
++static pgd_t *guest_root;
 +
-+		/* set a marker in sie_block that a PGM int occured */
-+		sblk = *((struct kvm_s390_sie_block **)(stack->grs0[13] + __SF_SIE_CONTROL));
-+		sblk->prog0c |= PROG_PGM_IN_SIE;
- 		return;
- 	}
- 
-diff --git a/lib/s390x/sie.c b/lib/s390x/sie.c
-index 22141ded1a90..5e9ae7115c47 100644
---- a/lib/s390x/sie.c
-+++ b/lib/s390x/sie.c
-@@ -44,6 +44,11 @@ void sie_handle_validity(struct vm *vm)
- 	vm->validity_expected = false;
- }
- 
-+bool sie_had_pgm_int(struct vm *vm)
++/* keep in sync with TEST_PAGE_COUNT in s390x/snippets/c/sie-dat.c */
++#define GUEST_TEST_PAGE_COUNT 10
++
++/* keep in sync with TOTAL_PAGE_COUNT in s390x/snippets/c/sie-dat.c */
++#define GUEST_TOTAL_PAGE_COUNT 256
++
++static void test_sie_dat(void)
 +{
-+	return vm->sblk->prog0c & PROG_PGM_IN_SIE;
++	uint8_t r1;
++	bool contents_match;
++	uint64_t test_page_gpa, test_page_hpa;
++	uint8_t *test_page_hva;
++
++	/* guest will tell us the guest physical address of the test buffer */
++	sie(&vm);
++
++	r1 = (vm.sblk->ipa & 0xf0) >> 4;
++	test_page_gpa = vm.save_area.guest.grs[r1];
++	test_page_hpa = virt_to_pte_phys(guest_root, (void*)test_page_gpa);
++	test_page_hva = __va(test_page_hpa);
++	report(vm.sblk->icptcode == ICPT_INST &&
++	       (vm.sblk->ipa & 0xFF00) == 0x8300 && vm.sblk->ipb == 0x9c0000,
++	       "test buffer gpa=0x%lx hva=%p", test_page_gpa, test_page_hva);
++
++	/* guest will now write to the test buffer and we verify the contents */
++	sie(&vm);
++	report(vm.sblk->icptcode == ICPT_INST &&
++	       vm.sblk->ipa == 0x8300 && vm.sblk->ipb == 0x440000,
++	       "guest wrote to test buffer");
++
++	contents_match = true;
++	for (unsigned int i = 0; i < GUEST_TEST_PAGE_COUNT; i++) {
++		uint8_t expected_val = 42 + i;
++		if (test_page_hva[i * PAGE_SIZE] != expected_val) {
++			report_fail("page %u mismatch actual_val=%x expected_val=%x",
++				    i, test_page_hva[i], expected_val);
++			contents_match = false;
++		}
++	}
++	report(contents_match, "test buffer contents match");
++
++	/* the guest will now write to an unmapped address and we check that this causes a segment translation */
++	report_prefix_push("guest write to unmapped");
++	expect_pgm_int();
++	sie(&vm);
++	check_pgm_int_code(PGM_INT_CODE_SEGMENT_TRANSLATION);
++	report(sie_had_pgm_int(&vm), "pgm int occured in sie");
++	report_prefix_pop();
 +}
 +
- void sie(struct vm *vm)
- {
- 	uint64_t old_cr13;
-@@ -68,7 +73,10 @@ void sie(struct vm *vm)
- 	lowcore.io_new_psw.mask |= PSW_MASK_DAT_HOME;
- 	mb();
- 
--	while (vm->sblk->icptcode == 0) {
-+	/* clear PGM int marker, which might still be set */
-+	vm->sblk->prog0c &= ~PROG_PGM_IN_SIE;
++static void setup_guest(void)
++{
++	extern const char SNIPPET_NAME_START(c, sie_dat)[];
++	extern const char SNIPPET_NAME_END(c, sie_dat)[];
++	uint64_t guest_max_addr;
 +
-+	while (vm->sblk->icptcode == 0 && !sie_had_pgm_int(vm)) {
- 		sie64a(vm->sblk, &vm->save_area);
- 		sie_handle_validity(vm);
- 	}
-diff --git a/lib/s390x/sie.h b/lib/s390x/sie.h
-index 0b00fb709776..8ab755dc9456 100644
---- a/lib/s390x/sie.h
-+++ b/lib/s390x/sie.h
-@@ -37,6 +37,7 @@ struct kvm_s390_sie_block {
- 	uint32_t 	ibc : 12;
- 	uint8_t		reserved08[4];		/* 0x0008 */
- #define PROG_IN_SIE (1<<0)
-+#define PROG_PGM_IN_SIE (1<<1)
- 	uint32_t	prog0c;			/* 0x000c */
- union {
- 		uint8_t	reserved10[16];		/* 0x0010 */
++	setup_vm();
++	snippet_setup_guest(&vm, false);
++
++	/* allocate a region-1 table */
++	guest_root = pgd_alloc_one();
++
++	/* map guest memory 1:1 */
++	guest_max_addr = GUEST_TOTAL_PAGE_COUNT * PAGE_SIZE;
++	for (uint64_t i = 0; i < guest_max_addr; i += PAGE_SIZE)
++		install_page(guest_root, __pa(vm.guest_mem + i), (void *)i);
++
++	/* set up storage limit supression - leave mso and msl intact they are ignored anyways */
++	vm.sblk->cpuflags |= CPUSTAT_SM;
++
++	/* set up the guest asce */
++	vm.save_area.guest.asce = __pa(guest_root) | ASCE_DT_REGION1 | REGION_TABLE_LENGTH;
++
++	snippet_init(&vm, SNIPPET_NAME_START(c, sie_dat),
++		     SNIPPET_LEN(c, sie_dat), SNIPPET_UNPACK_OFF);
++}
++
++int main(void)
++{
++	report_prefix_push("sie-dat");
++	if (!sclp_facilities.has_sief2) {
++		report_skip("SIEF2 facility unavailable");
++		goto done;
++	}
++
++	setup_guest();
++	test_sie_dat();
++	sie_guest_destroy(&vm);
++
++done:
++	report_prefix_pop();
++	return report_summary();
++
++}
+diff --git a/s390x/snippets/c/sie-dat.c b/s390x/snippets/c/sie-dat.c
+new file mode 100644
+index 000000000000..c9f7af0f3a56
+--- /dev/null
++++ b/s390x/snippets/c/sie-dat.c
+@@ -0,0 +1,58 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++/*
++ * Snippet used by the sie-dat.c test to verify paging without MSO/MSL
++ *
++ * Copyright (c) 2023 IBM Corp
++ *
++ * Authors:
++ *  Nico Boehr <nrb@linux.ibm.com>
++ */
++#include <stddef.h>
++#include <inttypes.h>
++#include <string.h>
++#include <asm-generic/page.h>
++
++/* keep in sync with GUEST_TEST_PAGE_COUNT in s390x/sie-dat.c */
++#define TEST_PAGE_COUNT 10
++static uint8_t test_page[TEST_PAGE_COUNT * PAGE_SIZE] __attribute__((__aligned__(PAGE_SIZE)));
++
++/* keep in sync with GUEST_TOTAL_PAGE_COUNT in s390x/sie-dat.c */
++#define TOTAL_PAGE_COUNT 256
++
++static inline void force_exit(void)
++{
++	asm volatile("	diag	0,0,0x44\n");
++}
++
++static inline void force_exit_value(uint64_t val)
++{
++	asm volatile(
++		"	diag	%[val],0,0x9c\n"
++		: : [val] "d"(val)
++	);
++}
++
++__attribute__((section(".text"))) int main(void)
++{
++	uint8_t *invalid_ptr;
++
++	memset(test_page, 0, sizeof(test_page));
++	/* tell the host the page's physical address (we're running DAT off) */
++	force_exit_value((uint64_t)test_page);
++
++	/* write some value to the page so the host can verify it */
++	for (size_t i = 0; i < TEST_PAGE_COUNT; i++)
++		test_page[i * PAGE_SIZE] = 42 + i;
++
++	/* indicate we've written all pages */
++	force_exit();
++
++	/* the first unmapped address */
++	invalid_ptr = (uint8_t *)(TOTAL_PAGE_COUNT * PAGE_SIZE);
++	*invalid_ptr = 42;
++
++	/* indicate we've written the non-allowed page (should never get here) */
++	force_exit();
++
++	return 0;
++}
+diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
+index d97eb5e943c8..aab0e670f2d4 100644
+--- a/s390x/unittests.cfg
++++ b/s390x/unittests.cfg
+@@ -215,3 +215,6 @@ file = migration-skey.elf
+ smp = 2
+ groups = migration
+ extra_params = -append '--parallel'
++
++[sie-dat]
++file = sie-dat.elf
 -- 
 2.39.1
 
