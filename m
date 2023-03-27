@@ -2,221 +2,324 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BE3F36CAE53
-	for <lists+kvm@lfdr.de>; Mon, 27 Mar 2023 21:14:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EE9226CAE8C
+	for <lists+kvm@lfdr.de>; Mon, 27 Mar 2023 21:27:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230187AbjC0TOy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Mar 2023 15:14:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35324 "EHLO
+        id S231174AbjC0T1N (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Mar 2023 15:27:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49740 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229946AbjC0TOl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Mar 2023 15:14:41 -0400
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2087.outbound.protection.outlook.com [40.107.223.87])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1D70272C;
-        Mon, 27 Mar 2023 12:14:21 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=LQYw+knAbOb06gDLy0BjLZSBgyDhg1O9pftiL5f7cAz6I3eGIfFzzk9IkwC4Y3+g+lydYgLMIA4bozdPqxdKQgVMo9+95fYwJov0zjTzGm/lxdlV4xL4baPSojSutjb+ne9x2PYxIJaADVk4JkliC0pVOnFwIWpmQx6KSSsxxEVKT1ixvRqOZO/SlE9878K/BMxqhFWSPFU/UxbKy8SC2MM/bEgqT/TcwMQGNyKJOxhYyT7ffa1AMYCXLDnPRBo8uno+BS2kdh4m/S4JhvyueNX3hFYTBOXtyg769LLatx01dIoMNYd9ue5Azri/bSBfIFizBv7Py3avy1Uut7+aeg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=KOc1eEdIyYOj1ErsYiqPRRGfGGEL6/LcrXI7BDXpiDY=;
- b=DJm2wbvlJ5KB9btxPLDYExwKp9KXlGQdigL0dKl4JsmdHlC0pNwC5ZP1dlLS2D5wxMdKZHDIOVURkg/5t1yKj/vsPR1FeyEOdAdIyHoam0hwE4jdvyAYb+EHx1rFvkDB4VypuAfDTYGyKTvIl8eqSrED+3pXPq5BHus6IdAbTPlawnxS4SI9IkfO64I/V/k34ERy2bWG0WpXiXIice01FQEir+W0HALQQSfHNDVijIhanYsDBbG5nVyqm6lwmfeUXp/dIvahNvFp4vpVfGZcTNHVmBLTv4hQYxdDJMbbutCQQ6NQh5VqUblSyvi4vt4effMMwvlaOPQhww7eWOZzcw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=KOc1eEdIyYOj1ErsYiqPRRGfGGEL6/LcrXI7BDXpiDY=;
- b=XdeNyAXAPDv5IDjZ7qeD04j2/Rs7V6FF3fiIi73Ak2uV3EwJOXL7P29EIbXmXJnUY1q4UXurcDu+9KwQAIFhSj+Fgj1lgyHtXrEiynzRo6ox2AnwWW9d0ozyuTodbIs1Z5LL/dFLB9mV/Hq8ojJkJnMNLG943wWFRKrb7bHz/aI=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DM4PR12MB5229.namprd12.prod.outlook.com (2603:10b6:5:398::12)
- by SN7PR12MB7129.namprd12.prod.outlook.com (2603:10b6:806:2a1::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6178.41; Mon, 27 Mar
- 2023 19:14:18 +0000
-Received: from DM4PR12MB5229.namprd12.prod.outlook.com
- ([fe80::5b56:bf13:70be:ea60]) by DM4PR12MB5229.namprd12.prod.outlook.com
- ([fe80::5b56:bf13:70be:ea60%5]) with mapi id 15.20.6178.041; Mon, 27 Mar 2023
- 19:14:18 +0000
-Message-ID: <2f5c1d5b-c275-fbd5-4cf4-f7b6d0cbff62@amd.com>
-Date:   Mon, 27 Mar 2023 14:14:15 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.8.0
-Subject: Re: [PATCH v16 8/8] x86/smpboot: Allow parallel bringup for SEV-ES
-Content-Language: en-US
-To:     David Woodhouse <dwmw2@infradead.org>,
-        Borislav Petkov <bp@alien8.de>, Brian Gerst <brgerst@gmail.com>
-Cc:     Usama Arif <usama.arif@bytedance.com>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "Phillips, Kim" <kim.phillips@amd.com>,
-        "piotrgorski@cachyos.org" <piotrgorski@cachyos.org>,
-        "oleksandr@natalenko.name" <oleksandr@natalenko.name>,
-        "arjan@linux.intel.com" <arjan@linux.intel.com>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
-        "hpa@zytor.com" <hpa@zytor.com>, "x86@kernel.org" <x86@kernel.org>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "paulmck@kernel.org" <paulmck@kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "rcu@vger.kernel.org" <rcu@vger.kernel.org>,
-        "mimoja@mimoja.de" <mimoja@mimoja.de>,
-        "hewenliang4@huawei.com" <hewenliang4@huawei.com>,
-        "seanjc@google.com" <seanjc@google.com>,
-        "pmenzel@molgen.mpg.de" <pmenzel@molgen.mpg.de>,
-        "fam.zheng@bytedance.com" <fam.zheng@bytedance.com>,
-        "punit.agrawal@bytedance.com" <punit.agrawal@bytedance.com>,
-        "simon.evans@bytedance.com" <simon.evans@bytedance.com>,
-        "liangma@liangbit.com" <liangma@liangbit.com>,
-        "gpiccoli@igalia.com" <gpiccoli@igalia.com>,
-        Sabin Rapan <sabrapan@amazon.com>
-References: <20230321194008.785922-1-usama.arif@bytedance.com>
- <20230321194008.785922-9-usama.arif@bytedance.com>
- <20230322224735.GAZBuFh9ld6FuYEyoH@fat_crate.local>
- <70628793e6777d07f27f43152df497e780925d18.camel@infradead.org>
- <20230323085138.GAZBwTGly7iOlvxrD4@fat_crate.local>
- <4dbdd277c4b26ae4b971a910209a3279f79f6837.camel@infradead.org>
- <CAMzpN2guz4HTQ8uir9Q=xrUpCYyBfuG2zGSJsakaqY7_OvxCPQ@mail.gmail.com>
- <20230327174746.GBZCHWwqIa4+nj1/qR@fat_crate.local>
- <e0e76d1de1e90aafa2d14f95648fff2569b21a73.camel@infradead.org>
-From:   Tom Lendacky <thomas.lendacky@amd.com>
-In-Reply-To: <e0e76d1de1e90aafa2d14f95648fff2569b21a73.camel@infradead.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: SN1PR12CA0088.namprd12.prod.outlook.com
- (2603:10b6:802:21::23) To DM4PR12MB5229.namprd12.prod.outlook.com
- (2603:10b6:5:398::12)
+        with ESMTP id S229705AbjC0T1M (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Mar 2023 15:27:12 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AEB72CD
+        for <kvm@vger.kernel.org>; Mon, 27 Mar 2023 12:26:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1679945184;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=YsJ82OYx+hJHZIpI5yk6abwb8YmFKXJFuVMXDYupmyI=;
+        b=gVDElN/Sa2BBm1P5vEjlefuCXrShq3FcFTAt5qmHDGgf6yM/b/uvbeAWWyEskVs7gyfH/3
+        wNV7S1E2SF4r1gOeTwk4uMd5PdsOtJmeYPwl+dZ0ew+v6AcSIFZ0MsObkSH954WdSIDaYD
+        lJd83rOOsFAJsf/V9OWSYluCtDcsWho=
+Received: from mail-il1-f199.google.com (mail-il1-f199.google.com
+ [209.85.166.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-459-T6youR3XNW6WZNUeDw_pog-1; Mon, 27 Mar 2023 15:26:23 -0400
+X-MC-Unique: T6youR3XNW6WZNUeDw_pog-1
+Received: by mail-il1-f199.google.com with SMTP id a17-20020a921a11000000b00325f9878441so3582940ila.7
+        for <kvm@vger.kernel.org>; Mon, 27 Mar 2023 12:26:23 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1679945182;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=YsJ82OYx+hJHZIpI5yk6abwb8YmFKXJFuVMXDYupmyI=;
+        b=Q2WzntEpAamC/oF13yVy1DR/ZtjNbDFEyMuLyvIHAsywsTrxqmZ3F7dhMpDnMRy8NN
+         qFmnoJpcH2VLGXy7t1AEjiiSGsUHGCCvWmaLnm5ir4JZx94vD/lGP4ILIu9lsBGQogup
+         hqMTW5PMAH0WpETBfbTEV1HYt1TZySdaeHX+LR6f5/pNjnIs1vqEsH7SQRexH97odzgq
+         65vBYvNpq2VG+G9l6GRRySA9oz/hZLkIPbY/9myRTmOxcC1AroVjhgMoNAugcg3+Mr/p
+         NljLI9XohUbYBW9NtFqM+YBKA6VhNKa14HKnUZ+EKXSYsKOKFpdPzLplaW+6zYUzelCb
+         xsKA==
+X-Gm-Message-State: AAQBX9cdJ7IB/21oERVMYaDU6wweF7y5jGbMdPcxM1pBHqHDWqZ+u652
+        sKCQeZmRNwLtZmf4j8MIFUkwV9Po+vI1039YOfKHV8mh8eCV8C6vUoz9GtEg4zHHlBCRN8ogN/m
+        Udu5CfIZyuPFt
+X-Received: by 2002:a92:d40a:0:b0:31f:9b6e:2f49 with SMTP id q10-20020a92d40a000000b0031f9b6e2f49mr10852817ilm.10.1679945182676;
+        Mon, 27 Mar 2023 12:26:22 -0700 (PDT)
+X-Google-Smtp-Source: AKy350Y2QNTmEbvdTz9lk9IkQz7nrMs0PzBDjUBGarV1PGA7S1BCrjZKxc1bKrijv1Hfy90uc2/XWg==
+X-Received: by 2002:a92:d40a:0:b0:31f:9b6e:2f49 with SMTP id q10-20020a92d40a000000b0031f9b6e2f49mr10852782ilm.10.1679945182317;
+        Mon, 27 Mar 2023 12:26:22 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id x10-20020a92300a000000b0030c0dce44b1sm8006694ile.15.2023.03.27.12.26.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 27 Mar 2023 12:26:21 -0700 (PDT)
+Date:   Mon, 27 Mar 2023 13:26:19 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Yi Liu <yi.l.liu@intel.com>
+Cc:     jgg@nvidia.com, kevin.tian@intel.com, joro@8bytes.org,
+        robin.murphy@arm.com, cohuck@redhat.com, eric.auger@redhat.com,
+        nicolinc@nvidia.com, kvm@vger.kernel.org, mjrosato@linux.ibm.com,
+        chao.p.peng@linux.intel.com, yi.y.sun@linux.intel.com,
+        peterx@redhat.com, jasowang@redhat.com,
+        shameerali.kolothum.thodi@huawei.com, lulu@redhat.com,
+        suravee.suthikulpanit@amd.com, intel-gvt-dev@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org, linux-s390@vger.kernel.org,
+        xudong.hao@intel.com, yan.y.zhao@intel.com, terrence.xu@intel.com,
+        yanting.jiang@intel.com
+Subject: Re: [PATCH v2 10/10] vfio/pci: Add
+ VFIO_DEVICE_GET_PCI_HOT_RESET_GROUP_INFO
+Message-ID: <20230327132619.5ab15440.alex.williamson@redhat.com>
+In-Reply-To: <20230327093458.44939-11-yi.l.liu@intel.com>
+References: <20230327093458.44939-1-yi.l.liu@intel.com>
+        <20230327093458.44939-11-yi.l.liu@intel.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM4PR12MB5229:EE_|SN7PR12MB7129:EE_
-X-MS-Office365-Filtering-Correlation-Id: 697d7d31-8b2e-465e-8373-08db2ef77697
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: ctRBARmJqrCvXhVldCEDMmiNqi1Dn5l/aOJYRi8bv0Nz4CBbwUBhSvhybXtuaZuStLe7Kie5HEDg38tcJluF0haw9tuBOtk0JRLNpwz8GnZemFt/zb/1B3Sqm21BqAsW+REjwxxqueSayzRBS9AhzMnJuQnzG4m/yvmfHgU46TgLpdt/bvEZWmKR8Ej9+CIdCLQcImtYrkfnm1r7Cc3CQmgU2Txmb7CseqRkNo6jNJTLbQxfVuEexZrXYS6DSY8W7/pEYenpz7ccQW+XxLkShMgSQd4U1/U7oAZ3KPLcRLKStkcqMrV01DzwmFmUiZjB/PalchFyeTAza5rnrZZprShBZMxvc4scAFCtqIOyKZS1Pblm7R2OUCqYEDktBdKgskcq1yfHJpK1/93wi0PEWn3LGf7DZpT8RcIW+83KVLIFdEVwt1r3Gbv3ruWBeTn+uduKw2gVPxuy5QICBlQP7NhaIhH+L6o1/0xKy6etBcKGlfrdIQ2EyuL+obvaft20gRyH2ZBBxw3px/+WNg1NsJG7ghql+21TS37hzvtdMM8DZcLF0EBv/XVpixavIdX5E3x/YeMFuKa0WdxPtS1SFUABCl8UollZRtzCQoAaEiKNw1Wg2NixZfV0H7Xwi+smTXQuTZchMeJoGBPeQ8MRlA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5229.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(376002)(136003)(396003)(39860400002)(366004)(346002)(451199021)(53546011)(6666004)(6512007)(6506007)(83380400001)(86362001)(36756003)(31696002)(2616005)(38100700002)(2906002)(41300700001)(6486002)(478600001)(31686004)(5660300002)(7416002)(8936002)(54906003)(110136005)(66946007)(66556008)(66476007)(8676002)(4326008)(26005)(186003)(316002)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?RHhSdE5FVU5oQ3VJZkxCN0dPdGJjMGpRTk50TVljdjZRL3RLaVBqcTRJRHh5?=
- =?utf-8?B?Q0xyK3g1NHkySmY0RXF6SWpBdXBGM2xmVXpxRXhxZGxVOHZJSDdQdER4MTJO?=
- =?utf-8?B?eFhIZDcrcjRQbnFPNUE1YWJOZG00QlEzd084d2g2Qk1UQnNYcHFvM3pUSE9n?=
- =?utf-8?B?MmhCUE9kRmU4cmNZTit0WE1KWW9TOVI2SEZBaXpUc3pabXcxUlFURWp0Z1lS?=
- =?utf-8?B?MVdpZnFsRVJRMFpuMWhHWHNiMFIydnVIeDYzQ1NMbWdrdlR4TFJPRkpWNk5q?=
- =?utf-8?B?aGxxQkFjUnZmc1JIM3RxVmcvaWtQaHJ3KzA1ME5nQXZENmN3YzVKVGdkYXAy?=
- =?utf-8?B?OXI2T0pLYlVsb1ltWTQ3UFp4RHcrSGVoelk1NE1yTEdiWVFIbkd5MjZkbWty?=
- =?utf-8?B?UFErMjIvRnZ2S01JUzV0cWQ2eWlkcGhDSlo3WTh3MkIrWEhVeHUwMkxQSDc3?=
- =?utf-8?B?dndwQ2xFcnVQQ1BrTy95V0NxQVZ1ZjJBREVhemxtZjdUNzRudU1qVmZZVlNE?=
- =?utf-8?B?V0tGTXdyM3pNWUJ0bVZ4MHpBcm44Yk1jRE5vVXFLTVJ5YnFCdFAvc2x6YWxy?=
- =?utf-8?B?NncyZE90NGNVdEpRMXBBcURwWU9lSUd3SFZkY0piL0pjRDVpZStkZ01QSTUz?=
- =?utf-8?B?VFdpYUxOSkE1aXFGeGVWcHl2NFd2ZHpPYmY3NTF6RnQ5Vjl0MTRxLzBzN0Ew?=
- =?utf-8?B?a3JmSC8wLzA1UjFabU8rK3lqOE5mYTlxajNPTnF0UkYyWUpjSXZiQ25rOElm?=
- =?utf-8?B?M3hTZHNSVUpqSFJQNFhtUm5CZk9mQ0ozYllaQ2tnQ2hzS3FYWktvTVdqc0hH?=
- =?utf-8?B?ZDdOS0t0akc2ck9FYUt6K0dKZ1NUbVN4VDdSaW03UGxDT2FuS2o0MThwNlZi?=
- =?utf-8?B?NURjMWxUVnFqTXNGUUZMcFJTSmZZaW9LZU1vbFlsRGFSMG5vT3lzUTZTazF1?=
- =?utf-8?B?UnAwMWE3c0NnTUU3R092c2FaMnZnTHlVdVpidmpUa0I4ZFh1UzBzOGowT0lx?=
- =?utf-8?B?emUrcndFYnR2cVE3Y0JRVkhnNU9RalFkcHMzMXcwK08ralNUcGpUN1IwVmw0?=
- =?utf-8?B?b0t1aWdZeUZma3FmSG5JSmhUNEw2YkFsbFNnUFFKMmxjOTcrQ1pDaW1Id1ht?=
- =?utf-8?B?MExMOWZJQ1p0KzdLa3dPUXR3bFlHT2tsNWx2OTJLTXhiRSs1TGxTVlJHelQv?=
- =?utf-8?B?d0V3TVpybkFNRkluckFsSHpJbU1NQ2U0d0dUWEp6dzJwRmtGeDRKMHMvTW5I?=
- =?utf-8?B?TTZ4QkFSTUh2RlFJN1AzaEMrWTBCWGduYU12MjVVRlhJSGcvWFRWL1dYQ2lM?=
- =?utf-8?B?ODltNzV4NksrRTQ0aTJNdk43QVU1RmtiTU5HRlIrbjQrVDYxN051MG1hWndW?=
- =?utf-8?B?WEFQd3ZDNVFGWEJ5bDF0OTJHOU4rNms4NUppZFkrbmV4NDRJL1RGbGp2a29Q?=
- =?utf-8?B?bE1pdDBTSnJRTFlIMkkxb1JsR0pGQWhJaHBvSFRmVHNqMHdCMTZRcTZ4bkZF?=
- =?utf-8?B?Z0phTWdPTy9ZY0pYTGNZTkxFV2M1UFNSKzRvK3BybU5iQmZwSjdVd25DdEdk?=
- =?utf-8?B?US9Zb09IYkJuOW9nZkhuaEczNEFUMzkrcFd5ZWtUOEQ5aFhDbEVPN1ZvaEs5?=
- =?utf-8?B?V3E3RmJERW5EdHpDaGNDcmVFS2ZVS3NBMGlRRlQ5d2lkNENvQ3Nublo0SlNa?=
- =?utf-8?B?VjA3cCt4QTdTNmNWRjB1UjBMK2RFZWl0a2FsbVpwOTdCUUdwTnZ5THJQU1ds?=
- =?utf-8?B?YnNwaG5IK3ZwbkRUS1BtKzVVeTVTTHFSWWVzQnovMkdEQ0dTL1Y5blkrZ1NZ?=
- =?utf-8?B?UE9TUWxxYThrQ0RoVHN3SXAybFA3VFV3RHM4ZWNERFFadFM0Sk0wdms2QS9L?=
- =?utf-8?B?K0JhREExeHg3VkxtR0t1VXJyWHl1NEFxTTY5MDdCakhQbGZER2VoUUZpcWlF?=
- =?utf-8?B?N1ZheUk2dkZVNFVkQUVmZmlVUlRWbjFCdGtTZ2xDZzZLdjBhZ2VpZzA4SlRo?=
- =?utf-8?B?aTk1TDBWbnFxYWdzbnBoRG1tQWYyK3IzQ0QrQTBSaHNYU0ZUemN5bzBwditX?=
- =?utf-8?B?TC9PZ05rUHJhZXFlY0VqMHJPbXczRGoxMllKakljOHhaam1qYU9oRzU3ZGZs?=
- =?utf-8?Q?OkERv/RnnYmQDt2e4Vko2gjLa?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 697d7d31-8b2e-465e-8373-08db2ef77697
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5229.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Mar 2023 19:14:18.6685
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: KfHtjgSSh/jmAPrtIhLi+HE3vwS1QWDEFEAcQLomgnJTx3XrpM7eUGA6Yk+TL/o37JEDHyBJmKwDip6HfOsLOQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB7129
-X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
-        DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 3/27/23 13:14, David Woodhouse wrote:
-> On Mon, 2023-03-27 at 19:47 +0200, Borislav Petkov wrote:
->>> Making sure that the stack protector is either disabled or properly
->>> set up, and disabling any instrumentation/profiling/debug crap that
->>> isn't initialized yet.
->>
->> Lemme dump brain of what Tom and I were talking about today so that it
->> is documented somewhere.
->>
->> * re: stack protector: I was thinking to mark this function
->>
->>   __attribute__((no_stack_protector))
->>
->> but gcc added the function attribute way later:
->>
->> ~/src/gcc/gcc.git> git tag --contains 346b302d09c1e6db56d9fe69048acb32fbb97845
->> basepoints/gcc-12
->> basepoints/gcc-13
->> releases/gcc-11.1.0
->> releases/gcc-11.2.0
->> releases/gcc-11.3.0
->> releases/gcc-12.1.0
->> releases/gcc-12.2.0
->>
->> which means, that function would have to live somewhere in a file which
->> has stack protector disabled. One possible place would be
->> arch/x86/mm/mem_encrypt_identity.c which is kinda related.
-> 
-> Shouldn't the rest of head64.c have the stack protector disabled, for
-> similar reasons?
-> 
->> * re: stack: in order to be able to call a C function that early, we'd
->> have to put the VA of the initial stack back into %rsp as we switch
->> pagetables a bit earlier in there (thx Tom).
-> 
-> Hm, don't you have a stack at the point you added that call? I thought
-> you did? It doesn't have to be *the* stack for the AP in question.
-> Just "a" stack. And you have the lock on the real-mode one that you're
-> using.
+On Mon, 27 Mar 2023 02:34:58 -0700
+Yi Liu <yi.l.liu@intel.com> wrote:
 
-Unfortunately RSP has the identity mapped stack value and when the 
-pagetable switch is performed the mapping to that stack is lost. It would 
-need to be updated to the equivalent of __va(RSP) to get a stack that can 
-be used without page faulting.
+> This is a preparation for vfio device cdev as cdev gives userspace the
+> capability to open device cdev fd and management stack (e.g. libvirt)
+> could pass the device fd to the actual user (e.g. QEMU). As a result,
+> the actual user has no idea about the device's bus:devfn information.
+> This is a problem when user uses VFIO_DEVICE_GET_PCI_HOT_RESET_INFO to
+> know the hot reset affected device scope as this ioctl returns bus:devfn
+> info. For the fd passing usage, the acutal user cannot map the bus:devfn
+> to the devices it has opened via the fd passed from management stack. So
+> a new ioctl is required.
+> 
+> This new ioctl reports the list of iommufd dev_id that is opened by the
+> user. If there is affected device that is not bound to vfio driver or
+> opened by another user, this command shall fail with -EPERM. For the
+> noiommu mode in the vfio device cdev path, this shall fail as no dev_id
+> would be generated, hence nothing to report.
+> 
+> This ioctl is useless to the users that open vfio group as such users
+> have no idea about the iommufd dev_id and it can use the existing
+> VFIO_DEVICE_GET_PCI_HOT_RESET_INFO. The user that uses the traditional
+> mode vfio group/container would be failed if invoking this ioctl. But
+> the user that uses the iommufd compat mode vfio group/container shall
+> succeed. This is harmless as long as user cannot make use of it and
+> should use VFIO_DEVICE_GET_PCI_HOT_RESET_INFO.
 
-Thanks,
-Tom
 
+So VFIO_DEVICE_GET_PCI_HOT_RESET_INFO reports a group and bdf, but
+VFIO_DEVICE_GET_PCI_HOT_RESET_*GROUP*_INFO is meant for the non-group,
+cdev use case and returns a dev_id rather than a group???
+
+Additionally, VFIO_DEVICE_GET_PCI_HOT_RESET_INFO has a flags arg that
+isn't used, why do we need a new ioctl vs defining
+VFIO_PCI_HOT_RESET_FLAG_IOMMUFD_DEV_ID.  In fact, we could define
+vfio_dependent_device as:
+
+struct vfio_pci_dependent_device {
+	union {
+	        __u32   group_id;
+		__u32	dev_id;
+	}
+        __u16   segment;
+        __u8    bus;
+        __u8    devfn;
+};
+
+If the user calls with the above flag, dev_id is valid, otherwise
+group_id.  Perhaps segment:buus:devfn could still be filled in with a
+NULL/invalid dev_id if the user doesn't have permissions for the device
+so that debugging from userspace isn't so opaque.  Thanks,
+
+Alex
+ 
+> Signed-off-by: Yi Liu <yi.l.liu@intel.com>
+> ---
+>  drivers/vfio/pci/vfio_pci_core.c | 98 ++++++++++++++++++++++++++++++++
+>  include/uapi/linux/vfio.h        | 47 +++++++++++++++
+>  2 files changed, 145 insertions(+)
 > 
->> So by then, doing all that cargo-cult just in order to not have a bunch
->> of lines in asm doesn't sound all that great anymore.
->>
->> * The __head per-function attribute is easily solved by lifting the
->> __head define into a common header.
->>
->> So meh, dunno. I guess we can do the asm thing for now, until a cleaner
->> solution without too many warts presents itself.
-> 
-> Hm, doesn't most of that just go away (or at least become "Already
-> Broken; Someone Else's Problem™") if you just concede to put your new C
-> function into head64.c along with a whole bunch of other existing
-> CONFIG_AMD_MEM_ENCRYPT support?
-> 
-> (We still have to fix it if it's Someone Else's Problem, of course.
-> It's just that you don't have to count that complexity towards your own
-> part.)
+> diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
+> index 19f5b075d70a..45edf4e9b98b 100644
+> --- a/drivers/vfio/pci/vfio_pci_core.c
+> +++ b/drivers/vfio/pci/vfio_pci_core.c
+> @@ -1181,6 +1181,102 @@ static int vfio_pci_ioctl_reset(struct vfio_pci_core_device *vdev,
+>  	return ret;
+>  }
+>  
+> +static struct pci_dev *
+> +vfio_pci_dev_set_resettable(struct vfio_device_set *dev_set);
+> +
+> +static int vfio_pci_ioctl_get_pci_hot_reset_group_info(
+> +	struct vfio_pci_core_device *vdev,
+> +	struct vfio_pci_hot_reset_group_info __user *arg)
+> +{
+> +	unsigned long minsz =
+> +		offsetofend(struct vfio_pci_hot_reset_group_info, count);
+> +	struct vfio_pci_hot_reset_group_info hdr;
+> +	struct iommufd_ctx *iommufd, *cur_iommufd;
+> +	u32 count = 0, index = 0, *devices = NULL;
+> +	struct vfio_pci_core_device *cur;
+> +	bool slot = false;
+> +	int ret = 0;
+> +
+> +	if (copy_from_user(&hdr, arg, minsz))
+> +		return -EFAULT;
+> +
+> +	if (hdr.argsz < minsz)
+> +		return -EINVAL;
+> +
+> +	hdr.flags = 0;
+> +
+> +	/* Can we do a slot or bus reset or neither? */
+> +	if (!pci_probe_reset_slot(vdev->pdev->slot))
+> +		slot = true;
+> +	else if (pci_probe_reset_bus(vdev->pdev->bus))
+> +		return -ENODEV;
+> +
+> +	mutex_lock(&vdev->vdev.dev_set->lock);
+> +	if (!vfio_pci_dev_set_resettable(vdev->vdev.dev_set)) {
+> +		ret = -EPERM;
+> +		goto out_unlock;
+> +	}
+> +
+> +	iommufd = vfio_iommufd_physical_ictx(&vdev->vdev);
+> +	if (!iommufd) {
+> +		ret = -EPERM;
+> +		goto out_unlock;
+> +	}
+> +
+> +	/* How many devices are affected? */
+> +	ret = vfio_pci_for_each_slot_or_bus(vdev->pdev, vfio_pci_count_devs,
+> +					    &count, slot);
+> +	if (ret)
+> +		goto out_unlock;
+> +
+> +	WARN_ON(!count); /* Should always be at least one */
+> +
+> +	/*
+> +	 * If there's enough space, fill it now, otherwise return -ENOSPC and
+> +	 * the number of devices affected.
+> +	 */
+> +	if (hdr.argsz < sizeof(hdr) + (count * sizeof(*devices))) {
+> +		ret = -ENOSPC;
+> +		hdr.count = count;
+> +		goto reset_info_exit;
+> +	}
+> +
+> +	devices = kcalloc(count, sizeof(*devices), GFP_KERNEL);
+> +	if (!devices) {
+> +		ret = -ENOMEM;
+> +		goto reset_info_exit;
+> +	}
+> +
+> +	list_for_each_entry(cur, &vdev->vdev.dev_set->device_list, vdev.dev_set_list) {
+> +		cur_iommufd = vfio_iommufd_physical_ictx(&cur->vdev);
+> +		if (cur->vdev.open_count) {
+> +			if (cur_iommufd != iommufd) {
+> +				ret = -EPERM;
+> +				break;
+> +			}
+> +			ret = vfio_iommufd_physical_devid(&cur->vdev, &devices[index]);
+> +			if (ret)
+> +				break;
+> +			index++;
+> +		}
+> +	}
+> +
+> +reset_info_exit:
+> +	if (copy_to_user(arg, &hdr, minsz))
+> +		ret = -EFAULT;
+> +
+> +	if (!ret) {
+> +		if (copy_to_user(&arg->devices, devices,
+> +				 hdr.count * sizeof(*devices)))
+> +			ret = -EFAULT;
+> +	}
+> +
+> +	kfree(devices);
+> +out_unlock:
+> +	mutex_unlock(&vdev->vdev.dev_set->lock);
+> +	return ret;
+> +}
+> +
+>  static int vfio_pci_ioctl_get_pci_hot_reset_info(
+>  	struct vfio_pci_core_device *vdev,
+>  	struct vfio_pci_hot_reset_info __user *arg)
+> @@ -1404,6 +1500,8 @@ long vfio_pci_core_ioctl(struct vfio_device *core_vdev, unsigned int cmd,
+>  		return vfio_pci_ioctl_get_irq_info(vdev, uarg);
+>  	case VFIO_DEVICE_GET_PCI_HOT_RESET_INFO:
+>  		return vfio_pci_ioctl_get_pci_hot_reset_info(vdev, uarg);
+> +	case VFIO_DEVICE_GET_PCI_HOT_RESET_GROUP_INFO:
+> +		return vfio_pci_ioctl_get_pci_hot_reset_group_info(vdev, uarg);
+>  	case VFIO_DEVICE_GET_REGION_INFO:
+>  		return vfio_pci_ioctl_get_region_info(vdev, uarg);
+>  	case VFIO_DEVICE_IOEVENTFD:
+> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+> index 25432ef213ee..61b801dfd40b 100644
+> --- a/include/uapi/linux/vfio.h
+> +++ b/include/uapi/linux/vfio.h
+> @@ -669,6 +669,53 @@ struct vfio_pci_hot_reset_info {
+>  
+>  #define VFIO_DEVICE_GET_PCI_HOT_RESET_INFO	_IO(VFIO_TYPE, VFIO_BASE + 12)
+>  
+> +/**
+> + * VFIO_DEVICE_GET_PCI_HOT_RESET_GROUP_INFO - _IOWR(VFIO_TYPE, VFIO_BASE + 12,
+> + *						    struct vfio_pci_hot_reset_group_info)
+> + *
+> + * This is used in the vfio device cdev mode.  It returns the list of
+> + * affected devices (represented by iommufd dev_id) when hot reset is
+> + * issued on the current device with which this ioctl is invoked.  It
+> + * only includes the devices that are opened by the current user in the
+> + * time of this command is invoked.  This list may change when user opens
+> + * new device or close opened device, hence user should re-invoke it
+> + * after open/close devices.  This command has no guarantee on the result
+> + * of VFIO_DEVICE_PCI_HOT_RESET since the not-opened affected device can
+> + * be by other users in the window between the two ioctls.  If the affected
+> + * devices are opened by multiple users, the VFIO_DEVICE_PCI_HOT_RESET
+> + * shall fail, detail can check the description of VFIO_DEVICE_PCI_HOT_RESET.
+> + *
+> + * For the users that open vfio group/container, this ioctl is useless as
+> + * they have no idea about the iommufd dev_id returned by this ioctl.  For
+> + * the users of the traditional mode vfio group/container, this ioctl will
+> + * fail as this mode does not use iommufd hence no dev_id to report back.
+> + * For the users of the iommufd compat mode vfio group/container, this ioctl
+> + * would succeed as this mode uses iommufd as container fd.  But such users
+> + * still have no idea about the iommufd dev_id as the dev_id is only stored
+> + * in kernel in this mode.  For the users of the vfio group/container, the
+> + * VFIO_DEVICE_GET_PCI_HOT_RESET_INFO should be used to know the hot reset
+> + * affected devices.
+> + *
+> + * Return: 0 on success, -errno on failure:
+> + *	-enospc = insufficient buffer;
+> + *	-enodev = unsupported for device;
+> + *	-eperm = no permission for device, this error comes:
+> + *		 - when there are affected devices that are opened but
+> + *		   not bound to the same iommufd with the current device
+> + *		   with which this ioctl is invoked,
+> + *		 - there are affected devices that are not bound to vfio
+> + *		   driver yet.
+> + *		 - no valid iommufd is bound (e.g. noiommu mode)
+> + */
+> +struct vfio_pci_hot_reset_group_info {
+> +	__u32	argsz;
+> +	__u32	flags;
+> +	__u32	count;
+> +	__u32	devices[];
+> +};
+> +
+> +#define VFIO_DEVICE_GET_PCI_HOT_RESET_GROUP_INFO	_IO(VFIO_TYPE, VFIO_BASE + 18)
+> +
+>  /**
+>   * VFIO_DEVICE_PCI_HOT_RESET - _IOW(VFIO_TYPE, VFIO_BASE + 13,
+>   *				    struct vfio_pci_hot_reset)
+
