@@ -2,70 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 05E046CAAF8
-	for <lists+kvm@lfdr.de>; Mon, 27 Mar 2023 18:50:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3B7426CAAF9
+	for <lists+kvm@lfdr.de>; Mon, 27 Mar 2023 18:50:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232334AbjC0QuE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Mar 2023 12:50:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37126 "EHLO
+        id S232324AbjC0QuI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Mar 2023 12:50:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37056 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232318AbjC0QuC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Mar 2023 12:50:02 -0400
-Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7BBC30C0
-        for <kvm@vger.kernel.org>; Mon, 27 Mar 2023 09:50:00 -0700 (PDT)
-Received: by mail-pl1-x633.google.com with SMTP id le6so8980820plb.12
-        for <kvm@vger.kernel.org>; Mon, 27 Mar 2023 09:50:00 -0700 (PDT)
+        with ESMTP id S232276AbjC0QuG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Mar 2023 12:50:06 -0400
+Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1481E35B5
+        for <kvm@vger.kernel.org>; Mon, 27 Mar 2023 09:50:05 -0700 (PDT)
+Received: by mail-pg1-x535.google.com with SMTP id q206so5530139pgq.9
+        for <kvm@vger.kernel.org>; Mon, 27 Mar 2023 09:50:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sifive.com; s=google; t=1679935800;
+        d=sifive.com; s=google; t=1679935804;
         h=references:in-reply-to:message-id:date:subject:cc:to:from:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=8ysjVmLSFjJmySy1HzqCUzkjl7bv/RwwIsrQKPYD1lk=;
-        b=IkQ1q+amsjtN+vSUgBq7brAFlKNuhfOXwhE8v/PRw2U4OmffuTAg0CPZZgN3x73nTb
-         XaulIDrsAsbQkjIaF7dpZ76X+LR7LS4Uc4WvEwvACKyLbHOU3NDGZPXqwl2zd9wW1GKt
-         wxwcZmlRpWtFm8LEDdmf2XIK8mhBBZwVKWAUKoay/nJYB5fI/O0W6tQM4izPtzHyFLVU
-         PpC7yRfezD7VQfSZ+L5jz1XRTzTDAlDJkJVyHpl5i8xUtwSOdVh8bib0123OddRd9IH/
-         Xfx5ragrQn2aloiECtyD8A4iHb4OYYxM5n1oH/vug5pqUUUe5ZpbXXWRPX60qfyPJCY9
-         E1Fg==
+        bh=wxwN7g3H6Sw6hU6xeUFUVA8oVaitJPaamaFICOanx0U=;
+        b=ddV9yf+Ej5SvPfEWDg02RLMqwomecI3qMrEVGh/489ozL+FbtvNWeB5Egzdce6DPzT
+         SNdk/nyNvnaXpb/Wr/OZNUG3szjDDmTnI98Ey1KYmgCCqsSWPh+OzDfN3VhSpXtcB/Fy
+         h+91EiWRFvP+I34noH8YmkXJBAl66SDJAC99ayt38GL8kf8VhbFsCarp5yaPA6pYHiK+
+         zPGDHZGabPFF6S54c+Yo+ivQKK5r+wpDlkwRlslTJvHKdQThE7LLzG9L362VuYb1XvfD
+         n8fk9LUdA8nSL51/snuo4AsyGxfxHKiWomOZOsdAsjK7ZSNQeXgVn9TIAxPRRkXGs2Xz
+         cIOw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679935800;
+        d=1e100.net; s=20210112; t=1679935804;
         h=references:in-reply-to:message-id:date:subject:cc:to:from
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8ysjVmLSFjJmySy1HzqCUzkjl7bv/RwwIsrQKPYD1lk=;
-        b=TF9OQGr0l5ciFK+YkPiaRgfCpdAzJQAcopoK9/6YbvvuGQx34T5kakLdl6z8dkq8pQ
-         gjd28sc4dNrcOMnUpPdy59aC8D7PDiLcPRudBpSs51dnep2lMzfyuw0rWWkjJ2O2p9yq
-         LTtdgp6m1ATpBYrqR7KAGSiwsASGD5YP3pgSAO8O9IO2wI80NQppvMXGs7QdPsPuArgH
-         xXfG7wWph1ib778g3i2GexaUNiiA9IT4YPt/DaSENP/sDwR4TYJETjzgADn8iHOqobnU
-         CJXN53CSxkEi94ywVGesnIXQ0iQWN3kZfoLYN5R5FnzWUfav6mZ2iVwu+vMOQo31FvUR
-         8IRQ==
-X-Gm-Message-State: AO0yUKUh5bdycDhbjS3RMNiYQ9svqCRK0OaOy1qRjehChfOF8r/gG7cZ
-        Q2Yvhy/fH5PdZkSDszTYgRpzPQ==
-X-Google-Smtp-Source: AK7set8HAL2dYA4fCV3CsxV0johJkK+Gdsl5YGWvfqUJNd+bUXZXKmWSYs2QlvN/RER/2CO+tauJSQ==
-X-Received: by 2002:a05:6a20:af1c:b0:d9:3683:bc15 with SMTP id dr28-20020a056a20af1c00b000d93683bc15mr10743515pzb.19.1679935800348;
-        Mon, 27 Mar 2023 09:50:00 -0700 (PDT)
+        bh=wxwN7g3H6Sw6hU6xeUFUVA8oVaitJPaamaFICOanx0U=;
+        b=NzE2ROhJmu8SQOftvcp6DBNbln6gCOP4EVgBoeMLuzC5pwrLBkgBJCSGrhisVPgchN
+         LHbfgcHcZnXZ/u9ZQVziQmQp52zT+3fUkTpXeXjkHDSsh/0kzvdG3dbcbx8ODFb3ht79
+         mO6Vr1x9orDToctvecDV1tlfYcCrc0ac8/EfZQikZzu0fIp9Emc/8DqptjesmcxuFcOB
+         CqWqQp9dCUgJCa0HR3+RnvJPX0pY+9gM8eFdGaNUN2OFexaPLov90aycvDty0iqxTbRf
+         Ec7T7ATrRtc53SS/cLuQB7YRJScdbMs4uGWoYpwFo/PDRB4yJtlfyYvNbpEuryESwwjw
+         CBgg==
+X-Gm-Message-State: AAQBX9dvuHo1ov83rgx5XkcGKw9C8pKdheOxa4AhSPdwMgKJz5MRsUsx
+        zaNfucApSDJbaB3DoBBZm3U44g==
+X-Google-Smtp-Source: AKy350bqYgUcs1CGvpZN85+lCPsdrnwLPwHuQVxFCsuTKyLVm9ww+/c9Hgu75VmL6DLbOYPm1hCZyQ==
+X-Received: by 2002:a62:5543:0:b0:625:a012:a59c with SMTP id j64-20020a625543000000b00625a012a59cmr13619565pfb.9.1679935804570;
+        Mon, 27 Mar 2023 09:50:04 -0700 (PDT)
 Received: from hsinchu25.internal.sifive.com (59-124-168-89.hinet-ip.hinet.net. [59.124.168.89])
-        by smtp.gmail.com with ESMTPSA id q20-20020a62e114000000b0061949fe3beasm19310550pfh.22.2023.03.27.09.49.56
+        by smtp.gmail.com with ESMTPSA id q20-20020a62e114000000b0061949fe3beasm19310550pfh.22.2023.03.27.09.50.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Mar 2023 09:49:59 -0700 (PDT)
+        Mon, 27 Mar 2023 09:50:04 -0700 (PDT)
 From:   Andy Chiu <andy.chiu@sifive.com>
 To:     linux-riscv@lists.infradead.org, palmer@dabbelt.com,
         anup@brainfault.org, atishp@atishpatra.org,
         kvm-riscv@lists.infradead.org, kvm@vger.kernel.org
 Cc:     vineetg@rivosinc.com, greentime.hu@sifive.com,
-        guoren@linux.alibaba.com, Guo Ren <ren_guo@c-sky.com>,
+        guoren@linux.alibaba.com, Vincent Chen <vincent.chen@sifive.com>,
         Andy Chiu <andy.chiu@sifive.com>,
         Paul Walmsley <paul.walmsley@sifive.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Conor Dooley <conor.dooley@microchip.com>,
-        Andrew Jones <ajones@ventanamicro.com>,
-        Heiko Stuebner <heiko.stuebner@vrull.eu>,
-        Guo Ren <guoren@kernel.org>,
-        Jisheng Zhang <jszhang@kernel.org>,
-        Dao Lu <daolu@rivosinc.com>,
-        Vincent Chen <vincent.chen@sifive.com>
-Subject: [PATCH -next v17 02/20] riscv: Extending cpufeature.c to detect V-extension
-Date:   Mon, 27 Mar 2023 16:49:22 +0000
-Message-Id: <20230327164941.20491-3-andy.chiu@sifive.com>
+        Albert Ou <aou@eecs.berkeley.edu>, Guo Ren <guoren@kernel.org>,
+        Anup Patel <apatel@ventanamicro.com>,
+        Atish Patra <atishp@rivosinc.com>
+Subject: [PATCH -next v17 03/20] riscv: Add new csr defines related to vector extension
+Date:   Mon, 27 Mar 2023 16:49:23 +0000
+Message-Id: <20230327164941.20491-4-andy.chiu@sifive.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20230327164941.20491-1-andy.chiu@sifive.com>
 References: <20230327164941.20491-1-andy.chiu@sifive.com>
@@ -78,110 +73,69 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Guo Ren <ren_guo@c-sky.com>
+From: Greentime Hu <greentime.hu@sifive.com>
 
-Add V-extension into riscv_isa_ext_keys array and detect it with isa
-string parsing.
+Follow the riscv vector spec to add new csr numbers.
 
-Signed-off-by: Guo Ren <ren_guo@c-sky.com>
+Acked-by: Guo Ren <guoren@kernel.org>
+Co-developed-by: Guo Ren <guoren@linux.alibaba.com>
 Signed-off-by: Guo Ren <guoren@linux.alibaba.com>
+Co-developed-by: Vincent Chen <vincent.chen@sifive.com>
+Signed-off-by: Vincent Chen <vincent.chen@sifive.com>
 Signed-off-by: Greentime Hu <greentime.hu@sifive.com>
+Reviewed-by: Palmer Dabbelt <palmer@rivosinc.com>
 Suggested-by: Vineet Gupta <vineetg@rivosinc.com>
-Co-developed-by: Andy Chiu <andy.chiu@sifive.com>
 Signed-off-by: Andy Chiu <andy.chiu@sifive.com>
 Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
+Reviewed-by: Heiko Stuebner <heiko.stuebner@vrull.eu>
 ---
- arch/riscv/include/asm/hwcap.h      |  1 +
- arch/riscv/include/asm/vector.h     | 26 ++++++++++++++++++++++++++
- arch/riscv/include/uapi/asm/hwcap.h |  1 +
- arch/riscv/kernel/cpufeature.c      | 11 +++++++++++
- 4 files changed, 39 insertions(+)
- create mode 100644 arch/riscv/include/asm/vector.h
+ arch/riscv/include/asm/csr.h | 18 ++++++++++++++++--
+ 1 file changed, 16 insertions(+), 2 deletions(-)
 
-diff --git a/arch/riscv/include/asm/hwcap.h b/arch/riscv/include/asm/hwcap.h
-index bbde5aafa957..7df8db320934 100644
---- a/arch/riscv/include/asm/hwcap.h
-+++ b/arch/riscv/include/asm/hwcap.h
-@@ -22,6 +22,7 @@
- #define RISCV_ISA_EXT_m		('m' - 'a')
- #define RISCV_ISA_EXT_s		('s' - 'a')
- #define RISCV_ISA_EXT_u		('u' - 'a')
-+#define RISCV_ISA_EXT_v		('v' - 'a')
+diff --git a/arch/riscv/include/asm/csr.h b/arch/riscv/include/asm/csr.h
+index 7c2b8cdb7b77..39f3fde69ee5 100644
+--- a/arch/riscv/include/asm/csr.h
++++ b/arch/riscv/include/asm/csr.h
+@@ -24,16 +24,24 @@
+ #define SR_FS_CLEAN	_AC(0x00004000, UL)
+ #define SR_FS_DIRTY	_AC(0x00006000, UL)
  
- /*
-  * These macros represent the logical IDs of each multi-letter RISC-V ISA
-diff --git a/arch/riscv/include/asm/vector.h b/arch/riscv/include/asm/vector.h
-new file mode 100644
-index 000000000000..427a3b51df72
---- /dev/null
-+++ b/arch/riscv/include/asm/vector.h
-@@ -0,0 +1,26 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
-+/*
-+ * Copyright (C) 2020 SiFive
-+ */
++#define SR_VS		_AC(0x00000600, UL) /* Vector Status */
++#define SR_VS_OFF	_AC(0x00000000, UL)
++#define SR_VS_INITIAL	_AC(0x00000200, UL)
++#define SR_VS_CLEAN	_AC(0x00000400, UL)
++#define SR_VS_DIRTY	_AC(0x00000600, UL)
 +
-+#ifndef __ASM_RISCV_VECTOR_H
-+#define __ASM_RISCV_VECTOR_H
-+
-+#include <linux/types.h>
-+
-+#ifdef CONFIG_RISCV_ISA_V
-+
-+#include <asm/hwcap.h>
-+
-+static __always_inline bool has_vector(void)
-+{
-+	return riscv_has_extension_likely(RISCV_ISA_EXT_v);
-+}
-+
-+#else /* ! CONFIG_RISCV_ISA_V  */
-+
-+static __always_inline bool has_vector(void) { return false; }
-+
-+#endif /* CONFIG_RISCV_ISA_V */
-+
-+#endif /* ! __ASM_RISCV_VECTOR_H */
-diff --git a/arch/riscv/include/uapi/asm/hwcap.h b/arch/riscv/include/uapi/asm/hwcap.h
-index 46dc3f5ee99f..c52bb7bbbabe 100644
---- a/arch/riscv/include/uapi/asm/hwcap.h
-+++ b/arch/riscv/include/uapi/asm/hwcap.h
-@@ -21,5 +21,6 @@
- #define COMPAT_HWCAP_ISA_F	(1 << ('F' - 'A'))
- #define COMPAT_HWCAP_ISA_D	(1 << ('D' - 'A'))
- #define COMPAT_HWCAP_ISA_C	(1 << ('C' - 'A'))
-+#define COMPAT_HWCAP_ISA_V	(1 << ('V' - 'A'))
+ #define SR_XS		_AC(0x00018000, UL) /* Extension Status */
+ #define SR_XS_OFF	_AC(0x00000000, UL)
+ #define SR_XS_INITIAL	_AC(0x00008000, UL)
+ #define SR_XS_CLEAN	_AC(0x00010000, UL)
+ #define SR_XS_DIRTY	_AC(0x00018000, UL)
  
- #endif /* _UAPI_ASM_RISCV_HWCAP_H */
-diff --git a/arch/riscv/kernel/cpufeature.c b/arch/riscv/kernel/cpufeature.c
-index 00d7cd2c9043..923ca75f2192 100644
---- a/arch/riscv/kernel/cpufeature.c
-+++ b/arch/riscv/kernel/cpufeature.c
-@@ -103,6 +103,7 @@ void __init riscv_fill_hwcap(void)
- 	isa2hwcap['f' - 'a'] = COMPAT_HWCAP_ISA_F;
- 	isa2hwcap['d' - 'a'] = COMPAT_HWCAP_ISA_D;
- 	isa2hwcap['c' - 'a'] = COMPAT_HWCAP_ISA_C;
-+	isa2hwcap['v' - 'a'] = COMPAT_HWCAP_ISA_V;
- 
- 	elf_hwcap = 0;
- 
-@@ -261,6 +262,16 @@ void __init riscv_fill_hwcap(void)
- 		elf_hwcap &= ~COMPAT_HWCAP_ISA_F;
- 	}
- 
-+	if (elf_hwcap & COMPAT_HWCAP_ISA_V) {
-+		/*
-+		 * ISA string in device tree might have 'v' flag, but
-+		 * CONFIG_RISCV_ISA_V is disabled in kernel.
-+		 * Clear V flag in elf_hwcap if CONFIG_RISCV_ISA_V is disabled.
-+		 */
-+		if (!IS_ENABLED(CONFIG_RISCV_ISA_V))
-+			elf_hwcap &= ~COMPAT_HWCAP_ISA_V;
-+	}
++#define SR_FS_VS	(SR_FS | SR_VS) /* Vector and Floating-Point Unit */
 +
- 	memset(print_str, 0, sizeof(print_str));
- 	for (i = 0, j = 0; i < NUM_ALPHA_EXTS; i++)
- 		if (riscv_isa[0] & BIT_MASK(i))
+ #ifndef CONFIG_64BIT
+-#define SR_SD		_AC(0x80000000, UL) /* FS/XS dirty */
++#define SR_SD		_AC(0x80000000, UL) /* FS/VS/XS dirty */
+ #else
+-#define SR_SD		_AC(0x8000000000000000, UL) /* FS/XS dirty */
++#define SR_SD		_AC(0x8000000000000000, UL) /* FS/VS/XS dirty */
+ #endif
+ 
+ #ifdef CONFIG_64BIT
+@@ -296,6 +304,12 @@
+ #define CSR_MIMPID		0xf13
+ #define CSR_MHARTID		0xf14
+ 
++#define CSR_VSTART		0x8
++#define CSR_VCSR		0xf
++#define CSR_VL			0xc20
++#define CSR_VTYPE		0xc21
++#define CSR_VLENB		0xc22
++
+ #ifdef CONFIG_RISCV_M_MODE
+ # define CSR_STATUS	CSR_MSTATUS
+ # define CSR_IE		CSR_MIE
 -- 
 2.17.1
 
