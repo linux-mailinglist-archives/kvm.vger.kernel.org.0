@@ -2,109 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2FDF96CA926
-	for <lists+kvm@lfdr.de>; Mon, 27 Mar 2023 17:37:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3C1906CA982
+	for <lists+kvm@lfdr.de>; Mon, 27 Mar 2023 17:47:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232665AbjC0Phn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Mar 2023 11:37:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57348 "EHLO
+        id S233007AbjC0Pr0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Mar 2023 11:47:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44060 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230239AbjC0Phl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Mar 2023 11:37:41 -0400
-Received: from mail-oi1-x22b.google.com (mail-oi1-x22b.google.com [IPv6:2607:f8b0:4864:20::22b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3D55E5
-        for <kvm@vger.kernel.org>; Mon, 27 Mar 2023 08:37:40 -0700 (PDT)
-Received: by mail-oi1-x22b.google.com with SMTP id r16so6566206oij.5
-        for <kvm@vger.kernel.org>; Mon, 27 Mar 2023 08:37:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1679931460;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2scqCpn+SlvwNwMyXAR1S8e8r39frvTEmZWmCdUynfo=;
-        b=rFuTXmnSGmSvQSqlTCwOwfje4dNunkyQvBQO1B0OEvIHKkhsQfByRaQcSeSdkocF5F
-         yX5bCRDLIxqpm38oYlhRVTBZnKZZyCzAT3tmFdduJnJIWAB4dNqYrmwMuqy5p0BI3sSD
-         mhkrQ8TcipD6vcrzyVkebrs0a3r308DuqctCTsGHROhou/kEUIj8jvRKfVIzu6Q9HPLw
-         dFjRG+qM+HSJhcNuO1bncPlwqbiI0YzErn7+H1mTYkhwIol9FFPfJ8h3ieDG/VxCH+LK
-         hhNfznLzq/+I9QjUSBuPCbtWWn5xvv1gxYSFnb+/aIijxkOshfIyTFx4YYYC/r4rYjmu
-         VRCw==
+        with ESMTP id S232983AbjC0PrY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Mar 2023 11:47:24 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBED5469B
+        for <kvm@vger.kernel.org>; Mon, 27 Mar 2023 08:46:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1679931995;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=suVVIjRV3oKGbuJwHAWeWKYJQxupg5L1pR21dbVXNSs=;
+        b=GOk3aIpJfLZ1hyDwEe/JkhxG2XK+gojoyUMm0ESypDe+/MPqrn21CkZ3OM+D2umZC/yvDk
+        AKnWptq55s41zUaF8EJ1ZDe0Dc9VMloNm51iKuLS7dsMBtIw6VnEHpT8kPheBwJAdGt93S
+        7/v+oXkRMglBt+taP0ruAumLdsPd2wk=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-562-mfE1XskhNr2T2GVR7v2Bgw-1; Mon, 27 Mar 2023 11:46:33 -0400
+X-MC-Unique: mfE1XskhNr2T2GVR7v2Bgw-1
+Received: by mail-wm1-f69.google.com with SMTP id bi7-20020a05600c3d8700b003edecc610abso5916017wmb.7
+        for <kvm@vger.kernel.org>; Mon, 27 Mar 2023 08:46:33 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679931460;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=2scqCpn+SlvwNwMyXAR1S8e8r39frvTEmZWmCdUynfo=;
-        b=T7GdT+M+AhhfGLodz0YJbUtJsd0iZQu4ZvhfG4QFgNUbJrNHABK2WiZJ9OLeX73WBT
-         zjEdiRKv056ZwihpUJtR/7nU/EHNMMw6vnqyCRw4pPE84y1wBPcgCJzSsR50AlA/KKsK
-         IWOqrwhqc0UtRqSfXD/SJXuBhACNqNj2P26bi9lGhAahTwJRp8dW+bwJgDBNaymG5XrN
-         9jVgWqYZBfRTxBZOOz7eHupkI5UX+xAXFN2oKFQdVHM6wJLMePv4IcLMd97hIvQp6+pH
-         KnikO62Z8+P90a61wfvaoq1UE3yrmm8OvwmFk3FbCXOXyO4Mr/mumCvR064M2DVMf6D5
-         h0Rg==
-X-Gm-Message-State: AO0yUKWXIp4Fa4ns28JH6IcRDGcsIPLfGy+9tKmS501kxlf3mdHbbJ9y
-        mB7UAooW3tG2/uYNpHnFZp5K3S4NUon7XaxF31ldfg==
-X-Google-Smtp-Source: AK7set+yYWM5lvMs9lQ15RVaYTAVVUaZW7sK+M1vnndSyDeraV8KLjlOca7p039jDbWxUJ7HlCk9vl5058ikbPt7n3g=
-X-Received: by 2002:a54:4710:0:b0:384:4e2d:81ea with SMTP id
- k16-20020a544710000000b003844e2d81eamr3381518oik.9.1679931459915; Mon, 27 Mar
- 2023 08:37:39 -0700 (PDT)
+        d=1e100.net; s=20210112; t=1679931992;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=suVVIjRV3oKGbuJwHAWeWKYJQxupg5L1pR21dbVXNSs=;
+        b=6HrzTRGcaDm9hy+hZURBTR1kJDtJlp61zEwiJzhCs7bPiRzPjYQNKjqlUgP/S04rYq
+         vpl3b8q1n6fncaicMHxCkyF3123rtwfdJmZd5kZ2R84q9QWRLcooDvhuS+7YHi/jp2bY
+         A96Zf8AU1CZ5hzNf6Q7xlNsC57QPKhP42qn1sXZSl+bwM6U9zSN85rFG1k4HjlQEbHSc
+         br6McZmjkLPuBx52TH7TyGGK19SdQHYSYqyS7m7DYrag4LQjYo/4G7NvtKzo6FMC0D96
+         HnAEJa5Ye0kkMvf/IH2+B6s2hA2L3a0TMhhCZXTHbbT3rL+t5bEMISQBBkutvDD6T/3F
+         eDzA==
+X-Gm-Message-State: AAQBX9fNhqsJHmTJplZVVwveuSaeQ4I2JnbXGVsKpamQqmolHq4FbxBH
+        mOeMVWejiUe2ZgijygBjEkrASYcnRyy2t1hbUwN98M4Hl9vdz3TBFMv/UnFRf6lODLgrxHsiOca
+        weo4sE007CIwO
+X-Received: by 2002:a5d:684a:0:b0:2ce:fd37:938c with SMTP id o10-20020a5d684a000000b002cefd37938cmr10101894wrw.50.1679931992547;
+        Mon, 27 Mar 2023 08:46:32 -0700 (PDT)
+X-Google-Smtp-Source: AKy350bIogvBhFKiM1BfoGRTLIj1Va5aO8952L7+RRJrVJ3LVX59i+b+GLF0/519SVZbSl6UgZQ0XQ==
+X-Received: by 2002:a5d:684a:0:b0:2ce:fd37:938c with SMTP id o10-20020a5d684a000000b002cefd37938cmr10101874wrw.50.1679931992242;
+        Mon, 27 Mar 2023 08:46:32 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
+        by smtp.googlemail.com with ESMTPSA id g16-20020a5d4890000000b002de99432fc8sm5812194wrq.49.2023.03.27.08.46.31
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 27 Mar 2023 08:46:31 -0700 (PDT)
+Message-ID: <c3705204-8803-8115-5c47-de73bd4523a7@redhat.com>
+Date:   Mon, 27 Mar 2023 17:46:30 +0200
 MIME-Version: 1.0
-References: <20230322011440.2195485-1-seanjc@google.com> <20230322011440.2195485-6-seanjc@google.com>
- <373823f7-00ba-070c-53c7-384d29889e40@intel.com>
-In-Reply-To: <373823f7-00ba-070c-53c7-384d29889e40@intel.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Mon, 27 Mar 2023 08:37:28 -0700
-Message-ID: <CALMp9eTEG5o2jQ457BTAL=srPYFbFi2Jx1YLp+a3NW3tQ19wDQ@mail.gmail.com>
-Subject: Re: [PATCH 5/6] KVM: x86: Virtualize FLUSH_L1D and passthrough MSR_IA32_FLUSH_CMD
-To:     Xiaoyao Li <xiaoyao.li@intel.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.8.0
+Subject: Re: [PATCH 0/6] KVM: x86: Unhost the *_CMD MSR mess
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         Nathan Chancellor <nathan@kernel.org>,
         Emanuele Giuseppe Esposito <eesposit@redhat.com>,
-        Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-15.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,ENV_AND_HDR_SPF_MATCH,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL,
-        USER_IN_DEF_SPF_WL autolearn=unavailable autolearn_force=no
-        version=3.4.6
+        Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
+        Jim Mattson <jmattson@google.com>
+References: <20230322011440.2195485-1-seanjc@google.com>
+ <151c3b04-31db-6a50-23af-c6886098c85c@redhat.com>
+ <ZCG2D1PyWobdb8jk@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <ZCG2D1PyWobdb8jk@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Mar 26, 2023 at 8:33=E2=80=AFPM Xiaoyao Li <xiaoyao.li@intel.com> w=
-rote:
->
-> On 3/22/2023 9:14 AM, Sean Christopherson wrote:
-> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > index c83ec88da043..3c58dbae7b4c 100644
-> > --- a/arch/x86/kvm/x86.c
-> > +++ b/arch/x86/kvm/x86.c
-> > @@ -3628,6 +3628,18 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, st=
-ruct msr_data *msr_info)
-> >
-> >               wrmsrl(MSR_IA32_PRED_CMD, PRED_CMD_IBPB);
-> >               break;
-> > +     case MSR_IA32_FLUSH_CMD:
-> > +             if (!msr_info->host_initiated &&
-> > +                 !guest_cpuid_has(vcpu, X86_FEATURE_FLUSH_L1D))
-> > +                     return 1;
-> > +
-> > +             if (!boot_cpu_has(X86_FEATURE_FLUSH_L1D) || (data & ~L1D_=
-FLUSH))
-> > +                     return 1;
-> > +             if (!data)
-> > +                     break;
-> > +
-> > +             wrmsrl(MSR_IA32_FLUSH_CMD, L1D_FLUSH);
-> > +             break;
->
-> Then KVM provides the ability to flush the L1 data cache of host to
-> userspace. Can it be exploited to degrade the host performance if
-> userspace VMM keeps flushing the L1 data cache?
+On 3/27/23 17:28, Sean Christopherson wrote:
+>> On 3/22/23 02:14, Sean Christopherson wrote:
+>>> Revert the FLUSH_L1D enabling, which has multiple fatal bugs, clean up
+>>> the existing PRED_CMD handling, and reintroduce FLUSH_L1D virtualization
+>>> without inheriting the mistakes made by PRED_CMD.
+>>>
+>>> The last patch hardens SVM against one of the bugs introduced in the
+>>> FLUSH_L1D enabling.
+>>>
+>>> I'll post KUT patches tomorrow.  I have the tests written (and they found
+>>> bugs in my code, :shocked-pikachu:), just need to write the changelogs.
+>>> Wanted to get this out sooner than later as I'm guessing I'm not the only
+>>> one whose VMs won't boot on Intel CPUs...
+>> Hi Sean,
+>>
+>> did you post them?
+> No, I'll get that done today (I pinky swear this time).
 
-The L1D$ isn't very big. A guest could always flush out any previously
-cached data simply by referencing its own data. Is the ability to
-flush the L1D$ by WRMSR that egregious?
+Ok, you can also send me a pull request if you prefer (or I can apply 
+the patches to kvm/next myself of course).
+
+Paolo
+
