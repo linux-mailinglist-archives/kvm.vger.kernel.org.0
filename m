@@ -2,97 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 08CD06CA8BD
-	for <lists+kvm@lfdr.de>; Mon, 27 Mar 2023 17:15:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6D8676CA8D0
+	for <lists+kvm@lfdr.de>; Mon, 27 Mar 2023 17:20:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231359AbjC0PPY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Mar 2023 11:15:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34440 "EHLO
+        id S232476AbjC0PUt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Mar 2023 11:20:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39236 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229498AbjC0PPW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Mar 2023 11:15:22 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C6B7122;
-        Mon, 27 Mar 2023 08:15:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=ESG8YxL4RYEQX1LFkg3iiiQWrSAkB2oA83asusDbCz4=; b=NWAfI7QUlRz5+ccBJuYiIVOHkK
-        QcMvSDy6LPabwrq5DTM051didsJVlsxaLJpRqwkSJtJxeg4drvCeKgpS0iOXkwr0Mcp8Z4uDaRIgE
-        rL3DwDja41UzXNHqcjp5ES1nZVdAGAejX9PAjNqdX0quYv4jKjdz9VvwFU4GXXSSNYpa/GFmKIWgQ
-        7knDdaHckHpJBZi7ikYjLB6V4cnUq7hSBlAQZx1HPysqEdpoFcys15/XC/INGGyp8O9HPWCwFXbJG
-        tTgpiRFuCJFGAXWM1CjzfdpGG5Ol1IECAXg+C3cR6dyuWTsnYsP390rbFeRYdY4YUONI58dk3rgE3
-        vr8AwB5w==;
-Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pgoYm-007VJI-Qe; Mon, 27 Mar 2023 15:15:01 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits))
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id BBBA9300379;
-        Mon, 27 Mar 2023 17:14:58 +0200 (CEST)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id 8A0F8200D8E1F; Mon, 27 Mar 2023 17:14:58 +0200 (CEST)
-Date:   Mon, 27 Mar 2023 17:14:58 +0200
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Boqun Feng <boqun.feng@gmail.com>
-Cc:     rcu@vger.kernel.org, Ingo Molnar <mingo@redhat.com>,
-        Will Deacon <will@kernel.org>,
-        Waiman Long <longman@redhat.com>,
-        Lai Jiangshan <jiangshanlai@gmail.com>,
-        "Paul E. McKenney" <paulmck@kernel.org>,
-        Josh Triplett <josh@joshtriplett.org>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-        Davidlohr Bueso <dave@stgolabs.net>,
-        Frederic Weisbecker <frederic@kernel.org>,
-        Neeraj Upadhyay <quic_neeraju@quicinc.com>,
-        Joel Fernandes <joel@joelfernandes.org>,
-        Shuah Khan <shuah@kernel.org>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        seanjc@google.com, linux-kernel@vger.kernel.org,
-        linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH rcu v2 0/7] RCU-related lockdep changes for v6.4
-Message-ID: <20230327151458.GB11425@hirez.programming.kicks-ass.net>
-References: <20230323042614.1191120-1-boqun.feng@gmail.com>
+        with ESMTP id S231834AbjC0PUr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Mar 2023 11:20:47 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 436E610F0
+        for <kvm@vger.kernel.org>; Mon, 27 Mar 2023 08:20:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1679930401;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=kBXULJ0YJW6Vv+dTm+DQzBsn3dK4XBiUD4aYtQvteI8=;
+        b=GSrmkCUPp2kiMm6J6fCDvpSolJYwSY3zqUPij4r4QxNWzVlSsVCnyf4wBhgwUA9G24FL4B
+        GEyk55FLHxmWYaFPjiKrkfsHtaI9lkM4NAXp0jMhkSqG92F9OFGrkIKCFYLS/Llz2BIc+N
+        cmJfBAHIrQ8cLn6L9aav+nuSUJ76yzs=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-414-wRSSFYcKN1SejWKShSHtmg-1; Mon, 27 Mar 2023 11:19:59 -0400
+X-MC-Unique: wRSSFYcKN1SejWKShSHtmg-1
+Received: by mail-ed1-f70.google.com with SMTP id q13-20020a5085cd000000b004af50de0bcfso13358981edh.15
+        for <kvm@vger.kernel.org>; Mon, 27 Mar 2023 08:19:58 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1679930397;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=kBXULJ0YJW6Vv+dTm+DQzBsn3dK4XBiUD4aYtQvteI8=;
+        b=MP/kvAi6IfEtihvHRQ06BqIfvn18/4tV2IHqbnveXetPYf4sTTFNOIGZwGdH2MMTYz
+         kAVzYWdHBG+GLonK8+m/eX/MugJGrsDtYRM3AveDmxcbBOSkIkbX70NlhLtwzzUi1926
+         f+8oLo2ZdfVuDkt4S5CcSyFKdmxdsRHkRq8Dh/ropjWXIIQH7M1waIR4VaMd+GfgdI7S
+         2fyWepfKj3m2PoVMszancrBLNOZYeBd/0q2t5n75x0KRza7FRfnybJLNqG6A5EwXvMM1
+         ObWSuIM9ype2DUlsahSpsvINId/ZOFqanjSIIQ9+zMf03POSr8RhiYxh1g7gYVvF66MV
+         mxQA==
+X-Gm-Message-State: AAQBX9dTtvXzG2jMwGAh7k6hOGpMWyFp/7VBiTOtbFy3Nw1KsKquj0bX
+        mg00x3rAJ3qE0dJXFs/F2iRpm9WNjqXOWguaWRUsT6qJO8ou49UrAqFhyrSW0HALLpxbOw2X+zP
+        KzH+Nx3tbKdqm
+X-Received: by 2002:a17:906:f6cd:b0:92f:b8d0:746c with SMTP id jo13-20020a170906f6cd00b0092fb8d0746cmr12315933ejb.20.1679930397764;
+        Mon, 27 Mar 2023 08:19:57 -0700 (PDT)
+X-Google-Smtp-Source: AKy350amEJt/4jKby5lbzCbh7fHRRBROfolwArbQtP8/z/b3EANonkAshH00FVXH2WUDdpY6F6QaDQ==
+X-Received: by 2002:a17:906:f6cd:b0:92f:b8d0:746c with SMTP id jo13-20020a170906f6cd00b0092fb8d0746cmr12315913ejb.20.1679930397502;
+        Mon, 27 Mar 2023 08:19:57 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
+        by smtp.googlemail.com with ESMTPSA id r12-20020a50c00c000000b00501d2f10d19sm10349379edb.20.2023.03.27.08.19.56
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 27 Mar 2023 08:19:56 -0700 (PDT)
+Message-ID: <151c3b04-31db-6a50-23af-c6886098c85c@redhat.com>
+Date:   Mon, 27 Mar 2023 17:19:55 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230323042614.1191120-1-boqun.feng@gmail.com>
-X-Spam-Status: No, score=-2.5 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
-        DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.8.0
+Subject: Re: [PATCH 0/6] KVM: x86: Unhost the *_CMD MSR mess
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Nathan Chancellor <nathan@kernel.org>,
+        Emanuele Giuseppe Esposito <eesposit@redhat.com>,
+        Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
+        Jim Mattson <jmattson@google.com>
+References: <20230322011440.2195485-1-seanjc@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20230322011440.2195485-1-seanjc@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 22, 2023 at 09:26:07PM -0700, Boqun Feng wrote:
-> Boqun Feng (4):
->   locking/lockdep: Introduce lock_sync()
->   rcu: Annotate SRCU's update-side lockdep dependencies
->   locking: Reduce the number of locks in ww_mutex stress tests
->   locking/lockdep: Improve the deadlock scenario print for sync and read
->     lock
+On 3/22/23 02:14, Sean Christopherson wrote:
+> Revert the FLUSH_L1D enabling, which has multiple fatal bugs, clean up
+> the existing PRED_CMD handling, and reintroduce FLUSH_L1D virtualization
+> without inheriting the mistakes made by PRED_CMD.
 > 
-> Paul E. McKenney (3):
->   rcutorture: Add SRCU deadlock scenarios
->   rcutorture: Add RCU Tasks Trace and SRCU deadlock scenarios
->   rcutorture: Add srcu_lockdep.sh
+> The last patch hardens SVM against one of the bugs introduced in the
+> FLUSH_L1D enabling.
 > 
->  include/linux/lockdep.h                       |   8 +-
->  include/linux/srcu.h                          |  34 +++-
->  kernel/locking/lockdep.c                      |  64 +++++-
->  kernel/locking/test-ww_mutex.c                |   2 +-
->  kernel/rcu/rcutorture.c                       | 185 ++++++++++++++++++
->  kernel/rcu/srcutiny.c                         |   2 +
->  kernel/rcu/srcutree.c                         |   2 +
->  .../selftests/rcutorture/bin/srcu_lockdep.sh  |  78 ++++++++
->  8 files changed, 364 insertions(+), 11 deletions(-)
->  create mode 100755 tools/testing/selftests/rcutorture/bin/srcu_lockdep.sh
+> I'll post KUT patches tomorrow.  I have the tests written (and they found
+> bugs in my code, :shocked-pikachu:), just need to write the changelogs.
+> Wanted to get this out sooner than later as I'm guessing I'm not the only
+> one whose VMs won't boot on Intel CPUs...
 
-Acked-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+Hi Sean,
+
+did you post them?
+
+Paolo
+
