@@ -2,43 +2,43 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3A9006CA104
-	for <lists+kvm@lfdr.de>; Mon, 27 Mar 2023 12:14:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AA1836CA109
+	for <lists+kvm@lfdr.de>; Mon, 27 Mar 2023 12:15:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233527AbjC0KOL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Mar 2023 06:14:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47458 "EHLO
+        id S233538AbjC0KPL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Mar 2023 06:15:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48848 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233424AbjC0KOK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Mar 2023 06:14:10 -0400
+        with ESMTP id S233506AbjC0KPK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Mar 2023 06:15:10 -0400
 Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8B7646BD
-        for <kvm@vger.kernel.org>; Mon, 27 Mar 2023 03:14:08 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 868D44C1B
+        for <kvm@vger.kernel.org>; Mon, 27 Mar 2023 03:15:08 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 5CED6B81074
-        for <kvm@vger.kernel.org>; Mon, 27 Mar 2023 10:14:07 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E7946C433D2;
-        Mon, 27 Mar 2023 10:14:05 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 361E6B81072
+        for <kvm@vger.kernel.org>; Mon, 27 Mar 2023 10:15:07 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DF152C433EF;
+        Mon, 27 Mar 2023 10:15:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1679912046;
-        bh=q8knNZbvz1AkxOZAS3ojAskQnyVm4evgO72JVaz/vrQ=;
+        s=k20201202; t=1679912105;
+        bh=13hrWAgfZQrYOohFgk5p4rU9Mu8DpOU4EbMcrSeixb4=;
         h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=eMPjCg5R0ofYFwzzoeh1VK5BPEvnZ+i4D6BKxYlpTcFYGnVv6c3+HnLw5gCivS8Ll
-         AwQ4qRUpRJDXvzUS4Lq0rm1rZIplObe79NNFvhxXYqL7VkFYEBxzrrC/wHlp26Lt0h
-         u6mCTCDKwHJUawYiEVgPSJcnthXvu+DOXZ8Kguq1fIAKdb3dz8qOL2BUr//1rBZIEV
-         /WWYmT85TX/wph5Bkhy5NM6pnaILuZPFeuRs5Ec5z0lbEI4Gx5I6OSrF1O8fnRAXZr
-         OvLBy0ckQTGUY1FUvFcWZqRMiR9/lSRoJ4NzISCIz3VM3Yoje7m/VR4CnUnVEXhfld
-         +/pd4uivrrr/Q==
+        b=Ag12dtK2/YfA79qJcvu9s3Cpeb74e+71dT+1Jzo3ZDSmCT7i+rW+9WigNJqHcFGW9
+         msRe8r9aFkfKnBEDUMNhBo43XmzNyRKm9+GGSL9gdLzpK0iDIk2bEEahC5HyR9lOLY
+         aS5lkrzVPs2HLniU4Ni8znXQSykUjTVob7S0S6goVAKPL6UjaHrWADCUwvF4ZiDl35
+         W6AK4d1GheL2It7IQvbvNAKkFioKlX6HtJRwrjdPw1T/Qc8rKPWINBQ1kwJ78UPY2w
+         K7eS19dlMpFislOOhATPAixGk3NOun03gRkszkvQSmezZIHoXIZ48H7w2tKMZvdCvP
+         lRhcXW7R3qBfg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1pgjrX-003PeQ-FW;
-        Mon, 27 Mar 2023 11:14:03 +0100
-Date:   Mon, 27 Mar 2023 11:14:03 +0100
-Message-ID: <86355qy00k.wl-maz@kernel.org>
+        id 1pgjsV-003Pfd-IH;
+        Mon, 27 Mar 2023 11:15:03 +0100
+Date:   Mon, 27 Mar 2023 11:15:03 +0100
+Message-ID: <861qlaxzyw.wl-maz@kernel.org>
 From:   Marc Zyngier <maz@kernel.org>
 To:     Jing Zhang <jingzhangos@google.com>
 Cc:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>,
@@ -53,10 +53,10 @@ Cc:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>,
         Reiji Watanabe <reijiw@google.com>,
         Ricardo Koller <ricarkol@google.com>,
         Raghavendra Rao Ananta <rananta@google.com>
-Subject: Re: [PATCH v4 1/6] KVM: arm64: Move CPU ID feature registers emulation into a separate file
-In-Reply-To: <20230317050637.766317-2-jingzhangos@google.com>
+Subject: Re: [PATCH v4 2/6] KVM: arm64: Save ID registers' sanitized value per guest
+In-Reply-To: <20230317050637.766317-3-jingzhangos@google.com>
 References: <20230317050637.766317-1-jingzhangos@google.com>
-        <20230317050637.766317-2-jingzhangos@google.com>
+        <20230317050637.766317-3-jingzhangos@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -75,249 +75,151 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 17 Mar 2023 05:06:32 +0000,
+On Fri, 17 Mar 2023 05:06:33 +0000,
 Jing Zhang <jingzhangos@google.com> wrote:
 > 
-> Create a new file id_regs.c for CPU ID feature registers emulation code,
-> which are moved from sys_regs.c and tweak sys_regs code accordingly.
+> From: Reiji Watanabe <reijiw@google.com>
+> 
+> Introduce id_regs[] in kvm_arch as a storage of guest's ID registers,
+> and save ID registers' sanitized value in the array at KVM_CREATE_VM.
+> Use the saved ones when ID registers are read by the guest or
+> userspace (via KVM_GET_ONE_REG).
 > 
 > No functional change intended.
 > 
+> Signed-off-by: Reiji Watanabe <reijiw@google.com>
+> Co-developed-by: Jing Zhang <jingzhangos@google.com>
 > Signed-off-by: Jing Zhang <jingzhangos@google.com>
 > ---
->  arch/arm64/kvm/Makefile   |   2 +-
->  arch/arm64/kvm/id_regs.c  | 506 ++++++++++++++++++++++++++++++++++++++
->  arch/arm64/kvm/sys_regs.c | 464 ++--------------------------------
->  arch/arm64/kvm/sys_regs.h |  41 +++
->  4 files changed, 575 insertions(+), 438 deletions(-)
->  create mode 100644 arch/arm64/kvm/id_regs.c
+>  arch/arm64/include/asm/kvm_host.h | 11 ++++++++
+>  arch/arm64/kvm/arm.c              |  1 +
+>  arch/arm64/kvm/id_regs.c          | 44 ++++++++++++++++++++++++-------
+>  arch/arm64/kvm/sys_regs.c         |  2 +-
+>  arch/arm64/kvm/sys_regs.h         |  1 +
+>  5 files changed, 49 insertions(+), 10 deletions(-)
 > 
-> diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
-> index c0c050e53157..a6a315fcd81e 100644
-> --- a/arch/arm64/kvm/Makefile
-> +++ b/arch/arm64/kvm/Makefile
-> @@ -13,7 +13,7 @@ obj-$(CONFIG_KVM) += hyp/
->  kvm-y += arm.o mmu.o mmio.o psci.o hypercalls.o pvtime.o \
->  	 inject_fault.o va_layout.o handle_exit.o \
->  	 guest.o debug.o reset.o sys_regs.o stacktrace.o \
-> -	 vgic-sys-reg-v3.o fpsimd.o pkvm.o \
-> +	 vgic-sys-reg-v3.o fpsimd.o pkvm.o id_regs.o \
->  	 arch_timer.o trng.o vmid.o emulate-nested.o nested.o \
->  	 vgic/vgic.o vgic/vgic-init.o \
->  	 vgic/vgic-irqfd.o vgic/vgic-v2.o \
-> diff --git a/arch/arm64/kvm/id_regs.c b/arch/arm64/kvm/id_regs.c
-> new file mode 100644
-> index 000000000000..08b738852955
-> --- /dev/null
-> +++ b/arch/arm64/kvm/id_regs.c
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index a1892a8f6032..fb6b50b1f111 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -245,6 +245,15 @@ struct kvm_arch {
+>  	 * the associated pKVM instance in the hypervisor.
+>  	 */
+>  	struct kvm_protected_vm pkvm;
+> +
+> +	/*
+> +	 * Save ID registers for the guest in id_regs[].
+> +	 * (Op0, Op1, CRn, CRm, Op2) of the ID registers to be saved in it
+> +	 * is (3, 0, 0, crm, op2), where 1<=crm<8, 0<=op2<8.
+> +	 */
+> +#define KVM_ARM_ID_REG_NUM	56
+> +#define IDREG_IDX(id)		(((sys_reg_CRm(id) - 1) << 3) | sys_reg_Op2(id))
+> +	u64 id_regs[KVM_ARM_ID_REG_NUM];
 
-[...]
+Place these registers in their own structure, and place this structure
+*before* the pvm structure. Document what guards these registers when
+updated (my hunch is that this should rely on Oliver's locking fixes
+if the update comes from a vcpu).
 
-> +/**
-> + * emulate_id_reg - Emulate a guest access to an AArch64 CPU ID feature register
-> + * @vcpu: The VCPU pointer
-> + * @params: Decoded system register parameters
-> + *
-> + * Return: true if the ID register access was successful, false otherwise.
-> + */
-> +int emulate_id_reg(struct kvm_vcpu *vcpu, struct sys_reg_params *params)
-> +{
-> +	const struct sys_reg_desc *r;
-> +
-> +	r = find_reg(params, id_reg_descs, ARRAY_SIZE(id_reg_descs));
-> +
-> +	if (likely(r)) {
-> +		perform_access(vcpu, params, r);
-> +	} else {
-> +		print_sys_reg_msg(params,
-> +				  "Unsupported guest id_reg access at: %lx [%08lx]\n",
-> +				  *vcpu_pc(vcpu), *vcpu_cpsr(vcpu));
-> +		kvm_inject_undefined(vcpu);
-> +	}
-> +
-> +	return 1;
-> +}
-> +
-> +
-> +void kvm_arm_reset_id_regs(struct kvm_vcpu *vcpu)
-> +{
-> +	unsigned long i;
-> +
-> +	for (i = 0; i < ARRAY_SIZE(id_reg_descs); i++)
-> +		if (id_reg_descs[i].reset)
-> +			id_reg_descs[i].reset(vcpu, &id_reg_descs[i]);
-> +}
-
-What does this mean? None of the idregs have a reset function, given
-that they are global. Maybe this will make sense in the following
-patches, but definitely not here.
-
-> +
-> +int kvm_arm_get_id_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
-> +{
-> +	return kvm_sys_reg_get_user(vcpu, reg,
-> +				    id_reg_descs, ARRAY_SIZE(id_reg_descs));
-> +}
-> +
-> +int kvm_arm_set_id_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
-> +{
-> +	return kvm_sys_reg_set_user(vcpu, reg,
-> +				    id_reg_descs, ARRAY_SIZE(id_reg_descs));
-> +}
-> +
-> +bool kvm_arm_check_idreg_table(void)
-> +{
-> +	return check_sysreg_table(id_reg_descs, ARRAY_SIZE(id_reg_descs), false);
-> +}
-
-All these helpers are called from sys_regs.c and directly call back
-into it. Why not simply have a helper that gets the base and size of
-the array, and stick to pure common code?
-
-> +
-> +int kvm_arm_walk_id_regs(struct kvm_vcpu *vcpu, u64 __user *uind)
-> +{
-> +	const struct sys_reg_desc *i2, *end2;
-> +	unsigned int total = 0;
-> +	int err;
-> +
-> +	i2 = id_reg_descs;
-> +	end2 = id_reg_descs + ARRAY_SIZE(id_reg_descs);
-> +
-> +	while (i2 != end2) {
-> +		err = walk_one_sys_reg(vcpu, i2++, &uind, &total);
-> +		if (err)
-> +			return err;
-> +	}
-> +	return total;
-> +}
-
-This is an exact copy of walk_sys_regs. Surely this can be made common
-code.
-
-[...]
-
-> @@ -2912,6 +2482,8 @@ void kvm_reset_sys_regs(struct kvm_vcpu *vcpu)
->  {
->  	unsigned long i;
+>  };
 >  
-> +	kvm_arm_reset_id_regs(vcpu);
+>  struct kvm_vcpu_fault_info {
+> @@ -1005,6 +1014,8 @@ int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
+>  long kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
+>  				struct kvm_arm_copy_mte_tags *copy_tags);
+>  
+> +void kvm_arm_set_default_id_regs(struct kvm *kvm);
 > +
->  	for (i = 0; i < ARRAY_SIZE(sys_reg_descs); i++)
->  		if (sys_reg_descs[i].reset)
->  			sys_reg_descs[i].reset(vcpu, &sys_reg_descs[i]);
-> @@ -2932,6 +2504,9 @@ int kvm_handle_sys_reg(struct kvm_vcpu *vcpu)
->  	params = esr_sys64_to_params(esr);
->  	params.regval = vcpu_get_reg(vcpu, Rt);
+>  /* Guest/host FPSIMD coordination helpers */
+>  int kvm_arch_vcpu_run_map_fp(struct kvm_vcpu *vcpu);
+>  void kvm_arch_vcpu_load_fp(struct kvm_vcpu *vcpu);
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 3bd732eaf087..4579c878ab30 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -153,6 +153,7 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
 >  
-> +	if (is_id_reg(reg_to_encoding(&params)))
-> +		return emulate_id_reg(vcpu, &params);
-> +
->  	if (!emulate_sys_reg(vcpu, &params))
->  		return 1;
+>  	set_default_spectre(kvm);
+>  	kvm_arm_init_hypercalls(kvm);
+> +	kvm_arm_set_default_id_regs(kvm);
 >  
-> @@ -3160,6 +2735,10 @@ int kvm_arm_sys_reg_get_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg
->  	if (err != -ENOENT)
->  		return err;
->  
-> +	err = kvm_arm_get_id_reg(vcpu, reg);
-
-Why not check for the encoding here? or in the helpers? It feels that
-this is an overhead that would be easy to reduce, given that we have
-fewer idregs than normal sysregs.
-
-> +	if (err != -ENOENT)
-> +		return err;
-> +
->  	return kvm_sys_reg_get_user(vcpu, reg,
->  				    sys_reg_descs, ARRAY_SIZE(sys_reg_descs));
->  }
-> @@ -3204,6 +2783,10 @@ int kvm_arm_sys_reg_set_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg
->  	if (err != -ENOENT)
->  		return err;
->  
-> +	err = kvm_arm_set_id_reg(vcpu, reg);
-
-Same here.
-
-> +	if (err != -ENOENT)
-> +		return err;
-> +
->  	return kvm_sys_reg_set_user(vcpu, reg,
->  				    sys_reg_descs, ARRAY_SIZE(sys_reg_descs));
->  }
-> @@ -3250,10 +2833,10 @@ static bool copy_reg_to_user(const struct sys_reg_desc *reg, u64 __user **uind)
->  	return true;
->  }
->  
-> -static int walk_one_sys_reg(const struct kvm_vcpu *vcpu,
-> -			    const struct sys_reg_desc *rd,
-> -			    u64 __user **uind,
-> -			    unsigned int *total)
-> +int walk_one_sys_reg(const struct kvm_vcpu *vcpu,
-> +		     const struct sys_reg_desc *rd,
-> +		     u64 __user **uind,
-> +		     unsigned int *total)
->  {
 >  	/*
->  	 * Ignore registers we trap but don't save,
-> @@ -3294,6 +2877,7 @@ unsigned long kvm_arm_num_sys_reg_descs(struct kvm_vcpu *vcpu)
->  {
->  	return ARRAY_SIZE(invariant_sys_regs)
->  		+ num_demux_regs()
-> +		+ kvm_arm_walk_id_regs(vcpu, (u64 __user *)NULL)
->  		+ walk_sys_regs(vcpu, (u64 __user *)NULL);
->  }
->  
-> @@ -3309,6 +2893,11 @@ int kvm_arm_copy_sys_reg_indices(struct kvm_vcpu *vcpu, u64 __user *uindices)
->  		uindices++;
+>  	 * Initialise the default PMUver before there is a chance to
+> diff --git a/arch/arm64/kvm/id_regs.c b/arch/arm64/kvm/id_regs.c
+> index 08b738852955..e393b5730557 100644
+> --- a/arch/arm64/kvm/id_regs.c
+> +++ b/arch/arm64/kvm/id_regs.c
+> @@ -52,16 +52,9 @@ static u8 pmuver_to_perfmon(u8 pmuver)
 >  	}
->  
-> +	err = kvm_arm_walk_id_regs(vcpu, uindices);
-> +	if (err < 0)
-> +		return err;
-> +	uindices += err;
-> +
->  	err = walk_sys_regs(vcpu, uindices);
->  	if (err < 0)
->  		return err;
-> @@ -3323,6 +2912,7 @@ int __init kvm_sys_reg_table_init(void)
->  	unsigned int i;
->  
->  	/* Make sure tables are unique and in order. */
-> +	valid &= kvm_arm_check_idreg_table();
->  	valid &= check_sysreg_table(sys_reg_descs, ARRAY_SIZE(sys_reg_descs), false);
->  	valid &= check_sysreg_table(cp14_regs, ARRAY_SIZE(cp14_regs), true);
->  	valid &= check_sysreg_table(cp14_64_regs, ARRAY_SIZE(cp14_64_regs), true);
-> diff --git a/arch/arm64/kvm/sys_regs.h b/arch/arm64/kvm/sys_regs.h
-> index 6b11f2cc7146..ad41305348f7 100644
-> --- a/arch/arm64/kvm/sys_regs.h
-> +++ b/arch/arm64/kvm/sys_regs.h
-> @@ -210,6 +210,35 @@ find_reg(const struct sys_reg_params *params, const struct sys_reg_desc table[],
->  	return __inline_bsearch((void *)pval, table, num, sizeof(table[0]), match_sys_reg);
 >  }
 >  
-> +static inline unsigned int raz_visibility(const struct kvm_vcpu *vcpu,
-> +					  const struct sys_reg_desc *r)
+> -/* Read a sanitised cpufeature ID register by sys_reg_desc */
+> -static u64 read_id_reg(const struct kvm_vcpu *vcpu, struct sys_reg_desc const *r)
+> +u64 kvm_arm_read_id_reg(const struct kvm_vcpu *vcpu, u32 id)
+>  {
+> -	u32 id = reg_to_encoding(r);
+> -	u64 val;
+> -
+> -	if (sysreg_visible_as_raz(vcpu, r))
+> -		return 0;
+> -
+> -	val = read_sanitised_ftr_reg(id);
+> +	u64 val = vcpu->kvm->arch.id_regs[IDREG_IDX(id)];
+>  
+>  	switch (id) {
+>  	case SYS_ID_AA64PFR0_EL1:
+> @@ -126,6 +119,14 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu, struct sys_reg_desc const *r
+>  	return val;
+>  }
+>  
+> +static u64 read_id_reg(const struct kvm_vcpu *vcpu, struct sys_reg_desc const *r)
 > +{
-> +	return REG_RAZ;
+> +	if (sysreg_visible_as_raz(vcpu, r))
+> +		return 0;
+> +
+> +	return kvm_arm_read_id_reg(vcpu, reg_to_encoding(r));
 > +}
+> +
+>  /* cpufeature ID register access trap handlers */
+>  
+>  static bool access_id_reg(struct kvm_vcpu *vcpu,
+> @@ -504,3 +505,28 @@ int kvm_arm_walk_id_regs(struct kvm_vcpu *vcpu, u64 __user *uind)
+>  	}
+>  	return total;
+>  }
+> +
+> +/*
+> + * Set the guest's ID registers that are defined in id_reg_descs[]
+> + * with ID_SANITISED() to the host's sanitized value.
+> + */
+> +void kvm_arm_set_default_id_regs(struct kvm *kvm)
+> +{
+> +	int i;
+> +	u32 id;
+> +	u64 val;
+> +
+> +	for (i = 0; i < ARRAY_SIZE(id_reg_descs); i++) {
+> +		id = reg_to_encoding(&id_reg_descs[i]);
+> +		if (WARN_ON_ONCE(!is_id_reg(id)))
+> +			/* Shouldn't happen */
+> +			continue;
+> +
+> +		if (id_reg_descs[i].visibility == raz_visibility)
+> +			/* Hidden or reserved ID register */
+> +			continue;
 
-No, please. This is used as a function pointer. You now potentially
-force the compiler to emit as many copy of this as there are pointers.
+Relying on function pointer comparison is really fragile. If I wrap
+raz_visibility() in another function, this won't catch it. It also
+doesn't bode well with your 'inline' definition of this function.
+
+More importantly, why do we care about checking for visibility at all?
+We can happily populate the array and rely on the runtime visibility.
 
 > +
-> +static inline bool write_to_read_only(struct kvm_vcpu *vcpu,
-> +				      struct sys_reg_params *params,
-> +				      const struct sys_reg_desc *r)
-> +{
-> +	WARN_ONCE(1, "Unexpected sys_reg write to read-only register\n");
-> +	print_sys_reg_instr(params);
-> +	kvm_inject_undefined(vcpu);
-> +	return false;
+> +		val = read_sanitised_ftr_reg(id);
+> +		kvm->arch.id_regs[IDREG_IDX(id)] = val;
+> +	}
 > +}
-
-Please make this common code, and not an inline function.
 
 Thanks,
 
