@@ -2,125 +2,136 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A4C8C6CBBDB
-	for <lists+kvm@lfdr.de>; Tue, 28 Mar 2023 12:06:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 274CE6CBBFE
+	for <lists+kvm@lfdr.de>; Tue, 28 Mar 2023 12:10:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232663AbjC1KFS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Mar 2023 06:05:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55768 "EHLO
+        id S232127AbjC1KKU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Mar 2023 06:10:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38382 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232745AbjC1KE6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Mar 2023 06:04:58 -0400
-Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 948FE6180;
-        Tue, 28 Mar 2023 03:04:56 -0700 (PDT)
-Received: by mail-pj1-x102b.google.com with SMTP id lr16-20020a17090b4b9000b0023f187954acso11957658pjb.2;
-        Tue, 28 Mar 2023 03:04:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1679997896;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=tj+JNRYSlmpI8qc8/QJIucmB+4IxZS7FjZc7hG2oNPs=;
-        b=fOegfL1/FdAwtPzd5RlErl3s4iL5bstKSKXsJsFpn4CnC4hUSmhZ9Bha5u/NsV5mY4
-         j7onHQb3tTJfvlm534eoE0xqQGi4V1sfvYcpIHtcLKKdUl7WCflUDMDZ3oRRIkUU5xpt
-         j18SZ3+t7Bova2API9Du695XzAX7pnxdr0O2F2wlZGKLgROmDNxDBt853Oec3+zdFlMX
-         vhbtq7G4CIL3tY+Z+csTxEKgOmVuHKvT5oLinfk+S+w5m4ksHJ0uZLOzGTu4Vr65ctex
-         J6c6nQ4rJoQO5dFfeayl8E6eygCm1ZQRG8LKGi2pOSucLuRlJU355mZkZfCfnbigzd20
-         ftDw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679997896;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=tj+JNRYSlmpI8qc8/QJIucmB+4IxZS7FjZc7hG2oNPs=;
-        b=a/gO/AmhEkbLqiLi8ngMvDip23IaCHaxqeR8pwjdI5OBQ/uMWIs/ZA8d3VjHNugrCQ
-         CrJq/Q+SbvrRMWEm3szy56JJzMARFjZBciXLwVjPLcP5OcLgAc8/LOtln4gx1/dd8P9/
-         RGnYXTu1RNKv1ioTQ5AMsCo1sgV0kYvFI6ySnqCga+gdpuGjIO98aBPmTsQIC2sYGdiK
-         P4WI5xPV7P0A2g9RtPcIUznpCunI7YBSKnRgdNo/DRvKBaFnN+Hf8dElRLY/bB5zdrsS
-         BHz8mJ/RvuA2ae6Gcj/+xEFvKHTEnSDhbJXNjThOS93ZbqdzZbRlbhmoxVT5hRMYykXg
-         CvbA==
-X-Gm-Message-State: AO0yUKUjheTOor7JpMWUUVuQWTDXAJQIYnzf29srZ9g92Dxn2jeWO0Vk
-        iqQTFORL61AY83TQB9pR7Ug=
-X-Google-Smtp-Source: AK7set/WDWKYpU+87FgYc0gxbbhEXX09YA9uvLztEHtpn+0SbnVY/NVFP2yh0jpDuEYXF49nqxRAXg==
-X-Received: by 2002:a05:6a20:47e2:b0:da:adbf:7b96 with SMTP id ey34-20020a056a2047e200b000daadbf7b96mr12428939pzb.21.1679997895936;
-        Tue, 28 Mar 2023 03:04:55 -0700 (PDT)
-Received: from [192.168.255.10] ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id j11-20020a62e90b000000b005825b8e0540sm3031187pfh.204.2023.03.28.03.04.52
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 28 Mar 2023 03:04:55 -0700 (PDT)
-Message-ID: <7e84bfb4-b052-4c31-a319-1ea2dd52ae54@gmail.com>
-Date:   Tue, 28 Mar 2023 18:04:45 +0800
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.9.0
-Subject: Re: [PATCH v2] KVM: x86/pmu: Fix emulation on Intel counters' bit
- width
-Content-Language: en-US
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20230322093117.48335-1-likexu@tencent.com>
- <CABgObfYfiUDf4zY=izcg_32yGCbUxxVc+JAkHGHwiQ0VmGdOgA@mail.gmail.com>
- <871434fe-ae80-bec6-9920-a6411f5842c0@gmail.com>
- <fce5c1ad-24a3-febf-127e-e97238492143@redhat.com>
-From:   Like Xu <like.xu.linux@gmail.com>
-In-Reply-To: <fce5c1ad-24a3-febf-127e-e97238492143@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
-        DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-        autolearn_force=no version=3.4.6
+        with ESMTP id S232263AbjC1KKJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Mar 2023 06:10:09 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B74C83D6
+        for <kvm@vger.kernel.org>; Tue, 28 Mar 2023 03:09:52 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 57599B81BDF
+        for <kvm@vger.kernel.org>; Tue, 28 Mar 2023 10:09:50 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1CFDEC433D2;
+        Tue, 28 Mar 2023 10:09:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1679998189;
+        bh=EOVmU8BJ5FxoPl3LUzLpL+JfKMMwtlA39IBMB2FcU+c=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=kE6Nmg0Suz0F9lk3wM2k7WVcZoJwcwFH+kMwi5GKx0Lg+I0FQgx0pw+fBqBfqP2hn
+         ZrPHtTd+dz9Ru8Ea9NALsog3vMiLJ1xP/LxCNqBGg15An5yyVnC/LS+GWy53NkXNxD
+         JmvnT4Lk/eduWXvwUBCF+rn8eR/gwqOId0n56R7GMTVKbGb5UljVa/01KMzBdfUDYk
+         Q1IrZuKp/9CkuQwVwTolqeJ9OHAD+JKN4eoltNlxtsO8bk9a69fC/kidJH4vABYclP
+         V1PlGxNndjxVOeBjT7JTg4lLmZzUP7pkDVOqdWdNipBHRNNHMBaKezpZUdoHqjFMNS
+         lxCriB9Y7vpGw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1ph6Gw-003jA4-TK;
+        Tue, 28 Mar 2023 11:09:47 +0100
+Date:   Tue, 28 Mar 2023 11:09:46 +0100
+Message-ID: <86r0t9w5jp.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Colton Lewis <coltonlewis@google.com>
+Cc:     pbonzini@redhat.com, shuah@kernel.org, seanjc@google.com,
+        dmatlack@google.com, vipinsh@google.com, andrew.jones@linux.dev,
+        bgardon@google.com, ricarkol@google.com, oliver.upton@linux.dev,
+        kvm@vger.kernel.org
+Subject: Re: [PATCH v2 1/2] KVM: selftests: Provide generic way to read system counter
+In-Reply-To: <gsntfs9xdipf.fsf@coltonlewis-kvm.c.googlers.com>
+References: <87y1nvgv8s.wl-maz@kernel.org>
+        <gsntfs9xdipf.fsf@coltonlewis-kvm.c.googlers.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: coltonlewis@google.com, pbonzini@redhat.com, shuah@kernel.org, seanjc@google.com, dmatlack@google.com, vipinsh@google.com, andrew.jones@linux.dev, bgardon@google.com, ricarkol@google.com, oliver.upton@linux.dev, kvm@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-2.5 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 28/3/2023 5:20 pm, Paolo Bonzini wrote:
-> On 3/28/23 11:16, Like Xu wrote:
->>
->>
->> If IA32_PERF_CAPABILITIES.FW_WRITE[bit 13] =1, each IA32_PMCi is accompanied by a
->> corresponding alias address starting at 4C1H for IA32_A_PMC0.
->>
->> The bit width of the performance monitoring counters is specified in 
->> CPUID.0AH:EAX[23:16].
->> If IA32_A_PMCi is present, the 64-bit input value (EDX:EAX) of WRMSR to 
->> IA32_A_PMCi will cause
->> IA32_PMCi to be updated by:
->>
->>      COUNTERWIDTH =
->>          CPUID.0AH:EAX[23:16] bit width of the performance monitoring counter
->>      IA32_PMCi[COUNTERWIDTH-1:32] := EDX[COUNTERWIDTH-33:0]);
->>      IA32_PMCi[31:0] := EAX[31:0];
->>      EDX[63:COUNTERWIDTH] are reserved
->>
->> ---
->>
->> Some might argue that this is all talking about GP counters, not
->> fixed counters. In fact, the full-width write hw behaviour is
->> presumed to do the same thing for all counters.
-> But the above behavior, and the #GP, is only true for IA32_A_PMCi (the 
-> full-witdh MSR).  Did I understand correctly that the behavior for fixed 
-> counters is changed without introducing an alias MSR?
+On Tue, 21 Mar 2023 19:10:04 +0000,
+Colton Lewis <coltonlewis@google.com> wrote:
 > 
-> Paolo
+> Marc Zyngier <maz@kernel.org> writes:
 > 
+> >> +#define MEASURE_CYCLES(x)			\
+> >> +	({					\
+> >> +		uint64_t start;			\
+> >> +		start = cycles_read();		\
+> >> +		x;				\
+> 
+> > You insert memory accesses inside a sequence that has no dependency
+> > with it. On a weakly ordered memory system, there is absolutely no
+> > reason why the memory access shouldn't be moved around. What do you
+> > exactly measure in that case?
+> 
+> cycles_read is built on another function timer_get_cntct which includes
+> its own barriers. Stripped of some abstraction, the sequence is:
+> 
+> timer_get_cntct (isb+read timer)
+> whatever is being measured
+> timer_get_cntct
+> 
+> I hadn't looked at it too closely before but on review of the manual
+> I think you are correct. Borrowing from example D7-2 in the manual, it
+> should be:
+> 
+> timer_get_cntct
+> isb
+> whatever is being measured
+> dsb
+> timer_get_cntct
 
-If true, why introducing those alias MSRs ? My archaeological findings are:
+That's better, but also very heavy handed. You'd be better off
+constructing an address dependency from the timer value, and feed that
+into a load-acquire/store-release pair wrapping your payload.
 
-a platform w/o full-witdh like Westmere (has 3-fixed counters already) is 
-declared to
-have a counter width (R:48, W:32) and its successor Sandy Bridge has (R:48 , W: 
-32/48).
+> 
+> >> +		cycles_read() - start;		\
+> 
+> > I also question the usefulness of this exercise. You're comparing the
+> > time it takes for a multi-GHz system to put a write in a store buffer
+> > (assuming it didn't miss in the TLBs) vs a counter that gets updated
+> > at a frequency of a few tens of MHz.
+> 
+> > My guts feeling is that this results in a big fat zero most of the
+> > time, but I'm happy to be explained otherwise.
+> 
+> 
+> In context, I'm trying to measure the time it takes to write to a buffer
+> *with dirty memory logging enabled*. What do you mean by zero? I can
+> confirm from running this code I am not measuring zero time.
 
-Thus I think the behaviour of the fixed counter has changed from there, and the 
-alias GP MSRs
-were introduced to keep the support on 32-bit writes on #GP counters (via 
-original address).
+See my earlier point: the counter tick is a few MHz, and the CPU
+multiple GHz. So unless "whatever" is something that takes a
+significant time (several thousands of CPU cycles), you'll measure
+nothing using the counter. Page faults will probably show, but not a
+normal access.
 
-[*] Intel® 64 and IA-32 Architectures Software Developer’s Manual Documentation 
-Changes
-(252046-030, January 2011) Table 30-18 Core PMU Comparison.
+The right tool for this job is to use PMU events, as they count at the
+CPU frequency.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
