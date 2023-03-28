@@ -2,62 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B3B2F6CC832
-	for <lists+kvm@lfdr.de>; Tue, 28 Mar 2023 18:39:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E714C6CC85F
+	for <lists+kvm@lfdr.de>; Tue, 28 Mar 2023 18:48:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232823AbjC1QjH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Mar 2023 12:39:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49626 "EHLO
+        id S230253AbjC1QsT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Mar 2023 12:48:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59188 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230339AbjC1QjF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Mar 2023 12:39:05 -0400
-Received: from mail-ot1-x336.google.com (mail-ot1-x336.google.com [IPv6:2607:f8b0:4864:20::336])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4698B977E
-        for <kvm@vger.kernel.org>; Tue, 28 Mar 2023 09:39:03 -0700 (PDT)
-Received: by mail-ot1-x336.google.com with SMTP id cm7-20020a056830650700b006a11f365d13so5378356otb.0
-        for <kvm@vger.kernel.org>; Tue, 28 Mar 2023 09:39:03 -0700 (PDT)
+        with ESMTP id S229861AbjC1QsR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Mar 2023 12:48:17 -0400
+Received: from mail-yb1-xb31.google.com (mail-yb1-xb31.google.com [IPv6:2607:f8b0:4864:20::b31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1604D61A8
+        for <kvm@vger.kernel.org>; Tue, 28 Mar 2023 09:48:16 -0700 (PDT)
+Received: by mail-yb1-xb31.google.com with SMTP id i7so15945667ybt.0
+        for <kvm@vger.kernel.org>; Tue, 28 Mar 2023 09:48:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1680021542;
+        d=google.com; s=20210112; t=1680022095;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=2kBfDOkLpG6hikV608JINDtCSthbfnxHO543G7BGPuA=;
-        b=A/eD/go7ClEtmJWDskIdc1JS8/KEST8EyDb/UxTH6FDcb31TgHBm1lJ4OjzByFFHPZ
-         IklAPlT1eTBjypz3WaJ7Q8/tzc/F3oQU3x9wBWEVsrOb1B2XHi7Gw5qpgxJ5+fdrP2XH
-         EK/m6Bdien2A20Z4Xnrw8woEuD/+UIuf+K+VCyx6MEfl9kTEL1wGawHihSGD16HMKmh9
-         7+xJ/7QDLl1yd+/gW3++Zm6x0qzxCzS0w8ADXydamkElroQLIGv767psVtFsO5XebcIo
-         ZOweBvREUK02KCf3K4pVNLUpVSzyMP+HeyzHsFhiKFEUsaIt80+8mUh8fCYuu687itRe
-         F8vw==
+        bh=hqjMvaLDfnVK/y/k0tCfZPzOD0WMWLp677CWGc7a374=;
+        b=XjAzXOf+OAujAkz7gfYD9bViHIA/QbQ9fEmMRBGih1etPRYe3XSRXx8jsEfsHq+Cc8
+         Lo6WN0cMuzrd7f03oONWR+iWbra8k2QOSOM8gtzuBzmpo8LSH38sCgqN99bCpd2OL9kd
+         Sfur1RxCgss2GoIXOY2oiiZVVk+jrkzn55G7fHYBFycKcekFx+FXzsti9M2u1anHE04N
+         6SuCO8jfie1AJRT+iz8A1GQ6mInDoVJOCrYDx4crSxbwnGbd8hUXxdGMOA3pfKxkytC/
+         +4GwwvNB9LQNo6IpTf5gWxgGsvjLoxPBDyHQrdmAWEywIRt23Ug1TI8MDvyoOwEJPz29
+         wb1g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680021542;
+        d=1e100.net; s=20210112; t=1680022095;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=2kBfDOkLpG6hikV608JINDtCSthbfnxHO543G7BGPuA=;
-        b=QxGYeP4eOPE6cU2u1P0DcBzaGHYHJKSixQqKCSAVxn0azWLqMRmPcyoI3QBitfg4Z3
-         wtNzgin0V1gcOxHkxa2iw2ySB58QrGhoLaSUkCzeIVwUtfB9IIDSQCbH3UaiNehQfuWB
-         AROkSkC/umjOKrahKMQsLYvCePYut4GApo2MvfRJenOBOLDd7L/7Yi8KkdCckR4a0v0z
-         Q/dNSXzVjy+0XAhcIp+KRu+6py4eGGCVejuuANffEUzTkFAl8r6+FVCW9EaaCcgjXiFR
-         CRff4WhH2WEUkN/6+sWHGxtlzoF6egDWMZajck1t2tQdJqUhqf4H3lgEF8eCTfETF9r+
-         260w==
-X-Gm-Message-State: AO0yUKVW+bELnjjhcWz5WrN9n92nl7cXSAvUOFVhQcwIJiyJXPkF1JQ0
-        P8T/NTXefHBIQ7+bdtZAty1lnIJWYE3X3jKORhg45ZWIOBRroH95hmA=
-X-Google-Smtp-Source: AK7set97hUk9wU6iaSXYhcAwA60MYzw6g1HSCdQc375zwrAyFJv8DGlFFQ52G0vzxqgMFLqP/x9m1PMus1GaxPyuB7A=
-X-Received: by 2002:a05:6830:1c4:b0:69d:66f0:a34e with SMTP id
- r4-20020a05683001c400b0069d66f0a34emr5066206ota.2.1680021542077; Tue, 28 Mar
- 2023 09:39:02 -0700 (PDT)
+        bh=hqjMvaLDfnVK/y/k0tCfZPzOD0WMWLp677CWGc7a374=;
+        b=2gi2MrErV2enZrr2R1nYfS1vUvU/LHgYPdEv5CHUTwlPH/1zJYoWZhPmSeEOndv/02
+         aI5WkmSGlRMTIgQA6Y0IRcqC8Q7phlqmYog8fuPm4MkhiGTX2Or0i/wyVTJSs6lPSfSY
+         EQuJPLE0f77g1GgOQFpoGMxGfRbfUQxNenY58UjLsix5JjA76G3tHcaqc7DAkH8aa7Sr
+         rFGNqrcXEcU1tia1sHYTDfL+5SdbiA/UGLjNrPDmDXLaSQJz8bQNp4smzBZasrn/hSF2
+         8n10KZFKjiDkTLGU11OJghC70z9SHroqGXx9kWiWLcZSaLqnFqAcKt00cBUXXw6Am3SX
+         MEJA==
+X-Gm-Message-State: AAQBX9cp5b0S6wHRoiCMiQ8pttc6+G84B/8qb45Yi8FK8f8MKOq/OD8+
+        Y3MX5TqacKSAHDxyGZ/94PWf2AFSEmyypYlxPdGE6Q==
+X-Google-Smtp-Source: AKy350bjSmjCodaksLx+hSuUtpW5oB+G2DqmMThD/W+KhVBLprn2VUun8xaj/BSYCiPWYx2j+YNCZlePSB5YhiMnkj0=
+X-Received: by 2002:a05:6902:102b:b0:b6c:48c3:3c1c with SMTP id
+ x11-20020a056902102b00b00b6c48c33c1cmr10837614ybt.13.1680022094777; Tue, 28
+ Mar 2023 09:48:14 -0700 (PDT)
 MIME-Version: 1.0
-References: <20230321112742.25255-1-likexu@tencent.com> <CALMp9eT0SrXCLriBN+nBv5fFQQ3n+b4Guq=-yLsFFQjeQ-nczA@mail.gmail.com>
- <e002f554-b69d-cedf-162c-271bc3609a39@gmail.com> <CALMp9eQVnk8gkOpX5AHhaCr8-5Fe=qNuX8PUP1Gv2H5FSYmHSw@mail.gmail.com>
- <cff6147a-9e57-0f8f-9dce-372f3992f17d@gmail.com>
-In-Reply-To: <cff6147a-9e57-0f8f-9dce-372f3992f17d@gmail.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Tue, 28 Mar 2023 09:38:50 -0700
-Message-ID: <CALMp9eT9bMGCNan2sQQyJpJvaTqn8hQjuzCASkHWufVtyksD5A@mail.gmail.com>
-Subject: Re: [PATCH] KVM: x86/pmu: Add Intel PMU supported fixed counters bit mask
-To:     Like Xu <like.xu.linux@gmail.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+References: <20230306224127.1689967-1-vipinsh@google.com> <20230306224127.1689967-12-vipinsh@google.com>
+ <ZBzL1Awe7S00dPUP@google.com>
+In-Reply-To: <ZBzL1Awe7S00dPUP@google.com>
+From:   Vipin Sharma <vipinsh@google.com>
+Date:   Tue, 28 Mar 2023 09:47:38 -0700
+Message-ID: <CAHVum0c7pLnYYHhzPPQSbSb1NoeW9hBbidd9i8fHSEazPaSJbA@mail.gmail.com>
+Subject: Re: [Patch v4 11/18] KVM: x86/mmu: Add documentation of NUMA aware
+ page table capability
+To:     David Matlack <dmatlack@google.com>
+Cc:     seanjc@google.com, pbonzini@redhat.com, bgardon@google.com,
+        jmattson@google.com, mizhang@google.com, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
@@ -72,357 +72,133 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 28, 2023 at 3:27=E2=80=AFAM Like Xu <like.xu.linux@gmail.com> w=
-rote:
+On Thu, Mar 23, 2023 at 2:59=E2=80=AFPM David Matlack <dmatlack@google.com>=
+ wrote:
 >
-> On 27/3/2023 10:58 pm, Jim Mattson wrote:
-> > On Mon, Mar 27, 2023 at 12:47=E2=80=AFAM Like Xu <like.xu.linux@gmail.c=
-om> wrote:
-> >>
-> >> On 25/3/2023 7:19 am, Jim Mattson wrote:
-> >>> On Tue, Mar 21, 2023 at 4:28=E2=80=AFAM Like Xu <like.xu.linux@gmail.=
-com> wrote:
-> >>>>
-> >>>> From: Like Xu <likexu@tencent.com>
-> >>>>
-> >>>> Per Intel SDM, fixed-function performance counter 'i' is supported i=
-f:
-> >>>>
-> >>>>           FxCtr[i]_is_supported :=3D ECX[i] || (EDX[4:0] > i);
-> >>>>
-> >>>> which means that the KVM user space can use EDX to limit the number =
-of
-> >>>> fixed counters and at the same time, using ECX to enable part of oth=
-er
-> >>>> KVM supported fixed counters.
-> >>>>
-> >>>> Add a bitmap (instead of always checking the vcpu's CPUIDs) to keep =
-track
-> >>>> of the guest available fixed counters and perform the semantic check=
-s.
-> >>>>
-> >>>> Signed-off-by: Like Xu <likexu@tencent.com>
-> >>>> ---
-> >>>>    arch/x86/include/asm/kvm_host.h |  2 ++
-> >>>>    arch/x86/kvm/pmu.h              |  8 +++++
-> >>>>    arch/x86/kvm/vmx/pmu_intel.c    | 53 +++++++++++++++++++++-------=
------
-> >>>>    3 files changed, 44 insertions(+), 19 deletions(-)
-> >>>>
-> >>>> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/=
-kvm_host.h
-> >>>> index a45de1118a42..14689e583127 100644
-> >>>> --- a/arch/x86/include/asm/kvm_host.h
-> >>>> +++ b/arch/x86/include/asm/kvm_host.h
-> >>>> @@ -565,6 +565,8 @@ struct kvm_pmu {
-> >>>>            */
-> >>>>           bool need_cleanup;
-> >>>>
-> >>>> +       DECLARE_BITMAP(supported_fixed_pmc_idx, KVM_PMC_MAX_FIXED);
-> >>>> +
-> >>>>           /*
-> >>>>            * The total number of programmed perf_events and it helps=
- to avoid
-> >>>>            * redundant check before cleanup if guest don't use vPMU =
-at all.
-> >>>> diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
-> >>>> index be62c16f2265..9f4504e5e9d5 100644
-> >>>> --- a/arch/x86/kvm/pmu.h
-> >>>> +++ b/arch/x86/kvm/pmu.h
-> >>>> @@ -111,6 +111,11 @@ static inline struct kvm_pmc *get_gp_pmc(struct=
- kvm_pmu *pmu, u32 msr,
-> >>>>           return NULL;
-> >>>>    }
-> >>>>
-> >>>> +static inline bool fixed_ctr_is_supported(struct kvm_pmu *pmu, unsi=
-gned int idx)
-> >>>> +{
-> >>>> +       return test_bit(idx, pmu->supported_fixed_pmc_idx);
-> >>>> +}
-> >>>> +
-> >>>>    /* returns fixed PMC with the specified MSR */
-> >>>>    static inline struct kvm_pmc *get_fixed_pmc(struct kvm_pmu *pmu, =
-u32 msr)
-> >>>>    {
-> >>>> @@ -120,6 +125,9 @@ static inline struct kvm_pmc *get_fixed_pmc(stru=
-ct kvm_pmu *pmu, u32 msr)
-> >>>>                   u32 index =3D array_index_nospec(msr - base,
-> >>>>                                                  pmu->nr_arch_fixed_=
-counters);
-> >>>>
-> >>>> +               if (!fixed_ctr_is_supported(pmu, index))
-> >>>> +                       return NULL;
-> >>>> +
-> >>>>                   return &pmu->fixed_counters[index];
-> >>>>           }
-> >>>>
-> >>>> diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_int=
-el.c
-> >>>> index e8a3be0b9df9..12f4b2fe7756 100644
-> >>>> --- a/arch/x86/kvm/vmx/pmu_intel.c
-> >>>> +++ b/arch/x86/kvm/vmx/pmu_intel.c
-> >>>> @@ -43,13 +43,16 @@ static int fixed_pmc_events[] =3D {1, 0, 7};
-> >>>>    static void reprogram_fixed_counters(struct kvm_pmu *pmu, u64 dat=
-a)
-> >>>>    {
-> >>>>           struct kvm_pmc *pmc;
-> >>>> -       u8 old_fixed_ctr_ctrl =3D pmu->fixed_ctr_ctrl;
-> >>>> +       u8 new_ctrl, old_ctrl, old_fixed_ctr_ctrl =3D pmu->fixed_ctr=
-_ctrl;
-> >>>>           int i;
-> >>>>
-> >>>>           pmu->fixed_ctr_ctrl =3D data;
-> >>>>           for (i =3D 0; i < pmu->nr_arch_fixed_counters; i++) {
-> >>>> -               u8 new_ctrl =3D fixed_ctrl_field(data, i);
-> >>>> -               u8 old_ctrl =3D fixed_ctrl_field(old_fixed_ctr_ctrl,=
- i);
-> >>>> +               if (!fixed_ctr_is_supported(pmu, i))
-> >>>> +                       continue;
-> >>>> +
-> >>>> +               new_ctrl =3D fixed_ctrl_field(data, i);
-> >>>> +               old_ctrl =3D fixed_ctrl_field(old_fixed_ctr_ctrl, i)=
-;
-> >>>>
-> >>>>                   if (old_ctrl =3D=3D new_ctrl)
-> >>>>                           continue;
-> >>>> @@ -125,6 +128,9 @@ static bool intel_is_valid_rdpmc_ecx(struct kvm_=
-vcpu *vcpu, unsigned int idx)
-> >>>>
-> >>>>           idx &=3D ~(3u << 30);
-> >>>>
-> >>>> +       if (fixed && !fixed_ctr_is_supported(pmu, idx))
-> >>>> +               return false;
-> >>>> +
-> >>>>           return fixed ? idx < pmu->nr_arch_fixed_counters
-> >>>>                        : idx < pmu->nr_arch_gp_counters;
-> >>>>    }
-> >>>> @@ -145,7 +151,7 @@ static struct kvm_pmc *intel_rdpmc_ecx_to_pmc(st=
-ruct kvm_vcpu *vcpu,
-> >>>>                   counters =3D pmu->gp_counters;
-> >>>>                   num_counters =3D pmu->nr_arch_gp_counters;
-> >>>>           }
-> >>>> -       if (idx >=3D num_counters)
-> >>>> +       if (idx >=3D num_counters || (fixed && !fixed_ctr_is_support=
-ed(pmu, idx)))
-> >>>>                   return NULL;
-> >>>>           *mask &=3D pmu->counter_bitmask[fixed ? KVM_PMC_FIXED : KV=
-M_PMC_GP];
-> >>>>           return &counters[array_index_nospec(idx, num_counters)];
-> >>>> @@ -500,6 +506,9 @@ static void setup_fixed_pmc_eventsel(struct kvm_=
-pmu *pmu)
-> >>>>           int i;
-> >>>>
-> >>>>           for (i =3D 0; i < pmu->nr_arch_fixed_counters; i++) {
-> >>>> +               if (!fixed_ctr_is_supported(pmu, i))
-> >>>> +                       continue;
-> >>>> +
-> >>>>                   pmc =3D &pmu->fixed_counters[i];
-> >>>>                   event =3D fixed_pmc_events[array_index_nospec(i, s=
-ize)];
-> >>>>                   pmc->eventsel =3D (intel_arch_events[event].unit_m=
-ask << 8) |
-> >>>> @@ -520,6 +529,7 @@ static void intel_pmu_refresh(struct kvm_vcpu *v=
-cpu)
-> >>>>
-> >>>>           pmu->nr_arch_gp_counters =3D 0;
-> >>>>           pmu->nr_arch_fixed_counters =3D 0;
-> >>>> +       bitmap_zero(pmu->supported_fixed_pmc_idx, KVM_PMC_MAX_FIXED)=
-;
-> >>>>           pmu->counter_bitmask[KVM_PMC_GP] =3D 0;
-> >>>>           pmu->counter_bitmask[KVM_PMC_FIXED] =3D 0;
-> >>>>           pmu->version =3D 0;
-> >>>> @@ -551,13 +561,24 @@ static void intel_pmu_refresh(struct kvm_vcpu =
-*vcpu)
-> >>>>           pmu->available_event_types =3D ~entry->ebx &
-> >>>>                                           ((1ull << eax.split.mask_l=
-ength) - 1);
-> >>>>
-> >>>> -       if (pmu->version =3D=3D 1) {
-> >>>> -               pmu->nr_arch_fixed_counters =3D 0;
-> >>>> -       } else {
-> >>>> +       counter_mask =3D ~(BIT_ULL(pmu->nr_arch_gp_counters) - 1);
-> >>>> +       bitmap_set(pmu->all_valid_pmc_idx, 0, pmu->nr_arch_gp_counte=
-rs);
-> >>>> +
-> >>>> +       if (pmu->version > 1) {
-> >>>>                   pmu->nr_arch_fixed_counters =3D
-> >>>> -                       min3(ARRAY_SIZE(fixed_pmc_events),
-> >>>> -                            (size_t) edx.split.num_counters_fixed,
-> >>>> -                            (size_t)kvm_pmu_cap.num_counters_fixed)=
-;
-> >>>> +                       min_t(int, ARRAY_SIZE(fixed_pmc_events),
-> >>>> +                             kvm_pmu_cap.num_counters_fixed);
-> >>>> +               for (i =3D 0; i < pmu->nr_arch_fixed_counters; i++) =
-{
-> >>>> +                       /* FxCtr[i]_is_supported :=3D CPUID.0xA.ECX[=
-i] || (EDX[4:0] > i) */
-> >>>
-> >>> This is true only when pmu->version >=3D 5.
-> >>
-> >> This is true in for "Version 5" section, but not mentioned in the CPUI=
-D.0xA section.
-> >> I would argue that this is a deliberate omission for the instruction i=
-mplementation,
-> >> as it does use the word "version>1" in the near CPUID.0xA.EDX section.
+> On Mon, Mar 06, 2023 at 02:41:20PM -0800, Vipin Sharma wrote:
+> > Add documentation for KVM_CAP_NUMA_AWARE_PAGE_TABLE capability and
+> > explain why it is needed.
 > >
-> > Do you have any evidence to support such an argument? The CPUID field
-> > in question was not defined prior to PMU version 5. (Does anyone from
-> > Intel want to chime in?)
+> > Signed-off-by: Vipin Sharma <vipinsh@google.com>
+> > ---
+> >  Documentation/virt/kvm/api.rst | 29 +++++++++++++++++++++++++++++
+> >  1 file changed, 29 insertions(+)
 > >
-> >> For virtualised use, this feature offers a kind of flexibility as user=
-s can
-> >> enable part of
-> >> the fixed counters, don't you think? Or maybe you're more looking forw=
-ard to the
-> >> patch set that raises the vPMU version number from 2 to 5, that part o=
-f the code
-> >> was already in my tree some years ago.
+> > diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/ap=
+i.rst
+> > index 62de0768d6aa..7e3a1299ca8e 100644
+> > --- a/Documentation/virt/kvm/api.rst
+> > +++ b/Documentation/virt/kvm/api.rst
+> > @@ -7669,6 +7669,35 @@ This capability is aimed to mitigate the threat =
+that malicious VMs can
+> >  cause CPU stuck (due to event windows don't open up) and make the CPU
+> >  unavailable to host or other VMs.
 > >
-> > I would not be surprised if a guest OS checked for PMU version 5
-> > before consulting the CPUID fields defined in PMU version 5. Does
-> > Linux even consult the fixed counter bitmask field today?
+> > +7.34 KVM_CAP_NUMA_AWARE_PAGE_TABLE
+> > +------------------------------
+> > +
+> > +:Architectures: x86
+> > +:Target: VM
+> > +:Returns: 0 on success, -EINVAL if vCPUs are already created.
+> > +
+> > +This capability allows userspace to enable NUMA aware page tables allo=
+cations.
 >
-> Yes, this is how host perf developer do it:
+> Call out that this capability overrides task mempolicies. e.g.
 >
->         if (version >=3D 5)
->                 x86_pmu.num_counters_fixed =3D fls(fixed_mask);
+>   This capability causes KVM to use a custom NUMA memory policy when
+>   allocating page tables. Specifically, KVM will attempt to co-locate
+>   page tables pages with the memory that they map, rather than following
+>   the mempolicy of the current task.
 >
-> based on real fresh hardware (always marked as the latest version).
+> > +NUMA aware page tables are disabled by default. Once enabled, prior to=
+ vCPU
+> > +creation, any page table allocated during the life of a VM will be all=
+ocated
 >
-> However, our KVM players can construct different valid CPUIDs, as long as=
- the
-> hardware is capable,
-> to emulate some vPMU devices that match the CPUID semantics but do not ex=
-ist in
-> the real world.
+> The "prior to vCPU creation" part here is confusing because it sounds
+> like you're talking about any page tables allocated before vCPU
+> creation. Just delete that part and put it in a separate paragraph.
 >
-> In the virtualisation world, use cases like "version 2 + fixed ctrs bit m=
-ask"
-> are perfectly possible
-> and should work as expected. One more case, if the forth fixed counter or=
- more
-> is enabled in your guest for top-down feature and you may still find the =
-guest's
-> pmu version number is stuck at 2.
-> This naturally does not occur in real hardware but no CPUID semantics her=
-e are
-> broken.
+>  KVM_CAP_NUMA_AWARE_PAGE_TABLE must be enabled before any vCPU is
+>  created, otherwise KVM will return -EINVAL.
+>
+> > +preferably from the NUMA node of the leaf page.
+> > +
+> > +Without this capability, default feature is to use current thread memp=
+olicy and
+>
+> s/default feature is to/KVM will/
+>
+> > +allocate page table based on that.
+>
+> s/and allocate page table based on that./to allocate page tables./
+>
+> > +
+> > +This capability is useful to improve page accesses by a guest. For exa=
+mple, an
+>
+> nit: Be more specific about how.
+>
+>  This capability aims to minimize the cost of TLB misses when a vCPU is
+>  accessing NUMA-local memory, by reducing the number of remote memory
+>  accesses needed to walk KVM's page tables.
+>
+> > +initialization thread which access lots of remote memory and ends up c=
+reating
+> > +page tables on local NUMA node, or some service thread allocates memor=
+y on
+> > +remote NUMA nodes and later worker/background threads accessing that m=
+emory
+> > +will end up accessing remote NUMA node page tables.
+>
+> It's not clear if these examples are talking about what happens when
+> KVM_CAP_NUMA_AWARE_PAGE_TABLE is enabled or disabled.
+>
+> Also it's important to distinguish virtual NUMA nodes from physical NUMA
+> nodes and where these "threads" are running. How about this:
+>
+>  For example, when KVM_CAP_NUMA_AWARE_PAGE_TABLE is disabled and a vCPU
+>  accesses memory on a remote NUMA node and triggers a KVM page fault,
+>  KVM will allocate page tables to handle that fault on the node where
+>  the vCPU is running rather than the node where the memory is allocated.
+>  When KVM_CAP_NUMA_AWARE_PAGE_TABLE is enabled, KVM will allocate the
+>  page tables on the node where the memory is located.
+>
+>  This is intended to be used in VM configurations that properly
+>  virtualize NUMA. i.e. VMs with one or more virtual NUMA nodes, each of
+>  which is mapped to a physical NUMA node. With this capability enabled
+>  on such VMs, any guest memory access to virtually-local memory will be
+>  translated through mostly[*] physically-local page tables, regardless
+>  of how the memory was faulted in.
+>
+>  [*] KVM will fallback to allocating from remote NUMA nodes if the
+>  preferred node is out of memory. Also, in VMs with 2 or more NUMA
+>  nodes, higher level page tables will necessarily map memory across
+>  multiple physical nodes.
+>
+> > So, a multi NUMA node
+> > +guest, can with high confidence access local memory faster instead of =
+going
+> > +through remote page tables first.
+> > +
+> > +This capability is also helpful for host to reduce live migration impa=
+ct when
+> > +splitting huge pages during dirty log operations. If the thread splitt=
+ing huge
+> > +page is on remote NUMA node it will create page tables on remote node.=
+ Even if
+> > +guest is careful in making sure that it only access local memory they =
+will end
+> > +up accessing remote page tables.
+>
+> Please also cover the limitations of this feature:
+>
+>  - Impact on remote memory accesses (more expensive).
+>  - How KVM handles NUMA node exhaustion.
+>  - How high-level page tables can span multiple nodes.
+>  - What KVM does if it can't determine the NUMA node of the pfn.
+>  - What KVM does for faults on GPAs that aren't backed by a pfn.
+>
 
-This is completely irrelevant to the current discussion. Nowhere is it
-documented that the number of fixed counters has a specific value for
-any given PMU version. However, it *is* documented that the fixed
-counter availability bitmask is introduced in PMU version 5. Surely,
-you understand the difference.
-
-> As I'm sure you've noticed, the logical relationship between CPUID.0xA.EC=
-X and
-> PMU version 5
-> is necessary but not sufficient. Version 5 mush has fixed counters bit ma=
-sk but
-> the reverse is not true.
-
-The reverse most certainly is true. You are, as is your wont, making
-stuff up again.
-
->  From the end user's point of view, destroying the flexibility of vHW
-> combinations is a design failure.
->
-> So I think we can implement this feature in guest version 2, what do you =
-think ?
-
-How does the userspace VMM query the capability? Certainly, if
-KVM_GET_SUPPORTED_CPUID returns a PMU version >=3D 5, then this bitmap
-is supported. But for PMU version 2, up until now, the bitmap has not
-been supported.
-
-And do you expect the guest OS to check for the HYPERVISOR bit and the
-KVMKVMKVM signature to determine whether or not this bitmap is
-meaningful for PMU versions < 5?
-
-> >
-> > I'd love to see KVM virtualize PMU version 5!
->
-> Great, I've got you and my plan will cover it.
->
-> >
-> >>>
-> >>>   From the SDM, volume 3, section 20.2.5 Architectural Performance
-> >>> Monitoring Version 5:
-> >>>
-> >>> With Architectural Performance Monitoring Version 5, register
-> >>> CPUID.0AH.ECX indicates Fixed Counter enumeration. It is a bit mask
-> >>> which enumerates the supported Fixed Counters in a processor. If bit
-> >>> 'i' is set, it implies that Fixed Counter 'i' is supported. Software
-> >>> is recommended to use the following logic to check if a Fixed Counter
-> >>> is supported on a given processor: FxCtr[i]_is_supported :=3D ECX[i] =
-||
-> >>> (EDX[4:0] > i);
-> >>>
-> >>> Prior to PMU version 5, all fixed counters from 0 through <number of
-> >>> fixed counters - 1> are supported.
-> >>>
-> >>>> +                       if (!(entry->ecx & BIT_ULL(i) ||
-> >>>> +                             edx.split.num_counters_fixed > i))
-> >>>> +                               continue;
-> >>>> +
-> >>>> +                       set_bit(i, pmu->supported_fixed_pmc_idx);
-> >>>> +                       set_bit(INTEL_PMC_MAX_GENERIC + i, pmu->all_=
-valid_pmc_idx);
-> >>>> +                       pmu->fixed_ctr_ctrl_mask &=3D ~(0xbull << (i=
- * 4));
-> >>>> +                       counter_mask &=3D ~BIT_ULL(INTEL_PMC_MAX_GEN=
-ERIC + i);
-> >>>> +               }
-> >>>>                   edx.split.bit_width_fixed =3D min_t(int, edx.split=
-.bit_width_fixed,
-> >>>>                                                     kvm_pmu_cap.bit_=
-width_fixed);
-> >>>>                   pmu->counter_bitmask[KVM_PMC_FIXED] =3D
-> >>>> @@ -565,10 +586,6 @@ static void intel_pmu_refresh(struct kvm_vcpu *=
-vcpu)
-> >>>>                   setup_fixed_pmc_eventsel(pmu);
-> >>>>           }
-> >>>>
-> >>>> -       for (i =3D 0; i < pmu->nr_arch_fixed_counters; i++)
-> >>>> -               pmu->fixed_ctr_ctrl_mask &=3D ~(0xbull << (i * 4));
-> >>>> -       counter_mask =3D ~(((1ull << pmu->nr_arch_gp_counters) - 1) =
-|
-> >>>> -               (((1ull << pmu->nr_arch_fixed_counters) - 1) << INTE=
-L_PMC_IDX_FIXED));
-> >>>>           pmu->global_ctrl_mask =3D counter_mask;
-> >>>>           pmu->global_ovf_ctrl_mask =3D pmu->global_ctrl_mask
-> >>>>                           & ~(MSR_CORE_PERF_GLOBAL_OVF_CTRL_OVF_BUF =
-|
-> >>>> @@ -585,11 +602,6 @@ static void intel_pmu_refresh(struct kvm_vcpu *=
-vcpu)
-> >>>>                   pmu->raw_event_mask |=3D (HSW_IN_TX|HSW_IN_TX_CHEC=
-KPOINTED);
-> >>>>           }
-> >>>>
-> >>>> -       bitmap_set(pmu->all_valid_pmc_idx,
-> >>>> -               0, pmu->nr_arch_gp_counters);
-> >>>> -       bitmap_set(pmu->all_valid_pmc_idx,
-> >>>> -               INTEL_PMC_MAX_GENERIC, pmu->nr_arch_fixed_counters);
-> >>>> -
-> >>>>           perf_capabilities =3D vcpu_get_perf_capabilities(vcpu);
-> >>>>           if (cpuid_model_is_consistent(vcpu) &&
-> >>>>               (perf_capabilities & PMU_CAP_LBR_FMT))
-> >>>> @@ -605,6 +617,9 @@ static void intel_pmu_refresh(struct kvm_vcpu *v=
-cpu)
-> >>>>                           pmu->pebs_enable_mask =3D counter_mask;
-> >>>>                           pmu->reserved_bits &=3D ~ICL_EVENTSEL_ADAP=
-TIVE;
-> >>>>                           for (i =3D 0; i < pmu->nr_arch_fixed_count=
-ers; i++) {
-> >>>> +                               if (!fixed_ctr_is_supported(pmu, i))
-> >>>> +                                       continue;
-> >>>> +
-> >>>>                                   pmu->fixed_ctr_ctrl_mask &=3D
-> >>>>                                           ~(1ULL << (INTEL_PMC_IDX_F=
-IXED + i * 4));
-> >>>>                           }
-> >>>>
-> >>>> base-commit: d8708b80fa0e6e21bc0c9e7276ad0bccef73b6e7
-> >>>> --
-> >>>> 2.40.0
-> >>>>
+Thanks for the suggestions, I will incorporate them in the next version.
