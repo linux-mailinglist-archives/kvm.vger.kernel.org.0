@@ -2,115 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 620436CB169
-	for <lists+kvm@lfdr.de>; Tue, 28 Mar 2023 00:02:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 708A26CB3F4
+	for <lists+kvm@lfdr.de>; Tue, 28 Mar 2023 04:24:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230070AbjC0WCN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Mar 2023 18:02:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41882 "EHLO
+        id S229610AbjC1CYS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Mar 2023 22:24:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52152 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229762AbjC0WCM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Mar 2023 18:02:12 -0400
-Received: from mail-qv1-xf2e.google.com (mail-qv1-xf2e.google.com [IPv6:2607:f8b0:4864:20::f2e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE3CFD9
-        for <kvm@vger.kernel.org>; Mon, 27 Mar 2023 15:01:46 -0700 (PDT)
-Received: by mail-qv1-xf2e.google.com with SMTP id cu4so7898627qvb.3
-        for <kvm@vger.kernel.org>; Mon, 27 Mar 2023 15:01:46 -0700 (PDT)
+        with ESMTP id S229718AbjC1CYQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Mar 2023 22:24:16 -0400
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0177C2
+        for <kvm@vger.kernel.org>; Mon, 27 Mar 2023 19:24:15 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-536a4eba107so105851897b3.19
+        for <kvm@vger.kernel.org>; Mon, 27 Mar 2023 19:24:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1679954506;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=VX1NBj5by138i4YAyUE/B8GjUplIoeAkADXmwDxGNDM=;
-        b=SebD/g43tpygUyk6ZM3YDldFlmJidPf7k3TynS59PcvmDEByGoo2yt47ql83Z4NzDC
-         lUASYGyyVh3QBEjcuQyduecz78g3JHHtpu8C9yVZTBXXLC2szTnZAu6RvGIr3NZvWFBI
-         6NsCyP5hcUvA7jjQtcKcd2LvodESeyCsPhnz50ZzdkLkUOmwW6B1zkKgb9KIpA6jLPxw
-         1TxuqldbXf9IBCSY2kgmmqFSjNyOMA8oz/qT2kw8ohirTCarfnFQ3Un6fIHgk76U3rX3
-         FjJ7ZLd2pMPaSYOHCA/95YLjw1XtOnykY4Ap0CIs20ORMNFdbHvg5Ad9+uNWjCslgOox
-         ICnQ==
+        d=google.com; s=20210112; t=1679970255;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=IIWk8E2FhD0ZC/ZMkyMUSyLH1n6qTXVTC28fBAMF0u4=;
+        b=eSI0jSMtM8TCN3DIt0ALDF8asOGVoGQPxFSek4Og40V4GHTgb7VX0uVSFnjiDOcbxo
+         EQ3YxSPgX5jfI/ZQvGom56MhyFLfgFUBZqwmx8himK0CTXSRg6UdvjMCyTUQWYOaksZE
+         fDBQzfJiMuLM4b/9ll9TI9ZUrkGPERrDXmnvtsH1PSk3kAWp4zAb5+s3EDOujPm+XHOz
+         ez2ZBUOHwemE68BkBAy+S4R1NRz/YNW2LraknIbs6ZrAcZTGI4Wx7n9kZMcwd2frIrFg
+         VTGvQCA4KhdFehoRP7IDJDyjak4oEB5m4es16rsqwoQc4HlhGIVNHMRdkI5K3KsSdbfp
+         V6tQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679954506;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=VX1NBj5by138i4YAyUE/B8GjUplIoeAkADXmwDxGNDM=;
-        b=GoER26vdWiQHfbI8OttZQd/0NjQ7dzDTipV+QQ60hkkK9lZYBEKfteyxbCFuH2RDg+
-         t1fmua9tEATd31vfOS9K4Dc0G2aKlGnZW5J4LoQiStDK5OcKyka/iRRF4pHbXxejKgPF
-         Q6ccrMN2BI0CP8GYyXG8W+Xt0vF+iHsuNBnzKjZdUKnRPrXSbEHlj4K5sHbEX+JWd5+c
-         v3vSYhV3I49qH8n5AviOHOoSO2wxlyy8p2SEGiUV+mm3Ui63yEQR2/5kXWaj8QVtuISQ
-         GnshUjm+dVbcYJcJAtPk7nMxN4qigD+fMhy+EwepsrQD51EhATzFealhhLVhBWRmrz1e
-         GRaA==
-X-Gm-Message-State: AAQBX9cWHyXjuQFnXea8xDvWaQwJbygXMfVulxCWPEyiN2UMo1ICuOO+
-        cwU/zSVZTJPtrch0kprvK/jh+w==
-X-Google-Smtp-Source: AKy350bpNLMZp4nU+AcWQ1pDqSqUI6blgXq7NZf41dmUi/9aSPTJ/0lx85kRQSFA/GEy2F859PeTWQ==
-X-Received: by 2002:a05:6214:2604:b0:5ab:e259:b2a9 with SMTP id gu4-20020a056214260400b005abe259b2a9mr25452716qvb.14.1679954505774;
-        Mon, 27 Mar 2023 15:01:45 -0700 (PDT)
-Received: from [172.17.0.3] ([130.44.212.120])
-        by smtp.gmail.com with ESMTPSA id t10-20020a37aa0a000000b0074683c45f6csm12299847qke.1.2023.03.27.15.01.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Mar 2023 15:01:45 -0700 (PDT)
-From:   Bobby Eshleman <bobby.eshleman@bytedance.com>
-Date:   Mon, 27 Mar 2023 22:01:05 +0000
-Subject: [PATCH net] virtio/vsock: fix leak due to missing skb owner
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20230327-vsock-fix-leak-v1-1-3fede367105f@bytedance.com>
-X-B4-Tracking: v=1; b=H4sIACASImQC/0WNQQrCQAxFr1KyNtCZIhavIi4yY2rDSEYSqULp3
- Z26cfk+7/FXcDZhh3O3gvEiLlUbhEMHeSa9M8qtMcQ+Dv0QT7h4zQUn+eCDqWAKmadwHCPRCC1
- K5IzJSPO8Z3/bS8L6Vrbdehq37Xd7AeUXXLftC+VLmi+LAAAA
-To:     Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Bobby Eshleman <bobby.eshleman@bytedance.com>
-Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Cong Wang <xiyou.wangcong@gmail.com>
-X-Mailer: b4 0.12.2
-X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
-        DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        d=1e100.net; s=20210112; t=1679970255;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=IIWk8E2FhD0ZC/ZMkyMUSyLH1n6qTXVTC28fBAMF0u4=;
+        b=JBdSo59e7VZuxiwvA/l5JdQzEuAgfYBwJMPxT7Bw/z0c/PGD9RgpGoBh7wQ6G0j7ZH
+         SJWVOYro9sCyfre5I3kq0tA01GUKt8UvBIf8pI0BdyIK+LzUyfQMXE/p9S8qEMzhMeXd
+         KhbjyF9SnTJmOK3iSKN+yXXn11OBsrX1ekVuNjT/NgYTZfU35MJd5KZImrxGGik+h9ZW
+         Uf0v1CoaKb4tXU6RhyA7GLckyb/rCg/AanD/bahNCPPCj+JEKQc45kAz92dOUUfNkw5A
+         o33USN45eq6hHU2mMGEpxHAyOH3n3a/sbOnaXk0Smv/w3mVbX6wBo0QG5xd387Ee/jBE
+         8j7w==
+X-Gm-Message-State: AAQBX9fqE7/jQ3oI4AM/+CT7GRcitky3uylNwNm3n94Xvgf2yrSp5nSv
+        PCf/uSL/X7XhNUT8tJs4bcQoBeZirxk=
+X-Google-Smtp-Source: AKy350Yc9gNnjUwkT1L/Czn4VDNPMMf9w37THZNTzarP3ln1ljYD3oSIACFpDcm6vwQtbisDUVLH1n76PiQ=
+X-Received: from pandoh.svl.corp.google.com ([2620:15c:2c5:11:7ff3:b6c5:b0f1:63e8])
+ (user=pandoh job=sendgmr) by 2002:a05:6902:18c7:b0:b72:fff0:2f7f with SMTP id
+ ck7-20020a05690218c700b00b72fff02f7fmr11533578ybb.4.1679970255089; Mon, 27
+ Mar 2023 19:24:15 -0700 (PDT)
+Date:   Mon, 27 Mar 2023 19:23:57 -0700
+In-Reply-To: <20230327094047.47215-17-yi.l.liu@intel.com>
+Mime-Version: 1.0
+References: <20230327094047.47215-17-yi.l.liu@intel.com>
+X-Mailer: git-send-email 2.40.0.348.gf938b09366-goog
+Message-ID: <20230328022357.2268961-1-pandoh@google.com>
+Subject: Re: [PATCH v8 16/24] iommufd/device: Add iommufd_access_detach() API
+From:   Jon Pan-Doh <pandoh@google.com>
+To:     yi.l.liu@intel.com
+Cc:     alex.williamson@redhat.com, chao.p.peng@linux.intel.com,
+        cohuck@redhat.com, eric.auger@redhat.com,
+        intel-gfx@lists.freedesktop.org,
+        intel-gvt-dev@lists.freedesktop.org, jasowang@redhat.com,
+        jgg@nvidia.com, joro@8bytes.org, kevin.tian@intel.com,
+        kvm@vger.kernel.org, linux-s390@vger.kernel.org, lulu@redhat.com,
+        mjrosato@linux.ibm.com, nicolinc@nvidia.com, peterx@redhat.com,
+        robin.murphy@arm.com, shameerali.kolothum.thodi@huawei.com,
+        suravee.suthikulpanit@amd.com, terrence.xu@intel.com,
+        xudong.hao@intel.com, yan.y.zhao@intel.com,
+        yanting.jiang@intel.com, yi.y.sun@linux.intel.com,
+        Jon Pan-Doh <pandoh@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-7.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This patch sets the owner for the skb when being sent from a socket and
-so solves the leak caused when virtio_transport_purge_skbs() finds
-skb->sk is always NULL and therefore never matches it with the current
-socket. Setting the owner upon allocation fixes this.
+On 2023/3/27 02:40, Yi Liu wrote:
+> diff --git a/drivers/iommu/iommufd/iommufd_private.h b/drivers/iommu/iommufd/iommufd_private.h
+> index 2e6e8e217cce..ec2ce3ef187d 100644
+> --- a/drivers/iommu/iommufd/iommufd_private.h
+> +++ b/drivers/iommu/iommufd/iommufd_private.h
+> @@ -263,6 +263,8 @@ struct iommufd_access {
+>  	struct iommufd_object obj;
+>  	struct iommufd_ctx *ictx;
+>  	struct iommufd_ioas *ioas;
+> +	struct iommufd_ioas *ioas_unpin;
+> +	struct mutex ioas_lock;
+>  	const struct iommufd_access_ops *ops;
+>  	void *data;
+>  	unsigned long iova_alignment;
 
-Fixes: 71dc9ec9ac7d ("virtio/vsock: replace virtio_vsock_pkt with sk_buff")
-Signed-off-by: Bobby Eshleman <bobby.eshleman@bytedance.com>
-Reported-by: Cong Wang <xiyou.wangcong@gmail.com>
-Link: https://lore.kernel.org/all/ZCCbATwov4U+GBUv@pop-os.localdomain/
----
- net/vmw_vsock/virtio_transport_common.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
-index 957cdc01c8e8..2a2f0c1a9fbd 100644
---- a/net/vmw_vsock/virtio_transport_common.c
-+++ b/net/vmw_vsock/virtio_transport_common.c
-@@ -94,6 +94,9 @@ virtio_transport_alloc_skb(struct virtio_vsock_pkt_info *info,
- 					 info->op,
- 					 info->flags);
- 
-+	if (info->vsk)
-+		skb_set_owner_w(skb, sk_vsock(info->vsk));
-+
- 	return skb;
- 
- out:
+I think you may need to initialize ioas_lock. I got lockdep warnings running
+iommufd selftests against this patch. Those went away when I added mutex_init().
 
 ---
-base-commit: e5b42483ccce50d5b957f474fd332afd4ef0c27b
-change-id: 20230327-vsock-fix-leak-b1cef1582aa8
+ drivers/iommu/iommufd/device.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-Best regards,
+diff --git a/drivers/iommu/iommufd/device.c b/drivers/iommu/iommufd/device.c
+index f0522d80919d..0eaae60f3537 100644
+--- a/drivers/iommu/iommufd/device.c
++++ b/drivers/iommu/iommufd/device.c
+@@ -474,6 +474,7 @@ iommufd_access_create(struct iommufd_ctx *ictx,
+ 	iommufd_ctx_get(ictx);
+ 	iommufd_object_finalize(ictx, &access->obj);
+ 	*id = access->obj.id;
++	mutex_init(&access->ioas_lock);
+ 	return access;
+ }
+ EXPORT_SYMBOL_NS_GPL(iommufd_access_create, IOMMUFD);
 -- 
-Bobby Eshleman <bobby.eshleman@bytedance.com>
+2.40.0.348.gf938b09366-goog
 
