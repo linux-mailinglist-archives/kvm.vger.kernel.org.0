@@ -2,319 +2,260 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2CE046CCB6D
-	for <lists+kvm@lfdr.de>; Tue, 28 Mar 2023 22:20:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D5FA06CCC22
+	for <lists+kvm@lfdr.de>; Tue, 28 Mar 2023 23:34:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229532AbjC1UU1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Mar 2023 16:20:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40228 "EHLO
+        id S229825AbjC1Vel (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Mar 2023 17:34:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35154 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229602AbjC1UU0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Mar 2023 16:20:26 -0400
-Received: from mail-oi1-x22a.google.com (mail-oi1-x22a.google.com [IPv6:2607:f8b0:4864:20::22a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B2A240C7
-        for <kvm@vger.kernel.org>; Tue, 28 Mar 2023 13:20:18 -0700 (PDT)
-Received: by mail-oi1-x22a.google.com with SMTP id r16so9870404oij.5
-        for <kvm@vger.kernel.org>; Tue, 28 Mar 2023 13:20:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1680034817;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JMJ0lbEpieVn3cFA01bO8crqPoJkdQ18ysyignOhrQw=;
-        b=EUWAPwEw0uX5nRyZVK97z2um0A2DhMJNZtrphCfxDbAv42agAYocC+yUdvnuK3ugtU
-         yM+nM24zDm75RqhCEKVZR/UMjGwaQZ8RgvVhz/4xKx32czYG9LJj+jRqmybWHVd7Mnxl
-         s8h8JXz/OWbG1iOtb/OS32V4Dt0Qh+1Dxiqeedt6iWntwMuQoSFVlrG/hianT2aZ8A7z
-         YEN2q+zcsU1+haAyd8HgL+g7TnHgqtQR4qJnzxe+dbI3ojXtqzzXlz//UzYdHQqmc0Ij
-         dkkfVrHd6qgvypmByQtnLIEPrfuPPFy+WKr9umbfczQfaJSRet6plb1aERfuHT/d2t2t
-         a8Sw==
+        with ESMTP id S229456AbjC1Vek (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Mar 2023 17:34:40 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8BA426BB
+        for <kvm@vger.kernel.org>; Tue, 28 Mar 2023 14:33:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1680039238;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=uqOJKbgb7ATLpuIGdDhmD1/D9xzym09yCeZarta+PK8=;
+        b=ArOl7+TrmC1sOk9WjOBfgQ4UqKHPTUYqqvQci2h0kr80tCeW5m+v5X6ybAjvr8xv9sBkqY
+        QkUkofHO2V9/kCkNLuZ2h/z0nb1SSO6URZX07qjQKhNQsSCPNH4c0mhOcG4Yd0VWErGEnR
+        pnUNtTl+WbEBlUFfgePWF9U+LwbvMTQ=
+Received: from mail-io1-f69.google.com (mail-io1-f69.google.com
+ [209.85.166.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-414-mv4kHh_-PQGIAcm5SadOgQ-1; Tue, 28 Mar 2023 17:33:56 -0400
+X-MC-Unique: mv4kHh_-PQGIAcm5SadOgQ-1
+Received: by mail-io1-f69.google.com with SMTP id 3-20020a6b1403000000b007588213c81aso8447674iou.18
+        for <kvm@vger.kernel.org>; Tue, 28 Mar 2023 14:33:56 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680034817;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20210112; t=1680039236;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=JMJ0lbEpieVn3cFA01bO8crqPoJkdQ18ysyignOhrQw=;
-        b=pX3R0/fo6UPXWpohP3hsSu+4gRzuDeLHNmO5fbV41AGPlPfWFiOasuxZYNCqnky+n8
-         CG6Ko/+4fapTxQ14bOlGlsz1zOmj2BPsudf5L/VTa2FTgs/DSzaZ2sD6NE36+uRprrPD
-         GQ6YKr7lxUPP8MuuESTmZNk/ItE1VAhxnJAlYctU5BP3315AaaAXaRZ0dRvyj2c7qpr6
-         Z2fROOy+EVILnyHeAui0WlsXhA4FeXB/I2HdbLg7Vpuh8F9Z6y96IYfRHbrxKZRtrqVq
-         AKJTnYLKtoBFQCAU5obEKGKrPtd88YNMINwBmACZkMZjZ/JsnBmaYPKqge8CRJ+lEMo7
-         RBew==
-X-Gm-Message-State: AO0yUKWJtrJB7D5fDR6r6+kcTP9jYfMbTxwJv45MTmrmCkIcIuS+64Zs
-        vGYsrTs3RMR6mDp8twvmhvCT9Kv5/6is3aiGbbfvBQ==
-X-Google-Smtp-Source: AK7set+8l3qe+kAGJeQH0GX8il8uSe8QJGkiP5c1aVYloAJeyFJO19YEOK5KAOHvw27vwu+xwnp9BSY0S0GT+GW6A6Q=
-X-Received: by 2002:aca:d05:0:b0:386:a120:4fdc with SMTP id
- 5-20020aca0d05000000b00386a1204fdcmr4200022oin.8.1680034817533; Tue, 28 Mar
- 2023 13:20:17 -0700 (PDT)
+        bh=uqOJKbgb7ATLpuIGdDhmD1/D9xzym09yCeZarta+PK8=;
+        b=XeaTUPGHTPjwzdV3Af/S//oGGQsEOae7yQyYCGB7AflactcGW6yGqxgFfGLxqjM9gk
+         PjqOwwwfHH3hPJvw0mrji2Hqa3BLYixAVKIRwt5ecEt/NB0/VpDl86F3fWTKURZ9hQQp
+         HWvQX5XVOZQOUrAS/Np4bQUqK89VfMmyCW6EBxffGSDc4kxZSw6hQJzrunNWmzGpZimp
+         LzeKfIZPbqVofk510WC8qkL9lIu99GSzrUnytpUU8vIE/fT0G10Zy/7EtPnPvckPyaBY
+         WeY5D4u8+LrmxJYi4hBDBPVZ8RM/vEm+wD5XZ7Ggwf0u4vU8c+9E3qimeOJCIfm68OVB
+         pgOA==
+X-Gm-Message-State: AAQBX9fO71FKOe07oFbIDOXR24Xxff1wdbNd2CClhucucMkSsUmLjhEG
+        SXiKrNcS92Tfi2Ykj04Gev47OdJUyZI6S+zj68B1JUL8nGqFf2O9nF7y2SHsDN7CSJstIHQZeh9
+        fN7qfqJoyZiEOFfi9DxzX
+X-Received: by 2002:a05:6e02:782:b0:315:6e7f:f429 with SMTP id q2-20020a056e02078200b003156e7ff429mr12502993ils.9.1680039235804;
+        Tue, 28 Mar 2023 14:33:55 -0700 (PDT)
+X-Google-Smtp-Source: AKy350bFTQnx3N9HNY32zRuYKOSoKbrxT758XDlpNXJefLuxy6Ef6baspB62jLxo+aOJR0orePzHQQ==
+X-Received: by 2002:a05:6e02:782:b0:315:6e7f:f429 with SMTP id q2-20020a056e02078200b003156e7ff429mr12502984ils.9.1680039235506;
+        Tue, 28 Mar 2023 14:33:55 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id h22-20020a056638339600b00374bf3b62a0sm9785701jav.99.2023.03.28.14.33.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 28 Mar 2023 14:33:54 -0700 (PDT)
+Date:   Tue, 28 Mar 2023 15:33:52 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Yi Liu <yi.l.liu@intel.com>
+Cc:     jgg@nvidia.com, kevin.tian@intel.com, joro@8bytes.org,
+        robin.murphy@arm.com, cohuck@redhat.com, eric.auger@redhat.com,
+        nicolinc@nvidia.com, kvm@vger.kernel.org, mjrosato@linux.ibm.com,
+        chao.p.peng@linux.intel.com, yi.y.sun@linux.intel.com,
+        peterx@redhat.com, jasowang@redhat.com,
+        shameerali.kolothum.thodi@huawei.com, lulu@redhat.com,
+        suravee.suthikulpanit@amd.com, intel-gvt-dev@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org, linux-s390@vger.kernel.org,
+        xudong.hao@intel.com, yan.y.zhao@intel.com, terrence.xu@intel.com,
+        yanting.jiang@intel.com
+Subject: Re: [PATCH v8 08/24] vfio: Block device access via device fd until
+ device is opened
+Message-ID: <20230328153352.6c1e2088.alex.williamson@redhat.com>
+In-Reply-To: <20230327094047.47215-9-yi.l.liu@intel.com>
+References: <20230327094047.47215-1-yi.l.liu@intel.com>
+        <20230327094047.47215-9-yi.l.liu@intel.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-References: <20230317050637.766317-1-jingzhangos@google.com>
- <20230317050637.766317-5-jingzhangos@google.com> <86y1niwk83.wl-maz@kernel.org>
-In-Reply-To: <86y1niwk83.wl-maz@kernel.org>
-From:   Jing Zhang <jingzhangos@google.com>
-Date:   Tue, 28 Mar 2023 13:20:06 -0700
-Message-ID: <CAAdAUtirFM-+uZvmahYJpTmpBDURDkM-R1Wg0yvm6-mwSkLS+g@mail.gmail.com>
-Subject: Re: [PATCH v4 4/6] KVM: arm64: Use per guest ID register for ID_AA64DFR0_EL1.PMUVer
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>,
-        ARMLinux <linux-arm-kernel@lists.infradead.org>,
-        Oliver Upton <oupton@google.com>,
-        Will Deacon <will@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Fuad Tabba <tabba@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Raghavendra Rao Ananta <rananta@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-15.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,ENV_AND_HDR_SPF_MATCH,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL,
-        USER_IN_DEF_SPF_WL autolearn=unavailable autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
+On Mon, 27 Mar 2023 02:40:31 -0700
+Yi Liu <yi.l.liu@intel.com> wrote:
 
-On Mon, Mar 27, 2023 at 3:40=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrote=
-:
->
-> On Fri, 17 Mar 2023 05:06:35 +0000,
-> Jing Zhang <jingzhangos@google.com> wrote:
-> >
-> > With per guest ID registers, PMUver settings from userspace
-> > can be stored in its corresponding ID register.
-> >
-> > No functional change intended.
-> >
-> > Signed-off-by: Jing Zhang <jingzhangos@google.com>
-> > ---
-> >  arch/arm64/include/asm/kvm_host.h | 11 +++---
-> >  arch/arm64/kvm/arm.c              |  6 ---
-> >  arch/arm64/kvm/id_regs.c          | 61 +++++++++++++++++++++++++------
-> >  include/kvm/arm_pmu.h             |  5 ++-
-> >  4 files changed, 59 insertions(+), 24 deletions(-)
-> >
-> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm=
-/kvm_host.h
-> > index e926ea91a73c..102860ba896d 100644
-> > --- a/arch/arm64/include/asm/kvm_host.h
-> > +++ b/arch/arm64/include/asm/kvm_host.h
-> > @@ -218,6 +218,12 @@ struct kvm_arch {
-> >  #define KVM_ARCH_FLAG_EL1_32BIT                              4
-> >       /* PSCI SYSTEM_SUSPEND enabled for the guest */
-> >  #define KVM_ARCH_FLAG_SYSTEM_SUSPEND_ENABLED         5
-> > +     /*
-> > +      * AA64DFR0_EL1.PMUver was set as ID_AA64DFR0_EL1_PMUVer_IMP_DEF
-> > +      * or DFR0_EL1.PerfMon was set as ID_DFR0_EL1_PerfMon_IMPDEF from
-> > +      * userspace for VCPUs without PMU.
-> > +      */
-> > +#define KVM_ARCH_FLAG_VCPU_HAS_IMP_DEF_PMU           6
-> >
-> >       unsigned long flags;
-> >
-> > @@ -230,11 +236,6 @@ struct kvm_arch {
-> >
-> >       cpumask_var_t supported_cpus;
-> >
-> > -     struct {
-> > -             u8 imp:4;
-> > -             u8 unimp:4;
-> > -     } dfr0_pmuver;
-> > -
-> >       /* Hypercall features firmware registers' descriptor */
-> >       struct kvm_smccc_features smccc_feat;
-> >
-> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> > index c78d68d011cb..fb2de2cb98cb 100644
-> > --- a/arch/arm64/kvm/arm.c
-> > +++ b/arch/arm64/kvm/arm.c
-> > @@ -138,12 +138,6 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned lon=
-g type)
-> >       kvm_arm_set_default_id_regs(kvm);
-> >       kvm_arm_init_hypercalls(kvm);
-> >
-> > -     /*
-> > -      * Initialise the default PMUver before there is a chance to
-> > -      * create an actual PMU.
-> > -      */
-> > -     kvm->arch.dfr0_pmuver.imp =3D kvm_arm_pmu_get_pmuver_limit();
-> > -
-> >       return 0;
-> >
-> >  err_free_cpumask:
-> > diff --git a/arch/arm64/kvm/id_regs.c b/arch/arm64/kvm/id_regs.c
-> > index b60ca1058301..3a87a3d2390d 100644
-> > --- a/arch/arm64/kvm/id_regs.c
-> > +++ b/arch/arm64/kvm/id_regs.c
-> > @@ -21,9 +21,12 @@
-> >  static u8 vcpu_pmuver(const struct kvm_vcpu *vcpu)
-> >  {
-> >       if (kvm_vcpu_has_pmu(vcpu))
-> > -             return vcpu->kvm->arch.dfr0_pmuver.imp;
-> > -
-> > -     return vcpu->kvm->arch.dfr0_pmuver.unimp;
-> > +             return FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVe=
-r),
-> > +                             vcpu->kvm->arch.id_regs[IDREG_IDX(SYS_ID_=
-AA64DFR0_EL1)]);
-> > +     else if (test_bit(KVM_ARCH_FLAG_VCPU_HAS_IMP_DEF_PMU, &vcpu->kvm-=
->arch.flags))
-> > +             return ID_AA64DFR0_EL1_PMUVer_IMP_DEF;
-> > +     else
-> > +             return 0;
->
-> Drop the pointless elses.
-Will do.
->
-> >  }
-> >
-> >  static u8 perfmon_to_pmuver(u8 perfmon)
-> > @@ -256,10 +259,23 @@ static int set_id_aa64dfr0_el1(struct kvm_vcpu *v=
-cpu,
-> >       if (val)
-> >               return -EINVAL;
-> >
-> > -     if (valid_pmu)
-> > -             vcpu->kvm->arch.dfr0_pmuver.imp =3D pmuver;
-> > -     else
-> > -             vcpu->kvm->arch.dfr0_pmuver.unimp =3D pmuver;
-> > +     if (valid_pmu) {
-> > +             mutex_lock(&vcpu->kvm->lock);
->
-> Bingo!
->
-Will fix it.
-> > +             vcpu->kvm->arch.id_regs[IDREG_IDX(SYS_ID_AA64DFR0_EL1)] &=
-=3D
-> > +                     ~ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer);
-> > +             vcpu->kvm->arch.id_regs[IDREG_IDX(SYS_ID_AA64DFR0_EL1)] |=
-=3D
-> > +                     FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMU=
-Ver), pmuver);
-> > +
-> > +             vcpu->kvm->arch.id_regs[IDREG_IDX(SYS_ID_DFR0_EL1)] &=3D
-> > +                     ~ARM64_FEATURE_MASK(ID_DFR0_EL1_PerfMon);
-> > +             vcpu->kvm->arch.id_regs[IDREG_IDX(SYS_ID_DFR0_EL1)] |=3D =
-FIELD_PREP(
-> > +                             ARM64_FEATURE_MASK(ID_DFR0_EL1_PerfMon), =
-pmuver_to_perfmon(pmuver));
-> > +             mutex_unlock(&vcpu->kvm->lock);
-> > +     } else if (pmuver =3D=3D ID_AA64DFR0_EL1_PMUVer_IMP_DEF) {
-> > +             set_bit(KVM_ARCH_FLAG_VCPU_HAS_IMP_DEF_PMU, &vcpu->kvm->a=
-rch.flags);
-> > +     } else {
-> > +             clear_bit(KVM_ARCH_FLAG_VCPU_HAS_IMP_DEF_PMU, &vcpu->kvm-=
->arch.flags);
-> > +     }
->
-> The last two cases are better written as:
->
->         assign_bit(KVM_ARCH_FLAG_VCPU_HAS_IMP_DEF_PMU, &vcpu->kvm->arch.f=
-lags,
->                    pmuver =3D=3D ID_AA64DFR0_EL1_PMUVer_IMP_DEF);
->
-Will do.
-> >
-> >       return 0;
-> >  }
-> > @@ -296,10 +312,23 @@ static int set_id_dfr0_el1(struct kvm_vcpu *vcpu,
-> >       if (val)
-> >               return -EINVAL;
-> >
-> > -     if (valid_pmu)
-> > -             vcpu->kvm->arch.dfr0_pmuver.imp =3D perfmon_to_pmuver(per=
-fmon);
-> > -     else
-> > -             vcpu->kvm->arch.dfr0_pmuver.unimp =3D perfmon_to_pmuver(p=
-erfmon);
-> > +     if (valid_pmu) {
-> > +             mutex_lock(&vcpu->kvm->lock);
->
-> Same here (lock inversion)
-Will fix it.
->
-> > +             vcpu->kvm->arch.id_regs[IDREG_IDX(SYS_ID_DFR0_EL1)] &=3D
-> > +                     ~ARM64_FEATURE_MASK(ID_DFR0_EL1_PerfMon);
-> > +             vcpu->kvm->arch.id_regs[IDREG_IDX(SYS_ID_DFR0_EL1)] |=3D =
-FIELD_PREP(
-> > +                     ARM64_FEATURE_MASK(ID_DFR0_EL1_PerfMon), perfmon)=
-;
-> > +
-> > +             vcpu->kvm->arch.id_regs[IDREG_IDX(SYS_ID_AA64DFR0_EL1)] &=
-=3D
-> > +                     ~ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer);
-> > +             vcpu->kvm->arch.id_regs[IDREG_IDX(SYS_ID_AA64DFR0_EL1)] |=
-=3D FIELD_PREP(
-> > +                     ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer), perfm=
-on_to_pmuver(perfmon));
-> > +             mutex_unlock(&vcpu->kvm->lock);
-> > +     } else if (perfmon =3D=3D ID_DFR0_EL1_PerfMon_IMPDEF) {
-> > +             set_bit(KVM_ARCH_FLAG_VCPU_HAS_IMP_DEF_PMU, &vcpu->kvm->a=
-rch.flags);
-> > +     } else {
-> > +             clear_bit(KVM_ARCH_FLAG_VCPU_HAS_IMP_DEF_PMU, &vcpu->kvm-=
->arch.flags);
-> > +     }
->
-> Same here (assign_bit).
-Will do.
-> >
-> >       return 0;
-> >  }
-> > @@ -543,4 +572,14 @@ void kvm_arm_set_default_id_regs(struct kvm *kvm)
-> >       }
-> >
-> >       kvm->arch.id_regs[IDREG_IDX(SYS_ID_AA64PFR0_EL1)] =3D val;
-> > +
-> > +     /*
-> > +      * Initialise the default PMUver before there is a chance to
-> > +      * create an actual PMU.
-> > +      */
-> > +     kvm->arch.id_regs[IDREG_IDX(SYS_ID_AA64DFR0_EL1)] &=3D
-> > +             ~ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer);
-> > +     kvm->arch.id_regs[IDREG_IDX(SYS_ID_AA64DFR0_EL1)] |=3D
-> > +             FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer),
-> > +                        kvm_arm_pmu_get_pmuver_limit());
->
-> Please put these assignments on a single line...
-Will do.
->
-> >  }
-> > diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
-> > index 628775334d5e..51c7f3e7bdde 100644
-> > --- a/include/kvm/arm_pmu.h
-> > +++ b/include/kvm/arm_pmu.h
-> > @@ -92,8 +92,9 @@ void kvm_vcpu_pmu_restore_host(struct kvm_vcpu *vcpu)=
-;
-> >  /*
-> >   * Evaluates as true when emulating PMUv3p5, and false otherwise.
-> >   */
-> > -#define kvm_pmu_is_3p5(vcpu)                                         \
-> > -     (vcpu->kvm->arch.dfr0_pmuver.imp >=3D ID_AA64DFR0_EL1_PMUVer_V3P5=
-)
-> > +#define kvm_pmu_is_3p5(vcpu)                                          =
-                       \
-> > +      (FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer),          =
-                       \
-> > +              vcpu->kvm->arch.id_regs[IDREG_IDX(SYS_ID_AA64DFR0_EL1)])=
- >=3D ID_AA64DFR0_EL1_PMUVer_V3P5)
->
-> I'll stop mentioning the need for accessors...
-Will fix it.
->
-> Thanks,
->
->         M.
->
-> --
-> Without deviation from the norm, progress is not possible.
+> Allow the vfio_device file to be in a state where the device FD is
+> opened but the device cannot be used by userspace (i.e. its .open_device()
+> hasn't been called). This inbetween state is not used when the device
+> FD is spawned from the group FD, however when we create the device FD
+> directly by opening a cdev it will be opened in the blocked state.
+> 
+> The reason for the inbetween state is that userspace only gets a FD but
+> doesn't gain access permission until binding the FD to an iommufd. So in
+> the blocked state, only the bind operation is allowed. Completing bind
+> will allow user to further access the device.
+> 
+> This is implemented by adding a flag in struct vfio_device_file to mark
+> the blocked state and using a simple smp_load_acquire() to obtain the
+> flag value and serialize all the device setup with the thread accessing
+> this device.
+> 
+> Following this lockless scheme, it can safely handle the device FD
+> unbound->bound but it cannot handle bound->unbound. To allow this we'd
+> need to add a lock on all the vfio ioctls which seems costly. So once
+> device FD is bound, it remains bound until the FD is closed.
+> 
+> Suggested-by: Jason Gunthorpe <jgg@nvidia.com>
+> Reviewed-by: Kevin Tian <kevin.tian@intel.com>
+> Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
+> Tested-by: Terrence Xu <terrence.xu@intel.com>
+> Tested-by: Nicolin Chen <nicolinc@nvidia.com>
+> Tested-by: Matthew Rosato <mjrosato@linux.ibm.com>
+> Signed-off-by: Yi Liu <yi.l.liu@intel.com>
+> ---
+>  drivers/vfio/group.c     | 11 ++++++++++-
+>  drivers/vfio/vfio.h      |  1 +
+>  drivers/vfio/vfio_main.c | 41 ++++++++++++++++++++++++++++++++++------
+>  3 files changed, 46 insertions(+), 7 deletions(-)
+> 
+> diff --git a/drivers/vfio/group.c b/drivers/vfio/group.c
+> index 9a7b2765eef6..4f267ae7bebc 100644
+> --- a/drivers/vfio/group.c
+> +++ b/drivers/vfio/group.c
+> @@ -194,9 +194,18 @@ static int vfio_device_group_open(struct vfio_device_file *df)
+>  	df->iommufd = device->group->iommufd;
+>  
+>  	ret = vfio_device_open(df);
+> -	if (ret)
+> +	if (ret) {
+>  		df->iommufd = NULL;
+> +		goto out_put_kvm;
+> +	}
+> +
+> +	/*
+> +	 * Paired with smp_load_acquire() in vfio_device_fops::ioctl/
+> +	 * read/write/mmap
+> +	 */
+> +	smp_store_release(&df->access_granted, true);
+>  
+> +out_put_kvm:
+>  	if (device->open_count == 0)
+>  		vfio_device_put_kvm(device);
+>  
+> diff --git a/drivers/vfio/vfio.h b/drivers/vfio/vfio.h
+> index cffc08f5a6f1..854f2c97cb9a 100644
+> --- a/drivers/vfio/vfio.h
+> +++ b/drivers/vfio/vfio.h
+> @@ -18,6 +18,7 @@ struct vfio_container;
+>  
+>  struct vfio_device_file {
+>  	struct vfio_device *device;
+> +	bool access_granted;
+>  	spinlock_t kvm_ref_lock; /* protect kvm field */
+>  	struct kvm *kvm;
+>  	struct iommufd_ctx *iommufd; /* protected by struct vfio_device_set::lock */
+> diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
+> index 2ea6cb6d03c7..b515bbda4c74 100644
+> --- a/drivers/vfio/vfio_main.c
+> +++ b/drivers/vfio/vfio_main.c
+> @@ -1114,6 +1114,10 @@ static long vfio_device_fops_unl_ioctl(struct file *filep,
+>  	struct vfio_device *device = df->device;
+>  	int ret;
+>  
+> +	/* Paired with smp_store_release() following vfio_device_open() */
+> +	if (!smp_load_acquire(&df->access_granted))
+> +		return -EINVAL;
+> +
+>  	ret = vfio_device_pm_runtime_get(device);
+>  	if (ret)
+>  		return ret;
+> @@ -1141,6 +1145,10 @@ static ssize_t vfio_device_fops_read(struct file *filep, char __user *buf,
+>  	struct vfio_device_file *df = filep->private_data;
+>  	struct vfio_device *device = df->device;
+>  
+> +	/* Paired with smp_store_release() following vfio_device_open() */
+> +	if (!smp_load_acquire(&df->access_granted))
+> +		return -EINVAL;
+> +
+>  	if (unlikely(!device->ops->read))
+>  		return -EINVAL;
+>  
+> @@ -1154,6 +1162,10 @@ static ssize_t vfio_device_fops_write(struct file *filep,
+>  	struct vfio_device_file *df = filep->private_data;
+>  	struct vfio_device *device = df->device;
+>  
+> +	/* Paired with smp_store_release() following vfio_device_open() */
+> +	if (!smp_load_acquire(&df->access_granted))
+> +		return -EINVAL;
+> +
+>  	if (unlikely(!device->ops->write))
+>  		return -EINVAL;
+>  
+> @@ -1165,6 +1177,10 @@ static int vfio_device_fops_mmap(struct file *filep, struct vm_area_struct *vma)
+>  	struct vfio_device_file *df = filep->private_data;
+>  	struct vfio_device *device = df->device;
+>  
+> +	/* Paired with smp_store_release() following vfio_device_open() */
+> +	if (!smp_load_acquire(&df->access_granted))
+> +		return -EINVAL;
+> +
+>  	if (unlikely(!device->ops->mmap))
+>  		return -EINVAL;
+>  
+> @@ -1201,6 +1217,24 @@ bool vfio_file_is_valid(struct file *file)
+>  }
+>  EXPORT_SYMBOL_GPL(vfio_file_is_valid);
+>  
+> +/*
+> + * Return true if the input file is a vfio device file and has opened
+> + * the input device. Otherwise, return false.
+> + */
+> +static bool vfio_file_has_device_access(struct file *file,
+> +					struct vfio_device *device)
+> +{
+> +	struct vfio_device *vdev = vfio_device_from_file(file);
+> +	struct vfio_device_file *df;
+> +
+> +	if (!vdev || vdev != device)
+> +		return false;
+> +
+> +	df = file->private_data;
+> +
+> +	return READ_ONCE(df->access_granted);
 
-Thanks,
-Jing
+Why did we change from smp_load_acquire() to READ_ONCE() here?  Thanks,
+
+Alex
+
+> +}
+> +
+>  /**
+>   * vfio_file_has_dev - True if the VFIO file is a handle for device
+>   * @file: VFIO file to check
+> @@ -1211,17 +1245,12 @@ EXPORT_SYMBOL_GPL(vfio_file_is_valid);
+>  bool vfio_file_has_dev(struct file *file, struct vfio_device *device)
+>  {
+>  	struct vfio_group *group;
+> -	struct vfio_device *vdev;
+>  
+>  	group = vfio_group_from_file(file);
+>  	if (group)
+>  		return vfio_group_has_dev(group, device);
+>  
+> -	vdev = vfio_device_from_file(file);
+> -	if (vdev)
+> -		return vdev == device;
+> -
+> -	return false;
+> +	return vfio_file_has_device_access(file, device);
+>  }
+>  EXPORT_SYMBOL_GPL(vfio_file_has_dev);
+>  
+
