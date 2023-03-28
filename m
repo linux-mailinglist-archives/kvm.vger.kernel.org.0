@@ -2,125 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F3BE36CC790
-	for <lists+kvm@lfdr.de>; Tue, 28 Mar 2023 18:10:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EC6CA6CC829
+	for <lists+kvm@lfdr.de>; Tue, 28 Mar 2023 18:38:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233150AbjC1QK3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Mar 2023 12:10:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44024 "EHLO
+        id S232206AbjC1QiF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Mar 2023 12:38:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48226 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232762AbjC1QKX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Mar 2023 12:10:23 -0400
-Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A27DBA;
-        Tue, 28 Mar 2023 09:10:07 -0700 (PDT)
-Received: by mail-pg1-x531.google.com with SMTP id z18so7502058pgj.13;
-        Tue, 28 Mar 2023 09:10:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1680019807;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=wJiKI9TnWzLmHi6C68IeZ+7MBHHTSu9CAEUNVVcXEnM=;
-        b=EBBgDVp5A/GqLJnvspK0XT7CNEATCRF2/0a1orkWSA1avZBU+sI2HGou2ex7aSGaov
-         cCOE9kHWEDYhyngnfLiraSjkg+wnbwoHXtf2VTKhHHHKrsPrFyvZUENcQ4wXL3kH0aGN
-         aL8QMmeKLageaUZhllDGpC5T6pRVNcXPvlveXK/zFR27SvLJJAobGwre0HwTsh5tJ7Ew
-         iY26ZBVBsLL1NxR/+8KCHcrnKKlVJDPKcCUevSAtcCEFThODlEDTbP2C4UgVh9Npi5M8
-         IZrMFAlh758uhQESLRkBikQA23Zrr1CJvwIBcB3c4gegNTnXCdlk3rmUjkCjyUbCICvR
-         rpMw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680019807;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wJiKI9TnWzLmHi6C68IeZ+7MBHHTSu9CAEUNVVcXEnM=;
-        b=UiTIRfVrnrh4y5eSPBs49uiacNlRSip7Ky9Q5gt5SULTjubhUvXsS+ZzcqUqdZ5+AQ
-         ACF9QUIjx8lsY1y5vjbTbG6VjJAAxHdUyW0itJYI/0wNI7gr+212td9+Zx6HtYrWXSWv
-         1IhXmCZ5OaFbgsPY3PMFOksYrF0/rphog+nrxjPS3wOAu3lHHb4glRz8aL45vfL/EP39
-         5JAJGpA8QCLsM27qrhMcCVhSRuRIaSYIWgD0Y1sCLUFI2WbD+oHAP2RiGfOxpY9ieaLG
-         Eowo1lvsHELFWQy+4TdsjEOiKNPLxaOydeV5LmfAIzOIFFntDG8ISDY09bBqnmadahyx
-         mujQ==
-X-Gm-Message-State: AAQBX9cwBL34be5awiB5aAxnXLd7DbcgJI7PU1UGv8OM3jQjUwYLTDhB
-        Pe+qPYimWNj8YQ/9fdPRiN0=
-X-Google-Smtp-Source: AKy350ZZkx2gxZ83pBMCw3pl3b7TNfCvbj4qE/D6y+DPEJppd29r6iK+7Iuar6PfmANY6VmdGpDeZQ==
-X-Received: by 2002:a62:18d5:0:b0:625:ff85:21ec with SMTP id 204-20020a6218d5000000b00625ff8521ecmr15186860pfy.26.1680019806894;
-        Tue, 28 Mar 2023 09:10:06 -0700 (PDT)
-Received: from localhost (ec2-54-67-115-33.us-west-1.compute.amazonaws.com. [54.67.115.33])
-        by smtp.gmail.com with ESMTPSA id j24-20020aa78dd8000000b0062d7d3d7346sm4703336pfr.20.2023.03.28.09.10.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Mar 2023 09:10:06 -0700 (PDT)
-Date:   Sat, 18 Mar 2023 11:38:38 +0000
-From:   Bobby Eshleman <bobbyeshleman@gmail.com>
-To:     Stefano Garzarella <sgarzare@redhat.com>
-Cc:     Bobby Eshleman <bobby.eshleman@bytedance.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Cong Wang <xiyou.wangcong@gmail.com>
-Subject: Re: [PATCH net] virtio/vsock: fix leak due to missing skb owner
-Message-ID: <ZBWivg3d7G/ETqqo@bullseye>
-References: <20230327-vsock-fix-leak-v1-1-3fede367105f@bytedance.com>
- <jinx5oduhddyyaxnreey2riem3s7ju5zuszddmoiie6dcnyiiy@fr4cg33vi7aq>
+        with ESMTP id S231424AbjC1QiD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Mar 2023 12:38:03 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47B03976A
+        for <kvm@vger.kernel.org>; Tue, 28 Mar 2023 09:38:02 -0700 (PDT)
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 32SGPQ62011973
+        for <kvm@vger.kernel.org>; Tue, 28 Mar 2023 16:38:01 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=ChvND5HbP2Cehht+tbIw7BxXXWCJQbw/IKg4MUhmbpE=;
+ b=nVJ5nF22dTSdAe+chNmruh31YTh1FogYWvCLRwvdW2kBl3nep4d/kkB/0tPfW3lK0f+c
+ xsVfkIyDNXBB8LObIH+1LF8lTcIo2nXklGvK7jZ9qUzvGGC+gaLFZWqqc2mvLcjgcBR/
+ KzbJe1KZ096cuD5JLdB6lCeGDHC20wXMIwb49Vk5QEdWZ49B6ISBrimoIZ4tFxE45XC6
+ UVahQ4vGKXACgX61x7CL/aS1i4MdbgB5IOk2iPAyDIvwohVCHHBvuEm2xJCOc0NkjFtL
+ vdVn5HCS6N2TO8GJSwNtSeADNEl+3VRCSIqpwcjczIXE61L6jrCqBC5Gyk9jC3X1WvuY ug== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pm3rc09sr-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Tue, 28 Mar 2023 16:38:01 +0000
+Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 32SGSio6020577
+        for <kvm@vger.kernel.org>; Tue, 28 Mar 2023 16:38:00 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pm3rc09rq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 28 Mar 2023 16:38:00 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 32S8aSkx002045;
+        Tue, 28 Mar 2023 16:37:59 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+        by ppma03ams.nl.ibm.com (PPS) with ESMTPS id 3phrk6m5vh-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 28 Mar 2023 16:37:59 +0000
+Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
+        by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 32SGbt6w63308146
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 28 Mar 2023 16:37:55 GMT
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 560C72004B;
+        Tue, 28 Mar 2023 16:37:55 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3185020043;
+        Tue, 28 Mar 2023 16:37:55 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.152.224.56])
+        by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Tue, 28 Mar 2023 16:37:55 +0000 (GMT)
+Date:   Tue, 28 Mar 2023 16:44:46 +0200
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Janosch Frank <frankja@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, thuth@redhat.com, nrb@linux.ibm.com
+Subject: Re: [kvm-unit-tests PATCH v2 1/3] lib: s390x: Introduce UV validity
+ function
+Message-ID: <20230328164446.29c38a99@p-imbrenda>
+In-Reply-To: <20230324120431.20260-2-frankja@linux.ibm.com>
+References: <20230324120431.20260-1-frankja@linux.ibm.com>
+        <20230324120431.20260-2-frankja@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <jinx5oduhddyyaxnreey2riem3s7ju5zuszddmoiie6dcnyiiy@fr4cg33vi7aq>
-X-Spam-Status: No, score=1.9 required=5.0 tests=DATE_IN_PAST_96_XX,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=no
-        autolearn_force=no version=3.4.6
-X-Spam-Level: *
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: B_Hsx3D7cSDPOPgICiGDzAHsZZ8VOHTp
+X-Proofpoint-GUID: ELy2EwIu8YUa2S9roOuLNdsJsvOxupeW
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
+ definitions=2023-03-24_11,2023-03-28_02,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 mlxscore=0
+ impostorscore=0 malwarescore=0 suspectscore=0 lowpriorityscore=0
+ bulkscore=0 mlxlogscore=999 adultscore=0 spamscore=0 phishscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2303200000 definitions=main-2303280130
+X-Spam-Status: No, score=-0.1 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
+        DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 28, 2023 at 09:58:00AM +0200, Stefano Garzarella wrote:
-> On Mon, Mar 27, 2023 at 10:01:05PM +0000, Bobby Eshleman wrote:
-> > This patch sets the owner for the skb when being sent from a socket and
-> > so solves the leak caused when virtio_transport_purge_skbs() finds
-> > skb->sk is always NULL and therefore never matches it with the current
-> > socket. Setting the owner upon allocation fixes this.
-> > 
-> > Fixes: 71dc9ec9ac7d ("virtio/vsock: replace virtio_vsock_pkt with sk_buff")
-> > Signed-off-by: Bobby Eshleman <bobby.eshleman@bytedance.com>
-> > Reported-by: Cong Wang <xiyou.wangcong@gmail.com>
-> > Link: https://lore.kernel.org/all/ZCCbATwov4U+GBUv@pop-os.localdomain/
-> > ---
-> > net/vmw_vsock/virtio_transport_common.c | 3 +++
-> > 1 file changed, 3 insertions(+)
-> > 
-> > diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
-> > index 957cdc01c8e8..2a2f0c1a9fbd 100644
-> > --- a/net/vmw_vsock/virtio_transport_common.c
-> > +++ b/net/vmw_vsock/virtio_transport_common.c
-> > @@ -94,6 +94,9 @@ virtio_transport_alloc_skb(struct virtio_vsock_pkt_info *info,
-> > 					 info->op,
-> > 					 info->flags);
-> > 
-> > +	if (info->vsk)
-> > +		skb_set_owner_w(skb, sk_vsock(info->vsk));
-> > +
-> 
-> Should we do the same also in virtio_transport_recv_pkt()?
-> 
-> The skb in that cases is allocated in drivers/vhost/vsock.c and
-> net/vmw_vsock/virtio_transport.c using directly
-> virtio_vsock_alloc_skb(), because we don't know in advance which socket
-> it belongs to.
-> 
-> Then in virtio_transport_recv_pkt() we look for the socket and queue it
-> up. This should also solve the problem in vsock_loopback.c where we move
-> skb from one socket to another.
-> 
+On Fri, 24 Mar 2023 12:04:29 +0000
+Janosch Frank <frankja@linux.ibm.com> wrote:
 
-That's a great point, skb_set_owner_r() in recv_pkt() will do all of the
-right accounting when called by vsock_loopback_work.
+> PV related validities are in the 0x20** range but the last byte might
+> be implementation specific, so everytime we check for a UV validity we
+> need to mask the last byte.
+> 
+> Let's add a function that checks for a UV validity and returns a
+> boolean.
+> 
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
 
-I'll add that in a v2.
+Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
 
-Thanks,
-Bobby
+> ---
+>  lib/s390x/uv.h | 7 +++++++
+>  1 file changed, 7 insertions(+)
+> 
+> diff --git a/lib/s390x/uv.h b/lib/s390x/uv.h
+> index 5fe29bda..78b979b7 100644
+> --- a/lib/s390x/uv.h
+> +++ b/lib/s390x/uv.h
+> @@ -35,4 +35,11 @@ static inline void uv_setup_asces(void)
+>  	lctlg(13, asce);
+>  }
+>  
+> +static inline bool uv_validity_check(struct vm *vm)
+> +{
+> +	uint16_t vir = sie_get_validity(vm);
+> +
+> +	return vm->sblk->icptcode == ICPT_VALIDITY && (vir & 0xff00) == 0x2000;
+> +}
+> +
+>  #endif /* UV_H */
+
