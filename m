@@ -2,73 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6ECB96CBFE9
-	for <lists+kvm@lfdr.de>; Tue, 28 Mar 2023 14:56:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E43F46CC142
+	for <lists+kvm@lfdr.de>; Tue, 28 Mar 2023 15:43:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230101AbjC1M42 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Mar 2023 08:56:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57736 "EHLO
+        id S232484AbjC1NnN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Mar 2023 09:43:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45646 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232191AbjC1M4Y (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Mar 2023 08:56:24 -0400
-Received: from mail-lj1-x229.google.com (mail-lj1-x229.google.com [IPv6:2a00:1450:4864:20::229])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E25597
-        for <kvm@vger.kernel.org>; Tue, 28 Mar 2023 05:56:18 -0700 (PDT)
-Received: by mail-lj1-x229.google.com with SMTP id y35so9930442ljq.4
-        for <kvm@vger.kernel.org>; Tue, 28 Mar 2023 05:56:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sifive.com; s=google; t=1680008177;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pY8KWhN7SgpHmmDG69ixmsCEWsblRlF4c4Kuf0LRZ4U=;
-        b=STHNi84isxh9ZXSer5QGVBlpqodlAQv0aIEc4KQcUqTrufjvjQVc+2doCTXNCia7Ix
-         e1tOqVdR5NrkSw4zTdv2ha6SFxiPDGLUJOVJAfqx4rZIOymKps7d13/mKDAm+mrtFOfg
-         uVsZLQwNmGOKNDmr9A7KqKU67ictliVieIsf2s6xgwH0JtS0/zF2I7xz96K+cNFjeLRL
-         EGyNuv+7dDZ86RVC6+QZ93T7c39pebwFXWCa+/1c+v/DOHvDjg8Q2YsIyZ3CFFY5gB/Q
-         szyRDTuAxBiCWToyCrU+y+KiPkVibQ+vGGyPKGp1ZAF+z+UcHQZjYD91YlV03XtQgw/Z
-         dsAQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680008177;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=pY8KWhN7SgpHmmDG69ixmsCEWsblRlF4c4Kuf0LRZ4U=;
-        b=miuOUX1BsF8zh/hGqzJ8TK/AekYoupT0EKlvNn3um8CJyjzHkV1lahQejl1wA2qjpZ
-         v+w/RUB8OVSIux04cHFJzo1++iNG5UNPXS5z4Pu2rl7TjUUBVYmQBdyi37vc60fjWhQo
-         chEDXWpmWtuPDJPKE47FOPoORFpIesQn7NO5WoVOCVskW6qICNttcPZFyfEzTdorTani
-         0ySSe3dnrtc54oJbOX0spkn7FAGYCcqVf5RiwiK3ZMaZUovvOFYNJOIihMqPTdx5x0nH
-         dgX/yz0S/+AyNmTHr7Cb1oynvoUOI2PI4qbpwEG28ofVn/I0O+17VJCePGhDe/YiXf2+
-         MVdw==
-X-Gm-Message-State: AAQBX9fYkGfW42PoNEv8QBEk5wzlf9MJA8bjemkm6tgJQF0B9xJ+pN6j
-        bhsk5fTCZK3Oc9JQPLC5YOD3xDyxZ6xKT80aGy+YdA==
-X-Google-Smtp-Source: AKy350Y74Cl5niSL3xTzg6tRDS+C5dIVCvZ2/zCM7y3SdsWuQ+2kXtftzH5czZ368jHKUBzow/GXJOMb2pFvL1m9Gbo=
-X-Received: by 2002:a2e:a175:0:b0:29c:8a14:74e6 with SMTP id
- u21-20020a2ea175000000b0029c8a1474e6mr4797617ljl.0.1680008177123; Tue, 28 Mar
- 2023 05:56:17 -0700 (PDT)
+        with ESMTP id S232842AbjC1Nm6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Mar 2023 09:42:58 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 112392D4C;
+        Tue, 28 Mar 2023 06:42:56 -0700 (PDT)
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 32SDd3wD023838;
+        Tue, 28 Mar 2023 13:42:56 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : to : cc : references : from : subject : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=CfDYwmqpCBlWGH8vmTBL83v4InRbcL8+v/ad7HJ3Gqk=;
+ b=Dk+k7NaQH5KtuWyTLUow0nOni079E7zwahfObwIX9R++FY9gnjNlJlLc1rY7kJfiF17p
+ bm4qVgcZal+kkDkNd5h86X/fWA9trCYm3OIraiX9NFLVwuxmMppI66t6n1s35B7Z5Y+O
+ wmzFQ+6Yy0ymcLHpzutYa33eL+u6XDvQv72cbxwnxINpSESz7AzEHdGhCvrQpxPNB87o
+ QYyPJkGcXu7dYU0T79KO7rpL1IBrb/ulxLd1qvtk8B6Vyy20OXI5ldfTzOJVxKat6/o5
+ TM5WKeUqdMZFAyIWwrQQe616807KtuP9cuoZqoSTl6q4rckxT4QzxOkQ7vUh0Jv2HFmU zQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pky56ktgx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 28 Mar 2023 13:42:55 +0000
+Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 32SDdsuK027542;
+        Tue, 28 Mar 2023 13:42:55 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pky56kt4v-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 28 Mar 2023 13:42:55 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 32S3FEt4019120;
+        Tue, 28 Mar 2023 13:42:31 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+        by ppma03ams.nl.ibm.com (PPS) with ESMTPS id 3phrk6m1h8-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 28 Mar 2023 13:42:30 +0000
+Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
+        by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 32SDgRhf11338390
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 28 Mar 2023 13:42:27 GMT
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5F94920043;
+        Tue, 28 Mar 2023 13:42:27 +0000 (GMT)
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 1A86E2004B;
+        Tue, 28 Mar 2023 13:42:27 +0000 (GMT)
+Received: from [9.179.1.68] (unknown [9.179.1.68])
+        by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Tue, 28 Mar 2023 13:42:27 +0000 (GMT)
+Message-ID: <4eb0d6aa-d0c9-ff0e-d1f6-2d23ea8a957d@linux.ibm.com>
+Date:   Tue, 28 Mar 2023 15:42:26 +0200
 MIME-Version: 1.0
-References: <20230323145924.4194-1-andy.chiu@sifive.com> <20230323145924.4194-20-andy.chiu@sifive.com>
- <04cc3420-26a7-4263-b120-677c758eabea@spud> <20230324145934.GB428955@dev-arch.thelio-3990X>
-In-Reply-To: <20230324145934.GB428955@dev-arch.thelio-3990X>
-From:   Andy Chiu <andy.chiu@sifive.com>
-Date:   Tue, 28 Mar 2023 20:55:00 +0800
-Message-ID: <CABgGipWr8y-Of=brW2=_yiGb6EYu=b7FfXxF0sEkU=9xQ=11aA@mail.gmail.com>
-Subject: Re: [PATCH -next v16 19/20] riscv: detect assembler support for
- .option arch
-To:     Nathan Chancellor <nathan@kernel.org>
-Cc:     Conor Dooley <conor.dooley@microchip.com>,
-        linux-riscv@lists.infradead.org, palmer@dabbelt.com,
-        anup@brainfault.org, atishp@atishpatra.org,
-        kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
-        vineetg@rivosinc.com, greentime.hu@sifive.com,
-        guoren@linux.alibaba.com, Paul Walmsley <paul.walmsley@sifive.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Tom Rix <trix@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
-        DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.9.0
+To:     Nico Boehr <nrb@linux.ibm.com>, imbrenda@linux.ibm.com,
+        thuth@redhat.com
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org
+References: <20230327082118.2177-1-nrb@linux.ibm.com>
+ <20230327082118.2177-4-nrb@linux.ibm.com>
+Content-Language: en-US
+From:   Janosch Frank <frankja@linux.ibm.com>
+Subject: Re: [kvm-unit-tests PATCH v1 3/4] s390x: lib: sie: don't reenter SIE
+ on pgm int
+In-Reply-To: <20230327082118.2177-4-nrb@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: O9Zk6q3OroVC5YymcRwQn2EiSPgrh-3w
+X-Proofpoint-ORIG-GUID: vFeWtwn65QU4dOSsy1CMYtfKHc20dke9
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
+ definitions=2023-03-24_11,2023-03-28_02,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ mlxlogscore=757 malwarescore=0 phishscore=0 adultscore=0 spamscore=0
+ clxscore=1011 suspectscore=0 priorityscore=1501 bulkscore=0
+ impostorscore=0 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2303200000 definitions=main-2303280107
+X-Spam-Status: No, score=-0.1 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
+        DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS
         autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -76,104 +94,36 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Mar 24, 2023 at 10:59=E2=80=AFPM Nathan Chancellor <nathan@kernel.o=
-rg> wrote:
->
-> On Thu, Mar 23, 2023 at 03:26:14PM +0000, Conor Dooley wrote:
-> > On Thu, Mar 23, 2023 at 02:59:23PM +0000, Andy Chiu wrote:
-> > > Some extensions use .option arch directive to selectively enable cert=
-ain
-> > > extensions in parts of its assembly code. For example, Zbb uses it to
-> > > inform assmebler to emit bit manipulation instructions. However,
-> > > supporting of this directive only exist on GNU assembler and has not
-> > > landed on clang at the moment, making TOOLCHAIN_HAS_ZBB depend on
-> > > AS_IS_GNU.
-> > >
-> > > While it is still under review at https://reviews.llvm.org/D123515, t=
-he
-> > > upcoming Vector patch also requires this feature in assembler. Thus,
-> > > provide Kconfig AS_HAS_OPTION_ARCH to detect such feature. Then
-> > > TOOLCHAIN_HAS_XXX will be turned on automatically when the feature la=
-nd.
-> > >
-> > > Suggested-by: Nathan Chancellor <nathan@kernel.org>
-> > > Signed-off-by: Andy Chiu <andy.chiu@sifive.com>
-> > > ---
-> > >  arch/riscv/Kconfig | 8 +++++++-
-> > >  1 file changed, 7 insertions(+), 1 deletion(-)
-> > >
-> > > diff --git a/arch/riscv/Kconfig b/arch/riscv/Kconfig
-> > > index 36a5b6fed0d3..4f8fd4002f1d 100644
-> > > --- a/arch/riscv/Kconfig
-> > > +++ b/arch/riscv/Kconfig
-> > > @@ -244,6 +244,12 @@ config RISCV_DMA_NONCOHERENT
-> > >  config AS_HAS_INSN
-> > >     def_bool $(as-instr,.insn r 51$(comma) 0$(comma) 0$(comma) t0$(co=
-mma) t0$(comma) zero)
-> > >
-> > > +config AS_HAS_OPTION_ARCH
-> > > +   # https://reviews.llvm.org/D123515
-> > > +   def_bool y
-> > > +   depends on $(as-instr, .option arch$(comma) +m)
-> > > +   depends on !$(as-instr, .option arch$(comma) -i)
-> >
-> > Oh cool, I didn't expect this to work given what Nathan said in his
-> > mail, but I gave it a whirl and it does seem to.
->
-> The second line is the clever part of this option that I had not
-> considered, as it checks for something that should error in addition to
-> something that shouldn't::
->
-> $ echo '.option arch, -i' | riscv64-linux-gcc -c -o /dev/null -x assemble=
-r -
-> {standard input}: Assembler messages:
-> {standard input}:1: Error: cannot + or - base extension `i' in .option ar=
-ch `-i'
->
-> Looking at D123515, I see this same option test is present and appears
-> to error in the same manner so this should work when that change is
-> merged.
+On 3/27/23 10:21, Nico Boehr wrote:
+> At the moment, when a PGM int occurs while in SIE, we will just reenter
+> SIE after the interrupt handler was called.
+> 
+> This is because sie() has a loop which checks icptcode and re-enters SIE
+> if it is zero.
+> 
+> However, this behaviour is quite undesirable for SIE tests, since it
+> doesn't give the host the chance to assert on the PGM int. Instead, we
+> will just re-enter SIE, on nullifing conditions even causing the
+> exception again.
+> 
+> Add a flag PROG_PGM_IN_SIE set by the pgm int fixup which indicates a
+> program interrupt has occured in SIE. Check for the flag in sie() and if
+> it's set return from sie() to give the host the ability to react on the
+> exception. The host may check if a PGM int has occured in the guest
+> using the new function sie_had_pgm_int().
 
-Thanks for checking D123515 Nathan. It was just lucky that It gets the
-same test coverage in Clang. I would take a look at that aspect in the
-future if the same happens.
+We could simply check "!lowcore.pgm_int_code" by introducing:
+uint16_t read_pgm_int(void)
+{
+	mb();
+	return lowcore.pgm_int_code;
+}
 
->
-> Reviewed-by: Nathan Chancellor <nathan@kernel.org>
->
-> > I suppose:
-> > Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
-> >
-> > I'd rather it be this way so that it is "hands off", as opposed to the
-> > version check that would need updating in the future. And I guess it
-> > means that support for V & IAS will automatically turn on for stable
-> > kernels too once the LLVM change lands, which is nice ;)
->
-> Very much agreed!
->
-> > Thanks Andy!
-> >
-> > > +
-> > >  source "arch/riscv/Kconfig.socs"
-> > >  source "arch/riscv/Kconfig.errata"
-> > >
-> > > @@ -442,7 +448,7 @@ config TOOLCHAIN_HAS_ZBB
-> > >     depends on !64BIT || $(cc-option,-mabi=3Dlp64 -march=3Drv64ima_zb=
-b)
-> > >     depends on !32BIT || $(cc-option,-mabi=3Dilp32 -march=3Drv32ima_z=
-bb)
-> > >     depends on LLD_VERSION >=3D 150000 || LD_VERSION >=3D 23900
-> > > -   depends on AS_IS_GNU
-> > > +   depends on AS_HAS_OPTION_ARCH
-> > >
-> > >  config RISCV_ISA_ZBB
-> > >     bool "Zbb extension support for bit manipulation instructions"
-> > > --
-> > > 2.17.1
-> > >
-> > >
->
->
+into interrupt.c.
 
-Regards,
-Andy
+
+Or to be a bit more verbose:
+I don't see a reason why we'd want to store a per sblk PGM in SIE bit 
+when all we want to know is either: was there a PGM at all (to stop the 
+SIE loop) or was there a PGM between the expect and the 
+check_pgm_int_code().
