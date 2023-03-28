@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DBAA16CCC56
-	for <lists+kvm@lfdr.de>; Tue, 28 Mar 2023 23:54:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A59EA6CCC5A
+	for <lists+kvm@lfdr.de>; Tue, 28 Mar 2023 23:54:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230017AbjC1Vy2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Mar 2023 17:54:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47886 "EHLO
+        id S230046AbjC1Vyh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Mar 2023 17:54:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48040 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230013AbjC1VyX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Mar 2023 17:54:23 -0400
+        with ESMTP id S230039AbjC1Vy2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Mar 2023 17:54:28 -0400
 Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34674270B;
-        Tue, 28 Mar 2023 14:54:05 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81F932721;
+        Tue, 28 Mar 2023 14:54:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1680040445; x=1711576445;
+  t=1680040454; x=1711576454;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=c6/0IvJxGbxNFxGBlKteRomX4zRUuc1+opLCThWE3hs=;
-  b=Qmiv4BY62AHXuwkdRh9oKn40eHX0aKXupqPXmKKIQO4SUP2SnCPCudAH
-   2v/bYyoIZOJI6+UudsAr0xYs6THZvPZUEVLXT3aMowVDdYI4nrsdv4PP7
-   1mG56TWPIV8/n8vaXjG/Dve51S08vEfmj6iNd7qWFvIfLwYA95aiARgo2
-   AD8HI254yGVsYj8VS39vWSllKAFQJZUGPaXITb/QUN0CDCWGJ9M5tnmsn
-   ixO5qo9svIMecAQ5jydbExcXasM5LAKf0q22lF5aKV7bp9aGYaJFWdULK
-   RzneyPQT1wTCdOQ9sk5Z6q5JxrTCiFAuwCY/XKvg/9agtvg/7szyC/EuB
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10663"; a="403316925"
+  bh=clXlp6AznSWgVdTSj2E/3+K57ayIvVDYVuY4v/JSdjI=;
+  b=chjTS6xIUQIO2WPKqI961QDPTTq4F1XiZQkq8Vu7eGP3B+ShYVkjFalw
+   uR9uvT9gR0zHh0nnMrldUH+h5Qxa3Hid6BJEN+Kwz5dB6mOfESw5rtY1I
+   fNoOhOwh5AB41wPNx0vpLEElxpQ7ZZP2qlxLQW3T/ArxNadhsETDAC9Gu
+   plpFdphFuLYOE2Ua4soAcUgug2n/KHoDXXBlg2KMOScRjVpLPE0JoxdXE
+   RK4a4xS+sqREe+OcCVXmKpyVVK18wqkKgZWBGbOE0AYurVyynR3FI5HO/
+   NuwKnswJ+5AUMxuioZ07pDgAe3XNF6i1VbuZgZZLvyc78qSpQ2NgDHjy9
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10663"; a="403316937"
 X-IronPort-AV: E=Sophos;i="5.98,297,1673942400"; 
-   d="scan'208";a="403316925"
+   d="scan'208";a="403316937"
 Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Mar 2023 14:53:50 -0700
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Mar 2023 14:53:52 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10663"; a="748543772"
+X-IronPort-AV: E=McAfee;i="6600,9927,10663"; a="748543776"
 X-IronPort-AV: E=Sophos;i="5.98,297,1673942400"; 
-   d="scan'208";a="748543772"
+   d="scan'208";a="748543776"
 Received: from rchatre-ws.ostc.intel.com ([10.54.69.144])
-  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Mar 2023 14:53:49 -0700
+  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Mar 2023 14:53:50 -0700
 From:   Reinette Chatre <reinette.chatre@intel.com>
 To:     jgg@nvidia.com, yishaih@nvidia.com,
         shameerali.kolothum.thodi@huawei.com, kevin.tian@intel.com,
@@ -46,9 +46,9 @@ Cc:     tglx@linutronix.de, darwi@linutronix.de, kvm@vger.kernel.org,
         dave.jiang@intel.com, jing2.liu@intel.com, ashok.raj@intel.com,
         fenghua.yu@intel.com, tom.zanussi@linux.intel.com,
         reinette.chatre@intel.com, linux-kernel@vger.kernel.org
-Subject: [PATCH V2 3/8] vfio/pci: Prepare for dynamic interrupt context storage
-Date:   Tue, 28 Mar 2023 14:53:30 -0700
-Message-Id: <e5afa44f91584409f71884316efa967c70901545.1680038771.git.reinette.chatre@intel.com>
+Subject: [PATCH V2 4/8] vfio/pci: Use xarray for interrupt context storage
+Date:   Tue, 28 Mar 2023 14:53:31 -0700
+Message-Id: <8e9aaee36eac32c4b22f6a2c334721ca84132d61.1680038771.git.reinette.chatre@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <cover.1680038771.git.reinette.chatre@intel.com>
 References: <cover.1680038771.git.reinette.chatre@intel.com>
@@ -63,497 +63,186 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Interrupt context storage is statically allocated at the time
-interrupts are allocated. Following allocation, the interrupt
-context is managed by directly accessing the elements of the
-array using the vector as index.
+Interrupt context is statically allocated at the time interrupts
+are allocated. Following allocation, the context is managed by
+directly accessing the elements of the array using the vector
+as index. The storage is released when interrupts are disabled.
 
-It is possible to allocate additional MSI-X vectors after
-MSI-X has been enabled. Dynamic storage of interrupt context
-is needed to support adding new MSI-X vectors after initial
-allocation.
+It is possible to dynamically allocate a single MSI-X index
+after MSI-X has been enabled. A dynamic storage for interrupt context
+is needed to support this. Replace the interrupt context array with an
+xarray (similar to what the core uses as store for MSI descriptors)
+that can support the dynamic expansion while maintaining the
+custom that uses the vector as index.
 
-Replace direct access of array elements with pointers to the
-array elements. Doing so reduces impact of moving to a new data
-structure.  Move interactions with the array to helpers to
-mostly contain changes needed to transition to a dynamic
-data structure.
+Use the new data storage to allocate all elements once and free all
+elements together. Dynamic usage follows.
 
-No functional change intended.
+Create helpers with understanding that it is only possible
+to (after initial MSI-X enabling) allocate a single MSI-X index at
+a time. The only time multiple MSI-X are allocated is during initial
+MSI-X enabling where failure results in no allocations.
 
 Signed-off-by: Reinette Chatre <reinette.chatre@intel.com>
 ---
 Changes since RFC V1:
+- Let vfio_irq_ctx_alloc_single() return pointer to allocated
+  context. (Alex)
+- Transition INTx allocation to simplified vfio_irq_ctx_alloc_single().
 - Improve accuracy of changelog.
 
- drivers/vfio/pci/vfio_pci_intrs.c | 206 ++++++++++++++++++++----------
- 1 file changed, 140 insertions(+), 66 deletions(-)
+ drivers/vfio/pci/vfio_pci_core.c  |  1 +
+ drivers/vfio/pci/vfio_pci_intrs.c | 77 ++++++++++++++++++++-----------
+ include/linux/vfio_pci_core.h     |  2 +-
+ 3 files changed, 53 insertions(+), 27 deletions(-)
 
+diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
+index a5ab416cf476..ae0e161c7fc9 100644
+--- a/drivers/vfio/pci/vfio_pci_core.c
++++ b/drivers/vfio/pci/vfio_pci_core.c
+@@ -2102,6 +2102,7 @@ int vfio_pci_core_init_dev(struct vfio_device *core_vdev)
+ 	INIT_LIST_HEAD(&vdev->vma_list);
+ 	INIT_LIST_HEAD(&vdev->sriov_pfs_item);
+ 	init_rwsem(&vdev->memory_lock);
++	xa_init(&vdev->ctx);
+ 
+ 	return 0;
+ }
 diff --git a/drivers/vfio/pci/vfio_pci_intrs.c b/drivers/vfio/pci/vfio_pci_intrs.c
-index 3f64ccdce69f..ece371ebea00 100644
+index ece371ebea00..00119641aa19 100644
 --- a/drivers/vfio/pci/vfio_pci_intrs.c
 +++ b/drivers/vfio/pci/vfio_pci_intrs.c
-@@ -48,6 +48,31 @@ static bool is_irq_none(struct vfio_pci_core_device *vdev)
- 		 vdev->irq_type == VFIO_PCI_MSIX_IRQ_INDEX);
+@@ -52,25 +52,60 @@ static
+ struct vfio_pci_irq_ctx *vfio_irq_ctx_get(struct vfio_pci_core_device *vdev,
+ 					  unsigned long index)
+ {
+-	if (index >= vdev->num_ctx)
+-		return NULL;
+-	return &vdev->ctx[index];
++	return xa_load(&vdev->ctx, index);
  }
  
-+static
-+struct vfio_pci_irq_ctx *vfio_irq_ctx_get(struct vfio_pci_core_device *vdev,
-+					  unsigned long index)
-+{
-+	if (index >= vdev->num_ctx)
-+		return NULL;
-+	return &vdev->ctx[index];
-+}
-+
-+static void vfio_irq_ctx_free_all(struct vfio_pci_core_device *vdev)
-+{
-+	kfree(vdev->ctx);
-+}
-+
-+static int vfio_irq_ctx_alloc_num(struct vfio_pci_core_device *vdev,
-+				  unsigned long num)
-+{
-+	vdev->ctx = kcalloc(num, sizeof(struct vfio_pci_irq_ctx),
-+			    GFP_KERNEL_ACCOUNT);
-+	if (!vdev->ctx)
-+		return -ENOMEM;
-+
-+	return 0;
-+}
-+
- /*
-  * INTx
-  */
-@@ -55,17 +80,28 @@ static void vfio_send_intx_eventfd(void *opaque, void *unused)
+ static void vfio_irq_ctx_free_all(struct vfio_pci_core_device *vdev)
  {
- 	struct vfio_pci_core_device *vdev = opaque;
- 
--	if (likely(is_intx(vdev) && !vdev->virq_disabled))
--		eventfd_signal(vdev->ctx[0].trigger, 1);
-+	if (likely(is_intx(vdev) && !vdev->virq_disabled)) {
-+		struct vfio_pci_irq_ctx *ctx;
+-	kfree(vdev->ctx);
++	struct vfio_pci_irq_ctx *ctx;
++	unsigned long index;
 +
-+		ctx = vfio_irq_ctx_get(vdev, 0);
-+		if (!ctx)
-+			return;
-+		eventfd_signal(ctx->trigger, 1);
++	xa_for_each(&vdev->ctx, index, ctx) {
++		xa_erase(&vdev->ctx, index);
++		kfree(ctx);
 +	}
- }
- 
- /* Returns true if the INTx vfio_pci_irq_ctx.masked value is changed. */
- bool vfio_pci_intx_mask(struct vfio_pci_core_device *vdev)
- {
- 	struct pci_dev *pdev = vdev->pdev;
-+	struct vfio_pci_irq_ctx *ctx;
- 	unsigned long flags;
- 	bool masked_changed = false;
- 
-+	ctx = vfio_irq_ctx_get(vdev, 0);
-+	if (!ctx)
-+		return masked_changed;
++}
 +
- 	spin_lock_irqsave(&vdev->irqlock, flags);
- 
- 	/*
-@@ -77,7 +113,7 @@ bool vfio_pci_intx_mask(struct vfio_pci_core_device *vdev)
- 	if (unlikely(!is_intx(vdev))) {
- 		if (vdev->pci_2_3)
- 			pci_intx(pdev, 0);
--	} else if (!vdev->ctx[0].masked) {
-+	} else if (!ctx->masked) {
- 		/*
- 		 * Can't use check_and_mask here because we always want to
- 		 * mask, not just when something is pending.
-@@ -87,7 +123,7 @@ bool vfio_pci_intx_mask(struct vfio_pci_core_device *vdev)
- 		else
- 			disable_irq_nosync(pdev->irq);
- 
--		vdev->ctx[0].masked = true;
-+		ctx->masked = true;
- 		masked_changed = true;
- 	}
- 
-@@ -105,9 +141,14 @@ static int vfio_pci_intx_unmask_handler(void *opaque, void *unused)
- {
- 	struct vfio_pci_core_device *vdev = opaque;
- 	struct pci_dev *pdev = vdev->pdev;
-+	struct vfio_pci_irq_ctx *ctx;
- 	unsigned long flags;
- 	int ret = 0;
- 
-+	ctx = vfio_irq_ctx_get(vdev, 0);
-+	if (!ctx)
-+		return ret;
-+
- 	spin_lock_irqsave(&vdev->irqlock, flags);
- 
- 	/*
-@@ -117,7 +158,7 @@ static int vfio_pci_intx_unmask_handler(void *opaque, void *unused)
- 	if (unlikely(!is_intx(vdev))) {
- 		if (vdev->pci_2_3)
- 			pci_intx(pdev, 1);
--	} else if (vdev->ctx[0].masked && !vdev->virq_disabled) {
-+	} else if (ctx->masked && !vdev->virq_disabled) {
- 		/*
- 		 * A pending interrupt here would immediately trigger,
- 		 * but we can avoid that overhead by just re-sending
-@@ -129,7 +170,7 @@ static int vfio_pci_intx_unmask_handler(void *opaque, void *unused)
- 		} else
- 			enable_irq(pdev->irq);
- 
--		vdev->ctx[0].masked = (ret > 0);
-+		ctx->masked = (ret > 0);
- 	}
- 
- 	spin_unlock_irqrestore(&vdev->irqlock, flags);
-@@ -146,18 +187,23 @@ void vfio_pci_intx_unmask(struct vfio_pci_core_device *vdev)
- static irqreturn_t vfio_intx_handler(int irq, void *dev_id)
- {
- 	struct vfio_pci_core_device *vdev = dev_id;
-+	struct vfio_pci_irq_ctx *ctx;
- 	unsigned long flags;
- 	int ret = IRQ_NONE;
- 
-+	ctx = vfio_irq_ctx_get(vdev, 0);
-+	if (!ctx)
-+		return ret;
-+
- 	spin_lock_irqsave(&vdev->irqlock, flags);
- 
- 	if (!vdev->pci_2_3) {
- 		disable_irq_nosync(vdev->pdev->irq);
--		vdev->ctx[0].masked = true;
-+		ctx->masked = true;
- 		ret = IRQ_HANDLED;
--	} else if (!vdev->ctx[0].masked &&  /* may be shared */
-+	} else if (!ctx->masked &&  /* may be shared */
- 		   pci_check_and_mask_intx(vdev->pdev)) {
--		vdev->ctx[0].masked = true;
-+		ctx->masked = true;
- 		ret = IRQ_HANDLED;
- 	}
- 
-@@ -171,15 +217,24 @@ static irqreturn_t vfio_intx_handler(int irq, void *dev_id)
- 
- static int vfio_intx_enable(struct vfio_pci_core_device *vdev)
- {
++static struct vfio_pci_irq_ctx *
++vfio_irq_ctx_alloc_single(struct vfio_pci_core_device *vdev,
++			  unsigned long index)
++{
 +	struct vfio_pci_irq_ctx *ctx;
 +	int ret;
 +
- 	if (!is_irq_none(vdev))
- 		return -EINVAL;
- 
- 	if (!vdev->pdev->irq)
- 		return -ENODEV;
- 
--	vdev->ctx = kzalloc(sizeof(struct vfio_pci_irq_ctx), GFP_KERNEL_ACCOUNT);
--	if (!vdev->ctx)
--		return -ENOMEM;
-+	ret = vfio_irq_ctx_alloc_num(vdev, 1);
-+	if (ret)
-+		return ret;
-+
-+	ctx = vfio_irq_ctx_get(vdev, 0);
-+	if (!ctx) {
-+		vfio_irq_ctx_free_all(vdev);
-+		return -EINVAL;
-+	}
- 
- 	vdev->num_ctx = 1;
- 
-@@ -189,9 +244,9 @@ static int vfio_intx_enable(struct vfio_pci_core_device *vdev)
- 	 * here, non-PCI-2.3 devices will have to wait until the
- 	 * interrupt is enabled.
- 	 */
--	vdev->ctx[0].masked = vdev->virq_disabled;
-+	ctx->masked = vdev->virq_disabled;
- 	if (vdev->pci_2_3)
--		pci_intx(vdev->pdev, !vdev->ctx[0].masked);
-+		pci_intx(vdev->pdev, !ctx->masked);
- 
- 	vdev->irq_type = VFIO_PCI_INTX_IRQ_INDEX;
- 
-@@ -202,41 +257,46 @@ static int vfio_intx_set_signal(struct vfio_pci_core_device *vdev, int fd)
- {
- 	struct pci_dev *pdev = vdev->pdev;
- 	unsigned long irqflags = IRQF_SHARED;
-+	struct vfio_pci_irq_ctx *ctx;
- 	struct eventfd_ctx *trigger;
- 	unsigned long flags;
- 	int ret;
- 
--	if (vdev->ctx[0].trigger) {
-+	ctx = vfio_irq_ctx_get(vdev, 0);
++	ctx = kzalloc(sizeof(*ctx), GFP_KERNEL_ACCOUNT);
 +	if (!ctx)
-+		return -EINVAL;
++		return NULL;
 +
-+	if (ctx->trigger) {
- 		free_irq(pdev->irq, vdev);
--		kfree(vdev->ctx[0].name);
--		eventfd_ctx_put(vdev->ctx[0].trigger);
--		vdev->ctx[0].trigger = NULL;
-+		kfree(ctx->name);
-+		eventfd_ctx_put(ctx->trigger);
-+		ctx->trigger = NULL;
- 	}
- 
- 	if (fd < 0) /* Disable only */
- 		return 0;
- 
--	vdev->ctx[0].name = kasprintf(GFP_KERNEL_ACCOUNT, "vfio-intx(%s)",
--				      pci_name(pdev));
--	if (!vdev->ctx[0].name)
-+	ctx->name = kasprintf(GFP_KERNEL_ACCOUNT, "vfio-intx(%s)",
-+			      pci_name(pdev));
-+	if (!ctx->name)
- 		return -ENOMEM;
- 
- 	trigger = eventfd_ctx_fdget(fd);
- 	if (IS_ERR(trigger)) {
--		kfree(vdev->ctx[0].name);
-+		kfree(ctx->name);
- 		return PTR_ERR(trigger);
- 	}
- 
--	vdev->ctx[0].trigger = trigger;
-+	ctx->trigger = trigger;
- 
- 	if (!vdev->pci_2_3)
- 		irqflags = 0;
- 
- 	ret = request_irq(pdev->irq, vfio_intx_handler,
--			  irqflags, vdev->ctx[0].name, vdev);
-+			  irqflags, ctx->name, vdev);
- 	if (ret) {
--		vdev->ctx[0].trigger = NULL;
--		kfree(vdev->ctx[0].name);
-+		ctx->trigger = NULL;
-+		kfree(ctx->name);
- 		eventfd_ctx_put(trigger);
- 		return ret;
- 	}
-@@ -246,7 +306,7 @@ static int vfio_intx_set_signal(struct vfio_pci_core_device *vdev, int fd)
- 	 * disable_irq won't.
- 	 */
- 	spin_lock_irqsave(&vdev->irqlock, flags);
--	if (!vdev->pci_2_3 && vdev->ctx[0].masked)
-+	if (!vdev->pci_2_3 && ctx->masked)
- 		disable_irq_nosync(pdev->irq);
- 	spin_unlock_irqrestore(&vdev->irqlock, flags);
- 
-@@ -255,12 +315,17 @@ static int vfio_intx_set_signal(struct vfio_pci_core_device *vdev, int fd)
- 
- static void vfio_intx_disable(struct vfio_pci_core_device *vdev)
- {
--	vfio_virqfd_disable(&vdev->ctx[0].unmask);
--	vfio_virqfd_disable(&vdev->ctx[0].mask);
-+	struct vfio_pci_irq_ctx *ctx;
-+
-+	ctx = vfio_irq_ctx_get(vdev, 0);
-+	if (ctx) {
-+		vfio_virqfd_disable(&ctx->unmask);
-+		vfio_virqfd_disable(&ctx->mask);
++	ret = xa_insert(&vdev->ctx, index, ctx, GFP_KERNEL_ACCOUNT);
++	if (ret) {
++		kfree(ctx);
++		return NULL;
 +	}
- 	vfio_intx_set_signal(vdev, -1);
- 	vdev->irq_type = VFIO_PCI_NUM_IRQS;
- 	vdev->num_ctx = 0;
--	kfree(vdev->ctx);
-+	vfio_irq_ctx_free_all(vdev);
++
++	return ctx;
  }
  
- /*
-@@ -284,10 +349,9 @@ static int vfio_msi_enable(struct vfio_pci_core_device *vdev, int nvec, bool msi
- 	if (!is_irq_none(vdev))
- 		return -EINVAL;
- 
--	vdev->ctx = kcalloc(nvec, sizeof(struct vfio_pci_irq_ctx),
++/* Only called during initial interrupt enabling. Never after.  */
+ static int vfio_irq_ctx_alloc_num(struct vfio_pci_core_device *vdev,
+ 				  unsigned long num)
+ {
+-	vdev->ctx = kcalloc(num, sizeof(struct vfio_pci_irq_ctx),
 -			    GFP_KERNEL_ACCOUNT);
 -	if (!vdev->ctx)
 -		return -ENOMEM;
-+	ret = vfio_irq_ctx_alloc_num(vdev, nvec);
-+	if (ret)
-+		return ret;
- 
- 	/* return the number of supported vectors if we can't get all: */
- 	cmd = vfio_pci_memory_lock_and_enable(vdev);
-@@ -296,7 +360,7 @@ static int vfio_msi_enable(struct vfio_pci_core_device *vdev, int nvec, bool msi
- 		if (ret > 0)
- 			pci_free_irq_vectors(pdev);
- 		vfio_pci_memory_unlock_and_restore(vdev, cmd);
--		kfree(vdev->ctx);
-+		vfio_irq_ctx_free_all(vdev);
- 		return ret;
- 	}
- 	vfio_pci_memory_unlock_and_restore(vdev, cmd);
-@@ -320,6 +384,7 @@ static int vfio_msi_set_vector_signal(struct vfio_pci_core_device *vdev,
- 				      unsigned int vector, int fd, bool msix)
- {
- 	struct pci_dev *pdev = vdev->pdev;
 +	struct vfio_pci_irq_ctx *ctx;
- 	struct eventfd_ctx *trigger;
- 	int irq, ret;
- 	u16 cmd;
-@@ -327,33 +392,33 @@ static int vfio_msi_set_vector_signal(struct vfio_pci_core_device *vdev,
- 	if (vector >= vdev->num_ctx)
- 		return -EINVAL;
- 
-+	ctx = vfio_irq_ctx_get(vdev, vector);
-+	if (!ctx)
-+		return -EINVAL;
- 	irq = pci_irq_vector(pdev, vector);
- 
--	if (vdev->ctx[vector].trigger) {
--		irq_bypass_unregister_producer(&vdev->ctx[vector].producer);
-+	if (ctx->trigger) {
-+		irq_bypass_unregister_producer(&ctx->producer);
- 
- 		cmd = vfio_pci_memory_lock_and_enable(vdev);
--		free_irq(irq, vdev->ctx[vector].trigger);
-+		free_irq(irq, ctx->trigger);
- 		vfio_pci_memory_unlock_and_restore(vdev, cmd);
--
--		kfree(vdev->ctx[vector].name);
--		eventfd_ctx_put(vdev->ctx[vector].trigger);
--		vdev->ctx[vector].trigger = NULL;
-+		kfree(ctx->name);
-+		eventfd_ctx_put(ctx->trigger);
-+		ctx->trigger = NULL;
- 	}
- 
- 	if (fd < 0)
- 		return 0;
- 
--	vdev->ctx[vector].name = kasprintf(GFP_KERNEL_ACCOUNT,
--					   "vfio-msi%s[%d](%s)",
--					   msix ? "x" : "", vector,
--					   pci_name(pdev));
--	if (!vdev->ctx[vector].name)
-+	ctx->name = kasprintf(GFP_KERNEL_ACCOUNT, "vfio-msi%s[%d](%s)",
-+			      msix ? "x" : "", vector, pci_name(pdev));
-+	if (!ctx->name)
- 		return -ENOMEM;
- 
- 	trigger = eventfd_ctx_fdget(fd);
- 	if (IS_ERR(trigger)) {
--		kfree(vdev->ctx[vector].name);
-+		kfree(ctx->name);
- 		return PTR_ERR(trigger);
- 	}
- 
-@@ -372,26 +437,25 @@ static int vfio_msi_set_vector_signal(struct vfio_pci_core_device *vdev,
- 		pci_write_msi_msg(irq, &msg);
- 	}
- 
--	ret = request_irq(irq, vfio_msihandler, 0,
--			  vdev->ctx[vector].name, trigger);
-+	ret = request_irq(irq, vfio_msihandler, 0, ctx->name, trigger);
- 	vfio_pci_memory_unlock_and_restore(vdev, cmd);
- 	if (ret) {
--		kfree(vdev->ctx[vector].name);
-+		kfree(ctx->name);
- 		eventfd_ctx_put(trigger);
- 		return ret;
- 	}
- 
--	vdev->ctx[vector].producer.token = trigger;
--	vdev->ctx[vector].producer.irq = irq;
--	ret = irq_bypass_register_producer(&vdev->ctx[vector].producer);
-+	ctx->producer.token = trigger;
-+	ctx->producer.irq = irq;
-+	ret = irq_bypass_register_producer(&ctx->producer);
- 	if (unlikely(ret)) {
- 		dev_info(&pdev->dev,
- 		"irq bypass producer (token %p) registration fails: %d\n",
--		vdev->ctx[vector].producer.token, ret);
-+		ctx->producer.token, ret);
- 
--		vdev->ctx[vector].producer.token = NULL;
-+		ctx->producer.token = NULL;
- 	}
--	vdev->ctx[vector].trigger = trigger;
-+	ctx->trigger = trigger;
++	unsigned long index;
++
++	WARN_ON(!xa_empty(&vdev->ctx));
++
++	for (index = 0; index < num; index++) {
++		ctx = vfio_irq_ctx_alloc_single(vdev, index);
++		if (!ctx)
++			goto err;
++	}
  
  	return 0;
- }
-@@ -421,13 +485,17 @@ static int vfio_msi_set_block(struct vfio_pci_core_device *vdev, unsigned start,
- static void vfio_msi_disable(struct vfio_pci_core_device *vdev, bool msix)
- {
- 	struct pci_dev *pdev = vdev->pdev;
-+	struct vfio_pci_irq_ctx *ctx;
- 	unsigned int i;
- 	u16 cmd;
- 
- 	for (i = 0; i < vdev->num_ctx; i++) {
--		vfio_virqfd_disable(&vdev->ctx[i].unmask);
--		vfio_virqfd_disable(&vdev->ctx[i].mask);
--		vfio_msi_set_vector_signal(vdev, i, -1, msix);
-+		ctx = vfio_irq_ctx_get(vdev, i);
-+		if (ctx) {
-+			vfio_virqfd_disable(&ctx->unmask);
-+			vfio_virqfd_disable(&ctx->mask);
-+			vfio_msi_set_vector_signal(vdev, i, -1, msix);
-+		}
- 	}
- 
- 	cmd = vfio_pci_memory_lock_and_enable(vdev);
-@@ -443,7 +511,7 @@ static void vfio_msi_disable(struct vfio_pci_core_device *vdev, bool msix)
- 
- 	vdev->irq_type = VFIO_PCI_NUM_IRQS;
- 	vdev->num_ctx = 0;
--	kfree(vdev->ctx);
++
++err:
 +	vfio_irq_ctx_free_all(vdev);
++	return -ENOMEM;
  }
  
  /*
-@@ -463,14 +531,18 @@ static int vfio_pci_set_intx_unmask(struct vfio_pci_core_device *vdev,
- 		if (unmask)
- 			vfio_pci_intx_unmask(vdev);
- 	} else if (flags & VFIO_IRQ_SET_DATA_EVENTFD) {
-+		struct vfio_pci_irq_ctx *ctx = vfio_irq_ctx_get(vdev, 0);
- 		int32_t fd = *(int32_t *)data;
-+
-+		if (!ctx)
-+			return -EINVAL;
- 		if (fd >= 0)
- 			return vfio_virqfd_enable((void *) vdev,
- 						  vfio_pci_intx_unmask_handler,
- 						  vfio_send_intx_eventfd, NULL,
--						  &vdev->ctx[0].unmask, fd);
-+						  &ctx->unmask, fd);
- 
--		vfio_virqfd_disable(&vdev->ctx[0].unmask);
-+		vfio_virqfd_disable(&ctx->unmask);
- 	}
- 
- 	return 0;
-@@ -543,6 +615,7 @@ static int vfio_pci_set_msi_trigger(struct vfio_pci_core_device *vdev,
- 				    unsigned index, unsigned start,
- 				    unsigned count, uint32_t flags, void *data)
+@@ -218,7 +253,6 @@ static irqreturn_t vfio_intx_handler(int irq, void *dev_id)
+ static int vfio_intx_enable(struct vfio_pci_core_device *vdev)
  {
-+	struct vfio_pci_irq_ctx *ctx;
- 	unsigned int i;
- 	bool msix = (index == VFIO_PCI_MSIX_IRQ_INDEX) ? true : false;
+ 	struct vfio_pci_irq_ctx *ctx;
+-	int ret;
  
-@@ -577,14 +650,15 @@ static int vfio_pci_set_msi_trigger(struct vfio_pci_core_device *vdev,
+ 	if (!is_irq_none(vdev))
  		return -EINVAL;
+@@ -226,15 +260,9 @@ static int vfio_intx_enable(struct vfio_pci_core_device *vdev)
+ 	if (!vdev->pdev->irq)
+ 		return -ENODEV;
  
- 	for (i = start; i < start + count; i++) {
--		if (!vdev->ctx[i].trigger)
-+		ctx = vfio_irq_ctx_get(vdev, i);
-+		if (!ctx || !ctx->trigger)
- 			continue;
- 		if (flags & VFIO_IRQ_SET_DATA_NONE) {
--			eventfd_signal(vdev->ctx[i].trigger, 1);
-+			eventfd_signal(ctx->trigger, 1);
- 		} else if (flags & VFIO_IRQ_SET_DATA_BOOL) {
- 			uint8_t *bools = data;
- 			if (bools[i - start])
--				eventfd_signal(vdev->ctx[i].trigger, 1);
-+				eventfd_signal(ctx->trigger, 1);
- 		}
+-	ret = vfio_irq_ctx_alloc_num(vdev, 1);
+-	if (ret)
+-		return ret;
+-
+-	ctx = vfio_irq_ctx_get(vdev, 0);
+-	if (!ctx) {
+-		vfio_irq_ctx_free_all(vdev);
+-		return -EINVAL;
+-	}
++	ctx = vfio_irq_ctx_alloc_single(vdev, 0);
++	if (!ctx)
++		return -ENOMEM;
+ 
+ 	vdev->num_ctx = 1;
+ 
+@@ -486,16 +514,13 @@ static void vfio_msi_disable(struct vfio_pci_core_device *vdev, bool msix)
+ {
+ 	struct pci_dev *pdev = vdev->pdev;
+ 	struct vfio_pci_irq_ctx *ctx;
+-	unsigned int i;
++	unsigned long i;
+ 	u16 cmd;
+ 
+-	for (i = 0; i < vdev->num_ctx; i++) {
+-		ctx = vfio_irq_ctx_get(vdev, i);
+-		if (ctx) {
+-			vfio_virqfd_disable(&ctx->unmask);
+-			vfio_virqfd_disable(&ctx->mask);
+-			vfio_msi_set_vector_signal(vdev, i, -1, msix);
+-		}
++	xa_for_each(&vdev->ctx, i, ctx) {
++		vfio_virqfd_disable(&ctx->unmask);
++		vfio_virqfd_disable(&ctx->mask);
++		vfio_msi_set_vector_signal(vdev, i, -1, msix);
  	}
- 	return 0;
+ 
+ 	cmd = vfio_pci_memory_lock_and_enable(vdev);
+diff --git a/include/linux/vfio_pci_core.h b/include/linux/vfio_pci_core.h
+index 367fd79226a3..61d7873a3973 100644
+--- a/include/linux/vfio_pci_core.h
++++ b/include/linux/vfio_pci_core.h
+@@ -59,7 +59,7 @@ struct vfio_pci_core_device {
+ 	struct perm_bits	*msi_perm;
+ 	spinlock_t		irqlock;
+ 	struct mutex		igate;
+-	struct vfio_pci_irq_ctx	*ctx;
++	struct xarray		ctx;
+ 	int			num_ctx;
+ 	int			irq_type;
+ 	int			num_regions;
 -- 
 2.34.1
 
