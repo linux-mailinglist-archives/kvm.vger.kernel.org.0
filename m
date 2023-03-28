@@ -2,85 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D5FA06CCC22
-	for <lists+kvm@lfdr.de>; Tue, 28 Mar 2023 23:34:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 20E706CCC46
+	for <lists+kvm@lfdr.de>; Tue, 28 Mar 2023 23:52:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229825AbjC1Vel (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Mar 2023 17:34:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35154 "EHLO
+        id S229941AbjC1VwD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Mar 2023 17:52:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44308 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229456AbjC1Vek (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Mar 2023 17:34:40 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8BA426BB
-        for <kvm@vger.kernel.org>; Tue, 28 Mar 2023 14:33:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1680039238;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=uqOJKbgb7ATLpuIGdDhmD1/D9xzym09yCeZarta+PK8=;
-        b=ArOl7+TrmC1sOk9WjOBfgQ4UqKHPTUYqqvQci2h0kr80tCeW5m+v5X6ybAjvr8xv9sBkqY
-        QkUkofHO2V9/kCkNLuZ2h/z0nb1SSO6URZX07qjQKhNQsSCPNH4c0mhOcG4Yd0VWErGEnR
-        pnUNtTl+WbEBlUFfgePWF9U+LwbvMTQ=
-Received: from mail-io1-f69.google.com (mail-io1-f69.google.com
- [209.85.166.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-414-mv4kHh_-PQGIAcm5SadOgQ-1; Tue, 28 Mar 2023 17:33:56 -0400
-X-MC-Unique: mv4kHh_-PQGIAcm5SadOgQ-1
-Received: by mail-io1-f69.google.com with SMTP id 3-20020a6b1403000000b007588213c81aso8447674iou.18
-        for <kvm@vger.kernel.org>; Tue, 28 Mar 2023 14:33:56 -0700 (PDT)
+        with ESMTP id S229729AbjC1VwC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Mar 2023 17:52:02 -0400
+Received: from mail-il1-x14a.google.com (mail-il1-x14a.google.com [IPv6:2607:f8b0:4864:20::14a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C5611B8
+        for <kvm@vger.kernel.org>; Tue, 28 Mar 2023 14:52:01 -0700 (PDT)
+Received: by mail-il1-x14a.google.com with SMTP id i7-20020a056e021b0700b0031dc4cdc47cso9113264ilv.23
+        for <kvm@vger.kernel.org>; Tue, 28 Mar 2023 14:52:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112; t=1680040320;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=jrbWmy/msHACqyJzbLS8J8+RsCE+wwj3fQmHMdANKeY=;
+        b=NzO8572j47xPn5O6aTU0ZQz8JchtdQS+nLjMBafy3OMUCJaJR7kKzK21M9+zw5dZ/2
+         muAnT0quOlPpikhoWxpUL9oSVqaXu+g13/Jv4/Yl/MYZHFnX0JjwitNFolUFLJvoJBWD
+         z2vmPEUivpkkVf5HEyCu4jEN8IdxDB0Bs69q+hY6Mi576WJvL5JTAs+K6O2HQ3Uwgdtp
+         BLoqIM8zSBctMINsDXTTB/BVmEwjFpaVEpgsTyYOnbcvAiDOSy9pfQ8VyKYSmKKlDmdW
+         hoB1eWcnJWZYTAk71JVdrWyuBUSWxw+Zinw9npyZhWkbs+o+x0GG7cKukPEjhuXx2Ph5
+         J9xw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680039236;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=uqOJKbgb7ATLpuIGdDhmD1/D9xzym09yCeZarta+PK8=;
-        b=XeaTUPGHTPjwzdV3Af/S//oGGQsEOae7yQyYCGB7AflactcGW6yGqxgFfGLxqjM9gk
-         PjqOwwwfHH3hPJvw0mrji2Hqa3BLYixAVKIRwt5ecEt/NB0/VpDl86F3fWTKURZ9hQQp
-         HWvQX5XVOZQOUrAS/Np4bQUqK89VfMmyCW6EBxffGSDc4kxZSw6hQJzrunNWmzGpZimp
-         LzeKfIZPbqVofk510WC8qkL9lIu99GSzrUnytpUU8vIE/fT0G10Zy/7EtPnPvckPyaBY
-         WeY5D4u8+LrmxJYi4hBDBPVZ8RM/vEm+wD5XZ7Ggwf0u4vU8c+9E3qimeOJCIfm68OVB
-         pgOA==
-X-Gm-Message-State: AAQBX9fO71FKOe07oFbIDOXR24Xxff1wdbNd2CClhucucMkSsUmLjhEG
-        SXiKrNcS92Tfi2Ykj04Gev47OdJUyZI6S+zj68B1JUL8nGqFf2O9nF7y2SHsDN7CSJstIHQZeh9
-        fN7qfqJoyZiEOFfi9DxzX
-X-Received: by 2002:a05:6e02:782:b0:315:6e7f:f429 with SMTP id q2-20020a056e02078200b003156e7ff429mr12502993ils.9.1680039235804;
-        Tue, 28 Mar 2023 14:33:55 -0700 (PDT)
-X-Google-Smtp-Source: AKy350bFTQnx3N9HNY32zRuYKOSoKbrxT758XDlpNXJefLuxy6Ef6baspB62jLxo+aOJR0orePzHQQ==
-X-Received: by 2002:a05:6e02:782:b0:315:6e7f:f429 with SMTP id q2-20020a056e02078200b003156e7ff429mr12502984ils.9.1680039235506;
-        Tue, 28 Mar 2023 14:33:55 -0700 (PDT)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id h22-20020a056638339600b00374bf3b62a0sm9785701jav.99.2023.03.28.14.33.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Mar 2023 14:33:54 -0700 (PDT)
-Date:   Tue, 28 Mar 2023 15:33:52 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Yi Liu <yi.l.liu@intel.com>
-Cc:     jgg@nvidia.com, kevin.tian@intel.com, joro@8bytes.org,
-        robin.murphy@arm.com, cohuck@redhat.com, eric.auger@redhat.com,
-        nicolinc@nvidia.com, kvm@vger.kernel.org, mjrosato@linux.ibm.com,
-        chao.p.peng@linux.intel.com, yi.y.sun@linux.intel.com,
-        peterx@redhat.com, jasowang@redhat.com,
-        shameerali.kolothum.thodi@huawei.com, lulu@redhat.com,
-        suravee.suthikulpanit@amd.com, intel-gvt-dev@lists.freedesktop.org,
-        intel-gfx@lists.freedesktop.org, linux-s390@vger.kernel.org,
-        xudong.hao@intel.com, yan.y.zhao@intel.com, terrence.xu@intel.com,
-        yanting.jiang@intel.com
-Subject: Re: [PATCH v8 08/24] vfio: Block device access via device fd until
- device is opened
-Message-ID: <20230328153352.6c1e2088.alex.williamson@redhat.com>
-In-Reply-To: <20230327094047.47215-9-yi.l.liu@intel.com>
-References: <20230327094047.47215-1-yi.l.liu@intel.com>
-        <20230327094047.47215-9-yi.l.liu@intel.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+        d=1e100.net; s=20210112; t=1680040320;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=jrbWmy/msHACqyJzbLS8J8+RsCE+wwj3fQmHMdANKeY=;
+        b=bt6AECgae45GPDhAFtnnG2abb41Ax0Y8RT5gFeF4OjXwLG7YG89OcPYT/1GQIot7Fz
+         yONEYuOkFaVDrLHcnBO2oyI93XhF7OdwZ2msTXGvncPg+4N/+WMrgxItHdlCnisZ6QVd
+         /wlbI1P5yL/dzqYmyQBegVxVWK2lkBVSwMwTeD6+EBxv6noqL8EPwsv8LDFSkdJVC4Eu
+         qwGnsHt+JlprdkluCdys4UWjC2D1TioFmtIrItV9d74FPH9Gm4yisw3gpFddF+7TMNvO
+         j7rOchsQreq7ZLetO/puH+BDKgCThRvFzJniAE+vErHHv4OO+zEu58k9iMO5XwmsQMyP
+         3++Q==
+X-Gm-Message-State: AAQBX9dAsGzhwR5m2SJpQoRgbio/6+CgkVksXF+OWhFTsO2oyKH10CFO
+        wkzwZAaiI4FdvrXvbxXOlbzpAEM3+Bs8HfIx1w==
+X-Google-Smtp-Source: AKy350ZFlypjqnliV0Pvj2Z9cIceg05qrxb5IgsSVvQ1rtktmRC84gwdefyuY2gRbeGCiwSolvjBuU8LCfYp9bHk4A==
+X-Received: from coltonlewis-kvm.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:14ce])
+ (user=coltonlewis job=sendgmr) by 2002:a02:95c3:0:b0:3eb:3166:9da4 with SMTP
+ id b61-20020a0295c3000000b003eb31669da4mr61886jai.2.1680040320519; Tue, 28
+ Mar 2023 14:52:00 -0700 (PDT)
+Date:   Tue, 28 Mar 2023 21:51:59 +0000
+In-Reply-To: <86r0t9w5jp.wl-maz@kernel.org> (message from Marc Zyngier on Tue,
+ 28 Mar 2023 11:09:46 +0100)
+Mime-Version: 1.0
+Message-ID: <gsntcz4s7dds.fsf@coltonlewis-kvm.c.googlers.com>
+Subject: Re: [PATCH v2 1/2] KVM: selftests: Provide generic way to read system counter
+From:   Colton Lewis <coltonlewis@google.com>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     pbonzini@redhat.com, shuah@kernel.org, seanjc@google.com,
+        dmatlack@google.com, vipinsh@google.com, andrew.jones@linux.dev,
+        bgardon@google.com, ricarkol@google.com, oliver.upton@linux.dev,
+        kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+X-Spam-Status: No, score=-7.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -88,174 +68,73 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 27 Mar 2023 02:40:31 -0700
-Yi Liu <yi.l.liu@intel.com> wrote:
+Marc Zyngier <maz@kernel.org> writes:
 
-> Allow the vfio_device file to be in a state where the device FD is
-> opened but the device cannot be used by userspace (i.e. its .open_device()
-> hasn't been called). This inbetween state is not used when the device
-> FD is spawned from the group FD, however when we create the device FD
-> directly by opening a cdev it will be opened in the blocked state.
-> 
-> The reason for the inbetween state is that userspace only gets a FD but
-> doesn't gain access permission until binding the FD to an iommufd. So in
-> the blocked state, only the bind operation is allowed. Completing bind
-> will allow user to further access the device.
-> 
-> This is implemented by adding a flag in struct vfio_device_file to mark
-> the blocked state and using a simple smp_load_acquire() to obtain the
-> flag value and serialize all the device setup with the thread accessing
-> this device.
-> 
-> Following this lockless scheme, it can safely handle the device FD
-> unbound->bound but it cannot handle bound->unbound. To allow this we'd
-> need to add a lock on all the vfio ioctls which seems costly. So once
-> device FD is bound, it remains bound until the FD is closed.
-> 
-> Suggested-by: Jason Gunthorpe <jgg@nvidia.com>
-> Reviewed-by: Kevin Tian <kevin.tian@intel.com>
-> Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
-> Tested-by: Terrence Xu <terrence.xu@intel.com>
-> Tested-by: Nicolin Chen <nicolinc@nvidia.com>
-> Tested-by: Matthew Rosato <mjrosato@linux.ibm.com>
-> Signed-off-by: Yi Liu <yi.l.liu@intel.com>
-> ---
->  drivers/vfio/group.c     | 11 ++++++++++-
->  drivers/vfio/vfio.h      |  1 +
->  drivers/vfio/vfio_main.c | 41 ++++++++++++++++++++++++++++++++++------
->  3 files changed, 46 insertions(+), 7 deletions(-)
-> 
-> diff --git a/drivers/vfio/group.c b/drivers/vfio/group.c
-> index 9a7b2765eef6..4f267ae7bebc 100644
-> --- a/drivers/vfio/group.c
-> +++ b/drivers/vfio/group.c
-> @@ -194,9 +194,18 @@ static int vfio_device_group_open(struct vfio_device_file *df)
->  	df->iommufd = device->group->iommufd;
->  
->  	ret = vfio_device_open(df);
-> -	if (ret)
-> +	if (ret) {
->  		df->iommufd = NULL;
-> +		goto out_put_kvm;
-> +	}
-> +
-> +	/*
-> +	 * Paired with smp_load_acquire() in vfio_device_fops::ioctl/
-> +	 * read/write/mmap
-> +	 */
-> +	smp_store_release(&df->access_granted, true);
->  
-> +out_put_kvm:
->  	if (device->open_count == 0)
->  		vfio_device_put_kvm(device);
->  
-> diff --git a/drivers/vfio/vfio.h b/drivers/vfio/vfio.h
-> index cffc08f5a6f1..854f2c97cb9a 100644
-> --- a/drivers/vfio/vfio.h
-> +++ b/drivers/vfio/vfio.h
-> @@ -18,6 +18,7 @@ struct vfio_container;
->  
->  struct vfio_device_file {
->  	struct vfio_device *device;
-> +	bool access_granted;
->  	spinlock_t kvm_ref_lock; /* protect kvm field */
->  	struct kvm *kvm;
->  	struct iommufd_ctx *iommufd; /* protected by struct vfio_device_set::lock */
-> diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
-> index 2ea6cb6d03c7..b515bbda4c74 100644
-> --- a/drivers/vfio/vfio_main.c
-> +++ b/drivers/vfio/vfio_main.c
-> @@ -1114,6 +1114,10 @@ static long vfio_device_fops_unl_ioctl(struct file *filep,
->  	struct vfio_device *device = df->device;
->  	int ret;
->  
-> +	/* Paired with smp_store_release() following vfio_device_open() */
-> +	if (!smp_load_acquire(&df->access_granted))
-> +		return -EINVAL;
-> +
->  	ret = vfio_device_pm_runtime_get(device);
->  	if (ret)
->  		return ret;
-> @@ -1141,6 +1145,10 @@ static ssize_t vfio_device_fops_read(struct file *filep, char __user *buf,
->  	struct vfio_device_file *df = filep->private_data;
->  	struct vfio_device *device = df->device;
->  
-> +	/* Paired with smp_store_release() following vfio_device_open() */
-> +	if (!smp_load_acquire(&df->access_granted))
-> +		return -EINVAL;
-> +
->  	if (unlikely(!device->ops->read))
->  		return -EINVAL;
->  
-> @@ -1154,6 +1162,10 @@ static ssize_t vfio_device_fops_write(struct file *filep,
->  	struct vfio_device_file *df = filep->private_data;
->  	struct vfio_device *device = df->device;
->  
-> +	/* Paired with smp_store_release() following vfio_device_open() */
-> +	if (!smp_load_acquire(&df->access_granted))
-> +		return -EINVAL;
-> +
->  	if (unlikely(!device->ops->write))
->  		return -EINVAL;
->  
-> @@ -1165,6 +1177,10 @@ static int vfio_device_fops_mmap(struct file *filep, struct vm_area_struct *vma)
->  	struct vfio_device_file *df = filep->private_data;
->  	struct vfio_device *device = df->device;
->  
-> +	/* Paired with smp_store_release() following vfio_device_open() */
-> +	if (!smp_load_acquire(&df->access_granted))
-> +		return -EINVAL;
-> +
->  	if (unlikely(!device->ops->mmap))
->  		return -EINVAL;
->  
-> @@ -1201,6 +1217,24 @@ bool vfio_file_is_valid(struct file *file)
->  }
->  EXPORT_SYMBOL_GPL(vfio_file_is_valid);
->  
-> +/*
-> + * Return true if the input file is a vfio device file and has opened
-> + * the input device. Otherwise, return false.
-> + */
-> +static bool vfio_file_has_device_access(struct file *file,
-> +					struct vfio_device *device)
-> +{
-> +	struct vfio_device *vdev = vfio_device_from_file(file);
-> +	struct vfio_device_file *df;
-> +
-> +	if (!vdev || vdev != device)
-> +		return false;
-> +
-> +	df = file->private_data;
-> +
-> +	return READ_ONCE(df->access_granted);
+> On Tue, 21 Mar 2023 19:10:04 +0000,
+> Colton Lewis <coltonlewis@google.com> wrote:
 
-Why did we change from smp_load_acquire() to READ_ONCE() here?  Thanks,
+>> Marc Zyngier <maz@kernel.org> writes:
 
-Alex
+>> >> +#define MEASURE_CYCLES(x)			\
+>> >> +	({					\
+>> >> +		uint64_t start;			\
+>> >> +		start = cycles_read();		\
+>> >> +		x;				\
 
-> +}
-> +
->  /**
->   * vfio_file_has_dev - True if the VFIO file is a handle for device
->   * @file: VFIO file to check
-> @@ -1211,17 +1245,12 @@ EXPORT_SYMBOL_GPL(vfio_file_is_valid);
->  bool vfio_file_has_dev(struct file *file, struct vfio_device *device)
->  {
->  	struct vfio_group *group;
-> -	struct vfio_device *vdev;
->  
->  	group = vfio_group_from_file(file);
->  	if (group)
->  		return vfio_group_has_dev(group, device);
->  
-> -	vdev = vfio_device_from_file(file);
-> -	if (vdev)
-> -		return vdev == device;
-> -
-> -	return false;
-> +	return vfio_file_has_device_access(file, device);
->  }
->  EXPORT_SYMBOL_GPL(vfio_file_has_dev);
->  
+>> > You insert memory accesses inside a sequence that has no dependency
+>> > with it. On a weakly ordered memory system, there is absolutely no
+>> > reason why the memory access shouldn't be moved around. What do you
+>> > exactly measure in that case?
 
+>> cycles_read is built on another function timer_get_cntct which includes
+>> its own barriers. Stripped of some abstraction, the sequence is:
+
+>> timer_get_cntct (isb+read timer)
+>> whatever is being measured
+>> timer_get_cntct
+
+>> I hadn't looked at it too closely before but on review of the manual
+>> I think you are correct. Borrowing from example D7-2 in the manual, it
+>> should be:
+
+>> timer_get_cntct
+>> isb
+>> whatever is being measured
+>> dsb
+>> timer_get_cntct
+
+> That's better, but also very heavy handed. You'd be better off
+> constructing an address dependency from the timer value, and feed that
+> into a load-acquire/store-release pair wrapping your payload.
+
+I can do something like that.
+
+
+>> >> +		cycles_read() - start;		\
+
+>> > I also question the usefulness of this exercise. You're comparing the
+>> > time it takes for a multi-GHz system to put a write in a store buffer
+>> > (assuming it didn't miss in the TLBs) vs a counter that gets updated
+>> > at a frequency of a few tens of MHz.
+
+>> > My guts feeling is that this results in a big fat zero most of the
+>> > time, but I'm happy to be explained otherwise.
+
+
+>> In context, I'm trying to measure the time it takes to write to a buffer
+>> *with dirty memory logging enabled*. What do you mean by zero? I can
+>> confirm from running this code I am not measuring zero time.
+
+> See my earlier point: the counter tick is a few MHz, and the CPU
+> multiple GHz. So unless "whatever" is something that takes a
+> significant time (several thousands of CPU cycles), you'll measure
+> nothing using the counter. Page faults will probably show, but not a
+> normal access.
+
+> The right tool for this job is to use PMU events, as they count at the
+> CPU frequency.
+
+Thanks. I understand you clearly now. I think it works out to tens of
+cpu cycles, not thousands to observe a timer tick in the usual case
+(2 GHz / 25 MHz = 80, of course slower timers exist), but I agree with
+you a more precise tool is called for.
