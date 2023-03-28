@@ -2,77 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 21A336CBD73
-	for <lists+kvm@lfdr.de>; Tue, 28 Mar 2023 13:24:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 748476CBDB1
+	for <lists+kvm@lfdr.de>; Tue, 28 Mar 2023 13:31:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232656AbjC1LYP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Mar 2023 07:24:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37370 "EHLO
+        id S232600AbjC1LaZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Mar 2023 07:30:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47188 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232591AbjC1LYL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Mar 2023 07:24:11 -0400
-Received: from mx.sberdevices.ru (mx.sberdevices.ru [45.89.227.171])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39E831FFB;
-        Tue, 28 Mar 2023 04:23:59 -0700 (PDT)
-Received: from s-lin-edge02.sberdevices.ru (localhost [127.0.0.1])
-        by mx.sberdevices.ru (Postfix) with ESMTP id C39BF5FD16;
-        Tue, 28 Mar 2023 14:23:56 +0300 (MSK)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
-        s=mail; t=1680002636;
-        bh=dJk0VhVFxTihh+TBGBXcxtL9YxXttn8vWx345uiojAw=;
-        h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-        b=P7p/H6aS5KM8I5eD7aGalT70Sx0PKpAn2U+NvQStqTXKQARqS6H+lU/4ZJwS2YD1Q
-         X1nFYnWOOipJxtphHWem3DpsZgKb2dy0m8+LKMc47ehLbnnGJQYS/Oe8pR+zrLVpNs
-         QpJlAQo2/Yj9sZqrx58azHUdaawP0gpPOMHQvwyqfDTOSQ2xmgNi1Gq9jhuQd2dk+y
-         pTjfa3kyt14Ux6NPtjoQgvKZeRu07BI/2+3ldFr0/NumavqHVXSmnKGgbKQDPM7sjA
-         MbNcEaZiG32Jvc+nsT0m1QmW1pbRJua7RHvcJN17rpPBdjO3AaNduSi3FbOVOl84Bd
-         ALk2pMxyGxFIA==
-Received: from S-MS-EXCH01.sberdevices.ru (S-MS-EXCH01.sberdevices.ru [172.16.1.4])
-        by mx.sberdevices.ru (Postfix) with ESMTP;
-        Tue, 28 Mar 2023 14:23:53 +0300 (MSK)
-Message-ID: <64451c35-5442-73cb-4398-2b907dd810cc@sberdevices.ru>
-Date:   Tue, 28 Mar 2023 14:20:33 +0300
+        with ESMTP id S232590AbjC1LaH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Mar 2023 07:30:07 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E68AD86AD
+        for <kvm@vger.kernel.org>; Tue, 28 Mar 2023 04:29:49 -0700 (PDT)
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 32SBLAOf033391;
+        Tue, 28 Mar 2023 11:29:21 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=c6HQJRbhNxCpRIQ39rTx8yXNmThqIYSIJmDg4MMTnnI=;
+ b=IftEuIhRUjSN6eFLdDfsCrNi3/erzcjlLifvg/ZEA94WjfK1liUuMXC5mt3xzvWxvaCC
+ N9TnzJSZXMxwvO/hHoOLPfweg2BxADpryPbsstT0WnIc3sH3enO62Gof1HI9fTFLOauB
+ ZA8y+srnpayu04OZTbD7PS6oV98eE4aR9lDP3ZnHEAkHb/OaDDeD6dIpdthTzOu0VL5c
+ V7uE/LB/hOLGQOOfb6bzJAFG+kcotDK39PHH6vGHjAyxqWB86Cf206FdtgZK1FJOKdpt
+ 6sliAt/xj+proWNftPrhYJ/cp122Pd0N83CJpmvb7X8/exJPSbsLCJbbwDC+MD058F1b IA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pky9f04ku-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 28 Mar 2023 11:29:21 +0000
+Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 32SBMOEe035938;
+        Tue, 28 Mar 2023 11:29:20 GMT
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pky9f04ju-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 28 Mar 2023 11:29:20 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 32S4Bcr3009599;
+        Tue, 28 Mar 2023 11:29:18 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+        by ppma04ams.nl.ibm.com (PPS) with ESMTPS id 3phrk6kw6t-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 28 Mar 2023 11:29:17 +0000
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+        by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 32SBT9wx66650592
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 28 Mar 2023 11:29:09 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 7DFEC20043;
+        Tue, 28 Mar 2023 11:29:09 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 1805C20040;
+        Tue, 28 Mar 2023 11:29:09 +0000 (GMT)
+Received: from [9.152.222.242] (unknown [9.152.222.242])
+        by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+        Tue, 28 Mar 2023 11:29:09 +0000 (GMT)
+Message-ID: <0bda770f-c073-3ed0-be26-3a77c8e40b8a@linux.ibm.com>
+Date:   Tue, 28 Mar 2023 13:29:08 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
-Subject: Re: [RFC PATCH v1 1/2] vsock: return errors other than -ENOMEM to
- socket
+ Thunderbird/102.8.0
+Subject: Re: [PATCH v18 01/17] s390x/cpu topology: add s390 specifics to CPU
+ topology
 Content-Language: en-US
-To:     Stefano Garzarella <sgarzare@redhat.com>,
-        Vishnu Dasa <vdasa@vmware.com>
-CC:     Bryan Tan <bryantan@vmware.com>,
-        VMware PV-Drivers Reviewers <pv-drivers@vmware.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Bobby Eshleman <bobby.eshleman@bytedance.com>,
-        <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
-        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <kernel@sberdevices.ru>, <oxffffaa@gmail.com>
-References: <97f19214-ba04-c47e-7486-72e8aa16c690@sberdevices.ru>
- <99da938b-3e67-150c-2f74-41d917a95950@sberdevices.ru>
- <itjmw7vh3a7ggbodsu4mksu2hqbpdpxmu6cpexbra66nfhsw4x@hzpuzwldkfx5>
- <CAGxU2F648TyvAJN+Zk6YCnGUhn=0W_MZTox7RxQ45zHmHHO0SA@mail.gmail.com>
- <0f0a8603-e8a1-5fb2-23d9-5773c808ef85@sberdevices.ru>
- <ak74j6l2qesrixxmw7pfw56najqhdn32lv3xfxcb53nvmkyi3x@fr25vo2jlvbj>
-From:   Arseniy Krasnov <avkrasnov@sberdevices.ru>
-In-Reply-To: <ak74j6l2qesrixxmw7pfw56najqhdn32lv3xfxcb53nvmkyi3x@fr25vo2jlvbj>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [172.16.1.6]
-X-ClientProxiedBy: S-MS-EXCH02.sberdevices.ru (172.16.1.5) To
- S-MS-EXCH01.sberdevices.ru (172.16.1.4)
-X-KSMG-Rule-ID: 4
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Status: not scanned, disabled by settings
-X-KSMG-AntiSpam-Interceptor-Info: not scanned
-X-KSMG-AntiPhishing: not scanned, disabled by settings
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 1.1.2.30, bases: 2023/03/28 06:38:00 #21021220
-X-KSMG-AntiVirus-Status: Clean, skipped
-X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
-        DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS
+To:     Nina Schoetterl-Glausch <nsg@linux.ibm.com>, qemu-s390x@nongnu.org
+Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
+        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
+        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
+        kvm@vger.kernel.org, ehabkost@redhat.com,
+        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
+        seiden@linux.ibm.com, nrb@linux.ibm.com, frankja@linux.ibm.com,
+        berrange@redhat.com, clg@kaod.org
+References: <20230315143502.135750-1-pmorel@linux.ibm.com>
+ <20230315143502.135750-2-pmorel@linux.ibm.com>
+ <1facc09195ef25a5f7ecf9c3bcc016fa1b313628.camel@linux.ibm.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+In-Reply-To: <1facc09195ef25a5f7ecf9c3bcc016fa1b313628.camel@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: R0aNsxmj8rZVYVD_pGTS4g-uzJ3uL0Pd
+X-Proofpoint-GUID: thHJOiAEAWR8Wwh2wonchJgMo5S-ABJk
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
+ definitions=2023-03-24_11,2023-03-27_02,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 mlxlogscore=999
+ adultscore=0 mlxscore=0 priorityscore=1501 impostorscore=0 suspectscore=0
+ spamscore=0 lowpriorityscore=0 phishscore=0 malwarescore=0 clxscore=1015
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2303200000
+ definitions=main-2303280091
+X-Spam-Status: No, score=-0.1 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
+        DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS
         autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -81,104 +101,98 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
+On 3/27/23 23:34, Nina Schoetterl-Glausch wrote:
+> On Wed, 2023-03-15 at 15:34 +0100, Pierre Morel wrote:
+>> S390 adds two new SMP levels, drawers and books to the CPU
+>> topology.
+>> The S390 CPU have specific topology features like dedication
+>> and entitlement to give to the guest indications on the host
+>> vCPUs scheduling and help the guest take the best decisions
+>> on the scheduling of threads on the vCPUs.
+>>
+>> Let us provide the SMP properties with books and drawers levels
+>> and S390 CPU with dedication and entitlement,
+>>
+>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+>> Reviewed-by: Thomas Huth <thuth@redhat.com>
+>> ---
+>>   qapi/machine-common.json        | 22 +++++++++++++++
+>>   qapi/machine-target.json        | 12 +++++++++
+>>   qapi/machine.json               | 17 +++++++++---
+>>   include/hw/boards.h             | 10 ++++++-
+>>   include/hw/s390x/cpu-topology.h | 15 +++++++++++
+>>   target/s390x/cpu.h              |  6 +++++
+>>   hw/core/machine-smp.c           | 48 ++++++++++++++++++++++++++++-----
+>>   hw/core/machine.c               |  4 +++
+>>   hw/s390x/s390-virtio-ccw.c      |  2 ++
+>>   softmmu/vl.c                    |  6 +++++
+>>   target/s390x/cpu.c              |  7 +++++
+>>   qapi/meson.build                |  1 +
+>>   qemu-options.hx                 |  7 +++--
+>>   13 files changed, 144 insertions(+), 13 deletions(-)
+>>   create mode 100644 qapi/machine-common.json
+>>   create mode 100644 include/hw/s390x/cpu-topology.h
+>>
+> [...]
+>> diff --git a/hw/core/machine-smp.c b/hw/core/machine-smp.c
+>> index c3dab007da..b8233df5a9 100644
+>> --- a/hw/core/machine-smp.c
+>> +++ b/hw/core/machine-smp.c
+>> @@ -31,6 +31,14 @@ static char *cpu_hierarchy_to_string(MachineState *ms)
+>>       MachineClass *mc = MACHINE_GET_CLASS(ms);
+>>       GString *s = g_string_new(NULL);
+>>   
+>> +    if (mc->smp_props.drawers_supported) {
+>> +        g_string_append_printf(s, " * drawers (%u)", ms->smp.drawers);
+>> +    }
+>> +
+>> +    if (mc->smp_props.books_supported) {
+>> +        g_string_append_printf(s, " * books (%u)", ms->smp.books);
+>> +    }
+>> +
+>>       g_string_append_printf(s, "sockets (%u)", ms->smp.sockets);
+> The output of this doesn't look great.
+> How about:
+>
+> static char *cpu_hierarchy_to_string(MachineState *ms)
+> {
+>      MachineClass *mc = MACHINE_GET_CLASS(ms);
+>      GString *s = g_string_new(NULL);
+>      const char *multiply = " * ", *prefix = "";
+>
+>      if (mc->smp_props.drawers_supported) {
+>          g_string_append_printf(s, "drawers (%u)", ms->smp.drawers);
+>          prefix = multiply;
+>      }
+>
+>      if (mc->smp_props.books_supported) {
+>          g_string_append_printf(s, "%sbooks (%u)", prefix, ms->smp.books);
+>          prefix = multiply;
+>      }
+>
+>      g_string_append_printf(s, "%ssockets (%u)", prefix, ms->smp.sockets);
+>
+>      if (mc->smp_props.dies_supported) {
+>          g_string_append_printf(s, " * dies (%u)", ms->smp.dies);
+>      }
+>
+>      if (mc->smp_props.clusters_supported) {
+>          g_string_append_printf(s, " * clusters (%u)", ms->smp.clusters);
+>      }
+>
+>      g_string_append_printf(s, " * cores (%u)", ms->smp.cores);
+>      g_string_append_printf(s, " * threads (%u)", ms->smp.threads);
+>
+>      return g_string_free(s, false);
+> }
+>
+>
+> [...]
 
-On 28.03.2023 14:19, Stefano Garzarella wrote:
-> On Tue, Mar 28, 2023 at 01:42:19PM +0300, Arseniy Krasnov wrote:
->>
->>
->> On 28.03.2023 12:42, Stefano Garzarella wrote:
->>> I pressed send too early...
->>>
->>> CCing Bryan, Vishnu, and pv-drivers@vmware.com
->>>
->>> On Tue, Mar 28, 2023 at 11:39 AM Stefano Garzarella <sgarzare@redhat.com> wrote:
->>>>
->>>> On Sun, Mar 26, 2023 at 01:13:11AM +0300, Arseniy Krasnov wrote:
->>>>> This removes behaviour, where error code returned from any transport
->>>>> was always switched to ENOMEM. This works in the same way as:
->>>>> commit
->>>>> c43170b7e157 ("vsock: return errors other than -ENOMEM to socket"),
->>>>> but for receive calls.
->>>>>
->>>>> Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
->>>>> ---
->>>>> net/vmw_vsock/af_vsock.c | 4 ++--
->>>>> 1 file changed, 2 insertions(+), 2 deletions(-)
->>>>>
->>>>> diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
->>>>> index 19aea7cba26e..9262e0b77d47 100644
->>>>> --- a/net/vmw_vsock/af_vsock.c
->>>>> +++ b/net/vmw_vsock/af_vsock.c
->>>>> @@ -2007,7 +2007,7 @@ static int __vsock_stream_recvmsg(struct sock *sk, struct msghdr *msg,
->>>>>
->>>>>               read = transport->stream_dequeue(vsk, msg, len - copied, flags);
->>>>
->>>> In vmci_transport_stream_dequeue() vmci_qpair_peekv() and
->>>> vmci_qpair_dequev() return VMCI_ERROR_* in case of errors.
->>>>
->>>> Maybe we should return -ENOMEM in vmci_transport_stream_dequeue() if
->>>> those functions fail to keep the same behavior.
->>
->> Yes, seems i missed it, because several months ago we had similar question for send
->> logic:
->> https://www.spinics.net/lists/kernel/msg4611091.html
->> And it was ok to not handle VMCI send path in this way. So i think current implementation
->> for tx is a little bit buggy, because VMCI specific error from 'vmci_qpair_enquev()' is
->> returned to af_vsock.c. I think error conversion must be added to VMCI transport for tx
->> also.
-> 
-> Good point!
-> 
-> These are negative values, so there are no big problems, but I don't
-> know what the user expects in this case.
-> 
-> @Vishnu Do we want to return an errno to the user or a VMCI_ERROR_*?
+Yes, looks better, thanks
 
-Small remark, as i can see, VMCI_ERROR_ is not exported to user in include/uapi,
-so IIUC user won't be able to interpret such values correctly.
+regards,
 
-Thanks, Arseniy
+Pierre
 
-> 
-> In both cases I think we should do the same for both enqueue and
-> dequeue.
-> 
->>
->> Good thing is that Hyper-V uses general error codes.
-> 
-> Yeah!
-> 
-> Thanks,
-> Stefano
-> 
->>
->> Thanks, Arseniy
->>>>
->>>> CCing Bryan, Vishnu, and pv-drivers@vmware.com
->>>>
->>>> The other transports seem okay to me.
->>>>
->>>> Thanks,
->>>> Stefano
->>>>
->>>>>               if (read < 0) {
->>>>> -                      err = -ENOMEM;
->>>>> +                      err = read;
->>>>>                       break;
->>>>>               }
->>>>>
->>>>> @@ -2058,7 +2058,7 @@ static int __vsock_seqpacket_recvmsg(struct sock *sk, struct msghdr *msg,
->>>>>       msg_len = transport->seqpacket_dequeue(vsk, msg, flags);
->>>>>
->>>>>       if (msg_len < 0) {
->>>>> -              err = -ENOMEM;
->>>>> +              err = msg_len;
->>>>>               goto out;
->>>>>       }
->>>>>
->>>>> -- 
->>>>> 2.25.1
->>>>>
->>>
->>
-> 
+
