@@ -2,220 +2,347 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1EE9F6CBC6B
-	for <lists+kvm@lfdr.de>; Tue, 28 Mar 2023 12:20:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C95146CBC81
+	for <lists+kvm@lfdr.de>; Tue, 28 Mar 2023 12:27:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230368AbjC1KUh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Mar 2023 06:20:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55886 "EHLO
+        id S232278AbjC1K1a (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Mar 2023 06:27:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60778 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231207AbjC1KUf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Mar 2023 06:20:35 -0400
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22AE04EE8
-        for <kvm@vger.kernel.org>; Tue, 28 Mar 2023 03:20:32 -0700 (PDT)
-Received: from pps.filterd (m0333520.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 32SAJf5i029268;
-        Tue, 28 Mar 2023 10:20:11 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=message-id : date :
- subject : to : cc : references : from : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=corp-2022-7-12;
- bh=/snZnygvI/n23ZTtfW77pYq61vzyG6vJA9SK0x1emI0=;
- b=yFVdwJvgfGnq4OlG6C63KbzMvNibe+eopD3wzxyXge+UdgspGD5uxbphW5xkj7hAQeOb
- AYJRoWCEv0t/VxcU76ee4nrdmSZsq5FEYEBYWfbHzKBCGBbNq0vwLhEfft3xL3NOedFn
- 2uKmmYrv7j9BhzwPa/ci0yOwOMBDhkXErcrAaT6VS9cg2bi0WKaFsuKKDt+NiVcU0b3/
- NHaIQFZUKzhQihzrl6zsBBj5guYia/HTem8sqCiWGNkJyPYHrdfo86+QN4x/NKylgF5W
- YQtP3W6kNePXQ0G78Gp9988k+HlM8HC6+EuEI13na+liZ4gAX9lfvHW5faUQxXnhY0Wm AA== 
-Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
-        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3pkxcp8010-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 28 Mar 2023 10:20:11 +0000
-Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-        by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.5/8.17.1.5) with ESMTP id 32S9ecSb026756;
-        Tue, 28 Mar 2023 10:20:11 GMT
-Received: from nam11-dm6-obe.outbound.protection.outlook.com (mail-dm6nam11lp2170.outbound.protection.outlook.com [104.47.57.170])
-        by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3phqdcqntu-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 28 Mar 2023 10:20:11 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=M2cIv+C6ori4pqfgFhD3Ti5lCgUovhmq79pskIqJr7DUFWdVdCjKSbeycSU07PWX463FMs1HNqMDEBoSsPyVYxPUnLMdEa7qRTlmNgWx1YhgvPW6pWzgfyIgTubz5hYobpOZC+m9gVrfKK9xeG6GL6U2yBsnhKUGuCdpZ8lGHSEQw5FFNPBqItUcqmCSZ64z8q+D/oeerw3OduisoEAfU22zIWKnHUK8cxkoHhjM8z0FGD//oQ/BAnwWJGdCVjj4vr5FQd1aADuiEO2HfPEFp389e8SOgq1y7mYQFzV0lO5UglSOAdbqMnpD5kRQL5CH0SnKA6G4MMCrA4FSMyllPg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=/snZnygvI/n23ZTtfW77pYq61vzyG6vJA9SK0x1emI0=;
- b=jdD+AXSmazbgOaTMKNGc+G8yQSs7SHK9wUxgDqsZl51UyUYFMU1t7ODDBpyLEAjL21u0ZXOJ+BIzM6r6ZVMGvH+la3bc2WSD/w6oqAF/t10k+UDwxAOYdsEQCmNlVwZ7dY5iu4Ygqzax3JhGq4XrBbHJCNEkXNux3AF/HntGRY3soTmVwdinN62vzOd6dyYzjvr4T+g5NCw8zP9hg1MKjMY0N9g4ScGhUENKt7K3wHyZUH7WqLee6942FxY2Li7de1/R1iLQZKQG9vQlwMiF6TmTPbP48OVzraDBOF4N6wKFRvFSK6QxqoGCayZh4H739l2HBb+OHXrqXlNCPxzbpg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
+        with ESMTP id S229670AbjC1K13 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Mar 2023 06:27:29 -0400
+Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C058D76A7;
+        Tue, 28 Mar 2023 03:27:26 -0700 (PDT)
+Received: by mail-pl1-x62d.google.com with SMTP id k2so11181990pll.8;
+        Tue, 28 Mar 2023 03:27:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=/snZnygvI/n23ZTtfW77pYq61vzyG6vJA9SK0x1emI0=;
- b=vtVUk4fsoH8+ZBlt2rWJj4FRZKrxTm55D9MsjUwTIm2Fp1CPK1KZA9ktkYIA/7vFWn1CrQIVQaIa0vnxlPabbixlFAUvoG4ZuTNFDQH3sfNCXa9Np2TyeavMTSNEk4R2RVP9jnrfzX0Te/V9FtQgeFnfvMrAIPWeeVDESQJY/jk=
-Received: from BLAPR10MB4835.namprd10.prod.outlook.com (2603:10b6:208:331::11)
- by MN0PR10MB5936.namprd10.prod.outlook.com (2603:10b6:208:3cc::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6222.33; Tue, 28 Mar
- 2023 10:20:04 +0000
-Received: from BLAPR10MB4835.namprd10.prod.outlook.com
- ([fe80::cd4:d27c:94b5:e2da]) by BLAPR10MB4835.namprd10.prod.outlook.com
- ([fe80::cd4:d27c:94b5:e2da%4]) with mapi id 15.20.6222.033; Tue, 28 Mar 2023
- 10:20:04 +0000
-Message-ID: <ab4d6a88-5003-c04a-1b7c-7356e5377f4e@oracle.com>
-Date:   Tue, 28 Mar 2023 11:19:57 +0100
-Subject: Re: [PATCH v2 1/2] iommu/amd: Don't block updates to GATag if guest
- mode is on
-Content-Language: en-US
-To:     Alexey Kardashevskiy <aik@amd.com>
-Cc:     Joerg Roedel <joro@8bytes.org>,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        Vasant Hegde <vasant.hegde@amd.com>,
-        Will Deacon <will@kernel.org>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        Alejandro Jimenez <alejandro.j.jimenez@oracle.com>,
-        kvm@vger.kernel.org, iommu@lists.linux.dev
-References: <20230316200219.42673-1-joao.m.martins@oracle.com>
- <20230316200219.42673-2-joao.m.martins@oracle.com>
- <63e71a7c-3767-dd00-7744-8a12663ad814@amd.com>
-From:   Joao Martins <joao.m.martins@oracle.com>
-In-Reply-To: <63e71a7c-3767-dd00-7744-8a12663ad814@amd.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: AS4P192CA0029.EURP192.PROD.OUTLOOK.COM
- (2603:10a6:20b:5e1::14) To BLAPR10MB4835.namprd10.prod.outlook.com
- (2603:10b6:208:331::11)
+        d=gmail.com; s=20210112; t=1679999246;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=tOIjDTDTINqb4sFcqQPv3KTocsKoyeVh61eYS0nesDE=;
+        b=OWGJFQnEh5dh4lnU+/NEZBZ36LPMPxZ1Sj9JS8HBZXjxx+RiIeTKDEUkEaZ9CnQ1kz
+         y8T14urIy97t4cjbkzDisz9FAk5xATMkiqdcPf0rp+/Y1IJe7rSPwm/7UdURX9xyVR4c
+         DCJBppdnm8PCidyN+ijaR8wqdbZOaTg+900Cm/avjhnp+Ge8p1soi7f3YIoBVmsmDM3i
+         EW9M6ip+eNFtad+d8JHrWtYyW7qp3gNBQoI9xr5egxrwYWu35uGl8CqVvrE/m4Rgkjha
+         PgyGpAKZAY/59MgW4mqfMUAHM5BLul1ydXwZ6RbiamXIsYNU04XHdviqwUHNdvvz7PKs
+         Ducw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1679999246;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=tOIjDTDTINqb4sFcqQPv3KTocsKoyeVh61eYS0nesDE=;
+        b=TTscD/4Ca+mTeV1MKbOUL8KE61Tr3mfWCqazouQK9fN70Z2/VSPvEpwuK3eJui4MFK
+         8MqgZudQNIaOLyZBbYEArjtLfU491JCYaTeL4otbgxeHAzV9q/yCx8axrvbu7sZAeX/d
+         6x6MHhXuZZCYHWsRVfuN5AxUwLNHJANOa5H3rvFXLLkeNkZu9hru5nw0y2Tb5WFTC5I2
+         6OhHr1Gzlr/2OqLr9MLnaeqYplzEG3jx1iZ/Y6RCv9CJJF0N2wqkEDVojI9JIbgfXh53
+         GW6sd5T7AYbp5lhPjlBVBpoC7QSKaMHfoBd9pnPvHlj9KCXoczLbE6Gj8v/oANbVjymg
+         w9SQ==
+X-Gm-Message-State: AO0yUKVvukYJSebJbbJ4thTu1X9opcd9kJKt6H0/c/+TPRIwMEV+vujQ
+        vuPek+1tvMYbOuLEzy6PGMY=
+X-Google-Smtp-Source: AK7set/Iij/YfcpakVk/mwLCilWxOEvQTWsVn7H6PBF8iddqJ8z6K5w/ETBHQmGQHw1jcogUwQyTpQ==
+X-Received: by 2002:a05:6a20:2a08:b0:da:5e10:799b with SMTP id e8-20020a056a202a0800b000da5e10799bmr12438048pzh.10.1679999245906;
+        Tue, 28 Mar 2023 03:27:25 -0700 (PDT)
+Received: from [192.168.255.10] ([103.7.29.32])
+        by smtp.gmail.com with ESMTPSA id a4-20020a62bd04000000b0062d7c0dc4f4sm4215911pff.80.2023.03.28.03.27.23
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 28 Mar 2023 03:27:25 -0700 (PDT)
+Message-ID: <cff6147a-9e57-0f8f-9dce-372f3992f17d@gmail.com>
+Date:   Tue, 28 Mar 2023 18:27:17 +0800
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BLAPR10MB4835:EE_|MN0PR10MB5936:EE_
-X-MS-Office365-Filtering-Correlation-Id: 19f0ef99-bf94-4c61-f1a4-08db2f75ff2e
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: kcJPAphAxk3yfkhj7JIgELSrMMpoUSfydn6Dd+iujvjCh4V5va7xiR7yEAxW5q59ffHbCdrWykDL0vympW/TqYnF1zxMIMrD9yuv7DyvLzgMjldjeGGJOLLRgWGDMrl9KlA8BFPh/5fyPY+O2hJ14L87S2q+nsvRZveHQec599x8ASZa18P3E/3PqoB/ZxHa0+P7tGJQn24awPxEPqLT9WMtTrPZMl5EbHjaD+cb8F/BeNE2Akl8sjr8QIJvjhbSVktnZTokxM1dHNxchLCS/UgNot4VYK3ItVLOhhmNZaJYwE/r9HhDvFFh2F/hD6dLcNyyeBAO8IPBFqH0xTWAqfsk/1FPOkX/WIlngPJ8X8OpRkJjp0DAFnkuDmX6hwAiY1acB7R1S6gx1BrgNp+FVd2R2Hp7eScMoOfnD3VG1f/zj8ThduFvAhPqpS5l8pYwCU8h9QWMkTmkuuiHMVz6rYHL+801KQ2SmcUk0LnK2fRFEzirPo6TJUD3eZ/h9+Lwh8416dUJMYDvUnEFTcbabK4SYRJcaHlhnO07LG3E+DvoDIVqOZGyuiOunZFEqNJgB4ngt/QgaUz9QIouUlpxBtJTRAHxx+OYT2PFpJZ1qUbOq8YUU8EnEYs2Z7pfmf0J
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BLAPR10MB4835.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(396003)(136003)(39860400002)(376002)(366004)(346002)(451199021)(6666004)(26005)(6506007)(6512007)(53546011)(6486002)(6916009)(31686004)(54906003)(316002)(478600001)(186003)(83380400001)(66556008)(66476007)(8676002)(66946007)(2616005)(41300700001)(8936002)(4326008)(5660300002)(15650500001)(2906002)(38100700002)(86362001)(31696002)(36756003)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?Uzk2ZTBCaDlVdjNxQlVYdDJ3ZFVlR3hOMThia2JHSVk1TitHSUN5cGpUNVpS?=
- =?utf-8?B?SDZyY08raHk2K28zQUd5cVdBL2JvRjBJSFpxQUVwdVMvK050M1dQTm1TcmlG?=
- =?utf-8?B?RUdidkhmS3Jka0RnVkd4K1BaN1Nma0cyRFJGYjNHT08ybjY5KzJRTzBHRzBF?=
- =?utf-8?B?M3hRSzFyQitjTFgvbUtyZVMwaXp5WmZPMDcxTzZaQkdWblEraWhpc3RablE1?=
- =?utf-8?B?ZHAzOXpaT0hoYjltNllqaDd6SXNSWHd5SjNpSnRCOU9mR0hQNVA1WnNmMStD?=
- =?utf-8?B?R2l5bWxkVll6L2REYlFwc3JhYzVUTjNNNWk3QjlKSmEzaGRNTmRCY0ZpNWQ2?=
- =?utf-8?B?Y1JCQUtLK2RsT2xldmM3aGVwVTZ1NnlveUVSQ0Z3YlpoMDdESFNmQTZLZEtT?=
- =?utf-8?B?TFRxeW1nUDNYdzZrNFU0MThhQk1YOXoyYmhhbnlnK2NSYytITDFJWll4WXpX?=
- =?utf-8?B?cE9ueDRSTFk0WU1xdEQ4Z0h1NFozVUI2Umd6dGtsUjF3Z2tWZjhVUDVXUGw4?=
- =?utf-8?B?cXpBYktlc3dkdnlTMnprOG9PT2RSTjdkZDVaQ2w3bnBtQy9NcUpOdktZaEZY?=
- =?utf-8?B?WnBQVVYyOWVZQlp5MFk3TkFrMGF2MzVRdHVOWFdXeFJIK2Vya2dqU1lIQU5U?=
- =?utf-8?B?NVdILzNIRDdhSnR6NkRQa3htVGlvblVUeDdoRVJZYnlTd2I0NG42cGFaYlNJ?=
- =?utf-8?B?TUdKYkNxa01GaHdyUTkvbmZEaDJtVTlsMmNtWWtBbUIvZFVRRmd6Y1VTdGoy?=
- =?utf-8?B?K2NXV0hLU0VPVkxqSTdtVGREMGF0VDl5U3FGYTMyNWdBL3IyQmNCMGpHcENQ?=
- =?utf-8?B?R2djcmordE1VOERuTVpadmZkYjZBWUpjL084c1lyUkRpeHdGL3BlSnRISFQ2?=
- =?utf-8?B?SllJb1NHK2U0b3g5QVZoc2p1Y2FaOFlyZ29rekttVkc3eEMwNlNDVHlFYU0w?=
- =?utf-8?B?b3lNa0ZuMGZ5SG9zNkJpcmV6eG9WVnhXR1lFdTlOc0loTnBvN2ZvNTZrWnBx?=
- =?utf-8?B?Y1RCeTJsQjRTd3ZMTlVyWU5KUng1ZW5ONW9yLzh0MDJ2RDN4Y2hUOThUQnRI?=
- =?utf-8?B?MFcxem8wN2RJbmthVkRmMnRXSEthMWpDYUJJd1IvQVY1Qk93ZjdzYjVHL1ht?=
- =?utf-8?B?NWo0cG1CZFJ4d2daSEJua0Q2akg0VVlZdHA5MGxNNVhNbUFYWHo5NWpIdXhG?=
- =?utf-8?B?WExmZVVIUWF6NVVkZWJiM3ZhZGVWS1djOGEwT0VCVVdEUUVDVmdsM2RGZi9v?=
- =?utf-8?B?STNGblM0Nk0yangzMXUzNW5nZmlsdkVBSG5Va2JkL2JiVlZtbWlUZkpFNkI5?=
- =?utf-8?B?U0dreEdpRkJ5WFh4Um9QdDF3U2dFUVNrSUpoMUdXOXIrZURkRFFieGlna0Js?=
- =?utf-8?B?T0E5bk0wSytGRGZOdCs3cGh1VVlyb0FPWHU4RzVxeDR1TDY5QUJ0VUp5M0dH?=
- =?utf-8?B?TjhIS0o4aVY5SUl1eWZsTThxOTdPWWxaM3M1SHp2MGc1WWVNM1lLZHgxQ3Az?=
- =?utf-8?B?RDc5SllkWlVlT1lyMjZVTkRCRFlvaFlONlN4bEFqWjhIelZzenorNUpENGZG?=
- =?utf-8?B?bzJ3WWhRK2NpRS9yblEvalVrVG9Ibnd6S2Z3TjNVOVFmUG5ubEVMYW1GWTBE?=
- =?utf-8?B?M0lGbEw5U2hqS1lSZGNnNUNheVAvaFIyUE0zVlVGKy8xbENvbkJVVG1VeWxC?=
- =?utf-8?B?VDBZclZjMTlUOHdqUGlvMGsrMEVLU2VOa2p2MlhLUGZvZ3loYTdSc1JBeTQ0?=
- =?utf-8?B?UmIrNm92Y3dBMVdka2M5ekVCbUhqT1ZDS2Z1NTlpR256WVhQMXFzTVkvSk4z?=
- =?utf-8?B?cFIrSlhGMlE2RXJYRUthVDRpejVZNkFKVHo4OWFiK1FpaGpTTUc0ckFnekYr?=
- =?utf-8?B?QktOMjNIejJJbFhOQytnR1NZQ2ltSlpSbXhuc0ZxUGx6KzlLb3RvK1B0MDhw?=
- =?utf-8?B?ZnpOcFpURDRFbnZRbXY4TkdWbTNQTjBPUnN3SWVETTVubFdsUktsL0hOQjI3?=
- =?utf-8?B?RkNna1NkaG5MdTZzSnRTTTBkVzUrVUhNYmFremJCT0hUNi9rVTBXdlJyUFNZ?=
- =?utf-8?B?akUzVFN3OWR4MGJsUG5LME9wMmFReHpGSkl3MkZrQ0U4ZzkxRi9rRjJDV05C?=
- =?utf-8?B?ZzJtWDd6U2tUTmQ0MWlvQ005ZEFZZlk3YUkwVVRzMmdCWk5jOUNBQks2cWdL?=
- =?utf-8?B?cnc9PQ==?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: =?utf-8?B?ZWdIZEI5N2VUVjNwb1AyaTBGZ0l4c3hrQitqM01FdjlXd3l6cVVsYkdWdjVz?=
- =?utf-8?B?YmxwdDJZUDdTSUtBTjJjdE9tVnhXeG45TXgxcWNxd2xjeHhtTkF4NE5kaEJP?=
- =?utf-8?B?ODZvVzZFY1pKdjVTc000OUtNNzJjNVJ2YUFWVk9sTnplZS9qczRWQ1R3bldU?=
- =?utf-8?B?TDEwZnFFRDQ0MzdQdkprTEZScDRZcHpmS3dZRi96VHhrS3BMTXc4MnROaVdt?=
- =?utf-8?B?aTRoUnZNSEpWN2JMTldsUkovUDljYWVGYVJFRFhvRmRzaFRPbTRCNlJTaERI?=
- =?utf-8?B?QTlXcVRjOHRDV2IwcW96NmFURXpsR0dDd1hmQzFVZjcrWkljakFDZnNjdFdx?=
- =?utf-8?B?am5IeHpKWWdaVTZkMTNKMGd5SlZDL3BiOHRLUHJXbHIzL0FoNktQLzRWN3RK?=
- =?utf-8?B?QlUzNjAxYTM4ZG9FUm1TVnBWTFUzN0FlSG1Kd3NyOVg2ZENvd1dUcVI2a1BN?=
- =?utf-8?B?RS9GMnpyYUROMktwKzdTeFpqWU1ZWndXZytyNW5kODRSaGFJTXZTa1ZHa0I1?=
- =?utf-8?B?NStFUjdIOGd1WXZIMGM3NlhYajcyTlE5SFUrTTdWYW56VHVzeXVmekRNWVQ1?=
- =?utf-8?B?TC9abVRNNXV4R1MrNjhOaFZxUE1qSEo1c3VrYWl0U25MM3FrVDlPSGxscHg5?=
- =?utf-8?B?TkVhV3pRcDVyRS9hY0xNODNqMitTcTFFWGZwTEI4U29yS3h0bk5YZTVScEl2?=
- =?utf-8?B?emVnQUZMMkNEWWliLzNtdmhIRitMaHNRYmc2aHA2S1p3RldsbUs0cjdQNlRr?=
- =?utf-8?B?SFRtcW4vOW43d3EzelcxOElZWE8ydTgzRnNMRUEyU3hGNjZNUGs1dDlxcFNN?=
- =?utf-8?B?dldzYWtFUWlBL2hUdmw1Qy9Iak5mc3JHWUpLeXJIeUlVSUlpb2had2htTEtz?=
- =?utf-8?B?YzVwQ3dxQXJ2U0laVUZQU3RWdGV4RW9Zc1MweENGTVJtYzJNNGJqcTRSdkhX?=
- =?utf-8?B?NVFBM0QvQ2tNWTVUL050N3VOL3lpL25Od2FkM1owbWJZRWg3eWJRdCtRVVZF?=
- =?utf-8?B?Z3NyTEpkMjZVc1NBdFN4a0JmUm5Mbmo3VVdkMlM1Qm55WlkwY3dvY1pqejU4?=
- =?utf-8?B?R1VsV0J2c2lZY0tMSmtpa1k4VU9GdjJENnR2LzQvNkRTZUJoNHFMV3BjYjl2?=
- =?utf-8?B?U3pWQS9jb2xrdjVRUkVhN1ZpeURaekZTNEZ0bVg3T3JaZVk0NWRqUnIzZ1hR?=
- =?utf-8?B?U3pBT1Nub2JsTUJwZHg3dTdLaHh2SHBPc2w3c285ZzM2ZGJKYkNUb0ZEWUZu?=
- =?utf-8?Q?Mo2o93MklF1fl+O?=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 19f0ef99-bf94-4c61-f1a4-08db2f75ff2e
-X-MS-Exchange-CrossTenant-AuthSource: BLAPR10MB4835.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Mar 2023 10:20:04.4580
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 6P+ksK2TJd8wGrAu7k6NtbCAJnxy4hS+TLbkvR9tHErelcqYD/xW8E9fkibA30CZBN2Ixr6xMr3AUN4sy3GbqBeVKt7cH2X88uDGG+I7RVc=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR10MB5936
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
- definitions=2023-03-24_11,2023-03-27_02,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 malwarescore=0
- suspectscore=0 mlxscore=0 mlxlogscore=999 spamscore=0 adultscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2303200000 definitions=main-2303280087
-X-Proofpoint-GUID: CDuhVtKGLMcc75N5hh4hrmRcU5VjVvYJ
-X-Proofpoint-ORIG-GUID: CDuhVtKGLMcc75N5hh4hrmRcU5VjVvYJ
-X-Spam-Status: No, score=-0.9 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
-        DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,RCVD_IN_MSPIKE_H2,
-        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.9.0
+Subject: Re: [PATCH] KVM: x86/pmu: Add Intel PMU supported fixed counters bit
+ mask
+Content-Language: en-US
+To:     Jim Mattson <jmattson@google.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20230321112742.25255-1-likexu@tencent.com>
+ <CALMp9eT0SrXCLriBN+nBv5fFQQ3n+b4Guq=-yLsFFQjeQ-nczA@mail.gmail.com>
+ <e002f554-b69d-cedf-162c-271bc3609a39@gmail.com>
+ <CALMp9eQVnk8gkOpX5AHhaCr8-5Fe=qNuX8PUP1Gv2H5FSYmHSw@mail.gmail.com>
+From:   Like Xu <like.xu.linux@gmail.com>
+In-Reply-To: <CALMp9eQVnk8gkOpX5AHhaCr8-5Fe=qNuX8PUP1Gv2H5FSYmHSw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
+        DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 28/03/2023 10:07, Alexey Kardashevskiy wrote:
-> On 17/3/23 07:02, Joao Martins wrote:
->> On KVM GSI routing table updates, specially those where they have vIOMMUs
->> with interrupt remapping enabled (to boot >255vcpus setups without relying
->> on KVM_FEATURE_MSI_EXT_DEST_ID), a VMM may update the backing VF MSIs
->> with a new VCPU affinity.
+On 27/3/2023 10:58 pm, Jim Mattson wrote:
+> On Mon, Mar 27, 2023 at 12:47 AM Like Xu <like.xu.linux@gmail.com> wrote:
 >>
->> On AMD with AVIC enabled, the new vcpu affinity info is updated via:
->>     avic_pi_update_irte()
->>         irq_set_vcpu_affinity()
->>             amd_ir_set_vcpu_affinity()
->>                 amd_iommu_{de}activate_guest_mode()
+>> On 25/3/2023 7:19 am, Jim Mattson wrote:
+>>> On Tue, Mar 21, 2023 at 4:28 AM Like Xu <like.xu.linux@gmail.com> wrote:
+>>>>
+>>>> From: Like Xu <likexu@tencent.com>
+>>>>
+>>>> Per Intel SDM, fixed-function performance counter 'i' is supported if:
+>>>>
+>>>>           FxCtr[i]_is_supported := ECX[i] || (EDX[4:0] > i);
+>>>>
+>>>> which means that the KVM user space can use EDX to limit the number of
+>>>> fixed counters and at the same time, using ECX to enable part of other
+>>>> KVM supported fixed counters.
+>>>>
+>>>> Add a bitmap (instead of always checking the vcpu's CPUIDs) to keep track
+>>>> of the guest available fixed counters and perform the semantic checks.
+>>>>
+>>>> Signed-off-by: Like Xu <likexu@tencent.com>
+>>>> ---
+>>>>    arch/x86/include/asm/kvm_host.h |  2 ++
+>>>>    arch/x86/kvm/pmu.h              |  8 +++++
+>>>>    arch/x86/kvm/vmx/pmu_intel.c    | 53 +++++++++++++++++++++------------
+>>>>    3 files changed, 44 insertions(+), 19 deletions(-)
+>>>>
+>>>> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+>>>> index a45de1118a42..14689e583127 100644
+>>>> --- a/arch/x86/include/asm/kvm_host.h
+>>>> +++ b/arch/x86/include/asm/kvm_host.h
+>>>> @@ -565,6 +565,8 @@ struct kvm_pmu {
+>>>>            */
+>>>>           bool need_cleanup;
+>>>>
+>>>> +       DECLARE_BITMAP(supported_fixed_pmc_idx, KVM_PMC_MAX_FIXED);
+>>>> +
+>>>>           /*
+>>>>            * The total number of programmed perf_events and it helps to avoid
+>>>>            * redundant check before cleanup if guest don't use vPMU at all.
+>>>> diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
+>>>> index be62c16f2265..9f4504e5e9d5 100644
+>>>> --- a/arch/x86/kvm/pmu.h
+>>>> +++ b/arch/x86/kvm/pmu.h
+>>>> @@ -111,6 +111,11 @@ static inline struct kvm_pmc *get_gp_pmc(struct kvm_pmu *pmu, u32 msr,
+>>>>           return NULL;
+>>>>    }
+>>>>
+>>>> +static inline bool fixed_ctr_is_supported(struct kvm_pmu *pmu, unsigned int idx)
+>>>> +{
+>>>> +       return test_bit(idx, pmu->supported_fixed_pmc_idx);
+>>>> +}
+>>>> +
+>>>>    /* returns fixed PMC with the specified MSR */
+>>>>    static inline struct kvm_pmc *get_fixed_pmc(struct kvm_pmu *pmu, u32 msr)
+>>>>    {
+>>>> @@ -120,6 +125,9 @@ static inline struct kvm_pmc *get_fixed_pmc(struct kvm_pmu *pmu, u32 msr)
+>>>>                   u32 index = array_index_nospec(msr - base,
+>>>>                                                  pmu->nr_arch_fixed_counters);
+>>>>
+>>>> +               if (!fixed_ctr_is_supported(pmu, index))
+>>>> +                       return NULL;
+>>>> +
+>>>>                   return &pmu->fixed_counters[index];
+>>>>           }
+>>>>
+>>>> diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
+>>>> index e8a3be0b9df9..12f4b2fe7756 100644
+>>>> --- a/arch/x86/kvm/vmx/pmu_intel.c
+>>>> +++ b/arch/x86/kvm/vmx/pmu_intel.c
+>>>> @@ -43,13 +43,16 @@ static int fixed_pmc_events[] = {1, 0, 7};
+>>>>    static void reprogram_fixed_counters(struct kvm_pmu *pmu, u64 data)
+>>>>    {
+>>>>           struct kvm_pmc *pmc;
+>>>> -       u8 old_fixed_ctr_ctrl = pmu->fixed_ctr_ctrl;
+>>>> +       u8 new_ctrl, old_ctrl, old_fixed_ctr_ctrl = pmu->fixed_ctr_ctrl;
+>>>>           int i;
+>>>>
+>>>>           pmu->fixed_ctr_ctrl = data;
+>>>>           for (i = 0; i < pmu->nr_arch_fixed_counters; i++) {
+>>>> -               u8 new_ctrl = fixed_ctrl_field(data, i);
+>>>> -               u8 old_ctrl = fixed_ctrl_field(old_fixed_ctr_ctrl, i);
+>>>> +               if (!fixed_ctr_is_supported(pmu, i))
+>>>> +                       continue;
+>>>> +
+>>>> +               new_ctrl = fixed_ctrl_field(data, i);
+>>>> +               old_ctrl = fixed_ctrl_field(old_fixed_ctr_ctrl, i);
+>>>>
+>>>>                   if (old_ctrl == new_ctrl)
+>>>>                           continue;
+>>>> @@ -125,6 +128,9 @@ static bool intel_is_valid_rdpmc_ecx(struct kvm_vcpu *vcpu, unsigned int idx)
+>>>>
+>>>>           idx &= ~(3u << 30);
+>>>>
+>>>> +       if (fixed && !fixed_ctr_is_supported(pmu, idx))
+>>>> +               return false;
+>>>> +
+>>>>           return fixed ? idx < pmu->nr_arch_fixed_counters
+>>>>                        : idx < pmu->nr_arch_gp_counters;
+>>>>    }
+>>>> @@ -145,7 +151,7 @@ static struct kvm_pmc *intel_rdpmc_ecx_to_pmc(struct kvm_vcpu *vcpu,
+>>>>                   counters = pmu->gp_counters;
+>>>>                   num_counters = pmu->nr_arch_gp_counters;
+>>>>           }
+>>>> -       if (idx >= num_counters)
+>>>> +       if (idx >= num_counters || (fixed && !fixed_ctr_is_supported(pmu, idx)))
+>>>>                   return NULL;
+>>>>           *mask &= pmu->counter_bitmask[fixed ? KVM_PMC_FIXED : KVM_PMC_GP];
+>>>>           return &counters[array_index_nospec(idx, num_counters)];
+>>>> @@ -500,6 +506,9 @@ static void setup_fixed_pmc_eventsel(struct kvm_pmu *pmu)
+>>>>           int i;
+>>>>
+>>>>           for (i = 0; i < pmu->nr_arch_fixed_counters; i++) {
+>>>> +               if (!fixed_ctr_is_supported(pmu, i))
+>>>> +                       continue;
+>>>> +
+>>>>                   pmc = &pmu->fixed_counters[i];
+>>>>                   event = fixed_pmc_events[array_index_nospec(i, size)];
+>>>>                   pmc->eventsel = (intel_arch_events[event].unit_mask << 8) |
+>>>> @@ -520,6 +529,7 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
+>>>>
+>>>>           pmu->nr_arch_gp_counters = 0;
+>>>>           pmu->nr_arch_fixed_counters = 0;
+>>>> +       bitmap_zero(pmu->supported_fixed_pmc_idx, KVM_PMC_MAX_FIXED);
+>>>>           pmu->counter_bitmask[KVM_PMC_GP] = 0;
+>>>>           pmu->counter_bitmask[KVM_PMC_FIXED] = 0;
+>>>>           pmu->version = 0;
+>>>> @@ -551,13 +561,24 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
+>>>>           pmu->available_event_types = ~entry->ebx &
+>>>>                                           ((1ull << eax.split.mask_length) - 1);
+>>>>
+>>>> -       if (pmu->version == 1) {
+>>>> -               pmu->nr_arch_fixed_counters = 0;
+>>>> -       } else {
+>>>> +       counter_mask = ~(BIT_ULL(pmu->nr_arch_gp_counters) - 1);
+>>>> +       bitmap_set(pmu->all_valid_pmc_idx, 0, pmu->nr_arch_gp_counters);
+>>>> +
+>>>> +       if (pmu->version > 1) {
+>>>>                   pmu->nr_arch_fixed_counters =
+>>>> -                       min3(ARRAY_SIZE(fixed_pmc_events),
+>>>> -                            (size_t) edx.split.num_counters_fixed,
+>>>> -                            (size_t)kvm_pmu_cap.num_counters_fixed);
+>>>> +                       min_t(int, ARRAY_SIZE(fixed_pmc_events),
+>>>> +                             kvm_pmu_cap.num_counters_fixed);
+>>>> +               for (i = 0; i < pmu->nr_arch_fixed_counters; i++) {
+>>>> +                       /* FxCtr[i]_is_supported := CPUID.0xA.ECX[i] || (EDX[4:0] > i) */
+>>>
+>>> This is true only when pmu->version >= 5.
 >>
->> Where the IRTE[GATag] is updated with the new vcpu affinity. The GATag
->> contains VM ID and VCPU ID, and is used by IOMMU hardware to signal KVM
->> (via GALog) when interrupt cannot be delivered due to vCPU is in
->> blocking state.
->>
->> The issue is that amd_iommu_activate_guest_mode() will essentially
->> only change IRTE fields on transitions from non-guest-mode to guest-mode
->> and otherwise returns *with no changes to IRTE* on already configured
->> guest-mode interrupts. To the guest this means that the VF interrupts
->> remain affined to the first vCPU they were first configured,and guest
->> will be unable to either VF interrupts and receive messages like this
->> from spuruious interrupts (e.g. from waking the wrong vCPU in GALog):
+>> This is true in for "Version 5" section, but not mentioned in the CPUID.0xA section.
+>> I would argue that this is a deliberate omission for the instruction implementation,
+>> as it does use the word "version>1" in the near CPUID.0xA.EDX section.
 > 
-> The "either" above sounds like there should be a verb which it is not, or is it?
-> (my english skills are meh). I kinda get the idea anyway (I hope).
+> Do you have any evidence to support such an argument? The CPUID field
+> in question was not defined prior to PMU version 5. (Does anyone from
+> Intel want to chime in?)
 > 
-It should be 'issue'. I'll delete the 'either'
+>> For virtualised use, this feature offers a kind of flexibility as users can
+>> enable part of
+>> the fixed counters, don't you think? Or maybe you're more looking forward to the
+>> patch set that raises the vPMU version number from 2 to 5, that part of the code
+>> was already in my tree some years ago.
+> 
+> I would not be surprised if a guest OS checked for PMU version 5
+> before consulting the CPUID fields defined in PMU version 5. Does
+> Linux even consult the fixed counter bitmask field today?
 
-> btw s/spuruious/spurious/, says my vim. Thanks,
+Yes, this is how host perf developer do it:
+
+	if (version >= 5)
+		x86_pmu.num_counters_fixed = fls(fixed_mask);
+
+based on real fresh hardware (always marked as the latest version).
+
+However, our KVM players can construct different valid CPUIDs, as long as the 
+hardware is capable,
+to emulate some vPMU devices that match the CPUID semantics but do not exist in 
+the real world.
+
+In the virtualisation world, use cases like "version 2 + fixed ctrs bit mask" 
+are perfectly possible
+and should work as expected. One more case, if the forth fixed counter or more 
+is enabled in your guest for top-down feature and you may still find the guest's 
+pmu version number is stuck at 2.
+This naturally does not occur in real hardware but no CPUID semantics here are 
+broken.
+
+As I'm sure you've noticed, the logical relationship between CPUID.0xA.ECX and 
+PMU version 5
+is necessary but not sufficient. Version 5 mush has fixed counters bit mask but 
+the reverse is not true.
+
+ From the end user's point of view, destroying the flexibility of vHW 
+combinations is a design failure.
+
+So I think we can implement this feature in guest version 2, what do you think ?
+
 > 
-/me nods
+> I'd love to see KVM virtualize PMU version 5!
+
+Great, I've got you and my plan will cover it.
+
+> 
+>>>
+>>>   From the SDM, volume 3, section 20.2.5 Architectural Performance
+>>> Monitoring Version 5:
+>>>
+>>> With Architectural Performance Monitoring Version 5, register
+>>> CPUID.0AH.ECX indicates Fixed Counter enumeration. It is a bit mask
+>>> which enumerates the supported Fixed Counters in a processor. If bit
+>>> 'i' is set, it implies that Fixed Counter 'i' is supported. Software
+>>> is recommended to use the following logic to check if a Fixed Counter
+>>> is supported on a given processor: FxCtr[i]_is_supported := ECX[i] ||
+>>> (EDX[4:0] > i);
+>>>
+>>> Prior to PMU version 5, all fixed counters from 0 through <number of
+>>> fixed counters - 1> are supported.
+>>>
+>>>> +                       if (!(entry->ecx & BIT_ULL(i) ||
+>>>> +                             edx.split.num_counters_fixed > i))
+>>>> +                               continue;
+>>>> +
+>>>> +                       set_bit(i, pmu->supported_fixed_pmc_idx);
+>>>> +                       set_bit(INTEL_PMC_MAX_GENERIC + i, pmu->all_valid_pmc_idx);
+>>>> +                       pmu->fixed_ctr_ctrl_mask &= ~(0xbull << (i * 4));
+>>>> +                       counter_mask &= ~BIT_ULL(INTEL_PMC_MAX_GENERIC + i);
+>>>> +               }
+>>>>                   edx.split.bit_width_fixed = min_t(int, edx.split.bit_width_fixed,
+>>>>                                                     kvm_pmu_cap.bit_width_fixed);
+>>>>                   pmu->counter_bitmask[KVM_PMC_FIXED] =
+>>>> @@ -565,10 +586,6 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
+>>>>                   setup_fixed_pmc_eventsel(pmu);
+>>>>           }
+>>>>
+>>>> -       for (i = 0; i < pmu->nr_arch_fixed_counters; i++)
+>>>> -               pmu->fixed_ctr_ctrl_mask &= ~(0xbull << (i * 4));
+>>>> -       counter_mask = ~(((1ull << pmu->nr_arch_gp_counters) - 1) |
+>>>> -               (((1ull << pmu->nr_arch_fixed_counters) - 1) << INTEL_PMC_IDX_FIXED));
+>>>>           pmu->global_ctrl_mask = counter_mask;
+>>>>           pmu->global_ovf_ctrl_mask = pmu->global_ctrl_mask
+>>>>                           & ~(MSR_CORE_PERF_GLOBAL_OVF_CTRL_OVF_BUF |
+>>>> @@ -585,11 +602,6 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
+>>>>                   pmu->raw_event_mask |= (HSW_IN_TX|HSW_IN_TX_CHECKPOINTED);
+>>>>           }
+>>>>
+>>>> -       bitmap_set(pmu->all_valid_pmc_idx,
+>>>> -               0, pmu->nr_arch_gp_counters);
+>>>> -       bitmap_set(pmu->all_valid_pmc_idx,
+>>>> -               INTEL_PMC_MAX_GENERIC, pmu->nr_arch_fixed_counters);
+>>>> -
+>>>>           perf_capabilities = vcpu_get_perf_capabilities(vcpu);
+>>>>           if (cpuid_model_is_consistent(vcpu) &&
+>>>>               (perf_capabilities & PMU_CAP_LBR_FMT))
+>>>> @@ -605,6 +617,9 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
+>>>>                           pmu->pebs_enable_mask = counter_mask;
+>>>>                           pmu->reserved_bits &= ~ICL_EVENTSEL_ADAPTIVE;
+>>>>                           for (i = 0; i < pmu->nr_arch_fixed_counters; i++) {
+>>>> +                               if (!fixed_ctr_is_supported(pmu, i))
+>>>> +                                       continue;
+>>>> +
+>>>>                                   pmu->fixed_ctr_ctrl_mask &=
+>>>>                                           ~(1ULL << (INTEL_PMC_IDX_FIXED + i * 4));
+>>>>                           }
+>>>>
+>>>> base-commit: d8708b80fa0e6e21bc0c9e7276ad0bccef73b6e7
+>>>> --
+>>>> 2.40.0
+>>>>
