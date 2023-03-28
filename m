@@ -2,69 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5BD5D6CC61F
-	for <lists+kvm@lfdr.de>; Tue, 28 Mar 2023 17:23:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 402446CC6C3
+	for <lists+kvm@lfdr.de>; Tue, 28 Mar 2023 17:40:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233313AbjC1PXc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Mar 2023 11:23:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49710 "EHLO
+        id S233192AbjC1Pk1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Mar 2023 11:40:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46842 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233217AbjC1PXK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Mar 2023 11:23:10 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3BFBC1204D
-        for <kvm@vger.kernel.org>; Tue, 28 Mar 2023 08:21:26 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id p12-20020a25420c000000b00b6eb3c67574so12301638yba.11
-        for <kvm@vger.kernel.org>; Tue, 28 Mar 2023 08:21:26 -0700 (PDT)
+        with ESMTP id S232494AbjC1PkC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Mar 2023 11:40:02 -0400
+Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18DBD12061
+        for <kvm@vger.kernel.org>; Tue, 28 Mar 2023 08:38:40 -0700 (PDT)
+Received: by mail-pf1-x449.google.com with SMTP id e14-20020a056a00162e00b0062804a7a79bso6099120pfc.23
+        for <kvm@vger.kernel.org>; Tue, 28 Mar 2023 08:38:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1680016856;
+        d=google.com; s=20210112; t=1680017919;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=5BDyXdwLNDkkL1EG1Vlg4E16wOafaNr02fD8vdba9Dk=;
-        b=RbKYy2noIQch80Msv5bqAn0EyQhd27bVKyUSI0EMZX8IuPWMo+mLVJKHSwqUfD5zMt
-         1S1fMEbHqh8a+fnJiferohyaGfiQ6WbTT2eMABg4attHMptZRuReJHL4lQdFgejv4vtM
-         s16zpjwXOQRsJ+YLsCocF7ZPAaq6tfdZ0Utq8NEh0JSnAfU1lch1kOy6Gb+T4vZK8OrP
-         j9izUYQxl9+jkwjEN+kCtsyZG+WnWn3bD5Uij8BqKyGQzOX6LsAfBmQUtIuzDz5IKQ4N
-         mj4ac674SwliP4++uxcrQMgQoUpTHfFDNqsYBozygFtoY0n9v2QBxuKjBdL7arM545og
-         Uw0Q==
+        bh=4JDo1hdn5PPYA/BrPBDKPiwkCmQEtXcPTBkl9kbEB7w=;
+        b=N1K0ep+qcbJsWJSGLJ6sqlco7+rngaXdVrOQ757dytJc1rQ8cuTmz0VmZydmLrquaE
+         EsGgi3hnWZTxfwgIznBbTKLjp8565dtlZYmjhoWPijnwp6cn80KUt8/cK6m7rah0zAy6
+         Cde2SPQGQkVjY4QsuCXVlC7qBpN4CAEi+yeSla1NzWfVa54CPzYbK4ccn11etIFdcBlw
+         dGobkcQh8haH0G8J6pVjyo74mqrGKdAwV3+FGI1dYAe+oLD596ZOObp0z9VI8TLATDEd
+         pSygP9pVe+5nAS7temcXYnxzJIDTeZodeFq5nswCJQwo+0qOkORXqMG08OZIZeOjYxZ4
+         yzcA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680016856;
+        d=1e100.net; s=20210112; t=1680017919;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=5BDyXdwLNDkkL1EG1Vlg4E16wOafaNr02fD8vdba9Dk=;
-        b=QGC//q6ohK7czY9rEy8ZkmSeOuaHw7uiceZR3ZClP1SOKcogxPstVf93716ZsOQ4TE
-         eC4+HQTN7kdFm4Sq2JHzxUbG634pxBbtI7yeleMeUcyppolQkdVQKrHuzLsrYEq7/I4b
-         Tq8+ASEr8mcvsfwPBk95ZqL7e4E8X9vybJrX+KCFD/3oF1VrSIFDAhEQ0niZ1unhNBoO
-         +P1qCmqScsFoFRts7Sy960e/4fCQkub7ldyFiHI2+fm/WTit6nMXvj+FTJjhXalRcpxI
-         oUbLxVT/GUqX5hCxH5SdKUUxl2og0+hZT9Q+i9WZF9OfXRMHlLOe69ROikfW9SOzSvlW
-         Kp1g==
-X-Gm-Message-State: AAQBX9fjYO0deJAE3Y4RW8J57eC8fr/gfZogRYlL11bOol2FBgy9+sPj
-        G+1QDid9cDrg2aGEDuWppE9grFWQO/c=
-X-Google-Smtp-Source: AKy350Y8HtUvudF/HEaI9/VQYB1jeEz2Bcg1zL2sdiujAx+T2SuW0eY/9HbiCKVqy3WNPHtE3AE9PjyBVew=
+        bh=4JDo1hdn5PPYA/BrPBDKPiwkCmQEtXcPTBkl9kbEB7w=;
+        b=YYR7n+FqK1hi5R8NcGa/kD44CKKmjo1lvfsbea/Kol29BNgbRhb1UUaysLb11O4QOZ
+         eCJBRoDdPwruHMDkeK4tu4HjM8MXJaE9hPaPSVEOoUGyR9bzKKqdS9FNZ21LZkKH/fAE
+         GZFJmI6CkuQ500U+V9fZzLAyhRvPQMY0tf/1vrArdXhmD+iodptBq37kQWy0G5qHtw9Z
+         BG56EY2Fp0S+iI4bbo9LLYxTiGQL6HPrKJzvMsKz2bmcjhjUp4KJzHxBv2DxHwHk3DVX
+         divEN1oqSABl9TWEInJFJRO2a16ZbwdX0W4P/hrmbyAIkhjBXo4OYWu47u0oewWh3kjp
+         Emng==
+X-Gm-Message-State: AAQBX9cNCfV+/3yqx+mh52cXdCNNQnx3keN6NrmykpQubUfFfPJachvx
+        ZGcpD8iGyV3PQMsQuHOeo2jMQEMCUoQ=
+X-Google-Smtp-Source: AKy350ZtM0+MuyO2MvFrK+NtTn7mCYiV3Vn25cfenMOsn75V1ItnkrLfG/3fWkJ1V3/8SRO8wxrg6TuHOik=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:10c3:b0:b75:9519:dbcd with SMTP id
- w3-20020a05690210c300b00b759519dbcdmr10605629ybu.12.1680016855844; Tue, 28
- Mar 2023 08:20:55 -0700 (PDT)
-Date:   Tue, 28 Mar 2023 08:20:49 -0700
-In-Reply-To: <cde77b1f-e612-2a9e-e437-8892f7f1fde9@oracle.com>
+ (user=seanjc job=sendgmr) by 2002:a17:90a:d381:b0:23d:4ab8:b1a3 with SMTP id
+ q1-20020a17090ad38100b0023d4ab8b1a3mr4950708pju.1.1680017919114; Tue, 28 Mar
+ 2023 08:38:39 -0700 (PDT)
+Date:   Tue, 28 Mar 2023 08:38:37 -0700
+In-Reply-To: <86r0t9w5jp.wl-maz@kernel.org>
 Mime-Version: 1.0
-References: <20230316200219.42673-1-joao.m.martins@oracle.com>
- <20230316200219.42673-2-joao.m.martins@oracle.com> <ZBODjjANx6pkq5iq@google.com>
- <655ac0f7-223b-9440-1bcb-e93af8915bfa@oracle.com> <ZB20W14VzVZZz+nI@google.com>
- <cde77b1f-e612-2a9e-e437-8892f7f1fde9@oracle.com>
-Message-ID: <ZCMF0ReWqG0Q7Zna@google.com>
-Subject: Re: [PATCH v2 1/2] iommu/amd: Don't block updates to GATag if guest
- mode is on
+References: <87y1nvgv8s.wl-maz@kernel.org> <gsntfs9xdipf.fsf@coltonlewis-kvm.c.googlers.com>
+ <86r0t9w5jp.wl-maz@kernel.org>
+Message-ID: <ZCMJ/Vs3t63rU9z3@google.com>
+Subject: Re: [PATCH v2 1/2] KVM: selftests: Provide generic way to read system counter
 From:   Sean Christopherson <seanjc@google.com>
-To:     Joao Martins <joao.m.martins@oracle.com>
-Cc:     iommu@lists.linux.dev, Joerg Roedel <joro@8bytes.org>,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        Vasant Hegde <vasant.hegde@amd.com>,
-        Will Deacon <will@kernel.org>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        Alejandro Jimenez <alejandro.j.jimenez@oracle.com>,
-        kvm@vger.kernel.org
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     Colton Lewis <coltonlewis@google.com>, pbonzini@redhat.com,
+        shuah@kernel.org, dmatlack@google.com, vipinsh@google.com,
+        andrew.jones@linux.dev, bgardon@google.com, ricarkol@google.com,
+        oliver.upton@linux.dev, kvm@vger.kernel.org
 Content-Type: text/plain; charset="us-ascii"
 X-Spam-Status: No, score=-7.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
@@ -76,65 +69,26 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 28, 2023, Joao Martins wrote:
-> [I was out sick, hence the delay]
+On Tue, Mar 28, 2023, Marc Zyngier wrote:
+> On Tue, 21 Mar 2023 19:10:04 +0000,
+> Colton Lewis <coltonlewis@google.com> wrote:
+> > In context, I'm trying to measure the time it takes to write to a buffer
+> > *with dirty memory logging enabled*. What do you mean by zero? I can
+> > confirm from running this code I am not measuring zero time.
 > 
-> On 24/03/2023 14:31, Sean Christopherson wrote:
-> > On Thu, Mar 16, 2023, Joao Martins wrote:
-> >> On 16/03/2023 21:01, Sean Christopherson wrote:
-> >>> Is there any harm in giving deactivate the same treatement?  If the worst case
-> >>> scenario is a few wasted cycles, having symmetric flows and eliminating benign
-> >>> bugs seems like a worthwhile tradeoff (assuming this is indeed a relatively slow
-> >>> path like I think it is).
-> >>>
-> >>
-> >> I wanna say there's no harm, but initially I had such a patch, and on testing it
-> >> broke the classic interrupt remapping case but I didn't investigate further --
-> >> my suspicion is that the only case that should care is the updates (not the
-> >> actual deactivation of guest-mode).
-> > 
-> > Ugh, I bet this is due to KVM invoking irq_set_vcpu_affinity() with garbage when
-> > AVIC is enabled, but KVM can't use a posted interrupt due to the how the IRQ is
-> > configured.  I vaguely recall a bug report about uninitialized data in "pi" being
-> > consumed, but I can't find it at the moment.
-> > 
-> > 	if (!get_pi_vcpu_info(kvm, e, &vcpu_info, &svm) && set &&
-> > 		    kvm_vcpu_apicv_active(&svm->vcpu)) {
-> > 
-> > 		...
-> > 
-> > 	} else {
-> > 			/* Use legacy mode in IRTE */
-> > 			struct amd_iommu_pi_data pi;
-> > 
-> > 			/**
-> > 			 * Here, pi is used to:
-> > 			 * - Tell IOMMU to use legacy mode for this interrupt.
-> > 			 * - Retrieve ga_tag of prior interrupt remapping data.
-> > 			 */
-> > 			pi.prev_ga_tag = 0;
-> > 			pi.is_guest_mode = false;
-> > 			ret = irq_set_vcpu_affinity(host_irq, &pi);
-> > 	}
-> > 
-> > 
-> 
-> I recall one instance of the 'garbage pi data' issue but this was due to
-> prev_ga_tag not being initialized (see commit f6426ab9c957).
+> See my earlier point: the counter tick is a few MHz, and the CPU
+> multiple GHz.
 
-Yep, that's the one I was trying to recall.
+On x86, the system counter (TSC) counts at multiple GHz, so we should be able to
+continue with that approach for x86.
 
-> As far as I understand, AMD implementation on irq_vcpu_set_affinity will
-> write back to caller the following fields of pi:
+> So unless "whatever" is something that takes a significant time (several
+> thousands of CPU cycles), you'll measure nothing using the counter. Page
+> faults will probably show, but not a normal access.
 > 
-> - prev_ga_tag
-> - ir_data
-> - guest_mode (sometimes when it is unsupported or disabled by the host via cmdline)
-> 
-> On legacy interrupt remap path (no iommu avic) the IRQ update just uses irq data
-> mostly. It's the avic path that uses more things (vcpu_data, ga_tag, base,
-> ga_root_ptr, ga_vector), but all of which are initialized by KVM properly already.
+> The right tool for this job is to use PMU events, as they count at the CPU
+> frequency.
 
-Ya, on my Nth read through, I don't see any issues with KVM's behavior.  I was
-thinking that KVM's "pi" could bleed into amd_iommu_deactivate_guest_mode(), but
-I had just gotten turned around by the many "data" variables.  Bummer.
+Out of curiosity, what does the kernel end up using for things like ndelay()?  I
+tried to follow the breadcrumbs for ARM and got as far as arm_arch_timer.c, but
+after that I'm more than a bit lost.
