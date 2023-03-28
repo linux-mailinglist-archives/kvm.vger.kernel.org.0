@@ -2,65 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E93A46CB577
-	for <lists+kvm@lfdr.de>; Tue, 28 Mar 2023 06:38:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4A6916CB5B3
+	for <lists+kvm@lfdr.de>; Tue, 28 Mar 2023 06:56:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231978AbjC1Ein (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Mar 2023 00:38:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52816 "EHLO
+        id S229631AbjC1E4s (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Mar 2023 00:56:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36520 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231359AbjC1Eik (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Mar 2023 00:38:40 -0400
-Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3FADD1FFB
-        for <kvm@vger.kernel.org>; Mon, 27 Mar 2023 21:38:14 -0700 (PDT)
-Received: by mail-pj1-x1049.google.com with SMTP id b1-20020a17090a8c8100b002400db03706so2890424pjo.0
-        for <kvm@vger.kernel.org>; Mon, 27 Mar 2023 21:38:14 -0700 (PDT)
+        with ESMTP id S231717AbjC1E4p (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Mar 2023 00:56:45 -0400
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F9C62D63
+        for <kvm@vger.kernel.org>; Mon, 27 Mar 2023 21:56:09 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-5419fb7d6c7so107647587b3.11
+        for <kvm@vger.kernel.org>; Mon, 27 Mar 2023 21:56:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1679978294;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=rcAqgQ8BH2Pd6M4X5nC8yYas5XPVcEcHPdn5I8yTc5c=;
-        b=F0y+ZlDZv9wReZiTDaK8D2Y9QzR6ohdjctRhdfVzmHxpj/4gFzrKKuHU65h5oumTdA
-         hrxu4FVimICN0L3xUlSz69j8BsPIvHAbLBY8/VuRKrnlge0Vpo7X65mJhfUPF8jYeezg
-         a4mrftgrNyPCrWsWXjF3f6KoFxkan+BJUxt38tE3gzIVRYU/aG8ssHFxvcWDi33R9k72
-         CkW1J94yEqUTAiRR8rlNlLtwPatPYJ07NvR2PmrofUDaLk+c6WtoaPXy5vBODi+K5Z/g
-         DnthRq7G5PJvL/FTSF/4pnBcbfUc8K80FgH09Lob97afCVDMyUIqyfbfMc/sEvK2H5WM
-         J1Ng==
+        d=google.com; s=20210112; t=1679979364;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=jr6fqdp6bviKxq26fqY3VfiJLpmiTmRcnKqOZtEa3+g=;
+        b=aJFlcJFELP8JBDEDASWH7ieMNnljbM3fElwd04/UnqjsXirVOda+tuNB+2BMkzP5tk
+         eG84LtG+5ShuDv0zeNMKdGiuzGV7v3DSok0NBTdICR6Z0i/ycqjXxq1pTGo7C9AOvmvx
+         /jS45/VH4wxtMoZDrtKgZQ6SDvwp4kSBVjYuRYHJvcU5lHd/tLOqM1r2BAyHekzVEf5H
+         qsfCTHjQIJvzIma3MnSMn7ejPPapbuwcdR0ntPQwCHhwrpJyeo5Ni5sMy8lU+rBxPRXp
+         HiXm5szRsB0p/amy5WeyY4y61NGUvQ26aElrUas6JNaGvpaOZCacFJSPhJazxy8h3zdd
+         kqcw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679978294;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=rcAqgQ8BH2Pd6M4X5nC8yYas5XPVcEcHPdn5I8yTc5c=;
-        b=DUg/6PDnjsvkAwujQGSyW/8g+Jx4AKLJL/aAjOVNI3ZoslWJn04Bz01rgDgcMfbMSb
-         6Y+bbN2frotU6FE/RpI0iuaIiJzWSFxJy09P+OOlE52GXTt4Aqi7M4MS+S0uQ1271FQd
-         CXofuFhz2FXH8+BEloeJDLU/fW81s00nC7H4ECzUDl3m0A6WEFKLJff0PuG1rqUeaIf7
-         IGuvP4IFI2ih6/eTkMdmhSXxQ2ENdTRQ4Xyj+x5dQIjAoCckjhNlL8QniOV/CHKYCOo8
-         Q0QQVHdmS/1/GJSEmtHHG4RtUvrC+U+D6fIiiUWjoqKTU/ssPX3MKZ8tt2RnTkmrOAER
-         lzkA==
-X-Gm-Message-State: AAQBX9eECCYzT/IhnCTlFh3g3Of03CJT1nxqF3KxUXQmpqMKHqcVcg1E
-        yD1a4AmOihzbtgBfrjn9knm5re06kXo=
-X-Google-Smtp-Source: AKy350ZBV7I8ZBSrQ9pzx5uhdonFvp2L4ZDqEPY8dbkJruv2l0Ti8RKraySA1RqdgUvobnP7uUGSs9BFBxo=
+        d=1e100.net; s=20210112; t=1679979364;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=jr6fqdp6bviKxq26fqY3VfiJLpmiTmRcnKqOZtEa3+g=;
+        b=qUHaQSUkkqV+p08ob7w7rpdhrj1TMgHRdniz7IusaXG1DgCbb+0fkGwk/oHKBKdKl5
+         /RIIAl7MfdCKLRIiZ7cwDKc6BGRM6S0bu3V9z3jKvXflYQNwmIpxVWHsoEI9aUQSN6iu
+         9k1iJbqh8GDZX5Lok8g/zFPaZyF0kLoMktvEs2yvxTqxfka+UeL5pCPXElBhKNjbfHkq
+         vwzQ7YMq4vHNI+37CJa7ELRrCJ/xzGz3hJ+aW5d6ONapLAZoyRDjKm8Uz0CERA9KT48j
+         1EPGPwj6123xXLKPmNIMxYOFAb9RluxO0iYewqziPZof8bfAgXJqAMJPsJg2AgQoyoSz
+         HU+g==
+X-Gm-Message-State: AAQBX9dEJu7TgB7ZVtB4rOenyCooRSJr0BsFyexIWpK1a8zJvtFmAniH
+        CUCRDxZR6U1E9ue6mJH3QEocLQiIUcs=
+X-Google-Smtp-Source: AKy350bgTvEy1V+jKmxIU1m1QAH50jLRQ4YKe3K/rTiSc4qy+OmPKYq0+VrvT8ZBG6BCqM/R5L8S6SpAfDI=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90a:5141:b0:23d:50d0:4ba4 with SMTP id
- k1-20020a17090a514100b0023d50d04ba4mr4324480pjm.3.1679978293792; Mon, 27 Mar
- 2023 21:38:13 -0700 (PDT)
-Date:   Tue, 28 Mar 2023 04:38:12 +0000
-In-Reply-To: <CA+wubQBsiaH_==UJ-JUi7hwS8W1i5MLZ-dPuw2smVH8Z0sqXsw@mail.gmail.com>
+ (user=seanjc job=sendgmr) by 2002:a25:e054:0:b0:b6b:d3f3:45af with SMTP id
+ x81-20020a25e054000000b00b6bd3f345afmr9145968ybg.1.1679979364091; Mon, 27 Mar
+ 2023 21:56:04 -0700 (PDT)
+Date:   Mon, 27 Mar 2023 21:56:02 -0700
+In-Reply-To: <20230324205249.3700408-2-paulmck@kernel.org>
 Mime-Version: 1.0
-References: <20230310125718.1442088-1-robert.hu@intel.com> <20230310125718.1442088-4-robert.hu@intel.com>
- <ZAtaY8ISOZyXB3V+@google.com> <CA+wubQBsiaH_==UJ-JUi7hwS8W1i5MLZ-dPuw2smVH8Z0sqXsw@mail.gmail.com>
-Message-ID: <ZCJvNOAP1Qiye2YV@google.com>
-Subject: Re: [PATCH 3/3] KVM: VMX: Use the canonical interface to read
- CR4.UMIP bit
+References: <8ae81b0e-2e03-4f83-aa3d-c7a0b96c8045@paulmck-laptop> <20230324205249.3700408-2-paulmck@kernel.org>
+Message-ID: <ZCJzYktdNRZmQjhl@google.com>
+Subject: Re: [PATCH rcu v3 2/4] kvm: Remove "select SRCU"
 From:   Sean Christopherson <seanjc@google.com>
-To:     Robert Hoo <robert.hoo.linux@gmail.com>
-Cc:     Robert Hoo <robert.hu@intel.com>, pbonzini@redhat.com,
-        kvm@vger.kernel.org
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+To:     "Paul E. McKenney" <paulmck@kernel.org>
+Cc:     rcu@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kernel-team@meta.com, rostedt@goodmis.org,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Christophe Leroy <christophe.leroy@csgroup.eu>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
+        Marc Zyngier <maz@kernel.org>,
+        Anup Patel <anup@brainfault.org>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        John Ogness <john.ogness@linutronix.de>
+Content-Type: text/plain; charset="us-ascii"
 X-Spam-Status: No, score=-7.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
@@ -71,19 +80,38 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Mar 11, 2023, Robert Hoo wrote:
-> Sean Christopherson <seanjc@google.com> =E4=BA=8E2023=E5=B9=B43=E6=9C=881=
-1=E6=97=A5=E5=91=A8=E5=85=AD 00:27=E5=86=99=E9=81=93=EF=BC=9A
-> > Practically speaking, UMIP _can't_ be guest owned without breaking UMIP
-> emulation.
->=20
-> Agree.
-> Can we expect that in the future (not near future) that emulating UMIP
-> isn't needed at all? I mean, when all x86 CPUs on the market have UMIP in=
- native.
+On Fri, Mar 24, 2023, Paul E. McKenney wrote:
+> Now that the SRCU Kconfig option is unconditionally selected, there is
+> no longer any point in selecting it.  Therefore, remove the "select SRCU"
+> Kconfig statements from the various KVM Kconfig files.
+> 
+> Signed-off-by: Paul E. McKenney <paulmck@kernel.org>
+> Cc: Huacai Chen <chenhuacai@kernel.org>
+> Cc: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+> Cc: Thomas Bogendoerfer <tsbogend@alpha.franken.de>
+> Cc: Michael Ellerman <mpe@ellerman.id.au>
+> Cc: Christophe Leroy <christophe.leroy@csgroup.eu>
+> Cc: Sean Christopherson <seanjc@google.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Thomas Gleixner <tglx@linutronix.de>
+> Cc: Ingo Molnar <mingo@redhat.com>
+> Cc: Borislav Petkov <bp@alien8.de>
+> Cc: Dave Hansen <dave.hansen@linux.intel.com>
+> Cc: "H. Peter Anvin" <hpa@zytor.com>
+> Cc: <kvm@vger.kernel.org>
+> Acked-by: Marc Zyngier <maz@kernel.org> (arm64)
+> Acked-by: Michael Ellerman <mpe@ellerman.id.au> (powerpc)
+> Acked-by: Anup Patel <anup@brainfault.org> (riscv)
+> Acked-by: Heiko Carstens <hca@linux.ibm.com> (s390)
+> Reviewed-by: John Ogness <john.ogness@linutronix.de>
+> ---
 
-Heh, define "all x86s on the market".  UMIP didn't come along until Broadwe=
-ll, and
-we still get bug reports for Core2.  It's going to be a long, long time bef=
-ore
-KVM can require UMIP support on Intel CPUs.
+As amusing at it would be to see KVM as the lone holdout,
+
+Acked-by: Sean Christopherson <seanjc@google.com> (x86)
+
+
+Paul, feel free to take this through your tree if you think that would be the
+fastest way to purge the config.  Holler if you want to route it through KVM, I'll
+either throw it kvm-x86/generic, or rewatch Beetlejuice and try to summon Paolo
+that way. ;-)
