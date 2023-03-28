@@ -2,94 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6882E6CBDF0
-	for <lists+kvm@lfdr.de>; Tue, 28 Mar 2023 13:38:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9BF226CBDF3
+	for <lists+kvm@lfdr.de>; Tue, 28 Mar 2023 13:38:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232762AbjC1LiK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Mar 2023 07:38:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60688 "EHLO
+        id S232777AbjC1Lim (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Mar 2023 07:38:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32980 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232709AbjC1LiI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Mar 2023 07:38:08 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76EEE40EA;
-        Tue, 28 Mar 2023 04:38:06 -0700 (PDT)
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 32S9KW0l006860;
-        Tue, 28 Mar 2023 11:38:05 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=/uql0AsOgChupybCjnv/4rCRhr5aUbiikSgPJ1sXICE=;
- b=cHZJyo5yuARzP34P4TTTvkHXyasXPU2DwS46I3NEBd2QXUvgTgiQUuoSJE5+np6F8FiG
- exIAIpPzyapROtXX+7JJe6nBmEabiMPm3sDp9/gOEBuczRXN3O4wy+CLzQg1HMMQMCyS
- 2Bt0zNROUF/TPs1yXu5/MxObhvv5RAwzkd7gEnVJF4uIPsovIvsvQSZLlGN052bFdnY8
- oGzLvnbrCtCyesleLLVABQ1Hw5xAGat5BEJaAptWgC+6bm0iHpPUyDxFGPX5wIosuENK
- g7IlrpXNxTYXFDhANKT3fDYMzv0G8iQiVQIWdyZv0wZUS3mxLuGrS3NpYdFHYKg3EKwj Pw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pkwgxb8ce-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 28 Mar 2023 11:38:05 +0000
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 32SBb3SW003350;
-        Tue, 28 Mar 2023 11:38:05 GMT
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pkwgxb8c0-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 28 Mar 2023 11:38:04 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 32S4VKHR019202;
-        Tue, 28 Mar 2023 11:38:03 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-        by ppma03ams.nl.ibm.com (PPS) with ESMTPS id 3phrk6kx7h-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 28 Mar 2023 11:38:03 +0000
-Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-        by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 32SBbxPH21234322
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 28 Mar 2023 11:37:59 GMT
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 8B7022004D;
-        Tue, 28 Mar 2023 11:37:59 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5E1B52004B;
-        Tue, 28 Mar 2023 11:37:59 +0000 (GMT)
-Received: from [9.152.222.242] (unknown [9.152.222.242])
-        by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-        Tue, 28 Mar 2023 11:37:59 +0000 (GMT)
-Message-ID: <3dcfb02a-84db-1298-1b88-810b52c12818@linux.ibm.com>
-Date:   Tue, 28 Mar 2023 13:37:59 +0200
+        with ESMTP id S232709AbjC1Lik (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Mar 2023 07:38:40 -0400
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2041.outbound.protection.outlook.com [40.107.236.41])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 596AB40EA;
+        Tue, 28 Mar 2023 04:38:39 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=dEt+U+DTOtOWkhDOEATOJ3y6pN26RCMU9PZTTnQya0Cu1c0hEUmMoqF3hDfRfawOgNk4jqFjfs/vJS3S+5GqTEOxCUK10I5bIjXDBmtsavSkZPKZnuCZXCqB+BJCVwENTvh1mdtjEOILct27uNEp+Sd+E8NB/se1IIP8E5ViLNgMWcMZ6mj7PaenlkFKeJr0jnc5Vd2os1MHP5mGXvlz0ck6i7Hq6EDTea6DJMjjvN9JcXHO+k9adqPn3JgjAcAiQYHjLuADUCTX1NyE96R1aG9DRjg8fM2L9GN5OCWh+tGrag+rhHgmwARqCmxNeYVkQLMzVgTZPoLogVEiVFwtTg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=8q4ieXqh5HRdC2PlygbNilLrLYubZOI/bFrow4V1TUY=;
+ b=Y9PhQkzne4noRG0HH2SEtK5wPuoYG1xsfennSfZSB9rRebR1G1iilJf9cpPQLoE3L0yQdO+Y2Qjobukf8d/RdBeBWja7Dosv++WkotT4zlT3RudgwEWou3/DVguPnSjq0qgmvdoH4xeEoOmcJB7JF1jklQC09UdVk3CizRsn42LljelngyQbFRaD7yRslU3S9e/OCVwukWSIgmvpEnsZkuO3goF9b4nTs+BZEEpc57SFszJFPcl4/RzSIGQRWGOMshjPLJ+7ZU8u9K4FAdguT1YvnlKq/4dsrgbi3LHje7bkgtqrc53KBTdc7bI06VHSTG/iyHyjX1nsAW/CG2xtFw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=8q4ieXqh5HRdC2PlygbNilLrLYubZOI/bFrow4V1TUY=;
+ b=FxWhMFvba6kZ98I/fnsfgFe6lpof9ZJoJmZgsb/Onz1FTYKy76Hu2f5HL1yBKJXPt3LFKfShEjlMcP/pBZ+eVGECuFuzaEUIgP5OLeICuYIG+pgItmBnFcDu/z+CVnHpmU0OgKg8zaPwoUnozNuLYX541/0OLjAulLJz2te0HlsuEMGaxDQad0QLnZ3S+ArG9/k7ovO3GN/oqGaATe+6V37sOZ6kUufbgRxdwJQGmwTLBOQ1AYPtVJ3SI4J+QN2L8KsIYj6dNq5vAdofEAnsCYSorH7WIv+8xgRXmzexxYmbg72P2nLcRugibiqKcA3u0AkVjTBcMpq4/QZsBbFgjQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by BL1PR12MB5144.namprd12.prod.outlook.com (2603:10b6:208:316::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6222.33; Tue, 28 Mar
+ 2023 11:38:37 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::ef6d:fdf6:352f:efd1]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::ef6d:fdf6:352f:efd1%3]) with mapi id 15.20.6178.037; Tue, 28 Mar 2023
+ 11:38:37 +0000
+Date:   Tue, 28 Mar 2023 08:38:35 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     "Tian, Kevin" <kevin.tian@intel.com>
+Cc:     "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Nicolin Chen <nicolinc@nvidia.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>
+Subject: Re: [PATCH v3 03/17] iommufd: Replace the hwpt->devices list with
+ iommufd_group
+Message-ID: <ZCLRu2NiVWNcdMk9@nvidia.com>
+References: <0-v3-61d41fd9e13e+1f5-iommufd_alloc_jgg@nvidia.com>
+ <3-v3-61d41fd9e13e+1f5-iommufd_alloc_jgg@nvidia.com>
+ <BN9PR11MB5276E42B629C3E5AF019B6748C879@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <ZBxg9cRIpsozB15G@nvidia.com>
+ <BN9PR11MB52767DA03C240F040929A2398C849@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <ZB27ke/vQxsCngtC@nvidia.com>
+ <BN9PR11MB52768F348A2814083BC5F5328C889@BN9PR11MB5276.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <BN9PR11MB52768F348A2814083BC5F5328C889@BN9PR11MB5276.namprd11.prod.outlook.com>
+X-ClientProxiedBy: MN2PR02CA0035.namprd02.prod.outlook.com
+ (2603:10b6:208:fc::48) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.8.0
-Subject: Re: [kvm-unit-tests PATCH v7 2/2] s390x: topology: Checking
- Configuration Topology Information
-Content-Language: en-US
-To:     Nico Boehr <nrb@linux.ibm.com>, linux-s390@vger.kernel.org
-Cc:     frankja@linux.ibm.com, thuth@redhat.com, kvm@vger.kernel.org,
-        imbrenda@linux.ibm.com, david@redhat.com, nsg@linux.ibm.com
-References: <20230320085642.12251-1-pmorel@linux.ibm.com>
- <20230320085642.12251-3-pmorel@linux.ibm.com>
- <167965555147.41638.10047922188597254104@t14-nrb>
- <eed972f5-7d94-4db3-c496-60f7d37db0f3@linux.ibm.com>
- <167998471655.28355.8845167343467425829@t14-nrb>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-In-Reply-To: <167998471655.28355.8845167343467425829@t14-nrb>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: peLi7sPjwIgMNQNpTlgCphY0wCGKfLn4
-X-Proofpoint-ORIG-GUID: WNCXHg-ws4MF4be1xOCNBZJGkcOdAS-x
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
- definitions=2023-03-24_11,2023-03-28_01,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- phishscore=0 impostorscore=0 spamscore=0 mlxlogscore=999 mlxscore=0
- clxscore=1015 adultscore=0 malwarescore=0 lowpriorityscore=0 bulkscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2303200000 definitions=main-2303280094
-X-Spam-Status: No, score=-0.1 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
-        DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|BL1PR12MB5144:EE_
+X-MS-Office365-Filtering-Correlation-Id: fd84878c-0989-4716-2182-08db2f80f838
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: ikM7BIpv3wI6xjCPWS5haB+Zr94fMdjlfBobcqmEccL0cpuhCX4HhUqrTyI0+1xJnjubMFnkZofyOQivAWFRSs6cp0d5kXAsZKFbPFBxIj/uAz+DvsazHfCQG3XA+jMND+/tQD44sqg7z3NBdh5B85baBKe6dYMBucEOB+aLes9nvicNY2wAIS8IdEc+6DEvwujOq2hfflc9TBSTBZ7s7OmR+u9thJi81qsttBGCLAnG1DjlxxD1b0+nL5bAuw2FuGNmfutX4pcJpeoW/ZerRfBbNiYQsyyxoEmi5KB2w1hIGkhJc9msm/6S3n6nfgFYva9dW9NqVb/Gogu2W/gNpWbGh5uLEm67lUOOuC9EOBYyaoMWst5z2cV6v2DIzUDVGW0r/xC/JHM5YlfWJn1NrDLEpxvaARdEl9aR3L1Xcjt+zGSKN8QBNYsJTV1PYKv5VgSrLwIG1yBghMpXCjwDdeFuqpNmv0mlqi9exxEHr5lgGOgHCuvWdKx7wbtr87c1ZoxUQtY1jdMT6rFBaRnpMHf5l9ZkWVzmFhZ8yFqMWx9qn1ImV8hVM+yn2NdJIl3i
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(39860400002)(376002)(346002)(366004)(136003)(396003)(451199021)(6486002)(54906003)(478600001)(8936002)(2616005)(316002)(6506007)(26005)(6512007)(66946007)(8676002)(6916009)(66476007)(186003)(4326008)(66556008)(41300700001)(5660300002)(2906002)(36756003)(38100700002)(86362001)(83380400001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?5PtofYXsO5xLQA/G8BHdRmcDYp+Y4MOdmGoOzdfTyEFTAivAqEvU5kc8AaxE?=
+ =?us-ascii?Q?171vdPN6y4GJ+8BDZBbTK5n7YpaHugy3+iwXuwcaVHZMhgZ0BB21W7IWAD78?=
+ =?us-ascii?Q?rCCjCj7OMdToEKf9A7SEVzVgvmwEnHiqs6hfWvW8oQ3fAmmmCV8S35Y7QlzY?=
+ =?us-ascii?Q?tuK4LhvIzIw9IpGmkUO1+m8WTg8cdu2T2WFbh9IGStVo6OCNIev3De0HnMOO?=
+ =?us-ascii?Q?ZkFKCQiVsQ0jjBMOoPpyG+FWQBM90hgG742gCrXQtpKXl8ZuLS9Iu9Fy/BzB?=
+ =?us-ascii?Q?gaGiulF74iDygs4JUOcKPDEtJbl1Vy4o/Qsrz17BfUKmOnJfBrtkqOQ+1SRn?=
+ =?us-ascii?Q?yGN1+ECRI5c8Y3yvzOiDN8SmB/xH3Dr/1Tr6T+2/tND+VMW+q30UOrCNZrvK?=
+ =?us-ascii?Q?GfHL7jwSBQLenLmq73hGe7ol6qe61QCh7/UNNrYeGqTstCGVr+CD6/EPHDlm?=
+ =?us-ascii?Q?zPvGqnMarL5zMBCJnorLhnHBzBMUO4P8xQOtHbH7Bk4TVVVFNG5twMdorbkT?=
+ =?us-ascii?Q?KCqvMJmlUa/aEExpWIWpUaydtsVc1sm8AHIvZjbuSOUQiYkhsvkW3Go9taXq?=
+ =?us-ascii?Q?N6g3aiTU+Jt/bUBo+Ug1/ld6KMEsc6uceDlnWV4Arnu0mKk31KodJJoVGi4Q?=
+ =?us-ascii?Q?nwopcelsVDaiLBbcrnCsoaFUHeEMhT07UERmcdw5vbxMCqEMxrIjKzUHukfk?=
+ =?us-ascii?Q?3hxYk8shs3dEPgeYQ7Dmp4kVlCGXtqL3aGCVWvuGn4EpPVGXxz7WL8OXsFDF?=
+ =?us-ascii?Q?nET/cW+lw/z4ASGjS98RkHHlZIOIXdw2U72PwewNdl8nmNaxkhAHUxrQD8wU?=
+ =?us-ascii?Q?r0kmpV3Wp/JzfESuMBGTcO89YOY+YSgr70LcqgSldKnr5tBEVSgSB+1XwkdM?=
+ =?us-ascii?Q?rKreqzk8CyaO+WLz/gVEUXaCbJcmwgDsu7xjmHl9rp8o1VbE2Cgs2Ha0aPe8?=
+ =?us-ascii?Q?GBNMcjGgWIfbrI9bjYZnlquDH4gZAwFAeFIUSpNeQomQzvv/iedp/Uh856vI?=
+ =?us-ascii?Q?kuQuAE8EaqHk0FIkJBY+HuW5v3/HK7DEyMhW6QPYvGU8MYjPXitmbD3r0UWe?=
+ =?us-ascii?Q?yBldnBSscK/OIbYHw9uGJfi7zZRJmrbIpbaYUCEib7IehQngyU/1+BoAHzoL?=
+ =?us-ascii?Q?O6pi3/D06cSoOYhpYrLUkPIafSwHpU9j390TNhuJk2aGYnSKwYcdti5Izxjn?=
+ =?us-ascii?Q?cIh49JpE2aQ7FYmZj5WRNtfrCDPSj03UUDTSipQ0qqGkEw68EJi5ZbgUJK1U?=
+ =?us-ascii?Q?sLObqd33HJ7LF23w9yU2LRjxs//O847Ah6H8Y/ufNfo2VLVNkC6MRSixyVOw?=
+ =?us-ascii?Q?lKnjIPXwDj8Jae+m8zgdp84Vm7M/Vz30+bf/pM7WVCbKgGdJY/zlWieeqvA+?=
+ =?us-ascii?Q?nT8ZAbllsUg5cJi6lGmCb63dkNcnBR7OqBDn9/RpxklOomykFbA72Ro14Y/c?=
+ =?us-ascii?Q?FDcyLW/cThZAdyp3SLr08Xw1PdJBYxbNb/PcRzUsyxm0GTlwwfXps6MkUgvG?=
+ =?us-ascii?Q?hIYotX3XquJfJv9ewZxiM5Se8RoaI8w8zeT2GJ9jTLA3ppvrh0aI03q9uaJ+?=
+ =?us-ascii?Q?AK7Z+pzQZ90fP36ElZMa7ARq07yJYSM6h9N1YbBV?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: fd84878c-0989-4716-2182-08db2f80f838
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Mar 2023 11:38:37.1679
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: D4Gh0pIBDIWbWhEe7EpB5/y9yeIUbxvXmiCjwrI14n+WOjLncwjJ26zXdJyuIUOV
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5144
+X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
         autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -97,67 +123,54 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Tue, Mar 28, 2023 at 02:32:22AM +0000, Tian, Kevin wrote:
+> > From: Jason Gunthorpe <jgg@nvidia.com>
+> > Sent: Friday, March 24, 2023 11:03 PM
+> > 
+> > On Fri, Mar 24, 2023 at 01:37:51AM +0000, Tian, Kevin wrote:
+> > 
+> > > If vfio races attach/detach then lots of things are messed.
+> > >
+> > > e.g. iommufd_device_detach() directly calls list_del(&idev->group_item)
+> > > w/o checking whether the device has been attached.
+> > 
+> > Yeah, you obviously can't race attach/detach or detach/replace
+> > 
+> > > And with that race UAF could occur if we narrow down the lock scope
+> > > to iommufd_hw_pagetable_attach():
+> > >
+> > >               cpu0                                cpu1
+> > > vfio_iommufd_attach()
+> > >   iommufd_device_attach()
+> > >     iommufd_device_auto_get_domain()
+> > >       mutex_lock(&ioas->mutex);
+> > >       iommufd_hw_pagetable_alloc()
+> > >         hwpt = iommufd_object_alloc() //hwpt.users=1
+> > >         hwpt->domain = iommu_domain_alloc(idev->dev->bus);
+> > >         iommufd_hw_pagetable_attach() //hwpt.users=2
+> > >                                           vfio_iommufd_detach()
+> > >                                             iommufd_device_detach()
+> > >                                               mutex_lock(&idev->igroup->lock);
+> > >                                               hwpt = iommufd_hw_pagetable_detach()
+> > >                                               mutex_unlock(&idev->igroup->lock);
+> > >                                               iommufd_hw_pagetable_put(hwpt)
+> > >                                                 iommufd_object_destroy_user(hwpt)
+> > //hwpt.users=0
+> > >                                                   iommufd_hw_pagetable_destroy(hwpt)
+> > >                                                     iommu_domain_free(hwpt->domain);
+> > >         iopt_table_add_domain(&hwpt->ioas->iopt, hwpt->domain); //UAF
+> > 
+> > You didn't balance the refcounts properly, the cpu1 put will get to
+> > hwpt.users=1
+> > 
+> 
+> iommufd_object_destroy_user() decrements the count twice if the value
+> is two:
+> 
+> 	refcount_dec(&obj->users);
+> 	if (!refcount_dec_if_one(&obj->users)) {
 
-On 3/28/23 08:25, Nico Boehr wrote:
-> Quoting Pierre Morel (2023-03-27 14:38:35)
->>> [...]
+Ohh, it isn't allowed to call iommufd_object_destroy_user() until
+finalize has passed..
 
-
-[...]
-
-
->> If a topology level always exist physically and if it is not specified
->> on the QEMU command line it is implicitly unique.
-> What do you mean by 'implicitly unique'?
-
-I mean that if the topology level is not explicitly specified on the 
-command line, it exists a single entity of this topology level.
-
-
->
->> OK for expected_topo_lvl if you prefer.
-> Yes, please.
->
->>> [...]
->>>> +/*
->>>> + * stsi_check_mag
->>>> + * @info: Pointer to the stsi information
->>>> + *
->>>> + * MAG field should match the architecture defined containers
->>>> + * when MNEST as returned by SCLP matches MNEST of the SYSIB.
->>>> + */
->>>> +static void stsi_check_mag(struct sysinfo_15_1_x *info)
->>>> +{
->>>> +       int i;
->>>> +
->>>> +       report_prefix_push("MAG");
->>>> +
->>>> +       stsi_check_maxcpus(info);
->>>> +
->>>> +       /* Explicitly skip the test if both mnest do not match */
->>>> +       if (max_nested_lvl != info->mnest)
->>>> +               goto done;
->>> What does it mean if the two don't match, i.e. is this an error? Or a skip? Or is it just expected?
->> I have no information on the representation of the MAG fields for a
->> SYSIB with a nested level different than the maximum nested level.
->>
->> There are examples in the documentation but I did not find, and did not
->> get a clear answer, on how the MAG field are calculated.
->>
->> The examples seems clear for info->mnest between MNEST -1 and 3 but the
->> explication I had on info->mnest = 2 is not to be found in any
->> documentation.
->>
->> Until it is specified in a documentation I skip all these tests.
-> Alright - then please:
-> - update the comment to say:
->    "It is not clear how the MAG fields are calculated when mnest in the SYSIB 15.x is different from the maximum nested level in the SCLP info, so we skip here for now."
-> - when this is the case, do a report_skip() and show info->mnest and max_nested_lvl in the message.
-
-
-OK, thanks.
-
-Regards,
-
-Pierre
-
+Jason
