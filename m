@@ -2,63 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 956296CC8FC
-	for <lists+kvm@lfdr.de>; Tue, 28 Mar 2023 19:17:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 21BF16CC8FB
+	for <lists+kvm@lfdr.de>; Tue, 28 Mar 2023 19:17:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230048AbjC1RRV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Mar 2023 13:17:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57896 "EHLO
+        id S229844AbjC1RRM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Mar 2023 13:17:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57764 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229874AbjC1RRS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Mar 2023 13:17:18 -0400
-Received: from mail-yb1-xb2f.google.com (mail-yb1-xb2f.google.com [IPv6:2607:f8b0:4864:20::b2f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16AA8B44C
-        for <kvm@vger.kernel.org>; Tue, 28 Mar 2023 10:17:17 -0700 (PDT)
-Received: by mail-yb1-xb2f.google.com with SMTP id n125so16006954ybg.7
-        for <kvm@vger.kernel.org>; Tue, 28 Mar 2023 10:17:17 -0700 (PDT)
+        with ESMTP id S229606AbjC1RRL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Mar 2023 13:17:11 -0400
+Received: from mail-oi1-x229.google.com (mail-oi1-x229.google.com [IPv6:2607:f8b0:4864:20::229])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 212259750
+        for <kvm@vger.kernel.org>; Tue, 28 Mar 2023 10:17:10 -0700 (PDT)
+Received: by mail-oi1-x229.google.com with SMTP id s8so9524790ois.2
+        for <kvm@vger.kernel.org>; Tue, 28 Mar 2023 10:17:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1680023836;
+        d=google.com; s=20210112; t=1680023829;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=dQnHU1M/MPboqyRKv1gTRYT/ZtZXQpcppYft9PMstwU=;
-        b=humGhO7LERdMZlcUrHW8NTZcBX3+1mOSPyZahqWh+rFkHIvm/HPQXiX7KJiXUDIlh3
-         gfZCfDW7E7wHUB4lqAJAhmQ5bYrMdFG3rD4AacVBv1L6Kan0KhIKuOgQ7FYcuHThUK8j
-         iERdJa2qgc9UapONyWfdVzQfA8Q52B5ky/o1sA2gZeBX9Mu81tFd6z7P6He0fvdr+MHV
-         d6s7rpXaGeBoEPbnfj9S/awZ3qYvtyXsmeQs2nfUBWgAVeXGH18zo/EJ9PjhsrD/fRVU
-         i1odoyFYu2HThc76oPSGUvkeDk82LmXexJh66vS7XuR5oXzkHGpDB1FoaHOx9UcxCx7m
-         4ziA==
+        bh=Evknxft0Ac0XGVBnsLo9FvaXJTOaQEI6guzSeaj2WBA=;
+        b=s1aX/DxTJvPElnOn9pz6EToPibV0RWdA7GsBBAxwesEG2y7sHJL4/1Wtw8LCOUxL2R
+         D0ZTZW4dW0okqngtsZsVtfhkqS4x7bscuOgnhIoEdDdxJ9BXk5JMt6sBwW1O+/abmlj7
+         0i7swLG9Mqee1rBj7Lm0tlkyq/FfWaNxqn0sYT8armIzSZt2oXSzoj0SKp8rpN69IVg5
+         REs9YcOlTYTuq6jfWYPyJGgVb1L5j1XEwYpJcMfg9MCLfr27fukneCc8ZoeUlZY2Chc9
+         KYJgeKG4oyQWHSAJ+ppYcuICuCRmZlTsSeOJRwee3u0RFRt56k5CSEGk+ptADQvgdaNU
+         ChLg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680023836;
+        d=1e100.net; s=20210112; t=1680023829;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=dQnHU1M/MPboqyRKv1gTRYT/ZtZXQpcppYft9PMstwU=;
-        b=tVtxyPboxqeHQdx0AJv87dI1l5mt0AwQN558NBVzrEU9uNdCctNzC8cIhf3Z6+n8Nl
-         JtI3HmAC8JZWyXTE2jlxB6n1FDB6/GDPen2Sqt0pn8iXGQRdfdTRUw3K2DL1dql3GIK/
-         vtDh8b+wPlaF/D526H/XJj/gfNvhsTFsKCgBrJfsQpy8L8LiOISgcpHDY8nIt3snjwZJ
-         z0RKxTPXzC335Q/bfLMJvJXzUAd9xzjXxuM7LRMLPeUUaOmv37Kvg7H4QWfECyKgl2eQ
-         JOVyov6VN4tgK1JNiHbalhTQWm6ijJ5LT64IyqlkJYrAh59Ho0DPZuPYL3Uxkz+aRuks
-         S8aw==
-X-Gm-Message-State: AAQBX9dbTpp9FEFvU8Ou1D3FRnxFli/rKVuJZAObGyQVBGhNQaKMTmhB
-        7igHAd8bzmflECiGBMRs1JTZ4CBzClrLeqsyx02+Hg==
-X-Google-Smtp-Source: AKy350YTzRLa29aH7q9brLMmTyorYZNQRmkiMJPcWBgHbxwacVxOEg+NP1P2diLGGLrCZIprxNz2cE9YVVP/CpzaDLk=
-X-Received: by 2002:a05:6902:100a:b0:b76:3e1:c42d with SMTP id
- w10-20020a056902100a00b00b7603e1c42dmr10629624ybt.13.1680023836016; Tue, 28
- Mar 2023 10:17:16 -0700 (PDT)
+        bh=Evknxft0Ac0XGVBnsLo9FvaXJTOaQEI6guzSeaj2WBA=;
+        b=UudhVSY5dtZab5usuI1qt9PMwVa97dUSfTH4Ankdy9IRYX/hutm1uyt+mbW4CAkvxN
+         3A0gGezs6oYBCT8Aj8yZ3S3sRxTvrU7JxZy0VWz25+X+n6v091cuFEEeJaDU//Y+rDyn
+         MEfah8HRNNNLVwYeTuyCOToCMr5J4rMd+idGWFymV/X5dcem1jT5sCTv+pAeZACzRncf
+         B0mLRad/wEjInwmtrTg+v/WTacLpX/6WKaOrGIItLOSI1IfMi0yISgDBJ/pyvZdc5n4v
+         FR5jH535/IV1hZEL2fzOsoDEKUG3LZerZGIt2vo/516UP2iqI6TYYBMLeBOfn9pwWCMb
+         m7TA==
+X-Gm-Message-State: AO0yUKV3E17AwqmZKvt6DuUwMRHbCul30jYe51Jx77ThOaKwpeAFIJ7+
+        O6AJ9EqEWH4ou13kT8Weovx0t8xdNQGYOJ4G+XTEGEMf0L2iXZVGUiY=
+X-Google-Smtp-Source: AK7set/5LtuzR9X3f7/tCH+Z2PqUWuzCeLTFc2SOYR0NzB1M+A1DDESzJA7birpgAvEbzEsq2rj5DT3283FnI/p1htQ=
+X-Received: by 2002:a54:4019:0:b0:386:a2d0:2814 with SMTP id
+ x25-20020a544019000000b00386a2d02814mr9035915oie.4.1680023829187; Tue, 28 Mar
+ 2023 10:17:09 -0700 (PDT)
 MIME-Version: 1.0
-References: <20230306224127.1689967-1-vipinsh@google.com> <20230306224127.1689967-14-vipinsh@google.com>
- <ZBzRYgC0IWiZy7PI@google.com>
-In-Reply-To: <ZBzRYgC0IWiZy7PI@google.com>
-From:   Vipin Sharma <vipinsh@google.com>
-Date:   Tue, 28 Mar 2023 10:16:40 -0700
-Message-ID: <CAHVum0duECXZQuk52FqckSY4yLxntSyRXLVMShH+UDtw0SfrZw@mail.gmail.com>
-Subject: Re: [Patch v4 13/18] KVM: mmu: Add common initialization logic for
- struct kvm_mmu_memory_cache{}
-To:     David Matlack <dmatlack@google.com>
-Cc:     seanjc@google.com, pbonzini@redhat.com, bgardon@google.com,
-        jmattson@google.com, mizhang@google.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
+References: <20230317050637.766317-1-jingzhangos@google.com>
+ <20230317050637.766317-2-jingzhangos@google.com> <86355qy00k.wl-maz@kernel.org>
+In-Reply-To: <86355qy00k.wl-maz@kernel.org>
+From:   Jing Zhang <jingzhangos@google.com>
+Date:   Tue, 28 Mar 2023 10:16:57 -0700
+Message-ID: <CAAdAUtgFs_SmTqcCHMzCx-9og9L58+vvrMfKaE8m-CoLiupL1Q@mail.gmail.com>
+Subject: Re: [PATCH v4 1/6] KVM: arm64: Move CPU ID feature registers
+ emulation into a separate file
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>,
+        ARMLinux <linux-arm-kernel@lists.infradead.org>,
+        Oliver Upton <oupton@google.com>,
+        Will Deacon <will@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Fuad Tabba <tabba@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Raghavendra Rao Ananta <rananta@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-15.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
@@ -72,187 +81,294 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 23, 2023 at 3:23=E2=80=AFPM David Matlack <dmatlack@google.com>=
- wrote:
+Hi Marc,
+
+On Mon, Mar 27, 2023 at 3:14=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrote=
+:
 >
-> On Mon, Mar 06, 2023 at 02:41:22PM -0800, Vipin Sharma wrote:
-> > Add macros and function to make common logic for struct
-> > kvm_mmu_memory_cache{} declaration and initialization.
+> On Fri, 17 Mar 2023 05:06:32 +0000,
+> Jing Zhang <jingzhangos@google.com> wrote:
 > >
-> > Any user which wants different values in struct kvm_mmu_memory_cache{}
-> > will overwrite the default values explicitly after the initialization.
+> > Create a new file id_regs.c for CPU ID feature registers emulation code=
+,
+> > which are moved from sys_regs.c and tweak sys_regs code accordingly.
 > >
-> > Suggested-by: David Matlack <dmatlack@google.com>
-> > Signed-off-by: Vipin Sharma <vipinsh@google.com>
+> > No functional change intended.
+> >
+> > Signed-off-by: Jing Zhang <jingzhangos@google.com>
 > > ---
-> >  arch/arm64/kvm/arm.c      |  1 +
-> >  arch/arm64/kvm/mmu.c      |  3 ++-
-> >  arch/riscv/kvm/mmu.c      |  9 +++++----
-> >  arch/riscv/kvm/vcpu.c     |  1 +
+> >  arch/arm64/kvm/Makefile   |   2 +-
+> >  arch/arm64/kvm/id_regs.c  | 506 ++++++++++++++++++++++++++++++++++++++
+> >  arch/arm64/kvm/sys_regs.c | 464 ++--------------------------------
+> >  arch/arm64/kvm/sys_regs.h |  41 +++
+> >  4 files changed, 575 insertions(+), 438 deletions(-)
+> >  create mode 100644 arch/arm64/kvm/id_regs.c
+> >
+> > diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
+> > index c0c050e53157..a6a315fcd81e 100644
+> > --- a/arch/arm64/kvm/Makefile
+> > +++ b/arch/arm64/kvm/Makefile
+> > @@ -13,7 +13,7 @@ obj-$(CONFIG_KVM) +=3D hyp/
+> >  kvm-y +=3D arm.o mmu.o mmio.o psci.o hypercalls.o pvtime.o \
+> >        inject_fault.o va_layout.o handle_exit.o \
+> >        guest.o debug.o reset.o sys_regs.o stacktrace.o \
+> > -      vgic-sys-reg-v3.o fpsimd.o pkvm.o \
+> > +      vgic-sys-reg-v3.o fpsimd.o pkvm.o id_regs.o \
+> >        arch_timer.o trng.o vmid.o emulate-nested.o nested.o \
+> >        vgic/vgic.o vgic/vgic-init.o \
+> >        vgic/vgic-irqfd.o vgic/vgic-v2.o \
+> > diff --git a/arch/arm64/kvm/id_regs.c b/arch/arm64/kvm/id_regs.c
+> > new file mode 100644
+> > index 000000000000..08b738852955
+> > --- /dev/null
+> > +++ b/arch/arm64/kvm/id_regs.c
 >
-> MIPS also has cache (git grep "struct kvm_mmu_memory_cache").
+> [...]
 >
-
-I will respond in Patch 15 where I added stuff for MIPS.
-
-> >  arch/x86/kvm/mmu/mmu.c    |  8 ++++++++
-> >  include/linux/kvm_types.h | 10 ++++++++++
-> >  6 files changed, 27 insertions(+), 5 deletions(-)
-> >
-> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> > index 3bd732eaf087..2b3d88e4ace8 100644
-> > --- a/arch/arm64/kvm/arm.c
-> > +++ b/arch/arm64/kvm/arm.c
-> > @@ -330,6 +330,7 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
-> >       vcpu->arch.target =3D -1;
-> >       bitmap_zero(vcpu->arch.features, KVM_VCPU_MAX_FEATURES);
-> >
-> > +     INIT_KVM_MMU_MEMORY_CACHE(&vcpu->arch.mmu_page_cache);
-> >       vcpu->arch.mmu_page_cache.gfp_zero =3D __GFP_ZERO;
-> >
-> >       /*
-> > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> > index 7113587222ff..8a56f071ca66 100644
-> > --- a/arch/arm64/kvm/mmu.c
-> > +++ b/arch/arm64/kvm/mmu.c
-> > @@ -895,7 +895,7 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_add=
-r_t guest_ipa,
-> >  {
-> >       phys_addr_t addr;
-> >       int ret =3D 0;
-> > -     struct kvm_mmu_memory_cache cache =3D { .gfp_zero =3D __GFP_ZERO =
-};
-> > +     KVM_MMU_MEMORY_CACHE(cache);
->
-> nit: DEFINE_KVM_MMU_MEMORY_CACHE()
->
-> (Based on similar existing macros in the kernel, e.g. DEFINE_MUTEX(),
-> DEFINE_TIMER().)
->
-
-I will update in v5.
-
-> >       struct kvm_pgtable *pgt =3D kvm->arch.mmu.pgt;
-> >       enum kvm_pgtable_prot prot =3D KVM_PGTABLE_PROT_DEVICE |
-> >                                    KVM_PGTABLE_PROT_R |
-> > @@ -904,6 +904,7 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_add=
-r_t guest_ipa,
-> >       if (is_protected_kvm_enabled())
-> >               return -EPERM;
-> >
-> > +     cache.gfp_zero =3D __GFP_ZERO;
-> >       size +=3D offset_in_page(guest_ipa);
-> >       guest_ipa &=3D PAGE_MASK;
-> >
-> > diff --git a/arch/riscv/kvm/mmu.c b/arch/riscv/kvm/mmu.c
-> > index 78211aed36fa..bdd8c17958dd 100644
-> > --- a/arch/riscv/kvm/mmu.c
-> > +++ b/arch/riscv/kvm/mmu.c
-> > @@ -351,10 +351,11 @@ int kvm_riscv_gstage_ioremap(struct kvm *kvm, gpa=
-_t gpa,
-> >       int ret =3D 0;
-> >       unsigned long pfn;
-> >       phys_addr_t addr, end;
-> > -     struct kvm_mmu_memory_cache pcache =3D {
-> > -             .gfp_custom =3D (in_atomic) ? GFP_ATOMIC | __GFP_ACCOUNT =
-: 0,
-> > -             .gfp_zero =3D __GFP_ZERO,
-> > -     };
-> > +     KVM_MMU_MEMORY_CACHE(pcache);
-> > +
-> > +     pcache.gfp_zero =3D __GFP_ZERO;
-> > +     if (in_atomic)
-> > +             pcache.gfp_custom =3D GFP_ATOMIC | __GFP_ACCOUNT;
-> >
-> >       end =3D (gpa + size + PAGE_SIZE - 1) & PAGE_MASK;
-> >       pfn =3D __phys_to_pfn(hpa);
-> > diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
-> > index 7d010b0be54e..bc743e9122d1 100644
-> > --- a/arch/riscv/kvm/vcpu.c
-> > +++ b/arch/riscv/kvm/vcpu.c
-> > @@ -163,6 +163,7 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
-> >
-> >       /* Mark this VCPU never ran */
-> >       vcpu->arch.ran_atleast_once =3D false;
-> > +     INIT_KVM_MMU_MEMORY_CACHE(&vcpu->arch.mmu_page_cache);
-> >       vcpu->arch.mmu_page_cache.gfp_zero =3D __GFP_ZERO;
-> >       bitmap_zero(vcpu->arch.isa, RISCV_ISA_EXT_MAX);
-> >
-> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> > index a4bf2e433030..b706087ef74e 100644
-> > --- a/arch/x86/kvm/mmu/mmu.c
-> > +++ b/arch/x86/kvm/mmu/mmu.c
-> > @@ -5961,15 +5961,20 @@ int kvm_mmu_create(struct kvm_vcpu *vcpu)
-> >  {
-> >       int ret;
-> >
-> > +     INIT_KVM_MMU_MEMORY_CACHE(&vcpu->arch.mmu_pte_list_desc_cache);
-> >       vcpu->arch.mmu_pte_list_desc_cache.kmem_cache =3D pte_list_desc_c=
-ache;
-> >       vcpu->arch.mmu_pte_list_desc_cache.gfp_zero =3D __GFP_ZERO;
-> >
-> > +     INIT_KVM_MMU_MEMORY_CACHE(&vcpu->arch.mmu_page_header_cache);
-> >       vcpu->arch.mmu_page_header_cache.kmem_cache =3D mmu_page_header_c=
-ache;
-> >       vcpu->arch.mmu_page_header_cache.gfp_zero =3D __GFP_ZERO;
-> >
-> > +     INIT_KVM_MMU_MEMORY_CACHE(&vcpu->arch.mmu_shadow_page_cache);
-> >       vcpu->arch.mmu_shadow_page_cache.gfp_zero =3D __GFP_ZERO;
-> >       mutex_init(&vcpu->arch.mmu_shadow_page_cache_lock);
-> >
-> > +     INIT_KVM_MMU_MEMORY_CACHE(&vcpu->arch.mmu_shadowed_info_cache);
-> > +
-> >       vcpu->arch.mmu =3D &vcpu->arch.root_mmu;
-> >       vcpu->arch.walk_mmu =3D &vcpu->arch.root_mmu;
-> >
-> > @@ -6131,11 +6136,14 @@ int kvm_mmu_init_vm(struct kvm *kvm)
-> >       node->track_flush_slot =3D kvm_mmu_invalidate_zap_pages_in_memslo=
-t;
-> >       kvm_page_track_register_notifier(kvm, node);
-> >
-> > +     INIT_KVM_MMU_MEMORY_CACHE(&kvm->arch.split_page_header_cache);
-> >       kvm->arch.split_page_header_cache.kmem_cache =3D mmu_page_header_=
-cache;
-> >       kvm->arch.split_page_header_cache.gfp_zero =3D __GFP_ZERO;
-> >
-> > +     INIT_KVM_MMU_MEMORY_CACHE(&kvm->arch.split_shadow_page_cache);
-> >       kvm->arch.split_shadow_page_cache.gfp_zero =3D __GFP_ZERO;
-> >
-> > +     INIT_KVM_MMU_MEMORY_CACHE(&kvm->arch.split_desc_cache);
-> >       kvm->arch.split_desc_cache.kmem_cache =3D pte_list_desc_cache;
-> >       kvm->arch.split_desc_cache.gfp_zero =3D __GFP_ZERO;
-> >
-> > diff --git a/include/linux/kvm_types.h b/include/linux/kvm_types.h
-> > index 2728d49bbdf6..192516eeccac 100644
-> > --- a/include/linux/kvm_types.h
-> > +++ b/include/linux/kvm_types.h
-> > @@ -98,6 +98,16 @@ struct kvm_mmu_memory_cache {
-> >       int capacity;
-> >       void **objects;
-> >  };
-> > +
-> > +#define KVM_MMU_MEMORY_CACHE_INIT() { }
-> > +
-> > +#define KVM_MMU_MEMORY_CACHE(_name) \
-> > +             struct kvm_mmu_memory_cache _name =3D KVM_MMU_MEMORY_CACH=
-E_INIT()
->
-> nit: There's an extra tab here.
->
-
-Auto formatting is happy with two tabs only. I will update in the next
-version. Thanks for catching it.
-
-> > +
-> > +static inline void INIT_KVM_MMU_MEMORY_CACHE(struct kvm_mmu_memory_cac=
-he *cache)
+> > +/**
+> > + * emulate_id_reg - Emulate a guest access to an AArch64 CPU ID featur=
+e register
+> > + * @vcpu: The VCPU pointer
+> > + * @params: Decoded system register parameters
+> > + *
+> > + * Return: true if the ID register access was successful, false otherw=
+ise.
+> > + */
+> > +int emulate_id_reg(struct kvm_vcpu *vcpu, struct sys_reg_params *param=
+s)
 > > +{
-> > +     *cache =3D (struct kvm_mmu_memory_cache)KVM_MMU_MEMORY_CACHE_INIT=
-();
+> > +     const struct sys_reg_desc *r;
+> > +
+> > +     r =3D find_reg(params, id_reg_descs, ARRAY_SIZE(id_reg_descs));
+> > +
+> > +     if (likely(r)) {
+> > +             perform_access(vcpu, params, r);
+> > +     } else {
+> > +             print_sys_reg_msg(params,
+> > +                               "Unsupported guest id_reg access at: %l=
+x [%08lx]\n",
+> > +                               *vcpu_pc(vcpu), *vcpu_cpsr(vcpu));
+> > +             kvm_inject_undefined(vcpu);
+> > +     }
+> > +
+> > +     return 1;
 > > +}
-> >  #endif
+> > +
+> > +
+> > +void kvm_arm_reset_id_regs(struct kvm_vcpu *vcpu)
+> > +{
+> > +     unsigned long i;
+> > +
+> > +     for (i =3D 0; i < ARRAY_SIZE(id_reg_descs); i++)
+> > +             if (id_reg_descs[i].reset)
+> > +                     id_reg_descs[i].reset(vcpu, &id_reg_descs[i]);
+> > +}
+>
+> What does this mean? None of the idregs have a reset function, given
+> that they are global. Maybe this will make sense in the following
+> patches, but definitely not here.
+>
+You are right. It actually does nothing for idregs which have no reset func=
+tion.
+Will remove this.
+> > +
+> > +int kvm_arm_get_id_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg=
+ *reg)
+> > +{
+> > +     return kvm_sys_reg_get_user(vcpu, reg,
+> > +                                 id_reg_descs, ARRAY_SIZE(id_reg_descs=
+));
+> > +}
+> > +
+> > +int kvm_arm_set_id_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg=
+ *reg)
+> > +{
+> > +     return kvm_sys_reg_set_user(vcpu, reg,
+> > +                                 id_reg_descs, ARRAY_SIZE(id_reg_descs=
+));
+> > +}
+> > +
+> > +bool kvm_arm_check_idreg_table(void)
+> > +{
+> > +     return check_sysreg_table(id_reg_descs, ARRAY_SIZE(id_reg_descs),=
+ false);
+> > +}
+>
+> All these helpers are called from sys_regs.c and directly call back
+> into it. Why not simply have a helper that gets the base and size of
+> the array, and stick to pure common code?
+>
+As you know from the later patches in this series, a per VM idregs
+array and an idregs specific structure are used. All these functions
+would be implemented based on that.
+> > +
+> > +int kvm_arm_walk_id_regs(struct kvm_vcpu *vcpu, u64 __user *uind)
+> > +{
+> > +     const struct sys_reg_desc *i2, *end2;
+> > +     unsigned int total =3D 0;
+> > +     int err;
+> > +
+> > +     i2 =3D id_reg_descs;
+> > +     end2 =3D id_reg_descs + ARRAY_SIZE(id_reg_descs);
+> > +
+> > +     while (i2 !=3D end2) {
+> > +             err =3D walk_one_sys_reg(vcpu, i2++, &uind, &total);
+> > +             if (err)
+> > +                     return err;
+> > +     }
+> > +     return total;
+> > +}
+>
+> This is an exact copy of walk_sys_regs. Surely this can be made common
+> code.
+The reason for not using common code is the same as last comment. An
+idregs specific data structure would be used.
+>
+> [...]
+>
+> > @@ -2912,6 +2482,8 @@ void kvm_reset_sys_regs(struct kvm_vcpu *vcpu)
+> >  {
+> >       unsigned long i;
 > >
-> >  #define HALT_POLL_HIST_COUNT                 32
-> > --
-> > 2.40.0.rc0.216.gc4246ad0f0-goog
+> > +     kvm_arm_reset_id_regs(vcpu);
+> > +
+> >       for (i =3D 0; i < ARRAY_SIZE(sys_reg_descs); i++)
+> >               if (sys_reg_descs[i].reset)
+> >                       sys_reg_descs[i].reset(vcpu, &sys_reg_descs[i]);
+> > @@ -2932,6 +2504,9 @@ int kvm_handle_sys_reg(struct kvm_vcpu *vcpu)
+> >       params =3D esr_sys64_to_params(esr);
+> >       params.regval =3D vcpu_get_reg(vcpu, Rt);
 > >
+> > +     if (is_id_reg(reg_to_encoding(&params)))
+> > +             return emulate_id_reg(vcpu, &params);
+> > +
+> >       if (!emulate_sys_reg(vcpu, &params))
+> >               return 1;
+> >
+> > @@ -3160,6 +2735,10 @@ int kvm_arm_sys_reg_get_reg(struct kvm_vcpu *vcp=
+u, const struct kvm_one_reg *reg
+> >       if (err !=3D -ENOENT)
+> >               return err;
+> >
+> > +     err =3D kvm_arm_get_id_reg(vcpu, reg);
+>
+> Why not check for the encoding here? or in the helpers? It feels that
+> this is an overhead that would be easy to reduce, given that we have
+> fewer idregs than normal sysregs.
+Sure, will move the encoding check here.
+>
+> > +     if (err !=3D -ENOENT)
+> > +             return err;
+> > +
+> >       return kvm_sys_reg_get_user(vcpu, reg,
+> >                                   sys_reg_descs, ARRAY_SIZE(sys_reg_des=
+cs));
+> >  }
+> > @@ -3204,6 +2783,10 @@ int kvm_arm_sys_reg_set_reg(struct kvm_vcpu *vcp=
+u, const struct kvm_one_reg *reg
+> >       if (err !=3D -ENOENT)
+> >               return err;
+> >
+> > +     err =3D kvm_arm_set_id_reg(vcpu, reg);
+>
+> Same here.
+Agreed.
+>
+> > +     if (err !=3D -ENOENT)
+> > +             return err;
+> > +
+> >       return kvm_sys_reg_set_user(vcpu, reg,
+> >                                   sys_reg_descs, ARRAY_SIZE(sys_reg_des=
+cs));
+> >  }
+> > @@ -3250,10 +2833,10 @@ static bool copy_reg_to_user(const struct sys_r=
+eg_desc *reg, u64 __user **uind)
+> >       return true;
+> >  }
+> >
+> > -static int walk_one_sys_reg(const struct kvm_vcpu *vcpu,
+> > -                         const struct sys_reg_desc *rd,
+> > -                         u64 __user **uind,
+> > -                         unsigned int *total)
+> > +int walk_one_sys_reg(const struct kvm_vcpu *vcpu,
+> > +                  const struct sys_reg_desc *rd,
+> > +                  u64 __user **uind,
+> > +                  unsigned int *total)
+> >  {
+> >       /*
+> >        * Ignore registers we trap but don't save,
+> > @@ -3294,6 +2877,7 @@ unsigned long kvm_arm_num_sys_reg_descs(struct kv=
+m_vcpu *vcpu)
+> >  {
+> >       return ARRAY_SIZE(invariant_sys_regs)
+> >               + num_demux_regs()
+> > +             + kvm_arm_walk_id_regs(vcpu, (u64 __user *)NULL)
+> >               + walk_sys_regs(vcpu, (u64 __user *)NULL);
+> >  }
+> >
+> > @@ -3309,6 +2893,11 @@ int kvm_arm_copy_sys_reg_indices(struct kvm_vcpu=
+ *vcpu, u64 __user *uindices)
+> >               uindices++;
+> >       }
+> >
+> > +     err =3D kvm_arm_walk_id_regs(vcpu, uindices);
+> > +     if (err < 0)
+> > +             return err;
+> > +     uindices +=3D err;
+> > +
+> >       err =3D walk_sys_regs(vcpu, uindices);
+> >       if (err < 0)
+> >               return err;
+> > @@ -3323,6 +2912,7 @@ int __init kvm_sys_reg_table_init(void)
+> >       unsigned int i;
+> >
+> >       /* Make sure tables are unique and in order. */
+> > +     valid &=3D kvm_arm_check_idreg_table();
+> >       valid &=3D check_sysreg_table(sys_reg_descs, ARRAY_SIZE(sys_reg_d=
+escs), false);
+> >       valid &=3D check_sysreg_table(cp14_regs, ARRAY_SIZE(cp14_regs), t=
+rue);
+> >       valid &=3D check_sysreg_table(cp14_64_regs, ARRAY_SIZE(cp14_64_re=
+gs), true);
+> > diff --git a/arch/arm64/kvm/sys_regs.h b/arch/arm64/kvm/sys_regs.h
+> > index 6b11f2cc7146..ad41305348f7 100644
+> > --- a/arch/arm64/kvm/sys_regs.h
+> > +++ b/arch/arm64/kvm/sys_regs.h
+> > @@ -210,6 +210,35 @@ find_reg(const struct sys_reg_params *params, cons=
+t struct sys_reg_desc table[],
+> >       return __inline_bsearch((void *)pval, table, num, sizeof(table[0]=
+), match_sys_reg);
+> >  }
+> >
+> > +static inline unsigned int raz_visibility(const struct kvm_vcpu *vcpu,
+> > +                                       const struct sys_reg_desc *r)
+> > +{
+> > +     return REG_RAZ;
+> > +}
+>
+> No, please. This is used as a function pointer. You now potentially
+> force the compiler to emit as many copy of this as there are pointers.
+>
+Thanks, will fix this.
+> > +
+> > +static inline bool write_to_read_only(struct kvm_vcpu *vcpu,
+> > +                                   struct sys_reg_params *params,
+> > +                                   const struct sys_reg_desc *r)
+> > +{
+> > +     WARN_ONCE(1, "Unexpected sys_reg write to read-only register\n");
+> > +     print_sys_reg_instr(params);
+> > +     kvm_inject_undefined(vcpu);
+> > +     return false;
+> > +}
+>
+> Please make this common code, and not an inline function.
+Sure, will do.
+>
+> Thanks,
+>
+>         M.
+>
+> --
+> Without deviation from the norm, progress is not possible.
+Thanks,
+Jing
