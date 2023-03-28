@@ -2,203 +2,186 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E714C6CC85F
-	for <lists+kvm@lfdr.de>; Tue, 28 Mar 2023 18:48:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 899706CC8B4
+	for <lists+kvm@lfdr.de>; Tue, 28 Mar 2023 19:01:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230253AbjC1QsT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Mar 2023 12:48:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59188 "EHLO
+        id S231730AbjC1RBT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Mar 2023 13:01:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46716 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229861AbjC1QsR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Mar 2023 12:48:17 -0400
-Received: from mail-yb1-xb31.google.com (mail-yb1-xb31.google.com [IPv6:2607:f8b0:4864:20::b31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1604D61A8
-        for <kvm@vger.kernel.org>; Tue, 28 Mar 2023 09:48:16 -0700 (PDT)
-Received: by mail-yb1-xb31.google.com with SMTP id i7so15945667ybt.0
-        for <kvm@vger.kernel.org>; Tue, 28 Mar 2023 09:48:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1680022095;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hqjMvaLDfnVK/y/k0tCfZPzOD0WMWLp677CWGc7a374=;
-        b=XjAzXOf+OAujAkz7gfYD9bViHIA/QbQ9fEmMRBGih1etPRYe3XSRXx8jsEfsHq+Cc8
-         Lo6WN0cMuzrd7f03oONWR+iWbra8k2QOSOM8gtzuBzmpo8LSH38sCgqN99bCpd2OL9kd
-         Sfur1RxCgss2GoIXOY2oiiZVVk+jrkzn55G7fHYBFycKcekFx+FXzsti9M2u1anHE04N
-         6SuCO8jfie1AJRT+iz8A1GQ6mInDoVJOCrYDx4crSxbwnGbd8hUXxdGMOA3pfKxkytC/
-         +4GwwvNB9LQNo6IpTf5gWxgGsvjLoxPBDyHQrdmAWEywIRt23Ug1TI8MDvyoOwEJPz29
-         wb1g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680022095;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=hqjMvaLDfnVK/y/k0tCfZPzOD0WMWLp677CWGc7a374=;
-        b=2gi2MrErV2enZrr2R1nYfS1vUvU/LHgYPdEv5CHUTwlPH/1zJYoWZhPmSeEOndv/02
-         aI5WkmSGlRMTIgQA6Y0IRcqC8Q7phlqmYog8fuPm4MkhiGTX2Or0i/wyVTJSs6lPSfSY
-         EQuJPLE0f77g1GgOQFpoGMxGfRbfUQxNenY58UjLsix5JjA76G3tHcaqc7DAkH8aa7Sr
-         rFGNqrcXEcU1tia1sHYTDfL+5SdbiA/UGLjNrPDmDXLaSQJz8bQNp4smzBZasrn/hSF2
-         8n10KZFKjiDkTLGU11OJghC70z9SHroqGXx9kWiWLcZSaLqnFqAcKt00cBUXXw6Am3SX
-         MEJA==
-X-Gm-Message-State: AAQBX9cp5b0S6wHRoiCMiQ8pttc6+G84B/8qb45Yi8FK8f8MKOq/OD8+
-        Y3MX5TqacKSAHDxyGZ/94PWf2AFSEmyypYlxPdGE6Q==
-X-Google-Smtp-Source: AKy350bjSmjCodaksLx+hSuUtpW5oB+G2DqmMThD/W+KhVBLprn2VUun8xaj/BSYCiPWYx2j+YNCZlePSB5YhiMnkj0=
-X-Received: by 2002:a05:6902:102b:b0:b6c:48c3:3c1c with SMTP id
- x11-20020a056902102b00b00b6c48c33c1cmr10837614ybt.13.1680022094777; Tue, 28
- Mar 2023 09:48:14 -0700 (PDT)
+        with ESMTP id S229806AbjC1RBR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Mar 2023 13:01:17 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 889A79ECF;
+        Tue, 28 Mar 2023 10:01:16 -0700 (PDT)
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 32SGuCj5020227;
+        Tue, 28 Mar 2023 17:01:15 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=ygXJ+bAfsvBTup8gyNESlCjdd9TB8mShFEv7UJPB6cs=;
+ b=bSvtnBREW4KbtDTfQvGog6unLGSGub8cWElbL10usJYTCD13TTUVS30cVrWIx+UVMLVw
+ inHf7B/vD6MTBuMb6Zv//fMjdDtUu1CJqNVBCvcNcAu/h60zbc3uj9z/kNTsZDKrR8PL
+ UKY1MZx4KyxoxqO9/4RS7oKRvNC6olMBbVp9VWrDWzeM/Cv5y/iNxaHUtqRyo7w0mAJm
+ hDJpaU+bgW2wyNDgH6jsKGGddIwsl2lnJXk5R9GYxtHc7bDhytMhN7oeo0HBFcKfA1JE
+ BKdcjTHerk56iKuekKsDN5J8jGrqh6zqa/FX5VlW8VeQjKMljoLxZsRb2uhq7fz4PYvm iA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3pm46hr3dd-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 28 Mar 2023 17:01:15 +0000
+Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 32SGv4fA027040;
+        Tue, 28 Mar 2023 17:01:14 GMT
+Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3pm46hr3cj-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 28 Mar 2023 17:01:14 +0000
+Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
+        by ppma04fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 32S2TJLk017934;
+        Tue, 28 Mar 2023 17:01:13 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+        by ppma04fra.de.ibm.com (PPS) with ESMTPS id 3phrk6bjf6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 28 Mar 2023 17:01:13 +0000
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+        by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 32SH18XE14156510
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 28 Mar 2023 17:01:08 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 4AFE52006C;
+        Tue, 28 Mar 2023 17:01:08 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2130C2004F;
+        Tue, 28 Mar 2023 17:01:08 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.152.224.56])
+        by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Tue, 28 Mar 2023 17:01:08 +0000 (GMT)
+Date:   Tue, 28 Mar 2023 19:01:06 +0200
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Nico Boehr <nrb@linux.ibm.com>
+Cc:     frankja@linux.ibm.com, thuth@redhat.com, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org
+Subject: Re: [kvm-unit-tests PATCH v1 3/4] s390x: lib: sie: don't reenter
+ SIE on pgm int
+Message-ID: <20230328190106.6ea977ee@p-imbrenda>
+In-Reply-To: <20230327082118.2177-4-nrb@linux.ibm.com>
+References: <20230327082118.2177-1-nrb@linux.ibm.com>
+        <20230327082118.2177-4-nrb@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-References: <20230306224127.1689967-1-vipinsh@google.com> <20230306224127.1689967-12-vipinsh@google.com>
- <ZBzL1Awe7S00dPUP@google.com>
-In-Reply-To: <ZBzL1Awe7S00dPUP@google.com>
-From:   Vipin Sharma <vipinsh@google.com>
-Date:   Tue, 28 Mar 2023 09:47:38 -0700
-Message-ID: <CAHVum0c7pLnYYHhzPPQSbSb1NoeW9hBbidd9i8fHSEazPaSJbA@mail.gmail.com>
-Subject: Re: [Patch v4 11/18] KVM: x86/mmu: Add documentation of NUMA aware
- page table capability
-To:     David Matlack <dmatlack@google.com>
-Cc:     seanjc@google.com, pbonzini@redhat.com, bgardon@google.com,
-        jmattson@google.com, mizhang@google.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-15.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,ENV_AND_HDR_SPF_MATCH,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL,
-        USER_IN_DEF_SPF_WL autolearn=unavailable autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: PYmeCd2TmhPicG5QheN4hWL0qjsmN7Fk
+X-Proofpoint-ORIG-GUID: _GJEKbynsSrKKiPeF5o810MxIBgdjyFY
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
+ definitions=2023-03-24_11,2023-03-28_02,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 malwarescore=0
+ clxscore=1015 mlxlogscore=999 priorityscore=1501 mlxscore=0 spamscore=0
+ impostorscore=0 lowpriorityscore=0 bulkscore=0 adultscore=0 suspectscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2303200000
+ definitions=main-2303280130
+X-Spam-Status: No, score=-0.1 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
+        DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 23, 2023 at 2:59=E2=80=AFPM David Matlack <dmatlack@google.com>=
- wrote:
->
-> On Mon, Mar 06, 2023 at 02:41:20PM -0800, Vipin Sharma wrote:
-> > Add documentation for KVM_CAP_NUMA_AWARE_PAGE_TABLE capability and
-> > explain why it is needed.
-> >
-> > Signed-off-by: Vipin Sharma <vipinsh@google.com>
-> > ---
-> >  Documentation/virt/kvm/api.rst | 29 +++++++++++++++++++++++++++++
-> >  1 file changed, 29 insertions(+)
-> >
-> > diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/ap=
-i.rst
-> > index 62de0768d6aa..7e3a1299ca8e 100644
-> > --- a/Documentation/virt/kvm/api.rst
-> > +++ b/Documentation/virt/kvm/api.rst
-> > @@ -7669,6 +7669,35 @@ This capability is aimed to mitigate the threat =
-that malicious VMs can
-> >  cause CPU stuck (due to event windows don't open up) and make the CPU
-> >  unavailable to host or other VMs.
-> >
-> > +7.34 KVM_CAP_NUMA_AWARE_PAGE_TABLE
-> > +------------------------------
-> > +
-> > +:Architectures: x86
-> > +:Target: VM
-> > +:Returns: 0 on success, -EINVAL if vCPUs are already created.
-> > +
-> > +This capability allows userspace to enable NUMA aware page tables allo=
-cations.
->
-> Call out that this capability overrides task mempolicies. e.g.
->
->   This capability causes KVM to use a custom NUMA memory policy when
->   allocating page tables. Specifically, KVM will attempt to co-locate
->   page tables pages with the memory that they map, rather than following
->   the mempolicy of the current task.
->
-> > +NUMA aware page tables are disabled by default. Once enabled, prior to=
- vCPU
-> > +creation, any page table allocated during the life of a VM will be all=
-ocated
->
-> The "prior to vCPU creation" part here is confusing because it sounds
-> like you're talking about any page tables allocated before vCPU
-> creation. Just delete that part and put it in a separate paragraph.
->
->  KVM_CAP_NUMA_AWARE_PAGE_TABLE must be enabled before any vCPU is
->  created, otherwise KVM will return -EINVAL.
->
-> > +preferably from the NUMA node of the leaf page.
-> > +
-> > +Without this capability, default feature is to use current thread memp=
-olicy and
->
-> s/default feature is to/KVM will/
->
-> > +allocate page table based on that.
->
-> s/and allocate page table based on that./to allocate page tables./
->
-> > +
-> > +This capability is useful to improve page accesses by a guest. For exa=
-mple, an
->
-> nit: Be more specific about how.
->
->  This capability aims to minimize the cost of TLB misses when a vCPU is
->  accessing NUMA-local memory, by reducing the number of remote memory
->  accesses needed to walk KVM's page tables.
->
-> > +initialization thread which access lots of remote memory and ends up c=
-reating
-> > +page tables on local NUMA node, or some service thread allocates memor=
-y on
-> > +remote NUMA nodes and later worker/background threads accessing that m=
-emory
-> > +will end up accessing remote NUMA node page tables.
->
-> It's not clear if these examples are talking about what happens when
-> KVM_CAP_NUMA_AWARE_PAGE_TABLE is enabled or disabled.
->
-> Also it's important to distinguish virtual NUMA nodes from physical NUMA
-> nodes and where these "threads" are running. How about this:
->
->  For example, when KVM_CAP_NUMA_AWARE_PAGE_TABLE is disabled and a vCPU
->  accesses memory on a remote NUMA node and triggers a KVM page fault,
->  KVM will allocate page tables to handle that fault on the node where
->  the vCPU is running rather than the node where the memory is allocated.
->  When KVM_CAP_NUMA_AWARE_PAGE_TABLE is enabled, KVM will allocate the
->  page tables on the node where the memory is located.
->
->  This is intended to be used in VM configurations that properly
->  virtualize NUMA. i.e. VMs with one or more virtual NUMA nodes, each of
->  which is mapped to a physical NUMA node. With this capability enabled
->  on such VMs, any guest memory access to virtually-local memory will be
->  translated through mostly[*] physically-local page tables, regardless
->  of how the memory was faulted in.
->
->  [*] KVM will fallback to allocating from remote NUMA nodes if the
->  preferred node is out of memory. Also, in VMs with 2 or more NUMA
->  nodes, higher level page tables will necessarily map memory across
->  multiple physical nodes.
->
-> > So, a multi NUMA node
-> > +guest, can with high confidence access local memory faster instead of =
-going
-> > +through remote page tables first.
-> > +
-> > +This capability is also helpful for host to reduce live migration impa=
-ct when
-> > +splitting huge pages during dirty log operations. If the thread splitt=
-ing huge
-> > +page is on remote NUMA node it will create page tables on remote node.=
- Even if
-> > +guest is careful in making sure that it only access local memory they =
-will end
-> > +up accessing remote page tables.
->
-> Please also cover the limitations of this feature:
->
->  - Impact on remote memory accesses (more expensive).
->  - How KVM handles NUMA node exhaustion.
->  - How high-level page tables can span multiple nodes.
->  - What KVM does if it can't determine the NUMA node of the pfn.
->  - What KVM does for faults on GPAs that aren't backed by a pfn.
->
+On Mon, 27 Mar 2023 10:21:17 +0200
+Nico Boehr <nrb@linux.ibm.com> wrote:
 
-Thanks for the suggestions, I will incorporate them in the next version.
+> At the moment, when a PGM int occurs while in SIE, we will just reenter
+> SIE after the interrupt handler was called.
+> 
+> This is because sie() has a loop which checks icptcode and re-enters SIE
+> if it is zero.
+> 
+> However, this behaviour is quite undesirable for SIE tests, since it
+> doesn't give the host the chance to assert on the PGM int. Instead, we
+> will just re-enter SIE, on nullifing conditions even causing the
+> exception again.
+> 
+> Add a flag PROG_PGM_IN_SIE set by the pgm int fixup which indicates a
+> program interrupt has occured in SIE. Check for the flag in sie() and if
+> it's set return from sie() to give the host the ability to react on the
+> exception. The host may check if a PGM int has occured in the guest
+> using the new function sie_had_pgm_int().
+> 
+> Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
+> ---
+>  lib/s390x/interrupt.c |  6 ++++++
+>  lib/s390x/sie.c       | 10 +++++++++-
+>  lib/s390x/sie.h       |  1 +
+>  3 files changed, 16 insertions(+), 1 deletion(-)
+> 
+> diff --git a/lib/s390x/interrupt.c b/lib/s390x/interrupt.c
+> index eb3d6a9b701d..9baf7a003f52 100644
+> --- a/lib/s390x/interrupt.c
+> +++ b/lib/s390x/interrupt.c
+> @@ -106,10 +106,16 @@ void register_ext_cleanup_func(void (*f)(struct stack_frame_int *))
+>  
+>  static void fixup_pgm_int(struct stack_frame_int *stack)
+>  {
+> +	struct kvm_s390_sie_block *sblk;
+> +
+>  	/* If we have an error on SIE we directly move to sie_exit */
+>  	if (lowcore.pgm_old_psw.addr >= (uint64_t)&sie_entry &&
+>  	    lowcore.pgm_old_psw.addr <= (uint64_t)&sie_exit) {
+>  		lowcore.pgm_old_psw.addr = (uint64_t)&sie_exit;
+> +
+> +		/* set a marker in sie_block that a PGM int occured */
+> +		sblk = *((struct kvm_s390_sie_block **)(stack->grs0[13] + __SF_SIE_CONTROL));
+> +		sblk->prog0c |= PROG_PGM_IN_SIE;
+>  		return;
+>  	}
+>  
+> diff --git a/lib/s390x/sie.c b/lib/s390x/sie.c
+> index 22141ded1a90..5e9ae7115c47 100644
+> --- a/lib/s390x/sie.c
+> +++ b/lib/s390x/sie.c
+> @@ -44,6 +44,11 @@ void sie_handle_validity(struct vm *vm)
+>  	vm->validity_expected = false;
+>  }
+>  
+> +bool sie_had_pgm_int(struct vm *vm)
+> +{
+> +	return vm->sblk->prog0c & PROG_PGM_IN_SIE;
+> +}
+> +
+>  void sie(struct vm *vm)
+>  {
+>  	uint64_t old_cr13;
+> @@ -68,7 +73,10 @@ void sie(struct vm *vm)
+>  	lowcore.io_new_psw.mask |= PSW_MASK_DAT_HOME;
+>  	mb();
+>  
+> -	while (vm->sblk->icptcode == 0) {
+> +	/* clear PGM int marker, which might still be set */
+> +	vm->sblk->prog0c &= ~PROG_PGM_IN_SIE;
+> +
+> +	while (vm->sblk->icptcode == 0 && !sie_had_pgm_int(vm)) {
+>  		sie64a(vm->sblk, &vm->save_area);
+>  		sie_handle_validity(vm);
+>  	}
+> diff --git a/lib/s390x/sie.h b/lib/s390x/sie.h
+> index 0b00fb709776..8ab755dc9456 100644
+> --- a/lib/s390x/sie.h
+> +++ b/lib/s390x/sie.h
+> @@ -37,6 +37,7 @@ struct kvm_s390_sie_block {
+>  	uint32_t 	ibc : 12;
+>  	uint8_t		reserved08[4];		/* 0x0008 */
+>  #define PROG_IN_SIE (1<<0)
+> +#define PROG_PGM_IN_SIE (1<<1)
+
+please align the body of the macros with tabs, so they are more readable
+
+>  	uint32_t	prog0c;			/* 0x000c */
+>  union {
+>  		uint8_t	reserved10[16];		/* 0x0010 */
+
