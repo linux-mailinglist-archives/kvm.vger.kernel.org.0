@@ -2,130 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CEDCA6CBB28
-	for <lists+kvm@lfdr.de>; Tue, 28 Mar 2023 11:37:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 509886CBB44
+	for <lists+kvm@lfdr.de>; Tue, 28 Mar 2023 11:41:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232915AbjC1Jg6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Mar 2023 05:36:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44478 "EHLO
+        id S232697AbjC1Jki (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Mar 2023 05:40:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53358 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231561AbjC1Jgj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Mar 2023 05:36:39 -0400
-Received: from mx.sberdevices.ru (mx.sberdevices.ru [45.89.227.171])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39E9C7DA0;
-        Tue, 28 Mar 2023 02:35:41 -0700 (PDT)
-Received: from s-lin-edge02.sberdevices.ru (localhost [127.0.0.1])
-        by mx.sberdevices.ru (Postfix) with ESMTP id 2F2215FD0E;
-        Tue, 28 Mar 2023 12:35:38 +0300 (MSK)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
-        s=mail; t=1679996138;
-        bh=3PbLJXlMS03N1z+S8n5YYeRBHkPx2Jy2H4fazX9eSgM=;
-        h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-        b=l1n8TpPu/p6OJEkJNH6kOrwK+E/UeccbzVOc2ZMwO6mRYUox6066R3ViEh/LNc0mY
-         HCWM8AHxjGpnVvodnApWGoeNnrkKSOqC7KVtnTuA3Z7jUtkLS5iNZ1+ox99WxVtsOe
-         Z/n+wtlZJ5BsDr3ZI+0hvehBwIzxXYoTMMiuUoM7PkTUQ1BOx4to4ggxPLEElT9cy1
-         y0+1R597Il65L1Nvel8NhfFng3718nIVDqPXj6T2mZ/zlqRbXO4N0Xc2JvVE7dIyoI
-         DDYsvoO6mJE2+N7BDTNejUyrrHVq/LhpUm7dm0b8isySObpvetM/F/T2wAV3Xz7SrB
-         tva+dyucyWp2w==
-Received: from S-MS-EXCH01.sberdevices.ru (S-MS-EXCH01.sberdevices.ru [172.16.1.4])
-        by mx.sberdevices.ru (Postfix) with ESMTP;
-        Tue, 28 Mar 2023 12:35:34 +0300 (MSK)
-Message-ID: <d91ac5f0-1f47-58b3-d033-f492d0e17da7@sberdevices.ru>
-Date:   Tue, 28 Mar 2023 12:32:10 +0300
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
-Subject: Re: [RFC PATCH v2 2/3] virtio/vsock: WARN_ONCE() for invalid state of
- socket
-Content-Language: en-US
-To:     Stefano Garzarella <sgarzare@redhat.com>
-CC:     Stefan Hajnoczi <stefanha@redhat.com>,
+        with ESMTP id S232129AbjC1Jkb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Mar 2023 05:40:31 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95FE792
+        for <kvm@vger.kernel.org>; Tue, 28 Mar 2023 02:39:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1679996384;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=SwPWb91WcUx6K1IICpQUovViuiJcsfmj59FF6gVXRXI=;
+        b=AkiCWCRHUo+WggOBsd0IrS34XFABPTg5EpxpJEuJfmhxLX19Kst96uRbylnxVDR1j+cVFu
+        HjKzMXqboxUUOrw3uObtQ844IJnz53cKoenifrnxMDVbwrxzf4oNX/reOw+OzfrYl5UEjo
+        nQAeQdQdmdzr6pPxnPDpPVQ37NRg7EQ=
+Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
+ [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-25-oDE28EJsME21eXfpZxV6pQ-1; Tue, 28 Mar 2023 05:39:41 -0400
+X-MC-Unique: oDE28EJsME21eXfpZxV6pQ-1
+Received: by mail-qk1-f197.google.com with SMTP id t21-20020a37aa15000000b00746b7fae197so5321749qke.12
+        for <kvm@vger.kernel.org>; Tue, 28 Mar 2023 02:39:41 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1679996381;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=SwPWb91WcUx6K1IICpQUovViuiJcsfmj59FF6gVXRXI=;
+        b=UcUNG55z17SKB5UL1wayrVXT1hOCRP2EVC/zk97JDU7EUP5U0cWmjoQvyGjskJsT1/
+         anlJJYMBv8MfCgzXU95iIZexVp1BYsUG5bjIdhCVLbqWp50wPG3O5LbQp9LS9Mt1L8Ag
+         wSwNcrzW8Rwi4PtZ6e12xGMyrK3DwaGMnXdaicxJv9Q8ltEn1ZO670oaNK8J6iKTu5BF
+         c464S9x+QM+0gwlW5ShjUNAct9AK4v6ziRKNTWQkUMu0IYvxNSGdmEYTeRFDqZbsKs+q
+         vWMbwP4eID1PJw8hay8W1YsUorUeLZglwecx7VHdlN+wwfoSj1GvaCN/o8uCfCt5nxiv
+         x9Bg==
+X-Gm-Message-State: AAQBX9f/TNJ4D8cEC6loLGV+NgGxD6/b9iChEcXLQqB1fMOtHTrH73s4
+        yH3Rdq972ZeBK0Yv9ygQuPZe+abRRANV/8MONxaRehK8lJdr2H8WQ2LjG8w7ytAH4ykmKIL2Pam
+        XyLQKOpe9n8c9
+X-Received: by 2002:a05:6214:518b:b0:5bb:eefc:1623 with SMTP id kl11-20020a056214518b00b005bbeefc1623mr21401852qvb.42.1679996381320;
+        Tue, 28 Mar 2023 02:39:41 -0700 (PDT)
+X-Google-Smtp-Source: AKy350ZvqOhRxjuWkb/qDRFEYG95lVTMqkyN1lH2NCL72/Gi430kGp8+0vpnXNL4RhABqLUioJi5lA==
+X-Received: by 2002:a05:6214:518b:b0:5bb:eefc:1623 with SMTP id kl11-20020a056214518b00b005bbeefc1623mr21401832qvb.42.1679996381014;
+        Tue, 28 Mar 2023 02:39:41 -0700 (PDT)
+Received: from sgarzare-redhat (host-82-53-134-98.retail.telecomitalia.it. [82.53.134.98])
+        by smtp.gmail.com with ESMTPSA id pe6-20020a056214494600b005dd8b9345a4sm3590288qvb.60.2023.03.28.02.39.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 28 Mar 2023 02:39:40 -0700 (PDT)
+Date:   Tue, 28 Mar 2023 11:39:35 +0200
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Arseniy Krasnov <avkrasnov@sberdevices.ru>
+Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
         "David S. Miller" <davem@davemloft.net>,
         Eric Dumazet <edumazet@google.com>,
         Jakub Kicinski <kuba@kernel.org>,
         Paolo Abeni <pabeni@redhat.com>,
         Bobby Eshleman <bobby.eshleman@bytedance.com>,
-        <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
-        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <kernel@sberdevices.ru>, <oxffffaa@gmail.com>
-References: <728181e9-6b35-0092-3d01-3d7aff4521b6@sberdevices.ru>
- <30aa2604-77c0-322e-44fd-ff99fc25e388@sberdevices.ru>
- <lgpswwclsuiukh2q5couf33jytf6abneazmwkty6fevoxcgh5p@3dzfbmenjhco>
-From:   Arseniy Krasnov <avkrasnov@sberdevices.ru>
-In-Reply-To: <lgpswwclsuiukh2q5couf33jytf6abneazmwkty6fevoxcgh5p@3dzfbmenjhco>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [172.16.1.6]
-X-ClientProxiedBy: S-MS-EXCH01.sberdevices.ru (172.16.1.4) To
- S-MS-EXCH01.sberdevices.ru (172.16.1.4)
-X-KSMG-Rule-ID: 4
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Status: not scanned, disabled by settings
-X-KSMG-AntiSpam-Interceptor-Info: not scanned
-X-KSMG-AntiPhishing: not scanned, disabled by settings
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 1.1.2.30, bases: 2023/03/28 06:38:00 #21021220
-X-KSMG-AntiVirus-Status: Clean, skipped
-X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
-        DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kernel@sberdevices.ru, oxffffaa@gmail.com
+Subject: Re: [RFC PATCH v1 1/2] vsock: return errors other than -ENOMEM to
+ socket
+Message-ID: <itjmw7vh3a7ggbodsu4mksu2hqbpdpxmu6cpexbra66nfhsw4x@hzpuzwldkfx5>
+References: <97f19214-ba04-c47e-7486-72e8aa16c690@sberdevices.ru>
+ <99da938b-3e67-150c-2f74-41d917a95950@sberdevices.ru>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <99da938b-3e67-150c-2f74-41d917a95950@sberdevices.ru>
+X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Sun, Mar 26, 2023 at 01:13:11AM +0300, Arseniy Krasnov wrote:
+>This removes behaviour, where error code returned from any transport
+>was always switched to ENOMEM. This works in the same way as:
+>commit
+>c43170b7e157 ("vsock: return errors other than -ENOMEM to socket"),
+>but for receive calls.
+>
+>Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
+>---
+> net/vmw_vsock/af_vsock.c | 4 ++--
+> 1 file changed, 2 insertions(+), 2 deletions(-)
+>
+>diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
+>index 19aea7cba26e..9262e0b77d47 100644
+>--- a/net/vmw_vsock/af_vsock.c
+>+++ b/net/vmw_vsock/af_vsock.c
+>@@ -2007,7 +2007,7 @@ static int __vsock_stream_recvmsg(struct sock *sk, struct msghdr *msg,
+>
+> 		read = transport->stream_dequeue(vsk, msg, len - copied, flags);
 
+In vmci_transport_stream_dequeue() vmci_qpair_peekv() and
+vmci_qpair_dequev() return VMCI_ERROR_* in case of errors.
 
-On 28.03.2023 12:29, Stefano Garzarella wrote:
-> On Sun, Mar 26, 2023 at 01:09:25AM +0300, Arseniy Krasnov wrote:
->> This adds WARN_ONCE() and return from stream dequeue callback when
->> socket's queue is empty, but 'rx_bytes' still non-zero.
-> 
-> Nit: I would explain why we add this, for example:
-> 
-> This allows the detection of potential bugs due to packet merging
-> (see previous patch).
-> 
->>
->> Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
->> ---
->> net/vmw_vsock/virtio_transport_common.c | 7 +++++++
->> 1 file changed, 7 insertions(+)
-> 
->>
->> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
->> index b9144af71553..ad70531de133 100644
->> --- a/net/vmw_vsock/virtio_transport_common.c
->> +++ b/net/vmw_vsock/virtio_transport_common.c
->> @@ -398,6 +398,13 @@ virtio_transport_stream_do_dequeue(struct vsock_sock *vsk,
->>     u32 free_space;
->>
->>     spin_lock_bh(&vvs->rx_lock);
->> +
->> +    if (WARN_ONCE(skb_queue_empty(&vvs->rx_queue) && vvs->rx_bytes,
->> +              "No skbuffs with non-zero 'rx_bytes'\n")) {
-> 
-> Nit: I would rephrase it this way:
-> "rx_queue is empty, but rx_bytes is non-zero"
-> 
->> +        spin_unlock_bh(&vvs->rx_lock);
->> +        return err;
->> +    }
->> +
->>     while (total < len && !skb_queue_empty(&vvs->rx_queue)) {
->>         skb = skb_peek(&vvs->rx_queue);
->>
->> -- 
->> 2.25.1
->>
-> 
-> Anyway the patch LGTM!
+Maybe we should return -ENOMEM in vmci_transport_stream_dequeue() if
+those functions fail to keep the same behavior.
 
-Thanks for review! Since only string value and commit message should be
-updated, i can resend it with 'net' (as it is fix) and update two thing
-above in 'net' version?
+CCing Bryan, Vishnu, and pv-drivers@vmware.com
 
-Thanks, Arseniy
-> 
-> Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
-> 
+The other transports seem okay to me.
+
+Thanks,
+Stefano
+
+> 		if (read < 0) {
+>-			err = -ENOMEM;
+>+			err = read;
+> 			break;
+> 		}
+>
+>@@ -2058,7 +2058,7 @@ static int __vsock_seqpacket_recvmsg(struct sock *sk, struct msghdr *msg,
+> 	msg_len = transport->seqpacket_dequeue(vsk, msg, flags);
+>
+> 	if (msg_len < 0) {
+>-		err = -ENOMEM;
+>+		err = msg_len;
+> 		goto out;
+> 	}
+>
+>-- 
+>2.25.1
+>
+
