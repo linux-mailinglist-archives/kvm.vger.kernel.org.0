@@ -2,143 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9108F6CC1D8
-	for <lists+kvm@lfdr.de>; Tue, 28 Mar 2023 16:15:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BB6756CC1E5
+	for <lists+kvm@lfdr.de>; Tue, 28 Mar 2023 16:17:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233128AbjC1OPm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Mar 2023 10:15:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58662 "EHLO
+        id S232832AbjC1ORH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Mar 2023 10:17:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33210 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233159AbjC1OPb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Mar 2023 10:15:31 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67F429EEF
-        for <kvm@vger.kernel.org>; Tue, 28 Mar 2023 07:15:28 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 0C4BBB81D66
-        for <kvm@vger.kernel.org>; Tue, 28 Mar 2023 14:15:27 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C29ABC43443;
-        Tue, 28 Mar 2023 14:15:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1680012925;
-        bh=49m7YtzLSlQ7IsIak5a6PdN9lSIxklya7T1YSDvOg8U=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=bBQh0oyXYzfRuT69hkDXpPq9oaxAT+alyCX3MSUJeFS44/ksMq9EJGneDyQALmSRw
-         yCR1KjfbfpVvEtL2+Tucd9GWFheKv8zHpTcxYToyfA1QTtZB6qH2RjhkknXZcd7qSg
-         OKAc0q/Ddm3Ve+wyUB/PZgXu6RAsn3LWhPJ9dfMFYBj1nkXMz3rkMnAgdbGWwEgRUt
-         t5AbkVyseS9zniSPRd6r5kdmhwMCE4PgF7lj/96ZSWTbwb7/KyR0CE4dFti1a9DTrR
-         DlBWiJs4kDG+qekukJ1UbfmZTGYAWZHddBBpw/dQe2OThlSKYPYyV1YW1lvydPLSkY
-         FjqL7a3SEs4vg==
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.95)
-        (envelope-from <maz@kernel.org>)
-        id 1phA6d-003nH5-Gr;
-        Tue, 28 Mar 2023 15:15:23 +0100
+        with ESMTP id S230444AbjC1OQz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Mar 2023 10:16:55 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C959CC3E;
+        Tue, 28 Mar 2023 07:16:54 -0700 (PDT)
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 32SEFg48017941;
+        Tue, 28 Mar 2023 14:16:54 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
+ mime-version : content-transfer-encoding : in-reply-to : references : cc :
+ to : from : subject : message-id : date; s=pp1;
+ bh=fJeZHWWyfWvSqqgFrPwYsCg34mKTxQM/CIAKKEiQIgk=;
+ b=i069lDtgDRlan6VeulVZ/SMZAbG47tv+qy9d3lCfqh3yxPO7yby66tuye2c8abEPn0ZY
+ hu+9OxYJY7XxOIvntbf6yNJxMdg9jbKkdo4RExUObnxHGCOcYC3fiXMltB44FLY2/7Dl
+ 1BTRBqpYv42WU6NAkTXxydk59jmYXmZXZEcFkJCF9pkiTuW2x9hSPYEc3wpA2YaO4Q2R
+ 4cyGFpP3W2GdAs9IWug0+cFkVVRw5oMfyzQG7nJB/kWNTI4keFqDBCAi6aAcSSRDjnsY
+ lBJY0ZXWwQAKwdn61wqEXi0WF3VIZs7kvn5YfWXbqbIsjXiec6xbTHVlY8F+mUlcpRMa xg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pm1ujg1nm-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 28 Mar 2023 14:16:53 +0000
+Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 32SEGFtT020266;
+        Tue, 28 Mar 2023 14:16:53 GMT
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pm1ujg17p-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 28 Mar 2023 14:16:51 +0000
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+        by ppma02fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 32SDG6vv017824;
+        Tue, 28 Mar 2023 14:16:32 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+        by ppma02fra.de.ibm.com (PPS) with ESMTPS id 3phrk6uex6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 28 Mar 2023 14:16:32 +0000
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+        by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 32SEGSoq23921314
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 28 Mar 2023 14:16:28 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A2AC120043;
+        Tue, 28 Mar 2023 14:16:28 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 78FDA20040;
+        Tue, 28 Mar 2023 14:16:28 +0000 (GMT)
+Received: from t14-nrb (unknown [9.171.48.75])
+        by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Tue, 28 Mar 2023 14:16:28 +0000 (GMT)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Date:   Tue, 28 Mar 2023 15:15:23 +0100
-From:   Marc Zyngier <maz@kernel.org>
-To:     Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc:     Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev,
-        kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Salil Mehta <salil.mehta@huawei.com>
-Subject: Re: [PATCH 05/11] KVM: arm64: Start handling SMCs from EL1
-In-Reply-To: <23758eb0-a5b9-afa6-a85e-faa2690323c7@arm.com>
-References: <20230320221002.4191007-1-oliver.upton@linux.dev>
- <20230320221002.4191007-6-oliver.upton@linux.dev>
- <23758eb0-a5b9-afa6-a85e-faa2690323c7@arm.com>
-User-Agent: Roundcube Webmail/1.4.13
-Message-ID: <3712e4370dafe95ab828d642dbf064f8@kernel.org>
-X-Sender: maz@kernel.org
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: suzuki.poulose@arm.com, oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, pbonzini@redhat.com, james.morse@arm.com, yuzenghui@huawei.com, seanjc@google.com, salil.mehta@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-5.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,SPF_HELO_NONE,
-        SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <4eb0d6aa-d0c9-ff0e-d1f6-2d23ea8a957d@linux.ibm.com>
+References: <20230327082118.2177-1-nrb@linux.ibm.com> <20230327082118.2177-4-nrb@linux.ibm.com> <4eb0d6aa-d0c9-ff0e-d1f6-2d23ea8a957d@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org
+To:     Janosch Frank <frankja@linux.ibm.com>, imbrenda@linux.ibm.com,
+        thuth@redhat.com
+From:   Nico Boehr <nrb@linux.ibm.com>
+Subject: Re: [kvm-unit-tests PATCH v1 3/4] s390x: lib: sie: don't reenter SIE on pgm int
+Message-ID: <168001298812.28355.13672619009088163461@t14-nrb>
+User-Agent: alot/0.8.1
+Date:   Tue, 28 Mar 2023 16:16:28 +0200
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: EVHA6faA7G0WTotXEGq68yP4ythaSo9Z
+X-Proofpoint-ORIG-GUID: BwSqF8cT1jRwl6M3B32Lrcx6twRCgNeU
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
+ definitions=2023-03-24_11,2023-03-28_02,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ spamscore=0 mlxscore=0 suspectscore=0 bulkscore=0 adultscore=0
+ mlxlogscore=737 malwarescore=0 impostorscore=0 phishscore=0 clxscore=1015
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2303200000 definitions=main-2303280111
+X-Spam-Status: No, score=-0.1 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
+        DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2023-03-28 09:52, Suzuki K Poulose wrote:
-> On 20/03/2023 22:09, Oliver Upton wrote:
->> Whelp, the architecture gods have spoken and confirmed that the 
->> function
->> ID space is common between SMCs and HVCs. Not only that, the 
->> expectation
->> is that hypervisors handle calls to both SMC and HVC conduits. KVM
->> recently picked up support for SMCCCs in commit bd36b1a9eb5a ("KVM:
->> arm64: nv: Handle SMCs taken from virtual EL2") but scoped it only to 
->> a
->> nested hypervisor.
->> 
->> Let's just open the floodgates and let EL1 access our SMCCC
->> implementation with the SMC instruction as well.
->> 
->> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-> 
-> Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> 
-> One minor observation below.
-> 
->> ---
->>   arch/arm64/kvm/handle_exit.c | 14 +++++++-------
->>   1 file changed, 7 insertions(+), 7 deletions(-)
->> 
->> diff --git a/arch/arm64/kvm/handle_exit.c 
->> b/arch/arm64/kvm/handle_exit.c
->> index 5e4f9737cbd5..68f95dcd41a1 100644
->> --- a/arch/arm64/kvm/handle_exit.c
->> +++ b/arch/arm64/kvm/handle_exit.c
->> @@ -72,13 +72,15 @@ static int handle_smc(struct kvm_vcpu *vcpu)
->>   	 *
->>   	 * We need to advance the PC after the trap, as it would
->>   	 * otherwise return to the same address...
->> -	 *
->> -	 * Only handle SMCs from the virtual EL2 with an immediate of zero 
->> and
->> -	 * skip it otherwise.
->>   	 */
->> -	if (!vcpu_is_el2(vcpu) || kvm_vcpu_hvc_get_imm(vcpu)) {
->> +	kvm_incr_pc(vcpu);
->> +
->> +	/*
->> +	 * SMCs with a nonzero immediate are reserved according to DEN0028E 
->> 2.9
->> +	 * "SMC and HVC immediate value".
->> +	 */
->> +	if (kvm_vcpu_hvc_get_imm(vcpu)) {
->>   		vcpu_set_reg(vcpu, 0, ~0UL);
->> -		kvm_incr_pc(vcpu);
->>   		return 1;
->>   	}
->>   @@ -93,8 +95,6 @@ static int handle_smc(struct kvm_vcpu *vcpu)
->>   	if (ret < 0)
->>   		vcpu_set_reg(vcpu, 0, ~0UL);
-> 
-> Nothing to do with this patch. But that check above is different
-> from how we handle HVC. i.e., we return back to guest for HVCs.
-> But for SMCs, we tend to return "ret" indicating an error (ret < 0).
-> 
-> Do we need to fix that ?
+Quoting Janosch Frank (2023-03-28 15:42:26)
+> On 3/27/23 10:21, Nico Boehr wrote:
+> > At the moment, when a PGM int occurs while in SIE, we will just reenter
+> > SIE after the interrupt handler was called.
+> >=20
+> > This is because sie() has a loop which checks icptcode and re-enters SIE
+> > if it is zero.
+> >=20
+> > However, this behaviour is quite undesirable for SIE tests, since it
+> > doesn't give the host the chance to assert on the PGM int. Instead, we
+> > will just re-enter SIE, on nullifing conditions even causing the
+> > exception again.
+> >=20
+> > Add a flag PROG_PGM_IN_SIE set by the pgm int fixup which indicates a
+> > program interrupt has occured in SIE. Check for the flag in sie() and if
+> > it's set return from sie() to give the host the ability to react on the
+> > exception. The host may check if a PGM int has occured in the guest
+> > using the new function sie_had_pgm_int().
+>=20
+> We could simply check "!lowcore.pgm_int_code" by introducing:
+> uint16_t read_pgm_int(void)
+> {
+>         mb();
+>         return lowcore.pgm_int_code;
+> }
+>=20
+> into interrupt.c.
+>=20
+>=20
+> Or to be a bit more verbose:
+> I don't see a reason why we'd want to store a per sblk PGM in SIE bit=20
+> when all we want to know is either: was there a PGM at all (to stop the=20
+> SIE loop) or was there a PGM between the expect and the=20
+> check_pgm_int_code().
 
-I guess so. It is just that it is practically impossible to get
-a negative value at the moment, but it isn't something we should
-rely on.
-
-Thanks,
-
-         M.
--- 
-Jazz is not dead. It just smells funny...
+Yes, makes perfect sense, I just didn't see this possiblity. Thanks, will c=
+hange.
