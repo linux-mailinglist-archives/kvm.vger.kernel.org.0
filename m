@@ -2,79 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9C8136CBA5C
-	for <lists+kvm@lfdr.de>; Tue, 28 Mar 2023 11:21:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1A9936CBA75
+	for <lists+kvm@lfdr.de>; Tue, 28 Mar 2023 11:24:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231717AbjC1JVa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Mar 2023 05:21:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47754 "EHLO
+        id S230284AbjC1JYT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Mar 2023 05:24:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50766 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230346AbjC1JV0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Mar 2023 05:21:26 -0400
+        with ESMTP id S230210AbjC1JYQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Mar 2023 05:24:16 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C95A195
-        for <kvm@vger.kernel.org>; Tue, 28 Mar 2023 02:20:41 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BBCB25BA5
+        for <kvm@vger.kernel.org>; Tue, 28 Mar 2023 02:23:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1679995240;
+        s=mimecast20190719; t=1679995403;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=cmenFZrPmab5EsKw3TDMXYEC3Wdv3EkUt5K0GPSSZs0=;
-        b=fz7l7tiKbQlSyglQ8VimGjBmkU9MMDEulhBOabibeOBY1SLdChJl2CAwG8YO31Mb1RM914
-        k1VQPKZSXJ7lkUnYfuS/bs86otIR7vUfL5kWRQFSV5yc6F8PpvoBGM7Tl4vtlNsDiJGxpS
-        K3+0cCL9Lb/VU9ZdrQ5Y2oB8MRDQYsw=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=FlyvMdw2nhPSREcgm2mQMSn2Bg5EDd8FhpiFHg5I85g=;
+        b=U2UQqI9hvzBmCId2321DGltf6q7/vTvZdTe10uVqS0lT8l+oNLpV8Xr2YkZNpY5HpLbidH
+        Pn6T25rbl77jdki48LtSJ4S+SG/mfXZ1t6YFP4QfTSK/Z+ehDsF/qcxP0dYzW3kUxfDSvX
+        XrpwjwWzZ5l3md2l0BwEtgjg+kWA2cA=
+Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
+ [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-622-8hnrj13LMQq6f0Y_Ry1ChA-1; Tue, 28 Mar 2023 05:20:39 -0400
-X-MC-Unique: 8hnrj13LMQq6f0Y_Ry1ChA-1
-Received: by mail-wm1-f72.google.com with SMTP id n19-20020a05600c3b9300b003ef63ef4519so4558888wms.3
-        for <kvm@vger.kernel.org>; Tue, 28 Mar 2023 02:20:38 -0700 (PDT)
+ us-mta-392-pWH_TW2nOJim8pCiy2BqOA-1; Tue, 28 Mar 2023 05:23:22 -0400
+X-MC-Unique: pWH_TW2nOJim8pCiy2BqOA-1
+Received: by mail-qk1-f199.google.com with SMTP id 187-20020a3707c4000000b007468d9a30faso5324599qkh.23
+        for <kvm@vger.kernel.org>; Tue, 28 Mar 2023 02:23:22 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679995238;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=cmenFZrPmab5EsKw3TDMXYEC3Wdv3EkUt5K0GPSSZs0=;
-        b=QSCGyPwpR9u8zWQiPqbwFqn4BHnN3sqtwVk3meXuz6hYASqihS7eWxOkqLecRKRvkV
-         Vq1QOwKl2BpQFLVGXsnPCdAeGQGRXxt1Cj9eIwJqVrbvAO6gddibVZo1lrlHiuv6BG8t
-         +3Zy8MY+L2+yCOizV1KXt3/GmWw0vauE7X8U80154tCkTUVksRst4IIm/MKWKEMEEV5E
-         rTj6e3NLUux4+KiQC67rPQPQGMmdzANnnuEMvdHKHgOBRSAFUFgRW6Z8+nw8cwvk1Idj
-         TgjtPP43pB59z5h6pLL0PF2nuPHcU91lD5eAXcZjeiUitFvIvAXEEneXsclRSMMRXEAo
-         w5mQ==
-X-Gm-Message-State: AAQBX9dMv8WS8XERwRxdPnGgyxKUZZsZERmO78iA773esS/LH0Ys+prd
-        eJazjQn26f8NcvyTq7EicN+VePLkhsek+lth2z4C5HFtwYU2q/TttsZ9Od2QxFcHgEBb0gmq0nc
-        gLSvXyXvKJYIj
-X-Received: by 2002:a5d:4b0d:0:b0:2d7:8254:bc14 with SMTP id v13-20020a5d4b0d000000b002d78254bc14mr11626370wrq.47.1679995238003;
-        Tue, 28 Mar 2023 02:20:38 -0700 (PDT)
-X-Google-Smtp-Source: AKy350ZzbnxZqk7E1yEYPpAjTaJXCiLIyKzmOLraPzZ/v8H+G8UaOf8S3BcIKhbMbICZjtEJDUPb6w==
-X-Received: by 2002:a5d:4b0d:0:b0:2d7:8254:bc14 with SMTP id v13-20020a5d4b0d000000b002d78254bc14mr11626354wrq.47.1679995237687;
-        Tue, 28 Mar 2023 02:20:37 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
-        by smtp.googlemail.com with ESMTPSA id p5-20020a5d4e05000000b002d75909c76esm20275639wrt.73.2023.03.28.02.20.35
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 28 Mar 2023 02:20:36 -0700 (PDT)
-Message-ID: <fce5c1ad-24a3-febf-127e-e97238492143@redhat.com>
-Date:   Tue, 28 Mar 2023 11:20:34 +0200
+        d=1e100.net; s=20210112; t=1679995402;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FlyvMdw2nhPSREcgm2mQMSn2Bg5EDd8FhpiFHg5I85g=;
+        b=3EIJTMdG7bMv/eMvtVoCHZNE/NtoH4CLVFv3LkGbb+FxVmu4FUnideNvI3OEHQVlAM
+         jlxQiWLUVD18pbX/I6ou1zcMhxF067YMPccSZRxjiz+fsoG2mov8D04trt/N1CU2K6uN
+         h5UfbjOgLdUOmQFo6yulMzu7ggWAa3tDZXaF/ZBBsdOUX0czTriz8/Yy3mth0uhiySN4
+         qk6E0VS0L9UORLJLFmkBYRCwSCq2XCSUPz8h4Pr81UvWp1lfh07j97DDuQ7jKEFnmAzT
+         jV6BkKulIC0mwVRP1mN04/zUWp8p0EU0EIEoJzRViZRFhE6i0PcxgqohM1XgFIO++wm6
+         wCpw==
+X-Gm-Message-State: AAQBX9ce24D0EazRTaCtnvDvkE7TT2/HVBqCmzmnC343uNsr7owcL4bi
+        Tx/+rcTUV1Q0uPXmBOfoGASGaxPUrbfub/hRR8nuHrwaux4AooOWN11SUrUyaSLE13jty6IKFga
+        2Sf/gEzlhZc9D
+X-Received: by 2002:a05:6214:27c6:b0:56e:a9d4:429b with SMTP id ge6-20020a05621427c600b0056ea9d4429bmr23339843qvb.1.1679995402137;
+        Tue, 28 Mar 2023 02:23:22 -0700 (PDT)
+X-Google-Smtp-Source: AKy350Yjyndn+8JhX5yEkfDB1ZbfV1IVX73FEzKiCbPGXb88TQ6qGch6AlQQ3iq9fmV5EH8VUrZ2rQ==
+X-Received: by 2002:a05:6214:27c6:b0:56e:a9d4:429b with SMTP id ge6-20020a05621427c600b0056ea9d4429bmr23339828qvb.1.1679995401919;
+        Tue, 28 Mar 2023 02:23:21 -0700 (PDT)
+Received: from sgarzare-redhat (host-82-53-134-98.retail.telecomitalia.it. [82.53.134.98])
+        by smtp.gmail.com with ESMTPSA id l7-20020a0cc207000000b005dd8b9345d0sm3588061qvh.104.2023.03.28.02.23.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 28 Mar 2023 02:23:21 -0700 (PDT)
+Date:   Tue, 28 Mar 2023 11:23:16 +0200
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Arseniy Krasnov <avkrasnov@sberdevices.ru>
+Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Bobby Eshleman <bobby.eshleman@bytedance.com>,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kernel@sberdevices.ru, oxffffaa@gmail.com
+Subject: Re: [RFC PATCH v2 1/3] virtio/vsock: fix header length on skb merging
+Message-ID: <yi6goqhyxkh4slmje6a37vlrxby2qmzg66wgdzrzgt55wgpvdy@d3b7jucayzxv>
+References: <728181e9-6b35-0092-3d01-3d7aff4521b6@sberdevices.ru>
+ <b5d31a81-a089-146b-d04f-569710e6b14b@sberdevices.ru>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.8.0
-Subject: Re: [PATCH v2] KVM: x86/pmu: Fix emulation on Intel counters' bit
- width
-Content-Language: en-US
-To:     Like Xu <like.xu.linux@gmail.com>
-Cc:     Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20230322093117.48335-1-likexu@tencent.com>
- <CABgObfYfiUDf4zY=izcg_32yGCbUxxVc+JAkHGHwiQ0VmGdOgA@mail.gmail.com>
- <871434fe-ae80-bec6-9920-a6411f5842c0@gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <871434fe-ae80-bec6-9920-a6411f5842c0@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <b5d31a81-a089-146b-d04f-569710e6b14b@sberdevices.ru>
 X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -83,34 +84,48 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 3/28/23 11:16, Like Xu wrote:
-> 
-> 
-> If IA32_PERF_CAPABILITIES.FW_WRITE[bit 13] =1, each IA32_PMCi is 
-> accompanied by a
-> corresponding alias address starting at 4C1H for IA32_A_PMC0.
-> 
-> The bit width of the performance monitoring counters is specified in 
-> CPUID.0AH:EAX[23:16].
-> If IA32_A_PMCi is present, the 64-bit input value (EDX:EAX) of WRMSR to 
-> IA32_A_PMCi will cause
-> IA32_PMCi to be updated by:
-> 
->      COUNTERWIDTH =
->          CPUID.0AH:EAX[23:16] bit width of the performance monitoring 
-> counter
->      IA32_PMCi[COUNTERWIDTH-1:32] := EDX[COUNTERWIDTH-33:0]);
->      IA32_PMCi[31:0] := EAX[31:0];
->      EDX[63:COUNTERWIDTH] are reserved
-> 
-> ---
-> 
-> Some might argue that this is all talking about GP counters, not
-> fixed counters. In fact, the full-width write hw behaviour is
-> presumed to do the same thing for all counters.
-But the above behavior, and the #GP, is only true for IA32_A_PMCi (the 
-full-witdh MSR).  Did I understand correctly that the behavior for fixed 
-counters is changed without introducing an alias MSR?
+On Sun, Mar 26, 2023 at 01:08:22AM +0300, Arseniy Krasnov wrote:
+>This fixes appending newly arrived skbuff to the last skbuff of the
+>socket's queue. Problem fires when we are trying to append data to skbuff
+>which was already processed in dequeue callback at least once. Dequeue
+>callback calls function 'skb_pull()' which changes 'skb->len'. In current
+>implementation 'skb->len' is used to update length in header of the last
+>skbuff after new data was copied to it. This is bug, because value in
+>header is used to calculate 'rx_bytes'/'fwd_cnt' and thus must be not
+>be changed during skbuff's lifetime.
+>
+>Bug starts to fire since:
+>
+>commit 077706165717
+>("virtio/vsock: don't use skbuff state to account credit")
+>
+>It presents before, but didn't triggered due to a little bit buggy
+>implementation of credit calculation logic. So use Fixes tag for it.
+>
+>Fixes: 077706165717 ("virtio/vsock: don't use skbuff state to account credit")
+>Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
+>---
+> net/vmw_vsock/virtio_transport_common.c | 2 +-
+> 1 file changed, 1 insertion(+), 1 deletion(-)
+>
+>diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+>index 7fc178c3ee07..b9144af71553 100644
+>--- a/net/vmw_vsock/virtio_transport_common.c
+>+++ b/net/vmw_vsock/virtio_transport_common.c
+>@@ -1101,7 +1101,7 @@ virtio_transport_recv_enqueue(struct vsock_sock *vsk,
+> 			memcpy(skb_put(last_skb, skb->len), skb->data, skb->len);
+> 			free_pkt = true;
+> 			last_hdr->flags |= hdr->flags;
+>-			last_hdr->len = cpu_to_le32(last_skb->len);
+>+			le32_add_cpu(&last_hdr->len, len);
+> 			goto out;
+> 		}
+> 	}
+>-- 
+>2.25.1
+>
 
-Paolo
+LGTM!
+
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 
