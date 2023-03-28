@@ -2,347 +2,274 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C95146CBC81
-	for <lists+kvm@lfdr.de>; Tue, 28 Mar 2023 12:27:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 990506CBCD8
+	for <lists+kvm@lfdr.de>; Tue, 28 Mar 2023 12:49:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232278AbjC1K1a (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Mar 2023 06:27:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60778 "EHLO
+        id S232562AbjC1KtQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Mar 2023 06:49:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53092 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229670AbjC1K13 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Mar 2023 06:27:29 -0400
-Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C058D76A7;
-        Tue, 28 Mar 2023 03:27:26 -0700 (PDT)
-Received: by mail-pl1-x62d.google.com with SMTP id k2so11181990pll.8;
-        Tue, 28 Mar 2023 03:27:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1679999246;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=tOIjDTDTINqb4sFcqQPv3KTocsKoyeVh61eYS0nesDE=;
-        b=OWGJFQnEh5dh4lnU+/NEZBZ36LPMPxZ1Sj9JS8HBZXjxx+RiIeTKDEUkEaZ9CnQ1kz
-         y8T14urIy97t4cjbkzDisz9FAk5xATMkiqdcPf0rp+/Y1IJe7rSPwm/7UdURX9xyVR4c
-         DCJBppdnm8PCidyN+ijaR8wqdbZOaTg+900Cm/avjhnp+Ge8p1soi7f3YIoBVmsmDM3i
-         EW9M6ip+eNFtad+d8JHrWtYyW7qp3gNBQoI9xr5egxrwYWu35uGl8CqVvrE/m4Rgkjha
-         PgyGpAKZAY/59MgW4mqfMUAHM5BLul1ydXwZ6RbiamXIsYNU04XHdviqwUHNdvvz7PKs
-         Ducw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679999246;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=tOIjDTDTINqb4sFcqQPv3KTocsKoyeVh61eYS0nesDE=;
-        b=TTscD/4Ca+mTeV1MKbOUL8KE61Tr3mfWCqazouQK9fN70Z2/VSPvEpwuK3eJui4MFK
-         8MqgZudQNIaOLyZBbYEArjtLfU491JCYaTeL4otbgxeHAzV9q/yCx8axrvbu7sZAeX/d
-         6x6MHhXuZZCYHWsRVfuN5AxUwLNHJANOa5H3rvFXLLkeNkZu9hru5nw0y2Tb5WFTC5I2
-         6OhHr1Gzlr/2OqLr9MLnaeqYplzEG3jx1iZ/Y6RCv9CJJF0N2wqkEDVojI9JIbgfXh53
-         GW6sd5T7AYbp5lhPjlBVBpoC7QSKaMHfoBd9pnPvHlj9KCXoczLbE6Gj8v/oANbVjymg
-         w9SQ==
-X-Gm-Message-State: AO0yUKVvukYJSebJbbJ4thTu1X9opcd9kJKt6H0/c/+TPRIwMEV+vujQ
-        vuPek+1tvMYbOuLEzy6PGMY=
-X-Google-Smtp-Source: AK7set/Iij/YfcpakVk/mwLCilWxOEvQTWsVn7H6PBF8iddqJ8z6K5w/ETBHQmGQHw1jcogUwQyTpQ==
-X-Received: by 2002:a05:6a20:2a08:b0:da:5e10:799b with SMTP id e8-20020a056a202a0800b000da5e10799bmr12438048pzh.10.1679999245906;
-        Tue, 28 Mar 2023 03:27:25 -0700 (PDT)
-Received: from [192.168.255.10] ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id a4-20020a62bd04000000b0062d7c0dc4f4sm4215911pff.80.2023.03.28.03.27.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 28 Mar 2023 03:27:25 -0700 (PDT)
-Message-ID: <cff6147a-9e57-0f8f-9dce-372f3992f17d@gmail.com>
-Date:   Tue, 28 Mar 2023 18:27:17 +0800
+        with ESMTP id S232502AbjC1KtM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Mar 2023 06:49:12 -0400
+Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9BA6A1BC0;
+        Tue, 28 Mar 2023 03:49:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1680000550; x=1711536550;
+  h=date:from:to:cc:subject:message-id:reply-to:references:
+   mime-version:in-reply-to;
+  bh=AseN6rlr5gwMYM5zhMJq+cjPxZAZKyFMZLKoTjj2S7w=;
+  b=RUVD9MEmst1jITrfZs9/DT/PV0vpczqs7TuvEXdFcSBeNBtA1QtZtSBH
+   qc2ws/fqgP85SX9IMZydBcISwuvlcAnbjl4MrqTcR9pXfydNGZPwg+SdO
+   4r/UA/LT2U59icVUOuPhf/syfYSOteovi51yhUN43wW/FjmzWBdLS0Ccb
+   24jYxM+QttAgeGaUvJqmjLHr9ISN4UHLKd5nupKb1UwUiMpUyo9StDVAD
+   izlO/1hFMBp7ZUnPPSVrgu1uCuctztbjpUS79jg9D/cEpoMY7EDglbP5+
+   x6geM7JCzPwk/EAp1dxCpsUXCtpS22GTmP2fHgYa7HA9pNyy+k0A1oXUl
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10662"; a="403144893"
+X-IronPort-AV: E=Sophos;i="5.98,297,1673942400"; 
+   d="scan'208";a="403144893"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Mar 2023 03:48:53 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10662"; a="794757674"
+X-IronPort-AV: E=Sophos;i="5.98,297,1673942400"; 
+   d="scan'208";a="794757674"
+Received: from chaop.bj.intel.com (HELO localhost) ([10.240.192.105])
+  by fmsmga002.fm.intel.com with ESMTP; 28 Mar 2023 03:48:42 -0700
+Date:   Tue, 28 Mar 2023 18:41:08 +0800
+From:   Chao Peng <chao.p.peng@linux.intel.com>
+To:     Xiaoyao Li <xiaoyao.li@intel.com>
+Cc:     Isaku Yamahata <isaku.yamahata@gmail.com>,
+        Ackerley Tng <ackerleytng@google.com>, seanjc@google.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+        linux-arch@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
+        pbonzini@redhat.com, corbet@lwn.net, vkuznets@redhat.com,
+        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, arnd@arndb.de,
+        naoya.horiguchi@nec.com, linmiaohe@huawei.com, x86@kernel.org,
+        hpa@zytor.com, hughd@google.com, jlayton@kernel.org,
+        bfields@fieldses.org, akpm@linux-foundation.org, shuah@kernel.org,
+        rppt@kernel.org, steven.price@arm.com, mail@maciej.szmigiero.name,
+        vbabka@suse.cz, vannapurve@google.com, yu.c.zhang@linux.intel.com,
+        kirill.shutemov@linux.intel.com, luto@kernel.org,
+        jun.nakajima@intel.com, dave.hansen@intel.com, ak@linux.intel.com,
+        david@redhat.com, aarcange@redhat.com, ddutile@redhat.com,
+        dhildenb@redhat.com, qperret@google.com, tabba@google.com,
+        michael.roth@amd.com, mhocko@suse.com, wei.w.wang@intel.com
+Subject: Re: [PATCH v10 9/9] KVM: Enable and expose KVM_MEM_PRIVATE
+Message-ID: <20230328104108.GB2909606@chaop.bj.intel.com>
+Reply-To: Chao Peng <chao.p.peng@linux.intel.com>
+References: <20230128140030.GB700688@chaop.bj.intel.com>
+ <diqz5ybc3xsr.fsf@ackerleytng-cloudtop.c.googlers.com>
+ <20230308074026.GA2183207@chaop.bj.intel.com>
+ <20230323004131.GA214881@ls.amr.corp.intel.com>
+ <20230324021029.GA2774613@chaop.bj.intel.com>
+ <6cf365a3-dddc-8b74-4d74-04666fbeb53d@intel.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.9.0
-Subject: Re: [PATCH] KVM: x86/pmu: Add Intel PMU supported fixed counters bit
- mask
-Content-Language: en-US
-To:     Jim Mattson <jmattson@google.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20230321112742.25255-1-likexu@tencent.com>
- <CALMp9eT0SrXCLriBN+nBv5fFQQ3n+b4Guq=-yLsFFQjeQ-nczA@mail.gmail.com>
- <e002f554-b69d-cedf-162c-271bc3609a39@gmail.com>
- <CALMp9eQVnk8gkOpX5AHhaCr8-5Fe=qNuX8PUP1Gv2H5FSYmHSw@mail.gmail.com>
-From:   Like Xu <like.xu.linux@gmail.com>
-In-Reply-To: <CALMp9eQVnk8gkOpX5AHhaCr8-5Fe=qNuX8PUP1Gv2H5FSYmHSw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
-        DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6cf365a3-dddc-8b74-4d74-04666fbeb53d@intel.com>
+X-Spam-Status: No, score=-2.4 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 27/3/2023 10:58 pm, Jim Mattson wrote:
-> On Mon, Mar 27, 2023 at 12:47 AM Like Xu <like.xu.linux@gmail.com> wrote:
->>
->> On 25/3/2023 7:19 am, Jim Mattson wrote:
->>> On Tue, Mar 21, 2023 at 4:28 AM Like Xu <like.xu.linux@gmail.com> wrote:
->>>>
->>>> From: Like Xu <likexu@tencent.com>
->>>>
->>>> Per Intel SDM, fixed-function performance counter 'i' is supported if:
->>>>
->>>>           FxCtr[i]_is_supported := ECX[i] || (EDX[4:0] > i);
->>>>
->>>> which means that the KVM user space can use EDX to limit the number of
->>>> fixed counters and at the same time, using ECX to enable part of other
->>>> KVM supported fixed counters.
->>>>
->>>> Add a bitmap (instead of always checking the vcpu's CPUIDs) to keep track
->>>> of the guest available fixed counters and perform the semantic checks.
->>>>
->>>> Signed-off-by: Like Xu <likexu@tencent.com>
->>>> ---
->>>>    arch/x86/include/asm/kvm_host.h |  2 ++
->>>>    arch/x86/kvm/pmu.h              |  8 +++++
->>>>    arch/x86/kvm/vmx/pmu_intel.c    | 53 +++++++++++++++++++++------------
->>>>    3 files changed, 44 insertions(+), 19 deletions(-)
->>>>
->>>> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
->>>> index a45de1118a42..14689e583127 100644
->>>> --- a/arch/x86/include/asm/kvm_host.h
->>>> +++ b/arch/x86/include/asm/kvm_host.h
->>>> @@ -565,6 +565,8 @@ struct kvm_pmu {
->>>>            */
->>>>           bool need_cleanup;
->>>>
->>>> +       DECLARE_BITMAP(supported_fixed_pmc_idx, KVM_PMC_MAX_FIXED);
->>>> +
->>>>           /*
->>>>            * The total number of programmed perf_events and it helps to avoid
->>>>            * redundant check before cleanup if guest don't use vPMU at all.
->>>> diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
->>>> index be62c16f2265..9f4504e5e9d5 100644
->>>> --- a/arch/x86/kvm/pmu.h
->>>> +++ b/arch/x86/kvm/pmu.h
->>>> @@ -111,6 +111,11 @@ static inline struct kvm_pmc *get_gp_pmc(struct kvm_pmu *pmu, u32 msr,
->>>>           return NULL;
->>>>    }
->>>>
->>>> +static inline bool fixed_ctr_is_supported(struct kvm_pmu *pmu, unsigned int idx)
->>>> +{
->>>> +       return test_bit(idx, pmu->supported_fixed_pmc_idx);
->>>> +}
->>>> +
->>>>    /* returns fixed PMC with the specified MSR */
->>>>    static inline struct kvm_pmc *get_fixed_pmc(struct kvm_pmu *pmu, u32 msr)
->>>>    {
->>>> @@ -120,6 +125,9 @@ static inline struct kvm_pmc *get_fixed_pmc(struct kvm_pmu *pmu, u32 msr)
->>>>                   u32 index = array_index_nospec(msr - base,
->>>>                                                  pmu->nr_arch_fixed_counters);
->>>>
->>>> +               if (!fixed_ctr_is_supported(pmu, index))
->>>> +                       return NULL;
->>>> +
->>>>                   return &pmu->fixed_counters[index];
->>>>           }
->>>>
->>>> diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
->>>> index e8a3be0b9df9..12f4b2fe7756 100644
->>>> --- a/arch/x86/kvm/vmx/pmu_intel.c
->>>> +++ b/arch/x86/kvm/vmx/pmu_intel.c
->>>> @@ -43,13 +43,16 @@ static int fixed_pmc_events[] = {1, 0, 7};
->>>>    static void reprogram_fixed_counters(struct kvm_pmu *pmu, u64 data)
->>>>    {
->>>>           struct kvm_pmc *pmc;
->>>> -       u8 old_fixed_ctr_ctrl = pmu->fixed_ctr_ctrl;
->>>> +       u8 new_ctrl, old_ctrl, old_fixed_ctr_ctrl = pmu->fixed_ctr_ctrl;
->>>>           int i;
->>>>
->>>>           pmu->fixed_ctr_ctrl = data;
->>>>           for (i = 0; i < pmu->nr_arch_fixed_counters; i++) {
->>>> -               u8 new_ctrl = fixed_ctrl_field(data, i);
->>>> -               u8 old_ctrl = fixed_ctrl_field(old_fixed_ctr_ctrl, i);
->>>> +               if (!fixed_ctr_is_supported(pmu, i))
->>>> +                       continue;
->>>> +
->>>> +               new_ctrl = fixed_ctrl_field(data, i);
->>>> +               old_ctrl = fixed_ctrl_field(old_fixed_ctr_ctrl, i);
->>>>
->>>>                   if (old_ctrl == new_ctrl)
->>>>                           continue;
->>>> @@ -125,6 +128,9 @@ static bool intel_is_valid_rdpmc_ecx(struct kvm_vcpu *vcpu, unsigned int idx)
->>>>
->>>>           idx &= ~(3u << 30);
->>>>
->>>> +       if (fixed && !fixed_ctr_is_supported(pmu, idx))
->>>> +               return false;
->>>> +
->>>>           return fixed ? idx < pmu->nr_arch_fixed_counters
->>>>                        : idx < pmu->nr_arch_gp_counters;
->>>>    }
->>>> @@ -145,7 +151,7 @@ static struct kvm_pmc *intel_rdpmc_ecx_to_pmc(struct kvm_vcpu *vcpu,
->>>>                   counters = pmu->gp_counters;
->>>>                   num_counters = pmu->nr_arch_gp_counters;
->>>>           }
->>>> -       if (idx >= num_counters)
->>>> +       if (idx >= num_counters || (fixed && !fixed_ctr_is_supported(pmu, idx)))
->>>>                   return NULL;
->>>>           *mask &= pmu->counter_bitmask[fixed ? KVM_PMC_FIXED : KVM_PMC_GP];
->>>>           return &counters[array_index_nospec(idx, num_counters)];
->>>> @@ -500,6 +506,9 @@ static void setup_fixed_pmc_eventsel(struct kvm_pmu *pmu)
->>>>           int i;
->>>>
->>>>           for (i = 0; i < pmu->nr_arch_fixed_counters; i++) {
->>>> +               if (!fixed_ctr_is_supported(pmu, i))
->>>> +                       continue;
->>>> +
->>>>                   pmc = &pmu->fixed_counters[i];
->>>>                   event = fixed_pmc_events[array_index_nospec(i, size)];
->>>>                   pmc->eventsel = (intel_arch_events[event].unit_mask << 8) |
->>>> @@ -520,6 +529,7 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
->>>>
->>>>           pmu->nr_arch_gp_counters = 0;
->>>>           pmu->nr_arch_fixed_counters = 0;
->>>> +       bitmap_zero(pmu->supported_fixed_pmc_idx, KVM_PMC_MAX_FIXED);
->>>>           pmu->counter_bitmask[KVM_PMC_GP] = 0;
->>>>           pmu->counter_bitmask[KVM_PMC_FIXED] = 0;
->>>>           pmu->version = 0;
->>>> @@ -551,13 +561,24 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
->>>>           pmu->available_event_types = ~entry->ebx &
->>>>                                           ((1ull << eax.split.mask_length) - 1);
->>>>
->>>> -       if (pmu->version == 1) {
->>>> -               pmu->nr_arch_fixed_counters = 0;
->>>> -       } else {
->>>> +       counter_mask = ~(BIT_ULL(pmu->nr_arch_gp_counters) - 1);
->>>> +       bitmap_set(pmu->all_valid_pmc_idx, 0, pmu->nr_arch_gp_counters);
->>>> +
->>>> +       if (pmu->version > 1) {
->>>>                   pmu->nr_arch_fixed_counters =
->>>> -                       min3(ARRAY_SIZE(fixed_pmc_events),
->>>> -                            (size_t) edx.split.num_counters_fixed,
->>>> -                            (size_t)kvm_pmu_cap.num_counters_fixed);
->>>> +                       min_t(int, ARRAY_SIZE(fixed_pmc_events),
->>>> +                             kvm_pmu_cap.num_counters_fixed);
->>>> +               for (i = 0; i < pmu->nr_arch_fixed_counters; i++) {
->>>> +                       /* FxCtr[i]_is_supported := CPUID.0xA.ECX[i] || (EDX[4:0] > i) */
->>>
->>> This is true only when pmu->version >= 5.
->>
->> This is true in for "Version 5" section, but not mentioned in the CPUID.0xA section.
->> I would argue that this is a deliberate omission for the instruction implementation,
->> as it does use the word "version>1" in the near CPUID.0xA.EDX section.
+On Fri, Mar 24, 2023 at 10:29:25AM +0800, Xiaoyao Li wrote:
+> On 3/24/2023 10:10 AM, Chao Peng wrote:
+> > On Wed, Mar 22, 2023 at 05:41:31PM -0700, Isaku Yamahata wrote:
+> > > On Wed, Mar 08, 2023 at 03:40:26PM +0800,
+> > > Chao Peng <chao.p.peng@linux.intel.com> wrote:
+> > > 
+> > > > On Wed, Mar 08, 2023 at 12:13:24AM +0000, Ackerley Tng wrote:
+> > > > > Chao Peng <chao.p.peng@linux.intel.com> writes:
+> > > > > 
+> > > > > > On Sat, Jan 14, 2023 at 12:01:01AM +0000, Sean Christopherson wrote:
+> > > > > > > On Fri, Dec 02, 2022, Chao Peng wrote:
+> > > > > > ...
+> > > > > > > Strongly prefer to use similar logic to existing code that detects wraps:
+> > > > > 
+> > > > > > > 		mem->restricted_offset + mem->memory_size < mem->restricted_offset
+> > > > > 
+> > > > > > > This is also where I'd like to add the "gfn is aligned to offset"
+> > > > > > > check, though
+> > > > > > > my brain is too fried to figure that out right now.
+> > > > > 
+> > > > > > Used count_trailing_zeros() for this TODO, unsure we have other better
+> > > > > > approach.
+> > > > > 
+> > > > > > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> > > > > > index afc8c26fa652..fd34c5f7cd2f 100644
+> > > > > > --- a/virt/kvm/kvm_main.c
+> > > > > > +++ b/virt/kvm/kvm_main.c
+> > > > > > @@ -56,6 +56,7 @@
+> > > > > >    #include <asm/processor.h>
+> > > > > >    #include <asm/ioctl.h>
+> > > > > >    #include <linux/uaccess.h>
+> > > > > > +#include <linux/count_zeros.h>
+> > > > > 
+> > > > > >    #include "coalesced_mmio.h"
+> > > > > >    #include "async_pf.h"
+> > > > > > @@ -2087,6 +2088,19 @@ static bool kvm_check_memslot_overlap(struct
+> > > > > > kvm_memslots *slots, int id,
+> > > > > >    	return false;
+> > > > > >    }
+> > > > > 
+> > > > > > +/*
+> > > > > > + * Return true when ALIGNMENT(offset) >= ALIGNMENT(gpa).
+> > > > > > + */
+> > > > > > +static bool kvm_check_rmem_offset_alignment(u64 offset, u64 gpa)
+> > > > > > +{
+> > > > > > +	if (!offset)
+> > > > > > +		return true;
+> > > > > > +	if (!gpa)
+> > > > > > +		return false;
+> > > > > > +
+> > > > > > +	return !!(count_trailing_zeros(offset) >= count_trailing_zeros(gpa));
+> > > 
+> > > This check doesn't work expected. For example, offset = 2GB, gpa=4GB
+> > > this check fails.
+> > 
+> > This case is expected to fail as Sean initially suggested[*]:
+> >    I would rather reject memslot if the gfn has lesser alignment than
+> >    the offset. I'm totally ok with this approach _if_ there's a use case.
+> >    Until such a use case presents itself, I would rather be conservative
+> >    from a uAPI perspective.
+> > 
+> > I understand that we put tighter restriction on this but if you see such
+> > restriction is really a big issue for real usage, instead of a
+> > theoretical problem, then we can loosen the check here. But at that time
+> > below code is kind of x86 specific and may need improve.
+> > 
+> > BTW, in latest code, I replaced count_trailing_zeros() with fls64():
+> >    return !!(fls64(offset) >= fls64(gpa));
 > 
-> Do you have any evidence to support such an argument? The CPUID field
-> in question was not defined prior to PMU version 5. (Does anyone from
-> Intel want to chime in?)
+> wouldn't it be !!(ffs64(offset) <= ffs64(gpa)) ?
+
+As the function document explains, here we want to return true when
+ALIGNMENT(offset) >= ALIGNMENT(gpa), so '>=' is what we need.
+
+It's worthy clarifying that in Sean's original suggestion he actually
+mentioned the opposite. He said 'reject memslot if the gfn has lesser
+alignment than the offset', but I wonder this is his purpose, since
+if ALIGNMENT(offset) < ALIGNMENT(gpa), we wouldn't be possible to map
+the page as largepage. Consider we have below config:
+
+  gpa=2M, offset=1M
+
+In this case KVM tries to map gpa at 2M as 2M hugepage but the physical
+page at the offset(1M) in private_fd cannot provide the 2M page due to
+misalignment.
+
+But as we discussed in the off-list thread, here we do find a real use
+case indicating this check is too strict. i.e. QEMU immediately fails
+when launch a guest > 2G memory. For this case QEMU splits guest memory
+space into two slots:
+
+  Slot#1(ram_below_4G): gpa=0x0, offset=0x0, size=2G
+  Slot#2(ram_above_4G): gpa=4G,  offset=2G,  size=totalsize-2G
+
+This strict alignment check fails for slot#2 because offset(2G) has less
+alignment than gpa(4G). To allow this, one solution can revert to my
+previous change in kvm_alloc_memslot_metadata() to disallow hugepage
+only when the offset/gpa are not aligned to related page size.
+
+Sean, How do you think?
+
+Chao
 > 
->> For virtualised use, this feature offers a kind of flexibility as users can
->> enable part of
->> the fixed counters, don't you think? Or maybe you're more looking forward to the
->> patch set that raises the vPMU version number from 2 to 5, that part of the code
->> was already in my tree some years ago.
-> 
-> I would not be surprised if a guest OS checked for PMU version 5
-> before consulting the CPUID fields defined in PMU version 5. Does
-> Linux even consult the fixed counter bitmask field today?
-
-Yes, this is how host perf developer do it:
-
-	if (version >= 5)
-		x86_pmu.num_counters_fixed = fls(fixed_mask);
-
-based on real fresh hardware (always marked as the latest version).
-
-However, our KVM players can construct different valid CPUIDs, as long as the 
-hardware is capable,
-to emulate some vPMU devices that match the CPUID semantics but do not exist in 
-the real world.
-
-In the virtualisation world, use cases like "version 2 + fixed ctrs bit mask" 
-are perfectly possible
-and should work as expected. One more case, if the forth fixed counter or more 
-is enabled in your guest for top-down feature and you may still find the guest's 
-pmu version number is stuck at 2.
-This naturally does not occur in real hardware but no CPUID semantics here are 
-broken.
-
-As I'm sure you've noticed, the logical relationship between CPUID.0xA.ECX and 
-PMU version 5
-is necessary but not sufficient. Version 5 mush has fixed counters bit mask but 
-the reverse is not true.
-
- From the end user's point of view, destroying the flexibility of vHW 
-combinations is a design failure.
-
-So I think we can implement this feature in guest version 2, what do you think ?
-
-> 
-> I'd love to see KVM virtualize PMU version 5!
-
-Great, I've got you and my plan will cover it.
-
-> 
->>>
->>>   From the SDM, volume 3, section 20.2.5 Architectural Performance
->>> Monitoring Version 5:
->>>
->>> With Architectural Performance Monitoring Version 5, register
->>> CPUID.0AH.ECX indicates Fixed Counter enumeration. It is a bit mask
->>> which enumerates the supported Fixed Counters in a processor. If bit
->>> 'i' is set, it implies that Fixed Counter 'i' is supported. Software
->>> is recommended to use the following logic to check if a Fixed Counter
->>> is supported on a given processor: FxCtr[i]_is_supported := ECX[i] ||
->>> (EDX[4:0] > i);
->>>
->>> Prior to PMU version 5, all fixed counters from 0 through <number of
->>> fixed counters - 1> are supported.
->>>
->>>> +                       if (!(entry->ecx & BIT_ULL(i) ||
->>>> +                             edx.split.num_counters_fixed > i))
->>>> +                               continue;
->>>> +
->>>> +                       set_bit(i, pmu->supported_fixed_pmc_idx);
->>>> +                       set_bit(INTEL_PMC_MAX_GENERIC + i, pmu->all_valid_pmc_idx);
->>>> +                       pmu->fixed_ctr_ctrl_mask &= ~(0xbull << (i * 4));
->>>> +                       counter_mask &= ~BIT_ULL(INTEL_PMC_MAX_GENERIC + i);
->>>> +               }
->>>>                   edx.split.bit_width_fixed = min_t(int, edx.split.bit_width_fixed,
->>>>                                                     kvm_pmu_cap.bit_width_fixed);
->>>>                   pmu->counter_bitmask[KVM_PMC_FIXED] =
->>>> @@ -565,10 +586,6 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
->>>>                   setup_fixed_pmc_eventsel(pmu);
->>>>           }
->>>>
->>>> -       for (i = 0; i < pmu->nr_arch_fixed_counters; i++)
->>>> -               pmu->fixed_ctr_ctrl_mask &= ~(0xbull << (i * 4));
->>>> -       counter_mask = ~(((1ull << pmu->nr_arch_gp_counters) - 1) |
->>>> -               (((1ull << pmu->nr_arch_fixed_counters) - 1) << INTEL_PMC_IDX_FIXED));
->>>>           pmu->global_ctrl_mask = counter_mask;
->>>>           pmu->global_ovf_ctrl_mask = pmu->global_ctrl_mask
->>>>                           & ~(MSR_CORE_PERF_GLOBAL_OVF_CTRL_OVF_BUF |
->>>> @@ -585,11 +602,6 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
->>>>                   pmu->raw_event_mask |= (HSW_IN_TX|HSW_IN_TX_CHECKPOINTED);
->>>>           }
->>>>
->>>> -       bitmap_set(pmu->all_valid_pmc_idx,
->>>> -               0, pmu->nr_arch_gp_counters);
->>>> -       bitmap_set(pmu->all_valid_pmc_idx,
->>>> -               INTEL_PMC_MAX_GENERIC, pmu->nr_arch_fixed_counters);
->>>> -
->>>>           perf_capabilities = vcpu_get_perf_capabilities(vcpu);
->>>>           if (cpuid_model_is_consistent(vcpu) &&
->>>>               (perf_capabilities & PMU_CAP_LBR_FMT))
->>>> @@ -605,6 +617,9 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
->>>>                           pmu->pebs_enable_mask = counter_mask;
->>>>                           pmu->reserved_bits &= ~ICL_EVENTSEL_ADAPTIVE;
->>>>                           for (i = 0; i < pmu->nr_arch_fixed_counters; i++) {
->>>> +                               if (!fixed_ctr_is_supported(pmu, i))
->>>> +                                       continue;
->>>> +
->>>>                                   pmu->fixed_ctr_ctrl_mask &=
->>>>                                           ~(1ULL << (INTEL_PMC_IDX_FIXED + i * 4));
->>>>                           }
->>>>
->>>> base-commit: d8708b80fa0e6e21bc0c9e7276ad0bccef73b6e7
->>>> --
->>>> 2.40.0
->>>>
+> > [*] https://lore.kernel.org/all/Y8HldeHBrw+OOZVm@google.com/
+> > 
+> > Chao
+> > > I come up with the following.
+> > > 
+> > > >From ec87e25082f0497431b732702fae82c6a05071bf Mon Sep 17 00:00:00 2001
+> > > Message-Id: <ec87e25082f0497431b732702fae82c6a05071bf.1679531995.git.isaku.yamahata@intel.com>
+> > > From: Isaku Yamahata <isaku.yamahata@intel.com>
+> > > Date: Wed, 22 Mar 2023 15:32:56 -0700
+> > > Subject: [PATCH] KVM: Relax alignment check for restricted mem
+> > > 
+> > > kvm_check_rmem_offset_alignment() only checks based on offset alignment
+> > > and GPA alignment.  However, the actual alignment for offset depends
+> > > on architecture.  For x86 case, it can be 1G, 2M or 4K.  So even if
+> > > GPA is aligned for 1G+, only 1G-alignment is required for offset.
+> > > 
+> > > Without this patch, gpa=4G, offset=2G results in failure of memory slot
+> > > creation.
+> > > 
+> > > Fixes: edc8814b2c77 ("KVM: Require gfn be aligned with restricted offset")
+> > > Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> > > ---
+> > >   arch/x86/include/asm/kvm_host.h | 15 +++++++++++++++
+> > >   virt/kvm/kvm_main.c             |  9 ++++++++-
+> > >   2 files changed, 23 insertions(+), 1 deletion(-)
+> > > 
+> > > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> > > index 88e11dd3afde..03af44650f24 100644
+> > > --- a/arch/x86/include/asm/kvm_host.h
+> > > +++ b/arch/x86/include/asm/kvm_host.h
+> > > @@ -16,6 +16,7 @@
+> > >   #include <linux/irq_work.h>
+> > >   #include <linux/irq.h>
+> > >   #include <linux/workqueue.h>
+> > > +#include <linux/count_zeros.h>
+> > >   #include <linux/kvm.h>
+> > >   #include <linux/kvm_para.h>
+> > > @@ -143,6 +144,20 @@
+> > >   #define KVM_HPAGE_MASK(x)	(~(KVM_HPAGE_SIZE(x) - 1))
+> > >   #define KVM_PAGES_PER_HPAGE(x)	(KVM_HPAGE_SIZE(x) / PAGE_SIZE)
+> > > +#define kvm_arch_required_alignment	kvm_arch_required_alignment
+> > > +static inline int kvm_arch_required_alignment(u64 gpa)
+> > > +{
+> > > +	int zeros = count_trailing_zeros(gpa);
+> > > +
+> > > +	WARN_ON_ONCE(!PAGE_ALIGNED(gpa));
+> > > +	if (zeros >= KVM_HPAGE_SHIFT(PG_LEVEL_1G))
+> > > +		return KVM_HPAGE_SHIFT(PG_LEVEL_1G);
+> > > +	else if (zeros >= KVM_HPAGE_SHIFT(PG_LEVEL_2M))
+> > > +		return KVM_HPAGE_SHIFT(PG_LEVEL_2M);
+> > > +
+> > > +	return PAGE_SHIFT;
+> > > +}
+> > > +
+> > >   #define KVM_MEMSLOT_PAGES_TO_MMU_PAGES_RATIO 50
+> > >   #define KVM_MIN_ALLOC_MMU_PAGES 64UL
+> > >   #define KVM_MMU_HASH_SHIFT 12
+> > > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> > > index c9c4eef457b0..f4ff96171d24 100644
+> > > --- a/virt/kvm/kvm_main.c
+> > > +++ b/virt/kvm/kvm_main.c
+> > > @@ -2113,6 +2113,13 @@ static bool kvm_check_memslot_overlap(struct kvm_memslots *slots, int id,
+> > >   	return false;
+> > >   }
+> > > +#ifndef kvm_arch_required_alignment
+> > > +__weak int kvm_arch_required_alignment(u64 gpa)
+> > > +{
+> > > +	return PAGE_SHIFT
+> > > +}
+> > > +#endif
+> > > +
+> > >   /*
+> > >    * Return true when ALIGNMENT(offset) >= ALIGNMENT(gpa).
+> > >    */
+> > > @@ -2123,7 +2130,7 @@ static bool kvm_check_rmem_offset_alignment(u64 offset, u64 gpa)
+> > >   	if (!gpa)
+> > >   		return false;
+> > > -	return !!(count_trailing_zeros(offset) >= count_trailing_zeros(gpa));
+> > > +	return !!(count_trailing_zeros(offset) >= kvm_arch_required_alignment(gpa));
+> > >   }
+> > >   /*
+> > > -- 
+> > > 2.25.1
+> > > 
+> > > 
+> > > 
+> > > -- 
+> > > Isaku Yamahata <isaku.yamahata@gmail.com>
