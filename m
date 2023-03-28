@@ -2,93 +2,48 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 891FF6CB939
-	for <lists+kvm@lfdr.de>; Tue, 28 Mar 2023 10:21:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 841706CB998
+	for <lists+kvm@lfdr.de>; Tue, 28 Mar 2023 10:39:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230467AbjC1IVD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Mar 2023 04:21:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37598 "EHLO
+        id S230197AbjC1IjJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Mar 2023 04:39:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60104 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230288AbjC1IU7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Mar 2023 04:20:59 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7CC673C3B
-        for <kvm@vger.kernel.org>; Tue, 28 Mar 2023 01:20:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1679991612;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Q3X0O+/TM7LVotJgrmc2xoQ/T0kA0UQLhsWOW/x515A=;
-        b=RzcuhHor46+fs9wiO9GR7qynLKoFSYx6Gf33Y5qrck2xPn5bhkBPwLouM6p4DxViUEGEi2
-        EHXmm9K2/hAv8nQVr8JdbDcsofJiarvibfgdjasHMQ5FpLuo2O5n6ZsuVp7EkQhf6Alcql
-        t3wUp1ki5vjaNlEUxE1Ln7kW9WjsdJM=
-Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
- [209.85.160.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-675-5PtWr-hHPrmLubb81TNB4g-1; Tue, 28 Mar 2023 04:20:11 -0400
-X-MC-Unique: 5PtWr-hHPrmLubb81TNB4g-1
-Received: by mail-qt1-f199.google.com with SMTP id v10-20020a05622a130a00b003e4ee70e001so1720103qtk.6
-        for <kvm@vger.kernel.org>; Tue, 28 Mar 2023 01:20:11 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679991611;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Q3X0O+/TM7LVotJgrmc2xoQ/T0kA0UQLhsWOW/x515A=;
-        b=1t4l0B3GFF0nBZsw0S/aT4lHui0fMPzc9NsOSq9bk1TPsh6O2bNefQbkQ0gWaapT6+
-         YWNRaX5SybDe3pU7WubbeP+vr3H6W7YpXAJeSlwHCclRGGhNyHdSWLgK6plqBbYVGDZh
-         yU64oNNXYsJdAR1HgQI8GUlntxEGNZ/kt5W/znUIuWhxlfID2lSEGD/wvfXyWe85J9g7
-         D2CxdXvM1Ife2Yf1z9MI/lwKe0sxjZArO602TgrDGGb2O4VJ4Ml4nAAMp7lm8nqdIV13
-         n9Aj1L/g9nJ5YQEd5c4+pFXx9NE6DV6aXuZF94wT+9sWT3Tod5lI+576OWnREvnQrFpk
-         k2yw==
-X-Gm-Message-State: AAQBX9fZglqNdJgKHaaRum8gtwjODVOANq0Khelju9mXAwwxyHSsjA36
-        /X49z6iiG9swCcFVUQIq5IXa6wIqQYl0k/eKe4h5NsLFfR4Mhpk8D0h6aEYFrp3TTFJZxS9Ofrm
-        joIq4+SFmGs61
-X-Received: by 2002:a05:622a:118a:b0:3e4:dcb4:162 with SMTP id m10-20020a05622a118a00b003e4dcb40162mr17628916qtk.4.1679991610933;
-        Tue, 28 Mar 2023 01:20:10 -0700 (PDT)
-X-Google-Smtp-Source: AKy350bNpzeZ7gjbtIL2Ka8dMo1Bzn5V8O4UfVAoHsG5EFh/3BhzXlyah+r/S5EZ4D3ccfOazp/h+A==
-X-Received: by 2002:a05:622a:118a:b0:3e4:dcb4:162 with SMTP id m10-20020a05622a118a00b003e4dcb40162mr17628888qtk.4.1679991610700;
-        Tue, 28 Mar 2023 01:20:10 -0700 (PDT)
-Received: from sgarzare-redhat (host-82-53-134-98.retail.telecomitalia.it. [82.53.134.98])
-        by smtp.gmail.com with ESMTPSA id 4-20020a05620a048400b007468bf8362esm11708565qkr.66.2023.03.28.01.20.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Mar 2023 01:20:09 -0700 (PDT)
-Date:   Tue, 28 Mar 2023 10:20:01 +0200
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Bobby Eshleman <bobby.eshleman@bytedance.com>
-Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Andrii Nakryiko <andrii@kernel.org>,
-        Mykola Lysenko <mykolal@fb.com>,
-        Alexei Starovoitov <ast@kernel.org>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Martin KaFai Lau <martin.lau@linux.dev>,
-        Song Liu <song@kernel.org>, Yonghong Song <yhs@fb.com>,
-        John Fastabend <john.fastabend@gmail.com>,
-        KP Singh <kpsingh@kernel.org>,
-        Stanislav Fomichev <sdf@google.com>,
-        Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
-        Shuah Khan <shuah@kernel.org>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, bpf@vger.kernel.org,
-        linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net-next v4 1/3] vsock: support sockmap
-Message-ID: <6eyspnma2esx4nzi2kszxkbuvh3xjb2g4nuhvng6tkvtp3whn6@hpyehyt6imdn>
-References: <20230327-vsock-sockmap-v4-0-c62b7cd92a85@bytedance.com>
- <20230327-vsock-sockmap-v4-1-c62b7cd92a85@bytedance.com>
+        with ESMTP id S229670AbjC1IjH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Mar 2023 04:39:07 -0400
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 0A1D735A1
+        for <kvm@vger.kernel.org>; Tue, 28 Mar 2023 01:39:06 -0700 (PDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 066EFC14;
+        Tue, 28 Mar 2023 01:39:50 -0700 (PDT)
+Received: from [10.1.197.1] (ewhatever.cambridge.arm.com [10.1.197.1])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A75563F73F;
+        Tue, 28 Mar 2023 01:39:04 -0700 (PDT)
+Message-ID: <a3b900b3-661b-f0ac-807d-d4f4f2ca1e85@arm.com>
+Date:   Tue, 28 Mar 2023 09:39:03 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20230327-vsock-sockmap-v4-1-c62b7cd92a85@bytedance.com>
-X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.1
+Subject: Re: [PATCH 03/11] KVM: arm64: Add vm fd device attribute accessors
+Content-Language: en-US
+To:     Oliver Upton <oliver.upton@linux.dev>
+Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Salil Mehta <salil.mehta@huawei.com>
+References: <20230320221002.4191007-1-oliver.upton@linux.dev>
+ <20230320221002.4191007-4-oliver.upton@linux.dev>
+ <5f7dcec1-eeeb-811b-d9bc-85ecb7c73aa9@arm.com> <ZBngKAqIIyIWTEsB@linux.dev>
+From:   Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <ZBngKAqIIyIWTEsB@linux.dev>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.3 required=5.0 tests=NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -96,31 +51,85 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Mar 27, 2023 at 07:11:51PM +0000, Bobby Eshleman wrote:
->This patch adds sockmap support for vsock sockets. It is intended to be
->usable by all transports, but only the virtio and loopback transports
->are implemented.
->
->SOCK_STREAM, SOCK_DGRAM, and SOCK_SEQPACKET are all supported.
->
->Signed-off-by: Bobby Eshleman <bobby.eshleman@bytedance.com>
->Acked-by: Michael S. Tsirkin <mst@redhat.com>
->---
-> drivers/vhost/vsock.c                   |   1 +
-> include/linux/virtio_vsock.h            |   1 +
-> include/net/af_vsock.h                  |  17 ++++
-> net/vmw_vsock/Makefile                  |   1 +
-> net/vmw_vsock/af_vsock.c                |  64 ++++++++++--
-> net/vmw_vsock/virtio_transport.c        |   2 +
-> net/vmw_vsock/virtio_transport_common.c |  25 +++++
-> net/vmw_vsock/vsock_bpf.c               | 174 ++++++++++++++++++++++++++++++++
-> net/vmw_vsock/vsock_loopback.c          |   2 +
-> 9 files changed, 281 insertions(+), 6 deletions(-)
+On 21/03/2023 16:49, Oliver Upton wrote:
+> Hi Suzuki,
+> 
+> On Tue, Mar 21, 2023 at 09:53:06AM +0000, Suzuki K Poulose wrote:
+>> On 20/03/2023 22:09, Oliver Upton wrote:
+>>> A subsequent change will allow userspace to convey a filter for
+>>> hypercalls through a vm device attribute. Add the requisite boilerplate
+>>> for vm attribute accessors.
+>>>
+>>> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+>>> ---
+>>>    arch/arm64/kvm/arm.c | 29 +++++++++++++++++++++++++++++
+>>>    1 file changed, 29 insertions(+)
+>>>
+>>> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+>>> index 3bd732eaf087..b6e26c0e65e5 100644
+>>> --- a/arch/arm64/kvm/arm.c
+>>> +++ b/arch/arm64/kvm/arm.c
+>>> @@ -1439,11 +1439,28 @@ static int kvm_vm_ioctl_set_device_addr(struct kvm *kvm,
+>>>    	}
+>>>    }
+>>> +static int kvm_vm_has_attr(struct kvm *kvm, struct kvm_device_attr *attr)
+>>> +{
+>>> +	switch (attr->group) {
+>>> +	default:
+>>> +		return -ENXIO;
+>>> +	}
+>>> +}
+>>> +
+>>> +static int kvm_vm_set_attr(struct kvm *kvm, struct kvm_device_attr *attr)
+>>> +{
+>>> +	switch (attr->group) {
+>>> +	default:
+>>> +		return -ENXIO;
+>>> +	}
+>>> +}
+>>> +
+>>>    long kvm_arch_vm_ioctl(struct file *filp,
+>>>    		       unsigned int ioctl, unsigned long arg)
+>>>    {
+>>>    	struct kvm *kvm = filp->private_data;
+>>>    	void __user *argp = (void __user *)arg;
+>>> +	struct kvm_device_attr attr;
+>>>    	switch (ioctl) {
+>>>    	case KVM_CREATE_IRQCHIP: {
+>>> @@ -1479,6 +1496,18 @@ long kvm_arch_vm_ioctl(struct file *filp,
+>>>    			return -EFAULT;
+>>>    		return kvm_vm_ioctl_mte_copy_tags(kvm, &copy_tags);
+>>>    	}
+>>> +	case KVM_HAS_DEVICE_ATTR: {
+>>> +		if (copy_from_user(&attr, argp, sizeof(attr)))
+>>> +			return -EFAULT;
+>>> +
+>>> +		return kvm_vm_has_attr(kvm, &attr);
+>>> +	}
+>>> +	case KVM_SET_DEVICE_ATTR: {
+>>> +		if (copy_from_user(&attr, argp, sizeof(attr)))
+>>> +			return -EFAULT;
+>>> +
+>>> +		return kvm_vm_set_attr(kvm, &attr);
+>>> +	}
+>>
+>> Is there a reason to exclude KVM_GET_DEVICE_ATTR handling ?
+> 
+> The GET_DEVICE_ATTR would effectively be dead code, as the hypercall filter is
+> a write-only attribute. The filter is constructed through iterative calls to
+> the attribute, so conveying the end result to userspace w/ the same UAPI
+> is non-trivial.
+> 
+> Hopefully userspace remembers what it wrote to the field ;-)
 
-LGTM!
+Fair enough. I am thinking of using VM DEVICE_ATTR for some of the Arm
+CCA Realm Configuration, which are now overloaded with ENABLE_CAP.
 
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+We could add GET_DEVICE_ATTR if and when we need it.
 
-Thanks,
-Stefano
+Thanks
+Suzuki
+
+
+> 
 
