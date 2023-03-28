@@ -2,68 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C96BD6CBDE8
-	for <lists+kvm@lfdr.de>; Tue, 28 Mar 2023 13:36:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6882E6CBDF0
+	for <lists+kvm@lfdr.de>; Tue, 28 Mar 2023 13:38:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232676AbjC1Lgd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Mar 2023 07:36:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58904 "EHLO
+        id S232762AbjC1LiK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Mar 2023 07:38:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60688 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230103AbjC1Lgc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Mar 2023 07:36:32 -0400
-Received: from mx.sberdevices.ru (mx.sberdevices.ru [45.89.227.171])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95A7959E9;
-        Tue, 28 Mar 2023 04:36:30 -0700 (PDT)
-Received: from s-lin-edge02.sberdevices.ru (localhost [127.0.0.1])
-        by mx.sberdevices.ru (Postfix) with ESMTP id C87825FD14;
-        Tue, 28 Mar 2023 14:36:28 +0300 (MSK)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
-        s=mail; t=1680003388;
-        bh=Y8nntKCoo+n61PM/8lM1Pimdv3DPve4+/I2dLAhzNuU=;
-        h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type;
-        b=TVHnStf6myFchlia37InfF8F2J5RP/rNzHTcFe/Hm+P2DLzW2SPzvbOfgmHjpARAS
-         yWzhn+Uj65RvkMRZZutEJF+EzNxIulyVE6pfhxMBGwpvkLgzj9jBPnH9EDPTi+actR
-         XaXADzxkzemEIIAnohlv6MKEQ9UY8F/A2ISOn88iIXZw3RRMSej0k4G3DKfNc4/gP6
-         qDbR28D4vT3kmAWOvCN1hPsBIzu/qeM1k+ayigGSElBDEVTzuMIFdO1hDZgLLKpfe0
-         pShhRs1NomyV6KQJKCtxvsuJPbMFYit/scWawvD+IulzUyojjBOLZ/350644jcAFGg
-         AQon4g+3PuQLg==
-Received: from S-MS-EXCH01.sberdevices.ru (S-MS-EXCH01.sberdevices.ru [172.16.1.4])
-        by mx.sberdevices.ru (Postfix) with ESMTP;
-        Tue, 28 Mar 2023 14:36:28 +0300 (MSK)
-Message-ID: <1e85f2b9-b958-0252-041d-6c48e04d9a19@sberdevices.ru>
-Date:   Tue, 28 Mar 2023 14:33:07 +0300
+        with ESMTP id S232709AbjC1LiI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Mar 2023 07:38:08 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76EEE40EA;
+        Tue, 28 Mar 2023 04:38:06 -0700 (PDT)
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 32S9KW0l006860;
+        Tue, 28 Mar 2023 11:38:05 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=/uql0AsOgChupybCjnv/4rCRhr5aUbiikSgPJ1sXICE=;
+ b=cHZJyo5yuARzP34P4TTTvkHXyasXPU2DwS46I3NEBd2QXUvgTgiQUuoSJE5+np6F8FiG
+ exIAIpPzyapROtXX+7JJe6nBmEabiMPm3sDp9/gOEBuczRXN3O4wy+CLzQg1HMMQMCyS
+ 2Bt0zNROUF/TPs1yXu5/MxObhvv5RAwzkd7gEnVJF4uIPsovIvsvQSZLlGN052bFdnY8
+ oGzLvnbrCtCyesleLLVABQ1Hw5xAGat5BEJaAptWgC+6bm0iHpPUyDxFGPX5wIosuENK
+ g7IlrpXNxTYXFDhANKT3fDYMzv0G8iQiVQIWdyZv0wZUS3mxLuGrS3NpYdFHYKg3EKwj Pw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pkwgxb8ce-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 28 Mar 2023 11:38:05 +0000
+Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 32SBb3SW003350;
+        Tue, 28 Mar 2023 11:38:05 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pkwgxb8c0-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 28 Mar 2023 11:38:04 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 32S4VKHR019202;
+        Tue, 28 Mar 2023 11:38:03 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+        by ppma03ams.nl.ibm.com (PPS) with ESMTPS id 3phrk6kx7h-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 28 Mar 2023 11:38:03 +0000
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+        by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 32SBbxPH21234322
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 28 Mar 2023 11:37:59 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 8B7022004D;
+        Tue, 28 Mar 2023 11:37:59 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5E1B52004B;
+        Tue, 28 Mar 2023 11:37:59 +0000 (GMT)
+Received: from [9.152.222.242] (unknown [9.152.222.242])
+        by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+        Tue, 28 Mar 2023 11:37:59 +0000 (GMT)
+Message-ID: <3dcfb02a-84db-1298-1b88-810b52c12818@linux.ibm.com>
+Date:   Tue, 28 Mar 2023 13:37:59 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
+ Thunderbird/102.8.0
+Subject: Re: [kvm-unit-tests PATCH v7 2/2] s390x: topology: Checking
+ Configuration Topology Information
 Content-Language: en-US
-In-Reply-To: <0683cc6e-5130-484c-1105-ef2eb792d355@sberdevices.ru>
-To:     Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Bobby Eshleman <bobby.eshleman@bytedance.com>
-CC:     <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
-        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <kernel@sberdevices.ru>, <oxffffaa@gmail.com>,
-        <avkrasnov@sberdevices.ru>
-From:   Arseniy Krasnov <avkrasnov@sberdevices.ru>
-Subject: [PATCH net v2 3/3] test/vsock: new skbuff appending test
-Content-Type: text/plain; charset="UTF-8"
+To:     Nico Boehr <nrb@linux.ibm.com>, linux-s390@vger.kernel.org
+Cc:     frankja@linux.ibm.com, thuth@redhat.com, kvm@vger.kernel.org,
+        imbrenda@linux.ibm.com, david@redhat.com, nsg@linux.ibm.com
+References: <20230320085642.12251-1-pmorel@linux.ibm.com>
+ <20230320085642.12251-3-pmorel@linux.ibm.com>
+ <167965555147.41638.10047922188597254104@t14-nrb>
+ <eed972f5-7d94-4db3-c496-60f7d37db0f3@linux.ibm.com>
+ <167998471655.28355.8845167343467425829@t14-nrb>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+In-Reply-To: <167998471655.28355.8845167343467425829@t14-nrb>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [172.16.1.6]
-X-ClientProxiedBy: S-MS-EXCH02.sberdevices.ru (172.16.1.5) To
- S-MS-EXCH01.sberdevices.ru (172.16.1.4)
-X-KSMG-Rule-ID: 4
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Status: not scanned, disabled by settings
-X-KSMG-AntiSpam-Interceptor-Info: not scanned
-X-KSMG-AntiPhishing: not scanned, disabled by settings
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 1.1.2.30, bases: 2023/03/28 06:38:00 #21021220
-X-KSMG-AntiVirus-Status: Clean, skipped
-X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
-        DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: peLi7sPjwIgMNQNpTlgCphY0wCGKfLn4
+X-Proofpoint-ORIG-GUID: WNCXHg-ws4MF4be1xOCNBZJGkcOdAS-x
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
+ definitions=2023-03-24_11,2023-03-28_01,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ phishscore=0 impostorscore=0 spamscore=0 mlxlogscore=999 mlxscore=0
+ clxscore=1015 adultscore=0 malwarescore=0 lowpriorityscore=0 bulkscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2303200000 definitions=main-2303280094
+X-Spam-Status: No, score=-0.1 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
+        DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
         autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -71,127 +97,67 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This adds test which checks case when data of newly received skbuff is
-appended to the last skbuff in the socket's queue. It looks like simple
-test with 'send()' and 'recv()', but internally it triggers logic which
-appends one received skbuff to another. Test checks that this feature
-works correctly.
 
-This test is actual only for virtio transport.
+On 3/28/23 08:25, Nico Boehr wrote:
+> Quoting Pierre Morel (2023-03-27 14:38:35)
+>>> [...]
 
-Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
----
- tools/testing/vsock/vsock_test.c | 90 ++++++++++++++++++++++++++++++++
- 1 file changed, 90 insertions(+)
 
-diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
-index 3de10dbb50f5..12b97c92fbb2 100644
---- a/tools/testing/vsock/vsock_test.c
-+++ b/tools/testing/vsock/vsock_test.c
-@@ -968,6 +968,91 @@ static void test_seqpacket_inv_buf_server(const struct test_opts *opts)
- 	test_inv_buf_server(opts, false);
- }
- 
-+#define HELLO_STR "HELLO"
-+#define WORLD_STR "WORLD"
-+
-+static void test_stream_virtio_skb_merge_client(const struct test_opts *opts)
-+{
-+	ssize_t res;
-+	int fd;
-+
-+	fd = vsock_stream_connect(opts->peer_cid, 1234);
-+	if (fd < 0) {
-+		perror("connect");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	/* Send first skbuff. */
-+	res = send(fd, HELLO_STR, strlen(HELLO_STR), 0);
-+	if (res != strlen(HELLO_STR)) {
-+		fprintf(stderr, "unexpected send(2) result %zi\n", res);
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	control_writeln("SEND0");
-+	/* Peer reads part of first skbuff. */
-+	control_expectln("REPLY0");
-+
-+	/* Send second skbuff, it will be appended to the first. */
-+	res = send(fd, WORLD_STR, strlen(WORLD_STR), 0);
-+	if (res != strlen(WORLD_STR)) {
-+		fprintf(stderr, "unexpected send(2) result %zi\n", res);
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	control_writeln("SEND1");
-+	/* Peer reads merged skbuff packet. */
-+	control_expectln("REPLY1");
-+
-+	close(fd);
-+}
-+
-+static void test_stream_virtio_skb_merge_server(const struct test_opts *opts)
-+{
-+	unsigned char buf[64];
-+	ssize_t res;
-+	int fd;
-+
-+	fd = vsock_stream_accept(VMADDR_CID_ANY, 1234, NULL);
-+	if (fd < 0) {
-+		perror("accept");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	control_expectln("SEND0");
-+
-+	/* Read skbuff partially. */
-+	res = recv(fd, buf, 2, 0);
-+	if (res != 2) {
-+		fprintf(stderr, "expected recv(2) returns 2 bytes, got %zi\n", res);
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	control_writeln("REPLY0");
-+	control_expectln("SEND1");
-+
-+	res = recv(fd, buf + 2, sizeof(buf) - 2, 0);
-+	if (res != 8) {
-+		fprintf(stderr, "expected recv(2) returns 8 bytes, got %zi\n", res);
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	res = recv(fd, buf, sizeof(buf) - 8 - 2, MSG_DONTWAIT);
-+	if (res != -1) {
-+		fprintf(stderr, "expected recv(2) failure, got %zi\n", res);
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	if (memcmp(buf, HELLO_STR WORLD_STR, strlen(HELLO_STR WORLD_STR))) {
-+		fprintf(stderr, "pattern mismatch\n");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	control_writeln("REPLY1");
-+
-+	close(fd);
-+}
-+
- static struct test_case test_cases[] = {
- 	{
- 		.name = "SOCK_STREAM connection reset",
-@@ -1038,6 +1123,11 @@ static struct test_case test_cases[] = {
- 		.run_client = test_seqpacket_inv_buf_client,
- 		.run_server = test_seqpacket_inv_buf_server,
- 	},
-+	{
-+		.name = "SOCK_STREAM virtio skb merge",
-+		.run_client = test_stream_virtio_skb_merge_client,
-+		.run_server = test_stream_virtio_skb_merge_server,
-+	},
- 	{},
- };
- 
--- 
-2.25.1
+[...]
+
+
+>> If a topology level always exist physically and if it is not specified
+>> on the QEMU command line it is implicitly unique.
+> What do you mean by 'implicitly unique'?
+
+I mean that if the topology level is not explicitly specified on the 
+command line, it exists a single entity of this topology level.
+
+
+>
+>> OK for expected_topo_lvl if you prefer.
+> Yes, please.
+>
+>>> [...]
+>>>> +/*
+>>>> + * stsi_check_mag
+>>>> + * @info: Pointer to the stsi information
+>>>> + *
+>>>> + * MAG field should match the architecture defined containers
+>>>> + * when MNEST as returned by SCLP matches MNEST of the SYSIB.
+>>>> + */
+>>>> +static void stsi_check_mag(struct sysinfo_15_1_x *info)
+>>>> +{
+>>>> +       int i;
+>>>> +
+>>>> +       report_prefix_push("MAG");
+>>>> +
+>>>> +       stsi_check_maxcpus(info);
+>>>> +
+>>>> +       /* Explicitly skip the test if both mnest do not match */
+>>>> +       if (max_nested_lvl != info->mnest)
+>>>> +               goto done;
+>>> What does it mean if the two don't match, i.e. is this an error? Or a skip? Or is it just expected?
+>> I have no information on the representation of the MAG fields for a
+>> SYSIB with a nested level different than the maximum nested level.
+>>
+>> There are examples in the documentation but I did not find, and did not
+>> get a clear answer, on how the MAG field are calculated.
+>>
+>> The examples seems clear for info->mnest between MNEST -1 and 3 but the
+>> explication I had on info->mnest = 2 is not to be found in any
+>> documentation.
+>>
+>> Until it is specified in a documentation I skip all these tests.
+> Alright - then please:
+> - update the comment to say:
+>    "It is not clear how the MAG fields are calculated when mnest in the SYSIB 15.x is different from the maximum nested level in the SCLP info, so we skip here for now."
+> - when this is the case, do a report_skip() and show info->mnest and max_nested_lvl in the message.
+
+
+OK, thanks.
+
+Regards,
+
+Pierre
+
