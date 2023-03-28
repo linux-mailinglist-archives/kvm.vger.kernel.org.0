@@ -2,109 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E98F16CC1D3
-	for <lists+kvm@lfdr.de>; Tue, 28 Mar 2023 16:15:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9108F6CC1D8
+	for <lists+kvm@lfdr.de>; Tue, 28 Mar 2023 16:15:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233081AbjC1OP0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Mar 2023 10:15:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56006 "EHLO
+        id S233128AbjC1OPm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Mar 2023 10:15:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58662 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233108AbjC1OPR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Mar 2023 10:15:17 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3FA37CDF3
-        for <kvm@vger.kernel.org>; Tue, 28 Mar 2023 07:14:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1680012840;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=ffLH5bZRJ6YtgLRSBMwzxg/+hZRSIpwmfi4hS4N8Nuc=;
-        b=eHw3l14bA7G0/Dq7DHE/y5X/WaB/JnOfrFfcJD26YhXBfioFjQ9qsvlj7N86XpvqEsObFS
-        XNKheb2y8iYtwhjnuaQ2xKZIbPQPU5PnnutghhPChRJ/N7wds493yDxRJLHVUD5HiOFq6P
-        Nx/ZHttcBuqmAh1qBO55x3egPRDe/4Y=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-610-SLVJAI6GPtCRZZwvjfINFQ-1; Tue, 28 Mar 2023 10:13:57 -0400
-X-MC-Unique: SLVJAI6GPtCRZZwvjfINFQ-1
-Received: by mail-ed1-f70.google.com with SMTP id s30-20020a508d1e000000b005005cf48a93so17642916eds.8
-        for <kvm@vger.kernel.org>; Tue, 28 Mar 2023 07:13:56 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680012836;
-        h=content-transfer-encoding:in-reply-to:subject:from:references:cc:to
-         :content-language:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ffLH5bZRJ6YtgLRSBMwzxg/+hZRSIpwmfi4hS4N8Nuc=;
-        b=h383NNo0mfRYXPbk67BwYwn1Y2qnrl1pfsaw2U8w/MABAH3H+lJG7ST7Lg7IxE3o/W
-         n0guRYh53CJ5BsgsodA+VunKuYstrqziNg/ln5zwAeOIY/weck7M18uI3hUVMqKFRoDz
-         /p0WJk+Oyl/GvIByp2wCesQShzUk+N3zgzAguuRiZ+GMTOAnDYnnIbNzJu3QlC4HZYbG
-         jt5uE5zLc8PEQrLhJNnhy2SDyRzSsLpy/Fq+Aktv1uLXt4Tu7iV/3TP1Y3d7+61h+5VZ
-         raoX3nDnAWPeZhVgGwuMCTtazpkrYXJ2KeJ0Y2TBc1WnLEd05Lh3afqOfLpv2Zsa+sA/
-         WRWQ==
-X-Gm-Message-State: AAQBX9ciqQllmNhQsZrxpqd8ZRHRSJt6j9kW/GfLha80ACMIIs4VpqBZ
-        9R0WTlX0nkyAXloZOasPq6lxk5do90v4vyU7FhI9TWPx2MY54fibzU5RWoVP7xSR1XXX8EUMhhD
-        rgn63GjieXLXh
-X-Received: by 2002:a17:906:4c91:b0:946:be05:ed7a with SMTP id q17-20020a1709064c9100b00946be05ed7amr2887638eju.70.1680012835984;
-        Tue, 28 Mar 2023 07:13:55 -0700 (PDT)
-X-Google-Smtp-Source: AKy350ZDesR/WhBhPl2B8jond6w5UYfHY//O0l7vDZqE7Ay9Y8tX64ayaBkW6XL6HcuBZ2hIUUWFwA==
-X-Received: by 2002:a17:906:4c91:b0:946:be05:ed7a with SMTP id q17-20020a1709064c9100b00946be05ed7amr2887614eju.70.1680012835739;
-        Tue, 28 Mar 2023 07:13:55 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:1c09:f536:3de6:228c? ([2001:b07:6468:f312:1c09:f536:3de6:228c])
-        by smtp.googlemail.com with ESMTPSA id gv27-20020a1709072bdb00b008b9b4ab6ad1sm15335005ejc.102.2023.03.28.07.13.54
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 28 Mar 2023 07:13:55 -0700 (PDT)
-Message-ID: <7463da3b-1d52-40a4-97a3-4f912f4f9fdb@redhat.com>
-Date:   Tue, 28 Mar 2023 16:13:54 +0200
+        with ESMTP id S233159AbjC1OPb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Mar 2023 10:15:31 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67F429EEF
+        for <kvm@vger.kernel.org>; Tue, 28 Mar 2023 07:15:28 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 0C4BBB81D66
+        for <kvm@vger.kernel.org>; Tue, 28 Mar 2023 14:15:27 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C29ABC43443;
+        Tue, 28 Mar 2023 14:15:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1680012925;
+        bh=49m7YtzLSlQ7IsIak5a6PdN9lSIxklya7T1YSDvOg8U=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=bBQh0oyXYzfRuT69hkDXpPq9oaxAT+alyCX3MSUJeFS44/ksMq9EJGneDyQALmSRw
+         yCR1KjfbfpVvEtL2+Tucd9GWFheKv8zHpTcxYToyfA1QTtZB6qH2RjhkknXZcd7qSg
+         OKAc0q/Ddm3Ve+wyUB/PZgXu6RAsn3LWhPJ9dfMFYBj1nkXMz3rkMnAgdbGWwEgRUt
+         t5AbkVyseS9zniSPRd6r5kdmhwMCE4PgF7lj/96ZSWTbwb7/KyR0CE4dFti1a9DTrR
+         DlBWiJs4kDG+qekukJ1UbfmZTGYAWZHddBBpw/dQe2OThlSKYPYyV1YW1lvydPLSkY
+         FjqL7a3SEs4vg==
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1phA6d-003nH5-Gr;
+        Tue, 28 Mar 2023 15:15:23 +0100
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.8.0
-Content-Language: en-US
-To:     Tianrui Zhao <zhaotianrui@loongson.cn>
-Cc:     Huacai Chen <chenhuacai@kernel.org>,
-        WANG Xuerui <kernel@xen0n.name>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        loongarch@lists.linux.dev, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Mark Brown <broonie@kernel.org>,
-        Alex Deucher <alexander.deucher@amd.com>,
-        Oliver Upton <oliver.upton@linux.dev>, maobibo@loongson.cn,
-        Xi Ruoyao <xry111@xry111.site>
-References: <20230328123119.3649361-1-zhaotianrui@loongson.cn>
- <20230328123119.3649361-24-zhaotianrui@loongson.cn>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PING PATCH v4 23/29] LoongArch: KVM: Implement handle gspr
- exception
-In-Reply-To: <20230328123119.3649361-24-zhaotianrui@loongson.cn>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Date:   Tue, 28 Mar 2023 15:15:23 +0100
+From:   Marc Zyngier <maz@kernel.org>
+To:     Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc:     Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev,
+        kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Salil Mehta <salil.mehta@huawei.com>
+Subject: Re: [PATCH 05/11] KVM: arm64: Start handling SMCs from EL1
+In-Reply-To: <23758eb0-a5b9-afa6-a85e-faa2690323c7@arm.com>
+References: <20230320221002.4191007-1-oliver.upton@linux.dev>
+ <20230320221002.4191007-6-oliver.upton@linux.dev>
+ <23758eb0-a5b9-afa6-a85e-faa2690323c7@arm.com>
+User-Agent: Roundcube Webmail/1.4.13
+Message-ID: <3712e4370dafe95ab828d642dbf064f8@kernel.org>
+X-Sender: maz@kernel.org
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: suzuki.poulose@arm.com, oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, pbonzini@redhat.com, james.morse@arm.com, yuzenghui@huawei.com, seanjc@google.com, salil.mehta@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-5.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,SPF_HELO_NONE,
+        SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 3/28/23 14:31, Tianrui Zhao wrote:
-> +			case 0xc91:
-> +				/* idle GSPR */
-> +				er = _kvm_emu_idle(vcpu);
-> +				break;
+On 2023-03-28 09:52, Suzuki K Poulose wrote:
+> On 20/03/2023 22:09, Oliver Upton wrote:
+>> Whelp, the architecture gods have spoken and confirmed that the 
+>> function
+>> ID space is common between SMCs and HVCs. Not only that, the 
+>> expectation
+>> is that hypervisors handle calls to both SMC and HVC conduits. KVM
+>> recently picked up support for SMCCCs in commit bd36b1a9eb5a ("KVM:
+>> arm64: nv: Handle SMCs taken from virtual EL2") but scoped it only to 
+>> a
+>> nested hypervisor.
+>> 
+>> Let's just open the floodgates and let EL1 access our SMCCC
+>> implementation with the SMC instruction as well.
+>> 
+>> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> 
+> Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> 
+> One minor observation below.
+> 
+>> ---
+>>   arch/arm64/kvm/handle_exit.c | 14 +++++++-------
+>>   1 file changed, 7 insertions(+), 7 deletions(-)
+>> 
+>> diff --git a/arch/arm64/kvm/handle_exit.c 
+>> b/arch/arm64/kvm/handle_exit.c
+>> index 5e4f9737cbd5..68f95dcd41a1 100644
+>> --- a/arch/arm64/kvm/handle_exit.c
+>> +++ b/arch/arm64/kvm/handle_exit.c
+>> @@ -72,13 +72,15 @@ static int handle_smc(struct kvm_vcpu *vcpu)
+>>   	 *
+>>   	 * We need to advance the PC after the trap, as it would
+>>   	 * otherwise return to the same address...
+>> -	 *
+>> -	 * Only handle SMCs from the virtual EL2 with an immediate of zero 
+>> and
+>> -	 * skip it otherwise.
+>>   	 */
+>> -	if (!vcpu_is_el2(vcpu) || kvm_vcpu_hvc_get_imm(vcpu)) {
+>> +	kvm_incr_pc(vcpu);
+>> +
+>> +	/*
+>> +	 * SMCs with a nonzero immediate are reserved according to DEN0028E 
+>> 2.9
+>> +	 * "SMC and HVC immediate value".
+>> +	 */
+>> +	if (kvm_vcpu_hvc_get_imm(vcpu)) {
+>>   		vcpu_set_reg(vcpu, 0, ~0UL);
+>> -		kvm_incr_pc(vcpu);
+>>   		return 1;
+>>   	}
+>>   @@ -93,8 +95,6 @@ static int handle_smc(struct kvm_vcpu *vcpu)
+>>   	if (ret < 0)
+>>   		vcpu_set_reg(vcpu, 0, ~0UL);
+> 
+> Nothing to do with this patch. But that check above is different
+> from how we handle HVC. i.e., we return back to guest for HVCs.
+> But for SMCs, we tend to return "ret" indicating an error (ret < 0).
+> 
+> Do we need to fix that ?
 
-So this is my last remark.  What some other architectures do is change 
-vcpu->arch.mp_state when entering an idle state, and at this point all 
-calls to KVM_RUN would call the equivalent of _kvm_emu_idle().  This 
-requires implementing the KVM_GET_MPSTATE and KVM_SET_MPSTATE ioctls.
+I guess so. It is just that it is practically impossible to get
+a negative value at the moment, but it isn't something we should
+rely on.
 
-This might also be useful if later you want to implement a mechanism 
-where vCPUs can pause or resume, for example for multi-vCPU VMs.
+Thanks,
 
-You can implement this on top of what you have, but I highly recommend 
-that you do it in the first version of what is committed to Linux.
-
-Paolo
-
+         M.
+-- 
+Jazz is not dead. It just smells funny...
