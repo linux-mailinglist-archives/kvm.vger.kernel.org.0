@@ -2,118 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id ACC8B6CCB30
-	for <lists+kvm@lfdr.de>; Tue, 28 Mar 2023 22:05:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7EE266CCB35
+	for <lists+kvm@lfdr.de>; Tue, 28 Mar 2023 22:07:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229655AbjC1UFg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Mar 2023 16:05:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54328 "EHLO
+        id S229820AbjC1UHx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Mar 2023 16:07:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55920 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229487AbjC1UFe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Mar 2023 16:05:34 -0400
-Received: from mail-ot1-x332.google.com (mail-ot1-x332.google.com [IPv6:2607:f8b0:4864:20::332])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A380D8
-        for <kvm@vger.kernel.org>; Tue, 28 Mar 2023 13:05:33 -0700 (PDT)
-Received: by mail-ot1-x332.google.com with SMTP id l39-20020a9d1b2a000000b006a121324abdso5461919otl.7
-        for <kvm@vger.kernel.org>; Tue, 28 Mar 2023 13:05:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1680033933;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=G6FEViEm4gU8JFCJ2RcfK27b9/P3kvs8pk7ugYHZuE0=;
-        b=CAj5fUeBt+P1MSKUzcuWRJjggwGGZ+vYKqnFK/a54Ju3lhtya1J1ugBJg02KobtzFt
-         8OHDRLAGnK49Hx7QJTS0AVwRdX7Fgmdsd4TKdXNs+tRx1/ptmc6RczIfzfYG5/SQfgj8
-         3yEn2AMT2wn8RXg4V5X8ikI0vD9BjMhzdr7BJJg7VppGmJsLlEeQtJNrMNW3YiQ7MhWw
-         I9lc1/2rFeHVLoby+T7rDtcRu/PIILyndSj2r3Mg1YHb38qobpZ6Tb053+pUuG1NTrX1
-         HLs+ndyMV9XKJWk5lFtVD7mB4GS/LBjge8IN4uOyqfEQB43z9Rh8ajNCDdxjM5Irm013
-         ut7Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680033933;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=G6FEViEm4gU8JFCJ2RcfK27b9/P3kvs8pk7ugYHZuE0=;
-        b=lIzaAZ2aUKPl5zN4Lg0cVGrH+G3aoZgye8br8xKKG1iWWH6dYJLWigXPZ/DIPoLcJt
-         QxUV/bILqAVJAR8mCqutocvOanXu96uec80lm3uEF4MsK31Y5Md82dJLxc9e8AH/L1Xc
-         +PJFXz65scNocedsuFz5lFlXB4A8UyY5uCA5aSVa0kHOOVXAjXFgq1jPWJOs7rZHYZVu
-         FqxhkzUJcLmqUGtjyWSGUsr0F250Gz601jPdIQo4WKtp6r9iAFBbq4W/8iWZzgo3O0H7
-         ionjvk42Q7N+sP9PqwEhJ6bpOcrMsH1I3jf3ez7ihoj2K4k1InbK4ObKxIZlf7h7TrPx
-         HG0Q==
-X-Gm-Message-State: AO0yUKVUpF3QYEHkXWjt+jL26BpMyG5KlyYqxgd8cdePvlsmxjhQaeml
-        6rJGsSGepN/8VgGT396ahgTaQ8hbpqw2fizhoLKZlg==
-X-Google-Smtp-Source: AK7set+9cVCFolZRcf/HkeMdzjRC+qu7Oe4WvcGrY+CXjpOPVRzgrslvflHbt6aKN8UoutEzxgbN5k5tngkpn/CeRpA=
-X-Received: by 2002:a9d:7998:0:b0:694:3b4e:d8d7 with SMTP id
- h24-20020a9d7998000000b006943b4ed8d7mr8972612otm.0.1680033932848; Tue, 28 Mar
- 2023 13:05:32 -0700 (PDT)
+        with ESMTP id S229737AbjC1UHw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Mar 2023 16:07:52 -0400
+Received: from mail.skyhub.de (mail.skyhub.de [5.9.137.197])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 738DB3A80;
+        Tue, 28 Mar 2023 13:07:30 -0700 (PDT)
+Received: from zn.tnic (p5de8e687.dip0.t-ipconnect.de [93.232.230.135])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id EA9441EC0338;
+        Tue, 28 Mar 2023 22:07:28 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1680034049;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=oKdrTofyNMhqgonYPtcUFPursqcJed5p9iWqgPvlUv8=;
+        b=Uhho4MMUmurp416gdQL7sryvkLqZDiWjF3Kfs8kHJ2TBPN7gNR+Ck5Z3Tv2WzkziVYGxfV
+        CsZZVDBePQq9Zbq6hN/woB6FV22qLMBj5e2ik+8Wy2BHm/iAj1774PdVFdqYPAN5EqASs6
+        t7XJRN87/P/+Ly8Fk15CYFqRBIqO688=
+Date:   Tue, 28 Mar 2023 22:07:25 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Usama Arif <usama.arif@bytedance.com>
+Cc:     dwmw2@infradead.org, tglx@linutronix.de, kim.phillips@amd.com,
+        brgerst@gmail.com, piotrgorski@cachyos.org,
+        oleksandr@natalenko.name, arjan@linux.intel.com, mingo@redhat.com,
+        dave.hansen@linux.intel.com, hpa@zytor.com, x86@kernel.org,
+        pbonzini@redhat.com, paulmck@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        rcu@vger.kernel.org, mimoja@mimoja.de, hewenliang4@huawei.com,
+        thomas.lendacky@amd.com, seanjc@google.com, pmenzel@molgen.mpg.de,
+        fam.zheng@bytedance.com, punit.agrawal@bytedance.com,
+        simon.evans@bytedance.com, liangma@liangbit.com,
+        gpiccoli@igalia.com, David Woodhouse <dwmw@amazon.co.uk>,
+        Sabin Rapan <sabrapan@amazon.com>
+Subject: Re: [PATCH v17 8/8] x86/smpboot: Allow parallel bringup for SEV-ES
+Message-ID: <20230328200725.GHZCNI/dHoUMwhsfiC@fat_crate.local>
+References: <20230328195758.1049469-1-usama.arif@bytedance.com>
+ <20230328195758.1049469-9-usama.arif@bytedance.com>
 MIME-Version: 1.0
-References: <20230317050637.766317-1-jingzhangos@google.com>
- <20230317050637.766317-3-jingzhangos@google.com> <861qlaxzyw.wl-maz@kernel.org>
- <CAAdAUtjp1tdyadjtU0RrdsRq-D3518G8eqP_coYNJ1vFEvrz2Q@mail.gmail.com> <87y1ngr89q.wl-maz@kernel.org>
-In-Reply-To: <87y1ngr89q.wl-maz@kernel.org>
-From:   Jing Zhang <jingzhangos@google.com>
-Date:   Tue, 28 Mar 2023 13:05:21 -0700
-Message-ID: <CAAdAUtj=D1+6bscT-CS5naKfi=Z4bKZ5F+xnmpPR5zHPhDExKg@mail.gmail.com>
-Subject: Re: [PATCH v4 2/6] KVM: arm64: Save ID registers' sanitized value per guest
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>,
-        ARMLinux <linux-arm-kernel@lists.infradead.org>,
-        Oliver Upton <oupton@google.com>,
-        Will Deacon <will@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Fuad Tabba <tabba@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Raghavendra Rao Ananta <rananta@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-15.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,ENV_AND_HDR_SPF_MATCH,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL,
-        USER_IN_DEF_SPF_WL autolearn=unavailable autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20230328195758.1049469-9-usama.arif@bytedance.com>
+X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
+        DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 28, 2023 at 12:22=E2=80=AFPM Marc Zyngier <maz@kernel.org> wrot=
-e:
->
-> On Tue, 28 Mar 2023 18:36:58 +0100,
-> Jing Zhang <jingzhangos@google.com> wrote:
-> >
-> > Hi Marc,
->
-> [...]
->
-> > IIUC, usually we don't need a specific locking to update idregs here.
-> > All idregs are 64 bit and can be read/written atomically. The only
-> > case that may need a locking is to keep the consistency for PMUVer in
-> > AA64DFR0_EL1 and PerfMon in DFR0_EL1. If there is no use case for two
-> > VCPU threads in a VM to update PMUVer and PerfMon concurrently, then
-> > we don't need the locking as in later patch by using the kvm lock.
-> > WDTY?
->
-> I think we generally need locking for any writable id-reg, the goal
-> being that they will ultimately *all* be writable. As you found out,
-> there is this need for the PMU fields, and I'm willing to bet that
-> there will be more of those.
->
-> And given that the locking you have used in some of the later patches
-> violates the locking order (don't worry, you're not alone!), we need
-> to use something else. Which is where Oliver's series comes into play.
-Got it. Thanks for the details. I'll add locking based on Oliver's series.
->
-> Thanks,
->
->         M.
->
-> --
-> Without deviation from the norm, progress is not possible.
-Thanks,
-Jing
+On Tue, Mar 28, 2023 at 08:57:58PM +0100, Usama Arif wrote:
+> From: David Woodhouse <dwmw@amazon.co.uk>
+> 
+> Enable parallel bringup for SEV-ES guests. The APs can't actually
+> execute the CPUID instruction directly during early startup, but they
+> can make the GHCB call directly instead, just as the VC trap handler
+> would do.
+> 
+> Thanks to Sabin for talking me through the way this works.
+> 
+> Suggested-by: Sabin Rapan <sabrapan@amazon.com>
+> Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+> Signed-off-by: Usama Arif <usama.arif@bytedance.com>
+> Reviewed-by: Tom Lendacky <thomas.lendacky@amd.com>
+> ---
+>  arch/x86/coco/core.c              |  5 ++++
+>  arch/x86/include/asm/coco.h       |  1 +
+>  arch/x86/include/asm/sev-common.h |  3 +++
+>  arch/x86/include/asm/smp.h        |  5 +++-
+>  arch/x86/kernel/head_64.S         | 30 ++++++++++++++++++++++++
+>  arch/x86/kernel/smpboot.c         | 39 ++++++++++++++++++++++++++-----
+>  6 files changed, 76 insertions(+), 7 deletions(-)
+> 
+> diff --git a/arch/x86/coco/core.c b/arch/x86/coco/core.c
+> index 49b44f881484..0bab38efb15a 100644
+> --- a/arch/x86/coco/core.c
+> +++ b/arch/x86/coco/core.c
+> @@ -129,6 +129,11 @@ u64 cc_mkdec(u64 val)
+>  }
+>  EXPORT_SYMBOL_GPL(cc_mkdec);
+>  
+> +enum cc_vendor cc_get_vendor(void)
+> +{
+> +	return vendor;
+> +}
+> +
+>  __init void cc_set_vendor(enum cc_vendor v)
+>  {
+>  	vendor = v;
+> diff --git a/arch/x86/include/asm/coco.h b/arch/x86/include/asm/coco.h
+> index 3d98c3a60d34..0428d9712c96 100644
+> --- a/arch/x86/include/asm/coco.h
+> +++ b/arch/x86/include/asm/coco.h
+> @@ -12,6 +12,7 @@ enum cc_vendor {
+>  };
+>  
+>  void cc_set_vendor(enum cc_vendor v);
+> +enum cc_vendor cc_get_vendor(void);
+>  void cc_set_mask(u64 mask);
+>  
+>  #ifdef CONFIG_ARCH_HAS_CC_PLATFORM
+
+You don't need those hunks adding cc_set_vendor() anymore:
+
+https://git.kernel.org/tip/5ae57743f578725a5dadb6f31d7798ee55e6e967
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
