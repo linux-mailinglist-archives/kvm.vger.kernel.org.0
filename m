@@ -2,474 +2,296 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3CCF46CF45E
-	for <lists+kvm@lfdr.de>; Wed, 29 Mar 2023 22:19:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 768716CF4E0
+	for <lists+kvm@lfdr.de>; Wed, 29 Mar 2023 22:56:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229588AbjC2UTo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 Mar 2023 16:19:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37574 "EHLO
+        id S229948AbjC2U4a (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 Mar 2023 16:56:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35318 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229481AbjC2UTn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 29 Mar 2023 16:19:43 -0400
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D100211C
-        for <kvm@vger.kernel.org>; Wed, 29 Mar 2023 13:19:40 -0700 (PDT)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-5417f156cb9so167192557b3.8
-        for <kvm@vger.kernel.org>; Wed, 29 Mar 2023 13:19:40 -0700 (PDT)
+        with ESMTP id S229475AbjC2U43 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 29 Mar 2023 16:56:29 -0400
+Received: from mail-wm1-x335.google.com (mail-wm1-x335.google.com [IPv6:2a00:1450:4864:20::335])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5A4E10FB
+        for <kvm@vger.kernel.org>; Wed, 29 Mar 2023 13:56:26 -0700 (PDT)
+Received: by mail-wm1-x335.google.com with SMTP id j18-20020a05600c1c1200b003ee5157346cso12241188wms.1
+        for <kvm@vger.kernel.org>; Wed, 29 Mar 2023 13:56:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1680121179;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=XYCjXnCbKN0PKkjf/crQNfbLtlBmvSfxLnNMsYaCJAI=;
-        b=Q4fVUhMJZ2VEoEGBOrMdLrJvCAfH4D4nBijG9a2dGjH0LYJ9xtR6jFOClavT+p3WSF
-         /ieyUJplRJvO5/il4QvETEhFDZkT9nTWYBJUhyuKSKrrI7fhtMiOeJ6jwrz5N0MF0y9C
-         1TLiYnzZTJOOnS/25vbgjaka/Wn2TSTbNEqgusKUZvTx0kpdYvYHub4A/Q05zg6hgGja
-         b6+TZ8NFmx2JljIi2jB8nbg2yJu1/jEwPZNkIrPXdHyj7ObBMC8Uj+MomqmFCZsZZon4
-         9n2Hw8wSlnhpf0zFC42QRDkvQ9w1Faonq1ucsjy/Hld9+bRisFqjXCpEkJPCqRJ4psrQ
-         niFQ==
+        d=linaro.org; s=google; t=1680123385;
+        h=content-transfer-encoding:mime-version:message-id:in-reply-to:date
+         :subject:cc:to:from:user-agent:references:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=gtBdKuDV256k43h2KK50cgoHxH1VCSEKNO2ufgv5r2s=;
+        b=ICvBLy4hrp+QYvOJ1ErKmxNmxeTXOgckXBBiNKT3vnVWtanE7C3qVx5sWbdmiib32Q
+         ihiDvJTy52AH/W52B9BPoW0YSnxvelQzeHhwKSZeZAjOL7jKnrH/EFkXywHHYORvEZZ7
+         arQbKgXPiQikBaXwzw1q0JWBGocZFCIDs8HzV55O/+9CZ2aidafKfSAmjxIjSXvt/xed
+         aZRQIym1UEYvJxAzXAAFvtw0s7ZyYSYAhwt19IrObO29otdTotcLoUX8iO0g1DmfjSI+
+         u+rHfSTtndm98YXCIQ/LEYwA5KII/qKP8/UPxsTBIBtyKnAEsE5D9H4irlzVmIBbMClf
+         ds8g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680121179;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=XYCjXnCbKN0PKkjf/crQNfbLtlBmvSfxLnNMsYaCJAI=;
-        b=SE73JsNdNF62hR1bMYY8gwdsTtBDc/6/ucg6FouCEzbkIAJRLDG1QH9/JUXB2Wy64N
-         y/C6DgDpLeb4/ICGLkBK1I7o2tf4Qbs5KpdlzpJmCAO334vNarUMhSP4ySSs9fjJHi7E
-         qzosE0U/OvNMExozOQxa+2KBBhnB6pGnSdMWsetwKjJY1kAvGUQP6Pvvg9W4rPQBDisz
-         tqQuP3CbYtQ1iGR98VjAMsLTn2lt+EiBBXrGtgqNaJUeNjm461NUNWLk32au8fRdOr5+
-         FkNf1/bZ5VGLy3KBOfXYtukm03MzKMX4Q/+fXiQQ4NgCw8mTu2DDlYQio5HGS+XDo5gj
-         javw==
-X-Gm-Message-State: AAQBX9e3nsj5AXDIEHSDDMD6Z1wlaRwtx2ufjYcmfhsMSL0tdJoMFsUk
-        Gxr5Hk7jhihSbV/SsOWdSG7fdPLK570=
-X-Google-Smtp-Source: AKy350ZIV/lRzBXoo6utQ0EIvoOZHHC57nvHhNiap20xqkupn9VmloUhByhO84IhMtiJ4j8NKFaasEDxR3Y=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a0d:ec12:0:b0:545:bade:c590 with SMTP id
- q18-20020a0dec12000000b00545badec590mr8154846ywn.1.1680121179401; Wed, 29 Mar
- 2023 13:19:39 -0700 (PDT)
-Date:   Wed, 29 Mar 2023 13:19:37 -0700
-In-Reply-To: <20230316031732.3591455-2-npiggin@gmail.com>
-Mime-Version: 1.0
-References: <20230316031732.3591455-1-npiggin@gmail.com> <20230316031732.3591455-2-npiggin@gmail.com>
-Message-ID: <ZCSdWc9te0Noiwo3@google.com>
-Subject: Re: [PATCH 1/2] KVM: PPC: Add kvm selftests support for powerpc
-From:   Sean Christopherson <seanjc@google.com>
-To:     Nicholas Piggin <npiggin@gmail.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
-        linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
-        linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-7.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+        d=1e100.net; s=20210112; t=1680123385;
+        h=content-transfer-encoding:mime-version:message-id:in-reply-to:date
+         :subject:cc:to:from:user-agent:references:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=gtBdKuDV256k43h2KK50cgoHxH1VCSEKNO2ufgv5r2s=;
+        b=CYdWkY6kfEEcqxnJ3YECj65tDjD6+eHQBTmtltD8VcwQ+1sV8k3433DAUJR54FGsae
+         yljQYGgeaOoh0pPW2nT47uVUEEpTArM9GmPqNID3/CuoDNztoeOxPvtOoRlNm8tHsgZ+
+         WuwjS4AFmlkgQEB5pLL00HnISS1gHeh9bcMlA4bGxbBZvow+QRpqbt6NNUqOvzGE37El
+         Ee+S330ujznVub9Vt+fUQNowIL198EnXNySy5EQlgeR7bCi0SllLtgwJoLsF9s4U9gPg
+         1wnEinUnqPl8u+GEhHzxslXFA5iofRaWMcZVY4RNWePJWVGFnARBsPlmF4fZRlwxjERh
+         QHqw==
+X-Gm-Message-State: AAQBX9eVM3voj1Eye+RArW5xT1PZMBRG+5PPHXHNIrLPVDbjPzQwMTb/
+        EEnAwOQN2l/3afRsh3ccoDEM2Q==
+X-Google-Smtp-Source: AKy350aw+Y3H6dtCnE8Y8sk2DGBKHBWhiLU1gLE4jX1PUgSL8oum1lRW1blLFjPiXpDkZ0DYjZ3MHw==
+X-Received: by 2002:a1c:cc1a:0:b0:3ef:622c:26d3 with SMTP id h26-20020a1ccc1a000000b003ef622c26d3mr12421462wmb.35.1680123385227;
+        Wed, 29 Mar 2023 13:56:25 -0700 (PDT)
+Received: from zen.linaroharston ([85.9.250.243])
+        by smtp.gmail.com with ESMTPSA id n2-20020a05600c4f8200b003ef5e5f93f5sm3609213wmq.19.2023.03.29.13.56.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 29 Mar 2023 13:56:24 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+        by zen.linaroharston (Postfix) with ESMTP id 6879F1FFB7;
+        Wed, 29 Mar 2023 21:56:24 +0100 (BST)
+References: <20230324160719.1790792-1-alex.bennee@linaro.org>
+User-agent: mu4e 1.10.0; emacs 29.0.60
+From:   Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To:     Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc:     qemu-devel@nongnu.org, David Woodhouse <dwmw@amazon.co.uk>,
+        Cleber Rosa <crosa@redhat.com>,
+        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+        Wainer dos Santos Moschetta <wainersm@redhat.com>,
+        Beraldo Leal <bleal@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "open list:Overall KVM CPUs" <kvm@vger.kernel.org>
+Subject: Re: [RFC PATCH] tests/avocado: Test Xen guest support under KVM
+Date:   Wed, 29 Mar 2023 21:56:04 +0100
+In-reply-to: <20230324160719.1790792-1-alex.bennee@linaro.org>
+Message-ID: <87y1nfp98n.fsf@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
+        DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 16, 2023, Nicholas Piggin wrote:
-> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-> index 3ea24a5f4c43..28ece960a0bb 100644
-> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
-> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-> @@ -153,6 +153,7 @@ const char *vm_guest_mode_string(uint32_t i)
->  		[VM_MODE_PXXV48_4K]	= "PA-bits:ANY, VA-bits:48,  4K pages",
->  		[VM_MODE_P47V64_4K]	= "PA-bits:47,  VA-bits:64,  4K pages",
->  		[VM_MODE_P44V64_4K]	= "PA-bits:44,  VA-bits:64,  4K pages",
-> +		[VM_MODE_P52V52_64K]	= "PA-bits:52,  VA-bits:52, 64K pages",
->  		[VM_MODE_P36V48_4K]	= "PA-bits:36,  VA-bits:48,  4K pages",
->  		[VM_MODE_P36V48_16K]	= "PA-bits:36,  VA-bits:48, 16K pages",
->  		[VM_MODE_P36V48_64K]	= "PA-bits:36,  VA-bits:48, 64K pages",
-> @@ -178,6 +179,7 @@ const struct vm_guest_mode_params vm_guest_mode_params[] = {
->  	[VM_MODE_PXXV48_4K]	= {  0,  0,  0x1000, 12 },
->  	[VM_MODE_P47V64_4K]	= { 47, 64,  0x1000, 12 },
->  	[VM_MODE_P44V64_4K]	= { 44, 64,  0x1000, 12 },
-> +	[VM_MODE_P52V52_64K]	= { 52, 52, 0x10000, 16 },
->  	[VM_MODE_P36V48_4K]	= { 36, 48,  0x1000, 12 },
->  	[VM_MODE_P36V48_16K]	= { 36, 48,  0x4000, 14 },
->  	[VM_MODE_P36V48_64K]	= { 36, 48, 0x10000, 16 },
-> @@ -279,6 +281,14 @@ struct kvm_vm *____vm_create(enum vm_guest_mode mode)
->  	case VM_MODE_P44V64_4K:
->  		vm->pgtable_levels = 5;
->  		break;
-> +	case VM_MODE_P52V52_64K:
-> +#ifdef __powerpc__
-> +		TEST_ASSERT(getpagesize() == 64*1024,
 
-This can use SZ_64K (we really need to convert a bunch of open coded stuff...)
+Alex Benn=C3=A9e <alex.bennee@linaro.org> writes:
 
-> +			    "KVM selftests requires 64K host page size\n");
+> From: David Woodhouse <dwmw@amazon.co.uk>
+>
+> Exercise guests with a few different modes for interrupt delivery. In
+> particular we want to cover:
+>
+>  =E2=80=A2 Xen event channel delivery via GSI to the I/O APIC
+>  =E2=80=A2 Xen event channel delivery via GSI to the i8259 PIC
+>  =E2=80=A2 MSIs routed to PIRQ event channels
+>  =E2=80=A2 GSIs routed to PIRQ event channels
+>
+> As well as some variants of normal non-Xen stuff like MSI to vAPIC and
+> PCI INTx going to the I/O APIC and PIC, which ought to still work even
+> in Xen mode.
+>
+> Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>
+> ---
+> v2 (ajb)
+>   - switch to plain QemuSystemTest + LinuxSSHMixIn
+>   - switch from fedora to custom kernel and buildroot
+>   - removed some unused code
+> TODO:
+>   - properly probe for host support to skip test
 
-What is the actual requirement?  E.g. is it that the host and guest page sizes
-must match, or is that the selftest setup itself only supports 64KiB pages?  If
-it's the former, would it make sense to assert outside of the switch statement, e.g.
+So any idea for the best thing to check for here?
 
-diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-index 298c4372fb1a..920813a71be0 100644
---- a/tools/testing/selftests/kvm/lib/kvm_util.c
-+++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-@@ -291,6 +291,10 @@ struct kvm_vm *____vm_create(enum vm_guest_mode mode)
- #ifdef __aarch64__
-        if (vm->pa_bits != 40)
-                vm->type = KVM_VM_TYPE_ARM_IPA_SIZE(vm->pa_bits);
-+#endif
-+#ifdef __powerpc__
-+       TEST_ASSERT(getpagesize() == vm->page_size, "blah blah blah");
-+
- #endif
- 
-        vm_open(vm);
+> ---
+>  tests/avocado/kvm_xen_guest.py | 160 +++++++++++++++++++++++++++++++++
+>  1 file changed, 160 insertions(+)
+>  create mode 100644 tests/avocado/kvm_xen_guest.py
+>
+> diff --git a/tests/avocado/kvm_xen_guest.py b/tests/avocado/kvm_xen_guest=
+.py
+> new file mode 100644
+> index 0000000000..1b4524d31c
+> --- /dev/null
+> +++ b/tests/avocado/kvm_xen_guest.py
+> @@ -0,0 +1,160 @@
+> +# KVM Xen guest functional tests
+> +#
+> +# Copyright =C2=A9 2021 Red Hat, Inc.
+> +# Copyright =C2=A9 2023 Amazon.com, Inc. or its affiliates. All Rights R=
+eserved.
+> +#
+> +# Author:
+> +#  David Woodhouse <dwmw2@infradead.org>
+> +#  Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> +#
+> +# SPDX-License-Identifier: GPL-2.0-or-later
+> +
+> +import os
+> +
+> +from avocado_qemu import LinuxSSHMixIn
+> +from avocado_qemu import QemuSystemTest
+> +from avocado_qemu import wait_for_console_pattern
+> +
+> +class KVMXenGuest(QemuSystemTest, LinuxSSHMixIn):
+> +    """
+> +    :avocado: tags=3Darch:x86_64
+> +    :avocado: tags=3Dmachine:q35
+> +    :avocado: tags=3Daccel:kvm
+> +    :avocado: tags=3Dkvm_xen_guest
+> +    """
+> +
+> +    KERNEL_DEFAULT =3D 'printk.time=3D0 root=3D/dev/xvda console=3DttyS0'
+> +
+> +    kernel_path =3D None
+> +    kernel_params =3D None
+> +
+> +    # Fetch assets from the kvm-xen-guest subdir of my shared test
+> +    # images directory on fileserver.linaro.org where you can find
+> +    # build instructions for how they where assembled.
+> +    def get_asset(self, name, sha1):
+> +        base_url =3D ('https://fileserver.linaro.org/s/'
+> +                    'kE4nCFLdQcoBF9t/download?'
+> +                    'path=3D%2Fkvm-xen-guest&files=3D' )
+> +        url =3D base_url + name
+> +        # use explicit name rather than failing to neatly parse the
+> +        # URL into a unique one
+> +        return self.fetch_asset(name=3Dname, locations=3D(url), asset_ha=
+sh=3Dsha1)
+> +
+> +    def common_vm_setup(self):
+> +
+> +        # TODO: we also need to check host kernel version/support
+> +        self.require_accelerator("kvm")
+> +
+> +        self.vm.set_console()
+> +
+> +        self.vm.add_args("-accel", "kvm,xen-version=3D0x4000a,kernel-irq=
+chip=3Dsplit")
+> +        self.vm.add_args("-smp", "2")
+> +
+> +        self.kernel_path =3D self.get_asset("bzImage",
+> +                                          "367962983d0d32109998a70b45dce=
+e4672d0b045")
+> +        self.rootfs =3D self.get_asset("rootfs.ext4",
+> +                                     "f1478401ea4b3fa2ea196396be44315bab=
+2bb5e4")
+> +
+> +    def run_and_check(self):
+> +        self.vm.add_args('-kernel', self.kernel_path,
+> +                         '-append', self.kernel_params,
+> +                         '-drive',  f"file=3D{self.rootfs},if=3Dnone,id=
+=3Ddrv0",
+> +                         '-device', 'xen-disk,drive=3Ddrv0,vdev=3Dxvda',
+> +                         '-device', 'virtio-net-pci,netdev=3Dunet',
+> +                         '-netdev', 'user,id=3Dunet,hostfwd=3D:127.0.0.1=
+:0-:22')
+> +
+> +        self.vm.launch()
+> +        self.log.info('VM launched, waiting for sshd')
+> +        console_pattern =3D 'Starting dropbear sshd: OK'
+> +        wait_for_console_pattern(self, console_pattern, 'Oops')
+> +        self.log.info('sshd ready')
+> +        self.ssh_connect('root', '', False)
+> +
+> +        self.ssh_command('cat /proc/cmdline')
+> +        self.ssh_command('dmesg | grep -e "Grant table initialized"')
+> +
+> +    def test_kvm_xen_guest(self):
+> +        """
+> +        :avocado: tags=3Dkvm_xen_guest
+> +        """
+> +
+> +        self.common_vm_setup()
+> +
+> +        self.kernel_params =3D (self.KERNEL_DEFAULT +
+> +                              ' xen_emul_unplug=3Dide-disks')
+> +        self.run_and_check()
+> +        self.ssh_command('grep xen-pirq.*msi /proc/interrupts')
+> +
+> +    def test_kvm_xen_guest_nomsi(self):
+> +        """
+> +        :avocado: tags=3Dkvm_xen_guest_nomsi
+> +        """
+> +
+> +        self.common_vm_setup()
+> +
+> +        self.kernel_params =3D (self.KERNEL_DEFAULT +
+> +                              ' xen_emul_unplug=3Dide-disks pci=3Dnomsi')
+> +        self.run_and_check()
+> +        self.ssh_command('grep xen-pirq.* /proc/interrupts')
+> +
+> +    def test_kvm_xen_guest_noapic_nomsi(self):
+> +        """
+> +        :avocado: tags=3Dkvm_xen_guest_noapic_nomsi
+> +        """
+> +
+> +        self.common_vm_setup()
+> +
+> +        self.kernel_params =3D (self.KERNEL_DEFAULT +
+> +                              ' xen_emul_unplug=3Dide-disks noapic pci=
+=3Dnomsi')
+> +        self.run_and_check()
+> +        self.ssh_command('grep xen-pirq /proc/interrupts')
+> +
+> +    def test_kvm_xen_guest_vapic(self):
+> +        """
+> +        :avocado: tags=3Dkvm_xen_guest_vapic
+> +        """
+> +
+> +        self.common_vm_setup()
+> +        self.vm.add_args('-cpu', 'host,+xen-vapic')
+> +        self.kernel_params =3D (self.KERNEL_DEFAULT +
+> +                              ' xen_emul_unplug=3Dide-disks')
+> +        self.run_and_check()
+> +        self.ssh_command('grep xen-pirq /proc/interrupts')
+> +        self.ssh_command('grep PCI-MSI /proc/interrupts')
+> +
+> +    def test_kvm_xen_guest_novector(self):
+> +        """
+> +        :avocado: tags=3Dkvm_xen_guest_novector
+> +        """
+> +
+> +        self.common_vm_setup()
+> +        self.kernel_params =3D (self.KERNEL_DEFAULT +
+> +                              ' xen_emul_unplug=3Dide-disks' +
+> +                              ' xen_no_vector_callback')
+> +        self.run_and_check()
+> +        self.ssh_command('grep xen-platform-pci /proc/interrupts')
+> +
+> +    def test_kvm_xen_guest_novector_nomsi(self):
+> +        """
+> +        :avocado: tags=3Dkvm_xen_guest_novector_nomsi
+> +        """
+> +
+> +        self.common_vm_setup()
+> +
+> +        self.kernel_params =3D (self.KERNEL_DEFAULT +
+> +                              ' xen_emul_unplug=3Dide-disks pci=3Dnomsi'=
+ +
+> +                              ' xen_no_vector_callback')
+> +        self.run_and_check()
+> +        self.ssh_command('grep xen-platform-pci /proc/interrupts')
+> +
+> +    def test_kvm_xen_guest_novector_noapic(self):
+> +        """
+> +        :avocado: tags=3Dkvm_xen_guest_novector_noapic
+> +        """
+> +
+> +        self.common_vm_setup()
+> +        self.kernel_params =3D (self.KERNEL_DEFAULT +
+> +                              ' xen_emul_unplug=3Dide-disks' +
+> +                              ' xen_no_vector_callback noapic')
+> +        self.run_and_check()
+> +        self.ssh_command('grep xen-platform-pci /proc/interrupts')
 
-If it's the latter (selftests limitation), can you add a comment explaining the
-limitation?
 
-> +void virt_arch_pgd_alloc(struct kvm_vm *vm)
-> +{
-> +	struct kvm_ppc_mmuv3_cfg mmu_cfg;
-> +	vm_paddr_t prtb, pgtb;
-> +	uint64_t *proc_table, *page_table;
-> +	size_t pgd_pages;
-> +
-> +	TEST_ASSERT(vm->mode == VM_MODE_P52V52_64K, "Attempt to use "
-> +		"unknown or unsupported guest mode, mode: 0x%x", vm->mode);
-
-Please don't split quoted lines, especially when it's easily avoided, e.g.
-
-	TEST_ASSERT(vm->mode == VM_MODE_P52V52_64K,
-		    "PPC doesn't support guest mode '0x%x', vm->mode);
-
-> +
-> +	/* If needed, create page table */
-> +	if (vm->pgd_created)
-> +		return;
-
-Heh, every arch has this.  Any objection to moving the check to virt_pgd_alloc()
-as a prep patch?
-
-> +
-> +	prtb = vm_phy_page_alloc(vm, KVM_GUEST_PAGE_TABLE_MIN_PADDR,
-> +				 vm->memslots[MEM_REGION_PT]);
-> +	proc_table = addr_gpa2hva(vm, prtb);
-> +	memset(proc_table, 0, vm->page_size);
-> +	vm->prtb = prtb;
-> +
-> +	pgd_pages = 1UL << ((RADIX_PGD_INDEX_SIZE + 3) >> vm->page_shift);
-> +	TEST_ASSERT(pgd_pages == 1, "PGD allocation must be single page");
-> +	pgtb = vm_phy_page_alloc(vm, KVM_GUEST_PAGE_TABLE_MIN_PADDR,
-> +				 vm->memslots[MEM_REGION_PT]);
-> +	page_table = addr_gpa2hva(vm, pgtb);
-> +	memset(page_table, 0, vm->page_size * pgd_pages);
-> +	vm->pgd = pgtb;
-> +
-> +	/* Set the base page directory in the proc table */
-> +	proc_table[0] = cpu_to_be64(pgtb | RTS | RADIX_PGD_INDEX_SIZE);
-> +
-> +	mmu_cfg.process_table = prtb | 0x8000000000000000UL | 0x4; // 64K size
-> +	mmu_cfg.flags = KVM_PPC_MMUV3_RADIX | KVM_PPC_MMUV3_GTSE;
-> +
-> +	vm_ioctl(vm, KVM_PPC_CONFIGURE_V3_MMU, &mmu_cfg);
-> +
-> +	vm->pgd_created = true;
-> +}
-> +
-> +static int pt_shift(struct kvm_vm *vm, int level)
-> +{
-> +	switch (level) {
-> +	case 1:
-> +		return 13;
-> +	case 2:
-> +	case 3:
-> +		return 9;
-> +	case 4:
-> +		return 5;
-> +	default:
-> +		TEST_ASSERT(false, "Invalid page table level %d\n", level);
-> +		return 0;
-> +	}
-> +}
-> +
-> +static uint64_t pt_entry_coverage(struct kvm_vm *vm, int level)
-> +{
-> +	uint64_t size = vm->page_size;
-> +
-> +	if (level == 4)
-> +		return size;
-> +	size <<= pt_shift(vm, 4);
-> +	if (level == 3)
-> +		return size;
-> +	size <<= pt_shift(vm, 3);
-> +	if (level == 2)
-> +		return size;
-> +	size <<= pt_shift(vm, 2);
-> +	return size;
-> +}
-> +
-> +static int pt_idx(struct kvm_vm *vm, uint64_t vaddr, int level, uint64_t *nls)
-> +{
-> +	switch (level) {
-> +	case 1:
-> +		*nls = 0x9;
-> +		return (vaddr >> 39) & 0x1fff;
-> +	case 2:
-> +		*nls = 0x9;
-> +		return (vaddr >> 30) & 0x1ff;
-> +	case 3:
-> +// 4K		*nls = 0x9;
-> +		*nls = 0x5;
-> +		return (vaddr >> 21) & 0x1ff;
-> +	case 4:
-> +// 4K		return (vaddr >> 12) & 0x1ff;
-> +		return (vaddr >> 16) & 0x1f;
-> +	default:
-> +		TEST_ASSERT(false, "Invalid page table level %d\n", level);
-> +		return 0;
-> +	}
-> +}
-> +
-> +static uint64_t *virt_get_pte(struct kvm_vm *vm, vm_paddr_t pt,
-> +			  uint64_t vaddr, int level, uint64_t *nls)
-> +{
-> +	uint64_t *page_table = addr_gpa2hva(vm, pt);
-> +	int idx = pt_idx(vm, vaddr, level, nls);
-> +
-> +	return &page_table[idx];
-> +}
-> +
-> +#define PTE_VALID	0x8000000000000000ull
-> +#define PTE_LEAF	0x4000000000000000ull
-> +#define PTE_REFERENCED	0x0000000000000100ull
-> +#define PTE_CHANGED	0x0000000000000080ull
-> +#define PTE_PRIV	0x0000000000000008ull
-> +#define PTE_READ	0x0000000000000004ull
-> +#define PTE_RW		0x0000000000000002ull
-> +#define PTE_EXEC	0x0000000000000001ull
-> +#define PTE_PAGE_MASK	0x01fffffffffff000ull
-> +
-> +#define PDE_VALID	PTE_VALID
-> +#define PDE_NLS		0x0000000000000011ull
-> +#define PDE_PT_MASK	0x0fffffffffffff00ull
-> +
-> +void virt_arch_pg_map(struct kvm_vm *vm, uint64_t gva, uint64_t gpa)
-> +{
-> +	vm_paddr_t pt = vm->pgd;
-> +	uint64_t *ptep, pte;
-> +	int level;
-> +
-> +	for (level = 1; level <= 3; level++) {
-> +		uint64_t nls;
-> +		uint64_t *pdep = virt_get_pte(vm, pt, gva, level, &nls);
-> +		uint64_t pde = be64_to_cpu(*pdep);
-> +		uint64_t *page_table;
-> +
-> +		if (pde) {
-> +			TEST_ASSERT((pde & PDE_VALID) && !(pde & PTE_LEAF),
-> +				"Invalid PDE at level: %u gva: 0x%lx pde:0x%lx\n",
-> +				level, gva, pde);
-> +			pt = pde & PDE_PT_MASK;
-> +			continue;
-> +		}
-> +
-> +		// XXX: 64K geometry does not require full pages!
-> +		pt = vm_phy_page_alloc(vm,
-> +				       KVM_GUEST_PAGE_TABLE_MIN_PADDR,
-> +				       vm->memslots[MEM_REGION_PT]);
-> +		page_table = addr_gpa2hva(vm, pt);
-> +		memset(page_table, 0, vm->page_size);
-> +		pde = PDE_VALID | nls | pt;
-> +		*pdep = cpu_to_be64(pde);
-> +	}
-> +
-> +	ptep = virt_get_pte(vm, pt, gva, level, NULL);
-> +	pte = be64_to_cpu(*ptep);
-> +
-> +	TEST_ASSERT(!pte,
-> +		"PTE already present at level: %u gva: 0x%lx pte:0x%lx\n",
-> +		level, gva, pte);
-> +
-> +	pte = PTE_VALID | PTE_LEAF | PTE_REFERENCED | PTE_CHANGED | PTE_PRIV | PTE_READ | PTE_RW | PTE_EXEC | (gpa & PTE_PAGE_MASK);
-
-Please wrap at 80 chars when it's convenient.  The general/unofficial style in
-KVM is to honor the old 80 char limit unless there's a good reason not to.  E.g.
-wrapping a line just because the terminating semicolon bumped past 80 is absurd.
-
-> +	*ptep = cpu_to_be64(pte);
-> +}
-> +
-> +vm_paddr_t addr_arch_gva2gpa(struct kvm_vm *vm, vm_vaddr_t gva)
-> +{
-> +	vm_paddr_t pt = vm->pgd;
-> +	uint64_t *ptep, pte;
-> +	int level;
-> +
-> +	for (level = 1; level <= 3; level++) {
-> +		uint64_t nls;
-> +		uint64_t *pdep = virt_get_pte(vm, pt, gva, level, &nls);
-> +		uint64_t pde = be64_to_cpu(*pdep);
-> +
-> +		TEST_ASSERT((pde & PDE_VALID) && !(pde & PTE_LEAF),
-> +			"PDE not present at level: %u gva: 0x%lx pde:0x%lx\n",
-> +			level, gva, pde);
-> +		pt = pde & PDE_PT_MASK;
-> +	}
-> +
-> +	ptep = virt_get_pte(vm, pt, gva, level, NULL);
-> +	pte = be64_to_cpu(*ptep);
-> +
-> +	TEST_ASSERT(pte,
-> +		"PTE not present at level: %u gva: 0x%lx pte:0x%lx\n",
-> +		level, gva, pte);
-> +
-> +	TEST_ASSERT((pte & PTE_VALID) && (pte & PTE_LEAF) && (pte & PTE_READ) && (pte & PTE_RW) && (pte & PTE_EXEC),
-
-Wrap here as well.
-
-> +		"PTE not valid at level: %u gva: 0x%lx pte:0x%lx\n",
-> +		level, gva, pte);
-> +
-> +	return (pte & PTE_PAGE_MASK) + (gva & (vm->page_size - 1));
-> +}
-> +
-> +static void virt_arch_dump_pt(FILE *stream, struct kvm_vm *vm, vm_paddr_t pt, vm_vaddr_t va, int level, uint8_t indent)
-
-And here.  Actually, why bother with the helper?  There's one caller, and that
-callers checks pgd_created, i.e. is already assuming its dumping only page tables.
-Ooh, nevermind, it's recursive.
-
-Can you drop "arch" from the name?  Selftests uses "arch" to tag functions that
-are provided by arch code for use in generic code.
-
-> +{
-> +	uint64_t *page_table;
-> +	int size, idx;
-> +
-> +	page_table = addr_gpa2hva(vm, pt);
-> +	size = 1U << pt_shift(vm, level);
-> +	for (idx = 0; idx < size; idx++) {
-> +		uint64_t pte = be64_to_cpu(page_table[idx]);
-
-Newline after variable declaration.
-
-> +		if (pte & PTE_VALID) {
-> +			if (pte & PTE_LEAF) {
-
-Curly braces aren't necessary.
-
-> +				fprintf(stream, "%*sgVA:0x%016lx -> gRA:0x%016llx\n", indent, "", va, pte & PTE_PAGE_MASK);
-
-Probably worth wrapping here too.
-
-> +			} else {
-> +				virt_arch_dump_pt(stream, vm, pte & PDE_PT_MASK, va, level + 1, indent);
-> +			}
-> +		}
-> +		va += pt_entry_coverage(vm, level);
-
-The shift is constant for vm+level, correct?  In that case, can't this be written
-as
-
-	for (idx = 0; idx < size; idx++, va += va_coverage) {
-
-or even without a snapshot
-
-	for (idx = 0; idx < size; idx++, va += pt_entry_coverage(vm, level)) {
-
-That would allow
-
-		if (!(pte & PTE_VALID)
-			continue
-
-to reduce the indentation of the printing.
-
-> +	}
-> +
-> +}
-> +
-> +void virt_arch_dump(FILE *stream, struct kvm_vm *vm, uint8_t indent)
-> +{
-> +	vm_paddr_t pt = vm->pgd;
-> +
-> +	if (!vm->pgd_created)
-> +		return;
-> +
-> +	virt_arch_dump_pt(stream, vm, pt, 0, 1, indent);
-> +}
-> +
-> +struct kvm_vcpu *vm_arch_vcpu_add(struct kvm_vm *vm, uint32_t vcpu_id,
-> +				  void *guest_code)
-> +{
-> +	size_t stack_size =  64*1024;
-
-SZ_64K
-
-> +	uint64_t stack_vaddr;
-> +	struct kvm_regs regs;
-> +	struct kvm_vcpu *vcpu;
-> +	uint64_t lpcr;
-> +
-> +	TEST_ASSERT(vm->page_size == 64*1024, "Unsupported page size: 0x%x",
-
-SZ_64K
-
-> +		    vm->page_size);
-> +
-> +	stack_vaddr = __vm_vaddr_alloc(vm, stack_size,
-> +				       DEFAULT_GUEST_STACK_VADDR_MIN,
-> +				       MEM_REGION_DATA);
-> +
-> +	vcpu = __vm_vcpu_add(vm, vcpu_id);
-> +
-> +	vcpu_enable_cap(vcpu, KVM_CAP_PPC_PAPR, 1);
-> +
-> +	/* Setup guest registers */
-> +	vcpu_regs_get(vcpu, &regs);
-> +	vcpu_get_reg(vcpu, KVM_REG_PPC_LPCR_64, &lpcr);
-> +
-> +	regs.pc = (uintptr_t)guest_code;
-> +	regs.gpr[12] = (uintptr_t)guest_code;
-> +	regs.msr = 0x8000000002103032ull;
-> +	regs.gpr[1] = stack_vaddr + stack_size - 256;
-> +
-> +	if (BYTE_ORDER == LITTLE_ENDIAN) {
-> +		regs.msr |= 0x1; // LE
-> +		lpcr |= 0x0000000002000000; // ILE
-
-Would it be appropriate to add #defines to processor.h instead of open coding the
-magic numbers?
-
-> +	} else {
-> +		lpcr &= ~0x0000000002000000; // !ILE
-> +	}
-> +
-> +	vcpu_regs_set(vcpu, &regs);
-> +	vcpu_set_reg(vcpu, KVM_REG_PPC_LPCR_64, lpcr);
-> +
-> +	return vcpu;
-> +}
-> +
-> +void vcpu_args_set(struct kvm_vcpu *vcpu, unsigned int num, ...)
-> +{
-> +	va_list ap;
-> +	struct kvm_regs regs;
-> +	int i;
-> +
-> +	TEST_ASSERT(num >= 1 && num <= 5, "Unsupported number of args,\n"
-
-Newlines in TEST_ASSERT() usually lead to weird formatting.
-
-> +		    "  num: %u\n",
-
-No quoted line wrap please.  And in this case, not wrapping is better IMO.
-
-	TEST_ASSERT(num >= 1 && num <= 5, "Unsupported number of args: %u", num);
-
-> +		    num);
-> +
-> +	va_start(ap, num);
-> +	vcpu_regs_get(vcpu, &regs);
-> +
-> +	for (i = 0; i < num; i++)
-> +		regs.gpr[i + 3] = va_arg(ap, uint64_t);
-> +
-> +	vcpu_regs_set(vcpu, &regs);
-> +	va_end(ap);
-> +}
+--=20
+Alex Benn=C3=A9e
+Virtualisation Tech Lead @ Linaro
