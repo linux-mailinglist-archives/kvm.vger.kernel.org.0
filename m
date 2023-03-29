@@ -2,150 +2,295 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0CF1D6CD928
-	for <lists+kvm@lfdr.de>; Wed, 29 Mar 2023 14:12:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 837576CD952
+	for <lists+kvm@lfdr.de>; Wed, 29 Mar 2023 14:25:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229669AbjC2MMz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 Mar 2023 08:12:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54464 "EHLO
+        id S229475AbjC2MY7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 Mar 2023 08:24:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36392 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229457AbjC2MMy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 29 Mar 2023 08:12:54 -0400
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2134.outbound.protection.outlook.com [40.107.93.134])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A587119A9;
-        Wed, 29 Mar 2023 05:12:51 -0700 (PDT)
+        with ESMTP id S229518AbjC2MY6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 29 Mar 2023 08:24:58 -0400
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2071d.outbound.protection.outlook.com [IPv6:2a01:111:f400:fe59::71d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DCD1F422C;
+        Wed, 29 Mar 2023 05:24:50 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=K17OB9fKJFJ9NQzKdVGP1biZt2NpRCQmv6mmH2NXH5P6JbE6I7RGyB8wWq53vmXyVHX16cZZKlEocqRN8PEhrkHq2BGGS/kLsKfM43Stei1gnPUdsk11Lk+rGHdoF/KBAHB+ZYs143hgQhBKyNzdKVwDRyN/dEqbhZTj7nzAOBrkZg09u0n64qMYdSq4AquDO8TEtoTMNSnY8mtvGGcZdl3Xk1Rg1COtext4/FgBEb6C/Iy9RruHuNIqnty7mg/GbuBMGnrklK8AOtyBtsPG5YPR73FFY5w5tfayqtpvYWtmmrlhrD4t+HdHX4Z5NeBU8bO1ffs3U/9oS0Oac/OkwA==
+ b=iNpqAhIrmiSLyPpojr86J7jjyPGWPNY4s7AVEUOKgcehEG9Bb+SS/DJvneSyxE57BS37ANJO3WJdZH1+95uyeBrrFZOzUvK3pJ/pop7rYE7vzZASQUI71UU99UbcRx7pjNKy9Yd9+SxupNuA6mee0neQ0r/2l8pZ+e4qzyIvTwg8khONh96UkKVMYGZZHrwfPNoFaE7m9QhrX652F6AAzusBGsTq0yGw6l2HnmoizWPiefakXUylM6uz7kx6o9LuTH2tnU5PlfvU5yXfgouW7vWASljM8ab+zf1it5hJ1FB1kVHIHH/A7Ek4G0kZbiOTTo8TbZgzKEp/4Q8oO1EwCw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=wZHnGdGSKkyHgvAJs6xgLket3Ji03AUXA88rO3geSv4=;
- b=IVDuNzmc7BGuDsuorc0gYBCCUJLS50QcVUG9PBXwr0+t/hl62hJd888qLbYcl0FFOqa7fgHjoIqhDn5R6++PyJkKxkh/k7dGotIH0v7A4M4kfjw/bcf5ZfnAA232INJJ9nwb6P5+3rwkqRSxn0WtRRHn+FzCA79bmLlkpgo+dGLYuzX5HJIG+2bC9Z85i4jhSLZd5RrM3FzBAnqR7S77K0g393IlSJTO4+WJdGObh1fVrEHr2MUJpuDeUGMtJZhEJ5AOELbfyROG5i59x6iHU6GyWLTwsTLGG39Y4FpKgbW7wiFPM5KpyNMMQ9eJ2K8En+bdXJiEtjdD8HEPvicgkw==
+ bh=7C51BFibW7xGNvUn1xhFcayLailsapHSAJ7ZyF86ezU=;
+ b=oTy15OzUdyZKDTN4FnYUfMWTN2BMosbDDH+xwuClScOLE9W2valvwMjFGuSObQ4S9KopbQZ/hdUruVBzegLScQSCwRPIwFEC0jjUpGvDEEx80jwW8W8IQcTDRa8j5GxLVdpPHW1kvhDlAbE5CyWlfkORBog0ZUPl6UddqNRGQQ4iDB+uMFna8B3RBDI2m4fQOMoxksuEYQiBtXT8maB/A7XJ7HZJofY3DHL55xRM77EunSO7/ld1RIa94ZnztEZ83WRXFSTS9hPNWSgEhq4eRZn4MOfhNH8OiWsXeAcRq7fMPujQ8nrQY2umoVOcAHDlrV37aqa2HoKTA9yJfbqzww==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
  dkim=pass header.d=corigine.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=wZHnGdGSKkyHgvAJs6xgLket3Ji03AUXA88rO3geSv4=;
- b=pgEzngkB0Mq/WRSzb3HofQAzohl0NT6OqPvdhHSbBYOiAnsbG4pghWWEr/bH/txioPnJb+IQuni7USaKIhZZY2+Ea9catvA0xlpsa9/da+KjDSrp1NGk8lE0U/CPpuXI2vDPEGax4eImhW2sWQHScNVpDAWgRUmEQOXcOhtdARo=
+ bh=7C51BFibW7xGNvUn1xhFcayLailsapHSAJ7ZyF86ezU=;
+ b=eTCHDpo/pwHp5dJYsiOvCKErpaaKjjFnsPWUrqSzv7gVoH6FBiBWujKY6FzNrJ6EocHVkXxZzUYUOKeZXHFddl4hVXg+cYXCTbyF1Yjug7o+Cbv9YpGhqi4jd++QOHJVOq9rinJOxazbh7nFkbBrpaWYtwv9ybPvCRZtPMFb2dw=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=corigine.com;
 Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
- by PH0PR13MB5950.namprd13.prod.outlook.com (2603:10b6:510:169::19) with
+ by DM6PR13MB4100.namprd13.prod.outlook.com (2603:10b6:5:2af::16) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6178.38; Wed, 29 Mar
- 2023 12:12:48 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6222.33; Wed, 29 Mar
+ 2023 12:24:47 +0000
 Received: from PH0PR13MB4842.namprd13.prod.outlook.com
  ([fe80::c506:5243:557e:82cb]) by PH0PR13MB4842.namprd13.prod.outlook.com
  ([fe80::c506:5243:557e:82cb%4]) with mapi id 15.20.6222.028; Wed, 29 Mar 2023
- 12:12:48 +0000
-Date:   Wed, 29 Mar 2023 14:12:41 +0200
+ 12:24:47 +0000
+Date:   Wed, 29 Mar 2023 14:24:40 +0200
 From:   Simon Horman <simon.horman@corigine.com>
 To:     Brett Creeley <brett.creeley@amd.com>
 Cc:     kvm@vger.kernel.org, netdev@vger.kernel.org,
         alex.williamson@redhat.com, jgg@nvidia.com, yishaih@nvidia.com,
         shameerali.kolothum.thodi@huawei.com, kevin.tian@intel.com,
         shannon.nelson@amd.com, drivers@pensando.io
-Subject: Re: [PATCH v6 vfio 1/7] vfio: Commonize combine_ranges for use in
- other VFIO drivers
-Message-ID: <ZCQrOeX8WtQplYdZ@corigine.com>
+Subject: Re: [PATCH v6 vfio 4/7] vfio/pds: Add VFIO live migration support
+Message-ID: <ZCQuCPG864f0R+9s@corigine.com>
 References: <20230327200553.13951-1-brett.creeley@amd.com>
- <20230327200553.13951-2-brett.creeley@amd.com>
+ <20230327200553.13951-5-brett.creeley@amd.com>
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230327200553.13951-2-brett.creeley@amd.com>
-X-ClientProxiedBy: AS4P195CA0019.EURP195.PROD.OUTLOOK.COM
- (2603:10a6:20b:5d6::6) To PH0PR13MB4842.namprd13.prod.outlook.com
+In-Reply-To: <20230327200553.13951-5-brett.creeley@amd.com>
+X-ClientProxiedBy: AS4P190CA0017.EURP190.PROD.OUTLOOK.COM
+ (2603:10a6:20b:5d0::7) To PH0PR13MB4842.namprd13.prod.outlook.com
  (2603:10b6:510:78::6)
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|PH0PR13MB5950:EE_
-X-MS-Office365-Filtering-Correlation-Id: 14d2cda5-7f07-4a5b-ce6e-08db304ee902
+X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|DM6PR13MB4100:EE_
+X-MS-Office365-Filtering-Correlation-Id: b2e31856-0247-404c-e25f-08db305095cc
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: UkhbYa/bIF6RvFMf6UQauAXkmXR+zA5kXri+eMXcrH2NN0U+7CThFDccy2lGmfmNfpJpL3ywAbyysKbrj1iJ/n2l7lfw/e/ubHZKeW3XneeDRf1PTaZRfnYecusLL3CCKrwVZqEpbSHhUynJlxv8Al3MtymsogC3KdrLcHR7D1BvojusyhhonAo6tBNUMtekwbHKZ0kizZtVgYl6+bM6TQomBN738ihG+e3HQySj5lq9pAo8GKQpDOgLASGIY6u0MhZrbGVysdKh6ZlHv9JplKT7wWhkDV9ngXMyZATevuWKIFdVpzQl8p3e/Oh/qB7oPQ+/tS/dP4ooT/2gA/NUPU0s0slGb3FobNxy2mUjx2Kkm/YqQwKp3jBG1IqEOuNmWF+IPGr6q4tn1BmUDVFjCuwmENt3G0IYd4Bf+50a+yEuwwQoBeinTiewuwYJ47pPD59EhJIwh9/SbPHYfQZX2z++Xecc7gyH2yi8GEQHzki7MtgaA0Yl9ePxl3eDWTc/XqmU0bmcjtd/FSiKWDFVhWqEhP+/Tt/s/wQi/vXb95d5W1Qk2Rc3lRHVwdWon3K5
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(136003)(396003)(366004)(376002)(346002)(39840400004)(451199021)(316002)(41300700001)(66556008)(36756003)(83380400001)(2906002)(8936002)(66946007)(8676002)(6506007)(86362001)(6916009)(2616005)(6512007)(66476007)(38100700002)(186003)(4326008)(478600001)(6486002)(6666004)(5660300002)(7416002)(44832011);DIR:OUT;SFP:1102;
+X-Microsoft-Antispam-Message-Info: XEXKZCRsVGSwAzxRIJDhzKjXjvuYwGpZcuJwJKbSZvBJbJtjoevghT+pFEAkMbOTMlgwfG3po40W6kJ6pFk610DPYfDarLBrOyLjqJUTWZdoEwr5L3N6ddhuKt4aT6Bi6kcN27W8R87N5ofKAoA2J6mhQGTBM5Bb7SB176XnygevI/Iy7Pcg0N9mA7FqFm3NBwgN7hsvyqX5FV36PxtqCGAD8D0LxFjkacRmcMfrPJ4J66QWP7HKYG0yg4lTH+a+x0fBV567Cr7wnh67hJBGNl2CYAbEz7FCl7emV3+po2BL+3De3xP19LeFtc4IcABp6v+7STQf3+2veUS0LoeJQRi+cobYnl6UPvNpE40ePCxB19CYKKCZEANNRG+cPqegCzUbNKuTGPpfgPuMKBFUfVUpGEfh4lbU0Hu7Fv3fv6aIAMrBVqq9ceQcKKAPN66Tl5IhokcUTmvI8VhT5uyUk4xB8iXsxkjI3i3XIgPIqIVhzfauDaiKG6uCv4nD7zuXUJi/NFKdCCcF9wBnyqv3kvhnnKSdKInvTB0ZzrYu5tpfQ7wPKjTdnF8oIEXWfVtFHvx3mzseIWbSMLRvmovOQL73mXh5L93CXx2gGSC8NVOGrwkmR4yPHhWBko/BlVRX6b0l2gE73Bqxmh865wVtHQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(366004)(376002)(136003)(396003)(39840400004)(346002)(451199021)(2906002)(44832011)(38100700002)(41300700001)(8936002)(4326008)(7416002)(5660300002)(86362001)(36756003)(66476007)(6916009)(478600001)(316002)(6666004)(6486002)(6512007)(6506007)(66556008)(2616005)(66946007)(8676002)(186003)(83380400001)(67856001);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?LF79pm4gETSnLe4UU0F7BgxpGw/SBzVdIKDvuzCsEtcQ+wq7N01Frxv8XQlM?=
- =?us-ascii?Q?e1w8WjOPBqTH0AzdjL/ravQmrbqbTYOXQcjZmSWmq8lVy5be7ckzufsScYtn?=
- =?us-ascii?Q?bgYJU/CIVqGYd/hhR7hxMUgbKW+FqckyJb3hSG0cC+35/4YJmqdzDRFABiE/?=
- =?us-ascii?Q?JZBh0WLusGJJmbBjXko23J27Zv4xH2tr2JueoPBEJez2HGWj2/5xKX6/PWgm?=
- =?us-ascii?Q?4zENLTyrYGXZaZFKiTyVUpWL/yLCMObdaPzCSmdcUspqpwliVk0LLoSnar/U?=
- =?us-ascii?Q?+Bx1zlAxSkhSYporqOwSI/pvglIVJ8VAQZICVFEiXfQrEt/46+mXIEBzExRi?=
- =?us-ascii?Q?CEsTstKPgO+7FEB38COHHxdI4uTroo3UnnB4P8OQOFhVY751WGLFNOhjIT03?=
- =?us-ascii?Q?noaXlxmiMaDQvFyr3zPHhsv9qZTo6U+ijJvcWjAGgYnCJOWNpucRN4p/OCaK?=
- =?us-ascii?Q?FuPORPLrrfAudKjywBXXRSd1ATqpTi332Lbwk3eUGnAyovNGjGJq+1UirVLo?=
- =?us-ascii?Q?Ow/j6UAyIGHG02oFiTns4e5snd1+PBOnitMh5uFFwxiN2dl8d4BwOMRnOxTR?=
- =?us-ascii?Q?O2KYxE7PsD5fHhJeW4QlSUIWIjRRIaBsFB5ONvQ/E3OCVQgWA6DS/TubdwR4?=
- =?us-ascii?Q?+O55pGLUEQwkqVKzXfA3nh4De3zHzsx625LOBLsYa3w1GA88Ik0DJx6nK3n1?=
- =?us-ascii?Q?X7nQ7GbWym0ZfwhPMH6RMwW6W5YMjv85GE13pIoJYnOdvQ3XIMTLs8vYdo36?=
- =?us-ascii?Q?6fXKlEXnChm6lI+Ku3hA7zblcAGPFVl0MZ0BKIVyi4fVy7irMa9rio18DbbO?=
- =?us-ascii?Q?5rp8qCpqEv2TkZtARfVLd4U1m/ZiYqQwVJ6XAVU+CCXOhQRQSTE9eJ61ldVh?=
- =?us-ascii?Q?H8BzX2rdqV7WGCkIJUTRR9EtIsD+s+VPOBK6sfU1iwc5NjO4Icfz+cX3RX6U?=
- =?us-ascii?Q?9MD/yEDW+rAe5x/7D1B9ADOC9E0HsKiKofYcZtPwnpjZ1kPveN6fPuicsEws?=
- =?us-ascii?Q?lza0DW74KLbhd6DDxsvU15Jfdiz4MUO4t3I2xbypQ66cLXjtPTGyLoMA/ANq?=
- =?us-ascii?Q?TEhqzvT2s71NW36Go+KH10Shl5C3HtnNXxPwg+K33uDnQ3N7PeO+GuVjw38e?=
- =?us-ascii?Q?350v7ffKNhj+bNYVBHQWxHYiPCVUK2ixKzuTspiplLI1Wkq2afBl45vndk4X?=
- =?us-ascii?Q?oNFgqTRwWnxYUjsYbSaQms56+CbEz1vIh/s9Kh0yNujAjMtEr4uKGxF67PNY?=
- =?us-ascii?Q?uN4CiKwds8FSlG9J793bGqbBK/692MCHCQqqrrD0Se/ZNOF9b6KIWLfywojh?=
- =?us-ascii?Q?6WphJUM4MwPD1jpvKdZrUaJvsROO5+g4Otlqpw8Ky7NTUBcQzoZuZ+TXgBiH?=
- =?us-ascii?Q?5Miux2BBkkgRRPfvkSIU5e7KC1ywWBmBRkzc1uDvs+jqXuz3tPqAi8ZlblIC?=
- =?us-ascii?Q?3foGKd7j+s3cLb46PtYJTrEFzk9fBpR+OVqreiFDjh7FcDOleuzKMTbT7d0h?=
- =?us-ascii?Q?131cHK+vKSeAES/iGclX5LxBMX5lS5OrwJc1iK2O8hUsjX0ZwbrJ04oGiTD6?=
- =?us-ascii?Q?v3Floofq/EklL0EwE1HcxmovgpTLCXvI/iev3nd0lH0u7rhMFc85sQZ3Q49X?=
- =?us-ascii?Q?TDDxwY+EhgDMdSOilRyzLk8vhC7nqUoQB8HTY+l8QBCRzz+wVbvPxmcajgxm?=
- =?us-ascii?Q?7kQNRg=3D=3D?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?QNDoi6qvwuimUBUSSZC/2u0Uxt0+rLNI5elnR+OEBe0DFsboymPi5RW4IQOq?=
+ =?us-ascii?Q?G4eVqqaAO5W52sjDAQe1g/iNxLyYoGiQv3vZ9phCHneNiRlGNGzXveKx5j99?=
+ =?us-ascii?Q?rlTVflEGxjelcUSBEpneimFSz3dKnC3oM518w8s/f1e9+FdLtvSjS/T8VpP/?=
+ =?us-ascii?Q?PQOtP0gLjySF344hZK3CjBQcPOxvrMrWVYbG0vKJ7fccOL1o3/LXmCx7kN1G?=
+ =?us-ascii?Q?G/zlvFTQGWdi1VDugTPGIlbr4rVVIPQk8LFLQH/pXvpAh8YqIQsWj48sHItY?=
+ =?us-ascii?Q?BMfQyWIx4qxpEhvlzW2vP5DAF0pO2XDPG11QBfSdQvPAuIylqMNJ2nys5Ocr?=
+ =?us-ascii?Q?pxlTv6StFPc3s+xnkEObl8E939g0zQAdOM9Zxm+BXIlCwbDFHuijOin12ApS?=
+ =?us-ascii?Q?oGydAAvIZzkWg7OmTyNxcH9NI9Cy4PvaUGLdtaN2WO3XcVmawlIt6L2uCFsT?=
+ =?us-ascii?Q?cSIWd6mDiVrTkyGJdYLciaWt7TlcwC45ntmQquh4gqYSGg8kBuSeiYhwiynq?=
+ =?us-ascii?Q?kyYx5GpWvppcR/zpTuEI1U2URtP6waiqmyFJFA+Q9dOqgn+pC9TGasRsOfkb?=
+ =?us-ascii?Q?qYudx2FxeaANVJEOa9i1F4xU6yUnH1mPdk2S+Lyn22UKoB30D7g86P5tPzI3?=
+ =?us-ascii?Q?5yE+9IatZm5wSZu20S81yqgcq2tZQu3v7uyoXBNgo9zirgcxX2wfd0AH4n9D?=
+ =?us-ascii?Q?YczHxMnnmKtY3HAYui0BFuuqEb7zOpyN8lCmF+JioWePNHuJHDDGfjE3QRMA?=
+ =?us-ascii?Q?vgOYo6SaBfs6vEGirRcpgQqNPHjpRls9P3ZrX0fkwSbA+zx8+FDTU0wmoQVD?=
+ =?us-ascii?Q?N0bMr3Ix/DOK+zShsW5qWYpIoM8Drdet9Am8j8Us01sxMcbjPdHSaW35bfgp?=
+ =?us-ascii?Q?WWttnm8re5wAV2ARI2TyathJAeZ6yRQ7YYFv9k/tvFNNSM/WfyJs0YtRzbzG?=
+ =?us-ascii?Q?N4Pwr7K91dgi+OiYFYHsfP8wLGIc7XyZ/oelbq8D8EIYKp6gSiW+S1RhLCmq?=
+ =?us-ascii?Q?E8W0nS/JW3YeMqgZvXENrWF0BXkiJyw4Ue90QvaNeVkxasA5J/q/rBiY4mPV?=
+ =?us-ascii?Q?thX7aMuO1j+u0WD+1goTDRGz9qKKEzXio143CSH92hdEovEJQPhyXlpjOwFo?=
+ =?us-ascii?Q?+3YskCIjminX/xMDqE41myCtio6AsFqTNSOtZABQ05uF6z3eWTxvj0vnWOH+?=
+ =?us-ascii?Q?t5DDkLj035PoSh7dNimtC0fioNSMUbC5DVYgggAFAo9fiqU7seeVxUvC0L96?=
+ =?us-ascii?Q?T6f8XGB4VuHyyKie4aGmViy9jT5fk6EQe+n9jbQc5YEABwVGwM9JZSXzmt/d?=
+ =?us-ascii?Q?iCYAyHVoN3C50K99riVnIB18/4CGT8wOE7G8++TNC/qhDWAEEQJ2DdeCbs7G?=
+ =?us-ascii?Q?ogp74iTq4U32GVRjdKKbc8VMJUFBs/6nz/cen8cNHfznLHFBJy1NIr5Gtn8D?=
+ =?us-ascii?Q?tN2grFZoRdfD5uPUEXTZZZGoBV/eoZPNkCzQlWLs6EZcfQZ4ybcYN5rEXIUs?=
+ =?us-ascii?Q?rUAB28fkuysL+GBiwoxSsopB5W5Sqrehu1MNJP0snFXJ8RqzBliRpTEtf+gT?=
+ =?us-ascii?Q?RjrKwOtue7WOEoYQ4eeRc6u1ueDljtwP0+Nl6JLlc16YJrPRghM5czfIcpyO?=
+ =?us-ascii?Q?V83xzbO8LWXrcrWFHTDerw/UvESW1mK3z5JcVIPFRmEgbB9EYm/YQQs+jpS2?=
+ =?us-ascii?Q?5cfYkQ=3D=3D?=
 X-OriginatorOrg: corigine.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 14d2cda5-7f07-4a5b-ce6e-08db304ee902
+X-MS-Exchange-CrossTenant-Network-Message-Id: b2e31856-0247-404c-e25f-08db305095cc
 X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Mar 2023 12:12:48.3882
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Mar 2023 12:24:47.3676
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: nivh2NtVyU7PyChLcGa8d5SvrnvPGlbtTUbhIOhUoxN1In9KxtOyMVmSOeyq5zw+/i6XVwi6QNBVQOg5yxYJFCZKhXe+BCFFc/T9/vY8QNo=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR13MB5950
+X-MS-Exchange-CrossTenant-UserPrincipalName: vUGinNuoDrI+fzLXVntpKv7hMv8pPCdKKvnaYr/h3NrBwqPT3bMMLjV3EdkAcVpZz9j72/JuZ3Ali1ipEnpV7cHmWkUKkzmkjYuBNBDaQQw=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR13MB4100
 X-Spam-Status: No, score=-0.0 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        SPF_HELO_PASS,SPF_PASS autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Mar 27, 2023 at 01:05:47PM -0700, Brett Creeley wrote:
-> Currently only Mellanox uses the combine_ranges function. The
-> new pds_vfio driver also needs this function. So, move it to
-> a common location for other vendor drivers to use.
+On Mon, Mar 27, 2023 at 01:05:50PM -0700, Brett Creeley wrote:
+> Add live migration support via the VFIO subsystem. The migration
+> implementation aligns with the definition from uapi/vfio.h and uses
+> the pds_core PF's adminq for device configuration.
 > 
-> Cc: Yishai Hadas <yishaih@nvidia.com>
+> The ability to suspend, resume, and transfer VF device state data is
+> included along with the required admin queue command structures and
+> implementations.
+> 
+> PDS_LM_CMD_SUSPEND and PDS_LM_CMD_SUSPEND_STATUS are added to support
+> the VF device suspend operation.
+> 
+> PDS_LM_CMD_RESUME is added to support the VF device resume operation.
+> 
+> PDS_LM_CMD_STATUS is added to determine the exact size of the VF
+> device state data.
+> 
+> PDS_LM_CMD_SAVE is added to get the VF device state data.
+> 
+> PDS_LM_CMD_RESTORE is added to restore the VF device with the
+> previously saved data from PDS_LM_CMD_SAVE.
+> 
+> PDS_LM_CMD_HOST_VF_STATUS is added to notify the device when
+> a migration is in/not-in progress from the host's perspective.
+> 
 > Signed-off-by: Brett Creeley <brett.creeley@amd.com>
 > Signed-off-by: Shannon Nelson <shannon.nelson@amd.com>
 
-Reviewed-by: Simon Horman <simon.horman@corigine.com>
+Thanks Brett,
 
-> diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
-> index 43bd6b76e2b6..49f37c1b4932 100644
-> --- a/drivers/vfio/vfio_main.c
-> +++ b/drivers/vfio/vfio_main.c
-> @@ -864,6 +864,54 @@ static int vfio_ioctl_device_feature_migration(struct vfio_device *device,
->  	return 0;
->  }
->  
-> +void vfio_combine_iova_ranges(struct rb_root_cached *root, u32 cur_nodes,
-> +			      u32 req_nodes)
+overall this looks clean to me.
+I've provided some minor points inline which you may wish
+to consider if you need to respin the series for some reason.
+
+...
+
+> diff --git a/drivers/vfio/pci/pds/cmds.c b/drivers/vfio/pci/pds/cmds.c
+
+...
+
+> +int
+> +pds_vfio_get_lm_status_cmd(struct pds_vfio_pci_device *pds_vfio, u64 *size)
 > +{
-> +	struct interval_tree_node *prev, *curr, *comb_start, *comb_end;
-> +	unsigned long min_gap;
-> +	unsigned long curr_gap;
+> +	struct pds_lm_status_cmd cmd = {
+> +		.opcode = PDS_LM_CMD_STATUS,
+> +		.vf_id = cpu_to_le16(pds_vfio->vf_id),
+> +	};
+> +	struct pds_lm_status_comp comp = {0};
+> +	int err = 0;
 
-I appreciate that this is just moving code from one place to another.
-But if you end up respining this series for another reason
-you may want to consider rearranging the above two lines so they are in
-reverse xmas tree order - longest to shortest.
+nit: there is no need to initialise err here,
+     as it is set below before it is used.
+
+> +
+> +	dev_dbg(&pds_vfio->pdev->dev, "vf%u: Get migration status\n",
+> +		pds_vfio->vf_id);
+> +
+> +	err = pds_client_adminq_cmd(pds_vfio,
+> +				    (union pds_core_adminq_cmd *)&cmd,
+> +				    sizeof(cmd),
+> +				    (union pds_core_adminq_comp *)&comp,
+> +				    0);
+> +	if (err)
+> +		return err;
+> +
+> +	*size = le64_to_cpu(comp.size);
+> +	return 0;
+> +}
+> +
+> +static int
+> +pds_vfio_dma_map_lm_file(struct device *dev, enum dma_data_direction dir,
+> +			 struct pds_vfio_lm_file *lm_file)
+> +{
+> +	struct pds_lm_sg_elem *sgl, *sge;
+> +	struct scatterlist *sg;
+> +	int err = 0;
+
+Ditto.
+
+> +	int i;
+> +
+> +	if (!lm_file)
+> +		return -EINVAL;
+> +
+> +	/* dma map file pages */
+> +	err = dma_map_sgtable(dev, &lm_file->sg_table, dir, 0);
+> +	if (err)
+> +		goto err_dma_map_sg;
+
+nit: 'return err;' might be simpler.
+
+> +
+> +	lm_file->num_sge = lm_file->sg_table.nents;
+> +
+> +	/* alloc sgl */
+> +	sgl = dma_alloc_coherent(dev, lm_file->num_sge *
+> +				 sizeof(struct pds_lm_sg_elem),
+> +				 &lm_file->sgl_addr, GFP_KERNEL);
+> +	if (!sgl) {
+> +		err = -ENOMEM;
+> +		goto err_alloc_sgl;
+> +	}
+> +
+> +	lm_file->sgl = sgl;
+> +
+> +	/* fill sgl */
+> +	sge = sgl;
+> +	for_each_sgtable_dma_sg(&lm_file->sg_table, sg, i) {
+> +		sge->addr = cpu_to_le64(sg_dma_address(sg));
+> +		sge->len  = cpu_to_le32(sg_dma_len(sg));
+> +		dev_dbg(dev, "addr = %llx, len = %u\n", sge->addr, sge->len);
+> +		sge++;
+> +	}
+> +
+> +	return 0;
+> +
+> +err_alloc_sgl:
+> +	dma_unmap_sgtable(dev, &lm_file->sg_table, dir, 0);
+> +err_dma_map_sg:
+> +	return err;
+> +}
+
+...
+
+> diff --git a/drivers/vfio/pci/pds/lm.c b/drivers/vfio/pci/pds/lm.c
+
+...
+
+> +static int
+> +pds_vfio_get_save_file(struct pds_vfio_pci_device *pds_vfio)
+> +{
+> +	struct pci_dev *pdev = pds_vfio->pdev;
+> +	struct pds_vfio_lm_file *lm_file;
+> +	int err = 0;
+> +	u64 size;
+> +
+> +	/* Get live migration state size in this state */
+> +	err = pds_vfio_get_lm_status_cmd(pds_vfio, &size);
+> +	if (err) {
+> +		dev_err(&pdev->dev, "failed to get save status: %pe\n",
+> +			ERR_PTR(err));
+> +		goto err_get_lm_status;
+> +	}
+> +
+> +	dev_dbg(&pdev->dev, "save status, size = %lld\n", size);
+> +
+> +	if (!size) {
+> +		err = -EIO;
+> +		dev_err(&pdev->dev, "invalid state size\n");
+> +		goto err_get_lm_status;
+> +	}
+> +
+> +	lm_file = pds_vfio_get_lm_file(PDS_VFIO_LM_FILENAME,
+> +				       &pds_vfio_save_fops,
+> +				       O_RDONLY, size);
+> +	if (!lm_file) {
+> +		err = -ENOENT;
+> +		dev_err(&pdev->dev, "failed to create save file\n");
+> +		goto err_get_lm_file;
+> +	}
+> +
+> +	dev_dbg(&pdev->dev, "size = %lld, alloc_size = %lld, npages = %lld\n",
+> +		lm_file->size, lm_file->alloc_size, lm_file->npages);
+> +
+> +	pds_vfio->save_file = lm_file;
+> +
+> +	return 0;
+> +
+> +err_get_lm_file:
+> +err_get_lm_status:
+
+nit: I don't think these labels are giving us much.
+     If it was me I'd just use return rather than goto above.
+
+> +	return err;
+> +}
 
 ...
