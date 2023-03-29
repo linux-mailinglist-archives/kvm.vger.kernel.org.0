@@ -2,161 +2,474 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3B6036CF3EE
-	for <lists+kvm@lfdr.de>; Wed, 29 Mar 2023 22:00:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3CCF46CF45E
+	for <lists+kvm@lfdr.de>; Wed, 29 Mar 2023 22:19:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229595AbjC2UAF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 Mar 2023 16:00:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53586 "EHLO
+        id S229588AbjC2UTo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 Mar 2023 16:19:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37574 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231348AbjC2T7s (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 29 Mar 2023 15:59:48 -0400
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2064.outbound.protection.outlook.com [40.107.93.64])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40FD16EA1;
-        Wed, 29 Mar 2023 12:59:41 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ELgJQqYj3b7GFZVCXWygnGwGJJUjY9j5LNhgCRP4b6qIi/v01iDOtvcur0L0uPLEgK5Li8ecYkckvMWymW4xq8NjJ9uIcWOuQl5D/Je6XsLYXHkzDUWya7VrTjRN+Rcnj+CSLywxD9Ajw0zRO+T7hHlta70rW/1kgDwROG3JSwDEhRkXH3LOq/qIOguzfV5lAdXR86HIiecLKkh6xe6mEm6S4cFHoMCs+16B2b13rgsaZjSr/o+n5xkPzcMCZ5wgmd18YtlLUOC1B0i7W3OhM8qRdT+GW650UVdlUZSk4CYJ+RL/85iqCKBsfKz/zX7vzmSi5oHHoITMkBh2CKFqog==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=MvgIXfLw2CX5GRpDiZKf3PWcQQ2cnumQO9I08lP6GjM=;
- b=a69GyUYj9+V1tHqdsIL1Y1T7etgI4gz52lYM23+myokkt4AArusNMHxq7DaiOtFHjksnw99ahQ5DfHCNMmmDgm69538ee9lBtQkFiiSU6t2dZDMzoCmSrIFEzPbnkltg+g1XSPKisW5BlpIvsY7Is6H2JFtbINlSwONsiacIbHc7PGn1SlHBNbSx2w1ysaHMTusrOdb4KJB84zSSZKzIh6hJWLLelhP6Cgjjlw7ex11GO99AJrsXsW2HCB1+7WmOnIforetDpNXzQ9NpCI6bXZiKbrRwPGwdOQkQZO8UUFIuYw/0HO8Z1Arq9P7yphl1FjP9xIDb8xXdWyQTPRf0BQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=MvgIXfLw2CX5GRpDiZKf3PWcQQ2cnumQO9I08lP6GjM=;
- b=LOxuGyldN337OLSFEdF49e/lLvP/Ig6Nh0CiRhqM3JO3LqsuviW+k0YdVcHHbWOVPt+5Vd8rW8gVlqdRoC3Ea5lnb5k3PFBP9qDNFP86ggIGCaVKgl0OtY2Tpu2BPYValk7TqaX4SrrtTyZlMCQx4Uf1HQp1nQNGbhmWgrWqTvJRRhjCcEzI2KGlX2N70Q/E26DBL0gx9QQDjcugg12/9t8GXrF4NHp2Y/JvmSI+VSSDY9HMmFqYcvFisZXIhzRYv3hKZH4SzURqpmdqtOrxs7/fGZMJicNvFoU8WfPpQs1lT9SR6a2wW87kfMu97nSPNJ5UnQqAgawKaNZ2YIq7mQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by SA1PR12MB7247.namprd12.prod.outlook.com (2603:10b6:806:2bb::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6222.33; Wed, 29 Mar
- 2023 19:59:39 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::ef6d:fdf6:352f:efd1]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::ef6d:fdf6:352f:efd1%3]) with mapi id 15.20.6178.037; Wed, 29 Mar 2023
- 19:59:39 +0000
-Date:   Wed, 29 Mar 2023 16:59:36 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Yi Liu <yi.l.liu@intel.com>
-Cc:     alex.williamson@redhat.com, kevin.tian@intel.com, joro@8bytes.org,
-        robin.murphy@arm.com, cohuck@redhat.com, eric.auger@redhat.com,
-        nicolinc@nvidia.com, kvm@vger.kernel.org, mjrosato@linux.ibm.com,
-        chao.p.peng@linux.intel.com, yi.y.sun@linux.intel.com,
-        peterx@redhat.com, jasowang@redhat.com,
-        shameerali.kolothum.thodi@huawei.com, lulu@redhat.com,
-        suravee.suthikulpanit@amd.com, intel-gvt-dev@lists.freedesktop.org,
-        intel-gfx@lists.freedesktop.org, linux-s390@vger.kernel.org,
-        xudong.hao@intel.com, yan.y.zhao@intel.com, terrence.xu@intel.com,
-        yanting.jiang@intel.com
-Subject: Re: [PATCH v3 2/6] iommufd: Create access in
- vfio_iommufd_emulated_bind()
-Message-ID: <ZCSYqHIo/QrFL70C@nvidia.com>
-References: <20230327093351.44505-1-yi.l.liu@intel.com>
- <20230327093351.44505-3-yi.l.liu@intel.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230327093351.44505-3-yi.l.liu@intel.com>
-X-ClientProxiedBy: YTBP288CA0024.CANP288.PROD.OUTLOOK.COM
- (2603:10b6:b01:14::37) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|SA1PR12MB7247:EE_
-X-MS-Office365-Filtering-Correlation-Id: 04451f2a-b544-4dd3-dd58-08db309020ad
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: MwwCUu97sT2ls5G+3jJ4SLPg8fAL7SDnLh/8FxYI4P7dR2VL6oT6cBvPzFmPpmYoMKgkS5ugxiO9+F5eL0mifCMdlksucqdciJ4woVfbobWyxKLv5kHX0SRTE8M3UNV7Nnkl7KuByBS4w4eganfaOD163dhsvCEk18pbDjh/6Dn1BGA6jL42FsSnBIpQfvExMkkoShQryL6YiwJCPyu5FpsroqKBjJuL/NF5xXCQECSnrH88UwVax4rS0LiNsgpqcYw/OuN5JqD079f57yujEU0eNjoRZy0seBsNwgYH/pKGjIecRCE8OBorrrxuk6e7q+D0fg0z3Qz5zKOK8dRDuJwtaGx2JQ19ff3l4OrmIRKwcEFjq4ukGX5jrJCzHewHxNMX/Oc5x18pLNMxoYkAK4YG0589FdH92rU9XV9Xsl3uJ2ReP318gz+3Ubpv73M7Ggk7inVglwpzZyD2QmiCzU0MXuMVFvxcZ5vyPi2W/7XbFGIOxgh0jddU59R+TQoVAN9kI2eTZnPlhKUKuHeZGb9ZrG+imDqYNyDGoKqKN0I4ld9eVYg7qNKoIbW9FCmQ
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(396003)(136003)(366004)(39860400002)(346002)(376002)(451199021)(66556008)(4326008)(66476007)(8676002)(66946007)(6916009)(41300700001)(36756003)(2906002)(7416002)(5660300002)(86362001)(6486002)(8936002)(38100700002)(478600001)(4744005)(316002)(6506007)(6512007)(26005)(6666004)(186003)(2616005)(83380400001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?V456vgEFJcKsX2ECdt4hN7RKDWtdTbnzY5qBEOi39aMMjFIVWXR0BXxhrOKs?=
- =?us-ascii?Q?lk6Puxp7tiiexFtQyqBYMrDUcI8i+EJeXzrhzuttBxnY7UUHhoZ8lkGGfo6v?=
- =?us-ascii?Q?9LhSblUZ7w4OPrHiovMc2jbRRuR1hPnBuwc6S9q5JBwF5TWhsKfVIQsqQVUC?=
- =?us-ascii?Q?SJqCkrE1LeEOgboDAiPrSCGyYu4hZInan9rUOyXyNSrdQ42hhwhI+mJGXG24?=
- =?us-ascii?Q?Sj6hzzmF51cAMzartgkUGhQ7x1Sus69N3lxI8elX5XwWDFNv+ldHSW1Y4vnt?=
- =?us-ascii?Q?ci3kAC0UYDHZfIcABUJMLVjipBpOAZcbzzfpx8rFGMJlhXS/F+LGMWdid1TJ?=
- =?us-ascii?Q?wNXFlNLkdonh9bTrsZVUY1oW/5TjNNJCGxtDw6bXs7kayigrVQF6HucaRdpi?=
- =?us-ascii?Q?xm3qdB8ywSOZmFbNe1pzMn3DP7eEoFQaeCaglJM9tqVvUX+o5AqiKqB0RxD8?=
- =?us-ascii?Q?awjK1Xyoz3dfwpxgdI7QQEyU+5omEtrjZ9wAQ8rQNLs4ZrraRU0TQauOEi/I?=
- =?us-ascii?Q?cXOmha2hGygdTRJ7Tu9756RsTwa0RoE44Nq7+vN5wUBeYx4Vs5qdi6ASmB46?=
- =?us-ascii?Q?l1cXgtMHYRNU+abrvBMrgUQh0Z/noMrzLscXAQ9PbmDVpG0BY049YQ4U+scC?=
- =?us-ascii?Q?901RZduFhrrYHad03jwUX5XhD10w9ScY3Tr4z92EsVT70pR9mBUfrnmClYEu?=
- =?us-ascii?Q?HGfOeEe91cfBwp1XUU8rjt4FpaX57uK/AfiUy7T5DqV8duWNe+ur60yX1sZT?=
- =?us-ascii?Q?DurScpjhGn0bFxnkwN+xR9XmxpkbPE7EgsRzp6RAmxe0bC+5Kc08Vyu+deaT?=
- =?us-ascii?Q?n0AXw0XKtLiln8OqGUZMnNABhPxJ5f9zu6UMop9eY7x8+MquKOkqfpi8cpoe?=
- =?us-ascii?Q?Np596f7TnWfGybfIn+Fgp758Ok/CoFukOn8vX3q76clwjR2WZdaEmhqT7BhB?=
- =?us-ascii?Q?SX5ToDzplgeCxUwh3j4dlx6FM85Q44X+LMxwfDMCK3/IJ3OGSKDop4XeVdM+?=
- =?us-ascii?Q?MwP+v2F8bRF8m/bdHCOM8mGkx+Z8Imc8SeZgg0p22yg5bKyCI0WwYDAyaIZx?=
- =?us-ascii?Q?T+EIomjQH132IR5kh5dCHFPSRygBndpr5iC5UtgfIQkDTEi2cSLQLadNFx6X?=
- =?us-ascii?Q?23AOELOLQ1GNjO6DA5HcHknP8qotTwYa4RwTWR9tL/O7ooecH95+z25PEQHv?=
- =?us-ascii?Q?A9WIUdLlF2hCB3XwG7y+BZpKtvP8PXYkuy68SearBSL4VMnHpGklTQxJ4f1t?=
- =?us-ascii?Q?ToJB1jV4dWoMl1dNRl11H+MYLwsSk98NBqx34X+Boye9WG16q8riVjWiSTsF?=
- =?us-ascii?Q?CT3Nv91KVVAfI4vRY+f33nGFW+nIDf2CJlSMJahQJxDUoVfUdLNe6mY0LRGQ?=
- =?us-ascii?Q?uQlsRodPMcCpAW6Yk5IdnJkSLy0BmtQQQh5MJdE6qF8vC6At58s99jnAeXgv?=
- =?us-ascii?Q?EuSeCKcRy5hJvfulPafwEj666+jx2DLbUt9x1SSu0rhY+tcdnR79F2tOVNpz?=
- =?us-ascii?Q?D5pIBZ/t37zbbAfrkVKznZ+TrRiw9DrnqTeG/6GbNo22EGwkDPIhlSEwg4wO?=
- =?us-ascii?Q?rHFUzLbeiA7txSuX5lKNjNAcZ3YasS/+lbLT5ua7?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 04451f2a-b544-4dd3-dd58-08db309020ad
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Mar 2023 19:59:38.7870
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Z/UYtDy/+fiJVXUCkqTT14MHpHZTYbdEkZdUslf4VM0OLoWZbhDH5ZTZWgOiLIXF
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB7247
-X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        with ESMTP id S229481AbjC2UTn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 29 Mar 2023 16:19:43 -0400
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D100211C
+        for <kvm@vger.kernel.org>; Wed, 29 Mar 2023 13:19:40 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-5417f156cb9so167192557b3.8
+        for <kvm@vger.kernel.org>; Wed, 29 Mar 2023 13:19:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112; t=1680121179;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=XYCjXnCbKN0PKkjf/crQNfbLtlBmvSfxLnNMsYaCJAI=;
+        b=Q4fVUhMJZ2VEoEGBOrMdLrJvCAfH4D4nBijG9a2dGjH0LYJ9xtR6jFOClavT+p3WSF
+         /ieyUJplRJvO5/il4QvETEhFDZkT9nTWYBJUhyuKSKrrI7fhtMiOeJ6jwrz5N0MF0y9C
+         1TLiYnzZTJOOnS/25vbgjaka/Wn2TSTbNEqgusKUZvTx0kpdYvYHub4A/Q05zg6hgGja
+         b6+TZ8NFmx2JljIi2jB8nbg2yJu1/jEwPZNkIrPXdHyj7ObBMC8Uj+MomqmFCZsZZon4
+         9n2Hw8wSlnhpf0zFC42QRDkvQ9w1Faonq1ucsjy/Hld9+bRisFqjXCpEkJPCqRJ4psrQ
+         niFQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1680121179;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=XYCjXnCbKN0PKkjf/crQNfbLtlBmvSfxLnNMsYaCJAI=;
+        b=SE73JsNdNF62hR1bMYY8gwdsTtBDc/6/ucg6FouCEzbkIAJRLDG1QH9/JUXB2Wy64N
+         y/C6DgDpLeb4/ICGLkBK1I7o2tf4Qbs5KpdlzpJmCAO334vNarUMhSP4ySSs9fjJHi7E
+         qzosE0U/OvNMExozOQxa+2KBBhnB6pGnSdMWsetwKjJY1kAvGUQP6Pvvg9W4rPQBDisz
+         tqQuP3CbYtQ1iGR98VjAMsLTn2lt+EiBBXrGtgqNaJUeNjm461NUNWLk32au8fRdOr5+
+         FkNf1/bZ5VGLy3KBOfXYtukm03MzKMX4Q/+fXiQQ4NgCw8mTu2DDlYQio5HGS+XDo5gj
+         javw==
+X-Gm-Message-State: AAQBX9e3nsj5AXDIEHSDDMD6Z1wlaRwtx2ufjYcmfhsMSL0tdJoMFsUk
+        Gxr5Hk7jhihSbV/SsOWdSG7fdPLK570=
+X-Google-Smtp-Source: AKy350ZIV/lRzBXoo6utQ0EIvoOZHHC57nvHhNiap20xqkupn9VmloUhByhO84IhMtiJ4j8NKFaasEDxR3Y=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a0d:ec12:0:b0:545:bade:c590 with SMTP id
+ q18-20020a0dec12000000b00545badec590mr8154846ywn.1.1680121179401; Wed, 29 Mar
+ 2023 13:19:39 -0700 (PDT)
+Date:   Wed, 29 Mar 2023 13:19:37 -0700
+In-Reply-To: <20230316031732.3591455-2-npiggin@gmail.com>
+Mime-Version: 1.0
+References: <20230316031732.3591455-1-npiggin@gmail.com> <20230316031732.3591455-2-npiggin@gmail.com>
+Message-ID: <ZCSdWc9te0Noiwo3@google.com>
+Subject: Re: [PATCH 1/2] KVM: PPC: Add kvm selftests support for powerpc
+From:   Sean Christopherson <seanjc@google.com>
+To:     Nicholas Piggin <npiggin@gmail.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
+        linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
+        linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-7.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Mar 27, 2023 at 02:33:47AM -0700, Yi Liu wrote:
-> @@ -494,6 +479,30 @@ void iommufd_access_destroy(struct iommufd_access *access)
->  }
->  EXPORT_SYMBOL_NS_GPL(iommufd_access_destroy, IOMMUFD);
->  
-> +int iommufd_access_attach(struct iommufd_access *access, u32 ioas_id)
+On Thu, Mar 16, 2023, Nicholas Piggin wrote:
+> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+> index 3ea24a5f4c43..28ece960a0bb 100644
+> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
+> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+> @@ -153,6 +153,7 @@ const char *vm_guest_mode_string(uint32_t i)
+>  		[VM_MODE_PXXV48_4K]	= "PA-bits:ANY, VA-bits:48,  4K pages",
+>  		[VM_MODE_P47V64_4K]	= "PA-bits:47,  VA-bits:64,  4K pages",
+>  		[VM_MODE_P44V64_4K]	= "PA-bits:44,  VA-bits:64,  4K pages",
+> +		[VM_MODE_P52V52_64K]	= "PA-bits:52,  VA-bits:52, 64K pages",
+>  		[VM_MODE_P36V48_4K]	= "PA-bits:36,  VA-bits:48,  4K pages",
+>  		[VM_MODE_P36V48_16K]	= "PA-bits:36,  VA-bits:48, 16K pages",
+>  		[VM_MODE_P36V48_64K]	= "PA-bits:36,  VA-bits:48, 64K pages",
+> @@ -178,6 +179,7 @@ const struct vm_guest_mode_params vm_guest_mode_params[] = {
+>  	[VM_MODE_PXXV48_4K]	= {  0,  0,  0x1000, 12 },
+>  	[VM_MODE_P47V64_4K]	= { 47, 64,  0x1000, 12 },
+>  	[VM_MODE_P44V64_4K]	= { 44, 64,  0x1000, 12 },
+> +	[VM_MODE_P52V52_64K]	= { 52, 52, 0x10000, 16 },
+>  	[VM_MODE_P36V48_4K]	= { 36, 48,  0x1000, 12 },
+>  	[VM_MODE_P36V48_16K]	= { 36, 48,  0x4000, 14 },
+>  	[VM_MODE_P36V48_64K]	= { 36, 48, 0x10000, 16 },
+> @@ -279,6 +281,14 @@ struct kvm_vm *____vm_create(enum vm_guest_mode mode)
+>  	case VM_MODE_P44V64_4K:
+>  		vm->pgtable_levels = 5;
+>  		break;
+> +	case VM_MODE_P52V52_64K:
+> +#ifdef __powerpc__
+> +		TEST_ASSERT(getpagesize() == 64*1024,
+
+This can use SZ_64K (we really need to convert a bunch of open coded stuff...)
+
+> +			    "KVM selftests requires 64K host page size\n");
+
+What is the actual requirement?  E.g. is it that the host and guest page sizes
+must match, or is that the selftest setup itself only supports 64KiB pages?  If
+it's the former, would it make sense to assert outside of the switch statement, e.g.
+
+diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+index 298c4372fb1a..920813a71be0 100644
+--- a/tools/testing/selftests/kvm/lib/kvm_util.c
++++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+@@ -291,6 +291,10 @@ struct kvm_vm *____vm_create(enum vm_guest_mode mode)
+ #ifdef __aarch64__
+        if (vm->pa_bits != 40)
+                vm->type = KVM_VM_TYPE_ARM_IPA_SIZE(vm->pa_bits);
++#endif
++#ifdef __powerpc__
++       TEST_ASSERT(getpagesize() == vm->page_size, "blah blah blah");
++
+ #endif
+ 
+        vm_open(vm);
+
+If it's the latter (selftests limitation), can you add a comment explaining the
+limitation?
+
+> +void virt_arch_pgd_alloc(struct kvm_vm *vm)
 > +{
-> +	struct iommufd_ioas *new_ioas;
-> +	int rc = 0;
+> +	struct kvm_ppc_mmuv3_cfg mmu_cfg;
+> +	vm_paddr_t prtb, pgtb;
+> +	uint64_t *proc_table, *page_table;
+> +	size_t pgd_pages;
 > +
-> +	if (access->ioas != NULL && access->ioas->obj.id != ioas_id)
-> +		return -EINVAL;
+> +	TEST_ASSERT(vm->mode == VM_MODE_P52V52_64K, "Attempt to use "
+> +		"unknown or unsupported guest mode, mode: 0x%x", vm->mode);
 
-This should just be
+Please don't split quoted lines, especially when it's easily avoided, e.g.
 
-   if (access->ioas)
-        return -EINVAL;
+	TEST_ASSERT(vm->mode == VM_MODE_P52V52_64K,
+		    "PPC doesn't support guest mode '0x%x', vm->mode);
 
 > +
-> +	new_ioas = iommufd_get_ioas(access->ictx, ioas_id);
-> +	if (IS_ERR(new_ioas))
-> +		return PTR_ERR(new_ioas);
+> +	/* If needed, create page table */
+> +	if (vm->pgd_created)
+> +		return;
+
+Heh, every arch has this.  Any objection to moving the check to virt_pgd_alloc()
+as a prep patch?
+
 > +
-> +	rc = iopt_add_access(&new_ioas->iopt, access);
-> +	if (rc) {
-> +		iommufd_put_object(&new_ioas->obj);
-> +		return rc;
+> +	prtb = vm_phy_page_alloc(vm, KVM_GUEST_PAGE_TABLE_MIN_PADDR,
+> +				 vm->memslots[MEM_REGION_PT]);
+> +	proc_table = addr_gpa2hva(vm, prtb);
+> +	memset(proc_table, 0, vm->page_size);
+> +	vm->prtb = prtb;
+> +
+> +	pgd_pages = 1UL << ((RADIX_PGD_INDEX_SIZE + 3) >> vm->page_shift);
+> +	TEST_ASSERT(pgd_pages == 1, "PGD allocation must be single page");
+> +	pgtb = vm_phy_page_alloc(vm, KVM_GUEST_PAGE_TABLE_MIN_PADDR,
+> +				 vm->memslots[MEM_REGION_PT]);
+> +	page_table = addr_gpa2hva(vm, pgtb);
+> +	memset(page_table, 0, vm->page_size * pgd_pages);
+> +	vm->pgd = pgtb;
+> +
+> +	/* Set the base page directory in the proc table */
+> +	proc_table[0] = cpu_to_be64(pgtb | RTS | RADIX_PGD_INDEX_SIZE);
+> +
+> +	mmu_cfg.process_table = prtb | 0x8000000000000000UL | 0x4; // 64K size
+> +	mmu_cfg.flags = KVM_PPC_MMUV3_RADIX | KVM_PPC_MMUV3_GTSE;
+> +
+> +	vm_ioctl(vm, KVM_PPC_CONFIGURE_V3_MMU, &mmu_cfg);
+> +
+> +	vm->pgd_created = true;
+> +}
+> +
+> +static int pt_shift(struct kvm_vm *vm, int level)
+> +{
+> +	switch (level) {
+> +	case 1:
+> +		return 13;
+> +	case 2:
+> +	case 3:
+> +		return 9;
+> +	case 4:
+> +		return 5;
+> +	default:
+> +		TEST_ASSERT(false, "Invalid page table level %d\n", level);
+> +		return 0;
 > +	}
-> +	iommufd_ref_to_users(&new_ioas->obj);
+> +}
 > +
-> +	access->ioas = new_ioas;
+> +static uint64_t pt_entry_coverage(struct kvm_vm *vm, int level)
+> +{
+> +	uint64_t size = vm->page_size;
+> +
+> +	if (level == 4)
+> +		return size;
+> +	size <<= pt_shift(vm, 4);
+> +	if (level == 3)
+> +		return size;
+> +	size <<= pt_shift(vm, 3);
+> +	if (level == 2)
+> +		return size;
+> +	size <<= pt_shift(vm, 2);
+> +	return size;
+> +}
+> +
+> +static int pt_idx(struct kvm_vm *vm, uint64_t vaddr, int level, uint64_t *nls)
+> +{
+> +	switch (level) {
+> +	case 1:
+> +		*nls = 0x9;
+> +		return (vaddr >> 39) & 0x1fff;
+> +	case 2:
+> +		*nls = 0x9;
+> +		return (vaddr >> 30) & 0x1ff;
+> +	case 3:
+> +// 4K		*nls = 0x9;
+> +		*nls = 0x5;
+> +		return (vaddr >> 21) & 0x1ff;
+> +	case 4:
+> +// 4K		return (vaddr >> 12) & 0x1ff;
+> +		return (vaddr >> 16) & 0x1f;
+> +	default:
+> +		TEST_ASSERT(false, "Invalid page table level %d\n", level);
+> +		return 0;
+> +	}
+> +}
+> +
+> +static uint64_t *virt_get_pte(struct kvm_vm *vm, vm_paddr_t pt,
+> +			  uint64_t vaddr, int level, uint64_t *nls)
+> +{
+> +	uint64_t *page_table = addr_gpa2hva(vm, pt);
+> +	int idx = pt_idx(vm, vaddr, level, nls);
+> +
+> +	return &page_table[idx];
+> +}
+> +
+> +#define PTE_VALID	0x8000000000000000ull
+> +#define PTE_LEAF	0x4000000000000000ull
+> +#define PTE_REFERENCED	0x0000000000000100ull
+> +#define PTE_CHANGED	0x0000000000000080ull
+> +#define PTE_PRIV	0x0000000000000008ull
+> +#define PTE_READ	0x0000000000000004ull
+> +#define PTE_RW		0x0000000000000002ull
+> +#define PTE_EXEC	0x0000000000000001ull
+> +#define PTE_PAGE_MASK	0x01fffffffffff000ull
+> +
+> +#define PDE_VALID	PTE_VALID
+> +#define PDE_NLS		0x0000000000000011ull
+> +#define PDE_PT_MASK	0x0fffffffffffff00ull
+> +
+> +void virt_arch_pg_map(struct kvm_vm *vm, uint64_t gva, uint64_t gpa)
+> +{
+> +	vm_paddr_t pt = vm->pgd;
+> +	uint64_t *ptep, pte;
+> +	int level;
+> +
+> +	for (level = 1; level <= 3; level++) {
+> +		uint64_t nls;
+> +		uint64_t *pdep = virt_get_pte(vm, pt, gva, level, &nls);
+> +		uint64_t pde = be64_to_cpu(*pdep);
+> +		uint64_t *page_table;
+> +
+> +		if (pde) {
+> +			TEST_ASSERT((pde & PDE_VALID) && !(pde & PTE_LEAF),
+> +				"Invalid PDE at level: %u gva: 0x%lx pde:0x%lx\n",
+> +				level, gva, pde);
+> +			pt = pde & PDE_PT_MASK;
+> +			continue;
+> +		}
+> +
+> +		// XXX: 64K geometry does not require full pages!
+> +		pt = vm_phy_page_alloc(vm,
+> +				       KVM_GUEST_PAGE_TABLE_MIN_PADDR,
+> +				       vm->memslots[MEM_REGION_PT]);
+> +		page_table = addr_gpa2hva(vm, pt);
+> +		memset(page_table, 0, vm->page_size);
+> +		pde = PDE_VALID | nls | pt;
+> +		*pdep = cpu_to_be64(pde);
+> +	}
+> +
+> +	ptep = virt_get_pte(vm, pt, gva, level, NULL);
+> +	pte = be64_to_cpu(*ptep);
+> +
+> +	TEST_ASSERT(!pte,
+> +		"PTE already present at level: %u gva: 0x%lx pte:0x%lx\n",
+> +		level, gva, pte);
+> +
+> +	pte = PTE_VALID | PTE_LEAF | PTE_REFERENCED | PTE_CHANGED | PTE_PRIV | PTE_READ | PTE_RW | PTE_EXEC | (gpa & PTE_PAGE_MASK);
 
-Since if ioas is non-null here then we will lose the reference counts
-already held.
+Please wrap at 80 chars when it's convenient.  The general/unofficial style in
+KVM is to honor the old 80 char limit unless there's a good reason not to.  E.g.
+wrapping a line just because the terminating semicolon bumped past 80 is absurd.
 
-I'll fix it
+> +	*ptep = cpu_to_be64(pte);
+> +}
+> +
+> +vm_paddr_t addr_arch_gva2gpa(struct kvm_vm *vm, vm_vaddr_t gva)
+> +{
+> +	vm_paddr_t pt = vm->pgd;
+> +	uint64_t *ptep, pte;
+> +	int level;
+> +
+> +	for (level = 1; level <= 3; level++) {
+> +		uint64_t nls;
+> +		uint64_t *pdep = virt_get_pte(vm, pt, gva, level, &nls);
+> +		uint64_t pde = be64_to_cpu(*pdep);
+> +
+> +		TEST_ASSERT((pde & PDE_VALID) && !(pde & PTE_LEAF),
+> +			"PDE not present at level: %u gva: 0x%lx pde:0x%lx\n",
+> +			level, gva, pde);
+> +		pt = pde & PDE_PT_MASK;
+> +	}
+> +
+> +	ptep = virt_get_pte(vm, pt, gva, level, NULL);
+> +	pte = be64_to_cpu(*ptep);
+> +
+> +	TEST_ASSERT(pte,
+> +		"PTE not present at level: %u gva: 0x%lx pte:0x%lx\n",
+> +		level, gva, pte);
+> +
+> +	TEST_ASSERT((pte & PTE_VALID) && (pte & PTE_LEAF) && (pte & PTE_READ) && (pte & PTE_RW) && (pte & PTE_EXEC),
 
-Jason
+Wrap here as well.
+
+> +		"PTE not valid at level: %u gva: 0x%lx pte:0x%lx\n",
+> +		level, gva, pte);
+> +
+> +	return (pte & PTE_PAGE_MASK) + (gva & (vm->page_size - 1));
+> +}
+> +
+> +static void virt_arch_dump_pt(FILE *stream, struct kvm_vm *vm, vm_paddr_t pt, vm_vaddr_t va, int level, uint8_t indent)
+
+And here.  Actually, why bother with the helper?  There's one caller, and that
+callers checks pgd_created, i.e. is already assuming its dumping only page tables.
+Ooh, nevermind, it's recursive.
+
+Can you drop "arch" from the name?  Selftests uses "arch" to tag functions that
+are provided by arch code for use in generic code.
+
+> +{
+> +	uint64_t *page_table;
+> +	int size, idx;
+> +
+> +	page_table = addr_gpa2hva(vm, pt);
+> +	size = 1U << pt_shift(vm, level);
+> +	for (idx = 0; idx < size; idx++) {
+> +		uint64_t pte = be64_to_cpu(page_table[idx]);
+
+Newline after variable declaration.
+
+> +		if (pte & PTE_VALID) {
+> +			if (pte & PTE_LEAF) {
+
+Curly braces aren't necessary.
+
+> +				fprintf(stream, "%*sgVA:0x%016lx -> gRA:0x%016llx\n", indent, "", va, pte & PTE_PAGE_MASK);
+
+Probably worth wrapping here too.
+
+> +			} else {
+> +				virt_arch_dump_pt(stream, vm, pte & PDE_PT_MASK, va, level + 1, indent);
+> +			}
+> +		}
+> +		va += pt_entry_coverage(vm, level);
+
+The shift is constant for vm+level, correct?  In that case, can't this be written
+as
+
+	for (idx = 0; idx < size; idx++, va += va_coverage) {
+
+or even without a snapshot
+
+	for (idx = 0; idx < size; idx++, va += pt_entry_coverage(vm, level)) {
+
+That would allow
+
+		if (!(pte & PTE_VALID)
+			continue
+
+to reduce the indentation of the printing.
+
+> +	}
+> +
+> +}
+> +
+> +void virt_arch_dump(FILE *stream, struct kvm_vm *vm, uint8_t indent)
+> +{
+> +	vm_paddr_t pt = vm->pgd;
+> +
+> +	if (!vm->pgd_created)
+> +		return;
+> +
+> +	virt_arch_dump_pt(stream, vm, pt, 0, 1, indent);
+> +}
+> +
+> +struct kvm_vcpu *vm_arch_vcpu_add(struct kvm_vm *vm, uint32_t vcpu_id,
+> +				  void *guest_code)
+> +{
+> +	size_t stack_size =  64*1024;
+
+SZ_64K
+
+> +	uint64_t stack_vaddr;
+> +	struct kvm_regs regs;
+> +	struct kvm_vcpu *vcpu;
+> +	uint64_t lpcr;
+> +
+> +	TEST_ASSERT(vm->page_size == 64*1024, "Unsupported page size: 0x%x",
+
+SZ_64K
+
+> +		    vm->page_size);
+> +
+> +	stack_vaddr = __vm_vaddr_alloc(vm, stack_size,
+> +				       DEFAULT_GUEST_STACK_VADDR_MIN,
+> +				       MEM_REGION_DATA);
+> +
+> +	vcpu = __vm_vcpu_add(vm, vcpu_id);
+> +
+> +	vcpu_enable_cap(vcpu, KVM_CAP_PPC_PAPR, 1);
+> +
+> +	/* Setup guest registers */
+> +	vcpu_regs_get(vcpu, &regs);
+> +	vcpu_get_reg(vcpu, KVM_REG_PPC_LPCR_64, &lpcr);
+> +
+> +	regs.pc = (uintptr_t)guest_code;
+> +	regs.gpr[12] = (uintptr_t)guest_code;
+> +	regs.msr = 0x8000000002103032ull;
+> +	regs.gpr[1] = stack_vaddr + stack_size - 256;
+> +
+> +	if (BYTE_ORDER == LITTLE_ENDIAN) {
+> +		regs.msr |= 0x1; // LE
+> +		lpcr |= 0x0000000002000000; // ILE
+
+Would it be appropriate to add #defines to processor.h instead of open coding the
+magic numbers?
+
+> +	} else {
+> +		lpcr &= ~0x0000000002000000; // !ILE
+> +	}
+> +
+> +	vcpu_regs_set(vcpu, &regs);
+> +	vcpu_set_reg(vcpu, KVM_REG_PPC_LPCR_64, lpcr);
+> +
+> +	return vcpu;
+> +}
+> +
+> +void vcpu_args_set(struct kvm_vcpu *vcpu, unsigned int num, ...)
+> +{
+> +	va_list ap;
+> +	struct kvm_regs regs;
+> +	int i;
+> +
+> +	TEST_ASSERT(num >= 1 && num <= 5, "Unsupported number of args,\n"
+
+Newlines in TEST_ASSERT() usually lead to weird formatting.
+
+> +		    "  num: %u\n",
+
+No quoted line wrap please.  And in this case, not wrapping is better IMO.
+
+	TEST_ASSERT(num >= 1 && num <= 5, "Unsupported number of args: %u", num);
+
+> +		    num);
+> +
+> +	va_start(ap, num);
+> +	vcpu_regs_get(vcpu, &regs);
+> +
+> +	for (i = 0; i < num; i++)
+> +		regs.gpr[i + 3] = va_arg(ap, uint64_t);
+> +
+> +	vcpu_regs_set(vcpu, &regs);
+> +	va_end(ap);
+> +}
