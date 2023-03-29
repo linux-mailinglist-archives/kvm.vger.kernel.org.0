@@ -2,149 +2,146 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D154B6CEFB7
-	for <lists+kvm@lfdr.de>; Wed, 29 Mar 2023 18:47:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E727D6CEFDC
+	for <lists+kvm@lfdr.de>; Wed, 29 Mar 2023 18:52:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230177AbjC2QrU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 Mar 2023 12:47:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55490 "EHLO
+        id S230449AbjC2QwY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 Mar 2023 12:52:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35348 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230313AbjC2QrS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 29 Mar 2023 12:47:18 -0400
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5892C5261
-        for <kvm@vger.kernel.org>; Wed, 29 Mar 2023 09:47:17 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-5411f21f849so161369457b3.16
-        for <kvm@vger.kernel.org>; Wed, 29 Mar 2023 09:47:17 -0700 (PDT)
+        with ESMTP id S230401AbjC2QwV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 29 Mar 2023 12:52:21 -0400
+Received: from mail-qv1-xf2c.google.com (mail-qv1-xf2c.google.com [IPv6:2607:f8b0:4864:20::f2c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6A765B8F
+        for <kvm@vger.kernel.org>; Wed, 29 Mar 2023 09:52:06 -0700 (PDT)
+Received: by mail-qv1-xf2c.google.com with SMTP id cu4so12026959qvb.3
+        for <kvm@vger.kernel.org>; Wed, 29 Mar 2023 09:52:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1680108436;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=XhJ2KAFNUebvt6cQMDTLf5QYVLkhRGTjjjB4Lv8Q8Pw=;
-        b=Nwnor0fuwBFL6HswHVDb9zq4uqB8N0vyANtOGoursE/xCXttz4V6jsoxjL4SKGjtcU
-         vM08UOGTQy3ImsotSEpEn8ev+cnvKUAvL56SaS8B8FBrIaQIcJJDDjylIjDObxUSVj3m
-         /QZ2b+8/qsofV6UllwSgZtticUjx9NgZ0p3PXNaUQQJNdVnoAIr1IyMyMkDLhy+jZkvd
-         3nt/k1QOxZXpVzmtl9BOim/yPZvH5Vvs4toGP76nX15+oc8clHEikoh1Mn2zLLjO+KnC
-         Nb14v+ooTd2RMCQTcprG20lhhxICTFeqHyl2aaxr+1MLBrctSNDVouYcDHucWdrm7uP3
-         p9iw==
+        d=bytedance.com; s=google; t=1680108726;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=TJcSi47EhXNIDZ28a5A+wUVsGYy6JkYPL7x7pr4x14E=;
+        b=WuSoUr/TbmkUjF2NfkFCiLWNR8BN63Wj2yZKpy+M4B64e8/kMV22C47oGxbcMFfC8a
+         u9K2KoG11gGOJV88vDBO0cHYSNjLau+amgIYXgnJy/mkhyPjfbPl1bpR55+gGFA/0T2X
+         Y3lycNnqyZdxaqxkJIKbMiDC1r8Gj8OTmpBMCymksqnij1usKSqpDIrarl3NgzaZfqjV
+         S8/uoEwaxx27oTUV+7urz/oarTKj5kZLJTFUkzuHdx3bRJJLEiJmTH7P8ajdrR5lzv0o
+         t0b5e7GwE3jiwm57u4EC/aaFF4fkZN9gaSFM6g80KTSZHj6RHlq9Xu5MXIUo7DUQPELT
+         BnxA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680108436;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=XhJ2KAFNUebvt6cQMDTLf5QYVLkhRGTjjjB4Lv8Q8Pw=;
-        b=Ky4wGHTQS8nBBSTrIgQ4aFkPyKGVFZVLTzqUtno4k2VQuS2h3zQsf0YSTYrepWaNZd
-         ttKvceln05CPQVfKDB7KZn5qWpxlM9DZ4dSMhhmpfeXsArF3NlNSJnb65vm79tTS+DyY
-         dJamAnO0l99lyTbUvcSoNc62fUQH7q82RZDYSCbR3SKNGIP8a5YLN799rdmUYX4f70Zw
-         TxmDL5xvNWM2eSGIwtP4+OQ2R2JHFN6M9aSIoSOLaSO0TkO9kJaT3lBCW1ikxA3CP15B
-         R4LxqWhJ7/MnUc96oePVbNtLinrmoavNlfZBVncNtcJ/SztUd1zQuFzavBUxENcyOhvB
-         4sYA==
-X-Gm-Message-State: AAQBX9evkrixtePgbMQMJT+963h6A9OgI12cgAvbwDkvszN6BFeompoi
-        s19c0r2C8D4cJBZwS2BrftnBN11fqO0=
-X-Google-Smtp-Source: AKy350aIOO/FRysptnp/XYsHQcm9j9T0hsEhp7XgPOREaWpwy9KrpbLjRF48BgXvySig/ZWmHz4PQEOOPoU=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:690c:b94:b0:541:698b:7bdb with SMTP id
- ck20-20020a05690c0b9400b00541698b7bdbmr1769126ywb.2.1680108436600; Wed, 29
- Mar 2023 09:47:16 -0700 (PDT)
-Date:   Wed, 29 Mar 2023 09:47:15 -0700
-In-Reply-To: <38601264-1957-579f-f156-c782bb9826cc@amd.com>
-Mime-Version: 1.0
-References: <20230206060545.628502-1-manali.shukla@amd.com>
- <20230206060545.628502-3-manali.shukla@amd.com> <ZB4AOaLRwSB0ClIH@google.com> <38601264-1957-579f-f156-c782bb9826cc@amd.com>
-Message-ID: <ZCRrk0qsdv7rYqFq@google.com>
-Subject: Re: [RFC PATCH kernel 2/2] KVM: SEV: PreventHostIBS enablement for
- SEV-ES and SNP guest
-From:   Sean Christopherson <seanjc@google.com>
-To:     Manali Shukla <manali.shukla@amd.com>
-Cc:     linux-kernel@vger.kernel.org, peterz@infradead.org,
-        mingo@redhat.com, acme@kernel.org, jolsa@kernel.org,
-        namhyung@kernel.org, tglx@linutronix.de, bp@alien8.de,
-        dave.hansen@linux.intel.com, pbonzini@redhat.com,
-        jpoimboe@kernel.org, pawan.kumar.gupta@linux.intel.com,
-        babu.moger@amd.com, sandipan.das@amd.com, jmattson@google.com,
-        thomas.lendacky@amd.com, nikunj@amd.com, ravi.bangoria@amd.com,
-        eranian@google.com, irogers@google.com, kvm@vger.kernel.org,
-        x86@kernel.org, linux-perf-users@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-7.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+        d=1e100.net; s=20210112; t=1680108726;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=TJcSi47EhXNIDZ28a5A+wUVsGYy6JkYPL7x7pr4x14E=;
+        b=Z+8T6DfbuivKVcWEsO0U3F/t82XD56bbZEy8PM8nk11vXm9St//LGNBMOM2H2B11u/
+         HJR+iSB1qqx1gZu7rm+RTtaefw/blz5B9TGeZibUVkF6ydNP1Unw4ik06D9G94naXlc9
+         S8rWW2U3vYiHr3/quTIRJyQ01qWRbnQS3BT7QXRFKCHCOunDj2q/C+qBKqB99A2b1+6g
+         AG0q2pkm55lRTc+e52RUtU8z3w71XvlFibWe6/CokcEGWgVVOoXvWBTPUV7Jpz247DD7
+         TFITHPdN0T9PVwWAt8X2nVIlC8CPHaAXzODliWR1uVEwcB09xIss49z+BOPjRI2OU/N0
+         BpwA==
+X-Gm-Message-State: AAQBX9dn7BJ5vn/GQnX5852xhEVDK1trDxCBUs5+y+C6iH6BCo3o2dVI
+        PSxGdsOjO1yB/ZpMhmvbLDxVHg==
+X-Google-Smtp-Source: AKy350bK7zGq4k69rZlQkPib1d9x8G+KiYL3mTAPdFc8sKo0rQ6LMTYNTi6e9fe7gDD2dheQbUJTQQ==
+X-Received: by 2002:ad4:5949:0:b0:5d5:11b4:ad0 with SMTP id eo9-20020ad45949000000b005d511b40ad0mr31106166qvb.11.1680108726011;
+        Wed, 29 Mar 2023 09:52:06 -0700 (PDT)
+Received: from [172.17.0.3] ([147.160.184.95])
+        by smtp.gmail.com with ESMTPSA id mh2-20020a056214564200b005dd8b934582sm4686029qvb.26.2023.03.29.09.52.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 29 Mar 2023 09:52:05 -0700 (PDT)
+From:   Bobby Eshleman <bobby.eshleman@bytedance.com>
+Date:   Wed, 29 Mar 2023 16:51:58 +0000
+Subject: [PATCH net v3] virtio/vsock: fix leaks due to missing skb owner
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20230327-vsock-fix-leak-v3-1-292cfc257531@bytedance.com>
+X-B4-Tracking: v=1; b=H4sIAK5sJGQC/32OzQ7CIBCEX8Vwdk2B9M+T72E88LNYUgUDDdo0f
+ XcpFxMTPc7szDe7kIjBYiTH3UICJhutd1nw/Y6oQbgrgtVZE1YxXnHWQopejWDsC24oRpBUoaF
+ 1x4ToSC5JERFkEE4NW+2TjqME/3QYttQjYPbK7Jk4nMglm4ONkw9zeSXRcvq1mihQ4AY18qalV
+ W1Ocp5Q51U8KH8vuMT+I1hGmKahfd8yjVh9I9Z1fQMY3VJGHgEAAA==
+To:     Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Bobby Eshleman <bobby.eshleman@bytedance.com>
+Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Cong Wang <xiyou.wangcong@gmail.com>
+X-Mailer: b4 0.12.2
+X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
+        DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 29, 2023, Manali Shukla wrote:
-> On 3/25/2023 1:25 AM, Sean Christopherson wrote:
-> > On Mon, Feb 06, 2023, Manali Shukla wrote:
-> >> -	if (sev_es_guest(vcpu->kvm))
-> >> +	if (sev_es_guest(vcpu->kvm)) {
-> >> +		bool ibs_fetch_active, ibs_op_active;
-> >> +		u64 ibs_fetch_ctl, ibs_op_ctl;
-> >> +
-> >> +		if (svm->prevent_hostibs_enabled) {
-> >> +			/*
-> >> +			 * With PreventHostIBS enabled, IBS profiling cannot
-> >> +			 * be active when VMRUN is executed. Disable IBS before
-> >> +			 * executing VMRUN and, because of a race condition,
-> >> +			 * enable the PreventHostIBS window if IBS profiling was
-> >> +			 * active.
-> > 
-> > And the race can't be fixed because...?
-> 
-> Race can not be fixed because VALID and ENABLE bit for IBS_FETCH_CTL and IBS_OP_CTL
-> are contained in their same resepective MSRs. Due to this reason following scenario can
-> be generated:
-> Read IBS_FETCH_CTL (IbsFetchEn bit is 1 and IBSFetchVal bit is 0)
-> Write IBS_FETCH_CTL (IbsFetchEn is 0 now)
-> Imagine in between Read and Write, IBSFetchVal changes to 1. Write to IBS_FETCH_CTL will
-> clear the IBSFetchVal bit. When STGI is executed after VMEXIT, the NMI is taken and check for
-> valid mask will fail and generate Dazed and Confused NMI messages.
-> Please refer to cover letter for more details.
+This patch sets the skb owner in the recv and send path for virtio.
 
-I understand the race, I'm asking why this series doesn't fix the race.  Effectively
-suppressing potentially unexpected NMIs because PreventHostIBS was enable is ugly.
+For the send path, this solves the leak caused when
+virtio_transport_purge_skbs() finds skb->sk is always NULL and therefore
+never matches it with the current socket. Setting the owner upon
+allocation fixes this.
 
-> >> +			 */
-> >> +			ibs_fetch_active =
-> >> +				amd_disable_ibs_fetch(&ibs_fetch_ctl);
-> >> +			ibs_op_active =
-> >> +				amd_disable_ibs_op(&ibs_op_ctl);
-> >> +
-> >> +			amd_prevent_hostibs_window(ibs_fetch_active ||
-> >> +						   ibs_op_active);
-> >> +		}
-> >> +
-> >>  		__svm_sev_es_vcpu_run(svm, spec_ctrl_intercepted);
-> >> -	else
-> >> +
-> >> +		if (svm->prevent_hostibs_enabled) {
-> >> +			if (ibs_fetch_active)
-> >> +				amd_restore_ibs_fetch(ibs_fetch_ctl);
-> >> +
-> >> +			if (ibs_op_active)
-> >> +				amd_restore_ibs_op(ibs_op_ctl);
-> > 
-> > IIUC, this adds up to 2 RDMSRs and 4 WRMSRs to the VMRUN path.  Blech.  There's
-> > gotta be a better way to implement this.  
-> 
-> I will try to find a better way to implement this.
-> 
-> > Like PeterZ said, this is basically
-> > exclude_guest.
-> 
-> As I mentioned before, exclude_guest lets the profiler decide whether it wants to trace the guest
-> data or not, whereas PreventHostIBS lets the owner of the guest decide whether host can trace guest's
-> data or not.
+For the recv path, this ensures correctness of accounting and also
+correct transfer of ownership in vsock_loopback (when skbs are sent from
+one socket and received by another).
 
-PreventHostIBS is purely an enforcement, it does not actually do anything to
-disable tracing of the guest.  What PeterZ and I are complaining about is that
-instead of integrating this feature with exclude_guest, e.g. finding a way to
-make guest tracing mutually exclusive with KVM_RUN so that PreventHostIBS can be
-contexted switched according, this series instead backdoors into perf to forcefully
-disable tracing.
+Fixes: 71dc9ec9ac7d ("virtio/vsock: replace virtio_vsock_pkt with sk_buff")
+Signed-off-by: Bobby Eshleman <bobby.eshleman@bytedance.com>
+Reported-by: Cong Wang <xiyou.wangcong@gmail.com>
+Link: https://lore.kernel.org/all/ZCCbATwov4U+GBUv@pop-os.localdomain/
+---
+Changes in v3:
+- virtio/vsock: use skb_set_owner_sk_safe() instead of
+  skb_set_owner_{r,w}
+- virtio/vsock: reject allocating/receiving skb if sk_refcnt==0 and WARN_ONCE
+- Link to v2: https://lore.kernel.org/r/20230327-vsock-fix-leak-v2-1-f6619972dee0@bytedance.com
 
-In other words, please try to create a sane contract between userspace, perf, and
-KVM, e.g. disallow tracing a guest with PreventHostIBS at some level instead of
-silently toggling tracing around VMRUN.
+Changes in v2:
+- virtio/vsock: add skb_set_owner_r to recv_pkt()
+- Link to v1: https://lore.kernel.org/r/20230327-vsock-fix-leak-v1-1-3fede367105f@bytedance.com
+---
+ net/vmw_vsock/virtio_transport_common.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+index 957cdc01c8e8..c927dc302faa 100644
+--- a/net/vmw_vsock/virtio_transport_common.c
++++ b/net/vmw_vsock/virtio_transport_common.c
+@@ -94,6 +94,11 @@ virtio_transport_alloc_skb(struct virtio_vsock_pkt_info *info,
+ 					 info->op,
+ 					 info->flags);
+ 
++	if (info->vsk && !skb_set_owner_sk_safe(skb, sk_vsock(info->vsk))) {
++		WARN_ONCE(1, "failed to allocate skb on vsock socket with sk_refcnt == 0\n");
++		goto out;
++	}
++
+ 	return skb;
+ 
+ out:
+@@ -1294,6 +1299,11 @@ void virtio_transport_recv_pkt(struct virtio_transport *t,
+ 		goto free_pkt;
+ 	}
+ 
++	if (!skb_set_owner_sk_safe(skb, sk)) {
++		WARN_ONCE(1, "receiving vsock socket has sk_refcnt == 0\n");
++		goto free_pkt;
++	}
++
+ 	vsk = vsock_sk(sk);
+ 
+ 	lock_sock(sk);
+
+---
+base-commit: e5b42483ccce50d5b957f474fd332afd4ef0c27b
+change-id: 20230327-vsock-fix-leak-b1cef1582aa8
+
+Best regards,
+-- 
+Bobby Eshleman <bobby.eshleman@bytedance.com>
+
