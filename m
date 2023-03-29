@@ -2,146 +2,178 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E727D6CEFDC
-	for <lists+kvm@lfdr.de>; Wed, 29 Mar 2023 18:52:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5F52D6CF136
+	for <lists+kvm@lfdr.de>; Wed, 29 Mar 2023 19:34:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230449AbjC2QwY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 Mar 2023 12:52:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35348 "EHLO
+        id S229773AbjC2Reu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 Mar 2023 13:34:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58580 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230401AbjC2QwV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 29 Mar 2023 12:52:21 -0400
-Received: from mail-qv1-xf2c.google.com (mail-qv1-xf2c.google.com [IPv6:2607:f8b0:4864:20::f2c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6A765B8F
-        for <kvm@vger.kernel.org>; Wed, 29 Mar 2023 09:52:06 -0700 (PDT)
-Received: by mail-qv1-xf2c.google.com with SMTP id cu4so12026959qvb.3
-        for <kvm@vger.kernel.org>; Wed, 29 Mar 2023 09:52:06 -0700 (PDT)
+        with ESMTP id S229817AbjC2Res (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 29 Mar 2023 13:34:48 -0400
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E08F240CF
+        for <kvm@vger.kernel.org>; Wed, 29 Mar 2023 10:34:47 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-5417f156cb9so162795717b3.8
+        for <kvm@vger.kernel.org>; Wed, 29 Mar 2023 10:34:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1680108726;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=TJcSi47EhXNIDZ28a5A+wUVsGYy6JkYPL7x7pr4x14E=;
-        b=WuSoUr/TbmkUjF2NfkFCiLWNR8BN63Wj2yZKpy+M4B64e8/kMV22C47oGxbcMFfC8a
-         u9K2KoG11gGOJV88vDBO0cHYSNjLau+amgIYXgnJy/mkhyPjfbPl1bpR55+gGFA/0T2X
-         Y3lycNnqyZdxaqxkJIKbMiDC1r8Gj8OTmpBMCymksqnij1usKSqpDIrarl3NgzaZfqjV
-         S8/uoEwaxx27oTUV+7urz/oarTKj5kZLJTFUkzuHdx3bRJJLEiJmTH7P8ajdrR5lzv0o
-         t0b5e7GwE3jiwm57u4EC/aaFF4fkZN9gaSFM6g80KTSZHj6RHlq9Xu5MXIUo7DUQPELT
-         BnxA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680108726;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=google.com; s=20210112; t=1680111287;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=TJcSi47EhXNIDZ28a5A+wUVsGYy6JkYPL7x7pr4x14E=;
-        b=Z+8T6DfbuivKVcWEsO0U3F/t82XD56bbZEy8PM8nk11vXm9St//LGNBMOM2H2B11u/
-         HJR+iSB1qqx1gZu7rm+RTtaefw/blz5B9TGeZibUVkF6ydNP1Unw4ik06D9G94naXlc9
-         S8rWW2U3vYiHr3/quTIRJyQ01qWRbnQS3BT7QXRFKCHCOunDj2q/C+qBKqB99A2b1+6g
-         AG0q2pkm55lRTc+e52RUtU8z3w71XvlFibWe6/CokcEGWgVVOoXvWBTPUV7Jpz247DD7
-         TFITHPdN0T9PVwWAt8X2nVIlC8CPHaAXzODliWR1uVEwcB09xIss49z+BOPjRI2OU/N0
-         BpwA==
-X-Gm-Message-State: AAQBX9dn7BJ5vn/GQnX5852xhEVDK1trDxCBUs5+y+C6iH6BCo3o2dVI
-        PSxGdsOjO1yB/ZpMhmvbLDxVHg==
-X-Google-Smtp-Source: AKy350bK7zGq4k69rZlQkPib1d9x8G+KiYL3mTAPdFc8sKo0rQ6LMTYNTi6e9fe7gDD2dheQbUJTQQ==
-X-Received: by 2002:ad4:5949:0:b0:5d5:11b4:ad0 with SMTP id eo9-20020ad45949000000b005d511b40ad0mr31106166qvb.11.1680108726011;
-        Wed, 29 Mar 2023 09:52:06 -0700 (PDT)
-Received: from [172.17.0.3] ([147.160.184.95])
-        by smtp.gmail.com with ESMTPSA id mh2-20020a056214564200b005dd8b934582sm4686029qvb.26.2023.03.29.09.52.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 Mar 2023 09:52:05 -0700 (PDT)
-From:   Bobby Eshleman <bobby.eshleman@bytedance.com>
-Date:   Wed, 29 Mar 2023 16:51:58 +0000
-Subject: [PATCH net v3] virtio/vsock: fix leaks due to missing skb owner
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20230327-vsock-fix-leak-v3-1-292cfc257531@bytedance.com>
-X-B4-Tracking: v=1; b=H4sIAK5sJGQC/32OzQ7CIBCEX8Vwdk2B9M+T72E88LNYUgUDDdo0f
- XcpFxMTPc7szDe7kIjBYiTH3UICJhutd1nw/Y6oQbgrgtVZE1YxXnHWQopejWDsC24oRpBUoaF
- 1x4ToSC5JERFkEE4NW+2TjqME/3QYttQjYPbK7Jk4nMglm4ONkw9zeSXRcvq1mihQ4AY18qalV
- W1Ocp5Q51U8KH8vuMT+I1hGmKahfd8yjVh9I9Z1fQMY3VJGHgEAAA==
-To:     Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Bobby Eshleman <bobby.eshleman@bytedance.com>
-Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Cong Wang <xiyou.wangcong@gmail.com>
-X-Mailer: b4 0.12.2
-X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
-        DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        bh=DNFNaG7IfQn0GoxGHQeAECVC0HUIZIm3W897ndNR614=;
+        b=WVRjEOhFK42+QTaIBDpc5ESW5rIEkrLv8L7Of70FyuU+jDHA6odDZ7JUH5pB3A5Wou
+         Rv7OTkRjntygAnYlh5u5jJl/eUE1cvTIVnf3EeFGrG7jVLYYRfnHYzsIQXBJZOZOfSWw
+         PZV/qt4K4AEvkDd/RKzkQibmsAx4oR/6TiOFwhqjGInNwaHcq5zsLh3dZMiPEV8EkN5n
+         QhARyxv083w07bSdn4SJVZD1hnjsyNEmiKXETlBZXytDlNICYaQxmKcG7arLGx6/hdDF
+         l34UfVEHvDjYUhwwAd+4rjbOBGH43cTC//kaGTPj3aoxGkIFlJVudy1NfCARqPp7mZyD
+         sSpQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1680111287;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=DNFNaG7IfQn0GoxGHQeAECVC0HUIZIm3W897ndNR614=;
+        b=21/skGr2LbTtvjNxXrwPGcZ7XiiQW3KtTOY5SJ2oRGbDLlGe/uRzhkluw9QdgfWRk7
+         qU4dqXzc+/TyAzdilOrGyKxBk/qa1K3TuFXuTBAn0+Sw7Uern4JIIIoJ+S77fHg+9lh8
+         X5s+PBxeDwhc+9V3jr4zWHYWyXMdC5nMmwtC5hvSdG8uUrxvpaKy8seUTOkgeQAgWMBB
+         kB0ryqCJ399vPJT9ZAwuxgec7WZs1OkCdsrJW6WycJbXU2dDxlTIGvTWurL2GpwM0FZr
+         1I28iAingsKt06UGlBqbAvBCkvkX6DbKvaxYZmjIZxMCOyNNIgG3qtwgk2hO03dKmdaw
+         sk5A==
+X-Gm-Message-State: AAQBX9extKesGJICxvEDHJpqsQNJwCiQCDRBppyhXw/bMHi+cjjjKOGe
+        XW2XUgkxOhRipghwS1q8YkAqDhkX+aU=
+X-Google-Smtp-Source: AKy350Y6YR29N0iDn73gQp4Y2NbtQaxpn3andjTdVc71mv2uApbarteg9hvLxcwa4AcT7C4hAeTsXmdcsv4=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:10c2:b0:b21:a3b8:45cd with SMTP id
+ w2-20020a05690210c200b00b21a3b845cdmr13935709ybu.0.1680111287180; Wed, 29 Mar
+ 2023 10:34:47 -0700 (PDT)
+Date:   Wed, 29 Mar 2023 10:34:45 -0700
+In-Reply-To: <b9e9dd1c-2213-81c7-cd45-f5cf7b86610b@linux.intel.com>
+Mime-Version: 1.0
+References: <20230319084927.29607-1-binbin.wu@linux.intel.com>
+ <20230319084927.29607-3-binbin.wu@linux.intel.com> <ZBhTa6QSGDp2ZkGU@gao-cwp>
+ <ZBojJgTG/SNFS+3H@google.com> <12c4f1d3c99253f364f3945a998fdccb0ddf300f.camel@intel.com>
+ <e0442b13-09f4-0985-3eb4-9b6a20d981fb@linux.intel.com> <682d01dec42ecdb80c9d3ffa2902dea3b1d576dd.camel@intel.com>
+ <b9e9dd1c-2213-81c7-cd45-f5cf7b86610b@linux.intel.com>
+Message-ID: <ZCR2PBx/4lj9X0vD@google.com>
+Subject: Re: [PATCH v6 2/7] KVM: VMX: Use is_64_bit_mode() to check 64-bit mode
+From:   Sean Christopherson <seanjc@google.com>
+To:     Binbin Wu <binbin.wu@linux.intel.com>
+Cc:     Kai Huang <kai.huang@intel.com>, Chao Gao <chao.gao@intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "robert.hu@linux.intel.com" <robert.hu@linux.intel.com>
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-7.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This patch sets the skb owner in the recv and send path for virtio.
+On Wed, Mar 29, 2023, Binbin Wu wrote:
+>=20
+> On 3/29/2023 10:04 AM, Huang, Kai wrote:
+> > On Wed, 2023-03-29 at 09:27 +0800, Binbin Wu wrote:
+> > > On 3/29/2023 7:33 AM, Huang, Kai wrote:
+> > > > On Tue, 2023-03-21 at 14:35 -0700, Sean Christopherson wrote:
+> > > > > On Mon, Mar 20, 2023, Chao Gao wrote:
+> > > > > > On Sun, Mar 19, 2023 at 04:49:22PM +0800, Binbin Wu wrote:
+> > > > > > > get_vmx_mem_address() and sgx_get_encls_gva() use is_long_mod=
+e()
+> > > > > > > to check 64-bit mode. Should use is_64_bit_mode() instead.
+> > > > > > >=20
+> > > > > > > Fixes: f9eb4af67c9d ("KVM: nVMX: VMX instructions: add checks=
+ for #GP/#SS exceptions")
+> > > > > > > Fixes: 70210c044b4e ("KVM: VMX: Add SGX ENCLS[ECREATE] handle=
+r to enforce CPUID restrictions")
+> > > > > > It is better to split this patch into two: one for nested and o=
+ne for
+> > > > > > SGX.
+> > > > > >=20
+> > > > > > It is possible that there is a kernel release which has just on=
+e of
+> > > > > > above two flawed commits, then this fix patch cannot be applied=
+ cleanly
+> > > > > > to the release.
+> > > > > The nVMX code isn't buggy, VMX instructions #UD in compatibility =
+mode, and except
+> > > > > for VMCALL, that #UD has higher priority than VM-Exit interceptio=
+n.  So I'd say
+> > > > > just drop the nVMX side of things.
+> > > > But it looks the old code doesn't unconditionally inject #UD when i=
+n
+> > > > compatibility mode?
+> > > I think Sean means VMX instructions is not valid in compatibility mod=
+e
+> > > and it triggers #UD, which has higher priority than VM-Exit, by the
+> > > processor in non-root mode.
+> > >=20
+> > > So if there is a VM-Exit due to VMX instruction , it is in 64-bit mod=
+e
+> > > for sure if it is in long mode.
+> > Oh I see thanks.
+> >=20
+> > Then is it better to add some comment to explain, or add a WARN() if it=
+'s not in
+> > 64-bit mode?
+>=20
+> I also prefer to add a comment if no objection.
+>=20
+> Seems I am not the only one who didn't get it=EF=BF=BD : )
 
-For the send path, this solves the leak caused when
-virtio_transport_purge_skbs() finds skb->sk is always NULL and therefore
-never matches it with the current socket. Setting the owner upon
-allocation fixes this.
+I would rather have a code change than a comment, e.g.=20
 
-For the recv path, this ensures correctness of accounting and also
-correct transfer of ownership in vsock_loopback (when skbs are sent from
-one socket and received by another).
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index f63b28f46a71..0460ca219f96 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -4931,7 +4931,8 @@ int get_vmx_mem_address(struct kvm_vcpu *vcpu, unsign=
+ed long exit_qualification,
+        int  base_reg       =3D (vmx_instruction_info >> 23) & 0xf;
+        bool base_is_valid  =3D !(vmx_instruction_info & (1u << 27));
+=20
+-       if (is_reg) {
++       if (is_reg ||
++           WARN_ON_ONCE(is_long_mode(vcpu) && !is_64_bit_mode(vcpu))) {
+                kvm_queue_exception(vcpu, UD_VECTOR);
+                return 1;
+        }
 
-Fixes: 71dc9ec9ac7d ("virtio/vsock: replace virtio_vsock_pkt with sk_buff")
-Signed-off-by: Bobby Eshleman <bobby.eshleman@bytedance.com>
-Reported-by: Cong Wang <xiyou.wangcong@gmail.com>
-Link: https://lore.kernel.org/all/ZCCbATwov4U+GBUv@pop-os.localdomain/
----
-Changes in v3:
-- virtio/vsock: use skb_set_owner_sk_safe() instead of
-  skb_set_owner_{r,w}
-- virtio/vsock: reject allocating/receiving skb if sk_refcnt==0 and WARN_ONCE
-- Link to v2: https://lore.kernel.org/r/20230327-vsock-fix-leak-v2-1-f6619972dee0@bytedance.com
 
-Changes in v2:
-- virtio/vsock: add skb_set_owner_r to recv_pkt()
-- Link to v1: https://lore.kernel.org/r/20230327-vsock-fix-leak-v1-1-3fede367105f@bytedance.com
----
- net/vmw_vsock/virtio_transport_common.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+The only downside is that querying is_64_bit_mode() could unnecessarily tri=
+gger a
+VMREAD to get the current CS.L bit, but a measurable performance regression=
+s is
+extremely unlikely because is_64_bit_mode() all but guaranteed to be called=
+ in
+these paths anyways (and KVM caches segment info), e.g. by kvm_register_rea=
+d().
 
-diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
-index 957cdc01c8e8..c927dc302faa 100644
---- a/net/vmw_vsock/virtio_transport_common.c
-+++ b/net/vmw_vsock/virtio_transport_common.c
-@@ -94,6 +94,11 @@ virtio_transport_alloc_skb(struct virtio_vsock_pkt_info *info,
- 					 info->op,
- 					 info->flags);
- 
-+	if (info->vsk && !skb_set_owner_sk_safe(skb, sk_vsock(info->vsk))) {
-+		WARN_ONCE(1, "failed to allocate skb on vsock socket with sk_refcnt == 0\n");
-+		goto out;
-+	}
-+
- 	return skb;
- 
- out:
-@@ -1294,6 +1299,11 @@ void virtio_transport_recv_pkt(struct virtio_transport *t,
- 		goto free_pkt;
- 	}
- 
-+	if (!skb_set_owner_sk_safe(skb, sk)) {
-+		WARN_ONCE(1, "receiving vsock socket has sk_refcnt == 0\n");
-+		goto free_pkt;
-+	}
-+
- 	vsk = vsock_sk(sk);
- 
- 	lock_sock(sk);
+And then in a follow-up, we should also be able to do:
 
----
-base-commit: e5b42483ccce50d5b957f474fd332afd4ef0c27b
-change-id: 20230327-vsock-fix-leak-b1cef1582aa8
-
-Best regards,
--- 
-Bobby Eshleman <bobby.eshleman@bytedance.com>
+@@ -5402,7 +5403,7 @@ static int handle_vmread(struct kvm_vcpu *vcpu)
+        if (instr_info & BIT(10)) {
+                kvm_register_write(vcpu, (((instr_info) >> 3) & 0xf), value=
+);
+        } else {
+-               len =3D is_64_bit_mode(vcpu) ? 8 : 4;
++               len =3D is_long_mode(vcpu) ? 8 : 4;
+                if (get_vmx_mem_address(vcpu, exit_qualification,
+                                        instr_info, true, len, &gva))
+                        return 1;
+@@ -5476,7 +5477,7 @@ static int handle_vmwrite(struct kvm_vcpu *vcpu)
+        if (instr_info & BIT(10))
+                value =3D kvm_register_read(vcpu, (((instr_info) >> 3) & 0x=
+f));
+        else {
+-               len =3D is_64_bit_mode(vcpu) ? 8 : 4;
++               len =3D is_long_mode(vcpu) ? 8 : 4;
+                if (get_vmx_mem_address(vcpu, exit_qualification,
+                                        instr_info, false, len, &gva))
+                        return 1;
 
