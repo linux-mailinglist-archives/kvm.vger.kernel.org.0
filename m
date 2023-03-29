@@ -2,240 +2,507 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DE91A6CCEA2
-	for <lists+kvm@lfdr.de>; Wed, 29 Mar 2023 02:17:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DF2BA6CCEAD
+	for <lists+kvm@lfdr.de>; Wed, 29 Mar 2023 02:21:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229624AbjC2ARM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Mar 2023 20:17:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53222 "EHLO
+        id S229690AbjC2AVi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Mar 2023 20:21:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55054 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229560AbjC2ARK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Mar 2023 20:17:10 -0400
-Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C6221737;
-        Tue, 28 Mar 2023 17:17:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1680049029; x=1711585029;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=EQv/L66Mza4VQuW5r79i38LMkfV91/LVaTXS9gXYxjA=;
-  b=de/8VluVxcI/NY6ytBV4iErti+HMF9U1myzcTdNxyrf3Rln8yrYJm6YL
-   tNiMFhWvlezoCC0FIELrBtLHzZEBFEBvaIHGC5mmcsPBgGJqz0oqYvi+U
-   R3euSvQdwlGEhDjGVdIO2/2VKcn+1k4GCBNdh54klI0vk1V+w+31ufyv/
-   AhX2HYAmEBA1ft5VMzPfNLS61EjyrYHIeM5gm0DAMQV/PPbGUltiKybSW
-   7inMWhqbEUy5Tmg98g285MbDvXhWhWBGuw4GcJE+FOzeguRRtgIT6y8if
-   /uT6EW608ExQDOjpZxH72pLClLAuM5QaQ79RZtIceDlOg6sszJPIAlg9M
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10663"; a="324631570"
-X-IronPort-AV: E=Sophos;i="5.98,299,1673942400"; 
-   d="scan'208";a="324631570"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Mar 2023 17:17:08 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10663"; a="795008988"
-X-IronPort-AV: E=Sophos;i="5.98,299,1673942400"; 
-   d="scan'208";a="795008988"
-Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
-  by fmsmga002.fm.intel.com with ESMTP; 28 Mar 2023 17:17:08 -0700
-Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.21; Tue, 28 Mar 2023 17:17:07 -0700
-Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.21 via Frontend Transport; Tue, 28 Mar 2023 17:17:07 -0700
-Received: from NAM02-SN1-obe.outbound.protection.outlook.com (104.47.57.44) by
- edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.21; Tue, 28 Mar 2023 17:17:06 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=anmfR4Pc7XDXFUHw90mX4URJhXcckaVrnFlnK+eia9PyM6Phi6s1+y42ss8dgwwfIx8GTVM5tfeaHvLbAcnFWNcJvIzaew8Itpn4HkZO7UyVaxUEuiELLuWWH3wtsoiFdfduce5J/CLrHTUBKb95z1LxCGhoHPa83aP8KiFKLd4Hkk7JIyZEnBtcMUZgg2Cfk20dtkNWaXNcv7xkuGrPLNmafO5eRTO4obtH+hoszw6b1SjOBVLWu3yybokVO0Pct109HEn6BtwxkkxQtDfGz9TzgYNxVRVPWXNplPDvQdqLpBhyDeuxvcaWroDt922XVFQYMpA7HHqpYBfHy7OMvw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=qwB7IVmU6NPsDVeG+HD8rGj20GJiD81rWvQT9YRitq4=;
- b=Fi8P8Oxq0Wh1Gfz1x3zVDy788hos4UVDUy3pgTMq11EevIOWeXjUA1ScZ43AuaTh4hotZn1HGxL9OFmnyYYD4UJZ5p5NxkKXbbrcUkGjEvk6Hzm2IO4SMDjyQoV1uKB4diSUlRDpFj4gXusOZEBp/Uy34TzvSWN5ughXfXti65F+uPmKOiWz15fr0AW3YRll+eYOyYBxFjp8jD7REnS8CFmBwLUjcQbajKbe3a15qXuZQEh1XxU3RrIpppgPbkflLk8b/IPA+bxKFmkYy7zQLUsDVefZYyS4E2PdMrrgGMhbZAzuFvwhAIR4Fj6FHN8BoFImKeKVso12spqO2aXjgw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from PH0PR11MB4965.namprd11.prod.outlook.com (2603:10b6:510:34::7)
- by CY5PR11MB6236.namprd11.prod.outlook.com (2603:10b6:930:23::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6222.30; Wed, 29 Mar
- 2023 00:17:04 +0000
-Received: from PH0PR11MB4965.namprd11.prod.outlook.com
- ([fe80::47e1:d7b9:aab:dada]) by PH0PR11MB4965.namprd11.prod.outlook.com
- ([fe80::47e1:d7b9:aab:dada%6]) with mapi id 15.20.6222.034; Wed, 29 Mar 2023
- 00:17:04 +0000
-Message-ID: <b75c6f20-a99c-a6d4-c1c1-7ae9f016d2af@intel.com>
-Date:   Wed, 29 Mar 2023 08:16:52 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.9.0
-Subject: Re: [RFC PATCH 0/7] SVM guest shadow stack support
-To:     John Allen <john.allen@amd.com>,
-        "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
-        "Christopherson, Sean" <seanjc@google.com>
-CC:     "thomas.lendacky@amd.com" <thomas.lendacky@amd.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "x86@kernel.org" <x86@kernel.org>, Borislav Petkov <bp@alien8.de>
-References: <20221012203910.204793-1-john.allen@amd.com>
- <Y9B97dZnFnjEHhVf@google.com>
- <d4e15021af4e72d6daba4021feaebf289b676830.camel@intel.com>
- <ZCMpJLAx8//1zLLV@johallen-workstation.lan>
-Content-Language: en-US
-From:   "Yang, Weijiang" <weijiang.yang@intel.com>
-In-Reply-To: <ZCMpJLAx8//1zLLV@johallen-workstation.lan>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: KL1PR0401CA0009.apcprd04.prod.outlook.com
- (2603:1096:820:f::14) To PH0PR11MB4965.namprd11.prod.outlook.com
- (2603:10b6:510:34::7)
+        with ESMTP id S229621AbjC2AVh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Mar 2023 20:21:37 -0400
+Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 046E91BF
+        for <kvm@vger.kernel.org>; Tue, 28 Mar 2023 17:21:35 -0700 (PDT)
+Received: by mail-pj1-x1034.google.com with SMTP id d13so12520638pjh.0
+        for <kvm@vger.kernel.org>; Tue, 28 Mar 2023 17:21:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112; t=1680049294;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=m0w3CShI6qTSAWvwiBHI3S8Co9XFTAiy1fef/rAuXkc=;
+        b=b8ZyAuWz3tgSgvN9gSsqrHrpp2oqUYksLXLhl8h3WIq+sOrBm0G+Mn9htI/XqnHXg1
+         I2LyXvEYQiIo5lK+NYOsmWkY4SusNuQeTIUQDPMmugZpk39HeQnZYGjdVGKvkzu9rwEW
+         Vj4zi2U142PJQsxz1sFHtknRf7H5nr7/HeSznNOVe5wupWMuBzP0VHpj9NG5RV6vcV1d
+         HKxWYB0kGwYvolKMnIIjaAPNs5WBNqS904n6p6Za6GP5f6SI6sNgc3sLL3UqP2SNq5ZU
+         jLgMepDUExr7vsJnjW8aOUJsnNCmNopd9XkHIKyZO0lADI/cwg1qNDvcee+xi6loXL5P
+         TXpA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1680049294;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=m0w3CShI6qTSAWvwiBHI3S8Co9XFTAiy1fef/rAuXkc=;
+        b=q5WSSqaCtfmaS9+aiBQJfnKTToO0I2f7ULuFJbq0ZuGVXJEtivV8e140e5QGBFtLu5
+         EoqOE2UMhGHcOf9GNq01vSb+ZwR/mC52e25Nuq1pNa7YI6k7C6USrUZ2Labh34mkH26d
+         9oepiYPY3KWFDW9dxHoLZlweD3dAV9NYlUBqzVQHcpBX4Xt+Ll9ZGjEGyUfxC0P/yq/I
+         wTF/kYmGD+IkRhLSvBAOkQRb58blb326/mzVO5ryNJqPfIMv3OeQUwEVmBsEol9V/WNi
+         VIyWuznBxw7vczAVidpZCYrw7lsIPFIKK7PqAdO0wGoNI2SO6LXXFWtcFRn0EP1dJywp
+         LC+A==
+X-Gm-Message-State: AAQBX9f40K/XZj+zCe0fBLR1ZiIzpDZE+z5n82wrJGPnOsU7PdYoFDNK
+        k/VKbAJjYLbvjpSp5I2IRg2dig==
+X-Google-Smtp-Source: AKy350aTXZ0xg93naoKrIn0CSCeL9HsP0Mprr8/R5IFlJyduiuBDvNGrpZEDSiFJvmAJwQWlV3GVnQ==
+X-Received: by 2002:a17:90b:4c0c:b0:233:d12f:f43a with SMTP id na12-20020a17090b4c0c00b00233d12ff43amr16856659pjb.1.1680049294149;
+        Tue, 28 Mar 2023 17:21:34 -0700 (PDT)
+Received: from google.com (223.103.125.34.bc.googleusercontent.com. [34.125.103.223])
+        by smtp.gmail.com with ESMTPSA id ge18-20020a17090b0e1200b00234e6d2de3dsm141718pjb.11.2023.03.28.17.21.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 28 Mar 2023 17:21:33 -0700 (PDT)
+Date:   Tue, 28 Mar 2023 17:21:29 -0700
+From:   David Matlack <dmatlack@google.com>
+To:     Vipin Sharma <vipinsh@google.com>
+Cc:     seanjc@google.com, pbonzini@redhat.com, bgardon@google.com,
+        jmattson@google.com, mizhang@google.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [Patch v4 16/18] KVM: x86/mmu: Allocate numa aware page tables
+ during page fault
+Message-ID: <ZCOEiVT31xEPKZ3H@google.com>
+References: <20230306224127.1689967-1-vipinsh@google.com>
+ <20230306224127.1689967-17-vipinsh@google.com>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR11MB4965:EE_|CY5PR11MB6236:EE_
-X-MS-Office365-Filtering-Correlation-Id: 5b8d0715-afb4-4431-3d83-08db2feaec2d
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: bOsAIX/nJDvj2Sn3JtRG/yQ8y1IPgM3FZmSghoqtzQkekcQz4P1r3kVtp0VZAzx09QQQTNqEhhpEPNX8GgTcjXrDlJg4HZ1pyFeMSCvs/s0yXTC6eRPtz1tymUEL5ulQ5rQ63SrVbcmUghEDh0GhXo0OUjI5YZcDDg6Y6hvdT2BNkgAMsLRqL/pEJ5VNFDfCcIfRTGjpV2QUKftzl3EQNf3sRZmK1pjcd/+DeewrXNzeNnVlp2rZDyEZMz1/vMdgvYT0/3/ReNPWSErQPDybWLeGeoKeynjnlJa1C5VRGPgR+X6wuz/HnqaajBB7qwlQRUW42YqRSU71eWRw0ryv7untt/k8OU79nrovgpqbAGCZhOahIHDoYq7+pHGoPQzJgRTVVrlWVrpPwqWFx1QVfhjjxpB4ZHarm2julJyj4hr8zcfEQCTVwpSVH9+9kyeXHmkyhdyNdXfgvrhaf+dnTXIsAiRe3fY7nqWjjlv/p4/mMHgA0utI1Hi9OfyRMxiewi6PlmM7cqO0+ggDTzOFr5N12XPUOUJIjBsdIAPNBNoAv6CCMXgF+rPzEF51SAFVPSOEtf3bNl/gMyeRFHj7VlLbe/yhs/ffRJr0RLZsd+644Oeld1Ypc2MH2oc77N4OXz5QGeUE3mvAmvTKTDWTnLjjjbcKCZrJU5E5TWyic30jy/pZGHQk86qrp0ZZZbwR
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB4965.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(366004)(39860400002)(136003)(396003)(346002)(376002)(451199021)(53546011)(6512007)(26005)(6506007)(41300700001)(6666004)(186003)(6486002)(966005)(83380400001)(2616005)(31686004)(478600001)(54906003)(316002)(110136005)(4326008)(38100700002)(66476007)(66556008)(2906002)(8676002)(66946007)(31696002)(82960400001)(86362001)(36756003)(5660300002)(8936002)(43740500002)(45980500001);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?bno1RWdNRWhkcmpVblFsVVpuRkpnclZEcXk0VkFqNU9hVjhZVXBSMXIxeEc1?=
- =?utf-8?B?ZVIxQjZXTnk4TWpsKzFXK0FiYjN5czVOS0cyaW1YVTk5eU1jYklHYTJINlNm?=
- =?utf-8?B?WFBsS2NVenZ6WW00MlNTZ3o3MG9lbWViUEY3VWNubVBtZFRNWVdzWmo3VmU5?=
- =?utf-8?B?dVRKQXg0cXBvdjcxQW1PeDcxZEpCZWJoUTNxcyt2a2U2a3BhL1ZGU3NldElO?=
- =?utf-8?B?RjZteWREU0ZSOXdvZDlpUWNPb054eVYwZWpVNU5IcHlHcnlEVjRDV2pjYjZr?=
- =?utf-8?B?QUs0L3hUcmh4RFdCMjdRMnU0UGk1eUp1VUp6MmxzRE53WWxySmo4NURHbk5a?=
- =?utf-8?B?WmkrYW9iK0dIRmxhNU9BSmptRnQ2cmYzWGRaRk9RZHI3VmpSdU1adUg3V1k5?=
- =?utf-8?B?YzN0Q0lwaXVhYzNyS2NrZGgrNTA1TVBsMFMzUmlaY1J6dkhnQlhhYzdYRmRk?=
- =?utf-8?B?RFkrVjBZcEJVODk2ei9STC9KT0VrQlV1bXZuOFcvek10NWk5QU5YT2VtKzMy?=
- =?utf-8?B?RHpUa2VKUStTa1NUUG5QUGVPOHVNeHFGTTRiVEFXYnMwZHAza2s4UXJnUUpi?=
- =?utf-8?B?OXhOMStzMFloR2x5czN1a29JQjAyNlZyck52MGJtWGUyNi9aai9LbGZyNzRU?=
- =?utf-8?B?ditya0YyTkhrMTlvVmJYQjBMTmVGQ3ZkRnlXSnV2TzFXQW81VGNTdnc0Wndr?=
- =?utf-8?B?bnRQYWI2Z3cwMmRla2UydkRXc3VZZ3MzOFVNSXdzNzdHMWp0aFJ3Q3Y1TE45?=
- =?utf-8?B?TG1sY0pOSm1kZDEyYzFkdWZleGpiMmtvRmF6M25IemN2T0t4MXhnZkJoNmNs?=
- =?utf-8?B?Q0FYcHp0d3FSSGtGUGt0Z1d6ZjJHeVY1MUwzQjQxQm8yRVZsSjIvdktJTVg0?=
- =?utf-8?B?ZnJLQ25tOHBwNkM4VktOanV1bDhuUk5scWZ1dGwvbUE5OGk2bCtvTUtqdHhW?=
- =?utf-8?B?M2R0WFJlRHZ5Vlc1VlFLSG9ac0owb3NXMnBaRk5tYVJhUUJCR04wZ1h2Ykdy?=
- =?utf-8?B?dFRKa25nQTlGbkdtTHJ4cWhFc1hvRVVOTVRjekh6Z1pra2lHQTROMXJjTzRY?=
- =?utf-8?B?SGFTTW0vSS84d0k2cXAwYjdTNENGUW8rRkd3bktnT3pKeEJ3dlVQNk1WeTlW?=
- =?utf-8?B?MG5RZ29ickhKbHl1SDF0ak8zQ3F0WXJEbFY0N2JZVXRVZ3hUcjg0WmpZaE5p?=
- =?utf-8?B?TU5TTG9acTVSMUhhU3JVK1Y3d1dBMERXbUtva2UxOWhxLzJ4U1NLSWdnZ2Ux?=
- =?utf-8?B?MWJ5WXhoSDMyNjFjY2FreGJKbmNiNlBLSnd5dnlINy9ZdllCQjQwU1U5Qy9z?=
- =?utf-8?B?empxTlNCRXN3K3JVYnJLWDNsN2daZTRZQlp5RUNsdm12YlNkbU9tOTRBQ2pW?=
- =?utf-8?B?UlBMMmxkMEo5WHRHbGQwTU5BZDEvakxGOHNqd0xIdE8yZHJzQnBTeVhISGt6?=
- =?utf-8?B?eVFOZW5GRWR5RWxRNHF6dGRsczl5RlNGZ1FxUE9Ybkp6UTRsY1drM2NzMjBF?=
- =?utf-8?B?QldxaVZ4eGc1aTFXTVRMcEt3UWhPSm5Ed0FKaFkzMTBuVG4yanZuc0ZaeS9S?=
- =?utf-8?B?WlNwcmdHWW9KWTdBbi82ZXJzV0FkNmZ0bkRoUmhqUzN3Q2MzdWtVQVJYTHBV?=
- =?utf-8?B?QUh6YlhxeUozN041ZDh5RUY1UFBIV0lLRGppTUlrazBocnM0bGxiZS9INXpK?=
- =?utf-8?B?OGh3V2F5djc5Rkx2OW5ISndJSXQvOHozQTJnMS9MRXZYNXlOZndqOE9oMWl6?=
- =?utf-8?B?enYrS0JtZEgzN09jdjRENkk2NFdoRWcwakpvYVJuOG9FOGdqUThXM0swWUcz?=
- =?utf-8?B?emcvNmtZTSthZ29ZVHorVjhzTzhCRDJIejI0TkVwVUVVbmxnNzR4LzN6V1V6?=
- =?utf-8?B?SzdVM25paGc4Z0VmeG1KdmRUNGZOaDM0UVd5R2Qvd0NXMDdvb2cxVGdVNEpj?=
- =?utf-8?B?S1hUY3JxZGwzNjQxWlhuZWVJM0llczd3NWFkZ2pXeTlCNGNZeVlwbVkyYkEx?=
- =?utf-8?B?bS9BNEM1SDlRN01yenJGTkQ3R3VmOG1oMDVrRmlzTytTMENIc3ErS1pTck9H?=
- =?utf-8?B?TWRBUVdCRWVNcDRpR0dMYmJLWCs1akthKzVMSEhXK0JCT1U1dDNrR1BRYUNI?=
- =?utf-8?B?aFlrVU4wZmU3NElpYnZ0YkR0WTZwRTd6WmlTTGVtU1Nrbi9GT252ak1vNjAr?=
- =?utf-8?B?dFE9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5b8d0715-afb4-4431-3d83-08db2feaec2d
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB4965.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Mar 2023 00:17:03.7995
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: o+fGWlLbQ6Ke08KMUuDBOpHimN1lyEB9z43d/ZbeCZf6nbzSGgpqrPL/Z5s0j04F3y7kM8vBbxWY2fuQ/zSAEQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR11MB6236
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,
-        SPF_NONE autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230306224127.1689967-17-vipinsh@google.com>
+X-Spam-Status: No, score=-15.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,ENV_AND_HDR_SPF_MATCH,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL,
+        USER_IN_DEF_SPF_WL autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Mon, Mar 06, 2023 at 02:41:25PM -0800, Vipin Sharma wrote:
+> Allocate page tables on the preferred NUMA node via memory cache during
+> page faults. If memory cache doesn't have a preferred NUMA node (node
+> value is set to NUMA_NO_NODE) then fallback to the default logic where
+> pages are selected based on thread's mempolicy. Also, free NUMA aware
+> page caches, mmu_shadow_page_cache, when memory shrinker is invoked.
+> 
+> Allocate root pages based on the current thread's NUMA node as there is
+> no way to know which will be the ideal NUMA node in long run.
+> 
+> This commit allocate page tables to be on the same NUMA node as the
+> physical page pointed by them, even if a vCPU causing page fault is on a
+> different NUMA node. If memory is not available on the requested NUMA
+> node then the other nearest NUMA node is selected by default. NUMA aware
+> page tables can be beneficial in cases where a thread touches lot of far
+> memory initially and then divide work among multiple threads. VMs
+> generally take advantage of NUMA architecture for faster memory access
+> by moving threads to the NUMA node of the memory they are accessing.
+> This change will help them in accessing pages faster.
+> 
+> Downside of this change is that an experimental workload can be created
+> where a guest threads are always accessing remote memory and not the one
+> local to them. This will cause performance to degrade compared to VMs
+> where numa aware page tables are not enabled. Ideally, these VMs when
+> using non-uniform memory access machine should generally be taking
+> advantage of NUMA architecture to improve their performance in the first
+> place.
+> 
+> Signed-off-by: Vipin Sharma <vipinsh@google.com>
+> ---
+>  arch/x86/include/asm/kvm_host.h |  2 +-
+>  arch/x86/kvm/mmu/mmu.c          | 63 ++++++++++++++++++++++++---------
+>  arch/x86/kvm/mmu/mmu_internal.h | 24 ++++++++++++-
+>  arch/x86/kvm/mmu/paging_tmpl.h  |  4 +--
+>  arch/x86/kvm/mmu/tdp_mmu.c      | 14 +++++---
+>  include/linux/kvm_types.h       |  6 ++++
+>  virt/kvm/kvm_main.c             |  2 +-
+>  7 files changed, 88 insertions(+), 27 deletions(-)
+> 
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 64de083cd6b9..77d3aa368e5e 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -787,7 +787,7 @@ struct kvm_vcpu_arch {
+>  	struct kvm_mmu *walk_mmu;
+>  
+>  	struct kvm_mmu_memory_cache mmu_pte_list_desc_cache;
+> -	struct kvm_mmu_memory_cache mmu_shadow_page_cache;
+> +	struct kvm_mmu_memory_cache mmu_shadow_page_cache[MAX_NUMNODES];
 
-On 3/29/2023 1:51 AM, John Allen wrote:
-> On Wed, Jan 25, 2023 at 01:11:44AM +0000, Edgecombe, Rick P wrote:
->> On Wed, 2023-01-25 at 00:55 +0000, Sean Christopherson wrote:
->>> On Wed, Oct 12, 2022, John Allen wrote:
->>>> AMD Zen3 and newer processors support shadow stack, a feature
->>>> designed to
->>>> protect against ROP (return-oriented programming) attacks in which
->>>> an attacker
->>>> manipulates return addresses on the call stack in order to execute
->>>> arbitrary
->>>> code. To prevent this, shadow stacks can be allocated that are only
->>>> used by
->>>> control transfer and return instructions. When a CALL instruction
->>>> is issued, it
->>>> writes the return address to both the program stack and the shadow
->>>> stack. When
->>>> the subsequent RET instruction is issued, it pops the return
->>>> address from both
->>>> stacks and compares them. If the addresses don't match, a control-
->>>> protection
->>>> exception is raised.
->>>>
->>>> Shadow stack and a related feature, Indirect Branch Tracking (IBT),
->>>> are
->>>> collectively referred to as Control-flow Enforcement Technology
->>>> (CET). However,
->>>> current AMD processors only support shadow stack and not IBT.
->>>>
->>>> This series adds support for shadow stack in SVM guests and builds
->>>> upon the
->>>> support added in the CET guest support patch series [1] and the CET
->>>> kernel
->>>> patch series [2]. Additional patches are required to support shadow
->>>> stack
->>>> enabled guests in qemu [3] and glibc [4].
->>>>
->>>> [1]: CET guest support patches
->>>>
->> https://lore.kernel.org/all/20220616084643.19564-1-weijiang.yang@intel.com/
->>>> [2]: Latest CET kernel patches
->>>>
->> https://lore.kernel.org/all/20220929222936.14584-1-rick.p.edgecombe@intel.com/
->>> That dependency chain makes me sad.
->>>
->>> Outside of a very shallow comment on the last patch, I don't plan on
->>> reviewing
->>> this until the kernel side of things gets out of our way.  When that
->>> finally
->>> does happen, I'll definitely prioritize reviewing and merging this
->>> and the KVM
->>> Intel series.  I'd love to see this land.
->> I think all KVM needs is a few patches from the beginning of the host
->> series (the FPU stuff). At one point Weijiang and I had discussed with
->> Paolo and x86 folks that those few could go up with the KVM series if
->> desired.
-> Now that the baremetal series has been accepted, how do we want to
-> proceed? I think I'd like to send a refreshed version based on the
-> version that was accpeted, but I'd want to wait to base it on a new
-> version of Weijiang's kvm/vmx series (if one is planned).
->
-> Weijiang and Rick,
->
-> Are you planning on sending a new version of the kvm/vmx series?
+I think we need an abstraction for a NUMA-aware mmu cache, since there
+is more than one by the end of this series.
 
-Hi, Allen,
+e.g. A wrapper struct (struct kvm_mmu_numa_memory_cache) or make
+NUMA-awareness an optional feature within kvm_mmu_memory_cache, plus
+common helper functions for operations like initializing, topping-up,
+and freeing.
 
-Yes, I'm working on the new version of kvm/vmx series, will cc you when
+I have some ideas I want to try but I ran out of time today.
 
-send it to community.
+>  	struct kvm_mmu_memory_cache mmu_shadowed_info_cache;
+>  	struct kvm_mmu_memory_cache mmu_page_header_cache;
+>  
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index d96afc849ee8..86f0d74d35ed 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -702,7 +702,7 @@ static void mmu_free_sp_memory_cache(struct kvm_mmu_memory_cache *cache)
+>  
+>  static int mmu_topup_memory_caches(struct kvm_vcpu *vcpu, bool maybe_indirect)
+>  {
+> -	int r;
+> +	int r, nid = KVM_MMU_DEFAULT_CACHE_INDEX;
+>  
+>  	/* 1 rmap, 1 parent PTE per level, and the prefetched rmaps. */
+>  	r = kvm_mmu_topup_memory_cache(&vcpu->arch.mmu_pte_list_desc_cache,
+> @@ -710,7 +710,16 @@ static int mmu_topup_memory_caches(struct kvm_vcpu *vcpu, bool maybe_indirect)
+>  	if (r)
+>  		return r;
+>  
+> -	r = mmu_topup_sp_memory_cache(&vcpu->arch.mmu_shadow_page_cache, PT64_ROOT_MAX_LEVEL);
+> +	if (kvm_numa_aware_page_table_enabled(vcpu->kvm)) {
+> +		for_each_online_node(nid) {
 
+Blegh. This is going to potentially waste a lot of memory. Yes the
+shrinker can free it, but the next fault will re-allocate all the online
+node caches.
 
->
-> Thanks,
-> John
+The reason we have to top-up all nodes is because KVM tops up caches
+before faulting in the PFN, and there is concern that changing this will
+increase the rate of guest page-fault retries [1].
+
+I think we should revisit that concern. Can we do any testing to
+validate that hypothesis? Or can we convince ourselves that re-ordering
+is ok?
+
+[1] https://lore.kernel.org/kvm/CAHVum0cjqsdG2NEjRF3ZRtUY2t2=Tb9H4OyOz9wpmsrN--Sjhg@mail.gmail.com/
+
+> +			r = mmu_topup_sp_memory_cache(&vcpu->arch.mmu_shadow_page_cache[nid],
+> +						      PT64_ROOT_MAX_LEVEL);
+
+This ignores the return value of mmu_topup_sp_memory_cache() for all but
+the last node.
+
+> +		}
+> +	} else {
+> +		r = mmu_topup_sp_memory_cache(&vcpu->arch.mmu_shadow_page_cache[nid],
+> +					      PT64_ROOT_MAX_LEVEL);
+> +	}
+> +
+>  	if (r)
+>  		return r;
+>  
+> @@ -726,9 +735,12 @@ static int mmu_topup_memory_caches(struct kvm_vcpu *vcpu, bool maybe_indirect)
+>  
+>  static void mmu_free_memory_caches(struct kvm_vcpu *vcpu)
+>  {
+> +	int nid;
+> +
+>  	kvm_mmu_free_memory_cache(&vcpu->arch.mmu_pte_list_desc_cache);
+>  	mutex_lock(&vcpu->arch.mmu_shadow_page_cache_lock);
+> -	mmu_free_sp_memory_cache(&vcpu->arch.mmu_shadow_page_cache);
+> +	for_each_node(nid)
+> +		mmu_free_sp_memory_cache(&vcpu->arch.mmu_shadow_page_cache[nid]);
+>  	mmu_free_sp_memory_cache(&vcpu->arch.mmu_shadowed_info_cache);
+>  	mutex_unlock(&vcpu->arch.mmu_shadow_page_cache_lock);
+>  	kvm_mmu_free_memory_cache(&vcpu->arch.mmu_page_header_cache);
+> @@ -2245,12 +2257,12 @@ static struct kvm_mmu_page *__kvm_mmu_get_shadow_page(struct kvm *kvm,
+>  }
+>  
+>  static struct kvm_mmu_page *kvm_mmu_get_shadow_page(struct kvm_vcpu *vcpu,
+> -						    gfn_t gfn,
+> +						    gfn_t gfn, int nid,
+>  						    union kvm_mmu_page_role role)
+>  {
+>  	struct shadow_page_caches caches = {
+>  		.page_header_cache = &vcpu->arch.mmu_page_header_cache,
+> -		.shadow_page_cache = &vcpu->arch.mmu_shadow_page_cache,
+> +		.shadow_page_cache = &vcpu->arch.mmu_shadow_page_cache[nid],
+>  		.shadowed_info_cache = &vcpu->arch.mmu_shadowed_info_cache,
+>  	};
+>  
+> @@ -2305,15 +2317,18 @@ static union kvm_mmu_page_role kvm_mmu_child_role(u64 *sptep, bool direct,
+>  
+>  static struct kvm_mmu_page *kvm_mmu_get_child_sp(struct kvm_vcpu *vcpu,
+>  						 u64 *sptep, gfn_t gfn,
+> -						 bool direct, unsigned int access)
+> +						 bool direct, unsigned int access,
+> +						 kvm_pfn_t pfn)
+>  {
+>  	union kvm_mmu_page_role role;
+> +	int nid;
+>  
+>  	if (is_shadow_present_pte(*sptep) && !is_large_pte(*sptep))
+>  		return ERR_PTR(-EEXIST);
+>  
+>  	role = kvm_mmu_child_role(sptep, direct, access);
+> -	return kvm_mmu_get_shadow_page(vcpu, gfn, role);
+> +	nid = kvm_pfn_to_mmu_cache_nid(vcpu->kvm, pfn);
+> +	return kvm_mmu_get_shadow_page(vcpu, gfn, nid, role);
+>  }
+>  
+>  static void shadow_walk_init_using_root(struct kvm_shadow_walk_iterator *iterator,
+> @@ -3205,7 +3220,8 @@ static int direct_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+>  		if (it.level == fault->goal_level)
+>  			break;
+>  
+> -		sp = kvm_mmu_get_child_sp(vcpu, it.sptep, base_gfn, true, ACC_ALL);
+> +		sp = kvm_mmu_get_child_sp(vcpu, it.sptep, base_gfn, true,
+> +					  ACC_ALL, fault->pfn);
+>  		if (sp == ERR_PTR(-EEXIST))
+>  			continue;
+>  
+> @@ -3625,6 +3641,7 @@ static hpa_t mmu_alloc_root(struct kvm_vcpu *vcpu, gfn_t gfn, int quadrant,
+>  {
+>  	union kvm_mmu_page_role role = vcpu->arch.mmu->root_role;
+>  	struct kvm_mmu_page *sp;
+> +	int nid;
+>  
+>  	role.level = level;
+>  	role.quadrant = quadrant;
+> @@ -3632,7 +3649,8 @@ static hpa_t mmu_alloc_root(struct kvm_vcpu *vcpu, gfn_t gfn, int quadrant,
+>  	WARN_ON_ONCE(quadrant && !role.has_4_byte_gpte);
+>  	WARN_ON_ONCE(role.direct && role.has_4_byte_gpte);
+>  
+> -	sp = kvm_mmu_get_shadow_page(vcpu, gfn, role);
+> +	nid = kvm_mmu_root_page_cache_nid(vcpu->kvm);
+> +	sp = kvm_mmu_get_shadow_page(vcpu, gfn, nid, role);
+>  	++sp->root_count;
+>  
+>  	return __pa(sp->spt);
+> @@ -5959,7 +5977,7 @@ static int __kvm_mmu_create(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu)
+>  
+>  int kvm_mmu_create(struct kvm_vcpu *vcpu)
+>  {
+> -	int ret;
+> +	int ret, nid;
+>  
+>  	INIT_KVM_MMU_MEMORY_CACHE(&vcpu->arch.mmu_pte_list_desc_cache);
+>  	vcpu->arch.mmu_pte_list_desc_cache.kmem_cache = pte_list_desc_cache;
+> @@ -5967,7 +5985,12 @@ int kvm_mmu_create(struct kvm_vcpu *vcpu)
+>  	INIT_KVM_MMU_MEMORY_CACHE(&vcpu->arch.mmu_page_header_cache);
+>  	vcpu->arch.mmu_page_header_cache.kmem_cache = mmu_page_header_cache;
+>  
+> -	INIT_KVM_MMU_MEMORY_CACHE(&vcpu->arch.mmu_shadow_page_cache);
+> +	for_each_node(nid) {
+> +		INIT_KVM_MMU_MEMORY_CACHE(&vcpu->arch.mmu_shadow_page_cache[nid]);
+> +		if (kvm_numa_aware_page_table_enabled(vcpu->kvm))
+> +			vcpu->arch.mmu_shadow_page_cache[nid].node = nid;
+> +	}
+> +
+>  	mutex_init(&vcpu->arch.mmu_shadow_page_cache_lock);
+>  
+>  	INIT_KVM_MMU_MEMORY_CACHE(&vcpu->arch.mmu_shadowed_info_cache);
+> @@ -6695,13 +6718,17 @@ void kvm_mmu_invalidate_mmio_sptes(struct kvm *kvm, u64 gen)
+>  }
+>  
+>  static int mmu_memory_cache_try_empty(struct kvm_mmu_memory_cache *cache,
+
+nit: s/cache/caches/
+
+> -				      struct mutex *cache_lock)
+> +				      int cache_count, struct mutex *cache_lock)
+
+nit: s/cache_count/nr_caches/
+
+>  {
+> -	int freed = 0;
+> +	int freed = 0, nid;
+
+nit: s/nid/i/
+
+(nothing in this function knows about NUMA so "nid" is an odd name here)
+>  
+>  	if (mutex_trylock(cache_lock)) {
+> -		freed = cache->nobjs;
+> -		kvm_mmu_empty_memory_cache(cache);
+> +		for (nid = 0; nid < cache_count; nid++) {
+> +			if (!cache[nid].nobjs)
+> +				continue;
+> +			freed += cache[nid].nobjs;
+> +			kvm_mmu_empty_memory_cache(&cache[nid]);
+> +		}
+>  		mutex_unlock(cache_lock);
+>  	}
+>  	return freed;
+> @@ -6725,15 +6752,17 @@ static unsigned long mmu_shrink_scan(struct shrinker *shrink,
+>  		list_move_tail(&kvm->vm_list, &vm_list);
+>  
+>  		kvm_for_each_vcpu(i, vcpu, kvm) {
+> -			freed += mmu_memory_cache_try_empty(&vcpu->arch.mmu_shadow_page_cache,
+> +			freed += mmu_memory_cache_try_empty(vcpu->arch.mmu_shadow_page_cache,
+> +							    MAX_NUMNODES,
+>  							    &vcpu->arch.mmu_shadow_page_cache_lock);
+>  			freed += mmu_memory_cache_try_empty(&vcpu->arch.mmu_shadowed_info_cache,
+> +							    1,
+>  							    &vcpu->arch.mmu_shadow_page_cache_lock);
+>  			if (freed >= sc->nr_to_scan)
+>  				goto out;
+>  		}
+>  		freed += mmu_memory_cache_try_empty(&kvm->arch.split_shadow_page_cache,
+> -						    &kvm->slots_lock);
+> +						    1, &kvm->slots_lock);
+>  		if (freed >= sc->nr_to_scan)
+>  			goto out;
+>  	}
+> diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
+> index b9d0e09ae974..652fd0c2bcba 100644
+> --- a/arch/x86/kvm/mmu/mmu_internal.h
+> +++ b/arch/x86/kvm/mmu/mmu_internal.h
+> @@ -340,11 +340,16 @@ void track_possible_nx_huge_page(struct kvm *kvm, struct kvm_mmu_page *sp);
+>  void untrack_possible_nx_huge_page(struct kvm *kvm, struct kvm_mmu_page *sp);
+>  void *mmu_sp_memory_cache_alloc(struct kvm_mmu_memory_cache *cache);
+>  
+> +static inline bool kvm_numa_aware_page_table_enabled(struct kvm *kvm)
+> +{
+> +	return kvm->arch.numa_aware_page_table;
+
+No need for this helper function. Accessing the variable directly makes
+lines shorter, does not introduce any code duplication, and reduces
+abstraction.
+
+> +}
+> +
+>  static inline int kvm_pfn_to_page_table_nid(struct kvm *kvm, kvm_pfn_t pfn)
+>  {
+>  	struct page *page;
+>  
+> -	if (!kvm->arch.numa_aware_page_table)
+> +	if (!kvm_numa_aware_page_table_enabled(kvm))
+>  		return NUMA_NO_NODE;
+>  
+>  	page = kvm_pfn_to_refcounted_page(pfn);
+> @@ -355,4 +360,21 @@ static inline int kvm_pfn_to_page_table_nid(struct kvm *kvm, kvm_pfn_t pfn)
+>  		return numa_mem_id();
+>  }
+>  
+> +static inline int kvm_pfn_to_mmu_cache_nid(struct kvm *kvm, kvm_pfn_t pfn)
+> +{
+> +	int index = kvm_pfn_to_page_table_nid(kvm, pfn);
+> +
+> +	if (index == NUMA_NO_NODE)
+> +		return KVM_MMU_DEFAULT_CACHE_INDEX;
+> +
+> +	return index;
+> +}
+> +
+> +static inline int kvm_mmu_root_page_cache_nid(struct kvm *kvm)
+> +{
+> +	if (kvm_numa_aware_page_table_enabled(kvm))
+> +		return numa_mem_id();
+> +
+> +	return KVM_MMU_DEFAULT_CACHE_INDEX;
+> +}
+>  #endif /* __KVM_X86_MMU_INTERNAL_H */
+> diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
+> index 1dea9be6849d..9db8b3df434d 100644
+> --- a/arch/x86/kvm/mmu/paging_tmpl.h
+> +++ b/arch/x86/kvm/mmu/paging_tmpl.h
+> @@ -652,7 +652,7 @@ static int FNAME(fetch)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
+>  		table_gfn = gw->table_gfn[it.level - 2];
+>  		access = gw->pt_access[it.level - 2];
+>  		sp = kvm_mmu_get_child_sp(vcpu, it.sptep, table_gfn,
+> -					  false, access);
+> +					  false, access, fault->pfn);
+>  
+>  		if (sp != ERR_PTR(-EEXIST)) {
+>  			/*
+> @@ -706,7 +706,7 @@ static int FNAME(fetch)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
+>  		validate_direct_spte(vcpu, it.sptep, direct_access);
+>  
+>  		sp = kvm_mmu_get_child_sp(vcpu, it.sptep, base_gfn,
+> -					  true, direct_access);
+> +					  true, direct_access, fault->pfn);
+>  		if (sp == ERR_PTR(-EEXIST))
+>  			continue;
+>  
+> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+> index 61fd9c177694..63113a66f560 100644
+> --- a/arch/x86/kvm/mmu/tdp_mmu.c
+> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
+> @@ -260,12 +260,12 @@ static struct kvm_mmu_page *tdp_mmu_next_root(struct kvm *kvm,
+>  		    kvm_mmu_page_as_id(_root) != _as_id) {		\
+>  		} else
+>  
+> -static struct kvm_mmu_page *tdp_mmu_alloc_sp(struct kvm_vcpu *vcpu)
+> +static struct kvm_mmu_page *tdp_mmu_alloc_sp(struct kvm_vcpu *vcpu, int nid)
+>  {
+>  	struct kvm_mmu_page *sp;
+>  
+>  	sp = kvm_mmu_memory_cache_alloc(&vcpu->arch.mmu_page_header_cache);
+> -	sp->spt = mmu_sp_memory_cache_alloc(&vcpu->arch.mmu_shadow_page_cache);
+> +	sp->spt = mmu_sp_memory_cache_alloc(&vcpu->arch.mmu_shadow_page_cache[nid]);
+>  
+>  	return sp;
+>  }
+> @@ -304,6 +304,7 @@ hpa_t kvm_tdp_mmu_get_vcpu_root_hpa(struct kvm_vcpu *vcpu)
+>  	union kvm_mmu_page_role role = vcpu->arch.mmu->root_role;
+>  	struct kvm *kvm = vcpu->kvm;
+>  	struct kvm_mmu_page *root;
+> +	int nid;
+>  
+>  	lockdep_assert_held_write(&kvm->mmu_lock);
+>  
+> @@ -317,7 +318,8 @@ hpa_t kvm_tdp_mmu_get_vcpu_root_hpa(struct kvm_vcpu *vcpu)
+>  			goto out;
+>  	}
+>  
+> -	root = tdp_mmu_alloc_sp(vcpu);
+> +	nid = kvm_mmu_root_page_cache_nid(vcpu->kvm);
+> +	root = tdp_mmu_alloc_sp(vcpu, nid);
+>  	tdp_mmu_init_sp(root, NULL, 0, role);
+>  
+>  	refcount_set(&root->tdp_mmu_root_count, 1);
+> @@ -1149,12 +1151,14 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+>  	struct kvm *kvm = vcpu->kvm;
+>  	struct tdp_iter iter;
+>  	struct kvm_mmu_page *sp;
+> -	int ret = RET_PF_RETRY;
+> +	int ret = RET_PF_RETRY, nid;
+>  
+>  	kvm_mmu_hugepage_adjust(vcpu, fault);
+>  
+>  	trace_kvm_mmu_spte_requested(fault);
+>  
+> +	nid = kvm_pfn_to_mmu_cache_nid(kvm, fault->pfn);
+> +
+>  	rcu_read_lock();
+>  
+>  	tdp_mmu_for_each_pte(iter, mmu, fault->gfn, fault->gfn + 1) {
+> @@ -1182,7 +1186,7 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+>  		 * The SPTE is either non-present or points to a huge page that
+>  		 * needs to be split.
+>  		 */
+> -		sp = tdp_mmu_alloc_sp(vcpu);
+> +		sp = tdp_mmu_alloc_sp(vcpu, nid);
+>  		tdp_mmu_init_child_sp(sp, &iter);
+>  
+>  		sp->nx_huge_page_disallowed = fault->huge_page_disallowed;
+> diff --git a/include/linux/kvm_types.h b/include/linux/kvm_types.h
+> index b2a405c8e629..13032da2ddfc 100644
+> --- a/include/linux/kvm_types.h
+> +++ b/include/linux/kvm_types.h
+> @@ -113,6 +113,12 @@ static inline void INIT_KVM_MMU_MEMORY_CACHE(struct kvm_mmu_memory_cache *cache)
+>  {
+>  	*cache = (struct kvm_mmu_memory_cache)KVM_MMU_MEMORY_CACHE_INIT();
+>  }
+> +
+> +/*
+> + * When NUMA aware page table option is disabled for a VM then use cache at the
+> + * below index in the array of NUMA caches.
+> + */
+> +#define KVM_MMU_DEFAULT_CACHE_INDEX 0
+>  #endif
+>  
+>  #define HALT_POLL_HIST_COUNT			32
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 47006d209309..25a549705c8e 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -401,7 +401,7 @@ static inline void *mmu_memory_cache_alloc_obj(struct kvm_mmu_memory_cache *mc,
+>  	if (mc->kmem_cache)
+>  		return kmem_cache_alloc(mc->kmem_cache, gfp_flags);
+>  	else
+> -		return (void *)__get_free_page(gfp_flags);
+> +		return kvm_mmu_get_free_page(gfp_flags, mc->node);
+>  }
+>  
+>  int __kvm_mmu_topup_memory_cache(struct kvm_mmu_memory_cache *mc, int capacity, int min)
+> -- 
+> 2.40.0.rc0.216.gc4246ad0f0-goog
+> 
