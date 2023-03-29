@@ -2,93 +2,76 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CBC1F6CD3DD
-	for <lists+kvm@lfdr.de>; Wed, 29 Mar 2023 10:00:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A27FB6CD46D
+	for <lists+kvm@lfdr.de>; Wed, 29 Mar 2023 10:21:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230207AbjC2IAb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 Mar 2023 04:00:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53326 "EHLO
+        id S230471AbjC2IVs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 Mar 2023 04:21:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56802 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230190AbjC2IA3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 29 Mar 2023 04:00:29 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92B752103;
-        Wed, 29 Mar 2023 01:00:28 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 32151B820FD;
-        Wed, 29 Mar 2023 08:00:27 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id B4975C433EF;
-        Wed, 29 Mar 2023 08:00:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1680076825;
-        bh=jsONW2bbKso3jFbuEI4vaV+27HAPUxIXLM70AQoX3gg=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=lLQxL0maR8V5vSL9YIIslrgcRLvDWgqnNv2IOBSjBhDFTsOV8vSY8CZTrdeCp8z9f
-         Wr99F72Lcsc7xZVnGj8u+FYvPqMPed/O2wDf1xC2sF7dGsLfo2kb6Dd6AOJsQpsEhc
-         3uxJsu2DvaqdR3mHcnQPF7DdWyFzq9fPp6kVplrp6yvsa2fNfEM+2nK2vlqjVohxEg
-         XXgKH0CBXOzZPvzMPyH+ri//deE6fHuYlu3Klk6QxQHsjt93eUgr2TPKW/GvI8Bkf1
-         0ppw8wkZGE8CJmGJl6uNLkgpUFMP6oKenmndodf55K78jSax/AYeJfYzucsAvz/vj/
-         O38DY/C9uuYfw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 9079CE4F0DB;
-        Wed, 29 Mar 2023 08:00:25 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+        with ESMTP id S230454AbjC2IVb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 29 Mar 2023 04:21:31 -0400
+Received: from smtpbgau2.qq.com (smtpbgau2.qq.com [54.206.34.216])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78EB749C1;
+        Wed, 29 Mar 2023 01:20:28 -0700 (PDT)
+X-QQ-mid: bizesmtp76t1680077956tsbj2yfo
+Received: from localhost.localdomain ( [1.202.39.170])
+        by bizesmtp.qq.com (ESMTP) with 
+        id ; Wed, 29 Mar 2023 16:19:04 +0800 (CST)
+X-QQ-SSF: 01400000000000C0H000000A0000000
+X-QQ-FEAT: I8hG9CuxGDKnF0zrM7FlPwImURR4VFgXj2Ah99m1dTebzaBSKMvDh3gWmjmwt
+        YHGZDYcXolBTAwjmPaGVVFtZE5ycy/uHyO37aTmsa7kltZVKznjYptQFBAsNzq1NDq44CQu
+        a1ZIQC0JSKAYYyTU1Ttw/czBir82blaFk2WTeFrbFIukP38V8hGVoQAj6nJ+XzALFT21sis
+        unZyqHcelYzm7YraOpFPTkASYJrVknIrlRjrnmcU7LtsdOljd9rmtYgMA2WP9IWaEm9h2Vb
+        Yakz2D/SpuX9rvXiEZulLNkuqjmUWvvmlbdljWo/877hHdjdE9wHRV3/Dn+fzd0ouS2V806
+        4DXyDn4LsphxnuviAb7RGEoWtCEcrrmAoMkt154Rq9TAvPe+s6WM/mX854z0s8hAWNwH+xa
+X-QQ-GoodBg: 1
+X-BIZMAIL-ID: 9811005486938683475
+From:   Ke Guo <guoke@uniontech.com>
+To:     seanjc@google.com, pbonzini@redhat.com, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com
+Cc:     x86@kernel.org, hpa@zytor.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, guoke@uniontech.com
+Subject: [PATCH] KVM: SVM: use kvm_pat_valid instead of kvm_mtrr_valid
+Date:   Wed, 29 Mar 2023 16:18:59 +0800
+Message-Id: <20230329081859.2571698-1-guoke@uniontech.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v4 0/3] Add support for sockmap to vsock.
-From:   patchwork-bot+netdevbpf@kernel.org
-Message-Id: <168007682558.9659.6900016248016625386.git-patchwork-notify@kernel.org>
-Date:   Wed, 29 Mar 2023 08:00:25 +0000
-References: <20230327-vsock-sockmap-v4-0-c62b7cd92a85@bytedance.com>
-In-Reply-To: <20230327-vsock-sockmap-v4-0-c62b7cd92a85@bytedance.com>
-To:     Bobby Eshleman <bobby.eshleman@bytedance.com>
-Cc:     stefanha@redhat.com, sgarzare@redhat.com, mst@redhat.com,
-        jasowang@redhat.com, davem@davemloft.net, edumazet@google.com,
-        kuba@kernel.org, pabeni@redhat.com, andrii@kernel.org,
-        mykolal@fb.com, ast@kernel.org, daniel@iogearbox.net,
-        martin.lau@linux.dev, song@kernel.org, yhs@fb.com,
-        john.fastabend@gmail.com, kpsingh@kernel.org, sdf@google.com,
-        haoluo@google.com, jolsa@kernel.org, shuah@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        bpf@vger.kernel.org, linux-kselftest@vger.kernel.org
-X-Spam-Status: No, score=-5.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,SPF_HELO_NONE,
-        SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.6
+X-QQ-SENDSIZE: 520
+Feedback-ID: bizesmtp:uniontech.com:qybglogicsvr:qybglogicsvr4
+X-Spam-Status: No, score=-0.0 required=5.0 tests=RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello:
+Using kvm_pat_valid instead of kvm_mtrr_valid here is more appropriate. It
+does the same thing as calling kvm_mtrr_valid here without two useless
+check. MSR_IA32_CR_PAT is only related to PAT register but not the other
+MTRR related registers.
 
-This series was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
+Signed-off-by: Ke Guo <guoke@uniontech.com>
+---
+ arch/x86/kvm/svm/svm.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-On Mon, 27 Mar 2023 19:11:50 +0000 you wrote:
-> We're testing usage of vsock as a way to redirect guest-local UDS
-> requests to the host and this patch series greatly improves the
-> performance of such a setup.
-> 
-> Compared to copying packets via userspace, this improves throughput by
-> 121% in basic testing.
-> 
-> [...]
-
-Here is the summary with links:
-  - [net-next,v4,1/3] vsock: support sockmap
-    https://git.kernel.org/netdev/net-next/c/634f1a7110b4
-  - [net-next,v4,2/3] selftests/bpf: add vsock to vmtest.sh
-    https://git.kernel.org/netdev/net-next/c/c7c605c982d6
-  - [net-next,v4,3/3] selftests/bpf: add a test case for vsock sockmap
-    https://git.kernel.org/netdev/net-next/c/d61bd8c1fd02
-
-You are awesome, thank you!
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 252e7f37e4e2..834bf9e6c158 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -2906,7 +2906,7 @@ static int svm_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr)
+ 
+ 		break;
+ 	case MSR_IA32_CR_PAT:
+-		if (!kvm_mtrr_valid(vcpu, MSR_IA32_CR_PAT, data))
++		if (!kvm_pat_valid(data))
+ 			return 1;
+ 		vcpu->arch.pat = data;
+ 		svm->vmcb01.ptr->save.g_pat = data;
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.25.1
 
