@@ -2,329 +2,274 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EFA996CD1D6
-	for <lists+kvm@lfdr.de>; Wed, 29 Mar 2023 07:53:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 70D2C6CD1F1
+	for <lists+kvm@lfdr.de>; Wed, 29 Mar 2023 08:11:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229735AbjC2FxJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 Mar 2023 01:53:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45940 "EHLO
+        id S229495AbjC2GLq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 Mar 2023 02:11:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54924 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229680AbjC2FxH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 29 Mar 2023 01:53:07 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 949C03C13
-        for <kvm@vger.kernel.org>; Tue, 28 Mar 2023 22:52:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1680069139;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=ObUDCyiUsnFV1cy9shzpagULe7hh9olQM4+SK/lwxlA=;
-        b=DKWvKmxBTtCPIC+wD41bCymfjUeZW5Pvi1G8dUjMBR2BWVH6xTuN9/7oXujqaJsaKrNW3S
-        aLhWgDSsE+oUWDlXvPD5ZiY5uv2eidrwjHFI26dHauy+Lo5NWlrfgAhIvcNwUhqkdPdBYK
-        SbctQY2SV6inlM13W7KkC7iUhq0aefE=
-Received: from mail-pl1-f198.google.com (mail-pl1-f198.google.com
- [209.85.214.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-416-9YQysfk2MVuGMZYB5-XKxQ-1; Wed, 29 Mar 2023 01:52:18 -0400
-X-MC-Unique: 9YQysfk2MVuGMZYB5-XKxQ-1
-Received: by mail-pl1-f198.google.com with SMTP id l1-20020a170903244100b001a0468b4afcso8917010pls.12
-        for <kvm@vger.kernel.org>; Tue, 28 Mar 2023 22:52:17 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680069137; x=1682661137;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ObUDCyiUsnFV1cy9shzpagULe7hh9olQM4+SK/lwxlA=;
-        b=0blfLuZ5Fyu5NIsEcmudvxgZAuN5pgxwvG85pbl0FreDfjDHcDCLnfnRqoKI9mRrYL
-         qA/0yLNZ30q8EZ7m5d2aohIy9PUedWoyrtOZNHniYwmM5qjKiK6PvYrwFD6s7bmjB5yN
-         MDWA394pWj8R//tvemFtj6VEV76MvHSk371846+6Iy3Tc74hvG1hRsqBmrbseRbzupnZ
-         OiZEsRgqipHIa6Yo1AHZSB6FocOsk8T3bwWEB0AnM3z03RTlFzCA7w/aRRDlwwz5uSLr
-         ZD5a5pjtPoLB1OBeWayg0bX6YNfB70a42hekk4u65SQKFMVDXgT0DoiOmBWwptq5t05P
-         w8Wg==
-X-Gm-Message-State: AAQBX9dS1BSN3qEs2TVMe/gQqr+nwjovd8TjkhzU9xZnRo9hLCQZplcu
-        y/Qf6BSmT5qDSP4PQYpw5Jr5aJ6QJFbN+c5sz85KfyCdR/6VrsD09Igl/rXHCjL3CV9R6CVUsSS
-        vTPKHCgi83mxG
-X-Received: by 2002:aa7:8b1a:0:b0:628:630:a374 with SMTP id f26-20020aa78b1a000000b006280630a374mr16086106pfd.2.1680069136917;
-        Tue, 28 Mar 2023 22:52:16 -0700 (PDT)
-X-Google-Smtp-Source: AKy350asRmMJZp2hmdpkoKSWcwC36pg3waaI7AAJ2maRryhwQrlS9edWxJxJU43lWsoujJkkL3PQZg==
-X-Received: by 2002:aa7:8b1a:0:b0:628:630:a374 with SMTP id f26-20020aa78b1a000000b006280630a374mr16086084pfd.2.1680069136580;
-        Tue, 28 Mar 2023 22:52:16 -0700 (PDT)
-Received: from [10.66.61.39] ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id i12-20020aa787cc000000b00580e3917af7sm15101517pfo.117.2023.03.28.22.52.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 28 Mar 2023 22:52:16 -0700 (PDT)
-Message-ID: <e17627fb-283e-dd42-94c1-f89dea167577@redhat.com>
-Date:   Wed, 29 Mar 2023 13:52:07 +0800
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.8.0
-Subject: Re: [RFC PATCH 00/32] ACPI/arm64: add support for virtual cpuhotplug
-To:     James Morse <james.morse@arm.com>, linux-pm@vger.kernel.org,
-        loongarch@lists.linux.dev, kvmarm@lists.linux.dev,
-        kvm@vger.kernel.org, linux-acpi@vger.kernel.org,
-        linux-arch@vger.kernel.org, linux-ia64@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        x86@kernel.org
-Cc:     Marc Zyngier <maz@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Lorenzo Pieralisi <lpieralisi@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Sudeep Holla <sudeep.holla@arm.com>,
-        Borislav Petkov <bp@alien8.de>, H Peter Anvin <hpa@zytor.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Ingo Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Len Brown <lenb@kernel.org>,
-        Rafael Wysocki <rafael@kernel.org>,
-        WANG Xuerui <kernel@xen0n.name>,
-        Salil Mehta <salil.mehta@huawei.com>,
-        Russell King <linux@armlinux.org.uk>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>
-References: <20230203135043.409192-1-james.morse@arm.com>
-Content-Language: en-US
-From:   Shaoqin Huang <shahuang@redhat.com>
-In-Reply-To: <20230203135043.409192-1-james.morse@arm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+        with ESMTP id S229379AbjC2GLp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 29 Mar 2023 02:11:45 -0400
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2064.outbound.protection.outlook.com [40.107.93.64])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18BA42705;
+        Tue, 28 Mar 2023 23:11:44 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=YEIywvIRBA8a4Pw+RbH/z285Oh5JvJghRjUkKcTvUIneF8glHGKo4WPj0WbAfJBRPGcZMhokiNEUJbJQ0CldjHx8N+YLopPxqS4Z55sMrekmyH4a4dZ+35bYg8gfka6VaMBYYufxhi2oWMcwY2weGiIB19yOBQzoG0EhNEDLy6dk+9JMQ6gMIwgqgpGVsIxfaO18Q6gTwcOw5GO7C2kaiu0dYJpk8l+w+KMq+0OwmTZqQ8Ze0AZlTweZDPJ8WWLyfdJqlZ4zFnFkUZPJ1oIj2JDnuWiD+D/3/AweLyxTXcAgNuhmIHqc5vSzuduwi5dTDKaldievpm6GV/njiGm1lw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=fBXOPDWvRKjsapnKwFWieqfN25sPpIK4Mk3MmrSWw9s=;
+ b=SE9z9TQ0OKRFC34I0nbxOllLtK/DTn/L4MQ5Dcp8VAzXkKBfPb107RjxsZhFXJSUnotINZYSVtq0vG1+CPCmLOTm/90a1565DnY4mapks10j1mtO+EQnZTu2WK5jCZKi5V4QWdzZWNYZ3fJlPBgvJ4aEVadoixNscxKUBjQR/Rk5JNL95muZ3pHi5EG98/8r9PFuWdk78MCTMy7NwhvQSRzXJ8XQYWvXDChGKDVm2vdESl3ZCe9MxH2eWbuOVgwFqRADhTMcq966NnDEu9BZPA/zozZk1+8iUkuXCbkFKYdr5Xf4h1qh5U2YNE+Rg3pySszvlgB5iUDYQ7hL8N6obA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=fBXOPDWvRKjsapnKwFWieqfN25sPpIK4Mk3MmrSWw9s=;
+ b=p6g34ZfylY0sHshu3ossexgI1gmcOYXwl3l+8RBXV9VJCQBlLmmePpXrePktIvYzBXvj1Ml5oSVQWqOKI7Sb0U8+ypZl9rkQxI+Vs7btKsHTAa2yFVzfld9ljg7FAtz2GCbB4THM6jHv9zJH+CnXF1WCfKWbAwSl/YBJL3yzzt0=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from SJ1PR12MB6218.namprd12.prod.outlook.com (2603:10b6:a03:457::17)
+ by MN0PR12MB6198.namprd12.prod.outlook.com (2603:10b6:208:3c5::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6222.30; Wed, 29 Mar
+ 2023 06:11:40 +0000
+Received: from SJ1PR12MB6218.namprd12.prod.outlook.com
+ ([fe80::bbe5:2fec:bec:c467]) by SJ1PR12MB6218.namprd12.prod.outlook.com
+ ([fe80::bbe5:2fec:bec:c467%3]) with mapi id 15.20.6222.030; Wed, 29 Mar 2023
+ 06:11:40 +0000
+Message-ID: <38601264-1957-579f-f156-c782bb9826cc@amd.com>
+Date:   Wed, 29 Mar 2023 11:41:22 +0530
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.12.0
+Subject: Re: [RFC PATCH kernel 2/2] KVM: SEV: PreventHostIBS enablement for
+ SEV-ES and SNP guest
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     linux-kernel@vger.kernel.org, peterz@infradead.org,
+        mingo@redhat.com, acme@kernel.org, jolsa@kernel.org,
+        namhyung@kernel.org, tglx@linutronix.de, bp@alien8.de,
+        dave.hansen@linux.intel.com, pbonzini@redhat.com,
+        jpoimboe@kernel.org, pawan.kumar.gupta@linux.intel.com,
+        babu.moger@amd.com, sandipan.das@amd.com, jmattson@google.com,
+        thomas.lendacky@amd.com, nikunj@amd.com, ravi.bangoria@amd.com,
+        eranian@google.com, irogers@google.com, kvm@vger.kernel.org,
+        x86@kernel.org, linux-perf-users@vger.kernel.org
+References: <20230206060545.628502-1-manali.shukla@amd.com>
+ <20230206060545.628502-3-manali.shukla@amd.com> <ZB4AOaLRwSB0ClIH@google.com>
+From:   Manali Shukla <manali.shukla@amd.com>
+In-Reply-To: <ZB4AOaLRwSB0ClIH@google.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+X-ClientProxiedBy: BMXP287CA0007.INDP287.PROD.OUTLOOK.COM
+ (2603:1096:b00:2c::14) To SJ1PR12MB6218.namprd12.prod.outlook.com
+ (2603:10b6:a03:457::17)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ1PR12MB6218:EE_|MN0PR12MB6198:EE_
+X-MS-Office365-Filtering-Correlation-Id: 2f8ea423-c4eb-4fb4-b653-08db301c75d1
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: ub69wI5GkMiDSN8Rvr1aEk4gmXZhxWQy8Hiw+D/pndIsGhq8RFgBNMuwNHRu0G3A6roz7rcY8uMJhN1cQqB/ztDM2Ig8aHCwcR/L5nbHuNLOxu/7Z3o8SE5PeFZ6+LHDTk/3nZU2cy4vvxQi4SjtT/nSgixBA2k0ywJDz/H6GF4urjYvxGo8pu8OPuZMpq19u9h1nZu6mKpKmZ0kIppLz0Tw5cylCo9TUOYk4rctROIiTSPI7oQEIS8Fqg+rsjWZEvEpuvMXV+czlkFUgl/JvTQQUxjepV+O2sWycRG+H5bu027iGR0tKXovL8Dr+RhnW16g5c9Xvh+g6FyQCTnHGaaFqtsO0Opyb4QU8H3T0LP4oTBdiKGDw5/oc4qqa6DS1q91OrL7VZ/gIbp1BLBM3+Z/i1vrMa2EpRuBNeZApqs9qstM2byPP3joLp9tEETsYuqcsM47iRwfjFAS7oMkXsrCiLgXxT+5thB1pzzi7CALm5LnHjQAPrBOoJExfHHCxE2UGH0XORf1YQcMI/27fVDdTqgwW52Lml0lkfOKTuNo1O5FfYPHJDyZPfCvNM4JxLj1DoSNNShUFA2piToaXPvBQaAbHoun7MU9ZUmKS+vxxr1kcv4cRVk3A/IxnRXBIDdnuJZwgW3BD4cS6tvr3w==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ1PR12MB6218.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(396003)(39860400002)(136003)(376002)(346002)(366004)(451199021)(36756003)(31696002)(31686004)(86362001)(5660300002)(186003)(53546011)(2616005)(83380400001)(26005)(6506007)(6512007)(7416002)(44832011)(8936002)(6666004)(41300700001)(6486002)(4326008)(6916009)(8676002)(2906002)(38100700002)(66946007)(316002)(66476007)(66556008)(478600001)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?Y2dMNVUwSnYvVFhNNGdsYUZreWhpZk04SGZ5akVDWE5oYlNpci9KZURvL0xn?=
+ =?utf-8?B?WENGdGJCYjZUU2NJMTkreVhXZmh6a2had1NKSzhzQzRIc295NHpBdXpIc3hG?=
+ =?utf-8?B?SmMvd3FBQnUvajVCYU5hSWxlbm90eGRuMTQ3ZEhLNDJqRmF5T09FUHU0RGRl?=
+ =?utf-8?B?UlpyQVJZL2VwZ2NHcWM3STNvYXJRSlZZZWE5clZNWFkzc3hSSGlFR1FURkR6?=
+ =?utf-8?B?S1Vad2taUWRmRXlIRXZJV04vcGNrNENEMFhUNnNrSU9JVGJWc2orVXQ3ZFdH?=
+ =?utf-8?B?VElYQ2RKQXhlTFNad2FxMDFUY0ZaNnpiSlVBUnNJSnE3aEhEcEtBWTBWdm5T?=
+ =?utf-8?B?RXdTVCtERXAvTWhhYVd5S1NxRU5nQ0h5UCtlSkVVd01hOTVwTmZ2aGFLeFRv?=
+ =?utf-8?B?b3JNb1pDRzByQ3U3MGpKRDBEWFdkQm9vNEt0b0ZDbFJCYjVrYVhnWG9tRXVF?=
+ =?utf-8?B?dzkxWTg1a1owZWFjZFc2YVpPVmU4V2ZXWmZPaE1DZUo3RHNidnlna2pYVnFy?=
+ =?utf-8?B?TVdqcURqeGNZZ1Jzdng2aVJvYVovblV3UU5ENkRlM2lsRDBvNVJBWXM3ZllJ?=
+ =?utf-8?B?czJ6dWxodjFqMThlSFJCaEJDS0FNdFZNSlBLcDBmS01zcVRUR1FZMk9COEtW?=
+ =?utf-8?B?VjcvNEU4T0xGT004V0h1THFRczlsRTkyTVVyUjNqMWxWdEVHYlNXb1Y0QUlw?=
+ =?utf-8?B?d3ZvcUhrNzNOSndEWkNRL0FFOFBIZVhnbXNCQXIwcStMQU54VUJjYXVFS0do?=
+ =?utf-8?B?NWkxUThScGV6K2luT0M3TERvNWtZNjRHU0dkWW4yY3F1UnhWQlo1VmJKZGFy?=
+ =?utf-8?B?MW5Sa0ZBSjF2VWlvdGptbkEya3pVS1BvVjhGN1pTTFViVlhQSVNiTDgwV1Z0?=
+ =?utf-8?B?Ly9LZHhoRXhURzhVdlBNQVBvaU56WGhFVCtjV0xid2V0SFArSUZqS1UxTWpY?=
+ =?utf-8?B?WFFrTzNEbVBkdVhodDJESjF4OHlabGROQmQrdEttQWxxTWsvUHBxcll5S094?=
+ =?utf-8?B?TldRVzd6S1huajFKUFZiZkxnbDYycmNKM3V5S2wzNWkvSVRtMllJZnFmS2F5?=
+ =?utf-8?B?bkhGZU1vV0xrWjlQKzhobHRmWG90TkZPd3BuSDNQWWRSRDN0aUh5MThsWW5R?=
+ =?utf-8?B?NXVkTFVnYXA4clJLNVFSL1RKRVhuL21ZdWdybkkwV1N5RVl5RTU1S1J6ZEZ3?=
+ =?utf-8?B?TVVvYVdyS2VtUk1Qb3VPZllUQnkwd3hRMTNhMytpSzAwQjBSejNOV0VCYk50?=
+ =?utf-8?B?WldhbUpBeW9sam5aSEd0M0hvejhGR3VVbjcyVG5BTFZBcGpyRXpYSjRNY3h2?=
+ =?utf-8?B?V1Jqb21VYUFVRmtxcDM1cDRZUGNvYlJwcFl2alVwZ1BZSXJ1K1lmS3Rsd0dn?=
+ =?utf-8?B?VHNFdW04c2dOSGpaWE15UUxSQk5hbFNhL3d1akZBdE9wVW5TQUlzWWxrMmtw?=
+ =?utf-8?B?ZzZEKzA4TjIxUUlwVUQ0NWgxS2JJTzg4VmF4NTVnV2ZITVkwVE5pSFAwVXhT?=
+ =?utf-8?B?RlNMbkpHaW5aRnBqZGxicmpjbU9SVWhLWU1mck9rTWxBUXdtUDJ4b0pvdEJD?=
+ =?utf-8?B?UEJ4bmsvQWxLUU5oNWh0L3k4bUtkK0hYdTB1aVRwNUtRd0RvYW5vdzVCL0N1?=
+ =?utf-8?B?YzJDTXpneG1kaG5ScXUwUnBreUlCQUtHYXVHdEswVFU5UkEzS3RvOE9pbDRs?=
+ =?utf-8?B?RmY4Nkthd0hKSlNMQXVMckxpdTJxOEROR2xKMlhhckYydElNbzhNT3Fzd0pl?=
+ =?utf-8?B?MzE2ZVV3QkNCLzZrZ2FaWTY1THlDOVV4L01VckN2VnJrdHM1R0U2M2Y0eXVE?=
+ =?utf-8?B?MnE3andHVkJoSlI5dXpRY1BXRjJKOUJSVVBGc1EwczVvVm03VHpWeDhXS2gy?=
+ =?utf-8?B?WXJjZ1RlR2Z2WHFFWlgydEVBSlNyNU1YdytIWlJQT1BtclhzR1RVMVhGWVpj?=
+ =?utf-8?B?UHNKV0R6M25hME1LU0RsWDdacVhKRndaY0FZemlMU09SZEloTFZqWC9uTHpl?=
+ =?utf-8?B?YnVnSHBJWmp3M1BINjBjQjJ0SmpqUjBCUVJGa2tKZVByMXJneGY3QzExanJB?=
+ =?utf-8?B?ZnpJdzNmQnZDUUpuNEtQelovT29aZTE1cUNja2lweXhZeTVUVHR6MHZHbmlt?=
+ =?utf-8?Q?4Af8e34WR2/sz9Xz9yJuNXPEr?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2f8ea423-c4eb-4fb4-b653-08db301c75d1
+X-MS-Exchange-CrossTenant-AuthSource: SJ1PR12MB6218.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Mar 2023 06:11:40.3097
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: MzMMZ3CdwOZFg/xhHLNCpKa15H5mqk/Jy3i5uCzpBOlWBn28BAp1GNRHeeVERY2xU/iVG3LZt5YtuIbxx1OHig==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR12MB6198
+X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
+        DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi James,
+On 3/25/2023 1:25 AM, Sean Christopherson wrote:
+> On Mon, Feb 06, 2023, Manali Shukla wrote:
+>> Currently, the hypervisor is able to inspect instruction based samples
+>> from a guest and gather execution information. SEV-ES and SNP guests
+>> can disallow the use of instruction based sampling by hypervisor by
+>> enabling the PreventHostIBS feature for the guest.  (More information
+>> in Section 15.36.17 APM Volume 2)
+>>
+>> The MSR_AMD64_IBSFETCHCTL[IbsFetchEn] and MSR_AMD64_IBSOPCTL[IbsOpEn]
+>> bits need to be disabled before VMRUN is called when PreventHostIBS
+>> feature is enabled. If either of these bits are not 0, VMRUN will fail
+>> with VMEXIT_INVALID error code.
+>>
+>> Because of an IBS race condition when disabling IBS, KVM needs to
+>> indicate when it is in a PreventHostIBS window. Activate the window
+>> based on whether IBS is currently active or inactive.
+>>
+>> Signed-off-by: Manali Shukla <manali.shukla@amd.com>
+>> ---
+>>  arch/x86/include/asm/cpufeatures.h |  1 +
+>>  arch/x86/kvm/svm/sev.c             | 10 ++++++++
+>>  arch/x86/kvm/svm/svm.c             | 39 ++++++++++++++++++++++++++++--
+>>  arch/x86/kvm/svm/svm.h             |  1 +
+>>  4 files changed, 49 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
+>> index 61012476d66e..1812e74f846a 100644
+>> --- a/arch/x86/include/asm/cpufeatures.h
+>> +++ b/arch/x86/include/asm/cpufeatures.h
+>> @@ -425,6 +425,7 @@
+>>  #define X86_FEATURE_SEV_ES		(19*32+ 3) /* AMD Secure Encrypted Virtualization - Encrypted State */
+>>  #define X86_FEATURE_V_TSC_AUX		(19*32+ 9) /* "" Virtual TSC_AUX */
+>>  #define X86_FEATURE_SME_COHERENT	(19*32+10) /* "" AMD hardware-enforced cache coherency */
+>> +#define X86_FEATURE_PREVENT_HOST_IBS	(19*32+15) /* "" AMD prevent host ibs */
+>>  
+>>  /*
+>>   * BUG word(s)
+>> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+>> index 86d6897f4806..b348b8931721 100644
+>> --- a/arch/x86/kvm/svm/sev.c
+>> +++ b/arch/x86/kvm/svm/sev.c
+>> @@ -569,6 +569,12 @@ static int sev_es_sync_vmsa(struct vcpu_svm *svm)
+>>  	if (svm->vcpu.guest_debug || (svm->vmcb->save.dr7 & ~DR7_FIXED_1))
+>>  		return -EINVAL;
+>>  
+>> +	if (sev_es_guest(svm->vcpu.kvm) &&
+>> +	    guest_cpuid_has(&svm->vcpu, X86_FEATURE_PREVENT_HOST_IBS)) {
+>> +		save->sev_features |= BIT(6);
+>> +		svm->prevent_hostibs_enabled = true;
+>> +	}
+>> +
+>>  	/*
+>>  	 * SEV-ES will use a VMSA that is pointed to by the VMCB, not
+>>  	 * the traditional VMSA that is part of the VMCB. Copy the
+>> @@ -2158,6 +2164,10 @@ void __init sev_set_cpu_caps(void)
+>>  		kvm_cpu_cap_clear(X86_FEATURE_SEV);
+>>  	if (!sev_es_enabled)
+>>  		kvm_cpu_cap_clear(X86_FEATURE_SEV_ES);
+>> +
+>> +	/* Enable PreventhostIBS feature for SEV-ES and higher guests */
+>> +	if (sev_es_enabled)
+>> +		kvm_cpu_cap_set(X86_FEATURE_PREVENT_HOST_IBS);
+> 
+> Uh, you can't just force a cap, there needs to be actual hardware support.  Just
+> copy what was done for X86_FEATURE_SEV_ES.
 
-On 2/3/23 21:50, James Morse wrote:
-> Hello!
-> 
-> This series adds what looks like cpuhotplug support to arm64 for use in
-> virtual machines. It does this by moving the cpu_register() calls for
-> architectures that support ACPI out of the arch code by using
-> GENERIC_CPU_DEVICES, then into the ACPI processor driver.
-> 
-> The kubernetes folk really want to be able to add CPUs to an existing VM,
-> in exactly the same way they do on x86. The use-case is pre-booting guests
-> with one CPU, then adding the number that were actually needed when the
-> workload is provisioned.
-> 
-> Wait? Doesn't arm64 support cpuhotplug already!?
-> In the arm world, cpuhotplug gets used to mean removing the power from a CPU.
-> The CPU is offline, and remains present. For x86, and ACPI, cpuhotplug
-> has the additional step of physically removing the CPU, so that it isn't
-> present anymore.
-> 
-> Arm64 doesn't support this, and can't support it: CPUs are really a slice
-> of the SoC, and there is not enough information in the existing ACPI tables
-> to describe which bits of the slice also got removed. Without a reference
-> machine: adding this support to the spec is a wild goose chase.
-> 
-> Critically: everything described in the firmware tables must remain present.
-> 
-> For a virtual machine this is easy as all the other bits of 'virtual SoC'
-> are emulated, so they can (and do) remain present when a vCPU is 'removed'.
-> 
-> On a system that supports cpuhotplug the MADT has to describe every possible
-> CPU at boot. Under KVM, the vGIC needs to know about every possible vCPU before
-> the guest is started.
-> With these constraints, virtual-cpuhotplug is really just a hypervisor/firmware
-> policy about which CPUs can be brought online.
-> 
-> This series adds support for virtual-cpuhotplug as exactly that: firmware
-> policy. This may even work on a physical machine too; for a guest the part of
-> firmware is played by the VMM. (typically Qemu).
-> 
-> PSCI support is modified to return 'DENIED' if the CPU can't be brought
-> online/enabled yet. The CPU object's _STA method's enabled bit is used to
-> indicate firmware's current disposition. If the CPU has its enabled bit clear,
-> it will not be registered with sysfs, and attempts to bring it online will
-> fail. The notifications that _STA has changed its value then work in the same
-> way as physical hotplug, and firmware can cause the CPU to be registered some
-> time later, allowing it to be brought online.
-> 
-> This creates something that looks like cpuhotplug to user-space, as the sysfs
-> files appear and disappear, and the udev notifications look the same.
-> 
-> One notable difference is the CPU present mask, which is exposed via sysfs.
-> Because the CPUs remain present throughout, they can still be seen in that mask.
-> This value does get used by webbrowsers to estimate the number of CPUs
-> as the CPU online mask is constantly changed on mobile phones.
-> 
-> Linux is tolerant of PSCI returning errors, as its always been allowed to do
-> that. To avoid confusing OS that can't tolerate this, we needed an additional
-> bit in the MADT GICC flags. This series copies ACPI_MADT_ONLINE_CAPABLE, which
-> appears to be for this purpose, but calls it ACPI_MADT_GICC_CPU_CAPABLE as it
-> has a different bit position in the GICC.
-> 
-> This code is unconditionally enabled for all ACPI architectures.
-> If there are problems with firmware tables on some devices, the CPUs will
-> already be online by the time the acpi_processor_make_enabled() is called.
-> A mismatch here causes a firmware-bug message and kernel taint. This should
-> only affect people with broken firmware who also boot with maxcpus=1, and
-> bring CPUs online later.
-> 
-> I had a go at switching the remaining architectures over to GENERIC_CPU_DEVICES,
-> so that the Kconfig symbol can be removed, but I got stuck with powerpc
-> and s390.
+Okay. I will do the suggested changes.
 > 
 > 
-> The first patch has already been posted as a fix here:
-> https://www.spinics.net/lists/linux-ia64/msg21920.html
-> I've only build tested Loongarch and ia64.
+>>  }
+>>  
+>>  void __init sev_hardware_setup(void)
+>> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+>> index 9a194aa1a75a..47c1e0fff23e 100644
+>> --- a/arch/x86/kvm/svm/svm.c
+>> +++ b/arch/x86/kvm/svm/svm.c
+>> @@ -3914,10 +3914,39 @@ static noinstr void svm_vcpu_enter_exit(struct kvm_vcpu *vcpu, bool spec_ctrl_in
+>>  
+>>  	guest_state_enter_irqoff();
+>>  
+>> -	if (sev_es_guest(vcpu->kvm))
+>> +	if (sev_es_guest(vcpu->kvm)) {
+>> +		bool ibs_fetch_active, ibs_op_active;
+>> +		u64 ibs_fetch_ctl, ibs_op_ctl;
+>> +
+>> +		if (svm->prevent_hostibs_enabled) {
+>> +			/*
+>> +			 * With PreventHostIBS enabled, IBS profiling cannot
+>> +			 * be active when VMRUN is executed. Disable IBS before
+>> +			 * executing VMRUN and, because of a race condition,
+>> +			 * enable the PreventHostIBS window if IBS profiling was
+>> +			 * active.
 > 
-> 
-> If folk want to play along at home, you'll need a copy of Qemu that supports this.
-> https://github.com/salil-mehta/qemu.git salil/virt-cpuhp-armv8/rfc-v1-port29092022.psci.present
-> 
-> You'll need to fix the numbers of KVM_CAP_ARM_HVC_TO_USER and KVM_CAP_ARM_PSCI_TO_USER
-> to match your host kernel. Replace your '-smp' argument with something like:
-> | -smp cpus=1,maxcpus=3,cores=3,threads=1,sockets=1
-> 
-> then feed the following to the Qemu montior;
-> | (qemu) device_add driver=host-arm-cpu,core-id=1,id=cpu1
-> | (qemu) device_del cpu1
-> 
-> 
-> This series is based on v6.2-rc3, and can be retrieved from:
-> https://git.kernel.org/pub/scm/linux/kernel/git/morse/linux.git/ virtual_cpu_hotplug/rfc/v1
+> And the race can't be fixed because...?
 
-I applied this patch series on v6.2-rc3 and using the QEMU cloned from 
-the salil-mehta/qemu.git repo. But when I try to run the QEMU, it shows:
-
-$ qemu-system-aarch64: -accel kvm: Failed to enable 
-KVM_CAP_ARM_PSCI_TO_USER cap.
-
-Here is the command I use:
-
-$ qemu-system-aarch64
--machine virt
--bios /usr/share/qemu-efi-aarch64/QEMU_EFI.fd
--accel kvm
--m 4096
--smp cpus=1,maxcpus=3,cores=3,threads=1,sockets=1
--cpu host
--qmp unix:./src.socket,server,nowait
--hda ./XXX.qcow2
--serial unix:./src.serial,server,nowait
--monitor stdio
-
-It seems something related to your notice: You'll need to fix the 
-numbers of KVM_CAP_ARM_HVC_TO_USER and KVM_CAP_ARM_PSCI_TO_USER
-to match your host kernel.
-
-But I'm not actually understand what should I fix, since I haven't 
-review the patch series. Could you give me some more information? Maybe 
-I'm doing something wrong.
-
-Thanks,
+Race can not be fixed because VALID and ENABLE bit for IBS_FETCH_CTL and IBS_OP_CTL
+are contained in their same resepective MSRs. Due to this reason following scenario can
+be generated:
+Read IBS_FETCH_CTL (IbsFetchEn bit is 1 and IBSFetchVal bit is 0)
+Write IBS_FETCH_CTL (IbsFetchEn is 0 now)
+Imagine in between Read and Write, IBSFetchVal changes to 1. Write to IBS_FETCH_CTL will
+clear the IBSFetchVal bit. When STGI is executed after VMEXIT, the NMI is taken and check for
+valid mask will fail and generate Dazed and Confused NMI messages.
+Please refer to cover letter for more details.
 
 > 
+>> +			 */
+>> +			ibs_fetch_active =
+>> +				amd_disable_ibs_fetch(&ibs_fetch_ctl);
+>> +			ibs_op_active =
+>> +				amd_disable_ibs_op(&ibs_op_ctl);
+>> +
+>> +			amd_prevent_hostibs_window(ibs_fetch_active ||
+>> +						   ibs_op_active);
+>> +		}
+>> +
+>>  		__svm_sev_es_vcpu_run(svm, spec_ctrl_intercepted);
+>> -	else
+>> +
+>> +		if (svm->prevent_hostibs_enabled) {
+>> +			if (ibs_fetch_active)
+>> +				amd_restore_ibs_fetch(ibs_fetch_ctl);
+>> +
+>> +			if (ibs_op_active)
+>> +				amd_restore_ibs_op(ibs_op_ctl);
 > 
-> Thanks,
-> 
-> James Morse (29):
->    ia64: Fix build error due to switch case label appearing next to
->      declaration
->    ACPI: Move ACPI_HOTPLUG_CPU to be enabled per architecture
->    drivers: base: Use present CPUs in GENERIC_CPU_DEVICES
->    drivers: base: Allow parts of GENERIC_CPU_DEVICES to be overridden
->    drivers: base: Move cpu_dev_init() after node_dev_init()
->    arm64: setup: Switch over to GENERIC_CPU_DEVICES using
->      arch_register_cpu()
->    ia64/topology: Switch over to GENERIC_CPU_DEVICES
->    x86/topology: Switch over to GENERIC_CPU_DEVICES
->    LoongArch: Switch over to GENERIC_CPU_DEVICES
->    arch_topology: Make register_cpu_capacity_sysctl() tolerant to late
->      CPUs
->    ACPI: processor: Add support for processors described as container
->      packages
->    ACPI: processor: Register CPUs that are online, but not described in
->      the DSDT
->    ACPI: processor: Register all CPUs from acpi_processor_get_info()
->    ACPI: Rename ACPI_HOTPLUG_CPU to include 'present'
->    ACPI: Move acpi_bus_trim_one() before acpi_scan_hot_remove()
->    ACPI: Rename acpi_processor_hotadd_init and remove pre-processor
->      guards
->    ACPI: Add post_eject to struct acpi_scan_handler for cpu hotplug
->    ACPI: Check _STA present bit before making CPUs not present
->    ACPI: Warn when the present bit changes but the feature is not enabled
->    drivers: base: Implement weak arch_unregister_cpu()
->    LoongArch: Use the __weak version of arch_unregister_cpu()
->    arm64: acpi: Move get_cpu_for_acpi_id() to a header
->    ACPICA: Add new MADT GICC flags fields [code first?]
->    arm64, irqchip/gic-v3, ACPI: Move MADT GICC enabled check into a
->      helper
->    irqchip/gic-v3: Don't return errors from gic_acpi_match_gicc()
->    irqchip/gic-v3: Add support for ACPI's disabled but 'online capable'
->      CPUs
->    ACPI: add support to register CPUs based on the _STA enabled bit
->    arm64: document virtual CPU hotplug's expectations
->    cpumask: Add enabled cpumask for present CPUs that can be brought
->      online
-> 
-> Jean-Philippe Brucker (3):
->    arm64: psci: Ignore DENIED CPUs
->    KVM: arm64: Pass hypercalls to userspace
->    KVM: arm64: Pass PSCI calls to userspace
-> 
->   Documentation/arm64/cpu-hotplug.rst       |  79 ++++++++++++
->   Documentation/arm64/index.rst             |   1 +
->   Documentation/virt/kvm/api.rst            |  31 ++++-
->   Documentation/virt/kvm/arm/hypercalls.rst |   1 +
->   arch/arm64/Kconfig                        |   1 +
->   arch/arm64/include/asm/acpi.h             |  11 ++
->   arch/arm64/include/asm/cpu.h              |   1 -
->   arch/arm64/include/asm/kvm_host.h         |   2 +
->   arch/arm64/kernel/acpi_numa.c             |  11 --
->   arch/arm64/kernel/psci.c                  |   2 +-
->   arch/arm64/kernel/setup.c                 |  13 +-
->   arch/arm64/kernel/smp.c                   |   5 +-
->   arch/arm64/kvm/arm.c                      |  15 ++-
->   arch/arm64/kvm/hypercalls.c               |  28 ++++-
->   arch/arm64/kvm/psci.c                     |  13 ++
->   arch/ia64/Kconfig                         |   2 +
->   arch/ia64/include/asm/acpi.h              |   2 +-
->   arch/ia64/include/asm/cpu.h               |  11 --
->   arch/ia64/kernel/acpi.c                   |   6 +-
->   arch/ia64/kernel/setup.c                  |   2 +-
->   arch/ia64/kernel/sys_ia64.c               |   7 +-
->   arch/ia64/kernel/topology.c               |  35 +-----
->   arch/loongarch/Kconfig                    |   2 +
->   arch/loongarch/kernel/topology.c          |  31 +----
->   arch/x86/Kconfig                          |   2 +
->   arch/x86/include/asm/cpu.h                |   6 -
->   arch/x86/kernel/acpi/boot.c               |   4 +-
->   arch/x86/kernel/topology.c                |  19 +--
->   drivers/acpi/Kconfig                      |   5 +-
->   drivers/acpi/acpi_processor.c             | 146 +++++++++++++++++-----
->   drivers/acpi/processor_core.c             |   2 +-
->   drivers/acpi/scan.c                       | 116 +++++++++++------
->   drivers/base/arch_topology.c              |  38 ++++--
->   drivers/base/cpu.c                        |  31 ++++-
->   drivers/base/init.c                       |   2 +-
->   drivers/firmware/psci/psci.c              |   2 +
->   drivers/irqchip/irq-gic-v3.c              |  38 +++---
->   include/acpi/acpi_bus.h                   |   1 +
->   include/acpi/actbl2.h                     |   1 +
->   include/kvm/arm_hypercalls.h              |   1 +
->   include/kvm/arm_psci.h                    |   4 +
->   include/linux/acpi.h                      |  10 +-
->   include/linux/cpu.h                       |   6 +
->   include/linux/cpumask.h                   |  25 ++++
->   include/uapi/linux/kvm.h                  |   2 +
->   kernel/cpu.c                              |   3 +
->   46 files changed, 532 insertions(+), 244 deletions(-)
->   create mode 100644 Documentation/arm64/cpu-hotplug.rst
-> 
+> IIUC, this adds up to 2 RDMSRs and 4 WRMSRs to the VMRUN path.  Blech.  There's
+> gotta be a better way to implement this.  
 
--- 
-Shaoqin
+I will try to find a better way to implement this.
 
+> Like PeterZ said, this is basically
+> exclude_guest.
+
+As I mentioned before, exclude_guest lets the profiler decide whether it wants to trace the guest
+data or not, whereas PreventHostIBS lets the owner of the guest decide whether host can trace guest's
+data or not.
+
+
+Thank you for reviewing the patches.
+
+- Manali
