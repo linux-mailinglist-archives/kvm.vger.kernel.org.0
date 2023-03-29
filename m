@@ -2,95 +2,163 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 590606CD8C3
-	for <lists+kvm@lfdr.de>; Wed, 29 Mar 2023 13:52:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2FF156CD907
+	for <lists+kvm@lfdr.de>; Wed, 29 Mar 2023 14:03:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229794AbjC2LwS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 Mar 2023 07:52:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51306 "EHLO
+        id S229987AbjC2MD0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 Mar 2023 08:03:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41988 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229550AbjC2LwQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 29 Mar 2023 07:52:16 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1F86B3
-        for <kvm@vger.kernel.org>; Wed, 29 Mar 2023 04:51:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1680090687;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=hsG/IsiG3YfNPPudBRiL48bBj3TG6pU/JFoXkZ4JFlI=;
-        b=V5s16p5omT819YV7VbzbUvlIvc6SgDRhzVLTcwVYUcOPSl4tEZtMh5dJcbww6H4IAwPjpq
-        NoxGbKhp+r5WpllmWMl4oFNDWXm0olLFQcu3+2hPsStzhcEbpkOIY+Z7izQm3lmMesMvYf
-        HDh3FSB4bMekqb/VAJou3a1ftRxd8ZM=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-507-fFB3jKpnNZ2RuCfI6a5p3Q-1; Wed, 29 Mar 2023 07:51:25 -0400
-X-MC-Unique: fFB3jKpnNZ2RuCfI6a5p3Q-1
-Received: by mail-ed1-f72.google.com with SMTP id s30-20020a508d1e000000b005005cf48a93so21857773eds.8
-        for <kvm@vger.kernel.org>; Wed, 29 Mar 2023 04:51:25 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680090684; x=1682682684;
-        h=content-transfer-encoding:in-reply-to:subject:from:references:cc:to
-         :content-language:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=hsG/IsiG3YfNPPudBRiL48bBj3TG6pU/JFoXkZ4JFlI=;
-        b=mpoNUjmrZvh6mlGAR4t/hOGkefcBLhFqfkt1RaT706Pfg1rxkpHutKa2x07jYwyHxr
-         dra/J+1A1txTHOa0fXmQde1WzPqgmt+z5wU9e0tfxFvTM5vQImDCt3D2Eq/UzJzEGLTM
-         4GeDs9sMjMlB7DjpVkDE4xaA6tpU94k+ymInLOBPfA9hghvo46pANTVhU92aLvQlQKEg
-         I4pdST+HNX01eMnRDLV5OvVGgoZHHkyeejjWWtT4M37Gwhgcnb1O/N1tX/RYNVjCNZBs
-         Rc+y5hmgezm7AjBHWoHBbvxUP5CfwHPz+kTbfRjC2Tk8KaChKhEBtJMlE4zBrJ1WkmEz
-         Npfg==
-X-Gm-Message-State: AAQBX9fHjQj1J1KjBipMf1Bisq6A0GGGN0Wqq92JHm4TZY6qOgkIxPzF
-        V60dooSjXWUqALNPuQXM4YM9hBGzAg/CD2vTXLA95eTAE4E2idXhUV/ocpDyJl/+3G2UWf8oR20
-        I4DwkG44Ecc5k
-X-Received: by 2002:a17:907:1628:b0:88f:8a5:b4cd with SMTP id hb40-20020a170907162800b0088f08a5b4cdmr26306270ejc.1.1680090684788;
-        Wed, 29 Mar 2023 04:51:24 -0700 (PDT)
-X-Google-Smtp-Source: AKy350Y+Qr69YtNXE48+iPelapxA7fisyf2qbyc27fubwM9iEFn6cFwHXzyyCcqd+msXRQS/S5HrGQ==
-X-Received: by 2002:a17:907:1628:b0:88f:8a5:b4cd with SMTP id hb40-20020a170907162800b0088f08a5b4cdmr26306251ejc.1.1680090684535;
-        Wed, 29 Mar 2023 04:51:24 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
-        by smtp.googlemail.com with ESMTPSA id f3-20020a17090624c300b0092a59ee224csm16331051ejb.185.2023.03.29.04.51.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 29 Mar 2023 04:51:24 -0700 (PDT)
-Message-ID: <75ae80f7-b86e-3380-b3da-0e2201df4b7f@redhat.com>
-Date:   Wed, 29 Mar 2023 13:51:23 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.8.0
-Content-Language: en-US
-To:     Yan Zhao <yan.y.zhao@intel.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20230313111022.13793-1-yan.y.zhao@intel.com>
- <ZB4uoe9WBzhG9ddU@google.com> <ZCOaHWE6aS0vjvya@yzhao56-desk.sh.intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v3] KVM: VMX: fix lockdep warning on posted intr wakeup
-In-Reply-To: <ZCOaHWE6aS0vjvya@yzhao56-desk.sh.intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+        with ESMTP id S229485AbjC2MDZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 29 Mar 2023 08:03:25 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB352C0
+        for <kvm@vger.kernel.org>; Wed, 29 Mar 2023 05:03:21 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 5477861CE6
+        for <kvm@vger.kernel.org>; Wed, 29 Mar 2023 12:03:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AC6D2C433EF;
+        Wed, 29 Mar 2023 12:03:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1680091400;
+        bh=fflAurITT6wZZq4CT/l1tDmWHMLH9l/Mga/pG41Cz+M=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=AjBvwfsGmjKar/CDpcP8h8PH+aRHUZ2RQa3IWgToLnrNOFCJOcY5Xjl42kYc0gzpk
+         CngXUH8UxRVGEO08KMsCAQzYDNUHl9ieS6dwiYwTpksdyBsBtc6EQ8hOoGKeYqBvcV
+         LucHyo1CSRUrvGg1OoL9plvm0shcSYLEZ4pvMmVDkfpKO4v8BWLZeTyrW0UJi1eTEV
+         8elo/FT86F7Q2QgahBCvFnOh6iNMU3QMwu6lXa+GFsiiCWK1Q/2jXnm8hDN816aLLP
+         8JmIEcedx9cU60vLNty5r1wgI1NDLRTDze2sfePn6klhZo+o2KEabkPip8f/41/7Rt
+         OdTk/i5tkOY4A==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1phUWM-0042VN-C4;
+        Wed, 29 Mar 2023 13:03:18 +0100
+Date:   Wed, 29 Mar 2023 13:03:18 +0100
+Message-ID: <86jzyzwyrd.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Reiji Watanabe <reijiw@google.com>
+Cc:     Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev,
+        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Raghavendra Rao Anata <rananta@google.com>,
+        Will Deacon <will@kernel.org>, Rob Herring <robh@kernel.org>
+Subject: Re: [PATCH v1 2/2] KVM: arm64: PMU: Ensure to trap PMU access from EL0 to EL2
+In-Reply-To: <20230329002136.2463442-3-reijiw@google.com>
+References: <20230329002136.2463442-1-reijiw@google.com>        <20230329002136.2463442-3-reijiw@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+X-TUID: VeERMf+sjuAB
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: reijiw@google.com, oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, alexandru.elisei@arm.com, yuzenghui@huawei.com, suzuki.poulose@arm.com, pbonzini@redhat.com, ricarkol@google.com, jingzhangos@google.com, rananta@google.com, will@kernel.org, robh@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-5.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,SPF_HELO_NONE,
+        SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 3/29/23 03:53, Yan Zhao wrote:
-> Yes, there's no actual deadlock currently.
+On Wed, 29 Mar 2023 01:21:36 +0100,
+Reiji Watanabe <reijiw@google.com> wrote:
 > 
-> But without fixing this issue, debug_locks will be set to false along
-> with below messages printed. Then lockdep will be turned off and any
-> other lock detections like lockdep_assert_held()... will not print
-> warning even when it's obviously violated.
+> Currently, with VHE, KVM sets ER, CR, SW and EN bits of
+> PMUSERENR_EL0 to 1 on vcpu_load().  So, if the value of those bits
+> are cleared after vcpu_load() (the perf subsystem would do when PMU
+> counters are programmed for the guest), PMU access from the guest EL0
+> might be trapped to the guest EL1 directly regardless of the current
+> PMUSERENR_EL0 value of the vCPU.
 
-Can you use lockdep subclasses, giving 0 to the sched_in path and 1 to 
-the sched_out path?
++ RobH.
 
-Paolo
+Is that what is done when the event is created and armv8pmu_start()
+called? This is... crap. The EL0 access thing breaks everything, and
+nobody tested it with KVM, obviously.
 
+I would be tempted to start mitigating it with the following:
+
+diff --git a/arch/arm64/kernel/perf_event.c b/arch/arm64/kernel/perf_event.c
+index dde06c0f97f3..8063525bf3dd 100644
+--- a/arch/arm64/kernel/perf_event.c
++++ b/arch/arm64/kernel/perf_event.c
+@@ -806,17 +806,19 @@ static void armv8pmu_disable_event(struct perf_event *event)
+ 
+ static void armv8pmu_start(struct arm_pmu *cpu_pmu)
+ {
+-	struct perf_event_context *ctx;
+-	int nr_user = 0;
++	if (sysctl_perf_user_access) {
++		struct perf_event_context *ctx;
++		int nr_user = 0;
+ 
+-	ctx = perf_cpu_task_ctx();
+-	if (ctx)
+-		nr_user = ctx->nr_user;
++		ctx = perf_cpu_task_ctx();
++		if (ctx)
++			nr_user = ctx->nr_user;
+ 
+-	if (sysctl_perf_user_access && nr_user)
+-		armv8pmu_enable_user_access(cpu_pmu);
+-	else
+-		armv8pmu_disable_user_access();
++		if (nr_user)
++			armv8pmu_enable_user_access(cpu_pmu);
++		else
++			armv8pmu_disable_user_access();
++	}
+ 
+ 	/* Enable all counters */
+ 	armv8pmu_pmcr_write(armv8pmu_pmcr_read() | ARMV8_PMU_PMCR_E);
+
+but that's obviously not enough as we want it to work with EL0 access
+enabled on the host as well.
+
+What we miss is something that tells the PMU code "we're in a context
+where host userspace isn't present", and this would be completely
+skipped, relying on KVM to restore the appropriate state on
+vcpu_put(). But then the IPI stuff that controls EL0 can always come
+in and wreck things. Gahhh...
+
+I'm a bit reluctant to use the "save/restore all the time" hammer,
+because it only hides that the EL0 counter infrastructure is a bit
+broken.
+
+> With VHE, fix this by setting those bits of the register on every
+> guest entry (as with nVHE).  Also, opportunistically make the similar
+> change for PMSELR_EL0, which is cleared by vcpu_load(), to ensure it
+> is always set to zero on guest entry (PMXEVCNTR_EL0 access might cause
+> UNDEF at EL1 instead of being trapped to EL2, depending on the value
+> of PMSELR_EL0).  I think that would be more robust, although I don't
+> find any kernel code that writes PMSELR_EL0.
+
+This was changed a while ago to avoid using the selection register,
+see 0fdf1bb75953 ("arm64: perf: Avoid PMXEV* indirection"), and the
+rationale behind the reset of PMSELR_EL0 in 21cbe3cc8a48 ("arm64: KVM:
+pmu: Reset PMSELR_EL0.SEL to a sane value before entering the guest").
+
+We *could* simply drop this zeroing of PMSELR_EL0 now that there is
+nothing else host-side that writes to it. But we need to agree on how
+to fix the above first.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
