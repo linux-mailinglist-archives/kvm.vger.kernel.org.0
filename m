@@ -2,150 +2,141 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 68EA26CD2C9
-	for <lists+kvm@lfdr.de>; Wed, 29 Mar 2023 09:17:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AAF636CD349
+	for <lists+kvm@lfdr.de>; Wed, 29 Mar 2023 09:34:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229642AbjC2HRT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 Mar 2023 03:17:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49678 "EHLO
+        id S230150AbjC2He3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 Mar 2023 03:34:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41284 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229923AbjC2HRS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 29 Mar 2023 03:17:18 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62DF9212F
-        for <kvm@vger.kernel.org>; Wed, 29 Mar 2023 00:16:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1680074185;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=FgNqIpETnEwtXon7v3S9aQlVl6/D6olezWGAgum/M94=;
-        b=UmgAySgWXbE/22GqjFjAGXcg951QWg0fDA+NE3CPihHInvQ4PEnTvLCzXaaZboJfPR/Zr8
-        bsGh0CsRcEb41Jpu/du7ZBMgAoEQyO3HsBUYUWNUF+qyUZN+gvPP3LRFI0Z4EGQEkEUIab
-        grIBiANYQV+cOO1zDApKMvu6A6/5Wd0=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-296-V34otYCXNyC-cFCgMFQ9jQ-1; Wed, 29 Mar 2023 03:16:23 -0400
-X-MC-Unique: V34otYCXNyC-cFCgMFQ9jQ-1
-Received: by mail-ed1-f70.google.com with SMTP id r19-20020a50aad3000000b005002e950cd3so21178066edc.11
-        for <kvm@vger.kernel.org>; Wed, 29 Mar 2023 00:16:23 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680074183;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=FgNqIpETnEwtXon7v3S9aQlVl6/D6olezWGAgum/M94=;
-        b=g4warWnX/RNLHqhb9wSJjc9ij6mBiN9730Wq57XiQUMZkJfDgejWdpD40Y/a/waOAU
-         irBUsIsUNMGrcAkCdnFbw2zuve/Y19P32jebLZ8jwAecgrqdCdBjSrPfvKWE3OJlpGdL
-         X0hEC3DCWd3rWBc68L2Ck6CKenNFqrlqRCTEytBJBFgzIxK1LfULhxrhfESAPYxbE0zi
-         nkTbxsPfFCWldpPv09fnaECfznbr2cta7U3tATKS2ifwi8VcOg8mn4Y5OqcKUUk7UyIM
-         gICB6i5nCiuAIDPUEMP/RBEQLLcAhbItjqxxpHSK6eSQPsxR7CCx/kVQQIpj+O8GG79n
-         CowA==
-X-Gm-Message-State: AAQBX9cjmqs7Cg47huFxLnrnAQsfwSd3lwQYVznMD4WhXJVJXa9AqE6B
-        DSqGZiFnhvvTmR8jmMqCBl+muaGKLoYQMFtZhl9AHocEuUDHSyKWrDl1qmPHZplyNrJiTodyujx
-        oRl0sV3YKMpcF
-X-Received: by 2002:a17:906:33d3:b0:908:7fed:f0f with SMTP id w19-20020a17090633d300b009087fed0f0fmr18015438eja.42.1680074182898;
-        Wed, 29 Mar 2023 00:16:22 -0700 (PDT)
-X-Google-Smtp-Source: AKy350bXrrArCxeBniSit8qX/4ISh60zS47mWrvlzo8Jgs3svz8qYB58JPbBHkk1wTagNwUK5LAUEQ==
-X-Received: by 2002:a17:906:33d3:b0:908:7fed:f0f with SMTP id w19-20020a17090633d300b009087fed0f0fmr18015416eja.42.1680074182527;
-        Wed, 29 Mar 2023 00:16:22 -0700 (PDT)
-Received: from sgarzare-redhat (host-82-57-51-130.retail.telecomitalia.it. [82.57.51.130])
-        by smtp.gmail.com with ESMTPSA id sc36-20020a1709078a2400b0093e39b921c8sm6666528ejc.164.2023.03.29.00.16.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 Mar 2023 00:16:22 -0700 (PDT)
-Date:   Wed, 29 Mar 2023 09:16:19 +0200
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Bobby Eshleman <bobby.eshleman@bytedance.com>
-Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Cong Wang <xiyou.wangcong@gmail.com>
-Subject: Re: [PATCH net v2] virtio/vsock: fix leaks due to missing skb owner
-Message-ID: <teatarzyqlkgbgxjezbm56ilpsbcq3f6nwvwwfi7f6z7agbgoh@jxwm3mgot2w4>
-References: <20230327-vsock-fix-leak-v2-1-f6619972dee0@bytedance.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20230327-vsock-fix-leak-v2-1-f6619972dee0@bytedance.com>
-X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+        with ESMTP id S229729AbjC2HeC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 29 Mar 2023 03:34:02 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9346B35B3
+        for <kvm@vger.kernel.org>; Wed, 29 Mar 2023 00:31:33 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id DCB8D60C5B
+        for <kvm@vger.kernel.org>; Wed, 29 Mar 2023 07:31:30 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 47D39C433EF;
+        Wed, 29 Mar 2023 07:31:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1680075090;
+        bh=IsuvjwQiGQfvNNZi00ZhmP672wnDWL3sVGtWAk43ClI=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=c0FvRHNYpHq7NWB2/Tpo6+WePRmcTBjwjGK+bIu14Ojeo4eHotMh6rkeOo1xy6TvV
+         V+tmmCcL8aqbOh9YJ94MxDdRk8h7DuxqwJIEsEJL4P7QUv5YIndE8f1k5XLNlN+c0t
+         xPRhM/aqU4b9WblgYgQaZMEtDvZA+GapOrRT0Cwqb3Oyv4zihZdoFbTeiBxE5WyK9Z
+         XCTjzbe6mvmWviHFDGhI2HFjmaiduMUEHhwrd1g1rVtdCRLCLnIAAhemTpD3Xg4UWw
+         Q+95qU5N5X7aaawzPtpo0HGW6ZGT1SVFzKR8nDO9BJ3WJ/kpUBJ4y56qI/ov7uiUbq
+         MCVQaACcaKS3w==
+Received: from [82.132.185.251] (helo=wait-a-minute.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1phQHH-003yn1-I3;
+        Wed, 29 Mar 2023 08:31:27 +0100
+Date:   Wed, 29 Mar 2023 08:31:24 +0100
+Message-ID: <87v8ikqaib.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Reiji Watanabe <reijiw@google.com>
+Cc:     Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev,
+        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Raghavendra Rao Anata <rananta@google.com>,
+        Will Deacon <will@kernel.org>
+Subject: Re: [PATCH v1 1/2] KVM: arm64: PMU: Restore the host's PMUSERENR_EL0
+In-Reply-To: <20230329002136.2463442-2-reijiw@google.com>
+References: <20230329002136.2463442-1-reijiw@google.com>
+        <20230329002136.2463442-2-reijiw@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 82.132.185.251
+X-SA-Exim-Rcpt-To: reijiw@google.com, oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, alexandru.elisei@arm.com, yuzenghui@huawei.com, suzuki.poulose@arm.com, pbonzini@redhat.com, ricarkol@google.com, jingzhangos@google.com, rananta@google.com, will@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-2.5 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 28, 2023 at 04:29:09PM +0000, Bobby Eshleman wrote:
->This patch sets the skb owner in the recv and send path for virtio.
->
->For the send path, this solves the leak caused when
->virtio_transport_purge_skbs() finds skb->sk is always NULL and therefore
->never matches it with the current socket. Setting the owner upon
->allocation fixes this.
->
->For the recv path, this ensures correctness of accounting and also
->correct transfer of ownership in vsock_loopback (when skbs are sent from
->one socket and received by another).
->
->Fixes: 71dc9ec9ac7d ("virtio/vsock: replace virtio_vsock_pkt with sk_buff")
->Signed-off-by: Bobby Eshleman <bobby.eshleman@bytedance.com>
->Reported-by: Cong Wang <xiyou.wangcong@gmail.com>
->Link: https://lore.kernel.org/all/ZCCbATwov4U+GBUv@pop-os.localdomain/
->---
->Changes in v2:
->- virtio/vsock: add skb_set_owner_r to recv_pkt()
->- Link to v1: https://lore.kernel.org/r/20230327-vsock-fix-leak-v1-1-3fede367105f@bytedance.com
->---
-> net/vmw_vsock/virtio_transport_common.c | 5 +++++
-> 1 file changed, 5 insertions(+)
->
->diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
->index 957cdc01c8e8..900e5dca05f5 100644
->--- a/net/vmw_vsock/virtio_transport_common.c
->+++ b/net/vmw_vsock/virtio_transport_common.c
->@@ -94,6 +94,9 @@ virtio_transport_alloc_skb(struct virtio_vsock_pkt_info *info,
-> 					 info->op,
-> 					 info->flags);
->
->+	if (info->vsk)
->+		skb_set_owner_w(skb, sk_vsock(info->vsk));
->+
-> 	return skb;
->
-> out:
->@@ -1294,6 +1297,8 @@ void virtio_transport_recv_pkt(struct virtio_transport *t,
-> 		goto free_pkt;
-> 	}
->
->+	skb_set_owner_r(skb, sk);
->+
-> 	vsk = vsock_sk(sk);
->
-> 	lock_sock(sk);
+On Wed, 29 Mar 2023 01:21:35 +0100,
+Reiji Watanabe <reijiw@google.com> wrote:
+> 
+> Restore the host's PMUSERENR_EL0 value instead of clearing it,
+> before returning back to userspace, as the host's EL0 might have
+> a direct access to PMU registers (some bits of PMUSERENR_EL0
+> might not be zero).
+> 
+> Fixes: 83a7a4d643d3 ("arm64: perf: Enable PMU counter userspace access for perf event")
+> Signed-off-by: Reiji Watanabe <reijiw@google.com>
+> ---
+>  arch/arm64/include/asm/kvm_host.h       | 3 +++
+>  arch/arm64/kvm/hyp/include/hyp/switch.h | 3 ++-
+>  2 files changed, 5 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index bcd774d74f34..82220ecec10e 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -544,6 +544,9 @@ struct kvm_vcpu_arch {
+>  
+>  	/* Per-vcpu CCSIDR override or NULL */
+>  	u32 *ccsidr;
+> +
+> +	/* the value of host's pmuserenr_el0 before guest entry */
+> +	u64	host_pmuserenr_el0;
 
-Can you explain why we are using skb_set_owner_w/skb_set_owner_r?
+I don't think we need this in each and every vcpu. Why can't this be
+placed in struct kvm_host_data and accessed via the per-cpu pointer?
+Maybe even use the PMUSERNR_EL0 field in the sysreg array?
 
-I'm a little concerned about 2 things:
-- skb_set_owner_r() documentation says: "Stream and sequenced
-   protocols can't normally use this as they need to fit buffers in
-   and play with them."
-- they increment sk_wmem_alloc and sk_rmem_alloc that we never used
-   (IIRC)
+There is probably a number of things that we could move there, but
+let's start by not adding more unnecessary stuff to the vcpu
+structure.
 
-For the long run, I think we should manage memory better, and using
-socket accounting makes sense to me, but since we now have a different
-system (which we have been carrying around since the introduction of
-vsock), I think this change is a bit risky, especially as a fix.
-
-So my suggestion is to use skb_set_owner_sk_safe() for now, unless I
-missed something about why to use skb_set_owner_w/skb_set_owner_r.
+>  };
+>  
+>  /*
+> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> index 07d37ff88a3f..44b84fbdde0d 100644
+> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
+> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> @@ -82,6 +82,7 @@ static inline void __activate_traps_common(struct kvm_vcpu *vcpu)
+>  	 */
+>  	if (kvm_arm_support_pmu_v3()) {
+>  		write_sysreg(0, pmselr_el0);
+> +		vcpu->arch.host_pmuserenr_el0 = read_sysreg(pmuserenr_el0);
+>  		write_sysreg(ARMV8_PMU_USERENR_MASK, pmuserenr_el0);
+>  	}
+>  
+> @@ -106,7 +107,7 @@ static inline void __deactivate_traps_common(struct kvm_vcpu *vcpu)
+>  
+>  	write_sysreg(0, hstr_el2);
+>  	if (kvm_arm_support_pmu_v3())
+> -		write_sysreg(0, pmuserenr_el0);
+> +		write_sysreg(vcpu->arch.host_pmuserenr_el0, pmuserenr_el0);
+>  
+>  	if (cpus_have_final_cap(ARM64_SME)) {
+>  		sysreg_clear_set_s(SYS_HFGRTR_EL2, 0,
 
 Thanks,
-Stefano
 
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
