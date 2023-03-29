@@ -2,182 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A130F6CD161
-	for <lists+kvm@lfdr.de>; Wed, 29 Mar 2023 07:01:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 349696CD163
+	for <lists+kvm@lfdr.de>; Wed, 29 Mar 2023 07:02:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229549AbjC2FBQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 Mar 2023 01:01:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44458 "EHLO
+        id S229618AbjC2FCW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 Mar 2023 01:02:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45022 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229456AbjC2FBP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 29 Mar 2023 01:01:15 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DCC02273E
-        for <kvm@vger.kernel.org>; Tue, 28 Mar 2023 22:00:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1680066021;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=We+AZVUP/d8CpVL/j63W3UR9arAJANgsuPfOHKpyQb4=;
-        b=NR5ayrsHr6+CBr5SkwmO0Sy5dhkQlGntZAl5BtviSnB2h8rIFyb2qSkok7mYtiveoL4PVa
-        I+ue2TeIzw3T1jHGA2O6KdpcM+XcAeXuHJwGJ/yMh8PpmfSZy9jZlOat47kH5aX+sCii3F
-        Xsx/Xyacyt6PLkzal5f2DNJaQU5M9rg=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-653-_MErfbT9OuyQqiZ0d4_F-g-1; Wed, 29 Mar 2023 01:00:19 -0400
-X-MC-Unique: _MErfbT9OuyQqiZ0d4_F-g-1
-Received: by mail-wm1-f71.google.com with SMTP id iv10-20020a05600c548a00b003ee112e6df1so7504632wmb.2
-        for <kvm@vger.kernel.org>; Tue, 28 Mar 2023 22:00:19 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680066018;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=We+AZVUP/d8CpVL/j63W3UR9arAJANgsuPfOHKpyQb4=;
-        b=kkQyyAWX64TA0mjtqRuaGZOk+wyikVc/pg3n13Y01C7E+MNNDA7fTQe+ubk1xurnzh
-         qejWGkWyOBPFOUSQmeOTCPkhE4pFh6FqN4/oiRzF7z2oJ8TrpdZq/ElFY4HBs1lAgWsI
-         YrDTQlasaIDD8Xc8Utvytlgdh332jrnYCnQN+pTL+0q4mz+48mkCiDMcGpMvc7bIRQo1
-         UGBzruFeweWXNTMamD6gCH9tY3d48pn46u/ugug/glTS4O3zD9589NjJKxHeO++2Cg82
-         mCSsVv6GZekvOvnyvtDHw/R8pJAYFv3muGWnnHY/XCn6S9vEy0YbwamPCeuqxh5G55RT
-         CJSA==
-X-Gm-Message-State: AAQBX9evWa77kjo+VnhybO1Gdn1Ul9+ryIlPEjEsUBosaSm8Prn6D3O5
-        SB8PBC985ZXrLEpTL/URjWYkfO5z5rq9MU54C+f/mZ4ReOjnH3x2oqINpk7gO0w2Rh10+Y8yAOx
-        okrOzvbrlwZGt
-X-Received: by 2002:a05:6000:7:b0:2cd:e0a8:f2dc with SMTP id h7-20020a056000000700b002cde0a8f2dcmr14955483wrx.7.1680066018334;
-        Tue, 28 Mar 2023 22:00:18 -0700 (PDT)
-X-Google-Smtp-Source: AKy350YDOk0pvKdBoYaZ8VC7rjX27v+hYK6oK1AhzIPMsliLPfZOypHN1UqK4iziIPJoino86cEe/w==
-X-Received: by 2002:a05:6000:7:b0:2cd:e0a8:f2dc with SMTP id h7-20020a056000000700b002cde0a8f2dcmr14955464wrx.7.1680066017945;
-        Tue, 28 Mar 2023 22:00:17 -0700 (PDT)
-Received: from redhat.com ([2.52.18.165])
-        by smtp.gmail.com with ESMTPSA id e13-20020a5d4e8d000000b002ceacff44c7sm29232578wru.83.2023.03.28.22.00.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Mar 2023 22:00:17 -0700 (PDT)
-Date:   Wed, 29 Mar 2023 01:00:12 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Sam Li <faithilikerun@gmail.com>
-Cc:     qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Eric Blake <eblake@redhat.com>,
-        Markus Armbruster <armbru@redhat.com>,
-        Raphael Norwitz <raphael.norwitz@nutanix.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Hanna Reitz <hreitz@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>, dmitry.fomichev@wdc.com,
-        kvm@vger.kernel.org, damien.lemoal@opensource.wdc.com,
-        hare@suse.de, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Subject: Re: [PATCH v9 0/5] Add zoned storage emulation to virtio-blk driver
-Message-ID: <20230329005755-mutt-send-email-mst@kernel.org>
-References: <20230327144553.4315-1-faithilikerun@gmail.com>
+        with ESMTP id S229456AbjC2FCU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 29 Mar 2023 01:02:20 -0400
+Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47DDA2723
+        for <kvm@vger.kernel.org>; Tue, 28 Mar 2023 22:02:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1680066139; x=1711602139;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=r74EaM73zY5ZRtB94VXOU/R69ArxoNuVsyjq3AcjTU4=;
+  b=nM3W5EJV6Si/iEWHRyz4i9RMjsyJ2gWpcgNM75+R634ULfqxXsr4VnO0
+   0SNR3WtAnZXCbAH+ZEIvH+Vi1pCgApifYdZQyDx5luuxQSpPwAMZPMcy/
+   AZv8WGad8rI5kMyGPhnwk7XCIBWOJmUk+fNMHUzTWa+tfVx9sx0by0IY7
+   u1NdWbIvcQZcrS1avgya7pY6MOzZqjR6XbwyrbmIB6ZDlgOItawvnFmdi
+   AphpTi1PC21YDP1CZNAzVgYVDLqksvwsG6T/NkknwpSxP/cfkaYoa9qHz
+   uoo4vhDDK9FW0hZhGlKAvXQhvw4m0hKXvU9W7shUgV3qbM/9XU+ix4Hv6
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10663"; a="342368582"
+X-IronPort-AV: E=Sophos;i="5.98,299,1673942400"; 
+   d="scan'208";a="342368582"
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Mar 2023 22:02:18 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10663"; a="858337799"
+X-IronPort-AV: E=Sophos;i="5.98,299,1673942400"; 
+   d="scan'208";a="858337799"
+Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.238.2.227]) ([10.238.2.227])
+  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Mar 2023 22:02:18 -0700
+Message-ID: <f097e63d-dce2-2abd-3050-a71c09dadd13@linux.intel.com>
+Date:   Wed, 29 Mar 2023 13:02:15 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230327144553.4315-1-faithilikerun@gmail.com>
-X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.9.0
+Subject: Re: [PATCH v6 6/7] KVM: x86: Untag address when LAM applicable
+To:     kvm@vger.kernel.org, seanjc@google.com, pbonzini@redhat.com
+Cc:     chao.gao@intel.com, robert.hu@linux.intel.com
+References: <20230319084927.29607-1-binbin.wu@linux.intel.com>
+ <20230319084927.29607-7-binbin.wu@linux.intel.com>
+From:   Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <20230319084927.29607-7-binbin.wu@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.4 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Mar 27, 2023 at 10:45:48PM +0800, Sam Li wrote:
-> This patch adds zoned storage emulation to the virtio-blk driver. It
-> implements the virtio-blk ZBD support standardization that is
-> recently accepted by virtio-spec. The link to related commit is at
-> 
-> https://github.com/oasis-tcs/virtio-spec/commit/b4e8efa0fa6c8d844328090ad15db65af8d7d981
-> 
-> The Linux zoned device code that implemented by Dmitry Fomichev has been
-> released at the latest Linux version v6.3-rc1.
-> 
-> Aside: adding zoned=on alike options to virtio-blk device will be
-> considered in following-up plan.
-> 
-> Note: Sorry to send it again because of the previous incoherent patches caused
-> by network error.
 
-virtio bits look ok.
+On 3/19/2023 4:49 PM, Binbin Wu wrote:
+> Untag address for 64-bit memory/mmio operand in instruction emulations
+> and vmexit handlers when LAM is applicable.
+>
+> For instruction emulation, untag address in __linearize() before
+> canonical check. LAM doesn't apply to instruction fetch and invlpg,
+> use KVM_X86_UNTAG_ADDR_SKIP_LAM to skip LAM untag.
+>
+> For vmexit handlings related to 64-bit linear address:
+> - Cases need to untag address
+>    Operand(s) of VMX instructions and INVPCID
+>    Operand(s) of SGX ENCLS
+>    Linear address in INVVPID descriptor.
+> - Cases LAM doesn't apply to (no change needed)
+>    Operand of INVLPG
+>    Linear address in INVPCID descriptor
+>
+> Co-developed-by: Robert Hoo <robert.hu@linux.intel.com>
+> Signed-off-by: Robert Hoo <robert.hu@linux.intel.com>
+> Signed-off-by: Binbin Wu <binbin.wu@linux.intel.com>
+> ---
+>   arch/x86/kvm/emulate.c    | 25 +++++++++++++++++--------
+>   arch/x86/kvm/vmx/nested.c |  2 ++
+>   arch/x86/kvm/vmx/sgx.c    |  1 +
+>   arch/x86/kvm/x86.c        |  4 ++++
+>   4 files changed, 24 insertions(+), 8 deletions(-)
+>
+> diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
+> index a630c5db971c..c46f0162498e 100644
+> --- a/arch/x86/kvm/emulate.c
+> +++ b/arch/x86/kvm/emulate.c
+> @@ -688,7 +688,8 @@ static __always_inline int __linearize(struct x86_emulate_ctxt *ctxt,
+>   				       struct segmented_address addr,
+>   				       unsigned *max_size, unsigned size,
+>   				       bool write, bool fetch,
+> -				       enum x86emul_mode mode, ulong *linear)
+> +				       enum x86emul_mode mode, ulong *linear,
+> +				       u64 untag_flags)
+>   {
+>   	struct desc_struct desc;
+>   	bool usable;
+> @@ -701,9 +702,10 @@ static __always_inline int __linearize(struct x86_emulate_ctxt *ctxt,
+>   	*max_size = 0;
+>   	switch (mode) {
+>   	case X86EMUL_MODE_PROT64:
+> -		*linear = la;
+> +		*linear = static_call(kvm_x86_untag_addr)(ctxt->vcpu, la, untag_flags);
+> +
+>   		va_bits = ctxt_virt_addr_bits(ctxt);
+> -		if (!__is_canonical_address(la, va_bits))
+> +		if (!__is_canonical_address(*linear, va_bits))
+>   			goto bad;
 
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Find  la as a local variable, will be used later.
+This part will be updated as following to make la untagged to avoid 
+further changes:
 
-merge through block layer tree I'm guessing?
+@@ -701,6 +702,7 @@ static __always_inline int __linearize(struct 
+x86_emulate_ctxt *ctxt,
+         *max_size = 0;
+         switch (mode) {
+         case X86EMUL_MODE_PROT64:
++               la = ctxt->ops->untag_addr(ctxt, la, untag_flags);
+                 *linear = la;
+                 va_bits = ctxt_virt_addr_bits(ctxt);
+                 if (!__is_canonical_address(la, va_bits))
 
-
-> v9:
-> - address review comments
->   * add docs for zoned emulation use case [Matias]
->   * add the zoned feature bit to qmp monitor [Matias]
->   * add the version number for newly added configs of accounting [Markus]
-> 
-> v8:
-> - address Stefan's review comments
->   * rm aio_context_acquire/release in handle_req
->   * rename function return type
->   * rename BLOCK_ACCT_APPEND to BLOCK_ACCT_ZONE_APPEND for clarity
-> 
-> v7:
-> - update headers to v6.3-rc1
-> 
-> v6:
-> - address Stefan's review comments
->   * add accounting for zone append operation
->   * fix in_iov usage in handle_request, error handling and typos
-> 
-> v5:
-> - address Stefan's review comments
->   * restore the way writing zone append result to buffer
->   * fix error checking case and other errands
-> 
-> v4:
-> - change the way writing zone append request result to buffer
-> - change zone state, zone type value of virtio_blk_zone_descriptor
-> - add trace events for new zone APIs
-> 
-> v3:
-> - use qemuio_from_buffer to write status bit [Stefan]
-> - avoid using req->elem directly [Stefan]
-> - fix error checkings and memory leak [Stefan]
-> 
-> v2:
-> - change units of emulated zone op coresponding to block layer APIs
-> - modify error checking cases [Stefan, Damien]
-> 
-> v1:
-> - add zoned storage emulation
-> 
-> Sam Li (5):
->   include: update virtio_blk headers to v6.3-rc1
->   virtio-blk: add zoned storage emulation for zoned devices
->   block: add accounting for zone append operation
->   virtio-blk: add some trace events for zoned emulation
->   docs/zoned-storage:add zoned emulation use case
-> 
->  block/qapi-sysemu.c                          |  11 +
->  block/qapi.c                                 |  18 +
->  docs/devel/zoned-storage.rst                 |  17 +
->  hw/block/trace-events                        |   7 +
->  hw/block/virtio-blk-common.c                 |   2 +
->  hw/block/virtio-blk.c                        | 405 +++++++++++++++++++
->  hw/virtio/virtio-qmp.c                       |   2 +
->  include/block/accounting.h                   |   1 +
->  include/standard-headers/drm/drm_fourcc.h    |  12 +
->  include/standard-headers/linux/ethtool.h     |  48 ++-
->  include/standard-headers/linux/fuse.h        |  45 ++-
->  include/standard-headers/linux/pci_regs.h    |   1 +
->  include/standard-headers/linux/vhost_types.h |   2 +
->  include/standard-headers/linux/virtio_blk.h  | 105 +++++
->  linux-headers/asm-arm64/kvm.h                |   1 +
->  linux-headers/asm-x86/kvm.h                  |  34 +-
->  linux-headers/linux/kvm.h                    |   9 +
->  linux-headers/linux/vfio.h                   |  15 +-
->  linux-headers/linux/vhost.h                  |   8 +
->  qapi/block-core.json                         |  68 +++-
->  qapi/block.json                              |   4 +
->  21 files changed, 794 insertions(+), 21 deletions(-)
-> 
-> -- 
-> 2.39.2
 
