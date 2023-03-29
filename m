@@ -2,192 +2,376 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B60B76CF6A7
-	for <lists+kvm@lfdr.de>; Thu, 30 Mar 2023 01:00:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 815E46CF6C7
+	for <lists+kvm@lfdr.de>; Thu, 30 Mar 2023 01:17:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230355AbjC2XAX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 Mar 2023 19:00:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43942 "EHLO
+        id S229869AbjC2XR3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 Mar 2023 19:17:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52666 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229652AbjC2XAW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 29 Mar 2023 19:00:22 -0400
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2081.outbound.protection.outlook.com [40.107.237.81])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC29D4699;
-        Wed, 29 Mar 2023 16:00:20 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=NDF5hj8BDGMD4qxIh985mwaV/AH5sy9XS7UG48Ey3Sf4GgaINL+hztWMJII1g2higdWH6eoCS1TkBmRi6WRzx0SOV69r3mCNx1dF8yWMU0N1qhn7ERlgkXx3bUUncIrytsPH0GstKu/+WtzniaNFyp4q6RwS7tWsdijRtjM538ZXHpkjZVjUR4DdV/8kd/cEgwC2NlKhWObjwPB+rvuM9Wfqc399/qmpjtHVUKPFJ1ISw+vxIfTjNinkfvo/5xiZElpvsNc+rKJkveIT1eUus0l+ncdczf1oYapSbga51YOzLU778GKGRhOEp6tkTb9+CcWZZXgNEPloMiCat9GeJQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=F65i/CnmezvIfKePWCnnkLjIp+bYiExkhS6ySO1ya+M=;
- b=G/BIQHVHu16TUvTOHERBJD0cNDjgTbNkzJUtsIdc8C4gLOQfeJJ0wn3ITqWAM7JkKSdikjUzXQcmGOksmQNXYKReGHQo02rJY4m8zzR3UEfIk8VLAHi9J3c1HmJ7PxkVYbk+SvWlkFt3/1Qw+gs+QG/c2+tCOuG9JWhiSoT2Lw+RLUZeL3jSSmNN5oHWVzwqcySUD//a2VEyfod8KzjGLZFCtnRVCXZY6gHlg2j5RcqE1Z3AavQeg/JSfq3tiNnjJ3QXyJ4MGxFWjh+dcuQKEkS/yUM8S9jRSzY3kC/a7LQuzSI8i5dKznNiKfjgCnV6KUWWhfN+nzYIjG+7ARaX3g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=suse.cz smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=F65i/CnmezvIfKePWCnnkLjIp+bYiExkhS6ySO1ya+M=;
- b=fbek3/RGpoHnVnJ0SrKVy2bxepOxiHlSPYjOG/EghObYfHS+XmLajG78U9JksX/E3eQOFe7UvPpcxCfuNmBYAgd+MdIM3lXlTJViYCUAiCIWysAoojToIah+ospKCq7HjVI7lqVcvcE25CozFM6PDS7U2xacQtvXwFr4pS5BVvs=
-Received: from DM6PR06CA0012.namprd06.prod.outlook.com (2603:10b6:5:120::25)
- by SN7PR12MB8434.namprd12.prod.outlook.com (2603:10b6:806:2e6::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6178.41; Wed, 29 Mar
- 2023 23:00:18 +0000
-Received: from DM6NAM11FT054.eop-nam11.prod.protection.outlook.com
- (2603:10b6:5:120:cafe::73) by DM6PR06CA0012.outlook.office365.com
- (2603:10b6:5:120::25) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6254.20 via Frontend
- Transport; Wed, 29 Mar 2023 23:00:17 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- DM6NAM11FT054.mail.protection.outlook.com (10.13.173.95) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.6222.22 via Frontend Transport; Wed, 29 Mar 2023 23:00:17 +0000
-Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Wed, 29 Mar
- 2023 18:00:16 -0500
-Date:   Wed, 29 Mar 2023 17:59:58 -0500
-From:   Michael Roth <michael.roth@amd.com>
-To:     Vlastimil Babka <vbabka@suse.cz>
-CC:     <kvm@vger.kernel.org>, <linux-coco@lists.linux.dev>,
-        <linux-mm@kvack.org>, <linux-crypto@vger.kernel.org>,
-        <x86@kernel.org>, <linux-kernel@vger.kernel.org>,
-        <tglx@linutronix.de>, <mingo@redhat.com>, <jroedel@suse.de>,
-        <thomas.lendacky@amd.com>, <hpa@zytor.com>, <ardb@kernel.org>,
-        <pbonzini@redhat.com>, <seanjc@google.com>, <vkuznets@redhat.com>,
-        <jmattson@google.com>, <luto@kernel.org>,
-        <dave.hansen@linux.intel.com>, <slp@redhat.com>,
-        <pgonda@google.com>, <peterz@infradead.org>,
-        <srinivas.pandruvada@linux.intel.com>, <rientjes@google.com>,
-        <dovmurik@linux.ibm.com>, <tobin@ibm.com>, <bp@alien8.de>,
-        <kirill@shutemov.name>, <ak@linux.intel.com>,
-        <tony.luck@intel.com>, <marcorr@google.com>,
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        <alpergun@google.com>, <dgilbert@redhat.com>, <jarkko@kernel.org>,
-        <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>,
-        Brijesh Singh <brijesh.singh@amd.com>
-Subject: Re: [PATCH RFC v8 12/56] x86/sev: Add RMP entry lookup helpers
-Message-ID: <20230329225958.4s3nwcqyjwzydwsf@amd.com>
-References: <20230220183847.59159-1-michael.roth@amd.com>
- <20230220183847.59159-13-michael.roth@amd.com>
- <b48ad925-eff0-8421-730a-6da13bf93ab6@suse.cz>
+        with ESMTP id S229525AbjC2XR1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 29 Mar 2023 19:17:27 -0400
+Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 305B055A3;
+        Wed, 29 Mar 2023 16:17:25 -0700 (PDT)
+Received: by mail-pj1-x102d.google.com with SMTP id l9-20020a17090a3f0900b0023d32684e7fso4802020pjc.1;
+        Wed, 29 Mar 2023 16:17:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112; t=1680131844;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=HudZuGPc7Nc3ie2KaSEypjt1nT+Q1pzjGNODaR9GZ9w=;
+        b=hmGmAGWiG6uVQ/NncB1GQujdOZ2T2X0x8ptijQ7uIh9NiJm9uOrl7Gkj+xn8Jo2xmL
+         iSQaEMWt1olNmtMau8ZT3Rxt1YkUUBq5KXdC1Knke5guq0M/qk4rnSucxzRfG2UxYRM/
+         xnx73UZ9aByejlC7yz1semcVKy6pa/3HqlPz2ojSpZUxdPFl6YvkO366h89RZJLWt7bI
+         AzURhY+fbhPUXET+uUb+51jHBFLI5ilpw48SWBGg01DBwQsnfBArSKF+AeP3xpw6l9cw
+         q27gmxNBNtixeY45K02L1kLnNWqDZFi3mFRvCAT6bCJfW876m4LWCjVOEnBRzNPQxhIy
+         s0NA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1680131844;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=HudZuGPc7Nc3ie2KaSEypjt1nT+Q1pzjGNODaR9GZ9w=;
+        b=LXyor97e4a8QY9KKxfelCUP0xJj7Cad+48HwMrXAKSg64IIZkkQfWRWhZ+LG8smk5G
+         KzNy/mG/FQBFZSSAlGGhWdifasKnI4jc4R9C6fQ6Ll7avj9OU9GJWhNaPpeqkP37bOWu
+         iRj2GGZM9KmDdnVIwWzrvG7Y6KWYorHiRs7GCLctfxjsrNQViydx7Z1kTjZCO7BMivH4
+         WSMKHatE7CeCr92bj/4HwxmyUcs8jM5qPX80CNRVotx2t3Wz8O3Hn+VhlLme5KhbH5ei
+         ImRhbGUMgm63Dh9vVNGZ9yQUbEe313fA3tC8yyrzyBemXKlH6iOTnX5rk1MqdXJjbzFo
+         HoZA==
+X-Gm-Message-State: AAQBX9cNFmAj5/3S22qw8hNuP2vEGKWd4SHTEEgZLIpia2BMJXvohpl7
+        DB1rwipo8mOSBh/VxTJFYW8=
+X-Google-Smtp-Source: AKy350YIZo1WXbOyOcwwkRwe3p+NVMDKtEAq5FvI4gJ4UjeosUA3wJH7IVbBLHKHPGv1dp96aVQVBw==
+X-Received: by 2002:a17:902:e54c:b0:1a0:65ae:df18 with SMTP id n12-20020a170902e54c00b001a065aedf18mr22468289plf.55.1680131844349;
+        Wed, 29 Mar 2023 16:17:24 -0700 (PDT)
+Received: from localhost ([192.55.54.55])
+        by smtp.gmail.com with ESMTPSA id c24-20020a170902849800b0019f27fd7cecsm23526071plo.197.2023.03.29.16.17.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 29 Mar 2023 16:17:23 -0700 (PDT)
+Date:   Wed, 29 Mar 2023 16:17:22 -0700
+From:   Isaku Yamahata <isaku.yamahata@gmail.com>
+To:     Zhi Wang <zhi.wang.linux@gmail.com>
+Cc:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com,
+        Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com,
+        Sean Christopherson <seanjc@google.com>,
+        Sagi Shahar <sagis@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Kai Huang <kai.huang@intel.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Subject: Re: [PATCH v13 016/113] KVM: TDX: x86: Add ioctl to get TDX
+ systemwide parameters
+Message-ID: <20230329231722.GA1108448@ls.amr.corp.intel.com>
+References: <cover.1678643051.git.isaku.yamahata@intel.com>
+ <cb0ae8b4941aaa45e1e5856dde644f9b2f53d9a6.1678643052.git.isaku.yamahata@intel.com>
+ <20230325104306.00004585@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <b48ad925-eff0-8421-730a-6da13bf93ab6@suse.cz>
-X-Originating-IP: [10.180.168.240]
-X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6NAM11FT054:EE_|SN7PR12MB8434:EE_
-X-MS-Office365-Filtering-Correlation-Id: 386e2420-2963-4438-c419-08db30a95d40
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 8+uw6rUbm+26o3aAn9ppZfmNfSIoOrNoLwa5+GtFs6ghcG7NMHOaIeJA/+TzRSQQl9NEcbZjvYZLQRka6G3jOBNmON7xkjaXFOo/YmouydAZ3291KdPWG9GePxSHSOqlA4Q65AwXqhvCoKWoo2EPxa9DgJ8RYGwRluZOH3iFV1NyVlTEHmcWnCS/K5NbO0VertEhJwl88/BOTlpzzloFiHIohMm5UkZTnFCTZX9QVYzr1wC+sKxYo7R8ECxcgOE6xJJvK58AtZsAiSTnSYjq/gwngZf7Drmk03yswHMKnmDnO8u8SiqhkVePGtZJNqld15PvaBPb/lBbVM367AvUxaCETjjBmlTKIydKMa1vQfFUr7Zpjdb4RZzS/vhKuPKTvcb3yPEdKEWMWsYw/brDifnzNkyGnBcTu6cueP5hvRIVL3umv68tUUGbhobBchkehSoB8xnC2aUkKRg/ZiQD6jf4pUSjf2y+zx8TEYHp6P7BJ5KW6p3RNxQtyAXPnvL4MZ3zeMsK3TSozOGQmOVmDgJ5mg53PLAFnqvog8/D4fUNeib6J81QfQeOLJ0xK3ejJgzZik8rzZBxq7kvjOZHYVM6zluCzWoAyl1rFwj0O7v9DfO3G0cc8Bb9KijKJ37Z02j9RFQlO+QDNi9v/RIP05YQOwoeNjK920p93YOpJ9dqO8Jbkle9gCIF2bK3YKCZk9RJ8EfYQ2XMt484QWoH09tQ1ewPXN4twTau1qV8szwX2wf66p9rJAXeEcbJrxak
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230028)(4636009)(346002)(376002)(39860400002)(396003)(136003)(451199021)(40470700004)(46966006)(36840700001)(5660300002)(7416002)(7406005)(8936002)(6916009)(70586007)(70206006)(316002)(41300700001)(40480700001)(8676002)(54906003)(81166007)(426003)(66899021)(2616005)(2906002)(336012)(4326008)(82740400003)(36860700001)(44832011)(478600001)(40460700003)(356005)(47076005)(36756003)(16526019)(6666004)(82310400005)(966005)(186003)(83380400001)(86362001)(53546011)(1076003)(26005)(36900700001)(309714004);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Mar 2023 23:00:17.4407
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 386e2420-2963-4438-c419-08db30a95d40
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT054.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB8434
+In-Reply-To: <20230325104306.00004585@gmail.com>
 X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
-        DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+        DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Mar 03, 2023 at 04:28:39PM +0100, Vlastimil Babka wrote:
-> On 2/20/23 19:38, Michael Roth wrote:
-> > From: Brijesh Singh <brijesh.singh@amd.com>
-> > 
-> > The snp_lookup_page_in_rmptable() can be used by the host to read the RMP
-> > entry for a given page. The RMP entry format is documented in AMD PPR, see
-> > https://bugzilla.kernel.org/attachment.cgi?id=296015.
-> > 
-> > Co-developed-by: Ashish Kalra <ashish.kalra@amd.com>
-> > Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
-> > Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> > Signed-off-by: Michael Roth <michael.roth@amd.com>
-> > ---
+On Sat, Mar 25, 2023 at 10:43:06AM +0200,
+Zhi Wang <zhi.wang.linux@gmail.com> wrote:
+
+> On Sun, 12 Mar 2023 10:55:40 -0700
+> isaku.yamahata@intel.com wrote:
 > 
-> > +/*
-> > + * Return 1 if the RMP entry is assigned, 0 if it exists but is not assigned,
-> > + * and -errno if there is no corresponding RMP entry.
-> > + */
+> Does this have to be a new generic ioctl with a dedicated new x86_ops? SNP
+> does not use it at all and all the system-scoped ioctl of SNP going through
+> the CCP driver. So getting system-scope information of TDX/SNP will end up
+> differently.
 > 
-> Hmm IMHO the kernel's idiomatic way is to return 0 on "success" and I'd
-> assume the more intuitive expectation of success here if the entry is
-> assigned?
+> Any thought, Sean? Moving getting SNP system-wide information to
+> KVM dev ioctl seems not ideal and TDX does not have a dedicated driver like
+> CCP. Maybe make this ioctl TDX-specific? KVM_TDX_DEV_OP?
 
-In general I'd agree. Here's it's a little awkward though.
-snp_lookup_rmpentry() sort of wants to be a bool, where true indicates
-an assigned entry was found, false indicates no assigned entry.
+We only need global parameters of the TDX module, and we don't interact with TDX
+module at this point.  One alternative is to export those parameters via sysfs.
+Also the existence of the sysfs node indicates that the TDX module is
+loaded(initialized?) or not in addition to boot log.  Thus we can drop system
+scope one.
+What do you think?
 
-But it also has to deal with error values, so the most direct way to
-encapsulate that is true == 1, false == 0, and < 0 for errors.
-
-Inverting it to align more with kernel expections of 0 == success/true
-gets awkward too, because stuff like:
-
-  if (snp_lookup_rmpentry(...))
-    //error
-
-still doesn't work the way most other functions written in this way
-would since it could still be "successful" if we were expecting PFN to
-be in shared state. So the return value needs special handling there
-too.
-
-Would it make sense to define it something like this?:
-
-  /*
-   * Query information about the RMP entry corresponding to the given
-   * PFN.
-   * 
-   * Returns 0 on success, and -errno if there was a problem accessing
-   * the RMP entry.
-   */
-  int snp_lookup_rmpentry(u64 pfn, int *level, bool *assigned)
-
-> The various callers seem to differ though so I guess it depends on
-> context. Some however don't distinguish their "failure" from an ERR and
-> maybe they should, at least for the purposes of the various printks?
-
-Yes, regardless of what we decide above, the call-sites should properly
-distinguish between failure/assigned/not-assigned and report the
-information accordingly. I'll get those fixed up where needed.
+Regarding to other TDX KVM specific ioctls (KVM_TDX_INIT_VM, KVM_TDX_INIT_VCPU,
+KVM_TDX_INIT_MEM_REGION, and KVM_TDX_FINALIZE_VM), they are specific to KVM.  So
+I don't think it can be split out to independent driver.
 
 Thanks,
 
--Mike
-
-> 
-> > +int snp_lookup_rmpentry(u64 pfn, int *level)
+> > From: Sean Christopherson <sean.j.christopherson@intel.com>
+> > 
+> > Implement a system-scoped ioctl to get system-wide parameters for TDX.
+> > 
+> > Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> > Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> > ---
+> >  arch/x86/include/asm/kvm-x86-ops.h    |  1 +
+> >  arch/x86/include/asm/kvm_host.h       |  1 +
+> >  arch/x86/include/uapi/asm/kvm.h       | 48 +++++++++++++++++++++++++
+> >  arch/x86/kvm/vmx/main.c               |  2 ++
+> >  arch/x86/kvm/vmx/tdx.c                | 51 +++++++++++++++++++++++++++
+> >  arch/x86/kvm/vmx/x86_ops.h            |  2 ++
+> >  arch/x86/kvm/x86.c                    |  6 ++++
+> >  tools/arch/x86/include/uapi/asm/kvm.h | 48 +++++++++++++++++++++++++
+> >  8 files changed, 159 insertions(+)
+> > 
+> > diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
+> > index eac4b65d1b01..b46dcac078b2 100644
+> > --- a/arch/x86/include/asm/kvm-x86-ops.h
+> > +++ b/arch/x86/include/asm/kvm-x86-ops.h
+> > @@ -117,6 +117,7 @@ KVM_X86_OP(enter_smm)
+> >  KVM_X86_OP(leave_smm)
+> >  KVM_X86_OP(enable_smi_window)
+> >  #endif
+> > +KVM_X86_OP_OPTIONAL(dev_mem_enc_ioctl)
+> >  KVM_X86_OP_OPTIONAL(mem_enc_ioctl)
+> >  KVM_X86_OP_OPTIONAL(mem_enc_register_region)
+> >  KVM_X86_OP_OPTIONAL(mem_enc_unregister_region)
+> > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> > index 00c25f6ab871..49e3ca89aced 100644
+> > --- a/arch/x86/include/asm/kvm_host.h
+> > +++ b/arch/x86/include/asm/kvm_host.h
+> > @@ -1719,6 +1719,7 @@ struct kvm_x86_ops {
+> >  	void (*enable_smi_window)(struct kvm_vcpu *vcpu);
+> >  #endif
+> >  
+> > +	int (*dev_mem_enc_ioctl)(void __user *argp);
+> >  	int (*mem_enc_ioctl)(struct kvm *kvm, void __user *argp);
+> >  	int (*mem_enc_register_region)(struct kvm *kvm, struct kvm_enc_region *argp);
+> >  	int (*mem_enc_unregister_region)(struct kvm *kvm, struct kvm_enc_region *argp);
+> > diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
+> > index 6afbfbb32d56..af4c5bd0af1c 100644
+> > --- a/arch/x86/include/uapi/asm/kvm.h
+> > +++ b/arch/x86/include/uapi/asm/kvm.h
+> > @@ -562,4 +562,52 @@ struct kvm_pmu_event_filter {
+> >  #define KVM_X86_DEFAULT_VM	0
+> >  #define KVM_X86_PROTECTED_VM	1
+> >  
+> > +/* Trust Domain eXtension sub-ioctl() commands. */
+> > +enum kvm_tdx_cmd_id {
+> > +	KVM_TDX_CAPABILITIES = 0,
+> > +
+> > +	KVM_TDX_CMD_NR_MAX,
+> > +};
+> > +
+> > +struct kvm_tdx_cmd {
+> > +	/* enum kvm_tdx_cmd_id */
+> > +	__u32 id;
+> > +	/* flags for sub-commend. If sub-command doesn't use this, set zero. */
+> > +	__u32 flags;
+> > +	/*
+> > +	 * data for each sub-command. An immediate or a pointer to the actual
+> > +	 * data in process virtual address.  If sub-command doesn't use it,
+> > +	 * set zero.
+> > +	 */
+> > +	__u64 data;
+> > +	/*
+> > +	 * Auxiliary error code.  The sub-command may return TDX SEAMCALL
+> > +	 * status code in addition to -Exxx.
+> > +	 * Defined for consistency with struct kvm_sev_cmd.
+> > +	 */
+> > +	__u64 error;
+> > +	/* Reserved: Defined for consistency with struct kvm_sev_cmd. */
+> > +	__u64 unused;
+> > +};
+> > +
+> > +struct kvm_tdx_cpuid_config {
+> > +	__u32 leaf;
+> > +	__u32 sub_leaf;
+> > +	__u32 eax;
+> > +	__u32 ebx;
+> > +	__u32 ecx;
+> > +	__u32 edx;
+> > +};
+> > +
+> > +struct kvm_tdx_capabilities {
+> > +	__u64 attrs_fixed0;
+> > +	__u64 attrs_fixed1;
+> > +	__u64 xfam_fixed0;
+> > +	__u64 xfam_fixed1;
+> > +
+> > +	__u32 nr_cpuid_configs;
+> > +	__u32 padding;
+> > +	struct kvm_tdx_cpuid_config cpuid_configs[0];
+> > +};
+> > +
+> >  #endif /* _ASM_X86_KVM_H */
+> > diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
+> > index c8548004802a..6a5d0c7a2950 100644
+> > --- a/arch/x86/kvm/vmx/main.c
+> > +++ b/arch/x86/kvm/vmx/main.c
+> > @@ -201,6 +201,8 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
+> >  	.complete_emulated_msr = kvm_complete_insn_gp,
+> >  
+> >  	.vcpu_deliver_sipi_vector = kvm_vcpu_deliver_sipi_vector,
+> > +
+> > +	.dev_mem_enc_ioctl = tdx_dev_ioctl,
+> >  };
+> >  
+> >  struct kvm_x86_init_ops vt_init_ops __initdata = {
+> > diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+> > index e9b7aa5654e9..b59d3081d061 100644
+> > --- a/arch/x86/kvm/vmx/tdx.c
+> > +++ b/arch/x86/kvm/vmx/tdx.c
+> > @@ -21,6 +21,57 @@ int tdx_hardware_enable(void)
+> >  	return tdx_cpu_enable();
+> >  }
+> >  
+> > +int tdx_dev_ioctl(void __user *argp)
 > > +{
-> > +	struct rmpentry *e;
+> > +	struct kvm_tdx_capabilities __user *user_caps;
+> > +	const struct tdsysinfo_struct *tdsysinfo;
+> > +	struct kvm_tdx_capabilities caps;
+> > +	struct kvm_tdx_cmd cmd;
 > > +
-> > +	e = __snp_lookup_rmpentry(pfn, level);
-> > +	if (IS_ERR(e))
-> > +		return PTR_ERR(e);
+> > +	BUILD_BUG_ON(sizeof(struct kvm_tdx_cpuid_config) !=
+> > +		     sizeof(struct tdx_cpuid_config));
 > > +
-> > +	return !!rmpentry_assigned(e);
+> > +	if (copy_from_user(&cmd, argp, sizeof(cmd)))
+> > +		return -EFAULT;
+> > +	if (cmd.flags || cmd.error || cmd.unused)
+> > +		return -EINVAL;
+> > +	/*
+> > +	 * Currently only KVM_TDX_CAPABILITIES is defined for system-scoped
+> > +	 * mem_enc_ioctl().
+> > +	 */
+> > +	if (cmd.id != KVM_TDX_CAPABILITIES)
+> > +		return -EINVAL;
+> > +
+> > +	tdsysinfo = tdx_get_sysinfo();
+> > +	if (!tdsysinfo)
+> > +		return -ENOTSUPP;
+> > +
+> > +	user_caps = (void __user *)cmd.data;
+> > +	if (copy_from_user(&caps, user_caps, sizeof(caps)))
+> > +		return -EFAULT;
+> > +
+> > +	if (caps.nr_cpuid_configs < tdsysinfo->num_cpuid_config)
+> > +		return -E2BIG;
+> > +
+> > +	caps = (struct kvm_tdx_capabilities) {
+> > +		.attrs_fixed0 = tdsysinfo->attributes_fixed0,
+> > +		.attrs_fixed1 = tdsysinfo->attributes_fixed1,
+> > +		.xfam_fixed0 = tdsysinfo->xfam_fixed0,
+> > +		.xfam_fixed1 = tdsysinfo->xfam_fixed1,
+> > +		.nr_cpuid_configs = tdsysinfo->num_cpuid_config,
+> > +		.padding = 0,
+> > +	};
+> > +
+> > +	if (copy_to_user(user_caps, &caps, sizeof(caps)))
+> > +		return -EFAULT;
+> > +	if (copy_to_user(user_caps->cpuid_configs, &tdsysinfo->cpuid_configs,
+> > +			 tdsysinfo->num_cpuid_config *
+> > +			 sizeof(struct tdx_cpuid_config)))
+> > +		return -EFAULT;
+> > +
+> > +	return 0;
 > > +}
-> > +EXPORT_SYMBOL_GPL(snp_lookup_rmpentry);
+> > +
+> >  static int __init tdx_module_setup(void)
+> >  {
+> >  	const struct tdsysinfo_struct *tdsysinfo;
+> > diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
+> > index b2c74c1b5bbd..78c5537e23a1 100644
+> > --- a/arch/x86/kvm/vmx/x86_ops.h
+> > +++ b/arch/x86/kvm/vmx/x86_ops.h
+> > @@ -141,10 +141,12 @@ void vmx_setup_mce(struct kvm_vcpu *vcpu);
+> >  int __init tdx_hardware_setup(struct kvm_x86_ops *x86_ops);
+> >  int tdx_hardware_enable(void);
+> >  bool tdx_is_vm_type_supported(unsigned long type);
+> > +int tdx_dev_ioctl(void __user *argp);
+> >  #else
+> >  static inline int tdx_hardware_setup(struct kvm_x86_ops *x86_ops) { return -ENOSYS; }
+> >  static inline int tdx_hardware_enable(void) { return -EOPNOTSUPP; }
+> >  static inline bool tdx_is_vm_type_supported(unsigned long type) { return false; }
+> > +static inline int tdx_dev_ioctl(void __user *argp) { return -EOPNOTSUPP; };
+> >  #endif
+> >  
+> >  #endif /* __KVM_X86_VMX_X86_OPS_H */
+> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> > index 27ab684f8374..a3dc32e33aca 100644
+> > --- a/arch/x86/kvm/x86.c
+> > +++ b/arch/x86/kvm/x86.c
+> > @@ -4718,6 +4718,12 @@ long kvm_arch_dev_ioctl(struct file *filp,
+> >  		r = kvm_x86_dev_has_attr(&attr);
+> >  		break;
+> >  	}
+> > +	case KVM_MEMORY_ENCRYPT_OP:
+> > +		r = -EINVAL;
+> > +		if (!kvm_x86_ops.dev_mem_enc_ioctl)
+> > +			goto out;
+> > +		r = static_call(kvm_x86_dev_mem_enc_ioctl)(argp);
+> > +		break;
+> >  	default:
+> >  		r = -EINVAL;
+> >  		break;
+> > diff --git a/tools/arch/x86/include/uapi/asm/kvm.h b/tools/arch/x86/include/uapi/asm/kvm.h
+> > index 6afbfbb32d56..af4c5bd0af1c 100644
+> > --- a/tools/arch/x86/include/uapi/asm/kvm.h
+> > +++ b/tools/arch/x86/include/uapi/asm/kvm.h
+> > @@ -562,4 +562,52 @@ struct kvm_pmu_event_filter {
+> >  #define KVM_X86_DEFAULT_VM	0
+> >  #define KVM_X86_PROTECTED_VM	1
+> >  
+> > +/* Trust Domain eXtension sub-ioctl() commands. */
+> > +enum kvm_tdx_cmd_id {
+> > +	KVM_TDX_CAPABILITIES = 0,
+> > +
+> > +	KVM_TDX_CMD_NR_MAX,
+> > +};
+> > +
+> > +struct kvm_tdx_cmd {
+> > +	/* enum kvm_tdx_cmd_id */
+> > +	__u32 id;
+> > +	/* flags for sub-commend. If sub-command doesn't use this, set zero. */
+> > +	__u32 flags;
+> > +	/*
+> > +	 * data for each sub-command. An immediate or a pointer to the actual
+> > +	 * data in process virtual address.  If sub-command doesn't use it,
+> > +	 * set zero.
+> > +	 */
+> > +	__u64 data;
+> > +	/*
+> > +	 * Auxiliary error code.  The sub-command may return TDX SEAMCALL
+> > +	 * status code in addition to -Exxx.
+> > +	 * Defined for consistency with struct kvm_sev_cmd.
+> > +	 */
+> > +	__u64 error;
+> > +	/* Reserved: Defined for consistency with struct kvm_sev_cmd. */
+> > +	__u64 unused;
+> > +};
+> > +
+> > +struct kvm_tdx_cpuid_config {
+> > +	__u32 leaf;
+> > +	__u32 sub_leaf;
+> > +	__u32 eax;
+> > +	__u32 ebx;
+> > +	__u32 ecx;
+> > +	__u32 edx;
+> > +};
+> > +
+> > +struct kvm_tdx_capabilities {
+> > +	__u64 attrs_fixed0;
+> > +	__u64 attrs_fixed1;
+> > +	__u64 xfam_fixed0;
+> > +	__u64 xfam_fixed1;
+> > +
+> > +	__u32 nr_cpuid_configs;
+> > +	__u32 padding;
+> > +	struct kvm_tdx_cpuid_config cpuid_configs[0];
+> > +};
+> > +
+> >  #endif /* _ASM_X86_KVM_H */
 > 
+
+-- 
+Isaku Yamahata <isaku.yamahata@gmail.com>
