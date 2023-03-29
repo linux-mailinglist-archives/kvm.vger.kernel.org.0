@@ -2,48 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E10766CF39A
-	for <lists+kvm@lfdr.de>; Wed, 29 Mar 2023 21:49:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 03D266CF3D6
+	for <lists+kvm@lfdr.de>; Wed, 29 Mar 2023 21:58:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229590AbjC2Ttc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 Mar 2023 15:49:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57582 "EHLO
+        id S229485AbjC2T6K (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 Mar 2023 15:58:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49754 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229555AbjC2Tt2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 29 Mar 2023 15:49:28 -0400
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on20620.outbound.protection.outlook.com [IPv6:2a01:111:f400:fe5a::620])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C7F899;
-        Wed, 29 Mar 2023 12:48:56 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=jh+IpcJGqKU37Fnqc0hPEG570RfzN0sVxfhoF3Q+MohQiTv7LKO/ahUoOcAS5QAHSnvJLJ/E19mo5cuCRj3NZyXgWEy6+5QdFuBlI0ZMELBclc8ryib1h99GeERfG/3OHlwltD+ENeyQoQXaxEkwPiUvL4eKmeZf5QiNTpXkROnxTYpJPdKyZjf1Lty3db1ewi155WaF1yKzF5mQ/3oTLF9aB5tzEriZuILwzYnl7Apv64YyVT8pR02K5GXObz3Lnu/aBsfsrORCaW/2tO0dI79loCIdjtLk7uI++mMiHwJ3yIgO1G/oyCCWXURztugQrN/S6L/NHarWWSQ9HBRvbA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=L/kCZ5yay1aMzcm+rEAw/fnnpkEhvQxypgSwexGJacA=;
- b=EK4gl6+mcfrF5WfGsQKzlBSe4JDyVp/SW4TX8FadmeX1iM5FpfkJVKOraE1SpdxLc7lRiO8EDNQKnFySD5nAx3EmBxotXJatzaks1Ybr5DzCJLtPTY5TX+05VOA3QrNiDUcQev8Zv6UcrX2MdLVdS7l/ChdDuLok2ia4VX5EDBfCaBpnuP8qn3mS4QNT/P8JBSaZCJe8r4dXUbORAjEJ596fJSDT7QEtE6yECd/LNVMUPGfYfZahvg9An4gL/+O7+gsKN6883a16lcfiWL5zh7TtuQbjXUwWmcdP+xkaGSZpUzHgnrtf5wV0iy4402V1SKYY9k3Ty7e9FAMCuMLbXQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=L/kCZ5yay1aMzcm+rEAw/fnnpkEhvQxypgSwexGJacA=;
- b=NK/SBPN8wCS2BkmLulOoryLeiiLZvSN9YiOsFFXrR+gsSF0REHOBlZ8ZKF8s2Z2/1ir5HExacBBw2BkUL5xIR9HTsFE6xklb/CqaHrpY0xnPR461Dfi5kbi48hQHteJkASc8t81YSgxqwVqnSDW/U1y+EuMdt/hq2xHq7BgvT6lVsmhZbrZJQAguo57+tL5CDYfE9M7XV7WS8nd3TaVMhCnlRAlCkSokBG4rOiEfEGCPljlIXPradN6j1ryGk9pfoihZhNhVl6tW2X1CrAmwCXF7J11PL9VHthDn4bygw6iHQBfNlYGVfF5zc4zHJoYNcBQqSp5VeWsULYF3cFKHJA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by MN2PR12MB4343.namprd12.prod.outlook.com (2603:10b6:208:26f::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6222.35; Wed, 29 Mar
- 2023 19:47:40 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::ef6d:fdf6:352f:efd1]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::ef6d:fdf6:352f:efd1%3]) with mapi id 15.20.6178.037; Wed, 29 Mar 2023
- 19:47:40 +0000
-Date:   Wed, 29 Mar 2023 16:47:39 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
+        with ESMTP id S229832AbjC2T6I (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 29 Mar 2023 15:58:08 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 707D983
+        for <kvm@vger.kernel.org>; Wed, 29 Mar 2023 12:57:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1680119848;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=mlzNdSqBUq7hFdpaURYUAN0/X+/m9jx/CyLubt4sDCs=;
+        b=bIgy7nIp5LwV1S5RKFReri9rr7P/D80WZtj/sI152mmL++ebainVMUlteK1SpZyA4IBfAB
+        XF2Uq6oiPcB788PC9DOTiwECaP2afj2HIjfEvku42ee/tnuvO9S67HZJpQBXi7cFJZ2aj5
+        nrIhszN/yG8sEqwyNsjyabtZ15MXFTc=
+Received: from mail-il1-f197.google.com (mail-il1-f197.google.com
+ [209.85.166.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-586-_JIOW46iPuWH5n0n3qKapA-1; Wed, 29 Mar 2023 15:57:23 -0400
+X-MC-Unique: _JIOW46iPuWH5n0n3qKapA-1
+Received: by mail-il1-f197.google.com with SMTP id o15-20020a056e02102f00b003261821bf26so5266952ilj.1
+        for <kvm@vger.kernel.org>; Wed, 29 Mar 2023 12:57:23 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1680119842;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=mlzNdSqBUq7hFdpaURYUAN0/X+/m9jx/CyLubt4sDCs=;
+        b=Gx31gQrz8qz+/QGMdDd3srJpSKZBBbVgM4k01st67HgdxXVE0oQQyVLhdDYQNiqa53
+         jL3sLpdufbRmpZMtlDnhUsca1EtizJADvxUO4Klqjp1mCWMX8yRY/u841dqJtecA7NO4
+         eHhPfilGCBhg3fgHkx5+PJYdBEgK1dKAGQc8BoASDlO4oTA9/1wkKM2JN0aL4iljsOHA
+         CbQrrcf88DfLk7d3a1sJrsmx+TKaUss1TsVvmNTKQAlCuJ4rFtdcLDNnpHoKRwySiK0w
+         ZDVV1sVyO5qHhBYoAIMXQi9LE4zme/+Omko6MOhE0FLu/kPmJ6F1eimivKh4sjhQBM4V
+         FZTw==
+X-Gm-Message-State: AAQBX9dCb+oQouGIA0Bl5BpSP+xXsjABbMqeXK/Hf8ynBGGXstnFfwzX
+        a706PXPLV4AnQ8r7YQlb7yF294qMsIkUs5rAprVWJNSxmnNOntgfxfmtPomn7futen6+vKWkTtf
+        M77RA9KM9PrjQ
+X-Received: by 2002:a92:6f04:0:b0:326:2025:84e4 with SMTP id k4-20020a926f04000000b00326202584e4mr4998904ilc.3.1680119842334;
+        Wed, 29 Mar 2023 12:57:22 -0700 (PDT)
+X-Google-Smtp-Source: AKy350aYXa0G8+E8laT0e6XCb4RulheIoXfK+T0gQxRLx9CaDoZVRLKJon6W/GPMEeYbFb3gGnwj0w==
+X-Received: by 2002:a92:6f04:0:b0:326:2025:84e4 with SMTP id k4-20020a926f04000000b00326202584e4mr4998898ilc.3.1680119841975;
+        Wed, 29 Mar 2023 12:57:21 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id q10-20020a056e020c2a00b00316e54a8287sm9583344ilg.14.2023.03.29.12.57.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 29 Mar 2023 12:57:21 -0700 (PDT)
+Date:   Wed, 29 Mar 2023 13:57:19 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
 To:     Yi Liu <yi.l.liu@intel.com>
-Cc:     alex.williamson@redhat.com, kevin.tian@intel.com, joro@8bytes.org,
+Cc:     jgg@nvidia.com, kevin.tian@intel.com, joro@8bytes.org,
         robin.murphy@arm.com, cohuck@redhat.com, eric.auger@redhat.com,
         nicolinc@nvidia.com, kvm@vger.kernel.org, mjrosato@linux.ibm.com,
         chao.p.peng@linux.intel.com, yi.y.sun@linux.intel.com,
@@ -53,105 +68,348 @@ Cc:     alex.williamson@redhat.com, kevin.tian@intel.com, joro@8bytes.org,
         intel-gfx@lists.freedesktop.org, linux-s390@vger.kernel.org,
         xudong.hao@intel.com, yan.y.zhao@intel.com, terrence.xu@intel.com,
         yanting.jiang@intel.com
-Subject: Re: [PATCH v3 0/6] vfio: Make emulated devices prepared for vfio
- device cdev
-Message-ID: <ZCSV2+LbgeWD2bPa@nvidia.com>
-References: <20230327093351.44505-1-yi.l.liu@intel.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230327093351.44505-1-yi.l.liu@intel.com>
-X-ClientProxiedBy: BL1PR13CA0092.namprd13.prod.outlook.com
- (2603:10b6:208:2b9::7) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+Subject: Re: [PATCH v8 20/24] vfio: Add cdev for vfio_device
+Message-ID: <20230329135719.22ac6c12.alex.williamson@redhat.com>
+In-Reply-To: <20230327094047.47215-21-yi.l.liu@intel.com>
+References: <20230327094047.47215-1-yi.l.liu@intel.com>
+        <20230327094047.47215-21-yi.l.liu@intel.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|MN2PR12MB4343:EE_
-X-MS-Office365-Filtering-Correlation-Id: 8f3a22b5-8f31-44b6-09fa-08db308e74c7
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: dTQYjpvwAnSJcCD0ZVAG4YUo6/r5UrRgduXxWTovA/zDOCzh5m6nt3ujgWGkn5arR8H+OALsCExnUBlUwr/WrZiO+769cPyHcrD8fghToow80t5OjT5wQ1WFsH/fieSEueoVxhgNS+/DUrOoo+KxxKF3ksnu/XiJXrpFXe6fn0/y/LQ7laSxl9Kc742MCjWJCv8Ns91iSazP3n9whNX3fF+S0Zj/F50FB8lEtNQNzdtVKpisbGd7uE5O5DL6Xyq5841Px9C4PMWatHvB9CkIf57aaMJkgLa9TPDEwszvUMX3Gup2EuQPy4exGwLug8FYzHTbTQgplStIEBx5rucQPPSlxkGxjB01W78faYCIRmVoh90m53/g5eFnICoLpB8nRDyAJZdxwREWdcpHglPtNb4i2kzco6iwzR41EmAdVYK2EfOOn0+rURYT1XMESxuRo8C7stXHmeY1HAOwALpCrj17a6/ouPIxNBZDJPAXZT0HRovgHNy5a1/OsDmRGzwZCxacdnaKy4Y2J0irBAsGUX0F4H6x/qSS7AAD4Hx1t6TRC6RAAFpnPwzIzqky0OEGUs3eL4sAoD7nAy279AuCJseBcK00vIeBB1UWB3h9+nc=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(366004)(396003)(136003)(376002)(39860400002)(346002)(451199021)(6506007)(26005)(6486002)(38100700002)(2616005)(186003)(2906002)(5660300002)(8936002)(7416002)(66556008)(6512007)(36756003)(478600001)(316002)(41300700001)(4326008)(6916009)(86362001)(8676002)(66946007)(66476007)(83380400001)(67856001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?I20oniJIKvDWoBFtpzLOdELGiuHt8wOSzXDr4+AdmB0d/A47r9UF08sdcIoE?=
- =?us-ascii?Q?VahV00brzGyK4MQLKm1f/uN0+fODaaIyl0I0uhkPvE7ynGlsMpBnoJanQTmK?=
- =?us-ascii?Q?z6yjF9zOALA30B/nWHX2upHX/uN/nq6P8Gp3vU83/hKWlWtUTs7VRRM1xfw8?=
- =?us-ascii?Q?3G8bLHGuOl7bEHqPOBk6lXP7I2oCHoq4y9nyfxMF1B82QWMEJ4G4/lVa4VEu?=
- =?us-ascii?Q?XW6FbxWgEtKsz5tTstGxVKtJgXIl2sOa5jqgYvmog07H8KxxcYi47cupxD+6?=
- =?us-ascii?Q?/Asl86itti/scyqauYw6wGiqeMKBtf0uoDGRTwJFMeFl6+KXU5XM1FCC2uq4?=
- =?us-ascii?Q?96iOVWt18XO00ai43Wo72XYZVs4aj4IsiJvInjYPqqhgU3ILO1vZGlIpdSie?=
- =?us-ascii?Q?ogEnpleiUre7q5xA0AmIf4vkHJlrFMvi1JKXerHy3OFJ26uG66tz1z2L3Ez2?=
- =?us-ascii?Q?gdqJISVblKE6dMt7aYIiiIKdlBnEzzJqE+++b5osRY5FSr4Xerx+WbKIDfy5?=
- =?us-ascii?Q?01dogWcNlkqnO8PCkZwVscA8nxa7dQhJ80v3Ka+7zWvSqOiy82kEEJOoovn/?=
- =?us-ascii?Q?w8QhYmOUmDGo56iKmTR8DbDe7p3C1Mz8VPmHJEZLCwmq5VLZ21Brrwiu06wy?=
- =?us-ascii?Q?jJX7udvSZBXfPmA729XxfI8XuJyFEr3v29D0I02liPiLORKmTPyho54aXzur?=
- =?us-ascii?Q?N7QtXXK9N58Ta2AcRdYd5vbjsv9mfUVOE94UAvzABfWg7w0l/8cSDTn4OA5K?=
- =?us-ascii?Q?7DkR5uuJTi7XmJO03qBeBPFxgrWgfKYrTOXixK4vEmEMnqn3stCDLG1SoGyM?=
- =?us-ascii?Q?Jvj09PGotFg+bOFhVJJ79gPUfTevr+LnIhKdFkuzTMLOiJgQrxZWM7H63kCp?=
- =?us-ascii?Q?d0rrobqAIZ2hELmvvFMO5i8Tj0yrEVI+8zVmeeXXfk1bZmouhsKf2xpicpDY?=
- =?us-ascii?Q?4cUQZl71qe64xOd2pj1nd/3BJXOa9JLGYSlqbctH9q5kCvEtrFAfAvyiGWsW?=
- =?us-ascii?Q?ZToDTunz5zfAvWxal8JL9XFILaLZeoV7V01LiXepWyAdnAbmrA7dEEFbZ4aQ?=
- =?us-ascii?Q?DBBAHmhKGMIeSx9doDY2H1Mi03IcAMwte8EkRaZWisY9pA/tcESHMJJJjSdT?=
- =?us-ascii?Q?LcWio2Xs+dJRrGp35cOzFiosqcy+BHujPGKBFcZq8T+1EAfq6E1o/YwcaUaN?=
- =?us-ascii?Q?ayzqj3xlYFjmw+BOQULv4Oklgh+/DBtE/xcKr81FJC5jykEtXwAj4j7QY3ZD?=
- =?us-ascii?Q?aE9eiw673b3EyEJu+7UqhZ+OCktaJvzKKQvI6xHARZP8ULlnbeJxl9r4fc13?=
- =?us-ascii?Q?1nyV3obf5dFYr+c6JW166l54Cmxz45Al519FEkiIVYbc9Khtva1xHF0pSPiR?=
- =?us-ascii?Q?reX86mjeMVc6YxPJpxu0bWTisROd65GqP4uBzYb1ddrFbwzBmE3tA2SodqlZ?=
- =?us-ascii?Q?kHvWhBWs+FmCaRVP3nZycGO+gbT6wMoh5WlVUH+2BYMtaOO4NlR6uUeJdkch?=
- =?us-ascii?Q?ovTroygHz/r3o5fFvP50lltQx5x3xeA+VXIMU6cTszC2kjKphqCYYNCX4PUx?=
- =?us-ascii?Q?zqSMgvMZDzARXuVGIz0PevjSaHLoZlez48yCpVO0?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8f3a22b5-8f31-44b6-09fa-08db308e74c7
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Mar 2023 19:47:40.8091
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: fmMspN1Sz29XW5X9QLqUBQK7/0k8DomHXsE8xg6WjLlH9IXOXClA1F4JeCgmSJPI
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB4343
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,SPF_HELO_PASS,
-        SPF_NONE autolearn=unavailable autolearn_force=no version=3.4.6
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Mar 27, 2023 at 02:33:45AM -0700, Yi Liu wrote:
-> Nicolin Chen (1):
->   iommufd: Create access in vfio_iommufd_emulated_bind()
+On Mon, 27 Mar 2023 02:40:43 -0700
+Yi Liu <yi.l.liu@intel.com> wrote:
+
+> This allows user to directly open a vfio device w/o using the legacy
+> container/group interface, as a prerequisite for supporting new iommu
+> features like nested translation.
 > 
-> Yi Liu (5):
->   iommu/iommufd: Pass iommufd_ctx pointer in iommufd_get_ioas()
->   vfio-iommufd: No need to record iommufd_ctx in vfio_device
->   vfio-iommufd: Make vfio_iommufd_emulated_bind() return iommufd_access
->     ID
->   vfio/mdev: Uses the vfio emulated iommufd ops set in the mdev sample
->     drivers
->   vfio: Check the presence for iommufd callbacks in
->     __vfio_register_dev()
+> The device fd opened in this manner doesn't have the capability to access
+> the device as the fops open() doesn't open the device until the successful
+> BIND_IOMMUFD which be added in next patch.
 > 
->  drivers/iommu/iommufd/device.c          | 55 +++++++++++++++----------
->  drivers/iommu/iommufd/ioas.c            | 14 +++----
->  drivers/iommu/iommufd/iommufd_private.h |  4 +-
->  drivers/iommu/iommufd/selftest.c        | 14 ++++---
->  drivers/iommu/iommufd/vfio_compat.c     |  2 +-
->  drivers/vfio/iommufd.c                  | 37 ++++++++---------
->  drivers/vfio/vfio_main.c                |  5 ++-
->  include/linux/iommufd.h                 |  5 ++-
->  include/linux/vfio.h                    |  1 -
->  samples/vfio-mdev/mbochs.c              |  3 ++
->  samples/vfio-mdev/mdpy.c                |  3 ++
->  samples/vfio-mdev/mtty.c                |  3 ++
->  12 files changed, 85 insertions(+), 61 deletions(-)
+> With this patch, devices registered to vfio core have both group and device
+> interface created.
+> 
+> - group interface : /dev/vfio/$groupID
+> - device interface: /dev/vfio/devices/vfioX - normal device
+> 		    /dev/vfio/devices/noiommu-vfioX - noiommu device
+> 		    ("X" is the minor number and is unique across devices)
+> 
+> Given a vfio device the user can identify the matching vfioX by checking
+> the sysfs path of the device. Take PCI device (0000:6a:01.0) for example,
+> /sys/bus/pci/devices/0000\:6a\:01.0/vfio-dev/vfio0/dev contains the
+> major:minor of the matching vfioX.
+> 
+> Userspace then opens the /dev/vfio/devices/vfioX and checks with fstat
+> that the major:minor matches.
+> 
+> The vfio_device cdev logic in this patch:
+> *) __vfio_register_dev() path ends up doing cdev_device_add() for each
+>    vfio_device if VFIO_DEVICE_CDEV configured.
+> *) vfio_unregister_group_dev() path does cdev_device_del();
+> 
+> Reviewed-by: Kevin Tian <kevin.tian@intel.com>
+> Tested-by: Terrence Xu <terrence.xu@intel.com>
+> Tested-by: Nicolin Chen <nicolinc@nvidia.com>
+> Tested-by: Matthew Rosato <mjrosato@linux.ibm.com>
+> Signed-off-by: Yi Liu <yi.l.liu@intel.com>
+> ---
+>  drivers/vfio/Kconfig       | 11 +++++++
+>  drivers/vfio/Makefile      |  1 +
+>  drivers/vfio/device_cdev.c | 62 ++++++++++++++++++++++++++++++++++++++
+>  drivers/vfio/vfio.h        | 46 ++++++++++++++++++++++++++++
+>  drivers/vfio/vfio_main.c   | 26 +++++++++++-----
+>  include/linux/vfio.h       |  4 +++
+>  6 files changed, 143 insertions(+), 7 deletions(-)
+>  create mode 100644 drivers/vfio/device_cdev.c
+> 
+> diff --git a/drivers/vfio/Kconfig b/drivers/vfio/Kconfig
+> index 89e06c981e43..e2105b4dac2d 100644
+> --- a/drivers/vfio/Kconfig
+> +++ b/drivers/vfio/Kconfig
+> @@ -12,6 +12,17 @@ menuconfig VFIO
+>  	  If you don't know what to do here, say N.
+>  
+>  if VFIO
+> +config VFIO_DEVICE_CDEV
+> +	bool "Support for the VFIO cdev /dev/vfio/devices/vfioX"
+> +	depends on IOMMUFD
+> +	help
+> +	  The VFIO device cdev is another way for userspace to get device
+> +	  access. Userspace gets device fd by opening device cdev under
+> +	  /dev/vfio/devices/vfioX, and then bind the device fd with an iommufd
+> +	  to set up secure DMA context for device access.
+> +
+> +	  If you don't know what to do here, say N.
+> +
+>  config VFIO_CONTAINER
+>  	bool "Support for the VFIO container /dev/vfio/vfio"
+>  	select VFIO_IOMMU_TYPE1 if MMU && (X86 || S390 || ARM || ARM64)
+> diff --git a/drivers/vfio/Makefile b/drivers/vfio/Makefile
+> index 70e7dcb302ef..245394aeb94b 100644
+> --- a/drivers/vfio/Makefile
+> +++ b/drivers/vfio/Makefile
+> @@ -4,6 +4,7 @@ obj-$(CONFIG_VFIO) += vfio.o
+>  vfio-y += vfio_main.o \
+>  	  group.o \
+>  	  iova_bitmap.o
+> +vfio-$(CONFIG_VFIO_DEVICE_CDEV) += device_cdev.o
+>  vfio-$(CONFIG_IOMMUFD) += iommufd.o
+>  vfio-$(CONFIG_VFIO_CONTAINER) += container.o
+>  vfio-$(CONFIG_VFIO_VIRQFD) += virqfd.o
+> diff --git a/drivers/vfio/device_cdev.c b/drivers/vfio/device_cdev.c
+> new file mode 100644
+> index 000000000000..1c640016a824
+> --- /dev/null
+> +++ b/drivers/vfio/device_cdev.c
+> @@ -0,0 +1,62 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + * Copyright (c) 2023 Intel Corporation.
+> + */
+> +#include <linux/vfio.h>
+> +
+> +#include "vfio.h"
+> +
+> +static dev_t device_devt;
+> +
+> +void vfio_init_device_cdev(struct vfio_device *device)
+> +{
+> +	device->device.devt = MKDEV(MAJOR(device_devt), device->index);
+> +	cdev_init(&device->cdev, &vfio_device_fops);
+> +	device->cdev.owner = THIS_MODULE;
+> +}
+> +
+> +/*
+> + * device access via the fd opened by this function is blocked until
+> + * .open_device() is called successfully during BIND_IOMMUFD.
+> + */
+> +int vfio_device_fops_cdev_open(struct inode *inode, struct file *filep)
+> +{
+> +	struct vfio_device *device = container_of(inode->i_cdev,
+> +						  struct vfio_device, cdev);
+> +	struct vfio_device_file *df;
+> +	int ret;
+> +
+> +	if (!vfio_device_try_get_registration(device))
+> +		return -ENODEV;
+> +
+> +	df = vfio_allocate_device_file(device);
+> +	if (IS_ERR(df)) {
+> +		ret = PTR_ERR(df);
+> +		goto err_put_registration;
+> +	}
+> +
+> +	filep->private_data = df;
+> +
+> +	return 0;
+> +
+> +err_put_registration:
+> +	vfio_device_put_registration(device);
+> +	return ret;
+> +}
+> +
+> +static char *vfio_device_devnode(const struct device *dev, umode_t *mode)
+> +{
+> +	return kasprintf(GFP_KERNEL, "vfio/devices/%s", dev_name(dev));
+> +}
+> +
+> +int vfio_cdev_init(struct class *device_class)
+> +{
+> +	device_class->devnode = vfio_device_devnode;
+> +	return alloc_chrdev_region(&device_devt, 0,
+> +				   MINORMASK + 1, "vfio-dev");
+> +}
+> +
+> +void vfio_cdev_cleanup(void)
+> +{
+> +	unregister_chrdev_region(device_devt, MINORMASK + 1);
+> +}
+> diff --git a/drivers/vfio/vfio.h b/drivers/vfio/vfio.h
+> index 41dfc9d5205a..3a8fd0e32f59 100644
+> --- a/drivers/vfio/vfio.h
+> +++ b/drivers/vfio/vfio.h
+> @@ -268,6 +268,52 @@ static inline void vfio_iommufd_unbind(struct vfio_device_file *df)
+>  }
+>  #endif
+>  
+> +#if IS_ENABLED(CONFIG_VFIO_DEVICE_CDEV)
+> +static inline int vfio_device_add(struct vfio_device *device)
+> +{
+> +	return cdev_device_add(&device->cdev, &device->device);
+> +}
+> +
+> +static inline void vfio_device_del(struct vfio_device *device)
+> +{
+> +	cdev_device_del(&device->cdev, &device->device);
+> +}
+> +
+> +void vfio_init_device_cdev(struct vfio_device *device);
+> +int vfio_device_fops_cdev_open(struct inode *inode, struct file *filep);
+> +int vfio_cdev_init(struct class *device_class);
+> +void vfio_cdev_cleanup(void);
+> +#else
+> +static inline int vfio_device_add(struct vfio_device *device)
+> +{
+> +	return device_add(&device->device);
+> +}
+> +
+> +static inline void vfio_device_del(struct vfio_device *device)
+> +{
+> +	device_del(&device->device);
+> +}
+> +
+> +static inline void vfio_init_device_cdev(struct vfio_device *device)
+> +{
+> +}
+> +
+> +static inline int vfio_device_fops_cdev_open(struct inode *inode,
+> +					     struct file *filep)
+> +{
+> +	return 0;
+> +}
+> +
+> +static inline int vfio_cdev_init(struct class *device_class)
+> +{
+> +	return 0;
+> +}
+> +
+> +static inline void vfio_cdev_cleanup(void)
+> +{
+> +}
+> +#endif /* CONFIG_VFIO_DEVICE_CDEV */
+> +
+>  #if IS_ENABLED(CONFIG_VFIO_VIRQFD)
+>  int __init vfio_virqfd_init(void);
+>  void vfio_virqfd_exit(void);
+> diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
+> index 8e96aab27029..58fc3bb768f2 100644
+> --- a/drivers/vfio/vfio_main.c
+> +++ b/drivers/vfio/vfio_main.c
+> @@ -242,6 +242,7 @@ static int vfio_init_device(struct vfio_device *device, struct device *dev,
+>  	device->device.release = vfio_device_release;
+>  	device->device.class = vfio.device_class;
+>  	device->device.parent = device->dev;
+> +	vfio_init_device_cdev(device);
+>  	return 0;
+>  
+>  out_uninit:
+> @@ -280,7 +281,7 @@ static int __vfio_register_dev(struct vfio_device *device,
+>  	if (ret)
+>  		goto err_out;
+>  
+> -	ret = device_add(&device->device);
+> +	ret = vfio_device_add(device);
+>  	if (ret)
+>  		goto err_out;
+>  
+> @@ -320,6 +321,12 @@ void vfio_unregister_group_dev(struct vfio_device *device)
+>  	bool interrupted = false;
+>  	long rc;
+>  
+> +	/* Prevent new device opened in the group path */
+> +	vfio_device_group_unregister(device);
+> +
+> +	/* Prevent new device opened in the cdev path */
+> +	vfio_device_del(device);
+> +
+>  	vfio_device_put_registration(device);
+>  	rc = try_wait_for_completion(&device->comp);
+>  	while (rc <= 0) {
+> @@ -343,11 +350,6 @@ void vfio_unregister_group_dev(struct vfio_device *device)
+>  		}
+>  	}
+>  
+> -	vfio_device_group_unregister(device);
+> -
+> -	/* Balances device_add in register path */
+> -	device_del(&device->device);
+> -
 
-It looks like most of this is iommufd so I will take it - Ok Alex?
+Why were these relocated?  And additionally why was the comment
+regarding the balance operations dropped?  The move seems unrelated to
+the patch here, so if it's actually advisable for some reason, it
+should be a separate patch.  Thanks,
 
-The following cdev patch needs it so I'll stick it on its own branch
-and we can sort it out after the reset series is done
+Alex
 
-Thanls,
-Jason
+>  	/* Balances vfio_device_set_group in register path */
+>  	vfio_device_remove_group(device);
+>  }
+> @@ -555,7 +557,8 @@ static int vfio_device_fops_release(struct inode *inode, struct file *filep)
+>  	struct vfio_device_file *df = filep->private_data;
+>  	struct vfio_device *device = df->device;
+>  
+> -	vfio_device_group_close(df);
+> +	if (df->group)
+> +		vfio_device_group_close(df);
+>  
+>  	vfio_device_put_registration(device);
+>  
+> @@ -1204,6 +1207,7 @@ static int vfio_device_fops_mmap(struct file *filep, struct vm_area_struct *vma)
+>  
+>  const struct file_operations vfio_device_fops = {
+>  	.owner		= THIS_MODULE,
+> +	.open		= vfio_device_fops_cdev_open,
+>  	.release	= vfio_device_fops_release,
+>  	.read		= vfio_device_fops_read,
+>  	.write		= vfio_device_fops_write,
+> @@ -1590,9 +1594,16 @@ static int __init vfio_init(void)
+>  		goto err_dev_class;
+>  	}
+>  
+> +	ret = vfio_cdev_init(vfio.device_class);
+> +	if (ret)
+> +		goto err_alloc_dev_chrdev;
+> +
+>  	pr_info(DRIVER_DESC " version: " DRIVER_VERSION "\n");
+>  	return 0;
+>  
+> +err_alloc_dev_chrdev:
+> +	class_destroy(vfio.device_class);
+> +	vfio.device_class = NULL;
+>  err_dev_class:
+>  	vfio_virqfd_exit();
+>  err_virqfd:
+> @@ -1603,6 +1614,7 @@ static int __init vfio_init(void)
+>  static void __exit vfio_cleanup(void)
+>  {
+>  	ida_destroy(&vfio.device_ida);
+> +	vfio_cdev_cleanup();
+>  	class_destroy(vfio.device_class);
+>  	vfio.device_class = NULL;
+>  	vfio_virqfd_exit();
+> diff --git a/include/linux/vfio.h b/include/linux/vfio.h
+> index 5c06af04ed9e..8719ec2adbbb 100644
+> --- a/include/linux/vfio.h
+> +++ b/include/linux/vfio.h
+> @@ -13,6 +13,7 @@
+>  #include <linux/mm.h>
+>  #include <linux/workqueue.h>
+>  #include <linux/poll.h>
+> +#include <linux/cdev.h>
+>  #include <uapi/linux/vfio.h>
+>  #include <linux/iova_bitmap.h>
+>  
+> @@ -51,6 +52,9 @@ struct vfio_device {
+>  	/* Members below here are private, not for driver use */
+>  	unsigned int index;
+>  	struct device device;	/* device.kref covers object life circle */
+> +#if IS_ENABLED(CONFIG_VFIO_DEVICE_CDEV)
+> +	struct cdev cdev;
+> +#endif
+>  	refcount_t refcount;	/* user count on registered device*/
+>  	unsigned int open_count;
+>  	struct completion comp;
+
