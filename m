@@ -2,163 +2,191 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E60986CCEB4
-	for <lists+kvm@lfdr.de>; Wed, 29 Mar 2023 02:22:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 546C36CCEC6
+	for <lists+kvm@lfdr.de>; Wed, 29 Mar 2023 02:28:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229765AbjC2AWJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Mar 2023 20:22:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55916 "EHLO
+        id S229573AbjC2A2j (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Mar 2023 20:28:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60386 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229755AbjC2AWH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Mar 2023 20:22:07 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8BB7211B
-        for <kvm@vger.kernel.org>; Tue, 28 Mar 2023 17:21:55 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id 3-20020a250b03000000b00b5f1fab9897so13758175ybl.19
-        for <kvm@vger.kernel.org>; Tue, 28 Mar 2023 17:21:55 -0700 (PDT)
+        with ESMTP id S229489AbjC2A2h (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Mar 2023 20:28:37 -0400
+Received: from mail-vs1-xe2d.google.com (mail-vs1-xe2d.google.com [IPv6:2607:f8b0:4864:20::e2d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C38E410F2
+        for <kvm@vger.kernel.org>; Tue, 28 Mar 2023 17:28:35 -0700 (PDT)
+Received: by mail-vs1-xe2d.google.com with SMTP id b6so8706133vsu.12
+        for <kvm@vger.kernel.org>; Tue, 28 Mar 2023 17:28:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1680049315;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=iXBtTxJA82bcXFQXnQ4d5hea80kX0towjerItzNuSjc=;
-        b=f3LE3sXwy/Ypo0P2WoNo8NflUs56Y6hwFUXr6NyFwI05caseJKeOArDA3LgE6Zvesh
-         n8XB+vhcrio7HWaQOwAgaN3DIiP9fCowNOXVr4nI+hNQtTbatppnEfPFQKmmykKrDCdm
-         BYn5i/V1hkx3deB/XcrBXFj3kTR5h1S7Xcr1lR4QtEztD3l97yuAqQGTW/v5IqFDFIB3
-         /BX/s9XQQjmYW6t6MQl5kqVyqT1vco7mSDQcsmO2kRkM429zib6uYwf6k+CXWGQpYA9r
-         q9xWmPJLZW8gDNFLVzvXNcN/lF/2sLxlfxPgRdF37A1YYkqf+/7neUK/EMVqdLyEtdw7
-         QJUw==
+        d=google.com; s=20210112; t=1680049715;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=PyqHjtL+rZkr3QGhJXzTG5s8vpvz1mXKLrceNpD1m0E=;
+        b=M9D88JPWAMKk/pgNwzzYgI5z1YNJXtj2tHk9EUoYPep6DDDgRuFEYvODeR83uSatIY
+         VUUbWLmlC1adBiKBFalomI+msFx3OAwmeW/YUIsmvSfwa5jAsmHm926CnzJ6ZrUFtooX
+         6vXPXVDamJUKmhkaqKk6Yj4947AW74g9+PUg1lw1O3zUzjKjObNThCXjKW8wFwEtP9wQ
+         tPRCY+PhQKg3iEOx8vMxZEdu6Zqnwp2rdnjC+DRUXrCfaFpP1KUc8REA1Xt+ZKPzq+iP
+         g8IquFTs/Gg+iMGbfV+lpSU0yjsU/ZOCUOWgDfXZbvH1xE4Sn0vywyYFGYkg+BRRXypG
+         xgCw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680049315;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=iXBtTxJA82bcXFQXnQ4d5hea80kX0towjerItzNuSjc=;
-        b=1ThJZ+BcWwCTSUp01+quRPUXi7/vTkhn5+4YSDHNNEiWO5kkiq9hNiJNS8O9WvySvY
-         ZN+x5Or0RzmGjIlwN/9zyVeb8lOPPL8rIi8bQxtQBey9saAGzR92x6KU9PirRntE06yQ
-         A7sSepnjdi3/qFMNOuAkTm4pPvXdpye7uF5X8NywCus0rLtZ/NxlNe3wIJOCw/IHL/uB
-         dD7+krwhqTu9PoAfd93KuSao0qMlUZx0brQJJzUUkFdfUKDXBLO/3rsNdLbwXsfgeKco
-         CdWcfA9kcUmdetb62NW5nljI9CFoJRM/4M7k6w/zSf2Jjr/xE7f8m9KOGofP6CQC75kU
-         nQrg==
-X-Gm-Message-State: AAQBX9enlP1Y+8rGtq/qM27LfmSgVifDc0ljRvL4cL4Ufl3nBRQcKW9U
-        kmXQladQhG6zjdJOnr6CnoWpWSCc2iI=
-X-Google-Smtp-Source: AKy350a64aWirwKtZfp2hNwUr2/sbk2BHCGDPtQLxA7yvFuGhqlS4CfVlAm0dtCZEFXYfpoboZnvH7OctM8=
-X-Received: from reijiw-west4.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:aa1])
- (user=reijiw job=sendgmr) by 2002:a05:6902:a8c:b0:b7b:fb15:8685 with SMTP id
- cd12-20020a0569020a8c00b00b7bfb158685mr5290936ybb.9.1680049315012; Tue, 28
- Mar 2023 17:21:55 -0700 (PDT)
-Date:   Tue, 28 Mar 2023 17:21:36 -0700
-In-Reply-To: <20230329002136.2463442-1-reijiw@google.com>
-Mime-Version: 1.0
-References: <20230329002136.2463442-1-reijiw@google.com>
-X-Mailer: git-send-email 2.40.0.348.gf938b09366-goog
-Message-ID: <20230329002136.2463442-3-reijiw@google.com>
-Subject: [PATCH v1 2/2] KVM: arm64: PMU: Ensure to trap PMU access from EL0 to EL2
-From:   Reiji Watanabe <reijiw@google.com>
-To:     Marc Zyngier <maz@kernel.org>,
-        Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev
-Cc:     kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Raghavendra Rao Anata <rananta@google.com>,
-        Will Deacon <will@kernel.org>,
-        Reiji Watanabe <reijiw@google.com>
+        d=1e100.net; s=20210112; t=1680049715;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=PyqHjtL+rZkr3QGhJXzTG5s8vpvz1mXKLrceNpD1m0E=;
+        b=qQt6oV3SZSwf8Y8B9AaIm8qBvzHltcV5qHc3mV/S7IcQbwUnQpxdNw6WaUvzktzMXG
+         XitTECp+9m5GxXJo7+vKCZUv6Eg2IN3I3JqESrE9kRbtPReRgWzqK9nQ8U0WAVxwYW83
+         kNeRJ/B6h62n4EljxRla73/H93VJB83/Nr81yPF0NGMQoUPAR574PbedfGRLMUG8gzSD
+         A7WqK2lX5vlYRHHY2CbxivXt8ixDMLV3lKA9+ELka/WeAbW0FVNA+G4dVcYGPXlb/zKA
+         EoNmcPvmLaGssIJitHZXNKeP0X3kPleP7S94PX1uC2W7iXyCb97bXLWKOyVSKTRAiN5w
+         VVvw==
+X-Gm-Message-State: AAQBX9cKt8inK7Pqke0LKGnTJZJ1XuZazlNCXzl94qWo4BLdhqb4hKed
+        13r932j+MLDueGkcIbv8tPGZbDey2Z9h5XNqvwp7CpXEC+Fj8JXwu4s=
+X-Google-Smtp-Source: AKy350ZOliy/SrIqb9WDpAtZYeUPgOgFxGeA6z3FKouIkdmj0YFGQzv89AfV53KPpPDZOrknJAXuZ0r2dC4w/giA6Pw=
+X-Received: by 2002:a67:d994:0:b0:423:e694:7a7d with SMTP id
+ u20-20020a67d994000000b00423e6947a7dmr9880934vsj.4.1680049714775; Tue, 28 Mar
+ 2023 17:28:34 -0700 (PDT)
+MIME-Version: 1.0
+References: <20230306224127.1689967-1-vipinsh@google.com> <20230306224127.1689967-17-vipinsh@google.com>
+ <ZCOEiVT31xEPKZ3H@google.com>
+In-Reply-To: <ZCOEiVT31xEPKZ3H@google.com>
+From:   David Matlack <dmatlack@google.com>
+Date:   Tue, 28 Mar 2023 17:28:08 -0700
+Message-ID: <CALzav=cKY37njK0=jsw7fiUsqLWVw0ir0LEYr6O=R+NPk2nVHw@mail.gmail.com>
+Subject: Re: [Patch v4 16/18] KVM: x86/mmu: Allocate numa aware page tables
+ during page fault
+To:     Vipin Sharma <vipinsh@google.com>
+Cc:     seanjc@google.com, pbonzini@redhat.com, bgardon@google.com,
+        jmattson@google.com, mizhang@google.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-7.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-15.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,ENV_AND_HDR_SPF_MATCH,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL,
+        USER_IN_DEF_SPF_WL autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Currently, with VHE, KVM sets ER, CR, SW and EN bits of
-PMUSERENR_EL0 to 1 on vcpu_load().  So, if the value of those bits
-are cleared after vcpu_load() (the perf subsystem would do when PMU
-counters are programmed for the guest), PMU access from the guest EL0
-might be trapped to the guest EL1 directly regardless of the current
-PMUSERENR_EL0 value of the vCPU.
+On Tue, Mar 28, 2023 at 5:21=E2=80=AFPM David Matlack <dmatlack@google.com>=
+ wrote:
+>
+> On Mon, Mar 06, 2023 at 02:41:25PM -0800, Vipin Sharma wrote:
+> > Allocate page tables on the preferred NUMA node via memory cache during
+> > page faults. If memory cache doesn't have a preferred NUMA node (node
+> > value is set to NUMA_NO_NODE) then fallback to the default logic where
+> > pages are selected based on thread's mempolicy. Also, free NUMA aware
+> > page caches, mmu_shadow_page_cache, when memory shrinker is invoked.
+> >
+> > Allocate root pages based on the current thread's NUMA node as there is
+> > no way to know which will be the ideal NUMA node in long run.
+> >
+> > This commit allocate page tables to be on the same NUMA node as the
+> > physical page pointed by them, even if a vCPU causing page fault is on =
+a
+> > different NUMA node. If memory is not available on the requested NUMA
+> > node then the other nearest NUMA node is selected by default. NUMA awar=
+e
+> > page tables can be beneficial in cases where a thread touches lot of fa=
+r
+> > memory initially and then divide work among multiple threads. VMs
+> > generally take advantage of NUMA architecture for faster memory access
+> > by moving threads to the NUMA node of the memory they are accessing.
+> > This change will help them in accessing pages faster.
+> >
+> > Downside of this change is that an experimental workload can be created
+> > where a guest threads are always accessing remote memory and not the on=
+e
+> > local to them. This will cause performance to degrade compared to VMs
+> > where numa aware page tables are not enabled. Ideally, these VMs when
+> > using non-uniform memory access machine should generally be taking
+> > advantage of NUMA architecture to improve their performance in the firs=
+t
+> > place.
+> >
+> > Signed-off-by: Vipin Sharma <vipinsh@google.com>
+> > ---
+> >  arch/x86/include/asm/kvm_host.h |  2 +-
+> >  arch/x86/kvm/mmu/mmu.c          | 63 ++++++++++++++++++++++++---------
+> >  arch/x86/kvm/mmu/mmu_internal.h | 24 ++++++++++++-
+> >  arch/x86/kvm/mmu/paging_tmpl.h  |  4 +--
+> >  arch/x86/kvm/mmu/tdp_mmu.c      | 14 +++++---
+> >  include/linux/kvm_types.h       |  6 ++++
+> >  virt/kvm/kvm_main.c             |  2 +-
+> >  7 files changed, 88 insertions(+), 27 deletions(-)
+> >
+> > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm=
+_host.h
+> > index 64de083cd6b9..77d3aa368e5e 100644
+> > --- a/arch/x86/include/asm/kvm_host.h
+> > +++ b/arch/x86/include/asm/kvm_host.h
+> > @@ -787,7 +787,7 @@ struct kvm_vcpu_arch {
+> >       struct kvm_mmu *walk_mmu;
+> >
+> >       struct kvm_mmu_memory_cache mmu_pte_list_desc_cache;
+> > -     struct kvm_mmu_memory_cache mmu_shadow_page_cache;
+> > +     struct kvm_mmu_memory_cache mmu_shadow_page_cache[MAX_NUMNODES];
+>
+> I think we need an abstraction for a NUMA-aware mmu cache, since there
+> is more than one by the end of this series.
+>
+> e.g. A wrapper struct (struct kvm_mmu_numa_memory_cache) or make
+> NUMA-awareness an optional feature within kvm_mmu_memory_cache, plus
+> common helper functions for operations like initializing, topping-up,
+> and freeing.
+>
+> I have some ideas I want to try but I ran out of time today.
+>
+> >       struct kvm_mmu_memory_cache mmu_shadowed_info_cache;
+> >       struct kvm_mmu_memory_cache mmu_page_header_cache;
+> >
+> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> > index d96afc849ee8..86f0d74d35ed 100644
+> > --- a/arch/x86/kvm/mmu/mmu.c
+> > +++ b/arch/x86/kvm/mmu/mmu.c
+> > @@ -702,7 +702,7 @@ static void mmu_free_sp_memory_cache(struct kvm_mmu=
+_memory_cache *cache)
+> >
+> >  static int mmu_topup_memory_caches(struct kvm_vcpu *vcpu, bool maybe_i=
+ndirect)
+> >  {
+> > -     int r;
+> > +     int r, nid =3D KVM_MMU_DEFAULT_CACHE_INDEX;
+> >
+> >       /* 1 rmap, 1 parent PTE per level, and the prefetched rmaps. */
+> >       r =3D kvm_mmu_topup_memory_cache(&vcpu->arch.mmu_pte_list_desc_ca=
+che,
+> > @@ -710,7 +710,16 @@ static int mmu_topup_memory_caches(struct kvm_vcpu=
+ *vcpu, bool maybe_indirect)
+> >       if (r)
+> >               return r;
+> >
+> > -     r =3D mmu_topup_sp_memory_cache(&vcpu->arch.mmu_shadow_page_cache=
+, PT64_ROOT_MAX_LEVEL);
+> > +     if (kvm_numa_aware_page_table_enabled(vcpu->kvm)) {
+> > +             for_each_online_node(nid) {
+>
+> Blegh. This is going to potentially waste a lot of memory. Yes the
+> shrinker can free it, but the next fault will re-allocate all the online
+> node caches.
+>
+> The reason we have to top-up all nodes is because KVM tops up caches
+> before faulting in the PFN, and there is concern that changing this will
+> increase the rate of guest page-fault retries [1].
+>
+> I think we should revisit that concern. Can we do any testing to
+> validate that hypothesis? Or can we convince ourselves that re-ordering
+> is ok?
+>
+> [1] https://lore.kernel.org/kvm/CAHVum0cjqsdG2NEjRF3ZRtUY2t2=3DTb9H4OyOz9=
+wpmsrN--Sjhg@mail.gmail.com/
 
-With VHE, fix this by setting those bits of the register on every
-guest entry (as with nVHE).  Also, opportunistically make the similar
-change for PMSELR_EL0, which is cleared by vcpu_load(), to ensure it
-is always set to zero on guest entry (PMXEVCNTR_EL0 access might cause
-UNDEF at EL1 instead of being trapped to EL2, depending on the value
-of PMSELR_EL0).  I think that would be more robust, although I don't
-find any kernel code that writes PMSELR_EL0.
-
-Fixes: 83a7a4d643d3 ("arm64: perf: Enable PMU counter userspace access for perf event")
-Signed-off-by: Reiji Watanabe <reijiw@google.com>
----
- arch/arm64/kvm/hyp/include/hyp/switch.h | 29 +++++++++++++------------
- 1 file changed, 15 insertions(+), 14 deletions(-)
-
-diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-index 44b84fbdde0d..7d39882d8a73 100644
---- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-@@ -74,18 +74,6 @@ static inline void __activate_traps_common(struct kvm_vcpu *vcpu)
- 	/* Trap on AArch32 cp15 c15 (impdef sysregs) accesses (EL1 or EL0) */
- 	write_sysreg(1 << 15, hstr_el2);
- 
--	/*
--	 * Make sure we trap PMU access from EL0 to EL2. Also sanitize
--	 * PMSELR_EL0 to make sure it never contains the cycle
--	 * counter, which could make a PMXEVCNTR_EL0 access UNDEF at
--	 * EL1 instead of being trapped to EL2.
--	 */
--	if (kvm_arm_support_pmu_v3()) {
--		write_sysreg(0, pmselr_el0);
--		vcpu->arch.host_pmuserenr_el0 = read_sysreg(pmuserenr_el0);
--		write_sysreg(ARMV8_PMU_USERENR_MASK, pmuserenr_el0);
--	}
--
- 	vcpu->arch.mdcr_el2_host = read_sysreg(mdcr_el2);
- 	write_sysreg(vcpu->arch.mdcr_el2, mdcr_el2);
- 
-@@ -106,8 +94,6 @@ static inline void __deactivate_traps_common(struct kvm_vcpu *vcpu)
- 	write_sysreg(vcpu->arch.mdcr_el2_host, mdcr_el2);
- 
- 	write_sysreg(0, hstr_el2);
--	if (kvm_arm_support_pmu_v3())
--		write_sysreg(vcpu->arch.host_pmuserenr_el0, pmuserenr_el0);
- 
- 	if (cpus_have_final_cap(ARM64_SME)) {
- 		sysreg_clear_set_s(SYS_HFGRTR_EL2, 0,
-@@ -130,6 +116,18 @@ static inline void ___activate_traps(struct kvm_vcpu *vcpu)
- 
- 	if (cpus_have_final_cap(ARM64_HAS_RAS_EXTN) && (hcr & HCR_VSE))
- 		write_sysreg_s(vcpu->arch.vsesr_el2, SYS_VSESR_EL2);
-+
-+	/*
-+	 * Make sure we trap PMU access from EL0 to EL2. Also sanitize
-+	 * PMSELR_EL0 to make sure it never contains the cycle
-+	 * counter, which could make a PMXEVCNTR_EL0 access UNDEF at
-+	 * EL1 instead of being trapped to EL2.
-+	 */
-+	if (kvm_arm_support_pmu_v3()) {
-+		write_sysreg(0, pmselr_el0);
-+		vcpu->arch.host_pmuserenr_el0 = read_sysreg(pmuserenr_el0);
-+		write_sysreg(ARMV8_PMU_USERENR_MASK, pmuserenr_el0);
-+	}
- }
- 
- static inline void ___deactivate_traps(struct kvm_vcpu *vcpu)
-@@ -144,6 +142,9 @@ static inline void ___deactivate_traps(struct kvm_vcpu *vcpu)
- 		vcpu->arch.hcr_el2 &= ~HCR_VSE;
- 		vcpu->arch.hcr_el2 |= read_sysreg(hcr_el2) & HCR_VSE;
- 	}
-+
-+	if (kvm_arm_support_pmu_v3())
-+		write_sysreg(vcpu->arch.host_pmuserenr_el0, pmuserenr_el0);
- }
- 
- static inline bool __populate_fault_info(struct kvm_vcpu *vcpu)
--- 
-2.40.0.348.gf938b09366-goog
-
+Ah I forgot about patch 18 reducing the default cache size. So at the
+end of this series, even with topping up every node, the maximum
+number of objects per cache will be 4 * num_online_nodes. So only
+hosts with more than 10 online NUMA nodes would have larger caches
+than today (40). That seems more reasonable to me.
