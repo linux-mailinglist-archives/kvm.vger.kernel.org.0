@@ -2,178 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5F52D6CF136
-	for <lists+kvm@lfdr.de>; Wed, 29 Mar 2023 19:34:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 95A606CF16C
+	for <lists+kvm@lfdr.de>; Wed, 29 Mar 2023 19:49:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229773AbjC2Reu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 Mar 2023 13:34:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58580 "EHLO
+        id S229564AbjC2Rtk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 Mar 2023 13:49:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43530 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229817AbjC2Res (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 29 Mar 2023 13:34:48 -0400
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E08F240CF
-        for <kvm@vger.kernel.org>; Wed, 29 Mar 2023 10:34:47 -0700 (PDT)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-5417f156cb9so162795717b3.8
-        for <kvm@vger.kernel.org>; Wed, 29 Mar 2023 10:34:47 -0700 (PDT)
+        with ESMTP id S229379AbjC2Rti (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 29 Mar 2023 13:49:38 -0400
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2105.outbound.protection.outlook.com [40.107.244.105])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D270189;
+        Wed, 29 Mar 2023 10:49:37 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=L9DX8oKNaTl4b8YUbznMpahm1g5l2qCzX2udpa9pvPTySsQCUcE9TyTByUyZQdyEWaUl+/aUhhwH3NJw1vSwPenIoGbyDmW5ZsTxIa3hxyATDccjIaGg8KF1Hmpd8yNUWq7aOuv0XInv2GWJe50d2kEPajZNnTRa9BiQ9FHSZ19niKw8eyJOAXa2NAOllkrcc6IMtDJxHFn/wX6oKt4e6mkGbQdZWLJtQqlukTmo/HbtS9cM2QclMcgRHhQR+uLYEBDKBQn1d2hRy3kzVPiWbcfxuY41oG2tvU/1LcXEuHzyiu4YlLAJWB8+Y9lH25k7Oz2oUdGx/uttD49iHJnZzA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=5oJddHsGoY4KcTcXzRAuDyuN0DIhxJCfvR1qryGImOo=;
+ b=i+BiZz3A0MD6hvvIhe++ZcbtsEjcKE+Ai+NRAS8aLQYKvG7gSV0dyhNGaiiB800xPjjQNeq8EiwuyUf6x6KS6nrjlJglCNnhO8dleUEjQiHZJqJP4W2MC4OB/R7XxNtmb02T1M8xi5y5U7q+MgiRtE/56FMu/JwZDt5g+0GxNNlDdlVLtijjL3UypOwgnVLPHCv12sFLQdoGU6LvPoySth9vLg5LKGAp1rFiOybW+7NdCu/F3DQK0uWeeAkkxUEtbSDZ/wL+PIGVNzGxKdOc8aLubMsPV7PHCSDOEGJfkIJNInCASWp6s4zZc++Zhi8O1uGvC0KiES5d8naAWDN+og==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
+ dkim=pass header.d=corigine.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1680111287;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=DNFNaG7IfQn0GoxGHQeAECVC0HUIZIm3W897ndNR614=;
-        b=WVRjEOhFK42+QTaIBDpc5ESW5rIEkrLv8L7Of70FyuU+jDHA6odDZ7JUH5pB3A5Wou
-         Rv7OTkRjntygAnYlh5u5jJl/eUE1cvTIVnf3EeFGrG7jVLYYRfnHYzsIQXBJZOZOfSWw
-         PZV/qt4K4AEvkDd/RKzkQibmsAx4oR/6TiOFwhqjGInNwaHcq5zsLh3dZMiPEV8EkN5n
-         QhARyxv083w07bSdn4SJVZD1hnjsyNEmiKXETlBZXytDlNICYaQxmKcG7arLGx6/hdDF
-         l34UfVEHvDjYUhwwAd+4rjbOBGH43cTC//kaGTPj3aoxGkIFlJVudy1NfCARqPp7mZyD
-         sSpQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680111287;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=DNFNaG7IfQn0GoxGHQeAECVC0HUIZIm3W897ndNR614=;
-        b=21/skGr2LbTtvjNxXrwPGcZ7XiiQW3KtTOY5SJ2oRGbDLlGe/uRzhkluw9QdgfWRk7
-         qU4dqXzc+/TyAzdilOrGyKxBk/qa1K3TuFXuTBAn0+Sw7Uern4JIIIoJ+S77fHg+9lh8
-         X5s+PBxeDwhc+9V3jr4zWHYWyXMdC5nMmwtC5hvSdG8uUrxvpaKy8seUTOkgeQAgWMBB
-         kB0ryqCJ399vPJT9ZAwuxgec7WZs1OkCdsrJW6WycJbXU2dDxlTIGvTWurL2GpwM0FZr
-         1I28iAingsKt06UGlBqbAvBCkvkX6DbKvaxYZmjIZxMCOyNNIgG3qtwgk2hO03dKmdaw
-         sk5A==
-X-Gm-Message-State: AAQBX9extKesGJICxvEDHJpqsQNJwCiQCDRBppyhXw/bMHi+cjjjKOGe
-        XW2XUgkxOhRipghwS1q8YkAqDhkX+aU=
-X-Google-Smtp-Source: AKy350Y6YR29N0iDn73gQp4Y2NbtQaxpn3andjTdVc71mv2uApbarteg9hvLxcwa4AcT7C4hAeTsXmdcsv4=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:10c2:b0:b21:a3b8:45cd with SMTP id
- w2-20020a05690210c200b00b21a3b845cdmr13935709ybu.0.1680111287180; Wed, 29 Mar
- 2023 10:34:47 -0700 (PDT)
-Date:   Wed, 29 Mar 2023 10:34:45 -0700
-In-Reply-To: <b9e9dd1c-2213-81c7-cd45-f5cf7b86610b@linux.intel.com>
-Mime-Version: 1.0
-References: <20230319084927.29607-1-binbin.wu@linux.intel.com>
- <20230319084927.29607-3-binbin.wu@linux.intel.com> <ZBhTa6QSGDp2ZkGU@gao-cwp>
- <ZBojJgTG/SNFS+3H@google.com> <12c4f1d3c99253f364f3945a998fdccb0ddf300f.camel@intel.com>
- <e0442b13-09f4-0985-3eb4-9b6a20d981fb@linux.intel.com> <682d01dec42ecdb80c9d3ffa2902dea3b1d576dd.camel@intel.com>
- <b9e9dd1c-2213-81c7-cd45-f5cf7b86610b@linux.intel.com>
-Message-ID: <ZCR2PBx/4lj9X0vD@google.com>
-Subject: Re: [PATCH v6 2/7] KVM: VMX: Use is_64_bit_mode() to check 64-bit mode
-From:   Sean Christopherson <seanjc@google.com>
-To:     Binbin Wu <binbin.wu@linux.intel.com>
-Cc:     Kai Huang <kai.huang@intel.com>, Chao Gao <chao.gao@intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "robert.hu@linux.intel.com" <robert.hu@linux.intel.com>
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-7.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+ d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=5oJddHsGoY4KcTcXzRAuDyuN0DIhxJCfvR1qryGImOo=;
+ b=uCnU5La8gt+PNvqrSHF4bJuMzCq3MOKDmizd1CpvrF0giueHAFuPAVzoxYn+P7Oa2RD69ZhllA5/lnmVSN6P0+kA4syWVNDKOLsXNjWbHzQe0AAQTy+k9B6hdiaR43A3u2b4jk0qZaFWnjNvcSR6bDphOxAcYjUp+pWblDtgXsU=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=corigine.com;
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
+ by PH0PR13MB5748.namprd13.prod.outlook.com (2603:10b6:510:123::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6222.33; Wed, 29 Mar
+ 2023 17:49:35 +0000
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::c506:5243:557e:82cb]) by PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::c506:5243:557e:82cb%4]) with mapi id 15.20.6222.028; Wed, 29 Mar 2023
+ 17:49:34 +0000
+Date:   Wed, 29 Mar 2023 19:49:27 +0200
+From:   Simon Horman <simon.horman@corigine.com>
+To:     Brett Creeley <brett.creeley@amd.com>
+Cc:     kvm@vger.kernel.org, netdev@vger.kernel.org,
+        alex.williamson@redhat.com, jgg@nvidia.com, yishaih@nvidia.com,
+        shameerali.kolothum.thodi@huawei.com, kevin.tian@intel.com,
+        shannon.nelson@amd.com, drivers@pensando.io
+Subject: Re: [PATCH v6 vfio 7/7] vfio/pds: Add Kconfig and documentation
+Message-ID: <ZCR6J9Y7hD5FpNZA@corigine.com>
+References: <20230327200553.13951-1-brett.creeley@amd.com>
+ <20230327200553.13951-8-brett.creeley@amd.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230327200553.13951-8-brett.creeley@amd.com>
+X-ClientProxiedBy: AM0PR04CA0054.eurprd04.prod.outlook.com
+ (2603:10a6:208:1::31) To PH0PR13MB4842.namprd13.prod.outlook.com
+ (2603:10b6:510:78::6)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|PH0PR13MB5748:EE_
+X-MS-Office365-Filtering-Correlation-Id: 65cd0a5d-ff0c-4c6a-5254-08db307df4ee
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: sxVJ76CF46QLUzoeBGM3dcORiXjt17NwjK5EcE9C5Xw91nGavbdkZxoxckoB4I7Dh5fYZC1MmDndK9zsV2QqafQCkP9j6avJYFSmd3PUADU1Dv2kbpQRlpA5y63Jb0iUX0JWd8QhivcWi7z7yJJzFw5UgBLN5L/CQ/3I0W+t+47Ad27p2MiA4JTGJkTD/B+LTEleRDb4DT9vPaxRD7fZN5YfjUQ7JU85kEVTdse5awMlh+zzcI/kz/UKVf3wITbfP5VwAdrZN/a/JP1/DjUca/k1/6QLi1UBkvxa+8b7A+7KTbnOKnAyYHUuteKtxRwWkQy0kHvUcX4smrKg84DdRVnd63O87EnxnfpnG9EfKCebqe/l14ChFjAYOlJz6eP8bBZsWakl4eRakcFFzDGwCuXOZe7QpQStA8KPBtrP7C9gE3ECZAVkUnfWwPNOsq/rW+uKYxmSky5TbpgorAN/cLo+bVIUnsayba7RYsUGex9dn43Ht5jgP9c85bV1kLFZNEWEQXmp+uoRJannfVXqdLt0uxCb9GjDl+uzLfD1q0qTEWHpI8ZdM25pQbgwpJzrFqWyg2NOJmA81TuGpvlMUrwS8LiQmLr5Eir/mvDmRDI=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(396003)(346002)(136003)(39840400004)(376002)(366004)(451199021)(36756003)(86362001)(186003)(4744005)(2616005)(6506007)(6512007)(44832011)(7416002)(8936002)(6666004)(5660300002)(6486002)(41300700001)(4326008)(8676002)(66556008)(2906002)(38100700002)(66946007)(316002)(66476007)(6916009)(478600001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?PiGDwG4liQSLfASQsdfFeN9mxLOTwqE66KMeAk+p2kQprcthbTOR7dSamgK+?=
+ =?us-ascii?Q?MgYvduzQbTvwE5pTpeJ7gAmQEE7/WZsyixcbvc+BigWDDn5Ed84Ovh0iJXAk?=
+ =?us-ascii?Q?aR2S+QzHj9g9AQViI+aZrhk6Z6iLTUuJ3GWwzbvSZ94vgpmUfL6Exaz1ep7U?=
+ =?us-ascii?Q?x2NkVAPi4aH8ZvQ0gFeB+GFaE959wT/KWje+N4JcoHShwT854JN7Vq+uWueg?=
+ =?us-ascii?Q?wU0TZ+TgjtY8pPlkXQ3Yda2HKJz0zRFe+bK87cEUDekO/FPmLW+B9cNLr9nf?=
+ =?us-ascii?Q?wW7C+lFmJD4yfWyc3rnE5FrT21oljaUYpX1Ymx+4zoAhcCwz2baV4i/3iD3p?=
+ =?us-ascii?Q?z5e2wYbEJGc8hWXz0G9CkqN5szLESIxrBcgkZYNRSU9WBMbs/eWYlWoFO4IS?=
+ =?us-ascii?Q?UwzibgaxrJ/4yC9KjSwuco3Su9EsrZn7WgasD8UI4rpJkDPL33VKKwOKeuEi?=
+ =?us-ascii?Q?9929twii+PqRKTnY3B1FPDDUPjT7CEkWsuC0vMgtMyvICvEnXaYywKKn+QWH?=
+ =?us-ascii?Q?aQHyd7JFOHIsA//zq0LFo6gQjmL5UVFar7qLVZqoKXRMlVUj25xVPVysWlI2?=
+ =?us-ascii?Q?7yXW8ZBjqTVpHo68x8sxyR9wHt8oClRRG0gCH6iIw/DlHt7ndhkXl0l+8Dw/?=
+ =?us-ascii?Q?W01TpUFoUT6XwLMFNvig9N//1vcTrvxa8RuJ2R12kxHPhxlzeB2VQGFxJFbr?=
+ =?us-ascii?Q?g1FmNrZwPnMP4dvjg8Q+EMULjIGGO91VdC3rTHK0tEzP+49SBiNm/skuQyCp?=
+ =?us-ascii?Q?mX8CO/iY41KFhx7ay2HOoRGJM8rw6KmXsMkEHxmiByKDWsGwi4vnS2FgS1BE?=
+ =?us-ascii?Q?iMqBridgx5o5hL0F96k7zaBGhfslMLWFG7ulf0Y5CVV/a5L0l6x5zMIIyUVE?=
+ =?us-ascii?Q?8hfVyw8GuGYjimy+N5DvyYxfpg7NUjC4swj6gO1Tjc9C8P/kuljkO7NE5P95?=
+ =?us-ascii?Q?F3pKtMnSpFfNkCQJw46XsJ6Ow1yTrNNZzK5+YzrRQWwHTAEGs0ChfnaeaQJO?=
+ =?us-ascii?Q?1lzlOu9Qg/wGaozGJhCB2kpA3ZMWa+rAC1fGlAAuWtXYf/2v99mDmkQgRHbq?=
+ =?us-ascii?Q?4ufLdqIX1Ci5hArssXKRbmFaBR3IzTZtXiJN3Z7H+iy6UB1HROW6HbscaBbQ?=
+ =?us-ascii?Q?D0GA8FtZ/ObkdJ2L1r5F74Ri6A616FRWlk2C1c4nCeO5aar6ivJQ/s7h22C6?=
+ =?us-ascii?Q?h/PV6/J5KBv3ju/EFDfJzIJAXhsfAyzJrLCCtyCMSjJ8lGd7/ADkMEqJpTKa?=
+ =?us-ascii?Q?BLcfsRw6/GtPyNzD3OgcPeCEDaEycsp9ya4c5/lbvaXnnY301upDck3X0/WY?=
+ =?us-ascii?Q?PcwVcUnKuZXaXcoXho/dvABgixcTMbdLMLL26BuIq+3WK1qlGuvG6UC0cIwL?=
+ =?us-ascii?Q?TTcpYJ8GI8jbLA95tRQQMzSJfTQE6DX5XTmbAhys0bXQw4dJPNWKllv/H9la?=
+ =?us-ascii?Q?+hANL7HW2W65iE5rYliTLWPUTlemx2Hq7vpZpaTWc0fNGkKvCEenvbyIG6C2?=
+ =?us-ascii?Q?QJDhYLX1i0wiH/CQEaj8itZneCzaxUSc/fD5wyiJ+P+ZKAPlrw0N4x4bm4mP?=
+ =?us-ascii?Q?m2KDClI8qUcsJwl5uZfsGbWWfq2P71inkQ+B/HTYxL8KC5uMIHX4B6+2Al53?=
+ =?us-ascii?Q?6QesVP3H/UfjHqtahlm8KE6mkBzZO29hM1ONSvevhd5zpIoiVW9GcnLHDN1C?=
+ =?us-ascii?Q?FnwMuQ=3D=3D?=
+X-OriginatorOrg: corigine.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 65cd0a5d-ff0c-4c6a-5254-08db307df4ee
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Mar 2023 17:49:34.7059
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Xddbx2ATY7ZC3NG+IpmQza7wrUtp2hyU1shN3tgYI0ApPtuD5+62s9Yo34iWmLlbdua8Jt+6c1bpf8ZtekxOC1+VBCaKsvDYu6L7O4w2YSo=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR13MB5748
+X-Spam-Status: No, score=-0.0 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 29, 2023, Binbin Wu wrote:
->=20
-> On 3/29/2023 10:04 AM, Huang, Kai wrote:
-> > On Wed, 2023-03-29 at 09:27 +0800, Binbin Wu wrote:
-> > > On 3/29/2023 7:33 AM, Huang, Kai wrote:
-> > > > On Tue, 2023-03-21 at 14:35 -0700, Sean Christopherson wrote:
-> > > > > On Mon, Mar 20, 2023, Chao Gao wrote:
-> > > > > > On Sun, Mar 19, 2023 at 04:49:22PM +0800, Binbin Wu wrote:
-> > > > > > > get_vmx_mem_address() and sgx_get_encls_gva() use is_long_mod=
-e()
-> > > > > > > to check 64-bit mode. Should use is_64_bit_mode() instead.
-> > > > > > >=20
-> > > > > > > Fixes: f9eb4af67c9d ("KVM: nVMX: VMX instructions: add checks=
- for #GP/#SS exceptions")
-> > > > > > > Fixes: 70210c044b4e ("KVM: VMX: Add SGX ENCLS[ECREATE] handle=
-r to enforce CPUID restrictions")
-> > > > > > It is better to split this patch into two: one for nested and o=
-ne for
-> > > > > > SGX.
-> > > > > >=20
-> > > > > > It is possible that there is a kernel release which has just on=
-e of
-> > > > > > above two flawed commits, then this fix patch cannot be applied=
- cleanly
-> > > > > > to the release.
-> > > > > The nVMX code isn't buggy, VMX instructions #UD in compatibility =
-mode, and except
-> > > > > for VMCALL, that #UD has higher priority than VM-Exit interceptio=
-n.  So I'd say
-> > > > > just drop the nVMX side of things.
-> > > > But it looks the old code doesn't unconditionally inject #UD when i=
-n
-> > > > compatibility mode?
-> > > I think Sean means VMX instructions is not valid in compatibility mod=
-e
-> > > and it triggers #UD, which has higher priority than VM-Exit, by the
-> > > processor in non-root mode.
-> > >=20
-> > > So if there is a VM-Exit due to VMX instruction , it is in 64-bit mod=
-e
-> > > for sure if it is in long mode.
-> > Oh I see thanks.
-> >=20
-> > Then is it better to add some comment to explain, or add a WARN() if it=
-'s not in
-> > 64-bit mode?
->=20
-> I also prefer to add a comment if no objection.
->=20
-> Seems I am not the only one who didn't get it=EF=BF=BD : )
+On Mon, Mar 27, 2023 at 01:05:53PM -0700, Brett Creeley wrote:
+> Add Kconfig entries and pds_vfio.rst. Also, add an entry in the
+> MAINTAINERS file for this new driver.
+> 
+> It's not clear where documentation for vendor specific VFIO
+> drivers should live, so just re-use the current amd
+> ethernet location.
+> 
+> Signed-off-by: Brett Creeley <brett.creeley@amd.com>
+> Signed-off-by: Shannon Nelson <shannon.nelson@amd.com>
 
-I would rather have a code change than a comment, e.g.=20
-
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index f63b28f46a71..0460ca219f96 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -4931,7 +4931,8 @@ int get_vmx_mem_address(struct kvm_vcpu *vcpu, unsign=
-ed long exit_qualification,
-        int  base_reg       =3D (vmx_instruction_info >> 23) & 0xf;
-        bool base_is_valid  =3D !(vmx_instruction_info & (1u << 27));
-=20
--       if (is_reg) {
-+       if (is_reg ||
-+           WARN_ON_ONCE(is_long_mode(vcpu) && !is_64_bit_mode(vcpu))) {
-                kvm_queue_exception(vcpu, UD_VECTOR);
-                return 1;
-        }
-
-
-The only downside is that querying is_64_bit_mode() could unnecessarily tri=
-gger a
-VMREAD to get the current CS.L bit, but a measurable performance regression=
-s is
-extremely unlikely because is_64_bit_mode() all but guaranteed to be called=
- in
-these paths anyways (and KVM caches segment info), e.g. by kvm_register_rea=
-d().
-
-And then in a follow-up, we should also be able to do:
-
-@@ -5402,7 +5403,7 @@ static int handle_vmread(struct kvm_vcpu *vcpu)
-        if (instr_info & BIT(10)) {
-                kvm_register_write(vcpu, (((instr_info) >> 3) & 0xf), value=
-);
-        } else {
--               len =3D is_64_bit_mode(vcpu) ? 8 : 4;
-+               len =3D is_long_mode(vcpu) ? 8 : 4;
-                if (get_vmx_mem_address(vcpu, exit_qualification,
-                                        instr_info, true, len, &gva))
-                        return 1;
-@@ -5476,7 +5477,7 @@ static int handle_vmwrite(struct kvm_vcpu *vcpu)
-        if (instr_info & BIT(10))
-                value =3D kvm_register_read(vcpu, (((instr_info) >> 3) & 0x=
-f));
-        else {
--               len =3D is_64_bit_mode(vcpu) ? 8 : 4;
-+               len =3D is_long_mode(vcpu) ? 8 : 4;
-                if (get_vmx_mem_address(vcpu, exit_qualification,
-                                        instr_info, false, len, &gva))
-                        return 1;
+Reviewed-by: Simon Horman <simon.horman@corigine.com>
 
