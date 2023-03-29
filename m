@@ -2,138 +2,244 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3A1AC6CD038
-	for <lists+kvm@lfdr.de>; Wed, 29 Mar 2023 04:40:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 37DB86CD055
+	for <lists+kvm@lfdr.de>; Wed, 29 Mar 2023 04:48:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229986AbjC2CkP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Mar 2023 22:40:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55170 "EHLO
+        id S229980AbjC2Csl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Mar 2023 22:48:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36314 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229972AbjC2CkL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Mar 2023 22:40:11 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 601DF2D4F
-        for <kvm@vger.kernel.org>; Tue, 28 Mar 2023 19:40:01 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id z4-20020a25bb04000000b00b392ae70300so14128797ybg.21
-        for <kvm@vger.kernel.org>; Tue, 28 Mar 2023 19:40:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1680057600;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=g+L6ngmQzqeAkDT2zaXK2CAjwgR4YJ46Vd4xGrMqvOI=;
-        b=I8QIadBdOlQ7lazV39hVWI0Kws6dkOboQeyNkOYTnlXnAnszJyff8w0ygPp8su/4Zu
-         Nny1qhPbY5EOcYeQP1NkrwbXxY9MfZ9fB9M6RWdP3JzQNJkPujH5JbCWDapX+IxYy7+I
-         qnJKGvD4Xsjb2nMJiMKeVTp/IrQWdvZoczS1B0WMdtjAJbNlLBD2BEy198yTua4eFZ7O
-         Z+plU+9ITDrs63mqQpAEZZgu718LG4YwwwpdYMpJiczCIS0Hz/f5Pw4NCQFaRQhUGVQu
-         f3c+eYfO/VIoCeOqsBFoU4wsPozrWQHpb/ikLkDBG2iATuNEw4LBou028tCKfEyUO5E0
-         z9eA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680057600;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=g+L6ngmQzqeAkDT2zaXK2CAjwgR4YJ46Vd4xGrMqvOI=;
-        b=vHZF12mGO1DHDTPOAgyhvDVhBCE25urTrDL1TIG9rivbWrZdXh2E+LMIAAGbmZxmtF
-         JcCyD0RTJGV+o1NyFrR9fzIUQurEZXl9Sk7sv7L6YBnYyQauC8fpRsrE+hGoDuNHABa3
-         2UjxUQe9XbfeiwGLQcPfCj8mGt/KdoIjFJw8MicvOi5AeP8OnDG/+YEC/Zq9yZMZ7u1f
-         mbUJ3AgUGg82bHGS6K4eNsaz5kkySBD3+BjeCu/LNjvNGO7R9oedtfQVs40tE8nAbp0c
-         bd3J5RvdtPLHmglxTxdiNbHjxHSNRwbKEr98HU2m3U8iaCLM2lej/TKJaKT3cCWSQAG8
-         lNQQ==
-X-Gm-Message-State: AAQBX9d+s3LU7Z75BLlQ+8iS/XwstH8yN2nEmFMBk0r7C4IHle7fqFDI
-        MHTJaNaVdfqqOf09bYGbBHXru3ZkwFQ=
-X-Google-Smtp-Source: AKy350Z396WmO5htsaorEF4lDrOAYg2qSUXByMyFmFnN20rjqJnOIXx38KZo3aNWtmyFJDUISkk9iVSdNco=
-X-Received: from reijiw-west4.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:aa1])
- (user=reijiw job=sendgmr) by 2002:a81:ad05:0:b0:545:fff5:b639 with SMTP id
- l5-20020a81ad05000000b00545fff5b639mr3570058ywh.1.1680057600649; Tue, 28 Mar
- 2023 19:40:00 -0700 (PDT)
-Date:   Tue, 28 Mar 2023 19:39:44 -0700
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.40.0.348.gf938b09366-goog
-Message-ID: <20230329023944.2488484-1-reijiw@google.com>
-Subject: [PATCH v2] KVM: arm64: PMU: Restore the guest's EL0 event counting
- after migration
-From:   Reiji Watanabe <reijiw@google.com>
-To:     Marc Zyngier <maz@kernel.org>,
-        Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev
-Cc:     kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Raghavendra Rao Anata <rananta@google.com>,
-        Will Deacon <will@kernel.org>,
-        Reiji Watanabe <reijiw@google.com>, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-7.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+        with ESMTP id S229683AbjC2Csl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Mar 2023 22:48:41 -0400
+Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08F6110C9;
+        Tue, 28 Mar 2023 19:48:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1680058120; x=1711594120;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=zWVM1XKe1VFK47f/RGqAXZAGN/Fc8fiPwEhDoVnF3HA=;
+  b=gnKGSIYRqfTsF/rIW590ss9BG7VgmU3YP2JbW+CH7AixvpFVoBQscdwn
+   pb8M16CN8xcJduCirsi9uptdrVnwNOHoiY6tvlhVNZbrqB2lEHx8vq0pA
+   n9MqBWv2P1RCt/KCspNWQwEaBbIpQqb3/MckWnALnOTGIPKZ3Gm16Iq9Z
+   b4PnDvOlxoBmUazXeceRSOTe4Sn2fEIrPzJhJm8SXB2e9Au9iMOqlGFf8
+   htxcVgoW4PBwLw7WSu+0jVazVcpYpeLmg9KMRnk7TY8zkvuJolyftk233
+   YYq7mzMZeXJ5kJdBbHZIJug5AwyQoc2LMwVGH3dMohM7V9QftfBc0MrBP
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10663"; a="343170001"
+X-IronPort-AV: E=Sophos;i="5.98,299,1673942400"; 
+   d="scan'208";a="343170001"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Mar 2023 19:48:36 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10663"; a="686650715"
+X-IronPort-AV: E=Sophos;i="5.98,299,1673942400"; 
+   d="scan'208";a="686650715"
+Received: from lkp-server01.sh.intel.com (HELO b613635ddfff) ([10.239.97.150])
+  by fmsmga007.fm.intel.com with ESMTP; 28 Mar 2023 19:48:32 -0700
+Received: from kbuild by b613635ddfff with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1phLrT-000J7L-2O;
+        Wed, 29 Mar 2023 02:48:31 +0000
+Date:   Wed, 29 Mar 2023 10:48:02 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Reinette Chatre <reinette.chatre@intel.com>, jgg@nvidia.com,
+        yishaih@nvidia.com, shameerali.kolothum.thodi@huawei.com,
+        kevin.tian@intel.com, alex.williamson@redhat.com
+Cc:     oe-kbuild-all@lists.linux.dev, tglx@linutronix.de,
+        darwi@linutronix.de, kvm@vger.kernel.org, dave.jiang@intel.com,
+        jing2.liu@intel.com, ashok.raj@intel.com, fenghua.yu@intel.com,
+        tom.zanussi@linux.intel.com, reinette.chatre@intel.com,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH V2 7/8] vfio/pci: Support dynamic MSI-x
+Message-ID: <202303291000.PWFqGCxH-lkp@intel.com>
+References: <419f3ba2f732154d8ae079b3deb02d0fdbe3e258.1680038771.git.reinette.chatre@intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <419f3ba2f732154d8ae079b3deb02d0fdbe3e258.1680038771.git.reinette.chatre@intel.com>
+X-Spam-Status: No, score=-2.5 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Currently, with VHE, KVM enables the EL0 event counting for the
-guest on vcpu_load() or KVM enables it as a part of the PMU
-register emulation process, when needed.  However, in the migration
-case (with VHE), the same handling is lacking, as vPMU register
-values that were restored by userspace haven't been propagated yet
-(the PMU events haven't been created) at the vcpu load-time on the
-first KVM_RUN (kvm_vcpu_pmu_restore_guest() called from vcpu_load()
-on the first KVM_RUN won't do anything as events_{guest,host} of
-kvm_pmu_events are still zero).
+Hi Reinette,
 
-So, with VHE, enable the guest's EL0 event counting on the first
-KVM_RUN (after the migration) when needed.  More specifically,
-have kvm_pmu_handle_pmcr() call kvm_vcpu_pmu_restore_guest()
-so that kvm_pmu_handle_pmcr() on the first KVM_RUN can take
-care of it.
+I love your patch! Yet something to improve:
 
-Fixes: d0c94c49792c ("KVM: arm64: Restore PMU configuration on first run")
-Cc: stable@vger.kernel.org
-Reviewed-by: Marc Zyngier <maz@kernel.org>
-Signed-off-by: Reiji Watanabe <reijiw@google.com>
+[auto build test ERROR on 197b6b60ae7bc51dd0814953c562833143b292aa]
 
----
-v2:
- - Added more explanation to the commit message [Marc]
- - Added Marc's r-b tag (Thank you!)
+url:    https://github.com/intel-lab-lkp/linux/commits/Reinette-Chatre/vfio-pci-Consolidate-irq-cleanup-on-MSI-MSI-X-disable/20230329-055735
+base:   197b6b60ae7bc51dd0814953c562833143b292aa
+patch link:    https://lore.kernel.org/r/419f3ba2f732154d8ae079b3deb02d0fdbe3e258.1680038771.git.reinette.chatre%40intel.com
+patch subject: [PATCH V2 7/8] vfio/pci: Support dynamic MSI-x
+config: i386-randconfig-a001-20230327 (https://download.01.org/0day-ci/archive/20230329/202303291000.PWFqGCxH-lkp@intel.com/config)
+compiler: gcc-11 (Debian 11.3.0-8) 11.3.0
+reproduce (this is a W=1 build):
+        # https://github.com/intel-lab-lkp/linux/commit/420198d6ba9227a0ef81a2192ca35019fa6439cf
+        git remote add linux-review https://github.com/intel-lab-lkp/linux
+        git fetch --no-tags linux-review Reinette-Chatre/vfio-pci-Consolidate-irq-cleanup-on-MSI-MSI-X-disable/20230329-055735
+        git checkout 420198d6ba9227a0ef81a2192ca35019fa6439cf
+        # save the config file
+        mkdir build_dir && cp config build_dir/.config
+        make W=1 O=build_dir ARCH=i386 olddefconfig
+        make W=1 O=build_dir ARCH=i386 SHELL=/bin/bash drivers/vfio/pci/
 
-v1: https://lore.kernel.org/all/20230328034725.2051499-1-reijiw@google.com/
----
- arch/arm64/kvm/pmu-emul.c | 1 +
- arch/arm64/kvm/sys_regs.c | 1 -
- 2 files changed, 1 insertion(+), 1 deletion(-)
+If you fix the issue, kindly add following tag where applicable
+| Reported-by: kernel test robot <lkp@intel.com>
+| Link: https://lore.kernel.org/oe-kbuild-all/202303291000.PWFqGCxH-lkp@intel.com/
 
-diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-index 24908400e190..74e0d2b153b5 100644
---- a/arch/arm64/kvm/pmu-emul.c
-+++ b/arch/arm64/kvm/pmu-emul.c
-@@ -557,6 +557,7 @@ void kvm_pmu_handle_pmcr(struct kvm_vcpu *vcpu, u64 val)
- 		for_each_set_bit(i, &mask, 32)
- 			kvm_pmu_set_pmc_value(kvm_vcpu_idx_to_pmc(vcpu, i), 0, true);
- 	}
-+	kvm_vcpu_pmu_restore_guest(vcpu);
- }
- 
- static bool kvm_pmu_counter_is_enabled(struct kvm_pmc *pmc)
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 53749d3a0996..425e1e9adae7 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -794,7 +794,6 @@ static bool access_pmcr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- 		if (!kvm_supports_32bit_el0())
- 			val |= ARMV8_PMU_PMCR_LC;
- 		kvm_pmu_handle_pmcr(vcpu, val);
--		kvm_vcpu_pmu_restore_guest(vcpu);
- 	} else {
- 		/* PMCR.P & PMCR.C are RAZ */
- 		val = __vcpu_sys_reg(vcpu, PMCR_EL0)
+All errors (new ones prefixed by >>):
 
-base-commit: 197b6b60ae7bc51dd0814953c562833143b292aa
+   drivers/vfio/pci/vfio_pci_intrs.c: In function 'vfio_msi_set_vector_signal':
+>> drivers/vfio/pci/vfio_pci_intrs.c:427:21: error: implicit declaration of function 'pci_msix_can_alloc_dyn' [-Werror=implicit-function-declaration]
+     427 |         if (msix && pci_msix_can_alloc_dyn(vdev->pdev))
+         |                     ^~~~~~~~~~~~~~~~~~~~~~
+   cc1: some warnings being treated as errors
+
+
+vim +/pci_msix_can_alloc_dyn +427 drivers/vfio/pci/vfio_pci_intrs.c
+
+   413	
+   414	static int vfio_msi_set_vector_signal(struct vfio_pci_core_device *vdev,
+   415					      unsigned int vector, int fd, bool msix)
+   416	{
+   417		struct pci_dev *pdev = vdev->pdev;
+   418		struct vfio_pci_irq_ctx *ctx;
+   419		struct msi_map msix_map = {};
+   420		bool allow_dyn_alloc = false;
+   421		struct eventfd_ctx *trigger;
+   422		bool new_ctx = false;
+   423		int irq, ret;
+   424		u16 cmd;
+   425	
+   426		/* Only MSI-X allows dynamic allocation. */
+ > 427		if (msix && pci_msix_can_alloc_dyn(vdev->pdev))
+   428			allow_dyn_alloc = true;
+   429	
+   430		ctx = vfio_irq_ctx_get(vdev, vector);
+   431		if (!ctx && !allow_dyn_alloc)
+   432			return -EINVAL;
+   433	
+   434		irq = pci_irq_vector(pdev, vector);
+   435		/* Context and interrupt are always allocated together. */
+   436		WARN_ON((ctx && irq == -EINVAL) || (!ctx && irq != -EINVAL));
+   437	
+   438		if (ctx && ctx->trigger) {
+   439			irq_bypass_unregister_producer(&ctx->producer);
+   440	
+   441			cmd = vfio_pci_memory_lock_and_enable(vdev);
+   442			free_irq(irq, ctx->trigger);
+   443			if (allow_dyn_alloc) {
+   444				msix_map.index = vector;
+   445				msix_map.virq = irq;
+   446				pci_msix_free_irq(pdev, msix_map);
+   447				irq = -EINVAL;
+   448			}
+   449			vfio_pci_memory_unlock_and_restore(vdev, cmd);
+   450			kfree(ctx->name);
+   451			eventfd_ctx_put(ctx->trigger);
+   452			ctx->trigger = NULL;
+   453			if (allow_dyn_alloc) {
+   454				vfio_irq_ctx_free(vdev, ctx, vector);
+   455				ctx = NULL;
+   456			}
+   457		}
+   458	
+   459		if (fd < 0)
+   460			return 0;
+   461	
+   462		if (!ctx) {
+   463			ctx = vfio_irq_ctx_alloc_single(vdev, vector);
+   464			if (!ctx)
+   465				return -ENOMEM;
+   466			new_ctx = true;
+   467		}
+   468	
+   469		ctx->name = kasprintf(GFP_KERNEL_ACCOUNT, "vfio-msi%s[%d](%s)",
+   470				      msix ? "x" : "", vector, pci_name(pdev));
+   471		if (!ctx->name) {
+   472			ret = -ENOMEM;
+   473			goto out_free_ctx;
+   474		}
+   475	
+   476		trigger = eventfd_ctx_fdget(fd);
+   477		if (IS_ERR(trigger)) {
+   478			ret = PTR_ERR(trigger);
+   479			goto out_free_name;
+   480		}
+   481	
+   482		cmd = vfio_pci_memory_lock_and_enable(vdev);
+   483		if (msix) {
+   484			if (irq == -EINVAL) {
+   485				msix_map = pci_msix_alloc_irq_at(pdev, vector, NULL);
+   486				if (msix_map.index < 0) {
+   487					vfio_pci_memory_unlock_and_restore(vdev, cmd);
+   488					ret = msix_map.index;
+   489					goto out_put_eventfd_ctx;
+   490				}
+   491				irq = msix_map.virq;
+   492			} else {
+   493				/*
+   494				 * The MSIx vector table resides in device memory which
+   495				 * may be cleared via backdoor resets. We don't allow
+   496				 * direct access to the vector table so even if a
+   497				 * userspace driver attempts to save/restore around
+   498				 * such a reset it would be unsuccessful. To avoid
+   499				 * this, restore the cached value of the message prior
+   500				 * to enabling.
+   501				 */
+   502				struct msi_msg msg;
+   503	
+   504				get_cached_msi_msg(irq, &msg);
+   505				pci_write_msi_msg(irq, &msg);
+   506			}
+   507		}
+   508	
+   509		ret = request_irq(irq, vfio_msihandler, 0, ctx->name, trigger);
+   510		if (ret)
+   511			goto out_free_irq_locked;
+   512	
+   513		vfio_pci_memory_unlock_and_restore(vdev, cmd);
+   514	
+   515		ctx->producer.token = trigger;
+   516		ctx->producer.irq = irq;
+   517		ret = irq_bypass_register_producer(&ctx->producer);
+   518		if (unlikely(ret)) {
+   519			dev_info(&pdev->dev,
+   520			"irq bypass producer (token %p) registration fails: %d\n",
+   521			ctx->producer.token, ret);
+   522	
+   523			ctx->producer.token = NULL;
+   524		}
+   525		ctx->trigger = trigger;
+   526	
+   527		return 0;
+   528	
+   529	out_free_irq_locked:
+   530		if (allow_dyn_alloc && new_ctx) {
+   531			msix_map.index = vector;
+   532			msix_map.virq = irq;
+   533			pci_msix_free_irq(pdev, msix_map);
+   534		}
+   535		vfio_pci_memory_unlock_and_restore(vdev, cmd);
+   536	out_put_eventfd_ctx:
+   537		eventfd_ctx_put(trigger);
+   538	out_free_name:
+   539		kfree(ctx->name);
+   540		ctx->name = NULL;
+   541	out_free_ctx:
+   542		if (allow_dyn_alloc && new_ctx)
+   543			vfio_irq_ctx_free(vdev, ctx, vector);
+   544		return ret;
+   545	}
+   546	
+
 -- 
-2.40.0.348.gf938b09366-goog
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests
