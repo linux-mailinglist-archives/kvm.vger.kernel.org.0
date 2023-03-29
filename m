@@ -2,317 +2,225 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 73DCE6CD489
-	for <lists+kvm@lfdr.de>; Wed, 29 Mar 2023 10:25:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 76CC66CD5B8
+	for <lists+kvm@lfdr.de>; Wed, 29 Mar 2023 11:00:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231235AbjC2IZT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 Mar 2023 04:25:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55482 "EHLO
+        id S231196AbjC2JAX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 Mar 2023 05:00:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49740 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230013AbjC2IZC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 29 Mar 2023 04:25:02 -0400
-Received: from mail-lj1-x232.google.com (mail-lj1-x232.google.com [IPv6:2a00:1450:4864:20::232])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0ED0C449B
-        for <kvm@vger.kernel.org>; Wed, 29 Mar 2023 01:24:27 -0700 (PDT)
-Received: by mail-lj1-x232.google.com with SMTP id y35so12711857ljq.4
-        for <kvm@vger.kernel.org>; Wed, 29 Mar 2023 01:24:26 -0700 (PDT)
+        with ESMTP id S229817AbjC2JAC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 29 Mar 2023 05:00:02 -0400
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2135.outbound.protection.outlook.com [40.107.223.135])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8456B59C7;
+        Wed, 29 Mar 2023 01:59:33 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=K6qZgtEtZWWzeH0DrYvCfMEu7EBmR//HtcM5DbnSzqefMC7QQ3/gMoti1UCZD9n3NgbLPZwqEyk7QNs8iWf4um6xZGfD+AbFib/19KLImHyyfifx55cB6IXkOHP76YkWE/KnoUJ8YXop8m8C9FqlCQBbgi8E/6rwoSYWFQd3oYpqfT71wKtINU6AoOvGqnERUVLz8+VDoqwHQgG+V3v+Uakn51iVr6jmbQcquiXOt1pyUUod62htzbYATsZnh0f+wZiDHcUVX0lWzyQYwvqcruPhJ9ThZsVolHeaqQNiF8i+T7oObBgsBKSmrPkRVgBVTmQAWF0+9t859AdtzCH2TQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=AuNKC9pH4LO7yqdB+55VHHoIvsBm8d1wUAcsqzYLARI=;
+ b=gW8sMlYtixVcFIF8kcF9vJ2/zDD0A6XD0iGec5rWvmWADZgwVw0Y7OXYQqBoZ0eWBG3SyxyLNm9AhsTZ06Q4lLDjYzjasrYtxwIgmZeGOct/+IzSZDoIkl4kSOzoKXGCGDpU1IyoyJfAOYHhFgfL/rMm7IqzfcCdQNQWVA+fKHORvViuf60C5Ipn6kn7YgObQhenjHuD2FPVsk/UqS4SJ0g9cevDdqNQ5/P4iuuoUzr/alWaC8lbCjU7ZjjsT6RCel+ZbuC8GX5jCQdaHOBlPrd9YfaUQgTvc4Mis/udeq9lUgtqVZpb95beCFavDrSMLI7N8YRu7di7QiSWU7dM8Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
+ dkim=pass header.d=corigine.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1680078265; x=1682670265;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Cu7qfeJkkczjvoIhjysrEZeUB7bjKlbqmDT12PkHlC8=;
-        b=eWSUMAK3bsqC0NedIQmMSaeFu3pjI8tedDfU4dyZrmfbCCpw5NqKj6dKYXE7MTCKQD
-         kWEYWCGrTkLGM8lnh9zQ8D9DB7N2uPZk32JBA7B4EW+aRw6a40i4Vnd8/FEYXDSDy/AB
-         Jr9FLnkonLo8eqqdOdwgKD/u4qw7RA2acB02aHarSts+1OeLhovIHCSpJFDiOkIirUjG
-         5jffcyBDPwx/rm8KAY6FJfoLQq71muTqzQSG9uNSNGusK1n5aKI39a9m1xteKCWxjhum
-         S+ssLX9MVS24xNUZo7y7g+cJ+1neazTZdomThrerj1kBhZBWOGlGQ5qoOlsnhQecuLAs
-         1Alw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680078265; x=1682670265;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Cu7qfeJkkczjvoIhjysrEZeUB7bjKlbqmDT12PkHlC8=;
-        b=YdJ7DODSd/qlPfLqkzKrnrT9YDdJ60qPrVMWOQ0rV3oIzcQ6Qw6pZNX820P0nEAYsB
-         pnZxjX45p0iPpqt1Gv4S34eMk5JU3QjpCsGta+Tp1TxPI7SKg/CoI5efZwBfszxCz6jK
-         KcHz/UeD4NC+frO+3cKsDDK35f7k3YJI/YSVCe4LNELplk9+WAhKJpb2H+rjpo/6dVTV
-         tlQlxGt1P/N0f/8lQF0It/T0/PH2tqVKRKM+ZGg1wuoaeCMcMMwF8BIbzZNDyMbSWHKg
-         0HQJtbXrR8SC2f2mCRyypg5YVAgFs7sSO4V9+RJBMgFeIS+bnlXK/ZTI7Qba/iVITGfq
-         GGpA==
-X-Gm-Message-State: AAQBX9c+9C7AmW1DLUUHMjgZN4EUq59/s7oaua47OanPrI4on8ll3q4y
-        UAk6rXfzdIpZV73Hj/XcAwmmDDPOW/d7HB1oaQISww==
-X-Google-Smtp-Source: AKy350Zdw/+dU54osSmbNi/6zrDBJpczBd5MKGiFdCqC9Nz8geRkJDzntcyO7cvI7fUpVXpmp302TmV6Sw+TA/69ln8=
-X-Received: by 2002:a05:651c:c1:b0:29a:a76a:194b with SMTP id
- 1-20020a05651c00c100b0029aa76a194bmr1164509ljr.3.1680078264821; Wed, 29 Mar
- 2023 01:24:24 -0700 (PDT)
+ d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=AuNKC9pH4LO7yqdB+55VHHoIvsBm8d1wUAcsqzYLARI=;
+ b=kGRZdpHxQaIIcsmdhBKAFSSfe+Lx1dAAlxq1uqTnf6cDPqo9pcI4LhVLWJ00iu8MX+aQMdQ2PvK6pOea313czwaosrDm4615S4egJHStmYayguX28AYrn9fcp21lMMiO+hbApx/pPB7v+InZizru6r1ZDcYbXHeMW3XCGPCoQJw=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=corigine.com;
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
+ by CH2PR13MB3800.namprd13.prod.outlook.com (2603:10b6:610:9c::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6222.35; Wed, 29 Mar
+ 2023 08:58:59 +0000
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::c506:5243:557e:82cb]) by PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::c506:5243:557e:82cb%4]) with mapi id 15.20.6222.028; Wed, 29 Mar 2023
+ 08:58:59 +0000
+Date:   Wed, 29 Mar 2023 10:58:51 +0200
+From:   Simon Horman <simon.horman@corigine.com>
+To:     Brett Creeley <brett.creeley@amd.com>
+Cc:     kvm@vger.kernel.org, netdev@vger.kernel.org,
+        alex.williamson@redhat.com, jgg@nvidia.com, yishaih@nvidia.com,
+        shameerali.kolothum.thodi@huawei.com, kevin.tian@intel.com,
+        shannon.nelson@amd.com, drivers@pensando.io
+Subject: Re: [PATCH v6 vfio 5/7] vfio/pds: Add support for dirty page tracking
+Message-ID: <ZCP9y/cmfB4acIOV@corigine.com>
+References: <20230327200553.13951-1-brett.creeley@amd.com>
+ <20230327200553.13951-6-brett.creeley@amd.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230327200553.13951-6-brett.creeley@amd.com>
+X-ClientProxiedBy: AM4P190CA0013.EURP190.PROD.OUTLOOK.COM
+ (2603:10a6:200:56::23) To PH0PR13MB4842.namprd13.prod.outlook.com
+ (2603:10b6:510:78::6)
 MIME-Version: 1.0
-References: <20230317050637.766317-1-jingzhangos@google.com>
- <20230317050637.766317-4-jingzhangos@google.com> <CA+EHjTwXA9TprX4jeG+-D+c8v9XG+oFdU1o6TSkvVye145_OvA@mail.gmail.com>
- <CAAdAUti3KhpiZDW1K8C7fVyFy1ma8Rp5JVxyJY57GR7CcrQ5UQ@mail.gmail.com>
-In-Reply-To: <CAAdAUti3KhpiZDW1K8C7fVyFy1ma8Rp5JVxyJY57GR7CcrQ5UQ@mail.gmail.com>
-From:   Fuad Tabba <tabba@google.com>
-Date:   Wed, 29 Mar 2023 09:23:48 +0100
-Message-ID: <CA+EHjTyH04NuSiDe5+5KCRri6Od-==0_gZzY_VJ_b95WFa-TOg@mail.gmail.com>
-Subject: Re: [PATCH v4 3/6] KVM: arm64: Use per guest ID register for ID_AA64PFR0_EL1.[CSV2|CSV3]
-To:     Jing Zhang <jingzhangos@google.com>
-Cc:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>,
-        ARMLinux <linux-arm-kernel@lists.infradead.org>,
-        Marc Zyngier <maz@kernel.org>,
-        Oliver Upton <oupton@google.com>,
-        Will Deacon <will@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Raghavendra Rao Ananta <rananta@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-15.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,ENV_AND_HDR_SPF_MATCH,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL,
-        USER_IN_DEF_SPF_WL autolearn=unavailable autolearn_force=no
-        version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|CH2PR13MB3800:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6ed571e6-8dc7-462e-cf48-08db3033d595
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: u9gWjwQWK20fWcTCi162objiv7GNiK7WLVNWIRVe4aZ1NLplH4V6H6RFQIgOSiR508z3ivjXVtoGqnpqSB/SxAMX65iUWwqY5Faa8m0Dg8ggYq3n6FjhcwpdSN0FjVAZBoa1Ierhy8s9r+Rv12T06QDtQTJHuhyFDkBayk2crD0hsKrar7rK6Stw5Ol91OBY6UGZUFWhQhkbxSEeumIPh4IN01T30PY65cXL2sGtvWiMhTAS3OrvhidNsMGijIX4AMQ0ikB31GD8oki91fJ2yx301yBNTDcVJsXpR+nOCVDS0HhwjgAdgWelCCjOuhVH8s6lZDMSN4P5OeFWA25U0VCoZxjBj2Mb2iSANEPnabL+CLAGbDa2xKN6S9fKHd0e3snr/kvqHul5hc5LzTaKP7xpKCke3gKZOUv5QkRi8cjQ83JaZbWXr69tvEXhfoHE8hrh/R+7NxllMEwUc2gi8Ot0e8Kd1xqMgm9fQ0qjDLlNpne4Gy2v8pNd2kV5xNn2w0Zl+IzaG0tbQBpc7Qe9WcvrMhdNPrYWycGDYrClmr1h3XYRc7qMaZr+Sv+u7Y9OJaJtGp+X6xtDpYmZTJTvxXehZktE6q4a9eUKU+EeJp8ttKo6gF30UtTPoH19obGKLXJgFzofNTqsuD9H/zBLzCICguXMTHbvutmfY6SUdT4=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(39840400004)(396003)(376002)(366004)(136003)(346002)(451199021)(83380400001)(66946007)(316002)(6486002)(6666004)(2616005)(6512007)(66556008)(478600001)(186003)(2906002)(86362001)(44832011)(6506007)(7416002)(5660300002)(38100700002)(36756003)(41300700001)(8676002)(6916009)(4326008)(66476007)(8936002)(14143004);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?K9kcJPELw5EZeKJT9M8c/jJBlLSIz7MfDRkh81rMgdF9sGTkcWfY4yMII6ew?=
+ =?us-ascii?Q?rE3jey0/EcZZa7gn1PWlGn1zh37MoSWRLguyqcIJAjqifgxvPxsZT1t4hRDm?=
+ =?us-ascii?Q?iV6dwXf8qTUtMq2N62lXurP8E1pflgG6O1Fh5CtEE5OmFi7V9bI5QAItr6nq?=
+ =?us-ascii?Q?fpwjqYYpAfJW0qF8QuRjXWzdxXIz2ZSUgWJEBQHbsTbDF+K7rxm2Oo964OEh?=
+ =?us-ascii?Q?1tCuJtf8jTbvMhX5R8ZbknjYMUO2aTJtPqJfbAp66VyKSnhx7OXtt8XNfAQA?=
+ =?us-ascii?Q?fabN0MuizAfLropo1g33RegeMGwsfAb9uMRFMay5hL19WEJlZOXtsanT57E8?=
+ =?us-ascii?Q?TZB6zdz5FjNf5XX2HW4V7/eZmpqnMjLfXsri3TY2lBahXZXT10Ah41lvCAWw?=
+ =?us-ascii?Q?n0fjS3JxoCoYYww5q6sndGR4shDbdRjY0Kxm5hIucYsDXX6cGvgoE7wAenn0?=
+ =?us-ascii?Q?PgAsqDmX9D6X9g/am2krqttd1VROwdIQWR9+TTsQhOAoEdtnUHEIS/Gf+g/J?=
+ =?us-ascii?Q?iBROcYhpUK2LESGyFceZFdMXFWNmCVsv3jTRQU05tpiHFlBFe5jsjeu7UJjR?=
+ =?us-ascii?Q?ps3TjjPqzRii9q3LWytUD9Vn040Mnni1fm9SUJprs7i9vvHsB8HLSyRdOuc6?=
+ =?us-ascii?Q?Tb/z08UtfGcXPgZKgX8pFWXNoTsRJW6CxbhzDIEGNTWKCZEqT4Dk/Mrm+mO+?=
+ =?us-ascii?Q?8zRYG8HLIVgzq3MpBhtZiVHeVchXmrasixS/g0o1pT/kbrX4sEypdYlnzGkh?=
+ =?us-ascii?Q?ThdLmw3pLdq3fOYpEdj2ds8R2mGMCvTdK3om6y//ZqdsjK6dQiFhHFcWjtKk?=
+ =?us-ascii?Q?O7Mwf1RbZZOzsMEIyuPwLc9SJ79J3UlUodVZEkPfLGfMWzBZ6vTGCBqQl3PM?=
+ =?us-ascii?Q?MEXIj/gZ5CIRUHARWzfSKHuD0EuY6YP5paqGDwc5m2jr42TyR4gJyk2h+3ux?=
+ =?us-ascii?Q?en3z5LJX4BXWwbQfWlIm+E7dflH0bY5QfzgPxXqNLpk+BBh9v/2gd5lV2ScF?=
+ =?us-ascii?Q?fGkNrEMK68HGwiN3UNadL6dC/dQwhJqnTfWQ1UK/dcNwUxuVr1KWbVLhQq/s?=
+ =?us-ascii?Q?TpDJG8+xUdNmlPc6sPUgqh7yUaETIJGGuFZHKcOJ+pf6O0QMR4jFJ+dtcgSF?=
+ =?us-ascii?Q?mTrey30whv1/CRQJzTrZ+wn/0g0J2LrKJHvU6jrr6gOu2GywZt6iru1T7FDb?=
+ =?us-ascii?Q?DLiiPfLMTPGX1xv5OxdqFTxlKBMirGg/sVmsvTwjlf7eWl8rdzVuRS58fVL9?=
+ =?us-ascii?Q?FNeteQUptM1Cj8JoqvNhL4iXnEPGRT89+TiE4HWnsSkuzxvDkH1M8tFYt9HP?=
+ =?us-ascii?Q?n7AKCDS+jngbw677T2Ctyn91zFUh33jVqcPg+Vy34BTNrhwT/HWKgKLS3JOg?=
+ =?us-ascii?Q?qj256IQAoobz2qMxqMFR1pKAusTlDTqxUU25GiUYOpD85wZvBZRb4tDgZAHR?=
+ =?us-ascii?Q?d6yUxf9w79lcigcyq10oeAyGTqRgBLkoxSSy2msdZaGxT7D5qgOahMhLhewd?=
+ =?us-ascii?Q?GYfYGlRoAJneIoHan0zCb5zVIHd1RABb+JS84tbhwDrvDfLHwBAWc3ZPRt1G?=
+ =?us-ascii?Q?CIYT0zLbKFvdIZ+AoP1hyb6SDX48a1WCnJtPVIgnA20po81gdvZTqa/lh5IU?=
+ =?us-ascii?Q?oJqcAMgddLsK4RkAjG9GPZWQEc65qrTszB00rQhdHXrCVgJgfD4tlquyNDG9?=
+ =?us-ascii?Q?vUYo0Q=3D=3D?=
+X-OriginatorOrg: corigine.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6ed571e6-8dc7-462e-cf48-08db3033d595
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Mar 2023 08:58:59.0813
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: I3SsnzJp/Ij2cnutkdUDq5iiWisVtTKp5ctBWt9FQNYXdWuxnzdIn1DRUU9cJRLQrREJFFrI9aye5AVYTylxcBMyMEG3H/+0Sl/+Qdx9WKc=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR13MB3800
+X-Spam-Status: No, score=-0.0 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Jing,
+On Mon, Mar 27, 2023 at 01:05:51PM -0700, Brett Creeley wrote:
+> In order to support dirty page tracking, the driver has to implement
+> the VFIO subsystem's vfio_log_ops. This includes log_start, log_stop,
+> and log_read_and_clear.
+> 
+> All of the tracker resources are allocated and dirty tracking on the
+> device is started during log_start. The resources are cleaned up and
+> dirty tracking on the device is stopped during log_stop. The dirty
+> pages are determined and reported during log_read_and_clear.
+> 
+> In order to support these callbacks admin queue commands are used.
+> All of the adminq queue command structures and implementations
+> are included as part of this patch.
+> 
+> PDS_LM_CMD_DIRTY_STATUS is added to query the current status of
+> dirty tracking on the device. This includes if it's enabled (i.e.
+> number of regions being tracked from the device's perspective) and
+> the maximum number of regions supported from the device's perspective.
+> 
+> PDS_LM_CMD_DIRTY_ENABLE is added to enable dirty tracking on the
+> specified number of regions and their iova ranges.
+> 
+> PDS_LM_CMD_DIRTY_DISABLE is added to disable dirty tracking for all
+> regions on the device.
+> 
+> PDS_LM_CMD_READ_SEQ and PDS_LM_CMD_DIRTY_WRITE_ACK are added to
+> support reading and acknowledging the currently dirtied pages.
+> 
+> Signed-off-by: Brett Creeley <brett.creeley@amd.com>
+> Signed-off-by: Shannon Nelson <shannon.nelson@amd.com>
 
-On Tue, Mar 28, 2023 at 9:01=E2=80=AFPM Jing Zhang <jingzhangos@google.com>=
- wrote:
->
-> Hi Faud,
->
-> On Tue, Mar 28, 2023 at 5:40=E2=80=AFAM Fuad Tabba <tabba@google.com> wro=
-te:
-> >
-> > Hi,
-> >
-> > On Fri, Mar 17, 2023 at 5:06=E2=80=AFAM Jing Zhang <jingzhangos@google.=
-com> wrote:
-> > >
-> > > With per guest ID registers, ID_AA64PFR0_EL1.[CSV2|CSV3] settings fro=
-m
-> > > userspace can be stored in its corresponding ID register.
-> > >
-> > > No functional change intended.
-> > >
-> > > Signed-off-by: Jing Zhang <jingzhangos@google.com>
-> > > ---
-> > >  arch/arm64/include/asm/kvm_host.h  |  2 --
-> > >  arch/arm64/kvm/arm.c               | 19 +------------------
-> > >  arch/arm64/kvm/hyp/nvhe/sys_regs.c |  7 +++----
-> > >  arch/arm64/kvm/id_regs.c           | 30 ++++++++++++++++++++++------=
---
-> > >  4 files changed, 26 insertions(+), 32 deletions(-)
-> > >
-> > > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/a=
-sm/kvm_host.h
-> > > index fb6b50b1f111..e926ea91a73c 100644
-> > > --- a/arch/arm64/include/asm/kvm_host.h
-> > > +++ b/arch/arm64/include/asm/kvm_host.h
-> > > @@ -230,8 +230,6 @@ struct kvm_arch {
-> > >
-> > >         cpumask_var_t supported_cpus;
-> > >
-> > > -       u8 pfr0_csv2;
-> > > -       u8 pfr0_csv3;
-> > >         struct {
-> > >                 u8 imp:4;
-> > >                 u8 unimp:4;
-> > > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> > > index 4579c878ab30..c78d68d011cb 100644
-> > > --- a/arch/arm64/kvm/arm.c
-> > > +++ b/arch/arm64/kvm/arm.c
-> > > @@ -104,22 +104,6 @@ static int kvm_arm_default_max_vcpus(void)
-> > >         return vgic_present ? kvm_vgic_get_max_vcpus() : KVM_MAX_VCPU=
-S;
-> > >  }
-> > >
-> > > -static void set_default_spectre(struct kvm *kvm)
-> > > -{
-> > > -       /*
-> > > -        * The default is to expose CSV2 =3D=3D 1 if the HW isn't aff=
-ected.
-> > > -        * Although this is a per-CPU feature, we make it global beca=
-use
-> > > -        * asymmetric systems are just a nuisance.
-> > > -        *
-> > > -        * Userspace can override this as long as it doesn't promise
-> > > -        * the impossible.
-> > > -        */
-> > > -       if (arm64_get_spectre_v2_state() =3D=3D SPECTRE_UNAFFECTED)
-> > > -               kvm->arch.pfr0_csv2 =3D 1;
-> > > -       if (arm64_get_meltdown_state() =3D=3D SPECTRE_UNAFFECTED)
-> > > -               kvm->arch.pfr0_csv3 =3D 1;
-> > > -}
-> > > -
-> > >  /**
-> > >   * kvm_arch_init_vm - initializes a VM data structure
-> > >   * @kvm:       pointer to the KVM struct
-> > > @@ -151,9 +135,8 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned lo=
-ng type)
-> > >         /* The maximum number of VCPUs is limited by the host's GIC m=
-odel */
-> > >         kvm->max_vcpus =3D kvm_arm_default_max_vcpus();
-> > >
-> > > -       set_default_spectre(kvm);
-> > > -       kvm_arm_init_hypercalls(kvm);
-> > >         kvm_arm_set_default_id_regs(kvm);
-> > > +       kvm_arm_init_hypercalls(kvm);
-> > >
-> > >         /*
-> > >          * Initialise the default PMUver before there is a chance to
-> > > diff --git a/arch/arm64/kvm/hyp/nvhe/sys_regs.c b/arch/arm64/kvm/hyp/=
-nvhe/sys_regs.c
-> > > index 08d2b004f4b7..0e1988740a65 100644
-> > > --- a/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-> > > +++ b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-> > > @@ -93,10 +93,9 @@ static u64 get_pvm_id_aa64pfr0(const struct kvm_vc=
-pu *vcpu)
-> > >                 PVM_ID_AA64PFR0_RESTRICT_UNSIGNED);
-> > >
-> > >         /* Spectre and Meltdown mitigation in KVM */
-> > > -       set_mask |=3D FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_C=
-SV2),
-> > > -                              (u64)kvm->arch.pfr0_csv2);
-> > > -       set_mask |=3D FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_C=
-SV3),
-> > > -                              (u64)kvm->arch.pfr0_csv3);
-> > > +       set_mask |=3D vcpu->kvm->arch.id_regs[IDREG_IDX(SYS_ID_AA64PF=
-R0_EL1)] &
-> > > +               (ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV2) |
-> > > +                       ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV3));
-> >
-> > This triggers a compiler warning now since the variable `struct kvm
-> > *kvm` isn't used anymore, this, however, isn't the main issue.
-> >
-> > The main issue is that `struct kvm` here (vcpu->kvm) is the
-> > hypervisor's version for protected vms, and not the host's. Therefore,
-> > reading that value is wrong. That said, this is an existing bug in
-> > pKVM since kvm->arch.pfr0_csv2 and kvm->arch.pfr0_csv3 are not
-> > initialized.
-> >
-> > The solution would be to track the spectre/meltown state at hyp and
-> > use that. I'll submit a patch that does that. In the meantime, I think
-> > that it would be better not to set the CSV bits for protected VMs,
-> > which is the current behavior in practice.
-> >
-> > Non-protected VMs in protected mode go back to the host on id register
-> > traps, and use the host's `struct kvm`, so they should behave as
-> > expected.
-> You mean just remove these two lines:
->  /* Spectre and Meltdown mitigation in KVM */
->  set_mask |=3D FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV2),
-> (u64)kvm->arch.pfr0_csv2);
-> set_mask |=3D FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV3),
-> (u64)kvm->arch.pfr0_csv3);
->
-> Will it cause any problem for pKVM without your incoming patch?
+Hi Brett,
 
-Yes, just remove those lines and maybe write a comment in the commit
-message referring to this thread please.
+overall this patch looks clean to me.
+I've made a minor comment inline, which you may wish to consider
+if you need to respin the series for some other reason.
 
-It won't cause any problems because in pKVM, these values are never
-set (initialized to zero). This means that a protected guest always
-needs to use spectre/meltdown mitigations, which could be a
-performance problem, but not a security one. This is still a bug of
-course, hence why I need to fix it.
+> diff --git a/drivers/vfio/pci/pds/dirty.c b/drivers/vfio/pci/pds/dirty.c
 
-Thanks,
-/fuad
+...
 
+> +static void
+> +pds_vfio_print_guest_region_info(struct pds_vfio_pci_device *pds_vfio,
+> +				 u8 max_regions)
+> +{
+> +	int len = max_regions * sizeof(struct pds_lm_dirty_region_info);
+> +	struct pds_lm_dirty_region_info *region_info;
+> +	struct pci_dev *pdev = pds_vfio->pdev;
+> +	dma_addr_t regions_dma;
+> +	u8 num_regions;
+> +	int err;
+> +
+> +	region_info = kcalloc(max_regions,
+> +			      sizeof(struct pds_lm_dirty_region_info),
+> +			      GFP_KERNEL);
+> +	if (!region_info)
+> +		return;
+> +
+> +	regions_dma = dma_map_single(pds_vfio->coredev, region_info, len,
+> +				     DMA_FROM_DEVICE);
+> +	if (dma_mapping_error(pds_vfio->coredev, regions_dma)) {
+> +		kfree(region_info);
+> +		return;
 
-> >
-> > Thanks,
-> > /fuad
-> >
-> >
-> > >
-> > >         return (id_aa64pfr0_el1_sys_val & allow_mask) | set_mask;
-> > >  }
-> > > diff --git a/arch/arm64/kvm/id_regs.c b/arch/arm64/kvm/id_regs.c
-> > > index e393b5730557..b60ca1058301 100644
-> > > --- a/arch/arm64/kvm/id_regs.c
-> > > +++ b/arch/arm64/kvm/id_regs.c
-> > > @@ -61,12 +61,6 @@ u64 kvm_arm_read_id_reg(const struct kvm_vcpu *vcp=
-u, u32 id)
-> > >                 if (!vcpu_has_sve(vcpu))
-> > >                         val &=3D ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_=
-SVE);
-> > >                 val &=3D ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_AMU);
-> > > -               val &=3D ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV2);
-> > > -               val |=3D FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL=
-1_CSV2),
-> > > -                                 (u64)vcpu->kvm->arch.pfr0_csv2);
-> > > -               val &=3D ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV3);
-> > > -               val |=3D FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL=
-1_CSV3),
-> > > -                                 (u64)vcpu->kvm->arch.pfr0_csv3);
-> > >                 if (kvm_vgic_global_state.type =3D=3D VGIC_V3) {
-> > >                         val &=3D ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_=
-GIC);
-> > >                         val |=3D FIELD_PREP(ARM64_FEATURE_MASK(ID_AA6=
-4PFR0_EL1_GIC), 1);
-> > > @@ -201,6 +195,7 @@ static int set_id_aa64pfr0_el1(struct kvm_vcpu *v=
-cpu,
-> > >                                u64 val)
-> > >  {
-> > >         u8 csv2, csv3;
-> > > +       u64 sval =3D val;
-> > >
-> > >         /*
-> > >          * Allow AA64PFR0_EL1.CSV2 to be set from userspace as long a=
-s
-> > > @@ -225,8 +220,7 @@ static int set_id_aa64pfr0_el1(struct kvm_vcpu *v=
-cpu,
-> > >         if (val)
-> > >                 return -EINVAL;
-> > >
-> > > -       vcpu->kvm->arch.pfr0_csv2 =3D csv2;
-> > > -       vcpu->kvm->arch.pfr0_csv3 =3D csv3;
-> > > +       vcpu->kvm->arch.id_regs[IDREG_IDX(reg_to_encoding(rd))] =3D s=
-val;
-> > >
-> > >         return 0;
-> > >  }
-> > > @@ -529,4 +523,24 @@ void kvm_arm_set_default_id_regs(struct kvm *kvm=
-)
-> > >                 val =3D read_sanitised_ftr_reg(id);
-> > >                 kvm->arch.id_regs[IDREG_IDX(id)] =3D val;
-> > >         }
-> > > +       /*
-> > > +        * The default is to expose CSV2 =3D=3D 1 if the HW isn't aff=
-ected.
-> > > +        * Although this is a per-CPU feature, we make it global beca=
-use
-> > > +        * asymmetric systems are just a nuisance.
-> > > +        *
-> > > +        * Userspace can override this as long as it doesn't promise
-> > > +        * the impossible.
-> > > +        */
-> > > +       val =3D kvm->arch.id_regs[IDREG_IDX(SYS_ID_AA64PFR0_EL1)];
-> > > +
-> > > +       if (arm64_get_spectre_v2_state() =3D=3D SPECTRE_UNAFFECTED) {
-> > > +               val &=3D ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV2);
-> > > +               val |=3D FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL=
-1_CSV2), 1);
-> > > +       }
-> > > +       if (arm64_get_meltdown_state() =3D=3D SPECTRE_UNAFFECTED) {
-> > > +               val &=3D ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV3);
-> > > +               val |=3D FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL=
-1_CSV3), 1);
-> > > +       }
-> > > +
-> > > +       kvm->arch.id_regs[IDREG_IDX(SYS_ID_AA64PFR0_EL1)] =3D val;
-> > >  }
-> > > --
-> > > 2.40.0.rc1.284.g88254d51c5-goog
-> > >
-> Thanks,
-> Jing
+nit: I think it would be more idiomatic to use a goto label here, say:
+
+		goto err_out;
+
+> +	}
+> +
+> +	err = pds_vfio_dirty_status_cmd(pds_vfio, regions_dma,
+> +					&max_regions, &num_regions);
+> +	dma_unmap_single(pds_vfio->coredev, regions_dma, len, DMA_FROM_DEVICE);
+
+and here:
+
+	if (err)
+		goto err_out;
+
+> +
+> +	if (!err) {
+
+And move this out of a conditional, into the main block of the function.
+
+> +		int i;
+> +
+> +		for (i = 0; i < num_regions; i++)
+
+The scope of i can handily be limited, now that the kernel has moved to C99.
+
+And it might be slightly nicer to use an unsigned type for it,
+I don't think it can ever be negative.
+
+		for (unsigned i = 0; i < num_regions; i++)
+
+> +			dev_dbg(&pdev->dev, "region_info[%d]: dma_base 0x%llx page_count %u page_size_log2 %u\n",
+> +				i, le64_to_cpu(region_info[i].dma_base),
+> +				le32_to_cpu(region_info[i].page_count),
+> +				region_info[i].page_size_log2);
+> +	}
+> +
+
+err_out:
+
+> +	kfree(region_info);
+> +}
+
+...
