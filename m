@@ -2,53 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7A3C16CF6EE
-	for <lists+kvm@lfdr.de>; Thu, 30 Mar 2023 01:23:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E77B76CF73D
+	for <lists+kvm@lfdr.de>; Thu, 30 Mar 2023 01:33:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230497AbjC2XXB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 Mar 2023 19:23:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58726 "EHLO
+        id S229807AbjC2XdF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 Mar 2023 19:33:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41088 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229735AbjC2XW7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 29 Mar 2023 19:22:59 -0400
-Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B52D926A4;
-        Wed, 29 Mar 2023 16:22:58 -0700 (PDT)
-Received: by mail-pj1-x1032.google.com with SMTP id j13so15601093pjd.1;
-        Wed, 29 Mar 2023 16:22:58 -0700 (PDT)
+        with ESMTP id S229525AbjC2XdD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 29 Mar 2023 19:33:03 -0400
+Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1AEB5257;
+        Wed, 29 Mar 2023 16:33:01 -0700 (PDT)
+Received: by mail-pl1-x636.google.com with SMTP id c18so16450921ple.11;
+        Wed, 29 Mar 2023 16:33:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1680132178;
+        d=gmail.com; s=20210112; t=1680132781;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Rxq/vuSpInfYGqF100OlU+qAGSifmYxPvkU49clv7gI=;
-        b=Ew0P11Cjc5Sfc4IF++NP/wDrXiOBhGgsRa/u+WD31TSlFZGiys9CS31gMyEsj1DdxB
-         fC09rc6XFylQDwHIA4pjwiztVeNeepTV2tCoa486LOaqPYT3XIX7zdl+zsaclQamDB5u
-         bn5r9LrUyjGaRgICe+E8Nv6TLNGP+3nrRcX+McsHBqlx8DOEnnDZ5HHp+tkxGX3CTjsI
-         fSl4bRZh5zrPMpwA5xVXi6BcvfbFiWhHl/N+UYc3d0UAqZou3Le5/lBsxIFarKKQH6Z5
-         qiMP0lDjOBgsYvNpzmJ0HDj6xBGkQYhUUddeIWhzZLz7eXfhDZZ7mJc4WuFtcwhBJJOm
-         vGnQ==
+        bh=6UqQPNvzkss1LbgIQ4B7N84vGNBYynu9RnkZNtN4TIw=;
+        b=U3I9pq60QeWrgwytzJFP7H4m5JL68HfMhTvMVt1ylcg7zv5QUQvRKe6ZXdJ4NeLpfg
+         TPxoX+MgPSeNZrDBXiKaUqbhqanTRrcQY0Ut6Tlein6CgJwQabMn/UyiITbQxs4nBYjI
+         w+YBfj/f9DFoOhO04t43+TYMYoL2BO1P1YZGCpjXqy6dRVy2rxAS6OfUU7Kn0v76K7Zy
+         UDVZzYCfbWAcVQ14EQfy+0b1uVNew/hlTkOOfJ0SVxawKyQ7pPhYaV1zVZKaaqRMTjSm
+         jbsLWxM5F5kKA37MFPg4QnKOTkuh2928QZLYPLZXHER6oKJsAE2FEl+sISyeYjIdFdoC
+         mYAw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680132178;
+        d=1e100.net; s=20210112; t=1680132781;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Rxq/vuSpInfYGqF100OlU+qAGSifmYxPvkU49clv7gI=;
-        b=ss1cBr+hqwaY7+kOT8e1Yeq8TKpvTaQz4raI3qjwys4Cy1kyq2XsDnAdGBEVRGG3QO
-         FtDjyikG5DviYWxtKpiju+MARkduezC7sNKhCUANGb9Emtrh+b2wVIsHLN8RjI4PbyKk
-         boaB/y/bis1evOqCmVxDat5JNzcRB4QewDqk2dgWLOHg5hdMhjVFwETHnlLVMxMa9R8d
-         Hgiiz84HsC0qGmzmPjxTm4VJyEKELf4JDVmPvc4SOpVPZTsiIaSY+7bYDncsdvEpn6bN
-         j1wstuHLzEfRE2iO5Nwa6CMN4KbH0YFqrFSMqIa9dSpSV8tx0zmNfYg43PEZulu026lU
-         vLSA==
-X-Gm-Message-State: AO0yUKVadwP3EYwrwuEUJ9vWoXVzaYs/f5m5qbMfNDJX7VqbnerQXR3F
-        IDY2i8eLpWM0cUpqf4Rd70I=
-X-Google-Smtp-Source: AK7set+r0G3UPfwGBAvscY8gFEcvK5MJoQ9CGKZufxvuaZeUcdiRpOGJ1Q2xEVE6KpDyuFifWwb0rQ==
-X-Received: by 2002:a05:6a20:4a13:b0:d8:afd4:4ac7 with SMTP id fr19-20020a056a204a1300b000d8afd44ac7mr17731367pzb.4.1680132178038;
-        Wed, 29 Mar 2023 16:22:58 -0700 (PDT)
+        bh=6UqQPNvzkss1LbgIQ4B7N84vGNBYynu9RnkZNtN4TIw=;
+        b=CCARyMxj1TDtWjPw3PZhp4GDSZ940Q8FTcS8B62dG+m9eIAkfY8wRxt64glep33I33
+         WWTsr4U4IdWfTh8t3Zqs4Xxf0CwIgUYIXG3i5XeNVLv0z1juGFe3vPMNY4AxwWQK9k6m
+         9vy+DqkH8XvKYJRNE0qUDMQv1QudKAuOIkU3gM444E+u365pqSrhi75sbW2REHIFmGmk
+         ustv8PA5bPxBctXHiNL0gnW2cZO1Ka74QP6P8Hi5MhTKJBi495IkZUMRPmpkFXO/wSOY
+         e7nSFMPWa6Sc1hxYCMdqrt6fHvLJTZgcqpgavBn/LBFHpWxU62QdZkHLqqyy5yhspl8a
+         7okA==
+X-Gm-Message-State: AAQBX9diXATSs7/i20bgVBwk/CFQx0tPanGtHXYCOQi32xCe2Hn/AMHA
+        kLLWiRhrzCcdfDNr1B3jaRo=
+X-Google-Smtp-Source: AKy350YWk9gKD6cYAGzYcktMbjE5pp/EGxRP14zqjzWWVzJ7+eE9ThgbS86fxS2eONurCzxuUST03A==
+X-Received: by 2002:a17:902:eccd:b0:19b:64bb:d546 with SMTP id a13-20020a170902eccd00b0019b64bbd546mr4542228plh.18.1680132780934;
+        Wed, 29 Mar 2023 16:33:00 -0700 (PDT)
 Received: from localhost ([192.55.54.55])
-        by smtp.gmail.com with ESMTPSA id i22-20020aa78b56000000b005aa60d8545esm23531104pfd.61.2023.03.29.16.22.57
+        by smtp.gmail.com with ESMTPSA id g6-20020a1709026b4600b001a19cf1b37esm23492704plt.40.2023.03.29.16.32.59
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 Mar 2023 16:22:57 -0700 (PDT)
-Date:   Wed, 29 Mar 2023 16:22:56 -0700
+        Wed, 29 Mar 2023 16:33:00 -0700 (PDT)
+Date:   Wed, 29 Mar 2023 16:32:58 -0700
 From:   Isaku Yamahata <isaku.yamahata@gmail.com>
 To:     Zhi Wang <zhi.wang.linux@gmail.com>
 Cc:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
@@ -58,16 +58,16 @@ Cc:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
         Sagi Shahar <sagis@google.com>,
         David Matlack <dmatlack@google.com>,
         Kai Huang <kai.huang@intel.com>
-Subject: Re: [PATCH v13 017/113] KVM: TDX: Add place holder for TDX VM
- specific mem_enc_op ioctl
-Message-ID: <20230329232256.GB1108448@ls.amr.corp.intel.com>
+Subject: Re: [PATCH v13 018/113] KVM: x86, tdx: Make KVM_CAP_MAX_VCPUS
+ backend specific
+Message-ID: <20230329233258.GC1108448@ls.amr.corp.intel.com>
 References: <cover.1678643051.git.isaku.yamahata@intel.com>
- <7cdfc307ea8717849e71063ceebf1e328448e773.1678643052.git.isaku.yamahata@intel.com>
- <20230325110550.00006091@gmail.com>
+ <87f6baf8419103077f0a42859a0a847c695f5f59.1678643052.git.isaku.yamahata@intel.com>
+ <20230325201326.00002d4d@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20230325110550.00006091@gmail.com>
+In-Reply-To: <20230325201326.00002d4d@gmail.com>
 X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
         DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
@@ -78,22 +78,30 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Mar 25, 2023 at 11:05:50AM +0200,
+On Sat, Mar 25, 2023 at 08:13:26PM +0200,
 Zhi Wang <zhi.wang.linux@gmail.com> wrote:
 
-> > diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
-> > index b46dcac078b2..58fbaa05fc8c 100644
-> > --- a/arch/x86/include/asm/kvm-x86-ops.h
-> > +++ b/arch/x86/include/asm/kvm-x86-ops.h
-> > @@ -117,7 +117,7 @@ KVM_X86_OP(enter_smm)
-> >  KVM_X86_OP(leave_smm)
-> >  KVM_X86_OP(enable_smi_window)
-> >  #endif
-> > -KVM_X86_OP_OPTIONAL(dev_mem_enc_ioctl)
-> > +KVM_X86_OP(dev_mem_enc_ioctl)
+> On Sun, 12 Mar 2023 10:55:42 -0700
+> isaku.yamahata@intel.com wrote:
 > 
-> I guess it should be KVM_X86_OP(mem_enc_ioctl) here.
+> > From: Isaku Yamahata <isaku.yamahata@intel.com>
+> > 
+> > TDX has its own limitation on the maximum number of vcpus that the guest
+> > can accommodate.  Allow x86 kvm backend to implement its own KVM_ENABLE_CAP
+> > handler and implement TDX backend for KVM_CAP_MAX_VCPUS.  user space VMM,
+> > e.g. qemu, can specify its value instead of KVM_MAX_VCPUS.
+> > 
+> 
+> I think enabling the cap here is actually "configuring the cap". KVM_CAP_MAX
+> _VCPUS is actually always enabled whether userspace enables it or not. It
+> would be nice to configure of the max VCPUS in kvm_arch_vm_ioctl() where
+> routines of configuring a VM should belong. E.g. KVM_SET_MAX_VCPUS.
 
-Yes, thanks for catching it.
+I'm not sure I understand your point.  Although KVM_ENABLE_CAP sounds like
+only on/off feature, but it isn't. It's also used to set parameters. For
+example, KVM_CAP_MAX_VCPU_ID.
+
+KVM_SET_XXX is for run time feature. But the maxium number of vcpus is not
+runtime changable. Set it at vm creation.
 -- 
 Isaku Yamahata <isaku.yamahata@gmail.com>
