@@ -2,71 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 499FD6CEF4C
-	for <lists+kvm@lfdr.de>; Wed, 29 Mar 2023 18:26:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F26486CEF5E
+	for <lists+kvm@lfdr.de>; Wed, 29 Mar 2023 18:29:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229887AbjC2Q0d (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 Mar 2023 12:26:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52502 "EHLO
+        id S229926AbjC2Q3X (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 Mar 2023 12:29:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57318 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229750AbjC2Q0c (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 29 Mar 2023 12:26:32 -0400
-Received: from mail-pg1-x52d.google.com (mail-pg1-x52d.google.com [IPv6:2607:f8b0:4864:20::52d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C993FB
-        for <kvm@vger.kernel.org>; Wed, 29 Mar 2023 09:26:31 -0700 (PDT)
-Received: by mail-pg1-x52d.google.com with SMTP id y19so9624156pgk.5
-        for <kvm@vger.kernel.org>; Wed, 29 Mar 2023 09:26:31 -0700 (PDT)
+        with ESMTP id S229950AbjC2Q3V (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 29 Mar 2023 12:29:21 -0400
+Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0F486593
+        for <kvm@vger.kernel.org>; Wed, 29 Mar 2023 09:29:13 -0700 (PDT)
+Received: by mail-pl1-x62e.google.com with SMTP id o11so15485707ple.1
+        for <kvm@vger.kernel.org>; Wed, 29 Mar 2023 09:29:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1680107191;
+        d=google.com; s=20210112; t=1680107353;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=xVyDMyZSpGCQ7MxCl/Op2Md4aBGMLAhdohsoe3DXYiw=;
-        b=UwJSnq+CIN6vt1rJP+cxGSL8i84zh2WehYJsz5WddGu7tY0iZ9MWigqVu/UoA4Vg5C
-         iHksoMOtr3avNPXC2tkZWY+uaKmYR2u7zk7pRDdUn+dr8yEQsGAw/O5g/OXrj5BQcodi
-         P29XKfzbTlOzcp5sOURe0GBCEtm32s/mFD+cLkFf+K0X5Ak+aZqXTq+tuB26YgT5to+Z
-         7+J8zOmODTQnmf0Y1TUUYr4bGm3SgGJ6yJzeHAfVWVuEHpBcUXYBIVceJsV4dQL9tznI
-         jgY4ZlqyVOqhSKJpZ7B/CZ5fTnRv5TOLwSA1L2oNeHvBuKjvPa5Y7cDZ1nvBDh2NnyFu
-         vpMQ==
+        bh=9wWrsLlXKWvQA38obw+xbkZDiZxNr9CZXUvW32hk7Zs=;
+        b=Zz6aCUUmIOsuN6jjhxWlSNkUocUVLBH86e4Cgs8AuqoEgzVZgAoXrLrwHoI1qV+7SG
+         eYGVOZwQlZ1yerLWiCTfWbSZ9ba7dYB4fbXiPKH96l6XVRCkJLtilAHjAsgDMiiS7iq/
+         hHg5b2DyjekHyoQua10b/Fdi5z0Pdt0QhHMwyGm7oE6c7lnMLOv2pYwycyOlKQ2YCBYu
+         twGVqko3CVySmDqYsadOtEGgy5Ye5WTkNDFpsMFGsvLa7viQ09FBSLoybrs12Jls+H3G
+         9z9MyicL3PlJP1NQZQZHEOqzopBFoMpSJHqB8d1r/DA85oJJFhSal70+02jrzlwNbo1z
+         82Gw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680107191;
+        d=1e100.net; s=20210112; t=1680107353;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=xVyDMyZSpGCQ7MxCl/Op2Md4aBGMLAhdohsoe3DXYiw=;
-        b=KthRsZ0W1azNg0MH1iL0LyktFCMCiEJTnJQ7RMIgxikzlrwjR8UxgaAskipWdl53ZP
-         z7pYyVlzRlrqO0tnpMZ6fa/pns9Hx0lLt0UzQmL76qP3cKRFW3wSUsAzecZiYzVlnuAp
-         qKyHM9881dGbcxHhd698LyVmETG5w2vGjV0PMFo1fUNfXDleE2gtibqs/2EEdsciIl1z
-         jMm8pCimAUk8ewr+r5BieQ1jPV2Q7HlvPVp5LRBOAisB8iEmMeqmx2C/JOId2Gp0W0TP
-         F6MZH9EOarredNHFSd99WUEu3QIPK1YL+xQtpTjI8+vqhyRUtlRIZnMQCPazZ39otRNs
-         foQg==
-X-Gm-Message-State: AAQBX9eNcqbx53CBl08URcyp8AMb8bBJBJGBrfR9fB7Qs+7S8XeoIMNT
-        o7DSWaBHIGUODjM5XAKOtvUlEwgoM6fpfsQNd+/nug==
-X-Google-Smtp-Source: AKy350YvipsUiNBJuE6YBTyMPuwRu2a0VFb8e6m8DUE6BW/xhC9hc8gC85jEyUX2V5MoAyWcDuJKSLxWs+vAwycyHb0=
-X-Received: by 2002:a05:6a00:99d:b0:5e6:f9a1:e224 with SMTP id
- u29-20020a056a00099d00b005e6f9a1e224mr10564721pfg.6.1680107190606; Wed, 29
- Mar 2023 09:26:30 -0700 (PDT)
+        bh=9wWrsLlXKWvQA38obw+xbkZDiZxNr9CZXUvW32hk7Zs=;
+        b=m1rwMZcEp3uNGuQeXcurEreEpOwRu4v/HqzV29/OU5f99yn+Sfs3Cq0auhkxzvRK1a
+         9mjA6Cacl96V7wg2hdJfTb7w2euPdp1eAa6Jy3iqU3UEUkvYyz9k0PDRFl4LTLUPU+Ks
+         bKLLnqTj7MCHAvgg22ADOSwYme+K0za08nHoDubueduUfiPTsdPBQaIYe00qMJCljmbj
+         2zLV8Iw57MtHP+tiDRYC3HLQV5VBmND7ZCCMRrc0ml187GGawQcdFRnpH3kFlkdsH1Rm
+         pSzAB5u5aajkUUSYl6SZ/ZVofy3l/qQYA3mfUa0QrVMNCOqV96VN9lIzVOe8udijm3gT
+         eEMQ==
+X-Gm-Message-State: AAQBX9dtDI6cUcYw0etJUvdZzpwFyHxPAaK1vChLYiimcSV8oKQy6UNa
+        TrhjI9MA0dcRmpCJMIa04zEZk17JWOwQ34kCZGDBiQ==
+X-Google-Smtp-Source: AKy350ZORUTybtTmxknrU6U6sDbDJmKms88a0NXHL8s0bQ+Pm9uOWRyP22uljRbj0cRwTCy7wM0LnHGSFCGNhYzF50w=
+X-Received: by 2002:a17:902:848d:b0:1a2:1fd0:226b with SMTP id
+ c13-20020a170902848d00b001a21fd0226bmr6464831plo.5.1680107352908; Wed, 29 Mar
+ 2023 09:29:12 -0700 (PDT)
 MIME-Version: 1.0
-References: <20230317050637.766317-1-jingzhangos@google.com>
- <20230317050637.766317-3-jingzhangos@google.com> <861qlaxzyw.wl-maz@kernel.org>
- <CAAdAUtjp1tdyadjtU0RrdsRq-D3518G8eqP_coYNJ1vFEvrz2Q@mail.gmail.com>
-In-Reply-To: <CAAdAUtjp1tdyadjtU0RrdsRq-D3518G8eqP_coYNJ1vFEvrz2Q@mail.gmail.com>
+References: <20230329002136.2463442-1-reijiw@google.com> <20230329002136.2463442-2-reijiw@google.com>
+ <87v8ikqaib.wl-maz@kernel.org>
+In-Reply-To: <87v8ikqaib.wl-maz@kernel.org>
 From:   Reiji Watanabe <reijiw@google.com>
-Date:   Wed, 29 Mar 2023 09:26:13 -0700
-Message-ID: <CAAeT=FyJyip9NOhTjdh169+9jE_eP3uEHMTszEQa7VfUY9MS1Q@mail.gmail.com>
-Subject: Re: [PATCH v4 2/6] KVM: arm64: Save ID registers' sanitized value per guest
-To:     Jing Zhang <jingzhangos@google.com>
-Cc:     Marc Zyngier <maz@kernel.org>, KVM <kvm@vger.kernel.org>,
-        KVMARM <kvmarm@lists.linux.dev>,
-        ARMLinux <linux-arm-kernel@lists.infradead.org>,
-        Oliver Upton <oupton@google.com>,
-        Will Deacon <will@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
+Date:   Wed, 29 Mar 2023 09:28:56 -0700
+Message-ID: <CAAeT=Fx3ZHXwOBoCTAV-Hp4ZG4V_MJfzbmC6zDUk-0M5mP=PnA@mail.gmail.com>
+Subject: Re: [PATCH v1 1/2] KVM: arm64: PMU: Restore the host's PMUSERENR_EL0
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev,
+        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
         James Morse <james.morse@arm.com>,
         Alexandru Elisei <alexandru.elisei@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Fuad Tabba <tabba@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
         Ricardo Koller <ricarkol@google.com>,
-        Raghavendra Rao Ananta <rananta@google.com>
+        Jing Zhang <jingzhangos@google.com>,
+        Raghavendra Rao Anata <rananta@google.com>,
+        Will Deacon <will@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-15.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,ENV_AND_HDR_SPF_MATCH,
@@ -79,64 +77,84 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> > > +/*
-> > > + * Set the guest's ID registers that are defined in id_reg_descs[]
-> > > + * with ID_SANITISED() to the host's sanitized value.
-> > > + */
-> > > +void kvm_arm_set_default_id_regs(struct kvm *kvm)
-> > > +{
-> > > +     int i;
-> > > +     u32 id;
-> > > +     u64 val;
-> > > +
-> > > +     for (i = 0; i < ARRAY_SIZE(id_reg_descs); i++) {
-> > > +             id = reg_to_encoding(&id_reg_descs[i]);
-> > > +             if (WARN_ON_ONCE(!is_id_reg(id)))
-> > > +                     /* Shouldn't happen */
-> > > +                     continue;
-> > > +
-> > > +             if (id_reg_descs[i].visibility == raz_visibility)
-> > > +                     /* Hidden or reserved ID register */
-> > > +                     continue;
-> >
-> > Relying on function pointer comparison is really fragile. If I wrap
-> > raz_visibility() in another function, this won't catch it. It also
-> > doesn't bode well with your 'inline' definition of this function.
-> >
-> > More importantly, why do we care about checking for visibility at all?
-> > We can happily populate the array and rely on the runtime visibility.
-> Right. I'll remove this checking.
+Hi Marc,
 
-Without the check, calling read_sanitised_ftr_reg() for some hidden
-ID registers will show a warning as some of them are not in
-arm64_ftr_regs[] (e.g. reserved ones). This checking is needed
-temporarily to avoid the warning (the check is removed in the following
-patches of this series).  It would be much less fragile to call the
-visibility function instead, but I don't think this is a also good way
-to check the availability of the sanitized values for ID registers
-either. I didn't found a good (proper) way to check that without
-making changes in cpufeature.c, and I'm not sure if it is worth it
-for this temporary purpose.
+On Wed, Mar 29, 2023 at 08:31:24AM +0100, Marc Zyngier wrote:
+> On Wed, 29 Mar 2023 01:21:35 +0100,
+> Reiji Watanabe <reijiw@google.com> wrote:
+> >
+> > Restore the host's PMUSERENR_EL0 value instead of clearing it,
+> > before returning back to userspace, as the host's EL0 might have
+> > a direct access to PMU registers (some bits of PMUSERENR_EL0
+> > might not be zero).
+> >
+> > Fixes: 83a7a4d643d3 ("arm64: perf: Enable PMU counter userspace access for perf event")
+> > Signed-off-by: Reiji Watanabe <reijiw@google.com>
+> > ---
+> >  arch/arm64/include/asm/kvm_host.h       | 3 +++
+> >  arch/arm64/kvm/hyp/include/hyp/switch.h | 3 ++-
+> >  2 files changed, 5 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> > index bcd774d74f34..82220ecec10e 100644
+> > --- a/arch/arm64/include/asm/kvm_host.h
+> > +++ b/arch/arm64/include/asm/kvm_host.h
+> > @@ -544,6 +544,9 @@ struct kvm_vcpu_arch {
+> >
+> >     /* Per-vcpu CCSIDR override or NULL */
+> >     u32 *ccsidr;
+> > +
+> > +   /* the value of host's pmuserenr_el0 before guest entry */
+> > +   u64     host_pmuserenr_el0;
+>
+> I don't think we need this in each and every vcpu. Why can't this be
+> placed in struct kvm_host_data and accessed via the per-cpu pointer?
+> Maybe even use the PMUSERNR_EL0 field in the sysreg array?
+
+Thank you for the nice suggestion.
+Indeed, that would be better.  I will fix it in v2.
+
+>
+> There is probably a number of things that we could move there, but
+> let's start by not adding more unnecessary stuff to the vcpu
+> structure.
+
+Yeah, I agree.
 
 Thank you,
 Reiji
 
 
 
-
+>
+> >  };
 > >
-> > > +
-> > > +             val = read_sanitised_ftr_reg(id);
-> > > +             kvm->arch.id_regs[IDREG_IDX(id)] = val;
-> > > +     }
-> > > +}
+> >  /*
+> > diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> > index 07d37ff88a3f..44b84fbdde0d 100644
+> > --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
+> > +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> > @@ -82,6 +82,7 @@ static inline void __activate_traps_common(struct kvm_vcpu *vcpu)
+> >      */
+> >     if (kvm_arm_support_pmu_v3()) {
+> >             write_sysreg(0, pmselr_el0);
+> > +           vcpu->arch.host_pmuserenr_el0 = read_sysreg(pmuserenr_el0);
+> >             write_sysreg(ARMV8_PMU_USERENR_MASK, pmuserenr_el0);
+> >     }
 > >
-> > Thanks,
+> > @@ -106,7 +107,7 @@ static inline void __deactivate_traps_common(struct kvm_vcpu *vcpu)
 > >
-> >         M.
+> >     write_sysreg(0, hstr_el2);
+> >     if (kvm_arm_support_pmu_v3())
+> > -           write_sysreg(0, pmuserenr_el0);
+> > +           write_sysreg(vcpu->arch.host_pmuserenr_el0, pmuserenr_el0);
 > >
-> > --
-> > Without deviation from the norm, progress is not possible.
+> >     if (cpus_have_final_cap(ARM64_SME)) {
+> >             sysreg_clear_set_s(SYS_HFGRTR_EL2, 0,
 >
 > Thanks,
-> Jing
+>
+>       M.
+>
+> --
+> Without deviation from the norm, progress is not possible.
