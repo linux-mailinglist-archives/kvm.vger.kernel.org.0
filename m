@@ -2,54 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E96736CCEAF
-	for <lists+kvm@lfdr.de>; Wed, 29 Mar 2023 02:22:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 737836CCEB2
+	for <lists+kvm@lfdr.de>; Wed, 29 Mar 2023 02:22:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229695AbjC2AWA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Mar 2023 20:22:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55604 "EHLO
+        id S229750AbjC2AWE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Mar 2023 20:22:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55720 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229697AbjC2AV7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Mar 2023 20:21:59 -0400
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CFA32D44
-        for <kvm@vger.kernel.org>; Tue, 28 Mar 2023 17:21:50 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-54196bfcd5fso135326417b3.4
-        for <kvm@vger.kernel.org>; Tue, 28 Mar 2023 17:21:50 -0700 (PDT)
+        with ESMTP id S229697AbjC2AWD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Mar 2023 20:22:03 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F00651737
+        for <kvm@vger.kernel.org>; Tue, 28 Mar 2023 17:21:52 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id g187-20020a2520c4000000b00b74680a7904so13654975ybg.15
+        for <kvm@vger.kernel.org>; Tue, 28 Mar 2023 17:21:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1680049309;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=eENpLd222ixV/BEnAXd0sJR92bJ82vOOCby7utTN/Sg=;
-        b=Aa8PAqkWPiWBkQau05fBBTj7M/gFx1Aynw2O/bik1Gs2nRZ+KCIt+jxe8K7YXvPuSQ
-         W1Wt5kni0xN/UeYWmRcoxL/2GaaRe6z0kiD1NxIRNpj3GIakz4LW6YxHpaaImCNac4/C
-         fl8p6fE4xBtuW1MsFWCX34HO/YCxvYmxwdDC8R/70EWIIQ3ZmoZTdpZWr787RJW/kueZ
-         QXt8o1DKgq/YfU9AoF390oIyWkG+IblRUs+kFr5ZcykjQmQX6Kb5cWu3fuLC0cNAKRpS
-         Llob84bCYPw0zLpomfS23S1dHYquDMJfAUbTKeALBoUDrsxrLh16Mm8L7K+H/HI9m0TL
-         Aing==
+        d=google.com; s=20210112; t=1680049312;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=M9VEYqg/OD1okwRTmN4uX/z0exuBfdAWAGm4G9tIIbA=;
+        b=cogAFos4A80Hq8+t7GQy2mKfxVx3APH3a1KXMCXu7X/Ftmir6SwV/tqrbmvoyJV6/G
+         2Ln6du+IarOLF0lqN4pFV71t1o3gztK8xBtNYgxZEc+rO8yCGMELfozjOMMWvnWq6Ie6
+         lw+XRBp+AUzc2OfkHb0EEqO6gGrCdqfI0U8b8Mg5GwGINrpd9B+/YmRxAixj7MdKPoe1
+         lySTkVLKGijW9ROYl46XIe+OR0Ao4qRHlfp/mq8zcTLuvsXKLceeDDVuhiXFh5GIQwOe
+         97BbRju/HlGwDxqp+BaFRCg+z7D74wMA4nXoK5NY8BFHqXjum7uu0MPk0UANnwwS/sPp
+         sLKw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680049309;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=eENpLd222ixV/BEnAXd0sJR92bJ82vOOCby7utTN/Sg=;
-        b=B5d9aV5TsRRd+pJhR+stomc/wohbO5XxZAeH9tsFlrdxWEXCwTwUtrjOK5V8gNjwYX
-         gsWuIU0Z52YqmDkWsYhtRrLGQbaMX1ipi2j5FEJ5h08u08A5Zo+PHE8fX23iehT+SFSL
-         Q4SW53fCuU6jSzJkYw8b7tS1MOywvCfCsRSF1kWeUHXRS64LyoOUiyahZmeLefzbUuvC
-         xPR3DesicJe9G59CA5Av+LN3tJyvXOGm0KmVD97yuYl+N3V89SBQHr845mwVKIgc00ni
-         eAqSLtpPxXw/PXJdfSvdqw6BZ12lPq2Eb2ieXnbd/G6E8D2hT8fi68regNo1e9wCM1pv
-         kj0w==
-X-Gm-Message-State: AAQBX9do57hRqp8ENhw5+3n2bWEaUHgmRY0XPkz5xMpSpRf/VrE9Qudf
-        ATm3DuoUI8/M7JBsQj5De9jaieTVoz8=
-X-Google-Smtp-Source: AKy350bYlftYs/VjTtPUhS+UZTqUG+PyB67xAw95S2F9WnlDiwxxGHU3sZYm6ArConjwnrWRT7z6nY2Gezw=
+        d=1e100.net; s=20210112; t=1680049312;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=M9VEYqg/OD1okwRTmN4uX/z0exuBfdAWAGm4G9tIIbA=;
+        b=hCRlWog88fZ6XTuMMrn6qhaeBrZBAy4R+BMP3e6YzTsnFKf8Hd66fe+DKQ7PDCJCji
+         dTOwCYRmC0oWoPpZH0QZckoiF+EE0QNxhECkAGTU4S5M2Dl1UFv12MHu80Jqavh83pl3
+         F5z1u17sSUyyASMojURWEQESukaWDhnTyQav8mCrt86HNTt5Gcz2Jl9VVDaT3gaqcmZX
+         EhV75dprnEpffj4h+NcWscvUu/V6/saWsEnXDc3ehJpuLYav8iXHS/5HWmPdW3fwLZzW
+         +1cz0uiu272CTN2HnwsRs6j88VtCoD408hoiZ9PMjomSWAfHjhSdQYV58RVS8AK44iD9
+         4dMQ==
+X-Gm-Message-State: AAQBX9ceIHH/meqETLchwEQ3RPbo6N83s6V/a1/Do9TgBYT4yJWHuDRj
+        WJtI7GjvurPOQKiGwuiy1dvNooWHnjg=
+X-Google-Smtp-Source: AKy350b63N/z5xs9NWQe+Xzd9HYhlJjhHJ9wsmtc2tjjz7mh4ninFi18LOOb1YEpPeCHA5TDzNeRfFgcGVw=
 X-Received: from reijiw-west4.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:aa1])
- (user=reijiw job=sendgmr) by 2002:a05:6902:102b:b0:b6c:48c3:3c1c with SMTP id
- x11-20020a056902102b00b00b6c48c33c1cmr11754883ybt.13.1680049309492; Tue, 28
- Mar 2023 17:21:49 -0700 (PDT)
-Date:   Tue, 28 Mar 2023 17:21:34 -0700
+ (user=reijiw job=sendgmr) by 2002:a05:6902:168d:b0:b26:47f3:6cb with SMTP id
+ bx13-20020a056902168d00b00b2647f306cbmr8882729ybb.4.1680049312210; Tue, 28
+ Mar 2023 17:21:52 -0700 (PDT)
+Date:   Tue, 28 Mar 2023 17:21:35 -0700
+In-Reply-To: <20230329002136.2463442-1-reijiw@google.com>
 Mime-Version: 1.0
+References: <20230329002136.2463442-1-reijiw@google.com>
 X-Mailer: git-send-email 2.40.0.348.gf938b09366-goog
-Message-ID: <20230329002136.2463442-1-reijiw@google.com>
-Subject: [PATCH v1 0/2] KVM: arm64: PMU: Correct the handling of PMUSERENR_EL0
+Message-ID: <20230329002136.2463442-2-reijiw@google.com>
+Subject: [PATCH v1 1/2] KVM: arm64: PMU: Restore the host's PMUSERENR_EL0
 From:   Reiji Watanabe <reijiw@google.com>
 To:     Marc Zyngier <maz@kernel.org>,
         Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev
@@ -75,41 +77,53 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This series will fix bugs in KVM's handling of PMUSERENR_EL0.
+Restore the host's PMUSERENR_EL0 value instead of clearing it,
+before returning back to userspace, as the host's EL0 might have
+a direct access to PMU registers (some bits of PMUSERENR_EL0
+might not be zero).
 
-With PMU access support from EL0 [1], the perf subsystem would
-set CR and ER bits of PMUSERENR_EL0 as needed to allow EL0 to have
-a direct access to PMU counters.  However, KVM appears to assume
-that the register value is always zero for the host EL0, and has
-the following two problems in handling the register.
+Fixes: 83a7a4d643d3 ("arm64: perf: Enable PMU counter userspace access for perf event")
+Signed-off-by: Reiji Watanabe <reijiw@google.com>
+---
+ arch/arm64/include/asm/kvm_host.h       | 3 +++
+ arch/arm64/kvm/hyp/include/hyp/switch.h | 3 ++-
+ 2 files changed, 5 insertions(+), 1 deletion(-)
 
-[A] The host EL0 might lose the direct access to PMU counters, as
-    KVM always clears PMUSERENR_EL0 before returning to userspace.
-
-[B] With VHE, the guest EL0 access to PMU counters might be trapped
-    to EL1 instead of to EL2 (even when PMUSERENR_EL0 for the guest
-    indicates that the guest EL0 has an access to the counters).
-    This is because, with VHE, KVM sets ER, CR, SW and EN bits of
-    PMUSERENR_EL0 to 1 on vcpu_load() to ensure to trap PMU access
-    from the guset EL0 to EL2, but those bits might be cleared by
-    the perf subsystem after vcpu_load() (when PMU counters are
-    programmed for the vPMU emulation).
-
-Patch-1 will fix [A], and Patch-2 will fix [B] respectively.
-The series is based on v6.3-rc4.
-
-[1] https://github.com/torvalds/linux/commit/83a7a4d643d33a8b74a42229346b7ed7139fcef9
-
-Reiji Watanabe (2):
-  KVM: arm64: PMU: Restore the host's PMUSERENR_EL0
-  KVM: arm64: PMU: Ensure to trap PMU access from EL0 to EL2
-
- arch/arm64/include/asm/kvm_host.h       |  3 +++
- arch/arm64/kvm/hyp/include/hyp/switch.h | 28 +++++++++++++------------
- 2 files changed, 18 insertions(+), 13 deletions(-)
-
-
-base-commit: 197b6b60ae7bc51dd0814953c562833143b292aa
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index bcd774d74f34..82220ecec10e 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -544,6 +544,9 @@ struct kvm_vcpu_arch {
+ 
+ 	/* Per-vcpu CCSIDR override or NULL */
+ 	u32 *ccsidr;
++
++	/* the value of host's pmuserenr_el0 before guest entry */
++	u64	host_pmuserenr_el0;
+ };
+ 
+ /*
+diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+index 07d37ff88a3f..44b84fbdde0d 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/switch.h
++++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+@@ -82,6 +82,7 @@ static inline void __activate_traps_common(struct kvm_vcpu *vcpu)
+ 	 */
+ 	if (kvm_arm_support_pmu_v3()) {
+ 		write_sysreg(0, pmselr_el0);
++		vcpu->arch.host_pmuserenr_el0 = read_sysreg(pmuserenr_el0);
+ 		write_sysreg(ARMV8_PMU_USERENR_MASK, pmuserenr_el0);
+ 	}
+ 
+@@ -106,7 +107,7 @@ static inline void __deactivate_traps_common(struct kvm_vcpu *vcpu)
+ 
+ 	write_sysreg(0, hstr_el2);
+ 	if (kvm_arm_support_pmu_v3())
+-		write_sysreg(0, pmuserenr_el0);
++		write_sysreg(vcpu->arch.host_pmuserenr_el0, pmuserenr_el0);
+ 
+ 	if (cpus_have_final_cap(ARM64_SME)) {
+ 		sysreg_clear_set_s(SYS_HFGRTR_EL2, 0,
 -- 
 2.40.0.348.gf938b09366-goog
 
