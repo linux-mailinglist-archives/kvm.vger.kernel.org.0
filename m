@@ -2,61 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 767C26CEF8E
-	for <lists+kvm@lfdr.de>; Wed, 29 Mar 2023 18:36:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D154B6CEFB7
+	for <lists+kvm@lfdr.de>; Wed, 29 Mar 2023 18:47:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229802AbjC2QgG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 Mar 2023 12:36:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41718 "EHLO
+        id S230177AbjC2QrU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 Mar 2023 12:47:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55490 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230057AbjC2QgE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 29 Mar 2023 12:36:04 -0400
-Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 93C203A8E
-        for <kvm@vger.kernel.org>; Wed, 29 Mar 2023 09:36:02 -0700 (PDT)
-Received: by mail-pj1-x1049.google.com with SMTP id b16-20020a17090a991000b0023f803081beso4796755pjp.3
-        for <kvm@vger.kernel.org>; Wed, 29 Mar 2023 09:36:02 -0700 (PDT)
+        with ESMTP id S230313AbjC2QrS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 29 Mar 2023 12:47:18 -0400
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5892C5261
+        for <kvm@vger.kernel.org>; Wed, 29 Mar 2023 09:47:17 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-5411f21f849so161369457b3.16
+        for <kvm@vger.kernel.org>; Wed, 29 Mar 2023 09:47:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1680107762;
+        d=google.com; s=20210112; t=1680108436;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=zWSaOtnT1PTd7puap+PC7Myxa3v4DAzj/2jnrgYrQ/M=;
-        b=NV4wUr7VSCkAVWSBOqjxzW7g7vjgfu7fGth7twe8wglJFD5HnH/G6oYLO/l8gvQRdI
-         Vd6uYB04aNiLENuMnYzggnHbTk2LppjJb4Xkom+UFUkGnlZfx/3YWZp/741KyTlcyf9n
-         /emN4QC5YJ8SANFisjXXd8+zDFlTFkN05Y0RKZJWYQN6wt/4v/8lUbNlIO+uXQtfrZPe
-         2u3ChU7xUAWvzTiBN81/Ze8Vf1v2IsPVBDjED0RCjjPNOoDZUXfHpES3HnqgaWTBYvTQ
-         ueK/+ASFtHKpDrG4ThMqgqhQda+W9zkLncWahkpdOEyg6khQ9ABsHH8wMrotdUAh9JgM
-         edgQ==
+        bh=XhJ2KAFNUebvt6cQMDTLf5QYVLkhRGTjjjB4Lv8Q8Pw=;
+        b=Nwnor0fuwBFL6HswHVDb9zq4uqB8N0vyANtOGoursE/xCXttz4V6jsoxjL4SKGjtcU
+         vM08UOGTQy3ImsotSEpEn8ev+cnvKUAvL56SaS8B8FBrIaQIcJJDDjylIjDObxUSVj3m
+         /QZ2b+8/qsofV6UllwSgZtticUjx9NgZ0p3PXNaUQQJNdVnoAIr1IyMyMkDLhy+jZkvd
+         3nt/k1QOxZXpVzmtl9BOim/yPZvH5Vvs4toGP76nX15+oc8clHEikoh1Mn2zLLjO+KnC
+         Nb14v+ooTd2RMCQTcprG20lhhxICTFeqHyl2aaxr+1MLBrctSNDVouYcDHucWdrm7uP3
+         p9iw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680107762;
+        d=1e100.net; s=20210112; t=1680108436;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=zWSaOtnT1PTd7puap+PC7Myxa3v4DAzj/2jnrgYrQ/M=;
-        b=weo4EOIaF1WK0AsRqc3xZA32wmTNZ4B/7Aq+43S1ljBHqUr+7Lch0RlFIRDur8HoD0
-         XYcsRS1JjTOmU/SzOBCIYbV5aDaRGCDaMqnFnQQ+D/68P8/Ucvd31Z3J53pB9i/svU9u
-         OPIHKAWe1RpsZaFpJIj7etpU0diZSV/jhWR3fXCcYpuXxYf9LCiVb1Aq1n6Q8LA4yIl8
-         aUX7Dxp7QLDnuQUNuahm8oUCS+EEN4rklHy3/G5SgKxzCT8dW3PddAhhM2bL5wNrL4F9
-         KIyC1JAxg50rGF+acZT2W2oNZjZHFkxDzu6aI7pBXZsuQoRzpD8+Vng1DLBga3YVWjag
-         OD6Q==
-X-Gm-Message-State: AAQBX9egqClySmoqZii4Nsa/rXtNMSG0crt6lajgntoAMiHmVFC0OjX1
-        +A8Q9qUjWoTz80QamDYXcAjeyCGYGbQ=
-X-Google-Smtp-Source: AKy350aS1Vd1r4LL3/gWrKpPneGUgNOecf1ruYPUYjwZOi9+vXFy25Qrt/XjDKbCNdE3OgJThSo2CkmdsyA=
+        bh=XhJ2KAFNUebvt6cQMDTLf5QYVLkhRGTjjjB4Lv8Q8Pw=;
+        b=Ky4wGHTQS8nBBSTrIgQ4aFkPyKGVFZVLTzqUtno4k2VQuS2h3zQsf0YSTYrepWaNZd
+         ttKvceln05CPQVfKDB7KZn5qWpxlM9DZ4dSMhhmpfeXsArF3NlNSJnb65vm79tTS+DyY
+         dJamAnO0l99lyTbUvcSoNc62fUQH7q82RZDYSCbR3SKNGIP8a5YLN799rdmUYX4f70Zw
+         TxmDL5xvNWM2eSGIwtP4+OQ2R2JHFN6M9aSIoSOLaSO0TkO9kJaT3lBCW1ikxA3CP15B
+         R4LxqWhJ7/MnUc96oePVbNtLinrmoavNlfZBVncNtcJ/SztUd1zQuFzavBUxENcyOhvB
+         4sYA==
+X-Gm-Message-State: AAQBX9evkrixtePgbMQMJT+963h6A9OgI12cgAvbwDkvszN6BFeompoi
+        s19c0r2C8D4cJBZwS2BrftnBN11fqO0=
+X-Google-Smtp-Source: AKy350aIOO/FRysptnp/XYsHQcm9j9T0hsEhp7XgPOREaWpwy9KrpbLjRF48BgXvySig/ZWmHz4PQEOOPoU=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90a:bf16:b0:23d:20c:2065 with SMTP id
- c22-20020a17090abf1600b0023d020c2065mr1057847pjs.1.1680107762120; Wed, 29 Mar
- 2023 09:36:02 -0700 (PDT)
-Date:   Wed, 29 Mar 2023 09:36:00 -0700
-In-Reply-To: <05792cbd-7fdb-6bf2-ebaa-9d13a2c4fddd@intel.com>
+ (user=seanjc job=sendgmr) by 2002:a05:690c:b94:b0:541:698b:7bdb with SMTP id
+ ck20-20020a05690c0b9400b00541698b7bdbmr1769126ywb.2.1680108436600; Wed, 29
+ Mar 2023 09:47:16 -0700 (PDT)
+Date:   Wed, 29 Mar 2023 09:47:15 -0700
+In-Reply-To: <38601264-1957-579f-f156-c782bb9826cc@amd.com>
 Mime-Version: 1.0
-References: <20230328050231.3008531-1-seanjc@google.com> <20230328050231.3008531-2-seanjc@google.com>
- <620935f7-dd7a-2db6-1ddf-8dae27326f60@intel.com> <ZCMCzpAkGV56+ZbS@google.com>
- <05792cbd-7fdb-6bf2-ebaa-9d13a2c4fddd@intel.com>
-Message-ID: <ZCRogsvUYMQV6kca@google.com>
-Subject: Re: [kvm-unit-tests PATCH 1/3] x86: Add define for
- MSR_IA32_PRED_CMD's PRED_CMD_IBPB (bit 0)
+References: <20230206060545.628502-1-manali.shukla@amd.com>
+ <20230206060545.628502-3-manali.shukla@amd.com> <ZB4AOaLRwSB0ClIH@google.com> <38601264-1957-579f-f156-c782bb9826cc@amd.com>
+Message-ID: <ZCRrk0qsdv7rYqFq@google.com>
+Subject: Re: [RFC PATCH kernel 2/2] KVM: SEV: PreventHostIBS enablement for
+ SEV-ES and SNP guest
 From:   Sean Christopherson <seanjc@google.com>
-To:     Xiaoyao Li <xiaoyao.li@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+To:     Manali Shukla <manali.shukla@amd.com>
+Cc:     linux-kernel@vger.kernel.org, peterz@infradead.org,
+        mingo@redhat.com, acme@kernel.org, jolsa@kernel.org,
+        namhyung@kernel.org, tglx@linutronix.de, bp@alien8.de,
+        dave.hansen@linux.intel.com, pbonzini@redhat.com,
+        jpoimboe@kernel.org, pawan.kumar.gupta@linux.intel.com,
+        babu.moger@amd.com, sandipan.das@amd.com, jmattson@google.com,
+        thomas.lendacky@amd.com, nikunj@amd.com, ravi.bangoria@amd.com,
+        eranian@google.com, irogers@google.com, kvm@vger.kernel.org,
+        x86@kernel.org, linux-perf-users@vger.kernel.org
 Content-Type: text/plain; charset="us-ascii"
 X-Spam-Status: No, score=-7.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
@@ -68,29 +75,76 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 29, 2023, Xiaoyao Li wrote:
-> On 3/28/2023 11:07 PM, Sean Christopherson wrote:
-> > On Tue, Mar 28, 2023, Xiaoyao Li wrote:
-> > > On 3/28/2023 1:02 PM, Sean Christopherson wrote:
-> > > > Add a define for PRED_CMD_IBPB and use it to replace the open coded '1' in
-> > > > the nVMX library.
-> > > 
-> > > What does nVMX mean here?
+On Wed, Mar 29, 2023, Manali Shukla wrote:
+> On 3/25/2023 1:25 AM, Sean Christopherson wrote:
+> > On Mon, Feb 06, 2023, Manali Shukla wrote:
+> >> -	if (sev_es_guest(vcpu->kvm))
+> >> +	if (sev_es_guest(vcpu->kvm)) {
+> >> +		bool ibs_fetch_active, ibs_op_active;
+> >> +		u64 ibs_fetch_ctl, ibs_op_ctl;
+> >> +
+> >> +		if (svm->prevent_hostibs_enabled) {
+> >> +			/*
+> >> +			 * With PreventHostIBS enabled, IBS profiling cannot
+> >> +			 * be active when VMRUN is executed. Disable IBS before
+> >> +			 * executing VMRUN and, because of a race condition,
+> >> +			 * enable the PreventHostIBS window if IBS profiling was
+> >> +			 * active.
 > > 
-> > Nested VMX.  From KUT's perspective, the testing exists to validate KVM's nested
-> > VMX implementation.  If it's at all confusing, I'll drop the 'n'  And we've already
-> > established that KUT can be used on bare metal, even if that's not the primary use
-> > case.
+> > And the race can't be fixed because...?
 > 
-> So vmexit.flat is supposed to be ran in L1 VM?
+> Race can not be fixed because VALID and ENABLE bit for IBS_FETCH_CTL and IBS_OP_CTL
+> are contained in their same resepective MSRs. Due to this reason following scenario can
+> be generated:
+> Read IBS_FETCH_CTL (IbsFetchEn bit is 1 and IBSFetchVal bit is 0)
+> Write IBS_FETCH_CTL (IbsFetchEn is 0 now)
+> Imagine in between Read and Write, IBSFetchVal changes to 1. Write to IBS_FETCH_CTL will
+> clear the IBSFetchVal bit. When STGI is executed after VMEXIT, the NMI is taken and check for
+> valid mask will fail and generate Dazed and Confused NMI messages.
+> Please refer to cover letter for more details.
 
-Not all of the tests can be run on bare metal, e.g. I can't imagine the VMware
-backdoor test works either.
+I understand the race, I'm asking why this series doesn't fix the race.  Effectively
+suppressing potentially unexpected NMIs because PreventHostIBS was enable is ugly.
 
-> I'm confused and interested in how KUT is used on bare metal.
+> >> +			 */
+> >> +			ibs_fetch_active =
+> >> +				amd_disable_ibs_fetch(&ibs_fetch_ctl);
+> >> +			ibs_op_active =
+> >> +				amd_disable_ibs_op(&ibs_op_ctl);
+> >> +
+> >> +			amd_prevent_hostibs_window(ibs_fetch_active ||
+> >> +						   ibs_op_active);
+> >> +		}
+> >> +
+> >>  		__svm_sev_es_vcpu_run(svm, spec_ctrl_intercepted);
+> >> -	else
+> >> +
+> >> +		if (svm->prevent_hostibs_enabled) {
+> >> +			if (ibs_fetch_active)
+> >> +				amd_restore_ibs_fetch(ibs_fetch_ctl);
+> >> +
+> >> +			if (ibs_op_active)
+> >> +				amd_restore_ibs_op(ibs_op_ctl);
+> > 
+> > IIUC, this adds up to 2 RDMSRs and 4 WRMSRs to the VMRUN path.  Blech.  There's
+> > gotta be a better way to implement this.  
+> 
+> I will try to find a better way to implement this.
+> 
+> > Like PeterZ said, this is basically
+> > exclude_guest.
+> 
+> As I mentioned before, exclude_guest lets the profiler decide whether it wants to trace the guest
+> data or not, whereas PreventHostIBS lets the owner of the guest decide whether host can trace guest's
+> data or not.
 
-I haven't used KUT on bare metal myself, but the idea is pretty much the same as
-running under QEMU/KVM: boot into the KUT "kernel" after getting through firmwrae
-instead of transferring control to an actual OS.  I assume the biggest challenges
-are getting the image loaded, and getting info out of KUT, e.g. having a serial
-port with something on the backend to capture/display output.
+PreventHostIBS is purely an enforcement, it does not actually do anything to
+disable tracing of the guest.  What PeterZ and I are complaining about is that
+instead of integrating this feature with exclude_guest, e.g. finding a way to
+make guest tracing mutually exclusive with KVM_RUN so that PreventHostIBS can be
+contexted switched according, this series instead backdoors into perf to forcefully
+disable tracing.
+
+In other words, please try to create a sane contract between userspace, perf, and
+KVM, e.g. disallow tracing a guest with PreventHostIBS at some level instead of
+silently toggling tracing around VMRUN.
