@@ -2,281 +2,173 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 91CFC6D126E
-	for <lists+kvm@lfdr.de>; Fri, 31 Mar 2023 00:45:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6E1066D127A
+	for <lists+kvm@lfdr.de>; Fri, 31 Mar 2023 00:46:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231247AbjC3Wo7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Mar 2023 18:44:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38238 "EHLO
+        id S231261AbjC3WqG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Mar 2023 18:46:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38708 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231144AbjC3Woc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 Mar 2023 18:44:32 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C76711652
-        for <kvm@vger.kernel.org>; Thu, 30 Mar 2023 15:44:26 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id w5-20020a253005000000b00aedd4305ff2so20346516ybw.13
-        for <kvm@vger.kernel.org>; Thu, 30 Mar 2023 15:44:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1680216265;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=sxm82ULq9HWZFwrrpsKKW1Wi+ka2XfyIhyEC8wmryEE=;
-        b=JFa4+7SBBm70AwsjA2qDEb8H6264qe0jsdOabWpuBQpeTA8q1Dwptf304Pfb4FDSjE
-         HcQd6xgrWtSNmiWha8BOMFD++Iy45eTglljvLnQ0nrIc7yQU8sapLJvfBcLKx9YfyclC
-         ASIfRlN7d7DrWabNir+/aeKQFtM3hHgY38RthgmPRJEmPk0WEVSC60mctZSpMkYTabWl
-         ejxe7TmLEYGIsppkU2JnuNYVVeEiKJrpJHt5uDVUPn7a6rF1gKWVCsZvuyzl+DANT3ti
-         wiDOU468U4DxaYrfVr4mD2Z2GyAdNNwNYJXkcanlwlU4RwsMeOFdhrXdnzTA6WE9OFOs
-         M1FQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680216265;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=sxm82ULq9HWZFwrrpsKKW1Wi+ka2XfyIhyEC8wmryEE=;
-        b=SRpSS98E6iVJkFPucuhjwLIy8XzSZ//8KbcwZdwzKjWTk2kNf55fSWI7MXUsxEfKCG
-         roAfxOXpcKo0gGumMMbWobm/EatgdRZtj74Q4WLPfPfjWkYzhj6+7ujMbtZKzv9wrx7S
-         V2IhTpGe45TshgsGMQttGcK997hZIa+IoptVE6VtB/XUasd3xE3p+lHKIAt9zRMfQEOB
-         kWsYqoqvxYJztdttR1TRheqA9Pl3d3MsC2MS7bqK2R5niRBDwzlFF1NWKzWSx8gG6Lcg
-         5faJQNmzO1CINJHLGMa5huULzFB7d7dWyhsZwd5Fqogc80S5MjQ0+ah3fRqeqli6OUx6
-         uEWg==
-X-Gm-Message-State: AAQBX9ei/CZ9yTxTxQh5THfH/nkUwaV8+a2RoXGl8F1lT1BuULmUp7ad
-        Xb+LL9IBYY4eFLESV4NgX2a6MTlmIvT0
-X-Google-Smtp-Source: AKy350YHU6ZjYfEssO+g7LMMzmSGhcnh1/DfYDsYy/ADjxPdUuHdSC5u6XcbgYvLRZf8eBu8n/7ZDdQOf4s7
-X-Received: from davidai2.mtv.corp.google.com ([2620:15c:211:201:c162:24e8:ec5e:d520])
- (user=davidai job=sendgmr) by 2002:a05:6902:18c6:b0:b78:4788:525b with SMTP
- id ck6-20020a05690218c600b00b784788525bmr16043899ybb.0.1680216265743; Thu, 30
- Mar 2023 15:44:25 -0700 (PDT)
-Date:   Thu, 30 Mar 2023 15:43:39 -0700
-In-Reply-To: <20230330224348.1006691-1-davidai@google.com>
-Mime-Version: 1.0
-References: <20230330224348.1006691-1-davidai@google.com>
-X-Mailer: git-send-email 2.40.0.348.gf938b09366-goog
-Message-ID: <20230330224348.1006691-5-davidai@google.com>
-Subject: [RFC PATCH 4/6] kvm: arm64: Add support for get_freqtbl service
-From:   David Dai <davidai@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Marc Zyngier <maz@kernel.org>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Lorenzo Pieralisi <lpieralisi@kernel.org>,
-        Sudeep Holla <sudeep.holla@arm.com>
-Cc:     David Dai <davidai@google.com>,
-        Saravana Kannan <saravanak@google.com>,
-        kernel-team@android.com, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-7.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+        with ESMTP id S231147AbjC3Wpq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 30 Mar 2023 18:45:46 -0400
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2045.outbound.protection.outlook.com [40.107.243.45])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D35A910ABB;
+        Thu, 30 Mar 2023 15:45:07 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=fYbk/No38XbXqQSOcLW1cgdfIFjIxitsyotQTpjuW4+yI1dBMosTZuX7f0rZvw1q0J/x5UZxCm4inO5wUMmtP08SvDuAaI+2YThJbJqmMz7eLUKXcWZD4ILhLnE9ugizDGUa87Y+YgC+RBYVE0OY0ESfG0B0VqDOdBdfSYily4UWS0a3X8a8EK42T7ZJZ3hkZbBJuFeMr8weh8YTQon8/2fmYb9LVeAIeKHIJuGrsv83ptt4dtqKjxGPyIDtR7R3yndmYuGKKIUjxacDyIFixdIrJM4bJDyNOs07MAOWr2KwhT7496ojKulQFm8U5WhWPn04mRa1PfK9+7GM/paTYQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=i0cx97Hcuah6BVSk+M+wLTLqe06bgmOETZq0V328K5U=;
+ b=aBi3RWXUNeYQ4LYOpR1J73BIvuaAwSdN3/3tGk0Td0RFglwnVOnpNzGCQc0R5Luodn4zkFDChn+1bitzSQi5eHE19jp5g34CyG4TFldM4skfwBPmwNMd+Hkc+nsvmI/uEIJRd1MyW5k2jHhTlkhxEWWIsf3wBqsp/FkBDcD+ls5+jmCxIECwZ597i1/tikAZ95UlQEC4YcauVRCGFuh17WU6eEw8iXAcPUTunvjk/wVY4X2UyTBLsuOr6ioG4GEoJbrO3FUUvVS9rQRberuyIBDeH6Qux2t6PdiHtSKn4Pk2lOQC1783HtETTZTk1Tthukq4OkGgtdf6+8Szhhp+7A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=i0cx97Hcuah6BVSk+M+wLTLqe06bgmOETZq0V328K5U=;
+ b=nAMCt7PgE8NrpgeToVNFM9HzBXrDXrUXliF9Dd5GFSe7cvpH1526EwDjOZx7LbWSR8y1XaQs3yZhgaKlDrnlfGQyoYJNCYq1cyMK6tgpro7uQXHoBtWgF2JLw0KoL6wkUABaaBHmk9ElilRQo1vOmKoPAMRVIegqWN1Hx0ab3RCojkNJt2O/tNPjMIUb4mT/tz+2KZYOcgbirOS4vYoxNjIKIPyeu9GSXb602unsmVB3bAjKqIPkutNx2g2Wd7bvtpPCeWfsVUhWDgQwd0Gw7fyDCAyG5UT1fRg/IeoegvKMShz4YDZJibLXkpILEWKEvGpVLi9+aPOstTAWU0oHsw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by PH7PR12MB7212.namprd12.prod.outlook.com (2603:10b6:510:207::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6254.22; Thu, 30 Mar
+ 2023 22:44:56 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::ef6d:fdf6:352f:efd1]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::ef6d:fdf6:352f:efd1%3]) with mapi id 15.20.6178.037; Thu, 30 Mar 2023
+ 22:44:56 +0000
+Date:   Thu, 30 Mar 2023 19:44:55 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     "Liu, Yi L" <yi.l.liu@intel.com>
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
+        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "shameerali.kolothum.thodi@huawei.com" 
+        <shameerali.kolothum.thodi@huawei.com>,
+        "lulu@redhat.com" <lulu@redhat.com>,
+        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
+        "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        "Hao, Xudong" <xudong.hao@intel.com>,
+        "Zhao, Yan Y" <yan.y.zhao@intel.com>,
+        "Xu, Terrence" <terrence.xu@intel.com>,
+        "Jiang, Yanting" <yanting.jiang@intel.com>
+Subject: Re: [PATCH v2 10/10] vfio/pci: Add
+ VFIO_DEVICE_GET_PCI_HOT_RESET_GROUP_INFO
+Message-ID: <ZCYQ5zhmjg/xQmTZ@nvidia.com>
+References: <DS0PR11MB7529B6782565BE8489D922F9C3889@DS0PR11MB7529.namprd11.prod.outlook.com>
+ <20230328084616.3361a293.alex.williamson@redhat.com>
+ <DS0PR11MB75290B84D334FC726A8BBA95C3889@DS0PR11MB7529.namprd11.prod.outlook.com>
+ <20230328091801.13de042a.alex.williamson@redhat.com>
+ <DS0PR11MB752903CE3D5906FE21146364C3889@DS0PR11MB7529.namprd11.prod.outlook.com>
+ <20230328100027.3b843b91.alex.williamson@redhat.com>
+ <DS0PR11MB7529C12E086DAB619FF9AFF0C3899@DS0PR11MB7529.namprd11.prod.outlook.com>
+ <BN9PR11MB52762E789B9C1D8021F54ECC8C899@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <20230329094944.50abde4e.alex.williamson@redhat.com>
+ <DS0PR11MB75298AF9A9ACAEBDD5D445ECC38E9@DS0PR11MB7529.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <DS0PR11MB75298AF9A9ACAEBDD5D445ECC38E9@DS0PR11MB7529.namprd11.prod.outlook.com>
+X-ClientProxiedBy: MN2PR17CA0004.namprd17.prod.outlook.com
+ (2603:10b6:208:15e::17) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|PH7PR12MB7212:EE_
+X-MS-Office365-Filtering-Correlation-Id: 525f4082-7653-4543-27b7-08db3170624f
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: nCJ2NZ9d9yMfOMTzeHZTXBXODRPkM5cZsu7qeJ0SQhiEjZ25fkDpm+N9cEm2y7QOyljovKr38RKgfbgcXVgV+E2J05B8S+j7Z0UhP0Afpb9wifCC3mZA/mP3oDdoP3mfD96qdHWFoqJfTlGPdSFc6WjeEGBv1goAdR34Y5raH8HJ6e1eYcBe4gMLi+1lRguykSmQodkiJDztZAxjTuPnpubUc9/hSuhOCsy5pchqe8NCDcTyLi7IQyfBmXOqFffT1QJjWLHJblaB/Hxvzh9tqnwT73gEnGDqktwzXurLpI8ysaXFzB9GORtXGyb4WEPC1NiKamW8DuT6XPt0maZv/rYo6dlnVhXKkS+HfeFm617VsyEs2s3W9P45G61oiSre8p+rtjtRrNbQlMx4DD2KbBhH6dkWVIgv3gxEEjS4hxRRrY4gbZgx6C0A6/LJ6lCtYKKftS540ypMd6Wv67bEN4QGTD/4/AGASNQA+FLOQ+tzb3EuquJi5W37gvzTbx94H0CaAjivmT/tu0KWQWq+w/4VBP2hxPP51Rfow+R85XYHoIhuvdIFflRbB8FxvK8i
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(346002)(366004)(396003)(39860400002)(136003)(376002)(451199021)(2906002)(8936002)(38100700002)(41300700001)(7416002)(4744005)(5660300002)(36756003)(86362001)(54906003)(6486002)(316002)(478600001)(66946007)(66556008)(66476007)(26005)(4326008)(8676002)(6916009)(83380400001)(2616005)(186003)(6506007)(6512007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?Eqa+a5jRE5dQZcGSE5qvpiTDk9IKc9ZzVIYh9FBHZsOyd7OmtwuWCZLQay9S?=
+ =?us-ascii?Q?nCbbIcGnP5ZX55Y17B3j/7w/vXdc9tIPCyK35OJqiZBRkhTGCiABsmL3oL3Q?=
+ =?us-ascii?Q?UqAer4xcweRutR0mXFc1tC/CrwZD8CrVD+1FpM/m3w4ZIkSqWkY7IE8/RsCs?=
+ =?us-ascii?Q?QkEaOL04GHFwJ+l7AlEyYY/NcmCZpWVZLUYRPTCugFJ6zHm15v9hFAItGai+?=
+ =?us-ascii?Q?2n9+UEYsQAIxgQ8tFkXi/rD2Rzs4H74JH/oBYFII36ntzeWaa/OL1SPgoWhQ?=
+ =?us-ascii?Q?F7KJwk9v8jPY+QqsxLoYGNFAqWv5n1QGz1zVVfxBQdn9gPjdo9NLOm8mPTzo?=
+ =?us-ascii?Q?Y9IHh3B8NtTjbFKVnG1D7mLxzLjQoCVIDsssutp2jP9ePolzaz3QD9BzSjUf?=
+ =?us-ascii?Q?UB9ps2j6+vKOpNjn6bE3R9N/qwXdwhr6+8OPWoUKd6RZjQ9YF6CAMFza3G+8?=
+ =?us-ascii?Q?zUpB0FJ7qQI7rAooi15YQbPuxFoUOAkSdNHZ8Y0jriVPHOYSwezJOCSSKCPZ?=
+ =?us-ascii?Q?IHDO1iwt3poZ9LEaCEFwlYeOe3WCJV+KvZ5FZQx/Kc09j9VlaI5kWeIsslTt?=
+ =?us-ascii?Q?aImhP5GwBlvCXAvB76iX9VWHHlT9woKCaKzCO/YZ13xpp8NufE/HkkCkl5R7?=
+ =?us-ascii?Q?OfBGuzdE+N6gIVgjc04xQ9O24NpTuQvLM4DW5eqPSu/Zj2E0jTYJwWJ3skM0?=
+ =?us-ascii?Q?obqiq4eN5OlrrMMcOV42IP25PUQO5gXo7EASheevIIPs2+s5Nvt0BBuFs4Ry?=
+ =?us-ascii?Q?XR4Wy6GhytBCD3GMe3duxClSHwa2D1LG05nQ4P+IWQ9l6j1B5WaYJbrCHr44?=
+ =?us-ascii?Q?AfZFF0taXGrRoA0kPKcplrdy+QHjNLuJ4A2JNm/NkDdEwkBs84V/LNc3FYC4?=
+ =?us-ascii?Q?1F/qU+1r3BdeseI8k911XSGMakMfBinBWyRR5GHNtzj6T/rxksP32K2qOTDm?=
+ =?us-ascii?Q?EP92lNsRrz2J99nWUAfp12SQUF2P1ilNes0By/FChJ/N2vd6c8Xr3fjX1mcS?=
+ =?us-ascii?Q?wtpY9MJUWs6YkW8BgiHgzi4b+OkkarN30ud7HlWfHuyHHIpG1KH7x3v6rXyP?=
+ =?us-ascii?Q?xW6Y4Pr8l6LovZmIWyVfoVaHZiWLTg5wStNGztUd5PXn8M6InPYVZWkV9Nrw?=
+ =?us-ascii?Q?Zx7DvIal24abO4zMioryhjtxnuP6CyXMGB30rpDkC6EOJTmjWrg4o/1XMr81?=
+ =?us-ascii?Q?9bAKgTqaWFdaun0lCKdoHhV62hsYaGw5MpfUZPQ5u+KscHTzQrHjSHC/ZJV0?=
+ =?us-ascii?Q?C9UZ+fYQ8+gd7KMf1E9hpyUM7Nrc1X0VjvqA6WK0P45Y3b50ZpTeAS4O0ed0?=
+ =?us-ascii?Q?PVxMkS4uO+Yyoepsx9nkwVSyJpJY9qi+F69uvKht8xx/dqWJnLp9EOU45Qdt?=
+ =?us-ascii?Q?69xWWITjh9s03mFzlRsPN5s+XOlMnuqUZOuiv56VX9JsDqHF6I5Pa8YJiQqs?=
+ =?us-ascii?Q?tGKLZr3w1osDEPLf40bymg012w0g3Q4FTFhOdRmAM7xRYRXx+VxUDMzElnM2?=
+ =?us-ascii?Q?a9X4qYtFo0InyjM8PyIt/mS79/IMmjLVeGW+LoiHs+7F8EaMwCYqPJpJgEBa?=
+ =?us-ascii?Q?DZMFZnC+AEHXTtg2uS4dCQwGUaprrfwXraQZGMEy?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 525f4082-7653-4543-27b7-08db3170624f
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Mar 2023 22:44:56.0906
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: LDWMSVO3Pchuyi+s68+H/Zjq3D9/338fxTg6JlLjTUVrLA6Aco9zUPI274AQcjF/
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB7212
+X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This service allows guests to query the host for the frequency table
-of the CPU that the vCPU is currently running on.
+On Thu, Mar 30, 2023 at 12:48:03PM +0000, Liu, Yi L wrote:
+> +	/*
+> +	 * If dev_id is needed, fill in the dev_id field, otherwise
+> +	 * fill in group_id.
+> +	 */
+> +	if (fill->require_devid) {
+> +		/*
+> +		 * Report the devices that are opened as cdev and have
+> +		 * the same iommufd with the fill->iommufd.  Otherwise,
+> +		 * just fill in an IOMMUFD_INVALID_ID.
+> +		 */
+> +		vdev = vfio_pci_find_device_in_devset(dev_set, pdev);
+> +		if (vdev && !vfio_device_cdev_opened(vdev) &&
+> +		    fill->iommufd == vfio_iommufd_physical_ictx(vdev))
+> +			vfio_iommufd_physical_devid(vdev, &fill->devices[fill->cur].dev_id);
+> +		fill->devices[fill->cur].dev_id = IOMMUFD_INVALID_ID;
 
-Co-developed-by: Saravana Kannan <saravanak@google.com>
-Signed-off-by: Saravana Kannan <saravanak@google.com>
-Signed-off-by: David Dai <davidai@google.com>
----
- Documentation/virt/kvm/api.rst             |  8 ++++++++
- Documentation/virt/kvm/arm/get_freqtbl.rst | 23 ++++++++++++++++++++++
- Documentation/virt/kvm/arm/index.rst       |  1 +
- arch/arm64/include/uapi/asm/kvm.h          |  1 +
- arch/arm64/kvm/arm.c                       |  1 +
- arch/arm64/kvm/hypercalls.c                | 22 +++++++++++++++++++++
- include/linux/arm-smccc.h                  |  7 +++++++
- include/uapi/linux/kvm.h                   |  1 +
- tools/arch/arm64/include/uapi/asm/kvm.h    |  1 +
- 9 files changed, 65 insertions(+)
- create mode 100644 Documentation/virt/kvm/arm/get_freqtbl.rst
+This needs an else?
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index 38ce33564efc..8f905456e2b4 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -8400,6 +8400,14 @@ after normalizing for architecture. This is useful when guests are tracking
- workload on its vCPUs. Util hints allow the host to make more accurate
- frequency selections and task placement for vCPU threads.
- 
-+8.42 KVM_CAP_GET_CPUFREQ_TBL
-+---------------------------
-+
-+:Architectures: arm64
-+
-+This capability indicates that the KVM supports getting the
-+frequency table of the current CPU that the vCPU thread is running on.
-+
- 9. Known KVM API problems
- =========================
- 
-diff --git a/Documentation/virt/kvm/arm/get_freqtbl.rst b/Documentation/virt/kvm/arm/get_freqtbl.rst
-new file mode 100644
-index 000000000000..f6832d7566e7
---- /dev/null
-+++ b/Documentation/virt/kvm/arm/get_freqtbl.rst
-@@ -0,0 +1,23 @@
-+.. SPDX-License-Identifier: GPL-2.0
-+
-+get_freqtbl support for arm/arm64
-+=============================
-+
-+Allows guest to query the frequency(in KHz) table of the current CPU that
-+the vCPU thread is running on.
-+
-+* ARM_SMCCC_VENDOR_HYP_KVM_GET_CPUFREQ_TBL_FUNC_ID: 0x86000042
-+
-+This hypercall uses the SMC32/HVC32 calling convention:
-+
-+ARM_SMCCC_VENDOR_HYP_KVM_GET_CPUFREQ_TBL_FUNC_ID
-+    ==============    ========    =====================================
-+    Function ID:      (uint32)    0x86000042
-+    Arguments:        (uint32)    index of the current CPU's frequency table
-+    Return Values:    (int32)     NOT_SUPPORTED(-1) on error, or
-+                      (uint32)    Frequency table entry of requested index
-+                                  in KHz
-+                                  of current CPU(r1)
-+    Endianness:                   Must be the same endianness
-+                                  as the host.
-+    ==============    ========    =====================================
-diff --git a/Documentation/virt/kvm/arm/index.rst b/Documentation/virt/kvm/arm/index.rst
-index f83877663813..e2e56bb41491 100644
---- a/Documentation/virt/kvm/arm/index.rst
-+++ b/Documentation/virt/kvm/arm/index.rst
-@@ -13,3 +13,4 @@ ARM
-    ptp_kvm
-    get_cur_cpufreq
-    util_hint
-+   get_freqtbl
-diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-index 61309ecb7241..ed6f593264bd 100644
---- a/arch/arm64/include/uapi/asm/kvm.h
-+++ b/arch/arm64/include/uapi/asm/kvm.h
-@@ -369,6 +369,7 @@ enum {
- 	KVM_REG_ARM_VENDOR_HYP_BIT_PTP		= 1,
- 	KVM_REG_ARM_VENDOR_HYP_BIT_GET_CUR_CPUFREQ	= 2,
- 	KVM_REG_ARM_VENDOR_HYP_BIT_UTIL_HINT		= 3,
-+	KVM_REG_ARM_VENDOR_HYP_BIT_GET_CPUFREQ_TBL	= 4,
- #ifdef __KERNEL__
- 	KVM_REG_ARM_VENDOR_HYP_BMAP_BIT_COUNT,
- #endif
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index bf3c4d4b9b67..cd76128e4af4 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -222,6 +222,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_ARM_SYSTEM_SUSPEND:
- 	case KVM_CAP_GET_CUR_CPUFREQ:
- 	case KVM_CAP_UTIL_HINT:
-+	case KVM_CAP_GET_CPUFREQ_TBL:
- 		r = 1;
- 		break;
- 	case KVM_CAP_SET_GUEST_DEBUG2:
-diff --git a/arch/arm64/kvm/hypercalls.c b/arch/arm64/kvm/hypercalls.c
-index 01dba07b5183..6f96579dda80 100644
---- a/arch/arm64/kvm/hypercalls.c
-+++ b/arch/arm64/kvm/hypercalls.c
-@@ -42,6 +42,22 @@ static void kvm_sched_set_util(struct kvm_vcpu *vcpu, u64 *val)
- 	val[0] = (u64)ret;
- }
- 
-+static void kvm_sched_get_cpufreq_table(struct kvm_vcpu *vcpu, u64 *val)
-+{
-+	struct cpufreq_policy *policy;
-+	u32 idx = smccc_get_arg1(vcpu);
-+
-+	policy = cpufreq_cpu_get(task_cpu(current));
-+
-+	if (!policy)
-+		return;
-+
-+	val[0] = SMCCC_RET_SUCCESS;
-+	val[1] = policy->freq_table[idx].frequency;
-+
-+	cpufreq_cpu_put(policy);
-+}
-+
- static void kvm_ptp_get_time(struct kvm_vcpu *vcpu, u64 *val)
- {
- 	struct system_time_snapshot systime_snapshot;
-@@ -148,6 +164,9 @@ static bool kvm_hvc_call_allowed(struct kvm_vcpu *vcpu, u32 func_id)
- 	case ARM_SMCCC_VENDOR_HYP_KVM_UTIL_HINT_FUNC_ID:
- 		return test_bit(KVM_REG_ARM_VENDOR_HYP_BIT_UTIL_HINT,
- 				&smccc_feat->vendor_hyp_bmap);
-+	case ARM_SMCCC_VENDOR_HYP_KVM_GET_CPUFREQ_TBL_FUNC_ID:
-+		return test_bit(KVM_REG_ARM_VENDOR_HYP_BIT_GET_CPUFREQ_TBL,
-+				&smccc_feat->vendor_hyp_bmap);
- 	default:
- 		return kvm_hvc_call_default_allowed(func_id);
- 	}
-@@ -251,6 +270,9 @@ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
- 	case ARM_SMCCC_VENDOR_HYP_KVM_UTIL_HINT_FUNC_ID:
- 		kvm_sched_set_util(vcpu, val);
- 		break;
-+	case ARM_SMCCC_VENDOR_HYP_KVM_GET_CPUFREQ_TBL_FUNC_ID:
-+		kvm_sched_get_cpufreq_table(vcpu, val);
-+		break;
- 	case ARM_SMCCC_TRNG_VERSION:
- 	case ARM_SMCCC_TRNG_FEATURES:
- 	case ARM_SMCCC_TRNG_GET_UUID:
-diff --git a/include/linux/arm-smccc.h b/include/linux/arm-smccc.h
-index 9f747e5025b6..19fefb73a9bd 100644
---- a/include/linux/arm-smccc.h
-+++ b/include/linux/arm-smccc.h
-@@ -114,6 +114,7 @@
- #define ARM_SMCCC_KVM_FUNC_PTP			1
- #define ARM_SMCCC_KVM_FUNC_GET_CUR_CPUFREQ	64
- #define ARM_SMCCC_KVM_FUNC_UTIL_HINT			65
-+#define ARM_SMCCC_KVM_FUNC_GET_CPUFREQ_TBL	66
- #define ARM_SMCCC_KVM_FUNC_FEATURES_2		127
- #define ARM_SMCCC_KVM_NUM_FUNCS			128
- 
-@@ -152,6 +153,12 @@
- 			   ARM_SMCCC_OWNER_VENDOR_HYP,			\
- 			   ARM_SMCCC_KVM_FUNC_UTIL_HINT)
- 
-+#define ARM_SMCCC_VENDOR_HYP_KVM_GET_CPUFREQ_TBL_FUNC_ID		\
-+	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
-+			   ARM_SMCCC_SMC_32,				\
-+			   ARM_SMCCC_OWNER_VENDOR_HYP,			\
-+			   ARM_SMCCC_KVM_FUNC_GET_CPUFREQ_TBL)
-+
- /* Paravirtualised time calls (defined by ARM DEN0057A) */
- #define ARM_SMCCC_HV_PV_TIME_FEATURES				\
- 	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,			\
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index 7f667ab344ae..90a7f37f046d 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -1186,6 +1186,7 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_PMU_EVENT_MASKED_EVENTS 226
- #define KVM_CAP_GET_CUR_CPUFREQ 512
- #define KVM_CAP_UTIL_HINT 513
-+#define KVM_CAP_GET_CPUFREQ_TBL 514
- 
- #ifdef KVM_CAP_IRQ_ROUTING
- 
-diff --git a/tools/arch/arm64/include/uapi/asm/kvm.h b/tools/arch/arm64/include/uapi/asm/kvm.h
-index 61309ecb7241..ebf9a3395c1b 100644
---- a/tools/arch/arm64/include/uapi/asm/kvm.h
-+++ b/tools/arch/arm64/include/uapi/asm/kvm.h
-@@ -369,6 +369,7 @@ enum {
- 	KVM_REG_ARM_VENDOR_HYP_BIT_PTP		= 1,
- 	KVM_REG_ARM_VENDOR_HYP_BIT_GET_CUR_CPUFREQ	= 2,
- 	KVM_REG_ARM_VENDOR_HYP_BIT_UTIL_HINT		= 3,
-+	KVM_REG_ARM_VENDOR_HYP_BIT_CPUFREQ_TBL		= 4,
- #ifdef __KERNEL__
- 	KVM_REG_ARM_VENDOR_HYP_BMAP_BIT_COUNT,
- #endif
--- 
-2.40.0.348.gf938b09366-goog
+I suggest to check for VFIO_PCI_HOT_RESET_FLAG_IOMMUFD_DEV_ID on input
+as well. I know the old kernels don't enforce this but at least we
+could start enforcing it going forward so that the group path would
+reject it to catch userspace bugs.
 
+May as well fix it up to fully validate the flags
+
+Jason
