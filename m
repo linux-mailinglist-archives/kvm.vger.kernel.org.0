@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D03F46D0D1D
-	for <lists+kvm@lfdr.de>; Thu, 30 Mar 2023 19:48:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CEF3E6D0D37
+	for <lists+kvm@lfdr.de>; Thu, 30 Mar 2023 19:56:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232658AbjC3RsZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Mar 2023 13:48:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54260 "EHLO
+        id S232296AbjC3R4S (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Mar 2023 13:56:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34690 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232372AbjC3RsM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 Mar 2023 13:48:12 -0400
+        with ESMTP id S231940AbjC3R4O (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 30 Mar 2023 13:56:14 -0400
 Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B695CDC8
-        for <kvm@vger.kernel.org>; Thu, 30 Mar 2023 10:48:10 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7721BB776
+        for <kvm@vger.kernel.org>; Thu, 30 Mar 2023 10:56:10 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 14B77B829BC
-        for <kvm@vger.kernel.org>; Thu, 30 Mar 2023 17:48:09 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BEA13C433A7;
-        Thu, 30 Mar 2023 17:48:07 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 176CDB8233F
+        for <kvm@vger.kernel.org>; Thu, 30 Mar 2023 17:56:09 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BD45CC433EF;
+        Thu, 30 Mar 2023 17:56:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1680198487;
-        bh=DBDnymD5o2/CmBaDtepcUQsuNo8CIoohXvq7ERE1/MA=;
+        s=k20201202; t=1680198967;
+        bh=aXGjfpqQud+mCxITmTYIhlbuCcXm/X86qedEc2gDtgA=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=VsQrSpuaa/rJUYJDzJl2Faf8cowRrdjmXDvygA7MA/grq6U07rc2Ejf7Sv7hKzhKf
-         KxFK+HpwU4O1Bjx5C1cJGkQ4BPBJA5g++KqrGB7/iVrDyaJgOUSWc7j5NVrt6/sf2J
-         u3WTpoci2Bi3Mo+3oH+lPFSMocmcfTpmIRiBBShfG7wwnANX9vKkwIFzs3gjuDSc7H
-         +yPqnSdmdRRO0+26q7kji4063WU1PHHjNUcLMaRUjpKYKBQ5lnTuGZBDq5gEqdGU2C
-         Werk2qNdypyVIw+p/2IUOOYtVyFkHjeH/li7nnXYNOXA8GOSeP9RJygyHN1WFEfCRY
-         cA8FvDWkPMKZA==
+        b=ZNepQaDfdItwmRdmG1cLtT56KyFwHnIHvJIjT9BzMSLO60Hn8puyQ9K8MzKGwrkbo
+         wwdLIrqk+o0ksauJnRZtQcrqK59/tK408mGB0hC5AtBQ+5202IoCWnBNswLlbf820k
+         lwGhSFjY8rdp8Bza/59N/ot4tRXKZRiDQ/W35Va4/uvi7f446MFR2zBdwGUfAYpBP/
+         p0WLwxyFkR7mcs7GJvYfEZCqi6wS5Hujj4vu7yqJYAXi7lq7YCajXFkP96uj3UdxOx
+         g4noUtDPgAlxFkB3I4SM6etKSh0itPdUJQWtyMGPhB9XKFJwzWHpNlqBQKK7suylg+
+         dtozHevbD4aBQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1phwNa-004Rpa-0p;
+        id 1phwNa-004Rpa-9r;
         Thu, 30 Mar 2023 18:48:06 +0100
 From:   Marc Zyngier <maz@kernel.org>
 To:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
@@ -49,9 +49,9 @@ Cc:     James Morse <james.morse@arm.com>,
         Reiji Watanabe <reijiw@google.com>,
         Colton Lewis <coltonlewis@google.com>,
         Joey Gouly <joey.gouly@arm.com>, dwmw2@infradead.org
-Subject: [PATCH v4 09/20] KVM: arm64: timers: Rationalise per-vcpu timer init
-Date:   Thu, 30 Mar 2023 18:47:49 +0100
-Message-Id: <20230330174800.2677007-10-maz@kernel.org>
+Subject: [PATCH v4 10/20] KVM: arm64: timers: Abstract per-timer IRQ access
+Date:   Thu, 30 Mar 2023 18:47:50 +0100
+Message-Id: <20230330174800.2677007-11-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230330174800.2677007-1-maz@kernel.org>
 References: <20230330174800.2677007-1-maz@kernel.org>
@@ -70,142 +70,166 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The way we initialise our timer contexts may be satisfactory
-for two timers, but will be getting pretty annoying with four.
-
-Cleanup the whole thing by removing the code duplication and
-getting rid of unused IRQ configuration elements.
+As we are about to move the location of the per-timer IRQ into
+the VM structure, abstract the location of the IRQ behind an
+accessor. This will make the repainting sligntly less painful.
 
 Reviewed-by: Colton Lewis <coltonlewis@google.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/arch_timer.c  | 73 +++++++++++++++++++-----------------
- include/kvm/arm_arch_timer.h |  1 -
- 2 files changed, 39 insertions(+), 35 deletions(-)
+ arch/arm64/kvm/arch_timer.c  | 38 ++++++++++++++++++------------------
+ include/kvm/arm_arch_timer.h |  2 ++
+ 2 files changed, 21 insertions(+), 19 deletions(-)
 
 diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
-index 771504c79711..e46f04ed8f86 100644
+index e46f04ed8f86..d08d8c2fc30d 100644
 --- a/arch/arm64/kvm/arch_timer.c
 +++ b/arch/arm64/kvm/arch_timer.c
-@@ -30,14 +30,9 @@ static u32 host_ptimer_irq_flags;
+@@ -392,12 +392,12 @@ static void kvm_timer_update_irq(struct kvm_vcpu *vcpu, bool new_level,
+ 	int ret;
  
- static DEFINE_STATIC_KEY_FALSE(has_gic_active_state);
+ 	timer_ctx->irq.level = new_level;
+-	trace_kvm_timer_update_irq(vcpu->vcpu_id, timer_ctx->irq.irq,
++	trace_kvm_timer_update_irq(vcpu->vcpu_id, timer_irq(timer_ctx),
+ 				   timer_ctx->irq.level);
  
--static const struct kvm_irq_level default_ptimer_irq = {
--	.irq	= 30,
--	.level	= 1,
--};
--
--static const struct kvm_irq_level default_vtimer_irq = {
--	.irq	= 27,
--	.level	= 1,
-+static const u8 default_ppi[] = {
-+	[TIMER_PTIMER]  = 30,
-+	[TIMER_VTIMER]  = 27,
- };
+ 	if (!userspace_irqchip(vcpu->kvm)) {
+ 		ret = kvm_vgic_inject_irq(vcpu->kvm, vcpu->vcpu_id,
+-					  timer_ctx->irq.irq,
++					  timer_irq(timer_ctx),
+ 					  timer_ctx->irq.level,
+ 					  timer_ctx);
+ 		WARN_ON(ret);
+@@ -607,7 +607,7 @@ static void kvm_timer_vcpu_load_gic(struct arch_timer_context *ctx)
+ 	kvm_timer_update_irq(ctx->vcpu, kvm_timer_should_fire(ctx), ctx);
  
- static bool kvm_timer_irq_can_fire(struct arch_timer_context *timer_ctx);
-@@ -820,12 +815,14 @@ int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu)
- 	 * resets the timer to be disabled and unmasked and is compliant with
- 	 * the ARMv7 architecture.
- 	 */
--	timer_set_ctl(vcpu_vtimer(vcpu), 0);
--	timer_set_ctl(vcpu_ptimer(vcpu), 0);
-+	for (int i = 0; i < NR_KVM_TIMERS; i++)
-+		timer_set_ctl(vcpu_get_timer(vcpu, i), 0);
-+
+ 	if (irqchip_in_kernel(vcpu->kvm))
+-		phys_active = kvm_vgic_map_is_active(vcpu, ctx->irq.irq);
++		phys_active = kvm_vgic_map_is_active(vcpu, timer_irq(ctx));
  
- 	if (timer->enabled) {
--		kvm_timer_update_irq(vcpu, false, vcpu_vtimer(vcpu));
--		kvm_timer_update_irq(vcpu, false, vcpu_ptimer(vcpu));
-+		for (int i = 0; i < NR_KVM_TIMERS; i++)
-+			kvm_timer_update_irq(vcpu, false,
-+					     vcpu_get_timer(vcpu, i));
+ 	phys_active |= ctx->irq.level;
+ 
+@@ -825,9 +825,9 @@ int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu)
+ 					     vcpu_get_timer(vcpu, i));
  
  		if (irqchip_in_kernel(vcpu->kvm)) {
- 			kvm_vgic_reset_mapped_irq(vcpu, map.direct_vtimer->irq.irq);
-@@ -840,39 +837,47 @@ int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu)
- 	return 0;
- }
- 
-+static void timer_context_init(struct kvm_vcpu *vcpu, int timerid)
-+{
-+	struct arch_timer_context *ctxt = vcpu_get_timer(vcpu, timerid);
-+	struct kvm *kvm = vcpu->kvm;
-+
-+	ctxt->vcpu = vcpu;
-+
-+	if (timerid == TIMER_VTIMER)
-+		ctxt->offset.vm_offset = &kvm->arch.timer_data.voffset;
-+	else
-+		ctxt->offset.vm_offset = &kvm->arch.timer_data.poffset;
-+
-+	hrtimer_init(&ctxt->hrtimer, CLOCK_MONOTONIC, HRTIMER_MODE_ABS_HARD);
-+	ctxt->hrtimer.function = kvm_hrtimer_expire;
-+	ctxt->irq.irq = default_ppi[timerid];
-+
-+	switch (timerid) {
-+	case TIMER_PTIMER:
-+		ctxt->host_timer_irq = host_ptimer_irq;
-+		break;
-+	case TIMER_VTIMER:
-+		ctxt->host_timer_irq = host_vtimer_irq;
-+		break;
-+	}
-+}
-+
- void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu)
- {
- 	struct arch_timer_cpu *timer = vcpu_timer(vcpu);
--	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
--	struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
- 
--	vtimer->vcpu = vcpu;
--	vtimer->offset.vm_offset = &vcpu->kvm->arch.timer_data.voffset;
--	ptimer->vcpu = vcpu;
--	ptimer->offset.vm_offset = &vcpu->kvm->arch.timer_data.poffset;
-+	for (int i = 0; i < NR_KVM_TIMERS; i++)
-+		timer_context_init(vcpu, i);
- 
- 	/* Synchronize offsets across timers of a VM if not already provided */
- 	if (!test_bit(KVM_ARCH_FLAG_VM_COUNTER_OFFSET, &vcpu->kvm->arch.flags)) {
--		timer_set_offset(vtimer, kvm_phys_timer_read());
--		timer_set_offset(ptimer, 0);
-+		timer_set_offset(vcpu_vtimer(vcpu), kvm_phys_timer_read());
-+		timer_set_offset(vcpu_ptimer(vcpu), 0);
+-			kvm_vgic_reset_mapped_irq(vcpu, map.direct_vtimer->irq.irq);
++			kvm_vgic_reset_mapped_irq(vcpu, timer_irq(map.direct_vtimer));
+ 			if (map.direct_ptimer)
+-				kvm_vgic_reset_mapped_irq(vcpu, map.direct_ptimer->irq.irq);
++				kvm_vgic_reset_mapped_irq(vcpu, timer_irq(map.direct_ptimer));
+ 		}
  	}
  
- 	hrtimer_init(&timer->bg_timer, CLOCK_MONOTONIC, HRTIMER_MODE_ABS_HARD);
- 	timer->bg_timer.function = kvm_bg_timer_expire;
--
--	hrtimer_init(&vtimer->hrtimer, CLOCK_MONOTONIC, HRTIMER_MODE_ABS_HARD);
--	hrtimer_init(&ptimer->hrtimer, CLOCK_MONOTONIC, HRTIMER_MODE_ABS_HARD);
--	vtimer->hrtimer.function = kvm_hrtimer_expire;
--	ptimer->hrtimer.function = kvm_hrtimer_expire;
--
--	vtimer->irq.irq = default_vtimer_irq.irq;
--	ptimer->irq.irq = default_ptimer_irq.irq;
--
--	vtimer->host_timer_irq = host_vtimer_irq;
--	ptimer->host_timer_irq = host_ptimer_irq;
--
--	vtimer->host_timer_irq_flags = host_vtimer_irq_flags;
--	ptimer->host_timer_irq_flags = host_ptimer_irq_flags;
+@@ -851,7 +851,7 @@ static void timer_context_init(struct kvm_vcpu *vcpu, int timerid)
+ 
+ 	hrtimer_init(&ctxt->hrtimer, CLOCK_MONOTONIC, HRTIMER_MODE_ABS_HARD);
+ 	ctxt->hrtimer.function = kvm_hrtimer_expire;
+-	ctxt->irq.irq = default_ppi[timerid];
++	timer_irq(ctxt) = default_ppi[timerid];
+ 
+ 	switch (timerid) {
+ 	case TIMER_PTIMER:
+@@ -1295,19 +1295,19 @@ static bool timer_irqs_are_valid(struct kvm_vcpu *vcpu)
+ 	int vtimer_irq, ptimer_irq, ret;
+ 	unsigned long i;
+ 
+-	vtimer_irq = vcpu_vtimer(vcpu)->irq.irq;
++	vtimer_irq = timer_irq(vcpu_vtimer(vcpu));
+ 	ret = kvm_vgic_set_owner(vcpu, vtimer_irq, vcpu_vtimer(vcpu));
+ 	if (ret)
+ 		return false;
+ 
+-	ptimer_irq = vcpu_ptimer(vcpu)->irq.irq;
++	ptimer_irq = timer_irq(vcpu_ptimer(vcpu));
+ 	ret = kvm_vgic_set_owner(vcpu, ptimer_irq, vcpu_ptimer(vcpu));
+ 	if (ret)
+ 		return false;
+ 
+ 	kvm_for_each_vcpu(i, vcpu, vcpu->kvm) {
+-		if (vcpu_vtimer(vcpu)->irq.irq != vtimer_irq ||
+-		    vcpu_ptimer(vcpu)->irq.irq != ptimer_irq)
++		if (timer_irq(vcpu_vtimer(vcpu)) != vtimer_irq ||
++		    timer_irq(vcpu_ptimer(vcpu)) != ptimer_irq)
+ 			return false;
+ 	}
+ 
+@@ -1322,9 +1322,9 @@ bool kvm_arch_timer_get_input_level(int vintid)
+ 	if (WARN(!vcpu, "No vcpu context!\n"))
+ 		return false;
+ 
+-	if (vintid == vcpu_vtimer(vcpu)->irq.irq)
++	if (vintid == timer_irq(vcpu_vtimer(vcpu)))
+ 		timer = vcpu_vtimer(vcpu);
+-	else if (vintid == vcpu_ptimer(vcpu)->irq.irq)
++	else if (vintid == timer_irq(vcpu_ptimer(vcpu)))
+ 		timer = vcpu_ptimer(vcpu);
+ 	else
+ 		BUG();
+@@ -1358,7 +1358,7 @@ int kvm_timer_enable(struct kvm_vcpu *vcpu)
+ 
+ 	ret = kvm_vgic_map_phys_irq(vcpu,
+ 				    map.direct_vtimer->host_timer_irq,
+-				    map.direct_vtimer->irq.irq,
++				    timer_irq(map.direct_vtimer),
+ 				    &arch_timer_irq_ops);
+ 	if (ret)
+ 		return ret;
+@@ -1366,7 +1366,7 @@ int kvm_timer_enable(struct kvm_vcpu *vcpu)
+ 	if (map.direct_ptimer) {
+ 		ret = kvm_vgic_map_phys_irq(vcpu,
+ 					    map.direct_ptimer->host_timer_irq,
+-					    map.direct_ptimer->irq.irq,
++					    timer_irq(map.direct_ptimer),
+ 					    &arch_timer_irq_ops);
+ 	}
+ 
+@@ -1391,8 +1391,8 @@ static void set_timer_irqs(struct kvm *kvm, int vtimer_irq, int ptimer_irq)
+ 	unsigned long i;
+ 
+ 	kvm_for_each_vcpu(i, vcpu, kvm) {
+-		vcpu_vtimer(vcpu)->irq.irq = vtimer_irq;
+-		vcpu_ptimer(vcpu)->irq.irq = ptimer_irq;
++		timer_irq(vcpu_vtimer(vcpu)) = vtimer_irq;
++		timer_irq(vcpu_ptimer(vcpu)) = ptimer_irq;
+ 	}
  }
  
- void kvm_timer_cpu_up(void)
+@@ -1417,10 +1417,10 @@ int kvm_arm_timer_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+ 
+ 	switch (attr->attr) {
+ 	case KVM_ARM_VCPU_TIMER_IRQ_VTIMER:
+-		set_timer_irqs(vcpu->kvm, irq, ptimer->irq.irq);
++		set_timer_irqs(vcpu->kvm, irq, timer_irq(ptimer));
+ 		break;
+ 	case KVM_ARM_VCPU_TIMER_IRQ_PTIMER:
+-		set_timer_irqs(vcpu->kvm, vtimer->irq.irq, irq);
++		set_timer_irqs(vcpu->kvm, timer_irq(vtimer), irq);
+ 		break;
+ 	default:
+ 		return -ENXIO;
+@@ -1446,7 +1446,7 @@ int kvm_arm_timer_get_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+ 		return -ENXIO;
+ 	}
+ 
+-	irq = timer->irq.irq;
++	irq = timer_irq(timer);
+ 	return put_user(irq, uaddr);
+ }
+ 
 diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
-index 2dd0fd2406fb..c746ef64220b 100644
+index c746ef64220b..27cada09f588 100644
 --- a/include/kvm/arm_arch_timer.h
 +++ b/include/kvm/arm_arch_timer.h
-@@ -59,7 +59,6 @@ struct arch_timer_context {
+@@ -109,6 +109,8 @@ bool kvm_arch_timer_get_input_level(int vintid);
  
- 	/* Duplicated state from arch_timer.c for convenience */
- 	u32				host_timer_irq;
--	u32				host_timer_irq_flags;
- };
+ #define arch_timer_ctx_index(ctx)	((ctx) - vcpu_timer((ctx)->vcpu)->timers)
  
- struct timer_map {
++#define timer_irq(ctx)			((ctx)->irq.irq)
++
+ u64 kvm_arm_timer_read_sysreg(struct kvm_vcpu *vcpu,
+ 			      enum kvm_arch_timers tmr,
+ 			      enum kvm_arch_timer_regs treg);
 -- 
 2.34.1
 
