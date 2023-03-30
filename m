@@ -2,139 +2,170 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 012AF6CFBE9
-	for <lists+kvm@lfdr.de>; Thu, 30 Mar 2023 08:50:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4654E6CFC22
+	for <lists+kvm@lfdr.de>; Thu, 30 Mar 2023 09:02:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230266AbjC3Guf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Mar 2023 02:50:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40932 "EHLO
+        id S229835AbjC3HCX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Mar 2023 03:02:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53424 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229849AbjC3Gud (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 Mar 2023 02:50:33 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16BBB61BF
-        for <kvm@vger.kernel.org>; Wed, 29 Mar 2023 23:49:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1680158981;
+        with ESMTP id S229784AbjC3HCW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 30 Mar 2023 03:02:22 -0400
+Received: from out-27.mta1.migadu.com (out-27.mta1.migadu.com [95.215.58.27])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 809C940C9
+        for <kvm@vger.kernel.org>; Thu, 30 Mar 2023 00:02:19 -0700 (PDT)
+Date:   Thu, 30 Mar 2023 07:02:13 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1680159737;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=+HljoYyE0A4dfFt+IDGioQ59lFVM9ZhkEwh8bnOu3Vk=;
-        b=A4tTl00OKsCiM8FlsgKpojNFAHyvEAisX1yoBgg4D/xQ+hnURawzx6tNsmFZsIoUvmSPL3
-        uSe0F7BTERodZ47yEPGmF4hxpRIcr9YQBfVgx9tU4RIZuXPC3OHHCMEbbRBsMVk/1DyfGZ
-        KcIPP+r6I1Hj6caM+VQt3IHazu0RTD8=
-Received: from mail-pl1-f200.google.com (mail-pl1-f200.google.com
- [209.85.214.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-481-mxEj7N2vMcOSnRS63BI4Tg-1; Thu, 30 Mar 2023 02:49:39 -0400
-X-MC-Unique: mxEj7N2vMcOSnRS63BI4Tg-1
-Received: by mail-pl1-f200.google.com with SMTP id f6-20020a170902ce8600b001a25ae310a9so5071738plg.10
-        for <kvm@vger.kernel.org>; Wed, 29 Mar 2023 23:49:39 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680158978; x=1682750978;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=+HljoYyE0A4dfFt+IDGioQ59lFVM9ZhkEwh8bnOu3Vk=;
-        b=NmPNtQ4pwYUXgkJ6i5Akjt8Zukrz2TkoLzesaG5Ai03b3DCrkI043VobKCm1nTRnaw
-         QDoNC9AlnOhH2uklHEYy9dDPjSSHTsAH+S0e0D3x7D1TdeDGHtWKxTfqV2/Y/m/ZN1Jb
-         +NILgSbn3bWjKs29li6KCqweEJW1xLP+Xo44w31wnKSe45jyhAkqACZ+4JaT2Wd1O1fF
-         BddfEh3IXcrKDdU5gyW9rPna4OzmiHc4/5Zu0fj9N/8BKnSh2qXnc/r3STA2o+ixtTuG
-         TtUqspRUcVoq0NWDZjEBAF2ELRK55GPGdxZd5RkpghizJudxAesmvX4gvULh+3hlpTHS
-         nQ7w==
-X-Gm-Message-State: AAQBX9fofyjmT2cmMOoE1hnCSlv36pGIzFABEHCh93GCrBkbU01+g9JX
-        zmXxkV5UWY9JvigCTU9StEBcGwhEPTib2WMq2rd+LHwRNvRqIbRJSmy6H0BQNWylpV6/fUdXzsF
-        iIwup+kajohMg
-X-Received: by 2002:a05:6a20:7fa4:b0:d9:ec4b:82b4 with SMTP id d36-20020a056a207fa400b000d9ec4b82b4mr1754097pzj.1.1680158978539;
-        Wed, 29 Mar 2023 23:49:38 -0700 (PDT)
-X-Google-Smtp-Source: AKy350YtUaPWBGGCMAs8Xf3BCWlvYX/FlSXZ9uqmvdzXiNkbTZlWKF2YXQ5ww1SBp0SsotUVOky6RQ==
-X-Received: by 2002:a05:6a20:7fa4:b0:d9:ec4b:82b4 with SMTP id d36-20020a056a207fa400b000d9ec4b82b4mr1754081pzj.1.1680158978270;
-        Wed, 29 Mar 2023 23:49:38 -0700 (PDT)
-Received: from [10.66.61.39] ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id p18-20020a62ab12000000b005809d382016sm14403050pff.74.2023.03.29.23.49.35
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 29 Mar 2023 23:49:37 -0700 (PDT)
-Message-ID: <9412d307-3fd8-b694-7c18-8bf248070f3c@redhat.com>
-Date:   Thu, 30 Mar 2023 14:49:34 +0800
+        bh=inQR8SSL3A8SF2lOvjXIotjfddM6BcB/Maw7D6h3xMw=;
+        b=g3B6Ekt6LSeZkbGRKUL4D5rIgaOwaa9DTjy/0Z2G+UQb/fXtDFlVunDvAV65UnATOetZlj
+        dJLRJ/YW0jPVT+4H62KO07SgHmYFKsys48DGp7VGinVgQz5jiaompWWJW3RnDDKoHyZvd5
+        1jpmh1PVRVph1n961kleNGweno0iFUA=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From:   Oliver Upton <oliver.upton@linux.dev>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Simon Veith <sveith@amazon.de>,
+        Reiji Watanabe <reijiw@google.com>,
+        Colton Lewis <coltonlewis@google.com>,
+        Joey Gouly <joey.gouly@arm.com>, dwmw2@infradead.org
+Subject: Re: [PATCH v3 11/18] KVM: arm64: timers: Move the timer IRQs into
+ arch_timer_vm_data
+Message-ID: <ZCUz9aZRLuEjWu59@linux.dev>
+References: <20230324144704.4193635-1-maz@kernel.org>
+ <20230324144704.4193635-12-maz@kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.8.0
-Subject: Re: [PATCH v4 25/30] arm64: Change GNU-EFI imported code to use
- defined types
-Content-Language: en-US
-To:     Nikos Nikoleris <nikos.nikoleris@arm.com>, kvm@vger.kernel.org,
-        kvmarm@lists.linux.dev, andrew.jones@linux.dev
-Cc:     pbonzini@redhat.com, alexandru.elisei@arm.com, ricarkol@google.com
-References: <20230213101759.2577077-1-nikos.nikoleris@arm.com>
- <20230213101759.2577077-26-nikos.nikoleris@arm.com>
-From:   Shaoqin Huang <shahuang@redhat.com>
-In-Reply-To: <20230213101759.2577077-26-nikos.nikoleris@arm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230324144704.4193635-12-maz@kernel.org>
+X-Migadu-Flow: FLOW_OUT
+X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
+        DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Nikos,
-
-On 2/13/23 18:17, Nikos Nikoleris wrote:
-> Convert some types to avoid dependency on gnu-efi's <efi.h> and
-> <efilib.h>.
+On Fri, Mar 24, 2023 at 02:46:57PM +0000, Marc Zyngier wrote:
+> Having the timer IRQs duplicated into each vcpu isn't great, and
+> becomes absolutely awful with NV. So let's move these into
+> the per-VM arch_timer_vm_data structure.
 > 
-> Signed-off-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
+> This simplifies a lot of code, but requires us to introduce a
+> mutex so that we can reason about userspace trying to change
+> an interrupt number while another vcpu is running, something
+> that wasn't really well handled so far.
+> 
+> Reviewed-by: Colton Lewis <coltonlewis@google.com>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
 > ---
->   arm/efi/reloc_aarch64.c | 9 +++------
->   1 file changed, 3 insertions(+), 6 deletions(-)
+>  arch/arm64/include/asm/kvm_host.h |   2 +
+>  arch/arm64/kvm/arch_timer.c       | 104 +++++++++++++++++-------------
+>  arch/arm64/kvm/arm.c              |   2 +
+>  include/kvm/arm_arch_timer.h      |  18 ++++--
+>  4 files changed, 78 insertions(+), 48 deletions(-)
 > 
-> diff --git a/arm/efi/reloc_aarch64.c b/arm/efi/reloc_aarch64.c
-> index 08672796..fa0cd6bc 100644
-> --- a/arm/efi/reloc_aarch64.c
-> +++ b/arm/efi/reloc_aarch64.c
-> @@ -34,14 +34,11 @@
->       SUCH DAMAGE.
->   */
->   
-> -#include <efi.h>
-> -#include <efilib.h>
-> - > +#include "efi.h"
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 116233a390e9..1280154c9ef3 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -223,6 +223,8 @@ struct kvm_arch {
+>  #define KVM_ARCH_FLAG_SYSTEM_SUSPEND_ENABLED		5
+>  	/* VM counter offset */
+>  #define KVM_ARCH_FLAG_VM_COUNTER_OFFSET			6
+> +	/* Timer PPIs made immutable */
+> +#define KVM_ARCH_FLAG_TIMER_PPIS_IMMUTABLE		7
+>  
+>  	unsigned long flags;
+>  
+> diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
+> index 7cd0b0947454..88a38d45d352 100644
+> --- a/arch/arm64/kvm/arch_timer.c
+> +++ b/arch/arm64/kvm/arch_timer.c
+> @@ -851,7 +851,6 @@ static void timer_context_init(struct kvm_vcpu *vcpu, int timerid)
+>  
+>  	hrtimer_init(&ctxt->hrtimer, CLOCK_MONOTONIC, HRTIMER_MODE_ABS_HARD);
+>  	ctxt->hrtimer.function = kvm_hrtimer_expire;
+> -	timer_irq(ctxt) = default_ppi[timerid];
+>  
+>  	switch (timerid) {
+>  	case TIMER_PTIMER:
+> @@ -880,6 +879,13 @@ void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu)
+>  	timer->bg_timer.function = kvm_bg_timer_expire;
+>  }
+>  
+> +void kvm_timer_init_vm(struct kvm *kvm)
+> +{
+> +	mutex_init(&kvm->arch.timer_data.lock);
+> +	for (int i = 0; i < NR_KVM_TIMERS; i++)
+> +		kvm->arch.timer_data.ppi[i] = default_ppi[i];
+> +}
+> +
+>  void kvm_timer_cpu_up(void)
+>  {
+>  	enable_percpu_irq(host_vtimer_irq, host_vtimer_irq_flags);
+> @@ -1292,44 +1298,52 @@ void kvm_timer_vcpu_terminate(struct kvm_vcpu *vcpu)
+>  
+>  static bool timer_irqs_are_valid(struct kvm_vcpu *vcpu)
+>  {
+> -	int vtimer_irq, ptimer_irq, ret;
+> -	unsigned long i;
+> +	u32 ppis = 0;
+>  
+> -	vtimer_irq = timer_irq(vcpu_vtimer(vcpu));
+> -	ret = kvm_vgic_set_owner(vcpu, vtimer_irq, vcpu_vtimer(vcpu));
+> -	if (ret)
+> -		return false;
+> +	mutex_lock(&vcpu->kvm->arch.timer_data.lock);
+>  
+> -	ptimer_irq = timer_irq(vcpu_ptimer(vcpu));
+> -	ret = kvm_vgic_set_owner(vcpu, ptimer_irq, vcpu_ptimer(vcpu));
+> -	if (ret)
+> -		return false;
+> +	for (int i = 0; i < NR_KVM_TIMERS; i++) {
+> +		struct arch_timer_context *ctx;
+> +		int irq;
+>  
+> -	kvm_for_each_vcpu(i, vcpu, vcpu->kvm) {
+> -		if (timer_irq(vcpu_vtimer(vcpu)) != vtimer_irq ||
+> -		    timer_irq(vcpu_ptimer(vcpu)) != ptimer_irq)
+> -			return false;
+> +		ctx = vcpu_get_timer(vcpu, i);
+> +		irq = timer_irq(ctx);
+> +		if (kvm_vgic_set_owner(vcpu, irq, ctx))
+> +			break;
+> +
+> +		/*
+> +		 * We know by construction that we only have PPIs, so
+> +		 * all values are less than 32.
+> +		 */
+> +		ppis |= BIT(irq);
+>  	}
+>  
+> -	return true;
+> +	set_bit(KVM_ARCH_FLAG_TIMER_PPIS_IMMUTABLE, &vcpu->kvm->arch.flags);
+> +
+> +	mutex_unlock(&vcpu->kvm->arch.timer_data.lock);
+> +
+> +	return hweight32(ppis) == NR_KVM_TIMERS;
 
-In [PATCH v4 27/30] lib: Avoid external dependency in libelf. The 
-Include header file changed again.
+Does it make sense to only set the IMMUTABLE flag if the timer IRQs are
+indeed valid? I doubt userspace would do anything when it gets the
+EINVAL, but it is possible userspace could make another attempt at
+configuring the IRQs correctly.
 
-So why not move this change early?
-
-diff --git a/arm/efi/reloc_aarch64.c b/arm/efi/reloc_aarch64.c
-index fa0cd6bc..3f6d9a6d 100644
---- a/arm/efi/reloc_aarch64.c
-+++ b/arm/efi/reloc_aarch64.c
-@@ -34,8 +34,7 @@
-      SUCH DAMAGE.
-  */
-
--#include "efi.h"
--#include <elf.h>
-+#include <efi.h>
-
-Thanks,
-Shaoqin
->   #include <elf.h>
->   
-> -EFI_STATUS _relocate (long ldbase, Elf64_Dyn *dyn,
-> -		      EFI_HANDLE image EFI_UNUSED,
-> -		      EFI_SYSTEM_TABLE *systab EFI_UNUSED)
-> +efi_status_t _relocate(long ldbase, Elf64_Dyn *dyn, efi_handle_t image,
-> +		       efi_system_table_t *sys_tab)
->   {
->   	long relsz = 0, relent = 0;
->   	Elf64_Rela *rel = 0;
+I believe that was the existing behavior of the UAPI.
 
 -- 
-Shaoqin
-
+Thanks,
+Oliver
