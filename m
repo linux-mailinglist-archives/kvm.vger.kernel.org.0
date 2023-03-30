@@ -2,60 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5FC9F6D1264
-	for <lists+kvm@lfdr.de>; Fri, 31 Mar 2023 00:44:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 66AFD6D1274
+	for <lists+kvm@lfdr.de>; Fri, 31 Mar 2023 00:45:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231159AbjC3Wof (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Mar 2023 18:44:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38088 "EHLO
+        id S230129AbjC3WpB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Mar 2023 18:45:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38646 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230517AbjC3Wo1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 Mar 2023 18:44:27 -0400
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 140B3EF89
-        for <kvm@vger.kernel.org>; Thu, 30 Mar 2023 15:44:08 -0700 (PDT)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-5463f2d3223so28664207b3.14
-        for <kvm@vger.kernel.org>; Thu, 30 Mar 2023 15:44:08 -0700 (PDT)
+        with ESMTP id S230476AbjC3Wod (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 30 Mar 2023 18:44:33 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54196E381
+        for <kvm@vger.kernel.org>; Thu, 30 Mar 2023 15:44:16 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id g187-20020a2520c4000000b00b74680a7904so20139060ybg.15
+        for <kvm@vger.kernel.org>; Thu, 30 Mar 2023 15:44:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1680216247;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=/uMEyvfRZ1sO1MO8fuPK2yVSFwIoti/weSCrfIahBz0=;
-        b=HkADuuWTDFb2CmUHzQygUqsd7n30DrfpZgY4wV0G+aV4No9xrlSOjbPfT1ey4pE9Cb
-         DxnIikT4DiB923Bsc4+sE37ne7OCdWy7ebRVdvvRktAgoq1RhoRr6O4WggKzX6ccQL1h
-         /EtTlA6E+dGWkBD7XDOb4k4njMZKcQr6eo9vZBs6wXscx1w58a0mSesUoQhFXj+ePjQj
-         h+ebWebBqMoo9y/g7E76Sh2E33fjPZli0KGhvrlq6jVa/ju6miqkMl/PLI2RyMBo7GtC
-         z3Zprjd20UWM+Aqg77lCdVEVVRZlD2w1h5UuNtDOO2p2G/1S0ya38+9WX0fsiGltK1Zp
-         LsVg==
+        d=google.com; s=20210112; t=1680216255;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=VWrmux7hI3Vkehq4mVAPcOxXo9VZdrd7e2opoA1ab28=;
+        b=i0OxGwAlYv/8fg/xl8vCs3bv85Ct5kGC4I40aiP6zlxrZNla0vcd+Dt/3ziZ5Z64R2
+         wwp0Kbij3HOATOhSkDXKKfOwlOYFxGiB/hDggLJkv/04GPSI/57NXaFnJDj78tlbjbfH
+         zHFU86siWEoZyPUZgnPxbdTYoIqqHSKeqWKBcgWSOpw+XgqPbgWADD37A8W3toAbs1MC
+         dcbVAQ8sl2OQzJt8IRgKDF9IS1AH/mRcNJT2VSC6zxmHCHPlb2t6r5bf+IqTbNLbJCvs
+         AKYlZU4JbVRQXfpRwnjWx/H9f5H7hruDbA3ZWfT7nOqwawvT9S9fX+9ZMwDadcKocd2n
+         Mp7g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680216247;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=/uMEyvfRZ1sO1MO8fuPK2yVSFwIoti/weSCrfIahBz0=;
-        b=RZDB5LjqVQckCLtPBOhW344MDKGYJ0r8BKXXmvdbC8nKi1Ee9OmDE8XXkuzpS3fBxs
-         9b6iyfiyTOmuzd/KMAbstgOyueHGVGLyaRodOzCEl30K8azPE6cEifR5EpyknjLgM48n
-         yLYZ9jR1BYyoLvNTssrJKfrmF9DUyGAETRMvEW43eKzi1W5QzfjSjgEpyjlJIYpbcaqs
-         O2yuKpi9ulOzzymx9ZWaT3HllFTeSHN3HI/admkYX6c5v6QNhns4Ig4onMtW2aRdgOEC
-         5BpBqxomfzxm+iHohVzCerjyHeXz5zVkTmRF4eo6L1Dw3dVN71Q/WeMROzChu1ColiiH
-         HhNA==
-X-Gm-Message-State: AAQBX9e8YlwBrxXOxV+ucSWQQLd420AhBV+MA2ONX/fSlZfPjKT/GUb+
-        U81+jfQkVOP4QffuDI+bnppqc62wiDq6
-X-Google-Smtp-Source: AKy350YJl7uVdoztbmhl+H5CjDDEGKtjny/a65KRC1+dFOZf9oOHrLjqq1QMw6vRcQ5hrX6JwNewWx5zSjOt
+        d=1e100.net; s=20210112; t=1680216255;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=VWrmux7hI3Vkehq4mVAPcOxXo9VZdrd7e2opoA1ab28=;
+        b=EljVHpacoby7khWQTNhWz8NkeQAqUBH2y1NVENSYZm1b7xygU/Qto+9mmNJSiZL/vZ
+         2k1f8QMCwJOLav3sCMjZiVjTyFDcyCCid44YzAyBqwc+039fSECZgY9pjQw4bgrD1D71
+         xMqHeH8ZCwG1HsL0NRxY1jQ/0B8LFNKYbNvbkohmdBx/PINBsnGFLo8ZOfr8w/rvr51V
+         v1f0Jcgify252cWvgJum6L+cpp5XkAyTZ6uH0sivpgmKkI3R6GvIp+dkMjxGeYJFTH0g
+         qZ90EqgVAtiw0btQcdMkCf0JwNSJCk1QOrMKHQ2ykNbaeRrXYGqwN9HAU7HlTGk0bQI4
+         grDw==
+X-Gm-Message-State: AAQBX9d+I+OkXISQ51vp932HcJnxPslxTe6D+G4eoTBTp/ZHFClidy2I
+        C3xdckm2YsVktwtQzprya7AUahzzPGJ+
+X-Google-Smtp-Source: AKy350bcwJ9FD9dZGNvGTPVwMDF1LwhIoUS2S5HjV59ByCSD7PADcxzbUOioxj2xH08uJn1CEJhYNkbKLaF/
 X-Received: from davidai2.mtv.corp.google.com ([2620:15c:211:201:c162:24e8:ec5e:d520])
- (user=davidai job=sendgmr) by 2002:a81:a805:0:b0:546:6ef:8baf with SMTP id
- f5-20020a81a805000000b0054606ef8bafmr6938530ywh.2.1680216247110; Thu, 30 Mar
- 2023 15:44:07 -0700 (PDT)
-Date:   Thu, 30 Mar 2023 15:43:35 -0700
+ (user=davidai job=sendgmr) by 2002:a25:680e:0:b0:b78:3a15:e6fe with SMTP id
+ d14-20020a25680e000000b00b783a15e6femr12135986ybc.2.1680216255549; Thu, 30
+ Mar 2023 15:44:15 -0700 (PDT)
+Date:   Thu, 30 Mar 2023 15:43:37 -0700
+In-Reply-To: <20230330224348.1006691-1-davidai@google.com>
 Mime-Version: 1.0
+References: <20230330224348.1006691-1-davidai@google.com>
 X-Mailer: git-send-email 2.40.0.348.gf938b09366-goog
-Message-ID: <20230330224348.1006691-1-davidai@google.com>
-Subject: [RFC PATCH 0/6] Improve VM DVFS and task placement behavior
+Message-ID: <20230330224348.1006691-3-davidai@google.com>
+Subject: [RFC PATCH 2/6] kvm: arm64: Add support for get_cur_cpufreq service
 From:   David Dai <davidai@google.com>
-To:     "Rafael J. Wysocki" <rafael@kernel.org>,
-        Viresh Kumar <viresh.kumar@linaro.org>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
+To:     Paolo Bonzini <pbonzini@redhat.com>,
         Jonathan Corbet <corbet@lwn.net>,
         Marc Zyngier <maz@kernel.org>,
         Oliver Upton <oliver.upton@linux.dev>,
@@ -66,20 +64,11 @@ To:     "Rafael J. Wysocki" <rafael@kernel.org>,
         Will Deacon <will@kernel.org>,
         Mark Rutland <mark.rutland@arm.com>,
         Lorenzo Pieralisi <lpieralisi@kernel.org>,
-        Sudeep Holla <sudeep.holla@arm.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Juri Lelli <juri.lelli@redhat.com>,
-        Vincent Guittot <vincent.guittot@linaro.org>,
-        Dietmar Eggemann <dietmar.eggemann@arm.com>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>,
-        Daniel Bristot de Oliveira <bristot@redhat.com>,
-        Valentin Schneider <vschneid@redhat.com>,
-        David Dai <davidai@google.com>
-Cc:     kernel-team@android.com, linux-pm@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, linux-doc@vger.kernel.org,
+        Sudeep Holla <sudeep.holla@arm.com>
+Cc:     David Dai <davidai@google.com>,
+        Saravana Kannan <saravanak@google.com>,
+        kernel-team@android.com, kvm@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-7.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
@@ -92,295 +81,203 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+This service allows guests to query the host for frequency of the CPU
+that the vCPU is currently running on.
 
-This patch series is a continuation of the talk Saravana gave at LPC 2022
-titled "CPUfreq/sched and VM guest workload problems" [1][2][3]. The gist
-of the talk is that workloads running in a guest VM get terrible task
-placement and DVFS behavior when compared to running the same workload in
-the host. Effectively, no EAS for threads inside VMs. This would make power
-and performance terrible just by running the workload in a VM even if we
-assume there is zero virtualization overhead.
-
-We have been iterating over different options for communicating between
-guest and host, ways of applying the information coming from the
-guest/host, etc to figure out the best performance and power improvements
-we could get.
-
-The patch series in its current state is NOT meant for landing in the
-upstream kernel. We are sending this patch series to share the current
-progress and data we have so far. The patch series is meant to be easy to
-cherry-pick and test on various devices to see what performance and power
-benefits this might give for others.
-
-With this series, a workload running in a VM gets the same task placement
-and DVFS treatment as it would when running in the host.
-
-As expected, we see significant performance improvement and better
-performance/power ratio. If anyone else wants to try this out for your VM
-workloads and report findings, that'd be very much appreciated.
-
-The idea is to improve VM CPUfreq/sched behavior by:
-- Having guest kernel to do accurate load tracking by taking host CPU
-  arch/type and frequency into account.
-- Sharing vCPU run queue utilization information with the host so that the
-  host can do proper frequency scaling and task placement on the host side.
-
-Results:
-========
-
-As of right now, the best results have been with using hypercalls (see more
-below first) to communicate between host and guest and treating the vCPU
-run queue util similar to util_est on the host side vCPU thread. So that's
-what this patch series does.
-
-Let's look at the results for this series first and then look at the other
-options we are trying/tried out:
-
-Use cases running Android inside a VM on a Chromebook:
-======================================================
-
-PCMark (Emulates real world usecases)
-Higher is better
-+-------------------+----------+------------+--------+
-| Test Case (score) | Baseline | Util_guest | %delta |
-+-------------------+----------+------------+--------+
-| Weighted Total    |     6136 |       7274 |   +19% |
-+-------------------+----------+------------+--------+
-| Web Browsing      |     5558 |       6273 |   +13% |
-+-------------------+----------+------------+--------+
-| Video Editing     |     4921 |       5221 |    +6% |
-+-------------------+----------+------------+--------+
-| Writing           |     6864 |       8825 |   +29% |
-+-------------------+----------+------------+--------+
-| Photo Editing     |     7983 |      11593 |   +45% |
-+-------------------+----------+------------+--------+
-| Data Manipulation |     5814 |       6081 |    +5% |
-+-------------------+----------+------------+--------+
-
-PCMark Performance/mAh
-Higher is better
-+-----------+----------+------------+--------+
-|           | Baseline | Util_guest | %delta |
-+-----------+----------+------------+--------+
-| Score/mAh |       79 |         88 |   +11% |
-+-----------+----------+------------+--------+
-
-Roblox
-Higher is better
-+-----+----------+------------+--------+
-|     | Baseline | Util_guest | %delta |
-+-----+----------+------------+--------+
-| FPS |    18.25 |      28.66 |   +57% |
-+-----+----------+------------+--------+
-
-Roblox FPS/mAh
-Higher is better
-+-----+----------+------------+--------+
-|     | Baseline | Util_guest | %delta |
-+-----+----------+------------+--------+
-| FPS |     0.15 |       0.19 |   +26% |
-+-----+----------+------------+--------+
-
-Use cases running a minimal system inside a VM on a Pixel 6:
-============================================================
-
-FIO
-Higher is better
-+----------------------+----------+------------+--------+
-| Test Case (avg MB/s) | Baseline | Util_guest | %delta |
-+----------------------+----------+------------+--------+
-| Seq Write            |     9.27 |       12.6 |   +36% |
-+----------------------+----------+------------+--------+
-| Rand Write           |     9.34 |       11.9 |   +27% |
-+----------------------+----------+------------+--------+
-| Seq Read             |      106 |        124 |   +17% |
-+----------------------+----------+------------+--------+
-| Rand Read            |     33.6 |         35 |    +4% |
-+----------------------+----------+------------+--------+
-
-CPU-based ML Inference Benchmark
-Lower is better
-+-------------------------+----------+------------+--------+
-| Test Case (ms)          | Baseline | Util_guest | %delta |
-+-------------------------+----------+------------+--------+
-| Cached Sample Inference |     2.57 |       1.75 |   -32% |
-+-------------------------+----------+------------+--------+
-| Small Sample Inference  |      6.8 |       5.57 |   -18% |
-+-------------------------+----------+------------+--------+
-| Large Sample Inference  |     31.2 |      26.58 |   -15% |
-+-------------------------+----------+------------+--------+
-
-These patches expect the host to:
-- Affine vCPUs to specific clusters.
-- Set vCPU capacity to match the host CPU they are running on.
-
-To make this easy to do/try out, we have put up patches[4][5] to do this on
-CrosVM. Once you pick up those patches, you can use options
-"--host-cpu-topology" and "--virt-cpufreq" to achieve the above.
-
-The patch series can be broken into:
-
-Patch 1: Add util_guest as an additional PELT signal for host vCPU threads
-Patch 2: Hypercall for guest to get current pCPU's frequency
-Patch 3: Send vCPU run queue util to host and apply as util_guest
-Patch 4: Query pCPU freq table from guest (we'll move this to DT in the
-	 future)
-Patch 5: Virtual cpufreq driver that uses the hypercalls to send util to
-	 host and implement frequency invariance in the guest.
-
-Alternative we have implemented and profiled:
-=============================================
-
-util_guest vs uclamp_min
-========================
-
-One suggestion at LPC was to use uclamp_min to apply the util info coming
-from the guest. As we suspected, it doesn't perform as well because
-uclamp_min is not additive, whereas the actual workload on the host CPU due
-to the vCPU is additive to the existing workloads on the host. Uclamp_min
-also has the undesirable side-effect of threads forked from the vCPU thread
-inheriting whatever uclamp_min value the vCPU thread had and then getting
-stuck with that uclamp_min value.
-
-Below are some additional benchmark results comparing the uclamp_min
-prototype (listed as Uclamp) using the same test environment as before
-(including hypercalls).
-
-As before, %delta is always comparing to baseline.
-
-PCMark
-Higher is better
-+-------------------+----------+------------+--------+--------+--------+
-| Test Case (score) | Baseline | Util_guest | %delta | Uclamp | %delta |
-+-------------------+----------+------------+--------+--------+--------+
-| Weighted Total    |     6136 |       7274 |   +19% |   6848 |   +12% |
-+-------------------+----------+------------+--------+--------+--------+
-| Web Browsing      |     5558 |       6273 |   +13% |   6050 |    +9% |
-+-------------------+----------+------------+--------+--------+--------+
-| Video Editing     |     4921 |       5221 |    +6% |   5091 |    +3% |
-+-------------------+----------+------------+--------+--------+--------+
-| Writing           |     6864 |       8825 |   +29% |   8523 |   +24% |
-+-------------------+----------+------------+--------+--------+--------+
-| Photo Editing     |     7983 |      11593 |   +45% |   9865 |   +24% |
-+-------------------+----------+------------+--------+--------+--------+
-| Data Manipulation |     5814 |       6081 |    +5% |   5836 |     0% |
-+-------------------+----------+------------+--------+--------+--------+
-
-PCMark Performance/mAh
-Higher is better
-+-----------+----------+------------+--------+--------+--------+
-|           | Baseline | Util_guest | %delta | Uclamp | %delta |
-+-----------+----------+------------+--------+--------+--------+
-| Score/mAh |       79 |         88 |   +11% |     83 |    +7% |
-+-----------+----------+------------+--------+--------+--------+
-
-Hypercalls vs MMIO:
-===================
-We realize that hypercalls are not the recommended choice for this and we
-have no attachment to any communication method as long as it gives good
-results.
-
-We started off with hypercalls to see what is the best we could achieve if
-we didn't have to context switch into host side userspace.
-
-To see the impact of switching from hypercalls to MMIO, we kept util_guest
-and only switched from hypercall to MMIO. So in the results below:
-- Hypercall = hypercall + util_guest
-- MMIO = MMIO + util_guest
-
-As before, %delta is always comparing to baseline.
-
-PCMark
-Higher is better
-+-------------------+----------+------------+--------+-------+--------+
-| Test Case (score) | Baseline |  Hypercall | %delta |  MMIO | %delta |
-+-------------------+----------+------------+--------+-------+--------+
-| Weighted Total    |     6136 |       7274 |   +19% |  6867 |   +12% |
-+-------------------+----------+------------+--------+-------+--------+
-| Web Browsing      |     5558 |       6273 |   +13% |  6035 |    +9% |
-+-------------------+----------+------------+--------+-------+--------+
-| Video Editing     |     4921 |       5221 |    +6% |  5167 |    +5% |
-+-------------------+----------+------------+--------+-------+--------+
-| Writing           |     6864 |       8825 |   +29% |  8529 |   +24% |
-+-------------------+----------+------------+--------+-------+--------+
-| Photo Editing     |     7983 |      11593 |   +45% | 10812 |   +35% |
-+-------------------+----------+------------+--------+-------+--------+
-| Data Manipulation |     5814 |       6081 |    +5% |  5327 |    -8% |
-+-------------------+----------+------------+--------+-------+--------+
-
-PCMark Performance/mAh
-Higher is better
-+-----------+----------+-----------+--------+------+--------+
-|           | Baseline | Hypercall | %delta | MMIO | %delta |
-+-----------+----------+-----------+--------+------+--------+
-| Score/mAh |       79 |        88 |   +11% |   83 |    +7% |
-+-----------+----------+-----------+--------+------+--------+
-
-Roblox
-Higher is better
-+-----+----------+------------+--------+-------+--------+
-|     | Baseline |  Hypercall | %delta |  MMIO | %delta |
-+-----+----------+------------+--------+-------+--------+
-| FPS |    18.25 |      28.66 |   +57% | 24.06 |   +32% |
-+-----+----------+------------+--------+-------+--------+
-
-Roblox Frames/mAh
-Higher is better
-+------------+----------+------------+--------+--------+--------+
-|            | Baseline |  Hypercall | %delta |   MMIO | %delta |
-+------------+----------+------------+--------+--------+--------+
-| Frames/mAh |    91.25 |     114.64 |   +26% | 103.11 |   +13% |
-+------------+----------+------------+--------+--------+--------+
-
-Next steps:
-===========
-We are continuing to look into communication mechanisms other than
-hypercalls that are just as/more efficient and avoid switching into the VMM
-userspace. Any inputs in this regard are greatly appreciated.
-
-Thanks,
-David & Saravana
-
-[1] - https://lpc.events/event/16/contributions/1195/
-[2] - https://lpc.events/event/16/contributions/1195/attachments/970/1893/LPC%202022%20-%20VM%20DVFS.pdf
-[3] - https://www.youtube.com/watch?v=hIg_5bg6opU
-[4] - https://chromium-review.googlesource.com/c/crosvm/crosvm/+/4208668
-[5] - https://chromium-review.googlesource.com/c/crosvm/crosvm/+/4288027
-
-David Dai (6):
-  sched/fair: Add util_guest for tasks
-  kvm: arm64: Add support for get_cur_cpufreq service
-  kvm: arm64: Add support for util_hint service
-  kvm: arm64: Add support for get_freqtbl service
-  dt-bindings: cpufreq: add bindings for virtual kvm cpufreq
-  cpufreq: add kvm-cpufreq driver
-
- .../bindings/cpufreq/cpufreq-virtual-kvm.yaml |  39 +++
- Documentation/virt/kvm/api.rst                |  28 ++
- .../virt/kvm/arm/get_cur_cpufreq.rst          |  21 ++
- Documentation/virt/kvm/arm/get_freqtbl.rst    |  23 ++
- Documentation/virt/kvm/arm/index.rst          |   3 +
- Documentation/virt/kvm/arm/util_hint.rst      |  22 ++
- arch/arm64/include/uapi/asm/kvm.h             |   3 +
- arch/arm64/kvm/arm.c                          |   3 +
- arch/arm64/kvm/hypercalls.c                   |  60 +++++
- drivers/cpufreq/Kconfig                       |  13 +
- drivers/cpufreq/Makefile                      |   1 +
- drivers/cpufreq/kvm-cpufreq.c                 | 245 ++++++++++++++++++
- include/linux/arm-smccc.h                     |  21 ++
- include/linux/sched.h                         |  12 +
- include/uapi/linux/kvm.h                      |   3 +
- kernel/sched/core.c                           |  24 +-
- kernel/sched/fair.c                           |  15 +-
- tools/arch/arm64/include/uapi/asm/kvm.h       |   3 +
- 18 files changed, 536 insertions(+), 3 deletions(-)
- create mode 100644 Documentation/devicetree/bindings/cpufreq/cpufreq-virtual-kvm.yaml
+Co-developed-by: Saravana Kannan <saravanak@google.com>
+Signed-off-by: Saravana Kannan <saravanak@google.com>
+Signed-off-by: David Dai <davidai@google.com>
+---
+ Documentation/virt/kvm/api.rst                |  8 +++++++
+ .../virt/kvm/arm/get_cur_cpufreq.rst          | 21 +++++++++++++++++++
+ Documentation/virt/kvm/arm/index.rst          |  1 +
+ arch/arm64/include/uapi/asm/kvm.h             |  1 +
+ arch/arm64/kvm/arm.c                          |  1 +
+ arch/arm64/kvm/hypercalls.c                   | 18 ++++++++++++++++
+ include/linux/arm-smccc.h                     |  7 +++++++
+ include/uapi/linux/kvm.h                      |  1 +
+ tools/arch/arm64/include/uapi/asm/kvm.h       |  1 +
+ 9 files changed, 59 insertions(+)
  create mode 100644 Documentation/virt/kvm/arm/get_cur_cpufreq.rst
- create mode 100644 Documentation/virt/kvm/arm/get_freqtbl.rst
- create mode 100644 Documentation/virt/kvm/arm/util_hint.rst
- create mode 100644 drivers/cpufreq/kvm-cpufreq.c
 
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index 62de0768d6aa..b0ff0ad700bf 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -8380,6 +8380,14 @@ structure.
+ When getting the Modified Change Topology Report value, the attr->addr
+ must point to a byte where the value will be stored or retrieved from.
+ 
++8.40 KVM_CAP_GET_CUR_CPUFREQ
++------------------------
++
++:Architectures: arm64
++
++This capability indicates that KVM supports getting the
++frequency of the current CPU that the vCPU thread is running on.
++
+ 9. Known KVM API problems
+ =========================
+ 
+diff --git a/Documentation/virt/kvm/arm/get_cur_cpufreq.rst b/Documentation/virt/kvm/arm/get_cur_cpufreq.rst
+new file mode 100644
+index 000000000000..06e0ed5b3868
+--- /dev/null
++++ b/Documentation/virt/kvm/arm/get_cur_cpufreq.rst
+@@ -0,0 +1,21 @@
++.. SPDX-License-Identifier: GPL-2.0
++
++get_cur_cpufreq support for arm/arm64
++=============================
++
++Get_cur_cpufreq support is used to get current frequency(in KHz) of the
++current CPU that the vCPU thread is running on.
++
++* ARM_SMCCC_VENDOR_HYP_KVM_GET_CUR_CPUFREQ_FUNC_ID: 0x86000040
++
++This hypercall uses the SMC32/HVC32 calling convention:
++
++ARM_SMCCC_VENDOR_HYP_KVM_GET_CUR_CPUFREQ_FUNC_ID
++    ==============    ========    =====================================
++    Function ID:      (uint32)    0x86000040
++    Return Values:    (int32)     NOT_SUPPORTED(-1) on error, or
++                      (uint32)    Frequency in KHz of current CPU that the
++                                  vCPU thread is running on.
++    Endianness:                   Must be the same endianness
++                                  as the host.
++    ==============    ========    =====================================
+diff --git a/Documentation/virt/kvm/arm/index.rst b/Documentation/virt/kvm/arm/index.rst
+index e84848432158..47afc5c1f24a 100644
+--- a/Documentation/virt/kvm/arm/index.rst
++++ b/Documentation/virt/kvm/arm/index.rst
+@@ -11,3 +11,4 @@ ARM
+    hypercalls
+    pvtime
+    ptp_kvm
++   get_cur_cpufreq
+diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+index f8129c624b07..ed8b63e91bdc 100644
+--- a/arch/arm64/include/uapi/asm/kvm.h
++++ b/arch/arm64/include/uapi/asm/kvm.h
+@@ -367,6 +367,7 @@ enum {
+ enum {
+ 	KVM_REG_ARM_VENDOR_HYP_BIT_FUNC_FEAT	= 0,
+ 	KVM_REG_ARM_VENDOR_HYP_BIT_PTP		= 1,
++	KVM_REG_ARM_VENDOR_HYP_BIT_GET_CUR_CPUFREQ	= 2,
+ #ifdef __KERNEL__
+ 	KVM_REG_ARM_VENDOR_HYP_BMAP_BIT_COUNT,
+ #endif
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 3bd732eaf087..f960b136c611 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -220,6 +220,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 	case KVM_CAP_VCPU_ATTRIBUTES:
+ 	case KVM_CAP_PTP_KVM:
+ 	case KVM_CAP_ARM_SYSTEM_SUSPEND:
++	case KVM_CAP_GET_CUR_CPUFREQ:
+ 		r = 1;
+ 		break;
+ 	case KVM_CAP_SET_GUEST_DEBUG2:
+diff --git a/arch/arm64/kvm/hypercalls.c b/arch/arm64/kvm/hypercalls.c
+index 5da884e11337..b3f4b90c024b 100644
+--- a/arch/arm64/kvm/hypercalls.c
++++ b/arch/arm64/kvm/hypercalls.c
+@@ -3,6 +3,9 @@
+ 
+ #include <linux/arm-smccc.h>
+ #include <linux/kvm_host.h>
++#include <linux/cpufreq.h>
++#include <linux/sched.h>
++#include <uapi/linux/sched/types.h>
+ 
+ #include <asm/kvm_emulate.h>
+ 
+@@ -16,6 +19,15 @@
+ #define KVM_ARM_SMCCC_VENDOR_HYP_FEATURES			\
+ 	GENMASK(KVM_REG_ARM_VENDOR_HYP_BMAP_BIT_COUNT - 1, 0)
+ 
++static void kvm_sched_get_cur_cpufreq(struct kvm_vcpu *vcpu, u64 *val)
++{
++	unsigned long ret_freq;
++
++	ret_freq = cpufreq_get(task_cpu(current));
++
++	val[0] = ret_freq;
++}
++
+ static void kvm_ptp_get_time(struct kvm_vcpu *vcpu, u64 *val)
+ {
+ 	struct system_time_snapshot systime_snapshot;
+@@ -116,6 +128,9 @@ static bool kvm_hvc_call_allowed(struct kvm_vcpu *vcpu, u32 func_id)
+ 	case ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID:
+ 		return test_bit(KVM_REG_ARM_VENDOR_HYP_BIT_PTP,
+ 				&smccc_feat->vendor_hyp_bmap);
++	case ARM_SMCCC_VENDOR_HYP_KVM_GET_CUR_CPUFREQ_FUNC_ID:
++		return test_bit(KVM_REG_ARM_VENDOR_HYP_BIT_GET_CUR_CPUFREQ,
++				&smccc_feat->vendor_hyp_bmap);
+ 	default:
+ 		return kvm_hvc_call_default_allowed(func_id);
+ 	}
+@@ -213,6 +228,9 @@ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
+ 	case ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID:
+ 		kvm_ptp_get_time(vcpu, val);
+ 		break;
++	case ARM_SMCCC_VENDOR_HYP_KVM_GET_CUR_CPUFREQ_FUNC_ID:
++		kvm_sched_get_cur_cpufreq(vcpu, val);
++		break;
+ 	case ARM_SMCCC_TRNG_VERSION:
+ 	case ARM_SMCCC_TRNG_FEATURES:
+ 	case ARM_SMCCC_TRNG_GET_UUID:
+diff --git a/include/linux/arm-smccc.h b/include/linux/arm-smccc.h
+index 220c8c60e021..e15f1bdcf3f1 100644
+--- a/include/linux/arm-smccc.h
++++ b/include/linux/arm-smccc.h
+@@ -112,6 +112,7 @@
+ /* KVM "vendor specific" services */
+ #define ARM_SMCCC_KVM_FUNC_FEATURES		0
+ #define ARM_SMCCC_KVM_FUNC_PTP			1
++#define ARM_SMCCC_KVM_FUNC_GET_CUR_CPUFREQ	64
+ #define ARM_SMCCC_KVM_FUNC_FEATURES_2		127
+ #define ARM_SMCCC_KVM_NUM_FUNCS			128
+ 
+@@ -138,6 +139,12 @@
+ #define KVM_PTP_VIRT_COUNTER			0
+ #define KVM_PTP_PHYS_COUNTER			1
+ 
++#define ARM_SMCCC_VENDOR_HYP_KVM_GET_CUR_CPUFREQ_FUNC_ID		\
++	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
++			   ARM_SMCCC_SMC_32,				\
++			   ARM_SMCCC_OWNER_VENDOR_HYP,			\
++			   ARM_SMCCC_KVM_FUNC_GET_CUR_CPUFREQ)
++
+ /* Paravirtualised time calls (defined by ARM DEN0057A) */
+ #define ARM_SMCCC_HV_PV_TIME_FEATURES				\
+ 	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,			\
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index d77aef872a0a..0a1a260243bf 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -1184,6 +1184,7 @@ struct kvm_ppc_resize_hpt {
+ #define KVM_CAP_S390_PROTECTED_ASYNC_DISABLE 224
+ #define KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP 225
+ #define KVM_CAP_PMU_EVENT_MASKED_EVENTS 226
++#define KVM_CAP_GET_CUR_CPUFREQ 512
+ 
+ #ifdef KVM_CAP_IRQ_ROUTING
+ 
+diff --git a/tools/arch/arm64/include/uapi/asm/kvm.h b/tools/arch/arm64/include/uapi/asm/kvm.h
+index f8129c624b07..ed8b63e91bdc 100644
+--- a/tools/arch/arm64/include/uapi/asm/kvm.h
++++ b/tools/arch/arm64/include/uapi/asm/kvm.h
+@@ -367,6 +367,7 @@ enum {
+ enum {
+ 	KVM_REG_ARM_VENDOR_HYP_BIT_FUNC_FEAT	= 0,
+ 	KVM_REG_ARM_VENDOR_HYP_BIT_PTP		= 1,
++	KVM_REG_ARM_VENDOR_HYP_BIT_GET_CUR_CPUFREQ	= 2,
+ #ifdef __KERNEL__
+ 	KVM_REG_ARM_VENDOR_HYP_BMAP_BIT_COUNT,
+ #endif
 -- 
 2.40.0.348.gf938b09366-goog
 
