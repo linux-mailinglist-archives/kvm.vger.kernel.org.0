@@ -2,361 +2,306 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 253146CFAC3
-	for <lists+kvm@lfdr.de>; Thu, 30 Mar 2023 07:31:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BCB946CFACA
+	for <lists+kvm@lfdr.de>; Thu, 30 Mar 2023 07:35:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229795AbjC3Fbu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Mar 2023 01:31:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38212 "EHLO
+        id S229598AbjC3FfS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Mar 2023 01:35:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40400 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229775AbjC3Fbs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 Mar 2023 01:31:48 -0400
-Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 474AF558D
-        for <kvm@vger.kernel.org>; Wed, 29 Mar 2023 22:31:47 -0700 (PDT)
-Received: by mail-pj1-x1035.google.com with SMTP id p3-20020a17090a74c300b0023f69bc7a68so18465318pjl.4
-        for <kvm@vger.kernel.org>; Wed, 29 Mar 2023 22:31:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1680154307; x=1682746307;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wYfff0Zf1lxUCbJ2nrqYJ8/mKtECEZ2GKO3QQowmo0w=;
-        b=b7S+LPDd7Hvt86RLSzYqZ4GZsU/AknAz3cGanMzkIeCLHxRjDPzRXgVy7GAy/Qe3SE
-         seWFzZ0WOcv4z6UnawMNV2zZpqhKO0FMrlpYfcKKNPM+Npzf2YR2UyxIovOnC/vFDugY
-         9t2BIQbS35J5L9olpYFJH3zl0gYw8KV05nsdBZ3DpZZ0FrEeDz1m4LzJ3RwzMgzRg4gj
-         LY2xVb5u52L9EEhZO1IKxBEf6uo1ClHbpMjsPCOcMKLR9YuQyzIGkHSKzQ591CZ3VYTX
-         wrzcgyXVDlnBfnzl+3NdSD7XmyG/ApCv33pDPIBnn5pt1xsEstreUVmphQLww/Fj7rJf
-         3zRQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680154307; x=1682746307;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=wYfff0Zf1lxUCbJ2nrqYJ8/mKtECEZ2GKO3QQowmo0w=;
-        b=OX/OU5CnRHnDlfj1IQC94Cd3E+8P3LlDz3s/bUQvYWJuoGNrvWNp3ZubfLTkGJc5ez
-         Nvyk+5yPxkLQnVimWULEKdW4iO+zXpuX58CGE7P4bNpuS3wdecXn5cSUoyPt/ZjiYARr
-         9uUrd8jdTwIXin8nsXD6YThW4/GgA1jONYWaghLxReEwAJGPwkEubxIoTY166IkA61J4
-         uijhZNIZFT3bHvvSdiARh94PYU0KIdzpKeuWYFSbMeRKMAcXsTS3tcrYdHir8AJ+I3hR
-         4JTs8WXRwK7a8JgP345GjJHAB7WuesmiKBRd6D+C3UtDkuC9I9Ax7oCKnlGtcZdGsg3S
-         NpYw==
-X-Gm-Message-State: AAQBX9dns4ZH+okjlZvckFKHyCfmRevNb8YyMr/qvmU/BD9tdMNDw9y/
-        jZEZFvalhh/jDZNRduxn/N7PuA==
-X-Google-Smtp-Source: AKy350YQBkdQX4AmdFekpxXAC2nXRbNnhNWSMNrXUc8W6PG87LflXR6+Or9JExtgLP75iPcok72lZw==
-X-Received: by 2002:a17:902:cf4e:b0:1a2:1922:985b with SMTP id e14-20020a170902cf4e00b001a21922985bmr17195587plg.59.1680154306611;
-        Wed, 29 Mar 2023 22:31:46 -0700 (PDT)
-Received: from anup-ubuntu-vm.localdomain ([171.76.80.30])
-        by smtp.gmail.com with ESMTPSA id 17-20020a170902ee5100b0019339f3368asm24045679plo.3.2023.03.29.22.31.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 Mar 2023 22:31:46 -0700 (PDT)
-From:   Anup Patel <apatel@ventanamicro.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Atish Patra <atishp@atishpatra.org>
-Cc:     Palmer Dabbelt <palmer@dabbelt.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Andrew Jones <ajones@ventanamicro.com>,
-        Anup Patel <anup@brainfault.org>, kvm@vger.kernel.org,
-        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-        linux-kernel@vger.kernel.org, Anup Patel <apatel@ventanamicro.com>
-Subject: [PATCH v2 1/1] RISC-V: KVM: Add ONE_REG interface to enable/disable SBI extensions
-Date:   Thu, 30 Mar 2023 11:01:35 +0530
-Message-Id: <20230330053135.1686577-2-apatel@ventanamicro.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230330053135.1686577-1-apatel@ventanamicro.com>
-References: <20230330053135.1686577-1-apatel@ventanamicro.com>
+        with ESMTP id S229452AbjC3FfR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 30 Mar 2023 01:35:17 -0400
+Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D02F149CF;
+        Wed, 29 Mar 2023 22:35:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1680154515; x=1711690515;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=26t1PkJKtQAZoUxOT1gF0JbXDFFzLgoR5+bs2KhzUkc=;
+  b=EKq8EZNzWVpB4st8nH6gLYc5HyRl9Mv5qM4Y2S6TYNvDlp+AeUxGBOWi
+   Yr+pelPRafivkH2Ek/MiMeBcjO6s0XnAwXpBmYBkSk4BSTA5b6ePphblJ
+   H9YxAYW6S1oZ8dK7nk6avKlDhTEypfEFaeZSIoP8u75Tbo3OnSoZDO3Da
+   kuheyrqYX4IUUcA8ZVmZ0y3th2d3bKEtASgxrcZjzRo0kiPQaEEuxLUIB
+   rlMhG1L6VbRER77rhsZneqicownveK2VjfnaIwtCWyxZLH35IZevNLWSL
+   KfuZOVb3xSLY61pEiLo8Q8IVltrny2GMWnQ45mnS3R6URkBv80+CrEGYf
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10664"; a="341090885"
+X-IronPort-AV: E=Sophos;i="5.98,303,1673942400"; 
+   d="scan'208";a="341090885"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Mar 2023 22:35:15 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10664"; a="714861074"
+X-IronPort-AV: E=Sophos;i="5.98,303,1673942400"; 
+   d="scan'208";a="714861074"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by orsmga008.jf.intel.com with ESMTP; 29 Mar 2023 22:35:14 -0700
+Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.21; Wed, 29 Mar 2023 22:35:14 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.21; Wed, 29 Mar 2023 22:35:14 -0700
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.21 via Frontend Transport; Wed, 29 Mar 2023 22:35:14 -0700
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.105)
+ by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.21; Wed, 29 Mar 2023 22:35:14 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=eeDm2+nxYkq/3n38ykgGz8qizxM6rRptdsOV9cHzfAO1VtOjLa95nFK1h6l2E3SQm3eDZ9W23MXnk+PKoVEP/AtWzq/IOTSHn9fOVY4HxNSvZcwhHKxhkwbL98soJzBURnROkNXI7/dF76YrA4P5s8FfODrjH7JJ4K5Hyvcs7Ea0i/crI2O8odwD9nUpfLMmqPfjGXb70yeLlUx6xoWOcTUjdOM1eGW6tcW9adwfT4glkU9KRlxMU/VJnLt490wTq+xaFUB4BgPrcwvdD+t5aTLG4SO8kBxtVvu8woiNQ/EzRH27RweIQERdoN7kUN2Z7OFedYBJAPLsBC3w1GdLUg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=FuutFvCEabRPK17aigtAAdVScfoxtK/eJqxzWxolPqg=;
+ b=nE0PL4K4ihSCRlPmgofRdevK8YbJ7aOJvdnHfNpPWtgt/i8ePOVThs2j/NtXUC8HfyI3daDS5yQOPrkn8sHAhoPQSyPWz1Jfg0e4eeygAzmRnz0Ju9gqBC80/SYV3DTi3i8VbVnZ3bdzwJpnQwmyUrsaxaxTq1dbIxG101kS3Qns9zCoumPtPnhOGfywDTnSvkzelaz5q1vOtJ/e0LA0ObIf5o+vPAgKrGVs7cir2sOinQp2SkB9EbOI27EtKy+OpmfFA+EwprUUJtL1Oxhev/cawV42yTojtygzgs48lAWoMnoXrDK/rLOMm5vag2vFlpv7gAuerLU9FDfU22mJ1w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from DS0PR11MB7529.namprd11.prod.outlook.com (2603:10b6:8:141::20)
+ by DM4PR11MB5294.namprd11.prod.outlook.com (2603:10b6:5:391::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6222.33; Thu, 30 Mar
+ 2023 05:35:11 +0000
+Received: from DS0PR11MB7529.namprd11.prod.outlook.com
+ ([fe80::ca24:b399:b445:a3de]) by DS0PR11MB7529.namprd11.prod.outlook.com
+ ([fe80::ca24:b399:b445:a3de%4]) with mapi id 15.20.6254.020; Thu, 30 Mar 2023
+ 05:35:11 +0000
+From:   "Liu, Yi L" <yi.l.liu@intel.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+CC:     "jgg@nvidia.com" <jgg@nvidia.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
+        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "shameerali.kolothum.thodi@huawei.com" 
+        <shameerali.kolothum.thodi@huawei.com>,
+        "lulu@redhat.com" <lulu@redhat.com>,
+        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
+        "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        "Hao, Xudong" <xudong.hao@intel.com>,
+        "Zhao, Yan Y" <yan.y.zhao@intel.com>,
+        "Xu, Terrence" <terrence.xu@intel.com>,
+        "Jiang, Yanting" <yanting.jiang@intel.com>
+Subject: RE: [PATCH v8 20/24] vfio: Add cdev for vfio_device
+Thread-Topic: [PATCH v8 20/24] vfio: Add cdev for vfio_device
+Thread-Index: AQHZYJBJCmZN16F9XU+/2pw4LnyBN68SMDWAgACc4qA=
+Date:   Thu, 30 Mar 2023 05:35:10 +0000
+Message-ID: <DS0PR11MB75293361C1465E891EBC694EC38E9@DS0PR11MB7529.namprd11.prod.outlook.com>
+References: <20230327094047.47215-1-yi.l.liu@intel.com>
+        <20230327094047.47215-21-yi.l.liu@intel.com>
+ <20230329135719.22ac6c12.alex.williamson@redhat.com>
+In-Reply-To: <20230329135719.22ac6c12.alex.williamson@redhat.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DS0PR11MB7529:EE_|DM4PR11MB5294:EE_
+x-ms-office365-filtering-correlation-id: 71b72ed4-8ad0-4c61-cec4-08db30e087a0
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: ZfnBQOLL31NCa0INsYMPTSKs3mnUNZZqW+OK5FX3jvqkOFgfhp9R/vmHkcSqGC+yNLtDBlFCpZn3hikHTbVclYPuznuW6N5avAVufl7dTLG/Z6sf1PjkjBMbpwZxSnwL7k8JtLiQ6LnFBXEret5O1NSEOQs4sVja7+UnGA2Y17qQAPxFKu6hEL4z/3a9tG/iK3AopbAgvnOauq5Bj94fQ2bgWJQan7giyJH8LP/JT0ivxtzaHwDl5xq4MBAqfGrOMZ5VHRSzr/TUppdtHb6fb5lJ5gNWgRzHY3efUXQp1CZBUJK53C+IFNoHvE4Bjx0BkRhP6adheOhqUJCZS0oSh448DTkUVrHVPw6Jep0y1Qv5GEL8mLdh0cBg8qWKmo75PhQHNQGW3/sQrZ8uNaEF/VawrKHsjZ3T5uIcZW/ak8OOlVkRufN74+fWw+VQBbtzHrke/ewmBD7kJ9MgxdR28vBJ3JyOq0NYwgK8woIPd8c1e9y+F5l5e/+9M3sgd8g4su121Zgjbu6Avj1Ry/HB88VvulfH8hr6v1TP3GIlNPf0k2wcRGv8isKxKg6HwMYeznWZO3Vbu8ZrBmauNCQoaCy+z2H6rYjBTkWqbKWTB/NiabL8LSF03gOclgufs3yB
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB7529.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(376002)(39860400002)(346002)(136003)(366004)(396003)(451199021)(2906002)(7416002)(52536014)(8936002)(83380400001)(5660300002)(86362001)(55016003)(7696005)(82960400001)(33656002)(71200400001)(38070700005)(122000001)(38100700002)(66476007)(4326008)(6916009)(66446008)(8676002)(66556008)(66946007)(76116006)(186003)(41300700001)(64756008)(54906003)(316002)(26005)(6506007)(9686003)(478600001);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?srCqHGX2CXeyYjugdDuehiRKiAFChq+B/ckiWrOAzsi9CQ+MH32TU3YIaFHQ?=
+ =?us-ascii?Q?G4OINWREHoibJgvkzqloUThjkyGfUSUH8TSw5BOD7RqSqoR2QgH19kNP8kDl?=
+ =?us-ascii?Q?QiiIDctOgMnsAQRnhF50/i4vXm6xR05JMjRzPNimYjfICRSMB0YmJ7bUfTC4?=
+ =?us-ascii?Q?jvFwJk3teHS7laH80R3t9RUZViTG3DklHmuGEIzvqHQeb+URE9ASWmaan34Q?=
+ =?us-ascii?Q?yxpLd3orh+pVjuZg7jbHZxhQvV7LUJXbctElGM6LmfvwBtWD5+BSNVIH/bks?=
+ =?us-ascii?Q?5uNUktHq+lw6CbdjnnNjuv+h/TLhZLE3eiA03XNPwvAFD6tHQqcIiUGPl6tr?=
+ =?us-ascii?Q?c44+3wy4X95/KyCbS4GgjOqhcTrdxmBUmiQW751zOyQnhtoeaA1fGIzYC5fH?=
+ =?us-ascii?Q?3xpRT2y99tHCtSAJF3BrOiShWaUf+98EplwbCWJLugLdGWUKmwCEJsINWzwO?=
+ =?us-ascii?Q?aGCGZG472gAmPMM2yheQ1XBRQ7tM4XXkJ/QzsYTX3cEfq2Y7ADlKbiG+jmqe?=
+ =?us-ascii?Q?sflb91ZCEQw76Ft130lbA9KrWhG3ZtQJwX1Fj8o8qdB2TiYO8x6EoppaBhHg?=
+ =?us-ascii?Q?SXC11lwg6efBuXyGgicfleNL+VC6EWb7+emSBjATyHfTiZE550JZ/FUHqoS1?=
+ =?us-ascii?Q?Ms7pTj/SmuP27/tZ182KgHfD3tjNijt/d45wvga7bFxd3uUfqjWBzHXgiJYz?=
+ =?us-ascii?Q?Kuh7AVBLMdFbKWnR7Zwua6wVuD3ZqHgnf6+CYw0IhSkfr4VyYgQ8aViroQEh?=
+ =?us-ascii?Q?px+3nSSzdV4IRwSAuzG95I2845aGeETFUdIVZenx2pJ9ad/+16vW5eijOqxF?=
+ =?us-ascii?Q?TEcH+GcNeU4Io2ut8hMQCQAYsLZ6s3KTbvatxEYNZFaEMt7H3y6d9t3fm3au?=
+ =?us-ascii?Q?UV4TgEz9gNG2oRbMFuixqfz3FHYc6eCW2V5q95acNLY34i1tFV5xLmG8SawM?=
+ =?us-ascii?Q?INxU9YshHAJm1L/k9qmGVRlFQD5sQ2UjYtb6yiY3q6twsFl6ZsxyUuj4MMpp?=
+ =?us-ascii?Q?A2/vYAWGUjBFAj6aa/cuSy9efMM1O0Z+BdrjNXZMoBn16niO9daAfWDRnDhJ?=
+ =?us-ascii?Q?QYzdOpMw5bbFyx0Bt+7UUPc5lf/2z+62JqbxiGfUFTpkQ5TitQ+jYFHLXb9Q?=
+ =?us-ascii?Q?W/TJFSj4n/6sWVdLncUFliT6Y/+rgX2HDu8zG8knzmO9aWn1wBuaC5hI+047?=
+ =?us-ascii?Q?Zwx3+NNKD6aFn/qpMRcULNEYtKi81qVVGwlnJuFg6J0go1S1VbNXMR301wDm?=
+ =?us-ascii?Q?BDwueAVTE4BB125zV/jA4/JReUjp3tEC2DZEyXOC4dX2w/m2NqpLsE8IxspI?=
+ =?us-ascii?Q?zqW0yovjBMctrS4slewpjCSdjZZuA2NG0pu8rgzAtd9+w1gL47JSXG5I9d+d?=
+ =?us-ascii?Q?j4T2Mpu4KuNxgfvlCArT9xKYwq+55F/0kRPy7/1K2AtNs71HctKtGVp77E1N?=
+ =?us-ascii?Q?Mx0QQfpMj1G3vYnkr89OlezA7XZQV/N3p7bOGHB0B4+N3MkPJOQVy1D8yy2H?=
+ =?us-ascii?Q?7XS4pWIXPPmIc2E9PaYGSpfX2qgspo9lq3J8GkWcsSMFDADX56ZbStuZgqXH?=
+ =?us-ascii?Q?srPVS0A6tPhfKqyL7FAmjy4qFoWLcNgiivQPfKTO?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
-        DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS
-        autolearn=unavailable autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB7529.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 71b72ed4-8ad0-4c61-cec4-08db30e087a0
+X-MS-Exchange-CrossTenant-originalarrivaltime: 30 Mar 2023 05:35:10.8862
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: AJTzLepN/FApNy0f9xUUX7nXq4kiIDK6U1yhiRlTinzN3ONnQ5fSzvFMPNRz5ROIiah/2SRK5mIOqftSt8v7IQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR11MB5294
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-2.5 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-We add ONE_REG interface to enable/disable SBI extensions (just
-like the ONE_REG interface for ISA extensions). This allows KVM
-user-space to decide the set of SBI extension enabled for a Guest
-and by default all SBI extensions are enabled.
+> From: Alex Williamson <alex.williamson@redhat.com>
+> Sent: Thursday, March 30, 2023 3:57 AM
+>=20
+> On Mon, 27 Mar 2023 02:40:43 -0700
+> Yi Liu <yi.l.liu@intel.com> wrote:
+>=20
+[...]
+> > +/*
+> > + * device access via the fd opened by this function is blocked until
+> > + * .open_device() is called successfully during BIND_IOMMUFD.
+> > + */
+> > +int vfio_device_fops_cdev_open(struct inode *inode, struct file *filep=
+)
+> > +{
+> > +	struct vfio_device *device =3D container_of(inode->i_cdev,
+> > +						  struct vfio_device, cdev);
+> > +	struct vfio_device_file *df;
+> > +	int ret;
+> > +
+> > +	if (!vfio_device_try_get_registration(device))
+> > +		return -ENODEV;
+> > +
+> > +	df =3D vfio_allocate_device_file(device);
+> > +	if (IS_ERR(df)) {
+> > +		ret =3D PTR_ERR(df);
+> > +		goto err_put_registration;
+> > +	}
+> > +
+> > +	filep->private_data =3D df;
+> > +
+> > +	return 0;
+> > +
+> > +err_put_registration:
+> > +	vfio_device_put_registration(device);
+> > +	return ret;
+> > +}
+> > +
+[...]
+> > diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
+> > index 8e96aab27029..58fc3bb768f2 100644
+> > --- a/drivers/vfio/vfio_main.c
+> > +++ b/drivers/vfio/vfio_main.c
+> > @@ -242,6 +242,7 @@ static int vfio_init_device(struct vfio_device *dev=
+ice, struct
+> device *dev,
+> >  	device->device.release =3D vfio_device_release;
+> >  	device->device.class =3D vfio.device_class;
+> >  	device->device.parent =3D device->dev;
+> > +	vfio_init_device_cdev(device);
+> >  	return 0;
+> >
+> >  out_uninit:
+> > @@ -280,7 +281,7 @@ static int __vfio_register_dev(struct vfio_device *=
+device,
+> >  	if (ret)
+> >  		goto err_out;
+> >
+> > -	ret =3D device_add(&device->device);
+> > +	ret =3D vfio_device_add(device);
+> >  	if (ret)
+> >  		goto err_out;
+> >
+> > @@ -320,6 +321,12 @@ void vfio_unregister_group_dev(struct vfio_device =
+*device)
+> >  	bool interrupted =3D false;
+> >  	long rc;
+> >
+> > +	/* Prevent new device opened in the group path */
+> > +	vfio_device_group_unregister(device);
+> > +
+> > +	/* Prevent new device opened in the cdev path */
+> > +	vfio_device_del(device);
+> > +
+> >  	vfio_device_put_registration(device);
+> >  	rc =3D try_wait_for_completion(&device->comp);
+> >  	while (rc <=3D 0) {
+> > @@ -343,11 +350,6 @@ void vfio_unregister_group_dev(struct vfio_device =
+*device)
+> >  		}
+> >  	}
+> >
+> > -	vfio_device_group_unregister(device);
+> > -
+> > -	/* Balances device_add in register path */
+> > -	device_del(&device->device);
+> > -
+>=20
+> Why were these relocated?  And additionally why was the comment
+> regarding the balance operations dropped?  The move seems unrelated to
+> the patch here, so if it's actually advisable for some reason, it
+> should be a separate patch.  Thanks,
 
-Signed-off-by: Anup Patel <apatel@ventanamicro.com>
----
- arch/riscv/include/asm/kvm_vcpu_sbi.h |   8 +-
- arch/riscv/include/uapi/asm/kvm.h     |  20 ++++
- arch/riscv/kvm/vcpu.c                 |   2 +
- arch/riscv/kvm/vcpu_sbi.c             | 150 +++++++++++++++++++++++---
- arch/riscv/kvm/vcpu_sbi_base.c        |   2 +-
- 5 files changed, 163 insertions(+), 19 deletions(-)
+The reason for the relocation is to prevent new device which would result
+in the device->refcount increasing. If the user keeps open device then the
+device->refcount may keep increasing. Then the vfio_unregister_group_dev()
+may be stuck here. This is rare, but possible.=20
 
-diff --git a/arch/riscv/include/asm/kvm_vcpu_sbi.h b/arch/riscv/include/asm/kvm_vcpu_sbi.h
-index 8425556af7d1..4278125a38a5 100644
---- a/arch/riscv/include/asm/kvm_vcpu_sbi.h
-+++ b/arch/riscv/include/asm/kvm_vcpu_sbi.h
-@@ -16,6 +16,7 @@
- 
- struct kvm_vcpu_sbi_context {
- 	int return_handled;
-+	bool extension_disabled[KVM_RISCV_SBI_EXT_MAX];
- };
- 
- struct kvm_vcpu_sbi_return {
-@@ -45,7 +46,12 @@ void kvm_riscv_vcpu_sbi_system_reset(struct kvm_vcpu *vcpu,
- 				     struct kvm_run *run,
- 				     u32 type, u64 flags);
- int kvm_riscv_vcpu_sbi_return(struct kvm_vcpu *vcpu, struct kvm_run *run);
--const struct kvm_vcpu_sbi_extension *kvm_vcpu_sbi_find_ext(unsigned long extid);
-+int kvm_riscv_vcpu_set_reg_sbi_ext(struct kvm_vcpu *vcpu,
-+				   const struct kvm_one_reg *reg);
-+int kvm_riscv_vcpu_get_reg_sbi_ext(struct kvm_vcpu *vcpu,
-+				   const struct kvm_one_reg *reg);
-+const struct kvm_vcpu_sbi_extension *kvm_vcpu_sbi_find_ext(
-+				struct kvm_vcpu *vcpu, unsigned long extid);
- int kvm_riscv_vcpu_sbi_ecall(struct kvm_vcpu *vcpu, struct kvm_run *run);
- 
- #ifdef CONFIG_RISCV_SBI_V01
-diff --git a/arch/riscv/include/uapi/asm/kvm.h b/arch/riscv/include/uapi/asm/kvm.h
-index 92af6f3f057c..33c3457b94e7 100644
---- a/arch/riscv/include/uapi/asm/kvm.h
-+++ b/arch/riscv/include/uapi/asm/kvm.h
-@@ -108,6 +108,23 @@ enum KVM_RISCV_ISA_EXT_ID {
- 	KVM_RISCV_ISA_EXT_MAX,
- };
- 
-+/*
-+ * SBI extension IDs specific to KVM. This is not the same as the SBI
-+ * extension IDs defined by the RISC-V SBI specification.
-+ */
-+enum KVM_RISCV_SBI_EXT_ID {
-+	KVM_RISCV_SBI_EXT_V01 = 0,
-+	KVM_RISCV_SBI_EXT_TIME,
-+	KVM_RISCV_SBI_EXT_IPI,
-+	KVM_RISCV_SBI_EXT_RFENCE,
-+	KVM_RISCV_SBI_EXT_SRST,
-+	KVM_RISCV_SBI_EXT_HSM,
-+	KVM_RISCV_SBI_EXT_PMU,
-+	KVM_RISCV_SBI_EXT_EXPERIMENTAL,
-+	KVM_RISCV_SBI_EXT_VENDOR,
-+	KVM_RISCV_SBI_EXT_MAX,
-+};
-+
- /* Possible states for kvm_riscv_timer */
- #define KVM_RISCV_TIMER_STATE_OFF	0
- #define KVM_RISCV_TIMER_STATE_ON	1
-@@ -152,6 +169,9 @@ enum KVM_RISCV_ISA_EXT_ID {
- /* ISA Extension registers are mapped as type 7 */
- #define KVM_REG_RISCV_ISA_EXT		(0x07 << KVM_REG_RISCV_TYPE_SHIFT)
- 
-+/* SBI extension registers are mapped as type 8 */
-+#define KVM_REG_RISCV_SBI_EXT		(0x08 << KVM_REG_RISCV_TYPE_SHIFT)
-+
- #endif
- 
- #endif /* __LINUX_KVM_RISCV_H */
-diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
-index 7d010b0be54e..311fd347c5a8 100644
---- a/arch/riscv/kvm/vcpu.c
-+++ b/arch/riscv/kvm/vcpu.c
-@@ -601,6 +601,8 @@ static int kvm_riscv_vcpu_set_reg(struct kvm_vcpu *vcpu,
- 						 KVM_REG_RISCV_FP_D);
- 	case KVM_REG_RISCV_ISA_EXT:
- 		return kvm_riscv_vcpu_set_reg_isa_ext(vcpu, reg);
-+	case KVM_REG_RISCV_SBI_EXT:
-+		return kvm_riscv_vcpu_set_reg_sbi_ext(vcpu, reg);
- 	default:
- 		break;
- 	}
-diff --git a/arch/riscv/kvm/vcpu_sbi.c b/arch/riscv/kvm/vcpu_sbi.c
-index 15fde15f9fb8..bedd7d78a5f0 100644
---- a/arch/riscv/kvm/vcpu_sbi.c
-+++ b/arch/riscv/kvm/vcpu_sbi.c
-@@ -30,17 +30,52 @@ static const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_pmu = {
- };
- #endif
- 
--static const struct kvm_vcpu_sbi_extension *sbi_ext[] = {
--	&vcpu_sbi_ext_v01,
--	&vcpu_sbi_ext_base,
--	&vcpu_sbi_ext_time,
--	&vcpu_sbi_ext_ipi,
--	&vcpu_sbi_ext_rfence,
--	&vcpu_sbi_ext_srst,
--	&vcpu_sbi_ext_hsm,
--	&vcpu_sbi_ext_pmu,
--	&vcpu_sbi_ext_experimental,
--	&vcpu_sbi_ext_vendor,
-+struct kvm_riscv_sbi_extension_entry {
-+	enum KVM_RISCV_SBI_EXT_ID dis_idx;
-+	const struct kvm_vcpu_sbi_extension *ext_ptr;
-+};
-+
-+static const struct kvm_riscv_sbi_extension_entry sbi_ext[] = {
-+	{
-+		.dis_idx = KVM_RISCV_SBI_EXT_V01,
-+		.ext_ptr = &vcpu_sbi_ext_v01,
-+	},
-+	{
-+		.dis_idx = KVM_RISCV_SBI_EXT_MAX, /* Can't be disabled */
-+		.ext_ptr = &vcpu_sbi_ext_base,
-+	},
-+	{
-+		.dis_idx = KVM_RISCV_SBI_EXT_TIME,
-+		.ext_ptr = &vcpu_sbi_ext_time,
-+	},
-+	{
-+		.dis_idx = KVM_RISCV_SBI_EXT_IPI,
-+		.ext_ptr = &vcpu_sbi_ext_ipi,
-+	},
-+	{
-+		.dis_idx = KVM_RISCV_SBI_EXT_RFENCE,
-+		.ext_ptr = &vcpu_sbi_ext_rfence,
-+	},
-+	{
-+		.dis_idx = KVM_RISCV_SBI_EXT_SRST,
-+		.ext_ptr = &vcpu_sbi_ext_srst,
-+	},
-+	{
-+		.dis_idx = KVM_RISCV_SBI_EXT_HSM,
-+		.ext_ptr = &vcpu_sbi_ext_hsm,
-+	},
-+	{
-+		.dis_idx = KVM_RISCV_SBI_EXT_PMU,
-+		.ext_ptr = &vcpu_sbi_ext_pmu,
-+	},
-+	{
-+		.dis_idx = KVM_RISCV_SBI_EXT_EXPERIMENTAL,
-+		.ext_ptr = &vcpu_sbi_ext_experimental,
-+	},
-+	{
-+		.dis_idx = KVM_RISCV_SBI_EXT_VENDOR,
-+		.ext_ptr = &vcpu_sbi_ext_vendor,
-+	},
- };
- 
- void kvm_riscv_vcpu_sbi_forward(struct kvm_vcpu *vcpu, struct kvm_run *run)
-@@ -99,14 +134,95 @@ int kvm_riscv_vcpu_sbi_return(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 	return 0;
- }
- 
--const struct kvm_vcpu_sbi_extension *kvm_vcpu_sbi_find_ext(unsigned long extid)
-+int kvm_riscv_vcpu_set_reg_sbi_ext(struct kvm_vcpu *vcpu,
-+				   const struct kvm_one_reg *reg)
-+{
-+	unsigned long __user *uaddr =
-+			(unsigned long __user *)(unsigned long)reg->addr;
-+	unsigned long reg_num = reg->id & ~(KVM_REG_ARCH_MASK |
-+					    KVM_REG_SIZE_MASK |
-+					    KVM_REG_RISCV_SBI_EXT);
-+	unsigned long i, reg_val;
-+	const struct kvm_riscv_sbi_extension_entry *sext = NULL;
-+	struct kvm_vcpu_sbi_context *scontext = &vcpu->arch.sbi_context;
-+
-+	if (KVM_REG_SIZE(reg->id) != sizeof(unsigned long))
-+		return -EINVAL;
-+
-+	if (copy_from_user(&reg_val, uaddr, KVM_REG_SIZE(reg->id)))
-+		return -EFAULT;
-+
-+	if (reg_num >= KVM_RISCV_SBI_EXT_MAX ||
-+	    (reg_val != 1 && reg_val != 0))
-+		return -EINVAL;
-+
-+	if (vcpu->arch.ran_atleast_once)
-+		return -EBUSY;
-+
-+	for (i = 0; i < ARRAY_SIZE(sbi_ext); i++) {
-+		if (sbi_ext[i].dis_idx == reg_num) {
-+			sext = &sbi_ext[i];
-+			break;
-+		}
-+	}
-+	if (!sext)
-+		return -ENOENT;
-+
-+	scontext->extension_disabled[sext->dis_idx] = !reg_val;
-+
-+	return 0;
-+}
-+
-+int kvm_riscv_vcpu_get_reg_sbi_ext(struct kvm_vcpu *vcpu,
-+				   const struct kvm_one_reg *reg)
-+{
-+	unsigned long __user *uaddr =
-+			(unsigned long __user *)(unsigned long)reg->addr;
-+	unsigned long reg_num = reg->id & ~(KVM_REG_ARCH_MASK |
-+					    KVM_REG_SIZE_MASK |
-+					    KVM_REG_RISCV_SBI_EXT);
-+	unsigned long i, reg_val;
-+	const struct kvm_riscv_sbi_extension_entry *sext = NULL;
-+	struct kvm_vcpu_sbi_context *scontext = &vcpu->arch.sbi_context;
-+
-+	if (KVM_REG_SIZE(reg->id) != sizeof(unsigned long))
-+		return -EINVAL;
-+
-+	if (reg_num >= KVM_RISCV_SBI_EXT_MAX)
-+		return -EINVAL;
-+
-+	for (i = 0; i < ARRAY_SIZE(sbi_ext); i++) {
-+		if (sbi_ext[i].dis_idx == reg_num) {
-+			sext = &sbi_ext[i];
-+			break;
-+		}
-+	}
-+	if (!sext)
-+		return -ENOENT;
-+
-+	reg_val = !scontext->extension_disabled[sext->dis_idx];
-+	if (copy_to_user(uaddr, &reg_val, KVM_REG_SIZE(reg->id)))
-+		return -EFAULT;
-+
-+	return 0;
-+}
-+
-+const struct kvm_vcpu_sbi_extension *kvm_vcpu_sbi_find_ext(
-+				struct kvm_vcpu *vcpu, unsigned long extid)
- {
--	int i = 0;
-+	int i;
-+	const struct kvm_riscv_sbi_extension_entry *sext;
-+	struct kvm_vcpu_sbi_context *scontext = &vcpu->arch.sbi_context;
- 
- 	for (i = 0; i < ARRAY_SIZE(sbi_ext); i++) {
--		if (sbi_ext[i]->extid_start <= extid &&
--		    sbi_ext[i]->extid_end >= extid)
--			return sbi_ext[i];
-+		sext = &sbi_ext[i];
-+		if (sext->ext_ptr->extid_start <= extid &&
-+		    sext->ext_ptr->extid_end >= extid) {
-+			if (sext->dis_idx < KVM_RISCV_SBI_EXT_MAX &&
-+			    scontext->extension_disabled[sext->dis_idx])
-+				return NULL;
-+			return sbi_ext[i].ext_ptr;
-+		}
- 	}
- 
- 	return NULL;
-@@ -126,7 +242,7 @@ int kvm_riscv_vcpu_sbi_ecall(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 	};
- 	bool ext_is_v01 = false;
- 
--	sbi_ext = kvm_vcpu_sbi_find_ext(cp->a7);
-+	sbi_ext = kvm_vcpu_sbi_find_ext(vcpu, cp->a7);
- 	if (sbi_ext && sbi_ext->handler) {
- #ifdef CONFIG_RISCV_SBI_V01
- 		if (cp->a7 >= SBI_EXT_0_1_SET_TIMER &&
-diff --git a/arch/riscv/kvm/vcpu_sbi_base.c b/arch/riscv/kvm/vcpu_sbi_base.c
-index 9945aff34c14..5bc570b984f4 100644
---- a/arch/riscv/kvm/vcpu_sbi_base.c
-+++ b/arch/riscv/kvm/vcpu_sbi_base.c
-@@ -44,7 +44,7 @@ static int kvm_sbi_ext_base_handler(struct kvm_vcpu *vcpu, struct kvm_run *run,
- 			kvm_riscv_vcpu_sbi_forward(vcpu, run);
- 			retdata->uexit = true;
- 		} else {
--			sbi_ext = kvm_vcpu_sbi_find_ext(cp->a0);
-+			sbi_ext = kvm_vcpu_sbi_find_ext(vcpu, cp->a0);
- 			*out_val = sbi_ext && sbi_ext->probe ?
- 					   sbi_ext->probe(vcpu) : !!sbi_ext;
- 		}
--- 
-2.34.1
+By doing vfio_device_group_unregister(), the device is removed from the
+group->device_list. Then user cannot open the device by VFIO_GROUP_GET_DEVI=
+CE_FD.
+Hence it won't increase the device->refcount. I agree with you, this should
+be done in a separate patch.
 
+Same reason for relocating device_del(&device->device); User may keep
+opening the cdev to increase the device->refcount. Then the
+vfio_device_group_unregister() path would be stuck as well. But this
+relocation needs to be done here since user cannot do it if without cdev.
+
+Last, need to keep the balance comment as well even the sequence
+it not strictly mirrored. will keep the comment.
+
+> Alex
+>=20
+> >  	/* Balances vfio_device_set_group in register path */
+> >  	vfio_device_remove_group(device);
+> >  }
+> > @@ -555,7 +557,8 @@ static int vfio_device_fops_release(struct inode *i=
+node,
+> struct file *filep)
+> >  	struct vfio_device_file *df =3D filep->private_data;
+> >  	struct vfio_device *device =3D df->device;
+> >
+> > -	vfio_device_group_close(df);
+> > +	if (df->group)
+> > +		vfio_device_group_close(df);
+> >
+> >  	vfio_device_put_registration(device);
+> >
+
+Thanks,
+Yi Liu
