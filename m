@@ -2,72 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DE7266CF86D
-	for <lists+kvm@lfdr.de>; Thu, 30 Mar 2023 03:02:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A4B426CF871
+	for <lists+kvm@lfdr.de>; Thu, 30 Mar 2023 03:04:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229691AbjC3BB7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 Mar 2023 21:01:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32898 "EHLO
+        id S229580AbjC3BEn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 Mar 2023 21:04:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34242 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229448AbjC3BB6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 29 Mar 2023 21:01:58 -0400
-Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7094A4ED4;
-        Wed, 29 Mar 2023 18:01:56 -0700 (PDT)
-Received: by mail-pj1-x102f.google.com with SMTP id a16so15757144pjs.4;
-        Wed, 29 Mar 2023 18:01:56 -0700 (PDT)
+        with ESMTP id S229448AbjC3BEl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 29 Mar 2023 21:04:41 -0400
+Received: from mail-pg1-x536.google.com (mail-pg1-x536.google.com [IPv6:2607:f8b0:4864:20::536])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DFE5D4EDB;
+        Wed, 29 Mar 2023 18:04:40 -0700 (PDT)
+Received: by mail-pg1-x536.google.com with SMTP id y19so10405565pgk.5;
+        Wed, 29 Mar 2023 18:04:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1680138116;
+        d=gmail.com; s=20210112; t=1680138280;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ambahkN5XdW7qXHNDINIC24o08jAaGeXQsgkARkrmIU=;
-        b=ouosHywmC5LEy+i6XmI8rHhLKmQifTAE77Oxt7BFzarPRrLZvQuUz025xKtrDyUL0B
-         8nQp5ULIftg9mlK2GghSMJDHlSK5J/Y6pl/xgZp1YKNdQ05pOmdw9vmldaSpVyRF72OT
-         woVRtqPOt3Y8ZzmMg2ZtJs4SSAwuGQtcERvWxOJBXisUZQ8NiMoPhWpRCABUta7Yofu/
-         P+M4svfKhwuuk2fMfOAHtnzF4NDd6gwI9eVPkzxtW1ImPpgtXPFwoq2Dl0eGZizqUAD9
-         zjvOM+Y4POvGIuHfnu7poGMB5zDRFDrs3nBUMtLW/o66ad/meUcHboIAl8WNjvGsb91G
-         LMXw==
+        bh=/eWdlLP1MP1yZejY0zNtzFCFxrL3Lo+DsUvtYHUea2w=;
+        b=LdoAehIKRG756eSRt70+TVOULlcLmpNQs5ZivpRN3S0Cq93DCl8yOEhAqTEVsRZuRE
+         R6Sf8TM6rlLIs13bjN3cR+3PVsxa0J0z5hhVdfQjZBph/gTf/tHM6DQHPwiCmBKuK5ke
+         GiK3DaZxUam6zxYX6q6jTAOWUca4El7izKu/CNozjYTpeIMJn3oaYqenFb05GVimtRAS
+         mVAhOeDAzlMQp9Y+8Nct9rsyckGONBBfKWEWJrA5qiraMttZgnzs56xHo+BFgg9u0qmA
+         3O2cq97auevw7aoe4XXczbHHRi8R1NXpli2PkYowgUcq6n1R0rICYrLrVLlL9IL3mE5J
+         Yu7A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680138116;
+        d=1e100.net; s=20210112; t=1680138280;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ambahkN5XdW7qXHNDINIC24o08jAaGeXQsgkARkrmIU=;
-        b=xkzpj8Sh0lGsBptpN4mcBnzOc/BbFc/95pXBxnLjUSUoyWuS669UhmezI+bhON+VYV
-         uZqRfeF4R+qNrOeA3KaG0pUkhjR1n2EoyTEBO65TrpfF8NtXAPTgSJ/k3RocRzWnXd30
-         MCrwJDxiQzFFxC4LjWt1XFhXA3pTr9c0FxpJDLCm6RphTfrwYMfDsrUEp7nXZze0EcWa
-         y2Hi8Co1/ktHzF7d0T+gD9jOhNsGmaVaILy+8XsO9l8Qa4/iuVsYC189PQXJAds8k29l
-         D4wY83kEz+JnAmGkLIDG635ZZV84WKqJkrueaAIww78sSBVxVPjWWyGMNF+1iJ/TJAT1
-         oHtA==
-X-Gm-Message-State: AAQBX9e7Fh+WZOSH1fSiVdWWZvJgPNCj7etTF0cu9wzkajpHxYb8nTwf
-        lNQwiB+f2qfZ2h7dXUkal/M=
-X-Google-Smtp-Source: AKy350bfnPPh8o+VeAI2wWqoxyNfA776Yqe7apoBE1tgQRdwqiR1e1GA/MchzzDgZvEtnVO2zrrCpQ==
-X-Received: by 2002:a17:90b:4f4d:b0:23f:7c82:2463 with SMTP id pj13-20020a17090b4f4d00b0023f7c822463mr23109684pjb.9.1680138115714;
-        Wed, 29 Mar 2023 18:01:55 -0700 (PDT)
+        bh=/eWdlLP1MP1yZejY0zNtzFCFxrL3Lo+DsUvtYHUea2w=;
+        b=BQWja13ny5HgVXz0ctPrURpSHUuetjCDBGwl61XdhMcf3EBo3LHcb1ycuEgOLgbqey
+         KS/hspXffizAXQjUR5d9ImpY0iezLXTbTgajOOjSR0VtYLzthPfVhC5ahtSz0fG3HcR9
+         8f/o9i0s0AGrnSO3rLsHIfeUf7gChOlI4La6NIQMod+l9m80+uAzpbQz313+CQbykDvs
+         TNRxVNIvZYqDeU8ZhhPZKWrzf60i/4fIYhnRec27/TKN8tQtPV4iVWEd9RFFAO4/b9hX
+         4D1shSaeJYxe/E7rlSValAPIFyO+F3bpwxUD1zP+YIK3bSr0gPbJ0frwP6XM716zQCXC
+         gjtg==
+X-Gm-Message-State: AAQBX9fCwNsB6/kR//fnCW46HckH5cV/GhXf/dNQKdkw/mfMWfIEH/Y+
+        KGayVeHagw7LPZyPl+jjv23SjuMEqZg=
+X-Google-Smtp-Source: AKy350b+PtEj1wZxOyuaNcqXmqy7hZ7gcYgnNP4ESNogR9RN8acUQZnQwtmDzb7VouLlYZOs0D2zcQ==
+X-Received: by 2002:a62:1ad7:0:b0:62d:b4ae:e48c with SMTP id a206-20020a621ad7000000b0062db4aee48cmr3075992pfa.23.1680138280217;
+        Wed, 29 Mar 2023 18:04:40 -0700 (PDT)
 Received: from localhost ([192.55.54.55])
-        by smtp.gmail.com with ESMTPSA id rj3-20020a17090b3e8300b0023f685f7914sm2020152pjb.49.2023.03.29.18.01.54
+        by smtp.gmail.com with ESMTPSA id w5-20020aa78585000000b005a8dd86018dsm18473777pfn.64.2023.03.29.18.04.39
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 Mar 2023 18:01:55 -0700 (PDT)
-Date:   Wed, 29 Mar 2023 18:01:53 -0700
+        Wed, 29 Mar 2023 18:04:39 -0700 (PDT)
+Date:   Wed, 29 Mar 2023 18:04:38 -0700
 From:   Isaku Yamahata <isaku.yamahata@gmail.com>
-To:     Zhi Wang <zhi.wang.linux@gmail.com>
-Cc:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com,
-        Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com,
-        Sean Christopherson <seanjc@google.com>,
-        Sagi Shahar <sagis@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Kai Huang <kai.huang@intel.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-Subject: Re: [PATCH v13 019/113] KVM: TDX: create/destroy VM structure
-Message-ID: <20230330010153.GB1112017@ls.amr.corp.intel.com>
-References: <cover.1678643051.git.isaku.yamahata@intel.com>
- <7c011a5c9dd92cfb9074297af22d132a4e57fd11.1678643052.git.isaku.yamahata@intel.com>
- <20230326140936.00003397@gmail.com>
+To:     "Huang, Kai" <kai.huang@intel.com>
+Cc:     "isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
+        "Christopherson,, Sean" <seanjc@google.com>,
+        "Shahar, Sagi" <sagis@google.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Aktas, Erdem" <erdemaktas@google.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "zhi.wang.linux@gmail.com" <zhi.wang.linux@gmail.com>,
+        "dmatlack@google.com" <dmatlack@google.com>,
+        "Yamahata, Isaku" <isaku.yamahata@intel.com>
+Subject: Re: [PATCH v13 003/113] KVM: TDX: Initialize the TDX module when
+ loading the KVM intel kernel module
+Message-ID: <20230330010438.GC1112017@ls.amr.corp.intel.com>
+References: <44f7fe9f235e29f2193eaac5890a4dede22c324c.1678643052.git.isaku.yamahata@intel.com>
+ <20ebae70fd625f8a0fe87f98c25613a2d4dc5792.camel@intel.com>
+ <20230315072711.GF3922605@ls.amr.corp.intel.com>
+ <8ee89a1376babf0a5dbc2feb614890b7e2ccf2f8.camel@intel.com>
+ <20230316002702.GA197448@ls.amr.corp.intel.com>
+ <3ebe8d34ecf199b924f4892ce911077005526628.camel@intel.com>
+ <20230328235839.GA1069687@ls.amr.corp.intel.com>
+ <5896fb851d20de4aab55307a73e2b4a4243ca155.camel@intel.com>
+ <20230329215609.GB1069687@ls.amr.corp.intel.com>
+ <f02637a56848cff1a39a2c7e2350c11b180a87ea.camel@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20230326140936.00003397@gmail.com>
+In-Reply-To: <f02637a56848cff1a39a2c7e2350c11b180a87ea.camel@intel.com>
 X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
         DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
@@ -78,182 +88,86 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi, thanks for review.
+On Wed, Mar 29, 2023 at 11:17:31PM +0000,
+"Huang, Kai" <kai.huang@intel.com> wrote:
 
-On Sun, Mar 26, 2023 at 02:09:36PM +0300,
-Zhi Wang <zhi.wang.linux@gmail.com> wrote:
-
-> On Sun, 12 Mar 2023 10:55:43 -0700
-> isaku.yamahata@intel.com wrote:
-
-> > diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-> > index 8b02e605cfb5..3ede8a726b47 100644
-> > --- a/arch/x86/kvm/vmx/tdx.c
-> > +++ b/arch/x86/kvm/vmx/tdx.c
-> > @@ -5,8 +5,9 @@
-> >  
-> >  #include "capabilities.h"
-> >  #include "x86_ops.h"
-> > -#include "x86.h"
-> >  #include "tdx.h"
-> > +#include "tdx_ops.h"
-> > +#include "x86.h"
-> >  
-> >  #undef pr_fmt
-> >  #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
-> > @@ -46,11 +47,276 @@ int tdx_vm_enable_cap(struct kvm *kvm, struct kvm_enable_cap *cap)
-> >  	return r;
-> >  }
-> >  
-> > +struct tdx_info {
-> > +	u8 nr_tdcs_pages;
-> > +};
-> > +
-> > +/* Info about the TDX module. */
-> > +static struct tdx_info tdx_info;
-> > +
-> > +/*
-> > + * Some TDX SEAMCALLs (TDH.MNG.CREATE, TDH.PHYMEM.CACHE.WB,
-> > + * TDH.MNG.KEY.RECLAIMID, TDH.MNG.KEY.FREEID etc) tries to acquire a global lock
-> > + * internally in TDX module.  If failed, TDX_OPERAND_BUSY is returned without
-> > + * spinning or waiting due to a constraint on execution time.  It's caller's
-> > + * responsibility to avoid race (or retry on TDX_OPERAND_BUSY).  Use this mutex
-> > + * to avoid race in TDX module because the kernel knows better about scheduling.
-> > + */
-> > +static DEFINE_MUTEX(tdx_lock);
-> > +static struct mutex *tdx_mng_key_config_lock;
-> > +
-> > +static __always_inline hpa_t set_hkid_to_hpa(hpa_t pa, u16 hkid)
-> > +{
-> > +	return pa | ((hpa_t)hkid << boot_cpu_data.x86_phys_bits);
-> > +}
-> > +
-> > +static inline bool is_td_created(struct kvm_tdx *kvm_tdx)
-> > +{
-> > +	return kvm_tdx->tdr_pa;
-> > +}
-> > +
-> > +static inline void tdx_hkid_free(struct kvm_tdx *kvm_tdx)
-> > +{
-> > +	tdx_guest_keyid_free(kvm_tdx->hkid);
-> > +	kvm_tdx->hkid = 0;
-> > +}
-> > +
-> > +static inline bool is_hkid_assigned(struct kvm_tdx *kvm_tdx)
-> > +{
-> > +	return kvm_tdx->hkid > 0;
-> > +}
-> > +
-> >  int tdx_hardware_enable(void)
-> >  {
-> >  	return tdx_cpu_enable();
-> >  }
-> >  
-> > +static void tdx_clear_page(unsigned long page_pa)
-> > +{
-> > +	const void *zero_page = (const void *) __va(page_to_phys(ZERO_PAGE(0)));
-> > +	void *page = __va(page_pa);
-> > +	unsigned long i;
-> > +
-> > +	if (!cpu_feature_enabled(X86_FEATURE_MOVDIR64B)) {
-> > +		clear_page(page);
-> > +		return;
-> > +	}
+> On Wed, 2023-03-29 at 14:56 -0700, Isaku Yamahata wrote:
+> > On Wed, Mar 29, 2023 at 01:13:45AM +0000,
+> > "Huang, Kai" <kai.huang@intel.com> wrote:
+> > 
+> > > > 
+> > > > > >  
+> > > > > > +	/*
+> > > > > > +	 * TDX requires those methods to enable VMXON by
+> > > > > > +	 * kvm_hardware_enable/disable_all()
+> > > > > > +	 */
+> > > > > > +	static_call_update(kvm_x86_check_processor_compatibility,
+> > > > > > +			   ops->runtime_ops->check_processor_compatibility);
+> > > > > > +	static_call_update(kvm_x86_hardware_enable,
+> > > > > > +			   ops->runtime_ops->hardware_enable);
+> > > > > > +	static_call_update(kvm_x86_hardware_disable,
+> > > > > > +			   ops->runtime_ops->hardware_disable);
+> > > > > >  	r = ops->hardware_setup();
+> > > > > >  	if (r != 0)
+> > > > > >  		goto out_mmu_exit;
+> > > > > 
+> > > > > Hmm.. I think this is ugly.  Perhaps we should never do any
+> > > > > static_call(kvm_x86_xxx)() in hardware_setup(), because hardware_setup() is
+> > > > > called before kvm_ops_update() and may update vendor's kvm_x86_ops.
+> > > > > 
+> > > > > So probably use hardware_enable_all() in hardware_setup() is a bad idea.
+> > > > > 
+> > > > > I think we have below options on how to handle:
+> > > > > 
+> > > > > 1) Use VMX's kvm_x86_ops directly in tdx_hardware_setup().  For instance,
+> > > > > something like below:
+> > > > > 
+> > > > > int __init tdx_hardware_setup(struct kvm_x86_ops *x86_ops)
+> > > > > {
+> > > > > 	...
+> > > > > 
+> > > > > 	cpus_read_lock();
+> > > > > 	r = on_each_cpu(vt_x86_ops.hardware_enable, ...);
+> > > > > 	if (!r)
+> > > > > 		r = tdx_module_setup();
+> > > > > 	on_each_cpu(vt_x86_ops.hardware_disable, ...);
+> > > > > 	cpus_read_unlock();
+> > > > > 
+> > > > > 	...
+> > > > > }
+> > > > > 
+> > > > > But this doesn't clean up nicely when there's some particular cpus fail to do
+> > > > > hardware_enable().  To clean up nicely, we do need additional things similar to
+> > > > > the hardware_enable_all() code path: a per-cpu variable or a cpumask_t + a
+> > > > > wrapper of vt_x86_ops->hardware_enable() to track which cpus have done
+> > > > > hardware_enable() successfully.
+> > > > > 
+> > > > > 2) Move those static_call_update() into tdx_hardware_setup() so they are TDX
+> > > > > code self-contained.  But this would require exposing kvm_x86_ops as symbol,
+> > > > > which isn't nice either.
+> > > > > 
+> > > > > 3) Introduce another kvm_x86_init_ops->hardware_post_setup(), which is called
+> > > > > after kvm_ops_update().
+> > > > > 
+> > > > > Personally, I think 3) perhaps is the most elegant one, but not sure whether
+> > > > > Sean/Paolo has any opinion.
+> > > > 
+> > > > I think we can simply update the ops before calling hardware_enable() and
+> > > > clean up ops on failure.
+> > > > 
+> > > > 
+> > > 
+> > > This doesn't work because hardware_setup() may update vendor's kvm_x86_ops.
+> > > 
+> > > If you do kvm_ops_update() before hardware_setup(), you need to manually update
+> > > those updated (in hardware_setup()) callbacks again after. 
+> > 
+> > We can call kvm_ops_update() twice before and after hardware_setup().
+> > 
 > 
-> Is it possbile to have a TDX machine without MOVDIR64B support? I am not sure
-> if there is any other way for the kernel to clear the posioned cache line.
-> 
-> If not, there should be a warn/bug at least and check if MOVDIR64B support
-> when initializing the TDX.
+> Personally I think it's too ugly.  
 
-Because the latest TDX specification uses movdir64b, it's safe for TDX
-to assume movdir64b.
-I'll add the check to TDX initialization part and drop it from here.
-
-
-> > +void tdx_mmu_release_hkid(struct kvm *kvm)
-> > +{
-> > +	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
-> > +	cpumask_var_t packages;
-> > +	bool cpumask_allocated;
-> > +	u64 err;
-> > +	int ret;
-> > +	int i;
-> > +
-> > +	if (!is_hkid_assigned(kvm_tdx))
-> > +		return;
-> > +
-> > +	if (!is_td_created(kvm_tdx))
-> > +		goto free_hkid;
-> > +
-> > +	cpumask_allocated = zalloc_cpumask_var(&packages, GFP_KERNEL);
-> > +	cpus_read_lock();
-> > +	for_each_online_cpu(i) {
-> > +		if (cpumask_allocated &&
-> > +			cpumask_test_and_set_cpu(topology_physical_package_id(i),
-> > +						packages))
-> > +			continue;
-> 
-> Is this necessary to check cpumask_allocated in the while loop? if cpumask
-> is not succefully allocated, wouldn't it be better to bail out just after
-> it?
-
-No because we can't return error here.  It's better to do in-efficiently freeing
-resources instead of leak.
-
-We can move the check out of loop. But it would be ugly
-(if () {cpu loop} else {cpu loop} ) and this function isn't performance
-critical.  Also I think it's okay to depend on compiler optimization for loop
-invariant. My compiler didn't optimize it in this case, though.
-
-
-> > +
-> > +		/*
-> > +		 * We can destroy multiple the guest TDs simultaneously.
-> > +		 * Prevent tdh_phymem_cache_wb from returning TDX_BUSY by
-> > +		 * serialization.
-> > +		 */
-> > +		mutex_lock(&tdx_lock);
-> > +		ret = smp_call_on_cpu(i, tdx_do_tdh_phymem_cache_wb, NULL, 1);
-> > +		mutex_unlock(&tdx_lock);
-> > +		if (ret)
-> > +			break;
-> > +	}
-> > +	cpus_read_unlock();
-> > +	free_cpumask_var(packages);
-> > +
-> > +	mutex_lock(&tdx_lock);
-> > +	err = tdh_mng_key_freeid(kvm_tdx->tdr_pa);
-> > +	mutex_unlock(&tdx_lock);
-> > +	if (WARN_ON_ONCE(err)) {
-> > +		pr_tdx_error(TDH_MNG_KEY_FREEID, err, NULL);
-> > +		pr_err("tdh_mng_key_freeid failed. HKID %d is leaked.\n",
-> > +			kvm_tdx->hkid);
-> > +		return;
-> > +	}
-> > +
-> > +free_hkid:
-> > +	tdx_hkid_free(kvm_tdx);
-> > +}
-> > +
-> > +void tdx_vm_free(struct kvm *kvm)
-> > +{
-> > +	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
-> > +	int i;
-> > +
-> > +	/* Can't reclaim or free TD pages if teardown failed. */
-> > +	if (is_hkid_assigned(kvm_tdx))
-> > +		return;
-> > +
-> 
-> Better to explain why, as it is common to think even the teardown failed, we
-> should still try to reclaim the pages as many as we can.
-
-Ok, here is the updated comment.
- /*
-  * tdx_mmu_release_hkid() failed to reclaim HKID.  Something went wrong
-  * heavily with TDX module.  Give up freeing TD pages.  As the function
-  * already warned, don't warn it again.
-  */
+So you prefer the option 3 to calling kvm_ops_update() twice. Okay, I'll update
+the patch.
 -- 
 Isaku Yamahata <isaku.yamahata@gmail.com>
