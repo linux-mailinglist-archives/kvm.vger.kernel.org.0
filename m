@@ -2,268 +2,204 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 751156D0BCE
-	for <lists+kvm@lfdr.de>; Thu, 30 Mar 2023 18:51:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BEDC16D0B9C
+	for <lists+kvm@lfdr.de>; Thu, 30 Mar 2023 18:47:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231308AbjC3Qug (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Mar 2023 12:50:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54612 "EHLO
+        id S232253AbjC3Qqq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Mar 2023 12:46:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52810 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232344AbjC3Qtm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 Mar 2023 12:49:42 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6286E19D;
-        Thu, 30 Mar 2023 09:48:50 -0700 (PDT)
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 32UFf4Cn007521;
-        Thu, 30 Mar 2023 16:48:28 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=E0TY+LGhsbV3nEV2m3CDeyjahuv5tBRPV8Oe4cX/vhU=;
- b=CDsafkI33XIZ/XOytScQc9ppp1ZR58eUe5q0WclMRI4HaH5DNzztQV4Ut6XcoDqaDLoo
- C3akrgRALwjyd8kWb45oXamldSk87HKyBXo/pbtom9xD9y7NbJnnSofZFj9l4Atid6An
- J2bdnACjsnnwG7hahanuwffQ4Ort/RDn+ruW5uE2oMzh7/pBo5k8xJiKtVCJJzfRTfeS
- B07+umuVGQ4ALcCqZca5IwGqFFHm7mFljDuDXoptxpWyNd91aeAetik7kw7K8014Ot/s
- Srereb75Br3NSnDg54KUJQMDCgBinWIEt0Thr1tuu7J0h38I8MFQle/DxvhtAaJg1wES TA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pmq6n457e-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 30 Mar 2023 16:48:28 +0000
-Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 32UGUmE0003997;
-        Thu, 30 Mar 2023 16:48:28 GMT
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pmq6n456w-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 30 Mar 2023 16:48:27 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 32TLdN4S005448;
-        Thu, 30 Mar 2023 16:48:26 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-        by ppma03ams.nl.ibm.com (PPS) with ESMTPS id 3phrk6p347-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 30 Mar 2023 16:48:26 +0000
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-        by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 32UGmMY614222002
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 30 Mar 2023 16:48:22 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 995FA2004B;
-        Thu, 30 Mar 2023 16:48:22 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6AD7220040;
-        Thu, 30 Mar 2023 16:48:22 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.152.224.56])
-        by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Thu, 30 Mar 2023 16:48:22 +0000 (GMT)
-Date:   Thu, 30 Mar 2023 18:44:47 +0200
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Janosch Frank <frankja@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, thuth@redhat.com, nrb@linux.ibm.com,
-        linux-s390@vger.kernel.org
-Subject: Re: [kvm-unit-tests PATCH 4/5] s390x: ap: Add pqap aqic tests
-Message-ID: <20230330184447.1751e2b0@p-imbrenda>
-In-Reply-To: <20230330114244.35559-5-frankja@linux.ibm.com>
-References: <20230330114244.35559-1-frankja@linux.ibm.com>
-        <20230330114244.35559-5-frankja@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
+        with ESMTP id S232224AbjC3Qq3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 30 Mar 2023 12:46:29 -0400
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10olkn2061.outbound.protection.outlook.com [40.92.42.61])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7FFCCDF6
+        for <kvm@vger.kernel.org>; Thu, 30 Mar 2023 09:46:20 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=btWsLviS5Rbqp/+MgzoU/gzISxoaog6XdmkcoDswFJj57rXnBDR0sR4KqZMg4x5oHg+/CBW+tPFRk4whpChEP8Lxe/F0xVsOYhCtwmwN09chWQC1Ut0HD6SKou9jGqpz2XtT4DmPksCT5KKSM/nlF3T93MOykr1tlsrMUp3r8Yp3crGrptNafKv58+PCcTX2YEi79X779ZByBV/fQ/dfluDe6U+AyeSg4D7bssTPj6Vqy/3SR2fb32xg37dEvPmQx6+1RPWQN6kwid626rXvgE5fm0jvtHMy34W6LphmssiPkQBwHPwDy792DS1a7oYEwfQBPOZxk0TjA1zi5c3oPg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=WHDJ914M4KmjMUZu8uIXgaAgNRzcLBadt7IzZJzFQAw=;
+ b=maEv1sU+xdPdShGc+0R7cYn25LvYt6JXFClWKvz9MXps2ro6DkleSGD0sUYq3vCBbuGXXp9umanlWe7UPneuSwpiQOJ9thwSbik1s1gvm23sBKvouMJorlIBhsUF375QecyG5TbKUd11QtHkwGc1xD98WmIyVKvDy52j/CmKVpf8I9cMvGpN5a8p2GFE0JkdKNp/SGjJmP3P4dEyssSGF40AcIc84sYfWSw0Ws+N9kmK7g2/52nJwABf5Q4F+FR3SdgZh4QGR7Bvax5nz+wyxthMFeSF1vSTdaVbck4aS8IgKzogYeKdtV/sRyS+irLMO7ObvfuYurjjwxXJqfqT+w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=WHDJ914M4KmjMUZu8uIXgaAgNRzcLBadt7IzZJzFQAw=;
+ b=ZlSHXmWVE3USrb5VRioO7gxF+Dqy/M7kzXhPwZhE+vQ0CHKOS9XmSMjPrGBe5W5iIh8/sEia4XUZ3ZI95hrDWFRgoxLDVOj/fMIUn6iWeHZnHZcJwzBs5rjw/ZQTeS0qL046310Nzn4YFizXPuT2/nzxtIVFN5v1zucHsx0VzWUExLQp/5gZI/Xmg6sqKmG9JKOOlpa0WkDkJthvI9CV0ezyeytgr4zKCZph5CHRQNU1i4jU9p/V0JhZtFghuKusgJFqrRqDH3URPWSN0eLC4hqgoy+PEdKjjvk0SNNaJqhEXMEdrj+bZa3qHUgtG91sGUNC/gcjG5uXUYGO2/0Q1g==
+Received: from MN2PR12MB3023.namprd12.prod.outlook.com (2603:10b6:208:c8::26)
+ by MN0PR12MB6245.namprd12.prod.outlook.com (2603:10b6:208:3c3::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6222.31; Thu, 30 Mar
+ 2023 16:46:19 +0000
+Received: from MN2PR12MB3023.namprd12.prod.outlook.com
+ ([fe80::4060:ba42:3bf:fac6]) by MN2PR12MB3023.namprd12.prod.outlook.com
+ ([fe80::4060:ba42:3bf:fac6%3]) with mapi id 15.20.6254.020; Thu, 30 Mar 2023
+ 16:46:18 +0000
+Message-ID: <MN2PR12MB30236B144DD58AD37EDE01FAA08E9@MN2PR12MB3023.namprd12.prod.outlook.com>
+Date:   Thu, 30 Mar 2023 18:46:13 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.9.0
+Subject: ping: Re: Nested virtualization not working with hyperv guest/windows
+ 11
+From:   =?UTF-8?Q?Micha=c5=82_Zegan?= <webczat@outlook.com>
+To:     kvm@vger.kernel.org
+References: <MN2PR12MB3023F67FF37889AB3E8885F2A0849@MN2PR12MB3023.namprd12.prod.outlook.com>
+ <ZB22ZbhyneWevHJo@google.com>
+ <a054ea77-e53c-8207-1e25-1081e4ecbb50@outlook.com>
+Content-Language: en-US
+In-Reply-To: <a054ea77-e53c-8207-1e25-1081e4ecbb50@outlook.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-TMN:  [/8C6BDPKGel9LRMekFiPnDpugL8T/nti]
+X-ClientProxiedBy: BE1P281CA0106.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:b10:7b::10) To MN2PR12MB3023.namprd12.prod.outlook.com
+ (2603:10b6:208:c8::26)
+X-Microsoft-Original-Message-ID: <9e2ac05c-74f7-ecf6-b81f-873e24425795@outlook.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: MMg9bJmv1UfaNr81EEkZR9LJyeZ8tJin
-X-Proofpoint-ORIG-GUID: QDhRnXY9YRwl_SBmmsTmx2qAw1i3clco
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
- definitions=2023-03-30_09,2023-03-30_03,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- priorityscore=1501 malwarescore=0 mlxlogscore=999 phishscore=0
- adultscore=0 lowpriorityscore=0 suspectscore=0 mlxscore=0 spamscore=0
- clxscore=1015 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2303200000 definitions=main-2303300130
-X-Spam-Status: No, score=-0.1 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
-        DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-        autolearn=unavailable autolearn_force=no version=3.4.6
+X-MS-Exchange-MessageSentRepresentingType: 1
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN2PR12MB3023:EE_|MN0PR12MB6245:EE_
+X-MS-Office365-Filtering-Correlation-Id: bc5e2189-94dd-4ea9-3d29-08db313e48eb
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: nacE01vqa1H8vDZAId0guQHde0aInZFJVuRDNhtj3P/HRc0vbHf+vdBWSNg/O9xOusDbjH9W3MlyWt2BkWf+m9ggDUFuVfeAfVj6TPTIlVEEG+4u1h6HsUAUe3Zfd6B7WL6luDw8fGw6TpEc45YZL5kKtY0vUgVJ5dic08inhDomz1MLLxiZPpu/ZwvzT5tYXrcXMVWe5DWkk7F6G6tLnBpf8EHnSo9JE21wUrVRukEnqMjCF6xHOkXxvOf6QT1kellqfr36hXh/jlDQTVkcjhu1I1wFmTzQk8a2MQc+7gauB0DRqjMQ6m6nuZmsro+Y4NlVGrllDGAh2nk2enxJEMC/5NubSDg0L7AS0036ecUcdqoXfxjScM86IQL7xuvxFwkXUUC0PyBbsm9AhuqfH/LIId5HLykxNGK8MBOLozAbY596xVVlwXil8g16rH/IF9CAyeZnDF+gPO+v7cM/9kHkeNVkJMQ/v79reiYbc+NNeEvBiApoC202jTVnq2FRJDhjEeeZqq+SMpfVKGqq2pU6MCfizs+4ZQNqYb2SFsE=
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?YndwQTR6N3ZhNlhvSk5lRk54cmI4MGRES3dXYjZTOVh5NnFCejY2VmZDUFpw?=
+ =?utf-8?B?dDUvVWNUNVpxZlVOb3ZDTzNCQ0dGRjFOSk10emhlWHVPb2tDL3Y3VEkyN0hk?=
+ =?utf-8?B?RzFNOWpDckpBT0tuSkY0NU9kR2FycXVBTnFOeTI3TEdac0xldGVranY1b0wr?=
+ =?utf-8?B?SS9LQkJxZyt2alU5cDJieVFzdVZ3OHZXV09seThQY0hDY0lOVDc2b3NKOVA4?=
+ =?utf-8?B?Vk9MUDk0VTJXUzNwRFIySi9PVkVYeWRudTBVY0hWWkJwZDA5Y2xYWmQybDJY?=
+ =?utf-8?B?UVpvUElWWnBraWtzK1E4bkxiazE1WG9CdU93QUYvaElySGY3SjhueEFndHgy?=
+ =?utf-8?B?OHhXMDdseW5oN3dETnYyRkdPajVWMHVyYm5FN1ByRW5zV3Z3SkNCMHZNcVBa?=
+ =?utf-8?B?TVhxSGN0bDh0aG0rWHJETkpZRnNua3F1VS9MU1pqUmhMc0NvaVFhdUtyNDRU?=
+ =?utf-8?B?S3JIQkdvQStHMXVvV01sZ0ZUbzhwTlhtbFFyREpaWGR4bkJlczFzdWxaS2V6?=
+ =?utf-8?B?NitJNjlabXY0Q0lYRVBmKzRQVmlVcjlWYXFCdlJtZVFLNkNYZTlUeDJuc2kv?=
+ =?utf-8?B?N3NYSE81RmNOVUJMK2xZYmswdU1mZDRmc1hhblFod1hlTzlrbUNXYUI0Sjd4?=
+ =?utf-8?B?eStEWWh1ZisrcWVqcXFHV3JHcmxUbGM2WkhPMkpNM2Nyc3ltYXhnT2ZQdjNz?=
+ =?utf-8?B?TkYwQ0RUbXZvVGhuOCtWaTJ6cW83TCtiZEFrMlZ4TFFYVng3UzVFOWhRb0oz?=
+ =?utf-8?B?SmY0Y3EyRTVzdnhsQU9iOE5pZWlUdm9oZ21BREF1MFp6Y3FkRzFIckZNdWV5?=
+ =?utf-8?B?akhvRkJteDNnMFdlODIvSThqdXptbFJValVGZjFEb01JZURyZlNuZGw1L1NL?=
+ =?utf-8?B?L0s0R2xqMWRYeUV0dlJZU0xYWjRHV2hxYmoyQWh5a2VRM01ucGg1WEJDY1px?=
+ =?utf-8?B?Qnc0V29yUkNPcU4zTUNxTGI1WXA5dWlhSVVuY08xdGNLT3VJcHhydFJ4WTZE?=
+ =?utf-8?B?dGFRaEFyem96RUxhV0xuQWZqVlR2aW5kOEUvSUEvbGxlUWVhN0ExWVN5M1Y0?=
+ =?utf-8?B?Q3BlOUllTkp4NTVGZkdpQXN5V0R3VGlRdTFIYW5YT1VSS1FJdEMyUndWNXNN?=
+ =?utf-8?B?ZzZ6MUtYZjVNdW05aG9uVUZJb2dPY2J1ZTV5Uk94NXpZWVZYUXFab20rS0k3?=
+ =?utf-8?B?OTZTZmxTTGZ6VjhLQlZIeXBLMEN2QXRaZUgyYmRNa2Q0ejhwME5iNTZ6MzM4?=
+ =?utf-8?B?YUQrRmhQdm9oMUdWZUNUeW9SNXF1bW1WOHNOdnRwVldBRjgyRmgyNzBBcU12?=
+ =?utf-8?B?U2VUZ2JpbG1oem1vdEVUNXV3bmt0dUJMckxUcitTK1oxbDU1STJRdFR2MWc3?=
+ =?utf-8?B?V2YxYmIxeHBkR1B5N0o0cjgvVzMwRkd0Yjg4bHhGRjFSdm9FSlJkNktNckE0?=
+ =?utf-8?B?VlBhQzZTeTZjRmJpQndsd3BpcklxMmJhdUlYb2lEczhFVkRoZ2dMOVpwWm5w?=
+ =?utf-8?B?NE1Bd1Z4djJCR0xuN2ZUcGRXcmlyY2QwM3ZWT09VS2dkVnZkQngxZUI3bXBC?=
+ =?utf-8?B?SnBhdFhnRFliU2tVTjBVSkxiSndEYmEvaDYxVjBkMnF6L3dzc3pSeVZmTm1T?=
+ =?utf-8?B?c0hpZnNyRVlLMWlQa3JXRzdsM3ZSSmc9PQ==?=
+X-OriginatorOrg: outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: bc5e2189-94dd-4ea9-3d29-08db313e48eb
+X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB3023.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Mar 2023 16:46:18.8646
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg: 00000000-0000-0000-0000-000000000000
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR12MB6245
+X-Spam-Status: No, score=1.4 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
+        DKIM_VALID_AU,DKIM_VALID_EF,FORGED_MUA_MOZILLA,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS
+        autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Level: *
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 30 Mar 2023 11:42:43 +0000
-Janosch Frank <frankja@linux.ibm.com> wrote:
 
-> Let's check if we can enable/disable interrupts and if all errors are
-> reported if we specify bad addresses for the notification indication
-> byte.
-> 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> ---
->  lib/s390x/ap.c | 33 +++++++++++++++++++++++++++++
->  lib/s390x/ap.h | 11 ++++++++++
->  s390x/ap.c     | 56 ++++++++++++++++++++++++++++++++++++++++++++++++++
->  3 files changed, 100 insertions(+)
-> 
-> diff --git a/lib/s390x/ap.c b/lib/s390x/ap.c
-> index 8d7f2992..aaf5b4b9 100644
-> --- a/lib/s390x/ap.c
-> +++ b/lib/s390x/ap.c
-> @@ -51,6 +51,39 @@ int ap_pqap_tapq(uint8_t ap, uint8_t qn, struct ap_queue_status *apqsw,
->  	return cc;
->  }
->  
-> +int ap_pqap_aqic(uint8_t ap, uint8_t qn, struct ap_queue_status *apqsw,
-> +		 struct ap_qirq_ctrl aqic, unsigned long addr)
-> +{
-> +	struct pqap_r0 r0 = {};
-> +	int cc;
-> +
-> +	/*
-> +	 * AP-Queue Interruption Control
-> +	 *
-> +	 * Enables/disables interrupts for a APQN
-> +	 *
-> +	 * Inputs: 0,1,2
-> +	 * Outputs: 1 (APQSW)
-> +	 * Synchronous
-> +	 */
-> +	r0.ap = ap;
-> +	r0.qn = qn;
-> +	r0.fc = PQAP_QUEUE_INT_CONTRL;
-> +	asm volatile(
-> +		"	lgr	0,%[r0]\n"
-> +		"	lgr	1,%[aqic]\n"
-> +		"	lgr	2,%[addr]\n"
-> +		"	.insn	rre,0xb2af0000,0,0\n" /* PQAP */
-> +		"	stg	1, %[apqsw]\n"
-> +		"	ipm	%[cc]\n"
-> +		"	srl	%[cc],28\n"
-> +		: [apqsw] "=T" (*apqsw), [cc] "=&d" (cc)
-> +		: [r0] "d" (r0), [aqic] "d" (aqic), [addr] "d" (addr)
-> +		: "cc", "memory", "0", "2");
-> +
-> +	return cc;
-> +}
-> +
->  int ap_pqap_qci(struct ap_config_info *info)
->  {
->  	struct pqap_r0 r0 = { .fc = PQAP_QUERY_AP_CONF_INFO };
-> diff --git a/lib/s390x/ap.h b/lib/s390x/ap.h
-> index 59595eba..3f9e2eb6 100644
-> --- a/lib/s390x/ap.h
-> +++ b/lib/s390x/ap.h
-> @@ -79,6 +79,15 @@ struct pqap_r2 {
->  } __attribute__((packed))  __attribute__((aligned(8)));
->  _Static_assert(sizeof(struct pqap_r2) == sizeof(uint64_t), "pqap_r2 size");
->  
-> +struct ap_qirq_ctrl {
-> +	uint64_t res0 : 16;
-> +	uint64_t ir    : 1;	/* ir flag: enable (1) or disable (0) irq */
-> +	uint64_t res1 : 44;
-> +	uint64_t isc   : 3;	/* irq sub class */
-> +} __attribute__((packed))  __attribute__((aligned(8)));
-> +_Static_assert(sizeof(struct ap_qirq_ctrl) == sizeof(uint64_t),
-> +	       "struct ap_qirq_ctrl size");
-> +
->  #define AP_SETUP_NOINSTR	-1
->  #define AP_SETUP_NOAPQN		1
->  
-> @@ -86,4 +95,6 @@ int ap_setup(uint8_t *ap, uint8_t *qn);
->  int ap_pqap_tapq(uint8_t ap, uint8_t qn, struct ap_queue_status *apqsw,
->  		 struct pqap_r2 *r2);
->  int ap_pqap_qci(struct ap_config_info *info);
-> +int ap_pqap_aqic(uint8_t ap, uint8_t qn, struct ap_queue_status *apqsw,
-> +		 struct ap_qirq_ctrl aqic, unsigned long addr);
->  #endif
-> diff --git a/s390x/ap.c b/s390x/ap.c
-> index 20b4e76e..31dcfe29 100644
-> --- a/s390x/ap.c
-> +++ b/s390x/ap.c
-> @@ -292,6 +292,55 @@ static void test_priv(void)
->  	report_prefix_pop();
->  }
->  
-> +static void test_pqap_aqic(void)
-> +{
-> +	struct ap_queue_status apqsw = {};
-> +	static uint8_t not_ind_byte;
-> +	struct ap_qirq_ctrl aqic = {};
-> +	struct pqap_r2 r2 = {};
-> +
-> +	int cc;
-> +
-> +	report_prefix_push("pqap");
-> +	report_prefix_push("aqic");
-> +
-> +	ap_pqap_tapq(apn, qn, &apqsw, &r2);
-> +
-> +	aqic.ir = 1;
-> +	cc = ap_pqap_aqic(apn, qn, &apqsw, aqic, 0);
-> +	report(cc == 3 && apqsw.rc == 6, "invalid addr 0");
-> +
-> +	aqic.ir = 1;
-> +	cc = ap_pqap_aqic(apn, qn, &apqsw, aqic, -1);
-> +	report(cc == 3 && apqsw.rc == 6, "invalid addr -1");
-> +
-> +	aqic.ir = 0;
-> +	cc = ap_pqap_aqic(apn, qn, &apqsw, aqic, (uintptr_t)&not_ind_byte);
-> +	report(cc == 3 && apqsw.rc == 7, "disable");
-
-maybe call it "disable but never enabled"
-
-> +
-> +	aqic.ir = 1;
-> +	cc = ap_pqap_aqic(apn, qn, &apqsw, aqic, (uintptr_t)&not_ind_byte);
-> +	report(cc == 0 && apqsw.rc == 0, "enable");
-> +
-> +	do {
-> +		cc = ap_pqap_tapq(apn, qn, &apqsw, &r2);
-> +	} while (cc == 0 && apqsw.irq_enabled == 0);
-
-you do this a lot, would it be worth it abstracting it?
-
-ap_pqap_wait_for_irq(..., false); 
-
-(try to find a better name though)
-
-> +
-> +	cc = ap_pqap_aqic(apn, qn, &apqsw, aqic, (uintptr_t)&not_ind_byte);
-> +	report(cc == 3 && apqsw.rc == 7, "enable while enabled");
-> +
-> +	aqic.ir = 0;
-> +	cc = ap_pqap_aqic(apn, qn, &apqsw, aqic, (uintptr_t)&not_ind_byte);
-> +	assert(cc == 0 && apqsw.rc == 0);
-> +
-> +	do {
-> +		cc = ap_pqap_tapq(apn, qn, &apqsw, &r2);
-> +	} while (cc == 0 && apqsw.irq_enabled == 1);
-
-ap_pqap_wait_for_irq(..., true); 
-
-and here test disable again "disable after disable"
-
-> +
-> +	report_prefix_pop();
-> +	report_prefix_pop();
-> +}
-> +
->  int main(void)
->  {
->  	int setup_rc = ap_setup(&apn, &qn);
-> @@ -307,6 +356,13 @@ int main(void)
->  	test_pgms_nqap();
->  	test_pgms_dqap();
->  
-> +	/* The next tests need queues */
-> +	if (setup_rc == AP_SETUP_NOAPQN) {
-> +		report_skip("No APQN available");
-> +		goto done;
-> +	}
-> +	test_pqap_aqic();
-> +
->  done:
->  	report_prefix_pop();
->  	return report_summary();
-
+W dniu 24.03.2023 o 15:59, Michał Zegan pisze:
+> Hello,
+>
+> Thanks for the reply.
+>
+> doesn't qemu actually panic on entry failure? note i don't have 
+> crashes nor anything in logs, I've tried to enable ignore_msrs in kvm 
+> parameters to see if maybe this will report something, but no luck.
+>
+> Tracing data are here: https://transfer.sh/1lfnMc/kvmtrace.gz
+>
+> Also unsure if I didn't lose some data in the process, although if 
+> this was actually three reboots, not just instantly going to recovery, 
+> it shouldn't matter.
+>
+> I definitely cannot get anything useful from it.
+>
+> W dniu 24.03.2023 o 15:40, Sean Christopherson pisze:
+>> On Fri, Mar 24, 2023, Michał Zegan wrote:
+>>> Hi,
+>>>
+>>> I've sent this some time ago, but was not subscribed here, so unsure 
+>>> if I
+>>> didn't get a reply or maybe missed it, so repeating:
+>>>
+>>> I have a linux host with cpu intel core i7 12700h, kernel currently 
+>>> 6.2,
+>>> fedora37.
+>>>
+>>> I have a kvm/qemu/libvirt virtual machine, cpu model set to host, 
+>>> machine
+>>> type q35, uefi with secureboot enabled, smm on.
+>>>
+>>> The kvm_intel module has nested=y set in parameters so nested 
+>>> virtualization
+>>> is enabled on host.
+>>>
+>>> The virtual machine has windows11 pro guest installed.
+>>>
+>>> When I install hyperv/virtualization platform/other similar 
+>>> functions, after
+>>> reboot, the windows does not boot. Namely it reboots three times and 
+>>> then
+>>> goes to recovery.
+>> This is going to be nearly impossible to debug without more 
+>> information.  Assuming
+>> you can't extract more information from the guest, can you try 
+>> enabling KVM
+>> tracepoints?  E.g. to see if KVM is injecting an exception or a 
+>> nested VM-Entry
+>> failure that leads to the reboot.
+>>
+>> I.e. enable tracing
+>>
+>>      echo 1 > /sys/kernel/debug/tracing/tracing_on
+>>
+>> and then to get the full blast from the trace firehose:
+>>
+>>      echo 1 > /sys/kernel/debug/tracing/events/kvm/enable
+>>
+>> or to get slightly less noisy log:
+>>
+>>      echo 1 > /sys/kernel/debug/tracing/events/kvm/kvm_entry/enable
+>>      echo 1 > /sys/kernel/debug/tracing/events/kvm/kvm_exit/enable
+>>      echo 1 > 
+>> /sys/kernel/debug/tracing/events/kvm/kvm_inj_exception/enable
+>>      echo 1 > 
+>> /sys/kernel/debug/tracing/events/kvm/kvm_nested_intercepts/enable
+>>      echo 1 > 
+>> /sys/kernel/debug/tracing/events/kvm/kvm_nested_intr_vmexit/enable
+>>      echo 1 > 
+>> /sys/kernel/debug/tracing/events/kvm/kvm_nested_vmenter_failed/enable
+>>      echo 1 > 
+>> /sys/kernel/debug/tracing/events/kvm/kvm_nested_vmexit/enable
+>>      echo 1 > 
+>> /sys/kernel/debug/tracing/events/kvm/kvm_nested_vmexit_inject/enable
+>>      echo 1 > 
+>> /sys/kernel/debug/tracing/events/kvm/kvm_nested_vmenter/enable
+>>
+>> To capture something useful, you may need to (significantly) increase 
+>> the size of
+>> the buffer,
+>>
+>>      echo 131072 > /sys/kernel/debug/tracing/buffer_size_kb
+>>
+>> The log itself can be found at
+>>
+>>      /sys/kernel/debug/tracing/trace
