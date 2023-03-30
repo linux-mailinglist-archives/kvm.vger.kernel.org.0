@@ -2,89 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9D23F6D1368
-	for <lists+kvm@lfdr.de>; Fri, 31 Mar 2023 01:40:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 923536D136C
+	for <lists+kvm@lfdr.de>; Fri, 31 Mar 2023 01:40:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231573AbjC3XkQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Mar 2023 19:40:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35506 "EHLO
+        id S231601AbjC3Xko (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Mar 2023 19:40:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36252 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231562AbjC3XkP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 Mar 2023 19:40:15 -0400
-Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B73FC66C;
-        Thu, 30 Mar 2023 16:40:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1680219615; x=1711755615;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=LNmjSR3S/bXR7CzTptdBltqNH7++NvqOXa0PpEvoA+U=;
-  b=FF6yWB2gPBj1/QEZCdsUHKwFUeI8a+H236a+wtmCGA63KYCXpR7REMcN
-   dRB6y+eBGPLOaRSH005amv4Eyx0+2/rvLlc2eBYJA47ZmZFVFB56gIy71
-   3XlDFvwlYHJdT7xuzokbVg9RV0N6IC2V3kdrA0IsZNC8CVaMPkAmOxM03
-   4=;
-X-IronPort-AV: E=Sophos;i="5.98,306,1673913600"; 
-   d="scan'208";a="199474312"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-pdx-2a-m6i4x-8a14c045.us-west-2.amazon.com) ([10.25.36.214])
-  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Mar 2023 23:40:12 +0000
-Received: from EX19MTAUWA002.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan3.pdx.amazon.com [10.236.137.198])
-        by email-inbound-relay-pdx-2a-m6i4x-8a14c045.us-west-2.amazon.com (Postfix) with ESMTPS id 971F58260D;
-        Thu, 30 Mar 2023 23:40:11 +0000 (UTC)
-Received: from EX19D002ANA003.ant.amazon.com (10.37.240.141) by
- EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.22; Thu, 30 Mar 2023 23:40:11 +0000
-Received: from b0f1d8753182.ant.amazon.com (10.106.82.30) by
- EX19D002ANA003.ant.amazon.com (10.37.240.141) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.26; Thu, 30 Mar 2023 23:40:07 +0000
-From:   Takahiro Itazuri <itazur@amazon.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-CC:     Jonathan Corbet <corbet@lwn.net>, <kvm@vger.kernel.org>,
-        <linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <zulinx86@gmail.com>, Takahiro Itazuri <itazur@amazon.com>
-Subject: [PATCH] docs: kvm: x86: Fix a broken field list
-Date:   Fri, 31 Mar 2023 00:39:56 +0100
-Message-ID: <20230330233956.78246-1-itazur@amazon.com>
-X-Mailer: git-send-email 2.38.0
+        with ESMTP id S231343AbjC3Xkn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 30 Mar 2023 19:40:43 -0400
+Received: from out-24.mta1.migadu.com (out-24.mta1.migadu.com [IPv6:2001:41d0:203:375::18])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7E95C671
+        for <kvm@vger.kernel.org>; Thu, 30 Mar 2023 16:40:41 -0700 (PDT)
+Date:   Thu, 30 Mar 2023 23:40:30 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1680219639;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=8ozqnvgu8saWyQ2rIbnUehRz7b/Vy2JwK5AYTCp0h8Q=;
+        b=GVUFHCJJP0L+YOHtwnGWmONEzat8uo7DSusSdlE1D3qnPxYk0iMb8uQI9VLkRv/Uwiv9j1
+        LWNOeAo0zDtIqihN5EKvigkpM6s9SEkE14H8s0DMZROBzjtgVGN1N4fSm0yuYorC3lS/53
+        MM3puUJM1f7PclveS6LFzOtpdEnj38I=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From:   Oliver Upton <oliver.upton@linux.dev>
+To:     Saravana Kannan <saravanak@google.com>
+Cc:     David Dai <davidai@google.com>,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        Viresh Kumar <viresh.kumar@linaro.org>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Lorenzo Pieralisi <lpieralisi@kernel.org>,
+        Sudeep Holla <sudeep.holla@arm.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Juri Lelli <juri.lelli@redhat.com>,
+        Vincent Guittot <vincent.guittot@linaro.org>,
+        Dietmar Eggemann <dietmar.eggemann@arm.com>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>,
+        Daniel Bristot de Oliveira <bristot@redhat.com>,
+        Valentin Schneider <vschneid@redhat.com>,
+        kernel-team@android.com, linux-pm@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+Subject: Re: [RFC PATCH 0/6] Improve VM DVFS and task placement behavior
+Message-ID: <ZCYd7kH2f/Ku8b0D@linux.dev>
+References: <20230330224348.1006691-1-davidai@google.com>
+ <ZCYZRIbPh+f3v26v@linux.dev>
+ <CAGETcx_P27-=wkAkCETTR2Q0edA01M5jArS_t-zZFn61YM9Muw@mail.gmail.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.106.82.30]
-X-ClientProxiedBy: EX19D038UWC004.ant.amazon.com (10.13.139.229) To
- EX19D002ANA003.ant.amazon.com (10.37.240.141)
-X-Spam-Status: No, score=-9.7 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-        RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_SPF_WL autolearn=unavailable autolearn_force=no
-        version=3.4.6
+In-Reply-To: <CAGETcx_P27-=wkAkCETTR2Q0edA01M5jArS_t-zZFn61YM9Muw@mail.gmail.com>
+X-Migadu-Flow: FLOW_OUT
+X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
+        DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This commit adds a missing `:` to fix a broken field list.
+On Thu, Mar 30, 2023 at 04:36:52PM -0700, Saravana Kannan wrote:
+> On Thu, Mar 30, 2023 at 4:20 PM Oliver Upton <oliver.upton@linux.dev> wrote:
+> >
+> > On Thu, Mar 30, 2023 at 03:43:35PM -0700, David Dai wrote:
+> >
+> > [...]
+> >
+> > > David Dai (6):
+> > >   sched/fair: Add util_guest for tasks
+> > >   kvm: arm64: Add support for get_cur_cpufreq service
+> > >   kvm: arm64: Add support for util_hint service
+> > >   kvm: arm64: Add support for get_freqtbl service
+> > >   dt-bindings: cpufreq: add bindings for virtual kvm cpufreq
+> > >   cpufreq: add kvm-cpufreq driver
+> >
+> > I only received patches 2-4 in my inbox (same goes for the mailing lists
+> > AFAICT). Mind sending the rest? :)
+> 
+> Oliver,
+> 
+> Sorry about that. Actually even I'm not cc'ed in the cover letter :)
+> 
+> Is it okay if we fix this when we send the next version? Mainly to
+> avoid some people responding to this vs other responding to a new
+> series (where the patches are the same).
 
-Signed-off-by: Takahiro Itazuri <itazur@amazon.com>
----
- Documentation/virt/kvm/api.rst | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Fine by me, as long as the full series arrived somewhere.
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index 62de0768d6aa..f9163590cda8 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -8296,7 +8296,7 @@ ENOSYS for the others.
- 8.35 KVM_CAP_PMU_CAPABILITY
- ---------------------------
- 
--:Capability KVM_CAP_PMU_CAPABILITY
-+:Capability: KVM_CAP_PMU_CAPABILITY
- :Architectures: x86
- :Type: vm
- :Parameters: arg[0] is bitmask of PMU virtualization capabilities.
+> We used a script for --to-cmd and --cc-cmd but looks like it needs
+> some more fixes.
+> 
+> Here is the full series to anyone who's wondering where the rest of
+> the patches are:
+> https://lore.kernel.org/lkml/20230330224348.1006691-1-davidai@google.com/T/#t
+
+Gah, a bit of noodling would've dug up the full series. Thanks for the
+link.
+
 -- 
-2.38.0
-
+Thanks,
+Oliver
