@@ -2,41 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C36356D0FE4
-	for <lists+kvm@lfdr.de>; Thu, 30 Mar 2023 22:19:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D397E6D0FEC
+	for <lists+kvm@lfdr.de>; Thu, 30 Mar 2023 22:22:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229770AbjC3UTL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Mar 2023 16:19:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56814 "EHLO
+        id S229784AbjC3UWF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Mar 2023 16:22:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58924 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229762AbjC3UTK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 Mar 2023 16:19:10 -0400
+        with ESMTP id S229771AbjC3UWE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 30 Mar 2023 16:22:04 -0400
 Received: from mx.sberdevices.ru (mx.sberdevices.ru [45.89.227.171])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5AF36D52B;
-        Thu, 30 Mar 2023 13:19:09 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 638EA40D3;
+        Thu, 30 Mar 2023 13:22:03 -0700 (PDT)
 Received: from s-lin-edge02.sberdevices.ru (localhost [127.0.0.1])
-        by mx.sberdevices.ru (Postfix) with ESMTP id BDAC65FD0B;
-        Thu, 30 Mar 2023 23:19:07 +0300 (MSK)
+        by mx.sberdevices.ru (Postfix) with ESMTP id B62095FD0B;
+        Thu, 30 Mar 2023 23:22:01 +0300 (MSK)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
-        s=mail; t=1680207547;
-        bh=Q1dSLV0WkKrQTTWvKTXPk9LEK5CXRc1NRkFMGJRvt8g=;
-        h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type;
-        b=kU4aK/E3vQu5t1Eebd5p3PWN/Bc3KDjVm0/N0WsUhRHUM4GVWGvnz3r4DWxe/xJJC
-         bG3ZE6KGc/1rqUoroukAYe8bbhdnAlDeQb3+KdSyuEKBuPnO8jSHAKjMbf8QciP5uI
-         6vBE0sroOzGPYEOaCqgZGd0hy4HHYw+Ix21h6+g6LZn09SIrPkaD4sIoX2KcYJrYML
-         RpllYuYSB14ofcFpZNbHQ/0Qh6wfk+yK1qPApgUewMSfxSc6tV6T52N5SDDhdp+UI4
-         LE2E4ccdcyvgrxVE0ofo7Y8F1ipMZtoaYze4sePePIwxquwXsl7k14rzl+haGn7YhU
-         wCVglskf9OLMg==
+        s=mail; t=1680207721;
+        bh=meOX4aPLT7ua2fm3pAcRz2CPeAaR40Mrt2950POSbpg=;
+        h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+        b=qG7GNsMjtkXbQFcQ7fVw4vaA+go5me0j2pKq/X6PeOnJazC5MTLXr6oC63qaExTkv
+         uzSLbsCTYnKYroneJ8IxfM0WJYPS1lhBNCEpXp+9faTSdOWf0XJGYdiD+8zwwV/Sc4
+         9nDIseWtAthUDHeAVAQMAHXE36ZGHQeXuZK8ilmhgK9rSPsQmYgBr5efnGGO4L/aa5
+         KR+lrAgME/LSuNM46TLhrfB1x46LwVOqJk4g0gy7OO4/jFPpwq1OKhdW2s3e+JC0ZF
+         53dnZ7uRnexDPUML9OEZI/217N3i8Ph+PjX2taUT3OqvPHNZRfTo2ctDBMhbNID0RW
+         gYJ3AfzIYaapQ==
 Received: from S-MS-EXCH01.sberdevices.ru (S-MS-EXCH01.sberdevices.ru [172.16.1.4])
         by mx.sberdevices.ru (Postfix) with ESMTP;
-        Thu, 30 Mar 2023 23:19:07 +0300 (MSK)
-Message-ID: <58763a8f-8898-84a3-8bab-b11d004eb200@sberdevices.ru>
-Date:   Thu, 30 Mar 2023 23:15:42 +0300
+        Thu, 30 Mar 2023 23:22:01 +0300 (MSK)
+Message-ID: <9fd06ca5-ace9-251d-34af-aca4db9c3ee0@sberdevices.ru>
+Date:   Thu, 30 Mar 2023 23:18:36 +0300
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.7.1
+Subject: Re: [RFC PATCH v3 2/4] vsock/vmci: convert VMCI error code to -ENOMEM
+ on receive
 Content-Language: en-US
-In-Reply-To: <dead4842-333a-015e-028b-302151336ff9@sberdevices.ru>
 To:     Stefan Hajnoczi <stefanha@redhat.com>,
         Stefano Garzarella <sgarzare@redhat.com>,
         "David S. Miller" <davem@davemloft.net>,
@@ -48,9 +49,10 @@ To:     Stefan Hajnoczi <stefanha@redhat.com>,
 CC:     <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
         <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
         <kernel@sberdevices.ru>, <oxffffaa@gmail.com>,
-        <avkrasnov@sberdevices.ru>, <pv-drivers@vmware.com>
+        <pv-drivers@vmware.com>
+References: <4d34fac8-7170-5a3e-5043-42a9f7e4b5b3@sberdevices.ru>
 From:   Arseniy Krasnov <avkrasnov@sberdevices.ru>
-Subject: [RFC PATCH v3 4/4] vsock/test: update expected return values
+In-Reply-To: <4d34fac8-7170-5a3e-5043-42a9f7e4b5b3@sberdevices.ru>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
 X-Originating-IP: [172.16.1.6]
@@ -64,7 +66,7 @@ X-KSMG-AntiPhishing: not scanned, disabled by settings
 X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 1.1.2.30, bases: 2023/03/30 18:07:00 #21069213
 X-KSMG-AntiVirus-Status: Clean, skipped
 X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
-        DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
+        DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS
         autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -72,36 +74,49 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This updates expected return values for invalid buffer test. Now such
-values are returned from transport, not from af_vsock.c.
 
-Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
----
- tools/testing/vsock/vsock_test.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
-index 3de10dbb50f5..a91d0ef963be 100644
---- a/tools/testing/vsock/vsock_test.c
-+++ b/tools/testing/vsock/vsock_test.c
-@@ -723,7 +723,7 @@ static void test_seqpacket_invalid_rec_buffer_server(const struct test_opts *opt
- 		exit(EXIT_FAILURE);
- 	}
- 
--	if (errno != ENOMEM) {
-+	if (errno != EFAULT) {
- 		perror("unexpected errno of 'broken_buf'");
- 		exit(EXIT_FAILURE);
- 	}
-@@ -887,7 +887,7 @@ static void test_inv_buf_client(const struct test_opts *opts, bool stream)
- 		exit(EXIT_FAILURE);
- 	}
- 
--	if (errno != ENOMEM) {
-+	if (errno != EFAULT) {
- 		fprintf(stderr, "unexpected recv(2) errno %d\n", errno);
- 		exit(EXIT_FAILURE);
- 	}
--- 
-2.25.1
+On 30.03.2023 23:13, Arseniy Krasnov wrote:
+> This adds conversion of VMCI specific error code to general -ENOMEM. It
+> is needed, because af_vsock.c passes error value returned from transport
+> to the user, which does not expect to get VMCI_ERROR_* values.
+
+@Stefano, I have some doubts about this commit message, as it says "... af_vsock.c
+passes error value returned from transport to the user ...", but this
+behaviour is implemented only in the next patch. Is it ok, if both patches
+are in a single patchset?
+
+For patch 1 I think it is ok, as it fixes current implementation.
+
+Thanks, Arseniy
+
+> 
+> Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
+> ---
+>  net/vmw_vsock/vmci_transport.c | 11 +++++++++--
+>  1 file changed, 9 insertions(+), 2 deletions(-)
+> 
+> diff --git a/net/vmw_vsock/vmci_transport.c b/net/vmw_vsock/vmci_transport.c
+> index 95cc4d79ba29..b370070194fa 100644
+> --- a/net/vmw_vsock/vmci_transport.c
+> +++ b/net/vmw_vsock/vmci_transport.c
+> @@ -1831,10 +1831,17 @@ static ssize_t vmci_transport_stream_dequeue(
+>  	size_t len,
+>  	int flags)
+>  {
+> +	ssize_t err;
+> +
+>  	if (flags & MSG_PEEK)
+> -		return vmci_qpair_peekv(vmci_trans(vsk)->qpair, msg, len, 0);
+> +		err = vmci_qpair_peekv(vmci_trans(vsk)->qpair, msg, len, 0);
+>  	else
+> -		return vmci_qpair_dequev(vmci_trans(vsk)->qpair, msg, len, 0);
+> +		err = vmci_qpair_dequev(vmci_trans(vsk)->qpair, msg, len, 0);
+> +
+> +	if (err < 0)
+> +		err = -ENOMEM;
+> +
+> +	return err;
+>  }
+>  
+>  static ssize_t vmci_transport_stream_enqueue(
