@@ -2,75 +2,81 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 768E76CFD9C
-	for <lists+kvm@lfdr.de>; Thu, 30 Mar 2023 10:02:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EA74C6CFDAC
+	for <lists+kvm@lfdr.de>; Thu, 30 Mar 2023 10:04:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230136AbjC3ICL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Mar 2023 04:02:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37698 "EHLO
+        id S230215AbjC3IEL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Mar 2023 04:04:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41302 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230134AbjC3IBm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 Mar 2023 04:01:42 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30C68729B
-        for <kvm@vger.kernel.org>; Thu, 30 Mar 2023 01:00:51 -0700 (PDT)
+        with ESMTP id S229459AbjC3IDw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 30 Mar 2023 04:03:52 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 499E16A40
+        for <kvm@vger.kernel.org>; Thu, 30 Mar 2023 01:03:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1680163250;
+        s=mimecast20190719; t=1680163385;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=aKnf9talvaQpvRmivVJ+UtDT41SWYzLKCf+gopv+JXM=;
-        b=c0L8l8Koism5nktLKUfI2jwtzSqktg4ExgBhD8gR/chcLFNoWIJuW4kWpbQ9xoo7zyo+M2
-        lGXJGfLRZTgiVNquow4USOACXdnUAILuCNgAnoYTDYNTWSmP/x84JWt5N5z9jN2f6xm6Ot
-        qQRhtPVx2bbSc+dqEOaw7FiV0d2Rhsw=
-Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
- [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=BmvkK8fYK4TJ5NfFumKVdlTRthgnv0I/fv0iMmHm2zA=;
+        b=ZIQFwgudMjjzSftHwkYjOLdI+mbixvYbSIgdLm3d4QJvSW06AOfYJ3XrVS7/wC1VHY4MCr
+        gMmJKLIp0Co397NdriGynuLX1SYM4hngJ9CgypRcIxxajTWKQfZ6KGvet6p9F++wqu9jN5
+        3HFAbhLrHrj5KzHxPVK3FktLWAibvEA=
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
+ [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-537-_HuzdPwdNzabseTdQAoLZQ-1; Thu, 30 Mar 2023 04:00:46 -0400
-X-MC-Unique: _HuzdPwdNzabseTdQAoLZQ-1
-Received: by mail-qk1-f199.google.com with SMTP id c80-20020ae9ed53000000b007468c560e1bso8592983qkg.2
-        for <kvm@vger.kernel.org>; Thu, 30 Mar 2023 01:00:46 -0700 (PDT)
+ us-mta-222-n04fnG-zPSaEpnoCuVSCfA-1; Thu, 30 Mar 2023 04:03:03 -0400
+X-MC-Unique: n04fnG-zPSaEpnoCuVSCfA-1
+Received: by mail-qk1-f198.google.com with SMTP id 206-20020a370cd7000000b007467b5765d2so8574348qkm.0
+        for <kvm@vger.kernel.org>; Thu, 30 Mar 2023 01:03:03 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680163246;
+        d=1e100.net; s=20210112; t=1680163383;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=aKnf9talvaQpvRmivVJ+UtDT41SWYzLKCf+gopv+JXM=;
-        b=5UpI5CPuqdKcocI5MmCNKEnMWTnQfLH3KnXUuWnce3A+rqfJsl47I6l29Iy29jXkHf
-         9fiHVOHo4n4RMX8jMPzKVfJhX+eAEbc/fPbYN3/7qkNUGCFdZJBsSEl1xWRCzCmet3uW
-         O46J7WZOdn6g0uq7kjaturzFf/fD3O0oFSLIZcsEOwpmjhsWHf+bFoBj7VhO1A5qdYZV
-         2xMEDdEtTa7pr3osBkaoEpCP9flv+iD8txfE6SmkxHy5RZnl3RAr2jznXYgH/c4cXR3v
-         6KJRroqREMD5vV7cwX89jeGUHyjw2JufMVu+IJL7kMgCOkp4Nw3ExEQv4haIm6HQigI3
-         ZKPw==
-X-Gm-Message-State: AAQBX9fG7xGfPAklzr/oFkreCoGFPrzUIqY8RoKAsz8eE8TLANaP9GF/
-        hbsg1Ae2vNSVubLr2u4JNWj8OcR4HAIN8hWAc5PlynuCbycejbTxfqe5BjEPNljz+LP+DYK7rKu
-        M0lGxUpEIM+nU
-X-Received: by 2002:a05:6214:21a8:b0:5e0:3bbf:78c5 with SMTP id t8-20020a05621421a800b005e03bbf78c5mr2381384qvc.37.1680163246450;
-        Thu, 30 Mar 2023 01:00:46 -0700 (PDT)
-X-Google-Smtp-Source: AKy350YFd/4+N/O9Q5uwc3AG+urPSvuo4JSxefwurWAaOedWAKnyL/UuyV9ifYC209uK3neiFHLf+g==
-X-Received: by 2002:a05:6214:21a8:b0:5e0:3bbf:78c5 with SMTP id t8-20020a05621421a800b005e03bbf78c5mr2381363qvc.37.1680163246211;
-        Thu, 30 Mar 2023 01:00:46 -0700 (PDT)
+        bh=BmvkK8fYK4TJ5NfFumKVdlTRthgnv0I/fv0iMmHm2zA=;
+        b=qwbRTMZzJ4iPEMuCTS8GxQoeVvL7+Wn6cPPT+8sE7bsdj286+KRJEYhoJxfWVlAaax
+         xX3WSt5fVAyHUKZk7revNQLy0u/4aw1tXdo0asimKNBe/kkCXYRPSmfhvu/fUGtmxKUX
+         LKrx0xgfOIhV8Esy8++I1h6ptOMfR5djO6fTkHMb6w6lOK871625SCMfY789RYSL3WD3
+         I5k+08aOgk/y/ymAWpIOZq9//27sACIToee/yTsF8l1m9nVlssSaujqaalafD7/hFilt
+         yrhwYT0Gq46fKvrbOvv88PaNlK7oDagptVRqc/jcNCcl9Z1YfVMtkE5OLYN62QAWrZYJ
+         98WA==
+X-Gm-Message-State: AAQBX9dpOuP3L/4P8WJg7Q3tJ7wIqK0EI9cjVaFcco3jG06RdDZ1lFfV
+        Y/mEFNxqpMtdbvL9fwvLtSXM5rXF3krxwgW9HfnZZUbn9YflrC2Rp+Z2ejpQmmvkZ8MnuY7XoFY
+        OgXh++oVaKx6r
+X-Received: by 2002:ad4:5dcd:0:b0:5a9:c0a1:d31a with SMTP id m13-20020ad45dcd000000b005a9c0a1d31amr32511899qvh.49.1680163383480;
+        Thu, 30 Mar 2023 01:03:03 -0700 (PDT)
+X-Google-Smtp-Source: AKy350b/24uAmv6SuUb1n6/2cdmqOMqi4TQbiOPJWGZJaeeZPx69yK8YzSEPOHSxImFh4Y41wpxtEg==
+X-Received: by 2002:ad4:5dcd:0:b0:5a9:c0a1:d31a with SMTP id m13-20020ad45dcd000000b005a9c0a1d31amr32511878qvh.49.1680163383217;
+        Thu, 30 Mar 2023 01:03:03 -0700 (PDT)
 Received: from sgarzare-redhat (host-82-57-51-130.retail.telecomitalia.it. [82.57.51.130])
-        by smtp.gmail.com with ESMTPSA id l4-20020ad44244000000b005dd8b9345cesm5192472qvq.102.2023.03.30.01.00.43
+        by smtp.gmail.com with ESMTPSA id mh2-20020a056214564200b005dd8b934582sm5197140qvb.26.2023.03.30.01.02.59
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Mar 2023 01:00:45 -0700 (PDT)
-Date:   Thu, 30 Mar 2023 10:00:40 +0200
+        Thu, 30 Mar 2023 01:03:02 -0700 (PDT)
+Date:   Thu, 30 Mar 2023 10:02:57 +0200
 From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Bobby Eshleman <bobby.eshleman@bytedance.com>
+To:     Arseniy Krasnov <avkrasnov@sberdevices.ru>
 Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
         "David S. Miller" <davem@davemloft.net>,
         Eric Dumazet <edumazet@google.com>,
         Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, kvm@vger.kernel.org,
+        Paolo Abeni <pabeni@redhat.com>,
+        Bobby Eshleman <bobby.eshleman@bytedance.com>,
+        Bryan Tan <bryantan@vmware.com>,
+        Vishnu Dasa <vdasa@vmware.com>, kvm@vger.kernel.org,
         virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Cong Wang <xiyou.wangcong@gmail.com>
-Subject: Re: [PATCH net v3] virtio/vsock: fix leaks due to missing skb owner
-Message-ID: <p6y6cwfywyi5apvn4cx5edob3n2zvyrmfvj6yss5szd24phgnt@gynsr43tsvan>
-References: <20230327-vsock-fix-leak-v3-1-292cfc257531@bytedance.com>
+        linux-kernel@vger.kernel.org, kernel@sberdevices.ru,
+        oxffffaa@gmail.com, pv-drivers@vmware.com
+Subject: Re: [RFC PATCH v2 1/3] vsock: return errors other than -ENOMEM to
+ socket
+Message-ID: <p64mv3f2ujn4uokl5i7abhdbmed3zy2lrozqoam3llcf4r2qkv@gmyoyikbyiwj>
+References: <60abc0da-0412-6e25-eeb0-8e32e3ec21e7@sberdevices.ru>
+ <b910764f-a193-e684-a762-f941883a0745@sberdevices.ru>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <20230327-vsock-fix-leak-v3-1-292cfc257531@bytedance.com>
+In-Reply-To: <b910764f-a193-e684-a762-f941883a0745@sberdevices.ru>
 X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
@@ -81,70 +87,49 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 29, 2023 at 04:51:58PM +0000, Bobby Eshleman wrote:
->This patch sets the skb owner in the recv and send path for virtio.
+On Thu, Mar 30, 2023 at 10:05:45AM +0300, Arseniy Krasnov wrote:
+>This removes behaviour, where error code returned from any transport
+>was always switched to ENOMEM. This works in the same way as:
+>commit
+>c43170b7e157 ("vsock: return errors other than -ENOMEM to socket"),
+>but for receive calls.
 >
->For the send path, this solves the leak caused when
->virtio_transport_purge_skbs() finds skb->sk is always NULL and therefore
->never matches it with the current socket. Setting the owner upon
->allocation fixes this.
->
->For the recv path, this ensures correctness of accounting and also
->correct transfer of ownership in vsock_loopback (when skbs are sent from
->one socket and received by another).
->
->Fixes: 71dc9ec9ac7d ("virtio/vsock: replace virtio_vsock_pkt with sk_buff")
->Signed-off-by: Bobby Eshleman <bobby.eshleman@bytedance.com>
->Reported-by: Cong Wang <xiyou.wangcong@gmail.com>
->Link: https://lore.kernel.org/all/ZCCbATwov4U+GBUv@pop-os.localdomain/
+>Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
 >---
->Changes in v3:
->- virtio/vsock: use skb_set_owner_sk_safe() instead of
->  skb_set_owner_{r,w}
->- virtio/vsock: reject allocating/receiving skb if sk_refcnt==0 and WARN_ONCE
->- Link to v2: https://lore.kernel.org/r/20230327-vsock-fix-leak-v2-1-f6619972dee0@bytedance.com
->
->Changes in v2:
->- virtio/vsock: add skb_set_owner_r to recv_pkt()
->- Link to v1: https://lore.kernel.org/r/20230327-vsock-fix-leak-v1-1-3fede367105f@bytedance.com
->---
-> net/vmw_vsock/virtio_transport_common.c | 10 ++++++++++
-> 1 file changed, 10 insertions(+)
->
->diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
->index 957cdc01c8e8..c927dc302faa 100644
->--- a/net/vmw_vsock/virtio_transport_common.c
->+++ b/net/vmw_vsock/virtio_transport_common.c
->@@ -94,6 +94,11 @@ virtio_transport_alloc_skb(struct virtio_vsock_pkt_info *info,
-> 					 info->op,
-> 					 info->flags);
->
->+	if (info->vsk && !skb_set_owner_sk_safe(skb, sk_vsock(info->vsk))) {
->+		WARN_ONCE(1, "failed to allocate skb on vsock socket with sk_refcnt == 0\n");
->+		goto out;
->+	}
->+
-> 	return skb;
->
-> out:
->@@ -1294,6 +1299,11 @@ void virtio_transport_recv_pkt(struct virtio_transport *t,
-> 		goto free_pkt;
-> 	}
->
->+	if (!skb_set_owner_sk_safe(skb, sk)) {
->+		WARN_ONCE(1, "receiving vsock socket has sk_refcnt == 0\n");
->+		goto free_pkt;
->+	}
->+
+> net/vmw_vsock/af_vsock.c | 4 ++--
+> 1 file changed, 2 insertions(+), 2 deletions(-)
 
-LGTM!
-
-I would have put the condition inside WARN_ONCE() because I find it
-more readable (e.g. WARN_ONCE(!skb_set_owner_sk_safe(skb, sk), ...),
-but I don't have a strong opinion on that, so that's fine too:
-
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+We should first make sure that all transports return the right value,
+and then expose it to the user, so I would move this patch, after
+patch 2.
 
 Thanks,
 Stefano
+
+>
+>diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
+>index 5f2dda35c980..413407bb646c 100644
+>--- a/net/vmw_vsock/af_vsock.c
+>+++ b/net/vmw_vsock/af_vsock.c
+>@@ -2043,7 +2043,7 @@ static int __vsock_stream_recvmsg(struct sock *sk, struct msghdr *msg,
+>
+> 		read = transport->stream_dequeue(vsk, msg, len - copied, flags);
+> 		if (read < 0) {
+>-			err = -ENOMEM;
+>+			err = read;
+> 			break;
+> 		}
+>
+>@@ -2094,7 +2094,7 @@ static int __vsock_seqpacket_recvmsg(struct sock *sk, struct msghdr *msg,
+> 	msg_len = transport->seqpacket_dequeue(vsk, msg, flags);
+>
+> 	if (msg_len < 0) {
+>-		err = -ENOMEM;
+>+		err = msg_len;
+> 		goto out;
+> 	}
+>
+>-- 
+>2.25.1
+>
 
