@@ -2,86 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 741616D03AB
-	for <lists+kvm@lfdr.de>; Thu, 30 Mar 2023 13:45:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D4C6D6D040A
+	for <lists+kvm@lfdr.de>; Thu, 30 Mar 2023 13:53:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231833AbjC3LpO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Mar 2023 07:45:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58458 "EHLO
+        id S231517AbjC3Lxu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Mar 2023 07:53:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50410 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231992AbjC3Loz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 Mar 2023 07:44:55 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AEF419EED;
-        Thu, 30 Mar 2023 04:44:33 -0700 (PDT)
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 32UBA5Pp003326;
-        Thu, 30 Mar 2023 11:43:50 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=XO17w8KdyosBV0pUgCFUV4D+xaV6cFlDxqnOuUyBrvo=;
- b=J5FadfI37nklgHdS61+zgAeRIjlufOjKA8WnqIyLvJ5HauEmy3+YGEciu9hmjBtguXeJ
- R/eU+i3bKECU+sMKNpLpjl5tuL6fxhaE+YFgGuy9ctgmVZWQu2zznShEIclJsIjBifoB
- WNDOijl9xqGsbYGNRJR9Blg8HVVFInrpo0kG4VDcO2e42UOQ2ivnmD8XkogLxOXlxWqc
- 8HLRcRJov1Hj2Ktb9AYtH3YZSuZyypMuqI7rOD1GZxFWcR65ehkPnnnrI+mYKCthFqpP
- xuqwP1LWUTFZqJjMPhO9UT5qbQpHjUo8gM2X0cW3uBu/L5TdjBhH562x3iOEqFHkYw1L 9Q== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pmq1pm1tg-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 30 Mar 2023 11:43:49 +0000
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 32UBAJO3004995;
-        Thu, 30 Mar 2023 11:43:49 GMT
-Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pmq1pm1sd-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 30 Mar 2023 11:43:49 +0000
-Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
-        by ppma05fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 32TLqbsR003825;
-        Thu, 30 Mar 2023 11:43:47 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-        by ppma05fra.de.ibm.com (PPS) with ESMTPS id 3phrk6ms20-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 30 Mar 2023 11:43:46 +0000
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-        by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 32UBhhu440894892
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 30 Mar 2023 11:43:43 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 74B0120049;
-        Thu, 30 Mar 2023 11:43:43 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C119620040;
-        Thu, 30 Mar 2023 11:43:42 +0000 (GMT)
-Received: from linux6.. (unknown [9.114.12.104])
-        by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Thu, 30 Mar 2023 11:43:42 +0000 (GMT)
-From:   Janosch Frank <frankja@linux.ibm.com>
-To:     kvm@vger.kernel.org
-Cc:     thuth@redhat.com, imbrenda@linux.ibm.com, nrb@linux.ibm.com,
-        linux-s390@vger.kernel.org
-Subject: [kvm-unit-tests PATCH 5/5] s390x: ap: Add reset tests
-Date:   Thu, 30 Mar 2023 11:42:44 +0000
-Message-Id: <20230330114244.35559-6-frankja@linux.ibm.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230330114244.35559-1-frankja@linux.ibm.com>
-References: <20230330114244.35559-1-frankja@linux.ibm.com>
+        with ESMTP id S231487AbjC3Lxq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 30 Mar 2023 07:53:46 -0400
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2040.outbound.protection.outlook.com [40.107.236.40])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C10D9753;
+        Thu, 30 Mar 2023 04:53:21 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Of/J4Nmoc5ORK4uTlxDhyB0q0HsJsew/qFOmevO2YlKKHtqgTgtzAZq/70wVXDjnM9dA1n7j4s8E5XiwJoJBMt4bMkXUoaFUfKhOTVAzP+HncB0tzLfj52Plw4nLn3JANj4Zaoji8bwQGJoYJdOWlIhkU2wR6n2Q5TlVRoek1cK+f2He8PyYpiOQPgm06rdfN7lKlaBj3sDIHzq8azYB++ewhxjmKeJhqN0Rb/mc9FjP+dpuLJbJgxSJRSXUgk7EBbaROB/99Dpq/02yMi6l4RL7IWBvSl+dpXcdj0jo06DpHt/F1F+i0ETjE4hR45QJIVQICW0mDN/iAS+RAQVAbA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=pDiWNIhyeYLrYny55TvdPFac9v3rMAXRtk3dNuw1Eik=;
+ b=DVHzSwwUJfo38/rwU8vJ8O7AE4Lie9V0fN25tcUnVNEnce+Upmwn+4l1IMwV9QGMZjc8JfxLxnB0bW+y36MkTKsSk6Ftau1ypGs2H4tdgJQn/nVukFonnMpvtOJH3ZIz7ozI8m4RqX2yG27vcT3L0yeqTY5qbbDGNvwcyVn2FlVuoYhP/vU1S6kUpGZFSUdL7SmYJKc2tpzvNEy1RqeUBQWR+FsNRmFtrmdNB3tsBRf//DYerOXtjB3EAku1vWza6QYNs+FcQi/tpA/NaKHR0460D5zrsyVcn5ZT6OCLL9Mr5wqCxNwQSMTd/kiOAa2kdpVmGhHzFJq6vALgqWwD6w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=pDiWNIhyeYLrYny55TvdPFac9v3rMAXRtk3dNuw1Eik=;
+ b=bBjYtaT3TS+JfuPlMy9noC2WcH8PLBMZ5Pwli3drlclE9JXA75Mf1Da3S2kQqIFEH+ETis2/8aOsGs+u0psEukctB8uEWNkrOOn0E9EI2k+spwN7JZBDKqmTKTM+pVFQ8BfUDGVWNfuH4Er7W3X6zuwLSGlucjITgX4NLY2p2vR1LxhjO7MWlRU+u4bxlGKxXYMa3ixmmbZeCJOqlfNKufrtLEEBM/j1CZGUHVJLvSbL7dTmgoWTEIzx6Zf9ySVesQWVT10GzZEdMhFh7PE7AZML91g5KGNskZriIierqdt3U7Kh+W0BucGC3GmktP3War/0Z+1BLhdLLJxw/Bzgsg==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by MW6PR12MB8664.namprd12.prod.outlook.com (2603:10b6:303:23c::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6254.21; Thu, 30 Mar
+ 2023 11:52:21 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::ef6d:fdf6:352f:efd1]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::ef6d:fdf6:352f:efd1%3]) with mapi id 15.20.6178.037; Thu, 30 Mar 2023
+ 11:52:20 +0000
+Date:   Thu, 30 Mar 2023 08:52:19 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     "Liu, Yi L" <yi.l.liu@intel.com>
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
+        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "shameerali.kolothum.thodi@huawei.com" 
+        <shameerali.kolothum.thodi@huawei.com>,
+        "lulu@redhat.com" <lulu@redhat.com>,
+        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
+        "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        "Hao, Xudong" <xudong.hao@intel.com>,
+        "Zhao, Yan Y" <yan.y.zhao@intel.com>,
+        "Xu, Terrence" <terrence.xu@intel.com>,
+        "Jiang, Yanting" <yanting.jiang@intel.com>
+Subject: Re: [PATCH v8 21/24] vfio: Add VFIO_DEVICE_BIND_IOMMUFD
+Message-ID: <ZCV38yPbzSRQcsRl@nvidia.com>
+References: <20230327094047.47215-1-yi.l.liu@intel.com>
+ <20230327094047.47215-22-yi.l.liu@intel.com>
+ <20230329150055.3dee2476.alex.williamson@redhat.com>
+ <DS0PR11MB7529A19B0368DA4769444B84C38E9@DS0PR11MB7529.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <DS0PR11MB7529A19B0368DA4769444B84C38E9@DS0PR11MB7529.namprd11.prod.outlook.com>
+X-ClientProxiedBy: MN2PR10CA0019.namprd10.prod.outlook.com
+ (2603:10b6:208:120::32) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: I5_mCWp2ugOhj3MfLEsjAmeStljk8UlL
-X-Proofpoint-ORIG-GUID: NMlbosLje0nwTcJhqEQCdYs6Dk_ja9xm
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
- definitions=2023-03-30_07,2023-03-30_02,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- impostorscore=0 malwarescore=0 lowpriorityscore=0 suspectscore=0
- mlxlogscore=999 mlxscore=0 bulkscore=0 phishscore=0 adultscore=0
- spamscore=0 clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2303200000 definitions=main-2303300095
-X-Spam-Status: No, score=-0.1 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
-        DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|MW6PR12MB8664:EE_
+X-MS-Office365-Filtering-Correlation-Id: e52ca783-b02d-467b-7f1d-08db311537fd
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: YDYUJeBJrsCloAIP9VgElZ2REQvc2SYFlj0AVoiBFp4OwN7sC20RaTJmhalGvfmA/N1LpsPg2XChFB6yjEtnUBTHOY3xDQrdHLSTTPtReGBbTg0oBXi1tiwDhOCjlZvXF2wh1Zj9QyInZstjri8h+Hn51/XU18gnIUYfMoLyJVVBCNcNcvV8uMzQthJALqBGK6JyxT6A+xNJyEEhCLhzA/CXVz+vhHVgs47HPy/3jrYmnxjsIjEjX+ZfX44N3i0sdpAqMzlYcdOxPbmzhHWBkhxqkXTackBe+vemZM8+ZSm77g0vvg8m28HSc/t6IU/dZc7e6uN0U3HJSV/kvz9Pzx1T0M1rwCjl47Ma795YTzizZE2ySI+1QOYw/Qv3KeeqhIRXVAAwZV7ySEOUpXjE88LDucTfX/NdWRMDZ3QyLtyltxhzml9Em1k7S0mbMh/6JXVVojimr82xXD3YHnyF7BsgwZ316/RLgeYNDZIuN9AaBC6PYktKj4VHcRyxVGsPhFTJZzQGRmTHPtojTIfBFazT0wjo1iwEFr34Z/PNQ6egB50eAqMTm+k+rt47wkEx
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(376002)(39860400002)(346002)(136003)(366004)(396003)(451199021)(36756003)(6916009)(38100700002)(66556008)(8936002)(5660300002)(7416002)(4326008)(66946007)(86362001)(4744005)(8676002)(66476007)(41300700001)(6506007)(6486002)(2616005)(26005)(6512007)(54906003)(2906002)(478600001)(186003)(316002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?I7gonf0cbXvTnt7T3euxzyyHO5wMgSES6+EFJhCuO/cA67aASB6sJx6FXjd6?=
+ =?us-ascii?Q?nv3LntPYKJN6oNb5NBkZXQLh+q6zG8IZPjiRjubk+471lUack9k0LpIw+idW?=
+ =?us-ascii?Q?qpfqMnfiOPtxKc7ZXxGF5sAkKZ4P1Vb+40qgkDRlGChUB9sNXBwmVeeyinMc?=
+ =?us-ascii?Q?LtUdXecMtKpEqS5bEyQ3eg1zMrbPJgE7Kyi8LtjSnU8G97Y3saKmRNZJr7Xl?=
+ =?us-ascii?Q?kOppzcI1RrZ3XJDMkS32hZabl/VMR1hMG38XehW6fMJhDGrgFCTAJ/3BJo3l?=
+ =?us-ascii?Q?DOyf74ZTObu1ybcK+jfcUbTLDWIu7WCwihBAgUUBwHgk740+eEhH/cM7XbHj?=
+ =?us-ascii?Q?2gcxZO0nV9U5aVccCT+Y495LJQOj219VRwClE5gmI/AcbCYKmXAjK6H1y8zA?=
+ =?us-ascii?Q?TpijGBCn1A88zXQBJt5Tqzg8GJVX+tWbrGrp09W7OjJC/JxiQUEZEattYc1j?=
+ =?us-ascii?Q?3F4c51YwkeMFF7PS7b3vI54gPGxk5l93ottnRaOfoqmEiuW3lNMvl/nFUbz2?=
+ =?us-ascii?Q?d+9CHTXdxqpDnjJ/FmuVMFc9/UuYMdS63OJzNbCr1rzfJsZhlh+N7+UPR/iy?=
+ =?us-ascii?Q?m9AlotcIndkr+2V/hcrWDPtbpvOMv4Ded5G4dvUXNouQJMfYd51v4ypmdVle?=
+ =?us-ascii?Q?xLWYRuHFBJ3Tit/hMhyPnf/NAkeoYMWw5FqWqcUdM3oS8UJs/QKuKAPGPVQK?=
+ =?us-ascii?Q?iETC80qibvNilWJUzh+gdFb7SPKndcx8popsjX0pwbba4PKhUtLxFE5oqxVN?=
+ =?us-ascii?Q?oH6nbb1/osRW5/Z1vaWUrdKPEnRjr2qG9QIZIG4e6DKyhIYHk6ze6Tz1LlRj?=
+ =?us-ascii?Q?WHqH6j/YgL+xO3MflceCe1nICcUwJCs4I7a7p+lpwgaXWM2UPeTNr7Ki8CXF?=
+ =?us-ascii?Q?bZiOIVpldBtCclhzKSscLqftEqYEZGoFKies5tyi9ZmPE30TyLHXTRcxJCKf?=
+ =?us-ascii?Q?0fUQRML17BKys8fYkrwJe+V6xmL7NirkNSWnJ4ReVm8UJ9cONB27Qj+veOVC?=
+ =?us-ascii?Q?Kpb9dwNam1W/LVmva5MZNh1w+eQ+wotl8m8gZk6SXkKLX4C4flQcftJ6GWt5?=
+ =?us-ascii?Q?yNWXHWEQce4mfJy3FN1BZ8emeM1YyldBO6SHQaojGV8KjOakguq1vtMHUCW/?=
+ =?us-ascii?Q?I1ZGXyTrR64HP2nilsGtzNqIGWBuhz4fUjRW7MPxjS+FdTVJHR0UIq3/+Cuz?=
+ =?us-ascii?Q?MT5rn1X+vgFhhvgT8IQEc3rrtepqs1Ez95QAPljPT8je06zbLX9vw4gh6Ef1?=
+ =?us-ascii?Q?I7P3+3QIX7x69xomf3yPWcVV0GF72CGOaVFpJ4c9o6LyN1CmSyyRPwG5vanz?=
+ =?us-ascii?Q?apK06t61l3Ml2zXN1bPqdl5XYUbt/oistEzeq7IklSQ/tRnIMhnefrgf+qoy?=
+ =?us-ascii?Q?4VqzlTFpFtLARhZseTIFhCqdwsL2UxK9Ljxlzd+XBGcPQ9CdfgrQMjP6IHKu?=
+ =?us-ascii?Q?l5EB4rWWbaPYRlToFcXz7QCioeoGUJL1csl+4FswoU3dCrlJt8ulOrdqohuT?=
+ =?us-ascii?Q?8gqILmIjmesv/5ROlZ3bYwQyAEWsRxrI94MDnwVrlz80PbXuIU5qQOjC9+0F?=
+ =?us-ascii?Q?wW3MV3kw9yNW+2/qtfBfRUiMLTiPjGSvYuqMU9cz?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e52ca783-b02d-467b-7f1d-08db311537fd
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Mar 2023 11:52:20.8053
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 1YtrdKO2x/kPdZDoCEghDzwCGtaNNOzZSiZgD6tqk3OqcAGKd7/S68hftGEvxgCR
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW6PR12MB8664
+X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
         autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -89,186 +138,24 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Test if the IRQ enablement is turned off on a reset or zeroize PQAP.
+On Thu, Mar 30, 2023 at 07:09:31AM +0000, Liu, Yi L wrote:
 
-Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
----
- lib/s390x/ap.c | 68 ++++++++++++++++++++++++++++++++++++++++++++++++++
- lib/s390x/ap.h |  4 +++
- s390x/ap.c     | 52 ++++++++++++++++++++++++++++++++++++++
- 3 files changed, 124 insertions(+)
+> > > +long vfio_device_ioctl_bind_iommufd(struct vfio_device_file *df,
+> > > +				    struct vfio_device_bind_iommufd __user *arg)
+> > > +{
+> > > +	struct vfio_device *device = df->device;
+> > > +	struct vfio_device_bind_iommufd bind;
+> > > +	struct iommufd_ctx *iommufd = NULL;
+> > > +	unsigned long minsz;
+> > > +	int ret;
+> > > +
+> > > +	static_assert(__same_type(arg->out_devid, bind.out_devid));
+> > 
+> > They're the same field in the same structure, how could they be
+> > otherwise?
+> 
+> @Jason, should I remove this check?
 
-diff --git a/lib/s390x/ap.c b/lib/s390x/ap.c
-index aaf5b4b9..d969b2a5 100644
---- a/lib/s390x/ap.c
-+++ b/lib/s390x/ap.c
-@@ -113,6 +113,74 @@ int ap_pqap_qci(struct ap_config_info *info)
- 	return cc;
- }
- 
-+static int pqap_reset(uint8_t ap, uint8_t qn, struct ap_queue_status *r1,
-+		      bool zeroize)
-+{
-+	struct pqap_r0 r0 = {};
-+	int cc;
-+
-+	/*
-+	 * Reset/zeroize AP Queue
-+	 *
-+	 * Resets/zeroizes a queue and disables IRQs
-+	 *
-+	 * Inputs: 0
-+	 * Outputs: 1
-+	 * Asynchronous
-+	 */
-+	r0.ap = ap;
-+	r0.qn = qn;
-+	r0.fc = zeroize ? PQAP_ZEROIZE_APQ : PQAP_RESET_APQ;
-+	asm volatile(
-+		"	lgr	0,%[r0]\n"
-+		"	lgr	1,%[r1]\n"
-+		"	.insn	rre,0xb2af0000,0,0\n" /* PQAP */
-+		"	ipm	%[cc]\n"
-+		"	srl	%[cc],28\n"
-+		: [r1] "+&d" (r1), [cc] "=&d" (cc)
-+		: [r0] "d" (r0)
-+		: "memory");
-+
-+	return cc;
-+}
-+
-+static int pqap_reset_wait(uint8_t ap, uint8_t qn, struct ap_queue_status *apqsw,
-+			   bool zeroize)
-+{
-+	struct pqap_r2 r2 = {};
-+	int cc;
-+
-+	cc = pqap_reset(ap, qn, apqsw, zeroize);
-+	/* On a cc == 3 / error we don't need to wait */
-+	if (cc)
-+		return cc;
-+
-+	/*
-+	 * TAPQ returns AP_RC_RESET_IN_PROGRESS if a reset is being
-+	 * processed
-+	 */
-+	do {
-+		cc = ap_pqap_tapq(ap, qn, apqsw, &r2);
-+		/* Give it some time to process before the retry */
-+		mdelay(20);
-+	} while (apqsw->rc == AP_RC_RESET_IN_PROGRESS);
-+
-+	if (apqsw->rc)
-+		printf("Wait for reset failed on ap %d queue %d with tapq rc %d.",
-+			ap, qn, apqsw->rc);
-+	return cc;
-+}
-+
-+int ap_pqap_reset(uint8_t ap, uint8_t qn, struct ap_queue_status *apqsw)
-+{
-+	return pqap_reset_wait(ap, qn, apqsw, false);
-+}
-+
-+int ap_pqap_reset_zeroize(uint8_t ap, uint8_t qn, struct ap_queue_status *apqsw)
-+{
-+	return pqap_reset_wait(ap, qn, apqsw, true);
-+}
-+
- static int ap_get_apqn(uint8_t *ap, uint8_t *qn)
- {
- 	unsigned long *ptr;
-diff --git a/lib/s390x/ap.h b/lib/s390x/ap.h
-index 3f9e2eb6..f9343b5f 100644
---- a/lib/s390x/ap.h
-+++ b/lib/s390x/ap.h
-@@ -12,6 +12,8 @@
- #ifndef _S390X_AP_H_
- #define _S390X_AP_H_
- 
-+#define AP_RC_RESET_IN_PROGRESS	0x02
-+
- enum PQAP_FC {
- 	PQAP_TEST_APQ,
- 	PQAP_RESET_APQ,
-@@ -94,6 +96,8 @@ _Static_assert(sizeof(struct ap_qirq_ctrl) == sizeof(uint64_t),
- int ap_setup(uint8_t *ap, uint8_t *qn);
- int ap_pqap_tapq(uint8_t ap, uint8_t qn, struct ap_queue_status *apqsw,
- 		 struct pqap_r2 *r2);
-+int ap_pqap_reset(uint8_t ap, uint8_t qn, struct ap_queue_status *apqsw);
-+int ap_pqap_reset_zeroize(uint8_t ap, uint8_t qn, struct ap_queue_status *apqsw);
- int ap_pqap_qci(struct ap_config_info *info);
- int ap_pqap_aqic(uint8_t ap, uint8_t qn, struct ap_queue_status *apqsw,
- 		 struct ap_qirq_ctrl aqic, unsigned long addr);
-diff --git a/s390x/ap.c b/s390x/ap.c
-index 31dcfe29..47b4f832 100644
---- a/s390x/ap.c
-+++ b/s390x/ap.c
-@@ -341,6 +341,57 @@ static void test_pqap_aqic(void)
- 	report_prefix_pop();
- }
- 
-+static void test_pqap_resets(void)
-+{
-+	struct ap_queue_status apqsw = {};
-+	static uint8_t not_ind_byte;
-+	struct ap_qirq_ctrl aqic = {};
-+	struct pqap_r2 r2 = {};
-+
-+	int cc;
-+
-+	report_prefix_push("pqap");
-+	report_prefix_push("rapq");
-+
-+	/* Enable IRQs which the resets will disable */
-+	aqic.ir = 1;
-+	cc = ap_pqap_aqic(apn, qn, &apqsw, aqic, (uintptr_t)&not_ind_byte);
-+	report(cc == 0 && apqsw.rc == 0, "enable");
-+
-+	do {
-+		cc = ap_pqap_tapq(apn, qn, &apqsw, &r2);
-+	} while (cc == 0 && apqsw.irq_enabled == 0);
-+	report(apqsw.irq_enabled == 1, "IRQs enabled");
-+
-+	ap_pqap_reset(apn, qn, &apqsw);
-+	cc = ap_pqap_tapq(apn, qn, &apqsw, &r2);
-+	assert(!cc);
-+	report(apqsw.irq_enabled == 0, "IRQs have been disabled");
-+
-+	report_prefix_pop();
-+
-+	report_prefix_push("zapq");
-+
-+	/* Enable IRQs which the resets will disable */
-+	aqic.ir = 1;
-+	cc = ap_pqap_aqic(apn, qn, &apqsw, aqic, (uintptr_t)&not_ind_byte);
-+	report(cc == 0 && apqsw.rc == 0, "enable");
-+
-+	do {
-+		cc = ap_pqap_tapq(apn, qn, &apqsw, &r2);
-+	} while (cc == 0 && apqsw.irq_enabled == 0);
-+	report(apqsw.irq_enabled == 1, "IRQs enabled");
-+
-+	ap_pqap_reset_zeroize(apn, qn, &apqsw);
-+	cc = ap_pqap_tapq(apn, qn, &apqsw, &r2);
-+	assert(!cc);
-+	report(apqsw.irq_enabled == 0, "IRQs have been disabled");
-+
-+	report_prefix_pop();
-+
-+	report_prefix_pop();
-+}
-+
- int main(void)
- {
- 	int setup_rc = ap_setup(&apn, &qn);
-@@ -362,6 +413,7 @@ int main(void)
- 		goto done;
- 	}
- 	test_pqap_aqic();
-+	test_pqap_resets();
- 
- done:
- 	report_prefix_pop();
--- 
-2.34.1
+Yes, it was from something that looked very different from this
 
+Jason
