@@ -2,101 +2,207 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6F4E16CF9A7
-	for <lists+kvm@lfdr.de>; Thu, 30 Mar 2023 05:44:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6C1D16CF9D2
+	for <lists+kvm@lfdr.de>; Thu, 30 Mar 2023 05:56:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229643AbjC3Doq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 Mar 2023 23:44:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57640 "EHLO
+        id S229597AbjC3D4C (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 Mar 2023 23:56:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36154 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229597AbjC3Dol (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 29 Mar 2023 23:44:41 -0400
-Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09AE3526F
-        for <kvm@vger.kernel.org>; Wed, 29 Mar 2023 20:44:41 -0700 (PDT)
-Received: by mail-pl1-x64a.google.com with SMTP id l14-20020a170902f68e00b001a1a9a1d326so10433211plg.9
-        for <kvm@vger.kernel.org>; Wed, 29 Mar 2023 20:44:41 -0700 (PDT)
+        with ESMTP id S229675AbjC3Dzx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 29 Mar 2023 23:55:53 -0400
+Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1CBD4468A
+        for <kvm@vger.kernel.org>; Wed, 29 Mar 2023 20:55:52 -0700 (PDT)
+Received: by mail-pl1-x62d.google.com with SMTP id d9443c01a7336-1a1b23f49e2so134365ad.0
+        for <kvm@vger.kernel.org>; Wed, 29 Mar 2023 20:55:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1680147880;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=XtS4ffNy9WGD8mXuYOI9etZtjBQFkCQ/o4N7TvvD7Ws=;
-        b=ME0Y6mYPyMaBgZPhSbo9DclSuUZYVMs9VJWrKgrf2ZRB9MHPvUMO3DiK4PIfktqJjz
-         AwAcoeJb+dVIO8CIM9umZMJRPIPrqLd8BduACCFdGGA0jibr6hWS5qTxdG47CU6zM6A1
-         Nq+KPHbtVPzCtSwLN1Ks5TOkNey1jDCGf6mTcIPQryshEu3egZuJwifmy9BwUovcZq9S
-         td9+g5SLdXbk3ZvSahIbfqxzYprOVB86THO7MxVJNrO7CE/J1xy8bifEpqPiggkNeSJY
-         hZCPiufeR1yGuRuYQ39AY7EAQ23FGTVvTUfa/g1Kjba6lnE33cvi/OYB/Oj/fss7tXla
-         R7Hg==
+        d=google.com; s=20210112; t=1680148551;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=+CVAOLuwD80Bd5PzmarfCnim42bOXcWvf05MWwjZBAE=;
+        b=lc+fBWtgGa5qjeLygju1S5fN83HoFYZLDyYq1ypW9Q7+E5lruuj2wUMR7nYareVx6r
+         KMxBoCBzpRTIn3oBWWck5U22wXDmjTOOzs1WzSzNRAaLFFjDMHBIKbLdWp+hqGo8faO/
+         julebdE8XgdhEFX86mw7hM/RjBw9HOLloW66GUrYUzz9WPfqShMkUfcNipTpRE7m2SZG
+         IzJBcymV6hSeoHy7vbsSTKOEEWELxXArcC/oqNU4fxgI1b2FRGrJCjTuaNu750gzQAHM
+         f6mGGfCTwezdycufQGlLiUxlg6CySA4J9Rq0439XHF+25GhuvdN+FHinjEymEASeVs1u
+         5NUQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680147880;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=XtS4ffNy9WGD8mXuYOI9etZtjBQFkCQ/o4N7TvvD7Ws=;
-        b=EnjW+h35H/IfI0/s1n8HyeT1ICds0DtxiBE8HicZZ4bmMiZQuuslq8nfvMa5kkraCh
-         cezlH91N4TAYWVOY2kbdKp7lj79QfUBWvboxsbuCS6e9BrbZG/GEZRf9tesxiol+QLH0
-         Oplu/vMkqIA4d2BlOtP47Bhg8S8erSMzLobEIWRpbpE5MXZEuktOFIfuXnwJ1/ed2AQq
-         tGvw/8KpdMgynCbACIgMwtJwa1wUCieoONmhO9QYu05pP/wrz5pHMP90jblDBqEU77D4
-         8hf1ppYYKHAqllKFYeJ0o98NJVgFm01rH6Cl4gEMy0H3aUkZGbFFoIy5dFCq2PK3/ed+
-         vYKg==
-X-Gm-Message-State: AAQBX9exSXY1sL1ng+hjKoAbBzLTzua3JauHLCo91K00EsKScxSZSNeC
-        zckF5uEqmRXnurf7ZFhK+swDqkmFxtw=
-X-Google-Smtp-Source: AKy350Z6WqglPzws8H5b3TR4jjEhE64t3nakeC9suvnjqCIcXMjGmSTc2M8G2MQveafPyMxg9QqmBDXLGNU=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90b:1203:b0:240:c387:6089 with SMTP id
- gl3-20020a17090b120300b00240c3876089mr299277pjb.1.1680147880561; Wed, 29 Mar
- 2023 20:44:40 -0700 (PDT)
-Date:   Wed, 29 Mar 2023 20:44:33 -0700
-In-Reply-To: <49dd4ae8-9b7a-b6ce-ee9b-3ba76b12c06e@intel.com>
-Mime-Version: 1.0
-References: <20230328050231.3008531-1-seanjc@google.com> <20230328050231.3008531-2-seanjc@google.com>
- <620935f7-dd7a-2db6-1ddf-8dae27326f60@intel.com> <ZCMCzpAkGV56+ZbS@google.com>
- <05792cbd-7fdb-6bf2-ebaa-9d13a2c4fddd@intel.com> <ZCRogsvUYMQV6kca@google.com>
- <49dd4ae8-9b7a-b6ce-ee9b-3ba76b12c06e@intel.com>
-Message-ID: <ZCUFoeqONfWU1+D1@google.com>
-Subject: Re: [kvm-unit-tests PATCH 1/3] x86: Add define for
- MSR_IA32_PRED_CMD's PRED_CMD_IBPB (bit 0)
-From:   Sean Christopherson <seanjc@google.com>
-To:     Xiaoyao Li <xiaoyao.li@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-7.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+        d=1e100.net; s=20210112; t=1680148551;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+CVAOLuwD80Bd5PzmarfCnim42bOXcWvf05MWwjZBAE=;
+        b=PbcQ4AT4k69MfkrlW9mIneAa/vvAEnz5P4rguFNe/4XvDCNe/mo7XeowWlixq6mL6/
+         pl+z2Dalyohr7tVObu9tlj5QPqz1WZaPfIlZ+xw6OB+p/ZbF9ovUPvgrHeIbv/zZIUNl
+         KL5aJ03vTBiM85OAFPzGkAht9d81ExxzojfTVwWMcE+LvrpGOrE9fZUh0qYKTNbK3Nmt
+         9lXnmzueN0NMW6R9a/qw5D+n2EcW3OOwUD3sUe1ciT3HzT7YVFuaimhmO0VA+gI33kW4
+         6xzMlWH9BoNkd3NdcxQRvmMWthV83RJpivFKtJd96tVNdym6A8ImOWIW9Sh4nezgb3WM
+         7q+A==
+X-Gm-Message-State: AAQBX9dB9bkiR4pEyadvDUV1Y15sY7EZNNMtrsZ8v7ymVz0GYT0COS5d
+        R56dcEwUTpywgE1HwiItQ8XFbA==
+X-Google-Smtp-Source: AKy350YjIPGrObbdmLjCfoFpURisbH1QkXA0e533gkNFg4lYQooMr7BEnC8qsxqYUP8WeXbcWjqc9A==
+X-Received: by 2002:a17:903:12c6:b0:1a2:4b5:8677 with SMTP id io6-20020a17090312c600b001a204b58677mr23679plb.7.1680148551326;
+        Wed, 29 Mar 2023 20:55:51 -0700 (PDT)
+Received: from google.com (223.103.125.34.bc.googleusercontent.com. [34.125.103.223])
+        by smtp.gmail.com with ESMTPSA id n2-20020aa79042000000b00625e885a6ffsm13718927pfo.18.2023.03.29.20.55.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 29 Mar 2023 20:55:50 -0700 (PDT)
+Date:   Wed, 29 Mar 2023 20:55:46 -0700
+From:   Reiji Watanabe <reijiw@google.com>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev,
+        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Raghavendra Rao Anata <rananta@google.com>,
+        Will Deacon <will@kernel.org>, Rob Herring <robh@kernel.org>
+Subject: Re: [PATCH v1 2/2] KVM: arm64: PMU: Ensure to trap PMU access from
+ EL0 to EL2
+Message-ID: <20230330035546.zosorjtilwccvc4m@google.com>
+References: <20230329002136.2463442-1-reijiw@google.com>
+ <20230329002136.2463442-3-reijiw@google.com>
+ <86jzyzwyrd.wl-maz@kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <86jzyzwyrd.wl-maz@kernel.org>
+X-Spam-Status: No, score=-15.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,ENV_AND_HDR_SPF_MATCH,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL,
+        USER_IN_DEF_SPF_WL autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 30, 2023, Xiaoyao Li wrote:
-> On 3/30/2023 12:36 AM, Sean Christopherson wrote:
-> > On Wed, Mar 29, 2023, Xiaoyao Li wrote:
-> > > On 3/28/2023 11:07 PM, Sean Christopherson wrote:
-> > > > On Tue, Mar 28, 2023, Xiaoyao Li wrote:
-> > > > > On 3/28/2023 1:02 PM, Sean Christopherson wrote:
-> > > > > > Add a define for PRED_CMD_IBPB and use it to replace the open coded '1' in
-> > > > > > the nVMX library.
-> > > > > What does nVMX mean here?
-> > > > Nested VMX.  From KUT's perspective, the testing exists to validate KVM's nested
-> > > > VMX implementation.  If it's at all confusing, I'll drop the 'n'  And we've already
-> > > > established that KUT can be used on bare metal, even if that's not the primary use
-> > > > case.
-> > > So vmexit.flat is supposed to be ran in L1 VM?
-> > Not all of the tests can be run on bare metal, e.g. I can't imagine the VMware
-> > backdoor test works either.
-> > 
-> 
-> Sorry, I think neither I ask clearly nor you got my point.
-> 
-> You said "the testing exists to validate KVM's nested VMX implementation".
-> So I want to know what's the expected usage to run vmexit.flat.
-> 
-> If for nested, we need to first boot a VM and then inside the VM we run the
-> vmexit.flat with QEMU, right?
-> 
-> That's what confuses me. Isn't vmexit.flat supposed to be directly used on
-> the host with QEMU? In this case, nothing to do with nested.
+Hi Marc,
 
-Oof, my bad, I had a literacy problem.  I somehow read "vmx.c" instead of "vmexit.c",
-and never picked up on what you were saying.  I'll fix the changelog.
+On Wed, Mar 29, 2023 at 01:03:18PM +0100, Marc Zyngier wrote:
+> On Wed, 29 Mar 2023 01:21:36 +0100,
+> Reiji Watanabe <reijiw@google.com> wrote:
+> > 
+> > Currently, with VHE, KVM sets ER, CR, SW and EN bits of
+> > PMUSERENR_EL0 to 1 on vcpu_load().  So, if the value of those bits
+> > are cleared after vcpu_load() (the perf subsystem would do when PMU
+> > counters are programmed for the guest), PMU access from the guest EL0
+> > might be trapped to the guest EL1 directly regardless of the current
+> > PMUSERENR_EL0 value of the vCPU.
+> 
+> + RobH.
+> 
+> Is that what is done when the event is created and armv8pmu_start()
+> called? 
+
+Yes, that is it.
+
+> This is... crap. The EL0 access thing breaks everything, and
+> nobody tested it with KVM, obviously.
+
+It was a bit shocking, as we detected those EL0 related
+issues just with the first EL0 PMU test we ran...
+
+> 
+> I would be tempted to start mitigating it with the following:
+> 
+> diff --git a/arch/arm64/kernel/perf_event.c b/arch/arm64/kernel/perf_event.c
+> index dde06c0f97f3..8063525bf3dd 100644
+> --- a/arch/arm64/kernel/perf_event.c
+> +++ b/arch/arm64/kernel/perf_event.c
+> @@ -806,17 +806,19 @@ static void armv8pmu_disable_event(struct perf_event *event)
+>  
+>  static void armv8pmu_start(struct arm_pmu *cpu_pmu)
+>  {
+> -	struct perf_event_context *ctx;
+> -	int nr_user = 0;
+> +	if (sysctl_perf_user_access) {
+> +		struct perf_event_context *ctx;
+> +		int nr_user = 0;
+>  
+> -	ctx = perf_cpu_task_ctx();
+> -	if (ctx)
+> -		nr_user = ctx->nr_user;
+> +		ctx = perf_cpu_task_ctx();
+> +		if (ctx)
+> +			nr_user = ctx->nr_user;
+>  
+> -	if (sysctl_perf_user_access && nr_user)
+> -		armv8pmu_enable_user_access(cpu_pmu);
+> -	else
+> -		armv8pmu_disable_user_access();
+> +		if (nr_user)
+> +			armv8pmu_enable_user_access(cpu_pmu);
+> +		else
+> +			armv8pmu_disable_user_access();
+> +	}
+>  
+>  	/* Enable all counters */
+>  	armv8pmu_pmcr_write(armv8pmu_pmcr_read() | ARMV8_PMU_PMCR_E);
+> 
+> but that's obviously not enough as we want it to work with EL0 access
+> enabled on the host as well.
+
+Right, also with the change above, since PMUSERENR_EL0 isn't explicitly
+cleared, a perf client (EL0) might have an access to counters.
+(with the current code, a non-perf client might have an access to
+counters though)
+
+
+> What we miss is something that tells the PMU code "we're in a context
+> where host userspace isn't present", and this would be completely
+
+Could you please elaborate ?
+I'm not sure if I understand the above correctly.
+Since the task actually has the host userspace, which could be using
+the PMU, and both the host EL0 and guest EL0 events are associated with
+the task context of the perf_cpu_context, I think the "something" we
+want to say would be subtle (I would assume it is similar to what we
+meant with exclude_guest == 0 && exclude_host == 1 in the event attr
+for the guest, in terms of events?).
+
+
+> skipped, relying on KVM to restore the appropriate state on
+> vcpu_put(). But then the IPI stuff that controls EL0 can always come
+> in and wreck things. Gahhh...
+> 
+> I'm a bit reluctant to use the "save/restore all the time" hammer,
+> because it only hides that the EL0 counter infrastructure is a bit
+> broken.
+
+Looking at the current code only, since KVM directly silently
+modifies the PMU register (PMUSERENR_EL0) even though KVM is
+a client of the perf in general, my original thought was
+it made sense to have KVM restore the register value.
+
+
+> > With VHE, fix this by setting those bits of the register on every
+> > guest entry (as with nVHE).  Also, opportunistically make the similar
+> > change for PMSELR_EL0, which is cleared by vcpu_load(), to ensure it
+> > is always set to zero on guest entry (PMXEVCNTR_EL0 access might cause
+> > UNDEF at EL1 instead of being trapped to EL2, depending on the value
+> > of PMSELR_EL0).  I think that would be more robust, although I don't
+> > find any kernel code that writes PMSELR_EL0.
+> 
+> This was changed a while ago to avoid using the selection register,
+> see 0fdf1bb75953 ("arm64: perf: Avoid PMXEV* indirection"), and the
+> rationale behind the reset of PMSELR_EL0 in 21cbe3cc8a48 ("arm64: KVM:
+> pmu: Reset PMSELR_EL0.SEL to a sane value before entering the guest").
+> 
+> We *could* simply drop this zeroing of PMSELR_EL0 now that there is
+> nothing else host-side that writes to it. But we need to agree on how
+> to fix the above first.
+
+We don't have to clear PMSELR_EL0 on every guest entry,
+but I would think we still should do that at least in vcpu_load(),
+since now the host EL0 could have a direct access to PMSELR_EL0.
+(should be fine with the sane EL0 though)
+
+Thank you,
+Reiji
