@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E877B6D0D34
-	for <lists+kvm@lfdr.de>; Thu, 30 Mar 2023 19:56:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 871656D0D3B
+	for <lists+kvm@lfdr.de>; Thu, 30 Mar 2023 19:56:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232053AbjC3R4K (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Mar 2023 13:56:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34490 "EHLO
+        id S232433AbjC3R4Z (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Mar 2023 13:56:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34638 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229895AbjC3R4I (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 Mar 2023 13:56:08 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 104B6BBA9
-        for <kvm@vger.kernel.org>; Thu, 30 Mar 2023 10:56:02 -0700 (PDT)
+        with ESMTP id S232340AbjC3R4U (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 30 Mar 2023 13:56:20 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E815CA3F
+        for <kvm@vger.kernel.org>; Thu, 30 Mar 2023 10:56:19 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id A2EDA6212B
-        for <kvm@vger.kernel.org>; Thu, 30 Mar 2023 17:56:01 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 10E44C433D2;
-        Thu, 30 Mar 2023 17:56:01 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id BFA1A6212B
+        for <kvm@vger.kernel.org>; Thu, 30 Mar 2023 17:56:18 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 33C49C433EF;
+        Thu, 30 Mar 2023 17:56:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1680198961;
-        bh=ETE4NkzcVBB5u4wZ7R2/Y2Ryce5KP4uPdlVqwWT7r3A=;
+        s=k20201202; t=1680198978;
+        bh=dItKPt/faZM+g2W4tQMQlg9MnXhL+x6/Lr6mKjoHBhM=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=jH7mjHuAaKYiTSClO0Xw+hlx2mgYZkHRydF4zVlLMT94IaNTg+POBvwnZb4CmVM3+
-         UdvFE771VQ8Rq9F+PdzVn9HgoMW72SEWDONs+LUpJ9v/ZX7no2XH92EssgNBJPFwia
-         tJswRFYkHNP/Hdxlm8Ll4w/f1o9M7AECBsmi5UTl7hyEKuWhlCcUGfzXczi9NeLuCf
-         z041tPwrWI9iUKMSezw/FhVTlHyOv7S1LlOUo+KbjWGFExYmZfj/RUl1ODYLOT8TRT
-         +nDKTwZsTz/iR6hPdh4mI8CgdmeoeyFqbbfNWjw33EHLKdLbHCuHKJ68EmWsT0Uyrr
-         fZqxNrwERN72g==
+        b=LO4vJufwTiUGJBAKDi1Qg9DCd5Iaqx7QqN69vPQ/Asny/5vljnoiQEIYn6eiGB1Re
+         3IWNnjTt56wiWoEveLEh0WQ8BSgrCYgYTndUKmRgIwKG1ZD6cu/i/du/Jm7eJbTIPZ
+         hIyiXJq9VXVC22S6Fwn3hfkW+dUEDTHC1q3m+U2aXvDciVziswodRCTVzifV1AJL5p
+         p9JFzrTV8exV+cg6ULyB92O4wGeaOpDjPyhF72FL8MuxOT9Qxj/F3SHe1+EaiDsdQf
+         UpNzxtXryYKqMLdtoRtY1GffXldUAXdRAg3JaZpcuREKYsQKO2npNjtanygtZ3h/dS
+         Rrjin4kXAfdaA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1phwNc-004Rpa-Nz;
-        Thu, 30 Mar 2023 18:48:08 +0100
+        id 1phwNd-004Rpa-0V;
+        Thu, 30 Mar 2023 18:48:09 +0100
 From:   Marc Zyngier <maz@kernel.org>
 To:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
         linux-arm-kernel@lists.infradead.org
@@ -49,9 +49,9 @@ Cc:     James Morse <james.morse@arm.com>,
         Reiji Watanabe <reijiw@google.com>,
         Colton Lewis <coltonlewis@google.com>,
         Joey Gouly <joey.gouly@arm.com>, dwmw2@infradead.org
-Subject: [PATCH v4 19/20] KVM: arm64: selftests: Deal with spurious timer interrupts
-Date:   Thu, 30 Mar 2023 18:47:59 +0100
-Message-Id: <20230330174800.2677007-20-maz@kernel.org>
+Subject: [PATCH v4 20/20] KVM: arm64: selftests: Augment existing timer test to handle variable offset
+Date:   Thu, 30 Mar 2023 18:48:00 +0100
+Message-Id: <20230330174800.2677007-21-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230330174800.2677007-1-maz@kernel.org>
 References: <20230330174800.2677007-1-maz@kernel.org>
@@ -61,8 +61,8 @@ X-SA-Exim-Connect-IP: 185.219.108.64
 X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, ricarkol@google.com, sveith@amazon.de, reijiw@google.com, coltonlewis@google.com, joey.gouly@arm.com, dwmw2@infradead.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-2.5 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+X-Spam-Status: No, score=-5.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,SPF_HELO_NONE,
         SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -70,96 +70,76 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Make sure the timer test can properly handle a spurious timer
-interrupt, something that is far from being unlikely.
-
-This involves checking for the GIC IAR return value (don't bother
-handling the interrupt if it was spurious) as well as the timer
-control register (don't do anything if the interrupt is masked
-or the timer disabled). Take this opportunity to rewrite the
-timer handler in a more readable way.
-
-This solves a bunch of failures that creep up on systems that
-are slow to retire the interrupt, something that the GIC architecture
-makes no guarantee about.
+Allow a user to specify the global offset on the command-line.
 
 Reviewed-by: Colton Lewis <coltonlewis@google.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- .../selftests/kvm/aarch64/arch_timer.c        | 40 ++++++++++++-------
- 1 file changed, 25 insertions(+), 15 deletions(-)
+ tools/testing/selftests/kvm/aarch64/arch_timer.c | 16 +++++++++++++++-
+ 1 file changed, 15 insertions(+), 1 deletion(-)
 
 diff --git a/tools/testing/selftests/kvm/aarch64/arch_timer.c b/tools/testing/selftests/kvm/aarch64/arch_timer.c
-index 26556a266021..176ab41dd01b 100644
+index 176ab41dd01b..8ef370924a02 100644
 --- a/tools/testing/selftests/kvm/aarch64/arch_timer.c
 +++ b/tools/testing/selftests/kvm/aarch64/arch_timer.c
-@@ -121,25 +121,35 @@ static void guest_validate_irq(unsigned int intid,
- 	uint64_t xcnt = 0, xcnt_diff_us, cval = 0;
- 	unsigned long xctl = 0;
- 	unsigned int timer_irq = 0;
-+	unsigned int accessor;
+@@ -47,6 +47,7 @@ struct test_args {
+ 	int nr_iter;
+ 	int timer_period_ms;
+ 	int migration_freq_ms;
++	struct kvm_arm_counter_offset offset;
+ };
  
--	if (stage == GUEST_STAGE_VTIMER_CVAL ||
--		stage == GUEST_STAGE_VTIMER_TVAL) {
--		xctl = timer_get_ctl(VIRTUAL);
--		timer_set_ctl(VIRTUAL, CTL_IMASK);
--		xcnt = timer_get_cntct(VIRTUAL);
--		cval = timer_get_cval(VIRTUAL);
-+	if (intid == IAR_SPURIOUS)
-+		return;
-+
-+	switch (stage) {
-+	case GUEST_STAGE_VTIMER_CVAL:
-+	case GUEST_STAGE_VTIMER_TVAL:
-+		accessor = VIRTUAL;
- 		timer_irq = vtimer_irq;
--	} else if (stage == GUEST_STAGE_PTIMER_CVAL ||
--		stage == GUEST_STAGE_PTIMER_TVAL) {
--		xctl = timer_get_ctl(PHYSICAL);
--		timer_set_ctl(PHYSICAL, CTL_IMASK);
--		xcnt = timer_get_cntct(PHYSICAL);
--		cval = timer_get_cval(PHYSICAL);
-+		break;
-+	case GUEST_STAGE_PTIMER_CVAL:
-+	case GUEST_STAGE_PTIMER_TVAL:
-+		accessor = PHYSICAL;
- 		timer_irq = ptimer_irq;
--	} else {
-+		break;
-+	default:
- 		GUEST_ASSERT(0);
-+		return;
- 	}
+ static struct test_args test_args = {
+@@ -54,6 +55,7 @@ static struct test_args test_args = {
+ 	.nr_iter = NR_TEST_ITERS_DEF,
+ 	.timer_period_ms = TIMER_TEST_PERIOD_MS_DEF,
+ 	.migration_freq_ms = TIMER_TEST_MIGRATION_FREQ_MS,
++	.offset = { .reserved = 1 },
+ };
  
-+	xctl = timer_get_ctl(accessor);
-+	if ((xctl & CTL_IMASK) || !(xctl & CTL_ENABLE))
-+		return;
-+
-+	timer_set_ctl(accessor, CTL_IMASK);
-+	xcnt = timer_get_cntct(accessor);
-+	cval = timer_get_cval(accessor);
-+
- 	xcnt_diff_us = cycles_to_usec(xcnt - shared_data->xcnt);
+ #define msecs_to_usecs(msec)		((msec) * 1000LL)
+@@ -382,6 +384,13 @@ static struct kvm_vm *test_vm_create(void)
+ 	vm_init_descriptor_tables(vm);
+ 	vm_install_exception_handler(vm, VECTOR_IRQ_CURRENT, guest_irq_handler);
  
- 	/* Make sure we are dealing with the correct timer IRQ */
-@@ -148,6 +158,8 @@ static void guest_validate_irq(unsigned int intid,
- 	/* Basic 'timer condition met' check */
- 	GUEST_ASSERT_3(xcnt >= cval, xcnt, cval, xcnt_diff_us);
- 	GUEST_ASSERT_1(xctl & CTL_ISTATUS, xctl);
++	if (!test_args.offset.reserved) {
++		if (kvm_has_cap(KVM_CAP_COUNTER_OFFSET))
++			vm_ioctl(vm, KVM_ARM_SET_COUNTER_OFFSET, &test_args.offset);
++		else
++			TEST_FAIL("no support for global offset\n");
++	}
 +
-+	WRITE_ONCE(shared_data->nr_iter, shared_data->nr_iter + 1);
+ 	for (i = 0; i < nr_vcpus; i++)
+ 		vcpu_init_descriptor_tables(vcpus[i]);
+ 
+@@ -413,6 +422,7 @@ static void test_print_help(char *name)
+ 		TIMER_TEST_PERIOD_MS_DEF);
+ 	pr_info("\t-m: Frequency (in ms) of vCPUs to migrate to different pCPU. 0 to turn off (default: %u)\n",
+ 		TIMER_TEST_MIGRATION_FREQ_MS);
++	pr_info("\t-o: Counter offset (in counter cycles, default: 0)\n");
+ 	pr_info("\t-h: print this help screen\n");
  }
  
- static void guest_irq_handler(struct ex_regs *regs)
-@@ -158,8 +170,6 @@ static void guest_irq_handler(struct ex_regs *regs)
+@@ -420,7 +430,7 @@ static bool parse_args(int argc, char *argv[])
+ {
+ 	int opt;
  
- 	guest_validate_irq(intid, shared_data);
- 
--	WRITE_ONCE(shared_data->nr_iter, shared_data->nr_iter + 1);
--
- 	gic_set_eoi(intid);
- }
- 
+-	while ((opt = getopt(argc, argv, "hn:i:p:m:")) != -1) {
++	while ((opt = getopt(argc, argv, "hn:i:p:m:o:")) != -1) {
+ 		switch (opt) {
+ 		case 'n':
+ 			test_args.nr_vcpus = atoi_positive("Number of vCPUs", optarg);
+@@ -439,6 +449,10 @@ static bool parse_args(int argc, char *argv[])
+ 		case 'm':
+ 			test_args.migration_freq_ms = atoi_non_negative("Frequency", optarg);
+ 			break;
++		case 'o':
++			test_args.offset.counter_offset = strtol(optarg, NULL, 0);
++			test_args.offset.reserved = 0;
++			break;
+ 		case 'h':
+ 		default:
+ 			goto err;
 -- 
 2.34.1
 
