@@ -2,25 +2,25 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BDEC06D0C6E
-	for <lists+kvm@lfdr.de>; Thu, 30 Mar 2023 19:14:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 14E066D0C6F
+	for <lists+kvm@lfdr.de>; Thu, 30 Mar 2023 19:14:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231722AbjC3ROC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Mar 2023 13:14:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44778 "EHLO
+        id S231761AbjC3ROD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Mar 2023 13:14:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44798 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230123AbjC3RN6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 Mar 2023 13:13:58 -0400
+        with ESMTP id S231869AbjC3ROA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 30 Mar 2023 13:14:00 -0400
 Received: from APC01-PSA-obe.outbound.protection.outlook.com (mail-psaapc01olkn2057.outbound.protection.outlook.com [40.92.52.57])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F18B26BA
-        for <kvm@vger.kernel.org>; Thu, 30 Mar 2023 10:13:57 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83452526F
+        for <kvm@vger.kernel.org>; Thu, 30 Mar 2023 10:13:58 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=VwWX6cJGrh4MsOwme28nPYP3ij282TC7Ub7VWxh+fR5BC6HNWXCMigclkHSm4aglW0ccS+xVQIOXEwI73uJulqACuKsxsTHIQ3zO1CBM3lbUvnqdrl7MSZHerJk5DbBtV8JL4huJFBF2+fCOr+KCYY0eNKenTteP06cY+u3EpKFcMaF+tVljUI9mnjQnLO4f86uAQCKwCsQ8TkUxjVL/oFWMTHQnLkd7KZ1K8UDdFKZVL6IR7v8keJcNbw+NCn/azmoivF8S+4O+MyVncz3WL1bkNJfhUvhUEr+my9vQaFzwe38HkWzJSk2M5ggQfbB+9B9kX7dIcfOOLArlTXCuAg==
+ b=Xup6gnUagzRneR4yaqeu1d2gEWWnEQCbz//6o3WnZZM0rWBgJHcF3q3Bk9dG3D/832QcuVy79+j4Rwg9ItaD5m3pyQXbJn0WulYBnzJM7FnzHVsKYGHFI4Jd3gHL69bbflrTqg4qrRzCYwASDfWJJLgKlQmvwFY5hubbCpIQ7fZRX78nV3A29HyrjfKMDVN5j8/59EY5WBeycPL6/Wjj8h6n0mgIKchyPGdWbTDi90Unvrmqkoc5//QN3B69p0NX7qGkCT0X3yWZuIplB/1nia7G+ABRKnqVuQ9fdSulEuJ59Uh8BpY/Q9picvfdWp2ATiTCxv7ro3+zxhGZNn194w==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=MDHqcmQRPGkUdd5Ety8ynIkDpC4OBcxd3mYN7rx0y9U=;
- b=XwhsomZi3tuQg9Smi44wJSAbFetSODPmO+Mm30Ald84oxxTOR1HQMK5QIKWcxpvs+PnCKKinbpKThLixlrw0ECygmddEKsvr4A6YSPXO95N2jkc8MudXOWsFZHkstovIHjVXynnI5xo5tWJoYNdhar34XkbTMreiwiYeTp+Z44VlOtSMX7rA/4vaQfnWyIOsJzOrjt6aWn6xK5E//CppWqIMRa3MOk5bYLp1wGy8H+IBZMwecmPop6vg+PPw4YaYlZNEKxHLiOUc0eeKxjll/njSwUSLbkhuAuZ2nZPknsNk8UNhtjEeoAxeR7lxAc0T5kucWsI6SCr1h5goe28i0w==
+ bh=fG5SDjiuVVhnlTF1nIrshKxcRESD8BJ2GE+gdl4vSUg=;
+ b=eWarKXNyAXNXwn15o9yYb6edjZXe5RnMKAej2Rm9ASMZj6HkFtEHefOuAgczqpjhcQera3HMGCWsc2CvU0hrK6sxF1ECLKDwCpnQ7GYGjD6XsarRei7zuflyoiwJKxnwJJDgpu9sAv3/FCQ8fk90feM+LFtb+k/J+qNM1zlqdCNflc0sfLeT4O7bz73GHMKD+wLW0+KZeqSA0A7pL+OK2eP67b+gUkKSyKwQsC8RlHcSoCj8dW3c8LoYnKgqJvBdiOhZ422UHnGRTnTccsDqoUSCC7wOm5nDpbPGXF+wh6dE+CGrBq6ZCibq82ZioFI/eBIKZN2JGmnqO7nbrsefpQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
  dkim=none; arc=none
 Received: from TYZPR06MB5418.apcprd06.prod.outlook.com (2603:1096:400:202::7)
@@ -38,56 +38,60 @@ Cc:     =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
         =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
         Yohei Kojima <y-koj@outlook.jp>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        kvm@vger.kernel.org (open list:Overall KVM CPUs)
-Subject: [PATCH v3 3/4] accel: replace strerror() function to the thread safe qemu_strerror()
-Date:   Fri, 31 Mar 2023 02:13:21 +0900
-Message-ID: <TYZPR06MB54184091F777130BFE71A8E99D8E9@TYZPR06MB5418.apcprd06.prod.outlook.com>
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Paul Durrant <paul@xen.org>,
+        Reinoud Zandijk <reinoud@netbsd.org>,
+        Sunil Muthuswamy <sunilmut@microsoft.com>,
+        kvm@vger.kernel.org (open list:X86 KVM CPUs)
+Subject: [PATCH v3 4/4] target/i386: replace strerror() function to the thread safe qemu_strerror()
+Date:   Fri, 31 Mar 2023 02:13:22 +0900
+Message-ID: <TYZPR06MB5418EC16ECFE6A7C228786A89D8E9@TYZPR06MB5418.apcprd06.prod.outlook.com>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <TYZPR06MB5418D71BB6F2BBFD80C01E559D8E9@TYZPR06MB5418.apcprd06.prod.outlook.com>
 References: <TYZPR06MB5418D71BB6F2BBFD80C01E559D8E9@TYZPR06MB5418.apcprd06.prod.outlook.com>
 Content-Transfer-Encoding: 7BIT
 Content-Type:   text/plain; charset=US-ASCII
-X-TMN:  [vH8xj3oNC7xQ1H5dSxnWevjpAJ1zD1NOwxm3XHHcetexZkovbrXZN4/c4I9uAZ9Y]
+X-TMN:  [UzUmQXPXUXzI9Crkq/QWU5gbtawtcj26GTvpBxxNX9+QaGbt7HV1TiV9FfOwAJSG]
 X-ClientProxiedBy: TYCP286CA0133.JPNP286.PROD.OUTLOOK.COM
  (2603:1096:400:2b6::20) To TYZPR06MB5418.apcprd06.prod.outlook.com
  (2603:1096:400:202::7)
-X-Microsoft-Original-Message-ID: <62bcf6eee9f60dfad0c6fd878e350ee941b4baea.1680195348.git.y-koj@outlook.jp>
+X-Microsoft-Original-Message-ID: <4594055207c9fd24c2429059cd8b300b3675b93d.1680195348.git.y-koj@outlook.jp>
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: TYZPR06MB5418:EE_|TY0PR06MB5331:EE_
-X-MS-Office365-Filtering-Correlation-Id: 0db8d1f7-076f-43ec-7f01-08db3142230c
+X-MS-Office365-Filtering-Correlation-Id: 9081d0cd-54d5-4ddd-a555-08db3142234a
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: ZVJInF9G7VtDIjsZZJkngPjrvHkSS8X686rn4jhlLv2iOOQ/cGPduB6ZE97fQAnHStNwm8jcWhqt6HRmhAxLrIEP0AAedvZUhWLMbJWe3MmagEBVC6Rzt8cyJGk1+1yIHAx3AaWEz8fiIOW2FduL1dt2XHwRJX35tv+ME9hO29f0soGZqxpU01/FFWsMVlIbyfCyuq8kIb4ckykO/a3QloFzVkq3mmXBATT5l+LUKAFghHet1PedSShOuL5SNVoXdiYZCjzY38X1GxD/iARrEQKKBLBeEreUeBeKLK9BObVy9Z9f9lzjgtQGJo+wXdY57/47cCvs6H3Usf5Eh4fxHWBk1TfeZi7YWZmmop4ycCbfjZ6n8SAgBMH/Ud+4qtKwlElpjiF6Tu5MIvknEX3dPLO16180nKLGHwETirJeNFUzi+awmw+nMRRJuz97kVbFj3UxnMAIP9AQX8gyXyBGP/AWYLti+p+sy+poEPgyK7z6b4an7ppAsW2rsZ7zLC3ULoSQerUX3M5iT0m3ArHvLiGFYJGAUlku6fIl1UYqwzaLOdVHKNkKCvqE8YgE3B8NvwHuOUeeUKgjqudnZH/vZHjPHHJoorfgs3pOuj789ms=
+X-Microsoft-Antispam-Message-Info: lkJ0i8v9Kp7AMJp/JtNMzZpm4I8Z9+8uvl44+Xi5387v4AdlL5wANexy0azBV3wM1muGNu7UMc4FePNE2CGvQbOt/pCTqN36ifzuDkfvqOOVJQMM4DY+U3LZWq5GSKU7qZ35itE7Uvu49liFSr+IBSDhjmeW3t8nwzmoLqQm4WPUIE5TQ07aV4mRHi4wY5bZ9xWVfXaf3HoqNmU0+lzdtfsMSRruTCxT7leJcx8EVmPP1dbe9hQnPhQDtTBjaRfElIPM7caj1ly9g9SfySqlw0z1RGsDKMziXCjOsNBmlLB8amg3DeQ4sSIsg9zrClJjuMbdGPnzwcDpbfxjL6mpNxP39yo1o0zMVWaMXnF9+fff9m5Ho9tHrifgrOl3kPvkDvZPs1IZzokFET3zC/uWsED3+TSoI9xr7kAqCsjKb1gvubEN/Owy2yCUq0Unefxp5qBF4gpJDw8gnvYfnJpXyyvjw/GbUQ0uUKWM6RLK/H7c9aFHAeL8hhmUvxcsCZWHOz3ibuHLHo7EvkAwInsK+oXgsElfgrnDweqnIpNuJlWb206rRhJRuYE+ClgOz5JUXzQdsz3Wo5RvCMI1cwBsZEAiTWF5EutYxSv1DF4jG/8=
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?5G3ns7+z71PqnY00gAp4d3FH3vJwbXlEiYZnOTp5gyS+qkmNdWtXWc32pvye?=
- =?us-ascii?Q?UtdWBB88cYDmUDnRXO8fJanq5gyoQU2kWIH+Jy+tg1CihkEA/gSmZfEzwNwx?=
- =?us-ascii?Q?Wo4GXdtzfxM2yyZxbSFvqJJKDpHXx7jDibyHuSM71Fgxxae3P6jU8qoJ/0MN?=
- =?us-ascii?Q?h8UJNFam3cjZdmZ6Ngwlu7AbrPqieTsmbztJPXogOvLpE7gYMiVSJeQTDdpH?=
- =?us-ascii?Q?PQoWjFhvUg8ElOKwZRp7mItN9hjXjvK4WXvDKFkLFgrqCs7eXODmBBASfSL1?=
- =?us-ascii?Q?46NTjbSdfHJT9zv2/8oce+KGIGBGoNP3HjXV8O3mmL6cgniBYl0HuyFA64Vy?=
- =?us-ascii?Q?i8rkJkfWfDDh/hkPS0gOjF3ZNNg50AOIgM6J6Wgkl/Hbknr8HkcI+FBOqfqM?=
- =?us-ascii?Q?jFI4GgKoAuZOOKkzX9rgYcYgq5t4Z/v+Y/S1tqNctiEOthhMDzuCvvxKq7AO?=
- =?us-ascii?Q?4kcz3Jp/0E2xbNi8xMXNmcSc2/4JZvfIbSW/sqSoTARGjztrn+lTH8MbGstg?=
- =?us-ascii?Q?BKB5qfWJsMGqeqbcIvWMqYPRLi0s8lgE1+aJemz9crzz7kcc1e08GKPZflDN?=
- =?us-ascii?Q?mRGaQJn37Zeurw9K99iwB8+cHblUvbYTchWEdsXOx6KJ2yAgAMire1P3lkUf?=
- =?us-ascii?Q?Jne+ijmzGK82OzNS843KmnuusJwoA9m3zSBAxDDDCZYFiZBYwafwhoutm5Bm?=
- =?us-ascii?Q?2JCWP1O7lQQfkks59aWiNmCAS0RKNW4hwGEh7jIW+uGAMyyTgGDk3qUpPRJi?=
- =?us-ascii?Q?S4jrvY5RdhMrJQ45B3LSJjcz2dzkm1oSurUrlw46UAhNgIsKeNR4QAQZ3RTl?=
- =?us-ascii?Q?Njq+yrG453b2bBpjvecV39o4nKpatE/zUSSZNsNRRnvJdxTnCgDbdk6jAciY?=
- =?us-ascii?Q?R0bIJSOz751jOlNP83YfHWNNAESSxjvIjZWiaGAPYTBhF6TQXrWcDj9Ezk7K?=
- =?us-ascii?Q?owYQwvwXdp8FxjibBPfQOcx5MO54gkMVswWo2l2lPhy2hVkAxdEaDpLbcKGs?=
- =?us-ascii?Q?phyNfVehz/qN+lLIOb9EoQWcbR4Gh++M9CgkkuLjPqY/eUyuwbFqoIRleKZK?=
- =?us-ascii?Q?mYi/QlOtdNRZVOD90bqX3aDZs4ycrJ3gXYIDknkr3voeODVKKhfe4E0imSFM?=
- =?us-ascii?Q?cjflmRZqd9KafGwLncEHDIKdRla1FvZp9LPAYzndnreuZACM5P/lYK+HsEKd?=
- =?us-ascii?Q?TeD6xaz4ZEZlOMVko1zCTCdhEK2nLdA/Jub/7CJLopi1Nxry9LU0Y+Wqzwos?=
- =?us-ascii?Q?IQdYEs8AlTeaBWqHf7jInfSo9gs1+pyZz33lomvNWw=3D=3D?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?bbuyvUCq37LdVMbBgefO3xx5JoRBFFDzUASGWhLom69e/nY/J0x33KTt8ycI?=
+ =?us-ascii?Q?QygD7xl26Ag2JKnVA95i6ojfEF/5KvnU6WI1jHFLJnn2xNqmGpOmbi1Z9R3H?=
+ =?us-ascii?Q?7tORjJqevjuvl17INHVr1HgOxM2DMnZCWDdspJP7GWrmQHOtYs3niOlOuKM5?=
+ =?us-ascii?Q?4NEyi3GhEgrC8sd11f6go50CTXqwT/qhkiMSXNUP5m9iEYNW+Yh/dwpcoyQi?=
+ =?us-ascii?Q?nCP/TQ2K0HHtiuH+pQlRoIsrSRHhP7JLOr3t2rTpB5M7FHT9zwYM91taZD8x?=
+ =?us-ascii?Q?gZtMlX0RRD0CISk56pSLNgusVxlG+0l+ohRobd3+udN5t3H2+IybczglQP3J?=
+ =?us-ascii?Q?rgsH2RtrQsOS3KrfsMCvodl8kccvzGMZVS+I8hS5+Y3hrl9gTgWTlzJhmHC3?=
+ =?us-ascii?Q?9kfNhhe+LNQCgIuHONGoptP/jShs/8ExL2ztjWyqXC7BXitVjsSlu3+qfHev?=
+ =?us-ascii?Q?M9D/S/iN+5q5IXSnf5LGpCk9PFwJmdh+tS+sSPGOreKqIZiv4BRJ7G2XOWWC?=
+ =?us-ascii?Q?2A3hI+/s9KWkm4N7yadwDW4rB5HLjVzpC4yMVqRORCsx1oS7+CHlZBX7HDOm?=
+ =?us-ascii?Q?3/+eC57f6piQEvJOE+6W6KEf76gdTtMHZoE0xKuoz9wJ+NzftLDU7PeANv6r?=
+ =?us-ascii?Q?tpeH17A6ycICTJFm7RcQPkWpWexrihCjgdTSK73PMFLHXKhc6elcZhpZHrc/?=
+ =?us-ascii?Q?SNTB1JOrTk46Ol8XF8BL6cUR1KrlcJG5ZI9Y8Ci3KT178t+gxw8ncMNROkPH?=
+ =?us-ascii?Q?XpSALAgxTkJ4NN4c9tmafcmpa1qaeoBkHkQqIsuRnUn5EzS6H26vEyE/qQxE?=
+ =?us-ascii?Q?yYTNRnJA7Ig8OjqYLS3QdRSl/apCxIP7JdAQAYDCsN+Kos5FRmNA9w+fPhEY?=
+ =?us-ascii?Q?eTjfrCm56WWFpXNnZKzFSJ+YXYG9TzqhBdkZMOV1aUQYGBnVsyTnivl551sa?=
+ =?us-ascii?Q?HxcqGNpMO3PElhmoWz6Ors6c6noVO1qx2XDlXQ9eZJ+vFmXkPOfZhBo/NRSo?=
+ =?us-ascii?Q?yt9nvCyvd9WDPV+gbrr9b27fo9WupydN8W8U0Vp2x28iQdwbQwIjtuySdygw?=
+ =?us-ascii?Q?8CEzA+7ZAIE5mSLZjiBCb43MyenpFVroGbaHspwWfXw6z2RIp43+8QyXYe0a?=
+ =?us-ascii?Q?9rWS7UxzyUIP1hx78N1MlU/gJRSI7Um06uCqkyYWlM5qftO6GWGvW0aabmTq?=
+ =?us-ascii?Q?AcS+nqJUBa8eY7E7AmPYb4bbIf6YcLCQ0t5XzqRdWpfmdNx+yK3elQJBygf2?=
+ =?us-ascii?Q?O9XuZc0ytkqXA6rgrCUGPBPk45S5ZVJyy1+nEMuDDg=3D=3D?=
 X-OriginatorOrg: sct-15-20-4755-11-msonline-outlook-3208f.templateTenant
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0db8d1f7-076f-43ec-7f01-08db3142230c
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9081d0cd-54d5-4ddd-a555-08db3142234a
 X-MS-Exchange-CrossTenant-AuthSource: TYZPR06MB5418.apcprd06.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Mar 2023 17:13:52.9980
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Mar 2023 17:13:53.3973
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
@@ -105,217 +109,334 @@ X-Mailing-List: kvm@vger.kernel.org
 strerror() is not guaranteed to be thread-safe as described in
 (https://gitlab.com/qemu-project/qemu/-/issues/416).
 
-This commit changes files under /accel that call strerror() to call
-the safer qemu_strerror().
+This commit changes files under /target/i386 that call strerror() to
+call the safer qemu_strerror().
 
 Signed-off-by: Yohei Kojima <y-koj@outlook.jp>
 ---
- accel/kvm/kvm-all.c | 32 ++++++++++++++++++--------------
- accel/tcg/cputlb.c  |  3 ++-
- accel/tcg/perf.c    |  7 ++++---
- 3 files changed, 24 insertions(+), 18 deletions(-)
+ target/i386/kvm/kvm.c             | 49 ++++++++++++++++---------------
+ target/i386/kvm/xen-emu.c         |  7 +++--
+ target/i386/nvmm/nvmm-accel-ops.c |  2 +-
+ target/i386/sev.c                 |  5 ++--
+ target/i386/whpx/whpx-accel-ops.c |  2 +-
+ 5 files changed, 35 insertions(+), 30 deletions(-)
 
-diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index f2a6ea6a68..b3dc7743db 100644
---- a/accel/kvm/kvm-all.c
-+++ b/accel/kvm/kvm-all.c
-@@ -22,6 +22,7 @@
- #include "qemu/atomic.h"
- #include "qemu/option.h"
+diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
+index de531842f6..b31810f108 100644
+--- a/target/i386/kvm/kvm.c
++++ b/target/i386/kvm/kvm.c
+@@ -41,6 +41,7 @@
+ #include "qemu/main-loop.h"
+ #include "qemu/ratelimit.h"
  #include "qemu/config-file.h"
 +#include "qemu/cutils.h"
  #include "qemu/error-report.h"
- #include "qapi/error.h"
- #include "hw/pci/msi.h"
-@@ -315,7 +316,7 @@ err:
-         error_report("%s: KVM_SET_USER_MEMORY_REGION failed, slot=%d,"
-                      " start=0x%" PRIx64 ", size=0x%" PRIx64 ": %s",
-                      __func__, mem.slot, slot->start_addr,
--                     (uint64_t)mem.memory_size, strerror(errno));
-+                     (uint64_t)mem.memory_size, qemu_strerror(errno));
-     }
-     return ret;
- }
-@@ -1366,7 +1367,7 @@ static void kvm_set_phys_mem(KVMMemoryListener *kml,
-             err = kvm_set_user_memory_region(kml, mem, false);
-             if (err) {
-                 fprintf(stderr, "%s: error unregistering slot: %s\n",
--                        __func__, strerror(-err));
-+                        __func__, qemu_strerror(-err));
-                 abort();
-             }
-             start_addr += slot_size;
-@@ -1389,7 +1390,7 @@ static void kvm_set_phys_mem(KVMMemoryListener *kml,
-         err = kvm_set_user_memory_region(kml, mem, true);
-         if (err) {
-             fprintf(stderr, "%s: error registering slot: %s\n", __func__,
--                    strerror(-err));
-+                    qemu_strerror(-err));
-             abort();
-         }
-         start_addr += slot_size;
-@@ -1613,7 +1614,7 @@ static void kvm_mem_ioeventfd_add(MemoryListener *listener,
-                                match_data);
-     if (r < 0) {
-         fprintf(stderr, "%s: error adding ioeventfd: %s (%d)\n",
--                __func__, strerror(-r), -r);
-+                __func__, qemu_strerror(-r), -r);
-         abort();
-     }
- }
-@@ -1649,7 +1650,7 @@ static void kvm_io_ioeventfd_add(MemoryListener *listener,
-                               match_data);
-     if (r < 0) {
-         fprintf(stderr, "%s: error adding ioeventfd: %s (%d)\n",
--                __func__, strerror(-r), -r);
-+                __func__, qemu_strerror(-r), -r);
-         abort();
-     }
- }
-@@ -1668,7 +1669,7 @@ static void kvm_io_ioeventfd_del(MemoryListener *listener,
-                               match_data);
-     if (r < 0) {
-         fprintf(stderr, "%s: error deleting ioeventfd: %s (%d)\n",
--                __func__, strerror(-r), -r);
-+                __func__, qemu_strerror(-r), -r);
-         abort();
-     }
- }
-@@ -2278,7 +2279,8 @@ static void kvm_irqchip_create(KVMState *s)
-     } else if (kvm_check_extension(s, KVM_CAP_S390_IRQCHIP)) {
-         ret = kvm_vm_enable_cap(s, KVM_CAP_S390_IRQCHIP, 0);
-         if (ret < 0) {
--            fprintf(stderr, "Enable kernel irqchip failed: %s\n", strerror(-ret));
-+            fprintf(stderr, "Enable kernel irqchip failed: %s\n",
-+                    qemu_strerror(-ret));
+ #include "qemu/memalign.h"
+ #include "hw/i386/x86.h"
+@@ -275,7 +276,7 @@ static struct kvm_cpuid2 *try_get_cpuid(KVMState *s, int max)
+             return NULL;
+         } else {
+             fprintf(stderr, "KVM_GET_SUPPORTED_CPUID failed: %s\n",
+-                    strerror(-r));
++                    qemu_strerror(-r));
              exit(1);
          }
-     } else {
-@@ -2297,7 +2299,8 @@ static void kvm_irqchip_create(KVMState *s)
+     }
+@@ -519,7 +520,7 @@ uint64_t kvm_arch_get_supported_msr_feature(KVMState *s, uint32_t index)
+     ret = kvm_ioctl(s, KVM_GET_MSRS, &msr_data);
+     if (ret != 1) {
+         error_report("KVM get MSR (index=0x%x) feature failed, %s",
+-            index, strerror(-ret));
++            index, qemu_strerror(-ret));
+         exit(1);
+     }
+ 
+@@ -1055,7 +1056,7 @@ static struct kvm_cpuid2 *try_get_hv_cpuid(CPUState *cs, int max,
+             return NULL;
+         } else {
+             fprintf(stderr, "KVM_GET_SUPPORTED_HV_CPUID failed: %s\n",
+-                    strerror(-r));
++                    qemu_strerror(-r));
+             exit(1);
          }
      }
-     if (ret < 0) {
--        fprintf(stderr, "Create kernel irqchip failed: %s\n", strerror(-ret));
-+        fprintf(stderr, "Create kernel irqchip failed: %s\n",
-+                qemu_strerror(-ret));
-         exit(1);
-     }
+@@ -1642,7 +1643,7 @@ static int hyperv_init_vcpu(X86CPU *cpu)
+         ret = kvm_vcpu_enable_cap(cs, synic_cap, 0);
+         if (ret < 0) {
+             error_report("failed to turn on HyperV SynIC in KVM: %s",
+-                         strerror(-ret));
++                         qemu_strerror(-ret));
+             return ret;
+         }
  
-@@ -2446,7 +2449,7 @@ static int kvm_init(MachineState *ms)
- 
-     if (ret < 0) {
-         fprintf(stderr, "ioctl(KVM_CREATE_VM) failed: %d %s\n", -ret,
--                strerror(-ret));
-+                qemu_strerror(-ret));
- 
- #ifdef TARGET_S390X
-         if (ret == -EINVAL) {
-@@ -2532,7 +2535,8 @@ static int kvm_init(MachineState *ms)
-             ret = kvm_vm_enable_cap(s, KVM_CAP_DIRTY_LOG_RING, 0, ring_bytes);
-             if (ret) {
-                 error_report("Enabling of KVM dirty ring failed: %s. "
--                             "Suggested minimum value is 1024.", strerror(-ret));
-+                             "Suggested minimum value is 1024.",
+@@ -1650,7 +1651,7 @@ static int hyperv_init_vcpu(X86CPU *cpu)
+             ret = hyperv_x86_synic_add(cpu);
+             if (ret < 0) {
+                 error_report("failed to create HyperV SynIC: %s",
+-                             strerror(-ret));
 +                             qemu_strerror(-ret));
-                 goto err;
+                 return ret;
              }
- 
-@@ -2949,7 +2953,7 @@ int kvm_cpu_exec(CPUState *cpu)
-                 break;
-             }
-             fprintf(stderr, "error: kvm run failed %s\n",
--                    strerror(-run_ret));
-+                    qemu_strerror(-run_ret));
- #ifdef TARGET_PPC
-             if (run_ret == -EBUSY) {
-                 fprintf(stderr,
-@@ -3455,7 +3459,7 @@ void kvm_init_cpu_signals(CPUState *cpu)
-         r = kvm_set_signal_mask(cpu, &set);
+         }
+@@ -1689,7 +1690,7 @@ static int hyperv_init_vcpu(X86CPU *cpu)
+         ret = kvm_vcpu_enable_cap(cs, KVM_CAP_HYPERV_ENFORCE_CPUID, 0, 1);
+         if (ret < 0) {
+             error_report("failed to enable KVM_CAP_HYPERV_ENFORCE_CPUID: %s",
+-                         strerror(-ret));
++                         qemu_strerror(-ret));
+             return ret;
+         }
      }
-     if (r) {
--        fprintf(stderr, "kvm_set_signal_mask: %s\n", strerror(-r));
-+        fprintf(stderr, "kvm_set_signal_mask: %s\n", qemu_strerror(-r));
-         exit(1);
-     }
- }
-@@ -3538,7 +3542,7 @@ int kvm_set_one_reg(CPUState *cs, uint64_t id, void *source)
-     reg.addr = (uintptr_t) source;
-     r = kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &reg);
-     if (r) {
--        trace_kvm_failed_reg_set(id, strerror(-r));
-+        trace_kvm_failed_reg_set(id, qemu_strerror(-r));
-     }
-     return r;
- }
-@@ -3552,7 +3556,7 @@ int kvm_get_one_reg(CPUState *cs, uint64_t id, void *target)
-     reg.addr = (uintptr_t) target;
-     r = kvm_vcpu_ioctl(cs, KVM_GET_ONE_REG, &reg);
-     if (r) {
--        trace_kvm_failed_reg_get(id, strerror(-r));
-+        trace_kvm_failed_reg_get(id, qemu_strerror(-r));
-     }
-     return r;
- }
-diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
-index e984a98dc4..6cf888cdf1 100644
---- a/accel/tcg/cputlb.c
-+++ b/accel/tcg/cputlb.c
-@@ -40,6 +40,7 @@
- #include "qemu/plugin-memory.h"
- #endif
- #include "tcg/tcg-ldst.h"
-+#include "qemu/cutils.h"
- 
- /* DEBUG defines, enable DEBUG_TLB_LOG to log to the CPU_LOG_MMU target */
- /* #define DEBUG_TLB */
-@@ -215,7 +216,7 @@ static void tlb_mmu_resize_locked(CPUTLBDesc *desc, CPUTLBDescFast *fast,
-      */
-     while (fast->table == NULL || desc->fulltlb == NULL) {
-         if (new_size == (1 << CPU_TLB_DYN_MIN_BITS)) {
--            error_report("%s: %s", __func__, strerror(errno));
-+            error_report("%s: %s", __func__, qemu_strerror(errno));
+@@ -1918,7 +1919,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
+         if (r < 0) {
+             fprintf(stderr,
+                     "failed to enable KVM_CAP_ENFORCE_PV_FEATURE_CPUID: %s",
+-                    strerror(-r));
++                    qemu_strerror(-r));
              abort();
          }
-         new_size = MAX(new_size >> 1, 1 << CPU_TLB_DYN_MIN_BITS);
-diff --git a/accel/tcg/perf.c b/accel/tcg/perf.c
-index 65e35ea3b9..0c7a3a8822 100644
---- a/accel/tcg/perf.c
-+++ b/accel/tcg/perf.c
-@@ -13,6 +13,7 @@
- #include "exec/exec-all.h"
- #include "qemu/timer.h"
- #include "tcg/tcg.h"
+     }
+@@ -2156,7 +2157,8 @@ int kvm_arch_init_vcpu(CPUState *cs)
+ 
+         ret = kvm_get_mce_cap_supported(cs->kvm_state, &mcg_cap, &banks);
+         if (ret < 0) {
+-            fprintf(stderr, "kvm_get_mce_cap_supported: %s", strerror(-ret));
++            fprintf(stderr, "kvm_get_mce_cap_supported: %s",
++                    qemu_strerror(-ret));
+             return ret;
+         }
+ 
+@@ -2179,7 +2181,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
+         env->mcg_cap &= mcg_cap | MCG_CAP_BANKS_MASK;
+         ret = kvm_vcpu_ioctl(cs, KVM_X86_SETUP_MCE, &env->mcg_cap);
+         if (ret < 0) {
+-            fprintf(stderr, "KVM_X86_SETUP_MCE: %s", strerror(-ret));
++            fprintf(stderr, "KVM_X86_SETUP_MCE: %s", qemu_strerror(-ret));
+             return ret;
+         }
+     }
+@@ -2354,7 +2356,7 @@ static int kvm_get_supported_feature_msrs(KVMState *s)
+     ret = kvm_ioctl(s, KVM_GET_MSR_FEATURE_INDEX_LIST, &msr_list);
+     if (ret < 0 && ret != -E2BIG) {
+         error_report("Fetch KVM feature MSR list failed: %s",
+-            strerror(-ret));
++            qemu_strerror(-ret));
+         return ret;
+     }
+ 
+@@ -2367,7 +2369,7 @@ static int kvm_get_supported_feature_msrs(KVMState *s)
+ 
+     if (ret < 0) {
+         error_report("Fetch KVM feature MSR list failed: %s",
+-            strerror(-ret));
++            qemu_strerror(-ret));
+         g_free(kvm_feature_msrs);
+         kvm_feature_msrs = NULL;
+         return ret;
+@@ -2595,7 +2597,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+         ret = kvm_vm_enable_cap(s, KVM_CAP_EXCEPTION_PAYLOAD, 0, true);
+         if (ret < 0) {
+             error_report("kvm: Failed to enable exception payload cap: %s",
+-                         strerror(-ret));
++                         qemu_strerror(-ret));
+             return ret;
+         }
+     }
+@@ -2605,7 +2607,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+         ret = kvm_vm_enable_cap(s, KVM_CAP_X86_TRIPLE_FAULT_EVENT, 0, true);
+         if (ret < 0) {
+             error_report("kvm: Failed to enable triple fault event cap: %s",
+-                         strerror(-ret));
++                         qemu_strerror(-ret));
+             return ret;
+         }
+     }
+@@ -2707,7 +2709,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+                                 disable_exits);
+         if (ret < 0) {
+             error_report("kvm: guest stopping CPU not supported: %s",
+-                         strerror(-ret));
++                         qemu_strerror(-ret));
+         }
+     }
+ 
+@@ -2724,7 +2726,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+                                     KVM_BUS_LOCK_DETECTION_EXIT);
+             if (ret < 0) {
+                 error_report("kvm: Failed to enable bus lock detection cap: %s",
+-                             strerror(-ret));
++                             qemu_strerror(-ret));
+                 return ret;
+             }
+             ratelimit_init(&bus_lock_ratelimit_ctrl);
+@@ -2743,7 +2745,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+                                     notify_window_flags);
+             if (ret < 0) {
+                 error_report("kvm: Failed to enable notify vmexit cap: %s",
+-                             strerror(-ret));
++                             qemu_strerror(-ret));
+                 return ret;
+             }
+     }
+@@ -2754,7 +2756,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+                                 KVM_MSR_EXIT_REASON_FILTER);
+         if (ret) {
+             error_report("Could not enable user space MSRs: %s",
+-                         strerror(-ret));
++                         qemu_strerror(-ret));
+             exit(1);
+         }
+ 
+@@ -2762,7 +2764,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+                            kvm_rdmsr_core_thread_count, NULL);
+         if (!r) {
+             error_report("Could not install MSR_CORE_THREAD_COUNT handler: %s",
+-                         strerror(-ret));
++                         qemu_strerror(-ret));
+             exit(1);
+         }
+     }
+@@ -4889,7 +4891,7 @@ void kvm_arch_pre_run(CPUState *cpu, struct kvm_run *run)
+             ret = kvm_vcpu_ioctl(cpu, KVM_NMI);
+             if (ret < 0) {
+                 fprintf(stderr, "KVM: injection failed, NMI lost (%s)\n",
+-                        strerror(-ret));
++                        qemu_strerror(-ret));
+             }
+         }
+         if (cpu->interrupt_request & CPU_INTERRUPT_SMI) {
+@@ -4900,7 +4902,7 @@ void kvm_arch_pre_run(CPUState *cpu, struct kvm_run *run)
+             ret = kvm_vcpu_ioctl(cpu, KVM_SMI);
+             if (ret < 0) {
+                 fprintf(stderr, "KVM: injection failed, SMI lost (%s)\n",
+-                        strerror(-ret));
++                        qemu_strerror(-ret));
+             }
+         }
+     }
+@@ -4941,7 +4943,7 @@ void kvm_arch_pre_run(CPUState *cpu, struct kvm_run *run)
+                 if (ret < 0) {
+                     fprintf(stderr,
+                             "KVM: injection failed, interrupt lost (%s)\n",
+-                            strerror(-ret));
++                            qemu_strerror(-ret));
+                 }
+             }
+         }
+@@ -5414,7 +5416,8 @@ static bool __kvm_enable_sgx_provisioning(KVMState *s)
+ 
+     ret = kvm_vm_enable_cap(s, KVM_CAP_SGX_ATTRIBUTE, 0, fd);
+     if (ret) {
+-        error_report("Could not enable SGX PROVISIONKEY: %s", strerror(-ret));
++        error_report("Could not enable SGX PROVISIONKEY: %s",
++                     qemu_strerror(-ret));
+         exit(1);
+     }
+     close(fd);
+@@ -5580,7 +5583,7 @@ int kvm_arch_irqchip_create(KVMState *s)
+         ret = kvm_vm_enable_cap(s, KVM_CAP_SPLIT_IRQCHIP, 0, 24);
+         if (ret) {
+             error_report("Could not enable split irqchip mode: %s",
+-                         strerror(-ret));
++                         qemu_strerror(-ret));
+             exit(1);
+         } else {
+             DPRINTF("Enabled KVM_CAP_SPLIT_IRQCHIP\n");
+diff --git a/target/i386/kvm/xen-emu.c b/target/i386/kvm/xen-emu.c
+index d7c7eb8d9c..f7837ff95a 100644
+--- a/target/i386/kvm/xen-emu.c
++++ b/target/i386/kvm/xen-emu.c
+@@ -12,6 +12,7 @@
+ #include "qemu/osdep.h"
+ #include "qemu/log.h"
+ #include "qemu/main-loop.h"
++#include "qemu/cutils.h"
+ #include "qemu/error-report.h"
+ #include "hw/xen/xen.h"
+ #include "sysemu/kvm_int.h"
+@@ -135,7 +136,7 @@ int kvm_xen_init(KVMState *s, uint32_t hypercall_msr)
+     ret = kvm_vm_ioctl(s, KVM_XEN_HVM_CONFIG, &cfg);
+     if (ret < 0) {
+         error_report("kvm: Failed to enable Xen HVM support: %s",
+-                     strerror(-ret));
++                     qemu_strerror(-ret));
+         return ret;
+     }
+ 
+@@ -209,7 +210,7 @@ int kvm_xen_init_vcpu(CPUState *cs)
+         err = kvm_vcpu_ioctl(cs, KVM_XEN_VCPU_SET_ATTR, &va);
+         if (err) {
+             error_report("kvm: Failed to set Xen vCPU ID attribute: %s",
+-                         strerror(-err));
++                         qemu_strerror(-err));
+             return err;
+         }
+     }
+@@ -964,7 +965,7 @@ static uint64_t kvm_get_current_ns(void)
+ 
+     ret = kvm_vm_ioctl(kvm_state, KVM_GET_CLOCK, &data);
+     if (ret < 0) {
+-        fprintf(stderr, "KVM_GET_CLOCK failed: %s\n", strerror(ret));
++        fprintf(stderr, "KVM_GET_CLOCK failed: %s\n", qemu_strerror(ret));
+                 abort();
+     }
+ 
+diff --git a/target/i386/nvmm/nvmm-accel-ops.c b/target/i386/nvmm/nvmm-accel-ops.c
+index 6c46101ac1..97d9daacea 100644
+--- a/target/i386/nvmm/nvmm-accel-ops.c
++++ b/target/i386/nvmm/nvmm-accel-ops.c
+@@ -32,7 +32,7 @@ static void *qemu_nvmm_cpu_thread_fn(void *arg)
+ 
+     r = nvmm_init_vcpu(cpu);
+     if (r < 0) {
+-        fprintf(stderr, "nvmm_init_vcpu failed: %s\n", strerror(-r));
++        fprintf(stderr, "nvmm_init_vcpu failed: %s\n", qemu_strerror(-r));
+         exit(1);
+     }
+ 
+diff --git a/target/i386/sev.c b/target/i386/sev.c
+index 859e06f6ad..9f19fc5469 100644
+--- a/target/i386/sev.c
++++ b/target/i386/sev.c
+@@ -38,6 +38,7 @@
+ #include "exec/confidential-guest-support.h"
+ #include "hw/i386/pc.h"
+ #include "exec/address-spaces.h"
 +#include "qemu/cutils.h"
  
- #include "debuginfo.h"
- #include "perf.h"
-@@ -54,7 +55,7 @@ void perf_enable_perfmap(void)
-     perfmap = safe_fopen_w(map_file);
-     if (perfmap == NULL) {
-         warn_report("Could not open %s: %s, proceeding without perfmap",
--                    map_file, strerror(errno));
-+                    map_file, qemu_strerror(errno));
+ #define TYPE_SEV_GUEST "sev-guest"
+ OBJECT_DECLARE_SIMPLE_TYPE(SevGuestState, SEV_GUEST)
+@@ -247,7 +248,7 @@ sev_ram_block_added(RAMBlockNotifier *n, void *host, size_t size,
+     r = kvm_vm_ioctl(kvm_state, KVM_MEMORY_ENCRYPT_REG_REGION, &range);
+     if (r) {
+         error_report("%s: failed to register region (%p+%#zx) error '%s'",
+-                     __func__, host, max_size, strerror(errno));
++                     __func__, host, max_size, qemu_strerror(errno));
+         exit(1);
      }
  }
+@@ -948,7 +949,7 @@ int sev_kvm_init(ConfidentialGuestSupport *cgs, Error **errp)
+     sev->sev_fd = open(devname, O_RDWR);
+     if (sev->sev_fd < 0) {
+         error_setg(errp, "%s: Failed to open %s '%s'", __func__,
+-                   devname, strerror(errno));
++                   devname, qemu_strerror(errno));
+         g_free(devname);
+         goto err;
+     }
+diff --git a/target/i386/whpx/whpx-accel-ops.c b/target/i386/whpx/whpx-accel-ops.c
+index e8dc4b3a47..bf16c8e643 100644
+--- a/target/i386/whpx/whpx-accel-ops.c
++++ b/target/i386/whpx/whpx-accel-ops.c
+@@ -32,7 +32,7 @@ static void *whpx_cpu_thread_fn(void *arg)
  
-@@ -201,7 +202,7 @@ void perf_enable_jitdump(void)
-     jitdump = safe_fopen_w(jitdump_file);
-     if (jitdump == NULL) {
-         warn_report("Could not open %s: %s, proceeding without jitdump",
--                    jitdump_file, strerror(errno));
-+                    jitdump_file, qemu_strerror(errno));
-         return;
+     r = whpx_init_vcpu(cpu);
+     if (r < 0) {
+-        fprintf(stderr, "whpx_init_vcpu failed: %s\n", strerror(-r));
++        fprintf(stderr, "whpx_init_vcpu failed: %s\n", qemu_strerror(-r));
+         exit(1);
      }
  
-@@ -214,7 +215,7 @@ void perf_enable_jitdump(void)
-                        MAP_PRIVATE, fileno(jitdump), 0);
-     if (perf_marker == MAP_FAILED) {
-         warn_report("Could not map %s: %s, proceeding without jitdump",
--                    jitdump_file, strerror(errno));
-+                    jitdump_file, qemu_strerror(errno));
-         fclose(jitdump);
-         jitdump = NULL;
-         return;
 -- 
 2.39.2
 
