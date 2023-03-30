@@ -2,43 +2,43 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 11E0C6D00E9
-	for <lists+kvm@lfdr.de>; Thu, 30 Mar 2023 12:15:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5221E6D00FA
+	for <lists+kvm@lfdr.de>; Thu, 30 Mar 2023 12:19:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231303AbjC3KPs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Mar 2023 06:15:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59930 "EHLO
+        id S229902AbjC3KTU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Mar 2023 06:19:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36824 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231274AbjC3KPo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 Mar 2023 06:15:44 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A9229012
-        for <kvm@vger.kernel.org>; Thu, 30 Mar 2023 03:15:37 -0700 (PDT)
+        with ESMTP id S229778AbjC3KTT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 30 Mar 2023 06:19:19 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8BFD67289
+        for <kvm@vger.kernel.org>; Thu, 30 Mar 2023 03:19:18 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 3A6CA61FDA
-        for <kvm@vger.kernel.org>; Thu, 30 Mar 2023 10:15:37 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 97742C433D2;
-        Thu, 30 Mar 2023 10:15:36 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 27D0761FDA
+        for <kvm@vger.kernel.org>; Thu, 30 Mar 2023 10:19:18 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 87350C433D2;
+        Thu, 30 Mar 2023 10:19:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1680171336;
-        bh=NdaGsMedVQMdyb65BLGq+Cwgltdi3hP6jpvLS9oJOcM=;
+        s=k20201202; t=1680171557;
+        bh=CMp2kdl18Tf8LPjUAO8ppft0LA+7nCX3ctxuW1Ll+48=;
         h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=I8KOOyH9ZMvunwfLcgIt5VUnq5G6tyhOPTPizGWmiao7+b4qirYOYw1mkpmxUcXh7
-         1Pv/hon11M2uMaYExCAgiVuFyjGSe2+qO4lcSyONxGLMJisUfxiFTmhK1FLsZchGbH
-         dSa0e+8UhKv6qh2plTTPXfRzE93CUgn7s3mIOC/4u2f7BWt7VlswwLuWnKByb0baVq
-         oJVdx6A7dkJUr1l6/F+PnTcDKNNQE/zhQ1WiXvLBVC8EAkpi9ByWQLTC7Jtt7gy7gg
-         37y0n8I+78DxjJIhf+6J20Hnj0FqnQ0TQbEe5QIKhH1/ZhXN3H/3tBdq0bYxNz82Ma
-         9DNZwa0LhyqgQ==
+        b=qRG71vlHK4iDGxPKLo/GpAGBGIQY8BxqFNGQcT9cc0Cn6tk9Y/G3QSPt6si/7xoUD
+         jq5MWjvgi4nLe7tbdTOYqIH4aT+LamdP6B19a9Uh30PW9xvhD5svbjGkwswur3Iq2J
+         j12/6TZ7H+Gmh+TyZySrXJkj3VCkVv6bpArOsnjJp1WG+DAYzk7X4RAlOzai/S6J4b
+         F5Kqw+NCahFPGJJEAQ8qT0+H5LyDStBhWuCXJuHRyDRv+i3YWGK6GslAODS2/PXnQx
+         woSwb5gXNzsv5KVnJQ/hfnXXB7pVlASOjXPoWEBpOlZyaSWBr646ZhOMH+vBRctnMZ
+         KTr/VDB0biraw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1phpJe-004KMF-6F;
-        Thu, 30 Mar 2023 11:15:34 +0100
-Date:   Thu, 30 Mar 2023 11:15:33 +0100
-Message-ID: <86fs9mwnne.wl-maz@kernel.org>
+        id 1phpND-004KQm-Aq;
+        Thu, 30 Mar 2023 11:19:15 +0100
+Date:   Thu, 30 Mar 2023 11:19:14 +0100
+Message-ID: <86edp6wnh9.wl-maz@kernel.org>
 From:   Marc Zyngier <maz@kernel.org>
 To:     Oliver Upton <oliver.upton@linux.dev>
 Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
@@ -51,11 +51,11 @@ Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
         Reiji Watanabe <reijiw@google.com>,
         Colton Lewis <coltonlewis@google.com>,
         Joey Gouly <joey.gouly@arm.com>, dwmw2@infradead.org
-Subject: Re: [PATCH v3 07/18] KVM: arm64: timers: Allow userspace to set the global counter offset
-In-Reply-To: <ZCUrqIwNNdcAUSv3@linux.dev>
+Subject: Re: [PATCH v3 11/18] KVM: arm64: timers: Move the timer IRQs into arch_timer_vm_data
+In-Reply-To: <ZCUz9aZRLuEjWu59@linux.dev>
 References: <20230324144704.4193635-1-maz@kernel.org>
-        <20230324144704.4193635-8-maz@kernel.org>
-        <ZCUrqIwNNdcAUSv3@linux.dev>
+        <20230324144704.4193635-12-maz@kernel.org>
+        <ZCUz9aZRLuEjWu59@linux.dev>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -65,8 +65,8 @@ X-SA-Exim-Connect-IP: 185.219.108.64
 X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, ricarkol@google.com, sveith@amazon.de, reijiw@google.com, coltonlewis@google.com, joey.gouly@arm.com, dwmw2@infradead.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-5.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,SPF_HELO_NONE,
+X-Spam-Status: No, score=-2.5 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
         SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -74,152 +74,120 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 30 Mar 2023 07:26:48 +0100,
+On Thu, 30 Mar 2023 08:02:13 +0100,
 Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> Hi Marc,
-> 
-> On Fri, Mar 24, 2023 at 02:46:53PM +0000, Marc Zyngier wrote:
-> > And this is the moment you have all been waiting for: setting the
-> > counter offset from userspace.
+> On Fri, Mar 24, 2023 at 02:46:57PM +0000, Marc Zyngier wrote:
+> > Having the timer IRQs duplicated into each vcpu isn't great, and
+> > becomes absolutely awful with NV. So let's move these into
+> > the per-VM arch_timer_vm_data structure.
 > > 
-> > We expose a brand new capability that reports the ability to set
-> > the offset for both the virtual and physical sides.
-> > 
-> > In keeping with the architecture, the offset is expressed as
-> > a delta that is substracted from the physical counter value.
-> > 
-> > Once this new API is used, there is no going back, and the counters
-> > cannot be written to to set the offsets implicitly (the writes
-> > are instead ignored).
+> > This simplifies a lot of code, but requires us to introduce a
+> > mutex so that we can reason about userspace trying to change
+> > an interrupt number while another vcpu is running, something
+> > that wasn't really well handled so far.
 > > 
 > > Reviewed-by: Colton Lewis <coltonlewis@google.com>
 > > Signed-off-by: Marc Zyngier <maz@kernel.org>
 > > ---
-> >  arch/arm64/include/asm/kvm_host.h |  4 +++
-> >  arch/arm64/include/uapi/asm/kvm.h |  9 ++++++
-> >  arch/arm64/kvm/arch_timer.c       | 46 +++++++++++++++++++++++++++----
-> >  arch/arm64/kvm/arm.c              |  8 ++++++
-> >  include/uapi/linux/kvm.h          |  3 ++
-> >  5 files changed, 65 insertions(+), 5 deletions(-)
+> >  arch/arm64/include/asm/kvm_host.h |   2 +
+> >  arch/arm64/kvm/arch_timer.c       | 104 +++++++++++++++++-------------
+> >  arch/arm64/kvm/arm.c              |   2 +
+> >  include/kvm/arm_arch_timer.h      |  18 ++++--
+> >  4 files changed, 78 insertions(+), 48 deletions(-)
 > > 
 > > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> > index 002a10cbade2..116233a390e9 100644
+> > index 116233a390e9..1280154c9ef3 100644
 > > --- a/arch/arm64/include/asm/kvm_host.h
 > > +++ b/arch/arm64/include/asm/kvm_host.h
-> > @@ -221,6 +221,8 @@ struct kvm_arch {
-> >  #define KVM_ARCH_FLAG_EL1_32BIT				4
-> >  	/* PSCI SYSTEM_SUSPEND enabled for the guest */
+> > @@ -223,6 +223,8 @@ struct kvm_arch {
 > >  #define KVM_ARCH_FLAG_SYSTEM_SUSPEND_ENABLED		5
-> > +	/* VM counter offset */
-> > +#define KVM_ARCH_FLAG_VM_COUNTER_OFFSET			6
+> >  	/* VM counter offset */
+> >  #define KVM_ARCH_FLAG_VM_COUNTER_OFFSET			6
+> > +	/* Timer PPIs made immutable */
+> > +#define KVM_ARCH_FLAG_TIMER_PPIS_IMMUTABLE		7
 > >  
 > >  	unsigned long flags;
 > >  
-> > @@ -1010,6 +1012,8 @@ int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
-> >  
-> >  long kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
-> >  				struct kvm_arm_copy_mte_tags *copy_tags);
-> > +int kvm_vm_ioctl_set_counter_offset(struct kvm *kvm,
-> > +				    struct kvm_arm_counter_offset *offset);
-> >  
-> >  /* Guest/host FPSIMD coordination helpers */
-> >  int kvm_arch_vcpu_run_map_fp(struct kvm_vcpu *vcpu);
-> > diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-> > index f8129c624b07..12fb0d8a760a 100644
-> > --- a/arch/arm64/include/uapi/asm/kvm.h
-> > +++ b/arch/arm64/include/uapi/asm/kvm.h
-> > @@ -198,6 +198,15 @@ struct kvm_arm_copy_mte_tags {
-> >  	__u64 reserved[2];
-> >  };
-> >  
-> > +/*
-> > + * Counter/Timer offset structure. Describe the virtual/physical offset.
-> > + * To be used with KVM_ARM_SET_COUNTER_OFFSET.
-> > + */
-> > +struct kvm_arm_counter_offset {
-> > +	__u64 counter_offset;
-> > +	__u64 reserved;
-> > +};
-> > +
-> >  #define KVM_ARM_TAGS_TO_GUEST		0
-> >  #define KVM_ARM_TAGS_FROM_GUEST		1
-> >  
 > > diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
-> > index bb64a71ae193..25625e1d6d89 100644
+> > index 7cd0b0947454..88a38d45d352 100644
 > > --- a/arch/arm64/kvm/arch_timer.c
 > > +++ b/arch/arm64/kvm/arch_timer.c
-> > @@ -851,9 +851,11 @@ void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu)
-> >  	ptimer->vcpu = vcpu;
-> >  	ptimer->offset.vm_offset = &vcpu->kvm->arch.timer_data.poffset;
+> > @@ -851,7 +851,6 @@ static void timer_context_init(struct kvm_vcpu *vcpu, int timerid)
 > >  
-> > -	/* Synchronize cntvoff across all vtimers of a VM. */
-> > -	timer_set_offset(vtimer, kvm_phys_timer_read());
-> > -	timer_set_offset(ptimer, 0);
-> > +	/* Synchronize offsets across timers of a VM if not already provided */
-> > +	if (!test_bit(KVM_ARCH_FLAG_VM_COUNTER_OFFSET, &vcpu->kvm->arch.flags)) {
-> > +		timer_set_offset(vtimer, kvm_phys_timer_read());
-> > +		timer_set_offset(ptimer, 0);
-> > +	}
+> >  	hrtimer_init(&ctxt->hrtimer, CLOCK_MONOTONIC, HRTIMER_MODE_ABS_HARD);
+> >  	ctxt->hrtimer.function = kvm_hrtimer_expire;
+> > -	timer_irq(ctxt) = default_ppi[timerid];
 > >  
-> >  	hrtimer_init(&timer->bg_timer, CLOCK_MONOTONIC, HRTIMER_MODE_ABS_HARD);
+> >  	switch (timerid) {
+> >  	case TIMER_PTIMER:
+> > @@ -880,6 +879,13 @@ void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu)
 > >  	timer->bg_timer.function = kvm_bg_timer_expire;
-> > @@ -897,8 +899,11 @@ int kvm_arm_timer_set_reg(struct kvm_vcpu *vcpu, u64 regid, u64 value)
-> >  		kvm_arm_timer_write(vcpu, timer, TIMER_REG_CTL, value);
-> >  		break;
-> >  	case KVM_REG_ARM_TIMER_CNT:
-> > -		timer = vcpu_vtimer(vcpu);
-> > -		timer_set_offset(timer, kvm_phys_timer_read() - value);
-> > +		if (!test_bit(KVM_ARCH_FLAG_VM_COUNTER_OFFSET,
-> > +			      &vcpu->kvm->arch.flags)) {
-> > +			timer = vcpu_vtimer(vcpu);
-> > +			timer_set_offset(timer, kvm_phys_timer_read() - value);
-> > +		}
-> >  		break;
-> >  	case KVM_REG_ARM_TIMER_CVAL:
-> >  		timer = vcpu_vtimer(vcpu);
-> > @@ -908,6 +913,13 @@ int kvm_arm_timer_set_reg(struct kvm_vcpu *vcpu, u64 regid, u64 value)
-> >  		timer = vcpu_ptimer(vcpu);
-> >  		kvm_arm_timer_write(vcpu, timer, TIMER_REG_CTL, value);
-> >  		break;
-> > +	case KVM_REG_ARM_PTIMER_CNT:
-> > +		if (!test_bit(KVM_ARCH_FLAG_VM_COUNTER_OFFSET,
-> > +			      &vcpu->kvm->arch.flags)) {
-> > +			timer = vcpu_ptimer(vcpu);
-> > +			timer_set_offset(timer, kvm_phys_timer_read() - value);
-> > +		}
-> > +		break;
-> >  	case KVM_REG_ARM_PTIMER_CVAL:
-> >  		timer = vcpu_ptimer(vcpu);
-> >  		kvm_arm_timer_write(vcpu, timer, TIMER_REG_CVAL, value);
-> > @@ -1443,3 +1455,27 @@ int kvm_arm_timer_has_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
-> >  
-> >  	return -ENXIO;
 > >  }
-> > +
-> > +int kvm_vm_ioctl_set_counter_offset(struct kvm *kvm,
-> > +				    struct kvm_arm_counter_offset *offset)
+> >  
+> > +void kvm_timer_init_vm(struct kvm *kvm)
 > > +{
-> > +	if (offset->reserved)
-> > +		return -EINVAL;
+> > +	mutex_init(&kvm->arch.timer_data.lock);
+> > +	for (int i = 0; i < NR_KVM_TIMERS; i++)
+> > +		kvm->arch.timer_data.ppi[i] = default_ppi[i];
+> > +}
 > > +
-> > +	if (!lock_all_vcpus(kvm))
-> > +		return -EBUSY;
+> >  void kvm_timer_cpu_up(void)
+> >  {
+> >  	enable_percpu_irq(host_vtimer_irq, host_vtimer_irq_flags);
+> > @@ -1292,44 +1298,52 @@ void kvm_timer_vcpu_terminate(struct kvm_vcpu *vcpu)
+> >  
+> >  static bool timer_irqs_are_valid(struct kvm_vcpu *vcpu)
+> >  {
+> > -	int vtimer_irq, ptimer_irq, ret;
+> > -	unsigned long i;
+> > +	u32 ppis = 0;
+> >  
+> > -	vtimer_irq = timer_irq(vcpu_vtimer(vcpu));
+> > -	ret = kvm_vgic_set_owner(vcpu, vtimer_irq, vcpu_vtimer(vcpu));
+> > -	if (ret)
+> > -		return false;
+> > +	mutex_lock(&vcpu->kvm->arch.timer_data.lock);
+> >  
+> > -	ptimer_irq = timer_irq(vcpu_ptimer(vcpu));
+> > -	ret = kvm_vgic_set_owner(vcpu, ptimer_irq, vcpu_ptimer(vcpu));
+> > -	if (ret)
+> > -		return false;
+> > +	for (int i = 0; i < NR_KVM_TIMERS; i++) {
+> > +		struct arch_timer_context *ctx;
+> > +		int irq;
+> >  
+> > -	kvm_for_each_vcpu(i, vcpu, vcpu->kvm) {
+> > -		if (timer_irq(vcpu_vtimer(vcpu)) != vtimer_irq ||
+> > -		    timer_irq(vcpu_ptimer(vcpu)) != ptimer_irq)
+> > -			return false;
+> > +		ctx = vcpu_get_timer(vcpu, i);
+> > +		irq = timer_irq(ctx);
+> > +		if (kvm_vgic_set_owner(vcpu, irq, ctx))
+> > +			break;
+> > +
+> > +		/*
+> > +		 * We know by construction that we only have PPIs, so
+> > +		 * all values are less than 32.
+> > +		 */
+> > +		ppis |= BIT(irq);
+> >  	}
+> >  
+> > -	return true;
+> > +	set_bit(KVM_ARCH_FLAG_TIMER_PPIS_IMMUTABLE, &vcpu->kvm->arch.flags);
+> > +
+> > +	mutex_unlock(&vcpu->kvm->arch.timer_data.lock);
+> > +
+> > +	return hweight32(ppis) == NR_KVM_TIMERS;
 > 
-> Similar to what you had mentioned over on the lock (un)inversion series,
-> doesn't this risk racing with vCPU creation w/o holding the kvm->lock?
+> Does it make sense to only set the IMMUTABLE flag if the timer IRQs are
+> indeed valid? I doubt userspace would do anything when it gets the
+> EINVAL, but it is possible userspace could make another attempt at
+> configuring the IRQs correctly.
 
-Huh, I was under the impression that kvm_vm_ioctl() would take the
-kvm->lock, but it really doesn't! I'll fix that right away.
+Yup, that's fair enough. I'll flip things around.
 
-> Alternatively you could require this ioctl to be issued before any vCPUs
-> are created to avoid the need to lock them all here. But, if you see
-> value in poking this at runtime then fine by me.
-
-I think there is some value in allowing the offset adjustment to be
-set at the last possible point, right before a vcpu is ran.
-
-Thanks for the heads up!
+Thanks!
 
 	M.
 
