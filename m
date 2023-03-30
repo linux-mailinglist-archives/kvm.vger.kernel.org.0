@@ -2,81 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 933CD6D1258
-	for <lists+kvm@lfdr.de>; Fri, 31 Mar 2023 00:43:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5FC9F6D1264
+	for <lists+kvm@lfdr.de>; Fri, 31 Mar 2023 00:44:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230462AbjC3WnJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Mar 2023 18:43:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35122 "EHLO
+        id S231159AbjC3Wof (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Mar 2023 18:44:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38088 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230388AbjC3WnH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 Mar 2023 18:43:07 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1265CA35
-        for <kvm@vger.kernel.org>; Thu, 30 Mar 2023 15:42:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1680216138;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=NUUQk1Rw4826YTliONysO8di5cIDKkIlgTF2OVJ91P8=;
-        b=EXcXD99EebOh9NkY09weEgTMpCBkqnAkVXItelcWjshjtK4aYFh/tDH6zWwF6SJPgcKkod
-        ApIjQT8AQyvJPMgSUukn0A3Jp2wX7vediaBqasgslr007JKSZptQW22bsO7uTEauZ1JzE2
-        u1m5FBoQJfF4kBGnbtjEnmRh/RoKdNU=
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com
- [209.85.166.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-631-IvwH9EKXPTey2OdiROYC2A-1; Thu, 30 Mar 2023 18:42:16 -0400
-X-MC-Unique: IvwH9EKXPTey2OdiROYC2A-1
-Received: by mail-il1-f197.google.com with SMTP id d12-20020a056e020bec00b00325e125fbe5so12936378ilu.12
-        for <kvm@vger.kernel.org>; Thu, 30 Mar 2023 15:42:16 -0700 (PDT)
+        with ESMTP id S230517AbjC3Wo1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 30 Mar 2023 18:44:27 -0400
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 140B3EF89
+        for <kvm@vger.kernel.org>; Thu, 30 Mar 2023 15:44:08 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-5463f2d3223so28664207b3.14
+        for <kvm@vger.kernel.org>; Thu, 30 Mar 2023 15:44:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112; t=1680216247;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=/uMEyvfRZ1sO1MO8fuPK2yVSFwIoti/weSCrfIahBz0=;
+        b=HkADuuWTDFb2CmUHzQygUqsd7n30DrfpZgY4wV0G+aV4No9xrlSOjbPfT1ey4pE9Cb
+         DxnIikT4DiB923Bsc4+sE37ne7OCdWy7ebRVdvvRktAgoq1RhoRr6O4WggKzX6ccQL1h
+         /EtTlA6E+dGWkBD7XDOb4k4njMZKcQr6eo9vZBs6wXscx1w58a0mSesUoQhFXj+ePjQj
+         h+ebWebBqMoo9y/g7E76Sh2E33fjPZli0KGhvrlq6jVa/ju6miqkMl/PLI2RyMBo7GtC
+         z3Zprjd20UWM+Aqg77lCdVEVVRZlD2w1h5UuNtDOO2p2G/1S0ya38+9WX0fsiGltK1Zp
+         LsVg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680216136;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=NUUQk1Rw4826YTliONysO8di5cIDKkIlgTF2OVJ91P8=;
-        b=3+fwrlaAPU0FqMrrPJFX59+Lech4ITBiGrYUNbGlPviujzl4F2ynSQUzVwWlhi3eyZ
-         rC+unw7TNVSWBVYDfZ28DKVVK4+naqbWkv+JoOHftoXTaLpEd/v5C83lwyEjjWuHXg1I
-         lOj9YyDrISkMBOoSo21vGM+Txn7wUz0tKB/5a5lagDz0fNCWWJdH+496O7B4kjZNdqPN
-         AvJyXz+21EaTQ9bzkPnyoH12emniBnZzPLVQ4NGwRlb+8/X2elEuUsNK3iHWzvsia3Xe
-         uEUM1CAA7EbI8yMnl5kgbC/l38RW/RBatW6GAKrVSgLMj8EK2LZAKN5fqHrvgO9WqU3k
-         Qy3Q==
-X-Gm-Message-State: AO0yUKWlcEyefCIuVFTsUN9UTQ3C/ZazK9C99AHWnOz3unIn6iMkFubh
-        MZD8Xs9jJH9vs3pwCr63AoReRlYNtiOt6MEU8M/qeuxpXdhkx8P3I1ZzTaCkhvt5A4jPx6Q0d+W
-        HusKVvcF2tLQD
-X-Received: by 2002:a05:6602:1844:b0:753:34ae:a00 with SMTP id d4-20020a056602184400b0075334ae0a00mr18463128ioi.3.1680216135898;
-        Thu, 30 Mar 2023 15:42:15 -0700 (PDT)
-X-Google-Smtp-Source: AK7set+YZKMc4+HFVK5LtPExjaMOsjgStxEiQgJXY+2Iq0hGwyPZGbJXZFPT299HzJF5P6qWjOGuWw==
-X-Received: by 2002:a05:6602:1844:b0:753:34ae:a00 with SMTP id d4-20020a056602184400b0075334ae0a00mr18463112ioi.3.1680216135550;
-        Thu, 30 Mar 2023 15:42:15 -0700 (PDT)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id b28-20020a056638389c00b0040af4b40201sm215319jav.86.2023.03.30.15.42.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Mar 2023 15:42:15 -0700 (PDT)
-Date:   Thu, 30 Mar 2023 16:42:14 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Reinette Chatre <reinette.chatre@intel.com>
-Cc:     jgg@nvidia.com, yishaih@nvidia.com,
-        shameerali.kolothum.thodi@huawei.com, kevin.tian@intel.com,
-        tglx@linutronix.de, darwi@linutronix.de, kvm@vger.kernel.org,
-        dave.jiang@intel.com, jing2.liu@intel.com, ashok.raj@intel.com,
-        fenghua.yu@intel.com, tom.zanussi@linux.intel.com,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH V2 7/8] vfio/pci: Support dynamic MSI-x
-Message-ID: <20230330164214.67ccbdfa.alex.williamson@redhat.com>
-In-Reply-To: <20230330164050.0069e2a5.alex.williamson@redhat.com>
-References: <cover.1680038771.git.reinette.chatre@intel.com>
-        <419f3ba2f732154d8ae079b3deb02d0fdbe3e258.1680038771.git.reinette.chatre@intel.com>
-        <20230330164050.0069e2a5.alex.williamson@redhat.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+        d=1e100.net; s=20210112; t=1680216247;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=/uMEyvfRZ1sO1MO8fuPK2yVSFwIoti/weSCrfIahBz0=;
+        b=RZDB5LjqVQckCLtPBOhW344MDKGYJ0r8BKXXmvdbC8nKi1Ee9OmDE8XXkuzpS3fBxs
+         9b6iyfiyTOmuzd/KMAbstgOyueHGVGLyaRodOzCEl30K8azPE6cEifR5EpyknjLgM48n
+         yLYZ9jR1BYyoLvNTssrJKfrmF9DUyGAETRMvEW43eKzi1W5QzfjSjgEpyjlJIYpbcaqs
+         O2yuKpi9ulOzzymx9ZWaT3HllFTeSHN3HI/admkYX6c5v6QNhns4Ig4onMtW2aRdgOEC
+         5BpBqxomfzxm+iHohVzCerjyHeXz5zVkTmRF4eo6L1Dw3dVN71Q/WeMROzChu1ColiiH
+         HhNA==
+X-Gm-Message-State: AAQBX9e8YlwBrxXOxV+ucSWQQLd420AhBV+MA2ONX/fSlZfPjKT/GUb+
+        U81+jfQkVOP4QffuDI+bnppqc62wiDq6
+X-Google-Smtp-Source: AKy350YJl7uVdoztbmhl+H5CjDDEGKtjny/a65KRC1+dFOZf9oOHrLjqq1QMw6vRcQ5hrX6JwNewWx5zSjOt
+X-Received: from davidai2.mtv.corp.google.com ([2620:15c:211:201:c162:24e8:ec5e:d520])
+ (user=davidai job=sendgmr) by 2002:a81:a805:0:b0:546:6ef:8baf with SMTP id
+ f5-20020a81a805000000b0054606ef8bafmr6938530ywh.2.1680216247110; Thu, 30 Mar
+ 2023 15:44:07 -0700 (PDT)
+Date:   Thu, 30 Mar 2023 15:43:35 -0700
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.40.0.348.gf938b09366-goog
+Message-ID: <20230330224348.1006691-1-davidai@google.com>
+Subject: [RFC PATCH 0/6] Improve VM DVFS and task placement behavior
+From:   David Dai <davidai@google.com>
+To:     "Rafael J. Wysocki" <rafael@kernel.org>,
+        Viresh Kumar <viresh.kumar@linaro.org>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Marc Zyngier <maz@kernel.org>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Lorenzo Pieralisi <lpieralisi@kernel.org>,
+        Sudeep Holla <sudeep.holla@arm.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Juri Lelli <juri.lelli@redhat.com>,
+        Vincent Guittot <vincent.guittot@linaro.org>,
+        Dietmar Eggemann <dietmar.eggemann@arm.com>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>,
+        Daniel Bristot de Oliveira <bristot@redhat.com>,
+        Valentin Schneider <vschneid@redhat.com>,
+        David Dai <davidai@google.com>
+Cc:     kernel-team@android.com, linux-pm@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-7.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -84,232 +92,295 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 30 Mar 2023 16:40:50 -0600
-Alex Williamson <alex.williamson@redhat.com> wrote:
+Hi,
 
-> On Tue, 28 Mar 2023 14:53:34 -0700
-> Reinette Chatre <reinette.chatre@intel.com> wrote:
-> 
-> > Recently introduced pci_msix_alloc_irq_at() and pci_msix_free_irq()
-> > enables an individual MSI-X index to be allocated and freed after
-> > MSI-X enabling.
-> > 
-> > Support dynamic MSI-X if supported by the device. Keep the association
-> > between allocated interrupt and vfio interrupt context. Allocate new
-> > context together with the new interrupt if no interrupt context exist
-> > for an MSI-X interrupt. Similarly, release an interrupt with its
-> > context.
-> > 
-> > Signed-off-by: Reinette Chatre <reinette.chatre@intel.com>
-> > ---
-> > Changes since RFC V1:
-> > - Add pointer to interrupt context as function parameter to
-> >   vfio_irq_ctx_free(). (Alex)
-> > - Initialize new_ctx to false. (Dan Carpenter)
-> > - Only support dynamic allocation if device supports it. (Alex)
-> > 
-> >  drivers/vfio/pci/vfio_pci_intrs.c | 93 +++++++++++++++++++++++++------
-> >  1 file changed, 76 insertions(+), 17 deletions(-)
-> > 
-> > diff --git a/drivers/vfio/pci/vfio_pci_intrs.c b/drivers/vfio/pci/vfio_pci_intrs.c
-> > index b3a258e58625..755b752ca17e 100644
-> > --- a/drivers/vfio/pci/vfio_pci_intrs.c
-> > +++ b/drivers/vfio/pci/vfio_pci_intrs.c
-> > @@ -55,6 +55,13 @@ struct vfio_pci_irq_ctx *vfio_irq_ctx_get(struct vfio_pci_core_device *vdev,
-> >  	return xa_load(&vdev->ctx, index);
-> >  }
-> >  
-> > +static void vfio_irq_ctx_free(struct vfio_pci_core_device *vdev,
-> > +			      struct vfio_pci_irq_ctx *ctx, unsigned long index)
-> > +{
-> > +	xa_erase(&vdev->ctx, index);
-> > +	kfree(ctx);
-> > +}
+This patch series is a continuation of the talk Saravana gave at LPC 2022
+titled "CPUfreq/sched and VM guest workload problems" [1][2][3]. The gist
+of the talk is that workloads running in a guest VM get terrible task
+placement and DVFS behavior when compared to running the same workload in
+the host. Effectively, no EAS for threads inside VMs. This would make power
+and performance terrible just by running the workload in a VM even if we
+assume there is zero virtualization overhead.
 
-Also, the function below should use this rather than open coding the
-same now.  Thanks,
+We have been iterating over different options for communicating between
+guest and host, ways of applying the information coming from the
+guest/host, etc to figure out the best performance and power improvements
+we could get.
 
-Alex
+The patch series in its current state is NOT meant for landing in the
+upstream kernel. We are sending this patch series to share the current
+progress and data we have so far. The patch series is meant to be easy to
+cherry-pick and test on various devices to see what performance and power
+benefits this might give for others.
 
-> > +
-> >  static void vfio_irq_ctx_free_all(struct vfio_pci_core_device *vdev)
-> >  {
-> >  	struct vfio_pci_irq_ctx *ctx;
-> > @@ -409,33 +416,62 @@ static int vfio_msi_set_vector_signal(struct vfio_pci_core_device *vdev,
-> >  {
-> >  	struct pci_dev *pdev = vdev->pdev;
-> >  	struct vfio_pci_irq_ctx *ctx;
-> > +	struct msi_map msix_map = {};
-> > +	bool allow_dyn_alloc = false;
-> >  	struct eventfd_ctx *trigger;
-> > +	bool new_ctx = false;
-> >  	int irq, ret;
-> >  	u16 cmd;
-> >  
-> > +	/* Only MSI-X allows dynamic allocation. */
-> > +	if (msix && pci_msix_can_alloc_dyn(vdev->pdev))
-> > +		allow_dyn_alloc = true;  
-> 
-> Should vfio-pci-core probe this and store it in a field on
-> vfio_pci_core_device so that we can simply use something like
-> vdev->has_dyn_msix throughout?
-> 
-> > +
-> >  	ctx = vfio_irq_ctx_get(vdev, vector);
-> > -	if (!ctx)
-> > +	if (!ctx && !allow_dyn_alloc)
-> >  		return -EINVAL;
-> > +
-> >  	irq = pci_irq_vector(pdev, vector);
-> > +	/* Context and interrupt are always allocated together. */
-> > +	WARN_ON((ctx && irq == -EINVAL) || (!ctx && irq != -EINVAL));
-> >  
-> > -	if (ctx->trigger) {
-> > +	if (ctx && ctx->trigger) {
-> >  		irq_bypass_unregister_producer(&ctx->producer);
-> >  
-> >  		cmd = vfio_pci_memory_lock_and_enable(vdev);
-> >  		free_irq(irq, ctx->trigger);
-> > +		if (allow_dyn_alloc) {  
-> 
-> It almost seems easier to define msix_map in each scope that it's used:
-> 
-> 			struct msi_map map = { .index = vector,
-> 					       .virq = irq };
-> 
-> > +			msix_map.index = vector;
-> > +			msix_map.virq = irq;
-> > +			pci_msix_free_irq(pdev, msix_map);
-> > +			irq = -EINVAL;
-> > +		}
-> >  		vfio_pci_memory_unlock_and_restore(vdev, cmd);
-> >  		kfree(ctx->name);
-> >  		eventfd_ctx_put(ctx->trigger);
-> >  		ctx->trigger = NULL;
-> > +		if (allow_dyn_alloc) {
-> > +			vfio_irq_ctx_free(vdev, ctx, vector);
-> > +			ctx = NULL;
-> > +		}
-> >  	}
-> >  
-> >  	if (fd < 0)
-> >  		return 0;
-> >  
-> > +	if (!ctx) {
-> > +		ctx = vfio_irq_ctx_alloc_single(vdev, vector);
-> > +		if (!ctx)
-> > +			return -ENOMEM;
-> > +		new_ctx = true;
-> > +	}
-> > +
-> >  	ctx->name = kasprintf(GFP_KERNEL_ACCOUNT, "vfio-msi%s[%d](%s)",
-> >  			      msix ? "x" : "", vector, pci_name(pdev));
-> > -	if (!ctx->name)
-> > -		return -ENOMEM;
-> > +	if (!ctx->name) {
-> > +		ret = -ENOMEM;
-> > +		goto out_free_ctx;
-> > +	}
-> >  
-> >  	trigger = eventfd_ctx_fdget(fd);
-> >  	if (IS_ERR(trigger)) {
-> > @@ -443,25 +479,38 @@ static int vfio_msi_set_vector_signal(struct vfio_pci_core_device *vdev,
-> >  		goto out_free_name;
-> >  	}
-> >  
-> > -	/*
-> > -	 * The MSIx vector table resides in device memory which may be cleared
-> > -	 * via backdoor resets. We don't allow direct access to the vector
-> > -	 * table so even if a userspace driver attempts to save/restore around
-> > -	 * such a reset it would be unsuccessful. To avoid this, restore the
-> > -	 * cached value of the message prior to enabling.
-> > -	 */
-> >  	cmd = vfio_pci_memory_lock_and_enable(vdev);
-> >  	if (msix) {
-> > -		struct msi_msg msg;
-> > -
-> > -		get_cached_msi_msg(irq, &msg);
-> > -		pci_write_msi_msg(irq, &msg);
-> > +		if (irq == -EINVAL) {
-> > +			msix_map = pci_msix_alloc_irq_at(pdev, vector, NULL);  
-> 
-> 			struct msi_map map = pci_msix_alloc_irq_at(pdev,
-> 								vector, NULL);
-> > +			if (msix_map.index < 0) {
-> > +				vfio_pci_memory_unlock_and_restore(vdev, cmd);
-> > +				ret = msix_map.index;
-> > +				goto out_put_eventfd_ctx;
-> > +			}
-> > +			irq = msix_map.virq;
-> > +		} else {
-> > +			/*
-> > +			 * The MSIx vector table resides in device memory which
-> > +			 * may be cleared via backdoor resets. We don't allow
-> > +			 * direct access to the vector table so even if a
-> > +			 * userspace driver attempts to save/restore around
-> > +			 * such a reset it would be unsuccessful. To avoid
-> > +			 * this, restore the cached value of the message prior
-> > +			 * to enabling.
-> > +			 */  
-> 
-> You've only just copied this comment down to here, but I think it's a
-> bit stale.  Maybe we should update it to something that helps explain
-> this split better, maybe:
-> 
-> 			/*
-> 			 * If the vector was previously allocated, refresh the
-> 			 * on-device message data before enabling in case it had
-> 			 * been cleared or corrupted since writing.
-> 			 */
-> 
-> IIRC, that was the purpose of writing it back to the device and the
-> blocking of direct access is no longer accurate anyway.
-> 
-> > +			struct msi_msg msg;
-> > +
-> > +			get_cached_msi_msg(irq, &msg);
-> > +			pci_write_msi_msg(irq, &msg);
-> > +		}
-> >  	}
-> >  
-> >  	ret = request_irq(irq, vfio_msihandler, 0, ctx->name, trigger);
-> > -	vfio_pci_memory_unlock_and_restore(vdev, cmd);
-> >  	if (ret)
-> > -		goto out_put_eventfd_ctx;
-> > +		goto out_free_irq_locked;
-> > +
-> > +	vfio_pci_memory_unlock_and_restore(vdev, cmd);
-> >  
-> >  	ctx->producer.token = trigger;
-> >  	ctx->producer.irq = irq;
-> > @@ -477,11 +526,21 @@ static int vfio_msi_set_vector_signal(struct vfio_pci_core_device *vdev,
-> >  
-> >  	return 0;
-> >  
-> > +out_free_irq_locked:
-> > +	if (allow_dyn_alloc && new_ctx) {  
-> 
-> 		struct msi_map map = { .index = vector,
-> 				       .virq = irq };
-> 
-> > +		msix_map.index = vector;
-> > +		msix_map.virq = irq;
-> > +		pci_msix_free_irq(pdev, msix_map);
-> > +	}
-> > +	vfio_pci_memory_unlock_and_restore(vdev, cmd);
-> >  out_put_eventfd_ctx:
-> >  	eventfd_ctx_put(trigger);
-> >  out_free_name:
-> >  	kfree(ctx->name);
-> >  	ctx->name = NULL;
-> > +out_free_ctx:
-> > +	if (allow_dyn_alloc && new_ctx)
-> > +		vfio_irq_ctx_free(vdev, ctx, vector);
-> >  	return ret;
-> >  }
-> >    
-> 
-> Do we really need the new_ctx test in the above cases?  Thanks,
-> 
-> Alex
+With this series, a workload running in a VM gets the same task placement
+and DVFS treatment as it would when running in the host.
+
+As expected, we see significant performance improvement and better
+performance/power ratio. If anyone else wants to try this out for your VM
+workloads and report findings, that'd be very much appreciated.
+
+The idea is to improve VM CPUfreq/sched behavior by:
+- Having guest kernel to do accurate load tracking by taking host CPU
+  arch/type and frequency into account.
+- Sharing vCPU run queue utilization information with the host so that the
+  host can do proper frequency scaling and task placement on the host side.
+
+Results:
+========
+
+As of right now, the best results have been with using hypercalls (see more
+below first) to communicate between host and guest and treating the vCPU
+run queue util similar to util_est on the host side vCPU thread. So that's
+what this patch series does.
+
+Let's look at the results for this series first and then look at the other
+options we are trying/tried out:
+
+Use cases running Android inside a VM on a Chromebook:
+======================================================
+
+PCMark (Emulates real world usecases)
+Higher is better
++-------------------+----------+------------+--------+
+| Test Case (score) | Baseline | Util_guest | %delta |
++-------------------+----------+------------+--------+
+| Weighted Total    |     6136 |       7274 |   +19% |
++-------------------+----------+------------+--------+
+| Web Browsing      |     5558 |       6273 |   +13% |
++-------------------+----------+------------+--------+
+| Video Editing     |     4921 |       5221 |    +6% |
++-------------------+----------+------------+--------+
+| Writing           |     6864 |       8825 |   +29% |
++-------------------+----------+------------+--------+
+| Photo Editing     |     7983 |      11593 |   +45% |
++-------------------+----------+------------+--------+
+| Data Manipulation |     5814 |       6081 |    +5% |
++-------------------+----------+------------+--------+
+
+PCMark Performance/mAh
+Higher is better
++-----------+----------+------------+--------+
+|           | Baseline | Util_guest | %delta |
++-----------+----------+------------+--------+
+| Score/mAh |       79 |         88 |   +11% |
++-----------+----------+------------+--------+
+
+Roblox
+Higher is better
++-----+----------+------------+--------+
+|     | Baseline | Util_guest | %delta |
++-----+----------+------------+--------+
+| FPS |    18.25 |      28.66 |   +57% |
++-----+----------+------------+--------+
+
+Roblox FPS/mAh
+Higher is better
++-----+----------+------------+--------+
+|     | Baseline | Util_guest | %delta |
++-----+----------+------------+--------+
+| FPS |     0.15 |       0.19 |   +26% |
++-----+----------+------------+--------+
+
+Use cases running a minimal system inside a VM on a Pixel 6:
+============================================================
+
+FIO
+Higher is better
++----------------------+----------+------------+--------+
+| Test Case (avg MB/s) | Baseline | Util_guest | %delta |
++----------------------+----------+------------+--------+
+| Seq Write            |     9.27 |       12.6 |   +36% |
++----------------------+----------+------------+--------+
+| Rand Write           |     9.34 |       11.9 |   +27% |
++----------------------+----------+------------+--------+
+| Seq Read             |      106 |        124 |   +17% |
++----------------------+----------+------------+--------+
+| Rand Read            |     33.6 |         35 |    +4% |
++----------------------+----------+------------+--------+
+
+CPU-based ML Inference Benchmark
+Lower is better
++-------------------------+----------+------------+--------+
+| Test Case (ms)          | Baseline | Util_guest | %delta |
++-------------------------+----------+------------+--------+
+| Cached Sample Inference |     2.57 |       1.75 |   -32% |
++-------------------------+----------+------------+--------+
+| Small Sample Inference  |      6.8 |       5.57 |   -18% |
++-------------------------+----------+------------+--------+
+| Large Sample Inference  |     31.2 |      26.58 |   -15% |
++-------------------------+----------+------------+--------+
+
+These patches expect the host to:
+- Affine vCPUs to specific clusters.
+- Set vCPU capacity to match the host CPU they are running on.
+
+To make this easy to do/try out, we have put up patches[4][5] to do this on
+CrosVM. Once you pick up those patches, you can use options
+"--host-cpu-topology" and "--virt-cpufreq" to achieve the above.
+
+The patch series can be broken into:
+
+Patch 1: Add util_guest as an additional PELT signal for host vCPU threads
+Patch 2: Hypercall for guest to get current pCPU's frequency
+Patch 3: Send vCPU run queue util to host and apply as util_guest
+Patch 4: Query pCPU freq table from guest (we'll move this to DT in the
+	 future)
+Patch 5: Virtual cpufreq driver that uses the hypercalls to send util to
+	 host and implement frequency invariance in the guest.
+
+Alternative we have implemented and profiled:
+=============================================
+
+util_guest vs uclamp_min
+========================
+
+One suggestion at LPC was to use uclamp_min to apply the util info coming
+from the guest. As we suspected, it doesn't perform as well because
+uclamp_min is not additive, whereas the actual workload on the host CPU due
+to the vCPU is additive to the existing workloads on the host. Uclamp_min
+also has the undesirable side-effect of threads forked from the vCPU thread
+inheriting whatever uclamp_min value the vCPU thread had and then getting
+stuck with that uclamp_min value.
+
+Below are some additional benchmark results comparing the uclamp_min
+prototype (listed as Uclamp) using the same test environment as before
+(including hypercalls).
+
+As before, %delta is always comparing to baseline.
+
+PCMark
+Higher is better
++-------------------+----------+------------+--------+--------+--------+
+| Test Case (score) | Baseline | Util_guest | %delta | Uclamp | %delta |
++-------------------+----------+------------+--------+--------+--------+
+| Weighted Total    |     6136 |       7274 |   +19% |   6848 |   +12% |
++-------------------+----------+------------+--------+--------+--------+
+| Web Browsing      |     5558 |       6273 |   +13% |   6050 |    +9% |
++-------------------+----------+------------+--------+--------+--------+
+| Video Editing     |     4921 |       5221 |    +6% |   5091 |    +3% |
++-------------------+----------+------------+--------+--------+--------+
+| Writing           |     6864 |       8825 |   +29% |   8523 |   +24% |
++-------------------+----------+------------+--------+--------+--------+
+| Photo Editing     |     7983 |      11593 |   +45% |   9865 |   +24% |
++-------------------+----------+------------+--------+--------+--------+
+| Data Manipulation |     5814 |       6081 |    +5% |   5836 |     0% |
++-------------------+----------+------------+--------+--------+--------+
+
+PCMark Performance/mAh
+Higher is better
++-----------+----------+------------+--------+--------+--------+
+|           | Baseline | Util_guest | %delta | Uclamp | %delta |
++-----------+----------+------------+--------+--------+--------+
+| Score/mAh |       79 |         88 |   +11% |     83 |    +7% |
++-----------+----------+------------+--------+--------+--------+
+
+Hypercalls vs MMIO:
+===================
+We realize that hypercalls are not the recommended choice for this and we
+have no attachment to any communication method as long as it gives good
+results.
+
+We started off with hypercalls to see what is the best we could achieve if
+we didn't have to context switch into host side userspace.
+
+To see the impact of switching from hypercalls to MMIO, we kept util_guest
+and only switched from hypercall to MMIO. So in the results below:
+- Hypercall = hypercall + util_guest
+- MMIO = MMIO + util_guest
+
+As before, %delta is always comparing to baseline.
+
+PCMark
+Higher is better
++-------------------+----------+------------+--------+-------+--------+
+| Test Case (score) | Baseline |  Hypercall | %delta |  MMIO | %delta |
++-------------------+----------+------------+--------+-------+--------+
+| Weighted Total    |     6136 |       7274 |   +19% |  6867 |   +12% |
++-------------------+----------+------------+--------+-------+--------+
+| Web Browsing      |     5558 |       6273 |   +13% |  6035 |    +9% |
++-------------------+----------+------------+--------+-------+--------+
+| Video Editing     |     4921 |       5221 |    +6% |  5167 |    +5% |
++-------------------+----------+------------+--------+-------+--------+
+| Writing           |     6864 |       8825 |   +29% |  8529 |   +24% |
++-------------------+----------+------------+--------+-------+--------+
+| Photo Editing     |     7983 |      11593 |   +45% | 10812 |   +35% |
++-------------------+----------+------------+--------+-------+--------+
+| Data Manipulation |     5814 |       6081 |    +5% |  5327 |    -8% |
++-------------------+----------+------------+--------+-------+--------+
+
+PCMark Performance/mAh
+Higher is better
++-----------+----------+-----------+--------+------+--------+
+|           | Baseline | Hypercall | %delta | MMIO | %delta |
++-----------+----------+-----------+--------+------+--------+
+| Score/mAh |       79 |        88 |   +11% |   83 |    +7% |
++-----------+----------+-----------+--------+------+--------+
+
+Roblox
+Higher is better
++-----+----------+------------+--------+-------+--------+
+|     | Baseline |  Hypercall | %delta |  MMIO | %delta |
++-----+----------+------------+--------+-------+--------+
+| FPS |    18.25 |      28.66 |   +57% | 24.06 |   +32% |
++-----+----------+------------+--------+-------+--------+
+
+Roblox Frames/mAh
+Higher is better
++------------+----------+------------+--------+--------+--------+
+|            | Baseline |  Hypercall | %delta |   MMIO | %delta |
++------------+----------+------------+--------+--------+--------+
+| Frames/mAh |    91.25 |     114.64 |   +26% | 103.11 |   +13% |
++------------+----------+------------+--------+--------+--------+
+
+Next steps:
+===========
+We are continuing to look into communication mechanisms other than
+hypercalls that are just as/more efficient and avoid switching into the VMM
+userspace. Any inputs in this regard are greatly appreciated.
+
+Thanks,
+David & Saravana
+
+[1] - https://lpc.events/event/16/contributions/1195/
+[2] - https://lpc.events/event/16/contributions/1195/attachments/970/1893/LPC%202022%20-%20VM%20DVFS.pdf
+[3] - https://www.youtube.com/watch?v=hIg_5bg6opU
+[4] - https://chromium-review.googlesource.com/c/crosvm/crosvm/+/4208668
+[5] - https://chromium-review.googlesource.com/c/crosvm/crosvm/+/4288027
+
+David Dai (6):
+  sched/fair: Add util_guest for tasks
+  kvm: arm64: Add support for get_cur_cpufreq service
+  kvm: arm64: Add support for util_hint service
+  kvm: arm64: Add support for get_freqtbl service
+  dt-bindings: cpufreq: add bindings for virtual kvm cpufreq
+  cpufreq: add kvm-cpufreq driver
+
+ .../bindings/cpufreq/cpufreq-virtual-kvm.yaml |  39 +++
+ Documentation/virt/kvm/api.rst                |  28 ++
+ .../virt/kvm/arm/get_cur_cpufreq.rst          |  21 ++
+ Documentation/virt/kvm/arm/get_freqtbl.rst    |  23 ++
+ Documentation/virt/kvm/arm/index.rst          |   3 +
+ Documentation/virt/kvm/arm/util_hint.rst      |  22 ++
+ arch/arm64/include/uapi/asm/kvm.h             |   3 +
+ arch/arm64/kvm/arm.c                          |   3 +
+ arch/arm64/kvm/hypercalls.c                   |  60 +++++
+ drivers/cpufreq/Kconfig                       |  13 +
+ drivers/cpufreq/Makefile                      |   1 +
+ drivers/cpufreq/kvm-cpufreq.c                 | 245 ++++++++++++++++++
+ include/linux/arm-smccc.h                     |  21 ++
+ include/linux/sched.h                         |  12 +
+ include/uapi/linux/kvm.h                      |   3 +
+ kernel/sched/core.c                           |  24 +-
+ kernel/sched/fair.c                           |  15 +-
+ tools/arch/arm64/include/uapi/asm/kvm.h       |   3 +
+ 18 files changed, 536 insertions(+), 3 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/cpufreq/cpufreq-virtual-kvm.yaml
+ create mode 100644 Documentation/virt/kvm/arm/get_cur_cpufreq.rst
+ create mode 100644 Documentation/virt/kvm/arm/get_freqtbl.rst
+ create mode 100644 Documentation/virt/kvm/arm/util_hint.rst
+ create mode 100644 drivers/cpufreq/kvm-cpufreq.c
+
+-- 
+2.40.0.348.gf938b09366-goog
 
