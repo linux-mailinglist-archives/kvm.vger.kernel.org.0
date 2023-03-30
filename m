@@ -2,80 +2,161 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6C1D16CF9D2
-	for <lists+kvm@lfdr.de>; Thu, 30 Mar 2023 05:56:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 858EA6CFA6A
+	for <lists+kvm@lfdr.de>; Thu, 30 Mar 2023 06:53:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229597AbjC3D4C (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 Mar 2023 23:56:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36154 "EHLO
+        id S229991AbjC3Ex2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Mar 2023 00:53:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48792 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229675AbjC3Dzx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 29 Mar 2023 23:55:53 -0400
-Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1CBD4468A
-        for <kvm@vger.kernel.org>; Wed, 29 Mar 2023 20:55:52 -0700 (PDT)
-Received: by mail-pl1-x62d.google.com with SMTP id d9443c01a7336-1a1b23f49e2so134365ad.0
-        for <kvm@vger.kernel.org>; Wed, 29 Mar 2023 20:55:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1680148551;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=+CVAOLuwD80Bd5PzmarfCnim42bOXcWvf05MWwjZBAE=;
-        b=lc+fBWtgGa5qjeLygju1S5fN83HoFYZLDyYq1ypW9Q7+E5lruuj2wUMR7nYareVx6r
-         KMxBoCBzpRTIn3oBWWck5U22wXDmjTOOzs1WzSzNRAaLFFjDMHBIKbLdWp+hqGo8faO/
-         julebdE8XgdhEFX86mw7hM/RjBw9HOLloW66GUrYUzz9WPfqShMkUfcNipTpRE7m2SZG
-         IzJBcymV6hSeoHy7vbsSTKOEEWELxXArcC/oqNU4fxgI1b2FRGrJCjTuaNu750gzQAHM
-         f6mGGfCTwezdycufQGlLiUxlg6CySA4J9Rq0439XHF+25GhuvdN+FHinjEymEASeVs1u
-         5NUQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680148551;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+CVAOLuwD80Bd5PzmarfCnim42bOXcWvf05MWwjZBAE=;
-        b=PbcQ4AT4k69MfkrlW9mIneAa/vvAEnz5P4rguFNe/4XvDCNe/mo7XeowWlixq6mL6/
-         pl+z2Dalyohr7tVObu9tlj5QPqz1WZaPfIlZ+xw6OB+p/ZbF9ovUPvgrHeIbv/zZIUNl
-         KL5aJ03vTBiM85OAFPzGkAht9d81ExxzojfTVwWMcE+LvrpGOrE9fZUh0qYKTNbK3Nmt
-         9lXnmzueN0NMW6R9a/qw5D+n2EcW3OOwUD3sUe1ciT3HzT7YVFuaimhmO0VA+gI33kW4
-         6xzMlWH9BoNkd3NdcxQRvmMWthV83RJpivFKtJd96tVNdym6A8ImOWIW9Sh4nezgb3WM
-         7q+A==
-X-Gm-Message-State: AAQBX9dB9bkiR4pEyadvDUV1Y15sY7EZNNMtrsZ8v7ymVz0GYT0COS5d
-        R56dcEwUTpywgE1HwiItQ8XFbA==
-X-Google-Smtp-Source: AKy350YjIPGrObbdmLjCfoFpURisbH1QkXA0e533gkNFg4lYQooMr7BEnC8qsxqYUP8WeXbcWjqc9A==
-X-Received: by 2002:a17:903:12c6:b0:1a2:4b5:8677 with SMTP id io6-20020a17090312c600b001a204b58677mr23679plb.7.1680148551326;
-        Wed, 29 Mar 2023 20:55:51 -0700 (PDT)
-Received: from google.com (223.103.125.34.bc.googleusercontent.com. [34.125.103.223])
-        by smtp.gmail.com with ESMTPSA id n2-20020aa79042000000b00625e885a6ffsm13718927pfo.18.2023.03.29.20.55.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 Mar 2023 20:55:50 -0700 (PDT)
-Date:   Wed, 29 Mar 2023 20:55:46 -0700
-From:   Reiji Watanabe <reijiw@google.com>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Raghavendra Rao Anata <rananta@google.com>,
-        Will Deacon <will@kernel.org>, Rob Herring <robh@kernel.org>
-Subject: Re: [PATCH v1 2/2] KVM: arm64: PMU: Ensure to trap PMU access from
- EL0 to EL2
-Message-ID: <20230330035546.zosorjtilwccvc4m@google.com>
-References: <20230329002136.2463442-1-reijiw@google.com>
- <20230329002136.2463442-3-reijiw@google.com>
- <86jzyzwyrd.wl-maz@kernel.org>
+        with ESMTP id S229552AbjC3Ex0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 30 Mar 2023 00:53:26 -0400
+Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E928040E8;
+        Wed, 29 Mar 2023 21:53:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1680152005; x=1711688005;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=nKH1YH/DqqQk2zQFRFkYjaIzsvKmuX0oes+ey+U+Pwk=;
+  b=b7iag+il/IQUbg6reHBAnfJjFzndIcqpzUARYNLvI7pj+hyGKrCgXq5u
+   duqZkIC58CT8/qyq5W5DaCbAz+bS+wZv/Ors0feTtYs0IWN5ZZhAZB4pG
+   AD/D3a88hk0Qw5KA9SAS1z/vyvQSo7pPcglBnxWyv3ZjUfv2btay69uQk
+   UYrIjkQLkcsEA1n5YMff0a3olceyCAzIpY9wFei8qYIDOV8ZY0VQp7Kvs
+   pprSu89XUwRGAs28EGPa2O0Gio0lQq0c8QmQ66Fhk9ZHcKnhJ+XMDMSJ4
+   yT4VGJpanrwAVKEtxiOBip2IO5R9oy2XF8rjwldM7wQUFPLdZgQ3xvn1L
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10664"; a="341084520"
+X-IronPort-AV: E=Sophos;i="5.98,301,1673942400"; 
+   d="scan'208";a="341084520"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Mar 2023 21:53:25 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10664"; a="684539643"
+X-IronPort-AV: E=Sophos;i="5.98,301,1673942400"; 
+   d="scan'208";a="684539643"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by orsmga002.jf.intel.com with ESMTP; 29 Mar 2023 21:53:25 -0700
+Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.21; Wed, 29 Mar 2023 21:53:24 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.21; Wed, 29 Mar 2023 21:53:24 -0700
+Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.21 via Frontend Transport; Wed, 29 Mar 2023 21:53:24 -0700
+Received: from NAM04-DM6-obe.outbound.protection.outlook.com (104.47.73.43) by
+ edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.21; Wed, 29 Mar 2023 21:53:23 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=mR1uUs5TrmalPOd7d4ys/m2t0SevvvZgzvq0tONYgPDqVJkCmLT34hCGCuOR5UmZfpRX6rOT1WgcaDLW1GRWHi8Rz6extNUPvC+SZSkVTQHp9seCOCOiH/onVwuG2EKdMD1N9eJe0op364ajKlxPzib+VITTwaj8XijLgGfhQANRV7jCZhTIeFrcxwE7ShvrJz8Bs/16kFDmyOLZx/IzYwQAFODYgnnkxYlPmcDFX8LrJJM9YhAXF68GyfJsvIHxl5dLt1HdAON6iXESr4KdsN+SkYgk7SSxzdOQsymKDlZddXEnJSo2JKpGFtvs8OYmeqarr0TUo4eVmDSzzJzaug==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=qjPpsCAyZO1GUovH3FYDI2bRlnFDwEQ0wA06jj56BB4=;
+ b=oHApUU6STSj6dOQfHCrTZjOZID5WNsg0kH3ZfES1tdCmGEjNPtL5u7+YkmdQrdgUy57vgC3+wGDYAOEX3RHrUu6tfZnEdrolUUTXTW3OETou00+r1aPBft2RjbvByqn2M2LTS8TSuFWHKkWdbu7NysfD+IM5+sHK77JEsjKJOmmK86435RAsd3lBA/EaRAn9FWc/byhwrx8GvHoiIEPPAIM9OwQTwCfK/BtZifGQu+i0FXDI3QKU5KxXs14kBE3cMHgUVbgZqRrldbwcHv5YI9RSFL3ngYuGxCdfz72/KRGDsiHsWSkdelBPZwt4ykVW3o9T+tEBZ8Q5RtPm6QRBKw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from PH0PR11MB4965.namprd11.prod.outlook.com (2603:10b6:510:34::7)
+ by CO1PR11MB5140.namprd11.prod.outlook.com (2603:10b6:303:9e::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6222.35; Thu, 30 Mar
+ 2023 04:53:20 +0000
+Received: from PH0PR11MB4965.namprd11.prod.outlook.com
+ ([fe80::47e1:d7b9:aab:dada]) by PH0PR11MB4965.namprd11.prod.outlook.com
+ ([fe80::47e1:d7b9:aab:dada%6]) with mapi id 15.20.6222.034; Thu, 30 Mar 2023
+ 04:53:20 +0000
+Message-ID: <ecd28c71-6f3d-d5bb-cd39-ab80edc549ab@intel.com>
+Date:   Thu, 30 Mar 2023 12:53:08 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.9.0
+Subject: Re: [Patch v4 08/18] KVM: x86/mmu: Track unused
+ mmu_shadowed_info_cache pages count via global counter
+To:     Vipin Sharma <vipinsh@google.com>
+CC:     <jmattson@google.com>, <mizhang@google.com>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <seanjc@google.com>,
+        <pbonzini@redhat.com>, <bgardon@google.com>, <dmatlack@google.com>
+References: <20230306224127.1689967-1-vipinsh@google.com>
+ <20230306224127.1689967-9-vipinsh@google.com>
+Content-Language: en-US
+From:   "Yang, Weijiang" <weijiang.yang@intel.com>
+In-Reply-To: <20230306224127.1689967-9-vipinsh@google.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: SG2PR01CA0114.apcprd01.prod.exchangelabs.com
+ (2603:1096:4:40::18) To PH0PR11MB4965.namprd11.prod.outlook.com
+ (2603:10b6:510:34::7)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <86jzyzwyrd.wl-maz@kernel.org>
-X-Spam-Status: No, score=-15.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,ENV_AND_HDR_SPF_MATCH,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL,
-        USER_IN_DEF_SPF_WL autolearn=unavailable autolearn_force=no
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR11MB4965:EE_|CO1PR11MB5140:EE_
+X-MS-Office365-Filtering-Correlation-Id: 9d0cd2c3-474f-4c50-2a6e-08db30daae92
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: b1meXaVVUsWnk00gpmlxiX/UQ/kaCuGJRvG9e0YwVrF6QjKevWyUjp1DMhmS9FU/F++Jbns4/M0ZcppUSiuT/CxPxG9En76B0C5dAUhkY9blcyZdlD90GWcgTrpdOy22pCMP6hPE3OIyzA37RvMDzBR5c6tl2Lw/ujTsWs4TQ0jkDhgnkXG3u5xf6hhHvBdWX54LTUu/hwAOthdBz8pJao24NHexEW+23Q2nzvaxdBkTCQPnbMeEAj66sySNon6IR3BLuv8ceBSaWqpTJvava5M7e/OssxaeTzLBtBlh1an85w2JuCxvbiOHmp0UntR3Frl6O6JK0qi+NDAmVKYyp/QovhMoeO5w9gtWfAZVj0g6ZvWMH1yzzbB57Ji8sjIRTVNrIwXLGMKNE2Ya6K+GolEk5rUJbJLjvRr3q6akyAnamcMs+vFCplpvG8xb0Jg+XcTRGkf14erUSdmTWs01phH44IOBQmG00N+cZ/M4nVMX7lCxuA7jiE+FK5dG15OIeoXQNYlqiqxAF4pLPyz5oh0hNKDhHRnJRJ8b54Vn3mnSvcshY8hRDzodxAlV58MvwCcvFSqbHAbtuWEcKF+/C1L8HiyXVYu3OCPMpmMvK4y7Ji2PhVipXy3HbW2mlpuugFNJMqgvlVxh1nNKuXcTQg==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB4965.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(136003)(346002)(376002)(39860400002)(396003)(366004)(451199021)(86362001)(26005)(66556008)(4326008)(6916009)(8676002)(2906002)(82960400001)(41300700001)(66946007)(66476007)(316002)(186003)(6512007)(53546011)(83380400001)(2616005)(6506007)(31686004)(478600001)(6666004)(31696002)(6486002)(36756003)(38100700002)(5660300002)(8936002)(45980500001)(43740500002);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?VlZabG1aVTJ2UlNteGhaczZVdGYwTUc0eU1Nakc4b0pqN1ZhNU1Gd2N6SmM1?=
+ =?utf-8?B?aG1xNXhOTTFJNFZWdE5aYXJnUEdkTnZJbmxhUm9XK2ZaeHF5aWxVRFBFT1NE?=
+ =?utf-8?B?c3Z1K0xPRXM5THNHTnZPOXRrNkNHVXBqNlc3T3RiajJRZjdSMUVjWk1ranBJ?=
+ =?utf-8?B?akx5V21MemJ6SkRMWnpWcmNnNjI3YW5YeGdGSytxaktpVU5TQlVkNi9ob0FT?=
+ =?utf-8?B?NXpCbXlOUWtGZzVkaW9XZEQrYVluOTYyYW5XaEJNNkRkQ21rZWFmZFVTdUl3?=
+ =?utf-8?B?b011NU9vUzRmaTZyTk92NEEyRWpTSGxPcFdmSW9HaFcvbjlVOFgzcUI3d2p3?=
+ =?utf-8?B?TkJxM0UwcCtuRGhEUWlkaCtiMXNvdjNFWEdhaDhuVm5HaHNEMWVZSUlUcHBt?=
+ =?utf-8?B?cW53RGZkUDZOQ3NuWWh5VFNPQmFVWGkvWnBHTjFNb2JsczJTRHV4dlZDZ2ts?=
+ =?utf-8?B?ajBPTG9QYVdzdnhJYXBzWDQ2a0grKzZ0SS9BelJkRHgwZ0U0RTNLMGs1d1lR?=
+ =?utf-8?B?NTJjSDdOamJZYzBiUm0yT0lsTzlySS84bTBlZkhNVmlReEdDbldleThxSWdl?=
+ =?utf-8?B?b1pQNmVPMFZTc0tzb3IyRENOS25XSS9RV2g3cVBqOGphdUpscFIzendaSmJz?=
+ =?utf-8?B?NVBJSmYyUE1zUGpaNkVmWHdzWW1scDd6RnEweWxwWnozWlB4THR6ZWZjY1pN?=
+ =?utf-8?B?dVFtdVdiRnJlZytCRlVMYkgyMk1wckpTVFFqSi9CUHJSdW1RZWhiNW9ra0VD?=
+ =?utf-8?B?d3BMLy9yYUZQdm15ckZjT3VpZStUUW1ZTzM5YXNHbnNpbkM4UVY4N1VIK3Y0?=
+ =?utf-8?B?NXFCNEFzNjZTMWoxd3UyaWs2bFVHVFNmb2lROWhRSjFEL3ZXUkE1YVlLOXhN?=
+ =?utf-8?B?SHV1dEpOaHNkSXRVbGdOdjRDNWozNm5nbE9uTjhvM082S2hUYmM4aU91b0R6?=
+ =?utf-8?B?dzJIVmdhWlZwNDZ6S2dWTWkxajVhZ0N4UDRXMEkzbHNwT05tb3h3TEs1Wnlp?=
+ =?utf-8?B?THBUanh6WnkvRmg1Q2ttanpEZ1BpNE9TWWVvaVJ3VmNyZVFIWndZWXovbVdj?=
+ =?utf-8?B?WXYvZEVicjBtZDVHdW9nUit0SW0wMnZydE14Q1ZyR081RFJyTVZ4Q0xSNC9Y?=
+ =?utf-8?B?Q3grcGh3UVYybWJaa2JiZzlvNFFkWHBNQmJsbmh6Q1JDOTI3blVWSUdkWEZr?=
+ =?utf-8?B?OXRYeHdQWmxGSWkvbGpEMWpGVU9JTUZuZDVxNlNXWlhHMEd4Ulc1YUlaMCta?=
+ =?utf-8?B?VjdDVmJvQ3JmWjRXU1hzUlp4UGhDMEZmRXRMRGJEVnJrNDcwVWxFa1VaNkQ1?=
+ =?utf-8?B?V0ZubVFxYXk4WlA3NlF5RVV0SmIwelluTk9HcHF6UGNwTk5reVFLMVVoRE5T?=
+ =?utf-8?B?bjI1bDg2SUhoUVJ4b0tJbGNFaU5SUXNiOHVKTUc1Mi9mYnJmRUZFZkxUVkJw?=
+ =?utf-8?B?RVc4QzNVakhtNnFEOUxNNk5YY0ZNSGN5NTluaGpCQVVkd0t5Z2RlNklwSXNF?=
+ =?utf-8?B?bUs5Ym93cDdDc2Iza2pEZk1qdFRmRHFyQ2NQb1pvaFhWakFBYWZ3alZvNTdL?=
+ =?utf-8?B?Y0todlMwY1BHWDNFK1F5QkRKSWJCZlpXMWdmNlBPUWs5K1pxck9Xdll2R2Zo?=
+ =?utf-8?B?cytmTG9TTmljMytjTkNlNHR1U245ejQrWGJUTGtmcWlsTXlDZHdtMnB1SU0w?=
+ =?utf-8?B?REtPZ010Y201UkppbnU3SHlBdGV4dmtsWVNWN1VEcHR1RDR6dWVqYjRvRmU3?=
+ =?utf-8?B?SmFuNlpzY3pOQ09WakR6TXJIaDJlL2l1RCsxcWNCYThFWmpoWHh6cUlZL3M1?=
+ =?utf-8?B?dzdKc2R0eFYyL1EwdTJTWVludjNOd1lnbEpta1pSbHZYdWhkSWJ1clduSWtT?=
+ =?utf-8?B?UkdSeTBrNGUvZnJvVkdweElCNEpCQk1yWFcrT0xpRVJRS0xIS3hhVmRiMXRJ?=
+ =?utf-8?B?UnRaU1lZMG1CUitrRksxcm9mejIvbUtXbHA5SjIzdysrdGc4NEZSK0Y5d3Rw?=
+ =?utf-8?B?MTJpRU9ER2kzTVFjdTZ0MTNsTjhscTBXWnpLSS9xOGEwYTBaM1ZBcEJ0Vk8x?=
+ =?utf-8?B?Y1g2cmJibmprZnQ3bkZObHo0S1pWbGR4OWRXOUdhZnJtVmpnejBPL3oyT3dw?=
+ =?utf-8?B?TkpjaDZic0thSGlWUXUwRTV0Nmp5VkkyY24wanE5aS8vVWVnSk1oczcvL1Zp?=
+ =?utf-8?B?Ync9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9d0cd2c3-474f-4c50-2a6e-08db30daae92
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB4965.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Mar 2023 04:53:19.7999
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Uj5G5jk+QJ9Vu/LJ7SJ96b3il3JuhYthndnRRwahBUXBE1FVGkOLrui4qVD5Pepfgw8N9EXOcAIv2645EyfCRg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO1PR11MB5140
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-2.5 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
         version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -83,126 +164,70 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
 
-On Wed, Mar 29, 2023 at 01:03:18PM +0100, Marc Zyngier wrote:
-> On Wed, 29 Mar 2023 01:21:36 +0100,
-> Reiji Watanabe <reijiw@google.com> wrote:
-> > 
-> > Currently, with VHE, KVM sets ER, CR, SW and EN bits of
-> > PMUSERENR_EL0 to 1 on vcpu_load().  So, if the value of those bits
-> > are cleared after vcpu_load() (the perf subsystem would do when PMU
-> > counters are programmed for the guest), PMU access from the guest EL0
-> > might be trapped to the guest EL1 directly regardless of the current
-> > PMUSERENR_EL0 value of the vCPU.
-> 
-> + RobH.
-> 
-> Is that what is done when the event is created and armv8pmu_start()
-> called? 
+On 3/7/2023 6:41 AM, Vipin Sharma wrote:
+> Add unused pages in mmu_shadowed_info_cache to global MMU unused page
+> cache counter i.e. kvm_total_unused_cached_pages. These pages will be
+> freed by MMU shrinker in future commit.
 
-Yes, that is it.
+This patch mainly renames some functions,  but the commit log doesn't 
+reflect what
 
-> This is... crap. The EL0 access thing breaks everything, and
-> nobody tested it with KVM, obviously.
-
-It was a bit shocking, as we detected those EL0 related
-issues just with the first EL0 PMU test we ran...
-
-> 
-> I would be tempted to start mitigating it with the following:
-> 
-> diff --git a/arch/arm64/kernel/perf_event.c b/arch/arm64/kernel/perf_event.c
-> index dde06c0f97f3..8063525bf3dd 100644
-> --- a/arch/arm64/kernel/perf_event.c
-> +++ b/arch/arm64/kernel/perf_event.c
-> @@ -806,17 +806,19 @@ static void armv8pmu_disable_event(struct perf_event *event)
->  
->  static void armv8pmu_start(struct arm_pmu *cpu_pmu)
->  {
-> -	struct perf_event_context *ctx;
-> -	int nr_user = 0;
-> +	if (sysctl_perf_user_access) {
-> +		struct perf_event_context *ctx;
-> +		int nr_user = 0;
->  
-> -	ctx = perf_cpu_task_ctx();
-> -	if (ctx)
-> -		nr_user = ctx->nr_user;
-> +		ctx = perf_cpu_task_ctx();
-> +		if (ctx)
-> +			nr_user = ctx->nr_user;
->  
-> -	if (sysctl_perf_user_access && nr_user)
-> -		armv8pmu_enable_user_access(cpu_pmu);
-> -	else
-> -		armv8pmu_disable_user_access();
-> +		if (nr_user)
-> +			armv8pmu_enable_user_access(cpu_pmu);
-> +		else
-> +			armv8pmu_disable_user_access();
-> +	}
->  
->  	/* Enable all counters */
->  	armv8pmu_pmcr_write(armv8pmu_pmcr_read() | ARMV8_PMU_PMCR_E);
-> 
-> but that's obviously not enough as we want it to work with EL0 access
-> enabled on the host as well.
-
-Right, also with the change above, since PMUSERENR_EL0 isn't explicitly
-cleared, a perf client (EL0) might have an access to counters.
-(with the current code, a non-perf client might have an access to
-counters though)
+this patch does. Please change the commit log or squash the patch.
 
 
-> What we miss is something that tells the PMU code "we're in a context
-> where host userspace isn't present", and this would be completely
-
-Could you please elaborate ?
-I'm not sure if I understand the above correctly.
-Since the task actually has the host userspace, which could be using
-the PMU, and both the host EL0 and guest EL0 events are associated with
-the task context of the perf_cpu_context, I think the "something" we
-want to say would be subtle (I would assume it is similar to what we
-meant with exclude_guest == 0 && exclude_host == 1 in the event attr
-for the guest, in terms of events?).
-
-
-> skipped, relying on KVM to restore the appropriate state on
-> vcpu_put(). But then the IPI stuff that controls EL0 can always come
-> in and wreck things. Gahhh...
-> 
-> I'm a bit reluctant to use the "save/restore all the time" hammer,
-> because it only hides that the EL0 counter infrastructure is a bit
-> broken.
-
-Looking at the current code only, since KVM directly silently
-modifies the PMU register (PMUSERENR_EL0) even though KVM is
-a client of the perf in general, my original thought was
-it made sense to have KVM restore the register value.
-
-
-> > With VHE, fix this by setting those bits of the register on every
-> > guest entry (as with nVHE).  Also, opportunistically make the similar
-> > change for PMSELR_EL0, which is cleared by vcpu_load(), to ensure it
-> > is always set to zero on guest entry (PMXEVCNTR_EL0 access might cause
-> > UNDEF at EL1 instead of being trapped to EL2, depending on the value
-> > of PMSELR_EL0).  I think that would be more robust, although I don't
-> > find any kernel code that writes PMSELR_EL0.
-> 
-> This was changed a while ago to avoid using the selection register,
-> see 0fdf1bb75953 ("arm64: perf: Avoid PMXEV* indirection"), and the
-> rationale behind the reset of PMSELR_EL0 in 21cbe3cc8a48 ("arm64: KVM:
-> pmu: Reset PMSELR_EL0.SEL to a sane value before entering the guest").
-> 
-> We *could* simply drop this zeroing of PMSELR_EL0 now that there is
-> nothing else host-side that writes to it. But we need to agree on how
-> to fix the above first.
-
-We don't have to clear PMSELR_EL0 on every guest entry,
-but I would think we still should do that at least in vcpu_load(),
-since now the host EL0 could have a direct access to PMSELR_EL0.
-(should be fine with the sane EL0 though)
-
-Thank you,
-Reiji
+>
+> Signed-off-by: Vipin Sharma <vipinsh@google.com>
+> ---
+>   arch/x86/include/asm/kvm_host.h | 3 ++-
+>   arch/x86/kvm/mmu/mmu.c          | 8 ++++----
+>   2 files changed, 6 insertions(+), 5 deletions(-)
+>
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 4322c7020d5d..185719dbeb81 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -792,7 +792,8 @@ struct kvm_vcpu_arch {
+>   	struct kvm_mmu_memory_cache mmu_page_header_cache;
+>   
+>   	/*
+> -	 * Protect allocation and release of pages from mmu_shadow_page_cache.
+> +	 * Protect allocation and release of pages from mmu_shadow_page_cache
+> +	 * and mmu_shadowed_info_cache.
+>   	 */
+>   	struct mutex mmu_shadow_page_cache_lock;
+>   
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 0a0962d8108b..b7ca31b5699c 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -715,8 +715,8 @@ static int mmu_topup_memory_caches(struct kvm_vcpu *vcpu, bool maybe_indirect)
+>   		return r;
+>   
+>   	if (maybe_indirect) {
+> -		r = kvm_mmu_topup_memory_cache(&vcpu->arch.mmu_shadowed_info_cache,
+> -					       PT64_ROOT_MAX_LEVEL);
+> +		r = mmu_topup_sp_memory_cache(&vcpu->arch.mmu_shadowed_info_cache,
+> +					      PT64_ROOT_MAX_LEVEL);
+>   		if (r)
+>   			return r;
+>   	}
+> @@ -729,8 +729,8 @@ static void mmu_free_memory_caches(struct kvm_vcpu *vcpu)
+>   	kvm_mmu_free_memory_cache(&vcpu->arch.mmu_pte_list_desc_cache);
+>   	mutex_lock(&vcpu->arch.mmu_shadow_page_cache_lock);
+>   	mmu_free_sp_memory_cache(&vcpu->arch.mmu_shadow_page_cache);
+> +	mmu_free_sp_memory_cache(&vcpu->arch.mmu_shadowed_info_cache);
+>   	mutex_unlock(&vcpu->arch.mmu_shadow_page_cache_lock);
+> -	kvm_mmu_free_memory_cache(&vcpu->arch.mmu_shadowed_info_cache);
+>   	kvm_mmu_free_memory_cache(&vcpu->arch.mmu_page_header_cache);
+>   }
+>   
+> @@ -2197,7 +2197,7 @@ static struct kvm_mmu_page *kvm_mmu_alloc_shadow_page(struct kvm *kvm,
+>   	sp = kvm_mmu_memory_cache_alloc(caches->page_header_cache);
+>   	sp->spt = mmu_sp_memory_cache_alloc(caches->shadow_page_cache);
+>   	if (!role.direct)
+> -		sp->shadowed_translation = kvm_mmu_memory_cache_alloc(caches->shadowed_info_cache);
+> +		sp->shadowed_translation = mmu_sp_memory_cache_alloc(caches->shadowed_info_cache);
+>   
+>   	set_page_private(virt_to_page(sp->spt), (unsigned long)sp);
+>   
