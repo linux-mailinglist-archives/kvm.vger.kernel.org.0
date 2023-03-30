@@ -2,36 +2,36 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8D35A6CFC41
-	for <lists+kvm@lfdr.de>; Thu, 30 Mar 2023 09:09:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1C2E06CFC52
+	for <lists+kvm@lfdr.de>; Thu, 30 Mar 2023 09:11:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230337AbjC3HJO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Mar 2023 03:09:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36904 "EHLO
+        id S230176AbjC3HLQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Mar 2023 03:11:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39454 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229640AbjC3HJM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 Mar 2023 03:09:12 -0400
+        with ESMTP id S229778AbjC3HLO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 30 Mar 2023 03:11:14 -0400
 Received: from mx.sberdevices.ru (mx.sberdevices.ru [45.89.227.171])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8F652683;
-        Thu, 30 Mar 2023 00:09:10 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1B972683;
+        Thu, 30 Mar 2023 00:11:01 -0700 (PDT)
 Received: from s-lin-edge02.sberdevices.ru (localhost [127.0.0.1])
-        by mx.sberdevices.ru (Postfix) with ESMTP id 01D9E5FD25;
-        Thu, 30 Mar 2023 10:09:09 +0300 (MSK)
+        by mx.sberdevices.ru (Postfix) with ESMTP id 2F7EE5FD25;
+        Thu, 30 Mar 2023 10:11:00 +0300 (MSK)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
-        s=mail; t=1680160149;
-        bh=wK7GCYWOw+lG9q/p1ToXem8gzHNx+PH+yGZk1ens7jQ=;
+        s=mail; t=1680160260;
+        bh=ggY0SHBEDfjLnsfC/RTR6iP6BEUZWncCZMwnfImDKoE=;
         h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type;
-        b=VVKgPd2AY8ifTLVP7yz7hKZ9V2P668QZRPGkv+dHfSh2CJr+Tccr+gwCfa5Bd+vVH
-         1GD73UM4EEZvfRdubWXVW6hMWV2dXWijONQCqgb18STJ245RG3gKu0UPuyN2u6mJyr
-         FbJ1itQszu2ZChMnNq0UfLA1nlx2BtTgSWvFB9m4cY8HoqFF2Yc0kM/3x3tTBJ3YF0
-         8XO5/Tq8a+bYvGhGX6HcfaqSLCtgC/lKFvQizMZHVVdLgHflAAiVdL9Wemj68swZA4
-         3PcsAlyoH2o2OlwGEKCZQcesrE3TPxHR8lCEPih/4aNBlhCLsFJeIdvu3dheIxaq7h
-         +J3K0uLxfS2CA==
+        b=oCPL5TtBEAP6W+v408n4Oq4bR+oEtlA6TQwuISu8BhUWeJ6vYR7TImdW1kVlgZs90
+         duxxYE/X8+6SNYv6N9KpE6FI8GC9n2O/SWi6Ut7VrTOXaGQJYz1+dGZe457in0uZGl
+         y5YIbaOVdN2mC6LDK7Go27pygHxYUh9GFtoyDdTEnv1j7GfrSTYZthmfcIHj4+oYDp
+         8+Nc/cfKRp3GDDT6aeZzC8HZweFypZwI1O5vV3TZkCceuSj1YQjlDwNlPTV8dCGr+v
+         Ume3wrtNEBiwc2vSiSJl8z2c0aCB7W7pvCVf5pTSGNCD7iitvuwUqLBsC5yjDvQssJ
+         J4AQmuDNWsjnQ==
 Received: from S-MS-EXCH01.sberdevices.ru (S-MS-EXCH01.sberdevices.ru [172.16.1.4])
         by mx.sberdevices.ru (Postfix) with ESMTP;
-        Thu, 30 Mar 2023 10:09:08 +0300 (MSK)
-Message-ID: <b910764f-a193-e684-a762-f941883a0745@sberdevices.ru>
-Date:   Thu, 30 Mar 2023 10:05:45 +0300
+        Thu, 30 Mar 2023 10:11:00 +0300 (MSK)
+Message-ID: <94d33849-d3c1-7468-72df-f87f897bafd2@sberdevices.ru>
+Date:   Thu, 30 Mar 2023 10:07:36 +0300
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.7.1
@@ -50,7 +50,7 @@ CC:     <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
         <kernel@sberdevices.ru>, <oxffffaa@gmail.com>,
         <avkrasnov@sberdevices.ru>, <pv-drivers@vmware.com>
 From:   Arseniy Krasnov <avkrasnov@sberdevices.ru>
-Subject: [RFC PATCH v2 1/3] vsock: return errors other than -ENOMEM to socket
+Subject: [RFC PATCH v2 2/3] vsock/vmci: convert VMCI error code to -ENOMEM
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
 X-Originating-IP: [172.16.1.6]
@@ -72,38 +72,53 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This removes behaviour, where error code returned from any transport
-was always switched to ENOMEM. This works in the same way as:
-commit
-c43170b7e157 ("vsock: return errors other than -ENOMEM to socket"),
-but for receive calls.
+This adds conversion of VMCI specific error code to general -ENOMEM. It
+is needed, because af_vsock.c passes error value returned from transport
+to the user.
 
 Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
 ---
- net/vmw_vsock/af_vsock.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ net/vmw_vsock/vmci_transport.c | 19 ++++++++++++++++---
+ 1 file changed, 16 insertions(+), 3 deletions(-)
 
-diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
-index 5f2dda35c980..413407bb646c 100644
---- a/net/vmw_vsock/af_vsock.c
-+++ b/net/vmw_vsock/af_vsock.c
-@@ -2043,7 +2043,7 @@ static int __vsock_stream_recvmsg(struct sock *sk, struct msghdr *msg,
+diff --git a/net/vmw_vsock/vmci_transport.c b/net/vmw_vsock/vmci_transport.c
+index 36eb16a40745..45de3e75597f 100644
+--- a/net/vmw_vsock/vmci_transport.c
++++ b/net/vmw_vsock/vmci_transport.c
+@@ -1831,10 +1831,17 @@ static ssize_t vmci_transport_stream_dequeue(
+ 	size_t len,
+ 	int flags)
+ {
++	int err;
++
+ 	if (flags & MSG_PEEK)
+-		return vmci_qpair_peekv(vmci_trans(vsk)->qpair, msg, len, 0);
++		err = vmci_qpair_peekv(vmci_trans(vsk)->qpair, msg, len, 0);
+ 	else
+-		return vmci_qpair_dequev(vmci_trans(vsk)->qpair, msg, len, 0);
++		err = vmci_qpair_dequev(vmci_trans(vsk)->qpair, msg, len, 0);
++
++	if (err < 0)
++		err = -ENOMEM;
++
++	return err;
+ }
  
- 		read = transport->stream_dequeue(vsk, msg, len - copied, flags);
- 		if (read < 0) {
--			err = -ENOMEM;
-+			err = read;
- 			break;
- 		}
+ static ssize_t vmci_transport_stream_enqueue(
+@@ -1842,7 +1849,13 @@ static ssize_t vmci_transport_stream_enqueue(
+ 	struct msghdr *msg,
+ 	size_t len)
+ {
+-	return vmci_qpair_enquev(vmci_trans(vsk)->qpair, msg, len, 0);
++	int err;
++
++	err = vmci_qpair_enquev(vmci_trans(vsk)->qpair, msg, len, 0);
++	if (err < 0)
++		err = -ENOMEM;
++
++	return err;
+ }
  
-@@ -2094,7 +2094,7 @@ static int __vsock_seqpacket_recvmsg(struct sock *sk, struct msghdr *msg,
- 	msg_len = transport->seqpacket_dequeue(vsk, msg, flags);
- 
- 	if (msg_len < 0) {
--		err = -ENOMEM;
-+		err = msg_len;
- 		goto out;
- 	}
- 
+ static s64 vmci_transport_stream_has_data(struct vsock_sock *vsk)
 -- 
 2.25.1
