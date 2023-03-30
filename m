@@ -2,76 +2,76 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B7E2F6D03AF
-	for <lists+kvm@lfdr.de>; Thu, 30 Mar 2023 13:45:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 741616D03AB
+	for <lists+kvm@lfdr.de>; Thu, 30 Mar 2023 13:45:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231857AbjC3LpP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Mar 2023 07:45:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58484 "EHLO
+        id S231833AbjC3LpO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Mar 2023 07:45:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58458 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231989AbjC3Loy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 Mar 2023 07:44:54 -0400
+        with ESMTP id S231992AbjC3Loz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 30 Mar 2023 07:44:55 -0400
 Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E8947ED6;
-        Thu, 30 Mar 2023 04:44:32 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AEF419EED;
+        Thu, 30 Mar 2023 04:44:33 -0700 (PDT)
 Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 32UBA39L003131;
-        Thu, 30 Mar 2023 11:43:48 GMT
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 32UBA5Pp003326;
+        Thu, 30 Mar 2023 11:43:50 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding; s=pp1;
- bh=8wADBOx4v+MCrfXi2qtbCPcodyNCWqeWEhoeLdy6kkY=;
- b=AqrupF63KenLFEjyvp3jc9QjaQOYsnA+p/YbDg+U9sHcYfaRRQjqVeHSs3BiWe7T7uvk
- dy5eMp8LBvzexX8TfnNaBzEQug3pZLV0E1U/mU/g/bvyWe1xZYf4NI2XLB3H0ZEz2X/y
- B4Fn9lGRDAsAfdSHd+jf/EqoYI9/7yGIeWJ2U7IKFYWZgIYsnn/sZy9D+tDqGIVFfE/K
- dZE10iTRVaQlER2QfT/FfMUCSk6Sdw9Mpfmi9PIO4qS0BlBn6P+lvc03lxp/GZ1nbGnn
- JSnpTOrSK25iCPDlGZw6qrPO9TkV6DpVsupVXETE04JCcnesm5odcMpZSLCwNjmNFzc5 ow== 
+ bh=XO17w8KdyosBV0pUgCFUV4D+xaV6cFlDxqnOuUyBrvo=;
+ b=J5FadfI37nklgHdS61+zgAeRIjlufOjKA8WnqIyLvJ5HauEmy3+YGEciu9hmjBtguXeJ
+ R/eU+i3bKECU+sMKNpLpjl5tuL6fxhaE+YFgGuy9ctgmVZWQu2zznShEIclJsIjBifoB
+ WNDOijl9xqGsbYGNRJR9Blg8HVVFInrpo0kG4VDcO2e42UOQ2ivnmD8XkogLxOXlxWqc
+ 8HLRcRJov1Hj2Ktb9AYtH3YZSuZyypMuqI7rOD1GZxFWcR65ehkPnnnrI+mYKCthFqpP
+ xuqwP1LWUTFZqJjMPhO9UT5qbQpHjUo8gM2X0cW3uBu/L5TdjBhH562x3iOEqFHkYw1L 9Q== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pmq1pm1ss-1
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pmq1pm1tg-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 30 Mar 2023 11:43:48 +0000
+        Thu, 30 Mar 2023 11:43:49 +0000
 Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 32UBhmbu004680;
-        Thu, 30 Mar 2023 11:43:48 GMT
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pmq1pm1s4-1
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 32UBAJO3004995;
+        Thu, 30 Mar 2023 11:43:49 GMT
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pmq1pm1sd-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 30 Mar 2023 11:43:47 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 32TKZfQa019202;
-        Thu, 30 Mar 2023 11:43:46 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-        by ppma03ams.nl.ibm.com (PPS) with ESMTPS id 3phrk6nujp-1
+        Thu, 30 Mar 2023 11:43:49 +0000
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+        by ppma05fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 32TLqbsR003825;
+        Thu, 30 Mar 2023 11:43:47 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+        by ppma05fra.de.ibm.com (PPS) with ESMTPS id 3phrk6ms20-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Thu, 30 Mar 2023 11:43:46 +0000
 Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-        by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 32UBhg9K22872754
+        by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 32UBhhu440894892
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 30 Mar 2023 11:43:42 GMT
+        Thu, 30 Mar 2023 11:43:43 GMT
 Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 9480D2004B;
+        by IMSVA (Postfix) with ESMTP id 74B0120049;
+        Thu, 30 Mar 2023 11:43:43 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C119620040;
         Thu, 30 Mar 2023 11:43:42 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E127B20040;
-        Thu, 30 Mar 2023 11:43:41 +0000 (GMT)
 Received: from linux6.. (unknown [9.114.12.104])
         by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Thu, 30 Mar 2023 11:43:41 +0000 (GMT)
+        Thu, 30 Mar 2023 11:43:42 +0000 (GMT)
 From:   Janosch Frank <frankja@linux.ibm.com>
 To:     kvm@vger.kernel.org
 Cc:     thuth@redhat.com, imbrenda@linux.ibm.com, nrb@linux.ibm.com,
         linux-s390@vger.kernel.org
-Subject: [kvm-unit-tests PATCH 4/5] s390x: ap: Add pqap aqic tests
-Date:   Thu, 30 Mar 2023 11:42:43 +0000
-Message-Id: <20230330114244.35559-5-frankja@linux.ibm.com>
+Subject: [kvm-unit-tests PATCH 5/5] s390x: ap: Add reset tests
+Date:   Thu, 30 Mar 2023 11:42:44 +0000
+Message-Id: <20230330114244.35559-6-frankja@linux.ibm.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230330114244.35559-1-frankja@linux.ibm.com>
 References: <20230330114244.35559-1-frankja@linux.ibm.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: BKCE0FjLvtp0jE1QsPShbbowBgEZZAx8
-X-Proofpoint-ORIG-GUID: jo3Dv3SrtUCqhVz1Sz7wzRevSsDMu3VT
+X-Proofpoint-GUID: I5_mCWp2ugOhj3MfLEsjAmeStljk8UlL
+X-Proofpoint-ORIG-GUID: NMlbosLje0nwTcJhqEQCdYs6Dk_ja9xm
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
  definitions=2023-03-30_07,2023-03-30_02,2023-02-09_01
@@ -89,97 +89,125 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Let's check if we can enable/disable interrupts and if all errors are
-reported if we specify bad addresses for the notification indication
-byte.
+Test if the IRQ enablement is turned off on a reset or zeroize PQAP.
 
 Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
 ---
- lib/s390x/ap.c | 33 +++++++++++++++++++++++++++++
- lib/s390x/ap.h | 11 ++++++++++
- s390x/ap.c     | 56 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 100 insertions(+)
+ lib/s390x/ap.c | 68 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ lib/s390x/ap.h |  4 +++
+ s390x/ap.c     | 52 ++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 124 insertions(+)
 
 diff --git a/lib/s390x/ap.c b/lib/s390x/ap.c
-index 8d7f2992..aaf5b4b9 100644
+index aaf5b4b9..d969b2a5 100644
 --- a/lib/s390x/ap.c
 +++ b/lib/s390x/ap.c
-@@ -51,6 +51,39 @@ int ap_pqap_tapq(uint8_t ap, uint8_t qn, struct ap_queue_status *apqsw,
+@@ -113,6 +113,74 @@ int ap_pqap_qci(struct ap_config_info *info)
  	return cc;
  }
  
-+int ap_pqap_aqic(uint8_t ap, uint8_t qn, struct ap_queue_status *apqsw,
-+		 struct ap_qirq_ctrl aqic, unsigned long addr)
++static int pqap_reset(uint8_t ap, uint8_t qn, struct ap_queue_status *r1,
++		      bool zeroize)
 +{
 +	struct pqap_r0 r0 = {};
 +	int cc;
 +
 +	/*
-+	 * AP-Queue Interruption Control
++	 * Reset/zeroize AP Queue
 +	 *
-+	 * Enables/disables interrupts for a APQN
++	 * Resets/zeroizes a queue and disables IRQs
 +	 *
-+	 * Inputs: 0,1,2
-+	 * Outputs: 1 (APQSW)
-+	 * Synchronous
++	 * Inputs: 0
++	 * Outputs: 1
++	 * Asynchronous
 +	 */
 +	r0.ap = ap;
 +	r0.qn = qn;
-+	r0.fc = PQAP_QUEUE_INT_CONTRL;
++	r0.fc = zeroize ? PQAP_ZEROIZE_APQ : PQAP_RESET_APQ;
 +	asm volatile(
 +		"	lgr	0,%[r0]\n"
-+		"	lgr	1,%[aqic]\n"
-+		"	lgr	2,%[addr]\n"
++		"	lgr	1,%[r1]\n"
 +		"	.insn	rre,0xb2af0000,0,0\n" /* PQAP */
-+		"	stg	1, %[apqsw]\n"
 +		"	ipm	%[cc]\n"
 +		"	srl	%[cc],28\n"
-+		: [apqsw] "=T" (*apqsw), [cc] "=&d" (cc)
-+		: [r0] "d" (r0), [aqic] "d" (aqic), [addr] "d" (addr)
-+		: "cc", "memory", "0", "2");
++		: [r1] "+&d" (r1), [cc] "=&d" (cc)
++		: [r0] "d" (r0)
++		: "memory");
 +
 +	return cc;
 +}
 +
- int ap_pqap_qci(struct ap_config_info *info)
++static int pqap_reset_wait(uint8_t ap, uint8_t qn, struct ap_queue_status *apqsw,
++			   bool zeroize)
++{
++	struct pqap_r2 r2 = {};
++	int cc;
++
++	cc = pqap_reset(ap, qn, apqsw, zeroize);
++	/* On a cc == 3 / error we don't need to wait */
++	if (cc)
++		return cc;
++
++	/*
++	 * TAPQ returns AP_RC_RESET_IN_PROGRESS if a reset is being
++	 * processed
++	 */
++	do {
++		cc = ap_pqap_tapq(ap, qn, apqsw, &r2);
++		/* Give it some time to process before the retry */
++		mdelay(20);
++	} while (apqsw->rc == AP_RC_RESET_IN_PROGRESS);
++
++	if (apqsw->rc)
++		printf("Wait for reset failed on ap %d queue %d with tapq rc %d.",
++			ap, qn, apqsw->rc);
++	return cc;
++}
++
++int ap_pqap_reset(uint8_t ap, uint8_t qn, struct ap_queue_status *apqsw)
++{
++	return pqap_reset_wait(ap, qn, apqsw, false);
++}
++
++int ap_pqap_reset_zeroize(uint8_t ap, uint8_t qn, struct ap_queue_status *apqsw)
++{
++	return pqap_reset_wait(ap, qn, apqsw, true);
++}
++
+ static int ap_get_apqn(uint8_t *ap, uint8_t *qn)
  {
- 	struct pqap_r0 r0 = { .fc = PQAP_QUERY_AP_CONF_INFO };
+ 	unsigned long *ptr;
 diff --git a/lib/s390x/ap.h b/lib/s390x/ap.h
-index 59595eba..3f9e2eb6 100644
+index 3f9e2eb6..f9343b5f 100644
 --- a/lib/s390x/ap.h
 +++ b/lib/s390x/ap.h
-@@ -79,6 +79,15 @@ struct pqap_r2 {
- } __attribute__((packed))  __attribute__((aligned(8)));
- _Static_assert(sizeof(struct pqap_r2) == sizeof(uint64_t), "pqap_r2 size");
+@@ -12,6 +12,8 @@
+ #ifndef _S390X_AP_H_
+ #define _S390X_AP_H_
  
-+struct ap_qirq_ctrl {
-+	uint64_t res0 : 16;
-+	uint64_t ir    : 1;	/* ir flag: enable (1) or disable (0) irq */
-+	uint64_t res1 : 44;
-+	uint64_t isc   : 3;	/* irq sub class */
-+} __attribute__((packed))  __attribute__((aligned(8)));
-+_Static_assert(sizeof(struct ap_qirq_ctrl) == sizeof(uint64_t),
-+	       "struct ap_qirq_ctrl size");
++#define AP_RC_RESET_IN_PROGRESS	0x02
 +
- #define AP_SETUP_NOINSTR	-1
- #define AP_SETUP_NOAPQN		1
- 
-@@ -86,4 +95,6 @@ int ap_setup(uint8_t *ap, uint8_t *qn);
+ enum PQAP_FC {
+ 	PQAP_TEST_APQ,
+ 	PQAP_RESET_APQ,
+@@ -94,6 +96,8 @@ _Static_assert(sizeof(struct ap_qirq_ctrl) == sizeof(uint64_t),
+ int ap_setup(uint8_t *ap, uint8_t *qn);
  int ap_pqap_tapq(uint8_t ap, uint8_t qn, struct ap_queue_status *apqsw,
  		 struct pqap_r2 *r2);
++int ap_pqap_reset(uint8_t ap, uint8_t qn, struct ap_queue_status *apqsw);
++int ap_pqap_reset_zeroize(uint8_t ap, uint8_t qn, struct ap_queue_status *apqsw);
  int ap_pqap_qci(struct ap_config_info *info);
-+int ap_pqap_aqic(uint8_t ap, uint8_t qn, struct ap_queue_status *apqsw,
-+		 struct ap_qirq_ctrl aqic, unsigned long addr);
- #endif
+ int ap_pqap_aqic(uint8_t ap, uint8_t qn, struct ap_queue_status *apqsw,
+ 		 struct ap_qirq_ctrl aqic, unsigned long addr);
 diff --git a/s390x/ap.c b/s390x/ap.c
-index 20b4e76e..31dcfe29 100644
+index 31dcfe29..47b4f832 100644
 --- a/s390x/ap.c
 +++ b/s390x/ap.c
-@@ -292,6 +292,55 @@ static void test_priv(void)
+@@ -341,6 +341,57 @@ static void test_pqap_aqic(void)
  	report_prefix_pop();
  }
  
-+static void test_pqap_aqic(void)
++static void test_pqap_resets(void)
 +{
 +	struct ap_queue_status apqsw = {};
 +	static uint8_t not_ind_byte;
@@ -189,22 +217,9 @@ index 20b4e76e..31dcfe29 100644
 +	int cc;
 +
 +	report_prefix_push("pqap");
-+	report_prefix_push("aqic");
++	report_prefix_push("rapq");
 +
-+	ap_pqap_tapq(apn, qn, &apqsw, &r2);
-+
-+	aqic.ir = 1;
-+	cc = ap_pqap_aqic(apn, qn, &apqsw, aqic, 0);
-+	report(cc == 3 && apqsw.rc == 6, "invalid addr 0");
-+
-+	aqic.ir = 1;
-+	cc = ap_pqap_aqic(apn, qn, &apqsw, aqic, -1);
-+	report(cc == 3 && apqsw.rc == 6, "invalid addr -1");
-+
-+	aqic.ir = 0;
-+	cc = ap_pqap_aqic(apn, qn, &apqsw, aqic, (uintptr_t)&not_ind_byte);
-+	report(cc == 3 && apqsw.rc == 7, "disable");
-+
++	/* Enable IRQs which the resets will disable */
 +	aqic.ir = 1;
 +	cc = ap_pqap_aqic(apn, qn, &apqsw, aqic, (uintptr_t)&not_ind_byte);
 +	report(cc == 0 && apqsw.rc == 0, "enable");
@@ -212,39 +227,48 @@ index 20b4e76e..31dcfe29 100644
 +	do {
 +		cc = ap_pqap_tapq(apn, qn, &apqsw, &r2);
 +	} while (cc == 0 && apqsw.irq_enabled == 0);
++	report(apqsw.irq_enabled == 1, "IRQs enabled");
 +
-+	cc = ap_pqap_aqic(apn, qn, &apqsw, aqic, (uintptr_t)&not_ind_byte);
-+	report(cc == 3 && apqsw.rc == 7, "enable while enabled");
++	ap_pqap_reset(apn, qn, &apqsw);
++	cc = ap_pqap_tapq(apn, qn, &apqsw, &r2);
++	assert(!cc);
++	report(apqsw.irq_enabled == 0, "IRQs have been disabled");
 +
-+	aqic.ir = 0;
++	report_prefix_pop();
++
++	report_prefix_push("zapq");
++
++	/* Enable IRQs which the resets will disable */
++	aqic.ir = 1;
 +	cc = ap_pqap_aqic(apn, qn, &apqsw, aqic, (uintptr_t)&not_ind_byte);
-+	assert(cc == 0 && apqsw.rc == 0);
++	report(cc == 0 && apqsw.rc == 0, "enable");
 +
 +	do {
 +		cc = ap_pqap_tapq(apn, qn, &apqsw, &r2);
-+	} while (cc == 0 && apqsw.irq_enabled == 1);
++	} while (cc == 0 && apqsw.irq_enabled == 0);
++	report(apqsw.irq_enabled == 1, "IRQs enabled");
++
++	ap_pqap_reset_zeroize(apn, qn, &apqsw);
++	cc = ap_pqap_tapq(apn, qn, &apqsw, &r2);
++	assert(!cc);
++	report(apqsw.irq_enabled == 0, "IRQs have been disabled");
 +
 +	report_prefix_pop();
++
 +	report_prefix_pop();
 +}
 +
  int main(void)
  {
  	int setup_rc = ap_setup(&apn, &qn);
-@@ -307,6 +356,13 @@ int main(void)
- 	test_pgms_nqap();
- 	test_pgms_dqap();
+@@ -362,6 +413,7 @@ int main(void)
+ 		goto done;
+ 	}
+ 	test_pqap_aqic();
++	test_pqap_resets();
  
-+	/* The next tests need queues */
-+	if (setup_rc == AP_SETUP_NOAPQN) {
-+		report_skip("No APQN available");
-+		goto done;
-+	}
-+	test_pqap_aqic();
-+
  done:
  	report_prefix_pop();
- 	return report_summary();
 -- 
 2.34.1
 
