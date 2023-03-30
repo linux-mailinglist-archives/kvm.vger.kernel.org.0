@@ -2,36 +2,36 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1872A6D04D3
+	by mail.lfdr.de (Postfix) with ESMTP id E3E2A6D04D5
 	for <lists+kvm@lfdr.de>; Thu, 30 Mar 2023 14:36:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230476AbjC3MgC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Mar 2023 08:36:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56938 "EHLO
+        id S229584AbjC3MgD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Mar 2023 08:36:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56962 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229661AbjC3MgB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S230014AbjC3MgB (ORCPT <rfc822;kvm@vger.kernel.org>);
         Thu, 30 Mar 2023 08:36:01 -0400
-Received: from out0-209.mail.aliyun.com (out0-209.mail.aliyun.com [140.205.0.209])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F49A7681;
-        Thu, 30 Mar 2023 05:35:59 -0700 (PDT)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R961e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018047203;MF=houwenlong.hwl@antgroup.com;NM=1;PH=DS;RN=12;SR=0;TI=SMTPD_---.S2zl1PU_1680179755;
-Received: from localhost(mailfrom:houwenlong.hwl@antgroup.com fp:SMTPD_---.S2zl1PU_1680179755)
+Received: from out0-193.mail.aliyun.com (out0-193.mail.aliyun.com [140.205.0.193])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70C65768A;
+        Thu, 30 Mar 2023 05:36:00 -0700 (PDT)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R111e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018047212;MF=houwenlong.hwl@antgroup.com;NM=1;PH=DS;RN=10;SR=0;TI=SMTPD_---.S30ISig_1680179756;
+Received: from localhost(mailfrom:houwenlong.hwl@antgroup.com fp:SMTPD_---.S30ISig_1680179756)
           by smtp.aliyun-inc.com;
-          Thu, 30 Mar 2023 20:35:55 +0800
+          Thu, 30 Mar 2023 20:35:57 +0800
 From:   "Hou Wenlong" <houwenlong.hwl@antgroup.com>
 To:     kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Sean Christopherson <seanjc@google.com>,
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
         Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
         Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH 1/3] KVM: x86: Disallow enable KVM_CAP_X86_DISABLE_EXITS capability after vCPUs have been created
-Date:   Thu, 30 Mar 2023 20:35:52 +0800
-Message-Id: <9227068821b275ac547eb2ede09ec65d2281fe07.1680179693.git.houwenlong.hwl@antgroup.com>
+        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org
+Subject: [PATCH 2/3] KVM: x86: Don't update KVM PV feature CPUID during vCPU running
+Date:   Thu, 30 Mar 2023 20:35:53 +0800
+Message-Id: <9fbf5b4022d67157d6305bc1811f36d9096c26fc.1680179693.git.houwenlong.hwl@antgroup.com>
 X-Mailer: git-send-email 2.31.1
+In-Reply-To: <9227068821b275ac547eb2ede09ec65d2281fe07.1680179693.git.houwenlong.hwl@antgroup.com>
+References: <9227068821b275ac547eb2ede09ec65d2281fe07.1680179693.git.houwenlong.hwl@antgroup.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=0.0 required=5.0 tests=SPF_HELO_NONE,SPF_PASS,
@@ -43,59 +43,61 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Disable PAUSE/MWAIT/HLT exits after vCPUs have been created is useless,
-because PAUSE/MWAIT/HLT intercepts configuration is not changed after
-vCPU created.  And two vCPUs may have inconsistent configuration if
-disable PAUSE/MWAIT/HLT exits between those two vCPUs creation. Since
-it's a per-VM capability, all vCPUs should keep same configuration, so
-disallow enable KVM_CAP_X86_DISABLE_EXITS capability after vCPUs have
-been created.
+__kvm_update_cpuid_runtime() may be called during vCPU running and KVM
+PV feature CPUID is updated too. But the cached KVM PV feature bitmap is
+not updated. Actually, KVM PV feature CPUID shouldn't be updated,
+otherwise, KVM PV feature would be broken in guest. Currently, only
+KVM_FEATURE_PV_UNHALT is updated, and it's impossible after disallow
+disable HLT exits. However, KVM PV feature CPUID should be updated only
+in KVM_SET_CPUID{,2} ioctl.
 
 Signed-off-by: Hou Wenlong <houwenlong.hwl@antgroup.com>
 ---
- Documentation/virt/kvm/api.rst | 3 ++-
- arch/x86/kvm/x86.c             | 5 +++++
- 2 files changed, 7 insertions(+), 1 deletion(-)
+ arch/x86/kvm/cpuid.c | 17 ++++++++++++-----
+ 1 file changed, 12 insertions(+), 5 deletions(-)
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index a69e91088d76..95a683a27cf2 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -7179,7 +7179,8 @@ branch to guests' 0x200 interrupt vector.
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index 6972e0be60fa..af92d3422c79 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -222,6 +222,17 @@ static struct kvm_cpuid_entry2 *kvm_find_kvm_cpuid_features(struct kvm_vcpu *vcp
+ 					     vcpu->arch.cpuid_nent);
+ }
  
- :Architectures: x86
- :Parameters: args[0] defines which exits are disabled
--:Returns: 0 on success, -EINVAL when args[0] contains invalid exits
-+:Returns: 0 on success, -EINVAL when args[0] contains invalid exits or
-+	  any vCPUs have been created.
++static void kvm_update_pv_cpuid(struct kvm_vcpu *vcpu, struct kvm_cpuid_entry2 *entries,
++				int nent)
++{
++	struct kvm_cpuid_entry2 *best;
++
++	best = __kvm_find_kvm_cpuid_features(vcpu, entries, nent);
++	if (kvm_hlt_in_guest(vcpu->kvm) && best &&
++		(best->eax & (1 << KVM_FEATURE_PV_UNHALT)))
++		best->eax &= ~(1 << KVM_FEATURE_PV_UNHALT);
++}
++
+ void kvm_update_pv_runtime(struct kvm_vcpu *vcpu)
+ {
+ 	struct kvm_cpuid_entry2 *best = kvm_find_kvm_cpuid_features(vcpu);
+@@ -280,11 +291,6 @@ static void __kvm_update_cpuid_runtime(struct kvm_vcpu *vcpu, struct kvm_cpuid_e
+ 		     cpuid_entry_has(best, X86_FEATURE_XSAVEC)))
+ 		best->ebx = xstate_required_size(vcpu->arch.xcr0, true);
  
- Valid bits in args[0] are::
+-	best = __kvm_find_kvm_cpuid_features(vcpu, entries, nent);
+-	if (kvm_hlt_in_guest(vcpu->kvm) && best &&
+-		(best->eax & (1 << KVM_FEATURE_PV_UNHALT)))
+-		best->eax &= ~(1 << KVM_FEATURE_PV_UNHALT);
+-
+ 	if (!kvm_check_has_quirk(vcpu->kvm, KVM_X86_QUIRK_MISC_ENABLE_NO_MWAIT)) {
+ 		best = cpuid_entry2_find(entries, nent, 0x1, KVM_CPUID_INDEX_NOT_SIGNIFICANT);
+ 		if (best)
+@@ -402,6 +408,7 @@ static int kvm_set_cpuid(struct kvm_vcpu *vcpu, struct kvm_cpuid_entry2 *e2,
+ 	int r;
  
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 2c0ff40e5345..7e97595465fc 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -6275,6 +6275,9 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
- 		if (cap->args[0] & ~KVM_X86_DISABLE_VALID_EXITS)
- 			break;
+ 	__kvm_update_cpuid_runtime(vcpu, e2, nent);
++	kvm_update_pv_cpuid(vcpu, e2, nent);
  
-+		mutex_lock(&kvm->lock);
-+		if (kvm->created_vcpus)
-+			goto disable_exits_unlock;
- 		if (cap->args[0] & KVM_X86_DISABLE_EXITS_PAUSE)
- 			kvm->arch.pause_in_guest = true;
- 
-@@ -6296,6 +6299,8 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
- 		}
- 
- 		r = 0;
-+disable_exits_unlock:
-+		mutex_unlock(&kvm->lock);
- 		break;
- 	case KVM_CAP_MSR_PLATFORM_INFO:
- 		kvm->arch.guest_can_read_msr_platform_info = cap->args[0];
-
-base-commit: 27d6845d258b67f4eb3debe062b7dacc67e0c393
+ 	/*
+ 	 * KVM does not correctly handle changing guest CPUID after KVM_RUN, as
 -- 
 2.31.1
 
