@@ -2,337 +2,287 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4DA2D6CFE96
-	for <lists+kvm@lfdr.de>; Thu, 30 Mar 2023 10:40:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C2E9D6CFEE2
+	for <lists+kvm@lfdr.de>; Thu, 30 Mar 2023 10:45:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229741AbjC3Iky (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Mar 2023 04:40:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58798 "EHLO
+        id S230029AbjC3Ipt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Mar 2023 04:45:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40162 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229459AbjC3Ikw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 Mar 2023 04:40:52 -0400
-Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0FF5140EA
-        for <kvm@vger.kernel.org>; Thu, 30 Mar 2023 01:40:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1680165650; x=1711701650;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=CQ1lWC15sVX+6/HQasueqUQdBXiz2cjN5+t2aSjC/Jo=;
-  b=J1cNXd0SSQc5Amnlnl7g3Aa+ERj9UYcSPJUvbiESupHqWaHQ/28x1LWU
-   AkBuaSKj2yLMIyVciLUNra0MenrENGDsLoGTx1dGjHPzSA6dvjpHL6Cap
-   09YaTeQ5ZqsHdV7js0jvMcRvRSt2z3QxdTN1FS6p9USuKnGuqE0WGuUQp
-   tajeQNmAvuKVrDbB9ywHfYFjQjx0vqQdb0YtpuleCGnCJItskXF/pLz5r
-   xU+pgeu7a/EeN1hcV5uIhY2U6Gm8hySIhLjXtUvj1y70w0tbXXh6uvtsH
-   0w/fwdMa8CkSSxIvvwyBCpT7TZdE/yzM1KgrdNdqwAmCkfyNQslk9UFds
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10664"; a="343559352"
-X-IronPort-AV: E=Sophos;i="5.98,303,1673942400"; 
-   d="scan'208";a="343559352"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Mar 2023 01:40:50 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10664"; a="684618808"
-X-IronPort-AV: E=Sophos;i="5.98,303,1673942400"; 
-   d="scan'208";a="684618808"
-Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.238.2.227]) ([10.238.2.227])
-  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Mar 2023 01:40:48 -0700
-Message-ID: <6d909544-6165-193a-d085-d6d79faf7fcc@linux.intel.com>
-Date:   Thu, 30 Mar 2023 16:40:46 +0800
+        with ESMTP id S230040AbjC3Ipk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 30 Mar 2023 04:45:40 -0400
+Received: from mail-ed1-x52b.google.com (mail-ed1-x52b.google.com [IPv6:2a00:1450:4864:20::52b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E4BE27D91
+        for <kvm@vger.kernel.org>; Thu, 30 Mar 2023 01:45:16 -0700 (PDT)
+Received: by mail-ed1-x52b.google.com with SMTP id x3so73459398edb.10
+        for <kvm@vger.kernel.org>; Thu, 30 Mar 2023 01:45:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=grsecurity.net; s=grsec; t=1680165914;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=vlpuagoHdNHyoDKKcfJ1S9LVllL6EOMCzIQgoSyOcDw=;
+        b=Tx7bJzrQxgZuGXRYSDpUU6tW0DHmt2iTn6ML51phHbdXfKxP8AaIs4F6Wu0CMU2E8k
+         TAyetfg9DZEHcSJF6/mUGYM4lpnqW9Z6jKPTkWhlX+u2FNpgbVSzV1c5UwASf+i/ucID
+         qpQd1ptvMyraYyazc1t299COIfXj86PJWnqWTiApvUTNAivQL9jSLNAbcn4+YwCYaSeD
+         cPls0ICIaZVH7QNEN3UHPJDrPSkJ++IMf6xeCyroBPSfDQOpCFs+DfwX2EHT2qJhadNH
+         N1PrrLkl88YEEu7OCgbPZSXxK/lHmt2qyol14Smh0MFP9mxNWPtW48jJoEasrsNXYXTV
+         /21w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1680165914;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=vlpuagoHdNHyoDKKcfJ1S9LVllL6EOMCzIQgoSyOcDw=;
+        b=QnGOhaYEHzM/d0T++ubFyTQmBXYzYiCriZeqEzDR2bSd/0kj96DgIG2wsr4T6OmWlH
+         rKBo0hUvR17i/apJOA7jm7WSOAFmQgc9AGZXCnMSndQSijXhEEbIgC+oB9isIFhWi/h3
+         WWvCYtgcLM3OCrV/gJvYyKNTbwxr3ZIKctDzCBvs6F9IWMD/hL2AjqObaXaonPfI6WOT
+         aczf0kVSrqXEY9LSA2TB4zJ9yRDcM7G6jbj+U8ZZYugSFw5NLeaB2NByNkf76MBv95s3
+         /H8s6Xxzq/YtG0NA4aUUVBzbCWxOjxVD4NknyOmR9oPJIBeQV/Rumsp8J5Q7Zxj2fGGq
+         JG4g==
+X-Gm-Message-State: AAQBX9d+OBIUPK+bRTK119cOTNCjlWr2ytVmF6Tb8OpdT2nkEFKBmkjj
+        Ar6ZRkm0NKhcE3guQ3I8mt29umj1qKQULI0zmkg=
+X-Google-Smtp-Source: AKy350bMXqRfsSuPyYXNvM8oNnrCj7oeuGoy0aRHd5nvAQf2BmF+qkwqfSM4zYWn2ggMUBDiceiR2Q==
+X-Received: by 2002:a17:907:6d0b:b0:930:9cec:2fb9 with SMTP id sa11-20020a1709076d0b00b009309cec2fb9mr25165267ejc.77.1680165913889;
+        Thu, 30 Mar 2023 01:45:13 -0700 (PDT)
+Received: from ?IPV6:2003:f6:af13:8b00:c684:f698:a009:dbf2? (p200300f6af138b00c684f698a009dbf2.dip0.t-ipconnect.de. [2003:f6:af13:8b00:c684:f698:a009:dbf2])
+        by smtp.gmail.com with ESMTPSA id qh7-20020a170906eca700b0092bea699124sm17411276ejb.106.2023.03.30.01.45.13
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 30 Mar 2023 01:45:13 -0700 (PDT)
+Message-ID: <677169b4-051f-fcae-756b-9a3e1bb9f8fe@grsecurity.net>
+Date:   Thu, 30 Mar 2023 10:45:12 +0200
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.9.0
-Subject: Re: [PATCH v6 4/7] KVM: x86: Virtualize CR3.LAM_{U48,U57}
-To:     "Yang, Weijiang" <weijiang.yang@intel.com>
-Cc:     chao.gao@intel.com, robert.hu@linux.intel.com, kvm@vger.kernel.org,
-        seanjc@google.com, pbonzini@redhat.com
-References: <20230319084927.29607-1-binbin.wu@linux.intel.com>
- <20230319084927.29607-5-binbin.wu@linux.intel.com>
- <3d73b47f-bce6-4af4-da42-5330aa7fc0e9@intel.com>
-From:   Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <3d73b47f-bce6-4af4-da42-5330aa7fc0e9@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Subject: Re: [PATCH v4 6/6] KVM: VMX: Make CR0.WP a guest owned bit
+Content-Language: en-US, de-DE
+To:     kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     linux-kernel@vger.kernel.org
+References: <20230322013731.102955-1-minipli@grsecurity.net>
+ <20230322013731.102955-7-minipli@grsecurity.net>
+From:   Mathias Krause <minipli@grsecurity.net>
+In-Reply-To: <20230322013731.102955-7-minipli@grsecurity.net>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.4 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE autolearn=unavailable autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=0.1 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
+        DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=no
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 22.03.23 02:37, Mathias Krause wrote:
+> Guests like grsecurity that make heavy use of CR0.WP to implement kernel
+> level W^X will suffer from the implied VMEXITs.
+> 
+> With EPT there is no need to intercept a guest change of CR0.WP, so
+> simply make it a guest owned bit if we can do so.
+> 
+> This implies that a read of a guest's CR0.WP bit might need a VMREAD.
+> However, the only potentially affected user seems to be kvm_init_mmu()
+> which is a heavy operation to begin with. But also most callers already
+> cache the full value of CR0 anyway, so no additional VMREAD is needed.
+> The only exception is nested_vmx_load_cr3().
+> 
+> This change is VMX-specific, as SVM has no such fine grained control
+> register intercept control.
 
-On 3/30/2023 4:33 PM, Yang, Weijiang wrote:
->
-> On 3/19/2023 4:49 PM, Binbin Wu wrote:
->> From: Robert Hoo <robert.hu@linux.intel.com>
->>
->> LAM uses CR3.LAM_U48 (bit 62) and CR3.LAM_U57 (bit 61) to configure LAM
->> masking for user mode pointers.
->>
->> When EPT is on:
->> CR3 is fully under control of guest, guest LAM is thus transparent to 
->> KVM.
->>
->> When EPT is off (shadow paging):
->> KVM needs to handle guest CR3.LAM_U48 and CR3.LAM_U57 toggles.
->> The two bits don't participate in page table walking. They should be 
->> masked
->> to get the base address of page table. When shadow paging is used, 
->> the two
->> bits should be kept as they are in the shadow CR3.
->> To be generic, introduce a field 'cr3_ctrl_bits' in kvm_vcpu_arch to 
->> record
->> the bits used to control supported features related to CR3 (e.g. LAM).
->> - Supported control bits are set to cr3_ctrl_bits.
->> - Add kvm_vcpu_is_legal_cr3() to validate CR3, allow setting of the 
->> control
->>    bits for the supported features.
->> - cr3_ctrl_bits is used to mask the control bits when calculate the base
->>    address of page table from mmu::get_guest_pgd().
->> - Add kvm_get_active_cr3_ctrl_bits() to get the active control bits 
->> to form
->>    a new guest CR3 (in vmx_load_mmu_pgd()).
->> - For only control bits toggle cases, it is unnecessary to make new 
->> pgd, but
->>    just make request of load pgd.
->>    Especially, for ONLY-LAM-bits toggle cases, skip TLB flush since 
->> hardware
->>    is not required to flush TLB when CR3 LAM bits toggled.
->>
->> Signed-off-by: Robert Hoo <robert.hu@linux.intel.com>
->> Co-developed-by: Binbin Wu <binbin.wu@linux.intel.com>
->> Signed-off-by: Binbin Wu <binbin.wu@linux.intel.com>
->> ---
->>   arch/x86/include/asm/kvm_host.h |  7 +++++++
->>   arch/x86/kvm/cpuid.h            |  5 +++++
->>   arch/x86/kvm/mmu.h              |  5 +++++
->>   arch/x86/kvm/mmu/mmu.c          |  2 +-
->>   arch/x86/kvm/mmu/paging_tmpl.h  |  2 +-
->>   arch/x86/kvm/vmx/nested.c       |  6 +++---
->>   arch/x86/kvm/vmx/vmx.c          |  6 +++++-
->>   arch/x86/kvm/x86.c              | 29 +++++++++++++++++++++++------
->>   8 files changed, 50 insertions(+), 12 deletions(-)
->>
->> diff --git a/arch/x86/include/asm/kvm_host.h 
->> b/arch/x86/include/asm/kvm_host.h
->> index 742fd84c7997..2174ad27013b 100644
->> --- a/arch/x86/include/asm/kvm_host.h
->> +++ b/arch/x86/include/asm/kvm_host.h
->> @@ -730,6 +730,13 @@ struct kvm_vcpu_arch {
->>       unsigned long cr0_guest_owned_bits;
->>       unsigned long cr2;
->>       unsigned long cr3;
->> +    /*
->> +     * Bits in CR3 used to enable certain features. These bits don't
->> +     * participate in page table walking. They should be masked to
->> +     * get the base address of page table. When shadow paging is
->> +     * used, these bits should be kept as they are in the shadow CR3.
->> +     */
->> +    u64 cr3_ctrl_bits;
->
-> The "ctrl_bits" turns out to be LAM bits only, so better to change the 
-> name as cr3_lam_bits
->
-> to make it specific.
+Just a heads up! We did more tests, especially with the backports we did
+internally already, and ran into a bug when running a nested guest on an
+ESXi host.
 
-The purpose to add the field here is to make it generic and can easily 
-be extended for other
-future features (if any), which also will use the reserved high bit(s), 
-although currently, it is
-only used by LAM.
+Setup is like: ESXi (L0) -> Linux (L1) -> Linux (L2)
 
+The Linux system, especially the kernel, is the same for L1 and L2. It's
+a grsecurity kernel, so makes use of toggling CR0.WP at runtime.
 
->
->>       unsigned long cr4;
->>       unsigned long cr4_guest_owned_bits;
->>       unsigned long cr4_guest_rsvd_bits;
->> diff --git a/arch/x86/kvm/cpuid.h b/arch/x86/kvm/cpuid.h
->> index b1658c0de847..ef8e1b912d7d 100644
->> --- a/arch/x86/kvm/cpuid.h
->> +++ b/arch/x86/kvm/cpuid.h
->> @@ -42,6 +42,11 @@ static inline int cpuid_maxphyaddr(struct kvm_vcpu 
->> *vcpu)
->>       return vcpu->arch.maxphyaddr;
->>   }
->>   +static inline bool kvm_vcpu_is_legal_cr3(struct kvm_vcpu *vcpu, 
->> unsigned long cr3)
->> +{
->> +    return !((cr3 & vcpu->arch.reserved_gpa_bits) & 
->> ~vcpu->arch.cr3_ctrl_bits);
->> +}
->> +
->>   static inline bool kvm_vcpu_is_legal_gpa(struct kvm_vcpu *vcpu, 
->> gpa_t gpa)
->>   {
->>       return !(gpa & vcpu->arch.reserved_gpa_bits);
->> diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
->> index 168c46fd8dd1..29985eeb8e12 100644
->> --- a/arch/x86/kvm/mmu.h
->> +++ b/arch/x86/kvm/mmu.h
->> @@ -142,6 +142,11 @@ static inline unsigned long 
->> kvm_get_active_pcid(struct kvm_vcpu *vcpu)
->>       return kvm_get_pcid(vcpu, kvm_read_cr3(vcpu));
->>   }
->>   +static inline u64 kvm_get_active_cr3_ctrl_bits(struct kvm_vcpu *vcpu)
->> +{
->> +    return kvm_read_cr3(vcpu) & vcpu->arch.cr3_ctrl_bits;
->> +}
-> Same as above, change the function name to kvm_get_active_cr3_lam_bits().
->> +
->>   static inline void kvm_mmu_load_pgd(struct kvm_vcpu *vcpu)
->>   {
->>       u64 root_hpa = vcpu->arch.mmu->root.hpa;
->> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
->> index aeb240b339f5..e0b86ace7326 100644
->> --- a/arch/x86/kvm/mmu/mmu.c
->> +++ b/arch/x86/kvm/mmu/mmu.c
->> @@ -3722,7 +3722,7 @@ static int mmu_alloc_shadow_roots(struct 
->> kvm_vcpu *vcpu)
->>       int quadrant, i, r;
->>       hpa_t root;
->>   -    root_pgd = mmu->get_guest_pgd(vcpu);
->> +    root_pgd = mmu->get_guest_pgd(vcpu) & ~vcpu->arch.cr3_ctrl_bits;
->>       root_gfn = root_pgd >> PAGE_SHIFT;
->>         if (mmu_check_root(vcpu, root_gfn))
->> diff --git a/arch/x86/kvm/mmu/paging_tmpl.h 
->> b/arch/x86/kvm/mmu/paging_tmpl.h
->> index e5662dbd519c..8887615534b0 100644
->> --- a/arch/x86/kvm/mmu/paging_tmpl.h
->> +++ b/arch/x86/kvm/mmu/paging_tmpl.h
->> @@ -324,7 +324,7 @@ static int FNAME(walk_addr_generic)(struct 
->> guest_walker *walker,
->>       trace_kvm_mmu_pagetable_walk(addr, access);
->>   retry_walk:
->>       walker->level = mmu->cpu_role.base.level;
->> -    pte           = mmu->get_guest_pgd(vcpu);
->> +    pte           = mmu->get_guest_pgd(vcpu) & 
->> ~vcpu->arch.cr3_ctrl_bits;
->>       have_ad       = PT_HAVE_ACCESSED_DIRTY(mmu);
->>     #if PTTYPE == 64
->> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
->> index 0f84cc05f57c..2eb258992d63 100644
->> --- a/arch/x86/kvm/vmx/nested.c
->> +++ b/arch/x86/kvm/vmx/nested.c
->> @@ -1079,7 +1079,7 @@ static int nested_vmx_load_cr3(struct kvm_vcpu 
->> *vcpu, unsigned long cr3,
->>                      bool nested_ept, bool reload_pdptrs,
->>                      enum vm_entry_failure_code *entry_failure_code)
->>   {
->> -    if (CC(kvm_vcpu_is_illegal_gpa(vcpu, cr3))) {
->> +    if (CC(!kvm_vcpu_is_legal_cr3(vcpu, cr3))) {
->>           *entry_failure_code = ENTRY_FAIL_DEFAULT;
->>           return -EINVAL;
->>       }
->> @@ -1101,7 +1101,7 @@ static int nested_vmx_load_cr3(struct kvm_vcpu 
->> *vcpu, unsigned long cr3,
->>       kvm_init_mmu(vcpu);
->>         if (!nested_ept)
->> -        kvm_mmu_new_pgd(vcpu, cr3);
->> +        kvm_mmu_new_pgd(vcpu, cr3 & ~vcpu->arch.cr3_ctrl_bits);
->>         return 0;
->>   }
->> @@ -2907,7 +2907,7 @@ static int nested_vmx_check_host_state(struct 
->> kvm_vcpu *vcpu,
->>         if (CC(!nested_host_cr0_valid(vcpu, vmcs12->host_cr0)) ||
->>           CC(!nested_host_cr4_valid(vcpu, vmcs12->host_cr4)) ||
->> -        CC(kvm_vcpu_is_illegal_gpa(vcpu, vmcs12->host_cr3)))
->> +        CC(!kvm_vcpu_is_legal_cr3(vcpu, vmcs12->host_cr3)))
->>           return -EINVAL;
->>         if 
->> (CC(is_noncanonical_address(vmcs12->host_ia32_sysenter_esp, vcpu)) ||
->> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
->> index 66a50224293e..9638a3000256 100644
->> --- a/arch/x86/kvm/vmx/vmx.c
->> +++ b/arch/x86/kvm/vmx/vmx.c
->> @@ -3390,7 +3390,8 @@ static void vmx_load_mmu_pgd(struct kvm_vcpu 
->> *vcpu, hpa_t root_hpa,
->>               update_guest_cr3 = false;
->>           vmx_ept_load_pdptrs(vcpu);
->>       } else {
->> -        guest_cr3 = root_hpa | kvm_get_active_pcid(vcpu);
->> +        guest_cr3 = root_hpa | kvm_get_active_pcid(vcpu) |
->> +                    kvm_get_active_cr3_ctrl_bits(vcpu);
->>       }
->>         if (update_guest_cr3)
->> @@ -7750,6 +7751,9 @@ static void vmx_vcpu_after_set_cpuid(struct 
->> kvm_vcpu *vcpu)
->>           vmx->msr_ia32_feature_control_valid_bits &=
->>               ~FEAT_CTL_SGX_LC_ENABLED;
->>   +    if (guest_cpuid_has(vcpu, X86_FEATURE_LAM))
->> +        vcpu->arch.cr3_ctrl_bits |= X86_CR3_LAM_U48 | X86_CR3_LAM_U57;
->> +
->>       /* Refresh #PF interception to account for MAXPHYADDR changes. */
->>       vmx_update_exception_bitmap(vcpu);
->>   }
->> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
->> index 410327e7eb55..e74af72f53ec 100644
->> --- a/arch/x86/kvm/x86.c
->> +++ b/arch/x86/kvm/x86.c
->> @@ -1236,7 +1236,7 @@ static void kvm_invalidate_pcid(struct kvm_vcpu 
->> *vcpu, unsigned long pcid)
->>   int kvm_set_cr3(struct kvm_vcpu *vcpu, unsigned long cr3)
->>   {
->>       bool skip_tlb_flush = false;
->> -    unsigned long pcid = 0;
->> +    unsigned long pcid = 0, old_cr3;
->>   #ifdef CONFIG_X86_64
->>       bool pcid_enabled = !!kvm_read_cr4_bits(vcpu, X86_CR4_PCIDE);
->>   @@ -1247,8 +1247,9 @@ int kvm_set_cr3(struct kvm_vcpu *vcpu, 
->> unsigned long cr3)
->>       }
->>   #endif
->>   +    old_cr3 = kvm_read_cr3(vcpu);
->>       /* PDPTRs are always reloaded for PAE paging. */
->> -    if (cr3 == kvm_read_cr3(vcpu) && !is_pae_paging(vcpu))
->> +    if (cr3 == old_cr3 && !is_pae_paging(vcpu))
->>           goto handle_tlb_flush;
->>         /*
->> @@ -1256,14 +1257,30 @@ int kvm_set_cr3(struct kvm_vcpu *vcpu, 
->> unsigned long cr3)
->>        * stuff CR3, e.g. for RSM emulation, and there is no guarantee 
->> that
->>        * the current vCPU mode is accurate.
->>        */
->> -    if (kvm_vcpu_is_illegal_gpa(vcpu, cr3))
->> +    if (!kvm_vcpu_is_legal_cr3(vcpu, cr3))
->>           return 1;
->>         if (is_pae_paging(vcpu) && !load_pdptrs(vcpu, cr3))
->>           return 1;
->>   -    if (cr3 != kvm_read_cr3(vcpu))
->> -        kvm_mmu_new_pgd(vcpu, cr3);
->> +    if (cr3 != old_cr3) {
->> +        if ((cr3 ^ old_cr3) & ~vcpu->arch.cr3_ctrl_bits) {
->> +            kvm_mmu_new_pgd(vcpu, cr3 & ~vcpu->arch.cr3_ctrl_bits);
->> +        } else {
->> +            /*
->> +             * Though only control (LAM) bits changed, make the
->> +             * request to force an update on guest CR3 because the
->> +             * control (LAM) bits are stale
->> +             */
->> +            kvm_make_request(KVM_REQ_LOAD_MMU_PGD, vcpu);
->> +            /*
->> +             * HW is not required to flush TLB when CR3 LAM bits 
->> toggled.
->> +             * Currently only LAM bits in cr3_ctrl_bits, if more 
->> bits added in
->> +             * the future, need to check whether to skip TLB flush 
->> or not.
->> +             */
->> +            skip_tlb_flush = true;
->> +        }
->> +    }
->>         vcpu->arch.cr3 = cr3;
->>       kvm_register_mark_dirty(vcpu, VCPU_EXREG_CR3);
->> @@ -11305,7 +11322,7 @@ static bool kvm_is_valid_sregs(struct 
->> kvm_vcpu *vcpu, struct kvm_sregs *sregs)
->>            */
->>           if (!(sregs->cr4 & X86_CR4_PAE) || !(sregs->efer & EFER_LMA))
->>               return false;
->> -        if (kvm_vcpu_is_illegal_gpa(vcpu, sregs->cr3))
->> +        if (!kvm_vcpu_is_legal_cr3(vcpu, sregs->cr3))
->>               return false;
->>       } else {
->>           /*
+The bug we see is that when L2 disables CR0.WP and tries to write to an
+r/o memory region (implicitly to the r/o GDT via LTR in our use case),
+this triggers a fault (EPT violation?) that gets ignored by L1, as,
+apparently, everything is fine from its point of view.
+
+I suspect the L0 VMM to be at fault here, as the VMCS structures look
+good, IMO. Here is a dump of vmx->loaded_vmcs in handle_triple_fault():
+
+[…] VMX: TRIPLE FAULT!
+[…] VMCS ffff8883a9f18000, last attempted VM-entry on CPU 8
+[…] *** Guest State ***
+[…] CR0: actual=0x0000000080040033, shadow=0x0000000080050033,
+gh_mask=fffffffffffefff7
+
+CR0 in the L2 VM has CR0.WP disabled. However, it is set in the shadow
+CR0 but masked out via CR0_MASK, so should be read as the guest's value,
+according to the SDM.
+
+I also tried masking the shadow CR0 value in vmx_set_cr0(), but that
+makes no difference.
+
+[…] CR4: actual=0x00000000003220f0, shadow=0x00000000003208b0,
+gh_mask=fffffffffffff871
+[…] CR3 = 0x0000000002684000
+[…] PDPTR0 = 0x0000000007d39001  PDPTR1 = 0x00000000033b5001
+[…] PDPTR2 = 0x000000000238c001  PDPTR3 = 0x0000000001c54001
+[…] RSP = 0xfffffe8040087f50  RIP = 0xffffffff8105d435
+[…] RFLAGS=0x00010006         DR7 = 0x0000000000000400
+[…] Sysenter RSP=0000000000000000 CS:RIP=0000:0000000000000000
+[…] CS:   sel=0x0010, attr=0x0a09b, limit=0xffffffff,
+base=0x0000000000000000
+[…] DS:   sel=0x0000, attr=0x1c001, limit=0xffffffff,
+base=0x0000000000000000
+[…] SS:   sel=0x0000, attr=0x1c001, limit=0xffffffff,
+base=0x0000000000000000
+[…] ES:   sel=0x0000, attr=0x1c001, limit=0xffffffff,
+base=0x0000000000000000
+[…] FS:   sel=0x0000, attr=0x1c001, limit=0xffffffff,
+base=0x0000000000000000
+[…] GS:   sel=0x0000, attr=0x1c001, limit=0xffffffff,
+base=0xffff888232e00000
+[…] GDTR:                           limit=0x00000097,
+base=0xfffffe0000201000
+[…] LDTR: sel=0x0000, attr=0x00082, limit=0x0000ffff,
+base=0x0000000000000000
+[…] IDTR:                           limit=0x000001ff,
+base=0xffffffff84004000
+[…] TR:   sel=0x0000, attr=0x0008b, limit=0x0000ffff,
+base=0x0000000000000000
+[…] EFER= 0x0000000000000d01 (effective)
+[…] PAT = 0x0007040600070406
+[…] DebugCtl = 0x0000000000000000  DebugExceptions = 0x0000000000000000
+[…] Interruptibility = 00000000  ActivityState = 00000000
+[…] *** Host State ***
+[…] RIP = 0xffffffff86d28db6  RSP = 0xfffffe8040927d50
+[…] CS=0010 SS=0018 DS=0000 ES=0000 FS=0000 GS=0000 TR=0040
+[…] FSBase=0000639563fce700 GSBase=ffff88881a800000 TRBase=fffffe0001003000
+[…] GDTBase=fffffe0001001000 IDTBase=fffffe0000000000
+[…] CR0=0000000080050033 CR3=00000000026a0004 CR4=00000000007626f0
+
+The "host" (which is our L1 VMM, I guess) has CR0.WP enabled and that is
+what I think confuses ESXi to enforce the read-only property to the L2
+guest as well -- for unknown reasons so far.
+
+[…] Sysenter RSP=fffffe0001003000 CS:RIP=0010:ffffffff810031a0
+[…] PAT = 0x0407050600070106
+[…] *** Control State ***
+[…] PinBased=0000003f CPUBased=b5a06dfa SecondaryExec=001034ee
+[…] EntryControls=000053ff ExitControls=000befff
+[…] ExceptionBitmap=00060042 PFECmask=00000000 PFECmatch=00000000
+[…] VMEntry: intr_info=00000000 errcode=00000003 ilen=00000000
+[…] VMExit: intr_info=00000000 errcode=00000000 ilen=00000000
+[…]         reason=00000002 qualification=0000000000000000
+[…] IDTVectoring: info=00000000 errcode=00000000
+[…] TSC Offset = 0xffffad7a1057f4cc
+[…] TPR Threshold = 0x00
+[…] virt-APIC addr = 0x000000015716b000
+[…] EPT pointer = 0x0000000583c1e05e
+[…] PLE Gap=00000080 Window=00001000
+[…] Virtual processor ID = 0x0002
+
+I tried to reproduce the bug with different KVM based L0 VMMs (with and
+without this series; vanilla and grsecurity kernels) but no luck. That's
+why I'm suspecting a ESXi bug.
+
+I'm leaning to make CR0.WP guest owned only iff we're running on bare
+metal or the VMM is KVM to not play whack-a-mole for all the VMMs that
+might have similar bugs. (Will try to test a few others here as well.)
+However, that would prevent them from getting the performance gain, so
+I'd rather have this fixed / worked around in KVM instead.
+
+Any ideas how to investigate this further?
+
+Thanks,
+Mathias
+
+PS: ...should have left the chicken bit of v3 to be able to disable the
+feature by a module parameter ;)
+
+> 
+> Suggested-and-co-developed-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Mathias Krause <minipli@grsecurity.net>
+> ---
+>  arch/x86/kvm/kvm_cache_regs.h |  2 +-
+>  arch/x86/kvm/vmx/nested.c     |  4 ++--
+>  arch/x86/kvm/vmx/vmx.c        |  2 +-
+>  arch/x86/kvm/vmx/vmx.h        | 18 ++++++++++++++++++
+>  4 files changed, 22 insertions(+), 4 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/kvm_cache_regs.h b/arch/x86/kvm/kvm_cache_regs.h
+> index 4c91f626c058..e50d353b5c1c 100644
+> --- a/arch/x86/kvm/kvm_cache_regs.h
+> +++ b/arch/x86/kvm/kvm_cache_regs.h
+> @@ -4,7 +4,7 @@
+>  
+>  #include <linux/kvm_host.h>
+>  
+> -#define KVM_POSSIBLE_CR0_GUEST_BITS X86_CR0_TS
+> +#define KVM_POSSIBLE_CR0_GUEST_BITS	(X86_CR0_TS | X86_CR0_WP)
+>  #define KVM_POSSIBLE_CR4_GUEST_BITS				  \
+>  	(X86_CR4_PVI | X86_CR4_DE | X86_CR4_PCE | X86_CR4_OSFXSR  \
+>  	 | X86_CR4_OSXMMEXCPT | X86_CR4_PGE | X86_CR4_TSD | X86_CR4_FSGSBASE)
+> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> index f63b28f46a71..61d940fc91ba 100644
+> --- a/arch/x86/kvm/vmx/nested.c
+> +++ b/arch/x86/kvm/vmx/nested.c
+> @@ -4481,7 +4481,7 @@ static void load_vmcs12_host_state(struct kvm_vcpu *vcpu,
+>  	 * CR0_GUEST_HOST_MASK is already set in the original vmcs01
+>  	 * (KVM doesn't change it);
+>  	 */
+> -	vcpu->arch.cr0_guest_owned_bits = KVM_POSSIBLE_CR0_GUEST_BITS;
+> +	vcpu->arch.cr0_guest_owned_bits = vmx_l1_guest_owned_cr0_bits();
+>  	vmx_set_cr0(vcpu, vmcs12->host_cr0);
+>  
+>  	/* Same as above - no reason to call set_cr4_guest_host_mask().  */
+> @@ -4632,7 +4632,7 @@ static void nested_vmx_restore_host_state(struct kvm_vcpu *vcpu)
+>  	 */
+>  	vmx_set_efer(vcpu, nested_vmx_get_vmcs01_guest_efer(vmx));
+>  
+> -	vcpu->arch.cr0_guest_owned_bits = KVM_POSSIBLE_CR0_GUEST_BITS;
+> +	vcpu->arch.cr0_guest_owned_bits = vmx_l1_guest_owned_cr0_bits();
+>  	vmx_set_cr0(vcpu, vmcs_readl(CR0_READ_SHADOW));
+>  
+>  	vcpu->arch.cr4_guest_owned_bits = ~vmcs_readl(CR4_GUEST_HOST_MASK);
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 8fc1a0c7856f..e501f6864a72 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -4790,7 +4790,7 @@ static void init_vmcs(struct vcpu_vmx *vmx)
+>  	/* 22.2.1, 20.8.1 */
+>  	vm_entry_controls_set(vmx, vmx_vmentry_ctrl());
+>  
+> -	vmx->vcpu.arch.cr0_guest_owned_bits = KVM_POSSIBLE_CR0_GUEST_BITS;
+> +	vmx->vcpu.arch.cr0_guest_owned_bits = vmx_l1_guest_owned_cr0_bits();
+>  	vmcs_writel(CR0_GUEST_HOST_MASK, ~vmx->vcpu.arch.cr0_guest_owned_bits);
+>  
+>  	set_cr4_guest_host_mask(vmx);
+> diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
+> index 2acdc54bc34b..423e9d3c9c40 100644
+> --- a/arch/x86/kvm/vmx/vmx.h
+> +++ b/arch/x86/kvm/vmx/vmx.h
+> @@ -640,6 +640,24 @@ BUILD_CONTROLS_SHADOW(tertiary_exec, TERTIARY_VM_EXEC_CONTROL, 64)
+>  				(1 << VCPU_EXREG_EXIT_INFO_1) | \
+>  				(1 << VCPU_EXREG_EXIT_INFO_2))
+>  
+> +static inline unsigned long vmx_l1_guest_owned_cr0_bits(void)
+> +{
+> +	unsigned long bits = KVM_POSSIBLE_CR0_GUEST_BITS;
+> +
+> +	/*
+> +	 * CR0.WP needs to be intercepted when KVM is shadowing legacy paging
+> +	 * in order to construct shadow PTEs with the correct protections.
+> +	 * Note!  CR0.WP technically can be passed through to the guest if
+> +	 * paging is disabled, but checking CR0.PG would generate a cyclical
+> +	 * dependency of sorts due to forcing the caller to ensure CR0 holds
+> +	 * the correct value prior to determining which CR0 bits can be owned
+> +	 * by L1.  Keep it simple and limit the optimization to EPT.
+> +	 */
+> +	if (!enable_ept)
+> +		bits &= ~X86_CR0_WP;
+> +	return bits;
+> +}
+> +
+>  static __always_inline struct kvm_vmx *to_kvm_vmx(struct kvm *kvm)
+>  {
+>  	return container_of(kvm, struct kvm_vmx, kvm);
