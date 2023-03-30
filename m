@@ -2,99 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DF7F16CF9A1
-	for <lists+kvm@lfdr.de>; Thu, 30 Mar 2023 05:41:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6F4E16CF9A7
+	for <lists+kvm@lfdr.de>; Thu, 30 Mar 2023 05:44:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229549AbjC3Dlm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 Mar 2023 23:41:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56248 "EHLO
+        id S229643AbjC3Doq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 Mar 2023 23:44:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57640 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229457AbjC3Dlk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 29 Mar 2023 23:41:40 -0400
-Received: from loongson.cn (mail.loongson.cn [114.242.206.163])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 98C3B49EB;
-        Wed, 29 Mar 2023 20:41:38 -0700 (PDT)
-Received: from loongson.cn (unknown [10.20.42.120])
-        by gateway (Coremail) with SMTP id _____8Cxf83xBCVkCTMUAA--.31062S3;
-        Thu, 30 Mar 2023 11:41:37 +0800 (CST)
-Received: from [10.20.42.120] (unknown [10.20.42.120])
-        by localhost.localdomain (Coremail) with SMTP id AQAAf8BxZbzvBCVklfQQAA--.11367S3;
-        Thu, 30 Mar 2023 11:41:36 +0800 (CST)
-Subject: Re: [PING PATCH v4 27/29] LoongArch: KVM: Implement vcpu world switch
-To:     Paolo Bonzini <pbonzini@redhat.com>
-References: <20230328123119.3649361-1-zhaotianrui@loongson.cn>
- <20230328123119.3649361-28-zhaotianrui@loongson.cn>
- <55c79f33-2549-38eb-f868-8e6141d7d322@redhat.com>
-Cc:     Huacai Chen <chenhuacai@kernel.org>,
-        WANG Xuerui <kernel@xen0n.name>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        loongarch@lists.linux.dev, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Mark Brown <broonie@kernel.org>,
-        Alex Deucher <alexander.deucher@amd.com>,
-        Oliver Upton <oliver.upton@linux.dev>, maobibo@loongson.cn,
-        Xi Ruoyao <xry111@xry111.site>
-From:   Tianrui Zhao <zhaotianrui@loongson.cn>
-Message-ID: <11fefc2b-63e4-a4a8-94c7-c4e312aa4958@loongson.cn>
-Date:   Thu, 30 Mar 2023 11:41:35 +0800
-User-Agent: Mozilla/5.0 (X11; Linux mips64; rv:45.0) Gecko/20100101
- Thunderbird/45.4.0
-MIME-Version: 1.0
-In-Reply-To: <55c79f33-2549-38eb-f868-8e6141d7d322@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: AQAAf8BxZbzvBCVklfQQAA--.11367S3
-X-CM-SenderInfo: p2kd03xldq233l6o00pqjv00gofq/
-X-Coremail-Antispam: 1Uk129KBjvdXoW7JFyDZF4xCw1kAr4UKw4UJwb_yoWxCrcEgw
-        4DG3ZrGa95Can2k34j9r15Xa18Wa40yr1Yy34xXry5Xry8GrW7WrnY9wn7Zry5J3WjyrW5
-        GF1v934UuFyYgjkaLaAFLSUrUUUUnb8apTn2vfkv8UJUUUU8wcxFpf9Il3svdxBIdaVrn0
-        xqx4xG64xvF2IEw4CE5I8CrVC2j2Jv73VFW2AGmfu7bjvjm3AaLaJ3UjIYCTnIWjp_UUUO
-        n7kC6x804xWl14x267AKxVWUJVW8JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0rVWrJVCq3w
-        AFIxvE14AKwVWUXVWUAwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK021l84ACjcxK
-        6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j6F4UM28EF7
-        xvwVC2z280aVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gr1j6F4UJwAa
-        w2AFwI0_JF0_Jw1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqjxCEc2xF0cIa020Ex4CE44
-        I27wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_JF0_Jw1lYx0Ex4A2
-        jsIE14v26r4j6F4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwIxGrwCYjI0SjxkI62
-        AI1cAE67vIY487MxkF7I0En4kS14v26r126r1DMxAIw28IcxkI7VAKI48JMxC20s026xCa
-        FVCjc4AY6r1j6r4UMxCIbckI1I0E14v26r126r1DMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2
-        IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI
-        42IY6xIIjxv20xvE14v26r1I6r4UMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42
-        IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Gr0_Cr1lIxAIcVC2z280
-        aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU8uc_3UUUUU==
-X-Spam-Status: No, score=-0.0 required=5.0 tests=NICE_REPLY_A,SPF_HELO_PASS,
-        SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.6
+        with ESMTP id S229597AbjC3Dol (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 29 Mar 2023 23:44:41 -0400
+Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09AE3526F
+        for <kvm@vger.kernel.org>; Wed, 29 Mar 2023 20:44:41 -0700 (PDT)
+Received: by mail-pl1-x64a.google.com with SMTP id l14-20020a170902f68e00b001a1a9a1d326so10433211plg.9
+        for <kvm@vger.kernel.org>; Wed, 29 Mar 2023 20:44:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112; t=1680147880;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=XtS4ffNy9WGD8mXuYOI9etZtjBQFkCQ/o4N7TvvD7Ws=;
+        b=ME0Y6mYPyMaBgZPhSbo9DclSuUZYVMs9VJWrKgrf2ZRB9MHPvUMO3DiK4PIfktqJjz
+         AwAcoeJb+dVIO8CIM9umZMJRPIPrqLd8BduACCFdGGA0jibr6hWS5qTxdG47CU6zM6A1
+         Nq+KPHbtVPzCtSwLN1Ks5TOkNey1jDCGf6mTcIPQryshEu3egZuJwifmy9BwUovcZq9S
+         td9+g5SLdXbk3ZvSahIbfqxzYprOVB86THO7MxVJNrO7CE/J1xy8bifEpqPiggkNeSJY
+         hZCPiufeR1yGuRuYQ39AY7EAQ23FGTVvTUfa/g1Kjba6lnE33cvi/OYB/Oj/fss7tXla
+         R7Hg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1680147880;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=XtS4ffNy9WGD8mXuYOI9etZtjBQFkCQ/o4N7TvvD7Ws=;
+        b=EnjW+h35H/IfI0/s1n8HyeT1ICds0DtxiBE8HicZZ4bmMiZQuuslq8nfvMa5kkraCh
+         cezlH91N4TAYWVOY2kbdKp7lj79QfUBWvboxsbuCS6e9BrbZG/GEZRf9tesxiol+QLH0
+         Oplu/vMkqIA4d2BlOtP47Bhg8S8erSMzLobEIWRpbpE5MXZEuktOFIfuXnwJ1/ed2AQq
+         tGvw/8KpdMgynCbACIgMwtJwa1wUCieoONmhO9QYu05pP/wrz5pHMP90jblDBqEU77D4
+         8hf1ppYYKHAqllKFYeJ0o98NJVgFm01rH6Cl4gEMy0H3aUkZGbFFoIy5dFCq2PK3/ed+
+         vYKg==
+X-Gm-Message-State: AAQBX9exSXY1sL1ng+hjKoAbBzLTzua3JauHLCo91K00EsKScxSZSNeC
+        zckF5uEqmRXnurf7ZFhK+swDqkmFxtw=
+X-Google-Smtp-Source: AKy350Z6WqglPzws8H5b3TR4jjEhE64t3nakeC9suvnjqCIcXMjGmSTc2M8G2MQveafPyMxg9QqmBDXLGNU=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:90b:1203:b0:240:c387:6089 with SMTP id
+ gl3-20020a17090b120300b00240c3876089mr299277pjb.1.1680147880561; Wed, 29 Mar
+ 2023 20:44:40 -0700 (PDT)
+Date:   Wed, 29 Mar 2023 20:44:33 -0700
+In-Reply-To: <49dd4ae8-9b7a-b6ce-ee9b-3ba76b12c06e@intel.com>
+Mime-Version: 1.0
+References: <20230328050231.3008531-1-seanjc@google.com> <20230328050231.3008531-2-seanjc@google.com>
+ <620935f7-dd7a-2db6-1ddf-8dae27326f60@intel.com> <ZCMCzpAkGV56+ZbS@google.com>
+ <05792cbd-7fdb-6bf2-ebaa-9d13a2c4fddd@intel.com> <ZCRogsvUYMQV6kca@google.com>
+ <49dd4ae8-9b7a-b6ce-ee9b-3ba76b12c06e@intel.com>
+Message-ID: <ZCUFoeqONfWU1+D1@google.com>
+Subject: Re: [kvm-unit-tests PATCH 1/3] x86: Add define for
+ MSR_IA32_PRED_CMD's PRED_CMD_IBPB (bit 0)
+From:   Sean Christopherson <seanjc@google.com>
+To:     Xiaoyao Li <xiaoyao.li@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-7.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Thu, Mar 30, 2023, Xiaoyao Li wrote:
+> On 3/30/2023 12:36 AM, Sean Christopherson wrote:
+> > On Wed, Mar 29, 2023, Xiaoyao Li wrote:
+> > > On 3/28/2023 11:07 PM, Sean Christopherson wrote:
+> > > > On Tue, Mar 28, 2023, Xiaoyao Li wrote:
+> > > > > On 3/28/2023 1:02 PM, Sean Christopherson wrote:
+> > > > > > Add a define for PRED_CMD_IBPB and use it to replace the open coded '1' in
+> > > > > > the nVMX library.
+> > > > > What does nVMX mean here?
+> > > > Nested VMX.  From KUT's perspective, the testing exists to validate KVM's nested
+> > > > VMX implementation.  If it's at all confusing, I'll drop the 'n'  And we've already
+> > > > established that KUT can be used on bare metal, even if that's not the primary use
+> > > > case.
+> > > So vmexit.flat is supposed to be ran in L1 VM?
+> > Not all of the tests can be run on bare metal, e.g. I can't imagine the VMware
+> > backdoor test works either.
+> > 
+> 
+> Sorry, I think neither I ask clearly nor you got my point.
+> 
+> You said "the testing exists to validate KVM's nested VMX implementation".
+> So I want to know what's the expected usage to run vmexit.flat.
+> 
+> If for nested, we need to first boot a VM and then inside the VM we run the
+> vmexit.flat with QEMU, right?
+> 
+> That's what confuses me. Isn't vmexit.flat supposed to be directly used on
+> the host with QEMU? In this case, nothing to do with nested.
 
-
-在 2023年03月28日 22:13, Paolo Bonzini 写道:
-> On 3/28/23 14:31, Tianrui Zhao wrote:
->> + * prepare switch to guest
->> + * @param:
->> + *  KVM_ARCH: kvm_vcpu_arch, don't touch it until 'ertn'
->> + *  GPRNUM: KVM_ARCH gpr number
->
-> Stale comment (should be "a2: kvm_vcpu_arch, don't touch it until 
-> 'ertn'").
->
-> Since you are at it, I noticed now that tmp and tmp1 aren't too useful 
-> because all registers will be overwritten before the end of the macro. 
-> You choose whether to keep or remove them.
->
-> Paolo
-
-Thanks, I will fix the stale comment and remove the tmp,tmp1 argument 
-and replace it with t0,t1 reg.
-
-Thanks
-Tianrui Zhao
-
->
->> + *  tmp, tmp1: temp register
->> + */
-
+Oof, my bad, I had a literacy problem.  I somehow read "vmx.c" instead of "vmexit.c",
+and never picked up on what you were saying.  I'll fix the changelog.
