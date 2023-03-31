@@ -2,59 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C93736D21DB
-	for <lists+kvm@lfdr.de>; Fri, 31 Mar 2023 15:57:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C23CA6D21DC
+	for <lists+kvm@lfdr.de>; Fri, 31 Mar 2023 15:57:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232540AbjCaN5e (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 31 Mar 2023 09:57:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56710 "EHLO
+        id S232546AbjCaN5g (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 31 Mar 2023 09:57:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56712 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232186AbjCaN5b (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S229629AbjCaN5b (ORCPT <rfc822;kvm@vger.kernel.org>);
         Fri, 31 Mar 2023 09:57:31 -0400
-Received: from mail-ed1-x532.google.com (mail-ed1-x532.google.com [IPv6:2a00:1450:4864:20::532])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C246DBCB
-        for <kvm@vger.kernel.org>; Fri, 31 Mar 2023 06:57:28 -0700 (PDT)
-Received: by mail-ed1-x532.google.com with SMTP id x3so89861001edb.10
-        for <kvm@vger.kernel.org>; Fri, 31 Mar 2023 06:57:28 -0700 (PDT)
+Received: from mail-ed1-x52d.google.com (mail-ed1-x52d.google.com [IPv6:2a00:1450:4864:20::52d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B77BEF81
+        for <kvm@vger.kernel.org>; Fri, 31 Mar 2023 06:57:29 -0700 (PDT)
+Received: by mail-ed1-x52d.google.com with SMTP id ew6so89878074edb.7
+        for <kvm@vger.kernel.org>; Fri, 31 Mar 2023 06:57:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=grsecurity.net; s=grsec; t=1680271047;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=/W/3TX1trWbw7cm7tHRSUUT7TeiRpxFpONHIB9AwQIA=;
-        b=NeP+fza4Hflo5YJNfbIjHIZXleW1lKi7+vRLnOTckZVIr/e+EFxMgj1xgslsMRvJZf
-         4L9qciexH44vu23fMpPIAHPZVU/nw4IjLhoN2vSbMzqhyJNR0lBq2pNaoVmGhLIdys+R
-         UtBsXdDCyQZnGCGrklIXibjlZBQMP6jYQL6KksMt2QFeU6bRxSLvfhG5S0MBOjPY6CUL
-         AHIHKZqUF/JQNVbTpaPk57jTxNs/0fV1jRzHmWiwkXVsJms6BCs3tpxozUvVpEFaPJ3w
-         3R6RlDi+6/TH+GJcWGP2WrqLK2gud10p26mZVmVtAsH8drXZ4dI/tRTKVNsDFk4Slttl
-         mumw==
+        bh=P2ecs728xz8eViS6nyVKhqitH9aCAjKZcKOdrIrAaoo=;
+        b=Z5+sJCH6Rdpn4imX4E2kh7GtAC06BaNjDvKp13hIOuvKgI4S4RFhRIWjIkVf0S/GaA
+         lHPN4JDS4rtdyBqVQantSbktQoOtW4CSpESCdm9j5lafgt9M0/AqD+k5lp7/qRSF4yxD
+         FL3L07t6DD6B8u6fQ1LjA0aL6Kh8v0vhQtx2u4GtBZU/yigUTotN2S6MjEj6mDdniij0
+         PVEHqmeXuDuI9ekrmDO+YUvqozouvq+uohu9VQiRrgAQPbsaU8I4uSgsfCHLZqrc+MiK
+         7jmOvGBf1+MIhSsI/wb/7kf0nQOOkJzROb1PZxDMx4tUmRiRXeZAa6M7j6Et0A/QUzN8
+         qovA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112; t=1680271047;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=/W/3TX1trWbw7cm7tHRSUUT7TeiRpxFpONHIB9AwQIA=;
-        b=D9E1lJQnu8vplTI81U17Fx/MU2FBL5AAWuvd8YnzbV7G70ttPyR+T3Bb41MUVxEWz7
-         H8NYY/9vBaN8Q5ySAUsZg1VmL1azezoeR9mzW6p0TqfFyyVzvCUIPGlsX5RqNTvBYVzp
-         9X+NgIH+pxJBAjMg/yKXHZWbiDVZDm50IzhDKeJzuQ6+MDHfXE5LyiMG+R6DuDLgUoSA
-         emtjVN34avsVN1YwCYcFVCQWdTbV96SlofytP763o76lOjhEwIzYJsJKmY3YdR8qu12X
-         pWHB3T3Up1P8tHOq68lEPvt/VnjSTzf3UJLdHveBf9xSNKew3g1HuPPvBqF2dkXw+TJX
-         ZxRA==
-X-Gm-Message-State: AAQBX9elL1HomYldE/r+kySRnvH7wCAZB8LqBYCzQrzLfUWn/eIyPRBJ
-        lptzHVFURj6Qm3/kqNiZflbFmNIW9Hj1ZJZXLkRSfQ==
-X-Google-Smtp-Source: AKy350ZCN1rEifz1w1qTC4AqvYeihja0MNDXlHd35XYs1FVg+HYIWBoISzK3hR/3plBa9v0pl6VeGw==
-X-Received: by 2002:a17:907:6d27:b0:932:cfbc:7613 with SMTP id sa39-20020a1709076d2700b00932cfbc7613mr31422121ejc.24.1680271046844;
-        Fri, 31 Mar 2023 06:57:26 -0700 (PDT)
+        bh=P2ecs728xz8eViS6nyVKhqitH9aCAjKZcKOdrIrAaoo=;
+        b=MHoNJL7x8Fpv1yl5VGg79p8khVTCceEv2WQtr24ZrOV7DhIrKgx5LXwUekzQSMOJ5+
+         oVJL0AGoy3MNx4vuxd1pzKpsvRWVzzMDfgTTe57ZZ7fGYXDpXk4mI/9VWQ1c6uJ3dTMT
+         Mout9wtVR9J5+PoxfECUsbiuvQ3A+cbAmdHZGZmoSf0NTH2mfVDw+Vk0fJN1eDrGvBa3
+         j2QLbnRXQV3t6YvsQq1fz58wZwzs4QGqg6GiWCbKrWjQR/Oo3XZ4S3CCoSFc2HW4Eely
+         3Wgl1JSWb2c8NKj9FHqb/ji2BaQ9fWe0rw5Rs503IJ7TSzT6iUFf37exvsFppkoBfgDQ
+         K9rg==
+X-Gm-Message-State: AAQBX9cXcNwxcdN791RrswlAq4aiMB5YmsJEsIwFur2FzjXgJxzSwzjU
+        eu2PjZxM8z6/hH/M6k7ex4zVyON6q/E4wR6xvMlxSA==
+X-Google-Smtp-Source: AKy350ZYlmhmYtoBoflC7KfeCuy34iMYnLOMdGiG+d/kCb3yilfoqrCbLl9wrxF96O9jVBLyPjsIfQ==
+X-Received: by 2002:a50:ed8b:0:b0:502:3ea3:fc24 with SMTP id h11-20020a50ed8b000000b005023ea3fc24mr9918033edr.17.1680271047533;
+        Fri, 31 Mar 2023 06:57:27 -0700 (PDT)
 Received: from nuc.fritz.box (p200300f6af1a510052e55a748e5a73cd.dip0.t-ipconnect.de. [2003:f6:af1a:5100:52e5:5a74:8e5a:73cd])
         by smtp.gmail.com with ESMTPSA id ay20-20020a170906d29400b00928de86245fsm996888ejb.135.2023.03.31.06.57.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 31 Mar 2023 06:57:26 -0700 (PDT)
+        Fri, 31 Mar 2023 06:57:27 -0700 (PDT)
 From:   Mathias Krause <minipli@grsecurity.net>
 To:     kvm@vger.kernel.org
 Cc:     Mathias Krause <minipli@grsecurity.net>
-Subject: [kvm-unit-tests PATCH v2 3/4] x86/access: Forced emulation support
-Date:   Fri, 31 Mar 2023 15:57:08 +0200
-Message-Id: <20230331135709.132713-4-minipli@grsecurity.net>
+Subject: [kvm-unit-tests PATCH v2 4/4] x86/access: Try emulation for CR0.WP test as well
+Date:   Fri, 31 Mar 2023 15:57:09 +0200
+Message-Id: <20230331135709.132713-5-minipli@grsecurity.net>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230331135709.132713-1-minipli@grsecurity.net>
 References: <20230331135709.132713-1-minipli@grsecurity.net>
@@ -69,122 +69,78 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add support to enforce access tests to be handled by the emulator, if
-supported by KVM. Exclude it from the ac_test_exec() test, though, to
-not slow it down too much.
+Enhance the CR.WP toggling test to do additional tests via the emulator
+as these used to trigger bugs when CR0.WP is guest owned.
 
+Link: https://lore.kernel.org/kvm/ea3a8fbc-2bf8-7442-e498-3e5818384c83@grsecurity.net/
 Signed-off-by: Mathias Krause <minipli@grsecurity.net>
 ---
- x86/access.c | 37 ++++++++++++++++++++++++++++++++-----
- 1 file changed, 32 insertions(+), 5 deletions(-)
+ x86/access.c | 46 +++++++++++++++++++++++++++++++---------------
+ 1 file changed, 31 insertions(+), 15 deletions(-)
 
 diff --git a/x86/access.c b/x86/access.c
-index d1ec99b4fa73..ae5e7d8e8892 100644
+index ae5e7d8e8892..21967434bc18 100644
 --- a/x86/access.c
 +++ b/x86/access.c
-@@ -82,6 +82,13 @@ enum {
- 	AC_CPU_CR4_SMEP_BIT,
- 	AC_CPU_CR4_PKE_BIT,
+@@ -1107,27 +1107,43 @@ static int check_write_cr0wp(ac_pt_env_t *pt_env)
+ 	 * We load CR0.WP with the inverse value of what would be used during
+ 	 * the access test and toggle EFER.NX to flush and rebuild the current
+ 	 * MMU context based on that value.
++	 *
++	 * This used to trigger a bug in the emulator we try to test via FEP.
+ 	 */
++	for (;;) {
++		const char *fep = (at.flags & AC_FEP_MASK) ? "FEP " : "";
  
-+	NR_AC_TEST_FLAGS,
+-	set_cr0_wp(1);
+-	set_efer_nx(1);
+-	set_efer_nx(0);
++		set_cr0_wp(1);
++		set_efer_nx(1);
++		set_efer_nx(0);
+ 
+-	if (!ac_test_do_access(&at)) {
+-		printf("%s: CR0.WP=0 r/o write fail\n", __FUNCTION__);
+-		err++;
+-	}
++		if (!ac_test_do_access(&at)) {
++			printf("%s: %sCR0.WP=0 r/o write fail\n", __FUNCTION__, fep);
++			err++;
++		}
+ 
+-	at.flags |= AC_CPU_CR0_WP_MASK;
+-	__ac_set_expected_status(&at, false);
++		at.flags |= AC_CPU_CR0_WP_MASK;
++		__ac_set_expected_status(&at, false);
+ 
+-	set_cr0_wp(0);
+-	set_efer_nx(1);
+-	set_efer_nx(0);
++		set_cr0_wp(0);
++		set_efer_nx(1);
++		set_efer_nx(0);
+ 
+-	if (!ac_test_do_access(&at)) {
+-		printf("%s: CR0.WP=1 r/o write deny fail\n", __FUNCTION__);
+-		err++;
++		if (!ac_test_do_access(&at)) {
++			printf("%s: %sCR0.WP=1 r/o write deny fail\n", __FUNCTION__, fep);
++			err++;
++		}
 +
-+	/*
-+	 *  synthetic flags follow, won't be exercised by ac_test_exec().
-+	 */
-+	AC_FEP_BIT,
++		if (!fep_available)
++			break;
 +
- 	NR_AC_FLAGS
- };
- 
-@@ -121,6 +128,8 @@ enum {
- #define AC_CPU_CR4_SMEP_MASK  (1 << AC_CPU_CR4_SMEP_BIT)
- #define AC_CPU_CR4_PKE_MASK   (1 << AC_CPU_CR4_PKE_BIT)
- 
-+#define AC_FEP_MASK           (1 << AC_FEP_BIT)
++		if (at.flags & AC_FEP_MASK)
++			break;
 +
- const char *ac_names[] = {
- 	[AC_PTE_PRESENT_BIT] = "pte.p",
- 	[AC_PTE_ACCESSED_BIT] = "pte.a",
-@@ -152,6 +161,7 @@ const char *ac_names[] = {
- 	[AC_CPU_CR0_WP_BIT] = "cr0.wp",
- 	[AC_CPU_CR4_SMEP_BIT] = "cr4.smep",
- 	[AC_CPU_CR4_PKE_BIT] = "cr4.pke",
-+	[AC_FEP_BIT] = "fep",
- };
- 
- static inline void *va(pt_element_t phys)
-@@ -190,6 +200,7 @@ typedef struct {
- 
- static void ac_test_show(ac_test_t *at);
- 
-+static bool fep_available;
- static unsigned long shadow_cr0;
- static unsigned long shadow_cr3;
- static unsigned long shadow_cr4;
-@@ -396,7 +407,7 @@ static void ac_test_init(ac_test_t *at, unsigned long virt, ac_pt_env_t *pt_env)
- static int ac_test_bump_one(ac_test_t *at)
- {
- 	at->flags = ((at->flags | invalid_mask) + 1) & ~invalid_mask;
--	return at->flags < (1 << NR_AC_FLAGS);
-+	return at->flags < (1 << NR_AC_TEST_FLAGS);
- }
- 
- #define F(x)  ((flags & x##_MASK) != 0)
-@@ -799,10 +810,13 @@ static int ac_test_do_access(ac_test_t *at)
- 
- 	if (F(AC_ACCESS_TWICE)) {
- 		asm volatile ("mov $fixed2, %%rsi \n\t"
--			      "mov (%[addr]), %[reg] \n\t"
-+			      "cmp $0, %[fep] \n\t"
-+			      "jz 1f \n\t"
-+			      KVM_FEP
-+			      "1: mov (%[addr]), %[reg] \n\t"
- 			      "fixed2:"
- 			      : [reg]"=r"(r), [fault]"=a"(fault), "=b"(e)
--			      : [addr]"r"(at->virt)
-+			      : [addr]"r"(at->virt), [fep]"r"(F(AC_FEP))
- 			      : "rsi");
- 		fault = 0;
- 	}
-@@ -823,9 +837,15 @@ static int ac_test_do_access(ac_test_t *at)
- 		      "jnz 2f \n\t"
- 		      "cmp $0, %[write] \n\t"
- 		      "jnz 1f \n\t"
--		      "mov (%[addr]), %[reg] \n\t"
-+		      "cmp $0, %[fep] \n\t"
-+		      "jz 0f \n\t"
-+		      KVM_FEP
-+		      "0: mov (%[addr]), %[reg] \n\t"
- 		      "jmp done \n\t"
--		      "1: mov %[reg], (%[addr]) \n\t"
-+		      "1: cmp $0, %[fep] \n\t"
-+		      "jz 0f \n\t"
-+		      KVM_FEP
-+		      "0: mov %[reg], (%[addr]) \n\t"
- 		      "jmp done \n\t"
- 		      "2: call *%[addr] \n\t"
- 		      "done: \n"
-@@ -843,6 +863,7 @@ static int ac_test_do_access(ac_test_t *at)
- 			[write]"r"(F(AC_ACCESS_WRITE)),
- 			[user]"r"(F(AC_ACCESS_USER)),
- 			[fetch]"r"(F(AC_ACCESS_FETCH)),
-+			[fep]"r"(F(AC_FEP)),
- 			[user_ds]"i"(USER_DS),
- 			[user_cs]"i"(USER_CS),
- 			[user_stack_top]"r"(user_stack + sizeof user_stack),
-@@ -1228,6 +1249,12 @@ int ac_test_run(int pt_levels)
- 		invalid_mask |= AC_PTE_BIT36_MASK;
++		/* Re-test via the emulator */
++		at.flags |= AC_FEP_MASK;
++		at.flags ^= AC_CPU_CR0_WP_MASK;
++		__ac_set_expected_status(&at, false);
  	}
  
-+	fep_available = is_fep_available();
-+	if (!fep_available) {
-+		printf("FEP not available, skipping emulation tests\n");
-+		invalid_mask |= AC_FEP_MASK;
-+	}
-+
- 	ac_env_int(&pt_env, pt_levels);
- 	ac_test_init(&at, 0xffff923400000000ul, &pt_env);
- 
+ 	return err == 0;
 -- 
 2.39.2
 
