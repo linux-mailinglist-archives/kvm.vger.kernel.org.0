@@ -2,60 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B0A3F6D1CF4
-	for <lists+kvm@lfdr.de>; Fri, 31 Mar 2023 11:50:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6264F6D1CF5
+	for <lists+kvm@lfdr.de>; Fri, 31 Mar 2023 11:50:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232330AbjCaJuU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 31 Mar 2023 05:50:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40426 "EHLO
+        id S231209AbjCaJuc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 31 Mar 2023 05:50:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41166 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232460AbjCaJtx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 31 Mar 2023 05:49:53 -0400
-Received: from mail-qv1-xf34.google.com (mail-qv1-xf34.google.com [IPv6:2607:f8b0:4864:20::f34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74C651FD08
-        for <kvm@vger.kernel.org>; Fri, 31 Mar 2023 02:48:46 -0700 (PDT)
-Received: by mail-qv1-xf34.google.com with SMTP id o44so16006647qvo.4
-        for <kvm@vger.kernel.org>; Fri, 31 Mar 2023 02:48:46 -0700 (PDT)
+        with ESMTP id S231177AbjCaJuD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 31 Mar 2023 05:50:03 -0400
+Received: from mail-qk1-x72b.google.com (mail-qk1-x72b.google.com [IPv6:2607:f8b0:4864:20::72b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 789892030B
+        for <kvm@vger.kernel.org>; Fri, 31 Mar 2023 02:48:52 -0700 (PDT)
+Received: by mail-qk1-x72b.google.com with SMTP id y7so6719194qky.1
+        for <kvm@vger.kernel.org>; Fri, 31 Mar 2023 02:48:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1680256125;
+        d=gmail.com; s=20210112; t=1680256131;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=haO5oy1hHoEi95p0w0HT0G2pQYSJcwxtZ4LM32vwLeg=;
-        b=eM1shNluFqdhpLeIhdFpgPHr2gGo13yM8w11yfVl5Hyh/ii4eciTnk82cdXE6NMpGZ
-         At7gEqB0jq73fDdJweyFFf7m8ZQh3fjxobibq+DJzxPdYdCa5GhjiO6GFfKzG0oOyfEm
-         Y0lxTuOpWYm5S8OFLMFZKKGndayNNUutdKteTo7ENFT46/t/95YztSs+byVM5PHNCuT+
-         akKXzsMAuKxKjstnxJ1KyymmLCkamPCTQFHCOq2dpQ/7WAvVomgA324LWz/f4IF5+UFf
-         lc/OIv62dYWkQh0VhEFAaimttnJEjUSj868whHpW+VOC9/U4L/W+jaFf7yfprGXodTU2
-         Ob1Q==
+        bh=RQev/2xSHIWb8A43B2OqeWKTXHV8C7phPdeVA/fkIpI=;
+        b=lUL3rOATa02+Lf9Uw8RW/eO3cWjS3bgkogMrYBYZFea6mewMLrbcZNSTXyOE4vZ2RU
+         0u8/tJ2Cmbj3Pfjjd90P45n9+oj1Y+Cu0Kfu6Mm7efU0tWJNo4nfToK+8Y9brh3/tA2E
+         zeIhhYlNnFshDpgIdH0dmh2zhUsUxi6dZDskWv5BmyPynVDpTit4HIiQpBJ8e2InlW8L
+         0dV20G97v1qA2h1Cf38+0IUn444xxSVu3LEgOds2/LL9TC1+6Jes/Kgwgp+dTccHn35/
+         KkMtreqCtEWoy7oI7GhXUBE2nycTgUJPnYh8uz17F1JGQmD9T4XrgRRPKPxPO5g/UznY
+         R1SQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680256125;
+        d=1e100.net; s=20210112; t=1680256131;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=haO5oy1hHoEi95p0w0HT0G2pQYSJcwxtZ4LM32vwLeg=;
-        b=SibFX/JTvQmR7PveP4n6ie8CviNFX9ad2srRFx+FWolnfY43CSUtSAtfg+tMBduWsG
-         QvEusHnz3v+u3MlMFiJR77SSEoot04UldzB5r+c9oO3K1CpQg4wuOBP7jbDyGAr6bf+Z
-         KlV3l19cQa9T0owqGL1bHopyPlWhvg5h/e9buk7MGxj2IO0KO5Np8uFS0GWIZC+YlujE
-         y1AHUaBjzFoDgpItVEVgjqA4pug25tc3dR3ZiS/AkWD5jsN7BkQKK2J8qyb/gmNn7jvj
-         0V0TFcabPuU5oXLg7ThjZ6fQON/tTUAJekCHKI5Yz/c2CUEaHMhU2wUTFSdEqU6KdpR9
-         c5pA==
-X-Gm-Message-State: AAQBX9cF5WwrNsW4sKjWKbyoiCJQkREGYrlAkGDXS1oqLRCi0abpMDDF
-        W5MQV1a1YtdX4VsqyZkWYcI35cdHPn35PPSSwu4=
-X-Google-Smtp-Source: AKy350amKlB75t1uLraLDYMg9Glfrt5gHish7KRp1pHgLWaCjuj3A/L+1XaskAFJAOIOtXciakaLsNa5QnAEzJIVuh8=
-X-Received: by 2002:a05:6214:1750:b0:5df:4d3f:81f4 with SMTP id
- dc16-20020a056214175000b005df4d3f81f4mr2159878qvb.7.1680256125491; Fri, 31
- Mar 2023 02:48:45 -0700 (PDT)
+        bh=RQev/2xSHIWb8A43B2OqeWKTXHV8C7phPdeVA/fkIpI=;
+        b=Snh6w8v75fEh9AAd6l16Y0J+DXDkuZ7jxgNXM9sQHal6WCc61HfFtZe5t/2FLrHkJd
+         HCCef/WUNdQyYyt/k6SYcdcCbhvFu4gdxAp4SaKEeUc8DLd+HNb7MbAvCje+bHzBpFvc
+         6WLq9V0HbkFSiHS+h2dyDp1YShD5A0AWPT5V4B4VIdJ9GC9o5AEj0gsWSNWR6i8jx5Ha
+         N5teXmT5iJ3+V+nD5fNXGnqlMerGLq33/UKTQPZhNmcfqZYh6MuS4qC32Y0tKCikQP1C
+         +IWgmvQxq3uziXcMPySSEc75IVFVPauELFpMtyfeuMhcCTDHS325cbpvHuSrc1TyT61E
+         QUfw==
+X-Gm-Message-State: AO0yUKWnjr/4QV7iEprQhF/EABgYnwQqLfkl1mOscQGo9CUmfNg8FdmH
+        m9aSBhCxZHWPiVEo5WEx+5NbLMlXHRsHU7jQHMeV7nmeHAA=
+X-Google-Smtp-Source: AK7set9yiMdsN11YoTydDJcCPcC9nZfMzuN4aSRsZ4bNrXisWB1PK86xXtOX8Zy/cdTdCnc4DH7brqU0uXKQQ6rFXhI=
+X-Received: by 2002:ae9:ef95:0:b0:745:811c:2aea with SMTP id
+ d143-20020ae9ef95000000b00745811c2aeamr5408959qkg.11.1680256131512; Fri, 31
+ Mar 2023 02:48:51 -0700 (PDT)
 MIME-Version: 1.0
-References: <20230310125718.1442088-1-robert.hu@intel.com> <20230310125718.1442088-3-robert.hu@intel.com>
- <ZAtW7PF/1yhgBwYP@google.com> <CA+wubQAXBFthBhsNqWDtY=Qf4-FtfJ3dojJctXXg=iokXJRbmg@mail.gmail.com>
- <ZBHz7kL7wSRZzvKk@google.com>
-In-Reply-To: <ZBHz7kL7wSRZzvKk@google.com>
+References: <20230310125718.1442088-1-robert.hu@intel.com> <20230310125718.1442088-4-robert.hu@intel.com>
+ <ZAtaY8ISOZyXB3V+@google.com>
+In-Reply-To: <ZAtaY8ISOZyXB3V+@google.com>
 From:   Robert Hoo <robert.hoo.linux@gmail.com>
-Date:   Fri, 31 Mar 2023 17:48:34 +0800
-Message-ID: <CA+wubQBDU4y97HrShmn+=0=o0HGwTckU1_y+VJLCuJtf2M+fyw@mail.gmail.com>
-Subject: Re: [PATCH 2/3] KVM: VMX: Remove a unnecessary cpu_has_vmx_desc()
- check in vmx_set_cr4()
+Date:   Fri, 31 Mar 2023 17:48:40 +0800
+Message-ID: <CA+wubQBN0LAW3aqTm8Psja7jBghdi1+9x=R18TpczxTSBXN4xg@mail.gmail.com>
+Subject: Re: [PATCH 3/3] KVM: VMX: Use the canonical interface to read
+ CR4.UMIP bit
 To:     Sean Christopherson <seanjc@google.com>
 Cc:     Robert Hoo <robert.hu@intel.com>, pbonzini@redhat.com,
         kvm@vger.kernel.org
@@ -71,45 +70,42 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sean Christopherson <seanjc@google.com> =E4=BA=8E2023=E5=B9=B43=E6=9C=8816=
-=E6=97=A5=E5=91=A8=E5=9B=9B 00:36=E5=86=99=E9=81=93=EF=BC=9A
-> > Sorry I don't follow you.
-> > My point is that, given it has passed kvm_is_valid_cr4() (in kvm_set_cr=
-4()),
-> > we can assert boot_cpu_has(X86_FEATURE_UMIP)  and vmx_umip_emulated() m=
-ust be
-> > at least one true.
+Sean Christopherson <seanjc@google.com> =E4=BA=8E2023=E5=B9=B43=E6=9C=8811=
+=E6=97=A5=E5=91=A8=E5=85=AD 00:27=E5=86=99=E9=81=93=EF=BC=9A
 >
-> This assertion is wrong for the case where guest.CR4.UMIP=3D0.  The below=
- code is
-> not guarded with a check on guest.CR4.UMIP.  If the vmx_umip_emulated() c=
-heck goes
-> away and guest.CR4.UMIP=3D0, KVM will attempt to write secondary controls=
-.
+> On Fri, Mar 10, 2023, Robert Hoo wrote:
+> > Use kvm_read_cr4_bits() rather than directly read vcpu->arch.cr4, now t=
+hat
+> > we have reg cache layer and defined this wrapper.
 >
-
-Sorry still don't follow you. Do you mean in nested case? the "guest"
-above is L1?
-
-> Technically, now that controls_shadow exists, KVM won't actually do a VMW=
-RITE,
-> but I most definitely don't want to rely on controls_shadow for functiona=
+> kvm_read_cr4_bits() predates this code by ~7 years.
+>
+> > Although, effectively for CR4.UMIP, it's the same, at present, as it's =
+not
+> > guest owned, in case of future changes, here better to use the canonica=
 l
-> correctness.  And controls_shadow aside, the "vmx_umip_emulated()" effect=
-ively
-> serves as documentation for why KVM is mucking with UMIP when it's obviou=
-sly not
-> supported in hardware.
+> > interface.
 >
->         if (!boot_cpu_has(X86_FEATURE_UMIP) && vmx_umip_emulated()) {
->                 if (cr4 & X86_CR4_UMIP) {
->                         secondary_exec_controls_setbit(vmx, SECONDARY_EXE=
-C_DESC);
->                         hw_cr4 &=3D ~X86_CR4_UMIP;
->                 } else if (!is_guest_mode(vcpu) ||
->                         !nested_cpu_has2(get_vmcs12(vcpu), SECONDARY_EXEC=
-_DESC)) {
->                         secondary_exec_controls_clearbit(vmx, SECONDARY_E=
-XEC_DESC);
->                 }
->         }
+> Practically speaking, UMIP _can't_ be guest owned without breaking UMIP e=
+mulation.
+> I do like not open coding vcpu->arch.cr4, but I don't particuarly like th=
+e changelog.
+>
+> This would also be a good time to opportunistically convert the WARN_ON()=
+ to a
+> WARN_ON_ONCE() (when it fires, it fires a _lot).
+>
+> This, with a reworded changelog?
+>
+>         /*
+>          * UMIP emulation relies on intercepting writes to CR4.UMIP, i.e.=
+ this
+>          * and other code needs to be updated if UMIP can be guest owned.
+>          */
+>         BUILD_BUG_ON(KVM_POSSIBLE_CR4_GUEST_BITS & X86_CR4_UMIP);
+>
+>         WARN_ON_ONCE(!kvm_read_cr4_bits(vcpu, X86_CR4_UMIP));
+>         return kvm_emulate_instruction(vcpu, 0);
+
+Are you going to have this along with your "[PATCH] KVM: VMX: Treat
+UMIP as emulated if and only if the host doesn't have UMIP"?
