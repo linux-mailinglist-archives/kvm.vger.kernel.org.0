@@ -2,84 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B820F6D192A
-	for <lists+kvm@lfdr.de>; Fri, 31 Mar 2023 10:00:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4861E6D193E
+	for <lists+kvm@lfdr.de>; Fri, 31 Mar 2023 10:03:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231247AbjCaIAd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 31 Mar 2023 04:00:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38786 "EHLO
+        id S231318AbjCaIDD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 31 Mar 2023 04:03:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42006 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231199AbjCaIA1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 31 Mar 2023 04:00:27 -0400
-Received: from sin.source.kernel.org (sin.source.kernel.org [IPv6:2604:1380:40e1:4800::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD1BF1A974;
-        Fri, 31 Mar 2023 01:00:22 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by sin.source.kernel.org (Postfix) with ESMTPS id E789CCE2D89;
-        Fri, 31 Mar 2023 08:00:19 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id F1C37C433AE;
-        Fri, 31 Mar 2023 08:00:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1680249618;
-        bh=W5/T8PFfQT4Kt2TSL/5tLnyXbGGwTe53FTh2jn5ZVBY=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=jcWoBrIMaP0a3vkd/dl+/0K8gWXF4ownzC+VQMS5lyZOLSCud/2WcFR/EQurj15i4
-         W+134QKpodbrW74WhF2FWKNHD47Zmti/tg8Xsz7hmceANiqNamlfGQY+Lc3Q+LHFSS
-         qEIDxxjp+Ieg7cS1wmdkSvrcstGcR5eObvtVCH4Dta+WWjcYe8JIobCQX0Zp/50KDw
-         yVVqk2QswZ4QW1vvhFd4TwzJPmnAlgR2LKMuMb15aSipUK5GIkUKyOgFtrYynuKkDr
-         gGx/iklOu7hagN2xK+e4wKKOmUCr7UL9KNpneWowrcc4EWk7+Ra0TLFeoD1vtjMAmX
-         k2YeyjmmPYBiQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D719EC73FE0;
-        Fri, 31 Mar 2023 08:00:17 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+        with ESMTP id S230368AbjCaIC7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 31 Mar 2023 04:02:59 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96683D322
+        for <kvm@vger.kernel.org>; Fri, 31 Mar 2023 01:02:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1680249733;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=Z1bhGoNJZMSwcpQc6yTvdcUKf3R+huOZ4zfMlXF6R1k=;
+        b=d8AwJGOUik9kjaeOIUlbAPgQkqOn66lhqtSuu/cHA6qjsGy6s9lbAlNbApXmcqHos0Q+t9
+        TOvn3IRr1BsYvoRUD/yeB4JZ2kvP+6B+js6oDYDT2Qg2wdAm8g6Ij0feLuRdxYRsRMVgFd
+        vZbD3gJ1kRcKssEV196Z/lzBCUkHgKQ=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-177-2SjJlWAXPjSS5rqs_vW49A-1; Fri, 31 Mar 2023 04:02:12 -0400
+X-MC-Unique: 2SjJlWAXPjSS5rqs_vW49A-1
+Received: by mail-ed1-f70.google.com with SMTP id k14-20020a508ace000000b005024a8cef5cso19619742edk.22
+        for <kvm@vger.kernel.org>; Fri, 31 Mar 2023 01:02:12 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1680249731;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Z1bhGoNJZMSwcpQc6yTvdcUKf3R+huOZ4zfMlXF6R1k=;
+        b=4u2Ymf4Ck5tM8+UGICkxNW5j4EJXhBNUK6956XIIx9L4+cyZpP0w3Vg5pMrCGrJgw1
+         VhlT1znv5IVWpvS98KVixNQxk5hKRa8uCoFdExNtqKRrKQHvoM3laybZL3u7quqeqPJf
+         SsX1BA9583JkAnELeDlHodGCi9Yx2maNW+w/pqwNqrtOjuRKqOpJfV7qWjYdCTxnVMFm
+         j8jBjJdQukOBmIMRgEsrrg/2h8HhTeW0T1XqqOXMO/yeHE9bZjoGFY6MDlBc4vNehVN7
+         Ffk36jdDv32vPs+6pK58N+l3QpAkV8VJ7MFYCb5sBauCsq+Ny2KNnyTmyr3S2yQBNLGJ
+         cGuA==
+X-Gm-Message-State: AAQBX9c42nxqufz330Ys7i2lvdFC7m61oPw4prtaMFuNizPMwiWFosJD
+        AuB83nMjDd1Pkup13XPJlFdbMSQOB4qScSeEMAKYnitjUEq/TjjUlpfsbwamfj3NTHoEbslm+1f
+        La/lJYR7gI3skz3k8P9sx
+X-Received: by 2002:a17:906:3a83:b0:932:9502:4fd1 with SMTP id y3-20020a1709063a8300b0093295024fd1mr25804893ejd.43.1680249730763;
+        Fri, 31 Mar 2023 01:02:10 -0700 (PDT)
+X-Google-Smtp-Source: AKy350YmxPDA5UW4cP8XQymOxzi1zIV1vQp/Pm9MW2epeKgfsHTsDIGjBuy3IHnIuIOwTawke5i8Zg==
+X-Received: by 2002:a17:906:3a83:b0:932:9502:4fd1 with SMTP id y3-20020a1709063a8300b0093295024fd1mr25804873ejd.43.1680249730456;
+        Fri, 31 Mar 2023 01:02:10 -0700 (PDT)
+Received: from step1.home (host-82-57-51-130.retail.telecomitalia.it. [82.57.51.130])
+        by smtp.gmail.com with ESMTPSA id p6-20020a170906498600b009321cd80fdfsm689029eju.158.2023.03.31.01.02.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 31 Mar 2023 01:02:09 -0700 (PDT)
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     virtualization@lists.linux-foundation.org
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>, kvm@vger.kernel.org,
+        Jason Wang <jasowang@redhat.com>, linux-kernel@vger.kernel.org,
+        netdev@vger.kernel.org, Stefano Garzarella <sgarzare@redhat.com>,
+        Simon Horman <simon.horman@corigine.com>
+Subject: [PATCH] vringh: fix typos in the vringh_init_* documentation
+Date:   Fri, 31 Mar 2023 10:02:08 +0200
+Message-Id: <20230331080208.17002-1-sgarzare@redhat.com>
+X-Mailer: git-send-email 2.39.2
 MIME-Version: 1.0
+Content-type: text/plain
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v3] virtio/vsock: fix leaks due to missing skb owner
-From:   patchwork-bot+netdevbpf@kernel.org
-Message-Id: <168024961787.12593.9775298884302736023.git-patchwork-notify@kernel.org>
-Date:   Fri, 31 Mar 2023 08:00:17 +0000
-References: <20230327-vsock-fix-leak-v3-1-292cfc257531@bytedance.com>
-In-Reply-To: <20230327-vsock-fix-leak-v3-1-292cfc257531@bytedance.com>
-To:     Bobby Eshleman <bobby.eshleman@bytedance.com>
-Cc:     stefanha@redhat.com, sgarzare@redhat.com, davem@davemloft.net,
-        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        xiyou.wangcong@gmail.com
-X-Spam-Status: No, score=-2.5 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello:
+Replace `userpace` with `userspace`.
 
-This patch was applied to netdev/net.git (main)
-by David S. Miller <davem@davemloft.net>:
+Cc: Simon Horman <simon.horman@corigine.com>
+Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+---
+ drivers/vhost/vringh.c | 18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
 
-On Wed, 29 Mar 2023 16:51:58 +0000 you wrote:
-> This patch sets the skb owner in the recv and send path for virtio.
-> 
-> For the send path, this solves the leak caused when
-> virtio_transport_purge_skbs() finds skb->sk is always NULL and therefore
-> never matches it with the current socket. Setting the owner upon
-> allocation fixes this.
-> 
-> [...]
-
-Here is the summary with links:
-  - [net,v3] virtio/vsock: fix leaks due to missing skb owner
-    https://git.kernel.org/netdev/net/c/f9d2b1e146e0
-
-You are awesome, thank you!
+diff --git a/drivers/vhost/vringh.c b/drivers/vhost/vringh.c
+index a1e27da54481..694462ba3242 100644
+--- a/drivers/vhost/vringh.c
++++ b/drivers/vhost/vringh.c
+@@ -636,9 +636,9 @@ static inline int xfer_to_user(const struct vringh *vrh,
+  * @features: the feature bits for this ring.
+  * @num: the number of elements.
+  * @weak_barriers: true if we only need memory barriers, not I/O.
+- * @desc: the userpace descriptor pointer.
+- * @avail: the userpace avail pointer.
+- * @used: the userpace used pointer.
++ * @desc: the userspace descriptor pointer.
++ * @avail: the userspace avail pointer.
++ * @used: the userspace used pointer.
+  *
+  * Returns an error if num is invalid: you should check pointers
+  * yourself!
+@@ -911,9 +911,9 @@ static inline int kern_xfer(const struct vringh *vrh, void *dst,
+  * @features: the feature bits for this ring.
+  * @num: the number of elements.
+  * @weak_barriers: true if we only need memory barriers, not I/O.
+- * @desc: the userpace descriptor pointer.
+- * @avail: the userpace avail pointer.
+- * @used: the userpace used pointer.
++ * @desc: the userspace descriptor pointer.
++ * @avail: the userspace avail pointer.
++ * @used: the userspace used pointer.
+  *
+  * Returns an error if num is invalid.
+  */
+@@ -1306,9 +1306,9 @@ static inline int putused_iotlb(const struct vringh *vrh,
+  * @features: the feature bits for this ring.
+  * @num: the number of elements.
+  * @weak_barriers: true if we only need memory barriers, not I/O.
+- * @desc: the userpace descriptor pointer.
+- * @avail: the userpace avail pointer.
+- * @used: the userpace used pointer.
++ * @desc: the userspace descriptor pointer.
++ * @avail: the userspace avail pointer.
++ * @used: the userspace used pointer.
+  *
+  * Returns an error if num is invalid.
+  */
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.39.2
 
