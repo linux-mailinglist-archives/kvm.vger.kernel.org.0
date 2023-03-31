@@ -2,88 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C0EF36D223D
-	for <lists+kvm@lfdr.de>; Fri, 31 Mar 2023 16:19:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 42E056D22C0
+	for <lists+kvm@lfdr.de>; Fri, 31 Mar 2023 16:38:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232676AbjCaOTo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 31 Mar 2023 10:19:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46842 "EHLO
+        id S232032AbjCaOi4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 31 Mar 2023 10:38:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44114 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232657AbjCaOTl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 31 Mar 2023 10:19:41 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A7FE1FD06
-        for <kvm@vger.kernel.org>; Fri, 31 Mar 2023 07:19:38 -0700 (PDT)
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 32VE9VJL009018;
-        Fri, 31 Mar 2023 14:19:35 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
- mime-version : content-transfer-encoding : in-reply-to : references : cc :
- from : to : subject : message-id : date; s=pp1;
- bh=bF2XlH6oOFEhN4EO/KRSBSdcL4jo3QQnxgmrnxzlEUA=;
- b=MqFm7dKiU8OT4GKs2BtCHcnkPr87W0NUQsoxikAZuzAz2VWJ/HGshktvOYLcyb+b+57/
- R+iplx3S7bEfFWqLjFkQNdIPU3BXhlzF/oLde4keyl9YgR44ZYEjAaPu+l6yxRHCI0zC
- K6/F9Jg0Qe6pZMKZPZrjpsbQvdhkIFWbvcgle2MBXf1flIZ3uTQc94nPekgdxSMkXGV/
- FWggtzmQoj4DuyS3kVS4m4vjAd9WvVnpq1ZCOmKhIVUtgJ6eSpEOZzZ3y2Z2EvzRLwK6
- klUgKRAKyddstDNe4oweJwHGtR0w1MJOyB/FSyFiJtXiiXQ7kDpFAKm/7tl0QKC2lkXX Wg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pnwahx6j9-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 31 Mar 2023 14:19:35 +0000
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 32VECNp8017101;
-        Fri, 31 Mar 2023 14:19:34 GMT
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pnwahx6hp-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 31 Mar 2023 14:19:34 +0000
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 32ULuwFi009365;
-        Fri, 31 Mar 2023 14:19:32 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-        by ppma04ams.nl.ibm.com (PPS) with ESMTPS id 3phrk6pt8f-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 31 Mar 2023 14:19:32 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-        by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 32VEJTvE20775608
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 31 Mar 2023 14:19:29 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3AE982004B;
-        Fri, 31 Mar 2023 14:19:29 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 179DE20049;
-        Fri, 31 Mar 2023 14:19:29 +0000 (GMT)
-Received: from t14-nrb (unknown [9.179.8.186])
-        by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Fri, 31 Mar 2023 14:19:29 +0000 (GMT)
-Content-Type: text/plain; charset="utf-8"
+        with ESMTP id S231661AbjCaOiy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 31 Mar 2023 10:38:54 -0400
+Received: from mail-lf1-x132.google.com (mail-lf1-x132.google.com [IPv6:2a00:1450:4864:20::132])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1720AD308
+        for <kvm@vger.kernel.org>; Fri, 31 Mar 2023 07:38:53 -0700 (PDT)
+Received: by mail-lf1-x132.google.com with SMTP id x17so29202426lfu.5
+        for <kvm@vger.kernel.org>; Fri, 31 Mar 2023 07:38:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=sifive.com; s=google; t=1680273531;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=OSw02QdSNYs5iQZe8kVdqUeP5gxl8yJEkHqDoZqEb90=;
+        b=UdGoddf5bXxD5gSKKZq5xbNf3lX6c0scs+3DExuWR1IkKuRV2OpGycyCufuzcrA7c0
+         6KGfJpJXc3FkeuZKrWcDoA/rHcdS5f/pxrQn64xP+LpQrgRVRap1cMy+/FLEgoP92oCc
+         4mdDYlp5aMhMgFuVrRpVUTbXZx4+irIvIZDVGYwtm/JnvIEn44OIrWP9z0SOvz426gZ0
+         44wbNjL4qnBL/2sGfBruXGltCiPoyo/pTzgOCcu2Ejcqqo1KgU+A2fHE0hP5VzPExB6g
+         wcElCE7LQasGv+7/bysxor0oo+O42M7d3JwI3YQJdQOtS1pvB6IFZ9qjkdFEDAqC4SCi
+         QfjA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1680273531;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=OSw02QdSNYs5iQZe8kVdqUeP5gxl8yJEkHqDoZqEb90=;
+        b=wirhV8CewNpHzgc8g4ZeoZcNT2fs2rfyZC6JVgCi1+OlTiKt25FhvRWGMAdkB2dw5W
+         wlYafxrHt4zK37JU7viNGnmmpZirJBYl4RzIZ0W/daNCVAu6pPw8olPvYOl/mfDt1HEH
+         HVnGn9xEbhak/J9VSwVwBB8RLSoYISOwNFyFjXvqGsthIk3mMBvWao2JOKRBHg5FqxUG
+         Sdc042WF8y6BWgD/B47Q2cqt7AhbJchJPyLoOQ1lPwSiwdgn3muC72f8MAOb4+OwyloS
+         9BPiaaiFJckqSdjSHc8cBf9fGvPAwwzNb6JSwybvv3acjFJ3YxvSs5onzwFMS2hFphCG
+         NtLA==
+X-Gm-Message-State: AAQBX9cUYJeiiDfrRE89ghw7ognkCF6Hqwj3WJxQiqpd1/yqTrW2XLb+
+        XXB6pTxDQnz7YbdU3JoUAvxdXBiamjtb2NUKLUj/AQ==
+X-Google-Smtp-Source: AKy350aQ7Ed8xOev3qhnK3Z1+w6VORlZZ7zAZIucuWwPUVNpKjgScrPlpHU6JNq5KIJ0AE2M12TI3RWGPDoDx3fLtVI=
+X-Received: by 2002:a05:6512:2182:b0:4dd:9931:c555 with SMTP id
+ b2-20020a056512218200b004dd9931c555mr3121265lft.0.1680273531309; Fri, 31 Mar
+ 2023 07:38:51 -0700 (PDT)
 MIME-Version: 1.0
+References: <20230327164941.20491-1-andy.chiu@sifive.com> <20230327164941.20491-11-andy.chiu@sifive.com>
+ <3435e5c9-5969-4abc-b929-5a73806e3506@spud>
+In-Reply-To: <3435e5c9-5969-4abc-b929-5a73806e3506@spud>
+From:   Andy Chiu <andy.chiu@sifive.com>
+Date:   Fri, 31 Mar 2023 22:38:40 +0800
+Message-ID: <CABgGipWEyhct3fQMjZ4+OL7WU-L_TZCDJsJq=GhsH0bn9Az_mA@mail.gmail.com>
+Subject: Re: [PATCH -next v17 10/20] riscv: Allocate user's vector context in
+ the first-use trap
+To:     Conor Dooley <conor@kernel.org>
+Cc:     linux-riscv@lists.infradead.org, palmer@dabbelt.com,
+        anup@brainfault.org, atishp@atishpatra.org,
+        kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
+        vineetg@rivosinc.com, greentime.hu@sifive.com,
+        guoren@linux.alibaba.com, Paul Walmsley <paul.walmsley@sifive.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Andrew Jones <ajones@ventanamicro.com>,
+        Heiko Stuebner <heiko.stuebner@vrull.eu>,
+        Conor Dooley <conor.dooley@microchip.com>,
+        Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>,
+        Liao Chang <liaochang1@huawei.com>,
+        Jisheng Zhang <jszhang@kernel.org>,
+        Guo Ren <guoren@kernel.org>,
+        Vincent Chen <vincent.chen@sifive.com>,
+        =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@rivosinc.com>,
+        Xianting Tian <xianting.tian@linux.alibaba.com>,
+        Mattias Nissler <mnissler@rivosinc.com>,
+        Richard Henderson <richard.henderson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <4a757f48-3fc0-4c1a-b401-8a2388b4d94d@redhat.com>
-References: <20230331113028.621828-1-nrb@linux.ibm.com> <4a757f48-3fc0-4c1a-b401-8a2388b4d94d@redhat.com>
-Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com, imbrenda@linux.ibm.com
-From:   Nico Boehr <nrb@linux.ibm.com>
-To:     Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
-        Thomas Huth <thuth@redhat.com>, andrew.jones@linux.dev,
-        pbonzini@redhat.com
-Subject: Re: [kvm-unit-tests GIT PULL 00/14] s390x: new maintainer, refactor linker scripts, tests for misalignments, execute-type instructions and vSIE epdx
-Message-ID: <168027236584.521366.16837896312489221810@t14-nrb>
-User-Agent: alot/0.8.1
-Date:   Fri, 31 Mar 2023 16:19:25 +0200
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 7JtioaqzWG9-t3GMgL7iJRleR1-K2B9g
-X-Proofpoint-GUID: 8JOyUQs6Xf2reraNWIp9eI5_DMNFh6e2
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
- definitions=2023-03-31_07,2023-03-31_01,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 spamscore=0
- bulkscore=0 clxscore=1015 lowpriorityscore=0 suspectscore=0
- mlxlogscore=999 impostorscore=0 mlxscore=0 phishscore=0 priorityscore=1501
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2303200000 definitions=main-2303310111
-X-Spam-Status: No, score=-0.1 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
-        DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
+        DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS
         autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -91,56 +85,30 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Quoting Thomas Huth (2023-03-31 15:17:33)
-> On 31/03/2023 13.30, Nico Boehr wrote:
-> > Hi Paolo and/or Thomas,
-> >=20
-> > here comes the first pull request from me. :)
->=20
-> Thanks!
->=20
-> ... I gave it a try, but I'm hitting a failure in the spec_ex test:
->=20
-> $ cat logs/spec_ex.log
-> timeout -k 1s --foreground 90s qemu-system-s390x -nodefaults -nographic -=
-machine s390-ccw-virtio,accel=3Dkvm -chardev stdio,id=3Dcon0 -device sclpco=
-nsole,chardev=3Dcon0 -kernel s390x/spec_ex.elf -smp 1 # -initrd /tmp/tmp.cx=
-HP06rT1F
-> PASS: specification exception: psw_bit_12_is_1: Program interrupt: expect=
-ed(6) =3D=3D received(6)
-> PASS: specification exception: short_psw_bit_12_is_0: Program interrupt: =
-expected(6) =3D=3D received(6)
-> FAIL: specification exception: psw_odd_address: Expected exception due to=
- invalid PSW
-> PASS: specification exception: odd_ex_target: did not perform ex with odd=
- target
-> PASS: specification exception: odd_ex_target: Program interrupt: expected=
-(6) =3D=3D received(6)
-> PASS: specification exception: bad_alignment_lqp: Program interrupt: expe=
-cted(6) =3D=3D received(6)
-> PASS: specification exception: bad_alignment_lrl: Program interrupt: expe=
-cted(6) =3D=3D received(6)
-> PASS: specification exception: not_even: Program interrupt: expected(6) =
-=3D=3D received(6)
-> PASS: specification exception during transaction: odd_ex_target: Program =
-interrupt: expected(518) =3D=3D received(518)
-> PASS: specification exception during transaction: bad_alignment_lqp: Prog=
-ram interrupt: expected(518) =3D=3D received(518)
-> PASS: specification exception during transaction: bad_alignment_lrl: Prog=
-ram interrupt: expected(518) =3D=3D received(518)
-> PASS: specification exception during transaction: not_even: Program inter=
-rupt: expected(518) =3D=3D received(518)
-> SUMMARY: 12 tests, 1 unexpected failures
->=20
-> EXIT: STATUS=3D3
->=20
-> I'm sure I'm missing something, I just cannot figure it out right
-> now (it's Friday afternoon...) - QEMU is the current version from
-> the master branch, so I thought that it should contain all the
-> recent fixes ... does this psw_odd_address test require a fix in
-> the kernel, too? (I'm currently running a RHEL9 kernel)
+On Wed, Mar 29, 2023 at 1:22=E2=80=AFAM Conor Dooley <conor@kernel.org> wro=
+te:
+>
+> On Mon, Mar 27, 2023 at 04:49:30PM +0000, Andy Chiu wrote:
+> > Vector unit is disabled by default for all user processes. Thus, a
+> > process will take a trap (illegal instruction) into kernel at the first
+> > time when it uses Vector. Only after then, the kernel allocates V
+> > context and starts take care of the context for that user process.
+> >
+> > Suggested-by: Richard Henderson <richard.henderson@linaro.org>
+> > Link: https://lore.kernel.org/r/3923eeee-e4dc-0911-40bf-84c34aee962d@li=
+naro.org
+> > Signed-off-by: Andy Chiu <andy.chiu@sifive.com>
+>
+> I see you dropped two R-b from this patch, what actually changed here?
+> It's not immediately obvious to me (sorry!) and the cover doesn't mention
+> why they were dropped.
 
-Thomas, I cannot reproduce this with a QEMU master and 6.3-rc4, so you migh=
-t be right that some kernel fix is required.
+Hi, the reason why I dropped R-b here is that there is a conflict in
+trap.c because the API has changed after converting to generic entry.
+And that change does not make v16's way work out of the box, so it
+(trap.c @ v17) requires some more reviewing I suppose.
 
-Since the weekend is calling now, I will take a look at this on Monday.
+Thanks for asking! I should get better at describing these in the cover let=
+ter.
+
+Andy
