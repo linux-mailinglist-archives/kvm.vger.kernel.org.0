@@ -2,154 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 832766D1F12
-	for <lists+kvm@lfdr.de>; Fri, 31 Mar 2023 13:32:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3EB856D1F54
+	for <lists+kvm@lfdr.de>; Fri, 31 Mar 2023 13:41:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231743AbjCaLcI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 31 Mar 2023 07:32:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40988 "EHLO
+        id S230428AbjCaLlM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 31 Mar 2023 07:41:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54374 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231186AbjCaLcE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 31 Mar 2023 07:32:04 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DCFE01EFEF
-        for <kvm@vger.kernel.org>; Fri, 31 Mar 2023 04:31:29 -0700 (PDT)
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 32V9tNaw014622;
-        Fri, 31 Mar 2023 11:31:07 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : content-transfer-encoding
- : mime-version; s=pp1; bh=3AMcCdIrjohLjHCBBSvqMu35AOG2/1a/6RSDFdhoE2s=;
- b=LMSbjRaLcm5eMq0I9GJ7Iv6J+kF4lyieBf90oAuTL3DsoXcCuBnBTxeSdwbWj8qBhptb
- lRhvCsC66AtvapEZgPCFUsMBvnoJH6F5mRq4KwSSzds/qFW82xe+iLesYOQBjaC3Vwax
- W00bN4wD060fQbk4VG0PHRk5nEy8NNESgA/eU1A4EJSG8xuRnSjtxMpRv0jLzPLffbIJ
- 8OqxHjI/7gbamZwNOoXMtsHWG9IYDyNZB9G/grt0fo6zgfV2mEk5GTDsGW+GZZ+PCCfD
- 00+GEWcLcEYqz0wI7PzQIVwrjkPX3YPbDEe6BbptqPZYuaPQQHP8VSTumSj4WhakkkHq aw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pnwahteeh-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 31 Mar 2023 11:31:07 +0000
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 32VAV42u031186;
-        Fri, 31 Mar 2023 11:31:06 GMT
-Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pnwahtee1-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 31 Mar 2023 11:31:06 +0000
-Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
-        by ppma01fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 32UAJLNA000399;
-        Fri, 31 Mar 2023 11:31:05 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-        by ppma01fra.de.ibm.com (PPS) with ESMTPS id 3phrk6nf8x-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 31 Mar 2023 11:31:05 +0000
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-        by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 32VBV0qr44106382
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 31 Mar 2023 11:31:00 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 25EDE2004D;
-        Fri, 31 Mar 2023 11:31:00 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 15A8B20040;
-        Fri, 31 Mar 2023 11:30:59 +0000 (GMT)
-Received: from t14-nrb.ibmuc.com (unknown [9.179.9.190])
-        by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Fri, 31 Mar 2023 11:30:58 +0000 (GMT)
-From:   Nico Boehr <nrb@linux.ibm.com>
-To:     thuth@redhat.com, pbonzini@redhat.com, andrew.jones@linux.dev
-Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com, imbrenda@linux.ibm.com
-Subject: [kvm-unit-tests GIT PULL 14/14] s390x: sie: Test whether the epoch extension field is working as expected
-Date:   Fri, 31 Mar 2023 13:30:28 +0200
-Message-Id: <20230331113028.621828-15-nrb@linux.ibm.com>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230331113028.621828-1-nrb@linux.ibm.com>
-References: <20230331113028.621828-1-nrb@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: sYmQ1n-UEHeJhC32GTrnGIffiRlnIdJy
-X-Proofpoint-GUID: z0NaV0iSOo575c54PrQEwvBVwdAp5qi8
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+        with ESMTP id S231149AbjCaLlJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 31 Mar 2023 07:41:09 -0400
+Received: from mail-wm1-x335.google.com (mail-wm1-x335.google.com [IPv6:2a00:1450:4864:20::335])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79DA21EA05
+        for <kvm@vger.kernel.org>; Fri, 31 Mar 2023 04:40:41 -0700 (PDT)
+Received: by mail-wm1-x335.google.com with SMTP id n19so12718157wms.0
+        for <kvm@vger.kernel.org>; Fri, 31 Mar 2023 04:40:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance.com; s=google; t=1680262840;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=4BMda4uP/trXOPVFbxA+44piSZybxeHCQYh1voebKMY=;
+        b=KrfJ+JLUhiklGuQ0qODImm/axxyEiVkecB4sK8IKbUhsoUeJMyhW/jzDbm/eFnTSDn
+         qHWkSqXGrFpua1u7aLcPeMLLjsAOkSZhERpQ1lZzDCIvUPo5h3MxQrUGHTCgjFCvzLgL
+         ymlxxrZvMM11Y6Lr/Vzo+VLUY1C9L3P/Ms6q5duVI9o+tGZjU7NrDSp5O8rC387qiYfY
+         885BRfMAk/DgNlOejW5WZuJW0QHM6/dKPQLTowFCPxBi67uSQxcb8VBaLYJPiC3iHZqs
+         /3HycxrKcjZmgm+IKlOotX+L7+zEZ5+sJZ6sak8RJsw6LBJA7fKec+dmTVEWi0wzSuB8
+         GpJQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1680262840;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=4BMda4uP/trXOPVFbxA+44piSZybxeHCQYh1voebKMY=;
+        b=4kOuvIq+0mLNrDTJ8CB/iIGUKq3GJcl7VOXglGiA8zcdjTHcraFpM6dQTDx53h3wwr
+         crzUMp+5McnoB8NVxmJRr0k4vxQM0zM5xfGfWTx/dBf2PbRa57hIDy+ayuQN7hKzB8lH
+         Ha5RZm1NZWX5eFYAQI/WZgI+bn8YwZVnbP+AFTD081Y9hRHLcL4E3gIzYtAZ2BcIjnzq
+         QwFH1r/DnNzJrrfrzvghkWISii3slia579HfSaX8L23VOLgmMTqTVmtwK+oyg0hGGng5
+         BWmI7M4B5Z93BxUE6JyekyywDqINf1yTpqIab5SMmGHCglEPbthw82DHZXVQ0SnkaaIK
+         QvgQ==
+X-Gm-Message-State: AAQBX9ctCAW92fFCviaP4LjsbkWSI+j02PB4yyH6p5JlbKMDJzYClVLw
+        ADOXUPch/l/2JIiQPSh2IVsbbg==
+X-Google-Smtp-Source: AKy350akXFV8HM8s/Ha6Lz3ESFXQ5hdrtXgaWbnYOF6NFoTV9iTpZm5oM2jthlq8wOd0t4RVLzWtXA==
+X-Received: by 2002:a7b:c852:0:b0:3ef:64b4:b081 with SMTP id c18-20020a7bc852000000b003ef64b4b081mr16262072wml.39.1680262839961;
+        Fri, 31 Mar 2023 04:40:39 -0700 (PDT)
+Received: from ?IPV6:2a02:6b6a:b566:0:668d:6a39:bcbb:5910? ([2a02:6b6a:b566:0:668d:6a39:bcbb:5910])
+        by smtp.gmail.com with ESMTPSA id f11-20020a7bc8cb000000b003edff838723sm2451209wml.3.2023.03.31.04.40.39
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 31 Mar 2023 04:40:39 -0700 (PDT)
+Message-ID: <144fbadc-8d27-796b-0263-ff2662b283ae@bytedance.com>
+Date:   Fri, 31 Mar 2023 12:40:38 +0100
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
- definitions=2023-03-31_06,2023-03-30_04,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 spamscore=0
- bulkscore=0 clxscore=1015 lowpriorityscore=0 suspectscore=0
- mlxlogscore=999 impostorscore=0 mlxscore=0 phishscore=0 priorityscore=1501
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2303200000 definitions=main-2303310091
-X-Spam-Status: No, score=-0.1 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
-        DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-        autolearn=unavailable autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.2
+Subject: Re: [External] Re: [PATCH v17 6/8] x86/smpboot: Send INIT/SIPI/SIPI
+ to secondary CPUs in parallel
+Content-Language: en-US
+To:     Thomas Gleixner <tglx@linutronix.de>,
+        Borislav Petkov <bp@alien8.de>, dwmw2@infradead.org,
+        kim.phillips@amd.com, brgerst@gmail.com
+Cc:     piotrgorski@cachyos.org, oleksandr@natalenko.name,
+        arjan@linux.intel.com, mingo@redhat.com,
+        dave.hansen@linux.intel.com, hpa@zytor.com, x86@kernel.org,
+        pbonzini@redhat.com, paulmck@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        rcu@vger.kernel.org, mimoja@mimoja.de, hewenliang4@huawei.com,
+        thomas.lendacky@amd.com, seanjc@google.com, pmenzel@molgen.mpg.de,
+        fam.zheng@bytedance.com, punit.agrawal@bytedance.com,
+        simon.evans@bytedance.com, liangma@liangbit.com,
+        gpiccoli@igalia.com, David Woodhouse <dwmw@amazon.co.uk>
+References: <20230328195758.1049469-1-usama.arif@bytedance.com>
+ <20230328195758.1049469-7-usama.arif@bytedance.com> <87v8iirxun.ffs@tglx>
+ <CAFC43E6-97E9-4E89-AABB-78E31037048A@alien8.de> <87sfdmrtnj.ffs@tglx>
+From:   Usama Arif <usama.arif@bytedance.com>
+In-Reply-To: <87sfdmrtnj.ffs@tglx>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
+        DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Thomas Huth <thuth@redhat.com>
 
-We recently discovered a bug with the time management in nested scenarios
-which got fixed by kernel commit "KVM: s390: vsie: Fix the initialization
-of the epoch extension (epdx) field". This adds a simple test for this
-bug so that it is easier to determine whether the host kernel of a machine
-has already been fixed or not.
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
-Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-Link: https://lore.kernel.org/r/20221208170502.17984-1-thuth@redhat.com
-Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
----
- s390x/sie.c | 28 ++++++++++++++++++++++++++++
- 1 file changed, 28 insertions(+)
+On 30/03/2023 19:17, Thomas Gleixner wrote:
+> On Thu, Mar 30 2023 at 19:05, Borislav Petkov wrote:
+> 
+>> On March 30, 2023 6:46:24 PM GMT+02:00, Thomas Gleixner <tglx@linutronix.de> wrote:
+>>> So that violates the rules of microcode loading that the sibling must be
+>>> in a state where it does not execute anything which might be affected by
+>>> the microcode update. The fragile startup code does not really qualify
+>>> as such a state :)
+>>
+>> Yeah I don't think we ever enforced this for early loading.
+> 
+> We don't have to so far. CPU bringup is fully serialized so when the
+> first sibling comes up the other one is still in wait for SIPI lala
+> land. When the second comes up it will see that the microcode is already
+> up to date.
+> 
 
-diff --git a/s390x/sie.c b/s390x/sie.c
-index 87575b2..cd3cea1 100644
---- a/s390x/sie.c
-+++ b/s390x/sie.c
-@@ -58,6 +58,33 @@ static void test_diags(void)
- 	}
- }
- 
-+static void test_epoch_ext(void)
-+{
-+	u32 instr[] = {
-+		0xb2780000,	/* STCKE 0 */
-+		0x83000044	/* DIAG 0x44 to intercept */
-+	};
-+
-+	if (!test_facility(139)) {
-+		report_skip("epdx: Multiple Epoch Facility is not available");
-+		return;
-+	}
-+
-+	guest[0] = 0x00;
-+	memcpy(guest_instr, instr, sizeof(instr));
-+
-+	vm.sblk->gpsw.addr = PAGE_SIZE * 2;
-+	vm.sblk->gpsw.mask = PSW_MASK_64;
-+
-+	vm.sblk->ecd |= ECD_MEF;
-+	vm.sblk->epdx = 0x47;	/* Setting the epoch extension here ... */
-+
-+	sie(&vm);
-+
-+	/* ... should result in the same epoch extension here: */
-+	report(guest[0] == 0x47, "epdx: different epoch is visible in the guest");
-+}
-+
- static void setup_guest(void)
- {
- 	setup_vm();
-@@ -80,6 +107,7 @@ int main(void)
- 
- 	setup_guest();
- 	test_diags();
-+	test_epoch_ext();
- 	sie_guest_destroy(&vm);
- 
- done:
--- 
-2.39.2
+A simple solution is to serialize load_ucode_ap by acquiring a spinlock 
+at the start of ucode_cpu_init and releasing it at its end.
+
+I guess if we had topology_sibling_cpumask initialized at this point we 
+could have a spinlock per core (not thread) and parallelize it, but 
+thats set much later in smp_callin.
+
+I can include the below in next version if it makes sense?
+
+diff --git a/arch/x86/kernel/cpu/common.c b/arch/x86/kernel/cpu/common.c
+index 80a688295ffa..b5e64628a975 100644
+--- a/arch/x86/kernel/cpu/common.c
++++ b/arch/x86/kernel/cpu/common.c
+@@ -2155,10 +2155,13 @@ static inline void setup_getcpu(int cpu)
+  }
+
+  #ifdef CONFIG_X86_64
++static DEFINE_SPINLOCK(ucode_cpu_spinlock);
+  static inline void ucode_cpu_init(int cpu)
+  {
++       spin_lock(&ucode_cpu_spinlock);
+         if (cpu)
+                 load_ucode_ap();
++       spin_unlock(&ucode_cpu_spinlock);
+  }
 
