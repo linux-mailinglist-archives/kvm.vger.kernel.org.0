@@ -2,102 +2,159 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5F1416D1CEE
-	for <lists+kvm@lfdr.de>; Fri, 31 Mar 2023 11:49:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B53AA6D1CF3
+	for <lists+kvm@lfdr.de>; Fri, 31 Mar 2023 11:50:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231724AbjCaJt1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 31 Mar 2023 05:49:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40990 "EHLO
+        id S230292AbjCaJuL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 31 Mar 2023 05:50:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40658 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230249AbjCaJsb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 31 Mar 2023 05:48:31 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1136D2033C
-        for <kvm@vger.kernel.org>; Fri, 31 Mar 2023 02:47:28 -0700 (PDT)
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 32V9ET88021692
-        for <kvm@vger.kernel.org>; Fri, 31 Mar 2023 09:47:27 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
- mime-version : content-transfer-encoding : in-reply-to : references : cc :
- from : to : subject : message-id : date; s=pp1;
- bh=84r5p7JX1Jex/EJxSW1h5fSB6t99p/e9BQcdF61TzGg=;
- b=Or+ap3jrKMYwKWVGmrvSHylwZlJlTPLfOsEMlQOZrisWLtRhFnnkqzFHLySuiQM5DUT9
- P7lcnufx7OAeOKcox/Etn3WSM+PpaKbPNQt8rSVRjDG0nZI1ydXLPUZcM4YJzivQF4FI
- 8TbnkpcXhO+lGvSgh1+rNiLMHweReR+tD4HCNONrKSFAO4kSjrCsM+7tIWzmLKlJHWHa
- JjqIKnG8jd9nENmiXeNnmUTXqEQZelfsh7Wd+ttk/AC2ZigXgwwLZRoukF2wMKORFAk0
- dah6awmM5rAfqpaYjq5nfaRanHdkO0EN/JAGdQRy2EylzsPNYtSsDaDKmbY0QpUeUAxX ug== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pnvq9grgx-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Fri, 31 Mar 2023 09:47:27 +0000
-Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 32V9c0dm015308
-        for <kvm@vger.kernel.org>; Fri, 31 Mar 2023 09:47:27 GMT
-Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pnvq9grg3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 31 Mar 2023 09:47:27 +0000
-Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
-        by ppma02fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 32UNUpbF013396;
-        Fri, 31 Mar 2023 09:47:24 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-        by ppma02fra.de.ibm.com (PPS) with ESMTPS id 3phrk6wct1-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 31 Mar 2023 09:47:24 +0000
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-        by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 32V9lLKB38797792
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 31 Mar 2023 09:47:21 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 40BE62004D;
-        Fri, 31 Mar 2023 09:47:21 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0AE0520040;
-        Fri, 31 Mar 2023 09:47:21 +0000 (GMT)
-Received: from t14-nrb (unknown [9.171.12.80])
-        by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Fri, 31 Mar 2023 09:47:20 +0000 (GMT)
-Content-Type: text/plain; charset="utf-8"
+        with ESMTP id S232361AbjCaJto (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 31 Mar 2023 05:49:44 -0400
+Received: from mail-qk1-x733.google.com (mail-qk1-x733.google.com [IPv6:2607:f8b0:4864:20::733])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D67821F78E
+        for <kvm@vger.kernel.org>; Fri, 31 Mar 2023 02:48:37 -0700 (PDT)
+Received: by mail-qk1-x733.google.com with SMTP id dw4so5919452qkb.10
+        for <kvm@vger.kernel.org>; Fri, 31 Mar 2023 02:48:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112; t=1680256117;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dTYufiTa8RDU0UzDOhAuB0+mFfR3PLIeeeccIx8HQg4=;
+        b=KI7Bv9HAoKbhzh4mwQHUprIYwMvWHqdCMto7UXYV1C0zImjrtB4ig0L4Ualk3bCRO8
+         Vh0W/nSVcZgwSfJbLgHMutI9eBjG/1jjt/8npAPGP/SPSnIsuDa4L2wEqy7A0jwRaz5m
+         7fG4ob1KUUYqo+GGrLYilNjRXc5op++A2kgE8E54PVLMm+F+6K40UyHJq342aQhDkPac
+         YOFjaK2ZRedsLJFxEdFIEBblAOkmYsm4eP3vo7yA03XO/2dlakUC9QLmVeOeX0bMQkGj
+         lSJayKEdzJLYoaeZ/NndeEQcz7sELo19Rvy3bZG5/SnNgRJj4LIbwLEq6QA79QUNwv0g
+         M33A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1680256117;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=dTYufiTa8RDU0UzDOhAuB0+mFfR3PLIeeeccIx8HQg4=;
+        b=sUTCbGkRifhjiwZC2JLPemtEMCYreINdIZ/UGgeBsIGMCe1cU5r4/bDgaRisF09vLz
+         dczMxayNSW6X9VGE+u/+SGt5Ntw0Q8tQwB/UXjsQI9oxRR6qPiRk0p6cnqp8E+K2sTFH
+         iMpwbjkanhtdlxTvgdyFyRpM0/KNZOhX44R84aIHAGQXUzHczJgREZmbC7hMIk597LXy
+         UFOBwQCJ9ZiXuD7XsqHl6yCP+7lNPd6/otRJsrXKaEColG6EP+Zl7MkTM/jtHr1JN0m8
+         QeTQ+UGY9Y8mG+TCQcW9sWEi5RC9SliZUTSIsoFT/uF0uJYioqCqR4fndCEBEjwJSmIs
+         CGqQ==
+X-Gm-Message-State: AO0yUKW1dM1WyvxcW/kgw2fa9Aqy0v1s8TFW9pJ2ckMR7iXFb6HddAOq
+        Zu87E5zgAHvPOewy+tFFQ6PklwmTo8/rmeVulYE=
+X-Google-Smtp-Source: AK7set/xFqTgtelVtukwYOeh2vJmxR8iFg5jxz200UgBkBa/wQvlX+S23nER8RNncEJgKcULKxQh3Q72+qQw35tjqss=
+X-Received: by 2002:a05:620a:44d5:b0:746:b32:a43d with SMTP id
+ y21-20020a05620a44d500b007460b32a43dmr6088072qkp.11.1680256117039; Fri, 31
+ Mar 2023 02:48:37 -0700 (PDT)
 MIME-Version: 1.0
+References: <20230310125718.1442088-1-robert.hu@intel.com> <20230310125718.1442088-2-robert.hu@intel.com>
+ <ZAtT5pFPqjM1Ocq0@google.com> <CA+wubQBWgz4YAi=T3MV82HrC3=gXSC_yD50ip0=N_x3MnTE1UA@mail.gmail.com>
+ <ZBIFgH4YBC71n6KR@google.com>
+In-Reply-To: <ZBIFgH4YBC71n6KR@google.com>
+From:   Robert Hoo <robert.hoo.linux@gmail.com>
+Date:   Fri, 31 Mar 2023 17:48:26 +0800
+Message-ID: <CA+wubQA3HP2s6dq7JUvxHj8jkjfK5E__RenzAk7tyf3xtmgoJg@mail.gmail.com>
+Subject: Re: [PATCH 1/3] KVM: VMX: Rename vmx_umip_emulated() to cpu_has_vmx_desc()
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Robert Hoo <robert.hu@intel.com>, pbonzini@redhat.com,
+        kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20230331082709.35955-1-mhartmay@linux.ibm.com>
-References: <168024782639.521366.8153497247119888695@t14-nrb> <20230331082709.35955-1-mhartmay@linux.ibm.com>
-Cc:     Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
-        Thomas Huth <thuth@redhat.com>
-From:   Nico Boehr <nrb@linux.ibm.com>
-To:     Marc Hartmayer <mhartmay@linux.ibm.com>, kvm@vger.kernel.org
-Subject: Re: [kvm-unit-tests PATCH v4] s390x/Makefile: refactor CPPFLAGS
-Message-ID: <168025604039.521366.11731416796810140141@t14-nrb>
-User-Agent: alot/0.8.1
-Date:   Fri, 31 Mar 2023 11:47:20 +0200
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: riTtlOZky4bBchFeHyUKQA7YUbEvOmYG
-X-Proofpoint-ORIG-GUID: 3dRRN91uqLG5SM5nKydhjjH9J5X0YcJ4
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
- definitions=2023-03-31_04,2023-03-30_04,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- impostorscore=0 priorityscore=1501 mlxscore=0 phishscore=0 spamscore=0
- bulkscore=0 mlxlogscore=872 adultscore=0 malwarescore=0 suspectscore=0
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2303200000 definitions=main-2303310075
-X-Spam-Status: No, score=-0.1 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
-        DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-        autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
+        DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Quoting Marc Hartmayer (2023-03-31 10:27:09)
-> This change makes it easier to reuse them. While at it, add a comment
-> why the `lib` include path is required.
->=20
-> Signed-off-by: Marc Hartmayer <mhartmay@linux.ibm.com>
+Sean Christopherson <seanjc@google.com> =E4=BA=8E2023=E5=B9=B43=E6=9C=8816=
+=E6=97=A5=E5=91=A8=E5=9B=9B 01:50=E5=86=99=E9=81=93=EF=BC=9A
+>
+> Please fix your editor or whatever it is that is resulting your emails be=
+ing
+> wrapped at very bizarre boundaries.
+>
+(Sorry for late reply.)
+Yes, I also noticed this. Just began using Gmail web portal for community m=
+ails.
+I worried that it has no auto wrapping (didn't find the setting), so manual=
+ly
+wrapped; but now looks like it has some.
+Give me some time, I'm going to switch to some mail client.
+Welcome suggestions of mail clients which is suited for community
+communications, on Windows platform.=F0=9F=99=82
 
-Reviewed-by: Nico Boehr <nrb@linux.ibm.com>
-Tested-by: Nico Boehr <nrb@linux.ibm.com>
+> On Sat, Mar 11, 2023, Robert Hoo wrote:
+> > Also, vmx_umip_emulated() =3D=3D true doesn't necessarily mean, as its =
+name
+> > indicates, UMIP-being-emulated, e.g. Host has UMIP capability, then UMI=
+P
+> > isn't emulated though vmx_umip_emulated() indicates true.
+>
+[...]
+> there's no
+> legitimate use for checking if UMIP _can_ be emulated.
+
+Agree.
+>
+> Functionally, this should be a glorified nop,
+
+Personally, I think it is more than this; good naming, not misleading
+its user, saving their time to look into, is always good.
+
+> but I agree it's worth changing.
+> I'll formally post this after testing.
+
+Thanks, looks good to me, it enriches the original patch, i.e. the
+cr4_fixed1 part is beyond my original findings. Just don't quite
+understand the last paragraph of the description. I ask inline below.
+>
+> From: Sean Christopherson <seanjc@google.com>
+> Date: Wed, 15 Mar 2023 10:27:40 -0700
+> Subject: [PATCH] KVM: VMX: Treat UMIP as emulated if and only if the host
+>  doesn't have UMIP
+>
+> Advertise UMIP as emulated if and only if the host doesn't natively
+> support UMIP, otherwise vmx_umip_emulated() is misleading when the host
+> _does_ support UMIP.  Of the four users of vmx_umip_emulated(), two
+> already check for native support, and the logic in vmx_set_cpu_caps() is
+> relevant if and only if UMIP isn't natively supported as UMIP is set in
+> KVM's caps by kvm_set_cpu_caps() when UMIP is present in hardware.
+>
+Sorry I don't fully understand the paragraph below, though I believe
+you're right.:)
+
+> That leaves KVM's stuffing of X86_CR4_UMIP into the default cr4_fixed1
+> value enumerated for nested VMX.  In that case, checking for (lack of)
+> host support is actually a bug fix of sorts,
+
+What bug?
+By your assumption below:
+    * host supports UMIP, host doesn't allow (nested?) vmx
+    * UMIP enumerated to L1, L1 thinks it has UMIP capability and
+enumerates to L2
+    * L1 MSR_IA32_VMX_CR4_FIXED1.UMIP is set (meaning allow 1, not fixed to=
+ 1)
+
+L2 can use UMIP, no matter L1's UMIP capability is backed by L0 host's
+HW UMIP or L0's vmx emulation, I don't see any problem. Shed more
+light?
+
+> as enumerating UMIP support
+> based solely on descriptor table
+
+What "descriptor table" do you mean here?
+
+> existing works only because KVM doesn't
+> sanity check MSR_IA32_VMX_CR4_FIXED1.
+
+Emm, nested_cr4_valid() should be applied to vmx_set_cr4()?
+
+> E.g. if a (very theoretical) host
+> supported UMIP in hardware but didn't allow UMIP+VMX, KVM would advertise
+> UMIP but not actually emulate UMIP.  Of course, KVM would explode long
+> before it could run a nested VM on said theoretical CPU, as KVM doesn't
+> modify host CR4 when enabling VMX.
