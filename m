@@ -2,75 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 59AF56D2493
-	for <lists+kvm@lfdr.de>; Fri, 31 Mar 2023 18:02:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B32EB6D2495
+	for <lists+kvm@lfdr.de>; Fri, 31 Mar 2023 18:03:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233004AbjCaQCe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 31 Mar 2023 12:02:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56036 "EHLO
+        id S233023AbjCaQDx convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Fri, 31 Mar 2023 12:03:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56724 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232221AbjCaQCd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 31 Mar 2023 12:02:33 -0400
-Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6AF4DB44B
-        for <kvm@vger.kernel.org>; Fri, 31 Mar 2023 09:02:30 -0700 (PDT)
-Received: by mail-pl1-x649.google.com with SMTP id x4-20020a170902ec8400b001a1a5f6f272so13148634plg.1
-        for <kvm@vger.kernel.org>; Fri, 31 Mar 2023 09:02:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1680278550;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=omBt8dkGmyrbtpTyfBXw/EDFrQqH5m7OcTU9r5l14Ww=;
-        b=WJvma0w7ZW5baCkDOvXR2A9mHBW8wN/GMj822meEms/vhidsiGL3yWUZibE327LB2U
-         L6qUNI0JkwzGGHMVpKAqwdz8y/Vvj63CFLuUOBt1nVuWUA6X8Fts4gSr1FCFmXX+QV5+
-         KXWwZhnEQD7SPvJXJDoNFx8V4bO7PxFwTnrsy51zLhs4tP2mYtvX8y9vk7a+H00NhRKq
-         VpIPlgdeG3O6T/5BeICv1sCg+B60yAv2fYCRQUXzPynsdw/NHYQYgRoU3sG0GNPDu5Zw
-         beqWyk4X5R7DUmsIoMBM5tLvdhSrhEvnqnp5wd5/2nXGPayKxnysUHkqs/OvGolGxw28
-         O5qw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680278550;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=omBt8dkGmyrbtpTyfBXw/EDFrQqH5m7OcTU9r5l14Ww=;
-        b=cb0te0BQ7V5IxnaBXYLWF4fRRXFxd+scnC68Cx4K20Eg9xv51tQLV+9RKpeIUYje4C
-         Y9ZxbDwJFMN8mzJ9mC399t9z4K1JrFGozruQ/saXKD8J+w7Qz8Qe6kil+sG9puXmeyQW
-         AIJPP1toUonnAGJ0EOMHGUkgFEMBIUFKTdHQHDKfvTKM6EAt5Eu1B/9v50HLFWqqpSK6
-         oYK/ub6C9AqivW15jVgr+hiHymmGbAEoLpj/scAg/gsBqrYe6gdoxcIE+rLtGNu9r2qp
-         OG8K74KAZxblVrbpvQLUTpGRABeoKUm474fJv5BBpBd19bPSo+3Sfg3nJvmHc945t7b8
-         P3lA==
-X-Gm-Message-State: AAQBX9cUsEx/gwbecp+/RJmXSXQbOx92MFh69S4phWDqcshFaBp4uKwx
-        MRNJNmtXzpGx63HLvW5uDivxZBE5uWw=
-X-Google-Smtp-Source: AKy350aMtlFGsA11MNEk25FDLnQJ60NC+ivbDw5HN2pm4HEDBpN5T2y0GpegvPyQEz6E6fnVcQgVcH1thK4=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90b:1203:b0:240:c387:6089 with SMTP id
- gl3-20020a17090b120300b00240c3876089mr2158651pjb.1.1680278549990; Fri, 31 Mar
- 2023 09:02:29 -0700 (PDT)
-Date:   Fri, 31 Mar 2023 09:02:28 -0700
-In-Reply-To: <20230331135709.132713-2-minipli@grsecurity.net>
-Mime-Version: 1.0
-References: <20230331135709.132713-1-minipli@grsecurity.net> <20230331135709.132713-2-minipli@grsecurity.net>
-Message-ID: <ZCcEFP+gRJ7Fcvxh@google.com>
-Subject: Re: [kvm-unit-tests PATCH v2 1/4] x86: Use existing CR0.WP / CR4.SMEP
- bit definitions
-From:   Sean Christopherson <seanjc@google.com>
-To:     Mathias Krause <minipli@grsecurity.net>
-Cc:     kvm@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-7.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+        with ESMTP id S232921AbjCaQDw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 31 Mar 2023 12:03:52 -0400
+Received: from gloria.sntech.de (gloria.sntech.de [185.11.138.130])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2D3B1EA38
+        for <kvm@vger.kernel.org>; Fri, 31 Mar 2023 09:03:49 -0700 (PDT)
+Received: from ip4d1634d3.dynamic.kabel-deutschland.de ([77.22.52.211] helo=diego.localnet)
+        by gloria.sntech.de with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <heiko@sntech.de>)
+        id 1piHE8-0004hH-Uv; Fri, 31 Mar 2023 18:03:44 +0200
+From:   Heiko =?ISO-8859-1?Q?St=FCbner?= <heiko@sntech.de>
+To:     linux-riscv@lists.infradead.org, palmer@dabbelt.com,
+        anup@brainfault.org, atishp@atishpatra.org,
+        kvm-riscv@lists.infradead.org, kvm@vger.kernel.org
+Cc:     vineetg@rivosinc.com, greentime.hu@sifive.com,
+        guoren@linux.alibaba.com, Vincent Chen <vincent.chen@sifive.com>,
+        Andy Chiu <andy.chiu@sifive.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Albert Ou <aou@eecs.berkeley.edu>, Guo Ren <guoren@kernel.org>,
+        Anup Patel <apatel@ventanamicro.com>,
+        Atish Patra <atishp@rivosinc.com>,
+        Andy Chiu <andy.chiu@sifive.com>
+Subject: Re: [PATCH -next v17 03/20] riscv: Add new csr defines related to vector
+ extension
+Date:   Fri, 31 Mar 2023 18:03:44 +0200
+Message-ID: <3030152.CbtlEUcBR6@diego>
+In-Reply-To: <20230327164941.20491-4-andy.chiu@sifive.com>
+References: <20230327164941.20491-1-andy.chiu@sifive.com>
+ <20230327164941.20491-4-andy.chiu@sifive.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset="iso-8859-1"
+X-Spam-Status: No, score=0.0 required=5.0 tests=SPF_PASS,T_SPF_HELO_TEMPERROR
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Mar 31, 2023, Mathias Krause wrote:
-> Use the existing bit definitions from x86/processor.h instead of
-> defining our own.
+Am Montag, 27. März 2023, 18:49:23 CEST schrieb Andy Chiu:
+> From: Greentime Hu <greentime.hu@sifive.com>
+> 
+> Follow the riscv vector spec to add new csr numbers.
+> 
+> Acked-by: Guo Ren <guoren@kernel.org>
+> Co-developed-by: Guo Ren <guoren@linux.alibaba.com>
+> Signed-off-by: Guo Ren <guoren@linux.alibaba.com>
+> Co-developed-by: Vincent Chen <vincent.chen@sifive.com>
+> Signed-off-by: Vincent Chen <vincent.chen@sifive.com>
+> Signed-off-by: Greentime Hu <greentime.hu@sifive.com>
+> Reviewed-by: Palmer Dabbelt <palmer@rivosinc.com>
+> Suggested-by: Vineet Gupta <vineetg@rivosinc.com>
+> Signed-off-by: Andy Chiu <andy.chiu@sifive.com>
+> Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
+> Reviewed-by: Heiko Stuebner <heiko.stuebner@vrull.eu>
 
-Please avoid pronouns.  E.g. in this case, "our" is really confusing because if
-"our" mean KVM-Unit-Tests, then x86/processor.h is also "ours".
+Tested-by: Heiko Stuebner <heiko.stuebner@vrull.eu>
 
-  defining one-off versions in individual tests.
+
