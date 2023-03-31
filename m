@@ -2,180 +2,190 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E0E556D1ADC
-	for <lists+kvm@lfdr.de>; Fri, 31 Mar 2023 10:52:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2DCDC6D1AE1
+	for <lists+kvm@lfdr.de>; Fri, 31 Mar 2023 10:55:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230047AbjCaIwn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 31 Mar 2023 04:52:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60354 "EHLO
+        id S230337AbjCaIzz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 31 Mar 2023 04:55:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35544 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229629AbjCaIwl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 31 Mar 2023 04:52:41 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8BFF5D50E;
-        Fri, 31 Mar 2023 01:52:40 -0700 (PDT)
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 32V87uow009609;
-        Fri, 31 Mar 2023 08:52:40 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : to : cc : references : from : subject : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=cZEUURmtTVuUK0MDRwsX/TKBZK1xujBKBauZKi96U7Y=;
- b=HRPT+O3IhznKGHV4tBtGYPc+9P5LZ/I3/4Kee5bX1QxcHKJ170S4P9836vN7wRvRTzXl
- 2otHLf/jqrsfNiYWB648R6e9k01WjMm2GuBO3njqNihP8uXe8IiZIzw+5dJ2OqoIsVm9
- sR06Q8WyEQnYU5gHZPwyLn7cJnTaR10vBr/PfWvKKUn2qSd5glhc1ym2/7np2UxC3XOC
- vLj+r7MGcl5Lirt0w7wLgpPa4xlWZvNwN5XRG1A5i01Q7lQSsWe/fk+rFWOc9hnE9xuJ
- nyiy678Hy3s/kAc4o3rYQ5tU8nEbnG9Z1pJRA94rPJQ/mQ0fOnfcL8o5qRs13UiGFk7O vg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pnrf7n922-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 31 Mar 2023 08:52:40 +0000
-Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 32V8KLYg024335;
-        Fri, 31 Mar 2023 08:52:39 GMT
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pnrf7n91k-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 31 Mar 2023 08:52:39 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 32V1I3NL013053;
-        Fri, 31 Mar 2023 08:52:37 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-        by ppma06ams.nl.ibm.com (PPS) with ESMTPS id 3phr7fpkq1-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 31 Mar 2023 08:52:37 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-        by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 32V8qXVM8520266
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 31 Mar 2023 08:52:33 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 9561E2004B;
-        Fri, 31 Mar 2023 08:52:33 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4232C20043;
-        Fri, 31 Mar 2023 08:52:33 +0000 (GMT)
-Received: from [9.171.33.158] (unknown [9.171.33.158])
-        by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Fri, 31 Mar 2023 08:52:33 +0000 (GMT)
-Message-ID: <5a768b62-0552-1174-2040-a9ee04fbc49a@linux.ibm.com>
-Date:   Fri, 31 Mar 2023 10:52:32 +0200
+        with ESMTP id S229957AbjCaIzw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 31 Mar 2023 04:55:52 -0400
+Received: from mail-lf1-x129.google.com (mail-lf1-x129.google.com [IPv6:2a00:1450:4864:20::129])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E0821739
+        for <kvm@vger.kernel.org>; Fri, 31 Mar 2023 01:55:51 -0700 (PDT)
+Received: by mail-lf1-x129.google.com with SMTP id c9so17566375lfb.1
+        for <kvm@vger.kernel.org>; Fri, 31 Mar 2023 01:55:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1680252949;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=4dm+BPEOnC7e4hjDLH6po2CUlQmPHlDI5qtCyO0in2Q=;
+        b=h9p+asgoR7hjf3xWGqt0dESGNOGLYImfThLBriNOU0tdhyee4Dj/v82aPxY1l+yshP
+         rJxuPxGgYI6jUI6DBjgYqYHHxlm+3k4RYYjQX99sNkOanqarLy2UZMupY9g1Qv7egTfD
+         3iQbRP3qKjrBlBC8MLOcVhwBkT2DGC+KDRqi3qP+7TvgmVGRfbMfZRu/AYlQ4SaPljzg
+         eKCGp/zIAvGJhIBwkH1RyLPXBc3rwVclVdlHiyQi2cfc80JRI6qtQmM/Tw/rIsAQTfyg
+         fAv4m06xtOPLY7yFFiKTKST/6WJIbCvp+KFLiospIbLfJzI44pgopG9eozFO+yO6h/5e
+         dQkA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1680252949;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=4dm+BPEOnC7e4hjDLH6po2CUlQmPHlDI5qtCyO0in2Q=;
+        b=ErJs8kXjYXvEKGiFrfscH0WwcxUdJLSB0RVNZwlSjOGrGRsTjEXioqt1oQX7uTHK19
+         82u2Axz/LjnGjMShwzA4or5mvE09voRdc/Sv9bwP55ugcb9jJhNInenz2t0skix+W6Dk
+         J24Hv/8OnnAnTHGdZWZ2JEZ/6siydasFyoA062qrNQm60glPuMC+k28nojXVu1/2Li6S
+         0S+rBLEdPvO5T5tEaV79YS4gVECu1Q0yYkZvLSHU5MHpLZBYJcmxN9v7q2DfB1Zuh6MP
+         2lVURIrYCpVxnMX9A9OUIKDrEvTgdFHAyOWDdqseZiX9uN+zMpH5FZqoxDudnFpOaMcA
+         OkrQ==
+X-Gm-Message-State: AAQBX9dV/4vyurz2d8c9S7H1TnaeG0cr9o/ghnGchSKJA9S9VKNN8wea
+        7pJbbHd8dXLurKtBKWt4qf2vCg==
+X-Google-Smtp-Source: AKy350ZI/3UGdFSqbHDvzrq0gk2lxo1Tz6xoBuV/VTSFHLt8yiKO4pkQahghPdhIFyzf5V5sRpBGCA==
+X-Received: by 2002:a19:f619:0:b0:4d5:831a:1af8 with SMTP id x25-20020a19f619000000b004d5831a1af8mr7934107lfe.40.1680252949296;
+        Fri, 31 Mar 2023 01:55:49 -0700 (PDT)
+Received: from [192.168.0.21] (78-11-189-27.static.ip.netia.com.pl. [78.11.189.27])
+        by smtp.gmail.com with ESMTPSA id z9-20020ac25de9000000b004eb2dab8a61sm294109lfq.44.2023.03.31.01.55.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 31 Mar 2023 01:55:48 -0700 (PDT)
+Message-ID: <e28e76e2-f392-44d9-e88c-27c6d26115d0@linaro.org>
+Date:   Fri, 31 Mar 2023 10:55:46 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.9.0
+Subject: Re: [RFC PATCH v2 5/6] dt-bindings: cpufreq: add bindings for virtual
+ kvm cpufreq
 Content-Language: en-US
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, thuth@redhat.com, nrb@linux.ibm.com,
-        linux-s390@vger.kernel.org
-References: <20230330114244.35559-1-frankja@linux.ibm.com>
- <20230330114244.35559-3-frankja@linux.ibm.com>
- <20230330183431.3003b391@p-imbrenda>
-From:   Janosch Frank <frankja@linux.ibm.com>
-Subject: Re: [kvm-unit-tests PATCH 2/5] s390x: Add guest 2 AP test
-In-Reply-To: <20230330183431.3003b391@p-imbrenda>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+To:     David Dai <davidai@google.com>,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        Viresh Kumar <viresh.kumar@linaro.org>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Marc Zyngier <maz@kernel.org>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Lorenzo Pieralisi <lpieralisi@kernel.org>,
+        Sudeep Holla <sudeep.holla@arm.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Juri Lelli <juri.lelli@redhat.com>,
+        Vincent Guittot <vincent.guittot@linaro.org>,
+        Dietmar Eggemann <dietmar.eggemann@arm.com>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>,
+        Daniel Bristot de Oliveira <bristot@redhat.com>,
+        Valentin Schneider <vschneid@redhat.com>
+Cc:     Saravana Kannan <saravanak@google.com>, kernel-team@android.com,
+        linux-pm@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kvmarm@lists.linux.dev
+References: <20230331014356.1033759-1-davidai@google.com>
+ <20230331014356.1033759-6-davidai@google.com>
+From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+In-Reply-To: <20230331014356.1033759-6-davidai@google.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 4oXW-bWzKutIZJKrKPeEkUUM9gmxREW_
-X-Proofpoint-GUID: FkojFadE93KE8wp8aVc_thEPtlwwWh-I
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
- definitions=2023-03-31_04,2023-03-30_04,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 phishscore=0
- spamscore=0 priorityscore=1501 adultscore=0 lowpriorityscore=0
- mlxlogscore=999 impostorscore=0 clxscore=1015 mlxscore=0 suspectscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2303200000 definitions=main-2303310070
-X-Spam-Status: No, score=-0.1 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
-        DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS
-        autolearn=unavailable autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
+        DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 3/30/23 18:34, Claudio Imbrenda wrote:
-> On Thu, 30 Mar 2023 11:42:41 +0000
-> Janosch Frank <frankja@linux.ibm.com> wrote:
-> 
->> Add a test that checks the exceptions for the PQAP, NQAP and DQAP
->> adjunct processor (AP) crypto instructions.
->>
->> Since triggering the exceptions doesn't require actual AP hardware,
->> this test can run without complicated setup.
->>
->> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
->> ---
-> 
-> [...]
-> 
->> +
->> +static void test_pgms_pqap(void)
->> +{
->> +	unsigned long grs[3] = {};
->> +	struct pqap_r0 *r0 = (struct pqap_r0 *)grs;
->> +	uint8_t *data = alloc_page();
->> +	uint16_t pgm;
->> +	int fails = 0;
->> +	int i;
->> +
->> +	report_prefix_push("pqap");
->> +
->> +	/* Wrong FC code */
->> +	report_prefix_push("invalid fc");
->> +	r0->fc = 42;
-> 
-> maybe make a macro out of it, both to avoid magic numbers and to change
-> it easily if code 42 will ever become defined in the future.
+On 31/03/2023 03:43, David Dai wrote:
+> Add devicetree bindings for a virtual kvm cpufreq driver.
 
-I don't really see a benefit to that.
+Why? Why virtual devices should be documented in DT? DT is for
+non-discoverable hardware, right? You have entire commit msg to explain
+it instead of saying something easily visible by the diff.
 
 > 
->> +	expect_pgm_int();
->> +	pqap(grs);
->> +	check_pgm_int_code(PGM_INT_CODE_SPECIFICATION);
->> +	memset(grs, 0, sizeof(grs));
->> +	report_prefix_pop();
->> +
->> +	report_prefix_push("invalid gr0 bits");
->> +	for (i = 42; i < 6; i++) {
+> Co-developed-by: Saravana Kannan <saravanak@google.com>
+> Signed-off-by: Saravana Kannan <saravanak@google.com>
+> Signed-off-by: David Dai <davidai@google.com>
+> ---
+>  .../bindings/cpufreq/cpufreq-virtual-kvm.yaml | 39 +++++++++++++++++++
+>  1 file changed, 39 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/cpufreq/cpufreq-virtual-kvm.yaml
 > 
-> 42 is not < 6, this whole thing will be skipped?
+> diff --git a/Documentation/devicetree/bindings/cpufreq/cpufreq-virtual-kvm.yaml b/Documentation/devicetree/bindings/cpufreq/cpufreq-virtual-kvm.yaml
+> new file mode 100644
+> index 000000000000..31e64558a7f1
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/cpufreq/cpufreq-virtual-kvm.yaml
+> @@ -0,0 +1,39 @@
+> +# SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
+> +%YAML 1.2
+> +---
+> +$id: http://devicetree.org/schemas/cpufreq/cpufreq-virtual-kvm.yaml#
+> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> +
+> +title: Virtual KVM CPUFreq
+> +
+> +maintainers:
+> +  - David Dai <davidai@google.com>
+> +
+> +description: |
 
-Right, I've fixed this.
+Do not need '|'.
+> +
 
-[...]
->> +
->> +static void test_pgms_nqap(void)
->> +{
->> +	uint8_t gr0_zeroes_bits[] = {
->> +		32, 34, 35, 40
->> +	};
->> +	uint64_t gr0;
->> +	bool fail;
->> +	int i;
->> +
->> +	report_prefix_push("nqap");
->> +
->> +	/* Registers 0 and 1 are always used, the others are
->> even/odd pairs */
->> +	report_prefix_push("spec");
->> +	report_prefix_push("r1");
->> +	expect_pgm_int();
->> +	asm volatile (
->> +		".insn	rre,0xb2ad0000,3,6\n"
->> +		: : : "cc", "memory", "0", "1", "2", "3");
-> 
-> I would say
-> "0", "1", "2", "3", "4", "6", "7"
-> 
-> since there are two ways of doing it wrong when it comes to even-odd
-> register pairs (r and r+1, r&~1 and r&~1+1)
+Drop stray blank line.
 
-R1 & R1 + 1 should never change, same goes for R2.
-GR0, GR1, R2 + 1 could potentially change.
+> +  KVM CPUFreq is a virtualized driver in guest kernels that sends utilization
+> +  of its vCPUs as a hint to the host. The host uses hint to schedule vCPU
+> +  threads and select CPU frequency. It enables accurate Per-Entity Load
+> +  Tracking for tasks running in the guest by querying host CPU frequency
+> +  unless a virtualized FIE exists(Like AMUs).
 
-But the more interesting question is: Does it make sense to clobber 
-anything other than cc (if at all) for the PGM checks? If the PGM fails 
-we're in uncharted territory. Seems like I need to look up what the 
-other tests do.
+No clue why you need DT bindings for this. KVM has interfaces between
+host and guests.
+
+> +
+> +properties:
+> +  compatible:
+> +    const: virtual,kvm-cpufreq
+> +
+> +required:
+> +  - compatible
+> +
+> +additionalProperties: false
+> +
+> +examples:
+> +  - |
+> +    {
+
+This is some broken syntax and/or indentation.
+
+I don't get what this node is about.
+
+> +      #address-cells = <2>;
+> +      #size-cells = <2>;
+
+Why?
+
+> +
+> +      cpufreq {
+> +            compatible = "virtual,kvm-cpufreq";
+> +      };
+> +
+
+Drop stray blank lines
+
+> +    };
+
+Best regards,
+Krzysztof
+
