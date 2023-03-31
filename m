@@ -2,275 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C780B6D2129
-	for <lists+kvm@lfdr.de>; Fri, 31 Mar 2023 15:09:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6973B6D215A
+	for <lists+kvm@lfdr.de>; Fri, 31 Mar 2023 15:18:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232749AbjCaNJG convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Fri, 31 Mar 2023 09:09:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45600 "EHLO
+        id S232208AbjCaNS1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 31 Mar 2023 09:18:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52216 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232711AbjCaNJF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 31 Mar 2023 09:09:05 -0400
-Received: from gloria.sntech.de (gloria.sntech.de [185.11.138.130])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 013915B9D
-        for <kvm@vger.kernel.org>; Fri, 31 Mar 2023 06:09:01 -0700 (PDT)
-Received: from ip4d1634d3.dynamic.kabel-deutschland.de ([77.22.52.211] helo=diego.localnet)
-        by gloria.sntech.de with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <heiko@sntech.de>)
-        id 1piEUg-0003kW-KL; Fri, 31 Mar 2023 15:08:38 +0200
-From:   Heiko =?ISO-8859-1?Q?St=FCbner?= <heiko@sntech.de>
-To:     linux-riscv@lists.infradead.org, palmer@dabbelt.com,
-        anup@brainfault.org, atishp@atishpatra.org,
-        kvm-riscv@lists.infradead.org, kvm@vger.kernel.org
-Cc:     vineetg@rivosinc.com, greentime.hu@sifive.com,
-        guoren@linux.alibaba.com, Andy Chiu <andy.chiu@sifive.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Andrew Jones <ajones@ventanamicro.com>,
-        Conor Dooley <conor.dooley@microchip.com>,
-        Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>,
-        Liao Chang <liaochang1@huawei.com>,
-        Jisheng Zhang <jszhang@kernel.org>,
-        Guo Ren <guoren@kernel.org>,
-        Vincent Chen <vincent.chen@sifive.com>,
-        =?ISO-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn@rivosinc.com>,
-        Xianting Tian <xianting.tian@linux.alibaba.com>,
-        Mattias Nissler <mnissler@rivosinc.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Andy Chiu <andy.chiu@sifive.com>
-Subject: Re: [PATCH -next v17 10/20] riscv: Allocate user's vector context in the
- first-use trap
-Date:   Fri, 31 Mar 2023 15:08:37 +0200
-Message-ID: <2409883.jE0xQCEvom@diego>
-In-Reply-To: <20230327164941.20491-11-andy.chiu@sifive.com>
-References: <20230327164941.20491-1-andy.chiu@sifive.com>
- <20230327164941.20491-11-andy.chiu@sifive.com>
+        with ESMTP id S232128AbjCaNSZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 31 Mar 2023 09:18:25 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC5331A46E
+        for <kvm@vger.kernel.org>; Fri, 31 Mar 2023 06:17:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1680268658;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=R29u93+oWpNSwMXbFvdPj5Qlpu2wfig3qZnrc9Aas7g=;
+        b=Z/fSBVp6b/r1fiVDK/UXfh6wE0Z4a2oC2BBV3CTLTFPGyAlq60Vx3Oxr29D9xOmmi12S9h
+        wUg2gRVndF42eGhjARIXBBibje6P4FgrSJTVXHZIjQ34GxrgUZNjCs6bkvTdQzZ0W5mHjl
+        Uc1zK91rxsLzOtwSPW4h4fTyx2U8N8A=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-192-cy7iBHcxN2GIF6nNakoKTQ-1; Fri, 31 Mar 2023 09:17:36 -0400
+X-MC-Unique: cy7iBHcxN2GIF6nNakoKTQ-1
+Received: by mail-wm1-f70.google.com with SMTP id n19-20020a05600c3b9300b003ef63ef4519so9791554wms.3
+        for <kvm@vger.kernel.org>; Fri, 31 Mar 2023 06:17:36 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1680268655;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=R29u93+oWpNSwMXbFvdPj5Qlpu2wfig3qZnrc9Aas7g=;
+        b=BuO3EELMqVJuncRsXt1BaZsfaGBbOohwHaBgQOvihAcXRkbAvYfOKLSIad/IDSxTi0
+         6ue9MQ82KPPXBDr8q7iF+he7rag/EzkLAIeBDP11Ftzr+E0cuOajHBxlm7xGjZmjVve5
+         CoNWT0c0vkHFg//jWqfWlfgvlVUbZz35UqyZD6DhWyOyPXAZBtEzo5vmoomusqcdD4a/
+         kaE8Na9dsQK8FNPjKgffzuNzGuPaidn5jy5rvRwYGQtL4DvGs/uSXRCkvKyF3RhVfBzg
+         3j9SmKFfgDES7r6cj94ssDYYZyv88yjeEswNqp/ls6F18vGtrHq/VQ1FtjMxRvETBqEV
+         qcTg==
+X-Gm-Message-State: AAQBX9cYt2jdTz+AA3pRaBhPCT3ZoHT4EbTG6ysLHf4vPVF+1E/M14BJ
+        tE8hMgmIWFZgGTpwjcyYKLAVvd1zDjlipHEJM9i/8sUfdWbzZs8zUjB+/PkmlEBLQQ8ODJvHLmO
+        9mIBs6zmwGP6EQR4jgGHWsPQ=
+X-Received: by 2002:a05:6000:180d:b0:2c5:a38f:ca31 with SMTP id m13-20020a056000180d00b002c5a38fca31mr6538279wrh.7.1680268655363;
+        Fri, 31 Mar 2023 06:17:35 -0700 (PDT)
+X-Google-Smtp-Source: AKy350ZvW6vc0eOYs/DmAWRda5UOv9Wnjr4WKD0nGgYUlepPK8SuvHvZ2hv7vUwL+H1AXp2mAaoP3g==
+X-Received: by 2002:a05:6000:180d:b0:2c5:a38f:ca31 with SMTP id m13-20020a056000180d00b002c5a38fca31mr6538266wrh.7.1680268655056;
+        Fri, 31 Mar 2023 06:17:35 -0700 (PDT)
+Received: from [192.168.0.3] (ip-109-43-177-12.web.vodafone.de. [109.43.177.12])
+        by smtp.gmail.com with ESMTPSA id d16-20020a5d4f90000000b002d51d10a3fasm2205837wru.55.2023.03.31.06.17.34
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 31 Mar 2023 06:17:34 -0700 (PDT)
+Message-ID: <4a757f48-3fc0-4c1a-b401-8a2388b4d94d@redhat.com>
+Date:   Fri, 31 Mar 2023 15:17:33 +0200
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8BIT
-Content-Type: text/plain; charset="iso-8859-1"
-X-Spam-Status: No, score=0.0 required=5.0 tests=SPF_PASS,T_SPF_HELO_TEMPERROR
-        autolearn=unavailable autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.13.0
+Subject: Re: [kvm-unit-tests GIT PULL 00/14] s390x: new maintainer, refactor
+ linker scripts, tests for misalignments, execute-type instructions and vSIE
+ epdx
+Content-Language: en-US
+To:     Nico Boehr <nrb@linux.ibm.com>, pbonzini@redhat.com,
+        andrew.jones@linux.dev, Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com, imbrenda@linux.ibm.com
+References: <20230331113028.621828-1-nrb@linux.ibm.com>
+From:   Thomas Huth <thuth@redhat.com>
+In-Reply-To: <20230331113028.621828-1-nrb@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Am Montag, 27. März 2023, 18:49:30 CEST schrieb Andy Chiu:
-> Vector unit is disabled by default for all user processes. Thus, a
-> process will take a trap (illegal instruction) into kernel at the first
-> time when it uses Vector. Only after then, the kernel allocates V
-> context and starts take care of the context for that user process.
+On 31/03/2023 13.30, Nico Boehr wrote:
+> Hi Paolo and/or Thomas,
 > 
-> Suggested-by: Richard Henderson <richard.henderson@linaro.org>
-> Link: https://lore.kernel.org/r/3923eeee-e4dc-0911-40bf-84c34aee962d@linaro.org
-> Signed-off-by: Andy Chiu <andy.chiu@sifive.com>
-> ---
->  arch/riscv/include/asm/insn.h   | 29 +++++++++++
->  arch/riscv/include/asm/vector.h |  2 +
->  arch/riscv/kernel/traps.c       | 26 +++++++++-
->  arch/riscv/kernel/vector.c      | 90 +++++++++++++++++++++++++++++++++
->  4 files changed, 145 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/riscv/include/asm/insn.h b/arch/riscv/include/asm/insn.h
-> index 8d5c84f2d5ef..4e1505cef8aa 100644
-> --- a/arch/riscv/include/asm/insn.h
-> +++ b/arch/riscv/include/asm/insn.h
-> @@ -137,6 +137,26 @@
->  #define RVG_OPCODE_JALR		0x67
->  #define RVG_OPCODE_JAL		0x6f
->  #define RVG_OPCODE_SYSTEM	0x73
-> +#define RVG_SYSTEM_CSR_OFF	20
-> +#define RVG_SYSTEM_CSR_MASK	GENMASK(12, 0)
+> here comes the first pull request from me. :)
 
-The CSR instructions are all I-type instructions it seems, but I do
-understand where this is coming from, as for CSRs this is not an IMM
-but an unsigned value
+Thanks!
 
-> +/* parts of opcode for RVF, RVD and RVQ */
-> +#define RVFDQ_FL_FS_WIDTH_OFF	12
-> +#define RVFDQ_FL_FS_WIDTH_MASK	GENMASK(3, 0)
-> +#define RVFDQ_FL_FS_WIDTH_W	2
-> +#define RVFDQ_FL_FS_WIDTH_D	3
-> +#define RVFDQ_LS_FS_WIDTH_Q	4
-> +#define RVFDQ_OPCODE_FL		0x07
-> +#define RVFDQ_OPCODE_FS		0x27
+... I gave it a try, but I'm hitting a failure in the spec_ex test:
 
+$ cat logs/spec_ex.log
+timeout -k 1s --foreground 90s qemu-system-s390x -nodefaults -nographic -machine s390-ccw-virtio,accel=kvm -chardev stdio,id=con0 -device sclpconsole,chardev=con0 -kernel s390x/spec_ex.elf -smp 1 # -initrd /tmp/tmp.cxHP06rT1F
+PASS: specification exception: psw_bit_12_is_1: Program interrupt: expected(6) == received(6)
+PASS: specification exception: short_psw_bit_12_is_0: Program interrupt: expected(6) == received(6)
+FAIL: specification exception: psw_odd_address: Expected exception due to invalid PSW
+PASS: specification exception: odd_ex_target: did not perform ex with odd target
+PASS: specification exception: odd_ex_target: Program interrupt: expected(6) == received(6)
+PASS: specification exception: bad_alignment_lqp: Program interrupt: expected(6) == received(6)
+PASS: specification exception: bad_alignment_lrl: Program interrupt: expected(6) == received(6)
+PASS: specification exception: not_even: Program interrupt: expected(6) == received(6)
+PASS: specification exception during transaction: odd_ex_target: Program interrupt: expected(518) == received(518)
+PASS: specification exception during transaction: bad_alignment_lqp: Program interrupt: expected(518) == received(518)
+PASS: specification exception during transaction: bad_alignment_lrl: Program interrupt: expected(518) == received(518)
+PASS: specification exception during transaction: not_even: Program interrupt: expected(518) == received(518)
+SUMMARY: 12 tests, 1 unexpected failures
 
-> +/* parts of opcode for RVV */
-> +#define RVV_OPCODE_VECTOR	0x57
-> +#define RVV_VL_VS_WIDTH_8	0
-> +#define RVV_VL_VS_WIDTH_16	5
-> +#define RVV_VL_VS_WIDTH_32	6
-> +#define RVV_VL_VS_WIDTH_64	7
-> +#define RVV_OPCODE_VL		RVFDQ_OPCODE_FL
-> +#define RVV_OPCODE_VS		RVFDQ_OPCODE_FS
+EXIT: STATUS=3
 
-Same issue for those (FL_FS + VL_VS), but those even don't declare
-being part of any *-type scheme in the spec.
+I'm sure I'm missing something, I just cannot figure it out right
+now (it's Friday afternoon...) - QEMU is the current version from
+the master branch, so I thought that it should contain all the
+recent fixes ... does this psw_odd_address test require a fix in
+the kernel, too? (I'm currently running a RHEL9 kernel)
 
-So all of them mix content-definitions (RV*_OPCODE_*) with structure-
-definitions and right now I don't know how to feel about that ;-) .
-
-On the one hand I like the original separation, but on the other hand it
-doesn't feel useful to put these single-use definitions somewhere above.
-
-
->  /* parts of opcode for RVC*/
->  #define RVC_OPCODE_C0		0x0
-> @@ -304,6 +324,15 @@ static __always_inline bool riscv_insn_is_branch(u32 code)
->  	(RVC_X(x_, RVC_B_IMM_7_6_OPOFF, RVC_B_IMM_7_6_MASK) << RVC_B_IMM_7_6_OFF) | \
->  	(RVC_IMM_SIGN(x_) << RVC_B_IMM_SIGN_OFF); })
->  
-> +#define RVG_EXTRACT_SYSTEM_CSR(x) \
-> +	({typeof(x) x_ = (x); RV_X(x_, RVG_SYSTEM_CSR_OFF, RVG_SYSTEM_CSR_MASK); })
-> +
-> +#define RVFDQ_EXTRACT_FL_FS_WIDTH(x) \
-> +	({typeof(x) x_ = (x); RV_X(x_, RVFDQ_FL_FS_WIDTH_OFF, \
-> +				   RVFDQ_FL_FS_WIDTH_MASK); })
-> +
-> +#define RVV_EXRACT_VL_VS_WIDTH(x) RVFDQ_EXTRACT_FL_FS_WIDTH(x)
-> +
->  /*
->   * Get the immediate from a J-type instruction.
->   *
-
-
-> diff --git a/arch/riscv/kernel/vector.c b/arch/riscv/kernel/vector.c
-> index 03582e2ade83..ea59f32adf46 100644
-> --- a/arch/riscv/kernel/vector.c
-> +++ b/arch/riscv/kernel/vector.c
-> @@ -4,9 +4,19 @@
->   * Author: Andy Chiu <andy.chiu@sifive.com>
->   */
->  #include <linux/export.h>
-> +#include <linux/sched/signal.h>
-> +#include <linux/types.h>
-> +#include <linux/slab.h>
-> +#include <linux/sched.h>
-> +#include <linux/uaccess.h>
->  
-> +#include <asm/thread_info.h>
-> +#include <asm/processor.h>
-> +#include <asm/insn.h>
->  #include <asm/vector.h>
->  #include <asm/csr.h>
-> +#include <asm/ptrace.h>
-> +#include <asm/bug.h>
->  
->  unsigned long riscv_v_vsize __read_mostly;
->  EXPORT_SYMBOL_GPL(riscv_v_vsize);
-> @@ -18,3 +28,83 @@ void riscv_v_setup_vsize(void)
->  	riscv_v_vsize = csr_read(CSR_VLENB) * 32;
->  	riscv_v_disable();
->  }
-> +
-> +static bool insn_is_vector(u32 insn_buf)
-> +{
-> +	u32 opcode = insn_buf & __INSN_OPCODE_MASK;
-> +	bool is_vector = false;
-> +	u32 width, csr;
-> +
-> +	/*
-> +	 * All V-related instructions, including CSR operations are 4-Byte. So,
-> +	 * do not handle if the instruction length is not 4-Byte.
-> +	 */
-> +	if (unlikely(GET_INSN_LENGTH(insn_buf) != 4))
-> +		return false;
-> +
-> +	switch (opcode) {
-> +	case RVV_OPCODE_VECTOR:
-> +		is_vector = true;
-> +		break;
-> +	case RVV_OPCODE_VL:
-> +	case RVV_OPCODE_VS:
-> +		width = RVV_EXRACT_VL_VS_WIDTH(insn_buf);
-> +		if (width == RVV_VL_VS_WIDTH_8 || width == RVV_VL_VS_WIDTH_16 ||
-> +		    width == RVV_VL_VS_WIDTH_32 || width == RVV_VL_VS_WIDTH_64)
-> +			is_vector = true;
-> +		break;
-> +	case RVG_OPCODE_SYSTEM:
-> +		csr = RVG_EXTRACT_SYSTEM_CSR(insn_buf);
-> +		if ((csr >= CSR_VSTART && csr <= CSR_VCSR) ||
-> +		    (csr >= CSR_VL && csr <= CSR_VLENB))
-> +			is_vector = true;
-> +		break;
-> +	}
-
-blank line?
-
-> +	return is_vector;
-
-I guess a matter of style-preference, but the other option would be to
-just return true from inside the case elements, and simply false here.
-
-
-> +}
-> +
-> +static int riscv_v_thread_zalloc(void)
-> +{
-> +	void *datap;
-> +
-> +	datap = kzalloc(riscv_v_vsize, GFP_KERNEL);
-> +	if (!datap)
-> +		return -ENOMEM;
-
-blank line?
-
-> +	current->thread.vstate.datap = datap;
-> +	memset(&current->thread.vstate, 0, offsetof(struct __riscv_v_ext_state,
-> +						    datap));
-> +	return 0;
-> +}
-> +
-> +bool riscv_v_first_use_handler(struct pt_regs *regs)
-> +{
-> +	u32 __user *epc = (u32 __user *)regs->epc;
-> +	u32 insn = (u32)regs->badaddr;
-> +
-> +	/* If V has been enabled then it is not the first-use trap */
-> +	if (riscv_v_vstate_query(regs))
-> +		return false;
-> +
-> +	/* Get the instruction */
-> +	if (!insn) {
-> +		if (__get_user(insn, epc))
-> +			return false;
-> +	}
-
-blank?
-
-> +	/* Filter out non-V instructions */
-> +	if (!insn_is_vector(insn))
-> +		return false;
-> +
-> +	/* Sanity check. datap should be null by the time of the first-use trap */
-> +	WARN_ON(current->thread.vstate.datap);
-
-blank?
-
-> +	/*
-> +	 * Now we sure that this is a V instruction. And it executes in the
-> +	 * context where VS has been off. So, try to allocate the user's V
-> +	 * context and resume execution.
-> +	 */
-> +	if (riscv_v_thread_zalloc()) {
-> +		force_sig(SIGKILL);
-> +		return true;
-> +	}
-> +	riscv_v_vstate_on(regs);
-> +	return true;
-> +}
-> 
-
-in any case,
-
-Acked-by: Heiko Stuebner <heiko.stuebner@vrull.eu>
-Tested-by: Heiko Stuebner <heiko.stuebner@vrull.eu>
-
-
-Heiko
-
-
+  Thomas
 
