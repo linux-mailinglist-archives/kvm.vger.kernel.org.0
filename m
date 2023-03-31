@@ -2,43 +2,43 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0E90C6D2663
-	for <lists+kvm@lfdr.de>; Fri, 31 Mar 2023 19:03:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 44F016D2676
+	for <lists+kvm@lfdr.de>; Fri, 31 Mar 2023 19:11:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231944AbjCaRDe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 31 Mar 2023 13:03:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38810 "EHLO
+        id S230501AbjCaRLA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 31 Mar 2023 13:11:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43744 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229832AbjCaRDd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 31 Mar 2023 13:03:33 -0400
+        with ESMTP id S229758AbjCaRK7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 31 Mar 2023 13:10:59 -0400
 Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F40FEEB54
-        for <kvm@vger.kernel.org>; Fri, 31 Mar 2023 10:03:31 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E42E01164C
+        for <kvm@vger.kernel.org>; Fri, 31 Mar 2023 10:10:57 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id ACBA0B82EB0
-        for <kvm@vger.kernel.org>; Fri, 31 Mar 2023 17:03:30 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5DF1BC433EF;
-        Fri, 31 Mar 2023 17:03:29 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 6CEE9B82C0E
+        for <kvm@vger.kernel.org>; Fri, 31 Mar 2023 17:10:56 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 38B12C433EF;
+        Fri, 31 Mar 2023 17:10:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1680282209;
-        bh=lUSdi6Mkn5Fjo7SaUXasgSepXMbWv83Qgd5TpuVsw04=;
+        s=k20201202; t=1680282655;
+        bh=wRdwk9DsZuujMkuOmAalU6b/15GazicugZqCbNRDy4M=;
         h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=c/BUzODlJN6ZT3GyaaQatryxltLJkoLtgfKuBFOMxdw9fB3ovI8R1gpseeG0c1tap
-         L/tvCAz+l33sGdpSBO2axd4B+FRaWTL5XRpm5JvEhLXaI7Zaw9JAkaW+M4l3oPkwBw
-         jtDXCcJaNIq3qRM8gnBJ9SAS0PksSuFPfGBGRLuXAkkI+loMFTpYm5kObSWwKjqgox
-         uJVjaeHc3GJxpUMSXKQyjkrctrnwelX+eG+4Si1+SJnPAqEzmSX0TjoSqUpbWgr2XN
-         C3F5ENmeqoSVIB6gCA7ISMduNO/etIuaR+JmoHp/d/DFtIxqrzx6EaYG7InGgTzBq0
-         EC5oA5L5tog+Q==
+        b=Q7XIZUFNItWO/ywHzFCPHKUFSO2lbmLogAr4mLdr357zCDkZmPkc7v4IgRmCfynjB
+         xNNJd3YH2JRmU7qdqheqT7lErgJaaOM0kEpf3clepKb2+k1SVmMcf72MiC9qv1HDMb
+         vUZfiJOt47RrtgjPXvwNllxyRTaEgS8UHwv2ETThuMHcfhM0nuk12UFzL2JRHAgheD
+         QazmovJOVg3TAP35O9k0pDB3/8jDOEE0bhpotJJEBvxI3YFetPoURPRIdQUm7cZ8BK
+         YD5km5r4pq+8XYedX4rgh8Od9p3VtGZWmke9BU4Nzv06pS/UGeXeVLZcw7cIdV0ujw
+         ZonzRGKdjd2zA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1piI9v-004mCD-1P;
-        Fri, 31 Mar 2023 18:03:27 +0100
-Date:   Fri, 31 Mar 2023 18:03:26 +0100
-Message-ID: <867cuwx38h.wl-maz@kernel.org>
+        id 1piIH6-004mJM-Tl;
+        Fri, 31 Mar 2023 18:10:53 +0100
+Date:   Fri, 31 Mar 2023 18:10:52 +0100
+Message-ID: <865yagx2w3.wl-maz@kernel.org>
 From:   Marc Zyngier <maz@kernel.org>
 To:     Oliver Upton <oliver.upton@linux.dev>
 Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
@@ -48,10 +48,10 @@ Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
         Zenghui Yu <yuzenghui@huawei.com>,
         Sean Christopherson <seanjc@google.com>,
         Salil Mehta <salil.mehta@huawei.com>
-Subject: Re: [PATCH v2 06/13] KVM: arm64: Refactor hvc filtering to support different actions
-In-Reply-To: <20230330154918.4014761-7-oliver.upton@linux.dev>
+Subject: Re: [PATCH v2 08/13] KVM: arm64: Add support for KVM_EXIT_HYPERCALL
+In-Reply-To: <20230330154918.4014761-9-oliver.upton@linux.dev>
 References: <20230330154918.4014761-1-oliver.upton@linux.dev>
-        <20230330154918.4014761-7-oliver.upton@linux.dev>
+        <20230330154918.4014761-9-oliver.upton@linux.dev>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -70,50 +70,144 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 30 Mar 2023 16:49:11 +0100,
+On Thu, 30 Mar 2023 16:49:13 +0100,
 Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> KVM presently allows userspace to filter guest hypercalls with bitmaps
-> expressed via pseudo-firmware registers. These bitmaps have a narrow
-> scope and, of course, can only allow/deny a particular call. A
-> subsequent change to KVM will introduce a generalized UAPI for filtering
-> hypercalls, allowing functions to be forwarded to userspace.
+> In anticipation of user hypercall filters, add the necessary plumbing to
+> get SMCCC calls out to userspace. Even though the exit structure has
+> space for KVM to pass register arguments, let's just avoid it altogether
+> and let userspace poke at the registers via KVM_GET_ONE_REG.
 > 
-> Refactor the existing hypercall filtering logic to make room for more
-> than two actions. While at it, generalize the function names around
-> SMCCC as it is the basis for the upcoming UAPI.
+> This deliberately stretches the definition of a 'hypercall' to cover
+> SMCs from EL1 in addition to the HVCs we know and love. KVM doesn't
+> support EL1 calls into secure services, but now we can paint that as a
+> userspace problem and be done with it.
 > 
-> No functional change intended.
+> Finally, we need a flag to let userspace know what conduit instruction
+> was used (i.e. SMC vs. HVC).
 > 
-> Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 > ---
->  arch/arm64/include/uapi/asm/kvm.h |  9 +++++++++
->  arch/arm64/kvm/hypercalls.c       | 19 +++++++++++++++----
->  2 files changed, 24 insertions(+), 4 deletions(-)
+>  Documentation/virt/kvm/api.rst    | 22 ++++++++++++++++++++--
+>  arch/arm64/include/uapi/asm/kvm.h |  4 ++++
+>  arch/arm64/kvm/handle_exit.c      |  4 +++-
+>  arch/arm64/kvm/hypercalls.c       | 17 +++++++++++++++++
+>  4 files changed, 44 insertions(+), 3 deletions(-)
 > 
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index 9b01e3d0e757..c8ab2f730945 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -6221,11 +6221,29 @@ to the byte array.
+>  			__u64 flags;
+>  		} hypercall;
+>  
+> -Unused.  This was once used for 'hypercall to userspace'.  To implement
+> -such functionality, use KVM_EXIT_IO (x86) or KVM_EXIT_MMIO (all except s390).
+> +
+> +It is strongly recommended that userspace use ``KVM_EXIT_IO`` (x86) or
+> +``KVM_EXIT_MMIO`` (all except s390) to implement functionality that
+> +requires a guest to interact with host userpace.
+>  
+>  .. note:: KVM_EXIT_IO is significantly faster than KVM_EXIT_MMIO.
+>  
+> +For arm64:
+> +----------
+> +
+> +SMCCC exits can be enabled depending on the configuration of the SMCCC
+> +filter. See the Documentation/virt/kvm/devices/vm.rst
+> +``KVM_ARM_SMCCC_FILTER`` for more details.
+
+Maybe this hunk should come with the following patch which actually
+adds that doc.
+
+> +
+> +``nr`` contains the function ID of the guest's SMCCC call. Userspace is
+> +expected to use the ``KVM_GET_ONE_REG`` ioctl to retrieve the call
+> +parameters from the vCPU's GPRs.
+> +
+> +Definition of ``flags``:
+> + - ``KVM_HYPERCALL_EXIT_SMC``: Indicates that the guest used the SMC
+> +   conduit to initiate the SMCCC call. If this bit is 0 then the guest
+> +   used the HVC conduit for the SMCCC call.
+> +
+>  ::
+>  
+>  		/* KVM_EXIT_TPR_ACCESS */
 > diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-> index f8129c624b07..bbab92402510 100644
+> index bbab92402510..1dabb7d05514 100644
 > --- a/arch/arm64/include/uapi/asm/kvm.h
 > +++ b/arch/arm64/include/uapi/asm/kvm.h
-> @@ -469,6 +469,15 @@ enum {
->  /* run->fail_entry.hardware_entry_failure_reason codes. */
->  #define KVM_EXIT_FAIL_ENTRY_CPU_UNSUPPORTED	(1ULL << 0)
+> @@ -472,12 +472,16 @@ enum {
+>  enum kvm_smccc_filter_action {
+>  	KVM_SMCCC_FILTER_ALLOW = 0,
+>  	KVM_SMCCC_FILTER_DENY,
+> +	KVM_SMCCC_FILTER_FWD_TO_USER,
 >  
-> +enum kvm_smccc_filter_action {
-> +	KVM_SMCCC_FILTER_ALLOW = 0,
-> +	KVM_SMCCC_FILTER_DENY,
+>  #ifdef __KERNEL__
+>  	NR_SMCCC_FILTER_ACTIONS
+>  #endif
+>  };
+>  
+> +/* arm64-specific KVM_EXIT_HYPERCALL flags */
+> +#define KVM_HYPERCALL_EXIT_SMC	(1U << 0)
 > +
-> +#ifdef __KERNEL__
-> +	NR_SMCCC_FILTER_ACTIONS
-> +#endif
-> +};
+>  #endif
+>  
+>  #endif /* __ARM_KVM_H__ */
+> diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+> index 68f95dcd41a1..3f43e20c48b6 100644
+> --- a/arch/arm64/kvm/handle_exit.c
+> +++ b/arch/arm64/kvm/handle_exit.c
+> @@ -71,7 +71,9 @@ static int handle_smc(struct kvm_vcpu *vcpu)
+>  	 * Trap exception, not a Secure Monitor Call exception [...]"
+>  	 *
+>  	 * We need to advance the PC after the trap, as it would
+> -	 * otherwise return to the same address...
+> +	 * otherwise return to the same address. Furthermore, pre-incrementing
+> +	 * the PC before potentially exiting to userspace maintains the same
+> +	 * abstraction for both SMCs and HVCs.
+>  	 */
+>  	kvm_incr_pc(vcpu);
+>  
+> diff --git a/arch/arm64/kvm/hypercalls.c b/arch/arm64/kvm/hypercalls.c
+> index 73b218ddd1a5..7e8c850847c1 100644
+> --- a/arch/arm64/kvm/hypercalls.c
+> +++ b/arch/arm64/kvm/hypercalls.c
+> @@ -180,6 +180,19 @@ static u8 kvm_smccc_get_action(struct kvm_vcpu *vcpu, u32 func_id)
+>  	return KVM_SMCCC_FILTER_DENY;
+>  }
+>  
+> +static void kvm_prepare_hypercall_exit(struct kvm_vcpu *vcpu, u32 func_id)
+> +{
+> +	u8 ec = ESR_ELx_EC(kvm_vcpu_get_esr(vcpu));
+> +	struct kvm_run *run = vcpu->run;
 > +
+> +	run->exit_reason = KVM_EXIT_HYPERCALL;
+> +	run->hypercall.nr = func_id;
+> +	run->hypercall.flags = 0;
+> +
+> +	if (ec == ESR_ELx_EC_SMC32 || ec == ESR_ELx_EC_SMC64)
+> +		run->hypercall.flags |= KVM_HYPERCALL_EXIT_SMC;
+> +}
+> +
+>  int kvm_smccc_call_handler(struct kvm_vcpu *vcpu)
+>  {
+>  	struct kvm_smccc_features *smccc_feat = &vcpu->kvm->arch.smccc_feat;
+> @@ -192,6 +205,10 @@ int kvm_smccc_call_handler(struct kvm_vcpu *vcpu)
+>  	action = kvm_smccc_get_action(vcpu, func_id);
+>  	if (action == KVM_SMCCC_FILTER_DENY)
+>  		goto out;
+> +	if (action == KVM_SMCCC_FILTER_FWD_TO_USER) {
+> +		kvm_prepare_hypercall_exit(vcpu, func_id);
+> +		return 0;
+> +	}
 
-One thing I find myself wondering is what "ALLOW" mean here: Allow the
-handling of the hypercall? Or allow its forwarding? My guess is that
-this is the former, but I'd love a comment to clarify it, or even a
-clearer name ("HANDLE" instead of "ALLOW", for example, but YMMV...).
+nit: maybe write this as a switch statement?
+
+>  
+>  	switch (func_id) {
+>  	case ARM_SMCCC_VERSION_FUNC_ID:
 
 Thanks,
 
