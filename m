@@ -2,116 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 77E706D18F0
-	for <lists+kvm@lfdr.de>; Fri, 31 Mar 2023 09:46:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9D9016D1927
+	for <lists+kvm@lfdr.de>; Fri, 31 Mar 2023 10:00:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231285AbjCaHq4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 31 Mar 2023 03:46:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45420 "EHLO
+        id S231202AbjCaIAS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 31 Mar 2023 04:00:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38626 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231153AbjCaHq1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 31 Mar 2023 03:46:27 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 154B51A967
-        for <kvm@vger.kernel.org>; Fri, 31 Mar 2023 00:45:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1680248741;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=ijuijWfOviH3p+YNIe7G3DYHHIm8VDsoLsYWWShhetc=;
-        b=Q1y5wMc2zk2H523GR3Q4ltmFSrX4DtQhtzHM4XQ8qeK+p4zfoM85mWujiguGG/lg6VU50J
-        BMCDRO//W9+CQFWJFinnTcJAH49Ui1LhSo3dT/iq/mb5BvpYseFtdifyBRmIXzepQgHrD3
-        KJUvzX93xTNn7ABlm2qneC4VTI+N6Zs=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-611-aw2bNhHfMwOJsM0tGjsDVg-1; Fri, 31 Mar 2023 03:45:39 -0400
-X-MC-Unique: aw2bNhHfMwOJsM0tGjsDVg-1
-Received: by mail-ed1-f71.google.com with SMTP id c1-20020a0564021f8100b004acbe232c03so30150293edc.9
-        for <kvm@vger.kernel.org>; Fri, 31 Mar 2023 00:45:39 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680248738;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ijuijWfOviH3p+YNIe7G3DYHHIm8VDsoLsYWWShhetc=;
-        b=iumn0BmkJFwZU/VmrwQeXk2IutIBWlOBLa8qb7c5EI61tFrcD30VNWL+H/KX17NcnV
-         v1NzPF2SubLIWqKtchoTUgLHNnnGVFYLta8KJ2VR0IX2VWyY1nDVocl9iKvUIfA6bmEA
-         JW9b3Gz3iwjC6Kr3hKuHQNv0nsJLXSNcrbsmyqqWXKfEQ5Mk5WuPrE067JHSbZwAzazI
-         AlPkmfi/N6+NEUwPrSRRd+oKS+HOuGNq76nARTXRUN+din7EQO80JpQVXs5AOLLSReoJ
-         pbSCdQmREgHsxQ8rc/mTupBISZ7fJcd/JZgs7WADcg5RRZafynx9Zs7T/U752QbVuJ8v
-         XziQ==
-X-Gm-Message-State: AAQBX9dvXw+bSRQd1b+UDk54w4phnC5m+5z2dfI4HoN0b+N3m04Ktdj7
-        aDJhqBPTG3h9ucUa5x7i0bzgTr+9+NQv7WgmyFxhmO7yMBW6z7z3uXerIhovVxjIi5LWeMSdOqa
-        azI2FzCHXFkpR
-X-Received: by 2002:a17:906:5785:b0:93d:1c2b:bd23 with SMTP id k5-20020a170906578500b0093d1c2bbd23mr28486740ejq.39.1680248738075;
-        Fri, 31 Mar 2023 00:45:38 -0700 (PDT)
-X-Google-Smtp-Source: AKy350YS3/z+4R+xl2x92XT2RXYCogfvtYmw2I34NDhSWzTMLR1o5S98t+qcxg+NZzy9Jd9gHuGQoQ==
-X-Received: by 2002:a17:906:5785:b0:93d:1c2b:bd23 with SMTP id k5-20020a170906578500b0093d1c2bbd23mr28486717ejq.39.1680248737742;
-        Fri, 31 Mar 2023 00:45:37 -0700 (PDT)
-Received: from sgarzare-redhat (host-82-57-51-130.retail.telecomitalia.it. [82.57.51.130])
-        by smtp.gmail.com with ESMTPSA id dx21-20020a170906a85500b008d044ede804sm677526ejb.163.2023.03.31.00.45.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 31 Mar 2023 00:45:37 -0700 (PDT)
-Date:   Fri, 31 Mar 2023 09:45:33 +0200
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Simon Horman <simon.horman@corigine.com>
-Cc:     virtualization@lists.linux-foundation.org,
-        Andrey Zhadchenko <andrey.zhadchenko@virtuozzo.com>,
-        Jason Wang <jasowang@redhat.com>, eperezma@redhat.com,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-        kvm@vger.kernel.org, stefanha@redhat.com,
-        "Michael S. Tsirkin" <mst@redhat.com>
-Subject: Re: [PATCH v4 5/9] vringh: support VA with iotlb
-Message-ID: <3jqstd75xs6f2pn7pwjxnkphhan5bk25er3ord4rw63545htu7@vgngick7zfco>
-References: <20230324153607.46836-1-sgarzare@redhat.com>
- <20230324153919.47633-1-sgarzare@redhat.com>
- <ZCWIXZbeWanvPJA3@corigine.com>
+        with ESMTP id S229441AbjCaIAR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 31 Mar 2023 04:00:17 -0400
+Received: from mx.sberdevices.ru (mx.sberdevices.ru [45.89.227.171])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E62ABEB63;
+        Fri, 31 Mar 2023 01:00:14 -0700 (PDT)
+Received: from s-lin-edge02.sberdevices.ru (localhost [127.0.0.1])
+        by mx.sberdevices.ru (Postfix) with ESMTP id AD83B5FD37;
+        Fri, 31 Mar 2023 11:00:11 +0300 (MSK)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
+        s=mail; t=1680249611;
+        bh=V4eJlIvHXOm3/75lYaNQr5oPI/99sRGeqA0cdS3xh7M=;
+        h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type;
+        b=F1fxVg77CUxw+QIRT8vN1DfEK8cX92WJsSUciLe2tobx/nuvIVz6mcEbXrDs84NGN
+         CjJnjVE37rUkma6nJ8NN3lcY/9AguGGZomk90k+wdZO06/NOV7pixWNypr0cQXt6SU
+         iCjObWsgnhMPFuq08k1dB+X8PB923RnecNfGndckFyUtmdC7DwhNbQ702OO2QYVU5G
+         6wIosDmXdvaWUfEDIExF5HDZOxMTLa1hdP7Ib0GdYYWooNC3G57teXjHBSsKM8HlWh
+         h13KIQmzOEw/F4CPPYjoWQiTV/9S4Vdeeuqt2V35+BSTgXDSmFFCuZPULmyFMTyZJ4
+         MERi7ZgzQ9eQw==
+Received: from S-MS-EXCH01.sberdevices.ru (S-MS-EXCH01.sberdevices.ru [172.16.1.4])
+        by mx.sberdevices.ru (Postfix) with ESMTP;
+        Fri, 31 Mar 2023 11:00:07 +0300 (MSK)
+Message-ID: <2c3aeeac-2fcb-16f6-41cd-c0ca4e6a6d3e@sberdevices.ru>
+Date:   Fri, 31 Mar 2023 10:56:41 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <ZCWIXZbeWanvPJA3@corigine.com>
-X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.1
+Content-Language: en-US
+To:     Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Bobby Eshleman <bobby.eshleman@bytedance.com>,
+        Bryan Tan <bryantan@vmware.com>, Vishnu Dasa <vdasa@vmware.com>
+CC:     <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
+        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <kernel@sberdevices.ru>, <oxffffaa@gmail.com>,
+        <avkrasnov@sberdevices.ru>, <pv-drivers@vmware.com>
+From:   Arseniy Krasnov <avkrasnov@sberdevices.ru>
+Subject: [PATCH net] vsock/vmci: convert VMCI error code to -ENOMEM on send
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [172.16.1.6]
+X-ClientProxiedBy: S-MS-EXCH02.sberdevices.ru (172.16.1.5) To
+ S-MS-EXCH01.sberdevices.ru (172.16.1.4)
+X-KSMG-Rule-ID: 4
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Status: not scanned, disabled by settings
+X-KSMG-AntiSpam-Interceptor-Info: not scanned
+X-KSMG-AntiPhishing: not scanned, disabled by settings
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 1.1.2.30, bases: 2023/03/31 05:18:00 #21105108
+X-KSMG-AntiVirus-Status: Clean, skipped
+X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
+        DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 30, 2023 at 03:02:21PM +0200, Simon Horman wrote:
->On Fri, Mar 24, 2023 at 04:39:19PM +0100, Stefano Garzarella wrote:
->> vDPA supports the possibility to use user VA in the iotlb messages.
->> So, let's add support for user VA in vringh to use it in the vDPA
->> simulators.
->>
->> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
->
->...
->
->> +/**
->> + * vringh_init_iotlb_va - initialize a vringh for a ring with IOTLB containing
->> + *                        user VA.
->> + * @vrh: the vringh to initialize.
->> + * @features: the feature bits for this ring.
->> + * @num: the number of elements.
->> + * @weak_barriers: true if we only need memory barriers, not I/O.
->> + * @desc: the userpace descriptor pointer.
->> + * @avail: the userpace avail pointer.
->> + * @used: the userpace used pointer.
->
->nit: s/userpace/userspace/
+This adds conversion of VMCI specific error code to general -ENOMEM. It
+is needed, because af_vsock.c passes error value returned from transport
+to the user, which does not expect to get VMCI_ERROR_* values.
 
-Oops, good catch!
+Fixes: c43170b7e157 ("vsock: return errors other than -ENOMEM to socket")
+Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
+Reviewed-by: Vishnu Dasa <vdasa@vmware.com>
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+---
+ net/vmw_vsock/vmci_transport.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-Copy & past typos also present in the documentation of vringh_init_kern
-and vringh_init_iotlb.
-
-I will fix this patch and send a separate patch to fix the other two.
-
-Thanks,
-Stefano
-
+diff --git a/net/vmw_vsock/vmci_transport.c b/net/vmw_vsock/vmci_transport.c
+index 36eb16a40745..95cc4d79ba29 100644
+--- a/net/vmw_vsock/vmci_transport.c
++++ b/net/vmw_vsock/vmci_transport.c
+@@ -1842,7 +1842,13 @@ static ssize_t vmci_transport_stream_enqueue(
+ 	struct msghdr *msg,
+ 	size_t len)
+ {
+-	return vmci_qpair_enquev(vmci_trans(vsk)->qpair, msg, len, 0);
++	ssize_t err;
++
++	err = vmci_qpair_enquev(vmci_trans(vsk)->qpair, msg, len, 0);
++	if (err < 0)
++		err = -ENOMEM;
++
++	return err;
+ }
+ 
+ static s64 vmci_transport_stream_has_data(struct vsock_sock *vsk)
+-- 
+2.25.1
