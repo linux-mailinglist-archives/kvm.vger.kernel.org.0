@@ -2,286 +2,228 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 592626D15A2
-	for <lists+kvm@lfdr.de>; Fri, 31 Mar 2023 04:33:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 38CB46D15DA
+	for <lists+kvm@lfdr.de>; Fri, 31 Mar 2023 05:11:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229891AbjCaCdC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Mar 2023 22:33:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48634 "EHLO
+        id S229769AbjCaDLD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Mar 2023 23:11:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34428 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229754AbjCaCc7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 Mar 2023 22:32:59 -0400
-Received: from mail-il1-f206.google.com (mail-il1-f206.google.com [209.85.166.206])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13FE51984
-        for <kvm@vger.kernel.org>; Thu, 30 Mar 2023 19:32:56 -0700 (PDT)
-Received: by mail-il1-f206.google.com with SMTP id n9-20020a056e02148900b003263d81730aso2292862ilk.0
-        for <kvm@vger.kernel.org>; Thu, 30 Mar 2023 19:32:56 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680229975; x=1682821975;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=XdfWxE7qTekvVgvYXimZhffUh8i0KCdKojoqqBZwDFA=;
-        b=q3+Bk7X/QfnXPDn8Le8R41fiCONryU3jE+JBlkGp+1rpFlP2uwyBq75e4hCEE8WWPQ
-         g8V4cwbAugD6ipOUZ1vt519sq+hC7PlGzWPghCPQR40+DdBCWyJ4G5I+mxu+SuVTB+B5
-         yFJYKzYIrOLdoZ/apPp1RQoBHB4pCFpEwKb8cBUFpG4V7JXbq7qbwT1EiUOWmilLs6Xj
-         880N21B2WaZe7Pc0UO5cngYYG/6vqnEqERQjIl7TYOm8PUOq3dt6nrVXvpFOqHpgysjm
-         OpO6yMxOmufsJDG+8jmH3wtTep2kW4K0/Ev9zcAVBGv/NKSg5CmbhXpoPOUcP3DzJcOU
-         nWLA==
-X-Gm-Message-State: AO0yUKWsDOopkIcrwC/O7waI0ekqMLeOs61/ST/0t9pN2B07XOoSCpg6
-        Gmar18dlb9sfpytqNB/YhH0cKyj+xoqxq+0IRMu4rnMc2Kp3
-X-Google-Smtp-Source: AK7set9rfQHEo5DQ+z7vq0IaNpBOVeRh1QxBQ2lLhTgWbddnCIBjCB2P1gECx1ftcYQCT19lPE/ciYCOX73CjKuxRW4rLPnEvdyZ
+        with ESMTP id S229470AbjCaDLB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 30 Mar 2023 23:11:01 -0400
+Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 978311207F;
+        Thu, 30 Mar 2023 20:10:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1680232259; x=1711768259;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=91467VDRzHrUNQcrtIymj4eK/swSc8zLh4lqhJA++HI=;
+  b=KoStZ04RSAQUxeyv1sQbO23PFzyVZAzNdJPH0aVJenaf6VWi1gtQwsT0
+   5/YkLVzaZ01EKIMvi1/uD3GeCCUs5CFhwDsfu6M2kYKLwpeOVqmGhItCC
+   zTYo5Dz/1u42XJfULF0sK7IOAEROJJ6nSvjqORcc4D+s9xD57kZRJJNd3
+   11o7OWGk36TWLJmb6QOq45hIvBu+iMGbcRtnGWET7uw+WK0AsBiDUwvds
+   4bol+zIHphkdMXw/RAit/QY2XeYGXbqY6P9JLC66/dBKavfFAmp+36E4r
+   eAN0MrFfxFJaIo4RcZLjr2etaXGV3rSc2EVAXqVfEVSRKVOoxLsZJU+Qa
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10665"; a="427617001"
+X-IronPort-AV: E=Sophos;i="5.98,306,1673942400"; 
+   d="scan'208";a="427617001"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Mar 2023 20:10:59 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10665"; a="754249632"
+X-IronPort-AV: E=Sophos;i="5.98,306,1673942400"; 
+   d="scan'208";a="754249632"
+Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
+  by fmsmga004.fm.intel.com with ESMTP; 30 Mar 2023 20:10:58 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.21; Thu, 30 Mar 2023 20:10:58 -0700
+Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.21; Thu, 30 Mar 2023 20:10:58 -0700
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.21 via Frontend Transport; Thu, 30 Mar 2023 20:10:58 -0700
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.105)
+ by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.21; Thu, 30 Mar 2023 20:10:56 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ao0VH+WL6kaODf1MaRVjVO2SeXZiz1gaMzuUTMP2xDSa8oCn7OxeIvLncgwaAIZgM7C/ywixUbZ8uf4EVMlp3TDDEPVEJz187y10O7vt24ZTFheaQ3QRUujPwsplwr0NVxv2IId/XY/wgX3kRRbqunFLGITAdreKQZ7IjX0OmvIIUPH7BYn2ATTCBbtqODLDK3ndUBOJqNgtcc3ntPClOzYBNYfHRtYFnzWwPrtsJp9z779oRd+x21oH7ZEfZtdxrMbPKCZ/0NYIh2J8uQXx4o8jSiIhrlpWOzIVBA9SURZVBvsc7PDVSFlipO30GkM1y/DfBk2VHOVPw0oprBH0dw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=91467VDRzHrUNQcrtIymj4eK/swSc8zLh4lqhJA++HI=;
+ b=bsfoxDRvTkMs6mAq+qEuYq5FxaFp4FFzsDSfNczjZrcIGfZaOj8kJkW0HLByzDj+wg41h6wTyUd2JziUjUfDbbu81WeEWriMQ8Po5n8Y4NTYKIk+vMTimJNw06yEyPfx/8Omau/k715A8wy0gvchXx+uSp3fADGnl6WpQe9xrnAdbkocbgIUt0+dHpct2tvuFr/fTJdKGQ6fS8kYIfWZWNZRv+dqVxv2DdxLTiabXzJ1DqHl79TxZuEtK7sQFtdLuyWR4aFY9l6lud27LLVljjYP+PTyYKtKrfrL+0ZlNT2BmsdogBGOBxXTi2RpPxqLs/nAqEvMpeTwxBs68gXQZQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from MW4PR11MB6763.namprd11.prod.outlook.com (2603:10b6:303:20b::7)
+ by IA0PR11MB7356.namprd11.prod.outlook.com (2603:10b6:208:432::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6178.37; Fri, 31 Mar
+ 2023 03:10:49 +0000
+Received: from MW4PR11MB6763.namprd11.prod.outlook.com
+ ([fe80::c4e:6c7:e9f7:7222]) by MW4PR11MB6763.namprd11.prod.outlook.com
+ ([fe80::c4e:6c7:e9f7:7222%7]) with mapi id 15.20.6222.035; Fri, 31 Mar 2023
+ 03:10:49 +0000
+From:   "Jiang, Yanting" <yanting.jiang@intel.com>
+To:     "Liu, Yi L" <yi.l.liu@intel.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "jgg@nvidia.com" <jgg@nvidia.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>
+CC:     "joro@8bytes.org" <joro@8bytes.org>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
+        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "shameerali.kolothum.thodi@huawei.com" 
+        <shameerali.kolothum.thodi@huawei.com>,
+        "lulu@redhat.com" <lulu@redhat.com>,
+        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
+        "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        "Hao, Xudong" <xudong.hao@intel.com>,
+        "Zhao, Yan Y" <yan.y.zhao@intel.com>,
+        "Xu, Terrence" <terrence.xu@intel.com>
+Subject: RE: [PATCH v8 00/24] Add vfio_device cdev for iommufd support
+Thread-Topic: [PATCH v8 00/24] Add vfio_device cdev for iommufd support
+Thread-Index: AQHZYJA9pBM5UV0gsEGCaT5PZWWhNa8UNuHA
+Date:   Fri, 31 Mar 2023 03:10:48 +0000
+Message-ID: <MW4PR11MB67639B35859D579574F36B2EE88F9@MW4PR11MB6763.namprd11.prod.outlook.com>
+References: <20230327094047.47215-1-yi.l.liu@intel.com>
+In-Reply-To: <20230327094047.47215-1-yi.l.liu@intel.com>
+Accept-Language: zh-CN, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: MW4PR11MB6763:EE_|IA0PR11MB7356:EE_
+x-ms-office365-filtering-correlation-id: 1678fb34-c480-49c4-224e-08db319586f0
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 4h2yPXbzoZuTWZiXCPy0/ZWXIaRyPl51+kLsD/I0MQkT1nbuQX5XT5lBkBYbdAjqfYRpehc0x0TDF+eB90+YpDEa8gfGGO6yJPZ49RQD9bGrnhUqmE8chYsv65oqrztCy4uIFUs8ZrbdoS9af45aPUPrJlxi0SuK3Dz3yy8mRVgzsB1XRi4kopsUcoze/sFmC7/QYWlSdT2uBPP1xHbsitTE1ugdJpyIZUnqMgA7/QzMis9PcN7HVcvzQzVVdkLTY1fpzne5KkfziJK3LGHIub57BpXtgGBiYfJrMYfKOXO2asoGZvY2NRgOPP/Dpn+Q17aFk+4yCgA3qJbeHsYDCmD2yighVCTSuTmdkX9x8lm6EJVjsk9IbFFkFLK+kKz0Ta9K5kCwPxOF/f8ZCMsywRxCO2kC+l+UjHbdx3kywJQeTNOmHkZySL/vu7bD3vN8Xq5Jqh0Ql7jhPORtz7gs524D7JDGUgdnD3OH26uyjcMHCrzsOt5H06YwIOAsi0lOuuPPF8S6xGtehYX36Tv4V25y1OYKYImR8XxteQC11FBzE2kG/KdJShVTBLEiT003ixvRQoAwKwyLBeXcabgID4mlCVKnnjU8bouYOBZZEtY=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW4PR11MB6763.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(376002)(366004)(346002)(136003)(396003)(39860400002)(451199021)(8676002)(9686003)(71200400001)(966005)(186003)(66446008)(66556008)(26005)(478600001)(54906003)(110136005)(316002)(83380400001)(66476007)(86362001)(8936002)(38070700005)(33656002)(55016003)(4326008)(2906002)(82960400001)(6636002)(38100700002)(7416002)(64756008)(7696005)(53546011)(5660300002)(6506007)(66946007)(76116006)(41300700001)(122000001)(52536014);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?wNV0n5Q1FLECgApLNbaW++A4+tXgbc00XGce4F+6lZhm1qXso10YHyeLCVuh?=
+ =?us-ascii?Q?TkVFN16ibdymRT6KHMMh5d7GYQoQuxVUyOz1allFb5hZad/+fTwN+UjsrYVv?=
+ =?us-ascii?Q?1SQEyEKN/CPMeJz8Wg4eRr47AXhKnltwNGcHtNiPBVH2ADImQi+YPz1oWiA+?=
+ =?us-ascii?Q?U9eYxkXKkXI4H7O6eNlRteX3DlyaUqiHpey1sXm4DBFQqer28lpTMwpnLAge?=
+ =?us-ascii?Q?A+37xINi9XjEJSD2AaXX7T6wiIgZxeOxzOe3srPRzqFo/lEtHu/vzeDPjQLF?=
+ =?us-ascii?Q?NyvCZq/t6+kf3qpk/35L2qiIrRHmgPE4n57u8NIarQWu5iJNNwRl7vSHzERO?=
+ =?us-ascii?Q?7WCHR111SIoeGlzpAzf2v/kv/IinhyJUGpv0gHuPWS8xgLkPZxpLbqgua/s0?=
+ =?us-ascii?Q?4TWjU9aoxWxTLfSNJT0dmazlO6JyI5UCi/cgT/FGmLmM3qWSHsSg+MbY7Zmg?=
+ =?us-ascii?Q?4fFenUA57u3dXKo2wmSWbEfKfQKSsU6a3uF3GxFgkDgC2j9o/LTHl5W7NpTz?=
+ =?us-ascii?Q?KQgJE6xM0gMY5DP37qkhxROmTndbBIasp9dhsZkQ79tF80Y+u/gd0PltErpa?=
+ =?us-ascii?Q?9JnPdNoyTgL0GOa0fy1dSl2ojJa8jyBQc/rMIXEwc3DFAECkA8Z+MdpcH4P8?=
+ =?us-ascii?Q?EEcCruNnPB6OHk7jBZQ2ovL1VVM2e+CVcS/fUaczLJGqspOEkQ/HUvaJnqgA?=
+ =?us-ascii?Q?e76w8UJMAtPb2jm4i5Dc5rLkBLTTfOyrB4RxHyH4MDAMeG1f1ptUtq9uyFXq?=
+ =?us-ascii?Q?OhY+iuijLILqzUQChNyz08mlPzbJP/TwzuN369tbEuDKzJb4lL9QESDXuqWh?=
+ =?us-ascii?Q?R4JjurTlvzTHVb2ESUCVO+dIcA4vS0868m4Xo6gJ53ctoxqryqh/4LiykAGK?=
+ =?us-ascii?Q?85v5plaVYK8VnrvLMGy1MFgAgCfhWaSdErLDYfy6qjNhbMcu+RjD2MaCdhvk?=
+ =?us-ascii?Q?HlAIDbr5A86uick1NA2HVFd2qtO+0uL9rkqiTPGBNbYAAX1nHuFu0I/3Av8U?=
+ =?us-ascii?Q?StfpMVmlqwoj7vCOBrB3V3KA3FFHM704+iDe2ZW+Bp7i+KRAJrqx5g1TCPlF?=
+ =?us-ascii?Q?5Ho/qR7sTK47UJ6LBd3Idr+ULAeyD7uuVZXXCEN+kauQvm6AfbhPbZOa899C?=
+ =?us-ascii?Q?/SNztOFQ6/AUvORjCc3JybFaSqh/0GA0KKjFAafD2fycbIF3tH7pW0dE+mXw?=
+ =?us-ascii?Q?tUBp13ed3apX6OuxiD3z6T77/czC1TF20ulpcIGaiTiux1KDPxbbxNYs8tLV?=
+ =?us-ascii?Q?ahU/7XuQpoFA+ULLm0+u6qsfTW4gOYPB8K7x2RNldz4O9xQGPrO/Zk9kgJSc?=
+ =?us-ascii?Q?HmFG0ojvyZW/oiOilaUPpEPfLxR2dPxKRmdHJD/GAsvO8SFj6+A9hV8rIONy?=
+ =?us-ascii?Q?jgIEBnuPXBjkacoZQHOhEn2TFHfRM7B+/LN9rX4uqo/YQn4FvT6pRjdlX0CF?=
+ =?us-ascii?Q?zjlu9mgq23qsV9M42753kd3ZzZEWRMy3s5OvrdmA91W0ePIkj/6Z/hz7yGFm?=
+ =?us-ascii?Q?9DDApek+ARse9JJ8fOCL4LORd/MX1G+xOHPSTHCSUth4MCRDsldBHapXy/xN?=
+ =?us-ascii?Q?/fnKN41ERcxGmm8Z/svIqnTHfzVSq0Wp64XPs7Pp?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-X-Received: by 2002:a5e:de09:0:b0:756:8d49:49f7 with SMTP id
- e9-20020a5ede09000000b007568d4949f7mr10188627iok.3.1680229975298; Thu, 30 Mar
- 2023 19:32:55 -0700 (PDT)
-Date:   Thu, 30 Mar 2023 19:32:55 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000d1971705f82906f1@google.com>
-Subject: [syzbot] [btrfs?] KASAN: slab-use-after-free Read in alloc_workqueue
-From:   syzbot <syzbot+513ff74eed8ed0db2a62@syzkaller.appspotmail.com>
-To:     bp@alien8.de, clm@fb.com, dave.hansen@linux.intel.com,
-        dsterba@suse.com, hpa@zytor.com, josef@toxicpanda.com,
-        kvm@vger.kernel.org, linux-btrfs@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        mingo@redhat.com, pbonzini@redhat.com, seanjc@google.com,
-        syzkaller-bugs@googlegroups.com, tglx@linutronix.de, x86@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=3.1 required=5.0 tests=FROM_LOCAL_HEX,
-        HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,SORTED_RECIPS,
-        SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.6
-X-Spam-Level: ***
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: MW4PR11MB6763.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1678fb34-c480-49c4-224e-08db319586f0
+X-MS-Exchange-CrossTenant-originalarrivaltime: 31 Mar 2023 03:10:48.6768
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: hQ+rln54HJJgkVqXa5OQTHBCZkrpJCT4VD7QhlJfuvioBeW/Sqa4OyzdjIZolG7cLKIYEBjADKdr7tHtr6tnsA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR11MB7356
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-2.5 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello,
+> On 2023/3/27 02:40, Yi Liu wrote:
+> Existing VFIO provides group-centric user APIs for userspace. Userspace o=
+pens
+> the /dev/vfio/$group_id first before getting device fd and hence getting =
+access
+> to device. This is not the desired model for iommufd. Per the conclusion =
+of
+> community discussion[1], iommufd provides device-centric kAPIs and requir=
+es its
+> consumer (like VFIO) to be device-centric user APIs. Such user APIs are u=
+sed to
+> associate device with iommufd and also the I/O address spaces managed by =
+the
+> iommufd.
+>=20
+> This series first introduces a per device file structure to be prepared f=
+or further
+> enhancement and refactors the kvm-vfio code to be prepared for accepting
+> device file from userspace. Afte this, adds a mechanism for blocking devi=
+ce
+> access before iommufd bind. Then refactors the vfio to be able to handle =
+cdev
+> path (e.g. iommufd binding, no-iommufd, [de]attach ioas).
+> This refactor includes making the device_open exclusive between group and
+> cdev path, only allow single device open in cdev path; vfio-iommufd code =
+is also
+> refactored to support cdev. e.g. split the vfio_iommufd_bind() into two s=
+teps.
+> Eventually, adds the cdev support for vfio device and the new ioctls, the=
+n makes
+> group infrastructure optional as it is not needed when vfio device cdev i=
+s
+> compiled.
+>=20
+> This series is based on some preparation works done to vfio emulated devi=
+ces[2]
+> and vfio pci hot reset enhancements[3].
+>=20
+> This series is a prerequisite for iommu nesting for vfio device[4] [5].
+>=20
+> The complete code can be found in below branch, simple tests done to the
+> legacy group path and the cdev path. Draft QEMU branch can be found at[6]
+>=20
+> https://github.com/yiliu1765/iommufd/tree/vfio_device_cdev_v8
+> (config CONFIG_IOMMUFD=3Dy CONFIG_VFIO_DEVICE_CDEV=3Dy)
+>=20
 
-syzbot found the following issue on:
+Tested NIC passthrough on Intel platform with above branch (commit id: 9464=
+af85d280511639f8a3e27b6c2a2c5535fa4c).
+Result looks good hence,=20
+Tested by: Jiang, Yanting <yanting.jiang@intel.com>
 
-HEAD commit:    a6d9e3034536 Add linux-next specific files for 20230330
-git tree:       linux-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=10af5d85c80000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=aceb117f7924508e
-dashboard link: https://syzkaller.appspot.com/bug?extid=513ff74eed8ed0db2a62
-compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
+Thanks,
+Yanting
 
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/ec1f900ea929/disk-a6d9e303.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/fabbf89c0d22/vmlinux-a6d9e303.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/1ed05d6192fa/bzImage-a6d9e303.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+513ff74eed8ed0db2a62@syzkaller.appspotmail.com
-
-==================================================================
-BUG: KASAN: slab-use-after-free in lockdep_register_key+0x396/0x410 kernel/locking/lockdep.c:1231
-Read of size 8 at addr ffff88806fde3360 by task syz-executor.4/14593
-
-CPU: 0 PID: 14593 Comm: syz-executor.4 Not tainted 6.3.0-rc4-next-20230330-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/02/2023
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0xd9/0x150 lib/dump_stack.c:106
- print_address_description.constprop.0+0x2c/0x3c0 mm/kasan/report.c:351
- print_report mm/kasan/report.c:462 [inline]
- kasan_report+0x11c/0x130 mm/kasan/report.c:572
- lockdep_register_key+0x396/0x410 kernel/locking/lockdep.c:1231
- wq_init_lockdep kernel/workqueue.c:3604 [inline]
- alloc_workqueue+0x3f8/0x1110 kernel/workqueue.c:4476
- kvm_mmu_init_tdp_mmu+0x23/0x100 arch/x86/kvm/mmu/tdp_mmu.c:19
- kvm_mmu_init_vm+0x150/0x360 arch/x86/kvm/mmu/mmu.c:6194
- kvm_arch_init_vm+0x6c/0x750 arch/x86/kvm/x86.c:12232
- kvm_create_vm arch/x86/kvm/../../../virt/kvm/kvm_main.c:1196 [inline]
- kvm_dev_ioctl_create_vm arch/x86/kvm/../../../virt/kvm/kvm_main.c:5018 [inline]
- kvm_dev_ioctl+0xa31/0x1bb0 arch/x86/kvm/../../../virt/kvm/kvm_main.c:5060
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:870 [inline]
- __se_sys_ioctl fs/ioctl.c:856 [inline]
- __x64_sys_ioctl+0x197/0x210 fs/ioctl.c:856
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x39/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x63/0xcd
-RIP: 0033:0x7f953d28c0f9
-Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 f1 19 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f953df2f168 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 00007f953d3abf80 RCX: 00007f953d28c0f9
-RDX: 0000000000000000 RSI: 000000000000ae01 RDI: 0000000000000003
-RBP: 00007f953d2e7b39 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007fff39044f3f R14: 00007f953df2f300 R15: 0000000000022000
- </TASK>
-
-Allocated by task 12:
- kasan_save_stack+0x22/0x40 mm/kasan/common.c:45
- kasan_set_track+0x25/0x30 mm/kasan/common.c:52
- ____kasan_kmalloc mm/kasan/common.c:374 [inline]
- ____kasan_kmalloc mm/kasan/common.c:333 [inline]
- __kasan_kmalloc+0xa2/0xb0 mm/kasan/common.c:383
- kasan_kmalloc include/linux/kasan.h:196 [inline]
- __do_kmalloc_node mm/slab_common.c:966 [inline]
- __kmalloc+0x5e/0x190 mm/slab_common.c:979
- kmalloc include/linux/slab.h:563 [inline]
- kzalloc include/linux/slab.h:680 [inline]
- ieee802_11_parse_elems_full+0x106/0x1340 net/mac80211/util.c:1609
- ieee802_11_parse_elems_crc.constprop.0+0x99/0xd0 net/mac80211/ieee80211_i.h:2311
- ieee802_11_parse_elems net/mac80211/ieee80211_i.h:2318 [inline]
- ieee80211_bss_info_update+0x410/0xb50 net/mac80211/scan.c:212
- ieee80211_rx_bss_info net/mac80211/ibss.c:1120 [inline]
- ieee80211_rx_mgmt_probe_beacon net/mac80211/ibss.c:1609 [inline]
- ieee80211_ibss_rx_queued_mgmt+0x18c4/0x2d50 net/mac80211/ibss.c:1638
- ieee80211_iface_process_skb net/mac80211/iface.c:1594 [inline]
- ieee80211_iface_work+0xa4d/0xd70 net/mac80211/iface.c:1648
- process_one_work+0x99a/0x15e0 kernel/workqueue.c:2405
- worker_thread+0x67d/0x10c0 kernel/workqueue.c:2552
- kthread+0x33e/0x440 kernel/kthread.c:379
- ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:308
-
-Freed by task 12:
- kasan_save_stack+0x22/0x40 mm/kasan/common.c:45
- kasan_set_track+0x25/0x30 mm/kasan/common.c:52
- kasan_save_free_info+0x2e/0x40 mm/kasan/generic.c:521
- ____kasan_slab_free mm/kasan/common.c:236 [inline]
- ____kasan_slab_free+0x160/0x1c0 mm/kasan/common.c:200
- kasan_slab_free include/linux/kasan.h:162 [inline]
- slab_free_hook mm/slub.c:1781 [inline]
- slab_free_freelist_hook+0x8b/0x1c0 mm/slub.c:1807
- slab_free mm/slub.c:3787 [inline]
- __kmem_cache_free+0xaf/0x2d0 mm/slub.c:3800
- ieee80211_bss_info_update+0x4a2/0xb50 net/mac80211/scan.c:223
- ieee80211_rx_bss_info net/mac80211/ibss.c:1120 [inline]
- ieee80211_rx_mgmt_probe_beacon net/mac80211/ibss.c:1609 [inline]
- ieee80211_ibss_rx_queued_mgmt+0x18c4/0x2d50 net/mac80211/ibss.c:1638
- ieee80211_iface_process_skb net/mac80211/iface.c:1594 [inline]
- ieee80211_iface_work+0xa4d/0xd70 net/mac80211/iface.c:1648
- process_one_work+0x99a/0x15e0 kernel/workqueue.c:2405
- worker_thread+0x67d/0x10c0 kernel/workqueue.c:2552
- kthread+0x33e/0x440 kernel/kthread.c:379
- ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:308
-
-Last potentially related work creation:
- kasan_save_stack+0x22/0x40 mm/kasan/common.c:45
- __kasan_record_aux_stack+0xbc/0xd0 mm/kasan/generic.c:491
- kvfree_call_rcu+0x70/0xad0 kernel/rcu/tree.c:3331
- neigh_destroy+0x433/0x660 net/core/neighbour.c:910
- neigh_release include/net/neighbour.h:447 [inline]
- neigh_cleanup_and_release net/core/neighbour.c:103 [inline]
- neigh_periodic_work+0x726/0xb80 net/core/neighbour.c:994
- process_one_work+0x99a/0x15e0 kernel/workqueue.c:2405
- worker_thread+0x67d/0x10c0 kernel/workqueue.c:2552
- kthread+0x33e/0x440 kernel/kthread.c:379
- ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:308
-
-Second to last potentially related work creation:
- kasan_save_stack+0x22/0x40 mm/kasan/common.c:45
- __kasan_record_aux_stack+0xbc/0xd0 mm/kasan/generic.c:491
- kvfree_call_rcu+0x70/0xad0 kernel/rcu/tree.c:3331
- put_css_set_locked kernel/cgroup/cgroup.c:995 [inline]
- put_css_set_locked+0xad9/0x1080 kernel/cgroup/cgroup.c:961
- put_css_set kernel/cgroup/cgroup-internal.h:209 [inline]
- put_css_set kernel/cgroup/cgroup-internal.h:196 [inline]
- cgroup_free+0x87/0x1d0 kernel/cgroup/cgroup.c:6717
- __put_task_struct+0x10e/0x3d0 kernel/fork.c:976
- put_task_struct include/linux/sched/task.h:126 [inline]
- delayed_put_task_struct+0x1f5/0x280 kernel/exit.c:225
- rcu_do_batch kernel/rcu/tree.c:2123 [inline]
- rcu_core+0x801/0x1b80 kernel/rcu/tree.c:2387
- __do_softirq+0x1d4/0x905 kernel/softirq.c:571
-
-The buggy address belongs to the object at ffff88806fde3000
- which belongs to the cache kmalloc-1k of size 1024
-The buggy address is located 864 bytes inside of
- freed 1024-byte region [ffff88806fde3000, ffff88806fde3400)
-
-The buggy address belongs to the physical page:
-page:ffffea0001bf7800 refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x6fde0
-head:ffffea0001bf7800 order:3 entire_mapcount:0 nr_pages_mapped:0 pincount:0
-flags: 0xfff00000010200(slab|head|node=0|zone=1|lastcpupid=0x7ff)
-page_type: 0xffffffff()
-raw: 00fff00000010200 ffff888012441dc0 ffffea0002518c00 dead000000000002
-raw: 0000000000000000 0000000000100010 00000001ffffffff 0000000000000000
-page dumped because: kasan: bad access detected
-page_owner tracks the page as allocated
-page last allocated via order 3, migratetype Unmovable, gfp_mask 0x52820(GFP_ATOMIC|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP), pid 5186, tgid 5186 (kworker/1:4), ts 283030316376, free_ts 281186381095
- prep_new_page mm/page_alloc.c:1729 [inline]
- get_page_from_freelist+0xf75/0x2aa0 mm/page_alloc.c:3493
- __alloc_pages+0x1cb/0x4a0 mm/page_alloc.c:4759
- alloc_pages+0x1aa/0x270 mm/mempolicy.c:2283
- alloc_slab_page mm/slub.c:1851 [inline]
- allocate_slab+0x28e/0x380 mm/slub.c:1998
- new_slab mm/slub.c:2051 [inline]
- ___slab_alloc+0xa91/0x1400 mm/slub.c:3193
- __slab_alloc.constprop.0+0x56/0xa0 mm/slub.c:3292
- __slab_alloc_node mm/slub.c:3345 [inline]
- slab_alloc_node mm/slub.c:3442 [inline]
- __kmem_cache_alloc_node+0x136/0x320 mm/slub.c:3491
- __do_kmalloc_node mm/slab_common.c:965 [inline]
- __kmalloc+0x4e/0x190 mm/slab_common.c:979
- kmalloc include/linux/slab.h:563 [inline]
- kzalloc include/linux/slab.h:680 [inline]
- neigh_alloc net/core/neighbour.c:486 [inline]
- ___neigh_create+0x156f/0x2a40 net/core/neighbour.c:640
- ip6_finish_output2+0xfef/0x1570 net/ipv6/ip6_output.c:125
- __ip6_finish_output net/ipv6/ip6_output.c:195 [inline]
- ip6_finish_output+0x69a/0x1170 net/ipv6/ip6_output.c:206
- NF_HOOK_COND include/linux/netfilter.h:291 [inline]
- ip6_output+0x1f1/0x540 net/ipv6/ip6_output.c:227
- dst_output include/net/dst.h:458 [inline]
- NF_HOOK include/linux/netfilter.h:302 [inline]
- ndisc_send_skb+0xa63/0x1850 net/ipv6/ndisc.c:508
- ndisc_send_rs+0x132/0x6f0 net/ipv6/ndisc.c:718
- addrconf_dad_completed+0x37a/0xe00 net/ipv6/addrconf.c:4254
- addrconf_dad_work+0x75d/0x1390 net/ipv6/addrconf.c:4162
-page last free stack trace:
- reset_page_owner include/linux/page_owner.h:24 [inline]
- free_pages_prepare mm/page_alloc.c:1302 [inline]
- free_unref_page_prepare+0x4d8/0xb80 mm/page_alloc.c:2555
- free_unref_page+0x33/0x370 mm/page_alloc.c:2650
- qlink_free mm/kasan/quarantine.c:166 [inline]
- qlist_free_all+0x6a/0x170 mm/kasan/quarantine.c:185
- kasan_quarantine_reduce+0x195/0x220 mm/kasan/quarantine.c:292
- __kasan_slab_alloc+0x63/0x90 mm/kasan/common.c:305
- kasan_slab_alloc include/linux/kasan.h:186 [inline]
- slab_post_alloc_hook mm/slab.h:711 [inline]
- slab_alloc_node mm/slub.c:3452 [inline]
- kmem_cache_alloc_node+0x185/0x3e0 mm/slub.c:3497
- __alloc_skb+0x288/0x330 net/core/skbuff.c:594
- alloc_skb include/linux/skbuff.h:1269 [inline]
- nlmsg_new include/net/netlink.h:1003 [inline]
- netlink_ack+0x357/0x1360 net/netlink/af_netlink.c:2509
- netlink_rcv_skb+0x34f/0x440 net/netlink/af_netlink.c:2578
- netlink_unicast_kernel net/netlink/af_netlink.c:1339 [inline]
- netlink_unicast+0x547/0x7f0 net/netlink/af_netlink.c:1365
- netlink_sendmsg+0x925/0xe30 net/netlink/af_netlink.c:1942
- sock_sendmsg_nosec net/socket.c:724 [inline]
- sock_sendmsg+0xde/0x190 net/socket.c:747
- __sys_sendto+0x23a/0x340 net/socket.c:2142
- __do_sys_sendto net/socket.c:2154 [inline]
- __se_sys_sendto net/socket.c:2150 [inline]
- __x64_sys_sendto+0xe1/0x1b0 net/socket.c:2150
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x39/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x63/0xcd
-
-Memory state around the buggy address:
- ffff88806fde3200: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
- ffff88806fde3280: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
->ffff88806fde3300: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-                                                       ^
- ffff88806fde3380: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
- ffff88806fde3400: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
-==================================================================
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
