@@ -2,63 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 20E266D1BDC
-	for <lists+kvm@lfdr.de>; Fri, 31 Mar 2023 11:19:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AF5146D1BDD
+	for <lists+kvm@lfdr.de>; Fri, 31 Mar 2023 11:19:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231664AbjCaJT1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 31 Mar 2023 05:19:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46060 "EHLO
+        id S231931AbjCaJTa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 31 Mar 2023 05:19:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47616 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231694AbjCaJTT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S231707AbjCaJTT (ORCPT <rfc822;kvm@vger.kernel.org>);
         Fri, 31 Mar 2023 05:19:19 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BB4C1CBAB
-        for <kvm@vger.kernel.org>; Fri, 31 Mar 2023 02:18:04 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F83C10F6
+        for <kvm@vger.kernel.org>; Fri, 31 Mar 2023 02:18:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1680254283;
+        s=mimecast20190719; t=1680254317;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=yF9v5IIOGw5V44anpb+5Mxccda/7bq4u5RLsf+2F9Rw=;
-        b=U1pGzEXC6ZgYteuVC35V9deabql+ulAQmviWiPvrNESAdqYN0kESXqdNPFyR+/vTLf0Sem
-        7o/KndFIVxMYF/C8FNhhc1Prono5So8iBF7y1DMGoD351nwce8NOo3W6jboP67YkPHgRwS
-        SaFc6MLAM9HS1eP1JUmtEuZBGtLhbVI=
-Received: from mail-oa1-f69.google.com (mail-oa1-f69.google.com
- [209.85.160.69]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=NjF7kg5QmZ1/qJ69Al0S1LwU0awEPb7/otJ5sPvHIVM=;
+        b=Yl7wUrumcW14cnJrDdhoMa7ritqV9DYboJ3f9wIjugD37OaRW1UydcNiLIHJC7owNxV0pu
+        H+MhA/O+2qMZ7MSmS/G4AyxfYvjQ+pnZ4jUxY93lDQFEoBHg1wPd9OYvcPqfFQpx5Yk7Kw
+        zGfGREzk18XvVzBHAv+sh5A9itPJWeA=
+Received: from mail-oo1-f72.google.com (mail-oo1-f72.google.com
+ [209.85.161.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-215-pxtvs_fZMFuo5IqX0VKGPQ-1; Fri, 31 Mar 2023 05:17:59 -0400
-X-MC-Unique: pxtvs_fZMFuo5IqX0VKGPQ-1
-Received: by mail-oa1-f69.google.com with SMTP id 586e51a60fabf-1802c0ae9bbso1507298fac.5
-        for <kvm@vger.kernel.org>; Fri, 31 Mar 2023 02:17:59 -0700 (PDT)
+ us-mta-197-HDcgyRdgOa2-a6hkca9CQA-1; Fri, 31 Mar 2023 05:18:36 -0400
+X-MC-Unique: HDcgyRdgOa2-a6hkca9CQA-1
+Received: by mail-oo1-f72.google.com with SMTP id f74-20020a4a584d000000b0053b693ef13dso5922454oob.16
+        for <kvm@vger.kernel.org>; Fri, 31 Mar 2023 02:18:36 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680254279; x=1682846279;
+        d=1e100.net; s=20210112; t=1680254315; x=1682846315;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=yF9v5IIOGw5V44anpb+5Mxccda/7bq4u5RLsf+2F9Rw=;
-        b=XUUmlFK9v3m8zKn68sdxQ5zcYrGJlflv4dCAILVRck+OG3hSh9B2fFTvikfNcVV4/i
-         tvIWZd6xUB2gbMc9BiGGGeHYRJ9RildnKvTGAlIvNzKGhqMnMRGN24ONUSsNKLfUOjSx
-         ww1jwdmQy9ATBfui4YVC8ywvXsI5bLYyyr6Cmep/pRCWRDI5ZBXMAEYWpgU/QJQWewxp
-         QeJR8Y0mQ/zNuILx/OuJznwIq9hFZRnzGMdyIBuWvPlkCv5vH6Bxq2GI/iCCh3wyeVgZ
-         r4pIK/hoOitUQN8gtd5yXWJVZUX1eLknB1TXqEdlU4nec0bLwEWMfaexSrq3t/F0AyoV
-         uZkg==
-X-Gm-Message-State: AAQBX9emBIVce/VCgXjOPlvYUxPFdXpim2po8lFu0MYKRGZYj0ZBWuJW
-        NGmsfBXKG5og7f01bs04uv+S8vPFZNpJ2cSiHX7TaaYafrG3zVJ7svEoLieVOMbJG1vPYeMsgjF
-        I4mnhtmJbj8FKFhmOPcD1T3X8JHM1
-X-Received: by 2002:a05:6870:8310:b0:177:c2fb:8cec with SMTP id p16-20020a056870831000b00177c2fb8cecmr10256250oae.9.1680254279145;
-        Fri, 31 Mar 2023 02:17:59 -0700 (PDT)
-X-Google-Smtp-Source: AK7set+E2W7ure/YSp1DuLxL/pvVMjd7YOtJGAtSadYaT4ARjDtzxSTPtCoDCPBuSTIJIZfHW6UC773ZQzF41GhWaJ8=
+        bh=NjF7kg5QmZ1/qJ69Al0S1LwU0awEPb7/otJ5sPvHIVM=;
+        b=K1OhUhxsDN+a1aFeYevGV5dbM4EKz2aq80NEL+SOUoyt9WMICa3QW49XPdcc4h6cP/
+         ETJ84pTMfvSoRyahqKSpWZ5RYINRzlEbC78ZuvqyQNWzI2qqGWZ5cORyiCxX87g4Hp/S
+         JYmH+OBX3LKbi6MCntY8B5tdjLT2J/0Pv31IIKRjeXMenQD0pWJdOdqvG/BdubVnGScd
+         QSD7cx3Mo0EPSHUSco2uqv6rhhWN+JmVciRaOBFMra4Y1MquRwZUrrz/bzcL3oGFZqEH
+         yhwxs79Jyh9ztk7r/o1bqV2ck3WYfeZMG79X1MLnQTG8UsUCUSLZK01bNM52Vv5/Ue15
+         jHtw==
+X-Gm-Message-State: AAQBX9f3beiexvMgh+aeMRPPGi3Icj18WRYhm/PJCXbzfTe50Uy6hLuc
+        pMKqdnFDNpqLoIoa/UiGo2KqgeOYonisv4BAyByfvNvUktecrx1r1vHat91wL6IFEJdaEcOlaM8
+        zgS62xO5SbRCpqvHs6PeFMd5n9dS3
+X-Received: by 2002:a05:6870:8310:b0:177:c2fb:8cec with SMTP id p16-20020a056870831000b00177c2fb8cecmr10256793oae.9.1680254315579;
+        Fri, 31 Mar 2023 02:18:35 -0700 (PDT)
+X-Google-Smtp-Source: AK7set8h/g9cwwlFDEN3CpISOrlwRlyD8WoPl87WsZC7TGG3Rc64PVQuD9PxGq42lxRD587X8v/3rvk9TjWgnzfbZZE=
 X-Received: by 2002:a05:6870:8310:b0:177:c2fb:8cec with SMTP id
- p16-20020a056870831000b00177c2fb8cecmr10256243oae.9.1680254278939; Fri, 31
- Mar 2023 02:17:58 -0700 (PDT)
+ p16-20020a056870831000b00177c2fb8cecmr10256789oae.9.1680254315408; Fri, 31
+ Mar 2023 02:18:35 -0700 (PDT)
 MIME-Version: 1.0
-References: <20230331-vhost-fixes-v1-0-1f046e735b9e@kernel.org> <20230331-vhost-fixes-v1-1-1f046e735b9e@kernel.org>
-In-Reply-To: <20230331-vhost-fixes-v1-1-1f046e735b9e@kernel.org>
+References: <20230331-vhost-fixes-v1-0-1f046e735b9e@kernel.org> <20230331-vhost-fixes-v1-3-1f046e735b9e@kernel.org>
+In-Reply-To: <20230331-vhost-fixes-v1-3-1f046e735b9e@kernel.org>
 From:   Jason Wang <jasowang@redhat.com>
-Date:   Fri, 31 Mar 2023 17:17:47 +0800
-Message-ID: <CACGkMEtObQFH=oQtEmeBdRS504roSTryx9QR5Xww5Lyob6W5Yg@mail.gmail.com>
-Subject: Re: [PATCH vhost 1/3] vdpa: address kdoc warnings
+Date:   Fri, 31 Mar 2023 17:18:24 +0800
+Message-ID: <CACGkMEu-0=-Kfw28BfxTWSWZ2Dwov_0NJMOxbh4n-=e2RU2x7Q@mail.gmail.com>
+Subject: Re: [PATCH vhost 3/3] MAINTAINERS: add vringh.h to Virtio Core and
+ Net Drivers
 To:     Simon Horman <horms@kernel.org>
 Cc:     "Michael S. Tsirkin" <mst@redhat.com>, Eli Cohen <elic@nvidia.com>,
         Si-Wei Liu <si-wei.liu@oracle.com>,
@@ -77,39 +78,12 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Mar 31, 2023 at 4:58=E2=80=AFPM Simon Horman <horms@kernel.org> wro=
+On Fri, Mar 31, 2023 at 4:59=E2=80=AFPM Simon Horman <horms@kernel.org> wro=
 te:
 >
-> This patch addresses the following minor kdoc problems.
->
-> * Incorrect spelling of 'callback' and 'notification'
-> * Unrecognised kdoc format for 'struct vdpa_map_file'
-> * Missing documentation of 'get_vendor_vq_stats' member of
->   'struct vdpa_config_ops'
-> * Missing documentation of 'max_supported_vqs' and 'supported_features'
->   members of 'struct vdpa_mgmt_dev'
->
-> Most of these problems were flagged by:
->
->  $ ./scripts/kernel-doc -Werror -none  include/linux/vdpa.h
->  include/linux/vdpa.h:20: warning: expecting prototype for struct vdpa_ca=
-lllback. Prototype was for struct vdpa_callback instead
->  include/linux/vdpa.h:117: warning: This comment starts with '/**', but i=
-sn't a kernel-doc comment. Refer Documentation/doc-guide/kernel-doc.rst
->   * Corresponding file area for device memory mapping
->  include/linux/vdpa.h:357: warning: Function parameter or member 'get_ven=
-dor_vq_stats' not described in 'vdpa_config_ops'
->  include/linux/vdpa.h:518: warning: Function parameter or member 'support=
-ed_features' not described in 'vdpa_mgmt_dev'
->  include/linux/vdpa.h:518: warning: Function parameter or member 'max_sup=
-ported_vqs' not described in 'vdpa_mgmt_dev'
->
-> The misspelling of 'notification' was flagged by:
->  $ ./scripts/checkpatch.pl --codespell --showfile --strict -f include/lin=
-ux/vdpa.h
->  include/linux/vdpa.h:171: CHECK: 'notifcation' may be misspelled - perha=
-ps 'notification'?
->  ...
+> vringh.h doesn't seem to belong to any section in MAINTAINERS.
+> Add it to Virtio Core and Net Drivers, which seems to be the most
+> appropriate section to me.
 >
 > Signed-off-by: Simon Horman <horms@kernel.org>
 
@@ -118,64 +92,21 @@ Acked-by: Jason Wang <jasowang@redhat.com>
 Thanks
 
 > ---
->  include/linux/vdpa.h | 14 +++++++++++---
->  1 file changed, 11 insertions(+), 3 deletions(-)
+>  MAINTAINERS | 1 +
+>  1 file changed, 1 insertion(+)
 >
-> diff --git a/include/linux/vdpa.h b/include/linux/vdpa.h
-> index 43f59ef10cc9..010321945997 100644
-> --- a/include/linux/vdpa.h
-> +++ b/include/linux/vdpa.h
-> @@ -10,7 +10,7 @@
->  #include <linux/if_ether.h>
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 91201c2b8190..7cf548302c56 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -22095,6 +22095,7 @@ F:      drivers/vdpa/
+>  F:     drivers/virtio/
+>  F:     include/linux/vdpa.h
+>  F:     include/linux/virtio*.h
+> +F:     include/linux/vringh.h
+>  F:     include/uapi/linux/virtio_*.h
+>  F:     tools/virtio/
 >
->  /**
-> - * struct vdpa_calllback - vDPA callback definition.
-> + * struct vdpa_callback - vDPA callback definition.
->   * @callback: interrupt callback function
->   * @private: the data passed to the callback function
->   */
-> @@ -114,7 +114,7 @@ struct vdpa_dev_set_config {
->  };
->
->  /**
-> - * Corresponding file area for device memory mapping
-> + * struct vdpa_map_file - file area for device memory mapping
->   * @file: vma->vm_file for the mapping
->   * @offset: mapping offset in the vm_file
->   */
-> @@ -165,10 +165,16 @@ struct vdpa_map_file {
->   *                             @vdev: vdpa device
->   *                             @idx: virtqueue index
->   *                             @state: pointer to returned state (last_a=
-vail_idx)
-> + * @get_vendor_vq_stats:       Get the vendor statistics of a device.
-> + *                             @vdev: vdpa device
-> + *                             @idx: virtqueue index
-> + *                             @msg: socket buffer holding stats message
-> + *                             @extack: extack for reporting error messa=
-ges
-> + *                             Returns integer: success (0) or error (< =
-0)
->   * @get_vq_notification:       Get the notification area for a virtqueue=
- (optional)
->   *                             @vdev: vdpa device
->   *                             @idx: virtqueue index
-> - *                             Returns the notifcation area
-> + *                             Returns the notification area
->   * @get_vq_irq:                        Get the irq number of a virtqueue=
- (optional,
->   *                             but must implemented if require vq irq of=
-floading)
->   *                             @vdev: vdpa device
-> @@ -506,6 +512,8 @@ struct vdpa_mgmtdev_ops {
->   * @config_attr_mask: bit mask of attributes of type enum vdpa_attr that
->   *                   management device support during dev_add callback
->   * @list: list entry
-> + * @supported_features: features supported by device
-> + * @max_supported_vqs: maximum number of virtqueues supported by device
->   */
->  struct vdpa_mgmt_dev {
->         struct device *device;
 >
 > --
 > 2.30.2
