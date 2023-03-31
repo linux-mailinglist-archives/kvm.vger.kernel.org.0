@@ -2,74 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4861E6D193E
-	for <lists+kvm@lfdr.de>; Fri, 31 Mar 2023 10:03:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 085316D1940
+	for <lists+kvm@lfdr.de>; Fri, 31 Mar 2023 10:03:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231318AbjCaIDD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 31 Mar 2023 04:03:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42006 "EHLO
+        id S231322AbjCaIDg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 31 Mar 2023 04:03:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43724 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230368AbjCaIC7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 31 Mar 2023 04:02:59 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96683D322
-        for <kvm@vger.kernel.org>; Fri, 31 Mar 2023 01:02:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1680249733;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=Z1bhGoNJZMSwcpQc6yTvdcUKf3R+huOZ4zfMlXF6R1k=;
-        b=d8AwJGOUik9kjaeOIUlbAPgQkqOn66lhqtSuu/cHA6qjsGy6s9lbAlNbApXmcqHos0Q+t9
-        TOvn3IRr1BsYvoRUD/yeB4JZ2kvP+6B+js6oDYDT2Qg2wdAm8g6Ij0feLuRdxYRsRMVgFd
-        vZbD3gJ1kRcKssEV196Z/lzBCUkHgKQ=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-177-2SjJlWAXPjSS5rqs_vW49A-1; Fri, 31 Mar 2023 04:02:12 -0400
-X-MC-Unique: 2SjJlWAXPjSS5rqs_vW49A-1
-Received: by mail-ed1-f70.google.com with SMTP id k14-20020a508ace000000b005024a8cef5cso19619742edk.22
-        for <kvm@vger.kernel.org>; Fri, 31 Mar 2023 01:02:12 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680249731;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Z1bhGoNJZMSwcpQc6yTvdcUKf3R+huOZ4zfMlXF6R1k=;
-        b=4u2Ymf4Ck5tM8+UGICkxNW5j4EJXhBNUK6956XIIx9L4+cyZpP0w3Vg5pMrCGrJgw1
-         VhlT1znv5IVWpvS98KVixNQxk5hKRa8uCoFdExNtqKRrKQHvoM3laybZL3u7quqeqPJf
-         SsX1BA9583JkAnELeDlHodGCi9Yx2maNW+w/pqwNqrtOjuRKqOpJfV7qWjYdCTxnVMFm
-         j8jBjJdQukOBmIMRgEsrrg/2h8HhTeW0T1XqqOXMO/yeHE9bZjoGFY6MDlBc4vNehVN7
-         Ffk36jdDv32vPs+6pK58N+l3QpAkV8VJ7MFYCb5sBauCsq+Ny2KNnyTmyr3S2yQBNLGJ
-         cGuA==
-X-Gm-Message-State: AAQBX9c42nxqufz330Ys7i2lvdFC7m61oPw4prtaMFuNizPMwiWFosJD
-        AuB83nMjDd1Pkup13XPJlFdbMSQOB4qScSeEMAKYnitjUEq/TjjUlpfsbwamfj3NTHoEbslm+1f
-        La/lJYR7gI3skz3k8P9sx
-X-Received: by 2002:a17:906:3a83:b0:932:9502:4fd1 with SMTP id y3-20020a1709063a8300b0093295024fd1mr25804893ejd.43.1680249730763;
-        Fri, 31 Mar 2023 01:02:10 -0700 (PDT)
-X-Google-Smtp-Source: AKy350YmxPDA5UW4cP8XQymOxzi1zIV1vQp/Pm9MW2epeKgfsHTsDIGjBuy3IHnIuIOwTawke5i8Zg==
-X-Received: by 2002:a17:906:3a83:b0:932:9502:4fd1 with SMTP id y3-20020a1709063a8300b0093295024fd1mr25804873ejd.43.1680249730456;
-        Fri, 31 Mar 2023 01:02:10 -0700 (PDT)
-Received: from step1.home (host-82-57-51-130.retail.telecomitalia.it. [82.57.51.130])
-        by smtp.gmail.com with ESMTPSA id p6-20020a170906498600b009321cd80fdfsm689029eju.158.2023.03.31.01.02.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 31 Mar 2023 01:02:09 -0700 (PDT)
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     virtualization@lists.linux-foundation.org
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>, kvm@vger.kernel.org,
-        Jason Wang <jasowang@redhat.com>, linux-kernel@vger.kernel.org,
-        netdev@vger.kernel.org, Stefano Garzarella <sgarzare@redhat.com>,
-        Simon Horman <simon.horman@corigine.com>
-Subject: [PATCH] vringh: fix typos in the vringh_init_* documentation
-Date:   Fri, 31 Mar 2023 10:02:08 +0200
-Message-Id: <20230331080208.17002-1-sgarzare@redhat.com>
-X-Mailer: git-send-email 2.39.2
+        with ESMTP id S231396AbjCaIDc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 31 Mar 2023 04:03:32 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 329D210273
+        for <kvm@vger.kernel.org>; Fri, 31 Mar 2023 01:03:24 -0700 (PDT)
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 32V6eMjo001798
+        for <kvm@vger.kernel.org>; Fri, 31 Mar 2023 08:03:23 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : in-reply-to : references : date : message-id : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=S9ufKjLfJku3ZJr1b5oe6VKo8F2Gx07dq16R1z+lts4=;
+ b=argE5FHenEg2M7I+DJbFYJCLzaSploeQDnX6VnSEL1JhfShWGYoUidpBk/4diFxc8fGq
+ ht02Ia51/40lW7Yb4FzDZKON4FwzmEYY29JNJGivh68Zk5DAF5aIZRDsH0zEoZdlSAJL
+ 9oXxdR8c2pKqWXkGHZLjGm4Xj+feO1AuKskq2uJyyfY5U1BzWAduTp6IBReQ3T4gugpp
+ zU9y9/dnSVXjnd9A29xWnRvYMzRGxlxc0XzZzTCdf0yfoRQ7gvu4t5A2/kEX1+NpVX4k
+ yj2o7cLH+ZXF/fi+2/ZvM99rJvys3HPMGGLsayzduARxbJ2ltcWe82hP71XMVuLV0G/R uw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pnssajhmc-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Fri, 31 Mar 2023 08:03:23 +0000
+Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 32V7IRc4014072
+        for <kvm@vger.kernel.org>; Fri, 31 Mar 2023 08:03:23 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pnssajhfc-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 31 Mar 2023 08:03:22 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 32UM4LS9019418;
+        Fri, 31 Mar 2023 08:03:14 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+        by ppma03ams.nl.ibm.com (PPS) with ESMTPS id 3phrk6pk4q-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 31 Mar 2023 08:03:14 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+        by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 32V83AHv23396858
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 31 Mar 2023 08:03:10 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id AF60820040;
+        Fri, 31 Mar 2023 08:03:10 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 263D920043;
+        Fri, 31 Mar 2023 08:03:10 +0000 (GMT)
+Received: from li-1de7cd4c-3205-11b2-a85c-d27f97db1fe1.ibm.com (unknown [9.171.68.115])
+        by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+        Fri, 31 Mar 2023 08:03:10 +0000 (GMT)
+From:   "Marc Hartmayer" <mhartmay@linux.ibm.com>
+To:     Nico Boehr <nrb@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
+        Thomas Huth <thuth@redhat.com>
+Subject: Re: [kvm-unit-tests PATCH v3 6/7] s390x: define a macro for the
+ stack frame size
+In-Reply-To: <168024782639.521366.8153497247119888695@t14-nrb>
+References: <20230307091051.13945-1-mhartmay@linux.ibm.com>
+ <20230307091051.13945-7-mhartmay@linux.ibm.com>
+ <168024782639.521366.8153497247119888695@t14-nrb>
+Date:   Fri, 31 Mar 2023 10:03:08 +0200
+Message-ID: <87h6u1ny9v.fsf@li-1de7cd4c-3205-11b2-a85c-d27f97db1fe1.ibm.com>
 MIME-Version: 1.0
-Content-type: text/plain
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: C15gpyCCGAZByH5-2xQY9tN7EcdIgAH6
+X-Proofpoint-GUID: Nq3Q3RnFJK-uRNf8OSw8uLnHb-RHpa0z
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
+ definitions=2023-03-31_04,2023-03-30_04,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 bulkscore=0
+ spamscore=0 priorityscore=1501 mlxscore=0 lowpriorityscore=0
+ mlxlogscore=999 clxscore=1011 phishscore=0 adultscore=0 suspectscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2303200000 definitions=main-2303310061
+X-Spam-Status: No, score=-0.1 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
+        DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -77,57 +95,49 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Replace `userpace` with `userspace`.
+Nico Boehr <nrb@linux.ibm.com> writes:
 
-Cc: Simon Horman <simon.horman@corigine.com>
-Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
----
- drivers/vhost/vringh.c | 18 +++++++++---------
- 1 file changed, 9 insertions(+), 9 deletions(-)
+> Hi Marc, Nina,
+>
+> Quoting Marc Hartmayer (2023-03-07 10:10:50)
+>> Define and use a macro for the stack frame size. While at it, fix
+>> whitespace in the `gs_handler_asm` block.
+>>=20
+>> Signed-off-by: Marc Hartmayer <mhartmay@linux.ibm.com>
+>> Co-developed-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+>
+> this commit breaks cross-compilation on x86 for me.
+>
+> Steps to reproduce:
+>
+> $ mkdir build
+> $ cd build
+> $ ../configure --arch=3Ds390x --cross-prefix=3Ds390x-linux-gnu-
+> $ make -j16
+>
+> Error is:
+> In file included from /builds/Nico-Boehr/kvm-unit-tests/lib/s390x/interru=
+pt.c:12:
+> /builds/Nico-Boehr/kvm-unit-tests/lib/s390x/asm/asm-offsets.h:8:10: fatal=
+ error: generated/asm-offsets.h: No such file or directory
+>     8 | #include <generated/asm-offsets.h>
+>       |          ^~~~~~~~~~~~~~~~~~~~~~~~~
+> compilation terminated.
+> make: *** [<builtin>: lib/s390x/interrupt.o] Error 1
+> make: *** Waiting for unfinished jobs....
+>
+> Can you take care of this? It prevents me from sending the next pull
+> request.
 
-diff --git a/drivers/vhost/vringh.c b/drivers/vhost/vringh.c
-index a1e27da54481..694462ba3242 100644
---- a/drivers/vhost/vringh.c
-+++ b/drivers/vhost/vringh.c
-@@ -636,9 +636,9 @@ static inline int xfer_to_user(const struct vringh *vrh,
-  * @features: the feature bits for this ring.
-  * @num: the number of elements.
-  * @weak_barriers: true if we only need memory barriers, not I/O.
-- * @desc: the userpace descriptor pointer.
-- * @avail: the userpace avail pointer.
-- * @used: the userpace used pointer.
-+ * @desc: the userspace descriptor pointer.
-+ * @avail: the userspace avail pointer.
-+ * @used: the userspace used pointer.
-  *
-  * Returns an error if num is invalid: you should check pointers
-  * yourself!
-@@ -911,9 +911,9 @@ static inline int kern_xfer(const struct vringh *vrh, void *dst,
-  * @features: the feature bits for this ring.
-  * @num: the number of elements.
-  * @weak_barriers: true if we only need memory barriers, not I/O.
-- * @desc: the userpace descriptor pointer.
-- * @avail: the userpace avail pointer.
-- * @used: the userpace used pointer.
-+ * @desc: the userspace descriptor pointer.
-+ * @avail: the userspace avail pointer.
-+ * @used: the userspace used pointer.
-  *
-  * Returns an error if num is invalid.
-  */
-@@ -1306,9 +1306,9 @@ static inline int putused_iotlb(const struct vringh *vrh,
-  * @features: the feature bits for this ring.
-  * @num: the number of elements.
-  * @weak_barriers: true if we only need memory barriers, not I/O.
-- * @desc: the userpace descriptor pointer.
-- * @avail: the userpace avail pointer.
-- * @used: the userpace used pointer.
-+ * @desc: the userspace descriptor pointer.
-+ * @avail: the userspace avail pointer.
-+ * @used: the userspace used pointer.
-  *
-  * Returns an error if num is invalid.
-  */
--- 
-2.39.2
+Thanks for reporting this. Commit 6ef5785d30e8 ("s390x/Makefile:
+refactor CPPFLAGS") broke it. I will be sending a fix for this soon.
 
+--=20
+Kind regards / Beste Gr=C3=BC=C3=9Fe
+   Marc Hartmayer
+
+IBM Deutschland Research & Development GmbH
+Vorsitzender des Aufsichtsrats: Gregor Pillen=20
+Gesch=C3=A4ftsf=C3=BChrung: David Faller
+Sitz der Gesellschaft: B=C3=B6blingen
+Registergericht: Amtsgericht Stuttgart, HRB 243294
