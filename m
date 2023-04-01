@@ -2,50 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B93FE6D34D5
-	for <lists+kvm@lfdr.de>; Sun,  2 Apr 2023 00:20:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 25B346D34D7
+	for <lists+kvm@lfdr.de>; Sun,  2 Apr 2023 00:21:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229529AbjDAWUr convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Sat, 1 Apr 2023 18:20:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45998 "EHLO
+        id S229729AbjDAWVY convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Sat, 1 Apr 2023 18:21:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46312 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229448AbjDAWUq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 1 Apr 2023 18:20:46 -0400
+        with ESMTP id S229448AbjDAWVX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 1 Apr 2023 18:21:23 -0400
 Received: from gloria.sntech.de (gloria.sntech.de [185.11.138.130])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CFFD51A963
-        for <kvm@vger.kernel.org>; Sat,  1 Apr 2023 15:20:43 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A03DE12845
+        for <kvm@vger.kernel.org>; Sat,  1 Apr 2023 15:21:20 -0700 (PDT)
 Received: from ip4d1634d3.dynamic.kabel-deutschland.de ([77.22.52.211] helo=diego.localnet)
         by gloria.sntech.de with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94.2)
         (envelope-from <heiko@sntech.de>)
-        id 1pijaL-0004qG-20; Sun, 02 Apr 2023 00:20:33 +0200
+        id 1pijay-0004qt-Lt; Sun, 02 Apr 2023 00:21:12 +0200
 From:   Heiko =?ISO-8859-1?Q?St=FCbner?= <heiko@sntech.de>
 To:     linux-riscv@lists.infradead.org, palmer@dabbelt.com,
         anup@brainfault.org, atishp@atishpatra.org,
         kvm-riscv@lists.infradead.org, kvm@vger.kernel.org
 Cc:     vineetg@rivosinc.com, greentime.hu@sifive.com,
-        guoren@linux.alibaba.com, Vincent Chen <vincent.chen@sifive.com>,
-        Andy Chiu <andy.chiu@sifive.com>,
+        guoren@linux.alibaba.com, Andy Chiu <andy.chiu@sifive.com>,
         Paul Walmsley <paul.walmsley@sifive.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
+        Albert Ou <aou@eecs.berkeley.edu>, Guo Ren <guoren@kernel.org>,
         Conor Dooley <conor.dooley@microchip.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Guo Ren <guoren@kernel.org>,
-        =?ISO-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn@rivosinc.com>,
-        Andrew Jones <ajones@ventanamicro.com>,
-        Xianting Tian <xianting.tian@linux.alibaba.com>,
-        Jisheng Zhang <jszhang@kernel.org>,
-        Wenting Zhang <zephray@outlook.com>,
-        Al Viro <viro@zeniv.linux.org.uk>,
+        Vincent Chen <vincent.chen@sifive.com>,
         Andrew Bresticker <abrestic@rivosinc.com>,
         Andy Chiu <andy.chiu@sifive.com>
-Subject: Re: [PATCH -next v17 13/20] riscv: signal: Add sigcontext save/restore for
- vector
-Date:   Sun, 02 Apr 2023 00:20:32 +0200
-Message-ID: <2624132.Isy0gbHreE@diego>
-In-Reply-To: <20230327164941.20491-14-andy.chiu@sifive.com>
+Subject: Re: [PATCH -next v17 12/20] riscv: signal: check fp-reserved words
+ unconditionally
+Date:   Sun, 02 Apr 2023 00:21:11 +0200
+Message-ID: <5898720.alqRGMn8q6@diego>
+In-Reply-To: <20230327164941.20491-13-andy.chiu@sifive.com>
 References: <20230327164941.20491-1-andy.chiu@sifive.com>
- <20230327164941.20491-14-andy.chiu@sifive.com>
+ <20230327164941.20491-13-andy.chiu@sifive.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8BIT
 Content-Type: text/plain; charset="iso-8859-1"
@@ -57,47 +49,20 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Am Montag, 27. März 2023, 18:49:33 CEST schrieb Andy Chiu:
-> From: Greentime Hu <greentime.hu@sifive.com>
+Am Montag, 27. März 2023, 18:49:32 CEST schrieb Andy Chiu:
+> In order to let kernel/user locate and identify an extension context on
+> the existing sigframe, we are going to utilize reserved space of fp and
+> encode the information there. And since the sigcontext has already
+> preserved a space for fp context w or w/o CONFIG_FPU, we move those
+> reserved words checking/setting routine back into generic code.
 > 
-> This patch facilitates the existing fp-reserved words for placement of
-> the first extension's context header on the user's sigframe. A context
-> header consists of a distinct magic word and the size, including the
-> header itself, of an extension on the stack. Then, the frame is followed
-> by the context of that extension, and then a header + context body for
-> another extension if exists. If there is no more extension to come, then
-> the frame must be ended with a null context header. A special case is
-> rv64gc, where the kernel support no extensions requiring to expose
-> additional regfile to the user. In such case the kernel would place the
-> null context header right after the first reserved word of
-> __riscv_q_ext_state when saving sigframe. And the kernel would check if
-> all reserved words are zeros when a signal handler returns.
+> This commit also undone an additional logical change carried by the
+> refactor commit 007f5c3589578
+> ("Refactor FPU code in signal setup/return procedures"). Originally we
+> did not restore fp context if restoring of gpr have failed. And it was
+> fine on the other side. In such way the kernel could keep the regfiles
+> intact, and potentially react at the failing point of restore.
 > 
-> __riscv_q_ext_state---->|	|<-__riscv_extra_ext_header
-> 			~	~
-> 	.reserved[0]--->|0	|<-	.reserved
-> 		<-------|magic	|<-	.hdr
-> 		|	|size	|_______ end of sc_fpregs
-> 		|	|ext-bdy|
-> 		|	~	~
-> 	+)size	------->|magic	|<- another context header
-> 			|size	|
-> 			|ext-bdy|
-> 			~	~
-> 			|magic:0|<- null context header
-> 			|size:0	|
-> 
-> The vector registers will be saved in datap pointer. The datap pointer
-> will be allocated dynamically when the task needs in kernel space. On
-> the other hand, datap pointer on the sigframe will be set right after
-> the __riscv_v_ext_state data structure.
-> 
-> Co-developed-by: Vincent Chen <vincent.chen@sifive.com>
-> Signed-off-by: Vincent Chen <vincent.chen@sifive.com>
-> Signed-off-by: Greentime Hu <greentime.hu@sifive.com>
-> Suggested-by: Vineet Gupta <vineetg@rivosinc.com>
-> Suggested-by: Richard Henderson <richard.henderson@linaro.org>
-> Co-developed-by: Andy Chiu <andy.chiu@sifive.com>
 > Signed-off-by: Andy Chiu <andy.chiu@sifive.com>
 > Acked-by: Conor Dooley <conor.dooley@microchip.com>
 
