@@ -2,48 +2,50 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F39DC6D34D1
-	for <lists+kvm@lfdr.de>; Sun,  2 Apr 2023 00:20:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B93FE6D34D5
+	for <lists+kvm@lfdr.de>; Sun,  2 Apr 2023 00:20:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229805AbjDAWUI convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Sat, 1 Apr 2023 18:20:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45568 "EHLO
+        id S229529AbjDAWUr convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Sat, 1 Apr 2023 18:20:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45998 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229448AbjDAWUH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 1 Apr 2023 18:20:07 -0400
+        with ESMTP id S229448AbjDAWUq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 1 Apr 2023 18:20:46 -0400
 Received: from gloria.sntech.de (gloria.sntech.de [185.11.138.130])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CCFEF1A474
-        for <kvm@vger.kernel.org>; Sat,  1 Apr 2023 15:20:04 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CFFD51A963
+        for <kvm@vger.kernel.org>; Sat,  1 Apr 2023 15:20:43 -0700 (PDT)
 Received: from ip4d1634d3.dynamic.kabel-deutschland.de ([77.22.52.211] helo=diego.localnet)
         by gloria.sntech.de with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94.2)
         (envelope-from <heiko@sntech.de>)
-        id 1pijZe-0004pj-V9; Sun, 02 Apr 2023 00:19:50 +0200
+        id 1pijaL-0004qG-20; Sun, 02 Apr 2023 00:20:33 +0200
 From:   Heiko =?ISO-8859-1?Q?St=FCbner?= <heiko@sntech.de>
 To:     linux-riscv@lists.infradead.org, palmer@dabbelt.com,
         anup@brainfault.org, atishp@atishpatra.org,
         kvm-riscv@lists.infradead.org, kvm@vger.kernel.org
-Cc:     Kefeng Wang <wangkefeng.wang@huawei.com>, guoren@linux.alibaba.com,
-        Kees Cook <keescook@chromium.org>,
-        Nick Knight <nick.knight@sifive.com>,
-        Andrew Bresticker <abrestic@rivosinc.com>,
-        vineetg@rivosinc.com,
-        =?ISO-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn@rivosinc.com>,
-        Vincent Chen <vincent.chen@sifive.com>,
-        Conor Dooley <conor.dooley@microchip.com>,
-        Albert Ou <aou@eecs.berkeley.edu>, Guo Ren <guoren@kernel.org>,
-        Eric Biederman <ebiederm@xmission.com>,
+Cc:     vineetg@rivosinc.com, greentime.hu@sifive.com,
+        guoren@linux.alibaba.com, Vincent Chen <vincent.chen@sifive.com>,
         Andy Chiu <andy.chiu@sifive.com>,
         Paul Walmsley <paul.walmsley@sifive.com>,
-        greentime.hu@sifive.com, Zong Li <zong.li@sifive.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Conor Dooley <conor.dooley@microchip.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Guo Ren <guoren@kernel.org>,
+        =?ISO-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn@rivosinc.com>,
+        Andrew Jones <ajones@ventanamicro.com>,
+        Xianting Tian <xianting.tian@linux.alibaba.com>,
+        Jisheng Zhang <jszhang@kernel.org>,
+        Wenting Zhang <zephray@outlook.com>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Andrew Bresticker <abrestic@rivosinc.com>,
         Andy Chiu <andy.chiu@sifive.com>
-Subject: Re: [PATCH -next v17 14/20] riscv: signal: Report signal frame size to
- userspace via auxv
-Date:   Sun, 02 Apr 2023 00:19:49 +0200
-Message-ID: <37344569.XM6RcZxFsP@diego>
-In-Reply-To: <20230327164941.20491-15-andy.chiu@sifive.com>
+Subject: Re: [PATCH -next v17 13/20] riscv: signal: Add sigcontext save/restore for
+ vector
+Date:   Sun, 02 Apr 2023 00:20:32 +0200
+Message-ID: <2624132.Isy0gbHreE@diego>
+In-Reply-To: <20230327164941.20491-14-andy.chiu@sifive.com>
 References: <20230327164941.20491-1-andy.chiu@sifive.com>
- <20230327164941.20491-15-andy.chiu@sifive.com>
+ <20230327164941.20491-14-andy.chiu@sifive.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8BIT
 Content-Type: text/plain; charset="iso-8859-1"
@@ -55,34 +57,51 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Am Montag, 27. März 2023, 18:49:34 CEST schrieb Andy Chiu:
-> From: Vincent Chen <vincent.chen@sifive.com>
+Am Montag, 27. März 2023, 18:49:33 CEST schrieb Andy Chiu:
+> From: Greentime Hu <greentime.hu@sifive.com>
 > 
-> The vector register belongs to the signal context. They need to be stored
-> and restored as entering and leaving the signal handler. According to the
-> V-extension specification, the maximum length of the vector registers can
-> be 2^16. Hence, if userspace refers to the MINSIGSTKSZ to create a
-> sigframe, it may not be enough. To resolve this problem, this patch refers
-> to the commit 94b07c1f8c39c
-> ("arm64: signal: Report signal frame size to userspace via auxv") to enable
-> userspace to know the minimum required sigframe size through the auxiliary
-> vector and use it to allocate enough memory for signal context.
+> This patch facilitates the existing fp-reserved words for placement of
+> the first extension's context header on the user's sigframe. A context
+> header consists of a distinct magic word and the size, including the
+> header itself, of an extension on the stack. Then, the frame is followed
+> by the context of that extension, and then a header + context body for
+> another extension if exists. If there is no more extension to come, then
+> the frame must be ended with a null context header. A special case is
+> rv64gc, where the kernel support no extensions requiring to expose
+> additional regfile to the user. In such case the kernel would place the
+> null context header right after the first reserved word of
+> __riscv_q_ext_state when saving sigframe. And the kernel would check if
+> all reserved words are zeros when a signal handler returns.
 > 
-> Note that auxv always reports size of the sigframe as if V exists for
-> all starting processes, whenever the kernel has CONFIG_RISCV_ISA_V. The
-> reason is that users usually reference this value to allocate an
-> alternative signal stack, and the user may use V anytime. So the user
-> must reserve a space for V-context in sigframe in case that the signal
-> handler invokes after the kernel allocating V.
+> __riscv_q_ext_state---->|	|<-__riscv_extra_ext_header
+> 			~	~
+> 	.reserved[0]--->|0	|<-	.reserved
+> 		<-------|magic	|<-	.hdr
+> 		|	|size	|_______ end of sc_fpregs
+> 		|	|ext-bdy|
+> 		|	~	~
+> 	+)size	------->|magic	|<- another context header
+> 			|size	|
+> 			|ext-bdy|
+> 			~	~
+> 			|magic:0|<- null context header
+> 			|size:0	|
 > 
-> Signed-off-by: Greentime Hu <greentime.hu@sifive.com>
+> The vector registers will be saved in datap pointer. The datap pointer
+> will be allocated dynamically when the task needs in kernel space. On
+> the other hand, datap pointer on the sigframe will be set right after
+> the __riscv_v_ext_state data structure.
+> 
+> Co-developed-by: Vincent Chen <vincent.chen@sifive.com>
 > Signed-off-by: Vincent Chen <vincent.chen@sifive.com>
+> Signed-off-by: Greentime Hu <greentime.hu@sifive.com>
+> Suggested-by: Vineet Gupta <vineetg@rivosinc.com>
+> Suggested-by: Richard Henderson <richard.henderson@linaro.org>
+> Co-developed-by: Andy Chiu <andy.chiu@sifive.com>
 > Signed-off-by: Andy Chiu <andy.chiu@sifive.com>
 > Acked-by: Conor Dooley <conor.dooley@microchip.com>
-> Reviewed-by: Björn Töpel <bjorn@rivosinc.com>
-> Reviewed-by: Guo Ren <guoren@kernel.org>
 
-Reviewed-by: Heiko Stuebner <heiko.stuebner@vrull.eu>
+Acked-by: Heiko Stuebner <heiko.stuebner@vrull.eu>
 Tested-by: Heiko Stuebner <heiko.stuebner@vrull.eu>
 
 
