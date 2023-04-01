@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D250C6D3249
-	for <lists+kvm@lfdr.de>; Sat,  1 Apr 2023 17:19:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C4AB96D324C
+	for <lists+kvm@lfdr.de>; Sat,  1 Apr 2023 17:19:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230155AbjDAPTZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 1 Apr 2023 11:19:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50028 "EHLO
+        id S230174AbjDAPT1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 1 Apr 2023 11:19:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50624 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230198AbjDAPS5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S230246AbjDAPS5 (ORCPT <rfc822;kvm@vger.kernel.org>);
         Sat, 1 Apr 2023 11:18:57 -0400
 Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2C6926254;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2E9226256;
         Sat,  1 Apr 2023 08:18:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
   t=1680362332; x=1711898332;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=B99jEbLR0tNkpukHQr/yNPobSRf3EINVeCE8niNa5rI=;
-  b=E1E6HZzLtlqm/VrwdhPNtF8bH/AVgU0Sahf0CAo3q5glvlBIfX+FU1VV
-   8MIHFZQ6VH4rg5xUV/NUeX/VQIi5RlsFwoTRZVWvBEdbyTq2VghfobOPd
-   YeHzPfQgnyv67eXb8xfqM6dZhh4ny8oGdOUHSyW+m361Ur0jv4MmF0PzX
-   c2SYRXoeh9aP9GewAy22Jfd0Xbm3nUJBKqgRZ9H3eWRm6m4xBpjyXIT2D
-   OaTSPEmwo0HWqI9KlV0BqtQj7Myjq4DVNQsYltY/6hymuPhUOBSyPqBIk
-   bdojCnKQSx2rbC3AI9xVImRSTql3qvlvyCjuNjU0byj8fNRxiL9sGcxuD
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10667"; a="404411409"
+  bh=XTW5OvP/lz6wAuWYHWZPf0Ckv407oLnpgloaD6rISDo=;
+  b=hdF7zaBxYn2DQujT1xbtvztG7pLCMT2AvMmwfs8ETQWrdQKkjez5oCkq
+   4TUFZABiAdnoFI+6AgZ0mYPjQD9rzEHawjrlSwsz4c0r5cjGZFydb5PHZ
+   e3J2ZHkRj7mUNNKPmBJ2JlmG8FXMZKxWEQJCW4DSkWmvyOBSu88jOQyV8
+   mKCC8dyCaZ3465svo8GbXkPv6hNvd+C7eOx+8EnA2jeyCOxisAiRogiXX
+   /zvQanBy4XqoojMGEP2s+R65xmTTU8KYM8hwoLQJPXBEpSppqSRZiJWPI
+   iK6x3DwLFnOFjYX9m++uY6j2wqz907HQpJjYW/e4GAn4ngB7DLGaj7DIa
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10667"; a="404411421"
 X-IronPort-AV: E=Sophos;i="5.98,310,1673942400"; 
-   d="scan'208";a="404411409"
+   d="scan'208";a="404411421"
 Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Apr 2023 08:18:49 -0700
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Apr 2023 08:18:50 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10667"; a="678937239"
+X-IronPort-AV: E=McAfee;i="6600,9927,10667"; a="678937242"
 X-IronPort-AV: E=Sophos;i="5.98,310,1673942400"; 
-   d="scan'208";a="678937239"
+   d="scan'208";a="678937242"
 Received: from 984fee00a4c6.jf.intel.com ([10.165.58.231])
-  by orsmga007.jf.intel.com with ESMTP; 01 Apr 2023 08:18:49 -0700
+  by orsmga007.jf.intel.com with ESMTP; 01 Apr 2023 08:18:50 -0700
 From:   Yi Liu <yi.l.liu@intel.com>
 To:     alex.williamson@redhat.com, jgg@nvidia.com, kevin.tian@intel.com
 Cc:     joro@8bytes.org, robin.murphy@arm.com, cohuck@redhat.com,
@@ -50,9 +50,9 @@ Cc:     joro@8bytes.org, robin.murphy@arm.com, cohuck@redhat.com,
         intel-gfx@lists.freedesktop.org, linux-s390@vger.kernel.org,
         xudong.hao@intel.com, yan.y.zhao@intel.com, terrence.xu@intel.com,
         yanting.jiang@intel.com
-Subject: [PATCH v9 24/25] vfio: Compile group optionally
-Date:   Sat,  1 Apr 2023 08:18:32 -0700
-Message-Id: <20230401151833.124749-25-yi.l.liu@intel.com>
+Subject: [PATCH v9 25/25] docs: vfio: Add vfio device cdev description
+Date:   Sat,  1 Apr 2023 08:18:33 -0700
+Message-Id: <20230401151833.124749-26-yi.l.liu@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230401151833.124749-1-yi.l.liu@intel.com>
 References: <20230401151833.124749-1-yi.l.liu@intel.com>
@@ -67,278 +67,161 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-group code is not needed for vfio device cdev, so with vfio device cdev
-introduced, the group infrastructures can be compiled out if only cdev
-is needed.
+This gives notes for userspace applications on device cdev usage.
 
 Reviewed-by: Kevin Tian <kevin.tian@intel.com>
-Tested-by: Terrence Xu <terrence.xu@intel.com>
-Tested-by: Nicolin Chen <nicolinc@nvidia.com>
-Tested-by: Yanting Jiang <yanting.jiang@intel.com>
 Signed-off-by: Yi Liu <yi.l.liu@intel.com>
 ---
- drivers/iommu/iommufd/Kconfig |   4 +-
- drivers/vfio/Kconfig          |  14 +++++
- drivers/vfio/Makefile         |   2 +-
- drivers/vfio/vfio.h           | 111 ++++++++++++++++++++++++++++++++--
- include/linux/vfio.h          |  13 +++-
- 5 files changed, 133 insertions(+), 11 deletions(-)
+ Documentation/driver-api/vfio.rst | 132 ++++++++++++++++++++++++++++++
+ 1 file changed, 132 insertions(+)
 
-diff --git a/drivers/iommu/iommufd/Kconfig b/drivers/iommu/iommufd/Kconfig
-index ada693ea51a7..99d4b075df49 100644
---- a/drivers/iommu/iommufd/Kconfig
-+++ b/drivers/iommu/iommufd/Kconfig
-@@ -14,8 +14,8 @@ config IOMMUFD
- if IOMMUFD
- config IOMMUFD_VFIO_CONTAINER
- 	bool "IOMMUFD provides the VFIO container /dev/vfio/vfio"
--	depends on VFIO && !VFIO_CONTAINER
--	default VFIO && !VFIO_CONTAINER
-+	depends on VFIO_GROUP && !VFIO_CONTAINER
-+	default VFIO_GROUP && !VFIO_CONTAINER
- 	help
- 	  IOMMUFD will provide /dev/vfio/vfio instead of VFIO. This relies on
- 	  IOMMUFD providing compatibility emulation to give the same ioctls.
-diff --git a/drivers/vfio/Kconfig b/drivers/vfio/Kconfig
-index e2105b4dac2d..62c58830a8d5 100644
---- a/drivers/vfio/Kconfig
-+++ b/drivers/vfio/Kconfig
-@@ -4,6 +4,8 @@ menuconfig VFIO
- 	select IOMMU_API
- 	depends on IOMMUFD || !IOMMUFD
- 	select INTERVAL_TREE
-+	select VFIO_GROUP if SPAPR_TCE_IOMMU || IOMMUFD=n
-+	select VFIO_DEVICE_CDEV if !VFIO_GROUP
- 	select VFIO_CONTAINER if IOMMUFD=n
- 	help
- 	  VFIO provides a framework for secure userspace device drivers.
-@@ -15,6 +17,7 @@ if VFIO
- config VFIO_DEVICE_CDEV
- 	bool "Support for the VFIO cdev /dev/vfio/devices/vfioX"
- 	depends on IOMMUFD
-+	default !VFIO_GROUP
- 	help
- 	  The VFIO device cdev is another way for userspace to get device
- 	  access. Userspace gets device fd by opening device cdev under
-@@ -23,9 +26,20 @@ config VFIO_DEVICE_CDEV
+diff --git a/Documentation/driver-api/vfio.rst b/Documentation/driver-api/vfio.rst
+index 363e12c90b87..4f21be7bda8a 100644
+--- a/Documentation/driver-api/vfio.rst
++++ b/Documentation/driver-api/vfio.rst
+@@ -239,6 +239,130 @@ group and can access them as follows::
+ 	/* Gratuitous device reset and go... */
+ 	ioctl(device, VFIO_DEVICE_RESET);
  
- 	  If you don't know what to do here, say N.
++IOMMUFD and vfio_iommu_type1
++----------------------------
++
++IOMMUFD is the new user API to manage I/O page tables from userspace.
++It intends to be the portal of delivering advanced userspace DMA
++features (nested translation [5], PASID [6], etc.) while also providing
++a backwards compatibility interface for existing VFIO_TYPE1v2_IOMMU use
++cases.  Eventually the vfio_iommu_type1 driver, as well as the legacy
++vfio container and group model is intended to be deprecated.
++
++The IOMMUFD backwards compatibility interface can be enabled two ways.
++In the first method, the kernel can be configured with
++CONFIG_IOMMUFD_VFIO_CONTAINER, in which case the IOMMUFD subsystem
++transparently provides the entire infrastructure for the VFIO
++container and IOMMU backend interfaces.  The compatibility mode can
++also be accessed if the VFIO container interface, ie. /dev/vfio/vfio is
++simply symlink'd to /dev/iommu.  Note that at the time of writing, the
++compatibility mode is not entirely feature complete relative to
++VFIO_TYPE1v2_IOMMU (ex. DMA mapping MMIO) and does not attempt to
++provide compatibility to the VFIO_SPAPR_TCE_IOMMU interface.  Therefore
++it is not generally advisable at this time to switch from native VFIO
++implementations to the IOMMUFD compatibility interfaces.
++
++Long term, VFIO users should migrate to device access through the cdev
++interface described below, and native access through the IOMMUFD
++provided interfaces.
++
++VFIO Device cdev
++----------------
++
++Traditionally user acquires a device fd via VFIO_GROUP_GET_DEVICE_FD
++in a VFIO group.
++
++With CONFIG_VFIO_DEVICE_CDEV=y the user can now acquire a device fd
++by directly opening a character device /dev/vfio/devices/vfioX where
++"X" is the number allocated uniquely by VFIO for registered devices.
++For noiommu devices, the character device would be named with "noiommu-"
++prefix. e.g. /dev/vfio/devices/noiommu-vfioX.
++
++The cdev only works with IOMMUFD.  Both VFIO drivers and applications
++must adapt to the new cdev security model which requires using
++VFIO_DEVICE_BIND_IOMMUFD to claim DMA ownership before starting to
++actually use the device.  Once BIND succeeds then a VFIO device can
++be fully accessed by the user.
++
++VFIO device cdev doesn't rely on VFIO group/container/iommu drivers.
++Hence those modules can be fully compiled out in an environment
++where no legacy VFIO application exists.
++
++So far SPAPR does not support IOMMUFD yet.  So it cannot support device
++cdev neither.
++
++Device cdev Example
++-------------------
++
++Assume user wants to access PCI device 0000:6a:01.0::
++
++	$ ls /sys/bus/pci/devices/0000:6a:01.0/vfio-dev/
++	vfio0
++
++This device is therefore represented as vfio0.  The user can verify
++its existence::
++
++	$ ls -l /dev/vfio/devices/vfio0
++	crw------- 1 root root 511, 0 Feb 16 01:22 /dev/vfio/devices/vfio0
++	$ cat /sys/bus/pci/devices/0000:6a:01.0/vfio-dev/vfio0/dev
++	511:0
++	$ ls -l /dev/char/511\:0
++	lrwxrwxrwx 1 root root 21 Feb 16 01:22 /dev/char/511:0 -> ../vfio/devices/vfio0
++
++Then provide the user with access to the device if unprivileged
++operation is desired::
++
++	$ chown user:user /dev/vfio/devices/vfio0
++
++Finally the user could get cdev fd by::
++
++	cdev_fd = open("/dev/vfio/devices/vfio0", O_RDWR);
++
++An opened cdev_fd doesn't give the user any permission of accessing
++the device except binding the cdev_fd to an iommufd.  After that point
++then the device is fully accessible including attaching it to an
++IOMMUFD IOAS/HWPT to enable userspace DMA::
++
++	struct vfio_device_bind_iommufd bind = {
++		.argsz = sizeof(bind),
++		.flags = 0,
++	};
++	struct iommu_ioas_alloc alloc_data  = {
++		.size = sizeof(alloc_data),
++		.flags = 0,
++	};
++	struct vfio_device_attach_iommufd_pt attach_data = {
++		.argsz = sizeof(attach_data),
++		.flags = 0,
++	};
++	struct iommu_ioas_map map = {
++		.size = sizeof(map),
++		.flags = IOMMU_IOAS_MAP_READABLE |
++			 IOMMU_IOAS_MAP_WRITEABLE |
++			 IOMMU_IOAS_MAP_FIXED_IOVA,
++		.__reserved = 0,
++	};
++
++	iommufd = open("/dev/iommu", O_RDWR);
++
++	bind.iommufd = iommufd; // negative value means vfio-noiommu mode
++	ioctl(cdev_fd, VFIO_DEVICE_BIND_IOMMUFD, &bind);
++
++	ioctl(iommufd, IOMMU_IOAS_ALLOC, &alloc_data);
++	attach_data.pt_id = alloc_data.out_ioas_id;
++	ioctl(cdev_fd, VFIO_DEVICE_ATTACH_IOMMUFD_PT, &attach_data);
++
++	/* Allocate some space and setup a DMA mapping */
++	map.user_va = (int64_t)mmap(0, 1024 * 1024, PROT_READ | PROT_WRITE,
++				    MAP_PRIVATE | MAP_ANONYMOUS, 0, 0);
++	map.iova = 0; /* 1MB starting at 0x0 from device view */
++	map.length = 1024 * 1024;
++	map.ioas_id = alloc_data.out_ioas_id;;
++
++	ioctl(iommufd, IOMMU_IOAS_MAP, &map);
++
++	/* Other device operations as stated in "VFIO Usage Example" */
++
+ VFIO User API
+ -------------------------------------------------------------------------------
  
-+config VFIO_GROUP
-+	bool "Support for the VFIO group /dev/vfio/$group_id"
-+	default y
-+	help
-+	   VFIO group support provides the traditional model for accessing
-+	   devices through VFIO and is used by the majority of userspace
-+	   applications and drivers making use of VFIO.
-+
-+	   If you don't know what to do here, say Y.
-+
- config VFIO_CONTAINER
- 	bool "Support for the VFIO container /dev/vfio/vfio"
- 	select VFIO_IOMMU_TYPE1 if MMU && (X86 || S390 || ARM || ARM64)
-+	depends on VFIO_GROUP
- 	default y
- 	help
- 	  The VFIO container is the classic interface to VFIO for establishing
-diff --git a/drivers/vfio/Makefile b/drivers/vfio/Makefile
-index 245394aeb94b..57c3515af606 100644
---- a/drivers/vfio/Makefile
-+++ b/drivers/vfio/Makefile
-@@ -2,9 +2,9 @@
- obj-$(CONFIG_VFIO) += vfio.o
+@@ -566,3 +690,11 @@ This implementation has some specifics:
+ 				\-0d.1
  
- vfio-y += vfio_main.o \
--	  group.o \
- 	  iova_bitmap.o
- vfio-$(CONFIG_VFIO_DEVICE_CDEV) += device_cdev.o
-+vfio-$(CONFIG_VFIO_GROUP) += group.o
- vfio-$(CONFIG_IOMMUFD) += iommufd.o
- vfio-$(CONFIG_VFIO_CONTAINER) += container.o
- vfio-$(CONFIG_VFIO_VIRQFD) += virqfd.o
-diff --git a/drivers/vfio/vfio.h b/drivers/vfio/vfio.h
-index c199e410db18..9c7a238ec8dd 100644
---- a/drivers/vfio/vfio.h
-+++ b/drivers/vfio/vfio.h
-@@ -36,6 +36,12 @@ vfio_allocate_device_file(struct vfio_device *device);
- 
- extern const struct file_operations vfio_device_fops;
- 
-+#ifdef CONFIG_VFIO_NOIOMMU
-+extern bool vfio_noiommu __read_mostly;
-+#else
-+enum { vfio_noiommu = false };
-+#endif
+ 	00:1e.0 PCI bridge: Intel Corporation 82801 PCI Bridge (rev 90)
 +
- enum vfio_group_type {
- 	/*
- 	 * Physical device with IOMMU backing.
-@@ -60,6 +66,7 @@ enum vfio_group_type {
- 	VFIO_NO_IOMMU,
- };
- 
-+#if IS_ENABLED(CONFIG_VFIO_GROUP)
- struct vfio_group {
- 	struct device 			dev;
- 	struct cdev			cdev;
-@@ -113,6 +120,104 @@ static inline void vfio_device_set_noiommu(struct vfio_device *device)
- 	device->noiommu = IS_ENABLED(CONFIG_VFIO_NOIOMMU) &&
- 			  device->group->type == VFIO_NO_IOMMU;
- }
-+#else
-+struct vfio_group;
++.. [5] Nested translation is an IOMMU feature which supports two stage
++   address translations.  This improves the address translation efficiency
++   in IOMMU virtualization.
 +
-+static inline int vfio_device_block_group(struct vfio_device *device)
-+{
-+	return 0;
-+}
-+
-+static inline void vfio_device_unblock_group(struct vfio_device *device)
-+{
-+}
-+
-+static inline int vfio_device_set_group(struct vfio_device *device,
-+					enum vfio_group_type type)
-+{
-+	return 0;
-+}
-+
-+static inline void vfio_device_remove_group(struct vfio_device *device)
-+{
-+}
-+
-+static inline void vfio_device_group_register(struct vfio_device *device)
-+{
-+}
-+
-+static inline void vfio_device_group_unregister(struct vfio_device *device)
-+{
-+}
-+
-+static inline bool vfio_device_group_uses_container(struct vfio_device_file *df)
-+{
-+	return false;
-+}
-+
-+static inline int vfio_device_group_use_iommu(struct vfio_device *device)
-+{
-+	return -EOPNOTSUPP;
-+}
-+
-+static inline void vfio_device_group_unuse_iommu(struct vfio_device *device)
-+{
-+}
-+
-+static inline void vfio_device_group_close(struct vfio_device_file *df)
-+{
-+}
-+
-+static inline struct vfio_group *vfio_group_from_file(struct file *file)
-+{
-+	return NULL;
-+}
-+
-+static inline bool vfio_group_has_dev(struct vfio_group *group,
-+				      struct vfio_device *device)
-+{
-+	return false;
-+}
-+
-+static inline bool vfio_group_enforced_coherent(struct vfio_group *group)
-+{
-+	return true;
-+}
-+
-+static inline void vfio_group_set_kvm(struct vfio_group *group, struct kvm *kvm)
-+{
-+}
-+
-+static inline bool vfio_device_has_container(struct vfio_device *device)
-+{
-+	return false;
-+}
-+
-+static inline int __init vfio_group_init(void)
-+{
-+	return 0;
-+}
-+
-+static inline void vfio_group_cleanup(void)
-+{
-+}
-+
-+static inline void vfio_device_set_noiommu(struct vfio_device *device)
-+{
-+	struct iommu_group *iommu_group;
-+
-+	device->noiommu = false;
-+
-+	if (!IS_ENABLED(CONFIG_VFIO_NOIOMMU) || !vfio_noiommu)
-+		return;
-+
-+	iommu_group = iommu_group_get(device->dev);
-+	if (iommu_group)
-+		iommu_group_put(iommu_group);
-+	else
-+		device->noiommu = true;
-+}
-+#endif /* CONFIG_VFIO_GROUP */
- 
- #if IS_ENABLED(CONFIG_VFIO_CONTAINER)
- /**
-@@ -356,12 +461,6 @@ static inline void vfio_virqfd_exit(void)
- }
- #endif
- 
--#ifdef CONFIG_VFIO_NOIOMMU
--extern bool vfio_noiommu __read_mostly;
--#else
--enum { vfio_noiommu = false };
--#endif
--
- #ifdef CONFIG_HAVE_KVM
- void _vfio_device_get_kvm_safe(struct vfio_device *device, struct kvm *kvm);
- void vfio_device_put_kvm(struct vfio_device *device);
-diff --git a/include/linux/vfio.h b/include/linux/vfio.h
-index db717a8f4440..46b313f8bfaf 100644
---- a/include/linux/vfio.h
-+++ b/include/linux/vfio.h
-@@ -43,7 +43,11 @@ struct vfio_device {
- 	 */
- 	const struct vfio_migration_ops *mig_ops;
- 	const struct vfio_log_ops *log_ops;
-+#if IS_ENABLED(CONFIG_VFIO_GROUP)
- 	struct vfio_group *group;
-+	struct list_head group_next;
-+	struct list_head iommu_entry;
-+#endif
- 	struct vfio_device_set *dev_set;
- 	struct list_head dev_set_list;
- 	unsigned int migration_flags;
-@@ -59,8 +63,6 @@ struct vfio_device {
- 	refcount_t refcount;	/* user count on registered device*/
- 	unsigned int open_count;
- 	struct completion comp;
--	struct list_head group_next;
--	struct list_head iommu_entry;
- 	struct iommufd_access *iommufd_access;
- 	void (*put_kvm)(struct kvm *kvm);
- #if IS_ENABLED(CONFIG_IOMMUFD)
-@@ -284,7 +286,14 @@ int vfio_mig_get_next_state(struct vfio_device *device,
- /*
-  * External user API
-  */
-+#if IS_ENABLED(CONFIG_VFIO_GROUP)
- struct iommu_group *vfio_file_iommu_group(struct file *file);
-+#else
-+static inline struct iommu_group *vfio_file_iommu_group(struct file *file)
-+{
-+	return NULL;
-+}
-+#endif
- bool vfio_file_is_valid(struct file *file);
- bool vfio_file_enforced_coherent(struct file *file);
- void vfio_file_set_kvm(struct file *file, struct kvm *kvm);
++.. [6] PASID stands for Process Address Space ID, introduced by PCI
++   Express.  It is a prerequisite for Shared Virtual Addressing (SVA)
++   and Scalable I/O Virtualization (Scalable IOV).
 -- 
 2.34.1
 
