@@ -2,140 +2,218 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A70F56D3510
-	for <lists+kvm@lfdr.de>; Sun,  2 Apr 2023 02:30:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6694E6D351D
+	for <lists+kvm@lfdr.de>; Sun,  2 Apr 2023 02:48:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229536AbjDBA1u (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 1 Apr 2023 20:27:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34480 "EHLO
+        id S230010AbjDBAs5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 1 Apr 2023 20:48:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38024 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229379AbjDBA1s (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 1 Apr 2023 20:27:48 -0400
-Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B8DC25560
-        for <kvm@vger.kernel.org>; Sat,  1 Apr 2023 17:27:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1680395267; x=1711931267;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=OCox6QVeMf6eKXYGZU5Pl/SsjUXrp7OFa4I0paCyj0k=;
-  b=YQ6sdXyEtC1s6ld8EfnXEYynaOSKVaQxQT/uMTwqzw1Zr9twUv3jkIUL
-   HHx0g4d1LavHNMeP/WYCjDIcKPStusPBTJVKzMTcpilbcFo+FYJl6ugAO
-   AlurixI4X+sJWg6zkxdHCu8XCzqGcPfhFu14S1zpZgsE/wzviWYdJUZXo
-   0FhxVnMY0iAL/NIn8Sj/qg9DGkVr8fDR2wtshsWk2Ev+XSPdN/xB2ATX8
-   Bxxv12LEYxGOkj4Zf0iW31nSHeauURfcN8nG4PKaLVwOdoJdWNY/Nl2ru
-   CM0/+MrDR9MPQO4pGQauPzFF7yb7KkBYU0WGlxNSVLy+itHCdTSc3CPBC
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10667"; a="369489391"
-X-IronPort-AV: E=Sophos;i="5.98,311,1673942400"; 
-   d="scan'208";a="369489391"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Apr 2023 17:27:47 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10667"; a="718129711"
-X-IronPort-AV: E=Sophos;i="5.98,311,1673942400"; 
-   d="scan'208";a="718129711"
-Received: from lkp-server01.sh.intel.com (HELO b613635ddfff) ([10.239.97.150])
-  by orsmga001.jf.intel.com with ESMTP; 01 Apr 2023 17:27:45 -0700
-Received: from kbuild by b613635ddfff with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1pilZQ-000N8T-0f;
-        Sun, 02 Apr 2023 00:27:44 +0000
-Date:   Sun, 2 Apr 2023 08:27:29 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@ozlabs.org
-Cc:     oe-kbuild-all@lists.linux.dev, Nicholas Piggin <npiggin@gmail.com>,
-        kvm@vger.kernel.org, Paul Mackerras <paulus@ozlabs.org>,
-        Michael Neuling <mikey@neuling.org>
-Subject: Re: [PATCH v2 1/2] KVM: PPC: Permit SRR1 flags in more injected
- interrupt types
-Message-ID: <202304020827.3LEZ86WB-lkp@intel.com>
-References: <20230330103224.3589928-2-npiggin@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230330103224.3589928-2-npiggin@gmail.com>
-X-Spam-Status: No, score=-2.5 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        with ESMTP id S230023AbjDBAsz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 1 Apr 2023 20:48:55 -0400
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D61BE1A474;
+        Sat,  1 Apr 2023 17:48:51 -0700 (PDT)
+Received: by mail-pj1-x102b.google.com with SMTP id p3-20020a17090a74c300b0023f69bc7a68so27207862pjl.4;
+        Sat, 01 Apr 2023 17:48:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112; t=1680396531;
+        h=in-reply-to:references:to:from:subject:cc:message-id:date
+         :content-transfer-encoding:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=769fy3W+8GF1XpGTcCE4kXG2vQJMw57gwKdzR53jc/c=;
+        b=C35uFhqG5NtAn0jrZKb2bJbdHnL416S5yfJNjxHAS8JipuzCXAhfOW5vJ5+Fgqubm/
+         ErFT/A7xVlMA69c9b12nKcITj5lIckjjGFJ2UyXMmPsPLG03oYBETVEvawTLpE1qXRmu
+         b/RthQKCArEoLM+3obkXhXR+v09MZaQ3ihNVL3fo1AIWWRZndw7Uu+Hrku8YydhLbP7h
+         OdBD+8ZoN/eXPC0FBdeCqyaufRAwnek4yswQBy+U8Uq560fETy9P7Rk49Bj3TNqalsro
+         rW5qgaJZg/Mpbd8c01O79Fmoug62pr4IG9sP/PSKrk5fhOJJZC5TKYwXZRFch014v0hm
+         karA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1680396531;
+        h=in-reply-to:references:to:from:subject:cc:message-id:date
+         :content-transfer-encoding:mime-version:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=769fy3W+8GF1XpGTcCE4kXG2vQJMw57gwKdzR53jc/c=;
+        b=sa5vvBz/fGWw+vEhskPJUgrHkXHh75STY5eCop86l7p+cOgvwmcXww5m4Tz19HCqtX
+         /YMvqnruG5HO5en7M7+2ztdRk8hCx5a6fJJV8ObDq4flk4WZ/0+NuF1IXH6t0Wba+2c+
+         6BtJmRUY5OJJS+z3KrfhkiHFjBqZGIwwWHwZfsACSZIRSfIF+O96qeYPkWKXacZbTF0p
+         t1iUXcacDv1nFfzCtzW8nutn2KwNy6nsj1QUxRBoOO4Sh/OWstJ/oz3GuDKdHxI8mtH9
+         cvRoKQf2Np5glRhLK4QtJdu672RF4ccDZ+uJGZAtYzdQyLhJy1zlAeob3UC5LzKAMjt1
+         cx2Q==
+X-Gm-Message-State: AAQBX9dflYHmA+Y7N+5dMJHeivHQ2So870Hztm7Zvpd4NKNBtAZG3inJ
+        v+XvTL8N9wTtt11bsqdr9/KeKJL/l7z6BQ==
+X-Google-Smtp-Source: AKy350YEF2WyrFngtQH+LlDrGaKYg9D/63daDsHWTW/ihmxZBdOCML6g/5Ytv7vhppScY3Ak8/flZg==
+X-Received: by 2002:a17:902:e34c:b0:1a0:69ba:832e with SMTP id p12-20020a170902e34c00b001a069ba832emr26018065plc.0.1680396531251;
+        Sat, 01 Apr 2023 17:48:51 -0700 (PDT)
+Received: from localhost (121-44-67-49.tpgi.com.au. [121.44.67.49])
+        by smtp.gmail.com with ESMTPSA id d19-20020a170902b71300b00198d7b52eefsm3900623pls.257.2023.04.01.17.48.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 01 Apr 2023 17:48:50 -0700 (PDT)
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date:   Sun, 02 Apr 2023 10:48:45 +1000
+Message-Id: <CRLUUQQWIY0E.6XPIKFXECRBG@bobo>
+Cc:     "Paolo Bonzini" <pbonzini@redhat.com>,
+        "Shuah Khan" <shuah@kernel.org>, <linuxppc-dev@lists.ozlabs.org>,
+        <kvm@vger.kernel.org>, <linux-kselftest@vger.kernel.org>
+Subject: Re: [PATCH 1/2] KVM: PPC: Add kvm selftests support for powerpc
+From:   "Nicholas Piggin" <npiggin@gmail.com>
+To:     "Sean Christopherson" <seanjc@google.com>
+X-Mailer: aerc 0.13.0
+References: <20230316031732.3591455-1-npiggin@gmail.com>
+ <20230316031732.3591455-2-npiggin@gmail.com> <ZCSdWc9te0Noiwo3@google.com>
+In-Reply-To: <ZCSdWc9te0Noiwo3@google.com>
+X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
+        DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Nicholas,
+Hey thanks for the review. Points about formatting and style all
+valid, I'll tidy those up. For the others,
 
-I love your patch! Yet something to improve:
+On Thu Mar 30, 2023 at 6:19 AM AEST, Sean Christopherson wrote:
+> On Thu, Mar 16, 2023, Nicholas Piggin wrote:
+> > +#ifdef __powerpc__
+> > +		TEST_ASSERT(getpagesize() =3D=3D 64*1024,
+>
+> This can use SZ_64K (we really need to convert a bunch of open coded stuf=
+f...)
+>
+> > +			    "KVM selftests requires 64K host page size\n");
+>
+> What is the actual requirement?  E.g. is it that the host and guest page =
+sizes
+> must match, or is that the selftest setup itself only supports 64KiB page=
+s?  If
+> it's the former, would it make sense to assert outside of the switch stat=
+ement, e.g.
+>
+> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/s=
+elftests/kvm/lib/kvm_util.c
+> index 298c4372fb1a..920813a71be0 100644
+> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
+> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+> @@ -291,6 +291,10 @@ struct kvm_vm *____vm_create(enum vm_guest_mode mode=
+)
+>  #ifdef __aarch64__
+>         if (vm->pa_bits !=3D 40)
+>                 vm->type =3D KVM_VM_TYPE_ARM_IPA_SIZE(vm->pa_bits);
+> +#endif
+> +#ifdef __powerpc__
+> +       TEST_ASSERT(getpagesize() =3D=3D vm->page_size, "blah blah blah")=
+;
+> +
+>  #endif
+> =20
+>         vm_open(vm);
+>
+> If it's the latter (selftests limitation), can you add a comment explaini=
+ng the
+> limitation?
 
-[auto build test ERROR on powerpc/topic/ppc-kvm]
-[also build test ERROR on linus/master v6.3-rc4 next-20230331]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+It's the selftests setup, requires both host and guest to be 64k page
+size. I think it shouldn't be *too* hard to add any mix of 64k/4k, but
+there are a few quirks like requiring pgd to have 64k size allocation.
+64/64 is the most important for us, but it would be nice to get other
+combos working soon if nothing else than because they don't get as much
+testing in other ways.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Nicholas-Piggin/KVM-PPC-Permit-SRR1-flags-in-more-injected-interrupt-types/20230330-183420
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/powerpc/linux.git topic/ppc-kvm
-patch link:    https://lore.kernel.org/r/20230330103224.3589928-2-npiggin%40gmail.com
-patch subject: [PATCH v2 1/2] KVM: PPC: Permit SRR1 flags in more injected interrupt types
-config: powerpc-randconfig-c033-20230402 (https://download.01.org/0day-ci/archive/20230402/202304020827.3LEZ86WB-lkp@intel.com/config)
-compiler: powerpc-linux-gcc (GCC) 12.1.0
-reproduce (this is a W=1 build):
-        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-        chmod +x ~/bin/make.cross
-        # https://github.com/intel-lab-lkp/linux/commit/31c610025a69f60bfa70c098471861456b2e4012
-        git remote add linux-review https://github.com/intel-lab-lkp/linux
-        git fetch --no-tags linux-review Nicholas-Piggin/KVM-PPC-Permit-SRR1-flags-in-more-injected-interrupt-types/20230330-183420
-        git checkout 31c610025a69f60bfa70c098471861456b2e4012
-        # save the config file
-        mkdir build_dir && cp config build_dir/.config
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross W=1 O=build_dir ARCH=powerpc olddefconfig
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross W=1 O=build_dir ARCH=powerpc SHELL=/bin/bash arch/powerpc/kvm/
+I can add a comment.
 
-If you fix the issue, kindly add following tag where applicable
-| Reported-by: kernel test robot <lkp@intel.com>
-| Link: https://lore.kernel.org/oe-kbuild-all/202304020827.3LEZ86WB-lkp@intel.com/
+> > +
+> > +	/* If needed, create page table */
+> > +	if (vm->pgd_created)
+> > +		return;
+>
+> Heh, every arch has this.  Any objection to moving the check to virt_pgd_=
+alloc()
+> as a prep patch?
 
-All errors (new ones prefixed by >>):
+I have no objection, I can do that for the next spin.
 
-   arch/powerpc/kvm/booke.c:1011:5: error: no previous prototype for 'kvmppc_handle_exit' [-Werror=missing-prototypes]
-    1011 | int kvmppc_handle_exit(struct kvm_vcpu *vcpu, unsigned int exit_nr)
-         |     ^~~~~~~~~~~~~~~~~~
-   arch/powerpc/kvm/booke.c: In function 'kvmppc_handle_exit':
->> arch/powerpc/kvm/booke.c:1244:17: error: too many arguments to function 'kvmppc_core_queue_alignment'
-    1244 |                 kvmppc_core_queue_alignment(vcpu, 0, vcpu->arch.fault_dear,
-         |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~
-   arch/powerpc/kvm/booke.c:306:13: note: declared here
-     306 | static void kvmppc_core_queue_alignment(struct kvm_vcpu *vcpu, ulong dear_flags,
-         |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~
-   cc1: all warnings being treated as errors
+> > +		"PTE not valid at level: %u gva: 0x%lx pte:0x%lx\n",
+> > +		level, gva, pte);
+> > +
+> > +	return (pte & PTE_PAGE_MASK) + (gva & (vm->page_size - 1));
+> > +}
+> > +
+> > +static void virt_arch_dump_pt(FILE *stream, struct kvm_vm *vm, vm_padd=
+r_t pt, vm_vaddr_t va, int level, uint8_t indent)
+>
+> And here.  Actually, why bother with the helper?  There's one caller, and=
+ that
+> callers checks pgd_created, i.e. is already assuming its dumping only pag=
+e tables.
+> Ooh, nevermind, it's recursive.
+>
+> Can you drop "arch" from the name?  Selftests uses "arch" to tag function=
+s that
+> are provided by arch code for use in generic code.
 
+Yeah agree, I'll drop that.
 
-vim +/kvmppc_core_queue_alignment +1244 arch/powerpc/kvm/booke.c
+> > +			} else {
+> > +				virt_arch_dump_pt(stream, vm, pte & PDE_PT_MASK, va, level + 1, in=
+dent);
+> > +			}
+> > +		}
+> > +		va +=3D pt_entry_coverage(vm, level);
+>
+> The shift is constant for vm+level, correct?  In that case, can't this be=
+ written
+> as
+>
+> 	for (idx =3D 0; idx < size; idx++, va +=3D va_coverage) {
+>
+> or even without a snapshot
+>
+> 	for (idx =3D 0; idx < size; idx++, va +=3D pt_entry_coverage(vm, level))=
+ {
+>
+> That would allow
+>
+> 		if (!(pte & PTE_VALID)
+> 			continue
+>
+> to reduce the indentation of the printing.
 
-  1229	
-  1230		case BOOKE_INTERRUPT_DATA_STORAGE:
-  1231			kvmppc_core_queue_data_storage(vcpu, 0, vcpu->arch.fault_dear,
-  1232			                               vcpu->arch.fault_esr);
-  1233			kvmppc_account_exit(vcpu, DSI_EXITS);
-  1234			r = RESUME_GUEST;
-  1235			break;
-  1236	
-  1237		case BOOKE_INTERRUPT_INST_STORAGE:
-  1238			kvmppc_core_queue_inst_storage(vcpu, vcpu->arch.fault_esr);
-  1239			kvmppc_account_exit(vcpu, ISI_EXITS);
-  1240			r = RESUME_GUEST;
-  1241			break;
-  1242	
-  1243		case BOOKE_INTERRUPT_ALIGNMENT:
-> 1244			kvmppc_core_queue_alignment(vcpu, 0, vcpu->arch.fault_dear,
-  1245			                            vcpu->arch.fault_esr);
-  1246			r = RESUME_GUEST;
-  1247			break;
-  1248	
+It is constant for a given (vm, level). Good thinking, that should work.
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests
+> > +	stack_vaddr =3D __vm_vaddr_alloc(vm, stack_size,
+> > +				       DEFAULT_GUEST_STACK_VADDR_MIN,
+> > +				       MEM_REGION_DATA);
+> > +
+> > +	vcpu =3D __vm_vcpu_add(vm, vcpu_id);
+> > +
+> > +	vcpu_enable_cap(vcpu, KVM_CAP_PPC_PAPR, 1);
+> > +
+> > +	/* Setup guest registers */
+> > +	vcpu_regs_get(vcpu, &regs);
+> > +	vcpu_get_reg(vcpu, KVM_REG_PPC_LPCR_64, &lpcr);
+> > +
+> > +	regs.pc =3D (uintptr_t)guest_code;
+> > +	regs.gpr[12] =3D (uintptr_t)guest_code;
+> > +	regs.msr =3D 0x8000000002103032ull;
+> > +	regs.gpr[1] =3D stack_vaddr + stack_size - 256;
+> > +
+> > +	if (BYTE_ORDER =3D=3D LITTLE_ENDIAN) {
+> > +		regs.msr |=3D 0x1; // LE
+> > +		lpcr |=3D 0x0000000002000000; // ILE
+>
+> Would it be appropriate to add #defines to processor.h instead of open co=
+ding the
+> magic numbers?
+
+Yes it would. I should have not been lazy about it from the start, will
+fix.
+
+(Other comments snipped but agreed for all)
+
+Thanks,
+Nick
