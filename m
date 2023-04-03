@@ -2,53 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2EA3F6D4675
-	for <lists+kvm@lfdr.de>; Mon,  3 Apr 2023 16:05:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 441A06D4677
+	for <lists+kvm@lfdr.de>; Mon,  3 Apr 2023 16:06:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232805AbjDCOF5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 3 Apr 2023 10:05:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43310 "EHLO
+        id S232810AbjDCOGA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 3 Apr 2023 10:06:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42670 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232172AbjDCOFv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 3 Apr 2023 10:05:51 -0400
-Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD4762CACB;
-        Mon,  3 Apr 2023 07:05:21 -0700 (PDT)
-Received: by mail-pj1-x1034.google.com with SMTP id fy10-20020a17090b020a00b0023b4bcf0727so30681321pjb.0;
-        Mon, 03 Apr 2023 07:05:21 -0700 (PDT)
+        with ESMTP id S232528AbjDCOFy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 3 Apr 2023 10:05:54 -0400
+Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C998B24AF4;
+        Mon,  3 Apr 2023 07:05:27 -0700 (PDT)
+Received: by mail-pj1-x1032.google.com with SMTP id mp3-20020a17090b190300b0023fcc8ce113so32629426pjb.4;
+        Mon, 03 Apr 2023 07:05:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1680530720;
+        d=gmail.com; s=20210112; t=1680530726;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=NxbMrHgICX+PzuOws0YA449+rnLgC+W+xeXNuZzARcg=;
-        b=AR6Lx/9XbhMlTOKj0uW359PfePlcMPcLdb6lc6JN8f/haKItlJfyxvt9vLZ3WoAneV
-         mmOFta9BIwUKS1ElbROBvfRXScc+D6GjEMnLFaLREJy80H9sDD+TECyU43x6me4Lbil2
-         sXcvAmzpgeRXKEbvY5tNUeU9J6KLOp9dW/v+NOuZP65fi6Cd9/EAcBc4dO2FsCJgfCQv
-         IVq+3sY7E++imRfQPH2kZgCmLfpZ8kkGof5yKx9+a6dP3O4BOaHveoUmnnuBAhBxNTET
-         5Eyef5XHlX617RaeEfqGLIx+DrdpVrrUWgGm4lTXj8oVRKPdh56evZYz4O3G1NppsOAW
-         /BsA==
+        bh=uW7m7/qrXam5zwn+ChF6Qpt85GH+CQW9JyNbrYZqUtk=;
+        b=QN64awyKH2bnzXFUM0DQTGfpVpq/h63QBaT+4tckfdagXqJDEmBMWLu2Vkl7oEJKic
+         fycFWDRzX3T7b8VVtnlAZcPhvxz1OzgldgL8O3FItUC/w73Hf7HYY/urvNTbXb0KXW3j
+         Ihk6w/7gVeGFBMR3zgPFLnVpDPtP/rL31KGdJhm9vvMfOCd3fH/H7IfLofRVdFqMgint
+         9FASraQTodJWJLEzvWW7bI28zLRlT9L/J+thd2t110TlJ4cr6JcZFZpf5YuQb1UAxFgC
+         S2FCaXBVsFD2k4RPksbuSugf9SIYjFmqM7kYB9D+wPXXEw4xgWoopTGc46cT9PqZAC2Q
+         zMtg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680530720;
+        d=1e100.net; s=20210112; t=1680530726;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=NxbMrHgICX+PzuOws0YA449+rnLgC+W+xeXNuZzARcg=;
-        b=118Kx2pNxBCE8o9kG/YCGBguSBGkkVFVQ7187nIGf/5TfMCGeDQKd0Mccv/JdD8cDR
-         t0y3NhUurJPGuCAQpXxQilEzJ63CoLnw5ycxhHEDU6UmdJ/rh1PsBYM5XcSC5eTjyhEt
-         Ok8bHwghXz5nu/yVDMOSuPkeefsth3bCVD1mKr1UTgj++Kc2o+4qnrUMacy9Si/YrFLD
-         gAKmAEXRTkqkdY8rTdSD4PFO2vgfXGDtdqiKyK8mNqqqdArA3zFuf5W4mP/ckuwM18N/
-         1xGE5WxDtnn7q78Mq75vFkcenmlYN+fTGAYsW/d6pj8b5pm7sEgtCn4hfGgb7hEzjZ7C
-         H1rA==
-X-Gm-Message-State: AAQBX9cga6CrkI/PURl02BOno2CWeLWGJiHUTyjMtfO2EnkQAOTn7p+K
-        X5o31diSGpezxA4AA8uDDlshHaJt4+A=
-X-Google-Smtp-Source: AKy350a3RjUaiH4XHbLWoO9BC1c+N8qfMXhehIi/eun4+wHvqOk+gwENOtPBIk1BisFY8WmvRq6eAQ==
-X-Received: by 2002:a17:902:ce83:b0:1a1:ad5e:bdb2 with SMTP id f3-20020a170902ce8300b001a1ad5ebdb2mr45730746plg.57.1680530720217;
-        Mon, 03 Apr 2023 07:05:20 -0700 (PDT)
-Received: from localhost ([47.88.5.130])
-        by smtp.gmail.com with ESMTPSA id w11-20020a170902d70b00b00186a2274382sm6639410ply.76.2023.04.03.07.05.19
+        bh=uW7m7/qrXam5zwn+ChF6Qpt85GH+CQW9JyNbrYZqUtk=;
+        b=jG6zvbSOgT3hT1Mu37EetBgApV5CenjEpSDD4Wr6xXjALjGd0d6j1SV6oM8YkR1uDj
+         AvPchw4PyMAXgmve3dzfdynU+rGPAx1cA96qfkGskngQtrAJjUM/U6wD35/ZvKACxV6A
+         TcuIWxcCRDtCx+pZT9G84jF3iQecA6hiCkqmjjB2sGScKlcJHRs5EeCE8MbVFq8OuFHn
+         32F8SnQ/6wbKi0qceiyhuM1R11d8IlkgcDsa8PGrqDYe9pePWiqy4zt1nP8JV4l4OyhS
+         LG2qNk0TcfI3p2jYRMcCQJ1BJQUINq+pupN7N1/8G5eclKxBQC+vZ7c6hLGyrdBdPs5U
+         WWag==
+X-Gm-Message-State: AAQBX9e9evMYsLZs7JQI4tlQz44/6OECl1C26dS5SNa6+QGzJjeTNxAD
+        W1yiaZFVYre+OPdWgs980xTJuQxBbyE=
+X-Google-Smtp-Source: AKy350Yiz3pkX2+ZDR0fWkZykmS9yXCpx/nMMdG3lv9PdOfELPEwKXfhTSZRhGUtA1MZusU5VNg0zw==
+X-Received: by 2002:a17:90b:314d:b0:23e:f8e2:9ec8 with SMTP id ip13-20020a17090b314d00b0023ef8e29ec8mr39219405pjb.16.1680530726066;
+        Mon, 03 Apr 2023 07:05:26 -0700 (PDT)
+Received: from localhost ([47.89.225.180])
+        by smtp.gmail.com with ESMTPSA id b9-20020a17090a800900b00233db0db3dfsm9902721pjn.7.2023.04.03.07.05.24
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 03 Apr 2023 07:05:19 -0700 (PDT)
+        Mon, 03 Apr 2023 07:05:25 -0700 (PDT)
 From:   Lai Jiangshan <jiangshanlai@gmail.com>
 To:     linux-kernel@vger.kernel.org
 Cc:     Lai Jiangshan <jiangshan.ljs@antgroup.com>,
@@ -82,11 +82,11 @@ Cc:     Lai Jiangshan <jiangshan.ljs@antgroup.com>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
         Dave Hansen <dave.hansen@linux.intel.com>,
         "H. Peter Anvin" <hpa@zytor.com>,
-        Josh Poimboeuf <jpoimboe@kernel.org>,
-        Arnd Bergmann <arnd@arndb.de>
-Subject: [RFC PATCH 3/7] x86/entry: Implement atomic-IST-entry
-Date:   Mon,  3 Apr 2023 22:06:01 +0800
-Message-Id: <20230403140605.540512-4-jiangshanlai@gmail.com>
+        Kuppuswamy Sathyanarayanan 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>
+Subject: [RFC PATCH 4/7] x86/entry: Use atomic-IST-entry for NMI
+Date:   Mon,  3 Apr 2023 22:06:02 +0800
+Message-Id: <20230403140605.540512-5-jiangshanlai@gmail.com>
 X-Mailer: git-send-email 2.19.1.6.gb485710b
 In-Reply-To: <20230403140605.540512-1-jiangshanlai@gmail.com>
 References: <20230403140605.540512-1-jiangshanlai@gmail.com>
@@ -104,612 +104,439 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Lai Jiangshan <jiangshan.ljs@antgroup.com>
 
-See the comments in the cover-letter.  They will be moved into the code
-and changelog here when improved.
-
 Signed-off-by: Lai Jiangshan <jiangshan.ljs@antgroup.com>
 ---
- arch/x86/entry/Makefile          |   3 +
- arch/x86/entry/entry_64.S        | 193 ++++++++++++++++++++
- arch/x86/entry/ist_entry.c       | 299 +++++++++++++++++++++++++++++++
- arch/x86/kernel/asm-offsets_64.c |   7 +
- arch/x86/kernel/callthunks.c     |   2 +
- tools/objtool/check.c            |   7 +-
- 6 files changed, 510 insertions(+), 1 deletion(-)
- create mode 100644 arch/x86/entry/ist_entry.c
+ arch/x86/entry/entry_64.S       | 373 --------------------------------
+ arch/x86/entry/ist_entry.c      |   2 +-
+ arch/x86/include/asm/idtentry.h |   9 +-
+ 3 files changed, 7 insertions(+), 377 deletions(-)
 
-diff --git a/arch/x86/entry/Makefile b/arch/x86/entry/Makefile
-index ca2fe186994b..7cc1254ca519 100644
---- a/arch/x86/entry/Makefile
-+++ b/arch/x86/entry/Makefile
-@@ -8,11 +8,14 @@ UBSAN_SANITIZE := n
- KCOV_INSTRUMENT := n
- 
- CFLAGS_REMOVE_common.o		= $(CC_FLAGS_FTRACE)
-+CFLAGS_REMOVE_ist_entry.o	= $(CC_FLAGS_FTRACE) $(RETHUNK_CFLAGS)
- 
- CFLAGS_common.o			+= -fno-stack-protector
-+CFLAGS_ist_entry.o		+= -fno-stack-protector
- 
- obj-y				:= entry.o entry_$(BITS).o syscall_$(BITS).o
- obj-y				+= common.o
-+obj-$(CONFIG_X86_64)		+= ist_entry.o
- 
- obj-y				+= vdso/
- obj-y				+= vsyscall/
 diff --git a/arch/x86/entry/entry_64.S b/arch/x86/entry/entry_64.S
-index 49ddc4dd3117..50a24cc83581 100644
+index 50a24cc83581..2bb7ab8512dc 100644
 --- a/arch/x86/entry/entry_64.S
 +++ b/arch/x86/entry/entry_64.S
-@@ -443,6 +443,184 @@ SYM_CODE_END(\asmsym)
- 	idtentry \vector asm_\cfunc \cfunc has_error_code=0
- .endm
+@@ -1341,379 +1341,6 @@ SYM_CODE_START_LOCAL(error_return)
+ 	jmp	swapgs_restore_regs_and_return_to_usermode
+ SYM_CODE_END(error_return)
  
-+/**
-+ * idtentry_ist - Macro to generate entry stubs for IST exceptions except #DF
-+ * @vector:		Vector number
-+ * @asmsym:		ASM symbol for the entry point
-+ * @cfunc:		C function to be called when it occurs in kernel
-+ * @user_cfunc:		C function to be called when it occurs in userspace
-+ * @has_error_code:	Hardware pushed error code on stack
-+ * @stack_offset:	Offset of the IST stack top in struct cea_exception_stacks
-+ *
-+ * The macro emits code to set up the kernel context for IST exceptions.
-+ *
-+ * From the hardware entry of the event to the SYM_INNER_LABEL(commit_\asmsym)
-+ * is atomic-IST-entry (note: atomic-IST-entry is from the hardware entry,
-+ * not merely from the first instruction of this macro).
-+ *
-+ * The atomic-IST-entry pushes pt_regs and copies the pt_regs to the IST
-+ * main stack, and switches to it.  If the atomic-IST-entry is interrupted
-+ * by another IST event (except #DF), the new atomic-IST-entry will
-+ * replicate the interrupted one as if every atomic-IST-entry is atomic.
-+ *
-+ * See the comments in entry64.c.
-+ *
-+ * When the cpu is on any IST stack or the IST main stack, %rsp can not be
-+ * switched off except being interrupted by any IST exception or totally
-+ * switching off (no usable data left).
-+ *
-+ * If the entry comes from user space, it turns to use the normal entry
-+ * path finally on its kernel stack including the return to user space
-+ * work and preemption checks on exit.  The macro idtentry_body ensures
-+ * the IST main stack is totally switched off (no usable data left) at
-+ * the same time it switches to the kernel stack..
-+ *
-+ * If hits in kernel mode then it needs to go through the paranoid
-+ * entry as the exception can hit any random state. No preemption
-+ * check on exit to keep the paranoid path simple.
-+ */
-+.macro idtentry_ist vector asmsym cfunc user_cfunc has_error_code:req, stack_offset:req
-+SYM_CODE_START(\asmsym)
-+	UNWIND_HINT_IRET_REGS offset=\has_error_code*8
-+	ENDBR
-+
-+	/*
-+	 * Clear X86_EFLAGS_AC, X86_EFLAGS_DF and set a default ORIG_RAX.
-+	 *
-+	 * The code setting ORIG_RAX will not be replicated if interrupted.
-+	 */
-+	ASM_CLAC
-+	cld
-+
-+	.if \has_error_code == 0
-+		pushq	$-1		/* ORIG_RAX: no syscall to restart */
-+	.endif
-+
-+	/*
-+	 * No register can be touched except %rsp,%rflags,%rip before
-+	 * pushing all the registers.  It is indispensable for nested
-+	 * atomic-IST-entry to replicate pushing the registers.
-+	 */
-+	PUSH_REGS
-+
-+	/*
-+	 * Finished pushing register, all registers can be touched by now.
-+	 *
-+	 * Clear registers for the C function ist_copy_regs_to_main_stack()
-+	 * and the handler to avoid any possible exploitation of any
-+	 * speculation attack.
-+	 */
-+	CLEAR_REGS
-+
-+	/*
-+	 * Copy the pt_regs to the IST main stack including the pt_regs of
-+	 * the interrupted atomic-IST-entris, if any, by replicating.
-+	 */
-+	movq	%rsp, %rdi				/* pt_regs pointer on its own IST stack */
-+	leaq	PTREGS_SIZE-\stack_offset(%rsp), %rsi	/* struct cea_exception_stacks pointer */
-+	call	ist_copy_regs_to_main_stack
-+
-+	/*
-+	 * Commit stage.
-+	 */
-+SYM_INNER_LABEL(start_commit_\asmsym, SYM_L_GLOBAL)
-+	/*
-+	 * Switches to the IST main stack.  Before the switching is done,
-+	 * %rax is the copied pt_regs pointer in IST main stack.
-+	 */
-+	movq	%rax, %rsp
-+
-+	/*
-+	 * The label should be immediate after the instruction that switches
-+	 * the stack since there is code assuming there is only one single
-+	 * instruction in the commit stage and the code assumes "%rsp in the
-+	 * IST main stack is also the sign of ending a atomic-IST-entry".
-+	 * (The code will be removed in future when %rip-based identifying
-+	 * is added.)
-+	 */
-+SYM_INNER_LABEL(commit_\asmsym, SYM_L_GLOBAL)
-+
-+	/*
-+	 * Now, it is on the IST main stack.  For the whole kernel, the entries
-+	 * of the IST exceptions can be seen from here because the inside
-+	 * of the atomic-IST-entry can not be seen from the whole kernel
-+	 * except in the atomic-IST-entry or #DF.
-+	 */
-+	UNWIND_HINT_REGS
-+	ENCODE_FRAME_POINTER
-+
-+	/*
-+	 * The code setting ORIG_RAX will not be replicated if interrupted.
-+	 * So redo it here.
-+	 */
-+	.if \has_error_code == 0
-+		movq	$-1, ORIG_RAX(%rsp)	/* ORIG_RAX: no syscall to restart */
-+	.endif
-+
-+	/*
-+	 * If the entry is from userspace, switch stacks and treat it as
-+	 * a normal entry.
-+	 */
-+	testb	$3, CS(%rsp)
-+	jnz	.Lfrom_usermode_switch_stack_\@
-+
-+	/*
-+	 * paranoid_entry returns GS/CR3/SPEC_CTL information for
-+	 * paranoid_exit in RBX/R14/R15.
-+	 */
-+	call	paranoid_entry
-+
-+	movq	%rsp, %rdi		/* pt_regs pointer */
-+	.if \has_error_code == 1
-+		movq	ORIG_RAX(%rsp), %rsi	/* get error code into 2nd argument*/
-+		movq	$-1, ORIG_RAX(%rsp)	/* no syscall to restart */
-+	.endif
-+	call	\cfunc
-+
-+	jmp	paranoid_exit
-+
-+.Lfrom_usermode_switch_stack_\@:
-+	/* Switch context: GS_BASE, CR3, SPEC_CTL. */
-+	swapgs
-+	FENCE_SWAPGS_USER_ENTRY
-+	/* We have user CR3.  Change to kernel CR3. */
-+	SWITCH_TO_KERNEL_CR3 scratch_reg=%rax
-+	IBRS_ENTER
-+	UNTRAIN_RET
-+
-+	/* Put the pt_regs onto the kernel task stack. */
-+	movq	%rsp, %rdi			/* arg0 = pt_regs pointer */
-+	call	sync_regs
-+
-+	/*
-+	 * Switch to the kernel task stack and use the user entry point.
-+	 *
-+	 * When from the user mode, the procedure has to atomically switches
-+	 * off the TSS-configured IST stacks too, so it switches to the IST
-+	 * main stack first, and then switches off the IST main stack in atomic
-+	 * fashion: when %rsp leaves the IST main stack, the IST main stack is
-+	 * totally free.
-+	 */
-+	movq	%rax, %rsp
-+	UNWIND_HINT_REGS
-+	ENCODE_FRAME_POINTER
-+
-+	movq	%rsp, %rdi			/* pt_regs pointer into 1st argument*/
-+	.if \has_error_code == 1
-+		movq	ORIG_RAX(%rsp), %rsi	/* get error code into 2nd argument*/
-+		movq	$-1, ORIG_RAX(%rsp)	/* no syscall to restart */
-+	.endif
-+	call	\user_cfunc
-+
-+	/* For some configurations \user_cfunc ends up being a noreturn. */
-+	REACHABLE
-+
-+	jmp	error_return
-+
-+_ASM_NOKPROBE(\asmsym)
-+SYM_CODE_END(\asmsym)
-+.endm
-+
- /**
-  * idtentry_mce_db - Macro to generate entry stubs for #MC and #DB
-  * @vector:		Vector number
-@@ -586,8 +764,23 @@ SYM_CODE_END(\asmsym)
-  */
- .macro idtentry_df vector asmsym cfunc
- SYM_CODE_START(\asmsym)
-+
-+	/*
-+	 * This unwind-hint is incorect if it is the soft double fault rasied
-+	 * from ist_double_fault().  It doesn't matter since it is unrecoverable
-+	 * double fault.
-+	 */
- 	UNWIND_HINT_IRET_REGS offset=8
- 	ENDBR
-+
-+	/*
-+	 * Set %rsp = %rsp - 8 if it is the soft double fault raisied from
-+	 * ist_double_fault().  The CPU doesn't push an error code in the case
-+	 * since it is injected by an INT instruction.
-+	 */
-+	btr	$3, %rsp
-+	UNWIND_HINT_IRET_REGS offset=8
-+
- 	ASM_CLAC
- 	cld
- 
+-/*
+- * Runs on exception stack.  Xen PV does not go through this path at all,
+- * so we can use real assembly here.
+- *
+- * Registers:
+- *	%r14: Used to save/restore the CR3 of the interrupted context
+- *	      when PAGE_TABLE_ISOLATION is in use.  Do not clobber.
+- */
+-SYM_CODE_START(asm_exc_nmi)
+-	UNWIND_HINT_IRET_REGS
+-	ENDBR
+-
+-	/*
+-	 * We allow breakpoints in NMIs. If a breakpoint occurs, then
+-	 * the iretq it performs will take us out of NMI context.
+-	 * This means that we can have nested NMIs where the next
+-	 * NMI is using the top of the stack of the previous NMI. We
+-	 * can't let it execute because the nested NMI will corrupt the
+-	 * stack of the previous NMI. NMI handlers are not re-entrant
+-	 * anyway.
+-	 *
+-	 * To handle this case we do the following:
+-	 *  Check the a special location on the stack that contains
+-	 *  a variable that is set when NMIs are executing.
+-	 *  The interrupted task's stack is also checked to see if it
+-	 *  is an NMI stack.
+-	 *  If the variable is not set and the stack is not the NMI
+-	 *  stack then:
+-	 *    o Set the special variable on the stack
+-	 *    o Copy the interrupt frame into an "outermost" location on the
+-	 *      stack
+-	 *    o Copy the interrupt frame into an "iret" location on the stack
+-	 *    o Continue processing the NMI
+-	 *  If the variable is set or the previous stack is the NMI stack:
+-	 *    o Modify the "iret" location to jump to the repeat_nmi
+-	 *    o return back to the first NMI
+-	 *
+-	 * Now on exit of the first NMI, we first clear the stack variable
+-	 * The NMI stack will tell any nested NMIs at that point that it is
+-	 * nested. Then we pop the stack normally with iret, and if there was
+-	 * a nested NMI that updated the copy interrupt stack frame, a
+-	 * jump will be made to the repeat_nmi code that will handle the second
+-	 * NMI.
+-	 *
+-	 * However, espfix prevents us from directly returning to userspace
+-	 * with a single IRET instruction.  Similarly, IRET to user mode
+-	 * can fault.  We therefore handle NMIs from user space like
+-	 * other IST entries.
+-	 */
+-
+-	ASM_CLAC
+-	cld
+-
+-	/* Use %rdx as our temp variable throughout */
+-	pushq	%rdx
+-
+-	testb	$3, CS-RIP+8(%rsp)
+-	jz	.Lnmi_from_kernel
+-
+-	/*
+-	 * NMI from user mode.  We need to run on the thread stack, but we
+-	 * can't go through the normal entry paths: NMIs are masked, and
+-	 * we don't want to enable interrupts, because then we'll end
+-	 * up in an awkward situation in which IRQs are on but NMIs
+-	 * are off.
+-	 *
+-	 * We also must not push anything to the stack before switching
+-	 * stacks lest we corrupt the "NMI executing" variable.
+-	 */
+-
+-	swapgs
+-	FENCE_SWAPGS_USER_ENTRY
+-	SWITCH_TO_KERNEL_CR3 scratch_reg=%rdx
+-	movq	%rsp, %rdx
+-	movq	PER_CPU_VAR(pcpu_hot + X86_top_of_stack), %rsp
+-	UNWIND_HINT_IRET_REGS base=%rdx offset=8
+-	pushq	5*8(%rdx)	/* pt_regs->ss */
+-	pushq	4*8(%rdx)	/* pt_regs->rsp */
+-	pushq	3*8(%rdx)	/* pt_regs->flags */
+-	pushq	2*8(%rdx)	/* pt_regs->cs */
+-	pushq	1*8(%rdx)	/* pt_regs->rip */
+-	UNWIND_HINT_IRET_REGS
+-	pushq   $-1		/* pt_regs->orig_ax */
+-	PUSH_AND_CLEAR_REGS rdx=(%rdx)
+-	ENCODE_FRAME_POINTER
+-
+-	IBRS_ENTER
+-	UNTRAIN_RET
+-
+-	/*
+-	 * At this point we no longer need to worry about stack damage
+-	 * due to nesting -- we're on the normal thread stack and we're
+-	 * done with the NMI stack.
+-	 */
+-
+-	movq	%rsp, %rdi
+-	movq	$-1, %rsi
+-	call	exc_nmi
+-
+-	/*
+-	 * Return back to user mode.  We must *not* do the normal exit
+-	 * work, because we don't want to enable interrupts.
+-	 */
+-	jmp	swapgs_restore_regs_and_return_to_usermode
+-
+-.Lnmi_from_kernel:
+-	/*
+-	 * Here's what our stack frame will look like:
+-	 * +---------------------------------------------------------+
+-	 * | original SS                                             |
+-	 * | original Return RSP                                     |
+-	 * | original RFLAGS                                         |
+-	 * | original CS                                             |
+-	 * | original RIP                                            |
+-	 * +---------------------------------------------------------+
+-	 * | temp storage for rdx                                    |
+-	 * +---------------------------------------------------------+
+-	 * | "NMI executing" variable                                |
+-	 * +---------------------------------------------------------+
+-	 * | iret SS          } Copied from "outermost" frame        |
+-	 * | iret Return RSP  } on each loop iteration; overwritten  |
+-	 * | iret RFLAGS      } by a nested NMI to force another     |
+-	 * | iret CS          } iteration if needed.                 |
+-	 * | iret RIP         }                                      |
+-	 * +---------------------------------------------------------+
+-	 * | outermost SS          } initialized in first_nmi;       |
+-	 * | outermost Return RSP  } will not be changed before      |
+-	 * | outermost RFLAGS      } NMI processing is done.         |
+-	 * | outermost CS          } Copied to "iret" frame on each  |
+-	 * | outermost RIP         } iteration.                      |
+-	 * +---------------------------------------------------------+
+-	 * | pt_regs                                                 |
+-	 * +---------------------------------------------------------+
+-	 *
+-	 * The "original" frame is used by hardware.  Before re-enabling
+-	 * NMIs, we need to be done with it, and we need to leave enough
+-	 * space for the asm code here.
+-	 *
+-	 * We return by executing IRET while RSP points to the "iret" frame.
+-	 * That will either return for real or it will loop back into NMI
+-	 * processing.
+-	 *
+-	 * The "outermost" frame is copied to the "iret" frame on each
+-	 * iteration of the loop, so each iteration starts with the "iret"
+-	 * frame pointing to the final return target.
+-	 */
+-
+-	/*
+-	 * Determine whether we're a nested NMI.
+-	 *
+-	 * If we interrupted kernel code between repeat_nmi and
+-	 * end_repeat_nmi, then we are a nested NMI.  We must not
+-	 * modify the "iret" frame because it's being written by
+-	 * the outer NMI.  That's okay; the outer NMI handler is
+-	 * about to about to call exc_nmi() anyway, so we can just
+-	 * resume the outer NMI.
+-	 */
+-
+-	movq	$repeat_nmi, %rdx
+-	cmpq	8(%rsp), %rdx
+-	ja	1f
+-	movq	$end_repeat_nmi, %rdx
+-	cmpq	8(%rsp), %rdx
+-	ja	nested_nmi_out
+-1:
+-
+-	/*
+-	 * Now check "NMI executing".  If it's set, then we're nested.
+-	 * This will not detect if we interrupted an outer NMI just
+-	 * before IRET.
+-	 */
+-	cmpl	$1, -8(%rsp)
+-	je	nested_nmi
+-
+-	/*
+-	 * Now test if the previous stack was an NMI stack.  This covers
+-	 * the case where we interrupt an outer NMI after it clears
+-	 * "NMI executing" but before IRET.  We need to be careful, though:
+-	 * there is one case in which RSP could point to the NMI stack
+-	 * despite there being no NMI active: naughty userspace controls
+-	 * RSP at the very beginning of the SYSCALL targets.  We can
+-	 * pull a fast one on naughty userspace, though: we program
+-	 * SYSCALL to mask DF, so userspace cannot cause DF to be set
+-	 * if it controls the kernel's RSP.  We set DF before we clear
+-	 * "NMI executing".
+-	 */
+-	lea	6*8(%rsp), %rdx
+-	/* Compare the NMI stack (rdx) with the stack we came from (4*8(%rsp)) */
+-	cmpq	%rdx, 4*8(%rsp)
+-	/* If the stack pointer is above the NMI stack, this is a normal NMI */
+-	ja	first_nmi
+-
+-	subq	$EXCEPTION_STKSZ, %rdx
+-	cmpq	%rdx, 4*8(%rsp)
+-	/* If it is below the NMI stack, it is a normal NMI */
+-	jb	first_nmi
+-
+-	/* Ah, it is within the NMI stack. */
+-
+-	testb	$(X86_EFLAGS_DF >> 8), (3*8 + 1)(%rsp)
+-	jz	first_nmi	/* RSP was user controlled. */
+-
+-	/* This is a nested NMI. */
+-
+-nested_nmi:
+-	/*
+-	 * Modify the "iret" frame to point to repeat_nmi, forcing another
+-	 * iteration of NMI handling.
+-	 */
+-	subq	$8, %rsp
+-	leaq	-10*8(%rsp), %rdx
+-	pushq	$__KERNEL_DS
+-	pushq	%rdx
+-	pushfq
+-	pushq	$__KERNEL_CS
+-	pushq	$repeat_nmi
+-
+-	/* Put stack back */
+-	addq	$(6*8), %rsp
+-
+-nested_nmi_out:
+-	popq	%rdx
+-
+-	/* We are returning to kernel mode, so this cannot result in a fault. */
+-	iretq
+-
+-first_nmi:
+-	/* Restore rdx. */
+-	movq	(%rsp), %rdx
+-
+-	/* Make room for "NMI executing". */
+-	pushq	$0
+-
+-	/* Leave room for the "iret" frame */
+-	subq	$(5*8), %rsp
+-
+-	/* Copy the "original" frame to the "outermost" frame */
+-	.rept 5
+-	pushq	11*8(%rsp)
+-	.endr
+-	UNWIND_HINT_IRET_REGS
+-
+-	/* Everything up to here is safe from nested NMIs */
+-
+-#ifdef CONFIG_DEBUG_ENTRY
+-	/*
+-	 * For ease of testing, unmask NMIs right away.  Disabled by
+-	 * default because IRET is very expensive.
+-	 */
+-	pushq	$0		/* SS */
+-	pushq	%rsp		/* RSP (minus 8 because of the previous push) */
+-	addq	$8, (%rsp)	/* Fix up RSP */
+-	pushfq			/* RFLAGS */
+-	pushq	$__KERNEL_CS	/* CS */
+-	pushq	$1f		/* RIP */
+-	iretq			/* continues at repeat_nmi below */
+-	UNWIND_HINT_IRET_REGS
+-1:
+-#endif
+-
+-repeat_nmi:
+-	ANNOTATE_NOENDBR // this code
+-	/*
+-	 * If there was a nested NMI, the first NMI's iret will return
+-	 * here. But NMIs are still enabled and we can take another
+-	 * nested NMI. The nested NMI checks the interrupted RIP to see
+-	 * if it is between repeat_nmi and end_repeat_nmi, and if so
+-	 * it will just return, as we are about to repeat an NMI anyway.
+-	 * This makes it safe to copy to the stack frame that a nested
+-	 * NMI will update.
+-	 *
+-	 * RSP is pointing to "outermost RIP".  gsbase is unknown, but, if
+-	 * we're repeating an NMI, gsbase has the same value that it had on
+-	 * the first iteration.  paranoid_entry will load the kernel
+-	 * gsbase if needed before we call exc_nmi().  "NMI executing"
+-	 * is zero.
+-	 */
+-	movq	$1, 10*8(%rsp)		/* Set "NMI executing". */
+-
+-	/*
+-	 * Copy the "outermost" frame to the "iret" frame.  NMIs that nest
+-	 * here must not modify the "iret" frame while we're writing to
+-	 * it or it will end up containing garbage.
+-	 */
+-	addq	$(10*8), %rsp
+-	.rept 5
+-	pushq	-6*8(%rsp)
+-	.endr
+-	subq	$(5*8), %rsp
+-end_repeat_nmi:
+-	ANNOTATE_NOENDBR // this code
+-
+-	/*
+-	 * Everything below this point can be preempted by a nested NMI.
+-	 * If this happens, then the inner NMI will change the "iret"
+-	 * frame to point back to repeat_nmi.
+-	 */
+-	pushq	$-1				/* ORIG_RAX: no syscall to restart */
+-
+-	PUSH_AND_CLEAR_REGS
+-	UNWIND_HINT_REGS
+-	ENCODE_FRAME_POINTER
+-
+-	/*
+-	 * Use paranoid_entry to handle SWAPGS, but no need to use paranoid_exit
+-	 * as we should not be calling schedule in NMI context.
+-	 * Even with normal interrupts enabled. An NMI should not be
+-	 * setting NEED_RESCHED or anything that normal interrupts and
+-	 * exceptions might do.
+-	 */
+-	call	paranoid_entry
+-
+-	movq	%rsp, %rdi
+-	movq	$-1, %rsi
+-	call	exc_nmi
+-
+-	/* Always restore stashed SPEC_CTRL value (see paranoid_entry) */
+-	IBRS_EXIT save_reg=%r15
+-
+-	/* Always restore stashed CR3 value (see paranoid_entry) */
+-	RESTORE_CR3 scratch_reg=%r15 save_reg=%r14
+-
+-	/*
+-	 * The above invocation of paranoid_entry stored the GSBASE
+-	 * related information in R/EBX depending on the availability
+-	 * of FSGSBASE.
+-	 *
+-	 * If FSGSBASE is enabled, restore the saved GSBASE value
+-	 * unconditionally, otherwise take the conditional SWAPGS path.
+-	 */
+-	ALTERNATIVE "jmp nmi_no_fsgsbase", "", X86_FEATURE_FSGSBASE
+-
+-	wrgsbase	%rbx
+-	jmp	nmi_restore
+-
+-nmi_no_fsgsbase:
+-	/* EBX == 0 -> invoke SWAPGS */
+-	testl	%ebx, %ebx
+-	jnz	nmi_restore
+-
+-nmi_swapgs:
+-	swapgs
+-
+-nmi_restore:
+-	POP_REGS
+-
+-	/*
+-	 * Skip orig_ax and the "outermost" frame to point RSP at the "iret"
+-	 * at the "iret" frame.
+-	 */
+-	addq	$6*8, %rsp
+-
+-	/*
+-	 * Clear "NMI executing".  Set DF first so that we can easily
+-	 * distinguish the remaining code between here and IRET from
+-	 * the SYSCALL entry and exit paths.
+-	 *
+-	 * We arguably should just inspect RIP instead, but I (Andy) wrote
+-	 * this code when I had the misapprehension that Xen PV supported
+-	 * NMIs, and Xen PV would break that approach.
+-	 */
+-	std
+-	movq	$0, 5*8(%rsp)		/* clear "NMI executing" */
+-
+-	/*
+-	 * iretq reads the "iret" frame and exits the NMI stack in a
+-	 * single instruction.  We are returning to kernel mode, so this
+-	 * cannot result in a fault.  Similarly, we don't need to worry
+-	 * about espfix64 on the way back to kernel mode.
+-	 */
+-	iretq
+-SYM_CODE_END(asm_exc_nmi)
+-
+ #ifndef CONFIG_IA32_EMULATION
+ /*
+  * This handles SYSCALL from 32-bit code.  There is no way to program
 diff --git a/arch/x86/entry/ist_entry.c b/arch/x86/entry/ist_entry.c
-new file mode 100644
-index 000000000000..e1b06306ac51
---- /dev/null
+index e1b06306ac51..407571cc4a8c 100644
+--- a/arch/x86/entry/ist_entry.c
 +++ b/arch/x86/entry/ist_entry.c
-@@ -0,0 +1,299 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ *  Copyright (C) 2022-2023 Lai Jiangshan, Ant Group
-+ *
-+ * Handle entries and exits for hardware traps and faults.
-+ *
-+ * It is as low level as entry_64.S and its code can be running in the
-+ * environments that the GS base is a user controlled value, or the CR3
-+ * is the PTI user CR3 or both.
-+ */
-+#include <asm/traps.h>
-+
-+#define IST_DOUBLE_FAULT_VECTOR 8
-+
-+static __always_inline void ist_double_fault(void)
-+{
-+	asm volatile ("int $" __stringify(IST_DOUBLE_FAULT_VECTOR));
-+}
-+
-+#define IN_CEA_ESTACK(ceastp, name, sp)			\
-+	((CEA_ESTACK_BOT(ceastp, name) <= (sp)) &&	\
-+	 ((sp) < CEA_ESTACK_TOP(ceastp, name)))
-+
-+struct ist_ctx {
-+	const struct pt_regs *regs;
-+	unsigned long commit_ip;
-+};
-+
-+#define DEFINE_IDENTIFY_IST(stack_name, sym_name, is_enabled)			\
-+extern char commit_asm_exc_##sym_name[];					\
-+static __always_inline bool identify_ist_##sym_name(				\
-+		const struct pt_regs *regs, struct cea_exception_stacks *stacks,\
-+		struct ist_ctx *ctx)						\
-+{										\
-+	if (!(is_enabled))							\
-+		return false;							\
-+	if (!IN_CEA_ESTACK(stacks, stack_name, regs->sp))			\
-+		return false;							\
-+	ctx->regs = (struct pt_regs *)CEA_ESTACK_TOP(stacks, stack_name) - 1;	\
-+	ctx->commit_ip = (unsigned long)commit_asm_exc_##sym_name;		\
-+	return true;								\
-+}
-+
-+DEFINE_IDENTIFY_IST(NMI, nmi, false)
-+DEFINE_IDENTIFY_IST(DB, debug, false)
-+DEFINE_IDENTIFY_IST(MCE, machine_check, false)
-+DEFINE_IDENTIFY_IST(VC, vmm_communication, false)
-+
-+static __always_inline bool identify_ist(
-+		const struct pt_regs *regs, struct cea_exception_stacks *stacks,
-+		struct ist_ctx *ctx)
-+{
-+	return	identify_ist_nmi(regs, stacks, ctx) ||
-+		identify_ist_debug(regs, stacks, ctx) ||
-+		identify_ist_machine_check(regs, stacks, ctx) ||
-+		identify_ist_vmm_communication(regs, stacks, ctx);
-+}
-+
-+/*
-+ * identify if an interrupted atomic-IST-entry had successfully saved
-+ * the general registers onto its IST stack.
-+ *
-+ * Generally, the outmost atomic-IST-entry had likely successfully saved
-+ * the general registers.  If not, there must be one of the nested
-+ * atomic-IST-entry had saved the general registers of the context that
-+ * the outmost atomic-IST-entry had interrupted.
-+ *
-+ * Arguments:
-+ *   @nested: the nested atomic-IST-entry who had interrupted @interrupted
-+ *   @interrupted: the interrupted atomic-IST-entry.
-+ *
-+ * Returns:
-+ *   true:  the interrupted atomic-IST-entry had saved the general registers.
-+ *   false: the interrupted atomic-IST-entry had not yet saved the general registers.
-+ */
-+static __always_inline
-+bool identify_if_gp_registers_saved(const struct pt_regs *nested, const struct pt_regs *interrupted)
-+{
-+	return nested->sp <= (unsigned long)(void *)interrupted;
-+}
-+
-+static __always_inline
-+void copy_regs_exception_head(struct pt_regs *target, const struct pt_regs *from)
-+{
-+	target->ss	= from->ss;
-+	target->sp	= from->sp;
-+	target->flags 	= from->flags;
-+	target->cs	= from->cs;
-+	target->ip	= from->ip;
-+	target->orig_ax	= from->orig_ax;
-+}
-+
-+static __always_inline
-+void copy_regs_general_registers(struct pt_regs *target, const struct pt_regs *from)
-+{
-+	target->di  = from->di;
-+	target->si  = from->si;
-+	target->dx  = from->dx;
-+	target->cx  = from->cx;
-+	target->ax  = from->ax;
-+	target->r8  = from->r8;
-+	target->r9  = from->r9;
-+	target->r10 = from->r10;
-+	target->r11 = from->r11;
-+	target->bx  = from->bx;
-+	target->bp  = from->bp;
-+	target->r12 = from->r12;
-+	target->r13 = from->r13;
-+	target->r14 = from->r14;
-+	target->r15 = from->r15;
-+}
-+
-+/*
-+ * Do the work as the outmost atomic-IST-entry to copy the supposed pt_regs
-+ * of the interrupted context to the IST main stack.  (If the ongoing
-+ * atomic-IST-entry is the outmost one, the work is literally doing copy as
-+ * the outmost, if not, the work is replicating the outmost.)
-+ *
-+ * The hardware-entry of the outmost atomic-IST-entry has already saved the
-+ * exception head of the  pt_regs. If the outmost atomic-IST-entry was
-+ * unfortunately interrupted before fully saving all the general registers,
-+ * the general registers are untouched and must be saved by one of the
-+ * consequent nested atomic-IST-entries. The identifying code can just
-+ * examine all the nested atomic-IST-entries to find which one has saved
-+ * the general registers.
-+ */
-+static __always_inline
-+void copy_outmost(struct pt_regs *target, const struct pt_regs *outmost, const struct pt_regs *gp)
-+{
-+	copy_regs_exception_head(target, outmost);
-+	copy_regs_general_registers(target, gp);
-+}
-+
-+/*
-+ * Replicate the interrupted atomic-IST-entry's CLAC and CLD in the ASM
-+ * code.  Even SMAP is not enabled, CLAC is replicated unconditionally
-+ * since doing so has no harm.
-+ */
-+static __always_inline void replicate_clac_cld(struct pt_regs *target)
-+{
-+	target->flags &= ~(unsigned long)(X86_EFLAGS_AC | X86_EFLAGS_DF);
-+}
-+
-+/* Replicate the interrupted atomic-IST-entry's CLEAR_REGS macro. */
-+static __always_inline void replicate_clear_regs(struct pt_regs *target)
-+{
-+	target->di  = 0;
-+	target->si  = 0;
-+	target->dx  = 0;
-+	target->cx  = 0;
-+	target->ax  = 0;
-+	target->r8  = 0;
-+	target->r9  = 0;
-+	target->r10 = 0;
-+	target->r11 = 0;
-+	target->bx  = 0;
-+	target->bp  = 0;
-+	target->r12 = 0;
-+	target->r13 = 0;
-+	target->r14 = 0;
-+	target->r15 = 0;
-+}
-+
-+/*
-+ * Replicate the action that the interrupted atomic-IST-entry's
-+ * ist_copy_regs_to_main_stack() clobbers caller-saved registers
-+ */
-+static __always_inline void replicate_func_clobber(struct pt_regs *target)
-+{
-+	/* nothing needs to be done. */
-+}
-+
-+/*
-+ * Replicate the copy operation in the interrupted atomic-IST-entry's
-+ * ist_copy_regs_to_main_stack()
-+ */
-+static __always_inline void replicate_func_copy(struct pt_regs *target)
-+{
-+	/*
-+	 * To avoid recursive functions calls with __always_inline, the
-+	 * copy operation for the interrupted atomic-IST-entry has been
-+	 * done in the caller of copy_nested(). Nothing need to be done.
-+	 */
-+}
-+
-+#define IST_FRAME_SIZE	ALIGN(sizeof(struct pt_regs), 16)
-+
-+/*
-+ * Replicate the return result of the interrupted atomic-IST-entry's
-+ * ist_copy_regs_to_main_stack() in %rax and the commit operation.
-+ */
-+static __always_inline void replicate_func_result_and_commit(struct pt_regs *target, unsigned long commit_ip)
-+{
-+	void *target_of_interrupted = (void *)target + IST_FRAME_SIZE;
-+
-+	/* return result in %rax */
-+	target->ax = (unsigned long)target_of_interrupted;
-+	/* move %rax, %rsp */
-+	target->sp = (unsigned long)target_of_interrupted;
-+	/* the %rip advances to commit point */
-+	target->ip = commit_ip;
-+}
-+
-+/*
-+ * Do the work as a nested atomic-IST-entry to copy the supposed pt_regs
-+ * of the interrupted context to the IST main stack.
-+ *
-+ * The hardware-entry of the nested atomic-IST-entry has already saved
-+ * the exception head of the pt_regs of the interrupted context (inside
-+ * the interrupted atomic-IST-entry).  To maintain the atomic attribute
-+ * of the atomic-IST-entry, the copy_nested() (of the ongoing nested
-+ * atomic-IST-entry) has to replicate all that the interrupted
-+ * atomic-IST-entries should have been done till the commit point and
-+ * copy the supposed saved context (pt_regs).
-+ *
-+ * To avoid touching any saved pt_regs, the replicating is actually
-+ * directly applied on the target pt_regs.
-+ */
-+static __always_inline
-+void copy_nested(struct pt_regs *target, const struct pt_regs *nested, unsigned long commit_ip)
-+{
-+	copy_regs_exception_head(target, nested);
-+	replicate_clac_cld(target);
-+	replicate_clear_regs(target);
-+	replicate_func_clobber(target);
-+	replicate_func_copy(target);
-+	replicate_func_result_and_commit(target, commit_ip);
-+}
-+
-+asmlinkage __visible __noinstr_section(".entry.text")
-+struct pt_regs *ist_copy_regs_to_main_stack(
-+		const struct pt_regs *regs, struct cea_exception_stacks *stacks)
-+{
-+	unsigned long ist_main_sp = CEA_ESTACK_TOP(stacks, IST);
-+	struct ist_ctx ist_ctx[8];
-+	const struct pt_regs *gp_saved;
-+	struct pt_regs *target;
-+	int nr_entries, i;
-+
-+	/*
-+	 * Identify all of the atomic-IST-entris.
-+	 *
-+	 * The current ongoing atomic-IST-entry doesn't need to be identified,
-+	 * but is also put in the @ist_ctx[0] for later convenience.
-+	 *
-+	 * The for-loop identifies what the context @regs has interrupted is.
-+	 * It travels back to the outmost atomic-IST-entry.
-+	 *
-+	 * Result:
-+	 *   Identified result is put in ist_ctx[i].
-+	 *   ist_ctx[0] is the current ongoing atomic-IST-entry.
-+	 *   ist_ctx[nr_entries-1] is the outmost atomic-IST-entry.
-+	 *   gp_saved is the atomic-IST-entry that has saved the general registers.
-+	 */
-+	ist_ctx[0].regs = regs;
-+	ist_ctx[0].commit_ip = -1; /* unused */
-+	nr_entries = 1;
-+	gp_saved = regs;
-+	for (;;) {
-+		if (user_mode((struct pt_regs *)regs))
-+			break;
-+		if (ip_within_syscall_gap((struct pt_regs *)regs))
-+			break;
-+		if (!identify_ist(regs, stacks, &ist_ctx[nr_entries])) {
-+			/* locate the top of copying target pt_regs */
-+			if (IN_CEA_ESTACK(stacks, IST, regs->sp))
-+				ist_main_sp = ALIGN_DOWN(regs->sp, 16);
-+			break;
-+		}
-+		if (identify_if_gp_registers_saved(regs, ist_ctx[nr_entries].regs))
-+			gp_saved = ist_ctx[nr_entries].regs;
-+		regs = ist_ctx[nr_entries].regs;
-+		nr_entries++;
-+		if (nr_entries >= ARRAY_SIZE(ist_ctx))
-+			ist_double_fault();
-+	}
-+
-+	if (!IN_CEA_ESTACK(stacks, IST, ist_main_sp - IST_FRAME_SIZE * nr_entries))
-+		ist_double_fault();
-+
-+	/*
-+	 * Copy the saved pt_regs to the IST main stack.
-+	 *
-+	 * For each atomic-IST-entry including the interrupted ones and
-+	 * the current ongoing one, calls either copy_outmost() or copy_nested()
-+	 * to copy the pt_regs of what should have been saved, by replicating
-+	 * if needed, to the IST main stack.
-+	 */
-+	ist_main_sp -= IST_FRAME_SIZE;
-+	target = (void *)ist_main_sp;
-+	copy_outmost(target, ist_ctx[nr_entries - 1].regs, gp_saved);
-+	for (i = nr_entries - 2; unlikely(i >= 0); i--) {
-+		ist_main_sp -= IST_FRAME_SIZE;
-+		target = (void *)ist_main_sp;
-+		copy_nested(target, ist_ctx[i].regs, ist_ctx[i+1].commit_ip);
-+	}
-+
-+	return target;
-+}
-diff --git a/arch/x86/kernel/asm-offsets_64.c b/arch/x86/kernel/asm-offsets_64.c
-index bb65371ea9df..f861a56c0002 100644
---- a/arch/x86/kernel/asm-offsets_64.c
-+++ b/arch/x86/kernel/asm-offsets_64.c
-@@ -60,5 +60,12 @@ int main(void)
- 	OFFSET(FIXED_stack_canary, fixed_percpu_data, stack_canary);
- 	BLANK();
- #endif
-+
-+	DEFINE(CEA_stacks_NMI, offsetofend(struct cea_exception_stacks, NMI_stack));
-+	DEFINE(CEA_stacks_DB,  offsetofend(struct cea_exception_stacks, DB_stack));
-+	DEFINE(CEA_stacks_MCE, offsetofend(struct cea_exception_stacks, MCE_stack));
-+	DEFINE(CEA_stacks_VC,  offsetofend(struct cea_exception_stacks, VC_stack));
-+	BLANK();
-+
- 	return 0;
- }
-diff --git a/arch/x86/kernel/callthunks.c b/arch/x86/kernel/callthunks.c
-index ffea98f9064b..e756c89996d8 100644
---- a/arch/x86/kernel/callthunks.c
-+++ b/arch/x86/kernel/callthunks.c
-@@ -123,6 +123,8 @@ static bool skip_addr(void *dest)
- {
- 	if (dest == error_entry)
- 		return true;
-+	if (dest == ist_copy_regs_to_main_stack)
-+		return true;
- 	if (dest == paranoid_entry)
- 		return true;
- 	if (dest == xen_error_entry)
-diff --git a/tools/objtool/check.c b/tools/objtool/check.c
-index f937be1afe65..8dfa627d4b41 100644
---- a/tools/objtool/check.c
-+++ b/tools/objtool/check.c
-@@ -3998,6 +3998,11 @@ static int validate_unret(struct objtool_file *file)
- 	return warnings;
+@@ -41,7 +41,7 @@ static __always_inline bool identify_ist_##sym_name(				\
+ 	return true;								\
  }
  
-+static bool in_ist_entry(struct instruction *insn)
-+{
-+	return !strcmp(insn->sym->name, "ist_copy_regs_to_main_stack");
-+}
-+
- static int validate_retpoline(struct objtool_file *file)
- {
- 	struct instruction *insn;
-@@ -4016,7 +4021,7 @@ static int validate_retpoline(struct objtool_file *file)
- 			continue;
+-DEFINE_IDENTIFY_IST(NMI, nmi, false)
++DEFINE_IDENTIFY_IST(NMI, nmi, true)
+ DEFINE_IDENTIFY_IST(DB, debug, false)
+ DEFINE_IDENTIFY_IST(MCE, machine_check, false)
+ DEFINE_IDENTIFY_IST(VC, vmm_communication, false)
+diff --git a/arch/x86/include/asm/idtentry.h b/arch/x86/include/asm/idtentry.h
+index b241af4ce9b4..b568f1de6da6 100644
+--- a/arch/x86/include/asm/idtentry.h
++++ b/arch/x86/include/asm/idtentry.h
+@@ -450,6 +450,9 @@ __visible noinstr void func(struct pt_regs *regs,			\
+ 	idtentry_sysvec vector func
  
- 		if (insn->type == INSN_RETURN) {
--			if (opts.rethunk) {
-+			if (opts.rethunk && !in_ist_entry(insn)) {
- 				WARN_FUNC("'naked' return found in RETHUNK build",
- 					  insn->sec, insn->offset);
- 			} else
+ #ifdef CONFIG_X86_64
++# define DECLARE_IDTENTRY_NMI(vector, func)				\
++	idtentry_ist vector asm_##func func func has_error_code=0 stack_offset=CEA_stacks_NMI
++
+ # define DECLARE_IDTENTRY_MCE(vector, func)				\
+ 	idtentry_mce_db vector asm_##func func
+ 
+@@ -475,11 +478,11 @@ __visible noinstr void func(struct pt_regs *regs,			\
+ /* No ASM emitted for XEN hypervisor callback */
+ # define DECLARE_IDTENTRY_XENCB(vector, func)
+ 
+-#endif
+-
+-/* No ASM code emitted for NMI */
++/* No ASM code emitted for NMI for X86_32 */
+ #define DECLARE_IDTENTRY_NMI(vector, func)
+ 
++#endif
++
+ /*
+  * ASM code to emit the common vector entry stubs where each stub is
+  * packed into IDT_ALIGN bytes.
 -- 
 2.19.1.6.gb485710b
 
