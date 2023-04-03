@@ -2,63 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3C0336D4BC6
-	for <lists+kvm@lfdr.de>; Mon,  3 Apr 2023 17:24:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6FB376D4BFE
+	for <lists+kvm@lfdr.de>; Mon,  3 Apr 2023 17:33:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232641AbjDCPYx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 3 Apr 2023 11:24:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58520 "EHLO
+        id S232008AbjDCPdJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 3 Apr 2023 11:33:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38534 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229509AbjDCPYw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 3 Apr 2023 11:24:52 -0400
-Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 726EA1BE6
-        for <kvm@vger.kernel.org>; Mon,  3 Apr 2023 08:24:50 -0700 (PDT)
-Received: by mail-pj1-x1049.google.com with SMTP id k4-20020a17090aef0400b0023fcccbd7e6so9118159pjz.5
-        for <kvm@vger.kernel.org>; Mon, 03 Apr 2023 08:24:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1680535490;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=9sC8H5VzjjhpCcVyFK02+wGSIDDjTLiGBsWhqbtn/fo=;
-        b=tY+Uce7KcLNj8AJF+w+3SgeQBCMtUQseMecEfr3e3mY5mbevJzC8UTw6dr3Tnj5FnI
-         S6O9diljZ3b1r1Nf8P+5ahTe4hi3UWZutrVn93ZtteGIxrakqck2xI2X5WWBuqGrgg0o
-         cyNyEEOCu2JNKK47DWj/CHKaeiOX+80r4CCqSBFqwzVHNmiBnE3RRFQXrzY/VwirVrX3
-         T2wPk2waJlM2LNjaNQoNgZVv7znaJo/+MFAc3qqDTkjO2+L3C5oUhCJu4cK1p97xB5Co
-         T3NBcuk0/MG6AzNklwQu99UH/gn5isI44G/4wN4282yATvYKvvt0+UMaddgxa2oma23T
-         wpgA==
+        with ESMTP id S231958AbjDCPdI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 3 Apr 2023 11:33:08 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17D2F19B4
+        for <kvm@vger.kernel.org>; Mon,  3 Apr 2023 08:32:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1680535942;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=mg/WY/5QTApvYEdExo6w0NW+ojlwZZElJz9ZdPVvAZI=;
+        b=MKiTetGSveHEbZCKjQmPvuxzfqHCLD0j8CC9Mn8XhDncGAJ+1RyQn5QS86YCAWZNRrrWdf
+        8t0MUgiwWolQRQTWGPMyImAyIQ22cPBmzCuFnTE7AN04Vdy3m5ZL/wtCGf2n5chedJZRwR
+        fNlINGybg1u3SpysK/LJWLAwqs6dsys=
+Received: from mail-io1-f69.google.com (mail-io1-f69.google.com
+ [209.85.166.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-605-QyZV3iMINsex7o_7zWCVGw-1; Mon, 03 Apr 2023 11:32:21 -0400
+X-MC-Unique: QyZV3iMINsex7o_7zWCVGw-1
+Received: by mail-io1-f69.google.com with SMTP id b12-20020a6bb20c000000b007585c93862aso18274087iof.4
+        for <kvm@vger.kernel.org>; Mon, 03 Apr 2023 08:32:21 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680535490;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=9sC8H5VzjjhpCcVyFK02+wGSIDDjTLiGBsWhqbtn/fo=;
-        b=K5JdrHehqoCQKOlCdBfvIKrIsxlfk4wXl9q3CNwNYNIos0X7UQGrrP2pRV57RsQgMu
-         7XKn95WBzwu5qnjUEYprHUo4em0vTilzZexe1hZHaUimq2BGJkwQ9HfQ51QcomjVGnMs
-         kL5PzN9u1VQl5IOp4Hn1K9fKPmkSq/soB4oK3BAV6mClD1VTm+U2r7qPtHC9UgcI78ew
-         0xTc0YcH34BLXni93i/nQr91KQ1GlWQUfPCvweB1hmQ9ZSH1+kD4cIpPsZ0K+3DcJyrp
-         YJWbBHoQnX0w6wJC9gaMaFhMnHyXq0lNduSFI8LtbR0QO0DUtXL5mO0cAs4zUeNlo1Vy
-         n66Q==
-X-Gm-Message-State: AAQBX9d/0JjmMF0xDLS9vhgn7oaw3+NacM1AvKK/tOqtM2QG5Cs4VTLj
-        heataJRXbaR3hG9VGOCbnKkheCVfBoY=
-X-Google-Smtp-Source: AKy350YE1K9YcZhsFGhu7+QhEIz/or2+TVrxV1gxrfDrv9SUPxhnGaTKfIHzC94mIZXY7ewyJ8ghcuGvkCw=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:903:2282:b0:1a0:428c:1dae with SMTP id
- b2-20020a170903228200b001a0428c1daemr13841278plh.5.1680535490028; Mon, 03 Apr
- 2023 08:24:50 -0700 (PDT)
-Date:   Mon, 3 Apr 2023 08:24:48 -0700
-In-Reply-To: <20230403112625.63833-1-thuth@redhat.com>
-Mime-Version: 1.0
-References: <20230403112625.63833-1-thuth@redhat.com>
-Message-ID: <ZCrvwEhb45cqGhmP@google.com>
-Subject: Re: [kvm-unit-tests PATCH] ci/cirrus-ci-fedora.yml: Disable the
- "memory" test in the KVM job
-From:   Sean Christopherson <seanjc@google.com>
-To:     Thomas Huth <thuth@redhat.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-7.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+        d=1e100.net; s=20210112; t=1680535940;
+        h=content-transfer-encoding:mime-version:organization:references
+         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=mg/WY/5QTApvYEdExo6w0NW+ojlwZZElJz9ZdPVvAZI=;
+        b=L8+No0HXv/NAa4EfkPcADfHi873jkd0+zQrsfF/buY7PHuHJC2bql0tgjYNSpZtlL5
+         gLw0k55aaC8iUrudEVYtixHWyanAVyC/soawb0WroJ8icIlCa9dXEvceTbgpf4a+dIhr
+         IJUr5VPVqSvCkZY0eUNntZKCLTSyTWo2no0KjF059bwsQKI7zJFtNkSb3/elBHkxjWq2
+         1ynfwn1yRyKi+qJS94XxvvS6r2eehQzk6WJpMNYq77XP9v7ht67uZkcRnv/BGKdTlJgP
+         TasapoGf7t7QLWInrzizDccnwpT7ttoqkNT76/tPqFy19+ySwXLJi62h5SdglqzNZQ0F
+         iYaw==
+X-Gm-Message-State: AAQBX9d2Kqzn3MOJC3T3Ou5zBKGgwYBcPHrYFcTDGmBuEv7ctoAoTX9J
+        MLyQrtgkjQ2CAxPqy2VGwicrmCHEjkizbtiA9tuf+cKSCXXHUpxTAwFl9Q+OEaRl/WgAcSbNpqW
+        f64AnsJzmjykN
+X-Received: by 2002:a6b:7d03:0:b0:74c:e1a5:c5e3 with SMTP id c3-20020a6b7d03000000b0074ce1a5c5e3mr11053640ioq.0.1680535940485;
+        Mon, 03 Apr 2023 08:32:20 -0700 (PDT)
+X-Google-Smtp-Source: AKy350bXWtL5Bw8Ad/8Ov2pt5McA0ZU3giGQcsZasTbEv+jukxYVvdtKYYQhb5IUNd4UqwaLyXy2hA==
+X-Received: by 2002:a6b:7d03:0:b0:74c:e1a5:c5e3 with SMTP id c3-20020a6b7d03000000b0074ce1a5c5e3mr11053599ioq.0.1680535940161;
+        Mon, 03 Apr 2023 08:32:20 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id q20-20020a5ea614000000b0075c47fb539asm2681451ioi.0.2023.04.03.08.32.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 03 Apr 2023 08:32:19 -0700 (PDT)
+Date:   Mon, 3 Apr 2023 09:32:18 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     "Liu, Yi L" <yi.l.liu@intel.com>
+Cc:     "jgg@nvidia.com" <jgg@nvidia.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
+        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "shameerali.kolothum.thodi@huawei.com" 
+        <shameerali.kolothum.thodi@huawei.com>,
+        "lulu@redhat.com" <lulu@redhat.com>,
+        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
+        "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        "Hao, Xudong" <xudong.hao@intel.com>,
+        "Zhao, Yan Y" <yan.y.zhao@intel.com>,
+        "Xu, Terrence" <terrence.xu@intel.com>,
+        "Jiang, Yanting" <yanting.jiang@intel.com>
+Subject: Re: [PATCH v3 12/12] vfio/pci: Report dev_id in
+ VFIO_DEVICE_GET_PCI_HOT_RESET_INFO
+Message-ID: <20230403093218.04e79d32.alex.williamson@redhat.com>
+In-Reply-To: <DS0PR11MB7529A380EF7E3F33C5DCEE3EC3929@DS0PR11MB7529.namprd11.prod.outlook.com>
+References: <20230401144429.88673-1-yi.l.liu@intel.com>
+        <20230401144429.88673-13-yi.l.liu@intel.com>
+        <DS0PR11MB752996A6E6B3263BAD01DAC2C3929@DS0PR11MB7529.namprd11.prod.outlook.com>
+        <20230403090151.4cb2158c.alex.williamson@redhat.com>
+        <DS0PR11MB7529A380EF7E3F33C5DCEE3EC3929@DS0PR11MB7529.namprd11.prod.outlook.com>
+Organization: Red Hat
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -66,50 +106,71 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Apr 03, 2023, Thomas Huth wrote:
-> Two of the sub-tests are currently failing in the Fedora KVM job
-> on Cirrus-CI:
-> 
-> FAIL: clflushopt (ABSENT)
-> FAIL: clwb (ABSENT)
-> 
-> Looks like the features have been marked as disabled in the L0 host,
-> while the hardware supports them. Since neither VMX nor SVM have
-> intercept controls for the instructions, KVM has no way to enforce the
-> guest's CPUID model, so this test is failing now in this environment.
-> There's not much we can do here except for disabling the test here.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  ci/cirrus-ci-fedora.yml | 1 -
->  1 file changed, 1 deletion(-)
-> 
-> diff --git a/ci/cirrus-ci-fedora.yml b/ci/cirrus-ci-fedora.yml
-> index 918c9a36..c83aff46 100644
-> --- a/ci/cirrus-ci-fedora.yml
-> +++ b/ci/cirrus-ci-fedora.yml
-> @@ -35,7 +35,6 @@ fedora_task:
->          ioapic
->          ioapic-split
->          kvmclock_test
-> -        memory
+On Mon, 3 Apr 2023 15:22:03 +0000
+"Liu, Yi L" <yi.l.liu@intel.com> wrote:
 
-What if we fix the test by making it TCG-only?  None of the other instructions in
-the test have intercepts, i.e. will also fail if the instructions are supported in
-bare metal but not the test VM.
+> > From: Alex Williamson <alex.williamson@redhat.com>
+> > Sent: Monday, April 3, 2023 11:02 PM
+> >=20
+> > On Mon, 3 Apr 2023 09:25:06 +0000
+> > "Liu, Yi L" <yi.l.liu@intel.com> wrote:
+> >  =20
+> > > > From: Liu, Yi L <yi.l.liu@intel.com>
+> > > > Sent: Saturday, April 1, 2023 10:44 PM =20
+> > > =20
+> > > > @@ -791,7 +813,21 @@ static int vfio_pci_fill_devs(struct pci_dev *=
+pdev, void =20
+> > *data) =20
+> > > >  	if (!iommu_group)
+> > > >  		return -EPERM; /* Cannot reset non-isolated devices */ =20
+> > >
+> > > Hi Alex,
+> > >
+> > > Is disabling iommu a sane way to test vfio noiommu mode? =20
+> >=20
+> > Yes
+> >  =20
+> > > I added intel_iommu=3Doff to disable intel iommu and bind a device to=
+ vfio-pci.
+> > > I can see the /dev/vfio/noiommu-0 and /dev/vfio/devices/noiommu-vfio0=
+. Bind
+> > > iommufd=3D=3D-1 can succeed, but failed to get hot reset info due to =
+the above
+> > > group check. Reason is that this happens to have some affected device=
+s, and
+> > > these devices have no valid iommu_group (because they are not bound t=
+o vfio-pci
+> > > hence nobody allocates noiommu group for them). So when hot reset inf=
+o loops
+> > > such devices, it failed with -EPERM. Is this expected? =20
+> >=20
+> > Hmm, I didn't recall that we put in such a limitation, but given the
+> > minimally intrusive approach to no-iommu and the fact that we never
+> > defined an invalid group ID to return to the user, it makes sense that
+> > we just blocked the ioctl for no-iommu use.  I guess we can do the same
+> > for no-iommu cdev. =20
+>=20
+> sure.
+>=20
+> >=20
+> > BTW, what does this series apply on?  I'm assuming[1], but I don't see
+> > a branch from Jason yet.  Thanks, =20
+>=20
+> yes, this series is applied on [1]. I put the [1], this series and cdev s=
+eries
+> in https://github.com/yiliu1765/iommufd/commits/vfio_device_cdev_v9.
+>=20
+> Jason has taken [1] in the below branch. It is based on rc1. So I hesitat=
+ed
+> to apply this series and cdev series on top of it. Maybe I should have do=
+ne
+> it to make life easier. =F0=9F=98=8A
+>=20
+> https://git.kernel.org/pub/scm/linux/kernel/git/jgg/iommufd.git/log/?h=3D=
+for-next
 
-An alternative would be to force emulation when using KVM, but KVM doesn't currently
-emulating pcommit (deprecated by Intel), clwb, or any of the fence instructions
-(at least, not afaict; I'm somewhat surprised *fence isn't "required").
+Seems like it must be in the vfio_mdev_ops branch which has not been
+pushed aside from the merge back to for-next.  Jason?  Thanks,
 
-diff --git a/x86/unittests.cfg b/x86/unittests.cfg
-index f324e32d..5afb5dad 100644
---- a/x86/unittests.cfg
-+++ b/x86/unittests.cfg
-@@ -185,6 +185,7 @@ arch = x86_64
- 
- [memory]
- file = memory.flat
-+accel = tcg
- extra_params = -cpu max
- arch = x86_64
+Alex
+
