@@ -2,563 +2,194 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 30A0C6D4813
-	for <lists+kvm@lfdr.de>; Mon,  3 Apr 2023 16:25:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8A5A76D487F
+	for <lists+kvm@lfdr.de>; Mon,  3 Apr 2023 16:29:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233284AbjDCOZm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 3 Apr 2023 10:25:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53354 "EHLO
+        id S233421AbjDCO3N (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 3 Apr 2023 10:29:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59420 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233276AbjDCOZk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 3 Apr 2023 10:25:40 -0400
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2087.outbound.protection.outlook.com [40.107.94.87])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7CA1F2C9F1;
-        Mon,  3 Apr 2023 07:25:38 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Gv8H2cATP6RCZvU2jw1Gfszb+ReAL0MDm3xSAaKfJAljzT/9T9CpXOnUSD0QuPVPkQfRETg3XbN0BCblNmTArE+V2touzEMZDP2i0xky6S+bjV4i+QU2QdYa9Ec1N+c5MnKoCpjytGuuQz2+ZZuM44s7LsgxvM1rUktqPtodM7tpNue/P0udbKICuit8clus75+lv0Gho8vI8nxud2k5RTIumUMH2wzSyKuXwP2Y4uCewOmmnY8UjV/LAjoZGrd1O0akSEJl0pYbntiYQGWIh0JNGi8hXVthE5NhzaopL2XuxyDR8e2LRqsktc/yaRD+NU6+JFFymXipUqiOlNo8jQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=WWgAPJJmwmJFnDVQ7OLWIXK+tdZUAP8PUJIC/us56VU=;
- b=URpcsBZrqcaqytYQcHMcfFUNrhs3KanJ4+QMkMb8ct1D8bIllM0E9WI4N7CiwMdCOMRNVmmv2bH61m8xAGo39D7NvAFtPtGz9JkwWVcrGfkX7NP4WjJ//wB1qQ5eVFaOdtTAXctoKHqSvAYx3xfQ0ZMZsrCnPaEnhMEXNcAXHAG3rSwFfs4/bW63L2hA9OhVvQ6xM0TrsuiurH3AFcTivAR1jVqJNKyhZ+BlZFF+3JE1ZVTqkXmMQva+1CeTpH951GgzJbsZdhr7bcGLC3Ju64o6pvk3wjuVCsXI3g2szcBISWy5RK1mSNlqGC0WdM1Bk8Dz9YuUneyZw+w8R2V2CQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=redhat.com smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=WWgAPJJmwmJFnDVQ7OLWIXK+tdZUAP8PUJIC/us56VU=;
- b=AMnKF5IV303hMeHtAikVWqB863HuxCz7XHF4PiZ/6esKtgn6mLT/jDFQhnhoCDkBUjkTVph+wLzqmFKFY/WGll8KlJmKlRZvs3ajgD2op+nzOwhBKDy/y/CKcT8uxjF2AoH0yA3umRiLUwY9RO6BgdJtdm3apePtBLxzVCIltIw=
-Received: from MW4PR03CA0211.namprd03.prod.outlook.com (2603:10b6:303:b9::6)
- by PH7PR12MB7260.namprd12.prod.outlook.com (2603:10b6:510:208::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6254.33; Mon, 3 Apr
- 2023 14:25:35 +0000
-Received: from CO1PEPF00001A5D.namprd05.prod.outlook.com
- (2603:10b6:303:b9:cafe::2) by MW4PR03CA0211.outlook.office365.com
- (2603:10b6:303:b9::6) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6254.22 via Frontend
- Transport; Mon, 3 Apr 2023 14:25:35 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- CO1PEPF00001A5D.mail.protection.outlook.com (10.167.241.4) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.6178.30 via Frontend Transport; Mon, 3 Apr 2023 14:25:35 +0000
-Received: from SATLEXMB05.amd.com (10.181.40.146) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Mon, 3 Apr
- 2023 09:25:32 -0500
-Received: from SATLEXMB04.amd.com (10.181.40.145) by SATLEXMB05.amd.com
- (10.181.40.146) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Mon, 3 Apr
- 2023 09:25:32 -0500
-Received: from xhdipdslab41.xilinx.com (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server id 15.1.2375.34 via Frontend
- Transport; Mon, 3 Apr 2023 09:25:30 -0500
-From:   Nipun Gupta <nipun.gupta@amd.com>
-To:     <alex.williamson@redhat.com>, <linux-kernel@vger.kernel.org>,
-        <kvm@vger.kernel.org>
-CC:     <git@amd.com>, <harpreet.anand@amd.com>, <michal.simek@amd.com>,
-        "Nipun Gupta" <nipun.gupta@amd.com>
-Subject: [PATCH] vfio/cdx: add support for CDX bus
-Date:   Mon, 3 Apr 2023 19:55:25 +0530
-Message-ID: <20230403142525.29494-1-nipun.gupta@amd.com>
-X-Mailer: git-send-email 2.17.1
+        with ESMTP id S233395AbjDCO3K (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 3 Apr 2023 10:29:10 -0400
+Received: from mail-lf1-x12e.google.com (mail-lf1-x12e.google.com [IPv6:2a00:1450:4864:20::12e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42194319BC;
+        Mon,  3 Apr 2023 07:29:01 -0700 (PDT)
+Received: by mail-lf1-x12e.google.com with SMTP id 2adb3069b0e04-4dd9da1c068so371235e87.0;
+        Mon, 03 Apr 2023 07:29:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112; t=1680532139;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hH1xosDA4fhxPoK+LaLX98KXIgYzN1S+FW0AjfW+bw8=;
+        b=CAME34HW9yFFaJHZ7ULEfnMwvsZan4hJr/ZWDR0xLha3apQc4IwWKETlrVaghgt3xV
+         UcrRmDrBUKo6ZvmtXsxFUdRjsQQbMhcYmox/0cgbME+IsDzoQKBuZE+q9SbI2cl6WjTH
+         BaHJ4Su3vP/mRlhn1hahIYdSB1Os23zS4bJIl0txBDlLofBY9pWfudKY/tHYtYWeq29w
+         ojH1l0firSySGu7uB8pL3nL+SXJhOrGJhC4QAsUEypA80pcWRhPSFFr6PBIwib4klKgd
+         ko0SS7GdkCEdOGVbVKDy/atEw8D7vrKRZ8hr4RNqUkDmPBx/JqUnfNf4M46PwK6TugRy
+         c5yQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1680532139;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=hH1xosDA4fhxPoK+LaLX98KXIgYzN1S+FW0AjfW+bw8=;
+        b=ihIggqbsIm2Vsvq1l5sUQa3SBQ2n5GlTCm5KEru/P2O2l/mJcLxrWUwSSplFFs9UAf
+         OH/wknqa9dJQMZDLl8S9ZVxYuzY+ortdX+glQsLPzIeo802m8zSJ11K0OaqkpL3bFj/w
+         5GTCRLaxZqSaNl30ni/UXVFqZhmqB5GF7otQ9sYSH7Q59gKP1jp6OuFVPJtzadmQqjNc
+         KRY1DvsUJavGgv9wattuGHtfl9IUtdt3xyIIuL3dwf4wN7ZhgYRbr+MCoy+bI+cvJ8dq
+         UAzBIjvlIOU6ZinU4rC4rIihMRhByoiP7EbrCRqo8KrUywsd4kmIRvArPTVHP7r49XWT
+         QwfQ==
+X-Gm-Message-State: AAQBX9eD+0htD9mpJXkwegnR6/9LzH8BTOr8t7HJcZ/z5iIJaavy1Dlp
+        9EzmYo7Ui47LY/3abKRVNYA=
+X-Google-Smtp-Source: AKy350YF5i/5sBNYuDwYsmDiEF88n9U1aGk+Td/cMo45pIqZYBQbsV5uAGFuQuFaFQcInSzohbWsdw==
+X-Received: by 2002:a05:651c:2128:b0:295:a024:f3e2 with SMTP id a40-20020a05651c212800b00295a024f3e2mr5011799ljq.5.1680532139341;
+        Mon, 03 Apr 2023 07:28:59 -0700 (PDT)
+Received: from localhost (88-115-161-74.elisa-laajakaista.fi. [88.115.161.74])
+        by smtp.gmail.com with ESMTPSA id h7-20020a2e3a07000000b00299f0194108sm1782309lja.31.2023.04.03.07.28.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 03 Apr 2023 07:28:59 -0700 (PDT)
+Date:   Mon, 3 Apr 2023 17:28:35 +0300
+From:   Zhi Wang <zhi.wang.linux@gmail.com>
+To:     Xiaoyao Li <xiaoyao.li@intel.com>
+Cc:     Isaku Yamahata <isaku.yamahata@gmail.com>,
+        isaku.yamahata@intel.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        erdemaktas@google.com, Sean Christopherson <seanjc@google.com>,
+        Sagi Shahar <sagis@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Kai Huang <kai.huang@intel.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Subject: Re: [PATCH v13 016/113] KVM: TDX: x86: Add ioctl to get TDX
+ systemwide parameters
+Message-ID: <20230403172835.000040eb.zhi.wang.linux@gmail.com>
+In-Reply-To: <24ddf589-34a4-b312-72c1-8176ee3e8b35@intel.com>
+References: <cover.1678643051.git.isaku.yamahata@intel.com>
+        <cb0ae8b4941aaa45e1e5856dde644f9b2f53d9a6.1678643052.git.isaku.yamahata@intel.com>
+        <20230325104306.00004585@gmail.com>
+        <20230329231722.GA1108448@ls.amr.corp.intel.com>
+        <20230331001803.GE1112017@ls.amr.corp.intel.com>
+        <20230331154432.00001373@gmail.com>
+        <24ddf589-34a4-b312-72c1-8176ee3e8b35@intel.com>
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
 MIME-Version: 1.0
-Content-Type: text/plain
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PEPF00001A5D:EE_|PH7PR12MB7260:EE_
-X-MS-Office365-Filtering-Correlation-Id: 74645897-e3a1-4d92-f2a0-08db344f4a18
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: TLrPKhwF1KP2uNBHyzlSaHJUNbsqeKSxZ/ILmp48ywqdvl8U+BtqofGYNEp8Vd1a4bwxz3DmQhRh6WhqGZvSzHwpcLPy0if0qFQ8xU5vm0Xd467GubYrA3NYWFI5EXGbpxpshLTLLzvs2m35paSWOlm/TEdxSzb0pGfmugzkFyFDvdbxjeMhaBQjgn1aZpW6vmL6E88yeMYBXZjITjnSnsYf3u0C2FM+1A6kjxWLP1U/XQWyD0XcGENVEf3gJwkWGPQjJzNeT+QI9IQ1bvdTCQQmD5S8M56n8egb98syxo0F1+xhFkHR3u8BKbktjcBF5TOffim7mGB3XCub4SmxAAOIAr+hNJFi6QFahgaHqZwM4YF8oj+q4s9yyYJnvPtSDlWlm2VHVx2IQgiUudivMEBN0Oeqpv+NumL4LADC+h1qt41IjzGS4P5vIMGQdueT46MM51AORiXBTypDyYiAimXeUIK2QZQ0U8SFNYisqZn6/ZlTurYCy4f7osXor1ehI3gUJXZyunmLJa7IbBZpXXGAqvV+PG/8TjFoxAv0SxekTVJdlN3VxNYOMfDzO8v5gWa5cB0Qin5WnIPeopd//2+dGap8HNK8w+HpIx/apLkQodWmkZnJnfsQibxZFEy8nog11nbortkPgHex/VnnfsmOAZ3d7wFfl08uUrfRIHzPqqvoq4pW1PvkASFKMFwl968ZPFUibUQqREe1HmwEj99XW3CKnMELiaHxcr6quRs=
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230028)(4636009)(376002)(396003)(346002)(136003)(39860400002)(451199021)(46966006)(36840700001)(40470700004)(30864003)(356005)(5660300002)(81166007)(44832011)(47076005)(2616005)(83380400001)(82310400005)(426003)(336012)(110136005)(54906003)(316002)(186003)(478600001)(6666004)(86362001)(40480700001)(1076003)(26005)(82740400003)(36756003)(41300700001)(40460700003)(36860700001)(8676002)(4326008)(8936002)(70586007)(70206006)(2906002)(36900700001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Apr 2023 14:25:35.1860
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 74645897-e3a1-4d92-f2a0-08db344f4a18
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: CO1PEPF00001A5D.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB7260
-X-Spam-Status: No, score=0.8 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
-        DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE autolearn=no
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
+        DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-vfio-cdx driver enables IOCTLs for user space to query
-MMIO regions for CDX devices and mmap them. This change
-also adds support for reset of CDX devices.
+On Mon, 3 Apr 2023 11:46:15 +0800
+Xiaoyao Li <xiaoyao.li@intel.com> wrote:
 
-This change adds the VFIO CDX driver and enables the following
-ioctls for CDX devices:
- - VFIO_DEVICE_GET_INFO:
- - VFIO_DEVICE_GET_REGION_INFO
- - VFIO_DEVICE_RESET
+> On 3/31/2023 8:44 PM, Zhi Wang wrote:
+> > On Thu, 30 Mar 2023 17:18:03 -0700
+> > Isaku Yamahata <isaku.yamahata@gmail.com> wrote:
+> > 
+> >> On Wed, Mar 29, 2023 at 04:17:22PM -0700,
+> >> Isaku Yamahata <isaku.yamahata@gmail.com> wrote:
+> >>
+> >>> On Sat, Mar 25, 2023 at 10:43:06AM +0200,
+> >>> Zhi Wang <zhi.wang.linux@gmail.com> wrote:
+> >>>
+> >>>> On Sun, 12 Mar 2023 10:55:40 -0700
+> >>>> isaku.yamahata@intel.com wrote:
+> >>>>
+> >>>> Does this have to be a new generic ioctl with a dedicated new x86_ops? SNP
+> >>>> does not use it at all and all the system-scoped ioctl of SNP going through
+> >>>> the CCP driver. So getting system-scope information of TDX/SNP will end up
+> >>>> differently.
+> >>>>
+> >>>> Any thought, Sean? Moving getting SNP system-wide information to
+> >>>> KVM dev ioctl seems not ideal and TDX does not have a dedicated driver like
+> >>>> CCP. Maybe make this ioctl TDX-specific? KVM_TDX_DEV_OP?
+> >>>
+> >>> We only need global parameters of the TDX module, and we don't interact with TDX
+> >>> module at this point.  One alternative is to export those parameters via sysfs.
+> >>> Also the existence of the sysfs node indicates that the TDX module is
+> >>> loaded(initialized?) or not in addition to boot log.  Thus we can drop system
+> >>> scope one.
+> >>> What do you think?
+> >>>
+> > 
+> > I like this idea and the patch below, it feels right for me now. It would be nice
+> > if more folks can chime in and comment.
+> 
+> SYSFS option requires CONFIG_SYSFS, which reqiures CONFIG_KVM_TDX to 
+> select CONFIG_SYSFS.
+> 
+> >>> Regarding to other TDX KVM specific ioctls (KVM_TDX_INIT_VM, KVM_TDX_INIT_VCPU,
+> >>> KVM_TDX_INIT_MEM_REGION, and KVM_TDX_FINALIZE_VM), they are specific to KVM.  So
+> >>> I don't think it can be split out to independent driver.
+> >>
+> > 
+> > They can stay in KVM as they are KVM-specific. SNP also has KVM-specific ioctls
+> > which wraps the SEV driver calls. At this level, both TDX and SNP go their specific
+> > implementation without more abstraction other than KVM_ENCRYPT_MEMORY_OP. Their
+> > strategies are aligned.
+> > 
+> > The problem of the previous approach was the abstraction that no other implementation
+> > is using it. It is like, TDX wants a higher abstraction to cover both TDX and SNP,
+> > but SNP is not using it, which makes the abstraction looks strange.
+> 
+> Note, before this TDX enabling series, KVM_MEMORY_ENCRYPT_OP is a VM 
+> scope ioctl, that only serves for SEV and no other implementation uses 
+> it. I see no reason why cannot introduce a new IOCTL in x86 KVM that 
+> serves only one vendor.
+> 
 
-Signed-off-by: Nipun Gupta <nipun.gupta@amd.com>
-Reviewed-by: Pieter Jansen van Vuuren <pieter.jansen-van-vuuren@amd.com>
-Tested-by: Nikhil Agarwal <nikhil.agarwal@amd.com>
----
+My point is: time is different. When KVM_MEMORY_ENCRYPT_OP is there,
+there was *only* one vendor and SEV/SNP didn't know how the future vendor
+is going to use the ioctl. That is a reasonable case an generic ioctl can
+have one vendor to back up.
 
-CDX bus is now merged on linux-next tree. So sending VFIO driver
-patch for CDX bus.
+The background here is: now another vendor is coming and there are going to
+be two vendors. The two vendors' flows are much clearer than early stage.
+Like, they know which flow is going to be used by each other.
 
- MAINTAINERS                         |   1 +
- drivers/vfio/Kconfig                |   1 +
- drivers/vfio/Makefile               |   1 +
- drivers/vfio/cdx/Kconfig            |  17 ++
- drivers/vfio/cdx/Makefile           |   8 +
- drivers/vfio/cdx/vfio_cdx.c         | 314 ++++++++++++++++++++++++++++
- drivers/vfio/cdx/vfio_cdx_private.h |  32 +++
- 7 files changed, 374 insertions(+)
- create mode 100644 drivers/vfio/cdx/Kconfig
- create mode 100644 drivers/vfio/cdx/Makefile
- create mode 100644 drivers/vfio/cdx/vfio_cdx.c
- create mode 100644 drivers/vfio/cdx/vfio_cdx_private.h
+With these kept in mind, IMHO, it is not appropriate to introduce
+an generic ioctl that only one vendor is going to use, meanwhile
+we have already known another vendor is not going to use it.
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 99b665e85f0a..2acb3dbff174 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -970,6 +970,7 @@ M:	Nikhil Agarwal <nikhil.agarwal@amd.com>
- S:	Maintained
- F:	Documentation/devicetree/bindings/bus/xlnx,versal-net-cdx.yaml
- F:	drivers/cdx/*
-+F:	drivers/vfio/cdx/*
- F:	include/linux/cdx/*
- 
- AMD CRYPTOGRAPHIC COPROCESSOR (CCP) DRIVER
-diff --git a/drivers/vfio/Kconfig b/drivers/vfio/Kconfig
-index 89e06c981e43..aba36f5be4ec 100644
---- a/drivers/vfio/Kconfig
-+++ b/drivers/vfio/Kconfig
-@@ -57,6 +57,7 @@ source "drivers/vfio/pci/Kconfig"
- source "drivers/vfio/platform/Kconfig"
- source "drivers/vfio/mdev/Kconfig"
- source "drivers/vfio/fsl-mc/Kconfig"
-+source "drivers/vfio/cdx/Kconfig"
- endif
- 
- source "virt/lib/Kconfig"
-diff --git a/drivers/vfio/Makefile b/drivers/vfio/Makefile
-index 70e7dcb302ef..1a27b2516612 100644
---- a/drivers/vfio/Makefile
-+++ b/drivers/vfio/Makefile
-@@ -14,3 +14,4 @@ obj-$(CONFIG_VFIO_PCI) += pci/
- obj-$(CONFIG_VFIO_PLATFORM) += platform/
- obj-$(CONFIG_VFIO_MDEV) += mdev/
- obj-$(CONFIG_VFIO_FSL_MC) += fsl-mc/
-+obj-$(CONFIG_VFIO_CDX) += cdx/
-diff --git a/drivers/vfio/cdx/Kconfig b/drivers/vfio/cdx/Kconfig
-new file mode 100644
-index 000000000000..e6de0a0caa32
---- /dev/null
-+++ b/drivers/vfio/cdx/Kconfig
-@@ -0,0 +1,17 @@
-+# SPDX-License-Identifier: GPL-2.0
-+#
-+# VFIO CDX configuration
-+#
-+# Copyright (C) 2022-2023, Advanced Micro Devices, Inc.
-+#
-+
-+config VFIO_CDX
-+	tristate "VFIO support for CDX bus devices"
-+	depends on CDX_BUS
-+	select EVENTFD
-+	help
-+	  Driver to enable VFIO support for the devices on CDX bus.
-+	  This is required to make use of CDX devices present in
-+	  the system using the VFIO framework.
-+
-+	  If you don't know what to do here, say N.
-diff --git a/drivers/vfio/cdx/Makefile b/drivers/vfio/cdx/Makefile
-new file mode 100644
-index 000000000000..82e4ef412c0f
---- /dev/null
-+++ b/drivers/vfio/cdx/Makefile
-@@ -0,0 +1,8 @@
-+# SPDX-License-Identifier: GPL-2.0
-+#
-+# Copyright (C) 2022-2023, Advanced Micro Devices, Inc.
-+#
-+
-+obj-$(CONFIG_VFIO_CDX) += vfio-cdx.o
-+
-+vfio-cdx-objs := vfio_cdx.o
-diff --git a/drivers/vfio/cdx/vfio_cdx.c b/drivers/vfio/cdx/vfio_cdx.c
-new file mode 100644
-index 000000000000..c23be3e06495
---- /dev/null
-+++ b/drivers/vfio/cdx/vfio_cdx.c
-@@ -0,0 +1,314 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Copyright (C) 2022-2023, Advanced Micro Devices, Inc.
-+ */
-+
-+#include <linux/device.h>
-+#include <linux/iommu.h>
-+#include <linux/module.h>
-+#include <linux/slab.h>
-+#include <linux/types.h>
-+#include <linux/vfio.h>
-+#include <linux/cdx/cdx_bus.h>
-+#include <linux/delay.h>
-+#include <linux/io-64-nonatomic-hi-lo.h>
-+
-+#include "vfio_cdx_private.h"
-+
-+static struct cdx_driver vfio_cdx_driver;
-+
-+enum {
-+	CDX_ID_F_VFIO_DRIVER_OVERRIDE = 1,
-+};
-+
-+static int vfio_cdx_init_device(struct vfio_device *core_vdev)
-+{
-+	struct vfio_cdx_device *vdev =
-+		container_of(core_vdev, struct vfio_cdx_device, vdev);
-+	struct cdx_device *cdx_dev = to_cdx_device(core_vdev->dev);
-+
-+	vdev->cdx_dev = cdx_dev;
-+	vdev->dev = &cdx_dev->dev;
-+
-+	return 0;
-+}
-+
-+static void vfio_cdx_release_device(struct vfio_device *core_vdev)
-+{
-+	struct vfio_cdx_device *vdev =
-+		container_of(core_vdev, struct vfio_cdx_device, vdev);
-+
-+	vdev->cdx_dev = NULL;
-+	vdev->dev = NULL;
-+}
-+
-+/**
-+ * CDX_DRIVER_OVERRIDE_DEVICE_VFIO - macro used to describe a VFIO
-+ *                                   "driver_override" CDX device.
-+ * @vend: the 16 bit CDX Vendor ID
-+ * @dev: the 16 bit CDX Device ID
-+ *
-+ * This macro is used to create a struct cdx_device_id that matches a
-+ * specific device. driver_override will be set to
-+ * CDX_ID_F_VFIO_DRIVER_OVERRIDE.
-+ */
-+#define CDX_DRIVER_OVERRIDE_DEVICE_VFIO(vend, dev) \
-+	CDX_DEVICE_DRIVER_OVERRIDE(vend, dev, CDX_ID_F_VFIO_DRIVER_OVERRIDE)
-+
-+static int vfio_cdx_open_device(struct vfio_device *core_vdev)
-+{
-+	struct vfio_cdx_device *vdev =
-+		container_of(core_vdev, struct vfio_cdx_device, vdev);
-+	struct cdx_device *cdx_dev = vdev->cdx_dev;
-+	int count = cdx_dev->res_count;
-+	int i;
-+
-+	vdev->regions = kcalloc(count, sizeof(struct vfio_cdx_region),
-+				GFP_KERNEL);
-+	if (!vdev->regions)
-+		return -ENOMEM;
-+
-+	for (i = 0; i < count; i++) {
-+		struct resource *res = &cdx_dev->res[i];
-+
-+		vdev->regions[i].addr = res->start;
-+		vdev->regions[i].size = resource_size(res);
-+		vdev->regions[i].type = res->flags;
-+		/*
-+		 * Only regions addressed with PAGE granularity may be
-+		 * MMAP'ed securely.
-+		 */
-+		if (!(vdev->regions[i].addr & ~PAGE_MASK) &&
-+		    !(vdev->regions[i].size & ~PAGE_MASK))
-+			vdev->regions[i].flags |=
-+					VFIO_REGION_INFO_FLAG_MMAP;
-+		vdev->regions[i].flags |= VFIO_REGION_INFO_FLAG_READ;
-+		if (!(cdx_dev->res[i].flags & IORESOURCE_READONLY))
-+			vdev->regions[i].flags |= VFIO_REGION_INFO_FLAG_WRITE;
-+	}
-+
-+	return 0;
-+}
-+
-+static void vfio_cdx_regions_cleanup(struct vfio_cdx_device *vdev)
-+{
-+	kfree(vdev->regions);
-+}
-+
-+static int vfio_cdx_reset_device(struct vfio_cdx_device *vdev)
-+{
-+	return cdx_dev_reset(&vdev->cdx_dev->dev);
-+}
-+
-+static void vfio_cdx_close_device(struct vfio_device *core_vdev)
-+{
-+	struct vfio_cdx_device *vdev =
-+		container_of(core_vdev, struct vfio_cdx_device, vdev);
-+	int ret;
-+
-+	vfio_cdx_regions_cleanup(vdev);
-+
-+	/* reset the device before cleaning up the interrupts */
-+	ret = vfio_cdx_reset_device(vdev);
-+	if (WARN_ON(ret))
-+		dev_warn(core_vdev->dev,
-+			 "VFIO_CDX: reset device has failed (%d)\n", ret);
-+}
-+
-+static long vfio_cdx_ioctl(struct vfio_device *core_vdev,
-+			   unsigned int cmd, unsigned long arg)
-+{
-+	struct vfio_cdx_device *vdev =
-+		container_of(core_vdev, struct vfio_cdx_device, vdev);
-+	struct cdx_device *cdx_dev = vdev->cdx_dev;
-+	unsigned long minsz;
-+
-+	switch (cmd) {
-+	case VFIO_DEVICE_GET_INFO:
-+	{
-+		struct vfio_device_info info;
-+
-+		minsz = offsetofend(struct vfio_device_info, num_irqs);
-+
-+		if (copy_from_user(&info, (void __user *)arg, minsz))
-+			return -EFAULT;
-+
-+		if (info.argsz < minsz)
-+			return -EINVAL;
-+
-+		info.flags = VFIO_DEVICE_FLAGS_RESET;
-+
-+		info.num_regions = cdx_dev->res_count;
-+		info.num_irqs = 0;
-+
-+		return copy_to_user((void __user *)arg, &info, minsz) ?
-+			-EFAULT : 0;
-+	}
-+	case VFIO_DEVICE_GET_REGION_INFO:
-+	{
-+		struct vfio_region_info info;
-+
-+		minsz = offsetofend(struct vfio_region_info, offset);
-+
-+		if (copy_from_user(&info, (void __user *)arg, minsz))
-+			return -EFAULT;
-+
-+		if (info.argsz < minsz)
-+			return -EINVAL;
-+
-+		if (info.index >= cdx_dev->res_count)
-+			return -EINVAL;
-+
-+		/* map offset to the physical address  */
-+		info.offset = VFIO_CDX_INDEX_TO_OFFSET(info.index);
-+		info.size = vdev->regions[info.index].size;
-+		info.flags = vdev->regions[info.index].flags;
-+
-+		if (copy_to_user((void __user *)arg, &info, minsz))
-+			return -EFAULT;
-+		return 0;
-+	}
-+	case VFIO_DEVICE_RESET:
-+	{
-+		return vfio_cdx_reset_device(vdev);
-+	}
-+	default:
-+		return -ENOTTY;
-+	}
-+}
-+
-+static int vfio_cdx_mmap_mmio(struct vfio_cdx_region region,
-+			      struct vm_area_struct *vma)
-+{
-+	u64 size = vma->vm_end - vma->vm_start;
-+	u64 pgoff, base;
-+
-+	pgoff = vma->vm_pgoff &
-+		((1U << (VFIO_CDX_OFFSET_SHIFT - PAGE_SHIFT)) - 1);
-+	base = pgoff << PAGE_SHIFT;
-+
-+	if (region.size < PAGE_SIZE || base + size > region.size)
-+		return -EINVAL;
-+
-+	vma->vm_pgoff = (region.addr >> PAGE_SHIFT) + pgoff;
-+	vma->vm_page_prot = pgprot_noncached(vma->vm_page_prot);
-+
-+	return remap_pfn_range(vma, vma->vm_start, vma->vm_pgoff,
-+			       size, vma->vm_page_prot);
-+}
-+
-+static int vfio_cdx_mmap(struct vfio_device *core_vdev,
-+			 struct vm_area_struct *vma)
-+{
-+	struct vfio_cdx_device *vdev =
-+		container_of(core_vdev, struct vfio_cdx_device, vdev);
-+	struct cdx_device *cdx_dev = vdev->cdx_dev;
-+	unsigned int index;
-+
-+	index = vma->vm_pgoff >> (VFIO_CDX_OFFSET_SHIFT - PAGE_SHIFT);
-+
-+	if (vma->vm_end < vma->vm_start)
-+		return -EINVAL;
-+	if (vma->vm_start & ~PAGE_MASK)
-+		return -EINVAL;
-+	if (vma->vm_end & ~PAGE_MASK)
-+		return -EINVAL;
-+	if (!(vma->vm_flags & VM_SHARED))
-+		return -EINVAL;
-+	if (index >= cdx_dev->res_count)
-+		return -EINVAL;
-+
-+	if (!(vdev->regions[index].flags & VFIO_REGION_INFO_FLAG_MMAP))
-+		return -EINVAL;
-+
-+	if (!(vdev->regions[index].flags & VFIO_REGION_INFO_FLAG_READ) &&
-+	    (vma->vm_flags & VM_READ))
-+		return -EINVAL;
-+
-+	if (!(vdev->regions[index].flags & VFIO_REGION_INFO_FLAG_WRITE) &&
-+	    (vma->vm_flags & VM_WRITE))
-+		return -EINVAL;
-+
-+	vma->vm_private_data = cdx_dev;
-+
-+	return vfio_cdx_mmap_mmio(vdev->regions[index], vma);
-+}
-+
-+static const struct vfio_device_ops vfio_cdx_ops = {
-+	.name		= "vfio-cdx",
-+	.init		= vfio_cdx_init_device,
-+	.release	= vfio_cdx_release_device,
-+	.open_device	= vfio_cdx_open_device,
-+	.close_device	= vfio_cdx_close_device,
-+	.ioctl		= vfio_cdx_ioctl,
-+	.mmap		= vfio_cdx_mmap,
-+};
-+
-+static int vfio_cdx_probe(struct cdx_device *cdx_dev)
-+{
-+	struct vfio_cdx_device *vdev = NULL;
-+	struct device *dev = &cdx_dev->dev;
-+	int ret;
-+
-+	vdev = vfio_alloc_device(vfio_cdx_device, vdev, dev,
-+				 &vfio_cdx_ops);
-+	if (IS_ERR(vdev))
-+		return PTR_ERR(vdev);
-+
-+	ret = vfio_register_group_dev(&vdev->vdev);
-+	if (ret) {
-+		dev_err(dev, "VFIO_CDX: Failed to add to vfio group\n");
-+		goto out_uninit;
-+	}
-+
-+	dev_set_drvdata(dev, vdev);
-+	return 0;
-+
-+out_uninit:
-+	vfio_put_device(&vdev->vdev);
-+	return ret;
-+}
-+
-+static int vfio_cdx_remove(struct cdx_device *cdx_dev)
-+{
-+	struct device *dev = &cdx_dev->dev;
-+	struct vfio_cdx_device *vdev;
-+
-+	vdev = dev_get_drvdata(dev);
-+	vfio_unregister_group_dev(&vdev->vdev);
-+	vfio_put_device(&vdev->vdev);
-+
-+	return 0;
-+}
-+
-+static const struct cdx_device_id vfio_cdx_table[] = {
-+	{ CDX_DRIVER_OVERRIDE_DEVICE_VFIO(CDX_ANY_ID, CDX_ANY_ID) }, /* match all by default */
-+	{}
-+};
-+
-+static struct cdx_driver vfio_cdx_driver = {
-+	.probe		= vfio_cdx_probe,
-+	.remove		= vfio_cdx_remove,
-+	.match_id_table	= vfio_cdx_table,
-+	.driver	= {
-+		.name	= "vfio-cdx",
-+		.owner	= THIS_MODULE,
-+	},
-+	.driver_managed_dma = true,
-+};
-+
-+static int __init vfio_cdx_driver_init(void)
-+{
-+	return cdx_driver_register(&vfio_cdx_driver);
-+}
-+
-+static void __exit vfio_cdx_driver_exit(void)
-+{
-+	cdx_driver_unregister(&vfio_cdx_driver);
-+}
-+
-+module_init(vfio_cdx_driver_init);
-+module_exit(vfio_cdx_driver_exit);
-+
-+MODULE_LICENSE("GPL");
-+MODULE_DESCRIPTION("VFIO for CDX devices - User Level meta-driver");
-diff --git a/drivers/vfio/cdx/vfio_cdx_private.h b/drivers/vfio/cdx/vfio_cdx_private.h
-new file mode 100644
-index 000000000000..8b6f1ee3f5cd
---- /dev/null
-+++ b/drivers/vfio/cdx/vfio_cdx_private.h
-@@ -0,0 +1,32 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/*
-+ * Copyright (C) 2022-2023, Advanced Micro Devices, Inc.
-+ */
-+
-+#ifndef VFIO_CDX_PRIVATE_H
-+#define VFIO_CDX_PRIVATE_H
-+
-+#define VFIO_CDX_OFFSET_SHIFT    40
-+#define VFIO_CDX_OFFSET_MASK (((u64)(1) << VFIO_CDX_OFFSET_SHIFT) - 1)
-+
-+#define VFIO_CDX_OFFSET_TO_INDEX(off) ((off) >> VFIO_CDX_OFFSET_SHIFT)
-+
-+#define VFIO_CDX_INDEX_TO_OFFSET(index)	\
-+	((u64)(index) << VFIO_CDX_OFFSET_SHIFT)
-+
-+struct vfio_cdx_region {
-+	u32			flags;
-+	u32			type;
-+	u64			addr;
-+	resource_size_t		size;
-+	void __iomem		*ioaddr;
-+};
-+
-+struct vfio_cdx_device {
-+	struct vfio_device	vdev;
-+	struct cdx_device	*cdx_dev;
-+	struct device		*dev;
-+	struct vfio_cdx_region	*regions;
-+};
-+
-+#endif /* VFIO_CDX_PRIVATE_H */
--- 
-2.17.1
+Defining a new userspace ABI is a serious thing and it is not an early
+stage anymore. Actually I think it is the best time to see how the
+code infrastructure should be re-purposed at this time. 
 
+> We choose KVM_MEMORY_ENCRYPT_OP for TDX platform scope, just because we 
+> reuse KVM_MEMORY_ENCRYPT_OP for TDX VM-scope and extend it to TDX vcpu 
+> scope. It's just to avoid defining a new IOCTL number.
+> 
+> We can rename it to KVM_GET_CC_CAPABILITIES, and even return different 
+> capabilities based on VM type. And even, if SNP wants to use it, I think 
+> it can wrap SNP driver calls inside this IOCTL?
+> 
+
+I am not opposed to this option as it shows effort to improve it and it
+is constructive. But this needs to be figured out with AMD folks and
+maintainers. E.g. what should be the best CC ioctl scheme for KVM?
+vendor-specific or generic, which brings better benefit for the userspace,
+and less maintenance burden.
+
+Back to the reason why I think a vendor-specific sysinfo interface for TDX
+is necessary:
+
+1) SEV driver has been there for quite some time. Unless people thinks an
+generic CC ioctl scheme is a way to go, then there will be motivation and
+efforts putting on it. The efforts is not only about wrapping SEV ioctls,
+it needs a systematic spec of generic CC ioctl scheme. 
+
+2) TDX doesn't have a driver like SEV and possibly not going to have one in
+the future. For those non-KVM related control flow of TDX in future, they
+can re-use this and stay away from KVM interface. (If vendor-specific
+scheme is the future direction.)
+
+> kvm.ko is special that it needs to serve two vendors. Sometime it's 
+> unaviodable that an interface is only used by one vendor.
+
+I am afraid that in this case it is avoidable right?
