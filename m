@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E6E826D461F
-	for <lists+kvm@lfdr.de>; Mon,  3 Apr 2023 15:49:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3FC8B6D461D
+	for <lists+kvm@lfdr.de>; Mon,  3 Apr 2023 15:49:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232684AbjDCNt3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 3 Apr 2023 09:49:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51820 "EHLO
+        id S232532AbjDCNt1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 3 Apr 2023 09:49:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51822 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232208AbjDCNtZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S232133AbjDCNtZ (ORCPT <rfc822;kvm@vger.kernel.org>);
         Mon, 3 Apr 2023 09:49:25 -0400
-Received: from mail-wm1-x32e.google.com (mail-wm1-x32e.google.com [IPv6:2a00:1450:4864:20::32e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74FF8728D
+Received: from mail-wm1-x336.google.com (mail-wm1-x336.google.com [IPv6:2a00:1450:4864:20::336])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C879E728F
         for <kvm@vger.kernel.org>; Mon,  3 Apr 2023 06:49:23 -0700 (PDT)
-Received: by mail-wm1-x32e.google.com with SMTP id o24-20020a05600c511800b003ef59905f26so18134627wms.2
+Received: by mail-wm1-x336.google.com with SMTP id v6-20020a05600c470600b003f034269c96so7931000wmo.4
         for <kvm@vger.kernel.org>; Mon, 03 Apr 2023 06:49:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google; t=1680529762;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=mN816sNtX5Vdj2G92pvv8I3i5QnGeNTrX25n5LbvU4I=;
-        b=O5sLqRX3o8wg3JSEuHWQfk7e53SjZslyalKpbNubzgxabPQbImJEAab9cWKIwTylAL
-         WgcyZqFlockFyY+eZ0Bf7vXgYjz2ZTwNjuS2v73b4lgsIVnXRvHaM3qr2WnHPKUdJAQI
-         5B7WEues0f+SO+CL77LGCSGQrN7h0W/Tk+GIroANmG1yd2r3D4iFC3sC8EHZrTpiedQM
-         sCILzvAqFtezCm6x72Z0UwzZmMlakI+VNU2GyYzB0Ne1NYLNF4GJQVY+tueL2OS5ZQkU
-         bx43IXHTD/y2FJ9UOtFFsIU3eYKPZNE6kaHy0DTyMLxFc6WvKs0qn0lonWM8EUzREfvE
-         2wSQ==
+        bh=dHHLYJ1Q7CDYpzOnQyJie+UJ0r74Mi54/+ouByLjk3E=;
+        b=CWzuya7JW2bY34opxAKYIrNfyS65J2Ve7Op8RUvVCTJWgo8mFVV0WttZ5XTBIOpOuw
+         qEc0uVEkLj4BSXrkGYzQuo4l+mgtk1/Cg5F8oZdEugZIT790Y3kd7/R/ROH79z7UrZQ0
+         v3Sn6tKQEDY9L3zgiYs7vsdbe8VCOYPEkeTzMCKl6g63yKNr+tFOllZTZi0lmaKWowSm
+         PARwtkZgJ1mpnizEjF6BHJMoGJzl5i5cHzOy7KasRbZka01wrMHVeI0zfyoEPcjqUfVu
+         oF/kl0e4k2mu2v96VOyu3vif1056EhDnaETNYv0h58W43SS6YkTyw2bu6X5j4qNswFKj
+         vOHg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112; t=1680529762;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=mN816sNtX5Vdj2G92pvv8I3i5QnGeNTrX25n5LbvU4I=;
-        b=RO2kEyuW7swt1nlSNgLSC1iwCaj3Leb0blP2Dn1J4Seo9aj2xN9eKscseh9ZdRGtUF
-         ZqmR6KyLI+nvNCBxbQ5eRs2HlO1DFDRpd/c/F1JATkaY1Ir53IetOPIkMpJZBGg4WQ4r
-         uRY5yA9wQ8k44geiOtvU0GMJqEJi8d5jRz5Ggakc2mQaMNy6czrwi6qEAO3u1//0ZH6D
-         bIqy2zQ+X7NZUrrgbbHjdPMDQ7OM01k2zgGxgfQfCMrm+PkLbG0KS1gpr682MiFV+gUN
-         7b182g2chHJW9mUCQE3nJs7aAUGfauvPaxd/d3r5B2dfYSK9eCy+nei/BtOAto8ASUjb
-         R7Yw==
-X-Gm-Message-State: AAQBX9cE06GSC1jt+JrUeLAx2Nh7oS1NRg6iuIupSgAwsDlRMP0BtczW
-        qt/xkzNgfZhuo2mHsKa/za+Y8w==
-X-Google-Smtp-Source: AKy350ZwFB2r0eAYmFp0426BeiHDQwJvp+zag6ay5Q14nm/hpxxlQCHq0zP0DbsDmaKOiNfdE1IMxQ==
-X-Received: by 2002:a7b:c045:0:b0:3ef:6fee:8057 with SMTP id u5-20020a7bc045000000b003ef6fee8057mr19211144wmc.25.1680529761833;
-        Mon, 03 Apr 2023 06:49:21 -0700 (PDT)
+        bh=dHHLYJ1Q7CDYpzOnQyJie+UJ0r74Mi54/+ouByLjk3E=;
+        b=ke6GCH6+3pM5QTeJmesO4IorXdjgiXNNBsmUxtDpJvFRMTcy9ivzrJxXsAQyULRgK/
+         5S7p5qszG4cMNc7x4KfKmyOMFsdTu/SiEsAaKuIWAkS/Nt2u7TBSllHtozDkQu/pqUIf
+         nGPI4GZzk0Iu7H2e2Eon228C0pI6wNg3ht4ZBlLJckBIte6co+26T8Vgc+2XATg3e/fT
+         BBbGU/rxmLZurU0JkrhEvjKlYO9WzY6khBx84fwY86K6Ngth7y6+zVRWdes02YSOQR1p
+         v9YmH6X69UlpQfDeHU5MTwzRqXzQpKnaurn9Gin0o9LTak5qO0Wd/vri0bxqy1x2uuqh
+         94oA==
+X-Gm-Message-State: AO0yUKXXMmO4MtMlMLWqZLhFgHP9T8y+vwORI+LxhbkOqzSP1nBgyQZS
+        TTINAoEnbcVoXuxpeYECyrG6CA==
+X-Google-Smtp-Source: AK7set8bJ8p2Mjm4rby/PfqCRzfAP52hZFXF8mjkWC1Vnn5qr98rrvtqR8gLVZ45HJE2Z+KffldK9w==
+X-Received: by 2002:a05:600c:acb:b0:3ee:4f92:907b with SMTP id c11-20020a05600c0acb00b003ee4f92907bmr26589298wmr.14.1680529762237;
+        Mon, 03 Apr 2023 06:49:22 -0700 (PDT)
 Received: from zen.linaroharston ([85.9.250.243])
-        by smtp.gmail.com with ESMTPSA id l7-20020a05600c4f0700b003ef5deb4188sm19526828wmq.17.2023.04.03.06.49.21
+        by smtp.gmail.com with ESMTPSA id iv19-20020a05600c549300b003ef69873cf1sm19941464wmb.40.2023.04.03.06.49.21
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Mon, 03 Apr 2023 06:49:21 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
-        by zen.linaroharston (Postfix) with ESMTP id E356F1FFBA;
-        Mon,  3 Apr 2023 14:49:20 +0100 (BST)
+        by zen.linaroharston (Postfix) with ESMTP id 05D4F1FFBB;
+        Mon,  3 Apr 2023 14:49:21 +0100 (BST)
 From:   =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To:     qemu-devel@nongnu.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -64,11 +64,10 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Wainer dos Santos Moschetta <wainersm@redhat.com>,
         =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
         Cleber Rosa <crosa@redhat.com>, Thomas Huth <thuth@redhat.com>,
-        Kevin Wolf <kwolf@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>
-Subject: [PATCH v2 02/11] gdbstub: Only build libgdb_user.fa / libgdb_softmmu.fa if necessary
-Date:   Mon,  3 Apr 2023 14:49:11 +0100
-Message-Id: <20230403134920.2132362-3-alex.bennee@linaro.org>
+        Kevin Wolf <kwolf@redhat.com>
+Subject: [PATCH v2 03/11] gdbstub: don't report auxv feature unless on Linux
+Date:   Mon,  3 Apr 2023 14:49:12 +0100
+Message-Id: <20230403134920.2132362-4-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230403134920.2132362-1-alex.bennee@linaro.org>
 References: <20230403134920.2132362-1-alex.bennee@linaro.org>
@@ -84,61 +83,34 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Philippe Mathieu-Daudé <philmd@linaro.org>
+The later handler if conditionally compiled only for Linux but we
+forgot to ensure we don't advertise it lest we confuse our BSD
+brethren.
 
-It is pointless to build libgdb_user.fa in a system-only build
-(or libgdb_softmmu.fa in a user-only build). Besides, in some
-restricted build configurations, some APIs might be restricted /
-not available. Example in a KVM-only builds where TCG is disabled:
-
-  $ ninja qemu-system-x86_64
-  [99/2187] Compiling C object gdbstub/libgdb_user.fa.p/user.c.o
-  FAILED: gdbstub/libgdb_user.fa.p/user.c.o
-  ../../gdbstub/user.c: In function ‘gdb_breakpoint_insert’:
-  ../../gdbstub/user.c:438:19: error: implicit declaration of function ‘cpu_breakpoint_insert’; did you mean ‘gdb_breakpoint_insert’? [-Werror=implicit-function-declaration]
-    438 |             err = cpu_breakpoint_insert(cpu, addr, BP_GDB, NULL);
-        |                   ^~~~~~~~~~~~~~~~~~~~~
-        |                   gdb_breakpoint_insert
-  ../../gdbstub/user.c:438:19: error: nested extern declaration of ‘cpu_breakpoint_insert’ [-Werror=nested-externs]
-  ../../gdbstub/user.c: In function ‘gdb_breakpoint_remove’:
-  ../../gdbstub/user.c:459:19: error: implicit declaration of function ‘cpu_breakpoint_remove’; did you mean ‘gdb_breakpoint_remove’? [-Werror=implicit-function-declaration]
-    459 |             err = cpu_breakpoint_remove(cpu, addr, BP_GDB);
-        |                   ^~~~~~~~~~~~~~~~~~~~~
-        |                   gdb_breakpoint_remove
-  ../../gdbstub/user.c:459:19: error: nested extern declaration of ‘cpu_breakpoint_remove’ [-Werror=nested-externs]
-  cc1: all warnings being treated as errors
-  ninja: build stopped: subcommand failed.
-
-Fixes: 61b2e136db ("gdbstub: only compile gdbstub twice for whole build")
-Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20230329161852.84992-1-philmd@linaro.org>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Message-Id: <20230330101141.30199-3-alex.bennee@linaro.org>
+Fixes: 51c623b0de ("gdbstub: add support to Xfer:auxv:read: packet")
+Reported-by: Warner Losh <imp@bsdimp.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+Reviewed-by: Warner Losh <imp@bsdimp.com>
+Tested-by: Warner Losh <imp@bsdimp.com>
+Message-Id: <20230403120250.2071560-1-alex.bennee@linaro.org>
 ---
- gdbstub/meson.build | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ gdbstub/gdbstub.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/gdbstub/meson.build b/gdbstub/meson.build
-index bd5c5cd67d..cdb4d28691 100644
---- a/gdbstub/meson.build
-+++ b/gdbstub/meson.build
-@@ -20,11 +20,13 @@ gdb_softmmu_ss = gdb_softmmu_ss.apply(config_host, strict: false)
- libgdb_user = static_library('gdb_user',
-                              gdb_user_ss.sources() + genh,
-                              name_suffix: 'fa',
--                             c_args: '-DCONFIG_USER_ONLY')
-+                             c_args: '-DCONFIG_USER_ONLY',
-+                             build_by_default: have_user)
+diff --git a/gdbstub/gdbstub.c b/gdbstub/gdbstub.c
+index 2a66371aa5..0760d78685 100644
+--- a/gdbstub/gdbstub.c
++++ b/gdbstub/gdbstub.c
+@@ -1468,7 +1468,7 @@ static void handle_query_supported(GArray *params, void *user_ctx)
+             ";ReverseStep+;ReverseContinue+");
+     }
  
- libgdb_softmmu = static_library('gdb_softmmu',
-                                 gdb_softmmu_ss.sources() + genh,
--                                name_suffix: 'fa')
-+                                name_suffix: 'fa',
-+                                build_by_default: have_system)
- 
- gdb_user = declare_dependency(link_whole: libgdb_user)
- user_ss.add(gdb_user)
+-#ifdef CONFIG_USER_ONLY
++#if defined(CONFIG_USER_ONLY) && defined(CONFIG_LINUX)
+     if (gdbserver_state.c_cpu->opaque) {
+         g_string_append(gdbserver_state.str_buf, ";qXfer:auxv:read+");
+     }
 -- 
 2.39.2
 
