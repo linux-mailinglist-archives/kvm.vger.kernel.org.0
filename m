@@ -2,64 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 95E8A6D4E65
-	for <lists+kvm@lfdr.de>; Mon,  3 Apr 2023 18:51:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AEF566D4E69
+	for <lists+kvm@lfdr.de>; Mon,  3 Apr 2023 18:53:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232939AbjDCQvx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 3 Apr 2023 12:51:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33558 "EHLO
+        id S232943AbjDCQxS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 3 Apr 2023 12:53:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34486 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232943AbjDCQvv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 3 Apr 2023 12:51:51 -0400
-Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25D62210A
-        for <kvm@vger.kernel.org>; Mon,  3 Apr 2023 09:51:50 -0700 (PDT)
-Received: by mail-pl1-x649.google.com with SMTP id s4-20020a170902ea0400b001a1f4137086so17867013plg.14
-        for <kvm@vger.kernel.org>; Mon, 03 Apr 2023 09:51:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1680540709;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=j0+AsVm/ICAEcAP4rxU82nAAsSy6vNn+W+CVde+YYzE=;
-        b=nnY+pELvU43otmpN0FYH574JDxJHD/YemNmoCWDwKRhowjTqAFseS6/AhsnyP/1Dlx
-         a+QEvEtVOUszU9dy5VPF6tm+vahgU5NxgfKrZ0ua4uwXen3y8WbNo262wAfK7TEyAXYQ
-         hLL0buw22y4bMJZBT50pFvYiOosvyBtodbpmiJrLpWe5YNKFpeL3Bweq6MmhRvZn5vCd
-         7mmIweQoAn/16C+vrQpVP3MphK/g/d/XvntkoW6U+AM6U4AZek2xPD/lglyeGp0ab2qO
-         xpVzuBrMBHOmA+EOhuSDrdE4HQgdbAeoRCu7GPpNYhqYxDOBP1qgi44HC3sDyZte6Wab
-         d63A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680540709;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=j0+AsVm/ICAEcAP4rxU82nAAsSy6vNn+W+CVde+YYzE=;
-        b=EivIH3UdWRtTOPapbksUA4JqnJOcvdKj1BxTolV7FsuTIXovNYDfl8BEXDKsP62bM3
-         LAh8PIihU5PQNN0Lj75A/E6yU1EgnQ2TIdFZHLF0dFapmezCC1I0YeigTcwxrN43iPAe
-         i+eeRStINedat2rPzb2iQUrT4ErCuCuUKbJ8Wz57BXLu94YDD5eqzVCNmznPZM4BSMEj
-         gBUjgspW+WWi2xp0CirGW2NDqvfkQLP7vIKW4CQwa4yjXONsNtf9iZ5tvj1Y9CTkEgfP
-         yXh5VEi6LgbPx/bM1xvOiA/tAZsluUdIAMLwxKkaWo/OTHXOodo22SJjuGPNJeFaihfa
-         9xtw==
-X-Gm-Message-State: AAQBX9cv65zl6gyhm58v4UZmAa0fq7gUDdhsmrqtZquXmAmTray4BCRc
-        b4lVmj4EdTTXl7yj7vbtsTO4hDU4zjE=
-X-Google-Smtp-Source: AKy350ZhY2dj1zF7nuU24v6IRoc4e1JXI6QyCj5OHk4qZbU6IqQ6ObciFfvpw3KS+ToEJ5g/PTAMWnoBlJs=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90a:fb57:b0:23d:30c2:c5b7 with SMTP id
- iq23-20020a17090afb5700b0023d30c2c5b7mr5988293pjb.3.1680540709693; Mon, 03
- Apr 2023 09:51:49 -0700 (PDT)
-Date:   Mon, 3 Apr 2023 09:51:48 -0700
-In-Reply-To: <3b8e64f5-6099-9e80-d0d8-4a5ea4e6c6f3@redhat.com>
-Mime-Version: 1.0
-References: <20230403112625.63833-1-thuth@redhat.com> <ZCrvwEhb45cqGhmP@google.com>
- <3b8e64f5-6099-9e80-d0d8-4a5ea4e6c6f3@redhat.com>
-Message-ID: <ZCsEJPjWA/IOk9ca@google.com>
-Subject: Re: [kvm-unit-tests PATCH] ci/cirrus-ci-fedora.yml: Disable the
- "memory" test in the KVM job
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-7.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+        with ESMTP id S229446AbjDCQxR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 3 Apr 2023 12:53:17 -0400
+Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F419B2121;
+        Mon,  3 Apr 2023 09:53:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1680540796; x=1712076796;
+  h=message-id:date:mime-version:from:subject:to:cc:
+   references:in-reply-to:content-transfer-encoding;
+  bh=ki7HvbTTIzSPCh+p8ENNZZvs3EEXOxF+XqGP2DaWK5Y=;
+  b=cBB3dej1+fSvz0QI8KMDHMbvQR6HSrIybpO+86Y2kGP5zo95fGTgoGGr
+   +h7KqPfTT2n+5or9QoYU2BfKyMKTmT5VqdR1b040xWWh+GT2Q7jl4mbq/
+   OM6R0csvd7EWMJOrffY1dIVNdgvZaOZ4a3IITPZM53tIELxY76sqG3Fwn
+   CBz12PulD0LlZPxernh3crw3mxB135SwTL2Qo5myFjdeJBdHVP6k7tvVJ
+   K29KW4+39s3j0RZm0CQLOd9rQWsVSSjgtyJo30W6LBxQdkPQpVGhEdums
+   JLwL50zTuhp4mXBy+gUj3hgKRbFWRtML+iaEZznKPkmmezIyQ4rDYy0KT
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10669"; a="407008575"
+X-IronPort-AV: E=Sophos;i="5.98,315,1673942400"; 
+   d="scan'208";a="407008575"
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Apr 2023 09:53:14 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10669"; a="860280525"
+X-IronPort-AV: E=Sophos;i="5.98,315,1673942400"; 
+   d="scan'208";a="860280525"
+Received: from ssidhu-mobl.amr.corp.intel.com (HELO [10.212.178.109]) ([10.212.178.109])
+  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Apr 2023 09:53:13 -0700
+Message-ID: <19035c40-e756-6efd-1c02-b09109fb44c1@intel.com>
+Date:   Mon, 3 Apr 2023 09:53:13 -0700
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.8.0
+From:   Dave Hansen <dave.hansen@intel.com>
+Subject: Re: [RFC PATCH 0/7] x86/entry: Atomic statck switching for IST
+To:     Lai Jiangshan <jiangshanlai@gmail.com>,
+        linux-kernel@vger.kernel.org
+Cc:     Lai Jiangshan <jiangshan.ljs@antgroup.com>,
+        "H. Peter Anvin" <hpa@linux.intel.com>,
+        Andi Kleen <ak@linux.intel.com>,
+        Andrew Cooper <andrew.cooper3@citrix.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Asit Mallick <asit.k.mallick@intel.com>,
+        Cfir Cohen <cfir@google.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        David Kaplan <David.Kaplan@amd.com>,
+        David Rientjes <rientjes@google.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        Jan Kiszka <jan.kiszka@siemens.com>,
+        Jiri Slaby <jslaby@suse.cz>, Joerg Roedel <joro@8bytes.org>,
+        Juergen Gross <jgross@suse.com>,
+        Kees Cook <keescook@chromium.org>,
+        Kirill Shutemov <kirill.shutemov@linux.intel.com>,
+        Kuppuswamy Sathyanarayanan <knsathya@kernel.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Mike Stunes <mstunes@vmware.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Raj Ashok <ashok.raj@intel.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Tony Luck <tony.luck@intel.com>, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, x86@kernel.org
+References: <20230403140605.540512-1-jiangshanlai@gmail.com>
+Content-Language: en-US
+In-Reply-To: <20230403140605.540512-1-jiangshanlai@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.8 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -67,24 +88,75 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Apr 03, 2023, Paolo Bonzini wrote:
-> On 4/3/23 17:24, Sean Christopherson wrote:
-> > An alternative would be to force emulation when using KVM, but KVM doesn't currently
-> > emulating pcommit (deprecated by Intel), clwb, or any of the fence instructions
-> > (at least, not afaict; I'm somewhat surprised *fence isn't "required").
-> > 
-> > diff --git a/x86/unittests.cfg b/x86/unittests.cfg
-> > index f324e32d..5afb5dad 100644
-> > --- a/x86/unittests.cfg
-> > +++ b/x86/unittests.cfg
-> > @@ -185,6 +185,7 @@ arch = x86_64
-> >   [memory]
-> >   file = memory.flat
-> > +accel = tcg
-> >   extra_params = -cpu max
-> >   arch = x86_64
-> > 
-> 
-> I think we should just drop the "CPUID bit non-present" case.
+On 4/3/23 07:05, Lai Jiangshan wrote:
+>  Documentation/x86/kernel-stacks.rst   |   2 +
+>  arch/x86/entry/Makefile               |   3 +
+>  arch/x86/entry/entry_64.S             | 615 +++++++-------------------
+>  arch/x86/entry/ist_entry.c            | 299 +++++++++++++
+>  arch/x86/include/asm/cpu_entry_area.h |   8 +-
+>  arch/x86/include/asm/idtentry.h       |  15 +-
+>  arch/x86/include/asm/sev.h            |  14 -
+>  arch/x86/include/asm/traps.h          |   1 -
+>  arch/x86/kernel/asm-offsets_64.c      |   7 +
+>  arch/x86/kernel/callthunks.c          |   2 +
+>  arch/x86/kernel/dumpstack_64.c        |   6 +-
+>  arch/x86/kernel/nmi.c                 |   8 -
+>  arch/x86/kernel/sev.c                 | 108 -----
+>  arch/x86/kernel/traps.c               |  43 --
+>  arch/x86/kvm/vmx/vmx.c                | 441 +++++++++++++++++-
+>  arch/x86/kvm/x86.c                    |  10 +-
+>  arch/x86/mm/cpu_entry_area.c          |   2 +-
+>  tools/objtool/check.c                 |   7 +-
+>  18 files changed, 937 insertions(+), 654 deletions(-)
+>  create mode 100644 arch/x86/entry/ist_entry.c
 
-Oh, yeah, that's even better.
+Some high-level comments...
+
+The diffstat looks a lot nastier because of the testing patch.  If you
+that patch and trim the diffstat a bit, it starts to look a _lot_ more
+appealing:
+
+>  arch/x86/entry/entry_64.S             |  615 ++++++++----------------------------
+>  arch/x86/entry/ist_entry.c            |  299 +++++++++++++++++
+>  arch/x86/kernel/sev.c                 |  108 ------
+>  arch/x86/kernel/traps.c               |   43 --
+...
+>  16 files changed, 490 insertions(+), 650 deletions(-)
+
+It removes more code than it adds and also removes a bunch of assembly.
+If it were me posting this, I'd have shouted that from the rooftops
+instead of obscuring it with a testing patch and leaving it as an
+exercise to the reader to figure out.
+
+It also comes with testing code and a great cover letter, which are rare
+and _spectacular_.
+
+That said, I'm torn.  This series makes a valiant attempt to improve one
+of the creakiest corners of arch/x86/.  But, there are precious few
+reviewers that can _really_ dig into this stuff.  This is also a lot
+less valuable now than it would have been when FRED was not on the horizon.
+
+It's also not incremental at all.  It's going to be a big pain when
+someone bisects their random system hang to patch 4/7.  It'll mean
+there's a bug buried somewhere in the 500 lines of patch 3/7.
+
+Grumbling aside, there's too much potential upside here to ignore.  As
+this moves out of RFC territory, it would be great if you could:
+
+ * Look at the FRED series and determine how much this collides
+ * Dig up some reviewers
+ * Flesh out the testing story.  What kind of hardware was this tested
+   on?  How much was bare metal vs. VMs, etc...?
+ * Reinforce what the benefits to end users are here.  Are folks
+   _actually_ running into the #VC fragility, for instance?
+
+Also, let's say we queue this, it starts getting linux-next testing, and
+we start getting bug reports of hangs.  It'll have to get reverted if we
+can't find the bug fast.
+
+How much of a pain would it be to make atomic-IST-entry _temporarily_
+selectable at boot time?  It would obviously need to keep the old code
+around and would not have the nice diffstat.  But that way, folks would
+at least have a workaround while we're bug hunting.
+
+1. https://lore.kernel.org/all/20230327075838.5403-1-xin3.li@intel.com/
