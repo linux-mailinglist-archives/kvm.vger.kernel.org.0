@@ -2,102 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 04CCB6D43F4
-	for <lists+kvm@lfdr.de>; Mon,  3 Apr 2023 14:00:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 11E606D4419
+	for <lists+kvm@lfdr.de>; Mon,  3 Apr 2023 14:05:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232254AbjDCMA4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 3 Apr 2023 08:00:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55538 "EHLO
+        id S232323AbjDCMFW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 3 Apr 2023 08:05:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33170 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231852AbjDCMAw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 3 Apr 2023 08:00:52 -0400
-Received: from mail-wm1-x32b.google.com (mail-wm1-x32b.google.com [IPv6:2a00:1450:4864:20::32b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55269AD01
-        for <kvm@vger.kernel.org>; Mon,  3 Apr 2023 05:00:51 -0700 (PDT)
-Received: by mail-wm1-x32b.google.com with SMTP id l15-20020a05600c4f0f00b003ef6d684102so14361544wmq.3
-        for <kvm@vger.kernel.org>; Mon, 03 Apr 2023 05:00:51 -0700 (PDT)
+        with ESMTP id S231782AbjDCMFT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 3 Apr 2023 08:05:19 -0400
+Received: from mail-ed1-x52f.google.com (mail-ed1-x52f.google.com [IPv6:2a00:1450:4864:20::52f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F415010DA
+        for <kvm@vger.kernel.org>; Mon,  3 Apr 2023 05:05:11 -0700 (PDT)
+Received: by mail-ed1-x52f.google.com with SMTP id eg48so116271495edb.13
+        for <kvm@vger.kernel.org>; Mon, 03 Apr 2023 05:05:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1680523250;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=cXOk+fnfr4jL/j1ia/s9JVKXSdrK1PkwEI4HTOkD6GA=;
-        b=Aiyl6AAyRbBt5w0rsfEa85x8cuTauU+/JxQJwXYkwafXZXGnKlUf0Gp0IXrnu7TeZ1
-         9K3WCHmVt5IM6Cn3dAkIs2IZmocG0PkOYE3cXt4X25eU6VuLThHari/ghOqiEKga0rr+
-         I2n3jXj5c5Poaeolks2xVGHbQAY1A/PfL4Is9a9VRSfwvEfnlfEqk4hZLac+QHxwFLjf
-         3Ymg9hWUOKUpUH9AaSZLjVxbRy7qRy2d1iiPK1RxWAJOW3XkU0VyLPXN3JgHHYWsSE7N
-         vtSYfpZk8N/z4oSvdgaLSvq/NahW1rAISSabz7CdpDbCuiTqL6dVweY3Q9CN87xie2Gg
-         GmbQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680523250;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=brainfault-org.20210112.gappssmtp.com; s=20210112; t=1680523510;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=cXOk+fnfr4jL/j1ia/s9JVKXSdrK1PkwEI4HTOkD6GA=;
-        b=ygGxKdBAnnmGv1zW21AApJaXY5yUQ+RQ4BZk7mC1ZCdZfUHyeu8qldfAH2Sb/NBfWx
-         MMDbxOKu/DFhfMERGJLjqv9u64DV/lVDuDjIt+napR3UvXvwrWE80YRD0frOIvvZ6uW4
-         9TfemHw/g7CeXpHFKW1ht05FfC1YBoVq8xaekqjn0cSSzvDqx2wBVxsKXMWkIEOBn4G3
-         9tFEVNeyYstnuSP0YZK9183ufla0AQzEx9m6LUFOTh7MYy0RaaDNYamCNfnHXYNf3YIz
-         E8NTVo4pKBimd5DlaosRBsjxjHwH4SQXJsHvhlykqClCv4mGK7PD7yGEm0bbGRBU3MBi
-         gvfw==
-X-Gm-Message-State: AAQBX9cm4y0bnDwJgJeNjeIqQEUEQWkzfFVQS8zn1fcNV1PmZAfnKyzb
-        AUnjspOCKiRA2DeV3egelvFKnQ==
-X-Google-Smtp-Source: AKy350YajdxWM3Qq7qE4WZWIToU9nLi7VCOLfAcIS90bSHWdp98RoaT8dTwG4f/4sNtkqSt9sL9RZg==
-X-Received: by 2002:a1c:7215:0:b0:3ef:d8c6:4bc0 with SMTP id n21-20020a1c7215000000b003efd8c64bc0mr13027828wmc.40.1680523249871;
-        Mon, 03 Apr 2023 05:00:49 -0700 (PDT)
-Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
-        by smtp.gmail.com with ESMTPSA id v8-20020a05600c470800b003ef71d7d64asm19405599wmo.6.2023.04.03.05.00.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 03 Apr 2023 05:00:49 -0700 (PDT)
-Date:   Mon, 3 Apr 2023 14:00:48 +0200
-From:   Andrew Jones <ajones@ventanamicro.com>
-To:     Anup Patel <apatel@ventanamicro.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        bh=aTnNv9XdGhYjOU9CcATjnOwylj3cx5IlVTw/VdMJWrc=;
+        b=1QVT5ZwH445IL+4hcb90apKtOn9XWo8AG3e4epOeRhuDSB0LUCiPjbbmuJyWq+tRZb
+         u/IgbDyskrFey489XvB7OkvalYU8dGfnykhLS+cPZEjA+onfYSoFNvsj9aT8jfL9ZoBd
+         gdzujFLSCOHiz4INorE7Di1m7BdejjdBE3XQhUtdBf69R0gbrkScWTUYd0Skvyxa+Y/h
+         aNbQSGo2iTrlLmWazm+hpPGmlATA71GLVf63Wd0caLF+ijf1VOzcsd/o3avhyjbRtYq0
+         MuJYMYq42icLOP0yB4Z3MMXeDh43gbbTPuT52FO9H2rlufmD9yYqDL4uZwCdQYxmYNZ6
+         Y9iQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1680523510;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=aTnNv9XdGhYjOU9CcATjnOwylj3cx5IlVTw/VdMJWrc=;
+        b=qk5mLlIPGF9l9f167i5D21AoXCWFL/QTgOeZbVKgZuphIp0V6KlXJNAQ5FLrFt8HKN
+         ptoJ0aOnowsBY3SSmmqjLFr3Zs9ay3NaitcJFQj05MuU1F0jfYKgjUklxmBAe1OCw98u
+         +SVWTQz4QvIbv5sWaw7+cntjmgdG0lMyB9c0G8ZMbPxvATP4Kk0qoz/JVaXCuY+9WgAd
+         Kw8Fjan7oIkpnHYOyX3EtXyj6KjlBGSCHwaivdNm8G1FWRiZTbPjiPOlEcJYwsucHEKe
+         4Z7Q4r5dJNiRLdLhPCVNsrxiScBOHnHMeRV3M0GLhRLBMwwkmw6x41TPEo1klFCyyIgH
+         E/6A==
+X-Gm-Message-State: AAQBX9cWhWmPYhkaV5KjvO/joEvEK8ztKnwGxFMb/ghIYJJGEMBuZU+G
+        J8c1PEaBzfL3ymWzdVC7o+NGMpEcyOSVvBxD8pI7Gg==
+X-Google-Smtp-Source: AKy350YucQu0o4XWT9/o4B6ERGyItJAJlV74UNbolWd6EWP1LnSHsHXRJcMFXLDM0cgX2h5Cra/y5okQv4y+6QYR1CY=
+X-Received: by 2002:a17:906:7c54:b0:932:6a66:fc43 with SMTP id
+ g20-20020a1709067c5400b009326a66fc43mr17062399ejp.13.1680523510364; Mon, 03
+ Apr 2023 05:05:10 -0700 (PDT)
+MIME-Version: 1.0
+References: <20230403093310.2271142-1-apatel@ventanamicro.com>
+ <20230403093310.2271142-7-apatel@ventanamicro.com> <osrpjiywxtkgxb5i6mfvxzfrzrnjv75uqzvlu3fouo4mqsktgj@blcmyjt3twqg>
+In-Reply-To: <osrpjiywxtkgxb5i6mfvxzfrzrnjv75uqzvlu3fouo4mqsktgj@blcmyjt3twqg>
+From:   Anup Patel <anup@brainfault.org>
+Date:   Mon, 3 Apr 2023 17:34:57 +0530
+Message-ID: <CAAhSdy1JEQBiO55iCy97arO63VjGc+NicUvvwzTpK97W97LmJg@mail.gmail.com>
+Subject: Re: [PATCH v3 6/8] RISC-V: KVM: Add ONE_REG interface for AIA CSRs
+To:     Andrew Jones <ajones@ventanamicro.com>
+Cc:     Anup Patel <apatel@ventanamicro.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
         Atish Patra <atishp@atishpatra.org>,
         Palmer Dabbelt <palmer@dabbelt.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Anup Patel <anup@brainfault.org>, kvm@vger.kernel.org,
+        Paul Walmsley <paul.walmsley@sifive.com>, kvm@vger.kernel.org,
         kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-        linux-kernel@vger.kernel.org, Atish Patra <atishp@rivosinc.com>
-Subject: Re: [PATCH v3 4/8] RISC-V: KVM: Initial skeletal support for AIA
-Message-ID: <3v5mew46z4kfa3kq4c5gdx72k7qh35qtk3tez26jthnbuygf2t@zy2lukq75ugv>
-References: <20230403093310.2271142-1-apatel@ventanamicro.com>
- <20230403093310.2271142-5-apatel@ventanamicro.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230403093310.2271142-5-apatel@ventanamicro.com>
-X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
-        DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=0.0 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Apr 03, 2023 at 03:03:06PM +0530, Anup Patel wrote:
-> To incrementally implement AIA support, we first add minimal skeletal
-> support which only compiles and detects AIA hardware support at the
-> boot-time but does not provide any functionality.
-> 
-> Signed-off-by: Anup Patel <apatel@ventanamicro.com>
-> Reviewed-by: Atish Patra <atishp@rivosinc.com>
-> ---
->  arch/riscv/include/asm/hwcap.h    |   6 ++
->  arch/riscv/include/asm/kvm_aia.h  | 109 ++++++++++++++++++++++++++++++
->  arch/riscv/include/asm/kvm_host.h |   7 ++
->  arch/riscv/kvm/Makefile           |   1 +
->  arch/riscv/kvm/aia.c              |  66 ++++++++++++++++++
->  arch/riscv/kvm/main.c             |  22 +++++-
->  arch/riscv/kvm/vcpu.c             |  40 ++++++++++-
->  arch/riscv/kvm/vcpu_insn.c        |   1 +
->  arch/riscv/kvm/vm.c               |   4 ++
->  9 files changed, 252 insertions(+), 4 deletions(-)
->  create mode 100644 arch/riscv/include/asm/kvm_aia.h
->  create mode 100644 arch/riscv/kvm/aia.c
+On Mon, Apr 3, 2023 at 5:01=E2=80=AFPM Andrew Jones <ajones@ventanamicro.co=
+m> wrote:
 >
+> On Mon, Apr 03, 2023 at 03:03:08PM +0530, Anup Patel wrote:
+> > We implement ONE_REG interface for AIA CSRs as a separate subtype
+> > under the CSR ONE_REG interface.
+> >
+> > Signed-off-by: Anup Patel <apatel@ventanamicro.com>
+> > ---
+> >  arch/riscv/include/uapi/asm/kvm.h | 8 ++++++++
+> >  arch/riscv/kvm/vcpu.c             | 8 ++++++++
+> >  2 files changed, 16 insertions(+)
+> >
+> > diff --git a/arch/riscv/include/uapi/asm/kvm.h b/arch/riscv/include/uap=
+i/asm/kvm.h
+> > index 182023dc9a51..cbc3e74fa670 100644
+> > --- a/arch/riscv/include/uapi/asm/kvm.h
+> > +++ b/arch/riscv/include/uapi/asm/kvm.h
+> > @@ -79,6 +79,10 @@ struct kvm_riscv_csr {
+> >       unsigned long scounteren;
+> >  };
+> >
+> > +/* AIA CSR registers for KVM_GET_ONE_REG and KVM_SET_ONE_REG */
+> > +struct kvm_riscv_aia_csr {
+> > +};
+> > +
+> >  /* TIMER registers for KVM_GET_ONE_REG and KVM_SET_ONE_REG */
+> >  struct kvm_riscv_timer {
+> >       __u64 frequency;
+> > @@ -107,6 +111,7 @@ enum KVM_RISCV_ISA_EXT_ID {
+> >       KVM_RISCV_ISA_EXT_ZIHINTPAUSE,
+> >       KVM_RISCV_ISA_EXT_ZICBOM,
+> >       KVM_RISCV_ISA_EXT_ZBB,
+>
+> Looks like this patch is also based on "[PATCH] RISC-V: KVM: Allow Zbb
+> extension for Guest/VM"
 
-Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
+Yes, do you want me to change the order of dependency?
 
-Thanks,
-drew
+Regards,
+Anup
