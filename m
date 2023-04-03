@@ -2,131 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1BD266D4338
-	for <lists+kvm@lfdr.de>; Mon,  3 Apr 2023 13:16:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6817A6D4371
+	for <lists+kvm@lfdr.de>; Mon,  3 Apr 2023 13:26:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232329AbjDCLQx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 3 Apr 2023 07:16:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41390 "EHLO
+        id S232190AbjDCL0q (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 3 Apr 2023 07:26:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57928 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232300AbjDCLQv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 3 Apr 2023 07:16:51 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D905526A2
-        for <kvm@vger.kernel.org>; Mon,  3 Apr 2023 04:15:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1680520543;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Ur1wtGFej11roMtg3KU2Y0Q1CPjhKzuCIJeUQ2U0Vpk=;
-        b=jJtoOU/7QKY1/S76Z41qlhZGBkfvuscdHMGtDv1hlk/uLwdJqGARhkbj+1oD0QNhtdOEe+
-        oXhzuisrlrDAoWPgCsptB+fexuh4y5oXn/DG/9PoI/7BCvYMTBPx+thWujhDYHxzXduaK1
-        tQhTsnzRIDIm0RgGhO7ixmF04Kx701c=
-Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
- [209.85.160.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-153-lZtJzxJMOWGvUrQWhkTUig-1; Mon, 03 Apr 2023 07:15:42 -0400
-X-MC-Unique: lZtJzxJMOWGvUrQWhkTUig-1
-Received: by mail-qt1-f200.google.com with SMTP id n10-20020a05622a11ca00b003e4e30c6c98so16855483qtk.19
-        for <kvm@vger.kernel.org>; Mon, 03 Apr 2023 04:15:42 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680520541;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Ur1wtGFej11roMtg3KU2Y0Q1CPjhKzuCIJeUQ2U0Vpk=;
-        b=eVPKS8jBXj5XdHFtvWal756jte8rFhv/QKCJPwPMrWKg4zvPtCu6IdLLG5Olr+3wVr
-         xVEcX2ttfJCNyznVWmX5qQz6JywIbWOOFUt8ni9m+Sp2xnwFORzv8F2ca/TBiVNGOxFE
-         cp6U3YbmVePLfg8vOIFFCAdKEQf8WPJuAMvYMFAREvHIpDqiJe1CnHHUf0Kd/41EA9oK
-         59pL3m0ffJGBdLSieJBDfrzJ7f6VGWdNW/Sod0n6WaIWVNmzIr6ktIxm34ApH/t/3Jw7
-         drF1WfXAmd/zscssbf0POKbfANp/eiwPUlQmPRZ93bECTo/NdT9vdNxGuLxgVgbcyJhv
-         on5g==
-X-Gm-Message-State: AO0yUKXDUvCuoalhGPag/eI9iD3ytRgupxPDhup85Yfoj9Ta+SnjYAh/
-        wk3Yzc0gjVncgYOapJ7iHx0GMzQLb4DzUUxNwYc1XmhozGdwt2WRlIT//uo8p2/PgbYHKHprSae
-        YYiqSTOvg0YCF
-X-Received: by 2002:ac8:5cd2:0:b0:3bf:a061:6cb1 with SMTP id s18-20020ac85cd2000000b003bfa0616cb1mr62090913qta.46.1680520541578;
-        Mon, 03 Apr 2023 04:15:41 -0700 (PDT)
-X-Google-Smtp-Source: AK7set8HQpeyOJ/KXUSADH0MyprE5zMqtU8EoodOwfi6AnLSMUEFrXmYuk4bhITi/GbG6fLerg5XmQ==
-X-Received: by 2002:ac8:5cd2:0:b0:3bf:a061:6cb1 with SMTP id s18-20020ac85cd2000000b003bfa0616cb1mr62090843qta.46.1680520540973;
-        Mon, 03 Apr 2023 04:15:40 -0700 (PDT)
-Received: from sgarzare-redhat (host-82-57-51-130.retail.telecomitalia.it. [82.57.51.130])
-        by smtp.gmail.com with ESMTPSA id m124-20020a375882000000b0073b8745fd39sm2682759qkb.110.2023.04.03.04.15.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 03 Apr 2023 04:15:40 -0700 (PDT)
-Date:   Mon, 3 Apr 2023 13:15:35 +0200
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Arseniy Krasnov <avkrasnov@sberdevices.ru>
-Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
+        with ESMTP id S231576AbjDCL0o (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 3 Apr 2023 07:26:44 -0400
+Received: from mx.sberdevices.ru (mx.sberdevices.ru [45.89.227.171])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8CB0F10C3;
+        Mon,  3 Apr 2023 04:26:41 -0700 (PDT)
+Received: from s-lin-edge02.sberdevices.ru (localhost [127.0.0.1])
+        by mx.sberdevices.ru (Postfix) with ESMTP id D02235FD22;
+        Mon,  3 Apr 2023 14:26:37 +0300 (MSK)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
+        s=mail; t=1680521197;
+        bh=s4eKgbhgNv4f1gYW15n6VyDdSflCXwAy8F8mScWFz1Y=;
+        h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type;
+        b=N1fUn7HlplUsCBt69oiXkW3iJYH1erjbGgmUNz6XOV0trL6r0ifCm6efGiBgZaaYn
+         n0GyArgAJlVSOMA/1C7RApPNudst0UJt88eqrCvfwnOv/e8vhPi9PAO/LnoEpXgVm4
+         S2KElDs8pdwL4Mf5/wl/4BKUOqXSGkNh7rJ7/ye64/rczXHP2sf8ND1ltIscS8dRwx
+         6MNYt81yFqMBjBI7xpf8fq4TgFYM5cIHQe3y0C1rrL0URdAoIHHlpSXc6vurdR9OkD
+         Bv1cE3bOdrktc46rJsaYorKDTJsIHutqqUs2X3lIQm+Xe/woSX25ylmEhsITMiZ7p1
+         dpLflBm5xsnyg==
+Received: from S-MS-EXCH01.sberdevices.ru (S-MS-EXCH01.sberdevices.ru [172.16.1.4])
+        by mx.sberdevices.ru (Postfix) with ESMTP;
+        Mon,  3 Apr 2023 14:26:31 +0300 (MSK)
+Message-ID: <0d20e25a-640c-72c1-2dcb-7a53a05e3132@sberdevices.ru>
+Date:   Mon, 3 Apr 2023 14:23:00 +0300
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.1
+Content-Language: en-US
+To:     Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
         "David S. Miller" <davem@davemloft.net>,
         Eric Dumazet <edumazet@google.com>,
         Jakub Kicinski <kuba@kernel.org>,
         Paolo Abeni <pabeni@redhat.com>,
         Bobby Eshleman <bobby.eshleman@bytedance.com>,
-        Bryan Tan <bryantan@vmware.com>,
-        Vishnu Dasa <vdasa@vmware.com>, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kernel@sberdevices.ru,
-        oxffffaa@gmail.com, pv-drivers@vmware.com
-Subject: Re: [RFC PATCH v4 2/3] vsock: return errors other than -ENOMEM to
+        Bryan Tan <bryantan@vmware.com>, Vishnu Dasa <vdasa@vmware.com>
+CC:     <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
+        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <kernel@sberdevices.ru>, <oxffffaa@gmail.com>,
+        <avkrasnov@sberdevices.ru>, <pv-drivers@vmware.com>
+From:   Arseniy Krasnov <avkrasnov@sberdevices.ru>
+Subject: [PATCH net-next v4 0/3] vsock: return errors other than -ENOMEM to
  socket
-Message-ID: <veo5rzjqzzdamfml5hx2ycwgsbflv7l62trdicmdqcivklarq2@p5wiwzn35tea>
-References: <5440aa51-8a6c-ac9f-9578-5bf9d66217a5@sberdevices.ru>
- <7715fd7f-1c50-7202-03c7-9d17c7f63cab@sberdevices.ru>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <7715fd7f-1c50-7202-03c7-9d17c7f63cab@sberdevices.ru>
-X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [172.16.1.6]
+X-ClientProxiedBy: S-MS-EXCH01.sberdevices.ru (172.16.1.4) To
+ S-MS-EXCH01.sberdevices.ru (172.16.1.4)
+X-KSMG-Rule-ID: 4
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Status: not scanned, disabled by settings
+X-KSMG-AntiSpam-Interceptor-Info: not scanned
+X-KSMG-AntiPhishing: not scanned, disabled by settings
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 1.1.2.30, bases: 2023/04/03 05:35:00 #21028078
+X-KSMG-AntiVirus-Status: Clean, skipped
+X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
+        DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Apr 02, 2023 at 09:16:46PM +0300, Arseniy Krasnov wrote:
->This removes behaviour, where error code returned from any transport
->was always switched to ENOMEM. This works in the same way as:
->commit
->c43170b7e157 ("vsock: return errors other than -ENOMEM to socket"),
->but for receive calls.
->
->Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
->---
-> net/vmw_vsock/af_vsock.c | 4 ++--
-> 1 file changed, 2 insertions(+), 2 deletions(-)
+Hello,
 
-LGTM!
+this patchset removes behaviour, where error code returned from any
+transport was always switched to ENOMEM. This works in the same way as
+patch from Bobby Eshleman:
+commit c43170b7e157 ("vsock: return errors other than -ENOMEM to socket"),
+but for receive calls. VMCI transport is also updated (both tx and rx
+SOCK_STREAM callbacks), because it returns VMCI specific error code to
+af_vsock.c (like VMCI_ERROR_*). Tx path is already merged to net, so it
+was excluded from patchset in v4. At the same time, virtio and Hyper-V
+transports are using general error codes, so there is no need to update
+them.
 
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+vsock_test suite is also updated.
 
->
->diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
->index 5f2dda35c980..413407bb646c 100644
->--- a/net/vmw_vsock/af_vsock.c
->+++ b/net/vmw_vsock/af_vsock.c
->@@ -2043,7 +2043,7 @@ static int __vsock_stream_recvmsg(struct sock *sk, struct msghdr *msg,
->
-> 		read = transport->stream_dequeue(vsk, msg, len - copied, flags);
-> 		if (read < 0) {
->-			err = -ENOMEM;
->+			err = read;
-> 			break;
-> 		}
->
->@@ -2094,7 +2094,7 @@ static int __vsock_seqpacket_recvmsg(struct sock *sk, struct msghdr *msg,
-> 	msg_len = transport->seqpacket_dequeue(vsk, msg, flags);
->
-> 	if (msg_len < 0) {
->-		err = -ENOMEM;
->+		err = msg_len;
-> 		goto out;
-> 	}
->
->-- 
->2.25.1
->
+Link to v1:
+https://lore.kernel.org/netdev/97f19214-ba04-c47e-7486-72e8aa16c690@sberdevices.ru/
+Link to v2:
+https://lore.kernel.org/netdev/60abc0da-0412-6e25-eeb0-8e32e3ec21e7@sberdevices.ru/
+Link to v3:
+https://lore.kernel.org/netdev/dead4842-333a-015e-028b-302151336ff9@sberdevices.ru/
 
+Changelog:
+
+v1 -> v2:
+ - Add patch for VMCI as Vishnu Dasa suggested.
+v2 -> v3:
+ - Change type of 'err' var in VMCI patches from 'int' to 'ssize_t'.
+ - Split VMCI patch to two patches: for send and for receive cases.
+ - Reorder patches: move VMCI before af_vsock.c.
+v3 -> v4:
+ - Exclude VMCI patch for send from patchset (merged to 'net').
+ - Update commit message of VMCI patch for receive.
+
+Arseniy Krasnov (3):
+  vsock/vmci: convert VMCI error code to -ENOMEM on receive
+  vsock: return errors other than -ENOMEM to socket
+  vsock/test: update expected return values
+
+ net/vmw_vsock/af_vsock.c         |  4 ++--
+ net/vmw_vsock/vmci_transport.c   | 11 +++++++++--
+ tools/testing/vsock/vsock_test.c |  4 ++--
+ 3 files changed, 13 insertions(+), 6 deletions(-)
+
+-- 
+2.25.1
