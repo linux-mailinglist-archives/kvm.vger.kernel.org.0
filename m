@@ -2,55 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D81436D4625
-	for <lists+kvm@lfdr.de>; Mon,  3 Apr 2023 15:49:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6F6EA6D4627
+	for <lists+kvm@lfdr.de>; Mon,  3 Apr 2023 15:49:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232136AbjDCNth (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 3 Apr 2023 09:49:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51906 "EHLO
+        id S232712AbjDCNtj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 3 Apr 2023 09:49:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51934 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232395AbjDCNt1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 3 Apr 2023 09:49:27 -0400
-Received: from mail-wr1-x434.google.com (mail-wr1-x434.google.com [IPv6:2a00:1450:4864:20::434])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7B706EAB
-        for <kvm@vger.kernel.org>; Mon,  3 Apr 2023 06:49:26 -0700 (PDT)
-Received: by mail-wr1-x434.google.com with SMTP id d17so29403503wrb.11
-        for <kvm@vger.kernel.org>; Mon, 03 Apr 2023 06:49:26 -0700 (PDT)
+        with ESMTP id S232646AbjDCNt2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 3 Apr 2023 09:49:28 -0400
+Received: from mail-wm1-x32d.google.com (mail-wm1-x32d.google.com [IPv6:2a00:1450:4864:20::32d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7BD9E6EAF
+        for <kvm@vger.kernel.org>; Mon,  3 Apr 2023 06:49:27 -0700 (PDT)
+Received: by mail-wm1-x32d.google.com with SMTP id l37so17153564wms.2
+        for <kvm@vger.kernel.org>; Mon, 03 Apr 2023 06:49:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1680529765;
+        d=linaro.org; s=google; t=1680529766;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=PldKx1qfpz7lDvG61jB68knTHdO2ooZN76NERNqkzDY=;
-        b=tAaXPTuxrZUwgDhNs2VAA3i3A5sbpUS96TJNu9EnHiuS5McEnfl5cstLz9L8iPRyMm
-         jWDWiyCo47qpsZoFmbQlC86I9o0KKIsuvTeq+G6EWzEJkwAAJpeHCXDuAQsCgp2zn9eX
-         F4qqn5xVcYpsCdCgRKXYKrcLgDuVHj3/chtJPS5xOJaQqG0XSxlyHWqCpnnl5tDVrWwd
-         EhL57J/td90pFXIrSsBfNC92WqwTVsqMuokr0Zsf2W5SUy3L5RWjqyLYARjjsoYgZyCW
-         p7Jd4iSOaVHpFVYz33XRBz8xdSqji6nhgSHdB/Kbk3PNu/cm1fr86kp6okiP5IdY760a
-         pjow==
+        bh=H2FeLZKR7rrXEZU0aPhVzNZ/e8CIWD3g/VnvrT6YWk8=;
+        b=kZmtBOf2iDPBbqPfDNkM9lOnUFuhMtgPgELYV+FeVe/tevJcmAoJoNpdgj0ET4cVJn
+         VHV1zWCKYwQ54Kaa4Qk/UY5c2/V28c2nip5l6WG2XVmBYXaCUJcgq2H25E5MoOxv/J9o
+         gqaz602XARMBoQilmFjbdQMTpXp9Ols/uPMZwaXeWQ/YsftVBAnOCkPFJVwOEhJAGzHj
+         4igZo/d/GSphULrD/hJbheAsFgf9D4zgVjv6r61QXFW0doyoAWpTelVO61it552Ydcqp
+         YwZABI2ajwBiOLZhRjDPk5sQYvjnZNLMorQ7GQa/YoFiart/Ta2VcGkqcwVjjuQk0okv
+         /LVw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680529765;
+        d=1e100.net; s=20210112; t=1680529766;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=PldKx1qfpz7lDvG61jB68knTHdO2ooZN76NERNqkzDY=;
-        b=XhIEhIvr5a545QlT+kUPp7GYKsa/8aEH0Xe+15CqlLYn4uXJHFuDBnlODQkOTwpKEn
-         HdhyNfL26Msz39J1KB7z5nN9FTe+uhtNOzRE9qfcdZya8UomZy1OQ321OiMDJ5FlJns3
-         EaiFNvceXj085di/Wvqyf22f3M5bIz9NPebVaCeG94s3NMr+VQTi0cuCaXV9Sx671CMR
-         +nbmXTRVZBpjv+zq+hX9BrlLERzLInODD28nFRx7UxdGpU5TGaWZVGcwLzRF1VjtLsp+
-         JGkA73MXSWVDVvYaIisbLaNJN66kQK3UTlQ6ZVzhZGesa6+1wcaKY17R4t3HSD1lvWY2
-         nVjw==
-X-Gm-Message-State: AAQBX9c3cP/nJMbT6QBuHDxHyYuEJAxPvNaa9jO+cCwCCbdtMn/mcGI/
-        RJZcmLoUQsrKTBlWFRwgvQLmrg==
-X-Google-Smtp-Source: AKy350bQGOJWN5zGDlFHeOGdE2SUiSfVLxmAnGCX0rxA7lXuuoZ5vohL7JrbQpsr9aKTsRFQUoJkHg==
-X-Received: by 2002:adf:e848:0:b0:2c7:fde:f7e0 with SMTP id d8-20020adfe848000000b002c70fdef7e0mr24295594wrn.65.1680529765220;
-        Mon, 03 Apr 2023 06:49:25 -0700 (PDT)
+        bh=H2FeLZKR7rrXEZU0aPhVzNZ/e8CIWD3g/VnvrT6YWk8=;
+        b=dU5G7wFE2fv+qaAN9vybkJBl3ovdXOTBRYqOHfQHKg210xU9AuzjZCmkH/6gEDMINF
+         to6NH8CwIMlsxccwkwaRvi+/WGLbUHK9Dp1O4F7GWP6sU1BR4krSQyQrwWiT8rVi9cPn
+         MKOvdMRp+wTj7nqbb2IMhi+cRoOTd4wVkhcnP8v/OVG6qy2J7pCbPIyQCqu9kqe+D3GG
+         YY8druZNBGeLhKUOeVgzlYrDMZp/2ciBjxBqeqUXm+gfrcvRQAnEKN6SFvaExseCVfTP
+         CrS5hyUl6aX4lKtVVF2BtpHGrN7GMp5ZL8YlN47o/H6s3Td4UmedDxwjUOS+FdMcMz9O
+         AXSQ==
+X-Gm-Message-State: AAQBX9ePMrkh6RU6EZsqIJQft5x4zDWJRSJ3K2RRBd+lrg+YMlgFcYuW
+        wnFXBuKQM/ts3gGwq3QNsHCxAw==
+X-Google-Smtp-Source: AKy350YA40DrGkbdfx/WSsRDtrRoPhUtAlw/ACRAcCii+kLbD9pF4FXTjcactSbOaqPqWUvzTTEOXw==
+X-Received: by 2002:a1c:4b04:0:b0:3ed:c84c:7efe with SMTP id y4-20020a1c4b04000000b003edc84c7efemr13588895wma.7.1680529766064;
+        Mon, 03 Apr 2023 06:49:26 -0700 (PDT)
 Received: from zen.linaroharston ([85.9.250.243])
-        by smtp.gmail.com with ESMTPSA id p13-20020a05600c468d00b003ef7058ea02sm19327158wmo.29.2023.04.03.06.49.22
+        by smtp.gmail.com with ESMTPSA id m8-20020a7bce08000000b003ee70225ed2sm12182902wmc.15.2023.04.03.06.49.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Mon, 03 Apr 2023 06:49:23 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
-        by zen.linaroharston (Postfix) with ESMTP id 960301FFC0;
+        by zen.linaroharston (Postfix) with ESMTP id AC70C1FFC1;
         Mon,  3 Apr 2023 14:49:21 +0100 (BST)
 From:   =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To:     qemu-devel@nongnu.org
@@ -64,11 +64,10 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Wainer dos Santos Moschetta <wainersm@redhat.com>,
         =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
         Cleber Rosa <crosa@redhat.com>, Thomas Huth <thuth@redhat.com>,
-        Kevin Wolf <kwolf@redhat.com>,
-        =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-Subject: [PATCH v2 09/11] tests/vm: use the default system python for NetBSD
-Date:   Mon,  3 Apr 2023 14:49:18 +0100
-Message-Id: <20230403134920.2132362-10-alex.bennee@linaro.org>
+        Kevin Wolf <kwolf@redhat.com>
+Subject: [PATCH v2 10/11] gitlab: fix typo
+Date:   Mon,  3 Apr 2023 14:49:19 +0100
+Message-Id: <20230403134920.2132362-11-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230403134920.2132362-1-alex.bennee@linaro.org>
 References: <20230403134920.2132362-1-alex.bennee@linaro.org>
@@ -84,47 +83,25 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Daniel P. Berrangé <berrange@redhat.com>
-
-Currently our NetBSD VM recipe requests instal of the python37 package
-and explicitly tells QEMU to use that version of python. Since the
-NetBSD base ISO was updated to version 9.3 though, the default system
-python version is 3.9 which is sufficiently new for QEMU to rely on.
-Rather than requesting an older python, just test against the default
-system python which is what most users will have.
-
-Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@linaro.org>
-Message-Id: <20230329124601.822209-1-berrange@redhat.com>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 Reviewed-by: Thomas Huth <thuth@redhat.com>
-Message-Id: <20230330101141.30199-9-alex.bennee@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+Message-Id: <20230330101141.30199-11-alex.bennee@linaro.org>
 ---
- tests/vm/netbsd | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ .gitlab-ci.d/base.yml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/tests/vm/netbsd b/tests/vm/netbsd
-index aa54338dfa..0b9536ca17 100755
---- a/tests/vm/netbsd
-+++ b/tests/vm/netbsd
-@@ -30,7 +30,6 @@ class NetBSDVM(basevm.BaseVM):
-         "git-base",
-         "pkgconf",
-         "xz",
--        "python37",
-         "ninja-build",
+diff --git a/.gitlab-ci.d/base.yml b/.gitlab-ci.d/base.yml
+index 0274228de8..2fbb58d2a3 100644
+--- a/.gitlab-ci.d/base.yml
++++ b/.gitlab-ci.d/base.yml
+@@ -75,5 +75,5 @@
+     - if: '$QEMU_CI != "2" && $CI_PROJECT_NAMESPACE != "qemu-project"'
+       when: manual
  
-         # gnu tools
-@@ -66,7 +65,7 @@ class NetBSDVM(basevm.BaseVM):
-         mkdir src build; cd src;
-         tar -xf /dev/rld1a;
-         cd ../build
--        ../src/configure --python=python3.7 --disable-opengl {configure_opts};
-+        ../src/configure --disable-opengl {configure_opts};
-         gmake --output-sync -j{jobs} {target} {verbose};
-     """
-     poweroff = "/sbin/poweroff"
+-    # Jobs can run if any jobs they depend on were successfull
++    # Jobs can run if any jobs they depend on were successful
+     - when: on_success
 -- 
 2.39.2
 
