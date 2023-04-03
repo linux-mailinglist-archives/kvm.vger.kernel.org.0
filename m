@@ -2,104 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F26796D5113
-	for <lists+kvm@lfdr.de>; Mon,  3 Apr 2023 21:06:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2B9166D5183
+	for <lists+kvm@lfdr.de>; Mon,  3 Apr 2023 21:43:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231486AbjDCTGS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 3 Apr 2023 15:06:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34814 "EHLO
+        id S232254AbjDCTnG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 3 Apr 2023 15:43:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59276 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229576AbjDCTGR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 3 Apr 2023 15:06:17 -0400
-Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00BD22101
-        for <kvm@vger.kernel.org>; Mon,  3 Apr 2023 12:06:16 -0700 (PDT)
-Received: by mail-pf1-x449.google.com with SMTP id c2-20020a62f842000000b0062d93664ad5so9696068pfm.19
-        for <kvm@vger.kernel.org>; Mon, 03 Apr 2023 12:06:16 -0700 (PDT)
+        with ESMTP id S229642AbjDCTnF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 3 Apr 2023 15:43:05 -0400
+Received: from mail-oa1-x2f.google.com (mail-oa1-x2f.google.com [IPv6:2001:4860:4864:20::2f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71A0B1FD0
+        for <kvm@vger.kernel.org>; Mon,  3 Apr 2023 12:43:04 -0700 (PDT)
+Received: by mail-oa1-x2f.google.com with SMTP id 586e51a60fabf-17997ccf711so32093745fac.0
+        for <kvm@vger.kernel.org>; Mon, 03 Apr 2023 12:43:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1680548776;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=IZEM6mvYmZj+yiKdKb8IHOdr6k0jIGoRnFbSKqxXi3U=;
-        b=sblg4pgEQBWs8JbOVsr4ajhbSddvrck4MJsagGRyIVa+QhdSFiUOGWC5ubx/A8gjog
-         EmIxHg0skJ4R1x8NJXyMTyHLspeP70cCU+c++/zzOekAn6DA4lu/uHXnmoYzzsoaVEiU
-         2buAOS0XySr0jR8Lt/P6m5zUeYBoLS3qfShCBVhtrT2mYsjG3NMEAIEebkiO086Sdpv1
-         xCnkyoGfEHexLT8/I7o60UxbSBLaHAyj9WzpSdwS+pNE8GXoOPTr/0MCZ1LBYVCoWGax
-         rM9Vdiw2nnXuOLFnPWPYwPCHiIKc00MGjyBU+xeAS8cnfSRSe++TTazhP8/RFxALxG/7
-         /xkw==
+        d=google.com; s=20210112; t=1680550984;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7iJK+OHZ5ZfCg5QFFBGWdn6OvEmXKpIceou758DXRpE=;
+        b=P75M9UuYSreShGG1oskdc2oEHaWakGfm3x1nmTBNbY3MhI1CCHeJEpI9YT0AaX7iuz
+         W8ppTg/AZfxOImDg64xMZaBEh/n8g0ScCZSFfr3f8iAb6E3VgcUnHOZXjo35Ww6qU9OK
+         HYnGda1Rowo0hROsI1n/ZepSutCdSa0xhS13Mr8Q15KtU4gsKDry1UMRVgLjeUEEFAA6
+         bMNFmhhvhX7y205udBzLWZOoJ9iEEypmx7YEi9sgb+hBNSADu8ssYBViDuS2wO+aJxXW
+         UAq3zDT7tf+A6voHMuArWr3SDGPKncFcNt0th4J/hxZQikvyMbjwHhQ+43Ip5P3bOZn5
+         gc+Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680548776;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=IZEM6mvYmZj+yiKdKb8IHOdr6k0jIGoRnFbSKqxXi3U=;
-        b=0R3BtgvqU1Uz77fNJhNeKAE7eNFrqFoy//GueI0l91SrzNm4HJ8hhjCwZZOEopwpaq
-         JU9G37hS6U2//0ecr1InDhHkjUNW+72SmOP0TwkJsmP/iuGNNF2Gs7cHzwQj2QmI+x/s
-         JgU1+4hV+6QqCCC5bylLiFVjqXW48bx3xmDgMlTWSsNqZ50Fc3n33Sn8JPmgx0hmPI7o
-         dwNa6B8ghziqM81ExQn+6eewcnyqvECCuXe0efazwS28sRBKjOuSxUpV3DO+Oat7h2Ks
-         BgJhYMRaj2n3+YqYUiuaAWIpn5wag6skEfZM2U8AGFMhKGvhTCQDl2nxOBiKdSh8b3kh
-         i3ag==
-X-Gm-Message-State: AAQBX9cF9dDeyUzQJ0loLhQOqHX+dD6KCRD/YrKEPYcfmvzSKPptEovk
-        2o0hw2pCKP5bOGBASj6dNioudd43D/M=
-X-Google-Smtp-Source: AKy350bZDON9g0ZW2ia4qZBmjIdUuuyQ5Jd65Dmh/EkxZrK24Xe2zxbrOsGtP2v8NStboovWAKubwLEC8aQ=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90a:2b09:b0:23d:33e5:33ec with SMTP id
- x9-20020a17090a2b0900b0023d33e533ecmr24068pjc.1.1680548776557; Mon, 03 Apr
- 2023 12:06:16 -0700 (PDT)
-Date:   Mon, 3 Apr 2023 12:06:15 -0700
-In-Reply-To: <dc285a74-9cce-2886-f8aa-f10e1a94f6f5@grsecurity.net>
-Mime-Version: 1.0
-References: <20230403105618.41118-1-minipli@grsecurity.net>
- <20230403105618.41118-4-minipli@grsecurity.net> <dc285a74-9cce-2886-f8aa-f10e1a94f6f5@grsecurity.net>
-Message-ID: <ZCsjp0666b9DOj+n@google.com>
-Subject: Re: [kvm-unit-tests PATCH v3 3/4] x86/access: Forced emulation support
-From:   Sean Christopherson <seanjc@google.com>
-To:     Mathias Krause <minipli@grsecurity.net>
-Cc:     kvm@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-7.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+        d=1e100.net; s=20210112; t=1680550984;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=7iJK+OHZ5ZfCg5QFFBGWdn6OvEmXKpIceou758DXRpE=;
+        b=jsfITG14oDaumCaOysgGrLfNEK3qXXeUaqQTvD/GJfw8F5sNPdPjvAg/SE5Umuc7B6
+         +1snUQPkor2/qaMBoHmTHNBoh/0e2FSdfpExoNHfd1bOcTgPOlf9Qy57q4U/SUVRn3RX
+         h+7QaNnEGreL/ffym95+8XPtzf1OsEBkTsxsMs1+uP0ZmWZmf6P8NdDxROxS2zLO4XaP
+         d4UM1OCJnXzUqrv25rE7DF70cqkCdroX4InCnKuGbQ0KjBXlerpq8Up6+DMFxWyfuFO6
+         iAJqTKoTY0ea9xUE7L+FOPNz6rAsSbU+FWKwRfCzih6H1oZAejP2Tisr22IxmXKfTW7I
+         2LMw==
+X-Gm-Message-State: AAQBX9cS24Ih9nvZBIASsOdsS5fW0NzzMlLLvOeaBPeZXaXqnoOFaiod
+        WYBizmbNP5VJOQ9b1ImzPCV4/EI3aByS2iqlmzaDIg==
+X-Google-Smtp-Source: AKy350YcqR0yqar7uvrPwBXHS+FhvAwEQIc1UW8a63ZVjaeuxY8QeREXpb8TCwCi9M1fb6UX5fncefBZmYL0TAOcxvQ=
+X-Received: by 2002:a05:6871:784:b0:177:bf3e:5d4f with SMTP id
+ o4-20020a056871078400b00177bf3e5d4fmr179968oap.8.1680550983629; Mon, 03 Apr
+ 2023 12:43:03 -0700 (PDT)
+MIME-Version: 1.0
+References: <20230402183735.3011540-1-jingzhangos@google.com> <861ql1w948.wl-maz@kernel.org>
+In-Reply-To: <861ql1w948.wl-maz@kernel.org>
+From:   Jing Zhang <jingzhangos@google.com>
+Date:   Mon, 3 Apr 2023 12:42:52 -0700
+Message-ID: <CAAdAUtj0Yn_s-bOxT9smwWzYO+MhUW=Nv7ZH9zrdkKUJPJLEYA@mail.gmail.com>
+Subject: Re: [PATCH v5 0/6] Support writable CPU ID registers from userspace
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>,
+        ARMLinux <linux-arm-kernel@lists.infradead.org>,
+        Oliver Upton <oupton@google.com>,
+        Will Deacon <will@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Fuad Tabba <tabba@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Raghavendra Rao Ananta <rananta@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-15.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,ENV_AND_HDR_SPF_MATCH,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL,
+        USER_IN_DEF_SPF_WL autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Apr 03, 2023, Mathias Krause wrote:
-> On 03.04.23 12:56, Mathias Krause wrote:
-> > Add support to enforce access tests to be handled by the emulator, if
-> > supported by KVM. Exclude it from the ac_test_exec() test, though, to
-> > not slow it down too much.
-> 
-> I tend to read a lot of objdumps and when initially looking at the
-> generated code it was kinda hard to recognize the FEP instruction, as
-> the FEP actually decodes to UD2 followed by some IMUL instruction that
-> lacks a byte, so when objdump does its linear disassembly, it eats a
-> byte from the to-be-emulated instruction. Like, "FEP; int $0xc3" would
-> decode to:
->    0:	0f 0b                	ud2
->    2:	6b 76 6d cd          	imul   $0xffffffcd,0x6d(%rsi),%esi
->    6:	c3                   	retq
-> This is slightly confusing, especially when the shortened instruction is
-> actually a valid one as above ("retq" vs "int $0xc3").
-> 
-> I have the below diff to "fix" that. It adds 0x3e to the FEP which would
-> restore objdump's ability to generate a proper disassembly that won't
-> destroy the to-be-emulated instruction. As 0x3e decodes to the DS prefix
-> byte, which the emulator assumes by default anyways, this should mostly
-> be a no-op. However, it helped me to get a proper code dump.a
+Hi Marc,
 
-I agree that the objdump output is annoying, but I don't love the idea of cramming
-in a prefix that's _mostly_ a nop.
-
-Given that FEP utilizes extremely specialized, off-by-default KVM code, what about
-reworking FEP in KVM itself to play nice with objdump (and other disasm tools)?
-E.g. "officially" change the magic prefix to include a trailing 0x3e.  Though IMO,
-even better would be a magic value that decodes to a multi-byte nop, e.g.
-0F 1F 44 00 00.  The only "requirement" is that the magic value doesn't get
-false positives, and I can't imagine any of our test environments generate a ud2
-followed by a multi-byte nop.
-
-Keeping KVM-Unit-Tests and KVM synchronized on the correct FEP value would be a
-pain, but disconnects between KVM and KUT are nothing new.
+On Mon, Apr 3, 2023 at 3:30=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrote:
+>
+> On Sun, 02 Apr 2023 19:37:29 +0100,
+> Jing Zhang <jingzhangos@google.com> wrote:
+> >
+> > This patchset refactors/adds code to support writable per guest CPU ID =
+feature
+> > registers. Part of the code/ideas are from
+> > https://lore.kernel.org/all/20220419065544.3616948-1-reijiw@google.com =
+.
+> > No functional change is intended in this patchset. With the new CPU ID =
+feature
+> > registers infrastructure, only writtings of ID_AA64PFR0_EL1.[CSV2|CSV3]=
+,
+> > ID_AA64DFR0_EL1.PMUVer and ID_DFR0_ELF.PerfMon are allowed as KVM does =
+before.
+> >
+> > Writable (Configurable) per guest CPU ID feature registers are useful f=
+or
+> > creating/migrating guest on ARM CPUs with different kinds of features.
+> >
+> > ---
+> >
+> > * v4 -> v5
+> >   - Rebased to 2fad20ae05cb (kvmarm/next)
+> >     Merge branch kvm-arm64/selftest/misc-6,4 into kvmarm-master/next
+>
+> Please don't do that. Always use a stable, tagged commit, not some
+> random "commit of the day". If there is a dependency, indicate the
+> *exact* dependency. Yes, x86 is managed differently.
+>
+> I'm never going to apply anything on top of an arbitrary commit, so
+> this makes it difficult for both you and I. I understand that you want
+> to avoid conflicts, but I really don't mind resolving those.
+>
+> So please stick to existing tags as a base, and describe the
+> dependencies you have (in this case, the locking series).
+Sure, will do that.
+>
+> Thanks,
+>
+>         M.
+>
+> --
+> Without deviation from the norm, progress is not possible.
+Thanks,
+Jing
