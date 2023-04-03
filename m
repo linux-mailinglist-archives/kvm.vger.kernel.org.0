@@ -2,55 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6CB506D4622
-	for <lists+kvm@lfdr.de>; Mon,  3 Apr 2023 15:49:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DDDF26D4624
+	for <lists+kvm@lfdr.de>; Mon,  3 Apr 2023 15:49:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232011AbjDCNtd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 3 Apr 2023 09:49:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51880 "EHLO
+        id S232701AbjDCNtf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 3 Apr 2023 09:49:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51908 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232453AbjDCNt0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 3 Apr 2023 09:49:26 -0400
-Received: from mail-wr1-x429.google.com (mail-wr1-x429.google.com [IPv6:2a00:1450:4864:20::429])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B19256E95
-        for <kvm@vger.kernel.org>; Mon,  3 Apr 2023 06:49:25 -0700 (PDT)
-Received: by mail-wr1-x429.google.com with SMTP id j24so29470751wrd.0
-        for <kvm@vger.kernel.org>; Mon, 03 Apr 2023 06:49:25 -0700 (PDT)
+        with ESMTP id S232565AbjDCNt1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 3 Apr 2023 09:49:27 -0400
+Received: from mail-wm1-x32e.google.com (mail-wm1-x32e.google.com [IPv6:2a00:1450:4864:20::32e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A906A1166C
+        for <kvm@vger.kernel.org>; Mon,  3 Apr 2023 06:49:26 -0700 (PDT)
+Received: by mail-wm1-x32e.google.com with SMTP id d11-20020a05600c3acb00b003ef6e6754c5so14447126wms.5
+        for <kvm@vger.kernel.org>; Mon, 03 Apr 2023 06:49:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1680529764;
+        d=linaro.org; s=google; t=1680529765;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=GjJ0WrIm2Di0AKuPGaQhGuqTtmI2bcqfL0u1knytYyA=;
-        b=JaVTpA1WR5Yo7HRGCieD9YHpHG6U+azsDNIGhcFsSoWXaTyGJ5nteWKiXEEwk/kw5K
-         4z/HoY6XttEATEGH7ML2L997lwjyaICp58vZdfBt7Ul4c19wLOOL8BaRtOmvSRUuhed7
-         F7xab7P0e5GN5SX2AiIVAfbcRe/dg27YalMfRch9sGsLGTKbnuA8YicvcomfH+IfCH9r
-         yVPY/U2gVCrVeue5OHDtNrUdHp/MGzzkoCWB1mxWhuzHAzkS8TVmgzbRXCEx5/h5OI/5
-         cq4Yc7i4nLK00nhoQn/G9sEJn3XzQD/Ddu+otDQolTbDvgrnOtmxHCp7MTofBVl/bMtO
-         ZnpQ==
+        bh=BNNm+hFhYmn6A4btsbTy8z3ys/wMqr7F5fsQ6UPTE0U=;
+        b=uMZTW/+EF5o1W2A5JdfLs4oBqxYHeVBh65G8DF6NWJWPjReRFhKuCC/ncNpHwzh1qs
+         mMEW2tZDNckEfFHS0GjWwR6IQexwG7ZXXRhicNL8f20z5m5Wdk3P5cQ8w/jkdpiCdqDL
+         nLh92n6g0umdfLVI/eQbiF1cxRXgRItEeUiApK+mbKSMit9AUhnjl4hdTriQp+jk79nE
+         6tFc8cnDjdFMut0KwN1OCHIduIw+ynMVFPZ/mXSo/w5MIZx1TOwiMx0bB0B/C3Z3gm0j
+         6ePgrajdov1CzO49xyt1IvyKD+1XurKgKZaKP/PrY/1o3SOzUPkceYK5rLcstSpCjaYb
+         OY9A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680529764;
+        d=1e100.net; s=20210112; t=1680529765;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=GjJ0WrIm2Di0AKuPGaQhGuqTtmI2bcqfL0u1knytYyA=;
-        b=HTAwfnGYIBo5lCF/bnMqABQ4cYjK6ec2GTCilVfpG2wAH3Y44N/eSSGm8lf0uJ18SQ
-         ZoeC/XdIeYmyhxFIDJEcP9uUgQWBBiPLo4OMdSxxbkLHM1lmEn0TQ1CPGew3DJdKwrv4
-         IJcj5JMxovAUDnpUij++SG9LVL7KDMy5xvg2ETwQW87Ig2tE3cenUJDI4oXKsNCbljWq
-         wbnxVMWrHSZ0mHha0xHfuCrlMW/YRvtJ5JcsIcP70r/naJRrS4+ScZLVnjXd70h+2oJ9
-         lj+xBvks2ING2VEIdblmracYiYJwqW8H4DxObNnd9pkJUDaHwT3QTmsAOasjCYNo6Xz3
-         wOVA==
-X-Gm-Message-State: AAQBX9d+Wt5YvXwU/oGGht4ycl6suxO7AgiD20hX0RtRYReGO8d7OOp7
-        Pmc1lW1mqmpqz4guUGlI0gEKRA==
-X-Google-Smtp-Source: AKy350Zih1/UPPhQr8jYeGyPYonELcT+rZRHLNBwD0ldfATP2SC3xnwB/VAGhSWQTnQNEnfb2Ap/xA==
-X-Received: by 2002:adf:ce02:0:b0:2c7:cdf:e548 with SMTP id p2-20020adfce02000000b002c70cdfe548mr27185931wrn.71.1680529764201;
-        Mon, 03 Apr 2023 06:49:24 -0700 (PDT)
+        bh=BNNm+hFhYmn6A4btsbTy8z3ys/wMqr7F5fsQ6UPTE0U=;
+        b=TE8fhL0YLriohDINRmkKmhXwaLGKWvo1FYpN+yFizNl5EtpMv25yqdXU8ZvSfPUzJ2
+         rHPjteTYoEHvg17ubSk/wyAj97Pdk8w4SknH9Zs8yF3uD7wWVCfbR0L1b3goGpeCgQ3I
+         AtMPxvXEG/0chhYgGs965B1s0a2OulyYViUn/xxG1FcT8fXs41Os/KnUj1dZ6R2ESifw
+         jPP1wO8k5BzdcCoV7/1P7SFJ16or5MEdKij2scpLiD9hTlolIwpqw40sWbPe+XdJK/nR
+         RIL0A1in3chHlNx2rlE/tfM+VRuI20PaFtOmmPBUeElQ2MFnHp9JY0PrZnQ29yXdL+dh
+         teuA==
+X-Gm-Message-State: AAQBX9fDGESQbn5H+z1+fya2bv+HgWHLMuNJuuioag8zkToDX4KmlssA
+        /YtQ3etU7bB8BUa0bw5vQmdeuA==
+X-Google-Smtp-Source: AKy350b3NNR46AzUUhLxuq4xz5tHpBeQaaVzMjYEw3SBCZ7bSYJ9UQeC7a2TmNiaH4Ew781UGyqx8w==
+X-Received: by 2002:a7b:c4c7:0:b0:3ef:6ae7:8994 with SMTP id g7-20020a7bc4c7000000b003ef6ae78994mr21868141wmk.22.1680529765031;
+        Mon, 03 Apr 2023 06:49:25 -0700 (PDT)
 Received: from zen.linaroharston ([85.9.250.243])
-        by smtp.gmail.com with ESMTPSA id z6-20020a5d4d06000000b002e6d4ac31a3sm7433916wrt.72.2023.04.03.06.49.22
+        by smtp.gmail.com with ESMTPSA id r16-20020a05600c35d000b003ee9f396dcesm19503795wmq.30.2023.04.03.06.49.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Mon, 03 Apr 2023 06:49:23 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
-        by zen.linaroharston (Postfix) with ESMTP id 6799D1FFBF;
+        by zen.linaroharston (Postfix) with ESMTP id 7E9FF1FFB7;
         Mon,  3 Apr 2023 14:49:21 +0100 (BST)
 From:   =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To:     qemu-devel@nongnu.org
@@ -65,11 +65,10 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
         Cleber Rosa <crosa@redhat.com>, Thomas Huth <thuth@redhat.com>,
         Kevin Wolf <kwolf@redhat.com>,
-        Marco Liebel <quic_mliebel@quicinc.com>,
-        Brian Cain <bcain@quicinc.com>
-Subject: [PATCH v2 07/11] Use hexagon toolchain version 16.0.0
-Date:   Mon,  3 Apr 2023 14:49:16 +0100
-Message-Id: <20230403134920.2132362-8-alex.bennee@linaro.org>
+        =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Subject: [PATCH v2 08/11] tests/qemu-iotests: explicitly invoke 'check' via 'python'
+Date:   Mon,  3 Apr 2023 14:49:17 +0100
+Message-Id: <20230403134920.2132362-9-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230403134920.2132362-1-alex.bennee@linaro.org>
 References: <20230403134920.2132362-1-alex.bennee@linaro.org>
@@ -85,30 +84,63 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Marco Liebel <quic_mliebel@quicinc.com>
+From: Daniel P. Berrangé <berrange@redhat.com>
 
-Signed-off-by: Marco Liebel <quic_mliebel@quicinc.com>
-Reviewed-by: Brian Cain <bcain@quicinc.com>
-Message-Id: <20230329142108.1199509-1-quic_mliebel@quicinc.com>
+The 'check' script will use "#!/usr/bin/env python3" by default
+to locate python, but this doesn't work in distros which lack a
+bare 'python3' binary like NetBSD.
+
+We need to explicitly invoke 'check' by referring to the 'python'
+variable in meson, which resolves to the detected python binary
+that QEMU intends to use.
+
+This fixes a regression introduced by
+
+  commit 51ab5f8bd795d8980351f8531e54995ff9e6d163
+  Author: Daniel P. Berrangé <berrange@redhat.com>
+  Date:   Wed Mar 15 17:43:23 2023 +0000
+
+    iotests: register each I/O test separately with meson
+
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+Message-Id: <20230329124539.822022-1-berrange@redhat.com>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Message-Id: <20230330101141.30199-7-alex.bennee@linaro.org>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Message-Id: <20230330101141.30199-8-alex.bennee@linaro.org>
 ---
- tests/docker/dockerfiles/debian-hexagon-cross.docker | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ tests/qemu-iotests/meson.build | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/tests/docker/dockerfiles/debian-hexagon-cross.docker b/tests/docker/dockerfiles/debian-hexagon-cross.docker
-index 5308ccb8fe..b99d99f943 100644
---- a/tests/docker/dockerfiles/debian-hexagon-cross.docker
-+++ b/tests/docker/dockerfiles/debian-hexagon-cross.docker
-@@ -27,7 +27,7 @@ RUN apt-get update && \
+diff --git a/tests/qemu-iotests/meson.build b/tests/qemu-iotests/meson.build
+index a162f683ef..9735071a29 100644
+--- a/tests/qemu-iotests/meson.build
++++ b/tests/qemu-iotests/meson.build
+@@ -47,19 +47,20 @@ foreach format, speed: qemu_iotests_formats
+   endif
  
+   rc = run_command(
+-      [qemu_iotests_check_cmd] + args + ['-n'],
++      [python, qemu_iotests_check_cmd] + args + ['-n'],
+       check: true,
+   )
  
- ENV TOOLCHAIN_INSTALL /opt
--ENV TOOLCHAIN_RELEASE 15.0.3
-+ENV TOOLCHAIN_RELEASE 16.0.0
- ENV TOOLCHAIN_BASENAME "clang+llvm-${TOOLCHAIN_RELEASE}-cross-hexagon-unknown-linux-musl"
- ENV TOOLCHAIN_URL https://codelinaro.jfrog.io/artifactory/codelinaro-toolchain-for-hexagon/v${TOOLCHAIN_RELEASE}/${TOOLCHAIN_BASENAME}.tar.xz
- 
+   foreach item: rc.stdout().strip().split()
+-      args = ['-tap', '-' + format, item,
++      args = [qemu_iotests_check_cmd,
++              '-tap', '-' + format, item,
+               '--source-dir', meson.current_source_dir(),
+               '--build-dir', meson.current_build_dir()]
+       # Some individual tests take as long as 45 seconds
+       # Bump the timeout to 3 minutes for some headroom
+       # on slow machines to minimize spurious failures
+       test('io-' + format + '-' + item,
+-           qemu_iotests_check_cmd,
++           python,
+            args: args,
+            depends: qemu_iotests_binaries,
+            env: qemu_iotests_env,
 -- 
 2.39.2
 
