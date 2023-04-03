@@ -2,101 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BB2CE6D4B50
-	for <lists+kvm@lfdr.de>; Mon,  3 Apr 2023 17:02:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0BA886D4B54
+	for <lists+kvm@lfdr.de>; Mon,  3 Apr 2023 17:02:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233006AbjDCPCr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 3 Apr 2023 11:02:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35776 "EHLO
+        id S234121AbjDCPC5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 3 Apr 2023 11:02:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36070 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232492AbjDCPCq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 3 Apr 2023 11:02:46 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5737CDD0
-        for <kvm@vger.kernel.org>; Mon,  3 Apr 2023 08:01:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1680534116;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=LDT5Lf+qM0AXT+Qr2m1vjFVPSH4VkpP6LN6DDAc5Ys4=;
-        b=cPdhHpDtKZ4UPsPdXz/WVSWYZpTVeNx3t2sefMGfnpFc1kyD4HiZgwxZM2/Z4f2gPzE9w+
-        WvMfU86ekfF0TsNUVsED+kFZfsVrFudfbyGPAZ8B+66euaUGzbgrsDf72EIJI2/+wLQb0B
-        Eh54As+dbKFL+Chy03J0U1Gn7v/qqhY=
-Received: from mail-io1-f71.google.com (mail-io1-f71.google.com
- [209.85.166.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-582-zS_MIDn_Psavg6k1dhZ5mQ-1; Mon, 03 Apr 2023 11:01:55 -0400
-X-MC-Unique: zS_MIDn_Psavg6k1dhZ5mQ-1
-Received: by mail-io1-f71.google.com with SMTP id i189-20020a6b3bc6000000b00758a1ed99c2so18014556ioa.1
-        for <kvm@vger.kernel.org>; Mon, 03 Apr 2023 08:01:54 -0700 (PDT)
+        with ESMTP id S232291AbjDCPCz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 3 Apr 2023 11:02:55 -0400
+Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 645E311E93
+        for <kvm@vger.kernel.org>; Mon,  3 Apr 2023 08:02:54 -0700 (PDT)
+Received: by mail-pl1-x64a.google.com with SMTP id e5-20020a17090301c500b001a1aa687e4bso17732066plh.17
+        for <kvm@vger.kernel.org>; Mon, 03 Apr 2023 08:02:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112; t=1680534174;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=hbMbZi+huQ2hPf3sjYcxLECq9oILbQJUcDUPXoJimxM=;
+        b=gQFDScVEYVGkPX2vuuCtrfW8grQtu9fQFLRJmk2TKmcY2JCeDge0XbtL7jyzIMtj9J
+         /kgNjX+HV8V7ViIZmKeLGda3QoJ2s3s9hK9rSGy1Fduo9BgaYRscfy5tqDS5Q/br512V
+         kqP1ppWRv4qqlmmaU0J0uk9Hf2j6JdBdba5nDXD2aYj+bg4VhwzU041OHKG0uVbLKO2M
+         QbrDlar6GApKBPjq4ZeRzWsmnyElmsF4ZOKhJtGgbBrTluI1D/QUaQeSAC+0ReNvRgbK
+         S+cC0dOGOiqJ389WooWpLNbzY4mQUI3qGMaWxa4jSipucz3Qbiomi1MQOyBj1D8Aqpsn
+         aR6g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680534114;
-        h=content-transfer-encoding:mime-version:organization:references
-         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=LDT5Lf+qM0AXT+Qr2m1vjFVPSH4VkpP6LN6DDAc5Ys4=;
-        b=shT3mPDpB6XnRz0XJGgyXQkA/VuRHsVu9FrZa+q1Bkqser3C3/t2Z0UJ1BSMR9Q04/
-         qWPf1GfM2THAuK9fJRsOgT6pZSWZydrxFKe9hbwhYY6VMlCacZgLIhiKkkY1ntC/QwLe
-         Ey6QRONMig3nUwFjYlrBBI+8WYKPEBzXZS95CYe0hX17cwRc1MK12xO+XdMVQooYSg2K
-         zvmCJAvgFcDpC9Z/P/hLcG2PgGE9Ol80Na419BxGBSQcHKYqUfbGNVQoW/ugS9rtQfj0
-         o1e3mAxBGGVdihHmoeMANuBPWgzjDBTj5rODD/ZK2POqeyE/yQxtKnEAVGQ7bUkf12rn
-         OVzg==
-X-Gm-Message-State: AO0yUKU7GtL9bS639YzpYqzcf6ng9QZufOmQvsbRExFgOyxY2FxrJ2GY
-        yPlfp836eo7235tvqJDyvmeYE0HeWkomzatq4DUO25R79O3f3yyK5pFAtC/bAyCwg0UryLDAeuX
-        q7Y/q34fxxv8P
-X-Received: by 2002:a5d:8142:0:b0:74c:e456:629d with SMTP id f2-20020a5d8142000000b0074ce456629dmr25003480ioo.7.1680534114160;
-        Mon, 03 Apr 2023 08:01:54 -0700 (PDT)
-X-Google-Smtp-Source: AK7set+kaGi07I/wH0q13cJZHTVv8M0jb8SFu1aYqy0WHHoYlpxzwPnYGZcVa2Sxzy5OzWM2Y+hdQQ==
-X-Received: by 2002:a5d:8142:0:b0:74c:e456:629d with SMTP id f2-20020a5d8142000000b0074ce456629dmr25003444ioo.7.1680534113860;
-        Mon, 03 Apr 2023 08:01:53 -0700 (PDT)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id q49-20020a056638347100b00408b3bc8061sm2735465jav.43.2023.04.03.08.01.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 03 Apr 2023 08:01:53 -0700 (PDT)
-Date:   Mon, 3 Apr 2023 09:01:51 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     "Liu, Yi L" <yi.l.liu@intel.com>
-Cc:     "jgg@nvidia.com" <jgg@nvidia.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
+        d=1e100.net; s=20210112; t=1680534174;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=hbMbZi+huQ2hPf3sjYcxLECq9oILbQJUcDUPXoJimxM=;
+        b=2WvkA02zMcRzm9Ygsx1UP9E/USXhKXDbjwRPK2f5B1cOxs0P1xrmvxhLLQOOGiK94H
+         Gk9lFHljttBYW2Zr4UaOIBQ+m690jhlf1mTu8A8x7if4p+IEVC4Vzq3+G9mgoZx6zCjx
+         tqvaAcRiS1xkOE5eAAPt0RgnXXY8kOa6YO+zrCpVEKr0Kj7+LiTYldPMxPILKDzbbfjO
+         iAg8OsEvdWkWSG3cas2G1WKTdnLfdEkLX5fb4ha2wQoick3A+R0S8iWEEuI69im6PvU6
+         dAvPm90U08mcfLod/bZjauHf0uKfVbsNI4kQyogta/iizyG5oRltgiHlDr+JSFmP//ao
+         dnmw==
+X-Gm-Message-State: AAQBX9fPQLGudy4uYvTSAMOapbMdvARSa/j4kt8JZOrmCbWstNxRVrX1
+        v6kaAHJHlrM4mkKdrG8rlx88s32PEDA=
+X-Google-Smtp-Source: AKy350ZFF+f98maypgxRZSwem7yt3ugKYlpvsZ4d+KsXnuHKPwslT2YmO5o/yuIEa8NptQZGHoWDHljj2uc=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:903:493:b0:1a2:6e4d:7831 with SMTP id
+ jj19-20020a170903049300b001a26e4d7831mr6933034plb.12.1680534173947; Mon, 03
+ Apr 2023 08:02:53 -0700 (PDT)
+Date:   Mon, 3 Apr 2023 08:02:52 -0700
+In-Reply-To: <fc92490afc7ee1b9679877878de64ad129853cc0.camel@intel.com>
+Mime-Version: 1.0
+References: <ZBhTa6QSGDp2ZkGU@gao-cwp> <ZBojJgTG/SNFS+3H@google.com>
+ <12c4f1d3c99253f364f3945a998fdccb0ddf300f.camel@intel.com>
+ <e0442b13-09f4-0985-3eb4-9b6a20d981fb@linux.intel.com> <682d01dec42ecdb80c9d3ffa2902dea3b1d576dd.camel@intel.com>
+ <b9e9dd1c-2213-81c7-cd45-f5cf7b86610b@linux.intel.com> <ZCR2PBx/4lj9X0vD@google.com>
+ <657efa6471503ee5c430e5942a14737ff5fbee6e.camel@intel.com>
+ <349bd65a-233e-587c-25b2-12b6031b12b6@linux.intel.com> <fc92490afc7ee1b9679877878de64ad129853cc0.camel@intel.com>
+Message-ID: <ZCrqZTZWd1LC5s3J@google.com>
+Subject: Re: [PATCH v6 2/7] KVM: VMX: Use is_64_bit_mode() to check 64-bit mode
+From:   Sean Christopherson <seanjc@google.com>
+To:     Kai Huang <kai.huang@intel.com>
+Cc:     "binbin.wu@linux.intel.com" <binbin.wu@linux.intel.com>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
-        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
-        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "jasowang@redhat.com" <jasowang@redhat.com>,
-        "shameerali.kolothum.thodi@huawei.com" 
-        <shameerali.kolothum.thodi@huawei.com>,
-        "lulu@redhat.com" <lulu@redhat.com>,
-        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
-        "intel-gvt-dev@lists.freedesktop.org" 
-        <intel-gvt-dev@lists.freedesktop.org>,
-        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
-        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-        "Hao, Xudong" <xudong.hao@intel.com>,
-        "Zhao, Yan Y" <yan.y.zhao@intel.com>,
-        "Xu, Terrence" <terrence.xu@intel.com>,
-        "Jiang, Yanting" <yanting.jiang@intel.com>
-Subject: Re: [PATCH v3 12/12] vfio/pci: Report dev_id in
- VFIO_DEVICE_GET_PCI_HOT_RESET_INFO
-Message-ID: <20230403090151.4cb2158c.alex.williamson@redhat.com>
-In-Reply-To: <DS0PR11MB752996A6E6B3263BAD01DAC2C3929@DS0PR11MB7529.namprd11.prod.outlook.com>
-References: <20230401144429.88673-1-yi.l.liu@intel.com>
-        <20230401144429.88673-13-yi.l.liu@intel.com>
-        <DS0PR11MB752996A6E6B3263BAD01DAC2C3929@DS0PR11MB7529.namprd11.prod.outlook.com>
-Organization: Red Hat
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "robert.hu@linux.intel.com" <robert.hu@linux.intel.com>,
+        Chao Gao <chao.gao@intel.com>
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-7.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -104,40 +77,118 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 3 Apr 2023 09:25:06 +0000
-"Liu, Yi L" <yi.l.liu@intel.com> wrote:
+On Mon, Apr 03, 2023, Huang, Kai wrote:
+> >=20
+> > I checked the code again and find the comment of=20
+> > nested_vmx_check_permission().
+> >=20
+> > "/*
+> >  =EF=BF=BD* Intel's VMX Instruction Reference specifies a common set of=
+=20
+> > prerequisites
+> >  =EF=BF=BD* for running VMX instructions (except VMXON, whose prerequis=
+ites are
+> >  =EF=BF=BD* slightly different). It also specifies what exception to in=
+ject=20
+> > otherwise.
+> >  =EF=BF=BD* Note that many of these exceptions have priority over VM ex=
+its, so they
+> >  =EF=BF=BD* don't have to be checked again here.
+> >  =EF=BF=BD*/"
+> >=20
+> > I think the Note part in the comment has tried to callout why the check=
+=20
+> > for compatibility mode is unnecessary.
+> >=20
+> > But I have a question here, nested_vmx_check_permission() checks that t=
+he
+> > vcpu is vmxon, otherwise it will inject a #UD. Why this #UD is handled =
+in
+> > the VMExit handler specifically?  Not all #UDs have higher priority tha=
+n VM
+> > exits?
+> >=20
+> > According to SDM Section "Relative Priority of Faults and VM Exits":
+> > "Certain exceptions have priority over VM exits. These include=20
+> > invalid-opcode exceptions, ..."
+> > Seems not further classifications of #UDs.
+>=20
+> This is clarified in the pseudo code of VMX instructions in the SDM.  If =
+you
+> look at the pseudo code, all VMX instructions except VMXON (obviously) ha=
+ve
+> something like below:
+>=20
+> 	IF (not in VMX operation) ...
+> 		THEN #UD;
+> 	ELSIF in VMX non-root operation
+> 		THEN VMexit;
+>=20
+> So to me "this particular" #UD has higher priority over VM exits (while o=
+ther
+> #UDs may not).
 
-> > From: Liu, Yi L <yi.l.liu@intel.com>
-> > Sent: Saturday, April 1, 2023 10:44 PM  
-> 
-> > @@ -791,7 +813,21 @@ static int vfio_pci_fill_devs(struct pci_dev *pdev, void *data)
-> >  	if (!iommu_group)
-> >  		return -EPERM; /* Cannot reset non-isolated devices */  
-> 
-> Hi Alex,
-> 
-> Is disabling iommu a sane way to test vfio noiommu mode?
+> But IIUC above #UD won't happen when running VMX instruction in the guest=
+,
+> because if there's any live guest, the CPU must already have been in VMX
+> operation.  So below check in nested_vmx_check_permission():
+>=20
+> 	if (!to_vmx(vcpu)->nested.vmxon) {                                      =
+     =20
+>                 kvm_queue_exception(vcpu, UD_VECTOR);                    =
+     =20
+>                 return 0;                                                =
+     =20
+>         }
+>=20
+> is needed to emulate the case that guest runs any other VMX instructions =
+before
+> VMXON.
 
-Yes
+Yep.  IMO, the pseucode is misleading/confusing, the "in VMX non-root opera=
+tion"
+check should really come first.  The VMXON pseudocode has the same awkward
+sequence:
 
-> I added intel_iommu=off to disable intel iommu and bind a device to vfio-pci.
-> I can see the /dev/vfio/noiommu-0 and /dev/vfio/devices/noiommu-vfio0. Bind
-> iommufd==-1 can succeed, but failed to get hot reset info due to the above
-> group check. Reason is that this happens to have some affected devices, and
-> these devices have no valid iommu_group (because they are not bound to vfio-pci
-> hence nobody allocates noiommu group for them). So when hot reset info loops
-> such devices, it failed with -EPERM. Is this expected?
+    IF (register operand) or (CR0.PE =3D 0) or (CR4.VMXE =3D 0) or ...
+        THEN #UD;
+    ELSIF not in VMX operation
+        THEN
+            IF (CPL > 0) or (in A20M mode) or
+            (the values of CR0 and CR4 are not supported in VMX operation)
+                THEN #GP(0);
+    ELSIF in VMX non-root operation
+        THEN VMexit;
+    ELSIF CPL > 0
+        THEN #GP(0);
+    ELSE VMfail("VMXON executed in VMX root operation");
+    FI;
 
-Hmm, I didn't recall that we put in such a limitation, but given the
-minimally intrusive approach to no-iommu and the fact that we never
-defined an invalid group ID to return to the user, it makes sense that
-we just blocked the ioctl for no-iommu use.  I guess we can do the same
-for no-iommu cdev.
 
-BTW, what does this series apply on?  I'm assuming[1], but I don't see
-a branch from Jason yet.  Thanks,
+whereas I find this sequence for VMXON more representative of what actually=
+ happens:
 
-Alex
+    IF (register operand) or (CR0.PE =3D 0) or (CR4.VMXE =3D 0) or ...
+        THEN #UD
 
-[1]https://lore.kernel.org/all/20230327093351.44505-1-yi.l.liu@intel.com/
+    IF in VMX non-root operation
+        THEN VMexit;
 
+    IF CPL > 0
+        THEN #GP(0)
+
+    IF in VMX operation
+        THEN VMfail("VMXON executed in VMX root operation");
+
+    IF (in A20M mode) or
+       (the values of CR0 and CR4 are not supported in VMX operation)
+        THEN #GP(0);
+
+> > Anyway, I will seperate this patch from the LAM KVM enabling patch. And=
+=20
+> > send a patch seperately if needed later.
+>=20
+> I think your change for SGX is still needed based on the pseudo code of E=
+NCLS.
+
+Agreed.
