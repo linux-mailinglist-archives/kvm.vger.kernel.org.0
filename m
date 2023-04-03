@@ -2,85 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9EAE26D5008
-	for <lists+kvm@lfdr.de>; Mon,  3 Apr 2023 20:10:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F26796D5113
+	for <lists+kvm@lfdr.de>; Mon,  3 Apr 2023 21:06:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232605AbjDCSKC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 3 Apr 2023 14:10:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36836 "EHLO
+        id S231486AbjDCTGS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 3 Apr 2023 15:06:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34814 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231741AbjDCSKB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 3 Apr 2023 14:10:01 -0400
-Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D43C22134;
-        Mon,  3 Apr 2023 11:10:00 -0700 (PDT)
-Received: by mail-pl1-x631.google.com with SMTP id z19so28893394plo.2;
-        Mon, 03 Apr 2023 11:10:00 -0700 (PDT)
+        with ESMTP id S229576AbjDCTGR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 3 Apr 2023 15:06:17 -0400
+Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00BD22101
+        for <kvm@vger.kernel.org>; Mon,  3 Apr 2023 12:06:16 -0700 (PDT)
+Received: by mail-pf1-x449.google.com with SMTP id c2-20020a62f842000000b0062d93664ad5so9696068pfm.19
+        for <kvm@vger.kernel.org>; Mon, 03 Apr 2023 12:06:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1680545400;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pa2BV/2hukT+SOvhLFebRK93sjsVntvwqiFRZkq+S+8=;
-        b=Ft1qqfdfNGU5SGGFhFJNTwfnyli0Ti5FvIuAoBaGQFmOv1UTShqS/OfC3YTYjAUQs0
-         dJKvkxBdJPgpi90Y0F85ubmo/RVC8OiYG8AENDXv4/VnYMlmKD8jM6MBWMb6Sfcnr4JH
-         H/Hxx0NOLriYHwfg3xDQPPHQYsBHIqAOG+w6Vv8EXmkiY8XmOZFJDfleP8N+/EJdUxNi
-         A1Q8PUhpj273Vr0Gjmm/xGVl8xnG9jqsl0s7Swia350HDxZ7w77JQMMY4sWLSOm1Km2s
-         A+2RPlTw8BMCXO0z8jv2cyaPCtT+6UkAnH99lmKLyE5hqlRw8keomBUy+dLCS+QFYo5F
-         r8vA==
+        d=google.com; s=20210112; t=1680548776;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=IZEM6mvYmZj+yiKdKb8IHOdr6k0jIGoRnFbSKqxXi3U=;
+        b=sblg4pgEQBWs8JbOVsr4ajhbSddvrck4MJsagGRyIVa+QhdSFiUOGWC5ubx/A8gjog
+         EmIxHg0skJ4R1x8NJXyMTyHLspeP70cCU+c++/zzOekAn6DA4lu/uHXnmoYzzsoaVEiU
+         2buAOS0XySr0jR8Lt/P6m5zUeYBoLS3qfShCBVhtrT2mYsjG3NMEAIEebkiO086Sdpv1
+         xCnkyoGfEHexLT8/I7o60UxbSBLaHAyj9WzpSdwS+pNE8GXoOPTr/0MCZ1LBYVCoWGax
+         rM9Vdiw2nnXuOLFnPWPYwPCHiIKc00MGjyBU+xeAS8cnfSRSe++TTazhP8/RFxALxG/7
+         /xkw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680545400;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=pa2BV/2hukT+SOvhLFebRK93sjsVntvwqiFRZkq+S+8=;
-        b=Ht55l5xrNZ7CT/c3CjPQu4pEChUzCfZz3nhYYpFgLw/QI3fJK0tdQYXkvDP0IvkHzd
-         JSd/b610iW1OqjitgfS95dJk7zrmxoUsiLa6Tm1lDWLpR35Ot5pRcv4qKQcTENNm0y5q
-         gr8huhfQWX+NzCgsup/Z062z0D3WkSNaoU0cwOQizI93OKEYkN13jrNd0V1GPeaY2BER
-         oFsd+CKOmV8qDYjJLOr9zP9iM1ckSR/wvbie8l5TWXKweMeYQ6v5vYne6m9WgRnmCGY7
-         c63AX0YaX3eDkZ/d5V5uxV8wl5UuT52uPoYpMf/Q/0PJkEO6jc16pOxuwWKl5GeihHd5
-         PL+Q==
-X-Gm-Message-State: AAQBX9c//o8IF/3orRW7mUvabS1G5EMSOoik1vXoqnUaMf1Q2grkGs0N
-        KxOz3MLKN0CxStv1eZSZ+Pg=
-X-Google-Smtp-Source: AKy350Zef2NXFx8d/z1eeGXLPDrs0U7IRPUog3tPrwe+/NGcARuYKvdU1cdBJ5iugXXsESTU7UsL9A==
-X-Received: by 2002:a17:902:ce8e:b0:19e:2fb0:a5d9 with SMTP id f14-20020a170902ce8e00b0019e2fb0a5d9mr22338760plg.32.1680545400262;
-        Mon, 03 Apr 2023 11:10:00 -0700 (PDT)
-Received: from ?IPV6:2404:f801:0:5:8000::75b? ([2404:f801:9000:18:efec::75b])
-        by smtp.gmail.com with ESMTPSA id x23-20020a1709027c1700b001a23e056423sm6893029pll.283.2023.04.03.11.09.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 03 Apr 2023 11:09:59 -0700 (PDT)
-Message-ID: <7efbc4fa-1797-0da8-2846-e0753e578ffe@gmail.com>
-Date:   Tue, 4 Apr 2023 02:09:46 +0800
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.9.1
-Subject: Re: [RFC PATCH V3 12/16] x86/sev: Add a #HV exception handler
-To:     Borislav Petkov <bp@alien8.de>
-Cc:     luto@kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
-        seanjc@google.com, pbonzini@redhat.com, jgross@suse.com,
-        tiala@microsoft.com, kirill@shutemov.name,
-        jiangshan.ljs@antgroup.com, peterz@infradead.org,
-        ashish.kalra@amd.com, srutherford@google.com,
-        akpm@linux-foundation.org, anshuman.khandual@arm.com,
-        pawan.kumar.gupta@linux.intel.com, adrian.hunter@intel.com,
-        daniel.sneddon@linux.intel.com, alexander.shishkin@linux.intel.com,
-        sandipan.das@amd.com, ray.huang@amd.com, brijesh.singh@amd.com,
-        michael.roth@amd.com, thomas.lendacky@amd.com,
-        venu.busireddy@oracle.com, sterritt@google.com,
-        tony.luck@intel.com, samitolvanen@google.com, fenghua.yu@intel.com,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-hyperv@vger.kernel.org, linux-arch@vger.kernel.org
-References: <20230122024607.788454-1-ltykernel@gmail.com>
- <20230122024607.788454-13-ltykernel@gmail.com>
- <20230331155714.GCZCcC2pHVZgIHr8k8@fat_crate.local>
-From:   Tianyu Lan <ltykernel@gmail.com>
-In-Reply-To: <20230331155714.GCZCcC2pHVZgIHr8k8@fat_crate.local>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-1.5 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
-        DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+        d=1e100.net; s=20210112; t=1680548776;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=IZEM6mvYmZj+yiKdKb8IHOdr6k0jIGoRnFbSKqxXi3U=;
+        b=0R3BtgvqU1Uz77fNJhNeKAE7eNFrqFoy//GueI0l91SrzNm4HJ8hhjCwZZOEopwpaq
+         JU9G37hS6U2//0ecr1InDhHkjUNW+72SmOP0TwkJsmP/iuGNNF2Gs7cHzwQj2QmI+x/s
+         JgU1+4hV+6QqCCC5bylLiFVjqXW48bx3xmDgMlTWSsNqZ50Fc3n33Sn8JPmgx0hmPI7o
+         dwNa6B8ghziqM81ExQn+6eewcnyqvECCuXe0efazwS28sRBKjOuSxUpV3DO+Oat7h2Ks
+         BgJhYMRaj2n3+YqYUiuaAWIpn5wag6skEfZM2U8AGFMhKGvhTCQDl2nxOBiKdSh8b3kh
+         i3ag==
+X-Gm-Message-State: AAQBX9cF9dDeyUzQJ0loLhQOqHX+dD6KCRD/YrKEPYcfmvzSKPptEovk
+        2o0hw2pCKP5bOGBASj6dNioudd43D/M=
+X-Google-Smtp-Source: AKy350bZDON9g0ZW2ia4qZBmjIdUuuyQ5Jd65Dmh/EkxZrK24Xe2zxbrOsGtP2v8NStboovWAKubwLEC8aQ=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:90a:2b09:b0:23d:33e5:33ec with SMTP id
+ x9-20020a17090a2b0900b0023d33e533ecmr24068pjc.1.1680548776557; Mon, 03 Apr
+ 2023 12:06:16 -0700 (PDT)
+Date:   Mon, 3 Apr 2023 12:06:15 -0700
+In-Reply-To: <dc285a74-9cce-2886-f8aa-f10e1a94f6f5@grsecurity.net>
+Mime-Version: 1.0
+References: <20230403105618.41118-1-minipli@grsecurity.net>
+ <20230403105618.41118-4-minipli@grsecurity.net> <dc285a74-9cce-2886-f8aa-f10e1a94f6f5@grsecurity.net>
+Message-ID: <ZCsjp0666b9DOj+n@google.com>
+Subject: Re: [kvm-unit-tests PATCH v3 3/4] x86/access: Forced emulation support
+From:   Sean Christopherson <seanjc@google.com>
+To:     Mathias Krause <minipli@grsecurity.net>
+Cc:     kvm@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-7.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -88,27 +66,40 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 3/31/2023 11:57 PM, Borislav Petkov wrote:
->> + *
->> + * If entered from kernel-mode the return stack is validated first, and if it is
->> + * not safe to use (e.g. because it points to the entry stack) the #HV handler
->> + * will switch to a fall-back stack (HV2) and call a special handler function.
->> + *
->> + * The macro is only used for one vector, but it is planned to be extended in
->> + * the future for the #HV exception.
->> + */
->> +.macro idtentry_hv vector asmsym cfunc
->> +SYM_CODE_START(\asmsym)
-> ...
+On Mon, Apr 03, 2023, Mathias Krause wrote:
+> On 03.04.23 12:56, Mathias Krause wrote:
+> > Add support to enforce access tests to be handled by the emulator, if
+> > supported by KVM. Exclude it from the ac_test_exec() test, though, to
+> > not slow it down too much.
 > 
-> why is this so much duplicated code instead of sharing it with
-> idtentry_vc and all the facilities it does?
+> I tend to read a lot of objdumps and when initially looking at the
+> generated code it was kinda hard to recognize the FEP instruction, as
+> the FEP actually decodes to UD2 followed by some IMUL instruction that
+> lacks a byte, so when objdump does its linear disassembly, it eats a
+> byte from the to-be-emulated instruction. Like, "FEP; int $0xc3" would
+> decode to:
+>    0:	0f 0b                	ud2
+>    2:	6b 76 6d cd          	imul   $0xffffffcd,0x6d(%rsi),%esi
+>    6:	c3                   	retq
+> This is slightly confusing, especially when the shortened instruction is
+> actually a valid one as above ("retq" vs "int $0xc3").
 > 
+> I have the below diff to "fix" that. It adds 0x3e to the FEP which would
+> restore objdump's ability to generate a proper disassembly that won't
+> destroy the to-be-emulated instruction. As 0x3e decodes to the DS prefix
+> byte, which the emulator assumes by default anyways, this should mostly
+> be a no-op. However, it helped me to get a proper code dump.a
 
-Hi Boris:
-	#VC and #HV use different stack. I try reusing vc code path for #HV 
-doesn't work. I will continue to work on this direction and report back 
-later. In the RFC v4, I still keep the old version and other patches may 
-be reviewed in the parellel.
+I agree that the objdump output is annoying, but I don't love the idea of cramming
+in a prefix that's _mostly_ a nop.
 
-Thanks.
+Given that FEP utilizes extremely specialized, off-by-default KVM code, what about
+reworking FEP in KVM itself to play nice with objdump (and other disasm tools)?
+E.g. "officially" change the magic prefix to include a trailing 0x3e.  Though IMO,
+even better would be a magic value that decodes to a multi-byte nop, e.g.
+0F 1F 44 00 00.  The only "requirement" is that the magic value doesn't get
+false positives, and I can't imagine any of our test environments generate a ud2
+followed by a multi-byte nop.
+
+Keeping KVM-Unit-Tests and KVM synchronized on the correct FEP value would be a
+pain, but disconnects between KVM and KUT are nothing new.
