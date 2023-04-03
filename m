@@ -2,125 +2,158 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 96C316D3C67
-	for <lists+kvm@lfdr.de>; Mon,  3 Apr 2023 06:25:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 54A4A6D3D4B
+	for <lists+kvm@lfdr.de>; Mon,  3 Apr 2023 08:26:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230200AbjDCEZT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 3 Apr 2023 00:25:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34320 "EHLO
+        id S231626AbjDCG0t (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 3 Apr 2023 02:26:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39212 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230447AbjDCEZR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 3 Apr 2023 00:25:17 -0400
-Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D6D483DD
-        for <kvm@vger.kernel.org>; Sun,  2 Apr 2023 21:25:00 -0700 (PDT)
-Received: by mail-pf1-x435.google.com with SMTP id z11so18193449pfh.4
-        for <kvm@vger.kernel.org>; Sun, 02 Apr 2023 21:25:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=atishpatra.org; s=google; t=1680495899;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9DUWV9ktqlDY/BbjAabfUWG15IVJ8NNADNU0tp46NqU=;
-        b=ecCTgHwD+RX5VqoH89r+CLiINbWmHhR+Doo+KG6KQPo5T9RpBIFceUdzn8stTHl1KY
-         qwvrNkD1b36X3KW4mXOefj+7llceiyqvhRV0ro1ZZ8VvAtwv71Zq1/iQ6cZQOwJrQdCs
-         TTzpCj8DU44ITnJXab5cryMIo9/P277vU029M=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680495899;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=9DUWV9ktqlDY/BbjAabfUWG15IVJ8NNADNU0tp46NqU=;
-        b=zowgTDfxA7mRrN4zXyCFEln7/LAiirYMVN97OdwLQ9R+UqDtknhGoa5PW013/CzTqq
-         VpuFUP7ybawEsnJZk8kXX21xqFnABVxrLXW4zX3qPPFaIgSOi+TxIz2YBEh9KX15xxKD
-         uGzRn2fzVu+imcvjrqAUteYbYd3fLlYfo3Jw/bhIghrBDVELjm5SvCHYZwt9tT6BvcBb
-         ZL6Ak+oFBIT8FTUtoobdmuNDqtFuskV1sfTNlH/IebKLkj//Qbn/uhEXbPSk6SYkyxI8
-         mbHpSo/+Yku6x0r5rQLKe68BsJBT9LxC2bAol3XlDUAOJ7EKdcdkg2zug7I4KVmUApPI
-         nY0A==
-X-Gm-Message-State: AAQBX9fOS12eA1NfWKm0JnCVZys30Vz3/KvtsOawFvf1hpmftyfSvsMz
-        QeAIoga4wJpCkFVjuoNl28NdssquEbiEJZCf/nbk
-X-Google-Smtp-Source: AKy350buPR6+d9jPTSOjsqUWE4vPnoVCi1WyVz7aXHC5S1Qdm0BMiGAb7aL0Tx+OP3pzy3gzY6/7lWFNCwWLO5eD3gs=
-X-Received: by 2002:a05:6a00:130c:b0:623:129f:6269 with SMTP id
- j12-20020a056a00130c00b00623129f6269mr16947692pfu.1.1680495899232; Sun, 02
- Apr 2023 21:24:59 -0700 (PDT)
+        with ESMTP id S231564AbjDCG0s (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 3 Apr 2023 02:26:48 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04CBB65BC
+        for <kvm@vger.kernel.org>; Sun,  2 Apr 2023 23:25:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1680503159;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=afBNaZ0DMuI7GB+2iDCGbyFFwGSVdQ773bP8QWimT1I=;
+        b=cRW2ueJYRQtARCwTWe/vNt6ZuNcu8S8/mjRC8vpBZAYZ44OkFihgUna53dbC/TF+PjkflY
+        KZjXKdAMYNATKjBdy2r4sOB0p6jHvhsHr/B9AenPIz8iTfAD1GZ+2HZAgEXsYyUMa2/dSH
+        Qts3ytEwmIURTvRyBcrg8dCR6efByVI=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-244-28z4qi46NM2VpjD3-hJMRQ-1; Mon, 03 Apr 2023 02:25:57 -0400
+X-MC-Unique: 28z4qi46NM2VpjD3-hJMRQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 0C99A801210;
+        Mon,  3 Apr 2023 06:25:56 +0000 (UTC)
+Received: from [10.72.12.158] (ovpn-12-158.pek2.redhat.com [10.72.12.158])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 2D5BAC15BA0;
+        Mon,  3 Apr 2023 06:25:40 +0000 (UTC)
+Reply-To: Gavin Shan <gshan@redhat.com>
+Subject: Re: [RFC PATCH 00/32] ACPI/arm64: add support for virtual cpuhotplug
+To:     Shaoqin Huang <shahuang@redhat.com>,
+        James Morse <james.morse@arm.com>, linux-pm@vger.kernel.org,
+        loongarch@lists.linux.dev, kvmarm@lists.linux.dev,
+        kvm@vger.kernel.org, linux-acpi@vger.kernel.org,
+        linux-arch@vger.kernel.org, linux-ia64@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        x86@kernel.org
+Cc:     Marc Zyngier <maz@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Lorenzo Pieralisi <lpieralisi@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Sudeep Holla <sudeep.holla@arm.com>,
+        Borislav Petkov <bp@alien8.de>, H Peter Anvin <hpa@zytor.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Ingo Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Len Brown <lenb@kernel.org>,
+        Rafael Wysocki <rafael@kernel.org>,
+        WANG Xuerui <kernel@xen0n.name>,
+        Salil Mehta <salil.mehta@huawei.com>,
+        Russell King <linux@armlinux.org.uk>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>
+References: <20230203135043.409192-1-james.morse@arm.com>
+ <e17627fb-283e-dd42-94c1-f89dea167577@redhat.com>
+From:   Gavin Shan <gshan@redhat.com>
+Message-ID: <972ed7df-78cd-e02a-7376-78c806181b5f@redhat.com>
+Date:   Mon, 3 Apr 2023 14:25:36 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-References: <20230401112730.2105240-1-apatel@ventanamicro.com>
-In-Reply-To: <20230401112730.2105240-1-apatel@ventanamicro.com>
-From:   Atish Patra <atishp@atishpatra.org>
-Date:   Mon, 3 Apr 2023 09:54:47 +0530
-Message-ID: <CAOnJCUJ9zgEjMDVo+rBuhzfaBWY1iaCL6Dy0Og+-QU3x4+GSmA@mail.gmail.com>
-Subject: Re: [PATCH] RISC-V: KVM: Allow Zbb extension for Guest/VM
-To:     Anup Patel <apatel@ventanamicro.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Andrew Jones <ajones@ventanamicro.com>,
-        Anup Patel <anup@brainfault.org>, kvm@vger.kernel.org,
-        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-        linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
-        DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS
-        autolearn=unavailable autolearn_force=no version=3.4.6
+In-Reply-To: <e17627fb-283e-dd42-94c1-f89dea167577@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
+X-Spam-Status: No, score=-2.6 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Apr 1, 2023 at 4:57=E2=80=AFPM Anup Patel <apatel@ventanamicro.com>=
- wrote:
->
-> We extend the KVM ISA extension ONE_REG interface to allow KVM
-> user space to detect and enable Zbb extension for Guest/VM.
->
-> Signed-off-by: Anup Patel <apatel@ventanamicro.com>
-> ---
->  arch/riscv/include/uapi/asm/kvm.h | 1 +
->  arch/riscv/kvm/vcpu.c             | 2 ++
->  2 files changed, 3 insertions(+)
->
-> diff --git a/arch/riscv/include/uapi/asm/kvm.h b/arch/riscv/include/uapi/=
-asm/kvm.h
-> index d8ead5952ed9..47a7c3958229 100644
-> --- a/arch/riscv/include/uapi/asm/kvm.h
-> +++ b/arch/riscv/include/uapi/asm/kvm.h
-> @@ -106,6 +106,7 @@ enum KVM_RISCV_ISA_EXT_ID {
->         KVM_RISCV_ISA_EXT_SVINVAL,
->         KVM_RISCV_ISA_EXT_ZIHINTPAUSE,
->         KVM_RISCV_ISA_EXT_ZICBOM,
-> +       KVM_RISCV_ISA_EXT_ZBB,
->         KVM_RISCV_ISA_EXT_MAX,
->  };
->
-> diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
-> index 3112697cb12d..02b49cb94561 100644
-> --- a/arch/riscv/kvm/vcpu.c
-> +++ b/arch/riscv/kvm/vcpu.c
-> @@ -61,6 +61,7 @@ static const unsigned long kvm_isa_ext_arr[] =3D {
->         KVM_ISA_EXT_ARR(SSTC),
->         KVM_ISA_EXT_ARR(SVINVAL),
->         KVM_ISA_EXT_ARR(SVPBMT),
-> +       KVM_ISA_EXT_ARR(ZBB),
->         KVM_ISA_EXT_ARR(ZIHINTPAUSE),
->         KVM_ISA_EXT_ARR(ZICBOM),
->  };
-> @@ -99,6 +100,7 @@ static bool kvm_riscv_vcpu_isa_disable_allowed(unsigne=
-d long ext)
->         case KVM_RISCV_ISA_EXT_SSTC:
->         case KVM_RISCV_ISA_EXT_SVINVAL:
->         case KVM_RISCV_ISA_EXT_ZIHINTPAUSE:
-> +       case KVM_RISCV_ISA_EXT_ZBB:
->                 return false;
->         default:
->                 break;
-> --
-> 2.34.1
->
+Hi Shaoqin,
 
-Reviewed-by: Atish Patra <atishp@rivosinc.com>
+On 3/29/23 1:52 PM, Shaoqin Huang wrote:
+> On 2/3/23 21:50, James Morse wrote:
 
---=20
-Regards,
-Atish
+[...]
+
+>>
+>> The first patch has already been posted as a fix here:
+>> https://www.spinics.net/lists/linux-ia64/msg21920.html
+>> I've only build tested Loongarch and ia64.
+>>
+>>
+>> If folk want to play along at home, you'll need a copy of Qemu that supports this.
+>> https://github.com/salil-mehta/qemu.git salil/virt-cpuhp-armv8/rfc-v1-port29092022.psci.present
+>>
+>> You'll need to fix the numbers of KVM_CAP_ARM_HVC_TO_USER and KVM_CAP_ARM_PSCI_TO_USER
+>> to match your host kernel. Replace your '-smp' argument with something like:
+>> | -smp cpus=1,maxcpus=3,cores=3,threads=1,sockets=1
+>>
+>> then feed the following to the Qemu montior;
+>> | (qemu) device_add driver=host-arm-cpu,core-id=1,id=cpu1
+>> | (qemu) device_del cpu1
+>>
+>>
+>> This series is based on v6.2-rc3, and can be retrieved from:
+>> https://git.kernel.org/pub/scm/linux/kernel/git/morse/linux.git/ virtual_cpu_hotplug/rfc/v1
+> 
+> I applied this patch series on v6.2-rc3 and using the QEMU cloned from the salil-mehta/qemu.git repo. But when I try to run the QEMU, it shows:
+> 
+> $ qemu-system-aarch64: -accel kvm: Failed to enable KVM_CAP_ARM_PSCI_TO_USER cap.
+> 
+> Here is the command I use:
+> 
+> $ qemu-system-aarch64
+> -machine virt
+> -bios /usr/share/qemu-efi-aarch64/QEMU_EFI.fd
+> -accel kvm
+> -m 4096
+> -smp cpus=1,maxcpus=3,cores=3,threads=1,sockets=1
+> -cpu host
+> -qmp unix:./src.socket,server,nowait
+> -hda ./XXX.qcow2
+> -serial unix:./src.serial,server,nowait
+> -monitor stdio
+> 
+> It seems something related to your notice: You'll need to fix the numbers of KVM_CAP_ARM_HVC_TO_USER and KVM_CAP_ARM_PSCI_TO_USER
+> to match your host kernel.
+> 
+> But I'm not actually understand what should I fix, since I haven't review the patch series. Could you give me some more information? Maybe I'm doing something wrong.
+> 
+
+When the kernel is rebased to v6.2.rc3, the two capabilities are conflictsing
+between QEMU and host kernel. Please adjust them like below and have a try:
+
+In qemu/linux-headers/linux/kvm.h
+
+#define KVM_CAP_ARM_HVC_TO_USER 250 /* TODO: as per linux 6.1-rc2 */
+#define KVM_CAP_ARM_PSCI_TO_USER 251 /* TODO: as per linux 6.1-rc2 */
+
+In linux/include/uapi/linux/kvm.h
+
+#define KVM_CAP_ARM_HVC_TO_USER 250
+#define KVM_CAP_ARM_PSCI_TO_USER 251
+
+Thanks,
+Gavin
+
+
