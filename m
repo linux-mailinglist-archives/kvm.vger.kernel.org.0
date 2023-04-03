@@ -2,55 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AF72F6D4623
-	for <lists+kvm@lfdr.de>; Mon,  3 Apr 2023 15:49:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6CB506D4622
+	for <lists+kvm@lfdr.de>; Mon,  3 Apr 2023 15:49:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232693AbjDCNte (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 3 Apr 2023 09:49:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51878 "EHLO
+        id S232011AbjDCNtd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 3 Apr 2023 09:49:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51880 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232503AbjDCNt0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S232453AbjDCNt0 (ORCPT <rfc822;kvm@vger.kernel.org>);
         Mon, 3 Apr 2023 09:49:26 -0400
-Received: from mail-wr1-x434.google.com (mail-wr1-x434.google.com [IPv6:2a00:1450:4864:20::434])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D500EC66
+Received: from mail-wr1-x429.google.com (mail-wr1-x429.google.com [IPv6:2a00:1450:4864:20::429])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B19256E95
         for <kvm@vger.kernel.org>; Mon,  3 Apr 2023 06:49:25 -0700 (PDT)
-Received: by mail-wr1-x434.google.com with SMTP id i9so29434305wrp.3
+Received: by mail-wr1-x429.google.com with SMTP id j24so29470751wrd.0
         for <kvm@vger.kernel.org>; Mon, 03 Apr 2023 06:49:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google; t=1680529764;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=NTOWIebDq0xH5MEdgwVyuiNxE4JxhgEfL/zEAMmcLTQ=;
-        b=Pd745bmnXlfs4LJh75sVHpdsPA+xhcR3XlKK3TosfuE1r4GmjMcCMK//Sg5U8B9OCy
-         QApDpXjTidsFf6gSbmq2SgYwstpQ7u2awLYYx+4Vk6KUWZCwSWqLUJc+NeSG8H+V/dcS
-         Dwbel5nNX0LpskAYoI3JNAv7Z3EznmNWbtxvBkjFqblsWce7z949QLS4zc79G8/BxSbl
-         QSU/Lc8ZBOAeIZwJ/NOLRhqcgUAl4KP04pfjAGGX6zJyVB8QT3D5VkPhJV6sx3HNLe+I
-         Jc9DoN1KL+ilRkw0P1VXc/p4l+WpoPVl1zCyAStMx/mXL11fRlcfkeTPV+1SMtDRrmRW
-         LP+A==
+        bh=GjJ0WrIm2Di0AKuPGaQhGuqTtmI2bcqfL0u1knytYyA=;
+        b=JaVTpA1WR5Yo7HRGCieD9YHpHG6U+azsDNIGhcFsSoWXaTyGJ5nteWKiXEEwk/kw5K
+         4z/HoY6XttEATEGH7ML2L997lwjyaICp58vZdfBt7Ul4c19wLOOL8BaRtOmvSRUuhed7
+         F7xab7P0e5GN5SX2AiIVAfbcRe/dg27YalMfRch9sGsLGTKbnuA8YicvcomfH+IfCH9r
+         yVPY/U2gVCrVeue5OHDtNrUdHp/MGzzkoCWB1mxWhuzHAzkS8TVmgzbRXCEx5/h5OI/5
+         cq4Yc7i4nLK00nhoQn/G9sEJn3XzQD/Ddu+otDQolTbDvgrnOtmxHCp7MTofBVl/bMtO
+         ZnpQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112; t=1680529764;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=NTOWIebDq0xH5MEdgwVyuiNxE4JxhgEfL/zEAMmcLTQ=;
-        b=HOh1Jxb295lVYsjCTC7RrgjQbRW6gtU1mB34VJPSo+EQz02mHPxmDGaE1+E8V7tf2/
-         +Rvkkj5ZRhparrIC6cOz+W20rwxwMliST7SjcL7KjI89qnk9uHpODUJI+7s77xly+anA
-         LE3oYXy1PPsfdOywj0YSST5FknPIKfmkdhBODB47YQlWrp7YUuktjw8t/thj8uXiG/Y3
-         WarNcsDDcvUwsgYn4FOcYmaJdhGX4wAzRiYMstOnsrkbtQS+RVsKLBN0fqJgKlWzJg3E
-         OiZHrgv5ER2wH8tlWusQvowOpoh3nSEjFsOiJG2OSfNHjz7IB92eocRIM0/RFxyNee6V
-         uLhQ==
-X-Gm-Message-State: AAQBX9duSEPru4hg70FWwUjRH0dBBndobhV1UF5a4aHAL2GZa2ajOFQP
-        Zb31qwVPjARmgDNv6or35yR8ag==
-X-Google-Smtp-Source: AKy350ZRhlxNrjjVOSPUKEPVG7isDQmeeJWmbFFZBRlp1mMjzm7Mq0oej7yeF6yUqNQCE7KoPphvYw==
-X-Received: by 2002:a5d:408b:0:b0:2cb:76d4:42ea with SMTP id o11-20020a5d408b000000b002cb76d442eamr29007696wrp.36.1680529764015;
+        bh=GjJ0WrIm2Di0AKuPGaQhGuqTtmI2bcqfL0u1knytYyA=;
+        b=HTAwfnGYIBo5lCF/bnMqABQ4cYjK6ec2GTCilVfpG2wAH3Y44N/eSSGm8lf0uJ18SQ
+         ZoeC/XdIeYmyhxFIDJEcP9uUgQWBBiPLo4OMdSxxbkLHM1lmEn0TQ1CPGew3DJdKwrv4
+         IJcj5JMxovAUDnpUij++SG9LVL7KDMy5xvg2ETwQW87Ig2tE3cenUJDI4oXKsNCbljWq
+         wbnxVMWrHSZ0mHha0xHfuCrlMW/YRvtJ5JcsIcP70r/naJRrS4+ScZLVnjXd70h+2oJ9
+         lj+xBvks2ING2VEIdblmracYiYJwqW8H4DxObNnd9pkJUDaHwT3QTmsAOasjCYNo6Xz3
+         wOVA==
+X-Gm-Message-State: AAQBX9d+Wt5YvXwU/oGGht4ycl6suxO7AgiD20hX0RtRYReGO8d7OOp7
+        Pmc1lW1mqmpqz4guUGlI0gEKRA==
+X-Google-Smtp-Source: AKy350Zih1/UPPhQr8jYeGyPYonELcT+rZRHLNBwD0ldfATP2SC3xnwB/VAGhSWQTnQNEnfb2Ap/xA==
+X-Received: by 2002:adf:ce02:0:b0:2c7:cdf:e548 with SMTP id p2-20020adfce02000000b002c70cdfe548mr27185931wrn.71.1680529764201;
         Mon, 03 Apr 2023 06:49:24 -0700 (PDT)
 Received: from zen.linaroharston ([85.9.250.243])
-        by smtp.gmail.com with ESMTPSA id e11-20020a5d4e8b000000b002cde626cd96sm9760207wru.65.2023.04.03.06.49.21
+        by smtp.gmail.com with ESMTPSA id z6-20020a5d4d06000000b002e6d4ac31a3sm7433916wrt.72.2023.04.03.06.49.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Mon, 03 Apr 2023 06:49:23 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
-        by zen.linaroharston (Postfix) with ESMTP id 51E3D1FFBE;
+        by zen.linaroharston (Postfix) with ESMTP id 6799D1FFBF;
         Mon,  3 Apr 2023 14:49:21 +0100 (BST)
 From:   =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To:     qemu-devel@nongnu.org
@@ -64,10 +64,12 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Wainer dos Santos Moschetta <wainersm@redhat.com>,
         =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
         Cleber Rosa <crosa@redhat.com>, Thomas Huth <thuth@redhat.com>,
-        Kevin Wolf <kwolf@redhat.com>
-Subject: [PATCH v2 06/11] metadata: add .git-blame-ignore-revs
-Date:   Mon,  3 Apr 2023 14:49:15 +0100
-Message-Id: <20230403134920.2132362-7-alex.bennee@linaro.org>
+        Kevin Wolf <kwolf@redhat.com>,
+        Marco Liebel <quic_mliebel@quicinc.com>,
+        Brian Cain <bcain@quicinc.com>
+Subject: [PATCH v2 07/11] Use hexagon toolchain version 16.0.0
+Date:   Mon,  3 Apr 2023 14:49:16 +0100
+Message-Id: <20230403134920.2132362-8-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230403134920.2132362-1-alex.bennee@linaro.org>
 References: <20230403134920.2132362-1-alex.bennee@linaro.org>
@@ -83,50 +85,30 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Someone mentioned this on IRC so I thought I would try it out with a
-few commits that are pure code style fixes.
+From: Marco Liebel <quic_mliebel@quicinc.com>
 
+Signed-off-by: Marco Liebel <quic_mliebel@quicinc.com>
+Reviewed-by: Brian Cain <bcain@quicinc.com>
+Message-Id: <20230329142108.1199509-1-quic_mliebel@quicinc.com>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Message-Id: <20230318115657.1345921-1-alex.bennee@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@linaro.org>
-Tested-by: Philippe Mathieu-Daudé <philmd@linaro.org>
-Message-Id: <20230330101141.30199-6-alex.bennee@linaro.org>
-
+Message-Id: <20230330101141.30199-7-alex.bennee@linaro.org>
 ---
-v2
-  - rm extraneous +
----
- .git-blame-ignore-revs | 21 +++++++++++++++++++++
- 1 file changed, 21 insertions(+)
- create mode 100644 .git-blame-ignore-revs
+ tests/docker/dockerfiles/debian-hexagon-cross.docker | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/.git-blame-ignore-revs b/.git-blame-ignore-revs
-new file mode 100644
-index 0000000000..93718ef425
---- /dev/null
-+++ b/.git-blame-ignore-revs
-@@ -0,0 +1,21 @@
-+#
-+# List of code-formatting clean ups the git blame can ignore
-+#
-+#   git blame --ignore-revs-file .git-blame-ignore-revs
-+#
-+# or
-+#
-+#   git config blame.ignoreRevsFile .git-blame-ignore-revs
-+#
-+
-+# gdbstub: clean-up indents
-+ad9e4585b3c7425759d3eea697afbca71d2c2082
-+
-+# e1000e: fix code style
-+0eadd56bf53ab196a16d492d7dd31c62e1c24c32
-+
-+# target/riscv: coding style fixes
-+8c7feddddd9218b407792120bcfda0347ed16205
-+
-+# replace TABs with spaces
-+48805df9c22a0700fba4b3b548fafaa21726ca68
+diff --git a/tests/docker/dockerfiles/debian-hexagon-cross.docker b/tests/docker/dockerfiles/debian-hexagon-cross.docker
+index 5308ccb8fe..b99d99f943 100644
+--- a/tests/docker/dockerfiles/debian-hexagon-cross.docker
++++ b/tests/docker/dockerfiles/debian-hexagon-cross.docker
+@@ -27,7 +27,7 @@ RUN apt-get update && \
+ 
+ 
+ ENV TOOLCHAIN_INSTALL /opt
+-ENV TOOLCHAIN_RELEASE 15.0.3
++ENV TOOLCHAIN_RELEASE 16.0.0
+ ENV TOOLCHAIN_BASENAME "clang+llvm-${TOOLCHAIN_RELEASE}-cross-hexagon-unknown-linux-musl"
+ ENV TOOLCHAIN_URL https://codelinaro.jfrog.io/artifactory/codelinaro-toolchain-for-hexagon/v${TOOLCHAIN_RELEASE}/${TOOLCHAIN_BASENAME}.tar.xz
+ 
 -- 
 2.39.2
 
