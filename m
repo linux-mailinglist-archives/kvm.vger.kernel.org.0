@@ -2,197 +2,153 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 827186D5378
-	for <lists+kvm@lfdr.de>; Mon,  3 Apr 2023 23:26:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6EECA6D537E
+	for <lists+kvm@lfdr.de>; Mon,  3 Apr 2023 23:29:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233498AbjDCV0M (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 3 Apr 2023 17:26:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44922 "EHLO
+        id S232683AbjDCV3A (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 3 Apr 2023 17:29:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47230 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233702AbjDCV0G (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 3 Apr 2023 17:26:06 -0400
-Received: from mail-oo1-xc35.google.com (mail-oo1-xc35.google.com [IPv6:2607:f8b0:4864:20::c35])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A79AF46AB
-        for <kvm@vger.kernel.org>; Mon,  3 Apr 2023 14:26:01 -0700 (PDT)
-Received: by mail-oo1-xc35.google.com with SMTP id f24-20020a4aeb18000000b0053b78077c9dso4856317ooj.12
-        for <kvm@vger.kernel.org>; Mon, 03 Apr 2023 14:26:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1680557161;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kj5a1Gjv5u3ed9nScVQuCJw/TrKNl0CS2e9DPpgpMXA=;
-        b=mgVL+rENIqJd9I9v7V0Guir9ljCZePQyRnCXisG5f1mOrzACjXVqszlL/X48Vanzo1
-         CjSAKSQ0mdQ3p/mVUVSOmzOOqszaQHXxfclviPRo7GCBAmHcdoGZhoxlEQaU8vjkjidC
-         JWA048aq1fb0aq47KQ58KMM30zZ5KBhy6EsFxZzk0M2LfmX4jpgE6Ql0UflKmsqGB0qR
-         Z9m3xzs0lYj8z/0uAiioNURmyO3StSqsmubWQ0qfIG9mfMR9plqhEZixLkCYodxZuzUN
-         GB0dBemlcOud2MslvusZ4ZQYOnAkm0OQ8dplUsrUoKquub/JZFFSyNLdq6+HzrSlFfeF
-         DNrg==
+        with ESMTP id S231513AbjDCV26 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 3 Apr 2023 17:28:58 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1E4C173F
+        for <kvm@vger.kernel.org>; Mon,  3 Apr 2023 14:28:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1680557294;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Tf7MHv60vp2k26fwOLDFA2jNT1TsKbPHn/4l+Hwjf/s=;
+        b=Q+7N8Eqx/QzYCWwXUMqJ4GNrNgd0Z35DVYQIQ3N6f/4M/evJtzQO+ctaFkSRdYdV/20MiV
+        gxWrt0l/lS122kejwaiObUYQlrc3xgdKqPhtRayvvVt6McuyKN2wC7C+qr79UgFmQrfbFp
+        CemeA5q5XYvNoTydL7OzwTUz87Iuleo=
+Received: from mail-il1-f200.google.com (mail-il1-f200.google.com
+ [209.85.166.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-201-8-pHF-YrM7mWS0tFTKyYMg-1; Mon, 03 Apr 2023 17:28:12 -0400
+X-MC-Unique: 8-pHF-YrM7mWS0tFTKyYMg-1
+Received: by mail-il1-f200.google.com with SMTP id c6-20020a056e020bc600b00325da077351so19829937ilu.11
+        for <kvm@vger.kernel.org>; Mon, 03 Apr 2023 14:28:12 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680557161;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=kj5a1Gjv5u3ed9nScVQuCJw/TrKNl0CS2e9DPpgpMXA=;
-        b=Y5rP23agGrtf4c3cUisPjObzNyJqW48PyNxXJBDxD/tdTxUlSFFXEWIxkTur3T/ni8
-         +5Jplm4gExxkCpDqqT3wYQj2FCg4JsZYFvDIQ5FL1KkpLIkO0g27NSfBmT1RwnFkP+e+
-         hXdkNp8c8R4yhB0ydGpPZCNRUXZyk4dlcus/zkkjPskUXLT3+yS1MKaHscB6meSFUbEc
-         2mww9tCshcT6muZRNWSGR7CcdIWSmordRChWljOBiUBoKqVmIizPMzmVBOskWu8iao9N
-         x+FHzuw/iD6DHGvvlsDqHlM9qCS3eJpZLOfdeUmVIT7ytFSBLRfkdXdN4IEkxcHSATMO
-         5vSw==
-X-Gm-Message-State: AAQBX9eKB4uXEeLsIWSxneB2SF/g95sD6zz+NTTREwdb0Asc9qEFhGWj
-        Hb0LoOhto/SFwwCZWI+PzDiweX/WZ2H2lSaF7vyiWw==
-X-Google-Smtp-Source: AKy350Zqul6mVyvawVN/gE10vGUZ571dKlqpaiOYYFKigQGJiSFxqug/tZdueykq19XibUWA6mbqM9ZFY60UoL6xlFM=
-X-Received: by 2002:a4a:a406:0:b0:53e:944:8896 with SMTP id
- v6-20020a4aa406000000b0053e09448896mr354553ool.0.1680557160674; Mon, 03 Apr
- 2023 14:26:00 -0700 (PDT)
+        d=1e100.net; s=20210112; t=1680557292;
+        h=content-transfer-encoding:mime-version:organization:references
+         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Tf7MHv60vp2k26fwOLDFA2jNT1TsKbPHn/4l+Hwjf/s=;
+        b=yUSwRoK5YHPP+U9qwIgj3vPo84fCqqzimG6RidOl9nqjMYlup6B7qGfBm+JwZSZqjy
+         hKqBcrvGVYxRE86cRvB2+YJKg71NGhB+tchIJlj7vGOQMQaceQJHV/xq4UdZYNrdSJ97
+         V6Ys8+0uNZxpffhUab3dBVS/AK+q8jI33OfP8E/WBC5O94/QMTZFTYyyq1KoAKjN28r0
+         cmDSDVHONwlMfTgFE7MPe6vUkkDisMhaqc4QxQlSHG/k/ipRDL1nchJCW3GxsMYISU4z
+         676mUHLVVy8vWk78lvx7L+J6iZEo6pS9apJEj4gMl+pZRZ9A/a7r2LJ+4sQp8oHExmrX
+         Es+A==
+X-Gm-Message-State: AAQBX9ejKCuvO+Zq4B0ir+YWb4jkjo08qc10KBiIEH+SKO03Mbys5On2
+        PSPvpn+bzxPiX87hYgRzTL/sOhBrGfXvFD1GKRM+pZinWD4dNtp77PVs3HO6+L+t4Uip/hcmdKn
+        GfOtf1keHNoZc
+X-Received: by 2002:a5e:a616:0:b0:753:786a:c003 with SMTP id q22-20020a5ea616000000b00753786ac003mr635329ioi.3.1680557292183;
+        Mon, 03 Apr 2023 14:28:12 -0700 (PDT)
+X-Google-Smtp-Source: AKy350ZeBK8jTQpKRj3YBDYuYCPItaKYhl3sLPkbYtcifrm13UX1o2MlMCVl8RcR5FlNr5W/UN0JmA==
+X-Received: by 2002:a5e:a616:0:b0:753:786a:c003 with SMTP id q22-20020a5ea616000000b00753786ac003mr635315ioi.3.1680557291980;
+        Mon, 03 Apr 2023 14:28:11 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id v11-20020a056638250b00b00408df9534c9sm2774141jat.130.2023.04.03.14.28.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 03 Apr 2023 14:28:11 -0700 (PDT)
+Date:   Mon, 3 Apr 2023 15:28:09 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Nipun Gupta <nipun.gupta@amd.com>
+Cc:     <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
+        <git@amd.com>, <harpreet.anand@amd.com>, <michal.simek@amd.com>
+Subject: Re: [PATCH] vfio/cdx: add support for CDX bus
+Message-ID: <20230403152809.239a4988.alex.williamson@redhat.com>
+In-Reply-To: <20230403142525.29494-1-nipun.gupta@amd.com>
+References: <20230403142525.29494-1-nipun.gupta@amd.com>
+Organization: Red Hat
 MIME-Version: 1.0
-References: <20230206172340.2639971-1-rananta@google.com> <20230206172340.2639971-7-rananta@google.com>
- <ZCTVFYd2oJnGR6O+@linux.dev>
-In-Reply-To: <ZCTVFYd2oJnGR6O+@linux.dev>
-From:   Raghavendra Rao Ananta <rananta@google.com>
-Date:   Mon, 3 Apr 2023 14:25:49 -0700
-Message-ID: <CAJHc60wfkYiO95c-oY1jSNyRBLtjBvr6bDDbBw26DxqiY4MSmA@mail.gmail.com>
-Subject: Re: [PATCH v2 6/7] KVM: arm64: Break the table entries using TLBI
- range instructions
-To:     Oliver Upton <oliver.upton@linux.dev>
-Cc:     Oliver Upton <oupton@google.com>, Marc Zyngier <maz@kernel.org>,
-        Ricardo Koller <ricarkol@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Colton Lewis <coltonlewis@google.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-15.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,ENV_AND_HDR_SPF_MATCH,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL,
-        USER_IN_DEF_SPF_WL autolearn=unavailable autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 29, 2023 at 5:17=E2=80=AFPM Oliver Upton <oliver.upton@linux.de=
-v> wrote:
->
-> nit: s/break/invalidate/g
->
-> There is a rather important degree of nuance there. 'Break' as it
-> relates to break-before-make implies that the PTE is made invalid and
-> visible to hardware _before_ a subsequent invalidation. There will be
-> systems that relax this requirement and also support TLBIRANGE.
->
-> On Mon, Feb 06, 2023 at 05:23:39PM +0000, Raghavendra Rao Ananta wrote:
->
-> Some nitpicking on the changelog:
->
-> > Currently, when breaking up the stage-2 table entries, KVM
->
-> 'breaking up stage-2 table entries' is rather ambiguous. Instead
-> describe the operation taking place on the page tables (i.e. hugepage
-> collapse).
->
-> > would flush the entire VM's context using 'vmalls12e1is'
-> > TLBI operation. One of the problematic situation is collapsing
-> > table entries into a hugepage, specifically if the VM is
-> > faulting on many hugepages (say after dirty-logging). This
-> > creates a performance penality for the guest whose pages have
->
-> typo: penalty
->
-> > already been faulted earlier as they would have to refill their
-> > TLBs again.
-> >
-> > Hence, if the system supports it, use __kvm_tlb_flush_range_vmid_ipa()
->
-> > to flush only the range of pages governed by the table entry,
-> > while leaving other TLB entries alone. An upcoming patch also
-> > takes advantage of this when breaking up table entries during
-> > the unmap operation.
->
-> Language regarding an upcoming patch isn't necessary, as this one stands
-> on its own (implements and uses a range-based invalidation helper).
->
-> > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-> > ---
-> >  arch/arm64/kvm/hyp/pgtable.c | 23 ++++++++++++++++++++---
-> >  1 file changed, 20 insertions(+), 3 deletions(-)
-> >
-> > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.=
-c
-> > index b11cf2c618a6c..0858d1fa85d6b 100644
-> > --- a/arch/arm64/kvm/hyp/pgtable.c
-> > +++ b/arch/arm64/kvm/hyp/pgtable.c
-> > @@ -686,6 +686,20 @@ static bool stage2_try_set_pte(const struct kvm_pg=
-table_visit_ctx *ctx, kvm_pte_
-> >       return cmpxchg(ctx->ptep, ctx->old, new) =3D=3D ctx->old;
-> >  }
-> >
-> > +static void kvm_pgtable_stage2_flush_range(struct kvm_s2_mmu *mmu, u64=
- start, u64 end,
-> > +                                             u32 level, u32 tlb_level)
-> > +{
-> > +     if (system_supports_tlb_range())
->
-> You also check this in __kvm_tlb_flush_range(), ideally this should be
-> done exactly once per call.
->
-> > +             kvm_call_hyp(__kvm_tlb_flush_range_vmid_ipa, mmu, start, =
-end, level, tlb_level);
-> > +     else
-> > +             /*
-> > +              * Invalidate the whole stage-2, as we may have numerous =
-leaf
-> > +              * entries below us which would otherwise need invalidati=
-ng
-> > +              * individually.
-> > +              */
-> > +             kvm_call_hyp(__kvm_tlb_flush_vmid, mmu);
-> > +}
-> > +
-> >  /**
-> >   * stage2_try_break_pte() - Invalidates a pte according to the
-> >   *                       'break-before-make' requirements of the
-> > @@ -721,10 +735,13 @@ static bool stage2_try_break_pte(const struct kvm=
-_pgtable_visit_ctx *ctx,
-> >        * Perform the appropriate TLB invalidation based on the evicted =
-pte
-> >        * value (if any).
-> >        */
-> > -     if (kvm_pte_table(ctx->old, ctx->level))
-> > -             kvm_call_hyp(__kvm_tlb_flush_vmid, mmu);
-> > -     else if (kvm_pte_valid(ctx->old))
-> > +     if (kvm_pte_table(ctx->old, ctx->level)) {
-> > +             u64 end =3D ctx->addr + kvm_granule_size(ctx->level);
-> > +
-> > +             kvm_pgtable_stage2_flush_range(mmu, ctx->addr, end, ctx->=
-level, 0);
-> > +     } else if (kvm_pte_valid(ctx->old)) {
-> >               kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, mmu, ctx->addr, ct=
-x->level);
-> > +     }
-> >
-> >       if (stage2_pte_is_counted(ctx->old))
-> >               mm_ops->put_page(ctx->ptep);
-> > --
-> > 2.39.1.519.gcb327c4b5f-goog
-> >
-> >
-ACK on all of the comments. I'll address them in next revision.
+On Mon, 3 Apr 2023 19:55:25 +0530
+Nipun Gupta <nipun.gupta@amd.com> wrote:
+> diff --git a/drivers/vfio/cdx/Makefile b/drivers/vfio/cdx/Makefile
+> new file mode 100644
+> index 000000000000..82e4ef412c0f
+> --- /dev/null
+> +++ b/drivers/vfio/cdx/Makefile
+...
+> +static int vfio_cdx_mmap_mmio(struct vfio_cdx_region region,
+> +			      struct vm_area_struct *vma)
+> +{
+> +	u64 size = vma->vm_end - vma->vm_start;
+> +	u64 pgoff, base;
+> +
+> +	pgoff = vma->vm_pgoff &
+> +		((1U << (VFIO_CDX_OFFSET_SHIFT - PAGE_SHIFT)) - 1);
+> +	base = pgoff << PAGE_SHIFT;
+> +
+> +	if (region.size < PAGE_SIZE || base + size > region.size)
+> +		return -EINVAL;
+> +
+> +	vma->vm_pgoff = (region.addr >> PAGE_SHIFT) + pgoff;
+> +	vma->vm_page_prot = pgprot_noncached(vma->vm_page_prot);
+> +
+> +	return remap_pfn_range(vma, vma->vm_start, vma->vm_pgoff,
+> +			       size, vma->vm_page_prot);
+> +}
+> +
+> +static int vfio_cdx_mmap(struct vfio_device *core_vdev,
+> +			 struct vm_area_struct *vma)
+> +{
+> +	struct vfio_cdx_device *vdev =
+> +		container_of(core_vdev, struct vfio_cdx_device, vdev);
+> +	struct cdx_device *cdx_dev = vdev->cdx_dev;
+> +	unsigned int index;
+> +
+> +	index = vma->vm_pgoff >> (VFIO_CDX_OFFSET_SHIFT - PAGE_SHIFT);
+> +
+> +	if (vma->vm_end < vma->vm_start)
+> +		return -EINVAL;
+> +	if (vma->vm_start & ~PAGE_MASK)
+> +		return -EINVAL;
+> +	if (vma->vm_end & ~PAGE_MASK)
+> +		return -EINVAL;
+> +	if (!(vma->vm_flags & VM_SHARED))
+> +		return -EINVAL;
+> +	if (index >= cdx_dev->res_count)
+> +		return -EINVAL;
+> +
+> +	if (!(vdev->regions[index].flags & VFIO_REGION_INFO_FLAG_MMAP))
+> +		return -EINVAL;
+> +
+> +	if (!(vdev->regions[index].flags & VFIO_REGION_INFO_FLAG_READ) &&
+> +	    (vma->vm_flags & VM_READ))
+> +		return -EINVAL;
+> +
+> +	if (!(vdev->regions[index].flags & VFIO_REGION_INFO_FLAG_WRITE) &&
+> +	    (vma->vm_flags & VM_WRITE))
+> +		return -EINVAL;
+> +
+> +	vma->vm_private_data = cdx_dev;
+> +
+> +	return vfio_cdx_mmap_mmio(vdev->regions[index], vma);
+> +}
 
-Thank you.
-Raghavendra
->
-> --
-> Thanks,
-> Oliver
+I see discussion of MMIO_REGIONS_ENABLE controlling host access to the
+device in mc_cdx_pcol.h.  Is a user of vfio-cdx able to manipulate
+whether MMIO space of the device is enabled?  If so, what's the system
+response to accessing MMIO through the mmap while disabled?  Is MMIO
+space accessible even through calling the RESET ioctl?  Is there a
+public specification somewhere for CDX?  Thanks,
+
+Alex
+
