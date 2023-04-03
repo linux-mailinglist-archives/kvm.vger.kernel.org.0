@@ -2,144 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DD7326D437D
-	for <lists+kvm@lfdr.de>; Mon,  3 Apr 2023 13:28:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 690056D4388
+	for <lists+kvm@lfdr.de>; Mon,  3 Apr 2023 13:31:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232433AbjDCL2n (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 3 Apr 2023 07:28:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33214 "EHLO
+        id S232218AbjDCLbX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 3 Apr 2023 07:31:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36574 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232238AbjDCL2l (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 3 Apr 2023 07:28:41 -0400
-Received: from mail-wr1-x42a.google.com (mail-wr1-x42a.google.com [IPv6:2a00:1450:4864:20::42a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41DA4B44F
-        for <kvm@vger.kernel.org>; Mon,  3 Apr 2023 04:28:39 -0700 (PDT)
-Received: by mail-wr1-x42a.google.com with SMTP id y14so28996942wrq.4
-        for <kvm@vger.kernel.org>; Mon, 03 Apr 2023 04:28:39 -0700 (PDT)
+        with ESMTP id S231626AbjDCLbV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 3 Apr 2023 07:31:21 -0400
+Received: from mail-ed1-x531.google.com (mail-ed1-x531.google.com [IPv6:2a00:1450:4864:20::531])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99A0A2D4A
+        for <kvm@vger.kernel.org>; Mon,  3 Apr 2023 04:31:20 -0700 (PDT)
+Received: by mail-ed1-x531.google.com with SMTP id t10so115825766edd.12
+        for <kvm@vger.kernel.org>; Mon, 03 Apr 2023 04:31:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=grsecurity.net; s=grsec; t=1680521317;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=kbcceqI+2pKpuXfzcAGNVPpZeOMu2CsxP+dsznNa4l8=;
-        b=Z3adzZ362LMcVsF9ahhS3xhjeZ3BKz8Dw561S5ke8kCI7L2IYHFiHh475BI8kZLLRF
-         gHnZPZ0pAeUFm2Cn4ujcUGG6TCgg915fhYdp8fcXE8EC5wgEnq3h+DE0+9YICCOKgPPP
-         pm87/5Uw0wFvvmIGyZyWyY3kpCC2F8RLYUbf7gtKWHI4jPuTFPApzeaVW/ChU8cfaA5F
-         ccPZd4KXGS+rVjXgHYeZ+tPo7mWc3Ay1cGRcdCTkgn7L4lgTyz3Vf8Ce/24o2DymoTyR
-         tlG0EVqHXUuTZkfRAw7K2aadXBF+soKv04+cn8reR7kdekDFwK41xk1v+SWSPQx0YKoq
-         BeHQ==
+        d=ventanamicro.com; s=google; t=1680521479;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=YcQcHVUeSM2zYODLoqIXNbDNYCp1LquQUGBod5NxxrU=;
+        b=MUH+FkWmhAqp+d3dxhf5ilxC49HG89GtfiPt2fXx77t1/qlF2PBIozQ2Xscb9oA9NU
+         4OhAXKGsLYPeCr8ROMQncNiUKbgXDYYheKx4FNRAJ9fjScAtvGqcPqHry8IWwCQGC3nd
+         dlKxn1D1iD39GAHilOpgg4xWPpYAiymSjoiF9NxP2UbqPmVWNN75O6JEawXhRdmfXX8z
+         RTvzQj/GHdXGJkDx6/kSS3ZzFAZFlW+zMTFKFrGoW8gJiR3sBZqhBlEDz/EAYd+MDIP8
+         fN8Gqfk9gK5RavABiGawEBeMY9X4SRXQGUVEyaEz8pzfN770Nst4eUT/qmX9uruuirZI
+         8nnw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680521317;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=kbcceqI+2pKpuXfzcAGNVPpZeOMu2CsxP+dsznNa4l8=;
-        b=t+zfQnlRS62cj7n0ySv/70JVXQkkYdbLszlIE3R96mxBbtAYJT5bnNi/78o8Tgi2/I
-         FWQngWYb1PegO15yrNTVllCuTaE6BMDvk+fOJryz4CYBWsM0sLDmM0R1zaWBlOjrxJ2A
-         ZA0pbBC4phCkavQqqB32nBaGKN/hrPxeOldsgl2IxUyXjuDkIj4u7of9ijm2BnKt/4pZ
-         nZdkQ6K+yRzgxrPegZzXKrUMsTqPJyUK90AIF4Y+XLCOYVa1Zs4SseopZ4chvDRxKXKd
-         X032QlF4G+XUTmWA1AuthuC35VwFvZ3FGrM8KN2qZPbCV0jj8QVL6PNd+Y41vZLoIg9j
-         IJfg==
-X-Gm-Message-State: AAQBX9eADUEAetmjzDM6N3EqBkQ9Fyr1gFF/wW5ff9JdpytJfCrFQ8EF
-        hp+UiYVb2FSE3SYZ2Og88dlHx9/kXrw7mLEJh2uaHg==
-X-Google-Smtp-Source: AKy350YAh+na9aQjLXnf4GF/VDPY3OKi2qJsvqFuk0EwPsm4rnjU2+sKJynG6DQDHLyp8u/QORxq6Q==
-X-Received: by 2002:adf:e748:0:b0:2e5:8874:d883 with SMTP id c8-20020adfe748000000b002e58874d883mr8583060wrn.8.1680521317558;
-        Mon, 03 Apr 2023 04:28:37 -0700 (PDT)
-Received: from ?IPV6:2003:f6:af22:1600:2f4c:bf50:182f:1b04? (p200300f6af2216002f4cbf50182f1b04.dip0.t-ipconnect.de. [2003:f6:af22:1600:2f4c:bf50:182f:1b04])
-        by smtp.gmail.com with ESMTPSA id e38-20020a5d5966000000b002d78a96cf5fsm9591452wri.70.2023.04.03.04.28.36
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 03 Apr 2023 04:28:37 -0700 (PDT)
-Message-ID: <dc285a74-9cce-2886-f8aa-f10e1a94f6f5@grsecurity.net>
-Date:   Mon, 3 Apr 2023 13:28:36 +0200
+        d=1e100.net; s=20210112; t=1680521479;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YcQcHVUeSM2zYODLoqIXNbDNYCp1LquQUGBod5NxxrU=;
+        b=NG76qeG+nIO7SG9KlCgWSHQBlYsyvdfUE5jdE4dfBC8YlGhGmi3VIsqmyAcg9+2k4Z
+         4HA+lokhkk9QPtSGZAcefcMW9ZYLi05F95rlvFNa4fRuItqlZ+0zlxfFDriHplZJN5Ix
+         piPW8sq2zJIHzs24fpds0fSc3Upn8exIhrlaQBwv0fI18F1GttCdh+Xw5Sy5yjl797qz
+         IkAjt5xI2EBcHuFrNlHFN/gkL2aFz67iHjepl3/86FylqGzP24RQQrSMFbLf3iDWjbmt
+         tKIt88/x9P7XiDTJZ3402WIQVSfHf5EED+ez2575vbDiT+MO1R4b45GhPm5tISkpOUwY
+         c0iA==
+X-Gm-Message-State: AAQBX9fs9ypFr6kIxTDHxMiI02TjVs+7+CVG6782XKopmp1hfUohUZuu
+        q0eLu2Z/1DpMO+TZscY0W3WAEw==
+X-Google-Smtp-Source: AKy350bks61W66k0lSbPXddI6pPorUDq+Ko8KS9lP2tr7b73279KTPnmSiWqrjFY+j5WQFvL71DmGQ==
+X-Received: by 2002:a17:906:8a41:b0:92b:6f92:7705 with SMTP id gx1-20020a1709068a4100b0092b6f927705mr31534625ejc.40.1680521479131;
+        Mon, 03 Apr 2023 04:31:19 -0700 (PDT)
+Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
+        by smtp.gmail.com with ESMTPSA id b17-20020a170906491100b008e57b5e0ce9sm4387728ejq.108.2023.04.03.04.31.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 03 Apr 2023 04:31:18 -0700 (PDT)
+Date:   Mon, 3 Apr 2023 13:31:18 +0200
+From:   Andrew Jones <ajones@ventanamicro.com>
+To:     Anup Patel <apatel@ventanamicro.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Atish Patra <atishp@atishpatra.org>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Anup Patel <anup@brainfault.org>, kvm@vger.kernel.org,
+        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 6/8] RISC-V: KVM: Add ONE_REG interface for AIA CSRs
+Message-ID: <osrpjiywxtkgxb5i6mfvxzfrzrnjv75uqzvlu3fouo4mqsktgj@blcmyjt3twqg>
+References: <20230403093310.2271142-1-apatel@ventanamicro.com>
+ <20230403093310.2271142-7-apatel@ventanamicro.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.9.0
-Subject: Re: [kvm-unit-tests PATCH v3 3/4] x86/access: Forced emulation
- support
-Content-Language: en-US, de-DE
-To:     kvm@vger.kernel.org
-Cc:     Sean Christopherson <seanjc@google.com>
-References: <20230403105618.41118-1-minipli@grsecurity.net>
- <20230403105618.41118-4-minipli@grsecurity.net>
-From:   Mathias Krause <minipli@grsecurity.net>
-In-Reply-To: <20230403105618.41118-4-minipli@grsecurity.net>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-1.2 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
-        DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230403093310.2271142-7-apatel@ventanamicro.com>
+X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
+        DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 03.04.23 12:56, Mathias Krause wrote:
-> Add support to enforce access tests to be handled by the emulator, if
-> supported by KVM. Exclude it from the ac_test_exec() test, though, to
-> not slow it down too much.
+On Mon, Apr 03, 2023 at 03:03:08PM +0530, Anup Patel wrote:
+> We implement ONE_REG interface for AIA CSRs as a separate subtype
+> under the CSR ONE_REG interface.
+> 
+> Signed-off-by: Anup Patel <apatel@ventanamicro.com>
+> ---
+>  arch/riscv/include/uapi/asm/kvm.h | 8 ++++++++
+>  arch/riscv/kvm/vcpu.c             | 8 ++++++++
+>  2 files changed, 16 insertions(+)
+> 
+> diff --git a/arch/riscv/include/uapi/asm/kvm.h b/arch/riscv/include/uapi/asm/kvm.h
+> index 182023dc9a51..cbc3e74fa670 100644
+> --- a/arch/riscv/include/uapi/asm/kvm.h
+> +++ b/arch/riscv/include/uapi/asm/kvm.h
+> @@ -79,6 +79,10 @@ struct kvm_riscv_csr {
+>  	unsigned long scounteren;
+>  };
+>  
+> +/* AIA CSR registers for KVM_GET_ONE_REG and KVM_SET_ONE_REG */
+> +struct kvm_riscv_aia_csr {
+> +};
+> +
+>  /* TIMER registers for KVM_GET_ONE_REG and KVM_SET_ONE_REG */
+>  struct kvm_riscv_timer {
+>  	__u64 frequency;
+> @@ -107,6 +111,7 @@ enum KVM_RISCV_ISA_EXT_ID {
+>  	KVM_RISCV_ISA_EXT_ZIHINTPAUSE,
+>  	KVM_RISCV_ISA_EXT_ZICBOM,
+>  	KVM_RISCV_ISA_EXT_ZBB,
 
-I tend to read a lot of objdumps and when initially looking at the
-generated code it was kinda hard to recognize the FEP instruction, as
-the FEP actually decodes to UD2 followed by some IMUL instruction that
-lacks a byte, so when objdump does its linear disassembly, it eats a
-byte from the to-be-emulated instruction. Like, "FEP; int $0xc3" would
-decode to:
-   0:	0f 0b                	ud2
-   2:	6b 76 6d cd          	imul   $0xffffffcd,0x6d(%rsi),%esi
-   6:	c3                   	retq
-This is slightly confusing, especially when the shortened instruction is
-actually a valid one as above ("retq" vs "int $0xc3").
-
-I have the below diff to "fix" that. It adds 0x3e to the FEP which would
-restore objdump's ability to generate a proper disassembly that won't
-destroy the to-be-emulated instruction. As 0x3e decodes to the DS prefix
-byte, which the emulator assumes by default anyways, this should mostly
-be a no-op. However, it helped me to get a proper code dump.
-
-If there's interest, I can send a proper patch. If not, this might help
-others to understand garbled objdumps involving the FEP ;)
-
---- a/lib/x86/desc.h
-+++ b/lib/x86/desc.h
-@@ -104,6 +104,7 @@ typedef struct  __attribute__((packed)) {
-
- /* Forced emulation prefix, used to invoke the emulator unconditionally. */
- #define KVM_FEP "ud2; .byte 'k', 'v', 'm';"
-+#define KVM_FEP_PRETTY KVM_FEP ".byte 0x3e;"
- #define ASM_TRY_FEP(catch) __ASM_TRY(KVM_FEP, catch)
-
- static inline bool is_fep_available(void)
-diff --git a/x86/access.c b/x86/access.c
-index eab3959bc871..ab1913313fbb 100644
---- a/x86/access.c
-+++ b/x86/access.c
-@@ -811,7 +811,7 @@ static int ac_test_do_access(ac_test_t *at)
-                asm volatile ("mov $fixed2, %%rsi \n\t"
-                              "cmp $0, %[fep] \n\t"
-                              "jz 1f \n\t"
--                             KVM_FEP
-+                             KVM_FEP_PRETTY
-                              "1: mov (%[addr]), %[reg] \n\t"
-                              "fixed2:"
-                              : [reg]"=r"(r), [fault]"=a"(fault), "=b"(e)
-@@ -838,12 +838,12 @@ static int ac_test_do_access(ac_test_t *at)
-                      "jnz 1f \n\t"
-                      "cmp $0, %[fep] \n\t"
-                      "jz 0f \n\t"
--                     KVM_FEP
-+                     KVM_FEP_PRETTY
-                      "0: mov (%[addr]), %[reg] \n\t"
-                      "jmp done \n\t"
-                      "1: cmp $0, %[fep] \n\t"
-                      "jz 0f \n\t"
--                     KVM_FEP
-+                     KVM_FEP_PRETTY
-                      "0: mov %[reg], (%[addr]) \n\t"
-                      "jmp done \n\t"
-                      "2: call *%[addr] \n\t"
-
+Looks like this patch is also based on "[PATCH] RISC-V: KVM: Allow Zbb
+extension for Guest/VM"
 
 Thanks,
-Mathias
+drew
