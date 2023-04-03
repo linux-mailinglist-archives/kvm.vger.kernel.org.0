@@ -2,196 +2,141 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 829326D3C2C
-	for <lists+kvm@lfdr.de>; Mon,  3 Apr 2023 05:37:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1FBF56D3C35
+	for <lists+kvm@lfdr.de>; Mon,  3 Apr 2023 05:46:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230484AbjDCDh0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 2 Apr 2023 23:37:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46616 "EHLO
+        id S231320AbjDCDqZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 2 Apr 2023 23:46:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49468 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230192AbjDCDhY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 2 Apr 2023 23:37:24 -0400
-Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA38B72BC
-        for <kvm@vger.kernel.org>; Sun,  2 Apr 2023 20:37:22 -0700 (PDT)
+        with ESMTP id S231295AbjDCDqX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 2 Apr 2023 23:46:23 -0400
+Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A848693D1;
+        Sun,  2 Apr 2023 20:46:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1680493042; x=1712029042;
+  t=1680493581; x=1712029581;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=RoBj8L0+FlXiFiZc0OsVac2fgoZBe/txBJA7aUvnXe8=;
-  b=eDxph58+qG3LKP4qka1VxysTQ1bXFKHEjoOM4sl1bUeHSgV38UJXMqdV
-   Hs+iSZ1BCIthyT5dR+uYtxWA1DOZP8Knz+Azm5NqByz6H60ztTIJksenc
-   juzBAzSvwa42+26GPO8XJEgiiq81G/P4FMQhFvfojRQDxjHJSowUPC7lx
-   /ftVHfaNn03BLCJjChz7GRsMRkzY9AjaHmfTFjNTwkxTZYEMkt9ayYQZL
-   6wQPinMwzfg9JS1TsjTetLPdOOSd5E6oK4na1sOCp7YnA9AIVnsXEad5+
-   Le2+LYqTII1j+iWza91r6C66epjom6qj35J74Tc60Ke2RH2dIhMJiJcEo
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10668"; a="339296769"
+  bh=wnzNf0gd51fOt3CJV4bjBBkYPO54QFZwipzBf7ePuCc=;
+  b=PmNTtrMNF4GXeRFoXnJVwmWFdP94x+rhyl67se0QCLPzHevAIc9UA7XW
+   dUjPsQnUZrfdcefI62PCYNcE6Xc62Re0oFUqkbloCSByQpnJNk5zoO+gl
+   xD1fLc5bO0E1GCBAtpufqZgM9uXKB4UmhNgnccNT8gxvd4132gDaQGsh+
+   wA1YtvBEC0/jpY1gJ0Qak4A+dhKEOUPeapNH377mTIY+Gnwh8iakZxqnV
+   6pzorqVBna+3Kf9x/QTQwTgMhx1CGOKUpTbe1EnnWfiv3R6SUVHY1vwxQ
+   zjUI3w7PD1951HULVx8fg2lb1qQj5BeueHQEoX3Pzi8AQwkKNW+7u/Vfi
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10668"; a="325800919"
 X-IronPort-AV: E=Sophos;i="5.98,313,1673942400"; 
-   d="scan'208";a="339296769"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Apr 2023 20:37:22 -0700
+   d="scan'208";a="325800919"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Apr 2023 20:46:21 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10668"; a="635964146"
+X-IronPort-AV: E=McAfee;i="6600,9927,10668"; a="829407306"
 X-IronPort-AV: E=Sophos;i="5.98,313,1673942400"; 
-   d="scan'208";a="635964146"
-Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.254.210.241]) ([10.254.210.241])
-  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Apr 2023 20:37:20 -0700
-Message-ID: <349bd65a-233e-587c-25b2-12b6031b12b6@linux.intel.com>
-Date:   Mon, 3 Apr 2023 11:37:18 +0800
+   d="scan'208";a="829407306"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.249.175.225]) ([10.249.175.225])
+  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Apr 2023 20:46:17 -0700
+Message-ID: <24ddf589-34a4-b312-72c1-8176ee3e8b35@intel.com>
+Date:   Mon, 3 Apr 2023 11:46:15 +0800
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.9.0
-Subject: Re: [PATCH v6 2/7] KVM: VMX: Use is_64_bit_mode() to check 64-bit
- mode
-To:     "Huang, Kai" <kai.huang@intel.com>,
-        "Christopherson,, Sean" <seanjc@google.com>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "robert.hu@linux.intel.com" <robert.hu@linux.intel.com>,
-        "Gao, Chao" <chao.gao@intel.com>
-References: <20230319084927.29607-1-binbin.wu@linux.intel.com>
- <20230319084927.29607-3-binbin.wu@linux.intel.com> <ZBhTa6QSGDp2ZkGU@gao-cwp>
- <ZBojJgTG/SNFS+3H@google.com>
- <12c4f1d3c99253f364f3945a998fdccb0ddf300f.camel@intel.com>
- <e0442b13-09f4-0985-3eb4-9b6a20d981fb@linux.intel.com>
- <682d01dec42ecdb80c9d3ffa2902dea3b1d576dd.camel@intel.com>
- <b9e9dd1c-2213-81c7-cd45-f5cf7b86610b@linux.intel.com>
- <ZCR2PBx/4lj9X0vD@google.com>
- <657efa6471503ee5c430e5942a14737ff5fbee6e.camel@intel.com>
-From:   Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <657efa6471503ee5c430e5942a14737ff5fbee6e.camel@intel.com>
+ Firefox/102.0 Thunderbird/102.9.1
+Subject: Re: [PATCH v13 016/113] KVM: TDX: x86: Add ioctl to get TDX
+ systemwide parameters
+Content-Language: en-US
+To:     Zhi Wang <zhi.wang.linux@gmail.com>,
+        Isaku Yamahata <isaku.yamahata@gmail.com>
+Cc:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        erdemaktas@google.com, Sean Christopherson <seanjc@google.com>,
+        Sagi Shahar <sagis@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Kai Huang <kai.huang@intel.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+References: <cover.1678643051.git.isaku.yamahata@intel.com>
+ <cb0ae8b4941aaa45e1e5856dde644f9b2f53d9a6.1678643052.git.isaku.yamahata@intel.com>
+ <20230325104306.00004585@gmail.com>
+ <20230329231722.GA1108448@ls.amr.corp.intel.com>
+ <20230331001803.GE1112017@ls.amr.corp.intel.com>
+ <20230331154432.00001373@gmail.com>
+From:   Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <20230331154432.00001373@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.8 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-1.8 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,HK_RANDOM_ENVFROM,
+        HK_RANDOM_FROM,NICE_REPLY_A,SPF_HELO_NONE,SPF_NONE
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-On 3/30/2023 6:46 AM, Huang, Kai wrote:
-> On Wed, 2023-03-29 at 10:34 -0700, Sean Christopherson wrote:
->> On Wed, Mar 29, 2023, Binbin Wu wrote:
->>> On 3/29/2023 10:04 AM, Huang, Kai wrote:
->>>> On Wed, 2023-03-29 at 09:27 +0800, Binbin Wu wrote:
->>>>> On 3/29/2023 7:33 AM, Huang, Kai wrote:
->>>>>> On Tue, 2023-03-21 at 14:35 -0700, Sean Christopherson wrote:
->>>>>>> On Mon, Mar 20, 2023, Chao Gao wrote:
->>>>>>>> On Sun, Mar 19, 2023 at 04:49:22PM +0800, Binbin Wu wrote:
->>>>>>>>> get_vmx_mem_address() and sgx_get_encls_gva() use is_long_mode()
->>>>>>>>> to check 64-bit mode. Should use is_64_bit_mode() instead.
->>>>>>>>>
->>>>>>>>> Fixes: f9eb4af67c9d ("KVM: nVMX: VMX instructions: add checks for #GP/#SS exceptions")
->>>>>>>>> Fixes: 70210c044b4e ("KVM: VMX: Add SGX ENCLS[ECREATE] handler to enforce CPUID restrictions")
->>>>>>>> It is better to split this patch into two: one for nested and one for
->>>>>>>> SGX.
->>>>>>>>
->>>>>>>> It is possible that there is a kernel release which has just one of
->>>>>>>> above two flawed commits, then this fix patch cannot be applied cleanly
->>>>>>>> to the release.
->>>>>>> The nVMX code isn't buggy, VMX instructions #UD in compatibility mode, and except
->>>>>>> for VMCALL, that #UD has higher priority than VM-Exit interception.  So I'd say
->>>>>>> just drop the nVMX side of things.
->>>>>> But it looks the old code doesn't unconditionally inject #UD when in
->>>>>> compatibility mode?
->>>>> I think Sean means VMX instructions is not valid in compatibility mode
->>>>> and it triggers #UD, which has higher priority than VM-Exit, by the
->>>>> processor in non-root mode.
->>>>>
->>>>> So if there is a VM-Exit due to VMX instruction , it is in 64-bit mode
->>>>> for sure if it is in long mode.
->>>> Oh I see thanks.
->>>>
->>>> Then is it better to add some comment to explain, or add a WARN() if it's not in
->>>> 64-bit mode?
->>> I also prefer to add a comment if no objection.
+On 3/31/2023 8:44 PM, Zhi Wang wrote:
+> On Thu, 30 Mar 2023 17:18:03 -0700
+> Isaku Yamahata <isaku.yamahata@gmail.com> wrote:
+> 
+>> On Wed, Mar 29, 2023 at 04:17:22PM -0700,
+>> Isaku Yamahata <isaku.yamahata@gmail.com> wrote:
+>>
+>>> On Sat, Mar 25, 2023 at 10:43:06AM +0200,
+>>> Zhi Wang <zhi.wang.linux@gmail.com> wrote:
 >>>
->>> Seems I am not the only one who didn't get itï¿½ : )
->> I would rather have a code change than a comment, e.g.
+>>>> On Sun, 12 Mar 2023 10:55:40 -0700
+>>>> isaku.yamahata@intel.com wrote:
+>>>>
+>>>> Does this have to be a new generic ioctl with a dedicated new x86_ops? SNP
+>>>> does not use it at all and all the system-scoped ioctl of SNP going through
+>>>> the CCP driver. So getting system-scope information of TDX/SNP will end up
+>>>> differently.
+>>>>
+>>>> Any thought, Sean? Moving getting SNP system-wide information to
+>>>> KVM dev ioctl seems not ideal and TDX does not have a dedicated driver like
+>>>> CCP. Maybe make this ioctl TDX-specific? KVM_TDX_DEV_OP?
+>>>
+>>> We only need global parameters of the TDX module, and we don't interact with TDX
+>>> module at this point.  One alternative is to export those parameters via sysfs.
+>>> Also the existence of the sysfs node indicates that the TDX module is
+>>> loaded(initialized?) or not in addition to boot log.  Thus we can drop system
+>>> scope one.
+>>> What do you think?
+>>>
+> 
+> I like this idea and the patch below, it feels right for me now. It would be nice
+> if more folks can chime in and comment.
+
+SYSFS option requires CONFIG_SYSFS, which reqiures CONFIG_KVM_TDX to 
+select CONFIG_SYSFS.
+
+>>> Regarding to other TDX KVM specific ioctls (KVM_TDX_INIT_VM, KVM_TDX_INIT_VCPU,
+>>> KVM_TDX_INIT_MEM_REGION, and KVM_TDX_FINALIZE_VM), they are specific to KVM.  So
+>>> I don't think it can be split out to independent driver.
 >>
->> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
->> index f63b28f46a71..0460ca219f96 100644
->> --- a/arch/x86/kvm/vmx/nested.c
->> +++ b/arch/x86/kvm/vmx/nested.c
->> @@ -4931,7 +4931,8 @@ int get_vmx_mem_address(struct kvm_vcpu *vcpu, unsigned long exit_qualification,
->>          int  base_reg       = (vmx_instruction_info >> 23) & 0xf;
->>          bool base_is_valid  = !(vmx_instruction_info & (1u << 27));
->>   
->> -       if (is_reg) {
->> +       if (is_reg ||
->> +           WARN_ON_ONCE(is_long_mode(vcpu) && !is_64_bit_mode(vcpu))) {
->>                  kvm_queue_exception(vcpu, UD_VECTOR);
->>                  return 1;
->>          }
->>
->>
-> Looks good to me.
->
->> The only downside is that querying is_64_bit_mode() could unnecessarily trigger a
->> VMREAD to get the current CS.L bit, but a measurable performance regressions is
->> extremely unlikely because is_64_bit_mode() all but guaranteed to be called in
->> these paths anyways (and KVM caches segment info), e.g. by kvm_register_read().
-> Agreed.
->
->> And then in a follow-up, we should also be able to do:
->>
->> @@ -5402,7 +5403,7 @@ static int handle_vmread(struct kvm_vcpu *vcpu)
->>          if (instr_info & BIT(10)) {
->>                  kvm_register_write(vcpu, (((instr_info) >> 3) & 0xf), value);
->>          } else {
->> -               len = is_64_bit_mode(vcpu) ? 8 : 4;
->> +               len = is_long_mode(vcpu) ? 8 : 4;
->>                  if (get_vmx_mem_address(vcpu, exit_qualification,
->>                                          instr_info, true, len, &gva))
->>                          return 1;
->> @@ -5476,7 +5477,7 @@ static int handle_vmwrite(struct kvm_vcpu *vcpu)
->>          if (instr_info & BIT(10))
->>                  value = kvm_register_read(vcpu, (((instr_info) >> 3) & 0xf));
->>          else {
->> -               len = is_64_bit_mode(vcpu) ? 8 : 4;
->> +               len = is_long_mode(vcpu) ? 8 : 4;
->>                  if (get_vmx_mem_address(vcpu, exit_qualification,
->>                                          instr_info, false, len, &gva))
->>                          return 1;
->>
-> Yeah, although it's a little bit wired the actual WARN() happens after above
-> code change.  But I don't know how to make the code better.  Maybe we should put
-> the WARN() at the very beginning but this would require duplicated code in each
-> handle_xxx() for VMX instructions.
+> 
+> They can stay in KVM as they are KVM-specific. SNP also has KVM-specific ioctls
+> which wraps the SEV driver calls. At this level, both TDX and SNP go their specific
+> implementation without more abstraction other than KVM_ENCRYPT_MEMORY_OP. Their
+> strategies are aligned.
+> 
+> The problem of the previous approach was the abstraction that no other implementation
+> is using it. It is like, TDX wants a higher abstraction to cover both TDX and SNP,
+> but SNP is not using it, which makes the abstraction looks strange.
 
-I checked the code again and find the comment of 
-nested_vmx_check_permission().
+Note, before this TDX enabling series, KVM_MEMORY_ENCRYPT_OP is a VM 
+scope ioctl, that only serves for SEV and no other implementation uses 
+it. I see no reason why cannot introduce a new IOCTL in x86 KVM that 
+serves only one vendor.
 
-"/*
-  * Intel's VMX Instruction Reference specifies a common set of 
-prerequisites
-  * for running VMX instructions (except VMXON, whose prerequisites are
-  * slightly different). It also specifies what exception to inject 
-otherwise.
-  * Note that many of these exceptions have priority over VM exits, so they
-  * don't have to be checked again here.
-  */"
+We choose KVM_MEMORY_ENCRYPT_OP for TDX platform scope, just because we 
+reuse KVM_MEMORY_ENCRYPT_OP for TDX VM-scope and extend it to TDX vcpu 
+scope. It's just to avoid defining a new IOCTL number.
 
-I think the Note part in the comment has tried to callout why the check 
-for compatibility mode is unnecessary.
+We can rename it to KVM_GET_CC_CAPABILITIES, and even return different 
+capabilities based on VM type. And even, if SNP wants to use it, I think 
+it can wrap SNP driver calls inside this IOCTL?
 
-But I have a question here, nested_vmx_check_permission() checks that 
-the vcpu is vmxon,
-otherwise it will inject a #UD. Why this #UD is handled in the VMExit 
-handler specifically?
-Not all #UDs have higher priority than VM exits?
-
-According to SDM Section "Relative Priority of Faults and VM Exits":
-"Certain exceptions have priority over VM exits. These include 
-invalid-opcode exceptions, ..."
-Seems not further classifications of #UDs.
-
-Anyway, I will seperate this patch from the LAM KVM enabling patch. And 
-send a patch seperately if
-needed later.
-
+kvm.ko is special that it needs to serve two vendors. Sometime it's 
+unaviodable that an interface is only used by one vendor.
