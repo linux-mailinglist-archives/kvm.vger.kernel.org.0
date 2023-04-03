@@ -2,148 +2,193 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F007F6D4DC5
-	for <lists+kvm@lfdr.de>; Mon,  3 Apr 2023 18:30:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 316616D4DE1
+	for <lists+kvm@lfdr.de>; Mon,  3 Apr 2023 18:32:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232812AbjDCQaI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 3 Apr 2023 12:30:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34580 "EHLO
+        id S232064AbjDCQcx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 3 Apr 2023 12:32:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38632 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232759AbjDCQaA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 3 Apr 2023 12:30:00 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5641D269F
-        for <kvm@vger.kernel.org>; Mon,  3 Apr 2023 09:29:55 -0700 (PDT)
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 333FTpkf012483;
-        Mon, 3 Apr 2023 16:29:49 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=uZK+hrbcdhiYMhkT2q6LqRfgn19nacec3/3ehtqEdLQ=;
- b=FAodioCIWQ3quHA8S5XOUUG92V6kysJ6jUQ8F4I1PHnn1DL4/h6uCIMG8B+WYfGiB7xR
- I6pz4cXiRutJ65a8x6ot120JDy2KM8R0EVYxFizdt3qRB41kx49lKiqNceN3Dxn4rELo
- pOcqG4I3BAakKtiNG8rktau0zDCQN8b7MGThhyer697iHamWyMUj0T7z6ZkFdGNEWpmm
- PY8G8JO4EWXd3kFDOBnm4Gp/dzZlDFToq9MCwhc+n38DHz1aatiqSOtKOyskX35nPZC7
- Q4ZJ81cBRtop+e+LfUYjsm8MN2sHwOEoLv1es08GCXeV3shzdCUQtBC0UEj1gq5G6ksR 8w== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pr1gb9j9k-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 03 Apr 2023 16:29:48 +0000
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 333FVVF8018539;
-        Mon, 3 Apr 2023 16:29:48 GMT
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pr1gb9j8u-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 03 Apr 2023 16:29:48 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 332LTQi6023017;
-        Mon, 3 Apr 2023 16:29:46 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-        by ppma03ams.nl.ibm.com (PPS) with ESMTPS id 3ppc871ut7-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 03 Apr 2023 16:29:45 +0000
-Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-        by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 333GTgQG26542824
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 3 Apr 2023 16:29:42 GMT
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7C4D920040;
-        Mon,  3 Apr 2023 16:29:42 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6109620043;
-        Mon,  3 Apr 2023 16:29:41 +0000 (GMT)
-Received: from li-c6ac47cc-293c-11b2-a85c-d421c8e4747b.ibm.com.com (unknown [9.179.22.128])
-        by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Mon,  3 Apr 2023 16:29:41 +0000 (GMT)
-From:   Pierre Morel <pmorel@linux.ibm.com>
-To:     qemu-s390x@nongnu.org
-Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
-        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
-        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
-        kvm@vger.kernel.org, ehabkost@redhat.com,
-        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
-        seiden@linux.ibm.com, nrb@linux.ibm.com, nsg@linux.ibm.com,
-        frankja@linux.ibm.com, berrange@redhat.com, clg@kaod.org
-Subject: [PATCH v19 21/21] tests/avocado: s390x cpu topology query-cpu-polarization
-Date:   Mon,  3 Apr 2023 18:29:05 +0200
-Message-Id: <20230403162905.17703-22-pmorel@linux.ibm.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20230403162905.17703-1-pmorel@linux.ibm.com>
-References: <20230403162905.17703-1-pmorel@linux.ibm.com>
+        with ESMTP id S230044AbjDCQcw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 3 Apr 2023 12:32:52 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20F252D70
+        for <kvm@vger.kernel.org>; Mon,  3 Apr 2023 09:31:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1680539452;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=MPS0a9q2wBgWzoVXK25wx68oYQt4CXIzgrAFBuym3Gg=;
+        b=Brx+GsAJ3u2TxV4M/VUIJLVBpu7F3FzkhMvEIBTHhEwbEfe3fPMP/jQ/BOy1C1m9UZFvxz
+        i6OUbd4DBArdh91WnFIph4OC9lZBiFGsBWYsiK1qNZm0T4WO4L4LdD7zRjpt68kD7c+gEF
+        E+SLteGj+vW/tb/4TQtHCTiDpSi3N40=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-186-M-rsmh8aMwKoaC_f74ABvw-1; Mon, 03 Apr 2023 12:30:51 -0400
+X-MC-Unique: M-rsmh8aMwKoaC_f74ABvw-1
+Received: by mail-ed1-f70.google.com with SMTP id ev6-20020a056402540600b004bc2358ac04so42528809edb.21
+        for <kvm@vger.kernel.org>; Mon, 03 Apr 2023 09:30:50 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1680539449; x=1683131449;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=MPS0a9q2wBgWzoVXK25wx68oYQt4CXIzgrAFBuym3Gg=;
+        b=a39TLqoNW9oA9JYFw8gxE4Vh5IkEg1BcczTnXSarRd7BiG4vKqJ1NVgBkxZA7XVdME
+         96riFZ4xw46A/twtYhoNGPFJkWaxbGYvctLzptHbqFILUpiDH0VhvutOc2/iccJ3CQ4I
+         P7tgY29Gd1ew4bSuVZeV+lUxwaqCnzoONd8Dg0iLb081GX1vOchF3D/Z/Fech1dctDMS
+         D+MC/xN87xmMZrv4ToL4i63TW1AmKNbmsZ5p1gxvPvuRdAsQNhU3FOBRifLJCQNbiV4B
+         2HIqEkvQ+Z5Xy4n68h0U02gxwXV7LOzAGDxItaHAQNumpjgB3mvq4EHRm/fEcDbRFDHH
+         lReQ==
+X-Gm-Message-State: AAQBX9dWbkvJ810OmY3FnXkaxioT0cYH7RIOZdBi3w66hIpNxqtTVnqs
+        ggdXmPcBL8JUb0MravqmsD/hCe0/p4Brz76ftxoSdGFLoF4h2cpx+yYyxMmMPSXdp/5StDf6XL7
+        9hXzo78V/LVBj/oapgDl4bFvAX+dt6l/SgATgp4CbxjgTPG0vqPI81nw7ol2RbIc6z/UjMgj0Z+
+        4=
+X-Received: by 2002:a17:906:2990:b0:92f:a6d3:b941 with SMTP id x16-20020a170906299000b0092fa6d3b941mr37699870eje.30.1680539449235;
+        Mon, 03 Apr 2023 09:30:49 -0700 (PDT)
+X-Google-Smtp-Source: AKy350YZO6yy3slohD2vwdLzy0n/CLUL0WYrHOjF1iIAKERVsFL+cXW6KUd1h4792Rkymp+TFDlvpA==
+X-Received: by 2002:a17:906:2990:b0:92f:a6d3:b941 with SMTP id x16-20020a170906299000b0092fa6d3b941mr37699848eje.30.1680539448823;
+        Mon, 03 Apr 2023 09:30:48 -0700 (PDT)
+Received: from [192.168.10.118] ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
+        by smtp.gmail.com with ESMTPSA id gl18-20020a170906e0d200b00924d38bbdc0sm4742475ejb.105.2023.04.03.09.30.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 03 Apr 2023 09:30:47 -0700 (PDT)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     kvm@vger.kernel.org
+Cc:     senajc@google.com, Thomas Huth <thuth@redhat.com>
+Subject: [PATCH kvm-unit-tests] memory: Skip tests for instructions that are absent
+Date:   Mon,  3 Apr 2023 18:30:46 +0200
+Message-Id: <20230403163046.387460-1-pbonzini@redhat.com>
+X-Mailer: git-send-email 2.39.2
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: BaKIOXqwBdd0nOGzbNDNtK2aaoPI0frq
-X-Proofpoint-GUID: Zt98uhPk97NeGPd1zCgiAnMcOUDgYwhA
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
- definitions=2023-04-03_13,2023-04-03_03,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 phishscore=0
- spamscore=0 priorityscore=1501 mlxscore=0 mlxlogscore=999 impostorscore=0
- adultscore=0 suspectscore=0 lowpriorityscore=0 malwarescore=0
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2303200000 definitions=main-2304030118
-X-Spam-Status: No, score=-0.1 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
-        DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-        autolearn=unavailable autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This test verifies that the qmp query query-cpu-polarization
-reports correctly the polarization when the guest requests
-a polarization change.
+Checking that instructions are absent is broken when running with CPU
+models other than the bare metal processor's, because neither VMX nor SVM have
+intercept controls for the instructions.
 
-Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+This can even happen with "-cpu max" when running under nested
+virtualization, which is the current situation in the Fedora KVM job
+on Cirrus-CI:
+
+FAIL: clflushopt (ABSENT)
+FAIL: clwb (ABSENT)
+
+In other words it looks like the features have been marked as disabled
+in the L0 host, while the hardware supports them.
+
+Reported-by: Thomas Huth <thuth@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- tests/avocado/s390_topology.py | 33 +++++++++++++++++++++++++++++++++
- 1 file changed, 33 insertions(+)
+ x86/memory.c | 69 +++++++++++++++++++++++++++-------------------------
+ 1 file changed, 36 insertions(+), 33 deletions(-)
 
-diff --git a/tests/avocado/s390_topology.py b/tests/avocado/s390_topology.py
-index 665876affe..88af48ba71 100644
---- a/tests/avocado/s390_topology.py
-+++ b/tests/avocado/s390_topology.py
-@@ -433,3 +433,36 @@ def test_move_error(self):
-         self.assertEqual(res['error']['class'], 'GenericError')
+diff --git a/x86/memory.c b/x86/memory.c
+index 351e7c0..ffd4eeb 100644
+--- a/x86/memory.c
++++ b/x86/memory.c
+@@ -25,53 +25,56 @@ static void handle_ud(struct ex_regs *regs)
  
-         self.check_topology(0, 0, 0, 0, 'medium', False)
-+
-+    def test_query_polarization(self):
-+        """
-+        This test verifies that query-cpu-polarization gives the right
-+        answer
-+
-+        :avocado: tags=arch:s390x
-+        :avocado: tags=machine:s390-ccw-virtio
-+        """
-+        self.kernel_init()
-+        self.vm.launch()
-+        self.wait_for_console_pattern('no job control')
-+
-+        self.system_init()
-+
-+        res = self.vm.qmp('query-cpu-polarization')
-+        self.assertEqual(res['return']['polarization'], 'horizontal')
-+
-+        exec_command(self, 'echo 1 > /sys/devices/system/cpu/dispatching')
-+        time.sleep(0.2)
-+        exec_command_and_wait_for_pattern(self,
-+                '/bin/cat /sys/devices/system/cpu/dispatching', '1')
-+
-+        res = self.vm.qmp('query-cpu-polarization')
-+        self.assertEqual(res['return']['polarization'], 'vertical')
-+
-+        exec_command(self, 'echo 0 > /sys/devices/system/cpu/dispatching')
-+        time.sleep(0.2)
-+        exec_command_and_wait_for_pattern(self,
-+                '/bin/cat /sys/devices/system/cpu/dispatching', '0')
-+
-+        res = self.vm.qmp('query-cpu-polarization')
-+        self.assertEqual(res['return']['polarization'], 'horizontal')
+ int main(int ac, char **av)
+ {
+-	int expected;
+-
+ 	handle_exception(UD_VECTOR, handle_ud);
+ 
+ 	/* 3-byte instructions: */
+ 	isize = 3;
+ 
+-	expected = !this_cpu_has(X86_FEATURE_CLFLUSH); /* CLFLUSH */
+-	ud = 0;
+-	asm volatile("clflush (%0)" : : "b" (&target));
+-	report(ud == expected, "clflush (%s)", expected ? "ABSENT" : "present");
++	if (this_cpu_has(X86_FEATURE_CLFLUSH)) { /* CLFLUSH */
++		ud = 0;
++		asm volatile("clflush (%0)" : : "b" (&target));
++		report(!ud, "clflush");
++	}
+ 
+-	expected = !this_cpu_has(X86_FEATURE_XMM); /* SSE */
+-	ud = 0;
+-	asm volatile("sfence");
+-	report(ud == expected, "sfence (%s)", expected ? "ABSENT" : "present");
++	if (this_cpu_has(X86_FEATURE_XMM)) { /* SSE */
++		ud = 0;
++		asm volatile("sfence");
++		report(!ud, "sfence");
++	}
+ 
+-	expected = !this_cpu_has(X86_FEATURE_XMM2); /* SSE2 */
+-	ud = 0;
+-	asm volatile("lfence");
+-	report(ud == expected, "lfence (%s)", expected ? "ABSENT" : "present");
++	if (this_cpu_has(X86_FEATURE_XMM2)) { /* SSE2 */
++		ud = 0;
++		asm volatile("lfence");
++		report(!ud, "lfence");
+ 
+-	ud = 0;
+-	asm volatile("mfence");
+-	report(ud == expected, "mfence (%s)", expected ? "ABSENT" : "present");
++		ud = 0;
++		asm volatile("mfence");
++		report(!ud, "mfence");
++	}
+ 
+ 	/* 4-byte instructions: */
+ 	isize = 4;
+ 
+-	expected = !this_cpu_has(X86_FEATURE_CLFLUSHOPT); /* CLFLUSHOPT */
+-	ud = 0;
+-	/* clflushopt (%rbx): */
+-	asm volatile(".byte 0x66, 0x0f, 0xae, 0x3b" : : "b" (&target));
+-	report(ud == expected, "clflushopt (%s)",
+-	       expected ? "ABSENT" : "present");
++	if (this_cpu_has(X86_FEATURE_CLFLUSHOPT)) { /* CLFLUSHOPT */
++		ud = 0;
++		/* clflushopt (%rbx): */
++		asm volatile(".byte 0x66, 0x0f, 0xae, 0x3b" : : "b" (&target));
++		report(!ud, "clflushopt");
++	}
+ 
+-	expected = !this_cpu_has(X86_FEATURE_CLWB); /* CLWB */
+-	ud = 0;
+-	/* clwb (%rbx): */
+-	asm volatile(".byte 0x66, 0x0f, 0xae, 0x33" : : "b" (&target));
+-	report(ud == expected, "clwb (%s)", expected ? "ABSENT" : "present");
++	if (this_cpu_has(X86_FEATURE_CLWB)) { /* CLWB */
++		ud = 0;
++		/* clwb (%rbx): */
++		asm volatile(".byte 0x66, 0x0f, 0xae, 0x33" : : "b" (&target));
++		report(!ud, "clwb");
++	}
+ 
+-	expected = !this_cpu_has(X86_FEATURE_PCOMMIT); /* PCOMMIT */
+-	ud = 0;
+-	/* pcommit: */
+-	asm volatile(".byte 0x66, 0x0f, 0xae, 0xf8");
+-	report(ud == expected, "pcommit (%s)", expected ? "ABSENT" : "present");
++	if (this_cpu_has(X86_FEATURE_PCOMMIT)) { /* PCOMMIT */
++		ud = 0;
++		/* pcommit: */
++		asm volatile(".byte 0x66, 0x0f, 0xae, 0xf8");
++		report(!ud, "pcommit");
++	}
+ 
+ 	return report_summary();
+ }
 -- 
-2.31.1
+2.39.2
 
