@@ -2,207 +2,222 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 542996D523C
-	for <lists+kvm@lfdr.de>; Mon,  3 Apr 2023 22:23:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DC8A76D5319
+	for <lists+kvm@lfdr.de>; Mon,  3 Apr 2023 23:09:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232870AbjDCUXR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 3 Apr 2023 16:23:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60688 "EHLO
+        id S233573AbjDCVJM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 3 Apr 2023 17:09:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50218 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232279AbjDCUXP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 3 Apr 2023 16:23:15 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25E1C3586
-        for <kvm@vger.kernel.org>; Mon,  3 Apr 2023 13:22:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1680553353;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=S7rPZVgCNxYpms8L6srVacst89M/965rzuu68j74ShQ=;
-        b=MxVFSQXpE1yDvQdRsVgQI5eiMSw8okNEdeYjOIXHu1oKjcDhwDm360EZuekNOyP49fkgkL
-        6wIKjWloCvbos6rNc5E2EjV8TqvSIBEjRDe3e8XncjZf3+W8Y6CPT92Kp/WrZ9gHsdUoXv
-        cBibeH/1KeTDRaVT6tFfoS4XBIIW0a0=
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com
- [209.85.166.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-553-qcusORVfPBCq1QvgBPiKfA-1; Mon, 03 Apr 2023 16:22:31 -0400
-X-MC-Unique: qcusORVfPBCq1QvgBPiKfA-1
-Received: by mail-il1-f198.google.com with SMTP id h1-20020a92d841000000b0031b4d3294dfso19896225ilq.9
-        for <kvm@vger.kernel.org>; Mon, 03 Apr 2023 13:22:31 -0700 (PDT)
+        with ESMTP id S233472AbjDCVJJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 3 Apr 2023 17:09:09 -0400
+Received: from mail-oa1-x2a.google.com (mail-oa1-x2a.google.com [IPv6:2001:4860:4864:20::2a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5FA8D4690
+        for <kvm@vger.kernel.org>; Mon,  3 Apr 2023 14:08:43 -0700 (PDT)
+Received: by mail-oa1-x2a.google.com with SMTP id 586e51a60fabf-17fcc07d6c4so18241093fac.8
+        for <kvm@vger.kernel.org>; Mon, 03 Apr 2023 14:08:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112; t=1680556121;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YYO5Q9xcDwGhhJXwP7FhrHqIG5oPNHWFCyDP0fw34Y4=;
+        b=Y+c7CV1lEypt/5pYzPsfM7H6xqM1xlMSw00MLh5URT4GZp3Qz/oAOCw7tmiVCBD9d0
+         lOL7E+YSRE4yfLUD2cPLIDVejl2iVVLOFRR9C5bzvDQKBZU+pAvpukErA/0uON+5K4vZ
+         feMOQm/ZL0IViZ3yXz2IWT9nzOmWI6VI20HrX3xzr96v3iPWn2qdJ3JT/ci35k55+4AS
+         dUbO1D7L7MoEWP5gK1HQaO+GT38Ze1wKUCKn29AgOrSzobpWebzc3/swww7WhUN4jtzV
+         4E2Xyg0Z9cqrDb16SdXGdT3x4l9Vr2nMEgnzb0HhcEIpm7ClFNKSylXj10qvjsouY1Pc
+         p9pQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680553351;
-        h=content-transfer-encoding:mime-version:organization:references
-         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=S7rPZVgCNxYpms8L6srVacst89M/965rzuu68j74ShQ=;
-        b=AoCK8dD+eKqfBbrkNp0LfB6WFdpYF+Ne9AVfEo/x5QdvvYkJ0knKapSuAayPJqz3gz
-         U5ihV7M7pbteJmhw0KxQEAafCbncRKEtCzMo/gLw73DK1Tc+gnYkdQ3acO/6W0urgUze
-         RigSVr5+dwNQ9qK8PnXF6Jkcbtg4ANZf8VuSSlR3AtbzMdCawpPw3xSJFn404FudZKAp
-         mr/gjtlHc9C9YoRd4/IX0s+biiJ7QXLwxkydRh2D3Ygw1PfatGebqcoyZXOuuQ36mMBN
-         RG7CZtRjXw+py8U3cKpafSTtu97wy6WT9Z3rxxL6eG93Jq9TTyS1N9evTpYOPwiDqIiO
-         81eQ==
-X-Gm-Message-State: AAQBX9ftxxebxT60TR9/Osg3LndmJycfY2Y0/vEuB/so7pgPpNSZziAO
-        7jwBl7CiUgMa3lzlTP2NS9X4dbcgdaNpnaDOJNpkQI377UqTtFY0MBWUbFCjvWkMzVz3Pfds4wR
-        ECcfnxHzb26ao
-X-Received: by 2002:a92:d28f:0:b0:325:b60b:e2fc with SMTP id p15-20020a92d28f000000b00325b60be2fcmr259887ilp.5.1680553351138;
-        Mon, 03 Apr 2023 13:22:31 -0700 (PDT)
-X-Google-Smtp-Source: AKy350a8n73fR0AsmRQ+fkeyssYMI9r59U0Zgbvv0cUqAVRqPsNVu/XWz5p7fAdegvqaeMHPjs/SUQ==
-X-Received: by 2002:a92:d28f:0:b0:325:b60b:e2fc with SMTP id p15-20020a92d28f000000b00325b60be2fcmr259865ilp.5.1680553350833;
-        Mon, 03 Apr 2023 13:22:30 -0700 (PDT)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id t8-20020a056638204800b003eafd76dc3fsm2928827jaj.23.2023.04.03.13.22.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 03 Apr 2023 13:22:30 -0700 (PDT)
-Date:   Mon, 3 Apr 2023 14:22:27 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Reinette Chatre <reinette.chatre@intel.com>
-Cc:     <jgg@nvidia.com>, <yishaih@nvidia.com>,
-        <shameerali.kolothum.thodi@huawei.com>, <kevin.tian@intel.com>,
-        <tglx@linutronix.de>, <darwi@linutronix.de>, <kvm@vger.kernel.org>,
-        <dave.jiang@intel.com>, <jing2.liu@intel.com>,
-        <ashok.raj@intel.com>, <fenghua.yu@intel.com>,
-        <tom.zanussi@linux.intel.com>, <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH V2 7/8] vfio/pci: Support dynamic MSI-x
-Message-ID: <20230403142227.1328b373.alex.williamson@redhat.com>
-In-Reply-To: <e15d588e-b63f-ab70-f6ae-91ceea8be79a@intel.com>
-References: <cover.1680038771.git.reinette.chatre@intel.com>
-        <419f3ba2f732154d8ae079b3deb02d0fdbe3e258.1680038771.git.reinette.chatre@intel.com>
-        <20230330164050.0069e2a5.alex.williamson@redhat.com>
-        <20230330164214.67ccbdfa.alex.williamson@redhat.com>
-        <688393bf-445c-15c5-e84d-1c16261a4197@intel.com>
-        <20230331162456.3f52b9e3.alex.williamson@redhat.com>
-        <e15d588e-b63f-ab70-f6ae-91ceea8be79a@intel.com>
-Organization: Red Hat
+        d=1e100.net; s=20210112; t=1680556121;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=YYO5Q9xcDwGhhJXwP7FhrHqIG5oPNHWFCyDP0fw34Y4=;
+        b=eimzecUhm+OD11VvWePbrStpCp80cIOhbOTK5YnFEC+LhizZdVCAFjtmyQcCsK5syM
+         Q+bhCtGC41s49K0ynacQaMaYv4/jpvG3UMmAvWjTLfsf+H1Cep/3VwChdAQAYIx2f4Gv
+         pc9aEEVLKeYE7GLebPR0JKn0UHD4UY23686zCbgQ8ecdd8cTdFT2GPULIe0eHZnALNfx
+         BZfPYMHaREo7l0ZwNr6oXdgN0mB2Y/WqiLW0xFPFk4jPHxznHUme81a8agk1dFNIXhe3
+         G7XnFB9yy9I8je9QuguEnBtB4FK7Bf/RAjYj6fk/MieErlJGhMiOEvMjButiQTsW0NSW
+         FLAw==
+X-Gm-Message-State: AAQBX9cfzfG4zObkdwVenfWtlf27Vflg7l8XnWnKdUtyjAYaMMRe4w8o
+        DhQgtamEutKW2wDM5vdgCU4ixXvUU/FMPY4ZzqhdyYie4bAOJKqq7ZaBgQ==
+X-Google-Smtp-Source: AKy350Z8MUinKXoco8X7G+BSkzc5PLWN0vKx/ieX8QMuJqevauIUuCxuxxsgGlclYqFlvQe44I4ErC2LpzBXkonie/o=
+X-Received: by 2002:a05:6870:3c07:b0:177:b9c0:bcba with SMTP id
+ gk7-20020a0568703c0700b00177b9c0bcbamr8642835oab.3.1680556120926; Mon, 03 Apr
+ 2023 14:08:40 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+References: <20230206172340.2639971-1-rananta@google.com> <20230206172340.2639971-4-rananta@google.com>
+ <ZCTe5koj8fOgbrYO@linux.dev>
+In-Reply-To: <ZCTe5koj8fOgbrYO@linux.dev>
+From:   Raghavendra Rao Ananta <rananta@google.com>
+Date:   Mon, 3 Apr 2023 14:08:29 -0700
+Message-ID: <CAJHc60x-ZHN=ZQemZp0wkj5jp-Ys8024YDQmWhmKn3NgZ0HHCQ@mail.gmail.com>
+Subject: Re: [PATCH v2 3/7] KVM: arm64: Implement __kvm_tlb_flush_range_vmid_ipa()
+To:     Oliver Upton <oliver.upton@linux.dev>
+Cc:     Oliver Upton <oupton@google.com>, Marc Zyngier <maz@kernel.org>,
+        Ricardo Koller <ricarkol@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Colton Lewis <coltonlewis@google.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-15.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,ENV_AND_HDR_SPF_MATCH,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL,
+        USER_IN_DEF_SPF_WL autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 3 Apr 2023 10:31:23 -0700
-Reinette Chatre <reinette.chatre@intel.com> wrote:
+On Wed, Mar 29, 2023 at 5:59=E2=80=AFPM Oliver Upton <oliver.upton@linux.de=
+v> wrote:
+>
+> On Mon, Feb 06, 2023 at 05:23:36PM +0000, Raghavendra Rao Ananta wrote:
+> > Define  __kvm_tlb_flush_range_vmid_ipa() (for VHE and nVHE)
+>
+> bikeshed: Personally, I find that range implies it takes an address as an
+> argument already. Maybe just call it __kvm_tlb_flush_vmid_range()
+>
+Hmm, since TLBI instructions takes-in a variety of ranges, VA or IPA,
+I just thought of extending the '_ipa' to make things clear. Moreover
+it aligns with the existing __kvm_tlb_flush_vmid_ipa(). WDYT?
 
-> Hi Alex,
-> 
-> On 3/31/2023 3:24 PM, Alex Williamson wrote:
-> > On Fri, 31 Mar 2023 10:49:16 -0700
-> > Reinette Chatre <reinette.chatre@intel.com> wrote:  
-> >> On 3/30/2023 3:42 PM, Alex Williamson wrote:  
-> >>> On Thu, 30 Mar 2023 16:40:50 -0600
-> >>> Alex Williamson <alex.williamson@redhat.com> wrote:
-> >>>     
-> >>>> On Tue, 28 Mar 2023 14:53:34 -0700
-> >>>> Reinette Chatre <reinette.chatre@intel.com> wrote:
-> >>>>    
-> 
-> ...
-> 
-> >>>>> +		msix_map.index = vector;
-> >>>>> +		msix_map.virq = irq;
-> >>>>> +		pci_msix_free_irq(pdev, msix_map);
-> >>>>> +	}
-> >>>>> +	vfio_pci_memory_unlock_and_restore(vdev, cmd);
-> >>>>>  out_put_eventfd_ctx:
-> >>>>>  	eventfd_ctx_put(trigger);
-> >>>>>  out_free_name:
-> >>>>>  	kfree(ctx->name);
-> >>>>>  	ctx->name = NULL;
-> >>>>> +out_free_ctx:
-> >>>>> +	if (allow_dyn_alloc && new_ctx)
-> >>>>> +		vfio_irq_ctx_free(vdev, ctx, vector);
-> >>>>>  	return ret;
-> >>>>>  }
-> >>>>>        
-> >>>>
-> >>>> Do we really need the new_ctx test in the above cases?  Thanks,    
-> >>
-> >> new_ctx is not required for correctness but instead is used to keep
-> >> the code symmetric. 
-> >> Specifically, if the user enables MSI-X without providing triggers and
-> >> then later assign triggers then an error path without new_ctx would unwind
-> >> more than done in this function, it would free the context that
-> >> was allocated within vfio_msi_enable().   
-> > 
-> > Seems like we already have that asymmetry, if a trigger is unset we'll
-> > free the ctx allocated by vfio_msi_enable().  Tracking which are  
-> 
-> Apologies, but could you please elaborate on where the asymmetry is? I am
-> not able to see a flow in this solution where the ctx allocated by
-> vfio_msi_enable() is freed if the trigger is unset.
+Thank you.
+Raghavendra
 
-The user first calls SET_IRQS to enable MSI-X with some number of
-vectors with (potentially) an eventfd for each vector.  The user later
-calls SET_IRQS passing a -1 eventfd for one or more of the vectors with
-an eventfd initialized in the prior step.  Given that we find the ctx,
-the ctx has a trigger, and assuming dynamic allocation is supported, the
-ctx is freed and vfio_msi_set_vector_signal() returns w/o allocating a
-new ctx.  We've de-allocated both the irq and context initialized from
-vfio_msi_enable().
-
-> > allocated where is unnecessarily complex, how about a policy that  
-> 
-> I do not see this as tracking where allocations are made. Instead I
-> see it as containing/compartmentalizing state changes with the goal of
-> making the code easier to understand and maintain. Specifically, new_ctx
-> is used so that if vfio_msi_set_vector_signal() fails, the state 
-> before and after vfio_msi_set_vector_signal() will be the same.
-
-That's not really possible given how we teardown the existing ctx
-before configuring the new one and unwind to disable contexts in
-vfio_msi_set_block()
-
-> I do agree that it makes vfio_msi_set_vector_signal() more complex
-> and I can remove new_ctx if you find that this is unnecessary after
-> considering the motivations behind its use. 
-
-If the goal is to allow the user to swap one eventfd for another, where
-the result will always be the new eventfd on success or the old eventfd
-on error, I don't see that this code does that, or that we've ever
-attempted to make such a guarantee.  If the ioctl errors, I think the
-eventfds are generally deconfigured.   We certainly have the unwind code
-that we discussed earlier that deconfigures all the vectors previously
-touched in the loop (which seems to be another path where we could
-de-allocate from the set of initial ctxs).
- 
-> > devices supporting vdev->has_dyn_msix only ever have active contexts
-> > allocated?  Thanks,  
-> 
-> What do you see as an "active context"? A policy that is currently enforced
-> is that an allocated context always has an allocated interrupt associated
-> with it. I do not see how this could be expanded to also require an
-> enabled interrupt because interrupt enabling requires a trigger that
-> may not be available.
-
-A context is essentially meant to track a trigger, ie. an eventfd
-provided by the user.  In the static case all the irqs are necessarily
-pre-allocated, therefore we had no reason to consider a dynamic array
-for the contexts.  However, a given context is really only "active" if
-it has a trigger, otherwise it's just a placeholder.  When the
-placeholder is filled by an eventfd, the pre-allocated irq is enabled.
-
-This proposal seems to be a hybrid approach, pre-allocating some
-initial set of irqs and contexts and expecting the differentiation to
-occur only when new vectors are added, though we have some disagreement
-about this per above.  Unfortunately I don't see an API to enable MSI-X
-without some vectors, so some pre-allocation of irqs seems to be
-required regardless.
-
-But if non-active contexts were only placeholders in the pre-dynamic
-world and we now manage them via a dynamic array, why is there any
-pre-allocation of contexts without knowing the nature of the eventfd to
-fill it?  We could have more commonality between cases if contexts are
-always dynamically allocated, which might simplify differentiation of
-the has_dyn_msix cases largely to wrappers allocating and freeing irqs.
-Thanks,
-
-Alex
-
+> > to flush a range of stage-2 page-tables using IPA in one go.
+> > If the system supports FEAT_TLBIRANGE, the following patches
+> > would conviniently replace global TLBI such as vmalls12e1is
+> > in the map, unmap, and dirty-logging paths with ripas2e1is
+> > instead.
+> >
+> > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> > ---
+> >  arch/arm64/include/asm/kvm_asm.h   |  3 +++
+> >  arch/arm64/kvm/hyp/nvhe/hyp-main.c | 12 ++++++++++++
+> >  arch/arm64/kvm/hyp/nvhe/tlb.c      | 28 ++++++++++++++++++++++++++++
+> >  arch/arm64/kvm/hyp/vhe/tlb.c       | 24 ++++++++++++++++++++++++
+> >  4 files changed, 67 insertions(+)
+> >
+> > diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/=
+kvm_asm.h
+> > index 995ff048e8851..80a8ea85e84f8 100644
+> > --- a/arch/arm64/include/asm/kvm_asm.h
+> > +++ b/arch/arm64/include/asm/kvm_asm.h
+> > @@ -79,6 +79,7 @@ enum __kvm_host_smccc_func {
+> >       __KVM_HOST_SMCCC_FUNC___pkvm_init_vm,
+> >       __KVM_HOST_SMCCC_FUNC___pkvm_init_vcpu,
+> >       __KVM_HOST_SMCCC_FUNC___pkvm_teardown_vm,
+> > +     __KVM_HOST_SMCCC_FUNC___kvm_tlb_flush_range_vmid_ipa,
+> >  };
+> >
+> >  #define DECLARE_KVM_VHE_SYM(sym)     extern char sym[]
+> > @@ -243,6 +244,8 @@ extern void __kvm_flush_vm_context(void);
+> >  extern void __kvm_flush_cpu_context(struct kvm_s2_mmu *mmu);
+> >  extern void __kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu, phys_addr=
+_t ipa,
+> >                                    int level);
+> > +extern void __kvm_tlb_flush_range_vmid_ipa(struct kvm_s2_mmu *mmu, phy=
+s_addr_t start,
+> > +                                             phys_addr_t end, int leve=
+l, int tlb_level);
+> >  extern void __kvm_tlb_flush_vmid(struct kvm_s2_mmu *mmu);
+> >
+> >  extern void __kvm_timer_set_cntvoff(u64 cntvoff);
+> > diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nv=
+he/hyp-main.c
+> > index 728e01d4536b0..5787eee4c9fe4 100644
+> > --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> > +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> > @@ -125,6 +125,17 @@ static void handle___kvm_tlb_flush_vmid_ipa(struct=
+ kvm_cpu_context *host_ctxt)
+> >       __kvm_tlb_flush_vmid_ipa(kern_hyp_va(mmu), ipa, level);
+> >  }
+> >
+> > +static void handle___kvm_tlb_flush_range_vmid_ipa(struct kvm_cpu_conte=
+xt *host_ctxt)
+> > +{
+> > +     DECLARE_REG(struct kvm_s2_mmu *, mmu, host_ctxt, 1);
+> > +     DECLARE_REG(phys_addr_t, start, host_ctxt, 2);
+> > +     DECLARE_REG(phys_addr_t, end, host_ctxt, 3);
+> > +     DECLARE_REG(int, level, host_ctxt, 4);
+> > +     DECLARE_REG(int, tlb_level, host_ctxt, 5);
+> > +
+> > +     __kvm_tlb_flush_range_vmid_ipa(kern_hyp_va(mmu), start, end, leve=
+l, tlb_level);
+> > +}
+> > +
+> >  static void handle___kvm_tlb_flush_vmid(struct kvm_cpu_context *host_c=
+txt)
+> >  {
+> >       DECLARE_REG(struct kvm_s2_mmu *, mmu, host_ctxt, 1);
+> > @@ -315,6 +326,7 @@ static const hcall_t host_hcall[] =3D {
+> >       HANDLE_FUNC(__kvm_vcpu_run),
+> >       HANDLE_FUNC(__kvm_flush_vm_context),
+> >       HANDLE_FUNC(__kvm_tlb_flush_vmid_ipa),
+> > +     HANDLE_FUNC(__kvm_tlb_flush_range_vmid_ipa),
+> >       HANDLE_FUNC(__kvm_tlb_flush_vmid),
+> >       HANDLE_FUNC(__kvm_flush_cpu_context),
+> >       HANDLE_FUNC(__kvm_timer_set_cntvoff),
+> > diff --git a/arch/arm64/kvm/hyp/nvhe/tlb.c b/arch/arm64/kvm/hyp/nvhe/tl=
+b.c
+> > index d296d617f5896..7398dd00445e7 100644
+> > --- a/arch/arm64/kvm/hyp/nvhe/tlb.c
+> > +++ b/arch/arm64/kvm/hyp/nvhe/tlb.c
+> > @@ -109,6 +109,34 @@ void __kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *m=
+mu,
+> >       __tlb_switch_to_host(&cxt);
+> >  }
+> >
+> > +void __kvm_tlb_flush_range_vmid_ipa(struct kvm_s2_mmu *mmu, phys_addr_=
+t start,
+> > +                                     phys_addr_t end, int level, int t=
+lb_level)
+> > +{
+> > +     struct tlb_inv_context cxt;
+> > +
+> > +     dsb(ishst);
+> > +
+> > +     /* Switch to requested VMID */
+> > +     __tlb_switch_to_guest(mmu, &cxt);
+> > +
+> > +     __kvm_tlb_flush_range(ipas2e1is, mmu, start, end, level, tlb_leve=
+l);
+> > +
+> > +     /*
+> > +      * Range-based ipas2e1is flushes only Stage-2 entries, and since =
+the
+> > +      * VA isn't available for Stage-1 entries, flush the entire stage=
+-1.
+> > +      */
+>
+> nit: if we are going to preserve some of the commentary over in
+> __kvm_tlb_flush_vmid_ipa(), I would prefer just an exact copy/paste.
+> But, FWIW, I think you can just elide the clarifying comments altogether
+> since the relationship between stage-1 and stage-2 invalidations is
+> already documented.
+>
+> > +     dsb(ish);
+> > +     __tlbi(vmalle1is);
+> > +     dsb(ish);
+> > +     isb();
+> > +
+> > +     /* See the comment below in __kvm_tlb_flush_vmid_ipa() */
+>
+> Same comment as above.
+>
+> --
+> Thanks,
+> Oliver
