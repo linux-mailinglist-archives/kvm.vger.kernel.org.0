@@ -2,219 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AFCA56D40AB
-	for <lists+kvm@lfdr.de>; Mon,  3 Apr 2023 11:34:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5E7056D40A5
+	for <lists+kvm@lfdr.de>; Mon,  3 Apr 2023 11:33:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230192AbjDCJd7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 3 Apr 2023 05:33:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33144 "EHLO
+        id S232090AbjDCJdk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 3 Apr 2023 05:33:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33350 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232110AbjDCJdv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 3 Apr 2023 05:33:51 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 670804C38
-        for <kvm@vger.kernel.org>; Mon,  3 Apr 2023 02:33:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1680514382;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=R9bvhW0T9vZH/N8G0NdZuEtSqDdDZcgyH28wEDCMfc0=;
-        b=Ads5LFUzXGaEa+ll9dQNiz08xXcccvtxm4MvBEevMJr2HKiMkg68aThSaKJoeYX6MKBc+Q
-        h07t+2D8s+Pe8sZjYQG4nsDkSAoqUSs4VxjOGBVz5Ab/BWDxdiqYVrqEoGzB2l3RGnggMV
-        g4PEANqlgQlkwaCEapVCCnTvdPGyh7o=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-343-wqfhj8fxMXal1vSIN1kQAA-1; Mon, 03 Apr 2023 05:32:59 -0400
-X-MC-Unique: wqfhj8fxMXal1vSIN1kQAA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id CC011101A531;
-        Mon,  3 Apr 2023 09:32:58 +0000 (UTC)
-Received: from thuth.com (unknown [10.39.192.195])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9441DC15BBA;
-        Mon,  3 Apr 2023 09:32:57 +0000 (UTC)
-From:   Thomas Huth <thuth@redhat.com>
-To:     kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Andrew Jones <andrew.jones@linux.dev>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Nico Boehr <nrb@linux.ibm.com>
-Subject: [kvm-unit-tests PATCH] ci: Provide the logs as artifacts
-Date:   Mon,  3 Apr 2023 11:32:55 +0200
-Message-Id: <20230403093255.45104-1-thuth@redhat.com>
+        with ESMTP id S232098AbjDCJdc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 3 Apr 2023 05:33:32 -0400
+Received: from mail-ot1-x335.google.com (mail-ot1-x335.google.com [IPv6:2607:f8b0:4864:20::335])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E54A96A41
+        for <kvm@vger.kernel.org>; Mon,  3 Apr 2023 02:33:27 -0700 (PDT)
+Received: by mail-ot1-x335.google.com with SMTP id ca2-20020a056830610200b006a11ab58c3fso14600095otb.4
+        for <kvm@vger.kernel.org>; Mon, 03 Apr 2023 02:33:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1680514404; x=1683106404;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=DZznhaLgkR5BAQNz1oF8xOUpsQ8iqxB7L0RTGOfw/xU=;
+        b=UbT8vAYvDN6OqpJ+R+oA5J2u0aFC3YpjFuymekDS1vJOIssNIUqJ/Pr3rv0yghLjmE
+         nIxx6L1TUeuDgIDJ019Jf0UeIZ58zJdh6Y2grtRYP1XtOThcq/pq/rx9rxRNbPw5qF1V
+         4nuDEeWZz/UVV7pTd1am8hEkRAUheoHcXvbHlNyStdimjkD1sooaunPwp7euGstILn3n
+         +mY3ZBa5sLKAA5EGL8LopqgiC1TeAMnE+6/66rwt9TGtsPu1M3P9ot92vCMhj5h7q6sw
+         mpmfQYgdfVIH9aSIKIjwU0fOBTTMTg4ynSFui75ag+jt6eXYFd+bKHPVU1SdwYvfwI76
+         gcCg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1680514404; x=1683106404;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=DZznhaLgkR5BAQNz1oF8xOUpsQ8iqxB7L0RTGOfw/xU=;
+        b=UGLtQkAweFWZQH2VQ075cowqWLGocN/DKUWNbGmPwh1CGhp9v5lxoZk3m97gwdLjMe
+         ix9yzBlW0NG5lR9OGF//iCrdBy/OmMIzZyQ8VUv1J2v6amI6m9Cccd/eV5IPcp2+KED9
+         COxc2z/ePl93E5/qRH5aOO3BXh6dHnYyCSeBxjX1BuoqW8SlpcLZxjieIHAq+ta9GRr/
+         cYnyboxovFSpPfAHkPW3I8xbD9+/fILZ4dHxpM+Bk4vkGkBjKkq1PzCzPtU54yBRH2GM
+         jXedDWb4kHASnYQuuL/EropE38pPZrN8vAUIKV90b17mM7wSAZAI+HFElOQO5RspsyZD
+         aWag==
+X-Gm-Message-State: AAQBX9dBGQRG9eB7dWDS19h6v9PrqNNLLnRXeUfYUK85zEjH9WNpc/L4
+        11EbDCrzWPHNE3Ob/Qb9LC7pqw==
+X-Google-Smtp-Source: AKy350aA5Ixs2WBzjri+SklllWtPpSloyccBIm2AHc49ql1/dCwqDARVWDxRF+zMDpQSH0NUaUW7RQ==
+X-Received: by 2002:a9d:668:0:b0:6a3:7e52:c3ae with SMTP id 95-20020a9d0668000000b006a37e52c3aemr434930otn.13.1680514404560;
+        Mon, 03 Apr 2023 02:33:24 -0700 (PDT)
+Received: from anup-ubuntu-vm.localdomain ([103.97.165.210])
+        by smtp.gmail.com with ESMTPSA id f5-20020a9d6c05000000b006a154373578sm3953953otq.39.2023.04.03.02.33.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 03 Apr 2023 02:33:24 -0700 (PDT)
+From:   Anup Patel <apatel@ventanamicro.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Atish Patra <atishp@atishpatra.org>
+Cc:     Palmer Dabbelt <palmer@dabbelt.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Andrew Jones <ajones@ventanamicro.com>,
+        Anup Patel <anup@brainfault.org>, kvm@vger.kernel.org,
+        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+        linux-kernel@vger.kernel.org, Anup Patel <apatel@ventanamicro.com>
+Subject: [PATCH v3 0/8] RISC-V KVM virtualize AIA CSRs
+Date:   Mon,  3 Apr 2023 15:03:02 +0530
+Message-Id: <20230403093310.2271142-1-apatel@ventanamicro.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
-X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
+        DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-If something goes wrong, it's good to have a way to see where it failed,
-so let's provide the logs as artifacts.
+The RISC-V AIA specification is now frozen as-per the RISC-V international
+process. The latest frozen specifcation can be found at:
+https://github.com/riscv/riscv-aia/releases/download/1.0-RC3/riscv-interrupts-1.0-RC3.pdf
 
-While we're at it, also dump /proc/cpuinfo in the Fedora KVM job
-as this might contain valuable information about the KVM environment.
+This series implements first phase of AIA virtualization which targets
+virtualizing AIA CSRs. This also provides a foundation for the second
+phase of AIA virtualization which will target in-kernel AIA irqchip
+(including both IMSIC and APLIC).
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- .gitlab-ci.yml                | 22 ++++++++++++++++++++++
- ci/cirrus-ci-fedora.yml       |  6 ++++++
- ci/cirrus-ci-macos-i386.yml   |  4 ++++
- ci/cirrus-ci-macos-x86-64.yml |  4 ++++
- 4 files changed, 36 insertions(+)
+The first two patches are shared with the "Linux RISC-V AIA Support"
+series which adds AIA driver support.
 
-diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
-index ad7949c9..59a3d3c8 100644
---- a/.gitlab-ci.yml
-+++ b/.gitlab-ci.yml
-@@ -4,7 +4,20 @@ before_script:
-  - dnf update -y
-  - dnf install -y make python
- 
-+.intree_template:
-+ artifacts:
-+  expire_in: 2 days
-+  paths:
-+   - logs
-+
-+.outoftree_template:
-+ artifacts:
-+  expire_in: 2 days
-+  paths:
-+   - build/logs
-+
- build-aarch64:
-+ extends: .intree_template
-  script:
-  - dnf install -y qemu-system-aarch64 gcc-aarch64-linux-gnu
-  - ./configure --arch=aarch64 --cross-prefix=aarch64-linux-gnu-
-@@ -35,6 +48,7 @@ build-aarch64:
-  - if grep -q FAIL results.txt ; then exit 1 ; fi
- 
- build-arm:
-+ extends: .outoftree_template
-  script:
-  - dnf install -y qemu-system-arm gcc-arm-linux-gnu
-  - mkdir build
-@@ -49,6 +63,7 @@ build-arm:
-  - if grep -q FAIL results.txt ; then exit 1 ; fi
- 
- build-ppc64be:
-+ extends: .outoftree_template
-  script:
-  - dnf install -y qemu-system-ppc gcc-powerpc64-linux-gnu
-  - mkdir build
-@@ -62,6 +77,7 @@ build-ppc64be:
-  - if grep -q FAIL results.txt ; then exit 1 ; fi
- 
- build-ppc64le:
-+ extends: .intree_template
-  script:
-  - dnf install -y qemu-system-ppc gcc-powerpc64-linux-gnu
-  - ./configure --arch=ppc64 --endian=little --cross-prefix=powerpc64-linux-gnu-
-@@ -73,6 +89,7 @@ build-ppc64le:
-  - if grep -q FAIL results.txt ; then exit 1 ; fi
- 
- build-s390x:
-+ extends: .outoftree_template
-  script:
-  - dnf install -y qemu-system-s390x gcc-s390x-linux-gnu
-  - mkdir build
-@@ -109,6 +126,7 @@ build-s390x:
-  - if grep -q FAIL results.txt ; then exit 1 ; fi
- 
- build-x86_64:
-+ extends: .intree_template
-  script:
-  - dnf install -y qemu-system-x86 gcc
-  - ./configure --arch=x86_64
-@@ -147,6 +165,7 @@ build-x86_64:
-  - if grep -q FAIL results.txt ; then exit 1 ; fi
- 
- build-i386:
-+ extends: .outoftree_template
-  script:
-  - dnf install -y qemu-system-x86 gcc
-  - mkdir build
-@@ -180,6 +199,7 @@ build-i386:
-  - if grep -q FAIL results.txt ; then exit 1 ; fi
- 
- build-clang:
-+ extends: .intree_template
-  script:
-  - dnf install -y qemu-system-x86 clang
-  - ./configure --arch=x86_64 --cc=clang
-@@ -218,6 +238,7 @@ build-clang:
-  - grep -q PASS results.txt && ! grep -q FAIL results.txt
- 
- build-centos7:
-+ extends: .outoftree_template
-  image: centos:7
-  before_script:
-  - yum update -y
-@@ -266,6 +287,7 @@ cirrus-ci-macos-x86-64:
-  <<: *cirrus_build_job_definition
- 
- s390x-kvm:
-+ extends: .intree_template
-  before_script: []
-  tags:
-   - s390x-z15-vm
-diff --git a/ci/cirrus-ci-fedora.yml b/ci/cirrus-ci-fedora.yml
-index d6070f70..918c9a36 100644
---- a/ci/cirrus-ci-fedora.yml
-+++ b/ci/cirrus-ci-fedora.yml
-@@ -13,6 +13,8 @@ fedora_task:
-     - git fetch origin "@CI_COMMIT_REF_NAME@"
-     - git reset --hard "@CI_COMMIT_SHA@"
-   script:
-+    - uname -r
-+    - sed -n "/processor.*:.0/,/^$/p" /proc/cpuinfo
-     - mkdir build
-     - cd build
-     - ../configure
-@@ -70,3 +72,7 @@ fedora_task:
-         xsave
-         | tee results.txt
-     - grep -q PASS results.txt && ! grep -q FAIL results.txt
-+  on_failure:
-+    log_artifacts:
-+      path: build/logs/*.log
-+      type: text/plain
-diff --git a/ci/cirrus-ci-macos-i386.yml b/ci/cirrus-ci-macos-i386.yml
-index ed580e61..45d1b716 100644
---- a/ci/cirrus-ci-macos-i386.yml
-+++ b/ci/cirrus-ci-macos-i386.yml
-@@ -35,3 +35,7 @@ macos_i386_task:
-          vmexit_tscdeadline_immed
-          | tee results.txt
-     - grep -q PASS results.txt && ! grep -q FAIL results.txt
-+  on_failure:
-+    log_artifacts:
-+      path: build/logs/*.log
-+      type: text/plain
-diff --git a/ci/cirrus-ci-macos-x86-64.yml b/ci/cirrus-ci-macos-x86-64.yml
-index 861caa16..8ee6fb7e 100644
---- a/ci/cirrus-ci-macos-x86-64.yml
-+++ b/ci/cirrus-ci-macos-x86-64.yml
-@@ -39,3 +39,7 @@ macos_task:
-          vmexit_tscdeadline_immed
-          | tee results.txt
-     - grep -q PASS results.txt && ! grep -q FAIL results.txt
-+  on_failure:
-+    log_artifacts:
-+      path: build/logs/*.log
-+      type: text/plain
+To test this series, use AIA drivers from the "Linux RISC-V AIA Support"
+series and use KVMTOOL from the riscv_aia_v1 branch at:
+https://github.com/avpatel/kvmtool.git
+
+These patches can also be found in the riscv_kvm_aia_csr_v3 branch at:
+https://github.com/avpatel/linux.git
+
+Changes since v2:
+ - Rebased on Linux-6.3-rc5
+ - Split PATCH5 into two separate patches as suggested by Atish.
+
+Changes since v1:
+ - Addressed from Drew and Conor in PATCH1
+ - Use alphabetical ordering for SMAIA and SSAIA enum in PATCH2
+ - Use GENMASK() in PATCH3
+
+Anup Patel (8):
+  RISC-V: Add AIA related CSR defines
+  RISC-V: Detect AIA CSRs from ISA string
+  RISC-V: KVM: Drop the _MASK suffix from hgatp.VMID mask defines
+  RISC-V: KVM: Initial skeletal support for AIA
+  RISC-V: KVM: Implement subtype for CSR ONE_REG interface
+  RISC-V: KVM: Add ONE_REG interface for AIA CSRs
+  RISC-V: KVM: Virtualize per-HART AIA CSRs
+  RISC-V: KVM: Implement guest external interrupt line management
+
+ arch/riscv/include/asm/csr.h      | 107 ++++-
+ arch/riscv/include/asm/hwcap.h    |   8 +
+ arch/riscv/include/asm/kvm_aia.h  | 137 +++++++
+ arch/riscv/include/asm/kvm_host.h |  14 +-
+ arch/riscv/include/uapi/asm/kvm.h |  18 +-
+ arch/riscv/kernel/cpu.c           |   2 +
+ arch/riscv/kernel/cpufeature.c    |   2 +
+ arch/riscv/kvm/Makefile           |   1 +
+ arch/riscv/kvm/aia.c              | 624 ++++++++++++++++++++++++++++++
+ arch/riscv/kvm/main.c             |  23 +-
+ arch/riscv/kvm/mmu.c              |   3 +-
+ arch/riscv/kvm/vcpu.c             | 185 +++++++--
+ arch/riscv/kvm/vcpu_insn.c        |   1 +
+ arch/riscv/kvm/vm.c               |   4 +
+ arch/riscv/kvm/vmid.c             |   4 +-
+ 15 files changed, 1077 insertions(+), 56 deletions(-)
+ create mode 100644 arch/riscv/include/asm/kvm_aia.h
+ create mode 100644 arch/riscv/kvm/aia.c
+
 -- 
-2.31.1
+2.34.1
 
