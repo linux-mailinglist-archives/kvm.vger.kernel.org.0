@@ -2,78 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B58AA6D58B5
-	for <lists+kvm@lfdr.de>; Tue,  4 Apr 2023 08:24:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 314F86D591B
+	for <lists+kvm@lfdr.de>; Tue,  4 Apr 2023 09:03:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233633AbjDDGYJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Apr 2023 02:24:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45186 "EHLO
+        id S233689AbjDDHDg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Apr 2023 03:03:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38990 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233236AbjDDGYH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Apr 2023 02:24:07 -0400
+        with ESMTP id S233711AbjDDHDd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Apr 2023 03:03:33 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3594B138
-        for <kvm@vger.kernel.org>; Mon,  3 Apr 2023 23:23:22 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0140130D5
+        for <kvm@vger.kernel.org>; Tue,  4 Apr 2023 00:02:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1680589401;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:mime-version:mime-version:
-         content-type:content-type:
+        s=mimecast20190719; t=1680591760;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=APNrYYwPBAuPO+GWb7+dbYKyxbTjRyfGmu8CPqknU3k=;
-        b=COXlicD+7EXAJ+V275J7ui2dMHKOPPP6Gfd1pAzppXqLa2Q/RkyXQAgkB9RKbUWi+8W/MJ
-        xZejej26+ewSBF4BrrfFoaKLl8wUyKsTsAMhIKHVrmPdOkoXAnz607dRZHxp7bSaF7pDHB
-        1YZAuMN2LxAUd5VgEVPA7Gyp9l+YrIk=
-Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
- [209.85.160.197]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=I3MVmNjjTrzkV62oECuu2nmnGPuxnQPyCsf8ynhsugY=;
+        b=QBLjGc9vLCZ6qOGib/Uc/R6S5XNhDVrBEmZ9IXstRJVPHWp9GlqH5uqmuAWy2MYP1b7LS0
+        8c9QkQ+mgpkzaIiTuEWD+dD72+/PEbqjA0nQpMG4u8eVC3T1S1+dgIAULXOXj/QwvI+wU0
+        3wVrJ9ZITlDjOcjq+6/KBmO3Kd5SUdc=
+Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
+ [209.85.160.198]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-578-pyt_4OIvPTeFRYSVb-fZDA-1; Tue, 04 Apr 2023 02:23:20 -0400
-X-MC-Unique: pyt_4OIvPTeFRYSVb-fZDA-1
-Received: by mail-qt1-f197.google.com with SMTP id r4-20020ac867c4000000b003bfefb6dd58so21564465qtp.2
-        for <kvm@vger.kernel.org>; Mon, 03 Apr 2023 23:23:20 -0700 (PDT)
+ us-mta-526-yl9_pSAMNHem7pf-P7rS7w-1; Tue, 04 Apr 2023 03:02:38 -0400
+X-MC-Unique: yl9_pSAMNHem7pf-P7rS7w-1
+Received: by mail-qt1-f198.google.com with SMTP id a11-20020ac85b8b000000b003e3979be6abso21321495qta.12
+        for <kvm@vger.kernel.org>; Tue, 04 Apr 2023 00:02:38 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680589399;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=APNrYYwPBAuPO+GWb7+dbYKyxbTjRyfGmu8CPqknU3k=;
-        b=FH717nIcUtTKIASW8cEIWhbPZrAinDPKr0HHjllA3UI0Bw89dx8uGHNUCCUgyyAGxS
-         Ja6X9R0+uyoMtD5YypKL0SvajDYQ/bgghrt7+ujg6Z5oQPi72/yDNzmiFrqnUXVgr3Vx
-         7F+MF8urvJH599RdAg5WklSvTUzZbxQTTlwjhfE9CHMqXVPOuTfB7IvB2DdiCHQRnwCn
-         EyP+OCyJ1LrIYUACqeSnEB9QajfRKIEKbrwfSwAyZvvZYQjx8YLenRNWu25fqD5qYZQU
-         o3hzZgbr80Nob/zTDKQC5XePgpPPzBDDfI2jB67rNoavjYK9MGpT3Vjt8vwJ6w+L7Hcf
-         ZDbg==
-X-Gm-Message-State: AAQBX9dDqzsMISlXe/whzIchEeYjRajZPs0DJSTFspnD6IvdRv5cHgvL
-        wRnAfl3ipxDnkkFVKm91UdNV8yN/1sTgk9PkIbg5BprO6HFPrz42+YYknAgZD19v/VHw6ne93rI
-        f3YVqpjOgeuZz
-X-Received: by 2002:a05:6214:21a4:b0:56f:d8:dbb4 with SMTP id t4-20020a05621421a400b0056f00d8dbb4mr1943711qvc.2.1680589399745;
-        Mon, 03 Apr 2023 23:23:19 -0700 (PDT)
-X-Google-Smtp-Source: AKy350azFYLEwDlMSgwwh8I9rqVxvJqaLdUyzLHmRZw0ztFX9U2/HybsX+OTx3X6c8SwpCBJw9wTYg==
-X-Received: by 2002:a05:6214:21a4:b0:56f:d8:dbb4 with SMTP id t4-20020a05621421a400b0056f00d8dbb4mr1943700qvc.2.1680589399506;
-        Mon, 03 Apr 2023 23:23:19 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id ny4-20020a056214398400b005e37909a7fcsm2022912qvb.13.2023.04.03.23.23.17
+        d=1e100.net; s=20210112; t=1680591758;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=I3MVmNjjTrzkV62oECuu2nmnGPuxnQPyCsf8ynhsugY=;
+        b=WvR7PfnuUtIkloVCSZR8/6FUqkoZSJ+TnRK6QsatfgBfQKC2Yj+Mab0XUX5frxKA9R
+         LoDHmk/B/XRnAiDHmifdsRz/W5KoHnOPvWnJgLo40HyEjhZd3cN5cYnddoyRziOk2wZt
+         FBybV8hdyneDcT3ub/dl3KeZqlXQMXmBP0hiyMvCOVUlwfh6lF4Psw64bJxieFQt5Yp9
+         0aJw5XLglCkv1FpcPjrqV0H9e/sk8TtC/042IGqfUMiIJgStaXVqrr6n9IJ2+ChT2dRN
+         Znje4wfWzfKRGGL+RPQZv9/AJszbyX+r4VkH9WtN8PvsEcn8JpaJBABMQQVDU7U/OlL0
+         NhRw==
+X-Gm-Message-State: AAQBX9cvudVQkfoJMzBmd1zn5mUsW97WFh35301Qd8dBpBVdSdgmmY4R
+        H3DhMvVAzi3IG36mOYysnxA9xsiRMvXneuabFPOEKMuM4XUSAj88q9iXxCicqk99Qzc3kxH4/8C
+        gd8lw+YQzSMkE
+X-Received: by 2002:a05:622a:1014:b0:3bd:db4:b967 with SMTP id d20-20020a05622a101400b003bd0db4b967mr1605080qte.58.1680591758436;
+        Tue, 04 Apr 2023 00:02:38 -0700 (PDT)
+X-Google-Smtp-Source: AKy350ZeBly8guyCmoO5xOctGAQXU6DItAkqiG1Wa+dT9GI6WOjdnqjMxk2CNPmIGaB4Rl1jZDmaUw==
+X-Received: by 2002:a05:622a:1014:b0:3bd:db4:b967 with SMTP id d20-20020a05622a101400b003bd0db4b967mr1605062qte.58.1680591758243;
+        Tue, 04 Apr 2023 00:02:38 -0700 (PDT)
+Received: from [192.168.0.3] (ip-109-43-178-74.web.vodafone.de. [109.43.178.74])
+        by smtp.gmail.com with ESMTPSA id t20-20020ac85314000000b003e3870008c8sm3045284qtn.23.2023.04.04.00.02.35
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 03 Apr 2023 23:23:18 -0700 (PDT)
-Message-ID: <968a026e-066e-deea-d02f-f64133295ff1@redhat.com>
-Date:   Tue, 4 Apr 2023 08:23:15 +0200
+        Tue, 04 Apr 2023 00:02:36 -0700 (PDT)
+Message-ID: <1a2de9e8-3536-17d8-e6b3-7312c7ca7f46@redhat.com>
+Date:   Tue, 4 Apr 2023 09:02:33 +0200
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.0
-Reply-To: eric.auger@redhat.com
-Subject: Re: [kvm-unit-tests PATCH 0/6] arm: pmu: Fix random failures of
- pmu-chain-promotion
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.13.0
+Subject: Re: [kvm-unit-tests v3 07/13] powerpc/sprs: Specify SPRs with data
+ rather than code
 Content-Language: en-US
-To:     eric.auger.pro@gmail.com, kvm@vger.kernel.org,
-        kvmarm@lists.linux.dev, andrew.jones@linux.dev, maz@kernel.org,
-        will@kernel.org, oliver.upton@linux.dev, ricarkol@google.com,
-        reijiw@google.com, alexandru.elisei@arm.com
-References: <20230315110725.1215523-1-eric.auger@redhat.com>
-From:   Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <20230315110725.1215523-1-eric.auger@redhat.com>
-Content-Type: text/plain; charset=UTF-8
+To:     Nicholas Piggin <npiggin@gmail.com>, kvm@vger.kernel.org
+Cc:     linuxppc-dev@lists.ozlabs.org, Laurent Vivier <lvivier@redhat.com>
+References: <20230327124520.2707537-1-npiggin@gmail.com>
+ <20230327124520.2707537-8-npiggin@gmail.com>
+From:   Thomas Huth <thuth@redhat.com>
+In-Reply-To: <20230327124520.2707537-8-npiggin@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-1.5 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
@@ -85,56 +81,31 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+On 27/03/2023 14.45, Nicholas Piggin wrote:
+> A significant rework that builds an array of 'struct spr', where each
+> element describes an SPR. This makes various metadata about the SPR
+> like name and access type easier to carry and use.
+> 
+> Hypervisor privileged registers are described despite not being used
+> at the moment for completeness, but also the code might one day be
+> reused for a hypervisor-privileged test.
+> 
+> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+> 
+> This ended up a little over-engineered perhaps, but there are lots of
+> SPRs, lots of access types, lots of changes between processor and ISA
+> versions, and lots of places they are implemented and used, so lots of
+> room for mistakes. There is not a good system in place to easily
+> see that userspace, supervisor, etc., switches perform all the right
+> SPR context switching so this is a nice test case to have. The sprs test
+> quickly caught a few QEMU TCG SPR bugs which really motivated me to
+> improve the SPR coverage.
+> ---
+> Since v2:
+> - Merged with "Indirect SPR accessor functions" patch.
+> 
+>   powerpc/sprs.c | 643 ++++++++++++++++++++++++++++++++++---------------
+>   1 file changed, 450 insertions(+), 193 deletions(-)
 
-On 3/15/23 12:07, Eric Auger wrote:
-> On some HW (ThunderXv2), some random failures of
-> pmu-chain-promotion test can be observed.
->
-> pmu-chain-promotion is composed of several subtests
-> which run 2 mem_access loops. The initial value of
-> the counter is set so that no overflow is expected on
-> the first loop run and overflow is expected on the second.
-> However it is observed that sometimes we get an overflow
-> on the first run. It looks related to some variability of
-> the mem_acess count. This variability is observed on all
-> HW I have access to, with different span though. On
-> ThunderX2 HW it looks the margin that is currently taken
-> is too small and we regularly hit failure.
->
-> although the first goal of this series is to increase
-> the count/margin used in those tests, it also attempts
-> to improve the pmu-chain-promotion logs, add some barriers
-> in the mem-access loop, clarify the chain counter
-> enable/disable sequence.
->
-> A new 'pmu-memaccess-reliability' is also introduced to
-> detect issues with MEM_ACCESS event variability and make
-> the debug easier.
->
-> Obviously one can wonder if this variability is something normal
-> and does not hide any other bug. I hope this series will raise
-> additional discussions about this.
->
-> https://github.com/eauger/kut/tree/pmu-chain-promotion-fixes-v1
-
-Gentle ping.
-
-Thanks
-
-Eric
->
-> Eric Auger (6):
->   arm: pmu: pmu-chain-promotion: Improve debug messages
->   arm: pmu: pmu-chain-promotion: Introduce defines for count and margin
->     values
->   arm: pmu: Add extra DSB barriers in the mem_access loop
->   arm: pmu: Fix chain counter enable/disable sequences
->   arm: pmu: Add pmu-memaccess-reliability test
->   arm: pmu-chain-promotion: Increase the count and margin values
->
->  arm/pmu.c         | 189 +++++++++++++++++++++++++++++++++-------------
->  arm/unittests.cfg |   6 ++
->  2 files changed, 141 insertions(+), 54 deletions(-)
->
+Acked-by: Thomas Huth <thuth@redhat.com>
 
