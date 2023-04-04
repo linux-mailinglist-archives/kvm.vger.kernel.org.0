@@ -2,103 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2BF076D5F59
-	for <lists+kvm@lfdr.de>; Tue,  4 Apr 2023 13:43:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F2E106D5F78
+	for <lists+kvm@lfdr.de>; Tue,  4 Apr 2023 13:50:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234792AbjDDLnf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Apr 2023 07:43:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47954 "EHLO
+        id S234502AbjDDLuV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Apr 2023 07:50:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54750 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234800AbjDDLna (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Apr 2023 07:43:30 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D07E3A8B;
-        Tue,  4 Apr 2023 04:43:23 -0700 (PDT)
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3349rVUv011097;
-        Tue, 4 Apr 2023 11:43:23 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
- mime-version : content-transfer-encoding : in-reply-to : references : cc :
- to : subject : from : message-id : date; s=pp1;
- bh=roMPf5OL4gaP5725IIAqaBn0Al14V6yndN4UkgXcdCs=;
- b=Z7k2rCt9Xd6aEjx6QSbrq4C/e3syb7K0pqb1O9+N2ogRKpubtihN22lN+1fhcksebynS
- HnRnEU5XKhJDc/hktgZ2ErIQfmqOU+j+PWyYsiQ8GYTm27WdWahxkXn48tyAW0eeLTba
- 8M7t6ZJIuyqv88VGWcOc39t8sW7sStOhKZm29niUBDeSho7QxNH4lFy/DUZZ05Ncugk3
- SLIkTU5mC8jItcUK4TMlfR+ktVklOGsMKqRhmk3Ev2791HiqPv1UzSFxSMdsiqGvbnLE
- go5jE9cxKfWuBx6kUrcmlJRmffB1jPb7qt9l7lcS+YIwkoI33vELo5ixVMV3WO4QUtT7 mg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pr3gs5xpv-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 04 Apr 2023 11:43:22 +0000
-Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 334BHNft031069;
-        Tue, 4 Apr 2023 11:43:22 GMT
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pr3gs5xpd-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 04 Apr 2023 11:43:22 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3341n3tw024634;
-        Tue, 4 Apr 2023 11:43:20 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-        by ppma06ams.nl.ibm.com (PPS) with ESMTPS id 3ppbvg2fvr-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 04 Apr 2023 11:43:20 +0000
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-        by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 334BhH9I14746218
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 4 Apr 2023 11:43:17 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 08F7A20049;
-        Tue,  4 Apr 2023 11:43:17 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D99D720043;
-        Tue,  4 Apr 2023 11:43:16 +0000 (GMT)
-Received: from t14-nrb (unknown [9.171.55.238])
-        by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Tue,  4 Apr 2023 11:43:16 +0000 (GMT)
+        with ESMTP id S234863AbjDDLuT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Apr 2023 07:50:19 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 023251982;
+        Tue,  4 Apr 2023 04:50:19 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 8F62D632A3;
+        Tue,  4 Apr 2023 11:50:18 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id E2B84C4339C;
+        Tue,  4 Apr 2023 11:50:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1680609017;
+        bh=PUme9Pqjr+nOp7BWP8OmqF17obLXySvwFTlVeaoxJaE=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=ZTaK2r+wl4Ag8QVQjUuxGrypd22g9th1Nn/TeN3oGHJZ1ITNecen8gBdA45U8zWoH
+         TSZNhR8Ljm6WLiDpFYCz+cVhDnt6hPz0XEkNNk3iTzrv5wKk/kiyxb0vl+7ennRL1m
+         Ahkiue8KerIjcH3weqJgp9Ths6X+8EqM8DgZF1vX7+uRRpmvjBsVusFKf5XVsy0bM8
+         tT9xc8i3mqfSq5/VrHdnDm6UOUetcGBicNBKsrajoCr8j4zK9Jm2Xkn23CWb7hGwlI
+         URA93xRtzlrai17cJQnXBMaJ4hIVZ2PLEKrL9b8VvLrdGJ3vuoFE8DrEsZVq+ol+0r
+         ZMK2Xt51fPMFA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id BFF37E5EA89;
+        Tue,  4 Apr 2023 11:50:17 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20230404102437.174404-1-thuth@redhat.com>
-References: <20230404102437.174404-1-thuth@redhat.com>
-Cc:     linux-s390@vger.kernel.org, Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>
-To:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org
-Subject: Re: [kvm-unit-tests PATCH] s390x: Use the right constraints in intercept.c
-From:   Nico Boehr <nrb@linux.ibm.com>
-Message-ID: <168060859657.37806.1305962304917629188@t14-nrb>
-User-Agent: alot/0.8.1
-Date:   Tue, 04 Apr 2023 13:43:16 +0200
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: gzzpo7LU_2ahm0HmEywDGlINcEZDPn6R
-X-Proofpoint-ORIG-GUID: UHo7X3sGY3EjqDq2nx0lf3YxyeNjY2PE
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
- definitions=2023-04-04_04,2023-04-04_01,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 clxscore=1015
- spamscore=0 bulkscore=0 phishscore=0 priorityscore=1501 malwarescore=0
- impostorscore=0 mlxlogscore=790 lowpriorityscore=0 adultscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2303200000 definitions=main-2304040107
-X-Spam-Status: No, score=-0.1 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
-        DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-        autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v4 0/3] vsock: return errors other than -ENOMEM to
+ socket
+From:   patchwork-bot+netdevbpf@kernel.org
+Message-Id: <168060901777.14038.3884666734757699938.git-patchwork-notify@kernel.org>
+Date:   Tue, 04 Apr 2023 11:50:17 +0000
+References: <0d20e25a-640c-72c1-2dcb-7a53a05e3132@sberdevices.ru>
+In-Reply-To: <0d20e25a-640c-72c1-2dcb-7a53a05e3132@sberdevices.ru>
+To:     Arseniy Krasnov <AVKrasnov@sberdevices.ru>
+Cc:     stefanha@redhat.com, sgarzare@redhat.com, davem@davemloft.net,
+        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+        bobby.eshleman@bytedance.com, bryantan@vmware.com,
+        vdasa@vmware.com, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kernel@sberdevices.ru,
+        oxffffaa@gmail.com, avkrasnov@sberdevices.ru, pv-drivers@vmware.com
+X-Spam-Status: No, score=-5.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,SPF_HELO_NONE,
+        SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Quoting Thomas Huth (2023-04-04 12:24:37)
-> stpx, spx, stap and stidp use addressing via "base register", i.e.
-> if register 0 is used, the base address will be 0, independent from
-> the value of the register. Thus we must not use the "r" constraint
-> here to avoid register 0. This fixes test failures when compiling
-> with Clang instead of GCC, since Clang apparently prefers to use
-> register 0 in some cases where GCC never uses register 0.
->=20
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+Hello:
 
-Reviewed-by: Nico Boehr <nrb@linux.ibm.com>
+This series was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
+
+On Mon, 3 Apr 2023 14:23:00 +0300 you wrote:
+> Hello,
+> 
+> this patchset removes behaviour, where error code returned from any
+> transport was always switched to ENOMEM. This works in the same way as
+> patch from Bobby Eshleman:
+> commit c43170b7e157 ("vsock: return errors other than -ENOMEM to socket"),
+> but for receive calls. VMCI transport is also updated (both tx and rx
+> SOCK_STREAM callbacks), because it returns VMCI specific error code to
+> af_vsock.c (like VMCI_ERROR_*). Tx path is already merged to net, so it
+> was excluded from patchset in v4. At the same time, virtio and Hyper-V
+> transports are using general error codes, so there is no need to update
+> them.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next,v4,1/3] vsock/vmci: convert VMCI error code to -ENOMEM on receive
+    https://git.kernel.org/netdev/net-next/c/f59f3006ca7b
+  - [net-next,v4,2/3] vsock: return errors other than -ENOMEM to socket
+    https://git.kernel.org/netdev/net-next/c/02ab696febab
+  - [net-next,v4,3/3] vsock/test: update expected return values
+    https://git.kernel.org/netdev/net-next/c/b5d54eb5899a
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
