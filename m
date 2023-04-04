@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 41EA06D5E3A
-	for <lists+kvm@lfdr.de>; Tue,  4 Apr 2023 12:54:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EFDAF6D5E42
+	for <lists+kvm@lfdr.de>; Tue,  4 Apr 2023 12:55:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234844AbjDDKyl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Apr 2023 06:54:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33892 "EHLO
+        id S234855AbjDDKyn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Apr 2023 06:54:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34506 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234773AbjDDKxu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Apr 2023 06:53:50 -0400
+        with ESMTP id S234681AbjDDKyD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Apr 2023 06:54:03 -0400
 Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0B524237;
-        Tue,  4 Apr 2023 03:53:14 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F56A448D;
+        Tue,  4 Apr 2023 03:53:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1680605594; x=1712141594;
+  t=1680605596; x=1712141596;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=9ZDzco+F9bEe6GLOCDycLaH8JYPs/ssjd/Vxju2hLBE=;
-  b=Oj+6CnneUeAPLf1Z9tCAQuNyyHvSlkTDwQESKSd0a2/DKtLNLQdoBVCD
-   BSF/A6TVfvFr/0yzn2QN835fUGvDszzRJHJfV309MAntP0gOQf6XXAWUr
-   ZrEbai6Pa8LyN8yIiVpi5O4hnqGrQBfZWdMhQqpYT8sOJH599TZyCIyVr
-   bslmrCXVGN7qg8YSMH4uP/DOFb6mKctaDi0ckCzSjqJXkOuLg/ZhX5SPo
-   S658QIpSP+JyJBfguiI70BZ0raEjhAGpNaT/o8ktAHjxh0+U12SK1ZVXD
-   +mziK21JnHwNncSYfrbKOZH2MaU2S0Y/yTTTv0bcOlDCH6Ma0xEjdbKIf
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10669"; a="330734043"
+  bh=tP9iIQUbrhMc+5l0AHCXnkXnhn3TgNNmkDoitFhCFbw=;
+  b=BGuYly58a8kzcEEEEBmnYMdnB8EzF9x88XbFR+zbTcXG7znOJxoVZSIj
+   Odaj7L7xRdtg5f4aXN7ynJZkzANkUlgetmR4u1iu1FuDZqQx7+dnQxbiU
+   9JyBr2Jt9qK6a4GPE5jBssB730Iw/vR2/CQvucT+MjrPeX/9a0q9atxz8
+   NAiw1b6Tqkm3DMkMF/Owk0vvIRAccduPFLmLlj1Pfdel5XHHfTA3cS6/d
+   V3vU5sTshLj7MNv4siNFrk2DKrCl0Kuw3MqJUKueoE+O+1DvyCZi8SU1j
+   /ewekNQvBm7LTBrdULERGRUppSJpRPPboYrucpthN/C22wJS+Vep1csxb
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10669"; a="330734053"
 X-IronPort-AV: E=Sophos;i="5.98,317,1673942400"; 
-   d="scan'208";a="330734043"
+   d="scan'208";a="330734053"
 Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Apr 2023 03:53:02 -0700
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Apr 2023 03:53:03 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10669"; a="775597814"
+X-IronPort-AV: E=McAfee;i="6600,9927,10669"; a="775597817"
 X-IronPort-AV: E=Sophos;i="5.98,317,1673942400"; 
-   d="scan'208";a="775597814"
+   d="scan'208";a="775597817"
 Received: from unknown (HELO fred..) ([172.25.112.68])
   by FMSMGA003.fm.intel.com with ESMTP; 04 Apr 2023 03:53:02 -0700
 From:   Xin Li <xin3.li@intel.com>
@@ -45,9 +45,9 @@ Cc:     tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
         andrew.cooper3@citrix.com, seanjc@google.com, pbonzini@redhat.com,
         ravi.v.shankar@intel.com, jiangshanlai@gmail.com,
         shan.kang@intel.com
-Subject: [PATCH v7 12/33] x86/cpu: add MSR numbers for FRED configuration
-Date:   Tue,  4 Apr 2023 03:26:55 -0700
-Message-Id: <20230404102716.1795-13-xin3.li@intel.com>
+Subject: [PATCH v7 13/33] x86/fred: header file for event types
+Date:   Tue,  4 Apr 2023 03:26:56 -0700
+Message-Id: <20230404102716.1795-14-xin3.li@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230404102716.1795-1-xin3.li@intel.com>
 References: <20230404102716.1795-1-xin3.li@intel.com>
@@ -63,69 +63,81 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: "H. Peter Anvin (Intel)" <hpa@zytor.com>
+FRED inherits the Intel VT-x enhancement of classified events with
+a two-level event dispatch logic. The first-level dispatch is on
+the event type, not the event vector as used in the IDT architecture.
+This also means that vectors in different event types are orthogonal,
+e.g., vectors 0x10-0x1f become available as hardware interrupts.
 
-Add MSR numbers for the FRED configuration registers.
+Add a header file for event types, and also use it in <asm/vmx.h>.
 
-Originally-by: Megha Dey <megha.dey@intel.com>
-Signed-off-by: H. Peter Anvin (Intel) <hpa@zytor.com>
+Suggested-by: H. Peter Anvin (Intel) <hpa@zytor.com>
 Tested-by: Shan Kang <shan.kang@intel.com>
 Signed-off-by: Xin Li <xin3.li@intel.com>
 ---
- arch/x86/include/asm/msr-index.h       | 13 ++++++++++++-
- tools/arch/x86/include/asm/msr-index.h | 13 ++++++++++++-
- 2 files changed, 24 insertions(+), 2 deletions(-)
+ arch/x86/include/asm/event-type.h | 17 +++++++++++++++++
+ arch/x86/include/asm/vmx.h        | 17 +++++++++--------
+ 2 files changed, 26 insertions(+), 8 deletions(-)
+ create mode 100644 arch/x86/include/asm/event-type.h
 
-diff --git a/arch/x86/include/asm/msr-index.h b/arch/x86/include/asm/msr-index.h
-index ad35355ee43e..87db728f8bbc 100644
---- a/arch/x86/include/asm/msr-index.h
-+++ b/arch/x86/include/asm/msr-index.h
-@@ -36,8 +36,19 @@
- #define EFER_FFXSR		(1<<_EFER_FFXSR)
- #define EFER_AUTOIBRS		(1<<_EFER_AUTOIBRS)
+diff --git a/arch/x86/include/asm/event-type.h b/arch/x86/include/asm/event-type.h
+new file mode 100644
+index 000000000000..fedaa0e492c5
+--- /dev/null
++++ b/arch/x86/include/asm/event-type.h
+@@ -0,0 +1,17 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++#ifndef _ASM_X86_EVENT_TYPE_H
++#define _ASM_X86_EVENT_TYPE_H
++
++/*
++ * Event type codes: these are the same that are used by VTx.
++ */
++#define EVENT_TYPE_HWINT	0	/* Maskable external interrupt */
++#define EVENT_TYPE_RESERVED	1
++#define EVENT_TYPE_NMI		2	/* Non-maskable interrupt */
++#define EVENT_TYPE_HWFAULT	3	/* Hardware exceptions (e.g., page fault) */
++#define EVENT_TYPE_SWINT	4	/* Software interrupt (INT n) */
++#define EVENT_TYPE_PRIVSW	5	/* INT1 (ICEBP) */
++#define EVENT_TYPE_SWFAULT	6	/* Software exception (INT3 or INTO) */
++#define EVENT_TYPE_OTHER	7	/* FRED: SYSCALL/SYSENTER */
++
++#endif
+diff --git a/arch/x86/include/asm/vmx.h b/arch/x86/include/asm/vmx.h
+index 498dc600bd5c..8d9b8b0d8e56 100644
+--- a/arch/x86/include/asm/vmx.h
++++ b/arch/x86/include/asm/vmx.h
+@@ -15,6 +15,7 @@
+ #include <linux/bitops.h>
+ #include <linux/types.h>
+ #include <uapi/asm/vmx.h>
++#include <asm/event-type.h>
+ #include <asm/vmxfeatures.h>
  
--/* Intel MSRs. Some also available on other CPUs */
-+/* FRED MSRs */
-+#define MSR_IA32_FRED_RSP0	0x1cc /* Level 0 stack pointer */
-+#define MSR_IA32_FRED_RSP1	0x1cd /* Level 1 stack pointer */
-+#define MSR_IA32_FRED_RSP2	0x1ce /* Level 2 stack pointer */
-+#define MSR_IA32_FRED_RSP3	0x1cf /* Level 3 stack pointer */
-+#define MSR_IA32_FRED_STKLVLS	0x1d0 /* Exception stack levels */
-+#define MSR_IA32_FRED_SSP0	MSR_IA32_PL0_SSP /* Level 0 shadow stack pointer */
-+#define MSR_IA32_FRED_SSP1	0x1d1 /* Level 1 shadow stack pointer */
-+#define MSR_IA32_FRED_SSP2	0x1d2 /* Level 2 shadow stack pointer */
-+#define MSR_IA32_FRED_SSP3	0x1d3 /* Level 3 shadow stack pointer */
-+#define MSR_IA32_FRED_CONFIG	0x1d4 /* Entrypoint and interrupt stack level */
+ #define VMCS_CONTROL_BIT(x)	BIT(VMX_FEATURE_##x & 0x1f)
+@@ -372,14 +373,14 @@ enum vmcs_field {
+ #define VECTORING_INFO_DELIVER_CODE_MASK    	INTR_INFO_DELIVER_CODE_MASK
+ #define VECTORING_INFO_VALID_MASK       	INTR_INFO_VALID_MASK
  
-+/* Intel MSRs. Some also available on other CPUs */
- #define MSR_TEST_CTRL				0x00000033
- #define MSR_TEST_CTRL_SPLIT_LOCK_DETECT_BIT	29
- #define MSR_TEST_CTRL_SPLIT_LOCK_DETECT		BIT(MSR_TEST_CTRL_SPLIT_LOCK_DETECT_BIT)
-diff --git a/tools/arch/x86/include/asm/msr-index.h b/tools/arch/x86/include/asm/msr-index.h
-index ad35355ee43e..87db728f8bbc 100644
---- a/tools/arch/x86/include/asm/msr-index.h
-+++ b/tools/arch/x86/include/asm/msr-index.h
-@@ -36,8 +36,19 @@
- #define EFER_FFXSR		(1<<_EFER_FFXSR)
- #define EFER_AUTOIBRS		(1<<_EFER_AUTOIBRS)
+-#define INTR_TYPE_EXT_INTR              (0 << 8) /* external interrupt */
+-#define INTR_TYPE_RESERVED              (1 << 8) /* reserved */
+-#define INTR_TYPE_NMI_INTR		(2 << 8) /* NMI */
+-#define INTR_TYPE_HARD_EXCEPTION	(3 << 8) /* processor exception */
+-#define INTR_TYPE_SOFT_INTR             (4 << 8) /* software interrupt */
+-#define INTR_TYPE_PRIV_SW_EXCEPTION	(5 << 8) /* ICE breakpoint - undocumented */
+-#define INTR_TYPE_SOFT_EXCEPTION	(6 << 8) /* software exception */
+-#define INTR_TYPE_OTHER_EVENT           (7 << 8) /* other event */
++#define INTR_TYPE_EXT_INTR		(EVENT_TYPE_HWINT << 8)		/* external interrupt */
++#define INTR_TYPE_RESERVED		(EVENT_TYPE_RESERVED << 8)	/* reserved */
++#define INTR_TYPE_NMI_INTR		(EVENT_TYPE_NMI << 8)		/* NMI */
++#define INTR_TYPE_HARD_EXCEPTION	(EVENT_TYPE_HWFAULT << 8)	/* processor exception */
++#define INTR_TYPE_SOFT_INTR		(EVENT_TYPE_SWINT << 8)		/* software interrupt */
++#define INTR_TYPE_PRIV_SW_EXCEPTION	(EVENT_TYPE_PRIVSW << 8)	/* ICE breakpoint - undocumented */
++#define INTR_TYPE_SOFT_EXCEPTION	(EVENT_TYPE_SWFAULT << 8)	/* software exception */
++#define INTR_TYPE_OTHER_EVENT		(EVENT_TYPE_OTHER << 8)		/* other event */
  
--/* Intel MSRs. Some also available on other CPUs */
-+/* FRED MSRs */
-+#define MSR_IA32_FRED_RSP0	0x1cc /* Level 0 stack pointer */
-+#define MSR_IA32_FRED_RSP1	0x1cd /* Level 1 stack pointer */
-+#define MSR_IA32_FRED_RSP2	0x1ce /* Level 2 stack pointer */
-+#define MSR_IA32_FRED_RSP3	0x1cf /* Level 3 stack pointer */
-+#define MSR_IA32_FRED_STKLVLS	0x1d0 /* Exception stack levels */
-+#define MSR_IA32_FRED_SSP0	MSR_IA32_PL0_SSP /* Level 0 shadow stack pointer */
-+#define MSR_IA32_FRED_SSP1	0x1d1 /* Level 1 shadow stack pointer */
-+#define MSR_IA32_FRED_SSP2	0x1d2 /* Level 2 shadow stack pointer */
-+#define MSR_IA32_FRED_SSP3	0x1d3 /* Level 3 shadow stack pointer */
-+#define MSR_IA32_FRED_CONFIG	0x1d4 /* Entrypoint and interrupt stack level */
- 
-+/* Intel MSRs. Some also available on other CPUs */
- #define MSR_TEST_CTRL				0x00000033
- #define MSR_TEST_CTRL_SPLIT_LOCK_DETECT_BIT	29
- #define MSR_TEST_CTRL_SPLIT_LOCK_DETECT		BIT(MSR_TEST_CTRL_SPLIT_LOCK_DETECT_BIT)
+ /* GUEST_INTERRUPTIBILITY_INFO flags. */
+ #define GUEST_INTR_STATE_STI		0x00000001
 -- 
 2.34.1
 
