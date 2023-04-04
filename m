@@ -2,62 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 87CCD6D59D3
-	for <lists+kvm@lfdr.de>; Tue,  4 Apr 2023 09:41:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4573D6D5AC7
+	for <lists+kvm@lfdr.de>; Tue,  4 Apr 2023 10:25:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233735AbjDDHlO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Apr 2023 03:41:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47628 "EHLO
+        id S234249AbjDDIZY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Apr 2023 04:25:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60330 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233212AbjDDHlM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Apr 2023 03:41:12 -0400
-Received: from smtpout1.mo529.mail-out.ovh.net (smtpout1.mo529.mail-out.ovh.net [178.32.125.2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE46110EA
-        for <kvm@vger.kernel.org>; Tue,  4 Apr 2023 00:41:10 -0700 (PDT)
-Received: from mxplan5.mail.ovh.net (unknown [10.109.138.233])
-        by mo529.mail-out.ovh.net (Postfix) with ESMTPS id 1FB0521711;
-        Tue,  4 Apr 2023 07:41:09 +0000 (UTC)
-Received: from kaod.org (37.59.142.97) by DAG4EX2.mxp5.local (172.16.2.32)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.23; Tue, 4 Apr
- 2023 09:41:08 +0200
-Authentication-Results: garm.ovh; auth=pass (GARM-97G0022fcbf9e4-7470-40b3-9410-4c66e3272b75,
-                    85507D0075A56E5AD4EA03BF56E5282CC2D8C3A6) smtp.auth=clg@kaod.org
-X-OVh-ClientIp: 82.64.250.170
-Message-ID: <227eb09d-e5dc-2662-32b0-0b9ca4e8ef34@kaod.org>
-Date:   Tue, 4 Apr 2023 09:41:07 +0200
+        with ESMTP id S234188AbjDDIZQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Apr 2023 04:25:16 -0400
+Received: from new2-smtp.messagingengine.com (new2-smtp.messagingengine.com [66.111.4.224])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC8CD19B6;
+        Tue,  4 Apr 2023 01:25:13 -0700 (PDT)
+Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
+        by mailnew.nyi.internal (Postfix) with ESMTP id 1357F582072;
+        Tue,  4 Apr 2023 04:25:13 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute5.internal (MEProxy); Tue, 04 Apr 2023 04:25:13 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shutemov.name;
+         h=cc:cc:content-type:content-type:date:date:from:from
+        :in-reply-to:in-reply-to:message-id:mime-version:references
+        :reply-to:sender:subject:subject:to:to; s=fm1; t=1680596713; x=
+        1680603913; bh=ucaJdjXCvIGCze6KDfbsPlFe2n6TgL3UUQGpg9tF7po=; b=I
+        DSiBq2VrNCBC6QDxMURGV8kNtJO9gautIsomo38gXtIcakYN8v07Vw2OYXsSxfn/
+        aME2qwMeJzDNTlSp3qzI9uRMEP3f+Py0rAVeAXat7UyeKEzqp3FPlm0aIf9IsYjU
+        VJMXwkd4SeUH00xSxDFBjlctr/KE/jVpLD7/h5Z7c2HZosqmXl8ah69koYjVKfMT
+        EKGrhBzG7kgvGD167S1ZyDIT9zruuzRj0k6xLwq1xP8PbiKquj2w/Trgcl4nMdZn
+        pEn9oeVAmcytzq5luBhkXUbiTk4DEACjFw2INXfbGWz9X3yl0QxMdplcJtecGdDv
+        w/IPQCjLyN72kjsv7QPJA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:cc:content-type:content-type:date:date
+        :feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+        :message-id:mime-version:references:reply-to:sender:subject
+        :subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+        :x-sasl-enc; s=fm2; t=1680596713; x=1680603913; bh=ucaJdjXCvIGCz
+        e6KDfbsPlFe2n6TgL3UUQGpg9tF7po=; b=KxjPvdshfxbt2/6hFUHYrRjGmYUQI
+        AacryrBkFC92hJLW6LUXwVPG8eoE6c9/ToxcviVUPXwT9n6U9KUtitW12VQTgEPM
+        dtWOhdv0rYR6MoluiNosghIZDNR9g+Xn7iMiDrGkNh+VsX9uFKovlLDYM4XsFMtn
+        BxmQ+xNwM/IVoJHAXQenfwwYITbs+6mK6YhZpuLJlps+FR2JJDBBaN5137529WCO
+        G6WozEo2zY2g0o+poTxy+XKEesh2njzFQJghOtV/BlkD90rQ1c1qkjfLVq8/8Nsj
+        cZR1ZPsKHFr0W0XueC5rcVZqlM9mpJNRHSnNgFCxUbirqS4tT4YcQT3vw==
+X-ME-Sender: <xms:594rZFsDdlfX3C3UBbehL30vE9YfyLf7XUtU0hKYnmKgT4UOtgLOcQ>
+    <xme:594rZOdLHY59ptztN9KpTQEq7XwkbjmkQqY0vzVa_GylWcd_Y6rxwruI_4HTO2_s5
+    2qQMdMxhutCwm-0Qlc>
+X-ME-Received: <xmr:594rZIwz_xb5yM2dG1h_WtLjuLqY2FJ1LNGUP70yWmzAIeKm4ZHovzbraDlUXc3NCuzxBQ>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedrvdeiledgtdefucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepfffhvfevuffkfhggtggujgesthdttddttddtvdenucfhrhhomhepfdfmihhr
+    ihhllhcutedrucfuhhhuthgvmhhovhdfuceokhhirhhilhhlsehshhhuthgvmhhovhdrnh
+    grmhgvqeenucggtffrrghtthgvrhhnpefhieeghfdtfeehtdeftdehgfehuddtvdeuheet
+    tddtheejueekjeegueeivdektdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmh
+    epmhgrihhlfhhrohhmpehkihhrihhllhesshhhuhhtvghmohhvrdhnrghmvg
+X-ME-Proxy: <xmx:594rZMMm7ERGOuRf6j0KEPnsIaOnJLLIAtNtQtvW9Kw28ObNyP2O4w>
+    <xmx:594rZF93Z5UZUB6gYgYG8-jATfACy8p3b0q_hraVNF4DpZz1KDIypw>
+    <xmx:594rZMXJx4DaW1I1BdTCKFNDqbrKkl3kR0g6UZ4xsMVfMaN14WwR3w>
+    <xmx:6d4rZEDiAVOUK62NR-3AI4m0fzW6ULVpFZqPWyawWzV3iixQHl6osw>
+Feedback-ID: ie3994620:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
+ 4 Apr 2023 04:25:10 -0400 (EDT)
+Received: by box.shutemov.name (Postfix, from userid 1000)
+        id 5730E10CC3C; Tue,  4 Apr 2023 11:25:07 +0300 (+03)
+Date:   Tue, 4 Apr 2023 11:25:07 +0300
+From:   "Kirill A. Shutemov" <kirill@shutemov.name>
+To:     Ackerley Tng <ackerleytng@google.com>
+Cc:     kvm@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-arch@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, qemu-devel@nongnu.org, aarcange@redhat.com,
+        ak@linux.intel.com, akpm@linux-foundation.org, arnd@arndb.de,
+        bfields@fieldses.org, bp@alien8.de, chao.p.peng@linux.intel.com,
+        corbet@lwn.net, dave.hansen@intel.com, david@redhat.com,
+        ddutile@redhat.com, dhildenb@redhat.com, hpa@zytor.com,
+        hughd@google.com, jlayton@kernel.org, jmattson@google.com,
+        joro@8bytes.org, jun.nakajima@intel.com,
+        kirill.shutemov@linux.intel.com, linmiaohe@huawei.com,
+        luto@kernel.org, mail@maciej.szmigiero.name, mhocko@suse.com,
+        michael.roth@amd.com, mingo@redhat.com, naoya.horiguchi@nec.com,
+        pbonzini@redhat.com, qperret@google.com, rppt@kernel.org,
+        seanjc@google.com, shuah@kernel.org, steven.price@arm.com,
+        tabba@google.com, tglx@linutronix.de, vannapurve@google.com,
+        vbabka@suse.cz, vkuznets@redhat.com, wanpengli@tencent.com,
+        wei.w.wang@intel.com, x86@kernel.org, yu.c.zhang@linux.intel.com
+Subject: Re: [RFC PATCH v3 1/2] mm: restrictedmem: Allow userspace to specify
+ mount for memfd_restricted
+Message-ID: <20230404082507.sbyfahwc4gdupmya@box.shutemov.name>
+References: <cover.1680306489.git.ackerleytng@google.com>
+ <592ebd9e33a906ba026d56dc68f42d691706f865.1680306489.git.ackerleytng@google.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.9.1
-Subject: Re: [PATCH v19 06/21] s390x/cpu topology: interception of PTF
- instruction
-Content-Language: en-US
-To:     Pierre Morel <pmorel@linux.ibm.com>, <qemu-s390x@nongnu.org>
-CC:     <qemu-devel@nongnu.org>, <borntraeger@de.ibm.com>,
-        <pasic@linux.ibm.com>, <richard.henderson@linaro.org>,
-        <david@redhat.com>, <thuth@redhat.com>, <cohuck@redhat.com>,
-        <mst@redhat.com>, <pbonzini@redhat.com>, <kvm@vger.kernel.org>,
-        <ehabkost@redhat.com>, <marcel.apfelbaum@gmail.com>,
-        <eblake@redhat.com>, <armbru@redhat.com>, <seiden@linux.ibm.com>,
-        <nrb@linux.ibm.com>, <nsg@linux.ibm.com>, <frankja@linux.ibm.com>,
-        <berrange@redhat.com>
-References: <20230403162905.17703-1-pmorel@linux.ibm.com>
- <20230403162905.17703-7-pmorel@linux.ibm.com>
-From:   =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-In-Reply-To: <20230403162905.17703-7-pmorel@linux.ibm.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [37.59.142.97]
-X-ClientProxiedBy: DAG1EX1.mxp5.local (172.16.2.1) To DAG4EX2.mxp5.local
- (172.16.2.32)
-X-Ovh-Tracer-GUID: b7aa4e4c-f92b-4df4-9d98-f74575e51847
-X-Ovh-Tracer-Id: 15317868234580397011
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedvhedrvdeikedguddtjecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefkffggfgfuvfevfhfhjggtgfhisehtjeertddtfeejnecuhfhrohhmpeevrogurhhitgcunfgvucfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhepuedutdetleegjefhieekgeffkefhleevgfefjeevffejieevgeefhefgtdfgiedtnecukfhppeduvdejrddtrddtrddupdefjedrheelrddugedvrdeljedpkedvrdeigedrvdehtddrudejtdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpeduvdejrddtrddtrddupdhmrghilhhfrhhomhepoegtlhhgsehkrghougdrohhrgheqpdhnsggprhgtphhtthhopedupdhrtghpthhtohepphhmohhrvghlsehlihhnuhigrdhisghmrdgtohhmpdhnshhgsehlihhnuhigrdhisghmrdgtohhmpdhnrhgssehlihhnuhigrdhisghmrdgtohhmpdhsvghiuggvnheslhhinhhugidrihgsmhdrtghomhdprghrmhgsrhhusehrvgguhhgrthdrtghomhdpvggslhgrkhgvsehrvgguhhgrthdrtghomhdpmhgrrhgtvghlrdgrphhfvghlsggruhhmsehgmhgrihhlrdgtohhmpdgvhhgrsghkohhsthesrhgvughhrghtrdgtohhmpdhkvhhmsehvgh
- gvrhdrkhgvrhhnvghlrdhorhhgpdhfrhgrnhhkjhgrsehlihhnuhigrdhisghmrdgtohhmpdhpsghonhiiihhnihesrhgvughhrghtrdgtohhmpdgtohhhuhgtkhesrhgvughhrghtrdgtohhmpdhthhhuthhhsehrvgguhhgrthdrtghomhdpuggrvhhiugesrhgvughhrghtrdgtohhmpdhrihgthhgrrhgurdhhvghnuggvrhhsohhnsehlihhnrghrohdrohhrghdpphgrshhitgeslhhinhhugidrihgsmhdrtghomhdpsghorhhnthhrrggvghgvrhesuggvrdhisghmrdgtohhmpdhqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhgpdhqvghmuhdqshefledtgiesnhhonhhgnhhurdhorhhgpdhmshhtsehrvgguhhgrthdrtghomhdpsggvrhhrrghnghgvsehrvgguhhgrthdrtghomhdpoffvtefjohhsthepmhhohedvledpmhhouggvpehsmhhtphhouhht
-X-Spam-Status: No, score=-1.9 required=5.0 tests=NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <592ebd9e33a906ba026d56dc68f42d691706f865.1680306489.git.ackerleytng@google.com>
+X-Spam-Status: No, score=-0.9 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
+        DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,SPF_PASS
         autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -65,161 +102,199 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 4/3/23 18:28, Pierre Morel wrote:
-> When the host supports the CPU topology facility, the PTF
-> instruction with function code 2 is interpreted by the SIE,
-> provided that the userland hypervisor activates the interpretation
-> by using the KVM_CAP_S390_CPU_TOPOLOGY KVM extension.
+On Fri, Mar 31, 2023 at 11:50:39PM +0000, Ackerley Tng wrote:
+> By default, the backing shmem file for a restrictedmem fd is created
+> on shmem's kernel space mount.
 > 
-> The PTF instructions with function code 0 and 1 are intercepted
-> and must be emulated by the userland hypervisor.
+> With this patch, an optional tmpfs mount can be specified via an fd,
+> which will be used as the mountpoint for backing the shmem file
+> associated with a restrictedmem fd.
 > 
-> During RESET all CPU of the configuration are placed in
-> horizontal polarity.
+> This will help restrictedmem fds inherit the properties of the
+> provided tmpfs mounts, for example, hugepage allocation hints, NUMA
+> binding hints, etc.
 > 
-> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+> Permissions for the fd passed to memfd_restricted() is modeled after
+> the openat() syscall, since both of these allow creation of a file
+> upon a mount/directory.
+> 
+> Permission to reference the mount the fd represents is checked upon fd
+> creation by other syscalls (e.g. fsmount(), open(), or open_tree(),
+> etc) and any process that can present memfd_restricted() with a valid
+> fd is expected to have obtained permission to use the mount
+> represented by the fd. This behavior is intended to parallel that of
+> the openat() syscall.
+> 
+> memfd_restricted() will check that the tmpfs superblock is
+> writable, and that the mount is also writable, before attempting to
+> create a restrictedmem file on the mount.
+> 
+> Signed-off-by: Ackerley Tng <ackerleytng@google.com>
 > ---
->   include/hw/s390x/s390-virtio-ccw.h |  6 ++++
->   hw/s390x/cpu-topology.c            | 56 ++++++++++++++++++++++++++++--
->   target/s390x/kvm/kvm.c             | 11 ++++++
->   3 files changed, 71 insertions(+), 2 deletions(-)
+>  include/linux/syscalls.h           |  2 +-
+>  include/uapi/linux/restrictedmem.h |  8 ++++
+>  mm/restrictedmem.c                 | 74 +++++++++++++++++++++++++++---
+>  3 files changed, 77 insertions(+), 7 deletions(-)
+>  create mode 100644 include/uapi/linux/restrictedmem.h
 > 
-> diff --git a/include/hw/s390x/s390-virtio-ccw.h b/include/hw/s390x/s390-virtio-ccw.h
-> index ea10a6c6e1..9aa9f48bd0 100644
-> --- a/include/hw/s390x/s390-virtio-ccw.h
-> +++ b/include/hw/s390x/s390-virtio-ccw.h
-> @@ -31,6 +31,12 @@ struct S390CcwMachineState {
->       bool vertical_polarization;
->   };
->   
-> +#define S390_PTF_REASON_NONE (0x00 << 8)
-> +#define S390_PTF_REASON_DONE (0x01 << 8)
-> +#define S390_PTF_REASON_BUSY (0x02 << 8)
-> +#define S390_TOPO_FC_MASK 0xffUL
-> +void s390_handle_ptf(S390CPU *cpu, uint8_t r1, uintptr_t ra);
+> diff --git a/include/linux/syscalls.h b/include/linux/syscalls.h
+> index f9e9e0c820c5..a23c4c385cd3 100644
+> --- a/include/linux/syscalls.h
+> +++ b/include/linux/syscalls.h
+> @@ -1056,7 +1056,7 @@ asmlinkage long sys_memfd_secret(unsigned int flags);
+>  asmlinkage long sys_set_mempolicy_home_node(unsigned long start, unsigned long len,
+>  					    unsigned long home_node,
+>  					    unsigned long flags);
+> -asmlinkage long sys_memfd_restricted(unsigned int flags);
+> +asmlinkage long sys_memfd_restricted(unsigned int flags, int mount_fd);
+> 
+>  /*
+>   * Architecture-specific system calls
+> diff --git a/include/uapi/linux/restrictedmem.h b/include/uapi/linux/restrictedmem.h
+> new file mode 100644
+> index 000000000000..22d6f2285f6d
+> --- /dev/null
+> +++ b/include/uapi/linux/restrictedmem.h
+> @@ -0,0 +1,8 @@
+> +/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+> +#ifndef _UAPI_LINUX_RESTRICTEDMEM_H
+> +#define _UAPI_LINUX_RESTRICTEDMEM_H
 > +
->   struct S390CcwMachineClass {
->       /*< private >*/
->       MachineClass parent_class;
-> diff --git a/hw/s390x/cpu-topology.c b/hw/s390x/cpu-topology.c
-> index 1d672d4d81..eec6c9a896 100644
-> --- a/hw/s390x/cpu-topology.c
-> +++ b/hw/s390x/cpu-topology.c
-> @@ -26,8 +26,6 @@
->    * .smp: keeps track of the machine topology.
->    * .list: queue the topology entries inside which
->    *        we keep the information on the CPU topology.
-> - * .polarization: the current subsystem polarization
-> - *
-
-Please remove from patch 3 instead.
-
->    */
->   S390Topology s390_topology = {
->       /* will be initialized after the cpu model is realized */
-> @@ -86,6 +84,57 @@ static void s390_topology_init(MachineState *ms)
->       QTAILQ_INSERT_HEAD(&s390_topology.list, entry, next);
->   }
->   
-> +/*
-> + * s390_handle_ptf:
-> + *
-> + * @register 1: contains the function code
-> + *
-> + * Function codes 0 (horizontal) and 1 (vertical) define the CPU
-> + * polarization requested by the guest.
-> + *
-> + * Function code 2 is handling topology changes and is interpreted
-> + * by the SIE.
-> + */
-> +void s390_handle_ptf(S390CPU *cpu, uint8_t r1, uintptr_t ra)
+> +/* flags for memfd_restricted */
+> +#define RMFD_USERMNT		0x0001U
+> +
+> +#endif /* _UAPI_LINUX_RESTRICTEDMEM_H */
+> diff --git a/mm/restrictedmem.c b/mm/restrictedmem.c
+> index c5d869d8c2d8..f7b62364a31a 100644
+> --- a/mm/restrictedmem.c
+> +++ b/mm/restrictedmem.c
+> @@ -1,11 +1,12 @@
+>  // SPDX-License-Identifier: GPL-2.0
+> -#include "linux/sbitmap.h"
+> +#include <linux/namei.h>
+>  #include <linux/pagemap.h>
+>  #include <linux/pseudo_fs.h>
+>  #include <linux/shmem_fs.h>
+>  #include <linux/syscalls.h>
+>  #include <uapi/linux/falloc.h>
+>  #include <uapi/linux/magic.h>
+> +#include <uapi/linux/restrictedmem.h>
+>  #include <linux/restrictedmem.h>
+> 
+>  struct restrictedmem {
+> @@ -189,19 +190,20 @@ static struct file *restrictedmem_file_create(struct file *memfd)
+>  	return file;
+>  }
+> 
+> -SYSCALL_DEFINE1(memfd_restricted, unsigned int, flags)
+> +static int restrictedmem_create(struct vfsmount *mount)
+>  {
+>  	struct file *file, *restricted_file;
+>  	int fd, err;
+> 
+> -	if (flags)
+> -		return -EINVAL;
+> -
+>  	fd = get_unused_fd_flags(0);
+>  	if (fd < 0)
+>  		return fd;
+> 
+> -	file = shmem_file_setup("memfd:restrictedmem", 0, VM_NORESERVE);
+> +	if (mount)
+> +		file = shmem_file_setup_with_mnt(mount, "memfd:restrictedmem", 0, VM_NORESERVE);
+> +	else
+> +		file = shmem_file_setup("memfd:restrictedmem", 0, VM_NORESERVE);
+> +
+>  	if (IS_ERR(file)) {
+>  		err = PTR_ERR(file);
+>  		goto err_fd;
+> @@ -223,6 +225,66 @@ SYSCALL_DEFINE1(memfd_restricted, unsigned int, flags)
+>  	return err;
+>  }
+> 
+> +static bool is_shmem_mount(struct vfsmount *mnt)
 > +{
-> +    struct S390CcwMachineState *s390ms = S390_CCW_MACHINE(current_machine);
-> +    CPUS390XState *env = &cpu->env;
-> +    uint64_t reg = env->regs[r1];
-> +    int fc = reg & S390_TOPO_FC_MASK;
-> +
-> +    if (!s390_has_feat(S390_FEAT_CONFIGURATION_TOPOLOGY)) {
-> +        s390_program_interrupt(env, PGM_OPERATION, ra);
-> +        return;
-> +    }
-> +
-> +    if (env->psw.mask & PSW_MASK_PSTATE) {
-> +        s390_program_interrupt(env, PGM_PRIVILEGED, ra);
-> +        return;
-> +    }
-> +
-> +    if (reg & ~S390_TOPO_FC_MASK) {
-> +        s390_program_interrupt(env, PGM_SPECIFICATION, ra);
-> +        return;
-> +    }
-> +
-> +    switch (fc) {
-> +    case S390_CPU_POLARIZATION_VERTICAL:
-> +    case S390_CPU_POLARIZATION_HORIZONTAL:
-> +        if (s390ms->vertical_polarization == !!fc) {
-> +            env->regs[r1] |= S390_PTF_REASON_DONE;
-> +            setcc(cpu, 2);
-> +        } else {
-> +            s390ms->vertical_polarization = !!fc;
-> +            s390_cpu_topology_set_changed(true);
-> +            setcc(cpu, 0);
-> +        }
-> +        break;
-> +    default:
-> +        /* Note that fc == 2 is interpreted by the SIE */
-> +        s390_program_interrupt(env, PGM_SPECIFICATION, ra);
-> +    }
+> +	return mnt && mnt->mnt_sb && mnt->mnt_sb->s_magic == TMPFS_MAGIC;
 > +}
 > +
->   /**
->    * s390_topology_reset:
->    *
-> @@ -94,7 +143,10 @@ static void s390_topology_init(MachineState *ms)
->    */
->   void s390_topology_reset(void)
->   {
-> +    struct S390CcwMachineState *s390ms = S390_CCW_MACHINE(current_machine);
-> +
->       s390_cpu_topology_set_changed(false);
-> +    s390ms->vertical_polarization = false;
->   }
->   
->   /**
-> diff --git a/target/s390x/kvm/kvm.c b/target/s390x/kvm/kvm.c
-> index bc953151ce..fb63be41b7 100644
-> --- a/target/s390x/kvm/kvm.c
-> +++ b/target/s390x/kvm/kvm.c
-> @@ -96,6 +96,7 @@
->   
->   #define PRIV_B9_EQBS                    0x9c
->   #define PRIV_B9_CLP                     0xa0
-> +#define PRIV_B9_PTF                     0xa2
->   #define PRIV_B9_PCISTG                  0xd0
->   #define PRIV_B9_PCILG                   0xd2
->   #define PRIV_B9_RPCIT                   0xd3
-> @@ -1464,6 +1465,13 @@ static int kvm_mpcifc_service_call(S390CPU *cpu, struct kvm_run *run)
->       }
->   }
->   
-> +static void kvm_handle_ptf(S390CPU *cpu, struct kvm_run *run)
+> +static bool is_mount_root(struct file *file)
 > +{
-> +    uint8_t r1 = (run->s390_sieic.ipb >> 20) & 0x0f;
-> +
-> +    s390_handle_ptf(cpu, r1, RA_IGNORED);
+> +	return file->f_path.dentry == file->f_path.mnt->mnt_root;
 > +}
 > +
->   static int handle_b9(S390CPU *cpu, struct kvm_run *run, uint8_t ipa1)
->   {
->       int r = 0;
-> @@ -1481,6 +1489,9 @@ static int handle_b9(S390CPU *cpu, struct kvm_run *run, uint8_t ipa1)
->       case PRIV_B9_RPCIT:
->           r = kvm_rpcit_service_call(cpu, run);
->           break;
-> +    case PRIV_B9_PTF:
-> +        kvm_handle_ptf(cpu, run);
-> +        break;
->       case PRIV_B9_EQBS:
->           /* just inject exception */
->           r = -1;
+> +static int restrictedmem_create_on_user_mount(int mount_fd)
+> +{
+> +	int ret;
+> +	struct fd f;
+> +	struct vfsmount *mnt;
+> +
+> +	f = fdget_raw(mount_fd);
+> +	if (!f.file)
+> +		return -EBADF;
+> +
+> +	ret = -EINVAL;
+> +	if (!is_mount_root(f.file))
+> +		goto out;
+> +
+> +	mnt = f.file->f_path.mnt;
+> +	if (!is_shmem_mount(mnt))
+> +		goto out;
+> +
+> +	ret = file_permission(f.file, MAY_WRITE | MAY_EXEC);
 
+Why MAY_EXEC?
+
+> +	if (ret)
+> +		goto out;
+> +
+> +	ret = mnt_want_write(mnt);
+> +	if (unlikely(ret))
+> +		goto out;
+> +
+> +	ret = restrictedmem_create(mnt);
+> +
+> +	mnt_drop_write(mnt);
+> +out:
+> +	fdput(f);
+> +
+> +	return ret;
+> +}
+
+We need review from fs folks. Look mostly sensible, but I have no
+experience in fs.
+
+> +
+> +SYSCALL_DEFINE2(memfd_restricted, unsigned int, flags, int, mount_fd)
+> +{
+> +	if (flags & ~RMFD_USERMNT)
+> +		return -EINVAL;
+> +
+> +	if (flags == RMFD_USERMNT) {
+> +		if (mount_fd < 0)
+> +			return -EINVAL;
+> +
+> +		return restrictedmem_create_on_user_mount(mount_fd);
+> +	} else {
+> +		return restrictedmem_create(NULL);
+> +	}
+
+Maybe restructure with single restrictedmem_create() call?
+
+	struct vfsmount *mnt = NULL;
+
+	if (flags == RMFD_USERMNT) {
+		...
+		mnt = ...();
+	}
+
+	return restrictedmem_create(mnt);
+> +}
+> +
+>  int restrictedmem_bind(struct file *file, pgoff_t start, pgoff_t end,
+>  		       struct restrictedmem_notifier *notifier, bool exclusive)
+>  {
+> --
+> 2.40.0.348.gf938b09366-goog
+
+-- 
+  Kiryl Shutsemau / Kirill A. Shutemov
