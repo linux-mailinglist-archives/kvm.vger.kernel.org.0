@@ -2,73 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 42F7B6D59B8
-	for <lists+kvm@lfdr.de>; Tue,  4 Apr 2023 09:33:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 54AB16D59BE
+	for <lists+kvm@lfdr.de>; Tue,  4 Apr 2023 09:35:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233926AbjDDHdQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Apr 2023 03:33:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39106 "EHLO
+        id S233901AbjDDHfB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Apr 2023 03:35:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41888 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233901AbjDDHdO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Apr 2023 03:33:14 -0400
+        with ESMTP id S229510AbjDDHe7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Apr 2023 03:34:59 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 275BE2726
-        for <kvm@vger.kernel.org>; Tue,  4 Apr 2023 00:32:28 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E5CA123
+        for <kvm@vger.kernel.org>; Tue,  4 Apr 2023 00:34:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1680593547;
+        s=mimecast20190719; t=1680593651;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=KQO5h3+WmOjHOdR/RQTb8OxWC50lKlPJekouNAzkZ20=;
-        b=BQn/ZtVwPmUS8d68NdUb/cMu3wcSq+Kb6McRcS9ophvHgOoqpYrr6I7krtDVV74Wco6mGf
-        JraKjLifUC6uEp0700asJkuvvGzA07ggWTyVgh89bp5j0AAN1Z7gnaxUZLnI2mKiOI2eA/
-        h8kzs9sB+F8WNm1ELQalvSqRb/3jTxs=
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
- [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=99tQM16AOIPSiD36e9lC8KgNlMe8A/CLkwAQnzAPAlM=;
+        b=INgABNkVMiFdVbA0UHfs23ESG1lsi4p6Msk/7RLzHX3FNNx1ry4MJqnC6FRliLiO5LNdGl
+        xCMn5VqDJT5Q87SaMlhaQdhL1ZK2p11VMKKghsdACoKQReRu4OzKslQwiQ+5BHhE76PsZv
+        MrucjPszh3PYieZlqtpp/9p7n6FOei4=
+Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
+ [209.85.160.197]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-643-eUJNTPZBOBWkNa-QS5VLFA-1; Tue, 04 Apr 2023 03:32:26 -0400
-X-MC-Unique: eUJNTPZBOBWkNa-QS5VLFA-1
-Received: by mail-qk1-f198.google.com with SMTP id d187-20020a3768c4000000b00746864b272cso14324300qkc.15
-        for <kvm@vger.kernel.org>; Tue, 04 Apr 2023 00:32:25 -0700 (PDT)
+ us-mta-675-19brWEYaMLSo3K38Snrfbw-1; Tue, 04 Apr 2023 03:34:10 -0400
+X-MC-Unique: 19brWEYaMLSo3K38Snrfbw-1
+Received: by mail-qt1-f197.google.com with SMTP id r22-20020ac85c96000000b003e638022bc9so9573984qta.5
+        for <kvm@vger.kernel.org>; Tue, 04 Apr 2023 00:34:10 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680593545;
+        d=1e100.net; s=20210112; t=1680593650;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=KQO5h3+WmOjHOdR/RQTb8OxWC50lKlPJekouNAzkZ20=;
-        b=vMDPI5S5WtYMFXP5gmSEspQxOYHp+M8hUddQ2IgU89lhGW3Os4rK1+e2/elwYGO8Ty
-         CddoHST3fbMbWh6aBupsiraju627/O2ZRawNCWEqK7AKFlxUFCV7Ffcj87XkHv6d3hSU
-         LJFgrrjHjvP//PQChpbSNJOK/Q8UZDXdahQNCnxsgwNEvXYaggerX/Y+2+MAJ+LYhFJ4
-         dPcR950wsU+jNhchKh9+OgOAqc9sSGgqEf9uV8EEKYezmz8cFPSNg+rFc0C22gcFRkBF
-         a+jK7P9Eek/CjP21VcVJSCr2HyQ2CZCY3NLt1mh1QTqNkipr4A1G4YGgDlZrjY2Y8CXP
-         7nqg==
-X-Gm-Message-State: AAQBX9fbjHeSkm3r5oIc1C5wu3nITJ14mHPBPVZoSzteBQgU2/5OD1KJ
-        ipSUUvfvEVPJlzGbN7PeJ1laMAAKB73buOgXAA4cdcGi54ccLJHB701s9DNDQhmeHrezjCfvdnB
-        buP0XgUWUcIF8
-X-Received: by 2002:a05:622a:182:b0:3e4:eb53:b02b with SMTP id s2-20020a05622a018200b003e4eb53b02bmr1896141qtw.9.1680593545530;
-        Tue, 04 Apr 2023 00:32:25 -0700 (PDT)
-X-Google-Smtp-Source: AKy350ZDOir1Y35E8xclX+Hnf46F/a/hbN46cWKyCZKECKxBaGphhxYeckRUlR/kD3u2/NfBjSZoGg==
-X-Received: by 2002:a05:622a:182:b0:3e4:eb53:b02b with SMTP id s2-20020a05622a018200b003e4eb53b02bmr1896125qtw.9.1680593545342;
-        Tue, 04 Apr 2023 00:32:25 -0700 (PDT)
+        bh=99tQM16AOIPSiD36e9lC8KgNlMe8A/CLkwAQnzAPAlM=;
+        b=TiQ+5aKC9gRzKSzKE9XrQzi4/OTriRonMNbIv6+ozqCl7tzbl3gsh1ptHBU9+u0CTc
+         JMwuPyYPn0avfVhZBCtLZu21F1QRfzifEoHoXo0gF5uPPRhPXV/npt+rNoNJYu8I3Xcf
+         QuUTBds+fDqpe5xL0jZ4ngaTl5t4EVnvQre4s7fqiDoUANUgTraTdOJpbHkPyek1wq0o
+         4Ed3dMaZjQZASZr3KYqc3bPk87lx9MFDgzUJyDixfyGuysyYVgdvKkAwqcqCl7v8UQmB
+         cyixMOc2APy+9wXMYhCOzUVDO9WyMEqmR+WUiQeUFqaUD/hw2kmCHntxZCFnm6VYJbAs
+         G5tg==
+X-Gm-Message-State: AAQBX9eNS6KCAJC1aG6+TTtO2ZBTg2Nekpo5V32qw0/A8N9mvOZiFKuu
+        0x3hOeUsJwt9Zc3Fp6rEMWTB/rD068FdfGxM/nr2mZyX1ZjCpCYPTxTd5s22MyqSGDZ1a/+yqSc
+        9mJUMYohW2H4Rq53IPrb1UeI=
+X-Received: by 2002:ac8:5bd1:0:b0:3bf:b5fe:372d with SMTP id b17-20020ac85bd1000000b003bfb5fe372dmr1675114qtb.61.1680593650214;
+        Tue, 04 Apr 2023 00:34:10 -0700 (PDT)
+X-Google-Smtp-Source: AKy350Yn6pC2+LOXbHC+brsOhPYWbUELBitKuSNkTaw8rn7U2Tsgh0u4bgya1L8Kaug4snYGGiJM5g==
+X-Received: by 2002:ac8:5bd1:0:b0:3bf:b5fe:372d with SMTP id b17-20020ac85bd1000000b003bfb5fe372dmr1675096qtb.61.1680593649980;
+        Tue, 04 Apr 2023 00:34:09 -0700 (PDT)
 Received: from [192.168.0.3] (ip-109-43-178-74.web.vodafone.de. [109.43.178.74])
-        by smtp.gmail.com with ESMTPSA id dt8-20020a05620a478800b00748461ac012sm3372415qkb.63.2023.04.04.00.32.23
+        by smtp.gmail.com with ESMTPSA id m124-20020a375882000000b0073b8745fd39sm3385199qkb.110.2023.04.04.00.34.08
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 04 Apr 2023 00:32:24 -0700 (PDT)
-Message-ID: <4ba1d826-b291-2120-f34f-e1e674608614@redhat.com>
-Date:   Tue, 4 Apr 2023 09:32:22 +0200
+        Tue, 04 Apr 2023 00:34:09 -0700 (PDT)
+Message-ID: <773ea477-2702-0511-eaca-2a110c5bf13d@redhat.com>
+Date:   Tue, 4 Apr 2023 09:34:07 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.13.0
-Subject: Re: [kvm-unit-tests v3 10/13] powerpc: Add support for more
- interrupts including HV interrupts
+Subject: Re: [kvm-unit-tests v3 11/13] powerpc: Discover runtime load address
+ dynamically
 Content-Language: en-US
 To:     Nicholas Piggin <npiggin@gmail.com>, kvm@vger.kernel.org
 Cc:     linuxppc-dev@lists.ozlabs.org, Laurent Vivier <lvivier@redhat.com>
 References: <20230327124520.2707537-1-npiggin@gmail.com>
- <20230327124520.2707537-11-npiggin@gmail.com>
+ <20230327124520.2707537-12-npiggin@gmail.com>
 From:   Thomas Huth <thuth@redhat.com>
-In-Reply-To: <20230327124520.2707537-11-npiggin@gmail.com>
+In-Reply-To: <20230327124520.2707537-12-npiggin@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
@@ -82,18 +82,28 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 27/03/2023 14.45, Nicholas Piggin wrote:
-> Interrupt vectors were not being populated for all architected
-> interrupt types, which could lead to crashes rather than a message for
-> unhandled interrupts.
-> 
-> 0x20 sized vectors require some reworking of the code to fit. This
-> also adds support for HV / HSRR type interrupts which will be used in
-> a later change.
+> The next change will load the kernels at different addresses depending
+> on test options, so this needs to be reverted back to dynamic
+> discovery.
 > 
 > Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 > ---
->   powerpc/cstart64.S | 79 ++++++++++++++++++++++++++++++++++++++--------
->   1 file changed, 65 insertions(+), 14 deletions(-)
+>   powerpc/cstart64.S | 19 ++++++++++++++-----
+>   1 file changed, 14 insertions(+), 5 deletions(-)
+> 
+> diff --git a/powerpc/cstart64.S b/powerpc/cstart64.S
+> index 1bd0437..0592e03 100644
+> --- a/powerpc/cstart64.S
+> +++ b/powerpc/cstart64.S
+> @@ -33,9 +33,14 @@ start:
+>   	 * We were loaded at QEMU's kernel load address, but we're not
+>   	 * allowed to link there due to how QEMU deals with linker VMAs,
+>   	 * so we just linked at zero. This means the first thing to do is
+> -	 * to find our stack and toc, and then do a relocate.
+> +	 * to find our stack and toc, and then do a relocate. powernv and
+> +	 * pseries load addreses are not the same, so find the address
+
+With s/addreses/addresses/ :
 
 Acked-by: Thomas Huth <thuth@redhat.com>
 
