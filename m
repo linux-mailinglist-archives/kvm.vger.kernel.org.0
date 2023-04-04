@@ -2,49 +2,49 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 47A476D6238
-	for <lists+kvm@lfdr.de>; Tue,  4 Apr 2023 15:09:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A62526D623C
+	for <lists+kvm@lfdr.de>; Tue,  4 Apr 2023 15:09:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235101AbjDDNJi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Apr 2023 09:09:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42854 "EHLO
+        id S234495AbjDDNJj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Apr 2023 09:09:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42926 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235068AbjDDNJg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Apr 2023 09:09:36 -0400
+        with ESMTP id S235022AbjDDNJh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Apr 2023 09:09:37 -0400
 Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66A201BCB
-        for <kvm@vger.kernel.org>; Tue,  4 Apr 2023 06:09:33 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C833010F2
+        for <kvm@vger.kernel.org>; Tue,  4 Apr 2023 06:09:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1680613773; x=1712149773;
+  t=1680613775; x=1712149775;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=VgKorZEIo2q2LdcEZ2+a0FhiC5U5ASocrDIOqvCsoxg=;
-  b=XfqsoQgcSaBhrI2bcvemIX8189N5rkZ92dbrX5Ca4iJROKYkv5/FOvTl
-   v4T7qjuh7fWANc3k0R1zPhy5PXvHH2W7EQq/XxALhiow0RMXBV+8FZPfx
-   0hc1BtauycPoVpDhK4njeYmIPZ1tcbYc4hpC4APZYzaU5WBOMuacbxIfn
-   /Jh3J9PkPlDysShLJXynueMhVVoHRnnm0+ei10ap3WDo+gB5UA701sqsw
-   xE4YuAPBDTKtbKaS/Kb1XwoOXS3cSXBI0vGTinzzlO9WzrmYlA6CQZd5P
-   u/rrD4iyugOqBgX0aYs2XRDmegUSQEmfwT9a3O9/3MH1qHlmGYGmEKCt3
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10670"; a="326193398"
+  bh=mbRkI6bDeqElk/F1wX+YTMuEf3TRl9TBsDznB8Yq6DE=;
+  b=KR5/d77Qa+BOk9X/+treAWx7puSu+mZBG/9SK6w5cH4XBKLTZY0bVbWb
+   RMyrzt1PnyIMg70/0+Vc7CEXNXrcPuU1TBNyLbiqY2rh5Wr6AG6mo60yH
+   Z4xRS6IRiyz4qRM1U0buB7Xje/D27yNN4gRYu87nOUl7B5jO5QCgSFwio
+   cBdhx9bZMG/34NWGV7n3Ryf1IK1qm45c+rw1xoEuxgTvG7I/PZk+LMuJm
+   PObW4oHfkdLMkedtRujvQQrBl6mtWpDNoS5e5GMhHmdFrs5szIs9wcJ54
+   zDy+K5JmKyG4IJvnchr7OISWP9+ozrvstMAhWHE24BOT3AhuVde+OcMfA
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10670"; a="326193406"
 X-IronPort-AV: E=Sophos;i="5.98,317,1673942400"; 
-   d="scan'208";a="326193398"
+   d="scan'208";a="326193406"
 Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Apr 2023 06:09:32 -0700
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Apr 2023 06:09:35 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10670"; a="750902076"
+X-IronPort-AV: E=McAfee;i="6600,9927,10670"; a="750902083"
 X-IronPort-AV: E=Sophos;i="5.98,317,1673942400"; 
-   d="scan'208";a="750902076"
+   d="scan'208";a="750902083"
 Received: from binbinwu-mobl.ccr.corp.intel.com ([10.254.215.140])
-  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Apr 2023 06:09:30 -0700
+  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Apr 2023 06:09:33 -0700
 From:   Binbin Wu <binbin.wu@linux.intel.com>
 To:     kvm@vger.kernel.org, seanjc@google.com, pbonzini@redhat.com
 Cc:     binbin.wu@linux.intel.com, kai.huang@intel.com, chao.gao@intel.com,
         xuelian.guo@intel.com, robert.hu@linux.intel.com
-Subject: [PATCH v7 1/5] KVM: x86: Virtualize CR4.LAM_SUP
-Date:   Tue,  4 Apr 2023 21:09:19 +0800
-Message-Id: <20230404130923.27749-2-binbin.wu@linux.intel.com>
+Subject: [PATCH v7 2/5] KVM: x86: Virtualize CR3.LAM_{U48,U57}
+Date:   Tue,  4 Apr 2023 21:09:20 +0800
+Message-Id: <20230404130923.27749-3-binbin.wu@linux.intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20230404130923.27749-1-binbin.wu@linux.intel.com>
 References: <20230404130923.27749-1-binbin.wu@linux.intel.com>
@@ -61,75 +61,231 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Robert Hoo <robert.hu@linux.intel.com>
 
-Allow setting of CR4.LAM_SUP (bit 28) by guest if vCPU supports LAM,
-and intercept the bit (as it already is).
+LAM uses CR3.LAM_U48 (bit 62) and CR3.LAM_U57 (bit 61) to configure LAM
+masking for user mode pointers.
 
-LAM uses CR4.LAM_SUP to configure LAM masking on supervisor mode address.
-To virtualize that, move CR4.LAM_SUP out of CR4_RESERVED_BITS and its
-reservation depends on vCPU has LAM feature or not.
-CR4.LAM_SUP is allowed to be set even not in 64-bit mode, but it will not
-take effect since LAM only applies to 64-bit linear address.
+When EPT is on:
+CR3 is fully under control of guest, guest LAM is thus transparent to KVM.
 
-Leave the bit intercepted to avoid vmread every time when KVM fetches its
-value, with the expectation that guest won't toggle the bit frequently.
+When EPT is off (shadow paging):
+- KVM needs to handle guest CR3.LAM_U48 and CR3.LAM_U57 toggles.
+  The two bits are allowed to be set in CR3 if vCPU supports LAM.
+  The two bits should be kept as they are in the shadow CR3.
+- Perform GFN calculation from guest CR3/PGD generically by extracting the
+  maximal base address mask since the validity has been checked already.
+- Leave LAM bits in root.pgd to force a new root for a CR3+LAM combination.
+  It could potentially increase root cache misses and mmu reload, however,
+  it's very rare to turn off EPT when performace matters.
 
-Hardware is not required to do TLB flush when CR4.LAM_SUP toggled, so KVM
-doesn't need to emulate TLB flush based on it.
-There's no other features/vmx_exec_controls connection, therefore no code
-need to be complemented in kvm/vmx_set_cr4().
+To be generic, introduce a field 'cr3_ctrl_bits' in kvm_vcpu_arch to record
+the bits used to control supported features related to CR3 (e.g. LAM).
+- Supported control bits are set to cr3_ctrl_bits after set cpuid.
+- Add kvm_vcpu_is_legal_cr3() to validate CR3, tp allow setting of control
+  bits for the supported features.
+- Add kvm_get_active_cr3_ctrl_bits() to get the active control bits to form
+  a new guest CR3 (in vmx_load_mmu_pgd()).
 
+Suggested-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Robert Hoo <robert.hu@linux.intel.com>
 Co-developed-by: Binbin Wu <binbin.wu@linux.intel.com>
 Signed-off-by: Binbin Wu <binbin.wu@linux.intel.com>
-Reviewed-by: Chao Gao <chao.gao@intel.com>
 Tested-by: Xuelian Guo <xuelian.guo@intel.com>
 ---
- arch/x86/include/asm/kvm_host.h | 3 ++-
- arch/x86/kvm/vmx/vmx.c          | 3 +++
- arch/x86/kvm/x86.h              | 2 ++
- 3 files changed, 7 insertions(+), 1 deletion(-)
+ arch/x86/include/asm/kvm_host.h | 6 ++++++
+ arch/x86/kvm/cpuid.h            | 5 +++++
+ arch/x86/kvm/mmu.h              | 5 +++++
+ arch/x86/kvm/mmu/mmu.c          | 6 +++++-
+ arch/x86/kvm/mmu/mmu_internal.h | 1 +
+ arch/x86/kvm/mmu/paging_tmpl.h  | 6 +++++-
+ arch/x86/kvm/mmu/spte.h         | 2 +-
+ arch/x86/kvm/vmx/nested.c       | 4 ++--
+ arch/x86/kvm/vmx/vmx.c          | 6 +++++-
+ arch/x86/kvm/x86.c              | 4 ++--
+ 10 files changed, 37 insertions(+), 8 deletions(-)
 
 diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 808c292ad3f4..ba594f9ea414 100644
+index ba594f9ea414..498d2b5e8dc1 100644
 --- a/arch/x86/include/asm/kvm_host.h
 +++ b/arch/x86/include/asm/kvm_host.h
-@@ -125,7 +125,8 @@
- 			  | X86_CR4_PGE | X86_CR4_PCE | X86_CR4_OSFXSR | X86_CR4_PCIDE \
- 			  | X86_CR4_OSXSAVE | X86_CR4_SMEP | X86_CR4_FSGSBASE \
- 			  | X86_CR4_OSXMMEXCPT | X86_CR4_LA57 | X86_CR4_VMXE \
--			  | X86_CR4_SMAP | X86_CR4_PKE | X86_CR4_UMIP))
-+			  | X86_CR4_SMAP | X86_CR4_PKE | X86_CR4_UMIP \
-+			  | X86_CR4_LAM_SUP))
- 
- #define CR8_RESERVED_BITS (~(unsigned long)X86_CR8_TPR)
- 
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index d2d6e1b6c788..42f163862a0f 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -7630,6 +7630,9 @@ static void nested_vmx_cr_fixed1_bits_update(struct kvm_vcpu *vcpu)
- 	cr4_fixed1_update(X86_CR4_UMIP,       ecx, feature_bit(UMIP));
- 	cr4_fixed1_update(X86_CR4_LA57,       ecx, feature_bit(LA57));
- 
-+	entry = kvm_find_cpuid_entry_index(vcpu, 0x7, 1);
-+	cr4_fixed1_update(X86_CR4_LAM_SUP,    eax, feature_bit(LAM));
-+
- #undef cr4_fixed1_update
+@@ -729,6 +729,12 @@ struct kvm_vcpu_arch {
+ 	unsigned long cr0_guest_owned_bits;
+ 	unsigned long cr2;
+ 	unsigned long cr3;
++	/*
++	 * Bits in CR3 used to enable certain features. These bits are allowed
++	 * to be set in CR3 when vCPU supports the features. When shadow paging
++	 * is used, these bits should be kept as they are in the shadow CR3.
++	 */
++	u64 cr3_ctrl_bits;
+ 	unsigned long cr4;
+ 	unsigned long cr4_guest_owned_bits;
+ 	unsigned long cr4_guest_rsvd_bits;
+diff --git a/arch/x86/kvm/cpuid.h b/arch/x86/kvm/cpuid.h
+index b1658c0de847..ef8e1b912d7d 100644
+--- a/arch/x86/kvm/cpuid.h
++++ b/arch/x86/kvm/cpuid.h
+@@ -42,6 +42,11 @@ static inline int cpuid_maxphyaddr(struct kvm_vcpu *vcpu)
+ 	return vcpu->arch.maxphyaddr;
  }
  
-diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
-index a8167b47b8c8..3a9d97b899df 100644
---- a/arch/x86/kvm/x86.h
-+++ b/arch/x86/kvm/x86.h
-@@ -487,6 +487,8 @@ bool kvm_msr_allowed(struct kvm_vcpu *vcpu, u32 index, u32 type);
- 		__reserved_bits |= X86_CR4_VMXE;        \
- 	if (!__cpu_has(__c, X86_FEATURE_PCID))          \
- 		__reserved_bits |= X86_CR4_PCIDE;       \
-+	if (!__cpu_has(__c, X86_FEATURE_LAM))           \
-+		__reserved_bits |= X86_CR4_LAM_SUP;     \
- 	__reserved_bits;                                \
- })
++static inline bool kvm_vcpu_is_legal_cr3(struct kvm_vcpu *vcpu, unsigned long cr3)
++{
++	return !((cr3 & vcpu->arch.reserved_gpa_bits) & ~vcpu->arch.cr3_ctrl_bits);
++}
++
+ static inline bool kvm_vcpu_is_legal_gpa(struct kvm_vcpu *vcpu, gpa_t gpa)
+ {
+ 	return !(gpa & vcpu->arch.reserved_gpa_bits);
+diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
+index 168c46fd8dd1..29985eeb8e12 100644
+--- a/arch/x86/kvm/mmu.h
++++ b/arch/x86/kvm/mmu.h
+@@ -142,6 +142,11 @@ static inline unsigned long kvm_get_active_pcid(struct kvm_vcpu *vcpu)
+ 	return kvm_get_pcid(vcpu, kvm_read_cr3(vcpu));
+ }
  
++static inline u64 kvm_get_active_cr3_ctrl_bits(struct kvm_vcpu *vcpu)
++{
++	return kvm_read_cr3(vcpu) & vcpu->arch.cr3_ctrl_bits;
++}
++
+ static inline void kvm_mmu_load_pgd(struct kvm_vcpu *vcpu)
+ {
+ 	u64 root_hpa = vcpu->arch.mmu->root.hpa;
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index c8ebe542c565..de2c51a0b611 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -3732,7 +3732,11 @@ static int mmu_alloc_shadow_roots(struct kvm_vcpu *vcpu)
+ 	hpa_t root;
+ 
+ 	root_pgd = mmu->get_guest_pgd(vcpu);
+-	root_gfn = root_pgd >> PAGE_SHIFT;
++	/*
++	* The guest PGD has already been checked for validity, unconditionally
++	* strip non-address bits when computing the GFN.
++	*/
++	root_gfn = (root_pgd & __PT_BASE_ADDR_MASK) >> PAGE_SHIFT;
+ 
+ 	if (mmu_check_root(vcpu, root_gfn))
+ 		return 1;
+diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
+index cc58631e2336..c0479cbc2ca3 100644
+--- a/arch/x86/kvm/mmu/mmu_internal.h
++++ b/arch/x86/kvm/mmu/mmu_internal.h
+@@ -21,6 +21,7 @@ extern bool dbg;
+ #endif
+ 
+ /* Page table builder macros common to shadow (host) PTEs and guest PTEs. */
++#define __PT_BASE_ADDR_MASK (((1ULL << 52) - 1) & ~(u64)(PAGE_SIZE-1))
+ #define __PT_LEVEL_SHIFT(level, bits_per_level)	\
+ 	(PAGE_SHIFT + ((level) - 1) * (bits_per_level))
+ #define __PT_INDEX(address, level, bits_per_level) \
+diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
+index 57f0b75c80f9..88351ba04249 100644
+--- a/arch/x86/kvm/mmu/paging_tmpl.h
++++ b/arch/x86/kvm/mmu/paging_tmpl.h
+@@ -62,7 +62,7 @@
+ #endif
+ 
+ /* Common logic, but per-type values.  These also need to be undefined. */
+-#define PT_BASE_ADDR_MASK	((pt_element_t)(((1ULL << 52) - 1) & ~(u64)(PAGE_SIZE-1)))
++#define PT_BASE_ADDR_MASK	((pt_element_t)__PT_BASE_ADDR_MASK)
+ #define PT_LVL_ADDR_MASK(lvl)	__PT_LVL_ADDR_MASK(PT_BASE_ADDR_MASK, lvl, PT_LEVEL_BITS)
+ #define PT_LVL_OFFSET_MASK(lvl)	__PT_LVL_OFFSET_MASK(PT_BASE_ADDR_MASK, lvl, PT_LEVEL_BITS)
+ #define PT_INDEX(addr, lvl)	__PT_INDEX(addr, lvl, PT_LEVEL_BITS)
+@@ -324,6 +324,10 @@ static int FNAME(walk_addr_generic)(struct guest_walker *walker,
+ 	trace_kvm_mmu_pagetable_walk(addr, access);
+ retry_walk:
+ 	walker->level = mmu->cpu_role.base.level;
++	/*
++	 * No need to mask cr3_ctrl_bits, gpte_to_gfn() will strip
++	 * non-address bits.
++	 */
+ 	pte           = mmu->get_guest_pgd(vcpu);
+ 	have_ad       = PT_HAVE_ACCESSED_DIRTY(mmu);
+ 
+diff --git a/arch/x86/kvm/mmu/spte.h b/arch/x86/kvm/mmu/spte.h
+index 1279db2eab44..777f7d443e3b 100644
+--- a/arch/x86/kvm/mmu/spte.h
++++ b/arch/x86/kvm/mmu/spte.h
+@@ -36,7 +36,7 @@ static_assert(SPTE_TDP_AD_ENABLED == 0);
+ #ifdef CONFIG_DYNAMIC_PHYSICAL_MASK
+ #define SPTE_BASE_ADDR_MASK (physical_mask & ~(u64)(PAGE_SIZE-1))
+ #else
+-#define SPTE_BASE_ADDR_MASK (((1ULL << 52) - 1) & ~(u64)(PAGE_SIZE-1))
++#define SPTE_BASE_ADDR_MASK __PT_BASE_ADDR_MASK
+ #endif
+ 
+ #define SPTE_PERM_MASK (PT_PRESENT_MASK | PT_WRITABLE_MASK | shadow_user_mask \
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index 1bc2b80273c9..d35bda9610e2 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -1079,7 +1079,7 @@ static int nested_vmx_load_cr3(struct kvm_vcpu *vcpu, unsigned long cr3,
+ 			       bool nested_ept, bool reload_pdptrs,
+ 			       enum vm_entry_failure_code *entry_failure_code)
+ {
+-	if (CC(kvm_vcpu_is_illegal_gpa(vcpu, cr3))) {
++	if (CC(!kvm_vcpu_is_legal_cr3(vcpu, cr3))) {
+ 		*entry_failure_code = ENTRY_FAIL_DEFAULT;
+ 		return -EINVAL;
+ 	}
+@@ -2907,7 +2907,7 @@ static int nested_vmx_check_host_state(struct kvm_vcpu *vcpu,
+ 
+ 	if (CC(!nested_host_cr0_valid(vcpu, vmcs12->host_cr0)) ||
+ 	    CC(!nested_host_cr4_valid(vcpu, vmcs12->host_cr4)) ||
+-	    CC(kvm_vcpu_is_illegal_gpa(vcpu, vmcs12->host_cr3)))
++	    CC(!kvm_vcpu_is_legal_cr3(vcpu, vmcs12->host_cr3)))
+ 		return -EINVAL;
+ 
+ 	if (CC(is_noncanonical_address(vmcs12->host_ia32_sysenter_esp, vcpu)) ||
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 42f163862a0f..4d329ee9474c 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -3388,7 +3388,8 @@ static void vmx_load_mmu_pgd(struct kvm_vcpu *vcpu, hpa_t root_hpa,
+ 			update_guest_cr3 = false;
+ 		vmx_ept_load_pdptrs(vcpu);
+ 	} else {
+-		guest_cr3 = root_hpa | kvm_get_active_pcid(vcpu);
++		guest_cr3 = root_hpa | kvm_get_active_pcid(vcpu) |
++		            kvm_get_active_cr3_ctrl_bits(vcpu);
+ 	}
+ 
+ 	if (update_guest_cr3)
+@@ -7763,6 +7764,9 @@ static void vmx_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
+ 		vmx->msr_ia32_feature_control_valid_bits &=
+ 			~FEAT_CTL_SGX_LC_ENABLED;
+ 
++	if (guest_cpuid_has(vcpu, X86_FEATURE_LAM))
++		vcpu->arch.cr3_ctrl_bits |= X86_CR3_LAM_U48 | X86_CR3_LAM_U57;
++
+ 	/* Refresh #PF interception to account for MAXPHYADDR changes. */
+ 	vmx_update_exception_bitmap(vcpu);
+ }
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 7713420abab0..aca255e69d0d 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -1260,7 +1260,7 @@ int kvm_set_cr3(struct kvm_vcpu *vcpu, unsigned long cr3)
+ 	 * stuff CR3, e.g. for RSM emulation, and there is no guarantee that
+ 	 * the current vCPU mode is accurate.
+ 	 */
+-	if (kvm_vcpu_is_illegal_gpa(vcpu, cr3))
++	if (!kvm_vcpu_is_legal_cr3(vcpu, cr3))
+ 		return 1;
+ 
+ 	if (is_pae_paging(vcpu) && !load_pdptrs(vcpu, cr3))
+@@ -11349,7 +11349,7 @@ static bool kvm_is_valid_sregs(struct kvm_vcpu *vcpu, struct kvm_sregs *sregs)
+ 		 */
+ 		if (!(sregs->cr4 & X86_CR4_PAE) || !(sregs->efer & EFER_LMA))
+ 			return false;
+-		if (kvm_vcpu_is_illegal_gpa(vcpu, sregs->cr3))
++		if (!kvm_vcpu_is_legal_cr3(vcpu, sregs->cr3))
+ 			return false;
+ 	} else {
+ 		/*
 -- 
 2.25.1
 
