@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D60436D5E4B
-	for <lists+kvm@lfdr.de>; Tue,  4 Apr 2023 12:55:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 77AA26D5E4D
+	for <lists+kvm@lfdr.de>; Tue,  4 Apr 2023 12:55:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234562AbjDDKzU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Apr 2023 06:55:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38782 "EHLO
+        id S234007AbjDDKzV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Apr 2023 06:55:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41610 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234874AbjDDKyq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Apr 2023 06:54:46 -0400
+        with ESMTP id S234878AbjDDKyr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Apr 2023 06:54:47 -0400
 Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C05864497;
-        Tue,  4 Apr 2023 03:53:50 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ABF1F44B2;
+        Tue,  4 Apr 2023 03:53:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
   t=1680605631; x=1712141631;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=SfNRJW38HST/J2vYBy+d2Rz7YNwfS+VaJzsap6qMLmE=;
-  b=CcbJ1CtqepaLUilw1dBE49F1/C7QRJu5QsBOHjksiRG7Q0PmSkJDmbRz
-   PPZTblD/8eaU7Nru24l7mzxzftHte/7CfXWRvHHkVzGpwHVjaj+C1+TN0
-   +th5FTcN0mIgq/aA5QaayU5e3eaDE6XNN76Hu/EbWYZQSKxhGiD/tuV9b
-   03VM2dOCr5Sy0NRS4yqOereDHLDkJ6lHor7b1tHKpmat1SnYVYJx28ggd
-   lWrkuQXiFbZu29zADYoMusSHYgaq03ixcLpOLYS+ldla122UNHx0KpkAS
-   VSIyVIFMp7wXXrXNEDn0uPUhtv6vdewgequqPyfG4x/le8m7ZrwXEpwIb
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10669"; a="330734145"
+  bh=O9acOeCuSr/+wKyZ7069qEc1yb3O4hIxP1jgg1zr2lE=;
+  b=OxLFL1EG8IE2p3wVLV5DbZVsjCXYOfKBUnT0f49b18rQudvs2BTzm+SF
+   jVpNKKgivZMILyiIKab54B90IzVa6ng9TdLuoValCPrcx9sZBCa0FlMq+
+   0h6UF3H11IXgm82gk5bE6YOIsogJ1db49VohQm+4L8h7NukjpsnWN2e3l
+   JnNn/AoviZTv7zdNcwqUNQHHEUfIhGATHsX4+JfXkAoa+VD3kyEn8uQa3
+   iyyV/wcNVXSl51bHrfBmlvuxDz4vLRe06wOy3hyysQMSokjfTCU8WN91G
+   kt4/uMboc0OHLmyGyGubb56y8rEuUmIwcXrgws6uQXGtsPYlUh4tZp7qU
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10669"; a="330734156"
 X-IronPort-AV: E=Sophos;i="5.98,317,1673942400"; 
-   d="scan'208";a="330734145"
+   d="scan'208";a="330734156"
 Received: from fmsmga003.fm.intel.com ([10.253.24.29])
   by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Apr 2023 03:53:05 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10669"; a="775597844"
+X-IronPort-AV: E=McAfee;i="6600,9927,10669"; a="775597847"
 X-IronPort-AV: E=Sophos;i="5.98,317,1673942400"; 
-   d="scan'208";a="775597844"
+   d="scan'208";a="775597847"
 Received: from unknown (HELO fred..) ([172.25.112.68])
-  by FMSMGA003.fm.intel.com with ESMTP; 04 Apr 2023 03:53:04 -0700
+  by FMSMGA003.fm.intel.com with ESMTP; 04 Apr 2023 03:53:05 -0700
 From:   Xin Li <xin3.li@intel.com>
 To:     linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org
 Cc:     tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
@@ -45,9 +45,9 @@ Cc:     tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
         andrew.cooper3@citrix.com, seanjc@google.com, pbonzini@redhat.com,
         ravi.v.shankar@intel.com, jiangshanlai@gmail.com,
         shan.kang@intel.com
-Subject: [PATCH v7 22/33] x86/fred: update MSR_IA32_FRED_RSP0 during task switch
-Date:   Tue,  4 Apr 2023 03:27:05 -0700
-Message-Id: <20230404102716.1795-23-xin3.li@intel.com>
+Subject: [PATCH v7 23/33] x86/fred: let ret_from_fork() jmp to fred_exit_user when FRED is enabled
+Date:   Tue,  4 Apr 2023 03:27:06 -0700
+Message-Id: <20230404102716.1795-24-xin3.li@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230404102716.1795-1-xin3.li@intel.com>
 References: <20230404102716.1795-1-xin3.li@intel.com>
@@ -65,42 +65,33 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: "H. Peter Anvin (Intel)" <hpa@zytor.com>
 
-MSR_IA32_FRED_RSP0 is used during ring 3 event delivery, and needs to
-be updated to point to the top of next task stack during task switch.
-
-Update MSR_IA32_FRED_RSP0 with WRMSR instruction for now, and will use
-WRMSRNS/WRMSRLIST for performance once it gets upstreamed.
+Let ret_from_fork() jmp to fred_exit_user when FRED is enabled,
+otherwise the existing IDT code is chosen.
 
 Signed-off-by: H. Peter Anvin (Intel) <hpa@zytor.com>
 Tested-by: Shan Kang <shan.kang@intel.com>
 Signed-off-by: Xin Li <xin3.li@intel.com>
 ---
- arch/x86/include/asm/switch_to.h | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
+ arch/x86/entry/entry_64.S | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/arch/x86/include/asm/switch_to.h b/arch/x86/include/asm/switch_to.h
-index 5c91305d09d2..00fd85abc1d2 100644
---- a/arch/x86/include/asm/switch_to.h
-+++ b/arch/x86/include/asm/switch_to.h
-@@ -68,9 +68,16 @@ static inline void update_task_stack(struct task_struct *task)
- #ifdef CONFIG_X86_32
- 	this_cpu_write(cpu_tss_rw.x86_tss.sp1, task->thread.sp0);
- #else
--	/* Xen PV enters the kernel on the thread stack. */
--	if (cpu_feature_enabled(X86_FEATURE_XENPV))
-+	if (cpu_feature_enabled(X86_FEATURE_FRED)) {
-+		/*
-+		 * Will use WRMSRNS/WRMSRLIST for performance once it's upstreamed.
-+		 */
-+		wrmsrl(MSR_IA32_FRED_RSP0,
-+		       task_top_of_stack(task) + TOP_OF_KERNEL_STACK_PADDING);
-+	} else if (cpu_feature_enabled(X86_FEATURE_XENPV)) {
-+		/* Xen PV enters the kernel on the thread stack. */
- 		load_sp0(task_top_of_stack(task));
-+	}
- #endif
- }
+diff --git a/arch/x86/entry/entry_64.S b/arch/x86/entry/entry_64.S
+index eccc3431e515..5b595a9b2ffb 100644
+--- a/arch/x86/entry/entry_64.S
++++ b/arch/x86/entry/entry_64.S
+@@ -299,7 +299,12 @@ SYM_CODE_START_NOALIGN(ret_from_fork)
+ 	UNWIND_HINT_REGS
+ 	movq	%rsp, %rdi
+ 	call	syscall_exit_to_user_mode	/* returns with IRQs disabled */
++#ifdef CONFIG_X86_FRED
++	ALTERNATIVE "jmp swapgs_restore_regs_and_return_to_usermode", \
++		    "jmp fred_exit_user", X86_FEATURE_FRED
++#else
+ 	jmp	swapgs_restore_regs_and_return_to_usermode
++#endif
  
+ 1:
+ 	/* kernel thread */
 -- 
 2.34.1
 
