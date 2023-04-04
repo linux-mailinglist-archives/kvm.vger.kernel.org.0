@@ -2,314 +2,840 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8C02B6D6401
-	for <lists+kvm@lfdr.de>; Tue,  4 Apr 2023 15:53:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0D16F6D640D
+	for <lists+kvm@lfdr.de>; Tue,  4 Apr 2023 15:55:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235739AbjDDNxx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Apr 2023 09:53:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53182 "EHLO
+        id S235686AbjDDNzI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Apr 2023 09:55:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55774 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235742AbjDDNxk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Apr 2023 09:53:40 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B72574224;
-        Tue,  4 Apr 2023 06:53:28 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 4159E61FF6;
-        Tue,  4 Apr 2023 13:53:28 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 01718C4339B;
-        Tue,  4 Apr 2023 13:53:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1680616407;
-        bh=/XmQ33Vz5rwMvBxocOUTIIX51AasQPq8MBzmwbLl0tM=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=j3pvbEx+ZOhkZUE1LhdjIxby9njBvyhGGDw8XHNztZL/HYm+7Hxi7G2yVH87tLGXc
-         8CnD+aWL0pEfl8K8eEelOm98QkGvx9t82yLNNIDbeUQbrNgrgJfn5szL4qfacmifzK
-         rPf45WV4a2jbZGv1xNcqWD6pLaJXwrjXc0olsbyf9BBEd2EZkpozWqX1cpZJ+N/H4B
-         DgcmwjDTRFPqxMyHwoKOds6qUcJuJA5u8+/FD/+XXp0LvwfGWk4fHYFr/UhTWZm0gV
-         fPQ9esbG+NnpA8lDyV4zQGiCjpZvv+DaqXProbhEGTYkWTuiPCv+24pkuCN8MpR4Xn
-         uVKJnk0xDg9EA==
-Date:   Tue, 4 Apr 2023 15:53:13 +0200
-From:   Christian Brauner <brauner@kernel.org>
-To:     Ackerley Tng <ackerleytng@google.com>
-Cc:     kvm@vger.kernel.org, linux-api@vger.kernel.org,
-        linux-arch@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, qemu-devel@nongnu.org, aarcange@redhat.com,
-        ak@linux.intel.com, akpm@linux-foundation.org, arnd@arndb.de,
-        bfields@fieldses.org, bp@alien8.de, chao.p.peng@linux.intel.com,
-        corbet@lwn.net, dave.hansen@intel.com, david@redhat.com,
-        ddutile@redhat.com, dhildenb@redhat.com, hpa@zytor.com,
-        hughd@google.com, jlayton@kernel.org, jmattson@google.com,
-        joro@8bytes.org, jun.nakajima@intel.com,
-        kirill.shutemov@linux.intel.com, linmiaohe@huawei.com,
-        luto@kernel.org, mail@maciej.szmigiero.name, mhocko@suse.com,
-        michael.roth@amd.com, mingo@redhat.com, naoya.horiguchi@nec.com,
-        pbonzini@redhat.com, qperret@google.com, rppt@kernel.org,
-        seanjc@google.com, shuah@kernel.org, steven.price@arm.com,
-        tabba@google.com, tglx@linutronix.de, vannapurve@google.com,
-        vbabka@suse.cz, vkuznets@redhat.com, wanpengli@tencent.com,
-        wei.w.wang@intel.com, x86@kernel.org, yu.c.zhang@linux.intel.com
-Subject: Re: [RFC PATCH v3 1/2] mm: restrictedmem: Allow userspace to specify
- mount for memfd_restricted
-Message-ID: <20230404-amnesty-untying-01de932d4945@brauner>
-References: <cover.1680306489.git.ackerleytng@google.com>
- <592ebd9e33a906ba026d56dc68f42d691706f865.1680306489.git.ackerleytng@google.com>
+        with ESMTP id S235802AbjDDNy5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Apr 2023 09:54:57 -0400
+Received: from mail-ed1-x529.google.com (mail-ed1-x529.google.com [IPv6:2a00:1450:4864:20::529])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD1A24ED8
+        for <kvm@vger.kernel.org>; Tue,  4 Apr 2023 06:54:35 -0700 (PDT)
+Received: by mail-ed1-x529.google.com with SMTP id r11so130973228edd.5
+        for <kvm@vger.kernel.org>; Tue, 04 Apr 2023 06:54:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=brainfault-org.20210112.gappssmtp.com; s=20210112; t=1680616474;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=TkFnxmoHRbxirXSM24cAOA+5VXQ2aSXuumuYgc5N61I=;
+        b=OWLKrJtjG2lGd4pVsd7BZl8GVi7wIoLgYzbm4osikdjGGM2tD+PlAkMHnBxYJuVzBZ
+         6Jh081mYbY62g5fna7leK95EHquvyBwmaOAK5asv+VxsJjaocIvJqP59Hr4OCYli5CuN
+         X6Bb0fB/KEIt0ibpLVW7e2ELGG7NJIH3UyBwvfxkeJN8Oy16G7JIJRMO7QkjWto3tntc
+         gooEQPCfV+bLpFy7b0bva74BEVjlsCxRz9cCdeGVaIvH7syrV7VOZnyqwslrDkiBZW7Y
+         uyMFZmPwU4vWqpWCrF218NZLAw0S+108XZAFK6zU9rtRAHraqDJe9G+yePW9iMHdTz4n
+         J+6A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1680616474;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=TkFnxmoHRbxirXSM24cAOA+5VXQ2aSXuumuYgc5N61I=;
+        b=3yQpYCaX3GJHv+n3r76EG25RvoyGLCukVA7J+j9gAxS1T5jPzu3rI3xr/vkMd8IaAf
+         fHtj9unxrd4XvTOWrnzSs/69B3aPGcXAAEkJJGsW1D2xNqjYzvXFO4LMeksBfKYWLLF5
+         i40cadfGA1DXI/lLf+n5MeAkWiSJqKmaDUb6nlIhdJpHqaL6PWssWYMudGNdjeMLKr7N
+         KkJXdOTNBNnreVBME9ofpuUskHyvSjzAhZGMOP0Em3sn0BYzsBOepTUFxFc8DZEjX8rA
+         AF/cgyWK052/gXxBpDUOMyvR2b0MGkcE38fhVszrbMSqdTU6vP7crKCKcq3C9hg15MjI
+         HrIQ==
+X-Gm-Message-State: AAQBX9eZzpyvfj2GVqXK9iuHRJulEomwn9Q2kQyjPdqrSstoZSDePvuA
+        12TLSEpbCdo8/EH4eImLXNj6TUdoC5ywe97PO/s2bg==
+X-Google-Smtp-Source: AKy350bRQJiQrD76k4kvjzbH66Sejc+CnAIInvbTFRY7diLTmfb5tOKVzlLAGPSvePhWpjes3jIj7GMXRiGwEC6BvEs=
+X-Received: by 2002:a17:906:1c55:b0:8b1:780d:e43d with SMTP id
+ l21-20020a1709061c5500b008b1780de43dmr1307077ejg.13.1680616474158; Tue, 04
+ Apr 2023 06:54:34 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <592ebd9e33a906ba026d56dc68f42d691706f865.1680306489.git.ackerleytng@google.com>
-X-Spam-Status: No, score=-5.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,SPF_HELO_NONE,
-        SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.6
+References: <20230403093310.2271142-1-apatel@ventanamicro.com>
+ <20230403093310.2271142-8-apatel@ventanamicro.com> <boauaf7zkv6bai4jqw7gjp5yexmwgecinen2ss7s2r2qxfn7xv@4jbglkwtrafk>
+In-Reply-To: <boauaf7zkv6bai4jqw7gjp5yexmwgecinen2ss7s2r2qxfn7xv@4jbglkwtrafk>
+From:   Anup Patel <anup@brainfault.org>
+Date:   Tue, 4 Apr 2023 19:24:22 +0530
+Message-ID: <CAAhSdy3WUR4q_tgJRXiiETYKQ5ksh=vGGAGuGufWdY7oQFxj9g@mail.gmail.com>
+Subject: Re: [PATCH v3 7/8] RISC-V: KVM: Virtualize per-HART AIA CSRs
+To:     Andrew Jones <ajones@ventanamicro.com>
+Cc:     Anup Patel <apatel@ventanamicro.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Atish Patra <atishp@atishpatra.org>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>, kvm@vger.kernel.org,
+        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=0.0 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Mar 31, 2023 at 11:50:39PM +0000, Ackerley Tng wrote:
-> By default, the backing shmem file for a restrictedmem fd is created
-> on shmem's kernel space mount.
-> 
-> With this patch, an optional tmpfs mount can be specified via an fd,
-> which will be used as the mountpoint for backing the shmem file
-> associated with a restrictedmem fd.
-> 
-> This will help restrictedmem fds inherit the properties of the
-> provided tmpfs mounts, for example, hugepage allocation hints, NUMA
-> binding hints, etc.
-> 
-> Permissions for the fd passed to memfd_restricted() is modeled after
-> the openat() syscall, since both of these allow creation of a file
-> upon a mount/directory.
-> 
-> Permission to reference the mount the fd represents is checked upon fd
-> creation by other syscalls (e.g. fsmount(), open(), or open_tree(),
-> etc) and any process that can present memfd_restricted() with a valid
-> fd is expected to have obtained permission to use the mount
-> represented by the fd. This behavior is intended to parallel that of
-> the openat() syscall.
-> 
-> memfd_restricted() will check that the tmpfs superblock is
-> writable, and that the mount is also writable, before attempting to
-> create a restrictedmem file on the mount.
-> 
-> Signed-off-by: Ackerley Tng <ackerleytng@google.com>
-> ---
->  include/linux/syscalls.h           |  2 +-
->  include/uapi/linux/restrictedmem.h |  8 ++++
->  mm/restrictedmem.c                 | 74 +++++++++++++++++++++++++++---
->  3 files changed, 77 insertions(+), 7 deletions(-)
->  create mode 100644 include/uapi/linux/restrictedmem.h
-> 
-> diff --git a/include/linux/syscalls.h b/include/linux/syscalls.h
-> index f9e9e0c820c5..a23c4c385cd3 100644
-> --- a/include/linux/syscalls.h
-> +++ b/include/linux/syscalls.h
-> @@ -1056,7 +1056,7 @@ asmlinkage long sys_memfd_secret(unsigned int flags);
->  asmlinkage long sys_set_mempolicy_home_node(unsigned long start, unsigned long len,
->  					    unsigned long home_node,
->  					    unsigned long flags);
-> -asmlinkage long sys_memfd_restricted(unsigned int flags);
-> +asmlinkage long sys_memfd_restricted(unsigned int flags, int mount_fd);
-> 
->  /*
->   * Architecture-specific system calls
-> diff --git a/include/uapi/linux/restrictedmem.h b/include/uapi/linux/restrictedmem.h
-> new file mode 100644
-> index 000000000000..22d6f2285f6d
-> --- /dev/null
-> +++ b/include/uapi/linux/restrictedmem.h
-> @@ -0,0 +1,8 @@
-> +/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
-> +#ifndef _UAPI_LINUX_RESTRICTEDMEM_H
-> +#define _UAPI_LINUX_RESTRICTEDMEM_H
-> +
-> +/* flags for memfd_restricted */
-> +#define RMFD_USERMNT		0x0001U
-> +
-> +#endif /* _UAPI_LINUX_RESTRICTEDMEM_H */
-> diff --git a/mm/restrictedmem.c b/mm/restrictedmem.c
-> index c5d869d8c2d8..f7b62364a31a 100644
-> --- a/mm/restrictedmem.c
-> +++ b/mm/restrictedmem.c
-> @@ -1,11 +1,12 @@
->  // SPDX-License-Identifier: GPL-2.0
-> -#include "linux/sbitmap.h"
-> +#include <linux/namei.h>
->  #include <linux/pagemap.h>
->  #include <linux/pseudo_fs.h>
->  #include <linux/shmem_fs.h>
->  #include <linux/syscalls.h>
->  #include <uapi/linux/falloc.h>
->  #include <uapi/linux/magic.h>
-> +#include <uapi/linux/restrictedmem.h>
->  #include <linux/restrictedmem.h>
-> 
->  struct restrictedmem {
-> @@ -189,19 +190,20 @@ static struct file *restrictedmem_file_create(struct file *memfd)
->  	return file;
->  }
-> 
-> -SYSCALL_DEFINE1(memfd_restricted, unsigned int, flags)
-> +static int restrictedmem_create(struct vfsmount *mount)
->  {
->  	struct file *file, *restricted_file;
->  	int fd, err;
-> 
-> -	if (flags)
-> -		return -EINVAL;
-> -
->  	fd = get_unused_fd_flags(0);
+On Mon, Apr 3, 2023 at 10:07=E2=80=AFPM Andrew Jones <ajones@ventanamicro.c=
+om> wrote:
+>
+> On Mon, Apr 03, 2023 at 03:03:09PM +0530, Anup Patel wrote:
+> > The AIA specification introduce per-HART AIA CSRs which primarily
+> > support:
+> > * 64 local interrupts on both RV64 and RV32
+> > * priority for each of the 64 local interrupts
+> > * interrupt filtering for local interrupts
+> >
+> > This patch virtualize above mentioned AIA CSRs and also extend
+> > ONE_REG interface to allow user-space save/restore Guest/VM
+> > view of these CSRs.
+> >
+> > Signed-off-by: Anup Patel <apatel@ventanamicro.com>
+> > ---
+> >  arch/riscv/include/asm/kvm_aia.h  |  88 +++++----
+> >  arch/riscv/include/asm/kvm_host.h |   7 +-
+> >  arch/riscv/include/uapi/asm/kvm.h |   7 +
+> >  arch/riscv/kvm/aia.c              | 317 ++++++++++++++++++++++++++++++
+> >  arch/riscv/kvm/vcpu.c             |  53 +++--
+> >  5 files changed, 415 insertions(+), 57 deletions(-)
+> >
+> > diff --git a/arch/riscv/include/asm/kvm_aia.h b/arch/riscv/include/asm/=
+kvm_aia.h
+> > index 258a835d4c32..1de0717112e5 100644
+> > --- a/arch/riscv/include/asm/kvm_aia.h
+> > +++ b/arch/riscv/include/asm/kvm_aia.h
+>
+> nit: Generating the diff with --patience makes this a bit easier to read,
+> and/or several of the stub functions could have been directly put in
+> arch/riscv/kvm/aia.c in the skeleton patch to avoid so many changes in
+> this one.
+>
+> > @@ -12,6 +12,7 @@
+> >
+> >  #include <linux/jump_label.h>
+> >  #include <linux/kvm_types.h>
+> > +#include <asm/csr.h>
+> >
+> >  struct kvm_aia {
+> >       /* In-kernel irqchip created */
+> > @@ -21,7 +22,22 @@ struct kvm_aia {
+> >       bool            initialized;
+> >  };
+> >
+> > +struct kvm_vcpu_aia_csr {
+> > +     unsigned long vsiselect;
+> > +     unsigned long hviprio1;
+> > +     unsigned long hviprio2;
+> > +     unsigned long vsieh;
+> > +     unsigned long hviph;
+> > +     unsigned long hviprio1h;
+> > +     unsigned long hviprio2h;
+> > +};
+> > +
+> >  struct kvm_vcpu_aia {
+> > +     /* CPU AIA CSR context of Guest VCPU */
+> > +     struct kvm_vcpu_aia_csr guest_csr;
+> > +
+> > +     /* CPU AIA CSR context upon Guest VCPU reset */
+> > +     struct kvm_vcpu_aia_csr guest_reset_csr;
+> >  };
+> >
+> >  #define kvm_riscv_aia_initialized(k) ((k)->arch.aia.initialized)
+> > @@ -32,48 +48,50 @@ DECLARE_STATIC_KEY_FALSE(kvm_riscv_aia_available);
+> >  #define kvm_riscv_aia_available() \
+> >       static_branch_unlikely(&kvm_riscv_aia_available)
+> >
+> > -static inline void kvm_riscv_vcpu_aia_flush_interrupts(struct kvm_vcpu=
+ *vcpu)
+> > -{
+> > -}
+> > -
+> > -static inline void kvm_riscv_vcpu_aia_sync_interrupts(struct kvm_vcpu =
+*vcpu)
+> > -{
+> > -}
+> > -
+> > -static inline bool kvm_riscv_vcpu_aia_has_interrupts(struct kvm_vcpu *=
+vcpu,
+> > -                                                  u64 mask)
+> > -{
+> > -     return false;
+> > -}
+> > -
+> > -static inline void kvm_riscv_vcpu_aia_update_hvip(struct kvm_vcpu *vcp=
+u)
+> > -{
+> > -}
+> > -
+> > -static inline void kvm_riscv_vcpu_aia_load(struct kvm_vcpu *vcpu, int =
+cpu)
+> > -{
+> > -}
+> > -
+> > -static inline void kvm_riscv_vcpu_aia_put(struct kvm_vcpu *vcpu)
+> > +#define KVM_RISCV_AIA_IMSIC_TOPEI    (ISELECT_MASK + 1)
+> > +static inline int kvm_riscv_vcpu_aia_imsic_rmw(struct kvm_vcpu *vcpu,
+> > +                                            unsigned long isel,
+> > +                                            unsigned long *val,
+> > +                                            unsigned long new_val,
+> > +                                            unsigned long wr_mask)
+> >  {
+> > +     return 0;
+> >  }
+> >
+> > -static inline int kvm_riscv_vcpu_aia_get_csr(struct kvm_vcpu *vcpu,
+> > -                                          unsigned long reg_num,
+> > -                                          unsigned long *out_val)
+> > +#ifdef CONFIG_32BIT
+> > +void kvm_riscv_vcpu_aia_flush_interrupts(struct kvm_vcpu *vcpu);
+> > +void kvm_riscv_vcpu_aia_sync_interrupts(struct kvm_vcpu *vcpu);
+> > +#else
+> > +static inline void kvm_riscv_vcpu_aia_flush_interrupts(struct kvm_vcpu=
+ *vcpu)
+> >  {
+> > -     *out_val =3D 0;
+> > -     return 0;
+> >  }
+> > -
+> > -static inline int kvm_riscv_vcpu_aia_set_csr(struct kvm_vcpu *vcpu,
+> > -                                          unsigned long reg_num,
+> > -                                          unsigned long val)
+> > +static inline void kvm_riscv_vcpu_aia_sync_interrupts(struct kvm_vcpu =
+*vcpu)
+> >  {
+> > -     return 0;
+> >  }
+> > -
+> > -#define KVM_RISCV_VCPU_AIA_CSR_FUNCS
+> > +#endif
+> > +bool kvm_riscv_vcpu_aia_has_interrupts(struct kvm_vcpu *vcpu, u64 mask=
+);
+> > +
+> > +void kvm_riscv_vcpu_aia_update_hvip(struct kvm_vcpu *vcpu);
+> > +void kvm_riscv_vcpu_aia_load(struct kvm_vcpu *vcpu, int cpu);
+> > +void kvm_riscv_vcpu_aia_put(struct kvm_vcpu *vcpu);
+> > +int kvm_riscv_vcpu_aia_get_csr(struct kvm_vcpu *vcpu,
+> > +                            unsigned long reg_num,
+> > +                            unsigned long *out_val);
+> > +int kvm_riscv_vcpu_aia_set_csr(struct kvm_vcpu *vcpu,
+> > +                            unsigned long reg_num,
+> > +                            unsigned long val);
+> > +
+> > +int kvm_riscv_vcpu_aia_rmw_topei(struct kvm_vcpu *vcpu,
+> > +                              unsigned int csr_num,
+> > +                              unsigned long *val,
+> > +                              unsigned long new_val,
+> > +                              unsigned long wr_mask);
+> > +int kvm_riscv_vcpu_aia_rmw_ireg(struct kvm_vcpu *vcpu, unsigned int cs=
+r_num,
+> > +                             unsigned long *val, unsigned long new_val=
+,
+> > +                             unsigned long wr_mask);
+> > +#define KVM_RISCV_VCPU_AIA_CSR_FUNCS \
+> > +{ .base =3D CSR_SIREG,      .count =3D 1, .func =3D kvm_riscv_vcpu_aia=
+_rmw_ireg }, \
+> > +{ .base =3D CSR_STOPEI,     .count =3D 1, .func =3D kvm_riscv_vcpu_aia=
+_rmw_topei },
+> >
+> >  static inline int kvm_riscv_vcpu_aia_update(struct kvm_vcpu *vcpu)
+> >  {
+> > diff --git a/arch/riscv/include/asm/kvm_host.h b/arch/riscv/include/asm=
+/kvm_host.h
+> > index 3157cf748df1..ee0acccb1d3b 100644
+> > --- a/arch/riscv/include/asm/kvm_host.h
+> > +++ b/arch/riscv/include/asm/kvm_host.h
+> > @@ -204,8 +204,9 @@ struct kvm_vcpu_arch {
+> >        * in irqs_pending. Our approach is modeled around multiple produ=
+cer
+> >        * and single consumer problem where the consumer is the VCPU its=
+elf.
+> >        */
+> > -     unsigned long irqs_pending;
+> > -     unsigned long irqs_pending_mask;
+> > +#define KVM_RISCV_VCPU_NR_IRQS       64
+> > +     DECLARE_BITMAP(irqs_pending, KVM_RISCV_VCPU_NR_IRQS);
+> > +     DECLARE_BITMAP(irqs_pending_mask, KVM_RISCV_VCPU_NR_IRQS);
+>
+> I'd prefer this ulong to bitmap change, and all its repercussions, be don=
+e
+> in a separate patch.
+>
+> >
+> >       /* VCPU Timer */
+> >       struct kvm_vcpu_timer timer;
+> > @@ -334,7 +335,7 @@ int kvm_riscv_vcpu_set_interrupt(struct kvm_vcpu *v=
+cpu, unsigned int irq);
+> >  int kvm_riscv_vcpu_unset_interrupt(struct kvm_vcpu *vcpu, unsigned int=
+ irq);
+> >  void kvm_riscv_vcpu_flush_interrupts(struct kvm_vcpu *vcpu);
+> >  void kvm_riscv_vcpu_sync_interrupts(struct kvm_vcpu *vcpu);
+> > -bool kvm_riscv_vcpu_has_interrupts(struct kvm_vcpu *vcpu, unsigned lon=
+g mask);
+> > +bool kvm_riscv_vcpu_has_interrupts(struct kvm_vcpu *vcpu, u64 mask);
+> >  void kvm_riscv_vcpu_power_off(struct kvm_vcpu *vcpu);
+> >  void kvm_riscv_vcpu_power_on(struct kvm_vcpu *vcpu);
+> >
+> > diff --git a/arch/riscv/include/uapi/asm/kvm.h b/arch/riscv/include/uap=
+i/asm/kvm.h
+> > index cbc3e74fa670..c517e70ddcd6 100644
+> > --- a/arch/riscv/include/uapi/asm/kvm.h
+> > +++ b/arch/riscv/include/uapi/asm/kvm.h
+> > @@ -81,6 +81,13 @@ struct kvm_riscv_csr {
+> >
+> >  /* AIA CSR registers for KVM_GET_ONE_REG and KVM_SET_ONE_REG */
+> >  struct kvm_riscv_aia_csr {
+> > +     unsigned long siselect;
+> > +     unsigned long siprio1;
+> > +     unsigned long siprio2;
+> > +     unsigned long sieh;
+> > +     unsigned long siph;
+> > +     unsigned long siprio1h;
+> > +     unsigned long siprio2h;
+> >  };
+> >
+> >  /* TIMER registers for KVM_GET_ONE_REG and KVM_SET_ONE_REG */
+> > diff --git a/arch/riscv/kvm/aia.c b/arch/riscv/kvm/aia.c
+> > index 7a633331cd3e..d530912f28bc 100644
+> > --- a/arch/riscv/kvm/aia.c
+> > +++ b/arch/riscv/kvm/aia.c
+> > @@ -26,6 +26,323 @@ static void aia_set_hvictl(bool ext_irq_pending)
+> >       csr_write(CSR_HVICTL, hvictl);
+> >  }
+> >
+> > +#ifdef CONFIG_32BIT
+> > +void kvm_riscv_vcpu_aia_flush_interrupts(struct kvm_vcpu *vcpu)
+> > +{
+> > +     struct kvm_vcpu_aia_csr *csr =3D &vcpu->arch.aia_context.guest_cs=
+r;
+> > +     unsigned long mask, val;
+> > +
+> > +     if (!kvm_riscv_aia_available())
+> > +             return;
+> > +
+> > +     if (READ_ONCE(vcpu->arch.irqs_pending_mask[1])) {
+> > +             mask =3D xchg_acquire(&vcpu->arch.irqs_pending_mask[1], 0=
+);
+> > +             val =3D READ_ONCE(vcpu->arch.irqs_pending[1]) & mask;
+> > +
+> > +             csr->hviph &=3D ~mask;
+> > +             csr->hviph |=3D val;
+> > +     }
+> > +}
+> > +
+> > +void kvm_riscv_vcpu_aia_sync_interrupts(struct kvm_vcpu *vcpu)
+> > +{
+> > +     struct kvm_vcpu_aia_csr *csr =3D &vcpu->arch.aia_context.guest_cs=
+r;
+> > +
+> > +     if (kvm_riscv_aia_available())
+> > +             csr->vsieh =3D csr_read(CSR_VSIEH);
+> > +}
+> > +#endif
+> > +
+> > +bool kvm_riscv_vcpu_aia_has_interrupts(struct kvm_vcpu *vcpu, u64 mask=
+)
+> > +{
+> > +     unsigned long seip;
+> > +
+> > +     if (!kvm_riscv_aia_available())
+> > +             return false;
+> > +
+> > +#ifdef CONFIG_32BIT
+> > +     if (READ_ONCE(vcpu->arch.irqs_pending[1]) &
+> > +         (vcpu->arch.aia_context.guest_csr.vsieh & (unsigned long)(mas=
+k >> 32)))
+>
+> upper_32_bits()
+>
+> > +             return true;
+> > +#endif
+> > +
+> > +     seip =3D vcpu->arch.guest_csr.vsie;
+> > +     seip &=3D (unsigned long)mask;
+> > +     seip &=3D BIT(IRQ_S_EXT);
+>
+> Please add a blank line above the if-statement.
+>
+> > +     if (!kvm_riscv_aia_initialized(vcpu->kvm) || !seip)
+>
+> Shouldn't we check kvm_riscv_aia_initialized() at the top of this
+> function?
+>
+> > +             return false;
+> > +
+> > +     return false;
+>
+> return true
+>
+> But if we move kvm_riscv_aia_initialized() up, then we instead can do
+>
+>  return !!seip;
 
-Any reasons the file descriptors aren't O_CLOEXEC by default? I don't
-see any reasons why we should introduce new fdtypes that aren't
-O_CLOEXEC by default. The "don't mix-and-match" train has already left
-the station anyway as we do have seccomp noitifer fds and pidfds both of
-which are O_CLOEXEC by default.
+This logic is correct. It is looking weird because it is incomplete
+and PATCH8 completes it.
 
->  	if (fd < 0)
->  		return fd;
-> 
-> -	file = shmem_file_setup("memfd:restrictedmem", 0, VM_NORESERVE);
-> +	if (mount)
-> +		file = shmem_file_setup_with_mnt(mount, "memfd:restrictedmem", 0, VM_NORESERVE);
-> +	else
-> +		file = shmem_file_setup("memfd:restrictedmem", 0, VM_NORESERVE);
-> +
->  	if (IS_ERR(file)) {
->  		err = PTR_ERR(file);
->  		goto err_fd;
-> @@ -223,6 +225,66 @@ SYSCALL_DEFINE1(memfd_restricted, unsigned int, flags)
->  	return err;
->  }
-> 
-> +static bool is_shmem_mount(struct vfsmount *mnt)
-> +{
-> +	return mnt && mnt->mnt_sb && mnt->mnt_sb->s_magic == TMPFS_MAGIC;
+It took a while to refresh my memory because I wrote this code
+almost 2 years back.
 
-This can just be if (mnt->mnt_sb->s_magic == TMPFS_MAGIC).
+Regards,
+Anup
 
-> +}
-> +
-> +static bool is_mount_root(struct file *file)
-> +{
-> +	return file->f_path.dentry == file->f_path.mnt->mnt_root;
-
-mount -t tmpfs tmpfs /mnt
-touch /mnt/bla
-touch /mnt/ble
-mount --bind /mnt/bla /mnt/ble
-fd = open("/mnt/ble")
-fd_restricted = memfd_restricted(fd)
-
-IOW, this doesn't restrict it to the tmpfs root. It only restricts it to
-paths that refer to the root of any tmpfs mount. To exclude bind-mounts
-that aren't bind-mounts of the whole filesystem you want:
-
-path->dentry == path->mnt->mnt_root && 
-path->mnt->mnt_root == path->mnt->mnt_sb->s_root
-
-> +}
-> +
-> +static int restrictedmem_create_on_user_mount(int mount_fd)
-> +{
-> +	int ret;
-> +	struct fd f;
-> +	struct vfsmount *mnt;
-> +
-> +	f = fdget_raw(mount_fd);
-> +	if (!f.file)
-> +		return -EBADF;
-> +
-> +	ret = -EINVAL;
-> +	if (!is_mount_root(f.file))
-> +		goto out;
-> +
-> +	mnt = f.file->f_path.mnt;
-> +	if (!is_shmem_mount(mnt))
-> +		goto out;
-> +
-> +	ret = file_permission(f.file, MAY_WRITE | MAY_EXEC);
-
-With the current semantics you're asking whether you have write
-permissions on the /mnt/ble file in order to get answer to the question
-whether you're allowed to create an unlinked restricted memory file.
-That doesn't make much sense afaict.
-
-> +	if (ret)
-> +		goto out;
-> +
-> +	ret = mnt_want_write(mnt);
-> +	if (unlikely(ret))
-> +		goto out;
-> +
-> +	ret = restrictedmem_create(mnt);
-> +
-> +	mnt_drop_write(mnt);
-> +out:
-> +	fdput(f);
-> +
-> +	return ret;
-> +}
-> +
-> +SYSCALL_DEFINE2(memfd_restricted, unsigned int, flags, int, mount_fd)
-> +{
-> +	if (flags & ~RMFD_USERMNT)
-> +		return -EINVAL;
-> +
-> +	if (flags == RMFD_USERMNT) {
-
-Why do you even need this flag? It seems that @mount_fd being < 0 is
-sufficient to indicate that a new restricted memory fd is supposed to be
-created in the system instance.
-
-> +		if (mount_fd < 0)
-> +			return -EINVAL;
-> +
-> +		return restrictedmem_create_on_user_mount(mount_fd);
-> +	} else {
-> +		return restrictedmem_create(NULL);
-> +	}
-> +}
-
-I have to say that I'm very confused by all of this the more I look at it.
-
-Effectively memfd restricted functions as a wrapper filesystem around
-the tmpfs filesystem. This is basically a weird overlay filesystem.
-You're allocating tmpfs files that you stash in restrictedmem files. 
-I have to say that this seems very hacky. I didn't get this at all at
-first.
-
-So what does the caller get if they call statx() on a restricted memfd?
-Do they get the device number of the tmpfs mount and the inode numbers
-of the tmpfs mount? Because it looks like they would:
-
-static int restrictedmem_getattr(struct user_namespace *mnt_userns,
-				 const struct path *path, struct kstat *stat,
-				 u32 request_mask, unsigned int query_flags)
-{
-	struct inode *inode = d_inode(path->dentry);
-	struct restrictedmem *rm = inode->i_mapping->private_data;
-	struct file *memfd = rm->memfd;
-
-	return memfd->f_inode->i_op->getattr(mnt_userns, path, stat,
-					     request_mask, query_flags);
-
-That @memfd would be a struct file allocated in a tmpfs instance, no? So
-you'd be calling the inode operation of the tmpfs file meaning that
-struct kstat will be filled up with the info from the tmpfs instance.
-
-But then if I call statfs() and check the fstype I would get
-RESTRICTEDMEM_MAGIC, no? This is... unorthodox?
-
-I'm honestly puzzled and this sounds really strange. There must be a
-better way to implement all of this.
-
-Shouldn't you try and make this a part of tmpfs proper? Make a really
-separate filesystem and add a memfs library that both tmpfs and
-restrictedmemfs can use? Add a mount option to tmpfs that makes it a
-restricted tmpfs?
+>
+> > +}
+> > +
+> > +void kvm_riscv_vcpu_aia_update_hvip(struct kvm_vcpu *vcpu)
+> > +{
+> > +     struct kvm_vcpu_csr *csr =3D &vcpu->arch.guest_csr;
+> > +
+> > +     if (!kvm_riscv_aia_available())
+> > +             return;
+> > +
+> > +#ifdef CONFIG_32BIT
+> > +     csr_write(CSR_HVIPH, vcpu->arch.aia_context.guest_csr.hviph);
+> > +#endif
+> > +     aia_set_hvictl((csr->hvip & BIT(IRQ_VS_EXT)) ? true : false);
+>
+> The compiler will manage the conversion of csr->hvip & BIT(IRQ_VS_EXT)
+> to a 1 or 0 since it's getting passed in as a boolean parameter.
+>
+> > +}
+> > +
+> > +void kvm_riscv_vcpu_aia_load(struct kvm_vcpu *vcpu, int cpu)
+> > +{
+> > +     struct kvm_vcpu_aia_csr *csr =3D &vcpu->arch.aia_context.guest_cs=
+r;
+> > +
+> > +     if (!kvm_riscv_aia_available())
+> > +             return;
+> > +
+> > +     csr_write(CSR_VSISELECT, csr->vsiselect);
+> > +     csr_write(CSR_HVIPRIO1, csr->hviprio1);
+> > +     csr_write(CSR_HVIPRIO2, csr->hviprio2);
+> > +#ifdef CONFIG_32BIT
+> > +     csr_write(CSR_VSIEH, csr->vsieh);
+> > +     csr_write(CSR_HVIPH, csr->hviph);
+> > +     csr_write(CSR_HVIPRIO1H, csr->hviprio1h);
+> > +     csr_write(CSR_HVIPRIO2H, csr->hviprio2h);
+> > +#endif
+> > +}
+> > +
+> > +void kvm_riscv_vcpu_aia_put(struct kvm_vcpu *vcpu)
+> > +{
+> > +     struct kvm_vcpu_aia_csr *csr =3D &vcpu->arch.aia_context.guest_cs=
+r;
+> > +
+> > +     if (!kvm_riscv_aia_available())
+> > +             return;
+> > +
+> > +     csr->vsiselect =3D csr_read(CSR_VSISELECT);
+> > +     csr->hviprio1 =3D csr_read(CSR_HVIPRIO1);
+> > +     csr->hviprio2 =3D csr_read(CSR_HVIPRIO2);
+> > +#ifdef CONFIG_32BIT
+> > +     csr->vsieh =3D csr_read(CSR_VSIEH);
+> > +     csr->hviph =3D csr_read(CSR_HVIPH);
+> > +     csr->hviprio1h =3D csr_read(CSR_HVIPRIO1H);
+> > +     csr->hviprio2h =3D csr_read(CSR_HVIPRIO2H);
+> > +#endif
+> > +}
+> > +
+> > +int kvm_riscv_vcpu_aia_get_csr(struct kvm_vcpu *vcpu,
+> > +                            unsigned long reg_num,
+> > +                            unsigned long *out_val)
+> > +{
+> > +     struct kvm_vcpu_aia_csr *csr =3D &vcpu->arch.aia_context.guest_cs=
+r;
+> > +
+> > +     if (reg_num >=3D sizeof(struct kvm_riscv_aia_csr) / sizeof(unsign=
+ed long))
+> > +             return -EINVAL;
+> > +
+> > +     *out_val =3D 0;
+> > +     if (kvm_riscv_aia_available())
+> > +             *out_val =3D ((unsigned long *)csr)[reg_num];
+> > +
+> > +     return 0;
+> > +}
+> > +
+> > +int kvm_riscv_vcpu_aia_set_csr(struct kvm_vcpu *vcpu,
+> > +                            unsigned long reg_num,
+> > +                            unsigned long val)
+> > +{
+> > +     struct kvm_vcpu_aia_csr *csr =3D &vcpu->arch.aia_context.guest_cs=
+r;
+> > +
+> > +     if (reg_num >=3D sizeof(struct kvm_riscv_aia_csr) / sizeof(unsign=
+ed long))
+> > +             return -EINVAL;
+> > +
+> > +     if (kvm_riscv_aia_available()) {
+> > +             ((unsigned long *)csr)[reg_num] =3D val;
+> > +
+> > +#ifdef CONFIG_32BIT
+> > +             if (reg_num =3D=3D KVM_REG_RISCV_CSR_AIA_REG(siph))
+> > +                     WRITE_ONCE(vcpu->arch.irqs_pending_mask[1], 0);
+> > +#endif
+> > +     }
+> > +
+> > +     return 0;
+> > +}
+> > +
+> > +int kvm_riscv_vcpu_aia_rmw_topei(struct kvm_vcpu *vcpu,
+> > +                              unsigned int csr_num,
+> > +                              unsigned long *val,
+> > +                              unsigned long new_val,
+> > +                              unsigned long wr_mask)
+> > +{
+> > +     /* If AIA not available then redirect trap */
+> > +     if (!kvm_riscv_aia_available())
+> > +             return KVM_INSN_ILLEGAL_TRAP;
+> > +
+> > +     /* If AIA not initialized then forward to user space */
+> > +     if (!kvm_riscv_aia_initialized(vcpu->kvm))
+> > +             return KVM_INSN_EXIT_TO_USER_SPACE;
+> > +
+> > +     return kvm_riscv_vcpu_aia_imsic_rmw(vcpu, KVM_RISCV_AIA_IMSIC_TOP=
+EI,
+> > +                                         val, new_val, wr_mask);
+> > +}
+> > +
+> > +/*
+> > + * External IRQ priority always read-only zero. This means default
+> > + * priority order  is always preferred for external IRQs unless
+> > + * HVICTL.IID =3D=3D 9 and HVICTL.IPRIO !=3D 0
+> > + */
+> > +static int aia_irq2bitpos[] =3D {
+> > +0,     8,   -1,   -1,   16,   24,   -1,   -1, /* 0 - 7 */
+> > +32,   -1,   -1,   -1,   -1,   40,   48,   56, /* 8 - 15 */
+> > +64,   72,   80,   88,   96,  104,  112,  120, /* 16 - 23 */
+> > +-1,   -1,   -1,   -1,   -1,   -1,   -1,   -1, /* 24 - 31 */
+> > +-1,   -1,   -1,   -1,   -1,   -1,   -1,   -1, /* 32 - 39 */
+> > +-1,   -1,   -1,   -1,   -1,   -1,   -1,   -1, /* 40 - 47 */
+> > +-1,   -1,   -1,   -1,   -1,   -1,   -1,   -1, /* 48 - 55 */
+> > +-1,   -1,   -1,   -1,   -1,   -1,   -1,   -1, /* 56 - 63 */
+> > +};
+> > +
+> > +static u8 aia_get_iprio8(struct kvm_vcpu *vcpu, unsigned int irq)
+> > +{
+> > +     unsigned long hviprio;
+> > +     int bitpos =3D aia_irq2bitpos[irq];
+> > +
+> > +     if (bitpos < 0)
+> > +             return 0;
+> > +
+> > +     switch (bitpos / BITS_PER_LONG) {
+> > +     case 0:
+> > +             hviprio =3D csr_read(CSR_HVIPRIO1);
+> > +             break;
+> > +     case 1:
+> > +#ifndef CONFIG_32BIT
+> > +             hviprio =3D csr_read(CSR_HVIPRIO2);
+> > +             break;
+> > +#else
+> > +             hviprio =3D csr_read(CSR_HVIPRIO1H);
+> > +             break;
+> > +     case 2:
+> > +             hviprio =3D csr_read(CSR_HVIPRIO2);
+> > +             break;
+> > +     case 3:
+> > +             hviprio =3D csr_read(CSR_HVIPRIO2H);
+> > +             break;
+> > +#endif
+> > +     default:
+> > +             return 0;
+> > +     };
+>          ^ unnecessary ;
+> > +
+> > +     return (hviprio >> (bitpos % BITS_PER_LONG)) & TOPI_IPRIO_MASK;
+> > +}
+> > +
+> > +static void aia_set_iprio8(struct kvm_vcpu *vcpu, unsigned int irq, u8=
+ prio)
+> > +{
+> > +     unsigned long hviprio;
+> > +     int bitpos =3D aia_irq2bitpos[irq];
+> > +
+> > +     if (bitpos < 0)
+> > +             return;
+> > +
+> > +     switch (bitpos / BITS_PER_LONG) {
+> > +     case 0:
+> > +             hviprio =3D csr_read(CSR_HVIPRIO1);
+> > +             break;
+> > +     case 1:
+> > +#ifndef CONFIG_32BIT
+> > +             hviprio =3D csr_read(CSR_HVIPRIO2);
+> > +             break;
+> > +#else
+> > +             hviprio =3D csr_read(CSR_HVIPRIO1H);
+> > +             break;
+> > +     case 2:
+> > +             hviprio =3D csr_read(CSR_HVIPRIO2);
+> > +             break;
+> > +     case 3:
+> > +             hviprio =3D csr_read(CSR_HVIPRIO2H);
+> > +             break;
+> > +#endif
+> > +     default:
+> > +             return;
+> > +     };
+>          ^ unnecessary ;
+>
+> The csr read switch could be put in a helper and shared between the get
+> and set functions.
+>
+> > +
+> > +     hviprio &=3D ~((unsigned long)TOPI_IPRIO_MASK <<
+>
+> I don't think the (unsigned long) cast is necessary, as I believe
+> TOPI_IPRIO_MASK is already an unsigned long.
+>
+> > +                  (bitpos % BITS_PER_LONG));
+> > +     hviprio |=3D (unsigned long)prio << (bitpos % BITS_PER_LONG);
+> > +
+> > +     switch (bitpos / BITS_PER_LONG) {
+> > +     case 0:
+> > +             csr_write(CSR_HVIPRIO1, hviprio);
+> > +             break;
+> > +     case 1:
+> > +#ifndef CONFIG_32BIT
+> > +             csr_write(CSR_HVIPRIO2, hviprio);
+> > +             break;
+> > +#else
+> > +             csr_write(CSR_HVIPRIO1H, hviprio);
+> > +             break;
+> > +     case 2:
+> > +             csr_write(CSR_HVIPRIO2, hviprio);
+> > +             break;
+> > +     case 3:
+> > +             csr_write(CSR_HVIPRIO2H, hviprio);
+> > +             break;
+> > +#endif
+> > +     default:
+> > +             return;
+> > +     };
+>          ^ unnecessary ;
+>
+> > +}
+> > +
+> > +static int aia_rmw_iprio(struct kvm_vcpu *vcpu, unsigned int isel,
+> > +                      unsigned long *val, unsigned long new_val,
+> > +                      unsigned long wr_mask)
+> > +{
+> > +     int i, firq, nirqs;
+>
+> nit: I guessed 'f' is for 'first', but 'first_irq' would make that more
+> clear from the start.
+>
+> > +     unsigned long old_val;
+> > +
+> > +#ifndef CONFIG_32BIT
+> > +     if (isel & 0x1)
+> > +             return KVM_INSN_ILLEGAL_TRAP;
+> > +#endif
+> > +
+> > +     nirqs =3D 4 * (BITS_PER_LONG / 32);
+> > +     firq =3D ((isel - ISELECT_IPRIO0) / (BITS_PER_LONG / 32)) * (nirq=
+s);
+>
+> This is just firq =3D 4 * (isel - ISELECT_IPRIO0);
+>
+> > +
+> > +     old_val =3D 0;
+> > +     for (i =3D 0; i < nirqs; i++)
+> > +             old_val |=3D (unsigned long)aia_get_iprio8(vcpu, firq + i=
+) <<
+> > +                        (TOPI_IPRIO_BITS * i);
+>
+> nit: normally would indent to under the (
+>
+> > +
+> > +     if (val)
+> > +             *val =3D old_val;
+> > +
+> > +     if (wr_mask) {
+> > +             new_val =3D (old_val & ~wr_mask) | (new_val & wr_mask);
+> > +             for (i =3D 0; i < nirqs; i++)
+> > +                     aia_set_iprio8(vcpu, firq + i,
+> > +                     (new_val >> (TOPI_IPRIO_BITS * i)) & TOPI_IPRIO_M=
+ASK);
+>
+> nit: normally would indent to under the (
+>
+> > +     }
+> > +
+> > +     return KVM_INSN_CONTINUE_NEXT_SEPC;
+> > +}
+> > +
+> > +#define IMSIC_FIRST  0x70
+> > +#define IMSIC_LAST   0xff
+> > +int kvm_riscv_vcpu_aia_rmw_ireg(struct kvm_vcpu *vcpu, unsigned int cs=
+r_num,
+> > +                             unsigned long *val, unsigned long new_val=
+,
+> > +                             unsigned long wr_mask)
+> > +{
+> > +     unsigned int isel;
+> > +
+> > +     /* If AIA not available then redirect trap */
+> > +     if (!kvm_riscv_aia_available())
+> > +             return KVM_INSN_ILLEGAL_TRAP;
+> > +
+> > +     /* First try to emulate in kernel space */
+> > +     isel =3D csr_read(CSR_VSISELECT) & ISELECT_MASK;
+> > +     if (isel >=3D ISELECT_IPRIO0 && isel <=3D ISELECT_IPRIO15)
+> > +             return aia_rmw_iprio(vcpu, isel, val, new_val, wr_mask);
+> > +     else if (isel >=3D IMSIC_FIRST && isel <=3D IMSIC_LAST &&
+> > +              kvm_riscv_aia_initialized(vcpu->kvm))
+> > +             return kvm_riscv_vcpu_aia_imsic_rmw(vcpu, isel, val, new_=
+val,
+> > +                                                 wr_mask);
+> > +
+> > +     /* We can't handle it here so redirect to user space */
+> > +     return KVM_INSN_EXIT_TO_USER_SPACE;
+> > +}
+> > +
+> >  void kvm_riscv_aia_enable(void)
+> >  {
+> >       if (!kvm_riscv_aia_available())
+> > diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
+> > index 15507cd3a595..30acf3ebdc3d 100644
+> > --- a/arch/riscv/kvm/vcpu.c
+> > +++ b/arch/riscv/kvm/vcpu.c
+> > @@ -141,8 +141,8 @@ static void kvm_riscv_reset_vcpu(struct kvm_vcpu *v=
+cpu)
+> >
+> >       kvm_riscv_vcpu_aia_reset(vcpu);
+> >
+> > -     WRITE_ONCE(vcpu->arch.irqs_pending, 0);
+> > -     WRITE_ONCE(vcpu->arch.irqs_pending_mask, 0);
+> > +     bitmap_zero(vcpu->arch.irqs_pending, KVM_RISCV_VCPU_NR_IRQS);
+> > +     bitmap_zero(vcpu->arch.irqs_pending_mask, KVM_RISCV_VCPU_NR_IRQS)=
+;
+> >
+> >       kvm_riscv_vcpu_pmu_reset(vcpu);
+> >
+> > @@ -474,6 +474,7 @@ static int kvm_riscv_vcpu_general_get_csr(struct kv=
+m_vcpu *vcpu,
+> >       if (reg_num =3D=3D KVM_REG_RISCV_CSR_REG(sip)) {
+> >               kvm_riscv_vcpu_flush_interrupts(vcpu);
+> >               *out_val =3D (csr->hvip >> VSIP_TO_HVIP_SHIFT) & VSIP_VAL=
+ID_MASK;
+> > +             *out_val |=3D csr->hvip & ~IRQ_LOCAL_MASK;
+> >       } else
+> >               *out_val =3D ((unsigned long *)csr)[reg_num];
+> >
+> > @@ -497,7 +498,7 @@ static inline int kvm_riscv_vcpu_general_set_csr(st=
+ruct kvm_vcpu *vcpu,
+> >       ((unsigned long *)csr)[reg_num] =3D reg_val;
+> >
+> >       if (reg_num =3D=3D KVM_REG_RISCV_CSR_REG(sip))
+> > -             WRITE_ONCE(vcpu->arch.irqs_pending_mask, 0);
+> > +             WRITE_ONCE(vcpu->arch.irqs_pending_mask[0], 0);
+> >
+> >       return 0;
+> >  }
+> > @@ -799,9 +800,9 @@ void kvm_riscv_vcpu_flush_interrupts(struct kvm_vcp=
+u *vcpu)
+> >       struct kvm_vcpu_csr *csr =3D &vcpu->arch.guest_csr;
+> >       unsigned long mask, val;
+> >
+> > -     if (READ_ONCE(vcpu->arch.irqs_pending_mask)) {
+> > -             mask =3D xchg_acquire(&vcpu->arch.irqs_pending_mask, 0);
+> > -             val =3D READ_ONCE(vcpu->arch.irqs_pending) & mask;
+> > +     if (READ_ONCE(vcpu->arch.irqs_pending_mask[0])) {
+> > +             mask =3D xchg_acquire(&vcpu->arch.irqs_pending_mask[0], 0=
+);
+> > +             val =3D READ_ONCE(vcpu->arch.irqs_pending[0]) & mask;
+> >
+> >               csr->hvip &=3D ~mask;
+> >               csr->hvip |=3D val;
+> > @@ -825,12 +826,12 @@ void kvm_riscv_vcpu_sync_interrupts(struct kvm_vc=
+pu *vcpu)
+> >       if ((csr->hvip ^ hvip) & (1UL << IRQ_VS_SOFT)) {
+> >               if (hvip & (1UL << IRQ_VS_SOFT)) {
+> >                       if (!test_and_set_bit(IRQ_VS_SOFT,
+> > -                                           &v->irqs_pending_mask))
+> > -                             set_bit(IRQ_VS_SOFT, &v->irqs_pending);
+> > +                                           v->irqs_pending_mask))
+> > +                             set_bit(IRQ_VS_SOFT, v->irqs_pending);
+> >               } else {
+> >                       if (!test_and_set_bit(IRQ_VS_SOFT,
+> > -                                           &v->irqs_pending_mask))
+> > -                             clear_bit(IRQ_VS_SOFT, &v->irqs_pending);
+> > +                                           v->irqs_pending_mask))
+> > +                             clear_bit(IRQ_VS_SOFT, v->irqs_pending);
+> >               }
+> >       }
+> >
+> > @@ -843,14 +844,20 @@ void kvm_riscv_vcpu_sync_interrupts(struct kvm_vc=
+pu *vcpu)
+> >
+> >  int kvm_riscv_vcpu_set_interrupt(struct kvm_vcpu *vcpu, unsigned int i=
+rq)
+> >  {
+> > -     if (irq !=3D IRQ_VS_SOFT &&
+> > +     /*
+> > +      * We only allow VS-mode software, timer, and external
+> > +      * interrupts when irq is one of the local interrupts
+> > +      * defined by RISC-V privilege specification.
+> > +      */
+> > +     if (irq < IRQ_LOCAL_MAX &&
+> > +         irq !=3D IRQ_VS_SOFT &&
+> >           irq !=3D IRQ_VS_TIMER &&
+> >           irq !=3D IRQ_VS_EXT)
+> >               return -EINVAL;
+> >
+> > -     set_bit(irq, &vcpu->arch.irqs_pending);
+> > +     set_bit(irq, vcpu->arch.irqs_pending);
+> >       smp_mb__before_atomic();
+> > -     set_bit(irq, &vcpu->arch.irqs_pending_mask);
+> > +     set_bit(irq, vcpu->arch.irqs_pending_mask);
+> >
+> >       kvm_vcpu_kick(vcpu);
+> >
+> > @@ -859,25 +866,33 @@ int kvm_riscv_vcpu_set_interrupt(struct kvm_vcpu =
+*vcpu, unsigned int irq)
+> >
+> >  int kvm_riscv_vcpu_unset_interrupt(struct kvm_vcpu *vcpu, unsigned int=
+ irq)
+> >  {
+> > -     if (irq !=3D IRQ_VS_SOFT &&
+> > +     /*
+> > +      * We only allow VS-mode software, timer, and external
+> > +      * interrupts when irq is one of the local interrupts
+> > +      * defined by RISC-V privilege specification.
+> > +      */
+> > +     if (irq < IRQ_LOCAL_MAX &&
+> > +         irq !=3D IRQ_VS_SOFT &&
+> >           irq !=3D IRQ_VS_TIMER &&
+> >           irq !=3D IRQ_VS_EXT)
+> >               return -EINVAL;
+> >
+> > -     clear_bit(irq, &vcpu->arch.irqs_pending);
+> > +     clear_bit(irq, vcpu->arch.irqs_pending);
+> >       smp_mb__before_atomic();
+> > -     set_bit(irq, &vcpu->arch.irqs_pending_mask);
+> > +     set_bit(irq, vcpu->arch.irqs_pending_mask);
+> >
+> >       return 0;
+> >  }
+> >
+> > -bool kvm_riscv_vcpu_has_interrupts(struct kvm_vcpu *vcpu, unsigned lon=
+g mask)
+> > +bool kvm_riscv_vcpu_has_interrupts(struct kvm_vcpu *vcpu, u64 mask)
+> >  {
+> >       unsigned long ie;
+> >
+> >       ie =3D ((vcpu->arch.guest_csr.vsie & VSIP_VALID_MASK)
+> > -             << VSIP_TO_HVIP_SHIFT) & mask;
+> > -     if (READ_ONCE(vcpu->arch.irqs_pending) & ie)
+> > +             << VSIP_TO_HVIP_SHIFT) & (unsigned long)mask;
+> > +     ie |=3D vcpu->arch.guest_csr.vsie & ~IRQ_LOCAL_MASK &
+> > +             (unsigned long)mask;
+> > +     if (READ_ONCE(vcpu->arch.irqs_pending[0]) & ie)
+> >               return true;
+> >
+> >       /* Check AIA high interrupts */
+> > --
+> > 2.34.1
+> >
+>
+> Thanks,
+> drew
