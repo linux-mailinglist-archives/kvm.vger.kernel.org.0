@@ -2,182 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C4A5B6D6E78
-	for <lists+kvm@lfdr.de>; Tue,  4 Apr 2023 22:59:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F35E46D6E96
+	for <lists+kvm@lfdr.de>; Tue,  4 Apr 2023 23:02:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236378AbjDDU7r (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Apr 2023 16:59:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35616 "EHLO
+        id S235445AbjDDVCa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Apr 2023 17:02:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38706 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236159AbjDDU7p (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Apr 2023 16:59:45 -0400
-Received: from mail-ot1-x32b.google.com (mail-ot1-x32b.google.com [IPv6:2607:f8b0:4864:20::32b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E50B49D6
-        for <kvm@vger.kernel.org>; Tue,  4 Apr 2023 13:59:44 -0700 (PDT)
-Received: by mail-ot1-x32b.google.com with SMTP id f4-20020a9d0384000000b0069fab3f4cafso18048705otf.9
-        for <kvm@vger.kernel.org>; Tue, 04 Apr 2023 13:59:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1680641983;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8XB956O45UzVksOyeGhwxzyBdQXHDRc1Q4yj23qYiJg=;
-        b=RN3hkQEhO24vo0vfwd4s0t68KhyLFB5bobj6eS6kQ1lCvGABwa562qwkSJpKBLhHsI
-         j9WyV/bZ9XUUkmDYf+xx+nqLQRXXyoH1MuACy1KypDYbTisxMcFFPsQ27f1Wt48z1eCe
-         Eff/XBDWq153oNecKmgeVWIXX2Wk5Cl2Wz2mDFmKW4gLy/ix+eYT7xT7Z8Onc9v69H+P
-         akaXzFzIepYWUiCTz/CfJFD8qj4ynB6JoyOmjfvskEHLgdwgbEkTOaNBwplMqrR2YZQl
-         92xCtdgJd+LiU2AY20nwNoj0e73AWfEbcYIiJBKhfeBA1W8r725EEmwGfIftOIdiMXdj
-         dSmQ==
+        with ESMTP id S235377AbjDDVCG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Apr 2023 17:02:06 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54A8C4EEA
+        for <kvm@vger.kernel.org>; Tue,  4 Apr 2023 14:00:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1680642038;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=eUlNSkHN+zXMVEgYFwpXLf7eXmZqDjBFuuY+21ymQM8=;
+        b=QNXRjxDDVb8WnLfJzpLtcHe9kDPw8/ELQwrFT5e3ilaHTMscvOlkSVw16gcyCI8S21TKrI
+        VeWxOX6cqsZOanftzA2xJ2EmhmzbmMm6FAR7SyGNYw4G5ihuzN/W2ez1GUPJTeKTeORA6m
+        pRFfIRWDw4HXINHMPHQALeuWUShDVDY=
+Received: from mail-il1-f197.google.com (mail-il1-f197.google.com
+ [209.85.166.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-370--ap5jZJrMzSr9IzD4vDLtw-1; Tue, 04 Apr 2023 17:00:37 -0400
+X-MC-Unique: -ap5jZJrMzSr9IzD4vDLtw-1
+Received: by mail-il1-f197.google.com with SMTP id d11-20020a056e020c0b00b00326156e3a8bso16562075ile.3
+        for <kvm@vger.kernel.org>; Tue, 04 Apr 2023 14:00:37 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680641983;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20210112; t=1680642036;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=8XB956O45UzVksOyeGhwxzyBdQXHDRc1Q4yj23qYiJg=;
-        b=lTvH7Elf+WQ1qhzTyOv8ruCCM0Rs1L4PkjCNInMzIErhXui3Y8ydSlwBeCAICFHTN5
-         /y+ZyVivakXnZCcV3t7HFS37dt1Gh4sfTyfIskVqj4tk4h/ud4PFdtKsUYMlY/XqroSN
-         zfst9xnFxVwoRmixbPLqbIHVW+Q7xIQrBrKA80VW+HYRGSkJxNHKPliEalJEmAMCs6bs
-         iYfSDN3WzvgrKNEQezbF1RmJ05JKa5473RcfEEzuevU4h4D3p/z/lRxlRV72HaygH0X6
-         nZBZq6NeTaP/hj7MeMGgQvFDJmCdvconoeT9oGH43Wh1mT0tQQI8i2pLzgTfOLA1Pxyj
-         y5Bw==
-X-Gm-Message-State: AAQBX9cdIXzMvRN51DjZiLO+aW2L0D0RKAfqy+MleFovG5bVDFpqmVm/
-        R0UgIFXDCBq4fwI6X+IIwIO/2cM5pAETPyoL6mxZjQ==
-X-Google-Smtp-Source: AKy350Yb1ENyDDt/RXMy8DJfza/HP2Xi2qT3CKtQ2KekykdBNnmTfFThnO0XbepJYeJpk18FCS4o4myYZqokMZsT8/Y=
-X-Received: by 2002:a9d:6191:0:b0:699:7883:940d with SMTP id
- g17-20020a9d6191000000b006997883940dmr1276983otk.7.1680641983242; Tue, 04 Apr
- 2023 13:59:43 -0700 (PDT)
+        bh=eUlNSkHN+zXMVEgYFwpXLf7eXmZqDjBFuuY+21ymQM8=;
+        b=t+V7zoi25zK7pC6CHR1A6AMclUG2njSW6Be+7bDt74B8n3ZOTiit9jNM3K6Wd5WrrI
+         L6SszeqzRWmYkOQyq1drPiRoUX+qAxwYartyUjDNqpK01C/MnfYsVl9E7WUZHzCh84zi
+         fS6PhAu/QFHENthhxv0PDXVrEWvlWPoDSM64QpF3P9988wR1cOk2Ae0jyffxXQSX0oyI
+         45yU5vfbOioERQdoBXfkefJnmgcdeh82cP1RPeeuwPKzyMEgo3/P3GXDCdC0pZ30our5
+         L7ZM0sdW6ZRjcKOoqfO1YwY0VWO2uckAQ3CLZxWfjd3oomVZvEqJWl4j1H4f5g/owVvu
+         8B3g==
+X-Gm-Message-State: AAQBX9fTiWU5ddaP7D0uCq6X6tZyEtwYzIClWQ64Kwjs5PpLClwAEjm6
+        zX31m82xJYEtLrg/NA2QWa2Uhc1yfmSQDSckDhNWzvn+XTbMWw9EQ4IPM6f6H7ibmD46T+FaO9P
+        cX51IFFG/mded
+X-Received: by 2002:a05:6602:2e05:b0:759:410c:99b6 with SMTP id o5-20020a0566022e0500b00759410c99b6mr565934iow.2.1680642036466;
+        Tue, 04 Apr 2023 14:00:36 -0700 (PDT)
+X-Google-Smtp-Source: AKy350ZBxWm4a3+LGUk3NVVLqCociOCxX0vWRo5d6ZJ4vSC6uL/zuJZ3VkObdr8SZMcgBOlbc8NPLw==
+X-Received: by 2002:a05:6602:2e05:b0:759:410c:99b6 with SMTP id o5-20020a0566022e0500b00759410c99b6mr565895iow.2.1680642036246;
+        Tue, 04 Apr 2023 14:00:36 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id m41-20020a026d29000000b003c4d71489aasm3548333jac.6.2023.04.04.14.00.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 04 Apr 2023 14:00:35 -0700 (PDT)
+Date:   Tue, 4 Apr 2023 15:00:34 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Yi Liu <yi.l.liu@intel.com>
+Cc:     jgg@nvidia.com, kevin.tian@intel.com, joro@8bytes.org,
+        robin.murphy@arm.com, cohuck@redhat.com, eric.auger@redhat.com,
+        nicolinc@nvidia.com, kvm@vger.kernel.org, mjrosato@linux.ibm.com,
+        chao.p.peng@linux.intel.com, yi.y.sun@linux.intel.com,
+        peterx@redhat.com, jasowang@redhat.com,
+        shameerali.kolothum.thodi@huawei.com, lulu@redhat.com,
+        suravee.suthikulpanit@amd.com, intel-gvt-dev@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org, linux-s390@vger.kernel.org,
+        xudong.hao@intel.com, yan.y.zhao@intel.com, terrence.xu@intel.com,
+        yanting.jiang@intel.com
+Subject: Re: [PATCH v3 11/12] iommufd: Define IOMMUFD_INVALID_ID in uapi
+Message-ID: <20230404150034.312fbcac.alex.williamson@redhat.com>
+In-Reply-To: <20230401144429.88673-12-yi.l.liu@intel.com>
+References: <20230401144429.88673-1-yi.l.liu@intel.com>
+        <20230401144429.88673-12-yi.l.liu@intel.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-References: <20230206172340.2639971-1-rananta@google.com> <20230206172340.2639971-5-rananta@google.com>
- <ZCTdcJLxWBRXItSM@linux.dev> <CAJHc60xbhyiVieqzeMcB1S7UWw_J3Jyh8PqjA9GLOhudja5nmA@mail.gmail.com>
- <ZCx13Q4nyRghItcI@linux.dev>
-In-Reply-To: <ZCx13Q4nyRghItcI@linux.dev>
-From:   Raghavendra Rao Ananta <rananta@google.com>
-Date:   Tue, 4 Apr 2023 13:59:31 -0700
-Message-ID: <CAJHc60z49Hfp0j39owGP1f+5Jv496ViVUfduAvSO36sv_2C1OA@mail.gmail.com>
-Subject: Re: [PATCH v2 4/7] KVM: arm64: Implement kvm_arch_flush_remote_tlbs_range()
-To:     Oliver Upton <oliver.upton@linux.dev>
-Cc:     Oliver Upton <oupton@google.com>, Marc Zyngier <maz@kernel.org>,
-        Ricardo Koller <ricarkol@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Colton Lewis <coltonlewis@google.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-15.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,ENV_AND_HDR_SPF_MATCH,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL,
-        USER_IN_DEF_SPF_WL autolearn=unavailable autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Apr 4, 2023 at 12:09=E2=80=AFPM Oliver Upton <oliver.upton@linux.de=
-v> wrote:
->
-> On Mon, Apr 03, 2023 at 02:23:17PM -0700, Raghavendra Rao Ananta wrote:
-> > On Wed, Mar 29, 2023 at 5:53=E2=80=AFPM Oliver Upton <oliver.upton@linu=
-x.dev> wrote:
-> > >
-> > > On Mon, Feb 06, 2023 at 05:23:37PM +0000, Raghavendra Rao Ananta wrot=
-e:
-> > > > Implement kvm_arch_flush_remote_tlbs_range() for arm64,
-> > > > such that it can utilize the TLBI range based instructions
-> > > > if supported.
-> > > >
-> > > > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-> > > > ---
-> > > >  arch/arm64/include/asm/kvm_host.h |  3 +++
-> > > >  arch/arm64/kvm/mmu.c              | 15 +++++++++++++++
-> > > >  2 files changed, 18 insertions(+)
-> > > >
-> > > > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include=
-/asm/kvm_host.h
-> > > > index dee530d75b957..211fab0c1de74 100644
-> > > > --- a/arch/arm64/include/asm/kvm_host.h
-> > > > +++ b/arch/arm64/include/asm/kvm_host.h
-> > > > @@ -1002,6 +1002,9 @@ struct kvm *kvm_arch_alloc_vm(void);
-> > > >  #define __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS
-> > > >  int kvm_arch_flush_remote_tlbs(struct kvm *kvm);
-> > > >
-> > > > +#define __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS_RANGE
-> > > > +int kvm_arch_flush_remote_tlbs_range(struct kvm *kvm, gfn_t start_=
-gfn, u64 pages);
-> > > > +
-> > > >  static inline bool kvm_vm_is_protected(struct kvm *kvm)
-> > > >  {
-> > > >       return false;
-> > > > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> > > > index e98910a8d0af6..409cb187f4911 100644
-> > > > --- a/arch/arm64/kvm/mmu.c
-> > > > +++ b/arch/arm64/kvm/mmu.c
-> > > > @@ -91,6 +91,21 @@ int kvm_arch_flush_remote_tlbs(struct kvm *kvm)
-> > > >       return 0;
-> > > >  }
-> > > >
-> > > > +int kvm_arch_flush_remote_tlbs_range(struct kvm *kvm, gfn_t start_=
-gfn, u64 pages)
-> > > > +{
-> > > > +     phys_addr_t start, end;
-> > > > +
-> > > > +     if (!system_supports_tlb_range())
-> > > > +             return -EOPNOTSUPP;
-> > >
-> > > There's multiple layers of fallback throughout this series, as it wou=
-ld
-> > > appear that deep in __kvm_tlb_flush_range() you're blasting the whole
-> > > VMID if either the range is too large or the feature isn't supported.
-> > >
-> > > Is it possible to just normalize on a single spot to gate the use of
-> > > range-based invalidations? I have a slight preference for doing it de=
-ep
-> > > in the handler, as it keeps the upper layers of code a bit more
-> > > readable.
-> > >
-> > I was a little skeptical on this part, since the
-> > kvm_arch_flush_remote_tlbs_range() expects to return -EOPNOTSUPP if
-> > indeed there's no support.
->
-> Well, the arch-neutral code can expect whatever it wants :) The only
-> real contract we have with it is to return 0 iff the specified range has
-> been invalidated, even if that comes with over-invalidating.
->
-> > But I see your point. The if-else in kvm_pgtable_stage2_flush_range()
-> > seems redundant and I can simply manage this conditions inside
-> > __kvm_tlb_flush_range_vmid_ipa() itself, but I'll leave the
-> > kvm_arch_flush_remote_tlbs_range()'s implementation as is. Thoughts?
->
-> The largest concern I had is that the series is testing for FEAT_TLBIRANG=
-E
-> all over the shop and I just raised that concern on this patch. AFAICT,
-> the iterative approach to invalidating a range of IPAs is effectively
-> dead code, as all flows into __kvm_tlb_flush_range_vmid_ipa() are gated
-> by system_supports_tlb_range() somewhere.
->
-> Personally, I prefer keeping the higher level software models making
-> aggressive use of range-based interfaces and letting the actual
-> implementation under the hood select the appropriate instruction. That
-> helps readability, as it directly communicates the expected outcome of
-> the invalidation.
->
-> So, if you want to make use of the iterative approach to TLB invalidation=
-s on
-> !TLBIRANGE systems, then this function should _not_ return EOPNOTSUPP.
->
-Thanks for the explanation. I can make the calls consistent across the
-code, and let the actual handler deal TLBIRANGE support.
+On Sat,  1 Apr 2023 07:44:28 -0700
+Yi Liu <yi.l.liu@intel.com> wrote:
 
-- Raghavendra
-> --
-> Thanks,
-> Oliver
+> as there are IOMMUFD users that want to know check if an ID generated
+> by IOMMUFD is valid or not. e.g. vfio-pci optionaly returns invalid
+> dev_id to user in the VFIO_DEVICE_GET_PCI_HOT_RESET_INFO ioctl. User
+> needs to check if the ID is valid or not.
+> 
+> IOMMUFD_INVALID_ID is defined as 0 since the IDs generated by IOMMUFD
+> starts from 0.
+> 
+> Signed-off-by: Yi Liu <yi.l.liu@intel.com>
+> ---
+>  include/uapi/linux/iommufd.h | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/include/uapi/linux/iommufd.h b/include/uapi/linux/iommufd.h
+> index 98ebba80cfa1..aeae73a93833 100644
+> --- a/include/uapi/linux/iommufd.h
+> +++ b/include/uapi/linux/iommufd.h
+> @@ -9,6 +9,9 @@
+>  
+>  #define IOMMUFD_TYPE (';')
+>  
+> +/* IDs allocated by IOMMUFD starts from 0 */
+> +#define IOMMUFD_INVALID_ID 0
+> +
+>  /**
+>   * DOC: General ioctl format
+>   *
+
+If allocation "starts from 0" then 0 is a valid id, no?  Does allocation
+start from 1, ie. skip 0?  Thanks,
+
+Alex
+
