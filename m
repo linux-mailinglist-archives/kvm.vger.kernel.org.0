@@ -2,116 +2,177 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8322F6D5715
-	for <lists+kvm@lfdr.de>; Tue,  4 Apr 2023 05:15:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 53CED6D571A
+	for <lists+kvm@lfdr.de>; Tue,  4 Apr 2023 05:17:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232940AbjDDDP6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 3 Apr 2023 23:15:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33124 "EHLO
+        id S233020AbjDDDRr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 3 Apr 2023 23:17:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33660 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231546AbjDDDP4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 3 Apr 2023 23:15:56 -0400
-Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E2331718
-        for <kvm@vger.kernel.org>; Mon,  3 Apr 2023 20:15:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1680578156; x=1712114156;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=pjwfnvy686ftXesM9aWNpE0jbQU3M78kbWirZZHLAGY=;
-  b=WkyjDxRtAwaPVSPbIzCnLrrJD/qQ9EqyYNpeWvuyWMgKaFnuTZwP2ZAP
-   GXriFpl51Wkr2tbG1GPN8p96tRUWfuPripCZ0BA7K6eOQVrgTFtCLQGrT
-   VP7FvZZQxRRtZ+DoRbWLo4n+BTpSacAO4wNDDBrPuGNYnw9IJ9oT0TTVZ
-   p5WnmMSg7jgq/TyzJRW12HrogDVwgX0R/QpQcFtMNNV06gxP2oiqYdX3C
-   DjTcgQfaeE/TpLu4BxDm/qvOeadO85ypsEkLkfhmQhjY642p8rQH+1cYT
-   dlgg3xbMhU+hfKcKU1VzF5RDQbSntBAW5VgoB45ly6RU4g9N8S7CtHr1p
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10669"; a="428362438"
-X-IronPort-AV: E=Sophos;i="5.98,316,1673942400"; 
-   d="scan'208";a="428362438"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Apr 2023 20:15:55 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10669"; a="636353641"
-X-IronPort-AV: E=Sophos;i="5.98,316,1673942400"; 
-   d="scan'208";a="636353641"
-Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.254.215.140]) ([10.254.215.140])
-  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Apr 2023 20:15:53 -0700
-Message-ID: <254ee5cf-be58-d33f-4b49-d2405c105a76@linux.intel.com>
-Date:   Tue, 4 Apr 2023 11:15:50 +0800
+        with ESMTP id S231546AbjDDDRp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 3 Apr 2023 23:17:45 -0400
+Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 237A6FB;
+        Mon,  3 Apr 2023 20:17:44 -0700 (PDT)
+Received: by mail-pj1-x102c.google.com with SMTP id lr16-20020a17090b4b9000b0023f187954acso32594487pjb.2;
+        Mon, 03 Apr 2023 20:17:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112; t=1680578263;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Qs3Bti2bEU1Z0C12LLTnFbjadt184MNl6VTmS9vvdvA=;
+        b=ULfEnAJ53opqKjbgs64Ovk34Ol+tT+bg9RrqVWjw5LWPaU60crwA/Zobsk3+pYV5aA
+         M46unl3ZvJn82ASeNzWgz5+bbeBQZ4t1hXoOFc1BaXgjmuZPD7Vc4TsJ38962NntvHw3
+         rLJc3LUDj9224mn8ipU1wZf2tN3en0ufLPwrNFWDusZ7bV9dcSe3Ixx3pIXByPGtECJM
+         qA2CH/4ZC3vGVsnNHvY67wLIUB++z4OGo8madgRMnz5C8ogko/rNsvmjkT/Dx/60Q+rp
+         Vvj36xMh/64sMAtVLRRiszVIV5lkkMjaWfkQ+QpJmQa1/COYKRW5dCWdk1AEklBJccPB
+         qhjA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1680578263;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Qs3Bti2bEU1Z0C12LLTnFbjadt184MNl6VTmS9vvdvA=;
+        b=vKCEwHulihQBSTQ33ksgv7N7aIdNOW2E0r/AGnIuqtKs84XedgxcvAr0FnifsfrKds
+         HFQkZjEcyqNeZfdQbS/hibg6EWgL6VgJIyDksHX1KDh/rDjl71g+7BAcpwur72Dkpwyf
+         eX3TxhjCyb081D//0yiqIixtpPnOGBT4PQ8rhuaZMl91hCvSuDSm1bJCUFiT/b0G6jPQ
+         7dmKgmVPTxf4gBj8OKZW5MMwhh5B8ZUwAGYPpjPj2g/J+rdiqb1yu5qRTkM/GzjyHWmb
+         SeFQuN5Tqj0Ho41fDcRWOdyn/WRiHMu/RQtBF7vOiUr5bOkxgT9es4Fc42MFOBaEuBHl
+         Zirg==
+X-Gm-Message-State: AAQBX9cgbL0zfLTl03qRDW9YNGjaPDCFoofOl6reudxJCrpzVcvj1sL8
+        tP6/Sz2MGfuEd9daOSygabwD1Kl+iDMwPRqbiSE=
+X-Google-Smtp-Source: AKy350Y0s2OKMr8Zi4R8GDBxrLZ/SmmL9/HHXxE1OnPLUl0zIpMPn3gR4F/jXhV/vL6Y/ufbCfRBFSrSNyjXvbvAeXw=
+X-Received: by 2002:a17:902:f683:b0:19f:1d62:4393 with SMTP id
+ l3-20020a170902f68300b0019f1d624393mr446573plg.7.1680578263546; Mon, 03 Apr
+ 2023 20:17:43 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.9.0
-Subject: Re: [PATCH v6 2/7] KVM: VMX: Use is_64_bit_mode() to check 64-bit
- mode
-To:     "Huang, Kai" <kai.huang@intel.com>,
-        "Christopherson,, Sean" <seanjc@google.com>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "robert.hu@linux.intel.com" <robert.hu@linux.intel.com>,
-        "Gao, Chao" <chao.gao@intel.com>
-References: <20230319084927.29607-1-binbin.wu@linux.intel.com>
- <20230319084927.29607-3-binbin.wu@linux.intel.com> <ZBhTa6QSGDp2ZkGU@gao-cwp>
- <ZBojJgTG/SNFS+3H@google.com>
- <12c4f1d3c99253f364f3945a998fdccb0ddf300f.camel@intel.com>
- <e0442b13-09f4-0985-3eb4-9b6a20d981fb@linux.intel.com>
- <682d01dec42ecdb80c9d3ffa2902dea3b1d576dd.camel@intel.com>
- <b9e9dd1c-2213-81c7-cd45-f5cf7b86610b@linux.intel.com>
- <ZCR2PBx/4lj9X0vD@google.com>
- <657efa6471503ee5c430e5942a14737ff5fbee6e.camel@intel.com>
- <349bd65a-233e-587c-25b2-12b6031b12b6@linux.intel.com>
- <fc92490afc7ee1b9679877878de64ad129853cc0.camel@intel.com>
- <559ebca9-dfb9-e041-3744-5eab36f4f4c5@linux.intel.com>
- <71214e870df7c280e2f7ddcd264c73e3191958d9.camel@intel.com>
- <9d0b7b6e-9067-0ff6-c28b-358b2e39b5a8@linux.intel.com>
- <74a840d0042b6413963c3fd37ffb83e0a4866735.camel@intel.com>
-From:   Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <74a840d0042b6413963c3fd37ffb83e0a4866735.camel@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.7 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE autolearn=unavailable autolearn_force=no version=3.4.6
+References: <20230403140605.540512-1-jiangshanlai@gmail.com> <19035c40-e756-6efd-1c02-b09109fb44c1@intel.com>
+In-Reply-To: <19035c40-e756-6efd-1c02-b09109fb44c1@intel.com>
+From:   Lai Jiangshan <jiangshanlai@gmail.com>
+Date:   Tue, 4 Apr 2023 11:17:30 +0800
+Message-ID: <CAJhGHyBHmC=UXr88GsykO9eUeqJZp59jrCH3ngkFiCxVBW2F3g@mail.gmail.com>
+Subject: Re: [RFC PATCH 0/7] x86/entry: Atomic statck switching for IST
+To:     Dave Hansen <dave.hansen@intel.com>
+Cc:     linux-kernel@vger.kernel.org,
+        Lai Jiangshan <jiangshan.ljs@antgroup.com>,
+        "H. Peter Anvin" <hpa@linux.intel.com>,
+        Andi Kleen <ak@linux.intel.com>,
+        Andrew Cooper <andrew.cooper3@citrix.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Asit Mallick <asit.k.mallick@intel.com>,
+        Cfir Cohen <cfir@google.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        David Kaplan <David.Kaplan@amd.com>,
+        David Rientjes <rientjes@google.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        Jan Kiszka <jan.kiszka@siemens.com>,
+        Jiri Slaby <jslaby@suse.cz>, Joerg Roedel <joro@8bytes.org>,
+        Juergen Gross <jgross@suse.com>,
+        Kees Cook <keescook@chromium.org>,
+        Kirill Shutemov <kirill.shutemov@linux.intel.com>,
+        Kuppuswamy Sathyanarayanan <knsathya@kernel.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Mike Stunes <mstunes@vmware.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Raj Ashok <ashok.raj@intel.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Tony Luck <tony.luck@intel.com>, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, x86@kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
+        DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-On 4/4/2023 11:09 AM, Huang, Kai wrote:
-> On Tue, 2023-04-04 at 10:45 +0800, Binbin Wu wrote:
->> On 4/4/2023 9:53 AM, Huang, Kai wrote:
->>> On Tue, 2023-04-04 at 09:21 +0800, Binbin Wu wrote:
->>>> On 4/3/2023 7:24 PM, Huang, Kai wrote:
->>>>>> Anyway, I will seperate this patch from the LAM KVM enabling patch. And
->>>>>> send a patch seperately if
->>>>>> needed later.
->>>>>>
->>>>> I think your change for SGX is still needed based on the pseudo code of ENCLS.
->>>> Yes, I meant I would seperate VMX part since it is not a bug after all,
->>>> SGX will still be in the patchset.
->>>>
->>>>
->>> Shouldn't SGX part be also split out as a bug fix patch?
->>>
->>> Does it have anything to do with this LAM support series?
->> It is related to LAM support because LAM only effective in 64-bit mode,
->> so the untag action should only be done in 64-bit mode.
->>
->> If the SGX fix patch is not included, that means LAM untag could be
->> called in compatiblity mode in SGX ENCLS handler.
->>
->>
-> Yes I got this point, and your patch 6/7 depends on it.
+On Tue, Apr 4, 2023 at 12:53=E2=80=AFAM Dave Hansen <dave.hansen@intel.com>=
+ wrote:
 >
-> But my point is this fix is needed anyway regardless the LAM support, and it
-> should be merged, for instance, asap as a bug fix (and CC stable perhaps) --
-> while the LAM support is a feature, and can be merged at a different time frame.
-
-OK, I can seperate the patch.
-
-
+> On 4/3/23 07:05, Lai Jiangshan wrote:
+> >  Documentation/x86/kernel-stacks.rst   |   2 +
+> >  arch/x86/entry/Makefile               |   3 +
+> >  arch/x86/entry/entry_64.S             | 615 +++++++-------------------
+> >  arch/x86/entry/ist_entry.c            | 299 +++++++++++++
+> >  arch/x86/include/asm/cpu_entry_area.h |   8 +-
+> >  arch/x86/include/asm/idtentry.h       |  15 +-
+> >  arch/x86/include/asm/sev.h            |  14 -
+> >  arch/x86/include/asm/traps.h          |   1 -
+> >  arch/x86/kernel/asm-offsets_64.c      |   7 +
+> >  arch/x86/kernel/callthunks.c          |   2 +
+> >  arch/x86/kernel/dumpstack_64.c        |   6 +-
+> >  arch/x86/kernel/nmi.c                 |   8 -
+> >  arch/x86/kernel/sev.c                 | 108 -----
+> >  arch/x86/kernel/traps.c               |  43 --
+> >  arch/x86/kvm/vmx/vmx.c                | 441 +++++++++++++++++-
+> >  arch/x86/kvm/x86.c                    |  10 +-
+> >  arch/x86/mm/cpu_entry_area.c          |   2 +-
+> >  tools/objtool/check.c                 |   7 +-
+> >  18 files changed, 937 insertions(+), 654 deletions(-)
+> >  create mode 100644 arch/x86/entry/ist_entry.c
 >
-> Of course just my 2cents and this is up to maintainers.
+> Some high-level comments...
+>
+> The diffstat looks a lot nastier because of the testing patch.  If you
+> that patch and trim the diffstat a bit, it starts to look a _lot_ more
+> appealing:
+>
+> >  arch/x86/entry/entry_64.S             |  615 ++++++++-----------------=
+-----------
+> >  arch/x86/entry/ist_entry.c            |  299 +++++++++++++++++
+> >  arch/x86/kernel/sev.c                 |  108 ------
+> >  arch/x86/kernel/traps.c               |   43 --
+> ...
+> >  16 files changed, 490 insertions(+), 650 deletions(-)
+>
+> It removes more code than it adds and also removes a bunch of assembly.
+> If it were me posting this, I'd have shouted that from the rooftops
+> instead of obscuring it with a testing patch and leaving it as an
+> exercise to the reader to figure out.
+
+The cover letter has 800+ lines of comments.  About 100-300 lines
+of comments will be moved into the code which would make the diffstat
+not so appealing.
+
+
+P.S.
+
+One of the reasons I didn't move them is that the comments are much more
+complicated than the code which is a sign of improvement-required.
+
+I'm going to change the narration from save-touch-replicate-copy-commit
+to save-copy-build-commit and avoid using "replicate".
+
+copy=3Dcopy_outmost(), build=3Dbuild_interrupted(), the new narration
+will change the comments mainly, and it will not change the actual
+work. If the new narration is not simpler, I will not send it out to
+add any confusion.
+
+>  * Flesh out the testing story.  What kind of hardware was this tested
+>    on?  How much was bare metal vs. VMs, etc...?
+
+It is tested on bare metal and VM.  It is hard to stress the bare
+metal on atomic-IST-entry.  The testing code tests it in VM and the
+super exceptions can be injected at will.
+
+>  * Reinforce what the benefits to end users are here.  Are folks
+>    _actually_ running into the #VC fragility, for instance?
+>
+> Also, let's say we queue this, it starts getting linux-next testing, and
+> we start getting bug reports of hangs.  It'll have to get reverted if we
+> can't find the bug fast.
+>
+> How much of a pain would it be to make atomic-IST-entry _temporarily_
+> selectable at boot time?  It would obviously need to keep the old code
+> around and would not have the nice diffstat.  But that way, folks would
+> at least have a workaround while we're bug hunting.
+
+It is easy to make atomic-IST-entry selectable at boot time since IDT
+is an indirect table.  I will do it and temporarily keep the old code.
