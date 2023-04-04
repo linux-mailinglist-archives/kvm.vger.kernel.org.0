@@ -2,80 +2,86 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EC74B6D6B5C
-	for <lists+kvm@lfdr.de>; Tue,  4 Apr 2023 20:17:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4C43D6D6BFD
+	for <lists+kvm@lfdr.de>; Tue,  4 Apr 2023 20:29:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236151AbjDDSRZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Apr 2023 14:17:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32910 "EHLO
+        id S236482AbjDDS26 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Apr 2023 14:28:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50798 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236142AbjDDSRX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Apr 2023 14:17:23 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 079DD46BF
-        for <kvm@vger.kernel.org>; Tue,  4 Apr 2023 11:16:34 -0700 (PDT)
+        with ESMTP id S236226AbjDDS2k (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Apr 2023 14:28:40 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7326283F1
+        for <kvm@vger.kernel.org>; Tue,  4 Apr 2023 11:25:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1680632194;
+        s=mimecast20190719; t=1680632688;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=IteB3h1IFF9JrrwNNhJrcSxfFKVKvFn7WIKCluRji64=;
-        b=T+aNbcTj0PM/4p7mCXMgq544SU8syIAaVzklZpnQiUMQnYz7EG8Aux7Um+kYCegnj/TKCo
-        OqxjrWt4KnE457XBa44g+ZUUDdrzqcJtSRbb9ME3/+yvXjC6qnM1WP6SDb/hwhnTkNyzQ8
-        DAcKd5FOIpGuO84sGZocwJUYmIQyF1w=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=r7qkJ3kGFig3GmLpy8FM3sy/Mc2VBWhX0DsSyyZtPrM=;
+        b=DF+n96IFWXyKhY9/h69z/RSycLvQOSAcPpVH2fk6lWgd2mvztya4O8RVAaXajU46QPjRRG
+        Z74+nFZMBMLWgINBSuVpxo6M0jQu22mOjDRG6hry6PclYmqh2a5UwccQduQF6uAj/JRa9L
+        ngnt/XGwwsEq+jwstz4MUdpUNvmyUrs=
+Received: from mail-il1-f200.google.com (mail-il1-f200.google.com
+ [209.85.166.200]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-639-ReFcDzh8OiymMW5y-0mEZw-1; Tue, 04 Apr 2023 14:16:32 -0400
-X-MC-Unique: ReFcDzh8OiymMW5y-0mEZw-1
-Received: by mail-ed1-f69.google.com with SMTP id n6-20020a5099c6000000b00502c2f26133so2130655edb.12
-        for <kvm@vger.kernel.org>; Tue, 04 Apr 2023 11:16:32 -0700 (PDT)
+ us-mta-354-WRoGlJQrMF6AD58-91Eaag-1; Tue, 04 Apr 2023 14:24:47 -0400
+X-MC-Unique: WRoGlJQrMF6AD58-91Eaag-1
+Received: by mail-il1-f200.google.com with SMTP id h19-20020a056e021d9300b00318f6b50475so21628805ila.21
+        for <kvm@vger.kernel.org>; Tue, 04 Apr 2023 11:24:47 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680632191;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=IteB3h1IFF9JrrwNNhJrcSxfFKVKvFn7WIKCluRji64=;
-        b=hBd4ROnrF0fEQIXdHnWd+5Aogf6zP9nTwMwlsGwo/QTH9kX5YW7fkHoDKzHpENSiqU
-         cr8Xy9XqIXScKKOyZTH2/c+XmjnpmplVSmthovIOQt/FXmJvSW4rYMLC/8NikM/yO9Gb
-         0Yd3YxgQdo34hZpo1sjZ+y5UyaVryreewvyicFdf7VsRgUo5NA9/EKf8ri2j/5Vvwaed
-         oGPNjL5yxRYFcDMOsdKq/KPZh6ZgUtRa2I8MwrzK6fnNJmaLU2/Zy1fSbDhj3VU4ep48
-         klwEcoFPfSbnVKOFkVwXz8Ta1f0l5HTKCkvlAAHCI3Dt79NKp9VsfLAQC5j7NGCUhuKh
-         vSgw==
-X-Gm-Message-State: AAQBX9d3y4M+r8JnfGfIgCHGgZpy7eJe5+OIfheLikC8iGHkH3zZ1e7I
-        dOhE85B+/tajy0q+WhATcU/DBfKVus2MVrVk3rFpT5Q9crU0VOjgDvW2xfBE5ynpFcYsh1JjooJ
-        yQJy69XBQJiZC
-X-Received: by 2002:a17:906:4714:b0:84d:4e4f:1f85 with SMTP id y20-20020a170906471400b0084d4e4f1f85mr344217ejq.59.1680632191696;
-        Tue, 04 Apr 2023 11:16:31 -0700 (PDT)
-X-Google-Smtp-Source: AKy350ZCgo8S1M18VZAugvOWFRDnPyPjTek7bcWsZJ7qMIVGPNRWD16Sn2oW1a2cmFO9+19n6ACQMQ==
-X-Received: by 2002:a17:906:4714:b0:84d:4e4f:1f85 with SMTP id y20-20020a170906471400b0084d4e4f1f85mr344205ejq.59.1680632191371;
-        Tue, 04 Apr 2023 11:16:31 -0700 (PDT)
-Received: from redhat.com ([2.52.139.22])
-        by smtp.gmail.com with ESMTPSA id g1-20020a170906394100b00933356c681esm6266002eje.150.2023.04.04.11.16.28
+        d=1e100.net; s=20210112; t=1680632686;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=r7qkJ3kGFig3GmLpy8FM3sy/Mc2VBWhX0DsSyyZtPrM=;
+        b=SJy76/YIwDoHi/33jqkDJL3Mlbz6a7biMkG0hpvIo7ppBvnCbQU1SJzsCVMSZIYhCo
+         sX5SYqma267pqvW5muxEU09FRPF48XY7166YQTMUTfAqUKRRxj1pkaGikf0yBMZD6htR
+         ujejN0aACQlQ87ClP3XlYV3IwLywIL7cYViRm/DxHqqlYtMShTO2kiLQ/LVuWrBoaXfn
+         lYGZHKTEq9nkBTKp3ajRqMJd2WCjGj1ys8U1+Q1JZpIHcXJinx0uf4gj3LmLxlhzFsFy
+         inxAw+Gnbcxxygrhr0v1G2s3kVoo88cvnC6secnztEYGzhtcR4PlkcdvR881GpR7/Uar
+         UbAw==
+X-Gm-Message-State: AAQBX9cdrDZwk7rUCd30qPEQ9L/NeScAfNOIsy5N7X/Inr4d1qwcqZIU
+        4QaooLAC+XNGsJynqZxljlA8RMkDp19CW2IyCPKmpRaR2YLFOOvxEZxNdlHjrSbJXXYD+4sZ61N
+        r3wFGPuG1jiFk
+X-Received: by 2002:a05:6602:330d:b0:758:55ff:5314 with SMTP id b13-20020a056602330d00b0075855ff5314mr2952012ioz.0.1680632686535;
+        Tue, 04 Apr 2023 11:24:46 -0700 (PDT)
+X-Google-Smtp-Source: AKy350azKYThQ1mAA0lmj4BDScAXCqFFq+kCgLoRnuuRBHPnfWUSziEYvyq6+YuYd+DYXcmviqPqrg==
+X-Received: by 2002:a05:6602:330d:b0:758:55ff:5314 with SMTP id b13-20020a056602330d00b0075855ff5314mr2952003ioz.0.1680632686253;
+        Tue, 04 Apr 2023 11:24:46 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id g27-20020a02271b000000b003e9e5e1aacasm3598588jaa.143.2023.04.04.11.24.45
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 04 Apr 2023 11:16:30 -0700 (PDT)
-Date:   Tue, 4 Apr 2023 14:16:26 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Alvaro Karsz <alvaro.karsz@solid-run.com>
-Cc:     Viktor Prutyanov <viktor@daynix.com>,
-        "jasowang@redhat.com" <jasowang@redhat.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
-        "farman@linux.ibm.com" <farman@linux.ibm.com>,
-        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "yan@daynix.com" <yan@daynix.com>
-Subject: Re: [PATCH v6] virtio: add VIRTIO_F_NOTIFICATION_DATA feature support
-Message-ID: <20230404141501-mutt-send-email-mst@kernel.org>
-References: <20230324195029.2410503-1-viktor@daynix.com>
- <AM0PR04MB4723A8D079076FA56AB45845D48C9@AM0PR04MB4723.eurprd04.prod.outlook.com>
+        Tue, 04 Apr 2023 11:24:45 -0700 (PDT)
+Date:   Tue, 4 Apr 2023 12:24:44 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Reinette Chatre <reinette.chatre@intel.com>
+Cc:     <jgg@nvidia.com>, <yishaih@nvidia.com>,
+        <shameerali.kolothum.thodi@huawei.com>, <kevin.tian@intel.com>,
+        <tglx@linutronix.de>, <darwi@linutronix.de>, <kvm@vger.kernel.org>,
+        <dave.jiang@intel.com>, <jing2.liu@intel.com>,
+        <ashok.raj@intel.com>, <fenghua.yu@intel.com>,
+        <tom.zanussi@linux.intel.com>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH V2 7/8] vfio/pci: Support dynamic MSI-x
+Message-ID: <20230404122444.59e36a99.alex.williamson@redhat.com>
+In-Reply-To: <5efa361d-012b-bdb6-b5e5-869887bde98d@intel.com>
+References: <cover.1680038771.git.reinette.chatre@intel.com>
+        <419f3ba2f732154d8ae079b3deb02d0fdbe3e258.1680038771.git.reinette.chatre@intel.com>
+        <20230330164050.0069e2a5.alex.williamson@redhat.com>
+        <20230330164214.67ccbdfa.alex.williamson@redhat.com>
+        <688393bf-445c-15c5-e84d-1c16261a4197@intel.com>
+        <20230331162456.3f52b9e3.alex.williamson@redhat.com>
+        <e15d588e-b63f-ab70-f6ae-91ceea8be79a@intel.com>
+        <20230403142227.1328b373.alex.williamson@redhat.com>
+        <57a8c701-bf97-fddd-9ac0-fc4d09e3cb16@intel.com>
+        <20230403211841.0e206b67.alex.williamson@redhat.com>
+        <5efa361d-012b-bdb6-b5e5-869887bde98d@intel.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <AM0PR04MB4723A8D079076FA56AB45845D48C9@AM0PR04MB4723.eurprd04.prod.outlook.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
@@ -86,62 +92,168 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Apr 02, 2023 at 08:17:49AM +0000, Alvaro Karsz wrote:
-> Hi Viktor,
+On Tue, 4 Apr 2023 09:54:46 -0700
+Reinette Chatre <reinette.chatre@intel.com> wrote:
+
+> Hi Alex,
 > 
-> > diff --git a/drivers/virtio/virtio_ring.c b/drivers/virtio/virtio_ring.c
-> > index 4c3bb0ddeb9b..f9c6604352b4 100644
-> > --- a/drivers/virtio/virtio_ring.c
-> > +++ b/drivers/virtio/virtio_ring.c
-> > @@ -2752,6 +2752,23 @@ void vring_del_virtqueue(struct virtqueue *_vq)
-> >  }
-> >  EXPORT_SYMBOL_GPL(vring_del_virtqueue);
+> On 4/3/2023 8:18 PM, Alex Williamson wrote:
+> > On Mon, 3 Apr 2023 15:50:54 -0700
+> > Reinette Chatre <reinette.chatre@intel.com> wrote:  
+> >> On 4/3/2023 1:22 PM, Alex Williamson wrote:  
+> >>> On Mon, 3 Apr 2023 10:31:23 -0700
+> >>> Reinette Chatre <reinette.chatre@intel.com> wrote:  
+> >>>> On 3/31/2023 3:24 PM, Alex Williamson wrote:    
+> >>>>> On Fri, 31 Mar 2023 10:49:16 -0700
+> >>>>> Reinette Chatre <reinette.chatre@intel.com> wrote:      
+> >>>>>> On 3/30/2023 3:42 PM, Alex Williamson wrote:      
+> >>>>>>> On Thu, 30 Mar 2023 16:40:50 -0600
+> >>>>>>> Alex Williamson <alex.williamson@redhat.com> wrote:
+> >>>>>>>         
+> >>>>>>>> On Tue, 28 Mar 2023 14:53:34 -0700
+> >>>>>>>> Reinette Chatre <reinette.chatre@intel.com> wrote:
+> >>>>>>>>        
+> 
+> 
+> ...
+> 
+> >>> If the goal is to allow the user to swap one eventfd for another, where
+> >>> the result will always be the new eventfd on success or the old eventfd
+> >>> on error, I don't see that this code does that, or that we've ever
+> >>> attempted to make such a guarantee.  If the ioctl errors, I think the
+> >>> eventfds are generally deconfigured.   We certainly have the unwind code
+> >>> that we discussed earlier that deconfigures all the vectors previously
+> >>> touched in the loop (which seems to be another path where we could
+> >>> de-allocate from the set of initial ctxs).    
+> >>
+> >> Thank you for your patience in hearing and addressing my concerns. I plan
+> >> to remove new_ctx in the next version.
+> >>  
+> >>>>> devices supporting vdev->has_dyn_msix only ever have active contexts
+> >>>>> allocated?  Thanks,      
+> >>>>
+> >>>> What do you see as an "active context"? A policy that is currently enforced
+> >>>> is that an allocated context always has an allocated interrupt associated
+> >>>> with it. I do not see how this could be expanded to also require an
+> >>>> enabled interrupt because interrupt enabling requires a trigger that
+> >>>> may not be available.    
+> >>>
+> >>> A context is essentially meant to track a trigger, ie. an eventfd
+> >>> provided by the user.  In the static case all the irqs are necessarily
+> >>> pre-allocated, therefore we had no reason to consider a dynamic array
+> >>> for the contexts.  However, a given context is really only "active" if
+> >>> it has a trigger, otherwise it's just a placeholder.  When the
+> >>> placeholder is filled by an eventfd, the pre-allocated irq is enabled.    
+> >>
+> >> I see.
+> >>  
+> >>>
+> >>> This proposal seems to be a hybrid approach, pre-allocating some
+> >>> initial set of irqs and contexts and expecting the differentiation to
+> >>> occur only when new vectors are added, though we have some disagreement
+> >>> about this per above.  Unfortunately I don't see an API to enable MSI-X
+> >>> without some vectors, so some pre-allocation of irqs seems to be
+> >>> required regardless.    
+> >>
+> >> Right. pci_alloc_irq_vectors() or equivalent continues to be needed to
+> >> enable MSI-X. Even so, it does seem possible (within vfio_msi_enable())
+> >> to just allocate one vector using pci_alloc_irq_vectors()
+> >> and then immediately free it using pci_msix_free_irq(). What do you think?  
 > > 
-> > +u32 vring_notification_data(struct virtqueue *_vq)
-> > +{
-> > +       struct vring_virtqueue *vq = to_vvq(_vq);
-> > +       u16 next;
-> > +
-> > +       if (vq->packed_ring)
-> > +               next = (vq->packed.next_avail_idx &
-> > +                               ~(-(1 << VRING_PACKED_EVENT_F_WRAP_CTR))) |
-> > +                       vq->packed.avail_wrap_counter <<
-> > +                               VRING_PACKED_EVENT_F_WRAP_CTR;
-> > +       else
-> > +               next = vq->split.avail_idx_shadow;
-> > +
-> > +       return next << 16 | _vq->index;
-> > +}
-> > +EXPORT_SYMBOL_GPL(vring_notification_data);
-> > +
-> >  /* Manipulates transport-specific feature bits. */
-> >  void vring_transport_features(struct virtio_device *vdev)
-> >  {
-> > @@ -2771,6 +2788,8 @@ void vring_transport_features(struct virtio_device *vdev)
-> >                         break;
-> >                 case VIRTIO_F_ORDER_PLATFORM:
-> >                         break;
-> > +               case VIRTIO_F_NOTIFICATION_DATA:
-> > +                       break;
+> > QEMU does something similar but I think it can really only be described
+> > as a hack.  In this case I think we can work with them being allocated
+> > since that's essentially the static path.  
 > 
-> This function is used by virtio_vdpa as well (drivers/virtio/virtio_vdpa.c:virtio_vdpa_finalize_features).
-> A vDPA device can offer this feature and it will be accepted, even though VIRTIO_F_NOTIFICATION_DATA is not a thing for the vDPA transport at the moment.
+> ok. In this case I understand the hybrid approach to be required. Without
+> something (a hack) like this I am not able to see how an "active context"
+> policy can be enforced though. Interrupts allocated during MSI-X enabling may
+> not have eventfd associated and thus cannot adhere to an "active context" policy. I
+> understand from  earlier comments that we do not want to track where contexts
+> are allocated so I can only see a way to enforce a policy that a context has
+> an allocated interrupt, but not an enabled interrupt.
+
+We're talking about the contexts that we now allocate in the xarray to
+store the eventfd linkage, right?  We need to pre-allocate some irqs
+both to satisfy the API and to support non-dynamic MSI-X devices, but
+we don't need to pre-allocate contexts.  The logic that I propose below
+supports lookup of the pre-allocated irqs for all cases and falls back
+to allocating a new irq only for cases that support it.  irqs and
+contexts aren't exactly 1:1 for the dynamic case due to the artifacts
+of the API, but the model supports only allocating contexts as they're
+used, or "active".
+ 
+> >> If I understand correctly this can be done without allocating any context
+> >> and leave MSI-X enabled without any interrupts allocated. This could be a
+> >> way to accomplish the "active context" policy for dynamic allocation.
+> >> This is not a policy that can be applied broadly to interrupt contexts though
+> >> because MSI and non-dynamic MSI-X could still have contexts with allocated
+> >> interrupts without eventfd.  
+> > 
+> > I think we could come up with wrappers that handle all cases, for
+> > example:
+> > 
+> > int vfio_pci_alloc_irq(struct vfio_pci_core_device *vdev,
+> > 		       unsigned int vector, int irq_type)
+> > {
+> > 	struct pci_dev *pdev = vdev->pdev;
+> > 	struct msi_map map;
+> > 	int irq;
+> > 
+> > 	if (irq_type == VFIO_PCI_INTX_IRQ_INDEX)
+> > 		return pdev->irq ?: -EINVAL;
+> > 
+> > 	irq = pci_irq_vector(pdev, vector);
+> > 	if (irq > 0 || irq_type == VFIO_PCI_MSI_IRQ_INDEX ||
+> > 	    !vdev->has_dyn_msix)
+> > 		return irq;
+> > 
+> > 	map = pci_msix_alloc_irq_at(pdev, vector, NULL);
+> > 
+> > 	return map.index;
+> > }
+> > 
+> > void vfio_pci_free_irq(struct vfio_pci_core_device *vdev,
+> > 		       unsigned in vector, int irq_type)
+> > {
+> > 	struct msi_map map;
+> > 	int irq;
+> > 
+> > 	if (irq_type != VFIO_PCI_INTX_MSIX_INDEX ||
+> > 	    !vdev->has_dyn_msix)
+> > 		return;
+> > 
+> > 	irq = pci_irq_vector(pdev, vector);
+> > 	map = { .index = vector, .virq = irq };
+> > 
+> > 	if (WARN_ON(irq < 0))
+> > 		return;
+> > 
+> > 	pci_msix_free_irq(pdev, msix_map);
+> > }  
 > 
-> I don't know if this is bad, since offering VIRTIO_F_NOTIFICATION_DATA is meaningless for a vDPA device at the moment.
+> Thank you very much for taking the time to write this out. I am not able to
+> see where vfio_pci_alloc_irq()/vfio_pci_free_irq() would be called for
+> an INTx interrupt. Is the INTx handling there for robustness or am I
+> missing how it should be used for INTx interrupts?
+
+Mostly just trying to illustrate that all interrupt types could be
+supported, if it doesn't make sense for INTx, drop it.
+
+> > At that point, maybe we'd check whether it makes sense to embed the irq
+> > alloc/free within the ctx alloc/free.  
 > 
-> I submitted a patch adding support for vDPA transport.
-> https://lore.kernel.org/virtualization/20230402081034.1021886-1-alvaro.karsz@solid-run.com/T/#u
+> I think doing so would be the right thing to do since it helps
+> to enforce the policy that interrupts and contexts are allocated together.
+> I think this can be done when switching around the initialization within 
+> vfio_msi_set_vector_signal(). I need to look into this more.
 
-Hmm.  So it seems we need to first apply yours then this patch,
-is that right? Or the other way around? What is the right way to make it not break bisect?
-Do you mind including this patch with yours in a patchset
-in the correct order?
+Interrupts and contexts allocated together would be ideal, but I think
+given the API it's a reasonable and simple compromise given the
+non-dynamic support to draw from the initial allocation where we can.
+Actually, there could be a latency and reliability advantage to hang on
+to the irq when an eventfd is unset, maybe we should only free irqs on
+MSI-X teardown and otherwise use the allocated irqs as a cache.  Maybe
+worth thinking about.  Thanks,
 
-
-
-
-> >                 default:
-> >                         /* We don't understand this bit. */
-> >                         __virtio_clear_bit(vdev, i);
-> 
+Alex
 
