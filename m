@@ -2,188 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 73B8F6D6E5F
-	for <lists+kvm@lfdr.de>; Tue,  4 Apr 2023 22:49:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D262F6D6E6B
+	for <lists+kvm@lfdr.de>; Tue,  4 Apr 2023 22:51:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236276AbjDDUtR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Apr 2023 16:49:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57838 "EHLO
+        id S236297AbjDDUvR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Apr 2023 16:51:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60520 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232313AbjDDUtP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Apr 2023 16:49:15 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD4CDAC;
-        Tue,  4 Apr 2023 13:49:14 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 5B7B063874;
-        Tue,  4 Apr 2023 20:49:14 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BA3AEC4339B;
-        Tue,  4 Apr 2023 20:49:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1680641353;
-        bh=gXqIcJnn5Eq5okLMpDEb9nxUz3SeXdgGCHq7sJi3mH4=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=CtyWHrJha0wN1fTMK3NpqKRCmt11CL56a5Z8muzaCRqQWsJy7r5Y9Yl3zLU3fjyEH
-         hCDUmR6dQQLAq46HmHA6CY8AoaY/rVu5X32EsbMOstevgFcKnTuG0gLwkzdZB3ilhp
-         vjkw8Vm3SSrNv1Zlb0k9XyLj4TO3GqQ+Kg8tLl2XiVq/csKBVyaa6pDCfw9j9gktnZ
-         u1CgwUF4S/IlC4auLKpQzclYprcp5T9wsRxFoiyfHfDUhWhKV15DJCXOGGI8vJX8UQ
-         qrtkRfFEMJ/qgcTxiAzvcJoC7l3oAfhnMFG2mV3pn8/ejQj2NUOY8ghg/wSfjoHNOv
-         YvdRLhNXBpsRA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.95)
-        (envelope-from <maz@kernel.org>)
-        id 1pjnaZ-005l6L-AO;
-        Tue, 04 Apr 2023 21:49:11 +0100
-Date:   Tue, 04 Apr 2023 21:49:10 +0100
-Message-ID: <86sfdfv0e1.wl-maz@kernel.org>
-From:   Marc Zyngier <maz@kernel.org>
-To:     David Dai <davidai@google.com>,
-        Oliver Upton <oliver.upton@linux.dev>
-Cc:     "Rafael J. Wysocki" <rafael@kernel.org>,
-        Viresh Kumar <viresh.kumar@linaro.org>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
+        with ESMTP id S236300AbjDDUvO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Apr 2023 16:51:14 -0400
+Received: from mail-oi1-x235.google.com (mail-oi1-x235.google.com [IPv6:2607:f8b0:4864:20::235])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85AA34685
+        for <kvm@vger.kernel.org>; Tue,  4 Apr 2023 13:51:02 -0700 (PDT)
+Received: by mail-oi1-x235.google.com with SMTP id bx42so9657809oib.6
+        for <kvm@vger.kernel.org>; Tue, 04 Apr 2023 13:51:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112; t=1680641462;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=EWld2DJgsr3xhsXTYvy21HtOymPU5OqulnM80zqfg8Y=;
+        b=EkBKjiDVLODWFdpJFcFh8O0aykY31wBxbHEzGsglQCXpXUxbloMC4ZIlwS3k/vDXkV
+         CH0QRAtpbyXcWKFxGvSg9BhILVEuQbdVhGuqhLYOJDcJw1tnYEknElbq2x5vMEZ3tk4J
+         AOlfZTAfUt8Oryal5xVNf9jrI9Z+CLyn50e6CHQiWRvYQs9nb4EnNDx7VKM+BZTvCAai
+         IlDXOHX/AyhWCwoCyubxmWfmotQbGZgCnwwsZuwWz2ByEKqx2ghK7IlZtcoEGdGh8LEM
+         LA1/OtBQmGSO7eyh7IuiWfqmWR+BCsWUrne4QK/eucDpWmmWL4HHW8qKTD2q82S0k5cu
+         uqzw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1680641462;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=EWld2DJgsr3xhsXTYvy21HtOymPU5OqulnM80zqfg8Y=;
+        b=oJI2S5Urub+KMLmPXU2dNKSKstBBvImI5hykxGoRMyhbi/LWsHNnH6XMzV9SyYUI0r
+         kCNKyokZSjSzAiGYpGDrC9qBTav3YDHidRfCENheLyzWp3qol8CEkpZZEpxgLdyrElKV
+         8fZolrBn/4RUf/SK5X6FWdiz1iLDoBmUiThfGU307BqXLwxg5T4/bknm3yWd+2y8yFpm
+         13H4X85QYsYztCgfb0/XgRlDaJOXfwUiPFIZ73d9C9XZQEmRWExAe/79huKtn2DKXY65
+         EgRiGPY3Gu+NGvb2MoQ8RMmf33T6rTQoFAPsxiwP3KFRQBVAdbqIpkSOFCaMPbmxFNG+
+         zIsw==
+X-Gm-Message-State: AAQBX9csZ+R+8vxvM6xvxZBCpzCYY0Ku2oVvXISXit/pY2XlFml4ZL5k
+        MzAkVRY6EEN7imMA6Rn5PxiGLmEm3zt/32GE/+7f6w==
+X-Google-Smtp-Source: AKy350Yww45xogvO5C7Z+SimshwIN+RETKNV2T6Sz5QzE93xiFMN/sSAK18mghWAPp1x73tX4TLvF3PGLLGdqPlIeiM=
+X-Received: by 2002:aca:171a:0:b0:389:50f2:4aa6 with SMTP id
+ j26-20020aca171a000000b0038950f24aa6mr1422388oii.9.1680641461577; Tue, 04 Apr
+ 2023 13:51:01 -0700 (PDT)
+MIME-Version: 1.0
+References: <20230206172340.2639971-1-rananta@google.com> <20230206172340.2639971-4-rananta@google.com>
+ <ZCTe5koj8fOgbrYO@linux.dev> <CAJHc60x-ZHN=ZQemZp0wkj5jp-Ys8024YDQmWhmKn3NgZ0HHCQ@mail.gmail.com>
+ <ZCxwjYf+EjuB64iH@linux.dev>
+In-Reply-To: <ZCxwjYf+EjuB64iH@linux.dev>
+From:   Raghavendra Rao Ananta <rananta@google.com>
+Date:   Tue, 4 Apr 2023 13:50:49 -0700
+Message-ID: <CAJHc60zz1Wef+1rKFBZB2jmoHuFgs=Q9_QK7UKbc6hfff7i=iA@mail.gmail.com>
+Subject: Re: [PATCH v2 3/7] KVM: arm64: Implement __kvm_tlb_flush_range_vmid_ipa()
+To:     Oliver Upton <oliver.upton@linux.dev>
+Cc:     Oliver Upton <oupton@google.com>, Marc Zyngier <maz@kernel.org>,
+        Ricardo Koller <ricarkol@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
         James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
         Will Deacon <will@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Lorenzo Pieralisi <lpieralisi@kernel.org>,
-        Sudeep Holla <sudeep.holla@arm.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Juri Lelli <juri.lelli@redhat.com>,
-        Vincent Guittot <vincent.guittot@linaro.org>,
-        Dietmar Eggemann <dietmar.eggemann@arm.com>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>,
-        Daniel Bristot de Oliveira <bristot@redhat.com>,
-        Valentin Schneider <vschneid@redhat.com>,
-        kernel-team@android.com, linux-pm@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
-Subject: Re: [RFC PATCH 0/6] Improve VM DVFS and task placement behavior
-In-Reply-To: <ZCx97IKjsBibjdGc@linux.dev>
-References: <20230330224348.1006691-1-davidai@google.com>
-        <ZCx97IKjsBibjdGc@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: davidai@google.com, oliver.upton@linux.dev, rafael@kernel.org, viresh.kumar@linaro.org, robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org, pbonzini@redhat.com, corbet@lwn.net, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com, lpieralisi@kernel.org, sudeep.holla@arm.com, mingo@redhat.com, peterz@infradead.org, juri.lelli@redhat.com, vincent.guittot@linaro.org, dietmar.eggemann@arm.com, rostedt@goodmis.org, bsegall@google.com, mgorman@suse.de, bristot@redhat.com, vschneid@redhat.com, kernel-team@android.com, linux-pm@vger.kernel.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, linux-doc@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-5.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,SPF_HELO_NONE,
-        SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.6
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Colton Lewis <coltonlewis@google.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-15.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,ENV_AND_HDR_SPF_MATCH,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL,
+        USER_IN_DEF_SPF_WL autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 04 Apr 2023 20:43:40 +0100,
-Oliver Upton <oliver.upton@linux.dev> wrote:
-> 
-> Folks,
-> 
-> On Thu, Mar 30, 2023 at 03:43:35PM -0700, David Dai wrote:
-> 
-> <snip>
-> 
-> > PCMark
-> > Higher is better
-> > +-------------------+----------+------------+--------+-------+--------+
-> > | Test Case (score) | Baseline |  Hypercall | %delta |  MMIO | %delta |
-> > +-------------------+----------+------------+--------+-------+--------+
-> > | Weighted Total    |     6136 |       7274 |   +19% |  6867 |   +12% |
-> > +-------------------+----------+------------+--------+-------+--------+
-> > | Web Browsing      |     5558 |       6273 |   +13% |  6035 |    +9% |
-> > +-------------------+----------+------------+--------+-------+--------+
-> > | Video Editing     |     4921 |       5221 |    +6% |  5167 |    +5% |
-> > +-------------------+----------+------------+--------+-------+--------+
-> > | Writing           |     6864 |       8825 |   +29% |  8529 |   +24% |
-> > +-------------------+----------+------------+--------+-------+--------+
-> > | Photo Editing     |     7983 |      11593 |   +45% | 10812 |   +35% |
-> > +-------------------+----------+------------+--------+-------+--------+
-> > | Data Manipulation |     5814 |       6081 |    +5% |  5327 |    -8% |
-> > +-------------------+----------+------------+--------+-------+--------+
-> > 
-> > PCMark Performance/mAh
-> > Higher is better
-> > +-----------+----------+-----------+--------+------+--------+
-> > |           | Baseline | Hypercall | %delta | MMIO | %delta |
-> > +-----------+----------+-----------+--------+------+--------+
-> > | Score/mAh |       79 |        88 |   +11% |   83 |    +7% |
-> > +-----------+----------+-----------+--------+------+--------+
-> > 
-> > Roblox
-> > Higher is better
-> > +-----+----------+------------+--------+-------+--------+
-> > |     | Baseline |  Hypercall | %delta |  MMIO | %delta |
-> > +-----+----------+------------+--------+-------+--------+
-> > | FPS |    18.25 |      28.66 |   +57% | 24.06 |   +32% |
-> > +-----+----------+------------+--------+-------+--------+
-> > 
-> > Roblox Frames/mAh
-> > Higher is better
-> > +------------+----------+------------+--------+--------+--------+
-> > |            | Baseline |  Hypercall | %delta |   MMIO | %delta |
-> > +------------+----------+------------+--------+--------+--------+
-> > | Frames/mAh |    91.25 |     114.64 |   +26% | 103.11 |   +13% |
-> > +------------+----------+------------+--------+--------+--------+
-> 
-> </snip>
-> 
-> > Next steps:
-> > ===========
-> > We are continuing to look into communication mechanisms other than
-> > hypercalls that are just as/more efficient and avoid switching into the VMM
-> > userspace. Any inputs in this regard are greatly appreciated.
-> 
-> We're highly unlikely to entertain such an interface in KVM.
-> 
-> The entire feature is dependent on pinning vCPUs to physical cores, for which
-> userspace is in the driver's seat. That is a well established and documented
-> policy which can be seen in the way we handle heterogeneous systems and
-> vPMU.
-> 
-> Additionally, this bloats the KVM PV ABI with highly VMM-dependent interfaces
-> that I would not expect to benefit the typical user of KVM.
-> 
-> Based on the data above, it would appear that the userspace implementation is
-> in the same neighborhood as a KVM-based implementation, which only further
-> weakens the case for moving this into the kernel.
-> 
-> I certainly can appreciate the motivation for the series, but this feature
-> should be in userspace as some form of a virtual device.
-
-+1 on all of the above.
-
-The one thing I'd like to understand that the comment seems to imply
-that there is a significant difference in overhead between a hypercall
-and an MMIO. In my experience, both are pretty similar in cost for a
-handling location (both in userspace or both in the kernel). MMIO
-handling is a tiny bit more expensive due to a guaranteed TLB miss
-followed by a walk of the in-kernel device ranges, but that's all. It
-should hardly register.
-
-And if you really want some super-low latency, low overhead
-signalling, maybe an exception is the wrong tool for the job. Shared
-memory communication could be more appropriate.
+On Tue, Apr 4, 2023 at 11:46=E2=80=AFAM Oliver Upton <oliver.upton@linux.de=
+v> wrote:
+>
+> On Mon, Apr 03, 2023 at 02:08:29PM -0700, Raghavendra Rao Ananta wrote:
+> > On Wed, Mar 29, 2023 at 5:59=E2=80=AFPM Oliver Upton <oliver.upton@linu=
+x.dev> wrote:
+> > >
+> > > On Mon, Feb 06, 2023 at 05:23:36PM +0000, Raghavendra Rao Ananta wrot=
+e:
+> > > > Define  __kvm_tlb_flush_range_vmid_ipa() (for VHE and nVHE)
+> > >
+> > > bikeshed: Personally, I find that range implies it takes an address a=
+s an
+> > > argument already. Maybe just call it __kvm_tlb_flush_vmid_range()
+> > >
+> > Hmm, since TLBI instructions takes-in a variety of ranges, VA or IPA,
+> > I just thought of extending the '_ipa' to make things clear. Moreover
+> > it aligns with the existing __kvm_tlb_flush_vmid_ipa(). WDYT?
+>
+> Like I said, just a bikeshed and it seemed trivial to eliminate a token
+> in the function name. FWIW, you're dealing in terms of the IPA space by
+> definition, as a VMID identifies an IPA address space. Range-based
+> invalidations by VA would instead take an ASID as the address space
+> identifier.
+>
+Okay, let's rename it to  __kvm_tlb_flush_vmid_range().
 
 Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Raghavendra
+> --
+> Thanks,
+> Oliver
