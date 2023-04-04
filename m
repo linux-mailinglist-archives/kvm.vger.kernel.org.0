@@ -2,79 +2,87 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C5B0B6D62A0
-	for <lists+kvm@lfdr.de>; Tue,  4 Apr 2023 15:19:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0E3176D62B4
+	for <lists+kvm@lfdr.de>; Tue,  4 Apr 2023 15:23:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235260AbjDDNTS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Apr 2023 09:19:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55084 "EHLO
+        id S235133AbjDDNXL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Apr 2023 09:23:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34232 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235206AbjDDNSh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Apr 2023 09:18:37 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2604A3C16
-        for <kvm@vger.kernel.org>; Tue,  4 Apr 2023 06:17:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1680614261;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=gKYp+kOgUX/GJB2EDtARo8NYPrwRtHr03kQCkOwXG8g=;
-        b=XFJBRxlDGuK6oA1YPdHbNRcjmqOEsPf8Qy5xvdlwWieVmeq5fkQMiAz3aDkRTIsEe8at7+
-        ekO2qAGPj1InXgU0xXz6Dv5DwvZYvqSIxKqUa4cvKduO0TsO94dAgTziiMSgmR3oCIj4Ui
-        cu3shYIFwx8hcOQMErxG/ji5Pcx9r2A=
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
- [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-226-ISBWasrSMBGhJzrz-dtjzw-1; Tue, 04 Apr 2023 09:17:40 -0400
-X-MC-Unique: ISBWasrSMBGhJzrz-dtjzw-1
-Received: by mail-qk1-f200.google.com with SMTP id t23-20020a374617000000b0074a4dba4b5aso2048887qka.16
-        for <kvm@vger.kernel.org>; Tue, 04 Apr 2023 06:17:39 -0700 (PDT)
+        with ESMTP id S235049AbjDDNXI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Apr 2023 09:23:08 -0400
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DEF7273D;
+        Tue,  4 Apr 2023 06:23:07 -0700 (PDT)
+Received: by mail-pj1-x102b.google.com with SMTP id l9-20020a17090a3f0900b0023d32684e7fso1453131pjc.1;
+        Tue, 04 Apr 2023 06:23:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112; t=1680614587;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3RPu6VlUeSzQsBCDXOfMV1nLDEC2lpZYeS7SpzCxn7M=;
+        b=X+lpYf9kBFMDrYX3qQl+JFRPqkRUZz4ZkxQ+Q25Dj1AMebmfplDn1BOElWSkzT646U
+         DJxbPpk8y4va/y+NhRG7uWm6r/fPssypDJTiVtCN9Zy8NAs6twU19IHnAjBrvlXzWChN
+         0pTe9LSe55ogF+5HUnUX+MdmMxcAstAu++uWU1Hw2h02yQsrCl97AKWYvh4qFvT+unMq
+         VcY5G0XJdhZAzMNtCuAMuN/bWp+8/0rMiNIOxdecqgialjrE+uDzHynlonbFNdroPCxP
+         /MH96xB3ymGHatj3v6rp4Sz3PeTZDnlnwbofv3k6HqQp1q1/jwLFsAUju9/u1UgSZgzL
+         3MNw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680614259;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=gKYp+kOgUX/GJB2EDtARo8NYPrwRtHr03kQCkOwXG8g=;
-        b=hnbTcd8IwyNeT2Io1QpQPMxObDxlxV5OYCdNfdjyAguQfzTJOwySdGsZ17dpqpiwwT
-         q9+hqryCpzWW6LnnyP43IJNMcxakTMEoTtv9hPAjhXXTcozMHpTUs+nGjCbWyPB6OgKu
-         keHAC1yJmTSeOabXJhvAYYolnSU04fevEYnqf/lPQ3SsK+I2sAVU8c1Z5GlxeT7+nTwX
-         i075irx34rFlEZGhfOOBecD7bpCAiWLaRpwdLSx52/t0VynTpVSN8TBzE2W/L8QsnpCz
-         yv513fdzx6U6NxvhbSahTfaUv75yGqsE/7cL+XGQ9kO6J/dV5BUTfv3OWFgPmVsEyQ50
-         Wa7w==
-X-Gm-Message-State: AAQBX9dTawYbheu1Flo4f5QSoP/bqF9z2fmfjNWZADW8pLxdDbK9ci1M
-        HhGW4oIfe1KUraVplJ/jp+CnqqoS1129+X6eXpNQeq8wLD1NZTF+KMvnccXecJ93Xk3TxDzdIJv
-        Ybo0xjQduNf/l
-X-Received: by 2002:a05:6214:2348:b0:5e0:2461:d313 with SMTP id hu8-20020a056214234800b005e02461d313mr3635652qvb.13.1680614259099;
-        Tue, 04 Apr 2023 06:17:39 -0700 (PDT)
-X-Google-Smtp-Source: AKy350ZQHHw9QMgxTDZ7Gx0mKxPm59F+7zD2PSm56JxGEVUgQJCxRQ0usDmkGmew2XpIoXpNgEcGmQ==
-X-Received: by 2002:a05:6214:2348:b0:5e0:2461:d313 with SMTP id hu8-20020a056214234800b005e02461d313mr3635618qvb.13.1680614258783;
-        Tue, 04 Apr 2023 06:17:38 -0700 (PDT)
-Received: from step1.redhat.com (host-82-53-134-157.retail.telecomitalia.it. [82.53.134.157])
-        by smtp.gmail.com with ESMTPSA id oh4-20020a056214438400b005dd8b9345e6sm3374101qvb.126.2023.04.04.06.17.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 04 Apr 2023 06:17:38 -0700 (PDT)
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     virtualization@lists.linux-foundation.org
-Cc:     stefanha@redhat.com,
-        Andrey Zhadchenko <andrey.zhadchenko@virtuozzo.com>,
-        kvm@vger.kernel.org, eperezma@redhat.com,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        linux-kernel@vger.kernel.org, Jason Wang <jasowang@redhat.com>,
-        netdev@vger.kernel.org, Stefano Garzarella <sgarzare@redhat.com>
-Subject: [PATCH v5 9/9] vdpa_sim: add support for user VA
-Date:   Tue,  4 Apr 2023 15:17:34 +0200
-Message-Id: <20230404131734.45943-1-sgarzare@redhat.com>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230404131326.44403-1-sgarzare@redhat.com>
-References: <20230404131326.44403-1-sgarzare@redhat.com>
+        d=1e100.net; s=20210112; t=1680614587;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=3RPu6VlUeSzQsBCDXOfMV1nLDEC2lpZYeS7SpzCxn7M=;
+        b=lEacYkUNUhabUmbFn12xKlrrAOU9Qwd+4unr3VmU39riK0MSDLgY1eGHpXmfC6lglp
+         A3Wfak/YhC4FuwAnuHHRehSWDP2Zo9y+eCJtpNL1+79kItVmdwRtwubXvIse69///l9A
+         oTlODdrq04GV9suUQkwMOYzY9MjmUEMZyLFvvLGsim9L4KkWTGpDlbIGWvQFzwO2pElM
+         0/2q+T4tb1Hxr8ZzB56Vm2fKaRS2Ia93MdNYVjS21fqpim/C3ACb+oHK0YWjdlGPvGu2
+         64dWUWst9bIsn29QGOdJrhDsasSOpYwsLUwvHAuoT9J1L64WfKGHSsRfqTSMVhwLmVtU
+         lbkA==
+X-Gm-Message-State: AAQBX9ddz6aGD53WRTaKL8IfqdW4xdMPj/lzBrQ89+Ci1+VciQeEwSXt
+        Ym3iVMnxtWWJ1J0iBP/DOy8=
+X-Google-Smtp-Source: AKy350anCelYHz08so8729YR0rRHw6Mupx2hEhWHQv8ym9I9UJCr21nrksRn8FlZ63WQrXoIWvhCKg==
+X-Received: by 2002:a17:90b:33c4:b0:23f:7843:93ed with SMTP id lk4-20020a17090b33c400b0023f784393edmr2842209pjb.8.1680614586865;
+        Tue, 04 Apr 2023 06:23:06 -0700 (PDT)
+Received: from ?IPV6:2404:f801:0:5:8000::75b? ([2404:f801:9000:1a:efea::75b])
+        by smtp.gmail.com with ESMTPSA id t6-20020a170902bc4600b0019ab151eb90sm8298961plz.139.2023.04.04.06.22.56
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 04 Apr 2023 06:23:06 -0700 (PDT)
+Message-ID: <e1579ebd-6436-4dc1-9983-20cefc100619@gmail.com>
+Date:   Tue, 4 Apr 2023 21:22:55 +0800
 MIME-Version: 1.0
-Content-type: text/plain
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.9.1
+Subject: Re: [RFC PATCH V4 17/17] x86/sev: Remove restrict interrupt injection
+ from SNP_FEATURES_IMPL_REQ
+To:     "Gupta, Pankaj" <pankaj.gupta@amd.com>, luto@kernel.org,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+        seanjc@google.com, pbonzini@redhat.com, jgross@suse.com,
+        tiala@microsoft.com, kirill@shutemov.name,
+        jiangshan.ljs@antgroup.com, peterz@infradead.org,
+        ashish.kalra@amd.com, srutherford@google.com,
+        akpm@linux-foundation.org, anshuman.khandual@arm.com,
+        pawan.kumar.gupta@linux.intel.com, adrian.hunter@intel.com,
+        daniel.sneddon@linux.intel.com, alexander.shishkin@linux.intel.com,
+        sandipan.das@amd.com, ray.huang@amd.com, brijesh.singh@amd.com,
+        michael.roth@amd.com, thomas.lendacky@amd.com,
+        venu.busireddy@oracle.com, sterritt@google.com,
+        tony.luck@intel.com, samitolvanen@google.com, fenghua.yu@intel.com
+Cc:     pangupta@amd.com, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, linux-hyperv@vger.kernel.org,
+        linux-arch@vger.kernel.org
+References: <20230403174406.4180472-1-ltykernel@gmail.com>
+ <20230403174406.4180472-18-ltykernel@gmail.com>
+ <f2dde9d6-dc04-4c33-7f9d-49454bb192da@amd.com>
+From:   Tianyu Lan <ltykernel@gmail.com>
+In-Reply-To: <f2dde9d6-dc04-4c33-7f9d-49454bb192da@amd.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
+        DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -82,226 +90,29 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The new "use_va" module parameter (default: true) is used in
-vdpa_alloc_device() to inform the vDPA framework that the device
-supports VA.
 
-vringh is initialized to use VA only when "use_va" is true and the
-user's mm has been bound. So, only when the bus supports user VA
-(e.g. vhost-vdpa).
+On 4/4/2023 8:25 PM, Gupta, Pankaj wrote:
+> 
+>> Enabled restrict interrupt injection function. Remove MSR_AMD64_
+>> SNP_RESTRICTED_INJ from SNP_FEATURES_IMPL_REQ to let kernel boot
+>> up with this function.
+>> ---
+>>   arch/x86/boot/compressed/sev.c | 1 -
+>>   1 file changed, 1 deletion(-)
+>>
+>> diff --git a/arch/x86/boot/compressed/sev.c 
+>> b/arch/x86/boot/compressed/sev.c
+>> index d63ad8f99f83..a5f41301a600 100644
+>> --- a/arch/x86/boot/compressed/sev.c
+>> +++ b/arch/x86/boot/compressed/sev.c
+>> @@ -299,7 +299,6 @@ static void enforce_vmpl0(void)
+>>    */
+>>   #define SNP_FEATURES_IMPL_REQ    (MSR_AMD64_SNP_VTOM |            \
+>>                    MSR_AMD64_SNP_REFLECT_VC |        \
+>> -                 MSR_AMD64_SNP_RESTRICTED_INJ |        \
+> 
+> Should we update the bit in "SNP_FEATURES_PRESENT" instead?
+> 
 
-vdpasim_mm_work_fn work is used to serialize the binding to a new
-address space when the .bind_mm callback is invoked, and unbinding
-when the .unbind_mm callback is invoked.
-
-Call mmget_not_zero()/kthread_use_mm() inside the worker function
-to pin the address space only as long as needed, following the
-documentation of mmget() in include/linux/sched/mm.h:
-
-  * Never use this function to pin this address space for an
-  * unbounded/indefinite amount of time.
-
-Acked-by: Jason Wang <jasowang@redhat.com>
-Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
----
-
-Notes:
-    v4:
-    - checked `use_va` in vdpasim_work_fn() [Jason]
-    - removed `va_enabled` variable now used only in the if condition
-    v3:
-    - called mmget_not_zero() before kthread_use_mm() [Jason]
-      As the documentation of mmget() in include/linux/sched/mm.h says:
-    
-      * Never use this function to pin this address space for an
-      * unbounded/indefinite amount of time.
-    
-      I moved mmget_not_zero/kthread_use_mm inside the worker function,
-      this way we pin the address space only as long as needed.
-      This is similar to what vfio_iommu_type1_dma_rw_chunk() does in
-      drivers/vfio/vfio_iommu_type1.c
-    - simplified the mm bind/unbind [Jason]
-    - renamed vdpasim_worker_change_mm_sync() [Jason]
-    - fix commit message (s/default: false/default: true)
-    v2:
-    - `use_va` set to true by default [Eugenio]
-    - supported the new unbind_mm callback [Jason]
-    - removed the unbind_mm call in vdpasim_do_reset() [Jason]
-    - avoided to release the lock while call kthread_flush_work() since we
-      are now using a mutex to protect the device state
-
- drivers/vdpa/vdpa_sim/vdpa_sim.h |  1 +
- drivers/vdpa/vdpa_sim/vdpa_sim.c | 97 +++++++++++++++++++++++++++++---
- 2 files changed, 90 insertions(+), 8 deletions(-)
-
-diff --git a/drivers/vdpa/vdpa_sim/vdpa_sim.h b/drivers/vdpa/vdpa_sim/vdpa_sim.h
-index 4774292fba8c..3a42887d05d9 100644
---- a/drivers/vdpa/vdpa_sim/vdpa_sim.h
-+++ b/drivers/vdpa/vdpa_sim/vdpa_sim.h
-@@ -59,6 +59,7 @@ struct vdpasim {
- 	struct vdpasim_virtqueue *vqs;
- 	struct kthread_worker *worker;
- 	struct kthread_work work;
-+	struct mm_struct *mm_bound;
- 	struct vdpasim_dev_attr dev_attr;
- 	/* mutex to synchronize virtqueue state */
- 	struct mutex mutex;
-diff --git a/drivers/vdpa/vdpa_sim/vdpa_sim.c b/drivers/vdpa/vdpa_sim/vdpa_sim.c
-index 2b2e439a66f7..2c706bb18897 100644
---- a/drivers/vdpa/vdpa_sim/vdpa_sim.c
-+++ b/drivers/vdpa/vdpa_sim/vdpa_sim.c
-@@ -35,10 +35,44 @@ module_param(max_iotlb_entries, int, 0444);
- MODULE_PARM_DESC(max_iotlb_entries,
- 		 "Maximum number of iotlb entries for each address space. 0 means unlimited. (default: 2048)");
- 
-+static bool use_va = true;
-+module_param(use_va, bool, 0444);
-+MODULE_PARM_DESC(use_va, "Enable/disable the device's ability to use VA");
-+
- #define VDPASIM_QUEUE_ALIGN PAGE_SIZE
- #define VDPASIM_QUEUE_MAX 256
- #define VDPASIM_VENDOR_ID 0
- 
-+struct vdpasim_mm_work {
-+	struct kthread_work work;
-+	struct vdpasim *vdpasim;
-+	struct mm_struct *mm_to_bind;
-+	int ret;
-+};
-+
-+static void vdpasim_mm_work_fn(struct kthread_work *work)
-+{
-+	struct vdpasim_mm_work *mm_work =
-+		container_of(work, struct vdpasim_mm_work, work);
-+	struct vdpasim *vdpasim = mm_work->vdpasim;
-+
-+	mm_work->ret = 0;
-+
-+	//TODO: should we attach the cgroup of the mm owner?
-+	vdpasim->mm_bound = mm_work->mm_to_bind;
-+}
-+
-+static void vdpasim_worker_change_mm_sync(struct vdpasim *vdpasim,
-+					  struct vdpasim_mm_work *mm_work)
-+{
-+	struct kthread_work *work = &mm_work->work;
-+
-+	kthread_init_work(work, vdpasim_mm_work_fn);
-+	kthread_queue_work(vdpasim->worker, work);
-+
-+	kthread_flush_work(work);
-+}
-+
- static struct vdpasim *vdpa_to_sim(struct vdpa_device *vdpa)
- {
- 	return container_of(vdpa, struct vdpasim, vdpa);
-@@ -59,13 +93,20 @@ static void vdpasim_queue_ready(struct vdpasim *vdpasim, unsigned int idx)
- {
- 	struct vdpasim_virtqueue *vq = &vdpasim->vqs[idx];
- 	uint16_t last_avail_idx = vq->vring.last_avail_idx;
--
--	vringh_init_iotlb(&vq->vring, vdpasim->features, vq->num, true,
--			  (struct vring_desc *)(uintptr_t)vq->desc_addr,
--			  (struct vring_avail *)
--			  (uintptr_t)vq->driver_addr,
--			  (struct vring_used *)
--			  (uintptr_t)vq->device_addr);
-+	struct vring_desc *desc = (struct vring_desc *)
-+				  (uintptr_t)vq->desc_addr;
-+	struct vring_avail *avail = (struct vring_avail *)
-+				    (uintptr_t)vq->driver_addr;
-+	struct vring_used *used = (struct vring_used *)
-+				  (uintptr_t)vq->device_addr;
-+
-+	if (use_va && vdpasim->mm_bound) {
-+		vringh_init_iotlb_va(&vq->vring, vdpasim->features, vq->num,
-+				     true, desc, avail, used);
-+	} else {
-+		vringh_init_iotlb(&vq->vring, vdpasim->features, vq->num,
-+				  true, desc, avail, used);
-+	}
- 
- 	vq->vring.last_avail_idx = last_avail_idx;
- 
-@@ -130,8 +171,20 @@ static const struct vdpa_config_ops vdpasim_batch_config_ops;
- static void vdpasim_work_fn(struct kthread_work *work)
- {
- 	struct vdpasim *vdpasim = container_of(work, struct vdpasim, work);
-+	struct mm_struct *mm = vdpasim->mm_bound;
-+
-+	if (use_va && mm) {
-+		if (!mmget_not_zero(mm))
-+			return;
-+		kthread_use_mm(mm);
-+	}
- 
- 	vdpasim->dev_attr.work_fn(vdpasim);
-+
-+	if (use_va && mm) {
-+		kthread_unuse_mm(mm);
-+		mmput(mm);
-+	}
- }
- 
- struct vdpasim *vdpasim_create(struct vdpasim_dev_attr *dev_attr,
-@@ -162,7 +215,7 @@ struct vdpasim *vdpasim_create(struct vdpasim_dev_attr *dev_attr,
- 	vdpa = __vdpa_alloc_device(NULL, ops,
- 				   dev_attr->ngroups, dev_attr->nas,
- 				   dev_attr->alloc_size,
--				   dev_attr->name, false);
-+				   dev_attr->name, use_va);
- 	if (IS_ERR(vdpa)) {
- 		ret = PTR_ERR(vdpa);
- 		goto err_alloc;
-@@ -582,6 +635,30 @@ static int vdpasim_set_map(struct vdpa_device *vdpa, unsigned int asid,
- 	return ret;
- }
- 
-+static int vdpasim_bind_mm(struct vdpa_device *vdpa, struct mm_struct *mm)
-+{
-+	struct vdpasim *vdpasim = vdpa_to_sim(vdpa);
-+	struct vdpasim_mm_work mm_work;
-+
-+	mm_work.vdpasim = vdpasim;
-+	mm_work.mm_to_bind = mm;
-+
-+	vdpasim_worker_change_mm_sync(vdpasim, &mm_work);
-+
-+	return mm_work.ret;
-+}
-+
-+static void vdpasim_unbind_mm(struct vdpa_device *vdpa)
-+{
-+	struct vdpasim *vdpasim = vdpa_to_sim(vdpa);
-+	struct vdpasim_mm_work mm_work;
-+
-+	mm_work.vdpasim = vdpasim;
-+	mm_work.mm_to_bind = NULL;
-+
-+	vdpasim_worker_change_mm_sync(vdpasim, &mm_work);
-+}
-+
- static int vdpasim_dma_map(struct vdpa_device *vdpa, unsigned int asid,
- 			   u64 iova, u64 size,
- 			   u64 pa, u32 perm, void *opaque)
-@@ -678,6 +755,8 @@ static const struct vdpa_config_ops vdpasim_config_ops = {
- 	.set_group_asid         = vdpasim_set_group_asid,
- 	.dma_map                = vdpasim_dma_map,
- 	.dma_unmap              = vdpasim_dma_unmap,
-+	.bind_mm		= vdpasim_bind_mm,
-+	.unbind_mm		= vdpasim_unbind_mm,
- 	.free                   = vdpasim_free,
- };
- 
-@@ -712,6 +791,8 @@ static const struct vdpa_config_ops vdpasim_batch_config_ops = {
- 	.get_iova_range         = vdpasim_get_iova_range,
- 	.set_group_asid         = vdpasim_set_group_asid,
- 	.set_map                = vdpasim_set_map,
-+	.bind_mm		= vdpasim_bind_mm,
-+	.unbind_mm		= vdpasim_unbind_mm,
- 	.free                   = vdpasim_free,
- };
- 
--- 
-2.39.2
+Nice cath! we should add the bit in the SNP_FEATURES_PRESENT.
 
