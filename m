@@ -2,155 +2,177 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9FEFF6D6C78
-	for <lists+kvm@lfdr.de>; Tue,  4 Apr 2023 20:41:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 31DCF6D6C8B
+	for <lists+kvm@lfdr.de>; Tue,  4 Apr 2023 20:44:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234402AbjDDSlo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Apr 2023 14:41:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45082 "EHLO
+        id S235669AbjDDSod (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Apr 2023 14:44:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47632 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233075AbjDDSln (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Apr 2023 14:41:43 -0400
-Received: from out-39.mta1.migadu.com (out-39.mta1.migadu.com [95.215.58.39])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE0CF12D
-        for <kvm@vger.kernel.org>; Tue,  4 Apr 2023 11:41:41 -0700 (PDT)
-Date:   Tue, 4 Apr 2023 18:41:34 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1680633699;
+        with ESMTP id S235644AbjDDSo3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Apr 2023 14:44:29 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B34D7CA
+        for <kvm@vger.kernel.org>; Tue,  4 Apr 2023 11:43:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1680633818;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=CD1jFme43qexXcrz2XKuPM7oAmE3rbgRSVHroXDqbrw=;
-        b=XxMWM4k6DzmlzlUYCTPsBpVShgELiUyXykVncoQOI9O0ryTtAg39juJqr096OjqQhF24JI
-        uEvzoH7ILn2I9mZGvoxalTYWjyS69x8X3o/W6iSilKD5dhH0vV8RaOw4on8UiGaV1aQyrs
-        OqJuRLoiUX/kY7qk/unXspbmaHW8FqA=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Oliver Upton <oliver.upton@linux.dev>
-To:     Raghavendra Rao Ananta <rananta@google.com>
-Cc:     Oliver Upton <oupton@google.com>, Marc Zyngier <maz@kernel.org>,
-        Ricardo Koller <ricarkol@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Colton Lewis <coltonlewis@google.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH v2 2/7] KVM: arm64: Add FEAT_TLBIRANGE support
-Message-ID: <ZCxvXq0dftq/Szra@linux.dev>
-References: <20230206172340.2639971-1-rananta@google.com>
- <20230206172340.2639971-3-rananta@google.com>
- <ZCTjirkCgBkT65eP@linux.dev>
- <CAJHc60y1BLQC4c0qXCuqF7JfewBC_fG2xuH0Wj0AHJh9x3CK5g@mail.gmail.com>
+        bh=JVe2x7+RkmWzTA4UkLZDpP7zxrG0357xafz+5+qM8mk=;
+        b=euIZCF/IIIvq9yMrpaPe5emjnCkaRWe/Vt8l6wwAuSghjX5OACxKOzlb1oD/dLWI/kTpCg
+        z5P4tUBY7SdfJ/1fKEYHH0fDTFLDzs+uvfY4O6vkzPlK3RRu7dt0F20pjqvFznNyJTzJcm
+        QGuhQmgbjwuJTTqoGPpSBDuN4RqFYx8=
+Received: from mail-io1-f71.google.com (mail-io1-f71.google.com
+ [209.85.166.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-215-ScvQfNYXNKKs9__Aeg1Jnw-1; Tue, 04 Apr 2023 14:43:37 -0400
+X-MC-Unique: ScvQfNYXNKKs9__Aeg1Jnw-1
+Received: by mail-io1-f71.google.com with SMTP id p128-20020a6b8d86000000b007583ebb18fdso20386081iod.19
+        for <kvm@vger.kernel.org>; Tue, 04 Apr 2023 11:43:37 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1680633817;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=JVe2x7+RkmWzTA4UkLZDpP7zxrG0357xafz+5+qM8mk=;
+        b=qwKPskqPDl4avBE7U+k3FqrpcMADOW/PfZK0OY/f+LldnjniJzoh5T6kZmiZ47zoEG
+         8DkGfTpavFIwpU3uyqtZLqG3Ir5j1flWmboyOq3p9DlHuy5aQ2exBKK2WOJ3FXZQqzIZ
+         MRUZXxGbPFe/uMYXsie0J6cIQ+UHVgc9GTkS2Puuxm5Ai0S4GwDrBjGbya/sKJ1K9H90
+         fYWlw0JefnM7oESU86rVLRTmsishHy/ycl7l2vqs0O9cimd7sg6eYWGcX1kzEl2W5hTs
+         h4YV0X60ikCkqKOeZMdzMUasmc74MG8qYqgePzpsR5GaVqKKXQCw3wqouxmNNAkMK/Cz
+         BcQQ==
+X-Gm-Message-State: AAQBX9eO0iu1M6wynlUtWHaj3BlOxpjnYFpMjUJh9Xh6rKj08D4DIzQX
+        6I4uWVsGYRkvc6wdw3+l9hivW5zN3U0xHFSB5xQ8sQol5PbXWled41YCHncCNtgQvrmjNhOjCNT
+        FNBm++chPwRty
+X-Received: by 2002:a92:c688:0:b0:326:1bc5:3008 with SMTP id o8-20020a92c688000000b003261bc53008mr2426923ilg.32.1680633816960;
+        Tue, 04 Apr 2023 11:43:36 -0700 (PDT)
+X-Google-Smtp-Source: AKy350bHhX25VBcEeAEy0phZawAEsaaqr+RqtIiHUEv4/fRP348Ef5cjI0z1ZqE0AE8rK/vx5e4UqQ==
+X-Received: by 2002:a92:c688:0:b0:326:1bc5:3008 with SMTP id o8-20020a92c688000000b003261bc53008mr2426916ilg.32.1680633816676;
+        Tue, 04 Apr 2023 11:43:36 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id g14-20020a056e021a2e00b0032649ee77d6sm3201232ile.56.2023.04.04.11.43.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 04 Apr 2023 11:43:36 -0700 (PDT)
+Date:   Tue, 4 Apr 2023 12:43:34 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Reinette Chatre <reinette.chatre@intel.com>
+Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
+        "jgg@nvidia.com" <jgg@nvidia.com>,
+        "yishaih@nvidia.com" <yishaih@nvidia.com>,
+        "shameerali.kolothum.thodi@huawei.com" 
+        <shameerali.kolothum.thodi@huawei.com>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "darwi@linutronix.de" <darwi@linutronix.de>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "Jiang, Dave" <dave.jiang@intel.com>,
+        "Liu, Jing2" <jing2.liu@intel.com>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "Yu, Fenghua" <fenghua.yu@intel.com>,
+        "tom.zanussi@linux.intel.com" <tom.zanussi@linux.intel.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH V2 7/8] vfio/pci: Support dynamic MSI-x
+Message-ID: <20230404124334.45cddae2.alex.williamson@redhat.com>
+In-Reply-To: <ad8c9137-bd57-4862-46c8-2c77a21b3419@intel.com>
+References: <cover.1680038771.git.reinette.chatre@intel.com>
+        <419f3ba2f732154d8ae079b3deb02d0fdbe3e258.1680038771.git.reinette.chatre@intel.com>
+        <20230330164050.0069e2a5.alex.williamson@redhat.com>
+        <20230330164214.67ccbdfa.alex.williamson@redhat.com>
+        <688393bf-445c-15c5-e84d-1c16261a4197@intel.com>
+        <20230331162456.3f52b9e3.alex.williamson@redhat.com>
+        <e15d588e-b63f-ab70-f6ae-91ceea8be79a@intel.com>
+        <20230403142227.1328b373.alex.williamson@redhat.com>
+        <57a8c701-bf97-fddd-9ac0-fc4d09e3cb16@intel.com>
+        <20230403211841.0e206b67.alex.williamson@redhat.com>
+        <BN9PR11MB527626CAE4BA7ECB64F0E9728C939@BN9PR11MB5276.namprd11.prod.outlook.com>
+        <ad8c9137-bd57-4862-46c8-2c77a21b3419@intel.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAJHc60y1BLQC4c0qXCuqF7JfewBC_fG2xuH0Wj0AHJh9x3CK5g@mail.gmail.com>
-X-Migadu-Flow: FLOW_OUT
-X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
-        DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
-        autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Apr 03, 2023 at 10:26:01AM -0700, Raghavendra Rao Ananta wrote:
-> Hi Oliver,
+On Tue, 4 Apr 2023 10:29:14 -0700
+Reinette Chatre <reinette.chatre@intel.com> wrote:
+
+> Hi Kevin,
 > 
-> On Wed, Mar 29, 2023 at 6:19 PM Oliver Upton <oliver.upton@linux.dev> wrote:
-> >
-> > On Mon, Feb 06, 2023 at 05:23:35PM +0000, Raghavendra Rao Ananta wrote:
-> > > Define a generic function __kvm_tlb_flush_range() to
-> > > invalidate the TLBs over a range of addresses. The
-> > > implementation accepts 'op' as a generic TLBI operation.
-> > > Upcoming patches will use this to implement IPA based
-> > > TLB invalidations (ipas2e1is).
-> > >
-> > > If the system doesn't support FEAT_TLBIRANGE, the
-> > > implementation falls back to flushing the pages one by one
-> > > for the range supplied.
-> > >
-> > > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-> > > ---
-> > >  arch/arm64/include/asm/kvm_asm.h | 18 ++++++++++++++++++
-> > >  1 file changed, 18 insertions(+)
-> > >
-> > > diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-> > > index 43c3bc0f9544d..995ff048e8851 100644
-> > > --- a/arch/arm64/include/asm/kvm_asm.h
-> > > +++ b/arch/arm64/include/asm/kvm_asm.h
-> > > @@ -221,6 +221,24 @@ DECLARE_KVM_NVHE_SYM(__per_cpu_end);
-> > >  DECLARE_KVM_HYP_SYM(__bp_harden_hyp_vecs);
-> > >  #define __bp_harden_hyp_vecs CHOOSE_HYP_SYM(__bp_harden_hyp_vecs)
-> > >
-> > > +#define __kvm_tlb_flush_range(op, mmu, start, end, level, tlb_level) do {    \
-> > > +     unsigned long pages, stride;                                            \
-> > > +                                                                             \
-> > > +     stride = kvm_granule_size(level);                                       \
-> >
-> > Hmm... There's a rather subtle and annoying complication here that I
-> > don't believe is handled.
-> >
-> > Similar to what I said in the last spin of the series, there is no
-> > guarantee that a range of IPAs is mapped at the exact same level
-> > throughout. Dirty logging and memslots that aren't hugepage aligned
-> > could lead to a mix of mapping levels being used within a range of the
-> > IPA space.
-> >
-> Unlike the comment on v1, the level/stride here is used to jump the
-> addresses in case the system doesn't support TLBIRANGE. The TTL hint
-> is 0.
+> On 4/3/2023 8:51 PM, Tian, Kevin wrote:
+> >> From: Alex Williamson <alex.williamson@redhat.com>
+> >> Sent: Tuesday, April 4, 2023 11:19 AM  
+> >>>
+> >>> Thank you very much for your guidance. I will digest this some more and
+> >>> see how wrappers could be used. In the mean time while trying to think  
+> >> how  
+> >>> to unify this code I do think there is an issue in this patch in that
+> >>> the get_cached_msi_msg()/pci_write_msi_msg()
+> >>> should not be in an else branch.
+> >>>
+> >>> Specifically, I think it needs to be:
+> >>> 	if (msix) {
+> >>> 		if (irq == -EINVAL) {
+> >>> 			/* dynamically allocate interrupt */
+> >>> 		}
+> >>> 		get_cached_msi_msg(irq, &msg);
+> >>> 		pci_write_msi_msg(irq, &msg);
+> >>> 	}  
+> >>
+> >> Yes, that's looked wrong to me all along, I think that resolves it.
+> >> Thanks,
+> >>  
+> > 
+> > Do you mind elaborating why this change is required? I thought
+> > pci_msix_alloc_irq_at() will compose a new msi message to write
+> > hence no need to get cached value again in that case...  
+> 
+> With this change an interrupt allocated via pci_msix_alloc_irq_at()
+> is treated the same as an interrupt allocated via pci_alloc_irq_vectors().
+> 
+> get_cached_msi_msg()/pci_write_msi_msg() is currently called for
+> every allocated interrupt and this snippet intends to maintain
+> this behavior.
+> 
+> One flow I considered that made me think this is fixing a bug is
+> as follows:
+> Scenario A (current behavior):
+> - host/user enables vectors 0, 1, 2 ,3 ,4
+>   - kernel allocates all interrupts via pci_alloc_irq_vectors()
+>   - get_cached_msi_msg()/pci_write_msi_msg() is called for each interrupt
 
-Right. So we agree that the level is not uniform throughout the provided
-range. The invalidation by IPA is also used if 'pages' is odd, even on
-systems with TLBIRANGE. We must assume the worst case here, in that the
-TLBI by IPA invalidated a single PTE-level entry. You could wind up
-over-invalidating in that case, but you'd still be correct.
+In this scenario, I think the intention is that there's non-zero
+time since pci_alloc_irq_vectors() such that a device reset or other
+manipulation of the vector table may have occurred, therefore we're
+potentially restoring the programming of the vector table with this
+get/write.
 
-> That being said, do you think we can always assume the least possible
-> stride (say, 4k) and hardcode it?
-> With respect to alignment, since the function is only called while
-> breaking the table PTE,  do you think it'll still be a problem even if
-> we go with the least granularity stride?
+> Scenario B (this series):
+> - host/user enables vector 0
+>   - kernel allocates interrupt 0 via pci_alloc_irq_vectors()
+>   - get_cached_msi_msg()/pci_write_msi_msg() is called for interrupt 0
+> - host/user enables vector 1
+>   - kernel allocates interrupt 1 via pci_msix_alloc_irq_at()
+>   - get_cached_msi_msg()/pci_write_msi_msg() is NOT called for interrupt 1
+>     /* This seems a bug since host may expect same outcome as in scenario A */
+> 
+> I am not familiar with how the MSI messages are composed though and I surely
+> could have gotten this wrong. I would like to learn more after you considered
+> the motivation for this change.
 
-I believe so. If we want to apply the range-based invalidations generally
-in KVM then we will not always be dealing with a block-aligned chunk of
-address.
+I think Kevin has a point, if it's correct that we do this get/write in
+order to account for manipulation of the device since we wrote into the
+vector table via either pci_alloc_irq_vectors() or
+pci_msix_alloc_irq_at(), then it really only makes sense to do that
+restore if we haven't allocated the irq and written the vector table
+immediately prior.  Thanks,
 
-> > > +     start = round_down(start, stride);                                      \
-> > > +     end = round_up(end, stride);                                            \
-> > > +     pages = (end - start) >> PAGE_SHIFT;                                    \
-> > > +                                                                             \
-> > > +     if ((!system_supports_tlb_range() &&                                    \
-> > > +          (end - start) >= (MAX_TLBI_OPS * stride)) ||                       \
-> >
-> > Doesn't checking for TLBIRANGE above eliminate the need to test against
-> > MAX_TLBI_OPS?
-> >
-> Derived from __flush_tlb_range(), I think the condition is used to
-> just flush everything if the range is too large to iterate and flush
-> when the system doesn't support TLBIRANGE. Probably to prevent
-> soft-lockups?
+Alex
 
-Right, but you test above for system_supports_tlb_range(), meaning that
-you'd unconditionally call __kvm_tlb_flush_vmid() below.
-
-> > > +         pages >= MAX_TLBI_RANGE_PAGES) {                                    \
-> > > +             __kvm_tlb_flush_vmid(mmu);                                      \
-> > > +             break;                                                          \
-> > > +     }                                                                       \
-> > > +                                                                             \
-> > > +     __flush_tlb_range_op(op, start, pages, stride, 0, tlb_level, false);    \
-> > > +} while (0)
-
--- 
-Thanks,
-Oliver
