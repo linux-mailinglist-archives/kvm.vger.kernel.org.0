@@ -2,242 +2,219 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4AD986D6F35
-	for <lists+kvm@lfdr.de>; Tue,  4 Apr 2023 23:46:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ECD016D6F46
+	for <lists+kvm@lfdr.de>; Tue,  4 Apr 2023 23:49:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236529AbjDDVqH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Apr 2023 17:46:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52348 "EHLO
+        id S236549AbjDDVts (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Apr 2023 17:49:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54220 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235833AbjDDVqG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Apr 2023 17:46:06 -0400
-Received: from mail-ot1-x333.google.com (mail-ot1-x333.google.com [IPv6:2607:f8b0:4864:20::333])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D8B910CA
-        for <kvm@vger.kernel.org>; Tue,  4 Apr 2023 14:46:05 -0700 (PDT)
-Received: by mail-ot1-x333.google.com with SMTP id x8-20020a9d3788000000b0069f922cd5ceso18119760otb.12
-        for <kvm@vger.kernel.org>; Tue, 04 Apr 2023 14:46:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1680644764;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sep2IsHHPi6VwoK6jVRyP5qZG2pWFbR4+s4uvdE1Pj8=;
-        b=TVNVkJ7Wgr3eBNyrguuJr4KbyC36pm49mYs5WIGWBdhvxbh36y5KZn55NFo2bZYEMS
-         XJEYOZlehkfGVtYXb8z/Rh3KbYZCORYlfv1Yo16FL8npwtDgrJP42nOUqVBlup3W/OAg
-         NbEweNaP+ZYnp0HJ6Oxg5pgrGU6th66YTULpbiUgOa3DRxZcmEXebsACoZTgNrJITZhX
-         DnIt5IYnST38UbSJ4oKygwuHgqiS1+8zAlYV1RKtZnu7IixetGzLgEPnEgi9ipaB/00R
-         E67fSn8ENKTlMswf/ShwbSXGWxe+2VxSp6GLh+5gEDDmA1837VObl0oKWs7chi17hnsw
-         jUZw==
+        with ESMTP id S229608AbjDDVtq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Apr 2023 17:49:46 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C35423C2F
+        for <kvm@vger.kernel.org>; Tue,  4 Apr 2023 14:49:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1680644941;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=BMOmz/hCD9hq0xa7lEyqqxxsKm/tr2tmPnHhHb56dRc=;
+        b=Wl2FQKaclK3bIMwaPqw8tF0bHXkMeft5YD6XVT9SYhMVKcxhqXdgZLaSb/ineNNkG5oi9K
+        52UtyOBShBrbobrzl3XLqOl4ZLieB38C3Qzq2G9ZMv+ZY+u2kIxLmMJCrkj/aDhfprGDx8
+        FyspkpU3qUnrxiuJIDp44/pJJdcS9WU=
+Received: from mail-il1-f198.google.com (mail-il1-f198.google.com
+ [209.85.166.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-287-7NyNVallPSi48MD41eRUbw-1; Tue, 04 Apr 2023 17:48:57 -0400
+X-MC-Unique: 7NyNVallPSi48MD41eRUbw-1
+Received: by mail-il1-f198.google.com with SMTP id d11-20020a056e020c0b00b00326156e3a8bso16631806ile.3
+        for <kvm@vger.kernel.org>; Tue, 04 Apr 2023 14:48:57 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680644764;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20210112; t=1680644937;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=sep2IsHHPi6VwoK6jVRyP5qZG2pWFbR4+s4uvdE1Pj8=;
-        b=xncravRL6ok8VwKtruXdYFuECEGFHoiYNqytXckTnR+XzCCxDBVc3KoAXTvdp7gRpi
-         c8urHh0h1zLZFq6MGI+264kfeV7GSora5WLECN6bkbWSZUbv8rDLFMXoClr+zseDZGmg
-         Drh5brEB1o7F3ejmPJgbQOEzyQHg75FJEomTn3gVIQbBicw2HH0lT+IPMs4NyYIR3ony
-         ekQX6trtkWylNPKE/rAbweSp0cGhRUqppR6OKpfjtVFRUmKwkhej/iBIeu1pSEaDQNEZ
-         rvP2/agP0HUQFNa4lata88bSRWE7+Y7KITYM0Uzmr0IZciBTk/cPTfYIuYQMKSId5ncG
-         O2Tg==
-X-Gm-Message-State: AAQBX9ew6H8o/XTY4sIfc0TzW3MfU27chFUrQy6nk1l+hBI96KengKxU
-        dC/z6+8yOnJPAHqDvsDB70weXlTmhQKVnGaw23jvFw==
-X-Google-Smtp-Source: AKy350bcPlJB7oPstsY310EnzkBFuuMkGNuuxOTrisQk1MNOgJbl7QRAmzq9lGup3ADNCpG68LK4svZ9J/yeKc1spZE=
-X-Received: by 2002:a05:6830:1be4:b0:6a1:1b5c:c6db with SMTP id
- k4-20020a0568301be400b006a11b5cc6dbmr1292746otb.7.1680644764217; Tue, 04 Apr
- 2023 14:46:04 -0700 (PDT)
+        bh=BMOmz/hCD9hq0xa7lEyqqxxsKm/tr2tmPnHhHb56dRc=;
+        b=EwmoLXt2yz1ZK0bOKiHo8biK10PiSePHnVAfu+RrgZVeyic8lTbOKFdPs4THnDwL+4
+         HuXRxLfSITls/oWhngGq9y8IW7IdvYshBO5Ao7EXL66QxHq16fLL9kH6XFHCHB7obLf9
+         LHVMc1gjGTpStb3NMKVCow8WZXznBfRdwwGD1Y5CehBlvjAp1WV8J3XpfQGTa4AZL3Hn
+         +Wh8zUsfit5cJqZ8ZAHTwpBY+uRRZqHRIiqKiAuTIUHeEmTkA7mKWAaTtCbF3wzqtheE
+         R84UsqFm5hAbMI99m370qR7MnkkLNmKJaZu8gfB5GUi/DLfZxCO01l1tieITMCHlJGu2
+         U8xg==
+X-Gm-Message-State: AAQBX9f6CfKLZSLFj0q7bvyk2JUPuKtCPGRa46X08YDwy7BLvzVQB5hd
+        Rkyo9eceb6M7dGBQu7vTwksvAUY/DX7UxvmunTvVSLySm9Bn5n5DUVIXz35QfFi1dS0xTCSNZ5Z
+        w6kdgH/jthEqS
+X-Received: by 2002:a92:dac3:0:b0:325:fb39:8494 with SMTP id o3-20020a92dac3000000b00325fb398494mr3960291ilq.4.1680644937157;
+        Tue, 04 Apr 2023 14:48:57 -0700 (PDT)
+X-Google-Smtp-Source: AKy350b8lhguNnSPsqwDGg9DndWThvVQtcWBignwR7e7WGC5/A4W046vPbFQR7NCsx0PzkO+Dv+mIw==
+X-Received: by 2002:a92:dac3:0:b0:325:fb39:8494 with SMTP id o3-20020a92dac3000000b00325fb398494mr3960288ilq.4.1680644936898;
+        Tue, 04 Apr 2023 14:48:56 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id c13-20020a928e0d000000b00325df6679a7sm3456502ild.26.2023.04.04.14.48.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 04 Apr 2023 14:48:55 -0700 (PDT)
+Date:   Tue, 4 Apr 2023 15:48:54 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Eric Auger <eric.auger@redhat.com>
+Cc:     Yi Liu <yi.l.liu@intel.com>, jgg@nvidia.com, kevin.tian@intel.com,
+        joro@8bytes.org, robin.murphy@arm.com, cohuck@redhat.com,
+        nicolinc@nvidia.com, kvm@vger.kernel.org, mjrosato@linux.ibm.com,
+        chao.p.peng@linux.intel.com, yi.y.sun@linux.intel.com,
+        peterx@redhat.com, jasowang@redhat.com,
+        shameerali.kolothum.thodi@huawei.com, lulu@redhat.com,
+        suravee.suthikulpanit@amd.com, intel-gvt-dev@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org, linux-s390@vger.kernel.org,
+        xudong.hao@intel.com, yan.y.zhao@intel.com, terrence.xu@intel.com,
+        yanting.jiang@intel.com
+Subject: Re: [PATCH v3 04/12] vfio-iommufd: Add helper to retrieve
+ iommufd_ctx and devid for vfio_device
+Message-ID: <20230404154854.4d9a95f0.alex.williamson@redhat.com>
+In-Reply-To: <702c2883-1d51-b609-1e99-337295e6e307@redhat.com>
+References: <20230401144429.88673-1-yi.l.liu@intel.com>
+        <20230401144429.88673-5-yi.l.liu@intel.com>
+        <702c2883-1d51-b609-1e99-337295e6e307@redhat.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-References: <20230206172340.2639971-1-rananta@google.com> <20230206172340.2639971-8-rananta@google.com>
- <ZCTa5wfVtGScLQEa@linux.dev> <CAJHc60xvSFpUs+o84fR14Rghd6rruBJkCMBtroeCeLDtjJg=gw@mail.gmail.com>
- <ZCx4QCs+cjr4nYev@linux.dev> <CAJHc60xQ36vah9+eEOLqKdjamfoxijPTwXLrrhOy=NVvMW=VOw@mail.gmail.com>
- <ZCyXEsm0RkvMQuns@linux.dev>
-In-Reply-To: <ZCyXEsm0RkvMQuns@linux.dev>
-From:   Raghavendra Rao Ananta <rananta@google.com>
-Date:   Tue, 4 Apr 2023 14:45:52 -0700
-Message-ID: <CAJHc60y84QDxYsBUNX4EmhyQSM=SJkmYus82GW9k+BmZV96Vjg@mail.gmail.com>
-Subject: Re: [PATCH v2 7/7] KVM: arm64: Create a fast stage-2 unmap path
-To:     Oliver Upton <oliver.upton@linux.dev>
-Cc:     h@linux.dev, Oliver Upton <oupton@google.com>,
-        Marc Zyngier <maz@kernel.org>,
-        Ricardo Koller <ricarkol@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Colton Lewis <coltonlewis@google.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-15.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,ENV_AND_HDR_SPF_MATCH,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL,
-        USER_IN_DEF_SPF_WL autolearn=unavailable autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Apr 4, 2023 at 2:31=E2=80=AFPM Oliver Upton <oliver.upton@linux.dev=
-> wrote:
->
-> On Tue, Apr 04, 2023 at 02:07:06PM -0700, Raghavendra Rao Ananta wrote:
-> > On Tue, Apr 4, 2023 at 12:19=E2=80=AFPM Oliver Upton <oliver.upton@linu=
-x.dev> wrote:
-> > >
-> > > On Tue, Apr 04, 2023 at 10:52:01AM -0700, Raghavendra Rao Ananta wrot=
-e:
-> > > > On Wed, Mar 29, 2023 at 5:42=E2=80=AFPM Oliver Upton <oliver.upton@=
-linux.dev> wrote:
-> > > > >
-> > > > > On Mon, Feb 06, 2023 at 05:23:40PM +0000, Raghavendra Rao Ananta =
-wrote:
-> > > > > > The current implementation of the stage-2 unmap walker
-> > > > > > traverses the entire page-table to clear and flush the TLBs
-> > > > > > for each entry. This could be very expensive, especially if
-> > > > > > the VM is not backed by hugepages. The unmap operation could be
-> > > > > > made efficient by disconnecting the table at the very
-> > > > > > top (level at which the largest block mapping can be hosted)
-> > > > > > and do the rest of the unmapping using free_removed_table().
-> > > > > > If the system supports FEAT_TLBIRANGE, flush the entire range
-> > > > > > that has been disconnected from the rest of the page-table.
-> > > > > >
-> > > > > > Suggested-by: Ricardo Koller <ricarkol@google.com>
-> > > > > > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-> > > > > > ---
-> > > > > >  arch/arm64/kvm/hyp/pgtable.c | 44 ++++++++++++++++++++++++++++=
-++++++++
-> > > > > >  1 file changed, 44 insertions(+)
-> > > > > >
-> > > > > > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/=
-pgtable.c
-> > > > > > index 0858d1fa85d6b..af3729d0971f2 100644
-> > > > > > --- a/arch/arm64/kvm/hyp/pgtable.c
-> > > > > > +++ b/arch/arm64/kvm/hyp/pgtable.c
-> > > > > > @@ -1017,6 +1017,49 @@ static int stage2_unmap_walker(const str=
-uct kvm_pgtable_visit_ctx *ctx,
-> > > > > >       return 0;
-> > > > > >  }
-> > > > > >
-> > > > > > +/*
-> > > > > > + * The fast walker executes only if the unmap size is exactly =
-equal to the
-> > > > > > + * largest block mapping supported (i.e. at KVM_PGTABLE_MIN_BL=
-OCK_LEVEL),
-> > > > > > + * such that the underneath hierarchy at KVM_PGTABLE_MIN_BLOCK=
-_LEVEL can
-> > > > > > + * be disconnected from the rest of the page-table without the=
- need to
-> > > > > > + * traverse all the PTEs, at all the levels, and unmap each an=
-d every one
-> > > > > > + * of them. The disconnected table is freed using free_removed=
-_table().
-> > > > > > + */
-> > > > > > +static int fast_stage2_unmap_walker(const struct kvm_pgtable_v=
-isit_ctx *ctx,
-> > > > > > +                            enum kvm_pgtable_walk_flags visit)
-> > > > > > +{
-> > > > > > +     struct kvm_pgtable_mm_ops *mm_ops =3D ctx->mm_ops;
-> > > > > > +     kvm_pte_t *childp =3D kvm_pte_follow(ctx->old, mm_ops);
-> > > > > > +     struct kvm_s2_mmu *mmu =3D ctx->arg;
-> > > > > > +
-> > > > > > +     if (!kvm_pte_valid(ctx->old) || ctx->level !=3D KVM_PGTAB=
-LE_MIN_BLOCK_LEVEL)
-> > > > > > +             return 0;
-> > > > > > +
-> > > > > > +     if (!stage2_try_break_pte(ctx, mmu))
-> > > > > > +             return -EAGAIN;
-> > > > > > +
-> > > > > > +     /*
-> > > > > > +      * Gain back a reference for stage2_unmap_walker() to fre=
-e
-> > > > > > +      * this table entry from KVM_PGTABLE_MIN_BLOCK_LEVEL - 1.
-> > > > > > +      */
-> > > > > > +     mm_ops->get_page(ctx->ptep);
-> > > > >
-> > > > > Doesn't this run the risk of a potential UAF if the refcount was =
-1 before
-> > > > > calling stage2_try_break_pte()? IOW, stage2_try_break_pte() will =
-drop
-> > > > > the refcount to 0 on the page before this ever gets called.
-> > > > >
-> > > > > Also, AFAICT this misses the CMOs that are required on systems w/=
-o
-> > > > > FEAT_FWB. Without them it is possible that the host will read som=
-ething
-> > > > > other than what was most recently written by the guest if it is u=
-sing
-> > > > > noncacheable memory attributes at stage-1.
-> > > > >
-> > > > > I imagine the actual bottleneck is the DSB required after every
-> > > > > CMO/TLBI. Theoretically, the unmap path could be updated to:
-> > > > >
-> > > > >  - Perform the appropriate CMOs for every valid leaf entry *witho=
-ut*
-> > > > >    issuing a DSB.
-> > > > >
-> > > > >  - Elide TLBIs entirely that take place in the middle of the walk
-> > > > >
-> > > > >  - After the walk completes, dsb(ish) to guarantee that the CMOs =
-have
-> > > > >    completed and the invalid PTEs are made visible to the hardwar=
-e
-> > > > >    walkers. This should be done implicitly by the TLBI implementa=
-tion
-> > > > >
-> > > > >  - Invalidate the [addr, addr + size) range of IPAs
-> > > > >
-> > > > > This would also avoid over-invalidating stage-1 since we blast th=
-e
-> > > > > entire stage-1 context for every stage-2 invalidation. Thoughts?
-> > > > >
-> > > > Correct me if I'm wrong, but if we invalidate the TLB after the wal=
-k
-> > > > is complete, don't you think there's a risk of race if the guest ca=
-n
-> > > > hit in the TLB even though the page was unmapped?
-> > >
-> > > Yeah, we'd need to do the CMOs _after_ making the translation invalid=
- in
-> > > the page tables and completing the TLB invalidation. Apologies.
-> > >
-> > > Otherwise, the only requirement we need to uphold w/ either the MMU
-> > > notifiers or userspace is that the translation has been invalidated a=
-t
-> > > the time of return.
-> > >
-> > Actually, my concern about the race was against the hardware. If we
-> > follow the above approach, let's say we invalidated a certain set of
-> > PTEs, but the TLBs aren't yet invalidated. During this point if
-> > another vCPU accesses the range governed by the invalidated PTEs,
-> > wouldn't it still hit in the TLB? Have I misunderstood you or am I
-> > missing something?
->
-> Yep, that's exactly what would happen. There is no way to eliminate the
-> race you mention, there will always be a window of time where the page
-> tables no longer contain a particular translation but the TLBs may still
-> be holding a valid entry.
->
-This is new to me :)
+On Tue, 4 Apr 2023 17:28:40 +0200
+Eric Auger <eric.auger@redhat.com> wrote:
 
-> This race is benign so long as we guarantee that all translations for
-> the affected address (i.e. in the page tables, cached in a TLB) have
-> been invalidated before returning to the caller. For example, MM cannot
-> start swapping out guest memory until it is guaranteed that the guest is
-> no longer writing to it.
->
-Well, if you feel that the risk is acceptable, we can probably defer
-the invalidations until the unmap walk is finished.
+> Hi,
+> 
+> On 4/1/23 16:44, Yi Liu wrote:
+> > This is needed by the vfio-pci driver to report affected devices in the
+> > hot reset for a given device.
+> >
+> > Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
+> > Tested-by: Yanting Jiang <yanting.jiang@intel.com>
+> > Signed-off-by: Yi Liu <yi.l.liu@intel.com>
+> > ---
+> >  drivers/iommu/iommufd/device.c | 12 ++++++++++++
+> >  drivers/vfio/iommufd.c         | 14 ++++++++++++++
+> >  include/linux/iommufd.h        |  3 +++
+> >  include/linux/vfio.h           | 13 +++++++++++++
+> >  4 files changed, 42 insertions(+)
+> >
+> > diff --git a/drivers/iommu/iommufd/device.c b/drivers/iommu/iommufd/device.c
+> > index 25115d401d8f..04a57aa1ae2c 100644
+> > --- a/drivers/iommu/iommufd/device.c
+> > +++ b/drivers/iommu/iommufd/device.c
+> > @@ -131,6 +131,18 @@ void iommufd_device_unbind(struct iommufd_device *idev)
+> >  }
+> >  EXPORT_SYMBOL_NS_GPL(iommufd_device_unbind, IOMMUFD);
+> >  
+> > +struct iommufd_ctx *iommufd_device_to_ictx(struct iommufd_device *idev)
+> > +{
+> > +	return idev->ictx;
+> > +}
+> > +EXPORT_SYMBOL_NS_GPL(iommufd_device_to_ictx, IOMMUFD);
+> > +
+> > +u32 iommufd_device_to_id(struct iommufd_device *idev)
+> > +{
+> > +	return idev->obj.id;
+> > +}
+> > +EXPORT_SYMBOL_NS_GPL(iommufd_device_to_id, IOMMUFD);
+> > +
+> >  static int iommufd_device_setup_msi(struct iommufd_device *idev,
+> >  				    struct iommufd_hw_pagetable *hwpt,
+> >  				    phys_addr_t sw_msi_start)
+> > diff --git a/drivers/vfio/iommufd.c b/drivers/vfio/iommufd.c
+> > index 88b00c501015..809f2dd73b9e 100644
+> > --- a/drivers/vfio/iommufd.c
+> > +++ b/drivers/vfio/iommufd.c
+> > @@ -66,6 +66,20 @@ void vfio_iommufd_unbind(struct vfio_device *vdev)
+> >  		vdev->ops->unbind_iommufd(vdev);
+> >  }
+> >  
+> > +struct iommufd_ctx *vfio_iommufd_physical_ictx(struct vfio_device *vdev)
+> > +{
+> > +	if (!vdev->iommufd_device)
+> > +		return NULL;
+> > +	return iommufd_device_to_ictx(vdev->iommufd_device);
+> > +}
+> > +EXPORT_SYMBOL_GPL(vfio_iommufd_physical_ictx);
+> > +
+> > +void vfio_iommufd_physical_devid(struct vfio_device *vdev, u32 *id)
+> > +{
+> > +	if (vdev->iommufd_device)
+> > +		*id = iommufd_device_to_id(vdev->iommufd_device);  
+> since there is no return value, may be worth to add at least a WARN_ON
+> in case of !vdev->iommufd_device
 
-Thank you.
-Raghavendra
+Yeah, this is bizarre and makes the one caller of this interface very
+awkward.  We later go on to define IOMMUFD_INVALID_ID, so this should
+simply return that in the case of no iommufd_device and skip this
+unnecessary pointer passing.  Thanks,
 
-> --
-> Thanks,
-> Oliver
+Alex
+
+> > +}
+> > +EXPORT_SYMBOL_GPL(vfio_iommufd_physical_devid);
+> >  /*
+> >   * The physical standard ops mean that the iommufd_device is bound to the
+> >   * physical device vdev->dev that was provided to vfio_init_group_dev(). Drivers
+> > diff --git a/include/linux/iommufd.h b/include/linux/iommufd.h
+> > index 1129a36a74c4..ac96df406833 100644
+> > --- a/include/linux/iommufd.h
+> > +++ b/include/linux/iommufd.h
+> > @@ -24,6 +24,9 @@ void iommufd_device_unbind(struct iommufd_device *idev);
+> >  int iommufd_device_attach(struct iommufd_device *idev, u32 *pt_id);
+> >  void iommufd_device_detach(struct iommufd_device *idev);
+> >  
+> > +struct iommufd_ctx *iommufd_device_to_ictx(struct iommufd_device *idev);
+> > +u32 iommufd_device_to_id(struct iommufd_device *idev);
+> > +
+> >  struct iommufd_access_ops {
+> >  	u8 needs_pin_pages : 1;
+> >  	void (*unmap)(void *data, unsigned long iova, unsigned long length);
+> > diff --git a/include/linux/vfio.h b/include/linux/vfio.h
+> > index 3188d8a374bd..97a1174b922f 100644
+> > --- a/include/linux/vfio.h
+> > +++ b/include/linux/vfio.h
+> > @@ -113,6 +113,8 @@ struct vfio_device_ops {
+> >  };
+> >  
+> >  #if IS_ENABLED(CONFIG_IOMMUFD)
+> > +struct iommufd_ctx *vfio_iommufd_physical_ictx(struct vfio_device *vdev);
+> > +void vfio_iommufd_physical_devid(struct vfio_device *vdev, u32 *id);
+> >  int vfio_iommufd_physical_bind(struct vfio_device *vdev,
+> >  			       struct iommufd_ctx *ictx, u32 *out_device_id);
+> >  void vfio_iommufd_physical_unbind(struct vfio_device *vdev);
+> > @@ -122,6 +124,17 @@ int vfio_iommufd_emulated_bind(struct vfio_device *vdev,
+> >  void vfio_iommufd_emulated_unbind(struct vfio_device *vdev);
+> >  int vfio_iommufd_emulated_attach_ioas(struct vfio_device *vdev, u32 *pt_id);
+> >  #else
+> > +static inline struct iommufd_ctx *
+> > +vfio_iommufd_physical_ictx(struct vfio_device *vdev)
+> > +{
+> > +	return NULL;
+> > +}
+> > +
+> > +static inline void
+> > +vfio_iommufd_physical_devid(struct vfio_device *vdev, u32 *id)
+> > +{
+> > +}
+> > +
+> >  #define vfio_iommufd_physical_bind                                      \
+> >  	((int (*)(struct vfio_device *vdev, struct iommufd_ctx *ictx,   \
+> >  		  u32 *out_device_id)) NULL)  
+> besides
+> 
+> Reviewed-by: Eric Auger <eric.auger@redhat.com>
+> 
+> Eric
+> 
+
