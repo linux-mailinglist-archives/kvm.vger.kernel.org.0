@@ -2,60 +2,81 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D8DC26D58AD
-	for <lists+kvm@lfdr.de>; Tue,  4 Apr 2023 08:18:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B58AA6D58B5
+	for <lists+kvm@lfdr.de>; Tue,  4 Apr 2023 08:24:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233743AbjDDGS5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Apr 2023 02:18:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39914 "EHLO
+        id S233633AbjDDGYJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Apr 2023 02:24:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45186 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233465AbjDDGSu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Apr 2023 02:18:50 -0400
-Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 486042705
-        for <kvm@vger.kernel.org>; Mon,  3 Apr 2023 23:18:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1680589096; x=1712125096;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=VDyMFgzKCaJ9TnC9ECWNQFyHiJvgRFWuo7ncWcBsgYs=;
-  b=RHJz9Q35aXdV6sTD382zCfFxZJf1iwnAnrdllEviFpLvOuNM08seIR/1
-   xXqwFBsayZcIUz4bBExYCtQ09sCGJSmND6j+SOZu1kcolRtTSKg5rurOk
-   AcQLqYtoSsIYjFawQ/8zIU39Vx8ikHmxLXbGaftU7BuG3jMeyeUF1dMO3
-   vxbe34tJ3SmzqHAQ73Ucl9gC16Tq7wh1pNyReGExKHc9JcvKlDQpcEavy
-   Wowr4rSDhGpu6eyapv2hro24pAvoaJJffzKuw8clN42RNffIpOWqPxoCS
-   pdz2YXaKR9itEKIh4AxqQfK6jFzFwKIIB7Sw0PBzqHp/qxa/EMwgKOUtb
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10669"; a="407161253"
-X-IronPort-AV: E=Sophos;i="5.98,316,1673942400"; 
-   d="scan'208";a="407161253"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Apr 2023 23:18:15 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10669"; a="663464967"
-X-IronPort-AV: E=Sophos;i="5.98,316,1673942400"; 
-   d="scan'208";a="663464967"
-Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.254.215.140]) ([10.254.215.140])
-  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Apr 2023 23:18:12 -0700
-Message-ID: <23cb6ccf-18e6-2728-e2b4-def4d9e9c601@linux.intel.com>
-Date:   Tue, 4 Apr 2023 14:18:11 +0800
+        with ESMTP id S233236AbjDDGYH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Apr 2023 02:24:07 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3594B138
+        for <kvm@vger.kernel.org>; Mon,  3 Apr 2023 23:23:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1680589401;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:mime-version:mime-version:
+         content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=APNrYYwPBAuPO+GWb7+dbYKyxbTjRyfGmu8CPqknU3k=;
+        b=COXlicD+7EXAJ+V275J7ui2dMHKOPPP6Gfd1pAzppXqLa2Q/RkyXQAgkB9RKbUWi+8W/MJ
+        xZejej26+ewSBF4BrrfFoaKLl8wUyKsTsAMhIKHVrmPdOkoXAnz607dRZHxp7bSaF7pDHB
+        1YZAuMN2LxAUd5VgEVPA7Gyp9l+YrIk=
+Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
+ [209.85.160.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-578-pyt_4OIvPTeFRYSVb-fZDA-1; Tue, 04 Apr 2023 02:23:20 -0400
+X-MC-Unique: pyt_4OIvPTeFRYSVb-fZDA-1
+Received: by mail-qt1-f197.google.com with SMTP id r4-20020ac867c4000000b003bfefb6dd58so21564465qtp.2
+        for <kvm@vger.kernel.org>; Mon, 03 Apr 2023 23:23:20 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1680589399;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:reply-to:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=APNrYYwPBAuPO+GWb7+dbYKyxbTjRyfGmu8CPqknU3k=;
+        b=FH717nIcUtTKIASW8cEIWhbPZrAinDPKr0HHjllA3UI0Bw89dx8uGHNUCCUgyyAGxS
+         Ja6X9R0+uyoMtD5YypKL0SvajDYQ/bgghrt7+ujg6Z5oQPi72/yDNzmiFrqnUXVgr3Vx
+         7F+MF8urvJH599RdAg5WklSvTUzZbxQTTlwjhfE9CHMqXVPOuTfB7IvB2DdiCHQRnwCn
+         EyP+OCyJ1LrIYUACqeSnEB9QajfRKIEKbrwfSwAyZvvZYQjx8YLenRNWu25fqD5qYZQU
+         o3hzZgbr80Nob/zTDKQC5XePgpPPzBDDfI2jB67rNoavjYK9MGpT3Vjt8vwJ6w+L7Hcf
+         ZDbg==
+X-Gm-Message-State: AAQBX9dDqzsMISlXe/whzIchEeYjRajZPs0DJSTFspnD6IvdRv5cHgvL
+        wRnAfl3ipxDnkkFVKm91UdNV8yN/1sTgk9PkIbg5BprO6HFPrz42+YYknAgZD19v/VHw6ne93rI
+        f3YVqpjOgeuZz
+X-Received: by 2002:a05:6214:21a4:b0:56f:d8:dbb4 with SMTP id t4-20020a05621421a400b0056f00d8dbb4mr1943711qvc.2.1680589399745;
+        Mon, 03 Apr 2023 23:23:19 -0700 (PDT)
+X-Google-Smtp-Source: AKy350azFYLEwDlMSgwwh8I9rqVxvJqaLdUyzLHmRZw0ztFX9U2/HybsX+OTx3X6c8SwpCBJw9wTYg==
+X-Received: by 2002:a05:6214:21a4:b0:56f:d8:dbb4 with SMTP id t4-20020a05621421a400b0056f00d8dbb4mr1943700qvc.2.1680589399506;
+        Mon, 03 Apr 2023 23:23:19 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id ny4-20020a056214398400b005e37909a7fcsm2022912qvb.13.2023.04.03.23.23.17
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 03 Apr 2023 23:23:18 -0700 (PDT)
+Message-ID: <968a026e-066e-deea-d02f-f64133295ff1@redhat.com>
+Date:   Tue, 4 Apr 2023 08:23:15 +0200
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.9.0
-Subject: Re: [kvm-unit-tests PATCH v2 1/4] x86: Allow setting of CR3 LAM bits
- if LAM supported
-To:     Chao Gao <chao.gao@intel.com>
-Cc:     kvm@vger.kernel.org, seanjc@google.com, pbonzini@redhat.com,
-        robert.hu@linux.intel.com
-References: <20230319083732.29458-1-binbin.wu@linux.intel.com>
- <20230319083732.29458-2-binbin.wu@linux.intel.com> <ZCu6+kqF2asJvwWU@gao-cwp>
-From:   Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <ZCu6+kqF2asJvwWU@gao-cwp>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.0
+Reply-To: eric.auger@redhat.com
+Subject: Re: [kvm-unit-tests PATCH 0/6] arm: pmu: Fix random failures of
+ pmu-chain-promotion
+Content-Language: en-US
+To:     eric.auger.pro@gmail.com, kvm@vger.kernel.org,
+        kvmarm@lists.linux.dev, andrew.jones@linux.dev, maz@kernel.org,
+        will@kernel.org, oliver.upton@linux.dev, ricarkol@google.com,
+        reijiw@google.com, alexandru.elisei@arm.com
+References: <20230315110725.1215523-1-eric.auger@redhat.com>
+From:   Eric Auger <eric.auger@redhat.com>
+In-Reply-To: <20230315110725.1215523-1-eric.auger@redhat.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.7 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
+X-Spam-Status: No, score=-1.5 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
         RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -64,65 +85,56 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi,
 
-On 4/4/2023 1:51 PM, Chao Gao wrote:
-> On Sun, Mar 19, 2023 at 04:37:29PM +0800, Binbin Wu wrote:
->> If LAM is supported, VM entry allows CR3.LAM_U48 (bit 62) and CR3.LAM_U57
->> (bit 61) to be set in CR3 field.
->>
->> Change the test result expectations when setting CR3.LAM_U48 or CR3.LAM_U57
->> on vmlaunch tests when LAM is supported.
->>
->> Signed-off-by: Binbin Wu <binbin.wu@linux.intel.com>
-> Reviewed-by: Chao Gao <chao.gao@intel.com>
+On 3/15/23 12:07, Eric Auger wrote:
+> On some HW (ThunderXv2), some random failures of
+> pmu-chain-promotion test can be observed.
 >
-> and two nits below:
+> pmu-chain-promotion is composed of several subtests
+> which run 2 mem_access loops. The initial value of
+> the counter is set so that no overflow is expected on
+> the first loop run and overflow is expected on the second.
+> However it is observed that sometimes we get an overflow
+> on the first run. It looks related to some variability of
+> the mem_acess count. This variability is observed on all
+> HW I have access to, with different span though. On
+> ThunderX2 HW it looks the margin that is currently taken
+> is too small and we regularly hit failure.
+>
+> although the first goal of this series is to increase
+> the count/margin used in those tests, it also attempts
+> to improve the pmu-chain-promotion logs, add some barriers
+> in the mem-access loop, clarify the chain counter
+> enable/disable sequence.
+>
+> A new 'pmu-memaccess-reliability' is also introduced to
+> detect issues with MEM_ACCESS event variability and make
+> the debug easier.
+>
+> Obviously one can wonder if this variability is something normal
+> and does not hide any other bug. I hope this series will raise
+> additional discussions about this.
+>
+> https://github.com/eauger/kut/tree/pmu-chain-promotion-fixes-v1
 
-Thanks, will update it.
+Gentle ping.
 
+Thanks
 
+Eric
 >
->> ---
->> lib/x86/processor.h | 2 ++
->> x86/vmx_tests.c     | 6 +++++-
->> 2 files changed, 7 insertions(+), 1 deletion(-)
->>
->> diff --git a/lib/x86/processor.h b/lib/x86/processor.h
->> index 3d58ef7..8373bbe 100644
->> --- a/lib/x86/processor.h
->> +++ b/lib/x86/processor.h
->> @@ -55,6 +55,8 @@
->> #define X86_CR0_PG		BIT(X86_CR0_PG_BIT)
->>
->> #define X86_CR3_PCID_MASK	GENMASK(11, 0)
->> +#define X86_CR3_LAM_U57_BIT	(61)
->> +#define X86_CR3_LAM_U48_BIT	(62)
->>
->> #define X86_CR4_VME_BIT		(0)
->> #define X86_CR4_VME		BIT(X86_CR4_VME_BIT)
->> diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
->> index 7bba816..1be22ac 100644
->> --- a/x86/vmx_tests.c
->> +++ b/x86/vmx_tests.c
->> @@ -7000,7 +7000,11 @@ static void test_host_ctl_regs(void)
->> 		cr3 = cr3_saved | (1ul << i);
->> 		vmcs_write(HOST_CR3, cr3);
->> 		report_prefix_pushf("HOST_CR3 %lx", cr3);
->> -		test_vmx_vmlaunch(VMXERR_ENTRY_INVALID_HOST_STATE_FIELD);
->> +		if (this_cpu_has(X86_FEATURE_LAM) &&
-> Nit: X86_FEATURE_LAM should be defined in this patch (instead of patch 2).
+> Eric Auger (6):
+>   arm: pmu: pmu-chain-promotion: Improve debug messages
+>   arm: pmu: pmu-chain-promotion: Introduce defines for count and margin
+>     values
+>   arm: pmu: Add extra DSB barriers in the mem_access loop
+>   arm: pmu: Fix chain counter enable/disable sequences
+>   arm: pmu: Add pmu-memaccess-reliability test
+>   arm: pmu-chain-promotion: Increase the count and margin values
 >
->> +		    ((i==X86_CR3_LAM_U57_BIT) || (i==X86_CR3_LAM_U48_BIT)))
-> Nit: spaces are needed around "==" i.e.,
+>  arm/pmu.c         | 189 +++++++++++++++++++++++++++++++++-------------
+>  arm/unittests.cfg |   6 ++
+>  2 files changed, 141 insertions(+), 54 deletions(-)
 >
-> 	((i == X86_CR3_LAM_U57_BIT) || (i == X86_CR3_LAM_U48_BIT)))
->
->> +			test_vmx_vmlaunch(0);
->> +		else
->> +			test_vmx_vmlaunch(VMXERR_ENTRY_INVALID_HOST_STATE_FIELD);
->> 		report_prefix_pop();
->> 	}
->>
->> -- 
->> 2.25.1
->>
+
