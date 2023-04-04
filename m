@@ -2,44 +2,44 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 087F86D55CF
-	for <lists+kvm@lfdr.de>; Tue,  4 Apr 2023 03:21:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B3E9D6D5627
+	for <lists+kvm@lfdr.de>; Tue,  4 Apr 2023 03:34:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229596AbjDDBVa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 3 Apr 2023 21:21:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42566 "EHLO
+        id S232656AbjDDBeh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 3 Apr 2023 21:34:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57428 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229446AbjDDBV2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 3 Apr 2023 21:21:28 -0400
+        with ESMTP id S229596AbjDDBeg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 3 Apr 2023 21:34:36 -0400
 Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2BF711FE0
-        for <kvm@vger.kernel.org>; Mon,  3 Apr 2023 18:21:28 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 398863AA5
+        for <kvm@vger.kernel.org>; Mon,  3 Apr 2023 18:34:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1680571288; x=1712107288;
+  t=1680572048; x=1712108048;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=I0Tne1xeDv3i0GoLHMNmx3mIMdSNoN2XF4qUp5t7G3A=;
-  b=C/Lr01ujBIrbpoIXVrdZqKKSBtmfMEmlvD0YFyngaW5dHupB4j5gbQD9
-   0MA+f9cmKA06omlTq10mhim6fd613SNLCV+Kq6b6pzdzIBiolZeaoI01Q
-   Sq9ft6scPtPXwIZdipVr2tq5CqSRA4MxibNTA1YHiJGXnuCiwMMPQ7VhB
-   MPaa/57hVbJQv9JoMhBAr/qBk14uic5REeFhmxsNSsp1j1gWKDAgQujZU
-   WAHa33ZfHih+o6Yb1L0rmzSEJckx+9j/BHcF5bd/hTxrHEdVOyLm3szIT
-   /Ksrs9EUCUuFfS4kSFBHSJSFLTtg+gHWkOOHeqJsjsivlA0aS2y2Qjt28
+  bh=pJ4f3+p4ivCsjlcWIVvjWyW4yA5MeOaZjWywsOXIeEo=;
+  b=ZcHFkdzygQi80PEDZRLXPftf8IruEFZemqP3BrhvWEkt++Xa9pvtUDBm
+   MbAzQJS9vCrqWydav+9Ss4obif2+GhVoIzN3Qp643WODyuKmnVq1fruNL
+   D54R6vGLvDrngXfFKmo/zZXXv2tmZPrkR/kk8DIKSXOdmNiuzZv/hHMPo
+   i/UKXCH0ad4Ufs7Bx8UfUAN40qns3RuSSHbQ29gfSH0KEh9zvq4xthbfz
+   9RDJV7EgzdgQTTUxm4PzriMBLregVyzxEEP9k8Y67uNHtyfAi7c66YRhT
+   0A7ku4FPh3+HJ3A925+EpwCu3r1zVFjsBGxSwDhY7vtfOOJYBMBzCNPIB
    Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10669"; a="342083760"
+X-IronPort-AV: E=McAfee;i="6600,9927,10669"; a="342085542"
 X-IronPort-AV: E=Sophos;i="5.98,316,1673942400"; 
-   d="scan'208";a="342083760"
+   d="scan'208";a="342085542"
 Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Apr 2023 18:21:27 -0700
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Apr 2023 18:31:38 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10669"; a="663401920"
+X-IronPort-AV: E=McAfee;i="6600,9927,10669"; a="663403074"
 X-IronPort-AV: E=Sophos;i="5.98,316,1673942400"; 
-   d="scan'208";a="663401920"
+   d="scan'208";a="663403074"
 Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.254.215.140]) ([10.254.215.140])
-  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Apr 2023 18:21:25 -0700
-Message-ID: <559ebca9-dfb9-e041-3744-5eab36f4f4c5@linux.intel.com>
-Date:   Tue, 4 Apr 2023 09:21:23 +0800
+  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Apr 2023 18:31:36 -0700
+Message-ID: <dafd7f36-0b6c-8390-5818-fe32a9dcba78@linux.intel.com>
+Date:   Tue, 4 Apr 2023 09:31:33 +0800
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
  Thunderbird/102.9.0
@@ -65,7 +65,7 @@ References: <20230319084927.29607-1-binbin.wu@linux.intel.com>
 From:   Binbin Wu <binbin.wu@linux.intel.com>
 In-Reply-To: <fc92490afc7ee1b9679877878de64ad129853cc0.camel@intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-3.7 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
         SPF_NONE autolearn=unavailable autolearn_force=no version=3.4.6
@@ -77,16 +77,56 @@ X-Mailing-List: kvm@vger.kernel.org
 
 
 On 4/3/2023 7:24 PM, Huang, Kai wrote:
+>> I checked the code again and find the comment of
+>> nested_vmx_check_permission().
 >>
+>> "/*
+>>    * Intel's VMX Instruction Reference specifies a common set of
+>> prerequisites
+>>    * for running VMX instructions (except VMXON, whose prerequisites are
+>>    * slightly different). It also specifies what exception to inject
+>> otherwise.
+>>    * Note that many of these exceptions have priority over VM exits, so they
+>>    * don't have to be checked again here.
+>>    */"
 >>
->> Anyway, I will seperate this patch from the LAM KVM enabling patch. And
->> send a patch seperately if
->> needed later.
+>> I think the Note part in the comment has tried to callout why the check
+>> for compatibility mode is unnecessary.
 >>
-> I think your change for SGX is still needed based on the pseudo code of ENCLS.
-
-Yes, I meant I would seperate VMX part since it is not a bug after all, 
-SGX will still be in the patchset.
-
-
+>> But I have a question here, nested_vmx_check_permission() checks that
+>> the vcpu is vmxon,
+>> otherwise it will inject a #UD. Why this #UD is handled in the VMExit
+>> handler specifically?
+>> Not all #UDs have higher priority than VM exits?
+>>
+>> According to SDM Section "Relative Priority of Faults and VM Exits":
+>> "Certain exceptions have priority over VM exits. These include
+>> invalid-opcode exceptions, ..."
+>> Seems not further classifications of #UDs.
+> This is clarified in the pseudo code of VMX instructions in the SDM.  If you
+> look at the pseudo code, all VMX instructions except VMXON (obviously) have
+> something like below:
 >
+> 	IF (not in VMX operation) ...
+> 		THEN #UD;
+> 	ELSIF in VMX non-root operation
+> 		THEN VMexit;
+>
+> So to me "this particular" #UD has higher priority over VM exits (while other
+> #UDs may not).
+>
+> But IIUC above #UD won't happen when running VMX instruction in the guest,
+> because if there's any live guest, the CPU must already have been in VMX
+> operation.  So below check in nested_vmx_check_permission():
+>
+> 	if (!to_vmx(vcpu)->nested.vmxon) {
+>                  kvm_queue_exception(vcpu, UD_VECTOR);
+>                  return 0;
+>          }
+>
+> is needed to emulate the case that guest runs any other VMX instructions before
+> VMXON.
+>
+Yes, you are right. Get the point now, thanks.
+
+
