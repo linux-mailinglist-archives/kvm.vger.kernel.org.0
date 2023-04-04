@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 50A2B6D5E40
+	by mail.lfdr.de (Postfix) with ESMTP id 0662C6D5E3F
 	for <lists+kvm@lfdr.de>; Tue,  4 Apr 2023 12:55:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234318AbjDDKzD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Apr 2023 06:55:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41736 "EHLO
+        id S234610AbjDDKzF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Apr 2023 06:55:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39106 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234702AbjDDKyL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S234622AbjDDKyL (ORCPT <rfc822;kvm@vger.kernel.org>);
         Tue, 4 Apr 2023 06:54:11 -0400
 Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 15C8D30C8;
-        Tue,  4 Apr 2023 03:53:24 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB27F1737;
+        Tue,  4 Apr 2023 03:53:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1680605604; x=1712141604;
+  t=1680605607; x=1712141607;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=SDGDSUDsSV7zT/y15Zj5Xr5rd8es//ZPrYL5DTYxefY=;
-  b=QT0korpHnDQkNyU8glN0l1WpkZg436w3BMRzMWGHb6yhBlIddEodQiWh
-   chte95kbojsd3GgHpDyAhKEDOaWx0nzmBaypio0s+IeyIilslV/n+dt6Q
-   KM6W4PIvQgbHrQJqJ3kDPsMl57XN/xYg+brQwTOpNBul4Oit2Is0IwjmR
-   qs1x1lSvijEHuqVXRBVp8F/UVcoorI+6SpjQRAK6gcrUM7a/PYYwukw1h
-   rvF9LENuOqwsnhuJy7ykce5YILYuyLT/ampSc6FmGgsKtfO2v9NIEWt8c
-   qgUbWm24RGMJSVsan3O3/mrNke3ECLkniQCd3nnf7ssfL0EHsD9ouTOOq
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10669"; a="330734063"
+  bh=voFQVjFSRNzDP3of726cqSfwzN6e3VmowuyZWcsyuKM=;
+  b=l8AHjYMO0iAGTYDkqN2IJc4ddHIP1EKjU30cdLHXSx12cfANBJU1ZyS7
+   6YE6Z6qZ5aA4IKTzkgxoudhiratEZTipWdPLKlF22itKp8XNw/lhPHWOA
+   AV/mCZx3C6YMIdsdGKSdzzhAWNFahFvAR7zAleyT2KI6D1EnpAnKveU/1
+   0cjelyjp0jAT1UkKl1PhGkKf8pPm5mIapzdcEuCYkEvpMgszAZIOLijFQ
+   UfJupVfjyeCTIcE8A6RAPxLMFDfGmV6fZBic5KcnBbtJW73vCq/s+gU/f
+   d9x6fExxnYoVzIuW9RkWj2zsJr/DBLAs5b7dlpXnhzGomKD9F5Xp7GlJw
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10669"; a="330734073"
 X-IronPort-AV: E=Sophos;i="5.98,317,1673942400"; 
-   d="scan'208";a="330734063"
+   d="scan'208";a="330734073"
 Received: from fmsmga003.fm.intel.com ([10.253.24.29])
   by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Apr 2023 03:53:03 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10669"; a="775597820"
+X-IronPort-AV: E=McAfee;i="6600,9927,10669"; a="775597823"
 X-IronPort-AV: E=Sophos;i="5.98,317,1673942400"; 
-   d="scan'208";a="775597820"
+   d="scan'208";a="775597823"
 Received: from unknown (HELO fred..) ([172.25.112.68])
   by FMSMGA003.fm.intel.com with ESMTP; 04 Apr 2023 03:53:03 -0700
 From:   Xin Li <xin3.li@intel.com>
@@ -45,9 +45,9 @@ Cc:     tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
         andrew.cooper3@citrix.com, seanjc@google.com, pbonzini@redhat.com,
         ravi.v.shankar@intel.com, jiangshanlai@gmail.com,
         shan.kang@intel.com
-Subject: [PATCH v7 14/33] x86/fred: header file with FRED definitions
-Date:   Tue,  4 Apr 2023 03:26:57 -0700
-Message-Id: <20230404102716.1795-15-xin3.li@intel.com>
+Subject: [PATCH v7 15/33] x86/fred: reserve space for the FRED stack frame
+Date:   Tue,  4 Apr 2023 03:26:58 -0700
+Message-Id: <20230404102716.1795-16-xin3.li@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230404102716.1795-1-xin3.li@intel.com>
 References: <20230404102716.1795-1-xin3.li@intel.com>
@@ -65,132 +65,48 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: "H. Peter Anvin (Intel)" <hpa@zytor.com>
 
-Add a header file for FRED prototypes and definitions.
+When using FRED, reserve space at the top of the stack frame, just
+like i386 does. A future version of FRED might have dynamic frame
+sizes, though, in which case it might be necessary to make
+TOP_OF_KERNEL_STACK_PADDING a variable instead of a constant.
 
 Signed-off-by: H. Peter Anvin (Intel) <hpa@zytor.com>
 Tested-by: Shan Kang <shan.kang@intel.com>
 Signed-off-by: Xin Li <xin3.li@intel.com>
 ---
+ arch/x86/include/asm/thread_info.h | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
 
-Changes since v6:
-* Replace pt_regs csx flags prefix FRED_CSL_ with FRED_CSX_.
----
- arch/x86/include/asm/fred.h | 106 ++++++++++++++++++++++++++++++++++++
- 1 file changed, 106 insertions(+)
- create mode 100644 arch/x86/include/asm/fred.h
-
-diff --git a/arch/x86/include/asm/fred.h b/arch/x86/include/asm/fred.h
-new file mode 100644
-index 000000000000..b59397411ab9
---- /dev/null
-+++ b/arch/x86/include/asm/fred.h
-@@ -0,0 +1,106 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/*
-+ * arch/x86/include/asm/fred.h
-+ *
-+ * Macros for Flexible Return and Event Delivery (FRED)
-+ */
-+
-+#ifndef ASM_X86_FRED_H
-+#define ASM_X86_FRED_H
-+
-+#ifdef CONFIG_X86_FRED
-+
-+#include <linux/const.h>
-+#include <asm/asm.h>
-+
-+/*
-+ * FRED return instructions
-+ *
-+ * Replace with "ERETS"/"ERETU" once binutils support FRED return instructions.
-+ * The binutils version supporting FRED instructions is still TBD, and will
-+ * update once we have it.
-+ */
-+#define ERETS			_ASM_BYTES(0xf2,0x0f,0x01,0xca)
-+#define ERETU			_ASM_BYTES(0xf3,0x0f,0x01,0xca)
-+
-+/*
-+ * RSP is aligned to a 64-byte boundary before used to push a new stack frame
-+ */
-+#define FRED_STACK_FRAME_RSP_MASK	_AT(unsigned long, (~0x3f))
-+
-+/*
-+ * Event stack level macro for the FRED_STKLVLS MSR.
-+ * Usage example: FRED_STKLVL(X86_TRAP_DF, 3)
-+ * Multiple values can be ORd together.
-+ */
-+#define FRED_STKLVL(v,l)	(_AT(unsigned long, l) << (2*(v)))
-+
-+/* FRED_CONFIG MSR */
-+#define FRED_CONFIG_CSL_MASK		0x3
-+#define FRED_CONFIG_REDZONE_AMOUNT	1 /* measured in 64-byte cache lines */
-+#define FRED_CONFIG_REDZONE		(_AT(unsigned long, FRED_CONFIG_REDZONE_AMOUNT) << 6)
-+#define FRED_CONFIG_INT_STKLVL(l)	(_AT(unsigned long, l) << 9)
-+#define FRED_CONFIG_ENTRYPOINT(p)	_AT(unsigned long, (p))
-+
-+/* FRED event type and vector bit width and counts */
-+#define FRED_EVENT_TYPE_BITS		3 /* only 3 bits used in FRED 3.0 */
-+#define FRED_EVENT_TYPE_COUNT		_BITUL(FRED_EVENT_TYPE_BITS)
-+#define FRED_EVENT_VECTOR_BITS		8
-+#define FRED_EVENT_VECTOR_COUNT		_BITUL(FRED_EVENT_VECTOR_BITS)
-+
-+/* FRED EVENT_TYPE_OTHER vector numbers */
-+#define FRED_SYSCALL			1
-+#define FRED_SYSENTER			2
-+
-+/* Flags above the CS selector (regs->csx) */
-+#define FRED_CSX_ENABLE_NMI		_BITUL(28)
-+#define FRED_CSX_ALLOW_SINGLE_STEP	_BITUL(25)
-+#define FRED_CSX_INTERRUPT_SHADOW	_BITUL(24)
-+
-+#ifndef __ASSEMBLY__
-+
-+#include <linux/kernel.h>
-+#include <asm/ptrace.h>
-+
-+/* FRED stack frame information */
-+struct fred_info {
-+	unsigned long edata;	/* Event data: CR2, DR6, ... */
-+	unsigned long resv;
-+};
-+
-+/* Full format of the FRED stack frame */
-+struct fred_frame {
-+	struct pt_regs   regs;
-+	struct fred_info info;
-+};
-+
-+/* Getting the FRED frame information from a pt_regs pointer */
-+static __always_inline struct fred_info *fred_info(struct pt_regs *regs)
-+{
-+	return &container_of(regs, struct fred_frame, regs)->info;
-+}
-+
-+static __always_inline unsigned long fred_event_data(struct pt_regs *regs)
-+{
-+	return fred_info(regs)->edata;
-+}
-+
-+/*
-+ * How FRED event handlers are called.
-+ *
-+ * FRED event delivery establishes the full supervisor context
-+ * by pushing everything related to the event being delivered
-+ * to the FRED stack frame, e.g., the faulting linear address
-+ * of a #PF is pushed as event data of the FRED #PF stack frame.
-+ * Thus a struct pt_regs has everything needed and it's the only
-+ * input parameter required for a FRED event handler.
-+ */
-+#define DECLARE_FRED_HANDLER(f) void f (struct pt_regs *regs)
-+#define DEFINE_FRED_HANDLER(f) noinstr DECLARE_FRED_HANDLER(f)
-+typedef DECLARE_FRED_HANDLER((*fred_handler));
-+
-+#endif /* __ASSEMBLY__ */
-+
-+#endif /* CONFIG_X86_FRED */
-+
-+#endif /* ASM_X86_FRED_H */
+diff --git a/arch/x86/include/asm/thread_info.h b/arch/x86/include/asm/thread_info.h
+index f1cccba52eb9..998483078d5f 100644
+--- a/arch/x86/include/asm/thread_info.h
++++ b/arch/x86/include/asm/thread_info.h
+@@ -31,7 +31,9 @@
+  * In vm86 mode, the hardware frame is much longer still, so add 16
+  * bytes to make room for the real-mode segments.
+  *
+- * x86_64 has a fixed-length stack frame.
++ * x86-64 has a fixed-length stack frame, but it depends on whether
++ * or not FRED is enabled. Future versions of FRED might make this
++ * dynamic, but for now it is always 2 words longer.
+  */
+ #ifdef CONFIG_X86_32
+ # ifdef CONFIG_VM86
+@@ -39,8 +41,12 @@
+ # else
+ #  define TOP_OF_KERNEL_STACK_PADDING 8
+ # endif
+-#else
+-# define TOP_OF_KERNEL_STACK_PADDING 0
++#else /* x86-64 */
++# ifdef CONFIG_X86_FRED
++#  define TOP_OF_KERNEL_STACK_PADDING (2*8)
++# else
++#  define TOP_OF_KERNEL_STACK_PADDING 0
++# endif
+ #endif
+ 
+ /*
 -- 
 2.34.1
 
