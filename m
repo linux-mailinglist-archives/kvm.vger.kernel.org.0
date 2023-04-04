@@ -2,60 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5FED66D5E6E
-	for <lists+kvm@lfdr.de>; Tue,  4 Apr 2023 12:56:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0BFBC6D5D8D
+	for <lists+kvm@lfdr.de>; Tue,  4 Apr 2023 12:32:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235006AbjDDK4t (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Apr 2023 06:56:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40598 "EHLO
+        id S234233AbjDDKcG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Apr 2023 06:32:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43562 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234886AbjDDK40 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Apr 2023 06:56:26 -0400
-Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 287064C2C;
-        Tue,  4 Apr 2023 03:54:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1680605663; x=1712141663;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=2hEOO4AGi3vlRhLY8tgivbLZ1qLQc8RNqYRR6FbCFpw=;
-  b=m/x/Twa9/Dwk4tyfda9pzI2x+xvNUxXAdYfGBZ2ysmRK5OuoGyKCtzrh
-   mTzQMVHdXgiIZl20n0EYYaFkfScZTiArE4XMC3Ox9LypKPSEQir70ePLk
-   BmTUaxfBkrAKRzFCfw6GHdIAKCWZfHvrbWW5oaljp01uS0glbufRAofPK
-   /EwRpAVSNFOwHGrJg5dbYU75L8JQV0skPekJwiF3QIinTF9tMqFmDxdnl
-   6Szy0yqBjquAf7ebHy/FnrUoLn6Al57PFXNXJ2stYbKSZ0fuAiranZPWy
-   JjwaFLat1am9tMQj1+/U03Arclw00zbamSxqHRH8Pzs0v7n6Eh6PHguIu
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10669"; a="330734263"
-X-IronPort-AV: E=Sophos;i="5.98,317,1673942400"; 
-   d="scan'208";a="330734263"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Apr 2023 03:53:07 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10669"; a="775597877"
-X-IronPort-AV: E=Sophos;i="5.98,317,1673942400"; 
-   d="scan'208";a="775597877"
-Received: from unknown (HELO fred..) ([172.25.112.68])
-  by FMSMGA003.fm.intel.com with ESMTP; 04 Apr 2023 03:53:07 -0700
-From:   Xin Li <xin3.li@intel.com>
-To:     linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org
-Cc:     tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, hpa@zytor.com, peterz@infradead.org,
-        andrew.cooper3@citrix.com, seanjc@google.com, pbonzini@redhat.com,
-        ravi.v.shankar@intel.com, jiangshanlai@gmail.com,
-        shan.kang@intel.com
-Subject: [PATCH v7 33/33] KVM: x86/vmx: refactor VMX_DO_EVENT_IRQOFF to generate FRED stack frames
-Date:   Tue,  4 Apr 2023 03:27:16 -0700
-Message-Id: <20230404102716.1795-34-xin3.li@intel.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230404102716.1795-1-xin3.li@intel.com>
-References: <20230404102716.1795-1-xin3.li@intel.com>
+        with ESMTP id S234042AbjDDKcE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Apr 2023 06:32:04 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1E9A1984;
+        Tue,  4 Apr 2023 03:32:03 -0700 (PDT)
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3349oxfi015614;
+        Tue, 4 Apr 2023 10:32:03 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=9DFbhkapjA9bvgrmGMTch97+0SsTLUUyhHhKBi84NrU=;
+ b=kAJKKpORtIopkl2koBRxJett0RG6+o94tJi6WemBVC0z7G/BLjxFXPJbuA5NCLj432m8
+ L8sEXXCKoAaWDLpDVsT9g1Ffu3X1p0sZW3LYJSJ5Fth3ciQH88OdUYJRHOgRzFQXlhZy
+ Tsa2C2apFBkczocA4BWYGXTj18FFo16Pq3kFpDW6dAAo2/+6Ml+OWKKcY3CnAq9Fw6Cz
+ IXBkI4XgA14w3fdUa/oS4aN30ZD6cc5KgKBhEl5Yhnd5c6GuB0QmW8ZGf9NXahOFBXkv
+ uMkF5mtd5JgQngCLgmdx+8cEATpbUiy3HaTKM5cr3DeZ2TXKlckbWhUIQL/0OxVNHVBc 4w== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3prhmg0yex-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 04 Apr 2023 10:32:02 +0000
+Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3349qRPf020278;
+        Tue, 4 Apr 2023 10:32:02 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3prhmg0ye7-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 04 Apr 2023 10:32:02 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 333NG4Bl008843;
+        Tue, 4 Apr 2023 10:32:00 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+        by ppma03ams.nl.ibm.com (PPS) with ESMTPS id 3ppc872e8p-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 04 Apr 2023 10:32:00 +0000
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+        by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 334AVuZG28574420
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 4 Apr 2023 10:31:56 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C544D2004B;
+        Tue,  4 Apr 2023 10:31:56 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 8B35A20043;
+        Tue,  4 Apr 2023 10:31:56 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.152.224.56])
+        by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Tue,  4 Apr 2023 10:31:56 +0000 (GMT)
+Date:   Tue, 4 Apr 2023 12:31:55 +0200
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Thomas Huth <thuth@redhat.com>
+Cc:     kvm@vger.kernel.org, Janosch Frank <frankja@linux.ibm.com>,
+        linux-s390@vger.kernel.org, David Hildenbrand <david@redhat.com>,
+        Nico Boehr <nrb@linux.ibm.com>
+Subject: Re: [kvm-unit-tests PATCH] s390x/snippets: Fix compilation with
+ Clang 15
+Message-ID: <20230404123155.728e3f2e@p-imbrenda>
+In-Reply-To: <20230404101434.172721-1-thuth@redhat.com>
+References: <20230404101434.172721-1-thuth@redhat.com>
+Organization: IBM
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.5 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: y1Z9QpJz5eDuR0cPFlQ1slBkwQUkocZR
+X-Proofpoint-GUID: K0Lil9t03cfqMJK30cRsmi7kWim-VNAA
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
+ definitions=2023-04-04_03,2023-04-03_03,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 bulkscore=0
+ priorityscore=1501 clxscore=1015 suspectscore=0 impostorscore=0
+ lowpriorityscore=0 phishscore=0 spamscore=0 adultscore=0 mlxscore=0
+ mlxlogscore=963 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2303200000 definitions=main-2304040093
+X-Spam-Status: No, score=-0.1 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
+        DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
         autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -63,272 +93,59 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Comparing to an IDT stack frame, a FRED stack frame has extra 16 bytes of
-information pushed at the regular stack top and 8 bytes of error code _always_
-pushed at the regular stack bottom, VMX_DO_EVENT_IRQOFF can be refactored
-to generate FRED stack frames with event type and vector properly set. Thus,
-IRQ/NMI can be handled with the existing approach when FRED is enabled.
+On Tue,  4 Apr 2023 12:14:34 +0200
+Thomas Huth <thuth@redhat.com> wrote:
 
-As a FRED stack frame always contains an error code pushed by hardware, call
-a trampoline function first to have the return instruction address pushed on
-the regular stack. Then the trampoline function pushes an error code (0 for
-both IRQ and NMI) and jumps to fred_entrypoint_kernel() for NMI handling or
-calls external_interrupt() for IRQ handling.
+> Clang complains:
+> 
+>  s390x/snippets/c/cstart.S:22:13: error: invalid operand for instruction
+>   lghi %r15, stackptr
+>              ^
+> Let's load the address with "larl" instead, like we already do
+> it in s390x/cstart64.S. For this we should also switch to 64-bit
+> mode first, then we also don't have to clear r15 right in front
+> of this anymore.
+> 
+> Changing the code here triggered another problem: initial_cr0
+> must be aligned on a double-word boundary, otherwise the lctlg
+> instruction will fail with an specification exception. This was
+> just working by accident so far - add an ".align 8" now to avoid
+> the problem.
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 
-The trampoline function for IRQ handling pushes general purpose registers to
-form a pt_regs structure and then use it to call external_interrupt(). As a
-result, IRQ handling does not execute any noinstr code.
+Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
 
-Export fred_entrypoint_kernel() and external_interrupt() for above changes.
-
-Tested-by: Shan Kang <shan.kang@intel.com>
-Signed-off-by: Xin Li <xin3.li@intel.com>
----
-
-Changes since v6:
-* Export fred_entrypoint_kernel(), required when kvm-intel built as a module.
-* Reserve a REDZONE for CALL emulation and Align RSP to a 64-byte boundary
-  before pushing a new FRED stack frame.
----
- arch/x86/entry/entry_64_fred.S        |  1 +
- arch/x86/include/asm/asm-prototypes.h |  1 +
- arch/x86/include/asm/fred.h           |  1 +
- arch/x86/include/asm/traps.h          |  2 +
- arch/x86/kernel/traps.c               |  5 ++
- arch/x86/kvm/vmx/vmenter.S            | 74 ++++++++++++++++++++++++++-
- arch/x86/kvm/vmx/vmx.c                | 16 +++++-
- 7 files changed, 96 insertions(+), 4 deletions(-)
-
-diff --git a/arch/x86/entry/entry_64_fred.S b/arch/x86/entry/entry_64_fred.S
-index efe2bcd11273..de74ab97ff00 100644
---- a/arch/x86/entry/entry_64_fred.S
-+++ b/arch/x86/entry/entry_64_fred.S
-@@ -59,3 +59,4 @@ SYM_CODE_START_NOALIGN(fred_entrypoint_kernel)
- 	FRED_EXIT
- 	ERETS
- SYM_CODE_END(fred_entrypoint_kernel)
-+EXPORT_SYMBOL(fred_entrypoint_kernel)
-diff --git a/arch/x86/include/asm/asm-prototypes.h b/arch/x86/include/asm/asm-prototypes.h
-index b1a98fa38828..076bf8dee702 100644
---- a/arch/x86/include/asm/asm-prototypes.h
-+++ b/arch/x86/include/asm/asm-prototypes.h
-@@ -12,6 +12,7 @@
- #include <asm/special_insns.h>
- #include <asm/preempt.h>
- #include <asm/asm.h>
-+#include <asm/fred.h>
- #include <asm/gsseg.h>
- 
- #ifndef CONFIG_X86_CMPXCHG64
-diff --git a/arch/x86/include/asm/fred.h b/arch/x86/include/asm/fred.h
-index f7caf3b2f3f7..d00b9cab6aa6 100644
---- a/arch/x86/include/asm/fred.h
-+++ b/arch/x86/include/asm/fred.h
-@@ -129,6 +129,7 @@ DECLARE_FRED_HANDLER(fred_exc_machine_check);
-  * The actual assembly entry and exit points
-  */
- extern __visible void fred_entrypoint_user(void);
-+extern __visible void fred_entrypoint_kernel(void);
- 
- /*
-  * Initialization
-diff --git a/arch/x86/include/asm/traps.h b/arch/x86/include/asm/traps.h
-index 612b3d6fec53..017b95624325 100644
---- a/arch/x86/include/asm/traps.h
-+++ b/arch/x86/include/asm/traps.h
-@@ -58,4 +58,6 @@ typedef DECLARE_SYSTEM_INTERRUPT_HANDLER((*system_interrupt_handler));
- 
- system_interrupt_handler get_system_interrupt_handler(unsigned int i);
- 
-+int external_interrupt(struct pt_regs *regs);
-+
- #endif /* _ASM_X86_TRAPS_H */
-diff --git a/arch/x86/kernel/traps.c b/arch/x86/kernel/traps.c
-index 73471053ed02..0f1fcd53cb52 100644
---- a/arch/x86/kernel/traps.c
-+++ b/arch/x86/kernel/traps.c
-@@ -1573,6 +1573,11 @@ int external_interrupt(struct pt_regs *regs)
- 	return 0;
- }
- 
-+#if IS_ENABLED(CONFIG_KVM_INTEL)
-+/* For KVM VMX to handle IRQs in IRQ induced VM exits. */
-+EXPORT_SYMBOL_GPL(external_interrupt);
-+#endif
-+
- #endif /* CONFIG_X86_64 */
- 
- void __init install_system_interrupt_handler(unsigned int n, const void *asm_addr, const void *addr)
-diff --git a/arch/x86/kvm/vmx/vmenter.S b/arch/x86/kvm/vmx/vmenter.S
-index 631fd7da2bc3..f64b05b3d775 100644
---- a/arch/x86/kvm/vmx/vmenter.S
-+++ b/arch/x86/kvm/vmx/vmenter.S
-@@ -2,12 +2,14 @@
- #include <linux/linkage.h>
- #include <asm/asm.h>
- #include <asm/bitsperlong.h>
-+#include <asm/fred.h>
- #include <asm/kvm_vcpu_regs.h>
- #include <asm/nospec-branch.h>
- #include <asm/percpu.h>
- #include <asm/segment.h>
- #include "kvm-asm-offsets.h"
- #include "run_flags.h"
-+#include "../../entry/calling.h"
- 
- #define WORD_SIZE (BITS_PER_LONG / 8)
- 
-@@ -31,7 +33,7 @@
- #define VCPU_R15	__VCPU_REGS_R15 * WORD_SIZE
- #endif
- 
--.macro VMX_DO_EVENT_IRQOFF call_insn call_target
-+.macro VMX_DO_EVENT_IRQOFF call_insn call_target fred=0 nmi=0
- 	/*
- 	 * Unconditionally create a stack frame, getting the correct RSP on the
- 	 * stack (for x86-64) would take two instructions anyways, and RBP can
-@@ -41,16 +43,56 @@
- 	mov %_ASM_SP, %_ASM_BP
- 
- #ifdef CONFIG_X86_64
-+	.if \fred
-+#ifdef CONFIG_X86_FRED
-+	/*
-+	 * It's not necessary to change current stack level for handling IRQ/NMI
-+	 * because the state of the kernel stack is well defined in this place
-+	 * in the code, and it is known not to be deep in a bunch of nested I/O
-+	 * layer handlers that eat up the stack.
-+	 */
-+
-+	/* Reserve a REDZONE for CALL emulation. */
-+	sub $(FRED_CONFIG_REDZONE_AMOUNT << 6), %rsp
-+
-+	/* Align RSP to a 64-byte boundary before pushing a new stack frame */
-+	and $FRED_STACK_FRAME_RSP_MASK, %rsp
-+
-+	push $0		/* Reserved by FRED, must be 0 */
-+	push $0		/* FRED event data, 0 for NMI and external interrupts */
-+#endif
-+	.else
- 	/*
- 	 * Align RSP to a 16-byte boundary (to emulate CPU behavior) before
- 	 * creating the synthetic interrupt stack frame for the IRQ/NMI.
- 	 */
- 	and  $-16, %rsp
-+	.endif
-+
-+	.if \fred
-+	.if \nmi
-+	mov $(2 << 32 | 2 << 48), %_ASM_AX	/* NMI event type and vector */
-+	.else
-+	mov %_ASM_ARG1, %_ASM_AX
-+	shl $32, %_ASM_AX			/* external interrupt vector */
-+	.endif
-+	add $__KERNEL_DS, %_ASM_AX
-+	bts $57, %_ASM_AX			/* bit 57: 64-bit mode */
-+	push %_ASM_AX
-+	.else
- 	push $__KERNEL_DS
-+	.endif
-+
- 	push %rbp
- #endif
- 	pushf
-+	.if \nmi
-+	mov $__KERNEL_CS, %_ASM_AX
-+	bts $28, %_ASM_AX			/* set the NMI bit */
-+	push %_ASM_AX
-+	.else
- 	push $__KERNEL_CS
-+	.endif
- 	\call_insn \call_target
- 
- 	/*
-@@ -300,9 +342,19 @@ SYM_INNER_LABEL(vmx_vmexit, SYM_L_GLOBAL)
- SYM_FUNC_END(__vmx_vcpu_run)
- 
- SYM_FUNC_START(vmx_do_nmi_irqoff)
--	VMX_DO_EVENT_IRQOFF call asm_exc_nmi_kvm_vmx
-+	VMX_DO_EVENT_IRQOFF call asm_exc_nmi_kvm_vmx nmi=1
- SYM_FUNC_END(vmx_do_nmi_irqoff)
- 
-+#ifdef CONFIG_X86_FRED
-+SYM_FUNC_START(vmx_do_fred_nmi_trampoline)
-+	push $0		/* FRED error code, 0 for NMI */
-+	jmp fred_entrypoint_kernel
-+SYM_FUNC_END(vmx_do_fred_nmi_trampoline)
-+
-+SYM_FUNC_START(vmx_do_fred_nmi_irqoff)
-+	VMX_DO_EVENT_IRQOFF call vmx_do_fred_nmi_trampoline fred=1 nmi=1
-+SYM_FUNC_END(vmx_do_fred_nmi_irqoff)
-+#endif
- 
- .section .text, "ax"
- 
-@@ -360,3 +412,21 @@ SYM_FUNC_END(vmread_error_trampoline)
- SYM_FUNC_START(vmx_do_interrupt_irqoff)
- 	VMX_DO_EVENT_IRQOFF CALL_NOSPEC _ASM_ARG1
- SYM_FUNC_END(vmx_do_interrupt_irqoff)
-+
-+#ifdef CONFIG_X86_FRED
-+SYM_FUNC_START(vmx_do_fred_interrupt_trampoline)
-+	push $0	/* FRED error code, 0 for NMI and external interrupts */
-+	PUSH_REGS
-+
-+	movq	%rsp, %rdi	/* %rdi -> pt_regs */
-+	call external_interrupt
-+
-+	POP_REGS
-+	addq $8,%rsp		/* Drop FRED error code */
-+	RET
-+SYM_FUNC_END(vmx_do_fred_interrupt_trampoline)
-+
-+SYM_FUNC_START(vmx_do_fred_interrupt_irqoff)
-+	VMX_DO_EVENT_IRQOFF call vmx_do_fred_interrupt_trampoline fred=1
-+SYM_FUNC_END(vmx_do_fred_interrupt_irqoff)
-+#endif
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index d2d6e1b6c788..6dfe692dfd6a 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -6875,7 +6875,9 @@ static void vmx_apicv_post_state_restore(struct kvm_vcpu *vcpu)
- }
- 
- void vmx_do_interrupt_irqoff(unsigned long entry);
-+void vmx_do_fred_interrupt_irqoff(unsigned int vector);
- void vmx_do_nmi_irqoff(void);
-+void vmx_do_fred_nmi_irqoff(void);
- 
- static void handle_nm_fault_irqoff(struct kvm_vcpu *vcpu)
- {
-@@ -6923,7 +6925,12 @@ static void handle_external_interrupt_irqoff(struct kvm_vcpu *vcpu)
- 		return;
- 
- 	kvm_before_interrupt(vcpu, KVM_HANDLING_IRQ);
--	vmx_do_interrupt_irqoff(gate_offset(desc));
-+#ifdef CONFIG_X86_64
-+	if (cpu_feature_enabled(X86_FEATURE_FRED))
-+		vmx_do_fred_interrupt_irqoff(vector);
-+	else
-+#endif
-+		vmx_do_interrupt_irqoff(gate_offset(desc));
- 	kvm_after_interrupt(vcpu);
- 
- 	vcpu->arch.at_instruction_boundary = true;
-@@ -7209,7 +7216,12 @@ static noinstr void vmx_vcpu_enter_exit(struct kvm_vcpu *vcpu,
- 	if ((u16)vmx->exit_reason.basic == EXIT_REASON_EXCEPTION_NMI &&
- 	    is_nmi(vmx_get_intr_info(vcpu))) {
- 		kvm_before_interrupt(vcpu, KVM_HANDLING_NMI);
--		vmx_do_nmi_irqoff();
-+#ifdef CONFIG_X86_64
-+		if (cpu_feature_enabled(X86_FEATURE_FRED))
-+			vmx_do_fred_nmi_irqoff();
-+		else
-+#endif
-+			vmx_do_nmi_irqoff();
- 		kvm_after_interrupt(vcpu);
- 	}
- 
--- 
-2.34.1
+> ---
+>  s390x/snippets/c/cstart.S | 7 ++++---
+>  1 file changed, 4 insertions(+), 3 deletions(-)
+> 
+> diff --git a/s390x/snippets/c/cstart.S b/s390x/snippets/c/cstart.S
+> index a7d4cd42..c80ccfed 100644
+> --- a/s390x/snippets/c/cstart.S
+> +++ b/s390x/snippets/c/cstart.S
+> @@ -15,12 +15,12 @@ start:
+>  	larl	%r1, initial_cr0
+>  	lctlg	%c0, %c0, 0(%r1)
+>  	/* XOR all registers with themselves to clear them fully. */
+> -	.irp i, 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
+> +	.irp i, 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14
+>  	xgr \i,\i
+>  	.endr
+> -	/* 0x3000 is the stack page for now */
+> -	lghi	%r15, stackptr
+>  	sam64
+> +	/* 0x3000 is the stack page for now */
+> +	larl	%r15, stackptr
+>  	brasl	%r14, main
+>  	/*
+>  	 * If main() returns, we stop the CPU with the code below. We also
+> @@ -37,6 +37,7 @@ exit:
+>  	xgr	%r0, %r0
+>  	sigp    %r2, %r0, SIGP_STOP
+>  
+> +	.align 8
+>  initial_cr0:
+>  	/* enable AFP-register control, so FP regs (+BFP instr) can be used */
+>  	.quad	0x0000000000040000
 
