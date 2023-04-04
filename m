@@ -2,67 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 941386D647D
-	for <lists+kvm@lfdr.de>; Tue,  4 Apr 2023 16:00:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 41F8F6D64A4
+	for <lists+kvm@lfdr.de>; Tue,  4 Apr 2023 16:05:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235496AbjDDOAx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Apr 2023 10:00:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59990 "EHLO
+        id S235581AbjDDOFo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Apr 2023 10:05:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49088 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235482AbjDDOAM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Apr 2023 10:00:12 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61D1AFC
-        for <kvm@vger.kernel.org>; Tue,  4 Apr 2023 06:59:04 -0700 (PDT)
+        with ESMTP id S235518AbjDDOFh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Apr 2023 10:05:37 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 370353C06
+        for <kvm@vger.kernel.org>; Tue,  4 Apr 2023 07:04:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1680616649;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+        s=mimecast20190719; t=1680616984;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=XYn7OYIVH83txTjtRmdLLOaHNTCqXl6caXuullcfhyc=;
-        b=HkW/D4dAF8CRlnGdFLoszg+zk9GkE41dBCuZv+GHZNda5tId2ecpc6eMz0JEXhbJQSweyD
-        Cho7oLR3+WDUDAplSGTuMW50UZ/TymiZA0+dhAwhyRRzzTKItgPRx3z8zyeU75ivKwowv7
-        xdfSaqubTGCzlglkB95ekxaeHf37zQo=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-94-7LQDqqgVOqK7cz1eWn9vKA-1; Tue, 04 Apr 2023 09:57:26 -0400
-X-MC-Unique: 7LQDqqgVOqK7cz1eWn9vKA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 67B5A101A551;
-        Tue,  4 Apr 2023 13:57:21 +0000 (UTC)
-Received: from redhat.com (unknown [10.39.194.152])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 2B8FA2027062;
-        Tue,  4 Apr 2023 13:57:18 +0000 (UTC)
-Date:   Tue, 4 Apr 2023 15:57:17 +0200
-From:   Kevin Wolf <kwolf@redhat.com>
-To:     Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Cc:     qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Reinoud Zandijk <reinoud@netbsd.org>,
-        Ryo ONODERA <ryoon@netbsd.org>, qemu-block@nongnu.org,
-        Hanna Reitz <hreitz@redhat.com>, Warner Losh <imp@bsdimp.com>,
-        Beraldo Leal <bleal@redhat.com>,
-        Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>,
-        Kyle Evans <kevans@freebsd.org>, kvm@vger.kernel.org,
-        Wainer dos Santos Moschetta <wainersm@redhat.com>,
-        Cleber Rosa <crosa@redhat.com>, Thomas Huth <thuth@redhat.com>,
-        Michael Tokarev <mjt@tls.msk.ru>, armbru@redhat.com
-Subject: Re: [PATCH v2 05/11] qemu-options: finesse the recommendations
- around -blockdev
-Message-ID: <ZCwsvaxRzx4bzbXo@redhat.com>
-References: <20230403134920.2132362-1-alex.bennee@linaro.org>
- <20230403134920.2132362-6-alex.bennee@linaro.org>
+        bh=wxXQaGpyUM5ChSgPSymgIrV3xjP+dbX+YB7Kwp3u8FE=;
+        b=MdX4iDREjiqaIQzSWDrZ+zYqIEDfrcB/sYnRV8f/gPQgtncwDPbE6OctHZpUZeOscuj+O/
+        9geKy6G0HkPV4TAsxczNL66+Ct6Dw9FER+eUofHay2GlMPTblt6dmq8B3QM8MRIOmuyatl
+        ZdfE1vaw5m9CqL7QyOKT3xpfhOBWTzo=
+Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
+ [209.85.160.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-594-ItWXl_EyPuGwBQPs-6Fx_g-1; Tue, 04 Apr 2023 09:59:41 -0400
+X-MC-Unique: ItWXl_EyPuGwBQPs-6Fx_g-1
+Received: by mail-qt1-f198.google.com with SMTP id w13-20020ac857cd000000b003e37d3e6de2so22218291qta.16
+        for <kvm@vger.kernel.org>; Tue, 04 Apr 2023 06:59:40 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1680616780;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:reply-to:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=wxXQaGpyUM5ChSgPSymgIrV3xjP+dbX+YB7Kwp3u8FE=;
+        b=zf+EXPvScJ2XTihZwufua7eZuImOqpknIQYD7a+VJHnFHNjU3Fzk/2wdxVdYdu+ZiD
+         FegwK82AxTXuzmg4vSTbWN5xPA3UDcvBdktGd5k/bOJKKi4G8fdaYePM+qAyacX3JnKm
+         tI6gTMu789EQokXtsCFEDTV1qjPdbEZBtW7IRm89xbiMTpxV9zLOsDenPzJ8RN8moSDo
+         FIs9RwDYzof1umMU0MEpbMyPKQwMFFlTkPApslBWeCFT3XHxOEzW4iU9B85CR7KGQ3Pr
+         woAvtGF8sTztjkb787GMyWZP/gLhY9Wu0SKXMNPMCxGYRuoG7ZrVvlNOOkRiAPZ3fwvW
+         mXOQ==
+X-Gm-Message-State: AAQBX9cDz87vFqnOCJWm4w6iXy9Os+EFS8uMeDdK7gPMH0dCZM9m4lvW
+        ZE2nP9MKRvv+fhKbHfbmp0KrFIVCBr2giF55WgFhJkbOBL8m0aQxsz6dm3xincXMlIkzr58C+9N
+        ZYM15Sz6kdwd3
+X-Received: by 2002:ac8:5990:0:b0:3bf:e364:1d19 with SMTP id e16-20020ac85990000000b003bfe3641d19mr3487122qte.54.1680616779656;
+        Tue, 04 Apr 2023 06:59:39 -0700 (PDT)
+X-Google-Smtp-Source: AKy350bCWWuuTxHWY9DOMfflmCQARBlvG/akS0xtd4IuYfgAD/YTofqLq6p8mh4g/QJi69uADkX8yQ==
+X-Received: by 2002:ac8:5990:0:b0:3bf:e364:1d19 with SMTP id e16-20020ac85990000000b003bfe3641d19mr3487031qte.54.1680616778531;
+        Tue, 04 Apr 2023 06:59:38 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id l26-20020a37f91a000000b007422eee8058sm3597749qkj.125.2023.04.04.06.59.33
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 04 Apr 2023 06:59:37 -0700 (PDT)
+Message-ID: <4bc269aa-f2b9-d8ac-82bf-2205d05e4b11@redhat.com>
+Date:   Tue, 4 Apr 2023 15:59:31 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20230403134920.2132362-6-alex.bennee@linaro.org>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
-X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.0
+Reply-To: eric.auger@redhat.com
+Subject: Re: [PATCH v3 03/12] vfio/pci: Move the existing hot reset logic to
+ be a helper
+Content-Language: en-US
+To:     Yi Liu <yi.l.liu@intel.com>, alex.williamson@redhat.com,
+        jgg@nvidia.com, kevin.tian@intel.com
+Cc:     joro@8bytes.org, robin.murphy@arm.com, cohuck@redhat.com,
+        nicolinc@nvidia.com, kvm@vger.kernel.org, mjrosato@linux.ibm.com,
+        chao.p.peng@linux.intel.com, yi.y.sun@linux.intel.com,
+        peterx@redhat.com, jasowang@redhat.com,
+        shameerali.kolothum.thodi@huawei.com, lulu@redhat.com,
+        suravee.suthikulpanit@amd.com, intel-gvt-dev@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org, linux-s390@vger.kernel.org,
+        xudong.hao@intel.com, yan.y.zhao@intel.com, terrence.xu@intel.com,
+        yanting.jiang@intel.com
+References: <20230401144429.88673-1-yi.l.liu@intel.com>
+ <20230401144429.88673-4-yi.l.liu@intel.com>
+From:   Eric Auger <eric.auger@redhat.com>
+In-Reply-To: <20230401144429.88673-4-yi.l.liu@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
         RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -71,54 +93,139 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Am 03.04.2023 um 15:49 hat Alex Bennée geschrieben:
-> We are a bit premature in recommending -blockdev/-device as the best
-> way to configure block devices, especially in the common case.
-> Improve the language to hopefully make things clearer.
-> 
-> Suggested-by: Michael Tokarev <mjt@tls.msk.ru>
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
-> Message-Id: <20230330101141.30199-5-alex.bennee@linaro.org>
+Hi Yi,
+
+On 4/1/23 16:44, Yi Liu wrote:
+> This prepares to add another method for hot reset. The major hot reset logic
+> are moved to vfio_pci_ioctl_pci_hot_reset_groups().
+>
+> No functional change is intended.
+>
+> Suggested-by: Jason Gunthorpe <jgg@nvidia.com>
+> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+> Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
+> Tested-by: Yanting Jiang <yanting.jiang@intel.com>
+> Signed-off-by: Yi Liu <yi.l.liu@intel.com>
 > ---
->  qemu-options.hx | 8 ++++++--
->  1 file changed, 6 insertions(+), 2 deletions(-)
-> 
-> diff --git a/qemu-options.hx b/qemu-options.hx
-> index 59bdf67a2c..9a69ed838e 100644
-> --- a/qemu-options.hx
-> +++ b/qemu-options.hx
-> @@ -1143,10 +1143,14 @@ have gone through several iterations as the feature set and complexity
->  of the block layer have grown. Many online guides to QEMU often
->  reference older and deprecated options, which can lead to confusion.
+>  drivers/vfio/pci/vfio_pci_core.c | 56 +++++++++++++++++++-------------
+>  1 file changed, 33 insertions(+), 23 deletions(-)
+>
+> diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
+> index 5d745c9abf05..3696b8e58445 100644
+> --- a/drivers/vfio/pci/vfio_pci_core.c
+> +++ b/drivers/vfio/pci/vfio_pci_core.c
+> @@ -1255,29 +1255,17 @@ static int vfio_pci_ioctl_get_pci_hot_reset_info(
+>  	return ret;
+>  }
 >  
-> -The recommended modern way to describe disks is to use a combination of
-> +The most explicit way to describe disks is to use a combination of
->  ``-device`` to specify the hardware device and ``-blockdev`` to
->  describe the backend. The device defines what the guest sees and the
-> -backend describes how QEMU handles the data.
-> +backend describes how QEMU handles the data. The ``-drive`` option
-> +combines the device and backend into a single command line options
-> +which is useful in the majority of cases. Older options like ``-hda``
-> +bake in a lot of assumptions from the days when QEMU was emulating a
-> +legacy PC, they are not recommended for modern configurations.
+> -static int vfio_pci_ioctl_pci_hot_reset(struct vfio_pci_core_device *vdev,
+> -					struct vfio_pci_hot_reset __user *arg)
+> +static int
+> +vfio_pci_ioctl_pci_hot_reset_groups(struct vfio_pci_core_device *vdev,
+> +				    struct vfio_pci_hot_reset *hdr,
+nit why don't you simply pass the user group count as decoded earlier.
+hdr sounds like a dup of arg.
+> +				    bool slot,
+> +				    struct vfio_pci_hot_reset __user *arg)
+>  {
+> -	unsigned long minsz = offsetofend(struct vfio_pci_hot_reset, count);
+> -	struct vfio_pci_hot_reset hdr;
+>  	int32_t *group_fds;
+>  	struct file **files;
+>  	struct vfio_pci_group_info info;
+> -	bool slot = false;
+>  	int file_idx, count = 0, ret = 0;
+>  
+> -	if (copy_from_user(&hdr, arg, minsz))
+> -		return -EFAULT;
+> -
+> -	if (hdr.argsz < minsz || hdr.flags)
+> -		return -EINVAL;
+> -
+> -	/* Can we do a slot or bus reset or neither? */
+> -	if (!pci_probe_reset_slot(vdev->pdev->slot))
+> -		slot = true;
+> -	else if (pci_probe_reset_bus(vdev->pdev->bus))
+> -		return -ENODEV;
+> -
+>  	/*
+>  	 * We can't let userspace give us an arbitrarily large buffer to copy,
+>  	 * so verify how many we think there could be.  Note groups can have
+> @@ -1289,11 +1277,11 @@ static int vfio_pci_ioctl_pci_hot_reset(struct vfio_pci_core_device *vdev,
+>  		return ret;
+>  
+>  	/* Somewhere between 1 and count is OK */
+> -	if (!hdr.count || hdr.count > count)
+> +	if (!hdr->count || hdr->count > count)
+>  		return -EINVAL;
+>  
+> -	group_fds = kcalloc(hdr.count, sizeof(*group_fds), GFP_KERNEL);
+> -	files = kcalloc(hdr.count, sizeof(*files), GFP_KERNEL);
+> +	group_fds = kcalloc(hdr->count, sizeof(*group_fds), GFP_KERNEL);
+> +	files = kcalloc(hdr->count, sizeof(*files), GFP_KERNEL);
+>  	if (!group_fds || !files) {
+>  		kfree(group_fds);
+>  		kfree(files);
+> @@ -1301,7 +1289,7 @@ static int vfio_pci_ioctl_pci_hot_reset(struct vfio_pci_core_device *vdev,
+>  	}
+>  
+>  	if (copy_from_user(group_fds, arg->group_fds,
+> -			   hdr.count * sizeof(*group_fds))) {
+> +			   hdr->count * sizeof(*group_fds))) {
+>  		kfree(group_fds);
+>  		kfree(files);
+>  		return -EFAULT;
+> @@ -1311,7 +1299,7 @@ static int vfio_pci_ioctl_pci_hot_reset(struct vfio_pci_core_device *vdev,
+>  	 * Get the group file for each fd to ensure the group held across
+>  	 * the reset
+>  	 */
+> -	for (file_idx = 0; file_idx < hdr.count; file_idx++) {
+> +	for (file_idx = 0; file_idx < hdr->count; file_idx++) {
+>  		struct file *file = fget(group_fds[file_idx]);
+>  
+>  		if (!file) {
+> @@ -1335,7 +1323,7 @@ static int vfio_pci_ioctl_pci_hot_reset(struct vfio_pci_core_device *vdev,
+>  	if (ret)
+>  		goto hot_reset_release;
+>  
+> -	info.count = hdr.count;
+> +	info.count = hdr->count;
+>  	info.files = files;
+>  
+>  	ret = vfio_pci_dev_set_hot_reset(vdev->vdev.dev_set, &info);
+> @@ -1348,6 +1336,28 @@ static int vfio_pci_ioctl_pci_hot_reset(struct vfio_pci_core_device *vdev,
+>  	return ret;
+>  }
+>  
+> +static int vfio_pci_ioctl_pci_hot_reset(struct vfio_pci_core_device *vdev,
+> +					struct vfio_pci_hot_reset __user *arg)
+> +{
+> +	unsigned long minsz = offsetofend(struct vfio_pci_hot_reset, count);
+> +	struct vfio_pci_hot_reset hdr;
+> +	bool slot = false;
+> +
+> +	if (copy_from_user(&hdr, arg, minsz))
+> +		return -EFAULT;
+> +
+> +	if (hdr.argsz < minsz || hdr.flags)
+> +		return -EINVAL;
+> +
+> +	/* Can we do a slot or bus reset or neither? */
+> +	if (!pci_probe_reset_slot(vdev->pdev->slot))
+> +		slot = true;
+> +	else if (pci_probe_reset_bus(vdev->pdev->bus))
+> +		return -ENODEV;
+> +
+> +	return vfio_pci_ioctl_pci_hot_reset_groups(vdev, &hdr, slot, arg);
+> +}
+> +
+>  static int vfio_pci_ioctl_ioeventfd(struct vfio_pci_core_device *vdev,
+>  				    struct vfio_device_ioeventfd __user *arg)
+>  {
+Besides
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
-Let's not make the use of -drive look more advisable than it really is.
-If you're writing a management tool/script and you're still using -drive
-today, you're doing it wrong.
+Thanks
 
-Maybe this is actually the point where we should just clearly define
-that -blockdev is the only supported stable API (like QMP), and that
--drive etc. are convenient shortcuts for human users with no
-compatibility promise (like HMP).
-
-What stopped us from doing so is that there are certain boards that
-don't allow the user to configure the onboard devices, but that look at
--drive. These wouldn't provide any stable API any more after this
-change. However, if this hasn't been solved in many years, maybe it's
-time to view it as the board's problem, and use this change to motivate
-them to implement ways to configure the devices. Or maybe some don't
-even want to bother with a stable API, who knows.
-
-Kevin
+Eric
 
