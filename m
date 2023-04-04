@@ -2,207 +2,236 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 65F566D679B
-	for <lists+kvm@lfdr.de>; Tue,  4 Apr 2023 17:39:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0DF916D67B0
+	for <lists+kvm@lfdr.de>; Tue,  4 Apr 2023 17:41:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235814AbjDDPj2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Apr 2023 11:39:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60602 "EHLO
+        id S235918AbjDDPlp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Apr 2023 11:41:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36498 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235897AbjDDPjO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Apr 2023 11:39:14 -0400
-Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02olkn2071.outbound.protection.outlook.com [40.92.43.71])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3047A5590
-        for <kvm@vger.kernel.org>; Tue,  4 Apr 2023 08:38:57 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=lDYRdzuepiBhJRoIkA/b6Gp6/gL+sA148k6qYaeQw/MlnsRtTQGKySGo8wgc7iPgFxhaqlMTTWmfLKXtue3bauscBqDn4hf2o/63lKU9jIOBwJOqgVG+yICYmLKPIRXsKWDHjEnCNvUXhnQ35HB8xC3OXlDCxyoMBUB2Ieyq7KPPEGdE8CyPzg4k6OZMRV06YeKMeuVhqPOONhIv+Q9RGQ6IBZRYUgwvR8r9Q1brYnXOXN/e3vKOST/4yeaU7jjBerQ2EIi+FBilhiRxo2tZSMpjlWaOv2Ufk/WtaUNsatDb1eLMd1pSFfacDMYmNTBqqbKNUOQ9VrezF35uAruK+Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=qu4/4CcE0GJ6VOHmC6WmRJW3FbT5D2plEU0+gbiz/sQ=;
- b=nj6Tr4Fv/wfbNWdNWpls2S+SK8BKF+1uUSH6mWj5RBAfr94RxOuHmwjRS9nWVTXp3vJYTMRiP547OleE7CEkAIa0j0o+WwXCsVTnq6WboQcdms1og3YBi09wwbDlPU/uFpIlqif4eb2XoR+WIjmYiw4HPJgZzDEUSJhrV0xZw/p4go1kqB2+rhMUapUjQExqJxqfcM/GsxnXZfdYYwY7nhO3MaYRTQF5n0KRLKH+KfzE4PIb0fUtePV7ScqQjZrF2HdpDKNialgE97XRYf6SD3EmoJQy9f6d/HRex57/gBG/KYzlTuAuLQYsc/UImp7oka0QnsM7uaaQxQ/eh1qegw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=qu4/4CcE0GJ6VOHmC6WmRJW3FbT5D2plEU0+gbiz/sQ=;
- b=Rp7+1F4UKbtTfN6aYkFXX5A2nHwMyvEnKKWkgEmH44nYPX1jZV67Ep9x6U2BtCYg5hiFZzM9WK99cvyT9vCqltT8GUyoF/Q1hgfIPHlmFHJRsiOL2WonKJYspQIjTj+dX5F0nLvtJTvdmEOdxc09r65wMPt5HxXWvjwpDvIndW/xhwX9E/IWBfjn7pUzwd0WZ69ZFpA1rNB4D0wDn/24aeI9tww3qpiY8KFDBz/mN24ppLdlfrPGUFoBfvOEDV8GNTvUDs0xBMNITlNmgh5rd4n6mh+UXzQu1XSLyC9eyaxmbFvqsQt3kqqNyoM1iheiJrpA9GgIz8GqY1yPfrybmw==
-Received: from BYAPR12MB3014.namprd12.prod.outlook.com (2603:10b6:a03:d8::11)
- by PH7PR12MB5733.namprd12.prod.outlook.com (2603:10b6:510:1e0::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6254.33; Tue, 4 Apr
- 2023 15:38:41 +0000
-Received: from BYAPR12MB3014.namprd12.prod.outlook.com
- ([fe80::5442:1d2e:772b:c994]) by BYAPR12MB3014.namprd12.prod.outlook.com
- ([fe80::5442:1d2e:772b:c994%4]) with mapi id 15.20.6254.035; Tue, 4 Apr 2023
- 15:38:41 +0000
-Message-ID: <BYAPR12MB301427E268ABAFA3365E2494A0939@BYAPR12MB3014.namprd12.prod.outlook.com>
-Date:   Tue, 4 Apr 2023 17:38:34 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.9.1
-Subject: ping: Re: Nested virtualization not working with hyperv guest/windows
- 11
-From:   =?UTF-8?Q?Micha=c5=82_Zegan?= <webczat@outlook.com>
-To:     kvm@vger.kernel.org
-References: <MN2PR12MB3023F67FF37889AB3E8885F2A0849@MN2PR12MB3023.namprd12.prod.outlook.com>
- <ZB22ZbhyneWevHJo@google.com>
- <a054ea77-e53c-8207-1e25-1081e4ecbb50@outlook.com>
- <9e2ac05c-74f7-ecf6-b81f-873e24425795@outlook.com>
-Content-Language: en-US
-In-Reply-To: <9e2ac05c-74f7-ecf6-b81f-873e24425795@outlook.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-TMN:  [vdWYyTIh+fk44Rty1A7Kk/id2rJ4wauQ]
-X-ClientProxiedBy: BE1P281CA0268.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:b10:86::13) To BYAPR12MB3014.namprd12.prod.outlook.com
- (2603:10b6:a03:d8::11)
-X-Microsoft-Original-Message-ID: <4cee07a8-a5c4-de0e-1bf8-7794a0b5041a@outlook.com>
+        with ESMTP id S235925AbjDDPld (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Apr 2023 11:41:33 -0400
+Received: from out-37.mta0.migadu.com (out-37.mta0.migadu.com [IPv6:2001:41d0:1004:224b::25])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 191915BA9
+        for <kvm@vger.kernel.org>; Tue,  4 Apr 2023 08:41:09 -0700 (PDT)
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1680622866;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=MSEtqrGwi5Kv11LtxCbSZb41cR3IYNHEwzVl0YQk5Ik=;
+        b=CAOQXI0dkdw7UE9LHMrg57LGGBP2aqltZFaN/pWm66GGqrA+GkY0X3Dl1m0nurZrSKRfVI
+        JRZ45pVMYuKttU5F7WVHgniXonCppE125yA2iJctUatSsqUIGsA+sD7wGZQbTXlHSevumw
+        tZwjlbV8Ps91OeLPLQs62uojMAeBsZc=
+From:   Oliver Upton <oliver.upton@linux.dev>
+To:     kvmarm@lists.linux.dev
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Salil Mehta <salil.mehta@huawei.com>,
+        Oliver Upton <oliver.upton@linux.dev>
+Subject: [PATCH v3 00/13] KVM: arm64: Userspace SMCCC call filtering
+Date:   Tue,  4 Apr 2023 15:40:37 +0000
+Message-Id: <20230404154050.2270077-1-oliver.upton@linux.dev>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BYAPR12MB3014:EE_|PH7PR12MB5733:EE_
-X-MS-Office365-Filtering-Correlation-Id: 00457c07-cf45-412d-230e-08db3522aac3
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: X7h8+80PRLcfLt5XqOQjmpjlDeeAcEbMEEvWCjL8MR6Vw6Ky58HfkrOo329pyKV33VtuU3XhPw7duh1746a0NaQWZeI+eTVuPPXpPiT8Dg8MaeCoGyVZf4ew6WF7M62ubUGkddnhDTimdGJiuNcV4wIL7fYSY4w+uiEVtxE4cCeKpHaWp5WaQdkG0ZKP9AY0fkAa1pJc9DXuFGoveS4a8nLCGFLnSw4wYZI986vwCqofD5xnQF20eyR2zdB8hg8dQP4Br3A6Vv8ojVtqIj6sSysSOik+vg8hm//7/p2aOFSBve19nApUa1Jtm6bm+QLR0/B1q9CMTRCIMrd8Xi6tpGTnb1BfTxH0DzdqJ+g7K8EaLXMe00jC2khKJtxJkpRoL6Jz0Dakovh5i5oqtneMglEtl6AMMrgn2LiD4cHjtKbvtlrPgF5t8JBwqm3zondGMnCGfucBT9CU7U10gXm/UUMiy6UDHWxbHFOhFnKHYOEUfw55P57oiWAaiTcwpI9tnH0h5gOptNlU/QfnhvFSv4OM7JHJy8wTEPXbhNI3YE7ykDImxWaWhTRFXDesQ8AFOW2mXeADItakPnO4culBIWMC2peIt8DsjlUo6KnyfFBhgzT2iYaT1789WK0goGBnxt4K6dB8G70yJUS+VxxKrJklV+zpo95PU0oovvUjWU08J/0NK7Ctf7N0Jq1wJL4231QXJCPbt7LNq0YNlypVtB6qQpNUmRwJZa3lpnpEOTo7B4TnkpoCtJJjR3yxS10n
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?WFVHUjNXRTFkTUpaZVRMWTJzVDRHWDNGV3Juc2Z3YTJmeUpIQTlvRnNxUFM2?=
- =?utf-8?B?TmpiSTdKNGRqYU56WEhuN3pQSDhJeDYzTkRwYWF2N3BEeURjMVgrOWQ4Vllt?=
- =?utf-8?B?K3ZGMU12eWxaTWl0WHYvUlNzS1JzU3R2K1lhY0pRbTl1SEdkK25ZL3Myclo3?=
- =?utf-8?B?Mk11R3l6SkE1QXR0YjhvT0tBRUVqc3RxNTh3WWRKVXpYOWRpdXI1M0Y5STBm?=
- =?utf-8?B?UGdKcHdzK0Mwa0pQaytaOWdrSG1HMy96S2M5RUtpNWVqV2xWV3ZGTHl0Tndj?=
- =?utf-8?B?U0tvWGkrT0xQeUlRNWoyQVZ6WmxtcVRkbHlJNlp0a2MwbVMwVkxjU0V3VkpD?=
- =?utf-8?B?NmNtRDZpZ244RFYvRjFHa2pMODdIV3FDdmtPYXhIVEZVcDZvTXhVOW9CTlhj?=
- =?utf-8?B?bEpvdmxxdE1tM0RPSkVocldyZXlHSWdSemZKOUNjaGhETWhVWkdTRS9BNWtv?=
- =?utf-8?B?TjM5dGVwcXlnQWMwT0ZBYm9JMkVudm52aW1SaU9LbGk5MjZxYlowelBRR2Y0?=
- =?utf-8?B?bHdUaFFCWUpBZ2FvdHNVMzgwQmVjeCtsWWpGZGFpWkd0YUg1TnFIMUhPVEI1?=
- =?utf-8?B?cG4xa3NxMEZRL20wTWdtRzVtU2ZLY3Awckthc25vZnVGVVZzeFYzRGFIT2tW?=
- =?utf-8?B?dVY5OVpneUNTSFZzbjg5OVd1ZUFOSkNDNjlUbWN5Q1ZXazU1eXFWcHphWHRn?=
- =?utf-8?B?bnBpaEZNRTFUSWFuYWlxelF0N0ptc0JtTHhNczNBeVFPUi9CMVBubVRzcm0v?=
- =?utf-8?B?OUduZFJKN1Q2OWxERFBudXV5NzJmOFhmcDZTSUUxK2hRT1NOdjE1WlZpbkJ1?=
- =?utf-8?B?UmpLSjU5VzdaZTlpQnVzTW9iazZyaUtRNHdDZTlLM3dOZDMzSks5djFKS1VI?=
- =?utf-8?B?c29WcW9BQnlWbFA2K2c3Z2xtWEhoSitEK3pwalRoZE5uRHRDeiswWlQxcUpx?=
- =?utf-8?B?aFhFOVlXQk5GTXI2Qi9PVGE2Z0tQMkNOdGVxNmk0R1R3eHFmMjRtZFl4Y1hH?=
- =?utf-8?B?TG9pLy91cHQzQkp5TDFBeWkwQlEwUW1xOU5iRG5Hd0x6YXhuRHluMWdtdi96?=
- =?utf-8?B?T20wVVlGZUpDUnZ2Z0J1ZHFSL3Btb3JkTm9TbE5YNG1rS1BVVWZ4ZVBHb0hy?=
- =?utf-8?B?T2orYkVUN3EyeXQvcFhsaUVKdHYvem1JK3RKTE5ZSFNEY0c5dnJiU0N3b3ZU?=
- =?utf-8?B?cjMwaXhJcnhCS1MySGxkZ2lRbDVKbnZ5cGJmdHNQSmF5WjlBWlgwb2hYblBI?=
- =?utf-8?B?UXdJZVlrTElQbDNuNlpBdDgxUHRNdlVwcVZ3Y3ZRNTFoSWpscXdzZ1c3N1I1?=
- =?utf-8?B?L0hndmZQcCthVEVQVnMrT1o0Zlg2dE8zMG5aZ2ZweUx1Ulgxdy96WHRqYkpY?=
- =?utf-8?B?K0VSZm9aYnUvcTFESEdLUGR1WVBsMkwxeHNSOFNsc3l5L1VlK2YzVHc2NVBD?=
- =?utf-8?B?T3owTmViNUN0UWJXN1Y0MS9HbnU1Z2R4RGJjdmxPOW5BSzd0UDM2ZWxjS0xi?=
- =?utf-8?B?SG53L1NPTmFaNU1uQ1VYM2c0dDd2VU1uTGZ4VXJhTWI3NHRDdG1ab0xVQ1FJ?=
- =?utf-8?B?anlUV0dyeVlNUUFSMit3MDhZNFVQU0RrcXdIZmxNU1pCaXB2VlRRbkVjcjJC?=
- =?utf-8?B?a08zZEwyajk5OThoQ1pBdnpDeitDVEE9PQ==?=
-X-OriginatorOrg: outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 00457c07-cf45-412d-230e-08db3522aac3
-X-MS-Exchange-CrossTenant-AuthSource: BYAPR12MB3014.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Apr 2023 15:38:41.8076
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg: 00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB5733
-X-Spam-Status: No, score=1.4 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
-        DKIM_VALID_AU,DKIM_VALID_EF,FORGED_MUA_MOZILLA,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_PASS,SPF_PASS autolearn=no
-        autolearn_force=no version=3.4.6
-X-Spam-Level: *
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
+X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
+        DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+The Arm SMCCC is rather prescriptive in regards to the allocation of
+SMCCC function ID ranges. Many of the hypercall ranges have an
+associated specification from Arm (FF-A, PSCI, SDEI, etc.) with some
+room for vendor-specific implementations.
 
-W dniu 30.03.2023 o 18:46, Michał Zegan pisze:
->
-> W dniu 24.03.2023 o 15:59, Michał Zegan pisze:
->> Hello,
->>
->> Thanks for the reply.
->>
->> doesn't qemu actually panic on entry failure? note i don't have 
->> crashes nor anything in logs, I've tried to enable ignore_msrs in kvm 
->> parameters to see if maybe this will report something, but no luck.
->>
->> Tracing data are here: https://transfer.sh/1lfnMc/kvmtrace.gz
->>
->> Also unsure if I didn't lose some data in the process, although if 
->> this was actually three reboots, not just instantly going to 
->> recovery, it shouldn't matter.
->>
->> I definitely cannot get anything useful from it.
->>
->> W dniu 24.03.2023 o 15:40, Sean Christopherson pisze:
->>> On Fri, Mar 24, 2023, Michał Zegan wrote:
->>>> Hi,
->>>>
->>>> I've sent this some time ago, but was not subscribed here, so 
->>>> unsure if I
->>>> didn't get a reply or maybe missed it, so repeating:
->>>>
->>>> I have a linux host with cpu intel core i7 12700h, kernel currently 
->>>> 6.2,
->>>> fedora37.
->>>>
->>>> I have a kvm/qemu/libvirt virtual machine, cpu model set to host, 
->>>> machine
->>>> type q35, uefi with secureboot enabled, smm on.
->>>>
->>>> The kvm_intel module has nested=y set in parameters so nested 
->>>> virtualization
->>>> is enabled on host.
->>>>
->>>> The virtual machine has windows11 pro guest installed.
->>>>
->>>> When I install hyperv/virtualization platform/other similar 
->>>> functions, after
->>>> reboot, the windows does not boot. Namely it reboots three times 
->>>> and then
->>>> goes to recovery.
->>> This is going to be nearly impossible to debug without more 
->>> information.  Assuming
->>> you can't extract more information from the guest, can you try 
->>> enabling KVM
->>> tracepoints?  E.g. to see if KVM is injecting an exception or a 
->>> nested VM-Entry
->>> failure that leads to the reboot.
->>>
->>> I.e. enable tracing
->>>
->>>      echo 1 > /sys/kernel/debug/tracing/tracing_on
->>>
->>> and then to get the full blast from the trace firehose:
->>>
->>>      echo 1 > /sys/kernel/debug/tracing/events/kvm/enable
->>>
->>> or to get slightly less noisy log:
->>>
->>>      echo 1 > /sys/kernel/debug/tracing/events/kvm/kvm_entry/enable
->>>      echo 1 > /sys/kernel/debug/tracing/events/kvm/kvm_exit/enable
->>>      echo 1 > 
->>> /sys/kernel/debug/tracing/events/kvm/kvm_inj_exception/enable
->>>      echo 1 > 
->>> /sys/kernel/debug/tracing/events/kvm/kvm_nested_intercepts/enable
->>>      echo 1 > 
->>> /sys/kernel/debug/tracing/events/kvm/kvm_nested_intr_vmexit/enable
->>>      echo 1 > 
->>> /sys/kernel/debug/tracing/events/kvm/kvm_nested_vmenter_failed/enable
->>>      echo 1 > 
->>> /sys/kernel/debug/tracing/events/kvm/kvm_nested_vmexit/enable
->>>      echo 1 > 
->>> /sys/kernel/debug/tracing/events/kvm/kvm_nested_vmexit_inject/enable
->>>      echo 1 > 
->>> /sys/kernel/debug/tracing/events/kvm/kvm_nested_vmenter/enable
->>>
->>> To capture something useful, you may need to (significantly) 
->>> increase the size of
->>> the buffer,
->>>
->>>      echo 131072 > /sys/kernel/debug/tracing/buffer_size_kb
->>>
->>> The log itself can be found at
->>>
->>>      /sys/kernel/debug/tracing/trace
+The ever-expanding SMCCC surface leaves a lot of work within KVM for
+providing new features. Furthermore, KVM implements its own
+vendor-specific ABI, with little room for other implementations (like
+Hyper-V, for example). Rather than cramming it all into the kernel we
+should provide a way for userspace to handle hypercalls.
+
+It would appear that vCPU hotplug [*] has a legitimate use case for
+something like this, sending PSCI calls to userspace (where they
+should have gone in the first place).
+
+[*] https://lore.kernel.org/kvmarm/20230203135043.409192-1-james.morse@arm.com/
+
+=> We have these new hypercall bitmap registers, why not use that?
+
+The hypercall bitmap registers aren't necessarily aimed at the same
+problem. The bitmap registers allow a VMM to preserve the ABI the guest
+gets from KVM by default when migrating between hosts. By default KVM
+exposes the entire feature set to the guest, whereas user SMCCC calls
+need explicit opt-in from userspace.
+
+Applies to 6.3-rc3. Note that the kvm->lock is used in this series to
+guard the SMCCC filter and should be converted to use
+kvm->arch.config_lock when that is available. Marc, you can find my
+conflict resolution below between these two series, and I've also pushed
+the result to:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/oupton/linux.git kvm-arm64/for-6.4
+
+  Presumptive, I know! :)
+
+v1: https://lore.kernel.org/kvmarm/20230320221002.4191007-1-oliver.upton@linux.dev/
+v2: https://lore.kernel.org/kvmarm/20230330154918.4014761-1-oliver.upton@linux.dev/
+
+v2 -> v3:
+ - Collect Sean's Ack (thanks!)
+ - s/ALLOW/HANDLE/g (Marc)
+ - Test that the padding is zero (Marc)
+ - Doc fixes, typos, etc. (Marc)
+ - Test that the filter range has not overflowed
+
+v1 -> v2:
+ - Only set bit 0 for longmode, requiring the remaining lower 31 bits be
+   0 (Sean)
+ - Let errors from kvm_smccc_call_handler() reach userspace (Suzuki)
+ - Use the kvm_vm_has_ran_once() helper in the hypercall bitmap register
+   handlers
+ - Collect Suzuki's R-bs (thanks!)
+
+Oliver Upton (13):
+  KVM: x86: Redefine 'longmode' as a flag for KVM_EXIT_HYPERCALL
+  KVM: arm64: Add a helper to check if a VM has ran once
+  KVM: arm64: Add vm fd device attribute accessors
+  KVM: arm64: Rename SMC/HVC call handler to reflect reality
+  KVM: arm64: Start handling SMCs from EL1
+  KVM: arm64: Refactor hvc filtering to support different actions
+  KVM: arm64: Use a maple tree to represent the SMCCC filter
+  KVM: arm64: Add support for KVM_EXIT_HYPERCALL
+  KVM: arm64: Introduce support for userspace SMCCC filtering
+  KVM: arm64: Return NOT_SUPPORTED to guest for unknown PSCI version
+  KVM: arm64: Let errors from SMCCC emulation to reach userspace
+  KVM: selftests: Add a helper for SMCCC calls with SMC instruction
+  KVM: selftests: Add test for SMCCC filter
+
+ Documentation/virt/kvm/api.rst                |  25 +-
+ Documentation/virt/kvm/devices/vm.rst         |  79 ++++++
+ arch/arm64/include/asm/kvm_host.h             |   8 +-
+ arch/arm64/include/uapi/asm/kvm.h             |  24 ++
+ arch/arm64/kvm/arm.c                          |  35 +++
+ arch/arm64/kvm/handle_exit.c                  |  36 +--
+ arch/arm64/kvm/hypercalls.c                   | 164 ++++++++++-
+ arch/arm64/kvm/pmu-emul.c                     |   4 +-
+ arch/arm64/kvm/psci.c                         |   7 +-
+ arch/x86/include/asm/kvm_host.h               |   7 +
+ arch/x86/include/uapi/asm/kvm.h               |   3 +
+ arch/x86/kvm/x86.c                            |   6 +-
+ include/kvm/arm_hypercalls.h                  |   6 +-
+ include/uapi/linux/kvm.h                      |   9 +-
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../selftests/kvm/aarch64/smccc_filter.c      | 260 ++++++++++++++++++
+ .../selftests/kvm/include/aarch64/processor.h |  13 +
+ .../selftests/kvm/lib/aarch64/processor.c     |  52 ++--
+ 18 files changed, 676 insertions(+), 63 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/aarch64/smccc_filter.c
+
+
+base-commit: e8d018dd0257f744ca50a729e3d042cf2ec9da65
+
+diff --cc arch/arm64/include/asm/kvm_host.h
+index a8e2c52b44aa,2682b3fd0881..000000000000
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@@ -224,11 -222,8 +225,12 @@@ struct kvm_arch 
+  #define KVM_ARCH_FLAG_EL1_32BIT				4
+  	/* PSCI SYSTEM_SUSPEND enabled for the guest */
+  #define KVM_ARCH_FLAG_SYSTEM_SUSPEND_ENABLED		5
+ +	/* VM counter offset */
+ +#define KVM_ARCH_FLAG_VM_COUNTER_OFFSET			6
+ +	/* Timer PPIs made immutable */
+ +#define KVM_ARCH_FLAG_TIMER_PPIS_IMMUTABLE		7
+- 
++ 	/* SMCCC filter initialized for the VM */
+ -#define KVM_ARCH_FLAG_SMCCC_FILTER_CONFIGURED		6
+++#define KVM_ARCH_FLAG_SMCCC_FILTER_CONFIGURED		8
+  	unsigned long flags;
+  
+  	/*
+diff --cc arch/arm64/kvm/arm.c
+index 0e5a3ff8cc5a,efee032c9560..000000000000
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@@ -1513,13 -1502,18 +1536,25 @@@ long kvm_arch_vm_ioctl(struct file *fil
+  			return -EFAULT;
+  		return kvm_vm_ioctl_mte_copy_tags(kvm, &copy_tags);
+  	}
+ +	case KVM_ARM_SET_COUNTER_OFFSET: {
+ +		struct kvm_arm_counter_offset offset;
+ +
+ +		if (copy_from_user(&offset, argp, sizeof(offset)))
+ +			return -EFAULT;
+ +		return kvm_vm_ioctl_set_counter_offset(kvm, &offset);
+ +	}
++ 	case KVM_HAS_DEVICE_ATTR: {
++ 		if (copy_from_user(&attr, argp, sizeof(attr)))
++ 			return -EFAULT;
++ 
++ 		return kvm_vm_has_attr(kvm, &attr);
++ 	}
++ 	case KVM_SET_DEVICE_ATTR: {
++ 		if (copy_from_user(&attr, argp, sizeof(attr)))
++ 			return -EFAULT;
++ 
++ 		return kvm_vm_set_attr(kvm, &attr);
++ 	}
+  	default:
+  		return -EINVAL;
+  	}
+diff --cc arch/arm64/kvm/pmu-emul.c
+index 240168416838,a0fc569fdbca..000000000000
+--- a/arch/arm64/kvm/pmu-emul.c
++++ b/arch/arm64/kvm/pmu-emul.c
+@@@ -958,8 -961,12 +958,8 @@@ int kvm_arm_pmu_v3_set_attr(struct kvm_
+  		     filter.action != KVM_PMU_EVENT_DENY))
+  			return -EINVAL;
+  
+- 		if (test_bit(KVM_ARCH_FLAG_HAS_RAN_ONCE, &kvm->arch.flags))
+ -		mutex_lock(&kvm->lock);
+ -
+ -		if (kvm_vm_has_ran_once(kvm)) {
+ -			mutex_unlock(&kvm->lock);
+++		if (kvm_vm_has_ran_once(kvm))
+  			return -EBUSY;
+ -		}
+  
+  		if (!kvm->arch.pmu_filter) {
+  			kvm->arch.pmu_filter = bitmap_alloc(nr_events, GFP_KERNEL_ACCOUNT);
+diff --git a/arch/arm64/kvm/hypercalls.c b/arch/arm64/kvm/hypercalls.c
+index ba1adc68d695..22938e4d947c 100644
+--- a/arch/arm64/kvm/hypercalls.c
++++ b/arch/arm64/kvm/hypercalls.c
+@@ -164,7 +164,7 @@ static int kvm_smccc_set_filter(struct kvm *kvm, struct kvm_smccc_filter __user
+ 	if (end < start || filter.action >= NR_SMCCC_FILTER_ACTIONS)
+ 		return -EINVAL;
+ 
+-	mutex_lock(&kvm->lock);
++	mutex_lock(&kvm->arch.config_lock);
+ 
+ 	if (kvm_vm_has_ran_once(kvm)) {
+ 		r = -EBUSY;
+@@ -179,7 +179,7 @@ static int kvm_smccc_set_filter(struct kvm *kvm, struct kvm_smccc_filter __user
+ 	set_bit(KVM_ARCH_FLAG_SMCCC_FILTER_CONFIGURED, &kvm->arch.flags);
+ 
+ out_unlock:
+-	mutex_unlock(&kvm->lock);
++	mutex_unlock(&kvm->arch.config_lock);
+ 	return r;
+ }
+ 
+
+-- 
+2.40.0.348.gf938b09366-goog
+
