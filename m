@@ -2,109 +2,181 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 982A06D5EE7
-	for <lists+kvm@lfdr.de>; Tue,  4 Apr 2023 13:24:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AF2646D5F25
+	for <lists+kvm@lfdr.de>; Tue,  4 Apr 2023 13:37:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234464AbjDDLYx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Apr 2023 07:24:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55962 "EHLO
+        id S234786AbjDDLhG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Apr 2023 07:37:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39234 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234681AbjDDLYv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Apr 2023 07:24:51 -0400
-Received: from mail-wr1-x42a.google.com (mail-wr1-x42a.google.com [IPv6:2a00:1450:4864:20::42a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EEB951FEE
-        for <kvm@vger.kernel.org>; Tue,  4 Apr 2023 04:24:50 -0700 (PDT)
-Received: by mail-wr1-x42a.google.com with SMTP id j24so32464614wrd.0
-        for <kvm@vger.kernel.org>; Tue, 04 Apr 2023 04:24:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1680607489;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=N87mk8mRdOayl+ChZVFIelbjG/oXWu2x7UlDEIktud4=;
-        b=Lhmagjj7NuCmNr9lXMkd6xtkZPotwRC9N8Xcabq7EJPqwjbhmhm42DMK2OqXQXSiLd
-         D9HxaYrlYDcExj7pm9OJoXeTk8vxbBS35lQwpkhHkwCaRzOw9iPlZDRxDbGlUhzUA9Zx
-         ikMNvPvd7RUfatGO99YYgixg6Lx62C002tpik4X0BM5jUGReTVlljPhIfhS7zitiz9j8
-         XiMBbo+gTyScKATMNWpw20CGJ4IOjcEfNS51A1CfXI/QdbggIGFQEMfCvb0RoW/6QsFL
-         5n5i1Xs5yQYFp+Un1+H0YUz3c02649NiWpjDXcdNl9K+44rE/bBnrQydsL9eVbmDlctU
-         /YVg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680607489;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=N87mk8mRdOayl+ChZVFIelbjG/oXWu2x7UlDEIktud4=;
-        b=Y9wVqUFxdNv09bfrsth1gKr2pZhB2dQQ9DgP0utAVHZDiuKO37tICtzG7CUz7JEpF4
-         pmIpz8qYIC1kuOLl8KIQvi8Q/yrNm2BlDodl4YWlgR6TdHrfj5f9Acwr8XooXXzkfiqo
-         36bojbPujG3c5gREO18pzv+IQeXS7Oqao4qWrel1ka+0eTcwlb+dWYDzWG0M6H3Zy6ip
-         nyYP48D0bfPXoebXLUhuasLqS4okqgqtPxQupWvqshRXcD79ByCeA4f/mLXkI0FFsle1
-         vAPJ1Lm5ug9LINKyJuESz+HHGVNBkJy1Fd/UQ07yD+hucFVNahA6ZoG1BqjL4BAJVwqJ
-         mebQ==
-X-Gm-Message-State: AAQBX9cSmDGzFSOqO4J+2QfVciyzOocIsmyGzDPM6DezHU6gOzykNz98
-        cVC9vb3RidgPSSxLvyI8EQ7LTg==
-X-Google-Smtp-Source: AKy350bmUJLylVHqUnD5hN8Q9rm7xsIhoB5PavXlWhfUWYsXikCRIOibm3MeKksjOnaxzIPlkGXpBg==
-X-Received: by 2002:adf:ed81:0:b0:2e6:ba1a:8d8 with SMTP id c1-20020adfed81000000b002e6ba1a08d8mr1431350wro.41.1680607489516;
-        Tue, 04 Apr 2023 04:24:49 -0700 (PDT)
-Received: from [192.168.69.115] (gra94-h02-176-184-53-13.dsl.sta.abo.bbox.fr. [176.184.53.13])
-        by smtp.gmail.com with ESMTPSA id d9-20020adff849000000b002c56af32e8csm12074373wrq.35.2023.04.04.04.24.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 04 Apr 2023 04:24:49 -0700 (PDT)
-Message-ID: <72fdb847-46ec-93e3-dc55-2e87ac96367c@linaro.org>
-Date:   Tue, 4 Apr 2023 13:24:46 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.9.1
-Subject: Re: [PATCH v2 09/11] tests/vm: use the default system python for
- NetBSD
-Content-Language: en-US
-To:     =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
-        qemu-devel@nongnu.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Reinoud Zandijk <reinoud@netbsd.org>,
-        Ryo ONODERA <ryoon@netbsd.org>, qemu-block@nongnu.org,
-        Hanna Reitz <hreitz@redhat.com>, Warner Losh <imp@bsdimp.com>,
-        Beraldo Leal <bleal@redhat.com>,
-        Kyle Evans <kevans@freebsd.org>, kvm@vger.kernel.org,
-        Wainer dos Santos Moschetta <wainersm@redhat.com>,
-        Cleber Rosa <crosa@redhat.com>, Thomas Huth <thuth@redhat.com>,
-        Kevin Wolf <kwolf@redhat.com>,
-        =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
-References: <20230403134920.2132362-1-alex.bennee@linaro.org>
- <20230403134920.2132362-10-alex.bennee@linaro.org>
-From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>
-In-Reply-To: <20230403134920.2132362-10-alex.bennee@linaro.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+        with ESMTP id S234159AbjDDLhE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Apr 2023 07:37:04 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0301E2D64
+        for <kvm@vger.kernel.org>; Tue,  4 Apr 2023 04:36:52 -0700 (PDT)
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3349oxhr015598;
+        Tue, 4 Apr 2023 11:36:50 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : content-transfer-encoding : mime-version; s=pp1;
+ bh=dliiwjiuqk8xsvVveTTtKn4GmqHcf18lGFidSmTE+CE=;
+ b=HaIunLfdFknHfiEZL7bovThJ4YPAFZ4rX4wy20qrjJqmSstp0NsWAQ7cj4zxekCXfJKD
+ hrcVdeCQXpecdrLapNHL5TmW/mEvbU6Gi1VdNgIc5Ox9vtLGBQg5t0g+eEIlvyrOM6Kx
+ dba/r4yrVmSvAhuAZTaUkbFC9ihR/xiZPfpGTnAlAASDTa3xqPHPQQl0WSyRqZ7WOlJS
+ FF38P7QqPgu9AGT5BFwBgghPxLBzwJhyNXrugNBR64lXxYuwqnyVx7rlv5WUykt3u0yv
+ naF4TZw+TdgcbYv27slovQ8TetHrclelCr5Y2jqodPE6s1iAx3QgJ+TQ5eJiqtzcDCFv gA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3prhmg2eve-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 04 Apr 2023 11:36:49 +0000
+Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 334BSFlc031458;
+        Tue, 4 Apr 2023 11:36:49 GMT
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3prhmg2euv-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 04 Apr 2023 11:36:49 +0000
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 333Mejit004036;
+        Tue, 4 Apr 2023 11:36:47 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+        by ppma06ams.nl.ibm.com (PPS) with ESMTPS id 3ppbvg2fs4-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 04 Apr 2023 11:36:47 +0000
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+        by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 334BahPb17302202
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 4 Apr 2023 11:36:43 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id BCEB820040;
+        Tue,  4 Apr 2023 11:36:43 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 4B40B2004B;
+        Tue,  4 Apr 2023 11:36:43 +0000 (GMT)
+Received: from t14-nrb.ibmuc.com (unknown [9.171.55.238])
+        by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Tue,  4 Apr 2023 11:36:43 +0000 (GMT)
+From:   Nico Boehr <nrb@linux.ibm.com>
+To:     thuth@redhat.com, pbonzini@redhat.com, andrew.jones@linux.dev
+Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com, imbrenda@linux.ibm.com
+Subject: [kvm-unit-tests GIT PULL v2 00/14] s390x: new maintainer, refactor linker scripts, tests for misalignments, execute-type instructions and vSIE epdx
+Date:   Tue,  4 Apr 2023 13:36:25 +0200
+Message-Id: <20230404113639.37544-1-nrb@linux.ibm.com>
+X-Mailer: git-send-email 2.39.2
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: GtP36W5b85QbRx9atgXGcPZuRI0gsjvu
+X-Proofpoint-GUID: oSzozZfeMLCZbeyZvZXOCW4K0QbMrMNz
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
-        DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-        version=3.4.6
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+MIME-Version: 1.0
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
+ definitions=2023-04-04_04,2023-04-04_01,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 bulkscore=0
+ priorityscore=1501 clxscore=1015 suspectscore=0 impostorscore=0
+ lowpriorityscore=0 phishscore=0 spamscore=0 adultscore=0 mlxscore=0
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2303200000 definitions=main-2304040107
+X-Spam-Status: No, score=-0.1 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
+        DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 3/4/23 15:49, Alex Bennée wrote:
-> From: Daniel P. Berrangé <berrange@redhat.com>
-> 
-> Currently our NetBSD VM recipe requests instal of the python37 package
-> and explicitly tells QEMU to use that version of python. Since the
-> NetBSD base ISO was updated to version 9.3 though, the default system
-> python version is 3.9 which is sufficiently new for QEMU to rely on.
-> Rather than requesting an older python, just test against the default
-> system python which is what most users will have.
-> 
-> Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
-> Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-> Reviewed-by: Philippe Mathieu-Daudé <philmd@linaro.org>
-> Message-Id: <20230329124601.822209-1-berrange@redhat.com>
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
-> Message-Id: <20230330101141.30199-9-alex.bennee@linaro.org>
-> ---
->   tests/vm/netbsd | 3 +--
->   1 file changed, 1 insertion(+), 2 deletions(-)
+Hi Paolo and/or Thomas,
 
-Tested-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+so, here's the second try of the first pull request from me :)
+
+v2:
+---
+* pick up a new version of Nina's spec_ex series to fix clang compiler issue and
+  missing barrier.
+
+Changes in this pull request:
+
+* Marc contributed a series with a few fixes. Most importantly, it generates
+  linker scripts for s390x with the assembler, permitting the use of defines in
+  linker scripts.
+  It is worth noting that it also touches lib/linux/const.h to check for
+  __ASSEMBLY__ and __ASSEMBLER__.
+* Nina contributed quite a few tests for misalignments in various instructions.
+  As well as tests for execute-type instructions. Note that a few of her tests
+  will require recent QEMUs under TCG. Upstream fixes are available [1, 2].
+* Thomas contributed a test for vSIE on s390x, where the g3 clock might
+  sometimes we wrong after reboot. A kernel patch is required[3].
+* And, finally, the patch where I get the honor to work as maintainer.
+
+MERGE: https://gitlab.com/kvm-unit-tests/kvm-unit-tests/-/merge_requests/42
+
+PIPELINE: https://gitlab.com/Nico-Boehr/kvm-unit-tests/-/pipelines/827521196
+
+PULL: https://gitlab.com/Nico-Boehr/kvm-unit-tests.git s390x-2023-03
+
+[1] https://lists.gnu.org/archive/html/qemu-devel/2023-03/msg04860.html
+[2] https://lists.gnu.org/archive/html/qemu-devel/2023-03/msg04896.html
+[3] https://lore.kernel.org/kvm/20221123090833.292938-1-thuth@redhat.com/
+
+The following changes since commit 5b5d27da2973b20ec29b18df4d749fb2190458af:
+
+  memory: Skip tests for instructions that are absent (2023-04-03 18:44:24 +0200)
+
+are available in the Git repository at:
+
+  https://gitlab.com/Nico-Boehr/kvm-unit-tests.git s390x-2023-03
+
+for you to fetch changes up to 215923b163742f167dd118664af638389e5ada59:
+
+  s390x: sie: Test whether the epoch extension field is working as expected (2023-04-04 13:10:33 +0200)
+
+----------------------------------------------------------------
+Janosch Frank (1):
+  MAINTAINERS: Add Nico as s390x Maintainer and make Thomas reviewer
+
+Marc Hartmayer (7):
+  .gitignore: ignore `s390x/comm.key` file
+  s390x/Makefile: simplify `%.hdr` target rules
+  s390x/Makefile: fix `*.gbin` target dependencies
+  s390x/Makefile: refactor CPPFLAGS
+  s390x: use preprocessor for linker script generation
+  s390x: define a macro for the stack frame size
+  lib/linux/const.h: test for `__ASSEMBLER__` as well
+
+Nina Schoetterl-Glausch (5):
+  s390x/spec_ex: Use PSW macro
+  s390x/spec_ex: Add test introducing odd address into PSW
+  s390x/spec_ex: Add test of EXECUTE with odd target address
+  s390x: Add tests for execute-type instructions
+  s390x: spec_ex: Add test for misaligned load
+
+Thomas Huth (1):
+  s390x: sie: Test whether the epoch extension field is working as
+    expected
+
+ MAINTAINERS                                 |   3 +-
+ s390x/Makefile                              |  28 +--
+ lib/linux/const.h                           |   2 +-
+ lib/s390x/asm-offsets.c                     |   1 +
+ s390x/cstart64.S                            |   2 +-
+ s390x/{flat.lds => flat.lds.S}              |   4 +-
+ s390x/macros.S                              |   4 +-
+ s390x/snippets/asm/{flat.lds => flat.lds.S} |   0
+ s390x/snippets/c/{flat.lds => flat.lds.S}   |   6 +-
+ s390x/ex.c                                  | 188 ++++++++++++++++++++
+ s390x/gs.c                                  |  38 ++--
+ s390x/sie.c                                 |  28 +++
+ s390x/spec_ex.c                             | 106 +++++++++--
+ s390x/unittests.cfg                         |   3 +
+ .gitignore                                  |   2 +
+ .gitlab-ci.yml                              |   1 +
+ 16 files changed, 370 insertions(+), 46 deletions(-)
+ rename s390x/{flat.lds => flat.lds.S} (93%)
+ rename s390x/snippets/asm/{flat.lds => flat.lds.S} (100%)
+ rename s390x/snippets/c/{flat.lds => flat.lds.S} (88%)
+ create mode 100644 s390x/ex.c
+
+-- 
+2.39.2
 
