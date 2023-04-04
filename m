@@ -2,114 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2BEEA6D594A
-	for <lists+kvm@lfdr.de>; Tue,  4 Apr 2023 09:17:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 247FC6D594C
+	for <lists+kvm@lfdr.de>; Tue,  4 Apr 2023 09:18:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233800AbjDDHRz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Apr 2023 03:17:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47560 "EHLO
+        id S233810AbjDDHSW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Apr 2023 03:18:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48150 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233352AbjDDHRy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Apr 2023 03:17:54 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B31D21FE2
-        for <kvm@vger.kernel.org>; Tue,  4 Apr 2023 00:17:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1680592629;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=NRYJdvmu2YT9+EZW2Y9gyrF6TzJ/lvpdC+QFmt09whw=;
-        b=aSjMomFDk+E9OePG4mHFoeD4THklGUedoG/mhLiVTUabxU5dVc/TYu1lFY2l5RpBAvjR3g
-        BYJOM41efIPChHHisa515LsKh21RIurtWzTwwF9wA+Mwo7fByF0iuLFpRvc1Zm97YtQLUI
-        2XNtWNnu+WTCxpo5jfwnxbw56vEyeH8=
-Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
- [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-106-sqERC9-lOCacUT7D5Soj4Q-1; Tue, 04 Apr 2023 03:17:08 -0400
-X-MC-Unique: sqERC9-lOCacUT7D5Soj4Q-1
-Received: by mail-qv1-f71.google.com with SMTP id a15-20020a0562140c2f00b005ad28a23cffso14008960qvd.6
-        for <kvm@vger.kernel.org>; Tue, 04 Apr 2023 00:17:08 -0700 (PDT)
+        with ESMTP id S233352AbjDDHSV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Apr 2023 03:18:21 -0400
+Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52AE6E5C;
+        Tue,  4 Apr 2023 00:18:20 -0700 (PDT)
+Received: by mail-pj1-x1031.google.com with SMTP id p13-20020a17090a284d00b0023d2e945aebso1141671pjf.0;
+        Tue, 04 Apr 2023 00:18:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112; t=1680592700;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=FCygZmbLng0ooUwO0+yqIAuXoXe7sopWyBe6SH2VVnk=;
+        b=ZeMFSm3rQ6boGlvBEEikmhbKoCXYmSQtt3VyzhkSUgIwMcYPQKiBFXZfHz8c6eYzXl
+         C5F1Tkc+cw2H4bv9V5Z/LbduzoSEaNw8cpEmktwc/TNnDuIDAZIPBoVQz3zac+vZhAXJ
+         N1rICkWE50isRzhk9UczFSOEkRqtPczf/FBY6x9Ssk5ecBc4W4l45srX/2xABNY2e2Zn
+         iuyq7N9M4+um+a6cIpLp6PIOpCBqyPFJfWDiA1xduvXqQz93YprKBnxV6oFfGMh4SMxQ
+         OSYAyHhTqnyWej9te7u4yQujwj9+/h2T11rfmjah6ahMpmHkz7i+IuBDYYM9TDrkaKPF
+         f31g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680592628;
-        h=content-transfer-encoding:in-reply-to:subject:from:references:cc:to
-         :content-language:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=NRYJdvmu2YT9+EZW2Y9gyrF6TzJ/lvpdC+QFmt09whw=;
-        b=10bZCIAjrdPN/7FFNzOcp6yBzGm6mgBG6FSlFq2ij4hFc3OUbXs41Wynsx7BZzWp6W
-         vZVjQRKMA1I8Pnc/JqFjQG6N8FYGV598ROb0KHqB42TYpgUej5jCl/06gsCd0Pr+qVWF
-         3Vhfg9L/+BLTGLdJyKH4NeuKDotOohIC1/QebOSZtV2fSWHeCsosJKo499uZwYVk97xw
-         Dy7WNRgV6jnj/zAut/OabSW9TwSPhAWEL2jaywo5IHSnoGE4wNhEFwOQ8ELjpV6Wd/kW
-         icRhSyZJq4dOgKMmn7lZJau145cvbK+rW0sIlgMpEJ4QfaQEBM98gKaS/H8EeIU7oW2i
-         OSsA==
-X-Gm-Message-State: AAQBX9c5FedmJOOb/4LcSnaoqT1Ca73+6ws6Rw2WSrFOhYx+Qo+mMn1I
-        ra4Qo4R3w5E+HBWA+ITlEf2571djMZ0T1xZ5VoEbgJsb/G/36NN9YBkQV43vAewBpm5U4XtvmTw
-        +jL02RpszhS7b
-X-Received: by 2002:a05:6214:27e5:b0:5df:44f2:e97d with SMTP id jt5-20020a05621427e500b005df44f2e97dmr33283680qvb.19.1680592628185;
-        Tue, 04 Apr 2023 00:17:08 -0700 (PDT)
-X-Google-Smtp-Source: AKy350b6/Qv/o3wVhUyDFX4zCkfQ4F1t3P/9CUFpq6rARbRXin+E+2DWPBrOHxMRu4dS2R5/r6Cm9g==
-X-Received: by 2002:a05:6214:27e5:b0:5df:44f2:e97d with SMTP id jt5-20020a05621427e500b005df44f2e97dmr33283667qvb.19.1680592627968;
-        Tue, 04 Apr 2023 00:17:07 -0700 (PDT)
-Received: from [192.168.0.3] (ip-109-43-178-74.web.vodafone.de. [109.43.178.74])
-        by smtp.gmail.com with ESMTPSA id k5-20020a0cebc5000000b005dd8b9345d3sm3160219qvq.107.2023.04.04.00.17.05
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 04 Apr 2023 00:17:06 -0700 (PDT)
-Message-ID: <de9407df-e3cf-8545-53fa-df7d671b4ea8@redhat.com>
-Date:   Tue, 4 Apr 2023 09:17:04 +0200
+        d=1e100.net; s=20210112; t=1680592700;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=FCygZmbLng0ooUwO0+yqIAuXoXe7sopWyBe6SH2VVnk=;
+        b=QPzEXxtpShuMv+ml6xvm4Tgm2MnsutaTJXoZSgzZKG3GDIHZ3gXb9KX4/M//pO33Ly
+         x5Ha/yOBjv7pY4b+FFJ3iGdNiM2uQse+ADLzL7soKMwqTTnijV1E9N/egxtNp1CJGeZd
+         X6JWZqv7vREt/c1nZhI8Zsl0dON+UGLNL3Tay4aULHF4i0TOPoOxbfm8HSwTm01O77gD
+         57/j34bmc+rOWoWG9P4PYO2myLRBUkmnUJ9zHuLhsRSf0TypS/dedJdDf5haJAXHwNpz
+         qBUodAPRClJm/7N7gxh2tgJciL7WqF3DGIeyfHcEDA753dKNhR8fkvsquq0ZQm/Wtf0X
+         ZRpg==
+X-Gm-Message-State: AAQBX9dkbtIeO0ZR0Lzj9Qw5bTUV2HrT3W3lkmgdS/0Vf01QKN1Cogtj
+        SssJwawLKAqqc1Zbx6MESNc=
+X-Google-Smtp-Source: AKy350YLCpuWAmtNpRSOJMnwdRDQeprw0LJ2hzLlggSqbqkCKHXtDOwUjJRO9vMJBzQrDsbmx0U6uQ==
+X-Received: by 2002:a17:90a:1902:b0:240:5c43:7766 with SMTP id 2-20020a17090a190200b002405c437766mr1918658pjg.4.1680592699721;
+        Tue, 04 Apr 2023 00:18:19 -0700 (PDT)
+Received: from localhost.localdomain ([103.7.29.32])
+        by smtp.gmail.com with ESMTPSA id gp11-20020a17090adf0b00b002376d85844dsm7269164pjb.51.2023.04.04.00.18.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 04 Apr 2023 00:18:19 -0700 (PDT)
+From:   Like Xu <like.xu.linux@gmail.com>
+X-Google-Original-From: Like Xu <likexu@tencent.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH] KVM: x86/pmu: Zero out pmu->all_valid_pmc_idx each time it's refreshed
+Date:   Tue,  4 Apr 2023 15:17:59 +0800
+Message-Id: <20230404071759.75376-1-likexu@tencent.com>
+X-Mailer: git-send-email 2.40.0
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.13.0
-Content-Language: en-US
-To:     Nicholas Piggin <npiggin@gmail.com>, kvm@vger.kernel.org
-Cc:     linuxppc-dev@lists.ozlabs.org, Laurent Vivier <lvivier@redhat.com>
-References: <20230327124520.2707537-1-npiggin@gmail.com>
- <20230327124520.2707537-9-npiggin@gmail.com>
-From:   Thomas Huth <thuth@redhat.com>
-Subject: Re: [kvm-unit-tests v3 08/13] powerpc/spapr_vpa: Add basic VPA tests
-In-Reply-To: <20230327124520.2707537-9-npiggin@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
+        DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 27/03/2023 14.45, Nicholas Piggin wrote:
-> The VPA is an optional memory structure shared between the hypervisor
-> and operating system, defined by PAPR. This test defines the structure
-> and adds registration, deregistration, and a few simple sanity tests.
-> 
-> [Thanks to Thomas Huth for suggesting many of the test cases.]
-> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
-> ---
-...
-> diff --git a/powerpc/Makefile.ppc64 b/powerpc/Makefile.ppc64
-> index ea68447..b0ed2b1 100644
-> --- a/powerpc/Makefile.ppc64
-> +++ b/powerpc/Makefile.ppc64
-> @@ -19,7 +19,7 @@ reloc.o  = $(TEST_DIR)/reloc64.o
->   OBJDIRS += lib/ppc64
->   
->   # ppc64 specific tests
-> -tests =
-> +tests = $(TEST_DIR)/spapr_vpa.elf
->   
->   include $(SRCDIR)/$(TEST_DIR)/Makefile.common
+From: Like Xu <likexu@tencent.com>
 
-That reminds me: We added all other tests to Makefile.common ... without 
-ever checking them on 32-bit. Since we removed the early 32-bit code long 
-ago already (see commit 2a814baab80af990eaf), it just might not make sense 
-anymore to keep the separation for 64-bit and 32-bit Makefiles around here 
-anymore --> could be a future cleanup to merge the Makefiles in the powerpc 
-folder.
+The kvm_pmu_refresh() may be called repeatedly (e.g. configure guest
+CPUID repeatedly or update MSR_IA32_PERF_CAPABILITIES) and each
+call will use the last pmu->all_valid_pmc_idx value, with the residual
+bits introducing additional overhead later in the vPMU emulation.
 
-Anyway, that's not a problem of your patch here which looks fine, so:
+Fixes: b35e5548b411 ("KVM: x86/vPMU: Add lazy mechanism to release perf_event per vPMC")
+Suggested-by: Sean Christopherson <seanjc@google.com>
+Signed-off-by: Like Xu <likexu@tencent.com>
+---
+ arch/x86/kvm/pmu.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
+index 612e6c70ce2e..29492c2a0c82 100644
+--- a/arch/x86/kvm/pmu.c
++++ b/arch/x86/kvm/pmu.c
+@@ -589,6 +589,7 @@ int kvm_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+  */
+ void kvm_pmu_refresh(struct kvm_vcpu *vcpu)
+ {
++	bitmap_zero(vcpu_to_pmu(vcpu)->all_valid_pmc_idx, X86_PMC_IDX_MAX);
+ 	static_call(kvm_x86_pmu_refresh)(vcpu);
+ }
+ 
+-- 
+2.40.0
 
