@@ -2,94 +2,200 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9A3616D5D9F
-	for <lists+kvm@lfdr.de>; Tue,  4 Apr 2023 12:37:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 14E316D5DD2
+	for <lists+kvm@lfdr.de>; Tue,  4 Apr 2023 12:45:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234228AbjDDKhH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Apr 2023 06:37:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46700 "EHLO
+        id S234433AbjDDKph (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Apr 2023 06:45:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54536 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234049AbjDDKhG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Apr 2023 06:37:06 -0400
-Received: from mail-pg1-x542.google.com (mail-pg1-x542.google.com [IPv6:2607:f8b0:4864:20::542])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D72641713;
-        Tue,  4 Apr 2023 03:37:05 -0700 (PDT)
-Received: by mail-pg1-x542.google.com with SMTP id 184so4679162pga.12;
-        Tue, 04 Apr 2023 03:37:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1680604625;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JuAO/TXt1co2Yl/jE9f+m6f2f1iw8gMZ65fgjuKcqFk=;
-        b=i+InxZv9vctTwvYJfOhr3IXiEJtQTdgq3FWlV7VrMh8MAQSk5o0oAYpnljO5NRRl2W
-         Nj6BVO477s8Olgu1uQ6iw0i3zNybyIvrZkGzMPYbVO+ERb5UiiImi461t7g7WJUwXDiG
-         LUE07ykWmtn1ukS7zNFgsGCUWFqrgek/SuWlrcpu/udR3MKyp6cga/YhKcpiXqXZShUR
-         N4kNSc033fYBMU1oU336mWuwwENheza2114WYsg/8HSLYp2LqVBwI+hythwbITjs+D6q
-         oe9ZF6NQQ2Coyp5UfD253HKcPhmFcZsbMVmXapl5bVsEOUqAdNKyOY7lq9i8gl7POMqB
-         vwCg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680604625;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=JuAO/TXt1co2Yl/jE9f+m6f2f1iw8gMZ65fgjuKcqFk=;
-        b=NBoAgK2or4sB90N/NPnOF94itohYVXKsoTwF7oReDVe6oKhYEUq8DuaWYy09WnHHHA
-         2QJaZ1tKA4Tgf/EbMctz9tZ5TzIBzOGCZ/5wgYC5w13Utx61OR6efOptfpTiKGE7Oiyj
-         cLvotyU3KZ4YEVFSQgNjGecsDweTikNa75aFKOY94+o5Q4D8rhG7XeVStQaZQxMrVwty
-         EwavTjOYNnaI6mwt0pOJhxDFHN/E2EsoL6PfN+WCb9G0nuDNb+3dXZvPgQtGiJb3xtLa
-         yBm0M333WKe3KniwOjJrBAn8g7D10LcOyvqwgq2FX38TUZ2x+Ka22tcoJgjSiftWaD0e
-         xi3A==
-X-Gm-Message-State: AAQBX9dhitS+8IEXVfix8b/Ff0S8bB5hdYjw/TF2sCV4gdezrHbYpId7
-        nZhf+sNw/P9fBhkzVIZsuI6F+XllC6O+MSLKmFE=
-X-Google-Smtp-Source: AKy350ZLMiwfQ0OYpYPabzR/YEcjjfk0uwyQ/gfJTgITHcf5YGeISd1e8jdWC9U7i3r6VQVA7eDzoxcoEcDxyLHByQI=
-X-Received: by 2002:a63:ea4d:0:b0:513:a748:c7d5 with SMTP id
- l13-20020a63ea4d000000b00513a748c7d5mr544257pgk.3.1680604624434; Tue, 04 Apr
- 2023 03:37:04 -0700 (PDT)
+        with ESMTP id S233989AbjDDKpf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Apr 2023 06:45:35 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B3681FC8;
+        Tue,  4 Apr 2023 03:45:31 -0700 (PDT)
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 334AJH79012405;
+        Tue, 4 Apr 2023 10:45:31 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=Akhko0nt0u0dEUUYPSe1+bUWxwqoYqNpuwSr8RegF/c=;
+ b=L/OpdZHj7ugOmk9WcmuWy6mTouwmgpNBhFnkoHKFGOOc0Mn4yWY9ad5U8yHF9PYdXLbn
+ Re1j3yEF1HOx1A5Zp1IE+rk8+MWlTyhUyW9LWSxkrKL6cRO3AGFSf5CUJ30wgwOReNSl
+ wllBg51WXQsUyw2icSLLc+YMtr54c5LUVke24j7AVn/DVg7n5uoIsCtuGXOOOeBp4Jwq
+ eNn1rfOi2DQD5cIsU/kdIK+WzTYB5qWKp2tJE6TX78COvLCz9DMpW1GFpod3OzTiAzLB
+ xdkR6nDPp7ClWRPe5MSWqBFm5sk4GcmzuQ3g0s3xrPGNqpRWwbvhxAqr4l5ibk57HjmO UQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3prj1q8hv4-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 04 Apr 2023 10:45:30 +0000
+Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 334AJsFL013915;
+        Tue, 4 Apr 2023 10:45:30 GMT
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3prj1q8htt-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 04 Apr 2023 10:45:30 +0000
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+        by ppma02fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3344jDbn030602;
+        Tue, 4 Apr 2023 10:45:27 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+        by ppma02fra.de.ibm.com (PPS) with ESMTPS id 3ppc86su4t-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 04 Apr 2023 10:45:26 +0000
+Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
+        by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 334AjLQ852691452
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 4 Apr 2023 10:45:21 GMT
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2B78620040;
+        Tue,  4 Apr 2023 10:45:21 +0000 (GMT)
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E0FBB20043;
+        Tue,  4 Apr 2023 10:45:20 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.152.224.56])
+        by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Tue,  4 Apr 2023 10:45:20 +0000 (GMT)
+Date:   Tue, 4 Apr 2023 12:45:19 +0200
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Thomas Huth <thuth@redhat.com>
+Cc:     kvm@vger.kernel.org, Nico Boehr <nrb@linux.ibm.com>,
+        linux-s390@vger.kernel.org, Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>
+Subject: Re: [kvm-unit-tests PATCH] s390x: Use the right constraints in
+ intercept.c
+Message-ID: <20230404124519.7e542cb6@p-imbrenda>
+In-Reply-To: <20230404102437.174404-1-thuth@redhat.com>
+References: <20230404102437.174404-1-thuth@redhat.com>
+Organization: IBM
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-References: <20230403095200.1391782-1-korantwork@gmail.com> <4235f3f7-bae5-1f5e-582e-077bc5d03306@gmail.com>
-In-Reply-To: <4235f3f7-bae5-1f5e-582e-077bc5d03306@gmail.com>
-From:   Xinghui Li <korantwork@gmail.com>
-Date:   Tue, 4 Apr 2023 18:38:13 +0800
-Message-ID: <CAEm4hYUOkPT4mHa0NQyUcSzaaCeLnco79-fU=bkRBROuwbT0VQ@mail.gmail.com>
-Subject: Re: [PATCH REBASED] KVM: x86: SVM: Fix one redefine issue about VMCB_AVIC_APIC_BAR_MASK
-To:     Like Xu <like.xu.linux@gmail.com>
-Cc:     "Paolo Bonzini - Distinguished Engineer (kernel-recipes.org) (KVM HoF)" 
-        <pbonzini@redhat.com>, Xinghui Li <korantli@tencent.com>,
-        linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org,
-        seanjc@google.com, tglx@linutronix.de, mingo@redhat.com,
-        mlevitsk@redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
-        DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: ky_bO4p4Cma7cs9E_lk9bHYYckBPymLM
+X-Proofpoint-ORIG-GUID: 4PYgeQXBv4dKE9-L4AGORrqYI_zFs0GO
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
+ definitions=2023-04-04_02,2023-04-03_03,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ mlxlogscore=999 mlxscore=0 phishscore=0 malwarescore=0 bulkscore=0
+ priorityscore=1501 suspectscore=0 clxscore=1015 spamscore=0 adultscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2303200000 definitions=main-2304040093
+X-Spam-Status: No, score=-0.1 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
+        DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Apr 4, 2023 at 4:40=E2=80=AFPM Like Xu <like.xu.linux@gmail.com> wr=
-ote:
->
-> On 3/4/2023 5:52 pm, korantwork@gmail.com wrote:
-> > From: Xinghui Li <korantli@tencent.com>
-> >
-> > VMCB_AVIC_APIC_BAR_MASK is defined twice with the same value in svm.h,
-> > which is meaningless. Delete the duplicate one.
-> >
-> > Fixes: 391503528257 ("KVM: x86: SVM: move avic definitions from AMD's s=
-pec to svm.h")
-> > Signed-off-by: Xinghui Li <korantli@tencent.com>
->
-> Reviewed-by: Like Xu <likexu@tencent.com>
->
-> Do we have any tool to find out more similar issues across numerous subsy=
-stems ?
->
-As far as I know, there is no such tool.
-But It seems possible to develop one, I will research it.
+On Tue,  4 Apr 2023 12:24:37 +0200
+Thomas Huth <thuth@redhat.com> wrote:
 
-Thanks~
+> stpx, spx, stap and stidp use addressing via "base register", i.e.
+> if register 0 is used, the base address will be 0, independent from
+> the value of the register. Thus we must not use the "r" constraint
+> here to avoid register 0. This fixes test failures when compiling
+> with Clang instead of GCC, since Clang apparently prefers to use
+> register 0 in some cases where GCC never uses register 0.
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+
+maybe you can also add a couple of Fixes tags:
+
+Fixes: 2667b05e ("s390x: Interception tests")
+Fixes: 484a3a57 ("s390x: add stidp interception test")
+
+in any case:
+
+Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+
+> ---
+>  s390x/intercept.c | 22 +++++++++++-----------
+>  1 file changed, 11 insertions(+), 11 deletions(-)
+> 
+> diff --git a/s390x/intercept.c b/s390x/intercept.c
+> index 9e826b6c..faa74bbb 100644
+> --- a/s390x/intercept.c
+> +++ b/s390x/intercept.c
+> @@ -36,16 +36,16 @@ static void test_stpx(void)
+>  
+>  	expect_pgm_int();
+>  	low_prot_enable();
+> -	asm volatile(" stpx 0(%0) " : : "r"(8));
+> +	asm volatile(" stpx 0(%0) " : : "a"(8));
+>  	low_prot_disable();
+>  	check_pgm_int_code(PGM_INT_CODE_PROTECTION);
+>  
+>  	expect_pgm_int();
+> -	asm volatile(" stpx 0(%0) " : : "r"(1));
+> +	asm volatile(" stpx 0(%0) " : : "a"(1));
+>  	check_pgm_int_code(PGM_INT_CODE_SPECIFICATION);
+>  
+>  	expect_pgm_int();
+> -	asm volatile(" stpx 0(%0) " : : "r"(-8L));
+> +	asm volatile(" stpx 0(%0) " : : "a"(-8L));
+>  	check_pgm_int_code(PGM_INT_CODE_ADDRESSING);
+>  }
+>  
+> @@ -70,13 +70,13 @@ static void test_spx(void)
+>  
+>  	report_prefix_push("operand not word aligned");
+>  	expect_pgm_int();
+> -	asm volatile(" spx 0(%0) " : : "r"(1));
+> +	asm volatile(" spx 0(%0) " : : "a"(1));
+>  	check_pgm_int_code(PGM_INT_CODE_SPECIFICATION);
+>  	report_prefix_pop();
+>  
+>  	report_prefix_push("operand outside memory");
+>  	expect_pgm_int();
+> -	asm volatile(" spx 0(%0) " : : "r"(-8L));
+> +	asm volatile(" spx 0(%0) " : : "a"(-8L));
+>  	check_pgm_int_code(PGM_INT_CODE_ADDRESSING);
+>  	report_prefix_pop();
+>  
+> @@ -113,16 +113,16 @@ static void test_stap(void)
+>  
+>  	expect_pgm_int();
+>  	low_prot_enable();
+> -	asm volatile ("stap 0(%0)\n" : : "r"(8));
+> +	asm volatile ("stap 0(%0)\n" : : "a"(8));
+>  	low_prot_disable();
+>  	check_pgm_int_code(PGM_INT_CODE_PROTECTION);
+>  
+>  	expect_pgm_int();
+> -	asm volatile ("stap 0(%0)\n" : : "r"(1));
+> +	asm volatile ("stap 0(%0)\n" : : "a"(1));
+>  	check_pgm_int_code(PGM_INT_CODE_SPECIFICATION);
+>  
+>  	expect_pgm_int();
+> -	asm volatile ("stap 0(%0)\n" : : "r"(-8L));
+> +	asm volatile ("stap 0(%0)\n" : : "a"(-8L));
+>  	check_pgm_int_code(PGM_INT_CODE_ADDRESSING);
+>  }
+>  
+> @@ -138,16 +138,16 @@ static void test_stidp(void)
+>  
+>  	expect_pgm_int();
+>  	low_prot_enable();
+> -	asm volatile ("stidp 0(%0)\n" : : "r"(8));
+> +	asm volatile ("stidp 0(%0)\n" : : "a"(8));
+>  	low_prot_disable();
+>  	check_pgm_int_code(PGM_INT_CODE_PROTECTION);
+>  
+>  	expect_pgm_int();
+> -	asm volatile ("stidp 0(%0)\n" : : "r"(1));
+> +	asm volatile ("stidp 0(%0)\n" : : "a"(1));
+>  	check_pgm_int_code(PGM_INT_CODE_SPECIFICATION);
+>  
+>  	expect_pgm_int();
+> -	asm volatile ("stidp 0(%0)\n" : : "r"(-8L));
+> +	asm volatile ("stidp 0(%0)\n" : : "a"(-8L));
+>  	check_pgm_int_code(PGM_INT_CODE_ADDRESSING);
+>  }
+>  
+
