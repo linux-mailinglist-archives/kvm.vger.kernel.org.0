@@ -2,188 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E560E6D6AEB
-	for <lists+kvm@lfdr.de>; Tue,  4 Apr 2023 19:52:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 16E8C6D6B37
+	for <lists+kvm@lfdr.de>; Tue,  4 Apr 2023 20:07:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235741AbjDDRwU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Apr 2023 13:52:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39718 "EHLO
+        id S236350AbjDDSHp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Apr 2023 14:07:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54260 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235462AbjDDRwR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Apr 2023 13:52:17 -0400
-Received: from mail-oa1-x33.google.com (mail-oa1-x33.google.com [IPv6:2001:4860:4864:20::33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6CBE43AAC
-        for <kvm@vger.kernel.org>; Tue,  4 Apr 2023 10:52:14 -0700 (PDT)
-Received: by mail-oa1-x33.google.com with SMTP id 586e51a60fabf-17ebba88c60so35496721fac.3
-        for <kvm@vger.kernel.org>; Tue, 04 Apr 2023 10:52:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1680630733;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yNm7ut5xw3YZveb3bi0ZcN2eShh+vdiK3vTRJbWEvZA=;
-        b=h2tJpzO+g3ZA7Mm7KbV9GPDwwOmXm1vnpvbntR367mW0dQav+pdZcj+f50RJIi6beM
-         tVxQJoFUESXI9XyuMrhwrLaOBoK0n+pJvu+rtplmt2eErJQNf032DN6A4hI9pGU7nOqV
-         rA4QUKDX2VY4sFlKjFptHf+4iiEDFyv7prc6Q5h2TOLHRM3Q7b77VNFimBQ+9XvOveN1
-         DzO6yQYD9660QaKaDSCGQc7rJrxfjCPklNv041UJdiHriaz9/nvtuSsG5es7QrCwbPOP
-         cHsKzjlv8Og+hpT6y5ROIw53CeSSVBe8AverjDtAy1Hc7sxC/vZQE8D2m+d8fvdnbtuF
-         cmVA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680630733;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=yNm7ut5xw3YZveb3bi0ZcN2eShh+vdiK3vTRJbWEvZA=;
-        b=h1BWHCbq5kEQ2hZPu/PKoU9Foi4312U0qi2VstjpyiEGc7tvylnpefSZ/XqcS1foib
-         Mu/rCJcfvOSsuBYhFCiGa/X+flMMz5Xf3wgW7X+73Us5TGqktM0GC5NR8RAZyRGytIJF
-         /2oYzO7N8r337g0548h8h4e7mw20Uf8w4a7xIM6cVmkDBLkkPEFKylnXciWGPMBRZ/R2
-         lg48yQCQ8lH00ty/Mg0aDK07H5TWyrd/Xx/Y5oY8pTfDLAQA6oh2ep0VITg4sn/KdfbL
-         CIjfxQ9dD3UHaT3VMzyJ5PhGomqsS7cqpmvDeobzp/kOGRogj7ncf81hrZPJhIOcJJqT
-         m10A==
-X-Gm-Message-State: AAQBX9cyDtutlaXYuGJOQsNUYeo1B32dwGI1C4MKeBjiyizKRuu3Lwq5
-        mf/u/mi/3EdRRGALjFmsq2w+8wBlJ4q89+5/4eS2cA==
-X-Google-Smtp-Source: AKy350aclrbPOzMya2Gmn5/BEKwLirIrj5w/kNKlHrChJIP3iEcRqHMaSM3SVKUi/0+yDBbwgDgjPwtuU+n5OtrvPAs=
-X-Received: by 2002:a05:6870:57:b0:17e:e396:cce0 with SMTP id
- 23-20020a056870005700b0017ee396cce0mr1672458oaz.9.1680630733248; Tue, 04 Apr
- 2023 10:52:13 -0700 (PDT)
-MIME-Version: 1.0
-References: <20230206172340.2639971-1-rananta@google.com> <20230206172340.2639971-8-rananta@google.com>
- <ZCTa5wfVtGScLQEa@linux.dev>
-In-Reply-To: <ZCTa5wfVtGScLQEa@linux.dev>
-From:   Raghavendra Rao Ananta <rananta@google.com>
-Date:   Tue, 4 Apr 2023 10:52:01 -0700
-Message-ID: <CAJHc60xvSFpUs+o84fR14Rghd6rruBJkCMBtroeCeLDtjJg=gw@mail.gmail.com>
-Subject: Re: [PATCH v2 7/7] KVM: arm64: Create a fast stage-2 unmap path
-To:     Oliver Upton <oliver.upton@linux.dev>
-Cc:     Oliver Upton <oupton@google.com>, Marc Zyngier <maz@kernel.org>,
-        Ricardo Koller <ricarkol@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Colton Lewis <coltonlewis@google.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+        with ESMTP id S236377AbjDDSHj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Apr 2023 14:07:39 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3FAE05593
+        for <kvm@vger.kernel.org>; Tue,  4 Apr 2023 11:07:17 -0700 (PDT)
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 334H7R6t011796;
+        Tue, 4 Apr 2023 18:06:46 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=PHZYzmxPEU/IgsGf7FCB/N1deq689PHxSAKsmwK3NRU=;
+ b=DKt7ChIiuXxOf4Qi+f/4P7/4lX7o38neVT9w1ZhR3vJW8FBXq91qR7YwzCLwHy8kwsJ/
+ E1UBcxHjnnYyfByd5iiSGRxX2pOuIITUZqeGDMRDIk8LhewG/enFfU2fZLGXFrFquFUo
+ o0y0gjj/SMTkXGzUKWg1vVVx+WvW8+Z//BUDKBlpzHV0Ocx128ww8uUwtAGraqy8dEQv
+ wdtKpe+JoyInWonGPYb6D7bA6UheVaM0DU0ZwGigabNOV9pYkQozwQApZwcK6/SGw2zz
+ 5r7xDCgdUZMnndocAUZLeqspdzo8sMHO7vNI8jtSgPz2m3k1FICgSVjtkbZeHZFpR1gH 7g== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3prpe0cfs1-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 04 Apr 2023 18:06:46 +0000
+Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 334HUDu2010144;
+        Tue, 4 Apr 2023 18:06:45 GMT
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3prpe0cfr8-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 04 Apr 2023 18:06:45 +0000
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+        by ppma05fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3342vgqk016631;
+        Tue, 4 Apr 2023 18:06:43 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+        by ppma05fra.de.ibm.com (PPS) with ESMTPS id 3ppc86t21r-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 04 Apr 2023 18:06:43 +0000
+Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
+        by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 334I6euE19595888
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 4 Apr 2023 18:06:40 GMT
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id EE84520043;
+        Tue,  4 Apr 2023 18:06:39 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C02EE20040;
+        Tue,  4 Apr 2023 18:06:39 +0000 (GMT)
+Received: from li-7e0de7cc-2d9d-11b2-a85c-de26c016e5ad.ibm.com (unknown [9.171.129.1])
+        by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Tue,  4 Apr 2023 18:06:39 +0000 (GMT)
+Message-ID: <5098eca038dfbd3e394e75d44ca061d64f9446f5.camel@linux.ibm.com>
+Subject: Re: [kvm-unit-tests GIT PULL v2 11/14] s390x: Add tests for
+ execute-type instructions
+From:   Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+To:     Nico Boehr <nrb@linux.ibm.com>, Thomas Huth <thuth@redhat.com>,
+        andrew.jones@linux.dev, pbonzini@redhat.com
+Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com, imbrenda@linux.ibm.com
+Date:   Tue, 04 Apr 2023 20:06:34 +0200
+In-Reply-To: <168062836004.37806.6096327013940193626@t14-nrb>
+References: <20230404113639.37544-1-nrb@linux.ibm.com>
+         <20230404113639.37544-12-nrb@linux.ibm.com>
+         <65075e9f-0d32-fc63-0200-3a3ec0c9bf63@redhat.com>
+         <06fd3ebc7770d1327be90cee10d12251cca76dd3.camel@linux.ibm.com>
+         <bf0f892e-7b7d-5806-b038-8392144da644@redhat.com>
+         <168062836004.37806.6096327013940193626@t14-nrb>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-15.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,ENV_AND_HDR_SPF_MATCH,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL,
-        USER_IN_DEF_SPF_WL autolearn=unavailable autolearn_force=no
-        version=3.4.6
+User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
+MIME-Version: 1.0
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: hVsDAupV5_bQb_ZZSVtSSVLHo8p_jP58
+X-Proofpoint-GUID: N2Tn6XUeH1FpeMy4FbWJi0Xrooxh2vxm
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
+ definitions=2023-04-04_08,2023-04-04_05,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 mlxscore=0
+ malwarescore=0 bulkscore=0 clxscore=1015 suspectscore=0 priorityscore=1501
+ phishscore=0 adultscore=0 lowpriorityscore=0 impostorscore=0 spamscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2303200000
+ definitions=main-2304040163
+X-Spam-Status: No, score=-0.1 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
+        DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 29, 2023 at 5:42=E2=80=AFPM Oliver Upton <oliver.upton@linux.de=
-v> wrote:
->
-> On Mon, Feb 06, 2023 at 05:23:40PM +0000, Raghavendra Rao Ananta wrote:
-> > The current implementation of the stage-2 unmap walker
-> > traverses the entire page-table to clear and flush the TLBs
-> > for each entry. This could be very expensive, especially if
-> > the VM is not backed by hugepages. The unmap operation could be
-> > made efficient by disconnecting the table at the very
-> > top (level at which the largest block mapping can be hosted)
-> > and do the rest of the unmapping using free_removed_table().
-> > If the system supports FEAT_TLBIRANGE, flush the entire range
-> > that has been disconnected from the rest of the page-table.
-> >
-> > Suggested-by: Ricardo Koller <ricarkol@google.com>
-> > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-> > ---
-> >  arch/arm64/kvm/hyp/pgtable.c | 44 ++++++++++++++++++++++++++++++++++++
-> >  1 file changed, 44 insertions(+)
-> >
-> > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.=
-c
-> > index 0858d1fa85d6b..af3729d0971f2 100644
-> > --- a/arch/arm64/kvm/hyp/pgtable.c
-> > +++ b/arch/arm64/kvm/hyp/pgtable.c
-> > @@ -1017,6 +1017,49 @@ static int stage2_unmap_walker(const struct kvm_=
-pgtable_visit_ctx *ctx,
-> >       return 0;
-> >  }
-> >
-> > +/*
-> > + * The fast walker executes only if the unmap size is exactly equal to=
- the
-> > + * largest block mapping supported (i.e. at KVM_PGTABLE_MIN_BLOCK_LEVE=
-L),
-> > + * such that the underneath hierarchy at KVM_PGTABLE_MIN_BLOCK_LEVEL c=
-an
-> > + * be disconnected from the rest of the page-table without the need to
-> > + * traverse all the PTEs, at all the levels, and unmap each and every =
-one
-> > + * of them. The disconnected table is freed using free_removed_table()=
+On Tue, 2023-04-04 at 19:12 +0200, Nico Boehr wrote:
+> Quoting Thomas Huth (2023-04-04 17:05:02)
+> [...]
+> > > > FWIW, this is failing with Clang 15 for me:
+> > > >=20
+> > > > s390x/ex.c:81:4: error: expected absolute expression
+> > > >                   "       .if (1b - 0b) !=3D (3b - 2b)\n"
+> > > >                    ^
+> > > > <inline asm>:12:6: note: instantiated into assembly here
+> > > >           .if (1b - 0b) !=3D (3b - 2b)
+> > >=20
+> > > Seems gcc is smarter here than clang.
+> >=20
+> > Yeah, the assembler from clang is quite a bit behind on s390x ... in th=
+e=20
+> > past I was only able to compile the k-u-t with Clang when using the=20
+> > "-no-integrated-as" option ... but at least in the most recent version =
+it=20
+> > seems to have caught up now enough to be very close to compile it with =
+the=20
+> > built-in assembler, so it would be great to get this problem here fixed=
+=20
+> > somehow, too...
+>=20
+> Bringing up another option: Can we maybe guard this section from Clang so=
+ we still have the assertion when compiling with GCC?
+
+I considered this, but only from the asm, where I don't think it's possible=
 .
-> > + */
-> > +static int fast_stage2_unmap_walker(const struct kvm_pgtable_visit_ctx=
- *ctx,
-> > +                            enum kvm_pgtable_walk_flags visit)
-> > +{
-> > +     struct kvm_pgtable_mm_ops *mm_ops =3D ctx->mm_ops;
-> > +     kvm_pte_t *childp =3D kvm_pte_follow(ctx->old, mm_ops);
-> > +     struct kvm_s2_mmu *mmu =3D ctx->arg;
-> > +
-> > +     if (!kvm_pte_valid(ctx->old) || ctx->level !=3D KVM_PGTABLE_MIN_B=
-LOCK_LEVEL)
-> > +             return 0;
-> > +
-> > +     if (!stage2_try_break_pte(ctx, mmu))
-> > +             return -EAGAIN;
-> > +
-> > +     /*
-> > +      * Gain back a reference for stage2_unmap_walker() to free
-> > +      * this table entry from KVM_PGTABLE_MIN_BLOCK_LEVEL - 1.
-> > +      */
-> > +     mm_ops->get_page(ctx->ptep);
->
-> Doesn't this run the risk of a potential UAF if the refcount was 1 before
-> calling stage2_try_break_pte()? IOW, stage2_try_break_pte() will drop
-> the refcount to 0 on the page before this ever gets called.
->
-> Also, AFAICT this misses the CMOs that are required on systems w/o
-> FEAT_FWB. Without them it is possible that the host will read something
-> other than what was most recently written by the guest if it is using
-> noncacheable memory attributes at stage-1.
->
-> I imagine the actual bottleneck is the DSB required after every
-> CMO/TLBI. Theoretically, the unmap path could be updated to:
->
->  - Perform the appropriate CMOs for every valid leaf entry *without*
->    issuing a DSB.
->
->  - Elide TLBIs entirely that take place in the middle of the walk
->
->  - After the walk completes, dsb(ish) to guarantee that the CMOs have
->    completed and the invalid PTEs are made visible to the hardware
->    walkers. This should be done implicitly by the TLBI implementation
->
->  - Invalidate the [addr, addr + size) range of IPAs
->
-> This would also avoid over-invalidating stage-1 since we blast the
-> entire stage-1 context for every stage-2 invalidation. Thoughts?
->
-Correct me if I'm wrong, but if we invalidate the TLB after the walk
-is complete, don't you think there's a risk of race if the guest can
-hit in the TLB even though the page was unmapped?
-
-Thanks,
-Raghavendra
-
-Raghavendra
-> > +     mm_ops->free_removed_table(childp, ctx->level);
-> > +     return 0;
-> > +}
-> > +
->
-> --
-> Thanks,
-> Oliver
+But putting #ifndef __clang__ around it works. Until you compile with gcc a=
+nd assemble with clang.
+Not something we need to care about IMO.
