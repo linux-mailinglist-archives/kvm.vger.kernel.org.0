@@ -2,192 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D0B126D69B5
-	for <lists+kvm@lfdr.de>; Tue,  4 Apr 2023 19:00:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6B5B56D69BE
+	for <lists+kvm@lfdr.de>; Tue,  4 Apr 2023 19:04:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235408AbjDDRAp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Apr 2023 13:00:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48540 "EHLO
+        id S235215AbjDDREp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Apr 2023 13:04:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51366 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235403AbjDDRAo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Apr 2023 13:00:44 -0400
-Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3CB3D1
-        for <kvm@vger.kernel.org>; Tue,  4 Apr 2023 10:00:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1680627641; x=1712163641;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=5xKt3Mh+Sl3zFYCi02o8CwPXbzSSg3wM1CcnJxfZW4s=;
-  b=lSHEXpl7Xh9k/fKXaeoXgAz7g1hYYiV5Ff3YDACnvDc1zcY47tHlDMG5
-   k2dhCm6hjDG0iWXvJKelubu2IexPkWLLF2RgEXAv8olprzX3c1chAfR0L
-   rQ8NiBN7QV+HhdNUcxIjDvrGZLVnpKBTN+/WicHo4+bRUD1ey3W4TMjBe
-   kMgwVycttS4gkqvCwgt7HnOF+hPxPA3ZV7Rwxpidm5FhuIwYUy2+VjRRE
-   wrs30N2sdQj5ulnfBlt1yuA8fSQSPw+YELkOWPviqc4FWzCsxgDNrwHZ2
-   STdUxiB06KLT84aWVD3fRRrOp4knqn7wXJFerSamUoMDYRIDJMsf43VAF
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10670"; a="343951133"
-X-IronPort-AV: E=Sophos;i="5.98,318,1673942400"; 
-   d="scan'208";a="343951133"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Apr 2023 10:00:41 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10670"; a="750993725"
-X-IronPort-AV: E=Sophos;i="5.98,318,1673942400"; 
-   d="scan'208";a="750993725"
-Received: from lkp-server01.sh.intel.com (HELO b613635ddfff) ([10.239.97.150])
-  by fmsmga008.fm.intel.com with ESMTP; 04 Apr 2023 10:00:37 -0700
-Received: from kbuild by b613635ddfff with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1pjk1M-000Pve-1d;
-        Tue, 04 Apr 2023 17:00:36 +0000
-Date:   Wed, 5 Apr 2023 00:59:46 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Jing Zhang <jingzhangos@google.com>, KVM <kvm@vger.kernel.org>,
-        KVMARM <kvmarm@lists.linux.dev>,
-        ARMLinux <linux-arm-kernel@lists.infradead.org>,
-        Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@google.com>
-Cc:     oe-kbuild-all@lists.linux.dev, Will Deacon <will@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Fuad Tabba <tabba@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Raghavendra Rao Ananta <rananta@google.com>,
-        Jing Zhang <jingzhangos@google.com>
-Subject: Re: [PATCH v6 4/6] KVM: arm64: Use per guest ID register for
- ID_AA64DFR0_EL1.PMUVer
-Message-ID: <202304050006.49TmDWF6-lkp@intel.com>
-References: <20230404035344.4043856-5-jingzhangos@google.com>
+        with ESMTP id S235633AbjDDREl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Apr 2023 13:04:41 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7FF2AE69
+        for <kvm@vger.kernel.org>; Tue,  4 Apr 2023 10:03:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1680627832;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=E8sSDVvxyvnOruB+0lVJW1HHgkW7ZReKHR1WtAZfwmo=;
+        b=UCpc+PfznrOWzF0a2DefJwzW3tDE45SHSUUIY/mS3mlSyuhfPDKhFk1AmFAz/xUWNxE+S1
+        S/W1OJuQxtjLaE6cFjma84anxTgGzsw8CutZXDIZCEBRSWx73LEhauNMr24rx39euT/ECf
+        iHoFN3H5XxFbsDgsli92oFvHeUwLgyw=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-480-1mqNPdZiO1KxVL4_sfVjyw-1; Tue, 04 Apr 2023 13:03:50 -0400
+X-MC-Unique: 1mqNPdZiO1KxVL4_sfVjyw-1
+Received: by mail-ed1-f70.google.com with SMTP id m18-20020a50d7d2000000b00501dfd867a4so47385610edj.20
+        for <kvm@vger.kernel.org>; Tue, 04 Apr 2023 10:03:49 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1680627828; x=1683219828;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=E8sSDVvxyvnOruB+0lVJW1HHgkW7ZReKHR1WtAZfwmo=;
+        b=q+zeLLmSYdevB/OIBNaRtEnmmU1HLJtRx50A56SSdUrO6YM9iFiI7IFNLVpC4t53cF
+         /WqXaVpBTFiN0F0L1xXj1s7bnjunSMQn0r4Lur01VBhFdlFuUrHp1+3Ki/AkaWANZnOL
+         duHkIjY0ko8Y68y01xbuPwHtxbwf72IJEOlUjzqUoV5TfGLh3DiiwVacr6wpmljPAaNb
+         E86c4j3hLX1B8r+rubfvK+E8HwF2qYsprVe2BxfQZrcnFs77u8nnXkTkKA0d36S3qzY1
+         TeF4YZAgOC45eYciimyy2ExOs/wX+8p6yVw1BqW3VIyDg+Emq2WsIXELyr7DOT0rFF0N
+         OxUQ==
+X-Gm-Message-State: AAQBX9e9UwT3srWkGWAhw0aRpqBH+eqKvI6pESHY9IlmuMIY2T7B79Hu
+        Vl0HipyOWSuK+j5NWJbhTcyO5ccEDTtez3Fk/tgbDQBRyxYKYaeuFnPTxTbTIZ5E33PE8Oyp776
+        XQUV2fDO8I3a9
+X-Received: by 2002:a17:906:360e:b0:931:ce20:db8e with SMTP id q14-20020a170906360e00b00931ce20db8emr222835ejb.51.1680627828514;
+        Tue, 04 Apr 2023 10:03:48 -0700 (PDT)
+X-Google-Smtp-Source: AKy350aFFDO02CFOBCMJ38oBbcfDo2OcrnEUu9Q6JgQdWEtobOV1hRzKF0iFO6xz/n2FBierAH2GMA==
+X-Received: by 2002:a17:906:360e:b0:931:ce20:db8e with SMTP id q14-20020a170906360e00b00931ce20db8emr222810ejb.51.1680627828194;
+        Tue, 04 Apr 2023 10:03:48 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
+        by smtp.googlemail.com with ESMTPSA id j10-20020a17090643ca00b0092f38a6d082sm6128661ejn.209.2023.04.04.10.03.46
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 04 Apr 2023 10:03:47 -0700 (PDT)
+Message-ID: <3591487f-96ae-3ab7-6ce7-e524a070c9e7@redhat.com>
+Date:   Tue, 4 Apr 2023 19:03:45 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230404035344.4043856-5-jingzhangos@google.com>
-X-Spam-Status: No, score=-2.5 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.9.0
+Subject: Re: [RFC PATCH 0/7] x86/entry: Atomic statck switching for IST
+Content-Language: en-US
+To:     Lai Jiangshan <jiangshanlai@gmail.com>,
+        Dave Hansen <dave.hansen@intel.com>
+Cc:     linux-kernel@vger.kernel.org,
+        Lai Jiangshan <jiangshan.ljs@antgroup.com>,
+        "H. Peter Anvin" <hpa@linux.intel.com>,
+        Andi Kleen <ak@linux.intel.com>,
+        Andrew Cooper <andrew.cooper3@citrix.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Asit Mallick <asit.k.mallick@intel.com>,
+        Cfir Cohen <cfir@google.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        David Kaplan <David.Kaplan@amd.com>,
+        David Rientjes <rientjes@google.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        Jan Kiszka <jan.kiszka@siemens.com>,
+        Jiri Slaby <jslaby@suse.cz>, Joerg Roedel <joro@8bytes.org>,
+        Juergen Gross <jgross@suse.com>,
+        Kees Cook <keescook@chromium.org>,
+        Kirill Shutemov <kirill.shutemov@linux.intel.com>,
+        Kuppuswamy Sathyanarayanan <knsathya@kernel.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Mike Stunes <mstunes@vmware.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Raj Ashok <ashok.raj@intel.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Tony Luck <tony.luck@intel.com>, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, x86@kernel.org
+References: <20230403140605.540512-1-jiangshanlai@gmail.com>
+ <19035c40-e756-6efd-1c02-b09109fb44c1@intel.com>
+ <CAJhGHyBHmC=UXr88GsykO9eUeqJZp59jrCH3ngkFiCxVBW2F3g@mail.gmail.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <CAJhGHyBHmC=UXr88GsykO9eUeqJZp59jrCH3ngkFiCxVBW2F3g@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Jing,
+On 4/4/23 05:17, Lai Jiangshan wrote:
+> The cover letter has 800+ lines of comments.  About 100-300 lines
+> of comments will be moved into the code which would make the diffstat
+> not so appealing.
 
-kernel test robot noticed the following build errors:
+Removing assembly from arch/x86/entry/ and adding English to 
+Documentation/?  That's _even more_ appealing. :)
 
-[auto build test ERROR on 7e364e56293bb98cae1b55fd835f5991c4e96e7d]
+Paolo
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Jing-Zhang/KVM-arm64-Move-CPU-ID-feature-registers-emulation-into-a-separate-file/20230404-115612
-base:   7e364e56293bb98cae1b55fd835f5991c4e96e7d
-patch link:    https://lore.kernel.org/r/20230404035344.4043856-5-jingzhangos%40google.com
-patch subject: [PATCH v6 4/6] KVM: arm64: Use per guest ID register for ID_AA64DFR0_EL1.PMUVer
-config: arm64-allyesconfig (https://download.01.org/0day-ci/archive/20230405/202304050006.49TmDWF6-lkp@intel.com/config)
-compiler: aarch64-linux-gcc (GCC) 12.1.0
-reproduce (this is a W=1 build):
-        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-        chmod +x ~/bin/make.cross
-        # https://github.com/intel-lab-lkp/linux/commit/66ece3020c02ab1206bb9478e8cb0172e125bbfc
-        git remote add linux-review https://github.com/intel-lab-lkp/linux
-        git fetch --no-tags linux-review Jing-Zhang/KVM-arm64-Move-CPU-ID-feature-registers-emulation-into-a-separate-file/20230404-115612
-        git checkout 66ece3020c02ab1206bb9478e8cb0172e125bbfc
-        # save the config file
-        mkdir build_dir && cp config build_dir/.config
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross W=1 O=build_dir ARCH=arm64 olddefconfig
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross W=1 O=build_dir ARCH=arm64 SHELL=/bin/bash arch/arm64/
-
-If you fix the issue, kindly add following tag where applicable
-| Reported-by: kernel test robot <lkp@intel.com>
-| Link: https://lore.kernel.org/oe-kbuild-all/202304050006.49TmDWF6-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   In file included from include/linux/rhashtable-types.h:14,
-                    from include/linux/ipc.h:7,
-                    from include/uapi/linux/sem.h:5,
-                    from include/linux/sem.h:5,
-                    from include/linux/sched.h:15,
-                    from include/linux/hardirq.h:9,
-                    from include/linux/kvm_host.h:7,
-                    from arch/arm64/kvm/id_regs.c:13:
-   arch/arm64/kvm/id_regs.c: In function 'set_id_aa64dfr0_el1':
->> arch/arm64/kvm/id_regs.c:261:44: error: 'struct kvm_arch' has no member named 'config_lock'
-     261 |                 mutex_lock(&vcpu->kvm->arch.config_lock);
-         |                                            ^
-   include/linux/mutex.h:187:44: note: in definition of macro 'mutex_lock'
-     187 | #define mutex_lock(lock) mutex_lock_nested(lock, 0)
-         |                                            ^~~~
-   arch/arm64/kvm/id_regs.c:269:46: error: 'struct kvm_arch' has no member named 'config_lock'
-     269 |                 mutex_unlock(&vcpu->kvm->arch.config_lock);
-         |                                              ^
-   arch/arm64/kvm/id_regs.c: In function 'set_id_dfr0_el1':
-   arch/arm64/kvm/id_regs.c:311:44: error: 'struct kvm_arch' has no member named 'config_lock'
-     311 |                 mutex_lock(&vcpu->kvm->arch.config_lock);
-         |                                            ^
-   include/linux/mutex.h:187:44: note: in definition of macro 'mutex_lock'
-     187 | #define mutex_lock(lock) mutex_lock_nested(lock, 0)
-         |                                            ^~~~
-   arch/arm64/kvm/id_regs.c:318:46: error: 'struct kvm_arch' has no member named 'config_lock'
-     318 |                 mutex_unlock(&vcpu->kvm->arch.config_lock);
-         |                                              ^
-
-
-vim +261 arch/arm64/kvm/id_regs.c
-
-   228	
-   229	static int set_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
-   230				       const struct sys_reg_desc *rd,
-   231				       u64 val)
-   232	{
-   233		u8 pmuver, host_pmuver;
-   234		bool valid_pmu;
-   235	
-   236		host_pmuver = kvm_arm_pmu_get_pmuver_limit();
-   237	
-   238		/*
-   239		 * Allow AA64DFR0_EL1.PMUver to be set from userspace as long
-   240		 * as it doesn't promise more than what the HW gives us. We
-   241		 * allow an IMPDEF PMU though, only if no PMU is supported
-   242		 * (KVM backward compatibility handling).
-   243		 */
-   244		pmuver = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer), val);
-   245		if ((pmuver != ID_AA64DFR0_EL1_PMUVer_IMP_DEF && pmuver > host_pmuver))
-   246			return -EINVAL;
-   247	
-   248		valid_pmu = (pmuver != 0 && pmuver != ID_AA64DFR0_EL1_PMUVer_IMP_DEF);
-   249	
-   250		/* Make sure view register and PMU support do match */
-   251		if (kvm_vcpu_has_pmu(vcpu) != valid_pmu)
-   252			return -EINVAL;
-   253	
-   254		/* We can only differ with PMUver, and anything else is an error */
-   255		val ^= read_id_reg(vcpu, rd);
-   256		val &= ~ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer);
-   257		if (val)
-   258			return -EINVAL;
-   259	
-   260		if (valid_pmu) {
- > 261			mutex_lock(&vcpu->kvm->arch.config_lock);
-   262			IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1) &= ~ID_AA64DFR0_EL1_PMUVer_MASK;
-   263			IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1) |= FIELD_PREP(ID_AA64DFR0_EL1_PMUVer_MASK,
-   264									    pmuver);
-   265	
-   266			IDREG(vcpu->kvm, SYS_ID_DFR0_EL1) &= ~ID_DFR0_EL1_PerfMon_MASK;
-   267			IDREG(vcpu->kvm, SYS_ID_DFR0_EL1) |= FIELD_PREP(ID_DFR0_EL1_PerfMon_MASK,
-   268									pmuver_to_perfmon(pmuver));
-   269			mutex_unlock(&vcpu->kvm->arch.config_lock);
-   270		} else {
-   271			assign_bit(KVM_ARCH_FLAG_VCPU_HAS_IMP_DEF_PMU, &vcpu->kvm->arch.flags,
-   272				   pmuver == ID_AA64DFR0_EL1_PMUVer_IMP_DEF);
-   273		}
-   274	
-   275		return 0;
-   276	}
-   277	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests
