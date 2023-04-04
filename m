@@ -2,522 +2,314 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B2AAB6D641D
-	for <lists+kvm@lfdr.de>; Tue,  4 Apr 2023 15:55:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8C02B6D6401
+	for <lists+kvm@lfdr.de>; Tue,  4 Apr 2023 15:53:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235387AbjDDNzz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Apr 2023 09:55:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52646 "EHLO
+        id S235739AbjDDNxx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Apr 2023 09:53:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53182 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235617AbjDDNwz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Apr 2023 09:52:55 -0400
-Received: from mail-ed1-x532.google.com (mail-ed1-x532.google.com [IPv6:2a00:1450:4864:20::532])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE1E54ECD
-        for <kvm@vger.kernel.org>; Tue,  4 Apr 2023 06:52:47 -0700 (PDT)
-Received: by mail-ed1-x532.google.com with SMTP id r11so130951347edd.5
-        for <kvm@vger.kernel.org>; Tue, 04 Apr 2023 06:52:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20210112.gappssmtp.com; s=20210112; t=1680616366;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=plOOgEIG8396rx4iCJr8AmtbDlt6pY+32irrDdi4MZU=;
-        b=mIzyzcaml54l5H7z2MLPPShVAiHPRay2/Yc4Lg/WSdneG8SOv3h3pxrwfBfdmIOzyt
-         8B1ke1cGZTXmRa1tOyVLkU8/LH0/RiMQvHYQtYx+ha5htRtrhipK8MJhFnOfwujIGLDF
-         HINPBaF8F4/cUWLGGpZRYAw62bns3Eu7TgyP7upmdsaSEOBX/ZA4qjEBBLEe8NE6nSWP
-         kfUwsEPEX8KdcliGjdTGuZUKvnezW+QJ9hvoOtBVxI1RCWR+lc9xMiUf/bckmpiu2dSq
-         AbpyxTd8ELS9bafRysD0nQTmPHji4b1UE6FuDqyWvyV7U7l8EUNv7S6srYHTb242+oJi
-         AXAg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680616366;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=plOOgEIG8396rx4iCJr8AmtbDlt6pY+32irrDdi4MZU=;
-        b=r5+XwVXmYQa3yBUK+xgZskue8qEbwYDpf3Aktdpa0nFBqPvJnqcnuf3rs4q9+ayKFS
-         42PySccR2bgYLXCBGnQRPZmjxce07Z8lBzVC+bcPkomqBX0szIKywtJapCU4iPINvqzu
-         5paiu2p7KvOOo4cy47g/CxzwmqI2Hw+tYuoKdEiwrbjrV05ORfkTI+AuNR/EDhMvGQbW
-         q9FA85AxFjPHENga/dF/5PpzfNw8lkjXzSnzx9Zdp2G3uloHm2UsdFYI9hjNW+y04+3T
-         yMBY4+S0u8jDjXfR1zVLIUgDFrpKhFo5gwzHGKAt9hnC07A4PX7ANFgxl05o1TQSIeyH
-         fmlg==
-X-Gm-Message-State: AAQBX9cwf2B1BQ7PKQt7DIUpQbFwR60Gmkxr1a47RS21Re9Mq+wQ/FtK
-        fGfFTTtRI14eG3xUO2rfy+5KnDTDhvbsZxT2Dr/mesUbhWfPTqT3+rA=
-X-Google-Smtp-Source: AKy350YOTIshLEk3PsuoxDxib9mcYfjnTeWGi4oF7Zyk/2q/aXtNdFT0Ya31C9SyiDa6zUXvngqONBo5cg9hoLpm+H8=
-X-Received: by 2002:a17:906:c34e:b0:93e:aac:bb8d with SMTP id
- ci14-20020a170906c34e00b0093e0aacbb8dmr1316405ejb.13.1680616365887; Tue, 04
- Apr 2023 06:52:45 -0700 (PDT)
+        with ESMTP id S235742AbjDDNxk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Apr 2023 09:53:40 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B72574224;
+        Tue,  4 Apr 2023 06:53:28 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 4159E61FF6;
+        Tue,  4 Apr 2023 13:53:28 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 01718C4339B;
+        Tue,  4 Apr 2023 13:53:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1680616407;
+        bh=/XmQ33Vz5rwMvBxocOUTIIX51AasQPq8MBzmwbLl0tM=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=j3pvbEx+ZOhkZUE1LhdjIxby9njBvyhGGDw8XHNztZL/HYm+7Hxi7G2yVH87tLGXc
+         8CnD+aWL0pEfl8K8eEelOm98QkGvx9t82yLNNIDbeUQbrNgrgJfn5szL4qfacmifzK
+         rPf45WV4a2jbZGv1xNcqWD6pLaJXwrjXc0olsbyf9BBEd2EZkpozWqX1cpZJ+N/H4B
+         DgcmwjDTRFPqxMyHwoKOds6qUcJuJA5u8+/FD/+XXp0LvwfGWk4fHYFr/UhTWZm0gV
+         fPQ9esbG+NnpA8lDyV4zQGiCjpZvv+DaqXProbhEGTYkWTuiPCv+24pkuCN8MpR4Xn
+         uVKJnk0xDg9EA==
+Date:   Tue, 4 Apr 2023 15:53:13 +0200
+From:   Christian Brauner <brauner@kernel.org>
+To:     Ackerley Tng <ackerleytng@google.com>
+Cc:     kvm@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-arch@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, qemu-devel@nongnu.org, aarcange@redhat.com,
+        ak@linux.intel.com, akpm@linux-foundation.org, arnd@arndb.de,
+        bfields@fieldses.org, bp@alien8.de, chao.p.peng@linux.intel.com,
+        corbet@lwn.net, dave.hansen@intel.com, david@redhat.com,
+        ddutile@redhat.com, dhildenb@redhat.com, hpa@zytor.com,
+        hughd@google.com, jlayton@kernel.org, jmattson@google.com,
+        joro@8bytes.org, jun.nakajima@intel.com,
+        kirill.shutemov@linux.intel.com, linmiaohe@huawei.com,
+        luto@kernel.org, mail@maciej.szmigiero.name, mhocko@suse.com,
+        michael.roth@amd.com, mingo@redhat.com, naoya.horiguchi@nec.com,
+        pbonzini@redhat.com, qperret@google.com, rppt@kernel.org,
+        seanjc@google.com, shuah@kernel.org, steven.price@arm.com,
+        tabba@google.com, tglx@linutronix.de, vannapurve@google.com,
+        vbabka@suse.cz, vkuznets@redhat.com, wanpengli@tencent.com,
+        wei.w.wang@intel.com, x86@kernel.org, yu.c.zhang@linux.intel.com
+Subject: Re: [RFC PATCH v3 1/2] mm: restrictedmem: Allow userspace to specify
+ mount for memfd_restricted
+Message-ID: <20230404-amnesty-untying-01de932d4945@brauner>
+References: <cover.1680306489.git.ackerleytng@google.com>
+ <592ebd9e33a906ba026d56dc68f42d691706f865.1680306489.git.ackerleytng@google.com>
 MIME-Version: 1.0
-References: <20230403093310.2271142-1-apatel@ventanamicro.com>
- <20230403093310.2271142-9-apatel@ventanamicro.com> <znn7ibu4r6ivsfb3sqoandhpvqkfwr6w4q4z6vwcwqiviya5bk@dsa3f5dk7m6l>
-In-Reply-To: <znn7ibu4r6ivsfb3sqoandhpvqkfwr6w4q4z6vwcwqiviya5bk@dsa3f5dk7m6l>
-From:   Anup Patel <anup@brainfault.org>
-Date:   Tue, 4 Apr 2023 19:22:33 +0530
-Message-ID: <CAAhSdy2txionLCED-cszdcKias5orHTnNRzHJcrFdMSUEsPnig@mail.gmail.com>
-Subject: Re: [PATCH v3 8/8] RISC-V: KVM: Implement guest external interrupt
- line management
-To:     Andrew Jones <ajones@ventanamicro.com>
-Cc:     Anup Patel <apatel@ventanamicro.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Atish Patra <atishp@atishpatra.org>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>, kvm@vger.kernel.org,
-        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-        linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=0.0 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <592ebd9e33a906ba026d56dc68f42d691706f865.1680306489.git.ackerleytng@google.com>
+X-Spam-Status: No, score=-5.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,SPF_HELO_NONE,
+        SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Apr 4, 2023 at 6:15=E2=80=AFPM Andrew Jones <ajones@ventanamicro.co=
-m> wrote:
->
-> On Mon, Apr 03, 2023 at 03:03:10PM +0530, Anup Patel wrote:
-> > The RISC-V host will have one guest external interrupt line for each
-> > VS-level IMSICs associated with a HART. The guest external interrupt
-> > lines are per-HART resources and hypervisor can use HGEIE, HGEIP, and
-> > HIE CSRs to manage these guest external interrupt lines.
-> >
-> > Signed-off-by: Anup Patel <apatel@ventanamicro.com>
-> > ---
-> >  arch/riscv/include/asm/kvm_aia.h |  10 ++
-> >  arch/riscv/kvm/aia.c             | 241 +++++++++++++++++++++++++++++++
-> >  arch/riscv/kvm/main.c            |   3 +-
-> >  arch/riscv/kvm/vcpu.c            |   2 +
-> >  4 files changed, 255 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/arch/riscv/include/asm/kvm_aia.h b/arch/riscv/include/asm/=
-kvm_aia.h
-> > index 1de0717112e5..0938e0cadf80 100644
-> > --- a/arch/riscv/include/asm/kvm_aia.h
-> > +++ b/arch/riscv/include/asm/kvm_aia.h
-> > @@ -44,10 +44,15 @@ struct kvm_vcpu_aia {
-> >
-> >  #define irqchip_in_kernel(k)         ((k)->arch.aia.in_kernel)
-> >
-> > +extern unsigned int kvm_riscv_aia_nr_hgei;
-> >  DECLARE_STATIC_KEY_FALSE(kvm_riscv_aia_available);
-> >  #define kvm_riscv_aia_available() \
-> >       static_branch_unlikely(&kvm_riscv_aia_available)
-> >
-> > +static inline void kvm_riscv_vcpu_aia_imsic_release(struct kvm_vcpu *v=
-cpu)
-> > +{
-> > +}
-> > +
-> >  #define KVM_RISCV_AIA_IMSIC_TOPEI    (ISELECT_MASK + 1)
-> >  static inline int kvm_riscv_vcpu_aia_imsic_rmw(struct kvm_vcpu *vcpu,
-> >                                              unsigned long isel,
-> > @@ -119,6 +124,11 @@ static inline void kvm_riscv_aia_destroy_vm(struct=
- kvm *kvm)
-> >  {
-> >  }
-> >
-> > +int kvm_riscv_aia_alloc_hgei(int cpu, struct kvm_vcpu *owner,
-> > +                          void __iomem **hgei_va, phys_addr_t *hgei_pa=
-);
-> > +void kvm_riscv_aia_free_hgei(int cpu, int hgei);
-> > +void kvm_riscv_aia_wakeon_hgei(struct kvm_vcpu *owner, bool enable);
-> > +
-> >  void kvm_riscv_aia_enable(void);
-> >  void kvm_riscv_aia_disable(void);
-> >  int kvm_riscv_aia_init(void);
-> > diff --git a/arch/riscv/kvm/aia.c b/arch/riscv/kvm/aia.c
-> > index d530912f28bc..1264783e7c4d 100644
-> > --- a/arch/riscv/kvm/aia.c
-> > +++ b/arch/riscv/kvm/aia.c
-> > @@ -7,11 +7,46 @@
-> >   *   Anup Patel <apatel@ventanamicro.com>
-> >   */
-> >
-> > +#include <linux/bitops.h>
-> > +#include <linux/irq.h>
-> > +#include <linux/irqdomain.h>
-> >  #include <linux/kvm_host.h>
-> > +#include <linux/percpu.h>
-> > +#include <linux/spinlock.h>
-> >  #include <asm/hwcap.h>
-> >
-> > +struct aia_hgei_control {
-> > +     raw_spinlock_t lock;
-> > +     unsigned long free_bitmap;
-> > +     struct kvm_vcpu *owners[BITS_PER_LONG];
-> > +};
-> > +static DEFINE_PER_CPU(struct aia_hgei_control, aia_hgei);
-> > +static int hgei_parent_irq;
-> > +
-> > +unsigned int kvm_riscv_aia_nr_hgei;
-> >  DEFINE_STATIC_KEY_FALSE(kvm_riscv_aia_available);
-> >
-> > +static int aia_find_hgei(struct kvm_vcpu *owner)
-> > +{
-> > +     int i, hgei;
-> > +     unsigned long flags;
-> > +     struct aia_hgei_control *hgctrl =3D this_cpu_ptr(&aia_hgei);
-> > +
-> > +     raw_spin_lock_irqsave(&hgctrl->lock, flags);
-> > +
-> > +     hgei =3D -1;
-> > +     for (i =3D 1; i <=3D kvm_riscv_aia_nr_hgei; i++) {
-> > +             if (hgctrl->owners[i] =3D=3D owner) {
-> > +                     hgei =3D i;
-> > +                     break;
-> > +             }
-> > +     }
-> > +
-> > +     raw_spin_unlock_irqrestore(&hgctrl->lock, flags);
-> > +
-> > +     return hgei;
-> > +}
-> > +
-> >  static void aia_set_hvictl(bool ext_irq_pending)
-> >  {
-> >       unsigned long hvictl;
-> > @@ -55,6 +90,7 @@ void kvm_riscv_vcpu_aia_sync_interrupts(struct kvm_vc=
-pu *vcpu)
-> >
-> >  bool kvm_riscv_vcpu_aia_has_interrupts(struct kvm_vcpu *vcpu, u64 mask=
-)
-> >  {
-> > +     int hgei;
-> >       unsigned long seip;
-> >
-> >       if (!kvm_riscv_aia_available())
-> > @@ -72,6 +108,10 @@ bool kvm_riscv_vcpu_aia_has_interrupts(struct kvm_v=
-cpu *vcpu, u64 mask)
-> >       if (!kvm_riscv_aia_initialized(vcpu->kvm) || !seip)
-> >               return false;
-> >
-> > +     hgei =3D aia_find_hgei(vcpu);
-> > +     if (hgei > 0)
-> > +             return (csr_read(CSR_HGEIP) & BIT(hgei)) ? true : false;
->
-> nit: return !!(csr_read(CSR_HGEIP) & BIT(hgei)) is a bit less verbose.
+On Fri, Mar 31, 2023 at 11:50:39PM +0000, Ackerley Tng wrote:
+> By default, the backing shmem file for a restrictedmem fd is created
+> on shmem's kernel space mount.
+> 
+> With this patch, an optional tmpfs mount can be specified via an fd,
+> which will be used as the mountpoint for backing the shmem file
+> associated with a restrictedmem fd.
+> 
+> This will help restrictedmem fds inherit the properties of the
+> provided tmpfs mounts, for example, hugepage allocation hints, NUMA
+> binding hints, etc.
+> 
+> Permissions for the fd passed to memfd_restricted() is modeled after
+> the openat() syscall, since both of these allow creation of a file
+> upon a mount/directory.
+> 
+> Permission to reference the mount the fd represents is checked upon fd
+> creation by other syscalls (e.g. fsmount(), open(), or open_tree(),
+> etc) and any process that can present memfd_restricted() with a valid
+> fd is expected to have obtained permission to use the mount
+> represented by the fd. This behavior is intended to parallel that of
+> the openat() syscall.
+> 
+> memfd_restricted() will check that the tmpfs superblock is
+> writable, and that the mount is also writable, before attempting to
+> create a restrictedmem file on the mount.
+> 
+> Signed-off-by: Ackerley Tng <ackerleytng@google.com>
+> ---
+>  include/linux/syscalls.h           |  2 +-
+>  include/uapi/linux/restrictedmem.h |  8 ++++
+>  mm/restrictedmem.c                 | 74 +++++++++++++++++++++++++++---
+>  3 files changed, 77 insertions(+), 7 deletions(-)
+>  create mode 100644 include/uapi/linux/restrictedmem.h
+> 
+> diff --git a/include/linux/syscalls.h b/include/linux/syscalls.h
+> index f9e9e0c820c5..a23c4c385cd3 100644
+> --- a/include/linux/syscalls.h
+> +++ b/include/linux/syscalls.h
+> @@ -1056,7 +1056,7 @@ asmlinkage long sys_memfd_secret(unsigned int flags);
+>  asmlinkage long sys_set_mempolicy_home_node(unsigned long start, unsigned long len,
+>  					    unsigned long home_node,
+>  					    unsigned long flags);
+> -asmlinkage long sys_memfd_restricted(unsigned int flags);
+> +asmlinkage long sys_memfd_restricted(unsigned int flags, int mount_fd);
+> 
+>  /*
+>   * Architecture-specific system calls
+> diff --git a/include/uapi/linux/restrictedmem.h b/include/uapi/linux/restrictedmem.h
+> new file mode 100644
+> index 000000000000..22d6f2285f6d
+> --- /dev/null
+> +++ b/include/uapi/linux/restrictedmem.h
+> @@ -0,0 +1,8 @@
+> +/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+> +#ifndef _UAPI_LINUX_RESTRICTEDMEM_H
+> +#define _UAPI_LINUX_RESTRICTEDMEM_H
+> +
+> +/* flags for memfd_restricted */
+> +#define RMFD_USERMNT		0x0001U
+> +
+> +#endif /* _UAPI_LINUX_RESTRICTEDMEM_H */
+> diff --git a/mm/restrictedmem.c b/mm/restrictedmem.c
+> index c5d869d8c2d8..f7b62364a31a 100644
+> --- a/mm/restrictedmem.c
+> +++ b/mm/restrictedmem.c
+> @@ -1,11 +1,12 @@
+>  // SPDX-License-Identifier: GPL-2.0
+> -#include "linux/sbitmap.h"
+> +#include <linux/namei.h>
+>  #include <linux/pagemap.h>
+>  #include <linux/pseudo_fs.h>
+>  #include <linux/shmem_fs.h>
+>  #include <linux/syscalls.h>
+>  #include <uapi/linux/falloc.h>
+>  #include <uapi/linux/magic.h>
+> +#include <uapi/linux/restrictedmem.h>
+>  #include <linux/restrictedmem.h>
+> 
+>  struct restrictedmem {
+> @@ -189,19 +190,20 @@ static struct file *restrictedmem_file_create(struct file *memfd)
+>  	return file;
+>  }
+> 
+> -SYSCALL_DEFINE1(memfd_restricted, unsigned int, flags)
+> +static int restrictedmem_create(struct vfsmount *mount)
+>  {
+>  	struct file *file, *restricted_file;
+>  	int fd, err;
+> 
+> -	if (flags)
+> -		return -EINVAL;
+> -
+>  	fd = get_unused_fd_flags(0);
 
-Okay, I will update.
+Any reasons the file descriptors aren't O_CLOEXEC by default? I don't
+see any reasons why we should introduce new fdtypes that aren't
+O_CLOEXEC by default. The "don't mix-and-match" train has already left
+the station anyway as we do have seccomp noitifer fds and pidfds both of
+which are O_CLOEXEC by default.
 
->
-> > +
-> >       return false;
-> >  }
-> >
-> > @@ -343,6 +383,144 @@ int kvm_riscv_vcpu_aia_rmw_ireg(struct kvm_vcpu *=
-vcpu, unsigned int csr_num,
-> >       return KVM_INSN_EXIT_TO_USER_SPACE;
-> >  }
-> >
-> > +int kvm_riscv_aia_alloc_hgei(int cpu, struct kvm_vcpu *owner,
-> > +                          void __iomem **hgei_va, phys_addr_t *hgei_pa=
-)
-> > +{
-> > +     int ret =3D -ENOENT;
-> > +     unsigned long flags;
-> > +     struct aia_hgei_control *hgctrl =3D per_cpu_ptr(&aia_hgei, cpu);
-> > +
-> > +     if (!kvm_riscv_aia_available())
-> > +             return -ENODEV;
-> > +     if (!hgctrl)
-> > +             return -ENODEV;
->
-> nit:
->
-> if (!kvm_riscv_aia_available() || !hgctrl)
->    return -ENODEV;
+>  	if (fd < 0)
+>  		return fd;
+> 
+> -	file = shmem_file_setup("memfd:restrictedmem", 0, VM_NORESERVE);
+> +	if (mount)
+> +		file = shmem_file_setup_with_mnt(mount, "memfd:restrictedmem", 0, VM_NORESERVE);
+> +	else
+> +		file = shmem_file_setup("memfd:restrictedmem", 0, VM_NORESERVE);
+> +
+>  	if (IS_ERR(file)) {
+>  		err = PTR_ERR(file);
+>  		goto err_fd;
+> @@ -223,6 +225,66 @@ SYSCALL_DEFINE1(memfd_restricted, unsigned int, flags)
+>  	return err;
+>  }
+> 
+> +static bool is_shmem_mount(struct vfsmount *mnt)
+> +{
+> +	return mnt && mnt->mnt_sb && mnt->mnt_sb->s_magic == TMPFS_MAGIC;
 
-Okay, I will update.
+This can just be if (mnt->mnt_sb->s_magic == TMPFS_MAGIC).
 
->
-> > +
-> > +     raw_spin_lock_irqsave(&hgctrl->lock, flags);
-> > +
-> > +     if (hgctrl->free_bitmap) {
-> > +             ret =3D __ffs(hgctrl->free_bitmap);
-> > +             hgctrl->free_bitmap &=3D ~BIT(ret);
-> > +             hgctrl->owners[ret] =3D owner;
-> > +     }
-> > +
-> > +     raw_spin_unlock_irqrestore(&hgctrl->lock, flags);
-> > +
-> > +     /* TODO: To be updated later by AIA in-kernel irqchip support */
-> > +     if (hgei_va)
-> > +             *hgei_va =3D NULL;
-> > +     if (hgei_pa)
-> > +             *hgei_pa =3D 0;
-> > +
-> > +     return ret;
-> > +}
-> > +
-> > +void kvm_riscv_aia_free_hgei(int cpu, int hgei)
-> > +{
-> > +     unsigned long flags;
-> > +     struct aia_hgei_control *hgctrl =3D per_cpu_ptr(&aia_hgei, cpu);
-> > +
-> > +     if (!kvm_riscv_aia_available() || !hgctrl)
-> > +             return;
-> > +
-> > +     raw_spin_lock_irqsave(&hgctrl->lock, flags);
-> > +
-> > +     if (hgei > 0 && hgei <=3D kvm_riscv_aia_nr_hgei) {
-> > +             if (!(hgctrl->free_bitmap & BIT(hgei))) {
-> > +                     hgctrl->free_bitmap |=3D BIT(hgei);
-> > +                     hgctrl->owners[hgei] =3D NULL;
-> > +             }
-> > +     }
-> > +
-> > +     raw_spin_unlock_irqrestore(&hgctrl->lock, flags);
-> > +}
-> > +
-> > +void kvm_riscv_aia_wakeon_hgei(struct kvm_vcpu *owner, bool enable)
-> > +{
-> > +     int hgei;
-> > +
-> > +     if (!kvm_riscv_aia_available())
-> > +             return;
-> > +
-> > +     hgei =3D aia_find_hgei(owner);
-> > +     if (hgei > 0) {
-> > +             if (enable)
-> > +                     csr_set(CSR_HGEIE, BIT(hgei));
-> > +             else
-> > +                     csr_clear(CSR_HGEIE, BIT(hgei));
-> > +     }
-> > +}
-> > +
-> > +static irqreturn_t hgei_interrupt(int irq, void *dev_id)
-> > +{
-> > +     int i;
-> > +     unsigned long hgei_mask, flags;
-> > +     struct aia_hgei_control *hgctrl =3D this_cpu_ptr(&aia_hgei);
-> > +
-> > +     hgei_mask =3D csr_read(CSR_HGEIP) & csr_read(CSR_HGEIE);
-> > +     csr_clear(CSR_HGEIE, hgei_mask);
-> > +
-> > +     raw_spin_lock_irqsave(&hgctrl->lock, flags);
-> > +
-> > +     for_each_set_bit(i, &hgei_mask, BITS_PER_LONG) {
-> > +             if (hgctrl->owners[i])
-> > +                     kvm_vcpu_kick(hgctrl->owners[i]);
-> > +     }
-> > +
-> > +     raw_spin_unlock_irqrestore(&hgctrl->lock, flags);
-> > +
-> > +     return IRQ_HANDLED;
-> > +}
-> > +
-> > +static int aia_hgei_init(void)
-> > +{
-> > +     int cpu, rc;
-> > +     struct irq_domain *domain;
-> > +     struct aia_hgei_control *hgctrl;
-> > +
-> > +     /* Initialize per-CPU guest external interrupt line management */
-> > +     for_each_possible_cpu(cpu) {
-> > +             hgctrl =3D per_cpu_ptr(&aia_hgei, cpu);
-> > +             raw_spin_lock_init(&hgctrl->lock);
-> > +             if (kvm_riscv_aia_nr_hgei) {
-> > +                     hgctrl->free_bitmap =3D
-> > +                             BIT(kvm_riscv_aia_nr_hgei + 1) - 1;
-> > +                     hgctrl->free_bitmap &=3D ~BIT(0);
-> > +             } else
-> > +                     hgctrl->free_bitmap =3D 0;
-> > +     }
-> > +
-> > +     /* Find INTC irq domain */
-> > +     domain =3D irq_find_matching_fwnode(riscv_get_intc_hwnode(),
-> > +                                       DOMAIN_BUS_ANY);
-> > +     if (!domain) {
-> > +             kvm_err("unable to find INTC domain\n");
-> > +             return -ENOENT;
-> > +     }
-> > +
-> > +     /* Map per-CPU SGEI interrupt from INTC domain */
-> > +     hgei_parent_irq =3D irq_create_mapping(domain, IRQ_S_GEXT);
-> > +     if (!hgei_parent_irq) {
-> > +             kvm_err("unable to map SGEI IRQ\n");
-> > +             return -ENOMEM;
-> > +     }
-> > +
-> > +     /* Request per-CPU SGEI interrupt */
-> > +     rc =3D request_percpu_irq(hgei_parent_irq, hgei_interrupt,
-> > +                             "riscv-kvm", &aia_hgei);
-> > +     if (rc) {
-> > +             kvm_err("failed to request SGEI IRQ\n");
-> > +             return rc;
-> > +     }
-> > +
-> > +     return 0;
-> > +}
-> > +
-> > +static void aia_hgei_exit(void)
-> > +{
-> > +     /* Free per-CPU SGEI interrupt */
-> > +     free_percpu_irq(hgei_parent_irq, &aia_hgei);
-> > +}
-> > +
-> >  void kvm_riscv_aia_enable(void)
-> >  {
-> >       if (!kvm_riscv_aia_available())
-> > @@ -357,21 +535,79 @@ void kvm_riscv_aia_enable(void)
-> >       csr_write(CSR_HVIPRIO1H, 0x0);
-> >       csr_write(CSR_HVIPRIO2H, 0x0);
-> >  #endif
-> > +
-> > +     /* Enable per-CPU SGEI interrupt */
-> > +     enable_percpu_irq(hgei_parent_irq,
-> > +                       irq_get_trigger_type(hgei_parent_irq));
-> > +     csr_set(CSR_HIE, BIT(IRQ_S_GEXT));
-> >  }
-> >
-> >  void kvm_riscv_aia_disable(void)
-> >  {
-> > +     int i;
-> > +     unsigned long flags;
-> > +     struct kvm_vcpu *vcpu;
-> > +     struct aia_hgei_control *hgctrl =3D this_cpu_ptr(&aia_hgei);
-> > +
-> >       if (!kvm_riscv_aia_available())
-> >               return;
-> >
-> > +     /* Disable per-CPU SGEI interrupt */
-> > +     csr_clear(CSR_HIE, BIT(IRQ_S_GEXT));
-> > +     disable_percpu_irq(hgei_parent_irq);
-> > +
-> >       aia_set_hvictl(false);
-> > +
-> > +     raw_spin_lock_irqsave(&hgctrl->lock, flags);
-> > +
-> > +     for (i =3D 0; i <=3D kvm_riscv_aia_nr_hgei; i++) {
->
-> I guess this should start at i =3D 1, but in this case it doesn't
-> matter since hgctrl->owners[0] should always be NULL.
+> +}
+> +
+> +static bool is_mount_root(struct file *file)
+> +{
+> +	return file->f_path.dentry == file->f_path.mnt->mnt_root;
 
-Yes, it doesn't matter in this case.
+mount -t tmpfs tmpfs /mnt
+touch /mnt/bla
+touch /mnt/ble
+mount --bind /mnt/bla /mnt/ble
+fd = open("/mnt/ble")
+fd_restricted = memfd_restricted(fd)
 
->
-> > +             vcpu =3D hgctrl->owners[i];
-> > +             if (!vcpu)
-> > +                     continue;
-> > +
-> > +             /*
-> > +              * We release hgctrl->lock before notifying IMSIC
-> > +              * so that we don't have lock ordering issues.
-> > +              */
-> > +             raw_spin_unlock_irqrestore(&hgctrl->lock, flags);
-> > +
-> > +             /* Notify IMSIC */
-> > +             kvm_riscv_vcpu_aia_imsic_release(vcpu);
-> > +
-> > +             /*
-> > +              * Wakeup VCPU if it was blocked so that it can
-> > +              * run on other HARTs
-> > +              */
-> > +             if (csr_read(CSR_HGEIE) & BIT(i)) {
-> > +                     csr_clear(CSR_HGEIE, BIT(i));
-> > +                     kvm_vcpu_kick(vcpu);
->
-> Doing all this outside the lock makes me wonder what happens when 'vcpu'
-> is no longer the owner at the time of kvm_riscv_vcpu_aia_imsic_release()
-> or kvm_vcpu_kick(). Even if the calls on the wrong vcpu are just noise,
-> then don't we still need to confirm that we release/kick the real owner
-> before we return from this function?
->
-> It appears safe to call kvm_vcpu_kick() while holding the lock and
-> hgei_interrupt() does that. So, since there's currently no
-> implementation of kvm_riscv_vcpu_aia_imsic_release(), I'm not sure what
-> lock ordering issues we need to avoid.
+IOW, this doesn't restrict it to the tmpfs root. It only restricts it to
+paths that refer to the root of any tmpfs mount. To exclude bind-mounts
+that aren't bind-mounts of the whole filesystem you want:
 
-Next batch of AIA patches has kvm_riscv_vcpu_aia_imsic_release() where
-kvm_riscv_vcpu_aia_imsic_release() function will release the HGEI interrupt
-line.
+path->dentry == path->mnt->mnt_root && 
+path->mnt->mnt_root == path->mnt->mnt_sb->s_root
 
-This is not to protect the kvm_vcpu_kick() call.
+> +}
+> +
+> +static int restrictedmem_create_on_user_mount(int mount_fd)
+> +{
+> +	int ret;
+> +	struct fd f;
+> +	struct vfsmount *mnt;
+> +
+> +	f = fdget_raw(mount_fd);
+> +	if (!f.file)
+> +		return -EBADF;
+> +
+> +	ret = -EINVAL;
+> +	if (!is_mount_root(f.file))
+> +		goto out;
+> +
+> +	mnt = f.file->f_path.mnt;
+> +	if (!is_shmem_mount(mnt))
+> +		goto out;
+> +
+> +	ret = file_permission(f.file, MAY_WRITE | MAY_EXEC);
 
-Regards,
-Anup
+With the current semantics you're asking whether you have write
+permissions on the /mnt/ble file in order to get answer to the question
+whether you're allowed to create an unlinked restricted memory file.
+That doesn't make much sense afaict.
 
->
-> > +             }
-> > +
-> > +             raw_spin_lock_irqsave(&hgctrl->lock, flags);
-> > +     }
-> > +
-> > +     raw_spin_unlock_irqrestore(&hgctrl->lock, flags);
-> >  }
-> >
-> >  int kvm_riscv_aia_init(void)
-> >  {
-> > +     int rc;
-> > +
-> >       if (!riscv_isa_extension_available(NULL, SxAIA))
-> >               return -ENODEV;
-> >
-> > +     /* Figure-out number of bits in HGEIE */
-> > +     csr_write(CSR_HGEIE, -1UL);
-> > +     kvm_riscv_aia_nr_hgei =3D fls_long(csr_read(CSR_HGEIE));
-> > +     csr_write(CSR_HGEIE, 0);
-> > +     if (kvm_riscv_aia_nr_hgei)
-> > +             kvm_riscv_aia_nr_hgei--;
-> > +
-> > +     /* Initialize guest external interrupt line management */
-> > +     rc =3D aia_hgei_init();
-> > +     if (rc)
-> > +             return rc;
-> > +
-> >       /* Enable KVM AIA support */
-> >       static_branch_enable(&kvm_riscv_aia_available);
-> >
-> > @@ -380,4 +616,9 @@ int kvm_riscv_aia_init(void)
-> >
-> >  void kvm_riscv_aia_exit(void)
-> >  {
-> > +     if (!kvm_riscv_aia_available())
-> > +             return;
-> > +
-> > +     /* Cleanup the HGEI state */
-> > +     aia_hgei_exit();
-> >  }
-> > diff --git a/arch/riscv/kvm/main.c b/arch/riscv/kvm/main.c
-> > index 6396352b4e4d..b0b46f48f31e 100644
-> > --- a/arch/riscv/kvm/main.c
-> > +++ b/arch/riscv/kvm/main.c
-> > @@ -116,7 +116,8 @@ static int __init riscv_kvm_init(void)
-> >       kvm_info("VMID %ld bits available\n", kvm_riscv_gstage_vmid_bits(=
-));
-> >
-> >       if (kvm_riscv_aia_available())
-> > -             kvm_info("AIA available\n");
-> > +             kvm_info("AIA available with %d guest external interrupts=
-\n",
-> > +                      kvm_riscv_aia_nr_hgei);
-> >
-> >       rc =3D kvm_init(sizeof(struct kvm_vcpu), 0, THIS_MODULE);
-> >       if (rc) {
-> > diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
-> > index 30acf3ebdc3d..eace51dd896f 100644
-> > --- a/arch/riscv/kvm/vcpu.c
-> > +++ b/arch/riscv/kvm/vcpu.c
-> > @@ -249,10 +249,12 @@ int kvm_cpu_has_pending_timer(struct kvm_vcpu *vc=
-pu)
-> >
-> >  void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu)
-> >  {
-> > +     kvm_riscv_aia_wakeon_hgei(vcpu, true);
-> >  }
-> >
-> >  void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu)
-> >  {
-> > +     kvm_riscv_aia_wakeon_hgei(vcpu, false);
-> >  }
-> >
-> >  int kvm_arch_vcpu_runnable(struct kvm_vcpu *vcpu)
-> > --
-> > 2.34.1
-> >
->
-> Thanks,
-> drew
+> +	if (ret)
+> +		goto out;
+> +
+> +	ret = mnt_want_write(mnt);
+> +	if (unlikely(ret))
+> +		goto out;
+> +
+> +	ret = restrictedmem_create(mnt);
+> +
+> +	mnt_drop_write(mnt);
+> +out:
+> +	fdput(f);
+> +
+> +	return ret;
+> +}
+> +
+> +SYSCALL_DEFINE2(memfd_restricted, unsigned int, flags, int, mount_fd)
+> +{
+> +	if (flags & ~RMFD_USERMNT)
+> +		return -EINVAL;
+> +
+> +	if (flags == RMFD_USERMNT) {
+
+Why do you even need this flag? It seems that @mount_fd being < 0 is
+sufficient to indicate that a new restricted memory fd is supposed to be
+created in the system instance.
+
+> +		if (mount_fd < 0)
+> +			return -EINVAL;
+> +
+> +		return restrictedmem_create_on_user_mount(mount_fd);
+> +	} else {
+> +		return restrictedmem_create(NULL);
+> +	}
+> +}
+
+I have to say that I'm very confused by all of this the more I look at it.
+
+Effectively memfd restricted functions as a wrapper filesystem around
+the tmpfs filesystem. This is basically a weird overlay filesystem.
+You're allocating tmpfs files that you stash in restrictedmem files. 
+I have to say that this seems very hacky. I didn't get this at all at
+first.
+
+So what does the caller get if they call statx() on a restricted memfd?
+Do they get the device number of the tmpfs mount and the inode numbers
+of the tmpfs mount? Because it looks like they would:
+
+static int restrictedmem_getattr(struct user_namespace *mnt_userns,
+				 const struct path *path, struct kstat *stat,
+				 u32 request_mask, unsigned int query_flags)
+{
+	struct inode *inode = d_inode(path->dentry);
+	struct restrictedmem *rm = inode->i_mapping->private_data;
+	struct file *memfd = rm->memfd;
+
+	return memfd->f_inode->i_op->getattr(mnt_userns, path, stat,
+					     request_mask, query_flags);
+
+That @memfd would be a struct file allocated in a tmpfs instance, no? So
+you'd be calling the inode operation of the tmpfs file meaning that
+struct kstat will be filled up with the info from the tmpfs instance.
+
+But then if I call statfs() and check the fstype I would get
+RESTRICTEDMEM_MAGIC, no? This is... unorthodox?
+
+I'm honestly puzzled and this sounds really strange. There must be a
+better way to implement all of this.
+
+Shouldn't you try and make this a part of tmpfs proper? Make a really
+separate filesystem and add a memfs library that both tmpfs and
+restrictedmemfs can use? Add a mount option to tmpfs that makes it a
+restricted tmpfs?
