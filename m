@@ -2,157 +2,150 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 780C16D6D3C
-	for <lists+kvm@lfdr.de>; Tue,  4 Apr 2023 21:35:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 99CF76D6D5B
+	for <lists+kvm@lfdr.de>; Tue,  4 Apr 2023 21:43:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235998AbjDDTfC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Apr 2023 15:35:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34746 "EHLO
+        id S236135AbjDDTny (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Apr 2023 15:43:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39330 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235844AbjDDTfA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Apr 2023 15:35:00 -0400
-Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8EA50AC
-        for <kvm@vger.kernel.org>; Tue,  4 Apr 2023 12:34:59 -0700 (PDT)
-Received: by mail-pg1-x54a.google.com with SMTP id 140-20020a630792000000b0050be9465db8so9734397pgh.2
-        for <kvm@vger.kernel.org>; Tue, 04 Apr 2023 12:34:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1680636899;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=LuV+/sJOq2uDAF4iudL5mtYpR36Yypb8trQPNgvINbg=;
-        b=KQ7Dk7TU7k221z8YiX2kN/3uZEQcyLXIZCxd4U6GQEAim0R92B50cjmrBHPVO8TEGw
-         DZqacgV+ZS3QoLfWUbPPHDXqO23foWHIPdzrO+mD7geIFab38WD2+TzgvEWILX9ik8dX
-         FW7NDUzHqUz3mqzF6i6OU6WaHOBSu1/T/Gd5CgoWstWYqyyluIr617MPHa1nOM3CJNuT
-         LJaowseQzcCmf2rFJeDXwkk2U1TmYINodpv6Yi/6Df5PIB44+6s1SWW4gAF7Y02ABddC
-         jQ78xmZrpu0/iKrfiQk3FnGkhLi4QUEXVGv4GMdE98xrUMJ4uhvo8TmVYyGol0YZvRBS
-         uZHg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680636899;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=LuV+/sJOq2uDAF4iudL5mtYpR36Yypb8trQPNgvINbg=;
-        b=VEvEcsgcF3tEfwYimOWu22k5Hhc0G/Ou0hXcN0bb9Q63qATWBvGa8ERhIJ5HWMWKvP
-         oLBYBLhmLduPOufWCNLRJ1tmiQPRx/Yw4QK7QHtLMnlfUrAQPneqE8YXoki1ZFeMKpjE
-         iy1JgakgkKrnp0r580MnTnXboaL55HKO9WrKAl66euzxT5EVV5OKrDQC2sShFhCBbRZL
-         GcWOa6vp8Or873KQErNlW+OPtA5zeQrvhZ8AWZjkWayp7iEFpvSoPpIZ2T9Kxrhkpj0g
-         xIm96amZmq5jB9LrPuKmz5KRCpIrIatiT+a3HuVk6bv+akAn+WwxV9O9bRQz1h+egdi0
-         j1TA==
-X-Gm-Message-State: AAQBX9fAFQvAKH6j/i0ctnQ9EWrJVdyUBmotjkVBl/SMDSFOecHmu2fb
-        RijAsP3hgf0xhGhyAMB3vKyyjzovewI=
-X-Google-Smtp-Source: AKy350bhdJ/ttpMbZ6gVAtAiTSzKPofPi3LmGG5tA+Ip3z9TKfjG/MNXk6an2WuCm3VuIO2e6EeXVPR7RAo=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a63:150c:0:b0:514:26cf:9c05 with SMTP id
- v12-20020a63150c000000b0051426cf9c05mr488041pgl.7.1680636899011; Tue, 04 Apr
- 2023 12:34:59 -0700 (PDT)
-Date:   Tue, 4 Apr 2023 12:34:57 -0700
-In-Reply-To: <CAF7b7moV9=w4zJhSD2XZrnZTQAP3QeO1rvyT0dMWDhYj0PDcEA@mail.gmail.com>
-Mime-Version: 1.0
-References: <20230317000226.GA408922@ls.amr.corp.intel.com>
- <CAF7b7mrTa735kDaEsJQSHTt7gpWy_QZEtsgsnKoe6c21s0jDVw@mail.gmail.com>
- <ZBTgnjXJvR8jtc4i@google.com> <CAF7b7mqnvLe8tw_6-cW1b2Bk8YB9qP=7BsOOJK3q-tAyDkarww@mail.gmail.com>
- <ZBiBkwIF4YHnphPp@google.com> <CAF7b7mrVQ6zP6SLHm4QBfQLgaxQuMtxjhqU5YKjjKGkoND4MLw@mail.gmail.com>
- <ZBnLaidtZEM20jMp@google.com> <CAF7b7mof8HkcaSthEO8Wu9kf8ZHjE9c1TDzQGAYDYv7FN9+k9w@mail.gmail.com>
- <ZBoIzo8FGxSyUJ2I@google.com> <CAF7b7moV9=w4zJhSD2XZrnZTQAP3QeO1rvyT0dMWDhYj0PDcEA@mail.gmail.com>
-Message-ID: <ZCx74RGh1/nnix6U@google.com>
-Subject: Re: [WIP Patch v2 04/14] KVM: x86: Add KVM_CAP_X86_MEMORY_FAULT_EXIT
- and associated kvm_run field
-From:   Sean Christopherson <seanjc@google.com>
-To:     Anish Moorthy <amoorthy@google.com>
-Cc:     Isaku Yamahata <isaku.yamahata@gmail.com>,
+        with ESMTP id S235290AbjDDTnw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Apr 2023 15:43:52 -0400
+Received: from out-37.mta1.migadu.com (out-37.mta1.migadu.com [95.215.58.37])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18BA44697
+        for <kvm@vger.kernel.org>; Tue,  4 Apr 2023 12:43:50 -0700 (PDT)
+Date:   Tue, 4 Apr 2023 19:43:40 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1680637429;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=oo72y+C9GAk4TX3Xexbl8ChW3WJT6jJtrsPurmSXTHs=;
+        b=NSRjnW/TZah/qkXgQrr9JHQ/FWR4wEvSnoja35+kwW5MrctQfwh4GlnwcLCiuPZkkCkcaA
+        /HzuZo/X+5T0jWLdwJHz4UF+6eNEPzg2jYp6klJeWrNAZvA1GLPKsZQRKcVMDTY5FNTZga
+        KodSImPt6+c6nNgwQaVEU6F24QCrwtY=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From:   Oliver Upton <oliver.upton@linux.dev>
+To:     David Dai <davidai@google.com>
+Cc:     "Rafael J. Wysocki" <rafael@kernel.org>,
+        Viresh Kumar <viresh.kumar@linaro.org>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
         Marc Zyngier <maz@kernel.org>,
-        Oliver Upton <oliver.upton@linux.dev>, jthoughton@google.com,
-        kvm@vger.kernel.org
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-7.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Lorenzo Pieralisi <lpieralisi@kernel.org>,
+        Sudeep Holla <sudeep.holla@arm.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Juri Lelli <juri.lelli@redhat.com>,
+        Vincent Guittot <vincent.guittot@linaro.org>,
+        Dietmar Eggemann <dietmar.eggemann@arm.com>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>,
+        Daniel Bristot de Oliveira <bristot@redhat.com>,
+        Valentin Schneider <vschneid@redhat.com>,
+        kernel-team@android.com, linux-pm@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+Subject: Re: [RFC PATCH 0/6] Improve VM DVFS and task placement behavior
+Message-ID: <ZCx97IKjsBibjdGc@linux.dev>
+References: <20230330224348.1006691-1-davidai@google.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230330224348.1006691-1-davidai@google.com>
+X-Migadu-Flow: FLOW_OUT
+X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
+        DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
+        T_PHOTO_EDITING_DIRECT autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 28, 2023, Anish Moorthy wrote:
-> On Tue, Mar 21, 2023 at 12:43=E2=80=AFPM Sean Christopherson <seanjc@goog=
-le.com> wrote:
-> >
-> > On Tue, Mar 21, 2023, Anish Moorthy wrote:
-> > > On Tue, Mar 21, 2023 at 8:21=E2=80=AFAM Sean Christopherson <seanjc@g=
-oogle.com> wrote:
-> > > > FWIW, I completely agree that filling KVM_EXIT_MEMORY_FAULT without=
- guaranteeing
-> > > > that KVM "immediately" exits to userspace isn't ideal, but given th=
-e amount of
-> > > > historical code that we need to deal with, it seems like the lesser=
- of all evils.
-> > > > Unless I'm misunderstanding the use cases, unnecessarily filling kv=
-m_run is a far
-> > > > better failure mode than KVM not filling kvm_run when it should, i.=
-e. false
-> > > > positives are ok, false negatives are fatal.
-> > >
-> > > Don't you have this in reverse?
-> >
-> > No, I don't think so.
-> >
-> > > False negatives will just result in userspace not having useful extra
-> > > information for the -EFAULT it receives from KVM_RUN, in which case u=
-serspace
-> > > can do what you mentioned all VMMs do today and just terminate the VM=
-.
-> >
-> > And that is _really_ bad behavior if we have any hope of userspace actu=
-ally being
-> > able to rely on this functionality.  E.g. any false negative when users=
-pace is
-> > trying to do postcopy demand paging will be fatal to the VM.
-> >
-> > > Whereas a false positive might cause a double-write to the KVM_RUN st=
-ruct,
-> > > either putting incorrect information in kvm_run.memory_fault or
-> >
-> > Recording unused information on -EFAULT in kvm_run doesn't make the inf=
-ormation
-> > incorrect.
->=20
-> Let's say that some function (converted to annotate its EFAULTs) fills
-> in kvm_run.memory_fault, but the EFAULT is suppressed from being
-> returned from kvm_run. What if, later within the same kvm_run call,
-> some other function (which we've completely overlooked) EFAULTs and
-> that return value actually does make it out to kvm_run? Userspace
-> would get stale information, which could be catastrophic.
+Folks,
 
-"catastrophic" is a bit hyperbolic.  Yes, it would be bad, but at _worst_ u=
-serspace
-will kill the VM, which is the status quo today.
+On Thu, Mar 30, 2023 at 03:43:35PM -0700, David Dai wrote:
 
-> Actually even performing the annotations only in functions that
-> currently always bubble EFAULTs to userspace still seems brittle: if
-> new callers are ever added which don't bubble the EFAULTs, then we end
-> up in the same situation.
+<snip>
 
-Because of KVM's semi-magical '1 =3D=3D resume, -errno/0 =3D=3D exit' "desi=
-gn", that's
-true for literally every exit to userspace in KVM and every VM-Exit handler=
-.
-E.g. see commit 2368048bf5c2 ("KVM: x86: Signal #GP, not -EPERM, on bad
-WRMSR(MCi_CTL/STATUS)"), where KVM returned '-1' instead of '1' when reject=
-ing
-MSR accesses and inadvertantly killed the VM.  A similar bug would be if KV=
-M
-returned EFAULT instead of -EFAULT, in which case vcpu_run() would resume t=
-he
-guest instead of exiting to userspace and likely put the vCPU into an infin=
-ite
-loop.
+> PCMark
+> Higher is better
+> +-------------------+----------+------------+--------+-------+--------+
+> | Test Case (score) | Baseline |  Hypercall | %delta |  MMIO | %delta |
+> +-------------------+----------+------------+--------+-------+--------+
+> | Weighted Total    |     6136 |       7274 |   +19% |  6867 |   +12% |
+> +-------------------+----------+------------+--------+-------+--------+
+> | Web Browsing      |     5558 |       6273 |   +13% |  6035 |    +9% |
+> +-------------------+----------+------------+--------+-------+--------+
+> | Video Editing     |     4921 |       5221 |    +6% |  5167 |    +5% |
+> +-------------------+----------+------------+--------+-------+--------+
+> | Writing           |     6864 |       8825 |   +29% |  8529 |   +24% |
+> +-------------------+----------+------------+--------+-------+--------+
+> | Photo Editing     |     7983 |      11593 |   +45% | 10812 |   +35% |
+> +-------------------+----------+------------+--------+-------+--------+
+> | Data Manipulation |     5814 |       6081 |    +5% |  5327 |    -8% |
+> +-------------------+----------+------------+--------+-------+--------+
+> 
+> PCMark Performance/mAh
+> Higher is better
+> +-----------+----------+-----------+--------+------+--------+
+> |           | Baseline | Hypercall | %delta | MMIO | %delta |
+> +-----------+----------+-----------+--------+------+--------+
+> | Score/mAh |       79 |        88 |   +11% |   83 |    +7% |
+> +-----------+----------+-----------+--------+------+--------+
+> 
+> Roblox
+> Higher is better
+> +-----+----------+------------+--------+-------+--------+
+> |     | Baseline |  Hypercall | %delta |  MMIO | %delta |
+> +-----+----------+------------+--------+-------+--------+
+> | FPS |    18.25 |      28.66 |   +57% | 24.06 |   +32% |
+> +-----+----------+------------+--------+-------+--------+
+> 
+> Roblox Frames/mAh
+> Higher is better
+> +------------+----------+------------+--------+--------+--------+
+> |            | Baseline |  Hypercall | %delta |   MMIO | %delta |
+> +------------+----------+------------+--------+--------+--------+
+> | Frames/mAh |    91.25 |     114.64 |   +26% | 103.11 |   +13% |
+> +------------+----------+------------+--------+--------+--------+
 
-Do I want to harden KVM to make things like this less brittle?  Absolutely.=
-  Do I
-think we should hold up this functionality just because it doesn't solve al=
-l of
-pre-existing flaws in the related KVM code?  No.
+</snip>
+
+> Next steps:
+> ===========
+> We are continuing to look into communication mechanisms other than
+> hypercalls that are just as/more efficient and avoid switching into the VMM
+> userspace. Any inputs in this regard are greatly appreciated.
+
+We're highly unlikely to entertain such an interface in KVM.
+
+The entire feature is dependent on pinning vCPUs to physical cores, for which
+userspace is in the driver's seat. That is a well established and documented
+policy which can be seen in the way we handle heterogeneous systems and
+vPMU.
+
+Additionally, this bloats the KVM PV ABI with highly VMM-dependent interfaces
+that I would not expect to benefit the typical user of KVM.
+
+Based on the data above, it would appear that the userspace implementation is
+in the same neighborhood as a KVM-based implementation, which only further
+weakens the case for moving this into the kernel.
+
+I certainly can appreciate the motivation for the series, but this feature
+should be in userspace as some form of a virtual device.
+
+-- 
+Thanks,
+Oliver
