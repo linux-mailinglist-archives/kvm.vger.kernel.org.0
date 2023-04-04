@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0662C6D5E3F
-	for <lists+kvm@lfdr.de>; Tue,  4 Apr 2023 12:55:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A648B6D5E3E
+	for <lists+kvm@lfdr.de>; Tue,  4 Apr 2023 12:55:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234610AbjDDKzF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Apr 2023 06:55:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39106 "EHLO
+        id S234669AbjDDKzH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Apr 2023 06:55:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39080 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234622AbjDDKyL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S234809AbjDDKyL (ORCPT <rfc822;kvm@vger.kernel.org>);
         Tue, 4 Apr 2023 06:54:11 -0400
 Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB27F1737;
-        Tue,  4 Apr 2023 03:53:26 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7226DC;
+        Tue,  4 Apr 2023 03:53:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1680605607; x=1712141607;
+  t=1680605609; x=1712141609;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=voFQVjFSRNzDP3of726cqSfwzN6e3VmowuyZWcsyuKM=;
-  b=l8AHjYMO0iAGTYDkqN2IJc4ddHIP1EKjU30cdLHXSx12cfANBJU1ZyS7
-   6YE6Z6qZ5aA4IKTzkgxoudhiratEZTipWdPLKlF22itKp8XNw/lhPHWOA
-   AV/mCZx3C6YMIdsdGKSdzzhAWNFahFvAR7zAleyT2KI6D1EnpAnKveU/1
-   0cjelyjp0jAT1UkKl1PhGkKf8pPm5mIapzdcEuCYkEvpMgszAZIOLijFQ
-   UfJupVfjyeCTIcE8A6RAPxLMFDfGmV6fZBic5KcnBbtJW73vCq/s+gU/f
-   d9x6fExxnYoVzIuW9RkWj2zsJr/DBLAs5b7dlpXnhzGomKD9F5Xp7GlJw
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10669"; a="330734073"
+  bh=3h63lm4e6EBF71B+XPLJAYkLnyTMlvSI36lVPpSC6fU=;
+  b=kZ+J7VPZM1r/UokeBHIWmb8S8OOBMS0MQF5nLX8+bqQDE19rXAQIObUe
+   6WAu0aSFYmiKwLI6ngITtHFMJhTbeYWZknOuizVypgwM45jVNdUjNscY0
+   pAq2sgoth9YNBxyJGOSSh+eGXiuhWdOzbVOsjDwfzAsODyRgviEBgw6wz
+   moQbuLX0WvuxmhRfvrh/n+iSNR7X3rcQ54CW52yGPGF+dqasczQVd2wi/
+   U/HDkyA6q0bi9SkMCwi6ZZw1Jr9beuyP6JU/bNtK/w7Nz4LwYCk6w0uvb
+   CEwdKwkyQr08eLMfXTHxhsJwjXARhV5aiJdP61ZN50pdP6DYJh0Drjerp
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10669"; a="330734083"
 X-IronPort-AV: E=Sophos;i="5.98,317,1673942400"; 
-   d="scan'208";a="330734073"
+   d="scan'208";a="330734083"
 Received: from fmsmga003.fm.intel.com ([10.253.24.29])
   by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Apr 2023 03:53:03 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10669"; a="775597823"
+X-IronPort-AV: E=McAfee;i="6600,9927,10669"; a="775597826"
 X-IronPort-AV: E=Sophos;i="5.98,317,1673942400"; 
-   d="scan'208";a="775597823"
+   d="scan'208";a="775597826"
 Received: from unknown (HELO fred..) ([172.25.112.68])
   by FMSMGA003.fm.intel.com with ESMTP; 04 Apr 2023 03:53:03 -0700
 From:   Xin Li <xin3.li@intel.com>
@@ -45,9 +45,9 @@ Cc:     tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
         andrew.cooper3@citrix.com, seanjc@google.com, pbonzini@redhat.com,
         ravi.v.shankar@intel.com, jiangshanlai@gmail.com,
         shan.kang@intel.com
-Subject: [PATCH v7 15/33] x86/fred: reserve space for the FRED stack frame
-Date:   Tue,  4 Apr 2023 03:26:58 -0700
-Message-Id: <20230404102716.1795-16-xin3.li@intel.com>
+Subject: [PATCH v7 16/33] x86/fred: add a page fault entry stub for FRED
+Date:   Tue,  4 Apr 2023 03:26:59 -0700
+Message-Id: <20230404102716.1795-17-xin3.li@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230404102716.1795-1-xin3.li@intel.com>
 References: <20230404102716.1795-1-xin3.li@intel.com>
@@ -65,48 +65,76 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: "H. Peter Anvin (Intel)" <hpa@zytor.com>
 
-When using FRED, reserve space at the top of the stack frame, just
-like i386 does. A future version of FRED might have dynamic frame
-sizes, though, in which case it might be necessary to make
-TOP_OF_KERNEL_STACK_PADDING a variable instead of a constant.
+Add a page fault entry stub for FRED.
+
+On a FRED system, the faulting address (CR2) is passed on the stack,
+to avoid the problem of transient state. Thus we get the page fault
+address from the stack instead of CR2.
 
 Signed-off-by: H. Peter Anvin (Intel) <hpa@zytor.com>
 Tested-by: Shan Kang <shan.kang@intel.com>
 Signed-off-by: Xin Li <xin3.li@intel.com>
 ---
- arch/x86/include/asm/thread_info.h | 12 +++++++++---
- 1 file changed, 9 insertions(+), 3 deletions(-)
+ arch/x86/include/asm/fred.h |  2 ++
+ arch/x86/mm/fault.c         | 20 ++++++++++++++++++--
+ 2 files changed, 20 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/include/asm/thread_info.h b/arch/x86/include/asm/thread_info.h
-index f1cccba52eb9..998483078d5f 100644
---- a/arch/x86/include/asm/thread_info.h
-+++ b/arch/x86/include/asm/thread_info.h
-@@ -31,7 +31,9 @@
-  * In vm86 mode, the hardware frame is much longer still, so add 16
-  * bytes to make room for the real-mode segments.
-  *
-- * x86_64 has a fixed-length stack frame.
-+ * x86-64 has a fixed-length stack frame, but it depends on whether
-+ * or not FRED is enabled. Future versions of FRED might make this
-+ * dynamic, but for now it is always 2 words longer.
-  */
- #ifdef CONFIG_X86_32
- # ifdef CONFIG_VM86
-@@ -39,8 +41,12 @@
- # else
- #  define TOP_OF_KERNEL_STACK_PADDING 8
- # endif
--#else
--# define TOP_OF_KERNEL_STACK_PADDING 0
-+#else /* x86-64 */
-+# ifdef CONFIG_X86_FRED
-+#  define TOP_OF_KERNEL_STACK_PADDING (2*8)
-+# else
-+#  define TOP_OF_KERNEL_STACK_PADDING 0
-+# endif
- #endif
+diff --git a/arch/x86/include/asm/fred.h b/arch/x86/include/asm/fred.h
+index b59397411ab9..4ff05d350066 100644
+--- a/arch/x86/include/asm/fred.h
++++ b/arch/x86/include/asm/fred.h
+@@ -99,6 +99,8 @@ static __always_inline unsigned long fred_event_data(struct pt_regs *regs)
+ #define DEFINE_FRED_HANDLER(f) noinstr DECLARE_FRED_HANDLER(f)
+ typedef DECLARE_FRED_HANDLER((*fred_handler));
  
- /*
++DECLARE_FRED_HANDLER(fred_exc_page_fault);
++
+ #endif /* __ASSEMBLY__ */
+ 
+ #endif /* CONFIG_X86_FRED */
+diff --git a/arch/x86/mm/fault.c b/arch/x86/mm/fault.c
+index a498ae1fbe66..0f946121de14 100644
+--- a/arch/x86/mm/fault.c
++++ b/arch/x86/mm/fault.c
+@@ -33,6 +33,7 @@
+ #include <asm/kvm_para.h>		/* kvm_handle_async_pf		*/
+ #include <asm/vdso.h>			/* fixup_vdso_exception()	*/
+ #include <asm/irq_stack.h>
++#include <asm/fred.h>			/* fred_event_data()	*/
+ 
+ #define CREATE_TRACE_POINTS
+ #include <asm/trace/exceptions.h>
+@@ -1507,9 +1508,10 @@ handle_page_fault(struct pt_regs *regs, unsigned long error_code,
+ 	}
+ }
+ 
+-DEFINE_IDTENTRY_RAW_ERRORCODE(exc_page_fault)
++static __always_inline void page_fault_common(struct pt_regs *regs,
++					      unsigned int error_code,
++					      unsigned long address)
+ {
+-	unsigned long address = read_cr2();
+ 	irqentry_state_t state;
+ 
+ 	prefetchw(&current->mm->mmap_lock);
+@@ -1556,3 +1558,17 @@ DEFINE_IDTENTRY_RAW_ERRORCODE(exc_page_fault)
+ 
+ 	irqentry_exit(regs, state);
+ }
++
++DEFINE_IDTENTRY_RAW_ERRORCODE(exc_page_fault)
++{
++	page_fault_common(regs, error_code, read_cr2());
++}
++
++#ifdef CONFIG_X86_FRED
++
++DEFINE_FRED_HANDLER(fred_exc_page_fault)
++{
++	page_fault_common(regs, regs->orig_ax, fred_event_data(regs));
++}
++
++#endif /* CONFIG_X86_FRED */
 -- 
 2.34.1
 
