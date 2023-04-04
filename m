@@ -2,108 +2,224 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 54AB16D59BE
-	for <lists+kvm@lfdr.de>; Tue,  4 Apr 2023 09:35:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 87CCD6D59D3
+	for <lists+kvm@lfdr.de>; Tue,  4 Apr 2023 09:41:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233901AbjDDHfB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Apr 2023 03:35:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41888 "EHLO
+        id S233735AbjDDHlO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Apr 2023 03:41:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47628 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229510AbjDDHe7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Apr 2023 03:34:59 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E5CA123
-        for <kvm@vger.kernel.org>; Tue,  4 Apr 2023 00:34:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1680593651;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=99tQM16AOIPSiD36e9lC8KgNlMe8A/CLkwAQnzAPAlM=;
-        b=INgABNkVMiFdVbA0UHfs23ESG1lsi4p6Msk/7RLzHX3FNNx1ry4MJqnC6FRliLiO5LNdGl
-        xCMn5VqDJT5Q87SaMlhaQdhL1ZK2p11VMKKghsdACoKQReRu4OzKslQwiQ+5BHhE76PsZv
-        MrucjPszh3PYieZlqtpp/9p7n6FOei4=
-Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
- [209.85.160.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-675-19brWEYaMLSo3K38Snrfbw-1; Tue, 04 Apr 2023 03:34:10 -0400
-X-MC-Unique: 19brWEYaMLSo3K38Snrfbw-1
-Received: by mail-qt1-f197.google.com with SMTP id r22-20020ac85c96000000b003e638022bc9so9573984qta.5
-        for <kvm@vger.kernel.org>; Tue, 04 Apr 2023 00:34:10 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680593650;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=99tQM16AOIPSiD36e9lC8KgNlMe8A/CLkwAQnzAPAlM=;
-        b=TiQ+5aKC9gRzKSzKE9XrQzi4/OTriRonMNbIv6+ozqCl7tzbl3gsh1ptHBU9+u0CTc
-         JMwuPyYPn0avfVhZBCtLZu21F1QRfzifEoHoXo0gF5uPPRhPXV/npt+rNoNJYu8I3Xcf
-         QuUTBds+fDqpe5xL0jZ4ngaTl5t4EVnvQre4s7fqiDoUANUgTraTdOJpbHkPyek1wq0o
-         4Ed3dMaZjQZASZr3KYqc3bPk87lx9MFDgzUJyDixfyGuysyYVgdvKkAwqcqCl7v8UQmB
-         cyixMOc2APy+9wXMYhCOzUVDO9WyMEqmR+WUiQeUFqaUD/hw2kmCHntxZCFnm6VYJbAs
-         G5tg==
-X-Gm-Message-State: AAQBX9eNS6KCAJC1aG6+TTtO2ZBTg2Nekpo5V32qw0/A8N9mvOZiFKuu
-        0x3hOeUsJwt9Zc3Fp6rEMWTB/rD068FdfGxM/nr2mZyX1ZjCpCYPTxTd5s22MyqSGDZ1a/+yqSc
-        9mJUMYohW2H4Rq53IPrb1UeI=
-X-Received: by 2002:ac8:5bd1:0:b0:3bf:b5fe:372d with SMTP id b17-20020ac85bd1000000b003bfb5fe372dmr1675114qtb.61.1680593650214;
-        Tue, 04 Apr 2023 00:34:10 -0700 (PDT)
-X-Google-Smtp-Source: AKy350Yn6pC2+LOXbHC+brsOhPYWbUELBitKuSNkTaw8rn7U2Tsgh0u4bgya1L8Kaug4snYGGiJM5g==
-X-Received: by 2002:ac8:5bd1:0:b0:3bf:b5fe:372d with SMTP id b17-20020ac85bd1000000b003bfb5fe372dmr1675096qtb.61.1680593649980;
-        Tue, 04 Apr 2023 00:34:09 -0700 (PDT)
-Received: from [192.168.0.3] (ip-109-43-178-74.web.vodafone.de. [109.43.178.74])
-        by smtp.gmail.com with ESMTPSA id m124-20020a375882000000b0073b8745fd39sm3385199qkb.110.2023.04.04.00.34.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 04 Apr 2023 00:34:09 -0700 (PDT)
-Message-ID: <773ea477-2702-0511-eaca-2a110c5bf13d@redhat.com>
-Date:   Tue, 4 Apr 2023 09:34:07 +0200
+        with ESMTP id S233212AbjDDHlM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Apr 2023 03:41:12 -0400
+Received: from smtpout1.mo529.mail-out.ovh.net (smtpout1.mo529.mail-out.ovh.net [178.32.125.2])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE46110EA
+        for <kvm@vger.kernel.org>; Tue,  4 Apr 2023 00:41:10 -0700 (PDT)
+Received: from mxplan5.mail.ovh.net (unknown [10.109.138.233])
+        by mo529.mail-out.ovh.net (Postfix) with ESMTPS id 1FB0521711;
+        Tue,  4 Apr 2023 07:41:09 +0000 (UTC)
+Received: from kaod.org (37.59.142.97) by DAG4EX2.mxp5.local (172.16.2.32)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.23; Tue, 4 Apr
+ 2023 09:41:08 +0200
+Authentication-Results: garm.ovh; auth=pass (GARM-97G0022fcbf9e4-7470-40b3-9410-4c66e3272b75,
+                    85507D0075A56E5AD4EA03BF56E5282CC2D8C3A6) smtp.auth=clg@kaod.org
+X-OVh-ClientIp: 82.64.250.170
+Message-ID: <227eb09d-e5dc-2662-32b0-0b9ca4e8ef34@kaod.org>
+Date:   Tue, 4 Apr 2023 09:41:07 +0200
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.13.0
-Subject: Re: [kvm-unit-tests v3 11/13] powerpc: Discover runtime load address
- dynamically
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.9.1
+Subject: Re: [PATCH v19 06/21] s390x/cpu topology: interception of PTF
+ instruction
 Content-Language: en-US
-To:     Nicholas Piggin <npiggin@gmail.com>, kvm@vger.kernel.org
-Cc:     linuxppc-dev@lists.ozlabs.org, Laurent Vivier <lvivier@redhat.com>
-References: <20230327124520.2707537-1-npiggin@gmail.com>
- <20230327124520.2707537-12-npiggin@gmail.com>
-From:   Thomas Huth <thuth@redhat.com>
-In-Reply-To: <20230327124520.2707537-12-npiggin@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+To:     Pierre Morel <pmorel@linux.ibm.com>, <qemu-s390x@nongnu.org>
+CC:     <qemu-devel@nongnu.org>, <borntraeger@de.ibm.com>,
+        <pasic@linux.ibm.com>, <richard.henderson@linaro.org>,
+        <david@redhat.com>, <thuth@redhat.com>, <cohuck@redhat.com>,
+        <mst@redhat.com>, <pbonzini@redhat.com>, <kvm@vger.kernel.org>,
+        <ehabkost@redhat.com>, <marcel.apfelbaum@gmail.com>,
+        <eblake@redhat.com>, <armbru@redhat.com>, <seiden@linux.ibm.com>,
+        <nrb@linux.ibm.com>, <nsg@linux.ibm.com>, <frankja@linux.ibm.com>,
+        <berrange@redhat.com>
+References: <20230403162905.17703-1-pmorel@linux.ibm.com>
+ <20230403162905.17703-7-pmorel@linux.ibm.com>
+From:   =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+In-Reply-To: <20230403162905.17703-7-pmorel@linux.ibm.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+X-Originating-IP: [37.59.142.97]
+X-ClientProxiedBy: DAG1EX1.mxp5.local (172.16.2.1) To DAG4EX2.mxp5.local
+ (172.16.2.32)
+X-Ovh-Tracer-GUID: b7aa4e4c-f92b-4df4-9d98-f74575e51847
+X-Ovh-Tracer-Id: 15317868234580397011
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedvhedrvdeikedguddtjecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefkffggfgfuvfevfhfhjggtgfhisehtjeertddtfeejnecuhfhrohhmpeevrogurhhitgcunfgvucfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhepuedutdetleegjefhieekgeffkefhleevgfefjeevffejieevgeefhefgtdfgiedtnecukfhppeduvdejrddtrddtrddupdefjedrheelrddugedvrdeljedpkedvrdeigedrvdehtddrudejtdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpeduvdejrddtrddtrddupdhmrghilhhfrhhomhepoegtlhhgsehkrghougdrohhrgheqpdhnsggprhgtphhtthhopedupdhrtghpthhtohepphhmohhrvghlsehlihhnuhigrdhisghmrdgtohhmpdhnshhgsehlihhnuhigrdhisghmrdgtohhmpdhnrhgssehlihhnuhigrdhisghmrdgtohhmpdhsvghiuggvnheslhhinhhugidrihgsmhdrtghomhdprghrmhgsrhhusehrvgguhhgrthdrtghomhdpvggslhgrkhgvsehrvgguhhgrthdrtghomhdpmhgrrhgtvghlrdgrphhfvghlsggruhhmsehgmhgrihhlrdgtohhmpdgvhhgrsghkohhsthesrhgvughhrghtrdgtohhmpdhkvhhmsehvgh
+ gvrhdrkhgvrhhnvghlrdhorhhgpdhfrhgrnhhkjhgrsehlihhnuhigrdhisghmrdgtohhmpdhpsghonhiiihhnihesrhgvughhrghtrdgtohhmpdgtohhhuhgtkhesrhgvughhrghtrdgtohhmpdhthhhuthhhsehrvgguhhgrthdrtghomhdpuggrvhhiugesrhgvughhrghtrdgtohhmpdhrihgthhgrrhgurdhhvghnuggvrhhsohhnsehlihhnrghrohdrohhrghdpphgrshhitgeslhhinhhugidrihgsmhdrtghomhdpsghorhhnthhrrggvghgvrhesuggvrdhisghmrdgtohhmpdhqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhgpdhqvghmuhdqshefledtgiesnhhonhhgnhhurdhorhhgpdhmshhtsehrvgguhhgrthdrtghomhdpsggvrhhrrghnghgvsehrvgguhhgrthdrtghomhdpoffvtefjohhsthepmhhohedvledpmhhouggvpehsmhhtphhouhht
+X-Spam-Status: No, score=-1.9 required=5.0 tests=NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 27/03/2023 14.45, Nicholas Piggin wrote:
-> The next change will load the kernels at different addresses depending
-> on test options, so this needs to be reverted back to dynamic
-> discovery.
+On 4/3/23 18:28, Pierre Morel wrote:
+> When the host supports the CPU topology facility, the PTF
+> instruction with function code 2 is interpreted by the SIE,
+> provided that the userland hypervisor activates the interpretation
+> by using the KVM_CAP_S390_CPU_TOPOLOGY KVM extension.
 > 
-> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+> The PTF instructions with function code 0 and 1 are intercepted
+> and must be emulated by the userland hypervisor.
+> 
+> During RESET all CPU of the configuration are placed in
+> horizontal polarity.
+> 
+> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
 > ---
->   powerpc/cstart64.S | 19 ++++++++++++++-----
->   1 file changed, 14 insertions(+), 5 deletions(-)
+>   include/hw/s390x/s390-virtio-ccw.h |  6 ++++
+>   hw/s390x/cpu-topology.c            | 56 ++++++++++++++++++++++++++++--
+>   target/s390x/kvm/kvm.c             | 11 ++++++
+>   3 files changed, 71 insertions(+), 2 deletions(-)
 > 
-> diff --git a/powerpc/cstart64.S b/powerpc/cstart64.S
-> index 1bd0437..0592e03 100644
-> --- a/powerpc/cstart64.S
-> +++ b/powerpc/cstart64.S
-> @@ -33,9 +33,14 @@ start:
->   	 * We were loaded at QEMU's kernel load address, but we're not
->   	 * allowed to link there due to how QEMU deals with linker VMAs,
->   	 * so we just linked at zero. This means the first thing to do is
-> -	 * to find our stack and toc, and then do a relocate.
-> +	 * to find our stack and toc, and then do a relocate. powernv and
-> +	 * pseries load addreses are not the same, so find the address
+> diff --git a/include/hw/s390x/s390-virtio-ccw.h b/include/hw/s390x/s390-virtio-ccw.h
+> index ea10a6c6e1..9aa9f48bd0 100644
+> --- a/include/hw/s390x/s390-virtio-ccw.h
+> +++ b/include/hw/s390x/s390-virtio-ccw.h
+> @@ -31,6 +31,12 @@ struct S390CcwMachineState {
+>       bool vertical_polarization;
+>   };
+>   
+> +#define S390_PTF_REASON_NONE (0x00 << 8)
+> +#define S390_PTF_REASON_DONE (0x01 << 8)
+> +#define S390_PTF_REASON_BUSY (0x02 << 8)
+> +#define S390_TOPO_FC_MASK 0xffUL
+> +void s390_handle_ptf(S390CPU *cpu, uint8_t r1, uintptr_t ra);
+> +
+>   struct S390CcwMachineClass {
+>       /*< private >*/
+>       MachineClass parent_class;
+> diff --git a/hw/s390x/cpu-topology.c b/hw/s390x/cpu-topology.c
+> index 1d672d4d81..eec6c9a896 100644
+> --- a/hw/s390x/cpu-topology.c
+> +++ b/hw/s390x/cpu-topology.c
+> @@ -26,8 +26,6 @@
+>    * .smp: keeps track of the machine topology.
+>    * .list: queue the topology entries inside which
+>    *        we keep the information on the CPU topology.
+> - * .polarization: the current subsystem polarization
+> - *
 
-With s/addreses/addresses/ :
+Please remove from patch 3 instead.
 
-Acked-by: Thomas Huth <thuth@redhat.com>
+>    */
+>   S390Topology s390_topology = {
+>       /* will be initialized after the cpu model is realized */
+> @@ -86,6 +84,57 @@ static void s390_topology_init(MachineState *ms)
+>       QTAILQ_INSERT_HEAD(&s390_topology.list, entry, next);
+>   }
+>   
+> +/*
+> + * s390_handle_ptf:
+> + *
+> + * @register 1: contains the function code
+> + *
+> + * Function codes 0 (horizontal) and 1 (vertical) define the CPU
+> + * polarization requested by the guest.
+> + *
+> + * Function code 2 is handling topology changes and is interpreted
+> + * by the SIE.
+> + */
+> +void s390_handle_ptf(S390CPU *cpu, uint8_t r1, uintptr_t ra)
+> +{
+> +    struct S390CcwMachineState *s390ms = S390_CCW_MACHINE(current_machine);
+> +    CPUS390XState *env = &cpu->env;
+> +    uint64_t reg = env->regs[r1];
+> +    int fc = reg & S390_TOPO_FC_MASK;
+> +
+> +    if (!s390_has_feat(S390_FEAT_CONFIGURATION_TOPOLOGY)) {
+> +        s390_program_interrupt(env, PGM_OPERATION, ra);
+> +        return;
+> +    }
+> +
+> +    if (env->psw.mask & PSW_MASK_PSTATE) {
+> +        s390_program_interrupt(env, PGM_PRIVILEGED, ra);
+> +        return;
+> +    }
+> +
+> +    if (reg & ~S390_TOPO_FC_MASK) {
+> +        s390_program_interrupt(env, PGM_SPECIFICATION, ra);
+> +        return;
+> +    }
+> +
+> +    switch (fc) {
+> +    case S390_CPU_POLARIZATION_VERTICAL:
+> +    case S390_CPU_POLARIZATION_HORIZONTAL:
+> +        if (s390ms->vertical_polarization == !!fc) {
+> +            env->regs[r1] |= S390_PTF_REASON_DONE;
+> +            setcc(cpu, 2);
+> +        } else {
+> +            s390ms->vertical_polarization = !!fc;
+> +            s390_cpu_topology_set_changed(true);
+> +            setcc(cpu, 0);
+> +        }
+> +        break;
+> +    default:
+> +        /* Note that fc == 2 is interpreted by the SIE */
+> +        s390_program_interrupt(env, PGM_SPECIFICATION, ra);
+> +    }
+> +}
+> +
+>   /**
+>    * s390_topology_reset:
+>    *
+> @@ -94,7 +143,10 @@ static void s390_topology_init(MachineState *ms)
+>    */
+>   void s390_topology_reset(void)
+>   {
+> +    struct S390CcwMachineState *s390ms = S390_CCW_MACHINE(current_machine);
+> +
+>       s390_cpu_topology_set_changed(false);
+> +    s390ms->vertical_polarization = false;
+>   }
+>   
+>   /**
+> diff --git a/target/s390x/kvm/kvm.c b/target/s390x/kvm/kvm.c
+> index bc953151ce..fb63be41b7 100644
+> --- a/target/s390x/kvm/kvm.c
+> +++ b/target/s390x/kvm/kvm.c
+> @@ -96,6 +96,7 @@
+>   
+>   #define PRIV_B9_EQBS                    0x9c
+>   #define PRIV_B9_CLP                     0xa0
+> +#define PRIV_B9_PTF                     0xa2
+>   #define PRIV_B9_PCISTG                  0xd0
+>   #define PRIV_B9_PCILG                   0xd2
+>   #define PRIV_B9_RPCIT                   0xd3
+> @@ -1464,6 +1465,13 @@ static int kvm_mpcifc_service_call(S390CPU *cpu, struct kvm_run *run)
+>       }
+>   }
+>   
+> +static void kvm_handle_ptf(S390CPU *cpu, struct kvm_run *run)
+> +{
+> +    uint8_t r1 = (run->s390_sieic.ipb >> 20) & 0x0f;
+> +
+> +    s390_handle_ptf(cpu, r1, RA_IGNORED);
+> +}
+> +
+>   static int handle_b9(S390CPU *cpu, struct kvm_run *run, uint8_t ipa1)
+>   {
+>       int r = 0;
+> @@ -1481,6 +1489,9 @@ static int handle_b9(S390CPU *cpu, struct kvm_run *run, uint8_t ipa1)
+>       case PRIV_B9_RPCIT:
+>           r = kvm_rpcit_service_call(cpu, run);
+>           break;
+> +    case PRIV_B9_PTF:
+> +        kvm_handle_ptf(cpu, run);
+> +        break;
+>       case PRIV_B9_EQBS:
+>           /* just inject exception */
+>           r = -1;
 
