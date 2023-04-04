@@ -2,246 +2,235 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EE1AA6D6597
-	for <lists+kvm@lfdr.de>; Tue,  4 Apr 2023 16:41:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8B4436D65CA
+	for <lists+kvm@lfdr.de>; Tue,  4 Apr 2023 16:52:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230004AbjDDOk7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Apr 2023 10:40:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44384 "EHLO
+        id S232408AbjDDOws (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Apr 2023 10:52:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53822 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229866AbjDDOk5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Apr 2023 10:40:57 -0400
-Received: from mail-lj1-x235.google.com (mail-lj1-x235.google.com [IPv6:2a00:1450:4864:20::235])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 803443AB5;
-        Tue,  4 Apr 2023 07:40:53 -0700 (PDT)
-Received: by mail-lj1-x235.google.com with SMTP id 38308e7fff4ca-2a5f619b4e2so760481fa.0;
-        Tue, 04 Apr 2023 07:40:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1680619252;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8jMFTqZ3iX4TYtwGxvCBQk3Ib7hvU7vvi0bgFu56EK0=;
-        b=AqFcW0+z2nqWIvV59SVfS9ovPz0wpK2NVEr/92uv+2oNKtQqs0gM/H2+VYxlIo6YCr
-         eD55r5NM39gud2Bz0x2CVKXX13ykMnkdqi+WwOXPr/tfqFyAbPK525CHZAJIHrXY53Ia
-         fmt6XU4HZiphjGhVWXAO88HzQSDHCJwiWkb1bKbJUt3aalNhPv6t5mnKFv4YP/ovYrSO
-         hP/i6xLR0H0NikKmLnUvedmvf+aRZKUcPUYzcaGhE6RkmsNzBNUaaYgQuXurUewfKcDj
-         /blybMBPkXprc32WMhNsW+JdCZEkNHKFGzrqwx0XQsdCsK5KLMiiqnFlmSi21btzyxfu
-         ddXw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680619252;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8jMFTqZ3iX4TYtwGxvCBQk3Ib7hvU7vvi0bgFu56EK0=;
-        b=Th9YS3j9uJdSMf8fHrKMWxDn9oO/4qYZignQPSo09xd/fJP11Q7B0lKAEJDP2W4rTF
-         Wz7IEZPE//r8Oe7Qg679ZWMCqKyBWuVCu/GnLXRHwYydTKMn/kAXcoCdM7pDewgaciPp
-         /q8rfwZSzh/UOXWIn8+UskB2xVTxsdbdQNvlLcjQZYMeFs9tSDrUiyfNfx9j68ejjwNp
-         v1wHzdsfN1FTh27/rPDlxoRJy+W5qtn0Rj1WlBCDhNSuTKak9Tm+poHdMlk3IFg0Y2y4
-         nLEhFS5zRiha7vuKeOtoRuUtrDtfdlr12qZyKkki/x7bWzGX6G/v05gDpiumPJr9RcV2
-         0FIA==
-X-Gm-Message-State: AAQBX9c3YEMqFpv5gfniDZrgAvHTd06ktOkGrK/rWQ7/1dVdEaQfcro2
-        BLH1fjRc5EwAleLMqM2covs=
-X-Google-Smtp-Source: AKy350b1m3A3BFbhnjEWAZBZaO+cl87OMMz86TJAKmwKy4zTQ86+WUTaHK3S2APiVUkq35oqpY+1rQ==
-X-Received: by 2002:a2e:bd84:0:b0:2a6:1dbf:5d3e with SMTP id o4-20020a2ebd84000000b002a61dbf5d3emr1026319ljq.0.1680619251465;
-        Tue, 04 Apr 2023 07:40:51 -0700 (PDT)
-Received: from localhost (88-115-161-74.elisa-laajakaista.fi. [88.115.161.74])
-        by smtp.gmail.com with ESMTPSA id a7-20020a05651c010700b0029c13f4d519sm2369013ljb.119.2023.04.04.07.40.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 04 Apr 2023 07:40:51 -0700 (PDT)
-Date:   Tue, 4 Apr 2023 17:40:48 +0300
-From:   Zhi Wang <zhi.wang.linux@gmail.com>
-To:     Michael Roth <michael.roth@amd.com>
-Cc:     <kvm@vger.kernel.org>, <linux-coco@lists.linux.dev>,
-        <linux-mm@kvack.org>, <linux-crypto@vger.kernel.org>,
-        <x86@kernel.org>, <linux-kernel@vger.kernel.org>,
-        <tglx@linutronix.de>, <mingo@redhat.com>, <jroedel@suse.de>,
-        <thomas.lendacky@amd.com>, <hpa@zytor.com>, <ardb@kernel.org>,
-        <pbonzini@redhat.com>, <seanjc@google.com>, <vkuznets@redhat.com>,
-        <jmattson@google.com>, <luto@kernel.org>,
-        <dave.hansen@linux.intel.com>, <slp@redhat.com>,
-        <pgonda@google.com>, <peterz@infradead.org>,
-        <srinivas.pandruvada@linux.intel.com>, <rientjes@google.com>,
-        <dovmurik@linux.ibm.com>, <tobin@ibm.com>, <bp@alien8.de>,
-        <vbabka@suse.cz>, <kirill@shutemov.name>, <ak@linux.intel.com>,
-        <tony.luck@intel.com>, <marcorr@google.com>,
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        <alpergun@google.com>, <dgilbert@redhat.com>, <jarkko@kernel.org>,
-        <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>,
-        Vishal Annapurve <vannapurve@google.com>
-Subject: Re: [PATCH RFC v8 04/56] KVM: Add HVA range operator
-Message-ID: <20230404174048.00005ef9.zhi.wang.linux@gmail.com>
-In-Reply-To: <20230327003444.lqfrididd4gavomb@amd.com>
-References: <20230220183847.59159-1-michael.roth@amd.com>
-        <20230220183847.59159-5-michael.roth@amd.com>
-        <20230220233709.00006dfc@gmail.com>
-        <20230327003444.lqfrididd4gavomb@amd.com>
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+        with ESMTP id S232512AbjDDOwo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Apr 2023 10:52:44 -0400
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2055.outbound.protection.outlook.com [40.107.237.55])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 422D546A3;
+        Tue,  4 Apr 2023 07:52:41 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=oJtxHqRZh9Cu6dXPg8dAs+I8QMBKt+32pnPacuZNqhrmppEHwtz+BlEqCtFgZllYnyzc5o7MYpkwJPA/scSuR9yluy5AsTz5ft3nW75jp/HJ7ZZp0PJWm9trgEYUwHUZg08kuO3VrRfzyaDItwfSD6MVQPGZZLSJHx/fqNV2lpmzG8BgIg4Fc9wDdGhBOsIWiFgYKtjcf+XuYKAManzV2H+hzEhnF7y2j/AXjL9FwvsfXbyt3moGtWxToMkAcmL/ClDA+q9/ktUqKUgjsQ5sMdJdKeikih/ymVK9k3gx1DLzt6e5umAeFC16bdN+STUWZ0aWIGDlRnVH8Te9oa9qPw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=OikdBzgA9yJI/rW34QzjiFc7BCw1yt1xXFus7ISgNPg=;
+ b=c8B0JOz/c6dTYT3luFFTzDBAv0Dd3qUFX3bzUqnMJSmUU5zbQaXlV2VStpjc50NFiAPsvxHUoacYLRBnPEVfWaPC9357Vphiat7kRnw933tllkJ3u+4cekhA/swkLVJxLMzYbS06uZGbHRK6ZTVvPVBD/H1/LWUyeZ0Vo34DMApEnEJmdsyFYuS7WQIvlsIVbK2kPyYsqmEUYoD9baYHyvCDPUrPDxQFayNCjfIXQXIMJvc3oQcExy7wWiTo+stsTqbFEDNhUy98IBglboPrIaCtynZu0bCmkfsNo89+PWMD/EbqTe7q3e4sLhMTDKCIQoxvsE+iQ7bxabbNeHCgdQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=OikdBzgA9yJI/rW34QzjiFc7BCw1yt1xXFus7ISgNPg=;
+ b=blZIl3ZAAU6IQRRW5S8SaMyjDVv0f3Oe29WZUc8IBoEssBzByJc0jj1TeI6U0YIWKPRRWL3NAyGCKs3Q/AgF1v4uCz1XgmXZSvLIyXdaRx7df3rwWq3DbujCOspS2mJtGR0UsCKrgrPGt9toDGRmWB5bfMhV6yY9Ru596j0c6Bo=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DM6PR12MB3082.namprd12.prod.outlook.com (2603:10b6:5:11b::12)
+ by DM8PR12MB5462.namprd12.prod.outlook.com (2603:10b6:8:24::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6254.30; Tue, 4 Apr
+ 2023 14:52:38 +0000
+Received: from DM6PR12MB3082.namprd12.prod.outlook.com
+ ([fe80::72ca:e9ef:88e5:26d0]) by DM6PR12MB3082.namprd12.prod.outlook.com
+ ([fe80::72ca:e9ef:88e5:26d0%4]) with mapi id 15.20.6254.033; Tue, 4 Apr 2023
+ 14:52:38 +0000
+Message-ID: <b81a4f2d-735d-b514-6768-75a88c9a1945@amd.com>
+Date:   Tue, 4 Apr 2023 20:21:21 +0530
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.9.1
+Subject: Re: [PATCH] vfio/cdx: add support for CDX bus
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org, git@amd.com,
+        harpreet.anand@amd.com, michal.simek@amd.com,
+        "Agarwal, Nikhil" <nikhil.agarwal@amd.com>, okaya@kernel.org,
+        Pieter Jansen van Vuuren <pieter.jansen-van-vuuren@amd.com>
+References: <20230403142525.29494-1-nipun.gupta@amd.com>
+ <20230403152809.239a4988.alex.williamson@redhat.com>
+Content-Language: en-US
+From:   Nipun Gupta <nipun.gupta@amd.com>
+In-Reply-To: <20230403152809.239a4988.alex.williamson@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
-        DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-        version=3.4.6
+X-ClientProxiedBy: PN2PR01CA0147.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:c01:6::32) To DM6PR12MB3082.namprd12.prod.outlook.com
+ (2603:10b6:5:11b::12)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6PR12MB3082:EE_|DM8PR12MB5462:EE_
+X-MS-Office365-Filtering-Correlation-Id: c90708e3-2511-4d8a-5455-08db351c3bbb
+X-LD-Processed: 3dd8961f-e488-4e60-8e11-a82d994e183d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: IY9eP5F+L+SLkuG7hhPAkmezyCp5wR9v0BzRydvecsOul9rtwW30QN+cPqyN60GDbHXWwcz13jTbLhp79FmsrO2/YWHoelLOE1lCPQtca7iAm8Vz4hDeUd/6pg44uRUyGt/BhwDH0XS+Qx2fPR6FkFru+FJoce8+kyPSgbhXWTqOV0bwGXEsHMq6YSxk0fF92yHD6Byo8BsfmWS35pJxzG4wLL9xS7w7VpUkGNrdBCeUBuaDNQyQOmVEjEF6/KNBvd4efIiTQNceb+e65/XhcaKL5ruf/DS8YK+LT9Wp4cujRoX8VrLagGyQbG75dEqxZaQt1LQF0iNGnsjKrF/9Z0iTF0OyH7Jq3J4q/76S63Zrf9xWcsN0pIg9SOZZ97Y6XMUUSpxuHVNlo6kCF30F5TvNNYmuhRxRV5dQvabITMrxqsljIZxScJQEYIwSOrBWNg8ci8fdiHUpZU+yAW64D3wIOmu07njMDJ79WaLctRiAB0GGMDJB1k4XWuZ3qxQVZlZidXgrcvu59tTftzoMoKb5fKBvDNCcvCB8TRAFXiNAS5Y6/KjAyilLaRy8GoZ/jg49FuOxbf3xMzRD8H9SxAMbf1snsYua0+YwZusjZDcVGKS/6kPMfQwVT0wv88XjJYtgSN0RQja4SxtgsyQEsA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB3082.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(346002)(136003)(39860400002)(376002)(366004)(396003)(451199021)(26005)(478600001)(2906002)(186003)(2616005)(6512007)(6506007)(53546011)(36756003)(6666004)(83380400001)(6486002)(6916009)(38100700002)(86362001)(316002)(31696002)(5660300002)(41300700001)(4326008)(8936002)(31686004)(66476007)(66556008)(54906003)(66946007)(8676002)(44832011)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?VHVsWnVGUHNzOFE0TWV6M1loYlgxbkNZL29JOThTVFRlWFJ0NUQrY0dWMWVk?=
+ =?utf-8?B?aDRaMnZhM21ZbDdVWi90dFJmRXlJc3lBcUZiRGp1R0JLbXhZTGJYbjN0VXNr?=
+ =?utf-8?B?UCs1dGtaZS9FY2w3Y2ZKQko0TElxbS9ENGFRY00yODVPSnNwalpqN1lBdEZp?=
+ =?utf-8?B?WUJCc2kvdzNicnBEQkwrRTR2L0RqbExRejRNUWJrYjBZQW1YeGoyR3UxQUdX?=
+ =?utf-8?B?NGljNTZ1OVlOV2FQSFk1OVRRaGpiUlFkSTdpK2cxTW1JL0I5MEY0QWhkVFpM?=
+ =?utf-8?B?c3JTbGVycmFYM2NlTzJ6NElvZHo2NHJCYXBrcVRZM1hld0wvRy9CUVlQakVz?=
+ =?utf-8?B?S3RvU2ljUUduSExSLzB0ay9qNEk5aE9lbjdmZitWcnFZY0dQNlhXdzJJMFB4?=
+ =?utf-8?B?N1JMYkpWQ1lEU25MQVlmb3U5WU9HS3g4emZlWjZMK2NZVzZsWUlQU2x0aEkw?=
+ =?utf-8?B?ZzFMQnRHdmxxSm1qUXAwSHdFS0NKR1pPcUlYTlBXUDIycGdnWHMvbzk5Y1pM?=
+ =?utf-8?B?anliSzNucW53RHVoYzZsNmwzYnhNZFFHNi9iNXpic0g3bnMyV2ZQT29vajhK?=
+ =?utf-8?B?UERQRzNPaG1LeVBTaERqQXdxWWNncWtHMUJNQTZSL0hmSUx0Wi95VkVvVDd5?=
+ =?utf-8?B?S0h6OGY2RDVNbDFFWXYvWGJhZUUvNDVVN2gvU2xkWDFxUm5kTFNDUVN3NGl4?=
+ =?utf-8?B?aEkxeDNOUWV1UmNtUHJuL1Vmandza1MxbDNZL0EwcmJ0QlNKWGwwekZyb1dH?=
+ =?utf-8?B?VXpyZzRtN2JSNWdyaEtFUVdJVWZVb2RYRlM4RTBiNlpoWlhlOXlxTC9lRzZO?=
+ =?utf-8?B?eUdNSlpseHE1a3B3dUxuY1hBaHkwTlc3TEhuSlFIYkpTc0hMWXByRG9peGEy?=
+ =?utf-8?B?di9Mc1VXamVNdXlvcEQyQUNlZ3ViQ2FRcjlKS014UldoanViZzNOOHBob1B0?=
+ =?utf-8?B?aytxUjRuMm13c1BaU2pPaVp6NTFONkRXZlo1Mmh1eGdIcGh5eVh6L3FhTFVo?=
+ =?utf-8?B?dzJzM2FNSVBaaEJhd0RkTnhnd21wY1RZaUo4OUErVW53YSt2WW93R1M1WmNP?=
+ =?utf-8?B?cFM1dGZuZDNxUEZYRVNDQjJMdnFtZ1ZlNW5ZcnYrZ2ErWmcxUSt2Qk9jYWo1?=
+ =?utf-8?B?YWRJazBpSnJlR25RNEVtRDNqNkJuQmlEV2dlUTZYRkV6SmdyU0FhSmFZYW1x?=
+ =?utf-8?B?bDdjaXRwdUpNWGtEcGZUUThSTHN1SUk3Z1IrcUdiRVQrMW5CM1YwanRWZTQw?=
+ =?utf-8?B?TC8ydUVwL2VRMkgwNDBzVzFRNXF2RTNZb0hYb3lDTTVGU3RmY0ZnNHcyT1lz?=
+ =?utf-8?B?Y1ZiRjNnWHdkcjN1M1JRRVRiSG81bWFjbUhIKy9FL2NhUDlZMkttNDNuQmRT?=
+ =?utf-8?B?VzlRRHdpYUkyMFBzVFIvMGFrbDNad292WGJuTVpYcHhoaDJ6WFplalU1dHFU?=
+ =?utf-8?B?YnpBMmN5aWI1VXg2Z2laSEVUdzI5M0lNM2YveVRqMkEySW9BSlIrbUg2OEJ5?=
+ =?utf-8?B?OTFlTktnakVkUGQ1L0Q4QzRESkdUdVJUNkl6N2pzbzVETWJIbktWVU5GakhH?=
+ =?utf-8?B?NDFpSWQvb2IxdTNJbDk1S0YwSzVZYmhZVDlhOG5KK1l3Y2h2cnhaKzJLU2RN?=
+ =?utf-8?B?SXFQOUM3T2sraWZCZUoxUFVGSVBPN0g5M1hOd3hyci90ajVueEFYQ1RkVmFq?=
+ =?utf-8?B?T1lPWTZYQWNTa0Z6aXVTMlpMeEdQRDRMK2ViNXR4N2dkWFhPblAwZnNrL1Vs?=
+ =?utf-8?B?SFpGNDZSZ0hjazNmdkdQYnpnRTFmT2hONWlvRXZ2bU9PcFFqUzdpa00rdXBp?=
+ =?utf-8?B?ZDlpbHBGZHE2cm5KL0drWXVFLzRkZmhmTEZ2aUU1alN0Z2hIallyeEcrV1hm?=
+ =?utf-8?B?Z0xoNU1wOFMzQ0RoYzZldWlibGlKVXIyNVltamdXUTJoTThnVWRreXRKNW45?=
+ =?utf-8?B?Y2RtUkhtQUxvWkFjQ0pUcWlGSDVpOGZ6cUJKNzJ5V0VuSmZodDNiZ3pLYkNQ?=
+ =?utf-8?B?VGFONmNDY3JpOFRWU0xqaExERXh3UnhNYm9EZFVXNTFtN1pNNjE5YjJkcHZV?=
+ =?utf-8?B?RWVJaUVvSWZQV2Z2cWUyUG85SUh2eVEzMmZBZFp5a0JONWlTejFhUW9kU0lD?=
+ =?utf-8?Q?szoKFzfg6LEBdfcVylJcQ5WRl?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c90708e3-2511-4d8a-5455-08db351c3bbb
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB3082.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Apr 2023 14:52:38.2428
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: tNwpC27/PleuUCQXPx1YvPic6n5uUOqIwXSiwCKxwSY4aRp+6LeSXC/Q6yfyE4GM
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM8PR12MB5462
+X-Spam-Status: No, score=-1.1 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
+        DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, 26 Mar 2023 19:34:44 -0500
-Michael Roth <michael.roth@amd.com> wrote:
 
-> On Mon, Feb 20, 2023 at 11:37:09PM +0200, Zhi Wang wrote:
-> > On Mon, 20 Feb 2023 12:37:55 -0600
-> > Michael Roth <michael.roth@amd.com> wrote:
-> > 
-> > > From: Vishal Annapurve <vannapurve@google.com>
-> > > 
-> > > Introduce HVA range operator so that other KVM subsystems
-> > > can operate on HVA range.
-> > > 
-> > > Signed-off-by: Vishal Annapurve <vannapurve@google.com>
-> > > [mdr: minor checkpatch alignment fixups]
-> > > Signed-off-by: Michael Roth <michael.roth@amd.com>
-> > > ---
-> > >  include/linux/kvm_host.h |  6 +++++
-> > >  virt/kvm/kvm_main.c      | 48 ++++++++++++++++++++++++++++++++++++++++
-> > >  2 files changed, 54 insertions(+)
-> > > 
-> > > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> > > index 4d542060cd93..c615650ed256 100644
-> > > --- a/include/linux/kvm_host.h
-> > > +++ b/include/linux/kvm_host.h
-> > > @@ -1402,6 +1402,12 @@ void kvm_mmu_invalidate_begin(struct kvm *kvm);
-> > >  void kvm_mmu_invalidate_range_add(struct kvm *kvm, gfn_t start, gfn_t end);
-> > >  void kvm_mmu_invalidate_end(struct kvm *kvm);
-> > >  
-> > > +typedef int (*kvm_hva_range_op_t)(struct kvm *kvm,
-> > > +				struct kvm_gfn_range *range, void *data);
-> > > +
-> > > +int kvm_vm_do_hva_range_op(struct kvm *kvm, unsigned long hva_start,
-> > > +			   unsigned long hva_end, kvm_hva_range_op_t handler, void *data);
-> > > +
-> > >  long kvm_arch_dev_ioctl(struct file *filp,
-> > >  			unsigned int ioctl, unsigned long arg);
-> > >  long kvm_arch_vcpu_ioctl(struct file *filp,
-> > > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> > > index f7e00593cc5d..4ccd655dd5af 100644
-> > > --- a/virt/kvm/kvm_main.c
-> > > +++ b/virt/kvm/kvm_main.c
-> > > @@ -642,6 +642,54 @@ static __always_inline int __kvm_handle_hva_range(struct kvm *kvm,
-> > >  	return (int)ret;
-> > >  }
-> > >  
-> > 
-> > Below function seems a reduced duplicate of __kvm_handle_hva_range()
-> > in virt/kvm/kvm_main.c. It would be nice to factor __kvm_handle_hva_range().
+
+On 4/4/2023 2:58 AM, Alex Williamson wrote:
+> Caution: This message originated from an External Source. Use proper caution when opening attachments, clicking links, or responding.
 > 
-> A few differences make it difficult to refactor this clearly:
 > 
->   - This handler is mainly used for loading initial contents into guest
->     image before booting and doesn't rely on the MMU lock being held. It
->     also *can't* be called with MMU lock held because it suffers from the
->     same issue with mem_attr_update() hook where it needs to take a
->     mutex as part of unmapping from directmap when transitioning page to
->     private state in RMP table
->   - This handler wants to return an error code, as opposed to existing
->     handlers which return a true/false values which are passed along to
->     MMU notifier call-site and handled differently.
->   - This handler wants to terminate iterating through memslots as soon
->     as it encounters the first failure, whereas the existing handlers
->     expect to be called for each slot regardless of return value.
+> On Mon, 3 Apr 2023 19:55:25 +0530
+> Nipun Gupta <nipun.gupta@amd.com> wrote:
+>> diff --git a/drivers/vfio/cdx/Makefile b/drivers/vfio/cdx/Makefile
+>> new file mode 100644
+>> index 000000000000..82e4ef412c0f
+>> --- /dev/null
+>> +++ b/drivers/vfio/cdx/Makefile
+> ...
+>> +static int vfio_cdx_mmap_mmio(struct vfio_cdx_region region,
+>> +                           struct vm_area_struct *vma)
+>> +{
+>> +     u64 size = vma->vm_end - vma->vm_start;
+>> +     u64 pgoff, base;
+>> +
+>> +     pgoff = vma->vm_pgoff &
+>> +             ((1U << (VFIO_CDX_OFFSET_SHIFT - PAGE_SHIFT)) - 1);
+>> +     base = pgoff << PAGE_SHIFT;
+>> +
+>> +     if (region.size < PAGE_SIZE || base + size > region.size)
+>> +             return -EINVAL;
+>> +
+>> +     vma->vm_pgoff = (region.addr >> PAGE_SHIFT) + pgoff;
+>> +     vma->vm_page_prot = pgprot_noncached(vma->vm_page_prot);
+>> +
+>> +     return remap_pfn_range(vma, vma->vm_start, vma->vm_pgoff,
+>> +                            size, vma->vm_page_prot);
+>> +}
+>> +
+>> +static int vfio_cdx_mmap(struct vfio_device *core_vdev,
+>> +                      struct vm_area_struct *vma)
+>> +{
+>> +     struct vfio_cdx_device *vdev =
+>> +             container_of(core_vdev, struct vfio_cdx_device, vdev);
+>> +     struct cdx_device *cdx_dev = vdev->cdx_dev;
+>> +     unsigned int index;
+>> +
+>> +     index = vma->vm_pgoff >> (VFIO_CDX_OFFSET_SHIFT - PAGE_SHIFT);
+>> +
+>> +     if (vma->vm_end < vma->vm_start)
+>> +             return -EINVAL;
+>> +     if (vma->vm_start & ~PAGE_MASK)
+>> +             return -EINVAL;
+>> +     if (vma->vm_end & ~PAGE_MASK)
+>> +             return -EINVAL;
+>> +     if (!(vma->vm_flags & VM_SHARED))
+>> +             return -EINVAL;
+>> +     if (index >= cdx_dev->res_count)
+>> +             return -EINVAL;
+>> +
+>> +     if (!(vdev->regions[index].flags & VFIO_REGION_INFO_FLAG_MMAP))
+>> +             return -EINVAL;
+>> +
+>> +     if (!(vdev->regions[index].flags & VFIO_REGION_INFO_FLAG_READ) &&
+>> +         (vma->vm_flags & VM_READ))
+>> +             return -EINVAL;
+>> +
+>> +     if (!(vdev->regions[index].flags & VFIO_REGION_INFO_FLAG_WRITE) &&
+>> +         (vma->vm_flags & VM_WRITE))
+>> +             return -EINVAL;
+>> +
+>> +     vma->vm_private_data = cdx_dev;
+>> +
+>> +     return vfio_cdx_mmap_mmio(vdev->regions[index], vma);
+>> +}
 > 
-> So it's a pretty different use-case that adds enough complexity to
-> __kvm_handle_hva_range() that it might need be worth refactoring it,
-> since it complicates some bits that are closely tied to dealing with
-> invalidations where the extra complexity probably needs to be
-> well-warranted.
+> I see discussion of MMIO_REGIONS_ENABLE controlling host access to the
+> device in mc_cdx_pcol.h.  Is a user of vfio-cdx able to manipulate
+> whether MMIO space of the device is enabled?  If so, what's the system
+> response to accessing MMIO through the mmap while disabled?
+
+The MMIO enable/disable has been added in mc_cdx_pcol.h from the future 
+support perspective, but it is not currently supported, as all the CDX 
+devices have the MMIO enable flag permanently set which cannot be 
+disabled. Due to this we have not added any interface/API in the CDX bus 
+to disable MMIO for the device. This is still under discussion and 
+future patches will add complete support for this.
+
+That said, if required we can add a flag currently in the "cdx_device" 
+which will be set when for MMIO enabled (it would be by default enabled 
+for now), and depending on this flag VFIO can return error during mmap, 
+but we would prefer to defer it to be added along with the complete 
+support for MMIO enable/disable in the CDX bus.
+
+> Is MMIO
+> space accessible even through calling the RESET ioctl?
+
+Yes, MMIO region would be accessible even through calling reset, but 
+user may not see the correct values as the device is being reset.
+
+
+> Is there a
+> public specification somewhere for CDX?  Thanks,
+
+I am afraid there is no public specification for CDX as of now.
+
+Thanks,
+Nipun
+
 > 
-> I took a stab at it here for reference, but even with what seems to be
-> the minimal set of changes it doesn't save on any code and ultimately I
-> think it makes it harder to make sense of what going on:
+> Alex
 > 
->   https://github.com/mdroth/linux/commit/976c5fb708f7babe899fd80e27e19f8ba3f6818d
-> 
-> Is there a better approach?
-> 
-
-Those requirements looks pretty suitable for kvm_handle_hva_range(). Guess
-we just need to extend the iterator a little bit.
-
-My ideas:
-
-1) Add a lock flag in struct kvm_hva_range to indicate if kvm_lock is required
-or not during the iteration. Check the flag with if (!locked && hva_range.need_lock). Then the unlock part can be left un-touched.
-
-2) Add an error code in struct kvm_gfn_range, the handler can set it so that __kvm_handle_hva_range() can check gfn_range.err after ret|= handler(xxx);
-If the err is set, bail out.
-
-3) Return the gfn_range.err to the caller. The caller can decide how to convert
-it (to boolean or keep it)
-
-4) Set hva_range.need_lock in the existing and the new caller.
-
-How about this?
-
-> Thanks,
-> 
-> -Mike
-> 
-> > 
-> > > +int kvm_vm_do_hva_range_op(struct kvm *kvm, unsigned long hva_start,
-> > > +			   unsigned long hva_end, kvm_hva_range_op_t handler, void *data)
-> > > +{
-> > > +	int ret = 0;
-> > > +	struct kvm_gfn_range gfn_range;
-> > > +	struct kvm_memory_slot *slot;
-> > > +	struct kvm_memslots *slots;
-> > > +	int i, idx;
-> > > +
-> > > +	if (WARN_ON_ONCE(hva_end <= hva_start))
-> > > +		return -EINVAL;
-> > > +
-> > > +	idx = srcu_read_lock(&kvm->srcu);
-> > > +
-> > > +	for (i = 0; i < kvm_arch_nr_memslot_as_ids(kvm); i++) {
-> > > +		struct interval_tree_node *node;
-> > > +
-> > > +		slots = __kvm_memslots(kvm, i);
-> > > +		kvm_for_each_memslot_in_hva_range(node, slots,
-> > > +						  hva_start, hva_end - 1) {
-> > > +			unsigned long start, end;
-> > > +
-> > > +			slot = container_of(node, struct kvm_memory_slot,
-> > > +					    hva_node[slots->node_idx]);
-> > > +			start = max(hva_start, slot->userspace_addr);
-> > > +			end = min(hva_end, slot->userspace_addr +
-> > > +						  (slot->npages << PAGE_SHIFT));
-> > > +
-> > > +			/*
-> > > +			 * {gfn(page) | page intersects with [hva_start, hva_end)} =
-> > > +			 * {gfn_start, gfn_start+1, ..., gfn_end-1}.
-> > > +			 */
-> > > +			gfn_range.start = hva_to_gfn_memslot(start, slot);
-> > > +			gfn_range.end = hva_to_gfn_memslot(end + PAGE_SIZE - 1, slot);
-> > > +			gfn_range.slot = slot;
-> > > +
-> > > +			ret = handler(kvm, &gfn_range, data);
-> > > +			if (ret)
-> > > +				goto e_ret;
-> > > +		}
-> > > +	}
-> > > +
-> > > +e_ret:
-> > > +	srcu_read_unlock(&kvm->srcu, idx);
-> > > +
-> > > +	return ret;
-> > > +}
-> > > +
-> > >  static __always_inline int kvm_handle_hva_range(struct mmu_notifier *mn,
-> > >  						unsigned long start,
-> > >  						unsigned long end,
-> > 
-
