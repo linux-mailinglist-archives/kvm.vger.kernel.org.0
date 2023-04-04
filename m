@@ -2,29 +2,29 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3E9656D67B8
-	for <lists+kvm@lfdr.de>; Tue,  4 Apr 2023 17:42:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D7DD46D67BD
+	for <lists+kvm@lfdr.de>; Tue,  4 Apr 2023 17:42:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235921AbjDDPmB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Apr 2023 11:42:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36464 "EHLO
+        id S235916AbjDDPmI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Apr 2023 11:42:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35950 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235940AbjDDPlv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Apr 2023 11:41:51 -0400
-Received: from out-18.mta0.migadu.com (out-18.mta0.migadu.com [IPv6:2001:41d0:1004:224b::12])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 354B510F6
-        for <kvm@vger.kernel.org>; Tue,  4 Apr 2023 08:41:27 -0700 (PDT)
+        with ESMTP id S235929AbjDDPmF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Apr 2023 11:42:05 -0400
+Received: from out-46.mta0.migadu.com (out-46.mta0.migadu.com [91.218.175.46])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E74B46BC
+        for <kvm@vger.kernel.org>; Tue,  4 Apr 2023 08:41:45 -0700 (PDT)
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1680622879;
+        t=1680622886;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=mu2eFrZPG8GUOKuHb2kSYzXBqt6mG8kAV7HOxPvOLfI=;
-        b=AHPjRhcZ2uAoGzHTH3EJY/U/h0g94j6fu0lCO8cjWeTXN1NOXeCpkzaB8X0xbFztgXEn6d
-        nBXLHi2BfcKoAi2B5rB8OeV8XFmhO8LOTN3hEPmrXahbUQrsjwI3iyeOiFZP66454nmin+
-        HcQ34ETK2i2GnSRsqytLztq720vmLfI=
+        bh=hu6Jzs9Jb4x0EU/aPzfV4CfH6E+q7hXBPM7EfsBJyRE=;
+        b=goRNlGQUsyZfbzgOMzCmtoyEWSnBFsGJapu/eZljQ2sdv65D+iAnBbD240N9ou/kM1Ley6
+        PJVKrBzk6bYiEB66d52vILsPgd81s6EhertAw+pEDzRxMrFCxllZg40YExdc8sjLhpZi0J
+        fcFvQXDz4qKPYbgjkTJwBgEBB4pDA4Y=
 From:   Oliver Upton <oliver.upton@linux.dev>
 To:     kvmarm@lists.linux.dev
 Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
@@ -35,9 +35,9 @@ Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
         Salil Mehta <salil.mehta@huawei.com>,
         Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH v3 06/13] KVM: arm64: Refactor hvc filtering to support different actions
-Date:   Tue,  4 Apr 2023 15:40:43 +0000
-Message-Id: <20230404154050.2270077-7-oliver.upton@linux.dev>
+Subject: [PATCH v3 07/13] KVM: arm64: Use a maple tree to represent the SMCCC filter
+Date:   Tue,  4 Apr 2023 15:40:44 +0000
+Message-Id: <20230404154050.2270077-8-oliver.upton@linux.dev>
 In-Reply-To: <20230404154050.2270077-1-oliver.upton@linux.dev>
 References: <20230404154050.2270077-1-oliver.upton@linux.dev>
 MIME-Version: 1.0
@@ -52,108 +52,155 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-KVM presently allows userspace to filter guest hypercalls with bitmaps
-expressed via pseudo-firmware registers. These bitmaps have a narrow
-scope and, of course, can only allow/deny a particular call. A
-subsequent change to KVM will introduce a generalized UAPI for filtering
-hypercalls, allowing functions to be forwarded to userspace.
+Maple tree is an efficient B-tree implementation that is intended for
+storing non-overlapping intervals. Such a data structure is a good fit
+for the SMCCC filter as it is desirable to sparsely allocate the 32 bit
+function ID space.
 
-Refactor the existing hypercall filtering logic to make room for more
-than two actions. While at it, generalize the function names around
-SMCCC as it is the basis for the upcoming UAPI.
+To that end, add a maple tree to kvm_arch and correctly init/teardown
+along with the VM. Wire in a test against the hypercall filter for HVCs
+which does nothing until the controls are exposed to userspace.
 
-No functional change intended.
-
-Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- arch/arm64/include/uapi/asm/kvm.h |  9 +++++++++
- arch/arm64/kvm/hypercalls.c       | 26 ++++++++++++++++++++++----
- 2 files changed, 31 insertions(+), 4 deletions(-)
+ arch/arm64/include/asm/kvm_host.h |  5 ++-
+ arch/arm64/kvm/arm.c              |  2 ++
+ arch/arm64/kvm/hypercalls.c       | 57 +++++++++++++++++++++++++++++++
+ include/kvm/arm_hypercalls.h      |  1 +
+ 4 files changed, 64 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-index f8129c624b07..f9672ef1159a 100644
---- a/arch/arm64/include/uapi/asm/kvm.h
-+++ b/arch/arm64/include/uapi/asm/kvm.h
-@@ -469,6 +469,15 @@ enum {
- /* run->fail_entry.hardware_entry_failure_reason codes. */
- #define KVM_EXIT_FAIL_ENTRY_CPU_UNSUPPORTED	(1ULL << 0)
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index d091d1c9890b..2682b3fd0881 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -16,6 +16,7 @@
+ #include <linux/types.h>
+ #include <linux/jump_label.h>
+ #include <linux/kvm_types.h>
++#include <linux/maple_tree.h>
+ #include <linux/percpu.h>
+ #include <linux/psci.h>
+ #include <asm/arch_gicv3.h>
+@@ -221,7 +222,8 @@ struct kvm_arch {
+ #define KVM_ARCH_FLAG_EL1_32BIT				4
+ 	/* PSCI SYSTEM_SUSPEND enabled for the guest */
+ #define KVM_ARCH_FLAG_SYSTEM_SUSPEND_ENABLED		5
+-
++	/* SMCCC filter initialized for the VM */
++#define KVM_ARCH_FLAG_SMCCC_FILTER_CONFIGURED		6
+ 	unsigned long flags;
  
-+enum kvm_smccc_filter_action {
-+	KVM_SMCCC_FILTER_HANDLE = 0,
-+	KVM_SMCCC_FILTER_DENY,
-+
-+#ifdef __KERNEL__
-+	NR_SMCCC_FILTER_ACTIONS
-+#endif
-+};
-+
- #endif
+ 	/*
+@@ -242,6 +244,7 @@ struct kvm_arch {
  
- #endif /* __ARM_KVM_H__ */
+ 	/* Hypercall features firmware registers' descriptor */
+ 	struct kvm_smccc_features smccc_feat;
++	struct maple_tree smccc_filter;
+ 
+ 	/*
+ 	 * For an untrusted host VM, 'pkvm.handle' is used to lookup
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index b6e26c0e65e5..1202ac03bee0 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -192,6 +192,8 @@ void kvm_arch_destroy_vm(struct kvm *kvm)
+ 	kvm_destroy_vcpus(kvm);
+ 
+ 	kvm_unshare_hyp(kvm, kvm + 1);
++
++	kvm_arm_teardown_hypercalls(kvm);
+ }
+ 
+ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
 diff --git a/arch/arm64/kvm/hypercalls.c b/arch/arm64/kvm/hypercalls.c
-index 5ead6c6afff0..0be974e2f1fc 100644
+index 0be974e2f1fc..ba7cd84c6668 100644
 --- a/arch/arm64/kvm/hypercalls.c
 +++ b/arch/arm64/kvm/hypercalls.c
-@@ -65,7 +65,7 @@ static void kvm_ptp_get_time(struct kvm_vcpu *vcpu, u64 *val)
- 	val[3] = lower_32_bits(cycles);
- }
- 
--static bool kvm_hvc_call_default_allowed(u32 func_id)
-+static bool kvm_smccc_default_allowed(u32 func_id)
- {
- 	switch (func_id) {
- 	/*
-@@ -93,7 +93,7 @@ static bool kvm_hvc_call_default_allowed(u32 func_id)
+@@ -121,8 +121,58 @@ static bool kvm_smccc_test_fw_bmap(struct kvm_vcpu *vcpu, u32 func_id)
  	}
  }
  
--static bool kvm_hvc_call_allowed(struct kvm_vcpu *vcpu, u32 func_id)
-+static bool kvm_smccc_test_fw_bmap(struct kvm_vcpu *vcpu, u32 func_id)
- {
- 	struct kvm_smccc_features *smccc_feat = &vcpu->kvm->arch.smccc_feat;
- 
-@@ -117,20 +117,38 @@ static bool kvm_hvc_call_allowed(struct kvm_vcpu *vcpu, u32 func_id)
- 		return test_bit(KVM_REG_ARM_VENDOR_HYP_BIT_PTP,
- 				&smccc_feat->vendor_hyp_bmap);
- 	default:
--		return kvm_hvc_call_default_allowed(func_id);
-+		return false;
- 	}
- }
- 
-+static u8 kvm_smccc_get_action(struct kvm_vcpu *vcpu, u32 func_id)
-+{
-+	if (kvm_smccc_test_fw_bmap(vcpu, func_id) ||
-+	    kvm_smccc_default_allowed(func_id))
-+		return KVM_SMCCC_FILTER_HANDLE;
++#define SMCCC_ARCH_RANGE_BEGIN	ARM_SMCCC_VERSION_FUNC_ID
++#define SMCCC_ARCH_RANGE_END				\
++	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,		\
++			   ARM_SMCCC_SMC_32,		\
++			   0, ARM_SMCCC_FUNC_MASK)
 +
-+	return KVM_SMCCC_FILTER_DENY;
++static void init_smccc_filter(struct kvm *kvm)
++{
++	int r;
++
++	mt_init(&kvm->arch.smccc_filter);
++
++	/*
++	 * Prevent userspace from handling any SMCCC calls in the architecture
++	 * range, avoiding the risk of misrepresenting Spectre mitigation status
++	 * to the guest.
++	 */
++	r = mtree_insert_range(&kvm->arch.smccc_filter,
++			       SMCCC_ARCH_RANGE_BEGIN, SMCCC_ARCH_RANGE_END,
++			       xa_mk_value(KVM_SMCCC_FILTER_HANDLE),
++			       GFP_KERNEL_ACCOUNT);
++	WARN_ON_ONCE(r);
 +}
 +
- int kvm_smccc_call_handler(struct kvm_vcpu *vcpu)
++static u8 kvm_smccc_filter_get_action(struct kvm *kvm, u32 func_id)
++{
++	unsigned long idx = func_id;
++	void *val;
++
++	if (!test_bit(KVM_ARCH_FLAG_SMCCC_FILTER_CONFIGURED, &kvm->arch.flags))
++		return KVM_SMCCC_FILTER_HANDLE;
++
++	/*
++	 * But where's the error handling, you say?
++	 *
++	 * mt_find() returns NULL if no entry was found, which just so happens
++	 * to match KVM_SMCCC_FILTER_HANDLE.
++	 */
++	val = mt_find(&kvm->arch.smccc_filter, &idx, idx);
++	return xa_to_value(val);
++}
++
+ static u8 kvm_smccc_get_action(struct kvm_vcpu *vcpu, u32 func_id)
  {
- 	struct kvm_smccc_features *smccc_feat = &vcpu->kvm->arch.smccc_feat;
- 	u32 func_id = smccc_get_function(vcpu);
- 	u64 val[4] = {SMCCC_RET_NOT_SUPPORTED};
- 	u32 feature;
-+	u8 action;
- 	gpa_t gpa;
++	/*
++	 * Intervening actions in the SMCCC filter take precedence over the
++	 * pseudo-firmware register bitmaps.
++	 */
++	u8 action = kvm_smccc_filter_get_action(vcpu->kvm, func_id);
++	if (action != KVM_SMCCC_FILTER_HANDLE)
++		return action;
++
+ 	if (kvm_smccc_test_fw_bmap(vcpu, func_id) ||
+ 	    kvm_smccc_default_allowed(func_id))
+ 		return KVM_SMCCC_FILTER_HANDLE;
+@@ -263,6 +313,13 @@ void kvm_arm_init_hypercalls(struct kvm *kvm)
+ 	smccc_feat->std_bmap = KVM_ARM_SMCCC_STD_FEATURES;
+ 	smccc_feat->std_hyp_bmap = KVM_ARM_SMCCC_STD_HYP_FEATURES;
+ 	smccc_feat->vendor_hyp_bmap = KVM_ARM_SMCCC_VENDOR_HYP_FEATURES;
++
++	init_smccc_filter(kvm);
++}
++
++void kvm_arm_teardown_hypercalls(struct kvm *kvm)
++{
++	mtree_destroy(&kvm->arch.smccc_filter);
+ }
  
--	if (!kvm_hvc_call_allowed(vcpu, func_id))
-+	action = kvm_smccc_get_action(vcpu, func_id);
-+	switch (action) {
-+	case KVM_SMCCC_FILTER_HANDLE:
-+		break;
-+	case KVM_SMCCC_FILTER_DENY:
-+		goto out;
-+	default:
-+		WARN_RATELIMIT(1, "Unhandled SMCCC filter action: %d\n", action);
- 		goto out;
-+	}
+ int kvm_arm_get_fw_num_regs(struct kvm_vcpu *vcpu)
+diff --git a/include/kvm/arm_hypercalls.h b/include/kvm/arm_hypercalls.h
+index 8f4e33bc43e8..fe6c31575b05 100644
+--- a/include/kvm/arm_hypercalls.h
++++ b/include/kvm/arm_hypercalls.h
+@@ -43,6 +43,7 @@ static inline void smccc_set_retval(struct kvm_vcpu *vcpu,
+ struct kvm_one_reg;
  
- 	switch (func_id) {
- 	case ARM_SMCCC_VERSION_FUNC_ID:
+ void kvm_arm_init_hypercalls(struct kvm *kvm);
++void kvm_arm_teardown_hypercalls(struct kvm *kvm);
+ int kvm_arm_get_fw_num_regs(struct kvm_vcpu *vcpu);
+ int kvm_arm_copy_fw_reg_indices(struct kvm_vcpu *vcpu, u64 __user *uindices);
+ int kvm_arm_get_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg);
 -- 
 2.40.0.348.gf938b09366-goog
 
