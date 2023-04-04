@@ -2,105 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6B5B56D69BE
-	for <lists+kvm@lfdr.de>; Tue,  4 Apr 2023 19:04:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B925E6D69F3
+	for <lists+kvm@lfdr.de>; Tue,  4 Apr 2023 19:13:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235215AbjDDREp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Apr 2023 13:04:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51366 "EHLO
+        id S233755AbjDDRNA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Apr 2023 13:13:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35272 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235633AbjDDREl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Apr 2023 13:04:41 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7FF2AE69
-        for <kvm@vger.kernel.org>; Tue,  4 Apr 2023 10:03:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1680627832;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=E8sSDVvxyvnOruB+0lVJW1HHgkW7ZReKHR1WtAZfwmo=;
-        b=UCpc+PfznrOWzF0a2DefJwzW3tDE45SHSUUIY/mS3mlSyuhfPDKhFk1AmFAz/xUWNxE+S1
-        S/W1OJuQxtjLaE6cFjma84anxTgGzsw8CutZXDIZCEBRSWx73LEhauNMr24rx39euT/ECf
-        iHoFN3H5XxFbsDgsli92oFvHeUwLgyw=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-480-1mqNPdZiO1KxVL4_sfVjyw-1; Tue, 04 Apr 2023 13:03:50 -0400
-X-MC-Unique: 1mqNPdZiO1KxVL4_sfVjyw-1
-Received: by mail-ed1-f70.google.com with SMTP id m18-20020a50d7d2000000b00501dfd867a4so47385610edj.20
-        for <kvm@vger.kernel.org>; Tue, 04 Apr 2023 10:03:49 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680627828; x=1683219828;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=E8sSDVvxyvnOruB+0lVJW1HHgkW7ZReKHR1WtAZfwmo=;
-        b=q+zeLLmSYdevB/OIBNaRtEnmmU1HLJtRx50A56SSdUrO6YM9iFiI7IFNLVpC4t53cF
-         /WqXaVpBTFiN0F0L1xXj1s7bnjunSMQn0r4Lur01VBhFdlFuUrHp1+3Ki/AkaWANZnOL
-         duHkIjY0ko8Y68y01xbuPwHtxbwf72IJEOlUjzqUoV5TfGLh3DiiwVacr6wpmljPAaNb
-         E86c4j3hLX1B8r+rubfvK+E8HwF2qYsprVe2BxfQZrcnFs77u8nnXkTkKA0d36S3qzY1
-         TeF4YZAgOC45eYciimyy2ExOs/wX+8p6yVw1BqW3VIyDg+Emq2WsIXELyr7DOT0rFF0N
-         OxUQ==
-X-Gm-Message-State: AAQBX9e9UwT3srWkGWAhw0aRpqBH+eqKvI6pESHY9IlmuMIY2T7B79Hu
-        Vl0HipyOWSuK+j5NWJbhTcyO5ccEDTtez3Fk/tgbDQBRyxYKYaeuFnPTxTbTIZ5E33PE8Oyp776
-        XQUV2fDO8I3a9
-X-Received: by 2002:a17:906:360e:b0:931:ce20:db8e with SMTP id q14-20020a170906360e00b00931ce20db8emr222835ejb.51.1680627828514;
-        Tue, 04 Apr 2023 10:03:48 -0700 (PDT)
-X-Google-Smtp-Source: AKy350aFFDO02CFOBCMJ38oBbcfDo2OcrnEUu9Q6JgQdWEtobOV1hRzKF0iFO6xz/n2FBierAH2GMA==
-X-Received: by 2002:a17:906:360e:b0:931:ce20:db8e with SMTP id q14-20020a170906360e00b00931ce20db8emr222810ejb.51.1680627828194;
-        Tue, 04 Apr 2023 10:03:48 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
-        by smtp.googlemail.com with ESMTPSA id j10-20020a17090643ca00b0092f38a6d082sm6128661ejn.209.2023.04.04.10.03.46
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 04 Apr 2023 10:03:47 -0700 (PDT)
-Message-ID: <3591487f-96ae-3ab7-6ce7-e524a070c9e7@redhat.com>
-Date:   Tue, 4 Apr 2023 19:03:45 +0200
+        with ESMTP id S234566AbjDDRM6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Apr 2023 13:12:58 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 796BD106
+        for <kvm@vger.kernel.org>; Tue,  4 Apr 2023 10:12:49 -0700 (PDT)
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 334GuUAc005162;
+        Tue, 4 Apr 2023 17:12:47 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
+ mime-version : content-transfer-encoding : in-reply-to : references : cc :
+ subject : from : to : message-id : date; s=pp1;
+ bh=DGU1sGBtrtSibyAD33kn/ZmkpHCjHHgGco09r2O2E1w=;
+ b=DTJOmLp2K6vKUZmY6W6yKhW+SRw9Ycc8LSueocSzWP6fejrLBdnccODpf4pqQjvIHm5N
+ py7Y6AyyY4w/5ifRdzZ8Q9jbf8BfBTQWl381YWo3C5bRA39Lb2U4sb+AmImaYgy/t65o
+ 5TtyqZl5wTMqMxacD51mBK30hKRbfshD7bMnO8v/tZGWlqr3sgQNPQMXbWeunaQOKEcc
+ q3SqW3VJJabDjW1N4I030jgS2uJnjhW7S1sBQz078bTej2w4Bbv9l5EmCoJAju3LqORm
+ qJMjMbL/59ZnBJaLA55W1CnGJ/B8g/dIYnicgdZghcBAqS7dmLgq9ubhRzwGFV3BzfXt bw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3prpwb23f8-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 04 Apr 2023 17:12:46 +0000
+Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 334H9ZfC031359;
+        Tue, 4 Apr 2023 17:12:46 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3prpwb23dv-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 04 Apr 2023 17:12:46 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 333NQ6Hu016838;
+        Tue, 4 Apr 2023 17:12:44 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+        by ppma03ams.nl.ibm.com (PPS) with ESMTPS id 3ppc872nsh-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 04 Apr 2023 17:12:43 +0000
+Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
+        by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 334HCeML47251794
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 4 Apr 2023 17:12:40 GMT
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 77C1620049;
+        Tue,  4 Apr 2023 17:12:40 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5717B20040;
+        Tue,  4 Apr 2023 17:12:40 +0000 (GMT)
+Received: from t14-nrb (unknown [9.171.33.218])
+        by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Tue,  4 Apr 2023 17:12:40 +0000 (GMT)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.9.0
-Subject: Re: [RFC PATCH 0/7] x86/entry: Atomic statck switching for IST
-Content-Language: en-US
-To:     Lai Jiangshan <jiangshanlai@gmail.com>,
-        Dave Hansen <dave.hansen@intel.com>
-Cc:     linux-kernel@vger.kernel.org,
-        Lai Jiangshan <jiangshan.ljs@antgroup.com>,
-        "H. Peter Anvin" <hpa@linux.intel.com>,
-        Andi Kleen <ak@linux.intel.com>,
-        Andrew Cooper <andrew.cooper3@citrix.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Asit Mallick <asit.k.mallick@intel.com>,
-        Cfir Cohen <cfir@google.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        David Kaplan <David.Kaplan@amd.com>,
-        David Rientjes <rientjes@google.com>,
-        Erdem Aktas <erdemaktas@google.com>,
-        Jan Kiszka <jan.kiszka@siemens.com>,
-        Jiri Slaby <jslaby@suse.cz>, Joerg Roedel <joro@8bytes.org>,
-        Juergen Gross <jgross@suse.com>,
-        Kees Cook <keescook@chromium.org>,
-        Kirill Shutemov <kirill.shutemov@linux.intel.com>,
-        Kuppuswamy Sathyanarayanan <knsathya@kernel.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Mike Stunes <mstunes@vmware.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Raj Ashok <ashok.raj@intel.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Tony Luck <tony.luck@intel.com>, kvm@vger.kernel.org,
-        linux-coco@lists.linux.dev, x86@kernel.org
-References: <20230403140605.540512-1-jiangshanlai@gmail.com>
- <19035c40-e756-6efd-1c02-b09109fb44c1@intel.com>
- <CAJhGHyBHmC=UXr88GsykO9eUeqJZp59jrCH3ngkFiCxVBW2F3g@mail.gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <CAJhGHyBHmC=UXr88GsykO9eUeqJZp59jrCH3ngkFiCxVBW2F3g@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <bf0f892e-7b7d-5806-b038-8392144da644@redhat.com>
+References: <20230404113639.37544-1-nrb@linux.ibm.com> <20230404113639.37544-12-nrb@linux.ibm.com> <65075e9f-0d32-fc63-0200-3a3ec0c9bf63@redhat.com> <06fd3ebc7770d1327be90cee10d12251cca76dd3.camel@linux.ibm.com> <bf0f892e-7b7d-5806-b038-8392144da644@redhat.com>
+Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com, imbrenda@linux.ibm.com
+Subject: Re: [kvm-unit-tests GIT PULL v2 11/14] s390x: Add tests for execute-type instructions
+From:   Nico Boehr <nrb@linux.ibm.com>
+To:     Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
+        Thomas Huth <thuth@redhat.com>, andrew.jones@linux.dev,
+        pbonzini@redhat.com
+Message-ID: <168062836004.37806.6096327013940193626@t14-nrb>
+User-Agent: alot/0.8.1
+Date:   Tue, 04 Apr 2023 19:12:40 +0200
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 2TOyB9HSdc0BvU_q9prV4-VDSX4bKMZN
+X-Proofpoint-ORIG-GUID: VpR0pRFxbmvQyDssibxWPI_oNryZL8r9
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
+ definitions=2023-04-04_08,2023-04-04_05,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
+ lowpriorityscore=0 suspectscore=0 phishscore=0 mlxscore=0 mlxlogscore=999
+ impostorscore=0 bulkscore=0 adultscore=0 priorityscore=1501 malwarescore=0
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2303200000 definitions=main-2304040158
+X-Spam-Status: No, score=-0.1 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
+        DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -108,13 +91,27 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 4/4/23 05:17, Lai Jiangshan wrote:
-> The cover letter has 800+ lines of comments.  About 100-300 lines
-> of comments will be moved into the code which would make the diffstat
-> not so appealing.
+Quoting Thomas Huth (2023-04-04 17:05:02)
+[...]
+> >> FWIW, this is failing with Clang 15 for me:
+> >>
+> >> s390x/ex.c:81:4: error: expected absolute expression
+> >>                   "       .if (1b - 0b) !=3D (3b - 2b)\n"
+> >>                    ^
+> >> <inline asm>:12:6: note: instantiated into assembly here
+> >>           .if (1b - 0b) !=3D (3b - 2b)
+> >=20
+> > Seems gcc is smarter here than clang.
+>=20
+> Yeah, the assembler from clang is quite a bit behind on s390x ... in the =
 
-Removing assembly from arch/x86/entry/ and adding English to 
-Documentation/?  That's _even more_ appealing. :)
+> past I was only able to compile the k-u-t with Clang when using the=20
+> "-no-integrated-as" option ... but at least in the most recent version it=
+=20
+> seems to have caught up now enough to be very close to compile it with th=
+e=20
+> built-in assembler, so it would be great to get this problem here fixed=20
+> somehow, too...
 
-Paolo
-
+Bringing up another option: Can we maybe guard this section from Clang so w=
+e still have the assertion when compiling with GCC?
