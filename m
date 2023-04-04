@@ -2,206 +2,263 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8B0446D6EAD
-	for <lists+kvm@lfdr.de>; Tue,  4 Apr 2023 23:07:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 63BB76D6EE1
+	for <lists+kvm@lfdr.de>; Tue,  4 Apr 2023 23:24:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236202AbjDDVHV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Apr 2023 17:07:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48054 "EHLO
+        id S236398AbjDDVYh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Apr 2023 17:24:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35942 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235081AbjDDVHU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Apr 2023 17:07:20 -0400
-Received: from mail-oi1-x22f.google.com (mail-oi1-x22f.google.com [IPv6:2607:f8b0:4864:20::22f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EEDCBE6
-        for <kvm@vger.kernel.org>; Tue,  4 Apr 2023 14:07:18 -0700 (PDT)
-Received: by mail-oi1-x22f.google.com with SMTP id f14so11683146oiw.10
-        for <kvm@vger.kernel.org>; Tue, 04 Apr 2023 14:07:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1680642438;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=D8wCu932h/gRywCSwLxOAEpXzxqJvpG+Yqrg4CPRzmc=;
-        b=JAd/1nZVeoy351xux6KFsMVzLIQjl9PnuOcBokKzB3bGJ+AiPCVTDt2lioXuKb9qEq
-         5xsvX9ZUJR/B5ESv4oz0I9GWx8PfRAoXHcNqEjR+5xzUwdN1AYQqGCigmKxDNJcqs5bH
-         M91VOT22HKSZKYEFfOaVFy5dpvkSqQvQAIZmIUEXQb6XP5bZBC1r8kT/j1fKPN1oz2yq
-         8yctitBEz1sts5F9bOkZ0F7bc4Na1Sx2pgp8pEjGQxqW+XLprm0XEm5h7+jAKBJDTpxW
-         8ZBHIYFtoJ/HMbC4p2PZQHGs/BsniOmP9elZZJnM7xXiA5UV0p6m6I6fLrv/eyX7EEsw
-         w2tg==
+        with ESMTP id S236143AbjDDVYg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Apr 2023 17:24:36 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 036EB19BD
+        for <kvm@vger.kernel.org>; Tue,  4 Apr 2023 14:23:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1680643430;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=wN65mwnOl0cJ7VCIj2dGHYdaX8HViyuK9uZH/ketQAk=;
+        b=g/L2PVCdPMqOWRjXrq+qa4LZ9S/d1RN8javZaX4dQRMlamYp8pkqXEo93K+/wzaIaOZ6oK
+        P61/MvKkygyqZJfoobVJg16UbEfkCXAovGStr2No3MOIob2EGyi03fUIrTl7gRM5yLBJPd
+        1vyk9w1SEfZ6cU95NKPSKjgxUoe5Dgk=
+Received: from mail-il1-f198.google.com (mail-il1-f198.google.com
+ [209.85.166.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-230-OqS77cg2M1mUBVBGBWTTGA-1; Tue, 04 Apr 2023 17:23:49 -0400
+X-MC-Unique: OqS77cg2M1mUBVBGBWTTGA-1
+Received: by mail-il1-f198.google.com with SMTP id d6-20020a92d786000000b00316f1737173so22738770iln.16
+        for <kvm@vger.kernel.org>; Tue, 04 Apr 2023 14:23:49 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680642438;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20210112; t=1680643426;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=D8wCu932h/gRywCSwLxOAEpXzxqJvpG+Yqrg4CPRzmc=;
-        b=RIonqaTww4Rhb4O6qGaZAYk4j5zyeMi6FtGln7KANBrLWj+EnNdzGsUbeftz0H0xYR
-         s7nGaZ1zE4aYOz/18dIR4vKjzuvLrpOgJubI7r9D0vjsHrD9EeVNbiF+0F75Are/pGv/
-         +ujW0x9Pv2ibLqVcgWMSjjw3A292E4Gx2xWbZ744Yro4gMxabJ+hs7zM3NRKLfNLpmyS
-         S+IwLZRAYlIJm2snkVWT6CUK/uGNF4gcyr19etU/YMBi2HxEhr5cId8WeDEAr6WxX8wE
-         BVXrSMJM+H6MlTQ+PKAeEAnjhPgiC/nIFQ+rhr46elR2NlaOZsL4t6yAKnLj3OQaOMVr
-         yy+w==
-X-Gm-Message-State: AAQBX9elemqejIgHO4B7EMmLjNe/clxlf6IxUaR8nzCIyFP9rqUGetvZ
-        whbXZo+Uyyf8U3exvk4N7NZwNZS3aRTx3UBZe3IMGw==
-X-Google-Smtp-Source: AKy350Z0YdQn3UAJSOuwQI8sp3lim7hTJHnaVlPm9ru9ZlukibPZgsTTBipva6Zi/jo0R/RR52EY0KdPqFTpNqI9Eyo=
-X-Received: by 2002:a54:4483:0:b0:37f:ab56:ff42 with SMTP id
- v3-20020a544483000000b0037fab56ff42mr1246545oiv.9.1680642438159; Tue, 04 Apr
- 2023 14:07:18 -0700 (PDT)
+        bh=wN65mwnOl0cJ7VCIj2dGHYdaX8HViyuK9uZH/ketQAk=;
+        b=pISKHhFO+Lq+XF1N2up+c63bABa2DxGMpLlFdiicqI15aPdhByMbHCgew0tAk298ys
+         wkWEpxMnsPkAkCAcH8uTczeV5cV4VvxYlf2d1CKI192VkhViCHejwxo9+Af4ejQTAItv
+         cbIuZefvuPZx1gXnbPmFStbo9iJvldg1ohQlw+1yriLAC6zL5FvYxjZX6RCbE317azoA
+         APICthcOf9yOjGfCtEsxQocx01rfCQlf/UoWk7X9SWH4q8edZR5+08H4piGoiayniC8L
+         7rXRJTUmRNCWr48kWA25+C6vf1nUMR+Q9hH2gzpFBOX5H2kyvl9o3pd338p5ffPTIC6D
+         5Bhg==
+X-Gm-Message-State: AAQBX9cztrkfRLEbwGO+A4NgmaLWLiBzaeh6I07gK+ZSsGwNHIpJn7qg
+        r0cz+VbQ0HB3HSEMTaOLooaF7qg2anuSXDtT0cEWuvjp6jDCF2b6Vn9vbaOfAjQkWjVuUvFVZe6
+        cl2iJAP7srAXg
+X-Received: by 2002:a6b:f60a:0:b0:75a:abfc:27e4 with SMTP id n10-20020a6bf60a000000b0075aabfc27e4mr3106499ioh.9.1680643426535;
+        Tue, 04 Apr 2023 14:23:46 -0700 (PDT)
+X-Google-Smtp-Source: AKy350aSgkWP5XhDrBsbjSoZ+3Kif0QnEue2HBucu6oUQFbA8Hwc5thex8OPsB0pvMBLSJ/0rcTV8g==
+X-Received: by 2002:a6b:f60a:0:b0:75a:abfc:27e4 with SMTP id n10-20020a6bf60a000000b0075aabfc27e4mr3106482ioh.9.1680643426207;
+        Tue, 04 Apr 2023 14:23:46 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id u20-20020a6be914000000b0074c8a021d4csm3563919iof.44.2023.04.04.14.23.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 04 Apr 2023 14:23:45 -0700 (PDT)
+Date:   Tue, 4 Apr 2023 15:23:43 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Yi Liu <yi.l.liu@intel.com>
+Cc:     jgg@nvidia.com, kevin.tian@intel.com, joro@8bytes.org,
+        robin.murphy@arm.com, cohuck@redhat.com, eric.auger@redhat.com,
+        nicolinc@nvidia.com, kvm@vger.kernel.org, mjrosato@linux.ibm.com,
+        chao.p.peng@linux.intel.com, yi.y.sun@linux.intel.com,
+        peterx@redhat.com, jasowang@redhat.com,
+        shameerali.kolothum.thodi@huawei.com, lulu@redhat.com,
+        suravee.suthikulpanit@amd.com, intel-gvt-dev@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org, linux-s390@vger.kernel.org,
+        xudong.hao@intel.com, yan.y.zhao@intel.com, terrence.xu@intel.com,
+        yanting.jiang@intel.com
+Subject: Re: [PATCH v3 08/12] vfio/pci: Renaming for accepting device fd in
+ hot reset path
+Message-ID: <20230404152343.790d6e78.alex.williamson@redhat.com>
+In-Reply-To: <20230401144429.88673-9-yi.l.liu@intel.com>
+References: <20230401144429.88673-1-yi.l.liu@intel.com>
+        <20230401144429.88673-9-yi.l.liu@intel.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-References: <20230206172340.2639971-1-rananta@google.com> <20230206172340.2639971-8-rananta@google.com>
- <ZCTa5wfVtGScLQEa@linux.dev> <CAJHc60xvSFpUs+o84fR14Rghd6rruBJkCMBtroeCeLDtjJg=gw@mail.gmail.com>
- <ZCx4QCs+cjr4nYev@linux.dev>
-In-Reply-To: <ZCx4QCs+cjr4nYev@linux.dev>
-From:   Raghavendra Rao Ananta <rananta@google.com>
-Date:   Tue, 4 Apr 2023 14:07:06 -0700
-Message-ID: <CAJHc60xQ36vah9+eEOLqKdjamfoxijPTwXLrrhOy=NVvMW=VOw@mail.gmail.com>
-Subject: Re: [PATCH v2 7/7] KVM: arm64: Create a fast stage-2 unmap path
-To:     Oliver Upton <oliver.upton@linux.dev>
-Cc:     h@linux.dev, Oliver Upton <oupton@google.com>,
-        Marc Zyngier <maz@kernel.org>,
-        Ricardo Koller <ricarkol@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Colton Lewis <coltonlewis@google.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-15.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,ENV_AND_HDR_SPF_MATCH,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL,
-        USER_IN_DEF_SPF_WL autolearn=unavailable autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Apr 4, 2023 at 12:19=E2=80=AFPM Oliver Upton <oliver.upton@linux.de=
-v> wrote:
->
-> On Tue, Apr 04, 2023 at 10:52:01AM -0700, Raghavendra Rao Ananta wrote:
-> > On Wed, Mar 29, 2023 at 5:42=E2=80=AFPM Oliver Upton <oliver.upton@linu=
-x.dev> wrote:
-> > >
-> > > On Mon, Feb 06, 2023 at 05:23:40PM +0000, Raghavendra Rao Ananta wrot=
-e:
-> > > > The current implementation of the stage-2 unmap walker
-> > > > traverses the entire page-table to clear and flush the TLBs
-> > > > for each entry. This could be very expensive, especially if
-> > > > the VM is not backed by hugepages. The unmap operation could be
-> > > > made efficient by disconnecting the table at the very
-> > > > top (level at which the largest block mapping can be hosted)
-> > > > and do the rest of the unmapping using free_removed_table().
-> > > > If the system supports FEAT_TLBIRANGE, flush the entire range
-> > > > that has been disconnected from the rest of the page-table.
-> > > >
-> > > > Suggested-by: Ricardo Koller <ricarkol@google.com>
-> > > > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-> > > > ---
-> > > >  arch/arm64/kvm/hyp/pgtable.c | 44 ++++++++++++++++++++++++++++++++=
-++++
-> > > >  1 file changed, 44 insertions(+)
-> > > >
-> > > > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgta=
-ble.c
-> > > > index 0858d1fa85d6b..af3729d0971f2 100644
-> > > > --- a/arch/arm64/kvm/hyp/pgtable.c
-> > > > +++ b/arch/arm64/kvm/hyp/pgtable.c
-> > > > @@ -1017,6 +1017,49 @@ static int stage2_unmap_walker(const struct =
-kvm_pgtable_visit_ctx *ctx,
-> > > >       return 0;
-> > > >  }
-> > > >
-> > > > +/*
-> > > > + * The fast walker executes only if the unmap size is exactly equa=
-l to the
-> > > > + * largest block mapping supported (i.e. at KVM_PGTABLE_MIN_BLOCK_=
-LEVEL),
-> > > > + * such that the underneath hierarchy at KVM_PGTABLE_MIN_BLOCK_LEV=
-EL can
-> > > > + * be disconnected from the rest of the page-table without the nee=
-d to
-> > > > + * traverse all the PTEs, at all the levels, and unmap each and ev=
-ery one
-> > > > + * of them. The disconnected table is freed using free_removed_tab=
-le().
-> > > > + */
-> > > > +static int fast_stage2_unmap_walker(const struct kvm_pgtable_visit=
-_ctx *ctx,
-> > > > +                            enum kvm_pgtable_walk_flags visit)
-> > > > +{
-> > > > +     struct kvm_pgtable_mm_ops *mm_ops =3D ctx->mm_ops;
-> > > > +     kvm_pte_t *childp =3D kvm_pte_follow(ctx->old, mm_ops);
-> > > > +     struct kvm_s2_mmu *mmu =3D ctx->arg;
-> > > > +
-> > > > +     if (!kvm_pte_valid(ctx->old) || ctx->level !=3D KVM_PGTABLE_M=
-IN_BLOCK_LEVEL)
-> > > > +             return 0;
-> > > > +
-> > > > +     if (!stage2_try_break_pte(ctx, mmu))
-> > > > +             return -EAGAIN;
-> > > > +
-> > > > +     /*
-> > > > +      * Gain back a reference for stage2_unmap_walker() to free
-> > > > +      * this table entry from KVM_PGTABLE_MIN_BLOCK_LEVEL - 1.
-> > > > +      */
-> > > > +     mm_ops->get_page(ctx->ptep);
-> > >
-> > > Doesn't this run the risk of a potential UAF if the refcount was 1 be=
-fore
-> > > calling stage2_try_break_pte()? IOW, stage2_try_break_pte() will drop
-> > > the refcount to 0 on the page before this ever gets called.
-> > >
-> > > Also, AFAICT this misses the CMOs that are required on systems w/o
-> > > FEAT_FWB. Without them it is possible that the host will read somethi=
-ng
-> > > other than what was most recently written by the guest if it is using
-> > > noncacheable memory attributes at stage-1.
-> > >
-> > > I imagine the actual bottleneck is the DSB required after every
-> > > CMO/TLBI. Theoretically, the unmap path could be updated to:
-> > >
-> > >  - Perform the appropriate CMOs for every valid leaf entry *without*
-> > >    issuing a DSB.
-> > >
-> > >  - Elide TLBIs entirely that take place in the middle of the walk
-> > >
-> > >  - After the walk completes, dsb(ish) to guarantee that the CMOs have
-> > >    completed and the invalid PTEs are made visible to the hardware
-> > >    walkers. This should be done implicitly by the TLBI implementation
-> > >
-> > >  - Invalidate the [addr, addr + size) range of IPAs
-> > >
-> > > This would also avoid over-invalidating stage-1 since we blast the
-> > > entire stage-1 context for every stage-2 invalidation. Thoughts?
-> > >
-> > Correct me if I'm wrong, but if we invalidate the TLB after the walk
-> > is complete, don't you think there's a risk of race if the guest can
-> > hit in the TLB even though the page was unmapped?
->
-> Yeah, we'd need to do the CMOs _after_ making the translation invalid in
-> the page tables and completing the TLB invalidation. Apologies.
->
-> Otherwise, the only requirement we need to uphold w/ either the MMU
-> notifiers or userspace is that the translation has been invalidated at
-> the time of return.
->
-Actually, my concern about the race was against the hardware. If we
-follow the above approach, let's say we invalidated a certain set of
-PTEs, but the TLBs aren't yet invalidated. During this point if
-another vCPU accesses the range governed by the invalidated PTEs,
-wouldn't it still hit in the TLB? Have I misunderstood you or am I
-missing something?
+On Sat,  1 Apr 2023 07:44:25 -0700
+Yi Liu <yi.l.liu@intel.com> wrote:
 
-Thank you.
-Raghavendra
-> --
-> Thanks,
-> Oliver
+> No functional change is intended.
+> 
+> Reviewed-by: Kevin Tian <kevin.tian@intel.com>
+> Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
+> Tested-by: Yanting Jiang <yanting.jiang@intel.com>
+> Signed-off-by: Yi Liu <yi.l.liu@intel.com>
+> ---
+>  drivers/vfio/pci/vfio_pci_core.c | 52 ++++++++++++++++----------------
+>  1 file changed, 26 insertions(+), 26 deletions(-)
+> 
+> diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
+> index 2a510b71edcb..da6325008872 100644
+> --- a/drivers/vfio/pci/vfio_pci_core.c
+> +++ b/drivers/vfio/pci/vfio_pci_core.c
+> @@ -177,10 +177,10 @@ static void vfio_pci_probe_mmaps(struct vfio_pci_core_device *vdev)
+>  	}
+>  }
+>  
+> -struct vfio_pci_group_info;
+> +struct vfio_pci_file_info;
+>  static void vfio_pci_dev_set_try_reset(struct vfio_device_set *dev_set);
+>  static int vfio_pci_dev_set_hot_reset(struct vfio_device_set *dev_set,
+> -				      struct vfio_pci_group_info *groups,
+> +				      struct vfio_pci_file_info *info,
+>  				      struct iommufd_ctx *iommufd_ctx);
+>  
+>  /*
+> @@ -800,7 +800,7 @@ static int vfio_pci_fill_devs(struct pci_dev *pdev, void *data)
+>  	return 0;
+>  }
+>  
+> -struct vfio_pci_group_info {
+> +struct vfio_pci_file_info {
+>  	int count;
+>  	struct file **files;
+>  };
+> @@ -1257,14 +1257,14 @@ static int vfio_pci_ioctl_get_pci_hot_reset_info(
+>  }
+>  
+>  static int
+> -vfio_pci_ioctl_pci_hot_reset_groups(struct vfio_pci_core_device *vdev,
+> -				    struct vfio_pci_hot_reset *hdr,
+> -				    bool slot,
+> -				    struct vfio_pci_hot_reset __user *arg)
+> +vfio_pci_ioctl_pci_hot_reset_files(struct vfio_pci_core_device *vdev,
+> +				   struct vfio_pci_hot_reset *hdr,
+> +				   bool slot,
+> +				   struct vfio_pci_hot_reset __user *arg)
+>  {
+> -	int32_t *group_fds;
+> +	int32_t *fds;
+>  	struct file **files;
+> -	struct vfio_pci_group_info info;
+> +	struct vfio_pci_file_info info;
+>  	int file_idx, count = 0, ret = 0;
+>  
+>  	/*
+> @@ -1281,17 +1281,17 @@ vfio_pci_ioctl_pci_hot_reset_groups(struct vfio_pci_core_device *vdev,
+>  	if (hdr->count > count)
+>  		return -EINVAL;
+>  
+> -	group_fds = kcalloc(hdr->count, sizeof(*group_fds), GFP_KERNEL);
+> +	fds = kcalloc(hdr->count, sizeof(*fds), GFP_KERNEL);
+>  	files = kcalloc(hdr->count, sizeof(*files), GFP_KERNEL);
+> -	if (!group_fds || !files) {
+> -		kfree(group_fds);
+> +	if (!fds || !files) {
+> +		kfree(fds);
+>  		kfree(files);
+>  		return -ENOMEM;
+>  	}
+>  
+> -	if (copy_from_user(group_fds, arg->group_fds,
+> -			   hdr->count * sizeof(*group_fds))) {
+> -		kfree(group_fds);
+> +	if (copy_from_user(fds, arg->group_fds,
+> +			   hdr->count * sizeof(*fds))) {
+> +		kfree(fds);
+>  		kfree(files);
+>  		return -EFAULT;
+>  	}
+> @@ -1301,7 +1301,7 @@ vfio_pci_ioctl_pci_hot_reset_groups(struct vfio_pci_core_device *vdev,
+>  	 * the reset
+>  	 */
+>  	for (file_idx = 0; file_idx < hdr->count; file_idx++) {
+> -		struct file *file = fget(group_fds[file_idx]);
+> +		struct file *file = fget(fds[file_idx]);
+>  
+>  		if (!file) {
+>  			ret = -EBADF;
+> @@ -1318,9 +1318,9 @@ vfio_pci_ioctl_pci_hot_reset_groups(struct vfio_pci_core_device *vdev,
+>  		files[file_idx] = file;
+>  	}
+>  
+> -	kfree(group_fds);
+> +	kfree(fds);
+>  
+> -	/* release reference to groups on error */
+> +	/* release reference to fds on error */
+>  	if (ret)
+>  		goto hot_reset_release;
+>  
+> @@ -1358,7 +1358,7 @@ static int vfio_pci_ioctl_pci_hot_reset(struct vfio_pci_core_device *vdev,
+>  		return -ENODEV;
+>  
+>  	if (hdr.count)
+> -		return vfio_pci_ioctl_pci_hot_reset_groups(vdev, &hdr, slot, arg);
+> +		return vfio_pci_ioctl_pci_hot_reset_files(vdev, &hdr, slot, arg);
+>  
+>  	iommufd = vfio_iommufd_physical_ictx(&vdev->vdev);
+>  
+> @@ -2329,16 +2329,16 @@ const struct pci_error_handlers vfio_pci_core_err_handlers = {
+>  };
+>  EXPORT_SYMBOL_GPL(vfio_pci_core_err_handlers);
+>  
+> -static bool vfio_dev_in_groups(struct vfio_pci_core_device *vdev,
+> -			       struct vfio_pci_group_info *groups)
+> +static bool vfio_dev_in_files(struct vfio_pci_core_device *vdev,
+> +			      struct vfio_pci_file_info *info)
+>  {
+>  	unsigned int i;
+>  
+> -	if (!groups)
+> +	if (!info)
+>  		return false;
+>  
+> -	for (i = 0; i < groups->count; i++)
+> -		if (vfio_file_has_dev(groups->files[i], &vdev->vdev))
+> +	for (i = 0; i < info->count; i++)
+> +		if (vfio_file_has_dev(info->files[i], &vdev->vdev))
+>  			return true;
+>  	return false;
+>  }
+> @@ -2429,7 +2429,7 @@ static bool vfio_dev_in_iommufd_ctx(struct vfio_pci_core_device *vdev,
+>   * get each memory_lock.
+>   */
+>  static int vfio_pci_dev_set_hot_reset(struct vfio_device_set *dev_set,
+> -				      struct vfio_pci_group_info *groups,
+> +				      struct vfio_pci_file_info *info,
+>  				      struct iommufd_ctx *iommufd_ctx)
+>  {
+>  	struct vfio_pci_core_device *cur_mem;
+> @@ -2478,7 +2478,7 @@ static int vfio_pci_dev_set_hot_reset(struct vfio_device_set *dev_set,
+>  		 * the calling device is in a singleton dev_set.
+>  		 */
+>  		if (cur_vma->vdev.open_count &&
+> -		    !vfio_dev_in_groups(cur_vma, groups) &&
+> +		    !vfio_dev_in_files(cur_vma, info) &&
+>  		    !vfio_dev_in_iommufd_ctx(cur_vma, iommufd_ctx) &&
+>  		    (dev_set->device_count > 1)) {
+>  			ret = -EINVAL;
+
+At this point, vfio_dev_in_files() supports both group and cdev fds and
+these can be used for both regular IOMMU protected and no-IOMMU
+devices AFAICT.  We only add this 1-off dev_set device count test and
+its subtle side-effects in order to support the null-array mode, which
+IMO really has yet to be shown as a requirement.
+
+IIRC, we were wanting to add that mode as part of the cdev interface so
+that the existence of cdevs implies this support, but now we're already
+making use of vfio_pci_hot_reset_info.flags to indicate group-id vs
+dev-id in the output, so does anything prevent us from setting another
+bit there if/when this feature proves itself useful and error free, to
+indicate it's an available mode for the hot-reset ioctl?
+
+With that I think we could drop patches 4 & 5 with a plan for
+introducing them later without trying to strong arm the feature in
+without a proven and available use case now.  Thanks,
+
+Alex
+
