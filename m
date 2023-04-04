@@ -2,117 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 35AE16D56C5
-	for <lists+kvm@lfdr.de>; Tue,  4 Apr 2023 04:32:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5719E6D56E1
+	for <lists+kvm@lfdr.de>; Tue,  4 Apr 2023 04:45:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232690AbjDDCc0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 3 Apr 2023 22:32:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40124 "EHLO
+        id S231741AbjDDCps (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 3 Apr 2023 22:45:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47830 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229757AbjDDCcY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 3 Apr 2023 22:32:24 -0400
-Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23919FE;
-        Mon,  3 Apr 2023 19:32:23 -0700 (PDT)
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4PrBcM4Q5qz4whh;
-        Tue,  4 Apr 2023 12:32:19 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-        s=201702; t=1680575541;
-        bh=g+Ca+8o14efamQlex7/wChezECtdEwAVcLvKdZ0WtcI=;
-        h=Date:From:To:Cc:Subject:From;
-        b=rHJYBppLA0A7w+oS/BA8ig5K/bt8hD0qCNOBVtqjunGSIOBp3l5CymLq+msDLVtYo
-         Ez+HmuS0pwWVEQJNZ1aGaiFQCQTdZFj6l6cBz8KKyeEZKEZ6N+WwBDrJsBFcgk8eKG
-         S3tBSwaNHhoHts+N7yiuogtyRrAV+c9La6yxHZDCAMi8kawbHkPdJo1UsJK5aCyqK+
-         5624ZkwSh6nGBE+jPn8ISQQvvL+N3X18PIXM5i+hDPx9Jhon0HRQB0CiwwZ4ea/JEQ
-         Ottk3Qjx0e08Am7AldiuJWhL5MTxM22xA4bMuJKYXXmW+CYKS9zG3jKp03XsYhqsyA
-         H/lb28FMaWSMw==
-Date:   Tue, 4 Apr 2023 12:32:17 +1000
-From:   Stephen Rothwell <sfr@canb.auug.org.au>
-To:     Christoffer Dall <cdall@cs.columbia.edu>,
-        Marc Zyngier <maz@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     KVM <kvm@vger.kernel.org>, Alexey Kardashevskiy <aik@ozlabs.ru>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>
-Subject: linux-next: manual merge of the kvm-arm tree with the kvm-fixes
- tree
-Message-ID: <20230404123217.6b784b4b@canb.auug.org.au>
+        with ESMTP id S229446AbjDDCpq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 3 Apr 2023 22:45:46 -0400
+Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2044B173B
+        for <kvm@vger.kernel.org>; Mon,  3 Apr 2023 19:45:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1680576346; x=1712112346;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=DUwQmkSqkYE5BFr6tjwLh8kLx9sndocG5guLoTgp+0Q=;
+  b=cdORzF5fokNluBftQZRzd1c2y2Op5ZbUPLcanRO4qPhFM74TYeK7Z0xZ
+   rF9I/VHXTTOJdEuSohjlIl2Fw7gmy6eIEzNVhEl8i7sr1Zf+QWNmQJiQR
+   DCF26Pn++hTFnT/ci/0rr5ZVLvNp7Vbjkffx5Gu/xRTdF4k8xAUxU59kw
+   VnGr8BP4LGy5H8iqtAAywMt+QgfVCAkrYNloBGxYvLt0hH5hKJmSMZfTy
+   ywdfAhQjzoTD5OJF9cpZM/GRT5NLIuB6OTml35gtU2SVaosSqdDIwDCsJ
+   82txj/vvqzRooVp3sD+You9XjqWM7vyGrtKUqFQP4ZFrp+gHeOk9buu7X
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10669"; a="326090586"
+X-IronPort-AV: E=Sophos;i="5.98,316,1673942400"; 
+   d="scan'208";a="326090586"
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Apr 2023 19:45:45 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10669"; a="860425789"
+X-IronPort-AV: E=Sophos;i="5.98,316,1673942400"; 
+   d="scan'208";a="860425789"
+Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.254.215.140]) ([10.254.215.140])
+  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Apr 2023 19:45:43 -0700
+Message-ID: <9d0b7b6e-9067-0ff6-c28b-358b2e39b5a8@linux.intel.com>
+Date:   Tue, 4 Apr 2023 10:45:41 +0800
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/toJpyekP/=0eG=/jvVezQS3";
- protocol="application/pgp-signature"; micalg=pgp-sha256
-X-Spam-Status: No, score=-0.1 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
-        DKIM_VALID_AU,SPF_HELO_PASS,SPF_PASS autolearn=unavailable
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.9.0
+Subject: Re: [PATCH v6 2/7] KVM: VMX: Use is_64_bit_mode() to check 64-bit
+ mode
+To:     "Huang, Kai" <kai.huang@intel.com>,
+        "Christopherson,, Sean" <seanjc@google.com>
+Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "robert.hu@linux.intel.com" <robert.hu@linux.intel.com>,
+        "Gao, Chao" <chao.gao@intel.com>
+References: <20230319084927.29607-1-binbin.wu@linux.intel.com>
+ <20230319084927.29607-3-binbin.wu@linux.intel.com> <ZBhTa6QSGDp2ZkGU@gao-cwp>
+ <ZBojJgTG/SNFS+3H@google.com>
+ <12c4f1d3c99253f364f3945a998fdccb0ddf300f.camel@intel.com>
+ <e0442b13-09f4-0985-3eb4-9b6a20d981fb@linux.intel.com>
+ <682d01dec42ecdb80c9d3ffa2902dea3b1d576dd.camel@intel.com>
+ <b9e9dd1c-2213-81c7-cd45-f5cf7b86610b@linux.intel.com>
+ <ZCR2PBx/4lj9X0vD@google.com>
+ <657efa6471503ee5c430e5942a14737ff5fbee6e.camel@intel.com>
+ <349bd65a-233e-587c-25b2-12b6031b12b6@linux.intel.com>
+ <fc92490afc7ee1b9679877878de64ad129853cc0.camel@intel.com>
+ <559ebca9-dfb9-e041-3744-5eab36f4f4c5@linux.intel.com>
+ <71214e870df7c280e2f7ddcd264c73e3191958d9.camel@intel.com>
+From:   Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <71214e870df7c280e2f7ddcd264c73e3191958d9.camel@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-1.4 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,SPF_NONE
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
---Sig_/toJpyekP/=0eG=/jvVezQS3
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
 
-Hi all,
+On 4/4/2023 9:53 AM, Huang, Kai wrote:
+> On Tue, 2023-04-04 at 09:21 +0800, Binbin Wu wrote:
+>> On 4/3/2023 7:24 PM, Huang, Kai wrote:
+>>>>
+>>>> Anyway, I will seperate this patch from the LAM KVM enabling patch. And
+>>>> send a patch seperately if
+>>>> needed later.
+>>>>
+>>> I think your change for SGX is still needed based on the pseudo code of ENCLS.
+>> Yes, I meant I would seperate VMX part since it is not a bug after all,
+>> SGX will still be in the patchset.
+>>
+>>
+> Shouldn't SGX part be also split out as a bug fix patch?
+>
+> Does it have anything to do with this LAM support series?
 
-Today's linux-next merge of the kvm-arm tree got a conflict in:
+It is related to LAM support because LAM only effective in 64-bit mode,
+so the untag action should only be done in 64-bit mode.
 
-  arch/arm64/kvm/arm.c
+If the SGX fix patch is not included, that means LAM untag could be 
+called in compatiblity mode in SGX ENCLS handler.
 
-between commit:
 
-  52882b9c7a76 ("KVM: PPC: Make KVM_CAP_IRQFD_RESAMPLE platform dependent")
-
-from the kvm-fixes tree and commit:
-
-  30ec7997d175 ("KVM: arm64: timers: Allow userspace to set the global coun=
-ter offset")
-
-from the kvm-arm tree.
-
-I fixed it up (see below) and can carry the fix as necessary. This
-is now fixed as far as linux-next is concerned, but any non trivial
-conflicts should be mentioned to your upstream maintainer when your tree
-is submitted for merging.  You may also want to consider cooperating
-with the maintainer of the conflicting tree to minimise any particularly
-complex conflicts.
-
---=20
-Cheers,
-Stephen Rothwell
-
-diff --cc arch/arm64/kvm/arm.c
-index aaa752be3776,0e5a3ff8cc5a..000000000000
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@@ -220,7 -232,7 +232,8 @@@ int kvm_vm_ioctl_check_extension(struc
-  	case KVM_CAP_VCPU_ATTRIBUTES:
-  	case KVM_CAP_PTP_KVM:
-  	case KVM_CAP_ARM_SYSTEM_SUSPEND:
- +	case KVM_CAP_IRQFD_RESAMPLE:
-+ 	case KVM_CAP_COUNTER_OFFSET:
-  		r =3D 1;
-  		break;
-  	case KVM_CAP_SET_GUEST_DEBUG2:
-
---Sig_/toJpyekP/=0eG=/jvVezQS3
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmQrjDIACgkQAVBC80lX
-0GxnBgf+MPxydLj2MmhqjmXUtoz8BPZq7V7HRcuxAsPedrjkOZVZGYdri6F2y5xh
-p1ux2wH9PqHTYCuxdajssenvSTqDNvYZJ5tWA9cv92EfTADzFVVG+nTn/zYJiRL7
-v8w+EwHy1BezCIokKiRGzYeUeOaNkC/39kITrxzIGzRZGp8P0arlTcjdI22pr0JA
-hwGxVVRxXrXkQSo85Jzwwm3IciMCKWN9767lMlzmT4hZbYqxzeEf8v6/cVfDXuFC
-m/qwZ1Q7iFgHD1Za5BFPX1olK1Enb2K7mI5os6Y8LJT8zCxpfjBhyUXY3rjmSDbm
-MOH0VE8LdqkKHoZ7Z0Zg89w/xyzupA==
-=UnsP
------END PGP SIGNATURE-----
-
---Sig_/toJpyekP/=0eG=/jvVezQS3--
