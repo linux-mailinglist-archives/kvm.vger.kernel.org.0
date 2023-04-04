@@ -2,29 +2,29 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F09DC6D67C0
-	for <lists+kvm@lfdr.de>; Tue,  4 Apr 2023 17:42:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 17AA26D67BB
+	for <lists+kvm@lfdr.de>; Tue,  4 Apr 2023 17:42:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235947AbjDDPmT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Apr 2023 11:42:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38382 "EHLO
+        id S235926AbjDDPmG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Apr 2023 11:42:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36534 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235788AbjDDPmQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Apr 2023 11:42:16 -0400
-Received: from out-33.mta0.migadu.com (out-33.mta0.migadu.com [91.218.175.33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 15D5659D0
-        for <kvm@vger.kernel.org>; Tue,  4 Apr 2023 08:41:48 -0700 (PDT)
+        with ESMTP id S235916AbjDDPmB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Apr 2023 11:42:01 -0400
+Received: from out-5.mta0.migadu.com (out-5.mta0.migadu.com [IPv6:2001:41d0:1004:224b::5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CEC5244B6
+        for <kvm@vger.kernel.org>; Tue,  4 Apr 2023 08:41:39 -0700 (PDT)
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1680622895;
+        t=1680622897;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=c3S+IvI30dXLpUpchouZSkX43/ychYIUDrO/VQdYbMU=;
-        b=CIrSYlk8OnuDzWBI8rbL8rYt4d8ADcQ+3kv880plIcrq180t1uUqC4pYuB9dbATS82mMUE
-        y5k9sScV2Aiuctkom0/aVcv80sZ5RNBdPyi5DCuZ5cmePA8thdxxhVEu5yg+DKi5lGPdrI
-        ao8NJNJK5QZoRp4ZELVR94vUX1CIH6Y=
+        bh=5vP+Gfs+9zHHCR8XXLDdZLzVRuJOqjfpkgA4LdG4drY=;
+        b=YKtT0MojeIjjygSTj/2MUhkqSkibMyIZx3HXn8B7TaaemjGX0ZSgc1wtWW/iOZloVNg+hg
+        0QoL9BrJjSi6FXOgxWRRPRuvQuCETpMSOgWjZrOUND2U3TyTmzxtRCJ40RrCejXYtTtu33
+        hV5ZHSN4vK35mFhc/cWmVunDs7Ii4ys=
 From:   Oliver Upton <oliver.upton@linux.dev>
 To:     kvmarm@lists.linux.dev
 Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
@@ -35,9 +35,9 @@ Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
         Salil Mehta <salil.mehta@huawei.com>,
         Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH v3 11/13] KVM: arm64: Let errors from SMCCC emulation to reach userspace
-Date:   Tue,  4 Apr 2023 15:40:48 +0000
-Message-Id: <20230404154050.2270077-12-oliver.upton@linux.dev>
+Subject: [PATCH v3 12/13] KVM: selftests: Add a helper for SMCCC calls with SMC instruction
+Date:   Tue,  4 Apr 2023 15:40:49 +0000
+Message-Id: <20230404154050.2270077-13-oliver.upton@linux.dev>
 In-Reply-To: <20230404154050.2270077-1-oliver.upton@linux.dev>
 References: <20230404154050.2270077-1-oliver.upton@linux.dev>
 MIME-Version: 1.0
@@ -52,67 +52,106 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Typically a negative return from an exit handler is used to request a
-return to userspace with the specified error. KVM's handling of SMCCC
-emulation (i.e. both HVCs and SMCs) deviates from the trend and resumes
-the guest instead.
+Build a helper for doing SMCs in selftests by macro-izing the current
+HVC implementation and taking the conduit instruction as an argument.
 
-Stop handling negative returns this way and instead let the error
-percolate to userspace.
-
-Suggested-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- arch/arm64/kvm/handle_exit.c | 18 ++----------------
- 1 file changed, 2 insertions(+), 16 deletions(-)
+ .../selftests/kvm/include/aarch64/processor.h | 13 +++++
+ .../selftests/kvm/lib/aarch64/processor.c     | 52 ++++++++++++-------
+ 2 files changed, 46 insertions(+), 19 deletions(-)
 
-diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-index 3f43e20c48b6..6dcd6604b6bc 100644
---- a/arch/arm64/kvm/handle_exit.c
-+++ b/arch/arm64/kvm/handle_exit.c
-@@ -36,8 +36,6 @@ static void kvm_handle_guest_serror(struct kvm_vcpu *vcpu, u64 esr)
+diff --git a/tools/testing/selftests/kvm/include/aarch64/processor.h b/tools/testing/selftests/kvm/include/aarch64/processor.h
+index 5f977528e09c..cb537253a6b9 100644
+--- a/tools/testing/selftests/kvm/include/aarch64/processor.h
++++ b/tools/testing/selftests/kvm/include/aarch64/processor.h
+@@ -214,6 +214,19 @@ void smccc_hvc(uint32_t function_id, uint64_t arg0, uint64_t arg1,
+ 	       uint64_t arg2, uint64_t arg3, uint64_t arg4, uint64_t arg5,
+ 	       uint64_t arg6, struct arm_smccc_res *res);
  
- static int handle_hvc(struct kvm_vcpu *vcpu)
- {
--	int ret;
--
- 	trace_kvm_hvc_arm64(*vcpu_pc(vcpu), vcpu_get_reg(vcpu, 0),
- 			    kvm_vcpu_hvc_get_imm(vcpu));
- 	vcpu->stat.hvc_exit_stat++;
-@@ -52,19 +50,11 @@ static int handle_hvc(struct kvm_vcpu *vcpu)
- 		return 1;
- 	}
++/**
++ * smccc_smc - Invoke a SMCCC function using the smc conduit
++ * @function_id: the SMCCC function to be called
++ * @arg0-arg6: SMCCC function arguments, corresponding to registers x1-x7
++ * @res: pointer to write the return values from registers x0-x3
++ *
++ */
++void smccc_smc(uint32_t function_id, uint64_t arg0, uint64_t arg1,
++	       uint64_t arg2, uint64_t arg3, uint64_t arg4, uint64_t arg5,
++	       uint64_t arg6, struct arm_smccc_res *res);
++
++
++
+ uint32_t guest_get_vcpuid(void);
  
--	ret = kvm_smccc_call_handler(vcpu);
--	if (ret < 0) {
--		vcpu_set_reg(vcpu, 0, ~0UL);
--		return 1;
--	}
--
--	return ret;
-+	return kvm_smccc_call_handler(vcpu);
+ #endif /* SELFTEST_KVM_PROCESSOR_H */
+diff --git a/tools/testing/selftests/kvm/lib/aarch64/processor.c b/tools/testing/selftests/kvm/lib/aarch64/processor.c
+index 5972a23b2765..24e8122307f4 100644
+--- a/tools/testing/selftests/kvm/lib/aarch64/processor.c
++++ b/tools/testing/selftests/kvm/lib/aarch64/processor.c
+@@ -508,29 +508,43 @@ void aarch64_get_supported_page_sizes(uint32_t ipa,
+ 	close(kvm_fd);
  }
  
- static int handle_smc(struct kvm_vcpu *vcpu)
++#define __smccc_call(insn, function_id, arg0, arg1, arg2, arg3, arg4, arg5,	\
++		     arg6, res)							\
++	asm volatile("mov   w0, %w[function_id]\n"				\
++		     "mov   x1, %[arg0]\n"					\
++		     "mov   x2, %[arg1]\n"					\
++		     "mov   x3, %[arg2]\n"					\
++		     "mov   x4, %[arg3]\n"					\
++		     "mov   x5, %[arg4]\n"					\
++		     "mov   x6, %[arg5]\n"					\
++		     "mov   x7, %[arg6]\n"					\
++		     #insn  "#0\n"						\
++		     "mov   %[res0], x0\n"					\
++		     "mov   %[res1], x1\n"					\
++		     "mov   %[res2], x2\n"					\
++		     "mov   %[res3], x3\n"					\
++		     : [res0] "=r"(res->a0), [res1] "=r"(res->a1),		\
++		       [res2] "=r"(res->a2), [res3] "=r"(res->a3)		\
++		     : [function_id] "r"(function_id), [arg0] "r"(arg0),	\
++		       [arg1] "r"(arg1), [arg2] "r"(arg2), [arg3] "r"(arg3),	\
++		       [arg4] "r"(arg4), [arg5] "r"(arg5), [arg6] "r"(arg6)	\
++		     : "x0", "x1", "x2", "x3", "x4", "x5", "x6", "x7")
++
++
+ void smccc_hvc(uint32_t function_id, uint64_t arg0, uint64_t arg1,
+ 	       uint64_t arg2, uint64_t arg3, uint64_t arg4, uint64_t arg5,
+ 	       uint64_t arg6, struct arm_smccc_res *res)
  {
--	int ret;
--
- 	/*
- 	 * "If an SMC instruction executed at Non-secure EL1 is
- 	 * trapped to EL2 because HCR_EL2.TSC is 1, the exception is a
-@@ -93,11 +83,7 @@ static int handle_smc(struct kvm_vcpu *vcpu)
- 	 * at Non-secure EL1 is trapped to EL2 if HCR_EL2.TSC==1, rather than
- 	 * being treated as UNDEFINED.
- 	 */
--	ret = kvm_smccc_call_handler(vcpu);
--	if (ret < 0)
--		vcpu_set_reg(vcpu, 0, ~0UL);
--
--	return ret;
-+	return kvm_smccc_call_handler(vcpu);
+-	asm volatile("mov   w0, %w[function_id]\n"
+-		     "mov   x1, %[arg0]\n"
+-		     "mov   x2, %[arg1]\n"
+-		     "mov   x3, %[arg2]\n"
+-		     "mov   x4, %[arg3]\n"
+-		     "mov   x5, %[arg4]\n"
+-		     "mov   x6, %[arg5]\n"
+-		     "mov   x7, %[arg6]\n"
+-		     "hvc   #0\n"
+-		     "mov   %[res0], x0\n"
+-		     "mov   %[res1], x1\n"
+-		     "mov   %[res2], x2\n"
+-		     "mov   %[res3], x3\n"
+-		     : [res0] "=r"(res->a0), [res1] "=r"(res->a1),
+-		       [res2] "=r"(res->a2), [res3] "=r"(res->a3)
+-		     : [function_id] "r"(function_id), [arg0] "r"(arg0),
+-		       [arg1] "r"(arg1), [arg2] "r"(arg2), [arg3] "r"(arg3),
+-		       [arg4] "r"(arg4), [arg5] "r"(arg5), [arg6] "r"(arg6)
+-		     : "x0", "x1", "x2", "x3", "x4", "x5", "x6", "x7");
++	__smccc_call(hvc, function_id, arg0, arg1, arg2, arg3, arg4, arg5,
++		     arg6, res);
++}
++
++void smccc_smc(uint32_t function_id, uint64_t arg0, uint64_t arg1,
++	       uint64_t arg2, uint64_t arg3, uint64_t arg4, uint64_t arg5,
++	       uint64_t arg6, struct arm_smccc_res *res)
++{
++	__smccc_call(smc, function_id, arg0, arg1, arg2, arg3, arg4, arg5,
++		     arg6, res);
  }
  
- /*
+ void kvm_selftest_arch_init(void)
 -- 
 2.40.0.348.gf938b09366-goog
 
