@@ -2,437 +2,198 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 751336D7993
-	for <lists+kvm@lfdr.de>; Wed,  5 Apr 2023 12:20:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8731B6D7A67
+	for <lists+kvm@lfdr.de>; Wed,  5 Apr 2023 12:53:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237221AbjDEKUQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Apr 2023 06:20:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38862 "EHLO
+        id S237504AbjDEKxU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Apr 2023 06:53:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34754 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237639AbjDEKUM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Apr 2023 06:20:12 -0400
-Received: from mail-wr1-x42d.google.com (mail-wr1-x42d.google.com [IPv6:2a00:1450:4864:20::42d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA1A34C27
-        for <kvm@vger.kernel.org>; Wed,  5 Apr 2023 03:19:59 -0700 (PDT)
-Received: by mail-wr1-x42d.google.com with SMTP id r29so35617485wra.13
-        for <kvm@vger.kernel.org>; Wed, 05 Apr 2023 03:19:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1680689998;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Byk5LNB9PsG7qsnBIJRRo9JOVccGApJy+cx27j4c9fU=;
-        b=zy6RoKZl3HFi+Q0vtR3UwohHMiMsWOn2/ul3EQVzNnehPXDwziBD8kN5oz8YFLSGXj
-         z/JbV/w7gRjJU5xeR6Z9EK4Q7ekBR7AroyEWwqox013ocsFMmdaA4ZWf2wIKs/m2o1XP
-         +/We8oxS7dteLdYGU8FLDvQO4VX6Suu2gr/VvXj3kZJ2FFAYoGMXBduf7o4qkVPTQNmu
-         0HhVtRaZCSFq9x8ZTK0MirJoKqdYOdV5BlEMLWbn5vWNkxftascntbFIYwA0uUlQwF/C
-         2xBShpUeR7qjrBXuhSVb8YEJTUIHLJJZrHR3rxKsIkhUvcQpcNTzRCtk+oyEz9o0QBbV
-         o/PA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680689998;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Byk5LNB9PsG7qsnBIJRRo9JOVccGApJy+cx27j4c9fU=;
-        b=CzkU/3J/v67AO04mflroQo9+ovhyXk5zN9bEdsZfT5SKoblzyxzbjwoF+ezl7QAV7H
-         k83ejaJmo1zx5B1wiaOtDDf1FZKkIvmgspbsG3vJ0vxGZyrTHb3Y5tzRIcsnKpyWrEIV
-         wQMWRpZxix8D+hc7kJ5++jJ5mOl/Jgu6sXGPgI0sLOH7PziwN9b1+MriheZerSW7LlNw
-         STpDsWPXaJwt7GSOoUtMviBP84vdboKJ+rO8uRGEqhMHycZ7ZWd2V6r0t+rYNPCBp/tJ
-         /drVZCV9YMIwhte1JwVTYj7E1n5EqddhnU7sdnxeUmtvw5qhhR3MybwMFokHcDbLFv4D
-         fuRw==
-X-Gm-Message-State: AAQBX9cGGBPIPJR2xn8gn5JD3ph4VVzFWFQ8/tGb7B+jl5wYA31sidcu
-        A4ajULASAIJMnRvhCdx3uTh2GA==
-X-Google-Smtp-Source: AKy350ZkCRxUlRNTXX0kIqDAWFewpV/6tQ9nx8c+rFpbVyobQsMD1OzgOrzwPflhmrDI+QR50xCA9g==
-X-Received: by 2002:a5d:42c1:0:b0:2cf:eeae:88c3 with SMTP id t1-20020a5d42c1000000b002cfeeae88c3mr3555848wrr.32.1680689998344;
-        Wed, 05 Apr 2023 03:19:58 -0700 (PDT)
-Received: from localhost.localdomain (4ab54-h01-176-184-52-81.dsl.sta.abo.bbox.fr. [176.184.52.81])
-        by smtp.gmail.com with ESMTPSA id e11-20020a5d4e8b000000b002cde626cd96sm14624762wru.65.2023.04.05.03.19.54
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Wed, 05 Apr 2023 03:19:58 -0700 (PDT)
-From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
-To:     qemu-devel@nongnu.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
-        xen-devel@lists.xenproject.org, kvm@vger.kernel.org,
-        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
-        Cameron Esfahani <dirty@apple.com>,
-        Roman Bolshakov <r.bolshakov@yadro.com>,
-        Eduardo Habkost <eduardo@habkost.net>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Yanan Wang <wangyanan55@huawei.com>,
-        Alexander Graf <agraf@csgraf.de>,
-        Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org
-Subject: [PATCH 14/14] accel: Rename HVF struct hvf_vcpu_state -> struct AccelvCPUState
-Date:   Wed,  5 Apr 2023 12:18:11 +0200
-Message-Id: <20230405101811.76663-15-philmd@linaro.org>
-X-Mailer: git-send-email 2.38.1
-In-Reply-To: <20230405101811.76663-1-philmd@linaro.org>
-References: <20230405101811.76663-1-philmd@linaro.org>
+        with ESMTP id S237236AbjDEKxS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Apr 2023 06:53:18 -0400
+Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F811AB;
+        Wed,  5 Apr 2023 03:53:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1680691989; x=1712227989;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=MkZ2gE13I1UcU0OaWmNUYcnAGe/Vxa0Pe6PhDl19euE=;
+  b=lgFqYfka7HCZ0rpGKhSgaUfnZ8+vrHdCCBjM8FYaHoQI1iwPJ+nB3QgM
+   1k17EsE0TfVNU+8mswHPFm/nxe5m651l48RVppD/8hnVIyDIPuYJzgNHf
+   VbGuoHimWtfXRxRnwdzDOeejUR1ff7lEdm1ypIj8VhslKbL/hyrbhPERZ
+   BzWq0E9LxxmkeMWFkmJ21E4E02Af7J/gKs+VTyILNDHt3E2WHfQehjglw
+   RNgxkc1+K5jMKQsezmU1RUdK5llz7S4n4dPmh1glZJl5Tdt4MbfSU2qh7
+   RED89xclAWWhLy0y++eS44bmL3oIJcC4myyxyuTMCtS6PVfaENZC6xhrb
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10670"; a="405196093"
+X-IronPort-AV: E=Sophos;i="5.98,319,1673942400"; 
+   d="scan'208";a="405196093"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Apr 2023 03:53:08 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10670"; a="719275452"
+X-IronPort-AV: E=Sophos;i="5.98,319,1673942400"; 
+   d="scan'208";a="719275452"
+Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
+  by orsmga001.jf.intel.com with ESMTP; 05 Apr 2023 03:53:08 -0700
+Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.21; Wed, 5 Apr 2023 03:53:08 -0700
+Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.21; Wed, 5 Apr 2023 03:53:07 -0700
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.21 via Frontend Transport; Wed, 5 Apr 2023 03:53:07 -0700
+Received: from NAM02-SN1-obe.outbound.protection.outlook.com (104.47.57.44) by
+ edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.21; Wed, 5 Apr 2023 03:53:07 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=cE29MM8qhgp37BO5yTKsL7DME9TYYYlAKboN2es9URJe7k65kog0oXh93ht3FYiQ+octgXe0/0Xr0OkfYWQUVquPbxe1s71zgzOXdcx7+d6UIdIDBhZEBjWmcmoaAU7N0kh4jExwk8YSAwJg7n8irVMYUsE7Syf2ICybGVUaK+HENa8QvVXVIjKIxYNZxBZiOsS3IBpXzKkdsocv8MNqO9DwWHtX+0u1gGtprvV/fKJfkUdPuAfX7pp41PKn3qCwyfGcvDgkV6YCHASeWhOSyF+XmG8IvJFVyHS5V5fVmbLNJ2odwbFF5hlKRyU+gRD7qq/hjgeBFodyjYqeUlagyg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=MkZ2gE13I1UcU0OaWmNUYcnAGe/Vxa0Pe6PhDl19euE=;
+ b=cOW1yjvxbiNNPZXa/6j5VUqXknwBnIUFYSl8JrVKjwVnoR2eTd6h2H2QGbADkTAWxAOG/MyX7Br+g7SSYOEIKd4tU5SiZ50Z/OmGsjtfSOjzhwcaOXcycpSvivuY6GyY4ai9EB3OOYmPxYTW5T7L4CGZVa92G8+ogfW8VWyiAlq3nalpqlj7Lt9sgh0nwU5x4r3cxkrhz1nkDFGlhH3fd3MMVlNFwatJ6UOzRPbPs881oIWj1is3rAzeVDhClLjakv8MjUczQOhl2JTYUIrfEmT0HWdMXuPlrXsfEmcEgBv5GAQF0bkCYseuEDWirHa6U/5pg9tiKYzeOL+oTJ3cLQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BL1PR11MB5978.namprd11.prod.outlook.com (2603:10b6:208:385::18)
+ by CO1PR11MB5170.namprd11.prod.outlook.com (2603:10b6:303:91::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6222.33; Wed, 5 Apr
+ 2023 10:53:00 +0000
+Received: from BL1PR11MB5978.namprd11.prod.outlook.com
+ ([fe80::f403:a0a2:e468:c1e9]) by BL1PR11MB5978.namprd11.prod.outlook.com
+ ([fe80::f403:a0a2:e468:c1e9%5]) with mapi id 15.20.6254.033; Wed, 5 Apr 2023
+ 10:53:00 +0000
+From:   "Huang, Kai" <kai.huang@intel.com>
+To:     "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "Christopherson,, Sean" <seanjc@google.com>
+CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH 1/3] KVM: VMX: Don't rely _only_ on CPUID to enforce XCR0
+ restrictions for ECREATE
+Thread-Topic: [PATCH 1/3] KVM: VMX: Don't rely _only_ on CPUID to enforce XCR0
+ restrictions for ECREATE
+Thread-Index: AQHZZ1neYlqkq4ONyEOC8NUatF9pta8cityA
+Date:   Wed, 5 Apr 2023 10:52:59 +0000
+Message-ID: <626179c54707297736158da89ee634705cd6d62f.camel@intel.com>
+References: <20230405005911.423699-1-seanjc@google.com>
+         <20230405005911.423699-2-seanjc@google.com>
+In-Reply-To: <20230405005911.423699-2-seanjc@google.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+user-agent: Evolution 3.46.4 (3.46.4-1.fc37) 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BL1PR11MB5978:EE_|CO1PR11MB5170:EE_
+x-ms-office365-filtering-correlation-id: 26278099-5354-4a45-5589-08db35c3ec1c
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: lso6MsHpkyJVlL5iBZedeazGewUTkqzp2bEAMBR9VYcUOxAvBYrZ4BpZ6F4ZncgWWaNLH9iXe1nHeFF7M8Veg1VR2VNkGXxubYJKrL1o8p398aoUzriRh0LgsuqGYbzSNNKVhVRlbGAMsrg1pAcsTbET3YpnZjhZcq4ZfuE12midbmE/BwArn03v373u/zXEtXumrYzx4ek5XQ0BgBNZJtGx9Fx0JZUdDUYQRy1WIOGH1tofJXpKVAGlbI19f72YHfOKCJCSlGrdX6i2hbVgaj74cf1ezaZ1DtBwZ1dJY7yM4bjcFh3zT1pZ2Hv5MtWQkmyxdr4ujsnKrX8ZBUGLWU8nEFx93+nWLFAuGRKzL7mDuQMHoKTqlyLaxcT8hbIkjLFwUCjIZ665e5vq8QrF2i94lC8Y6xXa91AEtw1a19WI2UOJcZld2gRmirALEWTc4t1fGard+ogN3Ks7eMOEvqHPLJyP1Sm2LthpgVaAzu0yI08AyRMlsFItweAeRHiGYEQxVHBK58AjnL4HT0W4Zult87deu0v/FWNClpBH1nou1/beb8L6A7C5ut7hwjHicB0hC0RKo3/NRkbFoZzL1lCkLyJbckKFuGdZgtOgf//sSDDI+Ont4dEeG3mBLlXO
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR11MB5978.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(376002)(396003)(136003)(39860400002)(346002)(366004)(451199021)(54906003)(8936002)(5660300002)(38100700002)(2616005)(36756003)(26005)(38070700005)(6512007)(6506007)(66446008)(66476007)(64756008)(8676002)(76116006)(91956017)(66946007)(4326008)(2906002)(186003)(86362001)(71200400001)(66556008)(6486002)(83380400001)(41300700001)(122000001)(110136005)(316002)(478600001)(82960400001);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?UzF6TnAvNWpVNmduK3FjSXRxN1NmRzJIVW1XSmtMYXpoUGw3WVVlQWEreFM0?=
+ =?utf-8?B?MFYyMVpHZWFhQ2R6MWZLUmVMWThsSVUxTUpjUDJJSHhsMlBNNWVZYVNXcmRC?=
+ =?utf-8?B?MUdtYTlrY0QzUzlicTFtcHpId2k4eVkxNjFZV3ExamxWcnhxenRTY1hLb0sw?=
+ =?utf-8?B?ay9jOEZKVkdCZjJrRnZQRWJIbTN6Y0xBME9sbzZaWmlTbUhOcTh3ZlJvTFhv?=
+ =?utf-8?B?MUo5dGJTcUdsVFJrWmY5QXo5R2FQVEdYRkduUFVqZk9wTHd1djkzYThjbFNo?=
+ =?utf-8?B?ZGxwZ0lLQkc1b3UxQ1M1UkhCSXJBSkpqejZHVUdTY1hncktOdXNkOTRDUFhr?=
+ =?utf-8?B?dy9hTE0vYnNLOTJoUWsrRExyRGFhQStKTnV2NG1Ub2cxMzFOS3BRbVp5UDla?=
+ =?utf-8?B?MWJvWCtYMnllOUJFRFZEYVNpMEtFL21IUVlLb3c3enlPaGtyaWhLb1VIOWdN?=
+ =?utf-8?B?ZlVnTEJSeFBPeUhvQk9SR2ZGUmRhNDRleWtmdlFWemoraS84NDBhQ3JQY09Q?=
+ =?utf-8?B?ZXR4akVvdkxYSlYyZ0VGYkNRQ0w0L29PMDhFcEJKbGVCMk5hdkhkcXhTdURW?=
+ =?utf-8?B?MHc3KzdQWUtrdkRIcXlrUmlQeU5pZ2V3aFZzZldncUMwYnd1MnkvSGNEV3Nv?=
+ =?utf-8?B?OVBUYVloWHEwQzQ3WlYvNVhYU0I3UEpTVjhLZlRTRVQzeUxNdU45SkEwdXpG?=
+ =?utf-8?B?dmRldE5LSDZtMUxwa1Z3MyttcGphWVJEQnQwL2FUMUhvNzAwUkI1M2JHUmZG?=
+ =?utf-8?B?aSsyaFlDTlF2bWdDSkVaSG1CbHhmNSsvakJvTnpLSzQ4RUNxUjdIQ2FkYjhs?=
+ =?utf-8?B?V0hzZXcxbmt1cTg1WHJQNHlMK2IzYW5admx0RnE3TGlZclpydlpjWmpWcndG?=
+ =?utf-8?B?eHUrK2x2YXhCMFJXL0k1REpWRm5nWC9BN1hTaGtSVGV6Y0lESWhlREhtb1VG?=
+ =?utf-8?B?RDRCdGl0OUd0QVdSc3oyRWRZRzhNQWZ2dXJLUHB5TWVDclN0WXkxYmZLQ0hk?=
+ =?utf-8?B?THhuMURYdXZsRjRDSUl3aU9TTzdGODg0MGxkbFlvZnV5UXZoajltNFhNZ3cz?=
+ =?utf-8?B?M0pjQW1MZEtyb2xNVUpqZUNlZnFKSDl6cjZnZGJwTE4waW0xOThCR3lBaWxG?=
+ =?utf-8?B?b2lYdEY2bE90aFQremVhYi8ydHZCaWxqQ011TFFSNDFCM1Z0ZEdWMGFhMTdN?=
+ =?utf-8?B?WFRDenhrdnd5cmRKanFHVlYrTmlWWWpMVHVDbWVJWmZFVHBubnZ2YUdqNjBm?=
+ =?utf-8?B?S1U2TU91eHd5SnpkOXpWWnVDNlc0bXNXbDY2TDRUaGVMM1M2SGJTejA0a3lK?=
+ =?utf-8?B?ZjJ1ZFN6b0liR2diSXVkd1ptdFZLT0NYaWFqQmc4S3dGdFJuZGNGQTdyMlhj?=
+ =?utf-8?B?T3duZmRWWkdKeFBpVDRkbFJGSytITGdqRXFiSC8ybjNMRk1GRDl6ZDVnaXZX?=
+ =?utf-8?B?OWhWdTJGYXRpS0MzLzJnbmU1MlN1RTRGNVhLRmxINkJGcUJHZUxjNjl2SHY1?=
+ =?utf-8?B?U0JiSjFnNWhwM3htdWxhamdMVTllMi85SjlZSG1lTk5pK3Zac0J5OTlsNERh?=
+ =?utf-8?B?eGI2UUJzd0UrVFk0Vkx5NVdEUWYzMXdRRFZvZzh6ellwSnBsdlkrVi93VENM?=
+ =?utf-8?B?eEtEZXJ6TU5iSHR6SzlqVXZxWTBiYkxTL25LS3QvQTJNSk9MeXpwUWk0ZlpX?=
+ =?utf-8?B?ejlkaEk0cWZmaUJ0LzZJcEx5a2UxbGxqRk84WHBPZ0dGYzY3MjhYV1Rmenhi?=
+ =?utf-8?B?ZmZER3JVQkZQNHJnbVJRTzUreDErckR1QjdlSHMrZ3hIKzFmcFdYWlVNblZp?=
+ =?utf-8?B?Q3h0MkVlVDRYeDNySitkRHl4QlRPZFRKeHZSWmZBdzJFWUVUY1d4U0RyWUF4?=
+ =?utf-8?B?OHNNaWMwU1I1RjJZNGpweVhLSDZ0K0J0SEJBNzQ0cHRDSGYydDFEeTdYZEF6?=
+ =?utf-8?B?NmxhNEdCeUR2RmVoTFpPTUdVYUF2UTlkOVBLemJkNVl0T2F1V2cwM1Z5L2k5?=
+ =?utf-8?B?L2dTd3YyUGRGYnBHSFhjOGFXTzVhSURoTVdXa2p4ODYzVytqRXAyM3JiMUh4?=
+ =?utf-8?B?ZkF4Mkp3UlluY3FWVjI0ZFRxVDNtZGg0dHhENmdNdU4xUkZXajE4a0o1Z3hP?=
+ =?utf-8?Q?LhzxOtlJNnir2cSxxtoQG08T3?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <5A8471DEA3E80E42BCCD193F5D6B26D6@namprd11.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
-        DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS
-        autolearn=unavailable autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BL1PR11MB5978.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 26278099-5354-4a45-5589-08db35c3ec1c
+X-MS-Exchange-CrossTenant-originalarrivaltime: 05 Apr 2023 10:52:59.9052
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 0AT3bi+o5X3bVC2OXpGu0fd20Xp3aTObq9eOQNHRMuFULJJT29Mci4GXOAEysJh5kDpWe7MwZ6GVnJLKLuMJjQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO1PR11MB5170
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-2.5 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-We want all accelerators to share the same opaque pointer in
-CPUState.
-
-Rename the 'hvf_vcpu_state' structure as 'AccelvCPUState'.
-
-Use the generic 'accel' field of CPUState instead of 'hvf'.
-
-Replace g_malloc0() by g_new0() for readability.
-
-Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
----
- include/hw/core/cpu.h     |  3 --
- include/sysemu/hvf_int.h  |  2 +-
- accel/hvf/hvf-accel-ops.c | 16 ++++-----
- target/arm/hvf/hvf.c      | 70 +++++++++++++++++++--------------------
- 4 files changed, 44 insertions(+), 47 deletions(-)
-
-diff --git a/include/hw/core/cpu.h b/include/hw/core/cpu.h
-index 8d27861ed5..1dc5efe650 100644
---- a/include/hw/core/cpu.h
-+++ b/include/hw/core/cpu.h
-@@ -236,7 +236,6 @@ typedef struct SavedIOTLB {
- struct KVMState;
- struct kvm_run;
- struct AccelvCPUState;
--struct hvf_vcpu_state;
- 
- /* work queue */
- 
-@@ -442,8 +441,6 @@ struct CPUState {
-     /* Used for user-only emulation of prctl(PR_SET_UNALIGN). */
-     bool prctl_unalign_sigbus;
- 
--    struct hvf_vcpu_state *hvf;
--
-     /* track IOMMUs whose translations we've cached in the TCG TLB */
-     GArray *iommu_notifiers;
- };
-diff --git a/include/sysemu/hvf_int.h b/include/sysemu/hvf_int.h
-index 6545f7cd61..96ef51f4df 100644
---- a/include/sysemu/hvf_int.h
-+++ b/include/sysemu/hvf_int.h
-@@ -48,7 +48,7 @@ struct HVFState {
- };
- extern HVFState *hvf_state;
- 
--struct hvf_vcpu_state {
-+struct AccelvCPUState {
-     uint64_t fd;
-     void *exit;
-     bool vtimer_masked;
-diff --git a/accel/hvf/hvf-accel-ops.c b/accel/hvf/hvf-accel-ops.c
-index 24913ca9c4..06ca1d59a4 100644
---- a/accel/hvf/hvf-accel-ops.c
-+++ b/accel/hvf/hvf-accel-ops.c
-@@ -363,19 +363,19 @@ type_init(hvf_type_init);
- 
- static void hvf_vcpu_destroy(CPUState *cpu)
- {
--    hv_return_t ret = hv_vcpu_destroy(cpu->hvf->fd);
-+    hv_return_t ret = hv_vcpu_destroy(cpu->accel->fd);
-     assert_hvf_ok(ret);
- 
-     hvf_arch_vcpu_destroy(cpu);
--    g_free(cpu->hvf);
--    cpu->hvf = NULL;
-+    g_free(cpu->accel);
-+    cpu->accel = NULL;
- }
- 
- static int hvf_init_vcpu(CPUState *cpu)
- {
-     int r;
- 
--    cpu->hvf = g_malloc0(sizeof(*cpu->hvf));
-+    cpu->accel = g_new0(struct AccelvCPUState, 1);
- 
-     /* init cpu signals */
-     struct sigaction sigact;
-@@ -384,13 +384,13 @@ static int hvf_init_vcpu(CPUState *cpu)
-     sigact.sa_handler = dummy_signal;
-     sigaction(SIG_IPI, &sigact, NULL);
- 
--    pthread_sigmask(SIG_BLOCK, NULL, &cpu->hvf->unblock_ipi_mask);
--    sigdelset(&cpu->hvf->unblock_ipi_mask, SIG_IPI);
-+    pthread_sigmask(SIG_BLOCK, NULL, &cpu->accel->unblock_ipi_mask);
-+    sigdelset(&cpu->accel->unblock_ipi_mask, SIG_IPI);
- 
- #ifdef __aarch64__
--    r = hv_vcpu_create(&cpu->hvf->fd, (hv_vcpu_exit_t **)&cpu->hvf->exit, NULL);
-+    r = hv_vcpu_create(&cpu->accel->fd, (hv_vcpu_exit_t **)&cpu->accel->exit, NULL);
- #else
--    r = hv_vcpu_create((hv_vcpuid_t *)&cpu->hvf->fd, HV_VCPU_DEFAULT);
-+    r = hv_vcpu_create((hv_vcpuid_t *)&cpu->accel->fd, HV_VCPU_DEFAULT);
- #endif
-     cpu->vcpu_dirty = 1;
-     assert_hvf_ok(r);
-diff --git a/target/arm/hvf/hvf.c b/target/arm/hvf/hvf.c
-index ad65603445..b85648b61c 100644
---- a/target/arm/hvf/hvf.c
-+++ b/target/arm/hvf/hvf.c
-@@ -366,29 +366,29 @@ int hvf_get_registers(CPUState *cpu)
-     int i;
- 
-     for (i = 0; i < ARRAY_SIZE(hvf_reg_match); i++) {
--        ret = hv_vcpu_get_reg(cpu->hvf->fd, hvf_reg_match[i].reg, &val);
-+        ret = hv_vcpu_get_reg(cpu->accel->fd, hvf_reg_match[i].reg, &val);
-         *(uint64_t *)((void *)env + hvf_reg_match[i].offset) = val;
-         assert_hvf_ok(ret);
-     }
- 
-     for (i = 0; i < ARRAY_SIZE(hvf_fpreg_match); i++) {
--        ret = hv_vcpu_get_simd_fp_reg(cpu->hvf->fd, hvf_fpreg_match[i].reg,
-+        ret = hv_vcpu_get_simd_fp_reg(cpu->accel->fd, hvf_fpreg_match[i].reg,
-                                       &fpval);
-         memcpy((void *)env + hvf_fpreg_match[i].offset, &fpval, sizeof(fpval));
-         assert_hvf_ok(ret);
-     }
- 
-     val = 0;
--    ret = hv_vcpu_get_reg(cpu->hvf->fd, HV_REG_FPCR, &val);
-+    ret = hv_vcpu_get_reg(cpu->accel->fd, HV_REG_FPCR, &val);
-     assert_hvf_ok(ret);
-     vfp_set_fpcr(env, val);
- 
-     val = 0;
--    ret = hv_vcpu_get_reg(cpu->hvf->fd, HV_REG_FPSR, &val);
-+    ret = hv_vcpu_get_reg(cpu->accel->fd, HV_REG_FPSR, &val);
-     assert_hvf_ok(ret);
-     vfp_set_fpsr(env, val);
- 
--    ret = hv_vcpu_get_reg(cpu->hvf->fd, HV_REG_CPSR, &val);
-+    ret = hv_vcpu_get_reg(cpu->accel->fd, HV_REG_CPSR, &val);
-     assert_hvf_ok(ret);
-     pstate_write(env, val);
- 
-@@ -397,7 +397,7 @@ int hvf_get_registers(CPUState *cpu)
-             continue;
-         }
- 
--        ret = hv_vcpu_get_sys_reg(cpu->hvf->fd, hvf_sreg_match[i].reg, &val);
-+        ret = hv_vcpu_get_sys_reg(cpu->accel->fd, hvf_sreg_match[i].reg, &val);
-         assert_hvf_ok(ret);
- 
-         arm_cpu->cpreg_values[hvf_sreg_match[i].cp_idx] = val;
-@@ -420,24 +420,24 @@ int hvf_put_registers(CPUState *cpu)
- 
-     for (i = 0; i < ARRAY_SIZE(hvf_reg_match); i++) {
-         val = *(uint64_t *)((void *)env + hvf_reg_match[i].offset);
--        ret = hv_vcpu_set_reg(cpu->hvf->fd, hvf_reg_match[i].reg, val);
-+        ret = hv_vcpu_set_reg(cpu->accel->fd, hvf_reg_match[i].reg, val);
-         assert_hvf_ok(ret);
-     }
- 
-     for (i = 0; i < ARRAY_SIZE(hvf_fpreg_match); i++) {
-         memcpy(&fpval, (void *)env + hvf_fpreg_match[i].offset, sizeof(fpval));
--        ret = hv_vcpu_set_simd_fp_reg(cpu->hvf->fd, hvf_fpreg_match[i].reg,
-+        ret = hv_vcpu_set_simd_fp_reg(cpu->accel->fd, hvf_fpreg_match[i].reg,
-                                       fpval);
-         assert_hvf_ok(ret);
-     }
- 
--    ret = hv_vcpu_set_reg(cpu->hvf->fd, HV_REG_FPCR, vfp_get_fpcr(env));
-+    ret = hv_vcpu_set_reg(cpu->accel->fd, HV_REG_FPCR, vfp_get_fpcr(env));
-     assert_hvf_ok(ret);
- 
--    ret = hv_vcpu_set_reg(cpu->hvf->fd, HV_REG_FPSR, vfp_get_fpsr(env));
-+    ret = hv_vcpu_set_reg(cpu->accel->fd, HV_REG_FPSR, vfp_get_fpsr(env));
-     assert_hvf_ok(ret);
- 
--    ret = hv_vcpu_set_reg(cpu->hvf->fd, HV_REG_CPSR, pstate_read(env));
-+    ret = hv_vcpu_set_reg(cpu->accel->fd, HV_REG_CPSR, pstate_read(env));
-     assert_hvf_ok(ret);
- 
-     aarch64_save_sp(env, arm_current_el(env));
-@@ -449,11 +449,11 @@ int hvf_put_registers(CPUState *cpu)
-         }
- 
-         val = arm_cpu->cpreg_values[hvf_sreg_match[i].cp_idx];
--        ret = hv_vcpu_set_sys_reg(cpu->hvf->fd, hvf_sreg_match[i].reg, val);
-+        ret = hv_vcpu_set_sys_reg(cpu->accel->fd, hvf_sreg_match[i].reg, val);
-         assert_hvf_ok(ret);
-     }
- 
--    ret = hv_vcpu_set_vtimer_offset(cpu->hvf->fd, hvf_state->vtimer_offset);
-+    ret = hv_vcpu_set_vtimer_offset(cpu->accel->fd, hvf_state->vtimer_offset);
-     assert_hvf_ok(ret);
- 
-     return 0;
-@@ -474,7 +474,7 @@ static void hvf_set_reg(CPUState *cpu, int rt, uint64_t val)
-     flush_cpu_state(cpu);
- 
-     if (rt < 31) {
--        r = hv_vcpu_set_reg(cpu->hvf->fd, HV_REG_X0 + rt, val);
-+        r = hv_vcpu_set_reg(cpu->accel->fd, HV_REG_X0 + rt, val);
-         assert_hvf_ok(r);
-     }
- }
-@@ -487,7 +487,7 @@ static uint64_t hvf_get_reg(CPUState *cpu, int rt)
-     flush_cpu_state(cpu);
- 
-     if (rt < 31) {
--        r = hv_vcpu_get_reg(cpu->hvf->fd, HV_REG_X0 + rt, &val);
-+        r = hv_vcpu_get_reg(cpu->accel->fd, HV_REG_X0 + rt, &val);
-         assert_hvf_ok(r);
-     }
- 
-@@ -629,22 +629,22 @@ int hvf_arch_init_vcpu(CPUState *cpu)
-     assert(write_cpustate_to_list(arm_cpu, false));
- 
-     /* Set CP_NO_RAW system registers on init */
--    ret = hv_vcpu_set_sys_reg(cpu->hvf->fd, HV_SYS_REG_MIDR_EL1,
-+    ret = hv_vcpu_set_sys_reg(cpu->accel->fd, HV_SYS_REG_MIDR_EL1,
-                               arm_cpu->midr);
-     assert_hvf_ok(ret);
- 
--    ret = hv_vcpu_set_sys_reg(cpu->hvf->fd, HV_SYS_REG_MPIDR_EL1,
-+    ret = hv_vcpu_set_sys_reg(cpu->accel->fd, HV_SYS_REG_MPIDR_EL1,
-                               arm_cpu->mp_affinity);
-     assert_hvf_ok(ret);
- 
--    ret = hv_vcpu_get_sys_reg(cpu->hvf->fd, HV_SYS_REG_ID_AA64PFR0_EL1, &pfr);
-+    ret = hv_vcpu_get_sys_reg(cpu->accel->fd, HV_SYS_REG_ID_AA64PFR0_EL1, &pfr);
-     assert_hvf_ok(ret);
-     pfr |= env->gicv3state ? (1 << 24) : 0;
--    ret = hv_vcpu_set_sys_reg(cpu->hvf->fd, HV_SYS_REG_ID_AA64PFR0_EL1, pfr);
-+    ret = hv_vcpu_set_sys_reg(cpu->accel->fd, HV_SYS_REG_ID_AA64PFR0_EL1, pfr);
-     assert_hvf_ok(ret);
- 
-     /* We're limited to underlying hardware caps, override internal versions */
--    ret = hv_vcpu_get_sys_reg(cpu->hvf->fd, HV_SYS_REG_ID_AA64MMFR0_EL1,
-+    ret = hv_vcpu_get_sys_reg(cpu->accel->fd, HV_SYS_REG_ID_AA64MMFR0_EL1,
-                               &arm_cpu->isar.id_aa64mmfr0);
-     assert_hvf_ok(ret);
- 
-@@ -654,7 +654,7 @@ int hvf_arch_init_vcpu(CPUState *cpu)
- void hvf_kick_vcpu_thread(CPUState *cpu)
- {
-     cpus_kick_thread(cpu);
--    hv_vcpus_exit(&cpu->hvf->fd, 1);
-+    hv_vcpus_exit(&cpu->accel->fd, 1);
- }
- 
- static void hvf_raise_exception(CPUState *cpu, uint32_t excp,
-@@ -1191,13 +1191,13 @@ static int hvf_inject_interrupts(CPUState *cpu)
- {
-     if (cpu->interrupt_request & CPU_INTERRUPT_FIQ) {
-         trace_hvf_inject_fiq();
--        hv_vcpu_set_pending_interrupt(cpu->hvf->fd, HV_INTERRUPT_TYPE_FIQ,
-+        hv_vcpu_set_pending_interrupt(cpu->accel->fd, HV_INTERRUPT_TYPE_FIQ,
-                                       true);
-     }
- 
-     if (cpu->interrupt_request & CPU_INTERRUPT_HARD) {
-         trace_hvf_inject_irq();
--        hv_vcpu_set_pending_interrupt(cpu->hvf->fd, HV_INTERRUPT_TYPE_IRQ,
-+        hv_vcpu_set_pending_interrupt(cpu->accel->fd, HV_INTERRUPT_TYPE_IRQ,
-                                       true);
-     }
- 
-@@ -1231,7 +1231,7 @@ static void hvf_wait_for_ipi(CPUState *cpu, struct timespec *ts)
-      */
-     qatomic_mb_set(&cpu->thread_kicked, false);
-     qemu_mutex_unlock_iothread();
--    pselect(0, 0, 0, 0, ts, &cpu->hvf->unblock_ipi_mask);
-+    pselect(0, 0, 0, 0, ts, &cpu->accel->unblock_ipi_mask);
-     qemu_mutex_lock_iothread();
- }
- 
-@@ -1252,7 +1252,7 @@ static void hvf_wfi(CPUState *cpu)
-         return;
-     }
- 
--    r = hv_vcpu_get_sys_reg(cpu->hvf->fd, HV_SYS_REG_CNTV_CTL_EL0, &ctl);
-+    r = hv_vcpu_get_sys_reg(cpu->accel->fd, HV_SYS_REG_CNTV_CTL_EL0, &ctl);
-     assert_hvf_ok(r);
- 
-     if (!(ctl & 1) || (ctl & 2)) {
-@@ -1261,7 +1261,7 @@ static void hvf_wfi(CPUState *cpu)
-         return;
-     }
- 
--    r = hv_vcpu_get_sys_reg(cpu->hvf->fd, HV_SYS_REG_CNTV_CVAL_EL0, &cval);
-+    r = hv_vcpu_get_sys_reg(cpu->accel->fd, HV_SYS_REG_CNTV_CVAL_EL0, &cval);
-     assert_hvf_ok(r);
- 
-     ticks_to_sleep = cval - hvf_vtimer_val();
-@@ -1294,12 +1294,12 @@ static void hvf_sync_vtimer(CPUState *cpu)
-     uint64_t ctl;
-     bool irq_state;
- 
--    if (!cpu->hvf->vtimer_masked) {
-+    if (!cpu->accel->vtimer_masked) {
-         /* We will get notified on vtimer changes by hvf, nothing to do */
-         return;
-     }
- 
--    r = hv_vcpu_get_sys_reg(cpu->hvf->fd, HV_SYS_REG_CNTV_CTL_EL0, &ctl);
-+    r = hv_vcpu_get_sys_reg(cpu->accel->fd, HV_SYS_REG_CNTV_CTL_EL0, &ctl);
-     assert_hvf_ok(r);
- 
-     irq_state = (ctl & (TMR_CTL_ENABLE | TMR_CTL_IMASK | TMR_CTL_ISTATUS)) ==
-@@ -1308,8 +1308,8 @@ static void hvf_sync_vtimer(CPUState *cpu)
- 
-     if (!irq_state) {
-         /* Timer no longer asserting, we can unmask it */
--        hv_vcpu_set_vtimer_mask(cpu->hvf->fd, false);
--        cpu->hvf->vtimer_masked = false;
-+        hv_vcpu_set_vtimer_mask(cpu->accel->fd, false);
-+        cpu->accel->vtimer_masked = false;
-     }
- }
- 
-@@ -1317,7 +1317,7 @@ int hvf_vcpu_exec(CPUState *cpu)
- {
-     ARMCPU *arm_cpu = ARM_CPU(cpu);
-     CPUARMState *env = &arm_cpu->env;
--    hv_vcpu_exit_t *hvf_exit = cpu->hvf->exit;
-+    hv_vcpu_exit_t *hvf_exit = cpu->accel->exit;
-     hv_return_t r;
-     bool advance_pc = false;
- 
-@@ -1332,7 +1332,7 @@ int hvf_vcpu_exec(CPUState *cpu)
-     flush_cpu_state(cpu);
- 
-     qemu_mutex_unlock_iothread();
--    assert_hvf_ok(hv_vcpu_run(cpu->hvf->fd));
-+    assert_hvf_ok(hv_vcpu_run(cpu->accel->fd));
- 
-     /* handle VMEXIT */
-     uint64_t exit_reason = hvf_exit->reason;
-@@ -1346,7 +1346,7 @@ int hvf_vcpu_exec(CPUState *cpu)
-         break;
-     case HV_EXIT_REASON_VTIMER_ACTIVATED:
-         qemu_set_irq(arm_cpu->gt_timer_outputs[GTIMER_VIRT], 1);
--        cpu->hvf->vtimer_masked = true;
-+        cpu->accel->vtimer_masked = true;
-         return 0;
-     case HV_EXIT_REASON_CANCELED:
-         /* we got kicked, no exit to process */
-@@ -1457,10 +1457,10 @@ int hvf_vcpu_exec(CPUState *cpu)
- 
-         flush_cpu_state(cpu);
- 
--        r = hv_vcpu_get_reg(cpu->hvf->fd, HV_REG_PC, &pc);
-+        r = hv_vcpu_get_reg(cpu->accel->fd, HV_REG_PC, &pc);
-         assert_hvf_ok(r);
-         pc += 4;
--        r = hv_vcpu_set_reg(cpu->hvf->fd, HV_REG_PC, pc);
-+        r = hv_vcpu_set_reg(cpu->accel->fd, HV_REG_PC, pc);
-         assert_hvf_ok(r);
-     }
- 
--- 
-2.38.1
-
+T24gVHVlLCAyMDIzLTA0LTA0IGF0IDE3OjU5IC0wNzAwLCBTZWFuIENocmlzdG9waGVyc29uIHdy
+b3RlOg0KPiBFeHBsaWNpdGx5IGNoZWNrIHRoZSB2Q1BVJ3Mgc3VwcG9ydGVkIFhDUjAgd2hlbiBk
+ZXRlcm1pbmluZyB3aGV0aGVyIG9yIG5vdA0KPiB0aGUgWEZSTSBmb3IgRUNSRUFURSBpcyB2YWxp
+ZC4gIENoZWNraW5nIENQVUlEIHdvcmtzIGJlY2F1c2UgS1ZNIHVwZGF0ZXMNCj4gZ3Vlc3QgQ1BV
+SUQuMHgxMi4xIHRvIHJlc3RyaWN0IHRoZSBsZWFmIHRvIGEgc3Vic2V0IG9mIHRoZSBndWVzdCdz
+IGFsbG93ZWQNCj4gWENSMCwgYnV0IHRoYXQgaXMgcmF0aGVyIHN1YnRsZSBhbmQgS1ZNIHNob3Vs
+ZCBub3QgbW9kaWZ5IGd1ZXN0IENQVUlEDQo+IGV4Y2VwdCBmb3IgbW9kZWxpbmcgdHJ1ZSBydW50
+aW1lIGJlaGF2aW9yIChhbGxvd2VkIFhGUk0gaXMgbW9zdCBkZWZpbml0ZWx5DQo+IG5vdCAicnVu
+dGltZSIgYmVoYXZpb3IpLg0KPiANCj4gU2lnbmVkLW9mZi1ieTogU2VhbiBDaHJpc3RvcGhlcnNv
+biA8c2VhbmpjQGdvb2dsZS5jb20+DQo+IC0tLQ0KPiAgYXJjaC94ODYva3ZtL3ZteC9zZ3guYyB8
+IDMgKystDQo+ICAxIGZpbGUgY2hhbmdlZCwgMiBpbnNlcnRpb25zKCspLCAxIGRlbGV0aW9uKC0p
+DQo+IA0KPiBkaWZmIC0tZ2l0IGEvYXJjaC94ODYva3ZtL3ZteC9zZ3guYyBiL2FyY2gveDg2L2t2
+bS92bXgvc2d4LmMNCj4gaW5kZXggYWE1M2M5ODAzNGJmLi4zNjJhMzFiMTliMGUgMTAwNjQ0DQo+
+IC0tLSBhL2FyY2gveDg2L2t2bS92bXgvc2d4LmMNCj4gKysrIGIvYXJjaC94ODYva3ZtL3ZteC9z
+Z3guYw0KPiBAQCAtMTc1LDcgKzE3NSw4IEBAIHN0YXRpYyBpbnQgX19oYW5kbGVfZW5jbHNfZWNy
+ZWF0ZShzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsDQo+ICAJICAgICh1MzIpYXR0cmlidXRlcyAmIH5z
+Z3hfMTJfMS0+ZWF4IHx8DQo+ICAJICAgICh1MzIpKGF0dHJpYnV0ZXMgPj4gMzIpICYgfnNneF8x
+Ml8xLT5lYnggfHwNCj4gIAkgICAgKHUzMil4ZnJtICYgfnNneF8xMl8xLT5lY3ggfHwNCj4gLQkg
+ICAgKHUzMikoeGZybSA+PiAzMikgJiB+c2d4XzEyXzEtPmVkeCkgew0KPiArCSAgICAodTMyKSh4
+ZnJtID4+IDMyKSAmIH5zZ3hfMTJfMS0+ZWR4IHx8DQo+ICsJICAgIHhmcm0gJiB+dmNwdS0+YXJj
+aC5ndWVzdF9zdXBwb3J0ZWRfeGNyMCkgew0KDQpQZXJoYXBzIHRoaXMgY2hhbmdlIGlzIG5lZWRl
+ZCBldmVuIHdpdGhvdXQgcGF0Y2ggMj8NCg0KVGhpcyBpcyBiZWNhdXNlIHdoZW4gQ1BVSUQgMHhE
+IGRvZXNuJ3QgZXhpc3QsIGd1ZXN0X3N1cHBvcnRlZF94Y3IwIGlzIDAuICBCdXQNCndoZW4gQ1BV
+SUQgMHhEIGRvZXNuJ3QgZXhpc3QsIElJVUMgY3VycmVudGx5IEtWTSBkb2Vzbid0IGNsZWFyIFNH
+WCBpbiBDUFVJRCwgYW5kDQpzZ3hfMTJfMS0+ZWN4IGlzIGFsd2F5cyBzZXQgdG8gMHgzLiDCoA0K
+DQpfX2hhbmRsZV9lbmNsc19lcmVhdGUoKSBkb2Vzbid0IGNoZWNrIENQVUlEIDB4RCBlaXRoZXIs
+IHNvIHcvbyBhYm92ZSBleHBsaWNpdA0KY2hlY2sgeGZybSBhZ2FpbnN0IGd1ZXN0X3N1cHBvcnRl
+ZF94Y3IwLCBpdCBzZWVtcyBndWVzdCBjYW4gc3VjY2Vzc2Z1bGx5IHJ1bg0KRUNSRUFURSB3aGVu
+IGl0IGRvZXNuJ3QgaGF2ZSBDUFVJRCAweEQ/DQoNCg0KPiAgCQlrdm1faW5qZWN0X2dwKHZjcHUs
+IDApOw0KPiAgCQlyZXR1cm4gMTsNCj4gIAl9DQo+IC0tIA0KPiAyLjQwLjAuMzQ4LmdmOTM4YjA5
+MzY2LWdvb2cNCj4gDQoNCg==
