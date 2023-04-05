@@ -2,79 +2,86 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3575D6D7C9B
-	for <lists+kvm@lfdr.de>; Wed,  5 Apr 2023 14:31:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CC2E66D7CB9
+	for <lists+kvm@lfdr.de>; Wed,  5 Apr 2023 14:35:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237766AbjDEMbF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Apr 2023 08:31:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40918 "EHLO
+        id S238026AbjDEMfT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Apr 2023 08:35:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46676 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230012AbjDEMbE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Apr 2023 08:31:04 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D1A61BD0
-        for <kvm@vger.kernel.org>; Wed,  5 Apr 2023 05:30:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1680697816;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=C3GXrj5/vq69zV8qx7J6eRA4bit5KAugf7Eq6t8FZsw=;
-        b=JYHvCAlAY9ObinBgw7w2lOT/+yidF3J2xGflzq3bS/NJiZGJ9KYPFg8U9HBdWmzrt0k/EK
-        H9FZNdtDf90KMQPdKdK2DwIAwea5c+D7yT/3Kby+hY96I1tspwGAI/vK8oavr12rIEo5m1
-        Rbwf+vjU6mQRhKqO/0e2Y9l6GvSWBVU=
-Received: from mail-vs1-f69.google.com (mail-vs1-f69.google.com
- [209.85.217.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-616-2RBezu62PUadzH1j5kSpHg-1; Wed, 05 Apr 2023 08:30:15 -0400
-X-MC-Unique: 2RBezu62PUadzH1j5kSpHg-1
-Received: by mail-vs1-f69.google.com with SMTP id m4-20020a67e0c4000000b004263667c260so12608078vsl.17
-        for <kvm@vger.kernel.org>; Wed, 05 Apr 2023 05:30:15 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680697815; x=1683289815;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=C3GXrj5/vq69zV8qx7J6eRA4bit5KAugf7Eq6t8FZsw=;
-        b=21UGDrLhiokGkTcr4Qpzg41BQjdJ+s/IYQe0Q88B+oPpeqL0P0xRmsw35v3Gwzkrhg
-         huF3LIgt9c6jVWElDtkpH95AfNXuDNxAWn+lomExA+ZngTXhEkCk19i8QAMZDJgXf9zI
-         TFoyGEXw14nHRNQNC6gsPwM0BPqAoHjmrih8f49MChlVHF3yMN690b7xN4Ce7F4y0ryN
-         6C8nHfg/zKD3E6hiGHlZnzJkMdQbj8Nz1Hciyel2INBPB1mUDfwqGmMdN+LpM07bzhwY
-         P7BGCnPd0boM6Egn2bWDfJyp1DnLrhsSOBsyvSa2LxyQMzI0KwqGC3aqHT58oMuA6JJF
-         eXCQ==
-X-Gm-Message-State: AAQBX9fjmT5Xfwu87XwP9idVzxKtW41KCMLykx0jAnbnw71ozKzR1yrL
-        qI3Slb0GdYeTZGhN5p59Mx3m9Kf+5O57pZWdCdro3ajwUajYaXRnkljUFG3Fr6T8zK4hXCJeUHb
-        HGuXFWiq0kR1pJY+pLbGaUCilgmoQ
-X-Received: by 2002:a67:d704:0:b0:425:f1d7:79f7 with SMTP id p4-20020a67d704000000b00425f1d779f7mr4842483vsj.1.1680697815030;
-        Wed, 05 Apr 2023 05:30:15 -0700 (PDT)
-X-Google-Smtp-Source: AKy350ZWVrFn5g7e+YJRp0HKSNr8gj3Lv/ZvTaL9NH7QwVvqIbpkGKu8U4X0hZjxC1r4mvle1Pd9h29lyXeZEw/xNXI=
-X-Received: by 2002:a67:d704:0:b0:425:f1d7:79f7 with SMTP id
- p4-20020a67d704000000b00425f1d779f7mr4842469vsj.1.1680697814765; Wed, 05 Apr
- 2023 05:30:14 -0700 (PDT)
+        with ESMTP id S237079AbjDEMfS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Apr 2023 08:35:18 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65B011BD0;
+        Wed,  5 Apr 2023 05:35:17 -0700 (PDT)
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 335AwRGE011355;
+        Wed, 5 Apr 2023 12:35:17 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=NpidT9U3QfRUXL0IvUatJaeWukJJg8CKx/psZwauPGs=;
+ b=BLWf1puQeJq4rErb1tU5YH82ylhv5CvA+6yACoufSuovbLlhgxJueAG5YZFtX05IsIeN
+ FIgfo/Oa1mwcbnKKIiOKCH5uBirw81p8OpAZpPT+kGIsDlzfMkj1FfzJRarsgxHx7aI6
+ 5nM0C/9Kv0MQrP/3I6ZUFYw5GEeo0GVFyHkcuGOkOcIJNn5LpMojHrAGQqnOnYsz22BM
+ AICnd3kpu16hxoTjkJB6VHUvcOScLne9+XTLuhJ1oI7OXzynaNytoQ3CXQs5eAE9mX/g
+ sOHXck4gBXvHximjy7uPl04MRWaOejTknYGUNGrR1Yw+lfEtbRgNwbpvK2EFJHLL8sIb Zw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ps7pt2cft-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 05 Apr 2023 12:35:16 +0000
+Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 335BfpTh005013;
+        Wed, 5 Apr 2023 12:35:16 GMT
+Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ps7pt2cea-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 05 Apr 2023 12:35:16 +0000
+Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
+        by ppma04fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3350esU6009693;
+        Wed, 5 Apr 2023 12:35:13 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+        by ppma04fra.de.ibm.com (PPS) with ESMTPS id 3ppc86tgyh-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 05 Apr 2023 12:35:13 +0000
+Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
+        by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 335CZAUD17695426
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 5 Apr 2023 12:35:10 GMT
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id ECCFB20043;
+        Wed,  5 Apr 2023 12:35:09 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 9C8FA20040;
+        Wed,  5 Apr 2023 12:35:09 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+        by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Wed,  5 Apr 2023 12:35:09 +0000 (GMT)
+From:   Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+To:     Nico Boehr <nrb@linux.ibm.com>, Thomas Huth <thuth@redhat.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc:     Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org
+Subject: [kvm-unit-tests PATCH v1] s390x: Improve stack traces that contain an interrupt frame
+Date:   Wed,  5 Apr 2023 14:35:08 +0200
+Message-Id: <20230405123508.854034-1-nsg@linux.ibm.com>
+X-Mailer: git-send-email 2.37.2
 MIME-Version: 1.0
-References: <SA1PR11MB673463616F7B1318874D11A3A8909@SA1PR11MB6734.namprd11.prod.outlook.com>
-In-Reply-To: <SA1PR11MB673463616F7B1318874D11A3A8909@SA1PR11MB6734.namprd11.prod.outlook.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Date:   Wed, 5 Apr 2023 14:30:03 +0200
-Message-ID: <CABgObfaJwgBKkSfp=GP437jEKTP=_eCktdiKcujeSOgwv9dbiQ@mail.gmail.com>
-Subject: Re: The necessity of injecting a hardware exception reported in VMX
- IDT vectoring information
-To:     "Li, Xin3" <xin3.li@intel.com>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Christopherson,, Sean" <seanjc@google.com>,
-        "Li, Xiaoyao" <xiaoyao.li@intel.com>,
-        "Yao, Yuan" <yuan.yao@intel.com>,
-        "Dong, Eddie" <eddie.dong@intel.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "Nakajima, Jun" <jun.nakajima@intel.com>,
-        "H.Peter Anvin" <hpa@zytor.com>,
-        "Mallick, Asit K" <asit.k.mallick@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: FfYLv27Y2zutJJfnGZhyVEFRn3ViKU06
+X-Proofpoint-ORIG-GUID: sVbOpcwKRGNChpmPoPPOuEwu3KT7Bfoi
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
+ definitions=2023-04-05_07,2023-04-05_01,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 suspectscore=0
+ mlxlogscore=576 impostorscore=0 phishscore=0 bulkscore=0 spamscore=0
+ mlxscore=0 lowpriorityscore=0 priorityscore=1501 malwarescore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2303200000 definitions=main-2304050113
+X-Spam-Status: No, score=-0.1 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
+        DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -82,54 +89,109 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Apr 5, 2023 at 11:34=E2=80=AFAM Li, Xin3 <xin3.li@intel.com> wrote:
-> The question is, must KVM inject a hardware exception from the IDT vector=
-ing
-> information field? Is there any correctness issue if KVM does not?
+When we encounter an unexpected interrupt we print a stack trace.
+While we can identify the interrupting instruction via the old psw,
+we don't really have a way to identify callers further up the stack,
+since we rely on the s390x elf abi calling convention to perform the
+backtrace. An interrupt is not a call, so there are no guarantees about
+the contents of the stack and return address registers.
+If we get lucky their content is as we need it or valid for a previous
+callee in which case we print one wrong caller and then proceed with the
+correct ones.
 
-Fault exceptions probably can be handled as you say, but traps
-definitely have to be reinjected. For example, not reinjecting a
-singlestep #DB would cause the guest to miss the exception for that
-instruction.
+Warn about the stack trace above the interrupting instruction possibly
+not being correct by inserting a new stack frame with a warning symbol.
+Also identify the interrupted instruction.
 
-> If no correctness issue, it's better to not do it, because the injected e=
-vent
-> from IDT vectoring could trigger another exception, i.e., a nested except=
-ion,
-> and after the nested exception is handled, the CPU resumes to re-trigger =
-the
-> original event, which makes not much sense to inject it.
+For example:
 
-(Let's use "second" exception instead of "nested" exception).
+0x00000000000150f1: print_pgm_info at lib/s390x/interrupt.c:255
+ (inlined by) handle_pgm_int at lib/s390x/interrupt.c:274
+0x0000000000011099: pgm_int at s390x/cstart64.S:97
+0x0000000000014523: sclp_service_call at lib/s390x/sclp.c:185
+0x0000000000000000: lowcore at lib/s390x/asm/arch_def.h:172
+0x0000000000014b8b: console_refill_read_buffer at lib/s390x/sclp-console.c:259
+ (inlined by) __getchar at lib/s390x/sclp-console.c:290
+0x00000000000188ef: getchar at lib/getchar.c:8
 
-The CPU doesn't re-trigger the original event unless the second
-exception causes a vmexit and the hypervisor moves the IDT-vectored
-event fields to the event injection fields. In this case, the first
-exception wasn't injected at all.
+becomes:
 
-If the second exception does not cause a vmexit, it is handled as
-usual by the processor (by checking if the two exceptions are benign,
-contributory or page faults). The behavior is the same even if the
-first exception comes from VMX event injection.
+0x00000000000151f9: print_pgm_info at lib/s390x/interrupt.c:255
+ (inlined by) handle_pgm_int at lib/s390x/interrupt.c:274
+0x00000000000110c1: pgm_int at s390x/cstart64.S:98
+0x000000000001462f: servc at lib/s390x/asm/arch_def.h:459
+ (inlined by) sclp_service_call at lib/s390x/sclp.c:186
+0x0000000000019150: WARNING_THE_FOLLOWING_CALLERS_MIGHT_BE_CORRECT_BY_ACCIDENT_ONLY at s390x/cstart64.S:?
+0x0000000000000000: lowcore at lib/s390x/asm/arch_def.h:172
+0x0000000000014c93: console_refill_read_buffer at lib/s390x/sclp-console.c:259
+ (inlined by) __getchar at lib/s390x/sclp-console.c:290
 
-Paolo
+Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+---
+ s390x/cstart64.S |  1 +
+ s390x/macros.S   | 21 +++++++++++++++++++++
+ 2 files changed, 22 insertions(+)
 
-> In addition, the benefits of not doing so are:
-> 1) Less code.
-> 2) Faster execution. Calling kvm_requeue_exception_e()/kvm_requeue_except=
-ion()
->    consumes a few hundred cycles at least, although it's a rare case with=
- EPT,
->    but a lot with shadow (who cares?). And vmx_inject_exception() also ha=
-s a
->    cost.
-> 3) An IDT vectoring could trigger more than one VM exit, e.g., the first =
-is an
->    EPT violation, and the second a PML full, KVM needs to reinject it twi=
-ce
->    (extremely rare).
->
-> Thanks!
->   Xin
->
+diff --git a/s390x/cstart64.S b/s390x/cstart64.S
+index 468ace3e..3cd0e3f3 100644
+--- a/s390x/cstart64.S
++++ b/s390x/cstart64.S
+@@ -13,6 +13,7 @@
+ #include <asm/asm-offsets.h>
+ #include <asm/sigp.h>
+ 
++.file __FILE__
+ #include "macros.S"
+ .section .init
+ 
+diff --git a/s390x/macros.S b/s390x/macros.S
+index e2a56a36..ebbb5fac 100644
+--- a/s390x/macros.S
++++ b/s390x/macros.S
+@@ -17,6 +17,20 @@
+  * we re-load the registers and load the old PSW.
+  */
+ 	.macro CALL_INT_HANDLER c_func, old_psw
++	/* Allocate new stack frame for warning symbol that shows up in the stack trace */
++	stg	%r15, -STACK_FRAME_SIZE + STACK_FRAME_INT_BACKCHAIN(%r15)
++	lay	%r15, -STACK_FRAME_SIZE(%r15)
++	/*
++	 * The handler must return with the original registers -> save r14
++	 * so it can be used to point to the interrupting instruction
++	 */
++	stg	%r14, STACK_FRAME_INT_GRS0(%r15)
++	larl	%r14, WARNING_THE_FOLLOWING_CALLERS_MIGHT_BE_CORRECT_BY_ACCIDENT_ONLY
++	/* Pretend we are returning to an instruction after the warning symbol */
++	la	%r14,1(%r14)
++	stg	%r14, 12 * 8 + STACK_FRAME_INT_GRS0(%r15)
++	/* Pretend we made a call with the old psw address as return address */
++	lg	%r14, 8 + \old_psw
+ 	SAVE_REGS_STACK
+ 	/* Save the stack address in GR2 which is the first function argument */
+ 	lgr     %r2, %r15
+@@ -30,7 +44,14 @@
+ 	brasl	%r14, \c_func
+ 	algfi   %r15, STACK_FRAME_SIZE
+ 	RESTORE_REGS_STACK
++	lg	%r14, STACK_FRAME_INT_GRS0(%r15)
++	lg	%r15, STACK_FRAME_INT_BACKCHAIN(%r15)
+ 	lpswe	\old_psw
++	.ifndef WARNING_THE_FOLLOWING_CALLERS_MIGHT_BE_CORRECT_BY_ACCIDENT_ONLY
++	.pushsection .rodata
++	.set	WARNING_THE_FOLLOWING_CALLERS_MIGHT_BE_CORRECT_BY_ACCIDENT_ONLY, .
++	.popsection
++	.endif
+ 	.endm
+ 
+ /* Save registers on the stack (r15), so we can have stacked interrupts. */
+
+base-commit: 5b5d27da2973b20ec29b18df4d749fb2190458af
+prerequisite-patch-id: 619d9dfe41a0509d1f123849d696af3109e534ce
+prerequisite-patch-id: b5b4345ef04be0c4c4c70903e343783a9ebec0ce
+prerequisite-patch-id: 8b1ee5a4dd43bd7f70a69e0ffe1dfea0cfe2be91
+prerequisite-patch-id: dc72bb12a0ee455bc607b69f9b644075338a15d0
+prerequisite-patch-id: e394d9d3d4c0df3c9788c06e7e940a5abf645318
+prerequisite-patch-id: efb98123d132fa4b0bf198dd2718966beea4fbd8
+-- 
+2.37.2
 
