@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4E9496D8263
-	for <lists+kvm@lfdr.de>; Wed,  5 Apr 2023 17:47:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 027446D8261
+	for <lists+kvm@lfdr.de>; Wed,  5 Apr 2023 17:46:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239025AbjDEPrB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Apr 2023 11:47:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57562 "EHLO
+        id S239056AbjDEPqv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Apr 2023 11:46:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57208 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239063AbjDEPqz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Apr 2023 11:46:55 -0400
+        with ESMTP id S238972AbjDEPqi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Apr 2023 11:46:38 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8DCDE40DA
-        for <kvm@vger.kernel.org>; Wed,  5 Apr 2023 08:46:27 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 769837685
+        for <kvm@vger.kernel.org>; Wed,  5 Apr 2023 08:46:17 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 2C96E63E1F
-        for <kvm@vger.kernel.org>; Wed,  5 Apr 2023 15:46:27 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 91AF5C433D2;
-        Wed,  5 Apr 2023 15:46:26 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id A115E63EFC
+        for <kvm@vger.kernel.org>; Wed,  5 Apr 2023 15:46:16 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 14225C433D2;
+        Wed,  5 Apr 2023 15:46:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1680709586;
-        bh=C+eYkxFuOlWI1J0Ai+7uKAkwuQz44DowGsncqCBujTA=;
+        s=k20201202; t=1680709576;
+        bh=q9r1hOTNh/oLCfkMuKIIcbe+H8ghVFyameXVN/4crsY=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=QLwyPTCVUNwX1ra03YiaNfDc3ORLFLTEcXljf4JoPppIdHgp51m5yr5k/J/snkYPs
-         Q9sg49L4y1IX06258+nn1DhGHU9h8P4TDKQtXvRWIsfjgbLUadfQaU3/jK/AE20pqM
-         CfxXSqErplFDkmhWuyBP3YdhURLDIcpO9IuxO7FdDCVBzKxqVz1ER/E3Bm9R2ejd7x
-         yQiG0zQ2GSQ86CxcMDX7GVoCufAqhdiLZqrVKgbIXUJGTqBvNLU5AUc20oJZwerTP9
-         bzenpExdBzgY8olp6GhsqpX0T8lxiBQGF71fXF4qDwg/J7zqgp/58hxzLF5yGl5LdP
-         oZrztHeZqQZKg==
+        b=CIbUyv8yMPeDkGi3BJLYFGLnn8Z/wG6rJWWQcBu5hpGwZdFS9bLA5r9Dl/CdDdmpM
+         GKzt/DDKMoHlSWz4R9HBqgm4mhFwYbeY+LrazOYiLHoMy0LbwqA26+AjTgKZwhfj+l
+         EeSEfmiz+TDgCUcnv1k3gKfvkZ7BY33Dc/EeRwe6aJaS1Aeh8chOY733qDcRGoZXXD
+         6L1DzS756sgl466Yw81/lO+HPUg6y1uatVfiQhZwvviICSJifWeKq/1yHN8/y8ZYkv
+         2lE3L4hOId0hS8/EZQhjmVqmz6WvkktylZNbtJO6jBsuUl+Q0cc7D4rEBZN2Qh7Yzn
+         9tQvLyau1pAGw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1pk5Fw-0062PV-71;
+        id 1pk5Fw-0062PV-G8;
         Wed, 05 Apr 2023 16:41:04 +0100
 From:   Marc Zyngier <maz@kernel.org>
 To:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
@@ -53,9 +53,9 @@ Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Oliver Upton <oliver.upton@linux.dev>,
         Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v9 48/50] KVM: arm64: nv: Fast-track EL1 TLBIs for VHE guests
-Date:   Wed,  5 Apr 2023 16:40:06 +0100
-Message-Id: <20230405154008.3552854-49-maz@kernel.org>
+Subject: [PATCH v9 49/50] KVM: arm64: nv: Use FEAT_ECV to trap access to EL0 timers
+Date:   Wed,  5 Apr 2023 16:40:07 +0100
+Message-Id: <20230405154008.3552854-50-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230405154008.3552854-1-maz@kernel.org>
 References: <20230405154008.3552854-1-maz@kernel.org>
@@ -74,134 +74,107 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Due to the way ARMv8.4-NV suppresses traps when accessing EL2
-system registers, we can't track when the guest changes its
-HCR_EL2.TGE setting. This means we always trap EL1 TLBIs,
-even if they don't affect any guest.
+Although FEAT_NV2 makes most things fast, it also makes it impossible
+to correctly emulate the timers, as the sysreg accesses are redirected
+to memory.
 
-This obviously has a huge impact on performance, as we handle
-TLBI traps as a normal exit, and a normal VHE host issues
-thousands of TLBIs when booting (and quite a few when running
-userspace).
+FEAT_ECV addresses this by giving a hypervisor the ability to trap
+the EL02 sysregs as well as the virtual timer.
 
-A cheap way to reduce the overhead is to handle the limited
-case of {E2H,TGE}=={1,1} as a guest fixup, as we already have
-the right mmu configuration in place. Just execute the decoded
-instruction right away and return to the guest.
+Add the required trap setting to make use of the feature, allowing
+us to elide the ugly resync in the middle of the run loop.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/hyp/vhe/switch.c | 43 ++++++++++++++++++++++++++++++++-
- arch/arm64/kvm/hyp/vhe/tlb.c    |  6 +++--
- arch/arm64/kvm/sys_regs.c       | 12 ---------
- 3 files changed, 46 insertions(+), 15 deletions(-)
+ arch/arm64/kvm/arch_timer.c          | 37 +++++++++++++++++++++++++---
+ include/clocksource/arm_arch_timer.h |  4 +++
+ 2 files changed, 38 insertions(+), 3 deletions(-)
 
-diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-index 238c6613cf47..a3555b90d9e1 100644
---- a/arch/arm64/kvm/hyp/vhe/switch.c
-+++ b/arch/arm64/kvm/hyp/vhe/switch.c
-@@ -168,6 +168,47 @@ void deactivate_traps_vhe_put(struct kvm_vcpu *vcpu)
- 	__deactivate_traps_common(vcpu);
- }
+diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
+index 98fddb4a846d..e3b5bd7cf15c 100644
+--- a/arch/arm64/kvm/arch_timer.c
++++ b/arch/arm64/kvm/arch_timer.c
+@@ -790,7 +790,7 @@ static void kvm_timer_vcpu_load_nested_switch(struct kvm_vcpu *vcpu,
  
-+static bool kvm_hyp_handle_tlbi_el1(struct kvm_vcpu *vcpu, u64 *exit_code)
-+{
-+	u32 instr;
-+	u64 val;
-+
-+	/*
-+	 * Ideally, we would never trap on EL1 TLB invalidations when the
-+	 * guest's HCR_EL2.{E2H,TGE} == {1,1}. But "thanks" to ARMv8.4, we
-+	 * don't trap writes to HCR_EL2, meaning that we can't track
-+	 * changes to the virtual TGE bit. So we leave HCR_EL2.TTLB set on
-+	 * the host. Oopsie...
-+	 *
-+	 * In order to speed-up EL1 TLBIs from the vEL2 guest when TGE is
-+	 * set, try and handle these invalidation as quickly as possible,
-+	 * without fully exiting (unless this needs forwarding).
-+	 */
-+	if (!vcpu_has_nv2(vcpu) ||
-+	    !vcpu_is_el2(vcpu) ||
-+	    (__vcpu_sys_reg(vcpu, HCR_EL2) & (HCR_E2H | HCR_TGE)) != (HCR_E2H | HCR_TGE))
-+		return false;
-+
-+	instr = esr_sys64_to_sysreg(kvm_vcpu_get_esr(vcpu));
-+	if (sys_reg_Op0(instr) != TLBI_Op0 ||
-+	    sys_reg_Op1(instr) != TLBI_Op1_EL1)
-+		return false;
-+
-+	val = vcpu_get_reg(vcpu, kvm_vcpu_sys_get_rt(vcpu));
-+	__kvm_tlb_el1_instr(NULL, val, instr);
-+	__kvm_skip_instr(vcpu);
-+
-+	return true;
-+}
-+
-+static bool kvm_hyp_handle_sysreg_vhe(struct kvm_vcpu *vcpu, u64 *exit_code)
-+{
-+	if (kvm_hyp_handle_tlbi_el1(vcpu, exit_code))
-+		return true;
-+
-+	return kvm_hyp_handle_sysreg(vcpu, exit_code);
-+}
-+
- static bool kvm_hyp_handle_eret(struct kvm_vcpu *vcpu, u64 *exit_code)
+ static void timer_set_traps(struct kvm_vcpu *vcpu, struct timer_map *map)
  {
- 	struct kvm_cpu_context *ctxt = &vcpu->arch.ctxt;
-@@ -216,7 +257,7 @@ static bool kvm_hyp_handle_eret(struct kvm_vcpu *vcpu, u64 *exit_code)
- static const exit_handler_fn hyp_exit_handlers[] = {
- 	[0 ... ESR_ELx_EC_MAX]		= NULL,
- 	[ESR_ELx_EC_CP15_32]		= kvm_hyp_handle_cp15_32,
--	[ESR_ELx_EC_SYS64]		= kvm_hyp_handle_sysreg,
-+	[ESR_ELx_EC_SYS64]		= kvm_hyp_handle_sysreg_vhe,
- 	[ESR_ELx_EC_SVE]		= kvm_hyp_handle_fpsimd,
- 	[ESR_ELx_EC_FP_ASIMD]		= kvm_hyp_handle_fpsimd,
- 	[ESR_ELx_EC_IABT_LOW]		= kvm_hyp_handle_iabt_low,
-diff --git a/arch/arm64/kvm/hyp/vhe/tlb.c b/arch/arm64/kvm/hyp/vhe/tlb.c
-index c4389db4cc22..beb162468c0b 100644
---- a/arch/arm64/kvm/hyp/vhe/tlb.c
-+++ b/arch/arm64/kvm/hyp/vhe/tlb.c
-@@ -201,7 +201,8 @@ void __kvm_tlb_el1_instr(struct kvm_s2_mmu *mmu, u64 val, u64 sys_encoding)
- 	dsb(ishst);
- 
- 	/* Switch to requested VMID */
--	__tlb_switch_to_guest(mmu, &cxt);
-+	if (mmu)
-+		__tlb_switch_to_guest(mmu, &cxt);
+-	bool tpt, tpc;
++	bool tvt, tpt, tvc, tpc, tvt02, tpt02;
+ 	u64 clr, set;
  
  	/*
- 	 * Execute the same instruction as the guest hypervisor did,
-@@ -240,5 +241,6 @@ void __kvm_tlb_el1_instr(struct kvm_s2_mmu *mmu, u64 val, u64 sys_encoding)
- 	dsb(ish);
- 	isb();
+@@ -805,7 +805,30 @@ static void timer_set_traps(struct kvm_vcpu *vcpu, struct timer_map *map)
+ 	 * within this function, reality kicks in and we start adding
+ 	 * traps based on emulation requirements.
+ 	 */
+-	tpt = tpc = false;
++	tvt = tpt = tvc = tpc = false;
++	tvt02 = tpt02 = false;
++
++	/*
++	 * NV2 badly breaks the timer semantics by redirecting accesses to
++	 * the EL0 timer state to memory, so let's call ECV to the rescue if
++	 * available: we trap all CNT{P,V}_{CTL,CVAL,TVAL}_EL0 accesses.
++	 *
++	 * The treatment slightly varies depending whether we run a nVHE or
++	 * VHE guest: nVHE will use the _EL0 registers directly, while VHE
++	 * will use the _EL02 accessors. This translates in different trap
++	 * bits.
++	 *
++	 * None of the trapping is required when running in non-HYP context,
++	 * unless required by the L1 hypervisor settings once we advertise
++	 * ECV+NV in the guest, or that we need trapping for other reasons.
++	 */
++	if (cpus_have_final_cap(ARM64_HAS_ECV) &&
++	    vcpu_has_nv2(vcpu) && is_hyp_ctxt(vcpu)) {
++		if (vcpu_el2_e2h_is_set(vcpu))
++			tvt02 = tpt02 = true;
++		else
++			tvt = tpt = true;
++	}
  
--	__tlb_switch_to_host(&cxt);
-+	if (mmu)
-+		__tlb_switch_to_host(&cxt);
- }
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 4a1c4a97f702..a671629fb366 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -3113,18 +3113,6 @@ static bool handle_tlbi_el1(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+ 	/*
+ 	 * We have two possibility to deal with a physical offset:
+@@ -845,6 +868,10 @@ static void timer_set_traps(struct kvm_vcpu *vcpu, struct timer_map *map)
  
- 	WARN_ON(!vcpu_is_el2(vcpu));
+ 	assign_clear_set_bit(tpt, CNTHCTL_EL1PCEN << 10, set, clr);
+ 	assign_clear_set_bit(tpc, CNTHCTL_EL1PCTEN << 10, set, clr);
++	assign_clear_set_bit(tvt, CNTHCTL_EL1TVT, clr, set);
++	assign_clear_set_bit(tvc, CNTHCTL_EL1TVCT, clr, set);
++	assign_clear_set_bit(tvt02, CNTHCTL_EL1NVVCT, clr, set);
++	assign_clear_set_bit(tpt02, CNTHCTL_EL1NVPCT, clr, set);
  
--	if ((__vcpu_sys_reg(vcpu, HCR_EL2) & (HCR_E2H | HCR_TGE)) == (HCR_E2H | HCR_TGE)) {
--		mutex_lock(&vcpu->kvm->lock);
--		/*
--		 * ARMv8.4-NV allows the guest to change TGE behind
--		 * our back, so we always trap EL1 TLBIs from vEL2...
--		 */
--		__kvm_tlb_el1_instr(&vcpu->kvm->arch.mmu, p->regval, sys_encoding);
--		mutex_unlock(&vcpu->kvm->lock);
--
--		return true;
--	}
--
- 	kvm_s2_mmu_iterate_by_vmid(vcpu->kvm, get_vmid(vttbr),
- 				   &(union tlbi_info) {
- 					   .va = {
+ 	/* This only happens on VHE, so use the CNTKCTL_EL1 accessor */
+ 	sysreg_clear_set(cntkctl_el1, clr, set);
+@@ -940,8 +967,12 @@ void kvm_timer_sync_nested(struct kvm_vcpu *vcpu)
+ 	 * accesses redirected to the VNCR page. Any guest action taken on
+ 	 * the timer is postponed until the next exit, leading to a very
+ 	 * poor quality of emulation.
++	 *
++	 * This is an unmitigated disaster, only papered over by FEAT_ECV,
++	 * which allows trapping of the timer registers even with NV2.
++	 * Still, this is still worse than FEAT_NV on its own. Meh.
+ 	 */
+-	if (!is_hyp_ctxt(vcpu))
++	if (cpus_have_const_cap(ARM64_HAS_ECV) || !is_hyp_ctxt(vcpu))
+ 		return;
+ 
+ 	if (!vcpu_el2_e2h_is_set(vcpu)) {
+diff --git a/include/clocksource/arm_arch_timer.h b/include/clocksource/arm_arch_timer.h
+index cbbc9a6dc571..c62811fb4130 100644
+--- a/include/clocksource/arm_arch_timer.h
++++ b/include/clocksource/arm_arch_timer.h
+@@ -22,6 +22,10 @@
+ #define CNTHCTL_EVNTDIR			(1 << 3)
+ #define CNTHCTL_EVNTI			(0xF << 4)
+ #define CNTHCTL_ECV			(1 << 12)
++#define CNTHCTL_EL1TVT			(1 << 13)
++#define CNTHCTL_EL1TVCT			(1 << 14)
++#define CNTHCTL_EL1NVPCT		(1 << 15)
++#define CNTHCTL_EL1NVVCT		(1 << 16)
+ 
+ enum arch_timer_reg {
+ 	ARCH_TIMER_REG_CTRL,
 -- 
 2.34.1
 
