@@ -2,59 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id ABD796D8918
-	for <lists+kvm@lfdr.de>; Wed,  5 Apr 2023 22:51:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A5FD76D8919
+	for <lists+kvm@lfdr.de>; Wed,  5 Apr 2023 22:51:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232888AbjDEUvs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Apr 2023 16:51:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46520 "EHLO
+        id S233393AbjDEUvu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Apr 2023 16:51:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46540 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229756AbjDEUvo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Apr 2023 16:51:44 -0400
-Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E6F3185
-        for <kvm@vger.kernel.org>; Wed,  5 Apr 2023 13:51:43 -0700 (PDT)
-Received: by mail-pl1-x649.google.com with SMTP id k1-20020a170902c40100b001a20f75cd40so21936231plk.22
-        for <kvm@vger.kernel.org>; Wed, 05 Apr 2023 13:51:43 -0700 (PDT)
+        with ESMTP id S231880AbjDEUvq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Apr 2023 16:51:46 -0400
+Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02506CD
+        for <kvm@vger.kernel.org>; Wed,  5 Apr 2023 13:51:45 -0700 (PDT)
+Received: by mail-pl1-x64a.google.com with SMTP id q9-20020a170902dac900b001a18ceff5ebso21447969plx.4
+        for <kvm@vger.kernel.org>; Wed, 05 Apr 2023 13:51:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1680727902;
+        d=google.com; s=20210112; t=1680727904;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=yIZS+lESLjc2SVQMvqfoiClSoxP1FKlhXwqqrQtmCCw=;
-        b=d7Qr3XQ8kYtcWqKNu75D003g7obqdDBf1X6q54wAFdogWsnqKpjMzx8Yt37jt2k8lt
-         Ly6fh4+8qL/rdU+iGz+bh7wUZYHDttno67iGquBSomvs65C0t42WHLyJWe8yo6XimMyw
-         jB9EysiXCbqv6XwP9QnEaLv6lSuiyeWEI14z217PRUxvILQRjTr03ImiuW+BM6OHpz1N
-         Dv0zA2OTphJ5EqrI6vQoKRxHxl11YZN0o0bMejfFOn35QZc9CgLUfLj18l616SWhRF3F
-         Mh4PxXv3xpBQctz1tmHUh/jjbdU/Bsk18bSyIAorrFokcBy8MkLWxWyo0orrElTtNxf5
-         TpJQ==
+        bh=J32QfDG/N0fnwFvEA1vrkQnMqbl9Zm9NHz5B44dC12w=;
+        b=JqSM2Uf3uS1YvgXiVIj2oy/QGwQbyyDIdjrpHy4m+pPHj8xS5hKqddwLtgNKwKE+sL
+         35OoLw6gbMR+z0SJ4TVe1WfYdOG4A9lyw0gUXJyKO5TUgll7XKH+PR73u3pB05QgRalL
+         EvHSKRfMFZXG4mCZ6jlNY5R3LySDEYUnTx8Jf7CSEM7eWZ6eQc+EKBr1xXYEp8o/B9T4
+         fiWA6uO2p9sh30REy8BU2zmj3Trx11Bj7SrPOkcTtvoNxOnCHl4ttXAJHpXxAbvdNZKz
+         IL2wgJITuJaY1gT8aK4y3dgv5KT5YWaIHsQOccXBpW0fIris9M3JjuOvmYW9aXXbz0W/
+         54wQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680727902;
+        d=1e100.net; s=20210112; t=1680727904;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=yIZS+lESLjc2SVQMvqfoiClSoxP1FKlhXwqqrQtmCCw=;
-        b=jPw9la9hWcwFPyyOvj16M0sSbDDSy4bffUWUD624W1XB7ktX1TkNWatlY5d/0CvAzE
-         EcSwqWi/A6yS3ZJ5rXhZ6KtpWW7rFqQ2OuFJo217aPAA57BJCXLZlkA10Gmh8arn0U92
-         cejSrY4aAxWnasEAOr9EFBYSeOXHqeIcnr4TO5YODGY9lfKtMeXSRKms2RbSeZKh4AEt
-         pv3wjxy8q24uXx7c6VYhYYdlWvYBHV4CKpnDLkj8ge/HPiLhvZZjRyCFn67JqSVH+q+q
-         SU1PGcJ1uWUuGoR/EVO4V2U1FgMCf16CdLUrHnKohHLPY0fZAE4w4mOvKIdMDA2BUpGp
-         kI4g==
-X-Gm-Message-State: AAQBX9drefe80Q6D36MM5v3gEWOkoC04GfzTjzPcckbllmD1ZXTA6GrZ
-        HPDIaClwq+KHN808J7bfSjS+7v9oJ4Q=
-X-Google-Smtp-Source: AKy350bmwnKQReX4GjZhoe5cW/ok+K99zU9OHOi3pYgv7QOUBvQ87IIRPHyXXL8UDl23aop3TIBseBBawX0=
+        bh=J32QfDG/N0fnwFvEA1vrkQnMqbl9Zm9NHz5B44dC12w=;
+        b=tUuiF2B5GG92DrFZPHu5VSaaURkSzraXqo55/zO8TIUSG9VVa8rnp5nAP16tc9+B6K
+         cZVm+PoNaK9j3WjuGFr4k1KdIYccCbqhArfHelV50WS620jwqWP80dMGaPquHVXwS6Yq
+         30opMPoT2V1yY7K7NbIIqRU61sDYOVjMHUPWUJEDbAeInQDWWwyZcJ+4CnhkHkvsblVY
+         k+Y17zNVm8roIdStQwOzCxvuEZmlqEUraJ3j+JVcWZVkz7KAbYQFe5LQugcDRVaMamFE
+         jC3ojeRhAHIVErD8csgAj1/xf2XNoUnC0ubPI2JC1ioiyh2Qs3V8rQ61MGOpRtVYbLEd
+         2ugQ==
+X-Gm-Message-State: AAQBX9dPziadHUiXShCE4GtJuYVIYRNMnI2ILM8jlwX+7vhNU/dXyKi2
+        Wz27OanXy7pougj5BjP1GJLL1onRg2A=
+X-Google-Smtp-Source: AKy350aSsK50Bqzap+Oy2/ML7KTFfpyvAFLLp63Br5yy7o833tWCfftkyahxr47DLlvDH73adsg/OeaSDIc=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:82cb:b0:1a0:7630:8ef1 with SMTP id
- u11-20020a17090282cb00b001a076308ef1mr3176042plz.11.1680727902718; Wed, 05
- Apr 2023 13:51:42 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a17:90a:2f23:b0:23f:6efa:bd55 with SMTP id
+ s32-20020a17090a2f2300b0023f6efabd55mr2792288pjd.8.1680727904539; Wed, 05 Apr
+ 2023 13:51:44 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Wed,  5 Apr 2023 13:51:37 -0700
+Date:   Wed,  5 Apr 2023 13:51:38 -0700
 In-Reply-To: <20230405205138.525310-1-seanjc@google.com>
 Mime-Version: 1.0
 References: <20230405205138.525310-1-seanjc@google.com>
 X-Mailer: git-send-email 2.40.0.348.gf938b09366-goog
-Message-ID: <20230405205138.525310-2-seanjc@google.com>
-Subject: [kvm-unit-tests PATCH v4 1/2] nSVM: Add helper to report fatal errors
- in guest
+Message-ID: <20230405205138.525310-3-seanjc@google.com>
+Subject: [kvm-unit-tests PATCH v4 2/2] x86: nSVM: Add support for VNMI test
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>,
@@ -70,260 +69,171 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add a helper macro to dedup nSVM test code that handles fatal errors
-by reporting the failure, setting the test stage to a magic number, and
-invoking VMMCALL to bail to the host and terminate.
+From: Santosh Shukla <santosh.shukla@amd.com>
 
-Note, the V_TPR fails if report() is invoked.  Punt on the issue for
-now as most users already report only failures, but leave a TODO for
-future developers.
+Add a VNMI test case to test Virtual NMI in a nested environment,
+The test covers the Virtual NMI (VNMI) delivery.
 
+Signed-off-by: Santosh Shukla <santosh.shukla@amd.com>
+[sean: reuse pieces of NMI test framework, fix formatting issues]
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- x86/svm_tests.c | 127 ++++++++++++++++--------------------------------
- 1 file changed, 42 insertions(+), 85 deletions(-)
+ lib/x86/processor.h |  1 +
+ x86/svm.c           |  5 +++
+ x86/svm.h           |  8 +++++
+ x86/svm_tests.c     | 78 +++++++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 92 insertions(+)
 
+diff --git a/lib/x86/processor.h b/lib/x86/processor.h
+index 3d58ef72..3802c1e2 100644
+--- a/lib/x86/processor.h
++++ b/lib/x86/processor.h
+@@ -267,6 +267,7 @@ static inline bool is_intel(void)
+ #define X86_FEATURE_PAUSEFILTER		(CPUID(0x8000000A, 0, EDX, 10))
+ #define X86_FEATURE_PFTHRESHOLD		(CPUID(0x8000000A, 0, EDX, 12))
+ #define	X86_FEATURE_VGIF		(CPUID(0x8000000A, 0, EDX, 16))
++#define X86_FEATURE_V_NMI               (CPUID(0x8000000A, 0, EDX, 25))
+ #define	X86_FEATURE_AMD_PMU_V2		(CPUID(0x80000022, 0, EAX, 0))
+ 
+ static inline bool this_cpu_has(u64 feature)
+diff --git a/x86/svm.c b/x86/svm.c
+index ba435b4a..022a0fde 100644
+--- a/x86/svm.c
++++ b/x86/svm.c
+@@ -99,6 +99,11 @@ bool npt_supported(void)
+ 	return this_cpu_has(X86_FEATURE_NPT);
+ }
+ 
++bool vnmi_supported(void)
++{
++       return this_cpu_has(X86_FEATURE_V_NMI);
++}
++
+ int get_test_stage(struct svm_test *test)
+ {
+ 	barrier();
+diff --git a/x86/svm.h b/x86/svm.h
+index 766ff7e3..4631c2ff 100644
+--- a/x86/svm.h
++++ b/x86/svm.h
+@@ -131,6 +131,13 @@ struct __attribute__ ((__packed__)) vmcb_control_area {
+ #define V_INTR_MASKING_SHIFT 24
+ #define V_INTR_MASKING_MASK (1 << V_INTR_MASKING_SHIFT)
+ 
++#define V_NMI_PENDING_SHIFT	11
++#define V_NMI_PENDING_MASK	(1 << V_NMI_PENDING_SHIFT)
++#define V_NMI_BLOCKING_SHIFT	12
++#define V_NMI_BLOCKING_MASK	(1 << V_NMI_BLOCKING_SHIFT)
++#define V_NMI_ENABLE_SHIFT	26
++#define V_NMI_ENABLE_MASK	(1 << V_NMI_ENABLE_SHIFT)
++
+ #define SVM_INTERRUPT_SHADOW_MASK 1
+ 
+ #define SVM_IOIO_STR_SHIFT 2
+@@ -419,6 +426,7 @@ void default_prepare(struct svm_test *test);
+ void default_prepare_gif_clear(struct svm_test *test);
+ bool default_finished(struct svm_test *test);
+ bool npt_supported(void);
++bool vnmi_supported(void);
+ int get_test_stage(struct svm_test *test);
+ void set_test_stage(struct svm_test *test, int s);
+ void inc_test_stage(struct svm_test *test);
 diff --git a/x86/svm_tests.c b/x86/svm_tests.c
-index 27ce47b4..e87db3fa 100644
+index e87db3fa..3d2ca0f6 100644
 --- a/x86/svm_tests.c
 +++ b/x86/svm_tests.c
-@@ -947,6 +947,21 @@ static bool lat_svm_insn_check(struct svm_test *test)
- 	return true;
+@@ -1419,6 +1419,81 @@ static bool nmi_hlt_check(struct svm_test *test)
+ 	return get_test_stage(test) == 3;
  }
  
-+/*
-+ * Report failures from SVM guest code, and on failure, set the stage to -1 and
-+ * do VMMCALL to terminate the test (host side must treat -1 as "finished").
-+ * TODO: fix the tests that don't play nice with a straight report, e.g. the
-+ * V_TPR test fails if report() is invoked.
-+ */
-+#define report_svm_guest(cond, test, fmt, args...)	\
-+do {							\
-+	if (!(cond)) {					\
-+		report_fail("why didn't my format '" fmt "' format?", ##args);\
-+		set_test_stage(test, -1);		\
-+		vmmcall();				\
-+	}						\
-+} while (0)
++static void vnmi_prepare(struct svm_test *test)
++{
++	nmi_prepare(test);
 +
- bool pending_event_ipi_fired;
- bool pending_event_guest_run;
++	/*
++	 * Disable NMI interception to start.  Enabling vNMI without
++	 * intercepting "real" NMIs should result in an ERR VM-Exit.
++	 */
++	vmcb->control.intercept &= ~(1ULL << INTERCEPT_NMI);
++	vmcb->control.int_ctl = V_NMI_ENABLE_MASK;
++	vmcb->control.int_vector = NMI_VECTOR;
++}
++
++static void vnmi_test(struct svm_test *test)
++{
++	report_svm_guest(!nmi_fired, test, "No vNMI before injection");
++	vmmcall();
++
++	report_svm_guest(nmi_fired, test, "vNMI delivered after injection");
++	vmmcall();
++}
++
++static bool vnmi_finished(struct svm_test *test)
++{
++	switch (get_test_stage(test)) {
++	case 0:
++		if (vmcb->control.exit_code != SVM_EXIT_ERR) {
++			report_fail("Wanted ERR VM-Exit, got 0x%x",
++				    vmcb->control.exit_code);
++			return true;
++		}
++		report(!nmi_fired, "vNMI enabled but NMI_INTERCEPT unset!");
++		vmcb->control.intercept |= (1ULL << INTERCEPT_NMI);
++		vmcb->save.rip += 3;
++		break;
++
++	case 1:
++		if (vmcb->control.exit_code != SVM_EXIT_VMMCALL) {
++			report_fail("Wanted VMMCALL VM-Exit, got 0x%x",
++				    vmcb->control.exit_code);
++			return true;
++		}
++		report(!nmi_fired, "vNMI with vector 2 not injected");
++		vmcb->control.int_ctl |= V_NMI_PENDING_MASK;
++		vmcb->save.rip += 3;
++		break;
++
++	case 2:
++		if (vmcb->control.exit_code != SVM_EXIT_VMMCALL) {
++			report_fail("Wanted VMMCALL VM-Exit, got 0x%x",
++				    vmcb->control.exit_code);
++			return true;
++		}
++		if (vmcb->control.int_ctl & V_NMI_BLOCKING_MASK) {
++			report_fail("V_NMI_BLOCKING_MASK not cleared on VMEXIT");
++			return true;
++		}
++		report_pass("VNMI serviced");
++		vmcb->save.rip += 3;
++		break;
++
++	default:
++		return true;
++	}
++
++	inc_test_stage(test);
++
++	return get_test_stage(test) == 3;
++}
++
++static bool vnmi_check(struct svm_test *test)
++{
++	return get_test_stage(test) == 3;
++}
++
+ static volatile int count_exc = 0;
  
-@@ -1049,22 +1064,16 @@ static void pending_event_cli_prepare_gif_clear(struct svm_test *test)
- 
- static void pending_event_cli_test(struct svm_test *test)
- {
--	if (pending_event_ipi_fired == true) {
--		set_test_stage(test, -1);
--		report_fail("Interrupt preceeded guest");
--		vmmcall();
--	}
-+	report_svm_guest(!pending_event_ipi_fired, test,
-+			 "IRQ should NOT be delivered while IRQs disabled");
- 
- 	/* VINTR_MASKING is zero.  This should cause the IPI to fire.  */
- 	irq_enable();
- 	asm volatile ("nop");
- 	irq_disable();
- 
--	if (pending_event_ipi_fired != true) {
--		set_test_stage(test, -1);
--		report_fail("Interrupt not triggered by guest");
--	}
--
-+	report_svm_guest(pending_event_ipi_fired, test,
-+			 "IRQ should be delivered after enabling IRQs");
- 	vmmcall();
- 
- 	/*
-@@ -1079,11 +1088,9 @@ static void pending_event_cli_test(struct svm_test *test)
- 
- static bool pending_event_cli_finished(struct svm_test *test)
- {
--	if ( vmcb->control.exit_code != SVM_EXIT_VMMCALL) {
--		report_fail("VM_EXIT return to host is not EXIT_VMMCALL exit reason 0x%x",
--			    vmcb->control.exit_code);
--		return true;
--	}
-+	report_svm_guest(vmcb->control.exit_code == SVM_EXIT_VMMCALL, test,
-+			 "Wanted VMMCALL VM-Exit, got ext reason 0x%x",
-+			 vmcb->control.exit_code);
- 
- 	switch (get_test_stage(test)) {
- 	case 0:
-@@ -1158,12 +1165,8 @@ static void interrupt_test(struct svm_test *test)
- 	for (loops = 0; loops < 10000000 && !timer_fired; loops++)
- 		asm volatile ("nop");
- 
--	report(timer_fired, "direct interrupt while running guest");
--
--	if (!timer_fired) {
--		set_test_stage(test, -1);
--		vmmcall();
--	}
-+	report_svm_guest(timer_fired, test,
-+			 "direct interrupt while running guest");
- 
- 	apic_write(APIC_TMICT, 0);
- 	irq_disable();
-@@ -1174,12 +1177,8 @@ static void interrupt_test(struct svm_test *test)
- 	for (loops = 0; loops < 10000000 && !timer_fired; loops++)
- 		asm volatile ("nop");
- 
--	report(timer_fired, "intercepted interrupt while running guest");
--
--	if (!timer_fired) {
--		set_test_stage(test, -1);
--		vmmcall();
--	}
-+	report_svm_guest(timer_fired, test,
-+			 "intercepted interrupt while running guest");
- 
- 	irq_enable();
- 	apic_write(APIC_TMICT, 0);
-@@ -1190,13 +1189,8 @@ static void interrupt_test(struct svm_test *test)
- 	apic_write(APIC_TMICT, 1000000);
- 	safe_halt();
- 
--	report(rdtsc() - start > 10000 && timer_fired,
--	       "direct interrupt + hlt");
--
--	if (!timer_fired) {
--		set_test_stage(test, -1);
--		vmmcall();
--	}
-+	report_svm_guest(timer_fired, test, "direct interrupt + hlt");
-+	report(rdtsc() - start > 10000, "IRQ arrived after expected delay");
- 
- 	apic_write(APIC_TMICT, 0);
- 	irq_disable();
-@@ -1207,13 +1201,8 @@ static void interrupt_test(struct svm_test *test)
- 	apic_write(APIC_TMICT, 1000000);
- 	asm volatile ("hlt");
- 
--	report(rdtsc() - start > 10000 && timer_fired,
--	       "intercepted interrupt + hlt");
--
--	if (!timer_fired) {
--		set_test_stage(test, -1);
--		vmmcall();
--	}
-+	report_svm_guest(timer_fired, test, "intercepted interrupt + hlt");
-+	report(rdtsc() - start > 10000, "IRQ arrived after expected delay");
- 
- 	apic_write(APIC_TMICT, 0);
- 	irq_disable();
-@@ -1287,10 +1276,7 @@ static void nmi_test(struct svm_test *test)
- {
- 	apic_icr_write(APIC_DEST_SELF | APIC_DEST_PHYSICAL | APIC_DM_NMI | APIC_INT_ASSERT, 0);
- 
--	report(nmi_fired, "direct NMI while running guest");
--
--	if (!nmi_fired)
--		set_test_stage(test, -1);
-+	report_svm_guest(nmi_fired, test, "direct NMI while running guest");
- 
- 	vmmcall();
- 
-@@ -1298,11 +1284,7 @@ static void nmi_test(struct svm_test *test)
- 
- 	apic_icr_write(APIC_DEST_SELF | APIC_DEST_PHYSICAL | APIC_DM_NMI | APIC_INT_ASSERT, 0);
- 
--	if (!nmi_fired) {
--		report(nmi_fired, "intercepted pending NMI not dispatched");
--		set_test_stage(test, -1);
--	}
--
-+	report_svm_guest(nmi_fired, test, "intercepted pending NMI delivered to guest");
- }
- 
- static bool nmi_finished(struct svm_test *test)
-@@ -1379,11 +1361,8 @@ static void nmi_hlt_test(struct svm_test *test)
- 
- 	asm volatile ("hlt");
- 
--	report((rdtsc() - start > NMI_DELAY) && nmi_fired,
--	       "direct NMI + hlt");
--
--	if (!nmi_fired)
--		set_test_stage(test, -1);
-+	report_svm_guest(nmi_fired, test, "direct NMI + hlt");
-+	report(rdtsc() - start > NMI_DELAY, "direct NMI after expected delay");
- 
- 	nmi_fired = false;
- 
-@@ -1395,14 +1374,8 @@ static void nmi_hlt_test(struct svm_test *test)
- 
- 	asm volatile ("hlt");
- 
--	report((rdtsc() - start > NMI_DELAY) && nmi_fired,
--	       "intercepted NMI + hlt");
--
--	if (!nmi_fired) {
--		report(nmi_fired, "intercepted pending NMI not dispatched");
--		set_test_stage(test, -1);
--		vmmcall();
--	}
-+	report_svm_guest(nmi_fired, test, "intercepted NMI + hlt");
-+	report(rdtsc() - start > NMI_DELAY, "intercepted NMI after expected delay");
- 
- 	set_test_stage(test, 3);
- }
-@@ -1534,37 +1507,23 @@ static void virq_inject_prepare(struct svm_test *test)
- 
- static void virq_inject_test(struct svm_test *test)
- {
--	if (virq_fired) {
--		report_fail("virtual interrupt fired before L2 sti");
--		set_test_stage(test, -1);
--		vmmcall();
--	}
-+	report_svm_guest(!virq_fired, test, "virtual IRQ blocked after L2 cli");
- 
- 	irq_enable();
- 	asm volatile ("nop");
- 	irq_disable();
- 
--	if (!virq_fired) {
--		report_fail("virtual interrupt not fired after L2 sti");
--		set_test_stage(test, -1);
--	}
-+	report_svm_guest(virq_fired, test, "virtual IRQ fired after L2 sti");
- 
- 	vmmcall();
- 
--	if (virq_fired) {
--		report_fail("virtual interrupt fired before L2 sti after VINTR intercept");
--		set_test_stage(test, -1);
--		vmmcall();
--	}
-+	report_svm_guest(!virq_fired, test, "intercepted VINTR blocked after L2 cli");
- 
- 	irq_enable();
- 	asm volatile ("nop");
- 	irq_disable();
- 
--	if (!virq_fired) {
--		report_fail("virtual interrupt not fired after return from VINTR intercept");
--		set_test_stage(test, -1);
--	}
-+	report_svm_guest(virq_fired, test, "intercepted VINTR fired after L2 sti");
- 
- 	vmmcall();
- 
-@@ -1572,10 +1531,8 @@ static void virq_inject_test(struct svm_test *test)
- 	asm volatile ("nop");
- 	irq_disable();
- 
--	if (virq_fired) {
--		report_fail("virtual interrupt fired when V_IRQ_PRIO less than V_TPR");
--		set_test_stage(test, -1);
--	}
-+	report_svm_guest(!virq_fired, test,
-+			  "virtual IRQ blocked V_IRQ_PRIO less than V_TPR");
- 
- 	vmmcall();
- 	vmmcall();
+ static void my_isr(struct ex_regs *r)
+@@ -3298,6 +3373,9 @@ struct svm_test svm_tests[] = {
+ 	{ "nmi_hlt", smp_supported, nmi_prepare,
+ 	  default_prepare_gif_clear, nmi_hlt_test,
+ 	  nmi_hlt_finished, nmi_hlt_check },
++        { "vnmi", vnmi_supported, vnmi_prepare,
++          default_prepare_gif_clear, vnmi_test,
++          vnmi_finished, vnmi_check },
+ 	{ "virq_inject", default_supported, virq_inject_prepare,
+ 	  default_prepare_gif_clear, virq_inject_test,
+ 	  virq_inject_finished, virq_inject_check },
 -- 
 2.40.0.348.gf938b09366-goog
 
