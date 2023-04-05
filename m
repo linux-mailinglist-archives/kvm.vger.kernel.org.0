@@ -2,64 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5C8006D834A
-	for <lists+kvm@lfdr.de>; Wed,  5 Apr 2023 18:14:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4C27A6D834B
+	for <lists+kvm@lfdr.de>; Wed,  5 Apr 2023 18:14:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229479AbjDEQOV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Apr 2023 12:14:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42414 "EHLO
+        id S230263AbjDEQOe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Apr 2023 12:14:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43020 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229544AbjDEQOU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Apr 2023 12:14:20 -0400
-Received: from mail-wr1-x42c.google.com (mail-wr1-x42c.google.com [IPv6:2a00:1450:4864:20::42c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03E351997
-        for <kvm@vger.kernel.org>; Wed,  5 Apr 2023 09:14:02 -0700 (PDT)
-Received: by mail-wr1-x42c.google.com with SMTP id r29so36724058wra.13
-        for <kvm@vger.kernel.org>; Wed, 05 Apr 2023 09:14:01 -0700 (PDT)
+        with ESMTP id S229881AbjDEQOb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Apr 2023 12:14:31 -0400
+Received: from mail-wr1-x435.google.com (mail-wr1-x435.google.com [IPv6:2a00:1450:4864:20::435])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6CE955AD
+        for <kvm@vger.kernel.org>; Wed,  5 Apr 2023 09:14:07 -0700 (PDT)
+Received: by mail-wr1-x435.google.com with SMTP id d17so36730895wrb.11
+        for <kvm@vger.kernel.org>; Wed, 05 Apr 2023 09:14:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1680711240;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=hySJmhGNiy7HBpCOkc2QYsFMx5sR+aPEFCWb6zlOjxI=;
-        b=I3tpQBRdYO7NclUI5y7b4CxkmUbLjgYdQkfRdqIxXZ3gqz6sLzsjyPpD8aPwvw+nj+
-         12OvETgsrS8t6LyMSITwaqXXfriHzioMJ7gDzwiuaS9X+ypnIepBCb/kVhriVf2XPjsa
-         4a1YCDw+UbPjuwehcbnJW4ksjNfkOnuqn5xYmflM80wLtNbWVhYnanzNvrBfd5nyRU2r
-         mWcODmrb34X1wIcsyEhbbK0XEMtZ2l+2vGa5W29Ii7Ma9UBKFP49adRd2SxMELr/SCXk
-         n/lsKDTV5cJyOqZUzlZH9L4djWXvVNGWyX1OeQi+bCY/7A3GLO/WQOzp9UCKsVIepDeT
-         rcrQ==
+        d=linaro.org; s=google; t=1680711245;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=31Dm8tqveH6A+pTj5FPrc9/OxO1iY2GmqoL5qWMaQ24=;
+        b=pd14cQKQnbGXSS7TUuEfdyDf5sS/zlY7sHExBVdaAoLm+FR9z4m97A4mvOPC2H8vyl
+         Gmz3wjbmUwxY/fJqAOLuDOhY616GTL2Q01yU23hOvKYe5S3u7w5HMDoKvtMf+89yPnKW
+         TJh1p0Vr+34FXtgnN9X54/7OdJnOV7yf+V4DeDcrkDTaQc6VPniCpr5vSXUXqAHSYMbY
+         eeWSSwe4gODZc5fJdhIkgFvMmlCnM3sbzsuI09kT6kRfZgBvgHP7FiCnkJzQo2xF7F4D
+         fqJGxbPspWNuXTatpW9EJFD+QObBG2IvHfaCUe0D2Se1nPtRizuXb0zttJf9EXgZ0BS2
+         3i9Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680711240;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=hySJmhGNiy7HBpCOkc2QYsFMx5sR+aPEFCWb6zlOjxI=;
-        b=38VOHzh1JwfpSqnseqHVTVB9BO0XvNZEBgofy3odQXUqXh8evVhf5Y4gljZOF0k/hU
-         ECVO4U+vuYcz3tPnBFIdx318q3EUQeV38ceiQQSM02XCxYxfUqfq57s+W1bU5j542/yX
-         0a6jKN3UsWMqg5/1k02dl5SfC/kl4GPdpS1qGjG38aC/JseeIt4UK/jEowFzCssKjqe+
-         9bnJ/3b7KfnntizW73KCzLrJL4YLxAPz9kMCvByUJSSU80LDI9CoD8aPYmrv5etwisrW
-         BWSYvPkgZ6swep9vP1oWV4pF7G3m6ZmZrNT3lhuxs2rbpAWHXwqK35CTOo8gCHPJJC4L
-         eA7w==
-X-Gm-Message-State: AAQBX9fwtUPfXyYdFuNODrPFS3hrEHC+JTl1HQn6Jcqe244RIrysh2Lo
-        /vS1CO3qNVpnGR/2SPpyc1RoxUm4/v4aLfS0wNQ=
-X-Google-Smtp-Source: AKy350YrotmbTzVq0tkKx8/EiMyJP/mHPmHYE241R8z+3aMmLyKQODCBRfZIXnZOowy8IChjZeF72A==
-X-Received: by 2002:a5d:668a:0:b0:2cf:3399:998d with SMTP id l10-20020a5d668a000000b002cf3399998dmr4753128wru.57.1680711239512;
-        Wed, 05 Apr 2023 09:13:59 -0700 (PDT)
+        d=1e100.net; s=20210112; t=1680711245;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=31Dm8tqveH6A+pTj5FPrc9/OxO1iY2GmqoL5qWMaQ24=;
+        b=hGyfuZiVHJgxEu6U7SA5zn0iTX9iP+a2m4TupUHCTCEmZKzDJNZSVwc7h2v+4Vn6o1
+         ZW/YIIpmqW/4d5vyFaXEqSTtRGZhGClfG6DVRFbH+oaSKyc8lOhHPTnsZhGY1kBKi8jx
+         rquOsN9hTwHAJgyJNhFRAOl1ZuLz87vwHBMGrmp2Tv0SxkNeIOshkzmoN9tMUTk6fkGZ
+         CZu4n7YKYQdUWy0GLzemFDKLonGesra3Tj1MPHm5M9lbtnGZofsvCb41+Q6KL12+mLZB
+         o1RradDWGX5VBVuqteBfRS0PJkKjr2vAcuOXtAyhVGHE8FK/cGyAIjgsR1Io/xclmJ3g
+         inAg==
+X-Gm-Message-State: AAQBX9dfqoZn3GjVWM8xmIDtx4qYjgTatkI7pY9jhubodECTxSCWtF2Y
+        8IILAy6VyT+RvOvA2Ar3f8QEuQ==
+X-Google-Smtp-Source: AKy350bBfE6YE7vKkF6jYUa53ola/eVUuEKMInhDF04I462o2T68qmBLO7/fpuw89LhKQ8T1lLCkdA==
+X-Received: by 2002:adf:fcc5:0:b0:2d0:c37a:5ebd with SMTP id f5-20020adffcc5000000b002d0c37a5ebdmr4814064wrs.64.1680711244870;
+        Wed, 05 Apr 2023 09:14:04 -0700 (PDT)
 Received: from localhost.localdomain (4ab54-h01-176-184-52-81.dsl.sta.abo.bbox.fr. [176.184.52.81])
-        by smtp.gmail.com with ESMTPSA id s11-20020a5d424b000000b002e5f6f8fc4fsm14753554wrr.100.2023.04.05.09.13.58
+        by smtp.gmail.com with ESMTPSA id k12-20020adfe8cc000000b002c7b229b1basm15351729wrn.15.2023.04.05.09.14.03
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Wed, 05 Apr 2023 09:13:59 -0700 (PDT)
+        Wed, 05 Apr 2023 09:14:04 -0700 (PDT)
 From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
 To:     Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
         kvm@vger.kernel.org,
         =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
-Subject: [PATCH 0/2] accel/stubs: Build HAX/KVM/XEN stubs once
-Date:   Wed,  5 Apr 2023 18:13:54 +0200
-Message-Id: <20230405161356.98004-1-philmd@linaro.org>
+Subject: [PATCH 1/2] accel/stubs: Remove kvm_flush_coalesced_mmio_buffer() stub
+Date:   Wed,  5 Apr 2023 18:13:55 +0200
+Message-Id: <20230405161356.98004-2-philmd@linaro.org>
 X-Mailer: git-send-email 2.38.1
+In-Reply-To: <20230405161356.98004-1-philmd@linaro.org>
+References: <20230405161356.98004-1-philmd@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
         DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS
@@ -70,19 +73,31 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-TCG stubs could become target agnostic but
-I'm leaving that for later.
+kvm_flush_coalesced_mmio_buffer() is only called from
+qemu_flush_coalesced_mmio_buffer() where it is protected
+by a kvm_enabled() check. When KVM is not available, the
+call is elided, there is no need for a stub definition.
 
-Based-on: <20230405160454.97436-1-philmd@linaro.org>
+Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+---
+ accel/stubs/kvm-stub.c | 4 ----
+ 1 file changed, 4 deletions(-)
 
-Philippe Mathieu-Daudé (2):
-  accel/stubs: Remove kvm_flush_coalesced_mmio_buffer() stub
-  accel/stubs: Build HAX/KVM/XEN stubs once
-
- accel/stubs/kvm-stub.c  |  4 ----
- accel/stubs/meson.build | 10 ++++++----
- 2 files changed, 6 insertions(+), 8 deletions(-)
-
+diff --git a/accel/stubs/kvm-stub.c b/accel/stubs/kvm-stub.c
+index 235dc661bc..c0e2df3fbf 100644
+--- a/accel/stubs/kvm-stub.c
++++ b/accel/stubs/kvm-stub.c
+@@ -29,10 +29,6 @@ bool kvm_ioeventfd_any_length_allowed;
+ bool kvm_msi_use_devid;
+ bool kvm_direct_msi_allowed;
+ 
+-void kvm_flush_coalesced_mmio_buffer(void)
+-{
+-}
+-
+ void kvm_cpu_synchronize_state(CPUState *cpu)
+ {
+ }
 -- 
 2.38.1
 
