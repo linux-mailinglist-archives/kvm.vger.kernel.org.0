@@ -2,211 +2,190 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E65C16D894B
-	for <lists+kvm@lfdr.de>; Wed,  5 Apr 2023 23:09:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 440756D8956
+	for <lists+kvm@lfdr.de>; Wed,  5 Apr 2023 23:09:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234009AbjDEVJF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Apr 2023 17:09:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58278 "EHLO
+        id S234421AbjDEVJo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Apr 2023 17:09:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58622 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231348AbjDEVJA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Apr 2023 17:09:00 -0400
-Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1FCC476A9;
-        Wed,  5 Apr 2023 14:08:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1680728911; x=1712264911;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=picBdeJZw61WBdGmpyZ2sgLgyFBlqMaZ7koEZZt3f8c=;
-  b=eezdR8znS5Fn4xo+7AdXhqwWcenmLDHr7NzBucm3S7zNYYPTBptoZMAj
-   9GWDW56P0Rgu16aXoVTHwh0kFzeUKZwxVKhUWrpoWo/hthEJRDW1qOsG1
-   jeu2qH0tmxVMWntrqt50UdKCzOryzowyIgQdxE0nCG9AQag9dud8nBuSx
-   Ce4zaM45w510Qf7OrqIriTqT8FviO2YXSAMYCITk6Vuh6oEcxrIqoJNIs
-   h32gwdVE7FRUxjUlYvJQOWKMMUXa54f77HkdXRES+0A6QDMa+pwQOihZP
-   X7J7n5R5Vr+FhNv7j+e49WNAzlottDAZK3CDgvwq3M+CT6+BE4TVEfeva
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10671"; a="407657505"
-X-IronPort-AV: E=Sophos;i="5.98,321,1673942400"; 
-   d="scan'208";a="407657505"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Apr 2023 14:08:29 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10671"; a="1016620275"
-X-IronPort-AV: E=Sophos;i="5.98,321,1673942400"; 
-   d="scan'208";a="1016620275"
-Received: from lkp-server01.sh.intel.com (HELO b613635ddfff) ([10.239.97.150])
-  by fmsmga005.fm.intel.com with ESMTP; 05 Apr 2023 14:08:25 -0700
-Received: from kbuild by b613635ddfff with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1pkAMi-000Qnu-1t;
-        Wed, 05 Apr 2023 21:08:24 +0000
-Date:   Thu, 6 Apr 2023 05:07:56 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     ankita@nvidia.com, jgg@nvidia.com, alex.williamson@redhat.com,
-        naoya.horiguchi@nec.com, maz@kernel.org, oliver.upton@linux.dev
-Cc:     oe-kbuild-all@lists.linux.dev, aniketa@nvidia.com, cjia@nvidia.com,
-        kwankhede@nvidia.com, targupta@nvidia.com, vsethi@nvidia.com,
-        acurrid@nvidia.com, apopple@nvidia.com, jhubbard@nvidia.com,
-        danw@nvidia.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-mm@kvack.org
-Subject: Re: [PATCH v3 3/6] mm: handle poisoning of pfn without struct pages
-Message-ID: <202304060452.tpNrPK39-lkp@intel.com>
-References: <20230405180134.16932-4-ankita@nvidia.com>
+        with ESMTP id S234073AbjDEVJf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Apr 2023 17:09:35 -0400
+Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 172AE7EEF
+        for <kvm@vger.kernel.org>; Wed,  5 Apr 2023 14:09:22 -0700 (PDT)
+Received: by mail-pf1-x42d.google.com with SMTP id cv11so11825545pfb.8
+        for <kvm@vger.kernel.org>; Wed, 05 Apr 2023 14:09:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112; t=1680728960;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6MLGKvl/FzbLKzi4k20FGuOr9OHamYGW4v4bUuCe4Pw=;
+        b=n28dxYvaxPfq5JUzsQqU6kb+bImfDaBPK4ACVIjk36q9wbwO2Ix5OhdxzRqVx+gjh7
+         vPGDsy2Z/CkVDlg0sacBgvwyhP7Cr0CdN6fmm+V+cxa8+RtEgXZfvRyRNCKyvdMkH3IG
+         AZIFu3+14yJXDRgL1cAXUeLDtssdqJhhsK3uUP9LNJOKnlmtgEbiGDaecgZ2kxcyuk+W
+         ieFXO/j1UfguA8IRQyx5S+9eNafvz99yFQpPT34J9xYi+XPsnNySq6lG7R9Y+uCWDb48
+         YGdH1N2wSkTT52iPU+n1BLdHUrV7R+KBKxYE48TbebgWoPnGhsUXfQZtwsoUmHH5p6Uh
+         UXGQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1680728960;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=6MLGKvl/FzbLKzi4k20FGuOr9OHamYGW4v4bUuCe4Pw=;
+        b=1b6R3mCxzBFE7MKbep35rhXqTRv63MEndU/pFN+nqUk8q+9mqKIZ99rFLwTNaqql2y
+         7vGO/7xXxSQnWFYdE8BnFVGUmrsOUvQ2IstNllG1Nrg8R0y8PTZKXUmLSkbfhwOi2KyV
+         xG4xgp/Ju/2Pkv3w6ImBbHBZaX2a5NR08XhxR1QeImVR+Ohbfg83ALb1bjOUAiykPfLq
+         xibNp1HWzMPyEBzcD7/rxHSYsCu3q1HDvIc1DHzMk8E0phYhXZp6Elz1gggyA/fkAcKD
+         h6ViUYlD5ea8QKql7GOF5r+LqOzqqSboCFC8xXRf/MDAXmZNxypwdtY+EGzO3oSPtcgh
+         f51Q==
+X-Gm-Message-State: AAQBX9c1I3qmy7IzEV9Vx/1ls60dtlqZg2LYj/Cgn2Rg//NlBslzlbO4
+        1jdTOdSQYIiAicCtZxabmZDsAIp/WAwttUg/UX+Tww==
+X-Google-Smtp-Source: AKy350b0IUXlBzjwLLr6SEpK1cx38ABlr+yVbGlA9Wc0dSXUg0uG5eQHWSVFl7t3uBAdQCZoYdM8DgcCcOXiLa8I580=
+X-Received: by 2002:a65:430c:0:b0:514:3d3d:da5a with SMTP id
+ j12-20020a65430c000000b005143d3dda5amr427665pgq.3.1680728960348; Wed, 05 Apr
+ 2023 14:09:20 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230405180134.16932-4-ankita@nvidia.com>
-X-Spam-Status: No, score=-2.5 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+References: <20230330224348.1006691-1-davidai@google.com> <20230405080548.GW4253@hirez.programming.kicks-ass.net>
+In-Reply-To: <20230405080548.GW4253@hirez.programming.kicks-ass.net>
+From:   Saravana Kannan <saravanak@google.com>
+Date:   Wed, 5 Apr 2023 14:08:43 -0700
+Message-ID: <CAGETcx-qgKeUQ60VhvW+hYUY-sMh-wX1G8zSwJUFpJ-u7aU6aA@mail.gmail.com>
+Subject: Re: [RFC PATCH 0/6] Improve VM DVFS and task placement behavior
+To:     Peter Zijlstra <peterz@infradead.org>
+Cc:     David Dai <davidai@google.com>,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        Viresh Kumar <viresh.kumar@linaro.org>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Marc Zyngier <maz@kernel.org>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Lorenzo Pieralisi <lpieralisi@kernel.org>,
+        Sudeep Holla <sudeep.holla@arm.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Juri Lelli <juri.lelli@redhat.com>,
+        Vincent Guittot <vincent.guittot@linaro.org>,
+        Dietmar Eggemann <dietmar.eggemann@arm.com>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>,
+        Daniel Bristot de Oliveira <bristot@redhat.com>,
+        Valentin Schneider <vschneid@redhat.com>,
+        kernel-team@android.com, linux-pm@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-15.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,ENV_AND_HDR_SPF_MATCH,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL,
+        USER_IN_DEF_SPF_WL autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+On Wed, Apr 5, 2023 at 1:06=E2=80=AFAM Peter Zijlstra <peterz@infradead.org=
+> wrote:
+>
+> On Thu, Mar 30, 2023 at 03:43:35PM -0700, David Dai wrote:
+> > Hi,
+> >
+> > This patch series is a continuation of the talk Saravana gave at LPC 20=
+22
+> > titled "CPUfreq/sched and VM guest workload problems" [1][2][3]. The gi=
+st
+> > of the talk is that workloads running in a guest VM get terrible task
+> > placement and DVFS behavior when compared to running the same workload =
+in
+> > the host. Effectively, no EAS for threads inside VMs. This would make p=
+ower
+> > and performance terrible just by running the workload in a VM even if w=
+e
+> > assume there is zero virtualization overhead.
+> >
+> > We have been iterating over different options for communicating between
+> > guest and host, ways of applying the information coming from the
+> > guest/host, etc to figure out the best performance and power improvemen=
+ts
+> > we could get.
+> >
+> > The patch series in its current state is NOT meant for landing in the
+> > upstream kernel. We are sending this patch series to share the current
+> > progress and data we have so far. The patch series is meant to be easy =
+to
+> > cherry-pick and test on various devices to see what performance and pow=
+er
+> > benefits this might give for others.
+> >
+> > With this series, a workload running in a VM gets the same task placeme=
+nt
+> > and DVFS treatment as it would when running in the host.
+> >
+> > As expected, we see significant performance improvement and better
+> > performance/power ratio. If anyone else wants to try this out for your =
+VM
+> > workloads and report findings, that'd be very much appreciated.
+> >
+> > The idea is to improve VM CPUfreq/sched behavior by:
+> > - Having guest kernel to do accurate load tracking by taking host CPU
+> >   arch/type and frequency into account.
+> > - Sharing vCPU run queue utilization information with the host so that =
+the
+> >   host can do proper frequency scaling and task placement on the host s=
+ide.
+>
+> So, not having actually been send many of the patches I've no idea what
+> you've done... Please, eradicate this ridiculous idea of sending random
+> people a random subset of a patch series. Either send all of it or none,
+> this is a bloody nuisance.
 
-kernel test robot noticed the following build errors:
+Sorry, that was our intention, but had a scripting error. It's been fixed.
 
-[auto build test ERROR on awilliam-vfio/for-linus]
-[also build test ERROR on kvmarm/next akpm-mm/mm-everything linus/master v6.3-rc5]
-[cannot apply to awilliam-vfio/next next-20230405]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+I have a script to use with git send-email's --to-cmd and --cc-cmd
+option. It uses get_maintainers.pl to figure out who to email, but it
+gets trickier for a patch series that spans maintainer trees.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/ankita-nvidia-com/kvm-determine-memory-type-from-VMA/20230406-020404
-base:   https://github.com/awilliam/linux-vfio.git for-linus
-patch link:    https://lore.kernel.org/r/20230405180134.16932-4-ankita%40nvidia.com
-patch subject: [PATCH v3 3/6] mm: handle poisoning of pfn without struct pages
-config: x86_64-randconfig-a015-20230403 (https://download.01.org/0day-ci/archive/20230406/202304060452.tpNrPK39-lkp@intel.com/config)
-compiler: gcc-11 (Debian 11.3.0-8) 11.3.0
-reproduce (this is a W=1 build):
-        # https://github.com/intel-lab-lkp/linux/commit/25466c8c2fa22d39a08721a24f0cf3bc3059417b
-        git remote add linux-review https://github.com/intel-lab-lkp/linux
-        git fetch --no-tags linux-review ankita-nvidia-com/kvm-determine-memory-type-from-VMA/20230406-020404
-        git checkout 25466c8c2fa22d39a08721a24f0cf3bc3059417b
-        # save the config file
-        mkdir build_dir && cp config build_dir/.config
-        make W=1 O=build_dir ARCH=x86_64 olddefconfig
-        make W=1 O=build_dir ARCH=x86_64 SHELL=/bin/bash
+v2 and later will have everyone get all the patches.
 
-If you fix the issue, kindly add following tag where applicable
-| Reported-by: kernel test robot <lkp@intel.com>
-| Link: https://lore.kernel.org/oe-kbuild-all/202304060452.tpNrPK39-lkp@intel.com/
+> Having said that; my biggest worry is that you're making scheduler
+> internals into an ABI. I would hate for this paravirt interface to tie
+> us down.
 
-All errors (new ones prefixed by >>):
+The only 2 pieces of information shared between host/guest are:
 
-   ld: vmlinux.o: in function `memory_failure_pfn':
->> mm/memory-failure.c:2124: undefined reference to `interval_tree_iter_first'
->> ld: mm/memory-failure.c:2125: undefined reference to `interval_tree_iter_next'
-   ld: vmlinux.o: in function `register_pfn_address_space':
->> mm/memory-failure.c:2087: undefined reference to `interval_tree_insert'
-   ld: vmlinux.o: in function `unregister_pfn_address_space':
->> mm/memory-failure.c:2105: undefined reference to `interval_tree_remove'
+1. Host CPU frequency -- this isn't really scheduler internals and
+will map nicely to a virtual cpufreq driver.
 
+2. A vCPU util value between 0 - 1024 where 1024 corresponds to the
+highest performance point across all CPUs (taking freq, arch, etc into
+consideration). Yes, this currently matches how the run queue util is
+tracked, but we can document the interface as "percentage of max
+performance capability", but representing it as 0 - 1024 instead of
+0-100. That way, even if the scheduler changes how it tracks util in
+the future, we can still keep this interface between guest/host and
+map it appropriately on the host end.
 
-vim +2124 mm/memory-failure.c
+In either case, we could even have a Windows guest where they might
+track vCPU utilization differently and still have this work with the
+Linux host with this interface.
 
-  2065	
-  2066	/**
-  2067	 * register_pfn_address_space - Register PA region for poison notification.
-  2068	 * @pfn_space: structure containing region range and callback function on
-  2069	 *             poison detection.
-  2070	 *
-  2071	 * This function is called by a kernel module to register a PA region and
-  2072	 * a callback function with the kernel. On detection of poison, the
-  2073	 * kernel code will go through all registered regions and call the
-  2074	 * appropriate callback function associated with the range. The kernel
-  2075	 * module is responsible for tracking the poisoned pages.
-  2076	 *
-  2077	 * Return: 0 if successfully registered,
-  2078	 *         -EBUSY if the region is already registered
-  2079	 */
-  2080	int register_pfn_address_space(struct pfn_address_space *pfn_space)
-  2081	{
-  2082		if (!request_mem_region(pfn_space->node.start << PAGE_SHIFT,
-  2083			(pfn_space->node.last - pfn_space->node.start + 1) << PAGE_SHIFT, ""))
-  2084			return -EBUSY;
-  2085	
-  2086		mutex_lock(&pfn_space_lock);
-> 2087		interval_tree_insert(&pfn_space->node, &pfn_space_itree);
-  2088		mutex_unlock(&pfn_space_lock);
-  2089	
-  2090		return 0;
-  2091	}
-  2092	EXPORT_SYMBOL_GPL(register_pfn_address_space);
-  2093	
-  2094	/**
-  2095	 * unregister_pfn_address_space - Unregister a PA region from poison
-  2096	 * notification.
-  2097	 * @pfn_space: structure containing region range to be unregistered.
-  2098	 *
-  2099	 * This function is called by a kernel module to unregister the PA region
-  2100	 * from the kernel from poison tracking.
-  2101	 */
-  2102	void unregister_pfn_address_space(struct pfn_address_space *pfn_space)
-  2103	{
-  2104		mutex_lock(&pfn_space_lock);
-> 2105		interval_tree_remove(&pfn_space->node, &pfn_space_itree);
-  2106		mutex_unlock(&pfn_space_lock);
-  2107		release_mem_region(pfn_space->node.start << PAGE_SHIFT,
-  2108			(pfn_space->node.last - pfn_space->node.start + 1) << PAGE_SHIFT);
-  2109	}
-  2110	EXPORT_SYMBOL_GPL(unregister_pfn_address_space);
-  2111	
-  2112	static int memory_failure_pfn(unsigned long pfn, int flags)
-  2113	{
-  2114		struct interval_tree_node *node;
-  2115		int rc = -EBUSY;
-  2116		LIST_HEAD(tokill);
-  2117	
-  2118		mutex_lock(&pfn_space_lock);
-  2119		/*
-  2120		 * Modules registers with MM the address space mapping to the device memory they
-  2121		 * manage. Iterate to identify exactly which address space has mapped to this
-  2122		 * failing PFN.
-  2123		 */
-> 2124		for (node = interval_tree_iter_first(&pfn_space_itree, pfn, pfn); node;
-> 2125		     node = interval_tree_iter_next(node, pfn, pfn)) {
-  2126			struct pfn_address_space *pfn_space =
-  2127				container_of(node, struct pfn_address_space, node);
-  2128			rc = 0;
-  2129	
-  2130			/*
-  2131			 * Modules managing the device memory needs to be conveyed about the
-  2132			 * memory failure so that the poisoned PFN can be tracked.
-  2133			 */
-  2134			pfn_space->ops->failure(pfn_space, pfn);
-  2135	
-  2136			collect_procs_pgoff(NULL, pfn_space->mapping, pfn, &tokill);
-  2137	
-  2138			unmap_mapping_range(pfn_space->mapping, pfn << PAGE_SHIFT,
-  2139					    PAGE_SIZE, 0);
-  2140		}
-  2141		mutex_unlock(&pfn_space_lock);
-  2142	
-  2143		/*
-  2144		 * Unlike System-RAM there is no possibility to swap in a different
-  2145		 * physical page at a given virtual address, so all userspace
-  2146		 * consumption of direct PFN memory necessitates SIGBUS (i.e.
-  2147		 * MF_MUST_KILL)
-  2148		 */
-  2149		flags |= MF_ACTION_REQUIRED | MF_MUST_KILL;
-  2150		kill_procs(&tokill, true, false, pfn, flags);
-  2151	
-  2152		pr_err("%#lx: recovery action for %s: %s\n",
-  2153				pfn, action_page_types[MF_MSG_PFN],
-  2154				action_name[rc ? MF_FAILED : MF_RECOVERED]);
-  2155	
-  2156		return rc;
-  2157	}
-  2158	
+Does that sound reasonable to you?
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests
+Another option is to convert (2) into a "CPU frequency" request (but
+without latching it to values in the CPUfreq table) but it'll add some
+unnecessary math (with division) on the guest and host end. But I'd
+rather keep it as 0-1024 unless you really want this 2nd option.
+
+-Saravana
