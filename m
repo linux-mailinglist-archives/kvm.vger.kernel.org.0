@@ -2,64 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 01E936D796B
-	for <lists+kvm@lfdr.de>; Wed,  5 Apr 2023 12:18:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F0A6C6D796C
+	for <lists+kvm@lfdr.de>; Wed,  5 Apr 2023 12:18:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237331AbjDEKST (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Apr 2023 06:18:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35444 "EHLO
+        id S237526AbjDEKS1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Apr 2023 06:18:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35538 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235049AbjDEKSR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Apr 2023 06:18:17 -0400
-Received: from mail-wm1-x335.google.com (mail-wm1-x335.google.com [IPv6:2a00:1450:4864:20::335])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 11EFF211F
-        for <kvm@vger.kernel.org>; Wed,  5 Apr 2023 03:18:16 -0700 (PDT)
-Received: by mail-wm1-x335.google.com with SMTP id d11-20020a05600c3acb00b003ef6e6754c5so17956848wms.5
-        for <kvm@vger.kernel.org>; Wed, 05 Apr 2023 03:18:15 -0700 (PDT)
+        with ESMTP id S237551AbjDEKSY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Apr 2023 06:18:24 -0400
+Received: from mail-wr1-x436.google.com (mail-wr1-x436.google.com [IPv6:2a00:1450:4864:20::436])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61896271C
+        for <kvm@vger.kernel.org>; Wed,  5 Apr 2023 03:18:23 -0700 (PDT)
+Received: by mail-wr1-x436.google.com with SMTP id r29so35612911wra.13
+        for <kvm@vger.kernel.org>; Wed, 05 Apr 2023 03:18:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1680689894;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=R3c7APLhxJFNCqIErCGS2nhF3aw+HLHuokeVO/lFk00=;
-        b=OBiO/iyMPp7HhyBZcX7fJgp2AA6LNBmXbyqspQfxTpbw5ifIhJkHachSnVGxiHum7T
-         pDyTjdZU/TDYDH8YqIYCNPP2VKdx3wdUBLlBxM9gzo34nXlEfQws3UH3CuMpU0XuvBtJ
-         BR0Y9rfffghCpUn3Lq722SfA08hTOExgU+rQvnILo+j+5Ft88ticBqenXwg5p/GlGvca
-         41krEivQExeKbzC6OcydV1hPviKH9pwe4ul7G2ol7M0QTifUHh3PLePZ/6n5cypktE9F
-         2KVXZ7OB0raOVG9XCJUMp3dAf1zpvJiqWUaGdW48AgcrjBnZSMXe3CucyEtdxru47k5Y
-         KTzQ==
+        d=linaro.org; s=google; t=1680689902;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=y5W5kRucCzOBlp3KNoaJLlOhdcHcmgdcoSudurkJOAU=;
+        b=YvdDHGNJmJITr/TCaBwa+nNTBQzwFo4m9pQoqmbmi3vaFmhxmN+kDfHXTlih7hjOuG
+         i5foQd722oTmMrBj+Hnn/y+vSEYHeAfBNU8qFxNsz637G6z7vjp3C2UAjRMomPmXSt6B
+         8zPBf0Ips8vfVnHZNtgCTbmeRiHGsNV5SUfNvKV2SqM3fJYcuc7ImyIhwyWRK6Hj9a9X
+         +Js3FJbT2ARj2FgCtaCnNeF4Yijhd95peS0BiCwqBd/BuWcL+6seYLzsD3aU2CENQUwI
+         ovnk8urTgfiCLVoqgt1J2QmQfKLKfpa8JYktu83jlKdtgVQauBcK79zdBkzhpVPSX3Ka
+         StWA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680689894;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=R3c7APLhxJFNCqIErCGS2nhF3aw+HLHuokeVO/lFk00=;
-        b=m3xhZxeyu8i56+lkdZ2Cm09hJyuL9kqzAr411tM8XufivK7BXjkASD4bOGAsPMSYsc
-         tB7ivF/RxzvNROd9ShvGxKUVrnc5/5V+0feGFTF4H34FgWhDO4Ux8lfypAEJwosH6SIh
-         ZvICGon6MYa7oIGxCXtOeqqDmDMaiEZt1CgIodKnH7ewO0jJs4NhI6frgtyRzCRZp3X6
-         bJSjonLvXVvbp3SR8bCnRy46p2753IFdoZ3Smesv+qahh0jeuogwSrlvtyCxxdUnn/tU
-         wqcw2Z9s4aZANlAIDPcAwT9JrTMvu9P0zDWqLdY8VEEpCEI7vKX3xR6Z56qGuMnNXEm1
-         Kl3A==
-X-Gm-Message-State: AAQBX9dhoS4PlZib4qwvrnckIl3d6dOy+6uo/xkbykviiOFyziuGhFYl
-        d8Tq9N9UpQ/KwCb/B+LxtTcODw==
-X-Google-Smtp-Source: AKy350Ybve9k60nXpw2N7+saf2pFb1rgNJYM8Jf0Z78V3ulPWVpu1aVqOeAnHikWi6TcyhWdL0mjyg==
-X-Received: by 2002:a7b:c4d3:0:b0:3ed:551b:b78f with SMTP id g19-20020a7bc4d3000000b003ed551bb78fmr4181570wmk.4.1680689894558;
-        Wed, 05 Apr 2023 03:18:14 -0700 (PDT)
+        d=1e100.net; s=20210112; t=1680689902;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=y5W5kRucCzOBlp3KNoaJLlOhdcHcmgdcoSudurkJOAU=;
+        b=Q4p9dPKOFLYNmer1id+nAQ9ZCiiPEjUs/i905Eou6Su5vPs1EziGqDLUDaAbzDICTa
+         bFUgEGunYydkOD//0ZcHrTIMhcc/GoJ37MeXQLCVvxi738vUIvUU8dO7dIS+L9A4VLyu
+         SsQbm83dwvSqcnOt4rnUaJLj7FgY1tJiY3TDc7WFiSW/ph7W2G1rzHiLSOtzIUGCkdEh
+         4v2kkCq5r0U4XgJaeZRmIJxdnsZEwl4g76Rh+FeXYJOF4elCrWjNZ3iCRW36ACqXCAUa
+         xUqK9mgKNFSCPZKAZF+j+oDny6Ds4Kqc+ZKRLPk78Cwrj1KMX/VB2inupnSgzGCGbPKe
+         uXjg==
+X-Gm-Message-State: AAQBX9ewhBiOqiXwdpdWRMJylebqwMi0bV8uj783PXk73Oo6UoodEMik
+        2zGfWa4D6zRaYXnYaJ6HaGJtX5n/VqY5otseQGY=
+X-Google-Smtp-Source: AKy350bpxg4IrwdUQGHpIVdGoidA/+sCsrkONX9FyvsEM868pIe4QiJWHCOtkMTvKUMsoYziJ+Rgdw==
+X-Received: by 2002:a5d:44c2:0:b0:2cf:efd7:2f1d with SMTP id z2-20020a5d44c2000000b002cfefd72f1dmr3851096wrr.13.1680689901758;
+        Wed, 05 Apr 2023 03:18:21 -0700 (PDT)
 Received: from localhost.localdomain (4ab54-h01-176-184-52-81.dsl.sta.abo.bbox.fr. [176.184.52.81])
-        by smtp.gmail.com with ESMTPSA id t16-20020a05600c451000b003ef66c89af0sm5203608wmo.0.2023.04.05.03.18.13
+        by smtp.gmail.com with ESMTPSA id a12-20020a056000100c00b002cea8664304sm14500312wrx.91.2023.04.05.03.18.19
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Wed, 05 Apr 2023 03:18:14 -0700 (PDT)
+        Wed, 05 Apr 2023 03:18:21 -0700 (PDT)
 From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
 To:     qemu-devel@nongnu.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
         xen-devel@lists.xenproject.org, kvm@vger.kernel.org,
-        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
-Subject: [PATCH 00/14] accel: Share CPUState accel context (HAX/NVMM/WHPX/HVF)
-Date:   Wed,  5 Apr 2023 12:17:57 +0200
-Message-Id: <20230405101811.76663-1-philmd@linaro.org>
+        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+        Reinoud Zandijk <reinoud@netbsd.org>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Sunil Muthuswamy <sunilmut@microsoft.com>,
+        Stefano Stabellini <sstabellini@kernel.org>,
+        Anthony Perard <anthony.perard@citrix.com>,
+        Paul Durrant <paul@xen.org>
+Subject: [PATCH 01/14] accel: Document generic accelerator headers
+Date:   Wed,  5 Apr 2023 12:17:58 +0200
+Message-Id: <20230405101811.76663-2-philmd@linaro.org>
 X-Mailer: git-send-email 2.38.1
+In-Reply-To: <20230405101811.76663-1-philmd@linaro.org>
+References: <20230405101811.76663-1-philmd@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
         DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS
@@ -70,52 +79,98 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This series is part of the single binary effort.
+These headers are meant to be include by any file to check
+the availability of accelerators, thus are not accelerator
+specific.
 
-All accelerator will share their per-vCPU context in
-an opaque 'accel' pointer within the CPUState.
+Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+---
+ include/sysemu/hax.h  | 2 ++
+ include/sysemu/kvm.h  | 2 ++
+ include/sysemu/nvmm.h | 2 ++
+ include/sysemu/tcg.h  | 2 ++
+ include/sysemu/whpx.h | 2 ++
+ include/sysemu/xen.h  | 2 ++
+ 6 files changed, 12 insertions(+)
 
-First handle HAX/NVMM/WHPX/HVF. KVM and TCG will follow
-as two different (bigger) follow-up series.
-
-Philippe Mathieu-Daudé (14):
-  accel: Document generic accelerator headers
-  accel: Remove unused hThread variable on TCG/WHPX
-  accel: Fix a leak on Windows HAX
-  accel: Destroy HAX vCPU threads once done
-  accel: Rename 'hax_vcpu' as 'accel' in CPUState
-  accel: Use a typedef for struct hax_vcpu_state
-  accel: Rename struct hax_vcpu_state -> struct AccelvCPUState
-  accel: Move HAX hThread to accelerator context
-  accel: Allocate NVMM vCPU using g_try_FOO()
-  accel: Rename NVMM struct qemu_vcpu -> struct AccelvCPUState
-  accel: Inline NVMM get_qemu_vcpu()
-  accel: Rename WHPX struct whpx_vcpu -> struct AccelvCPUState
-  accel: Inline WHPX get_whpx_vcpu()
-  accel: Rename HVF struct hvf_vcpu_state -> struct AccelvCPUState
-
- include/hw/core/cpu.h             | 11 ++---
- include/sysemu/hax.h              |  2 +
- include/sysemu/hvf_int.h          |  2 +-
- include/sysemu/kvm.h              |  2 +
- include/sysemu/nvmm.h             |  2 +
- include/sysemu/tcg.h              |  2 +
- include/sysemu/whpx.h             |  2 +
- include/sysemu/xen.h              |  2 +
- target/i386/hax/hax-i386.h        | 14 ++++---
- accel/hvf/hvf-accel-ops.c         | 16 +++----
- accel/tcg/tcg-accel-ops-mttcg.c   |  4 --
- accel/tcg/tcg-accel-ops-rr.c      |  3 --
- target/arm/hvf/hvf.c              | 70 +++++++++++++++----------------
- target/i386/hax/hax-accel-ops.c   |  5 ++-
- target/i386/hax/hax-all.c         | 26 +++++++-----
- target/i386/hax/hax-posix.c       |  4 +-
- target/i386/hax/hax-windows.c     |  6 +--
- target/i386/nvmm/nvmm-all.c       | 38 +++++++----------
- target/i386/whpx/whpx-accel-ops.c |  3 --
- target/i386/whpx/whpx-all.c       | 39 +++++++----------
- 20 files changed, 123 insertions(+), 130 deletions(-)
-
+diff --git a/include/sysemu/hax.h b/include/sysemu/hax.h
+index bf8f99a824..80fc716f80 100644
+--- a/include/sysemu/hax.h
++++ b/include/sysemu/hax.h
+@@ -19,6 +19,8 @@
+  *
+  */
+ 
++/* header to be included in non-HAX-specific code */
++
+ #ifndef QEMU_HAX_H
+ #define QEMU_HAX_H
+ 
+diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
+index c8281c07a7..cc6c678ed8 100644
+--- a/include/sysemu/kvm.h
++++ b/include/sysemu/kvm.h
+@@ -11,6 +11,8 @@
+  *
+  */
+ 
++/* header to be included in non-KVM-specific code */
++
+ #ifndef QEMU_KVM_H
+ #define QEMU_KVM_H
+ 
+diff --git a/include/sysemu/nvmm.h b/include/sysemu/nvmm.h
+index 833670fccb..be7bc9a62d 100644
+--- a/include/sysemu/nvmm.h
++++ b/include/sysemu/nvmm.h
+@@ -7,6 +7,8 @@
+  * See the COPYING file in the top-level directory.
+  */
+ 
++/* header to be included in non-NVMM-specific code */
++
+ #ifndef QEMU_NVMM_H
+ #define QEMU_NVMM_H
+ 
+diff --git a/include/sysemu/tcg.h b/include/sysemu/tcg.h
+index 53352450ff..5e2ca9aab3 100644
+--- a/include/sysemu/tcg.h
++++ b/include/sysemu/tcg.h
+@@ -5,6 +5,8 @@
+  * See the COPYING file in the top-level directory.
+  */
+ 
++/* header to be included in non-TCG-specific code */
++
+ #ifndef SYSEMU_TCG_H
+ #define SYSEMU_TCG_H
+ 
+diff --git a/include/sysemu/whpx.h b/include/sysemu/whpx.h
+index 2889fa2278..781ca5b2b6 100644
+--- a/include/sysemu/whpx.h
++++ b/include/sysemu/whpx.h
+@@ -10,6 +10,8 @@
+  *
+  */
+ 
++/* header to be included in non-WHPX-specific code */
++
+ #ifndef QEMU_WHPX_H
+ #define QEMU_WHPX_H
+ 
+diff --git a/include/sysemu/xen.h b/include/sysemu/xen.h
+index 0ca25697e4..bc13ad5692 100644
+--- a/include/sysemu/xen.h
++++ b/include/sysemu/xen.h
+@@ -5,6 +5,8 @@
+  * See the COPYING file in the top-level directory.
+  */
+ 
++/* header to be included in non-Xen-specific code */
++
+ #ifndef SYSEMU_XEN_H
+ #define SYSEMU_XEN_H
+ 
 -- 
 2.38.1
 
