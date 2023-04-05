@@ -2,65 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 792A86D8717
-	for <lists+kvm@lfdr.de>; Wed,  5 Apr 2023 21:42:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 46D4B6D875A
+	for <lists+kvm@lfdr.de>; Wed,  5 Apr 2023 21:51:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229379AbjDETmX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Apr 2023 15:42:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38046 "EHLO
+        id S231132AbjDETv2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Apr 2023 15:51:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45496 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230080AbjDETmV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Apr 2023 15:42:21 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C64446EA6
-        for <kvm@vger.kernel.org>; Wed,  5 Apr 2023 12:41:58 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id j11-20020a25230b000000b00b6871c296bdso36166448ybj.5
-        for <kvm@vger.kernel.org>; Wed, 05 Apr 2023 12:41:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1680723715;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=D9Q4GD2QPGOva7RvqFAPDAkxNzlyH0URb79YtuVE0ig=;
-        b=p6+bROWgidmq+3NmybkuWFFLsskbLz+KiwiS4NTI2dKXC/NHOtEdJMg34Nq90NO0Uk
-         AISqQuG9e8nD1cx9MI3RcLk4q+wodqaLQ7zBJaVB3cncFsGl1pzTJiPTiwo59sQmUAiN
-         KwaQsVqbe2YZq7lNiaCLN0tgS1sdV9qTh1xykrdsQP77KHcIgMWh6126I7ZXKhTxiA5C
-         bQTXxoHuTV2l1pxYaNJwSp4A385pajmJzu6YCFya64pdM4laJ8QA+WyUhl5BG7XdQQgl
-         2OyPvdmPwbuzUV5K5m5M/NqzUR/+ZEsX0A14le+vhdfOgkeaFf358jSNAJb8s6CyVfI8
-         5FMA==
+        with ESMTP id S233704AbjDETvM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Apr 2023 15:51:12 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65A2376AA
+        for <kvm@vger.kernel.org>; Wed,  5 Apr 2023 12:50:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1680724190;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=5VV/1+tZjcISuBy4Cr1ZNzpFLuXRsQrIQ62y/gstXpI=;
+        b=QxuN++igsvhzbGo71Uz3jk20+RURCrF4tZu4Ae6f1LmtXPnRok3I3u+0DUPXZwI31roSBR
+        1RRButgSfjBxvXsXpba3ZkLHQsSd1q0zTh6U2fHTKoYKlQMzEu7uGJp8GbzjHlWjpP03UH
+        ZLnX1YrNBXDdKWyA1iaMo4smZzFMgyY=
+Received: from mail-io1-f69.google.com (mail-io1-f69.google.com
+ [209.85.166.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-310-GO9bSjv8Nyq3uVFdm7GLlQ-1; Wed, 05 Apr 2023 15:49:48 -0400
+X-MC-Unique: GO9bSjv8Nyq3uVFdm7GLlQ-1
+Received: by mail-io1-f69.google.com with SMTP id i4-20020a6b5404000000b0075ff3fb6f4cso7467068iob.9
+        for <kvm@vger.kernel.org>; Wed, 05 Apr 2023 12:49:48 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680723715;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=D9Q4GD2QPGOva7RvqFAPDAkxNzlyH0URb79YtuVE0ig=;
-        b=25Wzk/rstkwrKJbj8zosFJfaABFhjBXia6d6sdaZLZg6EYYqvNLZcsqUr+EIyOqire
-         hoGm0YCJ45sLmZo6maLDwud9u6JBGME61agoFO6goPoXiN/WWgVTnf0EzoP3H7iGERyZ
-         tKdY9hb/KygiQPDJpdmqmA/0FAwxZ76e4Pitl26V3NbJLttNN7QOvKGPNTC9HvN9zRG0
-         ix0Q22Xbbn9c1JqVJkUq9cEAeKr9N8rxL91xl6ltjdYwqqdxWlPRTtEXF3lTt16QcM0E
-         UVfZMSdg8ZxB7moSFcsAIi1VGFNEfnHbIpXCFKa+ijma5KwjiYTmV26qb3lwtes/vopc
-         yqEA==
-X-Gm-Message-State: AAQBX9fX45H1VuWFTew2GFwMTTqxDbWDxRMTH18VDSqObRF35ra5ALfO
-        X3jPqFLvht432VarAaFcFAe88vzNvZc=
-X-Google-Smtp-Source: AKy350bZCB4gaYe3OpokETo/h/8efH3hud6jt+UsWPpLLo+J2o5R6MCv4hpEKPhlaxlJJh81SHBrMh0TUnk=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:12c7:b0:b26:884:c35e with SMTP id
- j7-20020a05690212c700b00b260884c35emr318170ybu.4.1680723715043; Wed, 05 Apr
- 2023 12:41:55 -0700 (PDT)
-Date:   Wed, 5 Apr 2023 12:41:53 -0700
-In-Reply-To: <f8d26a55-2371-241e-6165-24b6a04c2243@grsecurity.net>
-Mime-Version: 1.0
-References: <20230404165341.163500-1-seanjc@google.com> <20230404165341.163500-7-seanjc@google.com>
- <6fcaf791-da24-fae7-af03-3e19a781fd26@grsecurity.net> <ZC2FwphMDTz3ESLQ@google.com>
- <f8d26a55-2371-241e-6165-24b6a04c2243@grsecurity.net>
-Message-ID: <ZC3PAX5SHkg/dxlU@google.com>
-Subject: Re: [kvm-unit-tests PATCH v4 6/9] x86/access: Try forced emulation
- for CR0.WP test as well
-From:   Sean Christopherson <seanjc@google.com>
-To:     Mathias Krause <minipli@grsecurity.net>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-7.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+        d=1e100.net; s=20210112; t=1680724188;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=5VV/1+tZjcISuBy4Cr1ZNzpFLuXRsQrIQ62y/gstXpI=;
+        b=PFXH+fmSVNTl58IskPnR+2B1FCTwAr+U+Tnb8I8wVbS9hfavNdm3D0/hL9OE8TtLnE
+         gSfFaXkvmhGEZlAGnwvrAz7URIDyzFCHpKSYMQLTYEa6hLMlvjcn1MYi5+JCjUbvjc2U
+         zND8Fkq3hP5s6wVICRFXRNCb+4kb46mz74DtiRnmvPgd8crWP37t2AVn7O3WM/A9wY3D
+         0a/egwNAQDn71gf3whWNJvbnW2wNntsSAdrMBXfrsMetbwD2JKEl9b3KFoJWtMelUYzM
+         LG8vKaIdKrWKU+qQSU3DsBPwLzAVKizaU0PTYtVMmvG7ZhWux4ieIclycf7Vw9FCFz9f
+         YmFQ==
+X-Gm-Message-State: AAQBX9dkpniYAKpXhjgxhFP7ZXBdeMpsIaZMxnB4jvUOUcFhixyBqOtW
+        0MgcmG2SumwtsRIGeCBsBBpul3r8XeyYxzL49yWng0zXK5/eGA0ormrrtxvwrI0UNLPtNsDpBnp
+        BkftZqRkfJRyX
+X-Received: by 2002:a92:d282:0:b0:326:45af:ac3a with SMTP id p2-20020a92d282000000b0032645afac3amr4110792ilp.6.1680724187928;
+        Wed, 05 Apr 2023 12:49:47 -0700 (PDT)
+X-Google-Smtp-Source: AKy350aOs7AtJ3q6RxmL38alxILOxSsLWA2V9ndGqPOcLj391pPzzJ6A38c2cfdJ1QeIVh53KAfw7Q==
+X-Received: by 2002:a92:d282:0:b0:326:45af:ac3a with SMTP id p2-20020a92d282000000b0032645afac3amr4110780ilp.6.1680724187623;
+        Wed, 05 Apr 2023 12:49:47 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id x11-20020a92300b000000b00325daf836fdsm4046680ile.17.2023.04.05.12.49.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 05 Apr 2023 12:49:47 -0700 (PDT)
+Date:   Wed, 5 Apr 2023 13:49:45 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     "Liu, Yi L" <yi.l.liu@intel.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
+        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "shameerali.kolothum.thodi@huawei.com" 
+        <shameerali.kolothum.thodi@huawei.com>,
+        "lulu@redhat.com" <lulu@redhat.com>,
+        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
+        "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        "Hao, Xudong" <xudong.hao@intel.com>,
+        "Zhao, Yan Y" <yan.y.zhao@intel.com>,
+        "Xu, Terrence" <terrence.xu@intel.com>,
+        "Jiang, Yanting" <yanting.jiang@intel.com>
+Subject: Re: [PATCH v3 12/12] vfio/pci: Report dev_id in
+ VFIO_DEVICE_GET_PCI_HOT_RESET_INFO
+Message-ID: <20230405134945.29e967be.alex.williamson@redhat.com>
+In-Reply-To: <ZC3KJUxJa0O0M+9O@nvidia.com>
+References: <20230401144429.88673-1-yi.l.liu@intel.com>
+        <20230401144429.88673-13-yi.l.liu@intel.com>
+        <a937e622-ce32-6dda-d77c-7d8d76474ee0@redhat.com>
+        <DS0PR11MB7529D4E354C3B85D7698017DC3909@DS0PR11MB7529.namprd11.prod.outlook.com>
+        <20230405102545.41a61424.alex.williamson@redhat.com>
+        <ZC2jsQuWiMYM6JZb@nvidia.com>
+        <20230405105215.428fa9f5.alex.williamson@redhat.com>
+        <ZC2un1LaTUR1OrrJ@nvidia.com>
+        <20230405125621.4627ca19.alex.williamson@redhat.com>
+        <ZC3KJUxJa0O0M+9O@nvidia.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -68,96 +111,123 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Apr 05, 2023, Mathias Krause wrote:
-> On 05.04.23 16:29, Sean Christopherson wrote:
-> > On Wed, Apr 05, 2023, Mathias Krause wrote:
-> >> On 04.04.23 18:53, Sean Christopherson wrote:
-> >>> @@ -1127,6 +1128,10 @@ static int check_toggle_cr0_wp(ac_pt_env_t *pt_env)
-> >>>  
-> >>>  	err += do_cr0_wp_access(&at, 0);
-> >>>  	err += do_cr0_wp_access(&at, AC_CPU_CR0_WP_MASK);
-> >>
-> >>> +	if (!(invalid_mask & AC_FEP_MASK)) {
-> >>
-> >> Can we *please* change this back to 'if (is_fep_available()) {'...? I
-> >> really would like to get these tests exercised by default if possible.
+On Wed, 5 Apr 2023 16:21:09 -0300
+Jason Gunthorpe <jgg@nvidia.com> wrote:
+
+> On Wed, Apr 05, 2023 at 12:56:21PM -0600, Alex Williamson wrote:
+> > Usability needs to be a consideration as well.  An interface where the
+> > result is effectively arbitrary from a user perspective because the
+> > kernel is solely focused on whether the operation is allowed,
+> > evaluating constraints that the user is unaware of and cannot control,
+> > is unusable.  
+> 
+> Considering this API is only invoked by qemu we might be overdoing
+> this usability and 'no shoot in foot' view.
+
+Ok, I'm not sure why we're diminishing the de facto vfio userspace...
+
+> > > This is a good point that qemu needs to make a policy decision if it
+> > > is happy about the VFIO configuration - but that is a policy decision
+> > > that should not become entangled with the kernel's security checks.
+> > > 
+> > > Today qemu can make this policy choice the same way it does right now
+> > > - call _INFO and check the group_ids. It gets the exact same outcome
+> > > as today. We already discussed that we need to expose the group ID
+> > > through an ioctl someplace.  
 > > 
-> > "by default" is a bit misleading IMO.  The vast majority of developers almost
-> > certainly do not do testing with FEP enabled.
+> > QEMU can make a policy decision today because the kernel provides a
+> > sufficiently reliable interface, ie. based on the set of owned groups, a
+> > hot-reset is all but guaranteed to work.    
 > 
-> Fair enough. But with "by default if possible" I meant, if kvm.ko was
-> already loaded with force_emulation_prefix=1, the CR0.WP access tests
-> should automatically make use of it -- much like it's done in other
-> tests, like x86/emulator.c, x86/emulator64.c and x86/pmu.c. Or do you
-> want to change these tests to get a new "force_emulation" parameter as
-> well and disable the automatic detection and usage of FEP support in
-> tests completely?
-
-In an ideal world, the access test would use FEP if it's available, i.e. not make
-it a separate test case.  The unfortunate reality is that the runtime is simply
-too long to do that for the test as a whole.
-
-> > The goal is to reach a balance between the cost of maintenance, principle of least
-> > surprise, and test coverage.  Ease of debugging also factors in (if the FEP version
-> > fails but the non-FEP versions does not), but that's largely a bonus.
+> And we don't change that with cdev. If qemu wants to make the policy
+> decision it keeps using the exact same _INFO interface to make that
+> decision same it has always made.
 > 
-> It's a bonus on the test coverage side, IMHO. If the FEP version fails
-> but the non-FEP one doesn't, apparently something is broken somewhere
-> and should be fixed.
-
-For sure.  What I'm saying is that on my end, I can skip a non-trivial amount of
-triage/debug if "access" passes but "access_fep" fails.  That info _should_ also
-be captured in the log, but not all CI setups actually do that, e.g. the "official"
-gitlab based CI doesn't capture logs (and it's a giant pain).  But again, this is
-not a primary motivator, it's just a happy bonus.
-
-> > Defining a @force_emulation but then ignoring it for a one-off test violates the
-> > principle of least suprise.
+> We weaken the actual reset action to only consider the security side.
 > 
-> Do we need additional parameters for PKU / SMEP / SMAP / LA57 as well or
-> leave the automatic detection in place? </rhetorical question>
+> Applications that want this exclusive reset group policy simply must
+> check it on their own. It is a reasonable API design.
+
+I disagree, as I've argued before, the info ioctl becomes so weak and
+effectively arbitrary from a user perspective at being able to predict
+whether the hot-reset ioctl works that it becomes useless, diminishing
+the entire hot-reset info/execute API.
+
+> > > If this is too awkward we could add a query to the kernel if the cdev
+> > > is "reset exclusive" - eg the iommufd covers all the groups that span
+> > > the reset set.  
+> > 
+> > That's essentially what we have if there are valid dev-ids for each
+> > affected device in the info ioctl.  
 > 
-> We only need the "force_emulation" parameter because the ac_test_bump()
-> loop is so much slower with forced emulation. That's the only reason for
-> it to exists. We can rename it to "full" and do the force emulation
-> tests for ac_test_exec() if FEP is available. But just excluding some
-> (cheap) tests because some command line argument wasn't provided would
-> be surprising to me. Tests should be simple to use, IMO.
+> If you have dev-ids for everything, yes. If you don't, then you can't
+> make the same policy choice using a dev-id interface.
 
-Look at it from the perspective of someone who has never run these tests and has
-no clue what the test does, let alone the gory details of FEP.  The most straightforward
-interpretation of force_emulation=false is that the test does not force emulation,
-thus having a one-off testcase that forces emulation anyways would be surprising.
+Exactly, you can't make any policy choice because the success or
+failure of the hot-reset ioctl can't be known.
 
-E.g. imagine being the person that discovered the VMX #PF test failed because of
-the KVM bug where the emulator barfs on a NOP for L2.  Before they even get near
-the KVM bug itself, the person would be wondering why on earth a NOP is getting a
-#UD.  They would likely then discover FEP and ask the obvious question of why the
-test is trying to use FEP even though forced emulation is allegedly disabled.
-
-That can obviously be solved by comments to explain what "full" means, but as below,
-I would prefer to avoid that if possible.
-
-> > Plumbing a second param/flag into check_toggle_cr0_wp() would, IMO, unnecessarily
-> > increase the maintenance cost.  Ditto for creating a more complex param.
+> > I don't think it helps the user experience to create loopholes where
+> > the hot-reset ioctl can still work in spite of those missing
+> > devices.  
 > 
-> Fully agree, no need for additional parameters. The existing one should
-> simply be renamed to "full" and just control ac_test_exec()'s behavior.
->
-> > I doubt most CI setups that run KUT enable FEP either.  And if
-> > CI/developers do automatically enable FEP, I would be shocked/saddened if
-> > adding an additional configuration is more difficult than overiding a
-> > module param.  E.g. I will soon be modifying my scripts to do both.
+> I disagree. The easy straightforward design is that the reset ioctl
+> works if the process has security permissions. Mixing a policy check
+> into the kernel on this path is creating complexity we don't really
+> need.
 > 
-> Well, the force emulation access tests take a significant amount of time
-> to run, so will likely be disabled for CI systems that run on a free
-> tier basis. But do we need to disable the possibility to run the corner
-> case test as well? I don't think so. If some CI system already takes the
-> effort to manually load kvm.ko with force_emulation_prefix=1, it should
-> get these additional cheap tests automatically instead of having the
-> need to carry additional patches to get them.
+> I don't view it as a loophole, it is flexability to use the API in a
+> way that is different from what qemu wants - eg an app like dpdk may
+> be willing to tolerate a reset group that becomes unavailable after
+> startup. Who knows, why should we force this in the kernel?
 
-If that ends up being the case then I'm totally fine tweaking the param to gate
-only the main loop, but my preference is to wait until it's actually a real
-problem.  I.e. take on more complexity, even though it is minor, if and only if
-we really need to.
+Because look at all the problems it's causing to try to introduce these
+loopholes without also introducing subtle bugs.  There's an argument
+that we're overly strict, which is better than the alternative, which
+seems to be what we're dabbling with.  It is a straightforward
+interface for the hot-reset ioctl to mirror the information provided
+via the hot-reset info ioctl.
+
+> > For example, we have a VFIO_DEVICE_GET_INFO ioctl that supports
+> > capability chains, we could add a capability that reports the group ID
+> > for the device.    
+> 
+> I was going to put that in an iommufd ioctl so it works with VDPA too,
+> but sure, lets assume we can get the group ID from a cdev fd.
+> 
+> > The hot-reset info ioctl remains as it is today, reporting group-ids
+> > and bdfs.  
+> 
+> Sure, but userspace still needs to know how to map the reset sets into
+> dev-ids.
+
+No, it doesn't. 
+
+> Remember the reason we started doing this is because we don't
+> have easy access to the BDF anymore.
+
+We don't need it, the info ioctl provides the groups, the group
+association can be learned from the DEVICE_GET_INFO ioctl, the
+hot-reset ioctl only requires a single representative fd per affected
+group.  dev-ids not required.
+
+> I like leaving this ioctl alone, lets go back to a dedicated ioctl to
+> return the dev_ids.
+
+I don't see any justification for this.  We could add another PCI
+specific DEVICE_GET_INFO capability to report the bdf if we really need
+it, but reporting the group seems sufficient for this use case.
+
+> > The hot-reset ioctl itself is modified to transparently
+> > support either group fds or device fds.  The user can now map cdevs
+> > to group-ids and therefore follow the same rules as groups,
+> > providing at least one representative device fd for each group.  
+> 
+> This looks like a very complex uapi compared to the empty list option,
+> but it seems like it would work.
+
+It's the same API that we have now.  What's complex is trying to figure
+out all the subtle side-effects from the loopholes that are being
+proposed in this series.  Thanks,
+
+Alex
+
