@@ -2,290 +2,211 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1A4FA6D8948
-	for <lists+kvm@lfdr.de>; Wed,  5 Apr 2023 23:08:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 81F8B6D894F
+	for <lists+kvm@lfdr.de>; Wed,  5 Apr 2023 23:09:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233860AbjDEVIJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Apr 2023 17:08:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56208 "EHLO
+        id S234345AbjDEVJO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Apr 2023 17:09:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58318 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232739AbjDEVID (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Apr 2023 17:08:03 -0400
-Received: from mail-pg1-x532.google.com (mail-pg1-x532.google.com [IPv6:2607:f8b0:4864:20::532])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5427B61BA
-        for <kvm@vger.kernel.org>; Wed,  5 Apr 2023 14:07:56 -0700 (PDT)
-Received: by mail-pg1-x532.google.com with SMTP id q191so5277097pgq.7
-        for <kvm@vger.kernel.org>; Wed, 05 Apr 2023 14:07:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1680728875;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sml6aLd7NKNtOPArQglRTFmPrwxLRHpfQGEdpLGQuKU=;
-        b=hzTkqmv9kRVCuEZOHA2Eqet8sLVNbtm1v12CcRdciL89msd39FaXGObgLEAtilXQyw
-         8/nTJHQyEKtHUXCZDNVNUwjpTKf3T8Bkx+UVT8ihgYKBi77tqtVuIBHbp6G5BxfUwt8G
-         W5zxIeGHDJwNo9S7D5TYRs0cwadJf/BNQQs0a4O3I6poQik0dh2klYu6Z2u3dGzNnweb
-         OgcKeZNhlCtp8r2xGYgU3R1uYe35oXfVzjM1MTAFlcQRsQqvtrJSbVphRz52PniweMYe
-         mIyeb3OvhjOXZbUZJkXeD9VUUvZjh8RZ3FdimwT4HGsTjmkW282x/qfCTCsK7d/MGJDt
-         9q7Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680728875;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=sml6aLd7NKNtOPArQglRTFmPrwxLRHpfQGEdpLGQuKU=;
-        b=0J/zYXPAuv935CgZLnpJtINYkYjGG2uNsuf65ZrRvR83btDNQ+zdqORsof2VSNjpgz
-         am39W9MKEnUDN/UCgOgB0Nz2wz1zfUH2MXCCgTdwH2muYRBMzeO8Lw3BvPH700R6cNJd
-         n4FAUTIYPZN59ur4HulvHMwToOWqO/aMmwBUkfSBL+JU3/2OjpmzsvVOwfjjat3GMLas
-         5GIWpbXWQTbX3gfpCkB9hKre0VwV0fOhZZouyV5+j+3pjvIZlKm359YS6U0E3v0npYza
-         luK6BP0UxKMunfTP+1ayeai3fo35V/f2f8joNxEJma4XafS0vyjop6k0W1vmu/uG0W3W
-         slPw==
-X-Gm-Message-State: AAQBX9dqMkGBL8lznadgL7xguvkEcv+JXq4+aHPRKc7KBtVTTl0qQT56
-        B88BDpD7chPYJa8H3u9/95wqXxgQRu/6Hhs0kVc5pA==
-X-Google-Smtp-Source: AKy350a1ele4zhxKI9UlE9RFiSzwa5NSjMvOCRjyurTKaNDCmlUY6tE70hOuWN6BZR42t9Xf7juFWt7K2QkuVmJZcy4=
-X-Received: by 2002:a63:474b:0:b0:50f:ad00:3f92 with SMTP id
- w11-20020a63474b000000b0050fad003f92mr2366072pgk.3.1680728874841; Wed, 05 Apr
- 2023 14:07:54 -0700 (PDT)
+        with ESMTP id S234073AbjDEVJI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Apr 2023 17:09:08 -0400
+Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE6813C1F;
+        Wed,  5 Apr 2023 14:09:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1680728940; x=1712264940;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=kBtAlLh97wt5jwCzGnjJBSJuimQxEQuTgGnvc1uCkV8=;
+  b=aKe48h0qcLvmJrnu+5Z+zvZ7O0gVOCrToYE2OmCl8NXlBXant37ni+9s
+   cqO0HHzI4Eg7POPRKWrqEHTdX120LbPmB6IvAJjbF0ihXZwLKdLESfRtT
+   uPxrIBUg136cWNf6z3/vEOfDIAC0JIMXTRJQUkl0Ll1ULS+odBQosiooU
+   CLJB5dgHNEAex8Bqqsu8xD4VdpL0QugNaGXix9Gt5QI95VeXyOuSdFkh2
+   4Y0wUYdoNwq5Kdi8SpSsXpXQAJgs3dH4EoCamlUkrapm5O9acegPhovvp
+   bR5t1dn6D0YYPB5of/ysmV9dzAApe2yNR9DjzgeVdAGjvlySJWt/8sEgs
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10671"; a="407657517"
+X-IronPort-AV: E=Sophos;i="5.98,321,1673942400"; 
+   d="scan'208";a="407657517"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Apr 2023 14:08:30 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10671"; a="1016620276"
+X-IronPort-AV: E=Sophos;i="5.98,321,1673942400"; 
+   d="scan'208";a="1016620276"
+Received: from lkp-server01.sh.intel.com (HELO b613635ddfff) ([10.239.97.150])
+  by fmsmga005.fm.intel.com with ESMTP; 05 Apr 2023 14:08:25 -0700
+Received: from kbuild by b613635ddfff with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1pkAMi-000Qnq-1Z;
+        Wed, 05 Apr 2023 21:08:24 +0000
+Date:   Thu, 6 Apr 2023 05:07:54 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     ankita@nvidia.com, jgg@nvidia.com, alex.williamson@redhat.com,
+        naoya.horiguchi@nec.com, maz@kernel.org, oliver.upton@linux.dev
+Cc:     oe-kbuild-all@lists.linux.dev, aniketa@nvidia.com, cjia@nvidia.com,
+        kwankhede@nvidia.com, targupta@nvidia.com, vsethi@nvidia.com,
+        acurrid@nvidia.com, apopple@nvidia.com, jhubbard@nvidia.com,
+        danw@nvidia.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-mm@kvack.org
+Subject: Re: [PATCH v3 2/6] vfio/nvgpu: expose GPU device memory as BAR1
+Message-ID: <202304060424.MtQM4udq-lkp@intel.com>
+References: <20230405180134.16932-3-ankita@nvidia.com>
 MIME-Version: 1.0
-References: <20230330224348.1006691-1-davidai@google.com> <ZCx97IKjsBibjdGc@linux.dev>
- <86sfdfv0e1.wl-maz@kernel.org> <ZC0n0HRsmNJeJZps@google.com>
-In-Reply-To: <ZC0n0HRsmNJeJZps@google.com>
-From:   Saravana Kannan <saravanak@google.com>
-Date:   Wed, 5 Apr 2023 14:07:18 -0700
-Message-ID: <CAGETcx_9SdyCQ5UHhjsnV5+X8arhXoZS2NN-mewtPM3oHuZrkw@mail.gmail.com>
-Subject: Re: [RFC PATCH 0/6] Improve VM DVFS and task placement behavior
-To:     Quentin Perret <qperret@google.com>
-Cc:     Marc Zyngier <maz@kernel.org>, David Dai <davidai@google.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        Viresh Kumar <viresh.kumar@linaro.org>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Lorenzo Pieralisi <lpieralisi@kernel.org>,
-        Sudeep Holla <sudeep.holla@arm.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Juri Lelli <juri.lelli@redhat.com>,
-        Vincent Guittot <vincent.guittot@linaro.org>,
-        Dietmar Eggemann <dietmar.eggemann@arm.com>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>,
-        Daniel Bristot de Oliveira <bristot@redhat.com>,
-        Valentin Schneider <vschneid@redhat.com>,
-        kernel-team@android.com, linux-pm@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-15.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,ENV_AND_HDR_SPF_MATCH,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL,
-        USER_IN_DEF_SPF_WL autolearn=unavailable autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230405180134.16932-3-ankita@nvidia.com>
+X-Spam-Status: No, score=-2.5 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Apr 5, 2023 at 12:48=E2=80=AFAM 'Quentin Perret' via kernel-team
-<kernel-team@android.com> wrote:
->
-> On Tuesday 04 Apr 2023 at 21:49:10 (+0100), Marc Zyngier wrote:
-> > On Tue, 04 Apr 2023 20:43:40 +0100,
-> > Oliver Upton <oliver.upton@linux.dev> wrote:
-> > >
-> > > Folks,
-> > >
-> > > On Thu, Mar 30, 2023 at 03:43:35PM -0700, David Dai wrote:
-> > >
-> > > <snip>
-> > >
-> > > > PCMark
-> > > > Higher is better
-> > > > +-------------------+----------+------------+--------+-------+-----=
----+
-> > > > | Test Case (score) | Baseline |  Hypercall | %delta |  MMIO | %del=
-ta |
-> > > > +-------------------+----------+------------+--------+-------+-----=
----+
-> > > > | Weighted Total    |     6136 |       7274 |   +19% |  6867 |   +1=
-2% |
-> > > > +-------------------+----------+------------+--------+-------+-----=
----+
-> > > > | Web Browsing      |     5558 |       6273 |   +13% |  6035 |    +=
-9% |
-> > > > +-------------------+----------+------------+--------+-------+-----=
----+
-> > > > | Video Editing     |     4921 |       5221 |    +6% |  5167 |    +=
-5% |
-> > > > +-------------------+----------+------------+--------+-------+-----=
----+
-> > > > | Writing           |     6864 |       8825 |   +29% |  8529 |   +2=
-4% |
-> > > > +-------------------+----------+------------+--------+-------+-----=
----+
-> > > > | Photo Editing     |     7983 |      11593 |   +45% | 10812 |   +3=
-5% |
-> > > > +-------------------+----------+------------+--------+-------+-----=
----+
-> > > > | Data Manipulation |     5814 |       6081 |    +5% |  5327 |    -=
-8% |
-> > > > +-------------------+----------+------------+--------+-------+-----=
----+
-> > > >
-> > > > PCMark Performance/mAh
-> > > > Higher is better
-> > > > +-----------+----------+-----------+--------+------+--------+
-> > > > |           | Baseline | Hypercall | %delta | MMIO | %delta |
-> > > > +-----------+----------+-----------+--------+------+--------+
-> > > > | Score/mAh |       79 |        88 |   +11% |   83 |    +7% |
-> > > > +-----------+----------+-----------+--------+------+--------+
-> > > >
-> > > > Roblox
-> > > > Higher is better
-> > > > +-----+----------+------------+--------+-------+--------+
-> > > > |     | Baseline |  Hypercall | %delta |  MMIO | %delta |
-> > > > +-----+----------+------------+--------+-------+--------+
-> > > > | FPS |    18.25 |      28.66 |   +57% | 24.06 |   +32% |
-> > > > +-----+----------+------------+--------+-------+--------+
-> > > >
-> > > > Roblox Frames/mAh
-> > > > Higher is better
-> > > > +------------+----------+------------+--------+--------+--------+
-> > > > |            | Baseline |  Hypercall | %delta |   MMIO | %delta |
-> > > > +------------+----------+------------+--------+--------+--------+
-> > > > | Frames/mAh |    91.25 |     114.64 |   +26% | 103.11 |   +13% |
-> > > > +------------+----------+------------+--------+--------+--------+
-> > >
-> > > </snip>
-> > >
-> > > > Next steps:
-> > > > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > > > We are continuing to look into communication mechanisms other than
-> > > > hypercalls that are just as/more efficient and avoid switching into=
- the VMM
-> > > > userspace. Any inputs in this regard are greatly appreciated.
-> > >
-> > > We're highly unlikely to entertain such an interface in KVM.
-> > >
-> > > The entire feature is dependent on pinning vCPUs to physical cores, f=
-or which
-> > > userspace is in the driver's seat. That is a well established and doc=
-umented
-> > > policy which can be seen in the way we handle heterogeneous systems a=
-nd
-> > > vPMU.
-> > >
-> > > Additionally, this bloats the KVM PV ABI with highly VMM-dependent in=
-terfaces
-> > > that I would not expect to benefit the typical user of KVM.
-> > >
-> > > Based on the data above, it would appear that the userspace implement=
-ation is
-> > > in the same neighborhood as a KVM-based implementation, which only fu=
-rther
-> > > weakens the case for moving this into the kernel.
-> > >
-> > > I certainly can appreciate the motivation for the series, but this fe=
-ature
-> > > should be in userspace as some form of a virtual device.
-> >
-> > +1 on all of the above.
->
-> And I concur with all the above as well. Putting this in the kernel is
-> not an obvious fit at all as that requires a number of assumptions about
-> the VMM.
->
-> As Oliver pointed out, the guest topology, and how it maps to the host
-> topology (vcpu pinning etc) is very much a VMM policy decision and will
-> be particularly important to handle guest frequency requests correctly.
->
-> In addition to that, the VMM's software architecture may have an impact.
-> Crosvm for example does device emulation in separate processes for
-> security reasons, so it is likely that adjusting the scheduling
-> parameters ('util_guest', uclamp, or else) only for the vCPU thread that
-> issues frequency requests will be sub-optimal for performance, we may
-> want to adjust those parameters for all the tasks that are on the
-> critical path.
->
-> And at an even higher level, assuming in the kernel a certain mapping of
-> vCPU threads to host threads feels kinda wrong, this too is a host
-> userspace policy decision I believe. Not that anybody in their right
-> mind would want to do this, but I _think_ it would technically be
-> feasible to serialize the execution of multiple vCPUs on the same host
-> thread, at which point the util_guest thingy becomes entirely bogus. (I
-> obviously don't want to conflate this use-case, it's just an example
-> that shows the proposed abstraction in the series is not a perfect fit
-> for the KVM userspace delegation model.)
+Hi,
 
-See my reply to Oliver and Marc. To me it looks like we are converging
-towards having shared memory between guest, host kernel and VMM and
-that should address all our concerns.
+kernel test robot noticed the following build warnings:
 
-The guest will see a MMIO device, writing to it will trigger the host
-kernel to do the basic "set util_guest/uclamp for the vCPU thread that
-corresponds to the vCPU" and then the VMM can do more on top as/if
-needed (because it has access to the shared memory too). Does that
-make sense?
+[auto build test WARNING on awilliam-vfio/for-linus]
+[also build test WARNING on kvmarm/next akpm-mm/mm-everything linus/master v6.3-rc5 next-20230405]
+[cannot apply to awilliam-vfio/next]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-Even in the extreme example, the stuff the kernel would do would still
-be helpful, but not sufficient. You can aggregate the
-util_guest/uclamp and do whatever from the VMM.
-Technically in the extreme example, you don't need any of this. The
-normal util tracking of the vCPU thread on the host side would be
-sufficient.
+url:    https://github.com/intel-lab-lkp/linux/commits/ankita-nvidia-com/kvm-determine-memory-type-from-VMA/20230406-020404
+base:   https://github.com/awilliam/linux-vfio.git for-linus
+patch link:    https://lore.kernel.org/r/20230405180134.16932-3-ankita%40nvidia.com
+patch subject: [PATCH v3 2/6] vfio/nvgpu: expose GPU device memory as BAR1
+config: sparc-allyesconfig (https://download.01.org/0day-ci/archive/20230406/202304060424.MtQM4udq-lkp@intel.com/config)
+compiler: sparc64-linux-gcc (GCC) 12.1.0
+reproduce (this is a W=1 build):
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # https://github.com/intel-lab-lkp/linux/commit/09ea30fcd2fb02d13a38cab4bf3d903f902408f4
+        git remote add linux-review https://github.com/intel-lab-lkp/linux
+        git fetch --no-tags linux-review ankita-nvidia-com/kvm-determine-memory-type-from-VMA/20230406-020404
+        git checkout 09ea30fcd2fb02d13a38cab4bf3d903f902408f4
+        # save the config file
+        mkdir build_dir && cp config build_dir/.config
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross W=1 O=build_dir ARCH=sparc olddefconfig
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross W=1 O=build_dir ARCH=sparc SHELL=/bin/bash drivers/vfio/pci/nvgpu/
 
-Actually any time we have only 1 vCPU host thread per VM, we shouldn't
-be using anything in this patch series and not instantiate the guest
-device at all.
+If you fix the issue, kindly add following tag where applicable
+| Reported-by: kernel test robot <lkp@intel.com>
+| Link: https://lore.kernel.org/oe-kbuild-all/202304060424.MtQM4udq-lkp@intel.com/
 
-> So +1 from me to move this as a virtual device of some kind. And if the
-> extra cost of exiting all the way back to userspace is prohibitive (is
-> it btw?),
+All warnings (new ones prefixed by >>):
 
-I think the "13% increase in battery consumption for games" makes it
-pretty clear that going to userspace is prohibitive. And that's just
-one example.
+>> drivers/vfio/pci/nvgpu/main.c:57:5: warning: no previous prototype for 'nvgpu_vfio_pci_mmap' [-Wmissing-prototypes]
+      57 | int nvgpu_vfio_pci_mmap(struct vfio_device *core_vdev,
+         |     ^~~~~~~~~~~~~~~~~~~
+>> drivers/vfio/pci/nvgpu/main.c:100:6: warning: no previous prototype for 'nvgpu_vfio_pci_ioctl' [-Wmissing-prototypes]
+     100 | long nvgpu_vfio_pci_ioctl(struct vfio_device *core_vdev, unsigned int cmd,
+         |      ^~~~~~~~~~~~~~~~~~~~
 
-> then we can try to work on that. Maybe something a la vhost
-> can be done to optimize, I'll have a think.
->
-> > The one thing I'd like to understand that the comment seems to imply
-> > that there is a significant difference in overhead between a hypercall
-> > and an MMIO. In my experience, both are pretty similar in cost for a
-> > handling location (both in userspace or both in the kernel). MMIO
-> > handling is a tiny bit more expensive due to a guaranteed TLB miss
-> > followed by a walk of the in-kernel device ranges, but that's all. It
-> > should hardly register.
-> >
-> > And if you really want some super-low latency, low overhead
-> > signalling, maybe an exception is the wrong tool for the job. Shared
-> > memory communication could be more appropriate.
->
-> I presume some kind of signalling mechanism will be necessary to
-> synchronously update host scheduling parameters in response to guest
-> frequency requests, but if the volume of data requires it then a shared
-> buffer + doorbell type of approach should do.
 
-Part of the communication doesn't need synchronous handling by the
-host. So, what I said above.
+vim +/nvgpu_vfio_pci_mmap +57 drivers/vfio/pci/nvgpu/main.c
 
-> Thinking about it, using SCMI over virtio would implement exactly that.
-> Linux-as-a-guest already supports it IIRC, so possibly the problem
-> being addressed in this series could be 'simply' solved using an SCMI
-> backend in the VMM...
+    56	
+  > 57	int nvgpu_vfio_pci_mmap(struct vfio_device *core_vdev,
+    58				struct vm_area_struct *vma)
+    59	{
+    60		struct nvgpu_vfio_pci_core_device *nvdev = container_of(
+    61			core_vdev, struct nvgpu_vfio_pci_core_device, core_device.vdev);
+    62	
+    63		unsigned long start_pfn;
+    64		unsigned int index;
+    65		u64 req_len, pgoff;
+    66		int ret = 0;
+    67	
+    68		index = vma->vm_pgoff >> (VFIO_PCI_OFFSET_SHIFT - PAGE_SHIFT);
+    69		if (index != nvdev->mem_prop.bar1_start_offset)
+    70			return vfio_pci_core_mmap(core_vdev, vma);
+    71	
+    72		/*
+    73		 * Request to mmap the BAR1. Map to the CPU accessible memory on the
+    74		 * GPU using the memory information gathered from the system ACPI
+    75		 * tables.
+    76		 */
+    77		start_pfn = nvdev->mem_prop.hpa >> PAGE_SHIFT;
+    78		req_len = vma->vm_end - vma->vm_start;
+    79		pgoff = vma->vm_pgoff &
+    80			((1U << (VFIO_PCI_OFFSET_SHIFT - PAGE_SHIFT)) - 1);
+    81		if (pgoff >= (nvdev->mem_prop.mem_length >> PAGE_SHIFT))
+    82			return -EINVAL;
+    83	
+    84		/*
+    85		 * Perform a PFN map to the memory. The device BAR1 is backed by the
+    86		 * GPU memory now. Check that the mapping does not overflow out of
+    87		 * the GPU memory size.
+    88		 */
+    89		ret = remap_pfn_range(vma, vma->vm_start, start_pfn + pgoff,
+    90				      min(req_len, nvdev->mem_prop.mem_length - pgoff),
+    91				      vma->vm_page_prot);
+    92		if (ret)
+    93			return ret;
+    94	
+    95		vma->vm_pgoff = start_pfn + pgoff;
+    96	
+    97		return 0;
+    98	}
+    99	
+ > 100	long nvgpu_vfio_pci_ioctl(struct vfio_device *core_vdev, unsigned int cmd,
+   101				  unsigned long arg)
+   102	{
+   103		struct nvgpu_vfio_pci_core_device *nvdev = container_of(
+   104			core_vdev, struct nvgpu_vfio_pci_core_device, core_device.vdev);
+   105	
+   106		unsigned long minsz = offsetofend(struct vfio_region_info, offset);
+   107		struct vfio_region_info info;
+   108	
+   109		switch (cmd) {
+   110		case VFIO_DEVICE_GET_REGION_INFO:
+   111			if (copy_from_user(&info, (void __user *)arg, minsz))
+   112				return -EFAULT;
+   113	
+   114			if (info.argsz < minsz)
+   115				return -EINVAL;
+   116	
+   117			if (info.index == nvdev->mem_prop.bar1_start_offset) {
+   118				/*
+   119				 * Request to determine the BAR1 region information. Send the
+   120				 * GPU memory information.
+   121				 */
+   122				info.offset = VFIO_PCI_INDEX_TO_OFFSET(info.index);
+   123				info.size = nvdev->mem_prop.mem_length;
+   124				info.flags = VFIO_REGION_INFO_FLAG_READ |
+   125					     VFIO_REGION_INFO_FLAG_WRITE |
+   126					     VFIO_REGION_INFO_FLAG_MMAP;
+   127				return copy_to_user((void __user *)arg, &info, minsz) ?
+   128					       -EFAULT : 0;
+   129			}
+   130	
+   131			if (info.index == nvdev->mem_prop.bar1_start_offset + 1) {
+   132				/*
+   133				 * The BAR1 region is 64b. Ignore this access.
+   134				 */
+   135				info.offset = VFIO_PCI_INDEX_TO_OFFSET(info.index);
+   136				info.size = 0;
+   137				info.flags = 0;
+   138				return copy_to_user((void __user *)arg, &info, minsz) ?
+   139					-EFAULT : 0;
+   140			}
+   141	
+   142			return vfio_pci_core_ioctl(core_vdev, cmd, arg);
+   143	
+   144		default:
+   145			return vfio_pci_core_ioctl(core_vdev, cmd, arg);
+   146		}
+   147	}
+   148	
 
-This will be worse than all the options we've tried so far because it
-has the userspace overhead AND uclamp overhead.
-
--Saravana
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests
