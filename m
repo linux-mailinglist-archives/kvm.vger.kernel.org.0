@@ -2,179 +2,183 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 11F2B6D8571
-	for <lists+kvm@lfdr.de>; Wed,  5 Apr 2023 19:59:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0CB666D8586
+	for <lists+kvm@lfdr.de>; Wed,  5 Apr 2023 20:02:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233724AbjDER7T (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Apr 2023 13:59:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49826 "EHLO
+        id S230396AbjDESCq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Apr 2023 14:02:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54072 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233805AbjDER7S (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Apr 2023 13:59:18 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88BAD59FC
-        for <kvm@vger.kernel.org>; Wed,  5 Apr 2023 10:58:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1680717514;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=bxLaegyvGXsWtWEkMuJq7mzfRVKAvjHLcyr9E0NhVqA=;
-        b=E8d4ArS61+Mry+m8iWFyIHIMAF9Hy8vCOCOvmbzAhTqKq4VGC5Z/qfq0HND0IEUEX5KylC
-        xXQgmZvY+rnlruRRkTU657KLAUz5B6wAF+P91aUCUBRWHY3REy8ujLRy5GYre5kAe7kWms
-        czCunAUTKgl9WNBQS4ieNSvoFRfhDRM=
-Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
- [209.85.160.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-68-6FPBS5o9M0unMupOCXMueQ-1; Wed, 05 Apr 2023 13:58:33 -0400
-X-MC-Unique: 6FPBS5o9M0unMupOCXMueQ-1
-Received: by mail-qt1-f200.google.com with SMTP id e4-20020a05622a110400b003e4e915a164so20481201qty.4
-        for <kvm@vger.kernel.org>; Wed, 05 Apr 2023 10:58:33 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680717513;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=bxLaegyvGXsWtWEkMuJq7mzfRVKAvjHLcyr9E0NhVqA=;
-        b=P3zx9hU7Le0ke4eoUL740qhxDetUhhdZSrtVUHwIT/EaK3/A7SihIbe8oyNh9jlR1a
-         tnAbyBAlmmgvPqztC7iiD5slonQhzMHTxIM9NU5zQxWS/0+nhgiG5M5BBALKsz7b6EbW
-         3pnlsX7LuSO4avrmUXuUaST8Z/uUH8yQzfUv22bcmW7CAAtIhZmdzqfyEKgSrB5qdhBP
-         QYQ9fGB2neRwLCKjLE//v77AtPAwx9j2ZAgolZIxLBXdFCza46i+CUCs6MK6dFs61V5l
-         f8WInftE11J3BgWTLeOqki0gq5q/dDpL49/u1N3LFIAgU09BkHfJHabZ5Enavpje+Z0W
-         a49w==
-X-Gm-Message-State: AAQBX9flGSsajMiicyTdOuds1p5VfLIvMhKzd7T/AzTnmOhRnqPLtL00
-        T+9Ql1/qodNS53ZdY17wM/ZGMHZJyMmLBrBdmNZ0sXDwdtqSabrWvJo5JoJ6PO8jmmbOLjNoZJa
-        3RiMBXX+bJYMz
-X-Received: by 2002:ad4:5f8b:0:b0:5bd:14f9:650d with SMTP id jp11-20020ad45f8b000000b005bd14f9650dmr53910qvb.36.1680717513009;
-        Wed, 05 Apr 2023 10:58:33 -0700 (PDT)
-X-Google-Smtp-Source: AKy350aVDJ5I73OXxuM402WPKU9vfhckM20c+fZ/2+Cchx+DMOvKxzeMX7mOqyBFvtiDLu67T1foqg==
-X-Received: by 2002:ad4:5f8b:0:b0:5bd:14f9:650d with SMTP id jp11-20020ad45f8b000000b005bd14f9650dmr53862qvb.36.1680717512735;
-        Wed, 05 Apr 2023 10:58:32 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id h15-20020ac8548f000000b003e0945575dasm4184864qtq.1.2023.04.05.10.58.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 05 Apr 2023 10:58:31 -0700 (PDT)
-Message-ID: <43f6e334-f440-ea85-9e74-c0b700c07399@redhat.com>
-Date:   Wed, 5 Apr 2023 19:58:24 +0200
+        with ESMTP id S229484AbjDESCn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Apr 2023 14:02:43 -0400
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on20626.outbound.protection.outlook.com [IPv6:2a01:111:f400:fe5a::626])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14D837D87;
+        Wed,  5 Apr 2023 11:02:14 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ak/XaT6ZVJ6+H+MzYjK5xoBadbY46YfMArAL1uhRI43u7F7Ztw/SsW5/2eAOsZ8BtIpefjvPSarUDwLQ5wlilTSXOEvhN/ahdAi7KKpOXQhrNj0Z7WJgJgIkI7KxU5/rYjRgfioTfsItc8jYJMJY6hVzokL6wdjN9lDorZAmnd2iep6Kv0dcfhopAt83dOA/F7ConthWJV4UZ1jc/s+X+OIG/oajRIEmtzKusIf679d+E/KRFsDLArqXtGvVIMkIxL7tspBaijzd1crv+Ra2E9LmJVDaeVD0dm6QCwR3GvUh7CeHq7hA9LHyJVwEgHC5oNAjDIbFPtS2y+PksaYDPA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=SwQUxEBOMHJ6eWfIzwI/es+2mWD6zlsFPG/G51FI1X0=;
+ b=Ct1DMFiNQOL9kHeZlibHMGGp3211mtHWuMK9BNkcIBsLQ1eu2jISOFcKorpecekJhHGl5DjRMhWH7hqCB0UaZLqyTcVGAbFOlI38mUifJAhefeQZzCsts9dHftfCDRHyLP0fPHfjANvnoQZt7YWQE4KNYglX0O/6Y9tRzbJR3sSOQY0k8LAot2G9M5U50BRfaDgJErIVR7zBfhW0VHbTGWElpcP6ohC8MZMYTWnrl6z0ZvxVuIb0KlFslH6GRavNS/+EU/wJU+z9aYgOOOgKJNcrpckvXrNSZcXfvMGibAtBoEGcVeLdMoLm8C8THlKPSr0uhc2NTQA3coq8chmAMw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.118.233) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=SwQUxEBOMHJ6eWfIzwI/es+2mWD6zlsFPG/G51FI1X0=;
+ b=ExDQYqPKRhxrykyszD0F0t4kd93rIaCMXQD2MTtYlWV2kZkfRxCEPZQ08cBSAa+156kXnmwvLTvVxD7HKtfHk1dHwrkCTe0mPSreEeVEcQvpui9k17OqyirLo6dnrobYqpmLKzJclCnPB2MfVyE0+jckNMpPERJV+OIco9af0Bouc74gJ5505EBEvFYiFX89CDKC+I8W8GO2fEcAIx2itdc0TQaqcK+z2Pvjh5Ge7rL7ncG2K9FbN67sJ6kp+OjWrtV9vmFAwxipkIRg6ylssVrM9FI6+7VcJHQt5tfwJ2AYAO/+frO4aJCurG2EJBYUBf1yjskQIHUqlbisu2wdtw==
+Received: from DM6PR17CA0022.namprd17.prod.outlook.com (2603:10b6:5:1b3::35)
+ by BL3PR12MB6644.namprd12.prod.outlook.com (2603:10b6:208:3b1::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6254.33; Wed, 5 Apr
+ 2023 18:02:05 +0000
+Received: from DM6NAM11FT049.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:5:1b3:cafe::82) by DM6PR17CA0022.outlook.office365.com
+ (2603:10b6:5:1b3::35) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6254.22 via Frontend
+ Transport; Wed, 5 Apr 2023 18:02:05 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.233)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.118.233 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.118.233; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.118.233) by
+ DM6NAM11FT049.mail.protection.outlook.com (10.13.172.188) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6277.28 via Frontend Transport; Wed, 5 Apr 2023 18:02:05 +0000
+Received: from drhqmail201.nvidia.com (10.126.190.180) by mail.nvidia.com
+ (10.127.129.6) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5; Wed, 5 Apr 2023
+ 11:01:35 -0700
+Received: from drhqmail203.nvidia.com (10.126.190.182) by
+ drhqmail201.nvidia.com (10.126.190.180) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.986.37; Wed, 5 Apr 2023 11:01:34 -0700
+Received: from localhost.localdomain (10.127.8.14) by mail.nvidia.com
+ (10.126.190.182) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.37 via Frontend
+ Transport; Wed, 5 Apr 2023 11:01:34 -0700
+From:   <ankita@nvidia.com>
+To:     <ankita@nvidia.com>, <jgg@nvidia.com>,
+        <alex.williamson@redhat.com>, <naoya.horiguchi@nec.com>,
+        <maz@kernel.org>, <oliver.upton@linux.dev>
+CC:     <aniketa@nvidia.com>, <cjia@nvidia.com>, <kwankhede@nvidia.com>,
+        <targupta@nvidia.com>, <vsethi@nvidia.com>, <acurrid@nvidia.com>,
+        <apopple@nvidia.com>, <jhubbard@nvidia.com>, <danw@nvidia.com>,
+        <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>, <linux-mm@kvack.org>
+Subject: [PATCH v3 0/6] Expose GPU memory as coherently CPU accessible
+Date:   Wed, 5 Apr 2023 11:01:28 -0700
+Message-ID: <20230405180134.16932-1-ankita@nvidia.com>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.0
-Reply-To: eric.auger@redhat.com
-Subject: Re: [PATCH v9 04/25] vfio: Accept vfio device file in the KVM facing
- kAPI
-Content-Language: en-US
-To:     Yi Liu <yi.l.liu@intel.com>, alex.williamson@redhat.com,
-        jgg@nvidia.com, kevin.tian@intel.com
-Cc:     joro@8bytes.org, robin.murphy@arm.com, cohuck@redhat.com,
-        nicolinc@nvidia.com, kvm@vger.kernel.org, mjrosato@linux.ibm.com,
-        chao.p.peng@linux.intel.com, yi.y.sun@linux.intel.com,
-        peterx@redhat.com, jasowang@redhat.com,
-        shameerali.kolothum.thodi@huawei.com, lulu@redhat.com,
-        suravee.suthikulpanit@amd.com, intel-gvt-dev@lists.freedesktop.org,
-        intel-gfx@lists.freedesktop.org, linux-s390@vger.kernel.org,
-        xudong.hao@intel.com, yan.y.zhao@intel.com, terrence.xu@intel.com,
-        yanting.jiang@intel.com
-References: <20230401151833.124749-1-yi.l.liu@intel.com>
- <20230401151833.124749-5-yi.l.liu@intel.com>
-From:   Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <20230401151833.124749-5-yi.l.liu@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-1.6 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6NAM11FT049:EE_|BL3PR12MB6644:EE_
+X-MS-Office365-Filtering-Correlation-Id: 32c0a2c3-803f-48f9-5185-08db35ffddb6
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: k5bMWUgavq7pEqU/JQ0Aq5R35zfL1jKY6s7nKrpjQ4i23zFNDutfJxDN0Ig2Hvm5IR1lz0c4+Z9CApsR991/1+mb+alFOKPODbAIJOf6SQ1aInVuL4wjROYLh8lR5LdyQbA149ZoCMljm59xbk1U2CiMtojWKykhRkZpDHxpZ9sU9KTIXZQLpl3LpxfpDRHh068TjXuP0ccJaMcHUXU+OwOmiMnT31XsXOl0TcBR3ZEeJzsyI3s0ha5zBwz/QvuozE3iZZkZ8oYVY0QlP8qu+dEB9ZwlBxRO9aBjyRFdDOETVyoon1nWVmtuqmj8abaGBbD4oReBX0Jbl+x0R4BjCdLoSNTrHhmfVUQBP67QNXk3ZzbYGALyBTCCPKA0N6FTm6j3EbNoRx5zxWvBMIUJGwoXNHYktwrze8fKY6rODKwQinZT8Kz/n/7Fn0XFwQi6nuOrwKGoCB5f6yO7NarCkj9SIPgkS2FNKgu0hP3mAGfs89Ysv0/xBKMmAzcFUuIYfwXuq9PJNpE5w6fY1gYv51/ZF8r61gDcweA8QG42YqKm1hyvVeIxx0hY8GOnMER0Cptvb4sl3dfOcF5Q2RXREox+dcdoWEVUJO1VUqq3NJv/sejX437g+pGhChl1J62Lyve3glFyB2OsaBoAUoF5Cex5SkHCWtxQxe2NNUtGs78JyShw+7sVZQamqO89wh/LtOhOLkGcRoNyzTyfCbgNFRJUfpk5Ss/KWnHzw4kNIXZlLY36amxJR/OcZeCiLquY2fdGbEUbQQ+Ue030guHvqHTENKQj/0tIEhmWvQMNZRo=
+X-Forefront-Antispam-Report: CIP:216.228.118.233;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge2.nvidia.com;CAT:NONE;SFS:(13230028)(4636009)(376002)(39860400002)(346002)(136003)(396003)(451199021)(40470700004)(46966006)(36840700001)(86362001)(82310400005)(36756003)(2906002)(2876002)(966005)(7636003)(40480700001)(2616005)(47076005)(336012)(426003)(186003)(1076003)(6666004)(83380400001)(26005)(316002)(8676002)(70206006)(82740400003)(70586007)(36860700001)(4326008)(478600001)(40460700003)(5660300002)(356005)(54906003)(8936002)(110136005)(41300700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Apr 2023 18:02:05.4296
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 32c0a2c3-803f-48f9-5185-08db35ffddb6
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.233];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT049.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL3PR12MB6644
+X-Spam-Status: No, score=0.8 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,SPF_HELO_PASS,
+        SPF_NONE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Yi,
+From: Ankit Agrawal <ankita@nvidia.com>
 
-On 4/1/23 17:18, Yi Liu wrote:
-> This makes the vfio file kAPIs to accept vfio device files, also a
-> preparation for vfio device cdev support.
->
-> For the kvm set with vfio device file, kvm pointer is stored in struct
-> vfio_device_file, and use kvm_ref_lock to protect kvm set and kvm
-> pointer usage within VFIO. This kvm pointer will be set to vfio_device
-> after device file is bound to iommufd in the cdev path.
->
-> Reviewed-by: Kevin Tian <kevin.tian@intel.com>
-> Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
-> Tested-by: Terrence Xu <terrence.xu@intel.com>
-> Tested-by: Nicolin Chen <nicolinc@nvidia.com>
-> Tested-by: Matthew Rosato <mjrosato@linux.ibm.com>
-> Tested-by: Yanting Jiang <yanting.jiang@intel.com>
-> Signed-off-by: Yi Liu <yi.l.liu@intel.com>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
+NVIDIA's upcoming Grace Hopper Superchip provides a PCI-like device
+for the on-chip GPU that is the logical OS representation of the
+internal propritary cache coherent interconnect.
 
-Thanks
+This representation has a number of limitations compared to a real PCI
+device, in particular, it does not model the coherent GPU memory
+aperture as a PCI config space BAR, and PCI doesn't know anything
+about cacheable memory types.
 
-Eric
-> ---
->  drivers/vfio/vfio.h      |  2 ++
->  drivers/vfio/vfio_main.c | 18 ++++++++++++++++++
->  2 files changed, 20 insertions(+)
->
-> diff --git a/drivers/vfio/vfio.h b/drivers/vfio/vfio.h
-> index 56ad127ac618..e4672d91a6f7 100644
-> --- a/drivers/vfio/vfio.h
-> +++ b/drivers/vfio/vfio.h
-> @@ -18,6 +18,8 @@ struct vfio_container;
->  
->  struct vfio_device_file {
->  	struct vfio_device *device;
-> +	spinlock_t kvm_ref_lock; /* protect kvm field */
-> +	struct kvm *kvm;
->  };
->  
->  void vfio_device_put_registration(struct vfio_device *device);
-> diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
-> index 748bde4d74d9..cb543791b28b 100644
-> --- a/drivers/vfio/vfio_main.c
-> +++ b/drivers/vfio/vfio_main.c
-> @@ -414,6 +414,7 @@ vfio_allocate_device_file(struct vfio_device *device)
->  		return ERR_PTR(-ENOMEM);
->  
->  	df->device = device;
-> +	spin_lock_init(&df->kvm_ref_lock);
->  
->  	return df;
->  }
-> @@ -1246,6 +1247,20 @@ bool vfio_file_enforced_coherent(struct file *file)
->  }
->  EXPORT_SYMBOL_GPL(vfio_file_enforced_coherent);
->  
-> +static void vfio_device_file_set_kvm(struct file *file, struct kvm *kvm)
-> +{
-> +	struct vfio_device_file *df = file->private_data;
-> +
-> +	/*
-> +	 * The kvm is first recorded in the vfio_device_file, and will
-> +	 * be propagated to vfio_device::kvm when the file is bound to
-> +	 * iommufd successfully in the vfio device cdev path.
-> +	 */
-> +	spin_lock(&df->kvm_ref_lock);
-> +	df->kvm = kvm;
-> +	spin_unlock(&df->kvm_ref_lock);
-> +}
-> +
->  /**
->   * vfio_file_set_kvm - Link a kvm with VFIO drivers
->   * @file: VFIO group file or VFIO device file
-> @@ -1259,6 +1274,9 @@ void vfio_file_set_kvm(struct file *file, struct kvm *kvm)
->  	group = vfio_group_from_file(file);
->  	if (group)
->  		vfio_group_set_kvm(group, kvm);
-> +
-> +	if (vfio_device_from_file(file))
-> +		vfio_device_file_set_kvm(file, kvm);
->  }
->  EXPORT_SYMBOL_GPL(vfio_file_set_kvm);
->  
+Provide a VFIO PCI variant driver that adapts the unique PCI
+representation into a more standard PCI representation facing
+userspace. The GPU memory aperture is obtained from ACPI, according to
+the FW specification, and exported to userspace as the VFIO_REGION
+that covers the first PCI BAR. qemu will naturally generate a PCI
+device in the VM where the cacheable aperture is reported in BAR1.
+
+Since this memory region is actually cache coherent with the CPU, the
+VFIO variant driver will mmap it into VMA using a cacheable mapping.
+
+As this is the first time an ARM environment has placed cacheable
+non-struct page backed memory (eg from remap_pfn_range) into a KVM
+page table, fix a bug in ARM KVM where it does not copy the cacheable
+memory attributes from non-struct page backed PTEs to ensure the guest
+also gets a cacheable mapping.
+
+Finally, the cacheable memory can participate in memory failure
+handling. ECC failures on this memory will trigger the normal ARM
+mechanism to get into memory-failure.c. Since this memory is not
+backed by struct page create a mechanism to route the memory-failure's
+physical address to the VMA owner so that a SIGBUS can be generated
+toward the correct process. This works with the existing KVM/qemu
+handling for memory failure reporting toward a guest.
+
+This goes along with a qemu series to provides the necessary
+implementation of the Grace Hopper Superchip firmware specification so
+that the guest operating system can see the correct ACPI modeling for
+the coherent GPU device.
+https://github.com/qemu/qemu/compare/master...ankita-nv:qemu:dev-ankit/cohmem-0330
+
+Applied and tested over v6.3-rc4.
+
+Ankit Agrawal (6):
+  kvm: determine memory type from VMA
+  vfio/nvgpu: expose GPU device memory as BAR1
+  mm: handle poisoning of pfn without struct pages
+  mm: Add poison error check in fixup_user_fault() for mapped PFN
+  mm: Change ghes code to allow poison of non-struct PFN
+  vfio/nvgpu: register device memory for poison handling
+
+ MAINTAINERS                          |   6 +
+ arch/arm64/include/asm/kvm_pgtable.h |   8 +-
+ arch/arm64/include/asm/memory.h      |   6 +-
+ arch/arm64/kvm/hyp/pgtable.c         |  16 +-
+ arch/arm64/kvm/mmu.c                 |  27 +-
+ drivers/acpi/apei/ghes.c             |  12 +-
+ drivers/vfio/pci/Kconfig             |   2 +
+ drivers/vfio/pci/Makefile            |   2 +
+ drivers/vfio/pci/nvgpu/Kconfig       |  10 +
+ drivers/vfio/pci/nvgpu/Makefile      |   3 +
+ drivers/vfio/pci/nvgpu/main.c        | 359 +++++++++++++++++++++++++++
+ include/linux/memory-failure.h       |  22 ++
+ include/linux/mm.h                   |   1 +
+ include/ras/ras_event.h              |   1 +
+ mm/gup.c                             |   2 +-
+ mm/memory-failure.c                  | 148 +++++++++--
+ virt/kvm/kvm_main.c                  |   6 +
+ 17 files changed, 586 insertions(+), 45 deletions(-)
+ create mode 100644 drivers/vfio/pci/nvgpu/Kconfig
+ create mode 100644 drivers/vfio/pci/nvgpu/Makefile
+ create mode 100644 drivers/vfio/pci/nvgpu/main.c
+ create mode 100644 include/linux/memory-failure.h
+
+-- 
+2.17.1
 
