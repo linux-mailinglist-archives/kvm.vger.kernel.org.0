@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9C7926D8227
-	for <lists+kvm@lfdr.de>; Wed,  5 Apr 2023 17:40:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8D8046D8224
+	for <lists+kvm@lfdr.de>; Wed,  5 Apr 2023 17:40:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238860AbjDEPko (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Apr 2023 11:40:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44904 "EHLO
+        id S238853AbjDEPkj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Apr 2023 11:40:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44888 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238811AbjDEPkd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S238807AbjDEPkd (ORCPT <rfc822;kvm@vger.kernel.org>);
         Wed, 5 Apr 2023 11:40:33 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5DA5059C0
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CEF1559A
         for <kvm@vger.kernel.org>; Wed,  5 Apr 2023 08:40:32 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 6FB6E63ED4
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 0D2B463ED0
         for <kvm@vger.kernel.org>; Wed,  5 Apr 2023 15:40:31 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D5B65C433A7;
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D1773C433A1;
         Wed,  5 Apr 2023 15:40:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
         s=k20201202; t=1680709230;
-        bh=PU842ofrcMWedmXdFu0S0QmwVSfMPxO2WGHpEYZcEO4=;
+        bh=jbq5Iy6DFxO0TwOY6vUO/BAaSe6Vl+DDm//UTjVVy9A=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=LlwcTVnxkBw1sH+Xkqz8DcoE0af+YCQnkKMO2R2msKQeozqK1RNBX54wdfABIRXxE
-         q9zQAU1VvSAIFYCKBAq20iiQXVf7JHbZwZHAZBzk01QDNVOBBF5hoMpoRF0c7TB555
-         IcXHC7eU6YqPaAk6km1Kp7O3CK1zZw+Iy10crqwoUrjOzicOZ+WJ1I0+HBn3+QIYqq
-         d/CSuXCvAQGkegbgwCxNOeBYK+WXFi2aamZt3ipWnWCe8XRTWzj0JoqwR4afRwlyVZ
-         NyLmj3NaiMzbwweHb5Xynkgh/rXEwbXbqMfnJrGUvWHaTC6Olh+S/UVjjhyDdBHMks
-         9x+AnT9LPdOSw==
+        b=YO2zc3D8Kmw6jbiN1XUmiA5LWc49yV6vXX2bM1j1UubSMAXXbhxFCCyT65QGCRPfj
+         HZ/REU6nFCInsbX7hNxXoCWUh7Lo/buaesmMffvLqaSD34tQFo1xqqweAw4IwT/Hb4
+         7bHtPUNU/GwvNQcLr18k9VUNeL0RY1UDGlTT9d8gr3IxhLiI/kDXwAYyW7C05kY6RH
+         ffQ6pwyFt9QiXJztIP62aBhwPdZQFRyCP6Ts8aoLV5oECy0MZCPLZfz3v6ZvTxuwXC
+         0cs88rHY5e0xOyiJD5WUQxn4duUkaOupb+LlUFzJ7fSz1+n2204G+j/vU/Bt0nbFrP
+         9Nl39MYCX/VnA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1pk5FM-0062PV-Rc;
-        Wed, 05 Apr 2023 16:40:28 +0100
+        id 1pk5FN-0062PV-3q;
+        Wed, 05 Apr 2023 16:40:29 +0100
 From:   Marc Zyngier <maz@kernel.org>
 To:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
         linux-arm-kernel@lists.infradead.org
@@ -53,9 +53,9 @@ Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Oliver Upton <oliver.upton@linux.dev>,
         Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v9 07/50] KVM: arm64: nv: Trap CPACR_EL1 access in virtual EL2
-Date:   Wed,  5 Apr 2023 16:39:25 +0100
-Message-Id: <20230405154008.3552854-8-maz@kernel.org>
+Subject: [PATCH v9 08/50] KVM: arm64: nv: Respect virtual HCR_EL2.TWX setting
+Date:   Wed,  5 Apr 2023 16:39:26 +0100
+Message-Id: <20230405154008.3552854-9-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230405154008.3552854-1-maz@kernel.org>
 References: <20230405154008.3552854-1-maz@kernel.org>
@@ -76,45 +76,66 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Jintack Lim <jintack.lim@linaro.org>
 
-For the same reason we trap virtual memory register accesses in virtual
-EL2, we trap CPACR_EL1 access too; We allow the virtual EL2 mode to
-access EL1 system register state instead of the virtual EL2 one.
+Forward exceptions due to WFI or WFE instructions to the virtual EL2 if
+they are not coming from the virtual EL2 and virtual HCR_EL2.TWX is set.
 
-Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
 Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/hyp/vhe/switch.c | 3 +++
- arch/arm64/kvm/sys_regs.c       | 2 +-
- 2 files changed, 4 insertions(+), 1 deletion(-)
+ arch/arm64/include/asm/kvm_emulate.h | 14 ++++++++++++++
+ arch/arm64/kvm/handle_exit.c         |  6 +++++-
+ 2 files changed, 19 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-index c8da8d350453..41385bb02d6b 100644
---- a/arch/arm64/kvm/hyp/vhe/switch.c
-+++ b/arch/arm64/kvm/hyp/vhe/switch.c
-@@ -68,6 +68,9 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
- 		__activate_traps_fpsimd32(vcpu);
- 	}
+diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+index 2f5d3e27c017..6e9c0d76a818 100644
+--- a/arch/arm64/include/asm/kvm_emulate.h
++++ b/arch/arm64/include/asm/kvm_emulate.h
+@@ -17,6 +17,7 @@
+ #include <asm/esr.h>
+ #include <asm/kvm_arm.h>
+ #include <asm/kvm_hyp.h>
++#include <asm/kvm_nested.h>
+ #include <asm/ptrace.h>
+ #include <asm/cputype.h>
+ #include <asm/virt.h>
+@@ -333,6 +334,19 @@ static __always_inline u64 kvm_vcpu_get_esr(const struct kvm_vcpu *vcpu)
+ 	return vcpu->arch.fault.esr_el2;
+ }
  
-+	if (vcpu_is_el2(vcpu) && !vcpu_el2_e2h_is_set(vcpu))
-+		val |= CPTR_EL2_TCPAC;
-+	
- 	write_sysreg(val, cpacr_el1);
++static inline bool guest_hyp_wfx_traps_enabled(const struct kvm_vcpu *vcpu)
++{
++	u64 esr = kvm_vcpu_get_esr(vcpu);
++	bool is_wfe = !!(esr & ESR_ELx_WFx_ISS_WFE);
++	u64 hcr_el2 = __vcpu_sys_reg(vcpu, HCR_EL2);
++
++	if (!vcpu_has_nv(vcpu) || vcpu_is_el2(vcpu))
++		return false;
++
++	return ((is_wfe && (hcr_el2 & HCR_TWE)) ||
++		(!is_wfe && (hcr_el2 & HCR_TWI)));
++}
++
+ static __always_inline int kvm_vcpu_get_condition(const struct kvm_vcpu *vcpu)
+ {
+ 	u64 esr = kvm_vcpu_get_esr(vcpu);
+diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+index a798c0b4d717..758ab72e4dc4 100644
+--- a/arch/arm64/kvm/handle_exit.c
++++ b/arch/arm64/kvm/handle_exit.c
+@@ -126,8 +126,12 @@ static int handle_no_fpsimd(struct kvm_vcpu *vcpu)
+ static int kvm_handle_wfx(struct kvm_vcpu *vcpu)
+ {
+ 	u64 esr = kvm_vcpu_get_esr(vcpu);
++	bool is_wfe = !!(esr & ESR_ELx_WFx_ISS_WFE);
  
- 	write_sysreg(__this_cpu_read(kvm_hyp_vector), vbar_el1);
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 5dc158c39baa..cc3104167232 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -2066,7 +2066,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 
- 	{ SYS_DESC(SYS_SCTLR_EL1), access_vm_reg, reset_val, SCTLR_EL1, 0x00C50078 },
- 	{ SYS_DESC(SYS_ACTLR_EL1), access_actlr, reset_actlr, ACTLR_EL1 },
--	{ SYS_DESC(SYS_CPACR_EL1), NULL, reset_val, CPACR_EL1, 0 },
-+	{ SYS_DESC(SYS_CPACR_EL1), access_rw, reset_val, CPACR_EL1, 0 },
- 
- 	MTE_REG(RGSR_EL1),
- 	MTE_REG(GCR_EL1),
+-	if (esr & ESR_ELx_WFx_ISS_WFE) {
++	if (guest_hyp_wfx_traps_enabled(vcpu))
++		return kvm_inject_nested_sync(vcpu, kvm_vcpu_get_esr(vcpu));
++
++	if (is_wfe) {
+ 		trace_kvm_wfx_arm64(*vcpu_pc(vcpu), true);
+ 		vcpu->stat.wfe_exit_stat++;
+ 	} else {
 -- 
 2.34.1
 
