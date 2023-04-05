@@ -2,238 +2,274 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A5FD76D8919
-	for <lists+kvm@lfdr.de>; Wed,  5 Apr 2023 22:51:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0ED2F6D892C
+	for <lists+kvm@lfdr.de>; Wed,  5 Apr 2023 23:01:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233393AbjDEUvu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Apr 2023 16:51:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46540 "EHLO
+        id S232267AbjDEVBl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Apr 2023 17:01:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50744 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231880AbjDEUvq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Apr 2023 16:51:46 -0400
-Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02506CD
-        for <kvm@vger.kernel.org>; Wed,  5 Apr 2023 13:51:45 -0700 (PDT)
-Received: by mail-pl1-x64a.google.com with SMTP id q9-20020a170902dac900b001a18ceff5ebso21447969plx.4
-        for <kvm@vger.kernel.org>; Wed, 05 Apr 2023 13:51:44 -0700 (PDT)
+        with ESMTP id S231476AbjDEVBj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Apr 2023 17:01:39 -0400
+Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 833DC5FF2
+        for <kvm@vger.kernel.org>; Wed,  5 Apr 2023 14:01:36 -0700 (PDT)
+Received: by mail-pj1-x1030.google.com with SMTP id d13so35306771pjh.0
+        for <kvm@vger.kernel.org>; Wed, 05 Apr 2023 14:01:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1680727904;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=J32QfDG/N0fnwFvEA1vrkQnMqbl9Zm9NHz5B44dC12w=;
-        b=JqSM2Uf3uS1YvgXiVIj2oy/QGwQbyyDIdjrpHy4m+pPHj8xS5hKqddwLtgNKwKE+sL
-         35OoLw6gbMR+z0SJ4TVe1WfYdOG4A9lyw0gUXJyKO5TUgll7XKH+PR73u3pB05QgRalL
-         EvHSKRfMFZXG4mCZ6jlNY5R3LySDEYUnTx8Jf7CSEM7eWZ6eQc+EKBr1xXYEp8o/B9T4
-         fiWA6uO2p9sh30REy8BU2zmj3Trx11Bj7SrPOkcTtvoNxOnCHl4ttXAJHpXxAbvdNZKz
-         IL2wgJITuJaY1gT8aK4y3dgv5KT5YWaIHsQOccXBpW0fIris9M3JjuOvmYW9aXXbz0W/
-         54wQ==
+        d=google.com; s=20210112; t=1680728496;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fHFlMisxaJ0plZrJeiWQsYMJJxbUcOQBZpoj9lXl62o=;
+        b=o68UQJlSeR/2dP30d3/3CG29eQi7NJUexGjKnFCJlBRne7MBh/pnOLR6z5hr0IcBKF
+         rGtNS+VfkApuHBT4LOZszkfDA5ur0hx2XsTYBVaUo9Mpo8zstckblRhZIrIFyUAyNKeC
+         bImEOJVQiHH/0xwOgCdHD3FzLTUkJUOUg8YxvZjMvIvVZvTfDl/MO8+nVHCZ6Hjl/s9/
+         nBOkPddImEOqiBfKtLNmE4rQkxJtcAAr2zemszvWQQ2l4d4CdHEk5hq0cYT/tIfQAHNQ
+         PalbkNTzzkjmk+8KnlFVIxi2D0sXhuYRAxUUR3QGgi5uBzGsU5s1ufo++LrWQ+Aq5Ks9
+         PXBA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680727904;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=J32QfDG/N0fnwFvEA1vrkQnMqbl9Zm9NHz5B44dC12w=;
-        b=tUuiF2B5GG92DrFZPHu5VSaaURkSzraXqo55/zO8TIUSG9VVa8rnp5nAP16tc9+B6K
-         cZVm+PoNaK9j3WjuGFr4k1KdIYccCbqhArfHelV50WS620jwqWP80dMGaPquHVXwS6Yq
-         30opMPoT2V1yY7K7NbIIqRU61sDYOVjMHUPWUJEDbAeInQDWWwyZcJ+4CnhkHkvsblVY
-         k+Y17zNVm8roIdStQwOzCxvuEZmlqEUraJ3j+JVcWZVkz7KAbYQFe5LQugcDRVaMamFE
-         jC3ojeRhAHIVErD8csgAj1/xf2XNoUnC0ubPI2JC1ioiyh2Qs3V8rQ61MGOpRtVYbLEd
-         2ugQ==
-X-Gm-Message-State: AAQBX9dPziadHUiXShCE4GtJuYVIYRNMnI2ILM8jlwX+7vhNU/dXyKi2
-        Wz27OanXy7pougj5BjP1GJLL1onRg2A=
-X-Google-Smtp-Source: AKy350aSsK50Bqzap+Oy2/ML7KTFfpyvAFLLp63Br5yy7o833tWCfftkyahxr47DLlvDH73adsg/OeaSDIc=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90a:2f23:b0:23f:6efa:bd55 with SMTP id
- s32-20020a17090a2f2300b0023f6efabd55mr2792288pjd.8.1680727904539; Wed, 05 Apr
- 2023 13:51:44 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Wed,  5 Apr 2023 13:51:38 -0700
-In-Reply-To: <20230405205138.525310-1-seanjc@google.com>
-Mime-Version: 1.0
-References: <20230405205138.525310-1-seanjc@google.com>
-X-Mailer: git-send-email 2.40.0.348.gf938b09366-goog
-Message-ID: <20230405205138.525310-3-seanjc@google.com>
-Subject: [kvm-unit-tests PATCH v4 2/2] x86: nSVM: Add support for VNMI test
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>,
-        Santosh Shukla <santosh.shukla@amd.com>
+        d=1e100.net; s=20210112; t=1680728496;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=fHFlMisxaJ0plZrJeiWQsYMJJxbUcOQBZpoj9lXl62o=;
+        b=MvC0pmmCbVqpMIhcZf4nxYXT+ZQLYJbuKS2vyH/AY2+lkyFJC8trW6Zyxe8+cgfLmq
+         eYAuYTcRS4zqYChFoiuIYn4QidLWDG/zzsT/20PjPjhs5vUX43Wnt6ZbsQpiLNwb3vOi
+         ZQi+VyS7D5zNwPh/3lqyiOIoHkJbRkYaYXGTo9AliMbOH+Nc2PIp/fZY9QTGfgghf9T8
+         vnSxpqspQueW4SlckZBw4G+vawQAZDzURPJdkp8kuuVowo+774vjxjYQCQ16hV+eb3Aq
+         wORgShTdR2TCNb3GLARHzj5IBc0ut6zamHNpD19VFecrcKdhL9ip+2SB6igFbt1tENoa
+         RNAw==
+X-Gm-Message-State: AAQBX9cjASwhg5wSIVVw/AmmO3dQMP9LCyI2FKiEzpcZidgVkRESl3sT
+        heC9a2WHb9nl1piFQIpQutvALDXMwFtJOsKF5NZRvA==
+X-Google-Smtp-Source: AKy350aHiztqd9S0M+CMjOQXju2vYq2NssFDb70LAGMoQGKeCoDHJhiRNivzaqFcE6TN33nMAdUuT1+/TPOGcn3A86M=
+X-Received: by 2002:a17:902:a40a:b0:1a0:535b:22d9 with SMTP id
+ p10-20020a170902a40a00b001a0535b22d9mr3252431plq.10.1680728495555; Wed, 05
+ Apr 2023 14:01:35 -0700 (PDT)
+MIME-Version: 1.0
+References: <20230330224348.1006691-1-davidai@google.com> <ZCx97IKjsBibjdGc@linux.dev>
+ <86sfdfv0e1.wl-maz@kernel.org>
+In-Reply-To: <86sfdfv0e1.wl-maz@kernel.org>
+From:   Saravana Kannan <saravanak@google.com>
+Date:   Wed, 5 Apr 2023 14:00:59 -0700
+Message-ID: <CAGETcx90SiaztPO21GsHSr18XUTHoLWt3Jv+y=EW5yfjJgzJHw@mail.gmail.com>
+Subject: Re: [RFC PATCH 0/6] Improve VM DVFS and task placement behavior
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     David Dai <davidai@google.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        Viresh Kumar <viresh.kumar@linaro.org>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Lorenzo Pieralisi <lpieralisi@kernel.org>,
+        Sudeep Holla <sudeep.holla@arm.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Juri Lelli <juri.lelli@redhat.com>,
+        Vincent Guittot <vincent.guittot@linaro.org>,
+        Dietmar Eggemann <dietmar.eggemann@arm.com>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>,
+        Daniel Bristot de Oliveira <bristot@redhat.com>,
+        Valentin Schneider <vschneid@redhat.com>,
+        kernel-team@android.com, linux-pm@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-7.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-15.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,ENV_AND_HDR_SPF_MATCH,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL,
+        USER_IN_DEF_SPF_WL autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Santosh Shukla <santosh.shukla@amd.com>
+On Tue, Apr 4, 2023 at 1:49=E2=80=AFPM Marc Zyngier <maz@kernel.org> wrote:
+>
+> On Tue, 04 Apr 2023 20:43:40 +0100,
+> Oliver Upton <oliver.upton@linux.dev> wrote:
+> >
+> > Folks,
+> >
+> > On Thu, Mar 30, 2023 at 03:43:35PM -0700, David Dai wrote:
+> >
+> > <snip>
+> >
+> > > PCMark
+> > > Higher is better
+> > > +-------------------+----------+------------+--------+-------+-------=
+-+
+> > > | Test Case (score) | Baseline |  Hypercall | %delta |  MMIO | %delta=
+ |
+> > > +-------------------+----------+------------+--------+-------+-------=
+-+
+> > > | Weighted Total    |     6136 |       7274 |   +19% |  6867 |   +12%=
+ |
+> > > +-------------------+----------+------------+--------+-------+-------=
+-+
+> > > | Web Browsing      |     5558 |       6273 |   +13% |  6035 |    +9%=
+ |
+> > > +-------------------+----------+------------+--------+-------+-------=
+-+
+> > > | Video Editing     |     4921 |       5221 |    +6% |  5167 |    +5%=
+ |
+> > > +-------------------+----------+------------+--------+-------+-------=
+-+
+> > > | Writing           |     6864 |       8825 |   +29% |  8529 |   +24%=
+ |
+> > > +-------------------+----------+------------+--------+-------+-------=
+-+
+> > > | Photo Editing     |     7983 |      11593 |   +45% | 10812 |   +35%=
+ |
+> > > +-------------------+----------+------------+--------+-------+-------=
+-+
+> > > | Data Manipulation |     5814 |       6081 |    +5% |  5327 |    -8%=
+ |
+> > > +-------------------+----------+------------+--------+-------+-------=
+-+
+> > >
+> > > PCMark Performance/mAh
+> > > Higher is better
+> > > +-----------+----------+-----------+--------+------+--------+
+> > > |           | Baseline | Hypercall | %delta | MMIO | %delta |
+> > > +-----------+----------+-----------+--------+------+--------+
+> > > | Score/mAh |       79 |        88 |   +11% |   83 |    +7% |
+> > > +-----------+----------+-----------+--------+------+--------+
+> > >
+> > > Roblox
+> > > Higher is better
+> > > +-----+----------+------------+--------+-------+--------+
+> > > |     | Baseline |  Hypercall | %delta |  MMIO | %delta |
+> > > +-----+----------+------------+--------+-------+--------+
+> > > | FPS |    18.25 |      28.66 |   +57% | 24.06 |   +32% |
+> > > +-----+----------+------------+--------+-------+--------+
+> > >
+> > > Roblox Frames/mAh
+> > > Higher is better
+> > > +------------+----------+------------+--------+--------+--------+
+> > > |            | Baseline |  Hypercall | %delta |   MMIO | %delta |
+> > > +------------+----------+------------+--------+--------+--------+
+> > > | Frames/mAh |    91.25 |     114.64 |   +26% | 103.11 |   +13% |
+> > > +------------+----------+------------+--------+--------+--------+
+> >
+> > </snip>
+> >
+> > > Next steps:
+> > > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> > > We are continuing to look into communication mechanisms other than
+> > > hypercalls that are just as/more efficient and avoid switching into t=
+he VMM
+> > > userspace. Any inputs in this regard are greatly appreciated.
 
-Add a VNMI test case to test Virtual NMI in a nested environment,
-The test covers the Virtual NMI (VNMI) delivery.
+Hi Oliver and Marc,
 
-Signed-off-by: Santosh Shukla <santosh.shukla@amd.com>
-[sean: reuse pieces of NMI test framework, fix formatting issues]
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- lib/x86/processor.h |  1 +
- x86/svm.c           |  5 +++
- x86/svm.h           |  8 +++++
- x86/svm_tests.c     | 78 +++++++++++++++++++++++++++++++++++++++++++++
- 4 files changed, 92 insertions(+)
+Replying to both of you in this one email.
 
-diff --git a/lib/x86/processor.h b/lib/x86/processor.h
-index 3d58ef72..3802c1e2 100644
---- a/lib/x86/processor.h
-+++ b/lib/x86/processor.h
-@@ -267,6 +267,7 @@ static inline bool is_intel(void)
- #define X86_FEATURE_PAUSEFILTER		(CPUID(0x8000000A, 0, EDX, 10))
- #define X86_FEATURE_PFTHRESHOLD		(CPUID(0x8000000A, 0, EDX, 12))
- #define	X86_FEATURE_VGIF		(CPUID(0x8000000A, 0, EDX, 16))
-+#define X86_FEATURE_V_NMI               (CPUID(0x8000000A, 0, EDX, 25))
- #define	X86_FEATURE_AMD_PMU_V2		(CPUID(0x80000022, 0, EAX, 0))
- 
- static inline bool this_cpu_has(u64 feature)
-diff --git a/x86/svm.c b/x86/svm.c
-index ba435b4a..022a0fde 100644
---- a/x86/svm.c
-+++ b/x86/svm.c
-@@ -99,6 +99,11 @@ bool npt_supported(void)
- 	return this_cpu_has(X86_FEATURE_NPT);
- }
- 
-+bool vnmi_supported(void)
-+{
-+       return this_cpu_has(X86_FEATURE_V_NMI);
-+}
-+
- int get_test_stage(struct svm_test *test)
- {
- 	barrier();
-diff --git a/x86/svm.h b/x86/svm.h
-index 766ff7e3..4631c2ff 100644
---- a/x86/svm.h
-+++ b/x86/svm.h
-@@ -131,6 +131,13 @@ struct __attribute__ ((__packed__)) vmcb_control_area {
- #define V_INTR_MASKING_SHIFT 24
- #define V_INTR_MASKING_MASK (1 << V_INTR_MASKING_SHIFT)
- 
-+#define V_NMI_PENDING_SHIFT	11
-+#define V_NMI_PENDING_MASK	(1 << V_NMI_PENDING_SHIFT)
-+#define V_NMI_BLOCKING_SHIFT	12
-+#define V_NMI_BLOCKING_MASK	(1 << V_NMI_BLOCKING_SHIFT)
-+#define V_NMI_ENABLE_SHIFT	26
-+#define V_NMI_ENABLE_MASK	(1 << V_NMI_ENABLE_SHIFT)
-+
- #define SVM_INTERRUPT_SHADOW_MASK 1
- 
- #define SVM_IOIO_STR_SHIFT 2
-@@ -419,6 +426,7 @@ void default_prepare(struct svm_test *test);
- void default_prepare_gif_clear(struct svm_test *test);
- bool default_finished(struct svm_test *test);
- bool npt_supported(void);
-+bool vnmi_supported(void);
- int get_test_stage(struct svm_test *test);
- void set_test_stage(struct svm_test *test, int s);
- void inc_test_stage(struct svm_test *test);
-diff --git a/x86/svm_tests.c b/x86/svm_tests.c
-index e87db3fa..3d2ca0f6 100644
---- a/x86/svm_tests.c
-+++ b/x86/svm_tests.c
-@@ -1419,6 +1419,81 @@ static bool nmi_hlt_check(struct svm_test *test)
- 	return get_test_stage(test) == 3;
- }
- 
-+static void vnmi_prepare(struct svm_test *test)
-+{
-+	nmi_prepare(test);
-+
-+	/*
-+	 * Disable NMI interception to start.  Enabling vNMI without
-+	 * intercepting "real" NMIs should result in an ERR VM-Exit.
-+	 */
-+	vmcb->control.intercept &= ~(1ULL << INTERCEPT_NMI);
-+	vmcb->control.int_ctl = V_NMI_ENABLE_MASK;
-+	vmcb->control.int_vector = NMI_VECTOR;
-+}
-+
-+static void vnmi_test(struct svm_test *test)
-+{
-+	report_svm_guest(!nmi_fired, test, "No vNMI before injection");
-+	vmmcall();
-+
-+	report_svm_guest(nmi_fired, test, "vNMI delivered after injection");
-+	vmmcall();
-+}
-+
-+static bool vnmi_finished(struct svm_test *test)
-+{
-+	switch (get_test_stage(test)) {
-+	case 0:
-+		if (vmcb->control.exit_code != SVM_EXIT_ERR) {
-+			report_fail("Wanted ERR VM-Exit, got 0x%x",
-+				    vmcb->control.exit_code);
-+			return true;
-+		}
-+		report(!nmi_fired, "vNMI enabled but NMI_INTERCEPT unset!");
-+		vmcb->control.intercept |= (1ULL << INTERCEPT_NMI);
-+		vmcb->save.rip += 3;
-+		break;
-+
-+	case 1:
-+		if (vmcb->control.exit_code != SVM_EXIT_VMMCALL) {
-+			report_fail("Wanted VMMCALL VM-Exit, got 0x%x",
-+				    vmcb->control.exit_code);
-+			return true;
-+		}
-+		report(!nmi_fired, "vNMI with vector 2 not injected");
-+		vmcb->control.int_ctl |= V_NMI_PENDING_MASK;
-+		vmcb->save.rip += 3;
-+		break;
-+
-+	case 2:
-+		if (vmcb->control.exit_code != SVM_EXIT_VMMCALL) {
-+			report_fail("Wanted VMMCALL VM-Exit, got 0x%x",
-+				    vmcb->control.exit_code);
-+			return true;
-+		}
-+		if (vmcb->control.int_ctl & V_NMI_BLOCKING_MASK) {
-+			report_fail("V_NMI_BLOCKING_MASK not cleared on VMEXIT");
-+			return true;
-+		}
-+		report_pass("VNMI serviced");
-+		vmcb->save.rip += 3;
-+		break;
-+
-+	default:
-+		return true;
-+	}
-+
-+	inc_test_stage(test);
-+
-+	return get_test_stage(test) == 3;
-+}
-+
-+static bool vnmi_check(struct svm_test *test)
-+{
-+	return get_test_stage(test) == 3;
-+}
-+
- static volatile int count_exc = 0;
- 
- static void my_isr(struct ex_regs *r)
-@@ -3298,6 +3373,9 @@ struct svm_test svm_tests[] = {
- 	{ "nmi_hlt", smp_supported, nmi_prepare,
- 	  default_prepare_gif_clear, nmi_hlt_test,
- 	  nmi_hlt_finished, nmi_hlt_check },
-+        { "vnmi", vnmi_supported, vnmi_prepare,
-+          default_prepare_gif_clear, vnmi_test,
-+          vnmi_finished, vnmi_check },
- 	{ "virq_inject", default_supported, virq_inject_prepare,
- 	  default_prepare_gif_clear, virq_inject_test,
- 	  virq_inject_finished, virq_inject_check },
--- 
-2.40.0.348.gf938b09366-goog
+> >
+> > We're highly unlikely to entertain such an interface in KVM.
+> >
+> > The entire feature is dependent on pinning vCPUs to physical cores, for=
+ which
+> > userspace is in the driver's seat. That is a well established and docum=
+ented
+> > policy which can be seen in the way we handle heterogeneous systems and
+> > vPMU.
+> >
+> > Additionally, this bloats the KVM PV ABI with highly VMM-dependent inte=
+rfaces
+> > that I would not expect to benefit the typical user of KVM.
+> >
+> > Based on the data above, it would appear that the userspace implementat=
+ion is
+> > in the same neighborhood as a KVM-based implementation, which only furt=
+her
+> > weakens the case for moving this into the kernel.
 
+Oliver,
+
+Sorry if the tables/data aren't presented in an intuitive way, but
+MMIO vs hypercall is definitely not in the same neighborhood. The
+hypercall method often gives close to 2x the improvement that the MMIO
+method gives. For example:
+
+- Roblox FPS: MMIO improves it by 32% vs hypercall improves it by 57%.
+- Frames/mAh: MMIO improves it by 13% vs hypercall improves it by 26%.
+- PC Mark Data manipulation: MMIO makes it worse by 8% vs hypercall
+improves it by 5%
+
+Hypercall does better for other cases too, just not as good. For example,
+- PC Mark Photo editing: Going from MMIO to hypercall gives a 10% improveme=
+nt.
+
+These are all pretty non-trivial, at least in the mobile world. Heck,
+whole teams would spend months for 2% improvement in battery :)
+
+> >
+> > I certainly can appreciate the motivation for the series, but this feat=
+ure
+> > should be in userspace as some form of a virtual device.
+>
+> +1 on all of the above.
+
+Marc and Oliver,
+
+We are not tied to hypercalls. We want to do the right thing here, but
+MMIO going all the way to userspace definitely doesn't cut it as is.
+This is where we need some guidance. See more below.
+
+> The one thing I'd like to understand that the comment seems to imply
+> that there is a significant difference in overhead between a hypercall
+> and an MMIO. In my experience, both are pretty similar in cost for a
+> handling location (both in userspace or both in the kernel).
+
+I think the main difference really is that in our hypercall vs MMIO
+comparison the hypercall is handled in the kernel vs MMIO goes all the
+way to userspace. I agree with you that the difference probably won't
+be significant if both of them go to the same "depth" in the privilege
+levels.
+
+> MMIO
+> handling is a tiny bit more expensive due to a guaranteed TLB miss
+> followed by a walk of the in-kernel device ranges, but that's all. It
+> should hardly register.
+>
+> And if you really want some super-low latency, low overhead
+> signalling, maybe an exception is the wrong tool for the job. Shared
+> memory communication could be more appropriate.
+
+Yeah, that's one of our next steps. Ideally, we want to use shared
+memory for the host to guest information flow. It's a 32-bit value
+representing the current frequency that the host can update whenever
+the host CPU frequency changes and the guest can read whenever it
+needs it.
+
+For guest to host information flow, we'll need a kick from guest to
+host because we need to take action on the host side when threads
+migrate between vCPUs and cause a significant change in vCPU util.
+Again it can be just a shared memory and some kick. This is what we
+are currently trying to figure out how to do.
+
+If there are APIs to do this, can you point us to those please? We'd
+also want the shared memory to be accessible by the VMM (so, shared
+between guest kernel, host kernel and VMM).
+
+Are the above next steps sane? Or is that a no-go? The main thing we
+want to cut out is the need for having to switch to userspace for
+every single interaction because, as is, it leaves a lot on the table.
+
+Also, thanks for all the feedback. Glad to receive it.
+
+-Saravana
