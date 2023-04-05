@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AAA206D8262
-	for <lists+kvm@lfdr.de>; Wed,  5 Apr 2023 17:47:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CE6286D825D
+	for <lists+kvm@lfdr.de>; Wed,  5 Apr 2023 17:46:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238997AbjDEPrA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Apr 2023 11:47:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56830 "EHLO
+        id S238985AbjDEPq2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Apr 2023 11:46:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56254 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239004AbjDEPqy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Apr 2023 11:46:54 -0400
+        with ESMTP id S239024AbjDEPqM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Apr 2023 11:46:12 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C05E0658D
-        for <kvm@vger.kernel.org>; Wed,  5 Apr 2023 08:46:25 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 047972139
+        for <kvm@vger.kernel.org>; Wed,  5 Apr 2023 08:46:06 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id E6078623DE
-        for <kvm@vger.kernel.org>; Wed,  5 Apr 2023 15:46:23 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5A3C3C433D2;
-        Wed,  5 Apr 2023 15:46:23 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 7904063EFD
+        for <kvm@vger.kernel.org>; Wed,  5 Apr 2023 15:46:05 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DDBBCC433D2;
+        Wed,  5 Apr 2023 15:46:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1680709583;
-        bh=jexwEcEYoC0w5lw9cBv3BUVfKVxaWNo5BXzlFRvTiKE=;
+        s=k20201202; t=1680709564;
+        bh=mIGEzqeJ4OWwVwkeI3yoSLFdEg4/R9rCF1HJ3dE3CcU=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=gRE37ppRuH/Tkwl23J0CS1yiyT0L6bnufzl5owffXuf0Q/UzPPjLGyYsWhl8gws8C
-         RsjjQ3oNHlzV44SoWH0qWfnuJUz5sH56XViiPHubJKry0pMMzWbkCaqWz2/8MiyDTx
-         uTxiTQ8Awr950Ogb5gY9zKiovV3ll0PNpQU64isi+ECiADMwGS9WIxKn+MCwvz8RtX
-         7KVyK9NQy3h0MJeOfrAkSAWU750C5M4364NDe81jkV/+EzDTAqqWPYhckwAzJ9rwqq
-         nkeCBF358TJBkPMqY8sgD1OJwlzy2tns9kpxluGOSI8qaI6eEhQh0cdHoyniMQImu4
-         6bEPK9cx/uB3Q==
+        b=PXH2v50/FTDjMyqolfO0L1hk5dlmFSbdQ4VVZF9WffokwoLhpcMl3JpCIG9QQ9bRr
+         dUNkTu7rCoQfLOvnrz/AwKr2CdC+2y1p/3G7FKjG8BIMOtKRdswUlOClRx5YIUIwnR
+         V9he/Uvb50TaFfE7bG7GULAIgG/vdf95toDNOIZxYlxslbIK6Q3DiJh91BO99TdBfq
+         X8wbcE0eH6uUlUFzG+2M/J0NPj1xuimP1QNyxynBBH6MBpdShCFVuf9wSylV8+Cb4g
+         9i1v0L9DnePTxK/+Drz//6kqgQzlFA6VCNrOKvAbQ59CfS1WHLx9ahK5YIxwVMsLqO
+         AnECQOM4uBxgw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1pk5Fq-0062PV-AB;
-        Wed, 05 Apr 2023 16:40:59 +0100
+        id 1pk5Fr-0062PV-Du;
+        Wed, 05 Apr 2023 16:41:00 +0100
 From:   Marc Zyngier <maz@kernel.org>
 To:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
         linux-arm-kernel@lists.infradead.org
@@ -53,9 +53,9 @@ Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Oliver Upton <oliver.upton@linux.dev>,
         Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v9 41/50] KVM: arm64: Add FEAT_NV2 cpu feature
-Date:   Wed,  5 Apr 2023 16:39:59 +0100
-Message-Id: <20230405154008.3552854-42-maz@kernel.org>
+Subject: [PATCH v9 42/50] KVM: arm64: nv: Sync nested timer state with FEAT_NV2
+Date:   Wed,  5 Apr 2023 16:40:00 +0100
+Message-Id: <20230405154008.3552854-43-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230405154008.3552854-1-maz@kernel.org>
 References: <20230405154008.3552854-1-maz@kernel.org>
@@ -74,53 +74,103 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add the detection code for the FEAT_NV2 feature.
+From: Christoffer Dall <christoffer.dall@arm.com>
 
+Emulating the timers with FEAT_NV2 is a bit odd, as the timers
+can be reconfigured behind our back without the hypervisor even
+noticing. In the VHE case, that's an actual regression in the
+architecture...
+
+Co-developed-by: Christoffer Dall <christoffer.dall@arm.com>
+Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_nested.h |  6 ++++++
- arch/arm64/kernel/cpufeature.c      | 11 +++++++++++
- 2 files changed, 17 insertions(+)
+ arch/arm64/kvm/arch_timer.c  | 44 ++++++++++++++++++++++++++++++++++++
+ arch/arm64/kvm/arm.c         |  3 +++
+ include/kvm/arm_arch_timer.h |  1 +
+ 3 files changed, 48 insertions(+)
 
-diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
-index 784168dcb0fe..a58c3df12379 100644
---- a/arch/arm64/include/asm/kvm_nested.h
-+++ b/arch/arm64/include/asm/kvm_nested.h
-@@ -14,6 +14,12 @@ static inline bool vcpu_has_nv(const struct kvm_vcpu *vcpu)
- 		test_bit(KVM_ARM_VCPU_HAS_EL2, vcpu->arch.features));
+diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
+index c5c8cc3c25ae..2a1d88efada4 100644
+--- a/arch/arm64/kvm/arch_timer.c
++++ b/arch/arm64/kvm/arch_timer.c
+@@ -914,6 +914,50 @@ void kvm_timer_vcpu_put(struct kvm_vcpu *vcpu)
+ 		kvm_timer_blocking(vcpu);
  }
  
-+static inline bool vcpu_has_nv2(const struct kvm_vcpu *vcpu)
++void kvm_timer_sync_nested(struct kvm_vcpu *vcpu)
 +{
-+	return cpus_have_final_cap(ARM64_HAS_ENHANCED_NESTED_VIRT) &&
-+		vcpu_has_nv(vcpu);
++	/*
++	 * When NV2 is on, guest hypervisors have their EL0 timer register
++	 * accesses redirected to the VNCR page. Any guest action taken on
++	 * the timer is postponed until the next exit, leading to a very
++	 * poor quality of emulation.
++	 */
++	if (!is_hyp_ctxt(vcpu))
++		return;
++
++	if (!vcpu_el2_e2h_is_set(vcpu)) {
++		/*
++		 * A non-VHE guest hypervisor doesn't have any direct access
++		 * to its timers: the EL2 registers trap (and the HW is
++		 * fully emulated), while the EL0 registers access memory
++		 * despite the access being notionally direct. Boo.
++		 *
++		 * We update the hardware timer registers with the
++		 * latest value written by the guest to the VNCR page
++		 * and let the hardware take care of the rest.
++		 */
++		write_sysreg_el0(__vcpu_sys_reg(vcpu, CNTV_CTL_EL0),  SYS_CNTV_CTL);
++		write_sysreg_el0(__vcpu_sys_reg(vcpu, CNTV_CVAL_EL0), SYS_CNTV_CVAL);
++		write_sysreg_el0(__vcpu_sys_reg(vcpu, CNTP_CTL_EL0),  SYS_CNTP_CTL);
++		write_sysreg_el0(__vcpu_sys_reg(vcpu, CNTP_CVAL_EL0), SYS_CNTP_CVAL);
++	} else {
++		/*
++		 * For a VHE guest hypervisor, the EL2 state is directly
++		 * stored in the host EL0 timers, while the emulated EL0
++		 * state is stored in the VNCR page. The latter could have
++		 * been updated behind our back, and we must reset the
++		 * emulation of the timers.
++		 */
++		struct timer_map map;
++		get_timer_map(vcpu, &map);
++
++		soft_timer_cancel(&map.emul_vtimer->hrtimer);
++		soft_timer_cancel(&map.emul_ptimer->hrtimer);
++		timer_emulate(map.emul_vtimer);
++		timer_emulate(map.emul_ptimer);
++	}
 +}
 +
- /* Translation helpers from non-VHE EL2 to EL1 */
- static inline u64 tcr_el2_ps_to_tcr_el1_ips(u64 tcr_el2)
- {
-diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-index c331c49a7d19..db877f1d3a7b 100644
---- a/arch/arm64/kernel/cpufeature.c
-+++ b/arch/arm64/kernel/cpufeature.c
-@@ -2298,6 +2298,17 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
- 		.field_width = 4,
- 		.min_field_value = ID_AA64MMFR2_EL1_NV_IMP,
- 	},
-+	{
-+		.desc = "Enhanced Nested Virtualization Support",
-+		.capability = ARM64_HAS_ENHANCED_NESTED_VIRT,
-+		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
-+		.matches = has_nested_virt_support,
-+		.sys_reg = SYS_ID_AA64MMFR2_EL1,
-+		.sign = FTR_UNSIGNED,
-+		.field_pos = ID_AA64MMFR2_EL1_NV_SHIFT,
-+		.field_width = 4,
-+		.min_field_value = ID_AA64MMFR2_EL1_NV_NV2,
-+	},
- 	{
- 		.capability = ARM64_HAS_32BIT_EL0_DO_NOT_USE,
- 		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
+ /*
+  * With a userspace irqchip we have to check if the guest de-asserted the
+  * timer and if so, unmask the timer irq signal on the host interrupt
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 6af9fdf9b44d..c7089e558252 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -985,6 +985,9 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+ 		if (static_branch_unlikely(&userspace_irqchip_in_use))
+ 			kvm_timer_sync_user(vcpu);
+ 
++		if (vcpu_has_nv2(vcpu))
++			kvm_timer_sync_nested(vcpu);
++
+ 		kvm_arch_vcpu_ctxsync_fp(vcpu);
+ 
+ 		/*
+diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
+index 52008f5cff06..a8382dda1c2e 100644
+--- a/include/kvm/arm_arch_timer.h
++++ b/include/kvm/arm_arch_timer.h
+@@ -98,6 +98,7 @@ int __init kvm_timer_hyp_init(bool has_gic);
+ int kvm_timer_enable(struct kvm_vcpu *vcpu);
+ int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu);
+ void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu);
++void kvm_timer_sync_nested(struct kvm_vcpu *vcpu);
+ void kvm_timer_sync_user(struct kvm_vcpu *vcpu);
+ bool kvm_timer_should_notify_user(struct kvm_vcpu *vcpu);
+ void kvm_timer_update_run(struct kvm_vcpu *vcpu);
 -- 
 2.34.1
 
