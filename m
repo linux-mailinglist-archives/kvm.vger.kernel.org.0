@@ -2,76 +2,79 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 518456D882B
-	for <lists+kvm@lfdr.de>; Wed,  5 Apr 2023 22:24:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BB8EB6D88F3
+	for <lists+kvm@lfdr.de>; Wed,  5 Apr 2023 22:45:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233811AbjDEUY6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Apr 2023 16:24:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37146 "EHLO
+        id S234580AbjDEUpX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Apr 2023 16:45:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36304 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230033AbjDEUYx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Apr 2023 16:24:53 -0400
-Received: from mail-lf1-x12a.google.com (mail-lf1-x12a.google.com [IPv6:2a00:1450:4864:20::12a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B5564C21;
-        Wed,  5 Apr 2023 13:24:51 -0700 (PDT)
-Received: by mail-lf1-x12a.google.com with SMTP id 2adb3069b0e04-4e0ad2aa77fso472304e87.1;
-        Wed, 05 Apr 2023 13:24:51 -0700 (PDT)
+        with ESMTP id S234886AbjDEUpF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Apr 2023 16:45:05 -0400
+Received: from mail-oo1-xc2b.google.com (mail-oo1-xc2b.google.com [IPv6:2607:f8b0:4864:20::c2b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F3F6659A
+        for <kvm@vger.kernel.org>; Wed,  5 Apr 2023 13:44:41 -0700 (PDT)
+Received: by mail-oo1-xc2b.google.com with SMTP id w13-20020a4aca0d000000b0053b8aa32089so5873599ooq.5
+        for <kvm@vger.kernel.org>; Wed, 05 Apr 2023 13:44:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1680726289;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=z7bGBU2amChf9VSLvjx9x2NsgYO154k1agCs2bfejtI=;
-        b=nvtBMbWW2FPV97W8xfZ9Osx1LEiYvRQo78jbVtTnLDUBI68wEW53YmRiXoCx95HqVF
-         qR3NK0fSkVHaVJHJ0PGxkA/fJVylAGIsIDCI1o8MZWHALUaKR6GbTr5r04nefDAm6lZp
-         US/vGvP4+Scl4f2jwk/dO3hkXR2iBpoLYbnOGn0dDPytuY8RB0J/gGUL0PrYmMXo5gow
-         o30Pc7yGwWAOQUS2e4GfG+4QIQlvW+27m0hnhYyUfkvuIwp+Yj9stH244itQHtgkEr13
-         BBQzouGUuXGvzU/88sLGqpgpa/nvoOGTxFTVZcSgfURJRfv6106Aqf4XCu0ZBzYvxWbm
-         QhKw==
+        d=ventanamicro.com; s=google; t=1680727480;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ZqWfb2PPnDpc2PEqcd7YpJ7M16hWDtl2fWp2jjEorwo=;
+        b=TNOuzQODBFw4w+EKPw8H+hz/E1aFLDuz22IVxMRnSrjb96aaHbwmAL33xIMmsa9gvT
+         iQp4A+/cHZmTKQDilGfL91aI/DfMj/G4wqLu1ET9xijR7swBv3vTXJrJj8TmNGA7S2Wv
+         I2JUjyx6LNQ0MuLEQqZ0rTJGi44n1a2kWz1l/eM7zNNXDxXZaolcM9jdrg2Wwwx0V3gq
+         upJ4sQdYAzdREj76KzCbvrFdw4HQmzfe/DMlJEtP8AoCCIbKzxEHrOAI75X1/3Qrwetp
+         UjBxAFpe4rHKutfCkfjc7G0Sil1Fd+40EFqphuSetm2R1vMJ7pYfF7Wi3XT1HhpMA8GJ
+         DUrg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680726289;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=z7bGBU2amChf9VSLvjx9x2NsgYO154k1agCs2bfejtI=;
-        b=6Jy9gPZq33H3ycUCQZ+XpiAWHyelci8yKdS5dUJFmvFcHKe5eKTNbVtUlFh6lC0G9S
-         dgvuxD6l17BEmGgZEacmaPSQNpb8ZohO/LbBviG6AMuKJZw7+3bqSY9Lf3EevahcHFmM
-         xonFh148+dgSziAmQPHP3WCm1mRxhRYvo7Xx6+f5uhOq5s+IuQK+HbBJ5e8pOhckup0e
-         L4njBx5ablnljLYkttnMWI/MPtRtHF1IX0cHKP8R7XWR+G5/4KzXDBmDZF18UZUz+T3+
-         gN4qq4TCEQLOm9EZ7saj7r1cW62LUJj/5+ediFfu39T1Xh204z3PEKfMwDTMy8utkPBC
-         dGug==
-X-Gm-Message-State: AAQBX9eFi7rgoLlCp3fF/F7afI+m+P5jaqInplo/G4P+A4YIHD0aySvQ
-        66OhKmlHe+vMMXMeS1e8kQs=
-X-Google-Smtp-Source: AKy350aWWwjMz3kM8AO3ZsWhy9vCtRp+zieAq0a1+W55O0O03xHKWs0G/djXvt+fvVY7HssIuMVhjQ==
-X-Received: by 2002:ac2:4462:0:b0:4eb:7fa:515 with SMTP id y2-20020ac24462000000b004eb07fa0515mr952369lfl.2.1680726289387;
-        Wed, 05 Apr 2023 13:24:49 -0700 (PDT)
-Received: from localhost (88-115-161-74.elisa-laajakaista.fi. [88.115.161.74])
-        by smtp.gmail.com with ESMTPSA id t26-20020ac24c1a000000b004b5480edf67sm2972361lfq.36.2023.04.05.13.24.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 Apr 2023 13:24:49 -0700 (PDT)
-Date:   Wed, 5 Apr 2023 23:24:35 +0300
-From:   Zhi Wang <zhi.wang.linux@gmail.com>
-To:     <ankita@nvidia.com>
-Cc:     <jgg@nvidia.com>, <alex.williamson@redhat.com>,
-        <naoya.horiguchi@nec.com>, <maz@kernel.org>,
-        <oliver.upton@linux.dev>, <aniketa@nvidia.com>, <cjia@nvidia.com>,
-        <kwankhede@nvidia.com>, <targupta@nvidia.com>, <vsethi@nvidia.com>,
-        <acurrid@nvidia.com>, <apopple@nvidia.com>, <jhubbard@nvidia.com>,
-        <danw@nvidia.com>, <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>, <linux-mm@kvack.org>
-Subject: Re: [PATCH v3 6/6] vfio/nvgpu: register device memory for poison
- handling
-Message-ID: <20230405232435.0000090a.zhi.wang.linux@gmail.com>
-In-Reply-To: <20230405180134.16932-7-ankita@nvidia.com>
-References: <20230405180134.16932-1-ankita@nvidia.com>
-        <20230405180134.16932-7-ankita@nvidia.com>
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
+        d=1e100.net; s=20210112; t=1680727480;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZqWfb2PPnDpc2PEqcd7YpJ7M16hWDtl2fWp2jjEorwo=;
+        b=Iol3hgpAiPJc5aoQHlWEtfCnraX/PPeTM/4X0zaQlwH65YzSt4TnepYREmyDshM9hp
+         ERFL/RVd2vlCBxL/WO1gvzei64ir0V1vxOn0UNvqpCcZ6Buv+1Z2Fk8IX4/x1EPnphhz
+         vJrJ115VsQy7hHrlgJ+Jqr5vdkpnObeJiAwzvGn7Gv5lrNDVjRG593RjAQY12xOiAmYm
+         QwzLcbYLQ/J1SljTdP71MQol1s3MnX6QSlpxQ9NWhgEIj+0uAqLEbeOU61T3bdmOdypG
+         lSjNeEdfPsBfFZ14EjHxt3I2a6CzfMJ+/IefmUhzmOHZ0RIbud0ibQRnSevDgxQ3cJy2
+         d3Jw==
+X-Gm-Message-State: AAQBX9dHqzVOedVUjIr3Pj2EdxlBhJrh04/0XbfmgjYRR7rHvd92G7xK
+        eYvj+lO8ol0PKGtLL/YB53JNAg==
+X-Google-Smtp-Source: AKy350Zpo5917s3wwJGg0D4GjQAAqZMwM4zNUds49ooFSWmxGSeohhLZSBKl2stDGqytkYYe+q1+OA==
+X-Received: by 2002:a4a:5241:0:b0:537:b1ad:1c7c with SMTP id d62-20020a4a5241000000b00537b1ad1c7cmr3544290oob.0.1680727480668;
+        Wed, 05 Apr 2023 13:44:40 -0700 (PDT)
+Received: from [192.168.68.107] ([191.255.108.232])
+        by smtp.gmail.com with ESMTPSA id u1-20020a056830118100b0069fb749271bsm7192106otq.15.2023.04.05.13.44.36
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 05 Apr 2023 13:44:39 -0700 (PDT)
+Message-ID: <984d3eda-1efd-f39d-8930-3a8ea5226ad5@ventanamicro.com>
+Date:   Wed, 5 Apr 2023 17:44:34 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
-        DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,RCVD_IN_DNSWL_NONE,
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.9.0
+Subject: Re: [RFC PATCH 09/10] target/riscv: Restrict KVM-specific fields from
+ ArchCPU
+Content-Language: en-US
+To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>,
+        qemu-devel@nongnu.org
+Cc:     qemu-s390x@nongnu.org, qemu-riscv@nongnu.org,
+        =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+        qemu-arm@nongnu.org, kvm@vger.kernel.org, qemu-ppc@nongnu.org,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Alistair Francis <alistair.francis@wdc.com>,
+        Bin Meng <bin.meng@windriver.com>,
+        Weiwei Li <liweiwei@iscas.ac.cn>,
+        Liu Zhiwei <zhiwei_liu@linux.alibaba.com>
+References: <20230405160454.97436-1-philmd@linaro.org>
+ <20230405160454.97436-10-philmd@linaro.org>
+From:   Daniel Henrique Barboza <dbarboza@ventanamicro.com>
+In-Reply-To: <20230405160454.97436-10-philmd@linaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.6 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
+        DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
         version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -80,223 +83,94 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 5 Apr 2023 11:01:34 -0700
-<ankita@nvidia.com> wrote:
 
-> From: Ankit Agrawal <ankita@nvidia.com>
+
+On 4/5/23 13:04, Philippe Mathieu-Daudé wrote:
+> These fields shouldn't be accessed when KVM is not available.
 > 
-> The nvgpu-vfio-pci module maps QEMU VMA to device memory through
-> remap_pfn_range(). The new mechanism to handle poison on memory not backed
-> by struct page is leveraged here.
-> 
-> nvgpu-vfio-pci defines a function pfn_memory_failure() to get the ECC PFN
-> from the MM. The function is registered with kernel MM along with the
-> address space and PFN range through register_pfn_address_space().
-> 
-> Track poisoned PFN in the nvgpu-vfio-pci module as bitmap with a bit per
-> PFN. The PFN is communicated by the kernel MM to the module through the
-> failure function, which sets the appropriate bit in the bitmap.
-> 
-> Register a VMA fault ops for the module. It returns VM_FAULT_HWPOISON
-> in case the bit for the PFN is set in the bitmap.
-> 
-> Clear bitmap on reset to reflect the clean state of the device memory
-> after reset.
-> 
-> Signed-off-by: Ankit Agrawal <ankita@nvidia.com>
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 > ---
->  drivers/vfio/pci/nvgpu/main.c | 116 ++++++++++++++++++++++++++++++++--
->  1 file changed, 110 insertions(+), 6 deletions(-)
+> RFC: The migration part is likely invalid...
 > 
-> diff --git a/drivers/vfio/pci/nvgpu/main.c b/drivers/vfio/pci/nvgpu/main.c
-> index 2dd8cc6e0145..8ccd3fe33a0f 100644
-> --- a/drivers/vfio/pci/nvgpu/main.c
-> +++ b/drivers/vfio/pci/nvgpu/main.c
-> @@ -5,6 +5,8 @@
->  
->  #include <linux/pci.h>
->  #include <linux/vfio_pci_core.h>
-> +#include <linux/bitmap.h>
-> +#include <linux/memory-failure.h>
->  
->  #define DUMMY_PFN \
->  	(((nvdev->mem_prop.hpa + nvdev->mem_prop.mem_length) >> PAGE_SHIFT) - 1)
-> @@ -12,12 +14,78 @@
->  struct dev_mem_properties {
->  	uint64_t hpa;
->  	uint64_t mem_length;
-> +	unsigned long *pfn_bitmap;
->  	int bar1_start_offset;
->  };
->  
->  struct nvgpu_vfio_pci_core_device {
->  	struct vfio_pci_core_device core_device;
->  	struct dev_mem_properties mem_prop;
-> +	struct pfn_address_space pfn_address_space;
-> +};
-> +
-> +void nvgpu_vfio_pci_pfn_memory_failure(struct pfn_address_space *pfn_space,
-> +				       unsigned long pfn)
-> +{
-> +	struct nvgpu_vfio_pci_core_device *nvdev = container_of(
-> +		pfn_space, struct nvgpu_vfio_pci_core_device, pfn_address_space);
-> +
-> +	/*
-> +	 * MM has called to notify a poisoned page. Track that in the bitmap.
-> +	 */
-> +	__set_bit(pfn - (pfn_space->node.start), nvdev->mem_prop.pfn_bitmap);
-> +}
-> +
-> +struct pfn_address_space_ops nvgpu_vfio_pci_pas_ops = {
-> +	.failure = nvgpu_vfio_pci_pfn_memory_failure,
-> +};
-> +
-> +static int
-> +nvgpu_vfio_pci_register_pfn_range(struct nvgpu_vfio_pci_core_device *nvdev,
-> +				  struct vm_area_struct *vma)
-> +{
-> +	unsigned long nr_pages;
-> +	int ret = 0;
-> +
-> +	nr_pages = nvdev->mem_prop.mem_length >> PAGE_SHIFT;
-> +
-> +	nvdev->pfn_address_space.node.start = vma->vm_pgoff;
-> +	nvdev->pfn_address_space.node.last = vma->vm_pgoff + nr_pages - 1;
-> +	nvdev->pfn_address_space.ops = &nvgpu_vfio_pci_pas_ops;
-> +	nvdev->pfn_address_space.mapping = vma->vm_file->f_mapping;
-> +
-> +	ret = register_pfn_address_space(&(nvdev->pfn_address_space));
-> +
-> +	return ret;
-> +}
-> +
-> +static vm_fault_t nvgpu_vfio_pci_fault(struct vm_fault *vmf)
-> +{
-> +	unsigned long mem_offset = vmf->pgoff - vmf->vma->vm_pgoff;
-> +	struct nvgpu_vfio_pci_core_device *nvdev = container_of(
-> +		vmf->vma->vm_file->private_data,
-> +		struct nvgpu_vfio_pci_core_device, core_device.vdev);
-> +	int ret;
-> +
-> +	/*
-> +	 * Check if the page is poisoned.
-> +	 */
-> +	if (mem_offset < (nvdev->mem_prop.mem_length >> PAGE_SHIFT) &&
-> +		test_bit(mem_offset, nvdev->mem_prop.pfn_bitmap))
-> +		return VM_FAULT_HWPOISON;
-> +
-> +	ret = remap_pfn_range(vmf->vma,
-> +			vmf->vma->vm_start + (mem_offset << PAGE_SHIFT),
-> +			DUMMY_PFN, PAGE_SIZE,
-> +			vmf->vma->vm_page_prot);
-> +	if (ret)
-> +		return VM_FAULT_ERROR;
-> +
-> +	return VM_FAULT_NOPAGE;
-> +}
-> +
-> +static const struct vm_operations_struct nvgpu_vfio_pci_mmap_ops = {
-> +	.fault = nvgpu_vfio_pci_fault,
->  };
->  
->  static int vfio_get_bar1_start_offset(struct vfio_pci_core_device *vdev)
-> @@ -26,8 +94,9 @@ static int vfio_get_bar1_start_offset(struct vfio_pci_core_device *vdev)
->  
->  	pci_read_config_byte(vdev->pdev, 0x10, &val);
->  	/*
-> -	 * The BAR1 start offset in the PCI config space depends on the BAR0size.
-> -	 * Check if the BAR0 is 64b and return the approproiate BAR1 offset.
-> +	 * The BAR1 start offset in the PCI config space depends on the BAR0
-> +	 * size. Check if the BAR0 is 64b and return the approproiate BAR1
-> +	 * offset.
->  	 */
->  	if (val & PCI_BASE_ADDRESS_MEM_TYPE_64)
->  		return VFIO_PCI_BAR2_REGION_INDEX;
-> @@ -54,6 +123,16 @@ static int nvgpu_vfio_pci_open_device(struct vfio_device *core_vdev)
->  	return ret;
->  }
->  
-> +void nvgpu_vfio_pci_close_device(struct vfio_device *core_vdev)
-> +{
-> +	struct nvgpu_vfio_pci_core_device *nvdev = container_of(
-> +		core_vdev, struct nvgpu_vfio_pci_core_device, core_device.vdev);
-> +
-> +	unregister_pfn_address_space(&(nvdev->pfn_address_space));
-> +
-> +	vfio_pci_core_close_device(core_vdev);
-> +}
-> +
->  int nvgpu_vfio_pci_mmap(struct vfio_device *core_vdev,
->  			struct vm_area_struct *vma)
->  {
-> @@ -93,8 +172,11 @@ int nvgpu_vfio_pci_mmap(struct vfio_device *core_vdev,
->  		return ret;
->  
->  	vma->vm_pgoff = start_pfn + pgoff;
-> +	vma->vm_ops = &nvgpu_vfio_pci_mmap_ops;
->  
-> -	return 0;
-> +	ret = nvgpu_vfio_pci_register_pfn_range(nvdev, vma);
-> +
-> +	return ret;
->  }
->  
->  long nvgpu_vfio_pci_ioctl(struct vfio_device *core_vdev, unsigned int cmd,
-> @@ -140,7 +222,14 @@ long nvgpu_vfio_pci_ioctl(struct vfio_device *core_vdev, unsigned int cmd,
->  		}
->  
->  		return vfio_pci_core_ioctl(core_vdev, cmd, arg);
-> -
-> +	case VFIO_DEVICE_RESET:
-> +		/*
-> +		 * Resetting the GPU clears up the poisoned page. Reset the
-> +		 * poisoned page bitmap.
-> +		 */
-> +		memset(nvdev->mem_prop.pfn_bitmap, 0,
-> +		       nvdev->mem_prop.mem_length >> (PAGE_SHIFT + 3));
-> +		return vfio_pci_core_ioctl(core_vdev, cmd, arg);
->  	default:
->  		return vfio_pci_core_ioctl(core_vdev, cmd, arg);
->  	}
-> @@ -151,7 +240,7 @@ static const struct vfio_device_ops nvgpu_vfio_pci_ops = {
->  	.init = vfio_pci_core_init_dev,
->  	.release = vfio_pci_core_release_dev,
->  	.open_device = nvgpu_vfio_pci_open_device,
-> -	.close_device = vfio_pci_core_close_device,
-> +	.close_device = nvgpu_vfio_pci_close_device,
->  	.ioctl = nvgpu_vfio_pci_ioctl,
->  	.read = vfio_pci_core_read,
->  	.write = vfio_pci_core_write,
-> @@ -188,7 +277,20 @@ nvgpu_vfio_pci_fetch_memory_property(struct pci_dev *pdev,
->  
->  	ret = device_property_read_u64(&(pdev->dev), "nvidia,gpu-mem-size",
->  				       &(nvdev->mem_prop.mem_length));
-> -	return ret;
-> +	if (ret)
-> +		return ret;
-> +
-> +	/*
-> +	 * A bitmap is maintained to teack the pages that are poisoned. Each
-                                       ^track?
-> +	 * page is represented by a bit. Allocation size in bytes is
-> +	 * determined by shifting the device memory size by PAGE_SHIFT to
-> +	 * determine the number of pages; and further shifted by 3 as each
-> +	 * byte could track 8 pages.
-> +	 */
-> +	nvdev->mem_prop.pfn_bitmap
-> +		= vzalloc(nvdev->mem_prop.mem_length >> (PAGE_SHIFT + 3));
-> +
-> +	return 0;
->  }
->  
->  static int nvgpu_vfio_pci_probe(struct pci_dev *pdev,
-> @@ -224,6 +326,8 @@ static void nvgpu_vfio_pci_remove(struct pci_dev *pdev)
->  	struct nvgpu_vfio_pci_core_device *nvdev = nvgpu_drvdata(pdev);
->  	struct vfio_pci_core_device *vdev = &nvdev->core_device;
->  
-> +	vfree(nvdev->mem_prop.pfn_bitmap);
-> +
->  	vfio_pci_core_unregister_device(vdev);
->  	vfio_put_device(&vdev->vdev);
->  }
+> kvmtimer_needed() is defined in target/riscv/machine.c as
+> 
+>    static bool kvmtimer_needed(void *opaque)
+>    {
+>        return kvm_enabled();
+>    }
+> 
+> which depends on a host feature.
 
+
+kvm_enabled() can be false even when CONFIG_KVM is true when a KVM capable host
+is running a TCG guest, for example. In that case env->kvm_timer_* states exist
+but aren't initialized, and shouldn't be migrated.
+
+Thus it's not just a host feature, but a host feature + accel option. I think
+this is fine.
+
+> ---
+>   target/riscv/cpu.h     | 2 ++
+>   target/riscv/machine.c | 4 ++++
+>   2 files changed, 6 insertions(+)
+> 
+> diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
+> index 638e47c75a..82939235ab 100644
+> --- a/target/riscv/cpu.h
+> +++ b/target/riscv/cpu.h
+> @@ -377,12 +377,14 @@ struct CPUArchState {
+>       hwaddr kernel_addr;
+>       hwaddr fdt_addr;
+>   
+> +#ifdef CONFIG_KVM
+>       /* kvm timer */
+>       bool kvm_timer_dirty;
+>       uint64_t kvm_timer_time;
+>       uint64_t kvm_timer_compare;
+>       uint64_t kvm_timer_state;
+>       uint64_t kvm_timer_frequency;
+> +#endif /* CONFIG_KVM */
+>   };
+>   
+>   OBJECT_DECLARE_CPU_TYPE(RISCVCPU, RISCVCPUClass, RISCV_CPU)
+> diff --git a/target/riscv/machine.c b/target/riscv/machine.c
+> index 9c455931d8..e45d564ec3 100644
+> --- a/target/riscv/machine.c
+> +++ b/target/riscv/machine.c
+> @@ -201,10 +201,12 @@ static bool kvmtimer_needed(void *opaque)
+>   
+>   static int cpu_post_load(void *opaque, int version_id)
+>   {
+> +#ifdef CONFIG_KVM
+>       RISCVCPU *cpu = opaque;
+>       CPURISCVState *env = &cpu->env;
+>   
+>       env->kvm_timer_dirty = true;
+> +#endif
+>       return 0;
+>   }
+>   
+> @@ -215,9 +217,11 @@ static const VMStateDescription vmstate_kvmtimer = {
+>       .needed = kvmtimer_needed,
+>       .post_load = cpu_post_load,
+>       .fields = (VMStateField[]) {
+> +#ifdef CONFIG_KVM
+>           VMSTATE_UINT64(env.kvm_timer_time, RISCVCPU),
+>           VMSTATE_UINT64(env.kvm_timer_compare, RISCVCPU),
+>           VMSTATE_UINT64(env.kvm_timer_state, RISCVCPU),
+> +#endif
+
+Here you're creating an empty 'cpu/kvmtimer' vmstate that won't be migrated anyway
+because kvmtimer_needed (== kvm_enabled()) will be always false if CONFIG_KVM=n.
+
+I'd say it's better to just get rid of the whole vmstate in this case, but I don't
+like the precedence of having vmstates being gated by build flags.
+
+
+Reviewed-by: Daniel Henrique Barboza <dbarboza@ventanamicro.com>
+
+
+
+>           VMSTATE_END_OF_LIST()
+>       }
+>   };
