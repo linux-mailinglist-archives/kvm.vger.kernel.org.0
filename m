@@ -2,175 +2,169 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BB8EB6D88F3
-	for <lists+kvm@lfdr.de>; Wed,  5 Apr 2023 22:45:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D9A4C6D88FA
+	for <lists+kvm@lfdr.de>; Wed,  5 Apr 2023 22:46:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234580AbjDEUpX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Apr 2023 16:45:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36304 "EHLO
+        id S232447AbjDEUp7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Apr 2023 16:45:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39932 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234886AbjDEUpF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Apr 2023 16:45:05 -0400
-Received: from mail-oo1-xc2b.google.com (mail-oo1-xc2b.google.com [IPv6:2607:f8b0:4864:20::c2b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F3F6659A
-        for <kvm@vger.kernel.org>; Wed,  5 Apr 2023 13:44:41 -0700 (PDT)
-Received: by mail-oo1-xc2b.google.com with SMTP id w13-20020a4aca0d000000b0053b8aa32089so5873599ooq.5
-        for <kvm@vger.kernel.org>; Wed, 05 Apr 2023 13:44:41 -0700 (PDT)
+        with ESMTP id S232252AbjDEUp4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Apr 2023 16:45:56 -0400
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44620273F
+        for <kvm@vger.kernel.org>; Wed,  5 Apr 2023 13:45:42 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-54574d6204aso367840557b3.15
+        for <kvm@vger.kernel.org>; Wed, 05 Apr 2023 13:45:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1680727480;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ZqWfb2PPnDpc2PEqcd7YpJ7M16hWDtl2fWp2jjEorwo=;
-        b=TNOuzQODBFw4w+EKPw8H+hz/E1aFLDuz22IVxMRnSrjb96aaHbwmAL33xIMmsa9gvT
-         iQp4A+/cHZmTKQDilGfL91aI/DfMj/G4wqLu1ET9xijR7swBv3vTXJrJj8TmNGA7S2Wv
-         I2JUjyx6LNQ0MuLEQqZ0rTJGi44n1a2kWz1l/eM7zNNXDxXZaolcM9jdrg2Wwwx0V3gq
-         upJ4sQdYAzdREj76KzCbvrFdw4HQmzfe/DMlJEtP8AoCCIbKzxEHrOAI75X1/3Qrwetp
-         UjBxAFpe4rHKutfCkfjc7G0Sil1Fd+40EFqphuSetm2R1vMJ7pYfF7Wi3XT1HhpMA8GJ
-         DUrg==
+        d=google.com; s=20210112; t=1680727541;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=OqWp3muviIDsLuEo0I+CjY33qaMzCnuNiH2jilw/FyQ=;
+        b=bc/T9w3S7CK/4dOnFZo7pu05rfJHm9ttZb6aRb+mNJgmKqP3VDE8tVoyFgzAweKIqH
+         MAxJvMfSYd38r9NkS3nz/B2PIKExl/i/y5mHZMtZPxplbA9tmaRHk4XaWGFAWpGdqbxt
+         8YkbzprRP3BOocRmk6SXmEowAvQ594xRWhzDwUvMDPkiNWYrvaOXTFU6LgoSzbVlajj8
+         4YnaVIuGip1QfJw1P55VnwgpFco5nvon5AZxt0DnLuNsaoJ/1zNp9gk10U3KIY/T/nP4
+         ZB0QJPq9bum12rfIEhbM1pVcE3VaNa0hXCmANxOZovJWRLWaeGT5t3VZOyGQ+yEzvJHX
+         +0pw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680727480;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZqWfb2PPnDpc2PEqcd7YpJ7M16hWDtl2fWp2jjEorwo=;
-        b=Iol3hgpAiPJc5aoQHlWEtfCnraX/PPeTM/4X0zaQlwH65YzSt4TnepYREmyDshM9hp
-         ERFL/RVd2vlCBxL/WO1gvzei64ir0V1vxOn0UNvqpCcZ6Buv+1Z2Fk8IX4/x1EPnphhz
-         vJrJ115VsQy7hHrlgJ+Jqr5vdkpnObeJiAwzvGn7Gv5lrNDVjRG593RjAQY12xOiAmYm
-         QwzLcbYLQ/J1SljTdP71MQol1s3MnX6QSlpxQ9NWhgEIj+0uAqLEbeOU61T3bdmOdypG
-         lSjNeEdfPsBfFZ14EjHxt3I2a6CzfMJ+/IefmUhzmOHZ0RIbud0ibQRnSevDgxQ3cJy2
-         d3Jw==
-X-Gm-Message-State: AAQBX9dHqzVOedVUjIr3Pj2EdxlBhJrh04/0XbfmgjYRR7rHvd92G7xK
-        eYvj+lO8ol0PKGtLL/YB53JNAg==
-X-Google-Smtp-Source: AKy350Zpo5917s3wwJGg0D4GjQAAqZMwM4zNUds49ooFSWmxGSeohhLZSBKl2stDGqytkYYe+q1+OA==
-X-Received: by 2002:a4a:5241:0:b0:537:b1ad:1c7c with SMTP id d62-20020a4a5241000000b00537b1ad1c7cmr3544290oob.0.1680727480668;
-        Wed, 05 Apr 2023 13:44:40 -0700 (PDT)
-Received: from [192.168.68.107] ([191.255.108.232])
-        by smtp.gmail.com with ESMTPSA id u1-20020a056830118100b0069fb749271bsm7192106otq.15.2023.04.05.13.44.36
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 05 Apr 2023 13:44:39 -0700 (PDT)
-Message-ID: <984d3eda-1efd-f39d-8930-3a8ea5226ad5@ventanamicro.com>
-Date:   Wed, 5 Apr 2023 17:44:34 -0300
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.9.0
-Subject: Re: [RFC PATCH 09/10] target/riscv: Restrict KVM-specific fields from
- ArchCPU
-Content-Language: en-US
-To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>,
-        qemu-devel@nongnu.org
-Cc:     qemu-s390x@nongnu.org, qemu-riscv@nongnu.org,
-        =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
-        qemu-arm@nongnu.org, kvm@vger.kernel.org, qemu-ppc@nongnu.org,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Alistair Francis <alistair.francis@wdc.com>,
-        Bin Meng <bin.meng@windriver.com>,
-        Weiwei Li <liweiwei@iscas.ac.cn>,
-        Liu Zhiwei <zhiwei_liu@linux.alibaba.com>
-References: <20230405160454.97436-1-philmd@linaro.org>
- <20230405160454.97436-10-philmd@linaro.org>
-From:   Daniel Henrique Barboza <dbarboza@ventanamicro.com>
-In-Reply-To: <20230405160454.97436-10-philmd@linaro.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.6 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
-        DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-        version=3.4.6
+        d=1e100.net; s=20210112; t=1680727541;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=OqWp3muviIDsLuEo0I+CjY33qaMzCnuNiH2jilw/FyQ=;
+        b=crvnOynFGrTEmy0JO4nO9eNm+qGb9dON4QQOuNalFBBOPtNNmVA0yaF9Ibg41cvM8j
+         c0fO2nFq/wp/XSiv+HBo9umRbL0A1Ysr6wFSl+FISV50tP9k7UzS2zVPuGagSZcT7f4C
+         ovK62qDbKB8uSUcJs4sO460/OsTfBcV0f/pbMQwWep8cNuD+iGZlCMAmMitx9fRZSkp+
+         7b+Mhzsk6LaiPGBTuiTd+o3fWh+7V/QQN4oC7XXWHz1lqWs8e6r8WfjeisX6xXm25yTj
+         +jOxRf90Yu2VGhw0zPEXzXbeP1dPc0miQcH3/kBIxdNw2x8/63MvxsKXY45k6RAbjMGU
+         8pcQ==
+X-Gm-Message-State: AAQBX9fljQ/dL71Z7JlAK41Yj4fItYFJRbHCGXMDgBohY/y8uaQ7SbbX
+        aVNraV+Ilr+cjPtdiqICAOM2qtbIolE=
+X-Google-Smtp-Source: AKy350ac4+xwZhDrezXJonuNe20SvP6FeYm6LfdTvPSke3XT1okmA5YFL6u9FwUMSFsb9g70NEdu7DE4Kk4=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:768b:0:b0:b6d:80ab:8bb6 with SMTP id
+ r133-20020a25768b000000b00b6d80ab8bb6mr471857ybc.1.1680727541518; Wed, 05 Apr
+ 2023 13:45:41 -0700 (PDT)
+Date:   Wed, 5 Apr 2023 13:45:40 -0700
+In-Reply-To: <20220810061924.1418-1-santosh.shukla@amd.com>
+Mime-Version: 1.0
+References: <20220810061924.1418-1-santosh.shukla@amd.com>
+Message-ID: <ZC3d9EPMCoknCoU8@google.com>
+Subject: Re: [kvm-unit-tests PATCHv2] x86: nSVM: Add support for VNMI test
+From:   Sean Christopherson <seanjc@google.com>
+To:     Santosh Shukla <santosh.shukla@amd.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-7.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 4/5/23 13:04, Philippe Mathieu-Daudé wrote:
-> These fields shouldn't be accessed when KVM is not available.
+On Wed, Aug 10, 2022, Santosh Shukla wrote:
+> Add a VNMI test case to test Virtual NMI in a nested environment,
+> The test covers the Virtual NMI (VNMI) delivery.
 > 
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+> Signed-off-by: Santosh Shukla <santosh.shukla@amd.com>
 > ---
-> RFC: The migration part is likely invalid...
-> 
-> kvmtimer_needed() is defined in target/riscv/machine.c as
-> 
->    static bool kvmtimer_needed(void *opaque)
->    {
->        return kvm_enabled();
->    }
-> 
-> which depends on a host feature.
 
+Quite a few comments, but I'll post a v3 with everything cleaned up.  More below.
 
-kvm_enabled() can be false even when CONFIG_KVM is true when a KVM capable host
-is running a TCG guest, for example. In that case env->kvm_timer_* states exist
-but aren't initialized, and shouldn't be migrated.
+> diff --git a/x86/svm.h b/x86/svm.h
+> index 766ff7e36449..91a0dee2c864 100644
+> --- a/x86/svm.h
+> +++ b/x86/svm.h
+> @@ -131,6 +131,13 @@ struct __attribute__ ((__packed__)) vmcb_control_area {
+>  #define V_INTR_MASKING_SHIFT 24
+>  #define V_INTR_MASKING_MASK (1 << V_INTR_MASKING_SHIFT)
+>  
+> +#define V_NMI_PENDING_SHIFT 11
+> +#define V_NMI_PENDING (1 << V_NMI_PENDING_SHIFT)
+> +#define V_NMI_MASK_SHIFT 12
+> +#define V_NMI_MASK (1 << V_NMI_MASK_SHIFT)
+> +#define V_NMI_ENABLE_SHIFT 26
+> +#define V_NMI_ENABLE (1 << V_NMI_ENABLE_SHIFT)
 
-Thus it's not just a host feature, but a host feature + accel option. I think
-this is fine.
+Same complaints as I had for the kernel side, e.g. VM_NMI_MASK vs. V_NMI_BLOCKING_MASK.
 
-> ---
->   target/riscv/cpu.h     | 2 ++
->   target/riscv/machine.c | 4 ++++
->   2 files changed, 6 insertions(+)
-> 
-> diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
-> index 638e47c75a..82939235ab 100644
-> --- a/target/riscv/cpu.h
-> +++ b/target/riscv/cpu.h
-> @@ -377,12 +377,14 @@ struct CPUArchState {
->       hwaddr kernel_addr;
->       hwaddr fdt_addr;
->   
-> +#ifdef CONFIG_KVM
->       /* kvm timer */
->       bool kvm_timer_dirty;
->       uint64_t kvm_timer_time;
->       uint64_t kvm_timer_compare;
->       uint64_t kvm_timer_state;
->       uint64_t kvm_timer_frequency;
-> +#endif /* CONFIG_KVM */
->   };
->   
->   OBJECT_DECLARE_CPU_TYPE(RISCVCPU, RISCVCPUClass, RISCV_CPU)
-> diff --git a/target/riscv/machine.c b/target/riscv/machine.c
-> index 9c455931d8..e45d564ec3 100644
-> --- a/target/riscv/machine.c
-> +++ b/target/riscv/machine.c
-> @@ -201,10 +201,12 @@ static bool kvmtimer_needed(void *opaque)
->   
->   static int cpu_post_load(void *opaque, int version_id)
->   {
-> +#ifdef CONFIG_KVM
->       RISCVCPU *cpu = opaque;
->       CPURISCVState *env = &cpu->env;
->   
->       env->kvm_timer_dirty = true;
-> +#endif
->       return 0;
->   }
->   
-> @@ -215,9 +217,11 @@ static const VMStateDescription vmstate_kvmtimer = {
->       .needed = kvmtimer_needed,
->       .post_load = cpu_post_load,
->       .fields = (VMStateField[]) {
-> +#ifdef CONFIG_KVM
->           VMSTATE_UINT64(env.kvm_timer_time, RISCVCPU),
->           VMSTATE_UINT64(env.kvm_timer_compare, RISCVCPU),
->           VMSTATE_UINT64(env.kvm_timer_state, RISCVCPU),
-> +#endif
+> +
+>  #define SVM_INTERRUPT_SHADOW_MASK 1
+>  
+>  #define SVM_IOIO_STR_SHIFT 2
+> @@ -419,6 +426,7 @@ void default_prepare(struct svm_test *test);
+>  void default_prepare_gif_clear(struct svm_test *test);
+>  bool default_finished(struct svm_test *test);
+>  bool npt_supported(void);
+> +bool vnmi_supported(void);
+>  int get_test_stage(struct svm_test *test);
+>  void set_test_stage(struct svm_test *test, int s);
+>  void inc_test_stage(struct svm_test *test);
+> diff --git a/x86/svm_tests.c b/x86/svm_tests.c
+> index e2ec9541fd29..f83a2b56ce52 100644
+> --- a/x86/svm_tests.c
+> +++ b/x86/svm_tests.c
+> @@ -1445,6 +1445,93 @@ static bool nmi_hlt_check(struct svm_test *test)
+>  	return get_test_stage(test) == 3;
+>  }
+>  
+> +static volatile bool vnmi_fired;
 
-Here you're creating an empty 'cpu/kvmtimer' vmstate that won't be migrated anyway
-because kvmtimer_needed (== kvm_enabled()) will be always false if CONFIG_KVM=n.
+There's no need to use a separate flag, just reuse nmi_fired.  And then this
+test can also reuse nmi_prepare().
 
-I'd say it's better to just get rid of the whole vmstate in this case, but I don't
-like the precedence of having vmstates being gated by build flags.
+> +static void vnmi_handler(isr_regs_t *regs)
+> +{
+> +    vnmi_fired = true;
 
+Use tabs, not spaces.
 
-Reviewed-by: Daniel Henrique Barboza <dbarboza@ventanamicro.com>
+> +}
+> +
+> +static void vnmi_prepare(struct svm_test *test)
+> +{
+> +    default_prepare(test);
+> +    vnmi_fired = false;
+> +    vmcb->control.int_ctl = V_NMI_ENABLE;
+> +    vmcb->control.int_vector = NMI_VECTOR;
+> +    handle_irq(NMI_VECTOR, vnmi_handler);
+> +    set_test_stage(test, 0);
+> +}
+> +
+> +static void vnmi_test(struct svm_test *test)
+> +{
+> +    if (vnmi_fired) {
+> +        report(!vnmi_fired, "vNMI dispatched even before injection");
+> +        set_test_stage(test, -1);
 
+Ugh, so much copy+paste in the test.  I'll add a patch to provide a macro to dedup
+the report_fail() + set_test_stage() + vmmcall(), the last of which is unnecessarily
+dependent on non-failing code in many cases.
 
+> +static bool vnmi_finished(struct svm_test *test)
+> +{
+> +    switch (get_test_stage(test)) {
+> +    case 0:
+> +        if (vmcb->control.exit_code != SVM_EXIT_ERR) {
 
->           VMSTATE_END_OF_LIST()
->       }
->   };
+Took me a bit of staring to understand why an error is expected.  The setup path
+really needs a comment explaining that it deliberately creates a bad configuration,
+and it should explicitly clear INTERCEPT_NMI.
+
+> +            report_fail("VMEXIT not due to error. Exit reason 0x%x",
+> +                        vmcb->control.exit_code);
+> +            return true;
+> +        }
+> +        report(!vnmi_fired, "vNMI enabled but NMI_INTERCEPT unset!");
+> +        vmcb->control.intercept |= (1ULL << INTERCEPT_NMI);
+> +        vmcb->save.rip += 3;
+> +        break;
+> +
+> +    case 1:
+> +        if (vmcb->control.exit_code != SVM_EXIT_VMMCALL) {
+> +            report_fail("VMEXIT not due to error. Exit reason 0x%x",
+
+VMMCALL expected, not ERR.
