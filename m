@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5F7CA6D8236
-	for <lists+kvm@lfdr.de>; Wed,  5 Apr 2023 17:42:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9C47B6D8234
+	for <lists+kvm@lfdr.de>; Wed,  5 Apr 2023 17:42:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238963AbjDEPmE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Apr 2023 11:42:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48248 "EHLO
+        id S238932AbjDEPmC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Apr 2023 11:42:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48176 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238769AbjDEPmD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Apr 2023 11:42:03 -0400
+        with ESMTP id S238924AbjDEPmB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Apr 2023 11:42:01 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A0585BA0
-        for <kvm@vger.kernel.org>; Wed,  5 Apr 2023 08:41:48 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5C806EA2
+        for <kvm@vger.kernel.org>; Wed,  5 Apr 2023 08:41:46 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 2546B63EE1
-        for <kvm@vger.kernel.org>; Wed,  5 Apr 2023 15:41:35 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 70A93C4339B;
-        Wed,  5 Apr 2023 15:41:34 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 182A963EF4
+        for <kvm@vger.kernel.org>; Wed,  5 Apr 2023 15:41:28 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 71C95C4339E;
+        Wed,  5 Apr 2023 15:41:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1680709294;
-        bh=yIv++hVvWKIFNu2dgNdr+SI9bfGl9mL3kzkogdhncyo=;
+        s=k20201202; t=1680709287;
+        bh=A8APb/ShbfEk/49VtpSdFlMSQpzv8xpXTIJI/KZaCbQ=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=tI7QmZCpuZpOTYD3gwtVoahUgM634vsMCVLAOxYYBD7GLGaWmIcVkOuJkjQLIHENF
-         fmvWU//R/0zbG3X8JxHtqfC+4ae1SVJLEaxairHDJI3UwBNc6X7uCjYbLkQNF2KVje
-         b3dmLGtjC3Q4tDaw8vgMrwZkUbu3SQcqNVcgCr+PFEmVS7uH9ewpC1cntvqj9wUenN
-         3Hx3WfoShB6d91itVZtJEdBUeu7cyZdzv3ZwDL9wvRQ3kWi3UNAQRfUDJKBsnINyOj
-         taJ5DUDQBlPECGn27ITblOod/2BwbLdy5zr1e293FeCY/w6qWuSZvnDpTde0VGi5Qt
-         bSTrVs8T0lmXw==
+        b=us8bJebJKF5lor/94j4lpx/LipLQ6FGpgB907UJL/iQAmGl9gZM5lz69dezjKOVxz
+         sWWANH3W+xYXkUdQOIPI+FJ2SqM06iBS9ftRFgE/MPqRu2jrWBN1hLyCroTSXuDbO3
+         IJJBkBivOxyAmSPLkJUsDSA1UYfq+MYq8GkLngCXLyV8ta6tix8uolk88QuyT7PBpA
+         xO1wL1ThANsEhs0R8smN5DqjSYWhfwajCGgImJ1CDB47lnV9tQNJ3NrAS2HfSWqKX/
+         EikzggOeVvr0nvtcxOf58ZQxYtAkxFTLWZq9rGLUZdBzktstMwVPcRhk0+bBmaM87U
+         i4bP16T+k1zDA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1pk5FT-0062PV-OQ;
-        Wed, 05 Apr 2023 16:40:35 +0100
+        id 1pk5FU-0062PV-1N;
+        Wed, 05 Apr 2023 16:40:37 +0100
 From:   Marc Zyngier <maz@kernel.org>
 To:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
         linux-arm-kernel@lists.infradead.org
@@ -53,9 +53,9 @@ Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Oliver Upton <oliver.upton@linux.dev>,
         Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v9 31/50] KVM: arm64: nv: vgic: Allow userland to set VGIC maintenance IRQ
-Date:   Wed,  5 Apr 2023 16:39:49 +0100
-Message-Id: <20230405154008.3552854-32-maz@kernel.org>
+Subject: [PATCH v9 32/50] KVM: arm64: nv: Implement maintenance interrupt forwarding
+Date:   Wed,  5 Apr 2023 16:39:50 +0100
+Message-Id: <20230405154008.3552854-33-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230405154008.3552854-1-maz@kernel.org>
 References: <20230405154008.3552854-1-maz@kernel.org>
@@ -74,177 +74,149 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Andre Przywara <andre.przywara@arm.com>
+When we take a maintenance interrupt, we need to decide whether
+it is generated on an action from the guest, or if it is something
+that needs to be forwarded to the guest hypervisor.
 
-The VGIC maintenance IRQ signals various conditions about the LRs, when
-the GIC's virtualization extension is used.
-So far we didn't need it, but nested virtualization needs to know about
-this interrupt, so add a userland interface to setup the IRQ number.
-The architecture mandates that it must be a PPI, on top of that this code
-only exports a per-device option, so the PPI is the same on all VCPUs.
-
-Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-[added some bits of documentation]
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- .../virt/kvm/devices/arm-vgic-v3.rst          | 12 +++++++-
- arch/arm64/include/uapi/asm/kvm.h             |  1 +
- arch/arm64/kvm/vgic/vgic-kvm-device.c         | 29 +++++++++++++++++--
- include/kvm/arm_vgic.h                        |  3 ++
- tools/arch/arm/include/uapi/asm/kvm.h         |  1 +
- 5 files changed, 43 insertions(+), 3 deletions(-)
+ arch/arm64/kvm/vgic/vgic-init.c      | 33 ++++++++++++++++++++++++++++
+ arch/arm64/kvm/vgic/vgic-v3-nested.c | 28 ++++++++++++++++++-----
+ 2 files changed, 55 insertions(+), 6 deletions(-)
 
-diff --git a/Documentation/virt/kvm/devices/arm-vgic-v3.rst b/Documentation/virt/kvm/devices/arm-vgic-v3.rst
-index 51e5e5762571..1901e651cc00 100644
---- a/Documentation/virt/kvm/devices/arm-vgic-v3.rst
-+++ b/Documentation/virt/kvm/devices/arm-vgic-v3.rst
-@@ -284,8 +284,18 @@ Groups:
-       |    Aff3    |    Aff2    |    Aff1    |    Aff0    |
+diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
+index cd134db41a57..a97279f82bbd 100644
+--- a/arch/arm64/kvm/vgic/vgic-init.c
++++ b/arch/arm64/kvm/vgic/vgic-init.c
+@@ -6,10 +6,12 @@
+ #include <linux/uaccess.h>
+ #include <linux/interrupt.h>
+ #include <linux/cpu.h>
++#include <linux/irq.h>
+ #include <linux/kvm_host.h>
+ #include <kvm/arm_vgic.h>
+ #include <asm/kvm_emulate.h>
+ #include <asm/kvm_mmu.h>
++#include <asm/kvm_nested.h>
+ #include "vgic.h"
  
-   Errors:
--
-     =======  =============================================
-     -EINVAL  vINTID is not multiple of 32 or info field is
- 	     not VGIC_LEVEL_INFO_LINE_LEVEL
-     =======  =============================================
-+
-+  KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ
-+   Attributes:
-+
-+    The attr field of kvm_device_attr encodes the following values:
-+
-+      bits:     | 31   ....    5 | 4  ....  0 |
-+      values:   |      RES0      |   vINTID   |
-+
-+    The vINTID specifies which interrupt is generated when the vGIC
-+    must generate a maintenance interrupt. This must be a PPI.
-diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-index 0921f366c49f..d0b0bd14c02b 100644
---- a/arch/arm64/include/uapi/asm/kvm.h
-+++ b/arch/arm64/include/uapi/asm/kvm.h
-@@ -399,6 +399,7 @@ enum {
- #define KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS 6
- #define KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO  7
- #define KVM_DEV_ARM_VGIC_GRP_ITS_REGS 8
-+#define KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ  9
- #define KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_SHIFT	10
- #define KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_MASK \
- 			(0x3fffffULL << KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_SHIFT)
-diff --git a/arch/arm64/kvm/vgic/vgic-kvm-device.c b/arch/arm64/kvm/vgic/vgic-kvm-device.c
-index 04dd68835b3f..45416f3b3961 100644
---- a/arch/arm64/kvm/vgic/vgic-kvm-device.c
-+++ b/arch/arm64/kvm/vgic/vgic-kvm-device.c
-@@ -288,6 +288,12 @@ static int vgic_get_common_attr(struct kvm_device *dev,
- 			     VGIC_NR_PRIVATE_IRQS, uaddr);
- 		break;
- 	}
-+	case KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ: {
-+		u32 __user *uaddr = (u32 __user *)(long)attr->addr;
-+
-+		r = put_user(dev->kvm->arch.vgic.maint_irq, uaddr);
-+		break;
-+	}
- 	}
- 
- 	return r;
-@@ -503,7 +509,7 @@ static int vgic_v3_attr_regs_access(struct kvm_device *dev,
- 	struct vgic_reg_attr reg_attr;
- 	gpa_t addr;
- 	struct kvm_vcpu *vcpu;
--	bool uaccess;
-+	bool uaccess, post_init = true;
- 	u32 val;
- 	int ret;
- 
-@@ -519,6 +525,9 @@ static int vgic_v3_attr_regs_access(struct kvm_device *dev,
- 		/* Sysregs uaccess is performed by the sysreg handling code */
- 		uaccess = false;
- 		break;
-+	case KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ:
-+		post_init = false;
-+		fallthrough;
- 	default:
- 		uaccess = true;
- 	}
-@@ -531,7 +540,7 @@ static int vgic_v3_attr_regs_access(struct kvm_device *dev,
- 
- 	mutex_lock(&dev->kvm->lock);
- 
--	if (unlikely(!vgic_initialized(dev->kvm))) {
-+	if (post_init != vgic_initialized(dev->kvm)) {
- 		ret = -EBUSY;
- 		goto out;
- 	}
-@@ -566,6 +575,19 @@ static int vgic_v3_attr_regs_access(struct kvm_device *dev,
- 		}
- 		break;
- 	}
-+	case KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ:
-+		if (!is_write) {
-+			val = dev->kvm->arch.vgic.maint_irq;
-+			ret = 0;
-+			break;
-+		}
-+
-+		ret = -EINVAL;
-+		if ((val < VGIC_NR_PRIVATE_IRQS) && (val >= VGIC_NR_SGIS)) {
-+			dev->kvm->arch.vgic.maint_irq = val;
-+			ret = 0;
-+		}
-+		break;
- 	default:
- 		ret = -EINVAL;
- 		break;
-@@ -591,6 +613,7 @@ static int vgic_v3_set_attr(struct kvm_device *dev,
- 	case KVM_DEV_ARM_VGIC_GRP_REDIST_REGS:
- 	case KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS:
- 	case KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO:
-+	case KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ:
- 		return vgic_v3_attr_regs_access(dev, attr, true);
- 	default:
- 		return vgic_set_common_attr(dev, attr);
-@@ -605,6 +628,7 @@ static int vgic_v3_get_attr(struct kvm_device *dev,
- 	case KVM_DEV_ARM_VGIC_GRP_REDIST_REGS:
- 	case KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS:
- 	case KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO:
-+	case KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ:
- 		return vgic_v3_attr_regs_access(dev, attr, false);
- 	default:
- 		return vgic_get_common_attr(dev, attr);
-@@ -628,6 +652,7 @@ static int vgic_v3_has_attr(struct kvm_device *dev,
- 	case KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS:
- 		return vgic_v3_has_attr_regs(dev, attr);
- 	case KVM_DEV_ARM_VGIC_GRP_NR_IRQS:
-+	case KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ:
+ /*
+@@ -222,6 +224,16 @@ int kvm_vgic_vcpu_init(struct kvm_vcpu *vcpu)
+ 	if (!irqchip_in_kernel(vcpu->kvm))
  		return 0;
- 	case KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO: {
- 		if (((attr->attr & KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_MASK) >>
-diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-index ea45accbc690..1a2e2e8abd92 100644
---- a/include/kvm/arm_vgic.h
-+++ b/include/kvm/arm_vgic.h
-@@ -243,6 +243,9 @@ struct vgic_dist {
  
- 	int			nr_spis;
- 
-+	/* The GIC maintenance IRQ for nested hypervisors. */
-+	u32			maint_irq;
++	if (vcpu_has_nv(vcpu)) {
++		/* Cope with vintage userspace. Maybe we should fail instead */
++		if (vcpu->kvm->arch.vgic.maint_irq == 0)
++			vcpu->kvm->arch.vgic.maint_irq = kvm_vgic_global_state.maint_irq;
++		ret = kvm_vgic_set_owner(vcpu, vcpu->kvm->arch.vgic.maint_irq,
++					 vcpu);
++		if (ret)
++			return ret;
++	}
 +
- 	/* base addresses in guest physical address space: */
- 	gpa_t			vgic_dist_base;		/* distributor */
- 	union {
-diff --git a/tools/arch/arm/include/uapi/asm/kvm.h b/tools/arch/arm/include/uapi/asm/kvm.h
-index 03cd7c19a683..d5dd96902817 100644
---- a/tools/arch/arm/include/uapi/asm/kvm.h
-+++ b/tools/arch/arm/include/uapi/asm/kvm.h
-@@ -246,6 +246,7 @@ struct kvm_vcpu_events {
- #define KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS 6
- #define KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO  7
- #define KVM_DEV_ARM_VGIC_GRP_ITS_REGS	8
-+#define KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ	9
- #define KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_SHIFT	10
- #define KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_MASK \
- 			(0x3fffffULL << KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_SHIFT)
+ 	/*
+ 	 * If we are creating a VCPU with a GICv3 we must also register the
+ 	 * KVM io device for the redistributor that belongs to this VCPU.
+@@ -478,12 +490,23 @@ void kvm_vgic_cpu_down(void)
+ 
+ static irqreturn_t vgic_maintenance_handler(int irq, void *data)
+ {
++	struct kvm_vcpu *vcpu = *(struct kvm_vcpu **)data;
++
+ 	/*
+ 	 * We cannot rely on the vgic maintenance interrupt to be
+ 	 * delivered synchronously. This means we can only use it to
+ 	 * exit the VM, and we perform the handling of EOIed
+ 	 * interrupts on the exit path (see vgic_fold_lr_state).
+ 	 */
++
++	/* If not nested, deactivate */
++	if (!vcpu || !vgic_state_is_nested(vcpu)) {
++		irq_set_irqchip_state(irq, IRQCHIP_STATE_ACTIVE, false);
++		return IRQ_HANDLED;
++	}
++
++	/* Assume nested from now */
++	vgic_v3_handle_nested_maint_irq(vcpu);
+ 	return IRQ_HANDLED;
+ }
+ 
+@@ -582,6 +605,16 @@ int kvm_vgic_hyp_init(void)
+ 		return ret;
+ 	}
+ 
++	if (has_mask) {
++		ret = irq_set_vcpu_affinity(kvm_vgic_global_state.maint_irq,
++					    kvm_get_running_vcpus());
++		if (ret) {
++			kvm_err("Error setting vcpu affinity\n");
++			free_percpu_irq(kvm_vgic_global_state.maint_irq, kvm_get_running_vcpus());
++			return ret;
++		}
++	}
++
+ 	kvm_info("vgic interrupt IRQ%d\n", kvm_vgic_global_state.maint_irq);
+ 	return 0;
+ }
+diff --git a/arch/arm64/kvm/vgic/vgic-v3-nested.c b/arch/arm64/kvm/vgic/vgic-v3-nested.c
+index e88c75e79010..755e4819603a 100644
+--- a/arch/arm64/kvm/vgic/vgic-v3-nested.c
++++ b/arch/arm64/kvm/vgic/vgic-v3-nested.c
+@@ -175,10 +175,20 @@ void vgic_v3_sync_nested(struct kvm_vcpu *vcpu)
+ void vgic_v3_load_nested(struct kvm_vcpu *vcpu)
+ {
+ 	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
++	struct vgic_irq *irq;
++	unsigned long flags;
+ 
+ 	vgic_cpu->shadow_vgic_v3 = vgic_cpu->nested_vgic_v3;
+ 	vgic_v3_create_shadow_lr(vcpu);
+ 	__vgic_v3_restore_state(vcpu_shadow_if(vcpu));
++
++	irq = vgic_get_irq(vcpu->kvm, vcpu, vcpu->kvm->arch.vgic.maint_irq);
++	raw_spin_lock_irqsave(&irq->irq_lock, flags);
++	if (irq->line_level || irq->active)
++		irq_set_irqchip_state(kvm_vgic_global_state.maint_irq,
++				      IRQCHIP_STATE_ACTIVE, true);
++	raw_spin_unlock_irqrestore(&irq->irq_lock, flags);
++	vgic_put_irq(vcpu->kvm, irq);
+ }
+ 
+ void vgic_v3_put_nested(struct kvm_vcpu *vcpu)
+@@ -193,20 +203,26 @@ void vgic_v3_put_nested(struct kvm_vcpu *vcpu)
+ 	 */
+ 	vgic_v3_fixup_shadow_lr_state(vcpu);
+ 	vgic_cpu->nested_vgic_v3 = vgic_cpu->shadow_vgic_v3;
++	irq_set_irqchip_state(kvm_vgic_global_state.maint_irq,
++			      IRQCHIP_STATE_ACTIVE, false);
+ }
+ 
+ void vgic_v3_handle_nested_maint_irq(struct kvm_vcpu *vcpu)
+ {
+-	struct vgic_v3_cpu_if *cpu_if = vcpu_nested_if(vcpu);
+-
+ 	/*
+ 	 * If we exit a nested VM with a pending maintenance interrupt from the
+ 	 * GIC, then we need to forward this to the guest hypervisor so that it
+ 	 * can re-sync the appropriate LRs and sample level triggered interrupts
+ 	 * again.
+ 	 */
+-	if (vgic_state_is_nested(vcpu) &&
+-	    (cpu_if->vgic_hcr & ICH_HCR_EN) &&
+-	    vgic_v3_get_misr(vcpu))
+-		kvm_inject_nested_irq(vcpu);
++	if (vgic_state_is_nested(vcpu)) {
++		struct vgic_v3_cpu_if *cpu_if = vcpu_nested_if(vcpu);
++		bool state;
++
++		state  = cpu_if->vgic_hcr & ICH_HCR_EN;
++		state &= vgic_v3_get_misr(vcpu);
++
++		kvm_vgic_inject_irq(vcpu->kvm, vcpu->vcpu_id,
++				    vcpu->kvm->arch.vgic.maint_irq, state, vcpu);
++	}
+ }
 -- 
 2.34.1
 
