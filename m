@@ -2,68 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F0A6C6D796C
-	for <lists+kvm@lfdr.de>; Wed,  5 Apr 2023 12:18:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7F7696D7971
+	for <lists+kvm@lfdr.de>; Wed,  5 Apr 2023 12:18:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237526AbjDEKS1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Apr 2023 06:18:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35538 "EHLO
+        id S237640AbjDEKSh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Apr 2023 06:18:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35698 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237551AbjDEKSY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Apr 2023 06:18:24 -0400
-Received: from mail-wr1-x436.google.com (mail-wr1-x436.google.com [IPv6:2a00:1450:4864:20::436])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61896271C
-        for <kvm@vger.kernel.org>; Wed,  5 Apr 2023 03:18:23 -0700 (PDT)
-Received: by mail-wr1-x436.google.com with SMTP id r29so35612911wra.13
-        for <kvm@vger.kernel.org>; Wed, 05 Apr 2023 03:18:23 -0700 (PDT)
+        with ESMTP id S237574AbjDEKSc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Apr 2023 06:18:32 -0400
+Received: from mail-wm1-x329.google.com (mail-wm1-x329.google.com [IPv6:2a00:1450:4864:20::329])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32D564C27
+        for <kvm@vger.kernel.org>; Wed,  5 Apr 2023 03:18:29 -0700 (PDT)
+Received: by mail-wm1-x329.google.com with SMTP id hg25-20020a05600c539900b003f05a99a841so3732604wmb.3
+        for <kvm@vger.kernel.org>; Wed, 05 Apr 2023 03:18:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1680689902;
+        d=linaro.org; s=google; t=1680689907;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=y5W5kRucCzOBlp3KNoaJLlOhdcHcmgdcoSudurkJOAU=;
-        b=YvdDHGNJmJITr/TCaBwa+nNTBQzwFo4m9pQoqmbmi3vaFmhxmN+kDfHXTlih7hjOuG
-         i5foQd722oTmMrBj+Hnn/y+vSEYHeAfBNU8qFxNsz637G6z7vjp3C2UAjRMomPmXSt6B
-         8zPBf0Ips8vfVnHZNtgCTbmeRiHGsNV5SUfNvKV2SqM3fJYcuc7ImyIhwyWRK6Hj9a9X
-         +Js3FJbT2ARj2FgCtaCnNeF4Yijhd95peS0BiCwqBd/BuWcL+6seYLzsD3aU2CENQUwI
-         ovnk8urTgfiCLVoqgt1J2QmQfKLKfpa8JYktu83jlKdtgVQauBcK79zdBkzhpVPSX3Ka
-         StWA==
+        bh=Z3PbVXrARru//womsk1QFTfUC/jT1xFpRBIRhWzNLeg=;
+        b=c4FFRXSdAKN2IWwtiqV7Ffzer7xJF5apMUkKlQiTaxUK2YipBsMKVqtP9PC9OjOLHc
+         rMq0iWLrZJBM6oJj3ZcxNuV1npeN62fnwpOyTCL/NyjHhKWn4eE/PATJuuf/ffKK2NvR
+         l5O6MKTRN5ifGk9nigJmitObdfRL5i9btUsj2E5xzt7sy+nX/kRuir/iAaexJdDqUFJg
+         4racwp2lla6NgRk1CkowemsGQ25lhbtxKUZ69OG2cP31L9IIwSsFNGT7+hn7ucd+REZe
+         bpReBOAvbbifyVLiPMUCDSGVvfBSE6MFot4sUTf8DSomPdPCaRK9s3qVOS+XAggbGFny
+         j31A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680689902;
+        d=1e100.net; s=20210112; t=1680689907;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=y5W5kRucCzOBlp3KNoaJLlOhdcHcmgdcoSudurkJOAU=;
-        b=Q4p9dPKOFLYNmer1id+nAQ9ZCiiPEjUs/i905Eou6Su5vPs1EziGqDLUDaAbzDICTa
-         bFUgEGunYydkOD//0ZcHrTIMhcc/GoJ37MeXQLCVvxi738vUIvUU8dO7dIS+L9A4VLyu
-         SsQbm83dwvSqcnOt4rnUaJLj7FgY1tJiY3TDc7WFiSW/ph7W2G1rzHiLSOtzIUGCkdEh
-         4v2kkCq5r0U4XgJaeZRmIJxdnsZEwl4g76Rh+FeXYJOF4elCrWjNZ3iCRW36ACqXCAUa
-         xUqK9mgKNFSCPZKAZF+j+oDny6Ds4Kqc+ZKRLPk78Cwrj1KMX/VB2inupnSgzGCGbPKe
-         uXjg==
-X-Gm-Message-State: AAQBX9ewhBiOqiXwdpdWRMJylebqwMi0bV8uj783PXk73Oo6UoodEMik
-        2zGfWa4D6zRaYXnYaJ6HaGJtX5n/VqY5otseQGY=
-X-Google-Smtp-Source: AKy350bpxg4IrwdUQGHpIVdGoidA/+sCsrkONX9FyvsEM868pIe4QiJWHCOtkMTvKUMsoYziJ+Rgdw==
-X-Received: by 2002:a5d:44c2:0:b0:2cf:efd7:2f1d with SMTP id z2-20020a5d44c2000000b002cfefd72f1dmr3851096wrr.13.1680689901758;
-        Wed, 05 Apr 2023 03:18:21 -0700 (PDT)
+        bh=Z3PbVXrARru//womsk1QFTfUC/jT1xFpRBIRhWzNLeg=;
+        b=oU6uILbLt+fAiUedRoWqftMaiet0A2yNlxcqDhVh/oer7eJ+/p0RGV6BG10HCY2MhJ
+         JrKtF64v83Pjw83Bg/TyE88yy20WeQ6OStLj0Rizd9ZNu7lY0hb5k1I1pGFiegaWJD76
+         5cSkaCFtvaiRqUiArv9+xjG0xulvvJGEb3b6S1jLwCAwwxziT/t/A7pmoxobJz1vsYuM
+         owkvUDMGBUIFxfKcTDzyUFCiHLh9thVna9XykyGvpRYAn3pjHk6K8Hb/gOCfEbns/T1M
+         a6H2a7vrTVbDikTI6/PdRXbVl6lDjUoZFpLCVmmACH3RsSwWZb+FJmPqGjgDz3xVjcGP
+         c+yQ==
+X-Gm-Message-State: AAQBX9dy9gaDKPWumJtGErvVwOifIuGvKknxdh3PTNxsaClZWUoXNTeB
+        uJlgC3humTIEnnpEyZ0JLHVcfQ==
+X-Google-Smtp-Source: AKy350brt1TNZ7pG57+pZfUAcAl5eE1plZdTvYqjEnxz0kMrxGEeLijqmQ0ROub7VB7ZqCDrKQfQFA==
+X-Received: by 2002:a05:600c:2942:b0:3ee:4ee:bf73 with SMTP id n2-20020a05600c294200b003ee04eebf73mr4220330wmd.24.1680689907651;
+        Wed, 05 Apr 2023 03:18:27 -0700 (PDT)
 Received: from localhost.localdomain (4ab54-h01-176-184-52-81.dsl.sta.abo.bbox.fr. [176.184.52.81])
-        by smtp.gmail.com with ESMTPSA id a12-20020a056000100c00b002cea8664304sm14500312wrx.91.2023.04.05.03.18.19
+        by smtp.gmail.com with ESMTPSA id ay8-20020a05600c1e0800b003edddae1068sm1744815wmb.9.2023.04.05.03.18.26
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Wed, 05 Apr 2023 03:18:21 -0700 (PDT)
+        Wed, 05 Apr 2023 03:18:27 -0700 (PDT)
 From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
 To:     qemu-devel@nongnu.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
         xen-devel@lists.xenproject.org, kvm@vger.kernel.org,
         =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
-        Reinoud Zandijk <reinoud@netbsd.org>,
         Richard Henderson <richard.henderson@linaro.org>,
-        Sunil Muthuswamy <sunilmut@microsoft.com>,
-        Stefano Stabellini <sstabellini@kernel.org>,
-        Anthony Perard <anthony.perard@citrix.com>,
-        Paul Durrant <paul@xen.org>
-Subject: [PATCH 01/14] accel: Document generic accelerator headers
-Date:   Wed,  5 Apr 2023 12:17:58 +0200
-Message-Id: <20230405101811.76663-2-philmd@linaro.org>
+        Sunil Muthuswamy <sunilmut@microsoft.com>
+Subject: [PATCH 02/14] accel: Remove unused hThread variable on TCG/WHPX
+Date:   Wed,  5 Apr 2023 12:17:59 +0200
+Message-Id: <20230405101811.76663-3-philmd@linaro.org>
 X-Mailer: git-send-email 2.38.1
 In-Reply-To: <20230405101811.76663-1-philmd@linaro.org>
 References: <20230405101811.76663-1-philmd@linaro.org>
@@ -79,98 +75,57 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-These headers are meant to be include by any file to check
-the availability of accelerators, thus are not accelerator
-specific.
+On Windows hosts, cpu->hThread is assigned but never accessed:
+remove it.
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 ---
- include/sysemu/hax.h  | 2 ++
- include/sysemu/kvm.h  | 2 ++
- include/sysemu/nvmm.h | 2 ++
- include/sysemu/tcg.h  | 2 ++
- include/sysemu/whpx.h | 2 ++
- include/sysemu/xen.h  | 2 ++
- 6 files changed, 12 insertions(+)
+ accel/tcg/tcg-accel-ops-mttcg.c   | 4 ----
+ accel/tcg/tcg-accel-ops-rr.c      | 3 ---
+ target/i386/whpx/whpx-accel-ops.c | 3 ---
+ 3 files changed, 10 deletions(-)
 
-diff --git a/include/sysemu/hax.h b/include/sysemu/hax.h
-index bf8f99a824..80fc716f80 100644
---- a/include/sysemu/hax.h
-+++ b/include/sysemu/hax.h
-@@ -19,6 +19,8 @@
-  *
-  */
+diff --git a/accel/tcg/tcg-accel-ops-mttcg.c b/accel/tcg/tcg-accel-ops-mttcg.c
+index d50239e0e2..19cfb26c02 100644
+--- a/accel/tcg/tcg-accel-ops-mttcg.c
++++ b/accel/tcg/tcg-accel-ops-mttcg.c
+@@ -152,8 +152,4 @@ void mttcg_start_vcpu_thread(CPUState *cpu)
  
-+/* header to be included in non-HAX-specific code */
-+
- #ifndef QEMU_HAX_H
- #define QEMU_HAX_H
+     qemu_thread_create(cpu->thread, thread_name, mttcg_cpu_thread_fn,
+                        cpu, QEMU_THREAD_JOINABLE);
+-
+-#ifdef _WIN32
+-    cpu->hThread = qemu_thread_get_handle(cpu->thread);
+-#endif
+ }
+diff --git a/accel/tcg/tcg-accel-ops-rr.c b/accel/tcg/tcg-accel-ops-rr.c
+index 290833a37f..dafff71530 100644
+--- a/accel/tcg/tcg-accel-ops-rr.c
++++ b/accel/tcg/tcg-accel-ops-rr.c
+@@ -291,9 +291,6 @@ void rr_start_vcpu_thread(CPUState *cpu)
  
-diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
-index c8281c07a7..cc6c678ed8 100644
---- a/include/sysemu/kvm.h
-+++ b/include/sysemu/kvm.h
-@@ -11,6 +11,8 @@
-  *
-  */
+         single_tcg_halt_cond = cpu->halt_cond;
+         single_tcg_cpu_thread = cpu->thread;
+-#ifdef _WIN32
+-        cpu->hThread = qemu_thread_get_handle(cpu->thread);
+-#endif
+     } else {
+         /* we share the thread */
+         cpu->thread = single_tcg_cpu_thread;
+diff --git a/target/i386/whpx/whpx-accel-ops.c b/target/i386/whpx/whpx-accel-ops.c
+index e8dc4b3a47..67cad86720 100644
+--- a/target/i386/whpx/whpx-accel-ops.c
++++ b/target/i386/whpx/whpx-accel-ops.c
+@@ -71,9 +71,6 @@ static void whpx_start_vcpu_thread(CPUState *cpu)
+              cpu->cpu_index);
+     qemu_thread_create(cpu->thread, thread_name, whpx_cpu_thread_fn,
+                        cpu, QEMU_THREAD_JOINABLE);
+-#ifdef _WIN32
+-    cpu->hThread = qemu_thread_get_handle(cpu->thread);
+-#endif
+ }
  
-+/* header to be included in non-KVM-specific code */
-+
- #ifndef QEMU_KVM_H
- #define QEMU_KVM_H
- 
-diff --git a/include/sysemu/nvmm.h b/include/sysemu/nvmm.h
-index 833670fccb..be7bc9a62d 100644
---- a/include/sysemu/nvmm.h
-+++ b/include/sysemu/nvmm.h
-@@ -7,6 +7,8 @@
-  * See the COPYING file in the top-level directory.
-  */
- 
-+/* header to be included in non-NVMM-specific code */
-+
- #ifndef QEMU_NVMM_H
- #define QEMU_NVMM_H
- 
-diff --git a/include/sysemu/tcg.h b/include/sysemu/tcg.h
-index 53352450ff..5e2ca9aab3 100644
---- a/include/sysemu/tcg.h
-+++ b/include/sysemu/tcg.h
-@@ -5,6 +5,8 @@
-  * See the COPYING file in the top-level directory.
-  */
- 
-+/* header to be included in non-TCG-specific code */
-+
- #ifndef SYSEMU_TCG_H
- #define SYSEMU_TCG_H
- 
-diff --git a/include/sysemu/whpx.h b/include/sysemu/whpx.h
-index 2889fa2278..781ca5b2b6 100644
---- a/include/sysemu/whpx.h
-+++ b/include/sysemu/whpx.h
-@@ -10,6 +10,8 @@
-  *
-  */
- 
-+/* header to be included in non-WHPX-specific code */
-+
- #ifndef QEMU_WHPX_H
- #define QEMU_WHPX_H
- 
-diff --git a/include/sysemu/xen.h b/include/sysemu/xen.h
-index 0ca25697e4..bc13ad5692 100644
---- a/include/sysemu/xen.h
-+++ b/include/sysemu/xen.h
-@@ -5,6 +5,8 @@
-  * See the COPYING file in the top-level directory.
-  */
- 
-+/* header to be included in non-Xen-specific code */
-+
- #ifndef SYSEMU_XEN_H
- #define SYSEMU_XEN_H
- 
+ static void whpx_kick_vcpu_thread(CPUState *cpu)
 -- 
 2.38.1
 
