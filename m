@@ -2,62 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 424636D794B
-	for <lists+kvm@lfdr.de>; Wed,  5 Apr 2023 12:09:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 04AEE6D794C
+	for <lists+kvm@lfdr.de>; Wed,  5 Apr 2023 12:09:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237716AbjDEKJF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Apr 2023 06:09:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56578 "EHLO
+        id S237745AbjDEKJM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Apr 2023 06:09:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56740 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237666AbjDEKJD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Apr 2023 06:09:03 -0400
-Received: from mail-wr1-x42e.google.com (mail-wr1-x42e.google.com [IPv6:2a00:1450:4864:20::42e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 186074ECB
-        for <kvm@vger.kernel.org>; Wed,  5 Apr 2023 03:09:01 -0700 (PDT)
-Received: by mail-wr1-x42e.google.com with SMTP id m2so35618070wrh.6
-        for <kvm@vger.kernel.org>; Wed, 05 Apr 2023 03:09:01 -0700 (PDT)
+        with ESMTP id S237537AbjDEKJJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Apr 2023 06:09:09 -0400
+Received: from mail-wm1-x334.google.com (mail-wm1-x334.google.com [IPv6:2a00:1450:4864:20::334])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9230E4ECD
+        for <kvm@vger.kernel.org>; Wed,  5 Apr 2023 03:09:08 -0700 (PDT)
+Received: by mail-wm1-x334.google.com with SMTP id l15-20020a05600c4f0f00b003ef6d684102so18073538wmq.3
+        for <kvm@vger.kernel.org>; Wed, 05 Apr 2023 03:09:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1680689339;
+        d=linaro.org; s=google; t=1680689347;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=g7I8pgcW6ZwGjVMfJNjtnaXujAveSVqm+E8tHMTx8v0=;
-        b=MhyujAomibFLPs5Z1r+fQrzzSvg9H4r2EBzSetnjfIovo0D4SOHWUwSeiRMNgPoh1o
-         7h6hDoLWJdA8tHYvvh8HqzgvOpEgD8lMQv3Tz77QtPegzuQe5Qlye+HlBf3iI294ejVj
-         dkyFO5ZwK+u+nCxKcob1h3I1Hua9GeSm3zg4LMwmxMpoq8AjbZ/7zeL7FuqCwP1PDlzR
-         9AXgnwO44IVGF5Kt1cF5t91+2Spcqj4EPyL/GbCKZZQh9S2g/AvunFvUkRs9SV1l90g3
-         DYNOhupV0YEvOrj5PGN49nkPggU8u37pDPwL8d0V/htEWC24jJi27Kzgqvu52RRWcVFG
-         TJCQ==
+        bh=hOIUAejMDgPGNri6CTMX+NYmgz2rO96F3gJmXNOLJxs=;
+        b=S/sJ8y4f2rUl+i71e+mCuGZuZfY5fREdNc1TFr/aEXiGuikTme64GMgqYOa7eqvixO
+         sNf4U91Oj8cWhbCz7saOEF1jx3ZzoabpA11OvpGepX7sFWjMI2K2iaCYA5Fb4cTqW4qv
+         HoQvYT2zAkq2AlgE8ycDb+ODBHfZ/BCzFs9ybHjyfKeXsodw2D/l0JLrY1+diUnYMK0E
+         tXVNnQT0t9UN3DtYNnVA9xztmGer2h8JkgXwvU5dkPdsfscXL8aUv9mc9gBJdYD4Nbx/
+         4iwShUAj28BK3KLQ6kcThPbwc066mniDVXLh3YMBP3tos1Egxks3TfoEQ8SlpiFstZX7
+         RYdg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680689339;
+        d=1e100.net; s=20210112; t=1680689347;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=g7I8pgcW6ZwGjVMfJNjtnaXujAveSVqm+E8tHMTx8v0=;
-        b=YrnfRpwGfO4wy9CWoopPKh7pvqkLCYxR+32O+RyignrNHLLkUTr/h17cfkR+qFhY4n
-         tHqioyVqdoGawoCy5CO+/Mp0K8C4lTB2Js9KQPQZ57e6aj0LQsIdHyXnthHpIFeFsTrL
-         yDfEgTMKtLFf3HuzG5tK3h4ooMRWdqg7Zah5NF/sq0sOUR5GbA4ZGl3N4i3amzIpWhm5
-         2lpjWnABsxwftFd6OKKfFgUAT3Wq5ezDtUO+9OdCXMIQYmYU6E+LC74QsO/9YRTRggdS
-         76l6uFzJogcZMW5XHheO9XbjukawgkexYd+ySDFOMYKd2yyhd5NASOVzjFrlVr32XyYb
-         RAiw==
-X-Gm-Message-State: AAQBX9fdYA1MtxlFz0JLO8ZG3jSDQaNjPt5kG+WKvwwNJjLof6flW+yT
-        +jkrioZLOtXmexRbT8OSVHCtZ/a5n6fKkQVtXJM=
-X-Google-Smtp-Source: AKy350ZZ4fgFqdvHAn3EadEjlpVz+1pRNjnGMd2Adfq6cwTKDA6rtjIPgVMQ19Y5BFSB/g3YNh95tw==
-X-Received: by 2002:adf:f492:0:b0:2ce:a7df:c115 with SMTP id l18-20020adff492000000b002cea7dfc115mr3589528wro.41.1680689339485;
-        Wed, 05 Apr 2023 03:08:59 -0700 (PDT)
+        bh=hOIUAejMDgPGNri6CTMX+NYmgz2rO96F3gJmXNOLJxs=;
+        b=ip1+J/f87jQdOnMZcr2E24irfcnxkvplc39f0woS7vLijgfZn4qAdP6KCDG6Ky4/AU
+         IfjiTb5Ejy2156Z6Oyd+l2XLJIC2Ih5bJ1gi/irGdNpfFaGkq01Acr5vU95rYD3vxOYI
+         Xmxu0dDxNvqK6fUvz0lJvwMepSrN0IMpvhIsOemyyj/KdHZqkpQ/jworTUteR53ovKZ6
+         CKz98e60uXAYTQn4quK7ZjUb4wRXJHl04IwLq7gAa9Ui9t/G3oBmVVmYiNrgnU6KeYAC
+         ZG32GQWIU0N0eIaTyWHw4p+o4qJDMK+0IPcAbmEDMdv14/nAW5ihLmN/JNgufJRP2/R/
+         fFRA==
+X-Gm-Message-State: AAQBX9cq6W0x10vRRxer6PWQnSG8xUUlUcqKMl7dPOV+gLwN0wb+kn1x
+        wyoUuW+K88hUvzTiLDJ9AQ1dSg==
+X-Google-Smtp-Source: AKy350ZwPv7srv1WoSO/MmSOa2UJdjZu3e7HsfWH/ffyjG4++YTRkUBAfgBBRDMhjS3YahEj4GkMfQ==
+X-Received: by 2002:a05:600c:25a:b0:3ed:237f:3da with SMTP id 26-20020a05600c025a00b003ed237f03damr4592489wmj.22.1680689347060;
+        Wed, 05 Apr 2023 03:09:07 -0700 (PDT)
 Received: from localhost.localdomain (4ab54-h01-176-184-52-81.dsl.sta.abo.bbox.fr. [176.184.52.81])
-        by smtp.gmail.com with ESMTPSA id f16-20020adffcd0000000b002d5a8d8442asm14561130wrs.37.2023.04.05.03.08.56
+        by smtp.gmail.com with ESMTPSA id m19-20020a7bce13000000b003ee1acdb036sm1700160wmc.17.2023.04.05.03.09.04
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Wed, 05 Apr 2023 03:08:59 -0700 (PDT)
+        Wed, 05 Apr 2023 03:09:06 -0700 (PDT)
 From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
 To:     qemu-devel@nongnu.org
 Cc:     kvm@vger.kernel.org, qemu-arm@nongnu.org,
         Peter Maydell <peter.maydell@linaro.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
         =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
-Subject: [PATCH 1/2] target/arm: Remove KVM AArch32 CPU definitions
-Date:   Wed,  5 Apr 2023 12:08:47 +0200
-Message-Id: <20230405100848.76145-2-philmd@linaro.org>
+Subject: [PATCH 2/2] hw/arm/virt: Restrict Cortex-A7 check to TCG
+Date:   Wed,  5 Apr 2023 12:08:48 +0200
+Message-Id: <20230405100848.76145-3-philmd@linaro.org>
 X-Mailer: git-send-email 2.38.1
 In-Reply-To: <20230405100848.76145-1-philmd@linaro.org>
 References: <20230405100848.76145-1-philmd@linaro.org>
@@ -73,56 +73,28 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Missed in commit 80485d88f9 ("target/arm: Restrict
-v7A TCG cpus to TCG accel").
+The Cortex-A7 core is only available when TCG is enabled (see
+commit 80485d88f9 "target/arm: Restrict v7A TCG cpus to TCG accel").
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 ---
- target/arm/kvm-consts.h | 9 +++------
- target/arm/cpu_tcg.c    | 2 --
- 2 files changed, 3 insertions(+), 8 deletions(-)
+ hw/arm/virt.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/target/arm/kvm-consts.h b/target/arm/kvm-consts.h
-index 09967ec5e6..7c6adc14f6 100644
---- a/target/arm/kvm-consts.h
-+++ b/target/arm/kvm-consts.h
-@@ -124,13 +124,10 @@ MISMATCH_CHECK(QEMU_PSCI_RET_INTERNAL_FAILURE, PSCI_RET_INTERNAL_FAILURE);
- MISMATCH_CHECK(QEMU_PSCI_RET_NOT_PRESENT, PSCI_RET_NOT_PRESENT);
- MISMATCH_CHECK(QEMU_PSCI_RET_DISABLED, PSCI_RET_DISABLED);
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index ac626b3bef..1fe39c6683 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -204,7 +204,9 @@ static const int a15irqmap[] = {
+ };
  
--/* Note that KVM uses overlapping values for AArch32 and AArch64
-- * target CPU numbers. AArch32 targets:
-+/*
-+ * Note that KVM uses overlapping values for AArch32 and AArch64
-+ * target CPU numbers. AArch64 targets:
-  */
--#define QEMU_KVM_ARM_TARGET_CORTEX_A15 0
--#define QEMU_KVM_ARM_TARGET_CORTEX_A7 1
--
--/* AArch64 targets: */
- #define QEMU_KVM_ARM_TARGET_AEM_V8 0
- #define QEMU_KVM_ARM_TARGET_FOUNDATION_V8 1
- #define QEMU_KVM_ARM_TARGET_CORTEX_A57 2
-diff --git a/target/arm/cpu_tcg.c b/target/arm/cpu_tcg.c
-index df0c45e523..1911d7ec47 100644
---- a/target/arm/cpu_tcg.c
-+++ b/target/arm/cpu_tcg.c
-@@ -546,7 +546,6 @@ static void cortex_a7_initfn(Object *obj)
-     set_feature(&cpu->env, ARM_FEATURE_EL2);
-     set_feature(&cpu->env, ARM_FEATURE_EL3);
-     set_feature(&cpu->env, ARM_FEATURE_PMU);
--    cpu->kvm_target = QEMU_KVM_ARM_TARGET_CORTEX_A7;
-     cpu->midr = 0x410fc075;
-     cpu->reset_fpsid = 0x41023075;
-     cpu->isar.mvfr0 = 0x10110222;
-@@ -595,7 +594,6 @@ static void cortex_a15_initfn(Object *obj)
-     set_feature(&cpu->env, ARM_FEATURE_EL2);
-     set_feature(&cpu->env, ARM_FEATURE_EL3);
-     set_feature(&cpu->env, ARM_FEATURE_PMU);
--    cpu->kvm_target = QEMU_KVM_ARM_TARGET_CORTEX_A15;
-     /* r4p0 cpu, not requiring expensive tlb flush errata */
-     cpu->midr = 0x414fc0f0;
-     cpu->revidr = 0x0;
+ static const char *valid_cpus[] = {
++#ifdef CONFIG_TCG
+     ARM_CPU_TYPE_NAME("cortex-a7"),
++#endif
+     ARM_CPU_TYPE_NAME("cortex-a15"),
+     ARM_CPU_TYPE_NAME("cortex-a35"),
+     ARM_CPU_TYPE_NAME("cortex-a53"),
 -- 
 2.38.1
 
