@@ -2,119 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CE2366D85E4
-	for <lists+kvm@lfdr.de>; Wed,  5 Apr 2023 20:23:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B7B2B6D8604
+	for <lists+kvm@lfdr.de>; Wed,  5 Apr 2023 20:31:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233704AbjDESXc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Apr 2023 14:23:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52422 "EHLO
+        id S231906AbjDESb5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Apr 2023 14:31:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59544 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233497AbjDESXb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Apr 2023 14:23:31 -0400
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 942EF3C38
-        for <kvm@vger.kernel.org>; Wed,  5 Apr 2023 11:23:30 -0700 (PDT)
-Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
-        by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 335HMWb7029593;
-        Wed, 5 Apr 2023 18:23:21 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=date : from : to :
- cc : subject : message-id : references : mime-version : content-type :
- content-transfer-encoding : in-reply-to; s=qcppdkim1;
- bh=ATuS4Wftab2uHxmwIshAh84WAJ0uXVGyPcyRjldcboo=;
- b=i6lWLFi4Gq1X4Nr9MLBXfOHS4Whp+F9J8BVN9hZJczhWKIB2+DZnT4bim6bQ+E12/0AZ
- iKHoqeSkKVemF+vmW7fhej+3kWZdpTWbqMBJZqHolJA/EiHpHtWHsG1+hMXvSmb/BKRU
- 6dH3Ev1WdOdi8cy7bzfSkj57Csz67umWQZsNEEBjxpc32Z64fn805V+PgevsVnJS40Dr
- bKp6iaCkTk+kUCKO4/GEfc++Z0XtxhCyR4KHP/lbusYoH/c6N2dPR0yFBv46X5ZfmQT5
- NnFVkslyIq8eaFUv0kur2eu2FlnBkQ6BYMEtKH7eWtbnthEXI7Z1L2hEgYeLc8Hadf5l YQ== 
-Received: from nasanppmta03.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-        by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3ps8h08v3y-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 05 Apr 2023 18:23:21 +0000
-Received: from nasanex01c.na.qualcomm.com (nasanex01c.na.qualcomm.com [10.45.79.139])
-        by NASANPPMTA03.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 335INKRL014706
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 5 Apr 2023 18:23:20 GMT
-Received: from qc-i7.hemma.eciton.net (10.80.80.8) by
- nasanex01c.na.qualcomm.com (10.45.79.139) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.986.42; Wed, 5 Apr 2023 11:23:17 -0700
-Date:   Wed, 5 Apr 2023 19:23:14 +0100
-From:   Leif Lindholm <quic_llindhol@quicinc.com>
-To:     Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>
-CC:     <qemu-devel@nongnu.org>, <qemu-s390x@nongnu.org>,
-        <qemu-riscv@nongnu.org>,
-        Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
-        <qemu-arm@nongnu.org>, <kvm@vger.kernel.org>,
-        <qemu-ppc@nongnu.org>, Radoslaw Biernacki <rad@semihalf.com>,
-        Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH 05/10] hw/arm/sbsa-ref: Include missing 'sysemu/kvm.h'
- header
-Message-ID: <ZC28khr/jGDKK4/W@qc-i7.hemma.eciton.net>
-References: <20230405160454.97436-1-philmd@linaro.org>
- <20230405160454.97436-6-philmd@linaro.org>
+        with ESMTP id S229492AbjDESbz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Apr 2023 14:31:55 -0400
+Received: from mail-ed1-x530.google.com (mail-ed1-x530.google.com [IPv6:2a00:1450:4864:20::530])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 11C0F10E6
+        for <kvm@vger.kernel.org>; Wed,  5 Apr 2023 11:31:54 -0700 (PDT)
+Received: by mail-ed1-x530.google.com with SMTP id 4fb4d7f45d1cf-50240a3b7fcso770567a12.0
+        for <kvm@vger.kernel.org>; Wed, 05 Apr 2023 11:31:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=grsecurity.net; s=grsec; t=1680719512;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=D09SiNz8EY5of0RZSstwD4wzGlOaSY6p10qkdeMqURE=;
+        b=AMBAzG0QgqCb9iX9PLCffb23CmT4TJoNWb874LZlB3sAmSDRZUC0NWAWQXtO0OgVcB
+         11liVShStMKFI8j9WcoUWP3fvgWBz8I8+uJU4Z7v6lSWIJ6TvWajA589bDt8NtnIH+71
+         fJTQse113+euLE9CX1j98ByGAdEkK20MNX9dnEBv9HX/yynW2wgxb2Ab7lwIVE70l0IO
+         aIqbAIrH3BrH4ltYrEymyS3A9mOdpxmjGLzGWcl0+DXnl/jcKfvTjcmUFKdm26bsdpAI
+         R472xnO+IGBZegMc4dgdeVo3PNuczu8OYvRKyW3NiE+sUCgh0fFRTgU2dP1v1wBERoKg
+         30rw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1680719512;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=D09SiNz8EY5of0RZSstwD4wzGlOaSY6p10qkdeMqURE=;
+        b=Q2POF1becdOQYBV5GjDGk83s4EsexdrrTE8EcwnFzjLQWbmf8ufPH5S0Yxt1qr36n3
+         E3vyCXz3TZqNVB6eCpqz2XeEhHmB3RT4sy4ZeGPSf3IochSRnV39LKE1aoqq/ZhCqzIB
+         zWAYWlWHopmOckliC+er8vJ6H+EiAu616sAo6d3itSbWnrPTPn+t/FnfKz455lbbYa6s
+         GRXsXNBWP1K960uPrfZzPe1JO+UXQS+s47NlgzBWyfJhyNZ4dI1LxJaKUpF3xzJ8TPtz
+         nrYYkHIJCOYoqbJRjiV1zpGHa9domTk7HNcZNP1eCOT/9ffTHLCaGwSXljzSmg/4O9xl
+         n34A==
+X-Gm-Message-State: AAQBX9fq81Br3GI2AJnTmNLw4vGDivkguver5vv6NsnTb5JJJmEEV4tC
+        gKryHbb520p+tybTfVbJKWZoyg==
+X-Google-Smtp-Source: AKy350Y87Q/T/8FTq6Q/YZJVQXOGhfScnau62UvUJMsxpNVZIXVucIvS9gXGm9YlhupQXzkP29T9tA==
+X-Received: by 2002:aa7:d851:0:b0:4fb:999:e052 with SMTP id f17-20020aa7d851000000b004fb0999e052mr2633884eds.33.1680719512559;
+        Wed, 05 Apr 2023 11:31:52 -0700 (PDT)
+Received: from ?IPV6:2003:f6:af39:8900:5941:dee7:da1a:b514? (p200300f6af3989005941dee7da1ab514.dip0.t-ipconnect.de. [2003:f6:af39:8900:5941:dee7:da1a:b514])
+        by smtp.gmail.com with ESMTPSA id v6-20020a50d086000000b005023dc49bdasm7606189edd.83.2023.04.05.11.31.51
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 05 Apr 2023 11:31:52 -0700 (PDT)
+Message-ID: <58a9410a-62f2-5a35-2ce3-f5203912465e@grsecurity.net>
+Date:   Wed, 5 Apr 2023 20:31:50 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20230405160454.97436-6-philmd@linaro.org>
-X-Originating-IP: [10.80.80.8]
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nasanex01c.na.qualcomm.com (10.45.79.139)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: yuK9uBlDPdNsmZVYPiBTy9iMpffC3DO4
-X-Proofpoint-ORIG-GUID: yuK9uBlDPdNsmZVYPiBTy9iMpffC3DO4
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
- definitions=2023-04-05_12,2023-04-05_01,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- malwarescore=0 adultscore=0 suspectscore=0 mlxlogscore=789 phishscore=0
- priorityscore=1501 clxscore=1011 mlxscore=0 spamscore=0 bulkscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2303200000 definitions=main-2304050164
-X-Spam-Status: No, score=-0.9 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
-        DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_PASS
-        autolearn=unavailable autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.9.0
+Subject: Re: [PATCH] KVM: x86/mmu: Refresh CR0.WP prior to checking for
+ emulated permission faults
+Content-Language: en-US, de-DE
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20230405002608.418442-1-seanjc@google.com>
+ <a1ed2308-b521-14c0-a118-19c1afffd1d6@grsecurity.net>
+ <ZC2HfNLa7sLewJtl@google.com>
+From:   Mathias Krause <minipli@grsecurity.net>
+In-Reply-To: <ZC2HfNLa7sLewJtl@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-1.2 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
+        DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Apr 05, 2023 at 18:04:49 +0200, Philippe Mathieu-Daudé wrote:
-> "sysemu/kvm.h" is indirectly pulled in. Explicit its
-> inclusion to avoid when refactoring include/:
-> 
->   hw/arm/sbsa-ref.c:693:9: error: implicit declaration of function 'kvm_enabled' is invalid in C99 [-Werror,-Wimplicit-function-declaration]
->     if (kvm_enabled()) {
->         ^
-> 
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
-> ---
->  hw/arm/sbsa-ref.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/hw/arm/sbsa-ref.c b/hw/arm/sbsa-ref.c
-> index 0b93558dde..7df4d7b712 100644
-> --- a/hw/arm/sbsa-ref.c
-> +++ b/hw/arm/sbsa-ref.c
-> @@ -26,6 +26,7 @@
->  #include "sysemu/numa.h"
->  #include "sysemu/runstate.h"
->  #include "sysemu/sysemu.h"
-> +#include "sysemu/kvm.h"
-
-Can I do my traditional nitpick and ask this to be added above
-sysemu/numa.h in order to maintain alphabetical ordering within the
-sysemu block?
-
-With that:
-Reviewed-by: Leif Lindholm <quic_llindhol@quicinc.com>
 
 
->  #include "exec/hwaddr.h"
->  #include "kvm_arm.h"
->  #include "hw/arm/boot.h"
-> -- 
-> 2.38.1
+On 05.04.23 16:36, Sean Christopherson wrote:
+> On Wed, Apr 05, 2023, Mathias Krause wrote:
+>> On 05.04.23 02:26, Sean Christopherson wrote:
+>>> +void __kvm_mmu_refresh_passthrough_bits(struct kvm_vcpu *vcpu,
+>>> +					struct kvm_mmu *mmu)
+>>> +{
+>>> +	const bool cr0_wp = kvm_is_cr0_bit_set(vcpu, X86_CR0_WP);
+>>> +
+>>> +	BUILD_BUG_ON((KVM_MMU_CR0_ROLE_BITS & KVM_POSSIBLE_CR0_GUEST_BITS) != X86_CR0_WP);
+>>
+>>> +	BUILD_BUG_ON((KVM_MMU_CR4_ROLE_BITS & KVM_POSSIBLE_CR4_GUEST_BITS));
+>>
+>> Just curious, this should assert that we don't run into similar issues
+>> if we make more bits of CR4 guest owned?
 > 
+> Yes?  I'm not sure what you're asking.  BUILD_BUG_ON() is a just more flexible
+> version of stiatic_assert(); it only requires that the inputs be compile-time
+> constants, not purely "static>
+> he above throws an error at compile-time if there is new overlap between the
+> CR{0,4} MMU role bits and the possible guest-owned bits.  E.g. adding SMEP to the
+> possible guest-owned CR4 bits yields:
+
+Yes, I was just asking about the reasoning behind it as it, obviously,
+isn't a problem with the current code. But I ran into it while doing
+backports, so thanks for adding it :D
+
+> 
+> [...]
