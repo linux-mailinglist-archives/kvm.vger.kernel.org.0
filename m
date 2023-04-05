@@ -2,88 +2,78 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5BF406D7C4D
-	for <lists+kvm@lfdr.de>; Wed,  5 Apr 2023 14:21:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3575D6D7C9B
+	for <lists+kvm@lfdr.de>; Wed,  5 Apr 2023 14:31:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237481AbjDEMVD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Apr 2023 08:21:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56482 "EHLO
+        id S237766AbjDEMbF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Apr 2023 08:31:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40918 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230012AbjDEMVB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Apr 2023 08:21:01 -0400
+        with ESMTP id S230012AbjDEMbE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Apr 2023 08:31:04 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EEDB740E0
-        for <kvm@vger.kernel.org>; Wed,  5 Apr 2023 05:20:15 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D1A61BD0
+        for <kvm@vger.kernel.org>; Wed,  5 Apr 2023 05:30:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1680697215;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:
+        s=mimecast20190719; t=1680697816;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=erf4UNO3fNS9mv22A+JjIcgyW6S0YpQ5DUbNcYGvtZ0=;
-        b=Vv4bu1gFUdPCE0hvzS7JGgrxDvPYvsck+PahetuwUkXrcTNPKiWOu+gYzURj+YIKO9beXf
-        O9J3ohWquh5LkXs/I4PLyyjDJFkDzf6gIwYrgmtAQ4fnn0JL0g2oSbESDjfSE3nWRrxJsf
-        9xWA4dC1BVG5YJD/TZ27Le5o+Oirz+A=
-Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
- [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=C3GXrj5/vq69zV8qx7J6eRA4bit5KAugf7Eq6t8FZsw=;
+        b=JYHvCAlAY9ObinBgw7w2lOT/+yidF3J2xGflzq3bS/NJiZGJ9KYPFg8U9HBdWmzrt0k/EK
+        H9FZNdtDf90KMQPdKdK2DwIAwea5c+D7yT/3Kby+hY96I1tspwGAI/vK8oavr12rIEo5m1
+        Rbwf+vjU6mQRhKqO/0e2Y9l6GvSWBVU=
+Received: from mail-vs1-f69.google.com (mail-vs1-f69.google.com
+ [209.85.217.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-464-mIvpZW08Ndyt6V2JrHAQ8Q-1; Wed, 05 Apr 2023 08:20:14 -0400
-X-MC-Unique: mIvpZW08Ndyt6V2JrHAQ8Q-1
-Received: by mail-qv1-f69.google.com with SMTP id y19-20020ad445b3000000b005a5123cb627so16085301qvu.20
-        for <kvm@vger.kernel.org>; Wed, 05 Apr 2023 05:20:14 -0700 (PDT)
+ us-mta-616-2RBezu62PUadzH1j5kSpHg-1; Wed, 05 Apr 2023 08:30:15 -0400
+X-MC-Unique: 2RBezu62PUadzH1j5kSpHg-1
+Received: by mail-vs1-f69.google.com with SMTP id m4-20020a67e0c4000000b004263667c260so12608078vsl.17
+        for <kvm@vger.kernel.org>; Wed, 05 Apr 2023 05:30:15 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680697213;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=erf4UNO3fNS9mv22A+JjIcgyW6S0YpQ5DUbNcYGvtZ0=;
-        b=BvltmPMcExtdsfKaKxjErI6jHcCYfS1/zIf1LiEdjzGzsq0cz6tMBgKMBqb3VpZNxT
-         yzidgnrkr7164TpCIaQYCKtKCNy8/FG1m2HlHqsisstYIwdqBQOiMGfNoLIrBsI+qrQ9
-         uvdDM3fTwBLqPZUJkxmh/KkTSkmDXSuhf+9EahasLYvq1fWCW5X10EJIcjvmm9cQyj/0
-         G7k+qUmEW2WFgsO2Ueg6IEsVMz+uNrTgRTHmpmtj0BNordWSx2FkpzCKxQ8low1rGv9P
-         oSYOlIevjxGhy/HBoLnYnVHzINQ0SRCVQuc/oSzsMH87l5IvszmxKbUHfIGlzr/OIg94
-         ilIA==
-X-Gm-Message-State: AAQBX9cNbOzo6e0On+0LUwfVDM7MDSQpV5qwZFBEOPQ5qTtaO5qSftlu
-        YHXHwID4GEEByuPqJ1bD21AvTYaKJJ/AeooFl56F+23ETW4/EZvbkFCKx2OuNP59M6q1g8JQqYU
-        anT9O+gnMrzEz
-X-Received: by 2002:a05:6214:e6e:b0:56e:f9a2:1aff with SMTP id jz14-20020a0562140e6e00b0056ef9a21affmr7785845qvb.35.1680697213721;
-        Wed, 05 Apr 2023 05:20:13 -0700 (PDT)
-X-Google-Smtp-Source: AKy350YufqLIW4kTurRmpoStx2boSEtRlVeqT/uSnU6kdOvvAZfwzmAklgvT9NeSB7a7bO7FCPIIzA==
-X-Received: by 2002:a05:6214:e6e:b0:56e:f9a2:1aff with SMTP id jz14-20020a0562140e6e00b0056ef9a21affmr7785819qvb.35.1680697213472;
-        Wed, 05 Apr 2023 05:20:13 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id l8-20020a0cc208000000b005dd8b9345a2sm4164191qvh.58.2023.04.05.05.20.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 05 Apr 2023 05:20:12 -0700 (PDT)
-Message-ID: <f90410e0-96f1-9719-9d83-f7caa5992d6d@redhat.com>
-Date:   Wed, 5 Apr 2023 14:20:07 +0200
+        d=1e100.net; s=20210112; t=1680697815; x=1683289815;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=C3GXrj5/vq69zV8qx7J6eRA4bit5KAugf7Eq6t8FZsw=;
+        b=21UGDrLhiokGkTcr4Qpzg41BQjdJ+s/IYQe0Q88B+oPpeqL0P0xRmsw35v3Gwzkrhg
+         huF3LIgt9c6jVWElDtkpH95AfNXuDNxAWn+lomExA+ZngTXhEkCk19i8QAMZDJgXf9zI
+         TFoyGEXw14nHRNQNC6gsPwM0BPqAoHjmrih8f49MChlVHF3yMN690b7xN4Ce7F4y0ryN
+         6C8nHfg/zKD3E6hiGHlZnzJkMdQbj8Nz1Hciyel2INBPB1mUDfwqGmMdN+LpM07bzhwY
+         P7BGCnPd0boM6Egn2bWDfJyp1DnLrhsSOBsyvSa2LxyQMzI0KwqGC3aqHT58oMuA6JJF
+         eXCQ==
+X-Gm-Message-State: AAQBX9fjmT5Xfwu87XwP9idVzxKtW41KCMLykx0jAnbnw71ozKzR1yrL
+        qI3Slb0GdYeTZGhN5p59Mx3m9Kf+5O57pZWdCdro3ajwUajYaXRnkljUFG3Fr6T8zK4hXCJeUHb
+        HGuXFWiq0kR1pJY+pLbGaUCilgmoQ
+X-Received: by 2002:a67:d704:0:b0:425:f1d7:79f7 with SMTP id p4-20020a67d704000000b00425f1d779f7mr4842483vsj.1.1680697815030;
+        Wed, 05 Apr 2023 05:30:15 -0700 (PDT)
+X-Google-Smtp-Source: AKy350ZWVrFn5g7e+YJRp0HKSNr8gj3Lv/ZvTaL9NH7QwVvqIbpkGKu8U4X0hZjxC1r4mvle1Pd9h29lyXeZEw/xNXI=
+X-Received: by 2002:a67:d704:0:b0:425:f1d7:79f7 with SMTP id
+ p4-20020a67d704000000b00425f1d779f7mr4842469vsj.1.1680697814765; Wed, 05 Apr
+ 2023 05:30:14 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.0
-Reply-To: eric.auger@redhat.com
-Subject: Re: [PATCH v9 03/25] vfio: Remove vfio_file_is_group()
-Content-Language: en-US
-To:     Yi Liu <yi.l.liu@intel.com>, alex.williamson@redhat.com,
-        jgg@nvidia.com, kevin.tian@intel.com
-Cc:     joro@8bytes.org, robin.murphy@arm.com, cohuck@redhat.com,
-        nicolinc@nvidia.com, kvm@vger.kernel.org, mjrosato@linux.ibm.com,
-        chao.p.peng@linux.intel.com, yi.y.sun@linux.intel.com,
-        peterx@redhat.com, jasowang@redhat.com,
-        shameerali.kolothum.thodi@huawei.com, lulu@redhat.com,
-        suravee.suthikulpanit@amd.com, intel-gvt-dev@lists.freedesktop.org,
-        intel-gfx@lists.freedesktop.org, linux-s390@vger.kernel.org,
-        xudong.hao@intel.com, yan.y.zhao@intel.com, terrence.xu@intel.com,
-        yanting.jiang@intel.com
-References: <20230401151833.124749-1-yi.l.liu@intel.com>
- <20230401151833.124749-4-yi.l.liu@intel.com>
-From:   Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <20230401151833.124749-4-yi.l.liu@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-1.6 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+References: <SA1PR11MB673463616F7B1318874D11A3A8909@SA1PR11MB6734.namprd11.prod.outlook.com>
+In-Reply-To: <SA1PR11MB673463616F7B1318874D11A3A8909@SA1PR11MB6734.namprd11.prod.outlook.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Date:   Wed, 5 Apr 2023 14:30:03 +0200
+Message-ID: <CABgObfaJwgBKkSfp=GP437jEKTP=_eCktdiKcujeSOgwv9dbiQ@mail.gmail.com>
+Subject: Re: The necessity of injecting a hardware exception reported in VMX
+ IDT vectoring information
+To:     "Li, Xin3" <xin3.li@intel.com>
+Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "Christopherson,, Sean" <seanjc@google.com>,
+        "Li, Xiaoyao" <xiaoyao.li@intel.com>,
+        "Yao, Yuan" <yuan.yao@intel.com>,
+        "Dong, Eddie" <eddie.dong@intel.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "Nakajima, Jun" <jun.nakajima@intel.com>,
+        "H.Peter Anvin" <hpa@zytor.com>,
+        "Mallick, Asit K" <asit.k.mallick@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -92,57 +82,54 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Yi,
+On Wed, Apr 5, 2023 at 11:34=E2=80=AFAM Li, Xin3 <xin3.li@intel.com> wrote:
+> The question is, must KVM inject a hardware exception from the IDT vector=
+ing
+> information field? Is there any correctness issue if KVM does not?
 
-On 4/1/23 17:18, Yi Liu wrote:
-> since no user of vfio_file_is_group() now.
+Fault exceptions probably can be handled as you say, but traps
+definitely have to be reinjected. For example, not reinjecting a
+singlestep #DB would cause the guest to miss the exception for that
+instruction.
+
+> If no correctness issue, it's better to not do it, because the injected e=
+vent
+> from IDT vectoring could trigger another exception, i.e., a nested except=
+ion,
+> and after the nested exception is handled, the CPU resumes to re-trigger =
+the
+> original event, which makes not much sense to inject it.
+
+(Let's use "second" exception instead of "nested" exception).
+
+The CPU doesn't re-trigger the original event unless the second
+exception causes a vmexit and the hypervisor moves the IDT-vectored
+event fields to the event injection fields. In this case, the first
+exception wasn't injected at all.
+
+If the second exception does not cause a vmexit, it is handled as
+usual by the processor (by checking if the two exceptions are benign,
+contributory or page faults). The behavior is the same even if the
+first exception comes from VMX event injection.
+
+Paolo
+
+> In addition, the benefits of not doing so are:
+> 1) Less code.
+> 2) Faster execution. Calling kvm_requeue_exception_e()/kvm_requeue_except=
+ion()
+>    consumes a few hundred cycles at least, although it's a rare case with=
+ EPT,
+>    but a lot with shadow (who cares?). And vmx_inject_exception() also ha=
+s a
+>    cost.
+> 3) An IDT vectoring could trigger more than one VM exit, e.g., the first =
+is an
+>    EPT violation, and the second a PML full, KVM needs to reinject it twi=
+ce
+>    (extremely rare).
 >
-> Reviewed-by: Kevin Tian <kevin.tian@intel.com>
-> Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
-> Tested-by: Terrence Xu <terrence.xu@intel.com>
-> Tested-by: Nicolin Chen <nicolinc@nvidia.com>
-> Tested-by: Yanting Jiang <yanting.jiang@intel.com>
-> Signed-off-by: Yi Liu <yi.l.liu@intel.com>
-
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
-
-Eric
-> ---
->  drivers/vfio/group.c | 10 ----------
->  include/linux/vfio.h |  1 -
->  2 files changed, 11 deletions(-)
+> Thanks!
+>   Xin
 >
-> diff --git a/drivers/vfio/group.c b/drivers/vfio/group.c
-> index ede4723c5f72..4f937ebaf6f7 100644
-> --- a/drivers/vfio/group.c
-> +++ b/drivers/vfio/group.c
-> @@ -792,16 +792,6 @@ struct iommu_group *vfio_file_iommu_group(struct file *file)
->  }
->  EXPORT_SYMBOL_GPL(vfio_file_iommu_group);
->  
-> -/**
-> - * vfio_file_is_group - True if the file is a vfio group file
-> - * @file: VFIO group file
-> - */
-> -bool vfio_file_is_group(struct file *file)
-> -{
-> -	return vfio_group_from_file(file);
-> -}
-> -EXPORT_SYMBOL_GPL(vfio_file_is_group);
-> -
->  bool vfio_group_enforced_coherent(struct vfio_group *group)
->  {
->  	struct vfio_device *device;
-> diff --git a/include/linux/vfio.h b/include/linux/vfio.h
-> index d9a0770e5fc1..7519ae89fcd6 100644
-> --- a/include/linux/vfio.h
-> +++ b/include/linux/vfio.h
-> @@ -264,7 +264,6 @@ int vfio_mig_get_next_state(struct vfio_device *device,
->   * External user API
->   */
->  struct iommu_group *vfio_file_iommu_group(struct file *file);
-> -bool vfio_file_is_group(struct file *file);
->  bool vfio_file_is_valid(struct file *file);
->  bool vfio_file_enforced_coherent(struct file *file);
->  void vfio_file_set_kvm(struct file *file, struct kvm *kvm);
 
