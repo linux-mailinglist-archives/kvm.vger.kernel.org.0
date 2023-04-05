@@ -2,77 +2,44 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 069A06D82F4
-	for <lists+kvm@lfdr.de>; Wed,  5 Apr 2023 18:06:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E2F3F6D8347
+	for <lists+kvm@lfdr.de>; Wed,  5 Apr 2023 18:13:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238931AbjDEQGH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Apr 2023 12:06:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53518 "EHLO
+        id S232198AbjDEQNc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Apr 2023 12:13:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39968 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238580AbjDEQGC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Apr 2023 12:06:02 -0400
-Received: from mail-wr1-x431.google.com (mail-wr1-x431.google.com [IPv6:2a00:1450:4864:20::431])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 227465FCF
-        for <kvm@vger.kernel.org>; Wed,  5 Apr 2023 09:05:56 -0700 (PDT)
-Received: by mail-wr1-x431.google.com with SMTP id i9so36738238wrp.3
-        for <kvm@vger.kernel.org>; Wed, 05 Apr 2023 09:05:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1680710755;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YCSdJqBx+24lo5un4mJkeawVRhwXkPODtT/ypBXdn1k=;
-        b=nYNsq+8yFO7mMRk2/GCs4D4e2iDu1F5AjhPlSj5MwnASO0hw5U/4oxpVLogb6drfmz
-         3xU+KV29anaINmgzTl9ZhOc9H9utB1dE343KJ/Ch3nsDN2awoc2m/uGIUTaVMxmzxSgG
-         xqRD/xBZxEreYRjFvoqcqzu5XK6hiX/J8pDK3O5eVEHmU9QCzAK4BaAmplmm9aESOaiO
-         ae6Uv7SF5z/IgEENdF+M+eAcH47+wYVpnVgBJUOx9FPSM7Zy1/YL3ZUrvW8BmVJCLBZH
-         ZI65eOSaRJWzT4iXngpJ6wyoT9UFNgKF6YSG3WUY8ns0z8i9D9egnrZvA5oKcJER0raT
-         J/qQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680710755;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=YCSdJqBx+24lo5un4mJkeawVRhwXkPODtT/ypBXdn1k=;
-        b=yNOXmHLpYJ4FOXjwM2GDtebCAb0ISAt5M+ebsWM6DUTvhVgRAJDCLEwOqW+IQwRjpg
-         nh3/+LNm2PvAmqseV//VXr09UxVGHNMzhTIINOxrNb3Mkwx0ljwUqgL5VHIaWoj5EzBa
-         K6CoINMiEacnMiAOnG3HrbRCL7DJIu1hBEdDrcXuXGvflS+N1sbyYzUdhuhxV8j6lEsu
-         zitQ/CB7ee2RbpvTOgDaowHEhhruMNQNwTTibX0o3y9heHeNiQ3X0ZWIMtUgQLlAMWWv
-         FW7yY+nFjmRkVyS59FvhKcGajOs1JpQWjbUcBSn6fBLxA/hhZqSPL7nSaC/nw23z7bZA
-         4AnQ==
-X-Gm-Message-State: AAQBX9fSsPk67cEH+Nck+jdlgbAVBDQH/x/yPY2Lqxca+8qtLQSSrQ0K
-        YqJ6tO5kmghppERmIfWnX1i64A==
-X-Google-Smtp-Source: AKy350YkYdiHXB0g5ih7Cr+SgsA3BhgsWi6U992BWoRDvOtWKxTNhNkKh0iJQeFeR5+OUd9Zhgsf8g==
-X-Received: by 2002:a5d:4745:0:b0:2ce:a835:83d4 with SMTP id o5-20020a5d4745000000b002cea83583d4mr2147619wrs.27.1680710755745;
-        Wed, 05 Apr 2023 09:05:55 -0700 (PDT)
-Received: from localhost.localdomain (4ab54-h01-176-184-52-81.dsl.sta.abo.bbox.fr. [176.184.52.81])
-        by smtp.gmail.com with ESMTPSA id a12-20020a056000100c00b002cea8664304sm15199709wrx.91.2023.04.05.09.05.54
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Wed, 05 Apr 2023 09:05:55 -0700 (PDT)
-From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
-To:     qemu-devel@nongnu.org
-Cc:     qemu-s390x@nongnu.org, qemu-riscv@nongnu.org,
-        =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
-        qemu-arm@nongnu.org, kvm@vger.kernel.org, qemu-ppc@nongnu.org,
-        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        David Hildenbrand <david@redhat.com>,
-        Ilya Leoshkevich <iii@linux.ibm.com>,
-        Thomas Huth <thuth@redhat.com>
-Subject: [PATCH 10/10] hw/s390x: Rename pv.c -> pv-kvm.c
-Date:   Wed,  5 Apr 2023 18:04:54 +0200
-Message-Id: <20230405160454.97436-11-philmd@linaro.org>
-X-Mailer: git-send-email 2.38.1
-In-Reply-To: <20230405160454.97436-1-philmd@linaro.org>
-References: <20230405160454.97436-1-philmd@linaro.org>
+        with ESMTP id S233686AbjDEQNZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Apr 2023 12:13:25 -0400
+Received: from out-27.mta0.migadu.com (out-27.mta0.migadu.com [IPv6:2001:41d0:1004:224b::1b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3890A5590
+        for <kvm@vger.kernel.org>; Wed,  5 Apr 2023 09:12:58 -0700 (PDT)
+Date:   Wed, 5 Apr 2023 09:12:49 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1680711173;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+        bh=7CkgZMZOVF7MbpZue7UsvX7LmMmfoQVPHzEDVenfrgw=;
+        b=lcojLCqkONgW2SfBtg4a6NrQ3YjDDqXdKyYv4UAzFV1xRAgdzhwC4aiXEhAP13/vysW5ER
+        FbKVqUI4qhrDjvr1Uew6BeHLbRkn0ibu2xSSfKveUeor4VjT3eiJl6nsLf2CRmNk/C7yCN
+        G7A4GCArBLUM57KPGVdhPC75oYACwog=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From:   Oliver Upton <oliver.upton@linux.dev>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Marc Zyngier <maz@kernel.org>, Fuad Tabba <tabba@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev,
+        kvm@vger.kernel.org
+Subject: [GIT PULL] KVM/arm64 fixes for 6.3, part #3
+Message-ID: <ZC2eAXc9UE7Vesmn@thinky-boi>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Migadu-Flow: FLOW_OUT
 X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
-        DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS
+        DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
         autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -80,33 +47,54 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Protected Virtualization is specific to KVM.
-Rename the file as 'pv-kvm.c' to make this clearer.
+Hi Paolo,
 
-Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
----
- hw/s390x/{pv.c => pv-kvm.c} | 0
- hw/s390x/meson.build        | 2 +-
- 2 files changed, 1 insertion(+), 1 deletion(-)
- rename hw/s390x/{pv.c => pv-kvm.c} (100%)
+Sending out what is likely the last batch of fixes for 6.3. Most
+noteworthy is the PMU fix, as Reiji found that events counting in guest
+userspace stopped working after live migration on VHE systems.
+Additionally, Fuad found that pKVM was underselling the Spectre/Meltdown
+mitigation state to protected VMs, so we have a fix for that too.
 
-diff --git a/hw/s390x/pv.c b/hw/s390x/pv-kvm.c
-similarity index 100%
-rename from hw/s390x/pv.c
-rename to hw/s390x/pv-kvm.c
-diff --git a/hw/s390x/meson.build b/hw/s390x/meson.build
-index f291016fee..2f43b6c473 100644
---- a/hw/s390x/meson.build
-+++ b/hw/s390x/meson.build
-@@ -22,7 +22,7 @@ s390x_ss.add(when: 'CONFIG_KVM', if_true: files(
-   'tod-kvm.c',
-   's390-skeys-kvm.c',
-   's390-stattrib-kvm.c',
--  'pv.c',
-+  'pv-kvm.c',
-   's390-pci-kvm.c',
- ))
- s390x_ss.add(when: 'CONFIG_TCG', if_true: files(
--- 
-2.38.1
+Also, FYI, Marc will reprise his role for the 6.4 kernel. Nothing is
+set in stone but the working model is that we'll alternate the
+maintainer duties each kernel release.
 
+Please pull,
+
+Oliver
+
+The following changes since commit 8c2e8ac8ad4be68409e806ce1cc78fc7a04539f3:
+
+  KVM: arm64: Check for kvm_vma_mte_allowed in the critical section (2023-03-16 23:42:56 +0000)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-6.3-3
+
+for you to fetch changes up to e81625218bf7986ba1351a98c43d346b15601d26:
+
+  KVM: arm64: Advertise ID_AA64PFR0_EL1.CSV2/3 to protected VMs (2023-04-04 15:52:06 +0000)
+
+----------------------------------------------------------------
+KVM/arm64 fixes for 6.3, part #3
+
+ - Ensure the guest PMU context is restored before the first KVM_RUN,
+   fixing an issue where EL0 event counting is broken after vCPU
+   save/restore
+
+ - Actually initialize ID_AA64PFR0_EL1.{CSV2,CSV3} based on the
+   sanitized, system-wide values for protected VMs
+
+----------------------------------------------------------------
+Fuad Tabba (1):
+      KVM: arm64: Advertise ID_AA64PFR0_EL1.CSV2/3 to protected VMs
+
+Reiji Watanabe (1):
+      KVM: arm64: PMU: Restore the guest's EL0 event counting after migration
+
+ arch/arm64/kvm/arm.c                           | 26 +++++++++++++++++++++++++-
+ arch/arm64/kvm/hyp/include/nvhe/fixed_config.h |  5 ++++-
+ arch/arm64/kvm/hyp/nvhe/sys_regs.c             |  7 -------
+ arch/arm64/kvm/pmu-emul.c                      |  1 +
+ arch/arm64/kvm/sys_regs.c                      |  1 -
+ 5 files changed, 30 insertions(+), 10 deletions(-)
