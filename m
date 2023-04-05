@@ -2,198 +2,302 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8731B6D7A67
-	for <lists+kvm@lfdr.de>; Wed,  5 Apr 2023 12:53:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 68D736D7B51
+	for <lists+kvm@lfdr.de>; Wed,  5 Apr 2023 13:29:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237504AbjDEKxU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Apr 2023 06:53:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34754 "EHLO
+        id S237908AbjDEL3a (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Apr 2023 07:29:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43072 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237236AbjDEKxS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Apr 2023 06:53:18 -0400
-Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F811AB;
-        Wed,  5 Apr 2023 03:53:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1680691989; x=1712227989;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=MkZ2gE13I1UcU0OaWmNUYcnAGe/Vxa0Pe6PhDl19euE=;
-  b=lgFqYfka7HCZ0rpGKhSgaUfnZ8+vrHdCCBjM8FYaHoQI1iwPJ+nB3QgM
-   1k17EsE0TfVNU+8mswHPFm/nxe5m651l48RVppD/8hnVIyDIPuYJzgNHf
-   VbGuoHimWtfXRxRnwdzDOeejUR1ff7lEdm1ypIj8VhslKbL/hyrbhPERZ
-   BzWq0E9LxxmkeMWFkmJ21E4E02Af7J/gKs+VTyILNDHt3E2WHfQehjglw
-   RNgxkc1+K5jMKQsezmU1RUdK5llz7S4n4dPmh1glZJl5Tdt4MbfSU2qh7
-   RED89xclAWWhLy0y++eS44bmL3oIJcC4myyxyuTMCtS6PVfaENZC6xhrb
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10670"; a="405196093"
-X-IronPort-AV: E=Sophos;i="5.98,319,1673942400"; 
-   d="scan'208";a="405196093"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Apr 2023 03:53:08 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10670"; a="719275452"
-X-IronPort-AV: E=Sophos;i="5.98,319,1673942400"; 
-   d="scan'208";a="719275452"
-Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
-  by orsmga001.jf.intel.com with ESMTP; 05 Apr 2023 03:53:08 -0700
-Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.21; Wed, 5 Apr 2023 03:53:08 -0700
-Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
- fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.21; Wed, 5 Apr 2023 03:53:07 -0700
-Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
- fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.21 via Frontend Transport; Wed, 5 Apr 2023 03:53:07 -0700
-Received: from NAM02-SN1-obe.outbound.protection.outlook.com (104.47.57.44) by
- edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.21; Wed, 5 Apr 2023 03:53:07 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=cE29MM8qhgp37BO5yTKsL7DME9TYYYlAKboN2es9URJe7k65kog0oXh93ht3FYiQ+octgXe0/0Xr0OkfYWQUVquPbxe1s71zgzOXdcx7+d6UIdIDBhZEBjWmcmoaAU7N0kh4jExwk8YSAwJg7n8irVMYUsE7Syf2ICybGVUaK+HENa8QvVXVIjKIxYNZxBZiOsS3IBpXzKkdsocv8MNqO9DwWHtX+0u1gGtprvV/fKJfkUdPuAfX7pp41PKn3qCwyfGcvDgkV6YCHASeWhOSyF+XmG8IvJFVyHS5V5fVmbLNJ2odwbFF5hlKRyU+gRD7qq/hjgeBFodyjYqeUlagyg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=MkZ2gE13I1UcU0OaWmNUYcnAGe/Vxa0Pe6PhDl19euE=;
- b=cOW1yjvxbiNNPZXa/6j5VUqXknwBnIUFYSl8JrVKjwVnoR2eTd6h2H2QGbADkTAWxAOG/MyX7Br+g7SSYOEIKd4tU5SiZ50Z/OmGsjtfSOjzhwcaOXcycpSvivuY6GyY4ai9EB3OOYmPxYTW5T7L4CGZVa92G8+ogfW8VWyiAlq3nalpqlj7Lt9sgh0nwU5x4r3cxkrhz1nkDFGlhH3fd3MMVlNFwatJ6UOzRPbPs881oIWj1is3rAzeVDhClLjakv8MjUczQOhl2JTYUIrfEmT0HWdMXuPlrXsfEmcEgBv5GAQF0bkCYseuEDWirHa6U/5pg9tiKYzeOL+oTJ3cLQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from BL1PR11MB5978.namprd11.prod.outlook.com (2603:10b6:208:385::18)
- by CO1PR11MB5170.namprd11.prod.outlook.com (2603:10b6:303:91::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6222.33; Wed, 5 Apr
- 2023 10:53:00 +0000
-Received: from BL1PR11MB5978.namprd11.prod.outlook.com
- ([fe80::f403:a0a2:e468:c1e9]) by BL1PR11MB5978.namprd11.prod.outlook.com
- ([fe80::f403:a0a2:e468:c1e9%5]) with mapi id 15.20.6254.033; Wed, 5 Apr 2023
- 10:53:00 +0000
-From:   "Huang, Kai" <kai.huang@intel.com>
-To:     "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "Christopherson,, Sean" <seanjc@google.com>
-CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH 1/3] KVM: VMX: Don't rely _only_ on CPUID to enforce XCR0
- restrictions for ECREATE
-Thread-Topic: [PATCH 1/3] KVM: VMX: Don't rely _only_ on CPUID to enforce XCR0
- restrictions for ECREATE
-Thread-Index: AQHZZ1neYlqkq4ONyEOC8NUatF9pta8cityA
-Date:   Wed, 5 Apr 2023 10:52:59 +0000
-Message-ID: <626179c54707297736158da89ee634705cd6d62f.camel@intel.com>
-References: <20230405005911.423699-1-seanjc@google.com>
-         <20230405005911.423699-2-seanjc@google.com>
-In-Reply-To: <20230405005911.423699-2-seanjc@google.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-user-agent: Evolution 3.46.4 (3.46.4-1.fc37) 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BL1PR11MB5978:EE_|CO1PR11MB5170:EE_
-x-ms-office365-filtering-correlation-id: 26278099-5354-4a45-5589-08db35c3ec1c
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: lso6MsHpkyJVlL5iBZedeazGewUTkqzp2bEAMBR9VYcUOxAvBYrZ4BpZ6F4ZncgWWaNLH9iXe1nHeFF7M8Veg1VR2VNkGXxubYJKrL1o8p398aoUzriRh0LgsuqGYbzSNNKVhVRlbGAMsrg1pAcsTbET3YpnZjhZcq4ZfuE12midbmE/BwArn03v373u/zXEtXumrYzx4ek5XQ0BgBNZJtGx9Fx0JZUdDUYQRy1WIOGH1tofJXpKVAGlbI19f72YHfOKCJCSlGrdX6i2hbVgaj74cf1ezaZ1DtBwZ1dJY7yM4bjcFh3zT1pZ2Hv5MtWQkmyxdr4ujsnKrX8ZBUGLWU8nEFx93+nWLFAuGRKzL7mDuQMHoKTqlyLaxcT8hbIkjLFwUCjIZ665e5vq8QrF2i94lC8Y6xXa91AEtw1a19WI2UOJcZld2gRmirALEWTc4t1fGard+ogN3Ks7eMOEvqHPLJyP1Sm2LthpgVaAzu0yI08AyRMlsFItweAeRHiGYEQxVHBK58AjnL4HT0W4Zult87deu0v/FWNClpBH1nou1/beb8L6A7C5ut7hwjHicB0hC0RKo3/NRkbFoZzL1lCkLyJbckKFuGdZgtOgf//sSDDI+Ont4dEeG3mBLlXO
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR11MB5978.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(376002)(396003)(136003)(39860400002)(346002)(366004)(451199021)(54906003)(8936002)(5660300002)(38100700002)(2616005)(36756003)(26005)(38070700005)(6512007)(6506007)(66446008)(66476007)(64756008)(8676002)(76116006)(91956017)(66946007)(4326008)(2906002)(186003)(86362001)(71200400001)(66556008)(6486002)(83380400001)(41300700001)(122000001)(110136005)(316002)(478600001)(82960400001);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?UzF6TnAvNWpVNmduK3FjSXRxN1NmRzJIVW1XSmtMYXpoUGw3WVVlQWEreFM0?=
- =?utf-8?B?MFYyMVpHZWFhQ2R6MWZLUmVMWThsSVUxTUpjUDJJSHhsMlBNNWVZYVNXcmRC?=
- =?utf-8?B?MUdtYTlrY0QzUzlicTFtcHpId2k4eVkxNjFZV3ExamxWcnhxenRTY1hLb0sw?=
- =?utf-8?B?ay9jOEZKVkdCZjJrRnZQRWJIbTN6Y0xBME9sbzZaWmlTbUhOcTh3ZlJvTFhv?=
- =?utf-8?B?MUo5dGJTcUdsVFJrWmY5QXo5R2FQVEdYRkduUFVqZk9wTHd1djkzYThjbFNo?=
- =?utf-8?B?ZGxwZ0lLQkc1b3UxQ1M1UkhCSXJBSkpqejZHVUdTY1hncktOdXNkOTRDUFhr?=
- =?utf-8?B?dy9hTE0vYnNLOTJoUWsrRExyRGFhQStKTnV2NG1Ub2cxMzFOS3BRbVp5UDla?=
- =?utf-8?B?MWJvWCtYMnllOUJFRFZEYVNpMEtFL21IUVlLb3c3enlPaGtyaWhLb1VIOWdN?=
- =?utf-8?B?ZlVnTEJSeFBPeUhvQk9SR2ZGUmRhNDRleWtmdlFWemoraS84NDBhQ3JQY09Q?=
- =?utf-8?B?ZXR4akVvdkxYSlYyZ0VGYkNRQ0w0L29PMDhFcEJKbGVCMk5hdkhkcXhTdURW?=
- =?utf-8?B?MHc3KzdQWUtrdkRIcXlrUmlQeU5pZ2V3aFZzZldncUMwYnd1MnkvSGNEV3Nv?=
- =?utf-8?B?OVBUYVloWHEwQzQ3WlYvNVhYU0I3UEpTVjhLZlRTRVQzeUxNdU45SkEwdXpG?=
- =?utf-8?B?dmRldE5LSDZtMUxwa1Z3MyttcGphWVJEQnQwL2FUMUhvNzAwUkI1M2JHUmZG?=
- =?utf-8?B?aSsyaFlDTlF2bWdDSkVaSG1CbHhmNSsvakJvTnpLSzQ4RUNxUjdIQ2FkYjhs?=
- =?utf-8?B?V0hzZXcxbmt1cTg1WHJQNHlMK2IzYW5admx0RnE3TGlZclpydlpjWmpWcndG?=
- =?utf-8?B?eHUrK2x2YXhCMFJXL0k1REpWRm5nWC9BN1hTaGtSVGV6Y0lESWhlREhtb1VG?=
- =?utf-8?B?RDRCdGl0OUd0QVdSc3oyRWRZRzhNQWZ2dXJLUHB5TWVDclN0WXkxYmZLQ0hk?=
- =?utf-8?B?THhuMURYdXZsRjRDSUl3aU9TTzdGODg0MGxkbFlvZnV5UXZoajltNFhNZ3cz?=
- =?utf-8?B?M0pjQW1MZEtyb2xNVUpqZUNlZnFKSDl6cjZnZGJwTE4waW0xOThCR3lBaWxG?=
- =?utf-8?B?b2lYdEY2bE90aFQremVhYi8ydHZCaWxqQ011TFFSNDFCM1Z0ZEdWMGFhMTdN?=
- =?utf-8?B?WFRDenhrdnd5cmRKanFHVlYrTmlWWWpMVHVDbWVJWmZFVHBubnZ2YUdqNjBm?=
- =?utf-8?B?S1U2TU91eHd5SnpkOXpWWnVDNlc0bXNXbDY2TDRUaGVMM1M2SGJTejA0a3lK?=
- =?utf-8?B?ZjJ1ZFN6b0liR2diSXVkd1ptdFZLT0NYaWFqQmc4S3dGdFJuZGNGQTdyMlhj?=
- =?utf-8?B?T3duZmRWWkdKeFBpVDRkbFJGSytITGdqRXFiSC8ybjNMRk1GRDl6ZDVnaXZX?=
- =?utf-8?B?OWhWdTJGYXRpS0MzLzJnbmU1MlN1RTRGNVhLRmxINkJGcUJHZUxjNjl2SHY1?=
- =?utf-8?B?U0JiSjFnNWhwM3htdWxhamdMVTllMi85SjlZSG1lTk5pK3Zac0J5OTlsNERh?=
- =?utf-8?B?eGI2UUJzd0UrVFk0Vkx5NVdEUWYzMXdRRFZvZzh6ellwSnBsdlkrVi93VENM?=
- =?utf-8?B?eEtEZXJ6TU5iSHR6SzlqVXZxWTBiYkxTL25LS3QvQTJNSk9MeXpwUWk0ZlpX?=
- =?utf-8?B?ejlkaEk0cWZmaUJ0LzZJcEx5a2UxbGxqRk84WHBPZ0dGYzY3MjhYV1Rmenhi?=
- =?utf-8?B?ZmZER3JVQkZQNHJnbVJRTzUreDErckR1QjdlSHMrZ3hIKzFmcFdYWlVNblZp?=
- =?utf-8?B?Q3h0MkVlVDRYeDNySitkRHl4QlRPZFRKeHZSWmZBdzJFWUVUY1d4U0RyWUF4?=
- =?utf-8?B?OHNNaWMwU1I1RjJZNGpweVhLSDZ0K0J0SEJBNzQ0cHRDSGYydDFEeTdYZEF6?=
- =?utf-8?B?NmxhNEdCeUR2RmVoTFpPTUdVYUF2UTlkOVBLemJkNVl0T2F1V2cwM1Z5L2k5?=
- =?utf-8?B?L2dTd3YyUGRGYnBHSFhjOGFXTzVhSURoTVdXa2p4ODYzVytqRXAyM3JiMUh4?=
- =?utf-8?B?ZkF4Mkp3UlluY3FWVjI0ZFRxVDNtZGg0dHhENmdNdU4xUkZXajE4a0o1Z3hP?=
- =?utf-8?Q?LhzxOtlJNnir2cSxxtoQG08T3?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <5A8471DEA3E80E42BCCD193F5D6B26D6@namprd11.prod.outlook.com>
-Content-Transfer-Encoding: base64
+        with ESMTP id S237907AbjDEL3Z (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Apr 2023 07:29:25 -0400
+Received: from mail-ed1-x535.google.com (mail-ed1-x535.google.com [IPv6:2a00:1450:4864:20::535])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B91B527F
+        for <kvm@vger.kernel.org>; Wed,  5 Apr 2023 04:29:20 -0700 (PDT)
+Received: by mail-ed1-x535.google.com with SMTP id 4fb4d7f45d1cf-4fa3c1a7a41so316907a12.2
+        for <kvm@vger.kernel.org>; Wed, 05 Apr 2023 04:29:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=grsecurity.net; s=grsec; t=1680694159;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=yiy/yuoSNHLTP2g0kWK+iynp1hgQYX2IcbSZcMLPcD0=;
+        b=rxZdxoCJjE2OZQVO76Mm2mYkQv99sJ4LBn3lwF9i1ZyGfAlFnvD6cGrait2/v33scQ
+         XmGsqbnz2phSmoceJpIPAc+mq0G1VfWvgF4U3nQw3lVY0brI1bHHgvwpO/rNjZK+QkVP
+         sr9AzuK4xQn/Jt2i73T0P9IYJKneCyjWGusz8hHOenAuHTWKSrOb+JAPxgq6YxWIteq2
+         uOO0toneZWV7e1F2kzVaU2sd9YJr6CmM4Qdr/IM50rSPdbpgExrqukAzdVzC3PkBHsXI
+         Tg7nqRlZmcadquaOOBNF6odjkmIMsOx6FudWLhl7g/wRFgoAmVE7Nd8x2Xr7ixW6qwi5
+         LOyw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1680694159;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=yiy/yuoSNHLTP2g0kWK+iynp1hgQYX2IcbSZcMLPcD0=;
+        b=qZr9NCOI+/Yu8Wkb7b7dwdcMi7cRW8gROux6GipAr6w2043abKeo/Jm42pY1ya4Top
+         2NAEYwWTMYNa89E15kzCh6HBa+oqt/qsfpCcj4V2wxcVeG0epzY4xCEHFuR7lCIWxOWc
+         emH2zapHXzyVeQ8dC21sYw4XVSl0QawvTp3Ofv9qTS6jdiP4epIOR+vmRgTPX9qkbs97
+         wHh8xQKCjZC223vtid7uW3o9MOeRZeYNrMMUcUXc9+jo3yCf5oT3nRJRjUeHd65n5s9L
+         jb0HbzCv8KrjF5W4mJNUkLACtAK8Y1rqPnTCCkOS7zaaZEb8ULQtpf/C7Lq7qQHxjB6z
+         8Z9g==
+X-Gm-Message-State: AAQBX9erMHEbYsPdqCGPFEVstqOD3LhGl71SZCpO20cOi7jsi/uOzthZ
+        UANnyL0zEcVcdK7HUzn/pGjCqQ==
+X-Google-Smtp-Source: AKy350ZWlW8gRBR1cg1FMuROkrhNzHRvgc8+brb+r3erf/CHid/zb2Bqx5x9X2ULkIERyBmr4v3W0Q==
+X-Received: by 2002:aa7:cf8e:0:b0:4fa:57bf:141a with SMTP id z14-20020aa7cf8e000000b004fa57bf141amr1360422edx.32.1680694158734;
+        Wed, 05 Apr 2023 04:29:18 -0700 (PDT)
+Received: from ?IPV6:2003:f6:af39:8900:5941:dee7:da1a:b514? (p200300f6af3989005941dee7da1ab514.dip0.t-ipconnect.de. [2003:f6:af39:8900:5941:dee7:da1a:b514])
+        by smtp.gmail.com with ESMTPSA id o13-20020a50c90d000000b004f9ca99cf5csm6953193edh.92.2023.04.05.04.29.18
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 05 Apr 2023 04:29:18 -0700 (PDT)
+Message-ID: <8ce083e1-ae19-c9be-4d10-95c5237fce4e@grsecurity.net>
+Date:   Wed, 5 Apr 2023 13:29:17 +0200
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BL1PR11MB5978.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 26278099-5354-4a45-5589-08db35c3ec1c
-X-MS-Exchange-CrossTenant-originalarrivaltime: 05 Apr 2023 10:52:59.9052
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 0AT3bi+o5X3bVC2OXpGu0fd20Xp3aTObq9eOQNHRMuFULJJT29Mci4GXOAEysJh5kDpWe7MwZ6GVnJLKLuMJjQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO1PR11MB5170
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-2.5 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE autolearn=unavailable autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.9.0
+Subject: Re: [kvm-unit-tests PATCH v4 5/9] x86/access: Add forced emulation
+ support
+Content-Language: en-US, de-DE
+To:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org
+References: <20230404165341.163500-1-seanjc@google.com>
+ <20230404165341.163500-6-seanjc@google.com>
+From:   Mathias Krause <minipli@grsecurity.net>
+In-Reply-To: <20230404165341.163500-6-seanjc@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-1.2 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
+        DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-T24gVHVlLCAyMDIzLTA0LTA0IGF0IDE3OjU5IC0wNzAwLCBTZWFuIENocmlzdG9waGVyc29uIHdy
-b3RlOg0KPiBFeHBsaWNpdGx5IGNoZWNrIHRoZSB2Q1BVJ3Mgc3VwcG9ydGVkIFhDUjAgd2hlbiBk
-ZXRlcm1pbmluZyB3aGV0aGVyIG9yIG5vdA0KPiB0aGUgWEZSTSBmb3IgRUNSRUFURSBpcyB2YWxp
-ZC4gIENoZWNraW5nIENQVUlEIHdvcmtzIGJlY2F1c2UgS1ZNIHVwZGF0ZXMNCj4gZ3Vlc3QgQ1BV
-SUQuMHgxMi4xIHRvIHJlc3RyaWN0IHRoZSBsZWFmIHRvIGEgc3Vic2V0IG9mIHRoZSBndWVzdCdz
-IGFsbG93ZWQNCj4gWENSMCwgYnV0IHRoYXQgaXMgcmF0aGVyIHN1YnRsZSBhbmQgS1ZNIHNob3Vs
-ZCBub3QgbW9kaWZ5IGd1ZXN0IENQVUlEDQo+IGV4Y2VwdCBmb3IgbW9kZWxpbmcgdHJ1ZSBydW50
-aW1lIGJlaGF2aW9yIChhbGxvd2VkIFhGUk0gaXMgbW9zdCBkZWZpbml0ZWx5DQo+IG5vdCAicnVu
-dGltZSIgYmVoYXZpb3IpLg0KPiANCj4gU2lnbmVkLW9mZi1ieTogU2VhbiBDaHJpc3RvcGhlcnNv
-biA8c2VhbmpjQGdvb2dsZS5jb20+DQo+IC0tLQ0KPiAgYXJjaC94ODYva3ZtL3ZteC9zZ3guYyB8
-IDMgKystDQo+ICAxIGZpbGUgY2hhbmdlZCwgMiBpbnNlcnRpb25zKCspLCAxIGRlbGV0aW9uKC0p
-DQo+IA0KPiBkaWZmIC0tZ2l0IGEvYXJjaC94ODYva3ZtL3ZteC9zZ3guYyBiL2FyY2gveDg2L2t2
-bS92bXgvc2d4LmMNCj4gaW5kZXggYWE1M2M5ODAzNGJmLi4zNjJhMzFiMTliMGUgMTAwNjQ0DQo+
-IC0tLSBhL2FyY2gveDg2L2t2bS92bXgvc2d4LmMNCj4gKysrIGIvYXJjaC94ODYva3ZtL3ZteC9z
-Z3guYw0KPiBAQCAtMTc1LDcgKzE3NSw4IEBAIHN0YXRpYyBpbnQgX19oYW5kbGVfZW5jbHNfZWNy
-ZWF0ZShzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsDQo+ICAJICAgICh1MzIpYXR0cmlidXRlcyAmIH5z
-Z3hfMTJfMS0+ZWF4IHx8DQo+ICAJICAgICh1MzIpKGF0dHJpYnV0ZXMgPj4gMzIpICYgfnNneF8x
-Ml8xLT5lYnggfHwNCj4gIAkgICAgKHUzMil4ZnJtICYgfnNneF8xMl8xLT5lY3ggfHwNCj4gLQkg
-ICAgKHUzMikoeGZybSA+PiAzMikgJiB+c2d4XzEyXzEtPmVkeCkgew0KPiArCSAgICAodTMyKSh4
-ZnJtID4+IDMyKSAmIH5zZ3hfMTJfMS0+ZWR4IHx8DQo+ICsJICAgIHhmcm0gJiB+dmNwdS0+YXJj
-aC5ndWVzdF9zdXBwb3J0ZWRfeGNyMCkgew0KDQpQZXJoYXBzIHRoaXMgY2hhbmdlIGlzIG5lZWRl
-ZCBldmVuIHdpdGhvdXQgcGF0Y2ggMj8NCg0KVGhpcyBpcyBiZWNhdXNlIHdoZW4gQ1BVSUQgMHhE
-IGRvZXNuJ3QgZXhpc3QsIGd1ZXN0X3N1cHBvcnRlZF94Y3IwIGlzIDAuICBCdXQNCndoZW4gQ1BV
-SUQgMHhEIGRvZXNuJ3QgZXhpc3QsIElJVUMgY3VycmVudGx5IEtWTSBkb2Vzbid0IGNsZWFyIFNH
-WCBpbiBDUFVJRCwgYW5kDQpzZ3hfMTJfMS0+ZWN4IGlzIGFsd2F5cyBzZXQgdG8gMHgzLiDCoA0K
-DQpfX2hhbmRsZV9lbmNsc19lcmVhdGUoKSBkb2Vzbid0IGNoZWNrIENQVUlEIDB4RCBlaXRoZXIs
-IHNvIHcvbyBhYm92ZSBleHBsaWNpdA0KY2hlY2sgeGZybSBhZ2FpbnN0IGd1ZXN0X3N1cHBvcnRl
-ZF94Y3IwLCBpdCBzZWVtcyBndWVzdCBjYW4gc3VjY2Vzc2Z1bGx5IHJ1bg0KRUNSRUFURSB3aGVu
-IGl0IGRvZXNuJ3QgaGF2ZSBDUFVJRCAweEQ/DQoNCg0KPiAgCQlrdm1faW5qZWN0X2dwKHZjcHUs
-IDApOw0KPiAgCQlyZXR1cm4gMTsNCj4gIAl9DQo+IC0tIA0KPiAyLjQwLjAuMzQ4LmdmOTM4YjA5
-MzY2LWdvb2cNCj4gDQoNCg==
+On 04.04.23 18:53, Sean Christopherson wrote:
+> From: Mathias Krause <minipli@grsecurity.net>
+
+I saw you did some additional changes. Comments below...
+
+> 
+> Add support to force access tests to be handled by the emulator, if
+> supported by KVM.  Due to emulation being rather slow, make the forced
+> emulation nodefault, i.e. a manual-only testcase.  Note, "manual" just
+> means the test runner needs to specify a specific group(s), i.e. the
+> test is still easy to enable in CI for compatible setups.
+> 
+> Manually check for FEP support in the test instead of using the "check"
+> option to query the module param, as any non-zero force_emulation_prefix
+> value enables FEP (see KVM commit d500e1ed3dc8 ("KVM: x86: Allow clearing
+> RFLAGS.RF on forced emulation to test code #DBs") and scripts/runtime.bash
+> only supports checking for a single value.
+> 
+> Defer enabling FEP for the nested VMX variants to a future patch.  KVM has
+> a bug related to emulating NOP (yes, NOP) for L2, and the nVMX varaints
+                                                                    ~~
+typo: variants
+
+> will require additional massaging to propagate the "allow emulation" flag.
+> 
+> Signed-off-by: Mathias Krause <minipli@grsecurity.net>
+> [sean: make generic fep testcase nodefault instead of impossible]
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  x86/access.c      | 38 +++++++++++++++++++++++++++++++-------
+>  x86/access.h      |  2 +-
+>  x86/access_test.c |  8 +++++---
+>  x86/unittests.cfg |  6 ++++++
+>  x86/vmx_tests.c   |  2 +-
+>  5 files changed, 44 insertions(+), 12 deletions(-)
+> 
+> diff --git a/x86/access.c b/x86/access.c
+> index 1677d52e..4a3ca265 100644
+> --- a/x86/access.c
+> +++ b/x86/access.c
+> @@ -82,7 +82,9 @@ enum {
+>  	AC_CPU_CR4_SMEP_BIT,
+>  	AC_CPU_CR4_PKE_BIT,
+>  
+> -	NR_AC_FLAGS
+> +	AC_FEP_BIT,
+> +
+> +	NR_AC_FLAGS,
+>  };
+>  
+>  #define AC_PTE_PRESENT_MASK   (1 << AC_PTE_PRESENT_BIT)
+> @@ -121,6 +123,8 @@ enum {
+>  #define AC_CPU_CR4_SMEP_MASK  (1 << AC_CPU_CR4_SMEP_BIT)
+>  #define AC_CPU_CR4_PKE_MASK   (1 << AC_CPU_CR4_PKE_BIT)
+>  
+> +#define AC_FEP_MASK           (1 << AC_FEP_BIT)
+> +
+>  const char *ac_names[] = {
+>  	[AC_PTE_PRESENT_BIT] = "pte.p",
+>  	[AC_PTE_ACCESSED_BIT] = "pte.a",
+> @@ -152,6 +156,7 @@ const char *ac_names[] = {
+>  	[AC_CPU_CR0_WP_BIT] = "cr0.wp",
+>  	[AC_CPU_CR4_SMEP_BIT] = "cr4.smep",
+>  	[AC_CPU_CR4_PKE_BIT] = "cr4.pke",
+> +	[AC_FEP_BIT] = "fep",
+>  };
+>  
+>  static inline void *va(pt_element_t phys)
+> @@ -799,10 +804,13 @@ static int ac_test_do_access(ac_test_t *at)
+>  
+>  	if (F(AC_ACCESS_TWICE)) {
+>  		asm volatile ("mov $fixed2, %%rsi \n\t"
+> -			      "mov (%[addr]), %[reg] \n\t"
+> +			      "cmp $0, %[fep] \n\t"
+> +			      "jz 1f \n\t"
+> +			      KVM_FEP
+> +			      "1: mov (%[addr]), %[reg] \n\t"
+>  			      "fixed2:"
+>  			      : [reg]"=r"(r), [fault]"=a"(fault), "=b"(e)
+> -			      : [addr]"r"(at->virt)
+> +			      : [addr]"r"(at->virt), [fep]"r"(F(AC_FEP))
+>  			      : "rsi");
+>  		fault = 0;
+>  	}
+> @@ -823,9 +831,15 @@ static int ac_test_do_access(ac_test_t *at)
+>  		      "jnz 2f \n\t"
+>  		      "cmp $0, %[write] \n\t"
+>  		      "jnz 1f \n\t"
+> -		      "mov (%[addr]), %[reg] \n\t"
+> +		      "cmp $0, %[fep] \n\t"
+> +		      "jz 0f \n\t"
+> +		      KVM_FEP
+> +		      "0: mov (%[addr]), %[reg] \n\t"
+>  		      "jmp done \n\t"
+> -		      "1: mov %[reg], (%[addr]) \n\t"
+> +		      "1: cmp $0, %[fep] \n\t"
+> +		      "jz 0f \n\t"
+> +		      KVM_FEP
+> +		      "0: mov %[reg], (%[addr]) \n\t"
+>  		      "jmp done \n\t"
+>  		      "2: call *%[addr] \n\t"
+>  		      "done: \n"
+> @@ -843,6 +857,7 @@ static int ac_test_do_access(ac_test_t *at)
+>  			[write]"r"(F(AC_ACCESS_WRITE)),
+>  			[user]"r"(F(AC_ACCESS_USER)),
+>  			[fetch]"r"(F(AC_ACCESS_FETCH)),
+> +			[fep]"r"(F(AC_FEP)),
+>  			[user_ds]"i"(USER_DS),
+>  			[user_cs]"i"(USER_CS),
+>  			[user_stack_top]"r"(user_stack + sizeof user_stack),
+> @@ -1209,12 +1224,17 @@ const ac_test_fn ac_test_cases[] =
+>  	check_effective_sp_permissions,
+>  };
+>  
+> -void ac_test_run(int pt_levels)
+> +void ac_test_run(int pt_levels, bool force_emulation)
+>  {
+>  	ac_test_t at;
+>  	ac_pt_env_t pt_env;
+>  	int i, tests, successes;
+>  
+> +	if (force_emulation && !is_fep_available()) {
+> +		report_skip("Forced emulation prefix (FEP) not available\n");
+
+Trailing "\n" isn't needed, report_skip() already emits one.
+
+> +		return;
+> +	}
+> +
+>  	printf("run\n");
+>  	tests = successes = 0;
+>  
+> @@ -1232,6 +1252,9 @@ void ac_test_run(int pt_levels)
+>  		invalid_mask |= AC_PTE_BIT36_MASK;
+>  	}
+>  
+> +	if (!force_emulation)
+> +		invalid_mask |= AC_FEP_MASK;
+> +
+>  	ac_env_int(&pt_env, pt_levels);
+>  	ac_test_init(&at, 0xffff923400000000ul, &pt_env);
+>  
+> @@ -1292,5 +1315,6 @@ void ac_test_run(int pt_levels)
+>  
+>  	printf("\n%d tests, %d failures\n", tests, tests - successes);
+>  
+> -	report(successes == tests, "%d-level paging tests", pt_levels);
+> +	report(successes == tests, "%d-level paging tests%s", pt_levels,
+> +	       force_emulation ? " (with forced emulation)" : "");
+>  }
+> diff --git a/x86/access.h b/x86/access.h
+> index 9a6c5628..206a1c86 100644
+> --- a/x86/access.h
+> +++ b/x86/access.h
+> @@ -4,6 +4,6 @@
+>  #define PT_LEVEL_PML4 4
+>  #define PT_LEVEL_PML5 5
+>  
+> -void ac_test_run(int page_table_levels);
+> +void ac_test_run(int page_table_levels, bool force_emulation);
+>  
+>  #endif // X86_ACCESS_H
+
+> \ No newline at end of file
+
+Maybe fix that while already touching the file?
+
+> diff --git a/x86/access_test.c b/x86/access_test.c
+> index 2ac649d2..025294da 100644
+> --- a/x86/access_test.c
+> +++ b/x86/access_test.c
+> @@ -3,10 +3,12 @@
+>  #include "x86/vm.h"
+>  #include "access.h"
+>  
+> -int main(void)
+> +int main(int argc, const char *argv[])
+>  {
+> +	bool force_emulation = argc >= 2 && !strcmp(argv[1], "force_emulation");
+> +
+>  	printf("starting test\n\n");
+> -	ac_test_run(PT_LEVEL_PML4);
+> +	ac_test_run(PT_LEVEL_PML4, force_emulation);
+>  
+>  #ifndef CONFIG_EFI
+>  	/*
+> @@ -16,7 +18,7 @@ int main(void)
+>  	if (this_cpu_has(X86_FEATURE_LA57)) {
+>  		printf("starting 5-level paging test.\n\n");
+>  		setup_5level_page_table();
+> -		ac_test_run(PT_LEVEL_PML5);
+> +		ac_test_run(PT_LEVEL_PML5, force_emulation);
+>  	}
+>  #endif
+>  
+> diff --git a/x86/unittests.cfg b/x86/unittests.cfg
+> index f324e32d..6194e0ea 100644
+> --- a/x86/unittests.cfg
+> +++ b/x86/unittests.cfg
+> @@ -143,6 +143,12 @@ file = access_test.flat
+>  arch = x86_64
+>  extra_params = -cpu max
+>  
+> +[access_fep]
+> +file = access_test.flat
+> +arch = x86_64
+> +extra_params = -cpu max -append force_emulation
+> +groups = nodefault
+> +
+>  [access-reduced-maxphyaddr]
+>  file = access_test.flat
+>  arch = x86_64
+> diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
+> index 7bba8165..617b97b3 100644
+> --- a/x86/vmx_tests.c
+> +++ b/x86/vmx_tests.c
+> @@ -10460,7 +10460,7 @@ static void atomic_switch_overflow_msrs_test(void)
+>  
+>  static void vmx_pf_exception_test_guest(void)
+>  {
+> -	ac_test_run(PT_LEVEL_PML4);
+> +	ac_test_run(PT_LEVEL_PML4, false);
+>  }
+>  
+>  typedef void (*invalidate_tlb_t)(void *data);
