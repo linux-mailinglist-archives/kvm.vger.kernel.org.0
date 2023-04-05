@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6C1946D8242
-	for <lists+kvm@lfdr.de>; Wed,  5 Apr 2023 17:42:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 41D2E6D8240
+	for <lists+kvm@lfdr.de>; Wed,  5 Apr 2023 17:42:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238981AbjDEPm3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Apr 2023 11:42:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49222 "EHLO
+        id S238982AbjDEPm2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Apr 2023 11:42:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49028 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238984AbjDEPm1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S238902AbjDEPm1 (ORCPT <rfc822;kvm@vger.kernel.org>);
         Wed, 5 Apr 2023 11:42:27 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7FA986E8B
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E4334C20
         for <kvm@vger.kernel.org>; Wed,  5 Apr 2023 08:42:05 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 7CFE963ED2
-        for <kvm@vger.kernel.org>; Wed,  5 Apr 2023 15:41:37 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E53AAC433EF;
-        Wed,  5 Apr 2023 15:41:36 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 1B9AD63ED4
+        for <kvm@vger.kernel.org>; Wed,  5 Apr 2023 15:41:26 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 71F7AC4339B;
+        Wed,  5 Apr 2023 15:41:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1680709296;
-        bh=dFYqWAkqI7rmHSrp0oaI2dKputJS77Ob1ZODlvanPJU=;
+        s=k20201202; t=1680709285;
+        bh=+Dgp2ZystkCF2LXfDawgMy9ijTfY3yI7W5pOElk7QNY=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=nlf4WSg1EtXJ/cCOn5ndtcsowJ9MqaVXfcilDhAxCdvkxm7YZ0IsYAUY8lhDDhR6W
-         BbSPsu80Z+sY9b277vPrd1qCYtEZlbE0VhK6fYT8BsnXySbh3Evubw+ToiTLTJ8g1v
-         /LUJ0KEzwYAMdIKSfgHH06hIFn3f9q28Ogw2atbMOYPbjjOS0RBWYY0rVDhAoYbMfc
-         Yd9wdZxjeBr6X1wOhynHZM9YdJRVw/UCxa/xluD1iJF6oyetOh7j33fsgJgqws1WWB
-         YsN1+zM2S5ngN3k16bxivzXHXGTlRhWZrwdka9HeGLI6T+QnAX/umIQOwkbohblHfv
-         3Iajw2+Xu7rHw==
+        b=gpLtZ49aq6xshvE9Avjwx1vUS2du8qAoMfANObn1e0tIAFqqgrflklTTR8V1mEqZD
+         QNQ60Hx6SogXnZTWYGolIsJhqQ11kecOhqiHt1OAVmFRmQdQb/r+bgVDZ3YcbhysoP
+         imk8+4q6r4cEj4/xAAhdb8ViTipZ5PkBpy/2nL4ugwE070jqACH8z/RW8ZHRfHYejH
+         q2s/W3N9plS/fM50NIgGikCECfsSybfD72GpFzOX/dMcu+CxSoxE81IUi30l+E5hs5
+         DYCbiOj7jVtDu8yPz0gOl3geOZW8ER4VlYBXDmGHftW/paRBTDnQTc5JUiZzosocJH
+         okfnYO8n06qFw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1pk5FN-0062PV-KM;
+        id 1pk5FN-0062PV-U3;
         Wed, 05 Apr 2023 16:40:29 +0100
 From:   Marc Zyngier <maz@kernel.org>
 To:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
@@ -53,9 +53,9 @@ Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Oliver Upton <oliver.upton@linux.dev>,
         Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v9 10/50] KVM: arm64: nv: Respect the virtual HCR_EL2.NV bit setting
-Date:   Wed,  5 Apr 2023 16:39:28 +0100
-Message-Id: <20230405154008.3552854-11-maz@kernel.org>
+Subject: [PATCH v9 11/50] KVM: arm64: nv: Respect virtual HCR_EL2.TVM and TRVM settings
+Date:   Wed,  5 Apr 2023 16:39:29 +0100
+Message-Id: <20230405154008.3552854-12-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230405154008.3552854-1-maz@kernel.org>
 References: <20230405154008.3552854-1-maz@kernel.org>
@@ -76,182 +76,37 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Jintack Lim <jintack.lim@linaro.org>
 
-Forward traps due to HCR_EL2.NV bit to the virtual EL2 if they are not
-coming from the virtual EL2 and the virtual HCR_EL2.NV bit is set.
-
-In addition to EL2 register accesses, setting NV bit will also make EL12
-register accesses trap to EL2. To emulate this for the virtual EL2,
-forword traps due to EL12 register accessses to the virtual EL2 if the
-virtual HCR_EL2.NV bit is set. Same thing is done for SMCs issued by
-a guest and trapped by the virtual EL2.
+Forward the EL1 virtual memory register traps to the virtual EL2 if they
+are not coming from the virtual EL2 and the virtual HCR_EL2.TVM or TRVM
+bit is set.
 
 This is for recursive nested virtualization.
 
+Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
 Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
-[Moved code to emulate-nested.c]
-Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_arm.h    |  1 +
- arch/arm64/include/asm/kvm_nested.h |  3 +++
- arch/arm64/kvm/emulate-nested.c     | 27 +++++++++++++++++++++++++++
- arch/arm64/kvm/handle_exit.c        |  7 +++++++
- arch/arm64/kvm/sys_regs.c           | 21 +++++++++++++++++++++
- 5 files changed, 59 insertions(+)
+ arch/arm64/kvm/sys_regs.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-index baef29fcbeee..e47faadbfde1 100644
---- a/arch/arm64/include/asm/kvm_arm.h
-+++ b/arch/arm64/include/asm/kvm_arm.h
-@@ -20,6 +20,7 @@
- #define HCR_AMVOFFEN	(UL(1) << 51)
- #define HCR_FIEN	(UL(1) << 47)
- #define HCR_FWB		(UL(1) << 46)
-+#define HCR_NV		(UL(1) << 42)
- #define HCR_API		(UL(1) << 41)
- #define HCR_APK		(UL(1) << 40)
- #define HCR_TEA		(UL(1) << 37)
-diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
-index f8c4db870520..04096113cdf0 100644
---- a/arch/arm64/include/asm/kvm_nested.h
-+++ b/arch/arm64/include/asm/kvm_nested.h
-@@ -59,6 +59,9 @@ static inline u64 translate_ttbr0_el2_to_ttbr0_el1(u64 ttbr0)
- 	return ttbr0 & ~GENMASK_ULL(63, 48);
- }
- 
-+extern bool forward_traps(struct kvm_vcpu *vcpu, u64 control_bit);
-+extern bool forward_nv_traps(struct kvm_vcpu *vcpu);
-+
- struct sys_reg_params;
- struct sys_reg_desc;
- 
-diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
-index b96662029fb1..75cf6f15accc 100644
---- a/arch/arm64/kvm/emulate-nested.c
-+++ b/arch/arm64/kvm/emulate-nested.c
-@@ -14,6 +14,26 @@
- 
- #include "trace.h"
- 
-+bool forward_traps(struct kvm_vcpu *vcpu, u64 control_bit)
-+{
-+	bool control_bit_set;
-+
-+	if (!vcpu_has_nv(vcpu))
-+		return false;
-+
-+	control_bit_set = __vcpu_sys_reg(vcpu, HCR_EL2) & control_bit;
-+	if (!vcpu_is_el2(vcpu) && control_bit_set) {
-+		kvm_inject_nested_sync(vcpu, kvm_vcpu_get_esr(vcpu));
-+		return true;
-+	}
-+	return false;
-+}
-+
-+bool forward_nv_traps(struct kvm_vcpu *vcpu)
-+{
-+	return forward_traps(vcpu, HCR_NV);
-+}
-+
- static u64 kvm_check_illegal_exception_return(struct kvm_vcpu *vcpu, u64 spsr)
- {
- 	u64 mode = spsr & PSR_MODE_MASK;
-@@ -52,6 +72,13 @@ void kvm_emulate_nested_eret(struct kvm_vcpu *vcpu)
- 	u64 spsr, elr, mode;
- 	bool direct_eret;
- 
-+	/*
-+	 * Forward this trap to the virtual EL2 if the virtual
-+	 * HCR_EL2.NV bit is set and this is coming from !EL2.
-+	 */
-+	if (forward_nv_traps(vcpu))
-+		return;
-+
- 	/*
- 	 * Going through the whole put/load motions is a waste of time
- 	 * if this is a VHE guest hypervisor returning to its own
-diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-index 8355f7c2054f..49468f86aa2e 100644
---- a/arch/arm64/kvm/handle_exit.c
-+++ b/arch/arm64/kvm/handle_exit.c
-@@ -65,6 +65,13 @@ static int handle_smc(struct kvm_vcpu *vcpu)
- {
- 	int ret;
- 
-+	/*
-+	 * Forward this trapped smc instruction to the virtual EL2 if
-+	 * the guest has asked for it.
-+	 */
-+	if (forward_traps(vcpu, HCR_TSC))
-+		return 1;
-+
- 	/*
- 	 * "If an SMC instruction executed at Non-secure EL1 is
- 	 * trapped to EL2 because HCR_EL2.TSC is 1, the exception is a
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index cc3104167232..6628b66d02fb 100644
+index 6628b66d02fb..56cc60eede59 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -336,10 +336,19 @@ static int set_ccsidr(struct kvm_vcpu *vcpu, u32 csselr, u32 val)
- 	return 0;
- }
+@@ -420,6 +420,13 @@ static bool access_vm_reg(struct kvm_vcpu *vcpu,
+ 	if (el12_reg(p) && forward_nv_traps(vcpu))
+ 		return false;
  
-+static bool el12_reg(struct sys_reg_params *p)
-+{
-+	/* All *_EL12 registers have Op1=5. */
-+	return (p->Op1 == 5);
-+}
++	if (!el12_reg(p)) {
++		u64 bit = p->is_write ? HCR_TVM : HCR_TRVM;
 +
- static bool access_rw(struct kvm_vcpu *vcpu,
- 		      struct sys_reg_params *p,
- 		      const struct sys_reg_desc *r)
- {
-+	if (el12_reg(p) && forward_nv_traps(vcpu))
-+		return false;
-+
- 	if (p->is_write)
- 		vcpu_write_sys_reg(vcpu, p->regval, r->reg);
- 	else
-@@ -408,6 +417,9 @@ static bool access_vm_reg(struct kvm_vcpu *vcpu,
- 	bool was_enabled = vcpu_has_cache_enabled(vcpu);
- 	u64 val, mask, shift;
- 
-+	if (el12_reg(p) && forward_nv_traps(vcpu))
-+		return false;
++		if (forward_traps(vcpu, bit))
++			return false;
++	}
 +
  	/* We don't expect TRVM on the host */
  	BUG_ON(!vcpu_is_el2(vcpu) && !p->is_write);
  
-@@ -1897,6 +1909,9 @@ static bool access_elr(struct kvm_vcpu *vcpu,
- 		       struct sys_reg_params *p,
- 		       const struct sys_reg_desc *r)
- {
-+	if (el12_reg(p) && forward_nv_traps(vcpu))
-+		return false;
-+
- 	if (p->is_write)
- 		vcpu_write_sys_reg(vcpu, p->regval, ELR_EL1);
- 	else
-@@ -1909,6 +1924,9 @@ static bool access_spsr(struct kvm_vcpu *vcpu,
- 			struct sys_reg_params *p,
- 			const struct sys_reg_desc *r)
- {
-+	if (el12_reg(p) && forward_nv_traps(vcpu))
-+		return false;
-+
- 	if (p->is_write)
- 		__vcpu_sys_reg(vcpu, SPSR_EL1) = p->regval;
- 	else
-@@ -1921,6 +1939,9 @@ static bool access_spsr_el2(struct kvm_vcpu *vcpu,
- 			    struct sys_reg_params *p,
- 			    const struct sys_reg_desc *r)
- {
-+	if (el12_reg(p) && forward_nv_traps(vcpu))
-+		return false;
-+
- 	if (p->is_write)
- 		vcpu_write_sys_reg(vcpu, p->regval, SPSR_EL2);
- 	else
 -- 
 2.34.1
 
