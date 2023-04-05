@@ -2,165 +2,291 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B81616D7C0B
-	for <lists+kvm@lfdr.de>; Wed,  5 Apr 2023 13:56:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DBCBC6D7C18
+	for <lists+kvm@lfdr.de>; Wed,  5 Apr 2023 13:59:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237956AbjDEL4f (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Apr 2023 07:56:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42272 "EHLO
+        id S237007AbjDEL72 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Apr 2023 07:59:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45508 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237630AbjDEL4e (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Apr 2023 07:56:34 -0400
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2058.outbound.protection.outlook.com [40.107.244.58])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7861E3C0E;
-        Wed,  5 Apr 2023 04:56:32 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=BNCHhax4jjJa5iU+9jixF+ULHLR3yP27YtvAf9hAVaSzt73IZTa/MEmWsGf1ZajXHp6bT9smjuAs+spbaSiZUNm9VISdmX3RlkfbsB6xP3xLkEiB79KyqD8mB3m5Pm//BW3gLWt9MynvXFf/I7ojfaEN+WrXjyVwEXqbC9Pn16XUECQ2oDSeVXm3cqiFrlz07ECxkeq7B7/iSDliIJrFEPe6ASd855fhsclhSB6slxo4eQEYLwuDhRwiuo4KALucw4P4zTpjt5o6nsKtQnPYbBAJs/B5iIl3chi1rRbk/+Ryu8FtzyKtqyX74p15C+yXEG6LBwAnxIst6ACYG1uxlQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=+rJEMDHra+1+BQMxK42FJzeK0s7pnL9mKkFBo/ih6/Y=;
- b=d+GHRL2rg/Zt8qT//RDEbMqs1r1AhjjJtZZIb26IxZVv0fHlybq0XdIEqKlwdsqdECKfdeo2zcbZRYNF0ul9idu1fILR/AbsF29B8I7ZSexhHBFgbkxYflBk2h9QHUNbdxjexdxxlWPiUEi67FDCOI3kPZ/G84XitskQr1mBlwDmj386b2V/mcCN2UDPDvT8797NlKDNJgi02riHxWZ0dQ3Ve4pBE7wGMDzLVyRst1l2mhe0vmuSJZ8dABTcCXSteqMmW9k8t7RhV+sfDlWSzY3ePUs8blSmviKH/gd67Xqv5+lRo01GkJeJx2iqST3ZYASkFHjui6sR19q7xmQxJg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=+rJEMDHra+1+BQMxK42FJzeK0s7pnL9mKkFBo/ih6/Y=;
- b=TAQyvG3eDRSA/kiiHzartXzfe3c6vrptpWbdI9+w0WmqdpbsNaXMcmScv1390c/s1wwbBz6DTemEC2DomkOeRj7L1XjhP9vJhjO4NF9EqLJ0emGWGjkPKGwSoBoWG2FqBerbQAvD3cNOKj/qzuT7zZ3d7i4VCh620t9XpKi70tu40A/2H9NbdVUxo1zhYYyWbKyocTGcVcyTIK4UOsmvvVYkCYuoodqOGXyway8eXa5cJZSTNcbkVlu4CQpU/lhibhWRsc19iIEzr/3/C1z8ZTKK8fyNIUw6ceNZQlSU4Xy58bONVPeDmT4fgv8xGJTGEz4giYJD1haIceWizafLBA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by SJ0PR12MB6966.namprd12.prod.outlook.com (2603:10b6:a03:449::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6254.35; Wed, 5 Apr
- 2023 11:56:30 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::6045:ad97:10b7:62a2]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::6045:ad97:10b7:62a2%6]) with mapi id 15.20.6254.035; Wed, 5 Apr 2023
- 11:56:29 +0000
-Date:   Wed, 5 Apr 2023 08:56:28 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     Yi Liu <yi.l.liu@intel.com>, kevin.tian@intel.com, joro@8bytes.org,
-        robin.murphy@arm.com, cohuck@redhat.com, eric.auger@redhat.com,
-        nicolinc@nvidia.com, kvm@vger.kernel.org, mjrosato@linux.ibm.com,
-        chao.p.peng@linux.intel.com, yi.y.sun@linux.intel.com,
-        peterx@redhat.com, jasowang@redhat.com,
-        shameerali.kolothum.thodi@huawei.com, lulu@redhat.com,
-        suravee.suthikulpanit@amd.com, intel-gvt-dev@lists.freedesktop.org,
-        intel-gfx@lists.freedesktop.org, linux-s390@vger.kernel.org,
-        xudong.hao@intel.com, yan.y.zhao@intel.com, terrence.xu@intel.com,
-        yanting.jiang@intel.com
-Subject: Re: [PATCH v9 16/25] iommufd/device: Add iommufd_access_detach() API
-Message-ID: <ZC1h7PyuhEg3ZMcj@nvidia.com>
-References: <20230401151833.124749-1-yi.l.liu@intel.com>
- <20230401151833.124749-17-yi.l.liu@intel.com>
- <20230404164512.37bca62e.alex.williamson@redhat.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230404164512.37bca62e.alex.williamson@redhat.com>
-X-ClientProxiedBy: MN2PR22CA0024.namprd22.prod.outlook.com
- (2603:10b6:208:238::29) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|SJ0PR12MB6966:EE_
-X-MS-Office365-Filtering-Correlation-Id: f269dcbc-f1d6-426a-bbf1-08db35cccad6
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: L1ceSZz5amkOYLFRmAQarOBhDuH8hvahZLa+WCrmYssOnGgJ63Wf/05q+JdoXVFxhqIEvuhJPhamuQM0WEGaK2NUwjWUr7JgBUizvcMDp/JIEUb/ZioTK9WqO+vHfmG01fWEmoNAHWmYN3CxjXH47Fc6BXS5+Auk3sBtMUFhNqZMTj6wmQ7Y+0jIu6VyeuJWr4z6BV2+uUmYF80UMVCBuZc/QKd1G2gXhmlXjTMtyQUeSi+0S0keqc1fjCC7KKdo6rw5YBW8zFU4t8BQ/FZNiN04kJhbbOfRVGHLAeTT20/a5FC4gRHd3aj3NFgf9r0oDl0diBUygsiaKwQCag4OfyfK9tGDt3fXjhQaNT/FQFAuOus5u/+VSd2s+XfAZqxrlxPGztqiDhfNQN5FHW9GoQajkSIYe1XisRroec02H2FUE8oGbU3uORfAFNwTXBJAACMmKFoOJ1CjpyJQp8vaXT0ZkRjqtaFJtkgSfFLdwPWPpzth6rIL9iqRXfcJK34nKuZ7dUmyskyxWRuFVcx+KWl3BU8LYZMyF1VJUnNBLX6IRm5yy2G953OLou98XIs3
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(366004)(376002)(346002)(39860400002)(136003)(396003)(451199021)(6486002)(2616005)(6512007)(6506007)(38100700002)(186003)(8936002)(26005)(2906002)(7416002)(5660300002)(83380400001)(478600001)(36756003)(66476007)(66946007)(66556008)(41300700001)(6916009)(8676002)(86362001)(4326008)(316002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?smaD7vZFBr5KPlxQ9707RRoBUfY+MjLxoLcW+04MJ2+0vHaBmzwAaFaE+AT1?=
- =?us-ascii?Q?vLfJ0YSat12yt2P4qqEP83IaOd9Iw+5TTaNd3tzkfClMoS5Bns9MxO1l4ZZT?=
- =?us-ascii?Q?kjhtIL/uZS8y79TSB+3yYbRmhK80WjH2Fnnc7FQ0R7S+cE3EKh81zGvk53KL?=
- =?us-ascii?Q?KbRVZ4iNCcgVk657x9FSznVwdnBp/NT8sHTsa7DkKa9nMu1O4YPMPLiau+WO?=
- =?us-ascii?Q?eCBDMXG8z2PaAVPEqEh49H8/LgXFMLUmsMzWWECD2jAck7ZZpLpbITW3c4A0?=
- =?us-ascii?Q?6WzsDc3pU8/Tq/aH2A+a5T6il3jnlJ9hRrpcP+IPJ5ATKaKe2fX9Lqm8bR4q?=
- =?us-ascii?Q?XD2XONXmZ70C78Q9UxSp1gJyY2qU0lUh1QKCeZ4itcmE6zznVb7wILtE09Re?=
- =?us-ascii?Q?uQzjkSJlpgZWbzC2gqv6Wy+OWZtTVhZExt425fgqkNsgDaf2WyrMelV5h3uD?=
- =?us-ascii?Q?0FrbTUo+ZGMLI/GwHTBJvsuuJokolJosoj/f5S6lCL3qQFmd+ap1Sj/E7DUL?=
- =?us-ascii?Q?qiktL29g/wyGwMTr03o3pUwnzugIUaCBjlOtRbdrGfY5J0Zyp3wAQlhk3pio?=
- =?us-ascii?Q?olUoQfYGpc/QtXxUz1ngQaEb63nf3TheLu1VwkZZjC7KSkG7hd7NQ8ysd32F?=
- =?us-ascii?Q?o0+yv7OhRRLMQZdOQ2yvnDBnNbQG3GD7H+4yKHT4laivWvDuqVDWbW6Kb6hG?=
- =?us-ascii?Q?fft+FiOAAn2p5ujRhkMDDIRmwXbKI64Ph4ZG4Oy+I+vhir8sxEr1YbRb7/a9?=
- =?us-ascii?Q?AMDF8x4vijKyKu0NrjalRmnWfHfNkIkheLPbQ9gibAgOWbEub8rc2G3uJkEQ?=
- =?us-ascii?Q?bo05wb+EyAwqgxQevgXGy+6RA1AkFtlY5C4kn/G2Y9C6/LvrZVfNRptva10j?=
- =?us-ascii?Q?c2Jothq8C7qxKUyZEQNOe7T4dyUuSrB7QX6Z4/bLUohRC3ve27I/iaL+9Ffi?=
- =?us-ascii?Q?Y4+gIuN19dDbQQfupND5T9QR3RQ1X90LJhVq0IUcVn8CLMSKJFubVWl+P7zu?=
- =?us-ascii?Q?L/sw+yH6zFGF+8iNZ0AxwQdPLMmcaWsX+I0KFn7/Vc5YotqmWcxOMfGxHjYe?=
- =?us-ascii?Q?kZ/eO8t5rFjUr2Mth+1YDmnh0k+9d8OOreztlP6BwYJZEsmdY+YcbyefEWZT?=
- =?us-ascii?Q?IgENVWGIX45uM/KM7JWH4sIkEJD5CwTcJgdUftKUq8h5AicrCOsF7HVCDDJ3?=
- =?us-ascii?Q?NBKHv+fL3tJqMiBDq6aa8slhhC44sCw3Zhbh4PqjNBmtYbAhbsSkGoKzrwML?=
- =?us-ascii?Q?5zY9g6OQmBah/EBE6HZFf8ug+h8PW7p6F/o3GLKYETiIObcg7Sp4HM3lBnwb?=
- =?us-ascii?Q?b2U3IeXorZU571rgyPfqBxxkse+OF2QZo5cqrYxxJdYCtiQjJx0r9ysXaT/L?=
- =?us-ascii?Q?0B0WjwF335hewt1baA0T4qRlv+ilJRfbpUNKkSVw4dlERJb+jfDPnWUYLkTx?=
- =?us-ascii?Q?gMcamxC1GWAihrs8o0Ts8Zy/w35LhMYHuiQP7hTj1adalyxY+vxlFW6wRA1o?=
- =?us-ascii?Q?WMZyWPSv0PAcYj45jewYgFqr0F2KM231Ie1AXE+gwG0XtDri6J17Slkp2zhg?=
- =?us-ascii?Q?483A9LURpMyGFHhMUWITHr+thuMFDXffBm2kWdkl?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f269dcbc-f1d6-426a-bbf1-08db35cccad6
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Apr 2023 11:56:29.8282
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: AW5h1NZCpnJUlVC3Ok6dGJ3YnFOYDd1zjFVr7ybTuyUPvk50szn8tZrkMXyIMPpd
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB6966
-X-Spam-Status: No, score=0.8 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=no autolearn_force=no version=3.4.6
+        with ESMTP id S237728AbjDEL70 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Apr 2023 07:59:26 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D1AF1A4
+        for <kvm@vger.kernel.org>; Wed,  5 Apr 2023 04:59:24 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id E49526232D
+        for <kvm@vger.kernel.org>; Wed,  5 Apr 2023 11:59:23 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1B066C433EF;
+        Wed,  5 Apr 2023 11:59:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1680695963;
+        bh=GZfo/elhf7vPGUg+V1tZjMmVivCRFDcBOJg/TBwpr8Y=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=MHf8TjstrquWhrQgffZQpd0nNoqXPA6aeWQbq8PGD58GyFJa8myko+hwtaQMj5NiH
+         9p/BxPDNT9Hs9jqMZRENhqkjdEyJrNUT2Tive8EJ0EpPzvKxowyypKGgBrdeeQatqH
+         7+5m+vaIwaJNAwcBdfFkZcmjZ9bPNKXD+hexGH8YnvbywQqMibrcKApWjvPa275Zm9
+         L4MxpiQ0kc/yYjk+HWgiYprmONPmF8rW6H/d0+DdMzgFHTZcswOf78WCaNyaJer61q
+         RLL9dVMbL1XDiQQTQfY2FV4UzurlTd4l1Sg8iirhm8TxuLCvoy8cCoQA5kyaoLZeEC
+         OyynCzrvibCRw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1pk1nM-005y7n-Q4;
+        Wed, 05 Apr 2023 12:59:20 +0100
+Date:   Wed, 05 Apr 2023 12:59:20 +0100
+Message-ID: <86pm8iv8tj.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Oliver Upton <oliver.upton@linux.dev>
+Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Salil Mehta <salil.mehta@huawei.com>
+Subject: Re: [PATCH v3 08/13] KVM: arm64: Add support for KVM_EXIT_HYPERCALL
+In-Reply-To: <87o7o26aty.wl-maz@kernel.org>
+References: <20230404154050.2270077-1-oliver.upton@linux.dev>
+        <20230404154050.2270077-9-oliver.upton@linux.dev>
+        <87o7o26aty.wl-maz@kernel.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, pbonzini@redhat.com, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, seanjc@google.com, salil.mehta@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-2.5 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Apr 04, 2023 at 04:45:12PM -0600, Alex Williamson wrote:
-> On Sat,  1 Apr 2023 08:18:24 -0700
-> Yi Liu <yi.l.liu@intel.com> wrote:
-> 
-> > From: Nicolin Chen <nicolinc@nvidia.com>
-> > 
-> > Previously, the detach routine is only done by the destroy(). And it was
-> > called by vfio_iommufd_emulated_unbind() when the device runs close(), so
-> > all the mappings in iopt were cleaned in that setup, when the call trace
-> > reaches this detach() routine.
-> > 
-> > Now, there's a need of a detach uAPI, meaning that it does not only need
-> > a new iommufd_access_detach() API, but also requires access->ops->unmap()
-> > call as a cleanup. So add one.
-> > 
-> > However, leaving that unprotected can introduce some potential of a race
-> > condition during the pin_/unpin_pages() call, where access->ioas->iopt is
-> > getting referenced. So, add an ioas_lock to protect the context of iopt
-> > referencings.
-> > 
-> > Also, to allow the iommufd_access_unpin_pages() callback to happen via
-> > this unmap() call, add an ioas_unpin pointer, so the unpin routine won't
-> > be affected by the "access->ioas = NULL" trick.
-> > 
-> > Reviewed-by: Kevin Tian <kevin.tian@intel.com>
-> > Tested-by: Terrence Xu <terrence.xu@intel.com>
-> > Tested-by: Yanting Jiang <yanting.jiang@intel.com>
-> > Signed-off-by: Nicolin Chen <nicolinc@nvidia.com>
-> > Signed-off-by: Yi Liu <yi.l.liu@intel.com>
+On Wed, 05 Apr 2023 08:35:05 +0100,
+Marc Zyngier <maz@kernel.org> wrote:
+>=20
+> On Tue, 04 Apr 2023 16:40:45 +0100,
+> Oliver Upton <oliver.upton@linux.dev> wrote:
+> >=20
+> > In anticipation of user hypercall filters, add the necessary plumbing to
+> > get SMCCC calls out to userspace. Even though the exit structure has
+> > space for KVM to pass register arguments, let's just avoid it altogether
+> > and let userspace poke at the registers via KVM_GET_ONE_REG.
+> >=20
+> > This deliberately stretches the definition of a 'hypercall' to cover
+> > SMCs from EL1 in addition to the HVCs we know and love. KVM doesn't
+> > support EL1 calls into secure services, but now we can paint that as a
+> > userspace problem and be done with it.
+> >=20
+> > Finally, we need a flag to let userspace know what conduit instruction
+> > was used (i.e. SMC vs. HVC).
+> >=20
+> > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 > > ---
-> >  drivers/iommu/iommufd/device.c          | 76 +++++++++++++++++++++++--
-> >  drivers/iommu/iommufd/iommufd_private.h |  2 +
-> >  include/linux/iommufd.h                 |  1 +
-> >  3 files changed, 74 insertions(+), 5 deletions(-)
-> 
-> Does this need to go in via iommufd first?  There seems to be quite a
-> bit of churn in iommufd/device.c vs the vfio_mdev_ops branch (ie. it
-> doesn't apply). Thanks,
+> >  Documentation/virt/kvm/api.rst    | 18 ++++++++++++++++--
+> >  arch/arm64/include/uapi/asm/kvm.h |  4 ++++
+> >  arch/arm64/kvm/handle_exit.c      |  4 +++-
+> >  arch/arm64/kvm/hypercalls.c       | 16 ++++++++++++++++
+> >  4 files changed, 39 insertions(+), 3 deletions(-)
+> >=20
+> > diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/ap=
+i.rst
+> > index 9b01e3d0e757..9497792c4ee5 100644
+> > --- a/Documentation/virt/kvm/api.rst
+> > +++ b/Documentation/virt/kvm/api.rst
+> > @@ -6221,11 +6221,25 @@ to the byte array.
+> >  			__u64 flags;
+> >  		} hypercall;
+> > =20
+> > -Unused.  This was once used for 'hypercall to userspace'.  To implement
+> > -such functionality, use KVM_EXIT_IO (x86) or KVM_EXIT_MMIO (all except=
+ s390).
+> > +
+> > +It is strongly recommended that userspace use ``KVM_EXIT_IO`` (x86) or
+> > +``KVM_EXIT_MMIO`` (all except s390) to implement functionality that
+> > +requires a guest to interact with host userpace.
+> > =20
+> >  .. note:: KVM_EXIT_IO is significantly faster than KVM_EXIT_MMIO.
+> > =20
+> > +For arm64:
+> > +----------
+> > +
+> > +``nr`` contains the function ID of the guest's SMCCC call. Userspace is
+> > +expected to use the ``KVM_GET_ONE_REG`` ioctl to retrieve the call
+> > +parameters from the vCPU's GPRs.
+> > +
+> > +Definition of ``flags``:
+> > + - ``KVM_HYPERCALL_EXIT_SMC``: Indicates that the guest used the SMC
+> > +   conduit to initiate the SMCCC call. If this bit is 0 then the guest
+> > +   used the HVC conduit for the SMCCC call.
+> > +
+> >  ::
+> > =20
+> >  		/* KVM_EXIT_TPR_ACCESS */
+> > diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uap=
+i/asm/kvm.h
+> > index f9672ef1159a..f86446c5a7e3 100644
+> > --- a/arch/arm64/include/uapi/asm/kvm.h
+> > +++ b/arch/arm64/include/uapi/asm/kvm.h
+> > @@ -472,12 +472,16 @@ enum {
+> >  enum kvm_smccc_filter_action {
+> >  	KVM_SMCCC_FILTER_HANDLE =3D 0,
+> >  	KVM_SMCCC_FILTER_DENY,
+> > +	KVM_SMCCC_FILTER_FWD_TO_USER,
+> > =20
+> >  #ifdef __KERNEL__
+> >  	NR_SMCCC_FILTER_ACTIONS
+> >  #endif
+> >  };
+> > =20
+> > +/* arm64-specific KVM_EXIT_HYPERCALL flags */
+> > +#define KVM_HYPERCALL_EXIT_SMC	(1U << 0)
+> > +
+> >  #endif
+> > =20
+> >  #endif /* __ARM_KVM_H__ */
+> > diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+> > index 68f95dcd41a1..3f43e20c48b6 100644
+> > --- a/arch/arm64/kvm/handle_exit.c
+> > +++ b/arch/arm64/kvm/handle_exit.c
+> > @@ -71,7 +71,9 @@ static int handle_smc(struct kvm_vcpu *vcpu)
+> >  	 * Trap exception, not a Secure Monitor Call exception [...]"
+> >  	 *
+> >  	 * We need to advance the PC after the trap, as it would
+> > -	 * otherwise return to the same address...
+> > +	 * otherwise return to the same address. Furthermore, pre-incrementing
+> > +	 * the PC before potentially exiting to userspace maintains the same
+> > +	 * abstraction for both SMCs and HVCs.
+>=20
+> nit: this comment really needs to find its way in the documentation so
+> that a VMM author can determine the PC of the SMC/HVC. This is
+> specially important for 32bit, which has a 16bit encodings for
+> SMC/HVC.
+>=20
+> And thinking of it, this outlines a small flaw in this API. If
+> luserspace needs to find out about the address of the HVC/SMC, it
+> needs to know the *size* of the instruction. But we don't propagate
+> the ESR value. I think this still works by construction (userspace can
+> check PSTATE and work out whether we're in ARM or Thumb mode), but
+> this feels fragile.
+>=20
+> Should we expose the ESR, or at least ESR_EL2.IL as an additional
+> flag?
 
-I think it is best to stay with this series, Yi has to rebase it
+Just to make this a quicker round trip, I hacked the following
+together. If you agree with it, I'll stick it on top and get the ball
+rolling.
 
-Jason
+Thanks,
+
+	M.
+
+=46rom 9b830e7a3819c2771074bebe66c1d5f20394e3cc Mon Sep 17 00:00:00 2001
+From: Marc Zyngier <maz@kernel.org>
+Date: Wed, 5 Apr 2023 12:48:58 +0100
+Subject: [PATCH] KVM: arm64: Expose SMC/HVC width to userspace
+
+When returning to userspace to handle a SMCCC call, we consistently
+set PC to point to the instruction immediately after the HVC/SMC.
+
+However, should userspace need to know the exact address of the
+trapping instruction, it needs to know about the *size* of that
+instruction. For AArch64, this is pretty easy. For AArch32, this
+is a bit more funky, as Thumb has 16bit encodings for both HVC
+and SMC.
+
+Expose this to userspace with a new flag that directly derives
+from ESR_EL2.IL. Also update the documentation to reflect the PC
+state at the point of exit.
+
+Finally, this fixes a small buglet where the hypercall.{args,ret}
+fields would not be cleared on exit, and could contain some
+random junk.
+
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ Documentation/virt/kvm/api.rst    |  8 ++++++++
+ arch/arm64/include/uapi/asm/kvm.h |  3 ++-
+ arch/arm64/kvm/hypercalls.c       | 16 +++++++++++-----
+ 3 files changed, 21 insertions(+), 6 deletions(-)
+
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index c8ab2f730945..103f945959ed 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -6244,6 +6244,14 @@ Definition of ``flags``:
+    conduit to initiate the SMCCC call. If this bit is 0 then the guest
+    used the HVC conduit for the SMCCC call.
+=20
++ - ``KVM_HYPERCALL_EXIT_16BIT``: Indicates that the guest used a 16bit
++   instruction to initiate the SMCCC call. If this bit is 0 then the
++   guest used a 32bit instruction. An AArch64 guest always has this
++   bit set to 0.
++
++At the point of exit, PC points to the instruction immediately following
++the trapping instruction.
++
+ ::
+=20
+ 		/* KVM_EXIT_TPR_ACCESS */
+diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/as=
+m/kvm.h
+index 3dcfa4bfdf83..b1c1edf85480 100644
+--- a/arch/arm64/include/uapi/asm/kvm.h
++++ b/arch/arm64/include/uapi/asm/kvm.h
+@@ -491,7 +491,8 @@ struct kvm_smccc_filter {
+ };
+=20
+ /* arm64-specific KVM_EXIT_HYPERCALL flags */
+-#define KVM_HYPERCALL_EXIT_SMC	(1U << 0)
++#define KVM_HYPERCALL_EXIT_SMC		(1U << 0)
++#define KVM_HYPERCALL_EXIT_16BIT	(1U << 1)
+=20
+ #endif
+=20
+diff --git a/arch/arm64/kvm/hypercalls.c b/arch/arm64/kvm/hypercalls.c
+index 9a35d6d18193..3b6523f25afc 100644
+--- a/arch/arm64/kvm/hypercalls.c
++++ b/arch/arm64/kvm/hypercalls.c
+@@ -222,13 +222,19 @@ static void kvm_prepare_hypercall_exit(struct kvm_vcp=
+u *vcpu, u32 func_id)
+ {
+ 	u8 ec =3D ESR_ELx_EC(kvm_vcpu_get_esr(vcpu));
+ 	struct kvm_run *run =3D vcpu->run;
+-
+-	run->exit_reason =3D KVM_EXIT_HYPERCALL;
+-	run->hypercall.nr =3D func_id;
+-	run->hypercall.flags =3D 0;
++	u64 flags =3D 0;
+=20
+ 	if (ec =3D=3D ESR_ELx_EC_SMC32 || ec =3D=3D ESR_ELx_EC_SMC64)
+-		run->hypercall.flags |=3D KVM_HYPERCALL_EXIT_SMC;
++		flags |=3D KVM_HYPERCALL_EXIT_SMC;
++
++	if (!kvm_vcpu_trap_il_is32bit(vcpu))
++		flags |=3D KVM_HYPERCALL_EXIT_16BIT;
++
++	run->exit_reason =3D KVM_EXIT_HYPERCALL;
++	run->hypercall =3D (typeof(run->hypercall)) {
++		.nr	=3D func_id,
++		.flags	=3D flags,
++	};
+ }
+=20
+ int kvm_smccc_call_handler(struct kvm_vcpu *vcpu)
+--=20
+2.34.1
+
+
+--=20
+Without deviation from the norm, progress is not possible.
