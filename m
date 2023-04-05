@@ -2,66 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0CB666D8586
-	for <lists+kvm@lfdr.de>; Wed,  5 Apr 2023 20:02:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 492296D857E
+	for <lists+kvm@lfdr.de>; Wed,  5 Apr 2023 20:01:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230396AbjDESCq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Apr 2023 14:02:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54072 "EHLO
+        id S233862AbjDESBz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Apr 2023 14:01:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52298 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229484AbjDESCn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Apr 2023 14:02:43 -0400
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on20626.outbound.protection.outlook.com [IPv6:2a01:111:f400:fe5a::626])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14D837D87;
-        Wed,  5 Apr 2023 11:02:14 -0700 (PDT)
+        with ESMTP id S232267AbjDESBw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Apr 2023 14:01:52 -0400
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2089.outbound.protection.outlook.com [40.107.220.89])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E4D772AB;
+        Wed,  5 Apr 2023 11:01:50 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ak/XaT6ZVJ6+H+MzYjK5xoBadbY46YfMArAL1uhRI43u7F7Ztw/SsW5/2eAOsZ8BtIpefjvPSarUDwLQ5wlilTSXOEvhN/ahdAi7KKpOXQhrNj0Z7WJgJgIkI7KxU5/rYjRgfioTfsItc8jYJMJY6hVzokL6wdjN9lDorZAmnd2iep6Kv0dcfhopAt83dOA/F7ConthWJV4UZ1jc/s+X+OIG/oajRIEmtzKusIf679d+E/KRFsDLArqXtGvVIMkIxL7tspBaijzd1crv+Ra2E9LmJVDaeVD0dm6QCwR3GvUh7CeHq7hA9LHyJVwEgHC5oNAjDIbFPtS2y+PksaYDPA==
+ b=EjNMwqRdGLxzODoF40zrVzQDI4XjC45frrIYPX89CqRHScyfeBhO37Aw4WIRXDJiMEbw9kAF0OzdzxtNupsh9NI+tEWXhcCwHjDXYr7q4b30T1H1FBKyO5lx6susZokR4ZGoAwTMLWmKZyMwSg6JC3PIGTt0xCzOTRtgbZDJz+0gWEW/R60SAj7OnA0XvVsYx2oE1sW0mAtDkza8a4Dng1oTfOcKNUTAEYzDQX3mGk6LrAzs/1vhBv8FdPfg5cItN89o0droKcVpBO7wb08rnrUv7DSu8fHF0Keh7+VWWxRMWo5mV+Tws2FZ9ShT8LdoQ6GBev6Hj6lGtu6ij64z/A==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=SwQUxEBOMHJ6eWfIzwI/es+2mWD6zlsFPG/G51FI1X0=;
- b=Ct1DMFiNQOL9kHeZlibHMGGp3211mtHWuMK9BNkcIBsLQ1eu2jISOFcKorpecekJhHGl5DjRMhWH7hqCB0UaZLqyTcVGAbFOlI38mUifJAhefeQZzCsts9dHftfCDRHyLP0fPHfjANvnoQZt7YWQE4KNYglX0O/6Y9tRzbJR3sSOQY0k8LAot2G9M5U50BRfaDgJErIVR7zBfhW0VHbTGWElpcP6ohC8MZMYTWnrl6z0ZvxVuIb0KlFslH6GRavNS/+EU/wJU+z9aYgOOOgKJNcrpckvXrNSZcXfvMGibAtBoEGcVeLdMoLm8C8THlKPSr0uhc2NTQA3coq8chmAMw==
+ bh=ixyjebktJREJsrnkZvwgfBAu2SPMa3QRXMAWKUw88R8=;
+ b=X2fVm5gI7a+F3xVsXtxPCpbTF7gig3/5sOn8sTBnnbmDucS8JKWJ+33cd8mMgGyop2xU1twW7Q1DbkPitW29xqnwl6iiR3I6W3NC10xH1AXCZynvUT+GM8QSycjseVhUlmOvlmrFL8pTOpC2J5QaN6CRuxtSWPJxPGJ9jm3vFlCU1xJfjgD3h2IHxRR1mPnx5/03dgZL2QUXpAaXBcDQjtZLj4F+cLuOEDvz3mg1NmVbZks+ojdE6c9cLgmNQscDl3yUET83rMhsme6XpJp4MK0dobjvIhBGsUz8s8SAD8hzRcp8B2W+Z63NPeVnn79lSqVSm5qeP73mUXULzf5l5Q==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.118.233) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ 216.228.118.232) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
  dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=SwQUxEBOMHJ6eWfIzwI/es+2mWD6zlsFPG/G51FI1X0=;
- b=ExDQYqPKRhxrykyszD0F0t4kd93rIaCMXQD2MTtYlWV2kZkfRxCEPZQ08cBSAa+156kXnmwvLTvVxD7HKtfHk1dHwrkCTe0mPSreEeVEcQvpui9k17OqyirLo6dnrobYqpmLKzJclCnPB2MfVyE0+jckNMpPERJV+OIco9af0Bouc74gJ5505EBEvFYiFX89CDKC+I8W8GO2fEcAIx2itdc0TQaqcK+z2Pvjh5Ge7rL7ncG2K9FbN67sJ6kp+OjWrtV9vmFAwxipkIRg6ylssVrM9FI6+7VcJHQt5tfwJ2AYAO/+frO4aJCurG2EJBYUBf1yjskQIHUqlbisu2wdtw==
-Received: from DM6PR17CA0022.namprd17.prod.outlook.com (2603:10b6:5:1b3::35)
- by BL3PR12MB6644.namprd12.prod.outlook.com (2603:10b6:208:3b1::14) with
+ bh=ixyjebktJREJsrnkZvwgfBAu2SPMa3QRXMAWKUw88R8=;
+ b=AUky1adre3hnadQ9CFkTpT1NqUR3h5h3O3DB0hxmlprqknWBhJTefWIHvml6SkkfLfbZEA0t2Sh5rjVK14e/GBmQa/1Syp+0/NZJGGIrXV17rMltuTTfgUl/HbH0Pmgse3oZ0NOXpqkgYrYzmyRP0Is7lnXmw1JJfWGT4CaFYndbJBnYGj5M8QGSwOkZoa0/190RFoQ9L1aZNYTs8JwNyTyRIv7t7P/J4N9JNOzBw8Bhi+yYuFlah+Izbwy1GIX7JLS+zdXgntylD6QPDbBxPm8y1CxXQPbtRqcZrQjjbWDpp7j5xxx30wEjfv3X8orbYXDxFs22wNbaiDIsc+pzZg==
+Received: from MW4PR04CA0252.namprd04.prod.outlook.com (2603:10b6:303:88::17)
+ by DM6PR12MB4169.namprd12.prod.outlook.com (2603:10b6:5:215::22) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6254.33; Wed, 5 Apr
- 2023 18:02:05 +0000
-Received: from DM6NAM11FT049.eop-nam11.prod.protection.outlook.com
- (2603:10b6:5:1b3:cafe::82) by DM6PR17CA0022.outlook.office365.com
- (2603:10b6:5:1b3::35) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6254.22 via Frontend
- Transport; Wed, 5 Apr 2023 18:02:05 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.233)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6254.35; Wed, 5 Apr
+ 2023 18:01:46 +0000
+Received: from CO1NAM11FT045.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:303:88:cafe::40) by MW4PR04CA0252.outlook.office365.com
+ (2603:10b6:303:88::17) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6277.29 via Frontend
+ Transport; Wed, 5 Apr 2023 18:01:46 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.232)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
 Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.118.233 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.118.233; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.118.233) by
- DM6NAM11FT049.mail.protection.outlook.com (10.13.172.188) with Microsoft SMTP
+ 216.228.118.232 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.118.232; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.118.232) by
+ CO1NAM11FT045.mail.protection.outlook.com (10.13.175.181) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6277.28 via Frontend Transport; Wed, 5 Apr 2023 18:02:05 +0000
+ 15.20.6277.30 via Frontend Transport; Wed, 5 Apr 2023 18:01:46 +0000
 Received: from drhqmail201.nvidia.com (10.126.190.180) by mail.nvidia.com
- (10.127.129.6) with Microsoft SMTP Server (version=TLS1_2,
+ (10.127.129.5) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5; Wed, 5 Apr 2023
  11:01:35 -0700
 Received: from drhqmail203.nvidia.com (10.126.190.182) by
  drhqmail201.nvidia.com (10.126.190.180) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.986.37; Wed, 5 Apr 2023 11:01:34 -0700
+ 15.2.986.37; Wed, 5 Apr 2023 11:01:35 -0700
 Received: from localhost.localdomain (10.127.8.14) by mail.nvidia.com
  (10.126.190.182) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.37 via Frontend
- Transport; Wed, 5 Apr 2023 11:01:34 -0700
+ Transport; Wed, 5 Apr 2023 11:01:35 -0700
 From:   <ankita@nvidia.com>
 To:     <ankita@nvidia.com>, <jgg@nvidia.com>,
         <alex.williamson@redhat.com>, <naoya.horiguchi@nec.com>,
@@ -71,34 +71,37 @@ CC:     <aniketa@nvidia.com>, <cjia@nvidia.com>, <kwankhede@nvidia.com>,
         <apopple@nvidia.com>, <jhubbard@nvidia.com>, <danw@nvidia.com>,
         <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
         <linux-arm-kernel@lists.infradead.org>, <linux-mm@kvack.org>
-Subject: [PATCH v3 0/6] Expose GPU memory as coherently CPU accessible
-Date:   Wed, 5 Apr 2023 11:01:28 -0700
-Message-ID: <20230405180134.16932-1-ankita@nvidia.com>
+Subject: [PATCH v3 1/6] kvm: determine memory type from VMA
+Date:   Wed, 5 Apr 2023 11:01:29 -0700
+Message-ID: <20230405180134.16932-2-ankita@nvidia.com>
 X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20230405180134.16932-1-ankita@nvidia.com>
+References: <20230405180134.16932-1-ankita@nvidia.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6NAM11FT049:EE_|BL3PR12MB6644:EE_
-X-MS-Office365-Filtering-Correlation-Id: 32c0a2c3-803f-48f9-5185-08db35ffddb6
+X-MS-TrafficTypeDiagnostic: CO1NAM11FT045:EE_|DM6PR12MB4169:EE_
+X-MS-Office365-Filtering-Correlation-Id: 5c10b3d6-9f95-464f-6103-08db35ffd250
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: k5bMWUgavq7pEqU/JQ0Aq5R35zfL1jKY6s7nKrpjQ4i23zFNDutfJxDN0Ig2Hvm5IR1lz0c4+Z9CApsR991/1+mb+alFOKPODbAIJOf6SQ1aInVuL4wjROYLh8lR5LdyQbA149ZoCMljm59xbk1U2CiMtojWKykhRkZpDHxpZ9sU9KTIXZQLpl3LpxfpDRHh068TjXuP0ccJaMcHUXU+OwOmiMnT31XsXOl0TcBR3ZEeJzsyI3s0ha5zBwz/QvuozE3iZZkZ8oYVY0QlP8qu+dEB9ZwlBxRO9aBjyRFdDOETVyoon1nWVmtuqmj8abaGBbD4oReBX0Jbl+x0R4BjCdLoSNTrHhmfVUQBP67QNXk3ZzbYGALyBTCCPKA0N6FTm6j3EbNoRx5zxWvBMIUJGwoXNHYktwrze8fKY6rODKwQinZT8Kz/n/7Fn0XFwQi6nuOrwKGoCB5f6yO7NarCkj9SIPgkS2FNKgu0hP3mAGfs89Ysv0/xBKMmAzcFUuIYfwXuq9PJNpE5w6fY1gYv51/ZF8r61gDcweA8QG42YqKm1hyvVeIxx0hY8GOnMER0Cptvb4sl3dfOcF5Q2RXREox+dcdoWEVUJO1VUqq3NJv/sejX437g+pGhChl1J62Lyve3glFyB2OsaBoAUoF5Cex5SkHCWtxQxe2NNUtGs78JyShw+7sVZQamqO89wh/LtOhOLkGcRoNyzTyfCbgNFRJUfpk5Ss/KWnHzw4kNIXZlLY36amxJR/OcZeCiLquY2fdGbEUbQQ+Ue030guHvqHTENKQj/0tIEhmWvQMNZRo=
-X-Forefront-Antispam-Report: CIP:216.228.118.233;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge2.nvidia.com;CAT:NONE;SFS:(13230028)(4636009)(376002)(39860400002)(346002)(136003)(396003)(451199021)(40470700004)(46966006)(36840700001)(86362001)(82310400005)(36756003)(2906002)(2876002)(966005)(7636003)(40480700001)(2616005)(47076005)(336012)(426003)(186003)(1076003)(6666004)(83380400001)(26005)(316002)(8676002)(70206006)(82740400003)(70586007)(36860700001)(4326008)(478600001)(40460700003)(5660300002)(356005)(54906003)(8936002)(110136005)(41300700001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: cD44gJ8CMfj/RP+gPq48x8AgtnGDcgbMvl/HPyIaRDasHrowVD2SMju+1vMCWU1iFpEH0LKsAM67a7/a3vbaP0N5actqFMXfAQ3EMBkp6DuOW0OYeYgdNSREiKtYT7Fgw2IZrhNPIkw2ZNKStVWSM1Cd45p5YHjSNkn3k2Ric701jN6OpmY4nUPJPX4AGOqTXiaQI6qOMi0i419J2B4a7qqCvEM3Ow2TKWHx//0man6rNe9ziwKwa+U+YjHMBStWfPQQgoicpvapStHr/BpwU1yRifkEmGABwc28TFJKc9xgZh8HU1EHTfosgLR/m486x9nhYujtdyrttu+Xz/YIm+weKCrexQ/VieMZy4npAoVj3pLfKvvTjBkIZF3v3A8nXtxlK8KrWUFpUj4gFLjKvj577ln4htyWqlfDTo27JqQfGZCkv63z/99BoipfVANZkgxmD/GLtO+TnyQSYtsz/ApMu/heYKpDA6dERuDNPLiyO67ADfv9BDIAzbnuXXzCgI/DHtPoUZVRtnRBFxQKLOZ6rs7yFRtzhk3TEbj1fLmxMrl3Y5CInutsX5bF5IDZk7E4HSPUFrgEmLaW5IQjR6QLNufm1a90U8c+UEtmMTrSly+gMhWj8slhTsID3Jae3rPpwlf8Wi5LJMkqX6gVPNGk7WF04FLlwsfRl+/0DfTJZvpG1UopDNki5F6HKN1FS53vVDSmq0sND1QBwoNbgVEDq1EEjg6BOUwtPP14TIYgJimOXFqSEBiM9luPj0j4eqiIh9J15NeyRdSyfoBNv27N6ZsYH8Yvgc/rqFXRLkItQ2xsGzcfiuI4gh3meKVBv0vQsIA2GrKd1fbsp9S7rw==
+X-Forefront-Antispam-Report: CIP:216.228.118.232;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge1.nvidia.com;CAT:NONE;SFS:(13230028)(4636009)(346002)(39860400002)(376002)(136003)(396003)(451199021)(36840700001)(46966006)(40470700004)(54906003)(41300700001)(8936002)(2906002)(316002)(19627235002)(70206006)(5660300002)(4326008)(2876002)(186003)(8676002)(70586007)(478600001)(110136005)(966005)(336012)(6666004)(47076005)(7636003)(356005)(40460700003)(26005)(1076003)(426003)(40480700001)(2616005)(36756003)(83380400001)(82310400005)(82740400003)(86362001)(36860700001);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Apr 2023 18:02:05.4296
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Apr 2023 18:01:46.3535
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 32c0a2c3-803f-48f9-5185-08db35ffddb6
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5c10b3d6-9f95-464f-6103-08db35ffd250
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.233];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT049.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.232];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT045.eop-nam11.prod.protection.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL3PR12MB6644
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4169
 X-Spam-Status: No, score=0.8 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,SPF_HELO_PASS,
-        SPF_NONE autolearn=no autolearn_force=no version=3.4.6
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
@@ -107,78 +110,196 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Ankit Agrawal <ankita@nvidia.com>
 
-NVIDIA's upcoming Grace Hopper Superchip provides a PCI-like device
-for the on-chip GPU that is the logical OS representation of the
-internal propritary cache coherent interconnect.
+Each VM stores the requires pgprots for its mappings in the
+vma->pgprot. Based on this we can determine the desired MT_DEVICE_*
+for the VMA directly, and do not have to guess based on heuristics
+based on pfn_is_map_memory().
 
-This representation has a number of limitations compared to a real PCI
-device, in particular, it does not model the coherent GPU memory
-aperture as a PCI config space BAR, and PCI doesn't know anything
-about cacheable memory types.
+There are the following kinds of pgprot available to userspace and their
+corresponding type:
+pgprot_noncached -> MT_DEVICE_nGnRnE
+pgprot_writecombine -> MT_NORMAL_NC
+pgprot_device -> MT_DEVICE_nGnRE
+pgprot_tagged -> MT_NORMAL_TAGGED
 
-Provide a VFIO PCI variant driver that adapts the unique PCI
-representation into a more standard PCI representation facing
-userspace. The GPU memory aperture is obtained from ACPI, according to
-the FW specification, and exported to userspace as the VFIO_REGION
-that covers the first PCI BAR. qemu will naturally generate a PCI
-device in the VM where the cacheable aperture is reported in BAR1.
+Decode the relevant MT_* types in use and translate them into the
+corresponding KVM_PGTABLEPROT_*:
 
-Since this memory region is actually cache coherent with the CPU, the
-VFIO variant driver will mmap it into VMA using a cacheable mapping.
+ - MT_DEVICE_nGnRE -> KVM_PGTABLE_PROT_DEVICE_nGnRE (device)
+ - MT_DEVICE_nGnRnE -> KVM_PGTABLE_PROT_DEVICE_nGnRnE (noncached)
+ - MT_NORMAL/_TAGGED/_NC -> 0
 
-As this is the first time an ARM environment has placed cacheable
-non-struct page backed memory (eg from remap_pfn_range) into a KVM
-page table, fix a bug in ARM KVM where it does not copy the cacheable
-memory attributes from non-struct page backed PTEs to ensure the guest
-also gets a cacheable mapping.
+The selection of 0 for the S2 KVM_PGTABLE_PROT_DEVICE_nGnRnE is based
+on [2].
 
-Finally, the cacheable memory can participate in memory failure
-handling. ECC failures on this memory will trigger the normal ARM
-mechanism to get into memory-failure.c. Since this memory is not
-backed by struct page create a mechanism to route the memory-failure's
-physical address to the VMA owner so that a SIGBUS can be generated
-toward the correct process. This works with the existing KVM/qemu
-handling for memory failure reporting toward a guest.
+Also worth noting is the result of the stage-1 and stage-2. Ref [3]
+If FWB not set, then the combination is the one that is more restrictive.
+The sequence from lowest restriction to the highest:
+DEVICE_nGnRnE -> DEVICE_nGnRE -> NORMAL/_TAGGED/_NC
+If FWB is set, then stage-2 mapping type overrides the stage-1 [1].
 
-This goes along with a qemu series to provides the necessary
-implementation of the Grace Hopper Superchip firmware specification so
-that the guest operating system can see the correct ACPI modeling for
-the coherent GPU device.
-https://github.com/qemu/qemu/compare/master...ankita-nv:qemu:dev-ankit/cohmem-0330
+This solves a problem where KVM cannot preserve the MT_NORMAL memory
+type for non-struct page backed memory into the S2 mapping. Instead
+the VMA creator determines the MT type and the S2 will follow it.
 
-Applied and tested over v6.3-rc4.
+[1] https://developer.arm.com/documentation/102376/0100/Combining-Stage-1-and-Stage-2-attributes
+[2] ARMv8 reference manual: https://developer.arm.com/documentation/ddi0487/gb/ Section D5.5.3, Table D5-38
+[3] ARMv8 reference manual: https://developer.arm.com/documentation/ddi0487/gb/ Table G5-20 on page G5-6330
 
-Ankit Agrawal (6):
-  kvm: determine memory type from VMA
-  vfio/nvgpu: expose GPU device memory as BAR1
-  mm: handle poisoning of pfn without struct pages
-  mm: Add poison error check in fixup_user_fault() for mapped PFN
-  mm: Change ghes code to allow poison of non-struct PFN
-  vfio/nvgpu: register device memory for poison handling
+Signed-off-by: Ankit Agrawal <ankita@nvidia.com>
+---
+ arch/arm64/include/asm/kvm_pgtable.h |  8 +++++---
+ arch/arm64/include/asm/memory.h      |  6 ++++--
+ arch/arm64/kvm/hyp/pgtable.c         | 16 +++++++++++-----
+ arch/arm64/kvm/mmu.c                 | 27 ++++++++++++++++++++++-----
+ 4 files changed, 42 insertions(+), 15 deletions(-)
 
- MAINTAINERS                          |   6 +
- arch/arm64/include/asm/kvm_pgtable.h |   8 +-
- arch/arm64/include/asm/memory.h      |   6 +-
- arch/arm64/kvm/hyp/pgtable.c         |  16 +-
- arch/arm64/kvm/mmu.c                 |  27 +-
- drivers/acpi/apei/ghes.c             |  12 +-
- drivers/vfio/pci/Kconfig             |   2 +
- drivers/vfio/pci/Makefile            |   2 +
- drivers/vfio/pci/nvgpu/Kconfig       |  10 +
- drivers/vfio/pci/nvgpu/Makefile      |   3 +
- drivers/vfio/pci/nvgpu/main.c        | 359 +++++++++++++++++++++++++++
- include/linux/memory-failure.h       |  22 ++
- include/linux/mm.h                   |   1 +
- include/ras/ras_event.h              |   1 +
- mm/gup.c                             |   2 +-
- mm/memory-failure.c                  | 148 +++++++++--
- virt/kvm/kvm_main.c                  |   6 +
- 17 files changed, 586 insertions(+), 45 deletions(-)
- create mode 100644 drivers/vfio/pci/nvgpu/Kconfig
- create mode 100644 drivers/vfio/pci/nvgpu/Makefile
- create mode 100644 drivers/vfio/pci/nvgpu/main.c
- create mode 100644 include/linux/memory-failure.h
-
+diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+index 4cd6762bda80..d3166b6e6329 100644
+--- a/arch/arm64/include/asm/kvm_pgtable.h
++++ b/arch/arm64/include/asm/kvm_pgtable.h
+@@ -150,7 +150,8 @@ enum kvm_pgtable_stage2_flags {
+  * @KVM_PGTABLE_PROT_X:		Execute permission.
+  * @KVM_PGTABLE_PROT_W:		Write permission.
+  * @KVM_PGTABLE_PROT_R:		Read permission.
+- * @KVM_PGTABLE_PROT_DEVICE:	Device attributes.
++ * @KVM_PGTABLE_PROT_DEVICE_nGnRE:	Device nGnRE attributes.
++ * @KVM_PGTABLE_PROT_DEVICE_nGnRnE:	Device nGnRnE attributes.
+  * @KVM_PGTABLE_PROT_SW0:	Software bit 0.
+  * @KVM_PGTABLE_PROT_SW1:	Software bit 1.
+  * @KVM_PGTABLE_PROT_SW2:	Software bit 2.
+@@ -161,7 +162,8 @@ enum kvm_pgtable_prot {
+ 	KVM_PGTABLE_PROT_W			= BIT(1),
+ 	KVM_PGTABLE_PROT_R			= BIT(2),
+ 
+-	KVM_PGTABLE_PROT_DEVICE			= BIT(3),
++	KVM_PGTABLE_PROT_DEVICE_nGnRE		= BIT(3),
++	KVM_PGTABLE_PROT_DEVICE_nGnRnE		= BIT(4),
+ 
+ 	KVM_PGTABLE_PROT_SW0			= BIT(55),
+ 	KVM_PGTABLE_PROT_SW1			= BIT(56),
+@@ -178,7 +180,7 @@ enum kvm_pgtable_prot {
+ #define PAGE_HYP		KVM_PGTABLE_PROT_RW
+ #define PAGE_HYP_EXEC		(KVM_PGTABLE_PROT_R | KVM_PGTABLE_PROT_X)
+ #define PAGE_HYP_RO		(KVM_PGTABLE_PROT_R)
+-#define PAGE_HYP_DEVICE		(PAGE_HYP | KVM_PGTABLE_PROT_DEVICE)
++#define PAGE_HYP_DEVICE		(PAGE_HYP | KVM_PGTABLE_PROT_DEVICE_nGnRE)
+ 
+ typedef bool (*kvm_pgtable_force_pte_cb_t)(u64 addr, u64 end,
+ 					   enum kvm_pgtable_prot prot);
+diff --git a/arch/arm64/include/asm/memory.h b/arch/arm64/include/asm/memory.h
+index 78e5163836a0..4ebbc4b1ba4d 100644
+--- a/arch/arm64/include/asm/memory.h
++++ b/arch/arm64/include/asm/memory.h
+@@ -147,14 +147,16 @@
+  * Memory types for Stage-2 translation
+  */
+ #define MT_S2_NORMAL		0xf
++#define MT_S2_DEVICE_nGnRnE 0x0
+ #define MT_S2_DEVICE_nGnRE	0x1
+ 
+ /*
+  * Memory types for Stage-2 translation when ID_AA64MMFR2_EL1.FWB is 0001
+  * Stage-2 enforces Normal-WB and Device-nGnRE
+  */
+-#define MT_S2_FWB_NORMAL	6
+-#define MT_S2_FWB_DEVICE_nGnRE	1
++#define MT_S2_FWB_NORMAL	0x6
++#define MT_S2_FWB_DEVICE_nGnRnE 0x0
++#define MT_S2_FWB_DEVICE_nGnRE	0x1
+ 
+ #ifdef CONFIG_ARM64_4K_PAGES
+ #define IOREMAP_MAX_ORDER	(PUD_SHIFT)
+diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+index 3d61bd3e591d..7a8238b41590 100644
+--- a/arch/arm64/kvm/hyp/pgtable.c
++++ b/arch/arm64/kvm/hyp/pgtable.c
+@@ -355,7 +355,7 @@ struct hyp_map_data {
+ 
+ static int hyp_set_prot_attr(enum kvm_pgtable_prot prot, kvm_pte_t *ptep)
+ {
+-	bool device = prot & KVM_PGTABLE_PROT_DEVICE;
++	bool device = prot & KVM_PGTABLE_PROT_DEVICE_nGnRE;
+ 	u32 mtype = device ? MT_DEVICE_nGnRE : MT_NORMAL;
+ 	kvm_pte_t attr = FIELD_PREP(KVM_PTE_LEAF_ATTR_LO_S1_ATTRIDX, mtype);
+ 	u32 sh = KVM_PTE_LEAF_ATTR_LO_S1_SH_IS;
+@@ -636,14 +636,20 @@ static bool stage2_has_fwb(struct kvm_pgtable *pgt)
+ static int stage2_set_prot_attr(struct kvm_pgtable *pgt, enum kvm_pgtable_prot prot,
+ 				kvm_pte_t *ptep)
+ {
+-	bool device = prot & KVM_PGTABLE_PROT_DEVICE;
+-	kvm_pte_t attr = device ? KVM_S2_MEMATTR(pgt, DEVICE_nGnRE) :
+-			    KVM_S2_MEMATTR(pgt, NORMAL);
+ 	u32 sh = KVM_PTE_LEAF_ATTR_LO_S2_SH_IS;
++	kvm_pte_t attr;
++
++	if (prot & KVM_PGTABLE_PROT_DEVICE_nGnRE)
++		attr = KVM_S2_MEMATTR(pgt, DEVICE_nGnRE);
++	else if (prot & KVM_PGTABLE_PROT_DEVICE_nGnRnE)
++		attr = KVM_S2_MEMATTR(pgt, DEVICE_nGnRnE);
++	else
++		attr = KVM_S2_MEMATTR(pgt, NORMAL);
+ 
+ 	if (!(prot & KVM_PGTABLE_PROT_X))
+ 		attr |= KVM_PTE_LEAF_ATTR_HI_S2_XN;
+-	else if (device)
++	else if (prot & KVM_PGTABLE_PROT_DEVICE_nGnRE ||
++		 prot & KVM_PGTABLE_PROT_DEVICE_nGnRnE)
+ 		return -EINVAL;
+ 
+ 	if (prot & KVM_PGTABLE_PROT_R)
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 7113587222ff..8d63aa951c33 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -897,7 +897,7 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
+ 	int ret = 0;
+ 	struct kvm_mmu_memory_cache cache = { .gfp_zero = __GFP_ZERO };
+ 	struct kvm_pgtable *pgt = kvm->arch.mmu.pgt;
+-	enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_DEVICE |
++	enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_DEVICE_nGnRE |
+ 				     KVM_PGTABLE_PROT_R |
+ 				     (writable ? KVM_PGTABLE_PROT_W : 0);
+ 
+@@ -1186,6 +1186,15 @@ static bool kvm_vma_mte_allowed(struct vm_area_struct *vma)
+ 	return vma->vm_flags & VM_MTE_ALLOWED;
+ }
+ 
++/*
++ * Determine the memory region cacheability from VMA's pgprot. This
++ * is used to set the stage 2 PTEs.
++ */
++static unsigned long mapping_type(pgprot_t page_prot)
++{
++	return ((pgprot_val(page_prot) & PTE_ATTRINDX_MASK) >> 2);
++}
++
+ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 			  struct kvm_memory_slot *memslot, unsigned long hva,
+ 			  unsigned long fault_status)
+@@ -1368,10 +1377,18 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 	if (exec_fault)
+ 		prot |= KVM_PGTABLE_PROT_X;
+ 
+-	if (device)
+-		prot |= KVM_PGTABLE_PROT_DEVICE;
+-	else if (cpus_have_const_cap(ARM64_HAS_CACHE_DIC))
+-		prot |= KVM_PGTABLE_PROT_X;
++	switch (mapping_type(vma->vm_page_prot)) {
++	case MT_DEVICE_nGnRE:
++		prot |= KVM_PGTABLE_PROT_DEVICE_nGnRE;
++		break;
++	case MT_DEVICE_nGnRnE:
++		prot |= KVM_PGTABLE_PROT_DEVICE_nGnRnE;
++		break;
++		/* MT_NORMAL/_TAGGED/_NC */
++	default:
++		if (cpus_have_const_cap(ARM64_HAS_CACHE_DIC))
++			prot |= KVM_PGTABLE_PROT_X;
++	}
+ 
+ 	/*
+ 	 * Under the premise of getting a FSC_PERM fault, we just need to relax
 -- 
 2.17.1
 
