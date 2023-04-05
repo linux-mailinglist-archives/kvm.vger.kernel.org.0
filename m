@@ -2,108 +2,182 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 63FF26D7553
-	for <lists+kvm@lfdr.de>; Wed,  5 Apr 2023 09:28:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E2C966D75AF
+	for <lists+kvm@lfdr.de>; Wed,  5 Apr 2023 09:35:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237012AbjDEH2N (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Apr 2023 03:28:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41964 "EHLO
+        id S230163AbjDEHf3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Apr 2023 03:35:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52878 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236991AbjDEH2L (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Apr 2023 03:28:11 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE7092D55
-        for <kvm@vger.kernel.org>; Wed,  5 Apr 2023 00:28:10 -0700 (PDT)
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3356wPef028599;
-        Wed, 5 Apr 2023 07:28:08 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=Xo9VOJ8yvghNYez/k0nhjqw9JSOSv9fvbZJWf5yeNFE=;
- b=cWZZ6NzHtBPjwc0x90ZDHHE8LaGQaApCcj/V00QP4JgMFDkxdJDzVukak2PzNb2XLbuG
- JBh9mXpjU3LgIGGHmDiXydL6j4+d70LyTP2JdFBtSO9kRgBTA2rvOm+6cvESMsyYk28M
- 7GbkgMNwZ0kkzltFL7mSjlG/WDnX42VLUfw7yiyZv/imUQZeQNoqS9SjIrnpEL40rODX
- MaL0Ur8jao/g4qNT0H6+ONEwsa2nsXZi3AubSdJrpRz+LXCHcxpEoHEhn/z1o4yVFSzU
- JQgtXwG3GfW7x/mY/bKLvNU4s4U/xVeO1ihANIVzeBYeIBtHeNPHag19+GZQGE8bz8p5 SA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ps4698p9w-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 05 Apr 2023 07:28:07 +0000
-Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 335704BL006410;
-        Wed, 5 Apr 2023 07:28:07 GMT
-Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ps4698p98-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 05 Apr 2023 07:28:07 +0000
-Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
-        by ppma02fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3355SF2h004244;
-        Wed, 5 Apr 2023 07:28:04 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-        by ppma02fra.de.ibm.com (PPS) with ESMTPS id 3ppc86tbut-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 05 Apr 2023 07:28:04 +0000
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-        by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3357S1M329229724
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 5 Apr 2023 07:28:01 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 26E2520040;
-        Wed,  5 Apr 2023 07:28:01 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B5BE52004B;
-        Wed,  5 Apr 2023 07:28:00 +0000 (GMT)
-Received: from [9.171.60.228] (unknown [9.171.60.228])
-        by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Wed,  5 Apr 2023 07:28:00 +0000 (GMT)
-Message-ID: <c7de835c-6a0f-4190-a428-a0fdfeb3b8f9@linux.ibm.com>
-Date:   Wed, 5 Apr 2023 09:28:00 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.9.1
-Subject: Re: [kvm-unit-tests PATCH] MAINTAINERS: Add a catch-all entry for the
- kvm mailing list
-To:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org,
+        with ESMTP id S229925AbjDEHf1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Apr 2023 03:35:27 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45975A6
+        for <kvm@vger.kernel.org>; Wed,  5 Apr 2023 00:35:26 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id C61E462244
+        for <kvm@vger.kernel.org>; Wed,  5 Apr 2023 07:35:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 293D1C433D2;
+        Wed,  5 Apr 2023 07:35:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1680680125;
+        bh=r9fPk2ZLwV8C4ivtlt4hbSQ0Xx3nNbvxEH7kLfN7kTY=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=YTwzs24ZFYpYps1DURxOFyoQzr8k+w0vnAuZiRYv4FZKzA4bzXglzoMkOgB7CFB92
+         Wz/0RKqQYjhdWTmcyT4RSY6eW+yRAS+E+tB7dJ9TRhi6TmNs6xIZajIcHsgzMNNJ+M
+         D6vHJb2VlQr+jtfIyckq44KaojgrZ++nLtPg66Dp4zaTX7/r+quT/IH27pTMp5ucNr
+         doD1yX4K5ZtsBAZ9G0ddnUczPMoHDPYcnPquN5gdgJ8yHfedFF7u1qDJgMCZ6ZPSs3
+         LyJZVjsTAvGY9euZeHVCJ3GvDmYmz2ejDtwk9PKxuRyZzf4bdSNgL3aE7Wc3UzuRBN
+         uV326ypH7W8PA==
+Received: from ip-185-104-136-29.ptr.icomera.net ([185.104.136.29] helo=wait-a-minute.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1pjxfu-005tS6-PZ;
+        Wed, 05 Apr 2023 08:35:22 +0100
+Date:   Wed, 05 Apr 2023 08:35:05 +0100
+Message-ID: <87o7o26aty.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Oliver Upton <oliver.upton@linux.dev>
+Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Andrew Jones <andrew.jones@linux.dev>
-Cc:     Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Nico Boehr <nrb@linux.ibm.com>,
-        Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-References: <20230404125103.200027-1-thuth@redhat.com>
-Content-Language: en-US
-From:   Janosch Frank <frankja@linux.ibm.com>
-In-Reply-To: <20230404125103.200027-1-thuth@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: nggfIZuqBtJUIaiYW5EvRrvm3_zIeVQD
-X-Proofpoint-ORIG-GUID: ejRgpZOuzJca91xxjdzBl6exPJSRt6v-
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
- definitions=2023-04-05_03,2023-04-04_05,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 spamscore=0
- phishscore=0 clxscore=1015 suspectscore=0 priorityscore=1501
- mlxlogscore=999 mlxscore=0 lowpriorityscore=0 adultscore=0 impostorscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2303200000 definitions=main-2304050065
-X-Spam-Status: No, score=-2.0 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
-        DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Salil Mehta <salil.mehta@huawei.com>
+Subject: Re: [PATCH v3 08/13] KVM: arm64: Add support for KVM_EXIT_HYPERCALL
+In-Reply-To: <20230404154050.2270077-9-oliver.upton@linux.dev>
+References: <20230404154050.2270077-1-oliver.upton@linux.dev>
+        <20230404154050.2270077-9-oliver.upton@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.104.136.29
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, pbonzini@redhat.com, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, seanjc@google.com, salil.mehta@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-5.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,SPF_HELO_NONE,
+        SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 4/4/23 14:51, Thomas Huth wrote:
-> The scripts/get_maintainer.pl currently fails to suggest sending
-> patches to kvm@vger.kernel.org if a patch only touches files that
-> are not part of any target specific code (e.g. files in the script
-> folder). All patches should be CC:-ed to the kvm list, so we should
-> have an entry here that covers all files.
+On Tue, 04 Apr 2023 16:40:45 +0100,
+Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> In anticipation of user hypercall filters, add the necessary plumbing to
+> get SMCCC calls out to userspace. Even though the exit structure has
+> space for KVM to pass register arguments, let's just avoid it altogether
+> and let userspace poke at the registers via KVM_GET_ONE_REG.
+> 
+> This deliberately stretches the definition of a 'hypercall' to cover
+> SMCs from EL1 in addition to the HVCs we know and love. KVM doesn't
+> support EL1 calls into secure services, but now we can paint that as a
+> userspace problem and be done with it.
+> 
+> Finally, we need a flag to let userspace know what conduit instruction
+> was used (i.e. SMC vs. HVC).
+> 
+> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> ---
+>  Documentation/virt/kvm/api.rst    | 18 ++++++++++++++++--
+>  arch/arm64/include/uapi/asm/kvm.h |  4 ++++
+>  arch/arm64/kvm/handle_exit.c      |  4 +++-
+>  arch/arm64/kvm/hypercalls.c       | 16 ++++++++++++++++
+>  4 files changed, 39 insertions(+), 3 deletions(-)
+> 
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index 9b01e3d0e757..9497792c4ee5 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -6221,11 +6221,25 @@ to the byte array.
+>  			__u64 flags;
+>  		} hypercall;
+>  
+> -Unused.  This was once used for 'hypercall to userspace'.  To implement
+> -such functionality, use KVM_EXIT_IO (x86) or KVM_EXIT_MMIO (all except s390).
+> +
+> +It is strongly recommended that userspace use ``KVM_EXIT_IO`` (x86) or
+> +``KVM_EXIT_MMIO`` (all except s390) to implement functionality that
+> +requires a guest to interact with host userpace.
+>  
+>  .. note:: KVM_EXIT_IO is significantly faster than KVM_EXIT_MMIO.
+>  
+> +For arm64:
+> +----------
+> +
+> +``nr`` contains the function ID of the guest's SMCCC call. Userspace is
+> +expected to use the ``KVM_GET_ONE_REG`` ioctl to retrieve the call
+> +parameters from the vCPU's GPRs.
+> +
+> +Definition of ``flags``:
+> + - ``KVM_HYPERCALL_EXIT_SMC``: Indicates that the guest used the SMC
+> +   conduit to initiate the SMCCC call. If this bit is 0 then the guest
+> +   used the HVC conduit for the SMCCC call.
+> +
+>  ::
+>  
+>  		/* KVM_EXIT_TPR_ACCESS */
+> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+> index f9672ef1159a..f86446c5a7e3 100644
+> --- a/arch/arm64/include/uapi/asm/kvm.h
+> +++ b/arch/arm64/include/uapi/asm/kvm.h
+> @@ -472,12 +472,16 @@ enum {
+>  enum kvm_smccc_filter_action {
+>  	KVM_SMCCC_FILTER_HANDLE = 0,
+>  	KVM_SMCCC_FILTER_DENY,
+> +	KVM_SMCCC_FILTER_FWD_TO_USER,
+>  
+>  #ifdef __KERNEL__
+>  	NR_SMCCC_FILTER_ACTIONS
+>  #endif
+>  };
+>  
+> +/* arm64-specific KVM_EXIT_HYPERCALL flags */
+> +#define KVM_HYPERCALL_EXIT_SMC	(1U << 0)
+> +
+>  #endif
+>  
+>  #endif /* __ARM_KVM_H__ */
+> diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+> index 68f95dcd41a1..3f43e20c48b6 100644
+> --- a/arch/arm64/kvm/handle_exit.c
+> +++ b/arch/arm64/kvm/handle_exit.c
+> @@ -71,7 +71,9 @@ static int handle_smc(struct kvm_vcpu *vcpu)
+>  	 * Trap exception, not a Secure Monitor Call exception [...]"
+>  	 *
+>  	 * We need to advance the PC after the trap, as it would
+> -	 * otherwise return to the same address...
+> +	 * otherwise return to the same address. Furthermore, pre-incrementing
+> +	 * the PC before potentially exiting to userspace maintains the same
+> +	 * abstraction for both SMCs and HVCs.
 
-Acked-by: Janosch Frank <frankja@linux.ibm.com>
+nit: this comment really needs to find its way in the documentation so
+that a VMM author can determine the PC of the SMC/HVC. This is
+specially important for 32bit, which has a 16bit encodings for
+SMC/HVC.
 
+And thinking of it, this outlines a small flaw in this API. If
+luserspace needs to find out about the address of the HVC/SMC, it
+needs to know the *size* of the instruction. But we don't propagate
+the ESR value. I think this still works by construction (userspace can
+check PSTATE and work out whether we're in ARM or Thumb mode), but
+this feels fragile.
+
+Should we expose the ESR, or at least ESR_EL2.IL as an additional
+flag?
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
