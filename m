@@ -2,51 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4B9206D81F0
-	for <lists+kvm@lfdr.de>; Wed,  5 Apr 2023 17:31:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 52F606D81FD
+	for <lists+kvm@lfdr.de>; Wed,  5 Apr 2023 17:33:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238409AbjDEPbL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Apr 2023 11:31:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34534 "EHLO
+        id S238419AbjDEPdp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Apr 2023 11:33:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39556 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238837AbjDEPax (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Apr 2023 11:30:53 -0400
-Received: from out-39.mta0.migadu.com (out-39.mta0.migadu.com [91.218.175.39])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 597DD10D7
-        for <kvm@vger.kernel.org>; Wed,  5 Apr 2023 08:30:49 -0700 (PDT)
-Date:   Wed, 5 Apr 2023 15:30:41 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1680708646;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=9E5OY1K4w45DWf573FPZ+2UbjmJk7huX/eo3Pr5CduI=;
-        b=HR7E0IwqAIlq+8vjV2SEXl2q5CluHxEy6WnHMznnXgGCA3nwCgw019fxvP0+BKVXLLfjSR
-        6G67Ag5YWsVkVTYdh/3j4ci0TDtDjjXqZRhc3+1p/+UH9Enu0iAGIlnO7Xrf8J6ImWV7jb
-        qE1xQDKG7VW21FcQTq7l1QOq888XQmg=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Oliver Upton <oliver.upton@linux.dev>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Salil Mehta <salil.mehta@huawei.com>
-Subject: Re: [PATCH v3 08/13] KVM: arm64: Add support for KVM_EXIT_HYPERCALL
-Message-ID: <ZC2UIWa4huuiE0ZD@linux.dev>
-References: <20230404154050.2270077-1-oliver.upton@linux.dev>
- <20230404154050.2270077-9-oliver.upton@linux.dev>
- <87o7o26aty.wl-maz@kernel.org>
- <86pm8iv8tj.wl-maz@kernel.org>
+        with ESMTP id S237845AbjDEPdn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Apr 2023 11:33:43 -0400
+Received: from mail-qt1-x836.google.com (mail-qt1-x836.google.com [IPv6:2607:f8b0:4864:20::836])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D0AB180
+        for <kvm@vger.kernel.org>; Wed,  5 Apr 2023 08:33:42 -0700 (PDT)
+Received: by mail-qt1-x836.google.com with SMTP id bb36so736271qtb.3
+        for <kvm@vger.kernel.org>; Wed, 05 Apr 2023 08:33:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google; t=1680708821;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=JAA83h3rMO9yiss39MIEuvqUfO0ThiaUitzgjnYkq/E=;
+        b=VFVjB+wajJZwttZLFmf3dH6GInBwfa6fgjRbdG4XHeLh8yVA+kDknIw516FXMYv7gX
+         SF45vZdirh06fUl+obsZmsZTMVmlK3sbHEmnLMLrlinCZvBHyOK6D00LTyFid2/Uenpx
+         JCdm/5J2HOw2ZLn0wL7sWdFccemN8yuW2S5qA5BbzbpVvN4eMI3j0CSfFH1zA50mzVN9
+         oSYsv5JvTyg7SDNQMP4nIj9xHu3oeIuYxX+KWDQvTkvKvb1XMedpjmvky27E4AAoGSAt
+         mz3tgDEDM+lt1ipLb9cut24IDz8vWCXeoYiDQximUhIrfv8S4C149xyyu40wmuYsn0Qj
+         AJsA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1680708821;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=JAA83h3rMO9yiss39MIEuvqUfO0ThiaUitzgjnYkq/E=;
+        b=suD/zAMAvJ9jM/wFoprkmJ8ngluWv3vrJocKdywn2C1+3eGmCxsHEdmInfez1C2nys
+         K9VOl0pyUI0uwuPsDZONOlMIq/MQ4eaQ70ee4ZIBuyQN/smiFGNr66MDvpwUrtb2EC+4
+         IMKaEscY73xFwDl+2kI/twuGRo8pcscHkRh3m/Nr5TueHzCuGbc4e9WJhKUYFG9q9uPG
+         HDu5sshHbLpjO2MClWf9wnWEhQhxz0Ps8G3bchCMfyUSOG3w44EnPX2yZidmggRSKxl3
+         xOQ4pOmQK7VH0vHfW9Lc6WdwfdHCvEa+AGoYBVNevv3nr19LIzVWwO7mVqFizseUROUd
+         bJDQ==
+X-Gm-Message-State: AAQBX9e4/CcHNDRterEV1R2g2X3/dNNOS/SoBQ6N0XViOJW/kn0xMeAq
+        heynZiiULZwpaaCjvYh52/pTun2sfK7lA7IR7vg=
+X-Google-Smtp-Source: AKy350ZL3doRQBP2nu8UnusnIpVB12rSuYq2Qlw6uZRfd0UNr5PXOWG51ep5iSgydRWgvN5Ch/fdtw==
+X-Received: by 2002:a05:622a:1749:b0:3e3:86d4:5df0 with SMTP id l9-20020a05622a174900b003e386d45df0mr5606985qtk.55.1680708821401;
+        Wed, 05 Apr 2023 08:33:41 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-142-68-25-194.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.25.194])
+        by smtp.gmail.com with ESMTPSA id 84-20020a370a57000000b007422fa6376bsm4500271qkk.77.2023.04.05.08.33.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 05 Apr 2023 08:33:40 -0700 (PDT)
+Received: from jgg by wakko with local (Exim 4.95)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1pk58m-007MHn-08;
+        Wed, 05 Apr 2023 12:33:40 -0300
+Date:   Wed, 5 Apr 2023 12:33:39 -0300
+From:   Jason Gunthorpe <jgg@ziepe.ca>
+To:     Nipun Gupta <nipun.gupta@amd.com>
+Cc:     alex.williamson@redhat.com, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, git@amd.com, harpreet.anand@amd.com,
+        michal.simek@amd.com
+Subject: Re: [PATCH] vfio/cdx: add support for CDX bus
+Message-ID: <ZC2U0/v0toRVSWhf@ziepe.ca>
+References: <20230403142525.29494-1-nipun.gupta@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <86pm8iv8tj.wl-maz@kernel.org>
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <20230403142525.29494-1-nipun.gupta@amd.com>
 X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
-        DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
+        DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS
         autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -54,147 +74,151 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hey Marc,
+On Mon, Apr 03, 2023 at 07:55:25PM +0530, Nipun Gupta wrote:
 
-On Wed, Apr 05, 2023 at 12:59:20PM +0100, Marc Zyngier wrote:
+> +enum {
+> +	CDX_ID_F_VFIO_DRIVER_OVERRIDE = 1,
+> +};
 
-[...]
+This seems to be missing the file2alias part.
 
-> > > diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-> > > index 68f95dcd41a1..3f43e20c48b6 100644
-> > > --- a/arch/arm64/kvm/handle_exit.c
-> > > +++ b/arch/arm64/kvm/handle_exit.c
-> > > @@ -71,7 +71,9 @@ static int handle_smc(struct kvm_vcpu *vcpu)
-> > >  	 * Trap exception, not a Secure Monitor Call exception [...]"
-> > >  	 *
-> > >  	 * We need to advance the PC after the trap, as it would
-> > > -	 * otherwise return to the same address...
-> > > +	 * otherwise return to the same address. Furthermore, pre-incrementing
-> > > +	 * the PC before potentially exiting to userspace maintains the same
-> > > +	 * abstraction for both SMCs and HVCs.
-> > 
-> > nit: this comment really needs to find its way in the documentation so
-> > that a VMM author can determine the PC of the SMC/HVC. This is
-> > specially important for 32bit, which has a 16bit encodings for
-> > SMC/HVC.
-> > 
-> > And thinking of it, this outlines a small flaw in this API. If
-> > luserspace needs to find out about the address of the HVC/SMC, it
-> > needs to know the *size* of the instruction. But we don't propagate
-> > the ESR value. I think this still works by construction (userspace can
-> > check PSTATE and work out whether we're in ARM or Thumb mode), but
-> > this feels fragile.
-> > 
-> > Should we expose the ESR, or at least ESR_EL2.IL as an additional
-> > flag?
-> 
-> Just to make this a quicker round trip, I hacked the following
-> together. If you agree with it, I'll stick it on top and get the ball
-> rolling.
-
-Less work for me? How could I say no :)
-
-> From 9b830e7a3819c2771074bebe66c1d5f20394e3cc Mon Sep 17 00:00:00 2001
-> From: Marc Zyngier <maz@kernel.org>
-> Date: Wed, 5 Apr 2023 12:48:58 +0100
-> Subject: [PATCH] KVM: arm64: Expose SMC/HVC width to userspace
-> 
-> When returning to userspace to handle a SMCCC call, we consistently
-> set PC to point to the instruction immediately after the HVC/SMC.
-> 
-> However, should userspace need to know the exact address of the
-> trapping instruction, it needs to know about the *size* of that
-> instruction. For AArch64, this is pretty easy. For AArch32, this
-> is a bit more funky, as Thumb has 16bit encodings for both HVC
-> and SMC.
-> 
-> Expose this to userspace with a new flag that directly derives
-> from ESR_EL2.IL. Also update the documentation to reflect the PC
-> state at the point of exit.
-> 
-> Finally, this fixes a small buglet where the hypercall.{args,ret}
-> fields would not be cleared on exit, and could contain some
-> random junk.
-> 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-
-Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
-
-> ---
->  Documentation/virt/kvm/api.rst    |  8 ++++++++
->  arch/arm64/include/uapi/asm/kvm.h |  3 ++-
->  arch/arm64/kvm/hypercalls.c       | 16 +++++++++++-----
->  3 files changed, 21 insertions(+), 6 deletions(-)
-> 
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index c8ab2f730945..103f945959ed 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -6244,6 +6244,14 @@ Definition of ``flags``:
->     conduit to initiate the SMCCC call. If this bit is 0 then the guest
->     used the HVC conduit for the SMCCC call.
->  
-> + - ``KVM_HYPERCALL_EXIT_16BIT``: Indicates that the guest used a 16bit
-> +   instruction to initiate the SMCCC call. If this bit is 0 then the
-> +   guest used a 32bit instruction. An AArch64 guest always has this
-> +   bit set to 0.
+> +static void vfio_cdx_regions_cleanup(struct vfio_cdx_device *vdev)
+> +{
+> +	kfree(vdev->regions);
+> +}
 > +
-> +At the point of exit, PC points to the instruction immediately following
-> +the trapping instruction.
-> +
->  ::
->  
->  		/* KVM_EXIT_TPR_ACCESS */
-> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-> index 3dcfa4bfdf83..b1c1edf85480 100644
-> --- a/arch/arm64/include/uapi/asm/kvm.h
-> +++ b/arch/arm64/include/uapi/asm/kvm.h
-> @@ -491,7 +491,8 @@ struct kvm_smccc_filter {
->  };
->  
->  /* arm64-specific KVM_EXIT_HYPERCALL flags */
-> -#define KVM_HYPERCALL_EXIT_SMC	(1U << 0)
-> +#define KVM_HYPERCALL_EXIT_SMC		(1U << 0)
-> +#define KVM_HYPERCALL_EXIT_16BIT	(1U << 1)
->  
->  #endif
->  
-> diff --git a/arch/arm64/kvm/hypercalls.c b/arch/arm64/kvm/hypercalls.c
-> index 9a35d6d18193..3b6523f25afc 100644
-> --- a/arch/arm64/kvm/hypercalls.c
-> +++ b/arch/arm64/kvm/hypercalls.c
-> @@ -222,13 +222,19 @@ static void kvm_prepare_hypercall_exit(struct kvm_vcpu *vcpu, u32 func_id)
->  {
->  	u8 ec = ESR_ELx_EC(kvm_vcpu_get_esr(vcpu));
->  	struct kvm_run *run = vcpu->run;
-> -
-> -	run->exit_reason = KVM_EXIT_HYPERCALL;
-> -	run->hypercall.nr = func_id;
-> -	run->hypercall.flags = 0;
-> +	u64 flags = 0;
->  
->  	if (ec == ESR_ELx_EC_SMC32 || ec == ESR_ELx_EC_SMC64)
-> -		run->hypercall.flags |= KVM_HYPERCALL_EXIT_SMC;
-> +		flags |= KVM_HYPERCALL_EXIT_SMC;
-> +
-> +	if (!kvm_vcpu_trap_il_is32bit(vcpu))
-> +		flags |= KVM_HYPERCALL_EXIT_16BIT;
-> +
-> +	run->exit_reason = KVM_EXIT_HYPERCALL;
-> +	run->hypercall = (typeof(run->hypercall)) {
-> +		.nr	= func_id,
-> +		.flags	= flags,
-> +	};
->  }
->  
->  int kvm_smccc_call_handler(struct kvm_vcpu *vcpu)
-> -- 
-> 2.34.1
-> 
-> 
-> -- 
-> Without deviation from the norm, progress is not possible.
+> +static int vfio_cdx_reset_device(struct vfio_cdx_device *vdev)
+> +{
+> +	return cdx_dev_reset(&vdev->cdx_dev->dev);
+> +}
 
--- 
-Thanks,
-Oliver
+Wrapper functions should be avoided.
+
+> +static void vfio_cdx_close_device(struct vfio_device *core_vdev)
+> +{
+> +	struct vfio_cdx_device *vdev =
+> +		container_of(core_vdev, struct vfio_cdx_device, vdev);
+> +	int ret;
+> +
+> +	vfio_cdx_regions_cleanup(vdev);
+> +
+> +	/* reset the device before cleaning up the interrupts */
+> +	ret = vfio_cdx_reset_device(vdev);
+> +	if (WARN_ON(ret))
+> +		dev_warn(core_vdev->dev,
+> +			 "VFIO_CDX: reset device has failed (%d)\n", ret);
+
+This is pretty problematic.. if the reset can fail the device is
+returned to the system in an unknown state and it seems pretty likely
+that it can be a way to attack the kernel.
+
+> +	case VFIO_DEVICE_RESET:
+> +	{
+> +		return vfio_cdx_reset_device(vdev);
+> +	}
+
+What happens to MMIO access during this reset?
+
+> +static int vfio_cdx_mmap_mmio(struct vfio_cdx_region region,
+> +			      struct vm_area_struct *vma)
+> +{
+> +	u64 size = vma->vm_end - vma->vm_start;
+> +	u64 pgoff, base;
+> +
+> +	pgoff = vma->vm_pgoff &
+> +		((1U << (VFIO_CDX_OFFSET_SHIFT - PAGE_SHIFT)) - 1);
+> +	base = pgoff << PAGE_SHIFT;
+> +
+> +	if (region.size < PAGE_SIZE || base + size > region.size)
+> +		return -EINVAL;
+> +
+> +	vma->vm_pgoff = (region.addr >> PAGE_SHIFT) + pgoff;
+> +	vma->vm_page_prot = pgprot_noncached(vma->vm_page_prot);
+
+pgprot_device
+
+> +	return remap_pfn_range(vma, vma->vm_start, vma->vm_pgoff,
+> +			       size, vma->vm_page_prot);
+
+io_remap_pfn_range
+> +static int vfio_cdx_mmap(struct vfio_device *core_vdev,
+> +			 struct vm_area_struct *vma)
+> +{
+> +	struct vfio_cdx_device *vdev =
+> +		container_of(core_vdev, struct vfio_cdx_device, vdev);
+> +	struct cdx_device *cdx_dev = vdev->cdx_dev;
+> +	unsigned int index;
+> +
+> +	index = vma->vm_pgoff >> (VFIO_CDX_OFFSET_SHIFT - PAGE_SHIFT);
+> +
+> +	if (vma->vm_end < vma->vm_start)
+> +		return -EINVAL;
+> +	if (vma->vm_start & ~PAGE_MASK)
+> +		return -EINVAL;
+> +	if (vma->vm_end & ~PAGE_MASK)
+> +		return -EINVAL;
+
+The core code already assures these checks.
+
+> +	if (!(vma->vm_flags & VM_SHARED))
+> +		return -EINVAL;
+> +	if (index >= cdx_dev->res_count)
+> +		return -EINVAL;
+> +
+> +	if (!(vdev->regions[index].flags & VFIO_REGION_INFO_FLAG_MMAP))
+> +		return -EINVAL;
+> +
+> +	if (!(vdev->regions[index].flags & VFIO_REGION_INFO_FLAG_READ) &&
+> +	    (vma->vm_flags & VM_READ))
+> +		return -EINVAL;
+> +
+> +	if (!(vdev->regions[index].flags & VFIO_REGION_INFO_FLAG_WRITE) &&
+> +	    (vma->vm_flags & VM_WRITE))
+> +		return -EINVAL;
+> +
+> +	vma->vm_private_data = cdx_dev;
+
+not needed
+
+> diff --git a/drivers/vfio/cdx/vfio_cdx_private.h b/drivers/vfio/cdx/vfio_cdx_private.h
+> new file mode 100644
+> index 000000000000..8b6f1ee3f5cd
+> --- /dev/null
+> +++ b/drivers/vfio/cdx/vfio_cdx_private.h
+> @@ -0,0 +1,32 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +/*
+> + * Copyright (C) 2022-2023, Advanced Micro Devices, Inc.
+> + */
+> +
+> +#ifndef VFIO_CDX_PRIVATE_H
+> +#define VFIO_CDX_PRIVATE_H
+> +
+> +#define VFIO_CDX_OFFSET_SHIFT    40
+> +#define VFIO_CDX_OFFSET_MASK (((u64)(1) << VFIO_CDX_OFFSET_SHIFT) - 1)
+> +
+> +#define VFIO_CDX_OFFSET_TO_INDEX(off) ((off) >> VFIO_CDX_OFFSET_SHIFT)
+> +
+> +#define VFIO_CDX_INDEX_TO_OFFSET(index)	\
+> +	((u64)(index) << VFIO_CDX_OFFSET_SHIFT)
+
+use static inlines for function-line macros
+
+> +struct vfio_cdx_region {
+> +	u32			flags;
+> +	u32			type;
+> +	u64			addr;
+> +	resource_size_t		size;
+> +	void __iomem		*ioaddr;
+> +};
+> +
+> +struct vfio_cdx_device {
+> +	struct vfio_device	vdev;
+> +	struct cdx_device	*cdx_dev;
+> +	struct device		*dev;
+> +	struct vfio_cdx_region	*regions;
+> +};
+
+This header file does not seem necessary right now
+
+Jason
