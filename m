@@ -2,252 +2,215 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 509276D7877
-	for <lists+kvm@lfdr.de>; Wed,  5 Apr 2023 11:34:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 662E26D787C
+	for <lists+kvm@lfdr.de>; Wed,  5 Apr 2023 11:35:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236931AbjDEJeo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Apr 2023 05:34:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33772 "EHLO
+        id S237191AbjDEJfs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Apr 2023 05:35:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39556 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229477AbjDEJen (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Apr 2023 05:34:43 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A1624200
-        for <kvm@vger.kernel.org>; Wed,  5 Apr 2023 02:33:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1680687156;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=iJePrIKmM5p19yIm7M29IOK4mZgEMe/4wGNFN0wD5VI=;
-        b=XVehvmbbe9TRuJNo5A8Ehe1bN3KYbTa2ssLYcM4ltWPb2jLcQ14yPFGRj+QUGR4NJjnMK3
-        1CQp1YDnbi4tkrmhGFzNibn+T5ThwTCvhCUKb90YAwsKszBZFrYF9Sft+ZMHKDKXZesFMC
-        KSFhTry/caMYm/TNkO6B2nIWQ6x/o6s=
-Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
- [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-5-BVhfEG1SPmq2vzh9GQEDYQ-1; Wed, 05 Apr 2023 05:32:35 -0400
-X-MC-Unique: BVhfEG1SPmq2vzh9GQEDYQ-1
-Received: by mail-qv1-f69.google.com with SMTP id y19-20020ad445b3000000b005a5123cb627so15894657qvu.20
-        for <kvm@vger.kernel.org>; Wed, 05 Apr 2023 02:32:35 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680687155;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=iJePrIKmM5p19yIm7M29IOK4mZgEMe/4wGNFN0wD5VI=;
-        b=wq+2oLyJV9uHRSZXWiOSMuc6h7L9tzO/CYgl2D1ZSfA7bKKgzSW4V3nyWzq9bMNYoK
-         mlx5Dt7kS919J4ZR+GdMAVbtKPgsZscgtLwCwTCabs9mH/KCE0cJ/r8a8tF9c9omSPnl
-         LLQRxeQHRVyxxA0WnEmplJMm1j2QdKeku10oTI5baR178iIMPfIlJpZzWFG/19G1Ae0g
-         aJMdcYc+Q+1Y78JGBWDS0mCNdk+JtJ3/Ocz6lNSVIR3r70xU6bGWom1V8GTXyNKaSEo0
-         5xEQ1YemNPgh579QcxOV2l3k3MJJJRipUBlQ/snuIhiViCFs6xOnzhQo9N0WEsVdws1o
-         WFdA==
-X-Gm-Message-State: AAQBX9ejp76Y9ncZYyM8EhX/N8pxiL/57FY/SbjhD/P/A/jruf5OeO44
-        fT3zmbMq7DsTaSLm4AVCVbc2KKzs0sYaYfae6zlOlURrJ3+9mxv4ylmwyUqosN4dnOBfzVrW4rC
-        z8nnQvdq9eTnr
-X-Received: by 2002:ac8:5d8d:0:b0:3bf:9f6e:a383 with SMTP id d13-20020ac85d8d000000b003bf9f6ea383mr3773377qtx.20.1680687154761;
-        Wed, 05 Apr 2023 02:32:34 -0700 (PDT)
-X-Google-Smtp-Source: AKy350Za+7n9GSyWy9b45qFE/eA8nCSnC0CPFcZ7xK49KUKdqgO8AfWeVw15E1LUZ5+byQQ44jGWCQ==
-X-Received: by 2002:ac8:5d8d:0:b0:3bf:9f6e:a383 with SMTP id d13-20020ac85d8d000000b003bf9f6ea383mr3773354qtx.20.1680687154483;
-        Wed, 05 Apr 2023 02:32:34 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id h19-20020a05620a401300b0074589d41342sm1900175qko.17.2023.04.05.02.32.29
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 05 Apr 2023 02:32:33 -0700 (PDT)
-Message-ID: <4489a951-710f-a5b1-dcaf-f69d8b21f9fb@redhat.com>
-Date:   Wed, 5 Apr 2023 11:32:27 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.0
-Reply-To: eric.auger@redhat.com
-Subject: Re: [PATCH v3 08/12] vfio/pci: Renaming for accepting device fd in
- hot reset path
+        with ESMTP id S237052AbjDEJfl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Apr 2023 05:35:41 -0400
+Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3034559F
+        for <kvm@vger.kernel.org>; Wed,  5 Apr 2023 02:35:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1680687322; x=1712223322;
+  h=from:to:cc:subject:date:message-id:
+   content-transfer-encoding:mime-version;
+  bh=IvdIEyFpf3S8Lad6R2fd2wuHYQcEJCRioK5qnEaKHDA=;
+  b=ir6YCCFZCnXXsSNHggKyNQv4Kb47PF480xWMm+JBJuzdi+ss1+WIl8SQ
+   nNKLcas9lEfdYRNaxx5D3jCkZaLcBs4qUvkMQtcdub9gSNSUC4hoY/gXE
+   CrqaDUJxUxQuoF/ZKID9FS48rJiFpKgcwj3+/h/CpRoGTsZn/Mfu61fYq
+   ckwxTSflGIs+P3logcqWZWwBXgLiX32hoppXfFyapITvAz2JC+WvwAxj4
+   7mr0jHWDJFu9EJdU1Gl/WM1O7xotfRLsdg/u75LZ561z1JRO9x48CIT0g
+   7Zlbv7a06LFpJM1LOtvb7V+9s+Y83GO9pKy+iF/viAbAjpWlM6Kccd0dQ
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10670"; a="322789003"
+X-IronPort-AV: E=Sophos;i="5.98,319,1673942400"; 
+   d="scan'208";a="322789003"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Apr 2023 02:34:29 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10670"; a="686683605"
+X-IronPort-AV: E=Sophos;i="5.98,319,1673942400"; 
+   d="scan'208";a="686683605"
+Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
+  by orsmga002.jf.intel.com with ESMTP; 05 Apr 2023 02:34:28 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.21; Wed, 5 Apr 2023 02:34:28 -0700
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.21 via Frontend Transport; Wed, 5 Apr 2023 02:34:28 -0700
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.169)
+ by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.21; Wed, 5 Apr 2023 02:34:28 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=n8h5OKLvmW7iXI4cMeFxLC9dWJ7xgMXz/SzWBo7AFip6GoZjSLIzrOhi+9WU0Y2cb6RKyF3Cg567NdG6CNO84Mo8edWq9DIVvz1yySNQ1QCb1s/1X8xsD+RKeCR/mUdpFuhE9iAYBnAH2Rjs53GYamv7FsTBVdrr1DytPnI0YDyrgvMmXbnNh8xPhJKRYHEh7HZpZxDZSXeXYMORSz9OOgG5jZAbH9zqOwoirIQiPfS3EpzrVt95HCk1A6II9WuKRnSTgjsuWakSB/s1NisMlgDGWYkRdrZyDjwFw/4Qyl+ALAkmQ2pDoZXWLNPxd1EQtNNtekWUgRdNwhiz7CIfZw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=u5Ks7YAavOT4ZQDaLCbylaCagP7d66eDl13QTcCXfCs=;
+ b=OKAFzLukq3yXMYDAu/jIBA3DKshch44vq+xh+b82IdD2K00WZqhIV1s6r1YuXd9UIXfhDX74az0N6LGDInt65Ct6pW/HHngZhv6C4p0uGa+Lp8Zuq6vVpIhKqhjGV3EjRJRRxDguVd4ymF1tupzfyMEQnxVquNLP8TocJmjsuJOZVvq2CN0TVnNAC4q21dQCoKDDUqx1a96fjzigGDZKdVRfmtl/a5R+5hGj3nPz7YMbKofaKEPl1aEETYPBC9ajc11mBAPWckMRsZbW7W30+N36YxWvrClOfKlAHD0Sa7g1vdtv/d6q44Qu9AL1xtfoeDzd94itYUoZ3nT+mtpKwQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from SA1PR11MB6734.namprd11.prod.outlook.com (2603:10b6:806:25d::22)
+ by PH7PR11MB5958.namprd11.prod.outlook.com (2603:10b6:510:1e1::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6254.33; Wed, 5 Apr
+ 2023 09:34:25 +0000
+Received: from SA1PR11MB6734.namprd11.prod.outlook.com
+ ([fe80::5dfc:6a16:20d9:6948]) by SA1PR11MB6734.namprd11.prod.outlook.com
+ ([fe80::5dfc:6a16:20d9:6948%6]) with mapi id 15.20.6254.035; Wed, 5 Apr 2023
+ 09:34:25 +0000
+From:   "Li, Xin3" <xin3.li@intel.com>
+To:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+CC:     "Christopherson,, Sean" <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "Li, Xiaoyao" <xiaoyao.li@intel.com>,
+        "Yao, Yuan" <yuan.yao@intel.com>,
+        "Dong, Eddie" <eddie.dong@intel.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "Nakajima, Jun" <jun.nakajima@intel.com>,
+        "H.Peter Anvin" <hpa@zytor.com>,
+        "Mallick, Asit K" <asit.k.mallick@intel.com>
+Subject: The necessity of injecting a hardware exception reported in VMX IDT
+ vectoring information
+Thread-Topic: The necessity of injecting a hardware exception reported in VMX
+ IDT vectoring information
+Thread-Index: AdlnGoO7DMFQx8JhSoqsl2dQLdydDA==
+Date:   Wed, 5 Apr 2023 09:34:25 +0000
+Message-ID: <SA1PR11MB673463616F7B1318874D11A3A8909@SA1PR11MB6734.namprd11.prod.outlook.com>
+Accept-Language: en-US
 Content-Language: en-US
-To:     Yi Liu <yi.l.liu@intel.com>, alex.williamson@redhat.com,
-        jgg@nvidia.com, kevin.tian@intel.com
-Cc:     joro@8bytes.org, robin.murphy@arm.com, cohuck@redhat.com,
-        nicolinc@nvidia.com, kvm@vger.kernel.org, mjrosato@linux.ibm.com,
-        chao.p.peng@linux.intel.com, yi.y.sun@linux.intel.com,
-        peterx@redhat.com, jasowang@redhat.com,
-        shameerali.kolothum.thodi@huawei.com, lulu@redhat.com,
-        suravee.suthikulpanit@amd.com, intel-gvt-dev@lists.freedesktop.org,
-        intel-gfx@lists.freedesktop.org, linux-s390@vger.kernel.org,
-        xudong.hao@intel.com, yan.y.zhao@intel.com, terrence.xu@intel.com,
-        yanting.jiang@intel.com
-References: <20230401144429.88673-1-yi.l.liu@intel.com>
- <20230401144429.88673-9-yi.l.liu@intel.com>
-From:   Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <20230401144429.88673-9-yi.l.liu@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-1.6 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SA1PR11MB6734:EE_|PH7PR11MB5958:EE_
+x-ms-office365-filtering-correlation-id: 67aed4f3-6353-4116-3ba4-08db35b8f206
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: uSzpQdP3cj1t7dPklnSN8ysnMCbuwDkoPf+l4ZuWpuUYA0H8WfQmnC07e+hzHmyjCvYBNSYsDHSeTvAn/Pn6CtBKXNZWMb335yxIU58o4r/QaN6TSSOt0KFrqBOOL9T9I2hdW7ns1RgTyWdKvw5etWEriRs3ULthkhpoLXMaiZ097qEgxK6Er+mzoDNiKnvfa9JdIRtcgkAfFHMBftAy9kWHANIOp82ds4T0IIoDVh2tI5URJig+kgKCWzfxob2iJbNyTVaLjxVk3ExxgiXp9Plqa4oGDrJUkFtHup4nAsVjWixh7FaNU5uHlY+YSlNI5b+ivbqv2JDhLJryxgrGWj9ufxdWVItY2W982dBb8PLL/wJXISvGM9bl0FIyiOnK8Yftry64CB3MRzM5lVGIaFQ4DY7mIlkzb9ZN2DBsW4eSDPUSYHaVYhg21ptmbkTFVPkqViWH85vEcgbjfjt1P0GNmB1f5Khu+LOVTsNA5Eo0O5wA7mco/HIm2tfWAWgxn9ZEzEnGmws+49rwDvBlY/IJDuGcr/UDgKj3AHlIyT9RBeTo59tJUW2e7UvF+kelhc/gKuT+QTKdpEHLN7oy/crqLTUSX+eEzBX9RP1bBBn/d35BifGKyupuyuM0ryI9
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA1PR11MB6734.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(396003)(366004)(39860400002)(376002)(136003)(346002)(451199021)(86362001)(5660300002)(6916009)(107886003)(186003)(122000001)(82960400001)(26005)(9686003)(6506007)(38070700005)(52536014)(8936002)(66476007)(8676002)(66946007)(33656002)(66446008)(478600001)(55016003)(76116006)(4326008)(54906003)(64756008)(41300700001)(316002)(7696005)(71200400001)(66556008)(2906002)(38100700002);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?ae7zOHaBtrSoAbp71uFQs++GGEfMRNN5DOqtJq8uIQlYrVgNVDiWqwAzMv1i?=
+ =?us-ascii?Q?zOhcjArCTy2uFIcfipMJ55w453/GDXI/iukFnAEqvKnWYGQz/sem+jMjUrZs?=
+ =?us-ascii?Q?RKeXINrakomK+kIpfuSjGZHQTm6nKVYipL+OZuidhEk7ddL5qtoEufk+aCnK?=
+ =?us-ascii?Q?s9c6bhqMm7TZ+KvD4iCtFDWqFTfGcjSmmVgbV9wgg78aDJsgqdz68SDrir4T?=
+ =?us-ascii?Q?AyDXWoVHweVm0RXrga1VOIfrAWGyw36NoJ3ITffikUNnSmj0M9ytXzf/2fjB?=
+ =?us-ascii?Q?D3X+UyeX4Ie1pqojEcRZpPt0CNwqOr8yc539unNrn6kk3dkPLfc6+Uk8drmq?=
+ =?us-ascii?Q?RjOF8+UNzOuJ+dv1xViVOns4FGEnJmMxxuU7k/qm+wPk8ZotiZSGjoPr9Tcs?=
+ =?us-ascii?Q?NH1QH+m6dRfQVSq9LhEJezR3rC8UA2WHgc18azlo0lXVZLqSDxzdiMH39q5S?=
+ =?us-ascii?Q?G4Y4Loa9ELJBjhJ6xoJfz/6oTmgTsRH/95mZrxSn0bFCIBNAsGpUIa55MOnt?=
+ =?us-ascii?Q?m+qaSwwcUNIR5Xkmu3WQux5zipD81bvPnWBGEA8O3EzsrolTFQZThRSCuSyN?=
+ =?us-ascii?Q?XmZ0TdeGBOL2UL0oCK/KVQDfXWPWELXP1KybkV7YueewlkXFf5uVu6AyUmf4?=
+ =?us-ascii?Q?rLPV+fTmqCsZ+6TBAbOQ44LFc3fbvlWZNkdq5hmtx4bxBQ7cCi4ykgAjDsRS?=
+ =?us-ascii?Q?Qt57U9+rHBwFdpLkxb8oBEOI+Xv3K2uz5H0yFyYe8okTZ1oReWj8Nj+nECPc?=
+ =?us-ascii?Q?MOhjA/B77YOuD8Re654li+F594EmhuUtWW5OaWRD0ffXggQ8vMKrI73+R8Ty?=
+ =?us-ascii?Q?KaIsANAx+NVniwvrurS7/S68ABx7coXaMYYh5K6YPrDdyOsinhnP3KENRkoF?=
+ =?us-ascii?Q?atHt6f1abIV4wSqr+69+n5z/ZoYf2fjn+PszJFvEhHDesQygM2Mh8PyrXMcU?=
+ =?us-ascii?Q?Ign626A273XqJAOzIzd6p+CXFhO7S+OdFSVBGk5rWzN1VB8kZE+bqoUpjq3D?=
+ =?us-ascii?Q?mKLPD9lPRRxsawXW+QF8PGaKZvRDLCnTqhcKQzkWsqYhWf/B/glRjHEjbWZi?=
+ =?us-ascii?Q?348G816EaVSYjSx+vqkC/KvE6ln72XEt3ZbDh/NRJqbj1kHGfmJJ+Gw25yeQ?=
+ =?us-ascii?Q?UxGlY+SCZSjxzaOItMOseRtjUhWIzpodqO6x7KaGLn+xz06TaH6amo0HFJDq?=
+ =?us-ascii?Q?0tyzUyw7m4N/t3zTOmr7QKZgdvrPXK7iWukO7TYFUIRYWz5/y3MfEd90FAEd?=
+ =?us-ascii?Q?eaBE0OcXjG90UPQY4PGaTX2WrcZZIsRZVH2cgDTm4p2ZXC2lNsWo115kBMIj?=
+ =?us-ascii?Q?NaEQePWiabKHtI+hT8zhN3Yn0ZyiqFwu4JFxBhwjs3vQXkwNblWW/BQLCTo0?=
+ =?us-ascii?Q?yOA/9bKAUGy1zAX5cWNE8H1uj5Q7a8WOUgeZBrSDRrwIXQN4QaM4RuojFsYk?=
+ =?us-ascii?Q?zv8QKT12NQ4bPVn9TmsK7OT42NHs7GRUmeWHofE6jwC2eItJdBqVpuQdGnVS?=
+ =?us-ascii?Q?RLjIEM8w2gAQsoqKDbqzUy+YQpZW0Xvy1yU5suDk1NwYj8fduQBMCajW0q+4?=
+ =?us-ascii?Q?HHl1m8SvsjI/nvJ2iDc=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SA1PR11MB6734.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 67aed4f3-6353-4116-3ba4-08db35b8f206
+X-MS-Exchange-CrossTenant-originalarrivaltime: 05 Apr 2023 09:34:25.3683
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: tJDPDibuXuWRvIRksJZjn2UN4McC2tlFsL3GDOA61CLGhGePLFUwiGWw9vp3K+S1a83aYhD1peQkLxaxKLqnzA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB5958
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-2.5 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+The VMCS IDT vectoring information field is used to report basic informatio=
+n
+associated with the event that was being delivered when a VM exit occurred.
+such an event itself doesn't trigger a VM exit, however, a condition to del=
+iver
+the event is not met, e.g., EPT violation.
 
+When the IDT vectoring information field reports a maskable external interr=
+upt,
+KVM reinjects this external interrupt after handling the VM exit. Otherwise=
+,
+the external interrupt is lost.
 
-On 4/1/23 16:44, Yi Liu wrote:
-> No functional change is intended.
->
-> Reviewed-by: Kevin Tian <kevin.tian@intel.com>
-> Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
-> Tested-by: Yanting Jiang <yanting.jiang@intel.com>
-> Signed-off-by: Yi Liu <yi.l.liu@intel.com>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
+KVM handles a hardware exception reported in the IDT vectoring information
+field in the same way, which makes nothing wrong. This piece of code is in
+__vmx_complete_interrupts():
 
-Eric
-> ---
->  drivers/vfio/pci/vfio_pci_core.c | 52 ++++++++++++++++----------------
->  1 file changed, 26 insertions(+), 26 deletions(-)
->
-> diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
-> index 2a510b71edcb..da6325008872 100644
-> --- a/drivers/vfio/pci/vfio_pci_core.c
-> +++ b/drivers/vfio/pci/vfio_pci_core.c
-> @@ -177,10 +177,10 @@ static void vfio_pci_probe_mmaps(struct vfio_pci_core_device *vdev)
->  	}
->  }
->  
-> -struct vfio_pci_group_info;
-> +struct vfio_pci_file_info;
->  static void vfio_pci_dev_set_try_reset(struct vfio_device_set *dev_set);
->  static int vfio_pci_dev_set_hot_reset(struct vfio_device_set *dev_set,
-> -				      struct vfio_pci_group_info *groups,
-> +				      struct vfio_pci_file_info *info,
->  				      struct iommufd_ctx *iommufd_ctx);
->  
->  /*
-> @@ -800,7 +800,7 @@ static int vfio_pci_fill_devs(struct pci_dev *pdev, void *data)
->  	return 0;
->  }
->  
-> -struct vfio_pci_group_info {
-> +struct vfio_pci_file_info {
->  	int count;
->  	struct file **files;
->  };
-> @@ -1257,14 +1257,14 @@ static int vfio_pci_ioctl_get_pci_hot_reset_info(
->  }
->  
->  static int
-> -vfio_pci_ioctl_pci_hot_reset_groups(struct vfio_pci_core_device *vdev,
-> -				    struct vfio_pci_hot_reset *hdr,
-> -				    bool slot,
-> -				    struct vfio_pci_hot_reset __user *arg)
-> +vfio_pci_ioctl_pci_hot_reset_files(struct vfio_pci_core_device *vdev,
-> +				   struct vfio_pci_hot_reset *hdr,
-> +				   bool slot,
-> +				   struct vfio_pci_hot_reset __user *arg)
->  {
-> -	int32_t *group_fds;
-> +	int32_t *fds;
->  	struct file **files;
-> -	struct vfio_pci_group_info info;
-> +	struct vfio_pci_file_info info;
->  	int file_idx, count = 0, ret = 0;
->  
->  	/*
-> @@ -1281,17 +1281,17 @@ vfio_pci_ioctl_pci_hot_reset_groups(struct vfio_pci_core_device *vdev,
->  	if (hdr->count > count)
->  		return -EINVAL;
->  
-> -	group_fds = kcalloc(hdr->count, sizeof(*group_fds), GFP_KERNEL);
-> +	fds = kcalloc(hdr->count, sizeof(*fds), GFP_KERNEL);
->  	files = kcalloc(hdr->count, sizeof(*files), GFP_KERNEL);
-> -	if (!group_fds || !files) {
-> -		kfree(group_fds);
-> +	if (!fds || !files) {
-> +		kfree(fds);
->  		kfree(files);
->  		return -ENOMEM;
->  	}
->  
-> -	if (copy_from_user(group_fds, arg->group_fds,
-> -			   hdr->count * sizeof(*group_fds))) {
-> -		kfree(group_fds);
-> +	if (copy_from_user(fds, arg->group_fds,
-> +			   hdr->count * sizeof(*fds))) {
-> +		kfree(fds);
->  		kfree(files);
->  		return -EFAULT;
->  	}
-> @@ -1301,7 +1301,7 @@ vfio_pci_ioctl_pci_hot_reset_groups(struct vfio_pci_core_device *vdev,
->  	 * the reset
->  	 */
->  	for (file_idx = 0; file_idx < hdr->count; file_idx++) {
-> -		struct file *file = fget(group_fds[file_idx]);
-> +		struct file *file = fget(fds[file_idx]);
->  
->  		if (!file) {
->  			ret = -EBADF;
-> @@ -1318,9 +1318,9 @@ vfio_pci_ioctl_pci_hot_reset_groups(struct vfio_pci_core_device *vdev,
->  		files[file_idx] = file;
->  	}
->  
-> -	kfree(group_fds);
-> +	kfree(fds);
->  
-> -	/* release reference to groups on error */
-> +	/* release reference to fds on error */
->  	if (ret)
->  		goto hot_reset_release;
->  
-> @@ -1358,7 +1358,7 @@ static int vfio_pci_ioctl_pci_hot_reset(struct vfio_pci_core_device *vdev,
->  		return -ENODEV;
->  
->  	if (hdr.count)
-> -		return vfio_pci_ioctl_pci_hot_reset_groups(vdev, &hdr, slot, arg);
-> +		return vfio_pci_ioctl_pci_hot_reset_files(vdev, &hdr, slot, arg);
->  
->  	iommufd = vfio_iommufd_physical_ictx(&vdev->vdev);
->  
-> @@ -2329,16 +2329,16 @@ const struct pci_error_handlers vfio_pci_core_err_handlers = {
->  };
->  EXPORT_SYMBOL_GPL(vfio_pci_core_err_handlers);
->  
-> -static bool vfio_dev_in_groups(struct vfio_pci_core_device *vdev,
-> -			       struct vfio_pci_group_info *groups)
-> +static bool vfio_dev_in_files(struct vfio_pci_core_device *vdev,
-> +			      struct vfio_pci_file_info *info)
->  {
->  	unsigned int i;
->  
-> -	if (!groups)
-> +	if (!info)
->  		return false;
->  
-> -	for (i = 0; i < groups->count; i++)
-> -		if (vfio_file_has_dev(groups->files[i], &vdev->vdev))
-> +	for (i = 0; i < info->count; i++)
-> +		if (vfio_file_has_dev(info->files[i], &vdev->vdev))
->  			return true;
->  	return false;
->  }
-> @@ -2429,7 +2429,7 @@ static bool vfio_dev_in_iommufd_ctx(struct vfio_pci_core_device *vdev,
->   * get each memory_lock.
->   */
->  static int vfio_pci_dev_set_hot_reset(struct vfio_device_set *dev_set,
-> -				      struct vfio_pci_group_info *groups,
-> +				      struct vfio_pci_file_info *info,
->  				      struct iommufd_ctx *iommufd_ctx)
->  {
->  	struct vfio_pci_core_device *cur_mem;
-> @@ -2478,7 +2478,7 @@ static int vfio_pci_dev_set_hot_reset(struct vfio_device_set *dev_set,
->  		 * the calling device is in a singleton dev_set.
->  		 */
->  		if (cur_vma->vdev.open_count &&
-> -		    !vfio_dev_in_groups(cur_vma, groups) &&
-> +		    !vfio_dev_in_files(cur_vma, info) &&
->  		    !vfio_dev_in_iommufd_ctx(cur_vma, iommufd_ctx) &&
->  		    (dev_set->device_count > 1)) {
->  			ret = -EINVAL;
+        case INTR_TYPE_SOFT_EXCEPTION:
+                vcpu->arch.event_exit_inst_len =3D vmcs_read32(instr_len_fi=
+eld);
+                fallthrough;
+        case INTR_TYPE_HARD_EXCEPTION:
+                if (idt_vectoring_info & VECTORING_INFO_DELIVER_CODE_MASK) =
+{
+                        u32 err =3D vmcs_read32(error_code_field);
+                        kvm_requeue_exception_e(vcpu, vector, err);
+                } else
+                        kvm_requeue_exception(vcpu, vector);
+                break;
 
+But if KVM just ignores any hardware exception in such a case, the CPU will
+re-generate it once it resumes guest execution, which looks cleaner.
+
+The question is, must KVM inject a hardware exception from the IDT vectorin=
+g
+information field? Is there any correctness issue if KVM does not?
+
+If no correctness issue, it's better to not do it, because the injected eve=
+nt
+from IDT vectoring could trigger another exception, i.e., a nested exceptio=
+n,
+and after the nested exception is handled, the CPU resumes to re-trigger th=
+e
+original event, which makes not much sense to inject it.
+
+In addition, the benefits of not doing so are:
+1) Less code.
+2) Faster execution. Calling kvm_requeue_exception_e()/kvm_requeue_exceptio=
+n()
+   consumes a few hundred cycles at least, although it's a rare case with E=
+PT,
+   but a lot with shadow (who cares?). And vmx_inject_exception() also has =
+a
+   cost.
+3) An IDT vectoring could trigger more than one VM exit, e.g., the first is=
+ an
+   EPT violation, and the second a PML full, KVM needs to reinject it twice
+   (extremely rare).
+
+Thanks!
+  Xin
