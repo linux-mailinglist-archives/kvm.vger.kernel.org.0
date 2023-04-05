@@ -2,108 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D64CA6D7636
-	for <lists+kvm@lfdr.de>; Wed,  5 Apr 2023 10:04:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8176A6D764A
+	for <lists+kvm@lfdr.de>; Wed,  5 Apr 2023 10:06:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237262AbjDEIEc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Apr 2023 04:04:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45096 "EHLO
+        id S237308AbjDEIGo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Apr 2023 04:06:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48184 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237189AbjDEIEb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Apr 2023 04:04:31 -0400
-Received: from mail-ej1-x634.google.com (mail-ej1-x634.google.com [IPv6:2a00:1450:4864:20::634])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28D4A40C4
-        for <kvm@vger.kernel.org>; Wed,  5 Apr 2023 01:04:26 -0700 (PDT)
-Received: by mail-ej1-x634.google.com with SMTP id a640c23a62f3a-932072d4c00so31836766b.1
-        for <kvm@vger.kernel.org>; Wed, 05 Apr 2023 01:04:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1680681864; x=1683273864;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=1qeWL9csSccLs6fLdE0uQkmoTpVTl/CNeE7DAxN2MXc=;
-        b=Xhq2FpN6Mn9U+EjSMWm81/rOkL0bCFC+/2wjeKRsitvqUzxRSPfp9fuoLeyBFssxEy
-         uDCSbz1YbvYjEPswqb3S2GTeD5WrMfOxja6ExrIKkGQLeADhlgbB7YOPra4MuzjHMrmj
-         ZXdFh+JVuRGjSQyYZanQX5QlEVziDHiVidIiylGL7f0MyJUhqMsMEyHDcOQ7gNiV1wC+
-         ahUaXralaKBaRSz4fOK+iGVNv27U4eaNu+zC6QxXTv6Jps/OaYMBUjv3ab9gY0hKw4g7
-         NAydS21zEz4TOSL9DVk3uvDj3K8Lk9ct3FFtJCd1yGfrC7kCaSATBwW4q2DaUE7YXwsp
-         DLwA==
+        with ESMTP id S237322AbjDEIGm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Apr 2023 04:06:42 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B19AA4C17
+        for <kvm@vger.kernel.org>; Wed,  5 Apr 2023 01:05:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1680681938;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=jtyP2HJ2MI10GZPZtyh9yO+D0mamLiYV4IGTudd6x9k=;
+        b=Lhgn1n5CRVSreyjF3yEzgotwo4A9ZMk1fYjk7QZxqLftXYOohchwxCtAf8QfzhcVLId735
+        DoV0WIy26dfP9H/DyM8R+PlhYbnGLuWs/79hBzq3W0YbbbGjahFcOvc8SQ2QE257p5H3Ir
+        w26YUcFaCuqLQLqDRGhYfpvr/RkYNwA=
+Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
+ [209.85.160.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-638-oyeO1ZXrOHiWPRnIymeoAQ-1; Wed, 05 Apr 2023 04:05:37 -0400
+X-MC-Unique: oyeO1ZXrOHiWPRnIymeoAQ-1
+Received: by mail-qt1-f200.google.com with SMTP id v10-20020a05622a130a00b003e4ee70e001so17685558qtk.6
+        for <kvm@vger.kernel.org>; Wed, 05 Apr 2023 01:05:37 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680681864; x=1683273864;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1qeWL9csSccLs6fLdE0uQkmoTpVTl/CNeE7DAxN2MXc=;
-        b=FrSKzrOe15tITyymZArmtj6Oh9vumvXChqvXqyCAZz568qZQtYAHkegRB238DQadGo
-         f1nB1jAJi4Gaf7U/fsYzdTZEZqcdevVytp6zyjQDOC0tAdOKTNzRdCJ2iZ9VHTaJ/dhJ
-         xZKfW/coYnQbsTxFjTHtgeWUNChCeSIf6bUPEjU2hpIG0AHxNOLngCnoGxi2FPND1dH9
-         TAZatfd36DNV1AMW8vgBI+Yi0nN7cUfZC+mfyVKn7+ShyicO9Lf39EouvBhl9Q4ICfgG
-         /jTN9FOlolyOCN3UFdv5PSdv7Go3kaGvWPRer7qciKvhLbnGim9/g/KjLQ3EkcHuXaVp
-         NbAQ==
-X-Gm-Message-State: AAQBX9fjtZGfIgpGHa9z8ZHCICbyBFoSXDymNtGmTBJ8he3uEk4/F8gP
-        A4lV4yWjLk2Mk7kRNz41z1Fnng==
-X-Google-Smtp-Source: AKy350bF5rLJogTrsY1f6blQnOqzcwkAlbB5v+pmHg+Ta3p4lfp6J5hb3yzzRk5ijVMDrTT8n0Y6cA==
-X-Received: by 2002:a05:6402:2026:b0:4fd:2533:f56 with SMTP id ay6-20020a056402202600b004fd25330f56mr1005988edb.39.1680681864506;
-        Wed, 05 Apr 2023 01:04:24 -0700 (PDT)
-Received: from google.com (64.227.90.34.bc.googleusercontent.com. [34.90.227.64])
-        by smtp.gmail.com with ESMTPSA id a65-20020a509ec7000000b004fbf6b35a56sm6955177edf.76.2023.04.05.01.04.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 Apr 2023 01:04:23 -0700 (PDT)
-Date:   Wed, 5 Apr 2023 08:04:20 +0000
-From:   Quentin Perret <qperret@google.com>
-To:     David Dai <davidai@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Marc Zyngier <maz@kernel.org>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Lorenzo Pieralisi <lpieralisi@kernel.org>,
-        Sudeep Holla <sudeep.holla@arm.com>,
-        Saravana Kannan <saravanak@google.com>,
-        kernel-team@android.com, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
-Subject: Re: [RFC PATCH 2/6] kvm: arm64: Add support for get_cur_cpufreq
- service
-Message-ID: <ZC0rhEHTlz6dHKC0@google.com>
-References: <20230330224348.1006691-1-davidai@google.com>
- <20230330224348.1006691-3-davidai@google.com>
+        d=1e100.net; s=20210112; t=1680681937;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=jtyP2HJ2MI10GZPZtyh9yO+D0mamLiYV4IGTudd6x9k=;
+        b=kPEDi16bRbk0OVLseJxmc0j3Fw5aHWXSwInD9gv8pAUhoweVYZ+Lqj0mOTrbDFnf2X
+         asNtqrg0K7QEwHzziTieTgwXFSFXp/crnTbtc3OIr7Fv3pIobkOub8WOF8LMlVxC8xOQ
+         GwE4gkXt5n27uWTiz3LYkGtd7zJT2dVOOlRQ+q1WxPcpKaoH6mdKffoa5kRukq3W8WMw
+         fBj4cotZoXwXBS9iaKonS7V6d5jbziN4YnfdyFTcJCcGSbb3mSN+tt1DIhgYWirCyw5F
+         Kewe1pHOHa5h/Qcek/YceZJsOaOLPv0RDix7ACUZGNKAxH1O5lcd4i4y/73d1MQLuObx
+         VcYQ==
+X-Gm-Message-State: AAQBX9fBHE4Xn6mQJTnB+Q0SELWmCoKcdFOBwm//cjahpDLHS87a51fp
+        Fs4jGcBF2VVm+OyvhzvvvLgo3fTThwacnsCuAfdkLlXLqSmH2PWPCBWfCwhJHwU+qc4ZhN1DkKW
+        qQ4SwMqtQJdbS
+X-Received: by 2002:a05:6214:5081:b0:5df:8661:567f with SMTP id kk1-20020a056214508100b005df8661567fmr7876744qvb.24.1680681937246;
+        Wed, 05 Apr 2023 01:05:37 -0700 (PDT)
+X-Google-Smtp-Source: AKy350ag+hZEXnDAofxPnplypvshHaeG50C6Ge7/36WtAPNY9S98hVHDQMr2jYmHokelN0jGjmjP2Q==
+X-Received: by 2002:a05:6214:5081:b0:5df:8661:567f with SMTP id kk1-20020a056214508100b005df8661567fmr7876724qvb.24.1680681936995;
+        Wed, 05 Apr 2023 01:05:36 -0700 (PDT)
+Received: from [192.168.8.101] (tmo-066-157.customers.d1-online.com. [80.187.66.157])
+        by smtp.gmail.com with ESMTPSA id u7-20020a05621411a700b005dd8b9345ccsm3958869qvv.100.2023.04.05.01.05.34
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 05 Apr 2023 01:05:36 -0700 (PDT)
+Message-ID: <63b56fa9-de91-40df-61ad-654d362f8d12@redhat.com>
+Date:   Wed, 5 Apr 2023 10:05:33 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230330224348.1006691-3-davidai@google.com>
-X-Spam-Status: No, score=-15.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,ENV_AND_HDR_SPF_MATCH,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL,
-        USER_IN_DEF_SPF_WL autolearn=unavailable autolearn_force=no
-        version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.13.0
+Subject: Re: [kvm-unit-tests GIT PULL v2 11/14] s390x: Add tests for
+ execute-type instructions
+Content-Language: en-US
+To:     Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
+        Nico Boehr <nrb@linux.ibm.com>, andrew.jones@linux.dev,
+        pbonzini@redhat.com
+Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com, imbrenda@linux.ibm.com
+References: <20230404113639.37544-1-nrb@linux.ibm.com>
+ <20230404113639.37544-12-nrb@linux.ibm.com>
+ <65075e9f-0d32-fc63-0200-3a3ec0c9bf63@redhat.com>
+ <06fd3ebc7770d1327be90cee10d12251cca76dd3.camel@linux.ibm.com>
+ <bf0f892e-7b7d-5806-b038-8392144da644@redhat.com>
+ <168062836004.37806.6096327013940193626@t14-nrb>
+ <5098eca038dfbd3e394e75d44ca061d64f9446f5.camel@linux.ibm.com>
+From:   Thomas Huth <thuth@redhat.com>
+In-Reply-To: <5098eca038dfbd3e394e75d44ca061d64f9446f5.camel@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thursday 30 Mar 2023 at 15:43:37 (-0700), David Dai wrote:
-> This service allows guests to query the host for frequency of the CPU
-> that the vCPU is currently running on.
+On 04/04/2023 20.06, Nina Schoetterl-Glausch wrote:
+> On Tue, 2023-04-04 at 19:12 +0200, Nico Boehr wrote:
+>> Quoting Thomas Huth (2023-04-04 17:05:02)
+>> [...]
+>>>>> FWIW, this is failing with Clang 15 for me:
+>>>>>
+>>>>> s390x/ex.c:81:4: error: expected absolute expression
+>>>>>                    "       .if (1b - 0b) != (3b - 2b)\n"
+>>>>>                     ^
+>>>>> <inline asm>:12:6: note: instantiated into assembly here
+>>>>>            .if (1b - 0b) != (3b - 2b)
+>>>>
+>>>> Seems gcc is smarter here than clang.
+>>>
+>>> Yeah, the assembler from clang is quite a bit behind on s390x ... in the
+>>> past I was only able to compile the k-u-t with Clang when using the
+>>> "-no-integrated-as" option ... but at least in the most recent version it
+>>> seems to have caught up now enough to be very close to compile it with the
+>>> built-in assembler, so it would be great to get this problem here fixed
+>>> somehow, too...
+>>
+>> Bringing up another option: Can we maybe guard this section from Clang so we still have the assertion when compiling with GCC?
+> 
+> I considered this, but only from the asm, where I don't think it's possible.
+> But putting #ifndef __clang__ around it works. Until you compile with gcc and assemble with clang.
+> Not something we need to care about IMO.
 
-I assume the intention here is to achieve scale invariance in the guest
-to ensure its PELT signals represent how much work is actually being
-done. If so, it's likely the usage of activity monitors will be superior
-for this type of thing as that may allow us to drop the baked-in
-assumption about vCPU pinning. IIRC, AMUs v2 (arm64-specific obv) have
-extended support for virtualization, so I'd suggest looking into
-supporting that first.
+Right. So if the #ifndef works, let's go with that! Nico, could you fix it 
+up in the pull request?
 
-And assuming we also want to support this on hardware that don't have
-AMUs, or don't have the right virt extensions, then the only thing I can
-think of is to have the VMM expose non-architectural AMUs to the guest,
-maybe emulated using PMUs. If the guest uses Linux, it'll need to grow
-support for non-architectural AMUs which is its own can of worms though.
+  Thanks,
+   Thomas
 
-Thanks,
-Quentin
