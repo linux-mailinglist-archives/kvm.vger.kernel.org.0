@@ -2,86 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 759BD6D9D3F
-	for <lists+kvm@lfdr.de>; Thu,  6 Apr 2023 18:10:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6BE556D9D7A
+	for <lists+kvm@lfdr.de>; Thu,  6 Apr 2023 18:24:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239913AbjDFQKC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 Apr 2023 12:10:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50864 "EHLO
+        id S239674AbjDFQYL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 Apr 2023 12:24:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38740 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239910AbjDFQJ7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 Apr 2023 12:09:59 -0400
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C97D79ED7
-        for <kvm@vger.kernel.org>; Thu,  6 Apr 2023 09:09:56 -0700 (PDT)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-545dd1a1e31so345152197b3.22
-        for <kvm@vger.kernel.org>; Thu, 06 Apr 2023 09:09:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1680797396;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=FRMRkG2g/9liuKyR9/FweFwBQfdTNklXoYWd9JmqE/k=;
-        b=jmx73uJLJfJdsu94t6oO0LOG8hzvfWyAKQUaoGyp1hbrsS5ZfOMX2Imh6Nh3ckLs+z
-         /RSMXU/SFpevBaBtuhnTm9mY4FWJaSugUsuQO6+a193l5dBerM4ZPhiwSDuIy08K2erX
-         2HC+n1HaXaoIacJPe5BQvID27EyOWCiwmAhxqkaUozvbEW37iVop7+YlVk1qpK4Bvy/E
-         i7Q4E0qi5LxpI1Zyo+XzihI4nOZ7scJ6LJ7s0GgDEywxJXGiGzPMAPIh2ks1HaLqy7T5
-         yD/BpuGknDrGD5l4oaL3bJEID+/kDZBEFLwNHItzQ2t10SibA7JgFZDmLI4hMdd6EL6j
-         BJ5w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680797396;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=FRMRkG2g/9liuKyR9/FweFwBQfdTNklXoYWd9JmqE/k=;
-        b=vNHiKHuyUueNZW3bID+N/J1ucjgkdo4rOpIypyvb5ALPTvNoz/cwhtO76VPDwK8CpA
-         Jdcu2mCsQoWEFUKziIgkkX48cmmOaJoonoIwDD8zKdvx3OY9G85bNjow9LD8mpfq4aIG
-         aUta2W4be/iRqeH7OC7in6oIq5aWnlOmdlojrbZy8mCLl2bHden8GQYSPzEkdExQ2B/o
-         kIPQovhNPzV+TDgbbuiTeZpQ8JoS87WzjHJR3vfi6V3RvTZMI/FFJzjSBs6xIRP434aJ
-         0cmxgfbYbuJ2vzaZDP34/+/hyT54H4gEdSgKtK4I+tb7vmLy3GOe7TOUgGY3z0AOqi/3
-         1MTA==
-X-Gm-Message-State: AAQBX9eD73L1r9dsRZuN2dbMxFum6Ka52L1wE5VJKVvCll3kdTaNQVJt
-        OP8gSgLkjpto1RF/oktMhBZKcjLc0hw=
-X-Google-Smtp-Source: AKy350ZB8l/LJrmkRI8Hwj6Yt/N72KPpNWXOcuCCCaCnOvdjHf0Ba2PQNa3ccjltCgHcoUSZygW8cIv7kLc=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:da4f:0:b0:b8b:f8b1:1c80 with SMTP id
- n76-20020a25da4f000000b00b8bf8b11c80mr1511700ybf.7.1680797396114; Thu, 06 Apr
- 2023 09:09:56 -0700 (PDT)
-Date:   Thu, 6 Apr 2023 09:09:54 -0700
-In-Reply-To: <9896a0bf26e48dab853049f40733df5bb0e287a1.camel@intel.com>
-Mime-Version: 1.0
-References: <20230319082225.14302-1-binbin.wu@linux.intel.com> <9896a0bf26e48dab853049f40733df5bb0e287a1.camel@intel.com>
-Message-ID: <ZC7sQLdYpweORB6o@google.com>
-Subject: Re: [PATCH v2 0/4] x86: Add test cases for LAM
-From:   Sean Christopherson <seanjc@google.com>
-To:     Kai Huang <kai.huang@intel.com>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "binbin.wu@linux.intel.com" <binbin.wu@linux.intel.com>,
-        "robert.hu@linux.intel.com" <robert.hu@linux.intel.com>,
-        Chao Gao <chao.gao@intel.com>
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-7.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+        with ESMTP id S239229AbjDFQYG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 Apr 2023 12:24:06 -0400
+Received: from out-48.mta0.migadu.com (out-48.mta0.migadu.com [91.218.175.48])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5E8A49C3
+        for <kvm@vger.kernel.org>; Thu,  6 Apr 2023 09:24:03 -0700 (PDT)
+Date:   Thu, 6 Apr 2023 16:23:56 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1680798240;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=zWTa+WmjvRizEenNCYTpznSZcah8zt6cqf7cKCxX7a0=;
+        b=YpT2Fq4n3IHoq0NhqGWEGK0xXZgdwSqB4fNw/EmbCwH+l+E/MrrjoaME/5opFFWMdi+c+R
+        ZE4p8Y5lVIJD1YkvcVRijUkT7UmIcs5v809lkhdseoQq1syH+eK2vgk7gXhKeHpyl6Zl0Z
+        QMSkBoDf4Wai6xmXfI6vbezrnWtEGTE=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From:   Oliver Upton <oliver.upton@linux.dev>
+To:     Colin Ian King <colin.i.king@gmail.com>
+Cc:     Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Shuah Khan <shuah@kernel.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH][next] KVM: selftests: Fix spelling mistake
+ "KVM_HYPERCAL_EXIT_SMC" -> "KVM_HYPERCALL_EXIT_SMC"
+Message-ID: <ZC7yHC+FIJgE4APf@linux.dev>
+References: <20230406080226.122955-1-colin.i.king@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230406080226.122955-1-colin.i.king@gmail.com>
+X-Migadu-Flow: FLOW_OUT
+X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
+        DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Apr 06, 2023, Huang, Kai wrote:
-> On Sun, 2023-03-19 at 16:22 +0800, Binbin Wu wrote:
-> > Intel Linear-address masking (LAM) [1], modifies the checking that is applied to
-> > *64-bit* linear addresses, allowing software to use of the untranslated address
-> > bits for metadata.
-> > 
-> > The patch series add test cases for LAM:
-> > 
+On Thu, Apr 06, 2023 at 09:02:26AM +0100, Colin Ian King wrote:
+> There is a spelling mistake in a test assert message. Fix it.
 > 
-> I think you should just merge this series to the patchset which enables LAM
-> feature?
+> Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
 
-No, please keep them separate.  A lore link in the KUT series is more than
-sufficient, and even that isn't really necesary.  b4 and other tooling get
-confused by series that contain patches for two (or more) different repositories,
-i.e. posting everything in one bundle makes my life harder, not easier.
+Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
+
+> ---
+>  tools/testing/selftests/kvm/aarch64/smccc_filter.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/aarch64/smccc_filter.c b/tools/testing/selftests/kvm/aarch64/smccc_filter.c
+> index 0f9db0641847..82650313451a 100644
+> --- a/tools/testing/selftests/kvm/aarch64/smccc_filter.c
+> +++ b/tools/testing/selftests/kvm/aarch64/smccc_filter.c
+> @@ -211,7 +211,7 @@ static void expect_call_fwd_to_user(struct kvm_vcpu *vcpu, uint32_t func_id,
+>  			    "KVM_HYPERCALL_EXIT_SMC is not set");
+>  	else
+>  		TEST_ASSERT(!(run->hypercall.flags & KVM_HYPERCALL_EXIT_SMC),
+> -			    "KVM_HYPERCAL_EXIT_SMC is set");
+> +			    "KVM_HYPERCALL_EXIT_SMC is set");
+>  }
+>  
+>  /* SMCCC calls forwarded to userspace cause KVM_EXIT_HYPERCALL exits */
+> -- 
+> 2.30.2
+> 
+
+-- 
+Thanks,
+Oliver
