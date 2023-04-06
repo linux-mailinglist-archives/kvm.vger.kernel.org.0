@@ -2,64 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 364246D9DB2
-	for <lists+kvm@lfdr.de>; Thu,  6 Apr 2023 18:43:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8CFD56D9DC6
+	for <lists+kvm@lfdr.de>; Thu,  6 Apr 2023 18:45:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239240AbjDFQnX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 Apr 2023 12:43:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53954 "EHLO
+        id S239710AbjDFQpx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 Apr 2023 12:45:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54426 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239618AbjDFQnH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 Apr 2023 12:43:07 -0400
-Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F5CD4EFF
-        for <kvm@vger.kernel.org>; Thu,  6 Apr 2023 09:43:06 -0700 (PDT)
-Received: by mail-pg1-x54a.google.com with SMTP id s3-20020a632c03000000b0050300a8089aso11871068pgs.0
-        for <kvm@vger.kernel.org>; Thu, 06 Apr 2023 09:43:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1680799386;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=AYsbyALIYv+X9w8bL9Dllzu+6ryq0NV+c3WTFwhcy70=;
-        b=saf8muKa1u/C+Nb/mWnNjAt0Ks7VJ4fenL0VV+aDeCLwaCXQJh26HPTrE3U8+Se61P
-         7P3PXuXgMPrAqPIj+KglpYWiapgN7zJj6Y72ggZAoswddWo5NWrtEV0DnwKpBGe4DUZN
-         bz9kRCLZxxK0vDjSHHm/T4BiXMat8EJNsvkRl2+6DrFMMQPY+p6D+GEZOV70Pb6nJGka
-         8pnfZF9SQZ8eWoHxvCiViJ7FezgN6V8z/uUONSfNxhiAfolR9uPhilx7cb+EGHZr777m
-         jLNpIixBeky+ddxjAHkfH6XJpP/FkP6NcHWThkl4g1p4kn46i/8UsMxcthduFu54iWrG
-         rlPw==
+        with ESMTP id S239682AbjDFQpn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 Apr 2023 12:45:43 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E9065580
+        for <kvm@vger.kernel.org>; Thu,  6 Apr 2023 09:44:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1680799496;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=cj1qdraUDIqQ4wyinXOunxUjzkj6NEpe76it1VNYXg4=;
+        b=U9xrM+JdJFxzzj8sS8SM9/eLSM751eu1b7u9NtTfvD7KZvGKSPIv/wTX8fXJOI0ZD4Fro0
+        XCOIBi6uiM629Rt815+Y9riT3ySE9nwSe0If+xAEf8FYuw63y9Sjmor9BDp/rpEI8df/2I
+        yb9z9n2AzzdNbOVOSUFd9hWgJVpOxXI=
+Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
+ [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-202-ffNmDulpMTKBMbb-gsoiyw-1; Thu, 06 Apr 2023 12:44:55 -0400
+X-MC-Unique: ffNmDulpMTKBMbb-gsoiyw-1
+Received: by mail-qv1-f70.google.com with SMTP id g6-20020ad45426000000b005a33510e95aso18229186qvt.16
+        for <kvm@vger.kernel.org>; Thu, 06 Apr 2023 09:44:55 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680799386;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=AYsbyALIYv+X9w8bL9Dllzu+6ryq0NV+c3WTFwhcy70=;
-        b=1LKJ324Iuo/8ovO2jtUqRMAhYTB+0Nvy48mPV32yv7v/Dl0VvxFT2JONyUmHDunZrj
-         0wfRfcg0n3mN7z/0VSjTJSLIlLhp0AAAq08MYrf7gNYE2Nkruhg3WCfpJrxmY4b/kt7s
-         MLqAjnosgqIAZa+CzRy7BA09F9SBRhY4cB5W2HA+DtmdzkE60BuXkUAm8DM3TlTZKHzJ
-         fqcXzQQCGmZ1gcxqbsZMwqps+1icY6zvn+E9OA19u8ngglQhAFr9kzV+yCqzo5jayDDH
-         DbjnEZMexPT6aum4nTgiKz2FuQlzU0C/nc5Z33DHZDsATV12rzh1d182t3mACo2c+6oK
-         tt5g==
-X-Gm-Message-State: AAQBX9dY+OBDqTN2+OfbGRCX8i8jHAJHBSVXpfZT7Z6CG9eczYWEv1K3
-        Lt44+Qpowaq+sglsp+HUQcP+JgKBgoY=
-X-Google-Smtp-Source: AKy350ZKPODZ1QTM9MeV0Rl/fy/dG60DokUW3D/my2C/iKVEcSIytzMylNZv/cZq4J8gqcs/os8ugUmS5+0=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90b:fd8:b0:23b:446b:bbfd with SMTP id
- gd24-20020a17090b0fd800b0023b446bbbfdmr3889242pjb.1.1680799385735; Thu, 06
- Apr 2023 09:43:05 -0700 (PDT)
-Date:   Thu, 6 Apr 2023 09:43:04 -0700
-In-Reply-To: <f34b3d78-a1c4-90cb-079a-2dc81a5e6e7b@grsecurity.net>
-Mime-Version: 1.0
-References: <20230215142344.20200-1-minipli@grsecurity.net>
- <ZC42RavGH2Z82oJd@google.com> <f34b3d78-a1c4-90cb-079a-2dc81a5e6e7b@grsecurity.net>
-Message-ID: <ZC72mHH4oU4n7Jjc@google.com>
-Subject: Re: [kvm-unit-tests PATCH] x86/emulator: Test non-canonical memory
- access exceptions
-From:   Sean Christopherson <seanjc@google.com>
-To:     Mathias Krause <minipli@grsecurity.net>
-Cc:     kvm@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-7.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+        d=1e100.net; s=20210112; t=1680799495;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:reply-to:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=cj1qdraUDIqQ4wyinXOunxUjzkj6NEpe76it1VNYXg4=;
+        b=LFPfWwjRwo0dOS+s2BnBNlw6aVnQaCx0EhegENUAF6AH1FH3xvi/bO3bast/B3BWEI
+         or1+s/anlTjg20seu6XDseR6Lrrbb9mFbWIl9ui3+5y5di83fBdpY74lJgQZ1yBQ85Ia
+         pBYYg7muiUT8sw3ffZ/XCn8WEFO/vvpz3dL4Vsy/Dc8pAO6/o9dHWmfusuf4LQHLeczK
+         m1ZRPPK/m93SSPYgA9iy/myNU5pqWDzFgpvDhYX+htQ9ZJr122DMwGDBx0c4Syx5w0Pj
+         upITC3bhkODsQEfYbJGFZXPnvtYua+Rb9jHw2TCYgL7GN4vTkilAG8CcRCFT8JPO0fqs
+         aE+A==
+X-Gm-Message-State: AAQBX9eUz5o+05cmMtP+izsYTVGKaKK0eJyP4P1bUfpBYKCfKCnLfT9L
+        cI83oz40NcsHexsZ4LW7srmcJ/zGm5INW1rq1raD/eBFv9BnDNwZn0uCYai1f3JGxSnUliKnPrz
+        s02/TUAAo4sF+
+X-Received: by 2002:ac8:59ca:0:b0:3b8:2cf6:4bd6 with SMTP id f10-20020ac859ca000000b003b82cf64bd6mr12365681qtf.57.1680799494849;
+        Thu, 06 Apr 2023 09:44:54 -0700 (PDT)
+X-Google-Smtp-Source: AKy350ZSS7EeAJwH0ALWV4bKpdOrqM0X6ZUGe2iW062njbJkUl7t6KGbG/PG3FNAG8z/sy0GF4g7UQ==
+X-Received: by 2002:ac8:59ca:0:b0:3b8:2cf6:4bd6 with SMTP id f10-20020ac859ca000000b003b82cf64bd6mr12365645qtf.57.1680799494556;
+        Thu, 06 Apr 2023 09:44:54 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id h7-20020ac846c7000000b003e3921077d9sm532848qto.38.2023.04.06.09.44.48
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 06 Apr 2023 09:44:53 -0700 (PDT)
+Message-ID: <dbf2057d-b715-f32d-454a-e4953921d232@redhat.com>
+Date:   Thu, 6 Apr 2023 18:44:47 +0200
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.0
+Reply-To: eric.auger@redhat.com
+Subject: Re: [PATCH v9 10/25] vfio: Make vfio_device_open() single open for
+ device cdev path
+Content-Language: en-US
+To:     Yi Liu <yi.l.liu@intel.com>, alex.williamson@redhat.com,
+        jgg@nvidia.com, kevin.tian@intel.com
+Cc:     joro@8bytes.org, robin.murphy@arm.com, cohuck@redhat.com,
+        nicolinc@nvidia.com, kvm@vger.kernel.org, mjrosato@linux.ibm.com,
+        chao.p.peng@linux.intel.com, yi.y.sun@linux.intel.com,
+        peterx@redhat.com, jasowang@redhat.com,
+        shameerali.kolothum.thodi@huawei.com, lulu@redhat.com,
+        suravee.suthikulpanit@amd.com, intel-gvt-dev@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org, linux-s390@vger.kernel.org,
+        xudong.hao@intel.com, yan.y.zhao@intel.com, terrence.xu@intel.com,
+        yanting.jiang@intel.com
+References: <20230401151833.124749-1-yi.l.liu@intel.com>
+ <20230401151833.124749-11-yi.l.liu@intel.com>
+From:   Eric Auger <eric.auger@redhat.com>
+In-Reply-To: <20230401151833.124749-11-yi.l.liu@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.4 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -67,90 +93,85 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Apr 06, 2023, Mathias Krause wrote:
-> On 06.04.23 05:02, Sean Christopherson wrote:
-> > On Wed, Feb 15, 2023, Mathias Krause wrote:
-> >> +static void test_reg_noncanonical(void)
-> >> +{
-> >> +	extern char nc_rsp_start, nc_rsp_end, nc_rbp_start, nc_rbp_end;
-> >> +	extern char nc_rax_start, nc_rax_end;
-> >> +	handler old_ss, old_gp;
-> >> +
-> >> +	old_ss = handle_exception(SS_VECTOR, advance_rip_and_note_exception);
-> >> +	old_gp = handle_exception(GP_VECTOR, advance_rip_and_note_exception);
-> >> +
-> >> +	/* RAX based, should #GP(0) */
-> >> +	exceptions = 0;
-> >> +	rip_advance = &nc_rax_end - &nc_rax_start;
-> >> +	asm volatile("nc_rax_start: orq $0, (%[msb]); nc_rax_end:\n\t"
-> > 
-> > Can't we use ASM_TRY() + exception_vector() + exception_error_code()?  Installing
-> > a dedicated handler is (slowly) being phased out.
-> 
-> Well, you may have guessed it, but I tried to be "consistent with the
-> existing style." Sure this code could get a lot of cleanups too, the
-> whole file, actually, like the externs should be 'extern char []'
-> instead to point out they're just "labels" and no chars. But, again, I
-> just did as was "prior art" in this file. But if moving forward to a
-> more modern version is wanted, I can adapt.
+Hi Yi,
 
-Yes, please ignore prior art in KVM-Unit-Tests, so much of its "art" is just awful.
+On 4/1/23 17:18, Yi Liu wrote:
+> VFIO group has historically allowed multi-open of the device FD. This
+> was made secure because the "open" was executed via an ioctl to the
+> group FD which is itself only single open.
+>
+> However, no known use of multiple device FDs today. It is kind of a
+> strange thing to do because new device FDs can naturally be created
+> via dup().
+>
+> When we implement the new device uAPI (only used in cdev path) there is
+> no natural way to allow the device itself from being multi-opened in a
+> secure manner. Without the group FD we cannot prove the security context
+> of the opener.
+>
+> Thus, when moving to the new uAPI we block the ability of opening
+> a device multiple times. Given old group path still allows it we store
+> a vfio_group pointer in struct vfio_device_file to differentiate.
+>
+> Reviewed-by: Kevin Tian <kevin.tian@intel.com>
+> Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
+> Tested-by: Terrence Xu <terrence.xu@intel.com>
+> Tested-by: Nicolin Chen <nicolinc@nvidia.com>
+> Tested-by: Yanting Jiang <yanting.jiang@intel.com>
+> Signed-off-by: Yi Liu <yi.l.liu@intel.com>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
-> > And why hardcode use of RAX?  Won't any "r" constraint work?
-> 
-> Unfortunately not. It must be neither rsp nor rbp and with "r" the
-> compiler is free to choose one of these.
+Thanks
 
-Ah, right, I forgot about RBP.
+Eric
+> ---
+>  drivers/vfio/group.c     | 2 ++
+>  drivers/vfio/vfio.h      | 2 ++
+>  drivers/vfio/vfio_main.c | 7 +++++++
+>  3 files changed, 11 insertions(+)
+>
+> diff --git a/drivers/vfio/group.c b/drivers/vfio/group.c
+> index d55ce3ca44b7..1af4b9e012a7 100644
+> --- a/drivers/vfio/group.c
+> +++ b/drivers/vfio/group.c
+> @@ -245,6 +245,8 @@ static struct file *vfio_device_open_file(struct vfio_device *device)
+>  		goto err_out;
+>  	}
+>  
+> +	df->group = device->group;
+> +
+>  	ret = vfio_device_group_open(df);
+>  	if (ret)
+>  		goto err_free;
+> diff --git a/drivers/vfio/vfio.h b/drivers/vfio/vfio.h
+> index b2f20b78a707..f1a448f9d067 100644
+> --- a/drivers/vfio/vfio.h
+> +++ b/drivers/vfio/vfio.h
+> @@ -18,6 +18,8 @@ struct vfio_container;
+>  
+>  struct vfio_device_file {
+>  	struct vfio_device *device;
+> +	struct vfio_group *group;
+> +
+>  	bool access_granted;
+>  	spinlock_t kvm_ref_lock; /* protect kvm field */
+>  	struct kvm *kvm;
+> diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
+> index 6d5d3c2180c8..c8721d5d05fa 100644
+> --- a/drivers/vfio/vfio_main.c
+> +++ b/drivers/vfio/vfio_main.c
+> @@ -477,6 +477,13 @@ int vfio_device_open(struct vfio_device_file *df)
+>  
+>  	lockdep_assert_held(&device->dev_set->lock);
+>  
+> +	/*
+> +	 * Only the group path allows the device opened multiple times.
+> +	 * The device cdev path doesn't have a secure way for it.
+> +	 */
+> +	if (device->open_count != 0 && !df->group)
+> +		return -EINVAL;
+> +
+>  	device->open_count++;
+>  	if (device->open_count == 1) {
+>  		ret = vfio_device_first_open(df);
 
-> It'll unlikely make use of rsp, but rbp is a valid target we need to avoid.
-> (Yes, I saw the -no-omit-frame-pointer handling in the Makefiles, but I
-> dislike this implicit dependency.)
-> 
-> I can change the constraints to "abcdSD" to give the compiler a little
-> bit more freedom, but that makes the inline asm little harder to read,
-> IMHO. Hardcoding rax is no real constraint to the compiler either, as
-> it's a volatile register anyway. The call to report() will invalidate
-> its old value, so I don't see the need for a change -- a comment, at
-> best, but that's already there ;)
-
-Hardcoding RAX is totally fine, I just forgot about RBP.
-
-> > E.g. I believe this can be something like:
-> > 
-> > 	asm_safe_report_ex(GP_VECTOR, "orq $0, (%[noncanonical]), "r" (NONCANONICAL));
-> > 	report(!exception_error_code());
-> > 
-> > Or we could even add asm_safe_report_ex_ec(), e.g.
-> > 
-> > 	asm_safe_report_ex_ec(GP_VECTOR, 0,
-> > 			      "orq $0, (%[noncanonical]), "r" (NONCANONICAL));
-> 
-> Yeah, the latter. Verifying the error code is part of the test, so that
-> should be preserved.
-> 
-> The tests as written by me also ensure that an exception actually
-> occurred, exactly one, actually. Maybe that should be accounted for in
-> asm_safe*() as well?
-
-That's accounted for, the ASM_TRY() machinery treats "0" as no exception (we
-sacrified #DE for the greater good).  Realistically, the only way to have multiple
-exceptions without going into the weeds is if KVM somehow restarted the faulting
-instruction.  That would essentially require very precise memory corruption to
-undo the exception fixup handler's modification of RIP on the stack.  And at that
-point, one could also argue that KVM could also corrupt the exception counter.
-
-> PS: Would be nice if the entry barrier for new tests wouldn't require to
-> handle the accumulated technical debt of the file one's touching ;P
-
-Heh, and if wishes were horses we'd all be eating steak.  Just be glad I didn't
-ask you to rewrite the entire test ;-)
-
-Joking aside, coercing/extorting contributors into using new/better infrastructure
-is the only feasible way to keep KVM's test infrastructure somewhat manageable.
-E.g. I would love to be able to dedicate a substantial portion of my time to
-cleaning up the many warts KUT, but the unfortunate reality is that test infrastructure
-is always going to be lower priority than the product itself.
-
-> But I can understand that adding more code adapting to "existing style"
-> makes the problem only worse. So it's fine with me.
