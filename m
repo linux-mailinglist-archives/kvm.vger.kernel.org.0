@@ -2,78 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0A8546DA310
-	for <lists+kvm@lfdr.de>; Thu,  6 Apr 2023 22:33:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A82086DA3AC
+	for <lists+kvm@lfdr.de>; Thu,  6 Apr 2023 22:42:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239885AbjDFUdP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 Apr 2023 16:33:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36534 "EHLO
+        id S239710AbjDFUmG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 Apr 2023 16:42:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55010 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239605AbjDFUcm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 Apr 2023 16:32:42 -0400
-X-Greylist: delayed 474 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 06 Apr 2023 13:31:59 PDT
-Received: from gorilla.13thmonkey.org (77-173-18-117.fixed.kpn.net [77.173.18.117])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 6558E7683
-        for <kvm@vger.kernel.org>; Thu,  6 Apr 2023 13:31:59 -0700 (PDT)
-Received: by gorilla.13thmonkey.org (Postfix, from userid 103)
-        id 579ED2FF0958; Thu,  6 Apr 2023 22:23:59 +0200 (CEST)
-Date:   Thu, 6 Apr 2023 22:23:59 +0200
-From:   Reinoud Zandijk <reinoud@NetBSD.org>
-To:     Kevin Wolf <kwolf@redhat.com>
-Cc:     Michael Tokarev <mjt@tls.msk.ru>,
-        Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
-        qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Reinoud Zandijk <reinoud@netbsd.org>,
-        Ryo ONODERA <ryoon@netbsd.org>, qemu-block@nongnu.org,
-        Hanna Reitz <hreitz@redhat.com>, Warner Losh <imp@bsdimp.com>,
-        Beraldo Leal <bleal@redhat.com>,
-        Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>,
-        Kyle Evans <kevans@freebsd.org>, kvm@vger.kernel.org,
-        Wainer dos Santos Moschetta <wainersm@redhat.com>,
-        Cleber Rosa <crosa@redhat.com>, Thomas Huth <thuth@redhat.com>,
-        armbru@redhat.com
-Subject: Re: [PATCH v2 05/11] qemu-options: finesse the recommendations
- around -blockdev
-Message-ID: <ZC8qXxB6X8t7RBa+@gorilla.13thmonkey.org>
-References: <20230403134920.2132362-1-alex.bennee@linaro.org>
- <20230403134920.2132362-6-alex.bennee@linaro.org>
- <ZCwsvaxRzx4bzbXo@redhat.com>
- <cbb3df0a-7714-cbc0-efda-45f1d608e988@msgid.tls.msk.ru>
- <ZCxNqb9tEO24KaxX@redhat.com>
+        with ESMTP id S239554AbjDFUlc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 Apr 2023 16:41:32 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87C0A7AB9;
+        Thu,  6 Apr 2023 13:38:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=mWCYh+aHqMQPGU92cJY3RsdVCoOL6xggKE9AswxAjjI=; b=FVfGvilevbgchwqZb52BXeY8SA
+        yM4/PlPBCQF19uANo8phcXNg55OCv069MBl+d8kfOQ5fzChyQXwG8hcFBV26OSUTZK3K1MfiWWUTP
+        32vXXFNGdIMRTR5weNKpSj9tpJQJ08tYy7FODzQZIricHNb+7nLm/NlEmcEHUZUat4+aVvWRzkbiz
+        ZruHBv84ED5dthnKaC9V4SqK0Yq3SlaeD80X0P16qTbl5RgzuVxK7Xp1Z9JmtdzlZpwNiqopTQUez
+        SR04HbpaphOyaR+GDCdQeqjdy2CICbldb2Fzsbp+GTvV1FLr5ojiF1w7bxi5Fvgja+sPSUoHU2akV
+        mOqncIzg==;
+Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1pkWMX-0009V8-4F; Thu, 06 Apr 2023 20:37:41 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id B0750300274;
+        Thu,  6 Apr 2023 22:37:39 +0200 (CEST)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id 190072625036A; Thu,  6 Apr 2023 22:37:39 +0200 (CEST)
+Date:   Thu, 6 Apr 2023 22:37:38 +0200
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Lai Jiangshan <jiangshanlai@gmail.com>
+Cc:     linux-kernel@vger.kernel.org,
+        Lai Jiangshan <jiangshan.ljs@antgroup.com>,
+        "H. Peter Anvin" <hpa@linux.intel.com>,
+        Andi Kleen <ak@linux.intel.com>,
+        Andrew Cooper <andrew.cooper3@citrix.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Asit Mallick <asit.k.mallick@intel.com>,
+        Cfir Cohen <cfir@google.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        David Kaplan <David.Kaplan@amd.com>,
+        David Rientjes <rientjes@google.com>,
+        Dirk Hohndel <dirkhh@vmware.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        Jan Kiszka <jan.kiszka@siemens.com>,
+        Jiri Slaby <jslaby@suse.cz>, Joerg Roedel <joro@8bytes.org>,
+        Juergen Gross <jgross@suse.com>,
+        Kees Cook <keescook@chromium.org>,
+        Kirill Shutemov <kirill.shutemov@linux.intel.com>,
+        Kuppuswamy Sathyanarayanan <knsathya@kernel.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Mike Stunes <mstunes@vmware.com>,
+        Raj Ashok <ashok.raj@intel.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Tony Luck <tony.luck@intel.com>, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, x86@kernel.org,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>
+Subject: Re: [RFC PATCH 1/7] x86/entry: Move PUSH_AND_CLEAR_REGS out of
+ paranoid_entry
+Message-ID: <20230406203738.GE405948@hirez.programming.kicks-ass.net>
+References: <20230403140605.540512-1-jiangshanlai@gmail.com>
+ <20230403140605.540512-2-jiangshanlai@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <ZCxNqb9tEO24KaxX@redhat.com>
-X-Spam-Status: No, score=0.3 required=5.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-        KHOP_HELO_FCRDNS,SPF_HELO_NONE,SPF_NONE autolearn=no
-        autolearn_force=no version=3.4.6
+In-Reply-To: <20230403140605.540512-2-jiangshanlai@gmail.com>
+X-Spam-Status: No, score=-2.5 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
+        DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Apr 04, 2023 at 06:17:45PM +0200, Kevin Wolf wrote:
-> Am 04.04.2023 um 17:07 hat Michael Tokarev geschrieben:
-> > 04.04.2023 16:57, Kevin Wolf пишет:
-> Maybe -snapshot should error out if -blockdev is in use. You'd generally
-> expect that either -blockdev is used primarily and snapshots are done
-> externally (if the command line is generated by some management tool),
-> or that -drive is used consistently (by a human who likes the
-> convenience). In both cases, we wouldn't hit the error path.
-> 
-> There may be some exceptional cases where you have both -drive and
-> -blockdev (maybe because a human users needs more control for one
-> specific disk). This is the case where you can get a nasty surprise and
-> that would error out. If you legitimately want the -drive images
-> snapshotted, but not the -blockdev ones, you can still use individual
-> '-drive snapshot=on' options instead of the global '-snapshot' (and the
-> error message should mention this).
+On Mon, Apr 03, 2023 at 10:05:59PM +0800, Lai Jiangshan wrote:
+> @@ -915,11 +922,8 @@ SYM_CODE_END(xen_failsafe_callback)
+>   * R14 - old CR3
+>   * R15 - old SPEC_CTRL
+>   */
+> -SYM_CODE_START(paranoid_entry)
+> +SYM_FUNC_START(paranoid_entry)
+>  	ANNOTATE_NOENDBR
+> -	UNWIND_HINT_FUNC
 
-I didn't know that! I normally use the -snapshot as global option. Is there a
-reason why -blockdev isn't honouring -snapshot?
+That isn't quite equivalent. SYM_FUNC_START() gets you ENDBR, while the
+SYM_CODE_START(); ANNOTATE_NOENDBR; UNWIND_HINT_FUNC is
+explicitly no ENDBR.
 
-With regards,
-Reinoud
+
+> -	PUSH_AND_CLEAR_REGS save_ret=1
+> -	ENCODE_FRAME_POINTER 8
+>  
+>  	/*
+>  	 * Always stash CR3 in %r14.  This value will be restored,
+
 
