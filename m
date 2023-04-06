@@ -2,109 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 72FAC6D8D60
-	for <lists+kvm@lfdr.de>; Thu,  6 Apr 2023 04:20:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E25D66D8D6B
+	for <lists+kvm@lfdr.de>; Thu,  6 Apr 2023 04:25:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234474AbjDFCUN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Apr 2023 22:20:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49068 "EHLO
+        id S230527AbjDFCZm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Apr 2023 22:25:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51958 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229631AbjDFCUM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Apr 2023 22:20:12 -0400
-Received: from mail-pf1-x441.google.com (mail-pf1-x441.google.com [IPv6:2607:f8b0:4864:20::441])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B58036EAF;
-        Wed,  5 Apr 2023 19:20:11 -0700 (PDT)
-Received: by mail-pf1-x441.google.com with SMTP id z11so24912329pfh.4;
-        Wed, 05 Apr 2023 19:20:11 -0700 (PDT)
+        with ESMTP id S230497AbjDFCZk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Apr 2023 22:25:40 -0400
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91DE37ED6
+        for <kvm@vger.kernel.org>; Wed,  5 Apr 2023 19:25:39 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-545dd1a1e31so326507507b3.22
+        for <kvm@vger.kernel.org>; Wed, 05 Apr 2023 19:25:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1680747611;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QPttce9mwmXnSVxB26FbEZfZew9OpavH8s0yj1jWAxQ=;
-        b=FFnWjHp1JyVAdpXSYKsLs04rmCn/J2U/vI6DrqybZIScrcKTCtwyhmRW+kbIEPN7ha
-         2tUSl4YGQ/Vjx/kpH03mIbQ62YEkKX7j8RLdbRqvqTXpS8ThznMXKs65Tgvs8u08pTc6
-         mri3CqlPB393s4ENfHkYnZhV0+BmTY3pEIG0qJO/2pr+BPAeSrIKoqUxLb2zhVLrBFgy
-         Cu/JWGzMOCcE9HrzJbDXJiWBJJVYcKztmEyVOR5e/+wh9ARFfFrNSwGlpcUM9Xkf65xR
-         h2RPMjjVmVXjzzRzBq27I0h+V7nNnOJUDEGxfhRnlJhEtZLz0rt12SiFOmiYyVbovT8U
-         uPEA==
+        d=google.com; s=20210112; t=1680747939;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=uzLdQHPRXQy/82zolk+xJ8q+mSGRD7neb4gn4oC5I/4=;
+        b=PCLY2Ypu6l6hh2CIW4bQoTuVenTn3Y0AAyzXiGMd3jfotzgF95xcRMTOSFFN0A48kl
+         708o0LdF2NZTokf4TZaNDEPCCqsyuLOcV1YO2kCmobaGM5loFxXhR8p7LYmBdegZaWeY
+         GgbIrvzonzzi5/utvjc23HnZoIjLGdb91gmdFO042JtKTL7/3Ed2T+hd7YvNfBhso1zD
+         IDM60PbNRKbeHefJmqaZNLm1IyreMgpF3l2DI6lK3W2kb2OYWzk2/ill8MyhwZcvvIvE
+         zJ443wwDyPaRoF7vsC3LgVnyZiIyOrXmTECEse4btdezgmiMIESwPYSHelMjGyG8Gc9A
+         gIMQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680747611;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=QPttce9mwmXnSVxB26FbEZfZew9OpavH8s0yj1jWAxQ=;
-        b=ClgcBO3COgXZrB5JkAHrXbL3Bjchya4xnJ+aBYqjLQ3u/1nqoCspT45CbTF8lXDl/R
-         7VPHdFN9dF6h/jFmyQbofHqvjE4bV9eU5xsLd1sVjTEQdQSFwgDenCTduqmOiXd3nT6X
-         VtKMpzT96MLcNFmMH5BI5QROZKEPRcvnFIue8ZrV66Izn8es188h89WAO7kzR65BICfq
-         CVrEt7p6ODxGK8jSFoPJSbFlL7CyMGDYDA9LPerpv3N/yD9GVcFrWUf6lMxFPNQGTLFa
-         pnMvnatmvtYXsZ8HwCBQVyRg8Xg/+1BaK+MmOKSb0R8toj4i5CklRW5v2S1sBENFXDjk
-         kgtw==
-X-Gm-Message-State: AAQBX9cMN92jg/L4ahs/UF/ejUQX0yQKrUNpzFng3QbRu3Qc5d8S85+q
-        bfU6JbWeqQk6z16+9o3QCvpKgOoT2DT2W03kX+c=
-X-Google-Smtp-Source: AKy350ah/yAbNH61dTfsbN07VXnYGkfpcj6Q1ghmXf8mxiMvh8fyNX8pjOrxn77qIo7g1qOrHpABjcAD/0nRU8I3M3g=
-X-Received: by 2002:a05:6a00:174f:b0:62a:424b:2af0 with SMTP id
- j15-20020a056a00174f00b0062a424b2af0mr4713798pfc.0.1680747611176; Wed, 05 Apr
- 2023 19:20:11 -0700 (PDT)
-MIME-Version: 1.0
-References: <20230403095200.1391782-1-korantwork@gmail.com> <168063175075.174995.217166777153935864.b4-ty@google.com>
-In-Reply-To: <168063175075.174995.217166777153935864.b4-ty@google.com>
-From:   Xinghui Li <korantwork@gmail.com>
-Date:   Thu, 6 Apr 2023 10:21:20 +0800
-Message-ID: <CAEm4hYV-M1sbboOon_O=eRsk6LEgwog+oUKBpdnAkchs=KMWEw@mail.gmail.com>
-Subject: Re: [PATCH REBASED] KVM: x86: SVM: Fix one redefine issue about VMCB_AVIC_APIC_BAR_MASK
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com,
-        mlevitsk@redhat.com, linux-kernel@vger.kernel.org, x86@kernel.org,
-        kvm@vger.kernel.org, Xinghui Li <korantli@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
-        DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-        version=3.4.6
+        d=1e100.net; s=20210112; t=1680747939;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=uzLdQHPRXQy/82zolk+xJ8q+mSGRD7neb4gn4oC5I/4=;
+        b=mVPQGWBqTmkfg/IZ1E6LJwQDshyArvl2faoSnr7akHW3NupqZ/vIX8YLq7lxoVw3hw
+         UbuxZ4sPJbupEHM+Kstei8grtdLz7rvgLA6WyOskTXcsykuzVuONXiL018O7Wiw5whzY
+         X54Z193gxj1rz0Rux5BZ+oMpR5nPuU45Scx28ces3vpzMc6yYcmlitWT0At1/tjBD+bF
+         kX63CBN1RF4L+jVvggfyGdYBVI2G133BkC7cnqX781ejTaTV3M+6pKr/kpNiyOlrsnV6
+         b8FWytGfWQ/BX1RG5Yknf1h5SwmEpVNEhwuRRFnvm7lagRCWKlADMl4/RlPurjBFsyRN
+         eDww==
+X-Gm-Message-State: AAQBX9fZRIcc1ywBedacTH0HfJU+OcoGwXAeZo/+8PGmaPEZXCiZq2R+
+        HzhdD5pjgoRc0A8m7OLO8dT7QXMNepM=
+X-Google-Smtp-Source: AKy350ZMzk2zAw14PQHNGkXIvmyddKylyhVTHoaHYhsZY7mxch8XxLPCKp4ZKpPAS5ZQweRcA/5WylDGeO0=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:cad1:0:b0:b75:3fd4:1b31 with SMTP id
+ a200-20020a25cad1000000b00b753fd41b31mr1076802ybg.1.1680747938856; Wed, 05
+ Apr 2023 19:25:38 -0700 (PDT)
+Date:   Wed, 5 Apr 2023 19:25:37 -0700
+In-Reply-To: <ZB7oKD6CHa6f2IEO@kroah.com>
+Mime-Version: 1.0
+References: <20230322013731.102955-1-minipli@grsecurity.net>
+ <167949641597.2215962.13042575709754610384.b4-ty@google.com>
+ <190509c8-0f05-d05c-831c-596d2c9664ac@grsecurity.net> <ZB7oKD6CHa6f2IEO@kroah.com>
+Message-ID: <ZC4tocf+PeuUEe4+@google.com>
+Subject: Re: [PATCH v4 0/6] KVM: MMU: performance tweaks for heavy CR0.WP users
+From:   Sean Christopherson <seanjc@google.com>
+To:     Greg KH <greg@kroah.com>
+Cc:     Mathias Krause <minipli@grsecurity.net>, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>, stable@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-7.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Apr 5, 2023 at 7:44=E2=80=AFAM Sean Christopherson <seanjc@google.c=
-om> wrote:
->
-> On Mon, 03 Apr 2023 17:52:00 +0800, korantwork@gmail.com wrote:
-> > VMCB_AVIC_APIC_BAR_MASK is defined twice with the same value in svm.h,
-> > which is meaningless. Delete the duplicate one.
->
-> Applied to kvm-x86 svm, thanks!
->
-> In the future, please don't use "PATCH REBASED".  If you're sending a new
-> version of a patch that's been rebased, then the revision number needs to=
- be
-> bumped.  The fact that the only change is that the patch was rebased isn'=
-t
-> relevant as far as versioning is concerned, it's still a new version.  Th=
-e
-> cover letter and/or ignored part of the patch is where the delta between
-> versions should be captured.
->
-> And in this case, there really was no need to send a new version, the ori=
-ginal
-> patch still applies cleanly.  I suspect that the REBASED version was sent=
- as a
-> form of a ping, which again is not the right way to ping a patch/series. =
- If you
-> want to ping, please reply to the original patch.  Unnecessarily sending =
-new
-> versions means more patches to sort through, i.e. makes maintainers lives=
- harder,
-> not easier.
->
-Firstly, I'm so so SORRY to burden you in this way.
-I found the last patch can't be am directly, so I send a new patch
-with the last rebased code.
-I used to believe that this would alleviate your burden, but
-unfortunately, it had the opposite effect.
-Again, sorry for my wrong operation.
+On Sat, Mar 25, 2023, Greg KH wrote:
+> On Sat, Mar 25, 2023 at 12:39:59PM +0100, Mathias Krause wrote:
+> > On 23.03.23 23:50, Sean Christopherson wrote:
+> > > On Wed, 22 Mar 2023 02:37:25 +0100, Mathias Krause wrote:
+> > >> v3: https://lore.kernel.org/kvm/20230201194604.11135-1-minipli@grsecurity.net/
+> > >>
+> > >> This series is the fourth iteration of resurrecting the missing pieces of
+> > >> Paolo's previous attempt[1] to avoid needless MMU roots unloading.
+> > >>
+> > >> It's incorporating Sean's feedback to v3 and rebased on top of
+> > >> kvm-x86/next, namely commit d8708b80fa0e ("KVM: Change return type of
+> > >> kvm_arch_vm_ioctl() to "int"").
+> > >>
+> > >> [...]
+> > > 
+> > > Applied 1 and 5 to kvm-x86 mmu, and the rest to kvm-x86 misc, thanks!
+> > > 
+> > > [1/6] KVM: x86/mmu: Avoid indirect call for get_cr3
+> > >       https://github.com/kvm-x86/linux/commit/2fdcc1b32418
+> > > [2/6] KVM: x86: Do not unload MMU roots when only toggling CR0.WP with TDP enabled
+> > >       https://github.com/kvm-x86/linux/commit/01b31714bd90
+> > > [3/6] KVM: x86: Ignore CR0.WP toggles in non-paging mode
+> > >       https://github.com/kvm-x86/linux/commit/e40bcf9f3a18
+> > > [4/6] KVM: x86: Make use of kvm_read_cr*_bits() when testing bits
+> > >       https://github.com/kvm-x86/linux/commit/74cdc836919b
+> > > [5/6] KVM: x86/mmu: Fix comment typo
+> > >       https://github.com/kvm-x86/linux/commit/50f13998451e
+> > > [6/6] KVM: VMX: Make CR0.WP a guest owned bit
+> > >       https://github.com/kvm-x86/linux/commit/fb509f76acc8
+> > 
+> > Thanks a lot, Sean!
+> > 
+> > As this is a huge performance fix for us, we'd like to get it integrated
+> > into current stable kernels as well -- not without having the changes
+> > get some wider testing, of course, i.e. not before they end up in a
+> > non-rc version released by Linus. But I already did a backport to 5.4 to
+> > get a feeling how hard it would be and for the impact it has on older
+> > kernels.
+> > 
+> > Using the 'ssdd 10 50000' test I used before, I get promising results
+> > there as well. Without the patches it takes 9.31s, while with them we're
+> > down to 4.64s. Taking into account that this is the runtime of a
+> > workload in a VM that gets cut in half, I hope this qualifies as stable
+> > material, as it's a huge performance fix.
+> > 
+> > Greg, what's your opinion on it? Original series here:
+> > https://lore.kernel.org/kvm/20230322013731.102955-1-minipli@grsecurity.net/
+> 
+> I'll leave the judgement call up to the KVM maintainers, as they are the
+> ones that need to ack any KVM patch added to stable trees.
 
-Thanks~
+These are quite risky to backport.  E.g. we botched patch 6[*], and my initial
+fix also had a subtle bug.  There have also been quite a few KVM MMU changes since
+5.4, so it's possible that an edge case may exist in 5.4 that doesn't exist in
+mainline.
+
+I'm not totally opposed to the idea since our tests _should_ be provide solid
+coverage, e.g. existing tests caught my subtle bug, but I don't think we should
+backport these without a solid usecase, as there is a fairly high risk of breaking
+random KVM users that wouldn't see any meaningful benefit.
+
+In other words, who cares enough about the performance of running grsecurity kernels
+in VMs to want these backported, but doesn't have the resources to maintain (or pay
+someone to maintain) their own host kernel?
+
+[*] https://lkml.kernel.org/r/20230405002608.418442-1-seanjc%40google.com
