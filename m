@@ -2,148 +2,83 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E8E856D8DDC
-	for <lists+kvm@lfdr.de>; Thu,  6 Apr 2023 05:07:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 78EC46D8DE0
+	for <lists+kvm@lfdr.de>; Thu,  6 Apr 2023 05:09:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234940AbjDFDHL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Apr 2023 23:07:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57314 "EHLO
+        id S234400AbjDFDJR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Apr 2023 23:09:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60318 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235393AbjDFDG0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Apr 2023 23:06:26 -0400
-Received: from gandalf.ozlabs.org (mail.ozlabs.org [IPv6:2404:9400:2221:ea00::3])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA5BBAD04;
-        Wed,  5 Apr 2023 20:06:11 -0700 (PDT)
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4PsRGP20nxz4wgv;
-        Thu,  6 Apr 2023 13:06:04 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-        s=201702; t=1680750365;
-        bh=+7JnYdXl4iRYhR/fNbCL6DbEPldREXhma/t+L8lv3Js=;
-        h=Date:From:To:Cc:Subject:From;
-        b=nx9WwZzDcwf8f02O4B1Eo+3/kc7fR4+ptzZdOyJ0xWtJ2BN1fMxGw/Oq14JTz6CaE
-         L8Q7Etru1Qc+P+W6khw3YznWVtBDi0bppM8Bct2Hzl1BjBkhKJhNzHDTHpcm5t+kpD
-         qRUSW9YHeah0KwYMJaYdSj9WJJBiiSya6raaBfjKzFRgNQ6qkjfj/mVzZEI8k/fL/p
-         gxwttRbW7wq+tw5Oy2jR9SPLVS+dLpnvNTnQVlZ/+B7oiaQ60s6OYQueQg+9+78mPm
-         5+Y7pKPewP4FUIRXc/ND8Pv9RYjAtkPxOUqzvU3/eTgyvXceujVFlrXQ13FD6uMtMC
-         LldLzWDgaMU+Q==
-Date:   Thu, 6 Apr 2023 13:06:03 +1000
-From:   Stephen Rothwell <sfr@canb.auug.org.au>
-To:     Christoffer Dall <cdall@cs.columbia.edu>,
-        Marc Zyngier <maz@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     KVM <kvm@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Thomas Huth <thuth@redhat.com>
-Subject: linux-next: manual merge of the kvm-arm tree with the kvm tree
-Message-ID: <20230406130603.273997ca@canb.auug.org.au>
-MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/Z+Kjzg/rPvU7tRqN1R3suNi";
- protocol="application/pgp-signature"; micalg=pgp-sha256
-X-Spam-Status: No, score=-2.4 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
-        DKIM_VALID_AU,RCVD_IN_DNSWL_MED,SPF_HELO_PASS,SPF_PASS
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        with ESMTP id S235290AbjDFDId (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Apr 2023 23:08:33 -0400
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44BCAA261
+        for <kvm@vger.kernel.org>; Wed,  5 Apr 2023 20:08:17 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-54c01480e3cso23515207b3.1
+        for <kvm@vger.kernel.org>; Wed, 05 Apr 2023 20:08:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112; t=1680750496;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=YXwPO3COJugDpcH5uHXjJUSYvlyyN4boQH0VNgkoDVE=;
+        b=VUSllZJokxU+J/9IF5pahvqVy2lLsZD8c1FqSjy880xPSy7PLsVmL7hNgujCtzVD/9
+         8THEct2GMutRtI8j1oLsJn+npJh2cB2ONHhwyU8JVHm+bK7AymAUbCcpRyzhIvYqFDlT
+         B6ppDFghpiqctva1PRzAnYCuYjZPy97XBrRZ+KU2clstaawqvz4L6YD3zK0xSQL4deWH
+         CQ9YuPX7G7rpki/4p75EOxT1TI7QbgeqJkwa6K7xccYHZWbVRPmnxmmNPWC/QbfpvK6s
+         kMbkeWUnJilymgQC+8PaZhcppTQAEbPvdPQJdHF1F9bGxe/sCMyu0M9zZQkFMCY++y1q
+         nwUA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1680750496;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=YXwPO3COJugDpcH5uHXjJUSYvlyyN4boQH0VNgkoDVE=;
+        b=4k9OBgjybjltlE1ENuqJL2+BNKwXH0uowA/3//+500j13S/SWGygRrlFsnvbq+13Ch
+         5Z776rmWfY7NatyHWqcA2OfLagT1lrkqBJXz0lQZnZkQv+PJOK9q+xuZIXrR7/Ab+HQR
+         oi6Dy0tVstIUxcB1zCWonbJKTDs4gY1sARWfjYYyzDnBWz6r3Oy3uxSXyS6LB3rvxTQJ
+         sMuhTUmB9DhcqaW6ppwcb027KrY9DrjdnggoL3+2glmZoPqjeHW2FQMGHo5g2+n3ElPd
+         RoVMwErF7C5yp1EZT9skaOwFxAxHmi8NHBUC6TTpD0CS+IAs/krLbgUwxhj7e7P2tFaq
+         11qA==
+X-Gm-Message-State: AAQBX9cmCw+IH4dR2XbBvikEeT8JHUdRySevPmLMeAIfmvFdgZZJS0ST
+        DrHQDffYPUCSdUZNSryqewvfEYbUEBk=
+X-Google-Smtp-Source: AKy350aSM2AObDoRvgxmc7h58tZisvk9/DwCMWtBBlJNfF1AR1CkqA5WR7Ql4MORiuThxkqLDXhMC/iHktg=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a81:d107:0:b0:546:5b84:b558 with SMTP id
+ w7-20020a81d107000000b005465b84b558mr4844875ywi.10.1680750496507; Wed, 05 Apr
+ 2023 20:08:16 -0700 (PDT)
+Date:   Wed, 5 Apr 2023 20:08:15 -0700
+In-Reply-To: <ZByPWH5ayCT25vbN@google.com>
+Mime-Version: 1.0
+References: <20221226075412.61167-1-likexu@tencent.com> <c5da9a9c-b411-5a44-4255-eb49399cf4c0@gmail.com>
+ <1ac1507d-ab5d-4001-886a-f7b055fdad39@redhat.com> <ZByPWH5ayCT25vbN@google.com>
+Message-ID: <ZC43nyPWuZ6MdTjz@google.com>
+Subject: Re: [kvm-unit-tests PATCH 0/2] x86/pmu: Add TSX testcase and fix force_emulation_prefix
+From:   Sean Christopherson <seanjc@google.com>
+To:     Thomas Huth <thuth@redhat.com>
+Cc:     Like Xu <like.xu.linux@gmail.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Andrew Jones <andrew.jones@linux.dev>, kvm@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-7.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
---Sig_/Z+Kjzg/rPvU7tRqN1R3suNi
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On Thu, Mar 23, 2023, Sean Christopherson wrote:
+> On Thu, Mar 23, 2023, Thomas Huth wrote:
+> > On 14/02/2023 07.47, Like Xu wrote:
+> > > CC more KUT maintainers, could anyone pick up these two minor x86 tests ?
+> > 
+> > Your patches never made it to my inbox - I guess they got stuck in a mail
+> > filter on the way ... Paolo, Sean, did you get them?
+> 
+> Yeah, I have them.  I'll prep a pull request, there are many KUT x86 patches
+> floating around that need to get merged.  Will likely take me a few days though.
 
-Hi all,
-
-Today's linux-next merge of the kvm-arm tree got a conflict in:
-
-  arch/arm64/kvm/arm.c
-
-between commit:
-
-  d8708b80fa0e ("KVM: Change return type of kvm_arch_vm_ioctl() to "int"")
-
-from the kvm tree and commit:
-
-  e0fc6b21616d ("KVM: arm64: Add vm fd device attribute accessors")
-
-from the kvm-arm tree.
-
-I fixed it up (see below) and can carry the fix as necessary. This
-is now fixed as far as linux-next is concerned, but any non trivial
-conflicts should be mentioned to your upstream maintainer when your tree
-is submitted for merging.  You may also want to consider cooperating
-with the maintainer of the conflicting tree to minimise any particularly
-complex conflicts.
-
---=20
-Cheers,
-Stephen Rothwell
-
-diff --cc arch/arm64/kvm/arm.c
-index aaa752be3776,4ec888fdd4f7..000000000000
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@@ -220,7 -234,7 +234,8 @@@ int kvm_vm_ioctl_check_extension(struc
-  	case KVM_CAP_VCPU_ATTRIBUTES:
-  	case KVM_CAP_PTP_KVM:
-  	case KVM_CAP_ARM_SYSTEM_SUSPEND:
- +	case KVM_CAP_IRQFD_RESAMPLE:
-+ 	case KVM_CAP_COUNTER_OFFSET:
-  		r =3D 1;
-  		break;
-  	case KVM_CAP_SET_GUEST_DEBUG2:
-@@@ -1440,7 -1475,28 +1476,27 @@@ static int kvm_vm_ioctl_set_device_addr
-  	}
-  }
- =20
-+ static int kvm_vm_has_attr(struct kvm *kvm, struct kvm_device_attr *attr)
-+ {
-+ 	switch (attr->group) {
-+ 	case KVM_ARM_VM_SMCCC_CTRL:
-+ 		return kvm_vm_smccc_has_attr(kvm, attr);
-+ 	default:
-+ 		return -ENXIO;
-+ 	}
-+ }
-+=20
-+ static int kvm_vm_set_attr(struct kvm *kvm, struct kvm_device_attr *attr)
-+ {
-+ 	switch (attr->group) {
-+ 	case KVM_ARM_VM_SMCCC_CTRL:
-+ 		return kvm_vm_smccc_set_attr(kvm, attr);
-+ 	default:
-+ 		return -ENXIO;
-+ 	}
-+ }
-+=20
- -long kvm_arch_vm_ioctl(struct file *filp,
- -		       unsigned int ioctl, unsigned long arg)
- +int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned lon=
-g arg)
-  {
-  	struct kvm *kvm =3D filp->private_data;
-  	void __user *argp =3D (void __user *)arg;
-
---Sig_/Z+Kjzg/rPvU7tRqN1R3suNi
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmQuNxsACgkQAVBC80lX
-0Gxkkgf8CkKLR8AuSGIbWV+bE1n+NeVjsa6k0ugcz8f5hzGsf9aqX42s6meXooKk
-Ih2hWUUwi/4ilmGEqMk2IM8ZkYGbHAgsH2GrtzSo2M28shgQUfIO/qLt9D2PZrsh
-y0tg0i6i47iELIASqj8KjWXpnLiq9evWuKDxVHUMMfUXdF5AWvEmOG4qK/wXERNy
-n/G/f7jYpdqF09sUEigKIw6KhP1fu3GIOS30ymr/+Efgp0PJ4Tnb+NVCVSRIdPNB
-qzxkNul6FPVpL9AFaswPny/SwIWV2d6KKhvCzE87RWULlifMrnR5d6qan1SNbpPJ
-yP8BQdwO89+qqwRYihiin8skrbyVdw==
-=gLJS
------END PGP SIGNATURE-----
-
---Sig_/Z+Kjzg/rPvU7tRqN1R3suNi--
+Gah, forgot about this series.  I'll plan on doing another pull request next week,
+there are more outstanding KUT patches besides this one.  And I'm finally diving
+into KVM PMU stuff tomorrow, too.
