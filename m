@@ -2,85 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CFC8D6D8B99
-	for <lists+kvm@lfdr.de>; Thu,  6 Apr 2023 02:19:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DEC356D8BF3
+	for <lists+kvm@lfdr.de>; Thu,  6 Apr 2023 02:36:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233927AbjDFATC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Apr 2023 20:19:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36220 "EHLO
+        id S234601AbjDFAg3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Apr 2023 20:36:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50402 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229504AbjDFATA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Apr 2023 20:19:00 -0400
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD33B6592
-        for <kvm@vger.kernel.org>; Wed,  5 Apr 2023 17:18:59 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-5458201ab8cso379444557b3.23
-        for <kvm@vger.kernel.org>; Wed, 05 Apr 2023 17:18:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1680740339;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=cWlTF2KX/SLscX0Kn9NLj6T2D2vSbjVY278n3hbFYjY=;
-        b=Su2D1+qUf7Ph7eETWK8SAUW7jHWbOHfiOGnPWly+EXs6AMreGK9jAxeB1sMb/OMOPY
-         kb81oTWVp7qPJ2XaqWMTwg/It/LOWezEc3rfAp0sKBaL+3W33vnN2uAad8mK04NnX8v1
-         wgAS00fxMs0Eaz+vby2VZhRvD404NTgE/9a45xFXzFfTi/U2c5pggtcuLB/TcYR1JJDC
-         xNKoRnTU0wNG29j38mxAbaJJb0Ufgh/SdVrwZsC3vIzS1COrjLhtGDoK464jKbYW9zC+
-         TYvQ2qipOJbnx1veLjZWyA5PJ0blbodGz5ZfUzySMc7nrWDz1f4UI9YX21mBsZcMeCPm
-         Hr3g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680740339;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=cWlTF2KX/SLscX0Kn9NLj6T2D2vSbjVY278n3hbFYjY=;
-        b=cnQV8uJRdUPHf73o3F6u8Cfdfgz4N3VpV5tRPopuA9peJKTxdwL1EG1mp1BmMvjdk3
-         0yjkgxE1OVlw++rDiGX2cHA1PEHAIoTpvcjv8/o7/+vRYH9PUCVagDzdW42hjF53RvBC
-         1V91ZNkYMaGrYI6zQc6+QzaDsWVQ3xMsV/1gqBpLA0XmHyPfZcvudFlkKcDobyOW53BP
-         G/45mJT26yDhuYCZUcnV8/i6AVEWqLhYgs5RS1rKhoKLlebyX82o1sgKDRQKqIs86trM
-         kvtltgVJFgN2mDnlBat893iUKMgqD3JzR7Uz+bj9Rw0wtkQ9pLc4SfHkR6mAGpz5xINs
-         hW9A==
-X-Gm-Message-State: AAQBX9dqZ5tnjVSXiwd+M7fqxnrjgcaCNnmku50TazfPoDs/1uoBq69H
-        Jnr5cgvMyX7vKI6geKhbEQ9qKHGdZnM=
-X-Google-Smtp-Source: AKy350bQ3fIfLy6btCgwToPkUIzYS2FCVZiNU6H5A1yDmDhqpOXUJ575ykKtCBiZenPiKTLxHQxC0TT3qII=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:12c7:b0:b26:884:c35e with SMTP id
- j7-20020a05690212c700b00b260884c35emr835123ybu.4.1680740339147; Wed, 05 Apr
- 2023 17:18:59 -0700 (PDT)
-Date:   Wed,  5 Apr 2023 17:18:20 -0700
-In-Reply-To: <20230405101350.259000-1-gehao@kylinos.cn>
-Mime-Version: 1.0
-References: <20230405101350.259000-1-gehao@kylinos.cn>
-X-Mailer: git-send-email 2.40.0.348.gf938b09366-goog
-Message-ID: <168074029572.706923.3161914837229872289.b4-ty@google.com>
-Subject: Re: [RESEND PATCH] kvm/selftests: Close opened file descriptor in stable_tsc_check_supported()
-From:   Sean Christopherson <seanjc@google.com>
-To:     Sean Christopherson <seanjc@google.com>, pbonzini@redhat.com,
-        shuah@kernel.org, dmatlack@google.com, coltonlewis@google.com,
-        vipinsh@google.com, Hao Ge <gehao@kylinos.cn>
-Cc:     kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-kernel@vger.kernel.org, gehao618@163.com
+        with ESMTP id S234587AbjDFAg0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Apr 2023 20:36:26 -0400
+Received: from gandalf.ozlabs.org (mail.ozlabs.org [IPv6:2404:9400:2221:ea00::3])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1BC261A5;
+        Wed,  5 Apr 2023 17:36:22 -0700 (PDT)
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4PsMxc57kcz4xFL;
+        Thu,  6 Apr 2023 10:36:20 +1000 (AEST)
+From:   Michael Ellerman <patch-notifications@ellerman.id.au>
+To:     linuxppc-dev@ozlabs.org, kvm@vger.kernel.org,
+        Paul Mackerras <paulus@ozlabs.org>
+Cc:     Michael Neuling <mikey@neuling.org>,
+        Nick Piggin <npiggin@gmail.com>, kvm-ppc@vger.kernel.org
+In-Reply-To: <ZAgsR04beDcARCiw@cleo>
+References: <ZAgsR04beDcARCiw@cleo>
+Subject: Re: [PATCH 0/3] powerpc/kvm: Enable HV KVM guests to use prefixed instructions to access emulated MMIO
+Message-Id: <168074126988.3672916.555286026450877376.b4-ty@ellerman.id.au>
+Date:   Thu, 06 Apr 2023 10:34:29 +1000
+MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-X-Spam-Status: No, score=-7.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.3 required=5.0 tests=RCVD_IN_DNSWL_MED,
+        SPF_HELO_PASS,SPF_PASS autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 05 Apr 2023 18:13:50 +0800, Hao Ge wrote:
-> Close the "current_clocksource" file descriptor before
-> returning or exiting from stable_tsc_check_supported()
-> in vmx_nested_tsc_scaling_test
+On Wed, 08 Mar 2023 17:33:43 +1100, Paul Mackerras wrote:
+> This series changes the powerpc KVM code so that HV KVM can fetch
+> prefixed instructions from the guest in those situations where there
+> is a need to emulate an instruction, which for HV KVM means emulating
+> loads and stores to emulated MMIO devices.  (Prefixed instructions
+> were introduced with POWER10 and Power ISA v3.1, and consist of two
+> 32-bit words, called the prefix and the suffix.)
 > 
-> 
+> [...]
 
-Applied to kvm-x86 selftests, thanks!
+Applied to powerpc/topic/ppc-kvm.
 
-[1/1] kvm/selftests: Close opened file descriptor in stable_tsc_check_supported()
-      https://github.com/kvm-x86/linux/commit/771214507387
+[1/3] powerpc/kvm: Make kvmppc_get_last_inst() produce a ppc_inst_t
+      https://git.kernel.org/powerpc/c/acf17878da680a0c11c0bcb8a54b4f676ff39c80
+[2/3] powerpc/kvm: Fetch prefixed instructions from the guest
+      https://git.kernel.org/powerpc/c/953e37397fb61be61f095d36972188bac5235021
+[3/3] powerpc/kvm: Enable prefixed instructions for HV KVM and disable for PR KVM
+      https://git.kernel.org/powerpc/c/a3800ef9c48c4497dafe5ede1b65d91d9ef9cf1e
 
---
-https://github.com/kvm-x86/linux/tree/next
-https://github.com/kvm-x86/linux/tree/fixes
+cheers
