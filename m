@@ -2,68 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D88A46D9226
-	for <lists+kvm@lfdr.de>; Thu,  6 Apr 2023 10:58:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C2AE06D922B
+	for <lists+kvm@lfdr.de>; Thu,  6 Apr 2023 10:59:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235967AbjDFI6j (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 Apr 2023 04:58:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43862 "EHLO
+        id S235994AbjDFI7o (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 Apr 2023 04:59:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44240 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229589AbjDFI6h (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 Apr 2023 04:58:37 -0400
-Received: from mail-wm1-x333.google.com (mail-wm1-x333.google.com [IPv6:2a00:1450:4864:20::333])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 898134EFD
-        for <kvm@vger.kernel.org>; Thu,  6 Apr 2023 01:58:36 -0700 (PDT)
-Received: by mail-wm1-x333.google.com with SMTP id o32so22204453wms.1
-        for <kvm@vger.kernel.org>; Thu, 06 Apr 2023 01:58:36 -0700 (PDT)
+        with ESMTP id S235689AbjDFI7n (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 Apr 2023 04:59:43 -0400
+Received: from mail-wm1-x331.google.com (mail-wm1-x331.google.com [IPv6:2a00:1450:4864:20::331])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 678725B88
+        for <kvm@vger.kernel.org>; Thu,  6 Apr 2023 01:59:42 -0700 (PDT)
+Received: by mail-wm1-x331.google.com with SMTP id j18-20020a05600c1c1200b003ee5157346cso25144944wms.1
+        for <kvm@vger.kernel.org>; Thu, 06 Apr 2023 01:59:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1680771515;
+        d=linaro.org; s=google; t=1680771581;
         h=content-transfer-encoding:mime-version:message-id:in-reply-to:date
          :subject:cc:to:from:user-agent:references:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=hHzSA/w+tX29wdWiyiod4QQFWJP9A2SW72Qr9AlU6gA=;
-        b=CfPEMKLKqOz/c3+hZ29YAY4dhnm3/P8Qdd5ytuaG4hm36heD2Zf/Ekwv2bz3sieyAU
-         lCS9A60SVmslx2d+mK0nvxajpqAbWWH58sSX50rXMYKxvlOJT8cQtIKonxVMWaQJgpr2
-         z9ZCuQsrxcXpHJS4q4vmTB5xM1uqNH2aZXDpGq8XaLTUE+9L4Qj3x4aveWKuZTctKpoq
-         f8HBIJM2csKrijwyNxnz2n8JvCN9mEFcSyULbkVvfCxdojQtvuuPHIcmvsnvIdlISU8C
-         08sGcS1Kmk+2IN2DdDH14DbP5n3N0njIrvaDv8nFRT+8d50kImoO+gz6xnUFNzAelVyz
-         NqLg==
+        bh=5sRssPNnjk3FAAC+e6GI9oX98dvbrVIoKM4xtqCLlrA=;
+        b=YII4xabBar2qgebAcPiklW/unkEMHWDuzLRCvxFk/UIH+PpgClheiQltRIEzpj77Pa
+         E7NN+ACG3OIepEIJguzVWYGdlql7j7gya/NrJMMN2xMiJ4rHV6C4ykgh0KcgMUswajQF
+         F0S8b5Gg/tq5SaNEEi6s16L142Z9mzJDOIPY3P0t3k1iH+VgJQ2Y1JXs5lWKp3Hzz2Wm
+         yu1ioq8GHSxJHChSiUwRj5hZFWsTNj6lOH6K9PWeVBkLPCjaPaqs1Y+AhZflGsfkSnbN
+         sKCN6wWH+p/G8uVtjuoNxP+Pc98XX49VuoY6NYEyhoXdAvUIPpGMSldLMRAFYdodaZyU
+         5yVQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680771515;
+        d=1e100.net; s=20210112; t=1680771581;
         h=content-transfer-encoding:mime-version:message-id:in-reply-to:date
          :subject:cc:to:from:user-agent:references:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=hHzSA/w+tX29wdWiyiod4QQFWJP9A2SW72Qr9AlU6gA=;
-        b=qQL7UObcukgkRICym89QqTnytDNyLD11CPgoMfCGxCmPdrOyLwla4FRJG5zZ/6KngZ
-         +63JFiKlzgtW+KZRQQ668gqZKi3D7NiB7Zh2FEJodOLasCd3dVLwk8+AQsEAa6l0f3dq
-         /ogalTbXgh3GO9Uf/76sdp78jMdfGWC6pr2JDBOW/YPoD3kmDNKrjDbKcftdjHX0d4uX
-         Cr6ntDSkQ1QFBdIP4t2sn4sajv+FiULcuLyO6oK0PwzUawRL652N2iK1z21zoV65QJeW
-         lUmmIGrToyPMKhqT6rWtmacdq2lzrgO9G65RLRLEqTIB27r7Synu/aN4GA9PFTv+Cktp
-         JYew==
-X-Gm-Message-State: AAQBX9dnbGCls5KldSKF5OxDw10IqGHdkt+YCGezJuWqhzUXesRoTSuT
-        l/52CxuVWaEW7+aH9ugzpPZknQ==
-X-Google-Smtp-Source: AKy350ZvO2HEFpt6fKATtkVuDR9PZfHcx1kRVj+R7uhiRUrRmPQtOUp51lr7nDaatafZ7WJbFafRmg==
-X-Received: by 2002:a7b:c34d:0:b0:3f0:44d1:3ba7 with SMTP id l13-20020a7bc34d000000b003f044d13ba7mr3420294wmj.17.1680771515016;
-        Thu, 06 Apr 2023 01:58:35 -0700 (PDT)
+        bh=5sRssPNnjk3FAAC+e6GI9oX98dvbrVIoKM4xtqCLlrA=;
+        b=t4v9FbDJzw8cZStzz8h24ji1zAXIKpClX5yA5a2XHaml4pK8F5pzU6mpIZViH8xyjW
+         W9eTJbIBHiUHmr9Mwvq2AsR5px2UgL9isSKtEQw2jbnbSa2dlFgMmAK+S2KGiTPk6vC4
+         B6tVIdJ62dvuMHtupvXOZAps0Vj0UJkuoar9SEAfytjiplXZav6qdlF5lAbafB813sm3
+         AQfKEp5N+a1anWfdir/z39OKQj97sphZh0GrQN5vKJkFN4RcXyNNNH5NI5bYL6GlPrez
+         lsV8X7EnVQyApG+MkkMmwg0UdG8Hw03oLlFYiStiZNHruZuT6/08ob+2evTpqQNSxxBY
+         7Nxw==
+X-Gm-Message-State: AAQBX9d5cQiYddJIkrWaHWgjDOsZZ/L0zZINLvBzJoHIbqbrBkUdiu2N
+        vOB97me88vXk/yAI3F4atEV50A==
+X-Google-Smtp-Source: AKy350a5z9Vn/jqwCz8XAy+NdfPZbRY6wD5oyyp/lb/ETDZgLXHhcUAhKvVEQnxfzLFAT9HuflqkFw==
+X-Received: by 2002:a7b:cb4d:0:b0:3f0:6b33:a5e1 with SMTP id v13-20020a7bcb4d000000b003f06b33a5e1mr862961wmj.9.1680771580873;
+        Thu, 06 Apr 2023 01:59:40 -0700 (PDT)
 Received: from zen.linaroharston ([85.9.250.243])
-        by smtp.gmail.com with ESMTPSA id i16-20020a05600c355000b003ede6540190sm4772378wmq.0.2023.04.06.01.58.34
+        by smtp.gmail.com with ESMTPSA id w12-20020a05600c474c00b003ef6f87118dsm4798573wmo.42.2023.04.06.01.59.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Apr 2023 01:58:34 -0700 (PDT)
+        Thu, 06 Apr 2023 01:59:40 -0700 (PDT)
 Received: from zen (localhost [127.0.0.1])
-        by zen.linaroharston (Postfix) with ESMTP id 2B7231FFB7;
-        Thu,  6 Apr 2023 09:58:34 +0100 (BST)
+        by zen.linaroharston (Postfix) with ESMTP id 32B481FFB7;
+        Thu,  6 Apr 2023 09:59:40 +0100 (BST)
 References: <20230405160454.97436-1-philmd@linaro.org>
- <20230405160454.97436-2-philmd@linaro.org>
+ <20230405160454.97436-3-philmd@linaro.org>
 User-agent: mu4e 1.10.0; emacs 29.0.60
 From:   Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
 To:     Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>
 Cc:     qemu-devel@nongnu.org, qemu-s390x@nongnu.org,
         qemu-riscv@nongnu.org, qemu-arm@nongnu.org, kvm@vger.kernel.org,
         qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH 01/10] sysemu/kvm: Remove unused headers
-Date:   Thu, 06 Apr 2023 09:58:24 +0100
-In-reply-to: <20230405160454.97436-2-philmd@linaro.org>
-Message-ID: <87ile9jsjp.fsf@linaro.org>
+Subject: Re: [PATCH 02/10] accel/kvm: Declare kvm_direct_msi_allowed in stubs
+Date:   Thu, 06 Apr 2023 09:59:23 +0100
+In-reply-to: <20230405160454.97436-3-philmd@linaro.org>
+Message-ID: <87edoxjshv.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
@@ -79,7 +79,13 @@ X-Mailing-List: kvm@vger.kernel.org
 
 Philippe Mathieu-Daud=C3=A9 <philmd@linaro.org> writes:
 
-> All types used are forward-declared in "qemu/typedefs.h".
+> Avoid when calling kvm_direct_msi_enabled() from
+> arm_gicv3_its_common.c the next commit:
+>
+>   Undefined symbols for architecture arm64:
+>     "_kvm_direct_msi_allowed", referenced from:
+>         _its_class_name in hw_intc_arm_gicv3_its_common.c.o
+>   ld: symbol(s) not found for architecture arm64
 >
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@linaro.org>
 
