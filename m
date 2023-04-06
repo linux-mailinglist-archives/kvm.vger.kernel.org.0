@@ -2,106 +2,148 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D02CE6D8DD0
-	for <lists+kvm@lfdr.de>; Thu,  6 Apr 2023 05:02:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E8E856D8DDC
+	for <lists+kvm@lfdr.de>; Thu,  6 Apr 2023 05:07:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234563AbjDFDCd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Apr 2023 23:02:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55784 "EHLO
+        id S234940AbjDFDHL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Apr 2023 23:07:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57314 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229590AbjDFDCc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Apr 2023 23:02:32 -0400
-Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F7165BA9
-        for <kvm@vger.kernel.org>; Wed,  5 Apr 2023 20:02:31 -0700 (PDT)
-Received: by mail-pl1-x64a.google.com with SMTP id c2-20020a170903234200b001a0aecba4e1so22110064plh.16
-        for <kvm@vger.kernel.org>; Wed, 05 Apr 2023 20:02:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1680750150;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Qyj+UBSn+qJbXYis+Uut8ABKQ6jjNoJJtNcP+yAVe0I=;
-        b=VYHPND+7vhU1REET2977g166RgzUsIabTCQR5nO0ldkN3EmSZ3oQIylhq1gjk1hL2C
-         lnVHt4Vfrf24Pgr3te4SWu6xJQdTq0kLgQ1ybQMeh89hnAUaM6c0RYhLJo2zNeKwu2iK
-         WzMXn3JIBYQzIBP7ECvWV//wrhViF0bXx3xaBfWVMERkUr01iFjJ+B/6azFM7U9Q7pU9
-         cApdBt+hgsuq4r+7ARG0j/qsE6jKKc2SVMDQrJf1Qrxyt/BzTqY6GVCBZwrrnLzzSeo4
-         Ssf6iITiUSdU6aGQYO6KMxfZYGi6xQP0JnZS7bKPIm3FTpQAv+sReRTb9m7rhuO/yW1x
-         1whg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680750150;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Qyj+UBSn+qJbXYis+Uut8ABKQ6jjNoJJtNcP+yAVe0I=;
-        b=U74OD9C/8RpVklO8YvIURW7/OHaaIh7v9PHY1xuFcNSDSsdO/UVvJhAYfFfUi1BSMj
-         fShdVD2n6yXlxmcn1qyDZ5vjLJ40JH6M62VoPz7PxCMuE1lH3MjlZh4VLp8QebV+4zt1
-         bKJHzeCKlCl+a7l6AuYuRxiudieKQJ5J2W7zHsdiqS2/dcCCWWHh4a0OE7tUB/Bf0cTK
-         ixJVmKqcqVKc3FX42oZyIH6W2mi5bvx/dtap4u2DQV1GSEhpu3qG3uwswKqR4eLRIwhu
-         49HcC4ntS5mxNX1mmKwGAe8DhJE2nXc2q60R9M5IbJJdHRcWggJaXO/HrcngTVQ2dw9/
-         tzNA==
-X-Gm-Message-State: AAQBX9fQpi1wU+EAVPL31ggIG2AyrD+e4xZYKpL7ocq3yv5CofW1Zt+/
-        jlmU6xXAEgC3caCW/QqhAGlxQPyidEw=
-X-Google-Smtp-Source: AKy350Zh1qglJn4qtXvSoMtt2oBvfqPfZmhPHg8bUjnCDxMGMzTcoO4o3RVeYkaWPhm3MqELgQssfbLS678=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90a:4383:b0:23b:419d:8efe with SMTP id
- r3-20020a17090a438300b0023b419d8efemr3179503pjg.3.1680750150729; Wed, 05 Apr
- 2023 20:02:30 -0700 (PDT)
-Date:   Wed, 5 Apr 2023 20:02:29 -0700
-In-Reply-To: <20230215142344.20200-1-minipli@grsecurity.net>
-Mime-Version: 1.0
-References: <20230215142344.20200-1-minipli@grsecurity.net>
-Message-ID: <ZC42RavGH2Z82oJd@google.com>
-Subject: Re: [kvm-unit-tests PATCH] x86/emulator: Test non-canonical memory
- access exceptions
-From:   Sean Christopherson <seanjc@google.com>
-To:     Mathias Krause <minipli@grsecurity.net>
-Cc:     kvm@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-7.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+        with ESMTP id S235393AbjDFDG0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Apr 2023 23:06:26 -0400
+Received: from gandalf.ozlabs.org (mail.ozlabs.org [IPv6:2404:9400:2221:ea00::3])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA5BBAD04;
+        Wed,  5 Apr 2023 20:06:11 -0700 (PDT)
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4PsRGP20nxz4wgv;
+        Thu,  6 Apr 2023 13:06:04 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+        s=201702; t=1680750365;
+        bh=+7JnYdXl4iRYhR/fNbCL6DbEPldREXhma/t+L8lv3Js=;
+        h=Date:From:To:Cc:Subject:From;
+        b=nx9WwZzDcwf8f02O4B1Eo+3/kc7fR4+ptzZdOyJ0xWtJ2BN1fMxGw/Oq14JTz6CaE
+         L8Q7Etru1Qc+P+W6khw3YznWVtBDi0bppM8Bct2Hzl1BjBkhKJhNzHDTHpcm5t+kpD
+         qRUSW9YHeah0KwYMJaYdSj9WJJBiiSya6raaBfjKzFRgNQ6qkjfj/mVzZEI8k/fL/p
+         gxwttRbW7wq+tw5Oy2jR9SPLVS+dLpnvNTnQVlZ/+B7oiaQ60s6OYQueQg+9+78mPm
+         5+Y7pKPewP4FUIRXc/ND8Pv9RYjAtkPxOUqzvU3/eTgyvXceujVFlrXQ13FD6uMtMC
+         LldLzWDgaMU+Q==
+Date:   Thu, 6 Apr 2023 13:06:03 +1000
+From:   Stephen Rothwell <sfr@canb.auug.org.au>
+To:     Christoffer Dall <cdall@cs.columbia.edu>,
+        Marc Zyngier <maz@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     KVM <kvm@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Thomas Huth <thuth@redhat.com>
+Subject: linux-next: manual merge of the kvm-arm tree with the kvm tree
+Message-ID: <20230406130603.273997ca@canb.auug.org.au>
+MIME-Version: 1.0
+Content-Type: multipart/signed; boundary="Sig_/Z+Kjzg/rPvU7tRqN1R3suNi";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
+X-Spam-Status: No, score=-2.4 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
+        DKIM_VALID_AU,RCVD_IN_DNSWL_MED,SPF_HELO_PASS,SPF_PASS
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Feb 15, 2023, Mathias Krause wrote:
-> +static void test_reg_noncanonical(void)
-> +{
-> +	extern char nc_rsp_start, nc_rsp_end, nc_rbp_start, nc_rbp_end;
-> +	extern char nc_rax_start, nc_rax_end;
-> +	handler old_ss, old_gp;
-> +
-> +	old_ss = handle_exception(SS_VECTOR, advance_rip_and_note_exception);
-> +	old_gp = handle_exception(GP_VECTOR, advance_rip_and_note_exception);
-> +
-> +	/* RAX based, should #GP(0) */
-> +	exceptions = 0;
-> +	rip_advance = &nc_rax_end - &nc_rax_start;
-> +	asm volatile("nc_rax_start: orq $0, (%[msb]); nc_rax_end:\n\t"
+--Sig_/Z+Kjzg/rPvU7tRqN1R3suNi
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Can't we use ASM_TRY() + exception_vector() + exception_error_code()?  Installing
-a dedicated handler is (slowly) being phased out.  Even better, if you're willing
-to take a dependency and/or wait a few weeks for my series to land[*], you should
-be able to use asm_safe() to streamline this even further.
+Hi all,
 
-[*] https://lkml.kernel.org/r/20230406025117.738014-1-seanjc%40google.com
+Today's linux-next merge of the kvm-arm tree got a conflict in:
 
+  arch/arm64/kvm/arm.c
 
-> +		     : : [msb]"a"(1ul << 63));
+between commit:
 
-Use BIT_ULL().  Actually, scratch that, we have a NONCANONICAL macro.  It _probably_
-won't matter, but who know what will happen with things like LAM and LASS.
+  d8708b80fa0e ("KVM: Change return type of kvm_arch_vm_ioctl() to "int"")
 
-And why hardcode use of RAX?  Won't any "r" constraint work?
+from the kvm tree and commit:
 
-E.g. I believe this can be something like:
+  e0fc6b21616d ("KVM: arm64: Add vm fd device attribute accessors")
 
-	asm_safe_report_ex(GP_VECTOR, "orq $0, (%[noncanonical]), "r" (NONCANONICAL));
-	report(!exception_error_code());
+from the kvm-arm tree.
 
-Or we could even add asm_safe_report_ex_ec(), e.g.
+I fixed it up (see below) and can carry the fix as necessary. This
+is now fixed as far as linux-next is concerned, but any non trivial
+conflicts should be mentioned to your upstream maintainer when your tree
+is submitted for merging.  You may also want to consider cooperating
+with the maintainer of the conflicting tree to minimise any particularly
+complex conflicts.
 
-	asm_safe_report_ex_ec(GP_VECTOR, 0,
-			      "orq $0, (%[noncanonical]), "r" (NONCANONICAL));
+--=20
+Cheers,
+Stephen Rothwell
+
+diff --cc arch/arm64/kvm/arm.c
+index aaa752be3776,4ec888fdd4f7..000000000000
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@@ -220,7 -234,7 +234,8 @@@ int kvm_vm_ioctl_check_extension(struc
+  	case KVM_CAP_VCPU_ATTRIBUTES:
+  	case KVM_CAP_PTP_KVM:
+  	case KVM_CAP_ARM_SYSTEM_SUSPEND:
+ +	case KVM_CAP_IRQFD_RESAMPLE:
++ 	case KVM_CAP_COUNTER_OFFSET:
+  		r =3D 1;
+  		break;
+  	case KVM_CAP_SET_GUEST_DEBUG2:
+@@@ -1440,7 -1475,28 +1476,27 @@@ static int kvm_vm_ioctl_set_device_addr
+  	}
+  }
+ =20
++ static int kvm_vm_has_attr(struct kvm *kvm, struct kvm_device_attr *attr)
++ {
++ 	switch (attr->group) {
++ 	case KVM_ARM_VM_SMCCC_CTRL:
++ 		return kvm_vm_smccc_has_attr(kvm, attr);
++ 	default:
++ 		return -ENXIO;
++ 	}
++ }
++=20
++ static int kvm_vm_set_attr(struct kvm *kvm, struct kvm_device_attr *attr)
++ {
++ 	switch (attr->group) {
++ 	case KVM_ARM_VM_SMCCC_CTRL:
++ 		return kvm_vm_smccc_set_attr(kvm, attr);
++ 	default:
++ 		return -ENXIO;
++ 	}
++ }
++=20
+ -long kvm_arch_vm_ioctl(struct file *filp,
+ -		       unsigned int ioctl, unsigned long arg)
+ +int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned lon=
+g arg)
+  {
+  	struct kvm *kvm =3D filp->private_data;
+  	void __user *argp =3D (void __user *)arg;
+
+--Sig_/Z+Kjzg/rPvU7tRqN1R3suNi
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmQuNxsACgkQAVBC80lX
+0Gxkkgf8CkKLR8AuSGIbWV+bE1n+NeVjsa6k0ugcz8f5hzGsf9aqX42s6meXooKk
+Ih2hWUUwi/4ilmGEqMk2IM8ZkYGbHAgsH2GrtzSo2M28shgQUfIO/qLt9D2PZrsh
+y0tg0i6i47iELIASqj8KjWXpnLiq9evWuKDxVHUMMfUXdF5AWvEmOG4qK/wXERNy
+n/G/f7jYpdqF09sUEigKIw6KhP1fu3GIOS30ymr/+Efgp0PJ4Tnb+NVCVSRIdPNB
+qzxkNul6FPVpL9AFaswPny/SwIWV2d6KKhvCzE87RWULlifMrnR5d6qan1SNbpPJ
+yP8BQdwO89+qqwRYihiin8skrbyVdw==
+=gLJS
+-----END PGP SIGNATURE-----
+
+--Sig_/Z+Kjzg/rPvU7tRqN1R3suNi--
