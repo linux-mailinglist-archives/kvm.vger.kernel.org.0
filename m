@@ -2,905 +2,268 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 82BF06D8E6E
-	for <lists+kvm@lfdr.de>; Thu,  6 Apr 2023 06:42:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8E6C56D8ED4
+	for <lists+kvm@lfdr.de>; Thu,  6 Apr 2023 07:32:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233235AbjDFEm2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 Apr 2023 00:42:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44698 "EHLO
+        id S235069AbjDFFcI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 Apr 2023 01:32:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35772 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234712AbjDFEm0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 Apr 2023 00:42:26 -0400
-Received: from mail-ed1-x52f.google.com (mail-ed1-x52f.google.com [IPv6:2a00:1450:4864:20::52f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1EB7D86B0
-        for <kvm@vger.kernel.org>; Wed,  5 Apr 2023 21:42:23 -0700 (PDT)
-Received: by mail-ed1-x52f.google.com with SMTP id ew6so146207498edb.7
-        for <kvm@vger.kernel.org>; Wed, 05 Apr 2023 21:42:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20210112.gappssmtp.com; s=20210112; t=1680756141;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8FCFv8gCMr2DyZpo0HX3sXTL7d8CX/HFrWKuoPscp5c=;
-        b=8AelawvM5OAU593pkdCrAQSLyDKfj+LDAYZFLkPFJSHJmXS/rSRdDTnw1Pd06iT6Ag
-         YO97csjO6C/QLxtGNq8IibII1a2blVlSrnVD/+E1lemDt+srYuN6T6U0BsoVyDbb+/+N
-         TUj9qMh89oR7CCooG3AcYyCawyEUTNsyGtnfbJolbaOwv2fguW2DAch+Ne9lfCcXv1nX
-         coWgA9A36dDz4lRkuPL9e2Bnkj0UJ9B3H1sM1Uvet0STiqNBwUfBBrGXpIpC9PPX2RFo
-         1ReziCx8CGmL/KEQ157EustZvqTk2DWPQUryTiiqX/Joyo6/G1tbxeQ1+6UGyt2UOlns
-         8wLg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680756141;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8FCFv8gCMr2DyZpo0HX3sXTL7d8CX/HFrWKuoPscp5c=;
-        b=nJ34HNpHScq0AGmlNdqnbT2wcIeCc8ngjzXd6hUkqdcI4AeEoUmPOENrbgaH6FznhC
-         WOpgdnRXESw2kGnfr2h+24GhGh8PUO/c/pWEjMaPTzU5HUdu5CTrcJjDBBYFiamb/zy0
-         W8sbu12YIcDC9kJOp8sVqvO6nMtNcj3oyoqxAWTw7rgiyGjoTFBGdQrWcq2lJ7eqHDSV
-         5SrQ7Yn/MsmJrZ+TSTUMjVUgTE+Dn1zhDRge22NKIl4FhRyuwYSk3Pt0R9+FKCOMQZjz
-         a0smjZOSGsOcHKN7ndyIwNxOkRmA3opS1IAg2x89pUc0Kfa4Q6KjDMxd1Om9sBg0mxBD
-         Xjkg==
-X-Gm-Message-State: AAQBX9cXbTLxlBxFOWpXST8cbQJg2vZAN7P4cykcWCWip/VL2zO8+anh
-        04RAcP1Ia5+vRsHpHX7RRojg55wypq8kX5cfaPh65w==
-X-Google-Smtp-Source: AKy350Yd7faMosza4Vh36ElLdQpCof+OKoZ0fivp6pp7t7uRPSj79oKFl8M1QnAzgjpxt1hlaanPEXg+Ra4/joT7Y1c=
-X-Received: by 2002:a17:906:f14d:b0:949:2293:1d1a with SMTP id
- gw13-20020a170906f14d00b0094922931d1amr2930278ejb.13.1680756141323; Wed, 05
- Apr 2023 21:42:21 -0700 (PDT)
+        with ESMTP id S235059AbjDFFcC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 Apr 2023 01:32:02 -0400
+Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF67693ED;
+        Wed,  5 Apr 2023 22:32:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1680759120; x=1712295120;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=+RSN4l1FRg5tElMFHlBWXpmdA2lP1/T8qtU/05H+c4Y=;
+  b=HIbT93akLfKk7ZcCjYl/dN4URvtqtrx1+GHEvMcLZZEYdHkMg6TDubgp
+   ftOW8VXZ5W/1N//8sv6Px+5xBSmvnyt9ZXlu75Gla7qM+34f55AAwD5n4
+   0Eh87xatMi+yTXIHl2iVegg1hxsgST/anWne6P9YL9A3q9LcU4vSrk0nx
+   nVWzmjDpAdqYu5J0gOs8MMu+MDSYzpOPA6nTJvwkcCKCVldObwonhIMzV
+   jZ2zZgshhP/CPO8QlynKakoQxt00fd1NaIAPywG5Ma4KlsqtYpQJTM0aJ
+   wo+0ZTfDHLwPIINCh+rgvqyMK9nW0Qh/EwCGV8W4UXrlGedhoFuofj3o/
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10671"; a="326685292"
+X-IronPort-AV: E=Sophos;i="5.98,322,1673942400"; 
+   d="scan'208";a="326685292"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Apr 2023 22:32:00 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10671"; a="810869026"
+X-IronPort-AV: E=Sophos;i="5.98,322,1673942400"; 
+   d="scan'208";a="810869026"
+Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
+  by orsmga004.jf.intel.com with ESMTP; 05 Apr 2023 22:31:59 -0700
+Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.21; Wed, 5 Apr 2023 22:31:59 -0700
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.21 via Frontend Transport; Wed, 5 Apr 2023 22:31:59 -0700
+Received: from NAM02-DM3-obe.outbound.protection.outlook.com (104.47.56.48) by
+ edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.21; Wed, 5 Apr 2023 22:31:57 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=DXOOMzBkOQU7WyKQpyNweKDUyV4cLeW4QJxgd6rsZJlSg/KmlcULMRHm1CdcDRqAydZplDgKyugaCgXF6rkS5+nyiMzQrMxUPkPD/XJPQLg9xms3KArx7KDt2q86BoLFbt5cKJ8mbmtDyfVncDnHbsLGYlUtqxi16YwOz9dDsyttslwV8nxq3S2MuSuC4TPsLddDjeArW/hsOhdZm3F3ZrUKIxvMFBey7g/oul+w5KOSYpIJExv0NJlXwaVJu9s2H/WDjl1tDajhgsuXRRGzRmNbFExe91My2l30TEB2dRuenPKjfLU9VVbjAlwMyhdJ3VY3jTAyD+NJ4uAAzzwrrw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=+RSN4l1FRg5tElMFHlBWXpmdA2lP1/T8qtU/05H+c4Y=;
+ b=B45togGMTZaIzvTYky+5kOBwbp9orwaQ4ngNs3MyG9LqRl1p4TYt1ATH581toNdIXO2J6twM/w4j2fwR6wlWbFI9nsCNkfmJzRuDTLfhdPodm6h+uXrI+620B0aJI7a4qB5qB9thcJxQ/tXr/F199PbHnRbH0uuHBjJ8o5u3kXP4Lri/PbGGrwMN+6P6P0irXlb3W6PtmFa25K7kyCNv/Upa9ePyzsQtBAeCqw7UoXYSnulp/Yr2CnyI6DOtS27YVafq592AKUTXP0jJrmMHrBGfggzj8hO1mzvEqZfdOQSfpFmIF6QjoTJ9sjBIy9Q0OEdPmeYJ8kCeiU97I8yKTg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from DS0PR11MB7529.namprd11.prod.outlook.com (2603:10b6:8:141::20)
+ by DM4PR11MB8179.namprd11.prod.outlook.com (2603:10b6:8:18e::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6254.28; Thu, 6 Apr
+ 2023 05:31:56 +0000
+Received: from DS0PR11MB7529.namprd11.prod.outlook.com
+ ([fe80::ca24:b399:b445:a3de]) by DS0PR11MB7529.namprd11.prod.outlook.com
+ ([fe80::ca24:b399:b445:a3de%5]) with mapi id 15.20.6254.035; Thu, 6 Apr 2023
+ 05:31:55 +0000
+From:   "Liu, Yi L" <yi.l.liu@intel.com>
+To:     "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        Alex Williamson <alex.williamson@redhat.com>
+CC:     "jgg@nvidia.com" <jgg@nvidia.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
+        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "shameerali.kolothum.thodi@huawei.com" 
+        <shameerali.kolothum.thodi@huawei.com>,
+        "lulu@redhat.com" <lulu@redhat.com>,
+        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
+        "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        "Hao, Xudong" <xudong.hao@intel.com>,
+        "Zhao, Yan Y" <yan.y.zhao@intel.com>,
+        "Xu, Terrence" <terrence.xu@intel.com>,
+        "Jiang, Yanting" <yanting.jiang@intel.com>
+Subject: RE: [PATCH v3 12/12] vfio/pci: Report dev_id in
+ VFIO_DEVICE_GET_PCI_HOT_RESET_INFO
+Thread-Topic: [PATCH v3 12/12] vfio/pci: Report dev_id in
+ VFIO_DEVICE_GET_PCI_HOT_RESET_INFO
+Thread-Index: AQHZZKiCMJJkpNrujkKpjX0h05Zqwa8cqG8AgAAcMGCAACibgIAAGdGAgADAhkA=
+Date:   Thu, 6 Apr 2023 05:31:55 +0000
+Message-ID: <DS0PR11MB752979133CAE037FD09222FEC3919@DS0PR11MB7529.namprd11.prod.outlook.com>
+References: <20230401144429.88673-1-yi.l.liu@intel.com>
+ <20230401144429.88673-13-yi.l.liu@intel.com>
+ <a937e622-ce32-6dda-d77c-7d8d76474ee0@redhat.com>
+ <DS0PR11MB7529D4E354C3B85D7698017DC3909@DS0PR11MB7529.namprd11.prod.outlook.com>
+ <20230405102545.41a61424.alex.williamson@redhat.com>
+ <afbfbfe5-5334-6e18-6211-a3908816dc6e@redhat.com>
+In-Reply-To: <afbfbfe5-5334-6e18-6211-a3908816dc6e@redhat.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DS0PR11MB7529:EE_|DM4PR11MB8179:EE_
+x-ms-office365-filtering-correlation-id: 1a96555e-7e7a-4190-eb1a-08db36603c23
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: JTuC/E95OFaZAZiEuccUV0fi9riNtQmeyQ6rtudSiovjUqRfmJ4CEwvA7wcnNA0iLn63111lcitK3XAp48hnFjZdAPCKZzUdXYkimk4gyVAyOqFcsUs2CluVBAHHm42JDcfgW2GRFXHB8rdhWjCMPn6Tt3XaQr8Q3mwvgk7ijw/UWfTikgbs7GBXNSnrhIA6l/TBcR1PLyL3Xi8CYg/Fm5ZXd150XHtfLAT8OGvpr8e7hP01/VfmEkuFmqNCwHJKj0cVvas9/5V26LraIWNsjaUocs8nDD93GMuSt5iGiUsbcJto1+uFEnV0rXtosGXQoGEnQya36Tudv4R6JtTyjd3F1bvRuhlKdwTi7bvbxy9alAqlUGLgVLe1l2PN1I/xFAOSd4NuQMuz1/ywMEXTO7nTCNlzO/bIlr3VOeNawMcqBcdUKmR8Yf8EvMwJvXgo3WqPu8hCAhItNBj1I5L5U9rNUPGYV9GW41xAg7SMKZxcLJImDFut8wrPm/gJPws+/Tx2/gI3aSnf93PZP7QBhJUzH7nBrbUzq4QZA+YVJQoGDBX+nLkPQJkg85556v1Kw9NniaAdzuyrE4BiG7+W0ivtB0kcIMllGxrra4DLj/2deZt4eSwp4yZoNNgD1x4QsA/vgvHP3c+C5qMJo++FRA==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB7529.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(136003)(346002)(396003)(366004)(39860400002)(376002)(451199021)(82960400001)(71200400001)(38070700005)(122000001)(38100700002)(7696005)(86362001)(33656002)(55016003)(186003)(54906003)(9686003)(110136005)(26005)(2906002)(6506007)(66946007)(76116006)(5660300002)(66556008)(8676002)(41300700001)(66476007)(66446008)(478600001)(7416002)(52536014)(8936002)(316002)(64756008)(83380400001)(4326008)(13296009);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?WXhqTVdSYVNYWG1xbkFhSGdnYmtRZGNxV0E3amtYZkFIWlkyWXNOcXl6RnpL?=
+ =?utf-8?B?ckZiOGtpNUlEZnNMaWwyR0lmblZLTUpwM1VYTEp6akFDbVQ5d0RnMlg3MktI?=
+ =?utf-8?B?aXpMVjJEekVGVzRMa0Jkd2xhR1BOQjIvbWQ5bHl3cTV3TzMxZi9kTlZRdG40?=
+ =?utf-8?B?eWJKeEtBclJuRnZCdFFZSDJZeCtZWEpzV00wN29iWllOVjdqOHplSmRBckFn?=
+ =?utf-8?B?eExYRXRUeTFEZDNVVHViZ0JwVGNQbEwrcDVDVjhjRm5ZZndtWkxrVXJVY05Y?=
+ =?utf-8?B?U1VRUmo5Y3Nib3pSYkRPaG9CQ2RCYW1oWkRlUnhvSjdRZ1lTN1NmNVgreG9S?=
+ =?utf-8?B?ckhzK2JEVG80OHBLZlJiS29vVU8zSE1NWms3d3VSSUtHT3dtMjljZUhIQ3A0?=
+ =?utf-8?B?VmtPd2FaTmJQcVdaS0VhOE5BTEE1OFpUT3hxYU55V3NvRWlJSjN0MTd2UEFE?=
+ =?utf-8?B?cTFGdU1BU2twK3RIV1BvdmFyWGQvRk5ZdFJYTTQ5RU1UV1p5bEhBVmVSNVJP?=
+ =?utf-8?B?ZDl0ZnBad3BkcHBQNk9BOG1yNysyOU1aSzJIREl1Mm9adlNqRHdIUGtZc3Yv?=
+ =?utf-8?B?WG9iNW11OEJRc0NNaVFad3BaMmE2NVk4c0dPNE5xNDErWjBLQW5NaGsya2k0?=
+ =?utf-8?B?bzRsZm9aNnVEdEViZnVBci9MNGloVUdkYkxJc3pUTVhWMXhpdzdNd1J6U2xj?=
+ =?utf-8?B?RWdBU3VKRXd0V0tFWTZNMW14cExIRTM0RHJLRHZZWjhtU3BIY2E4WnFmc3VT?=
+ =?utf-8?B?azVEL0FJQ2RxQkdta3BGTkxLT0daL0xyc0FwZmJSV1c3bkR1bWNZV2FxQS9j?=
+ =?utf-8?B?NC94TEw5UnhRNkQrWm9ybk5uK0E2WWlaWUd1UWdObXVDS2VEei8wYlFVdHJL?=
+ =?utf-8?B?NEV2RkdUeWlLaWI1ZU5qMjhqZ3A3RVUrVVFpbUVxUjJKeGFMZVI1QmpyRzdo?=
+ =?utf-8?B?Zmh5c3dZb0lwdGszc3MvYVkyNGhCVXcvb2R4ZGFNUzA4b3d3cDdpMmlHVUFH?=
+ =?utf-8?B?Q0tidDZKUnluSXVCeEtCekVOZGhLaS9BTXQwYStqTnlzazArVkV4WFFqMVoy?=
+ =?utf-8?B?Rm1JK2J6aGJwR0FmMUQxamVOU0pWUmZyeFhWa3N3a3FQbWRLYU1PSFZKVDBO?=
+ =?utf-8?B?U0Y1Tm5JUW5EQXoyWnRsb0pBM21zVHo4QkUzQk1WcWdEWisyeXFXSEIwQTRa?=
+ =?utf-8?B?clJaelA5WEwxa2xEa25qbHZXSW1LNlF6NEpydEczTFRXdFhEbUR1T1R4b2Fm?=
+ =?utf-8?B?VGl6MkNhK051eXlUOWVsZE1XNnVpZGpFQitwSCtabzJKenN6d0RhcVBxSGV3?=
+ =?utf-8?B?aTNiVkZFNWZET3dDaTV6RmpKYmpUNXI0ZkgvQXVuN0t6eCtqQ09UVCtTK2Nn?=
+ =?utf-8?B?NkVFR3NoU0RlVVFRcTZORnRzdDVDb241NHArV0FWUWRYV094MlA2bFZVU3du?=
+ =?utf-8?B?R1cvS3pEdFNrZEVxMGJheUJlc2docW9ubGtudFNoVnA5Q09rV0ZGdDRlZXo0?=
+ =?utf-8?B?a1JsMGc2RzFMTlRzNitPUmE2eGFsSHdHSE15RFRmTWJDR3Bmb29tREJRY0tT?=
+ =?utf-8?B?ZUQrdTVyNVdOOGdEWFN3VVlpVlpMRjZQU01WOWFCRTFTQStKUWEyVzJJOFYx?=
+ =?utf-8?B?T3M5SWU2SHlNZklpU0JzWFVmcTF0bXloNnNjVlFBbmUwYWd4MmNXRnNIV25J?=
+ =?utf-8?B?YUVnV25FaGtROEZNQjdJWTBoS0ZWMHRGUm1JV3FvbHlsRUtnZjRkeWRqVXdy?=
+ =?utf-8?B?YS9SQXJkaitDUHQwSXJQQTlWUHVQai9ZQTVMcUdXbWxtdFJxcmlQVURoTzZR?=
+ =?utf-8?B?elUwSlFhc0VnaGR0NlVrZ1c3dFFDTFc2RWcwOTE0TDdWb21zVmFqSTJQVXNi?=
+ =?utf-8?B?MzdJbWN2V29vSDFzRmNQeHd3Yk1MSDBTdFlvQlNkS20yd0daeTdjWTBmSkRB?=
+ =?utf-8?B?d0lKVjZpUmw4bXdPNlZWckduOXJNU1lkSFpwYzUzQTVwYUU0blBKUy85ZG9K?=
+ =?utf-8?B?Y1pJVERhcXRWRjZQV3FXU0JJNHVLdFJLRFlqRVplK01sYjByVSt6eElGRm5L?=
+ =?utf-8?B?eGhCUjM2eWZYalNMZ3BWVXlHa3FtWVhiS3NJZU4vL29UeXpYT0J6R29Rb1lu?=
+ =?utf-8?Q?1QJfToa3EImtZ2Q1KK5g36xcr?=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-References: <20230306190156.434452-1-dmatlack@google.com> <20230306190156.434452-2-dmatlack@google.com>
-In-Reply-To: <20230306190156.434452-2-dmatlack@google.com>
-From:   Anup Patel <anup@brainfault.org>
-Date:   Thu, 6 Apr 2023 10:12:09 +0530
-Message-ID: <CAAhSdy2Edvf5PRoih2oqUD-emy2YEPdJqtm-QuL6uEJ=56f5Wg@mail.gmail.com>
-Subject: Re: [PATCH v2 1/4] KVM: Refactor stats descriptor generation macros
-To:     David Matlack <dmatlack@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Atish Patra <atishp@atishpatra.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Eric Farman <farman@linux.ibm.com>,
-        =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@linaro.org>,
-        Sathvika Vasireddy <sv@linux.ibm.com>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
-        linux-riscv@lists.infradead.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=0.8 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,UPPERCASE_50_75 autolearn=no
-        autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB7529.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1a96555e-7e7a-4190-eb1a-08db36603c23
+X-MS-Exchange-CrossTenant-originalarrivaltime: 06 Apr 2023 05:31:55.6547
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: sGBJUMcfErflnvGSnwWiZeFzrIB/WRzUiLcV+2Su89RxtG6f9eUgaR2s/X8UR3W3x7xGkS0/gL52mgD3pSIe8Q==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR11MB8179
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_NONE
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 7, 2023 at 12:32=E2=80=AFAM David Matlack <dmatlack@google.com>=
- wrote:
->
-> Refactor the various KVM stats macros to reduce the amount of duplicate
-> macro code. This change also improves readability by spelling out
-> "CUMULATIVE", "INSTANT", and "PEAK" instead of the previous short-hands
-> which were less clear ("COUNTER", "ICOUNTER", and "PCOUNTER").
->
-> No functional change intended.
->
-> Suggested-by: Sean Christopherson <seanjc@google.com>
-> Signed-off-by: David Matlack <dmatlack@google.com>
-
-For KVM RISC-V:
-Acked-by: Anup Patel <anup@brianfault.org>
-
-Regards,
-Anup
-
-> ---
->  arch/arm64/kvm/guest.c    |  14 +--
->  arch/mips/kvm/mips.c      |  54 +++++------
->  arch/powerpc/kvm/book3s.c |  62 ++++++------
->  arch/powerpc/kvm/booke.c  |  48 ++++-----
->  arch/riscv/kvm/vcpu.c     |  16 +--
->  arch/s390/kvm/kvm-s390.c  | 198 +++++++++++++++++++-------------------
->  arch/x86/kvm/x86.c        |  94 +++++++++---------
->  include/linux/kvm_host.h  |  95 ++++++------------
->  8 files changed, 272 insertions(+), 309 deletions(-)
->
-> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-> index 07444fa22888..890ed444c237 100644
-> --- a/arch/arm64/kvm/guest.c
-> +++ b/arch/arm64/kvm/guest.c
-> @@ -44,13 +44,13 @@ const struct kvm_stats_header kvm_vm_stats_header =3D=
- {
->
->  const struct _kvm_stats_desc kvm_vcpu_stats_desc[] =3D {
->         KVM_GENERIC_VCPU_STATS(),
-> -       STATS_DESC_COUNTER(VCPU, hvc_exit_stat),
-> -       STATS_DESC_COUNTER(VCPU, wfe_exit_stat),
-> -       STATS_DESC_COUNTER(VCPU, wfi_exit_stat),
-> -       STATS_DESC_COUNTER(VCPU, mmio_exit_user),
-> -       STATS_DESC_COUNTER(VCPU, mmio_exit_kernel),
-> -       STATS_DESC_COUNTER(VCPU, signal_exits),
-> -       STATS_DESC_COUNTER(VCPU, exits)
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, hvc_exit_stat),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, wfe_exit_stat),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, wfi_exit_stat),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, mmio_exit_user),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, mmio_exit_kernel),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, signal_exits),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, exits)
->  };
->
->  const struct kvm_stats_header kvm_vcpu_stats_header =3D {
-> diff --git a/arch/mips/kvm/mips.c b/arch/mips/kvm/mips.c
-> index 36c8991b5d39..b7b2fa400bcf 100644
-> --- a/arch/mips/kvm/mips.c
-> +++ b/arch/mips/kvm/mips.c
-> @@ -53,34 +53,34 @@ const struct kvm_stats_header kvm_vm_stats_header =3D=
- {
->
->  const struct _kvm_stats_desc kvm_vcpu_stats_desc[] =3D {
->         KVM_GENERIC_VCPU_STATS(),
-> -       STATS_DESC_COUNTER(VCPU, wait_exits),
-> -       STATS_DESC_COUNTER(VCPU, cache_exits),
-> -       STATS_DESC_COUNTER(VCPU, signal_exits),
-> -       STATS_DESC_COUNTER(VCPU, int_exits),
-> -       STATS_DESC_COUNTER(VCPU, cop_unusable_exits),
-> -       STATS_DESC_COUNTER(VCPU, tlbmod_exits),
-> -       STATS_DESC_COUNTER(VCPU, tlbmiss_ld_exits),
-> -       STATS_DESC_COUNTER(VCPU, tlbmiss_st_exits),
-> -       STATS_DESC_COUNTER(VCPU, addrerr_st_exits),
-> -       STATS_DESC_COUNTER(VCPU, addrerr_ld_exits),
-> -       STATS_DESC_COUNTER(VCPU, syscall_exits),
-> -       STATS_DESC_COUNTER(VCPU, resvd_inst_exits),
-> -       STATS_DESC_COUNTER(VCPU, break_inst_exits),
-> -       STATS_DESC_COUNTER(VCPU, trap_inst_exits),
-> -       STATS_DESC_COUNTER(VCPU, msa_fpe_exits),
-> -       STATS_DESC_COUNTER(VCPU, fpe_exits),
-> -       STATS_DESC_COUNTER(VCPU, msa_disabled_exits),
-> -       STATS_DESC_COUNTER(VCPU, flush_dcache_exits),
-> -       STATS_DESC_COUNTER(VCPU, vz_gpsi_exits),
-> -       STATS_DESC_COUNTER(VCPU, vz_gsfc_exits),
-> -       STATS_DESC_COUNTER(VCPU, vz_hc_exits),
-> -       STATS_DESC_COUNTER(VCPU, vz_grr_exits),
-> -       STATS_DESC_COUNTER(VCPU, vz_gva_exits),
-> -       STATS_DESC_COUNTER(VCPU, vz_ghfc_exits),
-> -       STATS_DESC_COUNTER(VCPU, vz_gpa_exits),
-> -       STATS_DESC_COUNTER(VCPU, vz_resvd_exits),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, wait_exits),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, cache_exits),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, signal_exits),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, int_exits),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, cop_unusable_exits),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, tlbmod_exits),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, tlbmiss_ld_exits),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, tlbmiss_st_exits),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, addrerr_st_exits),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, addrerr_ld_exits),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, syscall_exits),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, resvd_inst_exits),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, break_inst_exits),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, trap_inst_exits),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, msa_fpe_exits),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, fpe_exits),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, msa_disabled_exits),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, flush_dcache_exits),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, vz_gpsi_exits),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, vz_gsfc_exits),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, vz_hc_exits),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, vz_grr_exits),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, vz_gva_exits),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, vz_ghfc_exits),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, vz_gpa_exits),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, vz_resvd_exits),
->  #ifdef CONFIG_CPU_LOONGSON64
-> -       STATS_DESC_COUNTER(VCPU, vz_cpucfg_exits),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, vz_cpucfg_exits),
->  #endif
->  };
->
-> diff --git a/arch/powerpc/kvm/book3s.c b/arch/powerpc/kvm/book3s.c
-> index 57f4e7896d67..8a7a932961d5 100644
-> --- a/arch/powerpc/kvm/book3s.c
-> +++ b/arch/powerpc/kvm/book3s.c
-> @@ -40,8 +40,8 @@
->
->  const struct _kvm_stats_desc kvm_vm_stats_desc[] =3D {
->         KVM_GENERIC_VM_STATS(),
-> -       STATS_DESC_ICOUNTER(VM, num_2M_pages),
-> -       STATS_DESC_ICOUNTER(VM, num_1G_pages)
-> +       KVM_STAT(VM, INSTANT, NONE, num_2M_pages),
-> +       KVM_STAT(VM, INSTANT, NONE, num_1G_pages)
->  };
->
->  const struct kvm_stats_header kvm_vm_stats_header =3D {
-> @@ -55,35 +55,35 @@ const struct kvm_stats_header kvm_vm_stats_header =3D=
- {
->
->  const struct _kvm_stats_desc kvm_vcpu_stats_desc[] =3D {
->         KVM_GENERIC_VCPU_STATS(),
-> -       STATS_DESC_COUNTER(VCPU, sum_exits),
-> -       STATS_DESC_COUNTER(VCPU, mmio_exits),
-> -       STATS_DESC_COUNTER(VCPU, signal_exits),
-> -       STATS_DESC_COUNTER(VCPU, light_exits),
-> -       STATS_DESC_COUNTER(VCPU, itlb_real_miss_exits),
-> -       STATS_DESC_COUNTER(VCPU, itlb_virt_miss_exits),
-> -       STATS_DESC_COUNTER(VCPU, dtlb_real_miss_exits),
-> -       STATS_DESC_COUNTER(VCPU, dtlb_virt_miss_exits),
-> -       STATS_DESC_COUNTER(VCPU, syscall_exits),
-> -       STATS_DESC_COUNTER(VCPU, isi_exits),
-> -       STATS_DESC_COUNTER(VCPU, dsi_exits),
-> -       STATS_DESC_COUNTER(VCPU, emulated_inst_exits),
-> -       STATS_DESC_COUNTER(VCPU, dec_exits),
-> -       STATS_DESC_COUNTER(VCPU, ext_intr_exits),
-> -       STATS_DESC_COUNTER(VCPU, halt_successful_wait),
-> -       STATS_DESC_COUNTER(VCPU, dbell_exits),
-> -       STATS_DESC_COUNTER(VCPU, gdbell_exits),
-> -       STATS_DESC_COUNTER(VCPU, ld),
-> -       STATS_DESC_COUNTER(VCPU, st),
-> -       STATS_DESC_COUNTER(VCPU, pf_storage),
-> -       STATS_DESC_COUNTER(VCPU, pf_instruc),
-> -       STATS_DESC_COUNTER(VCPU, sp_storage),
-> -       STATS_DESC_COUNTER(VCPU, sp_instruc),
-> -       STATS_DESC_COUNTER(VCPU, queue_intr),
-> -       STATS_DESC_COUNTER(VCPU, ld_slow),
-> -       STATS_DESC_COUNTER(VCPU, st_slow),
-> -       STATS_DESC_COUNTER(VCPU, pthru_all),
-> -       STATS_DESC_COUNTER(VCPU, pthru_host),
-> -       STATS_DESC_COUNTER(VCPU, pthru_bad_aff)
-> +       KVM_STAT(VM, CUMULATIVE, NONE, sum_exits),
-> +       KVM_STAT(VM, CUMULATIVE, NONE, mmio_exits),
-> +       KVM_STAT(VM, CUMULATIVE, NONE, signal_exits),
-> +       KVM_STAT(VM, CUMULATIVE, NONE, light_exits),
-> +       KVM_STAT(VM, CUMULATIVE, NONE, itlb_real_miss_exits),
-> +       KVM_STAT(VM, CUMULATIVE, NONE, itlb_virt_miss_exits),
-> +       KVM_STAT(VM, CUMULATIVE, NONE, dtlb_real_miss_exits),
-> +       KVM_STAT(VM, CUMULATIVE, NONE, dtlb_virt_miss_exits),
-> +       KVM_STAT(VM, CUMULATIVE, NONE, syscall_exits),
-> +       KVM_STAT(VM, CUMULATIVE, NONE, isi_exits),
-> +       KVM_STAT(VM, CUMULATIVE, NONE, dsi_exits),
-> +       KVM_STAT(VM, CUMULATIVE, NONE, emulated_inst_exits),
-> +       KVM_STAT(VM, CUMULATIVE, NONE, dec_exits),
-> +       KVM_STAT(VM, CUMULATIVE, NONE, ext_intr_exits),
-> +       KVM_STAT(VM, CUMULATIVE, NONE, halt_successful_wait),
-> +       KVM_STAT(VM, CUMULATIVE, NONE, dbell_exits),
-> +       KVM_STAT(VM, CUMULATIVE, NONE, gdbell_exits),
-> +       KVM_STAT(VM, CUMULATIVE, NONE, ld),
-> +       KVM_STAT(VM, CUMULATIVE, NONE, st),
-> +       KVM_STAT(VM, CUMULATIVE, NONE, pf_storage),
-> +       KVM_STAT(VM, CUMULATIVE, NONE, pf_instruc),
-> +       KVM_STAT(VM, CUMULATIVE, NONE, sp_storage),
-> +       KVM_STAT(VM, CUMULATIVE, NONE, sp_instruc),
-> +       KVM_STAT(VM, CUMULATIVE, NONE, queue_intr),
-> +       KVM_STAT(VM, CUMULATIVE, NONE, ld_slow),
-> +       KVM_STAT(VM, CUMULATIVE, NONE, st_slow),
-> +       KVM_STAT(VM, CUMULATIVE, NONE, pthru_all),
-> +       KVM_STAT(VM, CUMULATIVE, NONE, pthru_host),
-> +       KVM_STAT(VM, CUMULATIVE, NONE, pthru_bad_aff)
->  };
->
->  const struct kvm_stats_header kvm_vcpu_stats_header =3D {
-> diff --git a/arch/powerpc/kvm/booke.c b/arch/powerpc/kvm/booke.c
-> index 01adffb24667..898bdd583289 100644
-> --- a/arch/powerpc/kvm/booke.c
-> +++ b/arch/powerpc/kvm/booke.c
-> @@ -38,8 +38,8 @@ unsigned long kvmppc_booke_handlers;
->
->  const struct _kvm_stats_desc kvm_vm_stats_desc[] =3D {
->         KVM_GENERIC_VM_STATS(),
-> -       STATS_DESC_ICOUNTER(VM, num_2M_pages),
-> -       STATS_DESC_ICOUNTER(VM, num_1G_pages)
-> +       KVM_STAT(VM, INSTANT, NONE, num_2M_pages),
-> +       KVM_STAT(VM, INSTANT, NONE, num_1G_pages)
->  };
->
->  const struct kvm_stats_header kvm_vm_stats_header =3D {
-> @@ -53,28 +53,28 @@ const struct kvm_stats_header kvm_vm_stats_header =3D=
- {
->
->  const struct _kvm_stats_desc kvm_vcpu_stats_desc[] =3D {
->         KVM_GENERIC_VCPU_STATS(),
-> -       STATS_DESC_COUNTER(VCPU, sum_exits),
-> -       STATS_DESC_COUNTER(VCPU, mmio_exits),
-> -       STATS_DESC_COUNTER(VCPU, signal_exits),
-> -       STATS_DESC_COUNTER(VCPU, light_exits),
-> -       STATS_DESC_COUNTER(VCPU, itlb_real_miss_exits),
-> -       STATS_DESC_COUNTER(VCPU, itlb_virt_miss_exits),
-> -       STATS_DESC_COUNTER(VCPU, dtlb_real_miss_exits),
-> -       STATS_DESC_COUNTER(VCPU, dtlb_virt_miss_exits),
-> -       STATS_DESC_COUNTER(VCPU, syscall_exits),
-> -       STATS_DESC_COUNTER(VCPU, isi_exits),
-> -       STATS_DESC_COUNTER(VCPU, dsi_exits),
-> -       STATS_DESC_COUNTER(VCPU, emulated_inst_exits),
-> -       STATS_DESC_COUNTER(VCPU, dec_exits),
-> -       STATS_DESC_COUNTER(VCPU, ext_intr_exits),
-> -       STATS_DESC_COUNTER(VCPU, halt_successful_wait),
-> -       STATS_DESC_COUNTER(VCPU, dbell_exits),
-> -       STATS_DESC_COUNTER(VCPU, gdbell_exits),
-> -       STATS_DESC_COUNTER(VCPU, ld),
-> -       STATS_DESC_COUNTER(VCPU, st),
-> -       STATS_DESC_COUNTER(VCPU, pthru_all),
-> -       STATS_DESC_COUNTER(VCPU, pthru_host),
-> -       STATS_DESC_COUNTER(VCPU, pthru_bad_aff)
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, sum_exits),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, mmio_exits),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, signal_exits),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, light_exits),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, itlb_real_miss_exits),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, itlb_virt_miss_exits),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, dtlb_real_miss_exits),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, dtlb_virt_miss_exits),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, syscall_exits),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, isi_exits),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, dsi_exits),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, emulated_inst_exits),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, dec_exits),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, ext_intr_exits),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, halt_successful_wait),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, dbell_exits),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, gdbell_exits),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, ld),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, st),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, pthru_all),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, pthru_host),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, pthru_bad_aff)
->  };
->
->  const struct kvm_stats_header kvm_vcpu_stats_header =3D {
-> diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
-> index 7d010b0be54e..57f57f6f5baf 100644
-> --- a/arch/riscv/kvm/vcpu.c
-> +++ b/arch/riscv/kvm/vcpu.c
-> @@ -25,14 +25,14 @@
->
->  const struct _kvm_stats_desc kvm_vcpu_stats_desc[] =3D {
->         KVM_GENERIC_VCPU_STATS(),
-> -       STATS_DESC_COUNTER(VCPU, ecall_exit_stat),
-> -       STATS_DESC_COUNTER(VCPU, wfi_exit_stat),
-> -       STATS_DESC_COUNTER(VCPU, mmio_exit_user),
-> -       STATS_DESC_COUNTER(VCPU, mmio_exit_kernel),
-> -       STATS_DESC_COUNTER(VCPU, csr_exit_user),
-> -       STATS_DESC_COUNTER(VCPU, csr_exit_kernel),
-> -       STATS_DESC_COUNTER(VCPU, signal_exits),
-> -       STATS_DESC_COUNTER(VCPU, exits)
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, ecall_exit_stat),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, wfi_exit_stat),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, mmio_exit_user),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, mmio_exit_kernel),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, csr_exit_user),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, csr_exit_kernel),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, signal_exits),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, exits)
->  };
->
->  const struct kvm_stats_header kvm_vcpu_stats_header =3D {
-> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-> index 39b36562c043..dfb3bc4d4b46 100644
-> --- a/arch/s390/kvm/kvm-s390.c
-> +++ b/arch/s390/kvm/kvm-s390.c
-> @@ -61,12 +61,12 @@
->
->  const struct _kvm_stats_desc kvm_vm_stats_desc[] =3D {
->         KVM_GENERIC_VM_STATS(),
-> -       STATS_DESC_COUNTER(VM, inject_io),
-> -       STATS_DESC_COUNTER(VM, inject_float_mchk),
-> -       STATS_DESC_COUNTER(VM, inject_pfault_done),
-> -       STATS_DESC_COUNTER(VM, inject_service_signal),
-> -       STATS_DESC_COUNTER(VM, inject_virtio),
-> -       STATS_DESC_COUNTER(VM, aen_forward)
-> +       KVM_STAT(VM, CUMULATIVE, NONE, inject_io),
-> +       KVM_STAT(VM, CUMULATIVE, NONE, inject_float_mchk),
-> +       KVM_STAT(VM, CUMULATIVE, NONE, inject_pfault_done),
-> +       KVM_STAT(VM, CUMULATIVE, NONE, inject_service_signal),
-> +       KVM_STAT(VM, CUMULATIVE, NONE, inject_virtio),
-> +       KVM_STAT(VM, CUMULATIVE, NONE, aen_forward)
->  };
->
->  const struct kvm_stats_header kvm_vm_stats_header =3D {
-> @@ -80,99 +80,99 @@ const struct kvm_stats_header kvm_vm_stats_header =3D=
- {
->
->  const struct _kvm_stats_desc kvm_vcpu_stats_desc[] =3D {
->         KVM_GENERIC_VCPU_STATS(),
-> -       STATS_DESC_COUNTER(VCPU, exit_userspace),
-> -       STATS_DESC_COUNTER(VCPU, exit_null),
-> -       STATS_DESC_COUNTER(VCPU, exit_external_request),
-> -       STATS_DESC_COUNTER(VCPU, exit_io_request),
-> -       STATS_DESC_COUNTER(VCPU, exit_external_interrupt),
-> -       STATS_DESC_COUNTER(VCPU, exit_stop_request),
-> -       STATS_DESC_COUNTER(VCPU, exit_validity),
-> -       STATS_DESC_COUNTER(VCPU, exit_instruction),
-> -       STATS_DESC_COUNTER(VCPU, exit_pei),
-> -       STATS_DESC_COUNTER(VCPU, halt_no_poll_steal),
-> -       STATS_DESC_COUNTER(VCPU, instruction_lctl),
-> -       STATS_DESC_COUNTER(VCPU, instruction_lctlg),
-> -       STATS_DESC_COUNTER(VCPU, instruction_stctl),
-> -       STATS_DESC_COUNTER(VCPU, instruction_stctg),
-> -       STATS_DESC_COUNTER(VCPU, exit_program_interruption),
-> -       STATS_DESC_COUNTER(VCPU, exit_instr_and_program),
-> -       STATS_DESC_COUNTER(VCPU, exit_operation_exception),
-> -       STATS_DESC_COUNTER(VCPU, deliver_ckc),
-> -       STATS_DESC_COUNTER(VCPU, deliver_cputm),
-> -       STATS_DESC_COUNTER(VCPU, deliver_external_call),
-> -       STATS_DESC_COUNTER(VCPU, deliver_emergency_signal),
-> -       STATS_DESC_COUNTER(VCPU, deliver_service_signal),
-> -       STATS_DESC_COUNTER(VCPU, deliver_virtio),
-> -       STATS_DESC_COUNTER(VCPU, deliver_stop_signal),
-> -       STATS_DESC_COUNTER(VCPU, deliver_prefix_signal),
-> -       STATS_DESC_COUNTER(VCPU, deliver_restart_signal),
-> -       STATS_DESC_COUNTER(VCPU, deliver_program),
-> -       STATS_DESC_COUNTER(VCPU, deliver_io),
-> -       STATS_DESC_COUNTER(VCPU, deliver_machine_check),
-> -       STATS_DESC_COUNTER(VCPU, exit_wait_state),
-> -       STATS_DESC_COUNTER(VCPU, inject_ckc),
-> -       STATS_DESC_COUNTER(VCPU, inject_cputm),
-> -       STATS_DESC_COUNTER(VCPU, inject_external_call),
-> -       STATS_DESC_COUNTER(VCPU, inject_emergency_signal),
-> -       STATS_DESC_COUNTER(VCPU, inject_mchk),
-> -       STATS_DESC_COUNTER(VCPU, inject_pfault_init),
-> -       STATS_DESC_COUNTER(VCPU, inject_program),
-> -       STATS_DESC_COUNTER(VCPU, inject_restart),
-> -       STATS_DESC_COUNTER(VCPU, inject_set_prefix),
-> -       STATS_DESC_COUNTER(VCPU, inject_stop_signal),
-> -       STATS_DESC_COUNTER(VCPU, instruction_epsw),
-> -       STATS_DESC_COUNTER(VCPU, instruction_gs),
-> -       STATS_DESC_COUNTER(VCPU, instruction_io_other),
-> -       STATS_DESC_COUNTER(VCPU, instruction_lpsw),
-> -       STATS_DESC_COUNTER(VCPU, instruction_lpswe),
-> -       STATS_DESC_COUNTER(VCPU, instruction_pfmf),
-> -       STATS_DESC_COUNTER(VCPU, instruction_ptff),
-> -       STATS_DESC_COUNTER(VCPU, instruction_sck),
-> -       STATS_DESC_COUNTER(VCPU, instruction_sckpf),
-> -       STATS_DESC_COUNTER(VCPU, instruction_stidp),
-> -       STATS_DESC_COUNTER(VCPU, instruction_spx),
-> -       STATS_DESC_COUNTER(VCPU, instruction_stpx),
-> -       STATS_DESC_COUNTER(VCPU, instruction_stap),
-> -       STATS_DESC_COUNTER(VCPU, instruction_iske),
-> -       STATS_DESC_COUNTER(VCPU, instruction_ri),
-> -       STATS_DESC_COUNTER(VCPU, instruction_rrbe),
-> -       STATS_DESC_COUNTER(VCPU, instruction_sske),
-> -       STATS_DESC_COUNTER(VCPU, instruction_ipte_interlock),
-> -       STATS_DESC_COUNTER(VCPU, instruction_stsi),
-> -       STATS_DESC_COUNTER(VCPU, instruction_stfl),
-> -       STATS_DESC_COUNTER(VCPU, instruction_tb),
-> -       STATS_DESC_COUNTER(VCPU, instruction_tpi),
-> -       STATS_DESC_COUNTER(VCPU, instruction_tprot),
-> -       STATS_DESC_COUNTER(VCPU, instruction_tsch),
-> -       STATS_DESC_COUNTER(VCPU, instruction_sie),
-> -       STATS_DESC_COUNTER(VCPU, instruction_essa),
-> -       STATS_DESC_COUNTER(VCPU, instruction_sthyi),
-> -       STATS_DESC_COUNTER(VCPU, instruction_sigp_sense),
-> -       STATS_DESC_COUNTER(VCPU, instruction_sigp_sense_running),
-> -       STATS_DESC_COUNTER(VCPU, instruction_sigp_external_call),
-> -       STATS_DESC_COUNTER(VCPU, instruction_sigp_emergency),
-> -       STATS_DESC_COUNTER(VCPU, instruction_sigp_cond_emergency),
-> -       STATS_DESC_COUNTER(VCPU, instruction_sigp_start),
-> -       STATS_DESC_COUNTER(VCPU, instruction_sigp_stop),
-> -       STATS_DESC_COUNTER(VCPU, instruction_sigp_stop_store_status),
-> -       STATS_DESC_COUNTER(VCPU, instruction_sigp_store_status),
-> -       STATS_DESC_COUNTER(VCPU, instruction_sigp_store_adtl_status),
-> -       STATS_DESC_COUNTER(VCPU, instruction_sigp_arch),
-> -       STATS_DESC_COUNTER(VCPU, instruction_sigp_prefix),
-> -       STATS_DESC_COUNTER(VCPU, instruction_sigp_restart),
-> -       STATS_DESC_COUNTER(VCPU, instruction_sigp_init_cpu_reset),
-> -       STATS_DESC_COUNTER(VCPU, instruction_sigp_cpu_reset),
-> -       STATS_DESC_COUNTER(VCPU, instruction_sigp_unknown),
-> -       STATS_DESC_COUNTER(VCPU, instruction_diagnose_10),
-> -       STATS_DESC_COUNTER(VCPU, instruction_diagnose_44),
-> -       STATS_DESC_COUNTER(VCPU, instruction_diagnose_9c),
-> -       STATS_DESC_COUNTER(VCPU, diag_9c_ignored),
-> -       STATS_DESC_COUNTER(VCPU, diag_9c_forward),
-> -       STATS_DESC_COUNTER(VCPU, instruction_diagnose_258),
-> -       STATS_DESC_COUNTER(VCPU, instruction_diagnose_308),
-> -       STATS_DESC_COUNTER(VCPU, instruction_diagnose_500),
-> -       STATS_DESC_COUNTER(VCPU, instruction_diagnose_other),
-> -       STATS_DESC_COUNTER(VCPU, pfault_sync)
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, exit_userspace),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, exit_null),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, exit_external_request),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, exit_io_request),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, exit_external_interrupt),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, exit_stop_request),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, exit_validity),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, exit_instruction),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, exit_pei),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, halt_no_poll_steal),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, instruction_lctl),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, instruction_lctlg),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, instruction_stctl),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, instruction_stctg),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, exit_program_interruption),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, exit_instr_and_program),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, exit_operation_exception),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, deliver_ckc),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, deliver_cputm),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, deliver_external_call),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, deliver_emergency_signal),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, deliver_service_signal),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, deliver_virtio),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, deliver_stop_signal),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, deliver_prefix_signal),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, deliver_restart_signal),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, deliver_program),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, deliver_io),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, deliver_machine_check),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, exit_wait_state),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, inject_ckc),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, inject_cputm),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, inject_external_call),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, inject_emergency_signal),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, inject_mchk),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, inject_pfault_init),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, inject_program),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, inject_restart),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, inject_set_prefix),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, inject_stop_signal),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, instruction_epsw),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, instruction_gs),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, instruction_io_other),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, instruction_lpsw),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, instruction_lpswe),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, instruction_pfmf),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, instruction_ptff),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, instruction_sck),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, instruction_sckpf),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, instruction_stidp),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, instruction_spx),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, instruction_stpx),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, instruction_stap),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, instruction_iske),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, instruction_ri),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, instruction_rrbe),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, instruction_sske),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, instruction_ipte_interlock),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, instruction_stsi),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, instruction_stfl),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, instruction_tb),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, instruction_tpi),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, instruction_tprot),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, instruction_tsch),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, instruction_sie),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, instruction_essa),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, instruction_sthyi),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, instruction_sigp_sense),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, instruction_sigp_sense_running),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, instruction_sigp_external_call),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, instruction_sigp_emergency),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, instruction_sigp_cond_emergency)=
-,
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, instruction_sigp_start),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, instruction_sigp_stop),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, instruction_sigp_stop_store_stat=
-us),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, instruction_sigp_store_status),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, instruction_sigp_store_adtl_stat=
-us),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, instruction_sigp_arch),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, instruction_sigp_prefix),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, instruction_sigp_restart),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, instruction_sigp_init_cpu_reset)=
-,
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, instruction_sigp_cpu_reset),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, instruction_sigp_unknown),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, instruction_diagnose_10),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, instruction_diagnose_44),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, instruction_diagnose_9c),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, diag_9c_ignored),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, diag_9c_forward),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, instruction_diagnose_258),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, instruction_diagnose_308),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, instruction_diagnose_500),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, instruction_diagnose_other),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, pfault_sync)
->  };
->
->  const struct kvm_stats_header kvm_vcpu_stats_header =3D {
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index f706621c35b8..072f5ba83170 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -233,19 +233,19 @@ EXPORT_SYMBOL_GPL(host_xss);
->
->  const struct _kvm_stats_desc kvm_vm_stats_desc[] =3D {
->         KVM_GENERIC_VM_STATS(),
-> -       STATS_DESC_COUNTER(VM, mmu_shadow_zapped),
-> -       STATS_DESC_COUNTER(VM, mmu_pte_write),
-> -       STATS_DESC_COUNTER(VM, mmu_pde_zapped),
-> -       STATS_DESC_COUNTER(VM, mmu_flooded),
-> -       STATS_DESC_COUNTER(VM, mmu_recycled),
-> -       STATS_DESC_COUNTER(VM, mmu_cache_miss),
-> -       STATS_DESC_ICOUNTER(VM, mmu_unsync),
-> -       STATS_DESC_ICOUNTER(VM, pages_4k),
-> -       STATS_DESC_ICOUNTER(VM, pages_2m),
-> -       STATS_DESC_ICOUNTER(VM, pages_1g),
-> -       STATS_DESC_ICOUNTER(VM, nx_lpage_splits),
-> -       STATS_DESC_PCOUNTER(VM, max_mmu_rmap_size),
-> -       STATS_DESC_PCOUNTER(VM, max_mmu_page_hash_collisions)
-> +       KVM_STAT(VM, CUMULATIVE, NONE, mmu_shadow_zapped),
-> +       KVM_STAT(VM, CUMULATIVE, NONE, mmu_pte_write),
-> +       KVM_STAT(VM, CUMULATIVE, NONE, mmu_pde_zapped),
-> +       KVM_STAT(VM, CUMULATIVE, NONE, mmu_flooded),
-> +       KVM_STAT(VM, CUMULATIVE, NONE, mmu_recycled),
-> +       KVM_STAT(VM, CUMULATIVE, NONE, mmu_cache_miss),
-> +       KVM_STAT(VM, INSTANT, NONE, mmu_unsync),
-> +       KVM_STAT(VM, INSTANT, NONE, pages_4k),
-> +       KVM_STAT(VM, INSTANT, NONE, pages_2m),
-> +       KVM_STAT(VM, INSTANT, NONE, pages_1g),
-> +       KVM_STAT(VM, INSTANT, NONE, nx_lpage_splits),
-> +       KVM_STAT(VM, PEAK, NONE, max_mmu_rmap_size),
-> +       KVM_STAT(VM, PEAK, NONE, max_mmu_page_hash_collisions)
->  };
->
->  const struct kvm_stats_header kvm_vm_stats_header =3D {
-> @@ -259,40 +259,40 @@ const struct kvm_stats_header kvm_vm_stats_header =
-=3D {
->
->  const struct _kvm_stats_desc kvm_vcpu_stats_desc[] =3D {
->         KVM_GENERIC_VCPU_STATS(),
-> -       STATS_DESC_COUNTER(VCPU, pf_taken),
-> -       STATS_DESC_COUNTER(VCPU, pf_fixed),
-> -       STATS_DESC_COUNTER(VCPU, pf_emulate),
-> -       STATS_DESC_COUNTER(VCPU, pf_spurious),
-> -       STATS_DESC_COUNTER(VCPU, pf_fast),
-> -       STATS_DESC_COUNTER(VCPU, pf_mmio_spte_created),
-> -       STATS_DESC_COUNTER(VCPU, pf_guest),
-> -       STATS_DESC_COUNTER(VCPU, tlb_flush),
-> -       STATS_DESC_COUNTER(VCPU, invlpg),
-> -       STATS_DESC_COUNTER(VCPU, exits),
-> -       STATS_DESC_COUNTER(VCPU, io_exits),
-> -       STATS_DESC_COUNTER(VCPU, mmio_exits),
-> -       STATS_DESC_COUNTER(VCPU, signal_exits),
-> -       STATS_DESC_COUNTER(VCPU, irq_window_exits),
-> -       STATS_DESC_COUNTER(VCPU, nmi_window_exits),
-> -       STATS_DESC_COUNTER(VCPU, l1d_flush),
-> -       STATS_DESC_COUNTER(VCPU, halt_exits),
-> -       STATS_DESC_COUNTER(VCPU, request_irq_exits),
-> -       STATS_DESC_COUNTER(VCPU, irq_exits),
-> -       STATS_DESC_COUNTER(VCPU, host_state_reload),
-> -       STATS_DESC_COUNTER(VCPU, fpu_reload),
-> -       STATS_DESC_COUNTER(VCPU, insn_emulation),
-> -       STATS_DESC_COUNTER(VCPU, insn_emulation_fail),
-> -       STATS_DESC_COUNTER(VCPU, hypercalls),
-> -       STATS_DESC_COUNTER(VCPU, irq_injections),
-> -       STATS_DESC_COUNTER(VCPU, nmi_injections),
-> -       STATS_DESC_COUNTER(VCPU, req_event),
-> -       STATS_DESC_COUNTER(VCPU, nested_run),
-> -       STATS_DESC_COUNTER(VCPU, directed_yield_attempted),
-> -       STATS_DESC_COUNTER(VCPU, directed_yield_successful),
-> -       STATS_DESC_COUNTER(VCPU, preemption_reported),
-> -       STATS_DESC_COUNTER(VCPU, preemption_other),
-> -       STATS_DESC_IBOOLEAN(VCPU, guest_mode),
-> -       STATS_DESC_COUNTER(VCPU, notify_window_exits),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, pf_taken),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, pf_fixed),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, pf_emulate),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, pf_spurious),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, pf_fast),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, pf_mmio_spte_created),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, pf_guest),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, tlb_flush),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, invlpg),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, exits),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, io_exits),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, mmio_exits),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, signal_exits),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, irq_window_exits),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, nmi_window_exits),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, l1d_flush),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, halt_exits),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, request_irq_exits),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, irq_exits),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, host_state_reload),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, fpu_reload),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, insn_emulation),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, insn_emulation_fail),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, hypercalls),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, irq_injections),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, nmi_injections),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, req_event),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, nested_run),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, directed_yield_attempted),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, directed_yield_successful),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, preemption_reported),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, preemption_other),
-> +       KVM_STAT(VCPU, INSTANT, BOOLEAN, guest_mode),
-> +       KVM_STAT(VCPU, CUMULATIVE, NONE, notify_window_exits),
->  };
->
->  const struct kvm_stats_header kvm_vcpu_stats_header =3D {
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index 8ada23756b0e..02b1151c2753 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -1785,80 +1785,43 @@ struct _kvm_stats_desc {
->                 },                                                       =
-      \
->                 .name =3D #stat,                                         =
-        \
->         }
-> +
->  /* SCOPE: VM, VM_GENERIC, VCPU, VCPU_GENERIC */
->  #define STATS_DESC(SCOPE, stat, type, unit, base, exp, sz, bsz)         =
-              \
->         SCOPE##_STATS_DESC(stat, type, unit, base, exp, sz, bsz)
->
-> -#define STATS_DESC_CUMULATIVE(SCOPE, name, unit, base, exponent)        =
-      \
-> -       STATS_DESC(SCOPE, name, KVM_STATS_TYPE_CUMULATIVE,               =
-      \
-> -               unit, base, exponent, 1, 0)
-> -#define STATS_DESC_INSTANT(SCOPE, name, unit, base, exponent)           =
-      \
-> -       STATS_DESC(SCOPE, name, KVM_STATS_TYPE_INSTANT,                  =
-      \
-> -               unit, base, exponent, 1, 0)
-> -#define STATS_DESC_PEAK(SCOPE, name, unit, base, exponent)              =
-      \
-> -       STATS_DESC(SCOPE, name, KVM_STATS_TYPE_PEAK,                     =
-      \
-> -               unit, base, exponent, 1, 0)
-> -#define STATS_DESC_LINEAR_HIST(SCOPE, name, unit, base, exponent, sz, bs=
-z)     \
-> -       STATS_DESC(SCOPE, name, KVM_STATS_TYPE_LINEAR_HIST,              =
-      \
-> -               unit, base, exponent, sz, bsz)
-> -#define STATS_DESC_LOG_HIST(SCOPE, name, unit, base, exponent, sz)      =
-      \
-> -       STATS_DESC(SCOPE, name, KVM_STATS_TYPE_LOG_HIST,                 =
-      \
-> -               unit, base, exponent, sz, 0)
-> -
-> -/* Cumulative counter, read/write */
-> -#define STATS_DESC_COUNTER(SCOPE, name)                                 =
-              \
-> -       STATS_DESC_CUMULATIVE(SCOPE, name, KVM_STATS_UNIT_NONE,          =
-      \
-> -               KVM_STATS_BASE_POW10, 0)
-> -/* Instantaneous counter, read only */
-> -#define STATS_DESC_ICOUNTER(SCOPE, name)                                =
-      \
-> -       STATS_DESC_INSTANT(SCOPE, name, KVM_STATS_UNIT_NONE,             =
-      \
-> -               KVM_STATS_BASE_POW10, 0)
-> -/* Peak counter, read/write */
-> -#define STATS_DESC_PCOUNTER(SCOPE, name)                                =
-      \
-> -       STATS_DESC_PEAK(SCOPE, name, KVM_STATS_UNIT_NONE,                =
-      \
-> -               KVM_STATS_BASE_POW10, 0)
-> -
-> -/* Instantaneous boolean value, read only */
-> -#define STATS_DESC_IBOOLEAN(SCOPE, name)                                =
-      \
-> -       STATS_DESC_INSTANT(SCOPE, name, KVM_STATS_UNIT_BOOLEAN,          =
-      \
-> -               KVM_STATS_BASE_POW10, 0)
-> -/* Peak (sticky) boolean value, read/write */
-> -#define STATS_DESC_PBOOLEAN(SCOPE, name)                                =
-      \
-> -       STATS_DESC_PEAK(SCOPE, name, KVM_STATS_UNIT_BOOLEAN,             =
-      \
-> -               KVM_STATS_BASE_POW10, 0)
-> -
-> -/* Cumulative time in nanosecond */
-> -#define STATS_DESC_TIME_NSEC(SCOPE, name)                               =
-      \
-> -       STATS_DESC_CUMULATIVE(SCOPE, name, KVM_STATS_UNIT_SECONDS,       =
-      \
-> -               KVM_STATS_BASE_POW10, -9)
-> -/* Linear histogram for time in nanosecond */
-> -#define STATS_DESC_LINHIST_TIME_NSEC(SCOPE, name, sz, bsz)              =
-      \
-> -       STATS_DESC_LINEAR_HIST(SCOPE, name, KVM_STATS_UNIT_SECONDS,      =
-      \
-> -               KVM_STATS_BASE_POW10, -9, sz, bsz)
-> -/* Logarithmic histogram for time in nanosecond */
-> -#define STATS_DESC_LOGHIST_TIME_NSEC(SCOPE, name, sz)                   =
-      \
-> -       STATS_DESC_LOG_HIST(SCOPE, name, KVM_STATS_UNIT_SECONDS,         =
-      \
-> -               KVM_STATS_BASE_POW10, -9, sz)
-> +#define KVM_STAT(SCOPE, TYPE, UNIT, _stat)                              =
-      \
-> +       STATS_DESC(SCOPE, _stat, KVM_STATS_TYPE_##TYPE,                  =
-      \
-> +                  KVM_STATS_UNIT_##UNIT, KVM_STATS_BASE_POW10, 0, 1, 0)
-> +
-> +#define KVM_STAT_NSEC(SCOPE, _stat)                                     =
-      \
-> +       STATS_DESC(SCOPE, _stat, KVM_STATS_TYPE_CUMULATIVE,              =
-      \
-> +                  KVM_STATS_UNIT_SECONDS, KVM_STATS_BASE_POW10, -9, 1, 0=
-)
-> +
-> +#define KVM_HIST_NSEC(SCOPE, TYPE, _stat, _size, _bucket_size)          =
-      \
-> +       STATS_DESC(VCPU_GENERIC, _stat, KVM_STATS_TYPE_##TYPE##_HIST,    =
-      \
-> +                  KVM_STATS_UNIT_SECONDS, KVM_STATS_BASE_POW10, -9,     =
-      \
-> +                  _size, _bucket_size)
->
->  #define KVM_GENERIC_VM_STATS()                                          =
-      \
-> -       STATS_DESC_COUNTER(VM_GENERIC, remote_tlb_flush),                =
-      \
-> -       STATS_DESC_COUNTER(VM_GENERIC, remote_tlb_flush_requests)
-> +       KVM_STAT(VM_GENERIC, CUMULATIVE, NONE, remote_tlb_flush),        =
-      \
-> +       KVM_STAT(VM_GENERIC, CUMULATIVE, NONE, remote_tlb_flush_requests)
-> +
-> +#define KVM_HALT_POLL_HIST(_stat)                                       =
-      \
-> +       KVM_HIST_NSEC(VCPU_GENERIC, LOG, _stat, HALT_POLL_HIST_COUNT, 0)
->
->  #define KVM_GENERIC_VCPU_STATS()                                        =
-      \
-> -       STATS_DESC_COUNTER(VCPU_GENERIC, halt_successful_poll),          =
-      \
-> -       STATS_DESC_COUNTER(VCPU_GENERIC, halt_attempted_poll),           =
-      \
-> -       STATS_DESC_COUNTER(VCPU_GENERIC, halt_poll_invalid),             =
-      \
-> -       STATS_DESC_COUNTER(VCPU_GENERIC, halt_wakeup),                   =
-      \
-> -       STATS_DESC_TIME_NSEC(VCPU_GENERIC, halt_poll_success_ns),        =
-      \
-> -       STATS_DESC_TIME_NSEC(VCPU_GENERIC, halt_poll_fail_ns),           =
-      \
-> -       STATS_DESC_TIME_NSEC(VCPU_GENERIC, halt_wait_ns),                =
-      \
-> -       STATS_DESC_LOGHIST_TIME_NSEC(VCPU_GENERIC, halt_poll_success_hist=
-,     \
-> -                       HALT_POLL_HIST_COUNT),                           =
-      \
-> -       STATS_DESC_LOGHIST_TIME_NSEC(VCPU_GENERIC, halt_poll_fail_hist,  =
-      \
-> -                       HALT_POLL_HIST_COUNT),                           =
-      \
-> -       STATS_DESC_LOGHIST_TIME_NSEC(VCPU_GENERIC, halt_wait_hist,       =
-      \
-> -                       HALT_POLL_HIST_COUNT),                           =
-      \
-> -       STATS_DESC_IBOOLEAN(VCPU_GENERIC, blocking)
-> +       KVM_STAT(VCPU_GENERIC, CUMULATIVE, NONE, halt_successful_poll),  =
-      \
-> +       KVM_STAT(VCPU_GENERIC, CUMULATIVE, NONE, halt_attempted_poll),   =
-      \
-> +       KVM_STAT(VCPU_GENERIC, CUMULATIVE, NONE, halt_poll_invalid),     =
-      \
-> +       KVM_STAT(VCPU_GENERIC, CUMULATIVE, NONE, halt_wakeup),           =
-      \
-> +       KVM_STAT_NSEC(VCPU_GENERIC, halt_poll_success_ns),               =
-      \
-> +       KVM_STAT_NSEC(VCPU_GENERIC, halt_poll_fail_ns),                  =
-      \
-> +       KVM_STAT_NSEC(VCPU_GENERIC, halt_wait_ns),                       =
-      \
-> +       KVM_HALT_POLL_HIST(halt_poll_success_hist),                      =
-      \
-> +       KVM_HALT_POLL_HIST(halt_poll_fail_hist),                         =
-      \
-> +       KVM_HALT_POLL_HIST(halt_wait_hist),                              =
-      \
-> +       KVM_STAT(VCPU_GENERIC, INSTANT, BOOLEAN, blocking)
->
->  extern struct dentry *kvm_debugfs_dir;
->
-> --
-> 2.40.0.rc0.216.gc4246ad0f0-goog
->
+SGkgRXJpYywNCg0KPiBGcm9tOiBFcmljIEF1Z2VyIDxlcmljLmF1Z2VyQHJlZGhhdC5jb20+DQo+
+IFNlbnQ6IFRodXJzZGF5LCBBcHJpbCA2LCAyMDIzIDE6NTggQU0NClsuLi5dDQo+ID4+Pj4gZGlm
+ZiAtLWdpdCBhL2luY2x1ZGUvdWFwaS9saW51eC92ZmlvLmggYi9pbmNsdWRlL3VhcGkvbGludXgv
+dmZpby5oDQo+ID4+Pj4gaW5kZXggMjU0MzJlZjIxM2VlLi41YTM0MzY0ZTNiOTQgMTAwNjQ0DQo+
+ID4+Pj4gLS0tIGEvaW5jbHVkZS91YXBpL2xpbnV4L3ZmaW8uaA0KPiA+Pj4+ICsrKyBiL2luY2x1
+ZGUvdWFwaS9saW51eC92ZmlvLmgNCj4gPj4+PiBAQCAtNjUwLDExICs2NTAsMzIgQEAgZW51bSB7
+DQo+ID4+Pj4gICAqIFZGSU9fREVWSUNFX0dFVF9QQ0lfSE9UX1JFU0VUX0lORk8gLSBfSU9XUihW
+RklPX1RZUEUsIFZGSU9fQkFTRSArDQo+IDEyLA0KPiA+Pj4+ICAgKgkJCQkJICAgICAgc3RydWN0
+IHZmaW9fcGNpX2hvdF9yZXNldF9pbmZvKQ0KPiA+Pj4+ICAgKg0KPiA+Pj4+ICsgKiBUaGlzIGNv
+bW1hbmQgaXMgdXNlZCB0byBxdWVyeSB0aGUgYWZmZWN0ZWQgZGV2aWNlcyBpbiB0aGUgaG90IHJl
+c2V0IGZvcg0KPiA+Pj4+ICsgKiBhIGdpdmVuIGRldmljZS4gIFVzZXIgY291bGQgdXNlIHRoZSBp
+bmZvcm1hdGlvbiByZXBvcnRlZCBieSB0aGlzIGNvbW1hbmQNCj4gPj4+PiArICogdG8gZmlndXJl
+IG91dCB0aGUgYWZmZWN0ZWQgZGV2aWNlcyBhbW9uZyB0aGUgZGV2aWNlcyBpdCBoYXMgb3BlbmVk
+Lg0KPiB0aGUgJ29wZW5lZCcgdGVybWlub2xvZ3kgZG9lcyBub3QgbG9vayBzdWZmaWNpZW50IGhl
+cmUgYmVjYXVzZSBpdCBpcyBub3QNCj4gb25seSBhIG1hdHRlciBvZiB0aGUgZGV2aWNlIGJlaW5n
+IG9wZW5lZCB1c2luZyBjZGV2IGJ1dCBpdCBhbHNvIG5lZWRzIHRvDQo+IGhhdmUgYmVlbiBib3Vu
+ZCB0byBhbiBpb21tdWZkLCBkZXZfaWQgYmVpbmcgdGhlIG91dHB1dCBvZiB0aGUNCj4gZGV2LWlv
+bW11ZmQgYmluZGluZy4NCj4gDQo+IEJ5IHRoZSB3YXkgSSBhbSBub3cgY29uZnVzZWQuIFdoYXQg
+ZG9lcyBoYXBwZW4gaWYgdGhlIHJlc2V0IGltcGFjdCBzb21lDQo+IGRldmljZXMgd2hpY2ggYXJl
+IG5vdCBib3VuZCB0byBhbiBpb21tdSBjdHguIFByZXZpb3VzbHkgd2UgcmV0dXJuZWQgdGhlDQo+
+IGlvbW11IGdyb3VwIHdoaWNoIGFsd2F5cyBwcmUtZXhpc3RzIGJ1dCBub3cgeW91IHdpbGwgcmVw
+b3J0IGludmFsaWQgaWQ/DQoNCkZvciBzdWNoIGRldmljZXMsIHVzZXIgY291bGQgdXNlIHRoZSBi
+ZGYgaW5mb3JtYXRpb24gdG8gY2hlY2sgaWYNCmFmZmVjdGVkIGRldmljZSBpcyBvcGVuZWQgYnkg
+dGhlIHVzZXIuIElmIHllcywgZG8gc29tZSBuZWNlc3NhcnkNCnByZXBhcmF0aW9uIG9uIHRoZSBk
+ZXZpY2UgYmVmb3JlIGlzc3VpbmcgaG90IHJlc2V0Lg0KDQpSZWdhcmRzLA0KWWkgTGl1DQoNCj4g
+Pj4+PiArICogVGhpcyBjb21tYW5kIGFsd2F5cyByZXBvcnRzIHRoZSBzZWdtZW50LCBidXMgYW5k
+IGRldmZuIGluZm9ybWF0aW9uIGZvcg0KPiA+Pj4+ICsgKiBlYWNoIGFmZmVjdGVkIGRldmljZSwg
+YW5kIHNlbGVjdGl2ZWx5IHJlcG9ydCB0aGUgZ3JvdXBfaWQgb3IgdGhlIGRldl9pZA0KPiA+Pj4+
+ICsgKiBwZXIgdGhlIHdheSBob3cgdGhlIGRldmljZSBiZWluZyBxdWVyaWVkIGlzIG9wZW5lZC4N
+Cj4gPj4+PiArICoJLSBJZiB0aGUgZGV2aWNlIGlzIG9wZW5lZCB2aWEgdGhlIHRyYWRpdGlvbmFs
+IGdyb3VwL2NvbnRhaW5lciBtYW5uZXIsDQo+ID4+Pj4gKyAqCSAgdGhpcyBjb21tYW5kIHJlcG9y
+dHMgdGhlIGdyb3VwX2lkIGZvciBlYWNoIGFmZmVjdGVkIGRldmljZS4NCj4gPj4+PiArICoNCj4g
+Pj4+PiArICoJLSBJZiB0aGUgZGV2aWNlIGlzIG9wZW5lZCBhcyBhIGNkZXYsIHRoaXMgY29tbWFu
+ZCBuZWVkcyB0byByZXBvcnQNCj4gPj4+IHMvbmVlZHMgdG8gcmVwb3J0L3JlcG9ydHMNCj4gPj4g
+Z290IGl0Lg0KPiA+Pg0KPiA+Pj4+ICsgKgkgIGRldl9pZCBmb3IgZWFjaCBhZmZlY3RlZCBkZXZp
+Y2UgYW5kIHNldCB0aGUNCj4gPj4+PiArICoJICBWRklPX1BDSV9IT1RfUkVTRVRfRkxBR19JT01N
+VUZEX0RFVl9JRCBmbGFnLiAgRm9yIHRoZQ0KPiBhZmZlY3RlZA0KPiA+Pj4+ICsgKgkgIGRldmlj
+ZXMgdGhhdCBhcmUgbm90IG9wZW5lZCBhcyBjZGV2IG9yIGJvdW5kIHRvIGRpZmZlcmVudCBpb21t
+dWZkcw0KPiA+Pj4+ICsgKgkgIHdpdGggdGhlIGRldmljZSB0aGF0IGlzIHF1ZXJpZWQsIHJlcG9y
+dCBhbiBpbnZhbGlkIGRldl9pZCB0byBhdm9pZA0KPiBvciBub3QgYm91bmQgYXQgYWxsDQo+ID4+
+PiBzL2JvdW5kIHRvIGRpZmZlcmVudCBpb21tdWZkcyB3aXRoIHRoZSBkZXZpY2UgdGhhdCBpcyBx
+dWVyaWVkL2JvdW5kIHRvDQo+ID4+PiBpb21tdWZkcyBkaWZmZXJlbnQgZnJvbSB0aGUgcmVzZXQg
+ZGV2aWNlIG9uZT8NCj4gPj4gaG1tbSwgSSdtIG5vdCBhIG5hdGl2ZSBzcGVha2VyIGhlcmUuIFRo
+aXMgX0lORk8gaXMgdG8gcXVlcnkgaWYgd2FudA0KPiA+PiBob3QgcmVzZXQgYSBnaXZlbiBkZXZp
+Y2UsIHdoYXQgZGV2aWNlcyB3b3VsZCBiZSBhZmZlY3RlZC4gU28gaXQgYXBwZWFycw0KPiA+PiB0
+aGUgcXVlcmllZCBkZXZpY2UgaXMgYmV0dGVyLiBCdXQgSSdkIGFkbWl0ICJ0aGUgcXVlcmllZCBk
+ZXZpY2UiIGlzIGFsc28NCj4gPj4gInRoZSByZXNldCBkZXZpY2UiLiBtYXkgQWxleCBoZWxwIHBp
+Y2sgb25lLiDwn5iKDQo+ID4gCS0gSWYgdGhlIGNhbGxpbmcgZGV2aWNlIGlzIG9wZW5lZCBkaXJl
+Y3RseSB2aWEgY2RldiByYXRoZXIgdGhhbg0KPiA+IAkgIGFjY2Vzc2VkIHRocm91Z2ggdGhlIHZm
+aW8gZ3JvdXAsIHRoZSByZXR1cm5lZA0KPiA+IAkgIHZmaW9fcGNpX2RlcGRlbmRlbnRfZGV2aWNl
+IHN0cnVjdHVyZSByZXBvcnRzIHRoZSBkZXZfaWQNCj4gPiAJICByYXRoZXIgdGhhbiB0aGUgZ3Jv
+dXBfaWQsIHdoaWNoIGlzIGluZGljYXRlZCBieSB0aGUNCj4gPiAJICBWRklPX1BDSV9IT1RfUkVT
+RVRfRkxBR19JT01NVUZEX0RFVl9JRCBmbGFnIGluDQo+ID4gCSAgdmZpb19wY2lfaG90X3Jlc2V0
+X2luZm8uICBJZiB0aGUgcmVzZXQgYWZmZWN0cyBkZXZpY2VzIHRoYXQNCj4gPiAJICBhcmUgbm90
+IG9wZW5lZCB3aXRoaW4gdGhlIHNhbWUgaW9tbXVmZCBjb250ZXh0IGFzIHRoZSBjYWxsaW5nDQo+
+ID4gCSAgZGV2aWNlLCBJT01NVUZEX0lOVkFMSURfSUQgd2lsbCBiZSBwcm92aWRlZCBhcyB0aGUg
+ZGV2X2lkLg0KPiA+DQo+ID4gQnV0IHRoYXQga2luZCBvZiBicmluZ3MgdG8gbGlnaHQgdGhlIHF1
+ZXN0aW9uIG9mIHdoYXQgZG9lcyB0aGUgdXNlciBkbw0KPiA+IHdoZW4gdGhleSBlbmNvdW50ZXIg
+dGhpcyBzaXR1YXRpb24uICBJZiB0aGUgZGV2aWNlIGlzIG5vdCBvcGVuZWQsIHRoZQ0KPiA+IHJl
+c2V0IGNhbiBjb21wbGV0ZS4gIElmIHRoZSBkZXZpY2UgaXMgb3BlbmVkIGJ5IGEgZGlmZmVyZW50
+IHVzZXIsIHRoZQ0KPiA+IHJlc2V0IGlzIGJsb2NrZWQuICBUaGUgb25seSBsb2dpY2FsIGNvbmNs
+dXNpb24gaXMgdGhhdCB0aGUgdXNlciBzaG91bGQNCj4gPiB0cnkgdGhlIHJlc2V0IHJlZ2FyZGxl
+c3Mgb2YgdGhlIHJlc3VsdCBvZiB0aGUgaW5mbyBpb2N0bCwgd2hpY2ggdGhlDQo+ID4gbnVsbC1h
+cnJheSBhcHByb2FjaCBmdXJ0aGVyIHNvbGlkaWZpZXMgYXMgdGhlIGRpcmVjdGlvbiBvZiB0aGUg
+QVBJLg0KPiA+IEknbSBub3QgbGlraW5nIHRoaXMuICBUaGFua3MsDQo+ID4NCj4gPiBBbGV4DQo+
+IA0KPiBUaGFua3MNCj4gDQo+IEVyaWMNCj4gPg0KPiA+DQo+ID4+Pj4gKyAqCSAgcG90ZW50aWFs
+IGRldl9pZCBjb25mbGljdCBhcyBkZXZfaWQgaXMgbG9jYWwgdG8gaW9tbXVmZC4gIEZvciBzdWNo
+DQo+ID4+Pj4gKyAqCSAgYWZmZWN0ZWQgZGV2aWNlcywgdXNlciBzaGFsbCBmYWxsIGJhY2sgdG8g
+dXNlIHRoZSBzZWdtZW50LCBidXMgYW5kDQo+ID4+Pj4gKyAqCSAgZGV2Zm4gaW5mbyB0byBtYXAg
+aXQgdG8gb3BlbmVkIGRldmljZS4NCj4gPj4+PiArICoNCj4gPj4+PiAgICogUmV0dXJuOiAwIG9u
+IHN1Y2Nlc3MsIC1lcnJubyBvbiBmYWlsdXJlOg0KPiA+Pj4+ICAgKgktZW5vc3BjID0gaW5zdWZm
+aWNpZW50IGJ1ZmZlciwgLWVub2RldiA9IHVuc3VwcG9ydGVkIGZvciBkZXZpY2UuDQo+ID4+Pj4g
+ICAqLw0KPiA+Pj4+ICBzdHJ1Y3QgdmZpb19wY2lfZGVwZW5kZW50X2RldmljZSB7DQo+ID4+Pj4g
+LQlfX3UzMglncm91cF9pZDsNCj4gPj4+PiArCXVuaW9uIHsNCj4gPj4+PiArCQlfX3UzMiAgIGdy
+b3VwX2lkOw0KPiA+Pj4+ICsJCV9fdTMyCWRldl9pZDsNCj4gPj4+PiArCX07DQo+ID4+Pj4gIAlf
+X3UxNglzZWdtZW50Ow0KPiA+Pj4+ICAJX191OAlidXM7DQo+ID4+Pj4gIAlfX3U4CWRldmZuOyAv
+KiBVc2UgUENJX1NMT1QvUENJX0ZVTkMgKi8NCj4gPj4+PiBAQCAtNjYzLDYgKzY4NCw3IEBAIHN0
+cnVjdCB2ZmlvX3BjaV9kZXBlbmRlbnRfZGV2aWNlIHsNCj4gPj4+PiAgc3RydWN0IHZmaW9fcGNp
+X2hvdF9yZXNldF9pbmZvIHsNCj4gPj4+PiAgCV9fdTMyCWFyZ3N6Ow0KPiA+Pj4+ICAJX191MzIJ
+ZmxhZ3M7DQo+ID4+Pj4gKyNkZWZpbmUgVkZJT19QQ0lfSE9UX1JFU0VUX0ZMQUdfSU9NTVVGRF9E
+RVZfSUQJKDEgPDwgMCkNCj4gPj4+PiAgCV9fdTMyCWNvdW50Ow0KPiA+Pj4+ICAJc3RydWN0IHZm
+aW9fcGNpX2RlcGVuZGVudF9kZXZpY2UJZGV2aWNlc1tdOw0KPiA+Pj4+ICB9Ow0KPiA+Pj4gRXJp
+Yw0KDQo=
