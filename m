@@ -2,81 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C8C7C6D9EEF
-	for <lists+kvm@lfdr.de>; Thu,  6 Apr 2023 19:36:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7B0256D9F25
+	for <lists+kvm@lfdr.de>; Thu,  6 Apr 2023 19:46:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238907AbjDFRgs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 Apr 2023 13:36:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54928 "EHLO
+        id S240061AbjDFRqQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 Apr 2023 13:46:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39896 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239619AbjDFRgo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 Apr 2023 13:36:44 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AFA2EAF21
-        for <kvm@vger.kernel.org>; Thu,  6 Apr 2023 10:35:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1680802510;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=FVq6vuqCUvv437Ye4jb4CJk28rz37KbFIJLyeie7Yy0=;
-        b=Ayu0W3PZXpnn1OpXTbOi4EAz7Gq5L5MG5hKbYwO7Hecofos0oa5Yt9LvCM3GsZvhRfic6x
-        4d4pzLnyJ6KIXesjb3g6ZZaT3OLxNHHCGw9fJSdtjuPN0ge+pAmhWsrHkAwG2Ehw5Mc4PS
-        wzqqco9PIbBliGtTj4nA6lUjhZhw578=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-248-PrFYZcGpMTGPHh8Yj9uxxg-1; Thu, 06 Apr 2023 13:35:09 -0400
-X-MC-Unique: PrFYZcGpMTGPHh8Yj9uxxg-1
-Received: by mail-ej1-f71.google.com with SMTP id j1-20020a170906830100b009497c250e96so543598ejx.15
-        for <kvm@vger.kernel.org>; Thu, 06 Apr 2023 10:35:08 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680802507; x=1683394507;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=FVq6vuqCUvv437Ye4jb4CJk28rz37KbFIJLyeie7Yy0=;
-        b=SvQsTZkcmn02kwTGyj1U8IwC6zZ01fg1OKIhYXTM8rQrD+pjnTiG7EppB03ijKIMk2
-         HG/bflgM94Czh+XyYPMXpkYUyStqyznxvJ0AANZjMNyutsONpx569eISm8Ixe7CgApa/
-         ToCic8R+oklBdciEPWEIud3F+vC8bkfgv1bmKqrdiw6mgvf6HjtLYlJJ46qWgMaNDJw+
-         nacklmrKFwEjdfAH8QUp+Yo7AXmc/+ZLPF7Yy/AxY9PcD5SuJHZ/MaA9JYkyHCfhJo8j
-         3UymM2qm8jl90ZoG1IPNMIj4Fn7pEd+t0EsXJ4/TkJx0n2/k32DWz1Q2I7K0ecDAXgUA
-         IQNA==
-X-Gm-Message-State: AAQBX9eSU5B+OeoP6+x3XjZ3I7iAn6dEt874IrQgOJ5jgQq+Sm8Du8yY
-        dRc5hEcibWt7DJTbsTnqkXrr/Vke2c37IkRaDnreLCxgbnMT4ANrlnweIxQCbfO6AWc0vC5sjTG
-        ybelv3wrVcoAYOgi9XoX6
-X-Received: by 2002:a17:906:9383:b0:948:d1af:3afb with SMTP id l3-20020a170906938300b00948d1af3afbmr5583614ejx.13.1680802507620;
-        Thu, 06 Apr 2023 10:35:07 -0700 (PDT)
-X-Google-Smtp-Source: AKy350YdZ23vTC3jb6Q4OZMvCq+v951UYx7wh1E9GCULBeCPXKfyfGJdz8NaX5Do6DoIVSdjPKIWMA==
-X-Received: by 2002:a17:906:9383:b0:948:d1af:3afb with SMTP id l3-20020a170906938300b00948d1af3afbmr5583592ejx.13.1680802507340;
-        Thu, 06 Apr 2023 10:35:07 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:1c09:f536:3de6:228c? ([2001:b07:6468:f312:1c09:f536:3de6:228c])
-        by smtp.googlemail.com with ESMTPSA id i24-20020a170906a29800b00948021c1629sm1049160ejz.182.2023.04.06.10.35.06
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 06 Apr 2023 10:35:06 -0700 (PDT)
-Message-ID: <bfab2767-0b31-4dce-c077-b72cac4bcb2e@redhat.com>
-Date:   Thu, 6 Apr 2023 19:35:05 +0200
+        with ESMTP id S240045AbjDFRqO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 Apr 2023 13:46:14 -0400
+Received: from 6.mo552.mail-out.ovh.net (6.mo552.mail-out.ovh.net [188.165.49.222])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E00E1AC
+        for <kvm@vger.kernel.org>; Thu,  6 Apr 2023 10:46:13 -0700 (PDT)
+Received: from mxplan5.mail.ovh.net (unknown [10.109.138.227])
+        by mo552.mail-out.ovh.net (Postfix) with ESMTPS id 4294527142;
+        Thu,  6 Apr 2023 17:46:11 +0000 (UTC)
+Received: from kaod.org (37.59.142.96) by DAG4EX2.mxp5.local (172.16.2.32)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.23; Thu, 6 Apr
+ 2023 19:46:10 +0200
+Authentication-Results: garm.ovh; auth=pass (GARM-96R001bbd69b5d-5ba5-40e2-98d5-61c75b75d5d4,
+                    FAD431FEE685CF753936F989CEAB98D84F5F9206) smtp.auth=clg@kaod.org
+X-OVh-ClientIp: 82.64.250.170
+Message-ID: <5b90b770-b420-1dab-401e-b1ed5b5d7e94@kaod.org>
+Date:   Thu, 6 Apr 2023 19:46:09 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.9.0
-Subject: Re: [GIT PULL] KVM/arm64 fixes for 6.3, part #3
+ Thunderbird/102.9.1
+Subject: Re: [PATCH 08/10] target/ppc: Restrict KVM-specific field from
+ ArchCPU
 Content-Language: en-US
-To:     Oliver Upton <oliver.upton@linux.dev>
-Cc:     Marc Zyngier <maz@kernel.org>, Fuad Tabba <tabba@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev,
-        kvm@vger.kernel.org
-References: <ZC2eAXc9UE7Vesmn@thinky-boi>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <ZC2eAXc9UE7Vesmn@thinky-boi>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.4 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>,
+        <qemu-devel@nongnu.org>
+CC:     <qemu-s390x@nongnu.org>, <qemu-riscv@nongnu.org>,
+        =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+        <qemu-arm@nongnu.org>, <kvm@vger.kernel.org>,
+        <qemu-ppc@nongnu.org>,
+        Daniel Henrique Barboza <danielhb413@gmail.com>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Greg Kurz <groug@kaod.org>
+References: <20230405160454.97436-1-philmd@linaro.org>
+ <20230405160454.97436-9-philmd@linaro.org>
+From:   =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+In-Reply-To: <20230405160454.97436-9-philmd@linaro.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [37.59.142.96]
+X-ClientProxiedBy: DAG9EX1.mxp5.local (172.16.2.81) To DAG4EX2.mxp5.local
+ (172.16.2.32)
+X-Ovh-Tracer-GUID: 4ee85be4-94f7-4812-b6b2-e6f1dcb9ab6d
+X-Ovh-Tracer-Id: 388153995401333749
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedvhedrvdejfedgudduhecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefkffggfgfuvfevfhfhjggtgfhisehtkeertddtfeejnecuhfhrohhmpeevrogurhhitgcunfgvucfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhepffdufeeliedujeeffffhjeffiefghffhhfdvkeeijeehledvueffhfejtdehgeegnecukfhppeduvdejrddtrddtrddupdefjedrheelrddugedvrdeliedpkedvrdeigedrvdehtddrudejtdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpeduvdejrddtrddtrddupdhmrghilhhfrhhomhepoegtlhhgsehkrghougdrohhrgheqpdhnsggprhgtphhtthhopedupdhrtghpthhtohepphhhihhlmhgusehlihhnrghrohdrohhrghdpqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrghdpqhgvmhhuqdhsfeeltdigsehnohhnghhnuhdrohhrghdpqhgvmhhuqdhrihhstghvsehnohhnghhnuhdrohhrghdprghlvgigrdgsvghnnhgvvgeslhhinhgrrhhordhorhhgpdhqvghmuhdqrghrmhesnhhonhhgnhhurdhorhhgpdhkvhhmsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhqvghmuhdqphhptgesnhhonhhgnhhurdhorhhgpd
+ gurghnihgvlhhhsgegudefsehgmhgrihhlrdgtohhmpdgurghvihgusehgihgsshhonhdrughrohhpsggvrghrrdhiugdrrghupdhgrhhouhhgsehkrghougdrohhrghdpoffvtefjohhsthepmhhoheehvddpmhhouggvpehsmhhtphhouhht
+X-Spam-Status: No, score=-2.2 required=5.0 tests=NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -84,20 +65,67 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 4/5/23 18:12, Oliver Upton wrote:
-> Hi Paolo,
-> 
-> Sending out what is likely the last batch of fixes for 6.3. Most
-> noteworthy is the PMU fix, as Reiji found that events counting in guest
-> userspace stopped working after live migration on VHE systems.
-> Additionally, Fuad found that pKVM was underselling the Spectre/Meltdown
-> mitigation state to protected VMs, so we have a fix for that too.
-> 
-> Also, FYI, Marc will reprise his role for the 6.4 kernel. Nothing is
-> set in stone but the working model is that we'll alternate the
-> maintainer duties each kernel release.
+Hello Philippe
 
-Pulled, thanks.
+On 4/5/23 18:04, Philippe Mathieu-Daudé wrote:
+> The 'kvm_sw_tlb' field shouldn't be accessed when KVM is not available.
+> 
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+> ---
+>   target/ppc/cpu.h        | 2 ++
+>   target/ppc/mmu_common.c | 4 ++++
+>   2 files changed, 6 insertions(+)
+> 
+> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+> index 557d736dab..0ec3957397 100644
+> --- a/target/ppc/cpu.h
+> +++ b/target/ppc/cpu.h
+> @@ -1148,7 +1148,9 @@ struct CPUArchState {
+>       int tlb_type;    /* Type of TLB we're dealing with */
+>       ppc_tlb_t tlb;   /* TLB is optional. Allocate them only if needed */
+>       bool tlb_dirty;  /* Set to non-zero when modifying TLB */
 
-Paolo
+'tlb_dirty' was part of the same commit 93dd5e852c ("kvm: ppc: booke206:
+use MMU API"). So we might as well include it in the #ifdef section.
+
+Thanks,
+
+C.
+
+> +#ifdef CONFIG_KVM
+>       bool kvm_sw_tlb; /* non-zero if KVM SW TLB API is active */
+> +#endif /* CONFIG_KVM */
+>       uint32_t tlb_need_flush; /* Delayed flush needed */
+>   #define TLB_NEED_LOCAL_FLUSH   0x1
+>   #define TLB_NEED_GLOBAL_FLUSH  0x2
+> diff --git a/target/ppc/mmu_common.c b/target/ppc/mmu_common.c
+> index 7235a4befe..21843c69f6 100644
+> --- a/target/ppc/mmu_common.c
+> +++ b/target/ppc/mmu_common.c
+> @@ -917,10 +917,12 @@ static void mmubooke_dump_mmu(CPUPPCState *env)
+>       ppcemb_tlb_t *entry;
+>       int i;
+>   
+> +#ifdef CONFIG_KVM
+>       if (kvm_enabled() && !env->kvm_sw_tlb) {
+>           qemu_printf("Cannot access KVM TLB\n");
+>           return;
+>       }
+> +#endif
+>   
+>       qemu_printf("\nTLB:\n");
+>       qemu_printf("Effective          Physical           Size PID   Prot     "
+> @@ -1008,10 +1010,12 @@ static void mmubooke206_dump_mmu(CPUPPCState *env)
+>       int offset = 0;
+>       int i;
+>   
+> +#ifdef CONFIG_KVM
+>       if (kvm_enabled() && !env->kvm_sw_tlb) {
+>           qemu_printf("Cannot access KVM TLB\n");
+>           return;
+>       }
+> +#endif
+>   
+>       for (i = 0; i < BOOKE206_MAX_TLBN; i++) {
+>           int size = booke206_tlb_size(env, i);
 
