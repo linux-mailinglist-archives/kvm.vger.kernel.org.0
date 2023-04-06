@@ -2,169 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7F1A26D913E
-	for <lists+kvm@lfdr.de>; Thu,  6 Apr 2023 10:11:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 106906D9166
+	for <lists+kvm@lfdr.de>; Thu,  6 Apr 2023 10:23:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235821AbjDFILk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 Apr 2023 04:11:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55260 "EHLO
+        id S235523AbjDFIXE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 Apr 2023 04:23:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37422 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233588AbjDFILi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 Apr 2023 04:11:38 -0400
-Received: from mail-ej1-x634.google.com (mail-ej1-x634.google.com [IPv6:2a00:1450:4864:20::634])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35E45E4A
-        for <kvm@vger.kernel.org>; Thu,  6 Apr 2023 01:11:37 -0700 (PDT)
-Received: by mail-ej1-x634.google.com with SMTP id a640c23a62f3a-9476e2fa157so93186066b.3
-        for <kvm@vger.kernel.org>; Thu, 06 Apr 2023 01:11:37 -0700 (PDT)
+        with ESMTP id S234958AbjDFIXC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 Apr 2023 04:23:02 -0400
+Received: from mail-wm1-x329.google.com (mail-wm1-x329.google.com [IPv6:2a00:1450:4864:20::329])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10A157AB9
+        for <kvm@vger.kernel.org>; Thu,  6 Apr 2023 01:22:55 -0700 (PDT)
+Received: by mail-wm1-x329.google.com with SMTP id d11-20020a05600c3acb00b003ef6e6754c5so19653108wms.5
+        for <kvm@vger.kernel.org>; Thu, 06 Apr 2023 01:22:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=grsecurity.net; s=grsec; t=1680768695;
+        d=linaro.org; s=google; t=1680769373;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=BoOqd0xJdAAqZznX9BqW+fG2YVKZERKSSsMI0PWSCV8=;
-        b=S0ZBXfHy5j7+woCKZgdCFSSNP8I/0njihmcirkEXvsE75rrcR4Lc+8Yz214ENHkRFU
-         sXzJKMzyGw8iC43Xxq+Oz5Mbm9p4h9Q5pLvcS1BCCwJXTP1wpn7C1XHIp3Fk2C/3zRDx
-         gZtGCrvEtBgedyttM17lM1zUmb9ktmpKTpsU4HvnjIWQyABMyUgTrrMHGaXSlcFZ5t+u
-         PFFUUvo49LRHf+X3yUXb0ZftEUkPtt5d1xfO+Z6ARvElcCArLSzj9SRF3luRg84gRBiR
-         SO93Tty1v+9ngjytFAzpH0cMjcCpFcGQT+f1bzIRckzw6yqGouMqp+f/BTFB8rJhSsM5
-         4Eag==
+        bh=f+vv1701z4r3GsWrWzYSdehjnmgPql22xoY5uBZzFYQ=;
+        b=gHfZ72U8PDz3pJ0wSpvqzO56iy9RJ0imX7saOaCqxClUJyiEnArU+wNiP3jmx7GuRy
+         hjYFHxs1VXKfQs6JeZuQN66v0h/MzWbkw/54erYOfqqRP4IvqRVebixWdejcycrQluvq
+         cmFmI/l/3QGAaSDd0eF8KOrr+8Q0lO20Ymt9Qbsp+wHD4MRuYJTrHY8kQMa0iSuuyBV8
+         EX0Mw0dI1i5p2m8GUqybfr/A9WAjUtFpbzvpcnshWY6fp2YHYQQNwatnwEwKYWFkQsVc
+         hQpbvVFJA8PHRVwsFGuJChPbxSpU/kzukOpWkkyd6JHj/DpPbGk7w8fTt/6S9io95/0R
+         yleQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680768695;
+        d=1e100.net; s=20210112; t=1680769373;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=BoOqd0xJdAAqZznX9BqW+fG2YVKZERKSSsMI0PWSCV8=;
-        b=tlsEMZDTAqpvN76eBHGo0jiX3QJ9QTEQzb+6ESjYmpkYHcsTXxccaizBIU8eZM7MJP
-         s3g6dBy1SFWC2a8yPY98NFYQOiESVvQONYjxwyUIgQUzzoTXstP5gWPdzKJsriyLch91
-         PCVCIFLu567Fh2Dk83wfZSkNYNv+/hq7JM6ACbU7Buen/VpBSlhE7N9IirKIE+BgXgMc
-         VB1/BQr5PhQw3NJypG3jXjogRb0oObSatH1kWfoXKyyfwkZ9D861gNIlQOCeHg3gLU4k
-         I9DI1KaZzgy5eRJv0x5rAfD43vZyuN4s414mlQDXo4x8gcnPXhSUSSlnQQHq2+k/wf5l
-         MruQ==
-X-Gm-Message-State: AAQBX9dlC6L9pH5zqxtpKigNnNEbyuvB8lAE5c8wwRM5YQi6u3+MJsVe
-        dc6dBK2Gru+VhIWz3VbE1d/ZtoR/ETsklPDesKI=
-X-Google-Smtp-Source: AKy350bxMENWXbuLG5O/VjAiIM1BZ66a7ajkWgSVuGe3ZTctQML48n9kAVuwuNWcC7QN+mjMXYEAWQ==
-X-Received: by 2002:a05:6402:b33:b0:500:2e94:26aa with SMTP id bo19-20020a0564020b3300b005002e9426aamr4992038edb.20.1680768695706;
-        Thu, 06 Apr 2023 01:11:35 -0700 (PDT)
-Received: from ?IPV6:2003:f6:af05:3700:e3dd:8565:18f3:3982? (p200300f6af053700e3dd856518f33982.dip0.t-ipconnect.de. [2003:f6:af05:3700:e3dd:8565:18f3:3982])
-        by smtp.gmail.com with ESMTPSA id ek14-20020a056402370e00b005028e87068fsm385429edb.73.2023.04.06.01.11.34
+        bh=f+vv1701z4r3GsWrWzYSdehjnmgPql22xoY5uBZzFYQ=;
+        b=rwTCpQ3J7urTCVOkV3jM9GW3JarmxHfJEytk9NAHqbT3fB+uY0HVLigrCo6IBJqGw4
+         TXqa2KqE6agHkhBK9Dojy+oQN4iteU1/zTndKI1SIWw9Hc5XSzJeqK0D38GJE2Y12GOC
+         187UxhDLT0I6mDkBcgrtexBSM/QSjTkoVfKK3w1YlghvVhdcbwxZQ6O89/HfoBA5C+f5
+         QhF8lvpkp1pQvVdklxIhrKxRHNPHRV/NAAO5WmobW0Fnszt2yzdZHuwD4dc4BccpKChL
+         QzCzEvVcy7SjHP8QvOo3nsHY/egkA6jAzs3GRNN9gq6xfEUOJxM+PAwHStnIwCuceLUp
+         TIdg==
+X-Gm-Message-State: AAQBX9dkliUnIVxR+oxFQhiGQslkrKWeuocqZOkuvkaM3yVDOjf7b/Pc
+        cWY5dQiKPZx6ZJwO+N+ieAu+mg==
+X-Google-Smtp-Source: AKy350bcVUwtarMk34DWCLPwzCwjECA0NL2+n2OBSiBjCe9BW3F4CnRqEgBhgifFneH5j/sjzSbckw==
+X-Received: by 2002:a1c:7c05:0:b0:3f0:3377:c15f with SMTP id x5-20020a1c7c05000000b003f03377c15fmr6665588wmc.12.1680769373564;
+        Thu, 06 Apr 2023 01:22:53 -0700 (PDT)
+Received: from [192.168.30.216] ([81.0.6.76])
+        by smtp.gmail.com with ESMTPSA id iv15-20020a05600c548f00b003ef5b285f65sm4614032wmb.46.2023.04.06.01.22.52
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 06 Apr 2023 01:11:35 -0700 (PDT)
-Message-ID: <f34b3d78-a1c4-90cb-079a-2dc81a5e6e7b@grsecurity.net>
-Date:   Thu, 6 Apr 2023 10:11:34 +0200
+        Thu, 06 Apr 2023 01:22:53 -0700 (PDT)
+Message-ID: <c47e1b5a-38bb-fe08-8020-29361fd0e99a@linaro.org>
+Date:   Thu, 6 Apr 2023 10:22:51 +0200
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.9.0
-Subject: Re: [kvm-unit-tests PATCH] x86/emulator: Test non-canonical memory
- access exceptions
-Content-Language: en-US, de-DE
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org
-References: <20230215142344.20200-1-minipli@grsecurity.net>
- <ZC42RavGH2Z82oJd@google.com>
-From:   Mathias Krause <minipli@grsecurity.net>
-In-Reply-To: <ZC42RavGH2Z82oJd@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-1.2 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
-        DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.9.1
+Subject: Re: [PATCH 10/10] hw/s390x: Rename pv.c -> pv-kvm.c
+Content-Language: en-US
+To:     Janosch Frank <frankja@linux.ibm.com>,
+        Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc:     qemu-s390x@nongnu.org, qemu-riscv@nongnu.org,
+        =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+        qemu-arm@nongnu.org, kvm@vger.kernel.org, qemu-ppc@nongnu.org,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        David Hildenbrand <david@redhat.com>,
+        Ilya Leoshkevich <iii@linux.ibm.com>
+References: <20230405160454.97436-1-philmd@linaro.org>
+ <20230405160454.97436-11-philmd@linaro.org>
+ <3cccc7e6-3a39-b3b4-feaf-85a3faa58570@redhat.com>
+ <3fe240da-9a75-0e39-7762-cd91af9ed3f0@linux.ibm.com>
+From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>
+In-Reply-To: <3fe240da-9a75-0e39-7762-cd91af9ed3f0@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.6 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
+        DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 06.04.23 05:02, Sean Christopherson wrote:
-> On Wed, Feb 15, 2023, Mathias Krause wrote:
->> +static void test_reg_noncanonical(void)
->> +{
->> +	extern char nc_rsp_start, nc_rsp_end, nc_rbp_start, nc_rbp_end;
->> +	extern char nc_rax_start, nc_rax_end;
->> +	handler old_ss, old_gp;
->> +
->> +	old_ss = handle_exception(SS_VECTOR, advance_rip_and_note_exception);
->> +	old_gp = handle_exception(GP_VECTOR, advance_rip_and_note_exception);
->> +
->> +	/* RAX based, should #GP(0) */
->> +	exceptions = 0;
->> +	rip_advance = &nc_rax_end - &nc_rax_start;
->> +	asm volatile("nc_rax_start: orq $0, (%[msb]); nc_rax_end:\n\t"
+On 6/4/23 10:04, Janosch Frank wrote:
+> On 4/6/23 09:50, Thomas Huth wrote:
+>> On 05/04/2023 18.04, Philippe Mathieu-Daudé wrote:
+>>> Protected Virtualization is specific to KVM.
+>>> Rename the file as 'pv-kvm.c' to make this clearer.
+>>>
+>>> Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+>>> ---
+>>>    hw/s390x/{pv.c => pv-kvm.c} | 0
+>>>    hw/s390x/meson.build        | 2 +-
+>>>    2 files changed, 1 insertion(+), 1 deletion(-)
+>>>    rename hw/s390x/{pv.c => pv-kvm.c} (100%)
+>>>
+>>> diff --git a/hw/s390x/pv.c b/hw/s390x/pv-kvm.c
+>>> similarity index 100%
+>>> rename from hw/s390x/pv.c
+>>> rename to hw/s390x/pv-kvm.c
+>>> diff --git a/hw/s390x/meson.build b/hw/s390x/meson.build
+>>> index f291016fee..2f43b6c473 100644
+>>> --- a/hw/s390x/meson.build
+>>> +++ b/hw/s390x/meson.build
+>>> @@ -22,7 +22,7 @@ s390x_ss.add(when: 'CONFIG_KVM', if_true: files(
+>>>      'tod-kvm.c',
+>>>      's390-skeys-kvm.c',
+>>>      's390-stattrib-kvm.c',
+>>> -  'pv.c',
+>>> +  'pv-kvm.c',
+>>>      's390-pci-kvm.c',
+>>>    ))
+>>>    s390x_ss.add(when: 'CONFIG_TCG', if_true: files(
+>>
+>> Hmmm, maybe we should rather move it to target/s390x/kvm/ instead?
+>>
+>> Janosch, what's your opinion?
+>>
+>>    Thomas
+>>
+>>
 > 
-> Can't we use ASM_TRY() + exception_vector() + exception_error_code()?  Installing
-> a dedicated handler is (slowly) being phased out.
+> Don't care as long as the file is not deleted :)
 
-Well, you may have guessed it, but I tried to be "consistent with the
-existing style." Sure this code could get a lot of cleanups too, the
-whole file, actually, like the externs should be 'extern char []'
-instead to point out they're just "labels" and no chars. But, again, I
-just did as was "prior art" in this file. But if moving forward to a
-more modern version is wanted, I can adapt.
+I followed the current pattern:
 
->  Even better, if you're willing
-> to take a dependency and/or wait a few weeks for my series to land[*], you should
-> be able to use asm_safe() to streamline this even further.
-> 
-> [*] https://lkml.kernel.org/r/20230406025117.738014-1-seanjc%40google.com
+$ ls -1 hw/s390x/*kvm*
+hw/s390x/s390-pci-kvm.c
+hw/s390x/s390-skeys-kvm.c
+hw/s390x/s390-stattrib-kvm.c
+hw/s390x/tod-kvm.c
 
-Looks like a nice cleanup, indeed. However, the conversion should be
-straight forward, so I don't think this change has to "wait" for it.
-
-The linked bug report turned 1 just two weeks ago. About time to get it
-some more traction. :D
-
-That said, I'll do a spring cleanup of emulator64.c along with my change
-to address the points you mentioned in the other test functions as well.
-But likely not before next week.
-
-> 
-> 
->> +		     : : [msb]"a"(1ul << 63));
-> 
-> Use BIT_ULL().  Actually, scratch that, we have a NONCANONICAL macro.  It _probably_
-> won't matter, but who know what will happen with things like LAM and LASS.
-
-Thanks, will change.
-
-> 
-> And why hardcode use of RAX?  Won't any "r" constraint work?
-
-Unfortunately not. It must be neither rsp nor rbp and with "r" the
-compiler is free to choose one of these. It'll unlikely make use of rsp,
-but rbp is a valid target we need to avoid. (Yes, I saw the
--no-omit-frame-pointer handling in the Makefiles, but I dislike this
-implicit dependency.)
-
-I can change the constraints to "abcdSD" to give the compiler a little
-bit more freedom, but that makes the inline asm little harder to read,
-IMHO. Hardcoding rax is no real constraint to the compiler either, as
-it's a volatile register anyway. The call to report() will invalidate
-its old value, so I don't see the need for a change -- a comment, at
-best, but that's already there ;)
-
-> 
-> E.g. I believe this can be something like:
-> 
-> 	asm_safe_report_ex(GP_VECTOR, "orq $0, (%[noncanonical]), "r" (NONCANONICAL));
-> 	report(!exception_error_code());
-> 
-> Or we could even add asm_safe_report_ex_ec(), e.g.
-> 
-> 	asm_safe_report_ex_ec(GP_VECTOR, 0,
-> 			      "orq $0, (%[noncanonical]), "r" (NONCANONICAL));
-
-Yeah, the latter. Verifying the error code is part of the test, so that
-should be preserved.
-
-The tests as written by me also ensure that an exception actually
-occurred, exactly one, actually. Maybe that should be accounted for in
-asm_safe*() as well?
-
-
-Thanks,
-Mathias
-
-PS: Would be nice if the entry barrier for new tests wouldn't require to
-handle the accumulated technical debt of the file one's touching ;P
-But I can understand that adding more code adapting to "existing style"
-makes the problem only worse. So it's fine with me.
+I'm still unsure where is the best place to put hw files which are
+arch (and accel) specific.
