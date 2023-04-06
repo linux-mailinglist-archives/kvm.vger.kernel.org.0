@@ -2,126 +2,170 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7B3566D90CE
-	for <lists+kvm@lfdr.de>; Thu,  6 Apr 2023 09:51:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AA98C6D9100
+	for <lists+kvm@lfdr.de>; Thu,  6 Apr 2023 10:01:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235239AbjDFHvj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 Apr 2023 03:51:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32824 "EHLO
+        id S235523AbjDFIBj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 Apr 2023 04:01:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42460 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233551AbjDFHvh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 Apr 2023 03:51:37 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66C947ABA
-        for <kvm@vger.kernel.org>; Thu,  6 Apr 2023 00:50:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1680767450;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Zfpt1hWlJeW+De1zXUq58qE//gZcupovgtklglmgOFw=;
-        b=ReWCfjFhhlA4kzXJsKA6z8n3PzX8kfoIG+aZf/9n5HaqtWtUIy5+GnoWXPU9npYdhvSh/V
-        9NAB+LBG7RYjezi+dxztJ9fIAfHcKd/2ayBq5YMHez8cAweu6cypnUqvwskwbVzr+tSX3m
-        ul+an4P9a2YyBLFsa7xy9RK35/km9tg=
-Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
- [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-608-7PiBXBLAMzS7btM6W--Jhg-1; Thu, 06 Apr 2023 03:50:41 -0400
-X-MC-Unique: 7PiBXBLAMzS7btM6W--Jhg-1
-Received: by mail-qv1-f70.google.com with SMTP id a10-20020a0ccdca000000b005d70160fbb0so17495679qvn.21
-        for <kvm@vger.kernel.org>; Thu, 06 Apr 2023 00:50:41 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680767441;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Zfpt1hWlJeW+De1zXUq58qE//gZcupovgtklglmgOFw=;
-        b=WVtmQKgw8eu45g7a/KsjXDyiv9hYnnFn9T62qlbri1tWZ/xnHzpaxLWnsoShIjL8At
-         CWQUODm/QiK5a3bz090rNbDhw9wlsg7CnWrfA4+X/LwNnZZ2ERXy+oS00kj8j4kYMeYZ
-         Kqrjc8f0edkM3Z6pRn3jWpcBGrPVImDWgm44VG1ss7MQJkAGc94O+/W4l0xs03Uuho/m
-         FLLCalga1GK/RmmvyCxSRBX1jMi5aGe+NwJtPsYjZFNDlN3zNs4cflnsEvsFKq7QBsRp
-         ecar5upqhlf7rZajr3y84CnFdnTdzPFBBHUj9hgMyoggCzo09oSJ6JecOS1BbqMW0yGR
-         XdiA==
-X-Gm-Message-State: AAQBX9e5kwAmizdUqkM3iwhtYbZBatp+5ko52AW6o0KwaGtNAwPDhB23
-        2OeSHTbbsNsqB2AjyCoEpO0HW9wUmG7QYO2H0VYhH6BC0gKdjKK785CMqdrJJno3GD7MoSnXG25
-        5EDSfigInJmhPmLv/Oyooa1E=
-X-Received: by 2002:a05:6214:19c3:b0:5a5:b269:bfd7 with SMTP id j3-20020a05621419c300b005a5b269bfd7mr3536295qvc.8.1680767441138;
-        Thu, 06 Apr 2023 00:50:41 -0700 (PDT)
-X-Google-Smtp-Source: AKy350aOTMeFA6L3L3kDCyW2m/d0fTHZIJmC7P+sa1stPv6snl6xCxTWIR0yTmfZxFMazbqwU1fSEQ==
-X-Received: by 2002:a05:6214:19c3:b0:5a5:b269:bfd7 with SMTP id j3-20020a05621419c300b005a5b269bfd7mr3536276qvc.8.1680767440725;
-        Thu, 06 Apr 2023 00:50:40 -0700 (PDT)
-Received: from [192.168.0.3] (ip-109-43-178-193.web.vodafone.de. [109.43.178.193])
-        by smtp.gmail.com with ESMTPSA id 65-20020a370c44000000b00746777fd176sm297041qkm.26.2023.04.06.00.50.37
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 06 Apr 2023 00:50:40 -0700 (PDT)
-Message-ID: <3cccc7e6-3a39-b3b4-feaf-85a3faa58570@redhat.com>
-Date:   Thu, 6 Apr 2023 09:50:36 +0200
+        with ESMTP id S235685AbjDFIBc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 Apr 2023 04:01:32 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E029D13E;
+        Thu,  6 Apr 2023 01:01:30 -0700 (PDT)
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3367TkoP027539;
+        Thu, 6 Apr 2023 08:01:30 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : to : cc : references : from : subject : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=O3mKm+YBoQnUmHgmzoSVfv5LTZzgdSjEwPou7UCR0Q4=;
+ b=M4w2D128wjtODR6bmZdz3DFLOCKX4RyF5dp+ohRBLg+xYzNKwkhbvLYGklxFnog4aXwx
+ FJuliK+/iG/oDe7K+j2x6vxCeRxNJGAKt63vjx54BeOzkNiU9A2NXiC1avL3H3iTbkqA
+ LVu7KIdxBfzIr43UP5qlqWaqTuonOSC0RYtkEG2lsYTuuFHgA+ByGE2JalwrjZg2QwBG
+ gcIKdahPTgzwxcsL6DcPeE+d0l0aQfPeaPELgoWPKrFaYZci33fOBOWeJZ2rY8KgnJQ/
+ 1S1eZx0ssC3sQ8pv3pY/SpMZpR0gDXsDhXMwYbcmHX1aWha1I9nvuL+kncPZCOYsiDB2 fQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ps75k3b8a-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 06 Apr 2023 08:01:30 +0000
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3367u59N021257;
+        Thu, 6 Apr 2023 08:01:29 GMT
+Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ps75k3b67-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 06 Apr 2023 08:01:29 +0000
+Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
+        by ppma06fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3365P6J1022079;
+        Thu, 6 Apr 2023 08:01:26 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+        by ppma06fra.de.ibm.com (PPS) with ESMTPS id 3ppbvfu2ym-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 06 Apr 2023 08:01:26 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+        by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 33681NZ46029876
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 6 Apr 2023 08:01:23 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 25E942004B;
+        Thu,  6 Apr 2023 08:01:23 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B2A8420040;
+        Thu,  6 Apr 2023 08:01:22 +0000 (GMT)
+Received: from [9.179.16.135] (unknown [9.179.16.135])
+        by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Thu,  6 Apr 2023 08:01:22 +0000 (GMT)
+Message-ID: <5770ea2b-2cf2-a57e-2003-fb043b0bea9c@linux.ibm.com>
+Date:   Thu, 6 Apr 2023 10:01:22 +0200
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.13.0
-Subject: Re: [PATCH 10/10] hw/s390x: Rename pv.c -> pv-kvm.c
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.9.1
+To:     Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
+        Nico Boehr <nrb@linux.ibm.com>, imbrenda@linux.ibm.com,
+        thuth@redhat.com
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org
+References: <20230327082118.2177-1-nrb@linux.ibm.com>
+ <20230327082118.2177-5-nrb@linux.ibm.com>
+ <cfd83c1d7a74e969e6e3c922bbe5650f8e9adadd.camel@linux.ibm.com>
 Content-Language: en-US
-To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>,
-        qemu-devel@nongnu.org, Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>
-Cc:     qemu-s390x@nongnu.org, qemu-riscv@nongnu.org,
-        =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
-        qemu-arm@nongnu.org, kvm@vger.kernel.org, qemu-ppc@nongnu.org,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        David Hildenbrand <david@redhat.com>,
-        Ilya Leoshkevich <iii@linux.ibm.com>
-References: <20230405160454.97436-1-philmd@linaro.org>
- <20230405160454.97436-11-philmd@linaro.org>
-From:   Thomas Huth <thuth@redhat.com>
-In-Reply-To: <20230405160454.97436-11-philmd@linaro.org>
+From:   Janosch Frank <frankja@linux.ibm.com>
+Subject: Re: [kvm-unit-tests PATCH v1 4/4] s390x: add a test for SIE without
+ MSO/MSL
+In-Reply-To: <cfd83c1d7a74e969e6e3c922bbe5650f8e9adadd.camel@linux.ibm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.6 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: ExmmPkX-EyUgeK7qSuSAXVkZVfXSsRCp
+X-Proofpoint-ORIG-GUID: i8Pf3VzXhEgh6oGPxwyC055NawIxh5po
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
+ definitions=2023-04-06_02,2023-04-05_01,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 phishscore=0
+ adultscore=0 priorityscore=1501 clxscore=1015 malwarescore=0
+ suspectscore=0 bulkscore=0 lowpriorityscore=0 mlxscore=0 spamscore=0
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2303200000 definitions=main-2304060071
+X-Spam-Status: No, score=-1.5 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
+        DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 05/04/2023 18.04, Philippe Mathieu-Daudé wrote:
-> Protected Virtualization is specific to KVM.
-> Rename the file as 'pv-kvm.c' to make this clearer.
+On 4/5/23 21:55, Nina Schoetterl-Glausch wrote:
+> On Mon, 2023-03-27 at 10:21 +0200, Nico Boehr wrote:
+>> Since we now have the ability to run guests without MSO/MSL, add a test
+>> to make sure this doesn't break.
+>>
+>> Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
+>> ---
+
+[...]
+
+>> +static inline void force_exit_value(uint64_t val)
+>> +{
+>> +	asm volatile(
+>> +		"	diag	%[val],0,0x9c\n"
+>> +		: : [val] "d"(val)
+>> +	);
+>> +}
+>> +
+>> +__attribute__((section(".text"))) int main(void)
 > 
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
-> ---
->   hw/s390x/{pv.c => pv-kvm.c} | 0
->   hw/s390x/meson.build        | 2 +-
->   2 files changed, 1 insertion(+), 1 deletion(-)
->   rename hw/s390x/{pv.c => pv-kvm.c} (100%)
+> Why is the attribute necessary? I know all the snippets have it, but I don't see
+> why it's necessary.
+> @Janosch ?
+
+"Historical growth" :)
+
+If it doesn't work without it then we need to find a way to fix it.
+If it does work without it then we should remove the attribute from all 
+snippets.
+
+But this issue is a low priority for me.
+
 > 
-> diff --git a/hw/s390x/pv.c b/hw/s390x/pv-kvm.c
-> similarity index 100%
-> rename from hw/s390x/pv.c
-> rename to hw/s390x/pv-kvm.c
-> diff --git a/hw/s390x/meson.build b/hw/s390x/meson.build
-> index f291016fee..2f43b6c473 100644
-> --- a/hw/s390x/meson.build
-> +++ b/hw/s390x/meson.build
-> @@ -22,7 +22,7 @@ s390x_ss.add(when: 'CONFIG_KVM', if_true: files(
->     'tod-kvm.c',
->     's390-skeys-kvm.c',
->     's390-stattrib-kvm.c',
-> -  'pv.c',
-> +  'pv-kvm.c',
->     's390-pci-kvm.c',
->   ))
->   s390x_ss.add(when: 'CONFIG_TCG', if_true: files(
-
-Hmmm, maybe we should rather move it to target/s390x/kvm/ instead?
-
-Janosch, what's your opinion?
-
-  Thomas
+>> +{
+>> +	uint8_t *invalid_ptr;
+>> +
+>> +	memset(test_page, 0, sizeof(test_page));
+>> +	/* tell the host the page's physical address (we're running DAT off) */
+>> +	force_exit_value((uint64_t)test_page);
+>> +
+>> +	/* write some value to the page so the host can verify it */
+>> +	for (size_t i = 0; i < TEST_PAGE_COUNT; i++)
+>> +		test_page[i * PAGE_SIZE] = 42 + i;
+>> +
+>> +	/* indicate we've written all pages */
+>> +	force_exit();
+>> +
+>> +	/* the first unmapped address */
+>> +	invalid_ptr = (uint8_t *)(TOTAL_PAGE_COUNT * PAGE_SIZE);
+> 
+> Why not just use an address high enough you know it will not be mapped?
+> -1 should do just fine.
+> 
+>> +	*invalid_ptr = 42;
+>> +
+>> +	/* indicate we've written the non-allowed page (should never get here) */
+>> +	force_exit();
+>> +
+>> +	return 0;
+>> +}
+>> diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
+>> index d97eb5e943c8..aab0e670f2d4 100644
+>> --- a/s390x/unittests.cfg
+>> +++ b/s390x/unittests.cfg
+>> @@ -215,3 +215,6 @@ file = migration-skey.elf
+>>   smp = 2
+>>   groups = migration
+>>   extra_params = -append '--parallel'
+>> +
+>> +[sie-dat]
+>> +file = sie-dat.elf
+> 
 
