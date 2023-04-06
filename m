@@ -2,76 +2,76 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 827F36D9EA2
-	for <lists+kvm@lfdr.de>; Thu,  6 Apr 2023 19:22:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C8C7C6D9EEF
+	for <lists+kvm@lfdr.de>; Thu,  6 Apr 2023 19:36:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240025AbjDFRWH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 Apr 2023 13:22:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57666 "EHLO
+        id S238907AbjDFRgs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 Apr 2023 13:36:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54928 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240061AbjDFRVu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 Apr 2023 13:21:50 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6CBF2A5CB
-        for <kvm@vger.kernel.org>; Thu,  6 Apr 2023 10:19:56 -0700 (PDT)
+        with ESMTP id S239619AbjDFRgo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 Apr 2023 13:36:44 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AFA2EAF21
+        for <kvm@vger.kernel.org>; Thu,  6 Apr 2023 10:35:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1680801578;
+        s=mimecast20190719; t=1680802510;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=LP3YXXyYJvN3aEObqIIMiycghi8EaKj04VX+mmVHJy4=;
-        b=LXWSrD7zLSUdRMeHi2N9qU9keqvVhNJxK7NZXIAN4is2+ALPBTfluEvVyZj02I+tt2oX36
-        Xc+lu1bRpuiPTeUWx1cp/MfgZ+Wz8h7CV0ScWrJCtlMyynAm8N8tsNuSH3EHOyG5dFgL+E
-        q6NRsb/tnnjgmc1hjYwhqboaIB7gBZY=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=FVq6vuqCUvv437Ye4jb4CJk28rz37KbFIJLyeie7Yy0=;
+        b=Ayu0W3PZXpnn1OpXTbOi4EAz7Gq5L5MG5hKbYwO7Hecofos0oa5Yt9LvCM3GsZvhRfic6x
+        4d4pzLnyJ6KIXesjb3g6ZZaT3OLxNHHCGw9fJSdtjuPN0ge+pAmhWsrHkAwG2Ehw5Mc4PS
+        wzqqco9PIbBliGtTj4nA6lUjhZhw578=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-15-kZc7RE8HM6a3QK4q_xSEbg-1; Thu, 06 Apr 2023 13:19:36 -0400
-X-MC-Unique: kZc7RE8HM6a3QK4q_xSEbg-1
-Received: by mail-ed1-f70.google.com with SMTP id t14-20020a056402240e00b004fb36e6d670so52739489eda.5
-        for <kvm@vger.kernel.org>; Thu, 06 Apr 2023 10:19:36 -0700 (PDT)
+ us-mta-248-PrFYZcGpMTGPHh8Yj9uxxg-1; Thu, 06 Apr 2023 13:35:09 -0400
+X-MC-Unique: PrFYZcGpMTGPHh8Yj9uxxg-1
+Received: by mail-ej1-f71.google.com with SMTP id j1-20020a170906830100b009497c250e96so543598ejx.15
+        for <kvm@vger.kernel.org>; Thu, 06 Apr 2023 10:35:08 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680801575; x=1683393575;
+        d=1e100.net; s=20210112; t=1680802507; x=1683394507;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=LP3YXXyYJvN3aEObqIIMiycghi8EaKj04VX+mmVHJy4=;
-        b=mlvtsxnyabHytyx0Qw5T5nZPb9ZLqOH876wz7SrSb4oEEOoy0sHZh5zrU39DOnj5LB
-         bOFPQNQ0wk8V7lxJCT5L8V8Iyu+MVf0uTgviwDioyoZ4BDreO6Sxl7goHEqaJ+XgSKbf
-         VJh3BlIvYIb8+PrDtF9m0bPlRZnj1sa9yykxqN/ym5WYZTgbbUUj8yTvtt7aZLL7mPa3
-         26NK8pPafTAG6zmu2v0MuQDGtQ7IPfwCxU+yZ+Q8+sC7Bgumyb9OFW2+WvElTRMa+dj8
-         bXdcmoZMe4ciSKwf5d+rDk9m6adFzHj+LsRMlVcITCtgUaGZG0n/uGZPYDXll9Gr6/iy
-         xZUw==
-X-Gm-Message-State: AAQBX9ejq0pSdlAB2JCxE3VQ59GOHRNLlbr+6KvexVDquatCxdBmHanH
-        L5fQU3+U3+MD82cKj0tGcHTC0aD+F1X3fBIVwED+OYPyia6VrYlv2Ynr7ghgbjRK9mj7cMEw02N
-        e9tlaEFAhjk39Kc1UvtfP
-X-Received: by 2002:a17:906:1754:b0:92d:44ca:1137 with SMTP id d20-20020a170906175400b0092d44ca1137mr6421307eje.43.1680801575038;
-        Thu, 06 Apr 2023 10:19:35 -0700 (PDT)
-X-Google-Smtp-Source: AKy350a5DIzoHAy5QTc+uAGixeCWzczV9Y6+81B3R8DL//DpfoqhKveFDbUoz+7LnVp4dosyJ4rYSA==
-X-Received: by 2002:a17:906:1754:b0:92d:44ca:1137 with SMTP id d20-20020a170906175400b0092d44ca1137mr6421287eje.43.1680801574709;
-        Thu, 06 Apr 2023 10:19:34 -0700 (PDT)
+        bh=FVq6vuqCUvv437Ye4jb4CJk28rz37KbFIJLyeie7Yy0=;
+        b=SvQsTZkcmn02kwTGyj1U8IwC6zZ01fg1OKIhYXTM8rQrD+pjnTiG7EppB03ijKIMk2
+         HG/bflgM94Czh+XyYPMXpkYUyStqyznxvJ0AANZjMNyutsONpx569eISm8Ixe7CgApa/
+         ToCic8R+oklBdciEPWEIud3F+vC8bkfgv1bmKqrdiw6mgvf6HjtLYlJJ46qWgMaNDJw+
+         nacklmrKFwEjdfAH8QUp+Yo7AXmc/+ZLPF7Yy/AxY9PcD5SuJHZ/MaA9JYkyHCfhJo8j
+         3UymM2qm8jl90ZoG1IPNMIj4Fn7pEd+t0EsXJ4/TkJx0n2/k32DWz1Q2I7K0ecDAXgUA
+         IQNA==
+X-Gm-Message-State: AAQBX9eSU5B+OeoP6+x3XjZ3I7iAn6dEt874IrQgOJ5jgQq+Sm8Du8yY
+        dRc5hEcibWt7DJTbsTnqkXrr/Vke2c37IkRaDnreLCxgbnMT4ANrlnweIxQCbfO6AWc0vC5sjTG
+        ybelv3wrVcoAYOgi9XoX6
+X-Received: by 2002:a17:906:9383:b0:948:d1af:3afb with SMTP id l3-20020a170906938300b00948d1af3afbmr5583614ejx.13.1680802507620;
+        Thu, 06 Apr 2023 10:35:07 -0700 (PDT)
+X-Google-Smtp-Source: AKy350YdZ23vTC3jb6Q4OZMvCq+v951UYx7wh1E9GCULBeCPXKfyfGJdz8NaX5Do6DoIVSdjPKIWMA==
+X-Received: by 2002:a17:906:9383:b0:948:d1af:3afb with SMTP id l3-20020a170906938300b00948d1af3afbmr5583592ejx.13.1680802507340;
+        Thu, 06 Apr 2023 10:35:07 -0700 (PDT)
 Received: from ?IPV6:2001:b07:6468:f312:1c09:f536:3de6:228c? ([2001:b07:6468:f312:1c09:f536:3de6:228c])
-        by smtp.googlemail.com with ESMTPSA id z98-20020a509e6b000000b004fd29e87535sm979422ede.14.2023.04.06.10.19.33
+        by smtp.googlemail.com with ESMTPSA id i24-20020a170906a29800b00948021c1629sm1049160ejz.182.2023.04.06.10.35.06
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 06 Apr 2023 10:19:34 -0700 (PDT)
-Message-ID: <92d87145-479b-05ad-8560-49765b1794ca@redhat.com>
-Date:   Thu, 6 Apr 2023 19:19:33 +0200
+        Thu, 06 Apr 2023 10:35:06 -0700 (PDT)
+Message-ID: <bfab2767-0b31-4dce-c077-b72cac4bcb2e@redhat.com>
+Date:   Thu, 6 Apr 2023 19:35:05 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.9.0
-Subject: Re: [kvm-unit-tests PATCH] x86/flat.lds: Silence warnings about empty
- loadable segments
+Subject: Re: [GIT PULL] KVM/arm64 fixes for 6.3, part #3
 Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>,
-        Thomas Huth <thuth@redhat.com>
-Cc:     kvm@vger.kernel.org
-References: <20230329123814.76051-1-thuth@redhat.com>
- <168073550254.619716.10085104611122942655.b4-ty@google.com>
- <8b2fe89b-718c-074a-e566-41106dff016c@redhat.com>
- <ZC7+c42p2IRWtHfT@google.com>
+To:     Oliver Upton <oliver.upton@linux.dev>
+Cc:     Marc Zyngier <maz@kernel.org>, Fuad Tabba <tabba@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev,
+        kvm@vger.kernel.org
+References: <ZC2eAXc9UE7Vesmn@thinky-boi>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <ZC7+c42p2IRWtHfT@google.com>
+In-Reply-To: <ZC2eAXc9UE7Vesmn@thinky-boi>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.4 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
@@ -84,22 +84,20 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 4/6/23 19:16, Sean Christopherson wrote:
->> I can see a .note.GNU-stack entry in x86/efi/elf_x86_64_efi.lds ... maybe we
->> need something similar in x86/flat.lds ?
-> I believe that just telling the linker that those sections don't need relocation
-> info.  I suspect it's unnecessary copy+paste from UEFI sources.
+On 4/5/23 18:12, Oliver Upton wrote:
+> Hi Paolo,
 > 
-> The linker warning from setjmp64.o (and cstart64.o) is yelling about_not_  having
-> .note.GNU-stack, which is a magic section that tells the linker that the binary
-> doesn't need an executable stack.  If I'm reading the NOTE correctly, it's saying
-> that the ability to have an executable stack is soon going away.
+> Sending out what is likely the last batch of fixes for 6.3. Most
+> noteworthy is the PMU fix, as Reiji found that events counting in guest
+> userspace stopped working after live migration on VHE systems.
+> Additionally, Fuad found that pKVM was underselling the Spectre/Meltdown
+> mitigation state to protected VMs, so we have a fix for that too.
+> 
+> Also, FYI, Marc will reprise his role for the 6.4 kernel. Nothing is
+> set in stone but the working model is that we'll alternate the
+> maintainer duties each kernel release.
 
-More or less; if I remember correctly they want to flip the default from 
-executable stack to non-executable stack.  If you want an executable 
-stack you'll have to add an ELF note or link with -z execstack.
-
-All of this of course is irrelevant in a freestanding environment.
+Pulled, thanks.
 
 Paolo
 
