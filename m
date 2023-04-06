@@ -2,59 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 38E776D8DB7
-	for <lists+kvm@lfdr.de>; Thu,  6 Apr 2023 04:52:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 872106D8DB8
+	for <lists+kvm@lfdr.de>; Thu,  6 Apr 2023 04:52:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235211AbjDFCwS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Apr 2023 22:52:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43696 "EHLO
+        id S235252AbjDFCwV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Apr 2023 22:52:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45576 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234638AbjDFCv7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Apr 2023 22:51:59 -0400
-Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A515F974F
-        for <kvm@vger.kernel.org>; Wed,  5 Apr 2023 19:51:21 -0700 (PDT)
-Received: by mail-pg1-x549.google.com with SMTP id 126-20020a630284000000b005135edbb985so9784378pgc.1
-        for <kvm@vger.kernel.org>; Wed, 05 Apr 2023 19:51:21 -0700 (PDT)
+        with ESMTP id S235035AbjDFCwA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Apr 2023 22:52:00 -0400
+Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80CA57290
+        for <kvm@vger.kernel.org>; Wed,  5 Apr 2023 19:51:23 -0700 (PDT)
+Received: by mail-pf1-x449.google.com with SMTP id a22-20020a62d416000000b0062e2649a33cso3127254pfh.16
+        for <kvm@vger.kernel.org>; Wed, 05 Apr 2023 19:51:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1680749481;
+        d=google.com; s=20210112; t=1680749483;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=Pg/t5eKKcauYZOGS2LFUsmCQ+1p6GjxyESTrzGnm0pI=;
-        b=W42cmTp/7CQXc8fkvRG+L+uZ6JR+Xkouct1f3c3JtRxLrGDA1G05BjNsS/HR17TDgV
-         bRoYkj7BAxyh2zKh8bI+EJZyISo/bIxvsJw7vOxNnU9eKKijz/MvP1h33vNXWm1NSMr1
-         KFyjaJ8/U7qnUfTkxGDluizXHCL2vgR8N2CWLnhSolxgebBkf179PwlTsomxNNPHQAsn
-         T2QzQpxTuJjUsiYgeYYZBmK/RvALW/+umzijwe0lXl74XMZQO6ZrSt23Na3tGyvJbA85
-         0IGT8MkPleZ81/KFYEwUB4+SlZbyzP41FPErTGt1NMw05eSiLYkMOh3r4+chkn+CFlS0
-         ic8A==
+        bh=LhuSJTdTS3WJC/krBqX0xLoMwPwrduVVFYKHNTNPgh8=;
+        b=H1nDfrjST4MB/4Wggf4/3no4PKfOBxIZEarXZefoul1DdpKN/TSIrpYyF9r0GaY9CB
+         y8OOPv8ugqUhFBf67Q5VvKW+jjHCqDjBDhEJujbIt6w8/usGS12uIZnoma5dMzbjWOCO
+         pNBd+QwndUkidsBGTTE7GvhmSTh7wYsiXJbNb53InflKIzgaj8WSP2NCtyarq035UeuC
+         2/34H32cXh7d0RpLLutusI35t/9cvC6jQULtPlyM9SI7crc2WxUfBJRzctj2tHmh1vdG
+         Oe40KTMZ2XcxGoO3wApnQ1cGE002clMeAAcOyEG9iny3DsjgoT2WoIIIeBwRGAkPVHFX
+         N55Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680749481;
+        d=1e100.net; s=20210112; t=1680749483;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=Pg/t5eKKcauYZOGS2LFUsmCQ+1p6GjxyESTrzGnm0pI=;
-        b=ChmQrejLHkAHPewJm+LzWqSaKYnzEzOuS7YU1GTUcp9RXHsG0nGMOagS9xLqbhrpWL
-         l7bWULf4fYbAEuteGN54Y37viIVt+wjW3+zDfvGAgXSfPXcJM4Tg9vTme2OoQ6F7vPvD
-         zIUJC48hXIWs77aSxgN1RrrzaHvkmi1FEqqNTXrkOGPOT5WQqEAHHVReeQLqGYob7Szz
-         otiukGG7zwqWOF7TAleRipP6QRHplmxBVtGsQnCkUGMz9zCQCW1aQf+nl0UB3Vgybsfx
-         7Z9RkTGjioMD4jC/22skyvfQFWnm0NyegjaHJzIWtK5Csdf9VqRPs4+Es5PUdBa3uwiG
-         iKLA==
-X-Gm-Message-State: AAQBX9cEyz4pTbATVJB5MCEyz1dVbN+UKc3dF5/URQNg93BWsQdrBkF4
-        RrEf7r9fNk5KsDdkLyGOaHhwRoIT7xE=
-X-Google-Smtp-Source: AKy350YwsE4pKtAXhOTX0faSUeo8exEJu25iKGG5OdmnvpdXzr0A0tpy31tuJsY3HdYs/ED4yf5NaET7jEU=
+        bh=LhuSJTdTS3WJC/krBqX0xLoMwPwrduVVFYKHNTNPgh8=;
+        b=OdZOO3POyT0ggubDVfJBMcye8/bv4n7QKjEiPcwhuYubK26IHM2+DjGBkPVkRjSNex
+         4xalcIr90x+wc1xZiu/m/6lFI9GluXy+OE8csohdZ/cHQHfpIgpQZZBhCL/D182F9V9Q
+         J3bBgfj5q7PURUPFgJG4AuXdoB1VvKNz1WegWzcAOXmL7mN13brICfjdUWY+/cMbd8d3
+         X7oQDAkOGB9c3B9VfbCwUrpMrFIT9OEvLy8kyfItNuHK/stNcdcCaKaOsPLrE4sMJjbb
+         jJhYpTqsldCOX6O0Ekh9e3ThjYWlvwU82XM6l/uYx9phUBvtZ02jYXCiYVm/zS/5tYDi
+         CH+A==
+X-Gm-Message-State: AAQBX9dIZG2rvHVe+uzCSxlT6yJ8hO5O5lEPc2NwxxqV2E/Frvk80Qbr
+        P6NLyXD2hFUxmolTjrT8JgaL7BQzk4Y=
+X-Google-Smtp-Source: AKy350aknpti9kC0OFx45bvxl3h/7/b8wXvvY7QgP3i7+ivnHkyfR4yMeZGjgAZIPr0z/Gk637oVA2Wn90k=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:903:1c7:b0:1a2:185a:cd6 with SMTP id
- e7-20020a17090301c700b001a2185a0cd6mr3616513plh.4.1680749481167; Wed, 05 Apr
- 2023 19:51:21 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a17:90a:4591:b0:234:acfd:c8da with SMTP id
+ v17-20020a17090a459100b00234acfdc8damr3048420pjg.2.1680749483105; Wed, 05 Apr
+ 2023 19:51:23 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Wed,  5 Apr 2023 19:51:13 -0700
+Date:   Wed,  5 Apr 2023 19:51:14 -0700
 In-Reply-To: <20230406025117.738014-1-seanjc@google.com>
 Mime-Version: 1.0
 References: <20230406025117.738014-1-seanjc@google.com>
 X-Mailer: git-send-email 2.40.0.348.gf938b09366-goog
-Message-ID: <20230406025117.738014-2-seanjc@google.com>
-Subject: [kvm-unit-tests PATCH 1/5] x86: Add macros to wrap ASM_TRY() for
- single instructions
+Message-ID: <20230406025117.738014-3-seanjc@google.com>
+Subject: [kvm-unit-tests PATCH 2/5] x86: Convert inputs-only "safe"
+ instruction helpers to asm_safe()
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>
@@ -69,148 +69,69 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add asm_safe(), asm_safe_report(), and asm_safe_report_ex() macros to
-reduce the boilerplate needed for using ASM_TRY() with a single
-instruction.
-
-Convert the memory test to the report variants to showcase the usage.
+Convert processor.h's "safe" helpers that do not have outputs to use
+asm_safe() instead of open coding the equivalent.  Leave instructions
+without outputs for a separate, future change as handling outputs is a
+bit more complex.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- lib/x86/desc.h | 26 ++++++++++++++++++++++
- x86/memory.c   | 60 ++++++++++++--------------------------------------
- 2 files changed, 40 insertions(+), 46 deletions(-)
+ lib/x86/processor.h | 21 ++++-----------------
+ 1 file changed, 4 insertions(+), 17 deletions(-)
 
-diff --git a/lib/x86/desc.h b/lib/x86/desc.h
-index c023b932..8079d462 100644
---- a/lib/x86/desc.h
-+++ b/lib/x86/desc.h
-@@ -272,4 +272,30 @@ extern gdt_entry_t *get_tss_descr(void);
- extern unsigned long get_gdt_entry_base(gdt_entry_t *entry);
- extern unsigned long get_gdt_entry_limit(gdt_entry_t *entry);
- 
-+#define asm_safe(insn, inputs...)					\
-+({									\
-+	asm volatile(ASM_TRY("1f")					\
-+		     insn "\n\t"					\
-+		     "1:\n\t"						\
-+		     :							\
-+		     : inputs						\
-+		     : "memory");					\
-+	exception_vector();						\
-+})
-+
-+#define __asm_safe_report(want, insn, inputs...)			\
-+do {									\
-+	int vector = asm_safe(insn, inputs);				\
-+									\
-+	report(vector == want, "Expected %s on '%s', got %s",		\
-+	       want ? exception_mnemonic(want) : "SUCCESS",		\
-+	       insn,							\
-+	       vector ? exception_mnemonic(vector) : "SUCCESS");	\
-+} while (0)
-+
-+#define asm_safe_report(insn, inputs...)				\
-+	__asm_safe_report(0, insn, inputs)
-+
-+#define asm_safe_report_ex __asm_safe_report
-+
- #endif
-diff --git a/x86/memory.c b/x86/memory.c
-index 58ef835e..ebfeceae 100644
---- a/x86/memory.c
-+++ b/x86/memory.c
-@@ -14,76 +14,44 @@
- #include "processor.h"
- 
- static long target;
--static volatile int ud;
--static volatile int isize;
--
--static void handle_ud(struct ex_regs *regs)
--{
--	ud = 1;
--	regs->rip += isize;
--}
- 
- int main(int ac, char **av)
+diff --git a/lib/x86/processor.h b/lib/x86/processor.h
+index 6555056e..e05b3fd0 100644
+--- a/lib/x86/processor.h
++++ b/lib/x86/processor.h
+@@ -434,11 +434,7 @@ static inline int wrmsr_safe(u32 index, u64 val)
  {
--	handle_exception(UD_VECTOR, handle_ud);
--
--	/* 3-byte instructions: */
--	isize = 3;
--
--	if (this_cpu_has(X86_FEATURE_CLFLUSH)) { /* CLFLUSH */
--		ud = 0;
--		asm volatile("clflush (%0)" : : "b" (&target));
--		report(!ud, "clflush");
--	} else {
-+	if (this_cpu_has(X86_FEATURE_CLFLUSH))
-+		asm_safe_report("clflush (%0)", "b" (&target));
-+	else
- 		report_skip("clflush");
--	}
+ 	u32 a = val, d = val >> 32;
  
--	if (this_cpu_has(X86_FEATURE_XMM)) { /* SSE */
--		ud = 0;
--		asm volatile("sfence");
--		report(!ud, "sfence");
--	} else {
-+	if (this_cpu_has(X86_FEATURE_XMM))
-+		asm_safe_report("sfence");
-+	else
- 		report_skip("sfence");
--	}
+-	asm volatile (ASM_TRY("1f")
+-		      "wrmsr\n\t"
+-		      "1:"
+-		      : : "a"(a), "d"(d), "c"(index) : "memory");
+-	return exception_vector();
++	return asm_safe("wrmsr", "a"(a), "d"(d), "c"(index));
+ }
  
--	if (this_cpu_has(X86_FEATURE_XMM2)) { /* SSE2 */
--		ud = 0;
--		asm volatile("lfence");
--		report(!ud, "lfence");
--		ud = 0;
--		asm volatile("mfence");
--		report(!ud, "mfence");
-+	if (this_cpu_has(X86_FEATURE_XMM2)) {
-+		asm_safe_report("lfence");
-+		asm_safe_report("mfence");
- 	} else {
- 		report_skip("lfence");
- 		report_skip("mfence");
- 	}
+ static inline int rdpmc_safe(u32 index, uint64_t *val)
+@@ -465,10 +461,7 @@ static inline uint64_t rdpmc(uint32_t index)
  
--	/* 4-byte instructions: */
--	isize = 4;
--
--	if (this_cpu_has(X86_FEATURE_CLFLUSHOPT)) { /* CLFLUSHOPT */
--		ud = 0;
-+	if (this_cpu_has(X86_FEATURE_CLFLUSHOPT)) {
- 		/* clflushopt (%rbx): */
--		asm volatile(".byte 0x66, 0x0f, 0xae, 0x3b" : : "b" (&target));
--		report(!ud, "clflushopt");
-+		asm_safe_report(".byte 0x66, 0x0f, 0xae, 0x3b", "b" (&target));
- 	} else {
- 		report_skip("clflushopt");
- 	}
+ static inline int write_cr0_safe(ulong val)
+ {
+-	asm volatile(ASM_TRY("1f")
+-		     "mov %0,%%cr0\n\t"
+-		     "1:": : "r" (val));
+-	return exception_vector();
++	return asm_safe("mov %0,%%cr0", "r" (val));
+ }
  
--	if (this_cpu_has(X86_FEATURE_CLWB)) { /* CLWB */
--		ud = 0;
-+	if (this_cpu_has(X86_FEATURE_CLWB)) {
- 		/* clwb (%rbx): */
--		asm volatile(".byte 0x66, 0x0f, 0xae, 0x33" : : "b" (&target));
--		report(!ud, "clwb");
-+		asm_safe_report(".byte 0x66, 0x0f, 0xae, 0x33", "b" (&target));
- 	} else {
- 		report_skip("clwb");
- 	}
+ static inline void write_cr0(ulong val)
+@@ -500,10 +493,7 @@ static inline ulong read_cr2(void)
  
- 	if (this_cpu_has(X86_FEATURE_PCOMMIT)) { /* PCOMMIT */
--		ud = 0;
- 		/* pcommit: */
--		asm volatile(".byte 0x66, 0x0f, 0xae, 0xf8");
--		report(!ud, "pcommit");
-+		asm_safe_report(".byte 0x66, 0x0f, 0xae, 0xf8");
- 	} else {
- 		report_skip("pcommit");
- 	}
+ static inline int write_cr3_safe(ulong val)
+ {
+-	asm volatile(ASM_TRY("1f")
+-		     "mov %0,%%cr3\n\t"
+-		     "1:": : "r" (val));
+-	return exception_vector();
++	return asm_safe("mov %0,%%cr3", "r" (val));
+ }
+ 
+ static inline void write_cr3(ulong val)
+@@ -528,10 +518,7 @@ static inline void update_cr3(void *cr3)
+ 
+ static inline int write_cr4_safe(ulong val)
+ {
+-	asm volatile(ASM_TRY("1f")
+-		     "mov %0,%%cr4\n\t"
+-		     "1:": : "r" (val));
+-	return exception_vector();
++	return asm_safe("mov %0,%%cr4", "r" (val));
+ }
+ 
+ static inline void write_cr4(ulong val)
 -- 
 2.40.0.348.gf938b09366-goog
 
