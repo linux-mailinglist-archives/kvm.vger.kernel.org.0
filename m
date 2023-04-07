@@ -2,73 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BF0AF6DAA9C
-	for <lists+kvm@lfdr.de>; Fri,  7 Apr 2023 11:07:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C62F66DAB14
+	for <lists+kvm@lfdr.de>; Fri,  7 Apr 2023 11:49:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231831AbjDGJHK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Apr 2023 05:07:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55316 "EHLO
+        id S229437AbjDGJtA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Apr 2023 05:49:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60486 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240136AbjDGJHI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 7 Apr 2023 05:07:08 -0400
-Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99A349039
-        for <kvm@vger.kernel.org>; Fri,  7 Apr 2023 02:07:07 -0700 (PDT)
-Received: by mail-pj1-x1036.google.com with SMTP id 60-20020a17090a09c200b0023fcc8ce113so848977pjo.4
-        for <kvm@vger.kernel.org>; Fri, 07 Apr 2023 02:07:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1680858427; x=1683450427;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=fuU1GOhfFqEu9fr2GUTYU92iqTBEkWnn/6trmftCB3U=;
-        b=c5331ZYhlAf9NHeQRvbgLNwiED4MEO0yjSDuDDRJm1slKE53JxZZNhhqtFN1NcSpyO
-         0R6VgAQmGAdux5an4zR62DCyJoYb1nPtmeXQ++Ai5YmNwQmPmSQYE7nqlU6G7ksPr0zx
-         L6qAnn0VrwGM2jkW/I64ccJM0i1bJFD1tWBIX+YgMVV4ejz6bzHRSb9hhpT0CaLH2z1r
-         d9Xs3I+IJ28oKH3D7BaVc6sKND14b96STdwDyFI4uVgVdRGzr/H8HxDat5k3qtUf8Evm
-         +evFU78U6vGi3aZb+74rNGFJf1LIHOrtoIvEwWfY5+M8lqzpRZ69xkJQngwjgo2KVOgw
-         oe9A==
+        with ESMTP id S232540AbjDGJs5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 7 Apr 2023 05:48:57 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79DB049FF
+        for <kvm@vger.kernel.org>; Fri,  7 Apr 2023 02:48:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1680860892;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=o4iRHgbQhPwVpyJmMFVyQJvJ+/Z7zOQeM679Xa5eK6c=;
+        b=iSlEb6dRvXMDop5RMYRqn5Njq7rKFqLE/qz6/OPdrW24enisci/r5c5cefC2WmekTn136F
+        yMwSvBYrCh77g3Y27frbugvhQjP1YYEA55cWs2M7Aa7LlX0r1hnYbKZdj/CqqIsK3hnCI0
+        BHHETUeX+C5BuGw3KBFwJYFkzHxtipA=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-554-DpzDG5kcNnSTHF3qS6TxtA-1; Fri, 07 Apr 2023 05:48:11 -0400
+X-MC-Unique: DpzDG5kcNnSTHF3qS6TxtA-1
+Received: by mail-wm1-f70.google.com with SMTP id u12-20020a05600c19cc00b003f07be0e96bso320973wmq.7
+        for <kvm@vger.kernel.org>; Fri, 07 Apr 2023 02:48:10 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680858427; x=1683450427;
+        d=1e100.net; s=20210112; t=1680860890;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=fuU1GOhfFqEu9fr2GUTYU92iqTBEkWnn/6trmftCB3U=;
-        b=xb5uSD9DPkqKVCUhCWLotwLYd2zRCPGIDfzRsYZPEQMVK93z+IJwWZH5cUcsDIRpfx
-         9NqiQ9PH3Rh2EDcuzpITXAIJVGEVGMs0l3oAUD8NtvDe4ua/S26gC8lHUE5lXK3HQH2p
-         48yT4P2q0dXKyYHvBOnOYQ0O6Wa5RnjYhTBB/dDZoyhRKXymXpMzhFArjfnwDwHAY9Rc
-         +spcpJ3RgM+8uQyqmMdA1LPoca/If+LoNcABPhZgp3qxEhCcEIJsswNSDm8bwiNMWH27
-         u+mwPmBLGN/nACA56TUFcyarkPOmXgL6OL9dR2zd0E9EboJEkd8grZuGopROlcM76M31
-         +5oA==
-X-Gm-Message-State: AAQBX9d3+QZ2CI5ED8N3YxQwymRlTj+z3LMpeCJ/OaaWkIHePuE5FnvS
-        SIolRM9txvuSmvSlD1hUmcE=
-X-Google-Smtp-Source: AKy350Z4BiCgDj9xxE4kQycnG29Q23k3G5Y+x5MCltKyRz51o7RwRLnGdFuWHZYOsWOzjohPharrUw==
-X-Received: by 2002:a17:903:41cd:b0:19a:9833:6f8 with SMTP id u13-20020a17090341cd00b0019a983306f8mr2547086ple.35.1680858427071;
-        Fri, 07 Apr 2023 02:07:07 -0700 (PDT)
-Received: from [192.168.255.10] ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id q9-20020a635049000000b0050336b0b08csm2275370pgl.19.2023.04.07.02.07.05
+         :content-language:subject:reply-to:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=o4iRHgbQhPwVpyJmMFVyQJvJ+/Z7zOQeM679Xa5eK6c=;
+        b=0wStaDOw8L9vYb/L7jbeNOwvne0+rYPPfdPIcEsXlRFyckowjrycFpFUZcKk82RNK1
+         4iZK+MHiysUlvGedV4U0erW88eYD4GnZ87mz/0VU6Ap2r04xf5PVuyFqYUm7a+KTaG7J
+         uze2E+JRPqa6uw1spQ7fhk4KXjiSqWNYnHo6/wNq7GYrDwwRyI2qgMIAdgN/9lUle6sd
+         6niX8ceNeXlua0CyZ7HBhbG56iRG1SokL2LWbMLnYbo5hZRKaj90se6sy5V80s+yiJFP
+         v6PqEFlitTxm7nblUkQ6jvRVSvqtZn+xe+A11a0q7ELQRVdCXhFIkGchNx7rgKi3SKkm
+         FvwQ==
+X-Gm-Message-State: AAQBX9eBX5WW2r9N+o5tJ1YADxSjQiYYV277vFxieYaPLamcYzGzgSMm
+        3UAeYf7oy4sGD9FC4LpthHThExCuw4qATyKdEUvVVIidAsl1cxhfSlxHq1P0hY7k4lESN5fYBMD
+        ObmezyT8QUubT
+X-Received: by 2002:a05:600c:204d:b0:3ea:e4f8:be09 with SMTP id p13-20020a05600c204d00b003eae4f8be09mr909008wmg.30.1680860889934;
+        Fri, 07 Apr 2023 02:48:09 -0700 (PDT)
+X-Google-Smtp-Source: AKy350ZlpsPfpxKVEL2171G53vaHOkQSd6+4Svqt/X88zEcX4kRYEeQU3ue1qYmeM1kP8/bXxozatA==
+X-Received: by 2002:a05:600c:204d:b0:3ea:e4f8:be09 with SMTP id p13-20020a05600c204d00b003eae4f8be09mr908998wmg.30.1680860889634;
+        Fri, 07 Apr 2023 02:48:09 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id a2-20020a1cf002000000b003f049a42689sm4103205wmb.25.2023.04.07.02.48.06
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 07 Apr 2023 02:07:06 -0700 (PDT)
-Message-ID: <fa000dc8-22e6-bafe-01c8-a18242fd1055@gmail.com>
-Date:   Fri, 7 Apr 2023 17:06:58 +0800
+        Fri, 07 Apr 2023 02:48:07 -0700 (PDT)
+Message-ID: <05d59a7e-fa75-a93e-95a5-a376c00721d5@redhat.com>
+Date:   Fri, 7 Apr 2023 11:48:05 +0200
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.9.1
-Subject: Re: [PATCH v3 0/5] Fix "Instructions Retired" from incorrectly
- counting
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.0
+Reply-To: eric.auger@redhat.com
+Subject: Re: [PATCH v9 10/25] vfio: Make vfio_device_open() single open for
+ device cdev path
 Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     pbonzini@redhat.com, jmattson@google.com,
-        Aaron Lewis <aaronlewis@google.com>,
-        kvm list <kvm@vger.kernel.org>
-References: <20230307141400.1486314-1-aaronlewis@google.com>
-From:   Like Xu <like.xu.linux@gmail.com>
-In-Reply-To: <20230307141400.1486314-1-aaronlewis@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+To:     Yi Liu <yi.l.liu@intel.com>, alex.williamson@redhat.com,
+        jgg@nvidia.com, kevin.tian@intel.com
+Cc:     joro@8bytes.org, robin.murphy@arm.com, cohuck@redhat.com,
+        nicolinc@nvidia.com, kvm@vger.kernel.org, mjrosato@linux.ibm.com,
+        chao.p.peng@linux.intel.com, yi.y.sun@linux.intel.com,
+        peterx@redhat.com, jasowang@redhat.com,
+        shameerali.kolothum.thodi@huawei.com, lulu@redhat.com,
+        suravee.suthikulpanit@amd.com, intel-gvt-dev@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org, linux-s390@vger.kernel.org,
+        xudong.hao@intel.com, yan.y.zhao@intel.com, terrence.xu@intel.com,
+        yanting.jiang@intel.com
+References: <20230401151833.124749-1-yi.l.liu@intel.com>
+ <20230401151833.124749-11-yi.l.liu@intel.com>
+From:   Eric Auger <eric.auger@redhat.com>
+In-Reply-To: <20230401151833.124749-11-yi.l.liu@intel.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
-        DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+X-Spam-Status: No, score=-2.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -76,31 +93,90 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sean, would you pick this series up ?
+Hi Yi,
 
-On 7/3/2023 10:13 pm, Aaron Lewis wrote:
-> This series fixes an issue with the PMU event "Instructions Retired"
-> (0xc0), then tests the fix to verify it works.  Running the test
-> updates without the fix will result in a failed test.
-> 
-> v2 -> v3:
->   - s/pmc_is_allowed/event_is_allowed/ [Like]
-> 
-> v1 -> v2:
->   - Add pmc_is_allowed() as common helper [Sean]
->   - Split test into multiple commits [Sean]
->   - Add macros for counting and not counting [Sean]
->   - Removed un-needed pr_info [Sean]
-> 
-> 
-> Aaron Lewis (5):
->    KVM: x86/pmu: Prevent the PMU from counting disallowed events
->    KVM: selftests: Add a common helper to the guest
->    KVM: selftests: Add helpers for PMC asserts
->    KVM: selftests: Fixup test asserts
->    KVM: selftests: Test the PMU event "Instructions retired"
-> 
->   arch/x86/kvm/pmu.c                            |  13 +-
->   .../kvm/x86_64/pmu_event_filter_test.c        | 146 ++++++++++++------
->   2 files changed, 108 insertions(+), 51 deletions(-)
-> 
+On 4/1/23 17:18, Yi Liu wrote:
+> VFIO group has historically allowed multi-open of the device FD. This
+> was made secure because the "open" was executed via an ioctl to the
+> group FD which is itself only single open.
+>
+> However, no known use of multiple device FDs today. It is kind of a
+> strange thing to do because new device FDs can naturally be created
+> via dup().
+>
+> When we implement the new device uAPI (only used in cdev path) there is
+> no natural way to allow the device itself from being multi-opened in a
+> secure manner. Without the group FD we cannot prove the security context
+> of the opener.
+>
+> Thus, when moving to the new uAPI we block the ability of opening
+> a device multiple times. Given old group path still allows it we store
+> a vfio_group pointer in struct vfio_device_file to differentiate.
+>
+> Reviewed-by: Kevin Tian <kevin.tian@intel.com>
+> Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
+> Tested-by: Terrence Xu <terrence.xu@intel.com>
+> Tested-by: Nicolin Chen <nicolinc@nvidia.com>
+> Tested-by: Yanting Jiang <yanting.jiang@intel.com>
+> Signed-off-by: Yi Liu <yi.l.liu@intel.com>
+> ---
+>  drivers/vfio/group.c     | 2 ++
+>  drivers/vfio/vfio.h      | 2 ++
+>  drivers/vfio/vfio_main.c | 7 +++++++
+>  3 files changed, 11 insertions(+)
+>
+> diff --git a/drivers/vfio/group.c b/drivers/vfio/group.c
+> index d55ce3ca44b7..1af4b9e012a7 100644
+> --- a/drivers/vfio/group.c
+> +++ b/drivers/vfio/group.c
+> @@ -245,6 +245,8 @@ static struct file *vfio_device_open_file(struct vfio_device *device)
+>  		goto err_out;
+>  	}
+>  
+> +	df->group = device->group;
+> +
+in previous patches df fields were protected with various locks. I refer
+to vfio_device_group_open() implementation. No need here?
+
+By the way since the group is set here, wrt [PATCH v9 06/25] kvm/vfio:
+Accept vfio device file from userspace you have a way to determine if a
+device was opened in the legacy way, no?
+>  	ret = vfio_device_group_open(df);
+>  	if (ret)
+>  		goto err_free;
+> diff --git a/drivers/vfio/vfio.h b/drivers/vfio/vfio.h
+> index b2f20b78a707..f1a448f9d067 100644
+> --- a/drivers/vfio/vfio.h
+> +++ b/drivers/vfio/vfio.h
+> @@ -18,6 +18,8 @@ struct vfio_container;
+>  
+>  struct vfio_device_file {
+>  	struct vfio_device *device;
+> +	struct vfio_group *group;
+> +
+>  	bool access_granted;
+>  	spinlock_t kvm_ref_lock; /* protect kvm field */
+>  	struct kvm *kvm;
+> diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
+> index 6d5d3c2180c8..c8721d5d05fa 100644
+> --- a/drivers/vfio/vfio_main.c
+> +++ b/drivers/vfio/vfio_main.c
+> @@ -477,6 +477,13 @@ int vfio_device_open(struct vfio_device_file *df)
+>  
+>  	lockdep_assert_held(&device->dev_set->lock);
+>  
+> +	/*
+> +	 * Only the group path allows the device opened multiple times.
+allows the device to be opened multiple times
+> +	 * The device cdev path doesn't have a secure way for it.
+> +	 */
+> +	if (device->open_count != 0 && !df->group)
+> +		return -EINVAL;
+> +
+>  	device->open_count++;
+>  	if (device->open_count == 1) {
+>  		ret = vfio_device_first_open(df);
+Thanks
+
+Eric
+
