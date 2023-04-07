@@ -2,62 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7D2C86DA74C
-	for <lists+kvm@lfdr.de>; Fri,  7 Apr 2023 04:01:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 24E1D6DA76A
+	for <lists+kvm@lfdr.de>; Fri,  7 Apr 2023 04:06:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240171AbjDGCA7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 Apr 2023 22:00:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49008 "EHLO
+        id S240426AbjDGCGg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 Apr 2023 22:06:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33440 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239783AbjDGCA0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 Apr 2023 22:00:26 -0400
-Received: from loongson.cn (mail.loongson.cn [114.242.206.163])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C5BCD9EF9;
-        Thu,  6 Apr 2023 19:00:23 -0700 (PDT)
-Received: from loongson.cn (unknown [10.2.5.185])
-        by gateway (Coremail) with SMTP id _____8Axrto0eS9kpqcXAA--.25031S3;
-        Fri, 07 Apr 2023 10:00:20 +0800 (CST)
-Received: from localhost.localdomain (unknown [10.2.5.185])
-        by localhost.localdomain (Coremail) with SMTP id AQAAf8BxLL4jeS9k17sXAA--.23369S32;
-        Fri, 07 Apr 2023 10:00:19 +0800 (CST)
-From:   Tianrui Zhao <zhaotianrui@loongson.cn>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Huacai Chen <chenhuacai@kernel.org>,
-        WANG Xuerui <kernel@xen0n.name>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        loongarch@lists.linux.dev, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Mark Brown <broonie@kernel.org>,
-        Alex Deucher <alexander.deucher@amd.com>,
-        Oliver Upton <oliver.upton@linux.dev>, maobibo@loongson.cn,
-        Xi Ruoyao <xry111@xry111.site>, zhaotianrui@loongson.cn
-Subject: [PATCH v5 30/30] LoongArch: KVM: Supplement kvm document about loongarch-specific part
-Date:   Fri,  7 Apr 2023 10:00:03 +0800
-Message-Id: <20230407020003.3651096-31-zhaotianrui@loongson.cn>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20230407020003.3651096-1-zhaotianrui@loongson.cn>
-References: <20230407020003.3651096-1-zhaotianrui@loongson.cn>
+        with ESMTP id S231743AbjDGCGQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 Apr 2023 22:06:16 -0400
+Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EBD2AA5F8;
+        Thu,  6 Apr 2023 19:04:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1680833075; x=1712369075;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=2Od254oOAWniJ+pr2U34s6T+QW7hHIwDJe++sSvcJfo=;
+  b=Q3y3va4929ulAafMzC358ekFgqIrxM4ckUlaJIFq8jNlG35XGqI2beeH
+   n7+nGHyoCEw75WptnuTCCsJV3WqKQjRRex9gtKpQbAKT+HFbRYrWZMoIV
+   jNBe+2hUkJT7W0YEs3YM+X9G1RbfBFHz4D7ipAHUihK9t8+iRmVLuZwf2
+   LFYxY0+XMdDBIpAM7th5Q9yeALK/s4pdWF7lSwELda8yp602IkqugRVjY
+   IJzOzojFTQ8LJ9rhsj/w2G2cPA/URpKT+zVIlxHT8Os07lQNBxYynAeNX
+   qzmWATOJAo/oBOJgW6dti3yS9C0ruhqgx+oAo2tmXvzNaXXfjPRi5GDKP
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10672"; a="341646884"
+X-IronPort-AV: E=Sophos;i="5.98,324,1673942400"; 
+   d="scan'208";a="341646884"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Apr 2023 19:01:35 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10672"; a="798555760"
+X-IronPort-AV: E=Sophos;i="5.98,324,1673942400"; 
+   d="scan'208";a="798555760"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.254.212.181]) ([10.254.212.181])
+  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Apr 2023 19:01:31 -0700
+Message-ID: <a358d966-86f9-93f5-ded9-36a0ad0b538a@intel.com>
+Date:   Fri, 7 Apr 2023 10:01:29 +0800
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: AQAAf8BxLL4jeS9k17sXAA--.23369S32
-X-CM-SenderInfo: p2kd03xldq233l6o00pqjv00gofq/
-X-Coremail-Antispam: 1Uk129KBjvJXoW3AFyUuF4rtFW3WFy3uF1DGFg_yoW7Zr4DpF
-        ZIk34fKr48try7t34xJ34UXry3GFyxtF47C3Wftr1xC3Wjyw1kJrnFyrW8JFWUC348AF18
-        AF10yw4UCFyUAw7anT9S1TB71UUUUjJqnTZGkaVYY2UrUUUUj1kv1TuYvTs0mT0YCTnIWj
-        qI5I8CrVACY4xI64kE6c02F40Ex7xfYxn0WfASr-VFAUDa7-sFnT9fnUUIcSsGvfJTRUUU
-        bxxFc2x0x2IEx4CE42xK8VAvwI8IcIk0rVWrJVCq3wA2ocxC64kIII0Yj41l84x0c7CEw4
-        AK67xGY2AK021l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF
-        7I0E14v26r4UJVWxJr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aV
-        CY1x0267AKxVW8Jr0_Cr1UM2kKe7AKxVWUAVWUtwAS0I0E0xvYzxvE52x082IY62kv0487
-        Mc804VCY07AIYIkI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VCjz48v1s
-        IEY20_WwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41lc7CjxVAaw2AFwI0_
-        JF0_Jw1l42xK82IYc2Ij64vIr41l42xK82IY6x8ErcxFaVAv8VWrMxC20s026xCaFVCjc4
-        AY6r1j6r4UMxCIbckI1I0E14v26r126r1DMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCj
-        r7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6x
-        IIjxv20xvE14v26w1j6s0DMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8Jr0_Cr1UMIIF0xvE
-        42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVW8Jr0_Cr1UMIIF0xvEx4A2js
-        IEc7CjxVAFwI0_Gr1j6F4UJbIYCTnIWIevJa73UjIFyTuYvj4RKpBTUUUUU
-X-Spam-Status: No, score=-0.0 required=5.0 tests=SPF_HELO_PASS,SPF_PASS
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Firefox/102.0 Thunderbird/102.9.1
+Subject: Re: [PATCH 1/3] KVM: x86: Disallow enable KVM_CAP_X86_DISABLE_EXITS
+ capability after vCPUs have been created
+Content-Language: en-US
+To:     Hou Wenlong <houwenlong.hwl@antgroup.com>, kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Sean Christopherson <seanjc@google.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <9227068821b275ac547eb2ede09ec65d2281fe07.1680179693.git.houwenlong.hwl@antgroup.com>
+From:   Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <9227068821b275ac547eb2ede09ec65d2281fe07.1680179693.git.houwenlong.hwl@antgroup.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.7 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,HK_RANDOM_ENVFROM,
+        HK_RANDOM_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE
         autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -65,201 +70,65 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Supplement kvm document about loongarch-specific part, such as add
-api introduction for GET/SET_ONE_REG, GET/SET_FPU, GET/SET_MP_STATE,
-etc.
+On 3/30/2023 8:35 PM, Hou Wenlong wrote:
+> Disable PAUSE/MWAIT/HLT exits after vCPUs have been created is useless,
+> because PAUSE/MWAIT/HLT intercepts configuration is not changed after
+> vCPU created.  
 
-Signed-off-by: Tianrui Zhao <zhaotianrui@loongson.cn>
----
- Documentation/virt/kvm/api.rst | 75 ++++++++++++++++++++++++++++++----
- 1 file changed, 66 insertions(+), 9 deletions(-)
+PAUSE intercepts can be updated via 
+SET_CPUID->vmx_vcpu_after_set_cpuid() after vCPU is created.
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index a5c803f39..3d4a22e06 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -416,6 +416,12 @@ Reads the general purpose registers from the vcpu.
- 	__u64 pc;
-   };
- 
-+  /* loongarch */
-+  struct kvm_regs {
-+        unsigned long gpr[32];
-+        unsigned long pc;
-+};
-+
- 
- 4.12 KVM_SET_REGS
- -----------------
-@@ -506,7 +512,7 @@ translation mode.
- ------------------
- 
- :Capability: basic
--:Architectures: x86, ppc, mips, riscv
-+:Architectures: x86, ppc, mips, riscv, loongarch
- :Type: vcpu ioctl
- :Parameters: struct kvm_interrupt (in)
- :Returns: 0 on success, negative on failure.
-@@ -592,6 +598,14 @@ b) KVM_INTERRUPT_UNSET
- 
- This is an asynchronous vcpu ioctl and can be invoked from any thread.
- 
-+LOONGARCH:
-+^^^^^^^^^^
-+
-+Queues an external interrupt to be injected into the virtual CPU. A negative
-+interrupt number dequeues the interrupt.
-+
-+This is an asynchronous vcpu ioctl and can be invoked from any thread.
-+
- 
- 4.17 KVM_DEBUG_GUEST
- --------------------
-@@ -737,7 +751,7 @@ signal mask.
- ----------------
- 
- :Capability: basic
--:Architectures: x86
-+:Architectures: x86, loongarch
- :Type: vcpu ioctl
- :Parameters: struct kvm_fpu (out)
- :Returns: 0 on success, -1 on error
-@@ -746,7 +760,7 @@ Reads the floating point state from the vcpu.
- 
- ::
- 
--  /* for KVM_GET_FPU and KVM_SET_FPU */
-+  /* x86: for KVM_GET_FPU and KVM_SET_FPU */
-   struct kvm_fpu {
- 	__u8  fpr[8][16];
- 	__u16 fcw;
-@@ -761,12 +775,22 @@ Reads the floating point state from the vcpu.
- 	__u32 pad2;
-   };
- 
-+  /* loongarch: for KVM_GET_FPU and KVM_SET_FPU */
-+  struct kvm_fpu {
-+        __u32 fcsr;
-+        __u32 none;
-+        __u64 fcc;
-+        struct kvm_fpureg {
-+                __u64 val64[4];
-+        }fpr[32];
-+  };
-+
- 
- 4.23 KVM_SET_FPU
- ----------------
- 
- :Capability: basic
--:Architectures: x86
-+:Architectures: x86 loongarch
- :Type: vcpu ioctl
- :Parameters: struct kvm_fpu (in)
- :Returns: 0 on success, -1 on error
-@@ -775,7 +799,7 @@ Writes the floating point state to the vcpu.
- 
- ::
- 
--  /* for KVM_GET_FPU and KVM_SET_FPU */
-+  /* x86: for KVM_GET_FPU and KVM_SET_FPU */
-   struct kvm_fpu {
- 	__u8  fpr[8][16];
- 	__u16 fcw;
-@@ -790,6 +814,16 @@ Writes the floating point state to the vcpu.
- 	__u32 pad2;
-   };
- 
-+  /* loongarch: for KVM_GET_FPU and KVM_SET_FPU */
-+  struct kvm_fpu {
-+        __u32 fcsr;
-+        __u32 none;
-+        __u64 fcc;
-+        struct kvm_fpureg {
-+                __u64 val64[4];
-+        }fpr[32];
-+  };
-+
- 
- 4.24 KVM_CREATE_IRQCHIP
- -----------------------
-@@ -1387,7 +1421,7 @@ documentation when it pops into existence).
- -------------------
- 
- :Capability: KVM_CAP_ENABLE_CAP
--:Architectures: mips, ppc, s390, x86
-+:Architectures: mips, ppc, s390, x86, loongarch
- :Type: vcpu ioctl
- :Parameters: struct kvm_enable_cap (in)
- :Returns: 0 on success; -1 on error
-@@ -1442,7 +1476,7 @@ for vm-wide capabilities.
- ---------------------
- 
- :Capability: KVM_CAP_MP_STATE
--:Architectures: x86, s390, arm64, riscv
-+:Architectures: x86, s390, arm64, riscv, loongarch
- :Type: vcpu ioctl
- :Parameters: struct kvm_mp_state (out)
- :Returns: 0 on success; -1 on error
-@@ -1460,7 +1494,7 @@ Possible values are:
- 
-    ==========================    ===============================================
-    KVM_MP_STATE_RUNNABLE         the vcpu is currently running
--                                 [x86,arm64,riscv]
-+                                 [x86,arm64,riscv,loongarch]
-    KVM_MP_STATE_UNINITIALIZED    the vcpu is an application processor (AP)
-                                  which has not yet received an INIT signal [x86]
-    KVM_MP_STATE_INIT_RECEIVED    the vcpu has received an INIT signal, and is
-@@ -1516,11 +1550,16 @@ For riscv:
- The only states that are valid are KVM_MP_STATE_STOPPED and
- KVM_MP_STATE_RUNNABLE which reflect if the vcpu is paused or not.
- 
-+For loongarch:
-+^^^^^^^^^^^^^^
-+
-+The KVM_MP_STATE_RUNNABLE state is only used which reflect the vcpu is runnable.
-+
- 4.39 KVM_SET_MP_STATE
- ---------------------
- 
- :Capability: KVM_CAP_MP_STATE
--:Architectures: x86, s390, arm64, riscv
-+:Architectures: x86, s390, arm64, riscv, loongarch
- :Type: vcpu ioctl
- :Parameters: struct kvm_mp_state (in)
- :Returns: 0 on success; -1 on error
-@@ -1538,6 +1577,11 @@ For arm64/riscv:
- The only states that are valid are KVM_MP_STATE_STOPPED and
- KVM_MP_STATE_RUNNABLE which reflect if the vcpu should be paused or not.
- 
-+For loongarch:
-+^^^^^^^^^^^^^^
-+
-+The KVM_MP_STATE_RUNNABLE state is only used which reflect the vcpu is runnable.
-+
- 4.40 KVM_SET_IDENTITY_MAP_ADDR
- ------------------------------
- 
-@@ -2839,6 +2883,19 @@ Following are the RISC-V D-extension registers:
-   0x8020 0000 0600 0020 fcsr      Floating point control and status register
- ======================= ========= =============================================
- 
-+LoongArch registers are mapped using the lower 32 bits. The upper 16 bits of
-+that is the register group type.
-+
-+LoongArch csr registers are used to control guest cpu or get status of guest
-+cpu, and they have the following id bit patterns::
-+
-+  0x9030 0000 0001 00 <reg:5> <sel:3>   (64-bit)
-+
-+LoongArch KVM control registers are used to implement some new defined functions
-+such as set vcpu counter or reset vcpu, and they have the following id bit patterns::
-+
-+  0x9030 0000 0002 <reg:16>
-+
- 
- 4.69 KVM_GET_ONE_REG
- --------------------
--- 
-2.31.1
+Aside it, this patch looks good to me.
+
+> And two vCPUs may have inconsistent configuration if
+> disable PAUSE/MWAIT/HLT exits between those two vCPUs creation. Since
+> it's a per-VM capability, all vCPUs should keep same configuration, so
+> disallow enable KVM_CAP_X86_DISABLE_EXITS capability after vCPUs have
+> been created.
+> 
+> Signed-off-by: Hou Wenlong <houwenlong.hwl@antgroup.com>
+> ---
+>   Documentation/virt/kvm/api.rst | 3 ++-
+>   arch/x86/kvm/x86.c             | 5 +++++
+>   2 files changed, 7 insertions(+), 1 deletion(-)
+> 
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index a69e91088d76..95a683a27cf2 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -7179,7 +7179,8 @@ branch to guests' 0x200 interrupt vector.
+>   
+>   :Architectures: x86
+>   :Parameters: args[0] defines which exits are disabled
+> -:Returns: 0 on success, -EINVAL when args[0] contains invalid exits
+> +:Returns: 0 on success, -EINVAL when args[0] contains invalid exits or
+> +	  any vCPUs have been created.
+>   
+>   Valid bits in args[0] are::
+>   
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 2c0ff40e5345..7e97595465fc 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -6275,6 +6275,9 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+>   		if (cap->args[0] & ~KVM_X86_DISABLE_VALID_EXITS)
+>   			break;
+>   
+> +		mutex_lock(&kvm->lock);
+> +		if (kvm->created_vcpus)
+> +			goto disable_exits_unlock;
+>   		if (cap->args[0] & KVM_X86_DISABLE_EXITS_PAUSE)
+>   			kvm->arch.pause_in_guest = true;
+>   
+> @@ -6296,6 +6299,8 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+>   		}
+>   
+>   		r = 0;
+> +disable_exits_unlock:
+> +		mutex_unlock(&kvm->lock);
+>   		break;
+>   	case KVM_CAP_MSR_PLATFORM_INFO:
+>   		kvm->arch.guest_can_read_msr_platform_info = cap->args[0];
+> 
+> base-commit: 27d6845d258b67f4eb3debe062b7dacc67e0c393
 
