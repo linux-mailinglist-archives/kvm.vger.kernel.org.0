@@ -2,60 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 656146DA704
-	for <lists+kvm@lfdr.de>; Fri,  7 Apr 2023 03:39:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 26A626DA71B
+	for <lists+kvm@lfdr.de>; Fri,  7 Apr 2023 03:50:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239290AbjDGBjH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 Apr 2023 21:39:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40438 "EHLO
+        id S239408AbjDGBu5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 Apr 2023 21:50:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44856 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230440AbjDGBjF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 Apr 2023 21:39:05 -0400
+        with ESMTP id S229495AbjDGBu4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 Apr 2023 21:50:56 -0400
 Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3CBD5FFB
-        for <kvm@vger.kernel.org>; Thu,  6 Apr 2023 18:39:04 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id x15-20020a25accf000000b00b3b4535c48dso40618441ybd.7
-        for <kvm@vger.kernel.org>; Thu, 06 Apr 2023 18:39:04 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33CA9213C
+        for <kvm@vger.kernel.org>; Thu,  6 Apr 2023 18:50:55 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id w5-20020a253005000000b00aedd4305ff2so41068279ybw.13
+        for <kvm@vger.kernel.org>; Thu, 06 Apr 2023 18:50:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1680831544;
+        d=google.com; s=20210112; t=1680832254;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=cnRzfyzI+UY6zqZu7950JAiupbhaGdQtV9MG+1slD40=;
-        b=Y4524jRw3W+rLRsHRjuLlT9k7xi/MKQdxqdP39rTMH31JAwcXg/T7RAlYDa00xKnHM
-         BLHHvnUSaElmfo4D1komDu4DICeBntRTZtnX6afs3vytQ787D0fF8ZUQCPGdDLJDK2FB
-         wfdewcjzzxnF2vDrG4u5Bo1WpfbzYS55YfIOBuEQhaPQgB7eKCCY2s++K3wgUANmSN+L
-         s5fitK3gubAuPeA2exKjwS/dNSbyyQ3jxhyp5ioa/txncG0CFd76sKBIWfHT0PihB/0u
-         Agy+pVUqnF924Y150/8wDl/aVpDubX32ssRYcYX/19BUbu7LqeMhDbPc+FYpEMUxmQLe
-         PjGQ==
+        bh=JowVrky1sJdaqIz82N9TZtKH8APFD0brvsJqK7PiSgc=;
+        b=VoAAmuxU0jHs+dSy5Fyk1n7oXhKdE/nFuTJCDoHeI+wV3/E+7tJ6st5i9QMFGkS+Xt
+         KItff21bALWu17UcdoQsCk4XiahsCjGpIBYMvUNelibdo8r14VaYcNROVPG5YA8+XFrk
+         7LVfGY+8E0QxIiBdkgX1BnJ8nCh1Pvn1MGrn7iit+vG1px6v4FPYi1RRFeltwST6J1iX
+         JML87NzWbjEqk6QEYRYGzu8zcnAgU1aJJLPkjjgl/TuV1/i6S+tNNBdFsrWYe5PURP7b
+         oexE1r3Y739tjvJrNC6/ZPssrXyYjDzt2JPNDC7oVH/F/Llh9h5GgBLKkqA6LtUWtsaa
+         tnyA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680831544;
+        d=1e100.net; s=20210112; t=1680832254;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=cnRzfyzI+UY6zqZu7950JAiupbhaGdQtV9MG+1slD40=;
-        b=JIB3EWFOQBYeqBlHE229MlT/E7hvI3pbbDoqcdQkJb0tPSVgjgVNzotzytMgSloYjA
-         M98j3JWMh7+JRyVGYDwWRnepBbNS2fPcsDYmgvaeVZHOH0JEBkhttBiCvSapQz0X3k19
-         17sl4jvko2JLAUOK4LtXuytaBTnaAMb5iVprbkMHs27nmdp1x6+32gSNRWaRrCivD8XO
-         6/f3GR0zcyFndaySkKMay/eMHgpFckHwJ4+UM29lflOD9p6OtQVfG3iUo0bwTABhPbKp
-         LPRJQ8MpHRP5eWvYmHcx18NvFcZQVGF5cRpjKWFCrH3qakNMY5+/XqZOIS8cyFsxD/X6
-         YpSA==
-X-Gm-Message-State: AAQBX9eML5ETzakOn5Ziv72WEUDqotaZxSODYJE6Fou+lBsF4kERIDDn
-        b9Tatwz224Z38alUpJ7f6MTfYvgdbPY=
-X-Google-Smtp-Source: AKy350b5Vsgx2wZUSbTO2NknkQL1122pL6zWUjx9ESwdl2mDLmZED3lD3f2PMeKjFd1n69JEwkvaeA7sPds=
+        bh=JowVrky1sJdaqIz82N9TZtKH8APFD0brvsJqK7PiSgc=;
+        b=TQ6Uh5MwhcRZIOZlzx8UfdjHOdFoUzY4YVp+kNvJoFADExEs8UJ8owZDfzoUj2ytge
+         KSe50PjdJe8gFvBc2Maw13+TdbRnoAl2kNdaIEnN8aCc3SYXHmjnfIav08HP0V6wrIu8
+         Skjs55kwrdPUjlAQM/aXg3bZZT9+PzP/5a0ZMqWiQuFyQEaka3ZiU34aXziGijOpYU6/
+         md6Ha8MHgupB9wq1fJmTq/Vwb9rDusZQCajKlFL1Dc2eztaXq2M9f4BT+26tFNkivffZ
+         k3GZADQ960hOMys3iOvsmfcNqT29gSTQfnR+4jHtf6tAJ7UYEJzd2+czZXGtHfAAfKyv
+         NGMQ==
+X-Gm-Message-State: AAQBX9eDARb6KHp73iNP9xaCpZ+u3p51rYs3iSDt3LXzEHLezaVu9lst
+        xCfJ5j5RNMcntSrIKOKWwHm45T3Mg8Y=
+X-Google-Smtp-Source: AKy350b/2615uacXu4PGtPnp7F39tKkNwP+m0AUlMDVtQgBK4+3c5IY/QdqO+HUQKksXHQUT/Efwh0H0xiQ=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:431e:0:b0:545:883a:544d with SMTP id
- q30-20020a81431e000000b00545883a544dmr175931ywa.9.1680831544075; Thu, 06 Apr
- 2023 18:39:04 -0700 (PDT)
-Date:   Thu, 6 Apr 2023 18:39:02 -0700
-In-Reply-To: <20230214050757.9623-7-likexu@tencent.com>
+ (user=seanjc job=sendgmr) by 2002:a25:d4d1:0:b0:b68:d117:305b with SMTP id
+ m200-20020a25d4d1000000b00b68d117305bmr767999ybf.10.1680832254517; Thu, 06
+ Apr 2023 18:50:54 -0700 (PDT)
+Date:   Thu, 6 Apr 2023 18:50:53 -0700
+In-Reply-To: <20230214050757.9623-13-likexu@tencent.com>
 Mime-Version: 1.0
-References: <20230214050757.9623-1-likexu@tencent.com> <20230214050757.9623-7-likexu@tencent.com>
-Message-ID: <ZC90Ni/DaoObtE7o@google.com>
-Subject: Re: [PATCH v4 06/12] KVM: x86/pmu: Make part of the Intel v2 PMU MSRs
- handling x86 generic
+References: <20230214050757.9623-1-likexu@tencent.com> <20230214050757.9623-13-likexu@tencent.com>
+Message-ID: <ZC92/WkJf9/AnABP@google.com>
+Subject: Re: [PATCH v4 12/12] KVM: x86/cpuid: Add AMD CPUID ExtPerfMonAndDbg
+ leaf 0x80000022
 From:   Sean Christopherson <seanjc@google.com>
 To:     Like Xu <like.xu.linux@gmail.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
+        linux-kernel@vger.kernel.org, Sandipan Das <sandipan.das@amd.com>
 Content-Type: text/plain; charset="us-ascii"
 X-Spam-Status: No, score=-7.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
@@ -68,130 +68,69 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On Tue, Feb 14, 2023, Like Xu wrote:
-> @@ -574,11 +569,61 @@ static void kvm_pmu_mark_pmc_in_use(struct kvm_vcpu *vcpu, u32 msr)
->  
->  int kvm_pmu_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->  {
-> +	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
-> +	u32 msr = msr_info->index;
-> +
-> +	switch (msr) {
-> +	case MSR_CORE_PERF_GLOBAL_STATUS:
-> +		msr_info->data = pmu->global_status;
-> +		return 0;
-> +	case MSR_CORE_PERF_GLOBAL_CTRL:
-> +		msr_info->data = pmu->global_ctrl;
-> +		return 0;
-> +	case MSR_CORE_PERF_GLOBAL_OVF_CTRL:
-> +		msr_info->data = 0;
-> +		return 0;
-> +	default:
-> +		break;
-> +	}
-> +
->  	return static_call(kvm_x86_pmu_get_msr)(vcpu, msr_info);
->  }
->  
->  int kvm_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->  {
-> +	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
-> +	u32 msr = msr_info->index;
-> +	u64 data = msr_info->data;
-> +	u64 diff;
-> +
-> +	switch (msr) {
-> +	case MSR_CORE_PERF_GLOBAL_STATUS:
-> +		if (!msr_info->host_initiated || (data & pmu->global_ovf_ctrl_mask))
-> +			return 1; /* RO MSR */
-> +
-> +		pmu->global_status = data;
-> +		return 0;
-> +	case MSR_CORE_PERF_GLOBAL_CTRL:
-> +		if (!kvm_valid_perf_global_ctrl(pmu, data))
-> +			return 1;
-> +
-> +		if (pmu->global_ctrl != data) {
-> +			diff = pmu->global_ctrl ^ data;
-> +			pmu->global_ctrl = data;
-> +			reprogram_counters(pmu, diff);
-> +		}
-> +		return 0;
-> +	case MSR_CORE_PERF_GLOBAL_OVF_CTRL:
-> +		if (data & pmu->global_ovf_ctrl_mask)
-> +			return 1;
-> +
-> +		if (!msr_info->host_initiated)
-> +			pmu->global_status &= ~data;
-> +		return 0;
-> +	default:
-> +		break;
-> +	}
-> +
->  	kvm_pmu_mark_pmc_in_use(vcpu, msr_info->index);
->  	return static_call(kvm_x86_pmu_set_msr)(vcpu, msr_info);
->  }
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index f4a4691b4f4e..2472fa8746c2 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -4916,6 +4916,12 @@ static __init void svm_set_cpu_caps(void)
+>  		} else {
+>  			/* AMD PMU PERFCTR_CORE CPUID */
+>  			kvm_cpu_cap_check_and_set(X86_FEATURE_PERFCTR_CORE);
+> +			/*
+> +			 * KVM only supports AMD PerfMon V2, even if it supports V3+.
 
-Please tweak these to follow the patterns for other MSR helpers (see below).  I
-don't actually mind the style, but people get used to the pattern and make mistakes
-when there are unexpected deviations.
+Ha!  A perfect example of why I strongly prefer that changelogs and comments avoid
+pronouns.  The above "it" reads as:
 
-int kvm_pmu_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
-{
-	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
-	u32 msr = msr_info->index;
+			 * KVM only supports AMD PerfMon V2, even if KVM supports V3+.
 
-	switch (msr) {
-	case MSR_CORE_PERF_GLOBAL_STATUS:
-		msr_info->data = pmu->global_status;
-		break;
-	case MSR_CORE_PERF_GLOBAL_CTRL:
-		msr_info->data = pmu->global_ctrl;
-		break;
-	case MSR_CORE_PERF_GLOBAL_OVF_CTRL:
-		msr_info->data = 0;
-		break;
-	default:
-		return static_call(kvm_x86_pmu_get_msr)(vcpu, msr_info);
-	}
+which is clearly nonsensical.
 
-	return 0;
-}
 
-int kvm_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
-{
-	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
-	u32 msr = msr_info->index;
-	u64 data = msr_info->data;
-	u64 diff;
+> +			 * For PerfMon V3+, it's unsafe to expect V2 bit is set or cleared.
 
-	switch (msr) {
-	case MSR_CORE_PERF_GLOBAL_STATUS:
-		if (!msr_info->host_initiated)
-			return 1; /* RO MSR */
+If it's unsafe to assume anything v3+ implying v2 support, then it's definitely
+not safe to assume that KVM can blindly set v2 without future changes.  I don't
+see any reason not to do
 
-		pmu->global_status = data;
-		break;
-	case MSR_CORE_PERF_GLOBAL_CTRL:
-		if (!kvm_valid_perf_global_ctrl(pmu, data))
-			return 1;
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index bd324962bb7e..1192f605ad47 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -756,6 +756,10 @@ void kvm_set_cpu_caps(void)
+                F(NULL_SEL_CLR_BASE) | F(AUTOIBRS) | 0 /* PrefetchCtlMsr */
+        );
+ 
++       kvm_cpu_cap_mask(CPUID_8000_0022_EAX,
++               F(PERFMON_V2)
++       );
++
+        /*
+         * Synthesize "LFENCE is serializing" into the AMD-defined entry in
+         * KVM's supported CPUID if the feature is reported as supported by the
 
-		if (pmu->global_ctrl != data) {
-			diff = pmu->global_ctrl ^ data;
-			pmu->global_ctrl = data;
-			reprogram_counters(pmu, diff);
-		}
-		break;
-	case MSR_CORE_PERF_GLOBAL_OVF_CTRL:
-		if (data & pmu->global_ovf_ctrl_mask)
-			return 1;
 
-		if (!msr_info->host_initiated)
-			pmu->global_status &= ~data;
-		break;
-	default:
-		kvm_pmu_mark_pmc_in_use(vcpu, msr_info->index);
-		return static_call(kvm_x86_pmu_set_msr)(vcpu, msr_info);
-	}
+and then this code can be:
 
-	return 0;
-}
+			if (kvm_pmu_cap.version != 2)
+				kvm_cpu_cap_clear(X86_FEATURE_PERFMON_V2);
+
+Ah, but presumably the
+
+		if (kvm_pmu_cap.num_counters_gp < AMD64_NUM_COUNTERS_CORE)
+
+path also needs to clear PERFMON_V2.  I think I'd still vote to grab host CPUID
+and clear here (instead of setting).
+
+What is the relationship between PERFCTR_CORE and PERFMON_V2?  E.g. if v2 depends
+on having PERFCTR_CORE, then we can do:
+
+	if (enable_pmu) {
+		if (kvm_pmu_cap.num_counters_gp < AMD64_NUM_COUNTERS_CORE)
+			kvm_pmu_cap.num_counters_gp = AMD64_NUM_COUNTERS;
+		else
+			kvm_cpu_cap_check_and_set(X86_FEATURE_PERFCTR_CORE);
+
+		if (kvm_pmu_cap.version != 2 ||
+		    !kvm_cpu_cap_has(X86_FEATURE_PERFCTR_CORE))
+			kvm_cpu_cap_clear(X86_FEATURE_PERFMON_V2);
