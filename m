@@ -2,59 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C1D646DA77F
-	for <lists+kvm@lfdr.de>; Fri,  7 Apr 2023 04:08:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C9F9B6DA7A2
+	for <lists+kvm@lfdr.de>; Fri,  7 Apr 2023 04:18:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240543AbjDGCIk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 Apr 2023 22:08:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36802 "EHLO
+        id S240440AbjDGCSn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 Apr 2023 22:18:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55240 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240419AbjDGCIY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 Apr 2023 22:08:24 -0400
+        with ESMTP id S240434AbjDGCSm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 Apr 2023 22:18:42 -0400
 Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F86EAD25
-        for <kvm@vger.kernel.org>; Thu,  6 Apr 2023 19:06:39 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id g187-20020a2520c4000000b00b74680a7904so40684615ybg.15
-        for <kvm@vger.kernel.org>; Thu, 06 Apr 2023 19:06:39 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E75410F4
+        for <kvm@vger.kernel.org>; Thu,  6 Apr 2023 19:18:41 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id j11-20020a25230b000000b00b6871c296bdso40407959ybj.5
+        for <kvm@vger.kernel.org>; Thu, 06 Apr 2023 19:18:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1680833196;
+        d=google.com; s=20210112; t=1680833920;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=wTyqhW8RWeLAixJpJjV1DL8fhOfJRXV99YLK1aO545A=;
-        b=FdAuY5D0K6rGqt3dXuqWsJz+tshuYx9UMAFV0YN5TsN5o9S9MjyXS8MopeiGSxaeRp
-         k4+a+PlnZv/GbxgufZRREhsi9iZ3WqfTr3U2tyHNNZzXL9A8OXHQjE7dA+Lbfwh4YZpa
-         X3LlRAjAxKsEqMzpW4tF7pzFg1xnkHTHlaXBjv5nP2IRmXgIGaUkPwbWjsD/Vz7znOsV
-         aLVYokzL3+LYmQRuNrHsATZDWxXXON7pkvynU5UTXiBvo4aJZ+f7OIVf8Hc1ueM6+yvr
-         JBvf61ejrM6gE0nQlgE0z4HTJsOYjXmgTqEb+UDo5dbxitLbn3y0v/iYFWmaVGFvZQbh
-         5pAQ==
+        bh=NM3Z7cWxI8VgV2XX878CM3uoNsycYkoMYtaVz8/N1I0=;
+        b=JGWnVDonFr7VmZ2kaJUOTe//CwQ+BYZhctxv/nQh12y8X44DdQq2iVCQBI9tqZxGd/
+         0KquaLo1cvhtPAH0IlRjD8MPKMTxKugwlzhjJP2l1LtcDbDXPBESuAwf1d1+k6MrnOHU
+         D1XiV1c3GqNobn2XqB1fnwGqP+9WYk7lHBPMfRDUR3kfJHOu91BelcC7JfjOFGDm/A3o
+         C9PGz6pf30pvdw5FFLM9QtCO5jfks1FeMiId2MdQjteS3SzYbfqIIgbFPiiX/egFsNX7
+         TuNT7xBKg7Vc99HIbCdDmBVlh/qyL3u20GMRE4UEsQjjDjnc/z1mWtAi+K2eBEF8WjNX
+         Wr9g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680833196;
+        d=1e100.net; s=20210112; t=1680833920;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=wTyqhW8RWeLAixJpJjV1DL8fhOfJRXV99YLK1aO545A=;
-        b=quSCaIYOdrnJrVKsZwiK/ndiaVVM2R5JOVHIBQwSICesLmBxCp8ZK8odIVV/1YOSUU
-         68CJr03gUERyCZfDMzdXzZfLWvtE8/7gBnEgVtS79Zrssv3bEe90dSsnmfflCivnpGvt
-         Ut5I1ntkAOqT4pO8eKeEl0nOK5+cAUyrm7+p2M5BUZvqOPduM3Sv0RIoxKrlf4sE3qz5
-         uK37LvM5dgryRTDD9fzs0A125+MTYSzLMfbU/mOX1aLUxfId6AVrdFlZPhys8MF15nrc
-         HCKboYZBJNphjon5Qtm60bptUQxExfBad00iPPgkNZ7n7pBNoMw7jwBgrlD1KSdbjIKi
-         8jWg==
-X-Gm-Message-State: AAQBX9cYAysUhjdM2Mz9D4oZrey7dxb29ul2QL04NBBsjtCXqQsZZw85
-        5KgVvNt8Zy8g9jyqAWwEgy8y8GBGakY=
-X-Google-Smtp-Source: AKy350aY3gStDXbuXOXQZq7mnfAib84JFsQtZRgICX3v3XmEECJJ+BRT+H6+5IhvQ40sE5U8r7OVonnf094=
+        bh=NM3Z7cWxI8VgV2XX878CM3uoNsycYkoMYtaVz8/N1I0=;
+        b=AJaPBuZ/DyIdSS+RKCKfA6LkK5DvJ25hWzPI3g73Bsn2S6P1wNOu5+ENyw1A2+k5yJ
+         38jYLQ7zrle8loHnOISF/PNbPNgu/mnxS5YY1973ImMoaziJAGqIPFrjalNob5OtIRya
+         JXzverv9B7oAdkmTKBsb8qRBAKrzMrgAh/xNeJskkqnbSy7eecJUckXZd6KRje3vv8MD
+         MBIHmynZ3NCodMegqevgvQaXd4eU+n4iehrIQjXQb6ofZfXpnYCQMZ7P7gzboEk3O//h
+         rHFImqrIGsam2DkAzsqrt/dX7WcTy2R7MRKUid6dEUzHz62mI/L+uZUSQYhPVNGV48DY
+         0puQ==
+X-Gm-Message-State: AAQBX9eAUElFa+YWK6n81T8l2hzgdZVGBQjpQc5rS2095tKyE54DKX4g
+        PEM68+bSWUh7veqDDmc/sxnBV2yBq4c=
+X-Google-Smtp-Source: AKy350a1NCLn+tgVEdl3G2usrimBWUcS0wPCR6h6zv+GoZPIROVYSl/Vegjn8xVBwAMs0hFntEsvbq4xRuw=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:c905:0:b0:b86:92c0:6433 with SMTP id
- z5-20020a25c905000000b00b8692c06433mr903796ybf.9.1680833196529; Thu, 06 Apr
- 2023 19:06:36 -0700 (PDT)
-Date:   Thu, 6 Apr 2023 19:06:35 -0700
-In-Reply-To: <20230307113819.34089-1-likexu@tencent.com>
+ (user=seanjc job=sendgmr) by 2002:a05:6902:909:b0:a27:3ecc:ffe7 with SMTP id
+ bu9-20020a056902090900b00a273eccffe7mr3536502ybb.3.1680833920841; Thu, 06 Apr
+ 2023 19:18:40 -0700 (PDT)
+Date:   Thu, 6 Apr 2023 19:18:39 -0700
+In-Reply-To: <20230310105346.12302-6-likexu@tencent.com>
 Mime-Version: 1.0
-References: <20230307113819.34089-1-likexu@tencent.com>
-Message-ID: <ZC96qzXHyWyRy8I5@google.com>
-Subject: Re: [PATCH] KVM: x86/pmu: Disable vPMU if EVENTSEL_GUESTONLY bit
- doesn't exist
+References: <20230310105346.12302-1-likexu@tencent.com> <20230310105346.12302-6-likexu@tencent.com>
+Message-ID: <ZC99f+AO1tZguu1I@google.com>
+Subject: Re: [PATCH 5/5] KVM: x86/pmu: Hide guest counter updates from the
+ VMRUN instruction
 From:   Sean Christopherson <seanjc@google.com>
 To:     Like Xu <like.xu.linux@gmail.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Ravi Bangoria <ravi.bangoria@amd.com>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="us-ascii"
 X-Spam-Status: No, score=-7.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
@@ -67,69 +68,42 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 07, 2023, Like Xu wrote:
+On Fri, Mar 10, 2023, Like Xu wrote:
 > From: Like Xu <likexu@tencent.com>
 > 
-> Unlike Intel's msr atomic_switch mechanism, AMD supports guest pmu
-> basic counter feature by setting the GUESTONLY bit on the host, so the
-> presence or absence of this bit determines whether vPMU is emulatable
-> (e.g. in nested virtualization). Since on AMD, writing reserved bits of
-> EVENTSEL register does not bring #GP, KVM needs to update the global
-> enable_pmu value by checking the persistence of this GUESTONLY bit.
+> When AMD guest is counting (branch) instructions event, its vPMU should
+> first subtract one for any relevant (branch)-instructions enabled counter
+> (when it precedes VMRUN and cannot be preempted) to offset the inevitable
+> plus-one effect of the VMRUN instruction immediately follows.
 > 
-> Signed-off-by: Like Xu <likexu@tencent.com>
-> ---
->  arch/x86/kvm/svm/svm.c | 15 ++++++++++++++-
->  1 file changed, 14 insertions(+), 1 deletion(-)
+> Based on a number of micro observations (also the reason why x86_64/
+> pmu_event_filter_test fails on AMD Zen platforms), each VMRUN will
+> increment all hw-(branch)-instructions counters by 1, even if they are
+> only enabled for guest code. This issue seriously affects the performance
+> understanding of guest developers based on (branch) instruction events.
 > 
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index dd21e8b1a259..f41d96e638ef 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -4866,6 +4866,16 @@ static __init void svm_adjust_mmio_mask(void)
->  	kvm_mmu_set_mmio_spte_mask(mask, mask, PT_WRITABLE_MASK | PT_USER_MASK);
->  }
->  
-> +static __init bool pmu_has_guestonly_mode(void)
+> If the current physical register value on the hardware is ~0x0, it triggers
+> an overflow in the guest world right after running VMRUN. Although this
+> cannot be avoided on mainstream released hardware, the resulting PMI
+> (if configured) will not be incorrectly injected into the guest by vPMU,
+> since the delayed injection mechanism for a normal counter overflow
+> depends only on the change of pmc->counter values.
+
+IIUC, this is saying that KVM may get a spurious PMI, but otherwise nothing bad
+will happen?
+
+> +static inline bool event_is_branch_instruction(struct kvm_pmc *pmc)
 > +{
-> +	u64 value;
-> +
-> +	wrmsrl(MSR_F15H_PERF_CTL0, AMD64_EVENTSEL_GUESTONLY);
-> +	rdmsrl(MSR_F15H_PERF_CTL0, value);
-
-Preemption needs to be disabled to ensure a stable CPU.  I gotta imagine KVM should
-be restoring the original value too.
-
-I'm guessing I'm not going to like the answer, but is there really no better way
-to probe for GUESTONLY support?
-
-> +
-> +	return value == AMD64_EVENTSEL_GUESTONLY;
+> +	return eventsel_match_perf_hw_id(pmc, PERF_COUNT_HW_INSTRUCTIONS) ||
+> +		eventsel_match_perf_hw_id(pmc,
+> +					  PERF_COUNT_HW_BRANCH_INSTRUCTIONS);
 > +}
 > +
->  static __init void svm_set_cpu_caps(void)
->  {
->  	kvm_set_cpu_caps();
-> @@ -4911,8 +4921,11 @@ static __init void svm_set_cpu_caps(void)
->  		kvm_cpu_cap_set(X86_FEATURE_VIRT_SSBD);
->  
->  	/* AMD PMU PERFCTR_CORE CPUID */
-> -	if (enable_pmu && boot_cpu_has(X86_FEATURE_PERFCTR_CORE))
-> +	if (enable_pmu && boot_cpu_has(X86_FEATURE_PERFCTR_CORE) &&
-> +	    pmu_has_guestonly_mode())
->  		kvm_cpu_cap_set(X86_FEATURE_PERFCTR_CORE);
-> +	else
-> +		enable_pmu = false;
+> +static inline bool quirky_pmc_will_count_vmrun(struct kvm_pmc *pmc)
+> +{
+> +	return event_is_branch_instruction(pmc) && event_is_allowed(pmc) &&
+> +		!static_call(kvm_x86_get_cpl)(pmc->vcpu);
 
-Why does lack of AMD64_EVENTSEL_GUESTONLY disable the PMU, but if and only if
-X86_FEATURE_PERFCTR_CORE?  E.g. why does the behavior not also apply to legacy
-perfmon support?
-
->  
->  	/* CPUID 0x8000001F (SME/SEV features) */
->  	sev_set_cpu_caps();
-> 
-> base-commit: 13738a3647368f7f600b30d241779bcd2a3ebbfd
-> -- 
-> 2.39.2
-> 
+Wait, really?  VMRUN is counted if and only if it enters to a CPL0 guest?  Can
+someone from AMD confirm this?  I was going to say we should just treat this as
+"normal" behavior, but counting CPL0 but not CPL>0 is definitely quirky.
