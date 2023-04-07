@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 304A96DB51E
-	for <lists+kvm@lfdr.de>; Fri,  7 Apr 2023 22:20:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1B9216DB521
+	for <lists+kvm@lfdr.de>; Fri,  7 Apr 2023 22:20:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229804AbjDGUUI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Apr 2023 16:20:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45522 "EHLO
+        id S231236AbjDGUUT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Apr 2023 16:20:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45156 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230373AbjDGUUE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 7 Apr 2023 16:20:04 -0400
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B60BFC65F
-        for <kvm@vger.kernel.org>; Fri,  7 Apr 2023 13:20:01 -0700 (PDT)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-54c23fab905so40171687b3.14
-        for <kvm@vger.kernel.org>; Fri, 07 Apr 2023 13:20:01 -0700 (PDT)
+        with ESMTP id S230373AbjDGUUM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 7 Apr 2023 16:20:12 -0400
+Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 596061737
+        for <kvm@vger.kernel.org>; Fri,  7 Apr 2023 13:20:05 -0700 (PDT)
+Received: by mail-pg1-x54a.google.com with SMTP id 41be03b00d2f7-5131897b5e3so84586a12.1
+        for <kvm@vger.kernel.org>; Fri, 07 Apr 2023 13:20:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1680898801; x=1683490801;
+        d=google.com; s=20210112; t=1680898804; x=1683490804;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=PEBmMXjBIn1CI5gPicrS6RIKVR0bvHgFijUJvWGbelY=;
-        b=UNL2PK7t+b3VGpTAoySNDTA+mhQvxrB+W6h/mWFGL0YyDEz7kTPWaIOvNmS+WVvWyS
-         ivIZ9nIH8jHYb+kHJlxEkyXUjU1+enRo+mdeLY912hcyg00OuMBTaCSGzuzjoX5NssFe
-         79+sx6iktGmnKyPBoLLzL1kNQRZZljEl+8AoTkeMnvVtmXwTK7UJYy3kLEXtqTPbRJ5r
-         eQqQbPAfzfNU/u6TfzAOYjyWVAewSxAy6MF20Isaa/0ATivpmpkVdCOHsJEPNt4Y/jRJ
-         TtVcpT89P+DpOMKYz47RYrAaCTXlT347XRNyZPzRpHF1cy/TvBAT/UT1pBLIFEMshICg
-         X3og==
+        bh=GgRFXdpbsewXFN8nfe13N4oAoHTkIOTXjaNF6DLenHQ=;
+        b=bUPKu4nhvU6AIpMyXIiHt43tbAVl8CQ5zUEZSFuYtVCkd015VQ7DKPwcFXmkmH17As
+         lVLq79uj/NQdWNkY26hN2EggIFXZpzKO7MNJr65yXQcHcpHpQeTfnrxw50qg9C4gx8RL
+         iy6eCReaQSIdPkYWlJzdeM1yXiqFLrTJzBWQ+KyLOH2z0fuAXahHqDM3ShgTW6UQ8eiS
+         71szTjXJlV/MBpQ6pN2g2pLgUqRonwbez8iewZcmNKFaJDdvBEolIbXNt2Ioa/Qw1pE1
+         lRrvA7nz+YB0FqnzFEDqCWuFkMZ4mLINvwECc8AohsUCtkcFdtPYhDRkIHP8oomf5Drr
+         OrxA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680898801; x=1683490801;
+        d=1e100.net; s=20210112; t=1680898804; x=1683490804;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=PEBmMXjBIn1CI5gPicrS6RIKVR0bvHgFijUJvWGbelY=;
-        b=2zFkXiHXu0xcdlhfV+4VU1t95MB1De12Sk8RYCeCQCnTGcgSuRPsRBUeY1vdY8qTvT
-         YANbiayzMsFzZbBgovdZJ25UE6tTvOMub3ijFQYHRmuXpDjqqnv9HinijUQBlR9cWf88
-         ricY8BgsL+ifTQmurstksTtuc+9RKfil5IaUI6v3oquxwejcV6bPStH8V6BjpG3kdMVg
-         QyI6BUy5X8F1PxNXINpiiljzk8oGcBFHhVYeOXm2sRxE5Bp7Nk0UxlJw52Hn+8juIazS
-         4zrEpxIT2gwt8EC8/18p5gL7Y6oua3pOacSR/1RjnrTKiGFWRNhUItLn9QfrIliR/Wcs
-         UALA==
-X-Gm-Message-State: AAQBX9cQjesgu/n6xTGr/LApIQIhbzgW1m51idoRAsdkz/YaqA6hni8a
-        ITX0VsjuL2px3nwagHwCRqXME6wf96w/zHlEwmh09Yu3W4WMVSYJnRIKUwiWtyHjn3b8P8hBUvR
-        tTmLsjq2AgLkgYxbeNgTIRuPkD9GrL9EeyKwoJ3Zlo+9v1l03tHzzJn4=
-X-Google-Smtp-Source: AKy350YHaPy5hMQ+7GbUpVR5qSB/2m0QcKG0N7nYosQ5zmWYwu6Dtks9XgsYgnAc7sdBi0uCpcTNNHNuyw==
+        bh=GgRFXdpbsewXFN8nfe13N4oAoHTkIOTXjaNF6DLenHQ=;
+        b=j22LGqAJMNRSQz7CC8Yep6qpcb7L+wvR0ky1T/MSiDhBUeK4cJv8IlRyosKPSv4RwR
+         wuG5C5R8AtxmbEWnAi11CXxrWJFvHyhsjZZLCcFzg3lyO/aLSMjq+0zze3qQBs76EhhZ
+         7xsBW8mXfSttQxKpxcpoRG3SxnOWnFKLAoMtMlbEY0XGZo6I/SsT3gfsJuL7qwM79FbO
+         EF5xynip0VNLGw2sGGNKlP/jP/r4ZYvgRWIROtH5ENVh9nO7C86mY5Lp5FbPr/egSFPJ
+         1nerpoL3+armeR7Ms9ZNAOc1OzPdpVrDhEhAe/em+7XP7ipPzzC/GIjU69AtyeEpoFod
+         l2nw==
+X-Gm-Message-State: AAQBX9f5JkplpcAt+m3i3iAACq6obdo56C7sDqAa8o26hikLvgtSu0iT
+        3ekoi56pkp6B4VdmQH8oJFKXfDgYNO4Yv3g8qpKT+biK7KMUwhsYDKY/irxakvcpgv7XEDBqBlJ
+        G5Yq4CHKgXf14cNBPbRNA+hR//s/0cEg2DCT3O2LzJQBq9/FJiSXNPTg=
+X-Google-Smtp-Source: AKy350YGEe2C15q4jyE6p1UWvUniafEfLkgm3j9s60Y8u1yQ+nOtXj2Cpevyz/K7PO+ujyOfnnjwJVut0g==
 X-Received: from sagi.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:241b])
- (user=sagis job=sendgmr) by 2002:a25:d6d6:0:b0:ad2:3839:f49 with SMTP id
- n205-20020a25d6d6000000b00ad238390f49mr1823667ybg.5.1680898800862; Fri, 07
- Apr 2023 13:20:00 -0700 (PDT)
-Date:   Fri,  7 Apr 2023 20:19:18 +0000
+ (user=sagis job=sendgmr) by 2002:a05:6a00:2d20:b0:627:d4fa:6a9c with SMTP id
+ fa32-20020a056a002d2000b00627d4fa6a9cmr1663271pfb.6.1680898803826; Fri, 07
+ Apr 2023 13:20:03 -0700 (PDT)
+Date:   Fri,  7 Apr 2023 20:19:19 +0000
 In-Reply-To: <20230407201921.2703758-1-sagis@google.com>
 Mime-Version: 1.0
 References: <20230407201921.2703758-1-sagis@google.com>
 X-Mailer: git-send-email 2.40.0.577.gac1e443424-goog
-Message-ID: <20230407201921.2703758-3-sagis@google.com>
-Subject: [RFC PATCH 2/5] KVM: SEV: Refactor common code out of sev_vm_move_enc_context_from
+Message-ID: <20230407201921.2703758-4-sagis@google.com>
+Subject: [RFC PATCH 3/5] KVM: TDX: Add base implementation for tdx_vm_move_enc_context_from
 From:   Sagi Shahar <sagis@google.com>
 To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -78,466 +78,144 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Both SEV and TDX are going to use similar flows for intra-host
-migration. This change moves some of the code which will be used by both
-architecture into shared code in x86.h
+This should mostly match the logic in sev_vm_move_enc_context_from.
 
 Signed-off-by: Sagi Shahar <sagis@google.com>
 ---
- arch/x86/kvm/svm/sev.c | 175 +++++------------------------------------
- arch/x86/kvm/x86.c     | 166 ++++++++++++++++++++++++++++++++++++++
- arch/x86/kvm/x86.h     |  16 ++++
- 3 files changed, 201 insertions(+), 156 deletions(-)
+ arch/x86/kvm/vmx/main.c    | 10 +++++++
+ arch/x86/kvm/vmx/tdx.c     | 56 ++++++++++++++++++++++++++++++++++++++
+ arch/x86/kvm/vmx/tdx.h     |  2 ++
+ arch/x86/kvm/vmx/x86_ops.h |  5 ++++
+ 4 files changed, 73 insertions(+)
 
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index c25aeb550cd97..18831a0b7734e 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -1553,116 +1553,6 @@ static bool is_cmd_allowed_from_mirror(u32 cmd_id)
- 	return false;
+diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
+index 5b64fe5404958..9d5d0ac465bf6 100644
+--- a/arch/x86/kvm/vmx/main.c
++++ b/arch/x86/kvm/vmx/main.c
+@@ -979,6 +979,14 @@ static int vt_vcpu_mem_enc_ioctl(struct kvm_vcpu *vcpu, void __user *argp)
+ 	return tdx_vcpu_ioctl(vcpu, argp);
  }
  
--static int sev_lock_two_vms(struct kvm *dst_kvm, struct kvm *src_kvm)
--{
--	struct kvm_sev_info *dst_sev = &to_kvm_svm(dst_kvm)->sev_info;
--	struct kvm_sev_info *src_sev = &to_kvm_svm(src_kvm)->sev_info;
--	int r = -EBUSY;
--
--	if (dst_kvm == src_kvm)
--		return -EINVAL;
--
--	/*
--	 * Bail if these VMs are already involved in a migration to avoid
--	 * deadlock between two VMs trying to migrate to/from each other.
--	 */
--	if (atomic_cmpxchg_acquire(&dst_sev->migration_in_progress, 0, 1))
--		return -EBUSY;
--
--	if (atomic_cmpxchg_acquire(&src_sev->migration_in_progress, 0, 1))
--		goto release_dst;
--
--	r = -EINTR;
--	if (mutex_lock_killable(&dst_kvm->lock))
--		goto release_src;
--	if (mutex_lock_killable_nested(&src_kvm->lock, SINGLE_DEPTH_NESTING))
--		goto unlock_dst;
--	return 0;
--
--unlock_dst:
--	mutex_unlock(&dst_kvm->lock);
--release_src:
--	atomic_set_release(&src_sev->migration_in_progress, 0);
--release_dst:
--	atomic_set_release(&dst_sev->migration_in_progress, 0);
--	return r;
--}
--
--static void sev_unlock_two_vms(struct kvm *dst_kvm, struct kvm *src_kvm)
--{
--	struct kvm_sev_info *dst_sev = &to_kvm_svm(dst_kvm)->sev_info;
--	struct kvm_sev_info *src_sev = &to_kvm_svm(src_kvm)->sev_info;
--
--	mutex_unlock(&dst_kvm->lock);
--	mutex_unlock(&src_kvm->lock);
--	atomic_set_release(&dst_sev->migration_in_progress, 0);
--	atomic_set_release(&src_sev->migration_in_progress, 0);
--}
--
--/* vCPU mutex subclasses.  */
--enum sev_migration_role {
--	SEV_MIGRATION_SOURCE = 0,
--	SEV_MIGRATION_TARGET,
--	SEV_NR_MIGRATION_ROLES,
--};
--
--static int sev_lock_vcpus_for_migration(struct kvm *kvm,
--					enum sev_migration_role role)
--{
--	struct kvm_vcpu *vcpu;
--	unsigned long i, j;
--
--	kvm_for_each_vcpu(i, vcpu, kvm) {
--		if (mutex_lock_killable_nested(&vcpu->mutex, role))
--			goto out_unlock;
--
--#ifdef CONFIG_PROVE_LOCKING
--		if (!i)
--			/*
--			 * Reset the role to one that avoids colliding with
--			 * the role used for the first vcpu mutex.
--			 */
--			role = SEV_NR_MIGRATION_ROLES;
--		else
--			mutex_release(&vcpu->mutex.dep_map, _THIS_IP_);
--#endif
--	}
--
--	return 0;
--
--out_unlock:
--
--	kvm_for_each_vcpu(j, vcpu, kvm) {
--		if (i == j)
--			break;
--
--#ifdef CONFIG_PROVE_LOCKING
--		if (j)
--			mutex_acquire(&vcpu->mutex.dep_map, role, 0, _THIS_IP_);
--#endif
--
--		mutex_unlock(&vcpu->mutex);
--	}
--	return -EINTR;
--}
--
--static void sev_unlock_vcpus_for_migration(struct kvm *kvm)
--{
--	struct kvm_vcpu *vcpu;
--	unsigned long i;
--	bool first = true;
--
--	kvm_for_each_vcpu(i, vcpu, kvm) {
--		if (first)
--			first = false;
--		else
--			mutex_acquire(&vcpu->mutex.dep_map,
--				      SEV_NR_MIGRATION_ROLES, 0, _THIS_IP_);
--
--		mutex_unlock(&vcpu->mutex);
--	}
--}
--
- static void sev_migrate_from(struct kvm *dst_kvm, struct kvm *src_kvm)
- {
- 	struct kvm_sev_info *dst = &to_kvm_svm(dst_kvm)->sev_info;
-@@ -1744,25 +1634,6 @@ static void sev_migrate_from(struct kvm *dst_kvm, struct kvm *src_kvm)
- 	}
- }
- 
--static int sev_check_source_vcpus(struct kvm *dst, struct kvm *src)
--{
--	struct kvm_vcpu *src_vcpu;
--	unsigned long i;
--
--	if (!sev_es_guest(src))
--		return 0;
--
--	if (atomic_read(&src->online_vcpus) != atomic_read(&dst->online_vcpus))
--		return -EINVAL;
--
--	kvm_for_each_vcpu(i, src_vcpu, src) {
--		if (!src_vcpu->arch.guest_state_protected)
--			return -EINVAL;
--	}
--
--	return 0;
--}
--
- int sev_vm_move_enc_context_from(struct kvm *kvm, unsigned int source_fd)
- {
- 	struct kvm_sev_info *dst_sev = &to_kvm_svm(kvm)->sev_info;
-@@ -1777,19 +1648,20 @@ int sev_vm_move_enc_context_from(struct kvm *kvm, unsigned int source_fd)
- 		ret = -EBADF;
- 		goto out_fput;
- 	}
--
- 	source_kvm = source_kvm_file->private_data;
--	ret = sev_lock_two_vms(kvm, source_kvm);
-+	src_sev = &to_kvm_svm(source_kvm)->sev_info;
++static int vt_move_enc_context_from(struct kvm *kvm, unsigned int source_fd)
++{
++	if (!is_td(kvm))
++		return -ENOTTY;
 +
-+	ret = pre_move_enc_context_from(kvm, source_kvm,
-+					&dst_sev->migration_in_progress,
-+					&src_sev->migration_in_progress);
- 	if (ret)
- 		goto out_fput;
++	return tdx_vm_move_enc_context_from(kvm, source_fd);
++}
++
+ #define VMX_REQUIRED_APICV_INHIBITS		       \
+ (						       \
+        BIT(APICV_INHIBIT_REASON_DISABLE)|	       \
+@@ -1141,6 +1149,8 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
+ 	.dev_mem_enc_ioctl = tdx_dev_ioctl,
+ 	.mem_enc_ioctl = vt_mem_enc_ioctl,
+ 	.vcpu_mem_enc_ioctl = vt_vcpu_mem_enc_ioctl,
++
++	.vm_move_enc_context_from = vt_move_enc_context_from,
+ };
  
--	if (sev_guest(kvm) || !sev_guest(source_kvm)) {
-+	if (sev_guest(kvm) || !sev_es_guest(source_kvm)) {
- 		ret = -EINVAL;
--		goto out_unlock;
+ struct kvm_x86_init_ops vt_init_ops __initdata = {
+diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+index 8af7e4e81c860..0999a6d827c99 100644
+--- a/arch/x86/kvm/vmx/tdx.c
++++ b/arch/x86/kvm/vmx/tdx.c
+@@ -2826,3 +2826,59 @@ int __init tdx_init(void)
+ 		INIT_LIST_HEAD(&per_cpu(associated_tdvcpus, cpu));
+ 	return 0;
+ }
++
++static __always_inline bool tdx_guest(struct kvm *kvm)
++{
++	struct kvm_tdx *tdx_kvm = to_kvm_tdx(kvm);
++
++	return tdx_kvm->finalized;
++}
++
++static int tdx_migrate_from(struct kvm *dst, struct kvm *src)
++{
++	return -EINVAL;
++}
++
++int tdx_vm_move_enc_context_from(struct kvm *kvm, unsigned int source_fd)
++{
++	struct kvm_tdx *dst_tdx = to_kvm_tdx(kvm);
++	struct file *src_kvm_file;
++	struct kvm_tdx *src_tdx;
++	struct kvm *src_kvm;
++	int ret;
++
++	src_kvm_file = fget(source_fd);
++	if (!file_is_kvm(src_kvm_file)) {
++		ret = -EBADF;
++		goto out_fput;
++	}
++	src_kvm = src_kvm_file->private_data;
++	src_tdx = to_kvm_tdx(src_kvm);
++
++	ret = pre_move_enc_context_from(kvm, src_kvm,
++					&dst_tdx->migration_in_progress,
++					&src_tdx->migration_in_progress);
++	if (ret)
++		goto out_fput;
++
++	if (tdx_guest(kvm) || !tdx_guest(src_kvm)) {
++		ret = -EINVAL;
 +		goto out_post;
- 	}
- 
--	src_sev = &to_kvm_svm(source_kvm)->sev_info;
--
- 	dst_sev->misc_cg = get_current_misc_cg();
- 	cg_cleanup_sev = dst_sev;
- 	if (dst_sev->misc_cg != src_sev->misc_cg) {
-@@ -1799,34 +1671,21 @@ int sev_vm_move_enc_context_from(struct kvm *kvm, unsigned int source_fd)
- 		charged = true;
- 	}
- 
--	ret = sev_lock_vcpus_for_migration(kvm, SEV_MIGRATION_SOURCE);
--	if (ret)
--		goto out_dst_cgroup;
--	ret = sev_lock_vcpus_for_migration(source_kvm, SEV_MIGRATION_TARGET);
--	if (ret)
--		goto out_dst_vcpu;
--
--	ret = sev_check_source_vcpus(kvm, source_kvm);
--	if (ret)
--		goto out_source_vcpu;
--
- 	sev_migrate_from(kvm, source_kvm);
- 	kvm_vm_dead(source_kvm);
- 	cg_cleanup_sev = src_sev;
- 	ret = 0;
- 
--out_source_vcpu:
--	sev_unlock_vcpus_for_migration(source_kvm);
--out_dst_vcpu:
--	sev_unlock_vcpus_for_migration(kvm);
- out_dst_cgroup:
- 	/* Operates on the source on success, on the destination on failure.  */
- 	if (charged)
- 		sev_misc_cg_uncharge(cg_cleanup_sev);
- 	put_misc_cg(cg_cleanup_sev->misc_cg);
- 	cg_cleanup_sev->misc_cg = NULL;
--out_unlock:
--	sev_unlock_two_vms(kvm, source_kvm);
++	}
++
++	ret = tdx_migrate_from(kvm, src_kvm);
++	if (ret)
++		goto out_post;
++
++	kvm_vm_dead(src_kvm);
++	ret = 0;
++
 +out_post:
-+	post_move_enc_context_from(kvm, source_kvm,
-+				   &dst_sev->migration_in_progress,
-+				   &src_sev->migration_in_progress);
- out_fput:
- 	if (source_kvm_file)
- 		fput(source_kvm_file);
-@@ -2058,7 +1917,11 @@ int sev_vm_copy_enc_context_from(struct kvm *kvm, unsigned int source_fd)
- 	}
- 
- 	source_kvm = source_kvm_file->private_data;
--	ret = sev_lock_two_vms(kvm, source_kvm);
-+	source_sev = &to_kvm_svm(source_kvm)->sev_info;
-+	mirror_sev = &to_kvm_svm(kvm)->sev_info;
-+	ret = lock_two_vms_for_migration(kvm, source_kvm,
-+					 &mirror_sev->migration_in_progress,
-+					 &source_sev->migration_in_progress);
- 	if (ret)
- 		goto e_source_fput;
- 
-@@ -2078,9 +1941,7 @@ int sev_vm_copy_enc_context_from(struct kvm *kvm, unsigned int source_fd)
- 	 * The mirror kvm holds an enc_context_owner ref so its asid can't
- 	 * disappear until we're done with it
- 	 */
--	source_sev = &to_kvm_svm(source_kvm)->sev_info;
- 	kvm_get_kvm(source_kvm);
--	mirror_sev = &to_kvm_svm(kvm)->sev_info;
- 	list_add_tail(&mirror_sev->mirror_entry, &source_sev->mirror_vms);
- 
- 	/* Set enc_context_owner and copy its encryption context over */
-@@ -2101,7 +1962,9 @@ int sev_vm_copy_enc_context_from(struct kvm *kvm, unsigned int source_fd)
- 	 */
- 
- e_unlock:
--	sev_unlock_two_vms(kvm, source_kvm);
-+	unlock_two_vms_for_migration(kvm, source_kvm,
-+				     &mirror_sev->migration_in_progress,
-+				     &source_sev->migration_in_progress);
- e_source_fput:
- 	if (source_kvm_file)
- 		fput(source_kvm_file);
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 870041887ed91..865c434a94899 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -13596,6 +13596,172 @@ int kvm_sev_es_string_io(struct kvm_vcpu *vcpu, unsigned int size,
- }
- EXPORT_SYMBOL_GPL(kvm_sev_es_string_io);
- 
-+/* vCPU mutex subclasses.  */
-+enum migration_role {
-+	MIGRATION_SOURCE = 0,
-+	MIGRATION_TARGET,
-+	NR_MIGRATION_ROLES,
-+};
-+
-+static int lock_vcpus_for_migration(struct kvm *kvm, enum migration_role role)
-+{
-+	struct kvm_vcpu *vcpu;
-+	unsigned long i, j;
-+
-+	kvm_for_each_vcpu(i, vcpu, kvm) {
-+		if (mutex_lock_killable_nested(&vcpu->mutex, role))
-+			goto out_unlock;
-+
-+#ifdef CONFIG_PROVE_LOCKING
-+		if (!i)
-+			/*
-+			 * Reset the role to one that avoids colliding with
-+			 * the role used for the first vcpu mutex.
-+			 */
-+			role = NR_MIGRATION_ROLES;
-+		else
-+			mutex_release(&vcpu->mutex.dep_map, _THIS_IP_);
-+#endif
-+	}
-+
-+	return 0;
-+
-+out_unlock:
-+
-+	kvm_for_each_vcpu(j, vcpu, kvm) {
-+		if (i == j)
-+			break;
-+
-+#ifdef CONFIG_PROVE_LOCKING
-+		if (j)
-+			mutex_acquire(&vcpu->mutex.dep_map, role, 0, _THIS_IP_);
-+#endif
-+
-+		mutex_unlock(&vcpu->mutex);
-+	}
-+	return -EINTR;
-+}
-+
-+static void unlock_vcpus_for_migration(struct kvm *kvm)
-+{
-+	struct kvm_vcpu *vcpu;
-+	unsigned long i;
-+	bool first = true;
-+
-+	kvm_for_each_vcpu(i, vcpu, kvm) {
-+		if (first)
-+			first = false;
-+		else
-+			mutex_acquire(&vcpu->mutex.dep_map, NR_MIGRATION_ROLES,
-+				      0, _THIS_IP_);
-+
-+		mutex_unlock(&vcpu->mutex);
-+	}
-+}
-+
-+int lock_two_vms_for_migration(struct kvm *dst_kvm, struct kvm *src_kvm,
-+			       atomic_t *dst_migration_in_progress,
-+			       atomic_t *src_migration_in_progress)
-+{
-+	int r = -EBUSY;
-+
-+	if (dst_kvm == src_kvm)
-+		return -EINVAL;
-+
-+	/*
-+	 * Bail if these VMs are already involved in a migration to avoid
-+	 * deadlock between two VMs trying to migrate to/from each other.
-+	 */
-+	if (atomic_cmpxchg_acquire(dst_migration_in_progress, 0, 1))
-+		return -EBUSY;
-+
-+	if (atomic_cmpxchg_acquire(src_migration_in_progress, 0, 1))
-+		goto release_dst;
-+
-+	r = -EINTR;
-+	if (mutex_lock_killable(&dst_kvm->lock))
-+		goto release_src;
-+	if (mutex_lock_killable_nested(&src_kvm->lock, SINGLE_DEPTH_NESTING))
-+		goto unlock_dst;
-+	return 0;
-+
-+unlock_dst:
-+	mutex_unlock(&dst_kvm->lock);
-+release_src:
-+	atomic_set_release(src_migration_in_progress, 0);
-+release_dst:
-+	atomic_set_release(dst_migration_in_progress, 0);
-+	return r;
-+}
-+EXPORT_SYMBOL_GPL(lock_two_vms_for_migration);
-+
-+void unlock_two_vms_for_migration(struct kvm *dst_kvm, struct kvm *src_kvm,
-+				  atomic_t *dst_migration_in_progress,
-+				  atomic_t *src_migration_in_progress)
-+{
-+	mutex_unlock(&dst_kvm->lock);
-+	mutex_unlock(&src_kvm->lock);
-+	atomic_set_release(dst_migration_in_progress, 0);
-+	atomic_set_release(src_migration_in_progress, 0);
-+}
-+EXPORT_SYMBOL_GPL(unlock_two_vms_for_migration);
-+
-+int pre_move_enc_context_from(struct kvm *dst_kvm, struct kvm *src_kvm,
-+			      atomic_t *dst_migration_in_progress,
-+			      atomic_t *src_migration_in_progress)
-+{
-+	struct kvm_vcpu *src_vcpu;
-+	unsigned long i;
-+	int ret = -EINVAL;
-+
-+	ret = lock_two_vms_for_migration(dst_kvm, src_kvm,
-+					 dst_migration_in_progress,
-+					 src_migration_in_progress);
-+	if (ret)
-+		return ret;
-+
-+	ret = lock_vcpus_for_migration(dst_kvm, MIGRATION_TARGET);
-+	if (ret)
-+		goto unlock_vms;
-+
-+	ret = lock_vcpus_for_migration(src_kvm, MIGRATION_SOURCE);
-+	if (ret)
-+		goto unlock_dst_vcpu;
-+
-+	if (atomic_read(&dst_kvm->online_vcpus) !=
-+	    atomic_read(&src_kvm->online_vcpus))
-+		goto unlock_dst_vcpu;
-+
-+	kvm_for_each_vcpu(i, src_vcpu, src_kvm) {
-+		if (!src_vcpu->arch.guest_state_protected)
-+			goto unlock_dst_vcpu;
-+	}
-+
-+	return 0;
-+
-+unlock_dst_vcpu:
-+	unlock_vcpus_for_migration(dst_kvm);
-+unlock_vms:
-+	unlock_two_vms_for_migration(dst_kvm, src_kvm,
-+				     dst_migration_in_progress,
-+				     src_migration_in_progress);
-+
++	post_move_enc_context_from(kvm, src_kvm,
++				 &dst_tdx->migration_in_progress,
++				 &src_tdx->migration_in_progress);
++out_fput:
++	if (src_kvm_file)
++		fput(src_kvm_file);
 +	return ret;
 +}
-+EXPORT_SYMBOL_GPL(pre_move_enc_context_from);
-+
-+void post_move_enc_context_from(struct kvm *dst_kvm, struct kvm *src_kvm,
-+				atomic_t *dst_migration_in_progress,
-+				atomic_t *src_migration_in_progress)
-+{
-+	unlock_vcpus_for_migration(src_kvm);
-+	unlock_vcpus_for_migration(dst_kvm);
-+	unlock_two_vms_for_migration(dst_kvm, src_kvm,
-+				     dst_migration_in_progress,
-+				     src_migration_in_progress);
-+}
-+EXPORT_SYMBOL_GPL(post_move_enc_context_from);
-+
- bool kvm_arch_dirty_log_supported(struct kvm *kvm)
- {
- 	return kvm->arch.vm_type != KVM_X86_PROTECTED_VM;
-diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
-index 33a1a5341e788..554c797184994 100644
---- a/arch/x86/kvm/x86.h
-+++ b/arch/x86/kvm/x86.h
-@@ -502,4 +502,20 @@ int kvm_sev_es_string_io(struct kvm_vcpu *vcpu, unsigned int size,
- 			 unsigned int port, void *data,  unsigned int count,
- 			 int in);
+diff --git a/arch/x86/kvm/vmx/tdx.h b/arch/x86/kvm/vmx/tdx.h
+index 71818c5001862..21b7e710be1fd 100644
+--- a/arch/x86/kvm/vmx/tdx.h
++++ b/arch/x86/kvm/vmx/tdx.h
+@@ -24,6 +24,8 @@ struct kvm_tdx {
+ 	atomic_t tdh_mem_track;
  
-+int lock_two_vms_for_migration(struct kvm *dst_kvm, struct kvm *src_kvm,
-+			       atomic_t *dst_migration_in_progress,
-+			       atomic_t *src_migration_in_progress);
+ 	u64 tsc_offset;
 +
-+void unlock_two_vms_for_migration(struct kvm *dst_kvm, struct kvm *src_kvm,
-+				  atomic_t *dst_migration_in_progress,
-+				  atomic_t *src_migration_in_progress);
++	atomic_t migration_in_progress;
+ };
+ 
+ union tdx_exit_reason {
+diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
+index d049e0c72ed0c..275f5d75e9bf1 100644
+--- a/arch/x86/kvm/vmx/x86_ops.h
++++ b/arch/x86/kvm/vmx/x86_ops.h
+@@ -187,6 +187,8 @@ int tdx_vcpu_ioctl(struct kvm_vcpu *vcpu, void __user *argp);
+ void tdx_flush_tlb(struct kvm_vcpu *vcpu);
+ int tdx_sept_tlb_remote_flush(struct kvm *kvm);
+ void tdx_load_mmu_pgd(struct kvm_vcpu *vcpu, hpa_t root_hpa, int root_level);
 +
-+int pre_move_enc_context_from(struct kvm *dst_kvm, struct kvm *src_kvm,
-+			      atomic_t *dst_migration_in_progress,
-+			      atomic_t *src_migration_in_progress);
++int tdx_vm_move_enc_context_from(struct kvm *kvm, unsigned int source_fd);
+ #else
+ static inline int tdx_init(void) { return 0; };
+ static inline int tdx_hardware_setup(struct kvm_x86_ops *x86_ops) { return -ENOSYS; }
+@@ -241,6 +243,9 @@ static inline int tdx_vcpu_ioctl(struct kvm_vcpu *vcpu, void __user *argp) { ret
+ static inline void tdx_flush_tlb(struct kvm_vcpu *vcpu) {}
+ static inline int tdx_sept_tlb_remote_flush(struct kvm *kvm) { return 0; }
+ static inline void tdx_load_mmu_pgd(struct kvm_vcpu *vcpu, hpa_t root_hpa, int root_level) {}
 +
-+void post_move_enc_context_from(struct kvm *dst_kvm, struct kvm *src_kvm,
-+				atomic_t *dst_migration_in_progress,
-+				atomic_t *src_migration_in_progress);
-+
++static inline int tdx_vm_move_enc_context_from(struct kvm *kvm, u
++					       nsigned int source_fd) { return -EOPNOTSUPP; }
  #endif
+ 
+ #if defined(CONFIG_INTEL_TDX_HOST) && defined(CONFIG_KVM_SMM)
 -- 
 2.40.0.348.gf938b09366-goog
 
