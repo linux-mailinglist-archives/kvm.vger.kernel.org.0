@@ -2,57 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B9DD86DA698
-	for <lists+kvm@lfdr.de>; Fri,  7 Apr 2023 02:23:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 578336DA69C
+	for <lists+kvm@lfdr.de>; Fri,  7 Apr 2023 02:32:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237455AbjDGAXq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 Apr 2023 20:23:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40044 "EHLO
+        id S230440AbjDGAcK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 Apr 2023 20:32:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41628 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229892AbjDGAXp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 Apr 2023 20:23:45 -0400
-Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81EC859D5
-        for <kvm@vger.kernel.org>; Thu,  6 Apr 2023 17:23:44 -0700 (PDT)
-Received: by mail-pj1-x1049.google.com with SMTP id 98e67ed59e1d1-2448b247ef8so41921a91.2
-        for <kvm@vger.kernel.org>; Thu, 06 Apr 2023 17:23:44 -0700 (PDT)
+        with ESMTP id S229716AbjDGAcI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 Apr 2023 20:32:08 -0400
+Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D81565FE4
+        for <kvm@vger.kernel.org>; Thu,  6 Apr 2023 17:32:07 -0700 (PDT)
+Received: by mail-pl1-x64a.google.com with SMTP id s4-20020a170902ea0400b001a1f4137086so23533096plg.14
+        for <kvm@vger.kernel.org>; Thu, 06 Apr 2023 17:32:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1680827024;
+        d=google.com; s=20210112; t=1680827527;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=9BL6xGXohD1mMjzQzL9jL23akOWofJeCBhg5NZPFl9s=;
-        b=e2YAugEvgT5tAXo7eVUS5zgBbfWIlCwI6gAkSy3eKfW/JPoowsZZe7fSYDgebDGW5g
-         w7qPjIQl5uNGRCeAmO9aPTn2ss01Mz8Jumtn3zcirquknCrjD2/iozRJN5kCWCNtaIOZ
-         d77le/+gF3tCjH5BB0YAu9UMLmpk7zL3HtcOFy+rn1c+rkcE549YeuajAx9WbxEq+YT9
-         GnMTR4IRHjrLsMB1dTLEzDfyO+wySRZMbPZjiGAQ6StHnYeq+th6CJIpeOUdMPMIBNiE
-         9CMPRy3oRtHpYWdtd6xVDUj+iqa45l3fe8R5OLeXoUncLF9LFsEDPxye6c67JUvjiNYR
-         o5sg==
+        bh=gB6QWOYr52F6RzUn42cn9YO/xJt1ZAN7hiQOwDN28jE=;
+        b=oHmnDkznLB2fqcJzNFTU5CRPcplPmHa+GIQvo6Orr7+wsQGd+s6vVf89WhNskorqqE
+         lLQG19YX7xsC6cNJu3aGKA02F4zBlgkRLI2TlIGHkPxT2JSWGp+N1IQoSHYPCk3g3/ge
+         Qe4fNqV+EpBohAuiAZ0cLezUCUrpsVfm6I/JEE/mOo/vwLU0kLmuMHEUHCbYAoZlUveK
+         qTk8ykE0+1aYqB7uWwpNJ3odfc3TqWHhG9byQ+2Ubr8nfELrzum0C7Qnjm/IZ9MD5eT3
+         xRm6ojDNp1UYi9lqluGOLwUN78Q+5I3ZmqwOXrQEiQ39Fq33KpwCTcb0OvfvRMsknJ8f
+         5FRw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680827024;
+        d=1e100.net; s=20210112; t=1680827527;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=9BL6xGXohD1mMjzQzL9jL23akOWofJeCBhg5NZPFl9s=;
-        b=WkRnUEBGy8nai7bu1F0ByC5xzJ+MsDLEo3K0/B423JPExXxm8IGcN+abnANlo4YmYV
-         Hs9MCMX/HpuAnCOiJ5ZaJwWtnZugtz5+zjTLzdx0ZBECcIR61qrGBDzhn8jl1xRSLJfs
-         uRHxuxfWq2HGWSz7EW8br6u0O/avEni/u/h7lkjJzaQX8Gr1KYnVcYn4XdgfJKVPaXay
-         wJ7aH6SPlCcYceOpBpW2EN7VMYie/ateApD40y+Wn2z7HYG/o//g8vc2AyLSZrez6QmF
-         1vHQx/vpDwYS02AG8lyZk5mN8D4KOKkzfGqdtxYiBMXVCBEOA40yNWxKi6K8PTI0wtLT
-         3pSQ==
-X-Gm-Message-State: AAQBX9dVF8VYjEeAfNNLHwF2iL9WWcVv2bYVZ8zCnajqqKHkg+QdVvWk
-        SNllgrZ2XLMfGzafpK2JodcaisSo6lE=
-X-Google-Smtp-Source: AKy350ZDcF01M0B0CctJ34aWlQdDkU/U4sdYBnEP029Qs93P/VbJsAL7otUHHaLd74TLG5g4YXpKhu1Uqds=
+        bh=gB6QWOYr52F6RzUn42cn9YO/xJt1ZAN7hiQOwDN28jE=;
+        b=G0yiNDZlx+FM72p6KZMeYbJ9Fy0GTrO3Lsml/e52fx9stxwhogCbkOs3Cz87rvH/NI
+         jlLsn3DWyMzsmZW892cZP8GfpzF7RJIxYD84VOmijy/0n/F/T6cM2BfiNwf9LK6j7qRi
+         lwWmTetBLHORXsvcIkXOf4sbEz9p9SbuHgCLu3y49vBF53yv2V+cu/L0Lei04b7C3a+E
+         iKmfjrKli/E7ZLEePUf4hhsDYFxzBIedcvoI817cb8UytXtCLBojdxd8qtcV6GgoQaPR
+         pVUp43kArcEvIi/X+4UcECDfXQYECuqqf2SVJypKR0ICln3fz8KXaYKh1n0hLpxh3otv
+         mV2w==
+X-Gm-Message-State: AAQBX9e0brifJcx8iuJFkWo4JFTv3h7m6RT9p0ijRInaZCoff2HlCECc
+        pkhW5cCwpsMxJUTIUgF97wpU5QtdYIo=
+X-Google-Smtp-Source: AKy350ZKPl5uhVQylzilx1ijUrU5YeSnYp0rewZjeOU7OOLMz3vTuRUjjlrZudIWP/Bn4kGIuKKUvf/UyXA=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:2182:b0:625:73a7:326f with SMTP id
- h2-20020a056a00218200b0062573a7326fmr383929pfi.3.1680827024058; Thu, 06 Apr
- 2023 17:23:44 -0700 (PDT)
-Date:   Thu, 6 Apr 2023 17:23:42 -0700
-In-Reply-To: <ZC9enygbWzJ59Ssb@google.com>
+ (user=seanjc job=sendgmr) by 2002:a17:902:da8e:b0:1a5:144c:27df with SMTP id
+ j14-20020a170902da8e00b001a5144c27dfmr107749plx.4.1680827527170; Thu, 06 Apr
+ 2023 17:32:07 -0700 (PDT)
+Date:   Thu, 6 Apr 2023 17:32:05 -0700
+In-Reply-To: <20230214050757.9623-10-likexu@tencent.com>
 Mime-Version: 1.0
-References: <20230214050757.9623-1-likexu@tencent.com> <20230214050757.9623-9-likexu@tencent.com>
- <ZC9enygbWzJ59Ssb@google.com>
-Message-ID: <ZC9ijgZBaz6p1ecw@google.com>
-Subject: Re: [PATCH v4 08/12] KVM: x86/pmu: Disable vPMU if the minimum num of
- counters isn't met
+References: <20230214050757.9623-1-likexu@tencent.com> <20230214050757.9623-10-likexu@tencent.com>
+Message-ID: <ZC9khVlFr2RYd83P@google.com>
+Subject: Re: [PATCH v4 09/12] KVM: x86/pmu: Forget PERFCTR_CORE if the min num
+ of counters isn't met
 From:   Sean Christopherson <seanjc@google.com>
 To:     Like Xu <like.xu.linux@gmail.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
@@ -68,64 +67,72 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Apr 06, 2023, Sean Christopherson wrote:
-> On Tue, Feb 14, 2023, Like Xu wrote:
-> > Suggested-by: Sean Christopherson <seanjc@google.com>
-> > Signed-off-by: Like Xu <likexu@tencent.com>
-> > ---
-> >  arch/x86/kvm/pmu.h | 6 ++++++
-> >  1 file changed, 6 insertions(+)
-> > 
-> > diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
-> > index d1cc02c8da88..46db5404894e 100644
-> > --- a/arch/x86/kvm/pmu.h
-> > +++ b/arch/x86/kvm/pmu.h
-> > @@ -170,6 +170,12 @@ static inline void kvm_init_pmu_capability(const struct kvm_pmu_ops *pmu_ops)
-> >  	if ((is_intel && !kvm_pmu_cap.version) || !kvm_pmu_cap.num_counters_gp)
-> >  		enable_pmu = false;
-> >  
-> > +	/*
-> > +	 * For AMD, disable vPMU if the minimum number of counters isn't met.
-> > +	 */
+On Tue, Feb 14, 2023, Like Xu wrote:
+> From: Like Xu <likexu@tencent.com>
 > 
-> Doesn't need to be a multiple line comment.  This comment is also useless.  It's
-> quite clear from the code that PMU support is being disabled when there aren't
-> enough counters, what's missing is _why_.
+> KVM should sanity check the number of counters enumerated by perf and
+> explicitly drop PERFCTR_CORE support if the min isn't met. E.g. if KVM
+> needs 6 counters and perf says there are 4, then something is wrong and
+> enumerating 6 to the guest is only going to cause more issues.
 > 
-> > +	if (!is_intel && kvm_pmu_cap.num_counters_gp < AMD64_NUM_COUNTERS)
+> Opportunistically, the existing kvm_cpu_cap_check_and_set() makes it
+> easier to simplify the host check before setting the PERFCTR_CORE flag.
 
-Actually, rather than bleed AMD details into common code, define a const int
-kvm_pmu_ops, e.g.
+Once again, state what the patch does.
 
-	const int MIN_NR_GP_COUNTERS
+> Suggested-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Like Xu <likexu@tencent.com>
+> ---
+>  arch/x86/kvm/svm/svm.c | 11 ++++++++---
+>  1 file changed, 8 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index dd21e8b1a259..f4a4691b4f4e 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -4910,9 +4910,14 @@ static __init void svm_set_cpu_caps(void)
+>  	    boot_cpu_has(X86_FEATURE_AMD_SSBD))
+>  		kvm_cpu_cap_set(X86_FEATURE_VIRT_SSBD);
+>  
+> -	/* AMD PMU PERFCTR_CORE CPUID */
+> -	if (enable_pmu && boot_cpu_has(X86_FEATURE_PERFCTR_CORE))
+> -		kvm_cpu_cap_set(X86_FEATURE_PERFCTR_CORE);
+> +	if (enable_pmu) {
 
-and then the above !kvm_pmu_cap.num_counters_gp can get replaced with a more generic
-check.   That will also give us a convenient location to document _why_ Intel
-and AMD have different mins (in particular, AMD's lack of any way to enumerate
-less than four counters to the guest).
+A comment would be very helpful here.   Even better would be if we can convince
+perf to rename AMD64_NUM_COUNTERS to AMD64_LEGACY_NUM_COUNTERS.
 
-E.g. end up with
 
-	if (enable_pmu) {
-		perf_get_x86_pmu_capability(&kvm_pmu_cap);
+> +		if (kvm_pmu_cap.num_counters_gp < AMD64_NUM_COUNTERS_CORE) {
+> +			kvm_pmu_cap.num_counters_gp = AMD64_NUM_COUNTERS;
+
+Hmm, this subtly relies on kvm_init_pmu_capability() running first.  That
+_probably_ won't change, but like the arch LBRs side of things I would prefer to
+avoid taking unnecessarily.  E.g. something like this?
 
 		/*
-		 * For Intel, only support guest architectural pmu
-		 * on a host with architectural pmu.
+		 * Enumerate support for PERFCTR_CORE if and only if KVM has
+		 * access to enough counters to virtualize "core" support,
+		 * otherwise limit vPMU support to the legacy number of counters.
 		 */
-		if ((is_intel && !kvm_pmu_cap.version) ||
-		    (kvm_pmu_cap.num_counters_gp < pmu_ops->MIN_NR_GP_COUNTERS))
-			enable_pmu = false;
-	}
+		if (kvm_pmu_cap.num_counters_gp < AMD64_NUM_COUNTERS_CORE)
+			kvm_pmu_cap.num_counters_gp = min(AMD64_NUM_COUNTERS,
+							  kvm_pmu_cap.num_counters_gp);
 
-Hmm, and doesn't have to be done in this series, but we could do the same for the
-min/max PMU versions.
+It's a bit paranoid, but practically speaking it doesn't cost us anything.
 
-> > +		enable_pmu = false;
-> > +
-> >  	if (!enable_pmu) {
-> >  		memset(&kvm_pmu_cap, 0, sizeof(kvm_pmu_cap));
-> >  		return;
-> > -- 
-> > 2.39.1
-> > 
+> +		} else {
+> +			/* AMD PMU PERFCTR_CORE CPUID */
+
+Meh, this is not a very helpful comment, no need to carry it forward.  And if you
+drop it, then the need for curly braces goes away.
+
+> +			kvm_cpu_cap_check_and_set(X86_FEATURE_PERFCTR_CORE);
+> +		}
+> +	}
+>  
+>  	/* CPUID 0x8000001F (SME/SEV features) */
+>  	sev_set_cpu_caps();
+> -- 
+> 2.39.1
+> 
