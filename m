@@ -2,68 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6F4E46DB511
-	for <lists+kvm@lfdr.de>; Fri,  7 Apr 2023 22:16:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 570B76DB519
+	for <lists+kvm@lfdr.de>; Fri,  7 Apr 2023 22:17:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229753AbjDGUQu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Apr 2023 16:16:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41100 "EHLO
+        id S230250AbjDGURx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Apr 2023 16:17:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43350 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229600AbjDGUQt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 7 Apr 2023 16:16:49 -0400
-Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14647CA0E
-        for <kvm@vger.kernel.org>; Fri,  7 Apr 2023 13:16:15 -0700 (PDT)
-Received: by mail-pl1-x64a.google.com with SMTP id d9443c01a7336-1a275cc7051so891545ad.2
-        for <kvm@vger.kernel.org>; Fri, 07 Apr 2023 13:16:15 -0700 (PDT)
+        with ESMTP id S230321AbjDGURt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 7 Apr 2023 16:17:49 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9817CC169
+        for <kvm@vger.kernel.org>; Fri,  7 Apr 2023 13:17:31 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id c193-20020a25c0ca000000b00b868826cdfeso18093841ybf.0
+        for <kvm@vger.kernel.org>; Fri, 07 Apr 2023 13:17:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1680898565;
+        d=google.com; s=20210112; t=1680898650;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=mde69Hj9R/KQCpYyhqUMxlQ7MljgYq9pFkGZMMmzCdQ=;
-        b=HWNa+X4Kboqth/qpv+qGP7/6SEJWlFOhUaG6+9Ea2pmfHn5mFek2OPQTAPu4ZX8ez1
-         2wVx0MGKzRVJXcROgp7Qy3FbPTaqyflsyNUD06xDFNi7SIb1yy7he4jC8zcAYwce2Znw
-         F48RpjdVJ3yrWDIYwbBhLEajtPgmqnb9dNwqvwJ8zcEurcpxh1+D9fZy/9JLsdt/EDtO
-         3lF/beXBy8uDU30xeaBYyLMgQTLYCxe4ouqj9tqEKzJtHkCYab1jQtbBRyOXvPRr4Oxc
-         m9en16kignQDffLXFU25jxJ74OwCr/MZkUc0xmh8XBAv7QqrtMMvjH6nkBRKYnZ4+Yhv
-         spfA==
+        bh=GQuRZgPGJuitZmRAmEtDKVZTfZ/GI8B6WfCH2oCyJ+I=;
+        b=ZZ3hqBxL9WVZAvP90AtF0BooyPBWkw2PZ8Y09ncxA3vHcu6fouEUcK87ddDFl0co0h
+         T3UHrMGzgIuXAigPIiYpmAg72GsT60rODXzTKnHWWBgFkbkEB93gMF7UczHwGDODlzQo
+         2DquEVw9OOnmuZ5CN62zSh4X0qV1bLFFZF8vDQc6/r6QChWWSCUavUZu85yESCaZWV13
+         SA/BG+R/TVsQlSD5V+6H7DNnldRkNP/bCux0R6KMyzHcxhoVNwwqTG4Dn4VVtZuaX9N0
+         SPulOGt3IgyLTEYMBZ/T6qbkbwn+I08u7V+RA8CcwDkhCcN2GthhJ6kW5RNWwDOwBtAG
+         ExZQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680898565;
+        d=1e100.net; s=20210112; t=1680898650;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=mde69Hj9R/KQCpYyhqUMxlQ7MljgYq9pFkGZMMmzCdQ=;
-        b=tWlotJQTs4avAuQnpwMvb60QsDhX3EAZyBHkM85UpjQCqFuOigqyCyAsQAnrLo+cHv
-         8+XPFpqOnk7gMbjmez+bMRj+5V3wJbYDawge0iikayYaqQhxSOqGA1IlyOtWbS2POhxo
-         PTO19NnTYVVbYukLCR7PQYmvonpD1/G3rnK1XQplj+wfPg9GAixG2J3u3SKT6YUCsSb7
-         RNIQksv89UtN7CGlPcEVIA6m3chgYswJ0slm0tg64rtYVjsyjiXdKSQTUyyqpZjgoNJ6
-         nJlWtdPHSNxN2EGFUJoWR75edjI8huOQBs+j/pwjV2vRHVHm/pDhS29+wHW41zoohLtv
-         I07A==
-X-Gm-Message-State: AAQBX9cMP2EMMgwCbWRwqLGvIdMWb9OU0/sULQYJ7i7DRgPJzLubeXwU
-        f6/9yiqqnJvVFPC6/Fl2/HtHL5bFYqg=
-X-Google-Smtp-Source: AKy350Y3weNQUsTbtpYXqwtEFj8XZzaGb4a9EvD8AbYueIwoAedZa/dzxiMIlNG5a+N/7oHVS8QRLsj2jr0=
+        bh=GQuRZgPGJuitZmRAmEtDKVZTfZ/GI8B6WfCH2oCyJ+I=;
+        b=nnBJX6wij38P/iGTbs6vjfNmO5u+60pvMHbO7w5BbiYShdheT7Io1uXHyqcQ6rkDpm
+         sviehZ0WHKe/OlS/q9hPtu9euy/7Q6SNzjL2uYFQlPw210i5CuEGxsLaOoLQpY3N7/Ui
+         E2wI7SW7vBgCgZPTokHosg/1/cYe5g/XYWe3zwB5anMRmJKBzU5mtp6UXqbK+uGCkMFF
+         fWQzkFETEQG3Hg3n9vETs1mcKpL7gcHSSzxBjfA9Sl3Xyqtduk8/U9CEqVtH1oVvKZyw
+         i2N1IIuwsSnDnZCtEUo53XJOhKOaUXKo5m/PVZLEeA/MCezb5mhPxOzYjW2TxEhXGXSG
+         H6Og==
+X-Gm-Message-State: AAQBX9fUeSHadZ0x5xaze4mIOgAVZYiDICbzI251abik5fzSqTVGGdho
+        MFIrI8YOhWBVX8DrIIkpkJol+mwZufw=
+X-Google-Smtp-Source: AKy350ZWV2a/5GlWKI7vC948ULh+ZhhIsFkaZ7AayvqB83aRn4iAdoyo6h5iYZVHBZ3Bxmet3ID/x7RFsuI=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:b41:b0:62d:934e:6ef8 with SMTP id
- p1-20020a056a000b4100b0062d934e6ef8mr1710893pfo.5.1680898565263; Fri, 07 Apr
- 2023 13:16:05 -0700 (PDT)
-Date:   Fri, 7 Apr 2023 13:16:03 -0700
-In-Reply-To: <684ad799-8247-9d2a-2eed-c8cb08e96633@intel.com>
+ (user=seanjc job=sendgmr) by 2002:a05:6902:909:b0:a27:3ecc:ffe7 with SMTP id
+ bu9-20020a056902090900b00a273eccffe7mr5154367ybb.3.1680898650818; Fri, 07 Apr
+ 2023 13:17:30 -0700 (PDT)
+Date:   Fri, 7 Apr 2023 13:17:29 -0700
+In-Reply-To: <20230307141400.1486314-6-aaronlewis@google.com>
 Mime-Version: 1.0
-References: <SA1PR11MB673463616F7B1318874D11A3A8909@SA1PR11MB6734.namprd11.prod.outlook.com>
- <684ad799-8247-9d2a-2eed-c8cb08e96633@intel.com>
-Message-ID: <ZDB6A00xskB+adzu@google.com>
-Subject: Re: The necessity of injecting a hardware exception reported in VMX
- IDT vectoring information
+References: <20230307141400.1486314-1-aaronlewis@google.com> <20230307141400.1486314-6-aaronlewis@google.com>
+Message-ID: <ZDB6WWhpl6b4/2M9@google.com>
+Subject: Re: [PATCH v3 5/5] KVM: selftests: Test the PMU event "Instructions retired"
 From:   Sean Christopherson <seanjc@google.com>
-To:     Xiaoyao Li <xiaoyao.li@intel.com>
-Cc:     Xin3 Li <xin3.li@intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Yuan Yao <yuan.yao@intel.com>,
-        Eddie Dong <eddie.dong@intel.com>,
-        Kevin Tian <kevin.tian@intel.com>,
-        Jun Nakajima <jun.nakajima@intel.com>,
-        "H.Peter Anvin" <hpa@zytor.com>,
-        Asit K Mallick <asit.k.mallick@intel.com>
+To:     Aaron Lewis <aaronlewis@google.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, jmattson@google.com,
+        like.xu.linux@gmail.com
 Content-Type: text/plain; charset="us-ascii"
 X-Spam-Status: No, score=-7.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
@@ -75,52 +66,56 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Apr 07, 2023, Xiaoyao Li wrote:
-> On 4/5/2023 5:34 PM, Li, Xin3 wrote:
-> > The VMCS IDT vectoring information field is used to report basic information
-> > associated with the event that was being delivered when a VM exit occurred.
-> > such an event itself doesn't trigger a VM exit, however, a condition to deliver
-> > the event is not met, e.g., EPT violation.
-> > 
-> > When the IDT vectoring information field reports a maskable external interrupt,
-> > KVM reinjects this external interrupt after handling the VM exit. Otherwise,
-> > the external interrupt is lost.
-> > 
-> > KVM handles a hardware exception reported in the IDT vectoring information
-> > field in the same way, which makes nothing wrong. This piece of code is in
-> > __vmx_complete_interrupts():
-> > 
-> >          case INTR_TYPE_SOFT_EXCEPTION:
-> >                  vcpu->arch.event_exit_inst_len = vmcs_read32(instr_len_field);
-> >                  fallthrough;
-> >          case INTR_TYPE_HARD_EXCEPTION:
-> >                  if (idt_vectoring_info & VECTORING_INFO_DELIVER_CODE_MASK) {
-> >                          u32 err = vmcs_read32(error_code_field);
-> >                          kvm_requeue_exception_e(vcpu, vector, err);
-> >                  } else
-> >                          kvm_requeue_exception(vcpu, vector);
-> >                  break;
-> > 
-> > But if KVM just ignores any hardware exception in such a case, the CPU will
-> > re-generate it once it resumes guest execution, which looks cleaner.
-> > 
-> > The question is, must KVM inject a hardware exception from the IDT vectoring
-> > information field? Is there any correctness issue if KVM does not?
-> 
-> Say there is a case that, a virtual interrupt arrives when an exception is
-> delivering but hit EPT VIOLATION. The interrupt is pending and recorded in
-> RVI.
-> - If KVM re-injects the exception on next VM entry, IDT vectoring first
-> vectors exception handler and at the instruction boundary (before the first
-> instruction of exception handler) to deliver the virtual interrupt (if
-> allowed)
-> - If KVM doesn't re-inject the exception but relies on the re-execution of
-> the instruction, then the virtual interrupt can be recognized and delivered
-> before the instruction causes the exception.
-> 
-> I'm not sure if the order of events matters or not.
+On Tue, Mar 07, 2023, Aaron Lewis wrote:
+> @@ -71,6 +86,16 @@ static const uint64_t event_list[] = {
+>  	AMD_ZEN_BR_RETIRED,
+>  };
+>  
+> +struct perf_results {
+> +	union {
+> +		uint64_t raw;
+> +		struct {
+> +			uint64_t br_count:32;
+> +			uint64_t ir_count:32;
+> +		};
+> +	};
+> +};
+> +
+>  /*
+>   * If we encounter a #GP during the guest PMU sanity check, then the guest
+>   * PMU is not functional. Inform the hypervisor via GUEST_SYNC(0).
+> @@ -102,13 +127,20 @@ static void check_msr(uint32_t msr, uint64_t bits_to_flip)
+>  
+>  static uint64_t test_guest(uint32_t msr_base)
+>  {
+> +	struct perf_results r;
+>  	uint64_t br0, br1;
+> +	uint64_t ir0, ir1;
+>  
+>  	br0 = rdmsr(msr_base + 0);
+> +	ir0 = rdmsr(msr_base + 1);
+>  	__asm__ __volatile__("loop ." : "+c"((int){NUM_BRANCHES}));
+>  	br1 = rdmsr(msr_base + 0);
+> +	ir1 = rdmsr(msr_base + 1);
+>  
+> -	return br1 - br0;
+> +	r.br_count = br1 - br0;
+> +	r.ir_count = ir1 - ir0;
 
-It matters, e.g. if the exception occurs in an STI shadow then I believe the vIRQ
-would get incorrectly delivered in the STI shadow.  That'll likely happen anyways
-after the resulting IRET, but there's no guarantee the guest's exception handler
-will IRET, or that it will even run, e.g. guest might triple fault first.
+The struct+union is problematic on 2+ fronts.  I don't like that it truncates
+a 64-bit MSR value into a 32-bit field.  And this test now ends up with two
+structs (perf_results and perf_counter) that serve the same purpose, but count
+different events, and without any indiciation in the name _what_ event(s) the
+struct tracks.
+
+The existing "struct perf_count" has the same truncation problem.  It _shouldn't_
+cause problems, but unless I'm missing something, it means that, very theoretically,
+the test could have false passes, e.g. if KVM manages to corrupt the upper 32 bits.
+
+There's really no reason to limit ourselves to 64 bits of data, as the selftests
+framework provides helpers to copy arbitrary structs to/from the guest.  If we
+throw all of the counts into a single struct, then we solve the naming issue and
+can provide a helper to do the copies to/from the guest.
+
+I have all of this typed up and it appears to work.  I'll post a new version of
+just the selftests patches.
