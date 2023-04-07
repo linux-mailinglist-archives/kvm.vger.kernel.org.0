@@ -2,24 +2,24 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9FF1E6DA739
-	for <lists+kvm@lfdr.de>; Fri,  7 Apr 2023 04:00:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5D9176DA774
+	for <lists+kvm@lfdr.de>; Fri,  7 Apr 2023 04:07:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239910AbjDGCAf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 Apr 2023 22:00:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49008 "EHLO
+        id S240502AbjDGCHS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 Apr 2023 22:07:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34888 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239637AbjDGCAU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 Apr 2023 22:00:20 -0400
+        with ESMTP id S240326AbjDGCGv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 Apr 2023 22:06:51 -0400
 Received: from loongson.cn (mail.loongson.cn [114.242.206.163])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 64B5A93F1;
-        Thu,  6 Apr 2023 19:00:12 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 8F873BB9B;
+        Thu,  6 Apr 2023 19:05:19 -0700 (PDT)
 Received: from loongson.cn (unknown [10.2.5.185])
-        by gateway (Coremail) with SMTP id _____8BxYU8qeS9k1aYXAA--.36781S3;
-        Fri, 07 Apr 2023 10:00:10 +0800 (CST)
+        by gateway (Coremail) with SMTP id _____8DxXNoreS9k5KYXAA--.25227S3;
+        Fri, 07 Apr 2023 10:00:11 +0800 (CST)
 Received: from localhost.localdomain (unknown [10.2.5.185])
-        by localhost.localdomain (Coremail) with SMTP id AQAAf8BxLL4jeS9k17sXAA--.23369S12;
-        Fri, 07 Apr 2023 10:00:09 +0800 (CST)
+        by localhost.localdomain (Coremail) with SMTP id AQAAf8BxLL4jeS9k17sXAA--.23369S13;
+        Fri, 07 Apr 2023 10:00:10 +0800 (CST)
 From:   Tianrui Zhao <zhaotianrui@loongson.cn>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Huacai Chen <chenhuacai@kernel.org>,
@@ -31,19 +31,19 @@ Cc:     Huacai Chen <chenhuacai@kernel.org>,
         Alex Deucher <alexander.deucher@amd.com>,
         Oliver Upton <oliver.upton@linux.dev>, maobibo@loongson.cn,
         Xi Ruoyao <xry111@xry111.site>, zhaotianrui@loongson.cn
-Subject: [PATCH v5 10/30] LoongArch: KVM: Implement vcpu ENABLE_CAP ioctl interface
-Date:   Fri,  7 Apr 2023 09:59:43 +0800
-Message-Id: <20230407020003.3651096-11-zhaotianrui@loongson.cn>
+Subject: [PATCH v5 11/30] LoongArch: KVM: Implement fpu related operations for vcpu
+Date:   Fri,  7 Apr 2023 09:59:44 +0800
+Message-Id: <20230407020003.3651096-12-zhaotianrui@loongson.cn>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20230407020003.3651096-1-zhaotianrui@loongson.cn>
 References: <20230407020003.3651096-1-zhaotianrui@loongson.cn>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: AQAAf8BxLL4jeS9k17sXAA--.23369S12
+X-CM-TRANSID: AQAAf8BxLL4jeS9k17sXAA--.23369S13
 X-CM-SenderInfo: p2kd03xldq233l6o00pqjv00gofq/
-X-Coremail-Antispam: 1Uk129KBjvJXoW7Zw4fJr4xJrWUJF1rAr1kKrg_yoW8JFyUpF
-        srCr90qr4rtrWxWwnxtws5Wr1aqrWkKrs7ZF9rX3y5AF42kry5GF4FkrWDAFW5ta1rGF1I
-        qr1rt3Wj9Fn8AwUanT9S1TB71UUUUjJqnTZGkaVYY2UrUUUUj1kv1TuYvTs0mT0YCTnIWj
+X-Coremail-Antispam: 1Uk129KBjvJXoW7KF1UXF4kKw4xXF4kKr4kWFg_yoW8ur1rpF
+        W7Ar9YqayrG3WxK34aqr1jqr1avrWkKr1xXa47WryfAr1UtryrZF4vkrW2vF98Jw1xZFyI
+        vF1rGF1UCFyDAwUanT9S1TB71UUUUjJqnTZGkaVYY2UrUUUUj1kv1TuYvTs0mT0YCTnIWj
         qI5I8CrVACY4xI64kE6c02F40Ex7xfYxn0WfASr-VFAUDa7-sFnT9fnUUIcSsGvfJTRUUU
         bxxFc2x0x2IEx4CE42xK8VAvwI8IcIk0rVWrJVCq3wA2ocxC64kIII0Yj41l84x0c7CEw4
         AK67xGY2AK021l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF
@@ -65,57 +65,85 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Implement loongarch vcpu KVM_ENABLE_CAP ioctl interface.
+Implement loongarch fpu related interface for vcpu, such as get fpu, set
+fpu, own fpu and lose fpu, etc.
 
 Signed-off-by: Tianrui Zhao <zhaotianrui@loongson.cn>
 ---
- arch/loongarch/kvm/vcpu.c | 26 ++++++++++++++++++++++++++
- 1 file changed, 26 insertions(+)
+ arch/loongarch/kvm/vcpu.c | 60 +++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 60 insertions(+)
 
 diff --git a/arch/loongarch/kvm/vcpu.c b/arch/loongarch/kvm/vcpu.c
-index 9ad6a285c..e1e616769 100644
+index e1e616769..d1e8cd402 100644
 --- a/arch/loongarch/kvm/vcpu.c
 +++ b/arch/loongarch/kvm/vcpu.c
-@@ -187,6 +187,23 @@ int kvm_arch_vcpu_ioctl_set_regs(struct kvm_vcpu *vcpu, struct kvm_regs *regs)
- 	return 0;
+@@ -245,6 +245,66 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
+ 	return r;
  }
  
-+static int kvm_vcpu_ioctl_enable_cap(struct kvm_vcpu *vcpu,
-+				     struct kvm_enable_cap *cap)
++int kvm_arch_vcpu_ioctl_get_fpu(struct kvm_vcpu *vcpu, struct kvm_fpu *fpu)
 +{
-+	int r = 0;
++	int i = 0;
 +
-+	if (!kvm_vm_ioctl_check_extension(vcpu->kvm, cap->cap))
-+		return -EINVAL;
-+	if (cap->flags)
-+		return -EINVAL;
-+	if (cap->args[0])
-+		return -EINVAL;
-+	if (cap->cap)
-+		return -EINVAL;
++	/* no need vcpu_load and vcpu_put */
++	fpu->fcsr = vcpu->arch.fpu.fcsr;
++	fpu->fcc = vcpu->arch.fpu.fcc;
++	for (i = 0; i < NUM_FPU_REGS; i++)
++		memcpy(&fpu->fpr[i], &vcpu->arch.fpu.fpr[i], FPU_REG_WIDTH / 64);
 +
-+	return r;
++	return 0;
 +}
 +
- long kvm_arch_vcpu_ioctl(struct file *filp,
- 			 unsigned int ioctl, unsigned long arg)
- {
-@@ -210,6 +227,15 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
- 			r = _kvm_get_reg(vcpu, &reg);
- 		break;
- 	}
-+	case KVM_ENABLE_CAP: {
-+		struct kvm_enable_cap cap;
++int kvm_arch_vcpu_ioctl_set_fpu(struct kvm_vcpu *vcpu, struct kvm_fpu *fpu)
++{
++	int i = 0;
 +
-+		r = -EFAULT;
-+		if (copy_from_user(&cap, argp, sizeof(cap)))
-+			break;
-+		r = kvm_vcpu_ioctl_enable_cap(vcpu, &cap);
-+		break;
++	/* no need vcpu_load and vcpu_put */
++	vcpu->arch.fpu.fcsr = fpu->fcsr;
++	vcpu->arch.fpu.fcc = fpu->fcc;
++	for (i = 0; i < NUM_FPU_REGS; i++)
++		memcpy(&vcpu->arch.fpu.fpr[i], &fpu->fpr[i], FPU_REG_WIDTH / 64);
++
++	return 0;
++}
++
++/* Enable FPU for guest and restore context */
++void kvm_own_fpu(struct kvm_vcpu *vcpu)
++{
++	preempt_disable();
++
++	/*
++	 * Enable FPU for guest
++	 */
++	set_csr_euen(CSR_EUEN_FPEN);
++
++	kvm_restore_fpu(&vcpu->arch.fpu);
++	vcpu->arch.aux_inuse |= KVM_LARCH_FPU;
++	trace_kvm_aux(vcpu, KVM_TRACE_AUX_RESTORE, KVM_TRACE_AUX_FPU);
++
++	preempt_enable();
++}
++
++/* Save and disable FPU */
++void kvm_lose_fpu(struct kvm_vcpu *vcpu)
++{
++	preempt_disable();
++
++	if (vcpu->arch.aux_inuse & KVM_LARCH_FPU) {
++		kvm_save_fpu(&vcpu->arch.fpu);
++		vcpu->arch.aux_inuse &= ~KVM_LARCH_FPU;
++		trace_kvm_aux(vcpu, KVM_TRACE_AUX_SAVE, KVM_TRACE_AUX_FPU);
++
++		/* Disable FPU */
++		clear_csr_euen(CSR_EUEN_FPEN);
 +	}
- 	default:
- 		r = -ENOIOCTLCMD;
- 		break;
++
++	preempt_enable();
++}
++
+ int kvm_arch_vcpu_precreate(struct kvm *kvm, unsigned int id)
+ {
+ 	return 0;
 -- 
 2.31.1
 
