@@ -2,43 +2,43 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D7E9E6DAC37
-	for <lists+kvm@lfdr.de>; Fri,  7 Apr 2023 13:27:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5AA376DAC43
+	for <lists+kvm@lfdr.de>; Fri,  7 Apr 2023 13:37:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231825AbjDGL1s (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Apr 2023 07:27:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47402 "EHLO
+        id S240454AbjDGLhS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Apr 2023 07:37:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52844 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230412AbjDGL1q (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 7 Apr 2023 07:27:46 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2160FAF36
-        for <kvm@vger.kernel.org>; Fri,  7 Apr 2023 04:27:18 -0700 (PDT)
+        with ESMTP id S231758AbjDGLhQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 7 Apr 2023 07:37:16 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 331786E94
+        for <kvm@vger.kernel.org>; Fri,  7 Apr 2023 04:37:15 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 82EC5650A7
-        for <kvm@vger.kernel.org>; Fri,  7 Apr 2023 11:26:30 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DF6C4C433D2;
-        Fri,  7 Apr 2023 11:26:29 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id C27F161154
+        for <kvm@vger.kernel.org>; Fri,  7 Apr 2023 11:37:14 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2B185C433D2;
+        Fri,  7 Apr 2023 11:37:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1680866789;
-        bh=gTM9Q+DtJm1MDW47XPSmHnT5LCzY51Ib7+ZkWiZyZao=;
+        s=k20201202; t=1680867434;
+        bh=gKTl3mxlnakzRJaSe8tQ31Hb1W+j6AYUGWXNgGKNPjo=;
         h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=OuuAa/k3jAms3bMu8FA2if6F2wpjsI7tjBZcEk2mcORQnW7sLcd/uKkVtol03rv45
-         SaIB48jUUiAxhRBvUQ/ihd2R2c1RJfTKceXIy+VSmtkug3+w7EveyRKY/qWJzv9Uki
-         WhpZBsCEYTBWrAaq0n76YehhkxZbKYfx3ro6LF2eNedLbC/fj8Y173HFgnpa0exfhP
-         w9z9Dd9vda9b8sId/Fq01BqPfAdMVA9GFyd1xg4aNslySlHkLqCSExld4vABz/arK5
-         lNM2RtdGPJPHVKUDq5SaW0VhhDCY1UgkWl0sH9q697PcXdRWm9WuJRg47KGJ8K+k6b
-         yCT7njZGm+v7w==
+        b=EKjJJ5JOzN5eBsDjVyBn1tGD4u2/BSgbVDSMdMHbmsrWQYTP3WCBafIbKEp3WxN9t
+         cmXxs1cv3E7VR7IwQjZPkrt6hxJQ/5QOjdbp4rolHet7ZmSNLBcG1eRSbSVvAcLEsw
+         65OAr7Pq4nTpCfmvXXvk/YzofBTajAQMnM8kAOuaUuLlApk7eg1ZxbyycDDoPnvTVD
+         klUJUlVH70h2krCXMZYZA7HTULlLRLhYngv3gWbj/MzH74kgEpHiLmq/E5GFOQu0o3
+         Jv6jQNIAa8wxMcQeoYOiKPIi3Z6ne+yGRQzWYxSpgxeA8uJ9XY3X5e96HQ+JhlGrTx
+         XXDRhyKnGe2CQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1pkkEd-006gXV-C9;
-        Fri, 07 Apr 2023 12:26:27 +0100
-Date:   Fri, 07 Apr 2023 12:26:26 +0100
-Message-ID: <87mt3k53x9.wl-maz@kernel.org>
+        id 1pkkP1-006geg-LK;
+        Fri, 07 Apr 2023 12:37:11 +0100
+Date:   Fri, 07 Apr 2023 12:37:11 +0100
+Message-ID: <87lej36hzs.wl-maz@kernel.org>
 From:   Marc Zyngier <maz@kernel.org>
 To:     Oliver Upton <oliver.upton@linux.dev>
 Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
@@ -48,10 +48,11 @@ Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
         Zenghui Yu <yuzenghui@huawei.com>,
         Will Deacon <will@kernel.org>
 Subject: Re: [PATCH 1/2] KVM: arm64: nvhe: Synchronise with page table walker on MMU update
-In-Reply-To: <ZC75v6kEe06omSc6@linux.dev>
+In-Reply-To: <87mt3k53x9.wl-maz@kernel.org>
 References: <20230330100419.1436629-1-maz@kernel.org>
         <20230330100419.1436629-2-maz@kernel.org>
         <ZC75v6kEe06omSc6@linux.dev>
+        <87mt3k53x9.wl-maz@kernel.org>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -61,8 +62,8 @@ X-SA-Exim-Connect-IP: 185.219.108.64
 X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, will@kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-5.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,SPF_HELO_NONE,
+X-Spam-Status: No, score=-2.5 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
         SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -70,54 +71,55 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Oliver,
-
-On Thu, 06 Apr 2023 17:56:31 +0100,
-Oliver Upton <oliver.upton@linux.dev> wrote:
+On Fri, 07 Apr 2023 12:26:26 +0100,
+Marc Zyngier <maz@kernel.org> wrote:
 > 
-> Hey Marc,
+> Hi Oliver,
 > 
-> On Thu, Mar 30, 2023 at 11:04:18AM +0100, Marc Zyngier wrote:
-> > When taking an exception between the EL1&0 translation regime and
-> > the EL2 translation regime, the page table walker is allowed to
-> > complete the walks started from EL0 or EL1 while running at EL2.
+> On Thu, 06 Apr 2023 17:56:31 +0100,
+> Oliver Upton <oliver.upton@linux.dev> wrote:
 > > 
-> > It means that altering the system registers that define the EL1&0
-> > translation regime is fraught with danger *unless* we wait for
-> > the completion of such walk with a DSB (R_LFHQG and subsequent
-> > statements in the ARM ARM). We already did the right thing for
-> > other external agents (SPE, TRBE), but not the PTW.
+> > Hey Marc,
 > > 
-> > In the case of nVHE, this is a bit involved, as there are a number
-> > of situations where this can happen (such as switching between
-> > host and guest, invalidating TLBs...).
+> > On Thu, Mar 30, 2023 at 11:04:18AM +0100, Marc Zyngier wrote:
+> > > When taking an exception between the EL1&0 translation regime and
+> > > the EL2 translation regime, the page table walker is allowed to
+> > > complete the walks started from EL0 or EL1 while running at EL2.
+> > > 
+> > > It means that altering the system registers that define the EL1&0
+> > > translation regime is fraught with danger *unless* we wait for
+> > > the completion of such walk with a DSB (R_LFHQG and subsequent
+> > > statements in the ARM ARM). We already did the right thing for
+> > > other external agents (SPE, TRBE), but not the PTW.
+> > > 
+> > > In the case of nVHE, this is a bit involved, as there are a number
+> > > of situations where this can happen (such as switching between
+> > > host and guest, invalidating TLBs...).
+> > 
+> > I'm assuming that the dsb(ishst) done in some of the other TLB
+> > invalidation handlers is sufficient, as R_LFHQG does not describe the
+> > scope of the DSB (i.e. loads and/or stores). Nonetheless, short of any
+> > special serialization rules, it seems probable for the PTW to have both
+> > outstanding loads and stores.
 > 
-> I'm assuming that the dsb(ishst) done in some of the other TLB
-> invalidation handlers is sufficient, as R_LFHQG does not describe the
-> scope of the DSB (i.e. loads and/or stores). Nonetheless, short of any
-> special serialization rules, it seems probable for the PTW to have both
-> outstanding loads and stores.
+> I too find the definition pretty light. My gut feeling is that we're
+> not really trying to synchronise against either loads or stores. We
+> are simply waiting for the PTW to complete (or give up) potential
+> speculative walks.
+> 
+> For TLBIs, we want to make sure that prior writes to the PTs are
+> observable, specially as we perform a broadcast invalidation.
+> 
+> But for external agents, we seem to always rely on an dsb(nsh), such
+> as for TRBE and SPE. My take is that if it is enough for them, it
+> should be enough for the PTW.
 
-I too find the definition pretty light. My gut feeling is that we're
-not really trying to synchronise against either loads or stores. We
-are simply waiting for the PTW to complete (or give up) potential
-speculative walks.
+I'll also add that dsb(nsh) orders both reads and writes either side
+of the barrier.
 
-For TLBIs, we want to make sure that prior writes to the PTs are
-observable, specially as we perform a broadcast invalidation.
-
-But for external agents, we seem to always rely on an dsb(nsh), such
-as for TRBE and SPE. My take is that if it is enough for them, it
-should be enough for the PTW.
-
-> Is there some other language in the architecture that speaks to the
-> effects of _any_ DSB on the PTW? I couldn't find it myself. In any case,
-> I'll have to take you at your word if you say it is sufficient :)
-
-"Data Synchronization Barrier (DSB)" has a tiny bit more info, but
-that's really thin.
-
-Maybe some of the ARM folks on cc can chime in?
+However, I finally get your point about the TLBI code. It only orders
+stores either side of the barrier, and I'm starting to wonder whether
+we should upgrade it to dsb(ish)...
 
 Thanks,
 
