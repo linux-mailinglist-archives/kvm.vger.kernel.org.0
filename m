@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 578336DA69C
-	for <lists+kvm@lfdr.de>; Fri,  7 Apr 2023 02:32:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ABC056DA6A5
+	for <lists+kvm@lfdr.de>; Fri,  7 Apr 2023 02:41:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230440AbjDGAcK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 Apr 2023 20:32:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41628 "EHLO
+        id S232933AbjDGAla (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 Apr 2023 20:41:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44864 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229716AbjDGAcI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 Apr 2023 20:32:08 -0400
-Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D81565FE4
-        for <kvm@vger.kernel.org>; Thu,  6 Apr 2023 17:32:07 -0700 (PDT)
-Received: by mail-pl1-x64a.google.com with SMTP id s4-20020a170902ea0400b001a1f4137086so23533096plg.14
-        for <kvm@vger.kernel.org>; Thu, 06 Apr 2023 17:32:07 -0700 (PDT)
+        with ESMTP id S230098AbjDGAl3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 Apr 2023 20:41:29 -0400
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C88637ED5
+        for <kvm@vger.kernel.org>; Thu,  6 Apr 2023 17:41:28 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-54c0b8ca2d1so41414487b3.17
+        for <kvm@vger.kernel.org>; Thu, 06 Apr 2023 17:41:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1680827527;
+        d=google.com; s=20210112; t=1680828088;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=gB6QWOYr52F6RzUn42cn9YO/xJt1ZAN7hiQOwDN28jE=;
-        b=oHmnDkznLB2fqcJzNFTU5CRPcplPmHa+GIQvo6Orr7+wsQGd+s6vVf89WhNskorqqE
-         lLQG19YX7xsC6cNJu3aGKA02F4zBlgkRLI2TlIGHkPxT2JSWGp+N1IQoSHYPCk3g3/ge
-         Qe4fNqV+EpBohAuiAZ0cLezUCUrpsVfm6I/JEE/mOo/vwLU0kLmuMHEUHCbYAoZlUveK
-         qTk8ykE0+1aYqB7uWwpNJ3odfc3TqWHhG9byQ+2Ubr8nfELrzum0C7Qnjm/IZ9MD5eT3
-         xRm6ojDNp1UYi9lqluGOLwUN78Q+5I3ZmqwOXrQEiQ39Fq33KpwCTcb0OvfvRMsknJ8f
-         5FRw==
+        bh=qnSSgZKRdvbPIrtsfog7qn4pLOiwfaQdSDWiuSpARLE=;
+        b=o2OHW9/K0xbtzyHr9GqnQWipotyYMmLhxrUEZDAdlLhV7l3Rv8xdaX0WCUK4HYc7aV
+         +DE9UFMpwbzj+oOOunqtG6WzIgGHk+rc1VFUdEWV9BxQEJMvraNlrjTkNt1VQs1ss7uk
+         hny49017FAxeDd/2gezMIalb641PAZKXsnwMY4huIocYbnvUf+UqMmCwQmvDGvi4xQcW
+         LJSM8Wdj5LhfvOtIeg+gW+2CL4Hnu2BVTL4EKY06qRgXxsdUAd5hNwZvHNz3AH4nLz/Y
+         BEMqj3Asxf+KzhhFzgNduVDmqN7XOTj6uAnnZqn5/IUVHOrx4E+PT5MpENFn/zh9Uz7+
+         heNw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680827527;
+        d=1e100.net; s=20210112; t=1680828088;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=gB6QWOYr52F6RzUn42cn9YO/xJt1ZAN7hiQOwDN28jE=;
-        b=G0yiNDZlx+FM72p6KZMeYbJ9Fy0GTrO3Lsml/e52fx9stxwhogCbkOs3Cz87rvH/NI
-         jlLsn3DWyMzsmZW892cZP8GfpzF7RJIxYD84VOmijy/0n/F/T6cM2BfiNwf9LK6j7qRi
-         lwWmTetBLHORXsvcIkXOf4sbEz9p9SbuHgCLu3y49vBF53yv2V+cu/L0Lei04b7C3a+E
-         iKmfjrKli/E7ZLEePUf4hhsDYFxzBIedcvoI817cb8UytXtCLBojdxd8qtcV6GgoQaPR
-         pVUp43kArcEvIi/X+4UcECDfXQYECuqqf2SVJypKR0ICln3fz8KXaYKh1n0hLpxh3otv
-         mV2w==
-X-Gm-Message-State: AAQBX9e0brifJcx8iuJFkWo4JFTv3h7m6RT9p0ijRInaZCoff2HlCECc
-        pkhW5cCwpsMxJUTIUgF97wpU5QtdYIo=
-X-Google-Smtp-Source: AKy350ZKPl5uhVQylzilx1ijUrU5YeSnYp0rewZjeOU7OOLMz3vTuRUjjlrZudIWP/Bn4kGIuKKUvf/UyXA=
+        bh=qnSSgZKRdvbPIrtsfog7qn4pLOiwfaQdSDWiuSpARLE=;
+        b=bu+vKz0fsWYlsb1E6ud3gZDB0OpKuOXFmWseaVH0tYKDhFiVsapV0Q3EUtX+3+j/7h
+         d+hZ2HZSC1UQOX9bjJ8Ea+37TsM90w5v8XrgreMzCVcAYQXnmAhTIHzW+KyVzRWbi6SO
+         jvteNA7pXBHh5SwgiQFA2tKEaL+OD/nvkegJl7SoFB48TLheUb7ZSA90wHUqvdrOnNW9
+         8uzy0qAWxAshYVxefAlMyE32CMJdzgiV324DZ1B1HvXXEPzfqN5UQZGGcPnRD6hNdWAm
+         IfP9LR4rnCTPEA1JAFxGgd5A8gxBEx8kehMvXNr6RUwkux9LgRFLgwQ4+Uv8vMlOicyI
+         djGQ==
+X-Gm-Message-State: AAQBX9ciUVYeA3wqSoABdNvxQUyU8blv99MxdzKChaMveLDSJ1ZClsVk
+        g8jVUe4JOCHoadg7ilZWnDN6eaJxpwg=
+X-Google-Smtp-Source: AKy350Zz5FKwxmfQDD5yYfqSgli2jvdRgU7L7OSoM6fF0+T1VLwPUZWhcVT+ru9jOJO6n6lt8LS/Aehavas=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:da8e:b0:1a5:144c:27df with SMTP id
- j14-20020a170902da8e00b001a5144c27dfmr107749plx.4.1680827527170; Thu, 06 Apr
- 2023 17:32:07 -0700 (PDT)
-Date:   Thu, 6 Apr 2023 17:32:05 -0700
-In-Reply-To: <20230214050757.9623-10-likexu@tencent.com>
+ (user=seanjc job=sendgmr) by 2002:a05:6902:1588:b0:b8c:ba33:462b with SMTP id
+ k8-20020a056902158800b00b8cba33462bmr144970ybu.2.1680828088140; Thu, 06 Apr
+ 2023 17:41:28 -0700 (PDT)
+Date:   Thu, 6 Apr 2023 17:41:26 -0700
+In-Reply-To: <20230214050757.9623-11-likexu@tencent.com>
 Mime-Version: 1.0
-References: <20230214050757.9623-1-likexu@tencent.com> <20230214050757.9623-10-likexu@tencent.com>
-Message-ID: <ZC9khVlFr2RYd83P@google.com>
-Subject: Re: [PATCH v4 09/12] KVM: x86/pmu: Forget PERFCTR_CORE if the min num
- of counters isn't met
+References: <20230214050757.9623-1-likexu@tencent.com> <20230214050757.9623-11-likexu@tencent.com>
+Message-ID: <ZC9mtqxmqKAoelNO@google.com>
+Subject: Re: [PATCH v4 10/12] KVM: x86/cpuid: Add X86_FEATURE_PERFMON_V2 as a
+ scattered flag
 From:   Sean Christopherson <seanjc@google.com>
 To:     Like Xu <like.xu.linux@gmail.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
@@ -67,72 +67,30 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+This shortlog is flat out wrong.  This patch does not add X86_FEATURE_PERFMON_V2,
+it adds a KVM-only leaf to redirect X86_FEATURE_PERFMON_V2 to its architectural
+location when KVM queries the leaf, e.g. via guest_cpuid_has().
+
 On Tue, Feb 14, 2023, Like Xu wrote:
 > From: Like Xu <likexu@tencent.com>
 > 
-> KVM should sanity check the number of counters enumerated by perf and
-> explicitly drop PERFCTR_CORE support if the min isn't met. E.g. if KVM
-> needs 6 counters and perf says there are 4, then something is wrong and
-> enumerating 6 to the guest is only going to cause more issues.
-> 
-> Opportunistically, the existing kvm_cpu_cap_check_and_set() makes it
-> easier to simplify the host check before setting the PERFCTR_CORE flag.
+> Considering that the core kernel may also want to know this flag, to avoid
 
-Once again, state what the patch does.
+Please write changelogs so that they do not depend on the shortlog for context.
+I know the tip maintainers in particular like to make the changelog a continuation
+of the shortlog, but I find it really annoying, especially when reviewing in mutt,
+e.g. as I'm typing this, I don't even have the shortlog visible.
 
-> Suggested-by: Sean Christopherson <seanjc@google.com>
-> Signed-off-by: Like Xu <likexu@tencent.com>
-> ---
->  arch/x86/kvm/svm/svm.c | 11 ++++++++---
->  1 file changed, 8 insertions(+), 3 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index dd21e8b1a259..f4a4691b4f4e 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -4910,9 +4910,14 @@ static __init void svm_set_cpu_caps(void)
->  	    boot_cpu_has(X86_FEATURE_AMD_SSBD))
->  		kvm_cpu_cap_set(X86_FEATURE_VIRT_SSBD);
->  
-> -	/* AMD PMU PERFCTR_CORE CPUID */
-> -	if (enable_pmu && boot_cpu_has(X86_FEATURE_PERFCTR_CORE))
-> -		kvm_cpu_cap_set(X86_FEATURE_PERFCTR_CORE);
-> +	if (enable_pmu) {
+In the vast majority of cases, being more explicit rarely adds more than a few
+chars, e.g. you'll save more by reducing the fluff in this changelog.
 
-A comment would be very helpful here.   Even better would be if we can convince
-perf to rename AMD64_NUM_COUNTERS to AMD64_LEGACY_NUM_COUNTERS.
+> confusion this needs to be a scattered flag rather than a pure KVM flag so
+> that KVM can redirect it to the hardware-defined bit position, which is the
+> role of __feature_translate() and KVM_X86_FEATURE_PERFMON_V2.
 
+Like the shortlog, the changelog is best misleading, X86_FEATURE_PERFMON_V2 is
+already a scattered flag.
 
-> +		if (kvm_pmu_cap.num_counters_gp < AMD64_NUM_COUNTERS_CORE) {
-> +			kvm_pmu_cap.num_counters_gp = AMD64_NUM_COUNTERS;
-
-Hmm, this subtly relies on kvm_init_pmu_capability() running first.  That
-_probably_ won't change, but like the arch LBRs side of things I would prefer to
-avoid taking unnecessarily.  E.g. something like this?
-
-		/*
-		 * Enumerate support for PERFCTR_CORE if and only if KVM has
-		 * access to enough counters to virtualize "core" support,
-		 * otherwise limit vPMU support to the legacy number of counters.
-		 */
-		if (kvm_pmu_cap.num_counters_gp < AMD64_NUM_COUNTERS_CORE)
-			kvm_pmu_cap.num_counters_gp = min(AMD64_NUM_COUNTERS,
-							  kvm_pmu_cap.num_counters_gp);
-
-It's a bit paranoid, but practically speaking it doesn't cost us anything.
-
-> +		} else {
-> +			/* AMD PMU PERFCTR_CORE CPUID */
-
-Meh, this is not a very helpful comment, no need to carry it forward.  And if you
-drop it, then the need for curly braces goes away.
-
-> +			kvm_cpu_cap_check_and_set(X86_FEATURE_PERFCTR_CORE);
-> +		}
-> +	}
->  
->  	/* CPUID 0x8000001F (SME/SEV features) */
->  	sev_set_cpu_caps();
-> -- 
-> 2.39.1
-> 
+  Define a KVM-only leaf for AMD's PerfMonV2 feature flag to redirect the
+  kernel's scattered version to its architectural location, e.g. so that
+  KVM can query guest support via guest_cpuid_has().
