@@ -2,107 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0DDE96DAF80
-	for <lists+kvm@lfdr.de>; Fri,  7 Apr 2023 17:15:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6A6486DAFC5
+	for <lists+kvm@lfdr.de>; Fri,  7 Apr 2023 17:37:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233754AbjDGPPJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Apr 2023 11:15:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56414 "EHLO
+        id S233632AbjDGPhM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Apr 2023 11:37:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47018 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240812AbjDGPO4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 7 Apr 2023 11:14:56 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 179FA44BC
-        for <kvm@vger.kernel.org>; Fri,  7 Apr 2023 08:14:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1680880447;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=iXAPNdBJMnoHbxVht9yPga+A2CeJtiyrlF4HM2aW+j0=;
-        b=dDPNHZDfdeyB062/uyMr6aoaGBYNaZqftMM32GwZZzIhO0DJCsmhhoiL+Q2+dwxYjpHz71
-        yTQ0qR9V0VvHr+ZckSL368//Xc/To9G07pgdSIyd9BZlM2Tqd8Qqk62QaA4fs7v8r1tw8e
-        SAzxv2/Wc1Rz0ZKihpMJhDdc1St/WPQ=
-Received: from mail-il1-f200.google.com (mail-il1-f200.google.com
- [209.85.166.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-631-ck1PBKwgNQSXWSs2-cZfkA-1; Fri, 07 Apr 2023 11:14:06 -0400
-X-MC-Unique: ck1PBKwgNQSXWSs2-cZfkA-1
-Received: by mail-il1-f200.google.com with SMTP id s6-20020a056e02216600b003264c778ef1so14869846ilv.23
-        for <kvm@vger.kernel.org>; Fri, 07 Apr 2023 08:14:06 -0700 (PDT)
+        with ESMTP id S232769AbjDGPhJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 7 Apr 2023 11:37:09 -0400
+Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 292D5A5E1
+        for <kvm@vger.kernel.org>; Fri,  7 Apr 2023 08:37:04 -0700 (PDT)
+Received: by mail-pf1-x44a.google.com with SMTP id e14-20020a056a00162e00b0062804a7a79bso19043811pfc.23
+        for <kvm@vger.kernel.org>; Fri, 07 Apr 2023 08:37:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112; t=1680881823;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=dtRo2WFL21oaAHbFrfR4Ddw4J5LButNKMmHMmvec6E8=;
+        b=fQ525XCgqO4r0Jd2ckX2rwmiwgXMlDh7YnhmFOVXtAmjvVC6fFfBt8giGMo2oJsOoD
+         d/dXG2J+bNOwxczTF84vIYIDodoZ6ZbrIV8pv6Q/eHP24Q8xDZNf1ATkqZLiYK0zxGlC
+         RxvpvRq0hljcpfrsWQsuUCTuMzt7ICLtbt6ndrL/Vxroft6EmGwcsosMxebxN1fWG2Zc
+         ifYPZAIEBsOBjVAT8wB1vAYk53XyRpsDASnET4K12S632fLTX8F5M8N7P7GoCjGaHMto
+         CTZ11jIMuZn5mBtj1in2moL/unXbqv7A6gHbDc5jrgyzxbQVZDxwLZK0jWpPri0HxPHj
+         4zNg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680880445; x=1683472445;
-        h=content-transfer-encoding:mime-version:organization:references
-         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=iXAPNdBJMnoHbxVht9yPga+A2CeJtiyrlF4HM2aW+j0=;
-        b=lsU5404FbsnhO9BwgGY3mLtykFk05/C9GilDMf7oIEpxfjatQzGqLz4mDQeqm0sxx4
-         hTBQJdXBdVdpoVWdnt1+QKM9yE3LFgllzk/udJJl5MpDOG2UCvBvmfi4/PH949lihbs9
-         v8RBf5rLe9yHM6F7eKz9NuZaaC4R9X83vXpuZE0iAp3+pgP8SWXSC3wpxsGi+o76CZYc
-         Q0FG/4I5itgSwmCZ2qUurY2+MCqniSUaS0FEUOfZ3KCYCjtcuQW5hDaeuy0LPGZn1kTs
-         VSlUKNQdla0P31fYjYY3xVO1WxSMcDPBtCPx+9p6x6hez9Iis4Kk/7cKgLDfHPWMucnX
-         RTjQ==
-X-Gm-Message-State: AAQBX9fjAXcdOdOrLAqva7Jbk0ztj+wwPqP0fnM6PZqvgy8nZ11FEPf1
-        PDSLtonjP59BRBkS+9WOkdkj1YTyehANStV9aAyot7P5Ff+ovHQSgiVsenRS52nxZjCqNOXktx5
-        04OMlCYW2NBMG
-X-Received: by 2002:a6b:e611:0:b0:74c:9235:8753 with SMTP id g17-20020a6be611000000b0074c92358753mr2519768ioh.13.1680880445446;
-        Fri, 07 Apr 2023 08:14:05 -0700 (PDT)
-X-Google-Smtp-Source: AKy350YEpVoORZpa6d3nNLDs1r1CtYmaffUAedkEJ1EC3FuUQNNUjaJPIAYHNqBk5PYwGJ72oUes6w==
-X-Received: by 2002:a6b:e611:0:b0:74c:9235:8753 with SMTP id g17-20020a6be611000000b0074c92358753mr2519746ioh.13.1680880445186;
-        Fri, 07 Apr 2023 08:14:05 -0700 (PDT)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id z20-20020a027a54000000b004061ac1ddd1sm1174890jad.169.2023.04.07.08.14.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Apr 2023 08:14:04 -0700 (PDT)
-Date:   Fri, 7 Apr 2023 09:14:01 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     "Liu, Yi L" <yi.l.liu@intel.com>
-Cc:     "jgg@nvidia.com" <jgg@nvidia.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
-        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
-        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "jasowang@redhat.com" <jasowang@redhat.com>,
-        "shameerali.kolothum.thodi@huawei.com" 
-        <shameerali.kolothum.thodi@huawei.com>,
-        "lulu@redhat.com" <lulu@redhat.com>,
-        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
-        "intel-gvt-dev@lists.freedesktop.org" 
-        <intel-gvt-dev@lists.freedesktop.org>,
-        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
-        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-        "Hao, Xudong" <xudong.hao@intel.com>,
-        "Zhao, Yan Y" <yan.y.zhao@intel.com>,
-        "Xu, Terrence" <terrence.xu@intel.com>,
-        "Jiang, Yanting" <yanting.jiang@intel.com>
-Subject: Re: [PATCH v3 12/12] vfio/pci: Report dev_id in
- VFIO_DEVICE_GET_PCI_HOT_RESET_INFO
-Message-ID: <20230407091401.1c847419.alex.williamson@redhat.com>
-In-Reply-To: <DS0PR11MB7529C1CA38D7D1035869F358C3969@DS0PR11MB7529.namprd11.prod.outlook.com>
-References: <20230401144429.88673-1-yi.l.liu@intel.com>
-        <20230401144429.88673-13-yi.l.liu@intel.com>
-        <DS0PR11MB752996A6E6B3263BAD01DAC2C3929@DS0PR11MB7529.namprd11.prod.outlook.com>
-        <20230403090151.4cb2158c.alex.williamson@redhat.com>
-        <DS0PR11MB75291E6ED702ADD03AAE023BC3969@DS0PR11MB7529.namprd11.prod.outlook.com>
-        <20230407060335.7babfeb8.alex.williamson@redhat.com>
-        <DS0PR11MB7529B0A91FF97C078BEA3783C3969@DS0PR11MB7529.namprd11.prod.outlook.com>
-        <20230407075155.3ad4c804.alex.williamson@redhat.com>
-        <DS0PR11MB7529C1CA38D7D1035869F358C3969@DS0PR11MB7529.namprd11.prod.outlook.com>
-Organization: Red Hat
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+        d=1e100.net; s=20210112; t=1680881823;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=dtRo2WFL21oaAHbFrfR4Ddw4J5LButNKMmHMmvec6E8=;
+        b=Xlg3JWpXT6ky2aulLJrzwj6Bh92h7Qf8B8dpupb/TA1vJr0bRK4DTPa7V6E8dfs/0G
+         MLg1GiT9wWQCoNKTGNrlXYWmDl1eJ77djclyNB5ti3MGD9LEeAzUUbyQ39zyh5hB2wXG
+         3h5A86SklSeOTw/dZqLIeeqcS+sGfORP1CcWC/4Fb4CqE4Obh/IJjRtLzUEfPRdXyZU9
+         D95Qe6ifKjFHjNZbiU6vaneQI+Z5JBmfh9GeQQokeMRCP7FoN+sEkW2gDmrwuOa5AM5A
+         yt3DPEa6up+0CqzClVeiVpSJRb/oOPaatUevQjyKgF+m/g1Hohx9ycbqg0NZgL7Iwl4F
+         braw==
+X-Gm-Message-State: AAQBX9cYBUqgrOMSZwXPw5bTM+5DlOFhzS1KurIJlf9beK025TFwcGuG
+        SLC1kvZ78XjQJNbE0ejav3Bdx7gENtk=
+X-Google-Smtp-Source: AKy350Z3PPXr0IyjDAwL0vaSoIYe+f/X8hPe0wn9swtrsKv8G52cCL84ZV69CuXp5ijMAgL0OjYQmsSkEwU=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:902:7787:b0:1a1:b3bb:cd5e with SMTP id
+ o7-20020a170902778700b001a1b3bbcd5emr917936pll.9.1680881823661; Fri, 07 Apr
+ 2023 08:37:03 -0700 (PDT)
+Date:   Fri, 7 Apr 2023 08:37:02 -0700
+In-Reply-To: <20230407085646.24809-1-likexu@tencent.com>
+Mime-Version: 1.0
+References: <20230407085646.24809-1-likexu@tencent.com>
+Message-ID: <ZDA4nsyAku9B2/58@google.com>
+Subject: Re: [PATCH V2] KVM: x86/pmu: Disable vPMU if EVENTSEL_GUESTONLY bit
+ doesn't exist
+From:   Sean Christopherson <seanjc@google.com>
+To:     Like Xu <like.xu.linux@gmail.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Ravi Bangoria <ravi.bangoria@amd.com>
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-7.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -110,89 +67,134 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 7 Apr 2023 14:04:02 +0000
-"Liu, Yi L" <yi.l.liu@intel.com> wrote:
-
-> > From: Alex Williamson <alex.williamson@redhat.com>
-> > Sent: Friday, April 7, 2023 9:52 PM
-> > 
-> > On Fri, 7 Apr 2023 13:24:25 +0000
-> > "Liu, Yi L" <yi.l.liu@intel.com> wrote:
-> >   
-> > > > From: Alex Williamson <alex.williamson@redhat.com>
-> > > > Sent: Friday, April 7, 2023 8:04 PM
-> > > >  
-> > > > > > > > @@ -791,7 +813,21 @@ static int vfio_pci_fill_devs(struct pci_dev *pdev,  
-> > void  
-> > > > > > *data)  
-> > > > > > > >  	if (!iommu_group)
-> > > > > > > >  		return -EPERM; /* Cannot reset non-isolated devices */  
-> > >
-> > > [1]
-> > >  
-> > > > > > >
-> > > > > > > Hi Alex,
-> > > > > > >
-> > > > > > > Is disabling iommu a sane way to test vfio noiommu mode?  
-> > > > > >
-> > > > > > Yes
-> > > > > >  
-> > > > > > > I added intel_iommu=off to disable intel iommu and bind a device to vfio-pci.
-> > > > > > > I can see the /dev/vfio/noiommu-0 and /dev/vfio/devices/noiommu-vfio0.  
-> > Bind  
-> > > > > > > iommufd==-1 can succeed, but failed to get hot reset info due to the above
-> > > > > > > group check. Reason is that this happens to have some affected devices, and
-> > > > > > > these devices have no valid iommu_group (because they are not bound to  
-> > vfio-  
-> > > > pci  
-> > > > > > > hence nobody allocates noiommu group for them). So when hot reset info  
-> > loops  
-> > > > > > > such devices, it failed with -EPERM. Is this expected?  
-> > > > > >
-> > > > > > Hmm, I didn't recall that we put in such a limitation, but given the
-> > > > > > minimally intrusive approach to no-iommu and the fact that we never
-> > > > > > defined an invalid group ID to return to the user, it makes sense that
-> > > > > > we just blocked the ioctl for no-iommu use.  I guess we can do the same
-> > > > > > for no-iommu cdev.  
-> > > > >
-> > > > > I just realize a further issue related to this limitation. Remember that we
-> > > > > may finally compile out the vfio group infrastructure in the future. Say I
-> > > > > want to test noiommu, I may boot such a kernel with iommu disabled. I think
-> > > > > the _INFO ioctl would fail as there is no iommu_group. Does it mean we will
-> > > > > not support hot reset for noiommu in future if vfio group infrastructure is
-> > > > > compiled out?  
-> > > >
-> > > > We're talking about IOMMU groups, IOMMU groups are always present
-> > > > regardless of whether we expose a vfio group interface to userspace.
-> > > > Remember, we create IOMMU groups even in the no-iommu case.  Even with
-> > > > pure cdev, there are underlying IOMMU groups that maintain the DMA
-> > > > ownership.  
-> > >
-> > > hmmm. As [1], when iommu is disabled, there will be no iommu_group for a
-> > > given device unless it is registered to VFIO, which a fake group is created.
-> > > That's why I hit the limitation [1]. When vfio_group is compiled out, then
-> > > even fake group goes away.  
-> > 
-> > In the vfio group case, [1] can be hit with no-iommu only when there
-> > are affected devices which are not bound to vfio.  
+On Fri, Apr 07, 2023, Like Xu wrote:
+> From: Like Xu <likexu@tencent.com>
 > 
-> yes. because vfio would allocate fake group when device is registered to
-> it.
-> 
-> > Why are we not
-> > allocating an IOMMU group to no-iommu devices when vfio group is
-> > disabled?  Thanks,  
-> 
-> hmmm. when the vfio group code is configured out. The
-> vfio_device_set_group() just returns 0 after below patch is
-> applied and CONFIG_VFIO_GROUP=n. So when there is no
-> vfio group, the fake group also goes away.
-> 
-> https://lore.kernel.org/kvm/20230401151833.124749-25-yi.l.liu@intel.com/
+> Unlike Intel's MSR atomic_switch mechanism, AMD supports guest pmu
+> basic counter feature by setting the GUESTONLY bit on the host, so the
+> presence or absence of this bit determines whether vPMU is emulatable
+> (e.g. in nested virtualization). Since on AMD, writing reserved bits of
+> EVENTSEL register does not bring #GP, KVM needs to update the global
+> enable_pmu value by checking the persistence of this GUESTONLY bit.
 
-Is this a fundamental issue or just a problem with the current
-implementation proposal?  It seems like the latter.  FWIW, I also don't
-see a taint happening in the cdev path for no-iommu use.  Thanks,
+This is looking more and more like a bug fix, i.e. needs a Fixes:, no?
 
-Alex
+> Cc: Ravi Bangoria <ravi.bangoria@amd.com>
+> Signed-off-by: Like Xu <likexu@tencent.com>
+> ---
+> V1:
+> https://lore.kernel.org/kvm/20230307113819.34089-1-likexu@tencent.com
+> V1 -> V2 Changelog:
+> - Preemption needs to be disabled to ensure a stable CPU; (Sean)
+> - KVM should be restoring the original value too; (Sean)
+> - Disable vPMU once guest_only mode is not supported; (Sean)
 
+Please respond to my questions, don't just send a new version.  When I asked
+
+ : Why does lack of AMD64_EVENTSEL_GUESTONLY disable the PMU, but if and only if
+ : X86_FEATURE_PERFCTR_CORE?  E.g. why does the behavior not also apply to legacy
+ : perfmon support?
+
+I wanted an actual answer because I genuinely do not know what the correct
+behavior is.
+
+> - Appreciate any better way to probe for GUESTONLY support;
+
+Again, wait for discussion in previous versions to resolve before posting a new
+version.  If your answer is "not as far as I know", that's totally fine, but
+sending a new version without responding makes it unnecessarily difficult to
+track down your "answer".  E.g. instead of seeing a very direct "I don't know",
+I had to discover that answer by finding a hint buried in the ignored section of
+a new patch.
+
+>  arch/x86/kvm/svm/svm.c | 17 +++++++++++++++++
+>  1 file changed, 17 insertions(+)
+> 
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index 7584eb85410b..1ab885596510 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -4884,6 +4884,20 @@ static __init void svm_adjust_mmio_mask(void)
+>  	kvm_mmu_set_mmio_spte_mask(mask, mask, PT_WRITABLE_MASK | PT_USER_MASK);
+>  }
+>  
+> +static __init bool pmu_has_guestonly_mode(void)
+> +{
+> +	u64 original, value;
+> +
+> +	preempt_disable();
+> +	rdmsrl(MSR_F15H_PERF_CTL0, original);
+
+What guarantees this MSR actually exists?  In v1, it was guarded by enable_pmu=%true,
+but that's longer the case.  And KVM does
+
+	case MSR_F15H_PERF_CTL0 ... MSR_F15H_PERF_CTR5:
+		if (!guest_cpuid_has(vcpu, X86_FEATURE_PERFCTR_CORE))
+			return NULL;
+
+which very strongly suggests this MSR doesn't exist if the CPU supports only the
+"legacy" PMU.
+
+> +	wrmsrl(MSR_F15H_PERF_CTL0, AMD64_EVENTSEL_GUESTONLY);
+> +	rdmsrl(MSR_F15H_PERF_CTL0, value);
+> +	wrmsrl(MSR_F15H_PERF_CTL0, original);
+> +	preempt_enable();
+> +
+> +	return value == AMD64_EVENTSEL_GUESTONLY;
+> +}
+> +
+>  static __init void svm_set_cpu_caps(void)
+>  {
+>  	kvm_set_cpu_caps();
+> @@ -4928,6 +4942,9 @@ static __init void svm_set_cpu_caps(void)
+>  	    boot_cpu_has(X86_FEATURE_AMD_SSBD))
+>  		kvm_cpu_cap_set(X86_FEATURE_VIRT_SSBD);
+>  
+> +	/* Probe for AMD64_EVENTSEL_GUESTONLY support */
+
+I've said this several times recently: use comments to explain _why_ and to call
+out subtleties.  The code quite obviously is probing for guest-only support, what's
+not obvious is why guest-only support is mandatory for vPMU support.  It may be
+obvious to you, but pease try to view all of this code from the perspective of
+someone who has only passing knowledge of the various components, i.e. doesn't
+know the gory details of exactly what KVM supports.
+
+Poking around, I see that pmc_reprogram_counter() unconditionally does
+
+	.exclude_host = 1,
+
+and amd_core_hw_config()
+
+	if (event->attr.exclude_host && event->attr.exclude_guest)
+		/*
+		 * When HO == GO == 1 the hardware treats that as GO == HO == 0
+		 * and will count in both modes. We don't want to count in that
+		 * case so we emulate no-counting by setting US = OS = 0.
+		 */
+		event->hw.config &= ~(ARCH_PERFMON_EVENTSEL_USR |
+				      ARCH_PERFMON_EVENTSEL_OS);
+	else if (event->attr.exclude_host)
+		event->hw.config |= AMD64_EVENTSEL_GUESTONLY;
+	else if (event->attr.exclude_guest)
+		event->hw.config |= AMD64_EVENTSEL_HOSTONLY;
+
+and so something like this seems appropriate
+
+	/*
+	 * KVM requires guest-only event support in order to isolate guest PMCs
+	 * from host PMCs.  SVM doesn't provide a way to atomically load MSRs
+	 * on VMRUN, and manually adjusting counts before/after VMRUN is not
+	 * accurate enough to properly virtualize a PMU.
+	 */
+
+But now I'm really confused, because if I'm reading the code correctly, perf
+invokes amd_core_hw_config() for legacy PMUs, i.e. even if PERFCTR_CORE isn't
+supported.  And the APM documents the host/guest bits only for "Core Performance
+Event-Select Registers".
+
+So either (a) GUESTONLY isn't supported on legacy CPUs and perf is relying on AMD
+CPUs ignoring reserved bits or (b) GUESTONLY _is_ supported on legacy PMUs and
+pmu_has_guestonly_mode() is checking the wrong MSR when running on older CPUs.
+
+And if (a) is true, then how on earth does KVM support vPMU when running on a
+legacy PMU?  Is vPMU on AMD just wildly broken?  Am I missing something?
