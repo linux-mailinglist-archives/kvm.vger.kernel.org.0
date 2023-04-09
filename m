@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 344A96DBEE5
-	for <lists+kvm@lfdr.de>; Sun,  9 Apr 2023 08:30:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 805DE6DBEE6
+	for <lists+kvm@lfdr.de>; Sun,  9 Apr 2023 08:30:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229601AbjDIGa0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 9 Apr 2023 02:30:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33104 "EHLO
+        id S229581AbjDIGa2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 9 Apr 2023 02:30:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33082 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229561AbjDIGaW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 9 Apr 2023 02:30:22 -0400
-Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AFEE06A57
-        for <kvm@vger.kernel.org>; Sat,  8 Apr 2023 23:30:19 -0700 (PDT)
-Received: by mail-pf1-x449.google.com with SMTP id d2e1a72fcca58-632cf80572bso217439b3a.3
-        for <kvm@vger.kernel.org>; Sat, 08 Apr 2023 23:30:19 -0700 (PDT)
+        with ESMTP id S229568AbjDIGaX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 9 Apr 2023 02:30:23 -0400
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39E5461B4
+        for <kvm@vger.kernel.org>; Sat,  8 Apr 2023 23:30:21 -0700 (PDT)
+Received: by mail-pl1-x649.google.com with SMTP id w14-20020a170902e88e00b001a238a5946cso23828654plg.11
+        for <kvm@vger.kernel.org>; Sat, 08 Apr 2023 23:30:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1681021818; x=1683613818;
+        d=google.com; s=20210112; t=1681021820; x=1683613820;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=LTdZbFSU/751OSOyYOxKL9fHdH3jkfed2ZTa4dAt9zk=;
-        b=HZDs7aqDNXsJ9RN4aH5phzvvTEmpG3V+78mv8742KdY47AFk63ErxhAifXU2Yeiz1e
-         bjdI5s2FkJalGQ51FlpYfFmKqJjsXHS8wMi/wzfWSu9XAdHE6u+O3rM/WC70uEGtdcoi
-         aibmOVHG7tsN98CeOrx04/lP3opX6GnCFxH0651QziUWtBDS8Qb8N43Fc0Eb57HvE01g
-         c2MSmWLemNwkCj7/etuBFKmTJhs53DtA1uNJwGGS3slQeP8Crsub4gqKeGTFhh+cb4Ba
-         Pm8+Y6fVJMDAhXQjHAHOdYtHUAJOQHT+FRKcsaJtwdnkiQ0vHbhCcuIbkuBJpvUpuEfM
-         NvTA==
+        bh=igOAuz0r1I5hEA8P4Bo74bcWKKXOHEcP0nYYkCmfiag=;
+        b=E7yG1q3IKNdHqcK/SdlJAqbCxmy9CsG1Tolzabddr4MPAw70ToSdoDR44cSmJ8B4jF
+         zhs39hkzcTG6IZ+fJZx5YLk90vvMGoI0srDkH8d89dNR+pJ4CWGoAL/4wM4hub8tBrz3
+         Xmcr6FWplkpy/5S4bVOsoawG1Xtd9EgBNWAY2C4t8/IzziO7abveboRdPSV0ogWrJtkp
+         45dQVusJ/3wbTtdaAfkeo5m+s9YKnF17DX47974aW1/NinsT4E/5Ja8BnpZ+XQ0kQhKL
+         t0pDN6jE3Z+z9XZXbosoY3a5mRg1HTveMCaAtneGwbhFxAjvBU5ZovIxxJ4f4yrUtYpY
+         PmHw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1681021818; x=1683613818;
+        d=1e100.net; s=20210112; t=1681021820; x=1683613820;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=LTdZbFSU/751OSOyYOxKL9fHdH3jkfed2ZTa4dAt9zk=;
-        b=KMu2A5L5Dk2G/PVhG7pNJXvXheGYPqJ/w+Ec+Ofpy9fRzh2H4nYR0dj7L3mz9l94oP
-         gjzY/Je52WziEMC4mkcz9V6ULoPpqdB0CyoeT4tpqP2HWGRa/uGz4+U/Zu3wa8LfmsRm
-         iM1gvXzM6FT6Q+iPcbxrW20tIxRYiPz0H11IJL4VBDNXXXO8qu6Phw4QbASlIKHZ5JYj
-         E5haaEYcDf++CaBqoryTstrGvjKBmjPozRPb8PBTGGC9WVaSukdOyU4k8csxhE8C69D8
-         2TIlvNP2GRJKg8nKy2icRCQWFjZzgR0ak9m0I1IVHMzoyQX6ojAKgHvqa7ohAOaa7srQ
-         6yxQ==
-X-Gm-Message-State: AAQBX9em7ygVeZnaeC8MpJ+iLTHT8bCGMl83ho/rlsAV0nyHCDBr7wl6
-        LEH7hZqA5jP+yQg80EQLFOh2D+dTkiMTYg==
-X-Google-Smtp-Source: AKy350bCvyUyyfSycEw9EqPn5D3eqNmd/GH5Ut255EHU6PpSDn+jysdSgW847z4k/QCqWgSdLregKQNOXTT4xQ==
+        bh=igOAuz0r1I5hEA8P4Bo74bcWKKXOHEcP0nYYkCmfiag=;
+        b=xkFOKPJgGaHu+AG4em1U/MHxuKBbY56OyiVS71o1GBxDZWGbHfq4UmuM6kViVOcjTM
+         c8+OTHTGKljgkpUCy68adqqDOoM76m9RqNSBi70zwQQeUKMVhvEhezSlyW9372fDFbDX
+         VA+ZmTWtz5mA+j7gcUXb0gZD7FgCfUpF5bxIZoqP1TAIa+Rfp2ZO9f+GVc/Y1pFUznDk
+         8oquT+c+xltI2dGh63nsaPge+Lphh1vUwpMGKnwTe2PFj/rk/cZ6im82OyzXnv2PVJx8
+         b9rE1PshcOGfAxdicNU9mJfTuUvcX1Tde5u2X+h/okej9eTZUUC+xhJh4w5cuOM/GJ0e
+         ghnw==
+X-Gm-Message-State: AAQBX9e/496rECpbWtdY/RTQ0GUsUVfCbMkTCUE+gIKtkeMK2g+8fCs6
+        6PqQq1WxquXUgXgdWwl2IJNPzIwYiblFbQ==
+X-Google-Smtp-Source: AKy350YSBrvguPlC4BjtLQ9kjRG7E/3WtRpDfhSM5FEF4pdpk/J4GyCI2B4LNfWwunsLJo7IpNhZTtJxpdvivA==
 X-Received: from ricarkol4.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:1248])
- (user=ricarkol job=sendgmr) by 2002:a05:6a00:2e8c:b0:5e6:f9a1:e224 with SMTP
- id fd12-20020a056a002e8c00b005e6f9a1e224mr3519311pfb.6.1681021818686; Sat, 08
- Apr 2023 23:30:18 -0700 (PDT)
-Date:   Sun,  9 Apr 2023 06:29:56 +0000
+ (user=ricarkol job=sendgmr) by 2002:a17:902:f685:b0:1a0:d6b:1211 with SMTP id
+ l5-20020a170902f68500b001a00d6b1211mr2427944plg.6.1681021820147; Sat, 08 Apr
+ 2023 23:30:20 -0700 (PDT)
+Date:   Sun,  9 Apr 2023 06:29:57 +0000
 In-Reply-To: <20230409063000.3559991-1-ricarkol@google.com>
 Mime-Version: 1.0
 References: <20230409063000.3559991-1-ricarkol@google.com>
 X-Mailer: git-send-email 2.40.0.577.gac1e443424-goog
-Message-ID: <20230409063000.3559991-10-ricarkol@google.com>
-Subject: [PATCH v7 08/12] KVM: arm64: Add KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE
+Message-ID: <20230409063000.3559991-11-ricarkol@google.com>
+Subject: [PATCH v7 09/12] KVM: arm64: Split huge pages when dirty logging is enabled
 From:   Ricardo Koller <ricarkol@google.com>
 To:     pbonzini@redhat.com, maz@kernel.org, oupton@google.com,
         yuzenghui@huawei.com, dmatlack@google.com
@@ -61,7 +61,7 @@ Cc:     kvm@vger.kernel.org, kvmarm@lists.linux.dev, qperret@google.com,
         eric.auger@redhat.com, gshan@redhat.com, reijiw@google.com,
         rananta@google.com, bgardon@google.com, ricarkol@gmail.com,
         Ricardo Koller <ricarkol@google.com>,
-        Oliver Upton <oliver.upton@linux.dev>
+        Shaoqin Huang <shahuang@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-7.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
@@ -73,197 +73,199 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add a capability for userspace to specify the eager split chunk size.
-The chunk size specifies how many pages to break at a time, using a
-single allocation. Bigger the chunk size, more pages need to be
-allocated ahead of time.
+Split huge pages eagerly when enabling dirty logging. The goal is to
+avoid doing it while faulting on write-protected pages, which
+negatively impacts guest performance.
 
-Suggested-by: Oliver Upton <oliver.upton@linux.dev>
+A memslot marked for dirty logging is split in 1GB pieces at a time.
+This is in order to release the mmu_lock and give other kernel threads
+the opportunity to run, and also in order to allocate enough pages to
+split a 1GB range worth of huge pages (or a single 1GB huge page).
+Note that these page allocations can fail, so eager page splitting is
+best-effort.  This is not a correctness issue though, as huge pages
+can still be split on write-faults.
+
+The benefits of eager page splitting are the same as in x86, added
+with commit a3fe5dbda0a4 ("KVM: x86/mmu: Split huge pages mapped by
+the TDP MMU when dirty logging is enabled"). For example, when running
+dirty_log_perf_test with 64 virtual CPUs (Ampere Altra), 1GB per vCPU,
+50% reads, and 2MB HugeTLB memory, the time it takes vCPUs to access
+all of their memory after dirty logging is enabled decreased by 44%
+from 2.58s to 1.42s.
+
 Signed-off-by: Ricardo Koller <ricarkol@google.com>
+Reviewed-by: Shaoqin Huang <shahuang@redhat.com>
 ---
- Documentation/virt/kvm/api.rst       | 28 ++++++++++++++++++++++++++
- arch/arm64/include/asm/kvm_host.h    | 15 ++++++++++++++
- arch/arm64/include/asm/kvm_pgtable.h | 18 +++++++++++++++++
- arch/arm64/kvm/arm.c                 | 30 ++++++++++++++++++++++++++++
- arch/arm64/kvm/mmu.c                 |  3 +++
- include/uapi/linux/kvm.h             |  2 ++
- 6 files changed, 96 insertions(+)
+ arch/arm64/kvm/mmu.c | 123 ++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 121 insertions(+), 2 deletions(-)
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index 62de0768d6aa5..f8faa80d87057 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -8380,6 +8380,34 @@ structure.
- When getting the Modified Change Topology Report value, the attr->addr
- must point to a byte where the value will be stored or retrieved from.
- 
-+8.40 KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE
-+---------------------------------------
-+
-+:Capability: KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE
-+:Architectures: arm64
-+:Type: vm
-+:Parameters: arg[0] is the new split chunk size.
-+:Returns: 0 on success, -EINVAL if any memslot was already created.
-+
-+This capability sets the chunk size used in Eager Page Splitting.
-+
-+Eager Page Splitting improves the performance of dirty-logging (used
-+in live migrations) when guest memory is backed by huge-pages.  It
-+avoids splitting huge-pages (into PAGE_SIZE pages) on fault, by doing
-+it eagerly when enabling dirty logging (with the
-+KVM_MEM_LOG_DIRTY_PAGES flag for a memory region), or when using
-+KVM_CLEAR_DIRTY_LOG.
-+
-+The chunk size specifies how many pages to break at a time, using a
-+single allocation for each chunk. Bigger the chunk size, more pages
-+need to be allocated ahead of time.
-+
-+The chunk size needs to be a valid block size. The list of acceptable
-+block sizes is exposed in KVM_CAP_ARM_SUPPORTED_BLOCK_SIZES as a 64bit
-+bitmap (each bit describing a block size). Setting
-+KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE to 0 disables Eager Page Splitting;
-+this is the default value.
-+
- 9. Known KVM API problems
- =========================
- 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index a1892a8f60323..b87da1ebc3454 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -158,6 +158,21 @@ struct kvm_s2_mmu {
- 	/* The last vcpu id that ran on each physical CPU */
- 	int __percpu *last_vcpu_ran;
- 
-+#define KVM_ARM_EAGER_SPLIT_CHUNK_SIZE_DEFAULT 0
-+	/*
-+	 * Memory cache used to split
-+	 * KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE worth of huge pages. It
-+	 * is used to allocate stage2 page tables while splitting huge
-+	 * pages. Note that the choice of EAGER_PAGE_SPLIT_CHUNK_SIZE
-+	 * influences both the capacity of the split page cache, and
-+	 * how often KVM reschedules. Be wary of raising CHUNK_SIZE
-+	 * too high.
-+	 *
-+	 * Protected by kvm->slots_lock.
-+	 */
-+	struct kvm_mmu_memory_cache split_page_cache;
-+	uint64_t split_page_chunk_size;
-+
- 	struct kvm_arch *arch;
- };
- 
-diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-index 32e5d42bf020f..889bd7afeb355 100644
---- a/arch/arm64/include/asm/kvm_pgtable.h
-+++ b/arch/arm64/include/asm/kvm_pgtable.h
-@@ -92,6 +92,24 @@ static inline bool kvm_level_supports_block_mapping(u32 level)
- 	return level >= KVM_PGTABLE_MIN_BLOCK_LEVEL;
- }
- 
-+static inline u64 kvm_supported_block_sizes(void)
-+{
-+	u32 level = KVM_PGTABLE_MIN_BLOCK_LEVEL;
-+	u64 res = 0;
-+
-+	for (; level < KVM_PGTABLE_MAX_LEVELS; level++)
-+		res |= BIT(kvm_granule_shift(level));
-+
-+	return res;
-+}
-+
-+static inline bool kvm_is_block_size_supported(u64 size)
-+{
-+	bool is_power_of_two = !((size) & ((size)-1));
-+
-+	return is_power_of_two && (size & kvm_supported_block_sizes());
-+}
-+
- /**
-  * struct kvm_pgtable_mm_ops - Memory management callbacks.
-  * @zalloc_page:		Allocate a single zeroed memory page.
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 3bd732eaf0872..34fd3c59a9b82 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -67,6 +67,7 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
- 			    struct kvm_enable_cap *cap)
- {
- 	int r;
-+	u64 new_cap;
- 
- 	if (cap->flags)
- 		return -EINVAL;
-@@ -91,6 +92,26 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
- 		r = 0;
- 		set_bit(KVM_ARCH_FLAG_SYSTEM_SUSPEND_ENABLED, &kvm->arch.flags);
- 		break;
-+	case KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE:
-+		new_cap = cap->args[0];
-+
-+		mutex_lock(&kvm->lock);
-+		mutex_lock(&kvm->slots_lock);
-+		/*
-+		 * To keep things simple, allow changing the chunk
-+		 * size only if there are no memslots already created.
-+		 */
-+		if (!kvm_are_all_memslots_empty(kvm)) {
-+			r = -EINVAL;
-+		} else if (new_cap && !kvm_is_block_size_supported(new_cap)) {
-+			r = -EINVAL;
-+		} else {
-+			r = 0;
-+			kvm->arch.mmu.split_page_chunk_size = new_cap;
-+		}
-+		mutex_unlock(&kvm->slots_lock);
-+		mutex_unlock(&kvm->lock);
-+		break;
- 	default:
- 		r = -EINVAL;
- 		break;
-@@ -288,6 +309,15 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_ARM_PTRAUTH_GENERIC:
- 		r = system_has_full_ptr_auth();
- 		break;
-+	case KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE:
-+		if (kvm)
-+			r = kvm->arch.mmu.split_page_chunk_size;
-+		else
-+			r = KVM_ARM_EAGER_SPLIT_CHUNK_SIZE_DEFAULT;
-+		break;
-+	case KVM_CAP_ARM_SUPPORTED_BLOCK_SIZES:
-+		r = kvm_supported_block_sizes();
-+		break;
- 	default:
- 		r = 0;
- 	}
 diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index a2800e5c42712..898985b09321a 100644
+index 898985b09321a..aaefabd8de89d 100644
 --- a/arch/arm64/kvm/mmu.c
 +++ b/arch/arm64/kvm/mmu.c
-@@ -756,6 +756,9 @@ int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu, unsigned long t
- 	for_each_possible_cpu(cpu)
- 		*per_cpu_ptr(mmu->last_vcpu_ran, cpu) = -1;
+@@ -31,14 +31,21 @@ static phys_addr_t __ro_after_init hyp_idmap_vector;
  
-+	mmu->split_page_cache.gfp_zero = __GFP_ZERO;
-+	mmu->split_page_chunk_size = KVM_ARM_EAGER_SPLIT_CHUNK_SIZE_DEFAULT;
+ static unsigned long __ro_after_init io_map_base;
+ 
+-static phys_addr_t stage2_range_addr_end(phys_addr_t addr, phys_addr_t end)
++static phys_addr_t __stage2_range_addr_end(phys_addr_t addr, phys_addr_t end,
++					   phys_addr_t size)
+ {
+-	phys_addr_t size = kvm_granule_size(KVM_PGTABLE_MIN_BLOCK_LEVEL);
+ 	phys_addr_t boundary = ALIGN_DOWN(addr + size, size);
+ 
+ 	return (boundary - 1 < end - 1) ? boundary : end;
+ }
+ 
++static phys_addr_t stage2_range_addr_end(phys_addr_t addr, phys_addr_t end)
++{
++	phys_addr_t size = kvm_granule_size(KVM_PGTABLE_MIN_BLOCK_LEVEL);
 +
- 	mmu->pgt = pgt;
- 	mmu->pgd_phys = __pa(pgt->pgd);
- 	return 0;
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index d77aef872a0a0..f18b48fcd25ba 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -1184,6 +1184,8 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_S390_PROTECTED_ASYNC_DISABLE 224
- #define KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP 225
- #define KVM_CAP_PMU_EVENT_MASKED_EVENTS 226
-+#define KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE 227
-+#define KVM_CAP_ARM_SUPPORTED_BLOCK_SIZES 228
++	return __stage2_range_addr_end(addr, end, size);
++}
++
+ /*
+  * Release kvm_mmu_lock periodically if the memory region is large. Otherwise,
+  * we may see kernel panics with CONFIG_DETECT_HUNG_TASK,
+@@ -75,6 +82,79 @@ static int stage2_apply_range(struct kvm_s2_mmu *mmu, phys_addr_t addr,
+ #define stage2_apply_range_resched(mmu, addr, end, fn)			\
+ 	stage2_apply_range(mmu, addr, end, fn, true)
  
- #ifdef KVM_CAP_IRQ_ROUTING
++/*
++ * Get the maximum number of page-tables pages needed to split a range
++ * of blocks into PAGE_SIZE PTEs. It assumes the range is already
++ * mapped at level 2, or at level 1 if allowed.
++ */
++static int kvm_mmu_split_nr_page_tables(u64 range)
++{
++	int n = 0;
++
++	if (KVM_PGTABLE_MIN_BLOCK_LEVEL < 2)
++		n += DIV_ROUND_UP_ULL(range, PUD_SIZE);
++	n += DIV_ROUND_UP_ULL(range, PMD_SIZE);
++	return n;
++}
++
++static bool need_split_memcache_topup_or_resched(struct kvm *kvm)
++{
++	struct kvm_mmu_memory_cache *cache;
++	u64 chunk_size, min;
++
++	if (need_resched() || rwlock_needbreak(&kvm->mmu_lock))
++		return true;
++
++	chunk_size = kvm->arch.mmu.split_page_chunk_size;
++	min = kvm_mmu_split_nr_page_tables(chunk_size);
++	cache = &kvm->arch.mmu.split_page_cache;
++	return kvm_mmu_memory_cache_nr_free_objects(cache) < min;
++}
++
++static int kvm_mmu_split_huge_pages(struct kvm *kvm, phys_addr_t addr,
++				    phys_addr_t end)
++{
++	struct kvm_mmu_memory_cache *cache;
++	struct kvm_pgtable *pgt;
++	int ret, cache_capacity;
++	u64 next, chunk_size;
++
++	lockdep_assert_held_write(&kvm->mmu_lock);
++
++	chunk_size = kvm->arch.mmu.split_page_chunk_size;
++	cache_capacity = kvm_mmu_split_nr_page_tables(chunk_size);
++
++	if (chunk_size == 0)
++		return 0;
++
++	cache = &kvm->arch.mmu.split_page_cache;
++
++	do {
++		if (need_split_memcache_topup_or_resched(kvm)) {
++			write_unlock(&kvm->mmu_lock);
++			cond_resched();
++			/* Eager page splitting is best-effort. */
++			ret = __kvm_mmu_topup_memory_cache(cache,
++							   cache_capacity,
++							   cache_capacity);
++			write_lock(&kvm->mmu_lock);
++			if (ret)
++				break;
++		}
++
++		pgt = kvm->arch.mmu.pgt;
++		if (!pgt)
++			return -EINVAL;
++
++		next = __stage2_range_addr_end(addr, end, chunk_size);
++		ret = kvm_pgtable_stage2_split(pgt, addr, next - addr, cache);
++		if (ret)
++			break;
++	} while (addr = next, addr != end);
++
++	return ret;
++}
++
+ static bool memslot_is_logging(struct kvm_memory_slot *memslot)
+ {
+ 	return memslot->dirty_bitmap && !(memslot->flags & KVM_MEM_READONLY);
+@@ -773,6 +853,7 @@ int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu, unsigned long t
+ void kvm_uninit_stage2_mmu(struct kvm *kvm)
+ {
+ 	kvm_free_stage2_pgd(&kvm->arch.mmu);
++	kvm_mmu_free_memory_cache(&kvm->arch.mmu.split_page_cache);
+ }
+ 
+ static void stage2_unmap_memslot(struct kvm *kvm,
+@@ -999,6 +1080,34 @@ static void kvm_mmu_write_protect_pt_masked(struct kvm *kvm,
+ 	stage2_wp_range(&kvm->arch.mmu, start, end);
+ }
+ 
++/**
++ * kvm_mmu_split_memory_region() - split the stage 2 blocks into PAGE_SIZE
++ *				   pages for memory slot
++ * @kvm:	The KVM pointer
++ * @slot:	The memory slot to split
++ *
++ * Acquires kvm->mmu_lock. Called with kvm->slots_lock mutex acquired,
++ * serializing operations for VM memory regions.
++ */
++static void kvm_mmu_split_memory_region(struct kvm *kvm, int slot)
++{
++	struct kvm_memslots *slots;
++	struct kvm_memory_slot *memslot;
++	phys_addr_t start, end;
++
++	lockdep_assert_held(&kvm->slots_lock);
++
++	slots = kvm_memslots(kvm);
++	memslot = id_to_memslot(slots, slot);
++
++	start = memslot->base_gfn << PAGE_SHIFT;
++	end = (memslot->base_gfn + memslot->npages) << PAGE_SHIFT;
++
++	write_lock(&kvm->mmu_lock);
++	kvm_mmu_split_huge_pages(kvm, start, end);
++	write_unlock(&kvm->mmu_lock);
++}
++
+ /*
+  * kvm_arch_mmu_enable_log_dirty_pt_masked - enable dirty logging for selected
+  * dirty pages.
+@@ -1790,6 +1899,16 @@ void kvm_arch_commit_memory_region(struct kvm *kvm,
+ 			return;
+ 
+ 		kvm_mmu_wp_memory_region(kvm, new->id);
++		kvm_mmu_split_memory_region(kvm, new->id);
++	} else {
++		/*
++		 * Free any leftovers from the eager page splitting cache. Do
++		 * this when deleting, moving, disabling dirty logging, or
++		 * creating the memslot (a nop). Doing it for deletes makes
++		 * sure we don't leak memory, and there's no need to keep the
++		 * cache around for any of the other cases.
++		 */
++		kvm_mmu_free_memory_cache(&kvm->arch.mmu.split_page_cache);
+ 	}
+ }
  
 -- 
 2.40.0.577.gac1e443424-goog
