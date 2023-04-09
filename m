@@ -2,105 +2,233 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1E0B76DBEEF
-	for <lists+kvm@lfdr.de>; Sun,  9 Apr 2023 08:42:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8257E6DBF5E
+	for <lists+kvm@lfdr.de>; Sun,  9 Apr 2023 11:36:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229461AbjDIGmU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 9 Apr 2023 02:42:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38214 "EHLO
+        id S229484AbjDIJgg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 9 Apr 2023 05:36:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36520 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229436AbjDIGmU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 9 Apr 2023 02:42:20 -0400
-Received: from out162-62-57-210.mail.qq.com (out162-62-57-210.mail.qq.com [162.62.57.210])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88D3B4EF8
-        for <kvm@vger.kernel.org>; Sat,  8 Apr 2023 23:42:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
-        s=s201512; t=1681022534;
-        bh=0xoq0VZblymNffNwmojFXnhxMT/n2/0TJ5ITpjunB3c=;
-        h=From:To:Cc:Subject:Date;
-        b=Crzc7B2pmGXuaii9GljrlOEkH7bBSkgu7CrejpVhUzg7jbOTleqQ4FUW9Kpgqfboq
-         DVDM/7OwFkueXkJh7fS/vNoZMkumI5mzx0wiKCkqhsgLNTyMn9mrdJB0oPplZKuOyi
-         it6jGonMHpo/XlLyID+qW+j0uZpNL7cGwyx7WrCQ=
-Received: from rtoax.. ([111.199.190.121])
-        by newxmesmtplogicsvrszc2-0.qq.com (NewEsmtp) with SMTP
-        id 99CACC8D; Sun, 09 Apr 2023 14:38:28 +0800
-X-QQ-mid: xmsmtpt1681022308txf8ucmpa
-Message-ID: <tencent_A1425D591197F22A02AF2CA3EA8858068D08@qq.com>
-X-QQ-XMAILINFO: NDgMZBR9sMma+AV5IAtjyQJ66oIlUw4U0lmGi0LnBKiZgf9CE8IGpuPIGlC4xS
-         wUeIEiZqwI829Zp2scj9yKpJv4Y41DbBcbQk4zOBfz5NqxB43PjjipriofkBzMnjn+oaVorzWGb5
-         6UiWQ5rY/wgWaq9pDmPpwzVRQBoXdJz6bwyqMI5CbjnS4p1URUyqgJ0CWRggIK/cIHhilZJGQKAV
-         isdePkPrfm5xQK3I/UHCHx35skR6JJ1Q1q9ry7poWN5vsUl4ikQOW69ZmPOFYMQobFFlBesb6q+6
-         oleUNcDGCJl8Om/zFTi5gKKFJcnqiWAPHGjO2YhLiYM09l86NtQbdWw2uiHA4/6i6EOM9Z2z4SoI
-         b8z/D4Fm/FJVSGsXOiw0HAkmWDwe052Yz+JdWXVsoZtbnOWbA6RqNtn/XrYm+VmPjT59qemH6uYV
-         ofRYUkX8YEcTe3oCA53ZbzMhF9N3Gt4JvpIc5iLm2Xor5qiZjKD4/axqux7LOzyAb10uEAPM6M/d
-         D4Cd449VMfR+iCLXfbQ8v4gMRg3+vmpCRDSbnMAcub0RUXXvga3GY1GzJW9/C9V0AJ20oX8dFcuw
-         a74lOOjOKutxwti7rtpl/7vYwUEL+mJzrszCzNUZ5DPtQ0MkrAn5SP7CPxeP6UH+V/f8RQq6VwYc
-         5c7hx9qS6Txfvgs0AXdC3Gk//fDOdep12AnjYDazxO21weDBX49+iPTWOkTrHBeLnnNd5mrjhSlt
-         Vqkf81PoqbSmxGXJKZzJYWVAoQ9xF+W+Lt5slwBxw0FLXLWcwPZDzFJCgchfrnnoGlHG/C+XUCza
-         Q9DLmBI22wWOnEEl6H87fqAxnBi2oJZIHfw5T8YrFUbUFCSz7K+S+lMcO2qHdy+vACB9ToHNPLsJ
-         n0eyKmLKXTTHRdObfyc/RfLorGf3BhqEfOTIhuw2HTzEImFvtYp2OE6G/j8a1ftEwMEJABFk9iF1
-         t1f01RBHtM9eBBUMvySLo2CdxnN1qQ
-From:   Rong Tao <rtoax@foxmail.com>
-To:     seanjc@google.com
-Cc:     rongtao@cestc.cn, Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        x86@kernel.org (maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)),
-        "H. Peter Anvin" <hpa@zytor.com>,
-        kvm@vger.kernel.org (open list:KERNEL VIRTUAL MACHINE FOR X86 (KVM/x86)),
-        linux-kernel@vger.kernel.org (open list:X86 ARCHITECTURE (32-BIT AND
-        64-BIT))
-Subject: [PATCH] KVM: x86/emulator: Use tabs instead of spaces for indentation
-Date:   Sun,  9 Apr 2023 14:38:27 +0800
-X-OQ-MSGID: <20230409063827.167207-1-rtoax@foxmail.com>
-X-Mailer: git-send-email 2.39.2
+        with ESMTP id S229437AbjDIJgf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 9 Apr 2023 05:36:35 -0400
+Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E98DC524D
+        for <kvm@vger.kernel.org>; Sun,  9 Apr 2023 02:36:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1681032993; x=1712568993;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=KR3OB1bN1xOPenjENINMC1U5px4J2IzqB6I4Fi/cpek=;
+  b=CRpovn4IEhsQ5HP5dexfAz49rLYk12izAaz5EDXBgmwzsR9rUBvtEIVE
+   XtNz2ukb8Ij+PSR4Ws5iZfO/IsW0nCHxkKmKxT7GZtdSErfl931XnJP2q
+   qq5GY/JoVPqkt6Dw05OVBSnqSxOiPxtuWSn6opj2LeQjY/QhLFnYqWHKX
+   TBaPa8F/D1wLbzCH+bG/buVJOelo9xC+jcbNLnkusIdO1TKqtie2tkNtX
+   tIYu6R9B2QUErkyFv1m4F+FS3RM3LHJH5Ypwq9RIs7hXibyLZT2GphH/0
+   bAjAn31t48jbAwh5mKQPXAPzqS5LSddQ7wfwcv/AR7gWQygLQ/EWlRfC0
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10674"; a="408345052"
+X-IronPort-AV: E=Sophos;i="5.98,331,1673942400"; 
+   d="scan'208";a="408345052"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Apr 2023 02:36:33 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10674"; a="1017701223"
+X-IronPort-AV: E=Sophos;i="5.98,331,1673942400"; 
+   d="scan'208";a="1017701223"
+Received: from lkp-server01.sh.intel.com (HELO b613635ddfff) ([10.239.97.150])
+  by fmsmga005.fm.intel.com with ESMTP; 09 Apr 2023 02:36:28 -0700
+Received: from kbuild by b613635ddfff with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1plRTH-000UST-1Q;
+        Sun, 09 Apr 2023 09:36:27 +0000
+Date:   Sun, 9 Apr 2023 17:36:02 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Ricardo Koller <ricarkol@google.com>, pbonzini@redhat.com,
+        maz@kernel.org, oupton@google.com, yuzenghui@huawei.com,
+        dmatlack@google.com
+Cc:     oe-kbuild-all@lists.linux.dev, kvm@vger.kernel.org,
+        kvmarm@lists.linux.dev, qperret@google.com,
+        catalin.marinas@arm.com, andrew.jones@linux.dev, seanjc@google.com,
+        alexandru.elisei@arm.com, suzuki.poulose@arm.com,
+        eric.auger@redhat.com, gshan@redhat.com, reijiw@google.com,
+        rananta@google.com, bgardon@google.com, ricarkol@gmail.com,
+        Ricardo Koller <ricarkol@google.com>,
+        Shaoqin Huang <shahuang@redhat.com>
+Subject: Re: [PATCH v7 04/12] KVM: arm64: Add kvm_pgtable_stage2_split()
+Message-ID: <202304091707.ALABRVCG-lkp@intel.com>
+References: <20230409063000.3559991-6-ricarkol@google.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=3.4 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
-        DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,HELO_DYNAMIC_IPADDR,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,RDNS_DYNAMIC,SPF_HELO_NONE,
-        SPF_PASS autolearn=no autolearn_force=no version=3.4.6
-X-Spam-Level: ***
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230409063000.3559991-6-ricarkol@google.com>
+X-Spam-Status: No, score=-2.5 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Rong Tao <rongtao@cestc.cn>
+Hi Ricardo,
 
-Code indentation should use tabs.
+kernel test robot noticed the following build errors:
 
-Signed-off-by: Rong Tao <rongtao@cestc.cn>
----
- arch/x86/kvm/emulate.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+[auto build test ERROR on kvm/queue]
+[also build test ERROR on mst-vhost/linux-next linus/master v6.3-rc5 next-20230406]
+[cannot apply to kvmarm/next kvm/linux-next]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
-index a20bec931764..b45ef99ebfab 100644
---- a/arch/x86/kvm/emulate.c
-+++ b/arch/x86/kvm/emulate.c
-@@ -2259,13 +2259,13 @@ static int em_ret_far(struct x86_emulate_ctxt *ctxt)
- 
- static int em_ret_far_imm(struct x86_emulate_ctxt *ctxt)
- {
--        int rc;
-+	int rc;
- 
--        rc = em_ret_far(ctxt);
--        if (rc != X86EMUL_CONTINUE)
--                return rc;
--        rsp_increment(ctxt, ctxt->src.val);
--        return X86EMUL_CONTINUE;
-+	rc = em_ret_far(ctxt);
-+	if (rc != X86EMUL_CONTINUE)
-+		return rc;
-+	rsp_increment(ctxt, ctxt->src.val);
-+	return X86EMUL_CONTINUE;
- }
- 
- static int em_cmpxchg(struct x86_emulate_ctxt *ctxt)
+url:    https://github.com/intel-lab-lkp/linux/commits/Ricardo-Koller/KVM-arm64-Rename-free_removed-to-free_unlinked/20230409-143229
+base:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git queue
+patch link:    https://lore.kernel.org/r/20230409063000.3559991-6-ricarkol%40google.com
+patch subject: [PATCH v7 04/12] KVM: arm64: Add kvm_pgtable_stage2_split()
+config: arm64-defconfig (https://download.01.org/0day-ci/archive/20230409/202304091707.ALABRVCG-lkp@intel.com/config)
+compiler: aarch64-linux-gcc (GCC) 12.1.0
+reproduce (this is a W=1 build):
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # https://github.com/intel-lab-lkp/linux/commit/c94328e3e8b2d2d873503360ea730c87f4a03301
+        git remote add linux-review https://github.com/intel-lab-lkp/linux
+        git fetch --no-tags linux-review Ricardo-Koller/KVM-arm64-Rename-free_removed-to-free_unlinked/20230409-143229
+        git checkout c94328e3e8b2d2d873503360ea730c87f4a03301
+        # save the config file
+        mkdir build_dir && cp config build_dir/.config
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross W=1 O=build_dir ARCH=arm64 olddefconfig
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross W=1 O=build_dir ARCH=arm64 SHELL=/bin/bash arch/arm64/
+
+If you fix the issue, kindly add following tag where applicable
+| Reported-by: kernel test robot <lkp@intel.com>
+| Link: https://lore.kernel.org/oe-kbuild-all/202304091707.ALABRVCG-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   In file included from include/linux/bitfield.h:10,
+                    from arch/arm64/kvm/hyp/pgtable.c:10:
+   arch/arm64/kvm/hyp/pgtable.c: In function 'stage2_split_walker':
+>> include/linux/container_of.h:20:54: error: 'struct kvm_s2_mmu' has no member named 'split_page_cache'
+      20 |         static_assert(__same_type(*(ptr), ((type *)0)->member) ||       \
+         |                                                      ^~
+   include/linux/build_bug.h:78:56: note: in definition of macro '__static_assert'
+      78 | #define __static_assert(expr, msg, ...) _Static_assert(expr, msg)
+         |                                                        ^~~~
+   include/linux/container_of.h:20:9: note: in expansion of macro 'static_assert'
+      20 |         static_assert(__same_type(*(ptr), ((type *)0)->member) ||       \
+         |         ^~~~~~~~~~~~~
+   include/linux/container_of.h:20:23: note: in expansion of macro '__same_type'
+      20 |         static_assert(__same_type(*(ptr), ((type *)0)->member) ||       \
+         |                       ^~~~~~~~~~~
+   arch/arm64/kvm/hyp/pgtable.c:1340:15: note: in expansion of macro 'container_of'
+    1340 |         mmu = container_of(mc, struct kvm_s2_mmu, split_page_cache);
+         |               ^~~~~~~~~~~~
+   include/linux/compiler_types.h:338:27: error: expression in static assertion is not an integer
+     338 | #define __same_type(a, b) __builtin_types_compatible_p(typeof(a), typeof(b))
+         |                           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/build_bug.h:78:56: note: in definition of macro '__static_assert'
+      78 | #define __static_assert(expr, msg, ...) _Static_assert(expr, msg)
+         |                                                        ^~~~
+   include/linux/container_of.h:20:9: note: in expansion of macro 'static_assert'
+      20 |         static_assert(__same_type(*(ptr), ((type *)0)->member) ||       \
+         |         ^~~~~~~~~~~~~
+   include/linux/container_of.h:20:23: note: in expansion of macro '__same_type'
+      20 |         static_assert(__same_type(*(ptr), ((type *)0)->member) ||       \
+         |                       ^~~~~~~~~~~
+   arch/arm64/kvm/hyp/pgtable.c:1340:15: note: in expansion of macro 'container_of'
+    1340 |         mmu = container_of(mc, struct kvm_s2_mmu, split_page_cache);
+         |               ^~~~~~~~~~~~
+   In file included from include/uapi/linux/posix_types.h:5,
+                    from include/uapi/linux/types.h:14,
+                    from include/linux/types.h:6,
+                    from include/linux/kasan-checks.h:5,
+                    from include/asm-generic/rwonce.h:26,
+                    from arch/arm64/include/asm/rwonce.h:71,
+                    from include/linux/compiler.h:247,
+                    from include/linux/build_bug.h:5:
+>> include/linux/stddef.h:16:33: error: 'struct kvm_s2_mmu' has no member named 'split_page_cache'
+      16 | #define offsetof(TYPE, MEMBER)  __builtin_offsetof(TYPE, MEMBER)
+         |                                 ^~~~~~~~~~~~~~~~~~
+   include/linux/container_of.h:23:28: note: in expansion of macro 'offsetof'
+      23 |         ((type *)(__mptr - offsetof(type, member))); })
+         |                            ^~~~~~~~
+   arch/arm64/kvm/hyp/pgtable.c:1340:15: note: in expansion of macro 'container_of'
+    1340 |         mmu = container_of(mc, struct kvm_s2_mmu, split_page_cache);
+         |               ^~~~~~~~~~~~
+--
+   In file included from include/linux/bitfield.h:10,
+                    from arch/arm64/kvm/hyp/nvhe/../pgtable.c:10:
+   arch/arm64/kvm/hyp/nvhe/../pgtable.c: In function 'stage2_split_walker':
+>> include/linux/container_of.h:20:54: error: 'struct kvm_s2_mmu' has no member named 'split_page_cache'
+      20 |         static_assert(__same_type(*(ptr), ((type *)0)->member) ||       \
+         |                                                      ^~
+   include/linux/build_bug.h:78:56: note: in definition of macro '__static_assert'
+      78 | #define __static_assert(expr, msg, ...) _Static_assert(expr, msg)
+         |                                                        ^~~~
+   include/linux/container_of.h:20:9: note: in expansion of macro 'static_assert'
+      20 |         static_assert(__same_type(*(ptr), ((type *)0)->member) ||       \
+         |         ^~~~~~~~~~~~~
+   include/linux/container_of.h:20:23: note: in expansion of macro '__same_type'
+      20 |         static_assert(__same_type(*(ptr), ((type *)0)->member) ||       \
+         |                       ^~~~~~~~~~~
+   arch/arm64/kvm/hyp/nvhe/../pgtable.c:1340:15: note: in expansion of macro 'container_of'
+    1340 |         mmu = container_of(mc, struct kvm_s2_mmu, split_page_cache);
+         |               ^~~~~~~~~~~~
+   include/linux/compiler_types.h:338:27: error: expression in static assertion is not an integer
+     338 | #define __same_type(a, b) __builtin_types_compatible_p(typeof(a), typeof(b))
+         |                           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/build_bug.h:78:56: note: in definition of macro '__static_assert'
+      78 | #define __static_assert(expr, msg, ...) _Static_assert(expr, msg)
+         |                                                        ^~~~
+   include/linux/container_of.h:20:9: note: in expansion of macro 'static_assert'
+      20 |         static_assert(__same_type(*(ptr), ((type *)0)->member) ||       \
+         |         ^~~~~~~~~~~~~
+   include/linux/container_of.h:20:23: note: in expansion of macro '__same_type'
+      20 |         static_assert(__same_type(*(ptr), ((type *)0)->member) ||       \
+         |                       ^~~~~~~~~~~
+   arch/arm64/kvm/hyp/nvhe/../pgtable.c:1340:15: note: in expansion of macro 'container_of'
+    1340 |         mmu = container_of(mc, struct kvm_s2_mmu, split_page_cache);
+         |               ^~~~~~~~~~~~
+   In file included from include/uapi/linux/posix_types.h:5,
+                    from include/uapi/linux/types.h:14,
+                    from include/linux/types.h:6,
+                    from include/linux/kasan-checks.h:5,
+                    from include/asm-generic/rwonce.h:26,
+                    from arch/arm64/include/asm/rwonce.h:71,
+                    from include/linux/compiler.h:247,
+                    from include/linux/build_bug.h:5:
+>> include/linux/stddef.h:16:33: error: 'struct kvm_s2_mmu' has no member named 'split_page_cache'
+      16 | #define offsetof(TYPE, MEMBER)  __builtin_offsetof(TYPE, MEMBER)
+         |                                 ^~~~~~~~~~~~~~~~~~
+   include/linux/container_of.h:23:28: note: in expansion of macro 'offsetof'
+      23 |         ((type *)(__mptr - offsetof(type, member))); })
+         |                            ^~~~~~~~
+   arch/arm64/kvm/hyp/nvhe/../pgtable.c:1340:15: note: in expansion of macro 'container_of'
+    1340 |         mmu = container_of(mc, struct kvm_s2_mmu, split_page_cache);
+         |               ^~~~~~~~~~~~
+
+
+vim +20 include/linux/container_of.h
+
+d2a8ebbf8192b8 Andy Shevchenko  2021-11-08   9  
+d2a8ebbf8192b8 Andy Shevchenko  2021-11-08  10  /**
+d2a8ebbf8192b8 Andy Shevchenko  2021-11-08  11   * container_of - cast a member of a structure out to the containing structure
+d2a8ebbf8192b8 Andy Shevchenko  2021-11-08  12   * @ptr:	the pointer to the member.
+d2a8ebbf8192b8 Andy Shevchenko  2021-11-08  13   * @type:	the type of the container struct this is embedded in.
+d2a8ebbf8192b8 Andy Shevchenko  2021-11-08  14   * @member:	the name of the member within the struct.
+d2a8ebbf8192b8 Andy Shevchenko  2021-11-08  15   *
+7376e561fd2e01 Sakari Ailus     2022-10-24  16   * WARNING: any const qualifier of @ptr is lost.
+d2a8ebbf8192b8 Andy Shevchenko  2021-11-08  17   */
+d2a8ebbf8192b8 Andy Shevchenko  2021-11-08  18  #define container_of(ptr, type, member) ({				\
+d2a8ebbf8192b8 Andy Shevchenko  2021-11-08  19  	void *__mptr = (void *)(ptr);					\
+e1edc277e6f6df Rasmus Villemoes 2021-11-08 @20  	static_assert(__same_type(*(ptr), ((type *)0)->member) ||	\
+e1edc277e6f6df Rasmus Villemoes 2021-11-08  21  		      __same_type(*(ptr), void),			\
+d2a8ebbf8192b8 Andy Shevchenko  2021-11-08  22  		      "pointer type mismatch in container_of()");	\
+d2a8ebbf8192b8 Andy Shevchenko  2021-11-08  23  	((type *)(__mptr - offsetof(type, member))); })
+d2a8ebbf8192b8 Andy Shevchenko  2021-11-08  24  
+
 -- 
-2.39.2
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests
