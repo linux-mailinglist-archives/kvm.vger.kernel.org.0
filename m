@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 03D9F6DBEDE
-	for <lists+kvm@lfdr.de>; Sun,  9 Apr 2023 08:30:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BD5466DBEDC
+	for <lists+kvm@lfdr.de>; Sun,  9 Apr 2023 08:30:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229503AbjDIGaL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 9 Apr 2023 02:30:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60766 "EHLO
+        id S229509AbjDIGaM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 9 Apr 2023 02:30:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60786 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229456AbjDIGaI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 9 Apr 2023 02:30:08 -0400
-Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D46059ED
-        for <kvm@vger.kernel.org>; Sat,  8 Apr 2023 23:30:07 -0700 (PDT)
-Received: by mail-pg1-x54a.google.com with SMTP id x189-20020a6386c6000000b004fc1c14c9daso1081531pgd.23
-        for <kvm@vger.kernel.org>; Sat, 08 Apr 2023 23:30:07 -0700 (PDT)
+        with ESMTP id S229468AbjDIGaK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 9 Apr 2023 02:30:10 -0400
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E7F759ED
+        for <kvm@vger.kernel.org>; Sat,  8 Apr 2023 23:30:09 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-54c1e4b7e63so77381447b3.20
+        for <kvm@vger.kernel.org>; Sat, 08 Apr 2023 23:30:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1681021807; x=1683613807;
+        d=google.com; s=20210112; t=1681021808; x=1683613808;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=W/9TrLiFh0g6i4CFqkD+8PkRd+TfJMu2Z2yB0plZBwo=;
-        b=OKme6zdcLHlLnQV+0WVds+nJndYTKtQG6clVmxCrMGqN+i9aiXDmV/i+QYrKZPYVNo
-         UHDSeXvov0SHBxbbiVkXLosyLPavrs0Z1WVMrBEs1yDd8d+/d57hFHkKeCMYaRSU7TVZ
-         woNAauRkvBMkeCUSQtaQkBNqNItxgm67ifIwgm+h9dlp6N+JtErbUG84vS4o9mXBc4+8
-         ev5VPudAMXCxz2h6Akctc3nmTqN0AE+8GQUhwyUHQ4z+l266a//kvLxl/0k8OaNQ+w7J
-         pnVWdEIJ6ojApjdCyeQ/2NOV4e5fKRQ36asYyOyDOkm4j74ATF+xTTuA8KRh7sf0Rwcw
-         BYBA==
+        bh=if+YkGXz3GoOKFXpY68wLACnSj9D5ohyIKRDRrK/Hs4=;
+        b=HygojbwsLM+kCoupRBYy10Ibop+q1/MYjUIVR7DbPvFnuNWijIn/UhfWGHmVnfNzSx
+         O/zMOGi5LhdHBN4rtUz+yk29d71nuWhbU0SaqMi7Tl+4eHezKkIjeI5cK69qyXeFi3Ft
+         Bmcg3+qMWQxApRrzosruX3kbbsZfuOVuj4IKjJ2tipYltcCFcS3CXzWuaZhj81ZIcFU0
+         octi8sr/FpV3xpC7dwTVcj1/ceXgVMwaVOLLhRTJdMAayTLOF4J2OQ1+5E4NtVE+gRua
+         kJEjUmc8x4jjanZoUpJkJ37vGzoZwxZMd8sG5quOoa4pKCZ1RvoiK2Cwvq83jfGeHlqi
+         qZQg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1681021807; x=1683613807;
+        d=1e100.net; s=20210112; t=1681021808; x=1683613808;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=W/9TrLiFh0g6i4CFqkD+8PkRd+TfJMu2Z2yB0plZBwo=;
-        b=KsTiUcHCwVq4iJGC9OHg0M8Mv0XAh7Xgwx1o4KfRN2m5eDblQNU6MwRb7zLOh2PmLD
-         WFlo444XLXFQrAa7ZVXpuNNdecaDdWRFcylEVUDMLRb/QgiG/tb7TQd26745/vcbFlFG
-         hpwMy65JOCLsXDlHqFFYOWc+1w+JeRogGjlZNv7eOzpeY+w0vTbM4AFyOv+R7KUPVJNA
-         azMPDnBmrzdSBQvCHkIJGW/DzoffUABvjn/4En0xz1ITQQKAknJczXA+WftujCvF4TMV
-         c5az+XZq+boOY5Ia8KYQjIXysqwPj/t8NiIqlq/u71IEmtjNQxJkwQjufgJsfrMYoev7
-         Kyqw==
-X-Gm-Message-State: AAQBX9cvYyf4yoqtpPKqJIBPqwgUEBgfUKiMAz/8c9unAa6XOuN17mIs
-        I/6nnSCjtXjeV1eOnX2p2SKKKWkfioDfOQ==
-X-Google-Smtp-Source: AKy350Z2WQwB5EMyLbrcj2e9/j7PUbO/8LTAEI6k3DdYFkDybadjKLoY/rTeCg4eYVz+ZWnt2lWiichG8LM6iQ==
+        bh=if+YkGXz3GoOKFXpY68wLACnSj9D5ohyIKRDRrK/Hs4=;
+        b=PzX+0f6+O1alD2tVuvUkIOI8nzb9JZfkBxPeoOuSzRYC4UUy+BtpesXnQhyj87M5h9
+         nUkARcfiBBvwDank/m6a9rKJRO0dOneJhMtELIORn3yVV0wVb6SsG+qz/gtwdP9X+tiK
+         MqOttQAu2NeVRBlyb2lM0LdVTWENjrX6EG6JuKofTU6yfZEW4th5s36XGrZvPVgNW4IK
+         k+R+8P7TcXDy68QQg6boe7PScK1WrCyqMBGD0UUQno8KIlcrK55qc3hfxqTupaqWy5rv
+         rB+SnqS+/UVZOP1kpQVVLfw497Cz+cAN0PYiRyeM114euBdHGLAvHvWlbbIK+7ymSQk/
+         FNGw==
+X-Gm-Message-State: AAQBX9c2dLrz9ImlVU2UinB4YDyyqya8zuXoPG7xLJOCPW0f6NgXcDI3
+        a4hFRTWuInbki8ON8WilZ5G54b3RS7RblA==
+X-Google-Smtp-Source: AKy350bux1gSy/tqUCk8dzR6pnh+RgxO/Ld8BwP+yAuSbfTZdOY365S2qdqqoy50RgsAHilx4ojrq8jmVNUhMQ==
 X-Received: from ricarkol4.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:1248])
- (user=ricarkol job=sendgmr) by 2002:a17:902:cecb:b0:19a:82a2:fcf9 with SMTP
- id d11-20020a170902cecb00b0019a82a2fcf9mr1088678plg.2.1681021806971; Sat, 08
- Apr 2023 23:30:06 -0700 (PDT)
-Date:   Sun,  9 Apr 2023 06:29:49 +0000
+ (user=ricarkol job=sendgmr) by 2002:a25:d98e:0:b0:b6e:b924:b96f with SMTP id
+ q136-20020a25d98e000000b00b6eb924b96fmr4248784ybg.3.1681021808809; Sat, 08
+ Apr 2023 23:30:08 -0700 (PDT)
+Date:   Sun,  9 Apr 2023 06:29:50 +0000
 In-Reply-To: <20230409063000.3559991-1-ricarkol@google.com>
 Mime-Version: 1.0
 References: <20230409063000.3559991-1-ricarkol@google.com>
 X-Mailer: git-send-email 2.40.0.577.gac1e443424-goog
-Message-ID: <20230409063000.3559991-3-ricarkol@google.com>
-Subject: [PATCH v7 02/12] KVM: arm64: Add KVM_PGTABLE_WALK ctx->flags for
- skipping BBM and CMO
+Message-ID: <20230409063000.3559991-4-ricarkol@google.com>
+Subject: [PATCH v7 02/12] KVM: arm64: Add KVM_PGTABLE_WALK flags for skipping
+ CMOs and BBM TLBIs
 From:   Ricardo Koller <ricarkol@google.com>
 To:     pbonzini@redhat.com, maz@kernel.org, oupton@google.com,
         yuzenghui@huawei.com, dmatlack@google.com
@@ -74,11 +74,11 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add two flags to kvm_pgtable_visit_ctx, KVM_PGTABLE_WALK_SKIP_BBM and
-KVM_PGTABLE_WALK_SKIP_CMO, to indicate that the walk should not
-perform break-before-make (BBM) nor cache maintenance operations
-(CMO). This will be used by a future commit to create unlinked tables
-not accessible to the HW page-table walker.
+Add two flags to kvm_pgtable_visit_ctx, KVM_PGTABLE_WALK_SKIP_BBM_TLBI
+and KVM_PGTABLE_WALK_SKIP_CMO, to indicate that the walk should not
+perform TLB invalidations (TLBIs) in break-before-make (BBM) nor cache
+maintenance operations (CMO). This will be used by a future commit to
+create unlinked tables not accessible to the HW page-table walker.
 
 Signed-off-by: Ricardo Koller <ricarkol@google.com>
 Reviewed-by: Shaoqin Huang <shahuang@redhat.com>
