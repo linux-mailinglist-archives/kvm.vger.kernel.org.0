@@ -2,61 +2,61 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1EAB56DC5E3
-	for <lists+kvm@lfdr.de>; Mon, 10 Apr 2023 12:51:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6C96E6DC5EA
+	for <lists+kvm@lfdr.de>; Mon, 10 Apr 2023 12:51:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229684AbjDJKvV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 Apr 2023 06:51:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40528 "EHLO
+        id S229699AbjDJKvZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 Apr 2023 06:51:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40558 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229678AbjDJKvU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 10 Apr 2023 06:51:20 -0400
-Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E9663581;
-        Mon, 10 Apr 2023 03:51:19 -0700 (PDT)
-Received: by mail-pf1-x432.google.com with SMTP id d2e1a72fcca58-634b28df952so422918b3a.2;
-        Mon, 10 Apr 2023 03:51:19 -0700 (PDT)
+        with ESMTP id S229682AbjDJKvV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 10 Apr 2023 06:51:21 -0400
+Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC951422C;
+        Mon, 10 Apr 2023 03:51:20 -0700 (PDT)
+Received: by mail-pj1-x1030.google.com with SMTP id 98e67ed59e1d1-2465836870fso237127a91.2;
+        Mon, 10 Apr 2023 03:51:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1681123879; x=1683715879;
+        d=gmail.com; s=20210112; t=1681123880; x=1683715880;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=AS0Uc7+GRHk2JAOMs6kTtR/AvHmqVodtFBcgwhyXJLQ=;
-        b=RURMy3bjBcxyE2TmYmZ5bRcBHne+dHqOxQTKUR1E19Cpgp1TLjrlTGF0hBxgV+Q1JU
-         V/V9RIo35bvieRPNjTgT/q780TYHA59+nD+8RujekbGqJQ7NWpcMCZ9Uql7hjiW5Dr1x
-         ALtP2Hm6ic9Solciaee0S0EVyENMLbvuqHBoRlOQuGzw7KWJCp6MFlr1ZFcfqM6T3+P3
-         qeyeuV32TCjZWc+S9OT6mOlDMq7UXAPj957EQkQsC/+IaKy7fjWdgelN/BUoMql6D+yd
-         Bu3zQpRHL2xatzOTf5cpRMzLmuiTrJfeWRIC8rNNC0EGGSiMrN8Lp8h8ciQGhtkXqGNS
-         UzNA==
+        bh=N4O1SVNaeIpkeBQIL0ko4BJ5hOU4NcStY8J8WtM3znA=;
+        b=Wtupbb25ioOyNwtHyVTkt16CeL0UR0/pJT8FI03uFH95xYqAwbxuS1eYm9k7c4hkdF
+         RCruyPz24OMnTJtdJJFnS4pD2QyDDuLQvrVpUd+juc0zI4ESVpNjaB72Z1Gayg3N287Q
+         uiCHLNorjgeTuml3/Yx/qmM6veegG64jortK7TSq/yWvswP7SyXPjJwEhGAITmt01NjO
+         +fgPhOIsAGnYle+akR3Gu7AE9zYpivwyDugRfKnY3gbuJWXM1KiqvZtWV8a7q6ttZo2U
+         G03W7oTLQUln40Zfmr3/IgZSQdBKKNfdqitJ/FHyFlTh1eNDoeMX/Qd6/UNRIaMd2ky+
+         RWxw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1681123879; x=1683715879;
+        d=1e100.net; s=20210112; t=1681123880; x=1683715880;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=AS0Uc7+GRHk2JAOMs6kTtR/AvHmqVodtFBcgwhyXJLQ=;
-        b=Ciovr9WG/wgqOFKMhkg6WMLx9mBOsliOEptGrG5iSi0WTubuj4vKxCSaEWuT5+h8q0
-         Uv+J8SW3H7pKB68B2TBZNOISeDA4RzGyOnWH8Qy6ReJe+ZcLBalOwg10n3KAOQqcSt+V
-         dbOLIkEBk/bjkSuKmcFDi42EaVVVaVl62U3mm3a+DWpq+0Es8/89FxzOgvl2gnx0/AJE
-         4eg3M/jjH1XqBhWthgtQj0cJlpyEzHPKG/WXII1r4frzSPaoTsm9YZ8z19ABhXis5K3h
-         dIvVenFj64Fm9PFMVQlC/3uB3SzAdCPMBu1t7BDCu8DKGMVSPOFPBIg5od23cTpLf7qE
-         8H4g==
-X-Gm-Message-State: AAQBX9c+2kP7Mq2n45YFW/HdOaCs2dTNAlCknEylvkGq73Ynmt4CAWdp
-        K9x9aT86WLc9mHA9WKJGDWsX0E+LnmvoTw==
-X-Google-Smtp-Source: AKy350bfCmd8FxzV7MO7p5Q79iCjrX6Z3ftpMmg6ChociNbnfVy7tFPfE5yqHrmTCLVgSU4kMAW5UQ==
-X-Received: by 2002:aa7:9697:0:b0:5a0:c4b6:edd6 with SMTP id f23-20020aa79697000000b005a0c4b6edd6mr11197859pfk.0.1681123878752;
-        Mon, 10 Apr 2023 03:51:18 -0700 (PDT)
+        bh=N4O1SVNaeIpkeBQIL0ko4BJ5hOU4NcStY8J8WtM3znA=;
+        b=NFFBFR9kJZGecUnWEhe7tEzzpJlEi2UMUf9srHV9nzNqfLfH4iORyYpXNPi6TA0KGQ
+         8WuVXRubYqPtqm0/OEJb7nvL03UFu7PhEMr3xGYQEemwssiopVaI4sWPCMmV5Y9lLJKR
+         WmUhZ0MXgILy7CljPnI7DZSe+MMbI03cT8NpKflP1/zX2RISclEmBLAXYxzdhqGb64vc
+         fgIMAhQhs0FB9ULFSmlQvJjRZ5MbeB3zuD6gmVe814Dl/sHFy2QTNT9OZjkutkPwssWV
+         MiHa3nLVatyPZXrK8iXLr9OGIbvc7GSTHvK1U8bMyHD/5LnBTf7gRdVNChMkttmiqLgx
+         0Cqg==
+X-Gm-Message-State: AAQBX9c68Sofcho4xORGLaKhK3mZZbVzEDFAqBh5UlWi8sFb93Bet2Sf
+        QtWhdx7afDo6cFuuPDDFxvg=
+X-Google-Smtp-Source: AKy350ZE1g8CAlAYQRUulknJJE6+REtl9axKnaC2e3TK6/Y3g8DUW4wmRW/nZVBpLlmhoehPBf41Ig==
+X-Received: by 2002:a62:6d81:0:b0:62d:d045:392 with SMTP id i123-20020a626d81000000b0062dd0450392mr10871889pfc.32.1681123880487;
+        Mon, 10 Apr 2023 03:51:20 -0700 (PDT)
 Received: from localhost.localdomain ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id h4-20020a056a00170400b0062e032b61a6sm7783252pfc.91.2023.04.10.03.51.17
+        by smtp.gmail.com with ESMTPSA id h4-20020a056a00170400b0062e032b61a6sm7783252pfc.91.2023.04.10.03.51.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Apr 2023 03:51:18 -0700 (PDT)
+        Mon, 10 Apr 2023 03:51:20 -0700 (PDT)
 From:   Like Xu <like.xu.linux@gmail.com>
 X-Google-Original-From: Like Xu <likexu@tencent.com>
 To:     Sean Christopherson <seanjc@google.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH V5 01/10] KVM: x86/pmu: Expose reprogram_counters() in pmu.h
-Date:   Mon, 10 Apr 2023 18:50:47 +0800
-Message-Id: <20230410105056.60973-2-likexu@tencent.com>
+Subject: [PATCH V5 02/10] KVM: x86/pmu: Return #GP if user sets the GLOBAL_STATUS reserved bits
+Date:   Mon, 10 Apr 2023 18:50:48 +0800
+Message-Id: <20230410105056.60973-3-likexu@tencent.com>
 X-Mailer: git-send-email 2.40.0
 In-Reply-To: <20230410105056.60973-1-likexu@tencent.com>
 References: <20230410105056.60973-1-likexu@tencent.com>
@@ -74,64 +74,37 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Like Xu <likexu@tencent.com>
 
-The optimization stands on its own, whereas the code movement is
-justified only by the incoming AMD PMU v2 support.
+Return #GP if KVM user space attempts to set a reserved bit for guest.
+If the user space sets reserved bits when restoring the MSR_CORE_
+PERF_GLOBAL_STATUS register, these bits will be accidentally returned
+when the guest runs a read access to this register, and cannot be cleared
+up inside the guest, which makes the guest's PMI handler very confused.
 
-No functional change intended.
+Note, reusing global_ovf_ctrl_mask as global_status_mask will be broken
+if KVM supports higher versions of Intel arch pmu.
 
-Suggested-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Like Xu <likexu@tencent.com>
 ---
- arch/x86/kvm/pmu.h           | 12 ++++++++++++
- arch/x86/kvm/vmx/pmu_intel.c | 12 ------------
- 2 files changed, 12 insertions(+), 12 deletions(-)
+ arch/x86/kvm/vmx/pmu_intel.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
-index 5c7bbf03b599..986563aeeef8 100644
---- a/arch/x86/kvm/pmu.h
-+++ b/arch/x86/kvm/pmu.h
-@@ -201,6 +201,18 @@ static inline void kvm_pmu_request_counter_reprogram(struct kvm_pmc *pmc)
- 	kvm_make_request(KVM_REQ_PMU, pmc->vcpu);
- }
- 
-+static inline void reprogram_counters(struct kvm_pmu *pmu, u64 diff)
-+{
-+	int bit;
-+
-+	if (!diff)
-+		return;
-+
-+	for_each_set_bit(bit, (unsigned long *)&diff, X86_PMC_IDX_MAX)
-+		set_bit(bit, pmu->reprogram_pmi);
-+	kvm_make_request(KVM_REQ_PMU, pmu_to_vcpu(pmu));
-+}
-+
- void kvm_pmu_deliver_pmi(struct kvm_vcpu *vcpu);
- void kvm_pmu_handle_event(struct kvm_vcpu *vcpu);
- int kvm_pmu_rdpmc(struct kvm_vcpu *vcpu, unsigned pmc, u64 *data);
 diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
-index 741efe2c497b..1f9c3e916a21 100644
+index 1f9c3e916a21..343b3182b7f4 100644
 --- a/arch/x86/kvm/vmx/pmu_intel.c
 +++ b/arch/x86/kvm/vmx/pmu_intel.c
-@@ -73,18 +73,6 @@ static struct kvm_pmc *intel_pmc_idx_to_pmc(struct kvm_pmu *pmu, int pmc_idx)
- 	}
- }
+@@ -399,7 +399,11 @@ static int intel_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 			reprogram_fixed_counters(pmu, data);
+ 		break;
+ 	case MSR_CORE_PERF_GLOBAL_STATUS:
+-		if (!msr_info->host_initiated)
++		/*
++		 * Caution, the assumption here is that some of the bits (such as
++		 * ASCI, CTR_FREEZE, and LBR_FREEZE) are not yet supported by KVM.
++		 */
++		if (!msr_info->host_initiated || (data & pmu->global_ovf_ctrl_mask))
+ 			return 1; /* RO MSR */
  
--static void reprogram_counters(struct kvm_pmu *pmu, u64 diff)
--{
--	int bit;
--
--	if (!diff)
--		return;
--
--	for_each_set_bit(bit, (unsigned long *)&diff, X86_PMC_IDX_MAX)
--		set_bit(bit, pmu->reprogram_pmi);
--	kvm_make_request(KVM_REQ_PMU, pmu_to_vcpu(pmu));
--}
--
- static bool intel_hw_event_available(struct kvm_pmc *pmc)
- {
- 	struct kvm_pmu *pmu = pmc_to_pmu(pmc);
+ 		pmu->global_status = data;
 -- 
 2.40.0
 
