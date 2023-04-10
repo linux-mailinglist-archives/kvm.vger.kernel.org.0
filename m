@@ -2,51 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 05C0C6DC6E8
-	for <lists+kvm@lfdr.de>; Mon, 10 Apr 2023 14:50:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DE5E46DC6EA
+	for <lists+kvm@lfdr.de>; Mon, 10 Apr 2023 14:50:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229756AbjDJMu3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 Apr 2023 08:50:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58532 "EHLO
+        id S229729AbjDJMud (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 Apr 2023 08:50:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58476 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229744AbjDJMuZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 10 Apr 2023 08:50:25 -0400
+        with ESMTP id S229707AbjDJMu0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 10 Apr 2023 08:50:26 -0400
 Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B08872BE;
-        Mon, 10 Apr 2023 05:50:22 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B2E761B1;
+        Mon, 10 Apr 2023 05:50:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1681131022; x=1712667022;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=EDtZprTCrB2b9phvfiB/TIQk1pW/5Uzc3NiWcZM3c78=;
-  b=jC6n3IQp7FGhc4crFuOwE7IGdZJTSrEiM0F/SoptwqO41bIaPEW7Nnwf
-   K7V6asiRkhTOmvHn6G3wQLuK/SZh1tPQxLfWOscY473x/KRgOCa9d6SW0
-   7zOiR++3KjK8CpjYR4tdBbCIS9wd0HDUEqQIY2rqH1SQCVEDXS5dairmp
-   gOr9D226DDhEwIoyzhgrmg/x7r+eIB/fpO0kPhU0C9FJBNTEoPbjyAvEb
-   u9z4aGKXqFAwF9Ujzwaxayem4ZlP+soRHAm+KA7Nqa9Pw3g8MZOW8c8RH
-   NS0INilbGjNpUTC7Ac6ndP/Bi7wg1fe55/5Z7uPMULVOEH7GRS9iCI/iV
+  t=1681131023; x=1712667023;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=Ff+CccVwXXrczPNnTRbmV+x1z43wLG9Logfb8NFVoXs=;
+  b=RC9Udjbv8bSVSlzdFcUHcb+7aJlwa/zwEeyCBv7iSiXF1/SDqUpafwEe
+   v70iYJcGcmkos0AGXpU1fZjEZZQ9otsXSIhoeMTEalFCqaRsAIRkpRT/m
+   1ylo68Xyo42tKP3U1IcZsHzep4cZ4HY9PjfeaayrlHbgq1HHhmPlL/ZQZ
+   oHJ5QrLHO28R7Y8BWtkrUGzqMYeFk9hWicukrMQqgXdspuYIMtgeXXZLF
+   mg/BIhKKqnzLJae3v4WwBWx/y/mzt4Er+vEjlLX6qNx1p1NKrAP6wma/Z
+   TcsxaPYTwX+Zf3NqJImtfcFQxgrcMWR5GEgR/kRcr+7f9+3jUPnEySkyb
    A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10675"; a="371183492"
+X-IronPort-AV: E=McAfee;i="6600,9927,10675"; a="371183495"
 X-IronPort-AV: E=Sophos;i="5.98,333,1673942400"; 
-   d="scan'208";a="371183492"
+   d="scan'208";a="371183495"
 Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Apr 2023 05:50:21 -0700
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Apr 2023 05:50:23 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10675"; a="638455264"
+X-IronPort-AV: E=McAfee;i="6600,9927,10675"; a="638455267"
 X-IronPort-AV: E=Sophos;i="5.98,333,1673942400"; 
-   d="scan'208";a="638455264"
+   d="scan'208";a="638455267"
 Received: from lxy-clx-4s.sh.intel.com ([10.239.48.46])
-  by orsmga003.jf.intel.com with ESMTP; 10 Apr 2023 05:50:19 -0700
+  by orsmga003.jf.intel.com with ESMTP; 10 Apr 2023 05:50:21 -0700
 From:   Xiaoyao Li <xiaoyao.li@intel.com>
 To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>
 Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         xiaoyao.li@intel.com
-Subject: [PATCH 0/2] KVM: VMX: Clean up of vmx_set_cr4()
-Date:   Mon, 10 Apr 2023 08:50:15 -0400
-Message-Id: <20230410125017.1305238-1-xiaoyao.li@intel.com>
+Subject: [PATCH 1/2] KVM: VMX: Use kvm_read_cr4() to get cr4 value
+Date:   Mon, 10 Apr 2023 08:50:16 -0400
+Message-Id: <20230410125017.1305238-2-xiaoyao.li@intel.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20230410125017.1305238-1-xiaoyao.li@intel.com>
+References: <20230410125017.1305238-1-xiaoyao.li@intel.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.5 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
@@ -60,25 +62,29 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Two minor patches of vmx_set_cr4() during code inspection.
+Directly use vcpu->arch.cr4 is not recommended since it gets stale value
+if the cr4 is not available.
 
-Patch 1 gets rid of the direct accessing of vcpu->arch.cr4 to avoid
-stale value.
+Use kvm_read_cr4() instead to ensure correct value.
 
-Patch 2 moves the code comment to correct place.
+Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+---
+ arch/x86/kvm/vmx/vmx.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Xiaoyao Li (2):
-  KVM: VMX: Use kvm_read_cr4() to get cr4 value
-  KVM: VMX: Move the comment of CR4.MCE handling right above the code
-
- arch/x86/kvm/vmx/vmx.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
-
-
-base-commit: d8708b80fa0e6e21bc0c9e7276ad0bccef73b6e7
-prerequisite-patch-id: 5c516b453b538845ceb91a76678803ec123834ba
-prerequisite-patch-id: 022904226ae3cb6766bba71c3bf407749ab5b5b2
-prerequisite-patch-id: cf5655ce89a2390cd29f33c57a4fc307a6045f62
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index d7bf14abdba1..befa2486836b 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -3431,7 +3431,7 @@ static bool vmx_is_valid_cr4(struct kvm_vcpu *vcpu, unsigned long cr4)
+ 
+ void vmx_set_cr4(struct kvm_vcpu *vcpu, unsigned long cr4)
+ {
+-	unsigned long old_cr4 = vcpu->arch.cr4;
++	unsigned long old_cr4 = kvm_read_cr4(vcpu);
+ 	struct vcpu_vmx *vmx = to_vmx(vcpu);
+ 	/*
+ 	 * Pass through host's Machine Check Enable value to hw_cr4, which
 -- 
 2.34.1
 
