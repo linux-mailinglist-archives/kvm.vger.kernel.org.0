@@ -2,263 +2,145 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 941646DCA1D
-	for <lists+kvm@lfdr.de>; Mon, 10 Apr 2023 19:40:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 92BE36DCA8F
+	for <lists+kvm@lfdr.de>; Mon, 10 Apr 2023 20:12:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230231AbjDJRkY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 Apr 2023 13:40:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33336 "EHLO
+        id S230081AbjDJSMQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 Apr 2023 14:12:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58652 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229854AbjDJRkX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 10 Apr 2023 13:40:23 -0400
-Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79000F2
-        for <kvm@vger.kernel.org>; Mon, 10 Apr 2023 10:40:21 -0700 (PDT)
-Received: by mail-pl1-x62c.google.com with SMTP id d9443c01a7336-1a2104d8b00so339795ad.1
-        for <kvm@vger.kernel.org>; Mon, 10 Apr 2023 10:40:21 -0700 (PDT)
+        with ESMTP id S230456AbjDJSMN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 10 Apr 2023 14:12:13 -0400
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0CD7C26B8
+        for <kvm@vger.kernel.org>; Mon, 10 Apr 2023 11:12:07 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-54c01480e3cso138912417b3.1
+        for <kvm@vger.kernel.org>; Mon, 10 Apr 2023 11:12:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1681148421; x=1683740421;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=BmS3g7a9fA+IzlthKOru22XUKTZ8ieK1g9PJz+KuvzU=;
-        b=X7NovNLqlnVzsEYlVLQjIKU0SdWNeJrMv3EsVB3BZ/ZeCNUKoGM6h9eTLlEUcCYtRO
-         kPnrOc32ByUnaSbtiIJVrehZuvOpp4HASi5EDJqlugnGkM/hbxvH70YstORCFy6DbSqC
-         kwhzABb95hTiC/Jz2RTDxrW2yEhKtpa8JNx4yK/gIBEuGRsU8RzULC38flPWlk/0Ycq6
-         N6g+KXxFoF817e/H6fWPj3enXg/EmkfF74bwsH0+p2ZulCiWLFIb/f65QOxoNx+TNN/u
-         ZanpsNz4fHtTfWCRFCa57hJR9+1+IF0PMzzZUPXgRcBAFZ0nnJQL4gLKPeT0ga3V99WD
-         KHTg==
+        d=google.com; s=20210112; t=1681150327;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=D/n1Pxmg/UOg9KyrXwFbetRz7jqbcZQ1Ll0ehgYOnfE=;
+        b=oM72fNkFqZMHZv0rAbOwTho1NR7QEKReb7A1INzikoowLrmGDFdiyM0NSR3Jtl5hUc
+         fJaFYhDKfRtY+zbomLdFCLUHFRVQGHOCWo+otIbQaaORbZ/390ylUS+dVAf6T8GLf0p8
+         Ss16YKMvfoypH32EBQ5Z0qr/MVJ/jsgUWM3imbw4OZHavuvgKvmY2PJ6UH+K+eCs6x00
+         MDg7EcJqsLMaCq7DRSz46a1LAiBFK0TNMoaz3cIQLppgzo6ddMFwQSj5iYc1w8SAqG/g
+         srQpzwtfHvPJkUmdkNKgwv8a6FvsI/YQ6YfEmYlyIomBJUcwzdoQuvpJpC7xEcfnwYtq
+         oPSQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1681148421; x=1683740421;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=BmS3g7a9fA+IzlthKOru22XUKTZ8ieK1g9PJz+KuvzU=;
-        b=1JUfcMDzre3DE0yhMnNQ1jihbPQr7hndrgs+2xD/llJUpoMnpzry95JhFI/o8vljmV
-         sQf/Y5Le8R8j2At6YAeXIWK6iGJfUfar8ojbjQrz0q6HQhoehx47BLMF65Xkqf4cafqc
-         yUEov06GvE2C6y/4/CWgkO0Nt6zIiaiVoy8uED4BZQtgXk4m/VhR6uvBPSmVb/v/Ud4V
-         Jh38wR+/ZOea8r0E5n5/h8v3SCeyhiy4eNeyUMToEaUw5zUhIwUuvXaUTOv+kIJ4VcWj
-         dlg90Jl2rfBm4GjMBykPQsMmum/4SZ0z/55hCA4ocsyoSFjR//L70ZgmihBhkzIlfkTI
-         +fWg==
-X-Gm-Message-State: AAQBX9elvvfExjOi14hzt1w4/Bw3YSwJSdiiMr6v3vyRgivNoRE8GZv8
-        4XWBil2B2LqzG02xG0UDRW/b4A==
-X-Google-Smtp-Source: AKy350bveW6How+9YYxTFmPlbhU9btR1uHIB4KV+Sar+uR+fI43+QRhezAgEI0cdxchXrF3bptj6gA==
-X-Received: by 2002:a17:902:9b83:b0:19b:c61:2867 with SMTP id y3-20020a1709029b8300b0019b0c612867mr489338plp.15.1681148420705;
-        Mon, 10 Apr 2023 10:40:20 -0700 (PDT)
-Received: from google.com (220.181.82.34.bc.googleusercontent.com. [34.82.181.220])
-        by smtp.gmail.com with ESMTPSA id x9-20020a1709028ec900b0019a773419a6sm8063433plo.170.2023.04.10.10.40.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Apr 2023 10:40:20 -0700 (PDT)
-Date:   Mon, 10 Apr 2023 10:40:16 -0700
-From:   Ricardo Koller <ricarkol@google.com>
-To:     kernel test robot <lkp@intel.com>
-Cc:     pbonzini@redhat.com, maz@kernel.org, oupton@google.com,
-        yuzenghui@huawei.com, dmatlack@google.com,
-        oe-kbuild-all@lists.linux.dev, kvm@vger.kernel.org,
-        kvmarm@lists.linux.dev, qperret@google.com,
-        catalin.marinas@arm.com, andrew.jones@linux.dev, seanjc@google.com,
-        alexandru.elisei@arm.com, suzuki.poulose@arm.com,
-        eric.auger@redhat.com, gshan@redhat.com, reijiw@google.com,
-        rananta@google.com, bgardon@google.com, ricarkol@gmail.com,
-        Shaoqin Huang <shahuang@redhat.com>
-Subject: Re: [PATCH v7 04/12] KVM: arm64: Add kvm_pgtable_stage2_split()
-Message-ID: <ZDRKAIKQsOdIQlPn@google.com>
-References: <20230409063000.3559991-6-ricarkol@google.com>
- <202304091707.ALABRVCG-lkp@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <202304091707.ALABRVCG-lkp@intel.com>
-X-Spam-Status: No, score=-15.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,ENV_AND_HDR_SPF_MATCH,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL,
-        USER_IN_DEF_SPF_WL autolearn=unavailable autolearn_force=no
-        version=3.4.6
+        d=1e100.net; s=20210112; t=1681150327;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=D/n1Pxmg/UOg9KyrXwFbetRz7jqbcZQ1Ll0ehgYOnfE=;
+        b=tcH6ujtSyB55mnlbvMlvKb4OdEfe1gBf/o/OA7s4Lc6ctpKtiCS+IG5gPmiyNXXwRV
+         T95dB8j+Ga324xmqs5Ynj4XTFm/gwmO3N3fI8Q4vlS80ZakdYb21yVF+QIoQyBJqXiBd
+         PXqAb6PlOkba3wgUaZpuDXMeAC0VknppsyUJp2rdsW9RZkdIMvkgA5KzHwdIhKa09oO8
+         Dz0gtTXitzaWCxvbK0bMjknEn3o8GRQ5aK7O+ltw+dSuHyRGRbSajLAh0roqrRLGqp32
+         +lH539LRZqb1GJ7NoWtkunGcIT1GlZmmS4R0v2SQM2hFWfQBLlV3yag1TGahcc/zx108
+         7Z8g==
+X-Gm-Message-State: AAQBX9ekNiNH22ME0A/71jsea2L3u3zriyy1IIv4EqU0+zdczS8RSQMq
+        HIIo2bP9oxDb1yF/fwW1pg+kojYKljg=
+X-Google-Smtp-Source: AKy350Y1xrw62peIh9p0yOXDR29P75YDAFzVRtmFri5ZudcsRVZkmZZN51o4afjYDsZnaLJi7gM1MiDfCWw=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:ab67:0:b0:b75:e15a:a91b with SMTP id
+ u94-20020a25ab67000000b00b75e15aa91bmr9985227ybi.6.1681150327149; Mon, 10 Apr
+ 2023 11:12:07 -0700 (PDT)
+Date:   Mon, 10 Apr 2023 11:12:05 -0700
+In-Reply-To: <CA+wubQA3HP2s6dq7JUvxHj8jkjfK5E__RenzAk7tyf3xtmgoJg@mail.gmail.com>
+Mime-Version: 1.0
+References: <20230310125718.1442088-1-robert.hu@intel.com> <20230310125718.1442088-2-robert.hu@intel.com>
+ <ZAtT5pFPqjM1Ocq0@google.com> <CA+wubQBWgz4YAi=T3MV82HrC3=gXSC_yD50ip0=N_x3MnTE1UA@mail.gmail.com>
+ <ZBIFgH4YBC71n6KR@google.com> <CA+wubQA3HP2s6dq7JUvxHj8jkjfK5E__RenzAk7tyf3xtmgoJg@mail.gmail.com>
+Message-ID: <ZDRRdchT2IHN7FUs@google.com>
+Subject: Re: [PATCH 1/3] KVM: VMX: Rename vmx_umip_emulated() to cpu_has_vmx_desc()
+From:   Sean Christopherson <seanjc@google.com>
+To:     Robert Hoo <robert.hoo.linux@gmail.com>
+Cc:     Robert Hoo <robert.hu@intel.com>, pbonzini@redhat.com,
+        kvm@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-7.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Apr 09, 2023 at 05:36:02PM +0800, kernel test robot wrote:
-> Hi Ricardo,
-> 
-> kernel test robot noticed the following build errors:
-> 
-> [auto build test ERROR on kvm/queue]
-> [also build test ERROR on mst-vhost/linux-next linus/master v6.3-rc5 next-20230406]
-> [cannot apply to kvmarm/next kvm/linux-next]
-> [If your patch is applied to the wrong git tree, kindly drop us a note.
-> And when submitting patch, we suggest to use '--base' as documented in
-> https://git-scm.com/docs/git-format-patch#_base_tree_information]
-> 
-> url:    https://github.com/intel-lab-lkp/linux/commits/Ricardo-Koller/KVM-arm64-Rename-free_removed-to-free_unlinked/20230409-143229
-> base:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git queue
-> patch link:    https://lore.kernel.org/r/20230409063000.3559991-6-ricarkol%40google.com
-> patch subject: [PATCH v7 04/12] KVM: arm64: Add kvm_pgtable_stage2_split()
-> config: arm64-defconfig (https://download.01.org/0day-ci/archive/20230409/202304091707.ALABRVCG-lkp@intel.com/config)
-> compiler: aarch64-linux-gcc (GCC) 12.1.0
-> reproduce (this is a W=1 build):
->         wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
->         chmod +x ~/bin/make.cross
->         # https://github.com/intel-lab-lkp/linux/commit/c94328e3e8b2d2d873503360ea730c87f4a03301
->         git remote add linux-review https://github.com/intel-lab-lkp/linux
->         git fetch --no-tags linux-review Ricardo-Koller/KVM-arm64-Rename-free_removed-to-free_unlinked/20230409-143229
->         git checkout c94328e3e8b2d2d873503360ea730c87f4a03301
->         # save the config file
->         mkdir build_dir && cp config build_dir/.config
->         COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross W=1 O=build_dir ARCH=arm64 olddefconfig
->         COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross W=1 O=build_dir ARCH=arm64 SHELL=/bin/bash arch/arm64/
-> 
-> If you fix the issue, kindly add following tag where applicable
-> | Reported-by: kernel test robot <lkp@intel.com>
-> | Link: https://lore.kernel.org/oe-kbuild-all/202304091707.ALABRVCG-lkp@intel.com/
-> 
-> All errors (new ones prefixed by >>):
-> 
->    In file included from include/linux/bitfield.h:10,
->                     from arch/arm64/kvm/hyp/pgtable.c:10:
->    arch/arm64/kvm/hyp/pgtable.c: In function 'stage2_split_walker':
-> >> include/linux/container_of.h:20:54: error: 'struct kvm_s2_mmu' has no member named 'split_page_cache'
->       20 |         static_assert(__same_type(*(ptr), ((type *)0)->member) ||       \
->          |                                                      ^~
->    include/linux/build_bug.h:78:56: note: in definition of macro '__static_assert'
->       78 | #define __static_assert(expr, msg, ...) _Static_assert(expr, msg)
->          |                                                        ^~~~
->    include/linux/container_of.h:20:9: note: in expansion of macro 'static_assert'
->       20 |         static_assert(__same_type(*(ptr), ((type *)0)->member) ||       \
->          |         ^~~~~~~~~~~~~
->    include/linux/container_of.h:20:23: note: in expansion of macro '__same_type'
->       20 |         static_assert(__same_type(*(ptr), ((type *)0)->member) ||       \
->          |                       ^~~~~~~~~~~
->    arch/arm64/kvm/hyp/pgtable.c:1340:15: note: in expansion of macro 'container_of'
->     1340 |         mmu = container_of(mc, struct kvm_s2_mmu, split_page_cache);
->          |               ^~~~~~~~~~~~
->    include/linux/compiler_types.h:338:27: error: expression in static assertion is not an integer
->      338 | #define __same_type(a, b) __builtin_types_compatible_p(typeof(a), typeof(b))
->          |                           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
->    include/linux/build_bug.h:78:56: note: in definition of macro '__static_assert'
->       78 | #define __static_assert(expr, msg, ...) _Static_assert(expr, msg)
->          |                                                        ^~~~
->    include/linux/container_of.h:20:9: note: in expansion of macro 'static_assert'
->       20 |         static_assert(__same_type(*(ptr), ((type *)0)->member) ||       \
->          |         ^~~~~~~~~~~~~
->    include/linux/container_of.h:20:23: note: in expansion of macro '__same_type'
->       20 |         static_assert(__same_type(*(ptr), ((type *)0)->member) ||       \
->          |                       ^~~~~~~~~~~
->    arch/arm64/kvm/hyp/pgtable.c:1340:15: note: in expansion of macro 'container_of'
->     1340 |         mmu = container_of(mc, struct kvm_s2_mmu, split_page_cache);
->          |               ^~~~~~~~~~~~
->    In file included from include/uapi/linux/posix_types.h:5,
->                     from include/uapi/linux/types.h:14,
->                     from include/linux/types.h:6,
->                     from include/linux/kasan-checks.h:5,
->                     from include/asm-generic/rwonce.h:26,
->                     from arch/arm64/include/asm/rwonce.h:71,
->                     from include/linux/compiler.h:247,
->                     from include/linux/build_bug.h:5:
-> >> include/linux/stddef.h:16:33: error: 'struct kvm_s2_mmu' has no member named 'split_page_cache'
->       16 | #define offsetof(TYPE, MEMBER)  __builtin_offsetof(TYPE, MEMBER)
->          |                                 ^~~~~~~~~~~~~~~~~~
->    include/linux/container_of.h:23:28: note: in expansion of macro 'offsetof'
->       23 |         ((type *)(__mptr - offsetof(type, member))); })
->          |                            ^~~~~~~~
->    arch/arm64/kvm/hyp/pgtable.c:1340:15: note: in expansion of macro 'container_of'
->     1340 |         mmu = container_of(mc, struct kvm_s2_mmu, split_page_cache);
->          |               ^~~~~~~~~~~~
-> --
->    In file included from include/linux/bitfield.h:10,
->                     from arch/arm64/kvm/hyp/nvhe/../pgtable.c:10:
->    arch/arm64/kvm/hyp/nvhe/../pgtable.c: In function 'stage2_split_walker':
-> >> include/linux/container_of.h:20:54: error: 'struct kvm_s2_mmu' has no member named 'split_page_cache'
->       20 |         static_assert(__same_type(*(ptr), ((type *)0)->member) ||       \
->          |                                                      ^~
->    include/linux/build_bug.h:78:56: note: in definition of macro '__static_assert'
->       78 | #define __static_assert(expr, msg, ...) _Static_assert(expr, msg)
->          |                                                        ^~~~
->    include/linux/container_of.h:20:9: note: in expansion of macro 'static_assert'
->       20 |         static_assert(__same_type(*(ptr), ((type *)0)->member) ||       \
->          |         ^~~~~~~~~~~~~
->    include/linux/container_of.h:20:23: note: in expansion of macro '__same_type'
->       20 |         static_assert(__same_type(*(ptr), ((type *)0)->member) ||       \
->          |                       ^~~~~~~~~~~
->    arch/arm64/kvm/hyp/nvhe/../pgtable.c:1340:15: note: in expansion of macro 'container_of'
->     1340 |         mmu = container_of(mc, struct kvm_s2_mmu, split_page_cache);
->          |               ^~~~~~~~~~~~
->    include/linux/compiler_types.h:338:27: error: expression in static assertion is not an integer
->      338 | #define __same_type(a, b) __builtin_types_compatible_p(typeof(a), typeof(b))
->          |                           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
->    include/linux/build_bug.h:78:56: note: in definition of macro '__static_assert'
->       78 | #define __static_assert(expr, msg, ...) _Static_assert(expr, msg)
->          |                                                        ^~~~
->    include/linux/container_of.h:20:9: note: in expansion of macro 'static_assert'
->       20 |         static_assert(__same_type(*(ptr), ((type *)0)->member) ||       \
->          |         ^~~~~~~~~~~~~
->    include/linux/container_of.h:20:23: note: in expansion of macro '__same_type'
->       20 |         static_assert(__same_type(*(ptr), ((type *)0)->member) ||       \
->          |                       ^~~~~~~~~~~
->    arch/arm64/kvm/hyp/nvhe/../pgtable.c:1340:15: note: in expansion of macro 'container_of'
->     1340 |         mmu = container_of(mc, struct kvm_s2_mmu, split_page_cache);
->          |               ^~~~~~~~~~~~
->    In file included from include/uapi/linux/posix_types.h:5,
->                     from include/uapi/linux/types.h:14,
->                     from include/linux/types.h:6,
->                     from include/linux/kasan-checks.h:5,
->                     from include/asm-generic/rwonce.h:26,
->                     from arch/arm64/include/asm/rwonce.h:71,
->                     from include/linux/compiler.h:247,
->                     from include/linux/build_bug.h:5:
-> >> include/linux/stddef.h:16:33: error: 'struct kvm_s2_mmu' has no member named 'split_page_cache'
->       16 | #define offsetof(TYPE, MEMBER)  __builtin_offsetof(TYPE, MEMBER)
->          |                                 ^~~~~~~~~~~~~~~~~~
->    include/linux/container_of.h:23:28: note: in expansion of macro 'offsetof'
->       23 |         ((type *)(__mptr - offsetof(type, member))); })
->          |                            ^~~~~~~~
->    arch/arm64/kvm/hyp/nvhe/../pgtable.c:1340:15: note: in expansion of macro 'container_of'
->     1340 |         mmu = container_of(mc, struct kvm_s2_mmu, split_page_cache);
->          |               ^~~~~~~~~~~~
-> 
-> 
-> vim +20 include/linux/container_of.h
-> 
-> d2a8ebbf8192b8 Andy Shevchenko  2021-11-08   9  
-> d2a8ebbf8192b8 Andy Shevchenko  2021-11-08  10  /**
-> d2a8ebbf8192b8 Andy Shevchenko  2021-11-08  11   * container_of - cast a member of a structure out to the containing structure
-> d2a8ebbf8192b8 Andy Shevchenko  2021-11-08  12   * @ptr:	the pointer to the member.
-> d2a8ebbf8192b8 Andy Shevchenko  2021-11-08  13   * @type:	the type of the container struct this is embedded in.
-> d2a8ebbf8192b8 Andy Shevchenko  2021-11-08  14   * @member:	the name of the member within the struct.
-> d2a8ebbf8192b8 Andy Shevchenko  2021-11-08  15   *
-> 7376e561fd2e01 Sakari Ailus     2022-10-24  16   * WARNING: any const qualifier of @ptr is lost.
-> d2a8ebbf8192b8 Andy Shevchenko  2021-11-08  17   */
-> d2a8ebbf8192b8 Andy Shevchenko  2021-11-08  18  #define container_of(ptr, type, member) ({				\
-> d2a8ebbf8192b8 Andy Shevchenko  2021-11-08  19  	void *__mptr = (void *)(ptr);					\
-> e1edc277e6f6df Rasmus Villemoes 2021-11-08 @20  	static_assert(__same_type(*(ptr), ((type *)0)->member) ||	\
-> e1edc277e6f6df Rasmus Villemoes 2021-11-08  21  		      __same_type(*(ptr), void),			\
-> d2a8ebbf8192b8 Andy Shevchenko  2021-11-08  22  		      "pointer type mismatch in container_of()");	\
-> d2a8ebbf8192b8 Andy Shevchenko  2021-11-08  23  	((type *)(__mptr - offsetof(type, member))); })
-> d2a8ebbf8192b8 Andy Shevchenko  2021-11-08  24  
-> 
-> -- 
-> 0-DAY CI Kernel Test Service
-> https://github.com/intel/lkp-tests
-> 
+On Fri, Mar 31, 2023, Robert Hoo wrote:
+> Sean Christopherson <seanjc@google.com> =E4=BA=8E2023=E5=B9=B43=E6=9C=881=
+6=E6=97=A5=E5=91=A8=E5=9B=9B 01:50=E5=86=99=E9=81=93=EF=BC=9A
+> >
+> > Please fix your editor or whatever it is that is resulting your emails =
+being
+> > wrapped at very bizarre boundaries.
+> >
+> (Sorry for late reply.)
+> Yes, I also noticed this. Just began using Gmail web portal for community=
+ mails.
+> I worried that it has no auto wrapping (didn't find the setting), so manu=
+ally
+> wrapped; but now looks like it has some.
+> Give me some time, I'm going to switch to some mail client.
+> Welcome suggestions of mail clients which is suited for community
+> communications, on Windows platform.=F0=9F=99=82
 
-Hi,
+Heh, none?  The "on Windows" is a bit problematic.  Sorry I can't help on t=
+his
+front.
 
-The fix is to move the commit introducing KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE
-right before this one, like this:
+> > That leaves KVM's stuffing of X86_CR4_UMIP into the default cr4_fixed1
+> > value enumerated for nested VMX.  In that case, checking for (lack of)
+> > host support is actually a bug fix of sorts,
+>=20
+> What bug?
+> By your assumption below:
+>     * host supports UMIP, host doesn't allow (nested?) vmx
+>     * UMIP enumerated to L1, L1 thinks it has UMIP capability and
+> enumerates to L2
+>     * L1 MSR_IA32_VMX_CR4_FIXED1.UMIP is set (meaning allow 1, not fixed =
+to 1)
+>=20
+> L2 can use UMIP, no matter L1's UMIP capability is backed by L0 host's
+> HW UMIP or L0's vmx emulation, I don't see any problem. Shed more
+> light?
+>=20
+> > as enumerating UMIP support
+> > based solely on descriptor table
+>=20
+> What "descriptor table" do you mean here?
 
-	KVM: arm64: Rename free_removed to free_unlinked
-	KVM: arm64: Add KVM_PGTABLE_WALK flags for skipping CMOs and BBM TLBIs
-	KVM: arm64: Add helper for creating unlinked stage2 subtrees
-KVM: arm64: Export kvm_are_all_memslots_empty()
-KVM: arm64: Add KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE
-	KVM: arm64: Add kvm_pgtable_stage2_split()
-	KVM: arm64: Refactor kvm_arch_commit_memory_region()
-	KVM: arm64: Add kvm_uninit_stage2_mmu()
-	KVM: arm64: Split huge pages when dirty logging is enabled
-	KVM: arm64: Open-code kvm_mmu_write_protect_pt_masked()
-	KVM: arm64: Split huge pages during KVM_CLEAR_DIRTY_LOG
-	KVM: arm64: Use local TLBI on permission relaxation
+There's a typo below.  It should be "exiting", not "existing".  As in "desc=
+riptor
+table exiting", i.e. the feature that allows KVM to intercept LGDT and frie=
+nds.
 
-Thanks,
-Ricardo
+> > existing works only because KVM doesn't
+> > sanity check MSR_IA32_VMX_CR4_FIXED1.
+>=20
+> Emm, nested_cr4_valid() should be applied to vmx_set_cr4()?
+
+No, what this is saying is that if a (virtual) CPU does support UMIP for ba=
+re
+metal (from the host's perspective), but does NOT allow UMIP to be set in a=
+ VMX
+guest's CR4, then KVM would end up advertising UMIP to L1 but would neither
+virtualize (set in hardware) nor emulate UMIP for L1.
+
+The blurb about KVM exploding is calling out that in this very, very theore=
+tical
+scenario, KVM will fail on the very first VM-Entry (if not before) as KVM u=
+ses the
+host kernel's CR4 verbatim when setting vmcs.HOST_CR4, i.e. will fail the c=
+onsistency
+check on a "cannot be 1" bits being set in HOST_CR4.
+
+> > E.g. if a (very theoretical) host supported UMIP in hardware but didn't
+> > allow UMIP+VMX, KVM would advertise UMIP but not actually emulate UMIP.=
+  Of
+> > course, KVM would explode long before it could run a nested VM on said
+> > theoretical CPU, as KVM doesn't modify host CR4 when enabling VMX.
