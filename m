@@ -2,68 +2,78 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 755056DCCE9
-	for <lists+kvm@lfdr.de>; Mon, 10 Apr 2023 23:50:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3E9496DCD43
+	for <lists+kvm@lfdr.de>; Tue, 11 Apr 2023 00:06:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229892AbjDJVuL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 Apr 2023 17:50:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42550 "EHLO
+        id S229936AbjDJWGd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 Apr 2023 18:06:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47278 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229605AbjDJVuK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 10 Apr 2023 17:50:10 -0400
-Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2269198B
-        for <kvm@vger.kernel.org>; Mon, 10 Apr 2023 14:50:08 -0700 (PDT)
-Received: by mail-pg1-x54a.google.com with SMTP id 41be03b00d2f7-51400ab994dso330346a12.3
-        for <kvm@vger.kernel.org>; Mon, 10 Apr 2023 14:50:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1681163408;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=mj8dSCbGPlf0CRd5FNuA/sfSA8tqFa0rbdFYnaL0J0Y=;
-        b=ooZshyiJM9UMbazIhJLtbwAA6XYym8j66UHXKxeDstWut5Z0om8gM2U8Wxsv7usA1j
-         /RDW4i+lw+54YqovzPCcrlvFD5NCURhqkzQMR563bk2Ly9QOz5ySTdTxMQVj88bnxUju
-         3Dzdpb7KWHHAHE0BhKFgGARlvJvvIfMjuqA0VuoHQfC43Hpnrz2IAWW2RnTKFagUXePJ
-         U6P9qyO957ebbuy6n78f7arEMU33C09rdIUe0Q76GW9f9hUnEQf3z+RLkXpYSiJoeHU4
-         mqgH7xOTHOZ4UyZtodRVU/csERu6lokPoNn9lXbhrWIiqNfE65Zi6wLRrRG6OSM00cRs
-         S0TQ==
+        with ESMTP id S229917AbjDJWGb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 10 Apr 2023 18:06:31 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F5C71BCA
+        for <kvm@vger.kernel.org>; Mon, 10 Apr 2023 15:05:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1681164342;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=JDZhCwGo8x3+STKd4yRTec3uFmFqrpXKNILuRc0wVDM=;
+        b=L2sIAFvAT2baJMBezUrXufrgAO7Gld3mBBpT7P0G43ThXFJcfKCkjnBCYHt/112M4jeJM7
+        KC9roqaxIZMMwnJPUcilnXwBR1BQy/GLuKHvqWU9ncZe5AXB8qdYxlqWPd/fUeG2TB/KhZ
+        ro5ll54sLtjvQGmHmXkffzhJsRhUqZs=
+Received: from mail-io1-f69.google.com (mail-io1-f69.google.com
+ [209.85.166.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-50-pjWHADIIMISeE9-6VTYBzQ-1; Mon, 10 Apr 2023 18:05:40 -0400
+X-MC-Unique: pjWHADIIMISeE9-6VTYBzQ-1
+Received: by mail-io1-f69.google.com with SMTP id m22-20020a0566022e9600b007608fe7d67dso856028iow.8
+        for <kvm@vger.kernel.org>; Mon, 10 Apr 2023 15:05:40 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1681163408;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=mj8dSCbGPlf0CRd5FNuA/sfSA8tqFa0rbdFYnaL0J0Y=;
-        b=VWOmpSy8NXfXttMh1Rwl+qkVU8jE5Bbcz/gtMFf1bdG1tfh/MKeIhSapQVh6Dz4jPh
-         OVQQECbnwovAPxO/nO2lOwOViHQWmtRLEQkaqpVeE5mYzHAtUn63/Be0d2kMseEBEB2h
-         41C6jJWwJ/MoUfOAuWDo3CS/KYrDSuAPI7VydM3t83A97sv+yHV7sg/SwxFN8L8B2rLP
-         O4vvncYTIe5Oi2lbGXwaESGXVqd1x+6/KwXGjNnewmlfmGRixVIMjmupNun/vDuMlEXm
-         znNMbNRYUruNuy8IGgXouRaIIm4moQobzPw5kRJaHKi+U8L/hn7syqlkPal5eJi+fFjK
-         etKg==
-X-Gm-Message-State: AAQBX9dwTBgGjSma0c6MT2XKQfKzS7PZnxJtpzoj+6izW+k/rbl2n2Fg
-        +1qdzpKRKECq1KYqBjQtFB4pdFLOczk=
-X-Google-Smtp-Source: AKy350YbhvrLBgazf2oCDb5y29XRCncB+f0XTQue/QJfvSxLioZvcRsgREAZwOBt6wfR46kpVcAihEU1g4Q=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:b87:b0:626:23a1:7b8a with SMTP id
- g7-20020a056a000b8700b0062623a17b8amr295013pfj.3.1681163408325; Mon, 10 Apr
- 2023 14:50:08 -0700 (PDT)
-Date:   Mon, 10 Apr 2023 14:50:06 -0700
-In-Reply-To: <20230410081438.1750-34-xin3.li@intel.com>
-Mime-Version: 1.0
-References: <20230410081438.1750-1-xin3.li@intel.com> <20230410081438.1750-34-xin3.li@intel.com>
-Message-ID: <ZDSEjhGV9D90J6Bx@google.com>
-Subject: Re: [PATCH v8 33/33] KVM: x86/vmx: refactor VMX_DO_EVENT_IRQOFF to
- generate FRED stack frames
-From:   Sean Christopherson <seanjc@google.com>
-To:     Xin Li <xin3.li@intel.com>
-Cc:     linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, hpa@zytor.com, peterz@infradead.org,
-        andrew.cooper3@citrix.com, pbonzini@redhat.com,
-        ravi.v.shankar@intel.com, jiangshanlai@gmail.com,
-        shan.kang@intel.com
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-7.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+        d=1e100.net; s=20210112; t=1681164340; x=1683756340;
+        h=content-transfer-encoding:mime-version:organization:references
+         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=JDZhCwGo8x3+STKd4yRTec3uFmFqrpXKNILuRc0wVDM=;
+        b=akKNxqzlcQw9QvQ31WgZhObT4bTA30skT3eCGQSjN/fSUBq8eOTAeOmLI0m6voTy8I
+         fyiHHAkwpV6H7MMqX1sObPGZDzfibVabr/z6NcSzmkt7BthWwnf17iQnSmhS76Ill14g
+         Ph/LSX/VgD3EfVUITxokb0w6nKPPR1YgTc96qBnC40j4kw/g23KuNxNhoK7+xYh7Ylp3
+         USLvxgC+iv6tOZ9w5yS0yKYbmhd10v3CsG0PqVYY0Kl9NfuGQMJ6nU9z8ICCCSJ7gXKB
+         Y2u71dpzlPAmIouK8XNrO/uJSdXPOS24AHV/cTyYqizwiNd3ZjcJmr6SOvzR8rQUsatK
+         uU2g==
+X-Gm-Message-State: AAQBX9fe95lAa1HQT5mIHEaS4jzdjkzTqBiPvJ+d9k0e2tQxXpp2ur8N
+        4KMD0k3fV2T1k4T7ft9vL48DCZjOFMqMylJa550q3dbhCGeiJmzt05DYYkuXAf/sOSvlNXs9lAX
+        HjUO4R2+/wjYo
+X-Received: by 2002:a92:c501:0:b0:325:b96e:6709 with SMTP id r1-20020a92c501000000b00325b96e6709mr7822955ilg.11.1681164340167;
+        Mon, 10 Apr 2023 15:05:40 -0700 (PDT)
+X-Google-Smtp-Source: AKy350burg5KwX4O3ylWYs3MtOi8+a2A1RmfQ6dzHFH5uBLbtKPI0Hz4QDU2gr9Ku4MRNPG7lzR+ww==
+X-Received: by 2002:a92:c501:0:b0:325:b96e:6709 with SMTP id r1-20020a92c501000000b00325b96e6709mr7822931ilg.11.1681164339894;
+        Mon, 10 Apr 2023 15:05:39 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id z12-20020a921a4c000000b003157b2c504bsm3174969ill.24.2023.04.10.15.05.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 10 Apr 2023 15:05:39 -0700 (PDT)
+Date:   Mon, 10 Apr 2023 16:05:37 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Brett Creeley <brett.creeley@amd.com>
+Cc:     <kvm@vger.kernel.org>, <netdev@vger.kernel.org>, <jgg@nvidia.com>,
+        <yishaih@nvidia.com>, <shameerali.kolothum.thodi@huawei.com>,
+        <kevin.tian@intel.com>, <shannon.nelson@amd.com>,
+        <drivers@pensando.io>, <simon.horman@corigine.com>
+Subject: Re: [PATCH v8 vfio 4/7] vfio/pds: Add VFIO live migration support
+Message-ID: <20230410160538.35c1a5a6.alex.williamson@redhat.com>
+In-Reply-To: <20230404190141.57762-5-brett.creeley@amd.com>
+References: <20230404190141.57762-1-brett.creeley@amd.com>
+        <20230404190141.57762-5-brett.creeley@amd.com>
+Organization: Red Hat
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -71,253 +81,159 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-"KVM: VMX:" for the shortlog please.
-
-On Mon, Apr 10, 2023, Xin Li wrote:
-> -.macro VMX_DO_EVENT_IRQOFF call_insn call_target
-> +.macro VMX_DO_EVENT_IRQOFF call_insn call_target fred=0 nmi=0
->  	/*
->  	 * Unconditionally create a stack frame, getting the correct RSP on the
->  	 * stack (for x86-64) would take two instructions anyways, and RBP can
-> @@ -41,16 +43,55 @@
->  	mov %_ASM_SP, %_ASM_BP
->  
->  #ifdef CONFIG_X86_64
-> +#ifdef CONFIG_X86_FRED
-> +	/*
-> +	 * It's not necessary to change current stack level for handling IRQ/NMI
-> +	 * because the state of the kernel stack is well defined in this place
-> +	 * in the code, and it is known not to be deep in a bunch of nested I/O
-> +	 * layer handlers that eat up the stack.
-> +	 *
-> +	 * Before starting to push a FRED stack frame, FRED reserves a redzone
-> +	 * (for CALL emulation) and aligns RSP to a 64-byte boundary.
-> +	 */
-> +	sub $(FRED_CONFIG_REDZONE_AMOUNT << 6), %rsp
-> +	and $FRED_STACK_FRAME_RSP_MASK, %rsp
+On Tue, 4 Apr 2023 12:01:38 -0700
+Brett Creeley <brett.creeley@amd.com> wrote:
+> diff --git a/drivers/vfio/pci/pds/lm.c b/drivers/vfio/pci/pds/lm.c
+> new file mode 100644
+> index 000000000000..855f5da9b99a
+> --- /dev/null
+> +++ b/drivers/vfio/pci/pds/lm.c
+> @@ -0,0 +1,479 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/* Copyright(c) 2023 Advanced Micro Devices, Inc. */
 > +
-> +	/*
-> +	 * A FRED stack frame has extra 16 bytes of information pushed at the
-> +	 * regular stack top comparing to an IDT stack frame.
-> +	 */
-> +	push $0		/* Reserved by FRED, must be 0 */
-> +	push $0		/* FRED event data, 0 for NMI and external interrupts */
-> +#else
->  	/*
->  	 * Align RSP to a 16-byte boundary (to emulate CPU behavior) before
->  	 * creating the synthetic interrupt stack frame for the IRQ/NMI.
->  	 */
->  	and  $-16, %rsp
-> -	push $__KERNEL_DS
-> +#endif
+> +#include <linux/anon_inodes.h>
+> +#include <linux/file.h>
+> +#include <linux/fs.h>
+> +#include <linux/highmem.h>
+> +#include <linux/vfio.h>
+> +#include <linux/vfio_pci_core.h>
 > +
-> +	.if \fred
-> +	.if \nmi
-> +	mov $(2 << 32 | 2 << 48), %rax		/* NMI event type and vector */
-> +	.else
-> +	mov %rdi, %rax
-> +	shl $32, %rax				/* External interrupt vector */
-> +	.endif
-> +	add $__KERNEL_DS, %rax
-> +	bts $57, %rax				/* Set 64-bit mode */
-> +	.else
-> +	mov $__KERNEL_DS, %rax
-> +	.endif
-> +	push %rax
-
-This is painfully difficult to read, and the trampolines only add to that pain.
-Using macros instead of magic numbers would alleviate a small amount of pain, but
-but the #ifdefs and .if \fred/\nmi are the real culprits.
-
->  static void handle_nm_fault_irqoff(struct kvm_vcpu *vcpu)
-> @@ -6916,14 +6916,20 @@ static void handle_external_interrupt_irqoff(struct kvm_vcpu *vcpu)
->  {
->  	u32 intr_info = vmx_get_intr_info(vcpu);
->  	unsigned int vector = intr_info & INTR_INFO_VECTOR_MASK;
-> -	gate_desc *desc = (gate_desc *)host_idt_base + vector;
-> +	unsigned long entry_or_vector;
+> +#include "vfio_dev.h"
+> +#include "cmds.h"
 > +
-> +#ifdef CONFIG_X86_64
-> +	entry_or_vector = vector;
-> +#else
-> +	entry_or_vector = gate_offset((gate_desc *)host_idt_base + vector);
-> +#endif
+> +#define PDS_VFIO_LM_FILENAME	"pds_vfio_lm"
+> +
+> +const char *
+> +pds_vfio_lm_state(enum vfio_device_mig_state state)
+> +{
+> +	switch (state) {
+> +	case VFIO_DEVICE_STATE_ERROR:
+> +		return "VFIO_DEVICE_STATE_ERROR";
+> +	case VFIO_DEVICE_STATE_STOP:
+> +		return "VFIO_DEVICE_STATE_STOP";
+> +	case VFIO_DEVICE_STATE_RUNNING:
+> +		return "VFIO_DEVICE_STATE_RUNNING";
+> +	case VFIO_DEVICE_STATE_STOP_COPY:
+> +		return "VFIO_DEVICE_STATE_STOP_COPY";
+> +	case VFIO_DEVICE_STATE_RESUMING:
+> +		return "VFIO_DEVICE_STATE_RESUMING";
+> +	case VFIO_DEVICE_STATE_RUNNING_P2P:
+> +		return "VFIO_DEVICE_STATE_RUNNING_P2P";
+> +	default:
+> +		return "VFIO_DEVICE_STATE_INVALID";
+> +	}
+> +
+> +	return "VFIO_DEVICE_STATE_INVALID";
 
-And then this is equally gross.  Rather than funnel FRED+legacy into a single
-function only to split them back out, just route FRED into its own asm subroutine.
-The common bits are basically the creation/destruction of the stack frame and the
-CALL itself, i.e. the truly interesting bits are what's different.
+Seems a tad redundant.
 
-Pretty much all of the #ifdeffery goes away, the helpers just need #ifdefs to
-play nice with CONFIG_X86_FRED=n.  E.g. something like the below as a starting
-point (it most definitely doesn't compile, and most definitely isn't 100% correct).
+> +}
+> +
+[snip]
+> +struct file *
+> +pds_vfio_step_device_state_locked(struct pds_vfio_pci_device *pds_vfio,
+> +				  enum vfio_device_mig_state next)
+> +{
+> +	enum vfio_device_mig_state cur = pds_vfio->state;
+> +	struct device *dev = &pds_vfio->pdev->dev;
+> +	int err = 0;
+> +
+> +	dev_dbg(dev, "%s => %s\n",
+> +		pds_vfio_lm_state(cur), pds_vfio_lm_state(next));
+> +
+> +	if (cur == VFIO_DEVICE_STATE_STOP && next == VFIO_DEVICE_STATE_STOP_COPY) {
+> +		/* Device is already stopped
+> +		 * create save device data file & get device state from firmware
+> +		 */
 
----
- arch/x86/kvm/vmx/vmenter.S | 72 ++++++++++++++++++++++++++++++++++++++
- arch/x86/kvm/vmx/vmx.c     | 19 ++++++++--
- 2 files changed, 88 insertions(+), 3 deletions(-)
+Standard multi-line comment style please, we're not under net/ here.
 
-diff --git a/arch/x86/kvm/vmx/vmenter.S b/arch/x86/kvm/vmx/vmenter.S
-index 631fd7da2bc3..a6929c78e038 100644
---- a/arch/x86/kvm/vmx/vmenter.S
-+++ b/arch/x86/kvm/vmx/vmenter.S
-@@ -2,12 +2,14 @@
- #include <linux/linkage.h>
- #include <asm/asm.h>
- #include <asm/bitsperlong.h>
-+#include <asm/fred.h>
- #include <asm/kvm_vcpu_regs.h>
- #include <asm/nospec-branch.h>
- #include <asm/percpu.h>
- #include <asm/segment.h>
- #include "kvm-asm-offsets.h"
- #include "run_flags.h"
-+#include "../../entry/calling.h"
- 
- #define WORD_SIZE (BITS_PER_LONG / 8)
- 
-@@ -31,6 +33,62 @@
- #define VCPU_R15	__VCPU_REGS_R15 * WORD_SIZE
- #endif
- 
-+#ifdef CONFIG_X86_FRED
-+.macro VMX_DO_FRED_EVENT_IRQOFF call_target cs_val
-+	/*
-+	 * Unconditionally create a stack frame, getting the correct RSP on the
-+	 * stack (for x86-64) would take two instructions anyways, and RBP can
-+	 * be used to restore RSP to make objtool happy (see below).
-+	 */
-+	push %_ASM_BP
-+	mov %_ASM_SP, %_ASM_BP
-+
-+	/*
-+	 * Don't check the FRED stack level, the call stack leading to this
-+	 * helper is effectively constant and shallow (relatively speaking).
-+	 *
-+	 * Emulate the FRED-defined redzone and stack alignment (128 bytes and
-+	 * 64 bytes respectively).
-+	 */
-+	sub $(FRED_CONFIG_REDZONE_AMOUNT << 6), %rsp
-+	and $FRED_STACK_FRAME_RSP_MASK, %rsp
-+
-+	/*
-+	* A FRED stack frame has extra 16 bytes of information pushed at the
-+	* regular stack top compared to an IDT stack frame.
-+	*/
-+	push $0         /* Reserved by FRED, must be 0 */
-+	push $0         /* FRED event data, 0 for NMI and external interrupts */
-+	shl $32, %rax
-+	orq $__KERNEL_DS | $FRED_64_BIT_MODE, %ax
-+	push %rax	/* Vector (from the "caller") and DS */
-+
-+	push %rbp
-+	pushf
-+	push \cs_val
-+
-+	push $0 /* FRED error code, 0 for NMI and external interrupts */
-+	PUSH_REGS
-+
-+	/* Load @pt_regs */
-+	movq    %rsp, %_ASM_ARG1
-+
-+	call \call_target
-+
-+	POP_REGS
-+
-+	/*
-+	 * "Restore" RSP from RBP, even though IRET has already unwound RSP to
-+	 * the correct value.  objtool doesn't know the callee will IRET and,
-+	 * without the explicit restore, thinks the stack is getting walloped.
-+	 * Using an unwind hint is problematic due to x86-64's dynamic alignment.
-+	 */
-+	mov %_ASM_BP, %_ASM_SP
-+	pop %_ASM_BP
-+	RET
-+.endm
-+#endif
-+
- .macro VMX_DO_EVENT_IRQOFF call_insn call_target
- 	/*
- 	 * Unconditionally create a stack frame, getting the correct RSP on the
-@@ -299,6 +357,14 @@ SYM_INNER_LABEL(vmx_vmexit, SYM_L_GLOBAL)
- 
- SYM_FUNC_END(__vmx_vcpu_run)
- 
-+#ifdef CONFIG_X86_FRED
-+SYM_FUNC_START(vmx_do_fred_nmi_irqoff)
-+	push $FRED_NMI_ERROR_CODE
-+	mov $NMI_VECTOR | $FRED_NMI_SOMETHING, %eax
-+	VMX_DO_FRED_EVENT_IRQOFF call fred_entrypoint_kernel $FRED_NMI_CS_VAL
-+SYM_FUNC_END(vmx_do_nmi_irqoff)
-+#endif
-+
- SYM_FUNC_START(vmx_do_nmi_irqoff)
- 	VMX_DO_EVENT_IRQOFF call asm_exc_nmi_kvm_vmx
- SYM_FUNC_END(vmx_do_nmi_irqoff)
-@@ -357,6 +423,12 @@ SYM_FUNC_START(vmread_error_trampoline)
- SYM_FUNC_END(vmread_error_trampoline)
- #endif
- 
-+#ifdef CONFIG_X86_FRED
-+SYM_FUNC_START(vmx_do_fred_interrupt_irqoff)
-+	mov %_ASM_ARG1, %rax
-+	VMX_DO_FRED_EVENT_IRQOFF call external_interrupt
-+#endif
-+
- SYM_FUNC_START(vmx_do_interrupt_irqoff)
- 	VMX_DO_EVENT_IRQOFF CALL_NOSPEC _ASM_ARG1
- SYM_FUNC_END(vmx_do_interrupt_irqoff)
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 11080a649f60..42f50b0cc125 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -6891,6 +6891,14 @@ static void vmx_apicv_post_state_restore(struct kvm_vcpu *vcpu)
- 	memset(vmx->pi_desc.pir, 0, sizeof(vmx->pi_desc.pir));
- }
- 
-+#ifdef CONFIG_X86_FRED
-+void vmx_do_fred_interrupt_irqoff(unsigned int vector);
-+void vmx_do_fred_nmi_irqoff(unsigned int vector);
-+#else
-+#define vmx_do_fred_interrupt_irqoff(x) BUG();
-+#define vmx_do_fred_nmi_irqoff(x) BUG();
-+#endif
-+
- void vmx_do_interrupt_irqoff(unsigned long entry);
- void vmx_do_nmi_irqoff(void);
- 
-@@ -6933,14 +6941,16 @@ static void handle_external_interrupt_irqoff(struct kvm_vcpu *vcpu)
- {
- 	u32 intr_info = vmx_get_intr_info(vcpu);
- 	unsigned int vector = intr_info & INTR_INFO_VECTOR_MASK;
--	gate_desc *desc = (gate_desc *)host_idt_base + vector;
- 
- 	if (KVM_BUG(!is_external_intr(intr_info), vcpu->kvm,
- 	    "unexpected VM-Exit interrupt info: 0x%x", intr_info))
- 		return;
- 
- 	kvm_before_interrupt(vcpu, KVM_HANDLING_IRQ);
--	vmx_do_interrupt_irqoff(gate_offset(desc));
-+	if (cpu_feature_enabled(X86_FEATURE_FRED))
-+		vmx_do_fred_interrupt_irqoff(vector);
-+	else
-+		vmx_do_interrupt_irqoff(gate_offset((gate_desc *)host_idt_base + vector));
- 	kvm_after_interrupt(vcpu);
- 
- 	vcpu->arch.at_instruction_boundary = true;
-@@ -7226,7 +7236,10 @@ static noinstr void vmx_vcpu_enter_exit(struct kvm_vcpu *vcpu,
- 	if ((u16)vmx->exit_reason.basic == EXIT_REASON_EXCEPTION_NMI &&
- 	    is_nmi(vmx_get_intr_info(vcpu))) {
- 		kvm_before_interrupt(vcpu, KVM_HANDLING_NMI);
--		vmx_do_nmi_irqoff();
-+		if (cpu_feature_enabled(X86_FEATURE_FRED))
-+			vmx_do_fred_nmi_irqoff();
-+		else
-+			vmx_do_nmi_irqoff();
- 		kvm_after_interrupt(vcpu);
- 	}
- 
+> +		err = pds_vfio_get_save_file(pds_vfio);
+> +		if (err)
+> +			return ERR_PTR(err);
+> +
+> +		/* Get device state */
+> +		err = pds_vfio_get_lm_state_cmd(pds_vfio);
+> +		if (err) {
+> +			pds_vfio_put_save_file(pds_vfio);
+> +			return ERR_PTR(err);
+> +		}
+> +
+> +		return pds_vfio->save_file->filep;
+> +	}
+> +
+> +	if (cur == VFIO_DEVICE_STATE_STOP_COPY && next == VFIO_DEVICE_STATE_STOP) {
+> +		/* Device is already stopped
+> +		 * delete the save device state file
+> +		 */
+> +		pds_vfio_put_save_file(pds_vfio);
+> +		pds_vfio_send_host_vf_lm_status_cmd(pds_vfio,
+> +						    PDS_LM_STA_NONE);
+> +		return NULL;
+> +	}
+> +
+> +	if (cur == VFIO_DEVICE_STATE_STOP && next == VFIO_DEVICE_STATE_RESUMING) {
+> +		/* create resume device data file */
+> +		err = pds_vfio_get_restore_file(pds_vfio);
+> +		if (err)
+> +			return ERR_PTR(err);
+> +
+> +		return pds_vfio->restore_file->filep;
+> +	}
+> +
+> +	if (cur == VFIO_DEVICE_STATE_RESUMING && next == VFIO_DEVICE_STATE_STOP) {
+> +		/* Set device state */
+> +		err = pds_vfio_set_lm_state_cmd(pds_vfio);
+> +		if (err)
+> +			return ERR_PTR(err);
+> +
+> +		/* delete resume device data file */
+> +		pds_vfio_put_restore_file(pds_vfio);
+> +		return NULL;
+> +	}
+> +
+> +	if (cur == VFIO_DEVICE_STATE_RUNNING && next == VFIO_DEVICE_STATE_RUNNING_P2P) {
+> +		pds_vfio_send_host_vf_lm_status_cmd(pds_vfio, PDS_LM_STA_IN_PROGRESS);
+> +		/* Device should be stopped
+> +		 * no interrupts, dma or change in internal state
+> +		 */
+> +		err = pds_vfio_suspend_device_cmd(pds_vfio);
+> +		if (err)
+> +			return ERR_PTR(err);
+> +
+> +		return NULL;
+> +	}
 
-base-commit: 33d1a64081c98e390e064db18738428d6fb96f95
--- 
+The comment here, as well as the no-op transitions from STOP->P2P and
+P2P->STOP has me concerned whether a device in this suspend state
+really meets the definition of our P2P state.  The RUNNING_P2P state is
+a quiescent state where the device must accept access, including
+peer-to-peer DMA, but it cannot initiate DMA or interrupts.  Is that
+consistent with this suspend state?  Thanks,
+
+Alex
+
+> +
+> +	if (cur == VFIO_DEVICE_STATE_RUNNING_P2P && next == VFIO_DEVICE_STATE_RUNNING) {
+> +		/* Device should be functional
+> +		 * interrupts, dma, mmio or changes to internal state is allowed
+> +		 */
+> +		err = pds_vfio_resume_device_cmd(pds_vfio);
+> +		if (err)
+> +			return ERR_PTR(err);
+> +
+> +		pds_vfio_send_host_vf_lm_status_cmd(pds_vfio,
+> +						    PDS_LM_STA_NONE);
+> +		return NULL;
+> +	}
+> +
+> +	if (cur == VFIO_DEVICE_STATE_STOP && next == VFIO_DEVICE_STATE_RUNNING_P2P)
+> +		return NULL;
+> +
+> +	if (cur == VFIO_DEVICE_STATE_RUNNING_P2P && next == VFIO_DEVICE_STATE_STOP)
+> +		return NULL;
+> +
+> +	return ERR_PTR(-EINVAL);
+> +}
 
