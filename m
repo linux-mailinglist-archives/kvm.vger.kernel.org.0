@@ -2,221 +2,175 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7744B6DC8BD
-	for <lists+kvm@lfdr.de>; Mon, 10 Apr 2023 17:48:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B2EB96DC954
+	for <lists+kvm@lfdr.de>; Mon, 10 Apr 2023 18:32:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229717AbjDJPsy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 Apr 2023 11:48:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58666 "EHLO
+        id S230223AbjDJQcV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 Apr 2023 12:32:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42206 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229701AbjDJPsu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 10 Apr 2023 11:48:50 -0400
-Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED21F1702
-        for <kvm@vger.kernel.org>; Mon, 10 Apr 2023 08:48:48 -0700 (PDT)
-Received: by mail-pl1-x62c.google.com with SMTP id d9443c01a7336-1a1b23f49e2so333055ad.0
-        for <kvm@vger.kernel.org>; Mon, 10 Apr 2023 08:48:48 -0700 (PDT)
+        with ESMTP id S229910AbjDJQcS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 10 Apr 2023 12:32:18 -0400
+Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E073810CF
+        for <kvm@vger.kernel.org>; Mon, 10 Apr 2023 09:32:17 -0700 (PDT)
+Received: by mail-pl1-x64a.google.com with SMTP id kw5-20020a170902f90500b001a238a5946cso1845833plb.11
+        for <kvm@vger.kernel.org>; Mon, 10 Apr 2023 09:32:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1681141728; x=1683733728;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=7l4iSC8HJNX/jqwH9S8F8xmqISL1JNp40w8q5yq7MLA=;
-        b=qOUMHH8KIB770gVMIvx2ktjfp8phYFhR7RAiQVXTyHFtVFQwG2HAwIF1kiScaToT5T
-         l6AoygbdvcrFkzeFgeD18FWlVfyjo+joDv+nJJ4OX67Qf9OQlbh4NdNHZI9tE3bQ80Xs
-         9kxJrAi77Qr9qZHGpgVAVs/rJoNou3Z2dzMpklo3UALJpZ/JDjZkjiwD7PPjxafmHllC
-         7adieNkkiemzP/hGwRe+swYMjwo7WcHwVPzyMSlU2FuDnsZ2+lOhtKR8MGxVXhwck/vb
-         XVv3rARqzfC6aucNdObDhXocLVDST4+REEO/60FYVtPrf4/Zl1LUNkh52t3DTWarh0DR
-         VfTQ==
+        d=google.com; s=20210112; t=1681144337;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=itQxv8BbM1PWm+RuQQ5FyL8tOIW1b7TZUP7dqH3kNac=;
+        b=I2sqdKuXsSOipEE4wkgH+zftrLP+ZQEvlfLiYQheAInvKEPAZuSnR3aFGMtEkqbAFR
+         SyTQDDUy726SsM1SPNsqKBd5DzBF+916FXKHv5mv2odD7ZSoowegDCzdulFXqhi5bwKs
+         0RO4A4u5NtsettVc7ORpAWmDOX2qoSbQfU+opLhH6bzUY5O5aHDjyJwinC8E6LxUo64O
+         Xoe//XAX5WmJ3OIV4r6zkDrxkmW/WvGB5Y17zVrOwXrTEFNzp0JMRCwlE39ZCcFTfITD
+         k94FBlTq7vw96Erc4nfik2gQfamsjjgLQyOplvHuAxVx/7xO6C8cRWmO2tQP/Iv4yWGs
+         Itpw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1681141728; x=1683733728;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7l4iSC8HJNX/jqwH9S8F8xmqISL1JNp40w8q5yq7MLA=;
-        b=YxVh2mPRwHz4wai1HZvYMqf/OwzRy0JT85uPW5vI4XPPzs6fRtJj4vbCZ0OiPiVKsp
-         LapdmjEyTjFENfVkLNV4SbmDwzHUYItWvFkP6oZA+IlywLKeOUpJVOrhCvWDvW9al1VE
-         2zk1WLH4UceSFOzjatoKzXPJzM8MTrEQT9/WrSpdJgQYncsAkGZUBHUWKYP1nlrIYFbX
-         NoxYdcQO0q1e871nY+NgW74pADe10SsI12e6U1VjCeBkRGq3jMtAOtwtO7zKV3i3Yoc4
-         kzFz6ikOyYIM0hDxC6QOWTH/qsj3MAdVwgBDmFj1gPi4QQSLglDdTVqc/roW1yySNADU
-         mD7g==
-X-Gm-Message-State: AAQBX9foj6l4nZMZWoP9HnYuJuEWqwOuk/kYoaCKwk0749Um6F4n8Vu/
-        eGSkbp7zHgAX9ZdQ5m9kex4T2w==
-X-Google-Smtp-Source: AKy350Y2lFHxocTI2qcWzUlXOekKkmNQbHsXKYtTNzae4FZttTk+OhuiKvvLIaVSc6k6NM18AnKqsg==
-X-Received: by 2002:a17:902:d202:b0:1a1:c5e6:1177 with SMTP id t2-20020a170902d20200b001a1c5e61177mr529227ply.10.1681141728116;
-        Mon, 10 Apr 2023 08:48:48 -0700 (PDT)
-Received: from google.com (223.103.125.34.bc.googleusercontent.com. [34.125.103.223])
-        by smtp.gmail.com with ESMTPSA id l9-20020a17090270c900b0019b089bc8d7sm5703143plt.78.2023.04.10.08.48.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Apr 2023 08:48:47 -0700 (PDT)
-Date:   Mon, 10 Apr 2023 08:48:43 -0700
-From:   Reiji Watanabe <reijiw@google.com>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Simon Veith <sveith@amazon.de>,
-        Colton Lewis <coltonlewis@google.com>,
-        Joey Gouly <joey.gouly@arm.com>, dwmw2@infradead.org
-Subject: Re: [PATCH v4 04/20] KVM: arm64: timers: Use CNTPOFF_EL2 to offset
- the physical timer
-Message-ID: <20230410154843.vin2tqxco2wwvu3f@google.com>
-References: <20230330174800.2677007-1-maz@kernel.org>
- <20230330174800.2677007-5-maz@kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230330174800.2677007-5-maz@kernel.org>
-X-Spam-Status: No, score=-15.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,ENV_AND_HDR_SPF_MATCH,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL,
-        USER_IN_DEF_SPF_WL autolearn=unavailable autolearn_force=no
-        version=3.4.6
+        d=1e100.net; s=20210112; t=1681144337;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=itQxv8BbM1PWm+RuQQ5FyL8tOIW1b7TZUP7dqH3kNac=;
+        b=T+q0fHLKDx1BMdQb7cZZWpfzGtPh1Djkh+50GSN8F6ruJGDZN6IZMU7ZAWLn7iCY+R
+         6KhGLx/NAa4HUgi+BNstImHjgAdBW1Rlw3plPrM9qnZNROWunv+tPmis7TeCIp8AGJXG
+         l19QJ8LUJ5oAGwDcIOCRF5C/8WgBVjFPHR4WsDiH8oiWetfqgOXgATO8YaYjgolW9rXv
+         i0ce2NaUvYjjqHIaeb2R7b0lJDQIyyWJ93BF2wJiGMwcMqPCqI4D3M0oBoQGUpobIlpc
+         QKIVOxGhYIXjAA6sS9KkRK3vcBdAF73UDRgVzFBg6b/LCKwK1dkQS+IZgmj9kUCOB4Vt
+         H8WQ==
+X-Gm-Message-State: AAQBX9edcthqVkR8sH2Sfk2DPLTWDmCNW+kqXC73e+O+nKCjV1S0J5YU
+        23dS46oCKRip4BYx3nSmVROnInkSodg=
+X-Google-Smtp-Source: AKy350bYR39SqtSRv+Q85bHi/2KjFrjWdeKh6KU41dxqae4MwZtBP8V6ChtQJu17TSE+4pp4qQkXCguhBrg=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a65:641a:0:b0:51b:fa5:7bce with SMTP id
+ a26-20020a65641a000000b0051b0fa57bcemr444164pgv.1.1681144337139; Mon, 10 Apr
+ 2023 09:32:17 -0700 (PDT)
+Date:   Mon, 10 Apr 2023 09:32:15 -0700
+In-Reply-To: <20230410031021.4145297-1-alexjlzheng@tencent.com>
+Mime-Version: 1.0
+References: <20230410031021.4145297-1-alexjlzheng@tencent.com>
+Message-ID: <ZDQ6D6BX/3mqhCbW@google.com>
+Subject: Re: [PATCH kvm RESEND] KVM: i8259: Fix poll command
+From:   Sean Christopherson <seanjc@google.com>
+To:     alexjlzheng@gmail.com
+Cc:     pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
+        hpa@zytor.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Jinliang Zheng <alexjlzheng@tencent.com>
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-7.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
+Please don't use RESEND as a ping, just respond to the original patch with a "Ping",
+or any question you might have.  I know Documentation/process/submitting-patches.rst
+says its ok to RESEND after a couple of weeks, but IMO that's overly aggressive
+and just creates noise, e.g. your original patch was in my todo list, I just hadn't
+gotten too it.  If you can't get a response after multiple pings, then by all means
+RESEND, but in the future, please try pinging first.
 
-On Thu, Mar 30, 2023 at 06:47:44PM +0100, Marc Zyngier wrote:
-> With ECV and CNTPOFF_EL2, it is very easy to offer an offset for
-> the physical timer. So let's do just that.
+For the patch context, there's no need to put "kvm" after patch, i.e. [PATCH], or
+in this case [PATCH RESEND].  The "KVM:" namespace in the shortlog provides
+sufficient context.
+
+Regarding the shortlog, if a v2 is needed, ignore the somewhat messy history of
+this file and use "KVM: x86:".
+
+On Mon, Apr 10, 2023, alexjlzheng@gmail.com wrote:
+> From: Jinliang Zheng <alexjlzheng@tencent.com>
 > 
-> Nothing can set the offset yet, so this should have no effect
-> whatsoever (famous last words...).
-> 
-> Reviewed-by: Colton Lewis <coltonlewis@google.com>
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> According to the hardware manual, when the Poll command is issued, the
+> byte returned by the I/O read is 1 in Bit 7 when there is an interrupt,
+> and the highest priority binary code in Bits 2:0. The current pic
+> simulation code is not implemented strictly according to the above
+> expression.
+
+There is way too much going on in this patch for this to be a sufficient description.
+pic_intack() is not a direct replacement for the open coded logic in pic_poll_read(),
+modulo the setting of bit 7.  E.g. there's no explanation for the "addr1 >> 7"
+logic, pic_clear_isr() is conditionally called on auto_eoi, priority_add is now
+modified, pic_update_irq() is no longer called, and so on and so forth.
+
+Maybe the patch is correct and pic_poll_read() was completely broken, but if that's
+the case, the changelog needs to be _much_ more verbose in explaining everything.
+
+> Fix the implementation of poll mode in pic simulation by pic_intack,
+
+Add () when referencing functions by name, i.e. pic_intack().
+
+> and remove redundant pic_poll_read code.
+
+Removing pic_poll() needs to be done in a separate patch.  Removing the helper
+while simultaneously modifying its effective code makes the patch unnecessarily
+difficult to review.
+
+> Signed-off-by: Jinliang Zheng <alexjlzheng@tencent.com>
 > ---
->  arch/arm64/kvm/arch_timer.c          | 18 +++++++++++++++++-
->  arch/arm64/kvm/hypercalls.c          |  2 +-
->  include/clocksource/arm_arch_timer.h |  1 +
->  include/kvm/arm_arch_timer.h         |  2 ++
->  4 files changed, 21 insertions(+), 2 deletions(-)
+>  arch/x86/kvm/i8259.c | 29 ++++++-----------------------
+>  1 file changed, 6 insertions(+), 23 deletions(-)
 > 
-> diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
-> index 9515c645f03d..3118ea0a1b41 100644
-> --- a/arch/arm64/kvm/arch_timer.c
-> +++ b/arch/arm64/kvm/arch_timer.c
-> @@ -52,6 +52,11 @@ static u64 kvm_arm_timer_read(struct kvm_vcpu *vcpu,
->  			      struct arch_timer_context *timer,
->  			      enum kvm_arch_timer_regs treg);
->  
-> +static bool has_cntpoff(void)
-> +{
-> +	return (has_vhe() && cpus_have_final_cap(ARM64_HAS_ECV_CNTPOFF));
-> +}
-> +
->  u32 timer_get_ctl(struct arch_timer_context *ctxt)
->  {
->  	struct kvm_vcpu *vcpu = ctxt->vcpu;
-> @@ -84,7 +89,7 @@ u64 timer_get_cval(struct arch_timer_context *ctxt)
->  
->  static u64 timer_get_offset(struct arch_timer_context *ctxt)
->  {
-> -	if (ctxt->offset.vm_offset)
-> +	if (ctxt && ctxt->offset.vm_offset)
->  		return *ctxt->offset.vm_offset;
-
-Reviewed-by: Reiji Watanabe <reijiw@google.com>
-
-Nit: This particular change appears to be unnecessary in this patch.
-(needed in the following patches ?)
-
-Thank you,
-Reiji
-
->  
->  	return 0;
-> @@ -432,6 +437,12 @@ static void set_cntvoff(u64 cntvoff)
->  	kvm_call_hyp(__kvm_timer_set_cntvoff, cntvoff);
+> diff --git a/arch/x86/kvm/i8259.c b/arch/x86/kvm/i8259.c
+> index 4756bcb5724f..bc5b758e8f73 100644
+> --- a/arch/x86/kvm/i8259.c
+> +++ b/arch/x86/kvm/i8259.c
+> @@ -397,35 +397,18 @@ static void pic_ioport_write(void *opaque, u32 addr, u32 val)
+>  		}
 >  }
 >  
-> +static void set_cntpoff(u64 cntpoff)
-> +{
-> +	if (has_cntpoff())
-> +		write_sysreg_s(cntpoff, SYS_CNTPOFF_EL2);
-> +}
-> +
->  static void timer_save_state(struct arch_timer_context *ctx)
+> -static u32 pic_poll_read(struct kvm_kpic_state *s, u32 addr1)
+> -{
+> -	int ret;
+> -
+> -	ret = pic_get_irq(s);
+> -	if (ret >= 0) {
+> -		if (addr1 >> 7) {
+> -			s->pics_state->pics[0].isr &= ~(1 << 2);
+> -			s->pics_state->pics[0].irr &= ~(1 << 2);
+> -		}
+> -		s->irr &= ~(1 << ret);
+> -		pic_clear_isr(s, ret);
+> -		if (addr1 >> 7 || ret != 2)
+> -			pic_update_irq(s->pics_state);
+> -	} else {
+> -		ret = 0x07;
+> -		pic_update_irq(s->pics_state);
+> -	}
+> -
+> -	return ret;
+> -}
+> -
+>  static u32 pic_ioport_read(void *opaque, u32 addr)
 >  {
->  	struct arch_timer_cpu *timer = vcpu_timer(ctx->vcpu);
-> @@ -480,6 +491,7 @@ static void timer_save_state(struct arch_timer_context *ctx)
->  		write_sysreg_el0(0, SYS_CNTP_CTL);
->  		isb();
+>  	struct kvm_kpic_state *s = opaque;
+>  	int ret;
 >  
-> +		set_cntpoff(0);
->  		break;
->  	case NR_KVM_TIMERS:
->  		BUG();
-> @@ -550,6 +562,7 @@ static void timer_restore_state(struct arch_timer_context *ctx)
->  		write_sysreg_el0(timer_get_ctl(ctx), SYS_CNTV_CTL);
->  		break;
->  	case TIMER_PTIMER:
-> +		set_cntpoff(timer_get_offset(ctx));
->  		write_sysreg_el0(timer_get_cval(ctx), SYS_CNTP_CVAL);
->  		isb();
->  		write_sysreg_el0(timer_get_ctl(ctx), SYS_CNTP_CTL);
-> @@ -767,6 +780,7 @@ void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu)
->  	vtimer->vcpu = vcpu;
->  	vtimer->offset.vm_offset = &vcpu->kvm->arch.timer_data.voffset;
->  	ptimer->vcpu = vcpu;
-> +	ptimer->offset.vm_offset = &vcpu->kvm->arch.timer_data.poffset;
->  
->  	/* Synchronize cntvoff across all vtimers of a VM. */
->  	timer_set_offset(vtimer, kvm_phys_timer_read());
-> @@ -1297,6 +1311,8 @@ void kvm_timer_init_vhe(void)
->  	val = read_sysreg(cnthctl_el2);
->  	val |= (CNTHCTL_EL1PCEN << cnthctl_shift);
->  	val |= (CNTHCTL_EL1PCTEN << cnthctl_shift);
-> +	if (cpus_have_final_cap(ARM64_HAS_ECV_CNTPOFF))
-> +		val |= CNTHCTL_ECV;
->  	write_sysreg(val, cnthctl_el2);
->  }
->  
-> diff --git a/arch/arm64/kvm/hypercalls.c b/arch/arm64/kvm/hypercalls.c
-> index 5da884e11337..39a4707e081d 100644
-> --- a/arch/arm64/kvm/hypercalls.c
-> +++ b/arch/arm64/kvm/hypercalls.c
-> @@ -47,7 +47,7 @@ static void kvm_ptp_get_time(struct kvm_vcpu *vcpu, u64 *val)
->  		cycles = systime_snapshot.cycles - vcpu->kvm->arch.timer_data.voffset;
->  		break;
->  	case KVM_PTP_PHYS_COUNTER:
-> -		cycles = systime_snapshot.cycles;
-> +		cycles = systime_snapshot.cycles - vcpu->kvm->arch.timer_data.poffset;
->  		break;
->  	default:
->  		return;
-> diff --git a/include/clocksource/arm_arch_timer.h b/include/clocksource/arm_arch_timer.h
-> index 057c8964aefb..cbbc9a6dc571 100644
-> --- a/include/clocksource/arm_arch_timer.h
-> +++ b/include/clocksource/arm_arch_timer.h
-> @@ -21,6 +21,7 @@
->  #define CNTHCTL_EVNTEN			(1 << 2)
->  #define CNTHCTL_EVNTDIR			(1 << 3)
->  #define CNTHCTL_EVNTI			(0xF << 4)
-> +#define CNTHCTL_ECV			(1 << 12)
->  
->  enum arch_timer_reg {
->  	ARCH_TIMER_REG_CTRL,
-> diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
-> index 70d47c4adc6a..2dd0fd2406fb 100644
-> --- a/include/kvm/arm_arch_timer.h
-> +++ b/include/kvm/arm_arch_timer.h
-> @@ -34,6 +34,8 @@ struct arch_timer_offset {
->  struct arch_timer_vm_data {
->  	/* Offset applied to the virtual timer/counter */
->  	u64	voffset;
-> +	/* Offset applied to the physical timer/counter */
-> +	u64	poffset;
->  };
->  
->  struct arch_timer_context {
+>  	if (s->poll) {
+> -		ret = pic_poll_read(s, addr);
+> +		ret = pic_get_irq(s);
+> +		if (ret >= 0) {
+> +			pic_intack(s, ret);
+> +			ret |= 0x80;
+> +		} else
+
+All branches in an if-elif-else statment need curly braces if any branch needs
+statements (again, ignore the bad "prior art" in this file), i.e.
+
+		if (ret >= 0) {
+			...
+		} else {
+			ret = 0;
+		}
+
+> +			ret = 0;
+>  		s->poll = 0;
+>  	} else
+>  		if ((addr & 1) == 0)
 > -- 
-> 2.34.1
+> 2.37.3
 > 
