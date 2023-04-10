@@ -2,61 +2,61 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BAF906DC5EC
-	for <lists+kvm@lfdr.de>; Mon, 10 Apr 2023 12:52:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A8E896DC5F2
+	for <lists+kvm@lfdr.de>; Mon, 10 Apr 2023 12:52:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229808AbjDJKv4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 Apr 2023 06:51:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41600 "EHLO
+        id S229868AbjDJKwJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 Apr 2023 06:52:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42060 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229670AbjDJKvq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 10 Apr 2023 06:51:46 -0400
-Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72BBD4EEF;
-        Mon, 10 Apr 2023 03:51:31 -0700 (PDT)
-Received: by mail-pj1-x1035.google.com with SMTP id 98e67ed59e1d1-24677297572so110641a91.1;
-        Mon, 10 Apr 2023 03:51:31 -0700 (PDT)
+        with ESMTP id S229771AbjDJKvw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 10 Apr 2023 06:51:52 -0400
+Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8194C7ABF;
+        Mon, 10 Apr 2023 03:51:37 -0700 (PDT)
+Received: by mail-pj1-x1036.google.com with SMTP id 98e67ed59e1d1-2467736d1c6so212712a91.2;
+        Mon, 10 Apr 2023 03:51:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1681123889; x=1683715889;
+        d=gmail.com; s=20210112; t=1681123891; x=1683715891;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=cdQCFY7on5P+S/gm8INkvpwBpAxQTaUMH+FZDvUGdXY=;
-        b=ho2riEP7y1sxLHyQL07IlwBlbWd14tnATzi3WcnzbTF2fZGfrEmQR816WFcw/eiaac
-         5bUOLFVPCMh56byqJvK/O/xajl/T6PGSi9416bagR7CADPOC6Zhv27L7ATGr/xp3ZTVy
-         WUpYf/6U5Jutdbwz5ieBo+TPR8qB5JagpfuFzUTzwb/E5wI61EWXA+iPMAnhL54saXaR
-         muy+/fuB+eMmV7i/CmNOcOQ070rArwKZv7chlMwxuT4FQVDGQwKvw7S/xvCD1Y4mfblT
-         ItWOfHajAmUAM/yBlSfeZ+b/8Slju2WEXkhP0HBwLAfC+HJ8wfqEfbUrbIPsF3Nf9Hxg
-         OF7g==
+        bh=VOg/+c/G3VaaM9K0QFYQTbvifMIEuvnJxkrgp3NNysU=;
+        b=lKs/DvJBKJnaZZgO/n8km6dzrGzOHLTyY8aATpZ69AGrI7fQmaptA7Blcw/eeD3cxr
+         1yOR10Bgz1IFC9lSbQ0HhGdp6b/5VO4RBGSH996nF6C+pUUUTXtFWn/iViGy2Lw62rZ9
+         APpYOITBn22lGewetwI4X/mXF7CEpM+T0DHE9yPck8435JJi2eJAoBA2xpRJA3cwyzO3
+         NOjY3zrz6jogqTCPkf7uvv1sHLIw3MgSwpjSnK5kvnIeBea+PrttIbBcpyAZ36dvu38t
+         iJ7ivNqiv2k6FMaXcvOopYNWffDVtidHH+NlW1xiQo79Rxk8qsEknpnMiQWtoLQrDoqm
+         KSwA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1681123889; x=1683715889;
+        d=1e100.net; s=20210112; t=1681123891; x=1683715891;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=cdQCFY7on5P+S/gm8INkvpwBpAxQTaUMH+FZDvUGdXY=;
-        b=VbFXChg8BOtSbPhXgRlgkaNhpotyP0BGo/6Vj649viUezjrDmJtQoKD125Fn2IlwZy
-         x6f01u3xb5dHVT27FvG6riooruNZKDV8pPTN22Dd6bq8v4MpkuwKUxaswX+L0cEHYwTj
-         lKYS4pw944Al2bBxW8yP/oSnS65+6bDcWh+HdNbulDFzcBYtkogq514/rnExZXqHLomN
-         iI9lvuc0uK/D9c1yOXrp78g3o+FxICf8TA7qlUr150gg7xrtQTw/HkQP7nOXauqRGZOU
-         b+ChOROgPV7rZX7UbIZbo6ok1ToPAVkxx9uF2xjJxdWbaiUCkj/T/rPyrbWYR0QyKl1f
-         U/Fw==
-X-Gm-Message-State: AAQBX9eL01TM+bTLTQMABnP8ApD1f3abnMi5xWUBwzr7Vy9cphnGF1X6
-        qVb0yefs5rd75McshIoC/dvZTE9Ds5PZ1g==
-X-Google-Smtp-Source: AKy350Y2H5MnE21z1fJM5d+wBKkUnCfLnEpP37PjlWbxSWNTt1qP3IA1yZs/v2Tywlu2yQgEz5GoKQ==
-X-Received: by 2002:a62:5255:0:b0:638:7e00:48c4 with SMTP id g82-20020a625255000000b006387e0048c4mr2452892pfb.21.1681123889559;
-        Mon, 10 Apr 2023 03:51:29 -0700 (PDT)
+        bh=VOg/+c/G3VaaM9K0QFYQTbvifMIEuvnJxkrgp3NNysU=;
+        b=usHkspA5UQCt7XaqSI3ncNywL38fc3dP0TfC51IolQVbIWqs2W0+j0ZdUwnmxmhU4L
+         imN/hBMxyl1iV9bojXjKV6SEgUI6DCcpS0Sst4MwrY1E58HF/FjhmsSjCsXCtSYnopy8
+         3BL8osyoMvGZxAxcMUnXujkeLuIu2E2UcVT3el4IZOvzMZ4OB0tKXxumv5m21AAIlPLS
+         GUt41goghqLWbVJpi5u8f2eH9TaA/GajAL7R4YFRa0Zxe20aW2/2buRtCzn2oXp4iYZv
+         1S1q7cOGzKt4rEFC+lCNYUX0NrBhNFN9KEG44IQ0D0yCloF8C/Q1AabrgO2WaJFsXjcj
+         kCZg==
+X-Gm-Message-State: AAQBX9cDXwulNMOe0gGI8kbkC7JvdamM5oa4AWUHzp4ueHj6X0+vpgJI
+        MKhTZMeAxQDdgDgLbo8voGA=
+X-Google-Smtp-Source: AKy350Y0l/Xy0MOOr+Hx+VT4fsOco2CjQkIlByB3RzddbFkqj2dhaZendap8pteVG6M63WaNyxbAcA==
+X-Received: by 2002:a62:5257:0:b0:635:1d57:bdee with SMTP id g84-20020a625257000000b006351d57bdeemr4572705pfb.11.1681123891125;
+        Mon, 10 Apr 2023 03:51:31 -0700 (PDT)
 Received: from localhost.localdomain ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id h4-20020a056a00170400b0062e032b61a6sm7783252pfc.91.2023.04.10.03.51.28
+        by smtp.gmail.com with ESMTPSA id h4-20020a056a00170400b0062e032b61a6sm7783252pfc.91.2023.04.10.03.51.29
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Apr 2023 03:51:29 -0700 (PDT)
+        Mon, 10 Apr 2023 03:51:30 -0700 (PDT)
 From:   Like Xu <like.xu.linux@gmail.com>
 X-Google-Original-From: Like Xu <likexu@tencent.com>
 To:     Sean Christopherson <seanjc@google.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH V5 07/10] KVM: x86/pmu: Constrain the num of guest counters with kvm_pmu_cap
-Date:   Mon, 10 Apr 2023 18:50:53 +0800
-Message-Id: <20230410105056.60973-8-likexu@tencent.com>
+Subject: [PATCH V5 08/10] KVM: x86/cpuid: Add a KVM-only leaf to redirect AMD PerfMonV2 flag
+Date:   Mon, 10 Apr 2023 18:50:54 +0800
+Message-Id: <20230410105056.60973-9-likexu@tencent.com>
 X-Mailer: git-send-email 2.40.0
 In-Reply-To: <20230410105056.60973-1-likexu@tencent.com>
 References: <20230410105056.60973-1-likexu@tencent.com>
@@ -74,30 +74,55 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Like Xu <likexu@tencent.com>
 
-A sanity check is added to limit the number of AMD guest counters,
-which help avoid a situation if KVM only has access to 4 counters, but
-user space sets guest X86_FEATURE_PERFCTR_CORE anyways.
+A KVM-only leaf for AMD's PerfMonV2 feature flag is defined to redirect
+the kernel's scattered version to its architectural location, e.g. so that
+KVM can query guest support via guest_cpuid_has().
 
 Suggested-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Like Xu <likexu@tencent.com>
 ---
- arch/x86/kvm/svm/pmu.c | 3 +++
- 1 file changed, 3 insertions(+)
+ arch/x86/kvm/reverse_cpuid.h | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/arch/x86/kvm/svm/pmu.c b/arch/x86/kvm/svm/pmu.c
-index 70143275e0a7..825b9cc26ae5 100644
---- a/arch/x86/kvm/svm/pmu.c
-+++ b/arch/x86/kvm/svm/pmu.c
-@@ -170,6 +170,9 @@ static void amd_pmu_refresh(struct kvm_vcpu *vcpu)
- 	else
- 		pmu->nr_arch_gp_counters = AMD64_NUM_COUNTERS;
+diff --git a/arch/x86/kvm/reverse_cpuid.h b/arch/x86/kvm/reverse_cpuid.h
+index a5717282bb9c..56cbdb24400a 100644
+--- a/arch/x86/kvm/reverse_cpuid.h
++++ b/arch/x86/kvm/reverse_cpuid.h
+@@ -15,6 +15,7 @@ enum kvm_only_cpuid_leafs {
+ 	CPUID_12_EAX	 = NCAPINTS,
+ 	CPUID_7_1_EDX,
+ 	CPUID_8000_0007_EDX,
++	CPUID_8000_0022_EAX,
+ 	NR_KVM_CPU_CAPS,
  
-+	pmu->nr_arch_gp_counters = min_t(unsigned int, pmu->nr_arch_gp_counters,
-+					 kvm_pmu_cap.num_counters_gp);
+ 	NKVMCAPINTS = NR_KVM_CPU_CAPS - NCAPINTS,
+@@ -47,6 +48,9 @@ enum kvm_only_cpuid_leafs {
+ /* CPUID level 0x80000007 (EDX). */
+ #define KVM_X86_FEATURE_CONSTANT_TSC	KVM_X86_FEATURE(CPUID_8000_0007_EDX, 8)
+ 
++/* CPUID level 0x80000022 (EAX) */
++#define KVM_X86_FEATURE_PERFMON_V2	KVM_X86_FEATURE(CPUID_8000_0022_EAX, 0)
 +
- 	pmu->counter_bitmask[KVM_PMC_GP] = ((u64)1 << 48) - 1;
- 	pmu->reserved_bits = 0xfffffff000280000ull;
- 	pmu->raw_event_mask = AMD64_RAW_EVENT_MASK;
+ struct cpuid_reg {
+ 	u32 function;
+ 	u32 index;
+@@ -74,6 +78,7 @@ static const struct cpuid_reg reverse_cpuid[] = {
+ 	[CPUID_7_1_EDX]       = {         7, 1, CPUID_EDX},
+ 	[CPUID_8000_0007_EDX] = {0x80000007, 0, CPUID_EDX},
+ 	[CPUID_8000_0021_EAX] = {0x80000021, 0, CPUID_EAX},
++	[CPUID_8000_0022_EAX] = {0x80000022, 0, CPUID_EAX},
+ };
+ 
+ /*
+@@ -108,6 +113,8 @@ static __always_inline u32 __feature_translate(int x86_feature)
+ 		return KVM_X86_FEATURE_SGX_EDECCSSA;
+ 	else if (x86_feature == X86_FEATURE_CONSTANT_TSC)
+ 		return KVM_X86_FEATURE_CONSTANT_TSC;
++	else if (x86_feature == X86_FEATURE_PERFMON_V2)
++		return KVM_X86_FEATURE_PERFMON_V2;
+ 
+ 	return x86_feature;
+ }
 -- 
 2.40.0
 
