@@ -2,71 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3E9496DCD43
-	for <lists+kvm@lfdr.de>; Tue, 11 Apr 2023 00:06:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 93CA96DCD59
+	for <lists+kvm@lfdr.de>; Tue, 11 Apr 2023 00:15:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229936AbjDJWGd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 Apr 2023 18:06:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47278 "EHLO
+        id S229897AbjDJWPw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 Apr 2023 18:15:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52082 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229917AbjDJWGb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 10 Apr 2023 18:06:31 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F5C71BCA
-        for <kvm@vger.kernel.org>; Mon, 10 Apr 2023 15:05:48 -0700 (PDT)
+        with ESMTP id S229735AbjDJWPv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 10 Apr 2023 18:15:51 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3F6513E
+        for <kvm@vger.kernel.org>; Mon, 10 Apr 2023 15:15:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1681164342;
+        s=mimecast20190719; t=1681164905;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=JDZhCwGo8x3+STKd4yRTec3uFmFqrpXKNILuRc0wVDM=;
-        b=L2sIAFvAT2baJMBezUrXufrgAO7Gld3mBBpT7P0G43ThXFJcfKCkjnBCYHt/112M4jeJM7
-        KC9roqaxIZMMwnJPUcilnXwBR1BQy/GLuKHvqWU9ncZe5AXB8qdYxlqWPd/fUeG2TB/KhZ
-        ro5ll54sLtjvQGmHmXkffzhJsRhUqZs=
-Received: from mail-io1-f69.google.com (mail-io1-f69.google.com
- [209.85.166.69]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=VDd3HjoS8oa69sUdzA2zyCnS0oqks4NjlLJ/OnIvYgA=;
+        b=d/GxpU2rAGIWlwlktdqiqs8iuc1S/aI0tRw6xkuCNZDdy+yRXON9Ik1oEJQBqgSbfwmtYh
+        vFSNqkYhc2tt7sxOA0JAYR/oDE2QIYSL8lXBQeYjzh0/rMnaz5uIfe3ekmtTrFNd0jGQwt
+        Arz5TyMEuN1nHG0Q56r2YeYRwRhG+v8=
+Received: from mail-il1-f200.google.com (mail-il1-f200.google.com
+ [209.85.166.200]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-50-pjWHADIIMISeE9-6VTYBzQ-1; Mon, 10 Apr 2023 18:05:40 -0400
-X-MC-Unique: pjWHADIIMISeE9-6VTYBzQ-1
-Received: by mail-io1-f69.google.com with SMTP id m22-20020a0566022e9600b007608fe7d67dso856028iow.8
-        for <kvm@vger.kernel.org>; Mon, 10 Apr 2023 15:05:40 -0700 (PDT)
+ us-mta-383-zgOLM2iOMhuxj9a7JvRsGQ-1; Mon, 10 Apr 2023 18:15:04 -0400
+X-MC-Unique: zgOLM2iOMhuxj9a7JvRsGQ-1
+Received: by mail-il1-f200.google.com with SMTP id u6-20020a926006000000b003232594207dso4919197ilb.8
+        for <kvm@vger.kernel.org>; Mon, 10 Apr 2023 15:15:03 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1681164340; x=1683756340;
+        d=1e100.net; s=20210112; t=1681164903; x=1683756903;
         h=content-transfer-encoding:mime-version:organization:references
          :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=JDZhCwGo8x3+STKd4yRTec3uFmFqrpXKNILuRc0wVDM=;
-        b=akKNxqzlcQw9QvQ31WgZhObT4bTA30skT3eCGQSjN/fSUBq8eOTAeOmLI0m6voTy8I
-         fyiHHAkwpV6H7MMqX1sObPGZDzfibVabr/z6NcSzmkt7BthWwnf17iQnSmhS76Ill14g
-         Ph/LSX/VgD3EfVUITxokb0w6nKPPR1YgTc96qBnC40j4kw/g23KuNxNhoK7+xYh7Ylp3
-         USLvxgC+iv6tOZ9w5yS0yKYbmhd10v3CsG0PqVYY0Kl9NfuGQMJ6nU9z8ICCCSJ7gXKB
-         Y2u71dpzlPAmIouK8XNrO/uJSdXPOS24AHV/cTyYqizwiNd3ZjcJmr6SOvzR8rQUsatK
-         uU2g==
-X-Gm-Message-State: AAQBX9fe95lAa1HQT5mIHEaS4jzdjkzTqBiPvJ+d9k0e2tQxXpp2ur8N
-        4KMD0k3fV2T1k4T7ft9vL48DCZjOFMqMylJa550q3dbhCGeiJmzt05DYYkuXAf/sOSvlNXs9lAX
-        HjUO4R2+/wjYo
-X-Received: by 2002:a92:c501:0:b0:325:b96e:6709 with SMTP id r1-20020a92c501000000b00325b96e6709mr7822955ilg.11.1681164340167;
-        Mon, 10 Apr 2023 15:05:40 -0700 (PDT)
-X-Google-Smtp-Source: AKy350burg5KwX4O3ylWYs3MtOi8+a2A1RmfQ6dzHFH5uBLbtKPI0Hz4QDU2gr9Ku4MRNPG7lzR+ww==
-X-Received: by 2002:a92:c501:0:b0:325:b96e:6709 with SMTP id r1-20020a92c501000000b00325b96e6709mr7822931ilg.11.1681164339894;
-        Mon, 10 Apr 2023 15:05:39 -0700 (PDT)
+        bh=VDd3HjoS8oa69sUdzA2zyCnS0oqks4NjlLJ/OnIvYgA=;
+        b=0pZsl4ldpp2wxOE6c2Y0vHRNZFKtZYKPIEf+qJNz4tHESGHD+w+9EcBxZWxW2no3md
+         QPJGdSGbQoIYYH432PcRvxxgO6traQ66yJyeIHk8rh4vU7OpT2D4EOtW0j2M5UKJffPL
+         /XttKqWvyDbCf3I46H1ZI6FyNjdvs3i8pMNB5C08QT8vMptlLvW9SoL6pA9R2fOWA+KQ
+         2WsLje8pj/5CnAhnQ7+D/1F54UYpvQdUkZGB8QKj4OEuJ3rmrk3P8nnSHTvoDERzrJqp
+         +en6hJvSBOa73PYRj219HCoLJBBa9DawyP6V7WiNcoYb5V3VPKxcUBCTPBxEYxsdOcLT
+         lTRw==
+X-Gm-Message-State: AAQBX9c6s5ua/2ZAAUWyQZmWT9EV5QidRhTVVKg2p63gSVXsd35wrE1m
+        m7+bMbjWZmOBwiNoFI/U6ruz4j8X+PxjTflBTcN/r+LrFucNpBG15UPCNegQItCCQvxUfHe3qa4
+        brbaBQBgRl64z
+X-Received: by 2002:a92:d081:0:b0:328:8a35:83b6 with SMTP id h1-20020a92d081000000b003288a3583b6mr5118051ilh.8.1681164903292;
+        Mon, 10 Apr 2023 15:15:03 -0700 (PDT)
+X-Google-Smtp-Source: AKy350ac5qzdi1O0DqPK3I0OiMETvi/H5VHAqWwvBHQm3WPQnIyNP5+oYR3o5uXzQLR0OvIkqz2IRw==
+X-Received: by 2002:a92:d081:0:b0:328:8a35:83b6 with SMTP id h1-20020a92d081000000b003288a3583b6mr5118041ilh.8.1681164903005;
+        Mon, 10 Apr 2023 15:15:03 -0700 (PDT)
 Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id z12-20020a921a4c000000b003157b2c504bsm3174969ill.24.2023.04.10.15.05.39
+        by smtp.gmail.com with ESMTPSA id c19-20020a056e020bd300b0032722299321sm3117332ilu.21.2023.04.10.15.15.02
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Apr 2023 15:05:39 -0700 (PDT)
-Date:   Mon, 10 Apr 2023 16:05:37 -0600
+        Mon, 10 Apr 2023 15:15:02 -0700 (PDT)
+Date:   Mon, 10 Apr 2023 16:15:01 -0600
 From:   Alex Williamson <alex.williamson@redhat.com>
 To:     Brett Creeley <brett.creeley@amd.com>
 Cc:     <kvm@vger.kernel.org>, <netdev@vger.kernel.org>, <jgg@nvidia.com>,
         <yishaih@nvidia.com>, <shameerali.kolothum.thodi@huawei.com>,
         <kevin.tian@intel.com>, <shannon.nelson@amd.com>,
         <drivers@pensando.io>, <simon.horman@corigine.com>
-Subject: Re: [PATCH v8 vfio 4/7] vfio/pds: Add VFIO live migration support
-Message-ID: <20230410160538.35c1a5a6.alex.williamson@redhat.com>
-In-Reply-To: <20230404190141.57762-5-brett.creeley@amd.com>
+Subject: Re: [PATCH v8 vfio 5/7] vfio/pds: Add support for dirty page
+ tracking
+Message-ID: <20230410161501.0a22bfa6.alex.williamson@redhat.com>
+In-Reply-To: <20230404190141.57762-6-brett.creeley@amd.com>
 References: <20230404190141.57762-1-brett.creeley@amd.com>
-        <20230404190141.57762-5-brett.creeley@amd.com>
+        <20230404190141.57762-6-brett.creeley@amd.com>
 Organization: Red Hat
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
@@ -81,159 +82,142 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 4 Apr 2023 12:01:38 -0700
+On Tue, 4 Apr 2023 12:01:39 -0700
 Brett Creeley <brett.creeley@amd.com> wrote:
-> diff --git a/drivers/vfio/pci/pds/lm.c b/drivers/vfio/pci/pds/lm.c
-> new file mode 100644
-> index 000000000000..855f5da9b99a
-> --- /dev/null
-> +++ b/drivers/vfio/pci/pds/lm.c
-> @@ -0,0 +1,479 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/* Copyright(c) 2023 Advanced Micro Devices, Inc. */
-> +
-> +#include <linux/anon_inodes.h>
-> +#include <linux/file.h>
-> +#include <linux/fs.h>
-> +#include <linux/highmem.h>
-> +#include <linux/vfio.h>
-> +#include <linux/vfio_pci_core.h>
-> +
-> +#include "vfio_dev.h"
-> +#include "cmds.h"
-> +
-> +#define PDS_VFIO_LM_FILENAME	"pds_vfio_lm"
-> +
-> +const char *
-> +pds_vfio_lm_state(enum vfio_device_mig_state state)
+> +static int
+> +pds_vfio_dirty_enable(struct pds_vfio_pci_device *pds_vfio,
+> +		      struct rb_root_cached *ranges, u32 nnodes,
+> +		      u64 *page_size)
 > +{
-> +	switch (state) {
-> +	case VFIO_DEVICE_STATE_ERROR:
-> +		return "VFIO_DEVICE_STATE_ERROR";
-> +	case VFIO_DEVICE_STATE_STOP:
-> +		return "VFIO_DEVICE_STATE_STOP";
-> +	case VFIO_DEVICE_STATE_RUNNING:
-> +		return "VFIO_DEVICE_STATE_RUNNING";
-> +	case VFIO_DEVICE_STATE_STOP_COPY:
-> +		return "VFIO_DEVICE_STATE_STOP_COPY";
-> +	case VFIO_DEVICE_STATE_RESUMING:
-> +		return "VFIO_DEVICE_STATE_RESUMING";
-> +	case VFIO_DEVICE_STATE_RUNNING_P2P:
-> +		return "VFIO_DEVICE_STATE_RUNNING_P2P";
-> +	default:
-> +		return "VFIO_DEVICE_STATE_INVALID";
+> +	struct pds_vfio_dirty *dirty = &pds_vfio->dirty;
+> +	u64 region_start, region_size, region_page_size;
+> +	struct pds_lm_dirty_region_info *region_info;
+> +	struct interval_tree_node *node = NULL;
+> +	struct pci_dev *pdev = pds_vfio->pdev;
+> +	u8 max_regions = 0, num_regions;
+> +	dma_addr_t regions_dma = 0;
+> +	u32 num_ranges = nnodes;
+> +	u32 page_count;
+> +	u16 len;
+> +	int err;
+> +
+> +	dev_dbg(&pdev->dev, "vf%u: Start dirty page tracking\n", pds_vfio->vf_id);
+> +
+> +	if (pds_vfio_dirty_is_enabled(pds_vfio))
+> +		return -EINVAL;
+> +
+> +	pds_vfio_dirty_set_enabled(pds_vfio);
+> +
+> +	/* find if dirty tracking is disabled, i.e. num_regions == 0 */
+> +	err = pds_vfio_dirty_status_cmd(pds_vfio, 0, &max_regions, &num_regions);
+> +	if (num_regions) {
+> +		dev_err(&pdev->dev, "Dirty tracking already enabled for %d regions\n",
+> +			num_regions);
+> +		err = -EEXIST;
+> +		goto err_out;
+> +	} else if (!max_regions) {
+> +		dev_err(&pdev->dev, "Device doesn't support dirty tracking, max_regions %d\n",
+> +			max_regions);
+> +		err = -EOPNOTSUPP;
+> +		goto err_out;
+> +	} else if (err) {
+> +		dev_err(&pdev->dev, "Failed to get dirty status, err %pe\n",
+> +			ERR_PTR(err));
+> +		goto err_out;
 > +	}
 > +
-> +	return "VFIO_DEVICE_STATE_INVALID";
+> +	/* Only support 1 region for now. If there are any large gaps in the
+> +	 * VM's address regions, then this would be a waste of memory as we are
+> +	 * generating 2 bitmaps (ack/seq) from the min address to the max
+> +	 * address of the VM's address regions. In the future, if we support
+> +	 * more than one region in the device/driver we can split the bitmaps
+> +	 * on the largest address region gaps. We can do this split up to the
+> +	 * max_regions times returned from the dirty_status command.
+> +	 */
 
-Seems a tad redundant.
-
-> +}
-> +
-[snip]
-> +struct file *
-> +pds_vfio_step_device_state_locked(struct pds_vfio_pci_device *pds_vfio,
-> +				  enum vfio_device_mig_state next)
-> +{
-> +	enum vfio_device_mig_state cur = pds_vfio->state;
-> +	struct device *dev = &pds_vfio->pdev->dev;
-> +	int err = 0;
-> +
-> +	dev_dbg(dev, "%s => %s\n",
-> +		pds_vfio_lm_state(cur), pds_vfio_lm_state(next));
-> +
-> +	if (cur == VFIO_DEVICE_STATE_STOP && next == VFIO_DEVICE_STATE_STOP_COPY) {
-> +		/* Device is already stopped
-> +		 * create save device data file & get device state from firmware
-> +		 */
-
-Standard multi-line comment style please, we're not under net/ here.
-
-> +		err = pds_vfio_get_save_file(pds_vfio);
-> +		if (err)
-> +			return ERR_PTR(err);
-> +
-> +		/* Get device state */
-> +		err = pds_vfio_get_lm_state_cmd(pds_vfio);
-> +		if (err) {
-> +			pds_vfio_put_save_file(pds_vfio);
-> +			return ERR_PTR(err);
-> +		}
-> +
-> +		return pds_vfio->save_file->filep;
-> +	}
-> +
-> +	if (cur == VFIO_DEVICE_STATE_STOP_COPY && next == VFIO_DEVICE_STATE_STOP) {
-> +		/* Device is already stopped
-> +		 * delete the save device state file
-> +		 */
-> +		pds_vfio_put_save_file(pds_vfio);
-> +		pds_vfio_send_host_vf_lm_status_cmd(pds_vfio,
-> +						    PDS_LM_STA_NONE);
-> +		return NULL;
-> +	}
-> +
-> +	if (cur == VFIO_DEVICE_STATE_STOP && next == VFIO_DEVICE_STATE_RESUMING) {
-> +		/* create resume device data file */
-> +		err = pds_vfio_get_restore_file(pds_vfio);
-> +		if (err)
-> +			return ERR_PTR(err);
-> +
-> +		return pds_vfio->restore_file->filep;
-> +	}
-> +
-> +	if (cur == VFIO_DEVICE_STATE_RESUMING && next == VFIO_DEVICE_STATE_STOP) {
-> +		/* Set device state */
-> +		err = pds_vfio_set_lm_state_cmd(pds_vfio);
-> +		if (err)
-> +			return ERR_PTR(err);
-> +
-> +		/* delete resume device data file */
-> +		pds_vfio_put_restore_file(pds_vfio);
-> +		return NULL;
-> +	}
-> +
-> +	if (cur == VFIO_DEVICE_STATE_RUNNING && next == VFIO_DEVICE_STATE_RUNNING_P2P) {
-> +		pds_vfio_send_host_vf_lm_status_cmd(pds_vfio, PDS_LM_STA_IN_PROGRESS);
-> +		/* Device should be stopped
-> +		 * no interrupts, dma or change in internal state
-> +		 */
-> +		err = pds_vfio_suspend_device_cmd(pds_vfio);
-> +		if (err)
-> +			return ERR_PTR(err);
-> +
-> +		return NULL;
-> +	}
-
-The comment here, as well as the no-op transitions from STOP->P2P and
-P2P->STOP has me concerned whether a device in this suspend state
-really meets the definition of our P2P state.  The RUNNING_P2P state is
-a quiescent state where the device must accept access, including
-peer-to-peer DMA, but it cannot initiate DMA or interrupts.  Is that
-consistent with this suspend state?  Thanks,
+Large gaps in a VM are very possible, particularly after QEMU has
+relocated RAM above 4GB to above the reserved hypertransport range on
+AMD systems.  Thanks,
 
 Alex
 
-> +
-> +	if (cur == VFIO_DEVICE_STATE_RUNNING_P2P && next == VFIO_DEVICE_STATE_RUNNING) {
-> +		/* Device should be functional
-> +		 * interrupts, dma, mmio or changes to internal state is allowed
-> +		 */
-> +		err = pds_vfio_resume_device_cmd(pds_vfio);
-> +		if (err)
-> +			return ERR_PTR(err);
-> +
-> +		pds_vfio_send_host_vf_lm_status_cmd(pds_vfio,
-> +						    PDS_LM_STA_NONE);
-> +		return NULL;
+> +	max_regions = 1;
+> +	if (num_ranges > max_regions) {
+> +		vfio_combine_iova_ranges(ranges, nnodes, max_regions);
+> +		num_ranges = max_regions;
 > +	}
 > +
-> +	if (cur == VFIO_DEVICE_STATE_STOP && next == VFIO_DEVICE_STATE_RUNNING_P2P)
-> +		return NULL;
+> +	node = interval_tree_iter_first(ranges, 0, ULONG_MAX);
+> +	if (!node) {
+> +		err = -EINVAL;
+> +		goto err_out;
+> +	}
 > +
-> +	if (cur == VFIO_DEVICE_STATE_RUNNING_P2P && next == VFIO_DEVICE_STATE_STOP)
-> +		return NULL;
+> +	region_size = node->last - node->start + 1;
+> +	region_start = node->start;
+> +	region_page_size = *page_size;
 > +
-> +	return ERR_PTR(-EINVAL);
+> +	len = sizeof(*region_info);
+> +	region_info = kzalloc(len, GFP_KERNEL);
+> +	if (!region_info) {
+> +		err = -ENOMEM;
+> +		goto err_out;
+> +	}
+> +
+> +	page_count = DIV_ROUND_UP(region_size, region_page_size);
+> +
+> +	region_info->dma_base = cpu_to_le64(region_start);
+> +	region_info->page_count = cpu_to_le32(page_count);
+> +	region_info->page_size_log2 = ilog2(region_page_size);
+> +
+> +	regions_dma = dma_map_single(pds_vfio->coredev, (void *)region_info, len,
+> +				     DMA_BIDIRECTIONAL);
+> +	if (dma_mapping_error(pds_vfio->coredev, regions_dma)) {
+> +		err = -ENOMEM;
+> +		kfree(region_info);
+> +		goto err_out;
+> +	}
+> +
+> +	err = pds_vfio_dirty_enable_cmd(pds_vfio, regions_dma, max_regions);
+> +	dma_unmap_single(pds_vfio->coredev, regions_dma, len, DMA_BIDIRECTIONAL);
+> +	/* page_count might be adjusted by the device,
+> +	 * update it before freeing region_info DMA
+> +	 */
+> +	page_count = le32_to_cpu(region_info->page_count);
+> +
+> +	dev_dbg(&pdev->dev, "region_info: regions_dma 0x%llx dma_base 0x%llx page_count %u page_size_log2 %u\n",
+> +		regions_dma, region_start, page_count, (u8)ilog2(region_page_size));
+> +
+> +	kfree(region_info);
+> +	if (err)
+> +		goto err_out;
+> +
+> +	err = pds_vfio_dirty_alloc_bitmaps(dirty, page_count);
+> +	if (err) {
+> +		dev_err(&pdev->dev, "Failed to alloc dirty bitmaps: %pe\n",
+> +			ERR_PTR(err));
+> +		goto err_out;
+> +	}
+> +
+> +	err = pds_vfio_dirty_alloc_sgl(pds_vfio, page_count);
+> +	if (err) {
+> +		dev_err(&pdev->dev, "Failed to alloc dirty sg lists: %pe\n",
+> +			ERR_PTR(err));
+> +		goto err_free_bitmaps;
+> +	}
+> +
+> +	dirty->region_start = region_start;
+> +	dirty->region_size = region_size;
+> +	dirty->region_page_size = region_page_size;
+> +
+> +	pds_vfio_print_guest_region_info(pds_vfio, max_regions);
+> +
+> +	return 0;
+> +
+> +err_free_bitmaps:
+> +	pds_vfio_dirty_free_bitmaps(dirty);
+> +err_out:
+> +	pds_vfio_dirty_set_disabled(pds_vfio);
+> +	return err;
 > +}
 
