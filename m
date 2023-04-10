@@ -2,222 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 93CA96DCD59
-	for <lists+kvm@lfdr.de>; Tue, 11 Apr 2023 00:15:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4CE9F6DCDAC
+	for <lists+kvm@lfdr.de>; Tue, 11 Apr 2023 00:50:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229897AbjDJWPw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 Apr 2023 18:15:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52082 "EHLO
+        id S229761AbjDJWu3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 Apr 2023 18:50:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41062 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229735AbjDJWPv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 10 Apr 2023 18:15:51 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3F6513E
-        for <kvm@vger.kernel.org>; Mon, 10 Apr 2023 15:15:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1681164905;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=VDd3HjoS8oa69sUdzA2zyCnS0oqks4NjlLJ/OnIvYgA=;
-        b=d/GxpU2rAGIWlwlktdqiqs8iuc1S/aI0tRw6xkuCNZDdy+yRXON9Ik1oEJQBqgSbfwmtYh
-        vFSNqkYhc2tt7sxOA0JAYR/oDE2QIYSL8lXBQeYjzh0/rMnaz5uIfe3ekmtTrFNd0jGQwt
-        Arz5TyMEuN1nHG0Q56r2YeYRwRhG+v8=
-Received: from mail-il1-f200.google.com (mail-il1-f200.google.com
- [209.85.166.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-383-zgOLM2iOMhuxj9a7JvRsGQ-1; Mon, 10 Apr 2023 18:15:04 -0400
-X-MC-Unique: zgOLM2iOMhuxj9a7JvRsGQ-1
-Received: by mail-il1-f200.google.com with SMTP id u6-20020a926006000000b003232594207dso4919197ilb.8
-        for <kvm@vger.kernel.org>; Mon, 10 Apr 2023 15:15:03 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1681164903; x=1683756903;
-        h=content-transfer-encoding:mime-version:organization:references
-         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=VDd3HjoS8oa69sUdzA2zyCnS0oqks4NjlLJ/OnIvYgA=;
-        b=0pZsl4ldpp2wxOE6c2Y0vHRNZFKtZYKPIEf+qJNz4tHESGHD+w+9EcBxZWxW2no3md
-         QPJGdSGbQoIYYH432PcRvxxgO6traQ66yJyeIHk8rh4vU7OpT2D4EOtW0j2M5UKJffPL
-         /XttKqWvyDbCf3I46H1ZI6FyNjdvs3i8pMNB5C08QT8vMptlLvW9SoL6pA9R2fOWA+KQ
-         2WsLje8pj/5CnAhnQ7+D/1F54UYpvQdUkZGB8QKj4OEuJ3rmrk3P8nnSHTvoDERzrJqp
-         +en6hJvSBOa73PYRj219HCoLJBBa9DawyP6V7WiNcoYb5V3VPKxcUBCTPBxEYxsdOcLT
-         lTRw==
-X-Gm-Message-State: AAQBX9c6s5ua/2ZAAUWyQZmWT9EV5QidRhTVVKg2p63gSVXsd35wrE1m
-        m7+bMbjWZmOBwiNoFI/U6ruz4j8X+PxjTflBTcN/r+LrFucNpBG15UPCNegQItCCQvxUfHe3qa4
-        brbaBQBgRl64z
-X-Received: by 2002:a92:d081:0:b0:328:8a35:83b6 with SMTP id h1-20020a92d081000000b003288a3583b6mr5118051ilh.8.1681164903292;
-        Mon, 10 Apr 2023 15:15:03 -0700 (PDT)
-X-Google-Smtp-Source: AKy350ac5qzdi1O0DqPK3I0OiMETvi/H5VHAqWwvBHQm3WPQnIyNP5+oYR3o5uXzQLR0OvIkqz2IRw==
-X-Received: by 2002:a92:d081:0:b0:328:8a35:83b6 with SMTP id h1-20020a92d081000000b003288a3583b6mr5118041ilh.8.1681164903005;
-        Mon, 10 Apr 2023 15:15:03 -0700 (PDT)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id c19-20020a056e020bd300b0032722299321sm3117332ilu.21.2023.04.10.15.15.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Apr 2023 15:15:02 -0700 (PDT)
-Date:   Mon, 10 Apr 2023 16:15:01 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Brett Creeley <brett.creeley@amd.com>
-Cc:     <kvm@vger.kernel.org>, <netdev@vger.kernel.org>, <jgg@nvidia.com>,
-        <yishaih@nvidia.com>, <shameerali.kolothum.thodi@huawei.com>,
-        <kevin.tian@intel.com>, <shannon.nelson@amd.com>,
-        <drivers@pensando.io>, <simon.horman@corigine.com>
-Subject: Re: [PATCH v8 vfio 5/7] vfio/pds: Add support for dirty page
- tracking
-Message-ID: <20230410161501.0a22bfa6.alex.williamson@redhat.com>
-In-Reply-To: <20230404190141.57762-6-brett.creeley@amd.com>
-References: <20230404190141.57762-1-brett.creeley@amd.com>
-        <20230404190141.57762-6-brett.creeley@amd.com>
-Organization: Red Hat
+        with ESMTP id S229591AbjDJWu1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 10 Apr 2023 18:50:27 -0400
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2040.outbound.protection.outlook.com [40.107.220.40])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDF751BF1;
+        Mon, 10 Apr 2023 15:50:26 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Ib9FxaDTFc/fWukhmfrJWOjy4oA5+39yhkyEHkQ5fZ+KsAEimIBVeT6+nldfhUz7r+wOQ4UiPurYY5Lv/w7bIuNgriAvJ6Fx2QzQg7Xgr1haDO0twAlqO6LeEAhvy7uneNZf4PSS3+8NwYExnPhGaNQrGsbKiSdA2u+iq6H0foLw6HW6bLcPThnNnRnIknNzf27kVbN6tD68GrAOH5kw0qjqmhe3kpCnIoDtxzUMu9O87qSpJuI0WLtd2hnBFUGGQtabrGjNGvETlTT+dV15/jxjKXHr7pLWdYWHlE7W/twVVKQI8vAj241g4iP5mq1T8Y3UiVwwgkbMIWprbqruog==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=3B4rjUf5998gTKbvClBzrvlQiVBsTqN5JAzGhGz0VeI=;
+ b=jTcrtcle+3jTizVO8BIo0nFkRxM5lIhHTuvO+AnU0BFOzUxmCRQBCAJW0f0jHUSLEVp/dxgqvJE0vLRu014XSVKz2zDs5sK9c0URHnOv9IBkz1Md2Jx/7QbsVGYFiOrtkZSJP38Z8Xf3zViVbKLyYGExtWWKsUrK7xAVM7Cpe4HEfdT0x6eDZnFtxMoEja7sLeF9/9Jk9ID4W9SQ+POxG7/zK7SKE9Q8qqZF8z1BExIcLl2+RtePO1v/9kWA//0GVbSyK0ALdx5fuiq/UKSDnCjOYIJjHfipl+BRU/NPBmU2Pomk4CNWaT89QuX/VlayI9bNKKuwQ7ONTTxycN0vcQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=intel.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=3B4rjUf5998gTKbvClBzrvlQiVBsTqN5JAzGhGz0VeI=;
+ b=hB7SXjwgBzY4nwzNbbr9WqmkKWLvxIPelb9NqO0xI575zE75P8wlciu8McsL8b2/K+LehJC5XPZRgMA/a5iF4kAyuJ7yRb+dKbQB+M7sMbIADqLxFvDAiBr4dsCcHJKLljsZWwaEwyeMJW1Fevjp6dwRa6QU6/mLfs+YmFcyL8l85vyndaY0/iEVyy1+KFqTqMjMhnr1T7VvkagomuSYRUKZ1N66nQzi9yNLRVo7WXPbNKikeqb9xiwtGohjx6GKmaUr21lUMkpZwMLZItbr9UdzD/h9WLD0+NAkl00x/ed11FU0jKEBr8mhJRDugYcaawoC4OUvk3Y4TalRZsk0Uw==
+Received: from MW4PR03CA0071.namprd03.prod.outlook.com (2603:10b6:303:b6::16)
+ by SN7PR12MB8059.namprd12.prod.outlook.com (2603:10b6:806:32b::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6277.38; Mon, 10 Apr
+ 2023 22:50:24 +0000
+Received: from CO1NAM11FT065.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:303:b6:cafe::b) by MW4PR03CA0071.outlook.office365.com
+ (2603:10b6:303:b6::16) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6277.39 via Frontend
+ Transport; Mon, 10 Apr 2023 22:50:24 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ CO1NAM11FT065.mail.protection.outlook.com (10.13.174.62) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6298.28 via Frontend Transport; Mon, 10 Apr 2023 22:50:23 +0000
+Received: from rnnvmail204.nvidia.com (10.129.68.6) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5; Mon, 10 Apr 2023
+ 15:50:13 -0700
+Received: from rnnvmail204.nvidia.com (10.129.68.6) by rnnvmail204.nvidia.com
+ (10.129.68.6) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.37; Mon, 10 Apr
+ 2023 15:50:13 -0700
+Received: from Asurada-Nvidia (10.127.8.11) by mail.nvidia.com (10.129.68.6)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.37 via Frontend
+ Transport; Mon, 10 Apr 2023 15:50:11 -0700
+Date:   Mon, 10 Apr 2023 15:50:10 -0700
+From:   Nicolin Chen <nicolinc@nvidia.com>
+To:     <jgg@nvidia.com>, <kevin.tian@intel.com>, <joro@8bytes.org>,
+        <will@kernel.org>, <robin.murphy@arm.com>,
+        <alex.williamson@redhat.com>, <shuah@kernel.org>
+CC:     <yi.l.liu@intel.com>, <linux-kernel@vger.kernel.org>,
+        <iommu@lists.linux.dev>, <kvm@vger.kernel.org>,
+        <linux-kselftest@vger.kernel.org>, <mjrosato@linux.ibm.com>,
+        <farman@linux.ibm.com>
+Subject: Re: [PATCH v6 2/4] iommufd: Add iommufd_access_replace() API
+Message-ID: <ZDSSoiMj4fFFmR0j@Asurada-Nvidia>
+References: <cover.1679939952.git.nicolinc@nvidia.com>
+ <955f7464fafc72984f3ec441671f37948f01d714.1679939952.git.nicolinc@nvidia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <955f7464fafc72984f3ec441671f37948f01d714.1679939952.git.nicolinc@nvidia.com>
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1NAM11FT065:EE_|SN7PR12MB8059:EE_
+X-MS-Office365-Filtering-Correlation-Id: 9d405f3e-1272-473d-5aab-08db3a15f862
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: V6A39LKTH0TdAH56DYLTjwkdK/blzO7T5eb9N6M8TGZvS0Btjw74JbQE6A2yTpsCRzemHnQa/45lnZYdIZLsqdTaA2zyo13+XDMN/VYtdMmfhVW88kRnpVyPy5A2IbLH4YtH7+RaxpbbAWmy7cmr1askWIFrIAXUq+y5M7MoqJt7kwZywg1WsTsN02wS75I4iYMHOq8It27OPu5m9e2AgwNA4BJIAUNYC0Sie+7rcVqXibFQidSfYqET3QSltpCdRy6mvx7hMeMD7eUc0oth/KJ48elr04pqLbG5nIogTjJ6pYbMWbi/NKFFHpEGxNCyxC/FIk7nrJwxHMIDwghEujTgDeipJEsVvH5uy4FoU2j7MroiD6jfmWpW40D8oaL49iuDVrz+N9c68Moe+A7bzSaTAU2rh1FiPpJlMqP5SexXgl+5+BZ2M8rheGB3wcRy63sQnBRtnEUHBRGIjU5/hxeOuqQsh9Q8nVwcd6E1chZwINexye8qsqWKFRVhfFQbohCu7s45nBiisIA/rZwW3rX4MGI37PFiQ5MgJE+zYgDcrrQ1ObbaywqO/Ke1Lf4ZwELQcu2eQvXtpolvbIiBqZ/6psFBKkV3EXWvNntdXV88ZCcUF5YqoA0VedmlhkbTaELvK5JvCWeImpsmJlJjl53d/rPCZOHqpxnGkytCtn9nfrs1BhfbpatbOov6I+a6hOg+jN4Evih9ZMtHqJNG+3jnXuD/ucoEwZnOti27swhDNrOOzeY+2pxGdy4zjJi2
+X-Forefront-Antispam-Report: CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230028)(4636009)(376002)(346002)(396003)(39860400002)(136003)(451199021)(40470700004)(36840700001)(46966006)(478600001)(316002)(110136005)(54906003)(9686003)(26005)(186003)(2906002)(4744005)(33716001)(4326008)(70206006)(70586007)(41300700001)(7416002)(5660300002)(8676002)(82310400005)(8936002)(7636003)(356005)(82740400003)(47076005)(40460700003)(55016003)(40480700001)(336012)(36860700001)(426003)(86362001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Apr 2023 22:50:23.8039
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9d405f3e-1272-473d-5aab-08db3a15f862
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT065.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB8059
+X-Spam-Status: No, score=0.8 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 4 Apr 2023 12:01:39 -0700
-Brett Creeley <brett.creeley@amd.com> wrote:
-> +static int
-> +pds_vfio_dirty_enable(struct pds_vfio_pci_device *pds_vfio,
-> +		      struct rb_root_cached *ranges, u32 nnodes,
-> +		      u64 *page_size)
-> +{
-> +	struct pds_vfio_dirty *dirty = &pds_vfio->dirty;
-> +	u64 region_start, region_size, region_page_size;
-> +	struct pds_lm_dirty_region_info *region_info;
-> +	struct interval_tree_node *node = NULL;
-> +	struct pci_dev *pdev = pds_vfio->pdev;
-> +	u8 max_regions = 0, num_regions;
-> +	dma_addr_t regions_dma = 0;
-> +	u32 num_ranges = nnodes;
-> +	u32 page_count;
-> +	u16 len;
-> +	int err;
-> +
-> +	dev_dbg(&pdev->dev, "vf%u: Start dirty page tracking\n", pds_vfio->vf_id);
-> +
-> +	if (pds_vfio_dirty_is_enabled(pds_vfio))
-> +		return -EINVAL;
-> +
-> +	pds_vfio_dirty_set_enabled(pds_vfio);
-> +
-> +	/* find if dirty tracking is disabled, i.e. num_regions == 0 */
-> +	err = pds_vfio_dirty_status_cmd(pds_vfio, 0, &max_regions, &num_regions);
-> +	if (num_regions) {
-> +		dev_err(&pdev->dev, "Dirty tracking already enabled for %d regions\n",
-> +			num_regions);
-> +		err = -EEXIST;
-> +		goto err_out;
-> +	} else if (!max_regions) {
-> +		dev_err(&pdev->dev, "Device doesn't support dirty tracking, max_regions %d\n",
-> +			max_regions);
-> +		err = -EOPNOTSUPP;
-> +		goto err_out;
-> +	} else if (err) {
-> +		dev_err(&pdev->dev, "Failed to get dirty status, err %pe\n",
-> +			ERR_PTR(err));
-> +		goto err_out;
-> +	}
-> +
-> +	/* Only support 1 region for now. If there are any large gaps in the
-> +	 * VM's address regions, then this would be a waste of memory as we are
-> +	 * generating 2 bitmaps (ack/seq) from the min address to the max
-> +	 * address of the VM's address regions. In the future, if we support
-> +	 * more than one region in the device/driver we can split the bitmaps
-> +	 * on the largest address region gaps. We can do this split up to the
-> +	 * max_regions times returned from the dirty_status command.
-> +	 */
+On Mon, Mar 27, 2023 at 11:05:03AM -0700, Nicolin Chen wrote:
 
-Large gaps in a VM are very possible, particularly after QEMU has
-relocated RAM above 4GB to above the reserved hypertransport range on
-AMD systems.  Thanks,
+>  tools/testing/selftests/iommu/iommfd*.c |  0
 
-Alex
+> diff --git a/tools/testing/selftests/iommu/iommfd*.c b/tools/testing/selftests/iommu/iommfd*.c
+> new file mode 100644
+> index 000000000000..e69de29bb2d1
 
-> +	max_regions = 1;
-> +	if (num_ranges > max_regions) {
-> +		vfio_combine_iova_ranges(ranges, nnodes, max_regions);
-> +		num_ranges = max_regions;
-> +	}
-> +
-> +	node = interval_tree_iter_first(ranges, 0, ULONG_MAX);
-> +	if (!node) {
-> +		err = -EINVAL;
-> +		goto err_out;
-> +	}
-> +
-> +	region_size = node->last - node->start + 1;
-> +	region_start = node->start;
-> +	region_page_size = *page_size;
-> +
-> +	len = sizeof(*region_info);
-> +	region_info = kzalloc(len, GFP_KERNEL);
-> +	if (!region_info) {
-> +		err = -ENOMEM;
-> +		goto err_out;
-> +	}
-> +
-> +	page_count = DIV_ROUND_UP(region_size, region_page_size);
-> +
-> +	region_info->dma_base = cpu_to_le64(region_start);
-> +	region_info->page_count = cpu_to_le32(page_count);
-> +	region_info->page_size_log2 = ilog2(region_page_size);
-> +
-> +	regions_dma = dma_map_single(pds_vfio->coredev, (void *)region_info, len,
-> +				     DMA_BIDIRECTIONAL);
-> +	if (dma_mapping_error(pds_vfio->coredev, regions_dma)) {
-> +		err = -ENOMEM;
-> +		kfree(region_info);
-> +		goto err_out;
-> +	}
-> +
-> +	err = pds_vfio_dirty_enable_cmd(pds_vfio, regions_dma, max_regions);
-> +	dma_unmap_single(pds_vfio->coredev, regions_dma, len, DMA_BIDIRECTIONAL);
-> +	/* page_count might be adjusted by the device,
-> +	 * update it before freeing region_info DMA
-> +	 */
-> +	page_count = le32_to_cpu(region_info->page_count);
-> +
-> +	dev_dbg(&pdev->dev, "region_info: regions_dma 0x%llx dma_base 0x%llx page_count %u page_size_log2 %u\n",
-> +		regions_dma, region_start, page_count, (u8)ilog2(region_page_size));
-> +
-> +	kfree(region_info);
-> +	if (err)
-> +		goto err_out;
-> +
-> +	err = pds_vfio_dirty_alloc_bitmaps(dirty, page_count);
-> +	if (err) {
-> +		dev_err(&pdev->dev, "Failed to alloc dirty bitmaps: %pe\n",
-> +			ERR_PTR(err));
-> +		goto err_out;
-> +	}
-> +
-> +	err = pds_vfio_dirty_alloc_sgl(pds_vfio, page_count);
-> +	if (err) {
-> +		dev_err(&pdev->dev, "Failed to alloc dirty sg lists: %pe\n",
-> +			ERR_PTR(err));
-> +		goto err_free_bitmaps;
-> +	}
-> +
-> +	dirty->region_start = region_start;
-> +	dirty->region_size = region_size;
-> +	dirty->region_page_size = region_page_size;
-> +
-> +	pds_vfio_print_guest_region_info(pds_vfio, max_regions);
-> +
-> +	return 0;
-> +
-> +err_free_bitmaps:
-> +	pds_vfio_dirty_free_bitmaps(dirty);
-> +err_out:
-> +	pds_vfio_dirty_set_disabled(pds_vfio);
-> +	return err;
-> +}
+Accidentally included a noise here...
 
+This series is on top of cdev, so I will send a v7 after the
+next version of cdev series (or next rc1), and drop this file.
+
+Thanks
+Nicolin
