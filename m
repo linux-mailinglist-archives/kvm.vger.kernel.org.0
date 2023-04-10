@@ -2,53 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9976F6DCAAE
-	for <lists+kvm@lfdr.de>; Mon, 10 Apr 2023 20:23:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 13B1B6DCABD
+	for <lists+kvm@lfdr.de>; Mon, 10 Apr 2023 20:26:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229721AbjDJSXB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 Apr 2023 14:23:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38060 "EHLO
+        id S229755AbjDJS0R (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 Apr 2023 14:26:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39576 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229700AbjDJSW7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 10 Apr 2023 14:22:59 -0400
-Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0DF61991
-        for <kvm@vger.kernel.org>; Mon, 10 Apr 2023 11:22:58 -0700 (PDT)
-Received: by mail-pl1-x62c.google.com with SMTP id d9443c01a7336-1a652700c36so13435ad.0
-        for <kvm@vger.kernel.org>; Mon, 10 Apr 2023 11:22:58 -0700 (PDT)
+        with ESMTP id S229748AbjDJS0Q (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 10 Apr 2023 14:26:16 -0400
+Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B47DF1FD3
+        for <kvm@vger.kernel.org>; Mon, 10 Apr 2023 11:26:15 -0700 (PDT)
+Received: by mail-pl1-x631.google.com with SMTP id d9443c01a7336-1a273b3b466so341565ad.1
+        for <kvm@vger.kernel.org>; Mon, 10 Apr 2023 11:26:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1681150978; x=1683742978;
+        d=google.com; s=20210112; t=1681151175; x=1683743175;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=eVM18TxEI3qmFS0lIFJvyIgGduj2m2mbGl7Gx7uGIpc=;
-        b=ZD+Xwl+epT0fVlytabKQ37TXfAq0mFRzxOndOEnT1EU0v1LH6cW6MWgZ8ZQRt3EBng
-         BI3QthRVFU9NX5VlT+Fl3PVGZ5z0s3EYs/h9kX0ZszEeaDaCpC4d1bb+bsbFAGeSG7EY
-         SB9jXeQxsg3D4AwN7OzRIdxCNMMif5g8eUXWyd6uUzBuXczYDuVFnqRrh5n8FTHvwBNe
-         M5SXab8R2Ajup6rtXA2QaK7dGfweG50PWnSD+FmD6W3d/xME5gWjizwLuhqSPrtCeU2R
-         jJcTYJCpkt6iPseT3sq5V23arEte5y1h9mqbwvTzUpaFUHi8xT+e/NOLAK/xhdVVOR9W
-         6bKQ==
+        bh=gegmea1yrJx+NuHvsp1BE4+R/pRBiovxk6jSZUU52wo=;
+        b=Fi03O5Y12ZKv3ORI8mzzQllH1PsEnuPu9BuSGZlFcK3tghBvHgkBnF1LtR8NG/BA6h
+         yFRui9LdClYMSMdb74JzNhM6H8ZARhVz/GEsAiYsVRrB1bl1Hsp8gorgSXZ/7M8VUVs4
+         mvFNHD5x2esh/25z/QkpC7faY7V2/XZRBRzL1HwaYADQk9nfywbtFPNj6N2SDp10OS5T
+         tAkz9GVw5pX/DIQL3QeffCycmZgFKScPI7pKZ7H0VDDEkE/AB6I9BYqE/oP+HVrXc2PV
+         /845qNJnz0HbEO9T+4LJkkrqZJ4AZLK4pLOS4jsvSZj0PWmsIZacS7Klse3IhdMnTjDF
+         VJQQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1681150978; x=1683742978;
+        d=1e100.net; s=20210112; t=1681151175; x=1683743175;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=eVM18TxEI3qmFS0lIFJvyIgGduj2m2mbGl7Gx7uGIpc=;
-        b=HeDIWwUBi28F8XUn1WE1p+0wXw/wHmXBohVea+qm++CyzjWVITMZiVESRt3wkBXynO
-         vV4WaHrAd3G7VQqTBdKYZkhiVnCMmI6x+7A2qBObNlVDFiOPcqff/E2GbpfL6Bpp9DcS
-         ahTi5HzGY3yTfb79MoLvUxG6wWKYLbrKBOvA6tazdRxAMSwMpZizfGN/LSmOesiOpBks
-         Oqb62Ks2WVunV/Z7xWkUepltUUuV91iw8qfI82LRDxiPolEGVN2PclomuMmj9PxHodJd
-         CvZ5c9eGby/2/9illKCgZ/8KeLmtGpmzSssDQX2+SxvDkasiIW2E5xM01unw0DCJlT6p
-         wBSA==
-X-Gm-Message-State: AAQBX9cMgblowUxDVlL8/vBuOY5aoiSi4GHx+9jqQbX75TfqGG9PXbd/
-        /TdB6hN0ghlb1EvQ8UQypziiLw==
-X-Google-Smtp-Source: AKy350b0R1/oKXYKBc1KSktZFe2bjEvW3LPVpRtJqCgm/kjwmuBME9tMz2jM1GpEWLtBZwaj+F117Q==
-X-Received: by 2002:a17:902:a515:b0:19f:3c83:e9fe with SMTP id s21-20020a170902a51500b0019f3c83e9femr29573plq.14.1681150978140;
-        Mon, 10 Apr 2023 11:22:58 -0700 (PDT)
+        bh=gegmea1yrJx+NuHvsp1BE4+R/pRBiovxk6jSZUU52wo=;
+        b=NoGDxZq1YZz7blhc8fgjxsPYy61OTduTZny+86s0AfUt5NFyG5OG8o0W0yDsPjnzYT
+         /xkHwYb/0OfMGDpu8xZt2dEdC7DytAAHrLRPv6MDRuLLDKl+QIdh3A/LzHXhh19S1Hm1
+         Rp+Afal604EWmKJdEGultsCZbq6xSSbG5rF2eNcdly0QHINmIpDnGEE+JFYsDaMmPZZd
+         2hdDqmlhZ2eJ0581+lTyaUK8pgsP7JSlnBFDGaWb0qHBwn9bCrGP0N9tPWLjqREUQs2v
+         tR0VNDQ0KCvr0x+Dd6P7Rm+UTymjUq22dYo0GNpXVsikBXMCiMy773EPJkA5UmKsRCyb
+         Yi3g==
+X-Gm-Message-State: AAQBX9e4OIgIPcWMDOwVYyzfkOvODoCCy2PK17akrB8YDGOtMJ3qFRYe
+        5F6j2x3UtuIi//baIbrkcQFDZw==
+X-Google-Smtp-Source: AKy350azQu4IRw/f3W906MZt4XqO9rUMLCEkks9KR0PfoYMuoGtpQC+aTPRRJ+FJdFhyjTKMJr8uHQ==
+X-Received: by 2002:a17:902:c1d3:b0:1a6:3785:dd6f with SMTP id c19-20020a170902c1d300b001a63785dd6fmr12344plc.13.1681151175111;
+        Mon, 10 Apr 2023 11:26:15 -0700 (PDT)
 Received: from google.com (220.181.82.34.bc.googleusercontent.com. [34.82.181.220])
-        by smtp.gmail.com with ESMTPSA id x27-20020a63171b000000b0050f74d435e6sm7091793pgl.18.2023.04.10.11.22.57
+        by smtp.gmail.com with ESMTPSA id e9-20020a62ee09000000b006259e883ee9sm8145849pfi.189.2023.04.10.11.26.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Apr 2023 11:22:57 -0700 (PDT)
-Date:   Mon, 10 Apr 2023 11:22:54 -0700
+        Mon, 10 Apr 2023 11:26:14 -0700 (PDT)
+Date:   Mon, 10 Apr 2023 11:26:11 -0700
 From:   Ricardo Koller <ricarkol@google.com>
 To:     Marc Zyngier <maz@kernel.org>
 Cc:     pbonzini@redhat.com, oupton@google.com, yuzenghui@huawei.com,
@@ -58,16 +58,16 @@ Cc:     pbonzini@redhat.com, oupton@google.com, yuzenghui@huawei.com,
         alexandru.elisei@arm.com, suzuki.poulose@arm.com,
         eric.auger@redhat.com, gshan@redhat.com, reijiw@google.com,
         rananta@google.com, bgardon@google.com, ricarkol@gmail.com
-Subject: Re: [PATCH v6 12/12] KVM: arm64: Use local TLBI on permission
- relaxation
-Message-ID: <ZDRT/qAnbf9Rp+1M@google.com>
+Subject: Re: [PATCH v6 11/12] KVM: arm64: Split huge pages during
+ KVM_CLEAR_DIRTY_LOG
+Message-ID: <ZDRUw+PF3CZ6hP2w@google.com>
 References: <20230307034555.39733-1-ricarkol@google.com>
- <20230307034555.39733-13-ricarkol@google.com>
- <87356a5ckf.wl-maz@kernel.org>
+ <20230307034555.39733-12-ricarkol@google.com>
+ <874jqq5djt.wl-maz@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <87356a5ckf.wl-maz@kernel.org>
+In-Reply-To: <874jqq5djt.wl-maz@kernel.org>
 X-Spam-Status: No, score=-15.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,ENV_AND_HDR_SPF_MATCH,
         RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL,
@@ -79,63 +79,87 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Mar 12, 2023 at 01:22:40PM +0000, Marc Zyngier wrote:
-> On Tue, 07 Mar 2023 03:45:55 +0000,
+On Sun, Mar 12, 2023 at 01:01:26PM +0000, Marc Zyngier wrote:
+> On Tue, 07 Mar 2023 03:45:54 +0000,
 > Ricardo Koller <ricarkol@google.com> wrote:
 > > 
-> > From: Marc Zyngier <maz@kernel.org>
-> 
-> Thanks for writing a commit message for my hacks!
-> 
+> > This is the arm64 counterpart of commit cb00a70bd4b7 ("KVM: x86/mmu:
+> > Split huge pages mapped by the TDP MMU during KVM_CLEAR_DIRTY_LOG"),
+> > which has the benefit of splitting the cost of splitting a memslot
+> > across multiple ioctls.
 > > 
-> > Broadcasted TLB invalidations (TLBI) are usually less performant than
-> 
-> More precisely, TLBIs targeting the Inner Shareable domain. Also,
-> 's/broadcasted/broadcast/', as this is an adjective and not a verb
-> indicative of the past tense..
-> 
-> > their local variant. In particular, we observed some implementations
-> 
-> non-shareable rather than local. 'Local' has all sort of odd
-> implementation specific meanings (local to *what* is the usual
-> question that follows...).
-> 
-> > that take millliseconds to complete parallel broadcasted TLBIs.
+> > Split huge pages on the range specified using KVM_CLEAR_DIRTY_LOG.
+> > And do not split when enabling dirty logging if
+> > KVM_DIRTY_LOG_INITIALLY_SET is set.
 > > 
-> > It's safe to use local, non-shareable, TLBIs when relaxing permissions
+> > Signed-off-by: Ricardo Koller <ricarkol@google.com>
+> > ---
+> >  arch/arm64/kvm/mmu.c | 15 ++++++++++++---
+> >  1 file changed, 12 insertions(+), 3 deletions(-)
+> > 
+> > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> > index 910aea6bbd1e..d54223b5db97 100644
+> > --- a/arch/arm64/kvm/mmu.c
+> > +++ b/arch/arm64/kvm/mmu.c
+> > @@ -1089,8 +1089,8 @@ static void kvm_mmu_split_memory_region(struct kvm *kvm, int slot)
+> >   * @mask:	The mask of pages at offset 'gfn_offset' in this memory
+> >   *		slot to enable dirty logging on
+> >   *
+> > - * Writes protect selected pages to enable dirty logging for them. Caller must
+> > - * acquire kvm->mmu_lock.
+> > + * Splits selected pages to PAGE_SIZE and then writes protect them to enable
+> > + * dirty logging for them. Caller must acquire kvm->mmu_lock.
 > 
-> s/local//
+> The code does things in the opposite order...
+
+Fixed the comment.
+
 > 
-> > on a PTE in the KVM case for a couple of reasons. First, according to
-> > the ARM Arm (DDI 0487H.a D5-4913), permission relaxation does not need
-> > break-before-make.
+> >   */
+> >  void kvm_arch_mmu_enable_log_dirty_pt_masked(struct kvm *kvm,
+> >  		struct kvm_memory_slot *slot,
+> > @@ -1103,6 +1103,13 @@ void kvm_arch_mmu_enable_log_dirty_pt_masked(struct kvm *kvm,
+> >  	lockdep_assert_held_write(&kvm->mmu_lock);
+> >  
+> >  	stage2_wp_range(&kvm->arch.mmu, start, end);
+> > +
+> > +	/*
+> > +	 * If initially-all-set mode is not set, then huge-pages were already
+> > +	 * split when enabling dirty logging: no need to do it again.
+> > +	 */
+> > +	if (kvm_dirty_log_manual_protect_and_init_set(kvm))
 > 
-> This requires some more details, and references to the latest revision
-> of the ARM ARM (0487I.a). In that particular revision, the relevant
-> information is contained in D8.13.1 "Using break-before-make when
-> updating translation table entries", and more importantly in the rule
-> R_WHZWS, which states that only a change of output address or block
-> size require a BBM.
+> This contradicts the comment. Which one is correct?a
+
+Changed the comment.
+
 > 
-> > Second, the VTTBR_EL2.CnP==0 case, where each PE
-> > has its own TLB entry for the same page, is tolerated correctly by KVM
-> > when doing permission relaxation. Not having changes broadcasted to
-> > all PEs is correct for this case, as it's safe to have other PEs fault
-> > on permission on the same page.
+> > +		kvm_mmu_split_huge_pages(kvm, start, end);
+> >  }
+> >  
+> >  static void kvm_send_hwpoison_signal(unsigned long address, short lsb)
+> > @@ -1889,7 +1896,9 @@ void kvm_arch_commit_memory_region(struct kvm *kvm,
+> >  		 * this when deleting, moving, disabling dirty logging, or
+> >  		 * creating the memslot (a nop). Doing it for deletes makes
+> >  		 * sure we don't leak memory, and there's no need to keep the
+> > -		 * cache around for any of the other cases.
+> > +		 * cache around for any of the other cases. Keeping the cache
+> > +		 * is useful for successive KVM_CLEAR_DIRTY_LOG calls, which is
+> > +		 * not handled in this function.
 > 
-> I'm not sure mentioning CnP is relevant here. If CnP==1, the TLBI will
-> nuke the TLB visible by the sibling PE, but not any other. So this is
-> always a partial TLB invalidation, irrespective of CnP.
+> Where is it handled then?
+
+This last sentence doesn't make much sense, so I removed it. CLEAR calls
+don't even go through this function.
+
+> 
+> >  		 */
+> >  		kvm_mmu_free_memory_cache(&kvm->arch.mmu.split_page_cache);
+> >  	}
 > 
 > Thanks,
 > 
 > 	M.
 > 
-
-Thanks Marc. Sent a new version incorporating all the above.
-
-Thanks,
-Ricardo
-
 > -- 
 > Without deviation from the norm, progress is not possible.
