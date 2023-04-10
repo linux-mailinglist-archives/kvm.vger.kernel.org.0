@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E4DFB6DC459
-	for <lists+kvm@lfdr.de>; Mon, 10 Apr 2023 10:41:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4BC5F6DC45D
+	for <lists+kvm@lfdr.de>; Mon, 10 Apr 2023 10:41:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229724AbjDJIlI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 Apr 2023 04:41:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49320 "EHLO
+        id S229749AbjDJIlN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 Apr 2023 04:41:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49340 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229626AbjDJIlE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 10 Apr 2023 04:41:04 -0400
+        with ESMTP id S229695AbjDJIlF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 10 Apr 2023 04:41:05 -0400
 Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D86B40D9;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1F3640EA;
         Mon, 10 Apr 2023 01:41:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
   t=1681116063; x=1712652063;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=Nl6wMwkpqmIYYyq7+MpcXBB5xF17anU3m57tPiay76c=;
-  b=lTIqv9Uq9rS5cOrLsD8ryaVKRwpxNGI27Jah/m8tlOFIW0l4tDhfNmJg
-   tVRGIRgftIhO4ZQAziIvvdiMfDH7llEAguwdue8AkgHO1o4+nvgd6QKgW
-   8Ykxe8S7FUfPqZjqypQL4KL2vT3jlNBQsQXbFWy1Oi9u/YUn60H0X3Tlx
-   jQTehOqVdNwFuEHLU0lJPDQNyJwGo4AXIrxZqd5kgeagWWK7D4B0h2O7h
-   H5btdyCOYxe/HF9CmyNQZ5SfjGGMXQSQoPe8TulYgf0YNKfifMdt/gjpj
-   kUF9SiPFqhm2kX7YBfjuAzifSajY+fLoYM3L9qPj0rBim8ZpYJKxMeQzn
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10675"; a="342077881"
+  bh=z5qENiAMJjZqe4SfagAzXU8H0qxh2oDTfz+gWyWVxMM=;
+  b=asVGckWG/kA3eeV6tXqTL26Jysx22NRo7aft1XsUGsHd2o7OBdtd6tuq
+   iWanjN5oOsRSmXLaPWB4ZXjyh1ANfxCI8ypcH49DP0Bj7m7jWvFH+ux81
+   IgnpL57FouB9HcSpi5ThPEoq/mBZdHovaSo3L3cGo84blKRYmUcKIfOlC
+   6fRL/0NEZ8kJi+V+bf8EOXKVvyDcU5QZsPKHASR+XblSWw5HKTEPP1YyM
+   AJm8A5qkHBPDOCmWE6XBGkYxc/9uCoy41Qt1VSC1OKpaYZTBvgL35XHnM
+   zdnn3SrzNtHSqXjPciO/o5iM4TgVhtc+Pc5oTJKS0PNymsc3OjSA7NQMg
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10675"; a="342077892"
 X-IronPort-AV: E=Sophos;i="5.98,333,1673942400"; 
-   d="scan'208";a="342077881"
+   d="scan'208";a="342077892"
 Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Apr 2023 01:41:01 -0700
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Apr 2023 01:41:02 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10675"; a="799436241"
+X-IronPort-AV: E=McAfee;i="6600,9927,10675"; a="799436246"
 X-IronPort-AV: E=Sophos;i="5.98,333,1673942400"; 
-   d="scan'208";a="799436241"
+   d="scan'208";a="799436246"
 Received: from unknown (HELO fred..) ([172.25.112.68])
   by fmsmga002.fm.intel.com with ESMTP; 10 Apr 2023 01:41:01 -0700
 From:   Xin Li <xin3.li@intel.com>
@@ -45,9 +45,9 @@ Cc:     tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
         andrew.cooper3@citrix.com, seanjc@google.com, pbonzini@redhat.com,
         ravi.v.shankar@intel.com, jiangshanlai@gmail.com,
         shan.kang@intel.com
-Subject: [PATCH v8 02/33] x86/fred: make unions for the cs and ss fields in struct pt_regs
-Date:   Mon, 10 Apr 2023 01:14:07 -0700
-Message-Id: <20230410081438.1750-3-xin3.li@intel.com>
+Subject: [PATCH v8 03/33] x86/traps: add a system interrupt table for system interrupt dispatch
+Date:   Mon, 10 Apr 2023 01:14:08 -0700
+Message-Id: <20230410081438.1750-4-xin3.li@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230410081438.1750-1-xin3.li@intel.com>
 References: <20230410081438.1750-1-xin3.li@intel.com>
@@ -64,101 +64,284 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: "H. Peter Anvin (Intel)" <hpa@zytor.com>
 
-Make the cs and ss fields in struct pt_regs unions between the actual
-selector and the unsigned long stack slot. FRED uses this space to
-store additional flags.
+On x86, external interrupts are divided into the following two groups
+  1) system interrupts
+  2) external device interrupts
 
-The printk changes are simply due to the cs and ss fields changed to
-unsigned short from unsigned long.
+External device interrupts are all routed to common_interrupt(), which
+dispatches external device interrupts through a per-CPU external interrupt
+dispatch table vector_irq.
+
+For system interrupts, add a system interrupt handler table for dispatching
+a system interrupt to its corresponding handler directly. Thus a software
+based dispatch function will be:
+
+  void external_interrupt(struct pt_regs *regs)
+  {
+    u8 vector = regs->vector;
+    if (is_system_interrupt(vector))
+      system_interrupt_handlers[vector_to_sysvec(vector)](regs);
+    else /* external device interrupt */
+      common_interrupt(regs);
+  }
 
 Signed-off-by: H. Peter Anvin (Intel) <hpa@zytor.com>
+Co-developed-by: Xin Li <xin3.li@intel.com>
 Tested-by: Shan Kang <shan.kang@intel.com>
 Signed-off-by: Xin Li <xin3.li@intel.com>
 ---
+ arch/x86/include/asm/idtentry.h | 64 +++++++++++++++++++++++++++------
+ arch/x86/include/asm/traps.h    |  7 ++++
+ arch/x86/kernel/traps.c         | 62 ++++++++++++++++++++++++++++++++
+ 3 files changed, 122 insertions(+), 11 deletions(-)
 
-Changes since v3:
-* Rename csl/ssl of the pt_regs structure to csx/ssx (x for extended)
-  (Andrew Cooper).
----
- arch/x86/entry/vsyscall/vsyscall_64.c |  2 +-
- arch/x86/include/asm/ptrace.h         | 34 ++++++++++++++++++++++++---
- arch/x86/kernel/process_64.c          |  2 +-
- 3 files changed, 33 insertions(+), 5 deletions(-)
-
-diff --git a/arch/x86/entry/vsyscall/vsyscall_64.c b/arch/x86/entry/vsyscall/vsyscall_64.c
-index d234ca797e4a..2429ad0df068 100644
---- a/arch/x86/entry/vsyscall/vsyscall_64.c
-+++ b/arch/x86/entry/vsyscall/vsyscall_64.c
-@@ -76,7 +76,7 @@ static void warn_bad_vsyscall(const char *level, struct pt_regs *regs,
- 	if (!show_unhandled_signals)
- 		return;
+diff --git a/arch/x86/include/asm/idtentry.h b/arch/x86/include/asm/idtentry.h
+index b241af4ce9b4..2876ddae02bc 100644
+--- a/arch/x86/include/asm/idtentry.h
++++ b/arch/x86/include/asm/idtentry.h
+@@ -167,17 +167,22 @@ __visible noinstr void func(struct pt_regs *regs, unsigned long error_code)
  
--	printk_ratelimited("%s%s[%d] %s ip:%lx cs:%lx sp:%lx ax:%lx si:%lx di:%lx\n",
-+	printk_ratelimited("%s%s[%d] %s ip:%lx cs:%x sp:%lx ax:%lx si:%lx di:%lx\n",
- 			   level, current->comm, task_pid_nr(current),
- 			   message, regs->ip, regs->cs,
- 			   regs->sp, regs->ax, regs->si, regs->di);
-diff --git a/arch/x86/include/asm/ptrace.h b/arch/x86/include/asm/ptrace.h
-index f4db78b09c8f..2abb23e6c1e2 100644
---- a/arch/x86/include/asm/ptrace.h
-+++ b/arch/x86/include/asm/ptrace.h
-@@ -82,12 +82,40 @@ struct pt_regs {
-  * On hw interrupt, it's IRQ number:
+ /**
+  * DECLARE_IDTENTRY_IRQ - Declare functions for device interrupt IDT entry
+- *			  points (common/spurious)
++ *			  points (common/spurious) and their corresponding
++ *			  software based dispatch handlers in the non-noinstr
++ *			  text section
+  * @vector:	Vector number (ignored for C)
+  * @func:	Function name of the entry point
+  *
+- * Maps to DECLARE_IDTENTRY_ERRORCODE()
++ * Maps to DECLARE_IDTENTRY_ERRORCODE(), plus a dispatch function prototype
   */
- 	unsigned long orig_ax;
--/* Return frame for iretq */
-+/* Return frame for iretq/eretu/erets */
- 	unsigned long ip;
--	unsigned long cs;
-+	union {
-+		unsigned long  csx;	/* cs extended: CS + any fields above it */
-+		struct __attribute__((__packed__)) {
-+			unsigned short cs;	/* CS selector proper */
-+			unsigned int current_stack_level: 2;
-+			unsigned int __csx_resv1	: 6;
-+			unsigned int interrupt_shadowed	: 1;
-+			unsigned int software_initiated	: 1;
-+			unsigned int __csx_resv2	: 2;
-+			unsigned int nmi		: 1;
-+			unsigned int __csx_resv3	: 3;
-+			unsigned int __csx_resv4	: 32;
-+		};
-+	};
- 	unsigned long flags;
- 	unsigned long sp;
--	unsigned long ss;
-+	union {
-+		unsigned long  ssx;	/* ss extended: SS + any fields above it */
-+		struct __attribute__((__packed__)) {
-+			unsigned short ss;	/* SS selector proper */
-+			unsigned int __ssx_resv1	: 16;
-+			unsigned int vector		: 8;
-+			unsigned int __ssx_resv2	: 8;
-+			unsigned int type		: 4;
-+			unsigned int __ssx_resv3	: 4;
-+			unsigned int enclv		: 1;
-+			unsigned int long_mode		: 1;
-+			unsigned int nested		: 1;
-+			unsigned int __ssx_resv4	: 1;
-+			unsigned int instr_len		: 4;
-+		};
-+	};
- /* top of stack page */
- };
+ #define DECLARE_IDTENTRY_IRQ(vector, func)				\
+-	DECLARE_IDTENTRY_ERRORCODE(vector, func)
++	DECLARE_IDTENTRY_ERRORCODE(vector, func);			\
++	void dispatch_##func(struct pt_regs *regs, unsigned long error_code)
  
-diff --git a/arch/x86/kernel/process_64.c b/arch/x86/kernel/process_64.c
-index bb65a68b4b49..a1aa74864c8b 100644
---- a/arch/x86/kernel/process_64.c
-+++ b/arch/x86/kernel/process_64.c
-@@ -116,7 +116,7 @@ void __show_regs(struct pt_regs *regs, enum show_regs_mode mode,
+ /**
+  * DEFINE_IDTENTRY_IRQ - Emit code for device interrupt IDT entry points
++ *			 and their corresponding software based dispatch
++ *			 handlers in the non-noinstr text section
+  * @func:	Function name of the entry point
+  *
+  * The vector number is pushed by the low level entry stub and handed
+@@ -187,6 +192,9 @@ __visible noinstr void func(struct pt_regs *regs, unsigned long error_code)
+  * irq_enter/exit_rcu() are invoked before the function body and the
+  * KVM L1D flush request is set. Stack switching to the interrupt stack
+  * has to be done in the function body if necessary.
++ *
++ * dispatch_func() is a software based dispatch handler in the non-noinstr
++ * text section.
+  */
+ #define DEFINE_IDTENTRY_IRQ(func)					\
+ static void __##func(struct pt_regs *regs, u32 vector);			\
+@@ -204,31 +212,48 @@ __visible noinstr void func(struct pt_regs *regs,			\
+ 	irqentry_exit(regs, state);					\
+ }									\
+ 									\
++void dispatch_##func(struct pt_regs *regs, unsigned long error_code)	\
++{									\
++	u32 vector = (u32)(u8)error_code;				\
++									\
++	kvm_set_cpu_l1tf_flush_l1d();					\
++	run_irq_on_irqstack_cond(__##func, regs, vector);		\
++}									\
++									\
+ static noinline void __##func(struct pt_regs *regs, u32 vector)
  
- 	printk("%sFS:  %016lx(%04x) GS:%016lx(%04x) knlGS:%016lx\n",
- 	       log_lvl, fs, fsindex, gs, gsindex, shadowgs);
--	printk("%sCS:  %04lx DS: %04x ES: %04x CR0: %016lx\n",
-+	printk("%sCS:  %04x DS: %04x ES: %04x CR0: %016lx\n",
- 		log_lvl, regs->cs, ds, es, cr0);
- 	printk("%sCR2: %016lx CR3: %016lx CR4: %016lx\n",
- 		log_lvl, cr2, cr3, cr4);
+ /**
+  * DECLARE_IDTENTRY_SYSVEC - Declare functions for system vector entry points
++ *			     and their corresponding software based dispatch
++ *			     handlers in the non-noinstr text section
+  * @vector:	Vector number (ignored for C)
+  * @func:	Function name of the entry point
+  *
+- * Declares three functions:
++ * Declares four functions:
+  * - The ASM entry point: asm_##func
+  * - The XEN PV trap entry point: xen_##func (maybe unused)
+  * - The C handler called from the ASM entry point
++ * - The C handler used in the system interrupt handler table
+  *
+- * Maps to DECLARE_IDTENTRY().
++ * Maps to DECLARE_IDTENTRY(), plus a dispatch table function prototype
+  */
+ #define DECLARE_IDTENTRY_SYSVEC(vector, func)				\
+-	DECLARE_IDTENTRY(vector, func)
++	DECLARE_IDTENTRY(vector, func);					\
++	void dispatch_table_##func(struct pt_regs *regs)
+ 
+ /**
+  * DEFINE_IDTENTRY_SYSVEC - Emit code for system vector IDT entry points
++ *			    and their corresponding software based dispatch
++ *			    handlers in the non-noinstr text section
+  * @func:	Function name of the entry point
+  *
+  * irqentry_enter/exit() and irq_enter/exit_rcu() are invoked before the
+  * function body. KVM L1D flush request is set.
+  *
+- * Runs the function on the interrupt stack if the entry hit kernel mode
++ * Runs the function on the interrupt stack if the entry hit kernel mode.
++ *
++ * dispatch_table_func() is used in the system interrupt handler table for
++ * system interrupts dispatching.
+  */
+ #define DEFINE_IDTENTRY_SYSVEC(func)					\
+ static void __##func(struct pt_regs *regs);				\
+@@ -244,11 +269,19 @@ __visible noinstr void func(struct pt_regs *regs)			\
+ 	irqentry_exit(regs, state);					\
+ }									\
+ 									\
++void dispatch_table_##func(struct pt_regs *regs)			\
++{									\
++	kvm_set_cpu_l1tf_flush_l1d();					\
++	run_sysvec_on_irqstack_cond(__##func, regs);			\
++}									\
++									\
+ static noinline void __##func(struct pt_regs *regs)
+ 
+ /**
+  * DEFINE_IDTENTRY_SYSVEC_SIMPLE - Emit code for simple system vector IDT
+- *				   entry points
++ *				   entry points and their corresponding
++ *				   software based dispatch handlers in
++ *				   the non-noinstr text section
+  * @func:	Function name of the entry point
+  *
+  * Runs the function on the interrupted stack. No switch to IRQ stack and
+@@ -256,6 +289,9 @@ static noinline void __##func(struct pt_regs *regs)
+  *
+  * Only use for 'empty' vectors like reschedule IPI and KVM posted
+  * interrupt vectors.
++ *
++ * dispatch_table_func() is used in the system interrupt handler table for
++ * system interrupts dispatching.
+  */
+ #define DEFINE_IDTENTRY_SYSVEC_SIMPLE(func)				\
+ static __always_inline void __##func(struct pt_regs *regs);		\
+@@ -273,6 +309,14 @@ __visible noinstr void func(struct pt_regs *regs)			\
+ 	irqentry_exit(regs, state);					\
+ }									\
+ 									\
++void dispatch_table_##func(struct pt_regs *regs)			\
++{									\
++	__irq_enter_raw();						\
++	kvm_set_cpu_l1tf_flush_l1d();					\
++	__##func (regs);						\
++	__irq_exit_raw();						\
++}									\
++									\
+ static __always_inline void __##func(struct pt_regs *regs)
+ 
+ /**
+@@ -634,9 +678,7 @@ DECLARE_IDTENTRY(X86_TRAP_VE,		exc_virtualization_exception);
+ 
+ /* Device interrupts common/spurious */
+ DECLARE_IDTENTRY_IRQ(X86_TRAP_OTHER,	common_interrupt);
+-#ifdef CONFIG_X86_LOCAL_APIC
+ DECLARE_IDTENTRY_IRQ(X86_TRAP_OTHER,	spurious_interrupt);
+-#endif
+ 
+ /* System vector entry points */
+ #ifdef CONFIG_X86_LOCAL_APIC
+@@ -647,7 +689,7 @@ DECLARE_IDTENTRY_SYSVEC(X86_PLATFORM_IPI_VECTOR,	sysvec_x86_platform_ipi);
+ #endif
+ 
+ #ifdef CONFIG_SMP
+-DECLARE_IDTENTRY(RESCHEDULE_VECTOR,			sysvec_reschedule_ipi);
++DECLARE_IDTENTRY_SYSVEC(RESCHEDULE_VECTOR,		sysvec_reschedule_ipi);
+ DECLARE_IDTENTRY_SYSVEC(IRQ_MOVE_CLEANUP_VECTOR,	sysvec_irq_move_cleanup);
+ DECLARE_IDTENTRY_SYSVEC(REBOOT_VECTOR,			sysvec_reboot);
+ DECLARE_IDTENTRY_SYSVEC(CALL_FUNCTION_SINGLE_VECTOR,	sysvec_call_function_single);
+diff --git a/arch/x86/include/asm/traps.h b/arch/x86/include/asm/traps.h
+index 47ecfff2c83d..28c8ba5fd81c 100644
+--- a/arch/x86/include/asm/traps.h
++++ b/arch/x86/include/asm/traps.h
+@@ -47,4 +47,11 @@ void __noreturn handle_stack_overflow(struct pt_regs *regs,
+ 				      struct stack_info *info);
+ #endif
+ 
++/*
++ * How system interrupt handlers are called.
++ */
++#define DECLARE_SYSTEM_INTERRUPT_HANDLER(f)	\
++	void f (struct pt_regs *regs)
++typedef DECLARE_SYSTEM_INTERRUPT_HANDLER((*system_interrupt_handler));
++
+ #endif /* _ASM_X86_TRAPS_H */
+diff --git a/arch/x86/kernel/traps.c b/arch/x86/kernel/traps.c
+index d317dc3d06a3..2cbe7e7e8b96 100644
+--- a/arch/x86/kernel/traps.c
++++ b/arch/x86/kernel/traps.c
+@@ -1451,6 +1451,68 @@ DEFINE_IDTENTRY_SW(iret_error)
+ }
+ #endif
+ 
++#ifdef CONFIG_X86_64
++
++#ifndef CONFIG_X86_LOCAL_APIC
++/*
++ * Used when local APIC is not configured to build into the kernel, but
++ * dispatch_table_spurious_interrupt() needs dispatch_spurious_interrupt().
++ */
++DEFINE_IDTENTRY_IRQ(spurious_interrupt)
++{
++	pr_info("Spurious interrupt (vector 0x%x) on CPU#%d, should never happen.\n",
++		vector, smp_processor_id());
++}
++#endif
++
++static void dispatch_table_spurious_interrupt(struct pt_regs *regs)
++{
++	dispatch_spurious_interrupt(regs, regs->vector);
++}
++
++#define SYSV(x,y) [(x) - FIRST_SYSTEM_VECTOR] = y
++
++static system_interrupt_handler system_interrupt_handlers[NR_SYSTEM_VECTORS] = {
++	[0 ... NR_SYSTEM_VECTORS-1]		= dispatch_table_spurious_interrupt,
++#ifdef CONFIG_SMP
++	SYSV(RESCHEDULE_VECTOR,			dispatch_table_sysvec_reschedule_ipi),
++	SYSV(CALL_FUNCTION_VECTOR,		dispatch_table_sysvec_call_function),
++	SYSV(CALL_FUNCTION_SINGLE_VECTOR,	dispatch_table_sysvec_call_function_single),
++	SYSV(REBOOT_VECTOR,			dispatch_table_sysvec_reboot),
++#endif
++
++#ifdef CONFIG_X86_THERMAL_VECTOR
++	SYSV(THERMAL_APIC_VECTOR,		dispatch_table_sysvec_thermal),
++#endif
++
++#ifdef CONFIG_X86_MCE_THRESHOLD
++	SYSV(THRESHOLD_APIC_VECTOR,		dispatch_table_sysvec_threshold),
++#endif
++
++#ifdef CONFIG_X86_MCE_AMD
++	SYSV(DEFERRED_ERROR_VECTOR,		dispatch_table_sysvec_deferred_error),
++#endif
++
++#ifdef CONFIG_X86_LOCAL_APIC
++	SYSV(LOCAL_TIMER_VECTOR,		dispatch_table_sysvec_apic_timer_interrupt),
++	SYSV(X86_PLATFORM_IPI_VECTOR,		dispatch_table_sysvec_x86_platform_ipi),
++# ifdef CONFIG_HAVE_KVM
++	SYSV(POSTED_INTR_VECTOR,		dispatch_table_sysvec_kvm_posted_intr_ipi),
++	SYSV(POSTED_INTR_WAKEUP_VECTOR,		dispatch_table_sysvec_kvm_posted_intr_wakeup_ipi),
++	SYSV(POSTED_INTR_NESTED_VECTOR,		dispatch_table_sysvec_kvm_posted_intr_nested_ipi),
++# endif
++# ifdef CONFIG_IRQ_WORK
++	SYSV(IRQ_WORK_VECTOR,			dispatch_table_sysvec_irq_work),
++# endif
++	SYSV(SPURIOUS_APIC_VECTOR,		dispatch_table_sysvec_spurious_apic_interrupt),
++	SYSV(ERROR_APIC_VECTOR,			dispatch_table_sysvec_error_interrupt),
++#endif
++};
++
++#undef SYSV
++
++#endif /* CONFIG_X86_64 */
++
+ void __init trap_init(void)
+ {
+ 	/* Init cpu_entry_area before IST entries are set up */
 -- 
 2.34.1
 
