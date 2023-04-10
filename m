@@ -2,138 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A50586DC25B
-	for <lists+kvm@lfdr.de>; Mon, 10 Apr 2023 03:37:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 60ADF6DC2D9
+	for <lists+kvm@lfdr.de>; Mon, 10 Apr 2023 05:11:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229704AbjDJBhI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 9 Apr 2023 21:37:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47108 "EHLO
+        id S229602AbjDJDLd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 9 Apr 2023 23:11:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56580 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229575AbjDJBhH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 9 Apr 2023 21:37:07 -0400
-Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B727535A7;
-        Sun,  9 Apr 2023 18:37:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1681090626; x=1712626626;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=kM3MVlxT3U4OwC09SKYW+x+Zuer/Bey+4Mm+quIUoZI=;
-  b=kqWDNU8/DuEvhb70D8DI1h+ky1kKev5x6UrAM3bu5y52/W3SaPewZO3P
-   RXsbR1UvJ4khoIy5a7XmvaTPOwTJcHmF7WqLk2QihmIpLdIqJMnP4unKs
-   tlLKhuAalWO+RpC/6aoW/Ss77JvzGkh2f2xRsIE4CYk/ScVcPFY/Danyd
-   Mrmtrt0NYZbIYgV5tyr9D6u9BexKu4+dUw2uC16cifamjkJvzPw3UozsJ
-   WgNfDvzdV1Q6BMKsLY1i9P9EnjFTrN3Tpko26z7mR1UAaSrlen0T5O0cr
-   8bO0+5O2CasVXx32z3GrKeyt6Z93uvTPyQsyBAPgY1MGR4Eypl6xY+yER
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10675"; a="429551537"
-X-IronPort-AV: E=Sophos;i="5.98,332,1673942400"; 
-   d="scan'208";a="429551537"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Apr 2023 18:37:06 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10675"; a="688106998"
-X-IronPort-AV: E=Sophos;i="5.98,332,1673942400"; 
-   d="scan'208";a="688106998"
-Received: from lkp-server01.sh.intel.com (HELO b613635ddfff) ([10.239.97.150])
-  by orsmga002.jf.intel.com with ESMTP; 09 Apr 2023 18:37:02 -0700
-Received: from kbuild by b613635ddfff with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1plgSr-000UuD-17;
-        Mon, 10 Apr 2023 01:37:01 +0000
-Date:   Mon, 10 Apr 2023 09:36:26 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Tianrui Zhao <zhaotianrui@loongson.cn>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     oe-kbuild-all@lists.linux.dev, Huacai Chen <chenhuacai@kernel.org>,
-        WANG Xuerui <kernel@xen0n.name>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        loongarch@lists.linux.dev, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Mark Brown <broonie@kernel.org>,
-        Alex Deucher <alexander.deucher@amd.com>,
-        Oliver Upton <oliver.upton@linux.dev>, maobibo@loongson.cn,
-        Xi Ruoyao <xry111@xry111.site>, zhaotianrui@loongson.cn
-Subject: Re: [PATCH v5 30/30] LoongArch: KVM: Supplement kvm document about
- loongarch-specific part
-Message-ID: <202304100944.xF4XkTAE-lkp@intel.com>
-References: <20230407020003.3651096-31-zhaotianrui@loongson.cn>
+        with ESMTP id S229504AbjDJDLb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 9 Apr 2023 23:11:31 -0400
+Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8FDB63AA4;
+        Sun,  9 Apr 2023 20:11:30 -0700 (PDT)
+Received: by mail-pj1-x1033.google.com with SMTP id d22-20020a17090a111600b0023d1b009f52so6133755pja.2;
+        Sun, 09 Apr 2023 20:11:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112; t=1681096290; x=1683688290;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=MrXPpTAZ2U7Dtc3azP6UwLsgOdV2TDhnTZz7lNXk02k=;
+        b=Rj7AHNk2iaIdfRQnuT282gM5WtMSlcoqxAfJoQ+Gl+mDdisfztkwfFFU4bvqo5rqKB
+         lU8aeNriLUQAr7UzGzd0pbA5SkyKisdVtIe8PUyeAGP/Q3QoK76uaaJUsVvaER3TK7Zh
+         kiruktb/hdQ60x2yheLWan9ofUA7/WAdMsE089nkVhGA+VWvBhqudAEAvYhpizXM+Cns
+         5EiX24NH4jbjbjGPFn8ChVWxcGsUPHBiANPT7ku68+WD1QHWsu4yT1/3/CPJk5jtOSFu
+         8jpBl+HUQsTZ6TD2epHqnnl+owcOWC61KMt0SJ0LFZecpj3Fo3IgmLIQ15/rW8PnESnZ
+         FU6Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1681096290; x=1683688290;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=MrXPpTAZ2U7Dtc3azP6UwLsgOdV2TDhnTZz7lNXk02k=;
+        b=kl21+T21rO5yuqa+cgGX36Arm+VLPEn9+w9LugTTAgVRv1m3SImKfypvHSo0cR4+yb
+         M/+YCyDl6i6nqSG9Q/hhn7cduXxGxGHOT/swQ5IFmknEwJt/qO3P6/YiAG7poBLd6dTp
+         Yjk9SfeGyKOCRKQ08o28SToKxnz7EHP+khEU4Al13uHPiYaSH73j8KRn92pEXSLOP/i8
+         kIpDRK2hmlfPkJOavW4g8vouAwxF+VoWU8o/BkXv1tEoWPyFK/Bliwa5wbYRUZmKvb+K
+         kJvfqLgg+ftDOTsSdzrlg/thMTafbkPgq6l6c3Xid0Z4DNv4kV+mhAfa7EbE0t0TYneN
+         72QQ==
+X-Gm-Message-State: AAQBX9cDjWZiustBcBYBSS2VI4HnEHG1kSdTd3jls+mlkKaYrkSdVVl5
+        X6NplERNcLAtk5SSC9D/n1A=
+X-Google-Smtp-Source: AKy350Y+WyV1d9YDDN90ETzUW12wP78TIrX5MPhkvKub2o8Ub+mT9WnOguUFOs6D9+o/5QImEuukng==
+X-Received: by 2002:a17:902:c9d2:b0:19f:2ae8:54b9 with SMTP id q18-20020a170902c9d200b0019f2ae854b9mr6718254pld.32.1681096290111;
+        Sun, 09 Apr 2023 20:11:30 -0700 (PDT)
+Received: from localhost.localdomain ([43.132.141.3])
+        by smtp.gmail.com with ESMTPSA id d11-20020a170902654b00b001a19f3a661esm6509595pln.138.2023.04.09.20.11.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 09 Apr 2023 20:11:29 -0700 (PDT)
+From:   alexjlzheng@gmail.com
+X-Google-Original-From: alexjlzheng@tencent.com
+To:     seanjc@google.com, pbonzini@redhat.com, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
+        x86@kernel.org, hpa@zytor.com
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Jinliang Zheng <alexjlzheng@tencent.com>
+Subject: [PATCH kvm RESEND] KVM: i8259: Fix poll command
+Date:   Mon, 10 Apr 2023 11:10:22 +0800
+Message-Id: <20230410031021.4145297-1-alexjlzheng@tencent.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230407020003.3651096-31-zhaotianrui@loongson.cn>
-X-Spam-Status: No, score=-2.5 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
+        DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Tianrui,
+From: Jinliang Zheng <alexjlzheng@tencent.com>
 
-kernel test robot noticed the following build warnings:
+According to the hardware manual, when the Poll command is issued, the
+byte returned by the I/O read is 1 in Bit 7 when there is an interrupt,
+and the highest priority binary code in Bits 2:0. The current pic
+simulation code is not implemented strictly according to the above
+expression.
 
-[auto build test WARNING on kvm/queue]
-[also build test WARNING on linus/master v6.3-rc6 next-20230406]
-[cannot apply to kvm/linux-next]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+Fix the implementation of poll mode in pic simulation by pic_intack,
+and remove redundant pic_poll_read code.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Tianrui-Zhao/LoongArch-KVM-Add-kvm-related-header-files/20230407-100816
-base:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git queue
-patch link:    https://lore.kernel.org/r/20230407020003.3651096-31-zhaotianrui%40loongson.cn
-patch subject: [PATCH v5 30/30] LoongArch: KVM: Supplement kvm document about loongarch-specific part
-reproduce:
-        # https://github.com/intel-lab-lkp/linux/commit/a4ea2786cae9b2350b1aed613edcc003ce93cfc2
-        git remote add linux-review https://github.com/intel-lab-lkp/linux
-        git fetch --no-tags linux-review Tianrui-Zhao/LoongArch-KVM-Add-kvm-related-header-files/20230407-100816
-        git checkout a4ea2786cae9b2350b1aed613edcc003ce93cfc2
-        make menuconfig
-        # enable CONFIG_COMPILE_TEST, CONFIG_WARN_MISSING_DOCUMENTS, CONFIG_WARN_ABI_ERRORS
-        make htmldocs
+Signed-off-by: Jinliang Zheng <alexjlzheng@tencent.com>
+---
+ arch/x86/kvm/i8259.c | 29 ++++++-----------------------
+ 1 file changed, 6 insertions(+), 23 deletions(-)
 
-If you fix the issue, kindly add following tag where applicable
-| Reported-by: kernel test robot <lkp@intel.com>
-| Link: https://lore.kernel.org/oe-kbuild-all/202304100944.xF4XkTAE-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
->> Documentation/virt/kvm/api.rst:423: WARNING: Literal block ends without a blank line; unexpected unindent.
-
-vim +423 Documentation/virt/kvm/api.rst
-
-   399	
-   400	  /* x86 */
-   401	  struct kvm_regs {
-   402		/* out (KVM_GET_REGS) / in (KVM_SET_REGS) */
-   403		__u64 rax, rbx, rcx, rdx;
-   404		__u64 rsi, rdi, rsp, rbp;
-   405		__u64 r8,  r9,  r10, r11;
-   406		__u64 r12, r13, r14, r15;
-   407		__u64 rip, rflags;
-   408	  };
-   409	
-   410	  /* mips */
-   411	  struct kvm_regs {
-   412		/* out (KVM_GET_REGS) / in (KVM_SET_REGS) */
-   413		__u64 gpr[32];
-   414		__u64 hi;
-   415		__u64 lo;
-   416		__u64 pc;
-   417	  };
-   418	
-   419	  /* loongarch */
-   420	  struct kvm_regs {
-   421	        unsigned long gpr[32];
-   422	        unsigned long pc;
- > 423	};
-   424	
-   425	
-
+diff --git a/arch/x86/kvm/i8259.c b/arch/x86/kvm/i8259.c
+index 4756bcb5724f..bc5b758e8f73 100644
+--- a/arch/x86/kvm/i8259.c
++++ b/arch/x86/kvm/i8259.c
+@@ -397,35 +397,18 @@ static void pic_ioport_write(void *opaque, u32 addr, u32 val)
+ 		}
+ }
+ 
+-static u32 pic_poll_read(struct kvm_kpic_state *s, u32 addr1)
+-{
+-	int ret;
+-
+-	ret = pic_get_irq(s);
+-	if (ret >= 0) {
+-		if (addr1 >> 7) {
+-			s->pics_state->pics[0].isr &= ~(1 << 2);
+-			s->pics_state->pics[0].irr &= ~(1 << 2);
+-		}
+-		s->irr &= ~(1 << ret);
+-		pic_clear_isr(s, ret);
+-		if (addr1 >> 7 || ret != 2)
+-			pic_update_irq(s->pics_state);
+-	} else {
+-		ret = 0x07;
+-		pic_update_irq(s->pics_state);
+-	}
+-
+-	return ret;
+-}
+-
+ static u32 pic_ioport_read(void *opaque, u32 addr)
+ {
+ 	struct kvm_kpic_state *s = opaque;
+ 	int ret;
+ 
+ 	if (s->poll) {
+-		ret = pic_poll_read(s, addr);
++		ret = pic_get_irq(s);
++		if (ret >= 0) {
++			pic_intack(s, ret);
++			ret |= 0x80;
++		} else
++			ret = 0;
+ 		s->poll = 0;
+ 	} else
+ 		if ((addr & 1) == 0)
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests
+2.37.3
+
