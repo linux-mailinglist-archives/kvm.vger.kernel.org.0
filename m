@@ -2,118 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 780056DD950
-	for <lists+kvm@lfdr.de>; Tue, 11 Apr 2023 13:25:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 69CFC6DDA6F
+	for <lists+kvm@lfdr.de>; Tue, 11 Apr 2023 14:10:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229710AbjDKLZJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Apr 2023 07:25:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35132 "EHLO
+        id S229548AbjDKMKW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Apr 2023 08:10:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58232 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229550AbjDKLZI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 Apr 2023 07:25:08 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68BE435A6
-        for <kvm@vger.kernel.org>; Tue, 11 Apr 2023 04:25:07 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        with ESMTP id S229451AbjDKMKV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 Apr 2023 08:10:21 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59F7D10B
+        for <kvm@vger.kernel.org>; Tue, 11 Apr 2023 05:09:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1681214975;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=5IVfwhrEHTxPIKyLpf6NqeW3t3CoaOLvsQwlw+bos94=;
+        b=fUZskO1WoskOFYDgKfIGCSJs6AqklzYFJSPp65AHbM+qgdCb1bAkkNGR1m+/Xht6U6IE4i
+        QB98SxvSlseRs7S5gY5zI6M5i8CNn33ADqDd3wT3H+/iTotApoqulE5bXxzx20sB+jFqhj
+        4yu0xLn8Td7+L+1cBpCgM24f1Wy8xaY=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-153-rCsjhhBWOhicwK3M74TQ6A-1; Tue, 11 Apr 2023 08:09:30 -0400
+X-MC-Unique: rCsjhhBWOhicwK3M74TQ6A-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 0648261FDA
-        for <kvm@vger.kernel.org>; Tue, 11 Apr 2023 11:25:07 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2CB2BC433EF;
-        Tue, 11 Apr 2023 11:25:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1681212306;
-        bh=B1ZaBaMT7tK1LgbIC9hi0qnUcpYo7fHssf6FQgCYUSc=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=b+6K2xiSZW9LeODlX6QGkuBhaatbr6qJ04rVPuUT9yhUF9ts+pT4CHfnTiJ3DfGFb
-         eTlekH9JjtnX8/ZH8bYitLFueHoRKQJomQHbalxo1LpxMQEZlR3DiBIoi4nVPLFnf9
-         hbwl+YJHksmSTQKbYBkWj7OY1g5marypXanq7RQe1t9PEjg43vhMNm8Xao9pq1ZVHw
-         qhq/oz5ckYg3iGq4p+W1mBvqy20+olh6dtQFvvMgrrVoTkAVpCgrTol0L2tqL3CQ0U
-         iLB8lYWxk9uWObv+f8uFxAL+ZXJyUklNvfpYKjxeBzvWmcfIkKyb2rfn3Dg6+V8OYo
-         1OMuU0QwnFKHA==
-Date:   Tue, 11 Apr 2023 12:24:59 +0100
-From:   Will Deacon <will@kernel.org>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     Reiji Watanabe <reijiw@google.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Raghavendra Rao Anata <rananta@google.com>,
-        Shaoqin Huang <shahuang@redhat.com>,
-        Rob Herring <robh@kernel.org>
-Subject: Re: [PATCH v2 0/2] KVM: arm64: PMU: Correct the handling of
- PMUSERENR_EL0
-Message-ID: <20230411112458.GA22090@willie-the-truck>
-References: <20230408034759.2369068-1-reijiw@google.com>
- <86r0subv8s.wl-maz@kernel.org>
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 08D3F101A54F;
+        Tue, 11 Apr 2023 12:09:30 +0000 (UTC)
+Received: from redhat.com (unknown [10.39.193.156])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 00925202701E;
+        Tue, 11 Apr 2023 12:09:26 +0000 (UTC)
+Date:   Tue, 11 Apr 2023 14:09:25 +0200
+From:   Kevin Wolf <kwolf@redhat.com>
+To:     Reinoud Zandijk <reinoud@netbsd.org>
+Cc:     Michael Tokarev <mjt@tls.msk.ru>,
+        Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
+        qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Ryo ONODERA <ryoon@netbsd.org>, qemu-block@nongnu.org,
+        Hanna Reitz <hreitz@redhat.com>, Warner Losh <imp@bsdimp.com>,
+        Beraldo Leal <bleal@redhat.com>,
+        Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>,
+        Kyle Evans <kevans@freebsd.org>, kvm@vger.kernel.org,
+        Wainer dos Santos Moschetta <wainersm@redhat.com>,
+        Cleber Rosa <crosa@redhat.com>, Thomas Huth <thuth@redhat.com>,
+        armbru@redhat.com
+Subject: Re: [PATCH v2 05/11] qemu-options: finesse the recommendations
+ around -blockdev
+Message-ID: <ZDVN9TlzrCOJHlDR@redhat.com>
+References: <20230403134920.2132362-1-alex.bennee@linaro.org>
+ <20230403134920.2132362-6-alex.bennee@linaro.org>
+ <ZCwsvaxRzx4bzbXo@redhat.com>
+ <cbb3df0a-7714-cbc0-efda-45f1d608e988@msgid.tls.msk.ru>
+ <ZCxNqb9tEO24KaxX@redhat.com>
+ <ZC8qXxB6X8t7RBa+@gorilla.13thmonkey.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <86r0subv8s.wl-maz@kernel.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Spam-Status: No, score=-2.5 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <ZC8qXxB6X8t7RBa+@gorilla.13thmonkey.org>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
+X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Apr 08, 2023 at 10:04:19AM +0100, Marc Zyngier wrote:
-> On Sat, 08 Apr 2023 04:47:57 +0100,
-> Reiji Watanabe <reijiw@google.com> wrote:
+Am 06.04.2023 um 22:23 hat Reinoud Zandijk geschrieben:
+> On Tue, Apr 04, 2023 at 06:17:45PM +0200, Kevin Wolf wrote:
+> > Am 04.04.2023 um 17:07 hat Michael Tokarev geschrieben:
+> > > 04.04.2023 16:57, Kevin Wolf пишет:
+> > Maybe -snapshot should error out if -blockdev is in use. You'd generally
+> > expect that either -blockdev is used primarily and snapshots are done
+> > externally (if the command line is generated by some management tool),
+> > or that -drive is used consistently (by a human who likes the
+> > convenience). In both cases, we wouldn't hit the error path.
 > > 
-> > This series will fix bugs in KVM's handling of PMUSERENR_EL0.
-> > 
-> > With PMU access support from EL0 [1], the perf subsystem would
-> > set CR and ER bits of PMUSERENR_EL0 as needed to allow EL0 to have
-> > a direct access to PMU counters.  However, KVM appears to assume
-> > that the register value is always zero for the host EL0, and has
-> > the following two problems in handling the register.
-> > 
-> > [A] The host EL0 might lose the direct access to PMU counters, as
-> >     KVM always clears PMUSERENR_EL0 before returning to userspace.
-> > 
-> > [B] With VHE, the guest EL0 access to PMU counters might be trapped
-> >     to EL1 instead of to EL2 (even when PMUSERENR_EL0 for the guest
-> >     indicates that the guest EL0 has an access to the counters).
-> >     This is because, with VHE, KVM sets ER, CR, SW and EN bits of
-> >     PMUSERENR_EL0 to 1 on vcpu_load() to ensure to trap PMU access
-> >     from the guset EL0 to EL2, but those bits might be cleared by
-> >     the perf subsystem after vcpu_load() (when PMU counters are
-> >     programmed for the vPMU emulation).
-> > 
-> > Patch-1 will fix [A], and Patch-2 will fix [B] respectively.
-> > The series is based on v6.3-rc5.
-> > 
-> > v2:
-> >  - Save the PMUSERENR_EL0 for the host in the sysreg array of
-> >    kvm_host_data. [Marc]
-> >  - Don't let armv8pmu_start() overwrite PMUSERENR if the vCPU
-> >    is loaded, instead have KVM update the saved shadow register
-> >    value for the host. [Marc, Mark]
+> > There may be some exceptional cases where you have both -drive and
+> > -blockdev (maybe because a human users needs more control for one
+> > specific disk). This is the case where you can get a nasty surprise and
+> > that would error out. If you legitimately want the -drive images
+> > snapshotted, but not the -blockdev ones, you can still use individual
+> > '-drive snapshot=on' options instead of the global '-snapshot' (and the
+> > error message should mention this).
 > 
-> This looks much better to me. If Mark is OK with it, I'm happy to take
-> it in 6.4.
-> 
-> Speaking of which, this will clash with the queued move of the PMUv3
-> code into drivers/perf, and probably break on 32bit. I can either take
-> a branch shared with arm64 (009d6dc87a56 ("ARM: perf: Allow the use of
-> the PMUv3 driver on 32bit ARM")), or wait until -rc1.
-> 
-> Will, what do you prefer?
+> I didn't know that! I normally use the -snapshot as global option. Is there a
+> reason why -blockdev isn't honouring -snapshot?
 
-I'd be inclined to wait until -rc1, but for-next/perf is stable if you
-decide to take it anyway.
+The philosophy behind -blockdev is that you're explicit about every
+image file (and other block node) you want to use and that QEMU doesn't
+magically insert or change things behind your back.
 
-Will
+For simple use cases that might not seem necessary, but many of the
+newer functions added to the block layer, like the block jobs, are
+operations that can work on any node in the block graph (i.e. any of the
+open images, including backing files etc.). If QEMU changed something
+behind your back, you can easily access the wrong image. Especially for
+management software like libvirt this kind of magic that -drive involves
+was really hard to work with because it always had to second guess what
+the world _really_ looked like on the QEMU side.
+
+For example, imagine you open foo.img with -snapshot. Now you want to
+create a backup of your current state, so tell QEMU to backup the block
+node for foo.img because that's what your VM is currently running on,
+right? Except that nobody told you that the active image is actually a
+temporary qcow2 image file that -snapshot created internally. You're
+backing up the wrong image without the changes of your running VM.
+
+So it's better to always be explicit, and then it's unambiguous which
+image file you really mean in operations.
+
+Kevin
+
