@@ -2,106 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5485F6DE3E1
-	for <lists+kvm@lfdr.de>; Tue, 11 Apr 2023 20:28:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 74DEA6DE3F7
+	for <lists+kvm@lfdr.de>; Tue, 11 Apr 2023 20:34:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230133AbjDKS2B (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Apr 2023 14:28:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48304 "EHLO
+        id S229815AbjDKSe2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Apr 2023 14:34:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55264 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230008AbjDKS1u (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 Apr 2023 14:27:50 -0400
-Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 053E065B3;
-        Tue, 11 Apr 2023 11:27:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1681237658; x=1712773658;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=1QioC9Kxlkpc1XJQphVkupGM3XmsH0QP9DjCNhRYggY=;
-  b=kXyZAYx2hDUxFwJIEqNx0HXArxzaQuv7xsnx9GzZJ/q4nmmj8/WaWFoF
-   GwST63x2yRU8eL/IoY85TcSnSmy9WYqa9Dp4077KxxLuAddWqGx09WUhz
-   C3JsGE2u3LzB5c6evwRyNv60huOoFRgaCr6JH5cYKsvx7zqW1TNForDC6
-   5YfgGusChybGCZ8nkFpGOtwzfSD/R5WOx0L+VRYz9fl1kiba3jl0+LMJz
-   1SIxZaj2J87jGSZumHfSV2PliIge0pzi9BQQ6j9dqECHZzm/4FVXVrwa7
-   ulgevw6jjq3ZZVjgwlNWyxFT/N0R/xAJ4/VS9+sBfd9scOdQ7FtJGcSWM
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10677"; a="343708303"
-X-IronPort-AV: E=Sophos;i="5.98,336,1673942400"; 
-   d="scan'208";a="343708303"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Apr 2023 11:27:38 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10677"; a="691265257"
-X-IronPort-AV: E=Sophos;i="5.98,336,1673942400"; 
-   d="scan'208";a="691265257"
-Received: from gtryonx-mobl.amr.corp.intel.com (HELO [10.209.72.81]) ([10.209.72.81])
-  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Apr 2023 11:27:36 -0700
-Message-ID: <7fe765e1-88b5-7bf1-133c-4587224f1e7a@intel.com>
-Date:   Tue, 11 Apr 2023 11:27:35 -0700
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.8.0
-Subject: Re: [PATCH RFC v8 17/56] x86/fault: Add support to handle the RMP
- fault for user address
-Content-Language: en-US
-To:     Michael Roth <michael.roth@amd.com>
-Cc:     kvm@vger.kernel.org, linux-coco@lists.linux.dev,
-        linux-mm@kvack.org, linux-crypto@vger.kernel.org, x86@kernel.org,
-        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-        vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
-        dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
-        peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
-        rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
-        bp@alien8.de, vbabka@suse.cz, kirill@shutemov.name,
-        ak@linux.intel.com, tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
-        dgilbert@redhat.com, jarkko@kernel.org, ashish.kalra@amd.com,
-        nikunj.dadhania@amd.com, Brijesh Singh <brijesh.singh@amd.com>,
-        Jarkko Sakkinen <jarkko.sakkinen@profian.com>
-References: <20230220183847.59159-1-michael.roth@amd.com>
- <20230220183847.59159-18-michael.roth@amd.com>
- <a15fc9a5-c136-47f7-e15e-776a511f3cdb@intel.com>
- <20230328233101.4idfki7ulpyhxrwy@amd.com>
-From:   Dave Hansen <dave.hansen@intel.com>
-In-Reply-To: <20230328233101.4idfki7ulpyhxrwy@amd.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.7 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+        with ESMTP id S229520AbjDKSe0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 Apr 2023 14:34:26 -0400
+Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1CA23A98
+        for <kvm@vger.kernel.org>; Tue, 11 Apr 2023 11:34:25 -0700 (PDT)
+Received: by mail-pj1-x104a.google.com with SMTP id x7-20020a17090a9dc700b0023f116f305bso4745831pjv.0
+        for <kvm@vger.kernel.org>; Tue, 11 Apr 2023 11:34:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1681238065;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=xzz/ozeVQf3oB9itOCR96Jt1Pb9+gGlg3JnJBxGTvCU=;
+        b=htQmsm+G+2DBSM9XNrsalnLTlXwDcK7h7GaDNvRSzfmVJjKXjQiX2VRl3BLfjgqXbX
+         BWz+Ex8uNSEffJ74b3HznJFOeJTpR4ZK61KMffBDxIUCYQHOpL0whynyINz7HFUu0ZpK
+         uKMKrPqr0Dx6iY8VAYmQGH8fB5GoMUnjZ4224jdgCC/DVcJz0yaGNvUTyoYPK2RBP0nj
+         Ja7PVYVNAIyKLPmDODylK2vjQiVU7tjZqkpS5Ovr/DJqIbDKXaiaXrVmAYH5g7xxQork
+         9DHLhZYxPnaowDRFqcQ5J200Kb1dUVu3gLWPaYBEVMLUxuT+cNALoWyb6cHkMvQY9V2t
+         eqFg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1681238065;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=xzz/ozeVQf3oB9itOCR96Jt1Pb9+gGlg3JnJBxGTvCU=;
+        b=2PdSndENvsR2IgBY7rZCravnAtbD6xdsopgS2IW9JSAqXdMowsd90Li5MKTlYVwgte
+         ojyJtBxoFGbN6Xh1/6doAxN40iuXNxZxaae2viUgRzW3NRepvG0CY4eww0CTJjuMeQaK
+         G12absev7G0c/+Bh5jRQ1VV7pKLXATuiAkCYtJOOcGBhiUHyS8KDmbjZ3B2387VBwDsa
+         yA3/DHL7D8pnl/dEJy2cZi3sQb3YHxEuLJU+Uba+h7szXDaVp+oJeYLXNgXgvLOdaf0s
+         +sXIfZyF7PXiaR+4GWRSCCGVdz0KaaXovrGUfwaY8zd+FWEUHDg/4qc3Z4mhjd9/6493
+         vkuQ==
+X-Gm-Message-State: AAQBX9c5BxmV2oaybAV1MsUU0Mx4JVcd8ovMUXz+HWVETQS7Zhn4q1c2
+        jB6VkWXL26W9DmtnP03pbNHWqhwMvSA=
+X-Google-Smtp-Source: AKy350bj7pd4sTy1uWs4sNsFnydS4MYjjhSE/GiNhA79fVNMQwPku6hINNGzdXsHMhyCB6X7gU/Nes/BKmY=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a63:c104:0:b0:507:46cb:f45b with SMTP id
+ w4-20020a63c104000000b0050746cbf45bmr50715pgf.1.1681238065535; Tue, 11 Apr
+ 2023 11:34:25 -0700 (PDT)
+Date:   Tue, 11 Apr 2023 11:34:23 -0700
+In-Reply-To: <SA1PR11MB673493A64E2BEAFA1A18ADE6A89A9@SA1PR11MB6734.namprd11.prod.outlook.com>
+Mime-Version: 1.0
+References: <20230410081438.1750-1-xin3.li@intel.com> <20230410081438.1750-34-xin3.li@intel.com>
+ <ZDSEjhGV9D90J6Bx@google.com> <SA1PR11MB673493A64E2BEAFA1A18ADE6A89A9@SA1PR11MB6734.namprd11.prod.outlook.com>
+Message-ID: <ZDWoL6o5LYgWP14y@google.com>
+Subject: Re: [PATCH v8 33/33] KVM: x86/vmx: refactor VMX_DO_EVENT_IRQOFF to
+ generate FRED stack frames
+From:   Sean Christopherson <seanjc@google.com>
+To:     Xin3 Li <xin3.li@intel.com>
+Cc:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "bp@alien8.de" <bp@alien8.de>,
+        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
+        "hpa@zytor.com" <hpa@zytor.com>,
+        "peterz@infradead.org" <peterz@infradead.org>,
+        "andrew.cooper3@citrix.com" <andrew.cooper3@citrix.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        Ravi V Shankar <ravi.v.shankar@intel.com>,
+        "jiangshanlai@gmail.com" <jiangshanlai@gmail.com>,
+        Shan Kang <shan.kang@intel.com>
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-7.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 3/28/23 16:31, Michael Roth wrote:
-> However...
+On Tue, Apr 11, 2023, Xin3 Li wrote:
+> > 
+> >  	kvm_before_interrupt(vcpu, KVM_HANDLING_IRQ);
+> > -	vmx_do_interrupt_irqoff(gate_offset(desc));
+> > +	if (cpu_feature_enabled(X86_FEATURE_FRED))
+> > +		vmx_do_fred_interrupt_irqoff(vector);
+> > +	else
+> > +		vmx_do_interrupt_irqoff(gate_offset((gate_desc *)host_idt_base
 > 
-> The fact that any pages potentially triggering these #PFs are able to be
-> mapped as 2M in the first place means that all the PFNs covered by that
-> 2M mapping must also been allocated by via mappable/VMA memory rather
-> than via restricted memfd where userspace mappings are not possible.
 > 
-> So I think we should be able to drop this patch entirely, as well as
-> allow the use of HugeTLBFS for non-restricted memfd memory (though
-> eventually the guest will switch all its memory to private/restricted
-> so not gaining much there other than reducing management complexity).
+> external_interrupt() is always available on x86_64, even when CONFIG_X86_FRED
+> is not defined. I prefer to always call external_interrupt() on x86_64 for IRQ
+> handling, which avoids re-entering noinstr code. how do you think? Too
+> aggressive?
 
-This is sounding a bit voodoo-ish to me.
-
-If this whole series is predicated on having its memory supplied via one
-very specific ABI with very specific behavior.
-
-That connection and the associated contract isn't spelled out very
-clearly in this series.  I'm sure it works on your machine and is clear
-to _you_ but I'm worried that nobody else is going to be able to figure
-out the voodoo.
-
-Could we make sure that this stuff is made very clear in the
-Documentation and cover letter, please?
+I think it's completely orthogonal to FRED enabling.  If you or anyone else wants
+to convert the non-FRED handling to external_interrupt(), then do so after FRED
+lands, or at the very least in a separate patch after enabling FRED in KVM.
