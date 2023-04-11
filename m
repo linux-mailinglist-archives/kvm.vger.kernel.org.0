@@ -2,139 +2,157 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7807B6DDDA0
-	for <lists+kvm@lfdr.de>; Tue, 11 Apr 2023 16:22:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D89316DDDFE
+	for <lists+kvm@lfdr.de>; Tue, 11 Apr 2023 16:31:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229811AbjDKOWQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Apr 2023 10:22:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57872 "EHLO
+        id S230206AbjDKObj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Apr 2023 10:31:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39870 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229490AbjDKOWO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 Apr 2023 10:22:14 -0400
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 0D7569E;
-        Tue, 11 Apr 2023 07:22:14 -0700 (PDT)
-Received: from [192.168.2.41] (77-166-152-30.fixed.kpn.net [77.166.152.30])
-        by linux.microsoft.com (Postfix) with ESMTPSA id 470262174E58;
-        Tue, 11 Apr 2023 07:22:12 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 470262174E58
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-        s=default; t=1681222933;
-        bh=9f8MMAF+5nW8ggEdvvifzFTTUP6zaiECoccXN8eh5Uo=;
-        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-        b=Poj+4wi3KaDcVfDdah1YnqjfdC5XU/aW78RDB+DFGVCsO8nZAtr+cQTBqc/STdT7o
-         p6dhgtr4zdWAe3CF8yZg6zCPRtbwMcqoiKQd/pXemgBQ8IWM/5QMa+2UyEB9w/ZrMx
-         U+ltYikZ/zAx5XE4zVu5QmN13AVpgMQ1pZtFYrj8=
-Message-ID: <ecd3d8de-859b-e5dd-c3bf-ea9c3c0aac60@linux.microsoft.com>
-Date:   Tue, 11 Apr 2023 16:22:10 +0200
+        with ESMTP id S229815AbjDKObU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 Apr 2023 10:31:20 -0400
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2041.outbound.protection.outlook.com [40.107.236.41])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 455752D77;
+        Tue, 11 Apr 2023 07:31:14 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=eQfQM3SM3K8HVRuCG+mQWPSxSebh0euifMEJmX6u/z1qv/FpnUDDmnQmk2+/Kt2xEJMT5838rpdS3HE8CQCsUQ4ZiCh6M4QShKxd4VyMxJqRBluyb9ZyhIbr6BUltCIrpD1sVbNzazBTmo8gKab7q3USOWYA5x6QuMRmaN1svJiauKmOZyU7rJcWASoRYL2Xz7BUivCy+2fEMHxYXq5f5PirtZzBCYsj6rjXvTR5jyXg/spQcSst8ISby5lCvw4umw0fTsmRoLesySOqjak+2rTK3UoODU3G2L3Zk8WyigKfK6tMeTf8N/yqJCd2+NFeNxReJJzi5dPN+I6S+GVd+Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=qsfQZaqaR/E7SMPgoppmrrryvUbOoU2SYCN5nEWH3XE=;
+ b=AVrPhEq9LunWt67TnkLgCaBqQEMlGMzpHN5Zj6YS+mETWdPHohnjVnlAS9G9yQZT9oYMVN+40y3IyTvC0Lw6QPJRFUTeMOPNXdzWO/kwO7NVZKCzUssvQTEkiS2NjUE5zXTkbJfeoUfUF+2Qw+DLcAfYV6sDQ3qui82cl7eOWdnKNQ0al8WnTRW5mFsrfYMhTyFhlSn6B/hlpoI1NGpKb7EuXqj8ddqDtAkLKYCGnNNlkH4ytLdRTCL8haXccWaPZVTqtRzPl+d1MCCmBO5zH7PONJnS63MeZycDhkmvIccVpE6yVs3cv4ulaTyJuZ2sKIsu7ztB4KErxAwjRP2TwQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=qsfQZaqaR/E7SMPgoppmrrryvUbOoU2SYCN5nEWH3XE=;
+ b=o2aG54gaAt5ZRKrOwe1D0lOVF4opg4101lt6vpfJWyONryD8CUZd0Cnh/6fM0CHnR+SahLics41cz91Gc3XIvBVUpCgPNEvBAPIacTM9QxAYyIt3ckqP3nOpufcShj/JM5e8By3u0xtL+6XOv9/Do/kTBbuPCai3V92kRquxIXj0kC3ZmQUht7d+E+4V6AvK+aMU3TUABB3Q57Vd5qiyCJmNGBfEEu6Shl49j3oD6VnSf5sLnpXD/ZFycdyex17oSTSDt0ZhXR1jiIZIsmXxZlraa5WDkYwQKn7j8Dr5YzVoumI6n/6brYLL5nb68VTqxPtzb90ONldKgQmNXX+Cqg==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by CH3PR12MB8483.namprd12.prod.outlook.com (2603:10b6:610:15c::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6277.35; Tue, 11 Apr
+ 2023 14:31:12 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::6045:ad97:10b7:62a2]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::6045:ad97:10b7:62a2%9]) with mapi id 15.20.6277.038; Tue, 11 Apr 2023
+ 14:31:11 +0000
+Date:   Tue, 11 Apr 2023 11:31:09 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     "Tian, Kevin" <kevin.tian@intel.com>
+Cc:     "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Nicolin Chen <nicolinc@nvidia.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>
+Subject: Re: [PATCH v3 03/17] iommufd: Replace the hwpt->devices list with
+ iommufd_group
+Message-ID: <ZDVvLbSN2TR1Er1c@nvidia.com>
+References: <0-v3-61d41fd9e13e+1f5-iommufd_alloc_jgg@nvidia.com>
+ <3-v3-61d41fd9e13e+1f5-iommufd_alloc_jgg@nvidia.com>
+ <BN9PR11MB5276E42B629C3E5AF019B6748C879@BN9PR11MB5276.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <BN9PR11MB5276E42B629C3E5AF019B6748C879@BN9PR11MB5276.namprd11.prod.outlook.com>
+X-ClientProxiedBy: YT4PR01CA0407.CANPRD01.PROD.OUTLOOK.COM
+ (2603:10b6:b01:108::21) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.9.1
-Subject: Re: [PATCH] KVM: SVM: Disable TDP MMU when running on Hyper-V
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Tianyu Lan <ltykernel@gmail.com>,
-        Michael Kelley <mikelley@microsoft.com>
-References: <20230227171751.1211786-1-jpiotrowski@linux.microsoft.com>
- <ZAd2MRNLw1JAXmOf@google.com>
- <959c5bce-beb5-b463-7158-33fc4a4f910c@linux.microsoft.com>
- <ZDSa9Bbqvh0btgQo@google.com>
-From:   Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>
-In-Reply-To: <ZDSa9Bbqvh0btgQo@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-20.1 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
-        DKIM_VALID_AU,ENV_AND_HDR_SPF_MATCH,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
-        SPF_HELO_PASS,SPF_PASS,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|CH3PR12MB8483:EE_
+X-MS-Office365-Filtering-Correlation-Id: 1d2cadf6-a6e8-4efd-20d7-08db3a9965c8
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: mBHSlazu2X2W/tkiWMcU5lOWr7VjwNF8OyQxcq1s8f8I74k3MD5Ew8XsbVOCSTotzwmCgLQUiEtwQ6Wmu5T+Z/RDaNM14a6aPfoxDasWlWAFfNBs1nJpWAe1jbtlBVsWTiYoTUnP94skJfdDybEXpCvADX4hKo6w/GRTrwhwOnh0dt8AO/WK3Kqd2WMEEqVwefzCF3HE7umFP18URxmkA1DyatQtPddfiWmUXGIRjzah9z0S30iBYkIk9uC5Pya8USzK4lA6P9gfpCeP1JV+uKVUh2nHLUh6Ra80Xl0fKL9qCMBsqdZM+wka6HpgOT1mOYg0oObpzehOZddM+aTJp3HthKyHwdIKPhLqD8NQaxVGZAwJsxV+MbZj+/GOd9MB/6ixp8IGSMG8DbmOVP1F8jWIObM2UJ2QH7CKXZkEPHvK7vea5b53TtAzk4FlvmAyqiH8f9QAQ2bZ54UYITWNm2TuEV/keyGddikxjzaOFGiZp+grzGUPztrY+yFey98X5Q7G/6gBM0QJHlmWBErVpgJgvnx5pO5X/fdBEmUGBRyI/WB7W1Sr9mgEPvL1QfYuDuKnBrEXB+u2QWRsUoQLtqyDtqcl05fRD9peBxH6CUU=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(39860400002)(136003)(346002)(376002)(396003)(366004)(451199021)(478600001)(86362001)(83380400001)(36756003)(2616005)(38100700002)(6486002)(4744005)(2906002)(966005)(6512007)(316002)(26005)(54906003)(6506007)(186003)(66476007)(41300700001)(8676002)(6916009)(66556008)(8936002)(4326008)(5660300002)(66946007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?oCgyN1tlYX2S4aG042FaV6fa1n8O3IOoxxkdjSikAZ/b4nN2fuOEcjKEfd1f?=
+ =?us-ascii?Q?9q8acF6tKqiLJCNJ4c3zT0CVuXEw23c1WHF7FwpNtV0R1JF4CNsH2m3BVmNp?=
+ =?us-ascii?Q?F5qrAMjYHnAhO4J2oktf9HYI1HkIpdfH5yEudgwfVCG4Hijr9KiupmQAVebh?=
+ =?us-ascii?Q?w8VwnXUzaJfEa3b+p6PKW+xtG1laaaPOUC/ZdFb6eEYEBIiZxZdRycm2MNm6?=
+ =?us-ascii?Q?5l0CUAKhckMBKdoqohAos6YLZ0pB5vy8y65RknJeg83bycWNJjLkivMWb3cw?=
+ =?us-ascii?Q?8xXmjeeLW99KSsUSsunFLLwSHMC0z7mYmSWCtPdLeYP+AUbx/87/DDX1LmIL?=
+ =?us-ascii?Q?KLxmT4d6o+YGlhBajZmPyIomK8MNA0FyBhQxDz3CX4+3N0cgcTFg2GxTteBJ?=
+ =?us-ascii?Q?Ow5Rq2iQ9sB6QhdGUmN4tH/whD+RKaXNoqjWXF/X5L7Hu6PekW+FNCNd+sBp?=
+ =?us-ascii?Q?V4bhEZ5INBP/eQZCMXE9ZDTLxDx/uKZXJi0Oruz+DNpmjw4J/tKqoU6/m039?=
+ =?us-ascii?Q?fp/SAEG7zV6pVcRS3knJPHgXDyk6UXZM3c0oK4jhBYHoOllC922UlUpgeQwZ?=
+ =?us-ascii?Q?fQe8aq0pDXLMROnyvtQ/klgbXjlkPZXbMKIMwRGaTc8bYAEBtVsNI35I+nWe?=
+ =?us-ascii?Q?dU5DQ0KSLreGHeeNq+dtDEgo0Zeat/REx4wQ0t0H5YlURHheMa+6D5U8/isH?=
+ =?us-ascii?Q?Z7g5a+VrIzmGM2TeVnqgUhaVwQEOIRVN15s+ooIGyquGDKhhC0cGCPJvUkPD?=
+ =?us-ascii?Q?OTYJjj9sbCTJdGLzlcvsMKMXKl88b97BL1ON6/jg99q1VWlKhdnjCIltdw/9?=
+ =?us-ascii?Q?Y7IH2N83kKtkHlV1bvcFMM31rq+GF41j0kEuFlI0ev2GQ1dGr9RR5Ca0O5ZH?=
+ =?us-ascii?Q?kGehUckO+9hrOid9dkjANBDM4myXQfEWcyX9E34zIeZgSYep7pUYvQ1t2ULS?=
+ =?us-ascii?Q?5NV1kO89B6ccnwFpUygWkOtggQzH5mi48s8/TuUUFI4XpZxE21EHU6Rn9TWz?=
+ =?us-ascii?Q?vunHysJAKRtiiv7lMtrDv4Kd9I9TQ//s3qJFsoel+JhCjlxA2Rrbf2EHH8EX?=
+ =?us-ascii?Q?U02Z2BQ+pw2TZCJr/zcu2nGSW3VLrBVI49jkBbZ8uc61Xc0T3YtHfG0uquw1?=
+ =?us-ascii?Q?/ijbXoN3/9VbD4xH1NLGDRoXfpeSdp0vxU8BQMyCDFMRzuxH0dalx6LwShlo?=
+ =?us-ascii?Q?bvTUx63ZizqhoKWmXC7EtO8XWMpjEnoucdqAd38z4bwjEPoaW6+lHLx7EOwz?=
+ =?us-ascii?Q?ev76gT5Shzoyu54JCTA/XatSYc/bC3oCJgSmHMTcy44e0Z3yReqG/zkXvklZ?=
+ =?us-ascii?Q?jkafwr9/RsXNKve/YvTLjBUe593+Mpv+VT6HvS+FAHm00eM28jxRTxW+W5Ea?=
+ =?us-ascii?Q?xdfBJH27kwMYEoquQzuExOv13O1fLApMwNKvtXyj7o80D3fDWm95HDS2a3l9?=
+ =?us-ascii?Q?lncM/D4L5GKp93/gMLT06D0gSgARMu9JEtrah38twHo/A5CnZuK+owPSDuhj?=
+ =?us-ascii?Q?PCdlrlUQyOY7+MLJL4lkUGw4uzH53n8v8ik2tzNtkC9Tiv9RQsI+ushrWcNl?=
+ =?us-ascii?Q?173GBMfsi8WbgRNWDSd/AJ1E8tWsWdXqVkgG4uK8?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1d2cadf6-a6e8-4efd-20d7-08db3a9965c8
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Apr 2023 14:31:11.6743
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: ZO4SRLj3JI2Ef1Md7WHdfkBUPBiCVkPMnBJ46wTqzFE2+0rSZ8dCHwxOT8XdEelQ
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB8483
+X-Spam-Status: No, score=0.8 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 4/11/2023 1:25 AM, Sean Christopherson wrote:
-> On Wed, Apr 05, 2023, Jeremi Piotrowski wrote:
->> On 3/7/2023 6:36 PM, Sean Christopherson wrote:
->>> Thinking about this more, I would rather revert commit 1e0c7d40758b ("KVM: SVM:
->>> hyper-v: Remote TLB flush for SVM") or fix the thing properly straitaway.  KVM
->>> doesn't magically handle the flushes correctly for the shadow/legacy MMU, KVM just
->>> happens to get lucky and not run afoul of the underlying bugs.  The revert appears
->>> to be reasonably straightforward (see bottom).
->>
->> Hi Sean,
->>
->> I'm back, and I don't have good news. The fix for the missing hyperv TLB flushes has
->> landed in Linus' tree and I now had the chance to test things outside Azure, in WSL on my
->> AMD laptop.
->>
->> There is some seriously weird interaction going on between TDP MMU and Hyper-V, with
->> or without enlightened TLB. My laptop has 16 vCPUs, so the WSL VM also has 16 vCPUs.
->> I have hardcoded the kernel to disable enlightened TLB (so we know that is not interfering).
->> I'm running a Flatcar Linux VM inside the WSL VM using legacy BIOS, a single CPU
->> and 4GB of RAM.
->>
->> If I run with `kvm.tdp_mmu=0`, I can boot and shutdown my VM consistently in 20 seconds.
->>
->> If I run with TDP MMU, the VM boot stalls for seconds at a time in various spots
->> (loading grub, decompressing kernel, during kernel boot), the boot output feels like
->> it's happening in slow motion. The fastest I see it finish the same cycle is 2 minutes,
->> I have also seen it take 4 minutes, sometimes even not finish at all. Same everything,
->> the only difference is the value of `kvm.tdp_mmu`.
-> 
-> When a stall occurs, can you tell where the time is lost?  E.g. is the CPU stuck
-> in L0, L1, or L2?  L2 being a single vCPU rules out quite a few scenarios, e.g.
-> lock contention and whatnot.
+On Thu, Mar 23, 2023 at 07:21:42AM +0000, Tian, Kevin wrote:
 
-It shows up as around 90% L2 time, 10% L1 time. I don't have great visibility into L0 time
-right now, I'm trying to find someone who might be able to help with that.
+> If no oversight then we can directly put the lock in
+> iommufd_hw_pagetable_attach/detach() which can also simplify a bit on 
+> its callers in device.c.
 
-> 
-> If you can run perf in WSL, that might be the easiest way to suss out what's going
-> on.
+So, I did this, and syzkaller explains why this can't be done:
 
-I can run perf, what trace would help?
+https://lore.kernel.org/r/0000000000006e66d605f83e09bc@google.com
 
-> 
->> So I would like to revisit disabling tdp_mmu on hyperv altogether for the time being but it
->> should probably be with the following condition:
->>
->>   tdp_mmu_enabled = tdp_mmu_allowed && tdp_enabled && !hypervisor_is_type(X86_HYPER_MS_HYPERV)
->>
->> Do you have an environment where you would be able to reproduce this? A Windows server perhaps
->> or an AMD laptop?
-> 
-> Hrm, not easily, no.  Can you try two things?
-> 
->   1. Linus' tree on Intel hardware
-This shows the same problematic behavior (tested commit 0d3eb744aed40ffce820cded61d7eac515199165).
+We can't allow the hwpt to be discovered by a parallel
+iommufd_hw_pagetable_attach() until it is done being setup, otherwise
+if we fail to set it up we can't destroy the hwpt.
+ 
+	if (immediate_attach) {
+		rc = iommufd_hw_pagetable_attach(hwpt, idev);
+		if (rc)
+			goto out_abort;
+	}
 
->   2. kvm-x86/next[*] on Intel hardware
+	rc = iopt_table_add_domain(&hwpt->ioas->iopt, hwpt->domain);
+	if (rc)
+		goto out_detach;
+	list_add_tail(&hwpt->hwpt_item, &hwpt->ioas->hwpt_list);
+	return hwpt;
 
-Same here (tested kvm-x86-next-2023.04.10)
+out_detach:
+	if (immediate_attach)
+		iommufd_hw_pagetable_detach(idev);
+out_abort:
+	iommufd_object_abort_and_destroy(ictx, &hwpt->obj);
 
-> 
-> Don't bother with #2 if #1 (Linus' tree) does NOT suffer the same stalls as AMD.
-> #2 is interesting iff Intel is also affected as kvm-x86/next has an optimization
-> for CR0.WP toggling, which was the achilles heel of the TDP MMU.  If Intel isn't
-> affected, then something other than CR0.WP is to blame.
-> 
-> I fully expect both experiments to show the same behavior as AMD, but if for some
-> reason they don't, the results should help narrow the search.
+As some other idev could be pointing at it too now.
 
-The results are the same for both branches, and it does look like this affects AMD and
-Intel equally.
+So the lock has to come back out..
 
-So seeing as this will likely take a while to figure out (and I know I won't be able to
-spend too many cycles on this in the next few weeks), what do you think of a patch to
-disable tdp_mmu in this configuration (for the time being?).
-
-Something else I've been wondering: in a KVM-on-KVM setup, is tdp_mmu used in both L0
-and L1 hypervisors right now?
-
-> 
-> [*] https://github.com/kvm-x86/linux/tree/next
-
+Jason
