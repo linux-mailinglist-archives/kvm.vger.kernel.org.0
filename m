@@ -2,61 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5C8746DD243
-	for <lists+kvm@lfdr.de>; Tue, 11 Apr 2023 07:57:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BA44A6DD280
+	for <lists+kvm@lfdr.de>; Tue, 11 Apr 2023 08:15:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230064AbjDKF5l (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Apr 2023 01:57:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43880 "EHLO
+        id S230195AbjDKGPD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Apr 2023 02:15:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57394 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230075AbjDKF5i (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 Apr 2023 01:57:38 -0400
-Received: from mail-ej1-x635.google.com (mail-ej1-x635.google.com [IPv6:2a00:1450:4864:20::635])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 062C52D7B;
-        Mon, 10 Apr 2023 22:57:20 -0700 (PDT)
-Received: by mail-ej1-x635.google.com with SMTP id ud9so17280677ejc.7;
-        Mon, 10 Apr 2023 22:57:19 -0700 (PDT)
+        with ESMTP id S230047AbjDKGO7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 Apr 2023 02:14:59 -0400
+Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58D27198D;
+        Mon, 10 Apr 2023 23:14:58 -0700 (PDT)
+Received: by mail-pl1-x629.google.com with SMTP id y6so5797567plp.2;
+        Mon, 10 Apr 2023 23:14:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=jms.id.au; s=google; t=1681192637;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=GUD9yijmU2vznVIxO0uguX/ETkIRPP+R6vlejm8iH3A=;
-        b=jSZdo1wtv4gzEvX4J3w0SJrZ0TKscwSVtBsZijS9j6qXePnpDefEgFR/+DsCoS2XZl
-         7lxW496fDD546lH25dzDrMY38jtLXcN2hVhf54Uw6Ln8Spv0ZRGnhkb+ACjEoLIsOHuR
-         keAkTDZ8rUZhccLTvCHhBAXoQNwoqQjecy4H0=
+        d=gmail.com; s=20210112; t=1681193698;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:sender:from:to:cc:subject:date:message-id:reply-to;
+        bh=40ATmUkELs3v2phkdscWCg0Eyb8UJbsAcFnoSmj4j6A=;
+        b=A2b515QpMfBXsiswPjWbR+ZdamIPJrVisa0qXF/MV4M75LGcRECaX8svgLkomuoMDI
+         5wbIYWnyq3heLwnRVHmRcCl1bFghNQlvKC6jnj7JaUlJox2Kt+VXj/c3F1phR2Smc6x2
+         tcBo4dsAQoq4lOJ7CuJoDw8EbbEsYWTuNboGfYo3+xbqOOsB6K7/VhrxiroKpKhscW4I
+         WmMs7sqBhg0OXB1jBSy4Yhd0hlzIr9Ejz6nnrpsvUH9vhEaezOSn9yQlHrRQ0Etx7kTD
+         N/cLFDu33sOmNU1ZwHI+evkVWeH0Qn52GG+Etq04uUWsYDjquRSn0H+Sf6VMPZwReebs
+         yCwg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1681192637;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=GUD9yijmU2vznVIxO0uguX/ETkIRPP+R6vlejm8iH3A=;
-        b=PDNiLhrAUZ1p7FWJ5sp2s+C9qxMw7iifSPjm8iTXi5lDb1mpP1V0at46gdhZlpG+Lr
-         aV0b7DsSL+HSykQ+vPObxSbKg5t8Ofkd+Qv/oGkPK/sSj7DDR33jkKndh4atx5dbzRUt
-         Wf9GMLP0wW+NVS97HD6CJZ1IpZQqafH787hvU0Qij/JxpmsBz0J3VOBteRk15CifXmfe
-         BULMSkaW7kHwoDbAb4ZDYVdSaLQV5rpdn2+NSXz+7n2yU/0akjpJB8WoWBDtSDIRF/ca
-         C1hWjIVRJBVSgv9HRVrNlaWYfNQcKyk3VRdYESRqcDVmfJEo78nNnOH4USTp9NEvteIR
-         0lhg==
-X-Gm-Message-State: AAQBX9cm+UThGdubeXrxyp4f+5dWlH53Ifn/c1elzpiwXRp2HUOcPMeY
-        KEC4BrHOGKL8p30i8LJAf0Cl3tLicmAnhydH4vcde6FyJOQ=
-X-Google-Smtp-Source: AKy350bWIaPszbl+8ZTUlnZswNv+DDIa4V3lvErdkuyIy4DyIRrAtDIkK+ieEjR0YoCV5dlQJy9rjsxfg+2wCz4SJOU=
-X-Received: by 2002:a17:907:75d9:b0:94b:28ff:9e89 with SMTP id
- jl25-20020a17090775d900b0094b28ff9e89mr1703013ejc.15.1681192636857; Mon, 10
- Apr 2023 22:57:16 -0700 (PDT)
-MIME-Version: 1.0
-References: <20230408040020.868929-1-npiggin@gmail.com>
-In-Reply-To: <20230408040020.868929-1-npiggin@gmail.com>
+        d=1e100.net; s=20210112; t=1681193698;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:sender:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=40ATmUkELs3v2phkdscWCg0Eyb8UJbsAcFnoSmj4j6A=;
+        b=OXiAcTSkGmM+obHQpXhHoO1xFazDM/96iK0H1UVNeFCSoUSJ3NM2AM5CFimgqH4CR3
+         j5eHDucregTyvfSwOWruGSrvmg45FDpXafh3M6DY957UGGIUHG/aKoQrvQNe7nBoM0zc
+         6kNkvNxAiVO+/U7HPluj1kU0pyqYRDzkQrL34PVrJ6s8kkainwpCJrqw8stnAYFRXwbW
+         lVdg6ioZaMPsycqD0c6WWZiVbYDXctgijqgJjYYxm9Us885XQMhhDHVXsvFU3IX4I0/U
+         TrgJ+5pIcud9/XNy9JxX1ksIm9w/maaqYfSbb0yDP06atnu4HZzCBveQ1v2WLSdg3EGi
+         7GFQ==
+X-Gm-Message-State: AAQBX9dRDuRQ9bIaW5iAhAjm+oaffiaUI4c4OePPgECBAt654ueMkjX6
+        Z69qOfA+tGNqGoEXKDlBFqpPhL/hloA=
+X-Google-Smtp-Source: AKy350YZHOcuClKKBy6/sDrm+6rHkQUS2d88QMXIEvzrBQIUtKtzaxhtkjjHJohUURDSp1hh6GhyTA==
+X-Received: by 2002:a17:902:c40e:b0:1a6:52f9:d4c7 with SMTP id k14-20020a170902c40e00b001a652f9d4c7mr2788877plk.60.1681193697493;
+        Mon, 10 Apr 2023 23:14:57 -0700 (PDT)
+Received: from localhost.localdomain ([45.124.203.18])
+        by smtp.gmail.com with ESMTPSA id jj4-20020a170903048400b001a64a2b790fsm2194180plb.164.2023.04.10.23.14.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 10 Apr 2023 23:14:56 -0700 (PDT)
+Sender: "joel.stan@gmail.com" <joel.stan@gmail.com>
 From:   Joel Stanley <joel@jms.id.au>
-Date:   Tue, 11 Apr 2023 05:57:04 +0000
-Message-ID: <CACPK8Xfw6S+pHDuWvoed=PkE7XUHme=eXoWRbLfCFKRO9w=C2w@mail.gmail.com>
-Subject: Re: [PATCH v2 0/4] KVM: selftests: add powerpc support
-To:     Nicholas Piggin <npiggin@gmail.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, linux-kselftest@vger.kernel.org,
-        Sean Christopherson <seanjc@google.com>,
-        Shuah Khan <shuah@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-doc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
+Cc:     Jonathan Corbet <corbet@lwn.net>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Michael Ellerman <mpe@ellerman.id.au>
+Subject: [PATCH] KVM: PPC: Fix documentation for ppc mmu caps
+Date:   Tue, 11 Apr 2023 15:44:46 +0930
+Message-Id: <20230411061446.26324-1-joel@jms.id.au>
+X-Mailer: git-send-email 2.39.2
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=0.4 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
-        DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+        DKIM_VALID_EF,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
         HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
         SPF_PASS autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -65,69 +71,90 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, 8 Apr 2023 at 04:01, Nicholas Piggin <npiggin@gmail.com> wrote:
->
-> This series adds initial KVM selftests support for powerpc
-> (64-bit, BookS, radix MMU).
+The documentation mentions KVM_CAP_PPC_RADIX_MMU, but the defines in the
+kvm headers spell it KVM_CAP_PPC_MMU_RADIX. Similarly with
+KVM_CAP_PPC_MMU_HASH_V3.
 
-This means the tests won't work on power8. Perhaps you could add
-something like this?
+Fixes: c92701322711 ("KVM: PPC: Book3S HV: Add userspace interfaces for POWER9 MMU")
+Signed-off-by: Joel Stanley <joel@jms.id.au>
+---
+There is also the copy of the uapi header in tools/ that needs updating,
+but that seems to be manually kept in sync so I didn't patch that.
+---
+ Documentation/virt/kvm/api.rst | 8 ++++----
+ include/uapi/linux/kvm.h       | 4 ++--
+ tools/include/uapi/linux/kvm.h | 2 +-
+ 3 files changed, 7 insertions(+), 7 deletions(-)
 
---- a/tools/testing/selftests/kvm/lib/powerpc/processor.c
-+++ b/tools/testing/selftests/kvm/lib/powerpc/processor.c
-@@ -33,6 +33,8 @@ void virt_arch_pgd_alloc(struct kvm_vm *vm)
-        vm_paddr_t prtb, pgtb;
-        size_t pgd_pages;
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index a5c803f39832..979a5f7b545e 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -4237,7 +4237,7 @@ operating system that uses the PIT for timing (e.g. Linux 2.4.x).
+ 4.100 KVM_PPC_CONFIGURE_V3_MMU
+ ------------------------------
+ 
+-:Capability: KVM_CAP_PPC_RADIX_MMU or KVM_CAP_PPC_HASH_MMU_V3
++:Capability: KVM_CAP_PPC_MMU_RADIX or KVM_CAP_PPC_MMU_HASH_V3
+ :Architectures: ppc
+ :Type: vm ioctl
+ :Parameters: struct kvm_ppc_mmuv3_cfg (in)
+@@ -4271,7 +4271,7 @@ the Power ISA V3.00, Book III section 5.7.6.1.
+ 4.101 KVM_PPC_GET_RMMU_INFO
+ ---------------------------
+ 
+-:Capability: KVM_CAP_PPC_RADIX_MMU
++:Capability: KVM_CAP_PPC_MMU_RADIX
+ :Architectures: ppc
+ :Type: vm ioctl
+ :Parameters: struct kvm_ppc_rmmu_info (out)
+@@ -7701,7 +7701,7 @@ capability via KVM_ENABLE_CAP ioctl on the vcpu fd. Note that this
+ will disable the use of APIC hardware virtualization even if supported
+ by the CPU, as it's incompatible with SynIC auto-EOI behavior.
+ 
+-8.3 KVM_CAP_PPC_RADIX_MMU
++8.3 KVM_CAP_PPC_MMU_RADIX
+ -------------------------
+ 
+ :Architectures: ppc
+@@ -7711,7 +7711,7 @@ available, means that the kernel can support guests using the
+ radix MMU defined in Power ISA V3.00 (as implemented in the POWER9
+ processor).
+ 
+-8.4 KVM_CAP_PPC_HASH_MMU_V3
++8.4 KVM_CAP_PPC_MMU_HASH_V3
+ ---------------------------
+ 
+ :Architectures: ppc
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index d77aef872a0a..69f90989bfc8 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -1533,9 +1533,9 @@ struct kvm_s390_ucas_mapping {
+ /* Available with KVM_CAP_SPAPR_RESIZE_HPT */
+ #define KVM_PPC_RESIZE_HPT_PREPARE _IOR(KVMIO, 0xad, struct kvm_ppc_resize_hpt)
+ #define KVM_PPC_RESIZE_HPT_COMMIT  _IOR(KVMIO, 0xae, struct kvm_ppc_resize_hpt)
+-/* Available with KVM_CAP_PPC_RADIX_MMU or KVM_CAP_PPC_HASH_MMU_V3 */
++/* Available with KVM_CAP_PPC_MMU_RADIX or KVM_CAP_PPC_MMU_HASH_V3 */
+ #define KVM_PPC_CONFIGURE_V3_MMU  _IOW(KVMIO,  0xaf, struct kvm_ppc_mmuv3_cfg)
+-/* Available with KVM_CAP_PPC_RADIX_MMU */
++/* Available with KVM_CAP_PPC_MMU_RADIX */
+ #define KVM_PPC_GET_RMMU_INFO	  _IOW(KVMIO,  0xb0, struct kvm_ppc_rmmu_info)
+ /* Available with KVM_CAP_PPC_GET_CPU_CHAR */
+ #define KVM_PPC_GET_CPU_CHAR	  _IOR(KVMIO,  0xb1, struct kvm_ppc_cpu_char)
+diff --git a/tools/include/uapi/linux/kvm.h b/tools/include/uapi/linux/kvm.h
+index d77aef872a0a..9fb12e04c93d 100644
+--- a/tools/include/uapi/linux/kvm.h
++++ b/tools/include/uapi/linux/kvm.h
+@@ -1533,7 +1533,7 @@ struct kvm_s390_ucas_mapping {
+ /* Available with KVM_CAP_SPAPR_RESIZE_HPT */
+ #define KVM_PPC_RESIZE_HPT_PREPARE _IOR(KVMIO, 0xad, struct kvm_ppc_resize_hpt)
+ #define KVM_PPC_RESIZE_HPT_COMMIT  _IOR(KVMIO, 0xae, struct kvm_ppc_resize_hpt)
+-/* Available with KVM_CAP_PPC_RADIX_MMU or KVM_CAP_PPC_HASH_MMU_V3 */
++/* Available with KVM_CAP_PPC_RADIX_MMU or KVM_CAP_PPC_MMU_HASH_V3 */
+ #define KVM_PPC_CONFIGURE_V3_MMU  _IOW(KVMIO,  0xaf, struct kvm_ppc_mmuv3_cfg)
+ /* Available with KVM_CAP_PPC_RADIX_MMU */
+ #define KVM_PPC_GET_RMMU_INFO	  _IOW(KVMIO,  0xb0, struct kvm_ppc_rmmu_info)
+-- 
+2.39.2
 
-+       TEST_REQUIRE(kvm_has_cap(KVM_CAP_PPC_MMU_RADIX));
-+
-
->
-> Since v1:
-> - Update MAINTAINERS KVM PPC entry to include kvm selftests.
-> - Fixes and cleanups from Sean's review including new patch 1.
-> - Add 4K guest page support requiring new patch 2.
->
-> Thanks,
-> Nick
->
-> Nicholas Piggin (4):
->   KVM: selftests: Move pgd_created check into virt_pgd_alloc
->   KVM: selftests: Add aligned guest physical page allocator
->   KVM: PPC: selftests: add support for powerpc
->   KVM: PPC: selftests: add selftests sanity tests
->
->  MAINTAINERS                                   |   2 +
->  tools/testing/selftests/kvm/Makefile          |  15 +
->  .../selftests/kvm/include/kvm_util_base.h     |  27 ++
->  .../selftests/kvm/include/powerpc/hcall.h     |  21 +
->  .../selftests/kvm/include/powerpc/ppc_asm.h   |  32 ++
->  .../selftests/kvm/include/powerpc/processor.h |  33 ++
->  .../selftests/kvm/lib/aarch64/processor.c     |   4 -
->  tools/testing/selftests/kvm/lib/guest_modes.c |   3 +
->  tools/testing/selftests/kvm/lib/kvm_util.c    |  56 ++-
->  .../selftests/kvm/lib/powerpc/handlers.S      |  93 ++++
->  .../testing/selftests/kvm/lib/powerpc/hcall.c |  45 ++
->  .../selftests/kvm/lib/powerpc/processor.c     | 429 ++++++++++++++++++
->  .../testing/selftests/kvm/lib/powerpc/ucall.c |  30 ++
->  .../selftests/kvm/lib/riscv/processor.c       |   4 -
->  .../selftests/kvm/lib/s390x/processor.c       |   4 -
->  .../selftests/kvm/lib/x86_64/processor.c      |   7 +-
->  tools/testing/selftests/kvm/powerpc/helpers.h |  46 ++
->  .../testing/selftests/kvm/powerpc/null_test.c | 166 +++++++
->  .../selftests/kvm/powerpc/rtas_hcall.c        | 146 ++++++
->  19 files changed, 1129 insertions(+), 34 deletions(-)
->  create mode 100644 tools/testing/selftests/kvm/include/powerpc/hcall.h
->  create mode 100644 tools/testing/selftests/kvm/include/powerpc/ppc_asm.h
->  create mode 100644 tools/testing/selftests/kvm/include/powerpc/processor.h
->  create mode 100644 tools/testing/selftests/kvm/lib/powerpc/handlers.S
->  create mode 100644 tools/testing/selftests/kvm/lib/powerpc/hcall.c
->  create mode 100644 tools/testing/selftests/kvm/lib/powerpc/processor.c
->  create mode 100644 tools/testing/selftests/kvm/lib/powerpc/ucall.c
->  create mode 100644 tools/testing/selftests/kvm/powerpc/helpers.h
->  create mode 100644 tools/testing/selftests/kvm/powerpc/null_test.c
->  create mode 100644 tools/testing/selftests/kvm/powerpc/rtas_hcall.c
->
-> --
-> 2.40.0
->
