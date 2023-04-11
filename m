@@ -2,120 +2,186 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B2CA36DD15E
-	for <lists+kvm@lfdr.de>; Tue, 11 Apr 2023 07:05:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E5D2E6DD163
+	for <lists+kvm@lfdr.de>; Tue, 11 Apr 2023 07:06:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229759AbjDKFFA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Apr 2023 01:05:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33226 "EHLO
+        id S229886AbjDKFGd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Apr 2023 01:06:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34018 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229624AbjDKFE7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 Apr 2023 01:04:59 -0400
-Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 237121FC1
-        for <kvm@vger.kernel.org>; Mon, 10 Apr 2023 22:04:58 -0700 (PDT)
-Received: by mail-pl1-x62f.google.com with SMTP id d9443c01a7336-1a52667e35fso4650255ad.1
-        for <kvm@vger.kernel.org>; Mon, 10 Apr 2023 22:04:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1681189497;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Pgg9iBxZJj9AESlGkJWpNG21cI3ZSKa62ycWyjsqGls=;
-        b=YlOJ58MIVy10F+LtDaVNYDFo3rBnNpGIsds7p+i4Nm84ZMCjDZTolxvmz0uA4aoCBq
-         B6dm/SzF15tFh4EQHeHQlwv8dGkWzwnIFj1wajhfGAdb8wYP6ANkFg+gHtH1ytCtcMrw
-         IYeE/9OowKi44v+Opyh7FDJOJZ10gSCaFABpJn2kf+Yj7/uAPhRZu8ZT/j+1bs/ek/3o
-         ycCTU+drXe/Gv7SwRa35d/UkR0sp8y35U03GYXMY3KKo27ZUppOvy5UNohvxRKrR314g
-         yWGSTojAPmuDS2tU2NBzYiGif9ER7tYniIjJD8vpsjZDc4HqcQszunl8qXUAvipArzB8
-         lCxg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1681189497;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Pgg9iBxZJj9AESlGkJWpNG21cI3ZSKa62ycWyjsqGls=;
-        b=ynbfKlyN/fCangLHCJB8lQgH8xMJ6atFec3One2cLBF9gdUS+x7h+NnVEvzbwATkEM
-         GpagcNa5yL5+qoxvkX6HA9H2nf9R2FDfsiDqtpWnQrPXHKSszO81pxsVG+IHL9ESuvIM
-         ZDOlJqTgIezTUEY8qkXW5lOpJiGsxhwyCzAXyBstXmN+tRGuHc8iUmgn8SM3Aqd+aj/e
-         31KhltZ4QChcNLk2zbJI6cBHQRgfqBFDhJ+l0AaDA2KzqxskUu7Hgm4/py4M9gLoIFWV
-         y2+L6CdSmvK0+91sUfKszvKSlIdhzAHjR9etvK3Ki6Nw+BKcAg3Ucf2Aihyys4YZWaWH
-         aaFw==
-X-Gm-Message-State: AAQBX9eEueJba162vgJIK78aQPbLizbdej94PyeCDOnfZYxec2SKcMSY
-        EeMwZMCNpTcC/p3SnYIzWQQa4INUjGv1mg==
-X-Google-Smtp-Source: AKy350ZxS0HZXvPaMeb4Oe5/wwvBjrq6vgeDrfYpICz5eSV+tiHNSTocsotyXfHuwmDIBoFU8DHosA==
-X-Received: by 2002:aa7:9435:0:b0:633:1938:e302 with SMTP id y21-20020aa79435000000b006331938e302mr10126746pfo.18.1681189497569;
-        Mon, 10 Apr 2023 22:04:57 -0700 (PDT)
-Received: from [172.27.232.2] (ec2-16-163-40-128.ap-east-1.compute.amazonaws.com. [16.163.40.128])
-        by smtp.gmail.com with ESMTPSA id w9-20020a655349000000b0050f85ef50d1sm7916570pgr.26.2023.04.10.22.04.55
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 10 Apr 2023 22:04:57 -0700 (PDT)
-Message-ID: <c23abfa4-c767-6c95-d14f-f6af8c414692@gmail.com>
-Date:   Tue, 11 Apr 2023 13:04:52 +0800
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.9.1
-Subject: Re: [PATCH 2/3] KVM: VMX: Remove a unnecessary cpu_has_vmx_desc()
- check in vmx_set_cr4()
+        with ESMTP id S229663AbjDKFGb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 Apr 2023 01:06:31 -0400
+Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BBCAA1FC1;
+        Mon, 10 Apr 2023 22:06:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1681189590; x=1712725590;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=vszLJnZEn5v2fGHJ6jJX92tl9+EloPD5EAY/dqlyag8=;
+  b=EifbJrtsJXfFSJdxJDvSK9Z4lc54DmIht8w9V2uSGJEmI2LwvbG0ixdj
+   V9T8JyZwbL5KT+5JkSxei2GeSow+nL0gii+Qe8LzM0jRd7iXpa9+1e6Wh
+   W5gndd3qGAyTKzp8HAfgjpacti/R0uT1O8quokd0XYphinVF98Ozj7Ozi
+   5JUJYt9rQl11K5U0QKLUKzlLIuN5a5xeoVkhGJKD02oQrzOEb/TKHSDv/
+   IgHm6GO6nu94e7XXOiXP1W6QkSwdoURit8KwNDB/d8qpNQkQ1sLKZTzjk
+   TvoPNCK+LznE91Umv/QtxoGUQ3s3Z2N3UMbNkbnbQHSjtRTaTOHZY6t4O
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10676"; a="345312905"
+X-IronPort-AV: E=Sophos;i="5.98,335,1673942400"; 
+   d="scan'208";a="345312905"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Apr 2023 22:06:29 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10676"; a="832213642"
+X-IronPort-AV: E=Sophos;i="5.98,335,1673942400"; 
+   d="scan'208";a="832213642"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by fmsmga001.fm.intel.com with ESMTP; 10 Apr 2023 22:06:29 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.23; Mon, 10 Apr 2023 22:06:28 -0700
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.23 via Frontend Transport; Mon, 10 Apr 2023 22:06:28 -0700
+Received: from NAM04-MW2-obe.outbound.protection.outlook.com (104.47.73.169)
+ by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.23; Mon, 10 Apr 2023 22:06:28 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=X1uwh83V/EcPs+lWP043+bzgr62iLn9V50mlhYOKM6wiU4UoM3IHDDOZhALJOq4vZLgwSCzMuUNIG1z5tpFD6gD3DpyylJYLEJ6XYVXeg0sD7nBEizZ84tmC1XVW2h/v9OwYKjNcYen70MnChUe9U3HIt/eKtcJGYa8sp3BbhomeoPrsuZtHYLji8HwZC0NYfny/m09vKGFam7qyQQXpTO+Cx58j/USlzc0QaqF0cvx9oXikJ8mzS8OlWE/iWqgFZwG3LirwN4utLdWB253ofj0pc6oYIu0k3B7iKk8tv4vme6WucWgGHPBkvK+GpZLb0OObkIDGvTaIvbJo8KC6iQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=V7uWof+7Xd82kHs1qfhv9mQjlXUVKVnCrgpTe2tohPI=;
+ b=Qjoe4ZLN7btTHg2hwtcm+VBo9eXYy4zvKdboOisi5JtxnoMDZ2S8TAlZDca3jgVE8sOYt+tqJpsTa6xUIMPlOdpjFUBpI2h/M/VzAh/beHjz4SPwdfQQZVsO1YlsDfQMUnwkA8brmofLCv3iobEU3Jkc6mjZeUP+4G7w1MFa6PUaspf0UNH9v848wbZCHkAj+ItDi4cyuGTFg9FyU3x/J6PzKP7ujZJgMVtfu8lVEEuy+j6pM2uxbEe8IqJSsuAJg+hplWBIDgsQLMGNrXW08+CWSNCUoSl0QefY7AlRFfOdnCKGP66ynPmvXQmizTuWw4MxKvFSzgmhQMB8D9Twqw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from SA1PR11MB6734.namprd11.prod.outlook.com (2603:10b6:806:25d::22)
+ by SA2PR11MB4906.namprd11.prod.outlook.com (2603:10b6:806:fa::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6277.38; Tue, 11 Apr
+ 2023 05:06:27 +0000
+Received: from SA1PR11MB6734.namprd11.prod.outlook.com
+ ([fe80::5dfc:6a16:20d9:6948]) by SA1PR11MB6734.namprd11.prod.outlook.com
+ ([fe80::5dfc:6a16:20d9:6948%5]) with mapi id 15.20.6277.034; Tue, 11 Apr 2023
+ 05:06:27 +0000
+From:   "Li, Xin3" <xin3.li@intel.com>
+To:     "Christopherson,, Sean" <seanjc@google.com>
+CC:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "bp@alien8.de" <bp@alien8.de>,
+        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
+        "hpa@zytor.com" <hpa@zytor.com>,
+        "peterz@infradead.org" <peterz@infradead.org>,
+        "andrew.cooper3@citrix.com" <andrew.cooper3@citrix.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "Shankar, Ravi V" <ravi.v.shankar@intel.com>,
+        "jiangshanlai@gmail.com" <jiangshanlai@gmail.com>,
+        "Kang, Shan" <shan.kang@intel.com>
+Subject: RE: [PATCH v8 33/33] KVM: x86/vmx: refactor VMX_DO_EVENT_IRQOFF to
+ generate FRED stack frames
+Thread-Topic: [PATCH v8 33/33] KVM: x86/vmx: refactor VMX_DO_EVENT_IRQOFF to
+ generate FRED stack frames
+Thread-Index: AQHZa4iiYR92PWeRCEi6WbUcy97+Bq8lFcEAgAB3RxA=
+Date:   Tue, 11 Apr 2023 05:06:26 +0000
+Message-ID: <SA1PR11MB673493A64E2BEAFA1A18ADE6A89A9@SA1PR11MB6734.namprd11.prod.outlook.com>
+References: <20230410081438.1750-1-xin3.li@intel.com>
+ <20230410081438.1750-34-xin3.li@intel.com> <ZDSEjhGV9D90J6Bx@google.com>
+In-Reply-To: <ZDSEjhGV9D90J6Bx@google.com>
+Accept-Language: en-US
 Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Robert Hoo <robert.hu@intel.com>, pbonzini@redhat.com,
-        kvm@vger.kernel.org
-References: <20230310125718.1442088-1-robert.hu@intel.com>
- <20230310125718.1442088-3-robert.hu@intel.com> <ZAtW7PF/1yhgBwYP@google.com>
- <CA+wubQAXBFthBhsNqWDtY=Qf4-FtfJ3dojJctXXg=iokXJRbmg@mail.gmail.com>
- <ZBHz7kL7wSRZzvKk@google.com>
- <CA+wubQBDU4y97HrShmn+=0=o0HGwTckU1_y+VJLCuJtf2M+fyw@mail.gmail.com>
- <ZDRW2zvPxa3ekDVv@google.com>
-From:   Hoo Robert <robert.hoo.linux@gmail.com>
-In-Reply-To: <ZDRW2zvPxa3ekDVv@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-3.4 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
-        DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-        autolearn_force=no version=3.4.6
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SA1PR11MB6734:EE_|SA2PR11MB4906:EE_
+x-ms-office365-filtering-correlation-id: ef8aacd6-3777-44e7-82ea-08db3a4a80f6
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: fRV+MMCqMNDh3eoIhvkGnSfFhEIIazzsmGITTRtt3HG0JhucrsQMftebfpFUVAsSRrk8sJ2m4qlVa/50ypYi+kEhCnVH6+gs4VKIipsRMEH1wan3PSsVdEs+qzhXhp16dr64xxMz7nIjRmngQ39iLJuOFaipinalLnQrnaVWtw/FPF/Rcp8dsvb3WzjZr2Ij8vEC+NGESfRxg4E5Ksoz3FNBcAWx4xgslP/xFSZTthkijL9OEM0nTpzj36WWJcx9BqzycK0RTPgrlZMhqCTJ/zEtqUiyssOvvNhtQnZxkLAUSNa9A9AdJLyaHnVeiuKhzU12jS/yFJyhEWbUiHr+eLNHrK/kXW+1Fq66GJn0uOKkP1CrsQixrBIBoe2vsZ2VkcPlB5JJKetLcKKCZ1QwRJGnYinndN04DDNS+GfVJRJPJfEUQ2yDW5gXmxT5reb3EKIlqPi63RqjZeugcVSaKlvwnMjO3dwuYBG/hpfm36wF9wIWd8CBj7jV3ODYDqwjgpQw3wXfeQclfSO5t1l5bARkyX6X6wYnKTj4MJAT+jWu32klU2Bi7uQPrRBzSlEI+LxY9mtq48PEHbUOnTJFUTlwI3rcK9hIA/E1WHxugv0=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA1PR11MB6734.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(366004)(39860400002)(376002)(346002)(136003)(396003)(451199021)(478600001)(7696005)(71200400001)(6506007)(316002)(54906003)(26005)(9686003)(186003)(2906002)(4744005)(66556008)(76116006)(66946007)(4326008)(52536014)(64756008)(41300700001)(7416002)(5660300002)(66446008)(66476007)(8676002)(8936002)(6916009)(38070700005)(38100700002)(122000001)(55016003)(33656002)(82960400001)(86362001);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?ZCnLSQ7QtwCJy8L2cdDYqyV3UWW+GiDxJ/6dxm4Wcxb28vxFBigDL2OJ/evj?=
+ =?us-ascii?Q?xdVLsWTAMhdeJQLLz6KFt7ogy9DQsYz9GW3q2E/YuNI3bXmkT0vtW2UoGoHW?=
+ =?us-ascii?Q?V6ekxHOfl9QvAxiAQ8VW9mxtK7BcJd1SiBeZMprP9gokYfvdnbt6tdXljW//?=
+ =?us-ascii?Q?5pqF6oUThPhu05+zgF42VNAPehTMs20bb/TZLSqVUPkR4FDwCpPpwgSDuLEw?=
+ =?us-ascii?Q?dWVpdikZUr+fz2m51aEgRo9ww2Q2AvscEDpUTqEdyQCgV1PRpYDJg3+AiduT?=
+ =?us-ascii?Q?SJGaK5YFkplBqIWqKf8W+hcDsVD2BHPR3+J4CcHn7dz4/cZELnKsWgtMzBYx?=
+ =?us-ascii?Q?DJy1IjiXp+t99LatKWTcwVGSsdz8NRHFi/kMN8dR5jMzQxVAji/zDzwkNHBY?=
+ =?us-ascii?Q?L7A74HEZjTdH7UHiV1S6rDZJfwUKmWTG9dJF7iFEmoNUTiFwdv0bTHWpURYC?=
+ =?us-ascii?Q?Gc20y9IVM9DwLD4d4QoihY7tyBfTdRY+iy2H75dme2VRhid/K5e68BH9hzFR?=
+ =?us-ascii?Q?y5S88WUBcVv/viv0IBqEqMGHng2ccaQwILnUpIRB52m+rW0O5SRRcWgsC0cS?=
+ =?us-ascii?Q?m5ziWTem7tjewZivnyWgWXI6DkW0t82rp/uISQHhBwO9FXEp5tGMvCtE2zWl?=
+ =?us-ascii?Q?JUIlfWyxmxZA0GrRU+T3/ozBXhfZnePTeHDAMatbE29cRcJI9LbiMyap7Nt5?=
+ =?us-ascii?Q?2UNw46Q6Y12owxuhnszbiFmueMOoM+8tJmIuls6/4DMupOju39y44hD3E4vb?=
+ =?us-ascii?Q?e26FwzXKHy7jLCkFUb9+L5B1ZTfbrieNp+L7FSjk2ch6a6qzTXTWZbZyfDWC?=
+ =?us-ascii?Q?Fv+LYZuNqZSi3QcvTMBSLeKWPLjWe9BcPhLGxYtm12WMDw72WyD+LUL1JkqL?=
+ =?us-ascii?Q?rKD7K+SwWcK/7NwTFzNry2vRZVraQySbAWtSAdTSxJ+6XOzeHWfvf+TeS3v4?=
+ =?us-ascii?Q?rPKEFGgo6DEuTQf/tpINI4iRhlqOOjsmwXGUFCyOtiB2Z5Po0ZZw1d1kxCqp?=
+ =?us-ascii?Q?qYQzVDNhUfIEUHhHpVkUKWWxcQXNOaaSLfuKjRqgugAOhk8aG3otCr2sFlPt?=
+ =?us-ascii?Q?fQgBLEmiAzfEoZ4EHVJWJjJwABYQE9s54KlPwkBzcKHql/qzQm0+c54DFiiN?=
+ =?us-ascii?Q?s0SWVN3sg310iOuveLvGuOTExCBqh66Ln6ScF22zu04AvQOiNBaNhGTknVYZ?=
+ =?us-ascii?Q?t4Ou7cH87OvVi60RzYInFv9EfRg0lc86q9uepaLQQVtbTqrCTbJhzOzoof2m?=
+ =?us-ascii?Q?HHD0d22HDhWHID4mReWHOIVkQbCu+ysuM6MuBxf3WEyvXUBfFroW9k8xVK8X?=
+ =?us-ascii?Q?Q/aKIkLpX6OmMRidoloXn+ZnZX7R8geeIvWmoFN4hY5GvQdRm9AGmuO01VpY?=
+ =?us-ascii?Q?6x492nunrymGRKyqNvLfDmWC9qqzYHa8ALAhAbXCInLTzx33GwHLiOY3WonQ?=
+ =?us-ascii?Q?U4KBeScDIt6WAilwZAf92BlFn5b4ED2NXxQ9UgIVEukdyBNuTpCmTX89mS9H?=
+ =?us-ascii?Q?f2evqvgfK34mtwJHetCbpiW8YHPBTKMfL5wayAJmSCyn1LwNXnNVQMs5Q0Zo?=
+ =?us-ascii?Q?/sb8VPuSl6YQGPG7CLM=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SA1PR11MB6734.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ef8aacd6-3777-44e7-82ea-08db3a4a80f6
+X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Apr 2023 05:06:26.8105
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: XptcG5hEApTwIxJ3y3b3MYWpyRGWy/I0vvMvyI8KCCVNytsMEBo6kcBjrNP+gCwNx1GgPKCJSfq6yy6sVlfeAA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA2PR11MB4906
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-2.5 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2023/4/11 2:35, Sean Christopherson wrote:
-> On Fri, Mar 31, 2023, Robert Hoo wrote:
->> Sean Christopherson <seanjc@google.com> 于2023年3月16日周四 00:36写道：
->>>> Sorry I don't follow you.
->>>> My point is that, given it has passed kvm_is_valid_cr4() (in kvm_set_cr4()),
->>>> we can assert boot_cpu_has(X86_FEATURE_UMIP)  and vmx_umip_emulated() must be
->>>> at least one true.
->>>
->>> This assertion is wrong for the case where guest.CR4.UMIP=0.  The below code is
->>> not guarded with a check on guest.CR4.UMIP.  If the vmx_umip_emulated() check goes
->>> away and guest.CR4.UMIP=0, KVM will attempt to write secondary controls.
->>>
->>
->> Sorry still don't follow you. Do you mean in nested case? the "guest"
->> above is L1?
-> 
-> Please take the time to walk through the code with possible inputs/scenarios before
-> asking these types of questions, e.g. if necessary use a whiteboard, pen+paper, etc.
-> I'm happy to explain subtleties and add answer specific questions, but as evidenced
-> by my delayed response, I simply do not have the bandwidth to answer questions where
-> the answer is literally a trace-through of a small, fully contained section of code.
+>=20
+>  	kvm_before_interrupt(vcpu, KVM_HANDLING_IRQ);
+> -	vmx_do_interrupt_irqoff(gate_offset(desc));
+> +	if (cpu_feature_enabled(X86_FEATURE_FRED))
+> +		vmx_do_fred_interrupt_irqoff(vector);
+> +	else
+> +		vmx_do_interrupt_irqoff(gate_offset((gate_desc *)host_idt_base
 
-Sure, fully understand your busyness, thanks for still providing detailed 
-explanation. Sorry for the annoyance.
 
-Given that you've merged host UMIP cap check into vmx_umip_emulated(), I 
-might have not tangled in this point.
+external_interrupt() is always available on x86_64, even when CONFIG_X86_FR=
+ED
+is not defined. I prefer to always call external_interrupt() on x86_64 for =
+IRQ
+handling, which avoids re-entering noinstr code. how do you think? Too
+aggressive?
 
-We can close this thread of patch set now.
-> 
-> 	if (!boot_cpu_has(X86_FEATURE_UMIP)) {    <= evaluates true when UMIP is NOT supported
-> 		if (cr4 & X86_CR4_UMIP) {         <= evaluates false when guest.CR4.UMIP == 0
-> 			secondary_exec_controls_setbit(vmx, SECONDARY_EXEC_DESC);
-> 			hw_cr4 &= ~X86_CR4_UMIP;
-> 		} else if (!is_guest_mode(vcpu) || <= evalutes true when L2 is NOT active
-> 			!nested_cpu_has2(get_vmcs12(vcpu), SECONDARY_EXEC_DESC)) {
-> 			secondary_exec_controls_clearbit(vmx, SECONDARY_EXEC_DESC); <= KVM "blindly" writes secondary controls
-> 		}
-> 	}
+Thanks!
+  Xin
+
+
+> +
+> +vector));
+>  	kvm_after_interrupt(vcpu);
