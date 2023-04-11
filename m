@@ -2,194 +2,144 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1AC5C6DDEA4
-	for <lists+kvm@lfdr.de>; Tue, 11 Apr 2023 16:58:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AB91B6DE061
+	for <lists+kvm@lfdr.de>; Tue, 11 Apr 2023 18:03:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230096AbjDKO64 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Apr 2023 10:58:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50120 "EHLO
+        id S230146AbjDKQDK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Apr 2023 12:03:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57118 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229864AbjDKO6y (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 Apr 2023 10:58:54 -0400
-Received: from mail-oa1-x35.google.com (mail-oa1-x35.google.com [IPv6:2001:4860:4864:20::35])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 513D6272B
-        for <kvm@vger.kernel.org>; Tue, 11 Apr 2023 07:58:52 -0700 (PDT)
-Received: by mail-oa1-x35.google.com with SMTP id 586e51a60fabf-18447b9a633so7362460fac.7
-        for <kvm@vger.kernel.org>; Tue, 11 Apr 2023 07:58:52 -0700 (PDT)
+        with ESMTP id S229525AbjDKQC4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 Apr 2023 12:02:56 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1CC0AF9
+        for <kvm@vger.kernel.org>; Tue, 11 Apr 2023 09:02:55 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id 202-20020a2502d3000000b00b8d404ac555so11806324ybc.14
+        for <kvm@vger.kernel.org>; Tue, 11 Apr 2023 09:02:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1681225131; x=1683817131;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JUzuStF55OhH4eYJH9aoC4gqNsDP4T1tXhgFLxA6Gjo=;
-        b=nPlZ7EJ4LlvNMM7msupsPQS6oXYYW6nRWe9Y9uR8NI2kQxz7q6XIRvI/j+7eVOgGyK
-         AWPjUjGgqH7W+HLqNVWo6n//cgFGnycoAFwwD12SGiY9jvAB6Eo/DbZ3kkVHPz4BTRxv
-         8qnlW/suArakriYS8Y/RTEaP30ThehXxph/k016mx2YbaEO+o31xy4iWVAirb3+Nc+oN
-         qpCO84/x9tQjDjDt0An/iROzPMy66W6TWgBsN8fK0XNNAFgPjBs4YhRSqdDxvRjAOw6Y
-         CAPtW4WQXymaYyC8+WQSHSZ76yLdQxxD3ZMYO3gauaINwjcCfyv+nJ+2xfPmmVz9tCez
-         yJDw==
+        d=google.com; s=20221208; t=1681228974;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=dAeE7rBx2LrEXGBOeJAa11rA6LzPuJMSc3yrCGL+cOo=;
+        b=yHKE0ADk4mlLhhfRhtgCadpVkMpvaHdD8O+iQcvjrzCzWiWCoMxJ5B6WSy8oSIrtU+
+         86IzlzFKFuCL/splmCmz4Y+fXbPQeHRrrVeQ+fp1Zod8GOX1yf6SIb2XwpKJF2DaXbiH
+         addi8Cj3zaUQD9mEDa5w9UMN9fbhWcC0M8q3n01RY8du83aaL27mCvHpFnmkP4CPdio+
+         RG5//irHEyT9DFgwyTszL4Au6tMwBD4ko1UI3T5Ti+vyGLSb50Fzz/L9e+R+6H3pfWE4
+         cjjomGR/siYxw8Zw1Vi7iFRkAD6mV5w3EPJjtgz1yxif0YQZAHJlSKHB8MoMvYIQ8xCs
+         i6Vw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1681225131; x=1683817131;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=JUzuStF55OhH4eYJH9aoC4gqNsDP4T1tXhgFLxA6Gjo=;
-        b=sNHO2DX2tlf5ZjSTgiQSW2Bw8e/Im766w46rQcmS3VJEplc8I9nhwoMaN9hu4+4aj7
-         estnIsTyljI+JVh0kTXlsPOPb3dKXk6Z3PT6JwcKwm5WWPMSHaoelrv8C1hwf9jLFo+M
-         kOjgk+0CxBgGTzOF23JSDgAIg6xawXgjahPx+2DW5DpDwbYIeXPXVaRK8/jbNoWoNIT/
-         65Nbq71bjzSoDgcx7s9K4yEzwJiFHgNScEGKYmy+hBDUDG8jToMDS5m9aonTO6pzhKx4
-         PkyEW1MEFaWi660GLW764bXEBIPzSngcoknER8pdRPl2nsO79sJySVnC0cAweiyGF6nC
-         g7fw==
-X-Gm-Message-State: AAQBX9fJMRUQpMdAurtrImDzmZWq/HmyNWC23NiLMGiA7G5YDsy722ba
-        bxL7Ci6S/nMhxjI00ytNU04r9/moGoud1lM9iPqCJzqjuvQdMQuNifQ=
-X-Google-Smtp-Source: AKy350Yu+cBKD9wvjtZX8dK6tlgo9sLprQfwWnmxGLSCUDD9zYyvKMNPRvM6luF4TTHhHeslEBSgbo0XOSGOyvc7wW8=
-X-Received: by 2002:a05:6870:7012:b0:177:c2fb:8cec with SMTP id
- u18-20020a056870701200b00177c2fb8cecmr1469994oae.9.1681225131251; Tue, 11 Apr
- 2023 07:58:51 -0700 (PDT)
-MIME-Version: 1.0
-References: <20230410105056.60973-1-likexu@tencent.com> <20230410105056.60973-6-likexu@tencent.com>
- <CALMp9eTLvJ6GW1mfgjO7CL7tW-79asykyz9=Fb=FfT74VRkDVA@mail.gmail.com>
- <9a7d5814-9eb1-d7af-7968-a6e3ebb90248@gmail.com> <CALMp9eR6DwY0EjAb1hcV9XGWQizN6R0dXtLaC4NXDgtCqv5cTA@mail.gmail.com>
- <81bbb700-9346-3d0d-ab86-6e684b185772@gmail.com>
-In-Reply-To: <81bbb700-9346-3d0d-ab86-6e684b185772@gmail.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Tue, 11 Apr 2023 07:58:40 -0700
-Message-ID: <CALMp9eSKnE8+jMpp0KzBRC7NDjT+S2cRz9CcBNDKB7JCU8dmTg@mail.gmail.com>
-Subject: Re: [PATCH V5 05/10] KVM: x86/pmu: Disable vPMU if the minimum num of
- counters isn't met
-To:     Like Xu <like.xu.linux@gmail.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-15.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,ENV_AND_HDR_SPF_MATCH,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL,
-        USER_IN_DEF_SPF_WL autolearn=unavailable autolearn_force=no
-        version=3.4.6
+        d=1e100.net; s=20210112; t=1681228974;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=dAeE7rBx2LrEXGBOeJAa11rA6LzPuJMSc3yrCGL+cOo=;
+        b=mj7Y2FwNJ1EC5OFkrYQCijB8dTaBctdCL69yE86HxIk5llN5NWxkXL4HsUju6IzGTx
+         V1rZ2gsMVkGkaoW5c5A3nYv+jfLuXKLegJO1qDcM203UquFOpwfkz/8o0fhFMCnlK6LN
+         Q1UtaimiUzyqSV40KWzSnqdkqCPYGfTqxJcLlYlEav/Um5LQRwPmT3cm8bA8K8Y5WSzB
+         Fok38ZBuhwD9rACG9+VEmUKvljhzm0sSvGaVgZCsPt3tMx7mwk+Mb1q4WonSd5sFLMIm
+         356g2bb3ISEo3V2XsvzEEGSZeufjuDqhX7AZ82k5GdxynRU1Z+LVfmVHuWYWgTNiRj3p
+         zHKQ==
+X-Gm-Message-State: AAQBX9dYRMIL5K1vDCyNdb2+/yJjfiPHF+J9EZkboHqh80zQNDb12QT3
+        OOYT+hy/H61T3U+0S2jwPcbXpaqXBdQ=
+X-Google-Smtp-Source: AKy350bPU43l2NGxsAIr+vg/0jzFplV883M5PQxzo3Pp2tOzb6IG6EspbBN7X/pTYgjclcvEKd4crZlm/tg=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:690c:c9a:b0:533:a15a:d33e with SMTP id
+ cm26-20020a05690c0c9a00b00533a15ad33emr9641481ywb.5.1681228974368; Tue, 11
+ Apr 2023 09:02:54 -0700 (PDT)
+Date:   Tue, 11 Apr 2023 09:02:52 -0700
+In-Reply-To: <ecd3d8de-859b-e5dd-c3bf-ea9c3c0aac60@linux.microsoft.com>
+Mime-Version: 1.0
+References: <20230227171751.1211786-1-jpiotrowski@linux.microsoft.com>
+ <ZAd2MRNLw1JAXmOf@google.com> <959c5bce-beb5-b463-7158-33fc4a4f910c@linux.microsoft.com>
+ <ZDSa9Bbqvh0btgQo@google.com> <ecd3d8de-859b-e5dd-c3bf-ea9c3c0aac60@linux.microsoft.com>
+Message-ID: <ZDWEgXM/UILjPGiG@google.com>
+Subject: Re: [PATCH] KVM: SVM: Disable TDP MMU when running on Hyper-V
+From:   Sean Christopherson <seanjc@google.com>
+To:     Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Tianyu Lan <ltykernel@gmail.com>,
+        Michael Kelley <mikelley@microsoft.com>
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-7.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Apr 11, 2023 at 6:18=E2=80=AFAM Like Xu <like.xu.linux@gmail.com> w=
-rote:
->
-> On 11/4/2023 8:58 pm, Jim Mattson wrote:
-> > On Mon, Apr 10, 2023 at 11:17=E2=80=AFPM Like Xu <like.xu.linux@gmail.c=
-om> wrote:
+On Tue, Apr 11, 2023, Jeremi Piotrowski wrote:
+> On 4/11/2023 1:25 AM, Sean Christopherson wrote:
+> > On Wed, Apr 05, 2023, Jeremi Piotrowski wrote:
+> >> On 3/7/2023 6:36 PM, Sean Christopherson wrote:
+> >>> Thinking about this more, I would rather revert commit 1e0c7d40758b ("KVM: SVM:
+> >>> hyper-v: Remote TLB flush for SVM") or fix the thing properly straitaway.  KVM
+> >>> doesn't magically handle the flushes correctly for the shadow/legacy MMU, KVM just
+> >>> happens to get lucky and not run afoul of the underlying bugs.  The revert appears
+> >>> to be reasonably straightforward (see bottom).
 > >>
-> >> On 11/4/2023 1:36 pm, Jim Mattson wrote:
-> >>> On Mon, Apr 10, 2023 at 3:51=E2=80=AFAM Like Xu <like.xu.linux@gmail.=
-com> wrote:
-> >>>>
-> >>>> From: Like Xu <likexu@tencent.com>
-> >>>>
-> >>>> Disable PMU support when running on AMD and perf reports fewer than =
-four
-> >>>> general purpose counters. All AMD PMUs must define at least four cou=
-nters
-> >>>> due to AMD's legacy architecture hardcoding the number of counters
-> >>>> without providing a way to enumerate the number of counters to softw=
-are,
-> >>>> e.g. from AMD's APM:
-> >>>>
-> >>>>    The legacy architecture defines four performance counters (PerfCt=
-rn)
-> >>>>    and corresponding event-select registers (PerfEvtSeln).
-> >>>>
-> >>>> Virtualizing fewer than four counters can lead to guest instability =
-as
-> >>>> software expects four counters to be available.
-> >>>
-> >>> I'm confused. Isn't zero less than four?
+> >> Hi Sean,
 > >>
-> >> As I understand it, you are saying that virtualization of zero counter=
- is also
-> >> reasonable.
-> >> If so, the above statement could be refined as:
+> >> I'm back, and I don't have good news. The fix for the missing hyperv TLB flushes has
+> >> landed in Linus' tree and I now had the chance to test things outside Azure, in WSL on my
+> >> AMD laptop.
 > >>
-> >>          Virtualizing fewer than four counters when vPMU is enabled ma=
-y lead to guest
-> >> instability
-> >>          as software expects at least four counters to be available, t=
-hus the vPMU is
-> >> disabled if the
-> >>          minimum number of KVM supported counters is not reached durin=
-g initialization.
+> >> There is some seriously weird interaction going on between TDP MMU and Hyper-V, with
+> >> or without enlightened TLB. My laptop has 16 vCPUs, so the WSL VM also has 16 vCPUs.
+> >> I have hardcoded the kernel to disable enlightened TLB (so we know that is not interfering).
+> >> I'm running a Flatcar Linux VM inside the WSL VM using legacy BIOS, a single CPU
+> >> and 4GB of RAM.
 > >>
-> >> Jim, does this help you or could you explain more about your confusion=
- ?
-> >
-> > You say that "fewer than four counters can lead to guest instability
-> > as software expects four counters to be available." Your solution is
-> > to disable the PMU, which leaves zero counters available. Zero is less
-> > than four. Hence, by your claim, disabling the PMU can lead to guest
-> > instability. I don't see how this is an improvement over one, two, or
-> > three counters.
->
-> As you know, AMD pmu lacks an architected method (such as CPUID) to
-> indicate that the VM does not have any pmu counters available for the
-> current platform. Guests like Linux tend to check if their first counters
-> exist and work properly to infer that other pmu counters exist.
+> >> If I run with `kvm.tdp_mmu=0`, I can boot and shutdown my VM consistently in 20 seconds.
+> >>
+> >> If I run with TDP MMU, the VM boot stalls for seconds at a time in various spots
+> >> (loading grub, decompressing kernel, during kernel boot), the boot output feels like
+> >> it's happening in slow motion. The fastest I see it finish the same cycle is 2 minutes,
+> >> I have also seen it take 4 minutes, sometimes even not finish at all. Same everything,
+> >> the only difference is the value of `kvm.tdp_mmu`.
+> > 
+> > When a stall occurs, can you tell where the time is lost?  E.g. is the CPU stuck
+> > in L0, L1, or L2?  L2 being a single vCPU rules out quite a few scenarios, e.g.
+> > lock contention and whatnot.
+> 
+> It shows up as around 90% L2 time, 10% L1 time.
 
-"Guests like Linux," or just Linux? What do you mean by "tend"? When
-do they perform this check, and when do they not?
+Are those numbers coming from /proc/<pid>/stat?  Something else?
 
-> If KVM chooses to emulate greater than 1 less than 4 counters, then the
-> AMD guest PMU agent may assume that there are legacy 4 counters all
-> present (it's what the APM specifies), which requires the legacy code
-> to add #GP error handling for counters that should exist but actually not=
-.
+> I don't have great visibility into L0 time right now, I'm trying to find
+> someone who might be able to help with that.
+> 
+> > 
+> > If you can run perf in WSL, that might be the easiest way to suss out what's going
+> > on.
+> 
+> I can run perf, what trace would help?
 
-I would argue that regardless of the number of counters emulated, a
-guest PMU agent may assume that the 4 legacy counters are present,
-since that's what the APM specifies.
+Good question.  I'm not exactly a perf expert and almost never do anything beyond
+`perf top`.  That's probably sufficient for now, I really just want to confirm that
+L1 doesn't appear to be stuck, e.g. in KVM's page fault handler.
 
-> So at Sean's suggestion, we took a conservative approach. If KVM detects
-> less than 4 counters, we think KVM (under the current configuration and
-> platform) is not capable of emulating the most basic AMD pmu capability.
-> A large number of legacy instances are ready for 0 or 4+ ctrs, not 2 or 3
+> The results are the same for both branches, and it does look like this affects AMD and
+> Intel equally.
 
-Which specific guest operating systems is this change intended for?
+Nice.  I have Intel hardware at home that I'll try to repro on, though it will
+be several weeks until I can dive into this.
 
-> Does this help you ? I wouldn't mind a better move.
+> So seeing as this will likely take a while to figure out (and I know I won't be able to
+> spend too many cycles on this in the next few weeks), what do you think of a patch to
+> disable tdp_mmu in this configuration (for the time being?).
 
-Which AMD platforms have less than 4 counters available?
+I don't particularly love the idea of disabling the TDP MMU without having the
+slightest clue what's going wrong, but I'm not totally opposed to it.
 
->
-> >
-> >>>
-> >>>> Suggested-by: Sean Christopherson <seanjc@google.com>
-> >>>> Signed-off-by: Like Xu <likexu@tencent.com>
-> >>>> ---
-> >>>>    arch/x86/kvm/pmu.h | 3 +++
-> >>>>    1 file changed, 3 insertions(+)
-> >>>>
-> >>>> diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
-> >>>> index dd7c7d4ffe3b..002b527360f4 100644
-> >>>> --- a/arch/x86/kvm/pmu.h
-> >>>> +++ b/arch/x86/kvm/pmu.h
-> >>>> @@ -182,6 +182,9 @@ static inline void kvm_init_pmu_capability(const=
- struct kvm_pmu_ops *pmu_ops)
-> >>>>                           enable_pmu =3D false;
-> >>>>           }
-> >>>>
-> >>>> +       if (!is_intel && kvm_pmu_cap.num_counters_gp < AMD64_NUM_COU=
-NTERS)
+Paolo, any thoughts?  You have far more experience with supporting downstream
+consumers of KVM.
 
-Does this actually guarantee that the requisite number of counters are
-available and will always be available while the guest is running?
-What happens if some other client of the host perf subsystem requests
-a CPU-pinned counter after this checck?
+> Something else I've been wondering: in a KVM-on-KVM setup, is tdp_mmu used in both L0
+> and L1 hypervisors right now?
 
-> >>>> +               enable_pmu =3D false;
-> >>>> +
-> >>>>           if (!enable_pmu) {
-> >>>>                   memset(&kvm_pmu_cap, 0, sizeof(kvm_pmu_cap));
-> >>>>                   return;
-> >>>> --
-> >>>> 2.40.0
-> >>>>
+By default, yes.  I double checked that L2 has similar boot times for KVM-on-KVM
+with and without the TDP MMU.  Certainly nothing remotely close to 2 minutes.
