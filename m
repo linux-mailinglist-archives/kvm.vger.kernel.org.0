@@ -2,72 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A416C6DE453
-	for <lists+kvm@lfdr.de>; Tue, 11 Apr 2023 20:52:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 879A56DE4F9
+	for <lists+kvm@lfdr.de>; Tue, 11 Apr 2023 21:29:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229996AbjDKSwc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Apr 2023 14:52:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39874 "EHLO
+        id S229574AbjDKT3I (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Apr 2023 15:29:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34844 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229977AbjDKSwa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 Apr 2023 14:52:30 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 812D1ED;
-        Tue, 11 Apr 2023 11:52:29 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 1ED0B62335;
-        Tue, 11 Apr 2023 18:52:29 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 81A95C433D2;
-        Tue, 11 Apr 2023 18:52:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1681239148;
-        bh=mSnbGsMR4SI5aq+KU6O+gjNS18/DJIBc5MUBlVa+nEA=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=B4AMr9u7u1s4hB5ZbSVf1nmhtxJX7ERT4etW2qNaRdEX5gEi3ER+bPoQiKMqxY9kN
-         7Ryao7YnQ3ZB3w+AiKwQcez9WKRo4Va4XR75Qz+uD320rMB1+MUxbnw9UERaqWGqTR
-         zMlNRyRZzjTjr+AwsV92u8TH8OQAIs+nN9SJvG64+LSlC7erajDOdJzUPZ9OWgd0Jc
-         MMDk6if0BRlgJOgn25+MXYQSZUBjZbSj4EhWUrx7/k6X81Yu7naqp7c/IKQpzhqJ85
-         jNOQCjUKNWt06ZRJgN05vLqOvsGoMFVzWcNZgp6ks4Kl3NCtPSKKDlYURWFfgsqFgd
-         oMC+Ukh8wcwbw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 702F0E52441;
-        Tue, 11 Apr 2023 18:52:28 +0000 (UTC)
-Subject: Re: [GIT PULL] KVM changes for Linux 6.3-rc7
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <20230410153917.1313858-1-pbonzini@redhat.com>
-References: <20230410153917.1313858-1-pbonzini@redhat.com>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20230410153917.1313858-1-pbonzini@redhat.com>
-X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
-X-PR-Tracked-Commit-Id: 0bf9601f8ef0703523018e975d6c1f3fdfcff4b9
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: aa4c9185f0a16662c25d814c713b3cd0b4f4e97a
-Message-Id: <168123914845.3950.12244729448044204339.pr-tracker-bot@kernel.org>
-Date:   Tue, 11 Apr 2023 18:52:28 +0000
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     torvalds@linux-foundation.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, oliver.upton@linux.dev
-X-Spam-Status: No, score=-2.5 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.6
+        with ESMTP id S229527AbjDKT3H (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 Apr 2023 15:29:07 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6F5C135
+        for <kvm@vger.kernel.org>; Tue, 11 Apr 2023 12:28:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1681241300;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=5ZEKtuwNJGmtYAK5ZDQZnYdhRcfjYTid9CwH+lPhpUg=;
+        b=b2vJK1zSQ04erV8PJ3WaZ++IQgDwSHYhXI52SO0qZ+s4TzK+dH/www6ggCk9OcmUoeqK+Y
+        X/tuvCPbS/y2fSuC1k63nZNA9q3gigbOJ1zszCaVVXm7/FrIgdzThpMRAW3Lpxec31kUnu
+        2B58Z6tenJG/wXTCnbkqTJUQVy8xgCs=
+Received: from mail-io1-f71.google.com (mail-io1-f71.google.com
+ [209.85.166.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-47-Nc7z37r5MUCie-ONoXg2Xw-1; Tue, 11 Apr 2023 15:28:19 -0400
+X-MC-Unique: Nc7z37r5MUCie-ONoXg2Xw-1
+Received: by mail-io1-f71.google.com with SMTP id i68-20020a6b3b47000000b00760a6d1a015so48742ioa.1
+        for <kvm@vger.kernel.org>; Tue, 11 Apr 2023 12:28:18 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1681241298; x=1683833298;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=5ZEKtuwNJGmtYAK5ZDQZnYdhRcfjYTid9CwH+lPhpUg=;
+        b=yuVMMUdtG0Ovoy7ouVbBIKSGks0lhUZYTvAoRxsxPjmP9n1CdwP53JDxrKRXwMXhcv
+         Z/nEGyhZ9heHPbeMgj0QljQEI9gX1PPsy2gyp+dmSNTJT593hfJ6pcL97p1qQ1HaLNUL
+         l+Md7h+ykl96HCUu/LaZkL2WmAQ8hr+awwt0x+ERmJqZaAoGJsba+byk59k45kddavWM
+         H1OCE/1rWI3cx8eL5VMIvG+mNuKVOIXpTiYtBWRTwOwC4W+zfd5kbWwxBhtFismoMfH9
+         EPG041e9FrWWrwv7xoF9UcFjNs6kX1xUVU7yVNU9UDE6X0Bazm30j9OttxnmRMxToRWL
+         dzSg==
+X-Gm-Message-State: AAQBX9cRv5QDbmnDCIZNZyv74paWnatJTT4MPmDEtyFCXkPWyrZFRm5v
+        AHI4k2t7yWaqQWe56Hn9HG8jpBn2T82D5fxj1FO2E87ziQOPuldg8EeRUFRNufIZYEoocuG6P20
+        sWLPdPsEV/W4DeYndZ8q7
+X-Received: by 2002:a92:512:0:b0:315:359e:2750 with SMTP id q18-20020a920512000000b00315359e2750mr9530561ile.20.1681241298002;
+        Tue, 11 Apr 2023 12:28:18 -0700 (PDT)
+X-Google-Smtp-Source: AKy350Y075HOqnk/ugsl6NkWBPtpulmp36BmS/tHbbyW71cHGowa9WPQAwjw+UvrRMkSIzSJi80jow==
+X-Received: by 2002:a92:512:0:b0:315:359e:2750 with SMTP id q18-20020a920512000000b00315359e2750mr9530556ile.20.1681241297782;
+        Tue, 11 Apr 2023 12:28:17 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id v3-20020a92c6c3000000b003292f183c95sm113795ilm.58.2023.04.11.12.28.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 11 Apr 2023 12:28:17 -0700 (PDT)
+Date:   Tue, 11 Apr 2023 13:28:03 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Yi Liu <yi.l.liu@intel.com>
+Cc:     jgg@nvidia.com, kevin.tian@intel.com, cohuck@redhat.com,
+        eric.auger@redhat.com, kvm@vger.kernel.org, mjrosato@linux.ibm.com,
+        chao.p.peng@linux.intel.com, yi.y.sun@linux.intel.com,
+        pbonzini@redhat.co
+Subject: Re: [PATCH v2] docs: kvm: vfio: Require call KVM_DEV_VFIO_GROUP_ADD
+ before VFIO_GROUP_GET_DEVICE_FD
+Message-ID: <20230411132803.4628e9fc.alex.williamson@redhat.com>
+In-Reply-To: <20230222022231.266381-1-yi.l.liu@intel.com>
+References: <20230222022231.266381-1-yi.l.liu@intel.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The pull request you sent on Mon, 10 Apr 2023 11:39:17 -0400:
+On Tue, 21 Feb 2023 18:22:31 -0800
+Yi Liu <yi.l.liu@intel.com> wrote:
 
-> https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
+> as some vfio_device drivers require a kvm pointer to be set in their
+> open_device and kvm pointer is set to VFIO in GROUP_ADD path.
+> 
+> Signed-off-by: Yi Liu <yi.l.liu@intel.com>
+> ---
+> v2:
+>  - Adopt Alex's suggestion
+> v1: https://lore.kernel.org/kvm/20230221034114.135386-1-yi.l.liu@intel.com/
+> ---
+>  Documentation/virt/kvm/devices/vfio.rst | 7 +++++++
+>  1 file changed, 7 insertions(+)
+> 
+> diff --git a/Documentation/virt/kvm/devices/vfio.rst b/Documentation/virt/kvm/devices/vfio.rst
+> index 2d20dc561069..79b6811bb4f3 100644
+> --- a/Documentation/virt/kvm/devices/vfio.rst
+> +++ b/Documentation/virt/kvm/devices/vfio.rst
+> @@ -39,3 +39,10 @@ KVM_DEV_VFIO_GROUP attributes:
+>  	- @groupfd is a file descriptor for a VFIO group;
+>  	- @tablefd is a file descriptor for a TCE table allocated via
+>  	  KVM_CREATE_SPAPR_TCE.
+> +
+> +::
+> +
+> +The GROUP_ADD operation above should be invoked prior to accessing the
+> +device file descriptor via VFIO_GROUP_GET_DEVICE_FD in order to support
+> +drivers which require a kvm pointer to be set in their .open_device()
+> +callback.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/aa4c9185f0a16662c25d814c713b3cd0b4f4e97a
+I updated the title and commit log so as not to further construe that
+documentation can impose a requirement, otherwise applied to vfio next
+branch for v6.4.  Thanks,
 
-Thank you!
+Alex
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
