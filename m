@@ -2,283 +2,136 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DA24C6DDB2E
-	for <lists+kvm@lfdr.de>; Tue, 11 Apr 2023 14:49:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2D4FE6DDB52
+	for <lists+kvm@lfdr.de>; Tue, 11 Apr 2023 14:57:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230146AbjDKMtq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Apr 2023 08:49:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42046 "EHLO
+        id S229788AbjDKM5r (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Apr 2023 08:57:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50474 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229962AbjDKMto (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 Apr 2023 08:49:44 -0400
-Received: from mail-lf1-x131.google.com (mail-lf1-x131.google.com [IPv6:2a00:1450:4864:20::131])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A52AC3598;
-        Tue, 11 Apr 2023 05:49:42 -0700 (PDT)
-Received: by mail-lf1-x131.google.com with SMTP id 2adb3069b0e04-4ec81245826so118033e87.0;
-        Tue, 11 Apr 2023 05:49:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1681217381; x=1683809381;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7ku9EtcidlNtqzX67tTGk7M7yMsM3S1p2FOEotyJKGM=;
-        b=LZTaRb/GPUYSKZ/ADfwvuSArpnl6vPZdPpBDFYoP+SY0ux1wVFguYvKCR+95ix3eh2
-         E8voMJwnIoo0RwlNtzWfxaE3pEJ2AGTkUw9mn/hAFmZGgnYTnU9B1Lxw0GxUaXjSqi54
-         Kfxjow3C3x+rYYu8lJudhk9ccT2nzcmq44JrISUg8KSiIOGrPr+/vJVpBI69IOKsuxbK
-         EYlX2KHrPlcdwQfxYEyvDgT3e4xVdclpcgo6M+R0z0S8m+4nbkyJ4xhUraTbuHV5wFoL
-         F600vWOlRtrVVzB4XHoeipcHhZevx+eLKUavgRPKDB9ap/NXmR31dkkKDxV/Ticg7bpf
-         Yb1A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1681217381; x=1683809381;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=7ku9EtcidlNtqzX67tTGk7M7yMsM3S1p2FOEotyJKGM=;
-        b=ICaADtGuI/3teKFQxZGweUBWe7JJsUvjVs3edpP+tZSH9taVJg6aIqhIP/Em86SW1x
-         K29sf6MeBp/hb0XDfbbRWpu4LSlJSYflmY6356+hysw00AhZ5mBt7jiBShYSTm8uYwXY
-         iH0vrWSQVy/ObXrGVIikz91Zf1I73kwtoFGoTQmg3Ew58HxisG/xnOeqqO/4xUIz1irM
-         dGPOGn4NwWglnm0QoZuzRej24yZOVkEzfOHoiLCG2V8mEJf7prX2byyDppJHJDFTO0b5
-         ZvcdP+G4S52i5NhnKyHPFpwq77CS6I3Aqo9R0GRnGXaPc0KGxE5s/LxqWpTZZnT6OUYJ
-         4WWg==
-X-Gm-Message-State: AAQBX9djQHs9iWAmSn4CAF2SE32Qh9dnWpUDcz5ELPwfYDsLITar+aSe
-        YiiNkvc3qEu/9G1g8K2/NNM=
-X-Google-Smtp-Source: AKy350bpJXvlw9D7LATZrTsAdI7JV+0gaulLvdUNhugaedxAKu/eG4xClKMOvOOyImExCKHWff8Sqg==
-X-Received: by 2002:ac2:43ad:0:b0:4ec:89d3:a89d with SMTP id t13-20020ac243ad000000b004ec89d3a89dmr1262969lfl.4.1681217380737;
-        Tue, 11 Apr 2023 05:49:40 -0700 (PDT)
-Received: from localhost (88-115-161-74.elisa-laajakaista.fi. [88.115.161.74])
-        by smtp.gmail.com with ESMTPSA id d7-20020ac25447000000b004eb4357122bsm2543436lfn.259.2023.04.11.05.49.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 Apr 2023 05:49:40 -0700 (PDT)
-Date:   Tue, 11 Apr 2023 15:49:38 +0300
-From:   Zhi Wang <zhi.wang.linux@gmail.com>
-To:     isaku.yamahata@intel.com
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
-        erdemaktas@google.com, Sean Christopherson <seanjc@google.com>,
-        Sagi Shahar <sagis@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Kai Huang <kai.huang@intel.com>
-Subject: Re: [PATCH v13 064/113] KVM: TDX: Implement TDX vcpu enter/exit
- path
-Message-ID: <20230411154938.000059a9.zhi.wang.linux@gmail.com>
-In-Reply-To: <5a146e4b6a1e667b5ef6705f39b0d41ffa59a09e.1678643052.git.isaku.yamahata@intel.com>
-References: <cover.1678643051.git.isaku.yamahata@intel.com>
-        <5a146e4b6a1e667b5ef6705f39b0d41ffa59a09e.1678643052.git.isaku.yamahata@intel.com>
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
+        with ESMTP id S229862AbjDKM5o (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 Apr 2023 08:57:44 -0400
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on20601.outbound.protection.outlook.com [IPv6:2a01:111:f400:7eae::601])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D588E3596;
+        Tue, 11 Apr 2023 05:57:42 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=QOg0g+UCIKeaMDjGLz1NjF+DtIrh/v6zcltUKLqaigruQtjpNx3fCj2kRbzG6uvxPCC/DD/LM8Us5k/twI1KySMBeBlY24l9tLfdxAr7jBWeLVZAbCeD14ZSty6x/S3yeVTybLs8K773UE2werxjEdDCAzZXfQTypw0mAPRwodySnC5fdmi1UdZahPeYxtY2BtaLisn2sxA+Uvo3MJ6GBfspRndDM92+7Mam1LdvLQS0+ThGG9GYIwfpUvAkpFnZrl2McqxfxWatoronoKmPlYXv2WbIs4rcUCgQsq2oFnxEpXfQ6blnxhjgKGyyGhw5Kc5BYqSEalv+9+ynLiyZlQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=6akHvPytSWW+T1d0qLMeSDSVBA8yqoukOe7DUFGoOzs=;
+ b=R3VijdX0HhZvTrudobEigwH+SeIydZwoUjTxrzS+zyIYHJDTo0alv9uQyrU5j0H9RIwX1A9zKC3I+VTTGcwh4fa029OaSZLEI5iUJ9up/Kc4LwsYBcwHB8L+4F0YaXOjzFxuvFqGRn7YzaEmuwgN1A+e/oFZDJEEvTv39W1X76tTeoJ8tVVDkYxp5aqaaZSgNrOygg+cFLpGL2XFZQ+YlXGG5zWfKX9LqUXIGjPILM0OeoMJYxRznwjUwFITVqGpzLnslZYbGz5DR6WuB2sfOse0BETEQGaXV6s4TVCu1ZxB3i9qzTnH0PAucU7f+dYRyruT79JGDySFRFaIKC1mVw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=6akHvPytSWW+T1d0qLMeSDSVBA8yqoukOe7DUFGoOzs=;
+ b=rJmZzFycVdR/dwGo2U16wu2hf91/DlKy1IKmv4D+VnHIdo4fsY6HalC8bT928GUR7Ng7URKjwQsD4yzs4PlA1PdW7ThzhAAFB1zApt2VcCnXFJEPpYkyfzF+zjK6WsAFLwHrGFaPV27z7cW5ny7/AkRhYZ/aKz/4hB7sARdxUU8=
+Received: from MW4PR03CA0080.namprd03.prod.outlook.com (2603:10b6:303:b6::25)
+ by CH3PR12MB8329.namprd12.prod.outlook.com (2603:10b6:610:12e::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6277.38; Tue, 11 Apr
+ 2023 12:57:39 +0000
+Received: from CO1NAM11FT035.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:303:b6:cafe::4c) by MW4PR03CA0080.outlook.office365.com
+ (2603:10b6:303:b6::25) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6277.39 via Frontend
+ Transport; Tue, 11 Apr 2023 12:57:39 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ CO1NAM11FT035.mail.protection.outlook.com (10.13.175.36) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.6298.28 via Frontend Transport; Tue, 11 Apr 2023 12:57:39 +0000
+Received: from aiemdeew.1.ozlabs.ru (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Tue, 11 Apr
+ 2023 07:57:33 -0500
+From:   Alexey Kardashevskiy <aik@amd.com>
+To:     <kvm@vger.kernel.org>
+CC:     <x86@kernel.org>, <linux-kernel@vger.kernel.org>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Sean Christopherson <seanjc@google.com>,
+        "Pankaj Gupta" <pankaj.gupta@amd.com>,
+        Nikunj A Dadhania <nikunj@amd.com>,
+        "Santosh Shukla" <santosh.shukla@amd.com>,
+        Carlos Bilbao <carlos.bilbao@amd.com>,
+        Alexey Kardashevskiy <aik@amd.com>
+Subject: [PATCH kernel v5 0/6] KVM: SEV: Enable AMD SEV-ES DebugSwap
+Date:   Tue, 11 Apr 2023 22:57:12 +1000
+Message-ID: <20230411125718.2297768-1-aik@amd.com>
+X-Mailer: git-send-email 2.39.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
-        DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.180.168.240]
+X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1NAM11FT035:EE_|CH3PR12MB8329:EE_
+X-MS-Office365-Filtering-Correlation-Id: 72847b36-fcfb-4f98-f263-08db3a8c54d1
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: /v1pQIrbYePh9p0Wm4J1RCGw2CVC1kyTT3WcaV/H+E3lzfxaM1+7zfPNmFLC3kf5J9R/0/97iMlq5Iqd1g7hBqV7T/4hW7Q8VRhmD5H6Hi3RZ8AC2JE7anfq3NhWi6iGxzRft8q8bPGRbBVTdoGqC1Sh2i7OUiveT9QWauyPqvnJ/zVDnNjUonaSS9kqlbmiQ0JXUYCBnxwwxer64phvdIg92pRNXb3twyCb0lr+nSJRREf7zdib6FSod3MgVhXfO7hGt2dcz6wESxmk/a80AeaJ37HGc5fDiJvG6XOIh81VmmDUw8u7A5qzZ1l6qTdqtj4o+U99V1UxH+oCabJHalKOPxbslicc+tsW2lQ5iwTNtNtvNe+t7nU501//xIVvuuHxx1oCfmsK5NT6wZdF6l4Ho6N+bjWQyvlhurKxq95/tYDmlPI4Tv2fABPNcCEmMo1J65zDvoXbXyqA47UZYXWHOswJ+UxaBq9PvVKXr5CwSmAm5qojwwUCSu6rPCh7qYIK2NQ7rWApIJhQaJBFef3xZ8mIL6JvKYdMM7d3B05q9pZ2HHEqUVEfBQWyIReKMbWlo6JWE+gXLweWcTi6cgTob3TBVsWmhHwLIOC7rboojPbLbBYDxq0D5baQNeoJ6ByO2ouR0wjuPfnlu5LWp19K4A+rG3FxFfgVVkxtdIfXNXhJUMa8oYNxLrXfRclOxckt4JIfFARvaLwy5dJTMh63syfH7WE0RRi+KW2W54k=
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230028)(4636009)(136003)(376002)(396003)(39860400002)(346002)(451199021)(36840700001)(46966006)(40470700004)(6666004)(478600001)(40460700003)(40480700001)(47076005)(83380400001)(36756003)(82740400003)(81166007)(356005)(2616005)(36860700001)(426003)(16526019)(2906002)(966005)(336012)(316002)(1076003)(54906003)(26005)(186003)(41300700001)(8676002)(4326008)(82310400005)(8936002)(6916009)(5660300002)(70586007)(70206006)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Apr 2023 12:57:39.4372
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 72847b36-fcfb-4f98-f263-08db3a8c54d1
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT035.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB8329
+X-Spam-Status: No, score=0.8 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
+        DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,SPF_HELO_PASS,SPF_NONE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, 12 Mar 2023 10:56:28 -0700
-isaku.yamahata@intel.com wrote:
+This is to use another AMD SEV-ES hardware assisted register swap,
+more detail in 5/6. In the process it's been suggested to fix other
+things, here is the attempt, with the great help of amders.
 
-> From: Isaku Yamahata <isaku.yamahata@intel.com>
-> 
-> This patch implements running TDX vcpu.  Once vcpu runs on the logical
-> processor (LP), the TDX vcpu is associated with it.  When the TDX vcpu
-> moves to another LP, the TDX vcpu needs to flush its status on the LP.
-> When destroying TDX vcpu, it needs to complete flush and flush cpu memory
-> cache.  Track which LP the TDX vcpu run and flush it as necessary.
-> 
-> Do nothing on sched_in event as TDX doesn't support pause loop.
-> 
-> TDX vcpu execution requires restoring PMU debug store after returning back
-> to KVM because the TDX module unconditionally resets the value.  To reuse
-> the existing code, export perf_restore_debug_store.
-> 
-> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> ---
->  arch/x86/kvm/vmx/main.c    | 21 +++++++++++++++++++--
->  arch/x86/kvm/vmx/tdx.c     | 32 ++++++++++++++++++++++++++++++++
->  arch/x86/kvm/vmx/tdx.h     | 33 +++++++++++++++++++++++++++++++++
->  arch/x86/kvm/vmx/x86_ops.h |  2 ++
->  arch/x86/kvm/x86.c         |  1 +
->  5 files changed, 87 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
-> index 55001b34e1f0..2fd6c954590d 100644
-> --- a/arch/x86/kvm/vmx/main.c
-> +++ b/arch/x86/kvm/vmx/main.c
-> @@ -170,6 +170,23 @@ static void vt_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
->  	vmx_vcpu_reset(vcpu, init_event);
->  }
->  
-> +static int vt_vcpu_pre_run(struct kvm_vcpu *vcpu)
-> +{
-> +	if (is_td_vcpu(vcpu))
-> +		/* Unconditionally continue to vcpu_run(). */
-> +		return 1;
-> +
-> +	return vmx_vcpu_pre_run(vcpu);
-> +}
-> +
-> +static fastpath_t vt_vcpu_run(struct kvm_vcpu *vcpu)
-> +{
-> +	if (is_td_vcpu(vcpu))
-> +		return tdx_vcpu_run(vcpu);
-> +
-> +	return vmx_vcpu_run(vcpu);
-> +}
-> +
->  static void vt_flush_tlb_all(struct kvm_vcpu *vcpu)
->  {
->  	if (is_td_vcpu(vcpu)) {
-> @@ -323,8 +340,8 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
->  	.flush_tlb_gva = vt_flush_tlb_gva,
->  	.flush_tlb_guest = vt_flush_tlb_guest,
->  
-> -	.vcpu_pre_run = vmx_vcpu_pre_run,
-> -	.vcpu_run = vmx_vcpu_run,
-> +	.vcpu_pre_run = vt_vcpu_pre_run,
-> +	.vcpu_run = vt_vcpu_run,
->  	.handle_exit = vmx_handle_exit,
->  	.skip_emulated_instruction = vmx_skip_emulated_instruction,
->  	.update_emulated_instruction = vmx_update_emulated_instruction,
-> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-> index d5a2f769a58d..28a19b14cbbc 100644
-> --- a/arch/x86/kvm/vmx/tdx.c
-> +++ b/arch/x86/kvm/vmx/tdx.c
-> @@ -11,6 +11,9 @@
->  #include "x86.h"
->  #include "mmu.h"
->  
-> +#include <trace/events/kvm.h>
-> +#include "trace.h"
-> +
->  #undef pr_fmt
->  #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
->  
-> @@ -439,6 +442,35 @@ void tdx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
->  	 */
->  }
->  
-> +u64 __tdx_vcpu_run(hpa_t tdvpr, void *regs, u32 regs_mask);
-> +
-> +static noinstr void tdx_vcpu_enter_exit(struct kvm_vcpu *vcpu,
-> +					struct vcpu_tdx *tdx)
-> +{
-> +	guest_enter_irqoff();
-> +	tdx->exit_reason.full = __tdx_vcpu_run(tdx->tdvpr_pa, vcpu->arch.regs, 0);
-> +	guest_exit_irqoff();
-> +}
-> +
-> +fastpath_t tdx_vcpu_run(struct kvm_vcpu *vcpu)
-> +{
-> +	struct vcpu_tdx *tdx = to_tdx(vcpu);
-> +
-> +	if (unlikely(vcpu->kvm->vm_bugged)) {
-> +		tdx->exit_reason.full = TDX_NON_RECOVERABLE_VCPU;
-> +		return EXIT_FASTPATH_NONE;
-> +	}
-> +
+The previous conversation is here:
+https://lore.kernel.org/r/20230203051459.1354589-1-aik@amd.com
 
-Maybe check if a TD vCPU is initialized here or in the vcpu_pre_run? Bascially
-I am thinking what if a TD vCPU is not initialized by KVM_TDX_INIT_VCPU (TDVPR
-does not even exist) and now userspace wants to run it. What would be the
-consequence?
+This is based on sha1
+f91f9332d782 Ingo Molnar "Merge branch into tip/master: 'x86/tdx'".
 
-> +	trace_kvm_entry(vcpu);
-> +
-> +	tdx_vcpu_enter_exit(vcpu, tdx);
-> +
-> +	vcpu->arch.regs_avail &= ~VMX_REGS_LAZY_LOAD_SET;
-> +	trace_kvm_exit(vcpu, KVM_ISA_VMX);
-> +
-> +	return EXIT_FASTPATH_NONE;
-> +}
-> +
->  void tdx_load_mmu_pgd(struct kvm_vcpu *vcpu, hpa_t root_hpa, int pgd_level)
->  {
->  	td_vmcs_write64(to_tdx(vcpu), SHARED_EPT_POINTER, root_hpa & PAGE_MASK);
-> diff --git a/arch/x86/kvm/vmx/tdx.h b/arch/x86/kvm/vmx/tdx.h
-> index 9d8445324841..af29e1d89657 100644
-> --- a/arch/x86/kvm/vmx/tdx.h
-> +++ b/arch/x86/kvm/vmx/tdx.h
-> @@ -25,12 +25,45 @@ struct kvm_tdx {
->  	u64 tsc_offset;
->  };
->  
-> +union tdx_exit_reason {
-> +	struct {
-> +		/* 31:0 mirror the VMX Exit Reason format */
-> +		u64 basic		: 16;
-> +		u64 reserved16		: 1;
-> +		u64 reserved17		: 1;
-> +		u64 reserved18		: 1;
-> +		u64 reserved19		: 1;
-> +		u64 reserved20		: 1;
-> +		u64 reserved21		: 1;
-> +		u64 reserved22		: 1;
-> +		u64 reserved23		: 1;
-> +		u64 reserved24		: 1;
-> +		u64 reserved25		: 1;
-> +		u64 bus_lock_detected	: 1;
-> +		u64 enclave_mode	: 1;
-> +		u64 smi_pending_mtf	: 1;
-> +		u64 smi_from_vmx_root	: 1;
-> +		u64 reserved30		: 1;
-> +		u64 failed_vmentry	: 1;
-> +
-> +		/* 63:32 are TDX specific */
-> +		u64 details_l1		: 8;
-> +		u64 class		: 8;
-> +		u64 reserved61_48	: 14;
-> +		u64 non_recoverable	: 1;
-> +		u64 error		: 1;
-> +	};
-> +	u64 full;
-> +};
-> +
->  struct vcpu_tdx {
->  	struct kvm_vcpu	vcpu;
->  
->  	unsigned long tdvpr_pa;
->  	unsigned long *tdvpx_pa;
->  
-> +	union tdx_exit_reason exit_reason;
-> +
->  	bool initialized;
->  
->  	/*
-> diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
-> index eba10dabc45f..c939a9d4d927 100644
-> --- a/arch/x86/kvm/vmx/x86_ops.h
-> +++ b/arch/x86/kvm/vmx/x86_ops.h
-> @@ -155,6 +155,7 @@ int tdx_vm_ioctl(struct kvm *kvm, void __user *argp);
->  int tdx_vcpu_create(struct kvm_vcpu *vcpu);
->  void tdx_vcpu_free(struct kvm_vcpu *vcpu);
->  void tdx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event);
-> +fastpath_t tdx_vcpu_run(struct kvm_vcpu *vcpu);
->  u8 tdx_get_mt_mask(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio);
->  
->  int tdx_vcpu_ioctl(struct kvm_vcpu *vcpu, void __user *argp);
-> @@ -181,6 +182,7 @@ static inline int tdx_vm_ioctl(struct kvm *kvm, void __user *argp) { return -EOP
->  static inline int tdx_vcpu_create(struct kvm_vcpu *vcpu) { return -EOPNOTSUPP; }
->  static inline void tdx_vcpu_free(struct kvm_vcpu *vcpu) {}
->  static inline void tdx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event) {}
-> +static inline fastpath_t tdx_vcpu_run(struct kvm_vcpu *vcpu) { return EXIT_FASTPATH_NONE; }
->  static inline u8 tdx_get_mt_mask(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio) { return 0; }
->  
->  static inline int tdx_vcpu_ioctl(struct kvm_vcpu *vcpu, void __user *argp) { return -EOPNOTSUPP; }
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 6d7ca694e1c9..41af9a943d49 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -309,6 +309,7 @@ const struct kvm_stats_header kvm_vcpu_stats_header = {
->  };
->  
->  u64 __read_mostly host_xcr0;
-> +EXPORT_SYMBOL_GPL(host_xcr0);
->  
->  static struct kmem_cache *x86_emulator_cache;
->  
+Please comment. Thanks.
+
+
+
+Alexey Kardashevskiy (6):
+  KVM: SEV: move set_dr_intercepts/clr_dr_intercepts from the header
+  KVM: SEV: Move SEV's GP_VECTOR intercept setup to SEV
+  KVM: SEV-ES: explicitly disable debug
+  KVM: SVM/SEV/SEV-ES: Rework intercepts
+  KVM: SEV: Enable data breakpoints in SEV-ES
+  x86/sev: Do not handle #VC for DR7 read/write
+
+ arch/x86/include/asm/cpufeatures.h |  1 +
+ arch/x86/include/asm/svm.h         |  1 +
+ arch/x86/kvm/svm/svm.h             | 42 ---------------
+ arch/x86/boot/compressed/sev.c     |  2 +-
+ arch/x86/kernel/sev.c              |  6 +++
+ arch/x86/kvm/svm/sev.c             | 54 +++++++++++++++++++-
+ arch/x86/kvm/svm/svm.c             | 48 +++++++++++++++--
+ 7 files changed, 105 insertions(+), 49 deletions(-)
+
+-- 
+2.39.1
 
