@@ -2,148 +2,150 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7BBFC6DDB5C
-	for <lists+kvm@lfdr.de>; Tue, 11 Apr 2023 14:59:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7BFE46DDB9F
+	for <lists+kvm@lfdr.de>; Tue, 11 Apr 2023 15:05:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229949AbjDKM7V (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Apr 2023 08:59:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53632 "EHLO
+        id S230317AbjDKNFL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Apr 2023 09:05:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37624 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229996AbjDKM7T (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 Apr 2023 08:59:19 -0400
-Received: from mail-oi1-x229.google.com (mail-oi1-x229.google.com [IPv6:2607:f8b0:4864:20::229])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D72AF44B8
-        for <kvm@vger.kernel.org>; Tue, 11 Apr 2023 05:59:09 -0700 (PDT)
-Received: by mail-oi1-x229.google.com with SMTP id bg24so5324015oib.5
-        for <kvm@vger.kernel.org>; Tue, 11 Apr 2023 05:59:09 -0700 (PDT)
+        with ESMTP id S230433AbjDKNFF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 Apr 2023 09:05:05 -0400
+Received: from mail-wm1-x332.google.com (mail-wm1-x332.google.com [IPv6:2a00:1450:4864:20::332])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF07A3AB6
+        for <kvm@vger.kernel.org>; Tue, 11 Apr 2023 06:04:53 -0700 (PDT)
+Received: by mail-wm1-x332.google.com with SMTP id v20-20020a05600c471400b003ed8826253aso890553wmo.0
+        for <kvm@vger.kernel.org>; Tue, 11 Apr 2023 06:04:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1681217949; x=1683809949;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=linaro.org; s=google; t=1681218292; x=1683810292;
+        h=content-transfer-encoding:mime-version:message-id:in-reply-to:date
+         :subject:cc:to:from:user-agent:references:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=oxCP1A0+vJC6rGQA6qVogYfyo3XWYkt2ipQ4u9C+9Vo=;
-        b=gghZTbYWLEKhTXXH+mFPU2gDRnLmMwf5Fl9ypn03IS+Y+H8057BjEVr5ykex3eyuFO
-         swk6sjSdyBXaZhedLClbY7ok86tiHw0zr4LkjOhr3QIMY36ua4MQ5i13dkHKt7uioI3w
-         2Vxm3ZuJi9lVAa5L8jWkLuLTi2AZ1HbyGJhC7Ii0swcGz/5eSWJudCF8F88qtvqzx2oH
-         fKJXL1Bvk3e4BSoVl4EeR98gqE5muWY4U1l7et4NehOeTy3J81V+uxJcgB+co+ZsGeFk
-         5Y8QlvbbUZIFcJX8UQgixmgsO6i4D/0NxcL/SThL8sx9aWFnJ1NRZUB4DKhT30VtDUt/
-         XQqg==
+        bh=+VsLOycAHyGZoxoPqUjjK9qLhajHi2nxfZLNUeNazbU=;
+        b=gbOmLCmuIScS2z0LOiNoMXkdN/CaFp4IOGreYjmCp5ohvxd0PukiO+daoaxEFYV2T1
+         OfTngPbS1qJFuFJGbm3AdX0FAUT8fxeMh3WXxh/ylVEw61l68O5hnUkHeAIzSgUzpUkL
+         rB49yTD0m1dhutmYCuQrZCsCLlg7oYsFLFcfi9b0cDxXUTMEAKMfq0516UmqA9tTOK1e
+         LMoE7/ro3o5FNhnnvzbWnsuEF5cvJwtflCZb6pTRvoxsBkUXx10hKEWUZgVmxinKFR6H
+         2nEz+LtiJE/Q8IcREWEXUIBfaYX6WGxlTkRBpv1cCB7C1iGAOtZItjBjOrOncZC/XWhH
+         Qv9g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1681217949; x=1683809949;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=oxCP1A0+vJC6rGQA6qVogYfyo3XWYkt2ipQ4u9C+9Vo=;
-        b=uHMU/LukxF9YyuwRaEvLVvKGktP0iCADfVmGKzmmvwZ3S0tNKBoGGAIKHvlIQ35uL+
-         bWIFV2bcHUSx0ZTgnKy2plV6Lj+6JB4g6BecFgxJRKUac/hRLtphINUH71SuNhnh3sF4
-         gPF2jkyoBTgq8gipf0um2LN/LB3rp8ET40/NSYwyONhzFRQ+U3a7fF0dXk/B1BSaymER
-         VXUq3Sn42ynE/uHu06HT4sXpB7J5fCVLn90W3VvLWoAHkmqtIgyEW0TjD6pU2g8pgzST
-         T0rTPe2RwN+Sj5asijUvjovgxjrWvHQpwQGXHw0wbfriuGGZyYosj+dc/Ab3Biy2Thaq
-         3oNw==
-X-Gm-Message-State: AAQBX9dqnI8d2QOqybP2teiyAk4mDRvk9f1A4OZaY7q92i3FKgsDi5y8
-        oxun8bwScKk0prGnvZl99K+Jq8fkz07To6rWVkWrrA==
-X-Google-Smtp-Source: AKy350bcNVrc7qnqc359b3WNy8WohYCXK5agomPwbAjVaUs8VyzzhZ7/AQ2DQDh76keg1NybpWlZjvAVc/7cE92qJZA=
-X-Received: by 2002:a05:6808:3307:b0:383:fef9:6cac with SMTP id
- ca7-20020a056808330700b00383fef96cacmr3751840oib.9.1681217948915; Tue, 11 Apr
- 2023 05:59:08 -0700 (PDT)
+        d=1e100.net; s=20210112; t=1681218292; x=1683810292;
+        h=content-transfer-encoding:mime-version:message-id:in-reply-to:date
+         :subject:cc:to:from:user-agent:references:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=+VsLOycAHyGZoxoPqUjjK9qLhajHi2nxfZLNUeNazbU=;
+        b=p463RiZ2bN7btjRXMA5cbr0vlrbQ3+PYyxcgLifqhR3t057kpCvMwbjcBmfrN27OGG
+         VkozDuQCG49rUskvkVhqoOYypoiPvoTfjhLF6ViqfDwBm+s/2QBUbm5Xe34dmO74r/PS
+         eyngGq+MexrwP7UaM1Qvf3WPgAc1fQPrXzv0KlUWF1Adhe3nnneaKeel8Atxj4oCQX0l
+         H74JY+VtObJEdpgLBLTrtXl77OwUon7APowPVr5HG7r8e1IaV42ag0BOnPdWENmHpdld
+         pokpa8ox8mhcYAVStCCS5Da5pZJINXT2XXoTy76UOc6o+E4Uo+Y1EFZjDZq/LrU2jcxc
+         YBcg==
+X-Gm-Message-State: AAQBX9ckzFgaUG+EB2mAa+gCF1gC6jxktBFKBWQM5SDSm6wXbC3JZ4cQ
+        odRP4zymmpUV3hpIVtUo0upiVQ==
+X-Google-Smtp-Source: AKy350bSzYQKI+JiwlucbWXfDBB89IiLUayKbfhkAVFYgHvUcugimzW1q0J4r7UlrQ2tGjrcMEevpA==
+X-Received: by 2002:a7b:c5c2:0:b0:3ed:c84c:7efe with SMTP id n2-20020a7bc5c2000000b003edc84c7efemr9597516wmk.7.1681218292069;
+        Tue, 11 Apr 2023 06:04:52 -0700 (PDT)
+Received: from zen.linaroharston ([85.9.250.243])
+        by smtp.gmail.com with ESMTPSA id w16-20020a05600c475000b003f092f0e0a0sm2037796wmo.3.2023.04.11.06.04.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 11 Apr 2023 06:04:51 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+        by zen.linaroharston (Postfix) with ESMTP id 075CE1FFB7;
+        Tue, 11 Apr 2023 14:04:51 +0100 (BST)
+References: <20230403134920.2132362-1-alex.bennee@linaro.org>
+ <20230403134920.2132362-6-alex.bennee@linaro.org>
+ <ZCwsvaxRzx4bzbXo@redhat.com>
+ <cbb3df0a-7714-cbc0-efda-45f1d608e988@msgid.tls.msk.ru>
+ <ZCxNqb9tEO24KaxX@redhat.com> <ZC8qXxB6X8t7RBa+@gorilla.13thmonkey.org>
+ <ZDVN9TlzrCOJHlDR@redhat.com>
+User-agent: mu4e 1.10.0; emacs 29.0.90
+From:   Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To:     Kevin Wolf <kwolf@redhat.com>
+Cc:     Reinoud Zandijk <reinoud@netbsd.org>,
+        Michael Tokarev <mjt@tls.msk.ru>, qemu-devel@nongnu.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Ryo ONODERA <ryoon@netbsd.org>, qemu-block@nongnu.org,
+        Hanna Reitz <hreitz@redhat.com>, Warner Losh <imp@bsdimp.com>,
+        Beraldo Leal <bleal@redhat.com>,
+        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+        Kyle Evans <kevans@freebsd.org>, kvm@vger.kernel.org,
+        Wainer dos Santos Moschetta <wainersm@redhat.com>,
+        Cleber Rosa <crosa@redhat.com>, Thomas Huth <thuth@redhat.com>,
+        armbru@redhat.com
+Subject: Re: [PATCH v2 05/11] qemu-options: finesse the recommendations
+ around -blockdev
+Date:   Tue, 11 Apr 2023 14:03:36 +0100
+In-reply-to: <ZDVN9TlzrCOJHlDR@redhat.com>
+Message-ID: <87o7nupo25.fsf@linaro.org>
 MIME-Version: 1.0
-References: <20230410105056.60973-1-likexu@tencent.com> <20230410105056.60973-6-likexu@tencent.com>
- <CALMp9eTLvJ6GW1mfgjO7CL7tW-79asykyz9=Fb=FfT74VRkDVA@mail.gmail.com> <9a7d5814-9eb1-d7af-7968-a6e3ebb90248@gmail.com>
-In-Reply-To: <9a7d5814-9eb1-d7af-7968-a6e3ebb90248@gmail.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Tue, 11 Apr 2023 05:58:57 -0700
-Message-ID: <CALMp9eR6DwY0EjAb1hcV9XGWQizN6R0dXtLaC4NXDgtCqv5cTA@mail.gmail.com>
-Subject: Re: [PATCH V5 05/10] KVM: x86/pmu: Disable vPMU if the minimum num of
- counters isn't met
-To:     Like Xu <like.xu.linux@gmail.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-15.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,ENV_AND_HDR_SPF_MATCH,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL,
-        USER_IN_DEF_SPF_WL autolearn=unavailable autolearn_force=no
-        version=3.4.6
+X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
+        DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Apr 10, 2023 at 11:17=E2=80=AFPM Like Xu <like.xu.linux@gmail.com> =
-wrote:
->
-> On 11/4/2023 1:36 pm, Jim Mattson wrote:
-> > On Mon, Apr 10, 2023 at 3:51=E2=80=AFAM Like Xu <like.xu.linux@gmail.co=
-m> wrote:
-> >>
-> >> From: Like Xu <likexu@tencent.com>
-> >>
-> >> Disable PMU support when running on AMD and perf reports fewer than fo=
-ur
-> >> general purpose counters. All AMD PMUs must define at least four count=
-ers
-> >> due to AMD's legacy architecture hardcoding the number of counters
-> >> without providing a way to enumerate the number of counters to softwar=
-e,
-> >> e.g. from AMD's APM:
-> >>
-> >>   The legacy architecture defines four performance counters (PerfCtrn)
-> >>   and corresponding event-select registers (PerfEvtSeln).
-> >>
-> >> Virtualizing fewer than four counters can lead to guest instability as
-> >> software expects four counters to be available.
-> >
-> > I'm confused. Isn't zero less than four?
->
-> As I understand it, you are saying that virtualization of zero counter is=
- also
-> reasonable.
-> If so, the above statement could be refined as:
->
->         Virtualizing fewer than four counters when vPMU is enabled may le=
-ad to guest
-> instability
->         as software expects at least four counters to be available, thus =
-the vPMU is
-> disabled if the
->         minimum number of KVM supported counters is not reached during in=
-itialization.
->
-> Jim, does this help you or could you explain more about your confusion ?
 
-You say that "fewer than four counters can lead to guest instability
-as software expects four counters to be available." Your solution is
-to disable the PMU, which leaves zero counters available. Zero is less
-than four. Hence, by your claim, disabling the PMU can lead to guest
-instability. I don't see how this is an improvement over one, two, or
-three counters.
+Kevin Wolf <kwolf@redhat.com> writes:
 
-> >
-> >> Suggested-by: Sean Christopherson <seanjc@google.com>
-> >> Signed-off-by: Like Xu <likexu@tencent.com>
-> >> ---
-> >>   arch/x86/kvm/pmu.h | 3 +++
-> >>   1 file changed, 3 insertions(+)
-> >>
-> >> diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
-> >> index dd7c7d4ffe3b..002b527360f4 100644
-> >> --- a/arch/x86/kvm/pmu.h
-> >> +++ b/arch/x86/kvm/pmu.h
-> >> @@ -182,6 +182,9 @@ static inline void kvm_init_pmu_capability(const s=
-truct kvm_pmu_ops *pmu_ops)
-> >>                          enable_pmu =3D false;
-> >>          }
-> >>
-> >> +       if (!is_intel && kvm_pmu_cap.num_counters_gp < AMD64_NUM_COUNT=
-ERS)
-> >> +               enable_pmu =3D false;
-> >> +
-> >>          if (!enable_pmu) {
-> >>                  memset(&kvm_pmu_cap, 0, sizeof(kvm_pmu_cap));
-> >>                  return;
-> >> --
-> >> 2.40.0
-> >>
+> Am 06.04.2023 um 22:23 hat Reinoud Zandijk geschrieben:
+>> On Tue, Apr 04, 2023 at 06:17:45PM +0200, Kevin Wolf wrote:
+>> > Am 04.04.2023 um 17:07 hat Michael Tokarev geschrieben:
+>> > > 04.04.2023 16:57, Kevin Wolf =D0=BF=D0=B8=D1=88=D0=B5=D1=82:
+>> > Maybe -snapshot should error out if -blockdev is in use. You'd general=
+ly
+>> > expect that either -blockdev is used primarily and snapshots are done
+>> > externally (if the command line is generated by some management tool),
+>> > or that -drive is used consistently (by a human who likes the
+>> > convenience). In both cases, we wouldn't hit the error path.
+>> >=20
+>> > There may be some exceptional cases where you have both -drive and
+>> > -blockdev (maybe because a human users needs more control for one
+>> > specific disk). This is the case where you can get a nasty surprise and
+>> > that would error out. If you legitimately want the -drive images
+>> > snapshotted, but not the -blockdev ones, you can still use individual
+>> > '-drive snapshot=3Don' options instead of the global '-snapshot' (and =
+the
+>> > error message should mention this).
+>>=20
+>> I didn't know that! I normally use the -snapshot as global option. Is th=
+ere a
+>> reason why -blockdev isn't honouring -snapshot?
+>
+> The philosophy behind -blockdev is that you're explicit about every
+> image file (and other block node) you want to use and that QEMU doesn't
+> magically insert or change things behind your back.
+>
+> For simple use cases that might not seem necessary, but many of the
+> newer functions added to the block layer, like the block jobs, are
+> operations that can work on any node in the block graph (i.e. any of the
+> open images, including backing files etc.). If QEMU changed something
+> behind your back, you can easily access the wrong image. Especially for
+> management software like libvirt this kind of magic that -drive involves
+> was really hard to work with because it always had to second guess what
+> the world _really_ looked like on the QEMU side.
+>
+> For example, imagine you open foo.img with -snapshot. Now you want to
+> create a backup of your current state, so tell QEMU to backup the block
+> node for foo.img because that's what your VM is currently running on,
+> right? Except that nobody told you that the active image is actually a
+> temporary qcow2 image file that -snapshot created internally. You're
+> backing up the wrong image without the changes of your running VM.
+>
+> So it's better to always be explicit, and then it's unambiguous which
+> image file you really mean in operations.
+
+With that in mind please review:
+
+  Subject: [PATCH v3] qemu-options: finesse the recommendations around -blo=
+ckdev
+  Date: Thu,  6 Apr 2023 10:53:17 +0100
+  Message-Id: <20230406095317.3321318-1-alex.bennee@linaro.org>
+
+--=20
+Alex Benn=C3=A9e
+Virtualisation Tech Lead @ Linaro
