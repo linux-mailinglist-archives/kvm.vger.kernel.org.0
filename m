@@ -2,444 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 55B2B6DD1F1
-	for <lists+kvm@lfdr.de>; Tue, 11 Apr 2023 07:42:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5C8746DD243
+	for <lists+kvm@lfdr.de>; Tue, 11 Apr 2023 07:57:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230080AbjDKFmx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Apr 2023 01:42:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52594 "EHLO
+        id S230064AbjDKF5l (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Apr 2023 01:57:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43880 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230053AbjDKFmt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 Apr 2023 01:42:49 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 334862D4E
-        for <kvm@vger.kernel.org>; Mon, 10 Apr 2023 22:41:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1681191714;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=F4bDRARzkF1gI/5ulEGpZGNsH6UfiOpQWPqUWlQsIBA=;
-        b=WiGaDJ7kbZPmyfrgvndmiSJoU6w7rmKDpodaxseg0ZNXqYKWVY/5P3KWiGIPh0MHkvj2C4
-        4k6MbOJ4n/GkjkP7f19uKkOePythYeS5wZgCbiiEJQjhNqKin9kWIu84LU6uhpHrIe5AmV
-        dOcyRZIolIEb+hsbMqVONX1hABd+Lnk=
-Received: from mail-oo1-f70.google.com (mail-oo1-f70.google.com
- [209.85.161.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-543-oz6yl7nVPwe-A8vYDVeNBw-1; Tue, 11 Apr 2023 01:41:53 -0400
-X-MC-Unique: oz6yl7nVPwe-A8vYDVeNBw-1
-Received: by mail-oo1-f70.google.com with SMTP id d81-20020a4a5254000000b0053b5874f94aso2323634oob.3
-        for <kvm@vger.kernel.org>; Mon, 10 Apr 2023 22:41:53 -0700 (PDT)
+        with ESMTP id S230075AbjDKF5i (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 Apr 2023 01:57:38 -0400
+Received: from mail-ej1-x635.google.com (mail-ej1-x635.google.com [IPv6:2a00:1450:4864:20::635])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 062C52D7B;
+        Mon, 10 Apr 2023 22:57:20 -0700 (PDT)
+Received: by mail-ej1-x635.google.com with SMTP id ud9so17280677ejc.7;
+        Mon, 10 Apr 2023 22:57:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=jms.id.au; s=google; t=1681192637;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=GUD9yijmU2vznVIxO0uguX/ETkIRPP+R6vlejm8iH3A=;
+        b=jSZdo1wtv4gzEvX4J3w0SJrZ0TKscwSVtBsZijS9j6qXePnpDefEgFR/+DsCoS2XZl
+         7lxW496fDD546lH25dzDrMY38jtLXcN2hVhf54Uw6Ln8Spv0ZRGnhkb+ACjEoLIsOHuR
+         keAkTDZ8rUZhccLTvCHhBAXoQNwoqQjecy4H0=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1681191712; x=1683783712;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=F4bDRARzkF1gI/5ulEGpZGNsH6UfiOpQWPqUWlQsIBA=;
-        b=ycqmMBJDYSgI7y6FJeuOQZEpck+mAfMAswJGERe9hRRQZoiKbF9s5s7R+GDAPolUJE
-         vjE95P3pKJeOvPuPyISlYhuYSkq+Hytjee/aHgxG+XtkqN1p6Wpj3/3u/L18qJANZ9r6
-         aPfgqq902JXEfBcJY+KYR2fMdV9mepFCoY2uKbKN7pfhfZyB0Asa0u0lSeZeEs0eR/1w
-         XRunA2VD5eytS1KzCFieBFbv/rF9hGdAwjuOmVeT7e1eL8dHgGfFeeBYhsuQCTUw0S7V
-         D6EE7WRIZx8Vzd+wqtPhqwIR+pS/4+GmZjxP0GNH04wa0v2y83x14a2aBo0vSat1K5a/
-         tQQA==
-X-Gm-Message-State: AAQBX9cPq50Sge5Bn3hL21bQkuXv6RAI8v+mM3lbgpc2REXYLCL+5G04
-        3xz4kScFctUOT0V5vjk14Hn/eSXv3gS5nPuKX5v3P1eUAXan98E3KTOCnw91/D8GwtAbTaPmqad
-        wMaKwbxfUsWPj5TtbnzuZEW7wTDf9
-X-Received: by 2002:a05:6808:915:b0:389:50f2:4aa6 with SMTP id w21-20020a056808091500b0038950f24aa6mr3485402oih.9.1681191712435;
-        Mon, 10 Apr 2023 22:41:52 -0700 (PDT)
-X-Google-Smtp-Source: AKy350ba79FFjguMP41m14aWnC03kxojFyfpXzYkG9oPN7/mMj3q5qfv4prTvfI8vurRSKAoUOOE20KPuCvEVg5CpGI=
-X-Received: by 2002:a05:6808:915:b0:389:50f2:4aa6 with SMTP id
- w21-20020a056808091500b0038950f24aa6mr3485398oih.9.1681191711952; Mon, 10 Apr
- 2023 22:41:51 -0700 (PDT)
+        d=1e100.net; s=20210112; t=1681192637;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=GUD9yijmU2vznVIxO0uguX/ETkIRPP+R6vlejm8iH3A=;
+        b=PDNiLhrAUZ1p7FWJ5sp2s+C9qxMw7iifSPjm8iTXi5lDb1mpP1V0at46gdhZlpG+Lr
+         aV0b7DsSL+HSykQ+vPObxSbKg5t8Ofkd+Qv/oGkPK/sSj7DDR33jkKndh4atx5dbzRUt
+         Wf9GMLP0wW+NVS97HD6CJZ1IpZQqafH787hvU0Qij/JxpmsBz0J3VOBteRk15CifXmfe
+         BULMSkaW7kHwoDbAb4ZDYVdSaLQV5rpdn2+NSXz+7n2yU/0akjpJB8WoWBDtSDIRF/ca
+         C1hWjIVRJBVSgv9HRVrNlaWYfNQcKyk3VRdYESRqcDVmfJEo78nNnOH4USTp9NEvteIR
+         0lhg==
+X-Gm-Message-State: AAQBX9cm+UThGdubeXrxyp4f+5dWlH53Ifn/c1elzpiwXRp2HUOcPMeY
+        KEC4BrHOGKL8p30i8LJAf0Cl3tLicmAnhydH4vcde6FyJOQ=
+X-Google-Smtp-Source: AKy350bWIaPszbl+8ZTUlnZswNv+DDIa4V3lvErdkuyIy4DyIRrAtDIkK+ieEjR0YoCV5dlQJy9rjsxfg+2wCz4SJOU=
+X-Received: by 2002:a17:907:75d9:b0:94b:28ff:9e89 with SMTP id
+ jl25-20020a17090775d900b0094b28ff9e89mr1703013ejc.15.1681192636857; Mon, 10
+ Apr 2023 22:57:16 -0700 (PDT)
 MIME-Version: 1.0
-References: <20230404131326.44403-1-sgarzare@redhat.com> <20230404131716.45855-1-sgarzare@redhat.com>
-In-Reply-To: <20230404131716.45855-1-sgarzare@redhat.com>
-From:   Jason Wang <jasowang@redhat.com>
-Date:   Tue, 11 Apr 2023 13:41:41 +0800
-Message-ID: <CACGkMEu_AL7M-szVsp9WmUZDQtD0p8t=XF=D+sxsLP=a5gny4Q@mail.gmail.com>
-Subject: Re: [PATCH v5 5/9] vringh: support VA with iotlb
-To:     Stefano Garzarella <sgarzare@redhat.com>
-Cc:     virtualization@lists.linux-foundation.org, stefanha@redhat.com,
-        Andrey Zhadchenko <andrey.zhadchenko@virtuozzo.com>,
-        kvm@vger.kernel.org, eperezma@redhat.com,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+References: <20230408040020.868929-1-npiggin@gmail.com>
+In-Reply-To: <20230408040020.868929-1-npiggin@gmail.com>
+From:   Joel Stanley <joel@jms.id.au>
+Date:   Tue, 11 Apr 2023 05:57:04 +0000
+Message-ID: <CACPK8Xfw6S+pHDuWvoed=PkE7XUHme=eXoWRbLfCFKRO9w=C2w@mail.gmail.com>
+Subject: Re: [PATCH v2 0/4] KVM: selftests: add powerpc support
+To:     Nicholas Piggin <npiggin@gmail.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, linux-kselftest@vger.kernel.org,
+        Sean Christopherson <seanjc@google.com>,
+        Shuah Khan <shuah@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=0.4 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
+        DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+        HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
+        SPF_PASS autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Apr 4, 2023 at 9:17=E2=80=AFPM Stefano Garzarella <sgarzare@redhat.=
-com> wrote:
+On Sat, 8 Apr 2023 at 04:01, Nicholas Piggin <npiggin@gmail.com> wrote:
 >
-> vDPA supports the possibility to use user VA in the iotlb messages.
-> So, let's add support for user VA in vringh to use it in the vDPA
-> simulators.
->
-> Acked-by: Eugenio P=C3=A9rez <eperezma@redhat.com>
-> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+> This series adds initial KVM selftests support for powerpc
+> (64-bit, BookS, radix MMU).
 
-Acked-by: Jason Wang <jasowang@redhat.com>
+This means the tests won't work on power8. Perhaps you could add
+something like this?
 
-Thanks
+--- a/tools/testing/selftests/kvm/lib/powerpc/processor.c
++++ b/tools/testing/selftests/kvm/lib/powerpc/processor.c
+@@ -33,6 +33,8 @@ void virt_arch_pgd_alloc(struct kvm_vm *vm)
+        vm_paddr_t prtb, pgtb;
+        size_t pgd_pages;
 
-> ---
++       TEST_REQUIRE(kvm_has_cap(KVM_CAP_PPC_MMU_RADIX));
++
+
 >
-> Notes:
->     v5:
->     - s/userpace/userspace/ in the vringh_init_iotlb_va doc [Simon]
->     v4:
->     - used uintptr_t for `io_addr` [Eugenio]
->     - added `io_addr` and `io_len` variables in iotlb_translate
->     - avoided overflow doing `map->addr - map->start + addr` [Jason]
->     - removed `is_iovec` field from struct iotlb_vec [Jason]
->     - added vringh_init_iotlb_va() [Jason]
->     v3:
->     - refactored avoiding code duplication [Eugenio]
->     v2:
->     - replace kmap_atomic() with kmap_local_page() [see previous patch]
->     - fix cast warnings when build with W=3D1 C=3D1
+> Since v1:
+> - Update MAINTAINERS KVM PPC entry to include kvm selftests.
+> - Fixes and cleanups from Sean's review including new patch 1.
+> - Add 4K guest page support requiring new patch 2.
 >
->  include/linux/vringh.h |   9 +++
->  drivers/vhost/vringh.c | 171 +++++++++++++++++++++++++++++++++--------
->  2 files changed, 148 insertions(+), 32 deletions(-)
+> Thanks,
+> Nick
 >
-> diff --git a/include/linux/vringh.h b/include/linux/vringh.h
-> index 1991a02c6431..b4edfadf5479 100644
-> --- a/include/linux/vringh.h
-> +++ b/include/linux/vringh.h
-> @@ -32,6 +32,9 @@ struct vringh {
->         /* Can we get away with weak barriers? */
->         bool weak_barriers;
+> Nicholas Piggin (4):
+>   KVM: selftests: Move pgd_created check into virt_pgd_alloc
+>   KVM: selftests: Add aligned guest physical page allocator
+>   KVM: PPC: selftests: add support for powerpc
+>   KVM: PPC: selftests: add selftests sanity tests
 >
-> +       /* Use user's VA */
-> +       bool use_va;
-> +
->         /* Last available index we saw (ie. where we're up to). */
->         u16 last_avail_idx;
+>  MAINTAINERS                                   |   2 +
+>  tools/testing/selftests/kvm/Makefile          |  15 +
+>  .../selftests/kvm/include/kvm_util_base.h     |  27 ++
+>  .../selftests/kvm/include/powerpc/hcall.h     |  21 +
+>  .../selftests/kvm/include/powerpc/ppc_asm.h   |  32 ++
+>  .../selftests/kvm/include/powerpc/processor.h |  33 ++
+>  .../selftests/kvm/lib/aarch64/processor.c     |   4 -
+>  tools/testing/selftests/kvm/lib/guest_modes.c |   3 +
+>  tools/testing/selftests/kvm/lib/kvm_util.c    |  56 ++-
+>  .../selftests/kvm/lib/powerpc/handlers.S      |  93 ++++
+>  .../testing/selftests/kvm/lib/powerpc/hcall.c |  45 ++
+>  .../selftests/kvm/lib/powerpc/processor.c     | 429 ++++++++++++++++++
+>  .../testing/selftests/kvm/lib/powerpc/ucall.c |  30 ++
+>  .../selftests/kvm/lib/riscv/processor.c       |   4 -
+>  .../selftests/kvm/lib/s390x/processor.c       |   4 -
+>  .../selftests/kvm/lib/x86_64/processor.c      |   7 +-
+>  tools/testing/selftests/kvm/powerpc/helpers.h |  46 ++
+>  .../testing/selftests/kvm/powerpc/null_test.c | 166 +++++++
+>  .../selftests/kvm/powerpc/rtas_hcall.c        | 146 ++++++
+>  19 files changed, 1129 insertions(+), 34 deletions(-)
+>  create mode 100644 tools/testing/selftests/kvm/include/powerpc/hcall.h
+>  create mode 100644 tools/testing/selftests/kvm/include/powerpc/ppc_asm.h
+>  create mode 100644 tools/testing/selftests/kvm/include/powerpc/processor.h
+>  create mode 100644 tools/testing/selftests/kvm/lib/powerpc/handlers.S
+>  create mode 100644 tools/testing/selftests/kvm/lib/powerpc/hcall.c
+>  create mode 100644 tools/testing/selftests/kvm/lib/powerpc/processor.c
+>  create mode 100644 tools/testing/selftests/kvm/lib/powerpc/ucall.c
+>  create mode 100644 tools/testing/selftests/kvm/powerpc/helpers.h
+>  create mode 100644 tools/testing/selftests/kvm/powerpc/null_test.c
+>  create mode 100644 tools/testing/selftests/kvm/powerpc/rtas_hcall.c
 >
-> @@ -284,6 +287,12 @@ int vringh_init_iotlb(struct vringh *vrh, u64 featur=
-es,
->                       struct vring_avail *avail,
->                       struct vring_used *used);
->
-> +int vringh_init_iotlb_va(struct vringh *vrh, u64 features,
-> +                        unsigned int num, bool weak_barriers,
-> +                        struct vring_desc *desc,
-> +                        struct vring_avail *avail,
-> +                        struct vring_used *used);
-> +
->  int vringh_getdesc_iotlb(struct vringh *vrh,
->                          struct vringh_kiov *riov,
->                          struct vringh_kiov *wiov,
-> diff --git a/drivers/vhost/vringh.c b/drivers/vhost/vringh.c
-> index 4aee230f7622..ab95160dcdd9 100644
-> --- a/drivers/vhost/vringh.c
-> +++ b/drivers/vhost/vringh.c
-> @@ -1094,10 +1094,17 @@ EXPORT_SYMBOL(vringh_need_notify_kern);
->
->  #if IS_REACHABLE(CONFIG_VHOST_IOTLB)
->
-> +struct iotlb_vec {
-> +       union {
-> +               struct iovec *iovec;
-> +               struct bio_vec *bvec;
-> +       } iov;
-> +       size_t count;
-> +};
-> +
->  static int iotlb_translate(const struct vringh *vrh,
->                            u64 addr, u64 len, u64 *translated,
-> -                          struct bio_vec iov[],
-> -                          int iov_size, u32 perm)
-> +                          struct iotlb_vec *ivec, u32 perm)
->  {
->         struct vhost_iotlb_map *map;
->         struct vhost_iotlb *iotlb =3D vrh->iotlb;
-> @@ -1107,9 +1114,11 @@ static int iotlb_translate(const struct vringh *vr=
-h,
->         spin_lock(vrh->iotlb_lock);
->
->         while (len > s) {
-> -               u64 size, pa, pfn;
-> +               uintptr_t io_addr;
-> +               size_t io_len;
-> +               u64 size;
->
-> -               if (unlikely(ret >=3D iov_size)) {
-> +               if (unlikely(ret >=3D ivec->count)) {
->                         ret =3D -ENOBUFS;
->                         break;
->                 }
-> @@ -1124,10 +1133,22 @@ static int iotlb_translate(const struct vringh *v=
-rh,
->                 }
->
->                 size =3D map->size - addr + map->start;
-> -               pa =3D map->addr + addr - map->start;
-> -               pfn =3D pa >> PAGE_SHIFT;
-> -               bvec_set_page(&iov[ret], pfn_to_page(pfn), min(len - s, s=
-ize),
-> -                             pa & (PAGE_SIZE - 1));
-> +               io_len =3D min(len - s, size);
-> +               io_addr =3D map->addr - map->start + addr;
-> +
-> +               if (vrh->use_va) {
-> +                       struct iovec *iovec =3D ivec->iov.iovec;
-> +
-> +                       iovec[ret].iov_len =3D io_len;
-> +                       iovec[ret].iov_base =3D (void __user *)io_addr;
-> +               } else {
-> +                       u64 pfn =3D io_addr >> PAGE_SHIFT;
-> +                       struct bio_vec *bvec =3D ivec->iov.bvec;
-> +
-> +                       bvec_set_page(&bvec[ret], pfn_to_page(pfn), io_le=
-n,
-> +                                     io_addr & (PAGE_SIZE - 1));
-> +               }
-> +
->                 s +=3D size;
->                 addr +=3D size;
->                 ++ret;
-> @@ -1146,23 +1167,36 @@ static int iotlb_translate(const struct vringh *v=
-rh,
->  static inline int copy_from_iotlb(const struct vringh *vrh, void *dst,
->                                   void *src, size_t len)
->  {
-> +       struct iotlb_vec ivec;
-> +       union {
-> +               struct iovec iovec[IOTLB_IOV_STRIDE];
-> +               struct bio_vec bvec[IOTLB_IOV_STRIDE];
-> +       } iov;
->         u64 total_translated =3D 0;
->
-> +       ivec.iov.iovec =3D iov.iovec;
-> +       ivec.count =3D IOTLB_IOV_STRIDE;
-> +
->         while (total_translated < len) {
-> -               struct bio_vec iov[IOTLB_IOV_STRIDE];
->                 struct iov_iter iter;
->                 u64 translated;
->                 int ret;
->
->                 ret =3D iotlb_translate(vrh, (u64)(uintptr_t)src,
->                                       len - total_translated, &translated=
-,
-> -                                     iov, ARRAY_SIZE(iov), VHOST_MAP_RO)=
-;
-> +                                     &ivec, VHOST_MAP_RO);
->                 if (ret =3D=3D -ENOBUFS)
-> -                       ret =3D ARRAY_SIZE(iov);
-> +                       ret =3D IOTLB_IOV_STRIDE;
->                 else if (ret < 0)
->                         return ret;
->
-> -               iov_iter_bvec(&iter, ITER_SOURCE, iov, ret, translated);
-> +               if (vrh->use_va) {
-> +                       iov_iter_init(&iter, ITER_SOURCE, ivec.iov.iovec,=
- ret,
-> +                                     translated);
-> +               } else {
-> +                       iov_iter_bvec(&iter, ITER_SOURCE, ivec.iov.bvec, =
-ret,
-> +                                     translated);
-> +               }
->
->                 ret =3D copy_from_iter(dst, translated, &iter);
->                 if (ret < 0)
-> @@ -1179,23 +1213,36 @@ static inline int copy_from_iotlb(const struct vr=
-ingh *vrh, void *dst,
->  static inline int copy_to_iotlb(const struct vringh *vrh, void *dst,
->                                 void *src, size_t len)
->  {
-> +       struct iotlb_vec ivec;
-> +       union {
-> +               struct iovec iovec[IOTLB_IOV_STRIDE];
-> +               struct bio_vec bvec[IOTLB_IOV_STRIDE];
-> +       } iov;
->         u64 total_translated =3D 0;
->
-> +       ivec.iov.iovec =3D iov.iovec;
-> +       ivec.count =3D IOTLB_IOV_STRIDE;
-> +
->         while (total_translated < len) {
-> -               struct bio_vec iov[IOTLB_IOV_STRIDE];
->                 struct iov_iter iter;
->                 u64 translated;
->                 int ret;
->
->                 ret =3D iotlb_translate(vrh, (u64)(uintptr_t)dst,
->                                       len - total_translated, &translated=
-,
-> -                                     iov, ARRAY_SIZE(iov), VHOST_MAP_WO)=
-;
-> +                                     &ivec, VHOST_MAP_WO);
->                 if (ret =3D=3D -ENOBUFS)
-> -                       ret =3D ARRAY_SIZE(iov);
-> +                       ret =3D IOTLB_IOV_STRIDE;
->                 else if (ret < 0)
->                         return ret;
->
-> -               iov_iter_bvec(&iter, ITER_DEST, iov, ret, translated);
-> +               if (vrh->use_va) {
-> +                       iov_iter_init(&iter, ITER_DEST, ivec.iov.iovec, r=
-et,
-> +                                     translated);
-> +               } else {
-> +                       iov_iter_bvec(&iter, ITER_DEST, ivec.iov.bvec, re=
-t,
-> +                                     translated);
-> +               }
->
->                 ret =3D copy_to_iter(src, translated, &iter);
->                 if (ret < 0)
-> @@ -1212,20 +1259,36 @@ static inline int copy_to_iotlb(const struct vrin=
-gh *vrh, void *dst,
->  static inline int getu16_iotlb(const struct vringh *vrh,
->                                u16 *val, const __virtio16 *p)
->  {
-> -       struct bio_vec iov;
-> -       void *kaddr, *from;
-> +       struct iotlb_vec ivec;
-> +       union {
-> +               struct iovec iovec[1];
-> +               struct bio_vec bvec[1];
-> +       } iov;
-> +       __virtio16 tmp;
->         int ret;
->
-> +       ivec.iov.iovec =3D iov.iovec;
-> +       ivec.count =3D 1;
-> +
->         /* Atomic read is needed for getu16 */
-> -       ret =3D iotlb_translate(vrh, (u64)(uintptr_t)p, sizeof(*p), NULL,
-> -                             &iov, 1, VHOST_MAP_RO);
-> +       ret =3D iotlb_translate(vrh, (u64)(uintptr_t)p, sizeof(*p),
-> +                             NULL, &ivec, VHOST_MAP_RO);
->         if (ret < 0)
->                 return ret;
->
-> -       kaddr =3D kmap_local_page(iov.bv_page);
-> -       from =3D kaddr + iov.bv_offset;
-> -       *val =3D vringh16_to_cpu(vrh, READ_ONCE(*(__virtio16 *)from));
-> -       kunmap_local(kaddr);
-> +       if (vrh->use_va) {
-> +               ret =3D __get_user(tmp, (__virtio16 __user *)ivec.iov.iov=
-ec[0].iov_base);
-> +               if (ret)
-> +                       return ret;
-> +       } else {
-> +               void *kaddr =3D kmap_local_page(ivec.iov.bvec[0].bv_page)=
-;
-> +               void *from =3D kaddr + ivec.iov.bvec[0].bv_offset;
-> +
-> +               tmp =3D READ_ONCE(*(__virtio16 *)from);
-> +               kunmap_local(kaddr);
-> +       }
-> +
-> +       *val =3D vringh16_to_cpu(vrh, tmp);
->
->         return 0;
->  }
-> @@ -1233,20 +1296,36 @@ static inline int getu16_iotlb(const struct vring=
-h *vrh,
->  static inline int putu16_iotlb(const struct vringh *vrh,
->                                __virtio16 *p, u16 val)
->  {
-> -       struct bio_vec iov;
-> -       void *kaddr, *to;
-> +       struct iotlb_vec ivec;
-> +       union {
-> +               struct iovec iovec;
-> +               struct bio_vec bvec;
-> +       } iov;
-> +       __virtio16 tmp;
->         int ret;
->
-> +       ivec.iov.iovec =3D &iov.iovec;
-> +       ivec.count =3D 1;
-> +
->         /* Atomic write is needed for putu16 */
-> -       ret =3D iotlb_translate(vrh, (u64)(uintptr_t)p, sizeof(*p), NULL,
-> -                             &iov, 1, VHOST_MAP_WO);
-> +       ret =3D iotlb_translate(vrh, (u64)(uintptr_t)p, sizeof(*p),
-> +                             NULL, &ivec, VHOST_MAP_RO);
->         if (ret < 0)
->                 return ret;
->
-> -       kaddr =3D kmap_local_page(iov.bv_page);
-> -       to =3D kaddr + iov.bv_offset;
-> -       WRITE_ONCE(*(__virtio16 *)to, cpu_to_vringh16(vrh, val));
-> -       kunmap_local(kaddr);
-> +       tmp =3D cpu_to_vringh16(vrh, val);
-> +
-> +       if (vrh->use_va) {
-> +               ret =3D __put_user(tmp, (__virtio16 __user *)ivec.iov.iov=
-ec[0].iov_base);
-> +               if (ret)
-> +                       return ret;
-> +       } else {
-> +               void *kaddr =3D kmap_local_page(ivec.iov.bvec[0].bv_page)=
-;
-> +               void *to =3D kaddr + ivec.iov.bvec[0].bv_offset;
-> +
-> +               WRITE_ONCE(*(__virtio16 *)to, tmp);
-> +               kunmap_local(kaddr);
-> +       }
->
->         return 0;
->  }
-> @@ -1320,11 +1399,39 @@ int vringh_init_iotlb(struct vringh *vrh, u64 fea=
-tures,
->                       struct vring_avail *avail,
->                       struct vring_used *used)
->  {
-> +       vrh->use_va =3D false;
-> +
->         return vringh_init_kern(vrh, features, num, weak_barriers,
->                                 desc, avail, used);
->  }
->  EXPORT_SYMBOL(vringh_init_iotlb);
->
-> +/**
-> + * vringh_init_iotlb_va - initialize a vringh for a ring with IOTLB cont=
-aining
-> + *                        user VA.
-> + * @vrh: the vringh to initialize.
-> + * @features: the feature bits for this ring.
-> + * @num: the number of elements.
-> + * @weak_barriers: true if we only need memory barriers, not I/O.
-> + * @desc: the userspace descriptor pointer.
-> + * @avail: the userspace avail pointer.
-> + * @used: the userspace used pointer.
-> + *
-> + * Returns an error if num is invalid.
-> + */
-> +int vringh_init_iotlb_va(struct vringh *vrh, u64 features,
-> +                        unsigned int num, bool weak_barriers,
-> +                        struct vring_desc *desc,
-> +                        struct vring_avail *avail,
-> +                        struct vring_used *used)
-> +{
-> +       vrh->use_va =3D true;
-> +
-> +       return vringh_init_kern(vrh, features, num, weak_barriers,
-> +                               desc, avail, used);
-> +}
-> +EXPORT_SYMBOL(vringh_init_iotlb_va);
-> +
->  /**
->   * vringh_set_iotlb - initialize a vringh for a ring with IOTLB.
->   * @vrh: the vring
 > --
-> 2.39.2
+> 2.40.0
 >
-
