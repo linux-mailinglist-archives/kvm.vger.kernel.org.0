@@ -2,64 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AB91B6DE061
-	for <lists+kvm@lfdr.de>; Tue, 11 Apr 2023 18:03:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AAA396DE079
+	for <lists+kvm@lfdr.de>; Tue, 11 Apr 2023 18:07:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230146AbjDKQDK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Apr 2023 12:03:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57118 "EHLO
+        id S229604AbjDKQH0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Apr 2023 12:07:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37108 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229525AbjDKQC4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 Apr 2023 12:02:56 -0400
+        with ESMTP id S229484AbjDKQHZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 Apr 2023 12:07:25 -0400
 Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1CC0AF9
-        for <kvm@vger.kernel.org>; Tue, 11 Apr 2023 09:02:55 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id 202-20020a2502d3000000b00b8d404ac555so11806324ybc.14
-        for <kvm@vger.kernel.org>; Tue, 11 Apr 2023 09:02:55 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8423AC5
+        for <kvm@vger.kernel.org>; Tue, 11 Apr 2023 09:07:24 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id 67-20020a250146000000b00b714602d43fso9297794ybb.10
+        for <kvm@vger.kernel.org>; Tue, 11 Apr 2023 09:07:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1681228974;
+        d=google.com; s=20221208; t=1681229243;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=dAeE7rBx2LrEXGBOeJAa11rA6LzPuJMSc3yrCGL+cOo=;
-        b=yHKE0ADk4mlLhhfRhtgCadpVkMpvaHdD8O+iQcvjrzCzWiWCoMxJ5B6WSy8oSIrtU+
-         86IzlzFKFuCL/splmCmz4Y+fXbPQeHRrrVeQ+fp1Zod8GOX1yf6SIb2XwpKJF2DaXbiH
-         addi8Cj3zaUQD9mEDa5w9UMN9fbhWcC0M8q3n01RY8du83aaL27mCvHpFnmkP4CPdio+
-         RG5//irHEyT9DFgwyTszL4Au6tMwBD4ko1UI3T5Ti+vyGLSb50Fzz/L9e+R+6H3pfWE4
-         cjjomGR/siYxw8Zw1Vi7iFRkAD6mV5w3EPJjtgz1yxif0YQZAHJlSKHB8MoMvYIQ8xCs
-         i6Vw==
+        bh=hxFAtEsJbdvLtNfJ/+L53LQFojPN24OozaH8YhStbXs=;
+        b=4/US+zI8k77bTfBehwqJE2pi/YmTOYnxZsoRgQqxe+hSfJGPZwAd/yQPRtpgTZHCvo
+         tgsiu/b+eB8R1WBAXVsD1uCFrw5o53FVx/RkGqX4eTJuDt4BLzPglF/yTL/Dem36WjZR
+         dxWa8B1Zq7WplWoXGJKtqthQN5xXVtAoP6RqUnXKSp/Ba99G4qMjK98p6H7bKVnBI8S2
+         uWQfarLgDMYS5Aki9gK9IGswJSPbw4/7XF3p84WPc2QVqSMx8T/Bj76ppWlPpv3n0hEm
+         jpzXBMSM3n6uufwEMYiVymKnFkE02YfSRxnj+7HyfswyFsY1u+JMNYitY1xHLfYe4pAg
+         4m+g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1681228974;
+        d=1e100.net; s=20210112; t=1681229243;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=dAeE7rBx2LrEXGBOeJAa11rA6LzPuJMSc3yrCGL+cOo=;
-        b=mj7Y2FwNJ1EC5OFkrYQCijB8dTaBctdCL69yE86HxIk5llN5NWxkXL4HsUju6IzGTx
-         V1rZ2gsMVkGkaoW5c5A3nYv+jfLuXKLegJO1qDcM203UquFOpwfkz/8o0fhFMCnlK6LN
-         Q1UtaimiUzyqSV40KWzSnqdkqCPYGfTqxJcLlYlEav/Um5LQRwPmT3cm8bA8K8Y5WSzB
-         Fok38ZBuhwD9rACG9+VEmUKvljhzm0sSvGaVgZCsPt3tMx7mwk+Mb1q4WonSd5sFLMIm
-         356g2bb3ISEo3V2XsvzEEGSZeufjuDqhX7AZ82k5GdxynRU1Z+LVfmVHuWYWgTNiRj3p
-         zHKQ==
-X-Gm-Message-State: AAQBX9dYRMIL5K1vDCyNdb2+/yJjfiPHF+J9EZkboHqh80zQNDb12QT3
-        OOYT+hy/H61T3U+0S2jwPcbXpaqXBdQ=
-X-Google-Smtp-Source: AKy350bPU43l2NGxsAIr+vg/0jzFplV883M5PQxzo3Pp2tOzb6IG6EspbBN7X/pTYgjclcvEKd4crZlm/tg=
+        bh=hxFAtEsJbdvLtNfJ/+L53LQFojPN24OozaH8YhStbXs=;
+        b=fH4VhAByNjGFS2DvhOlNRT0276KLcMZS5CjemY4HIDRly2Gf0+nVLbNFZDu2rV5lDt
+         WNYtgRdXSJ1Uf78/m6gqnf/xj1AfwmxnlKRLzdd5Z++ERf0mDisD3mMXQYWaIkOAXMM8
+         MV62+qmCWdgJlZLkKh4Ow+O8zAOi2aupW0Amrc3BZsPDAe4jDdV7EvCKtlGq5zZp14AX
+         qI7+sydXY25QnjxKknEbP1JM3Gr4xlDRTuiFTkFOZQtl9q9HEtzqkQSByL4lwmam84Ys
+         MeWWBwTxtGXHOGm9d/QjquzoYat1ALdCKqmjRY80XyBL9B5bhlvAx8WzVmlSvzV4/n73
+         5mhw==
+X-Gm-Message-State: AAQBX9fNiqW+RqzgOV696NiTcEL5j9LNlOCMOM8Ho7xMJI+IvaTST6PH
+        IJ2rAA2gexoxLHAMCnrdJLy0B/AAxuE=
+X-Google-Smtp-Source: AKy350bdH1VghV1oY5g6iFH9b4l1GJ2QrDTTqV4W4Ri6MK+N7qKBqaPP3co6412qPLXfdmFdj0AuOrqkJCQ=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:690c:c9a:b0:533:a15a:d33e with SMTP id
- cm26-20020a05690c0c9a00b00533a15ad33emr9641481ywb.5.1681228974368; Tue, 11
- Apr 2023 09:02:54 -0700 (PDT)
-Date:   Tue, 11 Apr 2023 09:02:52 -0700
-In-Reply-To: <ecd3d8de-859b-e5dd-c3bf-ea9c3c0aac60@linux.microsoft.com>
+ (user=seanjc job=sendgmr) by 2002:a81:c609:0:b0:53c:6fda:835f with SMTP id
+ l9-20020a81c609000000b0053c6fda835fmr5295332ywi.0.1681229243803; Tue, 11 Apr
+ 2023 09:07:23 -0700 (PDT)
+Date:   Tue, 11 Apr 2023 09:07:22 -0700
+In-Reply-To: <431136bf-2e49-fbef-457d-1145c1a59fac@redhat.com>
 Mime-Version: 1.0
-References: <20230227171751.1211786-1-jpiotrowski@linux.microsoft.com>
- <ZAd2MRNLw1JAXmOf@google.com> <959c5bce-beb5-b463-7158-33fc4a4f910c@linux.microsoft.com>
- <ZDSa9Bbqvh0btgQo@google.com> <ecd3d8de-859b-e5dd-c3bf-ea9c3c0aac60@linux.microsoft.com>
-Message-ID: <ZDWEgXM/UILjPGiG@google.com>
-Subject: Re: [PATCH] KVM: SVM: Disable TDP MMU when running on Hyper-V
+References: <20230405002359.418138-1-seanjc@google.com> <431136bf-2e49-fbef-457d-1145c1a59fac@redhat.com>
+Message-ID: <ZDWFup/igRUtfNTa@google.com>
+Subject: Re: [PATCH] KVM: nVMX: Emulate NOPs in L2, and PAUSE if it's not intercepted
 From:   Sean Christopherson <seanjc@google.com>
-To:     Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Tianyu Lan <ltykernel@gmail.com>,
-        Michael Kelley <mikelley@microsoft.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Mathias Krause <minipli@grsecurity.net>
 Content-Type: text/plain; charset="us-ascii"
 X-Spam-Status: No, score=-7.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
@@ -71,75 +66,50 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Apr 11, 2023, Jeremi Piotrowski wrote:
-> On 4/11/2023 1:25 AM, Sean Christopherson wrote:
-> > On Wed, Apr 05, 2023, Jeremi Piotrowski wrote:
-> >> On 3/7/2023 6:36 PM, Sean Christopherson wrote:
-> >>> Thinking about this more, I would rather revert commit 1e0c7d40758b ("KVM: SVM:
-> >>> hyper-v: Remote TLB flush for SVM") or fix the thing properly straitaway.  KVM
-> >>> doesn't magically handle the flushes correctly for the shadow/legacy MMU, KVM just
-> >>> happens to get lucky and not run afoul of the underlying bugs.  The revert appears
-> >>> to be reasonably straightforward (see bottom).
-> >>
-> >> Hi Sean,
-> >>
-> >> I'm back, and I don't have good news. The fix for the missing hyperv TLB flushes has
-> >> landed in Linus' tree and I now had the chance to test things outside Azure, in WSL on my
-> >> AMD laptop.
-> >>
-> >> There is some seriously weird interaction going on between TDP MMU and Hyper-V, with
-> >> or without enlightened TLB. My laptop has 16 vCPUs, so the WSL VM also has 16 vCPUs.
-> >> I have hardcoded the kernel to disable enlightened TLB (so we know that is not interfering).
-> >> I'm running a Flatcar Linux VM inside the WSL VM using legacy BIOS, a single CPU
-> >> and 4GB of RAM.
-> >>
-> >> If I run with `kvm.tdp_mmu=0`, I can boot and shutdown my VM consistently in 20 seconds.
-> >>
-> >> If I run with TDP MMU, the VM boot stalls for seconds at a time in various spots
-> >> (loading grub, decompressing kernel, during kernel boot), the boot output feels like
-> >> it's happening in slow motion. The fastest I see it finish the same cycle is 2 minutes,
-> >> I have also seen it take 4 minutes, sometimes even not finish at all. Same everything,
-> >> the only difference is the value of `kvm.tdp_mmu`.
+On Tue, Apr 11, 2023, Paolo Bonzini wrote:
+> On 4/5/23 02:23, Sean Christopherson wrote:
+> > Fixes: 07721feee46b ("KVM: nVMX: Don't emulate instructions in guest mode")
+> > Cc: Mathias Krause <minipli@grsecurity.net>
+> > Cc: stable@vger.kernel.org
+> > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> > ---
+> >   arch/x86/kvm/vmx/vmx.c | 15 +++++++++++++++
+> >   1 file changed, 15 insertions(+)
 > > 
-> > When a stall occurs, can you tell where the time is lost?  E.g. is the CPU stuck
-> > in L0, L1, or L2?  L2 being a single vCPU rules out quite a few scenarios, e.g.
-> > lock contention and whatnot.
-> 
-> It shows up as around 90% L2 time, 10% L1 time.
-
-Are those numbers coming from /proc/<pid>/stat?  Something else?
-
-> I don't have great visibility into L0 time right now, I'm trying to find
-> someone who might be able to help with that.
-> 
+> > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> > index 9ae4044f076f..1e560457bf9a 100644
+> > --- a/arch/x86/kvm/vmx/vmx.c
+> > +++ b/arch/x86/kvm/vmx/vmx.c
+> > @@ -7898,6 +7898,21 @@ static int vmx_check_intercept(struct kvm_vcpu *vcpu,
+> >   		/* FIXME: produce nested vmexit and return X86EMUL_INTERCEPTED.  */
+> >   		break;
+> > +	case x86_intercept_pause:
+> > +		/*
+> > +		 * PAUSE is a single-byte NOP with a REPE prefix, i.e. collides
+> > +		 * with vanilla NOPs in the emulator.  Apply the interception
+> > +		 * check only to actual PAUSE instructions.  Don't check
+> > +		 * PAUSE-loop-exiting, software can't expect a given PAUSE to
+> > +		 * exit, i.e. KVM is within its rights to allow L2 to execute
+> > +		 * the PAUSE.
+> > +		 */
+> > +		if ((info->rep_prefix != REPE_PREFIX) ||
+> > +		    !nested_cpu_has2(vmcs12, CPU_BASED_PAUSE_EXITING))
+> > +			return X86EMUL_CONTINUE;
+> > +
+> > +		break;
+> > +
+> >   	/* TODO: check more intercepts... */
+> >   	default:
+> >   		break;
 > > 
-> > If you can run perf in WSL, that might be the easiest way to suss out what's going
-> > on.
+> > base-commit: 27d6845d258b67f4eb3debe062b7dacc67e0c393
 > 
-> I can run perf, what trace would help?
+> Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+> 
+> Would you like me to apply this for 6.3?
 
-Good question.  I'm not exactly a perf expert and almost never do anything beyond
-`perf top`.  That's probably sufficient for now, I really just want to confirm that
-L1 doesn't appear to be stuck, e.g. in KVM's page fault handler.
+Nah, I don't think there's a good risk vs. reward ratio.  KVM doesn't enable PLE
+for L2, never enables PAUSE-exiting, and won't emulate NOP without forced emulation
+or TLB shenanigans from L2.  So other than tests, this really shouldn't matter.
 
-> The results are the same for both branches, and it does look like this affects AMD and
-> Intel equally.
-
-Nice.  I have Intel hardware at home that I'll try to repro on, though it will
-be several weeks until I can dive into this.
-
-> So seeing as this will likely take a while to figure out (and I know I won't be able to
-> spend too many cycles on this in the next few weeks), what do you think of a patch to
-> disable tdp_mmu in this configuration (for the time being?).
-
-I don't particularly love the idea of disabling the TDP MMU without having the
-slightest clue what's going wrong, but I'm not totally opposed to it.
-
-Paolo, any thoughts?  You have far more experience with supporting downstream
-consumers of KVM.
-
-> Something else I've been wondering: in a KVM-on-KVM setup, is tdp_mmu used in both L0
-> and L1 hypervisors right now?
-
-By default, yes.  I double checked that L2 has similar boot times for KVM-on-KVM
-with and without the TDP MMU.  Certainly nothing remotely close to 2 minutes.
+Actually, typing that out is making me rethink the stable tag...
