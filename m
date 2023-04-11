@@ -2,176 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1F5B46DD496
-	for <lists+kvm@lfdr.de>; Tue, 11 Apr 2023 09:46:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 775086DD4B8
+	for <lists+kvm@lfdr.de>; Tue, 11 Apr 2023 10:02:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230157AbjDKHqX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Apr 2023 03:46:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38302 "EHLO
+        id S229888AbjDKICM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Apr 2023 04:02:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44988 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230162AbjDKHqV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 Apr 2023 03:46:21 -0400
-Received: from mail-wr1-x430.google.com (mail-wr1-x430.google.com [IPv6:2a00:1450:4864:20::430])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6DF8119AB
-        for <kvm@vger.kernel.org>; Tue, 11 Apr 2023 00:45:59 -0700 (PDT)
-Received: by mail-wr1-x430.google.com with SMTP id d9so6626302wrb.11
-        for <kvm@vger.kernel.org>; Tue, 11 Apr 2023 00:45:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1681199158; x=1683791158;
-        h=content-transfer-encoding:mime-version:message-id:in-reply-to:date
-         :subject:cc:to:from:user-agent:references:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8GJkBu/6O7bpoxJpSxzQAmtDd9z9BrBcTp2/jbWSqLg=;
-        b=ONrys1MQcuUa+gyjSddYDw/0ef8cr2MbRXSeoXGLMVtibaBja5whE6sSVgGWAVK/EM
-         zJmY7FbvlT2+6CyulhXthb8c1nZ2Mbs6moQIVcQtfbUanq0yi/SLuWKSUIO8NiRxCj4O
-         H/j/UYM/KtAogIIcG1nAT6+cmekS7jliJO0wKDgOYCfQZvzDyWlNEw02aDu7WsndtaBU
-         Vuo6MVynWArAs8BXHY9gKF+j+0/fiWUvro80kG0bGyrZ3JIBPX7NuSRwfk7FBbKvg5yU
-         9iaox21FvCX8P0MKd215a+nZhjhRXqCu5lXASGBW4Q/pMvWCcU9YiJccAliKgvNG2NgY
-         LdAg==
+        with ESMTP id S229485AbjDKICJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 Apr 2023 04:02:09 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D55D82D60
+        for <kvm@vger.kernel.org>; Tue, 11 Apr 2023 01:01:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1681200081;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=AAs2OJP8pKZ8Gc7qYRAVj20lAWot/W5/JtvlgMjcymc=;
+        b=ax3984RU6V6C6jUybRKXDW0uFSq7Y7COsB2NLUDJXV4yNKRWOMf1W7chRP1JeWombvHnBD
+        Jr7wpgZBKylCqGf1FINiDssSIJjupSrB+D2rVf0dn0hF6y5E4RuzEzI4nz5Y4m0YZuQ9oQ
+        mCUi9BcJHNIZYlVfZnBolzmA4cObNI0=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-114-JZIqWZ3EMTumM9ewcA0K-w-1; Tue, 11 Apr 2023 04:01:20 -0400
+X-MC-Unique: JZIqWZ3EMTumM9ewcA0K-w-1
+Received: by mail-wm1-f70.google.com with SMTP id o4-20020a05600c510400b003eea8d25f06so1418606wms.1
+        for <kvm@vger.kernel.org>; Tue, 11 Apr 2023 01:01:20 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1681199158; x=1683791158;
-        h=content-transfer-encoding:mime-version:message-id:in-reply-to:date
-         :subject:cc:to:from:user-agent:references:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=8GJkBu/6O7bpoxJpSxzQAmtDd9z9BrBcTp2/jbWSqLg=;
-        b=XnXxsZEPzh5AQ/eavUF4uz+sM4O4yIUqAdF2vAQbr74plnNjUK6PD6+Ix1SvqVXTvJ
-         bIiRY1Zrg3SeOfSrhUeFP1EN4mbk2HltbpO90D6O5noh2cWFoyZLTkJHn/jlBO/Td2d4
-         VNHkL2yEDuJdJraCNuhDj0MOilwYf7I7m8Z8GXWboKm3W6wW0lfoyiSACuderFh7BGzG
-         72YxwRAPUicyWjK7YTqs2QXBiFrjCfYdrhVBelq2cS/ffYEzthzs0x0xY7cikdEVukSy
-         o/CApubKpZ7iT63C7toM86DZnHb/zA2H90VO4nBhK78IKqSgoTJQTa8wyrTjrihjpG7V
-         zNVg==
-X-Gm-Message-State: AAQBX9eE3XtzNROzdvSSOfDBRT2UEmj84BQRhYamtmqZB+Ezv9TSjFjs
-        bQqfoiOJ3TZjS3k4378rUaFyYw==
-X-Google-Smtp-Source: AKy350bBvr6G4NN9rfEYbGer6u6n82uyRoaKQDPSezwGnZVwZF/ZEYw9oCSuzQJ5e7sKq7TMi088/w==
-X-Received: by 2002:a05:6000:1081:b0:2f2:d852:c3e6 with SMTP id y1-20020a056000108100b002f2d852c3e6mr1336809wrw.3.1681199157880;
-        Tue, 11 Apr 2023 00:45:57 -0700 (PDT)
-Received: from zen.linaroharston ([85.9.250.243])
-        by smtp.gmail.com with ESMTPSA id s10-20020a5d6a8a000000b002efdf3e5be0sm7736513wru.44.2023.04.11.00.45.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 Apr 2023 00:45:57 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
-        by zen.linaroharston (Postfix) with ESMTP id 0218F1FFB7;
-        Tue, 11 Apr 2023 08:45:57 +0100 (BST)
-References: <20230307112845.452053-1-alex.bennee@linaro.org>
- <20230321152649.zae7edlfub76fyqq@orel>
-User-agent: mu4e 1.10.0; emacs 29.0.90
-From:   Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To:     Andrew Jones <andrew.jones@linux.dev>
-Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        qemu-devel@nongnu.org, Thomas Huth <thuth@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.linux.dev,
-        qemu-arm@nongnu.org
-Subject: Re: [kvm-unit-tests PATCH v10 0/7] MTTCG sanity tests for ARM
-Date:   Tue, 11 Apr 2023 08:43:49 +0100
-In-reply-to: <20230321152649.zae7edlfub76fyqq@orel>
-Message-ID: <87mt3erhe3.fsf@linaro.org>
+        d=1e100.net; s=20210112; t=1681200079;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=AAs2OJP8pKZ8Gc7qYRAVj20lAWot/W5/JtvlgMjcymc=;
+        b=2eFARufHzYKGgX904IL+zUewaJvFXRzqueYT8D2cF+scXcJDpXvX558XJ0Ir7v6uCU
+         hH0CXb+ZkylM+zt1WMz6VevCaHLcvSSWF/H91SGdHtE3euvA+7LbV7Pw5LZe1AZ0fFkA
+         C3w1I0omW8KmA/Ito6TGlYAQr+zvJpCK0buQY0BEs4mqG/wSpaEhZq7xfkudeVUT+6nF
+         2FExbNRdG1j2ijFFI5WjFS/4RDf7RSrDslFwKxJfYCnNrgkC8vc3+pWqOrfEoftS/fx/
+         P7jfWaKmn8HrKKZL7qjVHwhG0tlFIZT3p9+/Gkkt+iyv9Kz0+JkmS0CF2BJFNw2CD4Rh
+         bbbQ==
+X-Gm-Message-State: AAQBX9d0idIvTICxGp6E0kvNeAdSBRuxYKk7abavml5qRIrC+tpizaEM
+        2r5iDHEshyso7H9Lk/Fj4pHEPTgt46JvgAuVb/LnHCSYNc/gHswYluGxtSgatRnD+VoffpTv99V
+        /5B9F0Q0f2wN3
+X-Received: by 2002:a7b:c018:0:b0:3ed:6c71:9dc8 with SMTP id c24-20020a7bc018000000b003ed6c719dc8mr10030669wmb.22.1681200079602;
+        Tue, 11 Apr 2023 01:01:19 -0700 (PDT)
+X-Google-Smtp-Source: AKy350Yr97rLlD8PFTK8VWVrLEgughHb9CikcjDOH75PCtAjE2MRvEZvWpzNfYrgSzNCVsNcn5GU5w==
+X-Received: by 2002:a7b:c018:0:b0:3ed:6c71:9dc8 with SMTP id c24-20020a7bc018000000b003ed6c719dc8mr10030637wmb.22.1681200079083;
+        Tue, 11 Apr 2023 01:01:19 -0700 (PDT)
+Received: from [192.168.0.3] (ip-109-43-179-153.web.vodafone.de. [109.43.179.153])
+        by smtp.gmail.com with ESMTPSA id f3-20020a7bc8c3000000b003ee10fb56ebsm16269220wml.9.2023.04.11.01.01.17
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 11 Apr 2023 01:01:18 -0700 (PDT)
+Message-ID: <916aac4f-97b8-70c2-de39-87438eb4aea4@redhat.com>
+Date:   Tue, 11 Apr 2023 10:01:17 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
-        DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS
-        autolearn=unavailable autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.13.0
+Subject: Re: [kvm-unit-tests PATCH] x86: Link with "-z noexecstack" to
+ suppress irrelevant linker warnings
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org
+References: <20230406220839.835163-1-seanjc@google.com>
+From:   Thomas Huth <thuth@redhat.com>
+In-Reply-To: <20230406220839.835163-1-seanjc@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.4 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 07/04/2023 00.08, Sean Christopherson wrote:
+> Explicitly tell the linker KUT doesn't need an executable stack to
+> suppress gcc-12 warnings about the default behavior of having an
+> executable stack being deprecated.  The entire thing is irrelevant for KUT
+> (and other freestanding environments) as KUT creates its own stacks, i.e.
+> there's no loader/libc that consumes the magic ".note.GNU-stack" section.
+> 
+>    ld -nostdlib -m elf_x86_64 -T /home/seanjc/go/src/kernel.org/kvm-unit-tests/x86/flat.lds
+>       -o x86/vmx.elf x86/vmx.o x86/cstart64.o x86/access.o x86/vmx_tests.o lib/libcflat.a
+>    ld: warning: setjmp64.o: missing .note.GNU-stack section implies executable stack
+>    ld: NOTE: This behaviour is deprecated and will be removed in a future version of the linker
+> 
+> Link: https://lkml.kernel.org/r/ZC7%2Bc42p2IRWtHfT%40google.com
+> Cc: Thomas Huth <thuth@redhat.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>   x86/Makefile.common | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/x86/Makefile.common b/x86/Makefile.common
+> index 365e199f..c57d418a 100644
+> --- a/x86/Makefile.common
+> +++ b/x86/Makefile.common
+> @@ -62,7 +62,7 @@ else
+>   # We want to keep intermediate file: %.elf and %.o
+>   .PRECIOUS: %.elf %.o
+>   
+> -%.elf: LDFLAGS = -nostdlib $(arch_LDFLAGS)
+> +%.elf: LDFLAGS = -nostdlib $(arch_LDFLAGS) -z noexecstack
+>   %.elf: %.o $(FLATLIBS) $(SRCDIR)/x86/flat.lds $(cstart.o)
+>   	$(LD) $(LDFLAGS) -T $(SRCDIR)/x86/flat.lds -o $@ \
+>   		$(filter %.o, $^) $(FLATLIBS)
 
-Andrew Jones <andrew.jones@linux.dev> writes:
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 
-> On Tue, Mar 07, 2023 at 11:28:38AM +0000, Alex Benn=C3=A9e wrote:
->> I last had a go at getting these up-streamed at the end of 2021 so
->> its probably worth having another go. From the last iteration a
->> number of the groundwork patches did get merged:
->>=20
->>   Subject: [kvm-unit-tests PATCH v9 0/9] MTTCG sanity tests for ARM
->>   Date: Thu,  2 Dec 2021 11:53:43 +0000
->>   Message-Id: <20211202115352.951548-1-alex.bennee@linaro.org>
->>=20
->> So this leaves a minor gtags patch, adding the isaac RNG library which
->> would also be useful for other users, see:
->>=20
->>   Subject: [kvm-unit-tests PATCH v3 11/27] lib: Add random number genera=
-tor
->>   Date: Tue, 22 Nov 2022 18:11:36 +0200
->>   Message-Id: <20221122161152.293072-12-mlevitsk@redhat.com>
->>=20
->> Otherwise there are a few minor checkpatch tweaks.
->>=20
->> I would still like to enable KVM unit tests inside QEMU as things like
->> the x86 APIC tests are probably a better fit for unit testing TCG
->> emulation than booting a whole OS with various APICs enabled.
->>=20
->> Alex Benn=C3=A9e (7):
->>   Makefile: add GNU global tags support
->>   add .gitpublish metadata
->>   lib: add isaac prng library from CCAN
->>   arm/tlbflush-code: TLB flush during code execution
->>   arm/locking-tests: add comprehensive locking test
->>   arm/barrier-litmus-tests: add simple mp and sal litmus tests
->>   arm/tcg-test: some basic TCG exercising tests
->>=20
->>  Makefile                  |   5 +-
->>  arm/Makefile.arm          |   2 +
->>  arm/Makefile.arm64        |   2 +
->>  arm/Makefile.common       |   6 +-
->>  lib/arm/asm/barrier.h     |  19 ++
->>  lib/arm64/asm/barrier.h   |  50 +++++
->>  lib/prng.h                |  83 +++++++
->>  lib/prng.c                | 163 ++++++++++++++
->>  arm/tcg-test-asm.S        | 171 +++++++++++++++
->>  arm/tcg-test-asm64.S      | 170 ++++++++++++++
->>  arm/barrier-litmus-test.c | 450 ++++++++++++++++++++++++++++++++++++++
->>  arm/locking-test.c        | 321 +++++++++++++++++++++++++++
->>  arm/spinlock-test.c       |  87 --------
->>  arm/tcg-test.c            | 340 ++++++++++++++++++++++++++++
->>  arm/tlbflush-code.c       | 209 ++++++++++++++++++
->>  arm/unittests.cfg         | 170 ++++++++++++++
->>  .gitignore                |   3 +
->>  .gitpublish               |  18 ++
->>  18 files changed, 2180 insertions(+), 89 deletions(-)
->>  create mode 100644 lib/prng.h
->>  create mode 100644 lib/prng.c
->>  create mode 100644 arm/tcg-test-asm.S
->>  create mode 100644 arm/tcg-test-asm64.S
->>  create mode 100644 arm/barrier-litmus-test.c
->>  create mode 100644 arm/locking-test.c
->>  delete mode 100644 arm/spinlock-test.c
->>  create mode 100644 arm/tcg-test.c
->>  create mode 100644 arm/tlbflush-code.c
->>  create mode 100644 .gitpublish
->>=20
->> --=20
->> 2.39.2
->>
->
-> I don't see any problem with the series, but I didn't review it closely.
-> I think it's unlikely we'll get reviewers, but, as the tests are
-> nodefault, then that's probably OK. Can you make sure all tests have a
-> "tcg" type prefix when they are TCG-only, like the last patch does for
-> its tests? That will help filter them out when building all tests as
-> standalone tests.
-
-tcg-tests is the only test that explicitly targets TCG behaviour (in the
-choice of loops and SMC). The other tests are architecture validation
-tests which should just be easy passes on real silicon.
-
-> Someday mkstandalone could maybe learn how to build
-> a directory hierarchy using the group names, e.g.
->
->  tests/mttcg/tlb/all_other
-
-So nodefault isn't enough for this?
-
->
-> but I don't expect to have time for that myself anytime soon, so prefixes
-> will likely have to do for now (or forever).
->
-> Thanks,
-> drew
-
-
---=20
-Alex Benn=C3=A9e
-Virtualisation Tech Lead @ Linaro
