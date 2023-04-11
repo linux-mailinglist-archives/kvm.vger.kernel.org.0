@@ -2,150 +2,185 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CED966DD2FC
-	for <lists+kvm@lfdr.de>; Tue, 11 Apr 2023 08:38:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 18F526DD355
+	for <lists+kvm@lfdr.de>; Tue, 11 Apr 2023 08:48:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230324AbjDKGiB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Apr 2023 02:38:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48380 "EHLO
+        id S230293AbjDKGsK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Apr 2023 02:48:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58666 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230298AbjDKGh6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 Apr 2023 02:37:58 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F190819AC
-        for <kvm@vger.kernel.org>; Mon, 10 Apr 2023 23:37:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1681195033;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=olF5mjepmtklFbFK7hKHFfEdos+6jxWkuuqywTknkRQ=;
-        b=PM92Vt8jTux66/G2rvpKxOMC9sjcDV375dauFBeyJAidJ7U4e3lieYat3Fo5J95PTvZ1Lq
-        pNlTzql3tQ6KyK/odfWedjnZuR39T8paVqlUTjfiZYohMJoJkuO+in66XCyxEzI4gajfix
-        Yj2fgeR8KlnXZy28Lxc+zRAsf1MI5Sg=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-387-JGeIHa0cMSCTpqM-LFFbFA-1; Tue, 11 Apr 2023 02:37:12 -0400
-X-MC-Unique: JGeIHa0cMSCTpqM-LFFbFA-1
-Received: by mail-wm1-f70.google.com with SMTP id l26-20020a05600c1d1a00b003edf85f6bb1so4940727wms.3
-        for <kvm@vger.kernel.org>; Mon, 10 Apr 2023 23:37:11 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1681195030; x=1683787030;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=olF5mjepmtklFbFK7hKHFfEdos+6jxWkuuqywTknkRQ=;
-        b=zG9jrYsN56XpoPei1aF/KGoKjKraei807Cjs+Ir/RiXrBS/r3iOA8TTZpYUkdGYeo7
-         pENxa178moEt3e1xnLlRhSXlO5VssLlvfuLziOEoporEVgXdml7ZUmST2bTyPuV7N5pa
-         8jYhHeN6zLE0enTY7OH/S2Idm/TGCs5wKyy5jCAABB2bCEPxAiESJN9WQ7EoPVadD7fy
-         4BnS1VU4aRVPUTZoL3BIvmiZ/Xlq+3uqtGmeqTB649qeEcdmkNI+eH1wgGctlLjQDZ5s
-         vbetKt2rsMXbG8lj2GHaFZuFhlqLj1kVPD08VfLG5qLIihDTzuyCtjXtOG7A7vwaNFFs
-         xHZw==
-X-Gm-Message-State: AAQBX9fvNTFEevpd84t8snYZLWcA6awSP7f/SHUUNFkbA0lbPrt8YwFx
-        kVV+GHuJmkUzX5cz5OLbg/jnLeo+kn8VAMhIrlNiNNXAHqJyKrl8S5gJonz7wXt0h17j8wPtcPB
-        wwWQXrXL+nVUiC+ahQxfo
-X-Received: by 2002:a5d:48d2:0:b0:2ee:e42e:e8b7 with SMTP id p18-20020a5d48d2000000b002eee42ee8b7mr5945614wrs.33.1681195030470;
-        Mon, 10 Apr 2023 23:37:10 -0700 (PDT)
-X-Google-Smtp-Source: AKy350bi7wOckY7Uos6LLY1S0H/CZrnhoKLnlhxa4G7i+9nqN5zOvtaIWdafQtZ1IKvo+jBX7RcldQ==
-X-Received: by 2002:a5d:48d2:0:b0:2ee:e42e:e8b7 with SMTP id p18-20020a5d48d2000000b002eee42ee8b7mr5945602wrs.33.1681195030107;
-        Mon, 10 Apr 2023 23:37:10 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
-        by smtp.googlemail.com with ESMTPSA id b16-20020adfe310000000b002f27a6a49d0sm2524355wrj.10.2023.04.10.23.37.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 10 Apr 2023 23:37:09 -0700 (PDT)
-Message-ID: <431136bf-2e49-fbef-457d-1145c1a59fac@redhat.com>
-Date:   Tue, 11 Apr 2023 08:37:07 +0200
+        with ESMTP id S230198AbjDKGsF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 Apr 2023 02:48:05 -0400
+Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2168A272A
+        for <kvm@vger.kernel.org>; Mon, 10 Apr 2023 23:48:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1681195684; x=1712731684;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=P4YMBXScVBBglfEFkiGOeQasVcTNDpoblfuqLiEFJNE=;
+  b=ISTridHaKGmCP/skxCTS7NxATQQ74/Uvu2+eHsiQjv/4xUOMFNtFEzmY
+   +/g7oN+z/vxsfU2/KoHrosH/Tvl88DHAhJSdzHt2n0Uwf+xw278uQ18fB
+   XJkOP0JDJ6ZHY0QIyJLdxBUnROBZ+ow+y1R8Xze1vcmO84i0s8aSF+I7I
+   +4bxxVpI6zgbEJocpLCBjNpfKqpg93pZ6sfXINPvpvjyMr1TnG84ga1wM
+   wKd+Kg97nmQvpwt3WEOQ4MPlQvTgo7mNLIYZsUFUPasEIbQikTnN/Yar0
+   tUAPhAtv+I1hUwV1qA0fECLON8dEpM5YQAgUigIsZJu4TwoTtpqQlJ34l
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10676"; a="429828718"
+X-IronPort-AV: E=Sophos;i="5.98,336,1673942400"; 
+   d="scan'208";a="429828718"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Apr 2023 23:48:03 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10676"; a="721082322"
+X-IronPort-AV: E=Sophos;i="5.98,336,1673942400"; 
+   d="scan'208";a="721082322"
+Received: from lkp-server01.sh.intel.com (HELO b613635ddfff) ([10.239.97.150])
+  by orsmga001.jf.intel.com with ESMTP; 10 Apr 2023 23:47:58 -0700
+Received: from kbuild by b613635ddfff with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1pm7nJ-000W3G-10;
+        Tue, 11 Apr 2023 06:47:57 +0000
+Date:   Tue, 11 Apr 2023 14:47:02 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Jing Zhang <jingzhangos@google.com>, KVM <kvm@vger.kernel.org>,
+        KVMARM <kvmarm@lists.linux.dev>,
+        ARMLinux <linux-arm-kernel@lists.infradead.org>,
+        Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@google.com>
+Cc:     llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+        Will Deacon <will@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Fuad Tabba <tabba@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Raghavendra Rao Ananta <rananta@google.com>,
+        Jing Zhang <jingzhangos@google.com>
+Subject: Re: [PATCH v6 4/6] KVM: arm64: Use per guest ID register for
+ ID_AA64DFR0_EL1.PMUVer
+Message-ID: <202304111418.tQGXPpze-lkp@intel.com>
+References: <20230404035344.4043856-5-jingzhangos@google.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.9.0
-Subject: Re: [PATCH] KVM: nVMX: Emulate NOPs in L2, and PAUSE if it's not
- intercepted
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Mathias Krause <minipli@grsecurity.net>
-References: <20230405002359.418138-1-seanjc@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20230405002359.418138-1-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.4 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230404035344.4043856-5-jingzhangos@google.com>
+X-Spam-Status: No, score=-2.5 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 4/5/23 02:23, Sean Christopherson wrote:
-> Extend VMX's nested intercept logic for emulated instructions to handle
-> "pause" interception, in quotes because KVM's emulator doesn't filter out
-> NOPs when checking for nested intercepts.  Failure to allow emulation of
-> NOPs results in KVM injecting a #UD into L2 on any NOP that collides with
-> the emulator's definition of PAUSE, i.e. on all single-byte NOPs.
-> 
-> For PAUSE itself, honor L1's PAUSE-exiting control, but ignore PLE to
-> avoid unnecessarily injecting a #UD into L2.  Per the SDM, the first
-> execution of PAUSE after VM-Entry is treated as the beginning of a new
-> loop, i.e. will never trigger a PLE VM-Exit, and so L1 can't expect any
-> given execution of PAUSE to deterministically exit.
-> 
->    ... the processor considers this execution to be the first execution of
->    PAUSE in a loop. (It also does so for the first execution of PAUSE at
->    CPL 0 after VM entry.)
-> 
-> All that said, the PLE side of things is currently a moot point, as KVM
-> doesn't expose PLE to L1.
-> 
-> Note, vmx_check_intercept() is still wildly broken when L1 wants to
-> intercept an instruction, as KVM injects a #UD instead of synthesizing a
-> nested VM-Exit.  That issue extends far beyond NOP/PAUSE and needs far
-> more effort to fix, i.e. is a problem for the future.
-> 
-> Fixes: 07721feee46b ("KVM: nVMX: Don't emulate instructions in guest mode")
-> Cc: Mathias Krause <minipli@grsecurity.net>
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->   arch/x86/kvm/vmx/vmx.c | 15 +++++++++++++++
->   1 file changed, 15 insertions(+)
-> 
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 9ae4044f076f..1e560457bf9a 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -7898,6 +7898,21 @@ static int vmx_check_intercept(struct kvm_vcpu *vcpu,
->   		/* FIXME: produce nested vmexit and return X86EMUL_INTERCEPTED.  */
->   		break;
->   
-> +	case x86_intercept_pause:
-> +		/*
-> +		 * PAUSE is a single-byte NOP with a REPE prefix, i.e. collides
-> +		 * with vanilla NOPs in the emulator.  Apply the interception
-> +		 * check only to actual PAUSE instructions.  Don't check
-> +		 * PAUSE-loop-exiting, software can't expect a given PAUSE to
-> +		 * exit, i.e. KVM is within its rights to allow L2 to execute
-> +		 * the PAUSE.
-> +		 */
-> +		if ((info->rep_prefix != REPE_PREFIX) ||
-> +		    !nested_cpu_has2(vmcs12, CPU_BASED_PAUSE_EXITING))
-> +			return X86EMUL_CONTINUE;
-> +
-> +		break;
-> +
->   	/* TODO: check more intercepts... */
->   	default:
->   		break;
-> 
-> base-commit: 27d6845d258b67f4eb3debe062b7dacc67e0c393
+Hi Jing,
 
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+kernel test robot noticed the following build errors:
 
-Would you like me to apply this for 6.3?
+[auto build test ERROR on 7e364e56293bb98cae1b55fd835f5991c4e96e7d]
 
-Paolo
+url:    https://github.com/intel-lab-lkp/linux/commits/Jing-Zhang/KVM-arm64-Move-CPU-ID-feature-registers-emulation-into-a-separate-file/20230404-115612
+base:   7e364e56293bb98cae1b55fd835f5991c4e96e7d
+patch link:    https://lore.kernel.org/r/20230404035344.4043856-5-jingzhangos%40google.com
+patch subject: [PATCH v6 4/6] KVM: arm64: Use per guest ID register for ID_AA64DFR0_EL1.PMUVer
+config: arm64-randconfig-r031-20230410 (https://download.01.org/0day-ci/archive/20230411/202304111418.tQGXPpze-lkp@intel.com/config)
+compiler: clang version 17.0.0 (https://github.com/llvm/llvm-project 2c57868e2e877f73c339796c3374ae660bb77f0d)
+reproduce (this is a W=1 build):
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # install arm64 cross compiling tool for clang build
+        # apt-get install binutils-aarch64-linux-gnu
+        # https://github.com/intel-lab-lkp/linux/commit/66ece3020c02ab1206bb9478e8cb0172e125bbfc
+        git remote add linux-review https://github.com/intel-lab-lkp/linux
+        git fetch --no-tags linux-review Jing-Zhang/KVM-arm64-Move-CPU-ID-feature-registers-emulation-into-a-separate-file/20230404-115612
+        git checkout 66ece3020c02ab1206bb9478e8cb0172e125bbfc
+        # save the config file
+        mkdir build_dir && cp config build_dir/.config
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=arm64 olddefconfig
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=arm64 SHELL=/bin/bash arch/arm64/kvm/
 
+If you fix the issue, kindly add following tag where applicable
+| Reported-by: kernel test robot <lkp@intel.com>
+| Link: https://lore.kernel.org/oe-kbuild-all/202304111418.tQGXPpze-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+>> arch/arm64/kvm/id_regs.c:261:31: error: no member named 'config_lock' in 'struct kvm_arch'
+                   mutex_lock(&vcpu->kvm->arch.config_lock);
+                               ~~~~~~~~~~~~~~~ ^
+   include/linux/mutex.h:187:44: note: expanded from macro 'mutex_lock'
+   #define mutex_lock(lock) mutex_lock_nested(lock, 0)
+                                              ^~~~
+   arch/arm64/kvm/id_regs.c:269:33: error: no member named 'config_lock' in 'struct kvm_arch'
+                   mutex_unlock(&vcpu->kvm->arch.config_lock);
+                                 ~~~~~~~~~~~~~~~ ^
+   arch/arm64/kvm/id_regs.c:311:31: error: no member named 'config_lock' in 'struct kvm_arch'
+                   mutex_lock(&vcpu->kvm->arch.config_lock);
+                               ~~~~~~~~~~~~~~~ ^
+   include/linux/mutex.h:187:44: note: expanded from macro 'mutex_lock'
+   #define mutex_lock(lock) mutex_lock_nested(lock, 0)
+                                              ^~~~
+   arch/arm64/kvm/id_regs.c:318:33: error: no member named 'config_lock' in 'struct kvm_arch'
+                   mutex_unlock(&vcpu->kvm->arch.config_lock);
+                                 ~~~~~~~~~~~~~~~ ^
+   4 errors generated.
+
+
+vim +261 arch/arm64/kvm/id_regs.c
+
+   228	
+   229	static int set_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
+   230				       const struct sys_reg_desc *rd,
+   231				       u64 val)
+   232	{
+   233		u8 pmuver, host_pmuver;
+   234		bool valid_pmu;
+   235	
+   236		host_pmuver = kvm_arm_pmu_get_pmuver_limit();
+   237	
+   238		/*
+   239		 * Allow AA64DFR0_EL1.PMUver to be set from userspace as long
+   240		 * as it doesn't promise more than what the HW gives us. We
+   241		 * allow an IMPDEF PMU though, only if no PMU is supported
+   242		 * (KVM backward compatibility handling).
+   243		 */
+   244		pmuver = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer), val);
+   245		if ((pmuver != ID_AA64DFR0_EL1_PMUVer_IMP_DEF && pmuver > host_pmuver))
+   246			return -EINVAL;
+   247	
+   248		valid_pmu = (pmuver != 0 && pmuver != ID_AA64DFR0_EL1_PMUVer_IMP_DEF);
+   249	
+   250		/* Make sure view register and PMU support do match */
+   251		if (kvm_vcpu_has_pmu(vcpu) != valid_pmu)
+   252			return -EINVAL;
+   253	
+   254		/* We can only differ with PMUver, and anything else is an error */
+   255		val ^= read_id_reg(vcpu, rd);
+   256		val &= ~ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer);
+   257		if (val)
+   258			return -EINVAL;
+   259	
+   260		if (valid_pmu) {
+ > 261			mutex_lock(&vcpu->kvm->arch.config_lock);
+   262			IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1) &= ~ID_AA64DFR0_EL1_PMUVer_MASK;
+   263			IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1) |= FIELD_PREP(ID_AA64DFR0_EL1_PMUVer_MASK,
+   264									    pmuver);
+   265	
+   266			IDREG(vcpu->kvm, SYS_ID_DFR0_EL1) &= ~ID_DFR0_EL1_PerfMon_MASK;
+   267			IDREG(vcpu->kvm, SYS_ID_DFR0_EL1) |= FIELD_PREP(ID_DFR0_EL1_PerfMon_MASK,
+   268									pmuver_to_perfmon(pmuver));
+   269			mutex_unlock(&vcpu->kvm->arch.config_lock);
+   270		} else {
+   271			assign_bit(KVM_ARCH_FLAG_VCPU_HAS_IMP_DEF_PMU, &vcpu->kvm->arch.flags,
+   272				   pmuver == ID_AA64DFR0_EL1_PMUVer_IMP_DEF);
+   273		}
+   274	
+   275		return 0;
+   276	}
+   277	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests
