@@ -2,83 +2,156 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2929D6DD64A
-	for <lists+kvm@lfdr.de>; Tue, 11 Apr 2023 11:10:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 25A106DD662
+	for <lists+kvm@lfdr.de>; Tue, 11 Apr 2023 11:14:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230146AbjDKJKP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Apr 2023 05:10:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56656 "EHLO
+        id S229596AbjDKJOn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Apr 2023 05:14:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38524 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230251AbjDKJJt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 Apr 2023 05:09:49 -0400
-Received: from out-18.mta0.migadu.com (out-18.mta0.migadu.com [IPv6:2001:41d0:1004:224b::12])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06F5D46B1
-        for <kvm@vger.kernel.org>; Tue, 11 Apr 2023 02:08:46 -0700 (PDT)
-Date:   Tue, 11 Apr 2023 11:08:43 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1681204125;
+        with ESMTP id S229459AbjDKJOl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 Apr 2023 05:14:41 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 240412118
+        for <kvm@vger.kernel.org>; Tue, 11 Apr 2023 02:13:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1681204435;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=I2iC8buvK2tS8ozL9BHGlo/Sy4UT6qIVUL5c6wk4p6g=;
-        b=jDlTpk0mHI9HGFG/mMYsZ8feUXZFsTYrXMBV5wrpq5gBMwvb/D9qBQrkCPFRqNvyAJEb4W
-        P4y8LBz10RyPFh4MBpBmxUQknrrQybLiS/mbE8byvPCvvIGCxYHg6xrzoKogdNXTySydbl
-        /Ezp9qgwjnJyILNj90gjOzfVQUX4280=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Andrew Jones <andrew.jones@linux.dev>
-To:     Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        qemu-devel@nongnu.org, Thomas Huth <thuth@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.linux.dev,
-        qemu-arm@nongnu.org
-Subject: Re: [kvm-unit-tests PATCH v10 0/7] MTTCG sanity tests for ARM
-Message-ID: <hlno75xnob6jwbpfzwbwsjje2ujgfzw5kwvwmu2627obkmpqk2@dtcvgno2dkge>
-References: <20230307112845.452053-1-alex.bennee@linaro.org>
- <20230321152649.zae7edlfub76fyqq@orel>
- <87mt3erhe3.fsf@linaro.org>
+        bh=rG8YVr+3IWo4CE+CY2XyHcE+ZCDuW4teuWofuqNtms0=;
+        b=U+7HSel9jMppWWIyNARB03sZZpFm0YdAyDWNFUXCYM8eaUmjByV7zRk/U9axH/l9beXKlL
+        mTQvfD6qT/n8zKKhAbWGSMSWJ6GT0VlO9PdX0TTH1EfLa/5vZ2g8rgVyt7Ej2Ii4OfdGEG
+        PW6Yok4xcWS4Zwltqz0NLrTPoznugHs=
+Received: from mail-oo1-f69.google.com (mail-oo1-f69.google.com
+ [209.85.161.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-161-0KHg6CnOMTmLEVn8JDCrAw-1; Tue, 11 Apr 2023 05:13:53 -0400
+X-MC-Unique: 0KHg6CnOMTmLEVn8JDCrAw-1
+Received: by mail-oo1-f69.google.com with SMTP id x132-20020a4a418a000000b0053b4ee58e0fso2483138ooa.17
+        for <kvm@vger.kernel.org>; Tue, 11 Apr 2023 02:13:53 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1681204433; x=1683796433;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=rG8YVr+3IWo4CE+CY2XyHcE+ZCDuW4teuWofuqNtms0=;
+        b=1I2jRX/qwK3nHCZLV25CvJwJulAUdKaI6Zfv3+14wlHh9GKnQXydeGrJH0P040yEtJ
+         o9fRnM7jDARUtWrdskq5Dhg/f4abi+pvJblsavHOUediCGd6AdhuVDqsV0Fs6teAASP6
+         sfUvMj8fXgMYJlgnjwUVxzGQotw0ZuGodC0F8hvbnjndz03mKeqAXiEN1kpTHFUFlPOG
+         VAET/9GGM/U0VIC+wcqymhkcT05DhAMCpuOpn4F1Bs1RY8RAvqdbyWbantBf9uAmbJIR
+         tIfX1UA3rI8lWiCsU0To7zQQzCQWy6nUdgwRVoUSzhYTcKJBXNo+VdocW8YA1Z/+wbjI
+         M5yw==
+X-Gm-Message-State: AAQBX9cJtIC78EhhJ+Srq6Yb83wofp1e9qyrOiePPds+Io8uhQM6rRyn
+        DbphDqpAxolTcx8VXoqpuHHTlS5ksHTn72f76KT/lLd7n41R3Y2KVcDFWlkkcLl4ozRkk4mkNtg
+        s/BNN303ydGfkNvkTzf0b5xwy1fVA
+X-Received: by 2002:aca:280f:0:b0:387:5a8c:4125 with SMTP id 15-20020aca280f000000b003875a8c4125mr2889710oix.3.1681204432871;
+        Tue, 11 Apr 2023 02:13:52 -0700 (PDT)
+X-Google-Smtp-Source: AKy350YvpDPRV+stgWN71cbwISfDR9tuAtGF5dt0HDFBq3HH+19cK/azHyaoNC8arnfyuDaEmDUHp+71+dODeIH4ho4=
+X-Received: by 2002:aca:280f:0:b0:387:5a8c:4125 with SMTP id
+ 15-20020aca280f000000b003875a8c4125mr2889704oix.3.1681204432261; Tue, 11 Apr
+ 2023 02:13:52 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <87mt3erhe3.fsf@linaro.org>
-X-Migadu-Flow: FLOW_OUT
-X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
-        DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
-        autolearn=unavailable autolearn_force=no version=3.4.6
+References: <20230410150130.837691-1-lulu@redhat.com> <CACGkMEvTdgvqacFmMJZD4u++YJwESgSmLF6CMdAJBBqkxpZKgg@mail.gmail.com>
+ <CACLfguWKw68=wZNa7Ga+Jm8xTE93A_5za3Dc=S_z7ds9FCkRKg@mail.gmail.com>
+In-Reply-To: <CACLfguWKw68=wZNa7Ga+Jm8xTE93A_5za3Dc=S_z7ds9FCkRKg@mail.gmail.com>
+From:   Jason Wang <jasowang@redhat.com>
+Date:   Tue, 11 Apr 2023 17:13:41 +0800
+Message-ID: <CACGkMEv3aca0Thx+X3WZxbV2HK7514G3RzR+A0PqRu7k6Deztg@mail.gmail.com>
+Subject: Re: [PATCH] vhost_vdpa: fix unmap process in no-batch mode
+To:     Cindy Lu <lulu@redhat.com>
+Cc:     mst@redhat.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Apr 11, 2023 at 08:43:49AM +0100, Alex Bennée wrote:
-> 
-> Andrew Jones <andrew.jones@linux.dev> writes:
-...
-> > Someday mkstandalone could maybe learn how to build
-> > a directory hierarchy using the group names, e.g.
+On Tue, Apr 11, 2023 at 3:29=E2=80=AFPM Cindy Lu <lulu@redhat.com> wrote:
+>
+> On Tue, Apr 11, 2023 at 11:10=E2=80=AFAM Jason Wang <jasowang@redhat.com>=
+ wrote:
 > >
-> >  tests/mttcg/tlb/all_other
-> 
-> So nodefault isn't enough for this?
+> > On Mon, Apr 10, 2023 at 11:01=E2=80=AFPM Cindy Lu <lulu@redhat.com> wro=
+te:
+> > >
+> > > While using the no-batch mode, the process will not begin with
+> > > VHOST_IOTLB_BATCH_BEGIN, so we need to add the
+> > > VHOST_IOTLB_INVALIDATE to get vhost_vdpa_as, the process is the
+> > > same as VHOST_IOTLB_UPDATE
+> > >
+> > > Signed-off-by: Cindy Lu <lulu@redhat.com>
+> > > ---
+> > >  drivers/vhost/vdpa.c | 1 +
+> > >  1 file changed, 1 insertion(+)
+> > >
+> > > diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+> > > index 7be9d9d8f01c..32636a02a0ab 100644
+> > > --- a/drivers/vhost/vdpa.c
+> > > +++ b/drivers/vhost/vdpa.c
+> > > @@ -1074,6 +1074,7 @@ static int vhost_vdpa_process_iotlb_msg(struct =
+vhost_dev *dev, u32 asid,
+> > >                 goto unlock;
+> > >
+> > >         if (msg->type =3D=3D VHOST_IOTLB_UPDATE ||
+> > > +           msg->type =3D=3D VHOST_IOTLB_INVALIDATE ||
+> >
+> > I'm not sure I get here, invalidation doesn't need to create a new AS.
+> >
+> > Or maybe you can post the userspace code that can trigger this issue?
+> >
+> > Thanks
+> >
+> sorry I didn't write it clearly
+> For this issue can reproduce in vIOMMU no-batch mode support because
+> while the vIOMMU enabled, it will
+> flash a large memory to unmap, and this memory are haven't been mapped
+> before, so this unmapping will fail
+>
+> qemu-system-x86_64: failed to write, fd=3D12, errno=3D14 (Bad address)
+> qemu-system-x86_64: vhost_vdpa_dma_unmap(0x7fa26d1dd190, 0x0,
+> 0x80000000) =3D -5 (Bad address)
+
+So if this is a simple unmap, which error condition had you met in
+vhost_vdpa_process_iotlb_msg()?
+
+I think you need to trace to see what happens. For example:
+
+1) can the code pass asid_to_iotlb()
+2) if not, ASID 0 has been deleted since all the mappings have been unmappe=
+d
+
+if ASID 0 has been completely unmap, any reason we need to unmap it
+again? And do we need to drop the vhost_vdpa_remove_as() from both
+
+1) vhost_vdpa_unmap()
+and
+2) vhost_vdpa_process_iotlb_msg()
+?
+
+Thanks
+
+> qemu-system-x86_64: failed to write, fd=3D12, errno=3D14 (Bad address)
+> ....
+> in batch mode this operation will begin with VHOST_IOTLB_BATCH_BEGIN,
+> so don't have this issue
+>
+> Thanks
+> cindy
+> > >             msg->type =3D=3D VHOST_IOTLB_BATCH_BEGIN) {
+> > >                 as =3D vhost_vdpa_find_alloc_as(v, asid);
+> > >                 if (!as) {
+> > > --
+> > > 2.34.3
+> > >
+> >
 >
 
-nodefault is enough to avoid running a test with run_tests.sh,
-when its group hasn't been explicitly selected, i.e.
-
- ./run_tests.sh
-
-doesn't run the test
-
- ./run_tests.sh -g test-group-name
-
-does run the test.
-
-standalone test filtering is only done by filename (but
-potentially pathname), which is why I suggested we someday use
-the group names as directory names. Anyway, that's future work.
-This series just needs to ensure it gets its group names right.
-
-Thanks,
-drew
