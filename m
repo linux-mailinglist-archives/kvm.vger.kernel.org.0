@@ -2,55 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 324376E00F3
-	for <lists+kvm@lfdr.de>; Wed, 12 Apr 2023 23:35:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9A22C6E00F4
+	for <lists+kvm@lfdr.de>; Wed, 12 Apr 2023 23:35:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229667AbjDLVfT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 Apr 2023 17:35:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34922 "EHLO
+        id S229746AbjDLVfV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 Apr 2023 17:35:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34928 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229492AbjDLVfS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S229532AbjDLVfS (ORCPT <rfc822;kvm@vger.kernel.org>);
         Wed, 12 Apr 2023 17:35:18 -0400
 Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CDE7C7A85
-        for <kvm@vger.kernel.org>; Wed, 12 Apr 2023 14:35:15 -0700 (PDT)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-54f69fb5cafso71983727b3.12
-        for <kvm@vger.kernel.org>; Wed, 12 Apr 2023 14:35:15 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 975007A93
+        for <kvm@vger.kernel.org>; Wed, 12 Apr 2023 14:35:16 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-54f8a3ded60so42058287b3.8
+        for <kvm@vger.kernel.org>; Wed, 12 Apr 2023 14:35:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1681335315; x=1683927315;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=MEHMIaN+CjvT3NOB98sOvS+cCj2L9OMIJTblslenw6o=;
-        b=OW68UtvL6QVecVpXo8gdhAakChrF4onyj5YaYg8Dbd9jaRuc8F10sw4k/ziHUIm4fr
-         orQJ7SA8dC4Ki+r7H4TX5eVlQNPEdTjpiwdEwA1lUEum8NWexm3C/6bim7XFF9+5GO1T
-         L0RhSSunc4Wpg1WbTnR/cZ25ZxUsB4svJc94LGGGtaER5vXiU+gg9QVWPIWxaltCegcM
-         LfjfaJZJMVzfh8yBbZK8+dEq/ew1BA66F9iLC0A+/JO20051ZQ4Zn379u2DxvKil3bkC
-         qpePjiQfd01G8jTdxGmKKI4VC/Pxza1C/D68Uz0rOrRsktTtNImgFb4FuGCFNRv7P1gf
-         YwOA==
+        d=google.com; s=20221208; t=1681335316; x=1683927316;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=/kXYf91+49LZ0JwpuqmoTf9tA1AbmxtwzhKhgKU0C/k=;
+        b=VMzXtnNvKf2y7EtWP5a9jMGMHV6AhZQazpABnRuJhoLL/DhGR042EHMp9+y7Bjbauy
+         YcuVlfZ7NxMgQ8cDodJGrSFSJoc+drBie83nQRyq+5r+/JZAEBSXa6+xNsWo6GqsXLlV
+         YoNmFHo9NiDYLRl34+6TH8sUGpuN02NSKJEDxS9QvRaR9T25hl+V2R+hERVETVtweJsb
+         brcFqh7l9QU2QkEiqp3mHA/SV2EY4+264uRjaPczvOldWcoBZwYWEzR1aIL75xV7eJ4b
+         SDS0ZLj4BnzDcGSbSYJh822viTFjuVa+xJq1DDijd6MigmfOcN0bLKDriB/ZQXA/+Dkm
+         4oAg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681335315; x=1683927315;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=MEHMIaN+CjvT3NOB98sOvS+cCj2L9OMIJTblslenw6o=;
-        b=aWGFPp2F273YrNcAwRwYVjjDz/VhMV1Mx6PVYAkAnae0f5zbKV7TIaMewdU29xX0L5
-         MxZL+b/Mocihrdq0twJ7ngqk+hEi1WqrWkHhtyQV0IcYoV5rumvpbHY1o0HF31XfLihw
-         /ANNSvUxn8OHEnL23wIV01gS3UAmoPjlnyqA6uy5br7Qr3Tsu8VZOP+Zq3g/DH5RINF2
-         agvS+IcWUpQ0KWA+ORGXrT3b530sRosfijElYKA/sSlwp3nB0Ez+z5yfoU1UkLJy8nam
-         LUughA2qH7iA5JtcmVFrCzztkKrAinx/AiRzsOjUln4pp8Jvf5OmHgpkWSFrreOcX6mh
-         3OYg==
-X-Gm-Message-State: AAQBX9eb6NiuZ2YiOqku+DywtZcRhWv8RwWsImpiryIlH8zK/5cERFd2
-        x/AXpQ8zUctyV1Fxc9M70ECheDZxU1X3dA==
-X-Google-Smtp-Source: AKy350bkWlSXqypOsDQuqrGi0hmoin7r8Nd8gxJNleXJBXC/gmDI513qyLrz86YoD4pvFUuQ3Zg9plOmvxUBsw==
+        d=1e100.net; s=20221208; t=1681335316; x=1683927316;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=/kXYf91+49LZ0JwpuqmoTf9tA1AbmxtwzhKhgKU0C/k=;
+        b=JDFda4zZiLe4uUiplexCtImQLScj11ZnORXqo7XWqZGlrYv2yNiIBXa1aLRwfzlW2h
+         v/CkDfHQCMsjMsgjnSjteseJ+Unmtzmk7Re6SDz6ec5kL0VM9K3ZhAiUY2IGvfts0lPZ
+         3Dq/USGpqHayao0zVu3EP2z1WL5zL2VS+Cv7V36L8Dcbs6HGiXtCSHF4FjcA/MXNhg4d
+         SLPNHGWOAWib8M2Gpuc4dy80l+8LPv6wpA/2WfB98nT6GV++JK6Qe1/Sw8MFDUAJhJ0P
+         zNh6+bAkSBdkTHNsO4rZwOwOj0ynobgN8BHwXlBmYiw1FOB1KkHy4Vz44ijqocuv0HfQ
+         eHnw==
+X-Gm-Message-State: AAQBX9dtGOSfVyK3QIR6Mqz2vIq9IkWT0qNyw0l6mKsoiRe6kIa9hWCX
+        r5kXwm/MKJUqsvoMAo5iLxOg2ToJN0D/rQ==
+X-Google-Smtp-Source: AKy350bm3qmH6tQx04VSo1u5wAk3QedosfoCcidK89MQsRENDOeokBjvXvZshnaGV/tbVkAHuy9T68uXnE4JFw==
 X-Received: from laogai.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:2c9])
- (user=amoorthy job=sendgmr) by 2002:a25:d7d3:0:b0:b68:7a4a:5258 with SMTP id
- o202-20020a25d7d3000000b00b687a4a5258mr21996ybg.3.1681335315074; Wed, 12 Apr
+ (user=amoorthy job=sendgmr) by 2002:a25:d60c:0:b0:b8f:54f5:89f9 with SMTP id
+ n12-20020a25d60c000000b00b8f54f589f9mr40160ybg.0.1681335315919; Wed, 12 Apr
  2023 14:35:15 -0700 (PDT)
-Date:   Wed, 12 Apr 2023 21:34:48 +0000
+Date:   Wed, 12 Apr 2023 21:34:49 +0000
+In-Reply-To: <20230412213510.1220557-1-amoorthy@google.com>
 Mime-Version: 1.0
+References: <20230412213510.1220557-1-amoorthy@google.com>
 X-Mailer: git-send-email 2.40.0.577.gac1e443424-goog
-Message-ID: <20230412213510.1220557-1-amoorthy@google.com>
-Subject: [PATCH v3 00/22] Improve scalability of KVM + userfaultfd live
- migration via annotated memory faults.
+Message-ID: <20230412213510.1220557-2-amoorthy@google.com>
+Subject: [PATCH v3 01/22] KVM: selftests: Allow many vCPUs and reader threads
+ per UFFD in demand paging test
 From:   Anish Moorthy <amoorthy@google.com>
 To:     pbonzini@redhat.com, maz@kernel.org
 Cc:     oliver.upton@linux.dev, seanjc@google.com, jthoughton@google.com,
@@ -68,184 +70,413 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Due to serialization on internal wait queues, userfaultfd can be quite
-slow at delivering faults to userspace when many vCPUs fault on the same
-VMA/uffd: this problem only worsens as the number of vCPUs increases.
-This series allows page faults encountered in KVM_RUN to bypass
-userfaultfd (KVM_CAP_ABSENT_MAPPING_FAULT) and be delivered directly via
-VM exit to the faulting vCPU (KVM_CAP_MEMORY_FAULT_INFO), allowing much
-higher page-in rates during uffd-based postcopy.
+At the moment, demand_paging_test does not support profiling/testing
+multiple vCPU threads concurrently faulting on a single uffd because
 
-As a first step, KVM_CAP_MEMORY_FAULT_INFO is introduced. This
-capability is meant to deliver useful information to userspace (i.e. the
-problematic range of guest physical memory) when a vCPU fails a guest
-memory access. KVM_RUN currently just returns -1 and sets errno=EFAULT
-in response to these failed accesses: the new capability will cause it
-to also fill the kvm_run struct with an exit reason of
-KVM_EXIT_MEMORY_FAULT and populate the memory_fault field with the
-faulting range.
+    (a) "-u" (run test in userfaultfd mode) creates a uffd for each vCPU's
+        region, so that each uffd services a single vCPU thread.
+    (b) "-u -o" (userfaultfd mode + overlapped vCPU memory accesses)
+        simply doesn't work: the test tries to register the same memory
+        to multiple uffds, causing an error.
 
-Upon receiving an annotated EFAULT, userspace may take appropriate
-action to resolve the failed access. For instance, this might involve a
-UFFDIO_CONTINUE or MADV_POPULATE_WRITE in the context of uffd-based live
-migration postcopy.
+Add support for many vcpus per uffd by
+    (1) Keeping "-u" behavior unchanged.
+    (2) Making "-u -a" create a single uffd for all of guest memory.
+    (3) Making "-u -o" implicitly pass "-a", solving the problem in (b).
+In cases (2) and (3) all vCPU threads fault on a single uffd.
 
-KVM_CAP_MEMORY_FAULT_INFO comes with two important caveats, one public
-and another internal.
+With multiple potentially multiple vCPU per UFFD, it makes sense to
+allow configuring the number reader threads per UFFD as well: add the
+"-r" flag to do so.
 
-1. Its implementation is incomplete: userspace may still receive
-   un-annotated EFAULTs (exit reason != KVM_EXIT_MEMORY_FAULT) and must
-   be able to handle these, although these cases are to be fixed as the
-   maintainers learn of/identify them.
-
-2. The implementation strategy given in this series, which is basically
-   to fill the kvm_run.memory_fault field whenever a vCPU fails a guest
-   memory access (even if the resulting EFAULT might not have been
-   returned to userspace from KVM_RUN) is not without risk: some safety
-   measures are taken, but they will not ensure total correctness.
-
-   For example, if there are any existing paths in KVM_RUN which cause
-   a vCPU to (1) populate the kvm_run struct in preparation for an
-   exit to userspace then (2) try and fail to access guest memory for
-   some reason, but ignore the result of the access and then (3)
-   complete the exit to userspace, then the contents of the kvm_run
-   struct written in (1) could be lost.
-
-   Another example: if KVM_RUN fails a guest memory access for which the
-   EFAULT is annotated but does not return the EFAULT to userspace,
-   then later encounters another *un*annotated EFAULT which *is*
-   returned to userspace, then the kvm_run.memory_fault field read by
-   userspace will correspond to the first EFAULT, not the second.
-
-   The discussion on this topic and of the alternative (filling the
-   efault info only for those cases where KVM_RUN immediately returns to
-   userspace) occurs in [3].
-
-KVM_CAP_ABSENT_MAPPING_FAULT is introduced next (and is, I should note,
-an idea proposed by James Houghton in [1] :). This capability causes
-KVM_RUN to error with errno=EFAULT when it encounters a page fault for
-which the userspace page tables do not contain present mappings. When
-combined with KVM_CAP_MEMORY_FAULT_INFO, this capability allows KVM to
-deliver information on page faults directly to the involved vCPU thread,
-thus bypassing the userfaultfd wait queue and its related contention.
-
-As a side note, KVM_CAP_ABSENT_MAPPING_FAULT prevents KVM from
-generating async page faults. For this reason, hypervisors using it to
-improve postcopy performance will likely want to disable it at the end
-of postcopy.
-
-KVM's demand paging self test is extended to demonstrate the performance
-benefits of using the two new capabilities to bypass the userfaultfd
-wait queue. The performance samples below (rates in thousands of
-pages/s, n = 5), were generated using [2] on an x86 machine with 256
-cores.
-
-vCPUs, Average Paging Rate (w/o new caps), Average Paging Rate (w/ new caps)
-1       150     340
-2       191     477
-4       210     809
-8       155     1239
-16      130     1595
-32      108     2299
-64      86      3482
-128     62      4134
-256     36      4012
-
-[1] https://lore.kernel.org/linux-mm/CADrL8HVDB3u2EOhXHCrAgJNLwHkj2Lka1B_kkNb0dNwiWiAN_Q@mail.gmail.com/
-[2] ./demand_paging_test -b 64M -u MINOR -s shmem -a -v <n> -r <n> [-w]
-    A quick rundown of the new flags (also detailed in later commits)
-        -a registers all of guest memory to a single uffd.
-        -r species the number of reader threads for polling the uffd.
-        -w is what actually enables the new capabilities.
-    All data was collected after applying both the entire series and
-    the following bugfix:
-    https://lore.kernel.org/kvm/20230223001805.2971237-1-amoorthy@google.com/#r
-[3] https://lore.kernel.org/kvm/ZBTgnjXJvR8jtc4i@google.com/
-
+Signed-off-by: Anish Moorthy <amoorthy@google.com>
+Acked-by: James Houghton <jthoughton@google.com>
 ---
+ .../selftests/kvm/aarch64/page_fault_test.c   |  4 +-
+ .../selftests/kvm/demand_paging_test.c        | 62 +++++++++----
+ .../selftests/kvm/include/userfaultfd_util.h  | 18 +++-
+ .../selftests/kvm/lib/userfaultfd_util.c      | 86 +++++++++++++------
+ 4 files changed, 124 insertions(+), 46 deletions(-)
 
-v3
-  - Rework the implementation to be based on two orthogonal
-    capabilities (KVM_CAP_MEMORY_FAULT_INFO and
-    KVM_CAP_ABSENT_MAPPING_FAULT) [Sean, Oliver]
-  - Change return code of kvm_populate_efault_info [Isaku]
-  - Use kvm_populate_efault_info from arm code [Oliver]
-
-v2: https://lore.kernel.org/kvm/20230315021738.1151386-1-amoorthy@google.com/
-
-    This was a bit of a misfire, as I sent my WIP series on the mailing
-    list but was just targeting Sean for some feedback. Oliver Upton and
-    Isaku Yamahata ended up discovering the series and giving me some
-    feedback anyways, so thanks to them :) In the end, there was enough
-    discussion to justify retroactively labeling it as v2, even with the
-    limited cc list.
-
-  - Introduce KVM_CAP_X86_MEMORY_FAULT_EXIT.
-  - API changes:
-        - Gate KVM_CAP_MEMORY_FAULT_NOWAIT behind
-          KVM_CAP_x86_MEMORY_FAULT_EXIT (on x86 only: arm has no such
-          requirement).
-        - Switched to memslot flag
-  - Take Oliver's simplification to the "allow fast gup for readable
-    faults" logic.
-  - Slightly redefine the return code of user_mem_abort.
-  - Fix documentation errors brought up by Marc
-  - Reword commit messages in imperative mood
-
-v1: https://lore.kernel.org/kvm/20230215011614.725983-1-amoorthy@google.com/
-
-Anish Moorthy (22):
-  KVM: selftests: Allow many vCPUs and reader threads per UFFD in demand
-    paging test
-  KVM: selftests: Use EPOLL in userfaultfd_util reader threads and
-    signal errors via TEST_ASSERT
-  KVM: Allow hva_pfn_fast() to resolve read-only faults.
-  KVM: x86: Set vCPU exit reason to KVM_EXIT_UNKNOWN  at the start of
-    KVM_RUN
-  KVM: Add KVM_CAP_MEMORY_FAULT_INFO
-  KVM: Add docstrings to __kvm_write_guest_page() and
-    __kvm_read_guest_page()
-  KVM: Annotate -EFAULTs from kvm_vcpu_write_guest_page()
-  KVM: Annotate -EFAULTs from kvm_vcpu_read_guest_page()
-  KVM: Annotate -EFAULTs from kvm_vcpu_map()
-  KVM: x86: Annotate -EFAULTs from kvm_mmu_page_fault()
-  KVM: x86: Annotate -EFAULTs from setup_vmgexit_scratch()
-  KVM: x86: Annotate -EFAULTs from kvm_handle_page_fault()
-  KVM: x86: Annotate -EFAULTs from kvm_hv_get_assist_page()
-  KVM: x86: Annotate -EFAULTs from kvm_pv_clock_pairing()
-  KVM: x86: Annotate -EFAULTs from direct_map()
-  KVM: x86: Annotate -EFAULTs from kvm_handle_error_pfn()
-  KVM: Introduce KVM_CAP_ABSENT_MAPPING_FAULT without implementation
-  KVM: x86: Implement KVM_CAP_ABSENT_MAPPING_FAULT
-  KVM: arm64: Annotate (some) -EFAULTs from user_mem_abort()
-  KVM: arm64: Implement KVM_CAP_ABSENT_MAPPING_FAULT
-  KVM: selftests: Add memslot_flags parameter to memstress_create_vm()
-  KVM: selftests: Handle memory fault exits in demand_paging_test
-
- Documentation/virt/kvm/api.rst                |  66 ++++-
- arch/arm64/kvm/arm.c                          |   2 +
- arch/arm64/kvm/mmu.c                          |  18 +-
- arch/x86/kvm/hyperv.c                         |  14 +-
- arch/x86/kvm/mmu/mmu.c                        |  39 ++-
- arch/x86/kvm/svm/sev.c                        |   1 +
- arch/x86/kvm/x86.c                            |   7 +-
- include/linux/kvm_host.h                      |  19 ++
- include/uapi/linux/kvm.h                      |  18 ++
- tools/include/uapi/linux/kvm.h                |  12 +
- .../selftests/kvm/aarch64/page_fault_test.c   |   4 +-
- .../selftests/kvm/access_tracking_perf_test.c |   2 +-
- .../selftests/kvm/demand_paging_test.c        | 242 ++++++++++++++----
- .../selftests/kvm/dirty_log_perf_test.c       |   2 +-
- .../testing/selftests/kvm/include/memstress.h |   2 +-
- .../selftests/kvm/include/userfaultfd_util.h  |  18 +-
- tools/testing/selftests/kvm/lib/memstress.c   |   4 +-
- .../selftests/kvm/lib/userfaultfd_util.c      | 158 +++++++-----
- .../kvm/memslot_modification_stress_test.c    |   2 +-
- virt/kvm/kvm_main.c                           |  75 +++++-
- 20 files changed, 551 insertions(+), 154 deletions(-)
-
-
-base-commit: d8708b80fa0e6e21bc0c9e7276ad0bccef73b6e7
+diff --git a/tools/testing/selftests/kvm/aarch64/page_fault_test.c b/tools/testing/selftests/kvm/aarch64/page_fault_test.c
+index df10f1ffa20d9..3b6d228a9340d 100644
+--- a/tools/testing/selftests/kvm/aarch64/page_fault_test.c
++++ b/tools/testing/selftests/kvm/aarch64/page_fault_test.c
+@@ -376,14 +376,14 @@ static void setup_uffd(struct kvm_vm *vm, struct test_params *p,
+ 		*pt_uffd = uffd_setup_demand_paging(uffd_mode, 0,
+ 						    pt_args.hva,
+ 						    pt_args.paging_size,
+-						    test->uffd_pt_handler);
++						    1, test->uffd_pt_handler);
+ 
+ 	*data_uffd = NULL;
+ 	if (test->uffd_data_handler)
+ 		*data_uffd = uffd_setup_demand_paging(uffd_mode, 0,
+ 						      data_args.hva,
+ 						      data_args.paging_size,
+-						      test->uffd_data_handler);
++						      1, test->uffd_data_handler);
+ }
+ 
+ static void free_uffd(struct test_desc *test, struct uffd_desc *pt_uffd,
+diff --git a/tools/testing/selftests/kvm/demand_paging_test.c b/tools/testing/selftests/kvm/demand_paging_test.c
+index b0e1fc4de9e29..6c2253f4a64ef 100644
+--- a/tools/testing/selftests/kvm/demand_paging_test.c
++++ b/tools/testing/selftests/kvm/demand_paging_test.c
+@@ -77,9 +77,15 @@ static int handle_uffd_page_request(int uffd_mode, int uffd,
+ 		copy.mode = 0;
+ 
+ 		r = ioctl(uffd, UFFDIO_COPY, &copy);
+-		if (r == -1) {
+-			pr_info("Failed UFFDIO_COPY in 0x%lx from thread %d with errno: %d\n",
+-				addr, tid, errno);
++		/*
++		 * With multiple vCPU threads fault on a single page and there are
++		 * multiple readers for the UFFD, at least one of the UFFDIO_COPYs
++		 * will fail with EEXIST: handle that case without signaling an
++		 * error.
++		 */
++		if (r == -1 && errno != EEXIST) {
++			pr_info("Failed UFFDIO_COPY in 0x%lx from thread %d, errno = %d\n",
++					addr, tid, errno);
+ 			return r;
+ 		}
+ 	} else if (uffd_mode == UFFDIO_REGISTER_MODE_MINOR) {
+@@ -89,9 +95,10 @@ static int handle_uffd_page_request(int uffd_mode, int uffd,
+ 		cont.range.len = demand_paging_size;
+ 
+ 		r = ioctl(uffd, UFFDIO_CONTINUE, &cont);
+-		if (r == -1) {
+-			pr_info("Failed UFFDIO_CONTINUE in 0x%lx from thread %d with errno: %d\n",
+-				addr, tid, errno);
++		/* See the note about EEXISTs in the UFFDIO_COPY branch. */
++		if (r == -1 && errno != EEXIST) {
++			pr_info("Failed UFFDIO_CONTINUE in 0x%lx, thread %d, errno = %d\n",
++					addr, tid, errno);
+ 			return r;
+ 		}
+ 	} else {
+@@ -110,7 +117,9 @@ static int handle_uffd_page_request(int uffd_mode, int uffd,
+ 
+ struct test_params {
+ 	int uffd_mode;
++	bool single_uffd;
+ 	useconds_t uffd_delay;
++	int readers_per_uffd;
+ 	enum vm_mem_backing_src_type src_type;
+ 	bool partition_vcpu_memory_access;
+ };
+@@ -133,7 +142,8 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+ 	struct timespec start;
+ 	struct timespec ts_diff;
+ 	struct kvm_vm *vm;
+-	int i;
++	int i, num_uffds = 0;
++	uint64_t uffd_region_size;
+ 
+ 	vm = memstress_create_vm(mode, nr_vcpus, guest_percpu_mem_size, 1,
+ 				 p->src_type, p->partition_vcpu_memory_access);
+@@ -146,10 +156,13 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+ 	memset(guest_data_prototype, 0xAB, demand_paging_size);
+ 
+ 	if (p->uffd_mode) {
+-		uffd_descs = malloc(nr_vcpus * sizeof(struct uffd_desc *));
++		num_uffds = p->single_uffd ? 1 : nr_vcpus;
++		uffd_region_size = nr_vcpus * guest_percpu_mem_size / num_uffds;
++
++		uffd_descs = malloc(num_uffds * sizeof(struct uffd_desc *));
+ 		TEST_ASSERT(uffd_descs, "Memory allocation failed");
+ 
+-		for (i = 0; i < nr_vcpus; i++) {
++		for (i = 0; i < num_uffds; i++) {
+ 			struct memstress_vcpu_args *vcpu_args;
+ 			void *vcpu_hva;
+ 			void *vcpu_alias;
+@@ -160,8 +173,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+ 			vcpu_hva = addr_gpa2hva(vm, vcpu_args->gpa);
+ 			vcpu_alias = addr_gpa2alias(vm, vcpu_args->gpa);
+ 
+-			prefault_mem(vcpu_alias,
+-				vcpu_args->pages * memstress_args.guest_page_size);
++			prefault_mem(vcpu_alias, uffd_region_size);
+ 
+ 			/*
+ 			 * Set up user fault fd to handle demand paging
+@@ -169,7 +181,8 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+ 			 */
+ 			uffd_descs[i] = uffd_setup_demand_paging(
+ 				p->uffd_mode, p->uffd_delay, vcpu_hva,
+-				vcpu_args->pages * memstress_args.guest_page_size,
++				uffd_region_size,
++				p->readers_per_uffd,
+ 				&handle_uffd_page_request);
+ 		}
+ 	}
+@@ -186,7 +199,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+ 
+ 	if (p->uffd_mode) {
+ 		/* Tell the user fault fd handler threads to quit */
+-		for (i = 0; i < nr_vcpus; i++)
++		for (i = 0; i < num_uffds; i++)
+ 			uffd_stop_demand_paging(uffd_descs[i]);
+ 	}
+ 
+@@ -206,14 +219,19 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+ static void help(char *name)
+ {
+ 	puts("");
+-	printf("usage: %s [-h] [-m vm_mode] [-u uffd_mode] [-d uffd_delay_usec]\n"
+-	       "          [-b memory] [-s type] [-v vcpus] [-o]\n", name);
++	printf("usage: %s [-h] [-m vm_mode] [-u uffd_mode] [-a]\n"
++		   "          [-d uffd_delay_usec] [-r readers_per_uffd] [-b memory]\n"
++		   "          [-s type] [-v vcpus] [-o]\n", name);
+ 	guest_modes_help();
+ 	printf(" -u: use userfaultfd to handle vCPU page faults. Mode is a\n"
+ 	       "     UFFD registration mode: 'MISSING' or 'MINOR'.\n");
++	printf(" -a: Use a single userfaultfd for all of guest memory, instead of\n"
++		   "     creating one for each region paged by a unique vCPU\n"
++		   "     Set implicitly with -o, and no effect without -u.\n");
+ 	printf(" -d: add a delay in usec to the User Fault\n"
+ 	       "     FD handler to simulate demand paging\n"
+ 	       "     overheads. Ignored without -u.\n");
++	printf(" -r: Set the number of reader threads per uffd.\n");
+ 	printf(" -b: specify the size of the memory region which should be\n"
+ 	       "     demand paged by each vCPU. e.g. 10M or 3G.\n"
+ 	       "     Default: 1G\n");
+@@ -231,12 +249,14 @@ int main(int argc, char *argv[])
+ 	struct test_params p = {
+ 		.src_type = DEFAULT_VM_MEM_SRC,
+ 		.partition_vcpu_memory_access = true,
++		.readers_per_uffd = 1,
++		.single_uffd = false,
+ 	};
+ 	int opt;
+ 
+ 	guest_modes_append_default();
+ 
+-	while ((opt = getopt(argc, argv, "hm:u:d:b:s:v:o")) != -1) {
++	while ((opt = getopt(argc, argv, "ahom:u:d:b:s:v:r:")) != -1) {
+ 		switch (opt) {
+ 		case 'm':
+ 			guest_modes_cmdline(optarg);
+@@ -248,6 +268,9 @@ int main(int argc, char *argv[])
+ 				p.uffd_mode = UFFDIO_REGISTER_MODE_MINOR;
+ 			TEST_ASSERT(p.uffd_mode, "UFFD mode must be 'MISSING' or 'MINOR'.");
+ 			break;
++		case 'a':
++			p.single_uffd = true;
++			break;
+ 		case 'd':
+ 			p.uffd_delay = strtoul(optarg, NULL, 0);
+ 			TEST_ASSERT(p.uffd_delay >= 0, "A negative UFFD delay is not supported.");
+@@ -265,6 +288,13 @@ int main(int argc, char *argv[])
+ 			break;
+ 		case 'o':
+ 			p.partition_vcpu_memory_access = false;
++			p.single_uffd = true;
++			break;
++		case 'r':
++			p.readers_per_uffd = atoi(optarg);
++			TEST_ASSERT(p.readers_per_uffd >= 1,
++						"Invalid number of readers per uffd %d: must be >=1",
++						p.readers_per_uffd);
+ 			break;
+ 		case 'h':
+ 		default:
+diff --git a/tools/testing/selftests/kvm/include/userfaultfd_util.h b/tools/testing/selftests/kvm/include/userfaultfd_util.h
+index 877449c345928..92cc1f9ec0686 100644
+--- a/tools/testing/selftests/kvm/include/userfaultfd_util.h
++++ b/tools/testing/selftests/kvm/include/userfaultfd_util.h
+@@ -17,18 +17,30 @@
+ 
+ typedef int (*uffd_handler_t)(int uffd_mode, int uffd, struct uffd_msg *msg);
+ 
++struct uffd_reader_args {
++	int uffd_mode;
++	int uffd;
++	useconds_t delay;
++	uffd_handler_t handler;
++	/* Holds the read end of the pipe for killing the reader. */
++	int pipe;
++};
++
+ struct uffd_desc {
+ 	int uffd_mode;
+ 	int uffd;
+-	int pipefds[2];
+ 	useconds_t delay;
+ 	uffd_handler_t handler;
+-	pthread_t thread;
++	uint64_t num_readers;
++	/* Holds the write ends of the pipes for killing the readers. */
++	int *pipefds;
++	pthread_t *readers;
++	struct uffd_reader_args *reader_args;
+ };
+ 
+ struct uffd_desc *uffd_setup_demand_paging(int uffd_mode, useconds_t delay,
+ 					   void *hva, uint64_t len,
+-					   uffd_handler_t handler);
++					   uint64_t num_readers, uffd_handler_t handler);
+ 
+ void uffd_stop_demand_paging(struct uffd_desc *uffd);
+ 
+diff --git a/tools/testing/selftests/kvm/lib/userfaultfd_util.c b/tools/testing/selftests/kvm/lib/userfaultfd_util.c
+index 92cef20902f1f..2723ee1e3e1b2 100644
+--- a/tools/testing/selftests/kvm/lib/userfaultfd_util.c
++++ b/tools/testing/selftests/kvm/lib/userfaultfd_util.c
+@@ -27,10 +27,8 @@
+ 
+ static void *uffd_handler_thread_fn(void *arg)
+ {
+-	struct uffd_desc *uffd_desc = (struct uffd_desc *)arg;
+-	int uffd = uffd_desc->uffd;
+-	int pipefd = uffd_desc->pipefds[0];
+-	useconds_t delay = uffd_desc->delay;
++	struct uffd_reader_args *reader_args = (struct uffd_reader_args *)arg;
++	int uffd = reader_args->uffd;
+ 	int64_t pages = 0;
+ 	struct timespec start;
+ 	struct timespec ts_diff;
+@@ -44,7 +42,7 @@ static void *uffd_handler_thread_fn(void *arg)
+ 
+ 		pollfd[0].fd = uffd;
+ 		pollfd[0].events = POLLIN;
+-		pollfd[1].fd = pipefd;
++		pollfd[1].fd = reader_args->pipe;
+ 		pollfd[1].events = POLLIN;
+ 
+ 		r = poll(pollfd, 2, -1);
+@@ -92,9 +90,9 @@ static void *uffd_handler_thread_fn(void *arg)
+ 		if (!(msg.event & UFFD_EVENT_PAGEFAULT))
+ 			continue;
+ 
+-		if (delay)
+-			usleep(delay);
+-		r = uffd_desc->handler(uffd_desc->uffd_mode, uffd, &msg);
++		if (reader_args->delay)
++			usleep(reader_args->delay);
++		r = reader_args->handler(reader_args->uffd_mode, uffd, &msg);
+ 		if (r < 0)
+ 			return NULL;
+ 		pages++;
+@@ -110,7 +108,7 @@ static void *uffd_handler_thread_fn(void *arg)
+ 
+ struct uffd_desc *uffd_setup_demand_paging(int uffd_mode, useconds_t delay,
+ 					   void *hva, uint64_t len,
+-					   uffd_handler_t handler)
++					   uint64_t num_readers, uffd_handler_t handler)
+ {
+ 	struct uffd_desc *uffd_desc;
+ 	bool is_minor = (uffd_mode == UFFDIO_REGISTER_MODE_MINOR);
+@@ -118,14 +116,26 @@ struct uffd_desc *uffd_setup_demand_paging(int uffd_mode, useconds_t delay,
+ 	struct uffdio_api uffdio_api;
+ 	struct uffdio_register uffdio_register;
+ 	uint64_t expected_ioctls = ((uint64_t) 1) << _UFFDIO_COPY;
+-	int ret;
++	int ret, i;
+ 
+ 	PER_PAGE_DEBUG("Userfaultfd %s mode, faults resolved with %s\n",
+ 		       is_minor ? "MINOR" : "MISSING",
+ 		       is_minor ? "UFFDIO_CONINUE" : "UFFDIO_COPY");
+ 
+ 	uffd_desc = malloc(sizeof(struct uffd_desc));
+-	TEST_ASSERT(uffd_desc, "malloc failed");
++	TEST_ASSERT(uffd_desc, "Failed to malloc uffd descriptor");
++
++	uffd_desc->pipefds = malloc(sizeof(int) * num_readers);
++	TEST_ASSERT(uffd_desc->pipefds, "Failed to malloc pipes");
++
++	uffd_desc->readers = malloc(sizeof(pthread_t) * num_readers);
++	TEST_ASSERT(uffd_desc->readers, "Failed to malloc reader threads");
++
++	uffd_desc->reader_args = malloc(
++		sizeof(struct uffd_reader_args) * num_readers);
++	TEST_ASSERT(uffd_desc->reader_args, "Failed to malloc reader_args");
++
++	uffd_desc->num_readers = num_readers;
+ 
+ 	/* In order to get minor faults, prefault via the alias. */
+ 	if (is_minor)
+@@ -148,18 +158,32 @@ struct uffd_desc *uffd_setup_demand_paging(int uffd_mode, useconds_t delay,
+ 	TEST_ASSERT((uffdio_register.ioctls & expected_ioctls) ==
+ 		    expected_ioctls, "missing userfaultfd ioctls");
+ 
+-	ret = pipe2(uffd_desc->pipefds, O_CLOEXEC | O_NONBLOCK);
+-	TEST_ASSERT(!ret, "Failed to set up pipefd");
+-
+ 	uffd_desc->uffd_mode = uffd_mode;
+ 	uffd_desc->uffd = uffd;
+ 	uffd_desc->delay = delay;
+ 	uffd_desc->handler = handler;
+-	pthread_create(&uffd_desc->thread, NULL, uffd_handler_thread_fn,
+-		       uffd_desc);
+ 
+-	PER_VCPU_DEBUG("Created uffd thread for HVA range [%p, %p)\n",
+-		       hva, hva + len);
++	for (i = 0; i < uffd_desc->num_readers; ++i) {
++		int pipes[2];
++
++		ret = pipe2((int *) &pipes, O_CLOEXEC | O_NONBLOCK);
++		TEST_ASSERT(!ret, "Failed to set up pipefd %i for uffd_desc %p",
++					i, uffd_desc);
++
++		uffd_desc->pipefds[i] = pipes[1];
++
++		uffd_desc->reader_args[i].uffd_mode = uffd_mode;
++		uffd_desc->reader_args[i].uffd = uffd;
++		uffd_desc->reader_args[i].delay = delay;
++		uffd_desc->reader_args[i].handler = handler;
++		uffd_desc->reader_args[i].pipe = pipes[0];
++
++		pthread_create(&uffd_desc->readers[i], NULL, uffd_handler_thread_fn,
++					   &uffd_desc->reader_args[i]);
++
++		PER_VCPU_DEBUG("Created uffd thread %i for HVA range [%p, %p)\n",
++					   i, hva, hva + len);
++	}
+ 
+ 	return uffd_desc;
+ }
+@@ -167,19 +191,31 @@ struct uffd_desc *uffd_setup_demand_paging(int uffd_mode, useconds_t delay,
+ void uffd_stop_demand_paging(struct uffd_desc *uffd)
+ {
+ 	char c = 0;
+-	int ret;
++	int i, ret;
+ 
+-	ret = write(uffd->pipefds[1], &c, 1);
+-	TEST_ASSERT(ret == 1, "Unable to write to pipefd");
++	for (i = 0; i < uffd->num_readers; ++i) {
++		ret = write(uffd->pipefds[i], &c, 1);
++		TEST_ASSERT(
++			ret == 1, "Unable to write to pipefd %i for uffd_desc %p", i, uffd);
++	}
+ 
+-	ret = pthread_join(uffd->thread, NULL);
+-	TEST_ASSERT(ret == 0, "Pthread_join failed.");
++	for (i = 0; i < uffd->num_readers; ++i) {
++		ret = pthread_join(uffd->readers[i], NULL);
++		TEST_ASSERT(
++			ret == 0,
++			"Pthread_join failed on reader thread %i for uffd_desc %p", i, uffd);
++	}
+ 
+ 	close(uffd->uffd);
+ 
+-	close(uffd->pipefds[1]);
+-	close(uffd->pipefds[0]);
++	for (i = 0; i < uffd->num_readers; ++i) {
++		close(uffd->pipefds[i]);
++		close(uffd->reader_args[i].pipe);
++	}
+ 
++	free(uffd->pipefds);
++	free(uffd->readers);
++	free(uffd->reader_args);
+ 	free(uffd);
+ }
+ 
 -- 
 2.40.0.577.gac1e443424-goog
 
