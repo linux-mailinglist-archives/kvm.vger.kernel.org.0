@@ -2,43 +2,43 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id ACD106DF535
-	for <lists+kvm@lfdr.de>; Wed, 12 Apr 2023 14:28:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C542F6DF5DD
+	for <lists+kvm@lfdr.de>; Wed, 12 Apr 2023 14:44:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229615AbjDLM2n (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 Apr 2023 08:28:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39460 "EHLO
+        id S229819AbjDLMoc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 Apr 2023 08:44:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60818 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230038AbjDLM2R (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 Apr 2023 08:28:17 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1C7F7A9B;
-        Wed, 12 Apr 2023 05:28:12 -0700 (PDT)
+        with ESMTP id S229960AbjDLMoa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 12 Apr 2023 08:44:30 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B38B446B1;
+        Wed, 12 Apr 2023 05:44:06 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 3A51E6321F;
-        Wed, 12 Apr 2023 12:28:12 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9AFD2C4339B;
-        Wed, 12 Apr 2023 12:28:11 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 790A362B2C;
+        Wed, 12 Apr 2023 12:43:29 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BA2FAC4339B;
+        Wed, 12 Apr 2023 12:43:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1681302491;
-        bh=6FoH81ZoljOnwwsVDKczs8ze1AD1h4N7YdQq49DUJCI=;
+        s=k20201202; t=1681303408;
+        bh=/kdPsHKKVYTN+6vu6kxlhf19ktPb1zmiZOuS9HNAfl4=;
         h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=Z5IteanyktRgqXMBi2ojlqQXm8aO8qY7wuKa+kxHoEdUI1Pv9v2nMdYQmddGty2oP
-         +kzfgwhsEDdamBBntfgPzpUuvQetCM6y5bYI5SBFZRf2EOuvI5y6dOPFm3Q8EbbcPi
-         UoVKdcc08m7tw6v0HicScjoBxoZ8lMFZTyiE5t4o2vNgk4S2SaFRkDji8JZ/Jx75eN
-         rOSw5e+BYDUBg2JSz+lv+Jcb0vFkeICU9BKzr7dOzNrQgRpLyBMNfGrq7FdLYIwamI
-         AOyrFmM9wzyKCo4TKDfpuAi8AtM8tDq7/x48T7k02VPExTTHCbndcSrjI2FnTEQ9Cg
-         aIfjWNIYYuC3Q==
+        b=OvbMxQXrWWsvwDnEy64Lw0C7/sIfQmva2t1RhDQ6EVDYHQ3qboohu3BOWxBrzHFu7
+         8f2laYIrXzUTaB+ervg5FhaGARWsXw/chWHwFExpKhHvuXFl+iB8c4UyH0Xu+sey9A
+         2/U5HxFmldCJ1aEs/LwBsBgnYPKzHtQpmnI7n7kmaUSphxY7FfP/oHeuGpdMc+BCgQ
+         IHminolUsDroGpI7EhUp6v6Ew/MnIHNoBUJcWLxGXLQnCwGZoWBfA9ZrKVGHL7EUGi
+         AxWIMnrEoEeEYnnrJeAZUkeQ2bK0qyhzDFOmq1OD255AlitxmNcKuJfTGn/kl/01C3
+         9hzpt0FEuV0TQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1pmZa5-007pOX-7J;
-        Wed, 12 Apr 2023 13:28:09 +0100
-Date:   Wed, 12 Apr 2023 13:28:08 +0100
-Message-ID: <86sfd5l1yf.wl-maz@kernel.org>
+        id 1pmZos-007plz-FF;
+        Wed, 12 Apr 2023 13:43:26 +0100
+Date:   Wed, 12 Apr 2023 13:43:26 +0100
+Message-ID: <86r0spl18x.wl-maz@kernel.org>
 From:   Marc Zyngier <maz@kernel.org>
 To:     <ankita@nvidia.com>
 Cc:     <jgg@nvidia.com>, <alex.williamson@redhat.com>,
@@ -48,9 +48,10 @@ Cc:     <jgg@nvidia.com>, <alex.williamson@redhat.com>,
         <apopple@nvidia.com>, <jhubbard@nvidia.com>, <danw@nvidia.com>,
         <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
         <linux-arm-kernel@lists.infradead.org>, <linux-mm@kvack.org>
-Subject: Re: [PATCH v3 0/6] Expose GPU memory as coherently CPU accessible
-In-Reply-To: <20230405180134.16932-1-ankita@nvidia.com>
+Subject: Re: [PATCH v3 1/6] kvm: determine memory type from VMA
+In-Reply-To: <20230405180134.16932-2-ankita@nvidia.com>
 References: <20230405180134.16932-1-ankita@nvidia.com>
+        <20230405180134.16932-2-ankita@nvidia.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -60,49 +61,248 @@ X-SA-Exim-Connect-IP: 185.219.108.64
 X-SA-Exim-Rcpt-To: ankita@nvidia.com, jgg@nvidia.com, alex.williamson@redhat.com, naoya.horiguchi@nec.com, oliver.upton@linux.dev, aniketa@nvidia.com, cjia@nvidia.com, kwankhede@nvidia.com, targupta@nvidia.com, vsethi@nvidia.com, acurrid@nvidia.com, apopple@nvidia.com, jhubbard@nvidia.com, danw@nvidia.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-mm@kvack.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 05 Apr 2023 19:01:28 +0100,
+On Wed, 05 Apr 2023 19:01:29 +0100,
 <ankita@nvidia.com> wrote:
 > 
 > From: Ankit Agrawal <ankita@nvidia.com>
 > 
-> NVIDIA's upcoming Grace Hopper Superchip provides a PCI-like device
-> for the on-chip GPU that is the logical OS representation of the
-> internal propritary cache coherent interconnect.
-> 
-> This representation has a number of limitations compared to a real PCI
-> device, in particular, it does not model the coherent GPU memory
-> aperture as a PCI config space BAR, and PCI doesn't know anything
-> about cacheable memory types.
-> 
-> Provide a VFIO PCI variant driver that adapts the unique PCI
-> representation into a more standard PCI representation facing
-> userspace. The GPU memory aperture is obtained from ACPI, according to
-> the FW specification, and exported to userspace as the VFIO_REGION
-> that covers the first PCI BAR. qemu will naturally generate a PCI
-> device in the VM where the cacheable aperture is reported in BAR1.
-> 
-> Since this memory region is actually cache coherent with the CPU, the
-> VFIO variant driver will mmap it into VMA using a cacheable mapping.
-> 
-> As this is the first time an ARM environment has placed cacheable
-> non-struct page backed memory (eg from remap_pfn_range) into a KVM
-> page table, fix a bug in ARM KVM where it does not copy the cacheable
-> memory attributes from non-struct page backed PTEs to ensure the guest
-> also gets a cacheable mapping.
+> Each VM stores the requires pgprots for its mappings in the
 
-This is not a bug, but a conscious design decision. As you pointed out
-above, nothing needed this until now, and a device mapping is the only
-safe thing to do as we know exactly *nothing* about the memory that
-gets mapped.
+The VM stores *nothing*. Did you mean VMA? And even then, I can't
+parse this.
+
+> vma->pgprot. Based on this we can determine the desired MT_DEVICE_*
+> for the VMA directly, and do not have to guess based on heuristics
+> based on pfn_is_map_memory().
+> 
+> There are the following kinds of pgprot available to userspace and their
+> corresponding type:
+> pgprot_noncached -> MT_DEVICE_nGnRnE
+> pgprot_writecombine -> MT_NORMAL_NC
+> pgprot_device -> MT_DEVICE_nGnRE
+> pgprot_tagged -> MT_NORMAL_TAGGED
+> 
+> Decode the relevant MT_* types in use and translate them into the
+> corresponding KVM_PGTABLEPROT_*:
+> 
+>  - MT_DEVICE_nGnRE -> KVM_PGTABLE_PROT_DEVICE_nGnRE (device)
+>  - MT_DEVICE_nGnRnE -> KVM_PGTABLE_PROT_DEVICE_nGnRnE (noncached)
+>  - MT_NORMAL/_TAGGED/_NC -> 0
+> 
+> The selection of 0 for the S2 KVM_PGTABLE_PROT_DEVICE_nGnRnE is based
+> on [2].
+> 
+> Also worth noting is the result of the stage-1 and stage-2. Ref [3]
+> If FWB not set, then the combination is the one that is more restrictive.
+> The sequence from lowest restriction to the highest:
+> DEVICE_nGnRnE -> DEVICE_nGnRE -> NORMAL/_TAGGED/_NC
+
+Sorry, but I can't parse this either. If you mean that the strongest
+memory type wins, then I agree. But what does it bring to the
+discussion?
+
+> If FWB is set, then stage-2 mapping type overrides the stage-1 [1].
+> 
+> This solves a problem where KVM cannot preserve the MT_NORMAL memory
+> type for non-struct page backed memory into the S2 mapping. Instead
+> the VMA creator determines the MT type and the S2 will follow it.
+
+What makes it safe? How does VFIO ensures that the memory type used is
+correct in all circumstances? This has to hold for *ANY* device, not
+just your favourite toy of the day. Nothing in this patch is horribly
+wrong, but the above question must be answered before we can consider
+any of this.
+
+> 
+> [1] https://developer.arm.com/documentation/102376/0100/Combining-Stage-1-and-Stage-2-attributes
+> [2] ARMv8 reference manual: https://developer.arm.com/documentation/ddi0487/gb/ Section D5.5.3, Table D5-38
+> [3] ARMv8 reference manual: https://developer.arm.com/documentation/ddi0487/gb/ Table G5-20 on page G5-6330
+
+Please quote references that are current at the time of posting.
+Revision DDI0487I.a is the most recent version, so use that.
+
+>
+> Signed-off-by: Ankit Agrawal <ankita@nvidia.com>
+> ---
+>  arch/arm64/include/asm/kvm_pgtable.h |  8 +++++---
+>  arch/arm64/include/asm/memory.h      |  6 ++++--
+>  arch/arm64/kvm/hyp/pgtable.c         | 16 +++++++++++-----
+>  arch/arm64/kvm/mmu.c                 | 27 ++++++++++++++++++++++-----
+>  4 files changed, 42 insertions(+), 15 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+> index 4cd6762bda80..d3166b6e6329 100644
+> --- a/arch/arm64/include/asm/kvm_pgtable.h
+> +++ b/arch/arm64/include/asm/kvm_pgtable.h
+> @@ -150,7 +150,8 @@ enum kvm_pgtable_stage2_flags {
+>   * @KVM_PGTABLE_PROT_X:		Execute permission.
+>   * @KVM_PGTABLE_PROT_W:		Write permission.
+>   * @KVM_PGTABLE_PROT_R:		Read permission.
+> - * @KVM_PGTABLE_PROT_DEVICE:	Device attributes.
+> + * @KVM_PGTABLE_PROT_DEVICE_nGnRE:	Device nGnRE attributes.
+> + * @KVM_PGTABLE_PROT_DEVICE_nGnRnE:	Device nGnRnE attributes.
+>   * @KVM_PGTABLE_PROT_SW0:	Software bit 0.
+>   * @KVM_PGTABLE_PROT_SW1:	Software bit 1.
+>   * @KVM_PGTABLE_PROT_SW2:	Software bit 2.
+> @@ -161,7 +162,8 @@ enum kvm_pgtable_prot {
+>  	KVM_PGTABLE_PROT_W			= BIT(1),
+>  	KVM_PGTABLE_PROT_R			= BIT(2),
+>  
+> -	KVM_PGTABLE_PROT_DEVICE			= BIT(3),
+> +	KVM_PGTABLE_PROT_DEVICE_nGnRE		= BIT(3),
+> +	KVM_PGTABLE_PROT_DEVICE_nGnRnE		= BIT(4),
+>  
+>  	KVM_PGTABLE_PROT_SW0			= BIT(55),
+>  	KVM_PGTABLE_PROT_SW1			= BIT(56),
+> @@ -178,7 +180,7 @@ enum kvm_pgtable_prot {
+>  #define PAGE_HYP		KVM_PGTABLE_PROT_RW
+>  #define PAGE_HYP_EXEC		(KVM_PGTABLE_PROT_R | KVM_PGTABLE_PROT_X)
+>  #define PAGE_HYP_RO		(KVM_PGTABLE_PROT_R)
+> -#define PAGE_HYP_DEVICE		(PAGE_HYP | KVM_PGTABLE_PROT_DEVICE)
+> +#define PAGE_HYP_DEVICE		(PAGE_HYP | KVM_PGTABLE_PROT_DEVICE_nGnRE)
+>  
+>  typedef bool (*kvm_pgtable_force_pte_cb_t)(u64 addr, u64 end,
+>  					   enum kvm_pgtable_prot prot);
+> diff --git a/arch/arm64/include/asm/memory.h b/arch/arm64/include/asm/memory.h
+> index 78e5163836a0..4ebbc4b1ba4d 100644
+> --- a/arch/arm64/include/asm/memory.h
+> +++ b/arch/arm64/include/asm/memory.h
+> @@ -147,14 +147,16 @@
+>   * Memory types for Stage-2 translation
+>   */
+>  #define MT_S2_NORMAL		0xf
+> +#define MT_S2_DEVICE_nGnRnE 0x0
+>  #define MT_S2_DEVICE_nGnRE	0x1
+>  
+>  /*
+>   * Memory types for Stage-2 translation when ID_AA64MMFR2_EL1.FWB is 0001
+>   * Stage-2 enforces Normal-WB and Device-nGnRE
+>   */
+> -#define MT_S2_FWB_NORMAL	6
+> -#define MT_S2_FWB_DEVICE_nGnRE	1
+> +#define MT_S2_FWB_NORMAL	0x6
+> +#define MT_S2_FWB_DEVICE_nGnRnE 0x0
+> +#define MT_S2_FWB_DEVICE_nGnRE	0x1
+
+Why the repainting of perfectly valid constants? What does the 0x
+prefix bring? Does the comment above need updating?
+
+>  
+>  #ifdef CONFIG_ARM64_4K_PAGES
+>  #define IOREMAP_MAX_ORDER	(PUD_SHIFT)
+> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> index 3d61bd3e591d..7a8238b41590 100644
+> --- a/arch/arm64/kvm/hyp/pgtable.c
+> +++ b/arch/arm64/kvm/hyp/pgtable.c
+> @@ -355,7 +355,7 @@ struct hyp_map_data {
+>  
+>  static int hyp_set_prot_attr(enum kvm_pgtable_prot prot, kvm_pte_t *ptep)
+>  {
+> -	bool device = prot & KVM_PGTABLE_PROT_DEVICE;
+> +	bool device = prot & KVM_PGTABLE_PROT_DEVICE_nGnRE;
+>  	u32 mtype = device ? MT_DEVICE_nGnRE : MT_NORMAL;
+>  	kvm_pte_t attr = FIELD_PREP(KVM_PTE_LEAF_ATTR_LO_S1_ATTRIDX, mtype);
+>  	u32 sh = KVM_PTE_LEAF_ATTR_LO_S1_SH_IS;
+> @@ -636,14 +636,20 @@ static bool stage2_has_fwb(struct kvm_pgtable *pgt)
+>  static int stage2_set_prot_attr(struct kvm_pgtable *pgt, enum kvm_pgtable_prot prot,
+>  				kvm_pte_t *ptep)
+>  {
+> -	bool device = prot & KVM_PGTABLE_PROT_DEVICE;
+> -	kvm_pte_t attr = device ? KVM_S2_MEMATTR(pgt, DEVICE_nGnRE) :
+> -			    KVM_S2_MEMATTR(pgt, NORMAL);
+>  	u32 sh = KVM_PTE_LEAF_ATTR_LO_S2_SH_IS;
+> +	kvm_pte_t attr;
+> +
+> +	if (prot & KVM_PGTABLE_PROT_DEVICE_nGnRE)
+> +		attr = KVM_S2_MEMATTR(pgt, DEVICE_nGnRE);
+> +	else if (prot & KVM_PGTABLE_PROT_DEVICE_nGnRnE)
+> +		attr = KVM_S2_MEMATTR(pgt, DEVICE_nGnRnE);
+> +	else
+> +		attr = KVM_S2_MEMATTR(pgt, NORMAL);
+>  
+>  	if (!(prot & KVM_PGTABLE_PROT_X))
+>  		attr |= KVM_PTE_LEAF_ATTR_HI_S2_XN;
+> -	else if (device)
+> +	else if (prot & KVM_PGTABLE_PROT_DEVICE_nGnRE ||
+> +		 prot & KVM_PGTABLE_PROT_DEVICE_nGnRnE)
+
+Why don't you keep 'device', which is concise and readable, and simply
+change the way it is assigned?
+
+>  		return -EINVAL;
+>  
+>  	if (prot & KVM_PGTABLE_PROT_R)
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 7113587222ff..8d63aa951c33 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -897,7 +897,7 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
+>  	int ret = 0;
+>  	struct kvm_mmu_memory_cache cache = { .gfp_zero = __GFP_ZERO };
+>  	struct kvm_pgtable *pgt = kvm->arch.mmu.pgt;
+> -	enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_DEVICE |
+> +	enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_DEVICE_nGnRE |
+>  				     KVM_PGTABLE_PROT_R |
+>  				     (writable ? KVM_PGTABLE_PROT_W : 0);
+>  
+> @@ -1186,6 +1186,15 @@ static bool kvm_vma_mte_allowed(struct vm_area_struct *vma)
+>  	return vma->vm_flags & VM_MTE_ALLOWED;
+>  }
+>  
+> +/*
+> + * Determine the memory region cacheability from VMA's pgprot. This
+> + * is used to set the stage 2 PTEs.
+> + */
+> +static unsigned long mapping_type(pgprot_t page_prot)
+> +{
+> +	return ((pgprot_val(page_prot) & PTE_ATTRINDX_MASK) >> 2);
+
+Please use FIELD_GET() for field extraction.
+
+> +}
+> +
+>  static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>  			  struct kvm_memory_slot *memslot, unsigned long hva,
+>  			  unsigned long fault_status)
+> @@ -1368,10 +1377,18 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>  	if (exec_fault)
+>  		prot |= KVM_PGTABLE_PROT_X;
+>  
+> -	if (device)
+> -		prot |= KVM_PGTABLE_PROT_DEVICE;
+> -	else if (cpus_have_const_cap(ARM64_HAS_CACHE_DIC))
+> -		prot |= KVM_PGTABLE_PROT_X;
+> +	switch (mapping_type(vma->vm_page_prot)) {
+> +	case MT_DEVICE_nGnRE:
+> +		prot |= KVM_PGTABLE_PROT_DEVICE_nGnRE;
+> +		break;
+> +	case MT_DEVICE_nGnRnE:
+> +		prot |= KVM_PGTABLE_PROT_DEVICE_nGnRnE;
+> +		break;
+
+Please keep the 'device' guard. It makes it easy to find the code
+paths that are relevant to this case.
+
+> +		/* MT_NORMAL/_TAGGED/_NC */
+> +	default:
+> +		if (cpus_have_const_cap(ARM64_HAS_CACHE_DIC))
+> +			prot |= KVM_PGTABLE_PROT_X;
+> +	}
+>  
+>  	/*
+>  	 * Under the premise of getting a FSC_PERM fault, we just need to relax
+
+Thanks,
 
 	M.
 
