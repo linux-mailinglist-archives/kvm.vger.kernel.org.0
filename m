@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 52FBB6E00FD
-	for <lists+kvm@lfdr.de>; Wed, 12 Apr 2023 23:35:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 053AB6E00FE
+	for <lists+kvm@lfdr.de>; Wed, 12 Apr 2023 23:35:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229998AbjDLVfe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 Apr 2023 17:35:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35114 "EHLO
+        id S230031AbjDLVff (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 Apr 2023 17:35:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35112 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229663AbjDLVf0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S229897AbjDLVf0 (ORCPT <rfc822;kvm@vger.kernel.org>);
         Wed, 12 Apr 2023 17:35:26 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0CEBA83C0
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8D6C76BB
         for <kvm@vger.kernel.org>; Wed, 12 Apr 2023 14:35:25 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id 132-20020a250c8a000000b00b8f4e12dd57so1884659ybm.1
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-54f8d4f1ca1so37088367b3.20
         for <kvm@vger.kernel.org>; Wed, 12 Apr 2023 14:35:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1681335324; x=1683927324;
+        d=google.com; s=20221208; t=1681335325; x=1683927325;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=fXIZH8fY83vgfwH8POrr//89XoSgOMitG1Dp++mIiPs=;
-        b=YisQpRnBOeAwg9ZX219UZQMhQxuyDfMdNDGwIM7kYemLzsSfZ/SGeZjelJTvKZTX01
-         h+3Mva+AsoeDLPkEZfXti0QYJCd0Gnxtx2iPS46KcZYJMbtNIpccXd1nkV7JjclKAgOT
-         ZZgzQxYVQewWug5Hu/GM9rA5g0xIWgk9PTD6gv8RLkgLSKnFdVu0S2i0SZwpYwJwRWHr
-         M4RMrS3cKuQowbs4mv/G49o/rXgk/U+bWQ1jnOSm37UF5tkUkoqwpaqgy25/jiVwm4S5
-         dK6aGhjypYDdse2/jDhX7vXjaJhm5k+2X10ISVVE0X24dQw/ZwqzdXc93uctIAQ/wiBy
-         t+PA==
+        bh=+2CX14Kj8/FFXl+IH0W/8FGtmxWGznSGRKdbhRDJLUc=;
+        b=p8bqpn4Dk9Gz6MN4ywNEmQtagtzpLIxrNnIs/78XOR/BZCZsaubThr5jZlBe3A9/Bo
+         xUGwI26ti8RR6P8GdBzrDgrFhOrTjkeh9AtMCg/Q9PFIi3EAVKhB8I8p0MNXBEhdx058
+         qHIdK5MhwqEdX2g5KKNjLJnb/mhhyuldqk8s0eAqYV4nAchHoT628Fnj3jVtkCgj0KSZ
+         NQjg5DjX1iidMjq4DxkyjK7XFXry1UsIBkfsDw0DlcBJI06XomtB15gsVc+JjM+Pceog
+         lgxYPlOh7M/77mtkNft0npiYroONt+2TYP1Jm1lm0UlYFodlTIf10FXcOnCumbISliIr
+         sCqA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681335324; x=1683927324;
+        d=1e100.net; s=20221208; t=1681335325; x=1683927325;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=fXIZH8fY83vgfwH8POrr//89XoSgOMitG1Dp++mIiPs=;
-        b=aTO9V1orO3vKZuCIig4wTgLj5J9WhrhaEteUG0IrNOKz4U+yTi+/ItE3R9nyxYfYW5
-         qnCT+RacP1WHgOK2p4esDxiPOhUerGd5rxvyzwikOa5aCWfQn7Q3b41sv6WhmDcuL2gs
-         G2H2+YDCEO2bJ8QAElB7KPTsAxSRAVaLfZ4moSSKfX90Y2sHYCMX0D7DItXcXAdCe82q
-         QN+RlDUYk9CvLb3jB77stjuRSHqVUcVEN2iUT7Vg6Ec8BcN78ll5ZO1jfL6NgNXlTgHE
-         W+Oe0uRTu1X9M9p8bMkEZJZj229CDCE7UyPX6x+hTIwUtwjbPA/CcQmIv7keAkYZPEXH
-         HTtQ==
-X-Gm-Message-State: AAQBX9cmQB00v6xlJ4N85pfbF/SgN5Qj1NwqWTuJkFY/DR/XonZt1JV6
-        J+epPxnDe97NAlC3R3SVq42rWGyHE6lhqg==
-X-Google-Smtp-Source: AKy350bhXrkwYHL2oiwHoVZPq1a1kZqsww17x6UiZcbBFdt3mgWFNOOcT1fYEgc+pglz1McVDcJD24DYEi1ceQ==
+        bh=+2CX14Kj8/FFXl+IH0W/8FGtmxWGznSGRKdbhRDJLUc=;
+        b=ChxqHyQZSKqz5TqsuXZaMTT/mL/PvWSVMVYgk1nQkB8bJhVIuHyHxZq1ySsjJZhTnO
+         c71pjIvklr9VrjFhr48A+vwfg8vuTRgYQ1kdwXoA+undClk1ygOwfLeo6s4Qn97c2PMS
+         tZQxYkByQmh8Wv3wTQb+bqnyy3wsZ5SDreq4cf1NZTr5swJ3t8ZX1HumBPqlMe8D0lzZ
+         oJXgrrmj0BHNYWz+7ynHqoXxZ374jJOREIhy9gx79vv4hKGdknrEbUCr/JSW/d+3IUKE
+         rn4dBpwsF3DHhbMTDaY9Ai5yDoab2/3+xOqvjw9CQHR5spwfFQlRjuRnhaYPjjKBK80x
+         v5ig==
+X-Gm-Message-State: AAQBX9cz7DUKbXL4Mqtm+/3gfungVwJX0ATtM8tmp8vsR3ju9YsZBNvJ
+        Xbxos6Ea35Bx2miZz2X+iNSEzuAL5mY/pA==
+X-Google-Smtp-Source: AKy350ZoVAtaYWZqyK/PKLeLB7f5y1zErH4zuwClH5USqCfQLe7jp2ooTV3DJsYLDFSWaoh1ky/XqCmcJ18/XA==
 X-Received: from laogai.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:2c9])
  (user=amoorthy job=sendgmr) by 2002:a0d:ec02:0:b0:54c:2723:560d with SMTP id
- q2-20020a0dec02000000b0054c2723560dmr8663ywn.3.1681335324351; Wed, 12 Apr
- 2023 14:35:24 -0700 (PDT)
-Date:   Wed, 12 Apr 2023 21:34:58 +0000
+ q2-20020a0dec02000000b0054c2723560dmr8679ywn.3.1681335325180; Wed, 12 Apr
+ 2023 14:35:25 -0700 (PDT)
+Date:   Wed, 12 Apr 2023 21:34:59 +0000
 In-Reply-To: <20230412213510.1220557-1-amoorthy@google.com>
 Mime-Version: 1.0
 References: <20230412213510.1220557-1-amoorthy@google.com>
 X-Mailer: git-send-email 2.40.0.577.gac1e443424-goog
-Message-ID: <20230412213510.1220557-11-amoorthy@google.com>
-Subject: [PATCH v3 10/22] KVM: x86: Annotate -EFAULTs from kvm_mmu_page_fault()
+Message-ID: <20230412213510.1220557-12-amoorthy@google.com>
+Subject: [PATCH v3 11/22] KVM: x86: Annotate -EFAULTs from setup_vmgexit_scratch()
 From:   Anish Moorthy <amoorthy@google.com>
 To:     pbonzini@redhat.com, maz@kernel.org
 Cc:     oliver.upton@linux.dev, seanjc@google.com, jthoughton@google.com,
@@ -70,27 +70,25 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 Implement KVM_CAP_MEMORY_FAULT_INFO for efaults generated by
-kvm_mmu_page_fault().
+setup_vmgexit_scratch().
 
 Signed-off-by: Anish Moorthy <amoorthy@google.com>
 ---
- arch/x86/kvm/mmu/mmu.c | 3 +++
- 1 file changed, 3 insertions(+)
+ arch/x86/kvm/svm/sev.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 144c5a01cd778..7391d1f75149d 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -5670,6 +5670,9 @@ int noinline kvm_mmu_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa, u64 err
- 			return -EIO;
- 	}
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index c25aeb550cd97..9ef121f71dc26 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -2683,6 +2683,7 @@ static int setup_vmgexit_scratch(struct vcpu_svm *svm, bool sync, u64 len)
+ 			pr_err("vmgexit: kvm_read_guest for scratch area failed\n");
  
-+	if (r == -EFAULT)
-+		kvm_populate_efault_info(vcpu, round_down(cr2_or_gpa, PAGE_SIZE),
-+								 PAGE_SIZE);
- 	if (r < 0)
- 		return r;
- 	if (r != RET_PF_EMULATE)
+ 			kvfree(scratch_va);
++			kvm_populate_efault_info(&svm->vcpu, scratch_gpa_beg, len);
+ 			return -EFAULT;
+ 		}
+ 
 -- 
 2.40.0.577.gac1e443424-goog
 
