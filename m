@@ -2,120 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B1EC56DFA89
-	for <lists+kvm@lfdr.de>; Wed, 12 Apr 2023 17:47:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AA7C16DFA94
+	for <lists+kvm@lfdr.de>; Wed, 12 Apr 2023 17:51:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230406AbjDLPrf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 Apr 2023 11:47:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49980 "EHLO
+        id S231167AbjDLPvD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 Apr 2023 11:51:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52232 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230211AbjDLPre (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 Apr 2023 11:47:34 -0400
-Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF8B059F0
-        for <kvm@vger.kernel.org>; Wed, 12 Apr 2023 08:47:32 -0700 (PDT)
-Received: by mail-pl1-x649.google.com with SMTP id d9443c01a7336-1a667067280so2228035ad.1
-        for <kvm@vger.kernel.org>; Wed, 12 Apr 2023 08:47:32 -0700 (PDT)
+        with ESMTP id S230319AbjDLPvB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 12 Apr 2023 11:51:01 -0400
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDBE6728A
+        for <kvm@vger.kernel.org>; Wed, 12 Apr 2023 08:50:59 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-54f810e01f5so39766347b3.0
+        for <kvm@vger.kernel.org>; Wed, 12 Apr 2023 08:50:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1681314452; x=1683906452;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=yjrE3vkWoYaBe3XK1gCb5Sp1UmCvYlcNR4o4s9Hxl/0=;
-        b=x0lvcwo264vjHzlYWnCEK1c/d9SF4qJXDBKMDHCWZYlGR+S0SDr1jR3tI0yXPpi4Nq
-         EITD3Nqm4TOtwRLIFu+tskH8GAStRwoHEpYJClreiibgLOtabKQV/cRWlioJAlr9qPaf
-         wOqWSQIyC7jQKNnTsVxaixE2fu7wUXVbRbYSEepNC/ywEjsoddcFKD/p6HnxJkGQhtok
-         POF2elMpKOEK3b5gqIxih1gOfdp/ac07+OJ10EAykTiIWwDcCbChCnyskJDszVMlC6J4
-         k80kAsC1uIlED0JyrXNAFhQIPEoiA2pkdN7hFRMJAD5Y//HTxcONm6cuCHJMDaRavB5X
-         KjNg==
+        d=google.com; s=20221208; t=1681314659; x=1683906659;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ogzsp2Zb5oW4pVyV0bLaflVZnjMH0psN7OLO8aR9z+U=;
+        b=P4Q77Dt8KKqjxsvadieiyCHUhDBtlNXfW4kerlliv/IuwMrcjORNbIAEEjp/LVCboY
+         HE5sHotnLn1MCziHYz1yqsm4UMSp9t6ScPEthqJB0oKYv5vLM9kSRMwMT4uR8sOe80Zk
+         IdtyYqfBBGlMdG+wZcCAN8aMwYzx2oyWRXRWULawNtqeogSN+oLTau7yYNPB7S0T0+Xg
+         /SSk6bxpEBgArcYHASwZZaoy3CMnY9Gufg81WUuJA+YBvAv8s+jhTicuGRQjr0nDlZB4
+         5W/N28B56BxoVOYe3AnhrNT4tSS+SlxFOLaTtiqSyIxZwaOwggBOIFgJ++T2hcm2arRa
+         yjEw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1681314452; x=1683906452;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=yjrE3vkWoYaBe3XK1gCb5Sp1UmCvYlcNR4o4s9Hxl/0=;
-        b=HwkzOFsz1xM5Xx/3HmYM2/pDHT3guKhyKkuHY8hAvj+io+VLPuUa6BuLQSAryWJ1UC
-         dnByTTfsDnzG0u1MYR6oMQbKvoE14uVNY1IlqRRpkURs2Ju6UnpZ6KRQ28mFS0Tg65wV
-         ++g0t4wfBfa0znVm2UHeqzO+j+7oCm27W41UTEQX1mEJYOtzSxQtSDb4uCu96L10oFmU
-         KhmMoSnFATXuzXGt3XAJOnAwoeF2H0r+JGowzaYggY63uKF9w4ZrVg7cmyP1Q27zcKRQ
-         HO4ojX6bJvh5/689Gs1BrGyScl46YkmdekQJE3d47e/Y5hWfody3s4lRPmXTCIkU//YR
-         lLXg==
-X-Gm-Message-State: AAQBX9dmPI+2TSFCoiqsjjCBM4hz1WtUt1Ao1j1Y/dYQ8KKDmKJ1+pCI
-        stXeF78lfZ1bK8qLxNdaNu1VyuFYjDY=
-X-Google-Smtp-Source: AKy350aJDClf8K5+aIBJwRzeHF4JMKPh5FDv4GVFVqkv9oGFBr6wnSjqIYxtGQWHmi4AI9OsjRJkuI7bQV0=
+        d=1e100.net; s=20210112; t=1681314659; x=1683906659;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ogzsp2Zb5oW4pVyV0bLaflVZnjMH0psN7OLO8aR9z+U=;
+        b=ATYXmCK6YrRhN8pBUrGb3LZH4+/l1S3+xBsOmtDukZ2MSbnlwCSoLTiqwjHODGMDxg
+         pvprZDWw6uRfQZkjPURCuUB39WPbHxn7GiDGRHdEzjaM2AgbwrqCEBFaNLf5tmVD0N5I
+         t3wESZx2uOaUEsV31WUWs5F/1OR+yEMBzwqMcZfrYD1U4Q/XRUKYk2LEihXiPG4TArW/
+         nwy5g0ZBhalPhFTj3VlKzlDCICE8qjBBPl5lzvhZUaCT05yIefnKIH67WP1Bj2uGg9yO
+         24q4eHZT14BzO9u64OWIgpZ4FARpzxaljBBzBYCuDLBSH100u2BAtVLK21KmVXXoTVaa
+         K5rA==
+X-Gm-Message-State: AAQBX9dtoQ2RXP7TALRVwSUX7yIWJa5dwXIag/MMNVlA/bnk8MDUQUpF
+        nZ43xhGw/1Bf6VKONferixjTnBqXXj0=
+X-Google-Smtp-Source: AKy350ZxzccsV3vpmgHZjBcrZhDozNj2jpgFS5mxIJp24LtarbiEwtJ2n6Akktb8zEwWeGQEGnwknZAwnYI=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:1414:b0:637:ec79:5afc with SMTP id
- l20-20020a056a00141400b00637ec795afcmr5084428pfu.3.1681314452103; Wed, 12 Apr
- 2023 08:47:32 -0700 (PDT)
-Date:   Wed, 12 Apr 2023 08:47:30 -0700
-In-Reply-To: <4e3706bd9dccc6cd00eab9c59e06b3912b0c8dfe.camel@intel.com>
+ (user=seanjc job=sendgmr) by 2002:a81:eb08:0:b0:54f:97dd:633 with SMTP id
+ n8-20020a81eb08000000b0054f97dd0633mr1398481ywm.4.1681314659054; Wed, 12 Apr
+ 2023 08:50:59 -0700 (PDT)
+Date:   Wed, 12 Apr 2023 08:49:43 -0700
+In-Reply-To: <20230405004520.421768-1-seanjc@google.com>
 Mime-Version: 1.0
-References: <20230411171651.1067966-1-seanjc@google.com> <20230411171651.1067966-3-seanjc@google.com>
- <4e3706bd9dccc6cd00eab9c59e06b3912b0c8dfe.camel@intel.com>
-Message-ID: <ZDbSkqCm8AYVMqPI@google.com>
-Subject: Re: [PATCH v3 2/2] Documentation/process: Add a maintainer handbook
- for KVM x86
+References: <20230405004520.421768-1-seanjc@google.com>
+X-Mailer: git-send-email 2.40.0.577.gac1e443424-goog
+Message-ID: <168123371052.1068870.10975257258289226380.b4-ty@google.com>
+Subject: Re: [PATCH v4 0/6] KVM: x86: Fix unpermitted XTILE CPUID reporting
 From:   Sean Christopherson <seanjc@google.com>
-To:     Kai Huang <kai.huang@intel.com>
-Cc:     "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        Xiaoyao Li <xiaoyao.li@intel.com>,
-        "eesposit@redhat.com" <eesposit@redhat.com>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "pshier@google.com" <pshier@google.com>,
-        "bagasdotme@gmail.com" <bagasdotme@gmail.com>,
-        "jthoughton@google.com" <jthoughton@google.com>,
-        Guang Zeng <guang.zeng@intel.com>,
-        "jmattson@google.com" <jmattson@google.com>,
-        "leobras@redhat.com" <leobras@redhat.com>,
-        "bgardon@google.com" <bgardon@google.com>,
-        "pgonda@google.com" <pgonda@google.com>,
-        Jing2 Liu <jing2.liu@intel.com>,
-        "amoorthy@google.com" <amoorthy@google.com>,
-        "nikunj@amd.com" <nikunj@amd.com>,
-        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        "mhal@rbox.co" <mhal@rbox.co>,
-        "oliver.upton@linux.dev" <oliver.upton@linux.dev>,
-        "mizhang@google.com" <mizhang@google.com>,
-        Sagi Shahar <sagis@google.com>,
-        "michael.roth@amd.com" <michael.roth@amd.com>,
-        "thomas.lendacky@amd.com" <thomas.lendacky@amd.com>,
-        "aghulati@google.com" <aghulati@google.com>,
-        "ricarkol@google.com" <ricarkol@google.com>,
-        "bp@alien8.de" <bp@alien8.de>,
-        "flyingpenghao@gmail.com" <flyingpenghao@gmail.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "axelrasmussen@google.com" <axelrasmussen@google.com>,
-        "robert.hu@linux.intel.com" <robert.hu@linux.intel.com>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,
-        "vipinsh@google.com" <vipinsh@google.com>,
-        "ashish.kalra@amd.com" <ashish.kalra@amd.com>,
-        Chenyi Qiang <chenyi.qiang@intel.com>,
-        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
-        "dmatlack@google.com" <dmatlack@google.com>,
-        "aaronlewis@google.com" <aaronlewis@google.com>,
-        Maciej Szmigiero <maciej.szmigiero@oracle.com>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "pdurrant@amazon.com" <pdurrant@amazon.com>,
-        "wanpengli@tencent.com" <wanpengli@tencent.com>,
-        "yu.c.zhang@linux.intel.com" <yu.c.zhang@linux.intel.com>,
-        "junaids@google.com" <junaids@google.com>,
-        Erdem Aktas <erdemaktas@google.com>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        Zhenzhong Duan <zhenzhong.duan@intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "jiaxi.chen@linux.intel.com" <jiaxi.chen@linux.intel.com>,
-        Rongqing Li <lirongqing@baidu.com>,
-        "gshan@redhat.com" <gshan@redhat.com>,
-        "like.xu.linux@gmail.com" <like.xu.linux@gmail.com>,
-        "babu.moger@amd.com" <babu.moger@amd.com>,
-        Wei W Wang <wei.w.wang@intel.com>,
-        "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
-        "houwenlong.hwl@antgroup.com" <houwenlong.hwl@antgroup.com>,
-        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
-        Chao Gao <chao.gao@intel.com>
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+To:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Aaron Lewis <aaronlewis@google.com>,
+        Mingwei Zhang <mizhang@google.com>,
+        Jim Mattson <jmattson@google.com>
+Content-Type: text/plain; charset="utf-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
@@ -126,54 +70,34 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Apr 12, 2023, Kai Huang wrote:
-> On Tue, 2023-04-11 at 10:16 -0700, Sean Christopherson wrote:
-> > +Timeline
-> > +~~~~~~~~
-> > +Submissions are typically reviewed and applied in FIFO order, with som=
-e wiggle
-> > +room for the size of a series, patches that are "cache hot", etc.=EF=
-=BF=BD Fixes,
-> > +especially for the current release and or stable trees, get to jump th=
-e queue.
-> > +Patches that will be taken through a non-KVM tree (most often through =
-the tip
-> > +tree) and/or have other acks/reviews also jump the queue to some exten=
-t.
-> > +
-> > +Note, the vast majority of review is done between rc1 and rc6, give or=
- take.
-> > +The period between rc6 and the next rc1 is used to catch up on other t=
-asks,
-> > +i.e. radio silence during this period isn't unusual.
-> > +
-> > +Pings to get a status update are welcome, but keep in mind the timing =
-of the
-> > +current release cycle and have realistic expectations.=EF=BF=BD If you=
- are pinging for
-> > +acceptance, i.e. not just for feedback or an update, please do everyth=
-ing you
-> > +can, within reason, to ensure that your patches are ready to be merged=
-!=EF=BF=BD Pings
-> > +on series that break the build or fail tests lead to unhappy maintaine=
-rs!
-> > +
->=20
-> It seems you don't like resending patch as a ping:
->=20
-> https://lore.kernel.org/lkml/20230410031021.4145297-1-alexjlzheng@tencent=
-.com/t/#md30aa77e5c2592b5b1fb0401d14e6fdbf52c2e06
->=20
-> Do you want to include this to the documentation too?
+On Tue, 04 Apr 2023 17:45:14 -0700, Sean Christopherson wrote:
+> This is v4 of Aaron's "Clean up the supported xfeatures" series.
+> 
+> Fix a bug where KVM treats/reports XTILE_CFG as supported without
+> XTILE_DATA being supported if userspace queries the supported CPUID but
+> doesn't request access to AMX, a.k.a. XTILE_DATA.  If userspace reflects
+> that CPUID info back into KVM, the resulting VM may use it verbatim and
+> attempt to shove bad data into XCR0: XTILE_CFG and XTILE_DATA must be
+> set/cleared as a pair in XCR0, despite being enumerated separately.
+> 
+> [...]
 
-Honestly, I would rather get Documentation/process/submitting-patches.rst u=
-pdated
-to rework its recommended use of RESEND.  I doubt I am the only person that=
- thinks
-a RESEND after 1-2 weeks to ping for reviews is inefficient and confusing f=
-or
-everyone involved.  And on the flip side, AFAICT there's no mention anywher=
-e of
-the much more common (and IMO justified) use cases, e.g. to fix/tweak the T=
-o/Cc
-lists or because there was an issue with mail delivery.
+Applied to kvm-x86 selftests (due to the dependencies on the earlier AMX
+selftests rework).  Thanks!
+
+[1/6] KVM: x86: Add a helper to handle filtering of unpermitted XCR0 features
+      https://github.com/kvm-x86/linux/commit/6be3ae45f567
+[2/6] KVM: x86: Filter out XTILE_CFG if XTILE_DATA isn't permitted
+      https://github.com/kvm-x86/linux/commit/55cd57b596e8
+[3/6] KVM: selftests: Move XGETBV and XSETBV helpers to common code
+      https://github.com/kvm-x86/linux/commit/b213812d3f4c
+[4/6] KVM: selftests: Rework dynamic XFeature helper to take mask, not bit
+      https://github.com/kvm-x86/linux/commit/7040e54fddf6
+[5/6] KVM: selftests: Add all known XFEATURE masks to common code
+      https://github.com/kvm-x86/linux/commit/28f2302584af
+[6/6] KVM: selftests: Add test to verify KVM's supported XCR0
+      https://github.com/kvm-x86/linux/commit/03a405b7a522
+
+--
+https://github.com/kvm-x86/linux/tree/next
+https://github.com/kvm-x86/linux/tree/fixes
