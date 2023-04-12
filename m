@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 374D56E00FF
-	for <lists+kvm@lfdr.de>; Wed, 12 Apr 2023 23:35:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 349DA6E0100
+	for <lists+kvm@lfdr.de>; Wed, 12 Apr 2023 23:35:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230092AbjDLVfh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 Apr 2023 17:35:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35142 "EHLO
+        id S230029AbjDLVfi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 Apr 2023 17:35:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35272 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229886AbjDLVf2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 Apr 2023 17:35:28 -0400
+        with ESMTP id S230017AbjDLVf3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 12 Apr 2023 17:35:29 -0400
 Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C06C676A6
-        for <kvm@vger.kernel.org>; Wed, 12 Apr 2023 14:35:26 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id v200-20020a252fd1000000b00b8f548a72bbso862051ybv.9
-        for <kvm@vger.kernel.org>; Wed, 12 Apr 2023 14:35:26 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BCE037ABC
+        for <kvm@vger.kernel.org>; Wed, 12 Apr 2023 14:35:27 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id 184-20020a2515c1000000b009419f64f6afso13842887ybv.2
+        for <kvm@vger.kernel.org>; Wed, 12 Apr 2023 14:35:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1681335326; x=1683927326;
+        d=google.com; s=20221208; t=1681335327; x=1683927327;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=j57tzoPl16sC9ByxrSzcSJpXXHgYa+UwHfuGAFzOM3I=;
-        b=hPL8324f0dvuI9qEQzWCYrweNFqgGmr995W+iPkc+3GRVTRuBih5b/Tk+omn/cNuoJ
-         QJdd85nlJ+8gvBlpPMGC2W5MkTQLs/SUWLfnjqPap4MmVSGebtW35hwDOjZMMG8REtua
-         /lSLjpb4oFMt1H05FLzLPNItsS8aB/fITd6xVpVMffErvEaAjrQWdlIKMqUdcPA/heHg
-         VoN+2vk5kF95IclXeJ7opZl6vuf12QAxytef0yL5vmQDLvQICDV+IE0uA8hk6P6YyXbR
-         8T1OpFbeK2s2/ufzJ+ZIT92Ohgl6rhkbVKN2MsQE2rgAtc+yORcHLQWC9t+kfbYn1oae
-         i8tg==
+        bh=y3j9qgUxhtl7kPmvN8p0uLV24AtP48c1UXcpkvJrSL4=;
+        b=znOhPv9b3IaUt2OaMla7s/u7LvnQoRk71ovHLPBcB8TaKOJZW4sc0PrZ/iCJOA3dpf
+         tOqbawMve8/s5KX/HdPG1vEStSOt72Kmw4r6I2CRzt7aTV/loRc9v7u5y8AVoh1knwY0
+         v5sr8nQ1FxhezlnNZBhcPhVGpylmLUDVNSAM6t0u+jRxkU2Qg/s3CPvYEq2oX8PLWAtn
+         tbkqa47HvyfkWxPETB5zM2l4G6tE6nbgMjc7G1eq5ig+UgsglZAiNB7MUcWCOP8OGif5
+         IfWnPeuEFjIxy8esEjfZTnnBq4y3XPxCzKgnWXWNH8KBXL9L5a1ZJgPd6rgKBK0JIMGp
+         6Blw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681335326; x=1683927326;
+        d=1e100.net; s=20221208; t=1681335327; x=1683927327;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=j57tzoPl16sC9ByxrSzcSJpXXHgYa+UwHfuGAFzOM3I=;
-        b=M65Hp8Ox/1/Oyc8wiUCBg0vuVIUJR2zCQ/O/f5fiiTIbU8p2vjiIvA2jmsAUG9E0IR
-         Dqh5zLVUEQkpEySBAMP5p+1qAT0QjMW94Jasy27hwvZchbS7nKGjLQeHoTgT1us4har7
-         HZTdS65DySfFO/QjMSPikH8sm+k2XD2czNdrYP+vQbFtjKEPuouWRSo/L6ZDu9z2e44W
-         NbIysZgQVLxi5ntOSPSdOj2SO7/lorjmdlqcoUD7WQcecyV9m+IFlFqYKSmxnJ1VkhCJ
-         V/A6TpoWLhAeoYUj4mtj9I2b3t7d6sJ/2k7pKNiDQE2PP7jOsm+Dw+Lk83u7YHsn92JW
-         8T1g==
-X-Gm-Message-State: AAQBX9cFtBc4kv5r3U9qZ6z8sEjLku8LBxYg1E9NHScp8hCg14HPfdDa
-        72jEAi/tk+RmS2IcLlgrG3IOczvqvqu/Bg==
-X-Google-Smtp-Source: AKy350YnELcVqu3F38lVRb+xr7cHeJqZPpveoy9dsreWoQEbFvuQJOfQLeL37xkM4q0cAPIFSLawdQnrHh266A==
+        bh=y3j9qgUxhtl7kPmvN8p0uLV24AtP48c1UXcpkvJrSL4=;
+        b=dFhM9/ivuF5iH9qP/IHuuvwFj2W/SstW4Sf6L6Gkf9lP3k3kKo9mKkFQbG0Psph+te
+         eimmy2+lEMWnX5EjGtDnu8JErRDYdWO3MHeE4IR9GoKbNGmWa29+aTo6yof8/LV5gAjV
+         RByZyWAvyOMd+KacnTkpEojkYJQ0HGv3GcLksCestdHA1wXXdl0QHJjMgbRnRV4mXkY0
+         Y8kUPt7fTosSkb8VMu0U6Yocl0Xv5sNuzsbV5/66iE6RGG1BWNhk2G4kOpsZB7CX+Mt1
+         9F6XmFAF0AhbS2as/zRygrqILib6I73UABZVY7Kje2pbf3KsMGk1tvbN/ZX9Tkmeslo+
+         gWhQ==
+X-Gm-Message-State: AAQBX9fRPaaCrGS53Nah2Nf0cKQbochzrw4nihUnhT1NHP+0ckaroD7c
+        qtmHYWfEB1E7SQSxXZYPrIMbfOjGVQNoVQ==
+X-Google-Smtp-Source: AKy350YMWdkMCSKq761pJsOgwQGGxFRMIrQTIZEfBjuIxIleVcBDx4zXgdOdDVSMo9Fr8whNhn/grob/2f4/dQ==
 X-Received: from laogai.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:2c9])
- (user=amoorthy job=sendgmr) by 2002:a81:4319:0:b0:545:62cb:3bcf with SMTP id
- q25-20020a814319000000b0054562cb3bcfmr12058ywa.2.1681335326021; Wed, 12 Apr
- 2023 14:35:26 -0700 (PDT)
-Date:   Wed, 12 Apr 2023 21:35:00 +0000
+ (user=amoorthy job=sendgmr) by 2002:a05:690c:706:b0:545:5f92:f7ee with SMTP
+ id bs6-20020a05690c070600b005455f92f7eemr16230ywb.2.1681335326987; Wed, 12
+ Apr 2023 14:35:26 -0700 (PDT)
+Date:   Wed, 12 Apr 2023 21:35:01 +0000
 In-Reply-To: <20230412213510.1220557-1-amoorthy@google.com>
 Mime-Version: 1.0
 References: <20230412213510.1220557-1-amoorthy@google.com>
 X-Mailer: git-send-email 2.40.0.577.gac1e443424-goog
-Message-ID: <20230412213510.1220557-13-amoorthy@google.com>
-Subject: [PATCH v3 12/22] KVM: x86: Annotate -EFAULTs from kvm_handle_page_fault()
+Message-ID: <20230412213510.1220557-14-amoorthy@google.com>
+Subject: [PATCH v3 13/22] KVM: x86: Annotate -EFAULTs from kvm_hv_get_assist_page()
 From:   Anish Moorthy <amoorthy@google.com>
 To:     pbonzini@redhat.com, maz@kernel.org
 Cc:     oliver.upton@linux.dev, seanjc@google.com, jthoughton@google.com,
@@ -69,31 +69,43 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Implement KVM_CAP_MEMORY_FAULT_INFO for -EFAULTs caused by
-kvm_handle_page_fault().
+Implement KVM_CAP_MEMORY_FAULT_INFO for efaults generated by
+kvm_hv_get_assist_page().
 
 Signed-off-by: Anish Moorthy <amoorthy@google.com>
 ---
- arch/x86/kvm/mmu/mmu.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ arch/x86/kvm/hyperv.c | 14 +++++++++++---
+ 1 file changed, 11 insertions(+), 3 deletions(-)
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 7391d1f75149d..937329bee654e 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -4371,8 +4371,11 @@ int kvm_handle_page_fault(struct kvm_vcpu *vcpu, u64 error_code,
+diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
+index b28fd020066f6..467fff271bc88 100644
+--- a/arch/x86/kvm/hyperv.c
++++ b/arch/x86/kvm/hyperv.c
+@@ -921,13 +921,21 @@ EXPORT_SYMBOL_GPL(kvm_hv_assist_page_enabled);
  
- #ifndef CONFIG_X86_64
- 	/* A 64-bit CR2 should be impossible on 32-bit KVM. */
--	if (WARN_ON_ONCE(fault_address >> 32))
-+	if (WARN_ON_ONCE(fault_address >> 32)) {
-+		kvm_populate_efault_info(vcpu, round_down(fault_address, PAGE_SIZE),
-+								 PAGE_SIZE);
- 		return -EFAULT;
-+	}
- #endif
+ int kvm_hv_get_assist_page(struct kvm_vcpu *vcpu)
+ {
++	int ret = -EFAULT;
+ 	struct kvm_vcpu_hv *hv_vcpu = to_hv_vcpu(vcpu);
  
- 	vcpu->arch.l1tf_flush_l1d = true;
+ 	if (!hv_vcpu || !kvm_hv_assist_page_enabled(vcpu))
+-		return -EFAULT;
++		goto out;
++
++	ret = kvm_read_guest_cached(vcpu->kvm, &vcpu->arch.pv_eoi.data,
++								&hv_vcpu->vp_assist_page,
++								sizeof(struct hv_vp_assist_page));
+ 
+-	return kvm_read_guest_cached(vcpu->kvm, &vcpu->arch.pv_eoi.data,
+-				     &hv_vcpu->vp_assist_page, sizeof(struct hv_vp_assist_page));
++out:
++	if (ret == -EFAULT)
++		kvm_populate_efault_info(vcpu, vcpu->arch.pv_eoi.data.gpa,
++								 vcpu->arch.pv_eoi.data.len);
++	return ret;
+ }
+ EXPORT_SYMBOL_GPL(kvm_hv_get_assist_page);
+ 
 -- 
 2.40.0.577.gac1e443424-goog
 
