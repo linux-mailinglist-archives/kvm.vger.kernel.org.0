@@ -2,204 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E10016DF924
-	for <lists+kvm@lfdr.de>; Wed, 12 Apr 2023 16:56:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6F1F86DF926
+	for <lists+kvm@lfdr.de>; Wed, 12 Apr 2023 16:57:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230163AbjDLO4j (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 Apr 2023 10:56:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55292 "EHLO
+        id S230183AbjDLO5W (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 Apr 2023 10:57:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56124 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230281AbjDLO4f (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 Apr 2023 10:56:35 -0400
-Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73CE77DA0
-        for <kvm@vger.kernel.org>; Wed, 12 Apr 2023 07:56:11 -0700 (PDT)
-Received: from mail-yb1-f198.google.com (mail-yb1-f198.google.com [209.85.219.198])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id 3C45C3F429
-        for <kvm@vger.kernel.org>; Wed, 12 Apr 2023 14:56:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-        s=20210705; t=1681311370;
-        bh=OxpzX6kzOmYSsKE6qMLSC1R+x0dOP8fBolvejWA6sqA=;
-        h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-         To:Cc:Content-Type;
-        b=mDcdiTqot7FrCYU2Wl2VINayp+tkEYTHc1FxeB9hDYvLpfRK7IL/0klAdrBPoHbQw
-         XsafG9JkTb/812ppF6NqoU6lNJI+xkotON6flvbyhhdzwif2bLDMiWY5ZuzRrdTlT7
-         W8mBHt7xdMPS1RufG3yvYDPiFeSwhrxMJWj120Xh4jlHmxZPV3ueIzfVOwwIAxmt0a
-         LEm0fl+bCMpsgr4NuMpcINah22AQc7W0dvX+18TTR35mUhUK8LH/+tzHmQ5DyjRhxq
-         sL2D2+9uajpW7VenuLFKxKtq2tkNsgWF3U6DA5RFsO+Rj/5/8EdsFyQ/DHzbZDTz0F
-         3/gPO0lMC562g==
-Received: by mail-yb1-f198.google.com with SMTP id 186-20020a2510c3000000b00b880000325bso28883029ybq.3
-        for <kvm@vger.kernel.org>; Wed, 12 Apr 2023 07:56:10 -0700 (PDT)
+        with ESMTP id S229989AbjDLO5U (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 12 Apr 2023 10:57:20 -0400
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 651BC6E8F
+        for <kvm@vger.kernel.org>; Wed, 12 Apr 2023 07:57:04 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-54ee397553eso122298147b3.19
+        for <kvm@vger.kernel.org>; Wed, 12 Apr 2023 07:57:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1681311423; x=1683903423;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=UxuSmrxcS5kvb5ro9G9wLKGBPlYViuLgcSx+dZgTw44=;
+        b=vbh+sD6bSGK2jMfoJ/XyWWBWb258PuGE9SbBVYhyrammk8fHt+mzkhJr4NPIIobVOp
+         DnMtl3q99fCA0Jx4JRr2cqcOrRqOzO7K1mTcU45QX6JNnJbJUEIqzwAJA1153kODFif+
+         uGKr5cmUHodF9Z0qhJ4C0OF0XzISTXEyvOWGuVzj5rwgLzWLKh7wrcdsNTPYVuTnxZtr
+         dytsavvmD9UgtURE+8gFZiqP94OpeoOw32aOen7lUcLcM1t7ZbK1sCM9ldTSOdyfm8BZ
+         XQmOWQmi4fk3Gf95quFDdBaMlThOVLKt/3u5m5+4G31t60uahVsktM+ClGYuBHepi4BW
+         85qQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1681311369; x=1683903369;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=OxpzX6kzOmYSsKE6qMLSC1R+x0dOP8fBolvejWA6sqA=;
-        b=OMWhmgd9fbkydksfilMjYk4idNPHQJlDZpifaJAwwcLwT+qbXQ3Dly/ZP1pvIKA92l
-         0af7IxRccEO0Vbf6WD18ODu6b5S0lFAgmagsdkiOiynvu44DCAuFKdA0tfJ0X45/K8mV
-         jh27bCzT+X6JMOdLyxf5mec4WQbJC73d0l5QCeZ1ykgKqWY/wwkalNP0MWH51H7ZXZZ1
-         nIl4/bXg0Bo0jepVt94wKFnuhIdQSmM8JD9ZL097EvijMBEcuZ+E4zhA6wOHo8faD7eV
-         qWXr7tIiORg6pQ1ce/OfFbochfbBUPmy/rA87PgNNuflMdV5nwJtFk3Q0jkdbA1r8Vvi
-         /BWg==
-X-Gm-Message-State: AAQBX9cD9siCsDYR7R99l9eKVrC7lhZxwndVvAdboJGk3xBx9kQPADMu
-        RoRWVw47UyCv1RrTL96Ga2vN8JPzBS+PnVJxqjSL/HCBq/ptxuSgY6gtxNEUyMvwbejuDKkiUqu
-        AtZiMgqg9TaS0y+rGaz9soJF/FKbPCfGXR5IxMf6anBAbEg==
-X-Received: by 2002:a25:76c6:0:b0:b8b:ee74:c9d4 with SMTP id r189-20020a2576c6000000b00b8bee74c9d4mr12272194ybc.12.1681311369262;
-        Wed, 12 Apr 2023 07:56:09 -0700 (PDT)
-X-Google-Smtp-Source: AKy350ayKQid4DrFAszxepNHukT7rDUmpRKfL4/yXe/Auq2u5OoAJAKLAvIupIl1TNxT0UPAazi0OdRaFIcQIia5ivY=
-X-Received: by 2002:a25:76c6:0:b0:b8b:ee74:c9d4 with SMTP id
- r189-20020a2576c6000000b00b8bee74c9d4mr12272184ybc.12.1681311369029; Wed, 12
- Apr 2023 07:56:09 -0700 (PDT)
-MIME-Version: 1.0
-References: <20230404122652.275005-1-aleksandr.mikhalitsyn@canonical.com>
- <20230404122652.275005-3-aleksandr.mikhalitsyn@canonical.com> <20230411224337.000015ce.zhi.wang.linux@gmail.com>
-In-Reply-To: <20230411224337.000015ce.zhi.wang.linux@gmail.com>
-From:   Aleksandr Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
-Date:   Wed, 12 Apr 2023 16:55:58 +0200
-Message-ID: <CAEivzxd6GFMcW-k_dNKy83bHgPfa7iMivE=kdV-88Vkp28H2WA@mail.gmail.com>
-Subject: Re: [PATCH 2/2] KVM: SVM: add some info prints to SEV init
-To:     Zhi Wang <zhi.wang.linux@gmail.com>
-Cc:     pbonzini@redhat.com, Sean Christopherson <seanjc@google.com>,
-        =?UTF-8?Q?St=C3=A9phane_Graber?= <stgraber@ubuntu.com>,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-        version=3.4.6
+        d=1e100.net; s=20210112; t=1681311423; x=1683903423;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=UxuSmrxcS5kvb5ro9G9wLKGBPlYViuLgcSx+dZgTw44=;
+        b=p0wlAoZ1DjXuSYnvrHGWssSr4YZysrw6VNAH9yDrgfE9bA+8o6UXde9lOyi2HjM6lg
+         wPFoPpeHdyAUjC+L3WrDPBFTBzi6UGYJIZLjkprukXI/1xufmtiBuaxak/MHAKfOa555
+         15kWo/YOEiW57VqUq3gtaULmSm3im22IL/btPfugguUF9MMdyhNSCGFWAXGvQCq4DFX+
+         1xLQ3HYOWMAbWha8SV4+mLjxGMrbO1l1dXilQavhaEV9+o/C6F7TTdfdL32fxFxWz8jy
+         mszni8+Vp8+QVSZFnD4TiA0jjOwKLMEDMOXNHuHzqoL7S50ROV02QovsydHcuGWTMQVh
+         4lEg==
+X-Gm-Message-State: AAQBX9cqmopuWJH464cXZDXlF1pE1quVlFYdE/1vJWpfbDdPongdLzds
+        k0klUbT/8PlLfKaFU78KNXuJ9adBXh8=
+X-Google-Smtp-Source: AKy350a4ZuucXx2qirsNP0iItyLkiWlkZZ6EeKErOwzoigS1mEf9dDAD6gNZTKrWlhKqxdLhM/IjVG0ojf0=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a81:ae46:0:b0:54e:edf3:b48f with SMTP id
+ g6-20020a81ae46000000b0054eedf3b48fmr2040578ywk.5.1681311423706; Wed, 12 Apr
+ 2023 07:57:03 -0700 (PDT)
+Date:   Wed, 12 Apr 2023 07:57:02 -0700
+In-Reply-To: <1c9bebd63b25f2789b4064748c30c4590bbc2c7d.camel@intel.com>
+Mime-Version: 1.0
+References: <20230405005911.423699-1-seanjc@google.com> <d0af618169ebc17722e7019ca620ec22ee0b49c3.camel@intel.com>
+ <ZC4qF90l77m3X1Ir@google.com> <1c9bebd63b25f2789b4064748c30c4590bbc2c7d.camel@intel.com>
+Message-ID: <ZDbGvic9qmplVRT8@google.com>
+Subject: Re: [PATCH 0/3] KVM: x86: SGX vs. XCR0 cleanups
+From:   Sean Christopherson <seanjc@google.com>
+To:     Kai Huang <kai.huang@intel.com>
+Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Apr 11, 2023 at 9:43=E2=80=AFPM Zhi Wang <zhi.wang.linux@gmail.com>=
- wrote:
->
-> On Tue,  4 Apr 2023 14:26:52 +0200
-> Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com> wrote:
->
-> > Let's add a few pr_info's to sev_hardware_setup to make SEV/SEV-ES
-> > enabling a little bit handier for users. Right now it's too hard
-> > to guess why SEV/SEV-ES are failing to enable.
-> >
-> > There are a few reasons.
-> > SEV:
-> > - npt is disabled (module parameter)
->      ^NPT
-> > - CPU lacks some features (sev, decodeassists)
-> > - Maximum SEV ASID is 0
-> >
-> > SEV-ES:
-> > - mmio_caching is disabled (module parameter)
-> > - CPU lacks sev_es feature
-> > - Minimum SEV ASID value is 1 (can be adjusted in BIOS/UEFI)
-> >
-> > Cc: Sean Christopherson <seanjc@google.com>
-> > Cc: Paolo Bonzini <pbonzini@redhat.com>
-> > Cc: St=C3=A9phane Graber <stgraber@ubuntu.com>
-> > Cc: kvm@vger.kernel.org
-> > Cc: linux-kernel@vger.kernel.org
-> > Signed-off-by: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.c=
-om>
-> > ---
-> >  arch/x86/kvm/svm/sev.c | 27 +++++++++++++++++++++------
-> >  1 file changed, 21 insertions(+), 6 deletions(-)
-> >
-> > diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> > index a42536a0681a..14cbb8f14c6b 100644
-> > --- a/arch/x86/kvm/svm/sev.c
-> > +++ b/arch/x86/kvm/svm/sev.c
-> > @@ -2168,17 +2168,24 @@ void __init sev_hardware_setup(void)
-> >       bool sev_es_supported =3D false;
-> >       bool sev_supported =3D false;
-> >
-> > -     if (!sev_enabled || !npt_enabled)
-> > +     if (!sev_enabled)
-> >               goto out;
-> >
-> > +     if (!npt_enabled) {
-> > +             pr_info("Failed to enable AMD SEV as it requires Nested P=
-aging to be enabled\n");
-> > +             goto out;
->
-> Shouldn't we use pr_err() for error message?
+On Wed, Apr 12, 2023, Kai Huang wrote:
+> On Wed, 2023-04-05 at 19:10 -0700, Sean Christopherson wrote:
+> > On Wed, Apr 05, 2023, Huang, Kai wrote:
+> > > On Tue, 2023-04-04 at 17:59 -0700, Sean Christopherson wrote:
+> > > > *** WARNING *** ABI breakage.
+> > > > 
+> > > > Stop adjusting the guest's CPUID info for the allowed XFRM (a.k.a. XCR0)
+> > > > for SGX enclaves.  Past me didn't understand the roles and responsibilities
+> > > > between userspace and KVM with respect to CPUID leafs, i.e. I thought I was
+> > > > being helpful by having KVM adjust the entries.
+> > > 
+> > > Actually I am not clear about this topic.
+> > > 
+> > > So the rule is KVM should never adjust CPUID entries passed from userspace?
+> > 
+> > Yes, except for true runtime entries where a CPUID leaf is dynamic based on other
+> > CPU state, e.g. CR4 bits, MISC_ENABLES in the MONITOR/MWAIT case, etc.
+> > 
+> > > What if the userspace passed the incorrect CPUID entries?  Should KVM sanitize
+> > > those CPUID entries to ensure there's no insane configuration?  My concern is if
+> > > we allow guest to be created with insane CPUID configurations, the guest can be
+> > > confused and behaviour unexpectedly.
+> > 
+> > It is userspace's responsibility to provide a sane, correct setup.  The one
+> > exception is that KVM rejects KVM_SET_CPUID{2} if userspace attempts to define an
+> > unsupported virtual address width, the argument being that a malicious userspace
+> > could attack KVM by coercing KVM into stuff a non-canonical address into e.g. a
+> > VMCS field.
+> 
+> Sorry could you elaborate an example of such attack? :)
 
-I'm not sure. Because technically that's not an error, that is an
-information message about current configuration.
+Hrm, I was going to say that userspace could shove a noncanonical address in
+MSR_FS/GS_BASE and trigger an unexpected VM-Fail (VMX) or ??? behavior on VMLOAD
+(I don't think SVM consistency checks FS/GS.base).  But is_noncanonical_address()
+queries CR4.LA57, not the address width from CPUID.0x80000008, which makes sense
+enumearing 57 bits of virtual address space on a CPU without LA57 would also allow
+shoving a bad value into hardware.
 
+So even that example is bogus, i.e. commit dd598091de4a ("KVM: x86: Warn if guest
+virtual address space is not 48-bits") really shouldn't have gone in.
 
->
-> > +     }
-> > +
-> >       /*
-> >        * SEV must obviously be supported in hardware.  Sanity check tha=
-t the
-> >        * CPU supports decode assists, which is mandatory for SEV guests=
- to
-> >        * support instruction emulation.
-> >        */
-> >       if (!boot_cpu_has(X86_FEATURE_SEV) ||
-> > -         WARN_ON_ONCE(!boot_cpu_has(X86_FEATURE_DECODEASSISTS)))
-> > +         WARN_ON_ONCE(!boot_cpu_has(X86_FEATURE_DECODEASSISTS))) {
-> > +             pr_info("Failed to enable AMD SEV as it requires decodeas=
-sists and sev CPU features\n");
-> >               goto out;
-> > +     }
-> >
-> >       /* Retrieve SEV CPUID information */
-> >       cpuid(0x8000001f, &eax, &ebx, &ecx, &edx);
-> > @@ -2188,8 +2195,10 @@ void __init sev_hardware_setup(void)
-> >
-> >       /* Maximum number of encrypted guests supported simultaneously */
-> >       max_sev_asid =3D ecx;
-> > -     if (!max_sev_asid)
-> > +     if (!max_sev_asid) {
-> > +             pr_info("Failed to enable SEV as the maximum SEV ASID val=
-ue is 0.\n");
-> >               goto out;
-> > +     }
-> >
-> >       /* Minimum ASID value that should be used for SEV guest */
-> >       min_sev_asid =3D edx;
-> > @@ -2234,16 +2243,22 @@ void __init sev_hardware_setup(void)
-> >        * instead relies on #NPF(RSVD) being reflected into the guest as=
- #VC
-> >        * (the guest can then do a #VMGEXIT to request MMIO emulation).
-> >        */
-> > -     if (!enable_mmio_caching)
-> > +     if (!enable_mmio_caching) {
-> > +             pr_info("Failed to enable SEV-ES as it requires MMIO cach=
-ing to be enabled\n");
-> >               goto out;
-> > +     }
-> >
-> >       /* Does the CPU support SEV-ES? */
-> > -     if (!boot_cpu_has(X86_FEATURE_SEV_ES))
-> > +     if (!boot_cpu_has(X86_FEATURE_SEV_ES)) {
-> > +             pr_info("Failed to enable SEV-ES as it requires sev_es CP=
-U feature\n");
-> >               goto out;
-> > +     }
-> >
-> >       /* Has the system been allocated ASIDs for SEV-ES? */
-> > -     if (min_sev_asid =3D=3D 1)
-> > +     if (min_sev_asid =3D=3D 1) {
-> > +             pr_info("Failed to enable SEV-ES as the minimum SEV ASID =
-value is 1.\n");
-> >               goto out;
-> > +     }
-> >
-> >       sev_es_asid_count =3D min_sev_asid - 1;
-> >       if (misc_cg_set_capacity(MISC_CG_RES_SEV_ES, sev_es_asid_count))
->
-> As this patch is making sev_hardware_setup()more informative, it would be
-> better to print both ASID range and count (instead of only ASID count in
-> the current code). I was suspecting there seems a bug of ASID range alloc=
-ation
-> in the current code, but I don't have the HW to test yet...
+> > The reason for KVM punting to userspace is that it's all but impossible to define
+> > what is/isn't sane.  A really good example would be an alternative we (Google)
+> > considered for the "smaller MAXPHYADDR" fiasco, the underlying problem being that
+> > migrating a vCPU with MAXPHYADDR=46 to a system with MAXPHYADDR=52 will incorrectly
+> > miss reserved bit #PFs.
+> > 
+> > Rather than teach KVM to try and deal with smaller MAXPHYADDRs, an idea we considered
+> > was to instead enumerate guest.MAXPHYADDR=52 on platforms with host.MAXPHYADDR=46 in
+> > anticipation of eventual migration.  So long as userspace doesn't actually enumerate
+> > memslots in the illegal address space, KVM would be able to treat such accesses as
+> > emulated MMIO, and would only need to intercept #PF(RSVD).
+> > 
+> > Circling back to "what's sane", enumerating guest.MAXPHYADDR > host.MAXPHYADDR
+> > definitely qualifies as insane since it really can't work correctly, but in our
+> > opinion it was far superior to running with allow_smaller_maxphyaddr=true.
+> 
+> I guess everyone wants performance.
+
+Performance was a secondary concern, functional correctness was the main issue.
+We were concerned that KVM would end up terminating healthy/sane guests due to
+KVM's emulator being incomplete, i.e. if KVM failed to emulate an instruction in
+the EPT violation handler when GPA > guest.MAXPHYADDR.  That, and SVM sets the
+Accessed bit in the guest PTE before the NPT exit, i.e. KVM can't emulate a
+smaller guest.MAXPHYADDR without creating an architectural violation from the
+guest's perspective (a PTE with reserved bits should never set A/D bits).
