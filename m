@@ -2,48 +2,48 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8DFA06DF1DB
-	for <lists+kvm@lfdr.de>; Wed, 12 Apr 2023 12:22:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4A0706DF1EF
+	for <lists+kvm@lfdr.de>; Wed, 12 Apr 2023 12:29:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229822AbjDLKWf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 Apr 2023 06:22:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35356 "EHLO
+        id S230322AbjDLK35 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 Apr 2023 06:29:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40444 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229508AbjDLKWd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 Apr 2023 06:22:33 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 155ED30FF
-        for <kvm@vger.kernel.org>; Wed, 12 Apr 2023 03:22:33 -0700 (PDT)
+        with ESMTP id S229565AbjDLK3y (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 12 Apr 2023 06:29:54 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CAE1E2D48
+        for <kvm@vger.kernel.org>; Wed, 12 Apr 2023 03:29:53 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id A85E6632C1
-        for <kvm@vger.kernel.org>; Wed, 12 Apr 2023 10:22:32 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 04ED2C433D2;
-        Wed, 12 Apr 2023 10:22:32 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 6390062ADA
+        for <kvm@vger.kernel.org>; Wed, 12 Apr 2023 10:29:53 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B60CCC433EF;
+        Wed, 12 Apr 2023 10:29:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1681294952;
-        bh=QmbVMRuPzsg/M4pttl6wSDx2/9oXkjeFrhJjSYW9fgA=;
+        s=k20201202; t=1681295392;
+        bh=KxETWSFM6PX9F1aCzoKEky8AIF4EgyPmopldmq4pXys=;
         h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=VIsdan/auAtzFXE+7dlQjCHodaXuht/wZ/v4bcr0BhqaAsZd4THqgtLXKXhe2ZOKF
-         ENyYHcxvzFuKpkU68ilhmoojjAy2ULtzAZ2nz1d6isNNWIlwpTb+/zvUqbkXF4dURo
-         it++diMf/qh0xTvLPPZHxkPldocST0lu55kLppM2AmNnHCCJnHA4bDQQdNq/Iroain
-         he1jWwaQRUANl2FRXcJ/hilAF79zVqqDDl0NWJCmgt1Tk9psvmIgK6V/GtlxRrtkxE
-         4pYnbv15yMZpHZKxJyQy3EgfcGgGulIU8/my9xfeRk0zR21d7ERGXNIZcpeRceaiz+
-         gPg9C6HwGYvFA==
+        b=cvwzylPVkLVdU0xJjS7gk539HjYqPqSLvzjAVOB/7p9kphwPzfGAfkdG6ZjrZEjRI
+         VCD343EhyUnjAijx9Ts73/gfHOFcmzPNqHjylV+CNopkXQSbXrxWFXX8tbTAngYTSt
+         7s9RFec5H6EDe6ZzMIBUIYXmY2GSh74DrGAgM9MA1PwBmWXhbHHa7Meq7CbOIE1klf
+         HR9Ch8teJLXIBCEl07430oJp1neNgD5HGPT/yqCMQeGgKZu1bvZO4N4KlQBN2G7Zdr
+         mss90l1wjT1aFp9RjvuPvPXUgiWAZLU3h9nukZv+3OfzHU4NFbbemeK2lk0Y2CTYHu
+         ZqjR0iqoP/Dhg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1pmXcT-007nEe-LR;
-        Wed, 12 Apr 2023 11:22:29 +0100
-Date:   Wed, 12 Apr 2023 11:22:29 +0100
-Message-ID: <86v8i1l7ru.wl-maz@kernel.org>
+        id 1pmXja-007nKb-BO;
+        Wed, 12 Apr 2023 11:29:50 +0100
+Date:   Wed, 12 Apr 2023 11:29:50 +0100
+Message-ID: <86ttxll7fl.wl-maz@kernel.org>
 From:   Marc Zyngier <maz@kernel.org>
-To:     Mark Rutland <mark.rutland@arm.com>
+To:     Will Deacon <will@kernel.org>
 Cc:     Reiji Watanabe <reijiw@google.com>,
+        Mark Rutland <mark.rutland@arm.com>,
         Oliver Upton <oliver.upton@linux.dev>,
-        Will Deacon <will@kernel.org>,
         Catalin Marinas <catalin.marinas@arm.com>,
         kvmarm@lists.linux.dev, kvm@vger.kernel.org,
         linux-arm-kernel@lists.infradead.org,
@@ -57,24 +57,22 @@ Cc:     Reiji Watanabe <reijiw@google.com>,
         Raghavendra Rao Anata <rananta@google.com>,
         Shaoqin Huang <shahuang@redhat.com>,
         Rob Herring <robh@kernel.org>
-Subject: Re: [PATCH v2 2/2] KVM: arm64: PMU: Don't overwrite PMUSERENR with vcpu loaded
-In-Reply-To: <ZDZ3xbSePtOD3CSX@FVFF77S0Q05N>
+Subject: Re: [PATCH v2 0/2] KVM: arm64: PMU: Correct the handling of PMUSERENR_EL0
+In-Reply-To: <20230411112458.GA22090@willie-the-truck>
 References: <20230408034759.2369068-1-reijiw@google.com>
-        <20230408034759.2369068-3-reijiw@google.com>
-        <ZDUpfnXi/GwFwFV9@FVFF77S0Q05N>
-        <20230412051410.emaip77vyak624pu@google.com>
-        <ZDZ3xbSePtOD3CSX@FVFF77S0Q05N>
+        <86r0subv8s.wl-maz@kernel.org>
+        <20230411112458.GA22090@willie-the-truck>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: mark.rutland@arm.com, reijiw@google.com, oliver.upton@linux.dev, will@kernel.org, catalin.marinas@arm.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, alexandru.elisei@arm.com, yuzenghui@huawei.com, suzuki.poulose@arm.com, pbonzini@redhat.com, ricarkol@google.com, jingzhangos@google.com, rananta@google.com, shahuang@redhat.com, robh@kernel.org
+X-SA-Exim-Rcpt-To: will@kernel.org, reijiw@google.com, mark.rutland@arm.com, oliver.upton@linux.dev, catalin.marinas@arm.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, alexandru.elisei@arm.com, yuzenghui@huawei.com, suzuki.poulose@arm.com, pbonzini@redhat.com, ricarkol@google.com, jingzhangos@google.com, rananta@google.com, shahuang@redhat.com, robh@kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
         SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -82,35 +80,58 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 12 Apr 2023 10:20:05 +0100,
-Mark Rutland <mark.rutland@arm.com> wrote:
+On Tue, 11 Apr 2023 12:24:59 +0100,
+Will Deacon <will@kernel.org> wrote:
 > 
-> On Tue, Apr 11, 2023 at 10:14:10PM -0700, Reiji Watanabe wrote:
-> > Uh, right, interrupts are not masked during those windows...
+> On Sat, Apr 08, 2023 at 10:04:19AM +0100, Marc Zyngier wrote:
+> > On Sat, 08 Apr 2023 04:47:57 +0100,
+> > Reiji Watanabe <reijiw@google.com> wrote:
+> > > 
+> > > This series will fix bugs in KVM's handling of PMUSERENR_EL0.
+> > > 
+> > > With PMU access support from EL0 [1], the perf subsystem would
+> > > set CR and ER bits of PMUSERENR_EL0 as needed to allow EL0 to have
+> > > a direct access to PMU counters.  However, KVM appears to assume
+> > > that the register value is always zero for the host EL0, and has
+> > > the following two problems in handling the register.
+> > > 
+> > > [A] The host EL0 might lose the direct access to PMU counters, as
+> > >     KVM always clears PMUSERENR_EL0 before returning to userspace.
+> > > 
+> > > [B] With VHE, the guest EL0 access to PMU counters might be trapped
+> > >     to EL1 instead of to EL2 (even when PMUSERENR_EL0 for the guest
+> > >     indicates that the guest EL0 has an access to the counters).
+> > >     This is because, with VHE, KVM sets ER, CR, SW and EN bits of
+> > >     PMUSERENR_EL0 to 1 on vcpu_load() to ensure to trap PMU access
+> > >     from the guset EL0 to EL2, but those bits might be cleared by
+> > >     the perf subsystem after vcpu_load() (when PMU counters are
+> > >     programmed for the vPMU emulation).
+> > > 
+> > > Patch-1 will fix [A], and Patch-2 will fix [B] respectively.
+> > > The series is based on v6.3-rc5.
+> > > 
+> > > v2:
+> > >  - Save the PMUSERENR_EL0 for the host in the sysreg array of
+> > >    kvm_host_data. [Marc]
+> > >  - Don't let armv8pmu_start() overwrite PMUSERENR if the vCPU
+> > >    is loaded, instead have KVM update the saved shadow register
+> > >    value for the host. [Marc, Mark]
 > > 
-> > What I am currently considering on this would be disabling
-> > IRQs while manipulating the register, and introducing a new flag
-> > to indicate whether the PMUSERENR for the guest EL0 is loaded,
-> > and having kvm_set_pmuserenr() check the new flag.
+> > This looks much better to me. If Mark is OK with it, I'm happy to take
+> > it in 6.4.
 > > 
-> > The code would be something like below (local_irq_save/local_irq_restore
-> > needs to be excluded for NVHE though).
-
-It shouldn't need to be excluded. It should be fairly harmless, unless
-I'm missing something really obvious?
-
+> > Speaking of which, this will clash with the queued move of the PMUv3
+> > code into drivers/perf, and probably break on 32bit. I can either take
+> > a branch shared with arm64 (009d6dc87a56 ("ARM: perf: Allow the use of
+> > the PMUv3 driver on 32bit ARM")), or wait until -rc1.
 > > 
-> > What do you think ?
+> > Will, what do you prefer?
 > 
-> I'm happy with that; it doesn't change the arm_pmu side of the interface and it
-> looks good from a functional perspective.
-> 
-> I'll have to leave it to Marc and Oliver to say whether they're happy with the
-> KVM side.
+> I'd be inclined to wait until -rc1, but for-next/perf is stable if you
+> decide to take it anyway.
 
-This looks OK to me. My only ask would be to have a small comment in
-the __{de}activate_traps_common() functions to say what this protects
-against, because I'll page it out within minutes.
+Given that Mark and Reiji are still working out some of the corner
+cases, -rc1 feels like the right target.
 
 Thanks,
 
