@@ -2,72 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 707C26DEBD4
-	for <lists+kvm@lfdr.de>; Wed, 12 Apr 2023 08:33:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 24C9C6DEBE9
+	for <lists+kvm@lfdr.de>; Wed, 12 Apr 2023 08:38:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229565AbjDLGdK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 Apr 2023 02:33:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48074 "EHLO
+        id S229765AbjDLGiX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 Apr 2023 02:38:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51018 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229458AbjDLGdJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 Apr 2023 02:33:09 -0400
+        with ESMTP id S229503AbjDLGiV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 12 Apr 2023 02:38:21 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D85E359F7
-        for <kvm@vger.kernel.org>; Tue, 11 Apr 2023 23:32:20 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6839D59F0
+        for <kvm@vger.kernel.org>; Tue, 11 Apr 2023 23:37:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1681281139;
+        s=mimecast20190719; t=1681281448;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=iYkU2h5uuqeCAix2xVoQ4YssyuBrvdvQQLmL8KGrxsM=;
-        b=gQiSwsrHvXbeXWGjID9qKgZRE7SXODpT8xMQIyLYmCb418y0wGXmGs0ofHCYJzEkghawxU
-        ke8RQYXiUe9dmyRBfFRrsINdLN727CWFIybelz8tS08fliwJUp5OxlPmu23m6abPnKHDva
-        xWVG77Y9owUBw8NlRAZCg0uX9On78s4=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=VwCbzAAjwbVI6L1+WlkLHSTqF7zMVDO5V+z4G1Cyt20=;
+        b=EOdg3LC4yG3EwL3GNcd+kmZ7+neQ0Gzpx8eZmw/eX6uqwWptU+v9OYojOadME2BDypbEvk
+        C55uZIz8j9OiggKweYPRkho/LdjNRI5b9XnCEvbG55ihps07NT4rcF8SSzSNHTGqyxMfb7
+        PjEf40LnWxON1m+pmxnjh763Nl4CoFY=
+Received: from mail-oa1-f69.google.com (mail-oa1-f69.google.com
+ [209.85.160.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-203-7_pBEHucMfe7jCigDLe4xA-1; Wed, 12 Apr 2023 02:32:18 -0400
-X-MC-Unique: 7_pBEHucMfe7jCigDLe4xA-1
-Received: by mail-wm1-f69.google.com with SMTP id l26-20020a05600c1d1a00b003edf85f6bb1so6431893wms.3
-        for <kvm@vger.kernel.org>; Tue, 11 Apr 2023 23:32:18 -0700 (PDT)
+ us-mta-223-_TdcA0JHOAGEaeZuIIil6w-1; Wed, 12 Apr 2023 02:37:26 -0400
+X-MC-Unique: _TdcA0JHOAGEaeZuIIil6w-1
+Received: by mail-oa1-f69.google.com with SMTP id 586e51a60fabf-18654d56a1eso658453fac.4
+        for <kvm@vger.kernel.org>; Tue, 11 Apr 2023 23:37:26 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1681281137; x=1683873137;
+        d=1e100.net; s=20210112; t=1681281446; x=1683873446;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=iYkU2h5uuqeCAix2xVoQ4YssyuBrvdvQQLmL8KGrxsM=;
-        b=OQw4dH83C+y0K73sXRJC0CtiieriEXd8hEInIJ7Cse4hKXf6DzHA4tBb16ec48uCyj
-         6AABs4/4wXI23DkkablkP3BMJYr3MjID1xUvq9cIxC7JW/ASDvi7LwS7uQOWbL1zBOQ+
-         0pAlMH42fL90a2msn3OGGD+tFGkYj+oFtqtwyQxZ8sgvX63mH0KZb+HyiuwpFHEWj6Zu
-         qKbT9Y4Kw001rLK8jq8YRSWk3ldNCt96J0U3t5nPTrIeO5ARhfaMhrZWRSmulLiPCXxE
-         6G8e7xjnt609PlFimOaqVcAQYhIzsTfMWTWIDi4VEbRXFAUfmgjdY2dRctLq6esJpy/l
-         rH3g==
-X-Gm-Message-State: AAQBX9fznvNRZy5lFB4OC7+Z79HsnMopyA2dFX8OpkRxUTzHALDO/+wR
-        v+gSQ18cjuNtSOM74bv7x/feJuWukPgHkL8hVMNTUMpP2RygBpZOZrFPcC9HZmRL91FPg69r9Mz
-        oDXKNqWS4ql+RIrKfGh4noA7bIOjM
-X-Received: by 2002:a5d:4f0e:0:b0:2ef:b5e1:f6f9 with SMTP id c14-20020a5d4f0e000000b002efb5e1f6f9mr1138572wru.8.1681281137422;
-        Tue, 11 Apr 2023 23:32:17 -0700 (PDT)
-X-Google-Smtp-Source: AKy350bq+8zhP15Uz7cAyV/Z2wcK+XlbYPBXQnmfbUh0oOiNvYPBIB4YmU5DtGfzZWjmjnceIOMDqjcTSn3ph7ZNmlE=
-X-Received: by 2002:a5d:4f0e:0:b0:2ef:b5e1:f6f9 with SMTP id
- c14-20020a5d4f0e000000b002efb5e1f6f9mr1138568wru.8.1681281137152; Tue, 11 Apr
- 2023 23:32:17 -0700 (PDT)
+        bh=VwCbzAAjwbVI6L1+WlkLHSTqF7zMVDO5V+z4G1Cyt20=;
+        b=6Edbuk5Hy5tpHOC7fAqWb9PJAjdn3yWmt4jenK3EM5ODnJpnm0ScULVuTB2lBv8EqV
+         THi2EwgYjWiuiqiU2b0z+n/U3G8ZsWefEwC9xx+lPPi3DKZ1/2L/miIGtnqvObUPN+1K
+         WLlLLVbsYeALLZEPH9wjC1H7dW6H2cjopl4bl5LPKXOBUl4F5PKbRqN3DuLmavtJBIps
+         KbOraiDbRLclUBBKQdm34PXTgUj4+G6y6CcQV4gCU7trD34mN2FDxJniSvXg5+P6mgO5
+         ZpGyT0qShYCtDGfdliY5t29LfE+J20yLKUECL4GoN2HoLJpRbUMIjrHWdr5uYZqIVWwm
+         Jmbw==
+X-Gm-Message-State: AAQBX9coeaJRG/6uqoVyoK+JC78UT0toUVVhqSoDXdYqjncAJodZNEIp
+        4xrHut+22bwD0CAaEyoff1e0SKqt5AckkvtBHnnky5d2kAWQSIPx5afVmeYrqooVtX2EZnQ+CHO
+        YB/CECLB71UL18cSr6FvXuH56mIlW
+X-Received: by 2002:a05:6870:96a3:b0:184:4c39:fe30 with SMTP id o35-20020a05687096a300b001844c39fe30mr4140726oaq.9.1681281446156;
+        Tue, 11 Apr 2023 23:37:26 -0700 (PDT)
+X-Google-Smtp-Source: AKy350ZPI/ee2C3stnJNNuh0m3DxO1fUoT+0+j0FBOVNZyRv0Dqeao5UDr6cePplhgphOC+r4L2fQnDCBJAhIEVRckY=
+X-Received: by 2002:a05:6870:96a3:b0:184:4c39:fe30 with SMTP id
+ o35-20020a05687096a300b001844c39fe30mr4140719oaq.9.1681281445936; Tue, 11 Apr
+ 2023 23:37:25 -0700 (PDT)
 MIME-Version: 1.0
 References: <20230410150130.837691-1-lulu@redhat.com> <CACGkMEvTdgvqacFmMJZD4u++YJwESgSmLF6CMdAJBBqkxpZKgg@mail.gmail.com>
- <CACLfguWKw68=wZNa7Ga+Jm8xTE93A_5za3Dc=S_z7ds9FCkRKg@mail.gmail.com> <CACGkMEv3aca0Thx+X3WZxbV2HK7514G3RzR+A0PqRu7k6Deztg@mail.gmail.com>
-In-Reply-To: <CACGkMEv3aca0Thx+X3WZxbV2HK7514G3RzR+A0PqRu7k6Deztg@mail.gmail.com>
-From:   Cindy Lu <lulu@redhat.com>
-Date:   Wed, 12 Apr 2023 14:31:38 +0800
-Message-ID: <CACLfguXBeodQ=b-RAQ4JsaSnjS_ZNutr2nbunmdv1S8Gxz8gfg@mail.gmail.com>
+ <CACLfguWKw68=wZNa7Ga+Jm8xTE93A_5za3Dc=S_z7ds9FCkRKg@mail.gmail.com>
+ <CACGkMEv3aca0Thx+X3WZxbV2HK7514G3RzR+A0PqRu7k6Deztg@mail.gmail.com> <CACLfguXBeodQ=b-RAQ4JsaSnjS_ZNutr2nbunmdv1S8Gxz8gfg@mail.gmail.com>
+In-Reply-To: <CACLfguXBeodQ=b-RAQ4JsaSnjS_ZNutr2nbunmdv1S8Gxz8gfg@mail.gmail.com>
+From:   Jason Wang <jasowang@redhat.com>
+Date:   Wed, 12 Apr 2023 14:37:14 +0800
+Message-ID: <CACGkMEtwx7jMc2j=rhe8S1+uYVfs7UX9TCwRZsnW9tWR29uo5w@mail.gmail.com>
 Subject: Re: [PATCH] vhost_vdpa: fix unmap process in no-batch mode
-To:     Jason Wang <jasowang@redhat.com>
+To:     Cindy Lu <lulu@redhat.com>
 Cc:     mst@redhat.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -75,102 +76,124 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Apr 11, 2023 at 5:14=E2=80=AFPM Jason Wang <jasowang@redhat.com> wr=
-ote:
+On Wed, Apr 12, 2023 at 2:32=E2=80=AFPM Cindy Lu <lulu@redhat.com> wrote:
 >
-> On Tue, Apr 11, 2023 at 3:29=E2=80=AFPM Cindy Lu <lulu@redhat.com> wrote:
+> On Tue, Apr 11, 2023 at 5:14=E2=80=AFPM Jason Wang <jasowang@redhat.com> =
+wrote:
 > >
-> > On Tue, Apr 11, 2023 at 11:10=E2=80=AFAM Jason Wang <jasowang@redhat.co=
-m> wrote:
+> > On Tue, Apr 11, 2023 at 3:29=E2=80=AFPM Cindy Lu <lulu@redhat.com> wrot=
+e:
 > > >
-> > > On Mon, Apr 10, 2023 at 11:01=E2=80=AFPM Cindy Lu <lulu@redhat.com> w=
-rote:
+> > > On Tue, Apr 11, 2023 at 11:10=E2=80=AFAM Jason Wang <jasowang@redhat.=
+com> wrote:
 > > > >
-> > > > While using the no-batch mode, the process will not begin with
-> > > > VHOST_IOTLB_BATCH_BEGIN, so we need to add the
-> > > > VHOST_IOTLB_INVALIDATE to get vhost_vdpa_as, the process is the
-> > > > same as VHOST_IOTLB_UPDATE
+> > > > On Mon, Apr 10, 2023 at 11:01=E2=80=AFPM Cindy Lu <lulu@redhat.com>=
+ wrote:
+> > > > >
+> > > > > While using the no-batch mode, the process will not begin with
+> > > > > VHOST_IOTLB_BATCH_BEGIN, so we need to add the
+> > > > > VHOST_IOTLB_INVALIDATE to get vhost_vdpa_as, the process is the
+> > > > > same as VHOST_IOTLB_UPDATE
+> > > > >
+> > > > > Signed-off-by: Cindy Lu <lulu@redhat.com>
+> > > > > ---
+> > > > >  drivers/vhost/vdpa.c | 1 +
+> > > > >  1 file changed, 1 insertion(+)
+> > > > >
+> > > > > diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+> > > > > index 7be9d9d8f01c..32636a02a0ab 100644
+> > > > > --- a/drivers/vhost/vdpa.c
+> > > > > +++ b/drivers/vhost/vdpa.c
+> > > > > @@ -1074,6 +1074,7 @@ static int vhost_vdpa_process_iotlb_msg(str=
+uct vhost_dev *dev, u32 asid,
+> > > > >                 goto unlock;
+> > > > >
+> > > > >         if (msg->type =3D=3D VHOST_IOTLB_UPDATE ||
+> > > > > +           msg->type =3D=3D VHOST_IOTLB_INVALIDATE ||
 > > > >
-> > > > Signed-off-by: Cindy Lu <lulu@redhat.com>
-> > > > ---
-> > > >  drivers/vhost/vdpa.c | 1 +
-> > > >  1 file changed, 1 insertion(+)
+> > > > I'm not sure I get here, invalidation doesn't need to create a new =
+AS.
 > > > >
-> > > > diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
-> > > > index 7be9d9d8f01c..32636a02a0ab 100644
-> > > > --- a/drivers/vhost/vdpa.c
-> > > > +++ b/drivers/vhost/vdpa.c
-> > > > @@ -1074,6 +1074,7 @@ static int vhost_vdpa_process_iotlb_msg(struc=
-t vhost_dev *dev, u32 asid,
-> > > >                 goto unlock;
+> > > > Or maybe you can post the userspace code that can trigger this issu=
+e?
 > > > >
-> > > >         if (msg->type =3D=3D VHOST_IOTLB_UPDATE ||
-> > > > +           msg->type =3D=3D VHOST_IOTLB_INVALIDATE ||
+> > > > Thanks
+> > > >
+> > > sorry I didn't write it clearly
+> > > For this issue can reproduce in vIOMMU no-batch mode support because
+> > > while the vIOMMU enabled, it will
+> > > flash a large memory to unmap, and this memory are haven't been mappe=
+d
+> > > before, so this unmapping will fail
 > > >
-> > > I'm not sure I get here, invalidation doesn't need to create a new AS=
-.
-> > >
-> > > Or maybe you can post the userspace code that can trigger this issue?
-> > >
-> > > Thanks
-> > >
-> > sorry I didn't write it clearly
-> > For this issue can reproduce in vIOMMU no-batch mode support because
-> > while the vIOMMU enabled, it will
-> > flash a large memory to unmap, and this memory are haven't been mapped
-> > before, so this unmapping will fail
+> > > qemu-system-x86_64: failed to write, fd=3D12, errno=3D14 (Bad address=
+)
+> > > qemu-system-x86_64: vhost_vdpa_dma_unmap(0x7fa26d1dd190, 0x0,
+> > > 0x80000000) =3D -5 (Bad address)
 > >
-> > qemu-system-x86_64: failed to write, fd=3D12, errno=3D14 (Bad address)
-> > qemu-system-x86_64: vhost_vdpa_dma_unmap(0x7fa26d1dd190, 0x0,
-> > 0x80000000) =3D -5 (Bad address)
->
-> So if this is a simple unmap, which error condition had you met in
-> vhost_vdpa_process_iotlb_msg()?
->
-> I think you need to trace to see what happens. For example:
->
-this happens when vIOMMU enable and vdpa binds to vfio-pci run testpmd
-the qemu will unmapped whole memory that was used and then mapped the
-iommu MR section
-This memory much larger than the memory mapped to vdpa(this is what
-actually mapped to
-vdpa device in no-iommu MR)
+> > So if this is a simple unmap, which error condition had you met in
+> > vhost_vdpa_process_iotlb_msg()?
+> >
+> > I think you need to trace to see what happens. For example:
+> >
+> this happens when vIOMMU enable and vdpa binds to vfio-pci run testpmd
+> the qemu will unmapped whole memory that was used and then mapped the
+> iommu MR section
 
-> 1) can the code pass asid_to_iotlb()
-> 2) if not, ASID 0 has been deleted since all the mappings have been unmap=
-ped
->
-> if ASID 0 has been completely unmap, any reason we need to unmap it
-> again? And do we need to drop the vhost_vdpa_remove_as() from both
->
+So it's a map after an unmap, not an invalidation?
 
-> 1) vhost_vdpa_unmap()
-> and
-> 2) vhost_vdpa_process_iotlb_msg()
-> ?
+> This memory much larger than the memory mapped to vdpa(this is what
+> actually mapped to
+> vdpa device in no-iommu MR)
 >
-> Thanks
+> > 1) can the code pass asid_to_iotlb()
+> > 2) if not, ASID 0 has been deleted since all the mappings have been unm=
+apped
+> >
+> > if ASID 0 has been completely unmap, any reason we need to unmap it
+> > again? And do we need to drop the vhost_vdpa_remove_as() from both
+> >
 >
-the code passed the asid_to_iotlb(), The iotlb is NULL at this situation
-and the vhost_vdpa_process_iotlb_msg will return fail. this will cause
-the mapping
- in qemu fail
-
-thanks
-cindy
-
-> > qemu-system-x86_64: failed to write, fd=3D12, errno=3D14 (Bad address)
-> > ....
-> > in batch mode this operation will begin with VHOST_IOTLB_BATCH_BEGIN,
-> > so don't have this issue
+> > 1) vhost_vdpa_unmap()
+> > and
+> > 2) vhost_vdpa_process_iotlb_msg()
+> > ?
 > >
 > > Thanks
-> > cindy
-> > > >             msg->type =3D=3D VHOST_IOTLB_BATCH_BEGIN) {
-> > > >                 as =3D vhost_vdpa_find_alloc_as(v, asid);
-> > > >                 if (!as) {
-> > > > --
-> > > > 2.34.3
+> >
+> the code passed the asid_to_iotlb(), The iotlb is NULL at this situation
+> and the vhost_vdpa_process_iotlb_msg will return fail. this will cause
+> the mapping
+>  in qemu fail
+
+Yes, so what I meant:
+
+Instead of free the AS in vhost_vdpa_unmap() or
+vhost_vdpa_process_iotlb_msg() and allocate it again here.
+
+Is it better to not remove the AS in those two functions even if
+there's no maps?
+
+Thanks
+
+>
+> thanks
+> cindy
+>
+> > > qemu-system-x86_64: failed to write, fd=3D12, errno=3D14 (Bad address=
+)
+> > > ....
+> > > in batch mode this operation will begin with VHOST_IOTLB_BATCH_BEGIN,
+> > > so don't have this issue
+> > >
+> > > Thanks
+> > > cindy
+> > > > >             msg->type =3D=3D VHOST_IOTLB_BATCH_BEGIN) {
+> > > > >                 as =3D vhost_vdpa_find_alloc_as(v, asid);
+> > > > >                 if (!as) {
+> > > > > --
+> > > > > 2.34.3
+> > > > >
 > > > >
 > > >
 > >
