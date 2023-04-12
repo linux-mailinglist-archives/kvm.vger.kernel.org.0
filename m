@@ -2,49 +2,49 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 351D16DECFE
-	for <lists+kvm@lfdr.de>; Wed, 12 Apr 2023 09:52:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7672C6DECFF
+	for <lists+kvm@lfdr.de>; Wed, 12 Apr 2023 09:52:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229784AbjDLHwA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 Apr 2023 03:52:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40308 "EHLO
+        id S229757AbjDLHwF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 Apr 2023 03:52:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40758 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229499AbjDLHv6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 Apr 2023 03:51:58 -0400
+        with ESMTP id S229499AbjDLHwE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 12 Apr 2023 03:52:04 -0400
 Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 294576592
-        for <kvm@vger.kernel.org>; Wed, 12 Apr 2023 00:51:52 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E0B96589
+        for <kvm@vger.kernel.org>; Wed, 12 Apr 2023 00:51:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1681285912; x=1712821912;
+  t=1681285914; x=1712821914;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=IywIAfr5npYtgqb/3fxobMj9A+PuAxFXW2BLlrcpFUg=;
-  b=K5PMELTsGDOfTjsSD4GsVx59he6t9I0BWupNqHvWi2XxapPq/9VhCWNL
-   I0oCRMbt5Aa/f8cjzd8gBLpjNFObH1QRTc0IhwF7fCTgD1BkkgtMapKYZ
-   8YsjC59fjMBd9n9uwOcpb/cDtDjPwHQ4wYkWMtatvZkMdEs1bogm+3PE+
-   Z06ZL2gPWfehqhER7FKj3W9J5rbkUnGv9vHcxK+xwVu5Qrj7CK1qGjim7
-   8F7siC4W/jSR8QemwfnxfRbkBuF/2KyMnbcSFz73wkx41C4GU9uCyFzNZ
-   rE0fWWZToutczA4LG3uK0uf9miLwpBnM0bR0tJt071G+IQSknJBPaxNpU
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10677"; a="345623270"
+  bh=MjKV4s8VGpZ1zEkznfY4jiS1d+KzIYwTcz+xV2KmVqM=;
+  b=hld8OYlU/Bj8NY+PF9eWzeQY/rZAgyDooOiWn8D9qgZHlw2rFcZiqemV
+   wIf6DsNesZKCShAX4HSCbXAdjR3l5wqrNKQx2HfOfZRrEIg1U9CtE5RHs
+   mRE1nQfq2apc3lbek4UqAvcqnU1gVWPeinOtb7AIK+Ei9++WCZ2lKCh/q
+   CCT+q98/Qex40pLyeTPYsA1wwhRjbHjRtSfktIJMBNIZun4eo3zGLsHoo
+   h2yHIZSvXdw91Arf6n8RkoFn5ODQ/fqy+XNGw6Y4IsKDLiL4n9PEZKrWA
+   /H/7BqNd9rB2AsHBTTdqTMva5rP80AqwVU08NL3BqGQGJZ+7sJGnUDXNb
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10677"; a="345623276"
 X-IronPort-AV: E=Sophos;i="5.98,338,1673942400"; 
-   d="scan'208";a="345623270"
+   d="scan'208";a="345623276"
 Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Apr 2023 00:51:51 -0700
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Apr 2023 00:51:54 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10677"; a="812893682"
+X-IronPort-AV: E=McAfee;i="6600,9927,10677"; a="812893691"
 X-IronPort-AV: E=Sophos;i="5.98,338,1673942400"; 
-   d="scan'208";a="812893682"
+   d="scan'208";a="812893691"
 Received: from binbinwu-mobl.ccr.corp.intel.com ([10.238.8.125])
-  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Apr 2023 00:51:49 -0700
+  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Apr 2023 00:51:51 -0700
 From:   Binbin Wu <binbin.wu@linux.intel.com>
 To:     kvm@vger.kernel.org, seanjc@google.com, pbonzini@redhat.com
 Cc:     binbin.wu@linux.intel.com, chao.gao@intel.com,
         robert.hu@linux.intel.com
-Subject: [kvm-unit-tests v3 3/4] x86: Add test cases for LAM_{U48,U57}
-Date:   Wed, 12 Apr 2023 15:51:33 +0800
-Message-Id: <20230412075134.21240-4-binbin.wu@linux.intel.com>
+Subject: [kvm-unit-tests v3 4/4] x86: Add test case for INVVPID with LAM
+Date:   Wed, 12 Apr 2023 15:51:34 +0800
+Message-Id: <20230412075134.21240-5-binbin.wu@linux.intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20230412075134.21240-1-binbin.wu@linux.intel.com>
 References: <20230412075134.21240-1-binbin.wu@linux.intel.com>
@@ -60,150 +60,99 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This unit test covers:
-1. CR3 LAM bits toggles.
-2. Memory/MMIO access with user mode address containing LAM metadata.
+When LAM is on, the linear address of INVVPID operand can contain
+metadata, and the linear address in the INVVPID descriptor can
+contain metadata.
+
+The added cases use tagged descriptor address or/and tagged target
+invalidation address to make sure the behaviors are expected when
+LAM is on.
+Also, INVVPID cases can be used as the common test cases for VMX
+instruction VMExits.
 
 Signed-off-by: Binbin Wu <binbin.wu@linux.intel.com>
 ---
- lib/x86/processor.h |  2 ++
- x86/lam.c           | 71 +++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 73 insertions(+)
+ x86/vmx_tests.c | 60 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 60 insertions(+)
 
-diff --git a/lib/x86/processor.h b/lib/x86/processor.h
-index 4bb8cd7..a181e0b 100644
---- a/lib/x86/processor.h
-+++ b/lib/x86/processor.h
-@@ -56,7 +56,9 @@
- 
- #define X86_CR3_PCID_MASK	GENMASK(11, 0)
- #define X86_CR3_LAM_U57_BIT	(61)
-+#define X86_CR3_LAM_U57		BIT_ULL(X86_CR3_LAM_U57_BIT)
- #define X86_CR3_LAM_U48_BIT	(62)
-+#define X86_CR3_LAM_U48		BIT_ULL(X86_CR3_LAM_U48_BIT)
- 
- #define X86_CR4_VME_BIT		(0)
- #define X86_CR4_VME		BIT(X86_CR4_VME_BIT)
-diff --git a/x86/lam.c b/x86/lam.c
-index 63c3fde..50bcdf5 100644
---- a/x86/lam.c
-+++ b/x86/lam.c
-@@ -18,9 +18,11 @@
- #include "vm.h"
- #include "asm/io.h"
- #include "ioram.h"
-+#include "usermode.h"
- 
- #define LAM57_MASK	GENMASK_ULL(62, 57)
- #define LAM48_MASK	GENMASK_ULL(62, 48)
-+#define CR3_LAM_BITS_MASK (X86_CR3_LAM_U48 | X86_CR3_LAM_U57)
- 
- #define FLAGS_LAM_ACTIVE	BIT_ULL(0)
- #define FLAGS_LA57		BIT_ULL(1)
-@@ -41,6 +43,16 @@ static inline bool lam_sup_active(void)
- 	return !!(read_cr4() & X86_CR4_LAM_SUP);
+diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
+index 5ee1264..381ca1c 100644
+--- a/x86/vmx_tests.c
++++ b/x86/vmx_tests.c
+@@ -3225,6 +3225,65 @@ static void invvpid_test_not_in_vmx_operation(void)
+ 	TEST_ASSERT(!vmx_on());
  }
  
-+static inline bool lam_u48_active(void)
++#define LAM57_MASK	GENMASK_ULL(62, 57)
++#define LAM48_MASK	GENMASK_ULL(62, 48)
++
++static inline u64 set_metadata(u64 src, u64 metadata_mask)
 +{
-+	return (read_cr3() & CR3_LAM_BITS_MASK) == X86_CR3_LAM_U48;
++	return (src & ~metadata_mask) | (NONCANONICAL & metadata_mask);
 +}
 +
-+static inline bool lam_u57_active(void)
++/* LAM applies to the target address inside the descriptor of invvpid */
++static void invvpid_test_lam(void)
 +{
-+	return !!(read_cr3() & X86_CR3_LAM_U57);
-+}
++	void *vaddr;
++	struct invvpid_operand *operand;
++	u64 lam_mask = LAM48_MASK;
++	bool fault;
 +
- /* According to LAM mode, set metadata in high bits */
- static inline u64 set_metadata(u64 src, u64 metadata_mask)
- {
-@@ -92,6 +104,7 @@ static void do_mov(void *mem)
- static u64 test_ptr(u64 arg1, u64 arg2, u64 arg3, u64 arg4)
- {
- 	bool lam_active = !!(arg1 & FLAGS_LAM_ACTIVE);
-+	bool la_57 = !!(arg1 & FLAGS_LA57);
- 	u64 lam_mask = arg2;
- 	u64 *ptr = (u64 *)arg3;
- 	bool is_mmio = !!arg4;
-@@ -105,6 +118,17 @@ static u64 test_ptr(u64 arg1, u64 arg2, u64 arg3, u64 arg4)
- 	report(fault != lam_active,"Test tagged addr (%s)",
- 	       is_mmio ? "MMIO" : "Memory");
- 
-+	/*
-+	 * This test case is only triggered when LAM_U57 is active and 4-level
-+	 * paging is used. For the case, bit[56:47] aren't all 0 triggers #GP.
-+	 */
-+	if (lam_active && (lam_mask == LAM57_MASK) && !la_57) {
-+		ptr = (u64 *)set_metadata((u64)ptr, LAM48_MASK);
-+		fault = test_for_exception(GP_VECTOR, do_mov, ptr);
-+		report(fault,  "Test non-LAM-canonical addr (%s)",
-+		       is_mmio ? "MMIO" : "Memory");
++	if (!this_cpu_has(X86_FEATURE_LAM)) {
++		report_skip("LAM is not supported, skip INVVPID with LAM");
++		return;
 +	}
 +
- 	return 0;
- }
- 
-@@ -221,6 +245,52 @@ static void test_lam_sup(bool has_lam, bool fep_available)
- 		test_invlpg(lam_mask, vaddr, true);
- }
- 
-+static void test_lam_user_mode(bool has_lam, u64 lam_mask, u64 mem, u64 mmio)
-+{
-+	unsigned r;
-+	bool raised_vector;
-+	unsigned long cr3 = read_cr3() & ~CR3_LAM_BITS_MASK;
-+	u64 flags = 0;
++	if (this_cpu_has(X86_FEATURE_LA57) && read_cr4() & X86_CR4_LA57)
++		lam_mask = LAM57_MASK;
 +
-+	if (is_la57())
-+		flags |= FLAGS_LA57;
-+
-+	if (has_lam) {
-+		if (lam_mask == LAM48_MASK) {
-+			r = write_cr3_safe(cr3 | X86_CR3_LAM_U48);
-+			report((r == 0) && lam_u48_active(), "Set LAM_U48");
-+		} else {
-+			r = write_cr3_safe(cr3 | X86_CR3_LAM_U57);
-+			report((r == 0) && lam_u57_active(), "Set LAM_U57");
-+		}
-+	}
-+	if (lam_u48_active() || lam_u57_active())
-+		flags |= FLAGS_LAM_ACTIVE;
-+
-+	run_in_user((usermode_func)test_ptr, GP_VECTOR, flags, lam_mask, mem,
-+		    false, &raised_vector);
-+	run_in_user((usermode_func)test_ptr, GP_VECTOR, flags, lam_mask, mmio,
-+		    true, &raised_vector);
-+}
-+
-+static void test_lam_user(bool has_lam)
-+{
-+	phys_addr_t paddr;
-+	unsigned long cr3 = read_cr3();
-+
++	vaddr = alloc_vpage();
++	install_page(current_page_table(), virt_to_phys(alloc_page()), vaddr);
 +	/*
-+	 * The physical address width is within 36 bits, so that using identical
-+	 * mapping, the linear address will be considered as user mode address
-+	 * from the view of LAM.
++	 * Since the stack memory address in KUT doesn't follow kernel address
++	 * space partition rule, reuse the memory address for descriptor and
++	 * the target address in the descriptor of invvpid.
 +	 */
-+	paddr = virt_to_phys(alloc_page());
-+	install_page((void *)cr3, paddr, (void *)paddr);
-+	install_page((void *)cr3, IORAM_BASE_PHYS, (void *)IORAM_BASE_PHYS);
++	operand = (struct invvpid_operand *)vaddr;
++	operand->vpid = 0xffff;
++	operand->gla = (u64)vaddr;
 +
-+	test_lam_user_mode(has_lam, LAM48_MASK, paddr, IORAM_BASE_PHYS);
-+	test_lam_user_mode(has_lam, LAM57_MASK, paddr, IORAM_BASE_PHYS);
++	write_cr4_safe(read_cr4() | X86_CR4_LAM_SUP);
++	if (!(read_cr4() & X86_CR4_LAM_SUP)) {
++		report_skip("Failed to enable LAM_SUP");
++		return;
++	}
++
++	operand = (struct invvpid_operand *)vaddr;
++	operand->gla = set_metadata(operand->gla, lam_mask);
++	fault = test_for_exception(GP_VECTOR, ds_invvpid, operand);
++	report(!fault, "INVVPID (LAM on): untagged pointer + tagged addr");
++
++	operand = (struct invvpid_operand *)set_metadata((u64)operand, lam_mask);
++	operand->gla = (u64)vaddr;
++	fault = test_for_exception(GP_VECTOR, ds_invvpid, operand);
++	report(!fault, "INVVPID (LAM on): tagged pointer + untagged addr");
++
++	operand = (struct invvpid_operand *)set_metadata((u64)operand, lam_mask);
++	operand->gla = set_metadata(operand->gla, lam_mask);
++	fault = test_for_exception(GP_VECTOR, ds_invvpid, operand);
++	report(!fault, "INVVPID (LAM on): tagged pointer + tagged addr");
++
++	write_cr4_safe(read_cr4() & ~X86_CR4_LAM_SUP);
 +}
 +
- int main(int ac, char **av)
- {
- 	bool has_lam;
-@@ -239,6 +309,7 @@ int main(int ac, char **av)
- 			    "use kvm.force_emulation_prefix=1 to enable\n");
- 
- 	test_lam_sup(has_lam, fep_available);
-+	test_lam_user(has_lam);
- 
- 	return report_summary();
+ /*
+  * This does not test real-address mode, virtual-8086 mode, protected mode,
+  * or CPL > 0.
+@@ -3282,6 +3341,7 @@ static void invvpid_test(void)
+ 	invvpid_test_pf();
+ 	invvpid_test_compatibility_mode();
+ 	invvpid_test_not_in_vmx_operation();
++	invvpid_test_lam();
  }
+ 
+ /*
 -- 
 2.25.1
 
