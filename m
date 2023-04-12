@@ -2,318 +2,189 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1002D6E002E
-	for <lists+kvm@lfdr.de>; Wed, 12 Apr 2023 22:50:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6821F6E00E6
+	for <lists+kvm@lfdr.de>; Wed, 12 Apr 2023 23:31:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229839AbjDLUu2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 Apr 2023 16:50:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58350 "EHLO
+        id S229529AbjDLVbC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 Apr 2023 17:31:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60464 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229571AbjDLUu1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 Apr 2023 16:50:27 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 529F76584
-        for <kvm@vger.kernel.org>; Wed, 12 Apr 2023 13:50:26 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id DE76C63541
-        for <kvm@vger.kernel.org>; Wed, 12 Apr 2023 20:50:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 4D489C4339C
-        for <kvm@vger.kernel.org>; Wed, 12 Apr 2023 20:50:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1681332625;
-        bh=lWAHl44ZV0WqqcxQ65ArdEDu/dYYinrQJwPgp2tk1rc=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=tV4UEInG/5ie3qhVhMw4BPcU1eO0ZtfDccc1d1/B7LTiz/OnpqxaKIlsmIL21R/1x
-         Dm7P2ifD1syJA32uBP6YuIFzDAYw8RoNrhbUGc1wJI1MaJX559wkRoPxD6/jkMKxp8
-         Jd/qLg2HlDqUbS+Qrvx5V2bwKIcmMaK5qBzP9CNonVxpBd0gvtS10HstmlCVOJb9FH
-         V6X7aNZfCOyeOhvzbLHppZVhFz9GJWOojmlB/yIyCJOCc2rPZoUNzNIKoByZ8cf9Mk
-         lWHe1mcso+kneiXimkETn8InbqZWxaJOnP/1k4aCQPQ49dXjCFJS3qast0+I2Ct9OH
-         lB+BX5pPZXeug==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id 30D06C43145; Wed, 12 Apr 2023 20:50:25 +0000 (UTC)
-From:   bugzilla-daemon@kernel.org
-To:     kvm@vger.kernel.org
-Subject: [Bug 217304] KVM does not handle NMI blocking correctly in nested
- virtualization
-Date:   Wed, 12 Apr 2023 20:50:24 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: lixiaoyi13691419520@gmail.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-217304-28872-Omt4TdrpiW@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-217304-28872@https.bugzilla.kernel.org/>
-References: <bug-217304-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
+        with ESMTP id S229498AbjDLVbB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 12 Apr 2023 17:31:01 -0400
+Received: from EUR04-HE1-obe.outbound.protection.outlook.com (mail-he1eur04on2040.outbound.protection.outlook.com [40.107.7.40])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AFB3F7D9E;
+        Wed, 12 Apr 2023 14:30:31 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=jp0WCEeba18CU9M4hAH6W6frWIxCvQ1r5mmw7vlvhVeNFJZOAcbi/ReXkYSr9+NNShQBYlokmWTtXCT44bFd+FrA0JIOMB/Wn7erDj8L5v8WuclAhs3R63y0W9I/YNWm0zA2M6fN/0IoU9Bk4VXzOTyvQGRRqQTmz1c97Bk/rbN/Qd3rqIGONCfhHEIcmHLQ4UUROgVyY0Y9QuHM3XVGsF2cvcwrTTYSIUV7bq8OwZNjdOxwfGcW/z2U1PH5SvTm0lq0LIc0EWEM8aSanZstxmMbOcOCv8y114xwN0F4oWqzoeA5XmMhmQjn3hf2+5qd2TQHsH/Rqhni0vNYSHmATw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=PMhDTt8xHL3LyaU/8xpnfgRr2kjU0VVqdJ6icrhrECU=;
+ b=elC0YFy/T4CkesxFyS0sYU/R3W5Twp/pQc/2E49y1j0z9QzTJL4T+lCdukFO4VmVvZEKlT1oTKR+GmDWXBlL6BOrqOmtWaoVpEKYISmDljchUj2Qo2jq86wVdpHbGnBc+yyhVfempKXZ4cHrj9fVLtIkYRPEQ8axW3eXD6BqO0PwqHSTyjWvgeBT5OlCwR3MdIjO63IWjiXqiFs69Pj16vgl3sQJ/CwrHzLj6Tzp/5aeAFF13c9VAuR2QzcGGtHFnsscf/RUIknnLidAezU3INO3qbu4c46QrG5vFAbRJoC06E6RtnLd2QBK8JgZimBV+6VWIJfT19m4rQKwpwk36g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=PMhDTt8xHL3LyaU/8xpnfgRr2kjU0VVqdJ6icrhrECU=;
+ b=pF86ClAM+niZv2nWE26L0VVmoHWWlbv19RBTEmTAqRNTAIiwpJKP+XRP48IJnRbl+Snc2LKxdtpjWCrJfKsG+aRhkRdTSWh5UEJXxUFS7mtNMzvcezduNJI/BIwJ3l+grSIjtLQq08KNDUaDaQzL0Y9ZA3uLiWYamL+hqZqMWAM=
+Received: from AM0PR04MB6289.eurprd04.prod.outlook.com (2603:10a6:208:145::23)
+ by DB9PR04MB9820.eurprd04.prod.outlook.com (2603:10a6:10:4c3::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6277.35; Wed, 12 Apr
+ 2023 21:30:06 +0000
+Received: from AM0PR04MB6289.eurprd04.prod.outlook.com
+ ([fe80::8516:ebc7:c128:e69d]) by AM0PR04MB6289.eurprd04.prod.outlook.com
+ ([fe80::8516:ebc7:c128:e69d%6]) with mapi id 15.20.6277.038; Wed, 12 Apr 2023
+ 21:30:06 +0000
+From:   Leo Li <leoyang.li@nxp.com>
+To:     =?iso-8859-1?Q?Uwe_Kleine-K=F6nig?= 
+        <u.kleine-koenig@pengutronix.de>,
+        Stuart Yoder <stuyoder@gmail.com>,
+        Laurentiu Tudor <laurentiu.tudor@nxp.com>,
+        Roy Pledge <roy.pledge@nxp.com>,
+        Horia Geanta <horia.geanta@nxp.com>,
+        Pankaj Gupta <pankaj.gupta@nxp.com>,
+        Gaurav Jain <gaurav.jain@nxp.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Vinod Koul <vkoul@kernel.org>,
+        Ioana Ciornei <ioana.ciornei@nxp.com>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, "Y.B. Lu" <yangbo.lu@nxp.com>,
+        "Diana Madalina Craciun (OSS)" <diana.craciun@oss.nxp.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Richard Cochran <richardcochran@gmail.com>
+CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "kernel@pengutronix.de" <kernel@pengutronix.de>,
+        "dmaengine@vger.kernel.org" <dmaengine@vger.kernel.org>,
+        "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>
+Subject: RE: [PATCH 0/6] bus: fsl-mc: Make remove function return void
+Thread-Topic: [PATCH 0/6] bus: fsl-mc: Make remove function return void
+Thread-Index: AQHZU6GBM20rPir9q0ygz08QWqv0C68oHDoAgABHrAA=
+Date:   Wed, 12 Apr 2023 21:30:05 +0000
+Message-ID: <AM0PR04MB6289BB9BA4BC0B398F2989108F9B9@AM0PR04MB6289.eurprd04.prod.outlook.com>
+References: <20230310224128.2638078-1-u.kleine-koenig@pengutronix.de>
+ <20230412171056.xcluewbuyytm77yp@pengutronix.de>
+In-Reply-To: <20230412171056.xcluewbuyytm77yp@pengutronix.de>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: AM0PR04MB6289:EE_|DB9PR04MB9820:EE_
+x-ms-office365-filtering-correlation-id: ec435dec-bf04-4c33-4637-08db3b9d1577
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: l620WJPT3VkipPNCLsry1/kdB+xD3GmAW3g9UpIVetJ/lHz382v/ia81eQRGHPJXVFzs+EUerJCA4a7pjGoWHCf2A8EREUNlVD7oYiroQ/29tbtq4G7kd9EPp3NhNA1fprsi1Sb4U1AWS3GzMN+yvfkC77po29F+0+UkUxZi7nUbIuf55ULcGnkiVmJ8UiN7FpAx7GrL5rhVkJGph1yoBfzAK6ZOMVB+zg2FDXC11Atz4sQXJsm17MSmvtQC1ky7sQbluBcowjvX4lu0hwGj9+EO6ccoWqNQy/OMAUth54t7bvlxaNkTAU4xRkor5t4wyTaStquIi0QVYA1j3JJuOky+QVcZzeNhKnfXrV3FJuw2P+b8CSisJ2a+r2iHI6JOhiAFtSXuS3D9FRJEzL/5LJdf5fkK9HeXcrlRsSeUhHedka8v8H7pLpO1z1YlkOwSfCmQyY2DGhf19IBXylx5yhgPLG3BxyQpO8Ljtxb/AcJu9UUsJkabmiMq0/xzNrFMl3bswl9ZPx//SWZHPmA5x4mZA4OZ+Xx4CyyIrbObjF94pBTQQFuI2IAVkB7rTy+ds08gpHn8o0tyGv6+iG1tO3dpQeYXIqrtlBGi4CSky7PyxBTA4h8EwJ/yvHstG6WBiUHQwEZ8e6C21zDwT+NwyQ==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6289.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(396003)(39860400002)(366004)(376002)(346002)(136003)(451199021)(4326008)(71200400001)(41300700001)(66446008)(66946007)(54906003)(64756008)(66556008)(478600001)(8676002)(66476007)(76116006)(110136005)(316002)(33656002)(86362001)(66574015)(6506007)(9686003)(83380400001)(26005)(53546011)(7696005)(55236004)(122000001)(2906002)(7416002)(5660300002)(8936002)(55016003)(38070700005)(38100700002)(186003)(52536014)(921005);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?iso-8859-1?Q?xHHAQeDctD/F270s0NOMW3udQV6+E9ONJDyVp/Z5nTT13dvmqotKumSUiL?=
+ =?iso-8859-1?Q?2+YVrqMhCN60sE1F/AkVltk6aJd7ykZmbIcrZhDX4j+7ZjUBhAj8YfHAe0?=
+ =?iso-8859-1?Q?MV8GGQE6Fqzdln92KYmEwOlIIypbAtwOXnyQi3+m8PL0NLopDBurILF1ya?=
+ =?iso-8859-1?Q?Gwp3Covh4jbknZ5Q59z7UxFtOuRP3jL7D0x8n1BJpMnxkU/gD5qYp5U0wQ?=
+ =?iso-8859-1?Q?o/WBtTqLrw2syMkKS6KG+vy05dcJXKJNPn/opMgtPuZwwD4gFKPvt41G1z?=
+ =?iso-8859-1?Q?JlqKSPbqIy11jgfG6K/2o9P7VjLDQD6CZX7owjeyPBhWUReKsbh2jLgQzQ?=
+ =?iso-8859-1?Q?xOOOBCMIXJY71WQT4lLiTgr0pPXEz5NKgsNNteNeECXIW23Z2fzbCiBP+L?=
+ =?iso-8859-1?Q?nXjRwRaPv27UUond8DVc+ntXEN2Pmx1oBimb6rB8HATcIaHiRuPIoPngLI?=
+ =?iso-8859-1?Q?yRG4YjSImjUez5tFbUdkwFMT5hmHYF2OxkgNWZ7f3ugVugIgWwRT/+4Vtk?=
+ =?iso-8859-1?Q?0SCEmBafFnIn5+RvpypobBANDXHXqWDDm/cUGFLSUzSdkAqK8BQGFzT3L+?=
+ =?iso-8859-1?Q?YehN657Y8xj2SY3fsHXxnSMwub1oSGNVeS7NC+wFAp5i74LWLSbWGEui7d?=
+ =?iso-8859-1?Q?SPQl5cpehQ9Ph+pan9Vsrti4gbSfJzZNcLUukD2p5pHgaE0PNboTC953O2?=
+ =?iso-8859-1?Q?16Akz7lX/iS5vn+eQfr9fOzPKw+iWegUICqZtBZ82MR08Rjd5gWnADkS7y?=
+ =?iso-8859-1?Q?Y7BWYmFcWVWnk0sCCz5piyfyj5/iLsHWhRIHDWtM/asCNFnaMpI1POE61l?=
+ =?iso-8859-1?Q?m0vSmgvT2XRBhlhuiUcrg85LKY1FSGyaPJxjjAO6SC10Rf2Ra5c4shXdpm?=
+ =?iso-8859-1?Q?BtMqPdod9/dNiclG8d2YGSCRy9qQvhNaTyWauDzz/EFtX8r0iLufjKPhxO?=
+ =?iso-8859-1?Q?YNYuqVoYYBtPuDUo84/gd6kxre9jDvfhYcxD4RhAdAW3mlICDdnemvJQWN?=
+ =?iso-8859-1?Q?RBcrF51EM7p7OAGYx0DN+6f+i9ZZWZN+uWM3Zgd5LFEwzdFffuMXxYKmq5?=
+ =?iso-8859-1?Q?d0L1XH0xAoEUZ1+9Z5SX/Bb3qWAYlT6yQb/Jd2Qz/RKax3iq0ZPscWqbiS?=
+ =?iso-8859-1?Q?Abnh6teSFa6y2c0jhcMgOnz4cmMRY0uAzdbU1ur4m2rkzEkTJyqCe0p54D?=
+ =?iso-8859-1?Q?rudq1SaHDv9O1ab0REMeDLUlyXTj18wxK5uPf3ptF2tnH6MP3uzHmpJUDJ?=
+ =?iso-8859-1?Q?vL1EDOz6tzyn5oRuq7/eB6wojahFtfbQi9HjoT6D67h05jVvU7crhPM/X8?=
+ =?iso-8859-1?Q?scJyTIOwC5NaBgkUg61IyaEMaEhJp/JxO/yiW9jfdghJt74Pw4rV+LnHlA?=
+ =?iso-8859-1?Q?5ru9F23ucXYjC6/Koceu7Sf6n4jj5cUfGr1/p9xVRUqX2rVO8OCzAd0hJ4?=
+ =?iso-8859-1?Q?3oI21WDPxu/nMUjBPvnlpPuwrPdgidtDe0lF9Gwqpg5ehbrOr0AM/F3dZL?=
+ =?iso-8859-1?Q?AwxNB6jtadDeRi8QL1mgAgagCzfYnaWud8CRdsHXgKwxYSKB5cXIRcW03z?=
+ =?iso-8859-1?Q?67sOzUjAQmIq3kwUqLp0lDZmWW13pqPkwmK/J64eg1hKz2sQReYavpuPgG?=
+ =?iso-8859-1?Q?SXxDDi+ZGNnVE=3D?=
+Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
 MIME-Version: 1.0
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6289.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ec435dec-bf04-4c33-4637-08db3b9d1577
+X-MS-Exchange-CrossTenant-originalarrivaltime: 12 Apr 2023 21:30:05.8805
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: hErjG+UfQLjzL0rI6Yw8rghqhqB6H/aytPqCbJA9AjxtE9/JJ+W5Q+fZd5WJdD61lMVZgYIalchiL+Kv2OduVg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB9PR04MB9820
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D217304
 
---- Comment #4 from Eric Li (lixiaoyi13691419520@gmail.com) ---
-=E5=9C=A8 2023-04-12=E6=98=9F=E6=9C=9F=E4=B8=89=E7=9A=84 17:00 +0000=EF=BC=
-=8Cbugzilla-daemon@kernel.org=E5=86=99=E9=81=93=EF=BC=9A
-> https://bugzilla.kernel.org/show_bug.cgi?id=3D217304
->=20
-> --- Comment #3 from Sean Christopherson (seanjc@google.com) ---
-> On Thu, Apr 06, 2023, bugzilla-daemon@kernel.org=C2=A0wrote:
-> > https://bugzilla.kernel.org/show_bug.cgi?id=3D217304
-> >=20
-> > --- Comment #1 from Sean Christopherson (seanjc@google.com) ---
-> > On Thu, Apr 06, 2023, bugzilla-daemon@kernel.org=C2=A0wrote:
-> > > Assume KVM runs in L0, LHV runs in L1, the nested guest runs in
-> > > L2.
-> > >=20
-> > > The code in LHV performs an experiment (called "Experiment 13" in
-> > > serial
-> > > output) on CPU 0 to test the behavior of NMI blocking. The
-> > > experiment steps
-> > > are:
-> > > 1. Prepare state such that the CPU is currently in L1 (LHV), and
-> > > NMI is
-> > > blocked
-> > > 2. Modify VMCS12 to make sure that L2 has virtual NMIs enabled
-> > > (NMI exiting
-> > =3D
-> > > 1, Virtual NMIs =3D 1), and L2 does not block NMI (Blocking by NMI
-> > > =3D 0)
-> > > 3. VM entry to L2
-> > > 4. L2 performs VMCALL, get VM exit to L1
-> > > 5. L1 checks whether NMI is blocked.
-> > >=20
-> > > The expected behavior is that NMI should be blocked, which is
-> > > reproduced on
-> > > real hardware. According to Intel SDM, NMIs should be unblocked
-> > > after VM
-> > > entry
-> > > to L2 (step 3). After VM exit to L1 (step 4), NMI blocking does
-> > > not change,
-> > > so
-> > > NMIs are still unblocked. This behavior is reproducible on real
-> > > hardware.
-> > >=20
-> > > However, when running on KVM, the experiment shows that at step
-> > > 5, NMIs are
-> > > blocked in L1. Thus, I think NMI blocking is not implemented
-> > > correctly in
-> > > KVM's
-> > > nested virtualization.
-> >=20
-> > Ya, KVM blocks NMIs on nested NMI VM-Exits, but doesn't unblock
-> > NMIs for all
-> > other
-> > exit types.=C2=A0 I believe this is the fix (untested):
-> >=20
-> > ---
-> > =C2=A0arch/x86/kvm/vmx/nested.c | 12 +++++++-----
-> > =C2=A01 file changed, 7 insertions(+), 5 deletions(-)
-> >=20
-> > diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> > index 96ede74a6067..4240a052628a 100644
-> > --- a/arch/x86/kvm/vmx/nested.c
-> > +++ b/arch/x86/kvm/vmx/nested.c
-> > @@ -4164,12 +4164,7 @@ static int vmx_check_nested_events(struct
-> > kvm_vcpu
-> > *vcpu)
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 nested_vmx_vmexit(vcpu, EXIT_REASON_EXCEPTION_NMI,
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 NMI_VECTOR | INTR_TY=
-PE_NMI_INTR |
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 INTR_INFO_VALID_MASK=
-, 0);
-> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0 /*
-> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 * The NMI-triggered VM exit counts as injection:
-> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 * clear this one and block further NMIs.
-> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 */
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 vcpu->arch.nmi_pending =3D 0;
-> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0 vmx_set_nmi_mask(vcpu, true);
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 return 0;
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
-> >=20
-> > @@ -4865,6 +4860,13 @@ void nested_vmx_vmexit(struct kvm_vcpu
-> > *vcpu, u32
-> > vm_exit_reason,
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 INTR_INFO_VALID_MASK |
-> > INTR_TYPE_EXT_INTR;
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 }
-> >=20
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0 /*
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 * NMIs are blocked on VM-Exit due to NMI, and
-> > unblocked by
-> > all
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 * other VM-Exit types.
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 */
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0 vmx_set_nmi_mask(vcpu, (u16)vm_exit_reason =3D=3D
-> > EXIT_REASON_EXCEPTION_NMI &&
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 !is_nmi(vmcs12-
-> > >vm_exit_intr_info));
->=20
-> Ugh, this is wrong.=C2=A0 As Eric stated in the bug report, and per
-> section "27.5.5
-> Updating Non-Register State", VM-Exit does *not* affect NMI blocking
-> except if
-> the VM-Exit is directly due to an NMI
->=20
-> =C2=A0 Event blocking is affected as follows:
-> =C2=A0=C2=A0=C2=A0 * There is no blocking by STI or by MOV SS after a VM =
-exit.
-> =C2=A0=C2=A0=C2=A0 * VM exits caused directly by non-maskable interrupts =
-(NMIs)
-> cause blocking
-> by
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 NMI (see Table 24-3). Other VM exits do no=
-t affect blocking by
-> NMI. (See
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Section 27.1 for the case in which an NMI =
-causes a VM exit
-> indirectly.)
->=20
-Correct. In my experiment, NMI is unblocked at VMENTRY. VMEXIT does not
-change NMI blocking (i.e. remain unblocked).
 
-> The scenario here is that virtual NMIs are enabled, in which case
-> case
-> VM-Enter,
-> not VM-Exit, effectively clears NMI blocking.=C2=A0 From "26.7.1
-> Interruptibility
-> State":
+> -----Original Message-----
+> From: Uwe Kleine-K=F6nig <u.kleine-koenig@pengutronix.de>
+> Sent: Wednesday, April 12, 2023 12:11 PM
+> To: Stuart Yoder <stuyoder@gmail.com>; Laurentiu Tudor
+> <laurentiu.tudor@nxp.com>; Roy Pledge <roy.pledge@nxp.com>; Leo Li
+> <leoyang.li@nxp.com>; Horia Geanta <horia.geanta@nxp.com>; Pankaj
+> Gupta <pankaj.gupta@nxp.com>; Gaurav Jain <gaurav.jain@nxp.com>;
+> Herbert Xu <herbert@gondor.apana.org.au>; David S. Miller
+> <davem@davemloft.net>; Vinod Koul <vkoul@kernel.org>; Ioana Ciornei
+> <ioana.ciornei@nxp.com>; Eric Dumazet <edumazet@google.com>; Jakub
+> Kicinski <kuba@kernel.org>; Paolo Abeni <pabeni@redhat.com>; Y.B. Lu
+> <yangbo.lu@nxp.com>; Diana Madalina Craciun (OSS)
+> <diana.craciun@oss.nxp.com>; Alex Williamson
+> <alex.williamson@redhat.com>; Richard Cochran
+> <richardcochran@gmail.com>
+> Cc: kvm@vger.kernel.org; netdev@vger.kernel.org; linux-
+> kernel@vger.kernel.org; linux-crypto@vger.kernel.org;
+> kernel@pengutronix.de; dmaengine@vger.kernel.org; linuxppc-
+> dev@lists.ozlabs.org; linux-arm-kernel@lists.infradead.org
+> Subject: Re: [PATCH 0/6] bus: fsl-mc: Make remove function return void
 >=20
-> =C2=A0 The blocking of non-maskable interrupts (NMIs) is determined as
-> follows:
-> =C2=A0=C2=A0=C2=A0 * If the "virtual NMIs" VM-execution control is 0, NMI=
-s are
-> blocked if and
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 only if bit 3 (blocking by NMI) in the int=
-erruptibility-state
-> field is 1.
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 If the "NMI exiting" VM-execution control =
-is 0, execution of
-> the IRET
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 instruction removes this blocking (even if=
- the instruction
-> generates a
-> fault).
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 If the "NMI exiting" control is 1, IRET do=
-es not affect this
-> blocking.
-> =C2=A0=C2=A0=C2=A0 * The following items describe the use of bit 3 (block=
-ing by NMI)
-> in the
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 interruptibility-state field if the "virtu=
-al NMIs" VM-execution
-> control
-> is 1:
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * The bit=E2=80=99s value does=
- not affect the blocking of NMIs after
-> VM entry.
-> NMIs
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 are not blocked in=
- VMX non-root operation (except for
-> ordinary
-> blocking
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 for other reasons,=
- such as by the MOV SS instruction, the
-> wait-for-SIPI
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 state, etc.)
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * The bit=E2=80=99s value dete=
-rmines whether there is virtual-NMI
-> blocking
-> after VM
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 entry. If the bit =
-is 1, virtual-NMI blocking is in effect
-> after VM
-> entry.
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 If the bit is 0, t=
-here is no virtual-NMI blocking after VM
-> entry
-> unless
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 the VM entry is in=
-jecting an NMI (see Section 26.6.1.1).
-> Execution of
-> IRET
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 removes virtual-NM=
-I blocking (even if the instruction
-> generates a
-> fault).
+> Hello,
 >=20
-> I.e. forcing NMIs to be unblocked is wrong when virtual NMIs are
-> disabled.
+> On Fri, Mar 10, 2023 at 11:41:22PM +0100, Uwe Kleine-K=F6nig wrote:
+> > Hello,
+> >
+> > many bus remove functions return an integer which is a historic
+> > misdesign that makes driver authors assume that there is some kind of
+> > error handling in the upper layers. This is wrong however and
+> > returning and error code only yields an error message.
+> >
+> > This series improves the fsl-mc bus by changing the remove callback to
+> > return no value instead. As a preparation all drivers are changed to
+> > return zero before so that they don't trigger the error message.
 >=20
-> Unfortunately, that means fixing this will require a much more
-> involved patch
-> (series?), e.g. KVM can't modify NMI blocking until the VM-Enter is
-> successful,
-> at which point vmcs02, not vmcs01, is loaded, and so KVM will likely
-> need to
-> to track NMI blocking in a software variable.=C2=A0 That in turn gets
-> complicated by
-> the !vNMI case, because then KVM needs to propagate NMI blocking
-> between
-> vmcs01,
-> vmcs12, and vmcs02.=C2=A0 Blech.
->=20
-Yes, the implementation to handle NMI perfectly in nested
-virtualization may be complicated. There are many strange cases to
-think about (e.g. priority between NMI window VM-exit and NMI
-interrupts).
+> Who is supposed to pick up this patch series (or point out a good reason =
+for
+> not taking it)?
 
-> I'm going to punt fixing this due to lack of bandwidth, and AFAIK
-> lack of a use
-> case beyond testing.=C2=A0 Hopefully I'll be able to revisit this in a few
-> weeks,
-> but
-> that might be wishful thinking.
->=20
-I agree. This case probably only appears in testing. I can't think of a
-reasonable reason for a hypervisor to perform VM-enter with NMIs
-blocked.
+Previously Greg KH picked up MC bus patches.
 
---=20
-You may reply to this email to add a comment.
+If no one is picking up them this time, I probably can take it through the =
+fsl soc tree.
 
-You are receiving this mail because:
-You are watching the assignee of the bug.=
+Regards,
+Leo
