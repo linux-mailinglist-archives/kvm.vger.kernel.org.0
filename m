@@ -2,66 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6FF796DF904
-	for <lists+kvm@lfdr.de>; Wed, 12 Apr 2023 16:52:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E10016DF924
+	for <lists+kvm@lfdr.de>; Wed, 12 Apr 2023 16:56:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229717AbjDLOwo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 Apr 2023 10:52:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49476 "EHLO
+        id S230163AbjDLO4j (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 Apr 2023 10:56:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55292 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229609AbjDLOwn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 Apr 2023 10:52:43 -0400
+        with ESMTP id S230281AbjDLO4f (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 12 Apr 2023 10:56:35 -0400
 Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 013995BB8
-        for <kvm@vger.kernel.org>; Wed, 12 Apr 2023 07:52:38 -0700 (PDT)
-Received: from mail-yb1-f197.google.com (mail-yb1-f197.google.com [209.85.219.197])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73CE77DA0
+        for <kvm@vger.kernel.org>; Wed, 12 Apr 2023 07:56:11 -0700 (PDT)
+Received: from mail-yb1-f198.google.com (mail-yb1-f198.google.com [209.85.219.198])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
         (No client certificate requested)
-        by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id 334D63F431
-        for <kvm@vger.kernel.org>; Wed, 12 Apr 2023 14:52:36 +0000 (UTC)
+        by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id 3C45C3F429
+        for <kvm@vger.kernel.org>; Wed, 12 Apr 2023 14:56:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-        s=20210705; t=1681311156;
-        bh=hvqL5OvNUsZFZ+sHFmNlvVzy0tXAUd/iqPbCE7rbU6Q=;
+        s=20210705; t=1681311370;
+        bh=OxpzX6kzOmYSsKE6qMLSC1R+x0dOP8fBolvejWA6sqA=;
         h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
          To:Cc:Content-Type;
-        b=A/TfUhI3f/UPL84W3whA4eG0Wdx/lBn4TNfGEN0LKZDcUK/oGINKgfOLh1eAMNuba
-         uuYLntYchwDKW7L7XNSdHHfVwG2CoKnRiH2PbZklQqTbzu3o2qRkoofzgaWfNrwGLa
-         3GcRW+KmnPXrznnwrJuZw50iAiHA6GK7iWPpmuH+MpgdkaLK/Pz5Ii9GyQCcstwEAy
-         CNO4u8yG2plPke5k6k3KUxiFUF5WIyZPvpkWSbYp2gXX65Nt6TBFX4Rz6yZHusS6+R
-         8zmD+tUN46vcFshXz2DzkByO42nEbyWU4jT4OBLXIDsZ6VltT916GfHPuQsYKsf487
-         V3IAVkTBbxtbQ==
-Received: by mail-yb1-f197.google.com with SMTP id l141-20020a252593000000b00b8f2fd76d41so3846262ybl.9
-        for <kvm@vger.kernel.org>; Wed, 12 Apr 2023 07:52:36 -0700 (PDT)
+        b=mDcdiTqot7FrCYU2Wl2VINayp+tkEYTHc1FxeB9hDYvLpfRK7IL/0klAdrBPoHbQw
+         XsafG9JkTb/812ppF6NqoU6lNJI+xkotON6flvbyhhdzwif2bLDMiWY5ZuzRrdTlT7
+         W8mBHt7xdMPS1RufG3yvYDPiFeSwhrxMJWj120Xh4jlHmxZPV3ueIzfVOwwIAxmt0a
+         LEm0fl+bCMpsgr4NuMpcINah22AQc7W0dvX+18TTR35mUhUK8LH/+tzHmQ5DyjRhxq
+         sL2D2+9uajpW7VenuLFKxKtq2tkNsgWF3U6DA5RFsO+Rj/5/8EdsFyQ/DHzbZDTz0F
+         3/gPO0lMC562g==
+Received: by mail-yb1-f198.google.com with SMTP id 186-20020a2510c3000000b00b880000325bso28883029ybq.3
+        for <kvm@vger.kernel.org>; Wed, 12 Apr 2023 07:56:10 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1681311155; x=1683903155;
+        d=1e100.net; s=20210112; t=1681311369; x=1683903369;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=hvqL5OvNUsZFZ+sHFmNlvVzy0tXAUd/iqPbCE7rbU6Q=;
-        b=ndtVVjUEOUoDIsDuhYP3bz8cJTzUeVi5tAbhWWZWyGjgq+xNtpB3hcsEz4PYRvk8l+
-         PDqYCssR0gBsp0egjJROpbEilQYGIfWXWpNHNEdFObuVG9vW8IF//yk7aPC1Yo2GP1aj
-         gO7v3X1ExnAJJY3wcMFzSuOifJVX3piSAdimCYtPpeH8UhJ4B7+wagUT75DfXiQpnznQ
-         ehvBR4/FdQCFvv0f9E/5L8pds3xeAhWjdSMzfBs0apIXFLxPAqqnZgy43YJTGimsWWsi
-         XkVXHY8CzWSi/T15dhGY4ckvhJxJZeisMFc7SyMVCH8yKuriPR4JIE9XPFWnNOJrb07J
-         kaCQ==
-X-Gm-Message-State: AAQBX9eqhIVFRrTgR4dKUhsxXvNmCGk5LWFSy/4ricB+e12B5SkjWhE0
-        //kuF6hVC0f3DPPOOWGhIqWUYGV00JTVpaWpG/8tZ6RuaQnQSYCDYb+KscxglSqG4+72VWpRfyQ
-        fqCPkX5nvVul1ab2ngmgERqi7tmHiwc/L5B9uG1wLN0s1Og==
-X-Received: by 2002:a25:d884:0:b0:b8e:f1ef:a144 with SMTP id p126-20020a25d884000000b00b8ef1efa144mr2178693ybg.0.1681311155118;
-        Wed, 12 Apr 2023 07:52:35 -0700 (PDT)
-X-Google-Smtp-Source: AKy350YCHx1IlZRvzchQUAJk2tjUBg0HPj0JYKDBVhf6geq3Hy3rc7/eGhsBMiMfc3b+M7sGcaUGyylOozZ3OjdEFZ8=
-X-Received: by 2002:a25:d884:0:b0:b8e:f1ef:a144 with SMTP id
- p126-20020a25d884000000b00b8ef1efa144mr2178685ybg.0.1681311154914; Wed, 12
- Apr 2023 07:52:34 -0700 (PDT)
+        bh=OxpzX6kzOmYSsKE6qMLSC1R+x0dOP8fBolvejWA6sqA=;
+        b=OMWhmgd9fbkydksfilMjYk4idNPHQJlDZpifaJAwwcLwT+qbXQ3Dly/ZP1pvIKA92l
+         0af7IxRccEO0Vbf6WD18ODu6b5S0lFAgmagsdkiOiynvu44DCAuFKdA0tfJ0X45/K8mV
+         jh27bCzT+X6JMOdLyxf5mec4WQbJC73d0l5QCeZ1ykgKqWY/wwkalNP0MWH51H7ZXZZ1
+         nIl4/bXg0Bo0jepVt94wKFnuhIdQSmM8JD9ZL097EvijMBEcuZ+E4zhA6wOHo8faD7eV
+         qWXr7tIiORg6pQ1ce/OfFbochfbBUPmy/rA87PgNNuflMdV5nwJtFk3Q0jkdbA1r8Vvi
+         /BWg==
+X-Gm-Message-State: AAQBX9cD9siCsDYR7R99l9eKVrC7lhZxwndVvAdboJGk3xBx9kQPADMu
+        RoRWVw47UyCv1RrTL96Ga2vN8JPzBS+PnVJxqjSL/HCBq/ptxuSgY6gtxNEUyMvwbejuDKkiUqu
+        AtZiMgqg9TaS0y+rGaz9soJF/FKbPCfGXR5IxMf6anBAbEg==
+X-Received: by 2002:a25:76c6:0:b0:b8b:ee74:c9d4 with SMTP id r189-20020a2576c6000000b00b8bee74c9d4mr12272194ybc.12.1681311369262;
+        Wed, 12 Apr 2023 07:56:09 -0700 (PDT)
+X-Google-Smtp-Source: AKy350ayKQid4DrFAszxepNHukT7rDUmpRKfL4/yXe/Auq2u5OoAJAKLAvIupIl1TNxT0UPAazi0OdRaFIcQIia5ivY=
+X-Received: by 2002:a25:76c6:0:b0:b8b:ee74:c9d4 with SMTP id
+ r189-20020a2576c6000000b00b8bee74c9d4mr12272184ybc.12.1681311369029; Wed, 12
+ Apr 2023 07:56:09 -0700 (PDT)
 MIME-Version: 1.0
 References: <20230404122652.275005-1-aleksandr.mikhalitsyn@canonical.com>
- <20230404122652.275005-2-aleksandr.mikhalitsyn@canonical.com> <20230411224737.00001d67.zhi.wang.linux@gmail.com>
-In-Reply-To: <20230411224737.00001d67.zhi.wang.linux@gmail.com>
+ <20230404122652.275005-3-aleksandr.mikhalitsyn@canonical.com> <20230411224337.000015ce.zhi.wang.linux@gmail.com>
+In-Reply-To: <20230411224337.000015ce.zhi.wang.linux@gmail.com>
 From:   Aleksandr Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
-Date:   Wed, 12 Apr 2023 16:52:23 +0200
-Message-ID: <CAEivzxfxm9Kg-ap9QeceGgTeCd0du7FrH7Kmi2dRZH6gah-8HQ@mail.gmail.com>
-Subject: Re: [PATCH 1/2] KVM: SVM: free sev_*asid_bitmap init if SEV init fails
+Date:   Wed, 12 Apr 2023 16:55:58 +0200
+Message-ID: <CAEivzxd6GFMcW-k_dNKy83bHgPfa7iMivE=kdV-88Vkp28H2WA@mail.gmail.com>
+Subject: Re: [PATCH 2/2] KVM: SVM: add some info prints to SEV init
 To:     Zhi Wang <zhi.wang.linux@gmail.com>
 Cc:     pbonzini@redhat.com, Sean Christopherson <seanjc@google.com>,
         =?UTF-8?Q?St=C3=A9phane_Graber?= <stgraber@ubuntu.com>,
@@ -78,18 +78,27 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Apr 11, 2023 at 9:47=E2=80=AFPM Zhi Wang <zhi.wang.linux@gmail.com>=
+On Tue, Apr 11, 2023 at 9:43=E2=80=AFPM Zhi Wang <zhi.wang.linux@gmail.com>=
  wrote:
 >
-> On Tue,  4 Apr 2023 14:26:51 +0200
+> On Tue,  4 Apr 2023 14:26:52 +0200
 > Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com> wrote:
 >
-> > If misc_cg_set_capacity() fails for some reason then we have
-> > a memleak for sev_reclaim_asid_bitmap/sev_asid_bitmap. It's
-> > not a case right now, because misc_cg_set_capacity() just can't
-> > fail and check inside it is always successful.
+> > Let's add a few pr_info's to sev_hardware_setup to make SEV/SEV-ES
+> > enabling a little bit handier for users. Right now it's too hard
+> > to guess why SEV/SEV-ES are failing to enable.
 > >
-> > But let's fix that for code consistency.
+> > There are a few reasons.
+> > SEV:
+> > - npt is disabled (module parameter)
+>      ^NPT
+> > - CPU lacks some features (sev, decodeassists)
+> > - Maximum SEV ASID is 0
+> >
+> > SEV-ES:
+> > - mmio_caching is disabled (module parameter)
+> > - CPU lacks sev_es feature
+> > - Minimum SEV ASID value is 1 (can be adjusted in BIOS/UEFI)
 > >
 > > Cc: Sean Christopherson <seanjc@google.com>
 > > Cc: Paolo Bonzini <pbonzini@redhat.com>
@@ -99,40 +108,98 @@ On Tue, Apr 11, 2023 at 9:47=E2=80=AFPM Zhi Wang <zhi.wang.linux@gmail.com>=
 > > Signed-off-by: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.c=
 om>
 > > ---
-> >  arch/x86/kvm/svm/sev.c | 7 ++++++-
-> >  1 file changed, 6 insertions(+), 1 deletion(-)
+> >  arch/x86/kvm/svm/sev.c | 27 +++++++++++++++++++++------
+> >  1 file changed, 21 insertions(+), 6 deletions(-)
 > >
 > > diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> > index c25aeb550cd9..a42536a0681a 100644
+> > index a42536a0681a..14cbb8f14c6b 100644
 > > --- a/arch/x86/kvm/svm/sev.c
 > > +++ b/arch/x86/kvm/svm/sev.c
-> > @@ -2213,8 +2213,13 @@ void __init sev_hardware_setup(void)
-> >       }
+> > @@ -2168,17 +2168,24 @@ void __init sev_hardware_setup(void)
+> >       bool sev_es_supported =3D false;
+> >       bool sev_supported =3D false;
 > >
-> >       sev_asid_count =3D max_sev_asid - min_sev_asid + 1;
-> > -     if (misc_cg_set_capacity(MISC_CG_RES_SEV, sev_asid_count))
-> > +     if (misc_cg_set_capacity(MISC_CG_RES_SEV, sev_asid_count)) {
-> > +             bitmap_free(sev_reclaim_asid_bitmap);
-> > +             sev_reclaim_asid_bitmap =3D NULL;
-> > +             bitmap_free(sev_asid_bitmap);
-> > +             sev_asid_bitmap =3D NULL;
+> > -     if (!sev_enabled || !npt_enabled)
+> > +     if (!sev_enabled)
+> >               goto out;
+> >
+> > +     if (!npt_enabled) {
+> > +             pr_info("Failed to enable AMD SEV as it requires Nested P=
+aging to be enabled\n");
+> > +             goto out;
+>
+> Shouldn't we use pr_err() for error message?
+
+I'm not sure. Because technically that's not an error, that is an
+information message about current configuration.
+
+
+>
+> > +     }
+> > +
+> >       /*
+> >        * SEV must obviously be supported in hardware.  Sanity check tha=
+t the
+> >        * CPU supports decode assists, which is mandatory for SEV guests=
+ to
+> >        * support instruction emulation.
+> >        */
+> >       if (!boot_cpu_has(X86_FEATURE_SEV) ||
+> > -         WARN_ON_ONCE(!boot_cpu_has(X86_FEATURE_DECODEASSISTS)))
+> > +         WARN_ON_ONCE(!boot_cpu_has(X86_FEATURE_DECODEASSISTS))) {
+> > +             pr_info("Failed to enable AMD SEV as it requires decodeas=
+sists and sev CPU features\n");
 > >               goto out;
 > > +     }
 > >
-> >       pr_info("SEV supported: %u ASIDs\n", sev_asid_count);
-> >       sev_supported =3D true;
+> >       /* Retrieve SEV CPUID information */
+> >       cpuid(0x8000001f, &eax, &ebx, &ecx, &edx);
+> > @@ -2188,8 +2195,10 @@ void __init sev_hardware_setup(void)
+> >
+> >       /* Maximum number of encrypted guests supported simultaneously */
+> >       max_sev_asid =3D ecx;
+> > -     if (!max_sev_asid)
+> > +     if (!max_sev_asid) {
+> > +             pr_info("Failed to enable SEV as the maximum SEV ASID val=
+ue is 0.\n");
+> >               goto out;
+> > +     }
+> >
+> >       /* Minimum ASID value that should be used for SEV guest */
+> >       min_sev_asid =3D edx;
+> > @@ -2234,16 +2243,22 @@ void __init sev_hardware_setup(void)
+> >        * instead relies on #NPF(RSVD) being reflected into the guest as=
+ #VC
+> >        * (the guest can then do a #VMGEXIT to request MMIO emulation).
+> >        */
+> > -     if (!enable_mmio_caching)
+> > +     if (!enable_mmio_caching) {
+> > +             pr_info("Failed to enable SEV-ES as it requires MMIO cach=
+ing to be enabled\n");
+> >               goto out;
+> > +     }
+> >
+> >       /* Does the CPU support SEV-ES? */
+> > -     if (!boot_cpu_has(X86_FEATURE_SEV_ES))
+> > +     if (!boot_cpu_has(X86_FEATURE_SEV_ES)) {
+> > +             pr_info("Failed to enable SEV-ES as it requires sev_es CP=
+U feature\n");
+> >               goto out;
+> > +     }
+> >
+> >       /* Has the system been allocated ASIDs for SEV-ES? */
+> > -     if (min_sev_asid =3D=3D 1)
+> > +     if (min_sev_asid =3D=3D 1) {
+> > +             pr_info("Failed to enable SEV-ES as the minimum SEV ASID =
+value is 1.\n");
+> >               goto out;
+> > +     }
+> >
+> >       sev_es_asid_count =3D min_sev_asid - 1;
+> >       if (misc_cg_set_capacity(MISC_CG_RES_SEV_ES, sev_es_asid_count))
 >
-> It would be nice that another case can also be fixed:
->
->         sev_es_asid_count =3D min_sev_asid - 1;
->         if (misc_cg_set_capacity(MISC_CG_RES_SEV_ES, sev_es_asid_count))
->                 goto out; /* <----HERE */
-
-Nope.
-
-There is no leak. Because when we are at this point then sev_supported
-=3D true and everything is fine.
-
->
-> Maybe it would be a good idea to factor out an common error handling path=
-.
+> As this patch is making sev_hardware_setup()more informative, it would be
+> better to print both ASID range and count (instead of only ASID count in
+> the current code). I was suspecting there seems a bug of ASID range alloc=
+ation
+> in the current code, but I don't have the HW to test yet...
