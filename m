@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 52D506E0105
-	for <lists+kvm@lfdr.de>; Wed, 12 Apr 2023 23:35:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4EC2D6E0106
+	for <lists+kvm@lfdr.de>; Wed, 12 Apr 2023 23:35:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230033AbjDLVfo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 Apr 2023 17:35:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35706 "EHLO
+        id S230056AbjDLVfp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 Apr 2023 17:35:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35798 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230071AbjDLVfi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 Apr 2023 17:35:38 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5865E7A84
-        for <kvm@vger.kernel.org>; Wed, 12 Apr 2023 14:35:32 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id c67-20020a254e46000000b00b88f1fd158fso29214248ybb.17
-        for <kvm@vger.kernel.org>; Wed, 12 Apr 2023 14:35:32 -0700 (PDT)
+        with ESMTP id S230085AbjDLVfl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 12 Apr 2023 17:35:41 -0400
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2657883C0
+        for <kvm@vger.kernel.org>; Wed, 12 Apr 2023 14:35:33 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-54f9df9ebc5so27949227b3.13
+        for <kvm@vger.kernel.org>; Wed, 12 Apr 2023 14:35:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1681335331; x=1683927331;
+        d=google.com; s=20221208; t=1681335332; x=1683927332;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=oBWUDJru52jdEOiurtVr+EjXu6VveYkIMdfENGYuqF4=;
-        b=5Ov5+ZRfva2c/yhjYr6uvNwVs19NXcF+87yc5OV+Twmw1QDkz0RDskvnZST3sAoaOa
-         2DLJh3OJcPj62W7lWGXrhBgFBBN2ym5EzdxJy5WNiNWrRhDCQ7O9J4sD3IdsSDHkNkXH
-         IlWrqpFtk2bhPyl/fjbcuDlyAw9LBNJtjlC4/XKTUmyPx+21UfU5rIDVX+W5CyqAo7OS
-         gCrK6y4+iCGyxDx3qAIagEau4i7Q7ALYo2KpLBHy09J7o1/ugwnLzj5u7JBFxpuMMCcF
-         35wLNLvY8wChWZBVKEsf6irGy49x6q/APUlPlzGWacJC0sJ+CAjiGjEWDZ7ty6c3fUT1
-         QQRw==
+        bh=fW2lVHfchp9UgxlQ0eqx0Qnt2L2yZQNT4SVI95DvpSs=;
+        b=RbgkvGcRLIPqOOdYTNLhCUUYpP5u2hdsGoV9tBjd/zi1IjMKBqiqA4sTOeL9bmoW81
+         3H6Qawu5hfjaOHdrZKYJjjAR5wQ054U3LXNw8S1hT7BxcGUsYoBb3c/5ycAOlZhoOdIt
+         dgXzaicpEJwGYoy9qsWynR9W7h9/m4Ym8cnWfYm6bzs75oxhyzRFVeyTI27Ln42QTX+R
+         ETbJEewsFQeSLQ5tUo7roL1hW8q9eBwsa+gSY8ErXEcwEVuBQJ6YFyvwi3NQ8sUBj7jR
+         AoxcJZMbiDGNw5e335EAnuUNdSYzaovS6U4EKDLMkQBvIw6z8nn7Dxs2OReIS8YFbH7v
+         2ODA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681335331; x=1683927331;
+        d=1e100.net; s=20221208; t=1681335332; x=1683927332;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=oBWUDJru52jdEOiurtVr+EjXu6VveYkIMdfENGYuqF4=;
-        b=GUzLXObp272/ZR1jf0t32P1mcbHrioqbzmrDhgLjj5Nz2NQM32rE/fYIRwkfMyweeJ
-         9GlYV7aO0uUg3159zgqCuXbN3koU64kWSYmIBV124zxGqE9MXU4A0Rrb8RmGgOsJMpW6
-         G3koattla0hkIeNItQhoALKl2icRyypjoYIqS1bMluflhERShHieK13DgTj+AXb4m1bO
-         CtgJHGu8ylUnbwemipgUJDRmg30BVyhLBiAk1asg/L7qyN1D3ZjBPFpZK1J0XTcZNs1m
-         EZSuFC1Ob72ISwyPkgAC0YBfA6GxYR6wxbxT/ju+TyeD8WTgPkq0FUpMPlITBT6a6y0K
-         qxJA==
-X-Gm-Message-State: AAQBX9cSufaWNlDB5yvcmH6sDPIIZgJI07l9jgn1L2kdJ+qG7w8ifVBk
-        vwHJYt72rbAjLhuTcNGPl1RxcsefkegUbQ==
-X-Google-Smtp-Source: AKy350Z1Hz16awnvahWD8mb/lMbNByADtMsMOxZyj1zA+7AE5/pqJYBUSB/Hd6Gwg+5ip516oAEqf4bZn9oW7Q==
+        bh=fW2lVHfchp9UgxlQ0eqx0Qnt2L2yZQNT4SVI95DvpSs=;
+        b=XflZFsA6zefkBWkBKRH8RHF10TCG8HyEBI7IqVkqfev7q/N/uTjjpM6InVO6NIbfuM
+         Tp6ba45xQXqtkLSfUWARJzkYVdxZZpWE6TYPg2u/+i87GGbSQjpyoJJyQ3GTSgo2aXtg
+         2/4bmFImlxNjFUpbL8JriDjrXQwQ/luhVOmGfnVi3Dxy6sta3qPPN82bIUntquebalVL
+         Ba0O0isGonmHRlYwsjNBSl41lhKwjp9Lv8Kzw3mOOXvLfmUNzmi3rCD7zJqsd/ta7IEy
+         KmQICrztvmEQzS0xDRZFY+LMKw9ozjSoDT3GQFXsQoeK6sWy34RzkWA3ktDk4D56zywg
+         +wtg==
+X-Gm-Message-State: AAQBX9eTO7u1YIxOiFgel0NMJ2hr7RD+RLJTzQOiLfA//1J9SsZlJ+AN
+        joh9+wE7P+fOzQ1fZ4sq9h590ThNIworhg==
+X-Google-Smtp-Source: AKy350YH5KZy2ouOBNOYXjh55lIcz9SLFEFUhOyUV8JCny7/1ROofC6xXNHF+9m2d578/vmRjDjHN/WG7mo03Q==
 X-Received: from laogai.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:2c9])
- (user=amoorthy job=sendgmr) by 2002:a81:ae1d:0:b0:54f:84c0:93ff with SMTP id
- m29-20020a81ae1d000000b0054f84c093ffmr3294464ywh.5.1681335331269; Wed, 12 Apr
- 2023 14:35:31 -0700 (PDT)
-Date:   Wed, 12 Apr 2023 21:35:06 +0000
+ (user=amoorthy job=sendgmr) by 2002:a25:30c2:0:b0:b8f:553a:ddfd with SMTP id
+ w185-20020a2530c2000000b00b8f553addfdmr2164ybw.5.1681335332195; Wed, 12 Apr
+ 2023 14:35:32 -0700 (PDT)
+Date:   Wed, 12 Apr 2023 21:35:07 +0000
 In-Reply-To: <20230412213510.1220557-1-amoorthy@google.com>
 Mime-Version: 1.0
 References: <20230412213510.1220557-1-amoorthy@google.com>
 X-Mailer: git-send-email 2.40.0.577.gac1e443424-goog
-Message-ID: <20230412213510.1220557-19-amoorthy@google.com>
-Subject: [PATCH v3 18/22] KVM: x86: Implement KVM_CAP_ABSENT_MAPPING_FAULT
+Message-ID: <20230412213510.1220557-20-amoorthy@google.com>
+Subject: [PATCH v3 19/22] KVM: arm64: Annotate (some) -EFAULTs from user_mem_abort()
 From:   Anish Moorthy <amoorthy@google.com>
 To:     pbonzini@redhat.com, maz@kernel.org
 Cc:     oliver.upton@linux.dev, seanjc@google.com, jthoughton@google.com,
@@ -69,84 +69,42 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When the memslot flag is enabled, fail guest memory accesses for which
-fast-gup fails (ie, for which the mappings are not present).
+Implement KVM_CAP_MEMORY_FAULT_INFO for at least some -EFAULTs returned
+by user_mem_abort(). Other EFAULTs returned by this function come from
+before the guest physical address of the fault is calculated: leave
+those unannotated.
 
-Suggested-by: James Houghton <jthoughton@google.com>
 Signed-off-by: Anish Moorthy <amoorthy@google.com>
 ---
- Documentation/virt/kvm/api.rst |  2 +-
- arch/x86/kvm/mmu/mmu.c         | 17 ++++++++++++-----
- arch/x86/kvm/x86.c             |  1 +
- 3 files changed, 14 insertions(+), 6 deletions(-)
+ arch/arm64/kvm/mmu.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index 7967b9909e28b..452bbca800b15 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -7712,7 +7712,7 @@ reported to the maintainers.
- 7.35 KVM_CAP_ABSENT_MAPPING_FAULT
- ---------------------------------
- 
--:Architectures: None
-+:Architectures: x86
- :Returns: -EINVAL.
- 
- The presence of this capability indicates that userspace may pass the
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index d83a3e1e3eff9..4aef79b97c985 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -4218,7 +4218,9 @@ void kvm_arch_async_page_ready(struct kvm_vcpu *vcpu, struct kvm_async_pf *work)
- 	kvm_mmu_do_page_fault(vcpu, work->cr2_or_gpa, 0, true, NULL);
- }
- 
--static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
-+static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu,
-+				struct kvm_page_fault *fault,
-+				bool fault_on_absent_mapping)
- {
- 	struct kvm_memory_slot *slot = fault->slot;
- 	bool async;
-@@ -4251,9 +4253,12 @@ static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 7113587222ffe..d5ae636c26d62 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -1307,8 +1307,11 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 		kvm_send_hwpoison_signal(hva, vma_shift);
+ 		return 0;
  	}
+-	if (is_error_noslot_pfn(pfn))
++	if (is_error_noslot_pfn(pfn)) {
++		kvm_populate_efault_info(vcpu, round_down(gfn * PAGE_SIZE, vma_pagesize),
++				vma_pagesize);
+ 		return -EFAULT;
++	}
  
- 	async = false;
--	fault->pfn = __gfn_to_pfn_memslot(slot, fault->gfn, false, false, &async,
--					  fault->write, &fault->map_writable,
--					  &fault->hva);
-+
-+	fault->pfn = __gfn_to_pfn_memslot(slot, fault->gfn,
-+						fault_on_absent_mapping, false,
-+						fault_on_absent_mapping ? NULL : &async,
-+						fault->write, &fault->map_writable, &fault->hva);
-+
- 	if (!async)
- 		return RET_PF_CONTINUE; /* *pfn has correct page already */
- 
-@@ -4287,7 +4292,9 @@ static int kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
- 	fault->mmu_seq = vcpu->kvm->mmu_invalidate_seq;
- 	smp_rmb();
- 
--	ret = __kvm_faultin_pfn(vcpu, fault);
-+	ret = __kvm_faultin_pfn(vcpu, fault,
-+				likely(fault->slot)
-+					&& kvm_slot_fault_on_absent_mapping(fault->slot));
- 	if (ret != RET_PF_CONTINUE)
- 		return ret;
- 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 3e9deab31e1c8..bc465cde7acf6 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -4433,6 +4433,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_ENABLE_CAP:
- 	case KVM_CAP_VM_DISABLE_NX_HUGE_PAGES:
- 	case KVM_CAP_MEMORY_FAULT_INFO:
-+	case KVM_CAP_ABSENT_MAPPING_FAULT:
- 		r = 1;
- 		break;
- 	case KVM_CAP_EXIT_HYPERCALL:
+ 	if (kvm_is_device_pfn(pfn)) {
+ 		/*
+@@ -1357,6 +1360,8 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 		if (kvm_vma_mte_allowed(vma)) {
+ 			sanitise_mte_tags(kvm, pfn, vma_pagesize);
+ 		} else {
++			kvm_populate_efault_info(vcpu,
++					round_down(gfn * PAGE_SIZE, vma_pagesize), vma_pagesize);
+ 			ret = -EFAULT;
+ 			goto out_unlock;
+ 		}
 -- 
 2.40.0.577.gac1e443424-goog
 
