@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 349DA6E0100
-	for <lists+kvm@lfdr.de>; Wed, 12 Apr 2023 23:35:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 986E96E0101
+	for <lists+kvm@lfdr.de>; Wed, 12 Apr 2023 23:35:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230029AbjDLVfi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 Apr 2023 17:35:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35272 "EHLO
+        id S230112AbjDLVfj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 Apr 2023 17:35:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35142 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230017AbjDLVf3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 Apr 2023 17:35:29 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BCE037ABC
-        for <kvm@vger.kernel.org>; Wed, 12 Apr 2023 14:35:27 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id 184-20020a2515c1000000b009419f64f6afso13842887ybv.2
-        for <kvm@vger.kernel.org>; Wed, 12 Apr 2023 14:35:27 -0700 (PDT)
+        with ESMTP id S229994AbjDLVfa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 12 Apr 2023 17:35:30 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D3338685
+        for <kvm@vger.kernel.org>; Wed, 12 Apr 2023 14:35:28 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id l124-20020a252582000000b00b8f5572bcdaso526809ybl.13
+        for <kvm@vger.kernel.org>; Wed, 12 Apr 2023 14:35:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20221208; t=1681335327; x=1683927327;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=y3j9qgUxhtl7kPmvN8p0uLV24AtP48c1UXcpkvJrSL4=;
-        b=znOhPv9b3IaUt2OaMla7s/u7LvnQoRk71ovHLPBcB8TaKOJZW4sc0PrZ/iCJOA3dpf
-         tOqbawMve8/s5KX/HdPG1vEStSOt72Kmw4r6I2CRzt7aTV/loRc9v7u5y8AVoh1knwY0
-         v5sr8nQ1FxhezlnNZBhcPhVGpylmLUDVNSAM6t0u+jRxkU2Qg/s3CPvYEq2oX8PLWAtn
-         tbkqa47HvyfkWxPETB5zM2l4G6tE6nbgMjc7G1eq5ig+UgsglZAiNB7MUcWCOP8OGif5
-         IfWnPeuEFjIxy8esEjfZTnnBq4y3XPxCzKgnWXWNH8KBXL9L5a1ZJgPd6rgKBK0JIMGp
-         6Blw==
+        bh=dhrsBiTuRjQtjQ4EZddQuAWvN8rC8eA79u9jMPngMl0=;
+        b=pzM8+7lUWwg1ctdt2epdb63FhOV76MRpYAvlOaDzO4lPffbgXGSciySvkTLGMABUo5
+         4Ix+ciTJNGaKEFiCj5wXKtvT6Ld76sG3TFtk+fxp7YvW4cU6b8MuIBAUCI0slkvN9HyC
+         qoL691NessVKP39louyP6+8hEG1m2ZzP+9/pg4vgCFSv8hrSWHLtxWIezGImYBdrqoeE
+         9ouBzPUcFw3az2ZP6o+SHnsVaHJjjShgRZVyCZvErV2v6Q143Z73O9BGkTpxm5DHKKlt
+         ehC4CUaXrwW+RId5xZYKrp13x89+m+8HIZn1FgRcIsaIYjOODmDqahB9EnxcEdndyFLJ
+         F8HA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20221208; t=1681335327; x=1683927327;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=y3j9qgUxhtl7kPmvN8p0uLV24AtP48c1UXcpkvJrSL4=;
-        b=dFhM9/ivuF5iH9qP/IHuuvwFj2W/SstW4Sf6L6Gkf9lP3k3kKo9mKkFQbG0Psph+te
-         eimmy2+lEMWnX5EjGtDnu8JErRDYdWO3MHeE4IR9GoKbNGmWa29+aTo6yof8/LV5gAjV
-         RByZyWAvyOMd+KacnTkpEojkYJQ0HGv3GcLksCestdHA1wXXdl0QHJjMgbRnRV4mXkY0
-         Y8kUPt7fTosSkb8VMu0U6Yocl0Xv5sNuzsbV5/66iE6RGG1BWNhk2G4kOpsZB7CX+Mt1
-         9F6XmFAF0AhbS2as/zRygrqILib6I73UABZVY7Kje2pbf3KsMGk1tvbN/ZX9Tkmeslo+
-         gWhQ==
-X-Gm-Message-State: AAQBX9fRPaaCrGS53Nah2Nf0cKQbochzrw4nihUnhT1NHP+0ckaroD7c
-        qtmHYWfEB1E7SQSxXZYPrIMbfOjGVQNoVQ==
-X-Google-Smtp-Source: AKy350YMWdkMCSKq761pJsOgwQGGxFRMIrQTIZEfBjuIxIleVcBDx4zXgdOdDVSMo9Fr8whNhn/grob/2f4/dQ==
+        bh=dhrsBiTuRjQtjQ4EZddQuAWvN8rC8eA79u9jMPngMl0=;
+        b=froTyeCgGy94lLEuEbC+T6RmLihXZHwKF4WthzPuq727AUhDp4kykAhI3RUZNo3v4X
+         I6d3hfSBlsEW5DNZ3i0ULn2oTfu2QtIgu9u0ATHq5e0LkyCOHWGF0hBL80UvtcYisdB+
+         pDQ0DReA3f9zfY8NiyJH5K1SwnskHv2KB+3CbV1CO6qq53BTK6RL6UEtwWcNSNmdVNj6
+         OsFBH3wB7oDg7o37Xcusx+pYDuVKG0gpIADvS1b4hkOo5MR+9uWwbXiOBVkA38uU1VgR
+         JTrv2EAjcV+RJgF5Zp1QaTxTJFAx5cYLH11CQVuAWfNk/dF0bv807Wsv+QfV0D8bMbyw
+         KDWw==
+X-Gm-Message-State: AAQBX9dxlVS348yV26A+uh5zNseejbMPSda36sgGAuNANLhD02jKe8bp
+        +2r8Yr2ncashxtN5mKGYB5u8vt7n+GeO2w==
+X-Google-Smtp-Source: AKy350Yy9fFTdXwRu581MJp8gUoz3r22sI/d6sx2YB+r1CcqrBU9VrdlOkwBv38wUmogzZeQ3SFDc3UDjxFb+w==
 X-Received: from laogai.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:2c9])
  (user=amoorthy job=sendgmr) by 2002:a05:690c:706:b0:545:5f92:f7ee with SMTP
- id bs6-20020a05690c070600b005455f92f7eemr16230ywb.2.1681335326987; Wed, 12
- Apr 2023 14:35:26 -0700 (PDT)
-Date:   Wed, 12 Apr 2023 21:35:01 +0000
+ id bs6-20020a05690c070600b005455f92f7eemr16253ywb.2.1681335327843; Wed, 12
+ Apr 2023 14:35:27 -0700 (PDT)
+Date:   Wed, 12 Apr 2023 21:35:02 +0000
 In-Reply-To: <20230412213510.1220557-1-amoorthy@google.com>
 Mime-Version: 1.0
 References: <20230412213510.1220557-1-amoorthy@google.com>
 X-Mailer: git-send-email 2.40.0.577.gac1e443424-goog
-Message-ID: <20230412213510.1220557-14-amoorthy@google.com>
-Subject: [PATCH v3 13/22] KVM: x86: Annotate -EFAULTs from kvm_hv_get_assist_page()
+Message-ID: <20230412213510.1220557-15-amoorthy@google.com>
+Subject: [PATCH v3 14/22] KVM: x86: Annotate -EFAULTs from kvm_pv_clock_pairing()
 From:   Anish Moorthy <amoorthy@google.com>
 To:     pbonzini@redhat.com, maz@kernel.org
 Cc:     oliver.upton@linux.dev, seanjc@google.com, jthoughton@google.com,
@@ -70,42 +70,29 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 Implement KVM_CAP_MEMORY_FAULT_INFO for efaults generated by
-kvm_hv_get_assist_page().
+kvm_pv_clock_pairing().
 
 Signed-off-by: Anish Moorthy <amoorthy@google.com>
 ---
- arch/x86/kvm/hyperv.c | 14 +++++++++++---
- 1 file changed, 11 insertions(+), 3 deletions(-)
+ arch/x86/kvm/x86.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
-index b28fd020066f6..467fff271bc88 100644
---- a/arch/x86/kvm/hyperv.c
-+++ b/arch/x86/kvm/hyperv.c
-@@ -921,13 +921,21 @@ EXPORT_SYMBOL_GPL(kvm_hv_assist_page_enabled);
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 0925678e741de..3e9deab31e1c8 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -9589,8 +9589,10 @@ static int kvm_pv_clock_pairing(struct kvm_vcpu *vcpu, gpa_t paddr,
  
- int kvm_hv_get_assist_page(struct kvm_vcpu *vcpu)
- {
-+	int ret = -EFAULT;
- 	struct kvm_vcpu_hv *hv_vcpu = to_hv_vcpu(vcpu);
+ 	ret = 0;
+ 	if (kvm_write_guest(vcpu->kvm, paddr, &clock_pairing,
+-			    sizeof(struct kvm_clock_pairing)))
++						sizeof(struct kvm_clock_pairing))) {
++		kvm_populate_efault_info(vcpu, paddr, sizeof(struct kvm_clock_pairing));
+ 		ret = -KVM_EFAULT;
++	}
  
- 	if (!hv_vcpu || !kvm_hv_assist_page_enabled(vcpu))
--		return -EFAULT;
-+		goto out;
-+
-+	ret = kvm_read_guest_cached(vcpu->kvm, &vcpu->arch.pv_eoi.data,
-+								&hv_vcpu->vp_assist_page,
-+								sizeof(struct hv_vp_assist_page));
- 
--	return kvm_read_guest_cached(vcpu->kvm, &vcpu->arch.pv_eoi.data,
--				     &hv_vcpu->vp_assist_page, sizeof(struct hv_vp_assist_page));
-+out:
-+	if (ret == -EFAULT)
-+		kvm_populate_efault_info(vcpu, vcpu->arch.pv_eoi.data.gpa,
-+								 vcpu->arch.pv_eoi.data.len);
-+	return ret;
+ 	return ret;
  }
- EXPORT_SYMBOL_GPL(kvm_hv_get_assist_page);
- 
 -- 
 2.40.0.577.gac1e443424-goog
 
