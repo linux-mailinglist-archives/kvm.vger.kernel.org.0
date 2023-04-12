@@ -2,71 +2,77 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 14B8F6DFEB6
-	for <lists+kvm@lfdr.de>; Wed, 12 Apr 2023 21:27:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CB34E6DFECA
+	for <lists+kvm@lfdr.de>; Wed, 12 Apr 2023 21:37:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229895AbjDLT1O (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 Apr 2023 15:27:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55924 "EHLO
+        id S229963AbjDLThw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 Apr 2023 15:37:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58478 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229541AbjDLT1N (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 Apr 2023 15:27:13 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 548DD6181
-        for <kvm@vger.kernel.org>; Wed, 12 Apr 2023 12:26:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1681327590;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Fk7frx7Q0Hw+X3uBa4tZdHWxv64cvAvwz6sWqL8gwxc=;
-        b=MLh5aG9SpiLOBkMohI9H/LKALbugZ5xCaHuaO7JsMYXj0QkyZ0N6vkN/rrUJg6K3DO7kkZ
-        yK7qVtsDHdQob4QcU6APJ/YiCLwGWRbWmlJ/TOYBAA82Nd4tpoDBsaQZptHwXFs9s3ztvJ
-        Wg8WtGdzd0QEWrKi2m76LZVZtGjArOI=
-Received: from mail-vs1-f72.google.com (mail-vs1-f72.google.com
- [209.85.217.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-363-BOfeLgcMN3qYUUibhDlqOA-1; Wed, 12 Apr 2023 15:26:28 -0400
-X-MC-Unique: BOfeLgcMN3qYUUibhDlqOA-1
-Received: by mail-vs1-f72.google.com with SMTP id t6-20020a67d906000000b0042c91e8e2cbso729589vsj.23
-        for <kvm@vger.kernel.org>; Wed, 12 Apr 2023 12:26:28 -0700 (PDT)
+        with ESMTP id S229830AbjDLThu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 12 Apr 2023 15:37:50 -0400
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBAC5269F
+        for <kvm@vger.kernel.org>; Wed, 12 Apr 2023 12:37:49 -0700 (PDT)
+Received: by mail-pl1-x649.google.com with SMTP id m20-20020a170902c45400b001a641823abdso5121013plm.18
+        for <kvm@vger.kernel.org>; Wed, 12 Apr 2023 12:37:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1681328269; x=1683920269;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=WGPFGa6a5AyBKhKxp6OsNW9GYoSIZ4PdLtwW24G9FKo=;
+        b=MiYEWqDhRnABU3naI6gHGiNu4DYRKpHa8WFmvFxco7fq+UveqF9VTOD3pMUQoJhtY9
+         gBS+kqy6r9ZUqV3QawGdB8Z1/JwvugouPseU4SF9+JWAAIs91Y7iV1/TGGkdM+NAm/zD
+         x6CYFn0/ENR3xGwdsUiZU/VMYKxjOgk94myuDcWagH1E6zefkuKyPF+iEKis/pjAly5O
+         AL7LGiPhVMF4ulprtosfJ3xVqJc8dNZ55xB7vO1s3cJIeF0MWx5pCoeLbtbQa1wd7l6V
+         SwWym1Kd3wvEmChDkp/w07zOkZOFJxOLI7uU1BecWorn+0CmoK3YZKsHBifMW3/y1Ldb
+         zdHw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681327587; x=1683919587;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Fk7frx7Q0Hw+X3uBa4tZdHWxv64cvAvwz6sWqL8gwxc=;
-        b=GkhcWreVKSx4A69f7qPDI6Qd+38dsist7utVi2Pk90Xv0SD7OevmsxaHpKUY72/Olm
-         KB1iNPLXsfF26OfVTB6wQKsjgi2ILNwacPmlxmGNI//vkf9+46u1PXceJTboHp+dCT+L
-         HD7Cce4OmcYG/DML7MBOdeoVc3AxnvmFRMwzMOUXWy4gWXiZe0Y7M7U1r3/6HzPwTXWc
-         N2pEQhtF0fwz7uDxAk3ZKbSPF7s7kZD+GyqrAL9frE/SiTZ32tXHMwQsalpNySzeUNwp
-         3f8u9PF/ltI3LmTkJLoJ2l4wX80vxqv1u4xfIIdJI8f1p0mkmoR0DuDoNr+u4Fb5AGT+
-         qOeQ==
-X-Gm-Message-State: AAQBX9cWxQBO+W4QneZM0L06I0l9bPToJ3sIY2tmxvINZrPUaaDbNdsz
-        qFA+td/zuvQ0t2UqbYoFrsq3j5/Uz2OHhpCP9n8Q7ZHNTxOxFK3WGjBPDxCNCMMYf0sl79qe3d4
-        vRFT64TTGTe9Eb02FBY4vs/bbCxVdgvsvbCMR
-X-Received: by 2002:a67:e0da:0:b0:42c:c736:b832 with SMTP id m26-20020a67e0da000000b0042cc736b832mr30341vsl.1.1681327587681;
-        Wed, 12 Apr 2023 12:26:27 -0700 (PDT)
-X-Google-Smtp-Source: AKy350YEeq+WrR+r95DoHwR1fbJsfk2acups0RqQlqyDg7+hSNcQQACabEtfUYMknn8pnelQ+8gYoC/XGNTITKxUj1Y=
-X-Received: by 2002:a67:e0da:0:b0:42c:c736:b832 with SMTP id
- m26-20020a67e0da000000b0042cc736b832mr30334vsl.1.1681327587359; Wed, 12 Apr
- 2023 12:26:27 -0700 (PDT)
-MIME-Version: 1.0
-References: <20230328050231.3008531-1-seanjc@google.com> <20230328050231.3008531-3-seanjc@google.com>
-In-Reply-To: <20230328050231.3008531-3-seanjc@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Date:   Wed, 12 Apr 2023 21:26:16 +0200
-Message-ID: <CABgObfZQhQp3-S2HsF3dWiJykCwigAU9B_H8tf-nY6W9iDUxZg@mail.gmail.com>
-Subject: Re: [kvm-unit-tests PATCH 2/3] x86/msr: Add testcases for
- MSR_IA32_PRED_CMD and its IBPB command
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        d=1e100.net; s=20221208; t=1681328269; x=1683920269;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=WGPFGa6a5AyBKhKxp6OsNW9GYoSIZ4PdLtwW24G9FKo=;
+        b=PlvFxaAbXs6dKfstJcG/w+RYQgod6NDDlIKkowDjxsahPYJSW6aKcjrIlTIF4dRNoS
+         px6Qjpr3lCVBs7PvnPo+pKp9ek8b7MiAY6o9i60sLyV7FSGl/8zj9XVl2TxT1eZUZzWH
+         6zuZoYPmgpvcZQryFCihGIdH0baTR9uxlL1rqS26F03Og0KTQYNTdHM8UqTY7vNbJg7f
+         e1xrPxYsbBTDLne9aISZo1JsFSx0I9BQ5GsP+H5RZ0dpEuMKHYzJdxZGKaUbL1X7+7Gv
+         d/WPR2h6G8w3FoWWSDehTeSEfDQKE3gCjvCPcbItmdoC5pMPoBq9o5APj0cNPkqvFMWg
+         pIiQ==
+X-Gm-Message-State: AAQBX9fiN1e8LVPKp1D03/ja//n63LHihSd64cYQrO/7neU8Gw5HccQT
+        CxdOGRGjrd1jEvcdXEmIuYLbpgURU98=
+X-Google-Smtp-Source: AKy350ZeYSUnY3rkhOuQXtXKS+M/PQ1H/WWYcUufEfimNOsKQ0XLXzLQ/pdHOg6715P0xJONOorpoo0jx74=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a63:211d:0:b0:519:ad33:fa96 with SMTP id
+ h29-20020a63211d000000b00519ad33fa96mr2166203pgh.12.1681328269200; Wed, 12
+ Apr 2023 12:37:49 -0700 (PDT)
+Date:   Wed, 12 Apr 2023 12:37:48 -0700
+In-Reply-To: <SA1PR11MB6734897C0BC0FC7481333E29A89B9@SA1PR11MB6734.namprd11.prod.outlook.com>
+Mime-Version: 1.0
+References: <20230410081438.1750-1-xin3.li@intel.com> <20230410081438.1750-34-xin3.li@intel.com>
+ <ZDSEjhGV9D90J6Bx@google.com> <SA1PR11MB6734897C0BC0FC7481333E29A89B9@SA1PR11MB6734.namprd11.prod.outlook.com>
+Message-ID: <ZDcIjF/QnCZNkXJ8@google.com>
+Subject: Re: [PATCH v8 33/33] KVM: x86/vmx: refactor VMX_DO_EVENT_IRQOFF to
+ generate FRED stack frames
+From:   Sean Christopherson <seanjc@google.com>
+To:     Xin3 Li <xin3.li@intel.com>
+Cc:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "bp@alien8.de" <bp@alien8.de>,
+        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
+        "hpa@zytor.com" <hpa@zytor.com>,
+        "peterz@infradead.org" <peterz@infradead.org>,
+        "andrew.cooper3@citrix.com" <andrew.cooper3@citrix.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        Ravi V Shankar <ravi.v.shankar@intel.com>,
+        "jiangshanlai@gmail.com" <jiangshanlai@gmail.com>,
+        Shan Kang <shan.kang@intel.com>
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -74,85 +80,60 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 28, 2023 at 7:02=E2=80=AFAM Sean Christopherson <seanjc@google.=
-com> wrote:
->
-> Add test coverage to verify MSR_IA32_PRED_CMD is write-only, that it can
-> be written with '0' (nop command) and '1' (IBPB command) when IBPB is
-> supported by the CPU (SPEC_CTRL on Intel, IBPB on AMD), and that writing
-> any other bit (1-63) triggers a #GP due to the bits/commands being
-> reserved.
->
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
+On Wed, Apr 12, 2023, Xin3 Li wrote:
+> 
+> > And then this is equally gross.  Rather than funnel FRED+legacy into a single
+> > function only to split them back out, just route FRED into its own asm subroutine.
+> > The common bits are basically the creation/destruction of the stack frame and
+> > the CALL itself, i.e. the truly interesting bits are what's different.
+> 
+> I try to catch up with you but am still confused.
+> 
+> Because a FRED stack frame always contains an error code pushed after RIP,
+> the FRED entry code doesn't push any error code.
+> 
+> Thus I introduced a trampoline code, which is called to have the return
+> instruction address pushed first. Then the trampoline code pushes an error
+> code (0 for both IRQ and NMI) and jumps to fred_entrypoint_kernel() for NMI
+> handling or calls external_interrupt() for IRQ handling.
+> 
+> The return RIP is used to return from fred_entrypoint_kernel(), but not
+> external_interrupt().
 
-I have a machine here (run-of-the-mill Skylake Xeon Gold) where
-MSR_IA32_PRED_CMD does not fail for bits 1-63, so I am dropping that
-bit.
+...
 
-Paolo
+> > +	/*
+> > +	* A FRED stack frame has extra 16 bytes of information pushed at the
+> > +	* regular stack top compared to an IDT stack frame.
+> > +	*/
+> > +	push $0         /* Reserved by FRED, must be 0 */
+> > +	push $0         /* FRED event data, 0 for NMI and external interrupts */
+> > +	shl $32, %rax
+> > +	orq $__KERNEL_DS | $FRED_64_BIT_MODE, %ax
+> > +	push %rax	/* Vector (from the "caller") and DS */
+> > +
+> > +	push %rbp
+> > +	pushf
+> > +	push \cs_val
+> 
+> We need to push the RIP of the next instruction here. Or are you suggesting
+> we don't need to care about it because it may not be used to return from the
+> callee?
 
-> ---
->  x86/msr.c | 27 +++++++++++++++++++++++++++
->  1 file changed, 27 insertions(+)
->
-> diff --git a/x86/msr.c b/x86/msr.c
-> index 97cf5987..13cb6391 100644
-> --- a/x86/msr.c
-> +++ b/x86/msr.c
-> @@ -85,6 +85,15 @@ static void test_msr_rw(u32 msr, const char *name, uns=
-igned long long val)
->         __test_msr_rw(msr, name, val, 0);
->  }
->
-> +static void test_wrmsr(u32 msr, const char *name, unsigned long long val=
-)
-> +{
-> +       unsigned char vector =3D wrmsr_safe(msr, val);
-> +
-> +       report(!vector,
-> +              "Expected success on WRSMR(%s, 0x%llx), got vector %d",
-> +              name, val, vector);
-> +}
-> +
->  static void test_wrmsr_fault(u32 msr, const char *name, unsigned long lo=
-ng val)
->  {
->         unsigned char vector =3D wrmsr_safe(msr, val);
-> @@ -271,6 +280,23 @@ static void test_x2apic_msrs(void)
->         __test_x2apic_msrs(true);
->  }
->
-> +static void test_cmd_msrs(void)
-> +{
-> +       int i;
-> +
-> +       test_rdmsr_fault(MSR_IA32_PRED_CMD, "PRED_CMD");
-> +       if (this_cpu_has(X86_FEATURE_SPEC_CTRL) ||
-> +           this_cpu_has(X86_FEATURE_AMD_IBPB)) {
-> +               test_wrmsr(MSR_IA32_PRED_CMD, "PRED_CMD", 0);
-> +               test_wrmsr(MSR_IA32_PRED_CMD, "PRED_CMD", PRED_CMD_IBPB);
-> +       } else {
-> +               test_wrmsr_fault(MSR_IA32_PRED_CMD, "PRED_CMD", 0);
-> +               test_wrmsr_fault(MSR_IA32_PRED_CMD, "PRED_CMD", PRED_CMD_=
-IBPB);
-> +       }
-> +       for (i =3D 1; i < 64; i++)
-> +               test_wrmsr_fault(MSR_IA32_PRED_CMD, "PRED_CMD", BIT_ULL(i=
-));
-> +}
-> +
->  int main(int ac, char **av)
->  {
->         /*
-> @@ -283,6 +309,7 @@ int main(int ac, char **av)
->                 test_misc_msrs();
->                 test_mce_msrs();
->                 test_x2apic_msrs();
-> +               test_cmd_msrs();
->         }
->
->         return report_summary();
-> --
-> 2.40.0.348.gf938b09366-goog
->
+...
 
+> > +	push $0 /* FRED error code, 0 for NMI and external interrupts */
+> > +	PUSH_REGS
+> > +
+> > +	/* Load @pt_regs */
+> > +	movq    %rsp, %_ASM_ARG1
+> > +
+> > +	call \call_target
+
+The CALL here would push RIP, I missed/forgot the detail that the error code needs
+to be pushed _after_ RIP, not before.
+
+Unless CET complains, there's no need for a trampoline, just LEA+PUSH the return
+RIP, PUSH the error code, and JMP to the handler.  IMO, that isn't any weirder than
+a trampoline, and it's a bit more obviously weird, e.g. the LEA+PUSH can have a nice
+big comment.
