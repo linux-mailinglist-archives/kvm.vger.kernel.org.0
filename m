@@ -2,90 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7A6916E1628
-	for <lists+kvm@lfdr.de>; Thu, 13 Apr 2023 22:55:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 22F036E162C
+	for <lists+kvm@lfdr.de>; Thu, 13 Apr 2023 22:58:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230177AbjDMUzv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Apr 2023 16:55:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41410 "EHLO
+        id S230161AbjDMU6g (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Apr 2023 16:58:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42384 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230167AbjDMUzt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 13 Apr 2023 16:55:49 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8AC87ED8
-        for <kvm@vger.kernel.org>; Thu, 13 Apr 2023 13:55:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1681419303;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:in-reply-to:in-reply-to:  references:references;
-        bh=qyFTmv8B9Q2ZebQ5VyUiyE3lYybh2qt9vq9LjX5mk08=;
-        b=Pddnnb2uXx2l8BiOqizChOwsFh1t+hRd0Y0ycDFK8UrKXjQ/OfLjcuH2E1nJS+oDE1i+wU
-        2pxen4OVlRkLoNUpX3chxctTJE+GpWwvDIKS7Z5K0o2ufzQ0Z8aJt5F5KhQN6YrnB6xpYd
-        AJ2Hx/VZZh85iJHaGwcveh4JX9681f8=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-480-vB-hWoWkNUGvxInCOodIsw-1; Thu, 13 Apr 2023 16:55:01 -0400
-X-MC-Unique: vB-hWoWkNUGvxInCOodIsw-1
-Received: by mail-wm1-f72.google.com with SMTP id w16-20020a05600c475000b003f082eecdcaso6093471wmo.6
-        for <kvm@vger.kernel.org>; Thu, 13 Apr 2023 13:55:01 -0700 (PDT)
+        with ESMTP id S229676AbjDMU6e (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 13 Apr 2023 16:58:34 -0400
+Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BB9C8697
+        for <kvm@vger.kernel.org>; Thu, 13 Apr 2023 13:58:34 -0700 (PDT)
+Received: by mail-pf1-x44a.google.com with SMTP id d2e1a72fcca58-63779b48340so1214096b3a.3
+        for <kvm@vger.kernel.org>; Thu, 13 Apr 2023 13:58:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1681419513; x=1684011513;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=nEv2HVs1S+Egpav/jnzfzsQjcllfLnLuCFh+OUzwj8A=;
+        b=N/NxeDGiy0A3sp3zsLS3ONiWVymFkZsvGZW/ifZ+0iNpy4Cnu0yvtFO/vEmGTqLWiH
+         KXoYXslYuFxGsyEH33NwF0ERBM0GsmdjykR3Dc67bRTjpbFQ6HEMvFLZiBlBl5vRR2up
+         +3M0y1sLKYIO3HqKiayhyGXRcqPTcmkSVYAJBXoefUccwC7wXAkJ7K/acVdWDJF/zSZE
+         Ws36H1mGkrL56HIgJFH9kyVJunsDFoGM4WLNHVehJERDrCAYFDw4/1tidyOx0ddiMGCT
+         1M62BnNL7CUWlD6K+tKPpRpxO8IEQ/EADHzLI4PjUt2cbDJunv4i411h+dc9f9uqIlsy
+         KO1Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681419300; x=1684011300;
-        h=mime-version:message-id:date:reply-to:user-agent:references
-         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=qyFTmv8B9Q2ZebQ5VyUiyE3lYybh2qt9vq9LjX5mk08=;
-        b=Jg1alsJ5kS0YU2y1cez6BwsvszwGh5dhRkm0Pt+FM40oC2XzJcjkCH9HCZpO/dWfAU
-         +AElMr98ePd2yjn2bO3WtcJp+aKLNQEQLAr/wivmsA4aJKumpdsMS1B6WYs2m1Xy0UvQ
-         Oj+VotIAW8OBs6slY/MsNjwAfaI6pPK/2TU2zMmOySJqPW+SJwaYINHuubQrCXEt7/L4
-         7mx6pINoBO0g1ME5a498aLsaf7BBJrI+I+2qeIM/tgX2z3yk05QzJe9otGdi8hz6XClY
-         5i+RT2adIvItfvfjiLE1/3wyYYCw/b/0jJ4nHPBNlld10EaCJh9c2ZyqJdUR93XsOPPC
-         dROA==
-X-Gm-Message-State: AAQBX9djS/ciMMJl5lsCQwo5ees6YT/MsVRrTbiFUx1GD3hJuc7P7rnr
-        lj8f0p0CxCZgWkbqTZDQhYYRDu2P13TiBFlmfsEb2VCIBv5zhKlPdhmnsIUfu7A514PSq0xk/85
-        +640rs3Ozz+AN
-X-Received: by 2002:a1c:cc05:0:b0:3ef:d8c6:4bc0 with SMTP id h5-20020a1ccc05000000b003efd8c64bc0mr2699317wmb.40.1681419300318;
-        Thu, 13 Apr 2023 13:55:00 -0700 (PDT)
-X-Google-Smtp-Source: AKy350Zo143EWZNQSrlA5zw2mZ1NxT1Cye6rNp2MzadTtPGAPSIW66kV+mrpkv/u1nWRc+xOpHIqKQ==
-X-Received: by 2002:a1c:cc05:0:b0:3ef:d8c6:4bc0 with SMTP id h5-20020a1ccc05000000b003efd8c64bc0mr2699281wmb.40.1681419300048;
-        Thu, 13 Apr 2023 13:55:00 -0700 (PDT)
-Received: from redhat.com (static-214-39-62-95.ipcom.comunitel.net. [95.62.39.214])
-        by smtp.gmail.com with ESMTPSA id v3-20020a1cf703000000b003f04646838esm2707316wmh.39.2023.04.13.13.54.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 13 Apr 2023 13:54:59 -0700 (PDT)
-From:   Juan Quintela <quintela@redhat.com>
-To:     afaerber@suse.de, juan.quintela@gmail.com
-Cc:     ale@rev.ng, anjo@rev.ng, bazulay@redhat.com, bbauman@redhat.com,
-        chao.p.peng@linux.intel.com, cjia@nvidia.com, cw@f00f.org,
-        david.edmondson@oracle.com, Eric Northup <digitaleric@google.com>,
-        dustin.kirkland@canonical.com, eblake@redhat.com,
-        edgar.iglesias@gmail.com, elena.ufimtseva@oracle.com,
-        eric.auger@redhat.com, f4bug@amsat.org,
-        Felipe Franciosi <felipe.franciosi@nutanix.com>,
-        "iggy@theiggy.com" <iggy@kws1.com>, Warner Losh <wlosh@bsdimp.com>,
-        jan.kiszka@web.de, jgg@nvidia.com, jidong.xiao@gmail.com,
-        jjherne@linux.vnet.ibm.com, joao.m.martins@oracle.com,
-        konrad.wilk@oracle.com, kvm@vger.kernel.org,
-        mburton@qti.qualcomm.com, mdean@redhat.com,
-        mimu@linux.vnet.ibm.com, peter.maydell@linaro.org,
-        qemu-devel@nongnu.org, richard.henderson@linaro.org,
-        shameerali.kolothum.thodi@huawei.com, stefanha@gmail.com,
-        wei.w.wang@intel.com, z.huo@139.com, zwu.kernel@gmail.com
-Subject: Re: QEMU developers fortnightly conference call for agenda for
- 2023-04-18
-In-Reply-To: <calendar-8e6a5123-9421-4146-9451-985bdc6a55b9@google.com> (juan
-        quintela's message of "Thu, 13 Apr 2023 20:52:45 +0000")
-References: <calendar-8e6a5123-9421-4146-9451-985bdc6a55b9@google.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
-Reply-To: quintela@redhat.com
-Date:   Thu, 13 Apr 2023 22:54:58 +0200
-Message-ID: <87r0sn8pul.fsf@secure.mitica>
-MIME-Version: 1.0
-Content-Type: text/plain
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        d=1e100.net; s=20221208; t=1681419513; x=1684011513;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=nEv2HVs1S+Egpav/jnzfzsQjcllfLnLuCFh+OUzwj8A=;
+        b=RN+A/ysu0jBwKjLFcMmU1357WcrdpBnvfHT0XhmUtosgzfh541TAWXg7cOTtu7d3Q0
+         V+1j9+pL3tZcesBYd3Qxvv0/ruskEg6Kmd6KL5sKfXSHrMVd7uUAMyM3Nj2AuRahpFoj
+         75cpEljTWqROmFpnWPxMc7bS+x7IMMv0gVMuKJ1js/+f+K2rs5MZypw8k4g1Uy6GbaqD
+         XJAcGEGKwbc7LCMCDEJl5TNANX928NOyPlP78V9+UZD1PMl+ABg5E824eYmlPiKcEsva
+         8Kkh71urRbLHkYgcnxTGLZrvu2Sy95xqaDyD7L/rRsKzNOILnmcK7XPG4m+gbTpuG0gw
+         cpHg==
+X-Gm-Message-State: AAQBX9cQTyFtLb8ukm+Vpgjxau1lERbsK6AuhsQh6kHiVaUHP+x+V2sT
+        Q0SVuL7rtjr2Qq/E0ceuqAlQxqYvxUo=
+X-Google-Smtp-Source: AKy350bSXma0H87PRt68CUCJhjZ6Fcq2Rn85m8fx/BXyeVGSzmlgqoQTUIRypWDhyXYiGsOUwAoC45uhcEQ=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:2d25:b0:62e:1972:fab5 with SMTP id
+ fa37-20020a056a002d2500b0062e1972fab5mr1835355pfb.4.1681419513538; Thu, 13
+ Apr 2023 13:58:33 -0700 (PDT)
+Date:   Thu, 13 Apr 2023 13:58:32 -0700
+In-Reply-To: <CALzav=dv2MhoZ1BLqJWmmJv=H6vRaRUEcAJPydjrzJf1wdYEOA@mail.gmail.com>
+Mime-Version: 1.0
+References: <20230227171751.1211786-1-jpiotrowski@linux.microsoft.com>
+ <ZAd2MRNLw1JAXmOf@google.com> <959c5bce-beb5-b463-7158-33fc4a4f910c@linux.microsoft.com>
+ <ZDSa9Bbqvh0btgQo@google.com> <ecd3d8de-859b-e5dd-c3bf-ea9c3c0aac60@linux.microsoft.com>
+ <ZDWEgXM/UILjPGiG@google.com> <61d131da-7239-6aae-753f-2eb4f1b84c24@linux.microsoft.com>
+ <ZDg6w+1v4e/uRDfF@google.com> <ZDhTeIXRdcXDaD54@google.com> <CALzav=dv2MhoZ1BLqJWmmJv=H6vRaRUEcAJPydjrzJf1wdYEOA@mail.gmail.com>
+Message-ID: <ZDhs+AnytF030DYe@google.com>
+Subject: Re: [PATCH] KVM: SVM: Disable TDP MMU when running on Hyper-V
+From:   Sean Christopherson <seanjc@google.com>
+To:     David Matlack <dmatlack@google.com>
+Cc:     Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Tianyu Lan <ltykernel@gmail.com>,
+        Michael Kelley <mikelley@microsoft.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -93,31 +77,85 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Thu, Apr 13, 2023, David Matlack wrote:
+> On Thu, Apr 13, 2023 at 12:10=E2=80=AFPM Sean Christopherson <seanjc@goog=
+le.com> wrote:
+> >
+> > On Thu, Apr 13, 2023, Sean Christopherson wrote:
+> > > Aha!  Idea.  There are _at most_ 4 possible roots the TDP MMU can enc=
+ounter.
+> > > 4-level non-SMM, 4-level SMM, 5-level non-SMM, and 5-level SMM.  I.e.=
+ not keeping
+> > > inactive roots on a per-VM basis is just monumentally stupid.
+> >
+> > One correction: there are 6 possible roots:
+> >
+> >   1. 4-level !SMM !guest_mode (i.e. not nested)
+> >   2. 4-level SMM !guest_mode
+> >   3. 5-level !SMM !guest_mode
+> >   4. 5-level SMM !guest_mode
+> >   5. 4-level !SMM guest_mode
+> >   6. 5-level !SMM guest_mode
+> >
+> > I forgot that KVM still uses the TDP MMU when running L2 if L1 doesn't =
+enable
+> > EPT/TDP, i.e. if L1 is using shadow paging for L2.  But that really doe=
+sn't change
+> > anything as each vCPU can already track 4 roots, i.e. userspace can sat=
+urate all
+> > 6 roots anyways.  And in practice, no sane VMM will create a VM with bo=
+th 4-level
+> > and 5-level roots (KVM keys off of guest.MAXPHYADDR for the TDP root le=
+vel).
+>=20
+> Why do we create a new root for guest_mode=3D1 if L1 disables EPT/NPT?
 
-Hi
+Because "private", a.k.a. KVM-internal, memslots are visible to L1 but not =
+L2.
+Which for TDP means the APIC-access page.  From commit 3a2936dedd20:
 
-Please, send any topic that you are interested in covering.
+    kvm: mmu: Don't expose private memslots to L2
+   =20
+    These private pages have special purposes in the virtualization of L1,
+    but not in the virtualization of L2. In particular, L1's APIC access
+    page should never be entered into L2's page tables, because this
+    causes a great deal of confusion when the APIC virtualization hardware
+    is being used to accelerate L2's accesses to its own APIC.
 
-[google calendar is very, very bad to compose messages, but getting
-everybody cc'd is very complicated otherwise]
+FWIW, I _think_ KVM could actually let L2 access the APIC-access page when =
+L1 is
+running without any APIC virtualization, i.e. when L1 is passing its APIC t=
+hrough
+to L2.  E.g. something like the below, but I ain't touching that with a 10 =
+foot pole
+unless someone explicitly asks for it :-)
+
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 039fb16560a0..8aa12f5f2c30 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -4370,10 +4370,13 @@ static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu,=
+ struct kvm_page_fault *fault
+        if (!kvm_is_visible_memslot(slot)) {
+                /* Don't expose private memslots to L2. */
+                if (is_guest_mode(vcpu)) {
+-                       fault->slot =3D NULL;
+-                       fault->pfn =3D KVM_PFN_NOSLOT;
+-                       fault->map_writable =3D false;
+-                       return RET_PF_CONTINUE;
++                       if (!slot || slot->id !=3D APIC_ACCESS_PAGE_PRIVATE=
+_MEMSLOT ||
++                           nested_cpu_has_virtual_apic(vcpu)) {
++                               fault->slot =3D NULL;
++                               fault->pfn =3D KVM_PFN_NOSLOT;
++                               fault->map_writable =3D false;
++                               return RET_PF_CONTINUE;
++                           }
+                }
+                /*
+                 * If the APIC access page exists but is disabled, go direc=
+tly
 
 
-At the end of Monday I will send an email with the agenda or the
-cancellation of the call, so hurry up.
 
-After discussions on the QEMU Summit, we are going to have always open a
-QEMU call where you can add topics.
-
- Call details:
-
-By popular demand, a google calendar public entry with it
-
-  https://calendar.google.com/calendar/event?action=TEMPLATE&tmeid=NWR0NWppODdqNXFyYzAwbzYza3RxN2dob3VfMjAyMjEwMThUMTMwMDAwWiBlZ2VkN2NraTA1bG11MXRuZ3ZrbDN0aGlkc0Bn&tmsrc=eged7cki05lmu1tngvkl3thids%40group.calendar.google.com&scp=ALL
-
-(Let me know if you have any problems with the calendar entry.  I just
-gave up about getting right at the same time CEST, CET, EDT and DST).
-
-If you want to be added to the invite, let me know.
-
-Thanks, Juan.
 
