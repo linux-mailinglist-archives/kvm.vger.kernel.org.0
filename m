@@ -2,60 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A438C6E1461
-	for <lists+kvm@lfdr.de>; Thu, 13 Apr 2023 20:43:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 19FD16E1463
+	for <lists+kvm@lfdr.de>; Thu, 13 Apr 2023 20:43:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230115AbjDMSnQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Apr 2023 14:43:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32960 "EHLO
+        id S230172AbjDMSnT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Apr 2023 14:43:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32806 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230017AbjDMSnG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 13 Apr 2023 14:43:06 -0400
-Received: from mail-wr1-x436.google.com (mail-wr1-x436.google.com [IPv6:2a00:1450:4864:20::436])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BCE419029
-        for <kvm@vger.kernel.org>; Thu, 13 Apr 2023 11:42:42 -0700 (PDT)
-Received: by mail-wr1-x436.google.com with SMTP id e7so5083644wrc.12
-        for <kvm@vger.kernel.org>; Thu, 13 Apr 2023 11:42:42 -0700 (PDT)
+        with ESMTP id S230031AbjDMSnJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 13 Apr 2023 14:43:09 -0400
+Received: from mail-wr1-x429.google.com (mail-wr1-x429.google.com [IPv6:2a00:1450:4864:20::429])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C1CC83F5
+        for <kvm@vger.kernel.org>; Thu, 13 Apr 2023 11:42:43 -0700 (PDT)
+Received: by mail-wr1-x429.google.com with SMTP id s12so6687800wrb.1
+        for <kvm@vger.kernel.org>; Thu, 13 Apr 2023 11:42:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=grsecurity.net; s=grsec; t=1681411361; x=1684003361;
+        d=grsecurity.net; s=grsec; t=1681411362; x=1684003362;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=WbrPT/N7Surh1jkNSimNnuJgTuWjitARPKRftYu1iuE=;
-        b=VzaX3qjaz8tstpMvEBOWnMi9YMB8Ye413hyy1XgtsT/2md4d8Dlho4NnWjtJCdU+qa
-         1yLb2N5bxVqlE45dInyGkui9toH9XjhbR3L+dXeP9CtoddJXHz8IJUjtcr/PKLcIXd4/
-         YbamCWT9O3sbwzbjFPPEr9p0ZpupZbkslF069qek7pHuA2cmkkR5VcPoRiEZ7pvE3K1E
-         T2Dc8jfe9UgOqm64H5wnzhTBijcSBfRetpzqzegoPB29YPy1pJtlQqCgCODQ3vTvYB5T
-         x7NJTc4iINK1InhXbCPu8SPtO5JCOlcnOJCcKPglk1kant2ncs4V0VPSLg98i0YPJctx
-         Ufcw==
+        bh=a1ne7VVT4agLFjOnm1Owk3nY9/vLSYqIcSHVXPl3cSM=;
+        b=d3A7u3S8OrvxRtioAoHkP9p9cXs/jojcn5m5j9ntlB9U4GN7RTuTjR6bvyXCDzRT1q
+         YanXVnOo9+UQfV6+FtwB1MgPSuBB3Mo+wKeQkNgaNBWVm7G05FB4/T78vzsqBZ8QJFmC
+         zGj+vl7l4bpxiMuOUt2QJ4S/KzjlJhZPlwXniGyAs1R4jQpBBAH1Hw4gPePYDGpG050p
+         iPh75xGqA0X9X3MRsr9QTUHPf8sygN/JzUcotFxfvqi+heU2nM+LicRlTRUfT/xJvMKf
+         fU+9aXMG1vlIlZjRt99O7fS5R4QoL40iRDJfwJuZuYZBEJbaOLWGGBaTttQPAcFj+F3j
+         au2Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681411361; x=1684003361;
+        d=1e100.net; s=20221208; t=1681411362; x=1684003362;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=WbrPT/N7Surh1jkNSimNnuJgTuWjitARPKRftYu1iuE=;
-        b=FHizQWaZJRLu5P2H77g+92gyiBfMAY8ArrMDZXjguLcyumr/9wxdYShBgpQt2gc8MR
-         l/sg/XsbYHbanYK5pyU9G3nHnrStuBAG5xEhQ7spBsSlR0vbpINGym5LHSo+fZCPkjfM
-         1rs6KRmmz6rpeXFlaG697Pmp4dCp/OIvBF0sEhT7EJNiJT9lhwNbCYpLaOyyQ/DfeAIz
-         +8zTjjoS2xF3ZwUQ0D1r1vNPexIkXx0NQmvErEGTAsGtP1XaoeVYEv9c8vhHKllEXCpf
-         0rZVYiCyYMKd7rKY1Xu4Cszkk+4ef65cz/6yMG56l/XEG95Ua21UtdYTxZbJHogXEiq2
-         vesA==
-X-Gm-Message-State: AAQBX9fyTiIfygdQOMlcPIimeo4nFKDntlAwXUR9xGK1+JlD5Wb6vNZF
-        VBEDzK2Do6fxkOxpyFSWNmUvsA==
-X-Google-Smtp-Source: AKy350b8DGOwzexJ00EeAUX3M/0Yxv+Vz0gZth1tZmp7wUCvniQ/lLJRnxEEvIY1R+cqpw5d/NlMKg==
-X-Received: by 2002:adf:ef05:0:b0:2c3:e7d8:245c with SMTP id e5-20020adfef05000000b002c3e7d8245cmr2605773wro.13.1681411361334;
-        Thu, 13 Apr 2023 11:42:41 -0700 (PDT)
+        bh=a1ne7VVT4agLFjOnm1Owk3nY9/vLSYqIcSHVXPl3cSM=;
+        b=Tn7BPG7VWcEO2xU0OG4vWoW8ubLDyH+pjkhgrzE02qMqMYydWlYcZIzSb3zTfXhUvg
+         cWPzXj0Jo+LWBU6UCwJhdl2pTbE68m1R5GCKBnCzZe6UwVyys2hpbP2gCLcWEN56UyCY
+         Qm9rIH/QRprsP/kBOrB2McrdiMtb0xA5ktMPNjCg4meHPcbGMulRUDRWM4JaGo2F1lII
+         pM4Rb+P0Xlq6bfUTYIFtNViVsY1VcrhuNjoB7ONpHlawVh5RIQ0z6UPnrhaZGgrPsXs+
+         mT2Ivv1gFn112OIGnxR8v9aNMZ7+ShhT6QCF4iktbjnOkHvZu1O/OYE2blTvhFAMvttj
+         fcoQ==
+X-Gm-Message-State: AAQBX9cE/3Yj4SweRLv6WltL0U/LqUGZ+1xLrYj5BgyVYxSwy7BivdlD
+        asor/lUDm0xzDT6NY5vhOCYtgA==
+X-Google-Smtp-Source: AKy350YGiq2e/11hdnVQ/NAURvYhzy/uQ31HZlUfoNCvse4DWwfAut9zaXr2t7+zSqRbCaTtb4XiSA==
+X-Received: by 2002:adf:f388:0:b0:2d6:d05a:1fe0 with SMTP id m8-20020adff388000000b002d6d05a1fe0mr2325978wro.64.1681411362056;
+        Thu, 13 Apr 2023 11:42:42 -0700 (PDT)
 Received: from nuc.fritz.box (p200300f6af154800ce0bb7f104d5fcf7.dip0.t-ipconnect.de. [2003:f6:af15:4800:ce0b:b7f1:4d5:fcf7])
-        by smtp.gmail.com with ESMTPSA id x15-20020a5d6b4f000000b002c8476dde7asm1812652wrw.114.2023.04.13.11.42.40
+        by smtp.gmail.com with ESMTPSA id x15-20020a5d6b4f000000b002c8476dde7asm1812652wrw.114.2023.04.13.11.42.41
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Thu, 13 Apr 2023 11:42:41 -0700 (PDT)
 From:   Mathias Krause <minipli@grsecurity.net>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org
 Cc:     Mathias Krause <minipli@grsecurity.net>
-Subject: [kvm-unit-tests PATCH v2 07/16] x86/run_in_user: Preserve exception handler
-Date:   Thu, 13 Apr 2023 20:42:10 +0200
-Message-Id: <20230413184219.36404-8-minipli@grsecurity.net>
+Subject: [kvm-unit-tests PATCH v2 08/16] x86/run_in_user: Relax register constraints of inline asm
+Date:   Thu, 13 Apr 2023 20:42:11 +0200
+Message-Id: <20230413184219.36404-9-minipli@grsecurity.net>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230413184219.36404-1-minipli@grsecurity.net>
 References: <20230413184219.36404-1-minipli@grsecurity.net>
@@ -71,56 +71,82 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-run_in_user() replaces the exception handler for the expected fault
-vector to ensure the code can properly return back to kernel mode in
-case of such exceptions. However, it leaves the exception handler in
-place which may confuse later test code triggering the same exception
-without installing a handler first.
+The code doesn't clobber all the registers it states it would. It
+explicitly preserves the values of rcx, rdi and rsi. With a minor code
+change rdx can be preserved as well. The code does, however, needlessly
+save and restore rbx around the function call.
 
-Fix this be restoring the previous exception handler. Running the
-longjmp() handler out of context will lead to no good.
-
-We now also need to make 'rax' volatile to avoid a related compiler
-warning.
+Change the code to not clobber rdx and drop all the register clobbers
+from the asm constraints, as these registers are, in fact, preserved.
+The function call either returns without throwing an exception (and
+restoring all call clobbered registers itself) or via longjmp() (doing
+the same, basically, but with special handling in the compiler as well).
 
 Signed-off-by: Mathias Krause <minipli@grsecurity.net>
 ---
- lib/x86/usermode.c | 10 +++++++---
- 1 file changed, 7 insertions(+), 3 deletions(-)
+ lib/x86/usermode.c | 20 ++++++++------------
+ 1 file changed, 8 insertions(+), 12 deletions(-)
 
 diff --git a/lib/x86/usermode.c b/lib/x86/usermode.c
-index b976123ca753..10fcea288a62 100644
+index 10fcea288a62..fd19551a7a2d 100644
 --- a/lib/x86/usermode.c
 +++ b/lib/x86/usermode.c
-@@ -36,15 +36,17 @@ uint64_t run_in_user(usermode_func func, unsigned int fault_vector,
- 		uint64_t arg4, bool *raised_vector)
- {
- 	extern char ret_to_kernel[];
--	uint64_t rax = 0;
-+	volatile uint64_t rax = 0;
- 	static unsigned char user_stack[USERMODE_STACK_SIZE];
-+	handler old_ex;
+@@ -63,21 +63,20 @@ uint64_t run_in_user(usermode_func func, unsigned int fault_vector,
+ 			"pushq %[user_stack_top]\n\t"
+ 			"pushfq\n\t"
+ 			"pushq %[user_cs]\n\t"
+-			"lea user_mode(%%rip), %%rdx\n\t"
+-			"pushq %%rdx\n\t"
++			"lea user_mode(%%rip), %%rax\n\t"
++			"pushq %%rax\n\t"
+ 			"iretq\n"
  
- 	*raised_vector = 0;
- 	set_idt_entry(RET_TO_KERNEL_IRQ, ret_to_kernel, 3);
--	handle_exception(fault_vector,
--			restore_exec_to_jmpbuf_exception_handler);
-+	old_ex = handle_exception(fault_vector,
-+				  restore_exec_to_jmpbuf_exception_handler);
+ 			"user_mode:\n\t"
+-			/* Back up registers before invoking func */
+-			"push %%rbx\n\t"
++			/* Back up volatile registers before invoking func */
+ 			"push %%rcx\n\t"
+ 			"push %%rdx\n\t"
++			"push %%rdi\n\t"
++			"push %%rsi\n\t"
+ 			"push %%r8\n\t"
+ 			"push %%r9\n\t"
+ 			"push %%r10\n\t"
+ 			"push %%r11\n\t"
+-			"push %%rdi\n\t"
+-			"push %%rsi\n\t"
+ 			/* Call user mode function */
+ 			"mov %[arg1], %%rdi\n\t"
+ 			"mov %[arg2], %%rsi\n\t"
+@@ -85,15 +84,14 @@ uint64_t run_in_user(usermode_func func, unsigned int fault_vector,
+ 			"mov %[arg4], %%rcx\n\t"
+ 			"call *%[func]\n\t"
+ 			/* Restore registers */
+-			"pop %%rsi\n\t"
+-			"pop %%rdi\n\t"
+ 			"pop %%r11\n\t"
+ 			"pop %%r10\n\t"
+ 			"pop %%r9\n\t"
+ 			"pop %%r8\n\t"
++			"pop %%rsi\n\t"
++			"pop %%rdi\n\t"
+ 			"pop %%rdx\n\t"
+ 			"pop %%rcx\n\t"
+-			"pop %%rbx\n\t"
+ 			/* Return to kernel via system call */
+ 			"int %[kernel_entry_vector]\n\t"
+ 			/* Kernel Mode */
+@@ -112,9 +110,7 @@ uint64_t run_in_user(usermode_func func, unsigned int fault_vector,
+ 			[user_cs]"i"(USER_CS),
+ 			[user_stack_top]"r"(user_stack +
+ 					sizeof(user_stack)),
+-			[kernel_entry_vector]"i"(RET_TO_KERNEL_IRQ)
+-			:
+-			"rsi", "rdi", "rcx", "rdx");
++			[kernel_entry_vector]"i"(RET_TO_KERNEL_IRQ));
  
- 	if (setjmp(jmpbuf) != 0) {
-+		handle_exception(fault_vector, old_ex);
- 		*raised_vector = 1;
- 		return 0;
- 	}
-@@ -114,5 +116,7 @@ uint64_t run_in_user(usermode_func func, unsigned int fault_vector,
- 			:
- 			"rsi", "rdi", "rcx", "rdx");
+ 	handle_exception(fault_vector, old_ex);
  
-+	handle_exception(fault_vector, old_ex);
-+
- 	return rax;
- }
 -- 
 2.39.2
 
