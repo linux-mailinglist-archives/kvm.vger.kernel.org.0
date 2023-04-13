@@ -2,110 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C773F6E13E4
-	for <lists+kvm@lfdr.de>; Thu, 13 Apr 2023 20:08:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3E2FE6E145A
+	for <lists+kvm@lfdr.de>; Thu, 13 Apr 2023 20:43:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229917AbjDMSII (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Apr 2023 14:08:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43106 "EHLO
+        id S229996AbjDMSnC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Apr 2023 14:43:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60964 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229498AbjDMSIG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 13 Apr 2023 14:08:06 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 19AE530DA
-        for <kvm@vger.kernel.org>; Thu, 13 Apr 2023 11:07:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1681409237;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=IOA7GIourt4XlsCYYtkutlqTOJFvaYitvC0BAJCLNRU=;
-        b=Sdk/ORLwJ+JKUP9ok4oUPwp73qLmdLaXmdRAhGLe/Kob52pKteViL1HdFEmYRkIJxXlHkD
-        o9QeyvhPjwLSJO4ucWrz9t0sHkAPKxfvQUz2bcWS5PHgFULnCVGLgYF/6xqiqjG+mwmxz/
-        fqxEFhOaHXU+9WTrQSEuuIwZnXcIZxs=
-Received: from mail-il1-f200.google.com (mail-il1-f200.google.com
- [209.85.166.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-74-yoS8VwkqO5OyACkkYfTBiA-1; Thu, 13 Apr 2023 14:07:15 -0400
-X-MC-Unique: yoS8VwkqO5OyACkkYfTBiA-1
-Received: by mail-il1-f200.google.com with SMTP id i25-20020a056e021d1900b00316f1737173so9819965ila.16
-        for <kvm@vger.kernel.org>; Thu, 13 Apr 2023 11:07:15 -0700 (PDT)
+        with ESMTP id S229950AbjDMSm7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 13 Apr 2023 14:42:59 -0400
+Received: from mail-wm1-x32c.google.com (mail-wm1-x32c.google.com [IPv6:2a00:1450:4864:20::32c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00CF07EC5
+        for <kvm@vger.kernel.org>; Thu, 13 Apr 2023 11:42:36 -0700 (PDT)
+Received: by mail-wm1-x32c.google.com with SMTP id v20-20020a05600c471400b003ed8826253aso4194538wmo.0
+        for <kvm@vger.kernel.org>; Thu, 13 Apr 2023 11:42:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=grsecurity.net; s=grsec; t=1681411355; x=1684003355;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=9ouIXXzXkR9iKq5GS3MVc2uoUw4kzcTau4LjDKoSPTA=;
+        b=XQk6FDaXTuaLwl7BoDKn4nRtUXfgflZSFgiR/MifCxnNQOvl/c7C4099BTaLwyjCiC
+         B+wEa50+0tm5Kttz2PXQunB/rOelf41lnELASyVmNZn8AUqBG8ZJSSDijxRk/wJQ+Y+j
+         1ZuBbObbAtT06g0Pbqon3eIVpTujin/WUAEGcnUMjj5BMb64Rx5XTcng0Rwf5KODReYZ
+         R+aWkYUe7QfCpzLSEfjXzY7ska8w4XtoEjyoXXVDO+Lhq1vhNwOSgM1s+POavwwAu2Sy
+         2XiB2K0OcS1fS9z6ivsBB5jogL658HRbK2n8btlGk7HSNxB9hYlYjcMqQHaw00K3BK8Z
+         KGLg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681409235; x=1684001235;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=IOA7GIourt4XlsCYYtkutlqTOJFvaYitvC0BAJCLNRU=;
-        b=B8307/PiCva8eYyaQ3OuaVcflfj0GPMPWf1gqRIjMd7fJb9Zh8Hlr2YbEEckbIwT1+
-         Ug+WFCx/BaQ2c/KrxVd/MVhAfRLUvAzn6nSCopYSGyZAFyZ4ZlyrDxcgsaQ2gvUZxMbr
-         K174nwLOq7n88I3II9Guk7G+xjM2LXweoN33INjOcskVOKDV9oL5hvt+qnzGdTF82cN+
-         TnSiw+Y04iOuumJitcxqXvj4Gp1U218a697nLpjG8cIqaGcIwZYkcU4BhBgcVpnhB37K
-         xV7PJZcx2XCbQQ6XRSej7fXrQZcDHo+1httP/FJuPvNnurAUBmoNNcKjibWmQa9740VQ
-         b4yQ==
-X-Gm-Message-State: AAQBX9eDuzoPk01IP1tH3aepv4XgIjKcngYtCL9Tz4KscP3dNgM9fyYJ
-        hYi/HGIfHYxq+B7mllFVzDaNsE7UrMAdoN4eGlah+FiJkTcNhy8TFMymekRw32IYEATERUBODtg
-        ZsXLox0iNn1N0
-X-Received: by 2002:a5e:a80b:0:b0:74d:1318:618c with SMTP id c11-20020a5ea80b000000b0074d1318618cmr2016109ioa.10.1681409234949;
-        Thu, 13 Apr 2023 11:07:14 -0700 (PDT)
-X-Google-Smtp-Source: AKy350aNIxbTK4D/1WKJFyoeXfJddaFP2YjlcKRNN7MPTcaqR3ipJt2l6zNqwAhtPjb9PRhgDB1hHQ==
-X-Received: by 2002:a5e:a80b:0:b0:74d:1318:618c with SMTP id c11-20020a5ea80b000000b0074d1318618cmr2016087ioa.10.1681409234657;
-        Thu, 13 Apr 2023 11:07:14 -0700 (PDT)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id g7-20020a5ec747000000b00746cb6d90c0sm618854iop.14.2023.04.13.11.07.13
+        d=1e100.net; s=20221208; t=1681411355; x=1684003355;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=9ouIXXzXkR9iKq5GS3MVc2uoUw4kzcTau4LjDKoSPTA=;
+        b=bgQOTMOlc2wrfiTVFV+WSKrK4mCwYqEvcNuUNCo4rZ5qmdG/IosMAyg6K0W70aIbPy
+         H1XclhwwuyOXhPH/wxlrQremzoW4fbufNYAOrJpI/AAQ+frkcnmbdWq9QSPAM5+XSu8j
+         iJNYdj6ySFcOud8V4Np36H1+6FhSAnbkD1cdne1Uz2pL5Qbv2rrAqDe/6mg7D1SGiokQ
+         C5fVVmACUaWH+EcTKq8/1FYHc+cvqVKNJfAjPAwYuZXFYYOeGb/9GTlZwmeD3WLyaiTW
+         mTGGRrI/AQ5jSeKjVeiykVI204vXZNZDrmGGbx60+4fndqJ2v9JZR893C2BVfu/n6WnA
+         T2YQ==
+X-Gm-Message-State: AAQBX9ftjJftmP6UlQtF/YVUVKP7+BojqSUuwwed67VgfRR4DDXxnxlv
+        hva/N7jFtYdpS1y0XcYkKUo/igtwsmOPWjArp+c=
+X-Google-Smtp-Source: AKy350aY9kL8Qv/RvZ1+Aiot5F9lPtXL8vnYez7JnIVKMUF3HUHKWI5+zL31bERLPe6gcpL0pGGWvA==
+X-Received: by 2002:a05:600c:2289:b0:3ee:6161:7d98 with SMTP id 9-20020a05600c228900b003ee61617d98mr2271965wmf.16.1681411355493;
+        Thu, 13 Apr 2023 11:42:35 -0700 (PDT)
+Received: from nuc.fritz.box (p200300f6af154800ce0bb7f104d5fcf7.dip0.t-ipconnect.de. [2003:f6:af15:4800:ce0b:b7f1:4d5:fcf7])
+        by smtp.gmail.com with ESMTPSA id x15-20020a5d6b4f000000b002c8476dde7asm1812652wrw.114.2023.04.13.11.42.34
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 13 Apr 2023 11:07:14 -0700 (PDT)
-Date:   Thu, 13 Apr 2023 12:07:12 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
-        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
-        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "jasowang@redhat.com" <jasowang@redhat.com>,
-        "shameerali.kolothum.thodi@huawei.com" 
-        <shameerali.kolothum.thodi@huawei.com>,
-        "lulu@redhat.com" <lulu@redhat.com>,
-        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
-        "intel-gvt-dev@lists.freedesktop.org" 
-        <intel-gvt-dev@lists.freedesktop.org>,
-        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
-        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-        "Hao, Xudong" <xudong.hao@intel.com>,
-        "Zhao, Yan Y" <yan.y.zhao@intel.com>,
-        "Xu, Terrence" <terrence.xu@intel.com>,
-        "Jiang, Yanting" <yanting.jiang@intel.com>,
-        "Duan, Zhenzhong" <zhenzhong.duan@intel.com>
-Subject: Re: [PATCH v3 12/12] vfio/pci: Report dev_id in
- VFIO_DEVICE_GET_PCI_HOT_RESET_INFO
-Message-ID: <20230413120712.3b9bf42d.alex.williamson@redhat.com>
-In-Reply-To: <ZDfslVwqk6JtPpyD@nvidia.com>
-References: <20230406115347.7af28448.alex.williamson@redhat.com>
-        <ZDVfqpOCnImKr//m@nvidia.com>
-        <20230411095417.240bac39.alex.williamson@redhat.com>
-        <20230411111117.0766ad52.alex.williamson@redhat.com>
-        <ZDWph7g0hcbJHU1B@nvidia.com>
-        <20230411155827.3489400a.alex.williamson@redhat.com>
-        <ZDX0wtcvZuS4uxmG@nvidia.com>
-        <20230412105045.79adc83d.alex.williamson@redhat.com>
-        <ZDcPTTPlni/Mi6p3@nvidia.com>
-        <BN9PR11MB5276782DA56670C8209470828C989@BN9PR11MB5276.namprd11.prod.outlook.com>
-        <ZDfslVwqk6JtPpyD@nvidia.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
+        Thu, 13 Apr 2023 11:42:35 -0700 (PDT)
+From:   Mathias Krause <minipli@grsecurity.net>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org
+Cc:     Mathias Krause <minipli@grsecurity.net>
+Subject: [kvm-unit-tests PATCH v2 00/16] x86: cleanups, fixes and new tests
+Date:   Thu, 13 Apr 2023 20:42:03 +0200
+Message-Id: <20230413184219.36404-1-minipli@grsecurity.net>
+X-Mailer: git-send-email 2.39.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -113,96 +68,85 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 13 Apr 2023 08:50:45 -0300
-Jason Gunthorpe <jgg@nvidia.com> wrote:
+v1: https://lore.kernel.org/kvm/b6322bd0-3639-fb2a-7211-974386865bac@grsecurity.net/
 
-> On Thu, Apr 13, 2023 at 08:25:52AM +0000, Tian, Kevin wrote:
-> > > From: Jason Gunthorpe <jgg@nvidia.com>
-> > > Sent: Thursday, April 13, 2023 4:07 AM
-> > > 
-> > >   
-> > > > in which case we need c) a way to
-> > > > report the overall set of affected devices regardless of ownership in
-> > > > support of 4), BDF?  
-> > > 
-> > > Yes, continue to use INFO unmodified.
-> > >   
-> > > > Are we back to replacing group-ids with dev-ids in the INFO structure,
-> > > > where an invalid dev-id either indicates an affected device with
-> > > > implied ownership (ok) or a gap in ownership (bad) and a flag somewhere
-> > > > is meant to indicate the overall disposition based on the availability
-> > > > of reset?  
-> > > 
-> > > As you explore in the following this gets ugly. I prefer to keep INFO
-> > > unchanged and add INFO2.
-> > >   
-> > 
-> > INFO needs a change when VFIO_GROUP is disabled. Now it assumes
-> > a valid iommu group always exists:
-> > 
-> > vfio_pci_fill_devs()
-> > {
-> > 	...
-> > 	iommu_group = iommu_group_get(&pdev->dev);
-> > 	if (!iommu_group)
-> > 		return -EPERM; /* Cannot reset non-isolated devices */
-> > 	...
-> > }  
-> 
-> This can still work in a ugly way. With a INFO2 the only purpose of
-> INFO would be debugging, so if someone uses no-iommu, with hotreset
-> and misconfigures it then the only downside is they don't get the
-> debugging print. But we know of nothing that uses this combination
-> anyhow..
-> 
-> > with that plus BDF cap, I'm curious what is the actual purpose of
-> > INFO2 or why cannot requirement#3 reuse the information collected
-> > via existing INFO?  
-> 
-> It can - it is just more complicated for userspace to do it, it has to
-> extract and match the BDFs and then run some algorithm to determine if
-> the opened devices cover the right set of devices in the reset group,
-> and it has to have some special code for no-iommu.
-> 
-> VS info2 would return the dev_id's and a single yes/no if the right
-> set is present. Kernel runs the algorithm instead of userspace, it
-> seems more abstract this way.
-> 
-> Also, if we make iommufd return a 'ioas dev_id group' as well it
-> composes nicely that userspace just needs one translation from dev_id.
+This is v2 of the "non-canonical memory access" test. It evolved into a
+small series, bringing cleanups and fixes along the way.
 
+I integrated Sean's feedback and changed the test to make use of
+ASM_TRY() instead of using the hand-rolled exception handler. I also
+switched all other users in emulator64.c to ASM_TRY() and was able to
+drop the one-off exception handler all together.
 
-IIUC, the semantics we're proposing is that an INFO2 ioctl would return
-success or failure indicating whether the user has sufficient ownership
-of the affected devices, and in the success case returns an array of
-affected dev-ids within the user's iommufd_ctx.  Unopened, affected
-devices, are not reported via INFO2, and unopened, affected devices
-outside the user's scope of ownership (ie. outside the owned IOMMU
-group) will generate a failure condition.
+Sean, this should be a solid ground to refine it further when [1] lands?
 
-As for the INFO ioctl, it's described as unchanged, which does raise
-the question of what is reported for IOMMU groups and how does the
-value there coherently relate to anything else in the cdev-exclusive
-vfio API...
+[1] https://lkml.kernel.org/r/20230406025117.738014-1-seanjc@google.com
 
-We had already iterated a proposal where the group-id is replaced with
-a dev-id in the existing ioctl and a flag indicates when the return
-value is a dev-id vs group-id.  This had a gap that userspace cannot
-determine if a reset is available given this information since un-owned
-devices report an invalid dev-id and userspace can't know if it has
-implicit ownership.
+As for the fixes, run_in_user() didn't restore the exception handler it
+overwrites, which leads to interesting bugs when the handler fires again
+for an unrelated exception -- that longjmp() won't do the right thing in
+this case ;)
 
-It seems cleaner to me though that we would could still re-use INFO in
-a similar way, simply defining a new flag bit which is valid only in
-the case of returning dev-ids and indicates if the reset is available.
-Therefore in one ioctl, userspace knows if hot-reset is available
-(based on a kernel determination) and can pull valid dev-ids from the
-array to associate affected, owned devices, and still has the
-equivalent information to know that one or more of the devices listed
-with an invalid dev-id are preventing the hot-reset from being
-available.
+I fixed fault_test() as well, as it has the same behaviour.
 
-Is that an option?  Thanks,
+For new tests, I added the non-canonical memory access exception test of
+v1 and added another SS segment register load test to check non-NULL
+selectors as well, as I stumbled over the bugs in run_in_user() while
+switching test_sreg() over to TRY_ASM().
 
-Alex
+Be aware that the types.h removal (first patch) has an unfortunate side
+effect. It breaks compilation in already build trees, as the dependency
+files (.*.d) don't get regenerated / cleaned if a source file changes.
+This leads to stale references to types.h which can only be solved by a
+'make clean'. :(
+
+We really should change the dependency file generation to avoid that
+problem, as the current state is kinda awkward. Tho, I didn't had the
+time to look into it further myself.
+
+Please apply!
+
+Thanks,
+Mathias
+
+PS: I'm on holidays for three weeks from Saturday on, so won't respond
+to feedback any time soon.
+
+Mathias Krause (16):
+  x86: Drop types.h
+  x86: Use symbolic names in exception_mnemonic()
+  x86: Add vendor specific exception vectors
+  x86/cet: Use symbolic name for #CP
+  x86/access: Use 'bool' type as defined via libcflat.h
+  x86/run_in_user: Change type of code label
+  x86/run_in_user: Preserve exception handler
+  x86/run_in_user: Relax register constraints of inline asm
+  x86/run_in_user: Reload SS after successful return
+  x86/fault_test: Preserve exception handler
+  x86/emulator64: Relax register constraints for usr_gs_mov()
+  x86/emulator64: Switch test_sreg() to ASM_TRY()
+  x86/emulator64: Add non-null selector test
+  x86/emulator64: Switch test_jmp_noncanonical() to ASM_TRY()
+  x86/emulator64: Switch test_mmx_movq_mf() to ASM_TRY()
+  x86/emulator64: Test non-canonical memory access exceptions
+
+ lib/x86/processor.h  |  13 ++++++
+ lib/x86/desc.c       |  43 ++++++++++--------
+ lib/x86/fault_test.c |   4 +-
+ lib/x86/usermode.c   |  42 ++++++++++-------
+ x86/types.h          |  21 ---------
+ x86/access.c         |  11 ++---
+ x86/cet.c            |   2 +-
+ x86/cmpxchg8b.c      |   1 -
+ x86/emulator.c       |   1 -
+ x86/emulator64.c     | 105 ++++++++++++++++++++++++-------------------
+ x86/pmu_pebs.c       |   1 -
+ x86/svm.c            |   1 -
+ x86/svm_tests.c      |   1 -
+ x86/vmx_tests.c      |   1 -
+ 14 files changed, 129 insertions(+), 118 deletions(-)
+ delete mode 100644 x86/types.h
+
+-- 
+2.39.2
 
