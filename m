@@ -2,124 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4889B6E139D
-	for <lists+kvm@lfdr.de>; Thu, 13 Apr 2023 19:37:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 044BB6E13CF
+	for <lists+kvm@lfdr.de>; Thu, 13 Apr 2023 19:59:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229764AbjDMRhh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Apr 2023 13:37:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59760 "EHLO
+        id S229870AbjDMR7M (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Apr 2023 13:59:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40048 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229506AbjDMRhf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 13 Apr 2023 13:37:35 -0400
-Received: from mail-yb1-xb30.google.com (mail-yb1-xb30.google.com [IPv6:2607:f8b0:4864:20::b30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D62E4220
-        for <kvm@vger.kernel.org>; Thu, 13 Apr 2023 10:37:34 -0700 (PDT)
-Received: by mail-yb1-xb30.google.com with SMTP id u13so16382183ybu.5
-        for <kvm@vger.kernel.org>; Thu, 13 Apr 2023 10:37:34 -0700 (PDT)
+        with ESMTP id S229728AbjDMR7L (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 13 Apr 2023 13:59:11 -0400
+Received: from smtp-fw-9103.amazon.com (smtp-fw-9103.amazon.com [207.171.188.200])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0ACF8A5F;
+        Thu, 13 Apr 2023 10:59:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1681407453; x=1683999453;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=B1jnZnwN/IOOycxEpyhHeYgSCymd9H+aV9u/LeikvAg=;
-        b=xv33HL/Sgz5q7Yb32dgAQIxQHaYsTs1Ftmkoa477GEep3uRJcQJS6PO6P/CD+63CBC
-         7tTmF9AlscXTRE36iKX5JBKqyiT5bNgSybovp2wpGA+tNaX++49xBa+MDD8Fv+7Y7oDG
-         VpogIGbm1Fe0iyh5T9mbYYWHoQT+IEt3zH+l5qYDn+4Ay3e+zO50JUdZ+vBDwDMvhv99
-         Hja9X1DItRSGLhqMCtBKsslxiTOpOtxhvcBWiWYtwAhQDsNjdSBVhZWDX5YHYhPV5Vo8
-         T27BfNsRFq1j5pGTwMDbffM8HaDt+C/rb49bFht9N8O4Z42NEtUEoHwRdivvwGKgGfO/
-         wqkQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681407453; x=1683999453;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=B1jnZnwN/IOOycxEpyhHeYgSCymd9H+aV9u/LeikvAg=;
-        b=cCHdOlF8RRe2cydxtMnR3FQsEhSqcNjXe80L7z0Uhne5f/CYznVo+i+ax2xtHLgDB/
-         7UK4BYw9JEMXAl+PyFVAB0ovPI7GA7QG/kiNOI5UKPpRQuSG87iBa4VNy1J03lWwS2PC
-         5GFdh+YxKdO9+WXE9ckIE13U59beSRodpg2xUZ1KdlmDMDCJi6cK3pGCYT8/hXYbt0Wr
-         O8ex3OUoLzYiLiLDbe48aeZKimv33Rik8y/Dw32BM5BmWANWK96dWkl0sqhksDSmRLnZ
-         24nYnf/n5EDIyovpj27p/WK0aFYGaoRKTRLvcKHbPJ6N18VwQ5sxw37DS/nRGlFUbBwD
-         Znsw==
-X-Gm-Message-State: AAQBX9fBWFrtyCQ6m2bUDMaIEhENw5ljf5vgVSVtbxgeeB44hKTLJuTK
-        XH0iOvinYA9uoO/IWEM8fMZPAcUSSo6r12fvIHU+BofDLC8XcEoUdvUv5Q==
-X-Google-Smtp-Source: AKy350bmp9rTde3h4dHbTs+0zI1C9HiIU2SS8lrLXda8AU+ZbTnWOceus6xiuH8hf7IYk3AddbVes2e0jALZx/r3dLw=
-X-Received: by 2002:a25:df41:0:b0:b8f:3367:d5e0 with SMTP id
- w62-20020a25df41000000b00b8f3367d5e0mr1949248ybg.13.1681407453095; Thu, 13
- Apr 2023 10:37:33 -0700 (PDT)
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1681408750; x=1712944750;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=7NPGHZe7ksBAVtMO40tlkfmxNY/cTdX4an+XZxwARlU=;
+  b=DzFFJusJYtIeSq9/CDD+Z7MfSrVKqdm5q7N753NLLe/0RwWAC/EUfwIA
+   a6MkgQWCk9y+sOmUA7m2VCus53vuhomP2BE06kPtXZ78jRy6oxr9bKk6C
+   kgRZrvGueFtwX2XbBzjFmhJLuIT6D/WHoy90Abq3tKE/gdtVCNmA5fXbb
+   U=;
+X-IronPort-AV: E=Sophos;i="5.99,194,1677542400"; 
+   d="scan'208";a="1122409867"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-pdx-2b-m6i4x-cadc3fbd.us-west-2.amazon.com) ([10.25.36.214])
+  by smtp-border-fw-9103.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Apr 2023 17:59:01 +0000
+Received: from EX19MTAUWC001.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan2.pdx.amazon.com [10.236.137.194])
+        by email-inbound-relay-pdx-2b-m6i4x-cadc3fbd.us-west-2.amazon.com (Postfix) with ESMTPS id 77999A0F1C;
+        Thu, 13 Apr 2023 17:59:01 +0000 (UTC)
+Received: from EX19D002ANA003.ant.amazon.com (10.37.240.141) by
+ EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.25; Thu, 13 Apr 2023 17:59:01 +0000
+Received: from b0f1d8753182.ant.amazon.com (10.95.156.18) by
+ EX19D002ANA003.ant.amazon.com (10.37.240.141) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.26; Thu, 13 Apr 2023 17:58:57 +0000
+From:   Takahiro Itazuri <itazur@amazon.com>
+To:     <kvm@vger.kernel.org>
+CC:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        <linux-kernel@vger.kernel.org>,
+        Takahiro Itazuri <zulinx86@gmail.com>,
+        Takahiro Itazuri <itazur@amazon.com>
+Subject: [PATCH v2] KVM: x86: Update KVM_GET_CPUID2 to return valid entry count
+Date:   Thu, 13 Apr 2023 18:58:44 +0100
+Message-ID: <20230413175844.21760-1-itazur@amazon.com>
+X-Mailer: git-send-email 2.38.0
 MIME-Version: 1.0
-References: <20230412200913.1570873-1-pbonzini@redhat.com>
-In-Reply-To: <20230412200913.1570873-1-pbonzini@redhat.com>
-From:   Vipin Sharma <vipinsh@google.com>
-Date:   Thu, 13 Apr 2023 10:36:57 -0700
-Message-ID: <CAHVum0fDp8B0YSYdmMV0OHjA8s5O1Ba2-i81WB8ybhzbRp8RGg@mail.gmail.com>
-Subject: Re: [PATCH] selftests/kvm: touch all pages of args on each memstress iteration
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        bgardon@google.com, seanjc@google.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.95.156.18]
+X-ClientProxiedBy: EX19D041UWB003.ant.amazon.com (10.13.139.176) To
+ EX19D002ANA003.ant.amazon.com (10.37.240.141)
+X-Spam-Status: No, score=-4.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+        RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,T_SPF_PERMERROR
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Apr 12, 2023 at 1:09=E2=80=AFPM Paolo Bonzini <pbonzini@redhat.com>=
- wrote:
->
-> Access the same memory addresses on each iteration of the memstress
-> guest code.  This ensures that the state of KVM's page tables
-> is the same after every iteration, including the pages that host the
-> guest page tables for args and vcpu_args.
->
+Modify the KVM_GET_CPUID2 API to return the number of valid entries in
+nent field of kvm_cpuid2 even on success.
 
-AMD and eptad=3D0 reasoning you gave in
-https://lore.kernel.org/lkml/199f404d-c08e-3895-6ce3-36b21514f487@redhat.co=
-m
-should also be included here.
+Previously, the KVM_GET_CPUID2 API only updated the nent field when an
+error was returned. If the API was called with an entry count larger
+than necessary (e.g., KVM_MAX_CPUID_ENTRIES), it would succeed, but the
+nent field would continue to show a value larger than the actual number
+of entries filled by the KVM_GET_CPUID2 API. With this change, users can
+rely on the updated nent field and there is no need to traverse
+unnecessary entries and check whether an entry is valid or not.
 
-"It also reproduces on Intel with pml=3D0 and eptad=3D0; the reason is due
-to the different semantics of dirty bits for page-table pages on AMD
-and Intel.  Both AMD and eptad=3D0 Intel treat those as writes, therefore
-more pages are dropped before the repopulation phase when dirty logging
-is disabled.
+Suggested-by: Sean Christopherson <seanjc@google.com>
+Signed-off-by: Takahiro Itazuri <itazur@amazon.com>
+---
+Changes
+v1 -> v2
+* Capitalize "kvm" in the commit title.
+* Remove a scratch "nent" variable.
+* Link to v1: https://lore.kernel.org/all/20230410141820.57328-1-itazur@amazon.com/
 
-The "missing" page had been included in the population phase because it
-hosts the page tables for vcpu_args, but repopulation does not need it."
+ arch/x86/kvm/cpuid.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
-> This difference is visible on the dirty_log_page_splitting_test
-> on AMD machines.
->
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  tools/testing/selftests/kvm/lib/memstress.c | 3 +++
->  1 file changed, 3 insertions(+)
->
-> diff --git a/tools/testing/selftests/kvm/lib/memstress.c b/tools/testing/=
-selftests/kvm/lib/memstress.c
-> index 3632956c6bcf..df457452d146 100644
-> --- a/tools/testing/selftests/kvm/lib/memstress.c
-> +++ b/tools/testing/selftests/kvm/lib/memstress.c
-> @@ -65,6 +65,9 @@ void memstress_guest_code(uint32_t vcpu_idx)
->         GUEST_ASSERT(vcpu_args->vcpu_idx =3D=3D vcpu_idx);
->
->         while (true) {
-> +               for (i =3D 0; i < sizeof(memstress_args); i +=3D args->gu=
-est_page_size)
-> +                       (void) *((volatile char *)args + i);
-> +
->                 for (i =3D 0; i < pages; i++) {
->                         if (args->random_access)
->                                 page =3D guest_random_u32(&rand_state) % =
-pages;
-> --
-> 2.39.1
->
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index 599aebec2d52..20d28ebdc672 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -523,18 +523,18 @@ int kvm_vcpu_ioctl_get_cpuid2(struct kvm_vcpu *vcpu,
+ 			      struct kvm_cpuid2 *cpuid,
+ 			      struct kvm_cpuid_entry2 __user *entries)
+ {
+-	int r;
++	int r = 0;
+ 
+-	r = -E2BIG;
+ 	if (cpuid->nent < vcpu->arch.cpuid_nent)
+-		goto out;
+-	r = -EFAULT;
+-	if (copy_to_user(entries, vcpu->arch.cpuid_entries,
++		r = -E2BIG;
++	else if (copy_to_user(entries, vcpu->arch.cpuid_entries,
+ 			 vcpu->arch.cpuid_nent * sizeof(struct kvm_cpuid_entry2)))
+-		goto out;
+-	return 0;
++		r = -EFAULT;
+ 
+-out:
++	/*
++	 * Update "nent" even on failure, e.g. so that userspace can fix an
++	 * -E2BIG issue by allocating a larger array.
++	 */
+ 	cpuid->nent = vcpu->arch.cpuid_nent;
+ 	return r;
+ }
+-- 
+2.39.2
 
-Apart from the commit log.
-Reviewed-by: Vipin Sharma <vipinsh@google.com>
