@@ -2,129 +2,164 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 11CEB6E08EE
-	for <lists+kvm@lfdr.de>; Thu, 13 Apr 2023 10:33:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C6CE96E0987
+	for <lists+kvm@lfdr.de>; Thu, 13 Apr 2023 10:59:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229711AbjDMId1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Apr 2023 04:33:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35660 "EHLO
+        id S229893AbjDMI71 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Apr 2023 04:59:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49688 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229546AbjDMId0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 13 Apr 2023 04:33:26 -0400
-Received: from xry111.site (xry111.site [IPv6:2001:470:683e::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3F3810E5;
-        Thu, 13 Apr 2023 01:33:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=xry111.site;
-        s=default; t=1681374801;
-        bh=SD8a8KFvnCSwbVV6zTztQabyB1P9t20ITTiwlQmT/kI=;
-        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-        b=mMPkg7kd9d75I9RqubzvixZuTjV6gCBc24cVfdissGsaD546SzMl6lHKKk97MVXY5
-         arvvJFZE2+2piTELSwG6ZBV1DkuEVUCc2DKc0j+J9gj7LBWUK6Z8sGFRvYUzstmWX3
-         d+Vs220AH4XoU20omhJFRsciXnyPUKhuCS76xOX0=
-Received: from [192.168.124.11] (unknown [113.140.11.5])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature ECDSA (P-384) server-digest SHA384)
-        (Client did not present a certificate)
-        (Authenticated sender: xry111@xry111.site)
-        by xry111.site (Postfix) with ESMTPSA id 772AE65C44;
-        Thu, 13 Apr 2023 04:33:18 -0400 (EDT)
-Message-ID: <ee3b287c78d9fbbbc996a787053b4c37fe365c2c.camel@xry111.site>
-Subject: Re: [PATCH v6 29/30] LoongArch: KVM: Enable kvm config and add the
- makefile
-From:   Xi Ruoyao <xry111@xry111.site>
-To:     kernel test robot <lkp@intel.com>,
-        Tianrui Zhao <zhaotianrui@loongson.cn>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     oe-kbuild-all@lists.linux.dev, Huacai Chen <chenhuacai@kernel.org>,
-        WANG Xuerui <kernel@xen0n.name>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        loongarch@lists.linux.dev, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Mark Brown <broonie@kernel.org>,
-        Alex Deucher <alexander.deucher@amd.com>,
-        Oliver Upton <oliver.upton@linux.dev>, maobibo@loongson.cn
-Date:   Thu, 13 Apr 2023 16:33:10 +0800
-In-Reply-To: <202304131526.iXfLaVZc-lkp@intel.com>
-References: <20230412083023.1693910-30-zhaotianrui@loongson.cn>
-         <202304131526.iXfLaVZc-lkp@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.48.0 
-MIME-Version: 1.0
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS,
-        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S229917AbjDMI6x (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 13 Apr 2023 04:58:53 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F4589EF7
+        for <kvm@vger.kernel.org>; Thu, 13 Apr 2023 01:56:59 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 3957A6141C
+        for <kvm@vger.kernel.org>; Thu, 13 Apr 2023 08:56:59 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 93771C433EF;
+        Thu, 13 Apr 2023 08:56:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1681376218;
+        bh=zEf3rhAJHBPYfiQYH2oVuSK4sAgQN8WGP8TwFvgADmo=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=SPw5L1Jn7S/Frm7xZT8KZvOePxJRqV6nBhmUTP/OupGiG8Coy/3IHcxsZl+MbNw4S
+         ZQBntnOFQOSy3g9B81P2n3en1enRc/PRVcz9Ittag4yDNEfGJ6ncx7xnd7dPwUQdJc
+         ZuFdLk2EBe4C4CoPhCprWi/Ga/SYR8CPXd2Lc5zQPnq0iaCMHauyoKrWWPzTyz21QI
+         iQPAaf3nsstl6kZrdS7VYmIYi9m3JAwQP4W9kWdPBtDGeTJSOJHObODffYeZpDycH6
+         nSM3rzKzA6Dw+ho2CtkuDUGpgGmDEHNR0Auaz5Mh1a8njBstirXuhJM/6DJjZM64Qi
+         FGdmsUlV0Ai4g==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1pmslE-0083Tf-Ab;
+        Thu, 13 Apr 2023 09:56:56 +0100
+Date:   Thu, 13 Apr 2023 09:56:55 +0100
+Message-ID: <86jzygkvmw.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Reiji Watanabe <reijiw@google.com>
+Cc:     Mark Rutland <mark.rutland@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Will Deacon <will@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Raghavendra Rao Anata <rananta@google.com>,
+        Shaoqin Huang <shahuang@redhat.com>,
+        Rob Herring <robh@kernel.org>
+Subject: Re: [PATCH v2 2/2] KVM: arm64: PMU: Don't overwrite PMUSERENR with vcpu loaded
+In-Reply-To: <CAAeT=FwUZ-TTn+4tt9pcesB59b7_=_zxkeRftMh5aQDUqnMz8g@mail.gmail.com>
+References: <20230408034759.2369068-1-reijiw@google.com>
+        <20230408034759.2369068-3-reijiw@google.com>
+        <ZDUpfnXi/GwFwFV9@FVFF77S0Q05N>
+        <20230412051410.emaip77vyak624pu@google.com>
+        <ZDZ3xbSePtOD3CSX@FVFF77S0Q05N>
+        <86v8i1l7ru.wl-maz@kernel.org>
+        <CAAeT=FwUZ-TTn+4tt9pcesB59b7_=_zxkeRftMh5aQDUqnMz8g@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: reijiw@google.com, mark.rutland@arm.com, oliver.upton@linux.dev, will@kernel.org, catalin.marinas@arm.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, alexandru.elisei@arm.com, yuzenghui@huawei.com, suzuki.poulose@arm.com, pbonzini@redhat.com, ricarkol@google.com, jingzhangos@google.com, rananta@google.com, shahuang@redhat.com, robh@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 2023-04-13 at 15:32 +0800, kernel test robot wrote:
+On Thu, 13 Apr 2023 01:07:38 +0100,
+Reiji Watanabe <reijiw@google.com> wrote:
+> 
+> On Wed, Apr 12, 2023 at 11:22:29AM +0100, Marc Zyngier wrote:
+> > On Wed, 12 Apr 2023 10:20:05 +0100,
+> > Mark Rutland <mark.rutland@arm.com> wrote:
+> > >
+> > > On Tue, Apr 11, 2023 at 10:14:10PM -0700, Reiji Watanabe wrote:
+> > > > Uh, right, interrupts are not masked during those windows...
+> > > >
+> > > > What I am currently considering on this would be disabling
+> > > > IRQs while manipulating the register, and introducing a new flag
+> > > > to indicate whether the PMUSERENR for the guest EL0 is loaded,
+> > > > and having kvm_set_pmuserenr() check the new flag.
+> > > >
+> > > > The code would be something like below (local_irq_save/local_irq_restore
+> > > > needs to be excluded for NVHE though).
+> >
+> > It shouldn't need to be excluded. It should be fairly harmless, unless
+> > I'm missing something really obvious?
+> 
+> The reason why I think local_irq_{save,restore} should be excluded
+> are because they use trace_hardirqs_{on,off} (Since IRQs are
+> masked here for NVHE, practically, they shouldn't be called with
+> the current KVM implementation though).
 
-> vim +/asm +244 arch/loongarch/include/asm/loongarch.h
->=20
-> f2ac457a61389b Huacai Chen=C2=A0 2022-05-31=C2=A0 238=C2=A0=20
-> 2c87b678639d25 Tianrui Zhao 2023-04-12=C2=A0 239=C2=A0 /* GCSR */
-> 2c87b678639d25 Tianrui Zhao 2023-04-12=C2=A0 240=C2=A0 static inline u64 =
-gcsr_read(u32 reg)
+Gah. Indeed, we end-up with a lot of unwanted crap, and absolutely no
+way to locally override it.
 
-Try __always_inline instead of inline because this "function" will
-definitely break up if it's not inlined.
+> I'm looking at using "ifndef __KVM_NVHE_HYPERVISOR__" or other
+> ways to organize the code for this.
 
-And I guess we should have something like:
+I'd vote for something like the code below:
 
-extern u64 __compiletime_error("gcsr_read parameter is not a constant")=20
-__gcsr_read_non_const(void);
+diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile b/arch/arm64/kvm/hyp/nvhe/Makefile
+index 530347cdebe3..1796fadb26cc 100644
+--- a/arch/arm64/kvm/hyp/nvhe/Makefile
++++ b/arch/arm64/kvm/hyp/nvhe/Makefile
+@@ -10,7 +10,7 @@ asflags-y := -D__KVM_NVHE_HYPERVISOR__ -D__DISABLE_EXPORTS
+ # will explode instantly (Words of Marc Zyngier). So introduce a generic flag
+ # __DISABLE_TRACE_MMIO__ to disable MMIO tracing for nVHE KVM.
+ ccflags-y := -D__KVM_NVHE_HYPERVISOR__ -D__DISABLE_EXPORTS -D__DISABLE_TRACE_MMIO__
+-ccflags-y += -fno-stack-protector	\
++ccflags-y += -fno-stack-protector	-DNO_TRACE_IRQFLAGS \
+ 	     -DDISABLE_BRANCH_PROFILING	\
+ 	     $(DISABLE_STACKLEAK_PLUGIN)
+ 
+diff --git a/include/linux/irqflags.h b/include/linux/irqflags.h
+index 5ec0fa71399e..ab0ae58dd797 100644
+--- a/include/linux/irqflags.h
++++ b/include/linux/irqflags.h
+@@ -198,9 +198,10 @@ extern void warn_bogus_irq_restore(void);
+ 
+ /*
+  * The local_irq_*() APIs are equal to the raw_local_irq*()
+- * if !TRACE_IRQFLAGS.
++ * if !TRACE_IRQFLAGS or if NO_TRACE_IRQFLAGS is localy
++ * set.
+  */
+-#ifdef CONFIG_TRACE_IRQFLAGS
++#if defined(CONFIG_TRACE_IRQFLAGS) && !defined(NO_TRACE_IRQFLAGS)
+ 
+ #define local_irq_enable()				\
+ 	do {						\
 
-static __always_inline u64 gcsr_read(u32 reg)
-{
-	u64 val =3D 0;
 
-	if (!__builtin_constant_p(reg))
-		return __gcsr_read_non_const();
+> Since {__activate,__deactivate}_traps_common() are pretty lightweight
+> functions, I'm also considering disabling IRQs in their call sites
+> (i.e. activate_traps_vhe_load/deactivate_traps_vhe_put), instead of in
+> __{de}activate_traps_common() (Thanks for this suggestion, Oliver).
 
-	asm volatile (
-... ...
+That would work too.
 
-Or perhaps we should just rewrite gcsr_read to a macro.
+Thanks,
 
-> 2c87b678639d25 Tianrui Zhao 2023-04-12=C2=A0 241=C2=A0 {
-> 2c87b678639d25 Tianrui Zhao 2023-04-12=C2=A0 242=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0u64 val =3D 0;
-> 2c87b678639d25 Tianrui Zhao 2023-04-12=C2=A0 243=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0/* Instructions will be available in binutils later */
-> 2c87b678639d25 Tianrui Zhao 2023-04-12 @244=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-asm volatile (
-> 2c87b678639d25 Tianrui Zhao 2023-04-12=C2=A0 245=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0"parse_r __reg, %[val=
-]\n\t"
-> 2c87b678639d25 Tianrui Zhao 2023-04-12=C2=A0 246=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/*
-> 2c87b678639d25 Tianrui Zhao 2023-04-12=C2=A0 247=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * read val from gues=
-t csr register %[reg]
-> 2c87b678639d25 Tianrui Zhao 2023-04-12=C2=A0 248=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * gcsrrd %[val], %[r=
-eg]
-> 2c87b678639d25 Tianrui Zhao 2023-04-12=C2=A0 249=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 */
-> 2c87b678639d25 Tianrui Zhao 2023-04-12=C2=A0 250=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0".word 0x5 << 24 | %[=
-reg] << 10 | 0 << 5 | __reg\n\t"
-> 2c87b678639d25 Tianrui Zhao 2023-04-12=C2=A0 251=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0: [val] "+r" (val)
-> 2c87b678639d25 Tianrui Zhao 2023-04-12=C2=A0 252=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0: [reg] "i" (reg)
-> 2c87b678639d25 Tianrui Zhao 2023-04-12=C2=A0 253=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0: "memory");
-> 2c87b678639d25 Tianrui Zhao 2023-04-12=C2=A0 254=C2=A0=20
-> 2c87b678639d25 Tianrui Zhao 2023-04-12=C2=A0 255=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0return val;
-> 2c87b678639d25 Tianrui Zhao 2023-04-12=C2=A0 256=C2=A0 }
-> 2c87b678639d25 Tianrui Zhao 2023-04-12=C2=A0 257=C2=A0=20
->=20
+	M.
 
---=20
-Xi Ruoyao <xry111@xry111.site>
-School of Aerospace Science and Technology, Xidian University
+-- 
+Without deviation from the norm, progress is not possible.
