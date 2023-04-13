@@ -2,137 +2,180 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 181766E06A3
-	for <lists+kvm@lfdr.de>; Thu, 13 Apr 2023 08:00:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BC48B6E06B3
+	for <lists+kvm@lfdr.de>; Thu, 13 Apr 2023 08:07:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229742AbjDMGAb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Apr 2023 02:00:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58226 "EHLO
+        id S229877AbjDMGHM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Apr 2023 02:07:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60410 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229516AbjDMGA3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 13 Apr 2023 02:00:29 -0400
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C91662112
-        for <kvm@vger.kernel.org>; Wed, 12 Apr 2023 23:00:28 -0700 (PDT)
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-        by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1pmq08-0006Ev-7l; Thu, 13 Apr 2023 08:00:08 +0200
-Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
-        by drehscheibe.grey.stw.pengutronix.de with esmtp (Exim 4.94.2)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1pmq05-00Atqo-4l; Thu, 13 Apr 2023 08:00:05 +0200
-Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.94.2)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1pmq04-00CnQS-Az; Thu, 13 Apr 2023 08:00:04 +0200
-Date:   Thu, 13 Apr 2023 08:00:04 +0200
-From:   Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
-To:     Leo Li <leoyang.li@nxp.com>
-Cc:     Stuart Yoder <stuyoder@gmail.com>,
-        Laurentiu Tudor <laurentiu.tudor@nxp.com>,
-        Roy Pledge <roy.pledge@nxp.com>,
-        Horia Geanta <horia.geanta@nxp.com>,
-        Pankaj Gupta <pankaj.gupta@nxp.com>,
-        Gaurav Jain <gaurav.jain@nxp.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Vinod Koul <vkoul@kernel.org>,
-        Ioana Ciornei <ioana.ciornei@nxp.com>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, "Y.B. Lu" <yangbo.lu@nxp.com>,
-        "Diana Madalina Craciun (OSS)" <diana.craciun@oss.nxp.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Richard Cochran <richardcochran@gmail.com>,
+        with ESMTP id S229492AbjDMGHK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 13 Apr 2023 02:07:10 -0400
+Received: from mail-lf1-x130.google.com (mail-lf1-x130.google.com [IPv6:2a00:1450:4864:20::130])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3B8D4EFD;
+        Wed, 12 Apr 2023 23:07:08 -0700 (PDT)
+Received: by mail-lf1-x130.google.com with SMTP id 2adb3069b0e04-4eca9c8dd57so27504e87.1;
+        Wed, 12 Apr 2023 23:07:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1681366027; x=1683958027;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=m+jl2LZuEAFtS9zMp6EpJ1KnP4j914ngxP5uVncQweg=;
+        b=cw0akD+AoIiKabjnRbCgexjolcpcvYdtKzzm28l9hy/fQfYNMjQhnrwOO9msg4wxYd
+         iZTiuq5rKXVlhKqLAbtV9lwMUQ30+GhPMtGI3jyy5rAslxMO1zCWxzLak3ZQSKhHNtr9
+         8mJJDiW26t0S8Zi39fuVcCCL9sj+uN/lQZNQR1lqbPZM+xF/MUF1jgLfHB+1ouUfgrn8
+         a6HStO0gzfLKvthtR/16lGm+0Ih66GZbvFE+jxM8688Ie52ApIKxgFmffoSPZIRk0Vvo
+         ptmvjbo08FTDZNv3VCfx/GQ53p2I7rdru49Vy6cV6TWkz3x09VRrsYw9vVeW6episrst
+         9YoA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1681366027; x=1683958027;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=m+jl2LZuEAFtS9zMp6EpJ1KnP4j914ngxP5uVncQweg=;
+        b=IteWgVf3ZiRaXrQ2Bga42bUpBegu40tIv2qy/Mx+zVLs8dGfbu4c6tzsjh8L5si4Nz
+         //FmEAH55BsFgCvQwVBSUwy043oEjcCXucVZ2RtZTluaNSXpexdqhTpVoBNhuhvjdBxT
+         uO0I8Ex60HpNuahZJgnkpddDOlBW9aXAINFx3PdRB9uYG8EEhKcabRLg5i9fhfGHQaux
+         ebbT8j44FQ1zf7vKvIDMcQ6xwexWu7cM5AIDbyl3nJ4sZ09o61jVTiDFheVRoI1ejd79
+         Xty+LwgPNIe7nOxS8U+cYMt7U6d4l84DCR/2Ikp6EvcT3nSnaFHB6aQ5v0jVUStdDbqi
+         DwnA==
+X-Gm-Message-State: AAQBX9d47LVfb71c9HgxRiA5PIcNPqXXUVLZe7wjyFbNFpqoK03mCOyy
+        2jw/jQpKY646U9f8QOaT6NXqsckvzSE=
+X-Google-Smtp-Source: AKy350ZXnLCgunmYyDc3KU4RwH/pvLVPA87FAEL/b2XDE9ZSGl3pBRfJBbI+fqKEz5eb2zxubloLAw==
+X-Received: by 2002:a05:651c:50a:b0:2a7:805e:b0e6 with SMTP id o10-20020a05651c050a00b002a7805eb0e6mr483136ljp.2.1681366026707;
+        Wed, 12 Apr 2023 23:07:06 -0700 (PDT)
+Received: from localhost (88-115-161-74.elisa-laajakaista.fi. [88.115.161.74])
+        by smtp.gmail.com with ESMTPSA id a23-20020a2e8317000000b002a79d7ceb93sm116515ljh.9.2023.04.12.23.07.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 12 Apr 2023 23:07:06 -0700 (PDT)
+Date:   Thu, 13 Apr 2023 09:07:03 +0300
+From:   Zhi Wang <zhi.wang.linux@gmail.com>
+To:     "Huang, Kai" <kai.huang@intel.com>
+Cc:     "Christopherson,, Sean" <seanjc@google.com>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "kernel@pengutronix.de" <kernel@pengutronix.de>,
-        "dmaengine@vger.kernel.org" <dmaengine@vger.kernel.org>,
-        "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
-        "linux-arm-kernel@lists.infradead.org" 
-        <linux-arm-kernel@lists.infradead.org>
-Subject: Re: [PATCH 0/6] bus: fsl-mc: Make remove function return void
-Message-ID: <20230413060004.t55sqmfxqtnejvkc@pengutronix.de>
-References: <20230310224128.2638078-1-u.kleine-koenig@pengutronix.de>
- <20230412171056.xcluewbuyytm77yp@pengutronix.de>
- <AM0PR04MB6289BB9BA4BC0B398F2989108F9B9@AM0PR04MB6289.eurprd04.prod.outlook.com>
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH 0/3] KVM: x86: SGX vs. XCR0 cleanups
+Message-ID: <20230413090703.00002690.zhi.wang.linux@gmail.com>
+In-Reply-To: <e1e7a37a29c2c7ad22cd14181f24b06088eca451.camel@intel.com>
+References: <20230405005911.423699-1-seanjc@google.com>
+        <d0af618169ebc17722e7019ca620ec22ee0b49c3.camel@intel.com>
+        <ZC4qF90l77m3X1Ir@google.com>
+        <20230406130119.000011fe.zhi.wang.linux@gmail.com>
+        <e1e7a37a29c2c7ad22cd14181f24b06088eca451.camel@intel.com>
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="dipxl4niloq7i3xa"
-Content-Disposition: inline
-In-Reply-To: <AM0PR04MB6289BB9BA4BC0B398F2989108F9B9@AM0PR04MB6289.eurprd04.prod.outlook.com>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ukl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: kvm@vger.kernel.org
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Wed, 12 Apr 2023 12:07:13 +0000
+"Huang, Kai" <kai.huang@intel.com> wrote:
 
---dipxl4niloq7i3xa
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> On Thu, 2023-04-06 at 13:01 +0300, Zhi Wang wrote:
+> > On Wed, 5 Apr 2023 19:10:40 -0700
+> > Sean Christopherson <seanjc@google.com> wrote:
+> > 
+> > > On Wed, Apr 05, 2023, Huang, Kai wrote:
+> > > > On Tue, 2023-04-04 at 17:59 -0700, Sean Christopherson wrote:
+> > > > > *** WARNING *** ABI breakage.
+> > > > > 
+> > > > > Stop adjusting the guest's CPUID info for the allowed XFRM (a.k.a. XCR0)
+> > > > > for SGX enclaves.  Past me didn't understand the roles and responsibilities
+> > > > > between userspace and KVM with respect to CPUID leafs, i.e. I thought I was
+> > > > > being helpful by having KVM adjust the entries.
+> > > > 
+> > > > Actually I am not clear about this topic.
+> > > > 
+> > > > So the rule is KVM should never adjust CPUID entries passed from userspace?
+> > > 
+> > > Yes, except for true runtime entries where a CPUID leaf is dynamic based on other
+> > > CPU state, e.g. CR4 bits, MISC_ENABLES in the MONITOR/MWAIT case, etc.
+> > > 
+> > > > What if the userspace passed the incorrect CPUID entries?  Should KVM sanitize
+> > > > those CPUID entries to ensure there's no insane configuration?  My concern is if
+> > > > we allow guest to be created with insane CPUID configurations, the guest can be
+> > > > confused and behaviour unexpectedly.
+> > > 
+> > > It is userspace's responsibility to provide a sane, correct setup.  The one
+> > > exception is that KVM rejects KVM_SET_CPUID{2} if userspace attempts to define an
+> > > unsupported virtual address width, the argument being that a malicious userspace
+> > > could attack KVM by coercing KVM into stuff a non-canonical address into e.g. a
+> > > VMCS field.
+> > > 
+> > > The reason for KVM punting to userspace is that it's all but impossible to define
+> > > what is/isn't sane.  A really good example would be an alternative we (Google)
+> > > considered for the "smaller MAXPHYADDR" fiasco, the underlying problem being that
+> > > migrating a vCPU with MAXPHYADDR=46 to a system with MAXPHYADDR=52 will incorrectly
+> > > miss reserved bit #PFs.
+> > > 
+> > > Rather than teach KVM to try and deal with smaller MAXPHYADDRs, an idea we considered
+> > > was to instead enumerate guest.MAXPHYADDR=52 on platforms with host.MAXPHYADDR=46 in
+> > > anticipation of eventual migration.  So long as userspace doesn't actually enumerate
+> > > memslots in the illegal address space, KVM would be able to treat such accesses as
+> > > emulated MMIO, and would only need to intercept #PF(RSVD).
+> > > 
+> > > Circling back to "what's sane", enumerating guest.MAXPHYADDR > host.MAXPHYADDR
+> > > definitely qualifies as insane since it really can't work correctly, but in our
+> > > opinion it was far superior to running with allow_smaller_maxphyaddr=true.
+> > > 
+> > > And sane is not the same thing as architecturally legal.  AMX is a good example
+> > > of this.  It's _technically_ legal to enumerate support for XFEATURE_TILE_CFG but
+> > > not XFEATURE_TILE_DATA in CPUID, but illegal to actually try to enable TILE_CFG
+> > > in XCR0 without also enabling TILE_DATA.  KVM should arguably reject CPUID configs
+> > > with TILE_CFG but not TILE_DATA, and vice versa, but then KVM is rejecting a 100%
+> > > architecturally valid, if insane, CPUID configuration.  Ditto for nearly all of
+> > > the VMX control bits versus their CPUID counterparts.
+> > > 
+> > > And sometimes there are good reasons to run a VM with a truly insane configuration,
+> > > e.g. for testing purposes.
+> > > 
+> > > TL;DR: trying to enforce "sane" CPUID/feature configuration is a gigantic can of worms.
+> > 
+> > Interesting point. I was digging the CPUID virtualization OF TDX/SNP.
+> > It would be nice to have a conclusion of what is "sane" and what is the
+> > proper role for KVM, as firmware/TDX module is going to validate the "sane"
+> > CPUID.
+> > 
+> > TDX/SNP requires the CPUID to be pre-configured and validated before creating
+> > a CC guest. (It is done via TDH.MNG.INIT in TDX and inserting a CPUID page in
+> > SNP_LAUNCH_UPDATE in SNP).
+> > 
+> > IIUC according to what you mentioned, KVM should be treated like "CPUID box"
+> > for QEMU and the checks in KVM is only to ensure the requirements of a chosen
+> > one is literally possible and correct. KVM should not care if the combination, the usage of the chosen ones is insane or not, which gives QEMU flexibility.
+> > 
+> > As the valid CPUIDs have been decided when creating a CC guest, what should be
+> > the proper behavior (basically any new checks?) of KVM for the later
+> > SET_CPUID2? My gut feeling is KVM should know the "CPUID box" is reduced
+> > at least, because some KVM code paths rely on guest CPUID configuration.
+> 
+> For TDX guest my preference is KVM to save all CPUID entries in TDH.MNG.INIT and
+> manually make vcpu's CPUID point to the saved CPUIDs.  And then KVM just ignore
+> the SET_CPUID2 for TDX guest.
+> 
+> Not sure whether AMD counterpart can be done in similar way though. 
 
-Hello Leo,
+I took a look on AMD SNP kernel[1], it supports host managing the CPUID
+and firmware managing the CPUID. The host-managed CPUID is done via a GHCB
+message call and it is going to be removed according to the SNP firmware ABI
+spec:
 
-On Wed, Apr 12, 2023 at 09:30:05PM +0000, Leo Li wrote:
-> > On Fri, Mar 10, 2023 at 11:41:22PM +0100, Uwe Kleine-K=F6nig wrote:
-> > > Hello,
-> > >
-> > > many bus remove functions return an integer which is a historic
-> > > misdesign that makes driver authors assume that there is some kind of
-> > > error handling in the upper layers. This is wrong however and
-> > > returning and error code only yields an error message.
-> > >
-> > > This series improves the fsl-mc bus by changing the remove callback to
-> > > return no value instead. As a preparation all drivers are changed to
-> > > return zero before so that they don't trigger the error message.
-> >=20
-> > Who is supposed to pick up this patch series (or point out a good reaso=
-n for
-> > not taking it)?
->=20
-> Previously Greg KH picked up MC bus patches.
->=20
-> If no one is picking up them this time, I probably can take it through
-> the fsl soc tree.
+7.1 CPUID Reporting
+Note: This guest message may be removed in future versions as it is redundant with the CPUID page in SNP_LAUNCH_UPDATE. (See Section 8.17.)
 
-I guess Greg won't pick up this series as he didn't get a copy of it :-)
+So the style of CPUID virtualization of TDX and SNP will be aligned eventually.
+Both will configure the supported CPUID for the firmware/TDX module before
+creating a vCPU. 
 
-Browsing through the history of drivers/bus/fsl-mc there is no
-consistent maintainer to see. So if you can take it, that's very
-appreciated.
-
-Best regards
-Uwe
-
---=20
-Pengutronix e.K.                           | Uwe Kleine-K=F6nig            |
-Industrial Linux Solutions                 | https://www.pengutronix.de/ |
-
---dipxl4niloq7i3xa
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEP4GsaTp6HlmJrf7Tj4D7WH0S/k4FAmQ3mmMACgkQj4D7WH0S
-/k5nNwf/ScXPEzfZ09aQk2Q2m2lyI5GB0AuO3Y2J4NAHIWgAoR/6wit1ruKkfvFq
-uejLhBvkfGFlVytm4oo946r8RzazbFffixp6Yiu9rh2Mi4ieF8/jqmGA+rWMomRF
-36k+LsVG7UvSLjpeYby2OHiMR/+fNc61mRb8vgTq7SMe8Un5o7Lz6vZw7z1vmCWC
-KsPwmDvkh3glY1HIqf+fTJoB9EtfGMoQy5umRsLYXWDL5sZYASpBLsHiSOc4KatF
-NCT6j5R0wItmhG83LAurRC5NcG8aZ1Jt7kU/Qp6kWMEw2bmgxfWOGhCA2hh5efsh
-Leq++vvq24OB1Bd9sVbvuYSkpixT7A==
-=v4Gk
------END PGP SIGNATURE-----
-
---dipxl4niloq7i3xa--
+[1] https://github.com/AMDESE/linux/blob/upmv10-host-snp-v8-rfc/arch/x86/kvm/svm/sev.c
+[2] https://www.amd.com/system/files/TechDocs/56860.pdf
