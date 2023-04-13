@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 63D9C6E08B4
-	for <lists+kvm@lfdr.de>; Thu, 13 Apr 2023 10:14:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BCCDA6E08B6
+	for <lists+kvm@lfdr.de>; Thu, 13 Apr 2023 10:14:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230360AbjDMIOz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Apr 2023 04:14:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54708 "EHLO
+        id S230365AbjDMIO5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Apr 2023 04:14:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54716 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230347AbjDMIOw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 13 Apr 2023 04:14:52 -0400
+        with ESMTP id S230351AbjDMIOx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 13 Apr 2023 04:14:53 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA00F5FD4
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0A6E768D
         for <kvm@vger.kernel.org>; Thu, 13 Apr 2023 01:14:51 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 441B4619D2
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 8B231634CC
         for <kvm@vger.kernel.org>; Thu, 13 Apr 2023 08:14:51 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A03F1C433A0;
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E049FC433A7;
         Thu, 13 Apr 2023 08:14:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
         s=k20201202; t=1681373690;
-        bh=ssGIGapEX7W9wNVAFXirqDVqgvwzBthGP08DUYy3w04=;
+        bh=rwmmXpw7HzvlcwZFWNqSFO/o0tH4qlAkLiVY1MwzDMc=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=fSSlUmww/bhflKQrsaGCMT9KSau9hd7ktOCvVx1z6D6W0+bVlEKZGQQ77NAIlZXht
-         IVV+YXbk1/6lG+hdjMPuiLqZ8qVo7uwm8eEBWri6qjmgzbSsQoVmS9GQ+oi2tuVGt1
-         Jr5MvyqLKt8esOSLOuRLTf013vlhktwRFFPb84bCEgU/etIGBcNtvFkFizE1mA40tL
-         PkmTTBRZ3+++dERjINrWSKGIyOA0SxDnF9Vb2T5XuTa/85CePy/7I5NxeuTekkEvJ9
-         /O0jnawnAvGtyEPCDHHdDaoGz9FY9qp24Eh8iQQb+qVnM3eTwVwAmVg2KO07on3Tbc
-         d1i+Rmw0FyVFA==
+        b=hM+Rhk0Zau1RZ9pXacqypToa2pX0j8u9m7YuXb5ACT3nw7Xz5SSVPBeJBK4fZS7f0
+         ymL26T8VT37UX/zNl8x5NE8VY89v2OcF/mHpMb2LubGg4cwyIY6y6QQFVRi+3g+uo+
+         EC2SIknQ+tK3dvdqbU/gh4qu5xlQ50Dwwc+tznCvDOttJUcFgtTq5Ece/dm0ZbNdJF
+         9rl9/BnVdsy2jkA6VxIiQCSeVhsnbj7nm28SR8ovxyPhc/b5MCaN4d9vLzJEBrtioF
+         vmbR9JlIeqsSmabWT74tNZME7MtjSozG2SvGewqsikuTHeiw7bIXMj+0BveAiRyTFI
+         PCtlm08PxuTMw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1pms6S-0082qd-Mf;
+        id 1pms6S-0082qd-TM;
         Thu, 13 Apr 2023 09:14:48 +0100
 From:   Marc Zyngier <maz@kernel.org>
 To:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
@@ -46,9 +46,9 @@ Cc:     James Morse <james.morse@arm.com>,
         Zenghui Yu <yuzenghui@huawei.com>,
         Will Deacon <will@kernel.org>,
         Ricardo Koller <ricarkol@google.com>
-Subject: [PATCH v3 2/5] KVM: arm64: nvhe: Synchronise with page table walker on TLBI
-Date:   Thu, 13 Apr 2023 09:14:38 +0100
-Message-Id: <20230413081441.165134-3-maz@kernel.org>
+Subject: [PATCH v3 3/5] KVM: arm64: pkvm: Document the side effects of kvm_flush_dcache_to_poc()
+Date:   Thu, 13 Apr 2023 09:14:39 +0100
+Message-Id: <20230413081441.165134-4-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230413081441.165134-1-maz@kernel.org>
 References: <20230413081441.165134-1-maz@kernel.org>
@@ -67,99 +67,36 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-A TLBI from EL2 impacting EL1 involves messing with the EL1&0
-translation regime, and the page table walker may still be
-performing speculative walks.
+We rely on the presence of a DSB at the end of kvm_flush_dcache_to_poc()
+that, on top of ensuring completion of the cache clean, also covers
+the speculative page table walk started from EL1.
 
-Piggyback on the existing DSBs to always have a DSB ISH that
-will synchronise all load/store operations that the PTW may
-still have.
+Document this dependency.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
+Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- arch/arm64/kvm/hyp/nvhe/tlb.c | 38 ++++++++++++++++++++++++++---------
- 1 file changed, 29 insertions(+), 9 deletions(-)
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/tlb.c b/arch/arm64/kvm/hyp/nvhe/tlb.c
-index d296d617f589..1da2fc35f94e 100644
---- a/arch/arm64/kvm/hyp/nvhe/tlb.c
-+++ b/arch/arm64/kvm/hyp/nvhe/tlb.c
-@@ -15,8 +15,31 @@ struct tlb_inv_context {
- };
- 
- static void __tlb_switch_to_guest(struct kvm_s2_mmu *mmu,
--				  struct tlb_inv_context *cxt)
-+				  struct tlb_inv_context *cxt,
-+				  bool nsh)
- {
-+	/*
-+	 * We have two requirements:
-+	 *
-+	 * - ensure that the page table updates are visible to all
-+         *   CPUs, for which a dsb(DOMAIN-st) is what we need, DOMAIN
-+         *   being either ish or nsh, depending on the invalidation
-+         *   type.
-+	 *
-+	 * - complete any speculative page table walk started before
-+         *   we trapped to EL2 so that we can mess with the MM
-+         *   registers out of context, for which dsb(nsh) is enough
-+	 *
-+	 * The composition of these two barriers is a dsb(DOMAIN), and
-+	 * the 'nsh' parameter tracks the distinction between
-+	 * Inner-Shareable and Non-Shareable, as specified by the
-+	 * callers.
-+	 */
-+	if (nsh)
-+		dsb(nsh);
-+	else
-+		dsb(ish);
+diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+index 552653fa18be..2e9ec4a2a4a3 100644
+--- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
++++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+@@ -297,6 +297,13 @@ int __pkvm_prot_finalize(void)
+ 	params->vttbr = kvm_get_vttbr(mmu);
+ 	params->vtcr = host_mmu.arch.vtcr;
+ 	params->hcr_el2 |= HCR_VM;
 +
- 	if (cpus_have_final_cap(ARM64_WORKAROUND_SPECULATIVE_AT)) {
- 		u64 val;
++	/*
++	 * The CMO below not only cleans the updated params to the
++	 * PoC, but also provides the DSB that ensures ongoing
++	 * page-table walks that have started before we trapped to EL2
++	 * have completed.
++	 */
+ 	kvm_flush_dcache_to_poc(params, sizeof(*params));
  
-@@ -60,10 +83,8 @@ void __kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu,
- {
- 	struct tlb_inv_context cxt;
- 
--	dsb(ishst);
--
- 	/* Switch to requested VMID */
--	__tlb_switch_to_guest(mmu, &cxt);
-+	__tlb_switch_to_guest(mmu, &cxt, false);
- 
- 	/*
- 	 * We could do so much better if we had the VA as well.
-@@ -113,10 +134,8 @@ void __kvm_tlb_flush_vmid(struct kvm_s2_mmu *mmu)
- {
- 	struct tlb_inv_context cxt;
- 
--	dsb(ishst);
--
- 	/* Switch to requested VMID */
--	__tlb_switch_to_guest(mmu, &cxt);
-+	__tlb_switch_to_guest(mmu, &cxt, false);
- 
- 	__tlbi(vmalls12e1is);
- 	dsb(ish);
-@@ -130,7 +149,7 @@ void __kvm_flush_cpu_context(struct kvm_s2_mmu *mmu)
- 	struct tlb_inv_context cxt;
- 
- 	/* Switch to requested VMID */
--	__tlb_switch_to_guest(mmu, &cxt);
-+	__tlb_switch_to_guest(mmu, &cxt, false);
- 
- 	__tlbi(vmalle1);
- 	asm volatile("ic iallu");
-@@ -142,7 +161,8 @@ void __kvm_flush_cpu_context(struct kvm_s2_mmu *mmu)
- 
- void __kvm_flush_vm_context(void)
- {
--	dsb(ishst);
-+	/* Same remark as in __tlb_switch_to_guest() */
-+	dsb(ish);
- 	__tlbi(alle1is);
- 
- 	/*
+ 	write_sysreg(params->hcr_el2, hcr_el2);
 -- 
 2.34.1
 
