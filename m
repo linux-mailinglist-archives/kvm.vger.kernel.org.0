@@ -2,110 +2,170 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8A2206E0D46
-	for <lists+kvm@lfdr.de>; Thu, 13 Apr 2023 14:13:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 709EE6E0DA5
+	for <lists+kvm@lfdr.de>; Thu, 13 Apr 2023 14:47:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229772AbjDMMNz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Apr 2023 08:13:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35950 "EHLO
+        id S229708AbjDMMrx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Apr 2023 08:47:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51942 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229678AbjDMMNx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 13 Apr 2023 08:13:53 -0400
-Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 21BA83C21;
-        Thu, 13 Apr 2023 05:13:53 -0700 (PDT)
-Received: by mail-pl1-x62f.google.com with SMTP id i8so5763449plt.10;
-        Thu, 13 Apr 2023 05:13:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1681388032; x=1683980032;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Saxvl5qt1Z3mQFBq5MXm2iUi65BPeDQQ5SDFNrUre9o=;
-        b=gKtVWu7VtuYe88jEQCtkngg30vFAmje93vdtPc3bXPUi9GOek82Mrnk8gBEFqQx7KJ
-         gBrFFS2Xfm8DqKSLVALwXY+AHamirnUqoOcPwAFzzYNw5eQq6vdVMIve6pExAMC2JeYg
-         S6/U/zHwA3Nu8KRavzJd5xTL1uVI/PnPQ/aYhp+IY1xcP11GQkC6ue6dWIHSmkknoZ+5
-         rwhkUa1Hqoyio6/wN4ijQKJXwIT+WBrxu3wjp5hJjsxmeyNmkwZ5YcvaQVOpg6taaXH1
-         byqqA4AIohMbzXtelx9tdhN5nCG/I+CuQue+fJYekekfB7MsYoJtONNaT90+57BhomIQ
-         D7pA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681388032; x=1683980032;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Saxvl5qt1Z3mQFBq5MXm2iUi65BPeDQQ5SDFNrUre9o=;
-        b=UAegpZlGVHX5RvvGiRMSZvbI/zuje3UsY86RfoIKN5lQ2p0mNL5Nz1bAVlGVxXDHdn
-         4tA0ShxikfEWBFdW2aakb8+5VfJRCEb9sYnFsh8oUMLJ1VPOUxiO0N+dalIz2HfO/do0
-         3kOL+MYki0NV9NI/NMiaEsjonUMJb1YJiefhVZ+yOurRCjEcJFy6Z9d/Ws+YQi0S5raV
-         6YVzeXH5IuTupxRh6Y7nGb/TGvf/ol096U+Rjo1upRROZS6GKyxK11mDEYZ+kdm+Duri
-         snJFPMHbqFelbpAmSDyac5/NMB4d8cOXbbplowubYuslWIBPoR90cPVAbXASFwYc6NSO
-         9Igw==
-X-Gm-Message-State: AAQBX9eyVImTaOb7HML2/YQEb88Jg/Hsn8ffyck4j7+CUUvm/eECbK/X
-        RO8vGSiuldni006MmG4MmP4=
-X-Google-Smtp-Source: AKy350bBVj+ORBDiZvhDO7M1UqGIqAQF/FMKhs9LQK9n2UWpXzFGiiUx15Ge519tXB6tIKzlQWobBA==
-X-Received: by 2002:a17:90a:2a02:b0:246:d1ae:5fce with SMTP id i2-20020a17090a2a0200b00246d1ae5fcemr1662514pjd.35.1681388032339;
-        Thu, 13 Apr 2023 05:13:52 -0700 (PDT)
-Received: from localhost.localdomain ([43.132.141.9])
-        by smtp.gmail.com with ESMTPSA id ep13-20020a17090ae64d00b00246a7401d23sm1212814pjb.41.2023.04.13.05.13.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 13 Apr 2023 05:13:51 -0700 (PDT)
-From:   alexjlzheng@gmail.com
-X-Google-Original-From: alexjlzheng@tencent.com
-To:     seanjc@google.com, pbonzini@redhat.com, tglx@linutronix.de,
-        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
-        x86@kernel.org, hpa@zytor.com
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jinliang Zheng <alexjlzheng@tencent.com>
-Subject: [PATCH v2] KVM: x86: Fix poll command
-Date:   Thu, 13 Apr 2023 20:11:14 +0800
-Message-Id: <20230413121112.2563319-1-alexjlzheng@tencent.com>
-X-Mailer: git-send-email 2.31.1
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+        with ESMTP id S229479AbjDMMrw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 13 Apr 2023 08:47:52 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EACE3E46
+        for <kvm@vger.kernel.org>; Thu, 13 Apr 2023 05:47:50 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 868E760C48
+        for <kvm@vger.kernel.org>; Thu, 13 Apr 2023 12:47:50 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E407EC433D2;
+        Thu, 13 Apr 2023 12:47:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1681390069;
+        bh=lYjq1mhm2KORM73zusnPCOsUTVos5st/Qc5aIpzBhas=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=DRDNznaiCFTKJa2uiV9LQZZpUa/MHjZjxsD338y29ZGw5RLimFmhVztKVTdS9q15t
+         IoiLPVDVKgJiEko2I4fzivMQF8NYFgSUIq85a/7Vn8tnK801zmehR/NspysLHr8xpT
+         SVtcRc1sastFusHb9rcNBdEul0lKysIwBY80ITCEAK9f0b7pqM/RTpnb9a8dmfGFMQ
+         DT//tnmf9kXuer0qcZsh2bvDGPx4aIyYYerv286thq73Tb8lNwbmER2W9HWDAwSbSW
+         mXi8o8Savm7V+L4AdxAoLSm8KH40cH4XOzdh5jblVMdt/vYHNEIfUwBTqwhnADeV4V
+         S2MTaIdS/gMfw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1pmwMd-0086cc-K7;
+        Thu, 13 Apr 2023 13:47:47 +0100
+Date:   Thu, 13 Apr 2023 13:47:47 +0100
+Message-ID: <86h6tkkky4.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Reiji Watanabe <reijiw@google.com>
+Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Simon Veith <sveith@amazon.de>,
+        Colton Lewis <coltonlewis@google.com>,
+        Joey Gouly <joey.gouly@arm.com>, dwmw2@infradead.org
+Subject: Re: [PATCH v4 05/20] KVM: arm64: timers: Allow physical offset without CNTPOFF_EL2
+In-Reply-To: <20230410153441.vddskgxu2zzsi7bq@google.com>
+References: <20230330174800.2677007-1-maz@kernel.org>
+        <20230330174800.2677007-6-maz@kernel.org>
+        <20230410153441.vddskgxu2zzsi7bq@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: reijiw@google.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, ricarkol@google.com, sveith@amazon.de, coltonlewis@google.com, joey.gouly@arm.com, dwmw2@infradead.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Jinliang Zheng <alexjlzheng@tencent.com>
+On Mon, 10 Apr 2023 16:34:41 +0100,
+Reiji Watanabe <reijiw@google.com> wrote:
+> 
+> Hi Marc,
+> 
+> On Thu, Mar 30, 2023 at 06:47:45PM +0100, Marc Zyngier wrote:
 
-According to the hardware manual, when the Poll command is issued, the
-byte returned by the I/O read is 1 in Bit 7 when there is an interrupt,
-and the highest priority binary code in Bits 2:0. The current pic
-simulation code is not implemented strictly according to the above
-expression.
+[...]
 
-Fix the implementation of pic_poll_read():
-1. Set Bit 7 when there is an interrupt
-2. Return 0 when there is no interrupt
+> > +	assign_clear_set_bit(tpt, CNTHCTL_EL1PCEN << 10, set, clr);
+> > +	assign_clear_set_bit(tpc, CNTHCTL_EL1PCTEN << 10, set, clr);
+> 
+> Nit: IMHO the way the code specifies the 'set' and 'clr' arguments for
+> the macro might be a bit confusing ('set' is for '_clr', and 'clr' is
+> for '_set')?
 
-Signed-off-by: Jinliang Zheng <alexjlzheng@tencent.com>
----
-Changes since Version V2:
-- Keep the logic of pic_poll_read(), only fix the return value
----
- arch/x86/kvm/i8259.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+I don't disagree, but we end-up with bits of different polarity once
+NV is fully in, see:
 
-diff --git a/arch/x86/kvm/i8259.c b/arch/x86/kvm/i8259.c
-index 4756bcb5724f..6627f8a52f23 100644
---- a/arch/x86/kvm/i8259.c
-+++ b/arch/x86/kvm/i8259.c
-@@ -411,8 +411,9 @@ static u32 pic_poll_read(struct kvm_kpic_state *s, u32 addr1)
- 		pic_clear_isr(s, ret);
- 		if (addr1 >> 7 || ret != 2)
- 			pic_update_irq(s->pics_state);
-+		ret |= 0x80;
- 	} else {
--		ret = 0x07;
-+		ret = 0x00;
- 		pic_update_irq(s->pics_state);
- 	}
- 
+https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/tree/arch/arm64/kvm/arch_timer.c?h=kvm-arm64/nv-6.4-WIP#n861
+
+> Perhaps changing the parameter names of assign_clear_set_bit() like
+> below or flipping the condition (i.e. Specify !tpt or no_tpt instead
+> of tpt) might be less confusing?
+> 
+> #define assign_clear_set_bit(_pred, _bit, _t_val, _f_val)	\
+> do {								\
+> 	if (_pred)						\
+> 		(_t_val) |= (_bit);				\
+> 	else							\
+> 		(_f_val) |= (_bit);				\
+> } while (0)
+
+See the pointer above. We need a good way to specify bits that have
+one polarity or another, and compute the result given the high-level
+constraints that are provided by the emulation code.
+
+So far, I haven't been able to work out something "nice".
+
+[...]
+
+> > +	{ SYS_DESC(SYS_CNTPCT_EL0), access_arch_timer },
+> > +	{ SYS_DESC(SYS_CNTPCTSS_EL0), access_arch_timer },
+> >  	{ SYS_DESC(SYS_CNTP_TVAL_EL0), access_arch_timer },
+> >  	{ SYS_DESC(SYS_CNTP_CTL_EL0), access_arch_timer },
+> >  	{ SYS_DESC(SYS_CNTP_CVAL_EL0), access_arch_timer },
+> > @@ -2525,6 +2533,7 @@ static const struct sys_reg_desc cp15_64_regs[] = {
+> >  	{ Op1( 0), CRn( 0), CRm( 2), Op2( 0), access_vm_reg, NULL, TTBR0_EL1 },
+> >  	{ CP15_PMU_SYS_REG(DIRECT, 0, 0, 9, 0), .access = access_pmu_evcntr },
+> >  	{ Op1( 0), CRn( 0), CRm(12), Op2( 0), access_gic_sgi }, /* ICC_SGI1R */
+> > +	{ SYS_DESC(SYS_AARCH32_CNTPCT),	      access_arch_timer },
+> 
+> Shouldn't KVM also emulate CNTPCTSS (Aarch32) when its trapping is
+> enabled on the host with ECV_CNTPOFF ?
+
+Oh, well spotted. I'll queue something on top of the series to that
+effect (I'd rather not respin it as it has been in -next for some
+time, and the merge window is approaching).
+
+> 
+> 
+> >  	{ Op1( 1), CRn( 0), CRm( 2), Op2( 0), access_vm_reg, NULL, TTBR1_EL1 },
+> >  	{ Op1( 1), CRn( 0), CRm(12), Op2( 0), access_gic_sgi }, /* ICC_ASGI1R */
+> >  	{ Op1( 2), CRn( 0), CRm(12), Op2( 0), access_gic_sgi }, /* ICC_SGI0R */
+> > -- 
+> > 2.34.1
+> > 
+> > 
+> 
+> Nit: In emulating reading physical counter/timer for direct_ptimer
+> (poffset != 0 on VHE without ECV_CNTPOFF), it appears that
+> kvm_arm_timer_read_sysreg() unnecessarily calls
+> timer_{save,restore}_state(), and kvm_arm_timer_write_sysreg()
+> unnecessarily calls timer_save_state().  Couldn't we skip those
+> unnecessary calls ? (I didn't check all the following patches, but
+> the current code would be more convenient in the following patches ?)
+
+Well, it depends how you look at it. We still perform "some" level of
+emulation (such as offsetting CVAL), and it allows us to share some
+code with the full emulation.
+
+On top of that, we already fast-track CNTPCT_EL0, which is the main
+user, and has a visible benefit with NV. If anything, I'd rather add a
+similar fast-tracking for the read side of CNTP_CVAL_EL0 and
+CNTP_CTL_EL0. We could then leave that code for 32bit only, which
+nobody gives a toss about.
+
+What do you think?
+
+Thanks,
+
+	M.
+
 -- 
-2.31.1
-
+Without deviation from the norm, progress is not possible.
