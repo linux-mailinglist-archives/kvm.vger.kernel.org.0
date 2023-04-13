@@ -2,142 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DE6C26E063B
-	for <lists+kvm@lfdr.de>; Thu, 13 Apr 2023 07:07:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 181766E06A3
+	for <lists+kvm@lfdr.de>; Thu, 13 Apr 2023 08:00:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229832AbjDMFHL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Apr 2023 01:07:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36728 "EHLO
+        id S229742AbjDMGAb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Apr 2023 02:00:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58226 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229492AbjDMFHK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 13 Apr 2023 01:07:10 -0400
-Received: from mail-lf1-x134.google.com (mail-lf1-x134.google.com [IPv6:2a00:1450:4864:20::134])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B21F75BA2;
-        Wed, 12 Apr 2023 22:07:08 -0700 (PDT)
-Received: by mail-lf1-x134.google.com with SMTP id 2adb3069b0e04-4eca9c8dd57so24771e87.1;
-        Wed, 12 Apr 2023 22:07:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1681362427; x=1683954427;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=TX7sRRid9awit1AAtC83vg5eH8pjTbDg4I2j4+jQwKU=;
-        b=kS+OLw/Lqe8fkbB04uniKG+lwmu4vGoC+qLUtHqpXC+s+0m7OZnSWpVWYRQp615FSA
-         yyes7szk8xr3DKJubBSQy0C2aX44enOWhcNNZZTM6h9LYgvs78YpXCqXqMxRCA72aHMq
-         EAYr9J3Da3tkdfhgJM9pVvewhLdZHGTF9qBqm8wuEx4OIgXmU3WnXyiKBpVZLtnPhUrg
-         4ptRD3synuM/c8n2iYFE5eLlg3OaVxUjxtO6U+VA5ybcXMp0lT9CqSIRuuUhybHFnvNB
-         4/+augWlK7HtzgK5BB9Zf3xYodZBZHDZs7Vnwo7D/SMUhQOLn7BxiLBO0vaeiZdFaBVG
-         X/SQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681362427; x=1683954427;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=TX7sRRid9awit1AAtC83vg5eH8pjTbDg4I2j4+jQwKU=;
-        b=XEVU0bgyddekHEFEaeuMifWr8/p5a6PHu9RHU2EWa9eZjVH0oZkXUKDc8lm677ZavV
-         dPMrsyjgWjBas48BNEoDnPaHi4V3EviTyIrAAyWodqBNdEAZVDj8Z6i0neenzlEzDpf6
-         KRs6iyCUlnUV0ybQw+dgJeNWNsExttcmkVAffKHaAhOtP1VYJcC/o+ohObaSlqYub8Zm
-         0pKEeXQ2VPXLVsVH/4tlWdnPR0dNtfLchekPboes0RdjxzFskLu6dMNM/yE/BA4t7Gu5
-         e8mKWPkJtFph1nTZX9hfPxRsZSQJy2wwUvjgrjIMms/gcwocxKJGyfB7HbPrQ93B9J5h
-         astA==
-X-Gm-Message-State: AAQBX9ck+HMD37zVcYj6hgGfgY+njs++MJbxKn1C6HWqVO0u+XLk3+8K
-        fIfSB/M+R6klTJhCGgrl5T0=
-X-Google-Smtp-Source: AKy350Z9oxZZruutW3SOCaLih71+1Q72m9rkvwK1AYXTYfRotGa3BKY+bBY43SYHUE5NAtw3vAbstg==
-X-Received: by 2002:a19:7615:0:b0:4e9:c792:c950 with SMTP id c21-20020a197615000000b004e9c792c950mr324230lff.1.1681362426674;
-        Wed, 12 Apr 2023 22:07:06 -0700 (PDT)
-Received: from localhost (88-115-161-74.elisa-laajakaista.fi. [88.115.161.74])
-        by smtp.gmail.com with ESMTPSA id b10-20020ac25e8a000000b004d856fe5121sm133850lfq.194.2023.04.12.22.07.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Apr 2023 22:07:06 -0700 (PDT)
-Date:   Thu, 13 Apr 2023 08:07:02 +0300
-From:   Zhi Wang <zhi.wang.linux@gmail.com>
-To:     Aleksandr Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
-Cc:     pbonzini@redhat.com, Sean Christopherson <seanjc@google.com>,
-        =?ISO-8859-1?Q?St=E9phane?= Graber <stgraber@ubuntu.com>,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/2] KVM: SVM: free sev_*asid_bitmap init if SEV init
- fails
-Message-ID: <20230413080702.0000016b.zhi.wang.linux@gmail.com>
-In-Reply-To: <CAEivzxfxm9Kg-ap9QeceGgTeCd0du7FrH7Kmi2dRZH6gah-8HQ@mail.gmail.com>
-References: <20230404122652.275005-1-aleksandr.mikhalitsyn@canonical.com>
-        <20230404122652.275005-2-aleksandr.mikhalitsyn@canonical.com>
-        <20230411224737.00001d67.zhi.wang.linux@gmail.com>
-        <CAEivzxfxm9Kg-ap9QeceGgTeCd0du7FrH7Kmi2dRZH6gah-8HQ@mail.gmail.com>
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
+        with ESMTP id S229516AbjDMGA3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 13 Apr 2023 02:00:29 -0400
+Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C91662112
+        for <kvm@vger.kernel.org>; Wed, 12 Apr 2023 23:00:28 -0700 (PDT)
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+        by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <ukl@pengutronix.de>)
+        id 1pmq08-0006Ev-7l; Thu, 13 Apr 2023 08:00:08 +0200
+Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
+        by drehscheibe.grey.stw.pengutronix.de with esmtp (Exim 4.94.2)
+        (envelope-from <ukl@pengutronix.de>)
+        id 1pmq05-00Atqo-4l; Thu, 13 Apr 2023 08:00:05 +0200
+Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.94.2)
+        (envelope-from <ukl@pengutronix.de>)
+        id 1pmq04-00CnQS-Az; Thu, 13 Apr 2023 08:00:04 +0200
+Date:   Thu, 13 Apr 2023 08:00:04 +0200
+From:   Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
+To:     Leo Li <leoyang.li@nxp.com>
+Cc:     Stuart Yoder <stuyoder@gmail.com>,
+        Laurentiu Tudor <laurentiu.tudor@nxp.com>,
+        Roy Pledge <roy.pledge@nxp.com>,
+        Horia Geanta <horia.geanta@nxp.com>,
+        Pankaj Gupta <pankaj.gupta@nxp.com>,
+        Gaurav Jain <gaurav.jain@nxp.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Vinod Koul <vkoul@kernel.org>,
+        Ioana Ciornei <ioana.ciornei@nxp.com>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, "Y.B. Lu" <yangbo.lu@nxp.com>,
+        "Diana Madalina Craciun (OSS)" <diana.craciun@oss.nxp.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Richard Cochran <richardcochran@gmail.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "kernel@pengutronix.de" <kernel@pengutronix.de>,
+        "dmaengine@vger.kernel.org" <dmaengine@vger.kernel.org>,
+        "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>
+Subject: Re: [PATCH 0/6] bus: fsl-mc: Make remove function return void
+Message-ID: <20230413060004.t55sqmfxqtnejvkc@pengutronix.de>
+References: <20230310224128.2638078-1-u.kleine-koenig@pengutronix.de>
+ <20230412171056.xcluewbuyytm77yp@pengutronix.de>
+ <AM0PR04MB6289BB9BA4BC0B398F2989108F9B9@AM0PR04MB6289.eurprd04.prod.outlook.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: multipart/signed; micalg=pgp-sha512;
+        protocol="application/pgp-signature"; boundary="dipxl4niloq7i3xa"
+Content-Disposition: inline
+In-Reply-To: <AM0PR04MB6289BB9BA4BC0B398F2989108F9B9@AM0PR04MB6289.eurprd04.prod.outlook.com>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ukl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: kvm@vger.kernel.org
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 12 Apr 2023 16:52:23 +0200
-Aleksandr Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com> wrote:
 
-> On Tue, Apr 11, 2023 at 9:47=E2=80=AFPM Zhi Wang <zhi.wang.linux@gmail.co=
-m> wrote:
-> >
-> > On Tue,  4 Apr 2023 14:26:51 +0200
-> > Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com> wrote:
-> >
-> > > If misc_cg_set_capacity() fails for some reason then we have
-> > > a memleak for sev_reclaim_asid_bitmap/sev_asid_bitmap. It's
-> > > not a case right now, because misc_cg_set_capacity() just can't
-> > > fail and check inside it is always successful.
-> > >
-> > > But let's fix that for code consistency.
-> > >
-> > > Cc: Sean Christopherson <seanjc@google.com>
-> > > Cc: Paolo Bonzini <pbonzini@redhat.com>
-> > > Cc: St=C3=A9phane Graber <stgraber@ubuntu.com>
-> > > Cc: kvm@vger.kernel.org
-> > > Cc: linux-kernel@vger.kernel.org
-> > > Signed-off-by: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical=
-.com>
-> > > ---
-> > >  arch/x86/kvm/svm/sev.c | 7 ++++++-
-> > >  1 file changed, 6 insertions(+), 1 deletion(-)
-> > >
-> > > diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> > > index c25aeb550cd9..a42536a0681a 100644
-> > > --- a/arch/x86/kvm/svm/sev.c
-> > > +++ b/arch/x86/kvm/svm/sev.c
-> > > @@ -2213,8 +2213,13 @@ void __init sev_hardware_setup(void)
-> > >       }
-> > >
-> > >       sev_asid_count =3D max_sev_asid - min_sev_asid + 1;
-> > > -     if (misc_cg_set_capacity(MISC_CG_RES_SEV, sev_asid_count))
-> > > +     if (misc_cg_set_capacity(MISC_CG_RES_SEV, sev_asid_count)) {
-> > > +             bitmap_free(sev_reclaim_asid_bitmap);
-> > > +             sev_reclaim_asid_bitmap =3D NULL;
-> > > +             bitmap_free(sev_asid_bitmap);
-> > > +             sev_asid_bitmap =3D NULL;
-> > >               goto out;
-> > > +     }
-> > >
-> > >       pr_info("SEV supported: %u ASIDs\n", sev_asid_count);
-> > >       sev_supported =3D true;
-> >
-> > It would be nice that another case can also be fixed:
-> >
-> >         sev_es_asid_count =3D min_sev_asid - 1;
-> >         if (misc_cg_set_capacity(MISC_CG_RES_SEV_ES, sev_es_asid_count))
-> >                 goto out; /* <----HERE */
->=20
-> Nope.
->=20
-> There is no leak. Because when we are at this point then sev_supported
-> =3D true and everything is fine.
->=20
-Uh. You are right. Sorry that I was giving this comment based on my on-going
-development branch.
-> >
-> > Maybe it would be a good idea to factor out an common error handling pa=
-th.
+--dipxl4niloq7i3xa
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
+Hello Leo,
+
+On Wed, Apr 12, 2023 at 09:30:05PM +0000, Leo Li wrote:
+> > On Fri, Mar 10, 2023 at 11:41:22PM +0100, Uwe Kleine-K=F6nig wrote:
+> > > Hello,
+> > >
+> > > many bus remove functions return an integer which is a historic
+> > > misdesign that makes driver authors assume that there is some kind of
+> > > error handling in the upper layers. This is wrong however and
+> > > returning and error code only yields an error message.
+> > >
+> > > This series improves the fsl-mc bus by changing the remove callback to
+> > > return no value instead. As a preparation all drivers are changed to
+> > > return zero before so that they don't trigger the error message.
+> >=20
+> > Who is supposed to pick up this patch series (or point out a good reaso=
+n for
+> > not taking it)?
+>=20
+> Previously Greg KH picked up MC bus patches.
+>=20
+> If no one is picking up them this time, I probably can take it through
+> the fsl soc tree.
+
+I guess Greg won't pick up this series as he didn't get a copy of it :-)
+
+Browsing through the history of drivers/bus/fsl-mc there is no
+consistent maintainer to see. So if you can take it, that's very
+appreciated.
+
+Best regards
+Uwe
+
+--=20
+Pengutronix e.K.                           | Uwe Kleine-K=F6nig            |
+Industrial Linux Solutions                 | https://www.pengutronix.de/ |
+
+--dipxl4niloq7i3xa
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEP4GsaTp6HlmJrf7Tj4D7WH0S/k4FAmQ3mmMACgkQj4D7WH0S
+/k5nNwf/ScXPEzfZ09aQk2Q2m2lyI5GB0AuO3Y2J4NAHIWgAoR/6wit1ruKkfvFq
+uejLhBvkfGFlVytm4oo946r8RzazbFffixp6Yiu9rh2Mi4ieF8/jqmGA+rWMomRF
+36k+LsVG7UvSLjpeYby2OHiMR/+fNc61mRb8vgTq7SMe8Un5o7Lz6vZw7z1vmCWC
+KsPwmDvkh3glY1HIqf+fTJoB9EtfGMoQy5umRsLYXWDL5sZYASpBLsHiSOc4KatF
+NCT6j5R0wItmhG83LAurRC5NcG8aZ1Jt7kU/Qp6kWMEw2bmgxfWOGhCA2hh5efsh
+Leq++vvq24OB1Bd9sVbvuYSkpixT7A==
+=v4Gk
+-----END PGP SIGNATURE-----
+
+--dipxl4niloq7i3xa--
