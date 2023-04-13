@@ -2,60 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 014C86E146A
-	for <lists+kvm@lfdr.de>; Thu, 13 Apr 2023 20:43:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A8B4C6E146B
+	for <lists+kvm@lfdr.de>; Thu, 13 Apr 2023 20:43:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230242AbjDMSn2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Apr 2023 14:43:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32836 "EHLO
+        id S230259AbjDMSn3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Apr 2023 14:43:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33046 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229871AbjDMSnJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S230071AbjDMSnJ (ORCPT <rfc822;kvm@vger.kernel.org>);
         Thu, 13 Apr 2023 14:43:09 -0400
-Received: from mail-wr1-x436.google.com (mail-wr1-x436.google.com [IPv6:2a00:1450:4864:20::436])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86A2286A8
-        for <kvm@vger.kernel.org>; Thu, 13 Apr 2023 11:42:47 -0700 (PDT)
-Received: by mail-wr1-x436.google.com with SMTP id q6so3696822wrc.3
-        for <kvm@vger.kernel.org>; Thu, 13 Apr 2023 11:42:47 -0700 (PDT)
+Received: from mail-wr1-x431.google.com (mail-wr1-x431.google.com [IPv6:2a00:1450:4864:20::431])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A5F08A4F
+        for <kvm@vger.kernel.org>; Thu, 13 Apr 2023 11:42:48 -0700 (PDT)
+Received: by mail-wr1-x431.google.com with SMTP id s2so11890329wra.7
+        for <kvm@vger.kernel.org>; Thu, 13 Apr 2023 11:42:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=grsecurity.net; s=grsec; t=1681411366; x=1684003366;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=VEzPnT9BJgEXvliDbDR1VhVozm5deAohFLLUYFFrBSc=;
-        b=H7aOLZRY/iUS6b27nuIM1MoBSXZt+ExRPdjmx7NTJX+eCcH2iDa1IFEWbjYKbi52eD
-         Ok92+TL0FyyulJZNvnLMrwF/dq+qr1tT5ms5oCTKNsRiHK7BEPRzSApXqovau8owHlg4
-         wEoAG6FhX1/AOt5hUcoeLxkgJX3npaMbzSh3H+5Ay7vYDfXr3CWd4FMScuv9tniYkaju
-         pCcVhNkpXEiruVJt0BfseZG445yN6dmHLdLabK8WgMm20mUzEOIHrQPb6HqHmaJF89ju
-         k4XB+XcmH3cu7LcpmoZcyeR4wj3ceBFgM6C8GocKK2mcV8Y64y/Jm8IRAJs5m3Qvndup
-         d+xg==
+        bh=fbNSmdopHWdD2/8eXrDn8O1lhc85x+0fvqbJjVSSLV0=;
+        b=ns64lkz7Ny1HglhPxc3dH14AI5Aam0j7OYOcbfzAu2TA0lkaupMWeIzw0Ypz7ftSsk
+         w5BUPEG/WU73TLVPc6JK1F062VWqg6j+x1q3fUKoL/psQPRIgsfWpfHqdaQLMuET3YoK
+         w64nSat0SVT5kufRgxtUO5dtTPbKKbg2JDx9DoOB5EYWK73uD1DxSy22dnv7PqFOvRUv
+         lrxLCpNYrdxzSAxa1vpRDmHJp+PdYIZe0y+ZDs7E99IOdObMFJjaAXIb9nXt8Dp5mLQO
+         Gkqit3pdBeWNbATqiWP30LQssppNEbvAedmRJUnxaQXpAOPuB3vKTr1WW8wrc0HW843A
+         JHTQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20221208; t=1681411366; x=1684003366;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=VEzPnT9BJgEXvliDbDR1VhVozm5deAohFLLUYFFrBSc=;
-        b=VwcNWsq7zkQDeREnzB9CExMl8GCUFdJuXk1Rp9UXxk/gLofzQId0G7/rg/aBNCM95r
-         sqnmaiKKrr/TOqSg5Gj3xjLZ4I03CFP6lt642WE8zW6LQdK82e5TTI4SDk7poPCljCfd
-         NOXQZnPROn4BV6oxphhp1CE+auJOG40MkC2217y+LZx9+8f+Z3QQOmeT6/CRujzooHRo
-         MdCvaCBacNufToFOpo0fGahi5MvphrfteTDxE6gJ8iTsb0KudngPZZlTZzKxBaHBhc6l
-         kFDV4EUwSuBh6VihAA8QWyz40a/gzbrPXj9lVtwhOIfskuiojUK7Ffax4e3ObrjzVQiP
-         GG7w==
-X-Gm-Message-State: AAQBX9dDJAHs2oyJNGRpxCQFwlCSTyBQZ5MM1VTrqUyrB/EgBuT7ZVgX
-        S08QvJHJaQStfVqGIWfpoyJxzw==
-X-Google-Smtp-Source: AKy350Yk/Ft352jB0vtFJBgpo6mtO9m87CiPbw01r2kQx4ISkjhrBDTwRJ1Na1u6Ip5Kg4RHbBZJqg==
-X-Received: by 2002:a5d:4141:0:b0:2f0:2e3a:cbfa with SMTP id c1-20020a5d4141000000b002f02e3acbfamr2139364wrq.57.1681411366044;
+        bh=fbNSmdopHWdD2/8eXrDn8O1lhc85x+0fvqbJjVSSLV0=;
+        b=ATwV6KznP6zXGFXsqClHgfEBfI83MTKiMXHdnU+1FiV/YHCiP1aG4KCSCYYLwBEVb1
+         aE2XC6jbTQ0YkZbwW2bljG3AXtZsGY8veuEe9puAzGZnkRxFNa90l3Fm/l+/+NtfEhUS
+         izMxKlfb16Lcud+Rr3QiIdH7iBYBpcWmGL/NJ2uqdPJaE2WwlN0EOkTkrS2Cea/qBY8P
+         YuUmI1k9aBWdX+usB2yJF8r08imsaDsgZDN/GZTxgbpeGFaepar/K+6OAXUFero42OJu
+         TxaP1K1auCVG5YKvtQnc8780p58jPv8wxMA8QAKQq0NZzc7wGGBB55ARO5Y0eRdOTEUZ
+         1dKw==
+X-Gm-Message-State: AAQBX9ckR0MAz3BY9JKX7Lh+jg7om+fPek/aAeKhA3JK0JmjqkZ6+dwc
+        4ZKkVTAv1vxxUtypcogy56VqIQ==
+X-Google-Smtp-Source: AKy350bmLTfWaYtUsqiZEdIAj4IrVQm2K11sMKwsFwOyYYSMDyRJXdUyZ0dWbjYBiz5qAmCAYWuljA==
+X-Received: by 2002:adf:edce:0:b0:2ee:e456:5347 with SMTP id v14-20020adfedce000000b002eee4565347mr2313939wro.13.1681411366762;
         Thu, 13 Apr 2023 11:42:46 -0700 (PDT)
 Received: from nuc.fritz.box (p200300f6af154800ce0bb7f104d5fcf7.dip0.t-ipconnect.de. [2003:f6:af15:4800:ce0b:b7f1:4d5:fcf7])
-        by smtp.gmail.com with ESMTPSA id x15-20020a5d6b4f000000b002c8476dde7asm1812652wrw.114.2023.04.13.11.42.45
+        by smtp.gmail.com with ESMTPSA id x15-20020a5d6b4f000000b002c8476dde7asm1812652wrw.114.2023.04.13.11.42.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 13 Apr 2023 11:42:45 -0700 (PDT)
+        Thu, 13 Apr 2023 11:42:46 -0700 (PDT)
 From:   Mathias Krause <minipli@grsecurity.net>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org
 Cc:     Mathias Krause <minipli@grsecurity.net>
-Subject: [kvm-unit-tests PATCH v2 13/16] x86/emulator64: Add non-null selector test
-Date:   Thu, 13 Apr 2023 20:42:16 +0200
-Message-Id: <20230413184219.36404-14-minipli@grsecurity.net>
+Subject: [kvm-unit-tests PATCH v2 14/16] x86/emulator64: Switch test_jmp_noncanonical() to ASM_TRY()
+Date:   Thu, 13 Apr 2023 20:42:17 +0200
+Message-Id: <20230413184219.36404-15-minipli@grsecurity.net>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230413184219.36404-1-minipli@grsecurity.net>
 References: <20230413184219.36404-1-minipli@grsecurity.net>
@@ -71,33 +71,41 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Complement the NULL selector based RPL!=CPL test with a non-NULL one to
-ensure the failing segment selector is correctly reported through the
-exception error code.
+Instead of registering a one-off exception handler, make use of
+ASM_TRY() to catch the exception. Also make use of the 'NONCANONICAL'
+define to refer to a non-canonical address.
 
 Signed-off-by: Mathias Krause <minipli@grsecurity.net>
 ---
- x86/emulator64.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+ x86/emulator64.c | 15 ++++-----------
+ 1 file changed, 4 insertions(+), 11 deletions(-)
 
 diff --git a/x86/emulator64.c b/x86/emulator64.c
-index a98c66c2b44f..492e8a292839 100644
+index 492e8a292839..50a02bca6ac8 100644
 --- a/x86/emulator64.c
 +++ b/x86/emulator64.c
-@@ -401,6 +401,13 @@ static void test_sreg(volatile uint16_t *mem)
- 	       exception_error_code() == 0 && read_ss() == 0,
- 	       "mov null, %%ss (with ss.rpl != cpl)");
+@@ -334,17 +334,10 @@ static void test_mmx_movq_mf(uint64_t *mem)
  
-+	// check for exception when ss.rpl != cpl on non-null segment load
-+	*mem = KERNEL_DS | 3;
-+	asm volatile(ASM_TRY("1f") "mov %0, %%ss; 1:" : : "m"(*mem));
-+	report(exception_vector() == GP_VECTOR &&
-+	       exception_error_code() == KERNEL_DS && read_ss() == 0,
-+	       "mov non-null, %%ss (with ss.rpl != cpl)");
-+
- 	write_ss(ss);
+ static void test_jmp_noncanonical(uint64_t *mem)
+ {
+-	extern char nc_jmp_start, nc_jmp_end;
+-	handler old;
+-
+-	*mem = 0x1111111111111111ul;
+-
+-	exceptions = 0;
+-	rip_advance = &nc_jmp_end - &nc_jmp_start;
+-	old = handle_exception(GP_VECTOR, advance_rip_and_note_exception);
+-	asm volatile ("nc_jmp_start: jmp *%0; nc_jmp_end:" : : "m"(*mem));
+-	report(exceptions == 1, "jump to non-canonical address");
+-	handle_exception(GP_VECTOR, old);
++	*mem = NONCANONICAL;
++	asm volatile (ASM_TRY("1f") "jmp *%0; 1:" : : "m"(*mem));
++	report(exception_vector() == GP_VECTOR,
++	       "jump to non-canonical address");
  }
  
+ static void test_movabs(uint64_t *mem)
 -- 
 2.39.2
 
