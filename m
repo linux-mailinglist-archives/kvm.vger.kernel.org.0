@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CEC516E08B3
-	for <lists+kvm@lfdr.de>; Thu, 13 Apr 2023 10:14:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 63D9C6E08B4
+	for <lists+kvm@lfdr.de>; Thu, 13 Apr 2023 10:14:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230359AbjDMIOy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Apr 2023 04:14:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54694 "EHLO
+        id S230360AbjDMIOz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Apr 2023 04:14:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54708 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230061AbjDMIOw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S230347AbjDMIOw (ORCPT <rfc822;kvm@vger.kernel.org>);
         Thu, 13 Apr 2023 04:14:52 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6082C1A1
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA00F5FD4
         for <kvm@vger.kernel.org>; Thu, 13 Apr 2023 01:14:51 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id EFF3161382
-        for <kvm@vger.kernel.org>; Thu, 13 Apr 2023 08:14:50 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5C273C4339B;
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 441B4619D2
+        for <kvm@vger.kernel.org>; Thu, 13 Apr 2023 08:14:51 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A03F1C433A0;
         Thu, 13 Apr 2023 08:14:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
         s=k20201202; t=1681373690;
-        bh=qk94MloBoHcKpco7/ng1uMPscdfXbQSqaF+NP7aMdF4=;
+        bh=ssGIGapEX7W9wNVAFXirqDVqgvwzBthGP08DUYy3w04=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=WH+AyyeZa34g+wKSR6jaoKTa5ny4b6PVAHgmhPes7z8r8G2x+4yPJtn83Q2PVJWzm
-         gWGiC3QbZLubaWOzpnSS0rnmO1HlaG5b81vuZLWd4TtKJMBwBbZkGowP7AikxPLkt7
-         akMAyZB/52hzfr4APounc1WeygssrMSJ2qKHWFRtYrQgSOgALPJuLoB97xbPCaDpcL
-         oqMMhh5zG0c704A6zzDF5cCuyNnQLXHxIyOrp77IeAI40dTCH3GPANiuGdsdlJwnn/
-         gKyoClA1X4LUBiDeBaom1O2tT0FYRpcvmSYmsv2ZB4qgB1w3Fy4dDUlzYFnanTG3AQ
-         CQpkw/FKC6JKg==
+        b=fSSlUmww/bhflKQrsaGCMT9KSau9hd7ktOCvVx1z6D6W0+bVlEKZGQQ77NAIlZXht
+         IVV+YXbk1/6lG+hdjMPuiLqZ8qVo7uwm8eEBWri6qjmgzbSsQoVmS9GQ+oi2tuVGt1
+         Jr5MvyqLKt8esOSLOuRLTf013vlhktwRFFPb84bCEgU/etIGBcNtvFkFizE1mA40tL
+         PkmTTBRZ3+++dERjINrWSKGIyOA0SxDnF9Vb2T5XuTa/85CePy/7I5NxeuTekkEvJ9
+         /O0jnawnAvGtyEPCDHHdDaoGz9FY9qp24Eh8iQQb+qVnM3eTwVwAmVg2KO07on3Tbc
+         d1i+Rmw0FyVFA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1pms6S-0082qd-Fn;
+        id 1pms6S-0082qd-Mf;
         Thu, 13 Apr 2023 09:14:48 +0100
 From:   Marc Zyngier <maz@kernel.org>
 To:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
@@ -46,9 +46,9 @@ Cc:     James Morse <james.morse@arm.com>,
         Zenghui Yu <yuzenghui@huawei.com>,
         Will Deacon <will@kernel.org>,
         Ricardo Koller <ricarkol@google.com>
-Subject: [PATCH v3 1/5] KVM: arm64: nvhe: Synchronise with page table walker on vcpu run
-Date:   Thu, 13 Apr 2023 09:14:37 +0100
-Message-Id: <20230413081441.165134-2-maz@kernel.org>
+Subject: [PATCH v3 2/5] KVM: arm64: nvhe: Synchronise with page table walker on TLBI
+Date:   Thu, 13 Apr 2023 09:14:38 +0100
+Message-Id: <20230413081441.165134-3-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230413081441.165134-1-maz@kernel.org>
 References: <20230413081441.165134-1-maz@kernel.org>
@@ -67,82 +67,99 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When taking an exception between the EL1&0 translation regime and
-the EL2 translation regime, the page table walker is allowed to
-complete the walks started from EL0 or EL1 while running at EL2.
+A TLBI from EL2 impacting EL1 involves messing with the EL1&0
+translation regime, and the page table walker may still be
+performing speculative walks.
 
-It means that altering the system registers that define the EL1&0
-translation regime is fraught with danger *unless* we wait for
-the completion of such walk with a DSB (R_LFHQG and subsequent
-statements in the ARM ARM). We already did the right thing for
-other external agents (SPE, TRBE), but not the PTW.
-
-Rework the existing SPE/TRBE synchronisation to include the PTW,
-and add the missing DSB on guest exit.
+Piggyback on the existing DSBs to always have a DSB ISH that
+will synchronise all load/store operations that the PTW may
+still have.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
-Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- arch/arm64/kvm/hyp/nvhe/debug-sr.c |  2 --
- arch/arm64/kvm/hyp/nvhe/switch.c   | 18 ++++++++++++++++++
- 2 files changed, 18 insertions(+), 2 deletions(-)
+ arch/arm64/kvm/hyp/nvhe/tlb.c | 38 ++++++++++++++++++++++++++---------
+ 1 file changed, 29 insertions(+), 9 deletions(-)
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/debug-sr.c b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
-index 2673bde62fad..d756b939f296 100644
---- a/arch/arm64/kvm/hyp/nvhe/debug-sr.c
-+++ b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
-@@ -37,7 +37,6 @@ static void __debug_save_spe(u64 *pmscr_el1)
+diff --git a/arch/arm64/kvm/hyp/nvhe/tlb.c b/arch/arm64/kvm/hyp/nvhe/tlb.c
+index d296d617f589..1da2fc35f94e 100644
+--- a/arch/arm64/kvm/hyp/nvhe/tlb.c
++++ b/arch/arm64/kvm/hyp/nvhe/tlb.c
+@@ -15,8 +15,31 @@ struct tlb_inv_context {
+ };
  
- 	/* Now drain all buffered data to memory */
- 	psb_csync();
--	dsb(nsh);
- }
- 
- static void __debug_restore_spe(u64 pmscr_el1)
-@@ -69,7 +68,6 @@ static void __debug_save_trace(u64 *trfcr_el1)
- 	isb();
- 	/* Drain the trace buffer to memory */
- 	tsb_csync();
--	dsb(nsh);
- }
- 
- static void __debug_restore_trace(u64 trfcr_el1)
-diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
-index c2cb46ca4fb6..71fa16a0dc77 100644
---- a/arch/arm64/kvm/hyp/nvhe/switch.c
-+++ b/arch/arm64/kvm/hyp/nvhe/switch.c
-@@ -272,6 +272,17 @@ int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
- 	 */
- 	__debug_save_host_buffers_nvhe(vcpu);
- 
+ static void __tlb_switch_to_guest(struct kvm_s2_mmu *mmu,
+-				  struct tlb_inv_context *cxt)
++				  struct tlb_inv_context *cxt,
++				  bool nsh)
+ {
 +	/*
-+	 * We're about to restore some new MMU state. Make sure
-+	 * ongoing page-table walks that have started before we
-+	 * trapped to EL2 have completed. This also synchronises the
-+	 * above disabling of SPE and TRBE.
++	 * We have two requirements:
 +	 *
-+	 * See DDI0487I.a D8.1.5 "Out-of-context translation regimes",
-+	 * rule R_LFHQG and subsequent information statements.
++	 * - ensure that the page table updates are visible to all
++         *   CPUs, for which a dsb(DOMAIN-st) is what we need, DOMAIN
++         *   being either ish or nsh, depending on the invalidation
++         *   type.
++	 *
++	 * - complete any speculative page table walk started before
++         *   we trapped to EL2 so that we can mess with the MM
++         *   registers out of context, for which dsb(nsh) is enough
++	 *
++	 * The composition of these two barriers is a dsb(DOMAIN), and
++	 * the 'nsh' parameter tracks the distinction between
++	 * Inner-Shareable and Non-Shareable, as specified by the
++	 * callers.
 +	 */
-+	dsb(nsh);
++	if (nsh)
++		dsb(nsh);
++	else
++		dsb(ish);
 +
- 	__kvm_adjust_pc(vcpu);
+ 	if (cpus_have_final_cap(ARM64_WORKAROUND_SPECULATIVE_AT)) {
+ 		u64 val;
+ 
+@@ -60,10 +83,8 @@ void __kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu,
+ {
+ 	struct tlb_inv_context cxt;
+ 
+-	dsb(ishst);
+-
+ 	/* Switch to requested VMID */
+-	__tlb_switch_to_guest(mmu, &cxt);
++	__tlb_switch_to_guest(mmu, &cxt, false);
  
  	/*
-@@ -306,6 +317,13 @@ int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
- 	__timer_disable_traps(vcpu);
- 	__hyp_vgic_save_state(vcpu);
+ 	 * We could do so much better if we had the VA as well.
+@@ -113,10 +134,8 @@ void __kvm_tlb_flush_vmid(struct kvm_s2_mmu *mmu)
+ {
+ 	struct tlb_inv_context cxt;
  
-+	/*
-+	 * Same thing as before the guest run: we're about to switch
-+	 * the MMU context, so let's make sure we don't have any
-+	 * ongoing EL1&0 translations.
-+	 */
-+	dsb(nsh);
-+
- 	__deactivate_traps(vcpu);
- 	__load_host_stage2();
+-	dsb(ishst);
+-
+ 	/* Switch to requested VMID */
+-	__tlb_switch_to_guest(mmu, &cxt);
++	__tlb_switch_to_guest(mmu, &cxt, false);
  
+ 	__tlbi(vmalls12e1is);
+ 	dsb(ish);
+@@ -130,7 +149,7 @@ void __kvm_flush_cpu_context(struct kvm_s2_mmu *mmu)
+ 	struct tlb_inv_context cxt;
+ 
+ 	/* Switch to requested VMID */
+-	__tlb_switch_to_guest(mmu, &cxt);
++	__tlb_switch_to_guest(mmu, &cxt, false);
+ 
+ 	__tlbi(vmalle1);
+ 	asm volatile("ic iallu");
+@@ -142,7 +161,8 @@ void __kvm_flush_cpu_context(struct kvm_s2_mmu *mmu)
+ 
+ void __kvm_flush_vm_context(void)
+ {
+-	dsb(ishst);
++	/* Same remark as in __tlb_switch_to_guest() */
++	dsb(ish);
+ 	__tlbi(alle1is);
+ 
+ 	/*
 -- 
 2.34.1
 
