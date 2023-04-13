@@ -2,60 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 56B026E1466
-	for <lists+kvm@lfdr.de>; Thu, 13 Apr 2023 20:43:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 798E76E1469
+	for <lists+kvm@lfdr.de>; Thu, 13 Apr 2023 20:43:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230187AbjDMSnU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Apr 2023 14:43:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32810 "EHLO
+        id S230170AbjDMSnY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Apr 2023 14:43:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33040 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230032AbjDMSnJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S230056AbjDMSnJ (ORCPT <rfc822;kvm@vger.kernel.org>);
         Thu, 13 Apr 2023 14:43:09 -0400
-Received: from mail-wr1-x42a.google.com (mail-wr1-x42a.google.com [IPv6:2a00:1450:4864:20::42a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ECB5583FA
-        for <kvm@vger.kernel.org>; Thu, 13 Apr 2023 11:42:45 -0700 (PDT)
-Received: by mail-wr1-x42a.google.com with SMTP id g5so18542078wrb.5
-        for <kvm@vger.kernel.org>; Thu, 13 Apr 2023 11:42:45 -0700 (PDT)
+Received: from mail-wm1-x335.google.com (mail-wm1-x335.google.com [IPv6:2a00:1450:4864:20::335])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B19E793F6
+        for <kvm@vger.kernel.org>; Thu, 13 Apr 2023 11:42:46 -0700 (PDT)
+Received: by mail-wm1-x335.google.com with SMTP id n19-20020a05600c501300b003f064936c3eso13713643wmr.0
+        for <kvm@vger.kernel.org>; Thu, 13 Apr 2023 11:42:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=grsecurity.net; s=grsec; t=1681411364; x=1684003364;
+        d=grsecurity.net; s=grsec; t=1681411365; x=1684003365;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=wviqyZ85KGfFUzxOBpv3myd0D/M0XiS1I9CvoQwMgnY=;
-        b=f5kq15Nrt9zSQ+lV03e5MG+DAm1TrRRdVx03AbbuvcEfN4nEYpU2yoL4rzYNU2TITJ
-         Hsw3c8Cr3JW+grExeVccD/S3I84Oq+X8sA1zATGZNRDn8PpB6NvDNuEcOW2tF71Nu7IM
-         uYeqgEpOrCf79aXCxZFpIoiD/HAWywkg6GTspXKrotuxg1dwBuZQix0DY3IgA/Ljq+/W
-         1GrxriLpxbCykH4nXZycFMS5h3exbtHx+MBj16E7stqeNw6aAIsec0f9JXaFlXlxPH2l
-         4ObmijpOlkRPrZR5TE5cRttgot6p22mKyekzbwElujvVTdOL8Zm+nBXUTJ2wORvaAQqL
-         twDw==
+        bh=ESQ+BfeZUo7v07/2Wqyt37Bb9GRSnMpcy+kHTBycy9Y=;
+        b=uK5+hAMaF8H4NLLmqjUFeYI51VTtAb60r5CSkUPRv+Abj7OuN27oAupo95iWpiLNgp
+         pmbQgF/CP9UjxGtXDA3/yCxyUqQ6iGkz7Uci9KuMpagrTlJtD0Foyo8vAuhdKxVsurqz
+         9Flj8LlqIc9BbWyAEZwQ/bpOA2+sod63ljSO3kRDWzUk/rsxkFZ+7uwezttQPRoaPRVS
+         jvktwyU/Apm3BLZI7nDvakFx7XJMFIBlhJQ4RFlYgFyaT4RwFonwhrJ5DNfzzyhweRT/
+         CvxPxfNhbiXXWqCwv4Z69UOxthOU9o0rro1RDe9Zh9Xj8r/4c8AruoQWNUh6zhuXKsBw
+         0QLA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681411364; x=1684003364;
+        d=1e100.net; s=20221208; t=1681411365; x=1684003365;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=wviqyZ85KGfFUzxOBpv3myd0D/M0XiS1I9CvoQwMgnY=;
-        b=R4LBsHlqSb1rCLqoVMDp5c+QMibb7O1Mp5UvCB6Ci/y8xGQrbG1E8PGsm5xTV74MI8
-         YD/ULAHYz5vAnLKcbAM6RSQrWD0kcenFZzl+Soh09CN6D+dRYR0d0NJ1hXy92egn4vqF
-         bsDVH+zNYtya+pA+m8K98v+rW3WZeME3cHD1I0dtm6KP+DrMiZZtgDphLmZeOPpUjfZ8
-         lZSVZoqSH3iECzgKqpgshdmLAsov8b8YmRYTbvfiYWoynUb0T53kMnG8eqpaKMYzjhmI
-         9ZVImqOpsDhhqstQTYcb5FKhjWvTCMnEIZYfZNoibXMAuCriAbnyUl9btlqORvu2j+8C
-         WVXw==
-X-Gm-Message-State: AAQBX9fj60gWKpXqEJFkpKgxaYiwJebPg8bGGTM3wLHbHuLuJ9+YfqrW
-        DSQhPp3cAvmr7FTFJ8DWcgHR5xNX3hy/wFEXkgw=
-X-Google-Smtp-Source: AKy350YfgrH8WBJgrERCwwfu4RcquC5uYCsGZIJ6i8Kaaa03zpX4/v18xqtV8hjnfKI9uT4Q4ec1+Q==
-X-Received: by 2002:a5d:6a82:0:b0:2d3:33d4:1cfb with SMTP id s2-20020a5d6a82000000b002d333d41cfbmr2172302wru.36.1681411364609;
-        Thu, 13 Apr 2023 11:42:44 -0700 (PDT)
+        bh=ESQ+BfeZUo7v07/2Wqyt37Bb9GRSnMpcy+kHTBycy9Y=;
+        b=Azb2Z8Wbk5x8+zTsFpEqEbapTaspR4MdObJHfewuJXXC54AQv2CIMyLIzueRjMkQTl
+         6oArJ80FGV02BtVPYK5FUq3y3vipoVYzRUmhbklbmy137+buPpmCa11ZsmNESX9vDlbX
+         NyCbbVjeIRqEUJJYkgc/QaqM54YQuo9cAQ8nk6vWHrVMIhxuetldtrZ4OOaox4qeykRi
+         aVC3o3lYE0FS0yGUNNlKzK28uNsXubDDVQ/n3l4mBO6D3d2CF0qnFbTFgj6h3MamC+4F
+         E4fboadMqViwM79lsWfW6Gs2prFd3vv6gOrVZiC72dJZ9oXXnFn/wv1mlNhHm3lu7YpJ
+         qcVA==
+X-Gm-Message-State: AAQBX9fa9ufmY03S5r8dVHlzhTdVlOirpuWq+Yqf65bFQDokQVwTTQq3
+        yJtt7ZnMVTyGFrfDerxP2xmp1APlfczEXXpfhng=
+X-Google-Smtp-Source: AKy350Z8vmxwbQY0yue92CnvUxb+wDcBy6J/DqJzY3VUhgPTSJEttcckhnk1+DH747Yc6dhYb7R0/w==
+X-Received: by 2002:a05:600c:1e11:b0:3f0:4275:395f with SMTP id ay17-20020a05600c1e1100b003f04275395fmr2110437wmb.13.1681411365358;
+        Thu, 13 Apr 2023 11:42:45 -0700 (PDT)
 Received: from nuc.fritz.box (p200300f6af154800ce0bb7f104d5fcf7.dip0.t-ipconnect.de. [2003:f6:af15:4800:ce0b:b7f1:4d5:fcf7])
         by smtp.gmail.com with ESMTPSA id x15-20020a5d6b4f000000b002c8476dde7asm1812652wrw.114.2023.04.13.11.42.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 13 Apr 2023 11:42:44 -0700 (PDT)
+        Thu, 13 Apr 2023 11:42:45 -0700 (PDT)
 From:   Mathias Krause <minipli@grsecurity.net>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org
 Cc:     Mathias Krause <minipli@grsecurity.net>
-Subject: [kvm-unit-tests PATCH v2 11/16] x86/emulator64: Relax register constraints for usr_gs_mov()
-Date:   Thu, 13 Apr 2023 20:42:14 +0200
-Message-Id: <20230413184219.36404-12-minipli@grsecurity.net>
+Subject: [kvm-unit-tests PATCH v2 12/16] x86/emulator64: Switch test_sreg() to ASM_TRY()
+Date:   Thu, 13 Apr 2023 20:42:15 +0200
+Message-Id: <20230413184219.36404-13-minipli@grsecurity.net>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230413184219.36404-1-minipli@grsecurity.net>
 References: <20230413184219.36404-1-minipli@grsecurity.net>
@@ -71,27 +71,56 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-There's no need to hard-code the registers, allow the compiler to choose
-ones that fit.
+Instead of registering a one-off exception handler, make use of
+ASM_TRY() to catch the exception. Also test the error code to match the
+failing segment selector (NULL) as the code now easily can access it.
 
 Signed-off-by: Mathias Krause <minipli@grsecurity.net>
 ---
- x86/emulator64.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ x86/emulator64.c | 18 ++++--------------
+ 1 file changed, 4 insertions(+), 14 deletions(-)
 
 diff --git a/x86/emulator64.c b/x86/emulator64.c
-index c58441ca798c..4138eaae00c9 100644
+index 4138eaae00c9..a98c66c2b44f 100644
 --- a/x86/emulator64.c
 +++ b/x86/emulator64.c
-@@ -421,7 +421,7 @@ static uint64_t usr_gs_mov(void)
- 	uint64_t ret;
- 
- 	dummy_ptr -= GS_BASE;
--	asm volatile("mov %%gs:(%%rcx), %%rax" : "=a"(ret): "c"(dummy_ptr) :);
-+	asm volatile("mov %%gs:(%1), %0" : "=r"(ret) : "r"(dummy_ptr));
- 
- 	return ret;
+@@ -385,18 +385,9 @@ static void test_push16(uint64_t *mem)
+ 	report(rsp1 == rsp2, "push16");
  }
+ 
+-static void ss_bad_rpl(struct ex_regs *regs)
+-{
+-	extern char ss_bad_rpl_cont;
+-
+-	++exceptions;
+-	regs->rip = (ulong)&ss_bad_rpl_cont;
+-}
+-
+ static void test_sreg(volatile uint16_t *mem)
+ {
+ 	u16 ss = read_ss();
+-	handler old;
+ 
+ 	// check for null segment load
+ 	*mem = 0;
+@@ -404,13 +395,12 @@ static void test_sreg(volatile uint16_t *mem)
+ 	report(read_ss() == 0, "mov null, %%ss");
+ 
+ 	// check for exception when ss.rpl != cpl on null segment load
+-	exceptions = 0;
+-	old = handle_exception(GP_VECTOR, ss_bad_rpl);
+ 	*mem = 3;
+-	asm volatile("mov %0, %%ss; ss_bad_rpl_cont:" : : "m"(*mem));
+-	report(exceptions == 1 && read_ss() == 0,
++	asm volatile(ASM_TRY("1f") "mov %0, %%ss; 1:" : : "m"(*mem));
++	report(exception_vector() == GP_VECTOR &&
++	       exception_error_code() == 0 && read_ss() == 0,
+ 	       "mov null, %%ss (with ss.rpl != cpl)");
+-	handle_exception(GP_VECTOR, old);
++
+ 	write_ss(ss);
+ }
+ 
 -- 
 2.39.2
 
