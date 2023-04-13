@@ -2,193 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 930736E0A6C
-	for <lists+kvm@lfdr.de>; Thu, 13 Apr 2023 11:43:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9AD1B6E0AA1
+	for <lists+kvm@lfdr.de>; Thu, 13 Apr 2023 11:52:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229792AbjDMJnc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Apr 2023 05:43:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36128 "EHLO
+        id S229746AbjDMJwW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Apr 2023 05:52:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42100 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229564AbjDMJn3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 13 Apr 2023 05:43:29 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6620B30DA;
-        Thu, 13 Apr 2023 02:43:28 -0700 (PDT)
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 33D9E2uM015435;
-        Thu, 13 Apr 2023 09:43:27 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
- mime-version : content-transfer-encoding : in-reply-to : references : from
- : to : subject : cc : message-id : date; s=pp1;
- bh=akCZEmm025jBIjxua2C579Ptn7oKzzbO62SQ/RA7FVE=;
- b=V1hAmvDucVa5ra1Rb41BTjGCtWC2Cs9rsOFOGKRFSD2hrKhEVa2k/QvqiIIkjSzoSQW9
- OckRf1rua3aycZ5NpacnMmQdDGVRLc2egvQqxY3r1Anr3euCd6bLU2gTP/auBjTOO8qd
- P0RPIwOvY6k2ZT/6Z0przsx2byiDh8/lAvNaAx8v232EMqyBk4LisMrZfm4iA6vmr63b
- G83o1+sGf1I87mjAZrk32oeG2Rpcdi1c/Je4EndAUedrn8ZSxMGEpSM2UqwF4jJRwGSu
- QgaO/tMdWeepbAuX5Y9fQ+6UdbN9KDpn2SKGMiFAgrqb7if/eU679wRbh9GcKBFCTRzW yw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pxex1s0vx-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 13 Apr 2023 09:43:27 +0000
-Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 33D9EZE1018219;
-        Thu, 13 Apr 2023 09:43:27 GMT
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pxex1s0un-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 13 Apr 2023 09:43:26 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 33D3G6uh022165;
-        Thu, 13 Apr 2023 09:43:25 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-        by ppma03ams.nl.ibm.com (PPS) with ESMTPS id 3pu0hdjx22-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 13 Apr 2023 09:43:25 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-        by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 33D9hLka26280608
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 13 Apr 2023 09:43:21 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7662F20043;
-        Thu, 13 Apr 2023 09:43:21 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4616820040;
-        Thu, 13 Apr 2023 09:43:21 +0000 (GMT)
-Received: from t14-nrb (unknown [9.171.10.186])
-        by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Thu, 13 Apr 2023 09:43:21 +0000 (GMT)
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <cfd83c1d7a74e969e6e3c922bbe5650f8e9adadd.camel@linux.ibm.com>
-References: <20230327082118.2177-1-nrb@linux.ibm.com> <20230327082118.2177-5-nrb@linux.ibm.com> <cfd83c1d7a74e969e6e3c922bbe5650f8e9adadd.camel@linux.ibm.com>
-From:   Nico Boehr <nrb@linux.ibm.com>
-To:     Nina Schoetterl-Glausch <nsg@linux.ibm.com>, frankja@linux.ibm.com,
-        imbrenda@linux.ibm.com, thuth@redhat.com
-Subject: Re: [kvm-unit-tests PATCH v1 4/4] s390x: add a test for SIE without MSO/MSL
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org
-Message-ID: <168137900094.42330.6464555141616427645@t14-nrb>
-User-Agent: alot/0.8.1
-Date:   Thu, 13 Apr 2023 11:43:20 +0200
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: tuE6Mb5db4T2d6t64UA1DkPVP0rOMkcS
-X-Proofpoint-ORIG-GUID: Py4W6bz4uaviUuqn1BiD2nPAnFnTr5yA
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
- definitions=2023-04-13_06,2023-04-12_01,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- lowpriorityscore=0 mlxscore=0 spamscore=0 mlxlogscore=889 phishscore=0
- suspectscore=0 bulkscore=0 impostorscore=0 adultscore=0 clxscore=1015
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2303200000 definitions=main-2304130087
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S229708AbjDMJwR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 13 Apr 2023 05:52:17 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EDB3E30F3;
+        Thu, 13 Apr 2023 02:52:13 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 8C0F863CC9;
+        Thu, 13 Apr 2023 09:52:13 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F0009C433D2;
+        Thu, 13 Apr 2023 09:52:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1681379533;
+        bh=z5Duc20+BxsHeLAvvLwabMO0xTmluXnayswo1xBwGrY=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=ozUVL5WlWHFn6r0EiW5ErMVPB1jWgajxhrwnHdVCEkdfHry6uEFXEaQpfJQ7CuIkt
+         QDEMsqngpDBM4QYA1+HbPlhMD/Bqopw1wMulPu79MkMY3SbXrTthfSnU3LTs46I+JU
+         1lE2G0qLOap8DdgJx1a5lwumH4SHx/VpEngECJcmOJ+lYzUMcjGQjxhToN9cIpwYhP
+         VmmtzMSIUMB/0MhKFYeR8mWRtWXfw36lRIDMoRZHZOMmstSJoPk7k2sNIjvMlyPOUA
+         U6wNf08ZZ2BL3VM807G4O6CHMsrY8DYl7h2cDVbUc8VXDGu2eNNtb3jxsLs9oIT/09
+         Cf9MipMxCdRag==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1pmtcg-0084PT-JS;
+        Thu, 13 Apr 2023 10:52:10 +0100
+Date:   Thu, 13 Apr 2023 10:52:10 +0100
+Message-ID: <86ile0kt2t.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     ankita@nvidia.com, alex.williamson@redhat.com,
+        naoya.horiguchi@nec.com, oliver.upton@linux.dev,
+        aniketa@nvidia.com, cjia@nvidia.com, kwankhede@nvidia.com,
+        targupta@nvidia.com, vsethi@nvidia.com, acurrid@nvidia.com,
+        apopple@nvidia.com, jhubbard@nvidia.com, danw@nvidia.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-mm@kvack.org
+Subject: Re: [PATCH v3 0/6] Expose GPU memory as coherently CPU accessible
+In-Reply-To: <ZDapsz2QOdjhcBHJ@nvidia.com>
+References: <20230405180134.16932-1-ankita@nvidia.com>
+        <86sfd5l1yf.wl-maz@kernel.org>
+        <ZDapsz2QOdjhcBHJ@nvidia.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: jgg@nvidia.com, ankita@nvidia.com, alex.williamson@redhat.com, naoya.horiguchi@nec.com, oliver.upton@linux.dev, aniketa@nvidia.com, cjia@nvidia.com, kwankhede@nvidia.com, targupta@nvidia.com, vsethi@nvidia.com, acurrid@nvidia.com, apopple@nvidia.com, jhubbard@nvidia.com, danw@nvidia.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-mm@kvack.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Quoting Nina Schoetterl-Glausch (2023-04-05 21:55:01)
-> On Mon, 2023-03-27 at 10:21 +0200, Nico Boehr wrote:
-> > Since we now have the ability to run guests without MSO/MSL, add a test
-> > to make sure this doesn't break.
-> >=20
-> > Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
-> > ---
-> >  s390x/Makefile             |   2 +
-> >  s390x/sie-dat.c            | 121 +++++++++++++++++++++++++++++++++++++
-> >  s390x/snippets/c/sie-dat.c |  58 ++++++++++++++++++
-> >  s390x/unittests.cfg        |   3 +
-> >  4 files changed, 184 insertions(+)
-> >  create mode 100644 s390x/sie-dat.c
-> >  create mode 100644 s390x/snippets/c/sie-dat.c
-> >=20
->=20
-> Test looks good to me. Some comments below.
-> [...]
->=20
-> > diff --git a/s390x/sie-dat.c b/s390x/sie-dat.c
-> > new file mode 100644
-> > index 000000000000..37e46386181c
-> > --- /dev/null
-> > +++ b/s390x/sie-dat.c
-> > @@ -0,0 +1,121 @@
-> >=20
-> [...]
-> > +
-> > +/* keep in sync with TOTAL_PAGE_COUNT in s390x/snippets/c/sie-dat.c */
-> > +#define GUEST_TOTAL_PAGE_COUNT 256
->=20
-> This (1M) is the maximum snippet size (see snippet_setup_guest), is this =
-intentional?
+On Wed, 12 Apr 2023 13:53:07 +0100,
+Jason Gunthorpe <jgg@nvidia.com> wrote:
+> 
+> On Wed, Apr 12, 2023 at 01:28:08PM +0100, Marc Zyngier wrote:
+> > On Wed, 05 Apr 2023 19:01:28 +0100,
+> > <ankita@nvidia.com> wrote:
+> > > 
+> > > From: Ankit Agrawal <ankita@nvidia.com>
+> > > 
+> > > NVIDIA's upcoming Grace Hopper Superchip provides a PCI-like device
+> > > for the on-chip GPU that is the logical OS representation of the
+> > > internal propritary cache coherent interconnect.
+> > > 
+> > > This representation has a number of limitations compared to a real PCI
+> > > device, in particular, it does not model the coherent GPU memory
+> > > aperture as a PCI config space BAR, and PCI doesn't know anything
+> > > about cacheable memory types.
+> > > 
+> > > Provide a VFIO PCI variant driver that adapts the unique PCI
+> > > representation into a more standard PCI representation facing
+> > > userspace. The GPU memory aperture is obtained from ACPI, according to
+> > > the FW specification, and exported to userspace as the VFIO_REGION
+> > > that covers the first PCI BAR. qemu will naturally generate a PCI
+> > > device in the VM where the cacheable aperture is reported in BAR1.
+> > > 
+> > > Since this memory region is actually cache coherent with the CPU, the
+> > > VFIO variant driver will mmap it into VMA using a cacheable mapping.
+> > > 
+> > > As this is the first time an ARM environment has placed cacheable
+> > > non-struct page backed memory (eg from remap_pfn_range) into a KVM
+> > > page table, fix a bug in ARM KVM where it does not copy the cacheable
+> > > memory attributes from non-struct page backed PTEs to ensure the guest
+> > > also gets a cacheable mapping.
+> > 
+> > This is not a bug, but a conscious design decision. As you pointed out
+> > above, nothing needed this until now, and a device mapping is the only
+> > safe thing to do as we know exactly *nothing* about the memory that
+> > gets mapped.
+> 
+> IMHO, from the mm perspective, the bug is using pfn_is_map_memory() to
+> determine the cachability or device memory status of a PFN in a
+> VMA. That is not what that API is for.
 
-It is by accident the maximum snippet size. It is completely fine to stay a=
-t 256 pages when we increase the maximum snippet size.
+It is the right API for what KVM/arm64 has been designed for. RAM gets
+a normal memory mapping, and everything else gets device. That may not
+suit your *new* use case, but that doesn't make it broken.
 
-> In that case the comment is inaccurate, since you'd want to sync it with =
-the maximum snippet size.
-> You also know the actual snippet size SNIPPET_LEN(c, sie_dat) so I don't =
-see why you'd need a define
-> at all.
+> 
+> The cachability should be determined by the pgprot bits in the VMA.
+> 
+> VM_IO is the flag that says the VMA maps memory with side-effects.
+> 
+> I understand in ARM KVM it is not allowed for the VM and host to have
+> different cachability, so mis-detecting host cachable memory and
+> making it forced non-cachable in the VM is not a safe thing to do?
 
-The snippet size is not the same as the number of mapped pages in the guest=
-, no?
+Only if you insist on not losing coherency between the two aliases
+used at the same time (something that would seem pretty improbable).
+And said coherency can be restored by using CMOs, as documented in
+B2.8.
 
-[...]
-> > +
-> > +static void test_sie_dat(void)
-> > +{
-> >=20
-> [...]
-> > +
-> > +     /* the guest will now write to an unmapped address and we check t=
-hat this causes a segment translation */
->=20
-> I'd prefer "causes a segment translation exception"
+	M.
 
-OK
-
-[...]
-> > diff --git a/s390x/snippets/c/sie-dat.c b/s390x/snippets/c/sie-dat.c
-> > new file mode 100644
-> > index 000000000000..c9f7af0f3a56
-> > --- /dev/null
-> > +++ b/s390x/snippets/c/sie-dat.c
-[...]
-> > +static inline void force_exit(void)
-> > +{
-> > +     asm volatile("  diag    0,0,0x44\n");
->=20
-> Pretty sure the compiler will generate a leading tab, so this will be dou=
-bly indented.
-
-Copy-paste artifact, I can remove it.
-
-[...]
-> > +{
-> > +     uint8_t *invalid_ptr;
-> > +
-> > +     memset(test_page, 0, sizeof(test_page));
-> > +     /* tell the host the page's physical address (we're running DAT o=
-ff) */
-> > +     force_exit_value((uint64_t)test_page);
-> > +
-> > +     /* write some value to the page so the host can verify it */
-> > +     for (size_t i =3D 0; i < TEST_PAGE_COUNT; i++)
-> > +             test_page[i * PAGE_SIZE] =3D 42 + i;
-> > +
-> > +     /* indicate we've written all pages */
-> > +     force_exit();
-> > +
-> > +     /* the first unmapped address */
-> > +     invalid_ptr =3D (uint8_t *)(TOTAL_PAGE_COUNT * PAGE_SIZE);
->=20
-> Why not just use an address high enough you know it will not be mapped?
-> -1 should do just fine.
-
-I wanted to make sure exactly the right amount of pages is mapped and no mo=
-re.
-
--1 would defeat that purpose.
+-- 
+Without deviation from the norm, progress is not possible.
