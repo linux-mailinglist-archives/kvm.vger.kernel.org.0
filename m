@@ -2,60 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 782226E145F
-	for <lists+kvm@lfdr.de>; Thu, 13 Apr 2023 20:43:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E0E2A6E1460
+	for <lists+kvm@lfdr.de>; Thu, 13 Apr 2023 20:43:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229997AbjDMSnN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Apr 2023 14:43:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32838 "EHLO
+        id S230085AbjDMSnO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Apr 2023 14:43:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32936 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229998AbjDMSnD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 13 Apr 2023 14:43:03 -0400
-Received: from mail-wr1-x42e.google.com (mail-wr1-x42e.google.com [IPv6:2a00:1450:4864:20::42e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 325CD8A74
+        with ESMTP id S230011AbjDMSnF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 13 Apr 2023 14:43:05 -0400
+Received: from mail-wr1-x42b.google.com (mail-wr1-x42b.google.com [IPv6:2a00:1450:4864:20::42b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07FDC8A42
         for <kvm@vger.kernel.org>; Thu, 13 Apr 2023 11:42:41 -0700 (PDT)
-Received: by mail-wr1-x42e.google.com with SMTP id q6so3696556wrc.3
+Received: by mail-wr1-x42b.google.com with SMTP id j15so1423521wrb.11
         for <kvm@vger.kernel.org>; Thu, 13 Apr 2023 11:42:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=grsecurity.net; s=grsec; t=1681411359; x=1684003359;
+        d=grsecurity.net; s=grsec; t=1681411360; x=1684003360;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=RlFO6VQHbvsrhkxBXUqkpVJD2i9H4aa/y980IKqKnx0=;
-        b=vh9vH0MzKGfpsWxpzzx0UjXKALj9f9ReWwFcZ5M8wJvAgsM4OzHJ6wxQL+kfvjx4eB
-         Is0DPWPrAmGlRp5GMj+6o46KOzZ/ynfevTzLzhzJcmRRsJbsFkajjM/rXb62z7tZPoVZ
-         7BdxQr92bkaIQApdOwIF7ptAiodQ5uz/VgAcvBCwDntUxQrxguzu6aNheM9CwwGdRwYt
-         dE1htxvjnovHc4pbAXt0EL5Weebv8jIHLmgBRPHSkToPuWiFbyCBhAe6vpd1kWvy0LW2
-         RhFZgAgavGbtTix6WwFZH1p47XZWobqmOOG5xtiPwzhN9Vul4irAZlX2JdX8nGZ7oAOQ
-         EDdw==
+        bh=J3elqJXS+bFQRPcED8Mmzb52OGHkprqFCPRDONeOQX8=;
+        b=iFWy001yG7k9NEXUCsSndo8Nhwvgc0bmmCTHHxkF22Kg2s51TGmPLA9kQH1AAHfalI
+         l1UIiv9FMYGKYyDcL45ofyLTMuO2ICrk23p5HbsEaKSDfHNhFSFJ793fsO3cuvVzOmG/
+         Fs6MpUklJZLgJvuilvjnLXVd/7JuTpTd0I0Jt9REFp2dvk0SqUv1Lk6MJ7O2mU1D1JRZ
+         qZ9WYi8AqrGXd+dnM3iW7wKiCWe74h4l1STaoW0hHkCfQ92XecZY7PF879dJBXtv9mDP
+         GenYZjQfnPs2h7cnObjoMov9bNt/BnpV3WBDGejhtXfIdhivi5DirtSLJIiQoQPMgbXd
+         /dPg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681411359; x=1684003359;
+        d=1e100.net; s=20221208; t=1681411360; x=1684003360;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=RlFO6VQHbvsrhkxBXUqkpVJD2i9H4aa/y980IKqKnx0=;
-        b=MdsPrCygZgaZKfPvUMqhO/jdlR6ybk6eDcIcHQwHgleDGg3s+ybV0PvXHuWDXqwzua
-         fQ0LlasYv3ZLbGidM6OokGBmv8TtBnV+hkeeZwIksVLpx1odoE+hloM9y4s5xaDB/nfj
-         OXCGCo4J7CqRdXdVE0vAex1nsvqLbKB9SQ4jEA+NozgVo+j2ciXF+xBHFslAhtYCC6XH
-         Sv8GiHle393di4JspwjN8tGjyR1ZPdlI3Zkwik00yTQ7mv4uHMWULjw5gw1XMFSc4+tW
-         KR4qk51lUdQ9DPPBFpBusUVQtNcQEe0Ag6lv4JM8PQyGznXk1RmYT5rqgk/l+ylEe3ba
-         PYmQ==
-X-Gm-Message-State: AAQBX9cYGJPshljlNYhEnth0XFkrqiTvAIk5/MnLGxA5E0mU+stYpEJt
-        MnSgEKGpzO4XPPeCH76r9EUZjA==
-X-Google-Smtp-Source: AKy350Yv7exdByGADAB1ejtZMi+3XVQKEx0GhI5EwCdtbUgv7qGwXXsM5NNWs4F5HHK6Doh//Htqeg==
-X-Received: by 2002:a5d:6a89:0:b0:2ef:b051:95c5 with SMTP id s9-20020a5d6a89000000b002efb05195c5mr2148177wru.60.1681411359680;
-        Thu, 13 Apr 2023 11:42:39 -0700 (PDT)
+        bh=J3elqJXS+bFQRPcED8Mmzb52OGHkprqFCPRDONeOQX8=;
+        b=FDzTPnzxOUouUHzoFjTG881tCWmENdYku36e+AsiRhtIHfqAg5IDhaw5sLmEKBRULb
+         AaCPea0KhV6qKrZx2xCsN7Wz8U23tQdTmw/e56wygzgIyWzaPqP8rTuhmRU1dDaNyq1Y
+         tXGdvmrStm72DPX7GYIwjbId/Ga+iJBw2cmGvIcHYsUZL2NOyj4kixyrwqGcF7/ye5+C
+         CaXsY9ozsAKETdSyQVf6RDvn7Iy10AtYsuRVyhniQkHGfrsY7i+gjvqTT5fYh4uwOcmp
+         Z50IcgOKZOWTz7mGrtf137CsHOQxsu0FAaAyDppEvnop8Sp8sCGxwKLnYrJsXAHzWEsz
+         m2Iw==
+X-Gm-Message-State: AAQBX9e8KKS/Wswa1Yoe33G/4d7T4Lf+AsvX7hX6HlCt8/l2s8Lh3gOW
+        YTHZk2Fo3holL9j2Ipbj0sGMkdVzfxPOdhL7C3k=
+X-Google-Smtp-Source: AKy350a6ISM9678Na2Gp3sMzcSy58f8GR2ePSp9gLnvjqU2GpoaNp77Br209RB/wJnRDUuTz3fRQiQ==
+X-Received: by 2002:a5d:5943:0:b0:2ef:b525:bdf9 with SMTP id e3-20020a5d5943000000b002efb525bdf9mr2306149wri.48.1681411360585;
+        Thu, 13 Apr 2023 11:42:40 -0700 (PDT)
 Received: from nuc.fritz.box (p200300f6af154800ce0bb7f104d5fcf7.dip0.t-ipconnect.de. [2003:f6:af15:4800:ce0b:b7f1:4d5:fcf7])
-        by smtp.gmail.com with ESMTPSA id x15-20020a5d6b4f000000b002c8476dde7asm1812652wrw.114.2023.04.13.11.42.38
+        by smtp.gmail.com with ESMTPSA id x15-20020a5d6b4f000000b002c8476dde7asm1812652wrw.114.2023.04.13.11.42.39
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 13 Apr 2023 11:42:39 -0700 (PDT)
+        Thu, 13 Apr 2023 11:42:40 -0700 (PDT)
 From:   Mathias Krause <minipli@grsecurity.net>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org
 Cc:     Mathias Krause <minipli@grsecurity.net>
-Subject: [kvm-unit-tests PATCH v2 05/16] x86/access: Use 'bool' type as defined via libcflat.h
-Date:   Thu, 13 Apr 2023 20:42:08 +0200
-Message-Id: <20230413184219.36404-6-minipli@grsecurity.net>
+Subject: [kvm-unit-tests PATCH v2 06/16] x86/run_in_user: Change type of code label
+Date:   Thu, 13 Apr 2023 20:42:09 +0200
+Message-Id: <20230413184219.36404-7-minipli@grsecurity.net>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230413184219.36404-1-minipli@grsecurity.net>
 References: <20230413184219.36404-1-minipli@grsecurity.net>
@@ -71,57 +71,34 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Drop the unneeded definitions of 'true' and 'false' and make use of the
-common 'bool' type instead of using the pre-C99 / post-C23 definitions.
+Use an array type to refer to the code label 'ret_to_kernel'.
+
+No functional change.
 
 Signed-off-by: Mathias Krause <minipli@grsecurity.net>
 ---
- x86/access.c | 11 ++++-------
- 1 file changed, 4 insertions(+), 7 deletions(-)
+ lib/x86/usermode.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/x86/access.c b/x86/access.c
-index 70d81bf02d9d..f90a72d6e951 100644
---- a/x86/access.c
-+++ b/x86/access.c
-@@ -5,10 +5,7 @@
- #include "x86/vm.h"
- #include "access.h"
- 
--#define true 1
--#define false 0
--
--static _Bool verbose = false;
-+static bool verbose = false;
- 
- typedef unsigned long pt_element_t;
- static int invalid_mask;
-@@ -406,7 +403,7 @@ static int ac_test_bump_one(ac_test_t *at)
- 
- #define F(x)  ((flags & x##_MASK) != 0)
- 
--static _Bool ac_test_legal(ac_test_t *at)
-+static bool ac_test_legal(ac_test_t *at)
+diff --git a/lib/x86/usermode.c b/lib/x86/usermode.c
+index e22fb8f0132b..b976123ca753 100644
+--- a/lib/x86/usermode.c
++++ b/lib/x86/usermode.c
+@@ -35,12 +35,12 @@ uint64_t run_in_user(usermode_func func, unsigned int fault_vector,
+ 		uint64_t arg1, uint64_t arg2, uint64_t arg3,
+ 		uint64_t arg4, bool *raised_vector)
  {
- 	int flags = at->flags;
- 	unsigned reserved;
-@@ -738,7 +735,7 @@ static void dump_mapping(ac_test_t *at)
- 	walk_va(at, F(AC_PDE_PSE) ? 2 : 1, virt, __dump_pte, false);
- }
+-	extern char ret_to_kernel;
++	extern char ret_to_kernel[];
+ 	uint64_t rax = 0;
+ 	static unsigned char user_stack[USERMODE_STACK_SIZE];
  
--static void ac_test_check(ac_test_t *at, _Bool *success_ret, _Bool cond,
-+static void ac_test_check(ac_test_t *at, bool *success_ret, bool cond,
- 			  const char *fmt, ...)
- {
- 	va_list ap;
-@@ -780,7 +777,7 @@ static int ac_test_do_access(ac_test_t *at)
- 	unsigned e;
- 	static unsigned char user_stack[4096];
- 	unsigned long rsp;
--	_Bool success = true;
-+	bool success = true;
- 	int flags = at->flags;
+ 	*raised_vector = 0;
+-	set_idt_entry(RET_TO_KERNEL_IRQ, &ret_to_kernel, 3);
++	set_idt_entry(RET_TO_KERNEL_IRQ, ret_to_kernel, 3);
+ 	handle_exception(fault_vector,
+ 			restore_exec_to_jmpbuf_exception_handler);
  
- 	++unique;
 -- 
 2.39.2
 
