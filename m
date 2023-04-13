@@ -2,65 +2,77 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 45B656E17A8
-	for <lists+kvm@lfdr.de>; Fri, 14 Apr 2023 00:48:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 692A06E17B6
+	for <lists+kvm@lfdr.de>; Fri, 14 Apr 2023 00:53:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230131AbjDMWsI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Apr 2023 18:48:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32774 "EHLO
+        id S230354AbjDMWxb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Apr 2023 18:53:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35830 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229553AbjDMWsG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 13 Apr 2023 18:48:06 -0400
-Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB6BA171F
-        for <kvm@vger.kernel.org>; Thu, 13 Apr 2023 15:48:05 -0700 (PDT)
-Received: by mail-pl1-x649.google.com with SMTP id h8-20020a170902f54800b001a1f5f00f3fso8806752plf.2
-        for <kvm@vger.kernel.org>; Thu, 13 Apr 2023 15:48:05 -0700 (PDT)
+        with ESMTP id S230205AbjDMWx2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 13 Apr 2023 18:53:28 -0400
+Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4A7B213D
+        for <kvm@vger.kernel.org>; Thu, 13 Apr 2023 15:53:24 -0700 (PDT)
+Received: by mail-pg1-x54a.google.com with SMTP id r78-20020a632b51000000b00513d1de5204so12631054pgr.15
+        for <kvm@vger.kernel.org>; Thu, 13 Apr 2023 15:53:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1681426085; x=1684018085;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=7De+TR6k41slfMO+agxwSRrezzAt0xmZupWS+SIbKtw=;
-        b=wripiq38optx0A61pEC4QlxbrXV9310O1yzg1yey6FDBM3X/3bgYqN6lxWXAho4x2Z
-         b6b8/UzbX9j9h1jSPKzj89XyFovpOpw/PUeQ+0GvEyzDHVuB9wwO+dRPlFUrwpcPIhI7
-         ZKFw3DZ6ofccfo/zAQ44f4r2Rnwpb31HNbaYHWZM7/iPJ8BqRh4jIGV4uQ+CkeOUZdg3
-         u48pLtetbVssXKzdARwdPIHvlDYgsEuJYGdtXo6rIARliioKNY1De8ejJNY0TMvYlSp8
-         h9hcvepeqxGnrQjEb7GXmqTSAyAJ2JP9Q5UDMfqYZgFhQHMz1CjlVzVpjKCaNG57B1z6
-         wPYQ==
+        d=google.com; s=20221208; t=1681426404; x=1684018404;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=z8guo045Q+5eAEwhfUr30hz0PJkqMwxW7HV3gxeLbUM=;
+        b=Rjwp4Xdm6ZLaEPgG8cQHjLF9ituKkBuE4Kg1flS/uBoAlJ5LElw7Yfif+urjga4Z1k
+         Id9XGYBIPjUILBU5HRcXu81p8pDXA/u7T7lfZ53bFi0pGFkAASoZMc1FKWQlhEzWj7g7
+         M8ApiMQugbqBdsiM2beP1Zmsfm7UP5aAC4H3s81SX9hYygeAlfdJWkF78OhRMgmv5bOY
+         YVoHszS0N47VwRyOsgUt/J/+QeiNlvAv36oX5BxahWlc22nXKEGI9AqKs9w9dhKamSyI
+         7JyyYvDzq5fdoA1a6pagi9+JsHhlJPaWALPTL0IkyyyP5IWH3eftfLt0+7o6zZeS826/
+         vf/Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681426085; x=1684018085;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7De+TR6k41slfMO+agxwSRrezzAt0xmZupWS+SIbKtw=;
-        b=P2AWWpWsr2ny4coNz0fQxb0/xLe8AF/Tk+UdDICWghdL4SizVfWjH8cwUUstZK5jLO
-         ZHnHjKSDH0zfS002q9bDxkG6ka+d6hXC1xp3YLlCB35Wdf0mWF+tABT7dHu4Wdr/PsbM
-         JhNEsfMlQrHlB3putKdsxzKjq6Rx14KXqRzHqzVSU9O6Qo78X7Ed6LLMCM7Gyv8yTEq9
-         SxMsz3V0X2qiXzzBhAdbweNGqFMJDMTv2b2EvO8MM8gyS/sNCqEHoIiAi0V3anbQkqxu
-         XNktE8pIcgAWMNlZQcybw2BxsibhOUCgK6KjMWtsbVFrMBr3H6V9nyfrmY+dMbVJV220
-         AJhA==
-X-Gm-Message-State: AAQBX9fDpMToLKOQN0cJ1tGVlHp9/9OJgb18YBjZT3YSgnvgIk9KW91o
-        USG8FEo9cJESzKmG8rfUss4PxSWzp6g=
-X-Google-Smtp-Source: AKy350b/OBsmKfKzcv0b+1digNdsex0QQ/cOy6US20y18DtoSSeFH/BrW0XfTLmwilEqK6wAU2/PGGYKlM4=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:903:25d3:b0:1a4:f282:91c7 with SMTP id
- jc19-20020a17090325d300b001a4f28291c7mr216045plb.6.1681426085409; Thu, 13 Apr
- 2023 15:48:05 -0700 (PDT)
-Date:   Thu, 13 Apr 2023 15:48:04 -0700
-In-Reply-To: <ae28ce9b0c78a926c38a8c8b9694aa34b140b467.camel@intel.com>
+        d=1e100.net; s=20221208; t=1681426404; x=1684018404;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=z8guo045Q+5eAEwhfUr30hz0PJkqMwxW7HV3gxeLbUM=;
+        b=SMUXwfhQZgczd6yHULlxgqcGeEAJ9dwGM6v4yXWawvkE+xj+NqCJ/K0dKb+aHb9Bt9
+         PomgjC4EZt3eKcKH+zCE33nVkCTG0jba33yi/JL71YrnXuuRtKsz16u+7ZXajKbHkq+Z
+         u804w+KAAE5tz9uD0ny2B0Hbfym5/GHtO1yD8AmAlrlgACCRp7cCVBRZ4NTGP0zcfAS/
+         0h5cUyNHzBkoQDLoz+Y2m2RYFnFNvgAM0NBIh44n29c3nxjJKvD3188kTJvInfeO081i
+         J0JUyXuJTHf8Z57FjrX8fVLbt3Jgnvh+gxeDnpdHKL/TrFi08no35ECkUMdj7pRfXKYl
+         vVDw==
+X-Gm-Message-State: AAQBX9dwq72clO6H3pglOaEtWJL5JMyWJnaopFboQpjB3EBMGqR2G9yk
+        sPZhpWGb4gAv2vYvhvBocg1eBJIIHj2w/uDgLw==
+X-Google-Smtp-Source: AKy350ZDf9SfJRuS6hlT3xzlEOA5lECkBtR1nsxMCxij1QGPtfZHXE7tqJcIaT1y2UkRtOi3D6c9Q8ilUDsupR7kxA==
+X-Received: from ackerleytng-cloudtop.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1f5f])
+ (user=ackerleytng job=sendgmr) by 2002:a17:90a:3ea7:b0:246:f5c3:576 with SMTP
+ id k36-20020a17090a3ea700b00246f5c30576mr979461pjc.6.1681426404283; Thu, 13
+ Apr 2023 15:53:24 -0700 (PDT)
+Date:   Thu, 13 Apr 2023 22:53:22 +0000
+In-Reply-To: <20230412-kurzweilig-unsummen-3c1136f7f437@brauner> (message from
+ Christian Brauner on Wed, 12 Apr 2023 11:59:52 +0200)
 Mime-Version: 1.0
-References: <20230405005911.423699-1-seanjc@google.com> <d0af618169ebc17722e7019ca620ec22ee0b49c3.camel@intel.com>
- <ZC4qF90l77m3X1Ir@google.com> <20230406130119.000011fe.zhi.wang.linux@gmail.com>
- <e1e7a37a29c2c7ad22cd14181f24b06088eca451.camel@intel.com>
- <ZDbMuZKhAUbrkrc7@google.com> <ae28ce9b0c78a926c38a8c8b9694aa34b140b467.camel@intel.com>
-Message-ID: <ZDiGpCkXOcCm074O@google.com>
-Subject: Re: [PATCH 0/3] KVM: x86: SGX vs. XCR0 cleanups
-From:   Sean Christopherson <seanjc@google.com>
-To:     Kai Huang <kai.huang@intel.com>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "zhi.wang.linux@gmail.com" <zhi.wang.linux@gmail.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="us-ascii"
+Message-ID: <diqzedono0m5.fsf@ackerleytng-cloudtop.c.googlers.com>
+Subject: Re: [RFC PATCH v3 1/2] mm: restrictedmem: Allow userspace to specify
+ mount for memfd_restricted
+From:   Ackerley Tng <ackerleytng@google.com>
+To:     Christian Brauner <brauner@kernel.org>
+Cc:     kvm@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-arch@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, qemu-devel@nongnu.org, aarcange@redhat.com,
+        ak@linux.intel.com, akpm@linux-foundation.org, arnd@arndb.de,
+        bfields@fieldses.org, bp@alien8.de, chao.p.peng@linux.intel.com,
+        corbet@lwn.net, dave.hansen@intel.com, david@redhat.com,
+        ddutile@redhat.com, dhildenb@redhat.com, hpa@zytor.com,
+        hughd@google.com, jlayton@kernel.org, jmattson@google.com,
+        joro@8bytes.org, jun.nakajima@intel.com,
+        kirill.shutemov@linux.intel.com, linmiaohe@huawei.com,
+        luto@kernel.org, mail@maciej.szmigiero.name, mhocko@suse.com,
+        michael.roth@amd.com, mingo@redhat.com, naoya.horiguchi@nec.com,
+        pbonzini@redhat.com, qperret@google.com, rppt@kernel.org,
+        seanjc@google.com, shuah@kernel.org, steven.price@arm.com,
+        tabba@google.com, tglx@linutronix.de, vannapurve@google.com,
+        vbabka@suse.cz, vkuznets@redhat.com, wanpengli@tencent.com,
+        wei.w.wang@intel.com, x86@kernel.org, yu.c.zhang@linux.intel.com
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
@@ -71,55 +83,21 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Apr 13, 2023, Kai Huang wrote:
-> On Wed, 2023-04-12 at 08:22 -0700, Sean Christopherson wrote:
-> > KVM's uAPI for initiating TDH.MNG.INIT could obviously filter out
-> > unsupported leafs, but doing so would lead to potential ABI breaks, e.g. if a leaf
-> > that KVM filters out becomes known to the TDX Module, then upgrading the TDX Module
-> > could result in previously allowed input becoming invalid.
-> 
-> How about only filtering out PV related CPUIDs when applying CPUIDs to
-> TDH.MNG.INIT?  I think we can assume they are not gonna be known to TDX module
-> anyway.
+Christian Brauner <brauner@kernel.org> writes:
 
-Nope, not going down that road.  Fool me once[*], shame on you.  Fool me twice,
-shame on me :-)
+> On Wed, Apr 05, 2023 at 09:58:44PM +0000, Ackerley Tng wrote:
 
-Objections to hardware vendors defining PV interfaces aside, there exist leafs
-that are neither PV related nor known to the TDX module, e.g. Centaur leafs.  I
-think it's extremely unlikely (understatement) that anyone will want to expose
-Centaur leafs to a TDX guest, but again I want to say out of the business of
-telling userspace what is and isn't sane CPUID models.
+>> ...
 
-[*] https://lore.kernel.org/all/20221210160046.2608762-6-chen.zhang@intel.com
+>> > > Why do you even need this flag? It seems that @mount_fd being < 0 is
+>> > > sufficient to indicate that a new restricted memory fd is supposed  
+>> to be
+>> > > created in the system instance.
 
-> > Even if that weren't the case, ignoring KVM_SET_CPUID{2} would be a bad option
-> > becuase it doesn't allow KVM to open behavior in the future, i.e. ignoring the
-> > leaf would effectively make _everything_ valid input.  If KVM were to rely solely
-> > on TDH.MNG.INIT, then KVM would want to completely disallow KVM_SET_CPUID{2}.
-> 
-> Right.  Disallowing SET_CPUID{2} probably is better, as it gives userspace a
-> more concrete result.  
-> 
-> > 
-> > Back to Zhi's question, the best thing to do for TDX and SNP is likely to require
-> > that overlap between KVM_SET_CPUID{2} and the "trusted" CPUID be consistent.  The
-> > key difference is that KVM would be enforcing consistency, not sanity.  I.e. KVM
-> > isn't making arbitrary decisions on what is/isn't sane, KVM is simply requiring
-> > that userspace provide a CPUID model that's consistent with what userspace provided
-> > earlier.
-> 
-> So IIUC, you prefer to verifying the CPUIDs in SET_CPUID{2} are a super set of
-> the CPUIDs provided in TDH.MNG.INIT?  And KVM manually verifies all CPUIDs for
-> all vcpus are consistent (the same) in SET_CPUID{2}?
 
-Yes, except KVM doesn't need to verify vCPUs are consistent with respect to each
-other, just that each vCPU is consistent with respect to what was reported to the
-TDX Module.
+>> I'm hoping to have this patch series merged after Chao's patch series
+>> introduces the memfd_restricted() syscall [1].
 
-> Looks this is over-complicated, _if_ the "only filtering out PV related CPUIDs
-> when applying CPUIDs to TDH.MNG.INIT" approach works. 
+> I'm curious, is there an LSFMM session for this?
 
-It's not complicated at all.  Walk through the leafs defined during TDH.MNG.INIT,
-reject KVM_SET_CPUID if a leaf isn't present or doesn't match exactly.  Or has
-the TDX spec changed and it's no longer that simple?
+As far as I know, there is no LSFMM session for this.
