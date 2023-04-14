@@ -2,150 +2,144 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9FED76E27E2
-	for <lists+kvm@lfdr.de>; Fri, 14 Apr 2023 18:01:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 50E7F6E283C
+	for <lists+kvm@lfdr.de>; Fri, 14 Apr 2023 18:22:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230367AbjDNQBV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Apr 2023 12:01:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46474 "EHLO
+        id S229876AbjDNQW0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 Apr 2023 12:22:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33040 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231126AbjDNQBG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 14 Apr 2023 12:01:06 -0400
-Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8B04A276
-        for <kvm@vger.kernel.org>; Fri, 14 Apr 2023 09:00:48 -0700 (PDT)
-Received: by mail-pj1-x102c.google.com with SMTP id z11-20020a17090abd8b00b0024721c47ceaso5101904pjr.3
-        for <kvm@vger.kernel.org>; Fri, 14 Apr 2023 09:00:48 -0700 (PDT)
+        with ESMTP id S229446AbjDNQWZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 14 Apr 2023 12:22:25 -0400
+Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92A5D26A6;
+        Fri, 14 Apr 2023 09:22:24 -0700 (PDT)
+Received: by mail-pl1-x62b.google.com with SMTP id l21so841351pla.5;
+        Fri, 14 Apr 2023 09:22:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sifive.com; s=google; t=1681488048; x=1684080048;
-        h=references:in-reply-to:message-id:date:subject:cc:to:from:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=E9XECObCyZpUedK9knyGwZy3BMqflVOS6gxHGxGLKTE=;
-        b=gkc5s6HPzym+RHUm++bVdfv9jb1/AkXmpyekQHGNyDGRRDRYGjsm+T5pPdbkIedgdV
-         ZFQ6LrmUfO+1WkSx2IgoF4ZBZCNi62pkkDd2LecWTiR0dGThihYtuuKD3qAYYgyp4scN
-         6dSaca2jMax/dpE1eRXkip1mPWJVjhnFxU4OsG9dCgtR/38nce7UO6rc31M/0niyugTY
-         OGZBDUSrCItNQk5ZhcxqJNi+vl4rQPEd4dLts6y+fkwyPmztt2QGc3F1zJKebU4pVnFG
-         0z5VwwXgPyU4CL8P1dX+GDezKB2ciU51Yp3dyrXKzingm/2BiEBojiIbxgZVrF+8FpuD
-         77VQ==
+        d=gmail.com; s=20221208; t=1681489344; x=1684081344;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fTEhNVqZBw01s/PMM+cJ3g7Yn/OTOx3Os9TZhJT3Cc4=;
+        b=aExfXPPVLsn0eHbcr8h1bPznS8NVUHwuPKSzj0+5N4a2kMXbIh/OXWyITEDlmn0Nji
+         QNCvFNFoMgwekDUy3kxaF7hcgEG8WpDDLfpxzPztHFN21pOG5gLoyGQOyeA7TtDa5A6n
+         SycOB056nVLgChG/grzC1kxLHAuraxX86UG4GeIKPF9m+KlpRN1MeRL5sQcTnZ02C5mu
+         iU4RqNdcrDQCg4Ngjq7wldL/l/jMmHk6IGSJYxVTTp6MyGmSXL4Oul5wlQmDh4EqqepH
+         wc7E8UM44C+2QuuyR57JBDiC1Lzs8z2qXFyaTHvg+MciV2wUgICEiK9QfUC3NyZ+2t6W
+         YucA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681488048; x=1684080048;
-        h=references:in-reply-to:message-id:date:subject:cc:to:from
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=E9XECObCyZpUedK9knyGwZy3BMqflVOS6gxHGxGLKTE=;
-        b=l1rVzpvZHxeQUq+IzGyZ7Zd6ZKaQwJKasbjul10B7VropxBbIfV8xnesZR77FLlsgq
-         yuczfHos+7Mf9Q89/TyMb2HaMa+28N/AOyVAv8Fn8JsmDNYZGwxQcvTeK6lcfsqfLxCL
-         Trp/CZySl8NK597Gn4fnbPY7hTwaRKdhP1TfR4hI3cMdJE5eIJBkxQUh9ABiE9QHbtm1
-         ac5Vg0LNEgXXOlbG2BYWRfSIzBsHsaDl0Q8WJdyBJ1I2hpPBNTiv4bpfPsUzf0rANZpw
-         zRsBSDjsrO5TQsgZfsdIAeEz43ZmaqClek6/OdhF8sSIdRKS4TCIdTu+bAU0N1j1VVQ1
-         fqgQ==
-X-Gm-Message-State: AAQBX9eFLvDvtu0vu/V79kMon5lhwX5g+9iowj6/Cw7bSz/4vmjr7j9s
-        8fn92WNHsRervm0TMNT6ZjbFTw==
-X-Google-Smtp-Source: AKy350bAtaGvhnaI4rhSGJ+v1XE5PL7wflyiii5/XGq5ELK2D7RWeVxXUPMbdb1aQIpE7CzaET8gZQ==
-X-Received: by 2002:a17:90b:f0a:b0:23f:582d:f45f with SMTP id br10-20020a17090b0f0a00b0023f582df45fmr5745324pjb.1.1681488047968;
-        Fri, 14 Apr 2023 09:00:47 -0700 (PDT)
-Received: from hsinchu25.internal.sifive.com (59-124-168-89.hinet-ip.hinet.net. [59.124.168.89])
-        by smtp.gmail.com with ESMTPSA id br8-20020a17090b0f0800b00240d4521958sm3083584pjb.18.2023.04.14.09.00.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 14 Apr 2023 09:00:47 -0700 (PDT)
-From:   Andy Chiu <andy.chiu@sifive.com>
-To:     linux-riscv@lists.infradead.org, palmer@dabbelt.com,
-        anup@brainfault.org, atishp@atishpatra.org,
-        kvm-riscv@lists.infradead.org, kvm@vger.kernel.org
-Cc:     vineetg@rivosinc.com, greentime.hu@sifive.com,
-        guoren@linux.alibaba.com, Andy Chiu <andy.chiu@sifive.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Albert Ou <aou@eecs.berkeley.edu>
-Subject: [PATCH -next v18 20/20] riscv: Enable Vector code to be built
-Date:   Fri, 14 Apr 2023 15:58:43 +0000
-Message-Id: <20230414155843.12963-21-andy.chiu@sifive.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20230414155843.12963-1-andy.chiu@sifive.com>
-References: <20230414155843.12963-1-andy.chiu@sifive.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+        d=1e100.net; s=20221208; t=1681489344; x=1684081344;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=fTEhNVqZBw01s/PMM+cJ3g7Yn/OTOx3Os9TZhJT3Cc4=;
+        b=ZguXbEaQLtmqbyRmf7XJnAE2MPtdI/GZewAovK4NRt6l0q637JaWYo0z74It8vfgjd
+         nqHUEixejOzsXeIOP3al1peEPNyLiLZ9MHMZkHUFAVoDmkHmcM0hVGV9LoDm/kY6/WMa
+         FXHHbStoWUaJVn0hn8Pb2Kgds0vRtfiMYDT5GQfqORvu93OkJoQ5RNNMlbGqTR5gzUu/
+         tfd5/jb17xAG5dNrvcvrgyJlRbHJPjStNNaRw4BjzDf3KJONu/lRQf0U3x/6jfauZxdH
+         aBNNEPEi1+V+CdBvifxQLb/fYJwMuOobxJg0HWlsQZOb0kHUgHvkdTt3rk9B4tKdfRFc
+         14tg==
+X-Gm-Message-State: AAQBX9cKtjgoxLsZMmT1DpyC8wBjHDxjHUkxAkRdA+qtQadBpX3dvNrQ
+        GmueUphis10YgVHCWXKRmQ4=
+X-Google-Smtp-Source: AKy350Z4vu+cCQgSZbC4FG5FrywIq84iQCCq6NtgzACoGTjuRdeel5I8bVWxLOeexnvLfuSw/7uoYA==
+X-Received: by 2002:a17:90b:3a92:b0:240:90f0:fbe with SMTP id om18-20020a17090b3a9200b0024090f00fbemr6163103pjb.45.1681489344019;
+        Fri, 14 Apr 2023 09:22:24 -0700 (PDT)
+Received: from ?IPV6:2404:f801:0:5:8000::75b? ([2404:f801:9000:1a:efea::75b])
+        by smtp.gmail.com with ESMTPSA id iq3-20020a17090afb4300b00233b196fe30sm4885542pjb.20.2023.04.14.09.22.13
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 14 Apr 2023 09:22:23 -0700 (PDT)
+Message-ID: <527df1fc-5927-de9c-e18d-00fc1fab575e@gmail.com>
+Date:   Sat, 15 Apr 2023 00:22:11 +0800
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+Subject: Re: [RFC PATCH V4 10/17] x86/hyperv: Add smp support for sev-snp
+ guest
+To:     "Michael Kelley (LINUX)" <mikelley@microsoft.com>,
+        "luto@kernel.org" <luto@kernel.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "bp@alien8.de" <bp@alien8.de>,
+        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
+        "x86@kernel.org" <x86@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>,
+        "seanjc@google.com" <seanjc@google.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "jgross@suse.com" <jgross@suse.com>,
+        Tianyu Lan <Tianyu.Lan@microsoft.com>,
+        "kirill@shutemov.name" <kirill@shutemov.name>,
+        "jiangshan.ljs@antgroup.com" <jiangshan.ljs@antgroup.com>,
+        "peterz@infradead.org" <peterz@infradead.org>,
+        "ashish.kalra@amd.com" <ashish.kalra@amd.com>,
+        "srutherford@google.com" <srutherford@google.com>,
+        "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
+        "anshuman.khandual@arm.com" <anshuman.khandual@arm.com>,
+        "pawan.kumar.gupta@linux.intel.com" 
+        <pawan.kumar.gupta@linux.intel.com>,
+        "adrian.hunter@intel.com" <adrian.hunter@intel.com>,
+        "daniel.sneddon@linux.intel.com" <daniel.sneddon@linux.intel.com>,
+        "alexander.shishkin@linux.intel.com" 
+        <alexander.shishkin@linux.intel.com>,
+        "sandipan.das@amd.com" <sandipan.das@amd.com>,
+        "ray.huang@amd.com" <ray.huang@amd.com>,
+        "brijesh.singh@amd.com" <brijesh.singh@amd.com>,
+        "michael.roth@amd.com" <michael.roth@amd.com>,
+        "thomas.lendacky@amd.com" <thomas.lendacky@amd.com>,
+        "sterritt@google.com" <sterritt@google.com>,
+        "tony.luck@intel.com" <tony.luck@intel.com>,
+        "samitolvanen@google.com" <samitolvanen@google.com>,
+        "fenghua.yu@intel.com" <fenghua.yu@intel.com>
+Cc:     "pangupta@amd.com" <pangupta@amd.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+        "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>
+References: <20230403174406.4180472-1-ltykernel@gmail.com>
+ <20230403174406.4180472-11-ltykernel@gmail.com>
+ <BYAPR21MB1688D729D203638C17FBC82AD79B9@BYAPR21MB1688.namprd21.prod.outlook.com>
+From:   Tianyu Lan <ltykernel@gmail.com>
+In-Reply-To: <BYAPR21MB1688D729D203638C17FBC82AD79B9@BYAPR21MB1688.namprd21.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Guo Ren <guoren@linux.alibaba.com>
+On 4/12/2023 10:59 PM, Michael Kelley (LINUX) wrote:
+>>   #ifdef CONFIG_AMD_MEM_ENCRYPT
+>>
+>>   #define GHCB_USAGE_HYPERV_CALL	1
+>>
+>> +static u8 ap_start_input_arg[PAGE_SIZE] __bss_decrypted __aligned(PAGE_SIZE);
+>> +static u8 ap_start_stack[PAGE_SIZE] __aligned(PAGE_SIZE);
+> Just a question:  ap_start_stack is a static variable that gets used as the
+> starting stack for every AP.  So obviously, once each AP is started, we must
+> be sure that the AP moves off the ap_start_stack before the next AP is
+> started.  How is that synchronization done?  I see that do_boot_cpu() is
+> where the wakeup_secondary_cpu() function is called.  Then there's
+> some waiting until the AP completes "initial initialization" per the
+> comment in the code.  Is there where we know that the AP is no
+> longer using ap_start_stack?
+> 
 
-This patch adds a config which enables vector feature from the kernel
-space.
+Hi Micahel:
+	secondary_startup_64_no_verify() in the head_64.S initializes
+a boot time stack to replace the old stack. It's very begining stage of
+starting AP. The initial_stack was initialized with idle->thread.sp in
+the do_boot_cpu(). The AP is started one by one in current code and so
+It's safe to reuse the stack for all APs to boot up.
 
-Signed-off-by: Guo Ren <guoren@linux.alibaba.com>
-Co-developed-by: Greentime Hu <greentime.hu@sifive.com>
-Signed-off-by: Greentime Hu <greentime.hu@sifive.com>
-Suggested-by: Vineet Gupta <vineetg@rivosinc.com>
-Suggested-by: Atish Patra <atishp@atishpatra.org>
-Co-developed-by: Andy Chiu <andy.chiu@sifive.com>
-Signed-off-by: Andy Chiu <andy.chiu@sifive.com>
-Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
-Reviewed-by: Heiko Stuebner <heiko.stuebner@vrull.eu>
-Tested-by: Heiko Stuebner <heiko.stuebner@vrull.eu>
----
- arch/riscv/Kconfig  | 20 ++++++++++++++++++++
- arch/riscv/Makefile |  6 +++++-
- 2 files changed, 25 insertions(+), 1 deletion(-)
-
-diff --git a/arch/riscv/Kconfig b/arch/riscv/Kconfig
-index 205ce6e009a2..5edfc545aafd 100644
---- a/arch/riscv/Kconfig
-+++ b/arch/riscv/Kconfig
-@@ -442,6 +442,26 @@ config RISCV_ISA_SVPBMT
- 
- 	   If you don't know what to do here, say Y.
- 
-+config TOOLCHAIN_HAS_V
-+	bool
-+	default y
-+	depends on !64BIT || $(cc-option,-mabi=lp64 -march=rv64iv)
-+	depends on !32BIT || $(cc-option,-mabi=ilp32 -march=rv32iv)
-+	depends on LLD_VERSION >= 140000 || LD_VERSION >= 23800
-+	depends on AS_HAS_OPTION_ARCH
-+
-+config RISCV_ISA_V
-+	bool "VECTOR extension support"
-+	depends on TOOLCHAIN_HAS_V
-+	depends on FPU
-+	select DYNAMIC_SIGFRAME
-+	default y
-+	help
-+	  Say N here if you want to disable all vector related procedure
-+	  in the kernel.
-+
-+	  If you don't know what to do here, say Y.
-+
- config TOOLCHAIN_HAS_ZBB
- 	bool
- 	default y
-diff --git a/arch/riscv/Makefile b/arch/riscv/Makefile
-index 1b276f62f22b..94684dbe3b36 100644
---- a/arch/riscv/Makefile
-+++ b/arch/riscv/Makefile
-@@ -56,6 +56,7 @@ riscv-march-$(CONFIG_ARCH_RV32I)	:= rv32ima
- riscv-march-$(CONFIG_ARCH_RV64I)	:= rv64ima
- riscv-march-$(CONFIG_FPU)		:= $(riscv-march-y)fd
- riscv-march-$(CONFIG_RISCV_ISA_C)	:= $(riscv-march-y)c
-+riscv-march-$(CONFIG_RISCV_ISA_V)	:= $(riscv-march-y)v
- 
- # Newer binutils versions default to ISA spec version 20191213 which moves some
- # instructions from the I extension to the Zicsr and Zifencei extensions.
-@@ -65,7 +66,10 @@ riscv-march-$(toolchain-need-zicsr-zifencei) := $(riscv-march-y)_zicsr_zifencei
- # Check if the toolchain supports Zihintpause extension
- riscv-march-$(CONFIG_TOOLCHAIN_HAS_ZIHINTPAUSE) := $(riscv-march-y)_zihintpause
- 
--KBUILD_CFLAGS += -march=$(subst fd,,$(riscv-march-y))
-+# Remove F,D,V from isa string for all. Keep extensions between "fd" and "v" by
-+# matching non-v and non-multi-letter extensions out with the filter ([^v_]*)
-+KBUILD_CFLAGS += -march=$(shell echo $(riscv-march-y) | sed -E 's/(rv32ima|rv64ima)fd([^v_]*)v?/\1\2/')
-+
- KBUILD_AFLAGS += -march=$(riscv-march-y)
- 
- KBUILD_CFLAGS += -mno-save-restore
--- 
-2.17.1
+278        /*
+279         * Setup a boot time stack - Any secondary CPU will have lost 
+its stack
+280         * by now because the cr3-switch above unmaps the real-mode stack
+281         */
+282        movq initial_stack(%rip), %rsp
+283
 
