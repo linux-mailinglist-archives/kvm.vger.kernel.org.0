@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C22BD6E1C91
-	for <lists+kvm@lfdr.de>; Fri, 14 Apr 2023 08:26:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 37C496E1C94
+	for <lists+kvm@lfdr.de>; Fri, 14 Apr 2023 08:26:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230032AbjDNG0S (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Apr 2023 02:26:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53994 "EHLO
+        id S230003AbjDNG0U (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 Apr 2023 02:26:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54094 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230081AbjDNG0Q (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 14 Apr 2023 02:26:16 -0400
+        with ESMTP id S230030AbjDNG0S (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 14 Apr 2023 02:26:18 -0400
 Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D20735FC7;
-        Thu, 13 Apr 2023 23:26:14 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 435C16A42;
+        Thu, 13 Apr 2023 23:26:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1681453574; x=1712989574;
+  t=1681453577; x=1712989577;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=ReZ6d1h49UXz+50CffPRhXIdQK/vAa89RRvnljHBCbc=;
-  b=R1r7vNCd7O1EqrPxXVJdRuonIVnHD2T08G/OeWZhmUIdhkwrSL2Yw/Yz
-   Z6azFXrs0dy8QKYcFwINO5Xd+ct2cCnUzHx2pWepuH/TvM+iHdjRAiNlW
-   MVzTt+xJoaYaipImnwpts42J+QaI8jGuRElmIipTghDUpLM3j7btjjaym
-   97EJrlj/U0sn2xycs4kt+2L8lNTrrW1z0SBJIQYnOjxtRjp182qX0tNFe
-   21U+xG+oe8JISmZPdgcix/iBZRV/PzERVP3W3oIbdPZGx7HSF8aWeciye
-   x5zrHgHthloEglZMizNQRwFTESZbAPfG/lVMxQAbAFIOIE313wMjwZOJO
+  bh=3v96gRV+sEhmeJkt6bLopXdOVIbOcXfn+M8hUk0aLec=;
+  b=a16edSFrIgSJnGu0rB6WQQoEpFaIdU3Dbi8O3EOEM1AzOhL3WX19EXDL
+   MPolO9O5tK6yq6rEgEdw8EuGAEzdz3MkamWeQiiF562ZAzMpO1bcDICsa
+   U8Uk099+EXKRUiGuyTtL9jTS6KkO25Uq8ydU1ltU8WmJqeP90C9GiCWzO
+   qAf70liVPIUSSpvj+pz8s4rJkfRCO1PiSoIZw7W/UYguc+PNZ9Hf2K9ZH
+   4NxfkrTYFPgmeZhFc1fxClLgXifGjv4pxm5zFLRW413Bu2kNekcftoWEI
+   V2Qs8zxl1H9t1hvL5xQw4Aafj6g1jeYZIG8kqg2BE9xfUtKqD7AzV8WA8
    Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10679"; a="341892711"
+X-IronPort-AV: E=McAfee;i="6600,9927,10679"; a="341892723"
 X-IronPort-AV: E=Sophos;i="5.99,195,1677571200"; 
-   d="scan'208";a="341892711"
+   d="scan'208";a="341892723"
 Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Apr 2023 23:26:13 -0700
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Apr 2023 23:26:17 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10679"; a="935885814"
+X-IronPort-AV: E=McAfee;i="6600,9927,10679"; a="935885827"
 X-IronPort-AV: E=Sophos;i="5.99,195,1677571200"; 
-   d="scan'208";a="935885814"
+   d="scan'208";a="935885827"
 Received: from spr.sh.intel.com ([10.239.53.106])
-  by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Apr 2023 23:26:09 -0700
+  by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Apr 2023 23:26:13 -0700
 From:   Chao Gao <chao.gao@intel.com>
 To:     kvm@vger.kernel.org
 Cc:     Jiaan Lu <jiaan.lu@intel.com>, Zhang Chen <chen.zhang@intel.com>,
@@ -48,9 +48,9 @@ Cc:     Jiaan Lu <jiaan.lu@intel.com>, Zhang Chen <chen.zhang@intel.com>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
         Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
         "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org
-Subject: [RFC PATCH v2 02/11] KVM: x86: Advertise CPUID.7.2.EDX and RRSBA_CTRL support
-Date:   Fri, 14 Apr 2023 14:25:23 +0800
-Message-Id: <20230414062545.270178-3-chao.gao@intel.com>
+Subject: [RFC PATCH v2 03/11] KVM: x86: Advertise BHI_CTRL support
+Date:   Fri, 14 Apr 2023 14:25:24 +0800
+Message-Id: <20230414062545.270178-4-chao.gao@intel.com>
 X-Mailer: git-send-email 2.40.0
 In-Reply-To: <20230414062545.270178-1-chao.gao@intel.com>
 References: <20230414062545.270178-1-chao.gao@intel.com>
@@ -67,116 +67,50 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Zhang Chen <chen.zhang@intel.com>
 
-Add a kvm-only CPUID feature leaf for CPUID.7.2.EDX and RRSBA_CTRL
-as the first feature in the leaf.
+Add 100% kvm-only feature for BHI_CTRL because the kernel doesn't use it
+at all.
 
-RRSBA_CTRL is enumerated by CPUID.7.2.EDX[2]. If supported, RRSBA_DIS_U
-(bit 5) and RRSBA_DIS_S (bit 6) of IA32_SPEC_CTRL MSR can be used to
-disable RRSBA behavior for CPL3 and CPL0/1/2 respectively.
+BHI_CTRL is enumerated by CPUID.7.2.EDX[4]. If supported, BHI_DIS_S (bit
+10) of IA32_SPEC_CTRL MSR can be used to enable BHI_DIS_S behavior.
 
 Note that KVM does not intercept guests' IA32_SPEC_CTRL MSR accesses
 after a non-zero is written to the MSR. Therefore, guests can already
-toggle the two bits if the host supports RRSBA_CTRL, and no extra code
-is needed to allow guests to toggle the two bits.
+toggle the BHI_DIS_S bit if the host supports BHI_CTRL, and no extra
+code is needed to allow guests to toggle the bit.
 
 Signed-off-by: Zhang Chen <chen.zhang@intel.com>
 Signed-off-by: Chao Gao <chao.gao@intel.com>
 Tested-by: Jiaan Lu <jiaan.lu@intel.com>
 ---
- arch/x86/kvm/cpuid.c         | 22 +++++++++++++++++++---
- arch/x86/kvm/reverse_cpuid.h |  7 +++++++
- 2 files changed, 26 insertions(+), 3 deletions(-)
+ arch/x86/kvm/cpuid.c         | 2 +-
+ arch/x86/kvm/reverse_cpuid.h | 1 +
+ 2 files changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index 9583a110cf5f..f024c3ac2203 100644
+index f024c3ac2203..7cdd859d09a2 100644
 --- a/arch/x86/kvm/cpuid.c
 +++ b/arch/x86/kvm/cpuid.c
-@@ -685,6 +685,10 @@ void kvm_set_cpu_caps(void)
- 		SF(SGX1) | SF(SGX2) | SF(SGX_EDECCSSA)
+@@ -686,7 +686,7 @@ void kvm_set_cpu_caps(void)
  	);
  
-+	kvm_cpu_cap_init_kvm_defined(CPUID_7_2_EDX,
-+		SF(RRSBA_CTRL)
-+	);
-+
- 	kvm_cpu_cap_mask(CPUID_8000_0001_ECX,
- 		F(LAHF_LM) | F(CMP_LEGACY) | 0 /*SVM*/ | 0 /* ExtApicSpace */ |
- 		F(CR8_LEGACY) | F(ABM) | F(SSE4A) | F(MISALIGNSSE) |
-@@ -949,13 +953,14 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
- 		break;
- 	/* function 7 has additional index. */
- 	case 7:
--		entry->eax = min(entry->eax, 1u);
-+		entry->eax = min(entry->eax, 2u);
- 		cpuid_entry_override(entry, CPUID_7_0_EBX);
- 		cpuid_entry_override(entry, CPUID_7_ECX);
- 		cpuid_entry_override(entry, CPUID_7_EDX);
+ 	kvm_cpu_cap_init_kvm_defined(CPUID_7_2_EDX,
+-		SF(RRSBA_CTRL)
++		SF(RRSBA_CTRL) | F(BHI_CTRL)
+ 	);
  
--		/* KVM only supports 0x7.0 and 0x7.1, capped above via min(). */
--		if (entry->eax == 1) {
-+		max_idx = entry->eax;
-+
-+		if (max_idx >= 1) {
- 			entry = do_host_cpuid(array, function, 1);
- 			if (!entry)
- 				goto out;
-@@ -965,6 +970,17 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
- 			entry->ebx = 0;
- 			entry->ecx = 0;
- 		}
-+
-+		if (max_idx >= 2) {
-+			entry = do_host_cpuid(array, function, 2);
-+			if (!entry)
-+				goto out;
-+
-+			cpuid_entry_override(entry, CPUID_7_2_EDX);
-+			entry->eax = 0;
-+			entry->ebx = 0;
-+			entry->ecx = 0;
-+		}
- 		break;
- 	case 0xa: { /* Architectural Performance Monitoring */
- 		union cpuid10_eax eax;
+ 	kvm_cpu_cap_mask(CPUID_8000_0001_ECX,
 diff --git a/arch/x86/kvm/reverse_cpuid.h b/arch/x86/kvm/reverse_cpuid.h
-index a5717282bb9c..72bad8314a9c 100644
+index 72bad8314a9c..e7e70c9aa384 100644
 --- a/arch/x86/kvm/reverse_cpuid.h
 +++ b/arch/x86/kvm/reverse_cpuid.h
-@@ -15,6 +15,7 @@ enum kvm_only_cpuid_leafs {
- 	CPUID_12_EAX	 = NCAPINTS,
- 	CPUID_7_1_EDX,
- 	CPUID_8000_0007_EDX,
-+	CPUID_7_2_EDX,
- 	NR_KVM_CPU_CAPS,
+@@ -50,6 +50,7 @@ enum kvm_only_cpuid_leafs {
  
- 	NKVMCAPINTS = NR_KVM_CPU_CAPS - NCAPINTS,
-@@ -47,6 +48,9 @@ enum kvm_only_cpuid_leafs {
- /* CPUID level 0x80000007 (EDX). */
- #define KVM_X86_FEATURE_CONSTANT_TSC	KVM_X86_FEATURE(CPUID_8000_0007_EDX, 8)
+ /* Intel-defined sub-features, CPUID level 0x00000007:2 (EDX) */
+ #define KVM_X86_FEATURE_RRSBA_CTRL	KVM_X86_FEATURE(CPUID_7_2_EDX, 2)
++#define X86_FEATURE_BHI_CTRL		KVM_X86_FEATURE(CPUID_7_2_EDX, 4)
  
-+/* Intel-defined sub-features, CPUID level 0x00000007:2 (EDX) */
-+#define KVM_X86_FEATURE_RRSBA_CTRL	KVM_X86_FEATURE(CPUID_7_2_EDX, 2)
-+
  struct cpuid_reg {
  	u32 function;
- 	u32 index;
-@@ -69,6 +73,7 @@ static const struct cpuid_reg reverse_cpuid[] = {
- 	[CPUID_8000_0007_EBX] = {0x80000007, 0, CPUID_EBX},
- 	[CPUID_7_EDX]         = {         7, 0, CPUID_EDX},
- 	[CPUID_7_1_EAX]       = {         7, 1, CPUID_EAX},
-+	[CPUID_7_2_EDX]       = {         7, 2, CPUID_EDX},
- 	[CPUID_12_EAX]        = {0x00000012, 0, CPUID_EAX},
- 	[CPUID_8000_001F_EAX] = {0x8000001f, 0, CPUID_EAX},
- 	[CPUID_7_1_EDX]       = {         7, 1, CPUID_EDX},
-@@ -108,6 +113,8 @@ static __always_inline u32 __feature_translate(int x86_feature)
- 		return KVM_X86_FEATURE_SGX_EDECCSSA;
- 	else if (x86_feature == X86_FEATURE_CONSTANT_TSC)
- 		return KVM_X86_FEATURE_CONSTANT_TSC;
-+	else if (x86_feature == X86_FEATURE_RRSBA_CTRL)
-+		return KVM_X86_FEATURE_RRSBA_CTRL;
- 
- 	return x86_feature;
- }
 -- 
 2.40.0
 
