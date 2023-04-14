@@ -2,159 +2,203 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AE2106E1F4A
-	for <lists+kvm@lfdr.de>; Fri, 14 Apr 2023 11:29:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C62EB6E1FD0
+	for <lists+kvm@lfdr.de>; Fri, 14 Apr 2023 11:52:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229628AbjDNJ31 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Apr 2023 05:29:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48890 "EHLO
+        id S230143AbjDNJwA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 Apr 2023 05:52:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35728 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229448AbjDNJ3Y (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 14 Apr 2023 05:29:24 -0400
-Received: from mail-wr1-x430.google.com (mail-wr1-x430.google.com [IPv6:2a00:1450:4864:20::430])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69BCB4EDD
-        for <kvm@vger.kernel.org>; Fri, 14 Apr 2023 02:29:23 -0700 (PDT)
-Received: by mail-wr1-x430.google.com with SMTP id v27so7618676wra.13
-        for <kvm@vger.kernel.org>; Fri, 14 Apr 2023 02:29:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=grsecurity.net; s=grsec; t=1681464562; x=1684056562;
-        h=content-transfer-encoding:in-reply-to:references:cc:to:from
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=KIRaTiGVJHutsxHwytNtnJEYC8NOQXa64IXdr62gYmk=;
-        b=vC5WBMuYLwbMg/gPsSvug/5ZKaoP0HJDR2cE6ZryHOt00ZdBBFvlZnbCcWpKcnTrGC
-         s9PxyJhj2cBWtZVNeIgEDKm+ekjlS1hNI3zHMKBrJS/TPHE1mfASCuQuThfr/dGYS4YB
-         diD7RjvWZ1xFEL0H1KgGe4qlbaPsuDQRzTcBevKgi/Me991emZ93DhLQLsYCaUmwMAUe
-         PtyYnCR/l2lfk6hf2SNVH3Go0rlipYuArydqe4IAnynAhWdEWDahDvzXiy5aMz2JORPS
-         wM/mducHudwyOKOz/zFjaOGOG2WnF3OxqsYIiuPoctGdyxebvJDORRmBj+wpP/sUGNC0
-         d1LA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681464562; x=1684056562;
-        h=content-transfer-encoding:in-reply-to:references:cc:to:from
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=KIRaTiGVJHutsxHwytNtnJEYC8NOQXa64IXdr62gYmk=;
-        b=gA8sFDWu+hZnzS9OyNZCNjj0qr42yVRkHmBuKTn/BU+pgoogRBuXe7KTSsH3SN2z2b
-         s2Ox8IMiWLLk6wd/P0FWqGkfrqwOMo8qjZ46brulVdHSuQ+pOTmknTRF2drkOqEx/6a5
-         qp4bazBhlaANahx/Q71snxFO57/JVXUa1GizAZRS7Sj3AIauflvZpUeWiW5q2UqY/UGT
-         uLsM9DRZCeyoxvuix4lkEsPaRtef5JgBgx6ey8iXCMDNIm8ghkFcFoSC2TZfbOehbozf
-         8ZfVzlXTb813De4bm9tpVuY9/u9FIpL8FRl3+XfzQ5R/+ppiURqyjH39nT3J7P4KnJMJ
-         0yvg==
-X-Gm-Message-State: AAQBX9f351gDjpWwN82iEQznWZc1PKaZJLAvzT2CrTzehriG0lghGUTW
-        H5l3/2hn0OqoUSSf0x6ez5MDUQ==
-X-Google-Smtp-Source: AKy350Yld6S7prtEH2My94k4mNWRvHKrCSm4/MIqG1e3Qa0OAQuJ4tY2NxQ0giMdPl1CpwyEBQdBrA==
-X-Received: by 2002:a5d:6a82:0:b0:2f4:311:c877 with SMTP id s2-20020a5d6a82000000b002f40311c877mr3949522wru.34.1681464561834;
-        Fri, 14 Apr 2023 02:29:21 -0700 (PDT)
-Received: from ?IPV6:2003:f6:af15:b900:825b:a446:cb0c:8607? (p200300f6af15b900825ba446cb0c8607.dip0.t-ipconnect.de. [2003:f6:af15:b900:825b:a446:cb0c:8607])
-        by smtp.gmail.com with ESMTPSA id n8-20020a5d4c48000000b002f587f6c9b2sm3114366wrt.107.2023.04.14.02.29.21
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 14 Apr 2023 02:29:21 -0700 (PDT)
-Message-ID: <026dcbfe-a306-85c3-600e-17cae3d3b7c5@grsecurity.net>
-Date:   Fri, 14 Apr 2023 11:29:20 +0200
+        with ESMTP id S229448AbjDNJv6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 14 Apr 2023 05:51:58 -0400
+Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3759F7D81;
+        Fri, 14 Apr 2023 02:51:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1681465913; x=1713001913;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=7ODzppBG4KAoSSu3naC4Euw4OE/2+Qi+Zpg/LX33PDY=;
+  b=oHwATxf5A/usN7fUfMdk67r8EBUEyzQ4XDNjcBtKKMBTmtc99zPB2nzO
+   na6Xno6nsz7NBFlzQg/LuHoJycymHloSuhKwN10Vw+EfJ5yDtfMXg3GrY
+   6MiHE8YtkiF+G6EAZLko8xy5cghq431QxUbijR9QqdNQeV/LNLbteqD/l
+   lgOxWw6/nuNgVI1Qsp5PJkyEg4dtfyC+V9zniN+l+Kg8cp6gH33K8uWtS
+   iYWpq/sT5aUN2dVHw5Aq+Lo2w+QQ6KaWVr2GRfTc41crINFKMEdYmRgas
+   sgcqf+V4a1kTwypqfvrpct8YxlfkuiPE7rzapCOH+cf9eW5zr0dyQbfMx
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10679"; a="324056004"
+X-IronPort-AV: E=Sophos;i="5.99,195,1677571200"; 
+   d="scan'208";a="324056004"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Apr 2023 02:51:52 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10679"; a="754399076"
+X-IronPort-AV: E=Sophos;i="5.99,195,1677571200"; 
+   d="scan'208";a="754399076"
+Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.249.173.37]) ([10.249.173.37])
+  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Apr 2023 02:51:45 -0700
+Message-ID: <e956f4b9-34a1-de7b-2157-0101b586ab46@linux.intel.com>
+Date:   Fri, 14 Apr 2023 17:51:43 +0800
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.9.0
-Subject: Re: [PATCH v4 0/6] KVM: MMU: performance tweaks for heavy CR0.WP
- users
-Content-Language: en-US, de-DE
-From:   Mathias Krause <minipli@grsecurity.net>
-To:     Sean Christopherson <seanjc@google.com>, Greg KH <greg@kroah.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        stable@vger.kernel.org
-References: <20230322013731.102955-1-minipli@grsecurity.net>
- <167949641597.2215962.13042575709754610384.b4-ty@google.com>
- <190509c8-0f05-d05c-831c-596d2c9664ac@grsecurity.net>
- <ZB7oKD6CHa6f2IEO@kroah.com> <ZC4tocf+PeuUEe4+@google.com>
- <0c47acc0-1f13-ebe5-20e5-524e5b6930e3@grsecurity.net>
-In-Reply-To: <0c47acc0-1f13-ebe5-20e5-524e5b6930e3@grsecurity.net>
-Content-Type: text/plain; charset=UTF-8
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+Subject: Re: [RFC PATCH v2 00/11] Intel IA32_SPEC_CTRL Virtualization
+To:     Chao Gao <chao.gao@intel.com>, kvm@vger.kernel.org
+Cc:     Jiaan Lu <jiaan.lu@intel.com>,
+        Alexandre Chartre <alexandre.chartre@oracle.com>,
+        Arnaldo Carvalho de Melo <acme@redhat.com>,
+        Babu Moger <babu.moger@amd.com>,
+        Borislav Petkov <bp@alien8.de>, Borislav Petkov <bp@suse.de>,
+        Daniel Sneddon <daniel.sneddon@linux.intel.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        David Matlack <dmatlack@google.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
+        Josh Poimboeuf <jpoimboe@kernel.org>,
+        Kim Phillips <kim.phillips@amd.com>,
+        Len Brown <len.brown@intel.com>, linux-kernel@vger.kernel.org,
+        linux-kselftest@vger.kernel.org,
+        Nikunj A Dadhania <nikunj@amd.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Sandipan Das <sandipan.das@amd.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>, x86@kernel.org,
+        Zhang Chen <chen.zhang@intel.com>
+References: <20230414062545.270178-1-chao.gao@intel.com>
+From:   Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <20230414062545.270178-1-chao.gao@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-6.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
+        SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 06.04.23 15:22, Mathias Krause wrote:
-> On 06.04.23 04:25, Sean Christopherson wrote:
->> On Sat, Mar 25, 2023, Greg KH wrote:
->>> On Sat, Mar 25, 2023 at 12:39:59PM +0100, Mathias Krause wrote:
->>>> As this is a huge performance fix for us, we'd like to get it integrated
->>>> into current stable kernels as well -- not without having the changes
->>>> get some wider testing, of course, i.e. not before they end up in a
->>>> non-rc version released by Linus. But I already did a backport to 5.4 to
->>>> get a feeling how hard it would be and for the impact it has on older
->>>> kernels.
->>>>
->>>> Using the 'ssdd 10 50000' test I used before, I get promising results
->>>> there as well. Without the patches it takes 9.31s, while with them we're
->>>> down to 4.64s. Taking into account that this is the runtime of a
->>>> workload in a VM that gets cut in half, I hope this qualifies as stable
->>>> material, as it's a huge performance fix.
->>>>
->>>> Greg, what's your opinion on it? Original series here:
->>>> https://lore.kernel.org/kvm/20230322013731.102955-1-minipli@grsecurity.net/
->>>
->>> I'll leave the judgement call up to the KVM maintainers, as they are the
->>> ones that need to ack any KVM patch added to stable trees.
->>
->> These are quite risky to backport.  E.g. we botched patch 6[*], and my initial
->> fix also had a subtle bug.  There have also been quite a few KVM MMU changes since
->> 5.4, so it's possible that an edge case may exist in 5.4 that doesn't exist in
->> mainline.
-> 
-> I totally agree. Getting the changes to work with older kernels needs
-> more work. The MMU role handling was refactored in 5.14 and down to 5.4
-> it differs even more, so backports to earlier kernels definitely needs
-> more care.
-> 
-> My plan would be to limit backporting of the whole series to kernels
-> down to 5.15 (maybe 5.10 if it turns out to be doable) and for kernels
-> before that only without patch 6. That would leave out the problematic
-> change but still give us the benefits of dropping the needless mmu
-> unloads for only toggling CR0.WP in the VM. This already helps us a lot!
 
-To back up the "helps us a lot" with some numbers, here are the results
-I got from running the 'ssdd 10 50000' micro-benchmark on the backports
-I did, running on a grsecurity L1 VM (host is a vanilla kernel, as
-stated below; runtime in seconds, lower is better):
+On 4/14/2023 2:25 PM, Chao Gao wrote:
+> Changes since RFC v1:
+>   * add two kselftests (patch 10-11)
+>   * set virtual MSRs also on APs [Pawan]
+>   * enable "virtualize IA32_SPEC_CTRL" for L2 to prevent L2 from changing
+>     some bits of IA32_SPEC_CTRL (patch 4)
+>   * other misc cleanup and cosmetic changes
+>
+> RFC v1: https://lore.kernel.org/lkml/20221210160046.2608762-1-chen.zhang@intel.com/
+>
+>
+> This series introduces "virtualize IA32_SPEC_CTRL" support. Here are
+> introduction and use cases of this new feature.
+>
+> ### Virtualize IA32_SPEC_CTRL
+>
+> "Virtualize IA32_SPEC_CTRL" [1] is a new VMX feature on Intel CPUs. This feature
+> allows VMM to lock some bits of IA32_SPEC_CTRL MSR even when the MSR is
+> pass-thru'd to a guest.
+>
+>
+> ### Use cases of "virtualize IA32_SPEC_CTRL" [2]
+>
+> Software mitigations like Retpoline and software BHB-clearing sequence depend on
+> CPU microarchitectures. And guest cannot know exactly the underlying
+> microarchitecture. When a guest is migrated between processors of different
+> microarchitectures, software mitigations which work perfectly on previous
+> microachitecture may be not effective on the new one. To fix the problem, some
+> hardware mitigations should be used in conjunction with software mitigations.
 
-                          legacy     TDP    shadow
-    Linux v5.4.240          -        8.87s   56.8s
-    + patches               -        5.84s   55.4s
+So even the hardware mitigations are enabled, the software mitigations 
+are still needed, right?
 
-    Linux v5.10.177       10.37s    88.7s    69.7s
-    + patches              4.88s     4.92s   70.1s
 
-    Linux v5.15.106        9.94s    66.1s    64.9s
-    + patches              4.81s     4.79s   64.6s
+> Using virtual IA32_SPEC_CTRL, VMM can enforce hardware mitigations transparently
+> to guests and avoid those hardware mitigations being unintentionally disabled
+> when guest changes IA32_SPEC_CTRL MSR.
+>
+>
+> ### Intention of this series
+>
+> This series adds the capability of enforcing hardware mitigations for guests
+> transparently and efficiently (i.e., without intecepting IA32_SPEC_CTRL MSR
 
-    Linux v6.1.23          7.65s    8.23s    68.7s
-    + patches              3.36s    3.36s    69.1s
+/s/intecepting/intercepting
 
-    Linux v6.2.10          7.61s    7.98s    68.6s
-    + patches              3.37s    3.41s    70.2s
 
-I guess we can grossly ignore the shadow MMU numbers, beside noting them
-to regress from v5.4 to v5.10 (something to investigate?). The backports
-don't help (much) for shadow MMU setups and the flux in the measurements
-is likely related to the slab allocations involved.
-
-Another unrelated data point is that TDP MMU is really broken for our
-use case on v5.10 and v5.15 -- it's even slower that shadow paging!
-
-OTOH, the backports give nice speed-ups, ranging from ~2.2 times faster
-for pure EPT (legacy) MMU setups up to 18(!!!) times faster for TDP MMU
-on v5.10.
-
-I backported the whole series down to v5.10 but left out the CR0.WP
-guest owning patch+fix for v5.4 as the code base is too different to get
-all the nuances right, as Sean already hinted. However, even this
-limited backport provides a big performance fix for our use case!
-
-Thanks,
-Mathias
+> accesses) to kvm. The capability can be used to solve the VM migration issue in
+> a pool consisting of processors of different microarchitectures.
+>
+> Specifically, below are two target scenarios of this series:
+>
+> Scenario 1: If retpoline is used by a VM to mitigate IMBTI in CPL0, VMM can set
+> 	    RRSBA_DIS_S on parts enumerates RRSBA. Note that the VM is presented
+> 	    with a microarchitecture doesn't enumerate RRSBA.
+>
+> Scenario 2: If a VM uses software BHB-clearing sequence on transitions into CPL0
+> 	    to mitigate BHI, VMM can use "virtualize IA32_SPEC_CTRL" to set
+> 	    BHI_DIS_S on new parts which doesn't enumerate BHI_NO.
+>
+> Intel defines some virtual MSRs [2] for guests to report in-use software
+> mitigations. This allows guests to opt in VMM's deploying hardware mitigations
+> for them if the guests are either running or later migrated to a system on which
+> in-use software mitigations are not effective. The virtual MSRs interface is
+> also added in this series.
+>
+> ### Organization of this series
+>
+> 1. Patch 1-3	Advertise RRSBA_CTRL and BHI_CTRL to guest
+> 2. Patch 4	Add "virtualize IA32_SPEC_CTRL" support
+> 3. Patch 5-9	Allow guests to report in-use software mitigations to KVM so
+>                  that KVM can enable hardware mitigations for guests.
+> 4. Patch 10-11	Add kselftest for virtual MSRs and IA32_SPEC_CTRL
+>
+> [1]: https://cdrdv2.intel.com/v1/dl/getContent/671368 Ref. #319433-047 Chapter 12
+> [2]: https://www.intel.com/content/www/us/en/developer/articles/technical/software-security-guidance/technical-documentation/branch-history-injection.html
+>
+> Chao Gao (3):
+>    KVM: VMX: Advertise MITI_ENUM_RETPOLINE_S_SUPPORT
+>    KVM: selftests: Add tests for virtual enumeration/mitigation MSRs
+>    KVM: selftests: Add tests for IA32_SPEC_CTRL MSR
+>
+> Pawan Gupta (1):
+>    x86/bugs: Use Virtual MSRs to request hardware mitigations
+>
+> Zhang Chen (7):
+>    x86/msr-index: Add bit definitions for BHI_DIS_S and BHI_NO
+>    KVM: x86: Advertise CPUID.7.2.EDX and RRSBA_CTRL support
+>    KVM: x86: Advertise BHI_CTRL support
+>    KVM: VMX: Add IA32_SPEC_CTRL virtualization support
+>    KVM: x86: Advertise ARCH_CAP_VIRTUAL_ENUM support
+>    KVM: VMX: Advertise MITIGATION_CTRL support
+>    KVM: VMX: Advertise MITI_CTRL_BHB_CLEAR_SEQ_S_SUPPORT
+>
+>   arch/x86/include/asm/msr-index.h              |  33 +++-
+>   arch/x86/include/asm/vmx.h                    |   5 +
+>   arch/x86/include/asm/vmxfeatures.h            |   2 +
+>   arch/x86/kernel/cpu/bugs.c                    |  25 +++
+>   arch/x86/kvm/cpuid.c                          |  22 ++-
+>   arch/x86/kvm/reverse_cpuid.h                  |   8 +
+>   arch/x86/kvm/svm/svm.c                        |   3 +
+>   arch/x86/kvm/vmx/capabilities.h               |   5 +
+>   arch/x86/kvm/vmx/nested.c                     |  13 ++
+>   arch/x86/kvm/vmx/vmcs.h                       |   2 +
+>   arch/x86/kvm/vmx/vmx.c                        | 112 ++++++++++-
+>   arch/x86/kvm/vmx/vmx.h                        |  43 ++++-
+>   arch/x86/kvm/x86.c                            |  19 +-
+>   tools/arch/x86/include/asm/msr-index.h        |  37 +++-
+>   tools/testing/selftests/kvm/Makefile          |   2 +
+>   .../selftests/kvm/include/x86_64/processor.h  |   5 +
+>   .../selftests/kvm/x86_64/spec_ctrl_msr_test.c | 178 ++++++++++++++++++
+>   .../kvm/x86_64/virtual_mitigation_msr_test.c  | 175 +++++++++++++++++
+>   18 files changed, 676 insertions(+), 13 deletions(-)
+>   create mode 100644 tools/testing/selftests/kvm/x86_64/spec_ctrl_msr_test.c
+>   create mode 100644 tools/testing/selftests/kvm/x86_64/virtual_mitigation_msr_test.c
+>
+>
+> base-commit: 400d2132288edbd6d500f45eab5d85526ca94e46
