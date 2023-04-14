@@ -2,131 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2AC536E2AED
-	for <lists+kvm@lfdr.de>; Fri, 14 Apr 2023 22:08:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A04786E2AEF
+	for <lists+kvm@lfdr.de>; Fri, 14 Apr 2023 22:09:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229689AbjDNUIx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Apr 2023 16:08:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60114 "EHLO
+        id S229839AbjDNUJo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 Apr 2023 16:09:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60400 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229514AbjDNUIv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 14 Apr 2023 16:08:51 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC25865BC
-        for <kvm@vger.kernel.org>; Fri, 14 Apr 2023 13:08:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1681502887;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=vr6uwSQuXozRClSp8sqfIkdgWu/iFgT8RltUCx6FP5I=;
-        b=SJJ7qF+QcAnGdB5YYy5coAW78vFJEVUlRlPwzwfNcejlDULHwpoGTAyVjaXbszhYpvksGM
-        f2oOdxgiyXPCGmDqcI8F3I8c6452gWQNVNa2rm21EHMNWpc/DfVVusGbGK9yOce/yhRQwK
-        MHw6jIoRQAUP5rW5J6WPtWGEF6pSwgc=
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com
- [209.85.166.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-465-FKGUaoN1MlOB4P7IhYVDFQ-1; Fri, 14 Apr 2023 16:08:05 -0400
-X-MC-Unique: FKGUaoN1MlOB4P7IhYVDFQ-1
-Received: by mail-io1-f70.google.com with SMTP id h7-20020a6bb707000000b00760a8765317so3901689iof.23
-        for <kvm@vger.kernel.org>; Fri, 14 Apr 2023 13:08:05 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681502885; x=1684094885;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=vr6uwSQuXozRClSp8sqfIkdgWu/iFgT8RltUCx6FP5I=;
-        b=hnc5Sns497HNW+8zqSlaRgB1tcVZyi6ivFZwUlexNkqfkdMhcTQ01GskzaUCV6fUVx
-         epnt4o3Vyg5cweZSaOJkfFkzumBHOR9BXJxm9qWhWDsIiWAb+kNdUcBXID964j4WIz45
-         lB/ZxFOaLqf8d8RNLJNFKWSI/MnvTlMZQIgx35jDTeWb+O7PnicZ8zcjaAa3j4YmXxPo
-         Qdz9EjqCVipxm/90UFmkBIBOvU+OmWVGYD4iwsM10CAOOle49EkNeT8P8eiMJfD2ZFIk
-         QJTjTXDMpktl2NEq1Wvf7HLKon6CWjU2kvdWmhgoBe8BDIsfR0nUfcW4XYRCjUUp/eEV
-         Uavw==
-X-Gm-Message-State: AAQBX9eZsuYUJPwlbEByC8EswPu2jEl0g0rPzLaQjupq2M4WG2i2J7Du
-        jxv5b6AIAvPGEiWU5ulXKqnqc8KGrU1S8/No5p7rW63IMkqN/umBuFtxeVhMUF+JrK61+9AtYe6
-        ZrJVNUDWHzefn
-X-Received: by 2002:a5d:9844:0:b0:750:c68e:f028 with SMTP id p4-20020a5d9844000000b00750c68ef028mr3717453ios.9.1681502884903;
-        Fri, 14 Apr 2023 13:08:04 -0700 (PDT)
-X-Google-Smtp-Source: AKy350YpKWDpYWmic9y1b5BSJ7sAH6feMT18EXGxjhNBFhsUS6kpQechjkHGGpWk0NrK3gFgdxhw3A==
-X-Received: by 2002:a5d:9844:0:b0:750:c68e:f028 with SMTP id p4-20020a5d9844000000b00750c68ef028mr3717446ios.9.1681502884655;
-        Fri, 14 Apr 2023 13:08:04 -0700 (PDT)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id m6-20020a026d06000000b003bf39936d1esm1394867jac.131.2023.04.14.13.08.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 14 Apr 2023 13:08:03 -0700 (PDT)
-Date:   Fri, 14 Apr 2023 14:08:01 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Yi Liu <yi.l.liu@intel.com>
-Cc:     jgg@nvidia.com, kevin.tian@intel.com, cohuck@redhat.com,
-        eric.auger@redhat.com, kvm@vger.kernel.org, mjrosato@linux.ibm.com,
-        chao.p.peng@linux.intel.com, yi.y.sun@linux.intel.com,
-        pbonzini@redhat.co
-Subject: Re: [PATCH v2] docs: kvm: vfio: Require call KVM_DEV_VFIO_GROUP_ADD
- before VFIO_GROUP_GET_DEVICE_FD
-Message-ID: <20230414140801.17d27396.alex.williamson@redhat.com>
-In-Reply-To: <20230411132803.4628e9fc.alex.williamson@redhat.com>
-References: <20230222022231.266381-1-yi.l.liu@intel.com>
-        <20230411132803.4628e9fc.alex.williamson@redhat.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
+        with ESMTP id S229491AbjDNUJn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 14 Apr 2023 16:09:43 -0400
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 5F3C019AA;
+        Fri, 14 Apr 2023 13:09:42 -0700 (PDT)
+Received: by linux.microsoft.com (Postfix, from userid 1112)
+        id E6C7B217A940; Fri, 14 Apr 2023 13:09:41 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com E6C7B217A940
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+        s=default; t=1681502981;
+        bh=6uhXiJTN+AKVjrfHqRzBNpT9GlQSlUmzFKtHHg2mHb0=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=YXhL6fT2doVbtZNmQN/OTQhzDng2YAO8r09v/3Rrq7pQi9Zeyjv7mOPtzq5yVo57q
+         mHTcE/rgVaCvgymO5IGHNeRmOGIuaubJV+9bP3L/6QRN1O4j9bSmRkzHgH87TNpadF
+         7uEi8tzNMVbBnoNuTmZfbVPTBdcVlVWxn4AWV6+k=
+Date:   Fri, 14 Apr 2023 13:09:41 -0700
+From:   Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Mathias Krause <minipli@grsecurity.net>, Greg KH <greg@kroah.com>,
+        kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        stable@vger.kernel.org
+Subject: Re: [PATCH v4 0/6] KVM: MMU: performance tweaks for heavy CR0.WP
+ users
+Message-ID: <20230414200941.GA6776@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+References: <20230322013731.102955-1-minipli@grsecurity.net>
+ <167949641597.2215962.13042575709754610384.b4-ty@google.com>
+ <190509c8-0f05-d05c-831c-596d2c9664ac@grsecurity.net>
+ <ZB7oKD6CHa6f2IEO@kroah.com>
+ <ZC4tocf+PeuUEe4+@google.com>
+ <0c47acc0-1f13-ebe5-20e5-524e5b6930e3@grsecurity.net>
+ <026dcbfe-a306-85c3-600e-17cae3d3b7c5@grsecurity.net>
+ <ZDmEGM+CgYpvDLh6@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZDmEGM+CgYpvDLh6@google.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-Spam-Status: No, score=-19.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_MED,
+        SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,
+        USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 11 Apr 2023 13:28:03 -0600
-Alex Williamson <alex.williamson@redhat.com> wrote:
-
-> On Tue, 21 Feb 2023 18:22:31 -0800
-> Yi Liu <yi.l.liu@intel.com> wrote:
+On Fri, Apr 14, 2023 at 09:49:28AM -0700, Sean Christopherson wrote:
+> +Jeremi
 > 
-> > as some vfio_device drivers require a kvm pointer to be set in their
-> > open_device and kvm pointer is set to VFIO in GROUP_ADD path.
-> > 
-> > Signed-off-by: Yi Liu <yi.l.liu@intel.com>
-> > ---
-> > v2:
-> >  - Adopt Alex's suggestion
-> > v1: https://lore.kernel.org/kvm/20230221034114.135386-1-yi.l.liu@intel.com/
-> > ---
-> >  Documentation/virt/kvm/devices/vfio.rst | 7 +++++++
-> >  1 file changed, 7 insertions(+)
-> > 
-> > diff --git a/Documentation/virt/kvm/devices/vfio.rst b/Documentation/virt/kvm/devices/vfio.rst
-> > index 2d20dc561069..79b6811bb4f3 100644
-> > --- a/Documentation/virt/kvm/devices/vfio.rst
-> > +++ b/Documentation/virt/kvm/devices/vfio.rst
-> > @@ -39,3 +39,10 @@ KVM_DEV_VFIO_GROUP attributes:
-> >  	- @groupfd is a file descriptor for a VFIO group;
-> >  	- @tablefd is a file descriptor for a TCE table allocated via
-> >  	  KVM_CREATE_SPAPR_TCE.
-> > +
-> > +::
-> > +
-> > +The GROUP_ADD operation above should be invoked prior to accessing the
-> > +device file descriptor via VFIO_GROUP_GET_DEVICE_FD in order to support
-> > +drivers which require a kvm pointer to be set in their .open_device()
-> > +callback.  
+
+Adding myself :)
+
+> On Fri, Apr 14, 2023, Mathias Krause wrote:
+
+...
+
+> > OTOH, the backports give nice speed-ups, ranging from ~2.2 times faster
+> > for pure EPT (legacy) MMU setups up to 18(!!!) times faster for TDP MMU
+> > on v5.10.
 > 
-> I updated the title and commit log so as not to further construe that
-> documentation can impose a requirement, otherwise applied to vfio next
-> branch for v6.4.  Thanks,
+> Anyone that's enabling the TDP MMU on v5.10 is on their own, we didn't enable the
+> TDP MMU by default until v5.14 for very good reasons.
+> 
+> > I backported the whole series down to v5.10 but left out the CR0.WP
+> > guest owning patch+fix for v5.4 as the code base is too different to get
+> > all the nuances right, as Sean already hinted. However, even this
+> > limited backport provides a big performance fix for our use case!
+> 
+> As a compromise of sorts, I propose that we disable the TDP MMU by default on v5.15,
+> and backport these fixes to v6.1.  v5.15 and earlier won't get "ludicrous speed", but
+> I think that's perfectly acceptable since KVM has had the suboptimal behavior
+> literally since EPT/NPT support was first added.
+> 
 
-Dropped
+Disabling TDP MMU for v5.15, and backporting things to v6.1 works for me.
 
-https://lore.kernel.org/all/20230413163336.7ce6ecec.alex.williamson@redhat.com/
+> I'm comfortable backporting to v6.1 as that is recent enough, and there weren't
+> substantial MMU changes between v6.1 and v6.3 in this area.  I.e. I have a decent
+> level of confidence that we aren't overlooking some subtle dependency.
+> 
+> For v5.15, I am less confident in the safety of a backport, and more importantly,
+> I think we should disable the TDP MMU by default to mitigate the underlying flaw
+> that makes the 18x speedup possible.  That flaw is that KVM can end up freeing and
+> rebuilding TDP MMU roots every time CR0.WP is toggled or a vCPU transitions to/from
+> SMM.
+> 
 
-Please resubmit, resolving the warning and change the title since a
-requirement of some drivers does not equate to a requirement of the
-API.  Thanks,
+The interesting thing here is that these CR0.WP fixes seem to improve things
+with legacy MMU as well, and legacy MMU is not affected/touched by [3].
 
-Alex
+So I think you can consider Mathias' ask independent of disabling TDP MMU. On the one
+hand: there is no regression here. On the other: the gain is big and seems important
+to him.
 
+I didn't have time to review these patches so I can't judge risk-benefit, or
+whether any single patch might be a silver bullet on its own.
+
+> We mitigated the CR0.WP case between v5.15 and v6.1[1], which is why v6.1 doesn't
+> exhibit the same pain as v5.10, but Jeremi discovered that the SMM case badly affects
+> KVM-on-HyperV[2], e.g. when lauching KVM guests using WSL.  I posted a fix[3] to
+> finally resolve the underlying bug, but as Jeremi discovered[4], backporting the fix
+> to v5.15 is going to be gnarly, to say the least.  It'll be far worse than backporting
+> these CR0.WP patches, and maybe even infeasible without a large scale rework (no thanks).
+> 
+> Anyone that will realize meaningful benefits from the TDP MMU is all but guaranteed
+> to be rolling their own kernels, i.e. can do the backports themselves if they want
+> to use a v5.15 based kernel.  The big selling point of the TDP MMU is that it scales
+> better to hundreds of vCPUs, particularly when live migrating such VMs.  I highly
+> doubt that anyone running a stock kernel is running 100+ vCPU VMs, let alone trying
+> to live migrate them.
+> 
+> [1] https://lkml.kernel.org/r/20220209170020.1775368-1-pbonzini%40redhat.com
+> [2] https://lore.kernel.org/all/959c5bce-beb5-b463-7158-33fc4a4f910c@linux.microsoft.com
+> [3] https://lore.kernel.org/all/20230413231251.1481410-1-seanjc@google.com
+> [4] https://lore.kernel.org/all/7332d846-fada-eb5c-6068-18ff267bd37f@linux.microsoft.com
