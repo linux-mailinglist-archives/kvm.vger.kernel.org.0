@@ -2,311 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 35DDA6E22BC
-	for <lists+kvm@lfdr.de>; Fri, 14 Apr 2023 13:59:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DC7926E2346
+	for <lists+kvm@lfdr.de>; Fri, 14 Apr 2023 14:31:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229760AbjDNL7D (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Apr 2023 07:59:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53068 "EHLO
+        id S230036AbjDNMbO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 Apr 2023 08:31:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49860 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229625AbjDNL7C (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 14 Apr 2023 07:59:02 -0400
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 79A773C11;
-        Fri, 14 Apr 2023 04:58:53 -0700 (PDT)
-Received: from [192.168.2.41] (77-166-152-30.fixed.kpn.net [77.166.152.30])
-        by linux.microsoft.com (Postfix) with ESMTPSA id D85F7217927B;
-        Fri, 14 Apr 2023 04:58:51 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com D85F7217927B
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-        s=default; t=1681473532;
-        bh=K7moLybqmXhFd6ltNJ785cDNhj92t7yPGkeLPl1YI50=;
-        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-        b=nfC/g7m4x7hgwa65sLf31LrIMDjDB1tSafTa9LS6TTjV9h642tDUsxBItP837O5Ag
-         S4cR4pH24/zN/MxCG3Op3bb29is/t0lAOh3iaqpJdKbP9oOfoKoVu7/qtP/E+BYc9S
-         d7hToIAsvghFg1U4fWsMAjdIUSqtnutQgLVL7dDc=
-Message-ID: <7332d846-fada-eb5c-6068-18ff267bd37f@linux.microsoft.com>
-Date:   Fri, 14 Apr 2023 13:58:50 +0200
+        with ESMTP id S229611AbjDNMbM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 14 Apr 2023 08:31:12 -0400
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2058.outbound.protection.outlook.com [40.107.237.58])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1C4B1B3;
+        Fri, 14 Apr 2023 05:31:11 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Qlh3DCDG+tCs73eioeWnWZUV5PtVuemyrknKjcag2+B0qoEVPGUfrAmcDpdwwUt/V5J0b5YZWrBriBn/FnHmgPSzb9+fV+wmha7oC5jmKrftBIxHLjmAgBa+4X5OS9Q+72o7dLRZXK5Y8yIs71x83fewdOhe2PBRgnlIh9T9q7e1EdlhMOe4dr6xAGMdTr4viLJi+ddD649ejFKMStYRDSupR5Z71lUHJJ86sj11fRdN4WJKgKQCin5kwKItuUCcBO0b/2xBmRGcx7bHtGKTIcyhomQuBVp0Ep/zjHEz3C+3Z2pErATum1cprvTA8ltnM+i111VCEhzwxBT9QIpbuA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=9GlahPL+SRFF/dQJ+ZQ9dbEiFFp27DJFpFi4pOv7FD0=;
+ b=nlfeA6YYHiDjhok48tHoWgTcr4j4WEYPCYbLAJFf2FVPAO0D6rKtF+J632bjioTwmU4x//hDOXc6LtQt6TJdIRLSObhX7WquJrd1EsTInVOadfGqKVqnC+fLyW1OVj2jFQeEyLZfmWASzXybcP5lBZyCg9Ucmt8rEIQ6sc+OstqxRopGXux/N8GJ9Li2FD14eN6EtCEHIHcj/wTEB7sj9AE9auSbttEcL8dMkv7PeQe2eiIX55H87BwXMMpf8szHx6STrskdbQ7OJT0/cSLyNjsv/I0uhU/Q0OIbXp97UhjLp6bHvsSZZLwmhq45s/6ok4mDq12s8PLtPuP45+Xi5w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=9GlahPL+SRFF/dQJ+ZQ9dbEiFFp27DJFpFi4pOv7FD0=;
+ b=CgxFUoHbuIoJlP8dKIwQF1VoILeeP2ukjoH8W/JMKAuDRa+a/rBct8GlYytBQYlCgQ6OEOXR5gyUodTk4SeHjH61nxlSQFrlJMMr1bhEXcjdXmd5gwNx39o76+Y6KPTwUiLNs6MAc+WAO6UfCEdA6DAWCK5ruVjdIzacW8ovPUsmOVW+Dq95wG5tKGMHtmeRyIbg6bn/PVFNJQofMWYXl6usbpLJ2soqo7mjoLGnjbDD/eRHX0suSqAa0ulNb0kK7hi1UyKRi0WDxZTwR/5P3p38eBlLAULfwnlJHu1eRNZXUtZjWz2eqaXyAcShnen0lRmwoBgMtiqmp0ExxbM9og==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by IA1PR12MB7494.namprd12.prod.outlook.com (2603:10b6:208:41a::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6277.34; Fri, 14 Apr
+ 2023 12:31:09 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::6045:ad97:10b7:62a2]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::6045:ad97:10b7:62a2%9]) with mapi id 15.20.6298.030; Fri, 14 Apr 2023
+ 12:31:09 +0000
+Date:   Fri, 14 Apr 2023 09:31:06 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Brett Creeley <brett.creeley@amd.com>
+Cc:     kvm@vger.kernel.org, netdev@vger.kernel.org,
+        alex.williamson@redhat.com, yishaih@nvidia.com,
+        shameerali.kolothum.thodi@huawei.com, kevin.tian@intel.com,
+        shannon.nelson@amd.com, drivers@pensando.io,
+        simon.horman@corigine.com
+Subject: Re: [PATCH v8 vfio 1/7] vfio: Commonize combine_ranges for use in
+ other VFIO drivers
+Message-ID: <ZDlHing2lP2TNUo7@nvidia.com>
+References: <20230404190141.57762-1-brett.creeley@amd.com>
+ <20230404190141.57762-2-brett.creeley@amd.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230404190141.57762-2-brett.creeley@amd.com>
+X-ClientProxiedBy: SJ0PR13CA0143.namprd13.prod.outlook.com
+ (2603:10b6:a03:2c6::28) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Subject: Re: [PATCH] KVM: x86: Preserve TDP MMU roots until they are
- explicitly invalidated
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        David Matlack <dmatlack@google.com>,
-        Ben Gardon <bgardon@google.com>
-References: <20230413231251.1481410-1-seanjc@google.com>
-Content-Language: en-US
-From:   Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>
-In-Reply-To: <20230413231251.1481410-1-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-22.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,ENV_AND_HDR_SPF_MATCH,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|IA1PR12MB7494:EE_
+X-MS-Office365-Filtering-Correlation-Id: 56e50a59-c43b-4db6-cd4a-08db3ce4200b
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: Fb2aMLtHdPRe6+e9DFAAoFFbwRMglDnPXXIwCA+rokZ3cMKBZCodZJaVkjxaGLMB9zALllgfb6lRl3X1kzxtCsGjgGkz/Pt+UI1umhxrHKJc7+B+U6xVujfVcAowHioEL/0beirYE/XzgMp47PU2+0sjmdU2JyRfPU85uY4meXElCw0FmZz0lQA6ECfM9ywRgVYT+JLjD5b/pxfrd5Fpx5yTOb5zp6Qx6K6eoeIgpBsQCE3dWw+G6C8BgAXrJ7fG5maCwab7iibEl1tt3p2ytxUU9DaCdfmorlnsWcL680QMAKzLeHiwfdisq8SFmIW5LK7g185KzawahCGJ/i7/fSn7ecdurqeMNzB29rYrhTYlaT2LgzEXaoTfZrj5ajx4OHGrBTAvL0E43nV2h3d1d6q1qZYN9MgWzNpbxQAA/O+BEyK1MDPuW3P2HOGKrlsK668mAMYroQwTfvXkzQ8obNrEgn2tdi+SqZZZMcKwpIRjKGhHnk9SC4eoj583b2paKz2nS/AUttsKzOwX8xu8aVE7Pcemkho3uSz92bT7X87BR0KQ/4tlKnv4OnLmQA1I
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(39860400002)(346002)(136003)(396003)(366004)(376002)(451199021)(36756003)(41300700001)(316002)(66946007)(8676002)(6916009)(4326008)(478600001)(66556008)(66476007)(6486002)(4744005)(2906002)(8936002)(38100700002)(5660300002)(186003)(6512007)(26005)(6506007)(2616005)(6666004)(86362001)(83380400001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?/xw7PiqYv5X05RmumyB7/+uAzuxQSlzSBVISwc9Jarw3qi8QkVUgt0chpCJZ?=
+ =?us-ascii?Q?cF1McM3eAtVin5CPXK7yFgQgFc8JB1K05nATIBOixqv2iMaMEU8XCN4aKxrO?=
+ =?us-ascii?Q?ZIrS89QMXo0WjEt0xI0FOf9I5KrYF59+ktMeudMrnhoM9/ZIaTaFIJApNnRv?=
+ =?us-ascii?Q?oII8169gHqa2Lao0Gt90o38YMsllN/fPcp+lt5Xjjfm2WXQTzVX7jwOBdWGG?=
+ =?us-ascii?Q?2ZaaY16Ynqfu8eEKXCqnu3pnT/uaItSVgzOSRBrgpja5OhG63RXMgLypD35N?=
+ =?us-ascii?Q?d4WRx/3uMZqBtxsnN69Orvs4+2IGw+ZNFiqZ5fOAQHWeXTNkNcua6oRpMjaF?=
+ =?us-ascii?Q?ul6bvMdaEZCtSoq2Ktjk2DVoZuBWewvULtzYZxCCz2cZp3LjEm460Tij1z8O?=
+ =?us-ascii?Q?IGHilnsGUgkyEwa9KmGNzk7NfGxIlyaL8eELBYVTxDu2kXjPz/tgIli9jeA9?=
+ =?us-ascii?Q?fBfzrCNK9kghFh/TmZD9+Bd3sGsDWF2TBLygtd89qNlE7UF3Hj/OsmM0xSVz?=
+ =?us-ascii?Q?VJSoHKD5RZOSsKSwcjDG2AFsrWKoVHNsQsd6lvELHIlbuPau3i8PlBi3Iywf?=
+ =?us-ascii?Q?Egw7es2EYDyZN07T2vYHFQ6QvPax+WK7PyARVLmMwKUshQj+gZPgyzY0kHdx?=
+ =?us-ascii?Q?OP5cyFz/qZerb3575OWhtA6EsQCXwOInhoYc8Nxz+gf9po1OqHrtuQHXvisL?=
+ =?us-ascii?Q?+SDI2WZsH3cz9yadqjRnSf7Gns+bKYlaMvwHa7yGTuju4RNjnr4CKLE5QJOz?=
+ =?us-ascii?Q?LptbNIdRVC2KGQg34POMgQpA7CM3VtixgOCxdg2OTVpYzypCngZkuCspwZJ+?=
+ =?us-ascii?Q?pWskpy3Jmivc7Iy3LUqirdbIauPYAL1H9opJVRbC+CZAVipAjNvvbqGvr1Vq?=
+ =?us-ascii?Q?Y/rMc+J0vNDuSVc+74Erq5wK3OCqSWUre8uhbbp1yx93wJ8XVZZJ+rH1ysjo?=
+ =?us-ascii?Q?Um8/KudenbkZ6wd98qdCd74lOHeOocyiEoLxJVmJuneh44Aai66vuv2yN7Bw?=
+ =?us-ascii?Q?5cWkY0uWwc67txrPqvdFsaZWiMpa2iNw3QfPasEDOearx8ToFbSMwvHGKL+t?=
+ =?us-ascii?Q?6H6gIsUCsB2lLNetfZAnZCvdPYVzjRYxwo/EZLvPh9Ems+ShAPsPgJwaHPc3?=
+ =?us-ascii?Q?EFhKvhYYDIo1DfaZpt3AYV+szjCMh7nay9SV1HfjzPhq8g+XBWfHnnFMG+Bh?=
+ =?us-ascii?Q?4gMQ1hXeVTGAtTBVYIOYXP90Wsi/yNlGmFY+IscMYKWDbnkchQYJ0n0Q1VHQ?=
+ =?us-ascii?Q?+0vQ1JIR+GNT+A+fasrDXTS678rKetpQ7OVuPT9/mi6g5MLTVIaLnhSwse60?=
+ =?us-ascii?Q?n5YxiBelZMqv46TZE1pRZGVUnk5ac+jRbfZz4oB2PP0BcKunpJLbRyPEG6mw?=
+ =?us-ascii?Q?tMoLhLRnBrYG+6OBdj3k0RgGbp8d5ME6IJgJsK8HBSkBR9ZWKRRSnJy9GxrS?=
+ =?us-ascii?Q?ogwXQutf88BLhsqZ/a7lKySvU/w1DLkWn7Cwq6UPR1bb10kJ6tsmZDsVV+OC?=
+ =?us-ascii?Q?PfYLKpddJFtKvGS1goPYtyaNGbb8NNYHCCQ/f7tYTTF7czbs0p5R9uyV5zL8?=
+ =?us-ascii?Q?Qjw28iml7PdIO5Jgl0Rf9CB33oMy41Ga/94zDR2Y?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 56e50a59-c43b-4db6-cd4a-08db3ce4200b
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Apr 2023 12:31:09.3024
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: WZkk49vaFhw6TO5it1YORp5fnrWt3NRyxdlGJFeBlDSaGBtaXEcaMqq9Vkt/e9WV
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB7494
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 4/14/2023 1:12 AM, Sean Christopherson wrote:
-> Preserve TDP MMU roots until they are explicitly invalidated by gifting
-> the TDP MMU itself a reference to a root when it is allocated.  Keeping a
-> reference in the TDP MMU fixes a flaw where the TDP MMU exhibits terrible
-> performance, and can potentially even soft-hang a vCPU, if a vCPU
-> frequently unloads its roots, e.g. when KVM is emulating SMI+RSM.
+On Tue, Apr 04, 2023 at 12:01:35PM -0700, Brett Creeley wrote:
+> Currently only Mellanox uses the combine_ranges function. The
+> new pds_vfio driver also needs this function. So, move it to
+> a common location for other vendor drivers to use.
 > 
-> When KVM emulates something that invalidates _all_ TLB entries, e.g. SMI
-> and RSM, KVM unloads all of the vCPUs roots (KVM keeps a small per-vCPU
-> cache of previous roots).  Unloading roots is a simple way to ensure KVM
-> flushes and synchronizes all roots for the vCPU, as KVM flushes and syncs
-> when allocating a "new" root (from the vCPU's perspective).
+> Also, Simon Horman noticed that RCT ordering was not followed
+> for vfio_combin_iova_ranges(), so fix that.
 > 
-> In the shadow MMU, KVM keeps track of all shadow pages, roots included, in
-> a per-VM hash table.  Unloading a shadow MMU root just wipes it from the
-> per-vCPU cache; the root is still tracked in the per-VM hash table.  When
-> KVM loads a "new" root for the vCPU, KVM will find the old, unloaded root
-> in the per-VM hash table.
-> 
-> Unlike the shadow MMU, the TDP MMU doesn't track "inactive" roots in a
-> per-VM structure, where "active" in this case means a root is either
-> in-use or cached as a previous root by at least one vCPU.  When a TDP MMU
-> root becomes inactive, i.e. the last vCPU reference to the root is put,
-> KVM immediately frees the root (asterisk on "immediately" as the actual
-> freeing may be done by a worker, but for all intents and purposes the root
-> is gone).
-> 
-> The TDP MMU behavior is especially problematic for 1-vCPU setups, as
-> unloading all roots effectively frees all roots.  The issue is mitigated
-> to some degree in multi-vCPU setups as a different vCPU usually holds a
-> reference to an unloaded root and thus keeps the root alive, allowing the
-> vCPU to reuse its old root after unloading (with a flush+sync).
-> 
-> The TDP MMU flaw has been known for some time, as until very recently,
-> KVM's handling of CR0.WP also triggered unloading of all roots.  The
-> CR0.WP toggling scenario was eventually addressed by not unloading roots
-> when _only_ CR0.WP is toggled, but such an approach doesn't Just Work
-> for emulating SMM as KVM must emulate a full TLB flush on entry and exit
-> to/from SMM.  Given that the shadow MMU plays nice with unloading roots
-> at will, teaching the TDP MMU to do the same is far less complex than
-> modifying KVM to track which roots need to be flushed before reuse.
-> 
-> Note, preserving all possible TDP MMU roots is not a concern with respect
-> to memory consumption.  Now that the role for direct MMUs doesn't include
-> information about the guest, e.g. CR0.PG, CR0.WP, CR4.SMEP, etc., there
-> are _at most_ six possible roots (where "guest_mode" here means L2):
-> 
->   1. 4-level !SMM !guest_mode
->   2. 4-level  SMM !guest_mode
->   3. 5-level !SMM !guest_mode
->   4. 5-level  SMM !guest_mode
->   5. 4-level !SMM guest_mode
->   6. 5-level !SMM guest_mode
-> 
-> And because each vCPU can track 4 valid roots, a VM can already have all
-> 6 root combinations live at any given time.  Not to mention that, in
-> practice, no sane VMM will advertise different guest.MAXPHYADDR values
-> across vCPUs, i.e. KVM won't ever use both 4-level and 5-level roots for
-> a single VM.  Furthermore, the vast majority of modern hypervisors will
-> utilize EPT/NPT when available, thus the guest_mode=%true cases are also
-> unlikely to be utilized.
-> 
-> Reported-by: Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>
-> Link: https://lore.kernel.org/all/959c5bce-beb5-b463-7158-33fc4a4f910c@linux.microsoft.com
-> Link: https://lkml.kernel.org/r/20220209170020.1775368-1-pbonzini%40redhat.com
-> Link: https://lore.kernel.org/all/20230322013731.102955-1-minipli@grsecurity.net
-> Cc: David Matlack <dmatlack@google.com>
-> Cc: Ben Gardon <bgardon@google.com>
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> Cc: Yishai Hadas <yishaih@nvidia.com>
+> Signed-off-by: Brett Creeley <brett.creeley@amd.com>
+> Signed-off-by: Shannon Nelson <shannon.nelson@amd.com>
+> Reviewed-by: Simon Horman <simon.horman@corigine.com>
 > ---
->  arch/x86/kvm/mmu/tdp_mmu.c | 80 +++++++++++++-------------------------
->  1 file changed, 28 insertions(+), 52 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> index b2fca11b91ff..343deccab511 100644
-> --- a/arch/x86/kvm/mmu/tdp_mmu.c
-> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> @@ -40,7 +40,17 @@ static __always_inline bool kvm_lockdep_assert_mmu_lock_held(struct kvm *kvm,
->  
->  void kvm_mmu_uninit_tdp_mmu(struct kvm *kvm)
->  {
-> -	/* Also waits for any queued work items.  */
-> +	/*
-> +	 * Invalidate all roots, which besides the obvious, schedules all roots
-> +	 * for zapping and thus puts the TDP MMU's reference to each root, i.e.
-> +	 * ultimately frees all roots.
-> +	 */
-> +	kvm_tdp_mmu_invalidate_all_roots(kvm);
-> +
-> +	/*
-> +	 * Destroying a workqueue also first flushes the workqueue, i.e. no
-> +	 * need to invoke kvm_tdp_mmu_zap_invalidated_roots().
-> +	 */
->  	destroy_workqueue(kvm->arch.tdp_mmu_zap_wq);
->  
->  	WARN_ON(atomic64_read(&kvm->arch.tdp_mmu_pages));
-> @@ -116,16 +126,6 @@ static void tdp_mmu_schedule_zap_root(struct kvm *kvm, struct kvm_mmu_page *root
->  	queue_work(kvm->arch.tdp_mmu_zap_wq, &root->tdp_mmu_async_work);
->  }
->  
-> -static inline bool kvm_tdp_root_mark_invalid(struct kvm_mmu_page *page)
-> -{
-> -	union kvm_mmu_page_role role = page->role;
-> -	role.invalid = true;
-> -
-> -	/* No need to use cmpxchg, only the invalid bit can change.  */
-> -	role.word = xchg(&page->role.word, role.word);
-> -	return role.invalid;
-> -}
-> -
->  void kvm_tdp_mmu_put_root(struct kvm *kvm, struct kvm_mmu_page *root,
->  			  bool shared)
->  {
-> @@ -134,45 +134,12 @@ void kvm_tdp_mmu_put_root(struct kvm *kvm, struct kvm_mmu_page *root,
->  	if (!refcount_dec_and_test(&root->tdp_mmu_root_count))
->  		return;
->  
-> -	WARN_ON(!is_tdp_mmu_page(root));
-> -
->  	/*
-> -	 * The root now has refcount=0.  It is valid, but readers already
-> -	 * cannot acquire a reference to it because kvm_tdp_mmu_get_root()
-> -	 * rejects it.  This remains true for the rest of the execution
-> -	 * of this function, because readers visit valid roots only
-> -	 * (except for tdp_mmu_zap_root_work(), which however
-> -	 * does not acquire any reference itself).
-> -	 *
-> -	 * Even though there are flows that need to visit all roots for
-> -	 * correctness, they all take mmu_lock for write, so they cannot yet
-> -	 * run concurrently. The same is true after kvm_tdp_root_mark_invalid,
-> -	 * since the root still has refcount=0.
-> -	 *
-> -	 * However, tdp_mmu_zap_root can yield, and writers do not expect to
-> -	 * see refcount=0 (see for example kvm_tdp_mmu_invalidate_all_roots()).
-> -	 * So the root temporarily gets an extra reference, going to refcount=1
-> -	 * while staying invalid.  Readers still cannot acquire any reference;
-> -	 * but writers are now allowed to run if tdp_mmu_zap_root yields and
-> -	 * they might take an extra reference if they themselves yield.
-> -	 * Therefore, when the reference is given back by the worker,
-> -	 * there is no guarantee that the refcount is still 1.  If not, whoever
-> -	 * puts the last reference will free the page, but they will not have to
-> -	 * zap the root because a root cannot go from invalid to valid.
-> +	 * The TDP MMU itself holds a reference to each root until the root is
-> +	 * explicitly invalidated, i.e. the final reference should be never be
-> +	 * put for a valid root.
->  	 */
-> -	if (!kvm_tdp_root_mark_invalid(root)) {
-> -		refcount_set(&root->tdp_mmu_root_count, 1);
-> -
-> -		/*
-> -		 * Zapping the root in a worker is not just "nice to have";
-> -		 * it is required because kvm_tdp_mmu_invalidate_all_roots()
-> -		 * skips already-invalid roots.  If kvm_tdp_mmu_put_root() did
-> -		 * not add the root to the workqueue, kvm_tdp_mmu_zap_all_fast()
-> -		 * might return with some roots not zapped yet.
-> -		 */
-> -		tdp_mmu_schedule_zap_root(kvm, root);
-> -		return;
-> -	}
-> +	KVM_BUG_ON(!is_tdp_mmu_page(root) || !root->role.invalid, kvm);
->  
->  	spin_lock(&kvm->arch.tdp_mmu_pages_lock);
->  	list_del_rcu(&root->link);
-> @@ -320,7 +287,14 @@ hpa_t kvm_tdp_mmu_get_vcpu_root_hpa(struct kvm_vcpu *vcpu)
->  	root = tdp_mmu_alloc_sp(vcpu);
->  	tdp_mmu_init_sp(root, NULL, 0, role);
->  
-> -	refcount_set(&root->tdp_mmu_root_count, 1);
-> +	/*
-> +	 * TDP MMU roots are kept until they are explicitly invalidated, either
-> +	 * by a memslot update or by the destruction of the VM.  Initialize the
-> +	 * refcount to two; one reference for the vCPU, and one reference for
-> +	 * the TDP MMU itself, which is held until the root is invalidated and
-> +	 * is ultimately put by tdp_mmu_zap_root_work().
-> +	 */
-> +	refcount_set(&root->tdp_mmu_root_count, 2);
->  
->  	spin_lock(&kvm->arch.tdp_mmu_pages_lock);
->  	list_add_rcu(&root->link, &kvm->arch.tdp_mmu_roots);
-> @@ -964,10 +938,12 @@ void kvm_tdp_mmu_invalidate_all_roots(struct kvm *kvm)
->  {
->  	struct kvm_mmu_page *root;
->  
-> -	lockdep_assert_held_write(&kvm->mmu_lock);
-> +	/* No need to hold mmu_lock when the VM is being destroyed. */
-> +	if (refcount_read(&kvm->users_count))
-> +		lockdep_assert_held_write(&kvm->mmu_lock);
-> +
->  	list_for_each_entry(root, &kvm->arch.tdp_mmu_roots, link) {
-> -		if (!root->role.invalid &&
-> -		    !WARN_ON_ONCE(!kvm_tdp_mmu_get_root(root))) {
-> +		if (!root->role.invalid) {
->  			root->role.invalid = true;
->  			tdp_mmu_schedule_zap_root(kvm, root);
->  		}
-> 
-> base-commit: 62cf1e941a1169a5e8016fd8683d4d888ab51e01
+>  drivers/vfio/pci/mlx5/cmd.c | 48 +------------------------------------
+>  drivers/vfio/vfio_main.c    | 47 ++++++++++++++++++++++++++++++++++++
+>  include/linux/vfio.h        |  3 +++
+>  3 files changed, 51 insertions(+), 47 deletions(-)
 
-Thank you, I just tested this and it works wonderfully! Is this still on time for 6.3?
-In case you need it:
+Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
 
-Tested-by: Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>
-
-I'd also like to get this backported all the way back to 5.15 because the issue is
-already present there. I tried it myself, but this was before async zap and i'm
-doing something wrong with refcounts:
-
-I tried:
-
-kvm_mmu_uninit_tdp_mmu()
-{
-       kvm_tdp_mmu_invalidate_all_roots(kvm);
-       kvm_tdp_mmu_zap_invalidated_roots(kvm);
-}
-
-and dropping the refcount_inc_not_zero() from kvm_tdp_mmu_invalidate_all_roots(),
-but I hit:
-
-[   56.163528] refcount_t: underflow; use-after-free.
-[   56.163533] WARNING: CPU: 4 PID: 1137 at lib/refcount.c:28 refcount_warn_saturate+0x9f/0x150
-[   56.163539] Modules linked in: xt_owner xt_conntrack nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4 tls cfg80211 binfmt_misc nls_iso8859_1 xt_tcpudp nft_compat nf_tables libcrc32c nfnetlink kvm_amd ccp kvm hyperv_drm drm_kms_helper crct10dif_pclmul joydev crc32_pclmul ghash_clmulni_intel hid_generic cec rc_core aesni_intel fb_sys_fops syscopyarea crypto_simd hid_hyperv sysfillrect serio_raw cryptd hyperv_keyboard sysimgblt hv_netvsc hid hyperv_fb mac_hid pata_acpi dm_multipath scsi_dh_rdac scsi_dh_emc scsi_dh_alua ramoops reed_solomon drm efi_pstore i2c_core ip_tables x_tables autofs4
-[   56.163568] CPU: 4 PID: 1137 Comm: qemu-system-x86 Not tainted 5.15.107-00003-g2ee068e4a996 #1
-[   56.163570] Hardware name: Microsoft Corporation Virtual Machine/Virtual Machine, BIOS 090008  12/07/2018
-[   56.163572] RIP: 0010:refcount_warn_saturate+0x9f/0x150
-[   56.163574] Code: cc cc 0f b6 1d d3 4a 9a 01 80 fb 01 0f 87 3f d1 69 00 83 e3 01 75 e1 48 c7 c7 e8 59 bd a3 c6 05 b7 4a 9a 01 01 e8 df 2b 66 00 <0f> 0b eb ca 0f b6 1d aa 4a 9a 01 80 fb 01 0f 87 ff d0 69 00 83 e3
-[   56.163575] RSP: 0018:ffffbefb853f3c60 EFLAGS: 00010282
-[   56.163577] RAX: 0000000000000000 RBX: 0000000000000000 RCX: 0000000000000027
-[   56.163578] RDX: ffffa00dffb1f6c8 RSI: 0000000000000001 RDI: ffffa00dffb1f6c0
-[   56.163579] RBP: ffffbefb853f3c68 R08: 0000000000000000 R09: ffffbefb853f3bf0
-[   56.163579] R10: 00000000ffffe245 R11: 0000000000000246 R12: ffff9ffe43c37590
-[   56.163580] R13: ffffbefb854f5000 R14: 0000000000000001 R15: ffffffffffffffff
-[   56.163583] FS:  00007f389bcfc6c0(0000) GS:ffffa00dffb00000(0000) knlGS:0000000000000000
-[   56.163585] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[   56.163585] CR2: 00007f378c030000 CR3: 0000000101c60001 CR4: 0000000000370ee0
-[   56.163586] Call Trace:
-[   56.163588]  <TASK>
-[   56.163590]  kvm_tdp_mmu_put_root+0x11b/0x140 [kvm]
-[   56.163622]  mmu_free_root_page+0x9a/0xd0 [kvm]
-[   56.163646]  kvm_mmu_free_roots+0x149/0x1e0 [kvm]
-[   56.163666]  kvm_mmu_unload+0x20/0x70 [kvm]
-[   56.163686]  kvm_arch_vcpu_ioctl_run+0x9da/0x1750 [kvm]
-[   56.163709]  ? kvm_vm_ioctl+0x393/0x1120 [kvm]
-[   56.163729]  ? kvm_vm_ioctl+0x393/0x1120 [kvm]
-[   56.163748]  kvm_vcpu_ioctl+0x2d7/0x7b0 [kvm]
-[   56.163767]  ? __fget_files+0x83/0xb0
-[   56.163770]  ? __fget_files+0x83/0xb0
-[   56.163772]  __x64_sys_ioctl+0x98/0xd0
-[   56.163774]  do_syscall_64+0x5b/0x80
-[   56.163776]  ? do_syscall_64+0x67/0x80
-[   56.163777]  ? exc_page_fault+0x7c/0x150
-[   56.163779]  entry_SYSCALL_64_after_hwframe+0x61/0xcb
-
-which shouldn't be possible since we always hold 2 refs.
-
-Jeremi
+Jason
