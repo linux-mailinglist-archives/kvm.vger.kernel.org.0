@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7A99A6E27C9
-	for <lists+kvm@lfdr.de>; Fri, 14 Apr 2023 17:59:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9F6676E27CB
+	for <lists+kvm@lfdr.de>; Fri, 14 Apr 2023 17:59:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230142AbjDNP7B (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Apr 2023 11:59:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43736 "EHLO
+        id S230369AbjDNP7P (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 Apr 2023 11:59:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43930 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229752AbjDNP7A (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 14 Apr 2023 11:59:00 -0400
+        with ESMTP id S230374AbjDNP7K (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 14 Apr 2023 11:59:10 -0400
 Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58E00172D
-        for <kvm@vger.kernel.org>; Fri, 14 Apr 2023 08:58:59 -0700 (PDT)
-Received: by mail-pj1-x1033.google.com with SMTP id h24-20020a17090a9c1800b002404be7920aso19093111pjp.5
-        for <kvm@vger.kernel.org>; Fri, 14 Apr 2023 08:58:59 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A33862691
+        for <kvm@vger.kernel.org>; Fri, 14 Apr 2023 08:59:07 -0700 (PDT)
+Received: by mail-pj1-x1033.google.com with SMTP id g6so1845002pjx.4
+        for <kvm@vger.kernel.org>; Fri, 14 Apr 2023 08:59:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sifive.com; s=google; t=1681487939; x=1684079939;
+        d=sifive.com; s=google; t=1681487947; x=1684079947;
         h=references:in-reply-to:message-id:date:subject:cc:to:from:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=xZD7AFVtobxh1FGjEKQD2QW8IDIT5bzbSx/S1GQl+8U=;
-        b=SXvhgGoWdY4+v0js6UamSIbUsdNlillnh5BR2/gI3mr5VGZ/aiO0T+5K999+nOdAm1
-         FV53MybCKnLYnRlS/OUx5MFd1lPXPvysty5xly8BD2hDihMEmSv9d5HhyA2cj42zmrP4
-         HZs78S+Onq1MBO7YsEZm6NxRdFd2b4CdXnzSwIAs2tfvmTc/DHp9APpNxEkpOQYBw+Xu
-         UVSOcRKjEtMwCau7ZxxA/CvP/NJCTMXlKadL8tIvXYK6togfuSgjaPmDr0KVcf/UzN9u
-         3fNUWk9rdP3D/0SmwF9P5R5LPJkHfADah2vIlFTDAkCc8JWoQxG/N1boAa9qIPMqunGE
-         KCEA==
+        bh=U7ri8ZSvnPvQyAXJ6dQGQtYIAraNypeWm5i0/GIq5FY=;
+        b=YGmvXm/TuZoti9wweuSje/DwLyT5H6AiJaRqLiuK8jADZAJMP4Th25m4WmcRnYQbh3
+         WC1CY6kS84eID7rzBNa3mpK+uRN9O4nqQKKiOYyxKNc7OiWGMeWkAsi9wQMirwCNcmp8
+         k15vupj6hAY+hZ1EXRw/8bxxxxbGYtPq7prx9AagWTmKP5iNBHC9Kgc4j0YC76tK76IO
+         OzmKVA6KRzd9ZAexvU9vOVLfiXvwFp5JdiYvi91oTZOHUQB6oLP9ObWHKUpjdTMYar19
+         Q4x8TLumG60vSH+2HAmEzgNEm5n8uGGctC7JDTWbImNbUWxdSjjT1GS0bGAPCQJ4d6wM
+         mNIg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681487939; x=1684079939;
+        d=1e100.net; s=20221208; t=1681487947; x=1684079947;
         h=references:in-reply-to:message-id:date:subject:cc:to:from
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=xZD7AFVtobxh1FGjEKQD2QW8IDIT5bzbSx/S1GQl+8U=;
-        b=bDgxWb+n+4pU4FgEv0VCiiJs+1RAE1dPo9vcM4QU3vsWsgbITrBXJFz4SDPMN01Cc+
-         d8IlefJ4IB5nEK702K3qU7YC/ZfUjqcq7f/D9bM1w2/36NyGnQq6x9V6d+qYjeEQZGlk
-         WULnSy1eAIa9S6RI+VVpwvw3/HjE9hL86NsNLnxSyCLjw7ThEOSO91Ox+/o2+N8pBUP5
-         zZNUSqP5vB7piq1jlUqZQMSuOl3Zizpj7VoDG0Ef5ZbbKrL5uDbpDhjJitQti6v92rYW
-         VfGx2E1qdjxl5QGDVTyq3XibXzxsl6JzVLow8Ja78XY93gY7qtvNnjjy97TAlIsZXwG9
-         8Dvw==
-X-Gm-Message-State: AAQBX9d+zmE1cQgCPTpHaPRaXXLIaaF/p3n0mRbRZ07OrFs/4rQsPrP8
-        Q6OUv3zvxyTMhRCCWcQcspzVRw==
-X-Google-Smtp-Source: AKy350ZxguafjbuTJCtXZ0UwMA3Y+whb6ag2ldUxCKWrmYydILPzUyXVfqAAPNk2N+lqD0cJXe0veA==
-X-Received: by 2002:a17:90a:bf02:b0:246:57ba:ab25 with SMTP id c2-20020a17090abf0200b0024657baab25mr5991322pjs.11.1681487938804;
-        Fri, 14 Apr 2023 08:58:58 -0700 (PDT)
+        bh=U7ri8ZSvnPvQyAXJ6dQGQtYIAraNypeWm5i0/GIq5FY=;
+        b=Ur/bO8i+bEfWqiR7GhdxuT33aH5ocMfFKO20SOi6VpFVNTjatEGwCvRM9LykziA1bI
+         Palin8yCRfpinzGg/ZG8CbT29NBGaJLuGBTXJOq2t/dG3NsFzsPm4H8LYOeCFdNBdlX3
+         +VLW+s3M4EauaT6dFO5rX0Dm32kDWCpUJEJFwUllmpi+MjNJkllnP2WY/Au7Ft5g6CA+
+         8bdqQUfY8YM2vYbCCNptv0aUxCW1ZnR7WFrGxEhBTxqZlBB/oynoybbhl0Mbgd6QPhYx
+         om79v1gcXtwj4rFA52aWvmkFAFrMJUhDFT70V3Z3UzAyB7Axl4AzdRIRaUaCxamL31zb
+         RJNg==
+X-Gm-Message-State: AAQBX9dfL5eICPe90Hez58C0WFtzHuPm8rdgAdY3dsQM0SRyAHupO1eb
+        Ym0gouqPp9kfL4u4iv7CEwsyEnKfllX4RMDrb0M=
+X-Google-Smtp-Source: AKy350YnbAtdYK25WZBT6vEyXz1kqM58xh87+9tiIROkMCKXWs4cw9ZPIPVhDSDuh+/FG9kqtQfPXw==
+X-Received: by 2002:a17:903:32cd:b0:1a5:2c2e:e41d with SMTP id i13-20020a17090332cd00b001a52c2ee41dmr4492968plr.51.1681487946919;
+        Fri, 14 Apr 2023 08:59:06 -0700 (PDT)
 Received: from hsinchu25.internal.sifive.com (59-124-168-89.hinet-ip.hinet.net. [59.124.168.89])
-        by smtp.gmail.com with ESMTPSA id br8-20020a17090b0f0800b00240d4521958sm3083584pjb.18.2023.04.14.08.58.55
+        by smtp.gmail.com with ESMTPSA id br8-20020a17090b0f0800b00240d4521958sm3083584pjb.18.2023.04.14.08.59.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 14 Apr 2023 08:58:58 -0700 (PDT)
+        Fri, 14 Apr 2023 08:59:06 -0700 (PDT)
 From:   Andy Chiu <andy.chiu@sifive.com>
 To:     linux-riscv@lists.infradead.org, palmer@dabbelt.com,
         anup@brainfault.org, atishp@atishpatra.org,
@@ -56,14 +56,16 @@ Cc:     vineetg@rivosinc.com, greentime.hu@sifive.com,
         Andy Chiu <andy.chiu@sifive.com>,
         Paul Walmsley <paul.walmsley@sifive.com>,
         Albert Ou <aou@eecs.berkeley.edu>,
-        Heiko Stuebner <heiko.stuebner@vrull.eu>,
-        Guo Ren <guoren@kernel.org>,
         Conor Dooley <conor.dooley@microchip.com>,
-        Ruinland Tsai <ruinland.tsai@sifive.com>,
-        Jisheng Zhang <jszhang@kernel.org>
-Subject: [PATCH -next v18 01/20] riscv: Rename __switch_to_aux() -> fpu
-Date:   Fri, 14 Apr 2023 15:58:24 +0000
-Message-Id: <20230414155843.12963-2-andy.chiu@sifive.com>
+        Heiko Stuebner <heiko.stuebner@vrull.eu>,
+        Andrew Jones <ajones@ventanamicro.com>,
+        Guo Ren <guoren@kernel.org>,
+        Jisheng Zhang <jszhang@kernel.org>,
+        Dao Lu <daolu@rivosinc.com>,
+        Vincent Chen <vincent.chen@sifive.com>
+Subject: [PATCH -next v18 02/20] riscv: Extending cpufeature.c to detect V-extension
+Date:   Fri, 14 Apr 2023 15:58:25 +0000
+Message-Id: <20230414155843.12963-3-andy.chiu@sifive.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20230414155843.12963-1-andy.chiu@sifive.com>
 References: <20230414155843.12963-1-andy.chiu@sifive.com>
@@ -79,54 +81,110 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Guo Ren <ren_guo@c-sky.com>
 
-The name of __switch_to_aux() is not clear and rename it with the
-determine function: __switch_to_fpu(). Next we could add other regs'
-switch.
+Add V-extension into riscv_isa_ext_keys array and detect it with isa
+string parsing.
 
 Signed-off-by: Guo Ren <ren_guo@c-sky.com>
 Signed-off-by: Guo Ren <guoren@linux.alibaba.com>
 Signed-off-by: Greentime Hu <greentime.hu@sifive.com>
-Reviewed-by: Anup Patel <anup@brainfault.org>
-Reviewed-by: Palmer Dabbelt <palmer@rivosinc.com>
+Suggested-by: Vineet Gupta <vineetg@rivosinc.com>
+Co-developed-by: Andy Chiu <andy.chiu@sifive.com>
 Signed-off-by: Andy Chiu <andy.chiu@sifive.com>
-Tested-by: Heiko Stuebner <heiko.stuebner@vrull.eu>
-Reviewed-by: Heiko Stuebner <heiko.stuebner@vrull.eu>
 Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
+Reviewed-by: Heiko Stuebner <heiko.stuebner@vrull.eu>
+Tested-by: Heiko Stuebner <heiko.stuebner@vrull.eu>
 ---
- arch/riscv/include/asm/switch_to.h | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ arch/riscv/include/asm/hwcap.h      |  1 +
+ arch/riscv/include/asm/vector.h     | 26 ++++++++++++++++++++++++++
+ arch/riscv/include/uapi/asm/hwcap.h |  1 +
+ arch/riscv/kernel/cpufeature.c      | 11 +++++++++++
+ 4 files changed, 39 insertions(+)
+ create mode 100644 arch/riscv/include/asm/vector.h
 
-diff --git a/arch/riscv/include/asm/switch_to.h b/arch/riscv/include/asm/switch_to.h
-index 60f8ca01d36e..4b96b13dee27 100644
---- a/arch/riscv/include/asm/switch_to.h
-+++ b/arch/riscv/include/asm/switch_to.h
-@@ -46,7 +46,7 @@ static inline void fstate_restore(struct task_struct *task,
+diff --git a/arch/riscv/include/asm/hwcap.h b/arch/riscv/include/asm/hwcap.h
+index 9af793970855..5165588d1e8c 100644
+--- a/arch/riscv/include/asm/hwcap.h
++++ b/arch/riscv/include/asm/hwcap.h
+@@ -22,6 +22,7 @@
+ #define RISCV_ISA_EXT_m		('m' - 'a')
+ #define RISCV_ISA_EXT_s		('s' - 'a')
+ #define RISCV_ISA_EXT_u		('u' - 'a')
++#define RISCV_ISA_EXT_v		('v' - 'a')
+ 
+ /*
+  * These macros represent the logical IDs of each multi-letter RISC-V ISA
+diff --git a/arch/riscv/include/asm/vector.h b/arch/riscv/include/asm/vector.h
+new file mode 100644
+index 000000000000..427a3b51df72
+--- /dev/null
++++ b/arch/riscv/include/asm/vector.h
+@@ -0,0 +1,26 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++/*
++ * Copyright (C) 2020 SiFive
++ */
++
++#ifndef __ASM_RISCV_VECTOR_H
++#define __ASM_RISCV_VECTOR_H
++
++#include <linux/types.h>
++
++#ifdef CONFIG_RISCV_ISA_V
++
++#include <asm/hwcap.h>
++
++static __always_inline bool has_vector(void)
++{
++	return riscv_has_extension_likely(RISCV_ISA_EXT_v);
++}
++
++#else /* ! CONFIG_RISCV_ISA_V  */
++
++static __always_inline bool has_vector(void) { return false; }
++
++#endif /* CONFIG_RISCV_ISA_V */
++
++#endif /* ! __ASM_RISCV_VECTOR_H */
+diff --git a/arch/riscv/include/uapi/asm/hwcap.h b/arch/riscv/include/uapi/asm/hwcap.h
+index 46dc3f5ee99f..c52bb7bbbabe 100644
+--- a/arch/riscv/include/uapi/asm/hwcap.h
++++ b/arch/riscv/include/uapi/asm/hwcap.h
+@@ -21,5 +21,6 @@
+ #define COMPAT_HWCAP_ISA_F	(1 << ('F' - 'A'))
+ #define COMPAT_HWCAP_ISA_D	(1 << ('D' - 'A'))
+ #define COMPAT_HWCAP_ISA_C	(1 << ('C' - 'A'))
++#define COMPAT_HWCAP_ISA_V	(1 << ('V' - 'A'))
+ 
+ #endif /* _UAPI_ASM_RISCV_HWCAP_H */
+diff --git a/arch/riscv/kernel/cpufeature.c b/arch/riscv/kernel/cpufeature.c
+index 00d7cd2c9043..923ca75f2192 100644
+--- a/arch/riscv/kernel/cpufeature.c
++++ b/arch/riscv/kernel/cpufeature.c
+@@ -103,6 +103,7 @@ void __init riscv_fill_hwcap(void)
+ 	isa2hwcap['f' - 'a'] = COMPAT_HWCAP_ISA_F;
+ 	isa2hwcap['d' - 'a'] = COMPAT_HWCAP_ISA_D;
+ 	isa2hwcap['c' - 'a'] = COMPAT_HWCAP_ISA_C;
++	isa2hwcap['v' - 'a'] = COMPAT_HWCAP_ISA_V;
+ 
+ 	elf_hwcap = 0;
+ 
+@@ -261,6 +262,16 @@ void __init riscv_fill_hwcap(void)
+ 		elf_hwcap &= ~COMPAT_HWCAP_ISA_F;
  	}
- }
  
--static inline void __switch_to_aux(struct task_struct *prev,
-+static inline void __switch_to_fpu(struct task_struct *prev,
- 				   struct task_struct *next)
- {
- 	struct pt_regs *regs;
-@@ -66,7 +66,7 @@ static __always_inline bool has_fpu(void)
- static __always_inline bool has_fpu(void) { return false; }
- #define fstate_save(task, regs) do { } while (0)
- #define fstate_restore(task, regs) do { } while (0)
--#define __switch_to_aux(__prev, __next) do { } while (0)
-+#define __switch_to_fpu(__prev, __next) do { } while (0)
- #endif
- 
- extern struct task_struct *__switch_to(struct task_struct *,
-@@ -77,7 +77,7 @@ do {							\
- 	struct task_struct *__prev = (prev);		\
- 	struct task_struct *__next = (next);		\
- 	if (has_fpu())					\
--		__switch_to_aux(__prev, __next);	\
-+		__switch_to_fpu(__prev, __next);	\
- 	((last) = __switch_to(__prev, __next));		\
- } while (0)
- 
++	if (elf_hwcap & COMPAT_HWCAP_ISA_V) {
++		/*
++		 * ISA string in device tree might have 'v' flag, but
++		 * CONFIG_RISCV_ISA_V is disabled in kernel.
++		 * Clear V flag in elf_hwcap if CONFIG_RISCV_ISA_V is disabled.
++		 */
++		if (!IS_ENABLED(CONFIG_RISCV_ISA_V))
++			elf_hwcap &= ~COMPAT_HWCAP_ISA_V;
++	}
++
+ 	memset(print_str, 0, sizeof(print_str));
+ 	for (i = 0, j = 0; i < NUM_ALPHA_EXTS; i++)
+ 		if (riscv_isa[0] & BIT_MASK(i))
 -- 
 2.17.1
 
