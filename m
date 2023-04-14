@@ -2,64 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 547C66E1834
-	for <lists+kvm@lfdr.de>; Fri, 14 Apr 2023 01:20:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 20E9A6E18AA
+	for <lists+kvm@lfdr.de>; Fri, 14 Apr 2023 02:12:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230445AbjDMXT7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Apr 2023 19:19:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52704 "EHLO
+        id S230333AbjDNAME (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Apr 2023 20:12:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44012 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231274AbjDMXTm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 13 Apr 2023 19:19:42 -0400
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2453B448F
-        for <kvm@vger.kernel.org>; Thu, 13 Apr 2023 16:19:21 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-54be7584b28so286372577b3.16
-        for <kvm@vger.kernel.org>; Thu, 13 Apr 2023 16:19:21 -0700 (PDT)
+        with ESMTP id S229733AbjDNAMC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 13 Apr 2023 20:12:02 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3FA8A3A86
+        for <kvm@vger.kernel.org>; Thu, 13 Apr 2023 17:12:00 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id 85-20020a250d58000000b00b8f380b2bccso7596875ybn.14
+        for <kvm@vger.kernel.org>; Thu, 13 Apr 2023 17:12:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1681427960; x=1684019960;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=76AH6jeC0zUFc6RLhtB1VloLSMnKdwxfmQWgPXRFScc=;
-        b=3JkngVwkuZE/YTh1waUy7PTk9n/XgQp4TSQpXmwlB49LWxI9cPN/uXZJfO1L1Yqjd6
-         G/rjeCDaxoAW+0UbA87uVs+Op/nA46kVZQXvMq/nMpKkafrk7o7DleSB/h9FZJAZ05fT
-         5Swu9qAWOMPKj1IY04zyyF0AppbMGDiOa2NXw9oLgauoBYlGxij0wA1TXOu3UwStSRxK
-         0EKIPdPvZyu0HKZvErkzoWOIgS3GS+dFVjYI1w23aCzxd0OiN0QkQVaWYMcO9+c8vC3w
-         EsOtPYUbAjxFFbypNbMaYZ4Cni5hVFCgpkp57PAAS/rM6GqIbmhFViXB/7ZPIxF9Nzrx
-         c+lg==
+        d=google.com; s=20221208; t=1681431119; x=1684023119;
+        h=content-transfer-encoding:cc:to:from:subject:message-id
+         :mime-version:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=i+pweVgTeWv08z0ELDTsB0Ltp1Ye2bcZK0KHo4GqVbw=;
+        b=SxumLiXBZqVvPSsO4nE95gXtUUxXVcRm2giZRY9/5ORZ+OjADqAAbFJkobyKcqmfCt
+         ePUsZvwKG04KkaahIzuPRZeniJUEzn01e6frQqq0jAgCaSwlASsR29xtCtNlSjb+T5pj
+         VEWY0EVxAPptAmO48HG5tvNAJPPxntiFot3tECFeEreHjLrDdGnAKPlTKHy30+MbbqI8
+         64DeVDk4CEwT4IFGcaTIdQJJ7t2C3BZm2t+9Gp59h71CPchlPnK0jhl4w3WF/G3NQ2HG
+         SBMasteYkoK5+FJ8YkRnsN77u+ShB1rljGgMoVKQvjdG4NVzxFbFqiD01CFCoQkbIqFa
+         aeNQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681427960; x=1684019960;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=76AH6jeC0zUFc6RLhtB1VloLSMnKdwxfmQWgPXRFScc=;
-        b=Br3T1HfyV41Zk85cR8HSjp5IAHGRJC+L6gz1Wh2iIMGYBrw3dGJF9jj1gcf7oN7Ni9
-         txi4t3DjWRIgPI75Sjd8Y9mWQ0Z6hnEZhHjlVkK6FrnHf4Hj/2KhX5v4mHh0MJ4abx6u
-         3t5lU/IlBaaRu3aa4pBtglUPiXRjAozSemzd0Wd/q3J/kzTGlevf1B/wZ56kJXnYWh8M
-         fSuz4m5k3Z1uKwcvPjF6n/cZ2dNbS4GwdJc7fj+MXIMPun6NGWY/EMggWZk4nEQHI+WU
-         zF1vPwjbiqj9eINJlJa3OZ00CtDP3A2jozLmXKUdS2kVsE03bkDVD7IRJSrv9GRFA/ed
-         aB5w==
-X-Gm-Message-State: AAQBX9dGVziZnewJ1LV6Biwi9P9Jv3EQHrBHsN6NsDezQe88cC7ryMlq
-        plNwlt5tn0eGY8o65YulWLKbd2g21dE=
-X-Google-Smtp-Source: AKy350bNSFXacXMTWAobp0sufEqFSEvdZGZwi+emRTP2ohIDz7BXP4Xm8c+/fBJsyMhO81f0YOf6nrf0GJo=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:cc05:0:b0:b8b:eea7:525a with SMTP id
- l5-20020a25cc05000000b00b8beea7525amr2052763ybf.7.1681427960466; Thu, 13 Apr
- 2023 16:19:20 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Thu, 13 Apr 2023 16:19:14 -0700
-In-Reply-To: <20230413231914.1482782-1-seanjc@google.com>
+        d=1e100.net; s=20221208; t=1681431119; x=1684023119;
+        h=content-transfer-encoding:cc:to:from:subject:message-id
+         :mime-version:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=i+pweVgTeWv08z0ELDTsB0Ltp1Ye2bcZK0KHo4GqVbw=;
+        b=HC0BKzlgTENMKYLnN19alLe8MgCgyauSwyOFVnK17LFoFwRBNwfvG97/qBVDFzZ3ko
+         X5zmUkxAlLHmijuqjJCM65HjdZdeQhAoFNBiOMRalwkq50KcPu8/oeRziK/mB4cn0YYC
+         gtmpPScpvRxiwFLkRN46Qviss5lcEjvEQsaPhNWEhfCeNRcq/1HNbo3/S5szltACQH3p
+         Nx+3cD8cyYTjMppR37fekhmu+nBWCwRuAnHhCaJT0oLj2IKHEyBqyxjQwA2rg742xJPX
+         5plpOW9zkj94gUxe4D5+7qdSdIDV0Jk/oVjFtY8Ff+jnoFet4NqDCdXyx3oBUTzVYBqv
+         fVZA==
+X-Gm-Message-State: AAQBX9fFugBVVPYKvcLf0CFPC21EBA1VndGkzxr9VMEJe+Nd8vuDXYlN
+        IQIV8izPsxo2XS4dnUQU0HcfbcHXdqk6MvH0fzeD5JqeqL+DTJF+rW/OMGrBpl/qviLQFDNsH1x
+        Act6/ngW7jjysrCX6xvom5T/SSUJB54i2LHpL+bNcEMDtHOQTcCFAlb0qJtGnm+EvmP2/pno=
+X-Google-Smtp-Source: AKy350aFyMPBdyqRFopcQD1OOk7RIztiWHN973sMgROTFTwCsBiX6bTJGMx6PuL8Cu3fjd47w7zygKuC4QNdUU7X4w==
+X-Received: from ackerleytng-cloudtop.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1f5f])
+ (user=ackerleytng job=sendgmr) by 2002:a25:72d6:0:b0:b8f:55f6:e50f with SMTP
+ id n205-20020a2572d6000000b00b8f55f6e50fmr2609596ybc.1.1681431119162; Thu, 13
+ Apr 2023 17:11:59 -0700 (PDT)
+Date:   Fri, 14 Apr 2023 00:11:49 +0000
 Mime-Version: 1.0
-References: <20230413231914.1482782-1-seanjc@google.com>
 X-Mailer: git-send-email 2.40.0.634.g4ca3ef3211-goog
-Message-ID: <20230413231914.1482782-3-seanjc@google.com>
-Subject: [PATCH 2/2] KVM: VMX: Use proper accessor to read guest CR4 in handle_desc()
-From:   Sean Christopherson <seanjc@google.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Robert Hoo <robert.hu@intel.com>
+Message-ID: <cover.1681430907.git.ackerleytng@google.com>
+Subject: [RFC PATCH 0/6] Setting memory policy for restrictedmem file
+From:   Ackerley Tng <ackerleytng@google.com>
+To:     kvm@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-arch@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, qemu-devel@nongnu.org
+Cc:     aarcange@redhat.com, ak@linux.intel.com, akpm@linux-foundation.org,
+        arnd@arndb.de, bfields@fieldses.org, bp@alien8.de,
+        chao.p.peng@linux.intel.com, corbet@lwn.net, dave.hansen@intel.com,
+        david@redhat.com, ddutile@redhat.com, dhildenb@redhat.com,
+        hpa@zytor.com, hughd@google.com, jlayton@kernel.org,
+        jmattson@google.com, joro@8bytes.org, jun.nakajima@intel.com,
+        kirill.shutemov@linux.intel.com, linmiaohe@huawei.com,
+        luto@kernel.org, mail@maciej.szmigiero.name, mhocko@suse.com,
+        michael.roth@amd.com, mingo@redhat.com, naoya.horiguchi@nec.com,
+        pbonzini@redhat.com, qperret@google.com, rppt@kernel.org,
+        seanjc@google.com, shuah@kernel.org, steven.price@arm.com,
+        tabba@google.com, tglx@linutronix.de, vannapurve@google.com,
+        vbabka@suse.cz, vkuznets@redhat.com, wanpengli@tencent.com,
+        wei.w.wang@intel.com, x86@kernel.org, yu.c.zhang@linux.intel.com,
+        muchun.song@linux.dev, feng.tang@intel.com, brgerst@gmail.com,
+        rdunlap@infradead.org, masahiroy@kernel.org,
+        mailhol.vincent@wanadoo.fr, Ackerley Tng <ackerleytng@google.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
@@ -70,47 +86,100 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Use kvm_is_cr4_bit_set() to read guest CR4.UMIP when sanity checking that
-a descriptor table VM-Exit occurs if and only if guest.CR4.UMIP=1.  UMIP
-can't be guest-owned, i.e. using kvm_read_cr4_bits() to decache guest-
-owned bits isn't strictly necessary, but eliminating raw reads of
-vcpu->arch.cr4 is desirable as it makes it easy to visually audit KVM for
-correctness.
+Hello,
 
-Opportunistically add a compile-time assertion that UMIP isn't guest-owned
-as letting the guest own UMIP isn't compatible with emulation (or any CR4
-bit that is emulated by KVM).
+This patchset builds upon the memfd_restricted() system call that was
+discussed in the 'KVM: mm: fd-based approach for supporting KVM' patch
+series [1].
 
-Opportunistically change the WARN_ON() to a ONCE variant.  When the WARN
-fires, it fires _a lot_, and spamming the kernel logs ends up doing more
-harm than whatever led to KVM's unnecessary emulation.
+The tree can be found at:
+https://github.com/googleprodkernel/linux-cc/tree/restrictedmem-set-memory-=
+policy
 
-Reported-by: Robert Hoo <robert.hu@intel.com>
-Link: https://lore.kernel.org/all/20230310125718.1442088-4-robert.hu@intel.com
-Signed-off-by: Sean Christopherson <seanjc@google.com>
+In this patchset, a new syscall is introduced, which allows userspace
+to set the memory policy (e.g. NUMA bindings) for a restrictedmem
+file, to the granularity of offsets within the file.
+
+The offset/length tuple is termed a file_range which is passed to the
+kernel via a pointer to get around the limit of 6 arguments for a
+syscall.
+
+The following other approaches were also considered:
+
+1. Pre-configuring a mount with a memory policy and providing that
+   mount to memfd_restricted() as proposed at [2].
+    + Pro: It allows choice of a specific backing mount with custom
+      memory policy configurations
+    + Con: Will need to create an entire new mount just to set memory
+      policy for a restrictedmem file; files on the same mount cannot
+      have different memory policies.
+
+2. Passing memory policy to the memfd_restricted() syscall at creation time=
+.
+    + Pro: Only need to make a single syscall to create a file with a
+      given memory policy
+    + Con: At creation time, the kernel doesn=E2=80=99t know the size of th=
+e
+      restrictedmem file. Given that memory policy is stored in the
+      inode based on ranges (start, end), it is awkward for the kernel
+      to store the memory policy and then add hooks to set the memory
+      policy when allocation is done.
+
+3. A more generic fbind(): it seems like this new functionality is
+   really only needed for restrictedmem files, hence a separate,
+   specific syscall was proposed to avoid complexities with handling
+   conflicting policies that may be specified via other syscalls like
+   mbind()
+
+TODOs
+
++ Return -EINVAL if file_range is not within the size of the file and
+  tests for this
+
+Dependencies:
+
++ Chao=E2=80=99s work on UPM [3]
+
+[1] https://lore.kernel.org/lkml/20221202061347.1070246-1-chao.p.peng@linux=
+.intel.com/T/
+[2] https://lore.kernel.org/lkml/cover.1681176340.git.ackerleytng@google.co=
+m/T/
+[3] https://github.com/chao-p/linux/commits/privmem-v11.5
+
 ---
- arch/x86/kvm/vmx/vmx.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
 
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 57464c762c79..f0975e790f7f 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -5402,7 +5402,13 @@ static int handle_set_cr4(struct kvm_vcpu *vcpu, unsigned long val)
- 
- static int handle_desc(struct kvm_vcpu *vcpu)
- {
--	WARN_ON(!(vcpu->arch.cr4 & X86_CR4_UMIP));
-+	/*
-+	 * UMIP emulation relies on intercepting writes to CR4.UMIP, i.e. this
-+	 * and other code needs to be updated if UMIP can be guest owned.
-+	 */
-+	BUILD_BUG_ON(KVM_POSSIBLE_CR4_GUEST_BITS & X86_CR4_UMIP);
-+
-+	WARN_ON_ONCE(!kvm_is_cr4_bit_set(vcpu, X86_CR4_UMIP));
- 	return kvm_emulate_instruction(vcpu, 0);
- }
- 
--- 
+Ackerley Tng (6):
+  mm: shmem: Refactor out shmem_shared_policy() function
+  mm: mempolicy: Refactor out mpol_init_from_nodemask
+  mm: mempolicy: Refactor out __mpol_set_shared_policy()
+  mm: mempolicy: Add and expose mpol_create
+  mm: restrictedmem: Add memfd_restricted_bind() syscall
+  selftests: mm: Add selftest for memfd_restricted_bind()
+
+ arch/x86/entry/syscalls/syscall_32.tbl        |   1 +
+ arch/x86/entry/syscalls/syscall_64.tbl        |   1 +
+ include/linux/mempolicy.h                     |   4 +
+ include/linux/shmem_fs.h                      |   7 +
+ include/linux/syscalls.h                      |   5 +
+ include/uapi/asm-generic/unistd.h             |   5 +-
+ include/uapi/linux/mempolicy.h                |   7 +-
+ kernel/sys_ni.c                               |   1 +
+ mm/mempolicy.c                                | 100 ++++++++++---
+ mm/restrictedmem.c                            |  75 ++++++++++
+ mm/shmem.c                                    |  10 +-
+ scripts/checksyscalls.sh                      |   1 +
+ tools/testing/selftests/mm/.gitignore         |   1 +
+ tools/testing/selftests/mm/Makefile           |   8 +
+ .../selftests/mm/memfd_restricted_bind.c      | 139 ++++++++++++++++++
+ .../mm/restrictedmem_testmod/Makefile         |  21 +++
+ .../restrictedmem_testmod.c                   |  89 +++++++++++
+ tools/testing/selftests/mm/run_vmtests.sh     |   6 +
+ 18 files changed, 454 insertions(+), 27 deletions(-)
+ create mode 100644 tools/testing/selftests/mm/memfd_restricted_bind.c
+ create mode 100644 tools/testing/selftests/mm/restrictedmem_testmod/Makefi=
+le
+ create mode 100644 tools/testing/selftests/mm/restrictedmem_testmod/restri=
+ctedmem_testmod.c
+
+--
 2.40.0.634.g4ca3ef3211-goog
-
