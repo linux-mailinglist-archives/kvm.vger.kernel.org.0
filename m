@@ -2,60 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7A1CE6E1C8F
-	for <lists+kvm@lfdr.de>; Fri, 14 Apr 2023 08:26:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C22BD6E1C91
+	for <lists+kvm@lfdr.de>; Fri, 14 Apr 2023 08:26:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229992AbjDNG0P (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Apr 2023 02:26:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53976 "EHLO
+        id S230032AbjDNG0S (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 Apr 2023 02:26:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53994 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230030AbjDNG0M (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 14 Apr 2023 02:26:12 -0400
+        with ESMTP id S230081AbjDNG0Q (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 14 Apr 2023 02:26:16 -0400
 Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D17A16A5B;
-        Thu, 13 Apr 2023 23:26:10 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D20735FC7;
+        Thu, 13 Apr 2023 23:26:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1681453570; x=1712989570;
+  t=1681453574; x=1712989574;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=ygndTyg8hBNkzZXLP9ZLaPaNVa47s+9GCJKETWJ9QoU=;
-  b=QGFqjePAAt5qwMDE+NIMT6WKOaIFtxXMqi8MBPltefwOO3TSKkZCyJUW
-   UdVOijYxb+AUcyVecuIabkoIKFSIw4zyrKUs98Zhi/imQJbVC1oIRFPpm
-   roMG39CS6A1jClhWe192H+j3JoHuj1PJG4ma9O//P4Ebqem98odiLiqsB
-   QtscPmvhOxXrZNAlBmDMOVYZE1MRu+fOLjodYpC+iSBBepRTYjBqsB2fv
-   2k/7FpGaWcTUy73xMsW96Bj/RqZWSP48DYFPLX8pTtB4jqsQR5vn4+PaJ
-   oX+4D+1HsnMbZUVzsXakPHhaUtkjJvQx6laMo91cz3YUXLoYlyEBttznj
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10679"; a="341892686"
+  bh=ReZ6d1h49UXz+50CffPRhXIdQK/vAa89RRvnljHBCbc=;
+  b=R1r7vNCd7O1EqrPxXVJdRuonIVnHD2T08G/OeWZhmUIdhkwrSL2Yw/Yz
+   Z6azFXrs0dy8QKYcFwINO5Xd+ct2cCnUzHx2pWepuH/TvM+iHdjRAiNlW
+   MVzTt+xJoaYaipImnwpts42J+QaI8jGuRElmIipTghDUpLM3j7btjjaym
+   97EJrlj/U0sn2xycs4kt+2L8lNTrrW1z0SBJIQYnOjxtRjp182qX0tNFe
+   21U+xG+oe8JISmZPdgcix/iBZRV/PzERVP3W3oIbdPZGx7HSF8aWeciye
+   x5zrHgHthloEglZMizNQRwFTESZbAPfG/lVMxQAbAFIOIE313wMjwZOJO
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10679"; a="341892711"
 X-IronPort-AV: E=Sophos;i="5.99,195,1677571200"; 
-   d="scan'208";a="341892686"
+   d="scan'208";a="341892711"
 Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Apr 2023 23:26:09 -0700
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Apr 2023 23:26:13 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10679"; a="935885803"
+X-IronPort-AV: E=McAfee;i="6600,9927,10679"; a="935885814"
 X-IronPort-AV: E=Sophos;i="5.99,195,1677571200"; 
-   d="scan'208";a="935885803"
+   d="scan'208";a="935885814"
 Received: from spr.sh.intel.com ([10.239.53.106])
-  by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Apr 2023 23:26:04 -0700
+  by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Apr 2023 23:26:09 -0700
 From:   Chao Gao <chao.gao@intel.com>
 To:     kvm@vger.kernel.org
 Cc:     Jiaan Lu <jiaan.lu@intel.com>, Zhang Chen <chen.zhang@intel.com>,
         Chao Gao <chao.gao@intel.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
         Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
         Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
-        Daniel Sneddon <daniel.sneddon@linux.intel.com>,
-        Sandipan Das <sandipan.das@amd.com>,
-        Nikunj A Dadhania <nikunj@amd.com>,
-        Arnaldo Carvalho de Melo <acme@redhat.com>,
-        linux-kernel@vger.kernel.org
-Subject: [RFC PATCH v2 01/11] x86/msr-index: Add bit definitions for BHI_DIS_S and BHI_NO
-Date:   Fri, 14 Apr 2023 14:25:22 +0800
-Message-Id: <20230414062545.270178-2-chao.gao@intel.com>
+        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org
+Subject: [RFC PATCH v2 02/11] KVM: x86: Advertise CPUID.7.2.EDX and RRSBA_CTRL support
+Date:   Fri, 14 Apr 2023 14:25:23 +0800
+Message-Id: <20230414062545.270178-3-chao.gao@intel.com>
 X-Mailer: git-send-email 2.40.0
 In-Reply-To: <20230414062545.270178-1-chao.gao@intel.com>
 References: <20230414062545.270178-1-chao.gao@intel.com>
@@ -72,86 +67,116 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Zhang Chen <chen.zhang@intel.com>
 
-To ensure VM migration from a system where software mitigation works to
-a system where it doesn't won't harm guest's security level, KVM must
-mitigate BHI attacks for guests since migration is transparent to guests
-and guests won't and can't react to VM migration.
+Add a kvm-only CPUID feature leaf for CPUID.7.2.EDX and RRSBA_CTRL
+as the first feature in the leaf.
 
-For example, simple BHB clear sequence [1] is effective in mitigating BHI
-attacks on processors prior to Alder Lake, but it is not on Alder Lake.
-Guests migrated from prior to Alder Lake host to Alder Lake host become
-vulnerable to BHI attacks even if the simmple BHB clear sequence is
-deployed. In this case, KVM can enable hardware mitigation for guests by
-setting BHI_DIS_S bit of IA32_SPEC_CTRL MSR.
+RRSBA_CTRL is enumerated by CPUID.7.2.EDX[2]. If supported, RRSBA_DIS_U
+(bit 5) and RRSBA_DIS_S (bit 6) of IA32_SPEC_CTRL MSR can be used to
+disable RRSBA behavior for CPL3 and CPL0/1/2 respectively.
 
-Define the SPEC_CTRL_BHI_DIS_S of IA32_SPEC_CTRL MSR and BHI_NO bits in
-arch_capabilities, which will be used by KVM later.
-
-[1]: https://www.intel.com/content/www/us/en/developer/articles/technical/software-security-guidance/technical-documentation/branch-history-injection.html#inpage-nav-2-4
+Note that KVM does not intercept guests' IA32_SPEC_CTRL MSR accesses
+after a non-zero is written to the MSR. Therefore, guests can already
+toggle the two bits if the host supports RRSBA_CTRL, and no extra code
+is needed to allow guests to toggle the two bits.
 
 Signed-off-by: Zhang Chen <chen.zhang@intel.com>
-Co-developed-by: Chao Gao <chao.gao@intel.com>
 Signed-off-by: Chao Gao <chao.gao@intel.com>
 Tested-by: Jiaan Lu <jiaan.lu@intel.com>
 ---
- arch/x86/include/asm/msr-index.h       | 8 +++++++-
- tools/arch/x86/include/asm/msr-index.h | 8 +++++++-
- 2 files changed, 14 insertions(+), 2 deletions(-)
+ arch/x86/kvm/cpuid.c         | 22 +++++++++++++++++++---
+ arch/x86/kvm/reverse_cpuid.h |  7 +++++++
+ 2 files changed, 26 insertions(+), 3 deletions(-)
 
-diff --git a/arch/x86/include/asm/msr-index.h b/arch/x86/include/asm/msr-index.h
-index ad35355ee43e..60b25d87b82c 100644
---- a/arch/x86/include/asm/msr-index.h
-+++ b/arch/x86/include/asm/msr-index.h
-@@ -48,8 +48,10 @@
- #define SPEC_CTRL_STIBP			BIT(SPEC_CTRL_STIBP_SHIFT)	/* STIBP mask */
- #define SPEC_CTRL_SSBD_SHIFT		2	   /* Speculative Store Bypass Disable bit */
- #define SPEC_CTRL_SSBD			BIT(SPEC_CTRL_SSBD_SHIFT)	/* Speculative Store Bypass Disable */
--#define SPEC_CTRL_RRSBA_DIS_S_SHIFT	6	   /* Disable RRSBA behavior */
-+#define SPEC_CTRL_RRSBA_DIS_S_SHIFT	6	   /* Disable RRSBA behavior in supervisor mode */
- #define SPEC_CTRL_RRSBA_DIS_S		BIT(SPEC_CTRL_RRSBA_DIS_S_SHIFT)
-+#define SPEC_CTRL_BHI_DIS_S_SHIFT	10	   /* Disable BHI behavior in supervisor mode */
-+#define SPEC_CTRL_BHI_DIS_S		BIT(SPEC_CTRL_BHI_DIS_S_SHIFT)
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index 9583a110cf5f..f024c3ac2203 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -685,6 +685,10 @@ void kvm_set_cpu_caps(void)
+ 		SF(SGX1) | SF(SGX2) | SF(SGX_EDECCSSA)
+ 	);
  
- /* A mask for bits which the kernel toggles when controlling mitigations */
- #define SPEC_CTRL_MITIGATIONS_MASK	(SPEC_CTRL_IBRS | SPEC_CTRL_STIBP | SPEC_CTRL_SSBD \
-@@ -151,6 +153,10 @@
- 						 * are restricted to targets in
- 						 * kernel.
- 						 */
-+#define ARCH_CAP_BHI_NO			BIT(20)	/*
-+						 * Not susceptible to Branch History
-+						 * Injection.
-+						 */
- #define ARCH_CAP_PBRSB_NO		BIT(24)	/*
- 						 * Not susceptible to Post-Barrier
- 						 * Return Stack Buffer Predictions.
-diff --git a/tools/arch/x86/include/asm/msr-index.h b/tools/arch/x86/include/asm/msr-index.h
-index ad35355ee43e..6079a5fdb40b 100644
---- a/tools/arch/x86/include/asm/msr-index.h
-+++ b/tools/arch/x86/include/asm/msr-index.h
-@@ -48,8 +48,10 @@
- #define SPEC_CTRL_STIBP			BIT(SPEC_CTRL_STIBP_SHIFT)	/* STIBP mask */
- #define SPEC_CTRL_SSBD_SHIFT		2	   /* Speculative Store Bypass Disable bit */
- #define SPEC_CTRL_SSBD			BIT(SPEC_CTRL_SSBD_SHIFT)	/* Speculative Store Bypass Disable */
--#define SPEC_CTRL_RRSBA_DIS_S_SHIFT	6	   /* Disable RRSBA behavior */
-+#define SPEC_CTRL_RRSBA_DIS_S_SHIFT	6	   /* Disable RRSBA behavior in supervisor mode */
- #define SPEC_CTRL_RRSBA_DIS_S		BIT(SPEC_CTRL_RRSBA_DIS_S_SHIFT)
-+#define SPEC_CTRL_BHI_DIS_S_SHIFT	10         /* Disable BHI behavior in supervisor mode */
-+#define SPEC_CTRL_BHI_DIS_S		BIT(SPEC_CTRL_BHI_DIS_S_SHIFT)
++	kvm_cpu_cap_init_kvm_defined(CPUID_7_2_EDX,
++		SF(RRSBA_CTRL)
++	);
++
+ 	kvm_cpu_cap_mask(CPUID_8000_0001_ECX,
+ 		F(LAHF_LM) | F(CMP_LEGACY) | 0 /*SVM*/ | 0 /* ExtApicSpace */ |
+ 		F(CR8_LEGACY) | F(ABM) | F(SSE4A) | F(MISALIGNSSE) |
+@@ -949,13 +953,14 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
+ 		break;
+ 	/* function 7 has additional index. */
+ 	case 7:
+-		entry->eax = min(entry->eax, 1u);
++		entry->eax = min(entry->eax, 2u);
+ 		cpuid_entry_override(entry, CPUID_7_0_EBX);
+ 		cpuid_entry_override(entry, CPUID_7_ECX);
+ 		cpuid_entry_override(entry, CPUID_7_EDX);
  
- /* A mask for bits which the kernel toggles when controlling mitigations */
- #define SPEC_CTRL_MITIGATIONS_MASK	(SPEC_CTRL_IBRS | SPEC_CTRL_STIBP | SPEC_CTRL_SSBD \
-@@ -151,6 +153,10 @@
- 						 * are restricted to targets in
- 						 * kernel.
- 						 */
-+#define ARCH_CAP_BHI_NO			BIT(20) /*
-+						 * Not susceptible to Branch History
-+						 * Injection.
-+						 */
- #define ARCH_CAP_PBRSB_NO		BIT(24)	/*
- 						 * Not susceptible to Post-Barrier
- 						 * Return Stack Buffer Predictions.
+-		/* KVM only supports 0x7.0 and 0x7.1, capped above via min(). */
+-		if (entry->eax == 1) {
++		max_idx = entry->eax;
++
++		if (max_idx >= 1) {
+ 			entry = do_host_cpuid(array, function, 1);
+ 			if (!entry)
+ 				goto out;
+@@ -965,6 +970,17 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
+ 			entry->ebx = 0;
+ 			entry->ecx = 0;
+ 		}
++
++		if (max_idx >= 2) {
++			entry = do_host_cpuid(array, function, 2);
++			if (!entry)
++				goto out;
++
++			cpuid_entry_override(entry, CPUID_7_2_EDX);
++			entry->eax = 0;
++			entry->ebx = 0;
++			entry->ecx = 0;
++		}
+ 		break;
+ 	case 0xa: { /* Architectural Performance Monitoring */
+ 		union cpuid10_eax eax;
+diff --git a/arch/x86/kvm/reverse_cpuid.h b/arch/x86/kvm/reverse_cpuid.h
+index a5717282bb9c..72bad8314a9c 100644
+--- a/arch/x86/kvm/reverse_cpuid.h
++++ b/arch/x86/kvm/reverse_cpuid.h
+@@ -15,6 +15,7 @@ enum kvm_only_cpuid_leafs {
+ 	CPUID_12_EAX	 = NCAPINTS,
+ 	CPUID_7_1_EDX,
+ 	CPUID_8000_0007_EDX,
++	CPUID_7_2_EDX,
+ 	NR_KVM_CPU_CAPS,
+ 
+ 	NKVMCAPINTS = NR_KVM_CPU_CAPS - NCAPINTS,
+@@ -47,6 +48,9 @@ enum kvm_only_cpuid_leafs {
+ /* CPUID level 0x80000007 (EDX). */
+ #define KVM_X86_FEATURE_CONSTANT_TSC	KVM_X86_FEATURE(CPUID_8000_0007_EDX, 8)
+ 
++/* Intel-defined sub-features, CPUID level 0x00000007:2 (EDX) */
++#define KVM_X86_FEATURE_RRSBA_CTRL	KVM_X86_FEATURE(CPUID_7_2_EDX, 2)
++
+ struct cpuid_reg {
+ 	u32 function;
+ 	u32 index;
+@@ -69,6 +73,7 @@ static const struct cpuid_reg reverse_cpuid[] = {
+ 	[CPUID_8000_0007_EBX] = {0x80000007, 0, CPUID_EBX},
+ 	[CPUID_7_EDX]         = {         7, 0, CPUID_EDX},
+ 	[CPUID_7_1_EAX]       = {         7, 1, CPUID_EAX},
++	[CPUID_7_2_EDX]       = {         7, 2, CPUID_EDX},
+ 	[CPUID_12_EAX]        = {0x00000012, 0, CPUID_EAX},
+ 	[CPUID_8000_001F_EAX] = {0x8000001f, 0, CPUID_EAX},
+ 	[CPUID_7_1_EDX]       = {         7, 1, CPUID_EDX},
+@@ -108,6 +113,8 @@ static __always_inline u32 __feature_translate(int x86_feature)
+ 		return KVM_X86_FEATURE_SGX_EDECCSSA;
+ 	else if (x86_feature == X86_FEATURE_CONSTANT_TSC)
+ 		return KVM_X86_FEATURE_CONSTANT_TSC;
++	else if (x86_feature == X86_FEATURE_RRSBA_CTRL)
++		return KVM_X86_FEATURE_RRSBA_CTRL;
+ 
+ 	return x86_feature;
+ }
 -- 
 2.40.0
 
