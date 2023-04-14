@@ -2,62 +2,81 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 889006E2B18
-	for <lists+kvm@lfdr.de>; Fri, 14 Apr 2023 22:29:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8CA536E2B82
+	for <lists+kvm@lfdr.de>; Fri, 14 Apr 2023 23:08:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229820AbjDNU3b (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Apr 2023 16:29:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39836 "EHLO
+        id S230106AbjDNVIQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 Apr 2023 17:08:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55810 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229615AbjDNU3a (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 14 Apr 2023 16:29:30 -0400
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8F166581
-        for <kvm@vger.kernel.org>; Fri, 14 Apr 2023 13:29:29 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-54f1ffb8ccfso168483097b3.9
-        for <kvm@vger.kernel.org>; Fri, 14 Apr 2023 13:29:29 -0700 (PDT)
+        with ESMTP id S230032AbjDNVIM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 14 Apr 2023 17:08:12 -0400
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0DBEC5242
+        for <kvm@vger.kernel.org>; Fri, 14 Apr 2023 14:08:11 -0700 (PDT)
+Received: by mail-pl1-x649.google.com with SMTP id jz14-20020a170903430e00b001a69d98e71bso1497942plb.4
+        for <kvm@vger.kernel.org>; Fri, 14 Apr 2023 14:08:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1681504169; x=1684096169;
+        d=google.com; s=20221208; t=1681506490; x=1684098490;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=DLToSh8SFFWLZRyFSn4i7JQlNzNszta4xTWyY36zPEY=;
-        b=dpmv8GYPJG9Y6ih8+TvcQ+edTHglKG2Js/rYBcWjl6NW+0M+pqgW39ylCfa60dexZi
-         DcikGg0YcUK//c4DDFSsXjVyBtKVstj55BDa4latJZZfT6BZXQdFKZur+CF1NiYnfv1r
-         Ar3WhQ0JRYTCKTGlxXqJipp203cmSB1iWZAMC+pOHuds04YM74nbogb2hDxmdW8Ls8d2
-         m25JHxXb9tbOm6r+h9sfHSfr79rvJoEqQ1bxRGN3yrhvn6941TNduBebF8CUwf92Eot2
-         vkhRoqGuQW+iAMTUW+reMvp6CjV3n2Bx/CxA3aVlKcQjdI2FlYFi2kqbdG1tyYwGxr5v
-         LIIA==
+        bh=b7Jr+FjVXuQEnXDMlE3gznMa+dmQespZNtp7nLwMnLo=;
+        b=Z5HvJTutAVSami8OKTwQ0L/Tb2qB7TzKRMxFI28D2AJ1QCpuyyvVHOIi9Fb3XHR9ej
+         LUNfDfNV6JeVjW3E90abkAcvZRFvh1n+aONtio3M8f0noPTpRbjMmxowI+9sS4Xq8hOM
+         Sf8ikJlSVrVt4ndDSkdOQC01mNz5LJQqb5MN5v49d2Xg9pi+/EcTwfMmakOAtcymdSPB
+         3uhaOLkyYQ+M+WsF5l8y2hIZEq9pNWsbaA7iwUmYpJ328Zz4BxjSvHOlfXGK+mUVM1vi
+         r2OSTO5kfzooBMyGZCEiZPK8V4lIN0PFu5BvTJM4WCQKYevPaAgKuJZuB8K2huoAWqrx
+         vn+g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681504169; x=1684096169;
+        d=1e100.net; s=20221208; t=1681506490; x=1684098490;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=DLToSh8SFFWLZRyFSn4i7JQlNzNszta4xTWyY36zPEY=;
-        b=DPpoGPdndBRVusWD/Kc11mTrtIcsZ4eNIyjWbK5cG+CJrhw9rUUidW963rZAAFGki5
-         2YbWRUEucQVRYGlN6woOgpTnIIoYgSEzUKijInPEByf9TNvWNa+uonNnFc5GI+QMY9cQ
-         smAmfNpBqJnjGFaZwWxje7LXAfbRCmVSx/0SOUHivBIulYGQG3un95/vUSJ/ubBjNmNL
-         ZuWfruOW51uwjjnbG0cQXXQHAW0u+wyKKzXB7pa2nFnJBIvc2JAAeRkT0OSotWD9JJ7S
-         eXtqJci1M9LAEiDDKX2a9WRFV+GlJf8xb0yCmRVNymXEaXewMcEW1EJhljLgsfRyrK4E
-         7xAg==
-X-Gm-Message-State: AAQBX9ctP/vF2p64OH6Ea68Hep0dh22dTOhP3OtG1zJrM6cqm6sDg7gv
-        B/c7Zw7Ksk0FBk5m+Y6ZNNxlrNuflD4=
-X-Google-Smtp-Source: AKy350YGjJSkhSWbMFiapNaVp2vMMOdjYO4P14f48+AuxLsAITPxtQITPLvVcWwdaknrUYlaSrf7ZfMHlGk=
+        bh=b7Jr+FjVXuQEnXDMlE3gznMa+dmQespZNtp7nLwMnLo=;
+        b=cgE54xDD6B5Nel/RGfoXaqWARh9NZ3bSg8SKi4BodtOSuko9PMbRc58FojQOnGpGe7
+         yZKZzCgUms+9bDRRi5weeceiVzkWQBrz56R4Tsd/JhadTEkwVl7LBwY68NMkQZFu3YMm
+         FQ7eVZT/dNOd8VGiasQL+DjOjaTuPnOoVCSKDO39SDwVHEwiXAg8W/N/GOBJuVu37lzl
+         io2yQftDaUrRi7vw6iTKbekLSBp5sTIvP3V7IXS6H6OajWBfMIDw3w74cBaNsvA8OYzA
+         gLv0tBi27g5GBKTaM+WN3v9bdu9aY0uiGJsP0i7aM5e3YYgnISP9k1iR+CMT2TTEtJRN
+         Z7aQ==
+X-Gm-Message-State: AAQBX9ehTIlecCHEVnJSwoEBPZthQ8kGjoQG5UTuyOuyZfxbsrZ/HepZ
+        G6Nw2B1LFBURtQpKLlIy1W3EsILMlE4=
+X-Google-Smtp-Source: AKy350bBbN9SHkQpgaNZinbD0G0RBAygFGxlP9+ytFbgc7OhIviX9khLc+w+xI6iW/tqbkBNGnqofgsbIU0=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:da0b:0:b0:b8f:6f3f:ed20 with SMTP id
- n11-20020a25da0b000000b00b8f6f3fed20mr2167663ybf.5.1681504169043; Fri, 14 Apr
- 2023 13:29:29 -0700 (PDT)
-Date:   Fri, 14 Apr 2023 13:29:21 -0700
-In-Reply-To: <20230407233254.957013-1-seanjc@google.com>
+ (user=seanjc job=sendgmr) by 2002:a63:58a:0:b0:513:57ce:d61c with SMTP id
+ 132-20020a63058a000000b0051357ced61cmr1120918pgf.7.1681506490508; Fri, 14 Apr
+ 2023 14:08:10 -0700 (PDT)
+Date:   Fri, 14 Apr 2023 14:08:08 -0700
+In-Reply-To: <20230328104108.GB2909606@chaop.bj.intel.com>
 Mime-Version: 1.0
-References: <20230407233254.957013-1-seanjc@google.com>
-X-Mailer: git-send-email 2.40.0.634.g4ca3ef3211-goog
-Message-ID: <168150370438.1550830.5816847574112858499.b4-ty@google.com>
-Subject: Re: [PATCH v4 0/6] KVM: selftests: Add "instructions required" testcase
+References: <20230128140030.GB700688@chaop.bj.intel.com> <diqz5ybc3xsr.fsf@ackerleytng-cloudtop.c.googlers.com>
+ <20230308074026.GA2183207@chaop.bj.intel.com> <20230323004131.GA214881@ls.amr.corp.intel.com>
+ <20230324021029.GA2774613@chaop.bj.intel.com> <6cf365a3-dddc-8b74-4d74-04666fbeb53d@intel.com>
+ <20230328104108.GB2909606@chaop.bj.intel.com>
+Message-ID: <ZDnAuGKrCO2wgjlG@google.com>
+Subject: Re: [PATCH v10 9/9] KVM: Enable and expose KVM_MEM_PRIVATE
 From:   Sean Christopherson <seanjc@google.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Aaron Lewis <aaronlewis@google.com>
-Content-Type: text/plain; charset="utf-8"
+To:     Chao Peng <chao.p.peng@linux.intel.com>
+Cc:     Xiaoyao Li <xiaoyao.li@intel.com>,
+        Isaku Yamahata <isaku.yamahata@gmail.com>,
+        Ackerley Tng <ackerleytng@google.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-fsdevel@vger.kernel.org, linux-arch@vger.kernel.org,
+        linux-api@vger.kernel.org, linux-doc@vger.kernel.org,
+        qemu-devel@nongnu.org, pbonzini@redhat.com, corbet@lwn.net,
+        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+        joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, arnd@arndb.de, naoya.horiguchi@nec.com,
+        linmiaohe@huawei.com, x86@kernel.org, hpa@zytor.com,
+        hughd@google.com, jlayton@kernel.org, bfields@fieldses.org,
+        akpm@linux-foundation.org, shuah@kernel.org, rppt@kernel.org,
+        steven.price@arm.com, mail@maciej.szmigiero.name, vbabka@suse.cz,
+        vannapurve@google.com, yu.c.zhang@linux.intel.com,
+        kirill.shutemov@linux.intel.com, luto@kernel.org,
+        jun.nakajima@intel.com, dave.hansen@intel.com, ak@linux.intel.com,
+        david@redhat.com, aarcange@redhat.com, ddutile@redhat.com,
+        dhildenb@redhat.com, qperret@google.com, tabba@google.com,
+        michael.roth@amd.com, mhocko@suse.com, wei.w.wang@intel.com
+Content-Type: text/plain; charset="us-ascii"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
@@ -68,31 +87,90 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 07 Apr 2023 16:32:48 -0700, Sean Christopherson wrote:
-> This is the selftests portion of Aaron's series[*] to fix incorrect
-> "instructions required" counting.  The big change from v3 is to use a
-> common struct to copy counter values to/from the guest instead of smushing
-> the values into a single 64-bit value.
+On Tue, Mar 28, 2023, Chao Peng wrote:
+> On Fri, Mar 24, 2023 at 10:29:25AM +0800, Xiaoyao Li wrote:
+> > On 3/24/2023 10:10 AM, Chao Peng wrote:
+> > > On Wed, Mar 22, 2023 at 05:41:31PM -0700, Isaku Yamahata wrote:
+> > > > On Wed, Mar 08, 2023 at 03:40:26PM +0800,
+> > > > Chao Peng <chao.p.peng@linux.intel.com> wrote:
+> > > > 
+> > > > > On Wed, Mar 08, 2023 at 12:13:24AM +0000, Ackerley Tng wrote:
+> > > > > > Chao Peng <chao.p.peng@linux.intel.com> writes:
+> > > > > > 
+> > > > > > > On Sat, Jan 14, 2023 at 12:01:01AM +0000, Sean Christopherson wrote:
+> > > > > > > > On Fri, Dec 02, 2022, Chao Peng wrote:
+> > > > > > > +static bool kvm_check_rmem_offset_alignment(u64 offset, u64 gpa)
+> > > > > > > +{
+> > > > > > > +	if (!offset)
+> > > > > > > +		return true;
+> > > > > > > +	if (!gpa)
+> > > > > > > +		return false;
+> > > > > > > +
+> > > > > > > +	return !!(count_trailing_zeros(offset) >= count_trailing_zeros(gpa));
+> > > > 
+> > > > This check doesn't work expected. For example, offset = 2GB, gpa=4GB
+> > > > this check fails.
+> > > 
+> > > This case is expected to fail as Sean initially suggested[*]:
+> > >    I would rather reject memslot if the gfn has lesser alignment than
+> > >    the offset. I'm totally ok with this approach _if_ there's a use case.
+> > >    Until such a use case presents itself, I would rather be conservative
+> > >    from a uAPI perspective.
+> > > 
+> > > I understand that we put tighter restriction on this but if you see such
+> > > restriction is really a big issue for real usage, instead of a
+> > > theoretical problem, then we can loosen the check here. But at that time
+> > > below code is kind of x86 specific and may need improve.
+> > > 
+> > > BTW, in latest code, I replaced count_trailing_zeros() with fls64():
+> > >    return !!(fls64(offset) >= fls64(gpa));
+> > 
+> > wouldn't it be !!(ffs64(offset) <= ffs64(gpa)) ?
 > 
-> [*] https://lkml.kernel.org/r/20230307141400.1486314-1-aaronlewis%40google.com
+> As the function document explains, here we want to return true when
+> ALIGNMENT(offset) >= ALIGNMENT(gpa), so '>=' is what we need.
 > 
-> [...]
+> It's worthy clarifying that in Sean's original suggestion he actually
+> mentioned the opposite. He said 'reject memslot if the gfn has lesser
+> alignment than the offset', but I wonder this is his purpose, since
+> if ALIGNMENT(offset) < ALIGNMENT(gpa), we wouldn't be possible to map
+> the page as largepage. Consider we have below config:
+> 
+>   gpa=2M, offset=1M
+> 
+> In this case KVM tries to map gpa at 2M as 2M hugepage but the physical
+> page at the offset(1M) in private_fd cannot provide the 2M page due to
+> misalignment.
+> 
+> But as we discussed in the off-list thread, here we do find a real use
+> case indicating this check is too strict. i.e. QEMU immediately fails
+> when launch a guest > 2G memory. For this case QEMU splits guest memory
+> space into two slots:
+> 
+>   Slot#1(ram_below_4G): gpa=0x0, offset=0x0, size=2G
+>   Slot#2(ram_above_4G): gpa=4G,  offset=2G,  size=totalsize-2G
+> 
+> This strict alignment check fails for slot#2 because offset(2G) has less
+> alignment than gpa(4G). To allow this, one solution can revert to my
+> previous change in kvm_alloc_memslot_metadata() to disallow hugepage
+> only when the offset/gpa are not aligned to related page size.
+> 
+> Sean, How do you think?
 
-Applied to kvm-x86 pmu, thanks!
+I agree, a pure alignment check is too restrictive, and not really what I intended
+despite past me literally saying that's what I wanted :-)  I think I may have also
+inverted the "less alignment" statement, but luckily I believe that ends up being
+a moot point.
 
-[1/6] KVM: selftests: Add a common helper for the PMU event filter guest code
-      https://github.com/kvm-x86/linux/commit/33ef1411a36b
-[2/6] KVM: selftests: Add helpers for PMC asserts in PMU event filter test
-      https://github.com/kvm-x86/linux/commit/fa32233d51b9
-[3/6] KVM: selftests: Print detailed info in PMU event filter asserts
-      https://github.com/kvm-x86/linux/commit/c140e93a0c11
-[4/6] KVM: selftests: Use error codes to signal errors in PMU event filter test
-      https://github.com/kvm-x86/linux/commit/c02c74428288
-[5/6] KVM: selftests: Copy full counter values from guest in PMU event filter test
-      https://github.com/kvm-x86/linux/commit/e9f322bd2396
-[6/6] KVM: selftests: Test the PMU event "Instructions retired"
-      https://github.com/kvm-x86/linux/commit/457bd7af1a17
+The goal is to avoid having to juggle scenarios where KVM wants to create a hugepage,
+but restrictedmem can't provide one because of a misaligned file offset.  I think
+the rule we want is that the offset must be aligned to the largest page size allowed
+by the memslot _size_.  E.g. on x86, if the memslot size is >=1GiB then the offset
+must be 1GiB or beter, ditto for >=2MiB and >=4KiB (ignoring that 4KiB is already a
+requirement).
 
---
-https://github.com/kvm-x86/linux/tree/next
-https://github.com/kvm-x86/linux/tree/fixes
+We could loosen that to say the largest size allowed by the memslot, but I don't
+think that's worth the effort unless it's trivially easy to implement in code,
+e.g. KVM could technically allow a 4KiB aligned offset if the memslot is 2MiB
+sized but only 4KiB aligned on the GPA.  I doubt there's a real use case for such
+a memslot, so I want to disallow that unless it's super easy to implement.
