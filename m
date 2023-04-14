@@ -2,69 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 57C8D6E27DD
-	for <lists+kvm@lfdr.de>; Fri, 14 Apr 2023 18:00:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8D4756E27DE
+	for <lists+kvm@lfdr.de>; Fri, 14 Apr 2023 18:00:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230372AbjDNQAv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Apr 2023 12:00:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46192 "EHLO
+        id S230487AbjDNQA5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 Apr 2023 12:00:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46318 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229947AbjDNQAt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 14 Apr 2023 12:00:49 -0400
-Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 526E1BB80
-        for <kvm@vger.kernel.org>; Fri, 14 Apr 2023 09:00:34 -0700 (PDT)
-Received: by mail-pl1-x62e.google.com with SMTP id y6so17638807plp.2
-        for <kvm@vger.kernel.org>; Fri, 14 Apr 2023 09:00:34 -0700 (PDT)
+        with ESMTP id S230360AbjDNQA4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 14 Apr 2023 12:00:56 -0400
+Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 816CABB8A
+        for <kvm@vger.kernel.org>; Fri, 14 Apr 2023 09:00:37 -0700 (PDT)
+Received: by mail-pl1-x630.google.com with SMTP id p17so7560069pla.3
+        for <kvm@vger.kernel.org>; Fri, 14 Apr 2023 09:00:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sifive.com; s=google; t=1681488034; x=1684080034;
+        d=sifive.com; s=google; t=1681488037; x=1684080037;
         h=references:in-reply-to:message-id:date:subject:cc:to:from:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=hWB54ZotS7Y2ZgKJV1SIpYTu+cs8XvC1qHz0MxJpXfU=;
-        b=KmNeQFGssjzK0xQ018T4SlGSmqFwJkBPec76ZOBY4rleHRUhzy2MMot645T/KeOxTy
-         oCUzwlMXTlgUhoQ2v/rnI/1nwPbARVDCBxETuqvmwYWIRGAEKZrfCo/iztYx6JyMhV5g
-         O+uRyS2XqxLUA9A2EqVkmDcKftggvVg/dsNE+MsWdowrLBiDFI9/WYMvk5bD4fSOT/xC
-         FXhbKspwDSOieEFexzugK5oDC5yGNjFwNTmfgG/PP2YFGoMJGq3iCMX/8OPkOd/KD9h8
-         85Ymzshlsn6z0qRvDtlK0U7vbXaDnK3OjPzWfGqXH1wh0EWCZW+8yhpIAOLa670BS84k
-         KT1A==
+        bh=Odmz0JG+bEL0mEy4+sqiyjpf0XMQ6vVYrEOWb5kBhbI=;
+        b=FOctlegUDtDv3ZHjXnrQJCTB/Q6yyurIgcxUtsUoFzS7dn8jftYmLbD+75EhDZA2Cr
+         zRVATn8/u7h4RXGHOq10e69KRyHc/0+D/hBly1p5VO/Y1tdMTqJaNtb7RYGA/nhmWAf3
+         08pNFxl+FwPz9dxOalOIoXewTsF8wfk9yyojXsNQOUEFPUe2AB/bSHL2WyxhicJcsa5i
+         0nU6KQQTrq7QW8967WdAfAJ6sVx/21Z1pTNb/OINlieAIVJVwXtmwsASd+1L+42QsLIg
+         fCWGcV29bYX2+zTqwJe446i9FzP9Dm83skLE4j0C2s1H+FWSddrMeia1ROtHi4sZWwCw
+         3h4A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681488034; x=1684080034;
+        d=1e100.net; s=20221208; t=1681488037; x=1684080037;
         h=references:in-reply-to:message-id:date:subject:cc:to:from
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=hWB54ZotS7Y2ZgKJV1SIpYTu+cs8XvC1qHz0MxJpXfU=;
-        b=Pygi/mTmy7ehrECQutLzxJlm0cZ35XfhmDmX0Z8GtdkIyw3vvUAzZ7ac2SEIp/5R4D
-         V2xbu1oX8qb90g5LfQOaXffGejwVRPzyI2y7HhG6XNz9D8/S1CO6jOTW9vUOqA0xsdLw
-         h5Al+6LGScObGHru1UCXiZnhMucm0DQwMiJBUkmNI0pRPonz/cJ0idVAYFB36VYb3+0M
-         55wZnHJNoAeh00+H73WmW57baIsBWswkenS+xkNqosxOohoN7fLiyxCX7OocytlNkv/N
-         mkomPNEV40o1mN/8RkHVBr1ZWcJaCWj2tH8Fsy73FPjMl5vzE6a8aENHzv074OvS/xSK
-         naxA==
-X-Gm-Message-State: AAQBX9fhH1GC0mNnj4b5yHte6IpXrR4ohfenbiKjBPQ6fuSsrEP0hZoZ
-        B5UW68iYSLW8GAR1Q/TBWYJoGA==
-X-Google-Smtp-Source: AKy350bLWel/6yEV1JmbLZwHUbnX6eF24BdOzl+/i67z9xt7yAYwzmd+UIUx2N8+rcDKw8RpGj4wSg==
-X-Received: by 2002:a17:90a:be08:b0:233:f786:35ca with SMTP id a8-20020a17090abe0800b00233f78635camr5818524pjs.35.1681488033705;
-        Fri, 14 Apr 2023 09:00:33 -0700 (PDT)
+        bh=Odmz0JG+bEL0mEy4+sqiyjpf0XMQ6vVYrEOWb5kBhbI=;
+        b=HFwqPbmTi3eR0zI1ga5kx0W2cJO8SGob49Hcwlae0hQEoBUtzkm6Yea7TfjLAJ5slc
+         LqWvdJyE2CYHdFVeu4lQa1Txa97wqAofNHpEmtRPkHhmjHxs78V0Zs5S6WHAwQCUlFZu
+         HkeiVe3y2yZNJGJhxDT6OsY07A6BZUZZukKl/5HFL+q9tVutv6vJd2hXaTgcmZRDWv/T
+         PAwa4bk+JnFAfTYXd9sbYmEzi24Cq6kRSp/3RZxj6SA+RnuPE/vrdFvDxNpL6QE733JU
+         RoDPUYYFPnC9D1w5HQR/5oNYa+fnhb7yDaJEMVJ6C8eQH/uqIsBZVGlunjZsNUe8AGGe
+         oewg==
+X-Gm-Message-State: AAQBX9f99wOXf19CapeYvEsTyCHzk+RL9l07+zCKWGvvRAnVMwW9VncL
+        8O35gWor5pyB/h80S7VonSuoAw==
+X-Google-Smtp-Source: AKy350bD7mze/O0+fYsB9lpeXlbduhlDKv44rIlF3vXS+82oFbA62wV5LVEzKRe2kkBUE5wMisk7Nw==
+X-Received: by 2002:a17:90a:a091:b0:247:4538:a62e with SMTP id r17-20020a17090aa09100b002474538a62emr1878454pjp.27.1681488036960;
+        Fri, 14 Apr 2023 09:00:36 -0700 (PDT)
 Received: from hsinchu25.internal.sifive.com (59-124-168-89.hinet-ip.hinet.net. [59.124.168.89])
-        by smtp.gmail.com with ESMTPSA id br8-20020a17090b0f0800b00240d4521958sm3083584pjb.18.2023.04.14.09.00.30
+        by smtp.gmail.com with ESMTPSA id br8-20020a17090b0f0800b00240d4521958sm3083584pjb.18.2023.04.14.09.00.34
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 14 Apr 2023 09:00:32 -0700 (PDT)
+        Fri, 14 Apr 2023 09:00:36 -0700 (PDT)
 From:   Andy Chiu <andy.chiu@sifive.com>
 To:     linux-riscv@lists.infradead.org, palmer@dabbelt.com,
         anup@brainfault.org, atishp@atishpatra.org,
         kvm-riscv@lists.infradead.org, kvm@vger.kernel.org
 Cc:     vineetg@rivosinc.com, greentime.hu@sifive.com,
-        guoren@linux.alibaba.com, ShihPo Hung <shihpo.hung@sifive.com>,
-        Vincent Chen <vincent.chen@sifive.com>,
+        guoren@linux.alibaba.com, Vincent Chen <vincent.chen@sifive.com>,
         Andy Chiu <andy.chiu@sifive.com>,
         Paul Walmsley <paul.walmsley@sifive.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Heiko Stuebner <heiko.stuebner@vrull.eu>,
-        Conor Dooley <conor.dooley@microchip.com>,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        Alexandre Ghiti <alexandre.ghiti@canonical.com>,
-        Guo Ren <guoren@kernel.org>
-Subject: [PATCH -next v18 16/20] riscv: prevent stack corruption by reserving task_pt_regs(p) early
-Date:   Fri, 14 Apr 2023 15:58:39 +0000
-Message-Id: <20230414155843.12963-17-andy.chiu@sifive.com>
+        Albert Ou <aou@eecs.berkeley.edu>
+Subject: [PATCH -next v18 17/20] riscv: kvm: Add V extension to KVM ISA
+Date:   Fri, 14 Apr 2023 15:58:40 +0000
+Message-Id: <20230414155843.12963-18-andy.chiu@sifive.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20230414155843.12963-1-andy.chiu@sifive.com>
 References: <20230414155843.12963-1-andy.chiu@sifive.com>
@@ -78,53 +72,47 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Greentime Hu <greentime.hu@sifive.com>
+From: Vincent Chen <vincent.chen@sifive.com>
 
-Early function calls, such as setup_vm(), relocate_enable_mmu(),
-soc_early_init() etc, are free to operate on stack. However,
-PT_SIZE_ON_STACK bytes at the head of the kernel stack are purposedly
-reserved for the placement of per-task register context pointed by
-task_pt_regs(p). Those functions may corrupt task_pt_regs if we overlap
-the $sp with it. In fact, we had accidentally corrupted sstatus.VS in some
-tests, treating the kernel to save V context before V was actually
-allocated, resulting in a kernel panic.
+Add V extension to KVM isa extension list to enable supporting of V
+extension on VCPUs.
 
-Thus, we should skip PT_SIZE_ON_STACK for $sp before making C function
-calls from the top-level assembly.
-
-Co-developed-by: ShihPo Hung <shihpo.hung@sifive.com>
-Signed-off-by: ShihPo Hung <shihpo.hung@sifive.com>
-Co-developed-by: Vincent Chen <vincent.chen@sifive.com>
 Signed-off-by: Vincent Chen <vincent.chen@sifive.com>
 Signed-off-by: Greentime Hu <greentime.hu@sifive.com>
 Signed-off-by: Andy Chiu <andy.chiu@sifive.com>
 Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
+Reviewed-by: Anup Patel <anup@brainfault.org>
+Acked-by: Anup Patel <anup@brainfault.org>
 Reviewed-by: Heiko Stuebner <heiko.stuebner@vrull.eu>
-Tested-by: Heiko Stuebner <heiko.stuebner@vrull.eu>
 ---
- arch/riscv/kernel/head.S | 2 ++
- 1 file changed, 2 insertions(+)
+ arch/riscv/include/uapi/asm/kvm.h | 1 +
+ arch/riscv/kvm/vcpu.c             | 1 +
+ 2 files changed, 2 insertions(+)
 
-diff --git a/arch/riscv/kernel/head.S b/arch/riscv/kernel/head.S
-index e16bb2185d55..11c3b94c4534 100644
---- a/arch/riscv/kernel/head.S
-+++ b/arch/riscv/kernel/head.S
-@@ -301,6 +301,7 @@ clear_bss_done:
- 	la tp, init_task
- 	la sp, init_thread_union + THREAD_SIZE
- 	XIP_FIXUP_OFFSET sp
-+	addi sp, sp, -PT_SIZE_ON_STACK
- #ifdef CONFIG_BUILTIN_DTB
- 	la a0, __dtb_start
- 	XIP_FIXUP_OFFSET a0
-@@ -318,6 +319,7 @@ clear_bss_done:
- 	/* Restore C environment */
- 	la tp, init_task
- 	la sp, init_thread_union + THREAD_SIZE
-+	addi sp, sp, -PT_SIZE_ON_STACK
+diff --git a/arch/riscv/include/uapi/asm/kvm.h b/arch/riscv/include/uapi/asm/kvm.h
+index e44c1e90eaa7..d562dcb929ea 100644
+--- a/arch/riscv/include/uapi/asm/kvm.h
++++ b/arch/riscv/include/uapi/asm/kvm.h
+@@ -107,6 +107,7 @@ enum KVM_RISCV_ISA_EXT_ID {
+ 	KVM_RISCV_ISA_EXT_ZIHINTPAUSE,
+ 	KVM_RISCV_ISA_EXT_ZICBOM,
+ 	KVM_RISCV_ISA_EXT_ZICBOZ,
++	KVM_RISCV_ISA_EXT_V,
+ 	KVM_RISCV_ISA_EXT_MAX,
+ };
  
- #ifdef CONFIG_KASAN
- 	call kasan_early_init
+diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
+index 6adb1b6112a1..bfdd5b73d462 100644
+--- a/arch/riscv/kvm/vcpu.c
++++ b/arch/riscv/kvm/vcpu.c
+@@ -57,6 +57,7 @@ static const unsigned long kvm_isa_ext_arr[] = {
+ 	[KVM_RISCV_ISA_EXT_H] = RISCV_ISA_EXT_h,
+ 	[KVM_RISCV_ISA_EXT_I] = RISCV_ISA_EXT_i,
+ 	[KVM_RISCV_ISA_EXT_M] = RISCV_ISA_EXT_m,
++	[KVM_RISCV_ISA_EXT_V] = RISCV_ISA_EXT_v,
+ 
+ 	KVM_ISA_EXT_ARR(SSTC),
+ 	KVM_ISA_EXT_ARR(SVINVAL),
 -- 
 2.17.1
 
