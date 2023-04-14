@@ -2,62 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 54B5B6E28C8
-	for <lists+kvm@lfdr.de>; Fri, 14 Apr 2023 18:56:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0C0FE6E28F5
+	for <lists+kvm@lfdr.de>; Fri, 14 Apr 2023 19:07:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230260AbjDNQ4D (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Apr 2023 12:56:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56184 "EHLO
+        id S229468AbjDNRHF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 Apr 2023 13:07:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35444 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229778AbjDNQ4C (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 14 Apr 2023 12:56:02 -0400
-Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73BBF4230
-        for <kvm@vger.kernel.org>; Fri, 14 Apr 2023 09:55:55 -0700 (PDT)
-Received: by mail-pl1-x649.google.com with SMTP id n3-20020a170903110300b001a50ede5078so11652910plh.8
-        for <kvm@vger.kernel.org>; Fri, 14 Apr 2023 09:55:55 -0700 (PDT)
+        with ESMTP id S229561AbjDNRHE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 14 Apr 2023 13:07:04 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66CDEE9
+        for <kvm@vger.kernel.org>; Fri, 14 Apr 2023 10:07:02 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id f66-20020a255145000000b00b7f75c3cafdso4084163ybb.16
+        for <kvm@vger.kernel.org>; Fri, 14 Apr 2023 10:07:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1681491355; x=1684083355;
+        d=google.com; s=20221208; t=1681492021; x=1684084021;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=/CHSlTSd3N8g44bYo+dzvuKpfboW/yvp0BrTP/tMkTE=;
-        b=dV95e0sZyjnS6hOCoSmYE4HHtgh8oBiwz76SZWvJGB8ksgh3z/Hk42+hzRlELv4pY3
-         eOYGg/2rRkvWAPOBAcecfJrf0UpuLLeHKlK2dG3YtTFBirK3mAxPJnIn2Qn0UBKavn8U
-         vIIBNyvRHXvVJqekReX1XbAIeomHB6DC+vjJ6KG8A+AH2412vT+pkwBBmFhNQ/lRlbCr
-         rt4ZtujWcy+yJtbQibYk+YjWA7QDr8ndcPmk1XBkHHurmUAb01lF3B5lOKRYNby9cK7j
-         BLjrHltpt775eTCGO9Ku+YkAGUvtvJAKuuHp6MOHWqf62LY/mk4QqYhO3bVLasDciat+
-         RGpg==
+        bh=wDseySW9a2X7Qw1Sb9G9CgyISJMWN8rI1x6WKWTmJyo=;
+        b=ElymJGTZORqnkdX+LifBKgFphfCEVEy1d024fr+67V4qBmQ2e3LHA1P4/5AFoTDrAK
+         n7IeTEglCOD5+s9Yyf7odF0sgQBJAOceEBCkvOHysK1Dl26uWwXNooa3Ve2maOAA+EXa
+         RuG5yhvYFWVUEF2SNkkNkyGCSoP5fSF3F5I/76n4M6162VODJGGMZh3WfS0G6zfGm7Y9
+         MsflPZu+G+dRHRXNjxtOZ0Nk5BXHPlKlQuEeFvKDpRjhsJAVq8hLlE0vYdYy+AOavLsM
+         4VdepFJFp2OlkznQwbrZjvSXw35seTJPYZzNYNMwxIHzTUisJ4Fh7Yf6H2VC4/aVs3kX
+         33Kw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681491355; x=1684083355;
+        d=1e100.net; s=20221208; t=1681492021; x=1684084021;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/CHSlTSd3N8g44bYo+dzvuKpfboW/yvp0BrTP/tMkTE=;
-        b=IeiWrTwlgHqPU2u/UB3tPZ+bXv6OdED4sifUCYzGen1L2QJZsHkG25cuFgAWijb9OI
-         DWE73G3A3FOBVNHu+srXg0Y1EBb3/LzaalvagcCiJAZshw7sywjaxq5c6OQC82VZJHfl
-         4iVExg1v1pOcs507sIoO1KWMav949sEfkHitn6Saxiidi9xJ124jm/X1avkAqpOa1Ng4
-         8DnJSdrWvnADetKul1lev8cQkOnOo+oLGloS2idxUsfUExYnyb9jz4vv+Y+q75UmtUvH
-         bA5Q4kMKUUWt4NswFVQg5M6Woho0iaEhp9D2ccfLAdTHf3vHbNrFf9rjQkauCTx4TwXs
-         QSeQ==
-X-Gm-Message-State: AAQBX9frDS1sisHilAfuUJRlu3qBliTKJWL+xuMGRm6Wc+QxDkHjK6GB
-        Rs9xr21pM3E2qNI4NA3ZheDz7EsLQ6I=
-X-Google-Smtp-Source: AKy350adQowQwr3yxq3+IS2GGOLLapJUyeAl/BrmgjtSTRz1FWIGg26Fs6Ub5ZHTWEJYNBqfqo6Z0of1QQk=
+        bh=wDseySW9a2X7Qw1Sb9G9CgyISJMWN8rI1x6WKWTmJyo=;
+        b=Yk6fd6Zb92CSCrcl89oDQqUeiOcqwevHqdaaao8m9PoOPXrRTUoOQn8b0tyvykHGs5
+         t8b3B136cwlyfsNxjKzpsEYo7lmWwcWqOoJ/MNbJ9KR8nsaEeQEWCl/2R2czpHUEJ/7n
+         Dsg7oFPcyMvFvCaWX2Nbn3N2PKs7DI3x1SmRrnYuf4FbKTG1h/rjvhdVRXgJsX1936qY
+         dRHpB56HwAt1bTYAWJdTIqWVX0Vxo8/vGolcZy+/oyj7G9MocGcTs6YapkGVO4FSAfdM
+         EHmVZtOaQWQP74QK1bdb1rOfdTHcjti8CAsKfdeQ3qiX0PL1JrhyMQxdYP72j8hbUn1C
+         cadg==
+X-Gm-Message-State: AAQBX9e12cYTWM2VG2QgaSmCfEv6PRz4NRrt5k1PHCxtcRej7XVxbovr
+        oconBhhc11hIh4IQEUcSwpYBN4SbtKg=
+X-Google-Smtp-Source: AKy350Yat8GT3+tQtPKHn5QSYC3aQP0t7/vwRLFqPeHO7FhubHdEiGDN4FLO5CLDgp8jDvHiAI4diwo8Szo=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a63:a619:0:b0:51b:3c11:fb17 with SMTP id
- t25-20020a63a619000000b0051b3c11fb17mr984161pge.12.1681491354873; Fri, 14 Apr
- 2023 09:55:54 -0700 (PDT)
-Date:   Fri, 14 Apr 2023 09:55:53 -0700
-In-Reply-To: <7332d846-fada-eb5c-6068-18ff267bd37f@linux.microsoft.com>
+ (user=seanjc job=sendgmr) by 2002:a25:d28a:0:b0:b8f:359f:2a20 with SMTP id
+ j132-20020a25d28a000000b00b8f359f2a20mr3369573ybg.10.1681492021711; Fri, 14
+ Apr 2023 10:07:01 -0700 (PDT)
+Date:   Fri, 14 Apr 2023 10:05:28 -0700
+In-Reply-To: <20230414080809.1678603-1-colin.i.king@gmail.com>
 Mime-Version: 1.0
-References: <20230413231251.1481410-1-seanjc@google.com> <7332d846-fada-eb5c-6068-18ff267bd37f@linux.microsoft.com>
-Message-ID: <ZDmFmfPWmGxX855M@google.com>
-Subject: Re: [PATCH] KVM: x86: Preserve TDP MMU roots until they are
- explicitly invalidated
+References: <20230414080809.1678603-1-colin.i.king@gmail.com>
+X-Mailer: git-send-email 2.40.0.634.g4ca3ef3211-goog
+Message-ID: <168149189684.1511520.17004133772489176964.b4-ty@google.com>
+Subject: Re: [PATCH][next] KVM: selftests: Fix spelling mistake "perrmited" -> "permitted"
 From:   Sean Christopherson <seanjc@google.com>
-To:     Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, David Matlack <dmatlack@google.com>,
-        Ben Gardon <bgardon@google.com>
-Content-Type: text/plain; charset="us-ascii"
+To:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Shuah Khan <shuah@kernel.org>, kvm@vger.kernel.org,
+        linux-kselftest@vger.kernel.org,
+        Colin Ian King <colin.i.king@gmail.com>
+Cc:     kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
@@ -68,37 +70,16 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Apr 14, 2023, Jeremi Piotrowski wrote:
-> On 4/14/2023 1:12 AM, Sean Christopherson wrote:
-> > Preserve TDP MMU roots until they are explicitly invalidated by gifting
-> > the TDP MMU itself a reference to a root when it is allocated.  Keeping a
-> > reference in the TDP MMU fixes a flaw where the TDP MMU exhibits terrible
-> > performance, and can potentially even soft-hang a vCPU, if a vCPU
-> > frequently unloads its roots, e.g. when KVM is emulating SMI+RSM.
+On Fri, 14 Apr 2023 09:08:09 +0100, Colin Ian King wrote:
+> There is a spelling mistake in a test report message. Fix it.
 
-...
+Once again, your spell checker laughs dirisively at my futile attempts.
 
-> Thank you, I just tested this and it works wonderfully! Is this still on time for 6.3?
+Applied to kvm-x86 selftests, thanks!
 
-This is too risky for 6.3, but I am comfortable applying it for 6.4.
+[1/1] KVM: selftests: Fix spelling mistake "perrmited" -> "permitted"
+      https://github.com/kvm-x86/linux/commit/20aef201dafb
 
-> In case you need it:
-> 
-> Tested-by: Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>
-> 
-> I'd also like to get this backported all the way back to 5.15 because the issue is
-> already present there. I tried it myself, but this was before async zap and i'm
-> doing something wrong with refcounts:
-
-For 5.15, I think our best bet is to just disable the TDP MMU by default.  There
-have been a _lot_ of relevant changes since 5.15, I am skeptical that this patch
-can be backported to 5.15 without pulling in a big pile of changes from between
-5.15 and 6.1 or so.
-
-I added you to a related thread[*] about TDP MMU backports for 5.15, let's continue
-the 5.15 discussion there.
-
-Thanks!
-
-
-[*] https://lore.kernel.org/all/ZDmEGM+CgYpvDLh6@google.com
+--
+https://github.com/kvm-x86/linux/tree/next
+https://github.com/kvm-x86/linux/tree/fixes
