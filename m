@@ -2,272 +2,331 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CCC466EF94A
-	for <lists+kvm@lfdr.de>; Wed, 26 Apr 2023 19:24:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5D4946F1CF2
+	for <lists+kvm@lfdr.de>; Fri, 28 Apr 2023 18:53:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236413AbjDZRYL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 Apr 2023 13:24:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47410 "EHLO
+        id S1346385AbjD1QxW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 Apr 2023 12:53:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36670 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236147AbjDZRYB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 Apr 2023 13:24:01 -0400
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5099F6A60
-        for <kvm@vger.kernel.org>; Wed, 26 Apr 2023 10:23:55 -0700 (PDT)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-54f8b418ee6so62730247b3.1
-        for <kvm@vger.kernel.org>; Wed, 26 Apr 2023 10:23:55 -0700 (PDT)
+        with ESMTP id S230162AbjD1QxU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 28 Apr 2023 12:53:20 -0400
+Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 551914EE2;
+        Fri, 28 Apr 2023 09:53:15 -0700 (PDT)
+Received: by mail-pf1-x430.google.com with SMTP id d2e1a72fcca58-63b60365f53so289170b3a.0;
+        Fri, 28 Apr 2023 09:53:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1682529834; x=1685121834;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=m+oefhIeGqQv7kcts3DeT+bDBD9GfaJeIsIEbk17fF4=;
-        b=VddcYRxHevgdNcjnEnqgvoIS4ubgbk2iGGD0V/fEWxnV2Hi+LEXfFlHqMxMD4i6x4I
-         V9sVT15auVYP+Ii25CEjxGwRT9sVse+UoCQyeYO7n8rGzmw+ehBxqzQRoNU08qXCSwXW
-         PmpCAVgEbq/fZEGgzPl1P39ZtHqZUKa9zzhMam1DUWllAejzCPBt4et2iPXpFx3qREJU
-         mNWmemSnVzHNWRzWeVf1M0CV51P0kdtebP9HMh/B806yZ60wJ7D3/c56b3pduxSoudFm
-         /u5evlUO3gdSFdI3l8pRzsbxYKwGlNctpmtCCEzlF7n3L7vlSjhRR+lQ9/KJXMuglWXy
-         dbNw==
+        d=gmail.com; s=20221208; t=1682700794; x=1685292794;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=+QxcQwmg1pmTbHSBnT1S2CE2e3/rXWNKIsYLDVewC9E=;
+        b=Wiutx5Gpr7taZmNu+Ji2c8cnLN8GhPjQkgf+V6KmoCZG2yIF0DS6vfXgZLBYdpk3wS
+         lvSnITCY9ViuWNNROFqRNZ3P0dqMLWXia7ISHt8jZzeaDag6oQxCWJjSXjEk7tbODPmJ
+         2ZYdfrW2ban6rmdFfsrMAoqFPJdjFAybT+lm3IOjmEayaCQbomW08SWtE7fZjLZB1hEH
+         YvLcU00s5qUVpTt8RNdN549h8nBEldgnawWPC3X+PDyPn+b/6zxy6aZJ6ItH3QNMVzLL
+         wk4ipQwefzsGXkk7pRFCiwDefZn2lsvGSKTgearOcNVFQU/QUtrUyrtA9B60Ar6gYV+Q
+         7qxQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682529834; x=1685121834;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=m+oefhIeGqQv7kcts3DeT+bDBD9GfaJeIsIEbk17fF4=;
-        b=jJDEzlimDWHx0mq1t3uWs8qoqzu8EmBlpODFmOUDAUQBz7/dFtrFNsLXBoVQJ7MrDB
-         h4Gsg+xyBADpoeYlX4cdaqzkpeLATtgFVH6hZLR1/OqCCA+7wny1NVDu9pLrSn4wYePr
-         CECH+Upqh2beHl9k9cxe989eYiZXgmC66h3XyhHTXAqGZJAIz3NFSzQ0aGUMc2/U06Xq
-         /Dz8i82uQokioUb+Dfc7J4fxGOK8sY7obl32TxbWdLbdBeACmkHEptniZCao1iRRCNei
-         FucrL7siri2tHIc5ITXM5UrdKES7ivFiHKxvRbJIKZw9qGpNwt9Ol3mWhUrdGGm04Nwg
-         ioow==
-X-Gm-Message-State: AAQBX9dzwEV6ye4AXgMH8jtcO5m8OpLbyFcJHpPRARToRJ84d84leaoH
-        1Af+/qn13yfLKK8W4x3E1wsO+hT/7Jil+A==
-X-Google-Smtp-Source: AKy350ZA27z2gxmhn5kOicEbwIhaoOFA878owBygDLj2bScZYkFiQ/pSEUkISRZpACPBAC2/lGFq+zMwi0XQ6A==
-X-Received: from ricarkol4.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:1248])
- (user=ricarkol job=sendgmr) by 2002:a81:af5b:0:b0:54f:b56a:cd0f with SMTP id
- x27-20020a81af5b000000b0054fb56acd0fmr10958317ywj.3.1682529834638; Wed, 26
- Apr 2023 10:23:54 -0700 (PDT)
-Date:   Wed, 26 Apr 2023 17:23:30 +0000
-In-Reply-To: <20230426172330.1439644-1-ricarkol@google.com>
-Mime-Version: 1.0
-References: <20230426172330.1439644-1-ricarkol@google.com>
-X-Mailer: git-send-email 2.40.1.495.gc816e09b53d-goog
-Message-ID: <20230426172330.1439644-13-ricarkol@google.com>
-Subject: [PATCH v8 12/12] KVM: arm64: Use local TLBI on permission relaxation
-From:   Ricardo Koller <ricarkol@google.com>
-To:     pbonzini@redhat.com, maz@kernel.org, oupton@google.com,
-        yuzenghui@huawei.com, dmatlack@google.com
-Cc:     kvm@vger.kernel.org, kvmarm@lists.linux.dev, qperret@google.com,
-        catalin.marinas@arm.com, andrew.jones@linux.dev, seanjc@google.com,
-        alexandru.elisei@arm.com, suzuki.poulose@arm.com,
-        eric.auger@redhat.com, gshan@redhat.com, reijiw@google.com,
-        rananta@google.com, bgardon@google.com, ricarkol@gmail.com,
-        Ricardo Koller <ricarkol@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        d=1e100.net; s=20221208; t=1682700794; x=1685292794;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+QxcQwmg1pmTbHSBnT1S2CE2e3/rXWNKIsYLDVewC9E=;
+        b=VSvQBptH1MoVw/aag6KVtoTsegLmAvNzFho5mO2cFZ29m11lCfURhZtUZWHHvHrgfp
+         VGiphmthUoKWC7fAeuVsKZOY0cNmChJFlok8nLJEcAyZ+klDMYqQHX8kxcB3cSvLwVMh
+         Ol4T+WGep3d6kD1w8/Fc9Hpu/AVSd177MqYa4VMbFgxINEUyB2uqm4dv/tiSNAKgat+J
+         VN5Ms6id3u0okR2cdqYrBKzpms2KEDbSlSZTKVRVGXVHluHvIdQIWZkgI0eFssiFgeVe
+         ApNYKyBc7xUPdG3HDcGYZ4aouCHxlfnokvB0tbz6kLLiuvrfFUSm3zDCXlCfryi56yFb
+         mRkA==
+X-Gm-Message-State: AC+VfDw8peAOlaHyC20aaRQIrR7MIL4doNqqhLkCYVi0SttHDsqj3/A8
+        4GgjUNBGR26jIk2BwFP8Gl0=
+X-Google-Smtp-Source: ACHHUZ5xW1hI0KanevVm2aPZoOfGyAC5BsDffd4bfkw4RrbQn5BHotv4Ve9RRw1/sZwpWyqWIYQcdA==
+X-Received: by 2002:a05:6a20:2d0a:b0:f5:607f:b78 with SMTP id g10-20020a056a202d0a00b000f5607f0b78mr6332078pzl.27.1682700794236;
+        Fri, 28 Apr 2023 09:53:14 -0700 (PDT)
+Received: from localhost (c-73-25-35-85.hsd1.wa.comcast.net. [73.25.35.85])
+        by smtp.gmail.com with ESMTPSA id l21-20020a63ea55000000b005287a0560c9sm5581217pgk.1.2023.04.28.09.53.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 28 Apr 2023 09:53:13 -0700 (PDT)
+Date:   Sat, 15 Apr 2023 15:55:05 +0000
+From:   Bobby Eshleman <bobbyeshleman@gmail.com>
+To:     Stefano Garzarella <sgarzare@redhat.com>
+Cc:     Vishnu Dasa <vdasa@vmware.com>, virtio-dev@lists.oasis-open.org,
+        linux-hyperv@vger.kernel.org, Cong Wang <cong.wang@bytedance.com>,
+        Bobby Eshleman <bobby.eshleman@bytedance.com>,
+        kvm@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>,
+        VMware PV-Drivers Reviewers <pv-drivers@vmware.com>,
+        netdev@vger.kernel.org, Haiyang Zhang <haiyangz@microsoft.com>,
+        Dexuan Cui <decui@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
+        virtualization@lists.linux-foundation.org,
+        Bryan Tan <bryantan@vmware.com>,
+        Eric Dumazet <edumazet@google.com>,
+        Jiang Wang <jiang.wang@bytedance.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH RFC net-next v2 0/4] virtio/vsock: support datagrams
+Message-ID: <ZDrI2bBhiamYBKUB@bullseye>
+References: <20230413-b4-vsock-dgram-v2-0-079cc7cee62e@bytedance.com>
+ <ZDk2kOVnUvyLMLKE@bullseye>
+ <r6oxanmhwlonb7lcrrowpitlgobivzp7pcwk7snqvfnzudi6pb@4rnio5wef3qu>
+ <ZDpOq0ACuMYIUbb1@bullseye>
+ <yeu57zqwzcx33sylp565xgw7yv72qyczohkmukyex27rcdh6mr@w4x6t4enx6iu>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <yeu57zqwzcx33sylp565xgw7yv72qyczohkmukyex27rcdh6mr@w4x6t4enx6iu>
+X-Spam-Status: No, score=1.3 required=5.0 tests=BAYES_00,DATE_IN_PAST_96_XX,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Level: *
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Marc Zyngier <maz@kernel.org>
+On Fri, Apr 28, 2023 at 12:43:09PM +0200, Stefano Garzarella wrote:
+> On Sat, Apr 15, 2023 at 07:13:47AM +0000, Bobby Eshleman wrote:
+> > CC'ing virtio-dev@lists.oasis-open.org because this thread is starting
+> > to touch the spec.
+> > 
+> > On Wed, Apr 19, 2023 at 12:00:17PM +0200, Stefano Garzarella wrote:
+> > > Hi Bobby,
+> > > 
+> > > On Fri, Apr 14, 2023 at 11:18:40AM +0000, Bobby Eshleman wrote:
+> > > > CC'ing Cong.
+> > > >
+> > > > On Fri, Apr 14, 2023 at 12:25:56AM +0000, Bobby Eshleman wrote:
+> > > > > Hey all!
+> > > > >
+> > > > > This series introduces support for datagrams to virtio/vsock.
+> > > 
+> > > Great! Thanks for restarting this work!
+> > > 
+> > 
+> > No problem!
+> > 
+> > > > >
+> > > > > It is a spin-off (and smaller version) of this series from the summer:
+> > > > >   https://lore.kernel.org/all/cover.1660362668.git.bobby.eshleman@bytedance.com/
+> > > > >
+> > > > > Please note that this is an RFC and should not be merged until
+> > > > > associated changes are made to the virtio specification, which will
+> > > > > follow after discussion from this series.
+> > > > >
+> > > > > This series first supports datagrams in a basic form for virtio, and
+> > > > > then optimizes the sendpath for all transports.
+> > > > >
+> > > > > The result is a very fast datagram communication protocol that
+> > > > > outperforms even UDP on multi-queue virtio-net w/ vhost on a variety
+> > > > > of multi-threaded workload samples.
+> > > > >
+> > > > > For those that are curious, some summary data comparing UDP and VSOCK
+> > > > > DGRAM (N=5):
+> > > > >
+> > > > > 	vCPUS: 16
+> > > > > 	virtio-net queues: 16
+> > > > > 	payload size: 4KB
+> > > > > 	Setup: bare metal + vm (non-nested)
+> > > > >
+> > > > > 	UDP: 287.59 MB/s
+> > > > > 	VSOCK DGRAM: 509.2 MB/s
+> > > > >
+> > > > > Some notes about the implementation...
+> > > > >
+> > > > > This datagram implementation forces datagrams to self-throttle according
+> > > > > to the threshold set by sk_sndbuf. It behaves similar to the credits
+> > > > > used by streams in its effect on throughput and memory consumption, but
+> > > > > it is not influenced by the receiving socket as credits are.
+> > > 
+> > > So, sk_sndbuf influece the sender and sk_rcvbuf the receiver, right?
+> > > 
+> > 
+> > Correct.
+> > 
+> > > We should check if VMCI behaves the same.
+> > > 
+> > > > >
+> > > > > The device drops packets silently. There is room for improvement by
+> > > > > building into the device and driver some intelligence around how to
+> > > > > reduce frequency of kicking the virtqueue when packet loss is high. I
+> > > > > think there is a good discussion to be had on this.
+> > > 
+> > > Can you elaborate a bit here?
+> > > 
+> > > Do you mean some mechanism to report to the sender that a destination
+> > > (cid, port) is full so the packet will be dropped?
+> > > 
+> > 
+> > Correct. There is also the case of there being no receiver at all for
+> > this address since this case isn't rejected upon connect(). Ideally,
+> > such a socket (which will have 100% packet loss) will be throttled
+> > aggressively.
+> > 
+> > Before we go down too far on this path, I also want to clarify that
+> > using UDP over vhost/virtio-net also has this property... this can be
+> > observed by using tcpdump to dump the UDP packets on the bridge network
+> > your VM is using. UDP packets sent to a garbage address can be seen on
+> > the host bridge (this is the nature of UDP, how is the host supposed to
+> > know the address eventually goes nowhere). I mention the above because I
+> > think it is possible for vsock to avoid this cost, given that it
+> > benefits from being point-to-point and g2h/h2g.
+> > 
+> > If we're okay with vsock being on par, then the current series does
+> > that. I propose something below that can be added later and maybe
+> > negotiated as a feature bit too.
+> 
+> I see and I agree on that, let's do it step by step.
+> If we can do it in the first phase is great, but I think is fine to add
+> this feature later.
+> 
+> > 
+> > > Can we adapt the credit mechanism?
+> > > 
+> > 
+> > I've thought about this a lot because the attraction of the approach for
+> > me would be that we could get the wait/buffer-limiting logic for free
+> > and without big changes to the protocol, but the problem is that the
+> > unreliable nature of datagrams means that the source's free-running
+> > tx_cnt will become out-of-sync with the destination's fwd_cnt upon
+> > packet loss.
+> 
+> We need to understand where the packet can be lost.
+> If the packet always reaches the destination (vsock driver or device),
+> we can discard it, but also update the counters.
+> 
+> > 
+> > Imagine a source that initializes and starts sending packets before a
+> > destination socket even is created, the source's self-throttling will be
+> > dysfunctional because its tx_cnt will always far exceed the
+> > destination's fwd_cnt.
+> 
+> Right, the other problem I see is that the socket aren't connected, so
+> we have 1-N relationship.
+> 
 
-Broadcast TLB invalidations (TLBIs) targeting the Inner Shareable
-Domain are usually less performant than their non-shareable variant.
-In particular, we observed some implementations that take
-millliseconds to complete parallel broadcasted TLBIs.
+Oh yeah, good point.
 
-It's safe to use non-shareable TLBIs when relaxing permissions on a
-PTE in the KVM case.  According to the ARM ARM (0487I.a) section
-D8.13.1 "Using break-before-make when updating translation table
-entries", permission relaxation does not need break-before-make.
-Specifically, R_WHZWS states that these are the only changes that
-require a break-before-make sequence: changes of memory type
-(Shareability or Cacheability), address changes, or changing the block
-size.
+> > 
+> > We could play tricks with the meaning of the CREDIT_UPDATE message and
+> > fwd_cnt/buf_alloc fields, but I don't think we want to go down that
+> > path.
+> > 
+> > I think that the best and simplest approach introduces a congestion
+> > notification (VIRTIO_VSOCK_OP_CN?). When a packet is dropped, the
+> > destination sends this notification. At a given repeated time period T,
+> > the source can check if it has received any notifications in the last T.
+> > If so, it halves its buffer allocation. If not, it doubles its buffer
+> > allocation unless it is already at its max or original value.
+> > 
+> > An "invalid" socket which never has any receiver will converge towards a
+> > rate limit of one packet per time T * log2(average pkt size). That is, a
+> > socket with 100% packet loss will only be able to send 16 bytes every
+> > 4T. A default send buffer of MAX_UINT32 and T=5ms would hit zero within
+> > 160ms given at least one packet sent per 5ms. I have no idea if that is
+> > a reasonable default T for vsock, I just pulled it out of a hat for the
+> > sake of the example.
+> > 
+> > "Normal" sockets will be responsive to high loss and rebalance during
+> > low loss. The source is trying to guess and converge on the actual
+> > buffer state of the destination.
+> > 
+> > This would reuse the already-existing throttling mechanisms that
+> > throttle based upon buffer allocation. The usage of sk_sndbuf would have
+> > to be re-worked. The application using sendmsg() will see EAGAIN when
+> > throttled, or just sleep if !MSG_DONTWAIT.
+> 
+> I see, it looks interesting, but I think we need to share that
+> information between multiple sockets, since the same destination
+> (cid, port), can be reached by multiple sockets.
+> 
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
-Signed-off-by: Ricardo Koller <ricarkol@google.com>
-Reviewed-by: Gavin Shan <gshan@redhat.com>
----
- arch/arm64/include/asm/kvm_asm.h   |  4 +++
- arch/arm64/kvm/hyp/nvhe/hyp-main.c | 10 ++++++
- arch/arm64/kvm/hyp/nvhe/tlb.c      | 52 ++++++++++++++++++++++++++++++
- arch/arm64/kvm/hyp/pgtable.c       |  2 +-
- arch/arm64/kvm/hyp/vhe/tlb.c       | 32 ++++++++++++++++++
- 5 files changed, 99 insertions(+), 1 deletion(-)
+Good point, that is true.
 
-diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-index 43c3bc0f9544d..bb17b2ead4c71 100644
---- a/arch/arm64/include/asm/kvm_asm.h
-+++ b/arch/arm64/include/asm/kvm_asm.h
-@@ -68,6 +68,7 @@ enum __kvm_host_smccc_func {
- 	__KVM_HOST_SMCCC_FUNC___kvm_vcpu_run,
- 	__KVM_HOST_SMCCC_FUNC___kvm_flush_vm_context,
- 	__KVM_HOST_SMCCC_FUNC___kvm_tlb_flush_vmid_ipa,
-+	__KVM_HOST_SMCCC_FUNC___kvm_tlb_flush_vmid_ipa_nsh,
- 	__KVM_HOST_SMCCC_FUNC___kvm_tlb_flush_vmid,
- 	__KVM_HOST_SMCCC_FUNC___kvm_flush_cpu_context,
- 	__KVM_HOST_SMCCC_FUNC___kvm_timer_set_cntvoff,
-@@ -225,6 +226,9 @@ extern void __kvm_flush_vm_context(void);
- extern void __kvm_flush_cpu_context(struct kvm_s2_mmu *mmu);
- extern void __kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu, phys_addr_t ipa,
- 				     int level);
-+extern void __kvm_tlb_flush_vmid_ipa_nsh(struct kvm_s2_mmu *mmu,
-+					 phys_addr_t ipa,
-+					 int level);
- extern void __kvm_tlb_flush_vmid(struct kvm_s2_mmu *mmu);
- 
- extern void __kvm_timer_set_cntvoff(u64 cntvoff);
-diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-index 728e01d4536b0..c6bf1e49ca934 100644
---- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-+++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-@@ -125,6 +125,15 @@ static void handle___kvm_tlb_flush_vmid_ipa(struct kvm_cpu_context *host_ctxt)
- 	__kvm_tlb_flush_vmid_ipa(kern_hyp_va(mmu), ipa, level);
- }
- 
-+static void handle___kvm_tlb_flush_vmid_ipa_nsh(struct kvm_cpu_context *host_ctxt)
-+{
-+	DECLARE_REG(struct kvm_s2_mmu *, mmu, host_ctxt, 1);
-+	DECLARE_REG(phys_addr_t, ipa, host_ctxt, 2);
-+	DECLARE_REG(int, level, host_ctxt, 3);
-+
-+	__kvm_tlb_flush_vmid_ipa_nsh(kern_hyp_va(mmu), ipa, level);
-+}
-+
- static void handle___kvm_tlb_flush_vmid(struct kvm_cpu_context *host_ctxt)
- {
- 	DECLARE_REG(struct kvm_s2_mmu *, mmu, host_ctxt, 1);
-@@ -315,6 +324,7 @@ static const hcall_t host_hcall[] = {
- 	HANDLE_FUNC(__kvm_vcpu_run),
- 	HANDLE_FUNC(__kvm_flush_vm_context),
- 	HANDLE_FUNC(__kvm_tlb_flush_vmid_ipa),
-+	HANDLE_FUNC(__kvm_tlb_flush_vmid_ipa_nsh),
- 	HANDLE_FUNC(__kvm_tlb_flush_vmid),
- 	HANDLE_FUNC(__kvm_flush_cpu_context),
- 	HANDLE_FUNC(__kvm_timer_set_cntvoff),
-diff --git a/arch/arm64/kvm/hyp/nvhe/tlb.c b/arch/arm64/kvm/hyp/nvhe/tlb.c
-index 978179133f4b9..b9991bbd8e3fd 100644
---- a/arch/arm64/kvm/hyp/nvhe/tlb.c
-+++ b/arch/arm64/kvm/hyp/nvhe/tlb.c
-@@ -130,6 +130,58 @@ void __kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu,
- 	__tlb_switch_to_host(&cxt);
- }
- 
-+void __kvm_tlb_flush_vmid_ipa_nsh(struct kvm_s2_mmu *mmu,
-+				  phys_addr_t ipa, int level)
-+{
-+	struct tlb_inv_context cxt;
-+
-+	/* Switch to requested VMID */
-+	__tlb_switch_to_guest(mmu, &cxt, true);
-+
-+	/*
-+	 * We could do so much better if we had the VA as well.
-+	 * Instead, we invalidate Stage-2 for this IPA, and the
-+	 * whole of Stage-1. Weep...
-+	 */
-+	ipa >>= 12;
-+	__tlbi_level(ipas2e1, ipa, level);
-+
-+	/*
-+	 * We have to ensure completion of the invalidation at Stage-2,
-+	 * since a table walk on another CPU could refill a TLB with a
-+	 * complete (S1 + S2) walk based on the old Stage-2 mapping if
-+	 * the Stage-1 invalidation happened first.
-+	 */
-+	dsb(nsh);
-+	__tlbi(vmalle1);
-+	dsb(nsh);
-+	isb();
-+
-+	/*
-+	 * If the host is running at EL1 and we have a VPIPT I-cache,
-+	 * then we must perform I-cache maintenance at EL2 in order for
-+	 * it to have an effect on the guest. Since the guest cannot hit
-+	 * I-cache lines allocated with a different VMID, we don't need
-+	 * to worry about junk out of guest reset (we nuke the I-cache on
-+	 * VMID rollover), but we do need to be careful when remapping
-+	 * executable pages for the same guest. This can happen when KSM
-+	 * takes a CoW fault on an executable page, copies the page into
-+	 * a page that was previously mapped in the guest and then needs
-+	 * to invalidate the guest view of the I-cache for that page
-+	 * from EL1. To solve this, we invalidate the entire I-cache when
-+	 * unmapping a page from a guest if we have a VPIPT I-cache but
-+	 * the host is running at EL1. As above, we could do better if
-+	 * we had the VA.
-+	 *
-+	 * The moral of this story is: if you have a VPIPT I-cache, then
-+	 * you should be running with VHE enabled.
-+	 */
-+	if (icache_is_vpipt())
-+		icache_inval_all_pou();
-+
-+	__tlb_switch_to_host(&cxt);
-+}
-+
- void __kvm_tlb_flush_vmid(struct kvm_s2_mmu *mmu)
- {
- 	struct tlb_inv_context cxt;
-diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-index 85f42fb2d0d75..8acab89080af9 100644
---- a/arch/arm64/kvm/hyp/pgtable.c
-+++ b/arch/arm64/kvm/hyp/pgtable.c
-@@ -1212,7 +1212,7 @@ int kvm_pgtable_stage2_relax_perms(struct kvm_pgtable *pgt, u64 addr,
- 				       KVM_PGTABLE_WALK_HANDLE_FAULT |
- 				       KVM_PGTABLE_WALK_SHARED);
- 	if (!ret)
--		kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, pgt->mmu, addr, level);
-+		kvm_call_hyp(__kvm_tlb_flush_vmid_ipa_nsh, pgt->mmu, addr, level);
- 	return ret;
- }
- 
-diff --git a/arch/arm64/kvm/hyp/vhe/tlb.c b/arch/arm64/kvm/hyp/vhe/tlb.c
-index 24cef9b87f9e9..e69da550cdc5b 100644
---- a/arch/arm64/kvm/hyp/vhe/tlb.c
-+++ b/arch/arm64/kvm/hyp/vhe/tlb.c
-@@ -111,6 +111,38 @@ void __kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu,
- 	__tlb_switch_to_host(&cxt);
- }
- 
-+void __kvm_tlb_flush_vmid_ipa_nsh(struct kvm_s2_mmu *mmu,
-+				  phys_addr_t ipa, int level)
-+{
-+	struct tlb_inv_context cxt;
-+
-+	dsb(nshst);
-+
-+	/* Switch to requested VMID */
-+	__tlb_switch_to_guest(mmu, &cxt);
-+
-+	/*
-+	 * We could do so much better if we had the VA as well.
-+	 * Instead, we invalidate Stage-2 for this IPA, and the
-+	 * whole of Stage-1. Weep...
-+	 */
-+	ipa >>= 12;
-+	__tlbi_level(ipas2e1, ipa, level);
-+
-+	/*
-+	 * We have to ensure completion of the invalidation at Stage-2,
-+	 * since a table walk on another CPU could refill a TLB with a
-+	 * complete (S1 + S2) walk based on the old Stage-2 mapping if
-+	 * the Stage-1 invalidation happened first.
-+	 */
-+	dsb(nsh);
-+	__tlbi(vmalle1);
-+	dsb(nsh);
-+	isb();
-+
-+	__tlb_switch_to_host(&cxt);
-+}
-+
- void __kvm_tlb_flush_vmid(struct kvm_s2_mmu *mmu)
- {
- 	struct tlb_inv_context cxt;
--- 
-2.40.1.495.gc816e09b53d-goog
+> Another approach could be to have both congestion notification and
+> decongestion, but maybe it produces double traffic.
+> 
 
+I think this could simplify things and could reduce noise. It is also
+probably sufficient for the source to simply halt upon congestion
+notification and resume upon decongestion notification, instead of
+scaling up and down like I suggested above. It also avoids the
+burstiness that would occur with a "congestion notification"-only
+approach where the source guesses when to resume and guesses wrong.
+
+The congestion notification may want to have an expiration period after
+which the sender can resume without receiving a decongestion
+notification? If it receives congestion again, then it can halt again.
+
+> > 
+> > I looked at alternative schemes (like the Datagram Congestion Control
+> > Protocol), but I do not think the added complexity is necessary in the
+> > case of vsock (DCCP requires congestion windows, sequence numbers, batch
+> > acknowledgements, etc...). I also looked at UDP-based application
+> > protocols like TFTP, DHCP, and SIP over UDP which use a delay-based
+> > backoff mechanism, but seem to require acknowledgement for those packet
+> > types, which trigger the retries and backoffs. I think we can get away
+> > with the simpler approach and not have to potentially kill performance
+> > with per-packet acknowledgements.
+> 
+> Yep I agree. I think our advantage is that the channel (virtqueues),
+> can't lose packets.
+> 
+
+Exactly.
+
+> > 
+> > > > >
+> > > > > In this series I am also proposing that fairness be reexamined as an
+> > > > > issue separate from datagrams, which differs from my previous series
+> > > > > that coupled these issues. After further testing and reflection on the
+> > > > > design, I do not believe that these need to be coupled and I do not
+> > > > > believe this implementation introduces additional unfairness or
+> > > > > exacerbates pre-existing unfairness.
+> > > 
+> > > I see.
+> > > 
+> > > > >
+> > > > > I attempted to characterize vsock fairness by using a pool of processes
+> > > > > to stress test the shared resources while measuring the performance of a
+> > > > > lone stream socket. Given unfair preference for datagrams, we would
+> > > > > assume that a lone stream socket would degrade much more when a pool of
+> > > > > datagram sockets was stressing the system than when a pool of stream
+> > > > > sockets are stressing the system. The result, however, showed no
+> > > > > significant difference between the degradation of throughput of the lone
+> > > > > stream socket when using a pool of datagrams to stress the queue over
+> > > > > using a pool of streams. The absolute difference in throughput actually
+> > > > > favored datagrams as interfering least as the mean difference was +16%
+> > > > > compared to using streams to stress test (N=7), but it was not
+> > > > > statistically significant. Workloads were matched for payload size and
+> > > > > buffer size (to approximate memory consumption) and process count, and
+> > > > > stress workloads were configured to start before and last long after the
+> > > > > lifetime of the "lone" stream socket flow to ensure that competing flows
+> > > > > were continuously hot.
+> > > > >
+> > > > > Given the above data, I propose that vsock fairness be addressed
+> > > > > independent of datagrams and to defer its implementation to a future
+> > > > > series.
+> > > 
+> > > Makes sense to me.
+> > > 
+> > > I left some preliminary comments, anyway now it seems reasonable to use
+> > > the same virtqueues, so we can go head with the spec proposal.
+> > > 
+> > > Thanks,
+> > > Stefano
+> > > 
+> > 
+> > Thanks for the review!
+> 
+> You're welcome!
+> 
+> Stefano
+> 
+
+Best,
+Bobby
