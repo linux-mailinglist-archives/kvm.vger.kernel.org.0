@@ -2,74 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C913A6E2DE8
-	for <lists+kvm@lfdr.de>; Sat, 15 Apr 2023 02:28:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2AB486E2E05
+	for <lists+kvm@lfdr.de>; Sat, 15 Apr 2023 02:54:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229945AbjDOA2M (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Apr 2023 20:28:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49402 "EHLO
+        id S229820AbjDOAyI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 Apr 2023 20:54:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56344 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229457AbjDOA2L (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 14 Apr 2023 20:28:11 -0400
-Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB4893A96;
-        Fri, 14 Apr 2023 17:28:09 -0700 (PDT)
-Received: from fsav412.sakura.ne.jp (fsav412.sakura.ne.jp [133.242.250.111])
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 33F0Q4r1034541;
-        Sat, 15 Apr 2023 09:26:04 +0900 (JST)
-        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Received: from www262.sakura.ne.jp (202.181.97.72)
- by fsav412.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav412.sakura.ne.jp);
- Sat, 15 Apr 2023 09:26:04 +0900 (JST)
-X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav412.sakura.ne.jp)
-Received: from [192.168.1.6] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
-        (authenticated bits=0)
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 33F0Pqw2034458
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
-        Sat, 15 Apr 2023 09:26:03 +0900 (JST)
-        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Message-ID: <e715ec72-682f-291c-7131-8355843660d0@I-love.SAKURA.ne.jp>
-Date:   Sat, 15 Apr 2023 09:25:51 +0900
+        with ESMTP id S229457AbjDOAyH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 14 Apr 2023 20:54:07 -0400
+Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C09514EFB;
+        Fri, 14 Apr 2023 17:54:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1681520045; x=1713056045;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=BaBaSZvIdqqeUdPYY6SOwnbn8OIbBnqhJrQSQnGFXNI=;
+  b=jcGYIL4p+9xqUvkfzBF52fKD5tm9hTCSdfO9fJnNMKgnRVO9uNgW92fm
+   vgbZf/WozTx1u0hMsHfkZKSDC0qaHlfGdnfGHaBtWWCK4nrtu9PI1c2/W
+   eZpO/rodK+nK196CJnIwgBWPGMwJNn/zySfWdeAIk9ETEntupmaLWAV64
+   2V9TZgxuhqjQ3+8Jqo47L/EH9gAUZH2ymnWLZI+Fg8tuSElYGAJ1vYNa1
+   Pq9DveN/RJf2XUXCkUrqpOKXd5cDSJCvcvxEH5pkQom9JEkKEJEuUK8ne
+   7cJDwk3Z2z64FNi/0P7AG/wGN+6CuCfiJNjRKy4owVGHWf8CivuL/cs05
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10680"; a="342093259"
+X-IronPort-AV: E=Sophos;i="5.99,198,1677571200"; 
+   d="scan'208";a="342093259"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Apr 2023 17:54:05 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10680"; a="833736948"
+X-IronPort-AV: E=Sophos;i="5.99,198,1677571200"; 
+   d="scan'208";a="833736948"
+Received: from lkp-server01.sh.intel.com (HELO b613635ddfff) ([10.239.97.150])
+  by fmsmga001.fm.intel.com with ESMTP; 14 Apr 2023 17:54:01 -0700
+Received: from kbuild by b613635ddfff with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1pnUAy-000aC1-10;
+        Sat, 15 Apr 2023 00:54:00 +0000
+Date:   Sat, 15 Apr 2023 08:53:32 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Jinrong Liang <ljr.kernel@gmail.com>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     oe-kbuild-all@lists.linux.dev, Like Xu <like.xu.linux@gmail.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Shuah Khan <skhan@linuxfoundation.org>,
+        Aaron Lewis <aaronlewis@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jinrong Liang <cloudliang@tencent.com>,
+        linux-kselftest@vger.kernel.org, linux-doc@vger.kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 4/7] KVM: x86/pmu: Add documentation for fixed ctr on PMU
+ filter
+Message-ID: <202304150850.rx4UDDsB-lkp@intel.com>
+References: <20230414110056.19665-5-cloudliang@tencent.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Subject: Re: [PATCH 3/7] mm/gup: remove vmas parameter from
- get_user_pages_remote()
-Content-Language: en-US
-To:     Lorenzo Stoakes <lstoakes@gmail.com>,
-        Andrew Morton <akpm@linux-foundation.org>
-Cc:     linux-mm@kvack.org, linux-kernel@vger.kernel.org
-References: <cover.1681508038.git.lstoakes@gmail.com>
- <5a4cf1ebf1c6cdfabbf2f5209facb0180dd20006.1681508038.git.lstoakes@gmail.com>
-From:   Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-In-Reply-To: <5a4cf1ebf1c6cdfabbf2f5209facb0180dd20006.1681508038.git.lstoakes@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230414110056.19665-5-cloudliang@tencent.com>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2023/04/15 8:27, Lorenzo Stoakes wrote:
-> diff --git a/arch/arm64/kernel/mte.c b/arch/arm64/kernel/mte.c
-> index f5bcb0dc6267..74d8d4007dec 100644
-> --- a/arch/arm64/kernel/mte.c
-> +++ b/arch/arm64/kernel/mte.c
-> @@ -437,8 +437,9 @@ static int __access_remote_tags(struct mm_struct *mm, unsigned long addr,
->  		struct page *page = NULL;
->  
->  		ret = get_user_pages_remote(mm, addr, 1, gup_flags, &page,
-> -					    &vma, NULL);
-> -		if (ret <= 0)
-> +					    NULL);
-> +		vma = vma_lookup(mm, addr);
-> +		if (ret <= 0 || !vma)
->  			break;
+Hi Jinrong,
 
-This conversion looks wrong. When get_user_pages_remote(&page) returned > 0,
-put_page(page) is needed even if vma_lookup() returned NULL, isn't it?
+kernel test robot noticed the following build warnings:
 
+[auto build test WARNING on a25497a280bbd7bbcc08c87ddb2b3909affc8402]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Jinrong-Liang/KVM-selftests-Replace-int-with-uint32_t-for-nevents/20230414-190401
+base:   a25497a280bbd7bbcc08c87ddb2b3909affc8402
+patch link:    https://lore.kernel.org/r/20230414110056.19665-5-cloudliang%40tencent.com
+patch subject: [PATCH 4/7] KVM: x86/pmu: Add documentation for fixed ctr on PMU filter
+reproduce:
+        # https://github.com/intel-lab-lkp/linux/commit/b0effe04478df3b33a26331f48540851c4d33173
+        git remote add linux-review https://github.com/intel-lab-lkp/linux
+        git fetch --no-tags linux-review Jinrong-Liang/KVM-selftests-Replace-int-with-uint32_t-for-nevents/20230414-190401
+        git checkout b0effe04478df3b33a26331f48540851c4d33173
+        make menuconfig
+        # enable CONFIG_COMPILE_TEST, CONFIG_WARN_MISSING_DOCUMENTS, CONFIG_WARN_ABI_ERRORS
+        make htmldocs
+
+If you fix the issue, kindly add following tag where applicable
+| Reported-by: kernel test robot <lkp@intel.com>
+| Link: https://lore.kernel.org/oe-kbuild-all/202304150850.rx4UDDsB-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+>> Documentation/virt/kvm/api.rst:5133: WARNING: Definition list ends without a blank line; unexpected unindent.
+
+vim +5133 Documentation/virt/kvm/api.rst
+
+  5130	
+  5131	  FixCtr[i]_is_allowed = (action == ALLOW) && (bitmap & BIT(i)) ||
+  5132	    (action == DENY) && !(bitmap & BIT(i));
+> 5133	  FixCtr[i]_is_denied = !FixCtr[i]_is_allowed;
+  5134	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests
