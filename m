@@ -2,122 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5A8E26E3443
-	for <lists+kvm@lfdr.de>; Sun, 16 Apr 2023 00:10:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 097306E349B
+	for <lists+kvm@lfdr.de>; Sun, 16 Apr 2023 02:25:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229984AbjDOWKE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 15 Apr 2023 18:10:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39408 "EHLO
+        id S230147AbjDPAZy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 15 Apr 2023 20:25:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60118 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229541AbjDOWKC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 15 Apr 2023 18:10:02 -0400
-Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9E4D2D56
-        for <kvm@vger.kernel.org>; Sat, 15 Apr 2023 15:10:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1681596600; x=1713132600;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=Os+p0upBEWbxGvNLlKpp2n+3KvGMCu7BXDKIpiqGD+c=;
-  b=edNn+czquF8UFqT3ktgZBWAovhDstN2LYxIBrwsRH+MDFfokMGHOBDJX
-   ghfpTQTuJmFru5Y4N6GGepzrhC6g57tZWVaxuyQ7WwuQkCwP3TS6hC4eQ
-   EPwS99kNI/IX37cqApUUQ8e3OItPZ6fzDmi+bJDjoQ80K6BUrJBtuc1OW
-   CbrataPj6EPnmwfyAhF23ddnyw3pvn9spbpRt845bAtARWkPsdJoo7RLJ
-   gA6jxhyPrxam1hs3eUl9ioVsy9bTHWafhnMnjExKr0YWJvJuzQTOZeIrc
-   b57/CxrV7G8byq2sSKXVPrGm63WGMK87BPHcQe/qTtg+Npmvr7kkXxRSl
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10681"; a="333472501"
-X-IronPort-AV: E=Sophos;i="5.99,201,1677571200"; 
-   d="scan'208";a="333472501"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Apr 2023 15:10:00 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10681"; a="814326955"
-X-IronPort-AV: E=Sophos;i="5.99,201,1677571200"; 
-   d="scan'208";a="814326955"
-Received: from lkp-server01.sh.intel.com (HELO b613635ddfff) ([10.239.97.150])
-  by orsmga004.jf.intel.com with ESMTP; 15 Apr 2023 15:09:55 -0700
-Received: from kbuild by b613635ddfff with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1pno5i-000bNb-1X;
-        Sat, 15 Apr 2023 22:09:54 +0000
-Date:   Sun, 16 Apr 2023 06:09:04 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Reiji Watanabe <reijiw@google.com>, Marc Zyngier <maz@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Will Deacon <will@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        kvmarm@lists.linux.dev
-Cc:     oe-kbuild-all@lists.linux.dev, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Raghavendra Rao Anata <rananta@google.com>,
-        Shaoqin Huang <shahuang@redhat.com>,
-        Rob Herring <robh@kernel.org>,
-        Reiji Watanabe <reijiw@google.com>
-Subject: Re: [PATCH v3 2/2] KVM: arm64: PMU: Don't overwrite PMUSERENR with
- vcpu loaded
-Message-ID: <202304160658.Oqr1xZbi-lkp@intel.com>
-References: <20230415164029.526895-3-reijiw@google.com>
+        with ESMTP id S230099AbjDPAZx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 15 Apr 2023 20:25:53 -0400
+Received: from mail-ej1-x644.google.com (mail-ej1-x644.google.com [IPv6:2a00:1450:4864:20::644])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE8EF35A9;
+        Sat, 15 Apr 2023 17:25:52 -0700 (PDT)
+Received: by mail-ej1-x644.google.com with SMTP id dx24so11056814ejb.11;
+        Sat, 15 Apr 2023 17:25:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1681604751; x=1684196751;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=AikccuILl/rWwVlUOcy4wtolB2YL8IX34+EVMpD42sg=;
+        b=dPCVE1VQ9k0Cuu8quWGycURV9SGO5kqGK2tGTmoickhgMNDpDqcBvl5IcL+XDpuhl3
+         cOWkJWembdBu9WvJy52kUQA2ZSXBiRBiKCBqFVzjviJFVC9Brxy3iw/ErGO6jsBpHYk3
+         S8G4PAKdZopqWjA7S4NdtvXkORXKKQqN1OI20eQ3ILhOJAwlk2Bal7PjzFxSuXSc1CQ8
+         Ttlog++cOP2dT+V1t2hhXvarZyGaZvsQqW6cK2Gjry3vMUL53+d15wQ4UOagzze5+Fat
+         x9ohAczNH1lDYPkB1IjdaaQ88fmk6W9MLBV72LT8BTvwgcYPdUH861TPzTUgvKIek4QS
+         cYHQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1681604751; x=1684196751;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=AikccuILl/rWwVlUOcy4wtolB2YL8IX34+EVMpD42sg=;
+        b=TDRuc3NbJGuq0JPeJ1jmJ65fkcyIA3PxSKVXzdQML8MZ9aTf8CpGkPGe1na93cWLHk
+         /ZOMUIwDNDAbbF1h8e6/cS2Je8vQsDEeNqd9NobF0PlmrkxzRMoiNlkakQY571UCUHHR
+         UQgtHRXlGEkAlqD0q2zZihADBbEVlGX6PsrCkTjUXLiAEXSykuA/MlvIPOkHx6Hzn6mD
+         re/fUTr2evy/qRqoV3gHKB0AwOD+ZdcBAKrBsubYsfqUT4gb8HJAE38dFwFkvuLkeBtf
+         iYA4mkb576PbGQBT3j6N1GvUTBEFPyAsEVjeiAEflWf5CRTX4hB5wIqOhlXhEwkWu1xz
+         8S1g==
+X-Gm-Message-State: AAQBX9dG8ZnyrBDQ+inO9hYaHLtfFoxKPZrpLeyHdvaeUVHpRQNkbpzN
+        BgHYFnVQV7LzboFZ5fbXpH+pnwX9NSl75ObNV7E=
+X-Google-Smtp-Source: AKy350bwAxk4mfYw5rLmjnhLo0oyAebJps3Rkaf2Za1xbwAMpcl5KBQjhfMpWZzvodcmJLLEgxG23DeILztqemeHW6Q=
+X-Received: by 2002:a17:906:fcd8:b0:94e:2d:e94f with SMTP id
+ qx24-20020a170906fcd800b0094e002de94fmr1597507ejb.8.1681604751315; Sat, 15
+ Apr 2023 17:25:51 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230415164029.526895-3-reijiw@google.com>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+References: <20230414110056.19665-1-cloudliang@tencent.com>
+ <20230414110056.19665-5-cloudliang@tencent.com> <ZDoY1hOJfMwJk1SQ@debian.me>
+In-Reply-To: <ZDoY1hOJfMwJk1SQ@debian.me>
+From:   Jinrong Liang <ljr.kernel@gmail.com>
+Date:   Sun, 16 Apr 2023 08:25:40 +0800
+Message-ID: <CAFg_LQVLzXUhgOkzO780D1HmtLJ6topwPNQJTYXFbR9L7+X17Q@mail.gmail.com>
+Subject: Re: [PATCH 4/7] KVM: x86/pmu: Add documentation for fixed ctr on PMU filter
+To:     Bagas Sanjaya <bagasdotme@gmail.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Like Xu <like.xu.linux@gmail.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Shuah Khan <shuah@kernel.org>,
+        Aaron Lewis <aaronlewis@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jinrong Liang <cloudliang@tencent.com>,
+        linux-kselftest@vger.kernel.org, linux-doc@vger.kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Reiji,
+Bagas Sanjaya <bagasdotme@gmail.com> =E4=BA=8E2023=E5=B9=B44=E6=9C=8815=E6=
+=97=A5=E5=91=A8=E5=85=AD 11:24=E5=86=99=E9=81=93=EF=BC=9A
+>
+> On Fri, Apr 14, 2023 at 07:00:53PM +0800, Jinrong Liang wrote:
+> > +Specifically, KVM follows the following pseudo-code when determining w=
+hether to
+> > +allow the guest FixCtr[i] to count its pre-defined fixed event:
+> > +
+> > +  FixCtr[i]_is_allowed =3D (action =3D=3D ALLOW) && (bitmap & BIT(i)) =
+||
+> > +    (action =3D=3D DENY) && !(bitmap & BIT(i));
+> > +  FixCtr[i]_is_denied =3D !FixCtr[i]_is_allowed;
+> > +
+>
+> As kernel test robot has reported [1], you need to wrap the code above
+> in a code block:
 
-kernel test robot noticed the following build errors:
+I will make the changes as you suggested, i.e. wrap the code above in
+a code block.
 
-[auto build test ERROR on 09a9639e56c01c7a00d6c0ca63f4c7c41abe075d]
+Thanks.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Reiji-Watanabe/KVM-arm64-PMU-Restore-the-host-s-PMUSERENR_EL0/20230416-004142
-base:   09a9639e56c01c7a00d6c0ca63f4c7c41abe075d
-patch link:    https://lore.kernel.org/r/20230415164029.526895-3-reijiw%40google.com
-patch subject: [PATCH v3 2/2] KVM: arm64: PMU: Don't overwrite PMUSERENR with vcpu loaded
-config: arm64-allyesconfig (https://download.01.org/0day-ci/archive/20230416/202304160658.Oqr1xZbi-lkp@intel.com/config)
-compiler: aarch64-linux-gcc (GCC) 12.1.0
-reproduce (this is a W=1 build):
-        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-        chmod +x ~/bin/make.cross
-        # https://github.com/intel-lab-lkp/linux/commit/276e15e5db09003944d194da2b2577cff5192884
-        git remote add linux-review https://github.com/intel-lab-lkp/linux
-        git fetch --no-tags linux-review Reiji-Watanabe/KVM-arm64-PMU-Restore-the-host-s-PMUSERENR_EL0/20230416-004142
-        git checkout 276e15e5db09003944d194da2b2577cff5192884
-        # save the config file
-        mkdir build_dir && cp config build_dir/.config
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross W=1 O=build_dir ARCH=arm64 olddefconfig
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross W=1 O=build_dir ARCH=arm64 SHELL=/bin/bash
-
-If you fix the issue, kindly add following tag where applicable
-| Reported-by: kernel test robot <lkp@intel.com>
-| Link: https://lore.kernel.org/oe-kbuild-all/202304160658.Oqr1xZbi-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   aarch64-linux-ld: Unexpected GOT/PLT entries detected!
-   aarch64-linux-ld: Unexpected run-time procedure linkages detected!
-   aarch64-linux-ld: arch/arm64/kvm/hyp/nvhe/kvm_nvhe.o: in function `__kvm_nvhe___activate_traps_common':
->> __kvm_nvhe_switch.c:(.hyp.text+0x14b4): undefined reference to `__kvm_nvhe_warn_bogus_irq_restore'
-   aarch64-linux-ld: arch/arm64/kvm/hyp/nvhe/kvm_nvhe.o: in function `__kvm_nvhe___deactivate_traps_common':
-   __kvm_nvhe_switch.c:(.hyp.text+0x1f6c): undefined reference to `__kvm_nvhe_warn_bogus_irq_restore'
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests
+>
+> ---- >8 ----
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.=
+rst
+> index 036f5b1a39aff8..b5836767e0e76d 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -5126,7 +5126,7 @@ Via this API, KVM userspace can also control the be=
+havior of the VM's fixed
+>  counters (if any) by configuring the "action" and "fixed_counter_bitmap"=
+ fields.
+>
+>  Specifically, KVM follows the following pseudo-code when determining whe=
+ther to
+> -allow the guest FixCtr[i] to count its pre-defined fixed event:
+> +allow the guest FixCtr[i] to count its pre-defined fixed event::
+>
+>    FixCtr[i]_is_allowed =3D (action =3D=3D ALLOW) && (bitmap & BIT(i)) ||
+>      (action =3D=3D DENY) && !(bitmap & BIT(i));
+>
+> Thanks.
+>
+> [1]: https://lore.kernel.org/linux-doc/202304150850.rx4UDDsB-lkp@intel.co=
+m/
+>
+> --
+> An old man doll... just what I always wanted! - Clara
