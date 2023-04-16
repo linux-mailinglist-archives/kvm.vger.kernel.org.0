@@ -2,65 +2,61 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B48646E34CE
-	for <lists+kvm@lfdr.de>; Sun, 16 Apr 2023 05:31:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4FC0A6E3512
+	for <lists+kvm@lfdr.de>; Sun, 16 Apr 2023 06:53:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229989AbjDPDbd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 15 Apr 2023 23:31:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52010 "EHLO
+        id S229991AbjDPExe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 16 Apr 2023 00:53:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60994 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229923AbjDPDbb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 15 Apr 2023 23:31:31 -0400
-Received: from mail-pg1-x536.google.com (mail-pg1-x536.google.com [IPv6:2607:f8b0:4864:20::536])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59DD11BC8
-        for <kvm@vger.kernel.org>; Sat, 15 Apr 2023 20:31:30 -0700 (PDT)
-Received: by mail-pg1-x536.google.com with SMTP id 185so1587255pgc.10
-        for <kvm@vger.kernel.org>; Sat, 15 Apr 2023 20:31:30 -0700 (PDT)
+        with ESMTP id S229532AbjDPExd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 16 Apr 2023 00:53:33 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E3F8326BB
+        for <kvm@vger.kernel.org>; Sat, 15 Apr 2023 21:53:31 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id u188-20020a2560c5000000b00b8f15f2111dso16273608ybb.4
+        for <kvm@vger.kernel.org>; Sat, 15 Apr 2023 21:53:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1681615890; x=1684207890;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=TjeEy5ULGrDULBX1ItXV0d2QcNX0rRG2/eteK+KuAoI=;
-        b=M/nWmTVdu0YxzmSJntss1YOmDxAjmE/GtrRuumB4MpBtw51xAKy8bdcd+T3m4oSLqB
-         esNmYz8hBF+hT58WQw9JuJJzR5Eqa9oTLSr2UGtuzhLyycUVtJsHUmgG1+DbumXJu0Rl
-         NfkC2mzQUqglCB1WLrNH/r/rNEfr+51L1A0ErR8zAdMDTlZn3O8LeNOxFVWHum9hf9dw
-         fxcQ84MKljG6za7M0utyEqT/r3GsrljZl7rDO7V2z2+qXwfKBayMEo1sy5a4/WChYJGF
-         RQwBCEKpWgya6ymMPxbwwrkIWbR0HISzNNS+IwOyhDdO7ZwdAMHgBqb6OYJiNY3yWa1v
-         BwIg==
+        d=google.com; s=20221208; t=1681620811; x=1684212811;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=GSBOHO8J2MQ2o/VKIsPqTm9ugOUbkx/1SnLPtI3xz4A=;
+        b=ao6Gt0p3QbgT6+gIHy9isrfjtcrgOsou5uEF8cXmo65HRAKbSjAWxBlj5942sbxx7Y
+         /LqSQftNAIHrBN8knrrYx+4xCYjN/X82j3NAddpQDH9Rlx5YGZf8VxJqH09V7XpxhFJx
+         PdWGl5uOrq8wtx/GO6wmEfxK2+rlcFb6ZO8G8UnK8ey0/TeOKeDZI4vdkuVmTjHX4Jdm
+         O9h6hXfUrxOQXsInVKpGZilOzVoAEBqBQ6vPAsQNSJhHcY2LbqUE6sS3rKDCP/s5kK4d
+         PzFCt9s8+1cojNl2E6UpxGcnGyx9sA3BYYsvaJXx4ve5N6GbB7UiuIhHfywVhcEywCPj
+         hW2g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681615890; x=1684207890;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=TjeEy5ULGrDULBX1ItXV0d2QcNX0rRG2/eteK+KuAoI=;
-        b=ai/w0OL/x21BIv2iVpIBX3ciXwdzzgiRRNHiI6Gzh2A+u8NMt4LIPTivZrNwpxNJ39
-         oiso23e8ltISGa7GvYzTwKw3kcjlizgVIUt6YRaOVqQQhZ/rryfsXk9Qe+zvhFvtrUag
-         dk6TDIy3bk1bG0GHPDo7YPg9jFDhNV/iSNUivtvxjnzX8D4MxyKZlHS0jOH3GuTguOmY
-         bsdGdVt9Z5+kxYCfMPKsqeyAlhBySo3Nwkz340JjsPqcC3oGAJs7JtsqWymPrHHGf12h
-         zke7MLgQ065It88QZ6Ej/hPAK/ETn8XJH4suU+1kh0TXKq4aMP/eRnnE3FlNNH4lXnR4
-         joCw==
-X-Gm-Message-State: AAQBX9dDBiIwvalMnanPTxD8ejlaHneV10l/B7VDDYRrFNTOpgzHGDqT
-        /BTd0BbQBisC0lrSK5Z+trRBVoIgTRVB2pE9HE/XCA==
-X-Google-Smtp-Source: AKy350ZKe14U8RcoJ0rqKV44dc6s9km1gogrAzuwrrkg9jPwdTmhuq6/Rs1+82DYNXnDmzh0v7CW6bXhoMUzguC6a8E=
-X-Received: by 2002:a63:1a0f:0:b0:513:9350:c5bd with SMTP id
- a15-20020a631a0f000000b005139350c5bdmr1910375pga.4.1681615889591; Sat, 15 Apr
- 2023 20:31:29 -0700 (PDT)
-MIME-Version: 1.0
-References: <20230415164029.526895-3-reijiw@google.com> <202304160658.Oqr1xZbi-lkp@intel.com>
-In-Reply-To: <202304160658.Oqr1xZbi-lkp@intel.com>
+        d=1e100.net; s=20221208; t=1681620811; x=1684212811;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=GSBOHO8J2MQ2o/VKIsPqTm9ugOUbkx/1SnLPtI3xz4A=;
+        b=QZkWvEalNPKFF9Q29onnufvAZnNJqbcUy6kjGvGjVlSTr/bjx5HhQ2yea3Zxc92Txf
+         52D5veVlcbzcJ0+IbvOfom0kNLApijnUkWf2Vw+4RoPfGfPsXUBWrkxk7TAaWK5AKUnH
+         urzT1fWpFJrdJleD+kBoJTdyi6LJMLRg/La3QRL9nAx26yD0WxBE3tu+O5LzUPDrafdP
+         gNycJ6mVeTTN4mhl5JFVKcRhBBYdCWOvQg2Y+Y4Dso1FrQaGNrq23I3aPG/GoPx09x7n
+         flyHxcWxyrOVt/ODcCxxMgJlvsglw1RnyQXgbyX2gdMCNzBwFm90+alQnEM/w8XYywmh
+         tS1Q==
+X-Gm-Message-State: AAQBX9eGU0dz0HhRhWjzv3CQM4jdJKLwiL5H/vgiCidLZk5stpHP9vFR
+        XhWhSHZzjajD6BbXwCOPYjkAGlquT6k=
+X-Google-Smtp-Source: AKy350YrV2Jc2viuvwLHBzra9y9vpzRiIgY9TA0+SRfr+P59RNJCm7Qq0WQi8xckYzZJwFXI/uJfbMWGyoU=
+X-Received: from reijiw-west4.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:aa1])
+ (user=reijiw job=sendgmr) by 2002:a25:e08c:0:b0:b8f:3647:d757 with SMTP id
+ x134-20020a25e08c000000b00b8f3647d757mr7226448ybg.11.1681620811185; Sat, 15
+ Apr 2023 21:53:31 -0700 (PDT)
+Date:   Sat, 15 Apr 2023 21:53:14 -0700
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.40.0.634.g4ca3ef3211-goog
+Message-ID: <20230416045316.1367849-1-reijiw@google.com>
+Subject: [PATCH v4 0/2] KVM: arm64: PMU: Correct the handling of PMUSERENR_EL0
 From:   Reiji Watanabe <reijiw@google.com>
-Date:   Sat, 15 Apr 2023 20:31:13 -0700
-Message-ID: <CAAeT=Fy1gvJSDt7J2+NZN=PWdQ_r18vNGkVT+EbSrE5ZkNCzCA@mail.gmail.com>
-Subject: Re: [PATCH v3 2/2] KVM: arm64: PMU: Don't overwrite PMUSERENR with
- vcpu loaded
-To:     kernel test robot <lkp@intel.com>
-Cc:     Marc Zyngier <maz@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+To:     Marc Zyngier <maz@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
         Oliver Upton <oliver.upton@linux.dev>,
         Will Deacon <will@kernel.org>,
         Catalin Marinas <catalin.marinas@arm.com>,
-        kvmarm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kvmarm@lists.linux.dev
+Cc:     kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
         James Morse <james.morse@arm.com>,
         Alexandru Elisei <alexandru.elisei@arm.com>,
         Zenghui Yu <yuzenghui@huawei.com>,
@@ -70,13 +66,12 @@ Cc:     Marc Zyngier <maz@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
         Jing Zhang <jingzhangos@google.com>,
         Raghavendra Rao Anata <rananta@google.com>,
         Shaoqin Huang <shahuang@redhat.com>,
-        Rob Herring <robh@kernel.org>
+        Rob Herring <robh@kernel.org>,
+        Reiji Watanabe <reijiw@google.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        URIBL_BLOCKED,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -84,63 +79,65 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Apr 15, 2023 at 3:10=E2=80=AFPM kernel test robot <lkp@intel.com> w=
-rote:
->
-> Hi Reiji,
->
-> kernel test robot noticed the following build errors:
->
-> [auto build test ERROR on 09a9639e56c01c7a00d6c0ca63f4c7c41abe075d]
->
-> url:    https://github.com/intel-lab-lkp/linux/commits/Reiji-Watanabe/KVM=
--arm64-PMU-Restore-the-host-s-PMUSERENR_EL0/20230416-004142
-> base:   09a9639e56c01c7a00d6c0ca63f4c7c41abe075d
-> patch link:    https://lore.kernel.org/r/20230415164029.526895-3-reijiw%4=
-0google.com
-> patch subject: [PATCH v3 2/2] KVM: arm64: PMU: Don't overwrite PMUSERENR =
-with vcpu loaded
-> config: arm64-allyesconfig (https://download.01.org/0day-ci/archive/20230=
-416/202304160658.Oqr1xZbi-lkp@intel.com/config)
-> compiler: aarch64-linux-gcc (GCC) 12.1.0
-> reproduce (this is a W=3D1 build):
->         wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbi=
-n/make.cross -O ~/bin/make.cross
->         chmod +x ~/bin/make.cross
->         # https://github.com/intel-lab-lkp/linux/commit/276e15e5db0900394=
-4d194da2b2577cff5192884
->         git remote add linux-review https://github.com/intel-lab-lkp/linu=
-x
->         git fetch --no-tags linux-review Reiji-Watanabe/KVM-arm64-PMU-Res=
-tore-the-host-s-PMUSERENR_EL0/20230416-004142
->         git checkout 276e15e5db09003944d194da2b2577cff5192884
->         # save the config file
->         mkdir build_dir && cp config build_dir/.config
->         COMPILER_INSTALL_PATH=3D$HOME/0day COMPILER=3Dgcc-12.1.0 make.cro=
-ss W=3D1 O=3Dbuild_dir ARCH=3Darm64 olddefconfig
->         COMPILER_INSTALL_PATH=3D$HOME/0day COMPILER=3Dgcc-12.1.0 make.cro=
-ss W=3D1 O=3Dbuild_dir ARCH=3Darm64 SHELL=3D/bin/bash
->
-> If you fix the issue, kindly add following tag where applicable
-> | Reported-by: kernel test robot <lkp@intel.com>
-> | Link: https://lore.kernel.org/oe-kbuild-all/202304160658.Oqr1xZbi-lkp@i=
-ntel.com/
->
-> All errors (new ones prefixed by >>):
->
->    aarch64-linux-ld: Unexpected GOT/PLT entries detected!
->    aarch64-linux-ld: Unexpected run-time procedure linkages detected!
->    aarch64-linux-ld: arch/arm64/kvm/hyp/nvhe/kvm_nvhe.o: in function `__k=
-vm_nvhe___activate_traps_common':
-> >> __kvm_nvhe_switch.c:(.hyp.text+0x14b4): undefined reference to `__kvm_=
-nvhe_warn_bogus_irq_restore'
->    aarch64-linux-ld: arch/arm64/kvm/hyp/nvhe/kvm_nvhe.o: in function `__k=
-vm_nvhe___deactivate_traps_common':
->    __kvm_nvhe_switch.c:(.hyp.text+0x1f6c): undefined reference to `__kvm_=
-nvhe_warn_bogus_irq_restore'
+This series will fix bugs in KVM's handling of PMUSERENR_EL0.
 
-It looks like this happens when CONFIG_DEBUG_IRQFLAGS is enabled.
-I am going to introduce another flag to disable this as well.
+With PMU access support from EL0 [1], the perf subsystem would
+set CR and ER bits of PMUSERENR_EL0 as needed to allow EL0 to have
+a direct access to PMU counters.  However, KVM appears to assume
+that the register value is always zero for the host EL0, and has
+the following two problems in handling the register.
 
-Thanks,
-Reiji
+[A] The host EL0 might lose the direct access to PMU counters, as
+    KVM always clears PMUSERENR_EL0 before returning to userspace.
+
+[B] With VHE, the guest EL0 access to PMU counters might be trapped
+    to EL1 instead of to EL2 (even when PMUSERENR_EL0 for the guest
+    indicates that the guest EL0 has an access to the counters).
+    This is because, with VHE, KVM sets ER, CR, SW and EN bits of
+    PMUSERENR_EL0 to 1 on vcpu_load() to ensure to trap PMU access
+    from the guset EL0 to EL2, but those bits might be cleared by
+    the perf subsystem after vcpu_load() (when PMU counters are
+    programmed for the vPMU emulation).
+
+Patch-1 will fix [A], and Patch-2 will fix [B] respectively.
+The series is based on v6.3-rc6.
+
+v4:
+ - Introduce NO_DEBUG_IRQFLAGS to exclude warn_bogus_irq_restore()
+   from the nVHE hyp code. This is to address the issue [2] that
+   was reported by kernel test robot <lkp@intel.com>.
+
+v3: https://lore.kernel.org/all/20230415164029.526895-1-reijiw@google.com/
+ - While vcpu_{put,load}() are manipulating PMUSERENR_EL0,
+   disable IRQs to prevent a race condition between these
+   processes and IPIs that updates PMUSERENR_EL0. [Mark]
+
+v2: https://lore.kernel.org/all/20230408034759.2369068-1-reijiw@google.com/
+ - Save the PMUSERENR_EL0 for the host in the sysreg array of
+   kvm_host_data. [Marc]
+ - Don't let armv8pmu_start() overwrite PMUSERENR if the vCPU
+   is loaded, instead have KVM update the saved shadow register
+   value for the host. [Marc, Mark]
+
+v1: https://lore.kernel.org/all/20230329002136.2463442-1-reijiw@google.com/
+
+[1] https://github.com/torvalds/linux/commit/83a7a4d643d33a8b74a42229346b7ed7139fcef9
+[2] https://lore.kernel.org/all/202304160658.Oqr1xZbi-lkp@intel.com/
+
+Reiji Watanabe (2):
+  KVM: arm64: PMU: Restore the host's PMUSERENR_EL0
+  KVM: arm64: PMU: Don't overwrite PMUSERENR with vcpu loaded
+
+ arch/arm64/include/asm/kvm_host.h       |  7 +++++
+ arch/arm64/kernel/perf_event.c          | 21 ++++++++++++--
+ arch/arm64/kvm/hyp/include/hyp/switch.h | 37 +++++++++++++++++++++++--
+ arch/arm64/kvm/hyp/nvhe/Makefile        |  2 +-
+ arch/arm64/kvm/pmu.c                    | 25 +++++++++++++++++
+ include/linux/irqflags.h                |  6 ++--
+ 6 files changed, 89 insertions(+), 9 deletions(-)
+
+
+base-commit: 09a9639e56c01c7a00d6c0ca63f4c7c41abe075d
+-- 
+2.40.0.634.g4ca3ef3211-goog
+
