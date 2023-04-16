@@ -2,76 +2,81 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 097306E349B
-	for <lists+kvm@lfdr.de>; Sun, 16 Apr 2023 02:25:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B48646E34CE
+	for <lists+kvm@lfdr.de>; Sun, 16 Apr 2023 05:31:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230147AbjDPAZy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 15 Apr 2023 20:25:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60118 "EHLO
+        id S229989AbjDPDbd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 15 Apr 2023 23:31:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52010 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230099AbjDPAZx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 15 Apr 2023 20:25:53 -0400
-Received: from mail-ej1-x644.google.com (mail-ej1-x644.google.com [IPv6:2a00:1450:4864:20::644])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE8EF35A9;
-        Sat, 15 Apr 2023 17:25:52 -0700 (PDT)
-Received: by mail-ej1-x644.google.com with SMTP id dx24so11056814ejb.11;
-        Sat, 15 Apr 2023 17:25:52 -0700 (PDT)
+        with ESMTP id S229923AbjDPDbb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 15 Apr 2023 23:31:31 -0400
+Received: from mail-pg1-x536.google.com (mail-pg1-x536.google.com [IPv6:2607:f8b0:4864:20::536])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59DD11BC8
+        for <kvm@vger.kernel.org>; Sat, 15 Apr 2023 20:31:30 -0700 (PDT)
+Received: by mail-pg1-x536.google.com with SMTP id 185so1587255pgc.10
+        for <kvm@vger.kernel.org>; Sat, 15 Apr 2023 20:31:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1681604751; x=1684196751;
+        d=google.com; s=20221208; t=1681615890; x=1684207890;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=AikccuILl/rWwVlUOcy4wtolB2YL8IX34+EVMpD42sg=;
-        b=dPCVE1VQ9k0Cuu8quWGycURV9SGO5kqGK2tGTmoickhgMNDpDqcBvl5IcL+XDpuhl3
-         cOWkJWembdBu9WvJy52kUQA2ZSXBiRBiKCBqFVzjviJFVC9Brxy3iw/ErGO6jsBpHYk3
-         S8G4PAKdZopqWjA7S4NdtvXkORXKKQqN1OI20eQ3ILhOJAwlk2Bal7PjzFxSuXSc1CQ8
-         Ttlog++cOP2dT+V1t2hhXvarZyGaZvsQqW6cK2Gjry3vMUL53+d15wQ4UOagzze5+Fat
-         x9ohAczNH1lDYPkB1IjdaaQ88fmk6W9MLBV72LT8BTvwgcYPdUH861TPzTUgvKIek4QS
-         cYHQ==
+        bh=TjeEy5ULGrDULBX1ItXV0d2QcNX0rRG2/eteK+KuAoI=;
+        b=M/nWmTVdu0YxzmSJntss1YOmDxAjmE/GtrRuumB4MpBtw51xAKy8bdcd+T3m4oSLqB
+         esNmYz8hBF+hT58WQw9JuJJzR5Eqa9oTLSr2UGtuzhLyycUVtJsHUmgG1+DbumXJu0Rl
+         NfkC2mzQUqglCB1WLrNH/r/rNEfr+51L1A0ErR8zAdMDTlZn3O8LeNOxFVWHum9hf9dw
+         fxcQ84MKljG6za7M0utyEqT/r3GsrljZl7rDO7V2z2+qXwfKBayMEo1sy5a4/WChYJGF
+         RQwBCEKpWgya6ymMPxbwwrkIWbR0HISzNNS+IwOyhDdO7ZwdAMHgBqb6OYJiNY3yWa1v
+         BwIg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681604751; x=1684196751;
+        d=1e100.net; s=20221208; t=1681615890; x=1684207890;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=AikccuILl/rWwVlUOcy4wtolB2YL8IX34+EVMpD42sg=;
-        b=TDRuc3NbJGuq0JPeJ1jmJ65fkcyIA3PxSKVXzdQML8MZ9aTf8CpGkPGe1na93cWLHk
-         /ZOMUIwDNDAbbF1h8e6/cS2Je8vQsDEeNqd9NobF0PlmrkxzRMoiNlkakQY571UCUHHR
-         UQgtHRXlGEkAlqD0q2zZihADBbEVlGX6PsrCkTjUXLiAEXSykuA/MlvIPOkHx6Hzn6mD
-         re/fUTr2evy/qRqoV3gHKB0AwOD+ZdcBAKrBsubYsfqUT4gb8HJAE38dFwFkvuLkeBtf
-         iYA4mkb576PbGQBT3j6N1GvUTBEFPyAsEVjeiAEflWf5CRTX4hB5wIqOhlXhEwkWu1xz
-         8S1g==
-X-Gm-Message-State: AAQBX9dG8ZnyrBDQ+inO9hYaHLtfFoxKPZrpLeyHdvaeUVHpRQNkbpzN
-        BgHYFnVQV7LzboFZ5fbXpH+pnwX9NSl75ObNV7E=
-X-Google-Smtp-Source: AKy350bwAxk4mfYw5rLmjnhLo0oyAebJps3Rkaf2Za1xbwAMpcl5KBQjhfMpWZzvodcmJLLEgxG23DeILztqemeHW6Q=
-X-Received: by 2002:a17:906:fcd8:b0:94e:2d:e94f with SMTP id
- qx24-20020a170906fcd800b0094e002de94fmr1597507ejb.8.1681604751315; Sat, 15
- Apr 2023 17:25:51 -0700 (PDT)
+        bh=TjeEy5ULGrDULBX1ItXV0d2QcNX0rRG2/eteK+KuAoI=;
+        b=ai/w0OL/x21BIv2iVpIBX3ciXwdzzgiRRNHiI6Gzh2A+u8NMt4LIPTivZrNwpxNJ39
+         oiso23e8ltISGa7GvYzTwKw3kcjlizgVIUt6YRaOVqQQhZ/rryfsXk9Qe+zvhFvtrUag
+         dk6TDIy3bk1bG0GHPDo7YPg9jFDhNV/iSNUivtvxjnzX8D4MxyKZlHS0jOH3GuTguOmY
+         bsdGdVt9Z5+kxYCfMPKsqeyAlhBySo3Nwkz340JjsPqcC3oGAJs7JtsqWymPrHHGf12h
+         zke7MLgQ065It88QZ6Ej/hPAK/ETn8XJH4suU+1kh0TXKq4aMP/eRnnE3FlNNH4lXnR4
+         joCw==
+X-Gm-Message-State: AAQBX9dDBiIwvalMnanPTxD8ejlaHneV10l/B7VDDYRrFNTOpgzHGDqT
+        /BTd0BbQBisC0lrSK5Z+trRBVoIgTRVB2pE9HE/XCA==
+X-Google-Smtp-Source: AKy350ZKe14U8RcoJ0rqKV44dc6s9km1gogrAzuwrrkg9jPwdTmhuq6/Rs1+82DYNXnDmzh0v7CW6bXhoMUzguC6a8E=
+X-Received: by 2002:a63:1a0f:0:b0:513:9350:c5bd with SMTP id
+ a15-20020a631a0f000000b005139350c5bdmr1910375pga.4.1681615889591; Sat, 15 Apr
+ 2023 20:31:29 -0700 (PDT)
 MIME-Version: 1.0
-References: <20230414110056.19665-1-cloudliang@tencent.com>
- <20230414110056.19665-5-cloudliang@tencent.com> <ZDoY1hOJfMwJk1SQ@debian.me>
-In-Reply-To: <ZDoY1hOJfMwJk1SQ@debian.me>
-From:   Jinrong Liang <ljr.kernel@gmail.com>
-Date:   Sun, 16 Apr 2023 08:25:40 +0800
-Message-ID: <CAFg_LQVLzXUhgOkzO780D1HmtLJ6topwPNQJTYXFbR9L7+X17Q@mail.gmail.com>
-Subject: Re: [PATCH 4/7] KVM: x86/pmu: Add documentation for fixed ctr on PMU filter
-To:     Bagas Sanjaya <bagasdotme@gmail.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Like Xu <like.xu.linux@gmail.com>,
+References: <20230415164029.526895-3-reijiw@google.com> <202304160658.Oqr1xZbi-lkp@intel.com>
+In-Reply-To: <202304160658.Oqr1xZbi-lkp@intel.com>
+From:   Reiji Watanabe <reijiw@google.com>
+Date:   Sat, 15 Apr 2023 20:31:13 -0700
+Message-ID: <CAAeT=Fy1gvJSDt7J2+NZN=PWdQ_r18vNGkVT+EbSrE5ZkNCzCA@mail.gmail.com>
+Subject: Re: [PATCH v3 2/2] KVM: arm64: PMU: Don't overwrite PMUSERENR with
+ vcpu loaded
+To:     kernel test robot <lkp@intel.com>
+Cc:     Marc Zyngier <maz@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Will Deacon <will@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        kvmarm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Shuah Khan <shuah@kernel.org>,
-        Aaron Lewis <aaronlewis@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jinrong Liang <cloudliang@tencent.com>,
-        linux-kselftest@vger.kernel.org, linux-doc@vger.kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+        Ricardo Koller <ricarkol@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Raghavendra Rao Anata <rananta@google.com>,
+        Shaoqin Huang <shahuang@redhat.com>,
+        Rob Herring <robh@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        URIBL_BLOCKED,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -79,52 +84,63 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Bagas Sanjaya <bagasdotme@gmail.com> =E4=BA=8E2023=E5=B9=B44=E6=9C=8815=E6=
-=97=A5=E5=91=A8=E5=85=AD 11:24=E5=86=99=E9=81=93=EF=BC=9A
+On Sat, Apr 15, 2023 at 3:10=E2=80=AFPM kernel test robot <lkp@intel.com> w=
+rote:
 >
-> On Fri, Apr 14, 2023 at 07:00:53PM +0800, Jinrong Liang wrote:
-> > +Specifically, KVM follows the following pseudo-code when determining w=
-hether to
-> > +allow the guest FixCtr[i] to count its pre-defined fixed event:
-> > +
-> > +  FixCtr[i]_is_allowed =3D (action =3D=3D ALLOW) && (bitmap & BIT(i)) =
-||
-> > +    (action =3D=3D DENY) && !(bitmap & BIT(i));
-> > +  FixCtr[i]_is_denied =3D !FixCtr[i]_is_allowed;
-> > +
+> Hi Reiji,
 >
-> As kernel test robot has reported [1], you need to wrap the code above
-> in a code block:
+> kernel test robot noticed the following build errors:
+>
+> [auto build test ERROR on 09a9639e56c01c7a00d6c0ca63f4c7c41abe075d]
+>
+> url:    https://github.com/intel-lab-lkp/linux/commits/Reiji-Watanabe/KVM=
+-arm64-PMU-Restore-the-host-s-PMUSERENR_EL0/20230416-004142
+> base:   09a9639e56c01c7a00d6c0ca63f4c7c41abe075d
+> patch link:    https://lore.kernel.org/r/20230415164029.526895-3-reijiw%4=
+0google.com
+> patch subject: [PATCH v3 2/2] KVM: arm64: PMU: Don't overwrite PMUSERENR =
+with vcpu loaded
+> config: arm64-allyesconfig (https://download.01.org/0day-ci/archive/20230=
+416/202304160658.Oqr1xZbi-lkp@intel.com/config)
+> compiler: aarch64-linux-gcc (GCC) 12.1.0
+> reproduce (this is a W=3D1 build):
+>         wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbi=
+n/make.cross -O ~/bin/make.cross
+>         chmod +x ~/bin/make.cross
+>         # https://github.com/intel-lab-lkp/linux/commit/276e15e5db0900394=
+4d194da2b2577cff5192884
+>         git remote add linux-review https://github.com/intel-lab-lkp/linu=
+x
+>         git fetch --no-tags linux-review Reiji-Watanabe/KVM-arm64-PMU-Res=
+tore-the-host-s-PMUSERENR_EL0/20230416-004142
+>         git checkout 276e15e5db09003944d194da2b2577cff5192884
+>         # save the config file
+>         mkdir build_dir && cp config build_dir/.config
+>         COMPILER_INSTALL_PATH=3D$HOME/0day COMPILER=3Dgcc-12.1.0 make.cro=
+ss W=3D1 O=3Dbuild_dir ARCH=3Darm64 olddefconfig
+>         COMPILER_INSTALL_PATH=3D$HOME/0day COMPILER=3Dgcc-12.1.0 make.cro=
+ss W=3D1 O=3Dbuild_dir ARCH=3Darm64 SHELL=3D/bin/bash
+>
+> If you fix the issue, kindly add following tag where applicable
+> | Reported-by: kernel test robot <lkp@intel.com>
+> | Link: https://lore.kernel.org/oe-kbuild-all/202304160658.Oqr1xZbi-lkp@i=
+ntel.com/
+>
+> All errors (new ones prefixed by >>):
+>
+>    aarch64-linux-ld: Unexpected GOT/PLT entries detected!
+>    aarch64-linux-ld: Unexpected run-time procedure linkages detected!
+>    aarch64-linux-ld: arch/arm64/kvm/hyp/nvhe/kvm_nvhe.o: in function `__k=
+vm_nvhe___activate_traps_common':
+> >> __kvm_nvhe_switch.c:(.hyp.text+0x14b4): undefined reference to `__kvm_=
+nvhe_warn_bogus_irq_restore'
+>    aarch64-linux-ld: arch/arm64/kvm/hyp/nvhe/kvm_nvhe.o: in function `__k=
+vm_nvhe___deactivate_traps_common':
+>    __kvm_nvhe_switch.c:(.hyp.text+0x1f6c): undefined reference to `__kvm_=
+nvhe_warn_bogus_irq_restore'
 
-I will make the changes as you suggested, i.e. wrap the code above in
-a code block.
+It looks like this happens when CONFIG_DEBUG_IRQFLAGS is enabled.
+I am going to introduce another flag to disable this as well.
 
-Thanks.
-
->
-> ---- >8 ----
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.=
-rst
-> index 036f5b1a39aff8..b5836767e0e76d 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -5126,7 +5126,7 @@ Via this API, KVM userspace can also control the be=
-havior of the VM's fixed
->  counters (if any) by configuring the "action" and "fixed_counter_bitmap"=
- fields.
->
->  Specifically, KVM follows the following pseudo-code when determining whe=
-ther to
-> -allow the guest FixCtr[i] to count its pre-defined fixed event:
-> +allow the guest FixCtr[i] to count its pre-defined fixed event::
->
->    FixCtr[i]_is_allowed =3D (action =3D=3D ALLOW) && (bitmap & BIT(i)) ||
->      (action =3D=3D DENY) && !(bitmap & BIT(i));
->
-> Thanks.
->
-> [1]: https://lore.kernel.org/linux-doc/202304150850.rx4UDDsB-lkp@intel.co=
-m/
->
-> --
-> An old man doll... just what I always wanted! - Clara
+Thanks,
+Reiji
