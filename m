@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A50B66E3FFC
-	for <lists+kvm@lfdr.de>; Mon, 17 Apr 2023 08:42:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1D2766E4003
+	for <lists+kvm@lfdr.de>; Mon, 17 Apr 2023 08:43:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229830AbjDQGms (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 Apr 2023 02:42:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38170 "EHLO
+        id S230026AbjDQGnw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 17 Apr 2023 02:43:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39498 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229519AbjDQGmr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 17 Apr 2023 02:42:47 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5482C26AD
-        for <kvm@vger.kernel.org>; Sun, 16 Apr 2023 23:41:59 -0700 (PDT)
+        with ESMTP id S229878AbjDQGns (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 17 Apr 2023 02:43:48 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6C091997
+        for <kvm@vger.kernel.org>; Sun, 16 Apr 2023 23:43:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1681713718;
+        s=mimecast20190719; t=1681713781;
         h=from:from:reply-to:reply-to:subject:subject:date:date:
          message-id:message-id:to:to:cc:cc:mime-version:mime-version:
          content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=41kcF5/H9ceRzGEB/OQxlWiFDnnt6nMcXOxmlcq8A3s=;
-        b=EsUi4xvjesV4s6Fv8AQjgSt5+z5ms6f51Gp77xAzD8nok3k3Rp8RUmjumwvqKMASBYNewA
-        thBeoLC+IELgAeg+7ElE4uvcIu6jzw/cfr9/ruW7qIHzRJbkA1TwE/hEa8ynNGZhopZcSK
-        U8A4p2tw9yZfzs+ZY7qZHURDudeSdE8=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=MJcuDAKu+euVeV318qUGLioPveqj8/ZetW/OAfgdbMI=;
+        b=TS1yLsrbgCbUCNIvHNyqZMIPgn3K03SiGJLxc2DPoEZHO36VL8FO0LUKtj6+2LKHEzagq5
+        ReQv4eVHjC6Sy/93hHJHQHX09H/lIm3QaUuaK4m9PISOwKEA9q9FEscC4mZifBGyxJ678b
+        JuVlx97pWIsIF8yC9MBQT2TyAMJVUYo=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-130-4-omMUukOICZFWTIVb66lg-1; Mon, 17 Apr 2023 02:41:55 -0400
-X-MC-Unique: 4-omMUukOICZFWTIVb66lg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+ us-mta-73--CGkRktcNae6ef4tEEi0iQ-1; Mon, 17 Apr 2023 02:42:56 -0400
+X-MC-Unique: -CGkRktcNae6ef4tEEi0iQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 7E1C6855315;
-        Mon, 17 Apr 2023 06:41:54 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 7627538173C0;
+        Mon, 17 Apr 2023 06:42:55 +0000 (UTC)
 Received: from [10.72.13.187] (ovpn-13-187.pek2.redhat.com [10.72.13.187])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id AE76614171B8;
-        Mon, 17 Apr 2023 06:41:43 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 0685040C20FA;
+        Mon, 17 Apr 2023 06:42:44 +0000 (UTC)
 Reply-To: Gavin Shan <gshan@redhat.com>
 Subject: Re: [PATCH v7 05/12] KVM: arm64: Refactor
  kvm_arch_commit_memory_region()
@@ -53,8 +53,8 @@ Cc:     kvm@vger.kernel.org, kvmarm@lists.linux.dev, qperret@google.com,
 References: <20230409063000.3559991-1-ricarkol@google.com>
  <20230409063000.3559991-7-ricarkol@google.com>
 From:   Gavin Shan <gshan@redhat.com>
-Message-ID: <2819bd9d-9a8c-938c-9297-86c1b8614550@redhat.com>
-Date:   Mon, 17 Apr 2023 14:41:39 +0800
+Message-ID: <00649a3b-5b7d-ae12-8fc2-39b83a72009d@redhat.com>
+Date:   Mon, 17 Apr 2023 14:42:41 +0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.0
 MIME-Version: 1.0
@@ -62,7 +62,7 @@ In-Reply-To: <20230409063000.3559991-7-ricarkol@google.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
 X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
         RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,
@@ -84,8 +84,6 @@ On 4/9/23 2:29 PM, Ricardo Koller wrote:
 >   arch/arm64/kvm/mmu.c | 15 +++++++++++----
 >   1 file changed, 11 insertions(+), 4 deletions(-)
 > 
-
-With the following nits addressed:
 
 Reviewed-by: Gavin Shan <gshan@redhat.com>
 
@@ -115,11 +113,6 @@ Reviewed-by: Gavin Shan <gshan@redhat.com>
 >   		 * protect any pages because they're all reported as dirty.
 >   		 * Huge pages and normal pages will be write protect gradually.
 >   		 */
-
-The comments need to be adjusted after this series is applied. The huge pages
-won't be write protected gradually. Instead, the huge pages will be split and
-write protected in one shoot.
-
 > -		if (!kvm_dirty_log_manual_protect_and_init_set(kvm)) {
 > -			kvm_mmu_wp_memory_region(kvm, new->id);
 > -		}
@@ -131,7 +124,4 @@ write protected in one shoot.
 >   }
 >   
 > 
-
-Thanks,
-Gavin
 
