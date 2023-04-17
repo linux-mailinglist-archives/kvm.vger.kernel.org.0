@@ -2,44 +2,45 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 547A86E3FE6
-	for <lists+kvm@lfdr.de>; Mon, 17 Apr 2023 08:39:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A50B66E3FFC
+	for <lists+kvm@lfdr.de>; Mon, 17 Apr 2023 08:42:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229870AbjDQGjS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 Apr 2023 02:39:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35224 "EHLO
+        id S229830AbjDQGms (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 17 Apr 2023 02:42:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38170 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229649AbjDQGjR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 17 Apr 2023 02:39:17 -0400
+        with ESMTP id S229519AbjDQGmr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 17 Apr 2023 02:42:47 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 186E0139
-        for <kvm@vger.kernel.org>; Sun, 16 Apr 2023 23:38:29 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5482C26AD
+        for <kvm@vger.kernel.org>; Sun, 16 Apr 2023 23:41:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1681713508;
+        s=mimecast20190719; t=1681713718;
         h=from:from:reply-to:reply-to:subject:subject:date:date:
          message-id:message-id:to:to:cc:cc:mime-version:mime-version:
          content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=LqRvgvpkNmGxpsiBcOuuAEtfdPWdIq+R5UqWfViyFNI=;
-        b=B8jFRCDrvvngaJLNFdKchdnbekV9zoiHxtdsceE781QvR8Ig9fvNa+bPXgi+1rsGApVScV
-        MC8oG7sshF94yhmJMG4gSaMg+2B+1GvN/FYJ7LchnxFFqLgS3U9uuYzACt7fuo17xD3KLX
-        1p+gnFYS564YWw0KrD41mJAobXr/T7c=
+        bh=41kcF5/H9ceRzGEB/OQxlWiFDnnt6nMcXOxmlcq8A3s=;
+        b=EsUi4xvjesV4s6Fv8AQjgSt5+z5ms6f51Gp77xAzD8nok3k3Rp8RUmjumwvqKMASBYNewA
+        thBeoLC+IELgAeg+7ElE4uvcIu6jzw/cfr9/ruW7qIHzRJbkA1TwE/hEa8ynNGZhopZcSK
+        U8A4p2tw9yZfzs+ZY7qZHURDudeSdE8=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-120-Ls_amiK6P-u7afxQGuly4w-1; Mon, 17 Apr 2023 02:38:22 -0400
-X-MC-Unique: Ls_amiK6P-u7afxQGuly4w-1
+ us-mta-130-4-omMUukOICZFWTIVb66lg-1; Mon, 17 Apr 2023 02:41:55 -0400
+X-MC-Unique: 4-omMUukOICZFWTIVb66lg-1
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id A83A1185A794;
-        Mon, 17 Apr 2023 06:38:21 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 7E1C6855315;
+        Mon, 17 Apr 2023 06:41:54 +0000 (UTC)
 Received: from [10.72.13.187] (ovpn-13-187.pek2.redhat.com [10.72.13.187])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 5E3CD14152F6;
-        Mon, 17 Apr 2023 06:38:09 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id AE76614171B8;
+        Mon, 17 Apr 2023 06:41:43 +0000 (UTC)
 Reply-To: Gavin Shan <gshan@redhat.com>
-Subject: Re: [PATCH v7 04/12] KVM: arm64: Add kvm_pgtable_stage2_split()
+Subject: Re: [PATCH v7 05/12] KVM: arm64: Refactor
+ kvm_arch_commit_memory_region()
 To:     Ricardo Koller <ricarkol@google.com>, pbonzini@redhat.com,
         maz@kernel.org, oupton@google.com, yuzenghui@huawei.com,
         dmatlack@google.com
@@ -50,14 +51,14 @@ Cc:     kvm@vger.kernel.org, kvmarm@lists.linux.dev, qperret@google.com,
         bgardon@google.com, ricarkol@gmail.com,
         Shaoqin Huang <shahuang@redhat.com>
 References: <20230409063000.3559991-1-ricarkol@google.com>
- <20230409063000.3559991-6-ricarkol@google.com>
+ <20230409063000.3559991-7-ricarkol@google.com>
 From:   Gavin Shan <gshan@redhat.com>
-Message-ID: <ef8ec8d0-51d9-0971-395e-04d035e948fe@redhat.com>
-Date:   Mon, 17 Apr 2023 14:38:06 +0800
+Message-ID: <2819bd9d-9a8c-938c-9297-86c1b8614550@redhat.com>
+Date:   Mon, 17 Apr 2023 14:41:39 +0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.0
 MIME-Version: 1.0
-In-Reply-To: <20230409063000.3559991-6-ricarkol@google.com>
+In-Reply-To: <20230409063000.3559991-7-ricarkol@google.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -73,181 +74,62 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 4/9/23 2:29 PM, Ricardo Koller wrote:
-> Add a new stage2 function, kvm_pgtable_stage2_split(), for splitting a
-> range of huge pages. This will be used for eager-splitting huge pages
-> into PAGE_SIZE pages. The goal is to avoid having to split huge pages
-> on write-protection faults, and instead use this function to do it
-> ahead of time for large ranges (e.g., all guest memory in 1G chunks at
-> a time).
+> Refactor kvm_arch_commit_memory_region() as a preparation for a future
+> commit to look cleaner and more understandable. Also, it looks more
+> like its x86 counterpart (in kvm_mmu_slot_apply_flags()).
 > 
 > Signed-off-by: Ricardo Koller <ricarkol@google.com>
 > Reviewed-by: Shaoqin Huang <shahuang@redhat.com>
 > ---
->   arch/arm64/include/asm/kvm_pgtable.h |  19 +++++
->   arch/arm64/kvm/hyp/pgtable.c         | 103 +++++++++++++++++++++++++++
->   2 files changed, 122 insertions(+)
+>   arch/arm64/kvm/mmu.c | 15 +++++++++++----
+>   1 file changed, 11 insertions(+), 4 deletions(-)
 > 
 
 With the following nits addressed:
 
 Reviewed-by: Gavin Shan <gshan@redhat.com>
 
-> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-> index c8e0e7d9303b2..32e5d42bf020f 100644
-> --- a/arch/arm64/include/asm/kvm_pgtable.h
-> +++ b/arch/arm64/include/asm/kvm_pgtable.h
-> @@ -653,6 +653,25 @@ bool kvm_pgtable_stage2_is_young(struct kvm_pgtable *pgt, u64 addr);
->    */
->   int kvm_pgtable_stage2_flush(struct kvm_pgtable *pgt, u64 addr, u64 size);
->   
-> +/**
-> + * kvm_pgtable_stage2_split() - Split a range of huge pages into leaf PTEs pointing
-> + *				to PAGE_SIZE guest pages.
-> + * @pgt:	 Page-table structure initialised by kvm_pgtable_stage2_init().
-> + * @addr:	 Intermediate physical address from which to split.
-> + * @size:	 Size of the range.
-> + * @mc:		 Cache of pre-allocated and zeroed memory from which to allocate
-                  ^^^^^^^^
-Alignment.
-
-> + *		 page-table pages.
-> + *
-> + * The function tries to split any level 1 or 2 entry that overlaps
-> + * with the input range (given by @addr and @size).
-> + *
-> + * Return: 0 on success, negative error code on failure. Note that
-> + * kvm_pgtable_stage2_split() is best effort: it tries to break as many
-> + * blocks in the input range as allowed by @mc_capacity.
-> + */
-> +int kvm_pgtable_stage2_split(struct kvm_pgtable *pgt, u64 addr, u64 size,
-> +			     struct kvm_mmu_memory_cache *mc);
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index efdaab3f154de..37d7d2aa472ab 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -1761,20 +1761,27 @@ void kvm_arch_commit_memory_region(struct kvm *kvm,
+>   				   const struct kvm_memory_slot *new,
+>   				   enum kvm_mr_change change)
+>   {
+> +	bool log_dirty_pages = new && new->flags & KVM_MEM_LOG_DIRTY_PAGES;
 > +
->   /**
->    * kvm_pgtable_walk() - Walk a page-table.
->    * @pgt:	Page-table structure initialised by kvm_pgtable_*_init().
-> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> index 477d2be67d401..48c5a95c6e8cd 100644
-> --- a/arch/arm64/kvm/hyp/pgtable.c
-> +++ b/arch/arm64/kvm/hyp/pgtable.c
-> @@ -1272,6 +1272,109 @@ kvm_pte_t *kvm_pgtable_stage2_create_unlinked(struct kvm_pgtable *pgt,
->   	return pgtable;
+>   	/*
+>   	 * At this point memslot has been committed and there is an
+>   	 * allocated dirty_bitmap[], dirty pages will be tracked while the
+>   	 * memory slot is write protected.
+>   	 */
+> -	if (change != KVM_MR_DELETE && new->flags & KVM_MEM_LOG_DIRTY_PAGES) {
+> +	if (log_dirty_pages) {
+> +
+> +		if (change == KVM_MR_DELETE)
+> +			return;
+> +
+>   		/*
+>   		 * If we're with initial-all-set, we don't need to write
+>   		 * protect any pages because they're all reported as dirty.
+>   		 * Huge pages and normal pages will be write protect gradually.
+>   		 */
+
+The comments need to be adjusted after this series is applied. The huge pages
+won't be write protected gradually. Instead, the huge pages will be split and
+write protected in one shoot.
+
+> -		if (!kvm_dirty_log_manual_protect_and_init_set(kvm)) {
+> -			kvm_mmu_wp_memory_region(kvm, new->id);
+> -		}
+> +		if (kvm_dirty_log_manual_protect_and_init_set(kvm))
+> +			return;
+> +
+> +		kvm_mmu_wp_memory_region(kvm, new->id);
+>   	}
 >   }
 >   
-> +/*
-> + * Get the number of page-tables needed to replace a block with a
-> + * fully populated tree up to the PTE entries. Note that @level is
-> + * interpreted as in "level @level entry".
-> + */
-> +static int stage2_block_get_nr_page_tables(u32 level)
-> +{
-> +	switch (level) {
-> +	case 1:
-> +		return PTRS_PER_PTE + 1;
-> +	case 2:
-> +		return 1;
-> +	case 3:
-> +		return 0;
-> +	default:
-> +		WARN_ON_ONCE(level < KVM_PGTABLE_MIN_BLOCK_LEVEL ||
-> +			     level >= KVM_PGTABLE_MAX_LEVELS);
-> +		return -EINVAL;
-> +	};
-> +}
-> +
-
-When the starting level is 3, it's not a block mapping if I'm correct. Besides,
-the caller (stage2_split_walker()) bails when the starting level is 3. In this
-case, the changes may be integrated to stage2_split_walker(), which is the only
-caller. Otherwise, 'inline' is worthy to have.
-
-	nr_pages = kvm_granule_shift(level) == PUD_SHIFT && kvm_granule_shift(level) != PMD_SHIFT) ?
-                    (PTRS_PER_PTE + 1) : 1;
-
-> +static int stage2_split_walker(const struct kvm_pgtable_visit_ctx *ctx,
-> +			       enum kvm_pgtable_walk_flags visit)
-> +{
-> +	struct kvm_pgtable_mm_ops *mm_ops = ctx->mm_ops;
-> +	struct kvm_mmu_memory_cache *mc = ctx->arg;
-> +	struct kvm_s2_mmu *mmu;
-> +	kvm_pte_t pte = ctx->old, new, *childp;
-> +	enum kvm_pgtable_prot prot;
-> +	u32 level = ctx->level;
-> +	bool force_pte;
-> +	int nr_pages;
-> +	u64 phys;
-> +
-> +	/* No huge-pages exist at the last level */
-> +	if (level == KVM_PGTABLE_MAX_LEVELS - 1)
-> +		return 0;
-> +
-> +	/* We only split valid block mappings */
-> +	if (!kvm_pte_valid(pte))
-> +		return 0;
-> +
-> +	nr_pages = stage2_block_get_nr_page_tables(level);
-> +	if (nr_pages < 0)
-> +		return nr_pages;
-> +
-> +	if (mc->nobjs >= nr_pages) {
-> +		/* Build a tree mapped down to the PTE granularity. */
-> +		force_pte = true;
-> +	} else {
-> +		/*
-> +		 * Don't force PTEs, so create_unlinked() below does
-> +		 * not populate the tree up to the PTE level. The
-> +		 * consequence is that the call will require a single
-> +		 * page of level 2 entries at level 1, or a single
-> +		 * page of PTEs at level 2. If we are at level 1, the
-> +		 * PTEs will be created recursively.
-> +		 */
-> +		force_pte = false;
-> +		nr_pages = 1;
-> +	}
-> +
-> +	if (mc->nobjs < nr_pages)
-> +		return -ENOMEM;
-> +
-> +	mmu = container_of(mc, struct kvm_s2_mmu, split_page_cache);
-> +	phys = kvm_pte_to_phys(pte);
-> +	prot = kvm_pgtable_stage2_pte_prot(pte);
-> +
-> +	childp = kvm_pgtable_stage2_create_unlinked(mmu->pgt, phys,
-> +						    level, prot, mc, force_pte);
-> +	if (IS_ERR(childp))
-> +		return PTR_ERR(childp);
-> +
-> +	if (!stage2_try_break_pte(ctx, mmu)) {
-> +		kvm_pgtable_stage2_free_unlinked(mm_ops, childp, level);
-> +		mm_ops->put_page(childp);
-> +		return -EAGAIN;
-> +	}
-> +
-> +	/*
-> +	 * Note, the contents of the page table are guaranteed to be made
-> +	 * visible before the new PTE is assigned because stage2_make_pte()
-> +	 * writes the PTE using smp_store_release().
-> +	 */
-> +	new = kvm_init_table_pte(childp, mm_ops);
-> +	stage2_make_pte(ctx, new);
-> +	dsb(ishst);
-> +	return 0;
-> +}
-> +
-> +int kvm_pgtable_stage2_split(struct kvm_pgtable *pgt, u64 addr, u64 size,
-> +			     struct kvm_mmu_memory_cache *mc)
-> +{
-> +	struct kvm_pgtable_walker walker = {
-> +		.cb	= stage2_split_walker,
-> +		.flags	= KVM_PGTABLE_WALK_LEAF,
-> +		.arg	= mc,
-> +	};
-> +
-> +	return kvm_pgtable_walk(pgt, addr, size, &walker);
-> +}
-> +
->   int __kvm_pgtable_stage2_init(struct kvm_pgtable *pgt, struct kvm_s2_mmu *mmu,
->   			      struct kvm_pgtable_mm_ops *mm_ops,
->   			      enum kvm_pgtable_stage2_flags flags,
 > 
 
 Thanks,
