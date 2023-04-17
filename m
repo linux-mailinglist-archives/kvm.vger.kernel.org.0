@@ -2,154 +2,175 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id ECF176E4796
-	for <lists+kvm@lfdr.de>; Mon, 17 Apr 2023 14:24:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A9C286E47E0
+	for <lists+kvm@lfdr.de>; Mon, 17 Apr 2023 14:35:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229878AbjDQMYc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 Apr 2023 08:24:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44180 "EHLO
+        id S229878AbjDQMfz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 17 Apr 2023 08:35:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56242 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229887AbjDQMYb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 17 Apr 2023 08:24:31 -0400
-Received: from smtp-fw-9103.amazon.com (smtp-fw-9103.amazon.com [207.171.188.200])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5FB7E40E3
-        for <kvm@vger.kernel.org>; Mon, 17 Apr 2023 05:23:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.co.uk; i=@amazon.co.uk; q=dns/txt;
-  s=amazon201209; t=1681734238; x=1713270238;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=Gfe+8HDjV5SU9/ZBrdrb4UQOBSL9RtsaG8eEKBBNBCg=;
-  b=lO71bB7ILdpmZd20/vvTjKwfiv+kDrQS4bbf067S1IWHNOLm4RMou5Fj
-   T/RzBFyv9VGS8Tv6fvQUBAvltS6/iQN6JkUIdIjk61Umk4Z2noiexNYHC
-   JEABn9XBx+Rmbg6mxdzBEOmxUpWz3lO3l4KE1siRnal7ijhHRMzkyi/zJ
-   k=;
-X-IronPort-AV: E=Sophos;i="5.99,204,1677542400"; 
-   d="scan'208";a="1123273937"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-iad-1a-m6i4x-54a853e6.us-east-1.amazon.com) ([10.25.36.214])
-  by smtp-border-fw-9103.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Apr 2023 12:23:10 +0000
-Received: from EX19MTAUEC002.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan3.iad.amazon.com [10.40.163.38])
-        by email-inbound-relay-iad-1a-m6i4x-54a853e6.us-east-1.amazon.com (Postfix) with ESMTPS id 289E74516E;
-        Mon, 17 Apr 2023 12:23:06 +0000 (UTC)
-Received: from EX19D008UEA004.ant.amazon.com (10.252.134.191) by
- EX19MTAUEC002.ant.amazon.com (10.252.135.253) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.26; Mon, 17 Apr 2023 12:22:48 +0000
-Received: from EX19MTAUWA001.ant.amazon.com (10.250.64.204) by
- EX19D008UEA004.ant.amazon.com (10.252.134.191) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.26; Mon, 17 Apr 2023 12:22:47 +0000
-Received: from dev-dsk-metikaya-1c-d447d167.eu-west-1.amazon.com
- (10.13.250.103) by mail-relay.amazon.com (10.250.64.204) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.26 via Frontend Transport; Mon, 17 Apr 2023 12:22:45 +0000
-From:   Metin Kaya <metikaya@amazon.co.uk>
-To:     <kvm@vger.kernel.org>, <pbonzini@redhat.com>
-CC:     <x86@kernel.org>, <bp@alien8.de>, <dwmw@amazon.co.uk>,
-        <paul@xen.org>, <seanjc@google.com>, <tglx@linutronix.de>,
-        <mingo@redhat.com>, <dave.hansen@linux.intel.com>,
-        <joao.m.martins@oracle.com>, Metin Kaya <metikaya@amazon.co.uk>
-Subject: [PATCH v2] KVM: x86/xen: Implement hvm_op/HVMOP_flush_tlbs hypercall
-Date:   Mon, 17 Apr 2023 12:22:06 +0000
-Message-ID: <20230417122206.34647-2-metikaya@amazon.co.uk>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230417122206.34647-1-metikaya@amazon.co.uk>
-References: <20230417122206.34647-1-metikaya@amazon.co.uk>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
+        with ESMTP id S229574AbjDQMfy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 17 Apr 2023 08:35:54 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0C08C3;
+        Mon, 17 Apr 2023 05:35:52 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 7F53F6235E;
+        Mon, 17 Apr 2023 12:35:52 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DC353C433D2;
+        Mon, 17 Apr 2023 12:35:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1681734951;
+        bh=6UXgo+VUKr4Q5O8Hy6t/zQ8QpSNaPZ2EAGJ/i9IICf0=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=FdNW6CfnyxPyjxXXaZruUZDJNBhsoq+8Meh1VglBN4oyIousieo0IzJLaIoHvHgSv
+         e+9cCYyGm0Sj7526x9L0i6DwZvlYFSHZtnMBAlWiueRmz1Sa1YJjb3BU7Wrc/9+5Ad
+         Ogb/CkOnLpO0CqX1flslD3v4CpgXFtDLyaglwIpXpLINiAk3XK3aHk/lGgYlzI1c6P
+         ukWd496kcUnB+bCUSqUl00kVKEX+gzg6/s3Ce0+chljj91kLZTNVfD08/h7f7w4UZl
+         W7QWWRRS7jz5YZbFAHI5+6BK0B1p2Ab5+M5MZx74SoeVfU+jVSarR1ObnRbOFcMTO5
+         AILePj3gUBKiA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1poO5F-0090sd-KL;
+        Mon, 17 Apr 2023 13:35:49 +0100
+Date:   Mon, 17 Apr 2023 13:35:49 +0100
+Message-ID: <86bkjmlm8q.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Will Deacon <will@kernel.org>
+Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Quentin Perret <qperret@google.com>,
+        Mostafa Saleh <smostafa@google.com>, stable@vger.kernel.org
+Subject: Re: [PATCH] KVM: arm64: Make vcpu flag updates non-preemptible
+In-Reply-To: <20230417114025.GA30826@willie-the-truck>
+References: <20230417093629.1440039-1-maz@kernel.org>
+        <20230417114025.GA30826@willie-the-truck>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: will@kernel.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, catalin.marinas@arm.com, qperret@google.com, smostafa@google.com, stable@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,T_SCC_BODY_TEXT_LINE,T_SPF_PERMERROR
-        autolearn=ham autolearn_force=no version=3.4.6
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-HVMOP_flush_tlbs suboperation of hvm_op hypercall allows a guest to
-flush all vCPU TLBs. There is no way for the VMM to flush TLBs from
-userspace. Hence, this patch adds support for flushing vCPU TLBs to KVM
-by making a KVM_REQ_TLB_FLUSH_GUEST request for all guest vCPUs.
+On Mon, 17 Apr 2023 12:40:26 +0100,
+Will Deacon <will@kernel.org> wrote:
+> 
+> On Mon, Apr 17, 2023 at 10:36:29AM +0100, Marc Zyngier wrote:
+> > Per-vcpu flags are updated using a non-atomic RMW operation.
+> > Which means it is possible to get preempted between the read and
+> > write operations.
+> > 
+> > Another interesting thing to note is that preemption also updates
+> > flags, as we have some flag manipulation in both the load and put
+> > operations.
+> > 
+> > It is thus possible to lose information communicated by either
+> > load or put, as the preempted flag update will overwrite the flags
+> > when the thread is resumed. This is specially critical if either
+> > load or put has stored information which depends on the physical
+> > CPU the vcpu runs on.
+> > 
+> > This results in really elusive bugs, and kudos must be given to
+> > Mostafa for the long hours of debugging, and finally spotting
+> > the problem.
+> > 
+> > Fixes: e87abb73e594 ("KVM: arm64: Add helpers to manipulate vcpu flags among a set")
+> > Reported-by: Mostafa Saleh <smostafa@google.com>
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > Cc: stable@vger.kernel.org
+> > ---
+> >  arch/arm64/include/asm/kvm_host.h | 17 +++++++++++++++++
+> >  1 file changed, 17 insertions(+)
+> > 
+> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> > index bcd774d74f34..d716cfd806e8 100644
+> > --- a/arch/arm64/include/asm/kvm_host.h
+> > +++ b/arch/arm64/include/asm/kvm_host.h
+> > @@ -579,6 +579,19 @@ struct kvm_vcpu_arch {
+> >  		v->arch.flagset & (m);				\
+> >  	})
+> >  
+> > +/*
+> > + * Note that the set/clear accessors must be preempt-safe in order to
+> > + * avoid nesting them with load/put which also manipulate flags...
+> > + */
+> > +#ifdef __KVM_NVHE_HYPERVISOR__
+> > +/* the nVHE hypervisor is always non-preemptible */
+> > +#define __vcpu_flags_preempt_disable()
+> > +#define __vcpu_flags_preempt_enable()
+> > +#else
+> > +#define __vcpu_flags_preempt_disable()	preempt_disable()
+> > +#define __vcpu_flags_preempt_enable()	preempt_enable()
+> > +#endif
+> 
+> If it makes things cleaner, we could define local (empty) copies of these
+> preempt_*() macros at EL2 to save you having to wrap them here. Up to you.
 
-Signed-off-by: Metin Kaya <metikaya@amazon.co.uk>
+Nah, that's fine. This is subtle enough stuff that I'm happy to see it
+all exposed in the same location.
 
----
- arch/x86/kvm/xen.c                 | 31 ++++++++++++++++++++++++++++++
- include/xen/interface/hvm/hvm_op.h |  3 +++
- 2 files changed, 34 insertions(+)
+> >  #define __vcpu_set_flag(v, flagset, f, m)			\
+> >  	do {							\
+> >  		typeof(v->arch.flagset) *fset;			\
+> > @@ -586,9 +599,11 @@ struct kvm_vcpu_arch {
+> >  		__build_check_flag(v, flagset, f, m);		\
+> >  								\
+> >  		fset = &v->arch.flagset;			\
+> > +		__vcpu_flags_preempt_disable();			\
+> >  		if (HWEIGHT(m) > 1)				\
+> >  			*fset &= ~(m);				\
+> >  		*fset |= (f);					\
+> > +		__vcpu_flags_preempt_enable();			\
+> >  	} while (0)
+> >  
+> >  #define __vcpu_clear_flag(v, flagset, f, m)			\
+> > @@ -598,7 +613,9 @@ struct kvm_vcpu_arch {
+> >  		__build_check_flag(v, flagset, f, m);		\
+> >  								\
+> >  		fset = &v->arch.flagset;			\
+> > +		__vcpu_flags_preempt_disable();			\
+> >  		*fset &= ~(m);					\
+> > +		__vcpu_flags_preempt_enable();			\
+> >  	} while (0)
+> >  
+> >  #define vcpu_get_flag(v, ...)	__vcpu_get_flag((v), __VA_ARGS__)
+> 
+> Given that __vcpu_get_flag() is still preemptible, we should probably
+> add a READ_ONCE() in there when we access the relevant flags field. In
+> practice, they're all single-byte fields so it should be ok, but I think
+> the READ_ONCE() is still worthwhile.
 
-diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
-index 40edf4d1974c..78fa6d08bebc 100644
---- a/arch/x86/kvm/xen.c
-+++ b/arch/x86/kvm/xen.c
-@@ -21,6 +21,7 @@
- #include <xen/interface/vcpu.h>
- #include <xen/interface/version.h>
- #include <xen/interface/event_channel.h>
-+#include <xen/interface/hvm/hvm_op.h>
- #include <xen/interface/sched.h>
- 
- #include <asm/xen/cpuid.h>
-@@ -1330,6 +1331,32 @@ static bool kvm_xen_hcall_sched_op(struct kvm_vcpu *vcpu, bool longmode,
- 	return false;
- }
- 
-+static void kvm_xen_hvmop_flush_tlbs(struct kvm_vcpu *vcpu, bool longmode,
-+				     u64 arg, u64 *r)
-+{
-+	if (arg) {
-+		*r = -EINVAL;
-+		return;
-+	}
-+
-+	kvm_make_all_cpus_request(kvm, KVM_REQ_TLB_FLUSH_GUEST);
-+	*r = 0;
-+}
-+
-+static bool kvm_xen_hcall_hvm_op(struct kvm_vcpu *vcpu, bool longmode,
-+				 int cmd, u64 arg, u64 *r)
-+{
-+	switch (cmd) {
-+	case HVMOP_flush_tlbs:
-+		kvm_xen_hvmop_flush_tlbs(vcpu, longmode, arg, r);
-+		return true;
-+	default:
-+		break;
-+	}
-+
-+	return false;
-+}
-+
- struct compat_vcpu_set_singleshot_timer {
-     uint64_t timeout_abs_ns;
-     uint32_t flags;
-@@ -1501,6 +1528,10 @@ int kvm_xen_hypercall(struct kvm_vcpu *vcpu)
- 			timeout |= params[1] << 32;
- 		handled = kvm_xen_hcall_set_timer_op(vcpu, timeout, &r);
- 		break;
-+	case __HYPERVISOR_hvm_op:
-+		handled = kvm_xen_hcall_hvm_op(vcpu, longmode, params[0], params[1],
-+					       &r);
-+		break;
- 	}
- 	default:
- 		break;
-diff --git a/include/xen/interface/hvm/hvm_op.h b/include/xen/interface/hvm/hvm_op.h
-index 03134bf3cec1..373123226c6f 100644
---- a/include/xen/interface/hvm/hvm_op.h
-+++ b/include/xen/interface/hvm/hvm_op.h
-@@ -16,6 +16,9 @@ struct xen_hvm_param {
- };
- DEFINE_GUEST_HANDLE_STRUCT(xen_hvm_param);
- 
-+/* Flushes all VCPU TLBs: @arg must be NULL. */
-+#define HVMOP_flush_tlbs            5
-+
- /* Hint from PV drivers for pagetable destruction. */
- #define HVMOP_pagetable_dying       9
- struct xen_hvm_pagetable_dying {
+Yup, good point. People are already talking about expanding some of
+the fields for $REASON, so they may become larger than a single byte.
+And READ_ONCE() makes it clear that there is some level of atomicity
+required here as well.
+
+I'll respin this shortly.
+
+Thanks,
+
+	M.
+
 -- 
-2.39.2
-
+Without deviation from the norm, progress is not possible.
