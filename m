@@ -2,282 +2,309 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DFFAA6E4016
-	for <lists+kvm@lfdr.de>; Mon, 17 Apr 2023 08:49:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 13A9F6E405A
+	for <lists+kvm@lfdr.de>; Mon, 17 Apr 2023 09:06:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230085AbjDQGtU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 Apr 2023 02:49:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43582 "EHLO
+        id S229946AbjDQHGA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 17 Apr 2023 03:06:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53872 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230030AbjDQGtT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 17 Apr 2023 02:49:19 -0400
-Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B9A4E9;
-        Sun, 16 Apr 2023 23:49:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1681714158; x=1713250158;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=Q8Srhh9mlaTWSRBcBPDe/2AVdeGtBxBRyA5mzUBVGm8=;
-  b=Jru8eBpg7b19vLWZeBgk0/BjMKXnuqdSyFmQXabFpZe8+OTppQ06x6Dl
-   hDlThNXdtf395GUlPJfqadRO0zsiGsPNBIaV2v7d/K82YliNG39S+xbjc
-   25dkt73xvmbSUhqzCEDqxlLcB2771P0mydSx0uh5+wiKnKhFVIWxociKM
-   d/1yuhDnti0jvCUnFXCO+oSRk2nF0+O9aXBDybQ56mlbbbcmq/spOFfhD
-   pPfz94OWuaXPIPaoD9sxpjo1ScpEWMzQRU+6FcNqoxc96FuoOJ3P69W4Y
-   BOpeUYumUbA8yJOyeyl2VTvPMKce+F9VqpFCLb6d6j3QO/WMOj357d4ys
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10682"; a="333615816"
-X-IronPort-AV: E=Sophos;i="5.99,203,1677571200"; 
-   d="scan'208";a="333615816"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Apr 2023 23:49:17 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10682"; a="779950372"
-X-IronPort-AV: E=Sophos;i="5.99,203,1677571200"; 
-   d="scan'208";a="779950372"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by FMSMGA003.fm.intel.com with ESMTP; 16 Apr 2023 23:49:10 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.23; Sun, 16 Apr 2023 23:49:10 -0700
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.23 via Frontend Transport; Sun, 16 Apr 2023 23:49:10 -0700
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.42) by
- edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.23; Sun, 16 Apr 2023 23:49:10 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=U1C0ILZydmFYtW+BhFQTTivztxDR5+l/tUYX2x4DlVVy2kz6l8MI1A0wjVhVZwpZYFlHxkuqPVigGcptyC85T/GY29lXsjMK2WnQjosC61qsXdvbiEtACrX4+mICEHj5+tBODGYcJP+piHnIMxwSZ9NAJkMQXI6INx68qXQPmQ/8rqQclyMWFeB6Y4hYJIfVCRCzdG0Al1TizG1Rh8KTVHZ3vmb4VB0lQwA9DK22w21J2rDYK9ycJY7Zr68biiXUonFtPNKDc+oc8lXoIWjVrcsm3Yslvp5kHjInBXF6DgiX+OwR7iOCKyUF3gYrdzQtN+0dZxCaurh4PVBwfmbq/w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=IvVlyQ/N59Js7w6Api+90cxFV0XJ58g9m+KRCRodCXM=;
- b=UVJzsBOLHQpZRXK6tb424ukPeHM2qsBARih+dj9yPjJUl3ieVsuHuGlf1Q9RHJltmLSsVq133P0PDhe0FeRiljef8LUyH/BU3/wo9QIjFKHAazPs0WCWi0Vatt5yO5d4H0Aa9ogSdBCsCJ+Xns9koUAxUqfLfE6PDL1NLV9gShxrqOGSNoyYFhH1/majzaHGC63LVBNv098e1zNJlGWzNzVz59Vc60WdVtKS3TAEzidtkux+Crr68ypiRwVp+4p9clb4mWIrnTQnWDP3IR+ZjKtgSqBvsCv3cN13LQlcUwzRtFMt0f5hxHKhkBtrt4vySSRlSZLFGGAOBITYonAJUQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from PH0PR11MB5045.namprd11.prod.outlook.com (2603:10b6:510:3f::11)
- by PH7PR11MB6380.namprd11.prod.outlook.com (2603:10b6:510:1f8::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6298.45; Mon, 17 Apr
- 2023 06:49:08 +0000
-Received: from PH0PR11MB5045.namprd11.prod.outlook.com
- ([fe80::deb3:2852:a71:ce73]) by PH0PR11MB5045.namprd11.prod.outlook.com
- ([fe80::deb3:2852:a71:ce73%3]) with mapi id 15.20.6298.030; Mon, 17 Apr 2023
- 06:49:08 +0000
-Message-ID: <c89c9d44-f9c4-2e48-ff0f-f0e070de6426@intel.com>
-Date:   Mon, 17 Apr 2023 14:48:56 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Firefox/102.0 Thunderbird/102.10.0
-Subject: Re: [RFC PATCH v2 04/11] KVM: VMX: Add IA32_SPEC_CTRL virtualization
- support
-Content-Language: en-US
-To:     Chao Gao <chao.gao@intel.com>, <kvm@vger.kernel.org>
-CC:     Jiaan Lu <jiaan.lu@intel.com>, Zhang Chen <chen.zhang@intel.com>,
-        "Sean Christopherson" <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, <x86@kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>, <linux-kernel@vger.kernel.org>
-References: <20230414062545.270178-1-chao.gao@intel.com>
- <20230414062545.270178-5-chao.gao@intel.com>
-From:   Chenyi Qiang <chenyi.qiang@intel.com>
-In-Reply-To: <20230414062545.270178-5-chao.gao@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SG2PR02CA0019.apcprd02.prod.outlook.com
- (2603:1096:3:17::31) To PH0PR11MB5045.namprd11.prod.outlook.com
- (2603:10b6:510:3f::11)
+        with ESMTP id S229500AbjDQHF6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 17 Apr 2023 03:05:58 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12B3BB7
+        for <kvm@vger.kernel.org>; Mon, 17 Apr 2023 00:05:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1681715109;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=0ZEkcAbwZBFt6Vk4rvpPu2R+rXf5tjBzverFgxc+9iU=;
+        b=WGbxOcUVOg0W3b7+N0ACIF9O32w3T2+3qjymWnoQcsK6qaOw+LNqLfnwV+RYADV0YWW2oT
+        GfxnTkbVGUormON03pROhbyv+kda1lmHCqRemWnTCNtFraNH79Z8lH+vnWswG97ua5eG/l
+        N7bc4XFFjFLYDZj+QOdvnDGn+F3M3AY=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-331-GNLtMMJ-MOyeH3MAq4je6Q-1; Mon, 17 Apr 2023 03:05:04 -0400
+X-MC-Unique: GNLtMMJ-MOyeH3MAq4je6Q-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E2E10185A791;
+        Mon, 17 Apr 2023 07:05:02 +0000 (UTC)
+Received: from [10.72.13.187] (ovpn-13-187.pek2.redhat.com [10.72.13.187])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 8558D2166B26;
+        Mon, 17 Apr 2023 07:04:50 +0000 (UTC)
+Reply-To: Gavin Shan <gshan@redhat.com>
+Subject: Re: [PATCH v7 08/12] KVM: arm64: Add
+ KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE
+To:     Ricardo Koller <ricarkol@google.com>, pbonzini@redhat.com,
+        maz@kernel.org, oupton@google.com, yuzenghui@huawei.com,
+        dmatlack@google.com
+Cc:     kvm@vger.kernel.org, kvmarm@lists.linux.dev, qperret@google.com,
+        catalin.marinas@arm.com, andrew.jones@linux.dev, seanjc@google.com,
+        alexandru.elisei@arm.com, suzuki.poulose@arm.com,
+        eric.auger@redhat.com, reijiw@google.com, rananta@google.com,
+        bgardon@google.com, ricarkol@gmail.com,
+        Oliver Upton <oliver.upton@linux.dev>
+References: <20230409063000.3559991-1-ricarkol@google.com>
+ <20230409063000.3559991-10-ricarkol@google.com>
+From:   Gavin Shan <gshan@redhat.com>
+Message-ID: <58664917-edfa-8c7a-2833-0664d83277d6@redhat.com>
+Date:   Mon, 17 Apr 2023 15:04:47 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR11MB5045:EE_|PH7PR11MB6380:EE_
-X-MS-Office365-Filtering-Correlation-Id: bf4e63c0-d040-4227-1c0f-08db3f0fd782
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: rrQuhvyZikcKhsX8YmRZVrTj4kByfhLTQ9WZFqWdTjk1flLUSGCRQPr/2B03gqSfJ9mtQ+QhRQS5YS1/fVRbUSoJS5OHTHkXaQV2D1HC/ReHl6HZ3rRhNcnRdhlVdv7ez6//9I/7nxxJzt5fFBpPHYmK7+1boEckWBHiOOVFr3X2Rd5NrPxrllOfF09+EK+bWNLyYPjMiZIxlsB/sgkt2basprEPkPSf1u1Y/aFxME5yaKcFUR3iKGU5KsJPmwnWXmnjY/Y3wcShJKB5NyEAVD+FZKpnevLNbb0y6XxF0d6IqV5UHLxJS5zh4g2jj3D4GWlIj1mQO0J5LPF/I7kZs2dXGlkwljDiNRQNeu7KMxEMK9leNkzpAIQiZvhb4Bm9WoHEMr/VvsseNKKiHu11ZraMvwqieiiEktVTG6yh533URKF7O2LufNuTPSILBVcEk9BUAwgzqyOdU1+U3c8KwUbtqV+o2D/4wvGafF9ZifRl/4X6uI66LMFfKKq0ryU9WNsUV9ltlpMSjRoOOoVxICfQH7K0H/kVeDBoNXsR/pdnVEMJwm9dEONc9mwqoXT8MJonNGYbnp5nXAw+LYtfoMgt1ymCroKcfwyCnD5UuoKhe4FgKr5sx0SjB+hrAbjrShiLzHJ2PxxdS2tg5xvpuYWjQyULeJLP+hg7ti5xYPE=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB5045.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(136003)(366004)(346002)(376002)(39860400002)(396003)(451199021)(86362001)(31696002)(83380400001)(36756003)(53546011)(26005)(6512007)(6506007)(186003)(2906002)(44832011)(7416002)(31686004)(2616005)(6486002)(5660300002)(38100700002)(6666004)(8936002)(8676002)(478600001)(54906003)(82960400001)(41300700001)(316002)(66946007)(66556008)(66476007)(4326008)(21314003)(43740500002)(45980500001);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?SjhvU0ZDWlFZVWxabHdIOG5JNGlIK0F4S0pjK2c2SmZvb2NDQjN4MlVBV0U2?=
- =?utf-8?B?MjY5dXR0NXV1Uzdodkg4V0FYMmRndVVjY0Q3S1B1ei9XZGk5aFF2eXY1alBw?=
- =?utf-8?B?SFZCTlF2ZkwvZFh5UFBmNUV1emVuWkVYL3RhSTJpYkJGU0pXRHM1TG5aRHYw?=
- =?utf-8?B?bDE4UG04ODFneVpiazJlNDRDMGhLaDQvYXd4bStROTNnR2ZDT3JVMktlWDdB?=
- =?utf-8?B?Y0haL1ptUEF3NXNUUVRxVHk3dGlpQVZ1bUJHRE1OTFZRMjdYUDByNGZwMWNu?=
- =?utf-8?B?VmkwZmVzQk1ZVXBONEtkL21PbWxjcnlJb1l4cDdQTnB3bi9zemhSc1JOeDh1?=
- =?utf-8?B?ZVRBVHppZ29oVDFHTCtkYUNqSXdtQkZnUFl1TjBvUzlHb25yNlRGdnVjUGhY?=
- =?utf-8?B?c2d5MExoOGhDamNNa0x1cEphcXY4S1pNNDNIMjNLcTJjbW4rVWdVbGtkbzg4?=
- =?utf-8?B?Y0ViU2d1VTNva0tIY1ViQ2I4TmcvZE83K1VieGlRNmZnQ1JGNndLU1phb0d4?=
- =?utf-8?B?aHRCc3dnMTZOZEcvUElQMEY5LzVnQ1dZaFFhSHBQWStEUTdFTTVXR05EVUlG?=
- =?utf-8?B?THVzd3NxM1d5WCtXd3gzUG91Z2oxenhiTFc5ZldhSzhIV3pkdUZEUWt5b2NF?=
- =?utf-8?B?NG9JekRTY1d4SVNKVXd6K3F6SkJadnp0RTBOMm1WRURVamhrYVgxWmwvTkE1?=
- =?utf-8?B?YlpFSTJJWUZUTXhuVWtSVGRNWFdJVkFoQzAxcEJ5T2F4MzBSMUNDN2JlNUxq?=
- =?utf-8?B?ZDEyVlU5TS80Zk1BcU5Ydld2NGErYmRYd2dFQVQ3YU45bFd0SFZPSjFPWEwr?=
- =?utf-8?B?YTFRTGVSM1h2cGEvb25ha3EwZVVYNU1uVFU3V3Iyd1ptZmJCNXNWMkFzc2s4?=
- =?utf-8?B?bE9tYTloNGpjOWtueE9oNFVhbElkZVlPZlBuVHd5Mjd1SEVCNk92V1JDemR3?=
- =?utf-8?B?ODJ0NGV5amsyM2t4cmlWSzdUcnpGTmxuM0VJRnJqMkpXU2VJb21IM3Y0SVZk?=
- =?utf-8?B?Znd0WUkzNUo3UUI5b0UzR3pRWUhiUHR0S1dsSFhlazFoM1RIMnVRb1J6YjJG?=
- =?utf-8?B?TTFWaVFCUEZ6VDJjUVZrL2dyS29lYVQ3S2N6bkJYSFpSU08ydDl4aTYra2g2?=
- =?utf-8?B?T3JLMU94Z0tGcjBqR2JnbkY5NUtUeWw3UG9OZENTOEhuNGpnSy9wdWx2OU81?=
- =?utf-8?B?VzNaa3YreHNPdCtCNTZBU2xvdGJDTmliSFFsclhaSklMdGhDS1NDbVpPZytK?=
- =?utf-8?B?MGhCdTNQK1J0NUY3alNMLzYrK1VJVGl2STVoRE9UeWY5M0NJYVlMa3RCTHA5?=
- =?utf-8?B?U1hIVlZpN3V3dlBvWW5aYWhEamJpUGdicE52REdxbzRzeWVYU0hySll5NmpR?=
- =?utf-8?B?TUZIMTkveWJQa2tieS9vbTNFSVVhaFE1TzN4V0trWmRlOHJ3RFNyUlIrekJu?=
- =?utf-8?B?OXVUQ3JEd0c5eVI4Ym9BaVUzK1dsUEhWS3d2WFdBbHF0TE0zc08xSzIvLy9U?=
- =?utf-8?B?UFpOdldqa0dZQnVWT2s3bTFmS29ZcmlvOXo3TjdDaGJ2Rm9ISjB5cnk2d3g2?=
- =?utf-8?B?dkdKNm1GZTRXRTVVK2xPaFA2Mk9ndW4xU3g0YTlhbkxGZEJBNmFFbUtZbUM0?=
- =?utf-8?B?aEVYbDhrYmFhSGhLM1N3Z1NiOEo3VWgwYXNwUTlCMEZIRU1xZTEweGhKclFC?=
- =?utf-8?B?MkVEY291c1Bmc2VLNUVoUGQ0bGFBclJYcTFzc0hweCtLSDVFakhPNXpaNGNq?=
- =?utf-8?B?SnhUQ0hXSlBkWFY1VWRJSzlOZmVFcXdhbUdQQTgwVXZOdmNoTEVtc3Jqenlh?=
- =?utf-8?B?NVQ2ZTBndkR1TlVhWXB0ZUIwY1djbDJFS0hWdjZZOFJVZTRweVJzSWtCclhH?=
- =?utf-8?B?THBnR0RsRzhWSXBTRVpleG10MHU2Ynh2N25TUTcxZEI2NHo1Vm1YVWJOR0NY?=
- =?utf-8?B?Y21LVHZwenhRdkdMeVlYSW5hTmpCUmVjMjFwVG80MnN4eFNNVElrUUpGWm10?=
- =?utf-8?B?THZ3U1B3QUNaQS9LZ3NRcWlBQzB1VnJPZXZONzdsVjNabm1DeEJHZ3h3b1lV?=
- =?utf-8?B?UWMrTXBjdkJ5L0F3cFhhc0pnd1U0SjRxakUwZUlNVG1qZFBrb1UxK1pBU2NQ?=
- =?utf-8?Q?kBFzjnQ3HV/HpO6FvE/qaQ5MZ?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: bf4e63c0-d040-4227-1c0f-08db3f0fd782
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB5045.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Apr 2023 06:49:07.9594
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 3pPFROKarDNaLiEVtm37ZI+Kv1BDLK1FzUzq3dlLjiajghxML68rCq/ubs41e+/+em5gmPeBrSJ+qzLJNx/6Jw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB6380
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-5.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+In-Reply-To: <20230409063000.3559991-10-ricarkol@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
+X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 4/14/2023 2:25 PM, Chao Gao wrote:
-> From: Zhang Chen <chen.zhang@intel.com>
+On 4/9/23 2:29 PM, Ricardo Koller wrote:
+> Add a capability for userspace to specify the eager split chunk size.
+> The chunk size specifies how many pages to break at a time, using a
+> single allocation. Bigger the chunk size, more pages need to be
+> allocated ahead of time.
 > 
-> Currently KVM disables interception of IA32_SPEC_CTRL after a non-0 is
-> written to IA32_SPEC_CTRL by guest. Then, guest is allowed to write any
-> value to hardware.
-> 
-> "virtualize IA32_SPEC_CTRL" is a new tertiary vm-exec control. This
-> feature allows KVM to specify that certain bits of the IA32_SPEC_CTRL
-> MSR cannot be modified by guest software.
-> 
-> Two VMCS fields are added:
-> 
->   IA32_SPEC_CTRL_MASK:   bits that guest software cannot modify
->   IA32_SPEC_CTRL_SHADOW: value that guest software expects to be in the
-> 			 IA32_SPEC_CTRL MSR
-> 
-> On rdmsr, the shadow value is returned. on wrmsr, EDX:EAX is written
-> to the IA32_SPEC_CTRL_SHADOW and (cur_val & mask) | (EDX:EAX & ~mask)
-> is written to the IA32_SPEC_CTRL MSR, where
->   * cur_val is the original value of IA32_SPEC_CTRL MSR
->   * mask is the value of IA32_SPEC_CTRL_MASK
-> 
-> Add a mask e.g., loaded_vmcs->spec_ctrl_mask to represent the bits guest
-> shouldn't change. It is 0 for now and some bits will be added by
-> following patches. Use per-vmcs cache to avoid unnecessary vmcs_write()
-> on nested transition because the mask is expected to be rarely changed
-> and the same for vmcs01 and vmcs02.
-> 
-> To prevent guest from changing the bits in the mask, enable "virtualize
-> IA32_SPEC_CTRL" if supported or emulate its behavior by intercepting
-> the IA32_SPEC_CTRL msr. Emulating "virtualize IA32_SPEC_CTRL" behavior
-> is mainly to give the same capability to KVM running on potential broken
-> hardware or L1 guests.
-> 
-> To avoid L2 evading the enforcement, enable "virtualize IA32_SPEC_CTRL"
-> in vmcs02. Always update the guest (shadow) value of IA32_SPEC_CTRL MSR
-> and the mask to preserve them across nested transitions. Note that the
-> shadow value may be changed because L2 may access the IA32_SPEC_CTRL
-> directly and the mask may be changed due to migration when L2 vCPUs are
-> running.
-> 
-> Co-developed-by: Chao Gao <chao.gao@intel.com>
-> Signed-off-by: Chao Gao <chao.gao@intel.com>
-> Signed-off-by: Zhang Chen <chen.zhang@intel.com>
-> Signed-off-by: Chao Gao <chao.gao@intel.com>
-
-Duplicated SOB. Move the Co-developed-by down like other patches.
-
-> Tested-by: Jiaan Lu <jiaan.lu@intel.com>
+> Suggested-by: Oliver Upton <oliver.upton@linux.dev>
+> Signed-off-by: Ricardo Koller <ricarkol@google.com>
 > ---
->  arch/x86/include/asm/vmx.h         |  5 ++++
->  arch/x86/include/asm/vmxfeatures.h |  2 ++
->  arch/x86/kvm/vmx/capabilities.h    |  5 ++++
->  arch/x86/kvm/vmx/nested.c          | 13 ++++++++++
->  arch/x86/kvm/vmx/vmcs.h            |  2 ++
->  arch/x86/kvm/vmx/vmx.c             | 34 ++++++++++++++++++++-----
->  arch/x86/kvm/vmx/vmx.h             | 40 +++++++++++++++++++++++++++++-
->  7 files changed, 94 insertions(+), 7 deletions(-)
+>   Documentation/virt/kvm/api.rst       | 28 ++++++++++++++++++++++++++
+>   arch/arm64/include/asm/kvm_host.h    | 15 ++++++++++++++
+>   arch/arm64/include/asm/kvm_pgtable.h | 18 +++++++++++++++++
+>   arch/arm64/kvm/arm.c                 | 30 ++++++++++++++++++++++++++++
+>   arch/arm64/kvm/mmu.c                 |  3 +++
+>   include/uapi/linux/kvm.h             |  2 ++
+>   6 files changed, 96 insertions(+)
 > 
-> diff --git a/arch/x86/include/asm/vmx.h b/arch/x86/include/asm/vmx.h
-> index 498dc600bd5c..b9f88ecf20c3 100644
-> --- a/arch/x86/include/asm/vmx.h
-> +++ b/arch/x86/include/asm/vmx.h
-> @@ -81,6 +81,7 @@
->   * Definitions of Tertiary Processor-Based VM-Execution Controls.
->   */
->  #define TERTIARY_EXEC_IPI_VIRT			VMCS_CONTROL_BIT(IPI_VIRT)
-> +#define TERTIARY_EXEC_SPEC_CTRL_VIRT		VMCS_CONTROL_BIT(SPEC_CTRL_VIRT)
->  
->  #define PIN_BASED_EXT_INTR_MASK                 VMCS_CONTROL_BIT(INTR_EXITING)
->  #define PIN_BASED_NMI_EXITING                   VMCS_CONTROL_BIT(NMI_EXITING)
-> @@ -233,6 +234,10 @@ enum vmcs_field {
->  	TERTIARY_VM_EXEC_CONTROL_HIGH	= 0x00002035,
->  	PID_POINTER_TABLE		= 0x00002042,
->  	PID_POINTER_TABLE_HIGH		= 0x00002043,
-> +	IA32_SPEC_CTRL_MASK             = 0x0000204A,
-> +	IA32_SPEC_CTRL_MASK_HIGH        = 0x0000204B,
-> +	IA32_SPEC_CTRL_SHADOW           = 0x0000204C,
-> +	IA32_SPEC_CTRL_SHADOW_HIGH      = 0x0000204D,
->  	GUEST_PHYSICAL_ADDRESS          = 0x00002400,
->  	GUEST_PHYSICAL_ADDRESS_HIGH     = 0x00002401,
->  	VMCS_LINK_POINTER               = 0x00002800,
-> diff --git a/arch/x86/include/asm/vmxfeatures.h b/arch/x86/include/asm/vmxfeatures.h
-> index c6a7eed03914..c70d0769b7d0 100644
-> --- a/arch/x86/include/asm/vmxfeatures.h
-> +++ b/arch/x86/include/asm/vmxfeatures.h
-> @@ -89,4 +89,6 @@
->  
->  /* Tertiary Processor-Based VM-Execution Controls, word 3 */
->  #define VMX_FEATURE_IPI_VIRT		( 3*32+  4) /* Enable IPI virtualization */
-> +#define VMX_FEATURE_SPEC_CTRL_VIRT	( 3*32+  7) /* Enable IA32_SPEC_CTRL virtualization */
+
+With the following comments addressed:
+
+Reviewed-by: Gavin Shan <gshan@redhat.com>
+
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index 62de0768d6aa5..f8faa80d87057 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -8380,6 +8380,34 @@ structure.
+>   When getting the Modified Change Topology Report value, the attr->addr
+>   must point to a byte where the value will be stored or retrieved from.
+>   
+> +8.40 KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE
+> +---------------------------------------
 > +
->  #endif /* _ASM_X86_VMXFEATURES_H */
-> diff --git a/arch/x86/kvm/vmx/capabilities.h b/arch/x86/kvm/vmx/capabilities.h
-> index 45162c1bcd8f..a7ab70b55acf 100644
-> --- a/arch/x86/kvm/vmx/capabilities.h
-> +++ b/arch/x86/kvm/vmx/capabilities.h
-> @@ -138,6 +138,11 @@ static inline bool cpu_has_tertiary_exec_ctrls(void)
->  		CPU_BASED_ACTIVATE_TERTIARY_CONTROLS;
->  }
->  
-> +static __always_inline bool cpu_has_spec_ctrl_virt(void)
+> +:Capability: KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE
+> +:Architectures: arm64
+> +:Type: vm
+> +:Parameters: arg[0] is the new split chunk size.
+> +:Returns: 0 on success, -EINVAL if any memslot was already created.
+                                                   ^^^^^^^^^^^^^^^^^^^
 
-Do we need to use __always_inline to force generating inline code? or
-just align with other cpu_has_xxx() functions, use inline annotation.
+Maybe s/was already created/has been created
 
+> +
+> +This capability sets the chunk size used in Eager Page Splitting.
+> +
+> +Eager Page Splitting improves the performance of dirty-logging (used
+> +in live migrations) when guest memory is backed by huge-pages.  It
+> +avoids splitting huge-pages (into PAGE_SIZE pages) on fault, by doing
+> +it eagerly when enabling dirty logging (with the
+> +KVM_MEM_LOG_DIRTY_PAGES flag for a memory region), or when using
+> +KVM_CLEAR_DIRTY_LOG.
+> +
+> +The chunk size specifies how many pages to break at a time, using a
+> +single allocation for each chunk. Bigger the chunk size, more pages
+> +need to be allocated ahead of time.
+> +
+> +The chunk size needs to be a valid block size. The list of acceptable
+> +block sizes is exposed in KVM_CAP_ARM_SUPPORTED_BLOCK_SIZES as a 64bit
+> +bitmap (each bit describing a block size). Setting
+> +KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE to 0 disables Eager Page Splitting;
+> +this is the default value.
+> +
+
+s/a 64bit bitmap/a 64-bit bitmap
+
+For the last sentence, maybe:
+
+The default value is 0, to disable the eager page splitting.
+
+>   9. Known KVM API problems
+>   =========================
+>   
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index a1892a8f60323..b87da1ebc3454 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -158,6 +158,21 @@ struct kvm_s2_mmu {
+>   	/* The last vcpu id that ran on each physical CPU */
+>   	int __percpu *last_vcpu_ran;
+>   
+> +#define KVM_ARM_EAGER_SPLIT_CHUNK_SIZE_DEFAULT 0
+> +	/*
+> +	 * Memory cache used to split
+> +	 * KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE worth of huge pages. It
+> +	 * is used to allocate stage2 page tables while splitting huge
+> +	 * pages. Note that the choice of EAGER_PAGE_SPLIT_CHUNK_SIZE
+> +	 * influences both the capacity of the split page cache, and
+> +	 * how often KVM reschedules. Be wary of raising CHUNK_SIZE
+> +	 * too high.
+> +	 *
+> +	 * Protected by kvm->slots_lock.
+> +	 */
+> +	struct kvm_mmu_memory_cache split_page_cache;
+> +	uint64_t split_page_chunk_size;
+> +
+>   	struct kvm_arch *arch;
+>   };
+>   
+> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+> index 32e5d42bf020f..889bd7afeb355 100644
+> --- a/arch/arm64/include/asm/kvm_pgtable.h
+> +++ b/arch/arm64/include/asm/kvm_pgtable.h
+> @@ -92,6 +92,24 @@ static inline bool kvm_level_supports_block_mapping(u32 level)
+>   	return level >= KVM_PGTABLE_MIN_BLOCK_LEVEL;
+>   }
+>   
+> +static inline u64 kvm_supported_block_sizes(void)
 > +{
-> +	return vmcs_config.cpu_based_3rd_exec_ctrl & TERTIARY_EXEC_SPEC_CTRL_VIRT;
+> +	u32 level = KVM_PGTABLE_MIN_BLOCK_LEVEL;
+> +	u64 res = 0;
+> +
+> +	for (; level < KVM_PGTABLE_MAX_LEVELS; level++)
+> +		res |= BIT(kvm_granule_shift(level));
+> +
+> +	return res;
 > +}
 > +
->  static inline bool cpu_has_vmx_virtualize_apic_accesses(void)
->  {
->  	return vmcs_config.cpu_based_2nd_exec_ctrl &
+
+maybe s/@res/@r
+
+> +static inline bool kvm_is_block_size_supported(u64 size)
+> +{
+> +	bool is_power_of_two = !((size) & ((size)-1));
+> +
+> +	return is_power_of_two && (size & kvm_supported_block_sizes());
+> +}
+> +
+
+IS_ALIGNED() maybe used here.
+
+>   /**
+>    * struct kvm_pgtable_mm_ops - Memory management callbacks.
+>    * @zalloc_page:		Allocate a single zeroed memory page.
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 3bd732eaf0872..34fd3c59a9b82 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -67,6 +67,7 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+>   			    struct kvm_enable_cap *cap)
+>   {
+>   	int r;
+> +	u64 new_cap;
+>   
+>   	if (cap->flags)
+>   		return -EINVAL;
+> @@ -91,6 +92,26 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+>   		r = 0;
+>   		set_bit(KVM_ARCH_FLAG_SYSTEM_SUSPEND_ENABLED, &kvm->arch.flags);
+>   		break;
+> +	case KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE:
+> +		new_cap = cap->args[0];
+> +
+> +		mutex_lock(&kvm->lock);
+> +		mutex_lock(&kvm->slots_lock);
+> +		/*
+> +		 * To keep things simple, allow changing the chunk
+> +		 * size only if there are no memslots already created.
+> +		 */
+
+		/*
+		 * To keep things simple, allow changing the chunk size
+		 * only when no memory slots have been created.
+		 */
+
+> +		if (!kvm_are_all_memslots_empty(kvm)) {
+> +			r = -EINVAL;
+> +		} else if (new_cap && !kvm_is_block_size_supported(new_cap)) {
+> +			r = -EINVAL;
+> +		} else {
+> +			r = 0;
+> +			kvm->arch.mmu.split_page_chunk_size = new_cap;
+> +		}
+> +		mutex_unlock(&kvm->slots_lock);
+> +		mutex_unlock(&kvm->lock);
+> +		break;
+>   	default:
+>   		r = -EINVAL;
+>   		break;
+> @@ -288,6 +309,15 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>   	case KVM_CAP_ARM_PTRAUTH_GENERIC:
+>   		r = system_has_full_ptr_auth();
+>   		break;
+> +	case KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE:
+> +		if (kvm)
+> +			r = kvm->arch.mmu.split_page_chunk_size;
+> +		else
+> +			r = KVM_ARM_EAGER_SPLIT_CHUNK_SIZE_DEFAULT;
+> +		break;
+> +	case KVM_CAP_ARM_SUPPORTED_BLOCK_SIZES:
+> +		r = kvm_supported_block_sizes();
+> +		break;
+
+kvm_supported_block_sizes() returns u64, but @r is 32-bits in width. It may be
+worthy to make the return value from kvm_supported_block_sizes() as u32.
+
+>   	default:
+>   		r = 0;
+>   	}
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index a2800e5c42712..898985b09321a 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -756,6 +756,9 @@ int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu, unsigned long t
+>   	for_each_possible_cpu(cpu)
+>   		*per_cpu_ptr(mmu->last_vcpu_ran, cpu) = -1;
+>  
+
+It may be worthy to have comments like below:
+
+	/* The eager page splitting is disabled by default */
+  
+> +	mmu->split_page_cache.gfp_zero = __GFP_ZERO;
+> +	mmu->split_page_chunk_size = KVM_ARM_EAGER_SPLIT_CHUNK_SIZE_DEFAULT;
+> +
+>   	mmu->pgt = pgt;
+>   	mmu->pgd_phys = __pa(pgt->pgd);
+>   	return 0;
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index d77aef872a0a0..f18b48fcd25ba 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -1184,6 +1184,8 @@ struct kvm_ppc_resize_hpt {
+>   #define KVM_CAP_S390_PROTECTED_ASYNC_DISABLE 224
+>   #define KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP 225
+>   #define KVM_CAP_PMU_EVENT_MASKED_EVENTS 226
+> +#define KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE 227
+> +#define KVM_CAP_ARM_SUPPORTED_BLOCK_SIZES 228
+>   
+>   #ifdef KVM_CAP_IRQ_ROUTING
+>   
+> 
+
+Thanks,
+Gavin
 
