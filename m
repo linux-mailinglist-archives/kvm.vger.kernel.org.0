@@ -2,85 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E58836E510C
-	for <lists+kvm@lfdr.de>; Mon, 17 Apr 2023 21:35:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7C73F6E5110
+	for <lists+kvm@lfdr.de>; Mon, 17 Apr 2023 21:37:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229531AbjDQTfA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 Apr 2023 15:35:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50618 "EHLO
+        id S230168AbjDQThG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 17 Apr 2023 15:37:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52206 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230513AbjDQTez (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 17 Apr 2023 15:34:55 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6481B5
-        for <kvm@vger.kernel.org>; Mon, 17 Apr 2023 12:34:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1681760048;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=0qQGxbZ2Ila+Q997whosT821l4x4H8QzSUtQhvaCL+o=;
-        b=KpCVkLann2LhuX/F7JfHQnlmvlGaAiOhsAFVBOCOtbs2Epao9YVJ7AZPZFt8qulf1aoCEs
-        /K2RmTV6EnZDUL9OG2GUM6fjwXqzuGuVKR18pPALGz1CM5Eji3AXxLjefdxddqMbOhAuOT
-        Wt2BHQaMBBKi1FlWyX2d96ZtY0Bm1NI=
-Received: from mail-il1-f200.google.com (mail-il1-f200.google.com
- [209.85.166.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-142-8ScQUTJGOSS3N2_w61FLKQ-1; Mon, 17 Apr 2023 15:34:07 -0400
-X-MC-Unique: 8ScQUTJGOSS3N2_w61FLKQ-1
-Received: by mail-il1-f200.google.com with SMTP id y7-20020a056e02128700b0032a9be7a8e4so3336851ilq.6
-        for <kvm@vger.kernel.org>; Mon, 17 Apr 2023 12:34:07 -0700 (PDT)
+        with ESMTP id S229602AbjDQThE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 17 Apr 2023 15:37:04 -0400
+Received: from mail-lf1-x130.google.com (mail-lf1-x130.google.com [IPv6:2a00:1450:4864:20::130])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45A46EC;
+        Mon, 17 Apr 2023 12:37:02 -0700 (PDT)
+Received: by mail-lf1-x130.google.com with SMTP id 2adb3069b0e04-4edc51644b6so95351e87.1;
+        Mon, 17 Apr 2023 12:37:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1681760220; x=1684352220;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7kcEqkWwDnSb2Vr/kKTigbKdiQ7bKuudzY2P/pZrExU=;
+        b=pawD2mkoR+7QoMOQwCB1AYWgSd7dZsJs1NVJiLuM60kxBLCpkr2u4c0nF5ciUFoNg0
+         k64wLTCq9lKp1A9g4gM11Gz1bvdH/RnqRnvRg2cb5tTkWeDqcLa3mmal1kkmOdkllnJ4
+         t5dQTf0HLMzlrlpir1+cDDWeTS7lzjzS3t1QAMYtgjAGJ1Vgc8IhthnKhcZkfaHeWPFm
+         ZOxNaEFpS3uEQYOsMx3NAxkcXE8XAT30AuY/dh5LOnWz/vjz//Ob2Wcv1xrNyZ32VlrF
+         jNrfMS+JpHkjIf7/sWpdFWV/8UllRnGfSqjgeCPr2nw6CYEAnP/gBVVhhDX4+CoUU5XF
+         QOeA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681760047; x=1684352047;
+        d=1e100.net; s=20221208; t=1681760220; x=1684352220;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=0qQGxbZ2Ila+Q997whosT821l4x4H8QzSUtQhvaCL+o=;
-        b=Yb5/ohsfbNzvkZEBaI31/aZEtNoXas5+xqmhtG3yfeKIDWpfNrqsbSdpdKdWyBjKEn
-         9IAh/hnBUlPQoBTdfUW7yVGJ2+DOYfcyhfm30S2Emx7o6IHh4toMDM5sydfjqzXuK24p
-         tLDhJOEK4SA2TI6Y7QjJ6/wf1NqmucuUZWbu0SSBdLhRmfXPdSCwOUTQ9UWU1WNagxNk
-         OXjkAyR1AfYBHbtGrTeDdDVH/nJATMmgiWRrMbxiC/Up4h81MFrxdwkPiUwSMiMHom9M
-         Z4kP41DQvRWm6je7vegi7zGC+pJfdncuP0C36RbeBrsK3txA2Xw3Seoai17S2jOf+HhZ
-         aNaQ==
-X-Gm-Message-State: AAQBX9f0TqGPitzwrOUV5+eh/8HCdoW3eOLJHh8mnpwllOYSN3/a3PLx
-        AtjCj32bx650fZPMSZWLWigkI4r+H3ZYwTKDrRSbOlfQPqWWfjr1nP9K0qTntp2SgSR5r3evJoy
-        YPCLL7ORrmKgE
-X-Received: by 2002:a6b:d30e:0:b0:763:5a15:5b0c with SMTP id s14-20020a6bd30e000000b007635a155b0cmr1493490iob.6.1681760046820;
-        Mon, 17 Apr 2023 12:34:06 -0700 (PDT)
-X-Google-Smtp-Source: AKy350YbGCKpuxX3FSGpwGzEfcn/NsieT3yolj4kjxkZv5G24STHUOQLOvCM5pgGGWTFPPFecos5YA==
-X-Received: by 2002:a6b:d30e:0:b0:763:5a15:5b0c with SMTP id s14-20020a6bd30e000000b007635a155b0cmr1493472iob.6.1681760046552;
-        Mon, 17 Apr 2023 12:34:06 -0700 (PDT)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id c12-20020a5ea80c000000b0075c47fb539asm3388760ioa.0.2023.04.17.12.34.05
+        bh=7kcEqkWwDnSb2Vr/kKTigbKdiQ7bKuudzY2P/pZrExU=;
+        b=CT4FdIUtQbVZFdnsgAuZ0Cy838fcg9u0JEr0ZxuZ7puxLvKj2Wo1GAfC7Exo1aFr8H
+         c6s9zdHhtTKWrqpMmZ/FRazPsnKmq4cxpqWtVyS1vNysiwyDu6G/CPk4YYprd5v0NQuy
+         pt0XeHIJzmIkNVERPDl+xr4T5LMC8SpiEs+4xEmNRsK+qD/LV0yB+782ZFyt/SDrGkwW
+         KlY3eG+KzLUl3XJFBNV8Mu6LfEERD/Zmla4O10TtCDJ8YBL+EUyAwVX/qiMELHy46JsW
+         M9lRgCxh7iiEv2vQTH/PN18gaAsJNy4YA4oCZW1S74giV7/Z7TW8qHwi719QaaSbLzcS
+         rGAQ==
+X-Gm-Message-State: AAQBX9c9yzuMbJBSaKvSXmBGN2jgoDkVF7mK85Jl2lVb1ytJn42ozOoy
+        LGU9ZrEmC7kqYJfmgGukgxM=
+X-Google-Smtp-Source: AKy350bwPR/Fg5EyUJdxVaBkSyRMFm3rP1YuBXk/6dNmo5EhpB5GHRJudKaNFxzjf189UrXL2rbMsg==
+X-Received: by 2002:a05:651c:88a:b0:2a8:c954:e9e0 with SMTP id d10-20020a05651c088a00b002a8c954e9e0mr991502ljq.3.1681760220186;
+        Mon, 17 Apr 2023 12:37:00 -0700 (PDT)
+Received: from localhost (88-115-161-74.elisa-laajakaista.fi. [88.115.161.74])
+        by smtp.gmail.com with ESMTPSA id p24-20020a2ea418000000b002a7a5201bfdsm2328460ljn.80.2023.04.17.12.36.59
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 17 Apr 2023 12:34:06 -0700 (PDT)
-Date:   Mon, 17 Apr 2023 13:34:05 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     "Liu, Yi L" <yi.l.liu@intel.com>
-Cc:     "jgg@nvidia.com" <jgg@nvidia.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
-        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
-        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>
-Subject: Re: [PATCH v2] docs: kvm: vfio: Require call KVM_DEV_VFIO_GROUP_ADD
- before VFIO_GROUP_GET_DEVICE_FD
-Message-ID: <20230417133405.0891ae1a.alex.williamson@redhat.com>
-In-Reply-To: <DS0PR11MB75294B4B9E061F7CFEF94829C39C9@DS0PR11MB7529.namprd11.prod.outlook.com>
-References: <20230222022231.266381-1-yi.l.liu@intel.com>
-        <20230411132803.4628e9fc.alex.williamson@redhat.com>
-        <20230414140801.17d27396.alex.williamson@redhat.com>
-        <DS0PR11MB75294B4B9E061F7CFEF94829C39C9@DS0PR11MB7529.namprd11.prod.outlook.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
+        Mon, 17 Apr 2023 12:37:00 -0700 (PDT)
+Date:   Mon, 17 Apr 2023 22:36:11 +0300
+From:   Zhi Wang <zhi.wang.linux@gmail.com>
+To:     Sagi Shahar <sagis@google.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org,
+        Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Isaku Yamahata <isaku.yamahata@intel.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Kai Huang <kai.huang@intel.com>,
+        Chao Peng <chao.p.peng@linux.intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>
+Subject: Re: [RFC PATCH 1/5] KVM: Split tdp_mmu_pages to private and shared
+ lists
+Message-ID: <20230417223611.00004aee.zhi.wang.linux@gmail.com>
+In-Reply-To: <20230407201921.2703758-2-sagis@google.com>
+References: <20230407201921.2703758-1-sagis@google.com>
+        <20230407201921.2703758-2-sagis@google.com>
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -88,91 +83,78 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 17 Apr 2023 13:04:50 +0000
-"Liu, Yi L" <yi.l.liu@intel.com> wrote:
+On Fri,  7 Apr 2023 20:19:17 +0000
+Sagi Shahar <sagis@google.com> wrote:
 
-> > From: Alex Williamson <alex.williamson@redhat.com>
-> > Sent: Saturday, April 15, 2023 4:08 AM
-> > On Tue, 11 Apr 2023 13:28:03 -0600
-> > Alex Williamson <alex.williamson@redhat.com> wrote:
-> >   
-> > > On Tue, 21 Feb 2023 18:22:31 -0800
-> > > Yi Liu <yi.l.liu@intel.com> wrote:
-> > >  
-> > > > as some vfio_device drivers require a kvm pointer to be set in their
-> > > > open_device and kvm pointer is set to VFIO in GROUP_ADD path.
-> > > >
-> > > > Signed-off-by: Yi Liu <yi.l.liu@intel.com>
-> > > > ---
-> > > > v2:
-> > > >  - Adopt Alex's suggestion
-> > > > v1: https://lore.kernel.org/kvm/20230221034114.135386-1-yi.l.liu@intel.com/
-> > > > ---
-> > > >  Documentation/virt/kvm/devices/vfio.rst | 7 +++++++
-> > > >  1 file changed, 7 insertions(+)
-> > > >
-> > > > diff --git a/Documentation/virt/kvm/devices/vfio.rst  
-> > b/Documentation/virt/kvm/devices/vfio.rst  
-> > > > index 2d20dc561069..79b6811bb4f3 100644
-> > > > --- a/Documentation/virt/kvm/devices/vfio.rst
-> > > > +++ b/Documentation/virt/kvm/devices/vfio.rst
-> > > > @@ -39,3 +39,10 @@ KVM_DEV_VFIO_GROUP attributes:
-> > > >  	- @groupfd is a file descriptor for a VFIO group;
-> > > >  	- @tablefd is a file descriptor for a TCE table allocated via
-> > > >  	  KVM_CREATE_SPAPR_TCE.
-> > > > +
-> > > > +::
-> > > > +
-> > > > +The GROUP_ADD operation above should be invoked prior to accessing the
-> > > > +device file descriptor via VFIO_GROUP_GET_DEVICE_FD in order to support
-> > > > +drivers which require a kvm pointer to be set in their .open_device()
-> > > > +callback.  
-> > >
-> > > I updated the title and commit log so as not to further construe that
-> > > documentation can impose a requirement, otherwise applied to vfio next
-> > > branch for v6.4.  Thanks,  
-> > 
-> > Dropped
-> > 
-> > https://lore.kernel.org/all/20230413163336.7ce6ecec.alex.williamson@redhat.com/
-> > 
-> > Please resubmit, resolving the warning and change the title since a
-> > requirement of some drivers does not equate to a requirement of the
-> > API.  Thanks,  
+This patch is actually adding a separate counter for accounting private
+tdp mmu page not really introducing a new tdp_mmu_pages list for private
+pages. I guess better refine the tittle to reflect what this patch
+is doing.
+
+> tdp_mmu_pages holds all the active pages used by the mmu. When we
+> transfer the state during intra-host migration we need to transfer the
+> private pages but not the shared ones.
 > 
-> Sorry for it. May just remove the "::". So a version as below. Please let me
-> know it is ok, then I'll submit it.
-
-Sure, so long as the docs build warning is gone.  I'll wait for a
-separate v3 posting.  Thanks,
-
-Alex
-
- 
-> From abfc87425aa2977c08511b648a194bcfb072dcb8 Mon Sep 17 00:00:00 2001
-> From: Yi Liu <yi.l.liu@intel.com>
-> Date: Thu, 16 Feb 2023 02:37:28 -0800
-> Subject: [PATCH] docs: kvm: vfio: Suggest KVM_DEV_VFIO_GROUP_ADD vs VFIO_GROUP_GET_DEVICE_FD ordering
+Maybe explain a little bit about how the shared one is processed. Guess
+one sentence is enough.
+> Keeping them in separate counters makes this transfer more efficient.
 > 
-> as some vfio_device's open_device op requires kvm pointer and kvm pointer
-> set is part of GROUP_ADD.
-> 
-> Signed-off-by: Yi Liu <yi.l.liu@intel.com>
+> Signed-off-by: Sagi Shahar <sagis@google.com>
 > ---
->  Documentation/virt/kvm/devices/vfio.rst | 7 +++++++
->  1 file changed, 7 insertions(+)
+>  arch/x86/include/asm/kvm_host.h |  5 ++++-
+>  arch/x86/kvm/mmu/tdp_mmu.c      | 11 +++++++++--
+>  2 files changed, 13 insertions(+), 3 deletions(-)
 > 
-> diff --git a/Documentation/virt/kvm/devices/vfio.rst b/Documentation/virt/kvm/devices/vfio.rst
-> index 2d20dc561069..79b6811bb4f3 100644
-> --- a/Documentation/virt/kvm/devices/vfio.rst
-> +++ b/Documentation/virt/kvm/devices/vfio.rst
-> @@ -39,3 +39,8 @@ KVM_DEV_VFIO_GROUP attributes:
->  	- @groupfd is a file descriptor for a VFIO group;
->  	- @tablefd is a file descriptor for a TCE table allocated via
->  	  KVM_CREATE_SPAPR_TCE.
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index ae377eec81987..5ed70cd9d74bf 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -1426,9 +1426,12 @@ struct kvm_arch {
+>  	struct task_struct *nx_huge_page_recovery_thread;
+>  
+>  #ifdef CONFIG_X86_64
+> -	/* The number of TDP MMU pages across all roots. */
+> +	/* The number of non-private TDP MMU pages across all roots. */
+>  	atomic64_t tdp_mmu_pages;
+>  
+> +	/* Same as tdp_mmu_pages but only for private pages. */
+> +	atomic64_t tdp_private_mmu_pages;
 > +
-> +The GROUP_ADD operation above should be invoked prior to accessing the
-> +device file descriptor via VFIO_GROUP_GET_DEVICE_FD in order to support
-> +drivers which require a kvm pointer to be set in their .open_device()
-> +callback.
+>  	/*
+>  	 * List of struct kvm_mmu_pages being used as roots.
+>  	 * All struct kvm_mmu_pages in the list should have
+> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+> index 58a236a69ec72..327dee4f6170e 100644
+> --- a/arch/x86/kvm/mmu/tdp_mmu.c
+> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
+> @@ -44,6 +44,7 @@ void kvm_mmu_uninit_tdp_mmu(struct kvm *kvm)
+>  	destroy_workqueue(kvm->arch.tdp_mmu_zap_wq);
+>  
+>  	WARN_ON(atomic64_read(&kvm->arch.tdp_mmu_pages));
+> +	WARN_ON(atomic64_read(&kvm->arch.tdp_private_mmu_pages));
+>  	WARN_ON(!list_empty(&kvm->arch.tdp_mmu_roots));
+>  
+>  	/*
+> @@ -373,13 +374,19 @@ static void handle_changed_spte_dirty_log(struct kvm *kvm, int as_id, gfn_t gfn,
+>  static void tdp_account_mmu_page(struct kvm *kvm, struct kvm_mmu_page *sp)
+>  {
+>  	kvm_account_pgtable_pages((void *)sp->spt, +1);
+> -	atomic64_inc(&kvm->arch.tdp_mmu_pages);
+> +	if (is_private_sp(sp))
+> +		atomic64_inc(&kvm->arch.tdp_private_mmu_pages);
+> +	else
+> +		atomic64_inc(&kvm->arch.tdp_mmu_pages);
+>  }
+>  
+>  static void tdp_unaccount_mmu_page(struct kvm *kvm, struct kvm_mmu_page *sp)
+>  {
+>  	kvm_account_pgtable_pages((void *)sp->spt, -1);
+> -	atomic64_dec(&kvm->arch.tdp_mmu_pages);
+> +	if (is_private_sp(sp))
+> +		atomic64_dec(&kvm->arch.tdp_private_mmu_pages);
+> +	else
+> +		atomic64_dec(&kvm->arch.tdp_mmu_pages);
+>  }
+>  
+>  /**
 
