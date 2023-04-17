@@ -2,211 +2,177 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0A72C6E50FD
-	for <lists+kvm@lfdr.de>; Mon, 17 Apr 2023 21:32:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E58836E510C
+	for <lists+kvm@lfdr.de>; Mon, 17 Apr 2023 21:35:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229575AbjDQTcF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 Apr 2023 15:32:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48834 "EHLO
+        id S229531AbjDQTfA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 17 Apr 2023 15:35:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50618 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230389AbjDQTcC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 17 Apr 2023 15:32:02 -0400
-Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04on2040.outbound.protection.outlook.com [40.107.100.40])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D73F5FD6;
-        Mon, 17 Apr 2023 12:32:00 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=A6MyCLgXeoY9oPEw7+hMJlIRiinZje02GhH+XHKA66lwZgdtcfDdK9WsLoXbWIpamvi34cXgWyJj9F06dkjUo8szPNTkAsXgzuq+dLpMyeLSqTrY41Fxl0cJiKupC8z/o1IzA/wrqjfp8kXZwRwdxAq3XdOA/ejvW3j5SElrj9hjkCZDSCTcq37Oz32HjG/bUTIUvJRNdWZDlnJdRzzZ5+jyPUQchSvLyrDogZ+1cEt3+QugDK/ph0KJTFZmgTqR03a8RUuG60zoxeal8vQBLL9uJ5YTv/JgKlqUKc9uC4i3jYk0Q/i0M469oDDuhRDAERmb55ON4L5/IJdY5kHgDw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=MunhYH5pcGE4RyNguXu8EdBlYtDZp4zNieIc/Jcmy7U=;
- b=llA1yhSjFJ6iH0mmin/42wva8L+HIzuJ0S6+G5r0JGIoCTwp77v9rjFxwnypg4Yy2eFQNUgWPlTlKiHBR8pgU4GLL+afzWL/z2bDHEwSz+Wd3pQH7UYc4Xz8GBCJcAwkmpr6b3uqO/J1KJ9wb21eQ3NPQ+ZBASCnWPGVUB18AvqHmuCNoVPGqExRF4HrEcF9hfC3/0+VQYgtxD+zPKBIk5c6tZ/1d0QVpaQWzjeGpLceFsoAumYF/N4PdvX9uEolT3FaE1D7rLJvbrdY5YMpKT8QGV1oSsRXCTu68nCR6M2DZm1FQTMNAwOhZnbq2teAIU7xtuEYBk5N6xjhZX1J9w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=MunhYH5pcGE4RyNguXu8EdBlYtDZp4zNieIc/Jcmy7U=;
- b=eZFsowTrnGJ2cPPuLL+eKm5boIBeYrFg8A40nrmWovEh+yBBZp3WUX4rfVL1ZIDLOy+ESo3qAkNGVkooYSbEAJ7eAPet/Pceo3ZH3AGa6GWtRrVRv0rY6s9ux4U95jyApznlH6j6XjrrPCAvj9YEUA0+5NDaToiRiAyyugMKYIODq9cKpUMaBMLh8crYuYZst+hixPgIwaH0cEgG/3ABga2DAODK+ipLutFGEnAZjlwzvJwAhCF3US3P/SR/HFL/MpZIgZuQ467No//3+qJ3z0WftWLEOyFNnNiZoM7LzdCa59UG2qSDEL2O47WvFP0NY94CLr9dZOLG/J6p2TrqUQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by DS7PR12MB8274.namprd12.prod.outlook.com (2603:10b6:8:da::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6298.45; Mon, 17 Apr
- 2023 19:31:58 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::6045:ad97:10b7:62a2]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::6045:ad97:10b7:62a2%9]) with mapi id 15.20.6298.030; Mon, 17 Apr 2023
- 19:31:58 +0000
-Date:   Mon, 17 Apr 2023 16:31:56 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     "Liu, Yi L" <yi.l.liu@intel.com>,
+        with ESMTP id S230513AbjDQTez (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 17 Apr 2023 15:34:55 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6481B5
+        for <kvm@vger.kernel.org>; Mon, 17 Apr 2023 12:34:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1681760048;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=0qQGxbZ2Ila+Q997whosT821l4x4H8QzSUtQhvaCL+o=;
+        b=KpCVkLann2LhuX/F7JfHQnlmvlGaAiOhsAFVBOCOtbs2Epao9YVJ7AZPZFt8qulf1aoCEs
+        /K2RmTV6EnZDUL9OG2GUM6fjwXqzuGuVKR18pPALGz1CM5Eji3AXxLjefdxddqMbOhAuOT
+        Wt2BHQaMBBKi1FlWyX2d96ZtY0Bm1NI=
+Received: from mail-il1-f200.google.com (mail-il1-f200.google.com
+ [209.85.166.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-142-8ScQUTJGOSS3N2_w61FLKQ-1; Mon, 17 Apr 2023 15:34:07 -0400
+X-MC-Unique: 8ScQUTJGOSS3N2_w61FLKQ-1
+Received: by mail-il1-f200.google.com with SMTP id y7-20020a056e02128700b0032a9be7a8e4so3336851ilq.6
+        for <kvm@vger.kernel.org>; Mon, 17 Apr 2023 12:34:07 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1681760047; x=1684352047;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=0qQGxbZ2Ila+Q997whosT821l4x4H8QzSUtQhvaCL+o=;
+        b=Yb5/ohsfbNzvkZEBaI31/aZEtNoXas5+xqmhtG3yfeKIDWpfNrqsbSdpdKdWyBjKEn
+         9IAh/hnBUlPQoBTdfUW7yVGJ2+DOYfcyhfm30S2Emx7o6IHh4toMDM5sydfjqzXuK24p
+         tLDhJOEK4SA2TI6Y7QjJ6/wf1NqmucuUZWbu0SSBdLhRmfXPdSCwOUTQ9UWU1WNagxNk
+         OXjkAyR1AfYBHbtGrTeDdDVH/nJATMmgiWRrMbxiC/Up4h81MFrxdwkPiUwSMiMHom9M
+         Z4kP41DQvRWm6je7vegi7zGC+pJfdncuP0C36RbeBrsK3txA2Xw3Seoai17S2jOf+HhZ
+         aNaQ==
+X-Gm-Message-State: AAQBX9f0TqGPitzwrOUV5+eh/8HCdoW3eOLJHh8mnpwllOYSN3/a3PLx
+        AtjCj32bx650fZPMSZWLWigkI4r+H3ZYwTKDrRSbOlfQPqWWfjr1nP9K0qTntp2SgSR5r3evJoy
+        YPCLL7ORrmKgE
+X-Received: by 2002:a6b:d30e:0:b0:763:5a15:5b0c with SMTP id s14-20020a6bd30e000000b007635a155b0cmr1493490iob.6.1681760046820;
+        Mon, 17 Apr 2023 12:34:06 -0700 (PDT)
+X-Google-Smtp-Source: AKy350YbGCKpuxX3FSGpwGzEfcn/NsieT3yolj4kjxkZv5G24STHUOQLOvCM5pgGGWTFPPFecos5YA==
+X-Received: by 2002:a6b:d30e:0:b0:763:5a15:5b0c with SMTP id s14-20020a6bd30e000000b007635a155b0cmr1493472iob.6.1681760046552;
+        Mon, 17 Apr 2023 12:34:06 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id c12-20020a5ea80c000000b0075c47fb539asm3388760ioa.0.2023.04.17.12.34.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 17 Apr 2023 12:34:06 -0700 (PDT)
+Date:   Mon, 17 Apr 2023 13:34:05 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     "Liu, Yi L" <yi.l.liu@intel.com>
+Cc:     "jgg@nvidia.com" <jgg@nvidia.com>,
         "Tian, Kevin" <kevin.tian@intel.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>,
         "cohuck@redhat.com" <cohuck@redhat.com>,
-        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
         "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
         "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
-        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "jasowang@redhat.com" <jasowang@redhat.com>,
-        "shameerali.kolothum.thodi@huawei.com" 
-        <shameerali.kolothum.thodi@huawei.com>,
-        "lulu@redhat.com" <lulu@redhat.com>,
-        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
-        "intel-gvt-dev@lists.freedesktop.org" 
-        <intel-gvt-dev@lists.freedesktop.org>,
-        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
-        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-        "Hao, Xudong" <xudong.hao@intel.com>,
-        "Zhao, Yan Y" <yan.y.zhao@intel.com>,
-        "Xu, Terrence" <terrence.xu@intel.com>,
-        "Jiang, Yanting" <yanting.jiang@intel.com>,
-        "Duan, Zhenzhong" <zhenzhong.duan@intel.com>
-Subject: Re: [PATCH v3 12/12] vfio/pci: Report dev_id in
- VFIO_DEVICE_GET_PCI_HOT_RESET_INFO
-Message-ID: <ZD2erN3nKbnyqei9@nvidia.com>
-References: <20230412105045.79adc83d.alex.williamson@redhat.com>
- <ZDcPTTPlni/Mi6p3@nvidia.com>
- <BN9PR11MB5276782DA56670C8209470828C989@BN9PR11MB5276.namprd11.prod.outlook.com>
- <ZDfslVwqk6JtPpyD@nvidia.com>
- <20230413120712.3b9bf42d.alex.williamson@redhat.com>
- <BN9PR11MB5276A160CA699933B897C8C18C999@BN9PR11MB5276.namprd11.prod.outlook.com>
- <DS0PR11MB7529B7481AC97261E12AA116C3999@DS0PR11MB7529.namprd11.prod.outlook.com>
- <20230414111043.40c15dde.alex.williamson@redhat.com>
- <DS0PR11MB75290A78D6879EC2E31E21AEC39C9@DS0PR11MB7529.namprd11.prod.outlook.com>
- <20230417130140.1b68082e.alex.williamson@redhat.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230417130140.1b68082e.alex.williamson@redhat.com>
-X-ClientProxiedBy: CH0PR03CA0403.namprd03.prod.outlook.com
- (2603:10b6:610:11b::13) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>
+Subject: Re: [PATCH v2] docs: kvm: vfio: Require call KVM_DEV_VFIO_GROUP_ADD
+ before VFIO_GROUP_GET_DEVICE_FD
+Message-ID: <20230417133405.0891ae1a.alex.williamson@redhat.com>
+In-Reply-To: <DS0PR11MB75294B4B9E061F7CFEF94829C39C9@DS0PR11MB7529.namprd11.prod.outlook.com>
+References: <20230222022231.266381-1-yi.l.liu@intel.com>
+        <20230411132803.4628e9fc.alex.williamson@redhat.com>
+        <20230414140801.17d27396.alex.williamson@redhat.com>
+        <DS0PR11MB75294B4B9E061F7CFEF94829C39C9@DS0PR11MB7529.namprd11.prod.outlook.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|DS7PR12MB8274:EE_
-X-MS-Office365-Filtering-Correlation-Id: ef86ba37-c9c0-4504-3b7f-08db3f7a68a9
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: kFf3pEoDVfe8zIjWN8VEXEJ7ncAruGvO4NGu3sP7x9jY0FZi7gtgFDU32XfqjdbBE3833/QFGn/gUrJBkSGl4ey+M9eFepcdbe2xpSgo0exL8JpiuTqGrhIDEvPiygI7ryR85htGhniw2FTuxLml+ew/aYDbLa5iwG81MhqjUUoKJoV2bDy6tz3IQj/jpSzmPYdnfgD84d2m6R6nGEtfwYtKzo5pXJOD91jULO/0DKVXZeJ3cNqo9+vLVstuS1hFc1i2p1Hu/+wRcGBi+zoC13ZGyNmcMfTEGeGc3qK1Of1O2xeKwUU4rp0w0Ui2nNkuzuZG+DzigLhSucjOxXPjbZSFKUJAUS3dxrTw015b/EDtJ8VoYeG3x55vyO/JzO+L3OtX26afRzhtGyDVKqXS9zhpmpzVug231eLUAUK3BC8WPJ0SUhTt8molZPuIh05g/bYxwIt/TlBpoIi4h1ofUzbjHvOub/9VNa5xTuQ9gZT72l/7oikJKnMJ7K1hrFPtFWUv9Kj5PA8Axu5ODo4yMZTqEm0a3V7ymuuQ9vL/T/JniMhmC1zOmkB2jun/5QgT
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(39860400002)(376002)(136003)(346002)(396003)(366004)(451199021)(478600001)(38100700002)(8936002)(8676002)(316002)(41300700001)(6916009)(4326008)(66476007)(66946007)(66556008)(54906003)(186003)(2906002)(6512007)(26005)(86362001)(6506007)(83380400001)(36756003)(2616005)(5660300002)(6486002)(7416002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?Wb8TpKEDP4FvcYKqvhay+Ch9oomA4qFJI3G0SMoirlFfzk/zON+vmgLcwEsC?=
- =?us-ascii?Q?xzYfcsvc0ATv/s2NDOdMjWRrWyRRhRf733v+9zDtYNj84IL+2W3fMUG+Kre9?=
- =?us-ascii?Q?GFEenHrW4/ZUwElRWyE6KROVOWODNVJjThNs73eyP+BzsGjzkG6gONd4xHQh?=
- =?us-ascii?Q?ctk73fVDKE/o4ZuTfnmpzkUCdTAJrnvaOs50h7Cy0FiU3pLTKSI2xl6uSerZ?=
- =?us-ascii?Q?1LOLyWLqbAOujwX4WhW+kUF3hARozgkeaWwn9PEs0H6dNKu8LwtAQhJ4/b90?=
- =?us-ascii?Q?zElsQzLui2Vid8W8ENbfPVP5qwZoy+9gAribkWzkYtxy4yfjKjdqe3tKWKHP?=
- =?us-ascii?Q?ob8ce1vwvTynIta2cWU+pSBP8D4zIbE0d+SeHAo6lrJ9wWu9C6vNYc0xULta?=
- =?us-ascii?Q?y4j7HzwOYSCcyIkeFYrBHYjZw+V9JMDJyIcRqQKjQH4cKfQzGbIO2TOrkqeb?=
- =?us-ascii?Q?R8sC8BYt95UtzO/Cf8ATaNItJFkkGTzkjg1/D7V6nnp/2bRXQfQJWMzQeRQD?=
- =?us-ascii?Q?JWzhSM1XqbqxuoOWOEaoIvlrJdYl2eGN4yuq9QRm6mdMP9iZE0bjwiaYo4n0?=
- =?us-ascii?Q?UaYhElvfN3KGSLq4BIDppFUlSQJkml4hvSa0Jj+xWmRMHJevmK9nF1c1eHtl?=
- =?us-ascii?Q?57hZnAzgw5inlB9Hap6LMnT8KxhkQovSJ5j6csW5SYpjui+aUQ2gaqJAZeLJ?=
- =?us-ascii?Q?QbkFwY1TGyfwjx6xPro5qxcZcgcQY/NgDsS8lQ9Q552gYoQQr/71faVfau8q?=
- =?us-ascii?Q?2w8h+F35etv2BTm+znUEdF5iHQt6wAF94MJfLKXyb7iF+jBPg28Wbc9TYVR5?=
- =?us-ascii?Q?GcOWXuJ5r71VMQ5XaXDPh/SLlVg/9Z/RO97BEz2ArTEQXDjnzyHKtdN32+VL?=
- =?us-ascii?Q?k2KwxCP4a0wo9pfJ5pYffVMVXj8TJd+zi9AyxCKHCFZl4sgddBRMrBEeQwRt?=
- =?us-ascii?Q?u7WZRdQcwVzu6sMgsiZ8kUecsnTDPJlc80Op1ndMvp7CtkFPVLJBa9ThVghQ?=
- =?us-ascii?Q?7qF+/yk5tvpoKKyVGEYCZrfrT0ajhZKCN3pQTexsWUQ28uJwmkXumjwEyddZ?=
- =?us-ascii?Q?yBh7KTAITzlgtTMFVkTL9T8Yl7u24f6fUHYD71niSDfRnWts7ZAQAIKzGZyR?=
- =?us-ascii?Q?8RQGAXnLvmsQWyJUPZryV27GncSqBPBx90+XJ5KE1ABPrnrBcQ7u6NC5bAmv?=
- =?us-ascii?Q?9JXKApSgbALKEb48TRkI9a5LqIW72w15AQnes6CmgpiMqOsZX9P+GqWGZBoW?=
- =?us-ascii?Q?6f694lCOWhrCXP2bCXPIEQ26x7Fct8tHY9kFvvbxScfyI6kZ3dmGFkEUsvso?=
- =?us-ascii?Q?hGJAD86xKlhGMURvkwIO+Jq3UwYqPi9P440C4uJvf3l/3Zj9lKd8RgsDzFeM?=
- =?us-ascii?Q?ej9+otA8H5sUlYN9aZ+NQsASBZ6ZwK9WAugJO1PNfCd2N4MVBt3TlFsWWlXL?=
- =?us-ascii?Q?qYaQZJxtYtRailz2aX5qZ/10rCwDvM/vlQcfafSxJi+mG96X3L1xv7xHbAj4?=
- =?us-ascii?Q?U5P/6hEZK9TTupkXhIbBlGhSsD4q1mZBTYA5VC29vYbnz2srOXruCvIOFJsU?=
- =?us-ascii?Q?00bgzS4vZs56JKMgcZdLKMH9p/hsz/TYzmwLcqVF?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ef86ba37-c9c0-4504-3b7f-08db3f7a68a9
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Apr 2023 19:31:57.8915
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: pO0ZVZrkWizt1geRlze3/RJBys82pd9h9W91CatsYD+oDc1s84K99DEfz638gLyE
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB8274
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Apr 17, 2023 at 01:01:40PM -0600, Alex Williamson wrote:
-> Yes, it's not trivial, but Jason is now proposing that we consider
-> mixing groups, cdevs, and multiple iommufd_ctxs as invalid.  I think
-> this means that regardless of which device calls INFO, there's only one
-> answer (assuming same set of devices opened, all cdev, all within same
-> iommufd_ctx).  Based on what I explained about my understanding of INFO2
-> and Jason agreed to, I think the output would be:
+On Mon, 17 Apr 2023 13:04:50 +0000
+"Liu, Yi L" <yi.l.liu@intel.com> wrote:
+
+> > From: Alex Williamson <alex.williamson@redhat.com>
+> > Sent: Saturday, April 15, 2023 4:08 AM
+> > On Tue, 11 Apr 2023 13:28:03 -0600
+> > Alex Williamson <alex.williamson@redhat.com> wrote:
+> >   
+> > > On Tue, 21 Feb 2023 18:22:31 -0800
+> > > Yi Liu <yi.l.liu@intel.com> wrote:
+> > >  
+> > > > as some vfio_device drivers require a kvm pointer to be set in their
+> > > > open_device and kvm pointer is set to VFIO in GROUP_ADD path.
+> > > >
+> > > > Signed-off-by: Yi Liu <yi.l.liu@intel.com>
+> > > > ---
+> > > > v2:
+> > > >  - Adopt Alex's suggestion
+> > > > v1: https://lore.kernel.org/kvm/20230221034114.135386-1-yi.l.liu@intel.com/
+> > > > ---
+> > > >  Documentation/virt/kvm/devices/vfio.rst | 7 +++++++
+> > > >  1 file changed, 7 insertions(+)
+> > > >
+> > > > diff --git a/Documentation/virt/kvm/devices/vfio.rst  
+> > b/Documentation/virt/kvm/devices/vfio.rst  
+> > > > index 2d20dc561069..79b6811bb4f3 100644
+> > > > --- a/Documentation/virt/kvm/devices/vfio.rst
+> > > > +++ b/Documentation/virt/kvm/devices/vfio.rst
+> > > > @@ -39,3 +39,10 @@ KVM_DEV_VFIO_GROUP attributes:
+> > > >  	- @groupfd is a file descriptor for a VFIO group;
+> > > >  	- @tablefd is a file descriptor for a TCE table allocated via
+> > > >  	  KVM_CREATE_SPAPR_TCE.
+> > > > +
+> > > > +::
+> > > > +
+> > > > +The GROUP_ADD operation above should be invoked prior to accessing the
+> > > > +device file descriptor via VFIO_GROUP_GET_DEVICE_FD in order to support
+> > > > +drivers which require a kvm pointer to be set in their .open_device()
+> > > > +callback.  
+> > >
+> > > I updated the title and commit log so as not to further construe that
+> > > documentation can impose a requirement, otherwise applied to vfio next
+> > > branch for v6.4.  Thanks,  
+> > 
+> > Dropped
+> > 
+> > https://lore.kernel.org/all/20230413163336.7ce6ecec.alex.williamson@redhat.com/
+> > 
+> > Please resubmit, resolving the warning and change the title since a
+> > requirement of some drivers does not equate to a requirement of the
+> > API.  Thanks,  
 > 
-> flags: NOT_RESETABLE | DEV_ID
-> {
->   { valid devA-id,  devA-BDF },
->   { valid devC-id,  devC-BDF },
->   { valid devD-id,  devD-BDF },
->   { invalid dev-id, devE-BDF },
-> }
+> Sorry for it. May just remove the "::". So a version as below. Please let me
+> know it is ok, then I'll submit it.
+
+Sure, so long as the docs build warning is gone.  I'll wait for a
+separate v3 posting.  Thanks,
+
+Alex
+
+ 
+> From abfc87425aa2977c08511b648a194bcfb072dcb8 Mon Sep 17 00:00:00 2001
+> From: Yi Liu <yi.l.liu@intel.com>
+> Date: Thu, 16 Feb 2023 02:37:28 -0800
+> Subject: [PATCH] docs: kvm: vfio: Suggest KVM_DEV_VFIO_GROUP_ADD vs VFIO_GROUP_GET_DEVICE_FD ordering
 > 
-> Here devB gets dropped because the kernel understands that devB is
-> unopened, affected, and owned.  It's therefore not a blocker for
-> hot-reset.
+> as some vfio_device's open_device op requires kvm pointer and kvm pointer
+> set is part of GROUP_ADD.
+> 
+> Signed-off-by: Yi Liu <yi.l.liu@intel.com>
+> ---
+>  Documentation/virt/kvm/devices/vfio.rst | 7 +++++++
+>  1 file changed, 7 insertions(+)
+> 
+> diff --git a/Documentation/virt/kvm/devices/vfio.rst b/Documentation/virt/kvm/devices/vfio.rst
+> index 2d20dc561069..79b6811bb4f3 100644
+> --- a/Documentation/virt/kvm/devices/vfio.rst
+> +++ b/Documentation/virt/kvm/devices/vfio.rst
+> @@ -39,3 +39,8 @@ KVM_DEV_VFIO_GROUP attributes:
+>  	- @groupfd is a file descriptor for a VFIO group;
+>  	- @tablefd is a file descriptor for a TCE table allocated via
+>  	  KVM_CREATE_SPAPR_TCE.
+> +
+> +The GROUP_ADD operation above should be invoked prior to accessing the
+> +device file descriptor via VFIO_GROUP_GET_DEVICE_FD in order to support
+> +drivers which require a kvm pointer to be set in their .open_device()
+> +callback.
 
-I don't think we want to drop anything because it makes the API
-ill suited for the debugging purpose.
-
-devb should be returned with an invalid dev_id if I understand your
-example. Maybe it should return with -1 as the dev_id instead of 0, to
-make the debugging a bit better.
-
-Userspace should look at only NOT_RESETTABLE to determine if it
-proceeds or not, and it should use the valid dev_id list to iterate
-over the devices it has open to do the config stuff.
-
-> OTOH, devE is unopened, affected, and un-owned, and we
-> previously agreed against the opportunistic un-opened/un-owned loophole.
-
-NOT_RESETABLE should be returned in this case, yes.
-
-If we want to enable userspace to use the loophole it should be an
-additional flag. RESETABLE_FOR_NOW or something
-
-> I think we're narrowing in on an interface that isn't as arbitrary.  If
-> we assume the restrictions that Jason proposes, then cdev is exclusively
-> a kernel determined reset availability model
-
-Yes, I think this is probably best looking forward.
-
-> where I'd agree that
-> passing device-fds as a proof of ownership is pointless.  The group
-> interface would therefore remain exclusively a proof-of-ownership
-> model since we have no incentive to extend it to kernel-determined
-> given the limited use case of all affected devices managed by the same
-> vfio container.
-
-Yes
-
-> Moot, but there's actually enough information there to infer IOMMU
-> groups for each device, but we probably can't prove that would always
-> be the case.  If we adopt Jason's proposal though, I don't see that we
-> need either a group-id or BDF capability, the BDF is only for debug
-> reporting.  However, there is a new burden on the kernel to identify
-> the affected, un-owned devices for that report.  
-
-Yes and yes
-
-Jason
