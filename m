@@ -2,45 +2,45 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 575206E3F7F
-	for <lists+kvm@lfdr.de>; Mon, 17 Apr 2023 08:15:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 13C246E3F9A
+	for <lists+kvm@lfdr.de>; Mon, 17 Apr 2023 08:19:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230117AbjDQGPI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 Apr 2023 02:15:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50130 "EHLO
+        id S230049AbjDQGTq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 17 Apr 2023 02:19:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54452 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229982AbjDQGPH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 17 Apr 2023 02:15:07 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12A7E3A8D
-        for <kvm@vger.kernel.org>; Sun, 16 Apr 2023 23:14:19 -0700 (PDT)
+        with ESMTP id S230003AbjDQGTp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 17 Apr 2023 02:19:45 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F0123ABC
+        for <kvm@vger.kernel.org>; Sun, 16 Apr 2023 23:18:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1681712058;
+        s=mimecast20190719; t=1681712331;
         h=from:from:reply-to:reply-to:subject:subject:date:date:
          message-id:message-id:to:to:cc:cc:mime-version:mime-version:
          content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=j24MEVwN43Zu0qraND4t85yrKfAMNVQEujJ21aSXScE=;
-        b=BGo8dSaduQguBgalb7EVdm15+coCxcsyHP+tvlmsiQ0jBnELmmVf5JafhV5cMZrpvwfUKk
-        CNXfu+tH7vj0L2P1seGDbTaBsMSrKdYE0B7oYdxcVF5Gz5isPBc75pBmKvgWbQJA+iRzry
-        VP/MS1tJ2vwAp8g6Fg2jadiCwZyUEFg=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=Ty/AIseaiREXChMM5nDN57NtPbDNuS53lakU5EfBtIY=;
+        b=E1JMztF0c7OFO2qX5JsyY2Uj8B4JNNht/L+z6lwq0SIm4//OThbpiZp8VIVDK5Ma0ymbK8
+        +P+0TPOppcOWaO++CZqGCb+T5O/KUVChLoApDQuHQNFqaPkoF6iYLBnJpCEsy/ipczhYhb
+        OL0ilcsTn+tthANU3yuOEmcfgmTzWWU=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-176-6UjavtY3OWSMcaQYMS2FRw-1; Mon, 17 Apr 2023 02:14:13 -0400
-X-MC-Unique: 6UjavtY3OWSMcaQYMS2FRw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+ us-mta-271-x11MFGGXMzeNa4-Hozc7Ng-1; Mon, 17 Apr 2023 02:18:43 -0400
+X-MC-Unique: x11MFGGXMzeNa4-Hozc7Ng-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id AF0A43806720;
-        Mon, 17 Apr 2023 06:14:12 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 4DD1F185A78F;
+        Mon, 17 Apr 2023 06:18:42 +0000 (UTC)
 Received: from [10.72.13.187] (ovpn-13-187.pek2.redhat.com [10.72.13.187])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 0A4971121314;
-        Mon, 17 Apr 2023 06:14:01 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 4DF8740C6E6E;
+        Mon, 17 Apr 2023 06:18:29 +0000 (UTC)
 Reply-To: Gavin Shan <gshan@redhat.com>
-Subject: Re: [PATCH v7 02/12] KVM: arm64: Add KVM_PGTABLE_WALK flags for
- skipping CMOs and BBM TLBIs
+Subject: Re: [PATCH v7 03/12] KVM: arm64: Add helper for creating unlinked
+ stage2 subtrees
 To:     Ricardo Koller <ricarkol@google.com>, pbonzini@redhat.com,
         maz@kernel.org, oupton@google.com, yuzenghui@huawei.com,
         dmatlack@google.com
@@ -51,18 +51,18 @@ Cc:     kvm@vger.kernel.org, kvmarm@lists.linux.dev, qperret@google.com,
         bgardon@google.com, ricarkol@gmail.com,
         Shaoqin Huang <shahuang@redhat.com>
 References: <20230409063000.3559991-1-ricarkol@google.com>
- <20230409063000.3559991-4-ricarkol@google.com>
+ <20230409063000.3559991-5-ricarkol@google.com>
 From:   Gavin Shan <gshan@redhat.com>
-Message-ID: <cfc2d22c-8260-98e9-74d9-bf02e1035141@redhat.com>
-Date:   Mon, 17 Apr 2023 14:13:57 +0800
+Message-ID: <9cb621b0-7174-a7c7-1524-801b06f94e8f@redhat.com>
+Date:   Mon, 17 Apr 2023 14:18:26 +0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.0
 MIME-Version: 1.0
-In-Reply-To: <20230409063000.3559991-4-ricarkol@google.com>
+In-Reply-To: <20230409063000.3559991-5-ricarkol@google.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
 X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
         RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,
@@ -74,117 +74,136 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 4/9/23 2:29 PM, Ricardo Koller wrote:
-> Add two flags to kvm_pgtable_visit_ctx, KVM_PGTABLE_WALK_SKIP_BBM_TLBI
-> and KVM_PGTABLE_WALK_SKIP_CMO, to indicate that the walk should not
-> perform TLB invalidations (TLBIs) in break-before-make (BBM) nor cache
-> maintenance operations (CMO). This will be used by a future commit to
-> create unlinked tables not accessible to the HW page-table walker.
+> Add a stage2 helper, kvm_pgtable_stage2_create_unlinked(), for
+> creating unlinked tables (which is the opposite of
+> kvm_pgtable_stage2_free_unlinked()).  Creating an unlinked table is
+> useful for splitting level 1 and 2 entries into subtrees of PAGE_SIZE
+> PTEs.  For example, a level 1 entry can be split into PAGE_SIZE PTEs
+> by first creating a fully populated tree, and then use it to replace
+> the level 1 entry in a single step.  This will be used in a subsequent
+> commit for eager huge-page splitting (a dirty-logging optimization).
 > 
 > Signed-off-by: Ricardo Koller <ricarkol@google.com>
 > Reviewed-by: Shaoqin Huang <shahuang@redhat.com>
 > ---
->   arch/arm64/include/asm/kvm_pgtable.h |  8 ++++++
->   arch/arm64/kvm/hyp/pgtable.c         | 37 +++++++++++++++++++---------
->   2 files changed, 34 insertions(+), 11 deletions(-)
+>   arch/arm64/include/asm/kvm_pgtable.h | 26 +++++++++++++++
+>   arch/arm64/kvm/hyp/pgtable.c         | 49 ++++++++++++++++++++++++++++
+>   2 files changed, 75 insertions(+)
 > 
 
-This patch has been posted for towice since it was sent as the following one.
-
-[PATCH v7 02/12] KVM: arm64: Add KVM_PGTABLE_WALK ctx->flags for skipping BBM and CMO
-
-The code changes look good to me:
+With the following nits addressed:
 
 Reviewed-by: Gavin Shan <gshan@redhat.com>
 
 > diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-> index 26a4293726c14..3f2d43ba2b628 100644
+> index 3f2d43ba2b628..c8e0e7d9303b2 100644
 > --- a/arch/arm64/include/asm/kvm_pgtable.h
 > +++ b/arch/arm64/include/asm/kvm_pgtable.h
-> @@ -195,6 +195,12 @@ typedef bool (*kvm_pgtable_force_pte_cb_t)(u64 addr, u64 end,
->    *					with other software walkers.
->    * @KVM_PGTABLE_WALK_HANDLE_FAULT:	Indicates the page-table walk was
->    *					invoked from a fault handler.
-> + * @KVM_PGTABLE_WALK_SKIP_BBM_TLBI:	Visit and update table entries
-> + *					without Break-before-make's
-> + *					TLB invalidation.
-> + * @KVM_PGTABLE_WALK_SKIP_CMO:		Visit and update table entries
-> + *					without Cache maintenance
-> + *					operations required.
+> @@ -458,6 +458,32 @@ void kvm_pgtable_stage2_destroy(struct kvm_pgtable *pgt);
 >    */
->   enum kvm_pgtable_walk_flags {
->   	KVM_PGTABLE_WALK_LEAF			= BIT(0),
-> @@ -202,6 +208,8 @@ enum kvm_pgtable_walk_flags {
->   	KVM_PGTABLE_WALK_TABLE_POST		= BIT(2),
->   	KVM_PGTABLE_WALK_SHARED			= BIT(3),
->   	KVM_PGTABLE_WALK_HANDLE_FAULT		= BIT(4),
-> +	KVM_PGTABLE_WALK_SKIP_BBM_TLBI		= BIT(5),
-> +	KVM_PGTABLE_WALK_SKIP_CMO		= BIT(6),
->   };
+>   void kvm_pgtable_stage2_free_unlinked(struct kvm_pgtable_mm_ops *mm_ops, void *pgtable, u32 level);
 >   
->   struct kvm_pgtable_visit_ctx {
+> +/**
+> + * kvm_pgtable_stage2_create_unlinked() - Create an unlinked stage-2 paging structure.
+> + * @pgt:	Page-table structure initialised by kvm_pgtable_stage2_init*().
+> + * @phys:	Physical address of the memory to map.
+> + * @level:	Starting level of the stage-2 paging structure to be created.
+> + * @prot:	Permissions and attributes for the mapping.
+> + * @mc:		Cache of pre-allocated and zeroed memory from which to allocate
+                 ^^^^^^^^
+Alignment.
+
+> + *		page-table pages.
+> + * @force_pte:  Force mappings to PAGE_SIZE granularity.
+> + *
+> + * Returns an unlinked page-table tree.  This new page-table tree is
+> + * not reachable (i.e., it is unlinked) from the root pgd and it's
+> + * therefore unreachableby the hardware page-table walker. No TLB
+> + * invalidation or CMOs are performed.
+> + *
+> + * If device attributes are not explicitly requested in @prot, then the
+> + * mapping will be normal, cacheable.
+> + *
+> + * Return: The fully populated (unlinked) stage-2 paging structure, or
+> + * an ERR_PTR(error) on failure.
+> + */
+> +kvm_pte_t *kvm_pgtable_stage2_create_unlinked(struct kvm_pgtable *pgt,
+> +					      u64 phys, u32 level,
+> +					      enum kvm_pgtable_prot prot,
+> +					      void *mc, bool force_pte);
+> +
+>   /**
+>    * kvm_pgtable_stage2_map() - Install a mapping in a guest stage-2 page-table.
+>    * @pgt:	Page-table structure initialised by kvm_pgtable_stage2_init*().
 > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> index a3246d6cddec7..633679ee3c49a 100644
+> index 633679ee3c49a..477d2be67d401 100644
 > --- a/arch/arm64/kvm/hyp/pgtable.c
 > +++ b/arch/arm64/kvm/hyp/pgtable.c
-> @@ -62,6 +62,16 @@ struct kvm_pgtable_walk_data {
->   	u64				end;
->   };
+> @@ -1222,6 +1222,55 @@ int kvm_pgtable_stage2_flush(struct kvm_pgtable *pgt, u64 addr, u64 size)
+>   	return kvm_pgtable_walk(pgt, addr, size, &walker);
+>   }
 >   
-> +static bool kvm_pgtable_walk_skip_bbm_tlbi(const struct kvm_pgtable_visit_ctx *ctx)
+> +kvm_pte_t *kvm_pgtable_stage2_create_unlinked(struct kvm_pgtable *pgt,
+> +					      u64 phys, u32 level,
+> +					      enum kvm_pgtable_prot prot,
+> +					      void *mc, bool force_pte)
 > +{
-> +	return unlikely(ctx->flags & KVM_PGTABLE_WALK_SKIP_BBM_TLBI);
-> +}
+> +	struct stage2_map_data map_data = {
+> +		.phys		= phys,
+> +		.mmu		= pgt->mmu,
+> +		.memcache	= mc,
+> +		.force_pte	= force_pte,
+> +	};
+> +	struct kvm_pgtable_walker walker = {
+> +		.cb		= stage2_map_walker,
+> +		.flags		= KVM_PGTABLE_WALK_LEAF |
+> +				  KVM_PGTABLE_WALK_SKIP_BBM_TLBI |
+> +				  KVM_PGTABLE_WALK_SKIP_CMO,
+> +		.arg		= &map_data,
+> +	};
+> +	/* .addr (the IPA) is irrelevant for an unlinked table */
+> +	struct kvm_pgtable_walk_data data = {
+> +		.walker	= &walker,
+> +		.addr	= 0,
+> +		.end	= kvm_granule_size(level),
+> +	};
+
+The comment about '.addr' seems incorrect. The IPA address is still
+used to locate the page table entry, so I think it would be something
+like below:
+
+	/* The IPA address (.addr) is relative to zero */
+
+> +	struct kvm_pgtable_mm_ops *mm_ops = pgt->mm_ops;
+> +	kvm_pte_t *pgtable;
+> +	int ret;
 > +
-> +static bool kvm_pgtable_walk_skip_cmo(const struct kvm_pgtable_visit_ctx *ctx)
-> +{
-> +	return unlikely(ctx->flags & KVM_PGTABLE_WALK_SKIP_CMO);
-> +}
+> +	if (!IS_ALIGNED(phys, kvm_granule_size(level)))
+> +		return ERR_PTR(-EINVAL);
 > +
->   static bool kvm_phys_is_valid(u64 phys)
->   {
->   	return phys < BIT(id_aa64mmfr0_parange_to_phys_shift(ID_AA64MMFR0_EL1_PARANGE_MAX));
-> @@ -741,14 +751,17 @@ static bool stage2_try_break_pte(const struct kvm_pgtable_visit_ctx *ctx,
->   	if (!stage2_try_set_pte(ctx, KVM_INVALID_PTE_LOCKED))
->   		return false;
->   
-> -	/*
-> -	 * Perform the appropriate TLB invalidation based on the evicted pte
-> -	 * value (if any).
-> -	 */
-> -	if (kvm_pte_table(ctx->old, ctx->level))
-> -		kvm_call_hyp(__kvm_tlb_flush_vmid, mmu);
-> -	else if (kvm_pte_valid(ctx->old))
-> -		kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, mmu, ctx->addr, ctx->level);
-> +	if (!kvm_pgtable_walk_skip_bbm_tlbi(ctx)) {
-> +		/*
-> +		 * Perform the appropriate TLB invalidation based on the
-> +		 * evicted pte value (if any).
-> +		 */
-> +		if (kvm_pte_table(ctx->old, ctx->level))
-> +			kvm_call_hyp(__kvm_tlb_flush_vmid, mmu);
-> +		else if (kvm_pte_valid(ctx->old))
-> +			kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, mmu,
-> +				     ctx->addr, ctx->level);
+> +	ret = stage2_set_prot_attr(pgt, prot, &map_data.attr);
+> +	if (ret)
+> +		return ERR_PTR(ret);
+> +
+> +	pgtable = mm_ops->zalloc_page(mc);
+> +	if (!pgtable)
+> +		return ERR_PTR(-ENOMEM);
+> +
+> +	ret = __kvm_pgtable_walk(&data, mm_ops, (kvm_pteref_t)pgtable,
+> +				 level + 1);
+> +	if (ret) {
+> +		kvm_pgtable_stage2_free_unlinked(mm_ops, pgtable, level);
+> +		mm_ops->put_page(pgtable);
+> +		return ERR_PTR(ret);
 > +	}
+> +
+> +	return pgtable;
+> +}
 >   
->   	if (stage2_pte_is_counted(ctx->old))
->   		mm_ops->put_page(ctx->ptep);
-> @@ -832,11 +845,13 @@ static int stage2_map_walker_try_leaf(const struct kvm_pgtable_visit_ctx *ctx,
->   		return -EAGAIN;
->   
->   	/* Perform CMOs before installation of the guest stage-2 PTE */
-> -	if (mm_ops->dcache_clean_inval_poc && stage2_pte_cacheable(pgt, new))
-> +	if (!kvm_pgtable_walk_skip_cmo(ctx) && mm_ops->dcache_clean_inval_poc &&
-> +	    stage2_pte_cacheable(pgt, new))
->   		mm_ops->dcache_clean_inval_poc(kvm_pte_follow(new, mm_ops),
-> -						granule);
-> +					       granule);
->   
-> -	if (mm_ops->icache_inval_pou && stage2_pte_executable(new))
-> +	if (!kvm_pgtable_walk_skip_cmo(ctx) && mm_ops->icache_inval_pou &&
-> +	    stage2_pte_executable(new))
->   		mm_ops->icache_inval_pou(kvm_pte_follow(new, mm_ops), granule);
->   
->   	stage2_make_pte(ctx, new);
+>   int __kvm_pgtable_stage2_init(struct kvm_pgtable *pgt, struct kvm_s2_mmu *mmu,
+>   			      struct kvm_pgtable_mm_ops *mm_ops,
 > 
+
+Thanks,
+Gavin
 
