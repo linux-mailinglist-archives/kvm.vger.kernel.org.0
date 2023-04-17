@@ -2,135 +2,145 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 37CD86E4630
-	for <lists+kvm@lfdr.de>; Mon, 17 Apr 2023 13:17:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EC53C6E46AB
+	for <lists+kvm@lfdr.de>; Mon, 17 Apr 2023 13:41:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230145AbjDQLRb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 Apr 2023 07:17:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41492 "EHLO
+        id S229966AbjDQLlc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 17 Apr 2023 07:41:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60992 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229583AbjDQLR2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 17 Apr 2023 07:17:28 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55DC25242
-        for <kvm@vger.kernel.org>; Mon, 17 Apr 2023 04:16:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1681730081;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=5KNRdeLRU2Xq/n1iDZzMtTXMvfraDKy7YfY/QU65aIc=;
-        b=i3oFxczaEt479I0iFXaRhrqLSx9P6FifoKisSNQvp7e9tktK5cHxJxAFqtr3/GP3+qQL9I
-        nFNrBUPeyJNPD5WLlgYOR+rD9soVZlgW5jRZCfGZG+xYH4q8JIoahT5ZvWoP57opaZ5sBw
-        6jIV08hpzQ46euOkDOabHH0mEPAqZTI=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-611-Vmwz5GLyMSq-aZoz9pyE1g-1; Mon, 17 Apr 2023 07:14:40 -0400
-X-MC-Unique: Vmwz5GLyMSq-aZoz9pyE1g-1
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-3f080f534acso8156385e9.0
-        for <kvm@vger.kernel.org>; Mon, 17 Apr 2023 04:14:40 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681730079; x=1684322079;
-        h=content-transfer-encoding:in-reply-to:organization:from:references
-         :cc:to:content-language:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=5KNRdeLRU2Xq/n1iDZzMtTXMvfraDKy7YfY/QU65aIc=;
-        b=AQF87tNCkmQOY5ZPO8O7mmA5wPu9l+nAM2f+ENiGPIhlCQ1UXq8Fp9Zo/Qn2xRyBct
-         pdaMmJCKQk9IpVKRK8M35tqw1iDGfiEBuBinR71Tvz/JJQCmgjniOgiRVyb6hDxsVJjH
-         l76j/SZ/TqT6fwGiIqrXtJguw0Arsy4sDimXwq757FL+5m9qc+QNKRFGQ2RsDSzv8IT5
-         ldrstcQGS9nscr8qH/uewiUq4YL1VVccvix304NWC/6+n0V/0C50LmHnvDYNZI/cOkyp
-         MPzP6Fj1PfwQ3M3Rv2oTlIGBc4XM7bfYmtobqT4nD1O15rOqK6oiWn4c9MJa/1D+KlG2
-         KZ6g==
-X-Gm-Message-State: AAQBX9fQICmLXE+4zZ/s7I7G0I/cufsR6MESI0x33rbye3VNcEP87V6g
-        RAQwOb/MyhDYWgTTXtBk8npP6dm/lydMV5PejEj3jUg1ZIjV84me8HCNKLdMTi14Q9K4Au+Lgqr
-        N7uowGACCuyrP
-X-Received: by 2002:a5d:650c:0:b0:2f8:3225:2bc2 with SMTP id x12-20020a5d650c000000b002f832252bc2mr4681562wru.41.1681730079150;
-        Mon, 17 Apr 2023 04:14:39 -0700 (PDT)
-X-Google-Smtp-Source: AKy350bNt0CQlgSAneNNoqT/xp81/MyHZrBQz3dDdnffEdIUnbPzTF+43gFytbOZ+e3kttt+3w0ALw==
-X-Received: by 2002:a5d:650c:0:b0:2f8:3225:2bc2 with SMTP id x12-20020a5d650c000000b002f832252bc2mr4681519wru.41.1681730078827;
-        Mon, 17 Apr 2023 04:14:38 -0700 (PDT)
-Received: from ?IPV6:2003:cb:c700:fc00:db07:68a9:6af5:ecdf? (p200300cbc700fc00db0768a96af5ecdf.dip0.t-ipconnect.de. [2003:cb:c700:fc00:db07:68a9:6af5:ecdf])
-        by smtp.gmail.com with ESMTPSA id v3-20020adfe4c3000000b002f459afc809sm10282660wrm.72.2023.04.17.04.14.36
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 17 Apr 2023 04:14:38 -0700 (PDT)
-Message-ID: <eb624430-6fb5-0349-0798-3f71c39e8768@redhat.com>
-Date:   Mon, 17 Apr 2023 13:14:36 +0200
+        with ESMTP id S229710AbjDQLlb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 17 Apr 2023 07:41:31 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF48D5585;
+        Mon, 17 Apr 2023 04:40:34 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id B996F611E6;
+        Mon, 17 Apr 2023 11:40:32 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 07054C433D2;
+        Mon, 17 Apr 2023 11:40:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1681731632;
+        bh=mIQHO7+k2jNUk1GJ9SsvgtdCa75k5x9GzXYwLhevS84=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=SaZPU+wcSR498p/rcRkowFB0g4mwA8v9D9xL7q4zMnb2eGdVDE1SXaXHR7NLSWc7k
+         es2Xi0xQBS9VfbZmh7YF0UEAMriaoIrFHncxdPVwiloEfd7sWTAO8jw3G3B73zTaNy
+         UexbJKlbedrSAAplAaHzQW93NHeTQXtIEjNzBFpWOBcUfR+8Nnz06q6+FKDRFmTiJ8
+         mduRdP1wrdcJ5BG0FTxxeysNaSssmKt/BrAYMS/SNsRxY8OIu2SFlfNcFsMHxQD9of
+         A5Jld4lvFvdXqaBhI6l2j+1SNiqRZ5iWuqELnnQRcGaCO9H5KYymhMKFUzRXEix494
+         fAbF0eXye95Zg==
+Date:   Mon, 17 Apr 2023 12:40:26 +0100
+From:   Will Deacon <will@kernel.org>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Quentin Perret <qperret@google.com>,
+        Mostafa Saleh <smostafa@google.com>, stable@vger.kernel.org
+Subject: Re: [PATCH] KVM: arm64: Make vcpu flag updates non-preemptible
+Message-ID: <20230417114025.GA30826@willie-the-truck>
+References: <20230417093629.1440039-1-maz@kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.9.1
-Subject: Re: [PATCH v3 6/7] mm/gup: remove vmas parameter from
- pin_user_pages()
-Content-Language: en-US
-To:     Lorenzo Stoakes <lstoakes@gmail.com>, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org,
-        Andrew Morton <akpm@linux-foundation.org>
-Cc:     Matthew Wilcox <willy@infradead.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        Christophe Leroy <christophe.leroy@csgroup.eu>,
-        Dennis Dalessandro <dennis.dalessandro@cornelisnetworks.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Leon Romanovsky <leon@kernel.org>,
-        Christian Benvenuti <benve@cisco.com>,
-        Nelson Escobar <neescoba@cisco.com>,
-        Bernard Metzler <bmt@zurich.ibm.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        Pavel Begunkov <asml.silence@gmail.com>,
-        Bjorn Topel <bjorn@kernel.org>,
-        Magnus Karlsson <magnus.karlsson@intel.com>,
-        Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
-        Jonathan Lemon <jonathan.lemon@gmail.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Alexei Starovoitov <ast@kernel.org>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Jesper Dangaard Brouer <hawk@kernel.org>,
-        John Fastabend <john.fastabend@gmail.com>,
-        linuxppc-dev@lists.ozlabs.org, linux-rdma@vger.kernel.org,
-        linux-media@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        netdev@vger.kernel.org, io-uring@vger.kernel.org,
-        bpf@vger.kernel.org
-References: <cover.1681558407.git.lstoakes@gmail.com>
- <fa5487e54dfae725c84dfd7297b06567340165bd.1681558407.git.lstoakes@gmail.com>
-From:   David Hildenbrand <david@redhat.com>
-Organization: Red Hat
-In-Reply-To: <fa5487e54dfae725c84dfd7297b06567340165bd.1681558407.git.lstoakes@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230417093629.1440039-1-maz@kernel.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 15.04.23 14:09, Lorenzo Stoakes wrote:
-> After the introduction of FOLL_SAME_FILE we no longer require vmas for any
-> invocation of pin_user_pages(), so eliminate this parameter from the
-> function and all callers.
+On Mon, Apr 17, 2023 at 10:36:29AM +0100, Marc Zyngier wrote:
+> Per-vcpu flags are updated using a non-atomic RMW operation.
+> Which means it is possible to get preempted between the read and
+> write operations.
 > 
-> This clears the way to removing the vmas parameter from GUP altogether.
+> Another interesting thing to note is that preemption also updates
+> flags, as we have some flag manipulation in both the load and put
+> operations.
 > 
-> Signed-off-by: Lorenzo Stoakes <lstoakes@gmail.com>
+> It is thus possible to lose information communicated by either
+> load or put, as the preempted flag update will overwrite the flags
+> when the thread is resumed. This is specially critical if either
+> load or put has stored information which depends on the physical
+> CPU the vcpu runs on.
+> 
+> This results in really elusive bugs, and kudos must be given to
+> Mostafa for the long hours of debugging, and finally spotting
+> the problem.
+> 
+> Fixes: e87abb73e594 ("KVM: arm64: Add helpers to manipulate vcpu flags among a set")
+> Reported-by: Mostafa Saleh <smostafa@google.com>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> Cc: stable@vger.kernel.org
 > ---
+>  arch/arm64/include/asm/kvm_host.h | 17 +++++++++++++++++
+>  1 file changed, 17 insertions(+)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index bcd774d74f34..d716cfd806e8 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -579,6 +579,19 @@ struct kvm_vcpu_arch {
+>  		v->arch.flagset & (m);				\
+>  	})
+>  
+> +/*
+> + * Note that the set/clear accessors must be preempt-safe in order to
+> + * avoid nesting them with load/put which also manipulate flags...
+> + */
+> +#ifdef __KVM_NVHE_HYPERVISOR__
+> +/* the nVHE hypervisor is always non-preemptible */
+> +#define __vcpu_flags_preempt_disable()
+> +#define __vcpu_flags_preempt_enable()
+> +#else
+> +#define __vcpu_flags_preempt_disable()	preempt_disable()
+> +#define __vcpu_flags_preempt_enable()	preempt_enable()
+> +#endif
 
-Ideally, we'd avoid FOLL_SAME_FILE as well
+If it makes things cleaner, we could define local (empty) copies of these
+preempt_*() macros at EL2 to save you having to wrap them here. Up to you.
 
-Acked-by: David Hildenbrand <david@redhat.com>
+>  #define __vcpu_set_flag(v, flagset, f, m)			\
+>  	do {							\
+>  		typeof(v->arch.flagset) *fset;			\
+> @@ -586,9 +599,11 @@ struct kvm_vcpu_arch {
+>  		__build_check_flag(v, flagset, f, m);		\
+>  								\
+>  		fset = &v->arch.flagset;			\
+> +		__vcpu_flags_preempt_disable();			\
+>  		if (HWEIGHT(m) > 1)				\
+>  			*fset &= ~(m);				\
+>  		*fset |= (f);					\
+> +		__vcpu_flags_preempt_enable();			\
+>  	} while (0)
+>  
+>  #define __vcpu_clear_flag(v, flagset, f, m)			\
+> @@ -598,7 +613,9 @@ struct kvm_vcpu_arch {
+>  		__build_check_flag(v, flagset, f, m);		\
+>  								\
+>  		fset = &v->arch.flagset;			\
+> +		__vcpu_flags_preempt_disable();			\
+>  		*fset &= ~(m);					\
+> +		__vcpu_flags_preempt_enable();			\
+>  	} while (0)
+>  
+>  #define vcpu_get_flag(v, ...)	__vcpu_get_flag((v), __VA_ARGS__)
 
--- 
-Thanks,
+Given that __vcpu_get_flag() is still preemptible, we should probably
+add a READ_ONCE() in there when we access the relevant flags field. In
+practice, they're all single-byte fields so it should be ok, but I think
+the READ_ONCE() is still worthwhile.
 
-David / dhildenb
-
+Will
