@@ -2,204 +2,223 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1EAD16E4998
-	for <lists+kvm@lfdr.de>; Mon, 17 Apr 2023 15:13:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0248E6E4973
+	for <lists+kvm@lfdr.de>; Mon, 17 Apr 2023 15:11:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230230AbjDQNMz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 Apr 2023 09:12:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33068 "EHLO
+        id S231300AbjDQNLG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 17 Apr 2023 09:11:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33962 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231574AbjDQNML (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 17 Apr 2023 09:12:11 -0400
-Received: from smtp-fw-2101.amazon.com (smtp-fw-2101.amazon.com [72.21.196.25])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C931FB74A;
-        Mon, 17 Apr 2023 06:11:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1681737105; x=1713273105;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=IAokaNAEfHl9C8LoKjZyuJqQZ99655BjjMZAcAR45iw=;
-  b=gwnRnzPbF3mjrA4Ckb0Aku7/1Ved380InxTJTQXRNfGH5DNfnho4q9U2
-   4rgZF3UsdS44wz6V5TOtFPP2n5gYDOrSWjMXlSGwMwxGtgwuGti9rLix7
-   JsoLbIfR5qgTFce3UsmPgWjMJve0Nog2pQKnTiCbQPbMQpYF0mKHiDAZ4
-   Q=;
-X-IronPort-AV: E=Sophos;i="5.99,204,1677542400"; 
-   d="scan'208";a="314793493"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-iad-1d-m6i4x-e651a362.us-east-1.amazon.com) ([10.43.8.6])
-  by smtp-border-fw-2101.iad2.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Apr 2023 13:05:28 +0000
-Received: from EX19MTAUWC002.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan3.iad.amazon.com [10.40.163.38])
-        by email-inbound-relay-iad-1d-m6i4x-e651a362.us-east-1.amazon.com (Postfix) with ESMTPS id 640BB82D70;
-        Mon, 17 Apr 2023 13:05:13 +0000 (UTC)
-Received: from EX19D020UWC004.ant.amazon.com (10.13.138.149) by
- EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.25; Mon, 17 Apr 2023 13:05:12 +0000
-Received: from [0.0.0.0] (10.253.83.51) by EX19D020UWC004.ant.amazon.com
- (10.13.138.149) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.26; Mon, 17 Apr
- 2023 13:05:04 +0000
-Message-ID: <1b17d7d5-1181-5156-07fd-9c50ee7b1e5c@amazon.com>
-Date:   Mon, 17 Apr 2023 15:05:02 +0200
+        with ESMTP id S231284AbjDQNKw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 17 Apr 2023 09:10:52 -0400
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2040.outbound.protection.outlook.com [40.107.236.40])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4CA55AF14;
+        Mon, 17 Apr 2023 06:10:14 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=G89tKpt92EgpYtGMuTmPDClwEL6Bus+Y5BkijqX0cvypUGqGZsdSIG3UY056wpexw/L0xDpcAEHigfGdzP85pSIPX6QN18ARhNUGezdMNecdFyLAokmd2sY0OWMxEezO79YzCfIU7+hXNpd1UqMKwjANUXOtWI5eQbLvQ95GPKa3delnYoR9hRUhRLjKbs8ic5qOtEv8+UWAVibOm6RSPn03jo5D6zpOaM2gwzGBD46rIQx5nlqdmxn01jcP7p2Fl8r3CJaxcFK8uickW2hgxYTN4UWXyE6eoqwtSKHUPKRDh6isYu0wEq6LsK+e9V4CDiMuQLXjkHt6jWpnQuTehw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=tpz1+HfZkJgLZIIfaMx+w8aaEDg/GsNeWlrjiVnRJ8w=;
+ b=PFrPgZLRGeUA+LPTJ518X42m1h1D5mEQufK9HTGGDYRUeX7pl3nFi7GWkp2XPy/f0/trVIBG8ISYvI/1HsFTP3bcwOP9hIjDKjlO2BbVzEqMkFiuZODA66kv59MncLffO9Ei6D3K36ZUwyUkZOjOj8QD/G6vDM7kCRhd9efI2wg19iY2ELC7U0pIYCo1Xq/4O9uWGdqIo59sZgkoAI5y1F15ckSYnbvZlYvcYAWe4O22YLNzqGyvqW4cxDHcnKzzVy852sJWx6I6lFN9iQUsk9o0ducVLWGOypEulQNrHagXcpZ1ZS6Bv6DJFiZ9EW2aPZ55Jaud+22NuV6zWzHOrA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=tpz1+HfZkJgLZIIfaMx+w8aaEDg/GsNeWlrjiVnRJ8w=;
+ b=hSMZxaJp7VZRdReDy1wmcNcTYgmu+28UhvMcULa2Jcoj5+UJSB2bQPtipi29MKmOC0FuXZcUFQkeBBEQ78H+mBNAs+JuoEPS1egMWprjbovIb0r7lLmtFlRQXKoZEduOwNWkWMUIPCcvF6K7b09VXkn27GBHj7hNOowiZGNFBSk3zS+YQ7GzgIqVtMSGVY5UG2T6hHcMCuEQAQ5IqvkjO1byX1/F6BypO0/iidRH3nSPaTDWO9PLV6aSpJ3M/kzjq50JlP9R5k7dta1ymysgaI2YHW/Bc6eisJup57n8sAn/Nvni/p5r+BT4xK16wYcp+HHX7loSjyy7udezUP6Acg==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by MN2PR12MB4440.namprd12.prod.outlook.com (2603:10b6:208:26e::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6298.45; Mon, 17 Apr
+ 2023 13:09:39 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::6045:ad97:10b7:62a2]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::6045:ad97:10b7:62a2%9]) with mapi id 15.20.6298.030; Mon, 17 Apr 2023
+ 13:09:39 +0000
+Date:   Mon, 17 Apr 2023 10:09:36 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Lorenzo Stoakes <lstoakes@gmail.com>
+Cc:     linux-mm@kvack.org, linux-kernel@vger.kernel.org,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        David Hildenbrand <david@redhat.com>,
+        linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-perf-users@vger.kernel.org,
+        linux-security-module@vger.kernel.org,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Eric Biederman <ebiederm@xmission.com>,
+        Kees Cook <keescook@chromium.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Christian Brauner <brauner@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Jiri Olsa <jolsa@kernel.org>,
+        Namhyung Kim <namhyung@kernel.org>,
+        Ian Rogers <irogers@google.com>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        Kentaro Takeda <takedakn@nttdata.co.jp>,
+        Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
+        Paul Moore <paul@paul-moore.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E . Hallyn" <serge@hallyn.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH 3/7] mm/gup: remove vmas parameter from
+ get_user_pages_remote()
+Message-ID: <ZD1FECftWekha6Do@nvidia.com>
+References: <cover.1681508038.git.lstoakes@gmail.com>
+ <5a4cf1ebf1c6cdfabbf2f5209facb0180dd20006.1681508038.git.lstoakes@gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5a4cf1ebf1c6cdfabbf2f5209facb0180dd20006.1681508038.git.lstoakes@gmail.com>
+X-ClientProxiedBy: SJ0P220CA0002.NAMP220.PROD.OUTLOOK.COM
+ (2603:10b6:a03:41b::10) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.10.0
-Subject: Re: [PATCH RFC v8 45/56] KVM: SVM: Provide support for
- SNP_GUEST_REQUEST NAE event
-Content-Language: en-US
-To:     Michael Roth <michael.roth@amd.com>, <kvm@vger.kernel.org>
-CC:     <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
-        <linux-crypto@vger.kernel.org>, <x86@kernel.org>,
-        <linux-kernel@vger.kernel.org>, <tglx@linutronix.de>,
-        <mingo@redhat.com>, <jroedel@suse.de>, <thomas.lendacky@amd.com>,
-        <hpa@zytor.com>, <ardb@kernel.org>, <pbonzini@redhat.com>,
-        <seanjc@google.com>, <vkuznets@redhat.com>, <jmattson@google.com>,
-        <luto@kernel.org>, <dave.hansen@linux.intel.com>, <slp@redhat.com>,
-        <pgonda@google.com>, <peterz@infradead.org>,
-        <srinivas.pandruvada@linux.intel.com>, <rientjes@google.com>,
-        <dovmurik@linux.ibm.com>, <tobin@ibm.com>, <bp@alien8.de>,
-        <vbabka@suse.cz>, <kirill@shutemov.name>, <ak@linux.intel.com>,
-        <tony.luck@intel.com>, <marcorr@google.com>,
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        <alpergun@google.com>, <dgilbert@redhat.com>, <jarkko@kernel.org>,
-        <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        "Rapan, Sabin" <sabrapan@amazon.com>
-References: <20230220183847.59159-1-michael.roth@amd.com>
- <20230220183847.59159-46-michael.roth@amd.com>
-From:   Alexander Graf <graf@amazon.com>
-In-Reply-To: <20230220183847.59159-46-michael.roth@amd.com>
-X-Originating-IP: [10.253.83.51]
-X-ClientProxiedBy: EX19D036UWC003.ant.amazon.com (10.13.139.214) To
- EX19D020UWC004.ant.amazon.com (10.13.138.149)
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Transfer-Encoding: base64
-X-Spam-Status: No, score=-6.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-        NICE_REPLY_A,RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,T_SCC_BODY_TEXT_LINE,T_SPF_PERMERROR autolearn=ham
-        autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|MN2PR12MB4440:EE_
+X-MS-Office365-Filtering-Correlation-Id: c8cb5713-fc5a-448e-077b-08db3f45004f
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: O7dBBRxVm8mYOzQ0DfUx4MiwDO8ArpSlgOiBFpJVFAyI+ICLr3S5D5ikpC8c9pQzZY4Y29fQy9IxdvJO1M515WvAqgBy/b9KxZm5J8qrqsPHFLB8ZB3/kXcKXK5zE0ioIITO4JpvJvFrRKYuVA/OBXlzlbIPiDPNZzTgYycAnvqKMD7sUqDd8pgK/+VqByvV9Zre8PlnH9peDwr3eKIkkHwoTzK21TkwdKazZr4S14gHYADrhkfJuah996afkuxmKEhSF+YxUAk4GKwd7XHzRoR8S7hIiKpz5Djudnb2aFywEIqMK9ybR1LcBSsLjlMNB9/4nDpIUmC206kiJUNDM0WhzsG/Q09Y/uOcvLMB1SnPrqXuK8neVOo1RDA5jG4FrWWDLiAc+fhZ4CKpAsAi58AmPXQwumdMgr6A3ts6WLw4s6obW51lgf7SKhTednqLIYp+Fbp6QgXLnIauYOC9uueiTduwVHLInqDmTZ+QLB63th0KpKkUrA2+WBw/RQurzA87PIsdM7M2IZGnTqUW4d9untlBR2mjFAejaXVQCvNTEesSr7BW7sL9cX69OpuJ
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(376002)(396003)(136003)(39860400002)(366004)(346002)(451199021)(6486002)(6666004)(86362001)(478600001)(2616005)(36756003)(83380400001)(26005)(6506007)(186003)(6512007)(38100700002)(6916009)(66946007)(66476007)(66556008)(316002)(2906002)(4326008)(8936002)(8676002)(5660300002)(7416002)(7406005)(41300700001)(54906003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?E2yy/biwPHZy8ilmq0YNL9tCqzoGpXPyswKP3G3dXPbfIpTNNDb3UnMtCvbT?=
+ =?us-ascii?Q?r9uDLALWDAwSc5Z99LIoT8RoZBz16DmCXXkDaXP+8vlKtbmO1GsbUcYGbQmM?=
+ =?us-ascii?Q?bGF/goPa/+CedsTe+XoLua3vFa6/zBdFAEJ3W9hfql7dJbA2AcWRbKp4yyPF?=
+ =?us-ascii?Q?0dmDXVf3GED3wHhqytl5uZZRycX29NmoDpANbfzdVG+dDc0Tjj1GWyzKF8x3?=
+ =?us-ascii?Q?MGdum14NYZVIVy8E/eY1DE50HFqV5onse3j6no+SHQ6ZI0mLwlyzF3cE/Oyx?=
+ =?us-ascii?Q?ywHJqIipG7VvrRbw7ipT6IumPF1sUULDSDefzTLhaW+4cNsHvaFA/QhG1a3+?=
+ =?us-ascii?Q?VenE96xv//f0EfiDt6g9DvrtNCltgvduiU6jVmw7koiHDlDKC+R1LnuZyBRY?=
+ =?us-ascii?Q?GTwpgoTd0uyp7j/dkXV5udgkgq9HBCpTXdNPUt5HoF62hw84c2Xf/2WzX/OO?=
+ =?us-ascii?Q?i+J3NfZuamM+CNpE6TsjghKl6Fcagv+iT9HmvLF2pLvc5ZslOC6mrdAubPvx?=
+ =?us-ascii?Q?WOj5ZkDIk9fPmWXUbYxTWJht5rcaV4niHjPOKCDMJqKMiYCq344/85xOZbS8?=
+ =?us-ascii?Q?jltRxw94+YlXPQ1KJDxxgJwf3PA+LmuiIDF1sKQaNEbS8eQRx8pADaDLUU/i?=
+ =?us-ascii?Q?tNRJz9wZUYCuLU6adFAU/WizSzNrfO+4QSAGnUZ0wRH3ZtOwwAWFsA8Ktpcd?=
+ =?us-ascii?Q?j2c2IMu7YEvW1FaHMrT7kHgSje4WdZcMue6BvehIHoIXvZwiTcha5wJpFaAJ?=
+ =?us-ascii?Q?NLtPS4UE/qB1dEqs6NfyAIZ9eeynBI4OJgojb6sSEF0TsXIIRA9gR4iG0jux?=
+ =?us-ascii?Q?q4CYyBuYg4Iqt+ZtZQn5Zrd4y3C2Y49I3Dy1PPVLpmnVI1gTwhPqRoRYj+V0?=
+ =?us-ascii?Q?PtwwIBBdlQe2DCCWVdi1N0W1mdG0zW4MfZGJ6wAM1chp8uo+2/N5LjIj06/C?=
+ =?us-ascii?Q?G1xCh7azkgJtI5j4qtLwXDaWd3lHG0JU/VWtM/xSjcOBNFz9Cx3CTnB7z0Yn?=
+ =?us-ascii?Q?hZ/f6CJt12k5kEtSUthmsGUnakr5i3lyZYpMdGyBMkLPKvYVn3zgp29dqoMS?=
+ =?us-ascii?Q?7ePmgRhdKsuNOjx95Z0f9wI+l8CQx7IDmPDRWd7uK0tK7XtSdf77k8vJNQMr?=
+ =?us-ascii?Q?sMFIVNsaa/yYu+MiXuB9NXSX/wSLcdAudgXBiYxunIJ8yrxF1CSPEZvePjpt?=
+ =?us-ascii?Q?W5I+WbPlr/n+CJmrgVNhFvJK9IhPTD8NihYNZvXrdKA3bT2lMEkiWURkzzsF?=
+ =?us-ascii?Q?cZCQMbl+9dF+4H4TlhnejIGMSsU8PRpD37fRpzmefgOVJV3H30C96mYZe9sf?=
+ =?us-ascii?Q?PVrFXCHUzd8zHglrVlrPkCxBZzf92vG50WBSg+Bo4F3lGbXE+/RUEy5hqjsl?=
+ =?us-ascii?Q?PCd+htLB8utfRkhBrN993hOnLxSHtVEdoEPUB1sG87P1VpnPzyvg0PAAK7ee?=
+ =?us-ascii?Q?FFajWMQjqLlZxzropW7qQIoZDyDtKK0STTON3wwshbmgiq/gJM804YrOgC/7?=
+ =?us-ascii?Q?QlqrA3WrolQSeS2oGRvTeQrHqz6Z2Krx0y2LpZE6NhooL+RKct3H7VWlWNpb?=
+ =?us-ascii?Q?TlpOxOlRuMr9n05l3HtCHBM77v8x2dk5x7v6Vdmg?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c8cb5713-fc5a-448e-077b-08db3f45004f
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Apr 2023 13:09:39.5631
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 7oLjo/OBSveZ+2eKG/RE5a388wGBSDA1kBSQ3y0ei7335TXbQmvdSaC6x2eaZ5AU
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB4440
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Ck9uIDIwLjAyLjIzIDE5OjM4LCBNaWNoYWVsIFJvdGggd3JvdGU6Cgo+IEZyb206IEJyaWplc2gg
-U2luZ2ggPGJyaWplc2guc2luZ2hAYW1kLmNvbT4KPgo+IFZlcnNpb24gMiBvZiBHSENCIHNwZWNp
-ZmljYXRpb24gYWRkZWQgdGhlIHN1cHBvcnQgZm9yIHR3byBTTlAgR3Vlc3QKPiBSZXF1ZXN0IE1l
-c3NhZ2UgTkFFIGV2ZW50cy4gVGhlIGV2ZW50cyBhbGxvd3MgZm9yIGFuIFNFVi1TTlAgZ3Vlc3Qg
-dG8KPiBtYWtlIHJlcXVlc3QgdG8gdGhlIFNFVi1TTlAgZmlybXdhcmUgdGhyb3VnaCBoeXBlcnZp
-c29yIHVzaW5nIHRoZQo+IFNOUF9HVUVTVF9SRVFVRVNUIEFQSSBkZWZpbmUgaW4gdGhlIFNFVi1T
-TlAgZmlybXdhcmUgc3BlY2lmaWNhdGlvbi4KPgo+IFRoZSBTTlBfRVhUX0dVRVNUX1JFUVVFU1Qg
-aXMgc2ltaWxhciB0byBTTlBfR1VFU1RfUkVRVUVTVCB3aXRoIHRoZQo+IGRpZmZlcmVuY2Ugb2Yg
-YW4gYWRkaXRpb25hbCBjZXJ0aWZpY2F0ZSBibG9iIHRoYXQgY2FuIGJlIHBhc3NlZCB0aHJvdWdo
-Cj4gdGhlIFNOUF9TRVRfQ09ORklHIGlvY3RsIGRlZmluZWQgaW4gdGhlIENDUCBkcml2ZXIuIFRo
-ZSBDQ1AgZHJpdmVyCj4gcHJvdmlkZXMgc25wX2d1ZXN0X2V4dF9ndWVzdF9yZXF1ZXN0KCkgdGhh
-dCBpcyB1c2VkIGJ5IHRoZSBLVk0gdG8gZ2V0Cj4gYm90aCB0aGUgcmVwb3J0IGFuZCBjZXJ0aWZp
-Y2F0ZSBkYXRhIGF0IG9uY2UuCj4KPiBTaWduZWQtb2ZmLWJ5OiBCcmlqZXNoIFNpbmdoIDxicmlq
-ZXNoLnNpbmdoQGFtZC5jb20+Cj4gU2lnbmVkLW9mZi1ieTogQXNoaXNoIEthbHJhIDxhc2hpc2gu
-a2FscmFAYW1kLmNvbT4KPiBTaWduZWQtb2ZmLWJ5OiBNaWNoYWVsIFJvdGggPG1pY2hhZWwucm90
-aEBhbWQuY29tPgo+IC0tLQo+ICAgYXJjaC94ODYva3ZtL3N2bS9zZXYuYyB8IDE4NSArKysrKysr
-KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKystLQo+ICAgYXJjaC94ODYva3ZtL3N2bS9z
-dm0uaCB8ICAgMiArCj4gICAyIGZpbGVzIGNoYW5nZWQsIDE4MSBpbnNlcnRpb25zKCspLCA2IGRl
-bGV0aW9ucygtKQo+Cj4gZGlmZiAtLWdpdCBhL2FyY2gveDg2L2t2bS9zdm0vc2V2LmMgYi9hcmNo
-L3g4Ni9rdm0vc3ZtL3Nldi5jCj4gaW5kZXggMTk3YjFmOTA0NTY3Li45MjE3OTYxNDEwMmUgMTAw
-NjQ0Cj4gLS0tIGEvYXJjaC94ODYva3ZtL3N2bS9zZXYuYwo+ICsrKyBiL2FyY2gveDg2L2t2bS9z
-dm0vc2V2LmMKPiBAQCAtMzI3LDYgKzMyNyw3IEBAIHN0YXRpYyBpbnQgc2V2X2d1ZXN0X2luaXQo
-c3RydWN0IGt2bSAqa3ZtLCBzdHJ1Y3Qga3ZtX3Nldl9jbWQgKmFyZ3ApCj4gICAgICAgICAgICAg
-ICAgICBpZiAocmV0KQo+ICAgICAgICAgICAgICAgICAgICAgICAgICBnb3RvIGVfZnJlZTsKPgo+
-ICsgICAgICAgICAgICAgICBtdXRleF9pbml0KCZzZXYtPmd1ZXN0X3JlcV9sb2NrKTsKPiAgICAg
-ICAgICAgICAgICAgIHJldCA9IHNldl9zbnBfaW5pdCgmYXJncC0+ZXJyb3IsIGZhbHNlKTsKPiAg
-ICAgICAgICB9IGVsc2Ugewo+ICAgICAgICAgICAgICAgICAgcmV0ID0gc2V2X3BsYXRmb3JtX2lu
-aXQoJmFyZ3AtPmVycm9yKTsKPiBAQCAtMjA1OSwyMyArMjA2MCwzNCBAQCBpbnQgc2V2X3ZtX21v
-dmVfZW5jX2NvbnRleHRfZnJvbShzdHJ1Y3Qga3ZtICprdm0sIHVuc2lnbmVkIGludCBzb3VyY2Vf
-ZmQpCj4gICAgKi8KPiAgIHN0YXRpYyB2b2lkICpzbnBfY29udGV4dF9jcmVhdGUoc3RydWN0IGt2
-bSAqa3ZtLCBzdHJ1Y3Qga3ZtX3Nldl9jbWQgKmFyZ3ApCj4gICB7Cj4gKyAgICAgICBzdHJ1Y3Qg
-a3ZtX3Nldl9pbmZvICpzZXYgPSAmdG9fa3ZtX3N2bShrdm0pLT5zZXZfaW5mbzsKPiAgICAgICAg
-ICBzdHJ1Y3Qgc2V2X2RhdGFfc25wX2FkZHIgZGF0YSA9IHt9Owo+IC0gICAgICAgdm9pZCAqY29u
-dGV4dDsKPiArICAgICAgIHZvaWQgKmNvbnRleHQsICpjZXJ0c19kYXRhOwo+ICAgICAgICAgIGlu
-dCByYzsKPgo+ICsgICAgICAgLyogQWxsb2NhdGUgbWVtb3J5IHVzZWQgZm9yIHRoZSBjZXJ0cyBk
-YXRhIGluIFNOUCBndWVzdCByZXF1ZXN0ICovCj4gKyAgICAgICBjZXJ0c19kYXRhID0ga3phbGxv
-YyhTRVZfRldfQkxPQl9NQVhfU0laRSwgR0ZQX0tFUk5FTF9BQ0NPVU5UKTsKPiArICAgICAgIGlm
-ICghY2VydHNfZGF0YSkKPiArICAgICAgICAgICAgICAgcmV0dXJuIE5VTEw7Cj4gKwo+ICAgICAg
-ICAgIC8qIEFsbG9jYXRlIG1lbW9yeSBmb3IgY29udGV4dCBwYWdlICovCj4gICAgICAgICAgY29u
-dGV4dCA9IHNucF9hbGxvY19maXJtd2FyZV9wYWdlKEdGUF9LRVJORUxfQUNDT1VOVCk7Cj4gICAg
-ICAgICAgaWYgKCFjb250ZXh0KQo+IC0gICAgICAgICAgICAgICByZXR1cm4gTlVMTDsKPiArICAg
-ICAgICAgICAgICAgZ290byBlX2ZyZWU7Cj4KPiAgICAgICAgICBkYXRhLmdjdHhfcGFkZHIgPSBf
-X3BzcF9wYShjb250ZXh0KTsKPiAgICAgICAgICByYyA9IF9fc2V2X2lzc3VlX2NtZChhcmdwLT5z
-ZXZfZmQsIFNFVl9DTURfU05QX0dDVFhfQ1JFQVRFLCAmZGF0YSwgJmFyZ3AtPmVycm9yKTsKPiAt
-ICAgICAgIGlmIChyYykgewo+IC0gICAgICAgICAgICAgICBzbnBfZnJlZV9maXJtd2FyZV9wYWdl
-KGNvbnRleHQpOwo+IC0gICAgICAgICAgICAgICByZXR1cm4gTlVMTDsKPiAtICAgICAgIH0KPiAr
-ICAgICAgIGlmIChyYykKPiArICAgICAgICAgICAgICAgZ290byBlX2ZyZWU7Cj4gKwo+ICsgICAg
-ICAgc2V2LT5zbnBfY2VydHNfZGF0YSA9IGNlcnRzX2RhdGE7Cj4KPiAgICAgICAgICByZXR1cm4g
-Y29udGV4dDsKPiArCj4gK2VfZnJlZToKPiArICAgICAgIHNucF9mcmVlX2Zpcm13YXJlX3BhZ2Uo
-Y29udGV4dCk7Cj4gKyAgICAgICBrZnJlZShjZXJ0c19kYXRhKTsKPiArICAgICAgIHJldHVybiBO
-VUxMOwo+ICAgfQo+Cj4gICBzdGF0aWMgaW50IHNucF9iaW5kX2FzaWQoc3RydWN0IGt2bSAqa3Zt
-LCBpbnQgKmVycm9yKQo+IEBAIC0yNjkzLDYgKzI3MDUsOCBAQCBzdGF0aWMgaW50IHNucF9kZWNv
-bW1pc3Npb25fY29udGV4dChzdHJ1Y3Qga3ZtICprdm0pCj4gICAgICAgICAgc25wX2ZyZWVfZmly
-bXdhcmVfcGFnZShzZXYtPnNucF9jb250ZXh0KTsKPiAgICAgICAgICBzZXYtPnNucF9jb250ZXh0
-ID0gTlVMTDsKPgo+ICsgICAgICAga2ZyZWUoc2V2LT5zbnBfY2VydHNfZGF0YSk7Cj4gKwo+ICAg
-ICAgICAgIHJldHVybiAwOwo+ICAgfQo+Cj4gQEAgLTMxNTMsNiArMzE2Nyw4IEBAIHN0YXRpYyBp
-bnQgc2V2X2VzX3ZhbGlkYXRlX3ZtZ2V4aXQoc3RydWN0IHZjcHVfc3ZtICpzdm0pCj4gICAgICAg
-ICAgY2FzZSBTVk1fVk1HRVhJVF9VTlNVUFBPUlRFRF9FVkVOVDoKPiAgICAgICAgICBjYXNlIFNW
-TV9WTUdFWElUX0hWX0ZFQVRVUkVTOgo+ICAgICAgICAgIGNhc2UgU1ZNX1ZNR0VYSVRfUFNDOgo+
-ICsgICAgICAgY2FzZSBTVk1fVk1HRVhJVF9HVUVTVF9SRVFVRVNUOgo+ICsgICAgICAgY2FzZSBT
-Vk1fVk1HRVhJVF9FWFRfR1VFU1RfUkVRVUVTVDoKPiAgICAgICAgICAgICAgICAgIGJyZWFrOwo+
-ICAgICAgICAgIGRlZmF1bHQ6Cj4gICAgICAgICAgICAgICAgICByZWFzb24gPSBHSENCX0VSUl9J
-TlZBTElEX0VWRU5UOwo+IEBAIC0zMzg0LDYgKzM0MDAsMTQ5IEBAIHN0YXRpYyBpbnQgc25wX2Nv
-bXBsZXRlX3BzYyhzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpCj4gICAgICAgICAgcmV0dXJuIDE7Cj4g
-ICB9Cj4KPiArc3RhdGljIHVuc2lnbmVkIGxvbmcgc25wX3NldHVwX2d1ZXN0X2J1ZihzdHJ1Y3Qg
-dmNwdV9zdm0gKnN2bSwKPiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-IHN0cnVjdCBzZXZfZGF0YV9zbnBfZ3Vlc3RfcmVxdWVzdCAqZGF0YSwKPiArICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgIGdwYV90IHJlcV9ncGEsIGdwYV90IHJlc3BfZ3Bh
-KQo+ICt7Cj4gKyAgICAgICBzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUgPSAmc3ZtLT52Y3B1Owo+ICsg
-ICAgICAgc3RydWN0IGt2bSAqa3ZtID0gdmNwdS0+a3ZtOwo+ICsgICAgICAga3ZtX3Bmbl90IHJl
-cV9wZm4sIHJlc3BfcGZuOwo+ICsgICAgICAgc3RydWN0IGt2bV9zZXZfaW5mbyAqc2V2Owo+ICsK
-PiArICAgICAgIHNldiA9ICZ0b19rdm1fc3ZtKGt2bSktPnNldl9pbmZvOwo+ICsKPiArICAgICAg
-IGlmICghSVNfQUxJR05FRChyZXFfZ3BhLCBQQUdFX1NJWkUpIHx8ICFJU19BTElHTkVEKHJlc3Bf
-Z3BhLCBQQUdFX1NJWkUpKQo+ICsgICAgICAgICAgICAgICByZXR1cm4gU0VWX1JFVF9JTlZBTElE
-X1BBUkFNOwo+ICsKPiArICAgICAgIHJlcV9wZm4gPSBnZm5fdG9fcGZuKGt2bSwgZ3BhX3RvX2dm
-bihyZXFfZ3BhKSk7Cj4gKyAgICAgICBpZiAoaXNfZXJyb3Jfbm9zbG90X3BmbihyZXFfcGZuKSkK
-PiArICAgICAgICAgICAgICAgcmV0dXJuIFNFVl9SRVRfSU5WQUxJRF9BRERSRVNTOwo+ICsKPiAr
-ICAgICAgIHJlc3BfcGZuID0gZ2ZuX3RvX3Bmbihrdm0sIGdwYV90b19nZm4ocmVzcF9ncGEpKTsK
-PiArICAgICAgIGlmIChpc19lcnJvcl9ub3Nsb3RfcGZuKHJlc3BfcGZuKSkKPiArICAgICAgICAg
-ICAgICAgcmV0dXJuIFNFVl9SRVRfSU5WQUxJRF9BRERSRVNTOwo+ICsKPiArICAgICAgIGlmIChy
-bXBfbWFrZV9wcml2YXRlKHJlc3BfcGZuLCAwLCBQR19MRVZFTF80SywgMCwgdHJ1ZSkpCj4gKyAg
-ICAgICAgICAgICAgIHJldHVybiBTRVZfUkVUX0lOVkFMSURfQUREUkVTUzsKPiArCj4gKyAgICAg
-ICBkYXRhLT5nY3R4X3BhZGRyID0gX19wc3BfcGEoc2V2LT5zbnBfY29udGV4dCk7Cj4gKyAgICAg
-ICBkYXRhLT5yZXFfcGFkZHIgPSBfX3NtZV9zZXQocmVxX3BmbiA8PCBQQUdFX1NISUZUKTsKPiAr
-ICAgICAgIGRhdGEtPnJlc19wYWRkciA9IF9fc21lX3NldChyZXNwX3BmbiA8PCBQQUdFX1NISUZU
-KTsKPiArCj4gKyAgICAgICByZXR1cm4gMDsKPiArfQo+ICsKPiArc3RhdGljIHZvaWQgc25wX2Ns
-ZWFudXBfZ3Vlc3RfYnVmKHN0cnVjdCBzZXZfZGF0YV9zbnBfZ3Vlc3RfcmVxdWVzdCAqZGF0YSwg
-dW5zaWduZWQgbG9uZyAqcmMpCj4gK3sKPiArICAgICAgIHU2NCBwZm4gPSBfX3NtZV9jbHIoZGF0
-YS0+cmVzX3BhZGRyKSA+PiBQQUdFX1NISUZUOwo+ICsgICAgICAgaW50IHJldDsKPiArCj4gKyAg
-ICAgICByZXQgPSBzbnBfcGFnZV9yZWNsYWltKHBmbik7Cj4gKyAgICAgICBpZiAocmV0KQo+ICsg
-ICAgICAgICAgICAgICAqcmMgPSBTRVZfUkVUX0lOVkFMSURfQUREUkVTUzsKPiArCj4gKyAgICAg
-ICByZXQgPSBybXBfbWFrZV9zaGFyZWQocGZuLCBQR19MRVZFTF80Syk7Cj4gKyAgICAgICBpZiAo
-cmV0KQo+ICsgICAgICAgICAgICAgICAqcmMgPSBTRVZfUkVUX0lOVkFMSURfQUREUkVTUzsKPiAr
-fQo+ICsKPiArc3RhdGljIHZvaWQgc25wX2hhbmRsZV9ndWVzdF9yZXF1ZXN0KHN0cnVjdCB2Y3B1
-X3N2bSAqc3ZtLCBncGFfdCByZXFfZ3BhLCBncGFfdCByZXNwX2dwYSkKPiArewo+ICsgICAgICAg
-c3RydWN0IHNldl9kYXRhX3NucF9ndWVzdF9yZXF1ZXN0IGRhdGEgPSB7MH07Cj4gKyAgICAgICBz
-dHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUgPSAmc3ZtLT52Y3B1Owo+ICsgICAgICAgc3RydWN0IGt2bSAq
-a3ZtID0gdmNwdS0+a3ZtOwo+ICsgICAgICAgc3RydWN0IGt2bV9zZXZfaW5mbyAqc2V2Owo+ICsg
-ICAgICAgdW5zaWduZWQgbG9uZyByYzsKPiArICAgICAgIGludCBlcnI7Cj4gKwo+ICsgICAgICAg
-aWYgKCFzZXZfc25wX2d1ZXN0KHZjcHUtPmt2bSkpIHsKPiArICAgICAgICAgICAgICAgcmMgPSBT
-RVZfUkVUX0lOVkFMSURfR1VFU1Q7Cj4gKyAgICAgICAgICAgICAgIGdvdG8gZV9mYWlsOwo+ICsg
-ICAgICAgfQo+ICsKPiArICAgICAgIHNldiA9ICZ0b19rdm1fc3ZtKGt2bSktPnNldl9pbmZvOwo+
-ICsKPiArICAgICAgIG11dGV4X2xvY2soJnNldi0+Z3Vlc3RfcmVxX2xvY2spOwo+ICsKPiArICAg
-ICAgIHJjID0gc25wX3NldHVwX2d1ZXN0X2J1Zihzdm0sICZkYXRhLCByZXFfZ3BhLCByZXNwX2dw
-YSk7Cj4gKyAgICAgICBpZiAocmMpCj4gKyAgICAgICAgICAgICAgIGdvdG8gdW5sb2NrOwo+ICsK
-PiArICAgICAgIHJjID0gc2V2X2lzc3VlX2NtZChrdm0sIFNFVl9DTURfU05QX0dVRVNUX1JFUVVF
-U1QsICZkYXRhLCAmZXJyKTsKPiArICAgICAgIGlmIChyYykKPiArICAgICAgICAgICAgICAgLyog
-dXNlIHRoZSBmaXJtd2FyZSBlcnJvciBjb2RlICovCj4gKyAgICAgICAgICAgICAgIHJjID0gZXJy
-OwoKClRoZXJlIGFyZSBjYXNlcyB3aGVyZSBzZXZfaXNzdWVfY21kIGNhbiBmYWlsLCBidXQgbm90
-IHNldCBlcnIuIEZvciAKZXhhbXBsZSwgd2hlbiB0aGUgZmlsZSBkZXNjcmlwdG9yIGlzIGluY29y
-cmVjdC4gSW4gdGhhdCBjYXNlLCB0aGlzIGNvZGUgCnBhdGggbGVha3MgdW5pbml0aWFsaXplZCBz
-dGF0ZSBmcm9tIHRoZSBob3N0IHN0YWNrIChlcnIpIGFsbCB0aGUgd2F5IAppbnRvIGEgZ3Vlc3Qu
-CgoKQWxleAoKCgoKQW1hem9uIERldmVsb3BtZW50IENlbnRlciBHZXJtYW55IEdtYkgKS3JhdXNl
-bnN0ci4gMzgKMTAxMTcgQmVybGluCkdlc2NoYWVmdHNmdWVocnVuZzogQ2hyaXN0aWFuIFNjaGxh
-ZWdlciwgSm9uYXRoYW4gV2Vpc3MKRWluZ2V0cmFnZW4gYW0gQW10c2dlcmljaHQgQ2hhcmxvdHRl
-bmJ1cmcgdW50ZXIgSFJCIDE0OTE3MyBCClNpdHo6IEJlcmxpbgpVc3QtSUQ6IERFIDI4OSAyMzcg
-ODc5CgoK
+On Sat, Apr 15, 2023 at 12:27:31AM +0100, Lorenzo Stoakes wrote:
+> The only instances of get_user_pages_remote() invocations which used the
+> vmas parameter were for a single page which can instead simply look up the
+> VMA directly. In particular:-
+> 
+> - __update_ref_ctr() looked up the VMA but did nothing with it so we simply
+>   remove it.
+> 
+> - __access_remote_vm() was already using vma_lookup() when the original
+>   lookup failed so by doing the lookup directly this also de-duplicates the
+>   code.
+> 
+> This forms part of a broader set of patches intended to eliminate the vmas
+> parameter altogether.
+> 
+> Signed-off-by: Lorenzo Stoakes <lstoakes@gmail.com>
+> ---
+>  arch/arm64/kernel/mte.c   |  5 +++--
+>  arch/s390/kvm/interrupt.c |  2 +-
+>  fs/exec.c                 |  2 +-
+>  include/linux/mm.h        |  2 +-
+>  kernel/events/uprobes.c   | 10 +++++-----
+>  mm/gup.c                  | 12 ++++--------
+>  mm/memory.c               |  9 +++++----
+>  mm/rmap.c                 |  2 +-
+>  security/tomoyo/domain.c  |  2 +-
+>  virt/kvm/async_pf.c       |  3 +--
+>  10 files changed, 23 insertions(+), 26 deletions(-)
+> 
+> diff --git a/arch/arm64/kernel/mte.c b/arch/arm64/kernel/mte.c
+> index f5bcb0dc6267..74d8d4007dec 100644
+> --- a/arch/arm64/kernel/mte.c
+> +++ b/arch/arm64/kernel/mte.c
+> @@ -437,8 +437,9 @@ static int __access_remote_tags(struct mm_struct *mm, unsigned long addr,
+>  		struct page *page = NULL;
+>  
+>  		ret = get_user_pages_remote(mm, addr, 1, gup_flags, &page,
+> -					    &vma, NULL);
+> -		if (ret <= 0)
+> +					    NULL);
+> +		vma = vma_lookup(mm, addr);
+> +		if (ret <= 0 || !vma)
+>  			break;
 
+Given the slightly tricky error handling, it would make sense to turn
+this pattern into a helper function:
+
+page = get_single_user_page_locked(mm, addr, gup_flags, &vma);
+if (IS_ERR(page))
+  [..]
+
+static inline struct page *get_single_user_page_locked(struct mm_struct *mm,
+   unsigned long addr, int gup_flags, struct vm_area_struct **vma)
+{
+	struct page *page;
+	int ret;
+
+	ret = get_user_pages_remote(*mm, addr, 1, gup_flags, &page, NULL, NULL);
+	if (ret < 0)
+	   return ERR_PTR(ret);
+	if (WARN_ON(ret == 0))
+	   return ERR_PTR(-EINVAL);
+        *vma = vma_lookup(mm, addr);
+	if (WARN_ON(!*vma) {
+	   put_user_page(page);
+	   return ERR_PTR(-EINVAL);
+        }
+	return page;
+}
+
+It could be its own patch so this change was just a mechanical removal
+of NULL
+
+Jason
