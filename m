@@ -2,21 +2,21 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DEA3F6E4A6C
-	for <lists+kvm@lfdr.de>; Mon, 17 Apr 2023 15:59:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 664146E4A69
+	for <lists+kvm@lfdr.de>; Mon, 17 Apr 2023 15:59:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230190AbjDQN7H (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 Apr 2023 09:59:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49042 "EHLO
+        id S230146AbjDQN7D (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 17 Apr 2023 09:59:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49040 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229966AbjDQN67 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 17 Apr 2023 09:58:59 -0400
+        with ESMTP id S230014AbjDQN66 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 17 Apr 2023 09:58:58 -0400
 Received: from imap5.colo.codethink.co.uk (imap5.colo.codethink.co.uk [78.40.148.171])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 393395BBD
-        for <kvm@vger.kernel.org>; Mon, 17 Apr 2023 06:58:53 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1F2861A3
+        for <kvm@vger.kernel.org>; Mon, 17 Apr 2023 06:58:51 -0700 (PDT)
 Received: from [167.98.27.226] (helo=lawrence-thinkpad.guest.codethink.co.uk)
         by imap5.colo.codethink.co.uk with esmtpsa  (Exim 4.94.2 #2 (Debian))
-        id 1poPNO-0034ER-HR; Mon, 17 Apr 2023 14:58:38 +0100
+        id 1poPNO-0034ER-PQ; Mon, 17 Apr 2023 14:58:38 +0100
 From:   Lawrence Hunter <lawrence.hunter@codethink.co.uk>
 To:     qemu-devel@nongnu.org
 Cc:     dickon.hood@codethink.co.uk, nazar.kazakov@codethink.co.uk,
@@ -25,9 +25,9 @@ Cc:     dickon.hood@codethink.co.uk, nazar.kazakov@codethink.co.uk,
         bin.meng@windriver.com, pbonzini@redhat.com,
         philipp.tomsich@vrull.eu, kvm@vger.kernel.org,
         qemu-riscv@nongnu.org
-Subject: [PATCH v2 07/17] qemu/bitops.h: Limit rotate amounts
-Date:   Mon, 17 Apr 2023 14:58:11 +0100
-Message-Id: <20230417135821.609964-8-lawrence.hunter@codethink.co.uk>
+Subject: [PATCH v2 08/17] qemu/host-utils.h: Add clz and ctz functions for lower-bit integers
+Date:   Mon, 17 Apr 2023 14:58:12 +0100
+Message-Id: <20230417135821.609964-9-lawrence.hunter@codethink.co.uk>
 X-Mailer: git-send-email 2.40.0
 In-Reply-To: <20230417135821.609964-1-lawrence.hunter@codethink.co.uk>
 References: <20230417135821.609964-1-lawrence.hunter@codethink.co.uk>
@@ -42,101 +42,88 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Dickon Hood <dickon.hood@codethink.co.uk>
+From: Kiran Ostrolenk <kiran.ostrolenk@codethink.co.uk>
 
-Rotates have been fixed up to only allow for reasonable rotate amounts
-(ie, no rotates >7 on an 8b value etc.)  This fixes a problem with riscv
-vector rotate instructions.
+This is for use in the RISC-V vclz and vctz instructions (implemented in
+proceeding commit).
 
-Signed-off-by: Dickon Hood <dickon.hood@codethink.co.uk>
+Signed-off-by: Kiran Ostrolenk <kiran.ostrolenk@codethink.co.uk>
 ---
- include/qemu/bitops.h | 24 ++++++++++++++++--------
- 1 file changed, 16 insertions(+), 8 deletions(-)
+ include/qemu/host-utils.h | 54 +++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 54 insertions(+)
 
-diff --git a/include/qemu/bitops.h b/include/qemu/bitops.h
-index 03213ce952c..c443995b3ba 100644
---- a/include/qemu/bitops.h
-+++ b/include/qemu/bitops.h
-@@ -218,7 +218,8 @@ static inline unsigned long find_first_zero_bit(const unsigned long *addr,
-  */
- static inline uint8_t rol8(uint8_t word, unsigned int shift)
- {
--    return (word << shift) | (word >> ((8 - shift) & 7));
-+    shift &= 7;
-+    return (word << shift) | (word >> (8 - shift));
+diff --git a/include/qemu/host-utils.h b/include/qemu/host-utils.h
+index 3ce62bf4a56..d3b4dce6a93 100644
+--- a/include/qemu/host-utils.h
++++ b/include/qemu/host-utils.h
+@@ -107,6 +107,36 @@ static inline uint64_t muldiv64(uint64_t a, uint32_t b, uint32_t c)
+ }
+ #endif
+ 
++/**
++ * clz8 - count leading zeros in a 8-bit value.
++ * @val: The value to search
++ *
++ * Returns 8 if the value is zero.  Note that the GCC builtin is
++ * undefined if the value is zero.
++ *
++ * Note that the GCC builtin will upcast its argument to an `unsigned int`
++ * so this function subtracts off the number of prepended zeroes.
++ */
++static inline int clz8(uint8_t val)
++{
++    return val ? __builtin_clz(val) - 24 : 8;
++}
++
++/**
++ * clz16 - count leading zeros in a 16-bit value.
++ * @val: The value to search
++ *
++ * Returns 16 if the value is zero.  Note that the GCC builtin is
++ * undefined if the value is zero.
++ *
++ * Note that the GCC builtin will upcast its argument to an `unsigned int`
++ * so this function subtracts off the number of prepended zeroes.
++ */
++static inline int clz16(uint16_t val)
++{
++    return val ? __builtin_clz(val) - 16 : 16;
++}
++
+ /**
+  * clz32 - count leading zeros in a 32-bit value.
+  * @val: The value to search
+@@ -153,6 +183,30 @@ static inline int clo64(uint64_t val)
+     return clz64(~val);
  }
  
++/**
++ * ctz8 - count trailing zeros in a 8-bit value.
++ * @val: The value to search
++ *
++ * Returns 8 if the value is zero.  Note that the GCC builtin is
++ * undefined if the value is zero.
++ */
++static inline int ctz8(uint8_t val)
++{
++    return val ? __builtin_ctz(val) : 8;
++}
++
++/**
++ * ctz16 - count trailing zeros in a 16-bit value.
++ * @val: The value to search
++ *
++ * Returns 16 if the value is zero.  Note that the GCC builtin is
++ * undefined if the value is zero.
++ */
++static inline int ctz16(uint16_t val)
++{
++    return val ? __builtin_ctz(val) : 16;
++}
++
  /**
-@@ -228,7 +229,8 @@ static inline uint8_t rol8(uint8_t word, unsigned int shift)
-  */
- static inline uint8_t ror8(uint8_t word, unsigned int shift)
- {
--    return (word >> shift) | (word << ((8 - shift) & 7));
-+    shift &= 7;
-+    return (word >> shift) | (word << (8 - shift));
- }
- 
- /**
-@@ -238,7 +240,8 @@ static inline uint8_t ror8(uint8_t word, unsigned int shift)
-  */
- static inline uint16_t rol16(uint16_t word, unsigned int shift)
- {
--    return (word << shift) | (word >> ((16 - shift) & 15));
-+    shift &= 15;
-+    return (word << shift) | (word >> (16 - shift));
- }
- 
- /**
-@@ -248,7 +251,8 @@ static inline uint16_t rol16(uint16_t word, unsigned int shift)
-  */
- static inline uint16_t ror16(uint16_t word, unsigned int shift)
- {
--    return (word >> shift) | (word << ((16 - shift) & 15));
-+    shift &= 15;
-+    return (word >> shift) | (word << (16 - shift));
- }
- 
- /**
-@@ -258,7 +262,8 @@ static inline uint16_t ror16(uint16_t word, unsigned int shift)
-  */
- static inline uint32_t rol32(uint32_t word, unsigned int shift)
- {
--    return (word << shift) | (word >> ((32 - shift) & 31));
-+    shift &= 31;
-+    return (word << shift) | (word >> (32 - shift));
- }
- 
- /**
-@@ -268,7 +273,8 @@ static inline uint32_t rol32(uint32_t word, unsigned int shift)
-  */
- static inline uint32_t ror32(uint32_t word, unsigned int shift)
- {
--    return (word >> shift) | (word << ((32 - shift) & 31));
-+    shift &= 31;
-+    return (word >> shift) | (word << (32 - shift));
- }
- 
- /**
-@@ -278,7 +284,8 @@ static inline uint32_t ror32(uint32_t word, unsigned int shift)
-  */
- static inline uint64_t rol64(uint64_t word, unsigned int shift)
- {
--    return (word << shift) | (word >> ((64 - shift) & 63));
-+    shift &= 63;
-+    return (word << shift) | (word >> (64 - shift));
- }
- 
- /**
-@@ -288,7 +295,8 @@ static inline uint64_t rol64(uint64_t word, unsigned int shift)
-  */
- static inline uint64_t ror64(uint64_t word, unsigned int shift)
- {
--    return (word >> shift) | (word << ((64 - shift) & 63));
-+    shift &= 63;
-+    return (word >> shift) | (word << (64 - shift));
- }
- 
- /**
+  * ctz32 - count trailing zeros in a 32-bit value.
+  * @val: The value to search
 -- 
 2.40.0
 
