@@ -2,113 +2,217 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EFC676E4C4B
-	for <lists+kvm@lfdr.de>; Mon, 17 Apr 2023 17:01:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8A6746E504C
+	for <lists+kvm@lfdr.de>; Mon, 17 Apr 2023 20:33:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231209AbjDQPBw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 Apr 2023 11:01:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55482 "EHLO
+        id S230307AbjDQSdk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 17 Apr 2023 14:33:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46050 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231213AbjDQPBn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 17 Apr 2023 11:01:43 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37D71A5F2
-        for <kvm@vger.kernel.org>; Mon, 17 Apr 2023 08:01:32 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id l124-20020a252582000000b00b8f5572bcdaso10998982ybl.13
-        for <kvm@vger.kernel.org>; Mon, 17 Apr 2023 08:01:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1681743691; x=1684335691;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=3vFLlBa5cMlD9b7ag9UYfdTMx74Bbs3yMKPPX9I4GwM=;
-        b=OGK68FoyuQQ0kL2O5HxgRSHt2QbHDboc5hKMwP4bRlcKJMMQAqRIjlauG70g4aXaoI
-         RCwv7FXMFfNLqRJZOBy613A+w5XRRmN2H2zNWfDKzF5SD1tHfZhrbVuBk4E+E75tEqrF
-         tTw3g4U6dgFgiOat04BE8cBNJSCGB9Eo6i59NNQJ7dGQyIov0yYTuF8P3+jFvyWWxfrn
-         0j0To2/U3XsPrjlbsK4GxsP+6fqJeqao+Umk0Hyn6UYVUGH6nHHmq6l0xMVKwPTxX5p+
-         rKay54diEn82iZ0UmBZY1V+E+USumHcN/suI4FJwOO5iMGVBjQ3QbXWAt22U12qkos0n
-         8hfA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681743691; x=1684335691;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=3vFLlBa5cMlD9b7ag9UYfdTMx74Bbs3yMKPPX9I4GwM=;
-        b=kmHLWRFpw/OOlEzsOCOPWYD1xVMwNbCOREMi9DYHJBWeO2DGCKNQI9llDeu56jiuxy
-         s5u5sGXRTk2OWrXw1MLCvoSproHXu8Fea8qhGeeJXbXAK/deV9E3FaZ2VGTB/9nskMOT
-         WIPBh2oiHYQF8wEArOxUx6WWuyMYPe4bPP+6qy5ZTqI1gflTmie9BXXv68F/mo2oE1W0
-         DIC5/AwhS1oeB5vPHzTYfIZENU1g6OGvCJWK8QFgEUI6xs67ZPI1Yt7VdSwEqy0L1d9L
-         aC0eonUsHc4W6usgr8VkNQnh17hNaIseDC7V9PiEvxG7UWlcwazEswk+xsb6UBWmGblr
-         ebig==
-X-Gm-Message-State: AAQBX9f4ket+Tm0C8NL6bvplwPKVY/LUs2b+YByFzTKWZuTXtaJNfZzK
-        5rvSIUQnB3vNTXhldkII16qiiKKV2Dw=
-X-Google-Smtp-Source: AKy350b5nQcMgF9tvDaCScAgDkBQIzDDMu1+GFlUDC4dCSeKOYxYJW/fQSKubGNo1KBFDrJt/MuCx/ozRD0=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:ef02:0:b0:545:883a:544d with SMTP id
- o2-20020a81ef02000000b00545883a544dmr9382205ywm.9.1681743691396; Mon, 17 Apr
- 2023 08:01:31 -0700 (PDT)
-Date:   Mon, 17 Apr 2023 08:01:30 -0700
-In-Reply-To: <20230417143747.GA3639898@chaop.bj.intel.com>
-Mime-Version: 1.0
-References: <20221202061347.1070246-1-chao.p.peng@linux.intel.com>
- <Y8H5Z3e4hZkFxAVS@google.com> <20230119111308.GC2976263@ls.amr.corp.intel.com>
- <Y8lg1G2lRIrI/hld@google.com> <20230119223704.GD2976263@ls.amr.corp.intel.com>
- <Y880FiYF7YCtsw/i@google.com> <20230417143747.GA3639898@chaop.bj.intel.com>
-Message-ID: <ZD1fSl/LT6oBOOmg@google.com>
-Subject: Re: [PATCH v10 0/9] KVM: mm: fd-based approach for supporting KVM
-From:   Sean Christopherson <seanjc@google.com>
-To:     Chao Peng <chao.p.peng@linux.intel.com>
-Cc:     Isaku Yamahata <isaku.yamahata@gmail.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-fsdevel@vger.kernel.org, linux-arch@vger.kernel.org,
-        linux-api@vger.kernel.org, linux-doc@vger.kernel.org,
-        qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Naoya Horiguchi <naoya.horiguchi@nec.com>,
-        Miaohe Lin <linmiaohe@huawei.com>, x86@kernel.org,
-        "H . Peter Anvin" <hpa@zytor.com>, Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
+        with ESMTP id S230146AbjDQSdj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 17 Apr 2023 14:33:39 -0400
+X-Greylist: delayed 1484 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 17 Apr 2023 11:33:33 PDT
+Received: from out02.mta.xmission.com (out02.mta.xmission.com [166.70.13.232])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1B7A10DD;
+        Mon, 17 Apr 2023 11:33:32 -0700 (PDT)
+Received: from in02.mta.xmission.com ([166.70.13.52]:41666)
+        by out02.mta.xmission.com with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.93)
+        (envelope-from <ebiederm@xmission.com>)
+        id 1poQSt-00AYUx-8R; Mon, 17 Apr 2023 09:08:23 -0600
+Received: from ip68-110-29-46.om.om.cox.net ([68.110.29.46]:35070 helo=email.froward.int.ebiederm.org.xmission.com)
+        by in02.mta.xmission.com with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.93)
+        (envelope-from <ebiederm@xmission.com>)
+        id 1poQSs-004oqS-3G; Mon, 17 Apr 2023 09:08:22 -0600
+From:   "Eric W. Biederman" <ebiederm@xmission.com>
+To:     Lorenzo Stoakes <lstoakes@gmail.com>
+Cc:     Jason Gunthorpe <jgg@nvidia.com>, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org,
         Andrew Morton <akpm@linux-foundation.org>,
-        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
-        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
-        ddutile@redhat.com, dhildenb@redhat.com,
-        Quentin Perret <qperret@google.com>, tabba@google.com,
-        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
-        wei.w.wang@intel.com
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        Matthew Wilcox <willy@infradead.org>,
+        David Hildenbrand <david@redhat.com>,
+        linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-perf-users@vger.kernel.org,
+        linux-security-module@vger.kernel.org,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Kees Cook <keescook@chromium.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Christian Brauner <brauner@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Jiri Olsa <jolsa@kernel.org>,
+        Namhyung Kim <namhyung@kernel.org>,
+        Ian Rogers <irogers@google.com>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        Kentaro Takeda <takedakn@nttdata.co.jp>,
+        Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
+        Paul Moore <paul@paul-moore.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E . Hallyn" <serge@hallyn.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+References: <cover.1681508038.git.lstoakes@gmail.com>
+        <5a4cf1ebf1c6cdfabbf2f5209facb0180dd20006.1681508038.git.lstoakes@gmail.com>
+        <ZD1FECftWekha6Do@nvidia.com>
+        <9be77e7e-4531-4e1c-9e0d-4edbb5ad3bd5@lucifer.local>
+        <ZD1GrBezHrJTo6x2@nvidia.com>
+        <241f0c22-f3d6-436e-a0d8-be04e281ed2f@lucifer.local>
+Date:   Mon, 17 Apr 2023 10:07:53 -0500
+In-Reply-To: <241f0c22-f3d6-436e-a0d8-be04e281ed2f@lucifer.local> (Lorenzo
+        Stoakes's message of "Mon, 17 Apr 2023 14:23:52 +0100")
+Message-ID: <87cz427diu.fsf@email.froward.int.ebiederm.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
+MIME-Version: 1.0
+Content-Type: text/plain
+X-XM-SPF: eid=1poQSs-004oqS-3G;;;mid=<87cz427diu.fsf@email.froward.int.ebiederm.org>;;;hst=in02.mta.xmission.com;;;ip=68.110.29.46;;;frm=ebiederm@xmission.com;;;spf=pass
+X-XM-AID: U2FsdGVkX1/hlfhbMYdh8TSwqCEEto245myqDJhBbl8=
+X-SA-Exim-Connect-IP: 68.110.29.46
+X-SA-Exim-Mail-From: ebiederm@xmission.com
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
+X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_LOW,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Virus: No
+X-Spam-DCC: XMission; sa02 1397; Body=1 Fuz1=1 Fuz2=1 
+X-Spam-Combo: **;Lorenzo Stoakes <lstoakes@gmail.com>
+X-Spam-Relay-Country: 
+X-Spam-Timing: total 572 ms - load_scoreonly_sql: 0.03 (0.0%),
+        signal_user_changed: 4.0 (0.7%), b_tie_ro: 2.7 (0.5%), parse: 0.82
+        (0.1%), extract_message_metadata: 3.6 (0.6%), get_uri_detail_list:
+        1.99 (0.3%), tests_pri_-2000: 2.3 (0.4%), tests_pri_-1000: 4.3 (0.7%),
+        tests_pri_-950: 1.01 (0.2%), tests_pri_-900: 0.95 (0.2%),
+        tests_pri_-200: 0.67 (0.1%), tests_pri_-100: 8 (1.5%), tests_pri_-90:
+        107 (18.8%), check_bayes: 105 (18.3%), b_tokenize: 12 (2.1%),
+        b_tok_get_all: 12 (2.1%), b_comp_prob: 2.3 (0.4%), b_tok_touch_all: 76
+        (13.2%), b_finish: 0.68 (0.1%), tests_pri_0: 421 (73.5%),
+        check_dkim_signature: 0.45 (0.1%), check_dkim_adsp: 3.1 (0.5%),
+        poll_dns_idle: 1.64 (0.3%), tests_pri_10: 2.9 (0.5%), tests_pri_500: 9
+        (1.6%), rewrite_mail: 0.00 (0.0%)
+Subject: Re: [PATCH 3/7] mm/gup: remove vmas parameter from
+ get_user_pages_remote()
+X-SA-Exim-Version: 4.2.1 (built Sat, 08 Feb 2020 21:53:50 +0000)
+X-SA-Exim-Scanned: Yes (on in02.mta.xmission.com)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Apr 17, 2023, Chao Peng wrote:
-> In case you started working on the code again, I have a branch [1]
-> originally planned as v11 candidate which I believe I addressed all the
-> discussions we had for v10 except the very latest one [2] and integrated
-> all the newly added selftests from Ackerley and myself. The branch was
-> based on your original upm_base_support and then rebased to your
-> kvm-x86/mmu head. Feel free to take anything you think useful( most of
-> them are trivial things but also some fixes for bugs).
+Lorenzo Stoakes <lstoakes@gmail.com> writes:
 
-Nice!  I am going to work on splicing together the various series this week, I'll
-make sure to grab your work.
+> On Mon, Apr 17, 2023 at 10:16:28AM -0300, Jason Gunthorpe wrote:
+>> On Mon, Apr 17, 2023 at 02:13:39PM +0100, Lorenzo Stoakes wrote:
+>> > On Mon, Apr 17, 2023 at 10:09:36AM -0300, Jason Gunthorpe wrote:
+>> > > On Sat, Apr 15, 2023 at 12:27:31AM +0100, Lorenzo Stoakes wrote:
+>> > > > The only instances of get_user_pages_remote() invocations which used the
+>> > > > vmas parameter were for a single page which can instead simply look up the
+>> > > > VMA directly. In particular:-
+>> > > >
+>> > > > - __update_ref_ctr() looked up the VMA but did nothing with it so we simply
+>> > > >   remove it.
+>> > > >
+>> > > > - __access_remote_vm() was already using vma_lookup() when the original
+>> > > >   lookup failed so by doing the lookup directly this also de-duplicates the
+>> > > >   code.
+>> > > >
+>> > > > This forms part of a broader set of patches intended to eliminate the vmas
+>> > > > parameter altogether.
+>> > > >
+>> > > > Signed-off-by: Lorenzo Stoakes <lstoakes@gmail.com>
+>> > > > ---
+>> > > >  arch/arm64/kernel/mte.c   |  5 +++--
+>> > > >  arch/s390/kvm/interrupt.c |  2 +-
+>> > > >  fs/exec.c                 |  2 +-
+>> > > >  include/linux/mm.h        |  2 +-
+>> > > >  kernel/events/uprobes.c   | 10 +++++-----
+>> > > >  mm/gup.c                  | 12 ++++--------
+>> > > >  mm/memory.c               |  9 +++++----
+>> > > >  mm/rmap.c                 |  2 +-
+>> > > >  security/tomoyo/domain.c  |  2 +-
+>> > > >  virt/kvm/async_pf.c       |  3 +--
+>> > > >  10 files changed, 23 insertions(+), 26 deletions(-)
+>> > > >
+>> > > > diff --git a/arch/arm64/kernel/mte.c b/arch/arm64/kernel/mte.c
+>> > > > index f5bcb0dc6267..74d8d4007dec 100644
+>> > > > --- a/arch/arm64/kernel/mte.c
+>> > > > +++ b/arch/arm64/kernel/mte.c
+>> > > > @@ -437,8 +437,9 @@ static int __access_remote_tags(struct mm_struct *mm, unsigned long addr,
+>> > > >  		struct page *page = NULL;
+>> > > >
+>> > > >  		ret = get_user_pages_remote(mm, addr, 1, gup_flags, &page,
+>> > > > -					    &vma, NULL);
+>> > > > -		if (ret <= 0)
+>> > > > +					    NULL);
+>> > > > +		vma = vma_lookup(mm, addr);
+>> > > > +		if (ret <= 0 || !vma)
+>> > > >  			break;
+>> > >
+>> > > Given the slightly tricky error handling, it would make sense to turn
+>> > > this pattern into a helper function:
+>> > >
+>> > > page = get_single_user_page_locked(mm, addr, gup_flags, &vma);
+>> > > if (IS_ERR(page))
+>> > >   [..]
+>> > >
+>> > > static inline struct page *get_single_user_page_locked(struct mm_struct *mm,
+>> > >    unsigned long addr, int gup_flags, struct vm_area_struct **vma)
+>> > > {
+>> > > 	struct page *page;
+>> > > 	int ret;
+>> > >
+>> > > 	ret = get_user_pages_remote(*mm, addr, 1, gup_flags, &page, NULL, NULL);
+>> > > 	if (ret < 0)
+>> > > 	   return ERR_PTR(ret);
+>> > > 	if (WARN_ON(ret == 0))
+>> > > 	   return ERR_PTR(-EINVAL);
+>> > >         *vma = vma_lookup(mm, addr);
+>> > > 	if (WARN_ON(!*vma) {
+>> > > 	   put_user_page(page);
+>> > > 	   return ERR_PTR(-EINVAL);
+>> > >         }
+>> > > 	return page;
+>> > > }
+>> > >
+>> > > It could be its own patch so this change was just a mechanical removal
+>> > > of NULL
+>> > >
+>> > > Jason
+>> > >
+>> >
+>> > Agreed, I think this would work better as a follow up patch however so as
+>> > not to distract too much from the core change.
+>>
+>> I don't think you should open code sketchy error handling in several
+>> places and then clean it up later. Just do it right from the start.
+>>
+>
+> Intent was to do smallest change possible (though through review that grew
+> of course), but I see your point, in this instance this is fiddly stuff and
+> probably better to abstract it to enforce correct handling.
+>
+> I'll respin + add something like this.
 
-Thanks much! 
+Could you include in your description why looking up the vma after
+getting the page does not introduce a race?
+
+I am probably silly and just looking at this quickly but it does not
+seem immediately obvious why the vma and the page should match.
+
+I would not be surprised if you hold the appropriate mutex over the
+entire operation but it just isn't apparent from the diff.
+
+I am concerned because it is an easy mistake to refactor something into
+two steps and then discover you have introduced a race.
+
+Eric
