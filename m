@@ -2,427 +2,175 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 681AC6E5086
-	for <lists+kvm@lfdr.de>; Mon, 17 Apr 2023 21:02:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6A3FE6E50B5
+	for <lists+kvm@lfdr.de>; Mon, 17 Apr 2023 21:16:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229930AbjDQTCe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 Apr 2023 15:02:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57498 "EHLO
+        id S230410AbjDQTQZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 17 Apr 2023 15:16:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38840 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230296AbjDQTCd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 17 Apr 2023 15:02:33 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 391BF46BF
-        for <kvm@vger.kernel.org>; Mon, 17 Apr 2023 12:01:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1681758105;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=5Bvi+Bflt88Ev//sRfi1fS/kQHXju8BfZmtW+TpqD+M=;
-        b=JlPeo+NX7NDap7cBUKw6NxqkhFXr+9XQHnPLVV1Np/Z0BmVrSJm7i6mIDEEB+tVa3/OK3A
-        PtwXB0+lvzauyNzeOEfTvT4k2/Xc2Vi/fExWcmJwGSVBprpFS1vQTVR3f6kfgGvntpq5Nv
-        sSZqGGBrWa966PbmQiluyz8EIZBvBEI=
-Received: from mail-il1-f199.google.com (mail-il1-f199.google.com
- [209.85.166.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-91-NWl1zNRKN_S5EocQMz5KhQ-1; Mon, 17 Apr 2023 15:01:44 -0400
-X-MC-Unique: NWl1zNRKN_S5EocQMz5KhQ-1
-Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-32ad2e6cf31so20460905ab.2
-        for <kvm@vger.kernel.org>; Mon, 17 Apr 2023 12:01:43 -0700 (PDT)
+        with ESMTP id S230045AbjDQTQX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 17 Apr 2023 15:16:23 -0400
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41D1B40E6
+        for <kvm@vger.kernel.org>; Mon, 17 Apr 2023 12:16:22 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-54ee12aa4b5so239881947b3.4
+        for <kvm@vger.kernel.org>; Mon, 17 Apr 2023 12:16:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1681758981; x=1684350981;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=3ncZxqb5WFyPe1+ZpQ8PZQt8gt8+1KXsaLpvOssElGw=;
+        b=ztrYx909wU0E4C4fpIxazR3iU1/doAqQTn/It7I5XO5RP/H9ZYXyuhKdBCToffXuA4
+         9ymN8fyVDotr5xXEsIlQKbUlszwHgxz60FNw04gzVNpruLyyx64PubrHWVLlZpqpBhvh
+         vKWEH9YJ0YOLYMGo4iFU65zKtP7q7UZnp+uz9t4BR4N/9FBLehmWY0SIc5VhHkip24G5
+         K1m5AlClUhPs9NQEruZr7RLnkYdxG6AQA5cbku/1KRM6FGgQmeipGncM5ftAnohmLBxq
+         maaJarYp0xwTDMAFLUo1WRHPRRXtnFqiq3K5A0R+O1k2UroqEOBdn4ZYqcx+PaU9ygpP
+         MwIw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681758103; x=1684350103;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=5Bvi+Bflt88Ev//sRfi1fS/kQHXju8BfZmtW+TpqD+M=;
-        b=EgSf0dVHmYoIsQsLV8xwHhIVgU32ko+ZuDOGrCIMLA/ANb66wXwTZYqFQKqZdWS6mx
-         trcORwHjacIPEkuFqdR5KfQMqvJ3zi7bNtB55RLMKGQCPXqSw+4b/wLdAZEuYIa9rcwT
-         J3eOlgY5bTXbNnc/00MqKqgpBiB50oc8IPHglpstdfarAY4xiO7hP+5REkwBJxSechh6
-         2igvayLgw5HYmHWczlLCTn2kR+S6G+EGq2Y/DT+sSaV2W6c9UvK8HA6zXA/1fWm/AKp3
-         M/3R5EVKUVBk6+Lja9ZHNxwf6liLCMfWkuHeqDBj71/5Jp5XDOwwBej2csaotqmBfd19
-         2XzA==
-X-Gm-Message-State: AAQBX9fvzcm4JgtV0VwXKJ7Jf0wWshIKcSmboWMyTumcCNJr5YaY8QqO
-        gVgH2fkxU1wdcEAg0ANiWsrwMBDszJNmvtuPuSns9vXWDq7R38Zt/onPFPXRyEBnzGVIxSqNz5z
-        ryXeiu9gIYc6b
-X-Received: by 2002:a92:da4f:0:b0:329:43f0:1570 with SMTP id p15-20020a92da4f000000b0032943f01570mr11901400ilq.23.1681758103320;
-        Mon, 17 Apr 2023 12:01:43 -0700 (PDT)
-X-Google-Smtp-Source: AKy350Yc9MHqAd/FKqlu7BJXqDJc1DteytbzaOAPM3AcUnUMNFM/sAGolFFsk6RSPFhmSGf9KsRJww==
-X-Received: by 2002:a92:da4f:0:b0:329:43f0:1570 with SMTP id p15-20020a92da4f000000b0032943f01570mr11901377ilq.23.1681758103035;
-        Mon, 17 Apr 2023 12:01:43 -0700 (PDT)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id q1-20020a056e020c2100b0031595ea003asm3310707ilg.85.2023.04.17.12.01.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 17 Apr 2023 12:01:42 -0700 (PDT)
-Date:   Mon, 17 Apr 2023 13:01:40 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     "Liu, Yi L" <yi.l.liu@intel.com>
-Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
-        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
-        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "jasowang@redhat.com" <jasowang@redhat.com>,
-        "shameerali.kolothum.thodi@huawei.com" 
-        <shameerali.kolothum.thodi@huawei.com>,
-        "lulu@redhat.com" <lulu@redhat.com>,
-        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
-        "intel-gvt-dev@lists.freedesktop.org" 
-        <intel-gvt-dev@lists.freedesktop.org>,
-        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
-        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-        "Hao, Xudong" <xudong.hao@intel.com>,
-        "Zhao, Yan Y" <yan.y.zhao@intel.com>,
-        "Xu, Terrence" <terrence.xu@intel.com>,
-        "Jiang, Yanting" <yanting.jiang@intel.com>,
-        "Duan, Zhenzhong" <zhenzhong.duan@intel.com>
-Subject: Re: [PATCH v3 12/12] vfio/pci: Report dev_id in
- VFIO_DEVICE_GET_PCI_HOT_RESET_INFO
-Message-ID: <20230417130140.1b68082e.alex.williamson@redhat.com>
-In-Reply-To: <DS0PR11MB75290A78D6879EC2E31E21AEC39C9@DS0PR11MB7529.namprd11.prod.outlook.com>
-References: <20230406115347.7af28448.alex.williamson@redhat.com>
-        <ZDVfqpOCnImKr//m@nvidia.com>
-        <20230411095417.240bac39.alex.williamson@redhat.com>
-        <20230411111117.0766ad52.alex.williamson@redhat.com>
-        <ZDWph7g0hcbJHU1B@nvidia.com>
-        <20230411155827.3489400a.alex.williamson@redhat.com>
-        <ZDX0wtcvZuS4uxmG@nvidia.com>
-        <20230412105045.79adc83d.alex.williamson@redhat.com>
-        <ZDcPTTPlni/Mi6p3@nvidia.com>
-        <BN9PR11MB5276782DA56670C8209470828C989@BN9PR11MB5276.namprd11.prod.outlook.com>
-        <ZDfslVwqk6JtPpyD@nvidia.com>
-        <20230413120712.3b9bf42d.alex.williamson@redhat.com>
-        <BN9PR11MB5276A160CA699933B897C8C18C999@BN9PR11MB5276.namprd11.prod.outlook.com>
-        <DS0PR11MB7529B7481AC97261E12AA116C3999@DS0PR11MB7529.namprd11.prod.outlook.com>
-        <20230414111043.40c15dde.alex.williamson@redhat.com>
-        <DS0PR11MB75290A78D6879EC2E31E21AEC39C9@DS0PR11MB7529.namprd11.prod.outlook.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        d=1e100.net; s=20221208; t=1681758981; x=1684350981;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=3ncZxqb5WFyPe1+ZpQ8PZQt8gt8+1KXsaLpvOssElGw=;
+        b=gJLp0EEK6cKT3B8ZQI7vlt82T7wqiwaDNsYS2yATYuVhz8Pe4wgaH/t588GsnyKOeJ
+         Kim2bzD6beBeMTkke+ehlBrI/MCuQey8b+pjsCxOT7eJgw9b0X2qnvKdjHb8oVI0S3dX
+         sJSoGqG2Lq1XcNAZ9rDYOF6PODu02pqKBCSSQkVGYN+sRqkAZm3ZmEHi/+a37gCmfedn
+         pQmN6VOpSeJmTk3Nz/dRX2yl4ChC8KF9C2EOqR2qVqU7vIifRjaLo74jTBdSu0DN/HJE
+         DIwRIYokaFUfxLh0KQibYlmYCt1ZCjvA2ce9NxZlCR0yIPGOMlZq+duWC1w4LgwD4bkE
+         WoDg==
+X-Gm-Message-State: AAQBX9eW1U/Rt43JzmIuDrFomG4fhVbzl3UwA2vyoMyjA4q6E2KNEcCy
+        IBIUYNJcd5dTDvmbx/pLsBYR2ksB9RM=
+X-Google-Smtp-Source: AKy350a2dsem8ucyiGhUFVn2DtBy6lBFc/RqNb+Jfev6KtVWLDED5ErUcWhYM9l9XcC5/F95P0TGKweWO+0=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:e0c5:0:b0:b75:8ac3:d5d9 with SMTP id
+ x188-20020a25e0c5000000b00b758ac3d5d9mr10290256ybg.3.1681758981543; Mon, 17
+ Apr 2023 12:16:21 -0700 (PDT)
+Date:   Mon, 17 Apr 2023 12:16:20 -0700
+In-Reply-To: <1ed06a62-05a1-ebe6-7ac4-5b35ba272d13@redhat.com>
+Mime-Version: 1.0
+References: <20221202061347.1070246-1-chao.p.peng@linux.intel.com>
+ <ZD1oevE8iHsi66T2@google.com> <658018f9-581c-7786-795a-85227c712be0@redhat.com>
+ <ZD12htq6dWg0tg2e@google.com> <1ed06a62-05a1-ebe6-7ac4-5b35ba272d13@redhat.com>
+Message-ID: <ZD2bBB00eKP6F8kz@google.com>
+Subject: Re: Rename restrictedmem => guardedmem? (was: Re: [PATCH v10 0/9]
+ KVM: mm: fd-based approach for supporting KVM)
+From:   Sean Christopherson <seanjc@google.com>
+To:     David Hildenbrand <david@redhat.com>
+Cc:     Chao Peng <chao.p.peng@linux.intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        dhildenb@redhat.com, Quentin Perret <qperret@google.com>,
+        tabba@google.com, Michael Roth <michael.roth@amd.com>,
+        wei.w.wang@intel.com, Mike Rapoport <rppt@kernel.org>,
+        Liam Merwick <liam.merwick@oracle.com>,
+        Isaku Yamahata <isaku.yamahata@gmail.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Ackerley Tng <ackerleytng@google.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 17 Apr 2023 04:20:27 +0000
-"Liu, Yi L" <yi.l.liu@intel.com> wrote:
-
-> > From: Alex Williamson <alex.williamson@redhat.com>
-> > Sent: Saturday, April 15, 2023 1:11 AM
+On Mon, Apr 17, 2023, David Hildenbrand wrote:
+> On 17.04.23 18:40, Sean Christopherson wrote:
+> > On Mon, Apr 17, 2023, David Hildenbrand wrote:
+> > > On 17.04.23 17:40, Sean Christopherson wrote:
+> > > > I want to start referring to the code/patches by its syscall/implementation name
+> > > > instead of "UPM", as "UPM" is (a) very KVM centric, (b) refers to the broader effort
+> > > > and not just the non-KVM code, and (c) will likely be confusing for future reviewers
+> > > > since there's nothing in the code that mentions "UPM" in any way.
+> > > > 
+> > > > But typing out restrictedmem is quite tedious, and git grep shows that "rmem" is
+> > > > already used to refer to "reserved memory".
+> > > > 
+> > > > Renaming the syscall to "guardedmem"...
+> > > 
+> > > restrictedmem, guardedmem, ... all fairly "suboptimal" if you'd ask me ...
 > > 
-> > On Fri, 14 Apr 2023 11:38:24 +0000
-> > "Liu, Yi L" <yi.l.liu@intel.com> wrote:
-> >   
-> > > > From: Tian, Kevin <kevin.tian@intel.com>
-> > > > Sent: Friday, April 14, 2023 5:12 PM
-> > > >  
-> > > > > From: Alex Williamson <alex.williamson@redhat.com>
-> > > > > Sent: Friday, April 14, 2023 2:07 AM
-> > > > >
-> > > > > We had already iterated a proposal where the group-id is replaced with
-> > > > > a dev-id in the existing ioctl and a flag indicates when the return
-> > > > > value is a dev-id vs group-id.  This had a gap that userspace cannot
-> > > > > determine if a reset is available given this information since un-owned
-> > > > > devices report an invalid dev-id and userspace can't know if it has
-> > > > > implicit ownership.  
-> > > >  
-> > > > >
-> > > > > It seems cleaner to me though that we would could still re-use INFO in
-> > > > > a similar way, simply defining a new flag bit which is valid only in
-> > > > > the case of returning dev-ids and indicates if the reset is available.
-> > > > > Therefore in one ioctl, userspace knows if hot-reset is available
-> > > > > (based on a kernel determination) and can pull valid dev-ids from the  
-> > >
-> > > Need to confirm the meaning of hot-reset available flag. I think it
-> > > should at least meet below two conditions to set this flag. Although
-> > > it may not mean hot-reset is for sure to succeed. (but should be
-> > > a high chance).
-> > >
-> > > 1) dev_set is resettable (all affected device are in dev_set)
-> > > 2) affected device are owned by the current user  
-> > 
-> > Per thread with Kevin, ownership can't always be known by the kernel.
-> > Beyond the group vs cdev discussion there, isn't it also possible
-> > (though perhaps not recommended) that a user can have multiple iommufd
-> > ctxs?  So I think 2) becomes "ownership of the affected dev-set can be
-> > inferred from the iommufd_ctx of the calling device", iow, the
-> > null-array calling model is available and the flag is redefined to
-> > match.  Reset may still be available via the proof-of-ownership model.  
+> > I'm definitely open to other suggestions, but I suspect it's going to be difficult
+> > to be more precise than something like "guarded".
 > 
-> Yes, if there are multiple iommufd ctxs, this shall fall back to use
-> the proof-of-ownership model.
+> Guardedmem is just as bad as restrictedmem IMHO, sorry.
 > 
-> >   
-> > > Also, we need to has assumption that below two cases are rare
-> > > if user encounters it, it just bad luck for them. I think the existing
-> > > _INFO and hot-reset already has such assumption. So cdev mode
-> > > can adopt it as well.
-> > >
-> > > a) physical topology change (e.g. new devices plugged to affected slot)
-> > > b) an affected device is unbound from vfio  
-> > 
-> > Yes, these are sufficiently rare that we can't do much about them.
-> >   
-> > > > So the kernel needs to compare the group id between devices with
-> > > > valid dev-ids and devices with invalid dev-ids to decide the implicit
-> > > > ownership. For noiommu device which has no group_id when
-> > > > VFIO_GROUP is off then it's resettable only if having a valid dev_id.  
-> > >
-> > > In cdev mode, noiommu device doesn't have dev_id as it is not
-> > > bound to valid iommufd. So if VFIO_GROUP is off, we may never
-> > > allow hot-reset for noiommu devices. But we don't want to have
-> > > regression with noiommu devices. Perhaps we may define the usage
-> > > of the resettable flag like this:
-> > > 1) if it is set, user does not need to own all the affected devices as
-> > >     some of them may have been owned implicitly. Kernel should have
-> > >     checked it.
-> > > 2) if the flag is not set, that means user needs to check ownership
-> > >     by itself. It needs to own all the affected devices. If not, don't
-> > >    do hot-reset.  
-> > 
-> > Exactly, the flag essentially indicates that the null-array approach is
-> > available, lack of the flag indicates proof-of-ownership is required.
-> >   
-> > > This way we can still make noiommu devices support hot-reset
-> > > just like VFIO_GROUP is on. Because noiommu devices have fake
-> > > groups, such groups are all singleton. So checking all affected
-> > > devices are opened by user is just same as check all affected
-> > > groups.  
-> > 
-> > Yep.
-> >   
-> > > > The only corner case with this option is when a user mixes group
-> > > > and cdev usages. iirc you mentioned it's a valid usage to be supported.
-> > > > In that case the kernel doesn't have sufficient knowledge to judge
-> > > > 'resettable' as it doesn't know which groups are opened by this user.
-> > > >
-> > > > Not sure whether we can leave it in a ugly way so INFO may not tell
-> > > > 'resettable' accurately in that weird scenario.  
-> > >
-> > > This seems not easy to support. If above scenario is allowed there can be
-> > > three cases that returns invalid dev_id.
-> > > 1) devices not opened by user but owned implicitly  
-> > 
-> > The cdev approach has a hard time with this in general, it has no way to
-> > represent unopened devices. so any case where the nature of an unopened
-> > device block reset on the dev-set is rather opaque to the user.
-> >   
-> > > 2) devices not owned by user  
-> > 
-> > (and presumable not owned)  We still provide BDF.  Not much difference
-> > from the group case here, being able to point to a BDF or group is
-> > about all we can do.
-> >   
-> > > 3) devices opened via group but owned by user  
-> > 
-> > I think this still works in the proof-of-ownership, passing fds to
-> > hot-reset model.  
 > 
-> Ok. let's see below scenario and user's processing makes sense.
+> Restricted: what's restricted? how does the restriction manifest? secretmem
+> also has it's restrictions/limitations (pinning), why does that one not fall
+> under the same category?
 > 
-> Say there are five devices (devA, devB, devC, devD, devE) in the same reset
-> group. devA and devB are in the same iommu group. devC, devD, and devE have
-> separate iommu groups. Say devA is opened via cdev, devB is not opened, devC
-> is opened via group, devD is opened cdev but bound to another iommufdctx that
-> is different with devA. devE is not opened by any user
+> Make a stranger guess what "restrictedmem" is and I can guarantee that it
+> has nothing to do with the concept we're introducing here.
 > 
-> If this INFO is called on devA, user should get a valid dev_id for devA, but
-> four invalid dev_ids. The resettable flag should be clear. Below is how user
-> to handle the info returned.
-
-INFO from devA returns:
-
-flags: NOT_RESETABLE | DEV_ID
-{
-  { valid devA-id,  devA-BDF },
-  { invalid dev-id, devB-BDF },
-  { invalid dev-id, devC-BDF },
-  { invalid dev-id, devD-BDF },
-  { invalid dev-id, devE-BDF },
-}
-
-User knows devA-id, learns devA-BDF
-
-from devC:
-{
-  { devA/B-group-id, devA-BDF },
-  { devA/B-group-id, devB-BDF },
-  { devC-group-id,   devC-BDF },
-  { devD-group-id,   devD-BDF },
-  { devE-group-id,   devE-BDF },
-}
-
-User is assumed to know devC group-id + BDF given group semantics,
-knows devA ownership, infers devB ownership.
-
-from devD:
-flags: NOT_RESETABLE | DEV_ID
-{
-  { invalid dev-id, devA-BDF },
-  { invalid dev-id, devB-BDF },
-  { invalid dev-id, devC-BDF },
-  { valid devD-id,  devD-BDF },
-  { invalid dev-id, devE-BDF },
-}
-
-User knows devD-id, learns devD-bdf, knows devA and devC ownership, and
-inferred devB ownership
-
-> - For devB, user shall get the group_id for devA, and also get group_id for
->   devB, hence able to check ownership of devB by checking the group
-
-Per above, groups are only available through the group devices,
-therefore inferred ownership of devB can only be learned from devC.
-
-> - For devC, user can check ownership by the group_id and bdf returned
-
-Yes, the INFO ioctl on devC can confirm devC is affected, but more
-importantly this is the bridge to learn BDF of other affected devices
-and their groups.
-
-> - For devD, if it is opened by the user, should be able to find it by bdf
-
-I think the reverse, the user presumably already knows the dev-id for
-devD and knows that a hot-reset of the calling device necessarily
-affects the device, but it learns the BDF, which helps it connect 4 of
-the 5 device affected by the reset.
-
-> - For devE, user shall fail to find it hence consider no ownership on it.
-
-Yes, which is correct.
-
-> To finish the above check, user needs to get group_id via devid an also needs
-> to get group_id via device fd. Is it?
-
-Not absolutely required, but the user needs to do a lot of inferring via
-BDF.
-
-> The above example may be the most tricky scenario. Is it? user shall not do
-> hot-reset as not all affected devices are owned by user. But if devE is also
-> opened by user, it could do hot-reset.
-
-Yes, it's not trivial, but Jason is now proposing that we consider
-mixing groups, cdevs, and multiple iommufd_ctxs as invalid.  I think
-this means that regardless of which device calls INFO, there's only one
-answer (assuming same set of devices opened, all cdev, all within same
-iommufd_ctx).  Based on what I explained about my understanding of INFO2
-and Jason agreed to, I think the output would be:
-
-flags: NOT_RESETABLE | DEV_ID
-{
-  { valid devA-id,  devA-BDF },
-  { valid devC-id,  devC-BDF },
-  { valid devD-id,  devD-BDF },
-  { invalid dev-id, devE-BDF },
-}
-
-Here devB gets dropped because the kernel understands that devB is
-unopened, affected, and owned.  It's therefore not a blocker for
-hot-reset.  OTOH, devE is unopened, affected, and un-owned, and we
-previously agreed against the opportunistic un-opened/un-owned loophole.
-
-If devA and devD were separate iommufd_ctxs, with devC in the same
-ctx as devA, I think this becomes:
-
-INFO on devA:
-flags: NOT_RESETABLE | DEV_ID
-{
-  { valid devA-id,  devA-BDF },
-  { valid devC-id,  devC-BDF },
-  { invalid dev-id, devD-BDF },
-  { invalid dev-id, devE-BDF },
-}
-
-INFO on devD:
-flags: NOT_RESETABLE | DEV_ID
-{
-  { invalid dev-id, devA-BDF },
-  { invalid dev-id, devB-BDF },
-  { invalid dev-id, devC-BDF },
-  { valid devD-id, devD-BDF },
-  { invalid dev-id, devE-BDF },
-}
-
-I think this illustrates that it makes sense for unopened affected
-devices with implicit ownership to always be hidden, but otherwise are
-fully enumerated.
-
-> > > User would require more info to tell the above cases from each other.  
-> > 
-> > Obviously we could be equivalent to the group model if IOMMU groups
-> > were exposed for a device and all devices had IOMMU groups, but
-> > reasons...
-> >   
-> > > > > array to associate affected, owned devices, and still has the
-> > > > > equivalent information to know that one or more of the devices listed
-> > > > > with an invalid dev-id are preventing the hot-reset from being
-> > > > > available.
-> > > > >
-> > > > > Is that an option?  Thanks,
-> > > > >  
-> > > >
-> > > > This works for me if above corner case can be waived.  
-> > >
-> > > One side check, perhaps already confirmed in prior email. @Alex, So
-> > > the reason for the prediction of hot-reset is to avoid the possible
-> > > vfio_pci_pre_reset() which does heavy operations like stop DMA and
-> > > copy config space. Is it? Any other special reason? Anyhow, this reason
-> > > is enough for this prediction per my understanding.  
-> > 
-> > It's not clear to me what "prediction" is referring to.  
 > 
-> It is predicting whether hot-reset ioctl can work or not as you mentioned
-> in prior discussion.[1].
+> Guarded: what's guarded? From whom? For which purpose? How does the
+> "guarding" manifest?
+
+I completely agree that "guarded" lacks precision, but as above, I've pretty much
+given up hope of being super precise.  I actually like "restricted", I just don't
+like that I can't shorten the name.
+
+Hmm, maybe that won't be a huge problem in practice.  I can't say I've ever heard
+any use "rmem" in verbale or written communication, it's primarily just "rmem" in
+code that we can't use, and I don't mind having to use restrictedmem for the namespace.
+So maybe we can use "rmem", just not in code?
+
+Or, we could pretend we're pirates and call it arrrmem!, which is definitely going
+to be how I refer to it in my internal dialogue if we keep "restricted" :-)
+
+> Again, make a stranger guess what "guardedmem" is and I can guarantee that
+> it has nothing to do with the concept we're introducing here.
 > 
-> "I disagree, as I've argued before, the info ioctl becomes so weak and
-> effectively arbitrary from a user perspective at being able to predict
-> whether the hot-reset ioctl works that it becomes useless, diminishing
-> the entire hot-reset info/execute API."
+> If, at all, the guess might be "guarded storage" [1] on s390x, which, of
+> course, has nothing to do with the concept here.
+
+Oof, and guarded storage is even documented in Documentation/virt/kvm/api.rst.
+
+> (storage on s390x is just the dinosaur slang for memory)
 > 
-> [1] https://lore.kernel.org/kvm/20230405134945.29e967be.alex.williamson@redhat.com/
-
-I think we're narrowing in on an interface that isn't as arbitrary.  If
-we assume the restrictions that Jason proposes, then cdev is exclusively
-a kernel determined reset availability model, where I'd agree that
-passing device-fds as a proof of ownership is pointless.  The group
-interface would therefore remain exclusively a proof-of-ownership
-model since we have no incentive to extend it to kernel-determined
-given the limited use case of all affected devices managed by the same
-vfio container.
-
-> > As above, I
-> > think we can redefine the reset-available flag I proposed to more
-> > restrictively indicate that the null-array approach is available based
-> > on the dev-set group in relation to the iommufd_ctx of the calling
-> > device.  Prediction of the affected devices seems like basic
-> > functionality to me, we can't assume the user's usage model, they must
-> > be able to make a well informed decision regarding affected devices.
-> > Thanks,  
 > 
-> As my above reply with the five-device scenario. It still needs to get
-> group_id to check implicit ownership in the case of sharing the same
-> iommu_group.
+> Often, if we fail to find a good name, the concept is either unclear or not
+> well defined.
+> 
+> So what are the characteristics we want to generalize under that new name?
+> We want to have an fd, that
+> 
+> (a) cannot be mapped into user space (mmap)
+> (b) cannot be accessed using ordinary system calls (read/write)
+> (c) can still be managed like other fds (fallocate, future NUMA
+>     policies?)
+> (d) can be consumed by some special entities that are allowed to
+>     read/write/map.
+> 
+> So the fd content is inaccessible using the ordinary POSIX syscalls. It's
+> only accessible by special entities (e.g., KVM).
+> 
+> Most probably I am forgetting something. But maybe that will help to find a
+> more expressive name. Maybe :)
 
-Moot, but there's actually enough information there to infer IOMMU
-groups for each device, but we probably can't prove that would always
-be the case.  If we adopt Jason's proposal though, I don't see that we
-need either a group-id or BDF capability, the BDF is only for debug
-reporting.  However, there is a new burden on the kernel to identify
-the affected, un-owned devices for that report.  Thanks,
+Hidden/Concealed/etc - Too close to secretmem, suffers the "hidden from whom" problem,
+and depending on the use case, the memory may not actually be concealed from the
+user that controls the VMM.
 
-Alex
+Restricted - "rmem" collides with "reserved memory" in code.
 
+Guarded - Conflicts with s390's "guarded storage", has the "from whom" problem.
+
+Inaccessible - Many of the same problems as "hidden".
+
+Unmappable - Doesn't cover things like read/write, and is wrong in the sense that
+the memory is still mappable, just not via mmap().
+
+Secured - I'm not getting anywhere near this one :-)
