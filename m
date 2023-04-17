@@ -2,167 +2,207 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DBC876E3DEC
-	for <lists+kvm@lfdr.de>; Mon, 17 Apr 2023 05:17:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B392E6E3E49
+	for <lists+kvm@lfdr.de>; Mon, 17 Apr 2023 05:37:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230094AbjDQDRo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 16 Apr 2023 23:17:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42838 "EHLO
+        id S230369AbjDQDhd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 16 Apr 2023 23:37:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52722 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229547AbjDQDRn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 16 Apr 2023 23:17:43 -0400
-Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F81B1FE8;
-        Sun, 16 Apr 2023 20:17:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1681701462; x=1713237462;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=BIGXHvmfwanLSioUPx3H5y5bX16YMkfJyknDFdNRixA=;
-  b=Veeuyssw4rncA6JbKt0K9V7/ExD2rxVuani4pNahqecQ3/vIBMxMzcUX
-   +MRlJy+pJjsqRMy4fRCFDzZLW13TMKvM1gmAQ+8MT0YWD0rEcCqJrfiZN
-   ydJ3Maa5kjR4dWQDHDbAzV8kahdX3NaTsgJQb4iQxYyqCVHL+GFFCB1eZ
-   oyF8PwSLS2lG8juUTA6DBDL+OHrRe+hrN/QiOVYOpj2wp/f4huqomvX2R
-   z6ASR6dAA+l+T+6hhRtFGCR7Jbsvh69c49NH/9mK1VyEHXfi5YAfs2Lr0
-   4mZ0008HUM01LWAXQoqA4icp0Pn+bT14S02fRMr14ONVtqVJEhwn/J0mz
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10682"; a="431085373"
-X-IronPort-AV: E=Sophos;i="5.99,203,1677571200"; 
-   d="scan'208";a="431085373"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Apr 2023 20:17:42 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10682"; a="779905728"
-X-IronPort-AV: E=Sophos;i="5.99,203,1677571200"; 
-   d="scan'208";a="779905728"
-Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.238.8.125]) ([10.238.8.125])
-  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Apr 2023 20:17:38 -0700
-Message-ID: <35b92d89-3eb1-368e-3804-e3ce9ad9c81f@linux.intel.com>
-Date:   Mon, 17 Apr 2023 11:17:36 +0800
+        with ESMTP id S230241AbjDQDhF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 16 Apr 2023 23:37:05 -0400
+Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F72C4497
+        for <kvm@vger.kernel.org>; Sun, 16 Apr 2023 20:34:55 -0700 (PDT)
+Received: by mail-pl1-x631.google.com with SMTP id d9443c01a7336-1a652700c36so429395ad.0
+        for <kvm@vger.kernel.org>; Sun, 16 Apr 2023 20:34:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1681702494; x=1684294494;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=NlW2TVVx2ak294Y+VUa1rl/r58qCiE5sh+v8a4TOPOo=;
+        b=tEkMX2pLHGrbo019aJCQi+10L/qFWKi2RdR9ix640cDeuAnVgB0I5VZ1oArJKNLsCF
+         pWQZkLtyn8ZavtmHkVgYf7DMcxlXr38qdv0YGv/6MDZA95Ovs0JDHaO8kzjOfndIVFWw
+         l+FbineuX/d3Cq+6ixhP9Fyu84qGvP0U3T+Gds7pDbB/7gYiud6w2cWeM/UiKXlm97ko
+         5NODe5Ims2uMcg5t1xkSy3AtZOcycNfQ+di3hWv1lN7BmIV5O/okne+yeR+QBbe1BtX9
+         442bn35GDCwsd1RExs+oAoNp+GM1+6Rkber7Ftz7qLq79QHXvsgfTZGRsrmD9NyJFpwZ
+         rhgw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1681702494; x=1684294494;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=NlW2TVVx2ak294Y+VUa1rl/r58qCiE5sh+v8a4TOPOo=;
+        b=M3y7+EU14BZ+u8+DGPFTzE0dSuHgd1j0FyAEZUP19F3WnUc4Xp6xeAWoHWOeTy8dVg
+         CJSx6f3abhL8/1OtmhURdcikxBCK9hqQzB0FLYwhpMMPuO5Sj52zUrLuvSqj1KqHRHWp
+         7domVcGcofUnXMUPvqE/en9FSArqJWHULo9Ye3PYPopi+jQqm8qYH121weGY8oAjTkWs
+         89h/33USQcbqU4sdGJCHIp4sNZ5eSfAb0HheLJczeECSvlZG/nyHZOGLG21E6GpYUz/B
+         dGK0iUh37S4VKSG1zMSVl5mnWtLNyf+ioANrtvqHH1QiguYmdAQbDvSA7h8M6OieHpO6
+         MuMA==
+X-Gm-Message-State: AAQBX9dqK8VXm7M+UxRhtjkFyio1yKDLSM/SoTuirF9vPd4W/zYmgauJ
+        ncKRVH/rBLPnjLwNHLl8QTHsGA==
+X-Google-Smtp-Source: AKy350ZuBUQNLPxBSAuymBWh4oP4g4a3g2zWJtFKy9jLFZ4M1TP0qTcejsl9m7wrjq4FbzrkEVzf2g==
+X-Received: by 2002:a17:903:4103:b0:1a6:760c:af3d with SMTP id r3-20020a170903410300b001a6760caf3dmr604530pld.16.1681702494429;
+        Sun, 16 Apr 2023 20:34:54 -0700 (PDT)
+Received: from google.com (223.103.125.34.bc.googleusercontent.com. [34.125.103.223])
+        by smtp.gmail.com with ESMTPSA id ij8-20020a170902ab4800b001a514d75d16sm6516955plb.13.2023.04.16.20.34.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 16 Apr 2023 20:34:53 -0700 (PDT)
+Date:   Sun, 16 Apr 2023 20:34:49 -0700
+From:   Reiji Watanabe <reijiw@google.com>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Simon Veith <sveith@amazon.de>,
+        Colton Lewis <coltonlewis@google.com>,
+        Joey Gouly <joey.gouly@arm.com>, dwmw2@infradead.org
+Subject: Re: [PATCH v4 05/20] KVM: arm64: timers: Allow physical offset
+ without CNTPOFF_EL2
+Message-ID: <20230417033449.2obz4ywzdtkl2z42@google.com>
+References: <20230330174800.2677007-1-maz@kernel.org>
+ <20230330174800.2677007-6-maz@kernel.org>
+ <20230410153441.vddskgxu2zzsi7bq@google.com>
+ <86h6tkkky4.wl-maz@kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Subject: Re: [RFC PATCH v2 04/11] KVM: VMX: Add IA32_SPEC_CTRL virtualization
- support
-To:     Chao Gao <chao.gao@intel.com>, kvm@vger.kernel.org
-Cc:     Jiaan Lu <jiaan.lu@intel.com>, Zhang Chen <chen.zhang@intel.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org
-References: <20230414062545.270178-1-chao.gao@intel.com>
- <20230414062545.270178-5-chao.gao@intel.com>
-From:   Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <20230414062545.270178-5-chao.gao@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-5.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <86h6tkkky4.wl-maz@kernel.org>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+> > > +	assign_clear_set_bit(tpt, CNTHCTL_EL1PCEN << 10, set, clr);
+> > > +	assign_clear_set_bit(tpc, CNTHCTL_EL1PCTEN << 10, set, clr);
+> > 
+> > Nit: IMHO the way the code specifies the 'set' and 'clr' arguments for
+> > the macro might be a bit confusing ('set' is for '_clr', and 'clr' is
+> > for '_set')?
+> 
+> I don't disagree, but we end-up with bits of different polarity once
+> NV is fully in, see:
+> 
+> https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/tree/arch/arm64/kvm/arch_timer.c?h=kvm-arm64/nv-6.4-WIP#n861
+> 
+> > Perhaps changing the parameter names of assign_clear_set_bit() like
+> > below or flipping the condition (i.e. Specify !tpt or no_tpt instead
+> > of tpt) might be less confusing?
+> > 
+> > #define assign_clear_set_bit(_pred, _bit, _t_val, _f_val)	\
+> > do {								\
+> > 	if (_pred)						\
+> > 		(_t_val) |= (_bit);				\
+> > 	else							\
+> > 		(_f_val) |= (_bit);				\
+> > } while (0)
+> 
+> See the pointer above. We need a good way to specify bits that have
+> one polarity or another, and compute the result given the high-level
+> constraints that are provided by the emulation code.
+> 
+> So far, I haven't been able to work out something "nice".
 
-On 4/14/2023 2:25 PM, Chao Gao wrote:
-> From: Zhang Chen <chen.zhang@intel.com>
->
-> Currently KVM disables interception of IA32_SPEC_CTRL after a non-0 is
-> written to IA32_SPEC_CTRL by guest. Then, guest is allowed to write any
-> value to hardware.
->
-> "virtualize IA32_SPEC_CTRL" is a new tertiary vm-exec control. This
-> feature allows KVM to specify that certain bits of the IA32_SPEC_CTRL
-> MSR cannot be modified by guest software.
->
-> Two VMCS fields are added:
->
->    IA32_SPEC_CTRL_MASK:   bits that guest software cannot modify
->    IA32_SPEC_CTRL_SHADOW: value that guest software expects to be in the
-> 			 IA32_SPEC_CTRL MSR
->
-> On rdmsr, the shadow value is returned. on wrmsr, EDX:EAX is written
-> to the IA32_SPEC_CTRL_SHADOW and (cur_val & mask) | (EDX:EAX & ~mask)
-> is written to the IA32_SPEC_CTRL MSR, where
->    * cur_val is the original value of IA32_SPEC_CTRL MSR
->    * mask is the value of IA32_SPEC_CTRL_MASK
->
-> Add a mask e.g.,
+Thank you for the pointer.  Understood.
+I don't have a batter idea though :)
 
-e.g. or i.e. ?
+> 
+> [...]
+> 
+> > > +	{ SYS_DESC(SYS_CNTPCT_EL0), access_arch_timer },
+> > > +	{ SYS_DESC(SYS_CNTPCTSS_EL0), access_arch_timer },
+> > >  	{ SYS_DESC(SYS_CNTP_TVAL_EL0), access_arch_timer },
+> > >  	{ SYS_DESC(SYS_CNTP_CTL_EL0), access_arch_timer },
+> > >  	{ SYS_DESC(SYS_CNTP_CVAL_EL0), access_arch_timer },
+> > > @@ -2525,6 +2533,7 @@ static const struct sys_reg_desc cp15_64_regs[] = {
+> > >  	{ Op1( 0), CRn( 0), CRm( 2), Op2( 0), access_vm_reg, NULL, TTBR0_EL1 },
+> > >  	{ CP15_PMU_SYS_REG(DIRECT, 0, 0, 9, 0), .access = access_pmu_evcntr },
+> > >  	{ Op1( 0), CRn( 0), CRm(12), Op2( 0), access_gic_sgi }, /* ICC_SGI1R */
+> > > +	{ SYS_DESC(SYS_AARCH32_CNTPCT),	      access_arch_timer },
+> > 
+> > Shouldn't KVM also emulate CNTPCTSS (Aarch32) when its trapping is
+> > enabled on the host with ECV_CNTPOFF ?
+> 
+> Oh, well spotted. I'll queue something on top of the series to that
+> effect (I'd rather not respin it as it has been in -next for some
+> time, and the merge window is approaching).
 
-
-> loaded_vmcs->spec_ctrl_mask to represent the bits guest
-> shouldn't change. It is 0 for now and some bits will be added by
-> following patches. Use per-vmcs cache to avoid unnecessary vmcs_write()
-> on nested transition because the mask is expected to be rarely changed
-> and the same for vmcs01 and vmcs02.
->
-> To prevent guest from changing the bits in the mask, enable "virtualize
-> IA32_SPEC_CTRL" if supported or emulate its behavior by intercepting
-> the IA32_SPEC_CTRL msr. Emulating "virtualize IA32_SPEC_CTRL" behavior
-> is mainly to give the same capability to KVM running on potential broken
-> hardware or L1 guests.
->
-> To avoid L2 evading the enforcement, enable "virtualize IA32_SPEC_CTRL"
-> in vmcs02. Always update the guest (shadow) value of IA32_SPEC_CTRL MSR
-> and the mask to preserve them across nested transitions. Note that the
-> shadow value may be changed because L2 may access the IA32_SPEC_CTRL
-> directly and the mask may be changed due to migration when L2 vCPUs are
-> running.
->
-> Co-developed-by: Chao Gao <chao.gao@intel.com>
-> Signed-off-by: Chao Gao <chao.gao@intel.com>
-> Signed-off-by: Zhang Chen <chen.zhang@intel.com>
-> Signed-off-by: Chao Gao <chao.gao@intel.com>
-> Tested-by: Jiaan Lu <jiaan.lu@intel.com>
-> ---
->   arch/x86/include/asm/vmx.h         |  5 ++++
->   arch/x86/include/asm/vmxfeatures.h |  2 ++
->   arch/x86/kvm/vmx/capabilities.h    |  5 ++++
->   arch/x86/kvm/vmx/nested.c          | 13 ++++++++++
->   arch/x86/kvm/vmx/vmcs.h            |  2 ++
->   arch/x86/kvm/vmx/vmx.c             | 34 ++++++++++++++++++++-----
->   arch/x86/kvm/vmx/vmx.h             | 40 +++++++++++++++++++++++++++++-
->   7 files changed, 94 insertions(+), 7 deletions(-)
->
-[...]
-
-> @@ -750,4 +766,26 @@ static inline bool guest_cpuid_has_evmcs(struct kvm_vcpu *vcpu)
->   	       to_vmx(vcpu)->nested.enlightened_vmcs_enabled;
->   }
->   
-> +static inline u64 vmx_get_guest_spec_ctrl(struct vcpu_vmx *vmx)
-> +{
-> +	return vmx->guest_spec_ctrl;
-> +}
-> +
-> +static inline void vmx_set_guest_spec_ctrl(struct vcpu_vmx *vmx, u64 val)
-> +{
-> +	vmx->guest_spec_ctrl = val;
-> +
-> +	/*
-> +	 * For simplicity, always keep IA32_SPEC_CTRL_SHADOW up-to-date,
-> +	 * regardless of the MSR intercept state.
-
-It is better to use "IA32_SPEC_CTRL"  explicitly instead of "the MSR" to 
-avoid misunderstand.
+Understood.
 
 
-> +	 */
-> +	if (cpu_has_spec_ctrl_virt())
-> +		vmcs_write64(IA32_SPEC_CTRL_SHADOW, val);
-> +
-> +	/*
-> +	 * Update the effective value of IA32_SPEC_CTRL to reflect changes to
-> +	 * guest's IA32_SPEC_CTRL. Bits in the mask should always be set.
-> +	 */
-> +	vmx->spec_ctrl = val | vmx_get_spec_ctrl_mask(vmx);
-> +}
->   #endif /* __KVM_X86_VMX_H */
+> 
+> > 
+> > 
+> > >  	{ Op1( 1), CRn( 0), CRm( 2), Op2( 0), access_vm_reg, NULL, TTBR1_EL1 },
+> > >  	{ Op1( 1), CRn( 0), CRm(12), Op2( 0), access_gic_sgi }, /* ICC_ASGI1R */
+> > >  	{ Op1( 2), CRn( 0), CRm(12), Op2( 0), access_gic_sgi }, /* ICC_SGI0R */
+> > > -- 
+> > > 2.34.1
+> > > 
+> > > 
+> > 
+> > Nit: In emulating reading physical counter/timer for direct_ptimer
+> > (poffset != 0 on VHE without ECV_CNTPOFF), it appears that
+> > kvm_arm_timer_read_sysreg() unnecessarily calls
+> > timer_{save,restore}_state(), and kvm_arm_timer_write_sysreg()
+> > unnecessarily calls timer_save_state().  Couldn't we skip those
+> > unnecessary calls ? (I didn't check all the following patches, but
+> > the current code would be more convenient in the following patches ?)
+> 
+> Well, it depends how you look at it. We still perform "some" level of
+> emulation (such as offsetting CVAL), and it allows us to share some
+> code with the full emulation.
+
+Even if we skip calling timer_save_state() and/or timer_restore_state(),
+I would think we could still share some code with the full emulation.
+What I meant was something like below (a diff from the patch-5).
+Or Am I misunderstanding something?
+
+
+--- a/arch/arm64/kvm/arch_timer.c
++++ b/arch/arm64/kvm/arch_timer.c
+@@ -1003,7 +1003,7 @@ u64 kvm_arm_timer_read_sysreg(struct kvm_vcpu *vcpu,
+        get_timer_map(vcpu, &map);
+        timer = vcpu_get_timer(vcpu, tmr);
+ 
+-       if (timer == map.emul_ptimer)
++       if (timer == map.emul_ptimer || timer == map.direct_ptimer)
+                return kvm_arm_timer_read(vcpu, timer, treg);
+ 
+        preempt_disable();
+@@ -1056,7 +1056,9 @@ void kvm_arm_timer_write_sysreg(struct kvm_vcpu *vcpu,
+                timer_emulate(timer);
+        } else {
+                preempt_disable();
+-               timer_save_state(timer);
++               if (timer != map.direct_ptimer)
++                       timer_save_state(timer);
++
+                kvm_arm_timer_write(vcpu, timer, treg, val);
+                timer_restore_state(timer);
+                preempt_enable();
+
+
+> On top of that, we already fast-track CNTPCT_EL0, which is the main
+> user, and has a visible benefit with NV. If anything, I'd rather add a
+> similar fast-tracking for the read side of CNTP_CVAL_EL0 and
+> CNTP_CTL_EL0. We could then leave that code for 32bit only, which
+> nobody gives a toss about.
+> 
+> What do you think?
+
+Ah, I didn't check that fast-track CNTPCT_EL0.
+Yes, that would be nicer.
+
+Thank you!
+Reiji
