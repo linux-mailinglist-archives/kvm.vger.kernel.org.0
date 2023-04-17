@@ -2,45 +2,45 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9CD856E3F6B
-	for <lists+kvm@lfdr.de>; Mon, 17 Apr 2023 08:11:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 575206E3F7F
+	for <lists+kvm@lfdr.de>; Mon, 17 Apr 2023 08:15:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229573AbjDQGLg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 Apr 2023 02:11:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48398 "EHLO
+        id S230117AbjDQGPI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 17 Apr 2023 02:15:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50130 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229519AbjDQGLe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 17 Apr 2023 02:11:34 -0400
+        with ESMTP id S229982AbjDQGPH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 17 Apr 2023 02:15:07 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 770951FE1
-        for <kvm@vger.kernel.org>; Sun, 16 Apr 2023 23:10:52 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12A7E3A8D
+        for <kvm@vger.kernel.org>; Sun, 16 Apr 2023 23:14:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1681711851;
+        s=mimecast20190719; t=1681712058;
         h=from:from:reply-to:reply-to:subject:subject:date:date:
          message-id:message-id:to:to:cc:cc:mime-version:mime-version:
          content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=KdemsBQQ4DOQKWwtl2Z4p0X5uD/zbkNR6MG+QW9jbGQ=;
-        b=gMo4y532ypBW4iKB50GHyiLPpNFYEQh4DbmwPBF6ahrsn0Jk3pWmB8H8QoZGSrlrQr6Cav
-        KZZA0ZIBouAkDn1YoIDTbbaiy/J3t1n3hTQmiqo+xMauQVylhfco2Olun2xVYAIid+nzPl
-        8H7ss+ixx/vdGxLkL/Rwl5SWQ4eyQ3k=
+        bh=j24MEVwN43Zu0qraND4t85yrKfAMNVQEujJ21aSXScE=;
+        b=BGo8dSaduQguBgalb7EVdm15+coCxcsyHP+tvlmsiQ0jBnELmmVf5JafhV5cMZrpvwfUKk
+        CNXfu+tH7vj0L2P1seGDbTaBsMSrKdYE0B7oYdxcVF5Gz5isPBc75pBmKvgWbQJA+iRzry
+        VP/MS1tJ2vwAp8g6Fg2jadiCwZyUEFg=
 Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
  [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-652-dnGF7VnvOhOWdY752v0qLg-1; Mon, 17 Apr 2023 02:10:48 -0400
-X-MC-Unique: dnGF7VnvOhOWdY752v0qLg-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
+ us-mta-176-6UjavtY3OWSMcaQYMS2FRw-1; Mon, 17 Apr 2023 02:14:13 -0400
+X-MC-Unique: 6UjavtY3OWSMcaQYMS2FRw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 5DE293C0F196;
-        Mon, 17 Apr 2023 06:10:47 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id AF0A43806720;
+        Mon, 17 Apr 2023 06:14:12 +0000 (UTC)
 Received: from [10.72.13.187] (ovpn-13-187.pek2.redhat.com [10.72.13.187])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 55C27492B03;
-        Mon, 17 Apr 2023 06:10:20 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 0A4971121314;
+        Mon, 17 Apr 2023 06:14:01 +0000 (UTC)
 Reply-To: Gavin Shan <gshan@redhat.com>
-Subject: Re: [PATCH v7 02/12] KVM: arm64: Add KVM_PGTABLE_WALK ctx->flags for
- skipping BBM and CMO
+Subject: Re: [PATCH v7 02/12] KVM: arm64: Add KVM_PGTABLE_WALK flags for
+ skipping CMOs and BBM TLBIs
 To:     Ricardo Koller <ricarkol@google.com>, pbonzini@redhat.com,
         maz@kernel.org, oupton@google.com, yuzenghui@huawei.com,
         dmatlack@google.com
@@ -51,18 +51,18 @@ Cc:     kvm@vger.kernel.org, kvmarm@lists.linux.dev, qperret@google.com,
         bgardon@google.com, ricarkol@gmail.com,
         Shaoqin Huang <shahuang@redhat.com>
 References: <20230409063000.3559991-1-ricarkol@google.com>
- <20230409063000.3559991-3-ricarkol@google.com>
+ <20230409063000.3559991-4-ricarkol@google.com>
 From:   Gavin Shan <gshan@redhat.com>
-Message-ID: <af0cae47-d7dd-eacb-c6f5-6392f392756f@redhat.com>
-Date:   Mon, 17 Apr 2023 14:10:17 +0800
+Message-ID: <cfc2d22c-8260-98e9-74d9-bf02e1035141@redhat.com>
+Date:   Mon, 17 Apr 2023 14:13:57 +0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.0
 MIME-Version: 1.0
-In-Reply-To: <20230409063000.3559991-3-ricarkol@google.com>
+In-Reply-To: <20230409063000.3559991-4-ricarkol@google.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
 X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
         RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,
@@ -74,11 +74,11 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 4/9/23 2:29 PM, Ricardo Koller wrote:
-> Add two flags to kvm_pgtable_visit_ctx, KVM_PGTABLE_WALK_SKIP_BBM and
-> KVM_PGTABLE_WALK_SKIP_CMO, to indicate that the walk should not
-> perform break-before-make (BBM) nor cache maintenance operations
-> (CMO). This will be used by a future commit to create unlinked tables
-> not accessible to the HW page-table walker.
+> Add two flags to kvm_pgtable_visit_ctx, KVM_PGTABLE_WALK_SKIP_BBM_TLBI
+> and KVM_PGTABLE_WALK_SKIP_CMO, to indicate that the walk should not
+> perform TLB invalidations (TLBIs) in break-before-make (BBM) nor cache
+> maintenance operations (CMO). This will be used by a future commit to
+> create unlinked tables not accessible to the HW page-table walker.
 > 
 > Signed-off-by: Ricardo Koller <ricarkol@google.com>
 > Reviewed-by: Shaoqin Huang <shahuang@redhat.com>
@@ -87,6 +87,12 @@ On 4/9/23 2:29 PM, Ricardo Koller wrote:
 >   arch/arm64/kvm/hyp/pgtable.c         | 37 +++++++++++++++++++---------
 >   2 files changed, 34 insertions(+), 11 deletions(-)
 > 
+
+This patch has been posted for towice since it was sent as the following one.
+
+[PATCH v7 02/12] KVM: arm64: Add KVM_PGTABLE_WALK ctx->flags for skipping BBM and CMO
+
+The code changes look good to me:
 
 Reviewed-by: Gavin Shan <gshan@redhat.com>
 
