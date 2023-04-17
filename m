@@ -2,112 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 88C7B6E41CD
-	for <lists+kvm@lfdr.de>; Mon, 17 Apr 2023 09:58:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A783F6E41ED
+	for <lists+kvm@lfdr.de>; Mon, 17 Apr 2023 10:02:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230171AbjDQH6F (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 Apr 2023 03:58:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43000 "EHLO
+        id S229982AbjDQICh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 17 Apr 2023 04:02:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48778 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229540AbjDQH5g (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 17 Apr 2023 03:57:36 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E1913C10;
-        Mon, 17 Apr 2023 00:57:18 -0700 (PDT)
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 33H7FN2b011504;
-        Mon, 17 Apr 2023 07:57:17 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
- mime-version : content-transfer-encoding : in-reply-to : references : from
- : to : subject : cc : message-id : date; s=pp1;
- bh=T5FZUthH1Gz1fO5fi4FamQlVotW7V7NzGISS4UHkRR4=;
- b=arl87F//XafdN5tVoIEumZ98Mp/ZgkneLDIlzWvOsrLM+b3IDD+YuWcH34aFS+ZwNY78
- FVPc66AK/972jICkMi/oKVve1hHS+dAcP902xAxq5Om2CuiRV6qUWsKE4UZXQioNqpvb
- XAXrCsSu0oVnp09KAZZVrSKaH/iSVSi2w8kCsBnd0ry6hgVOkh0FgDIS5w4LiWANM4SP
- rOHhmIhy538o+/VpMx6EEy2wDcW6z8c5SU9hybRNk5mZh41QBuGHbQu/azozogaNdozD
- 8PWFSsn+pmew8QUL/DL1OxsCRBNumKRs0jMz/TuY8BHFVt8Xc6xedz0S5tqqJeqaFZlI Xg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3q0e6abut7-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 17 Apr 2023 07:57:17 +0000
-Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 33H7uRHT020876;
-        Mon, 17 Apr 2023 07:57:17 GMT
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3q0e6abusj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 17 Apr 2023 07:57:17 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 33GIsskX002135;
-        Mon, 17 Apr 2023 07:57:14 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-        by ppma03ams.nl.ibm.com (PPS) with ESMTPS id 3pykj6h5ba-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 17 Apr 2023 07:57:14 +0000
-Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-        by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 33H7v4M712649094
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 17 Apr 2023 07:57:04 GMT
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 96E8120043;
-        Mon, 17 Apr 2023 07:57:04 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7271D20040;
-        Mon, 17 Apr 2023 07:57:04 +0000 (GMT)
-Received: from t14-nrb (unknown [9.179.0.19])
-        by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Mon, 17 Apr 2023 07:57:04 +0000 (GMT)
-Content-Type: text/plain; charset="utf-8"
+        with ESMTP id S230125AbjDQICf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 17 Apr 2023 04:02:35 -0400
+Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 337A5196
+        for <kvm@vger.kernel.org>; Mon, 17 Apr 2023 01:02:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1681718554; x=1713254554;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=WeOwEB2N7hfIRx2MuLh7+gbTaYwreGKIrEYBuA9sS8M=;
+  b=dvCFMKiDzxL6hCNKOaF07whoR69i7p1oCqt71Zd30PMnUZs10JQOcJr3
+   SQM5FzlbSnYAkqnvIwj/4Xo/z7b5zfWhHGKJBvaikyr5a2uq8eR6Z5wP+
+   eOyPzuz0KSmJKrmB83XweM+WrIJdbMpppQHVSZwHvzjg06LE8q10H1QL7
+   c/O3Lk6Oe/F15YnCcXPl2fQYV/1juGmDz/URheeMEE1U3b2CiGvXFOpe4
+   g/QYrebNmfo3rLzarbPQkwkdACcBEOcrEA9AKgzstyZtjev9l4a65cM6r
+   ytTwuSnPOQ8MA/OXmSzGQiPn6JE3Fey48ZoYoiRLcItaP+wEAZUvlNta5
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10682"; a="325177446"
+X-IronPort-AV: E=Sophos;i="5.99,203,1677571200"; 
+   d="scan'208";a="325177446"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Apr 2023 01:02:33 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10682"; a="721036795"
+X-IronPort-AV: E=Sophos;i="5.99,203,1677571200"; 
+   d="scan'208";a="721036795"
+Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.238.8.125]) ([10.238.8.125])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Apr 2023 01:02:27 -0700
+Message-ID: <39aa87d4-440b-6b7b-3ddc-7b759f4f8359@linux.intel.com>
+Date:   Mon, 17 Apr 2023 16:02:24 +0800
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20230405123508.854034-1-nsg@linux.ibm.com>
-References: <20230405123508.854034-1-nsg@linux.ibm.com>
-From:   Nico Boehr <nrb@linux.ibm.com>
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
-        Thomas Huth <thuth@redhat.com>
-Subject: Re: [kvm-unit-tests PATCH v1] s390x: Improve stack traces that contain an interrupt frame
-Cc:     Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-Message-ID: <168171822413.10491.11548053616048775653@t14-nrb>
-User-Agent: alot/0.8.1
-Date:   Mon, 17 Apr 2023 09:57:04 +0200
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: Fk4XNGymFNQG-zn8KLkiuSVU3U6EKTAM
-X-Proofpoint-GUID: gJlqfntp9iTGFJnC6o0qSTP6mgWBVqdq
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
- definitions=2023-04-17_04,2023-04-14_01,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 mlxscore=0
- clxscore=1015 impostorscore=0 adultscore=0 malwarescore=0
- lowpriorityscore=0 suspectscore=0 spamscore=0 bulkscore=0
- priorityscore=1501 mlxlogscore=785 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2303200000 definitions=main-2304170063
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+Subject: Re: [PATCH v7 2/5] KVM: x86: Virtualize CR3.LAM_{U48,U57}
+To:     Chao Gao <chao.gao@intel.com>
+Cc:     kvm@vger.kernel.org, seanjc@google.com, pbonzini@redhat.com,
+        kai.huang@intel.com, xuelian.guo@intel.com,
+        robert.hu@linux.intel.com
+References: <20230404130923.27749-1-binbin.wu@linux.intel.com>
+ <20230404130923.27749-3-binbin.wu@linux.intel.com>
+ <ZDz0N4yBomWLnz3N@chao-env>
+From:   Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <ZDz0N4yBomWLnz3N@chao-env>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-5.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Quoting Nina Schoetterl-Glausch (2023-04-05 14:35:08)
-> When we encounter an unexpected interrupt we print a stack trace.
-> While we can identify the interrupting instruction via the old psw,
-> we don't really have a way to identify callers further up the stack,
-> since we rely on the s390x elf abi calling convention to perform the
-> backtrace. An interrupt is not a call, so there are no guarantees about
-> the contents of the stack and return address registers.
-> If we get lucky their content is as we need it or valid for a previous
-> callee in which case we print one wrong caller and then proceed with the
-> correct ones.
 
-I did not think too much about it, so it might not work, but how about a
-seperate interrupt stack?
+On 4/17/2023 3:24 PM, Chao Gao wrote:
+> On Tue, Apr 04, 2023 at 09:09:20PM +0800, Binbin Wu wrote:
+>> /* Page table builder macros common to shadow (host) PTEs and guest PTEs. */
+>> +#define __PT_BASE_ADDR_MASK (((1ULL << 52) - 1) & ~(u64)(PAGE_SIZE-1))
+> This is an open-coded(). So, you'd better use GENMASK_ULL() here.
 
-Then, we could print the interrupt stack trace (which should be correct) an=
-d -
-with a warning as you suggest - the maybe incorrect regular stack trace.
+Here basically is a code move and rename from PT_BASE_ADDR_MASK to 
+__PT_BASE_ADDR_MASK.
+I didn't change the original code, but if it is preferred to use 
+GENMASK_ULL()
+in kernel/KVM, I can change it as following:
+
+#define __PT_BASE_ADDR_MASK GENMASK_ULL(51, 12)
+
+
+>
+>> --- a/arch/x86/kvm/x86.c
+>> +++ b/arch/x86/kvm/x86.c
+>> @@ -1260,7 +1260,7 @@ int kvm_set_cr3(struct kvm_vcpu *vcpu, unsigned long cr3)
+>> 	 * stuff CR3, e.g. for RSM emulation, and there is no guarantee that
+>> 	 * the current vCPU mode is accurate.
+>> 	 */
+>> -	if (kvm_vcpu_is_illegal_gpa(vcpu, cr3))
+>> +	if (!kvm_vcpu_is_legal_cr3(vcpu, cr3))
+> I prefer to modify the call sites in SVM nested code to use the new
+> function. Although this change does not affect functionality, it
+> provides a clear distinction between CR3 checks and GPA checks.
+
+Make sense, will do it.
+
+
