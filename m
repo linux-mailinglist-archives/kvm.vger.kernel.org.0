@@ -2,60 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 51D7E6E6F70
-	for <lists+kvm@lfdr.de>; Wed, 19 Apr 2023 00:39:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 35F486E6F73
+	for <lists+kvm@lfdr.de>; Wed, 19 Apr 2023 00:39:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232616AbjDRWjB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Apr 2023 18:39:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58698 "EHLO
+        id S232735AbjDRWjY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Apr 2023 18:39:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58934 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230153AbjDRWi7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Apr 2023 18:38:59 -0400
+        with ESMTP id S232681AbjDRWjV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Apr 2023 18:39:21 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ADD4D9020
-        for <kvm@vger.kernel.org>; Tue, 18 Apr 2023 15:38:12 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB5279010
+        for <kvm@vger.kernel.org>; Tue, 18 Apr 2023 15:38:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1681857491;
+        s=mimecast20190719; t=1681857512;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=oP1ijZh35veM9qQcwnSkBW41khK7UA9WgipBEl7rzDE=;
-        b=fa95ywFfRhtft48h5oZGZzhuwkFTCU2DGhq+6xhrLk2IwiGi7STVDPzJ4MKTzoha67kU6g
-        S2vM1TCwd2Re/fRySeY2EJsWUZFSeAtclhLSMIOC4X9y2FULrPyS5mbTstIH0q6IGOsROo
-        VnHT5hosyacFTZEAv0MZ7rLzWKZCbEQ=
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com
- [209.85.166.70]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=zuW8bCnBtwfPEYcD/xLW4pmQaYGuW5H8om9ioj7wcK4=;
+        b=d2FuWTYhGHkgUbh7UbykN2lkQ9cnIDzzL2QAMxEUwGwMgvFIYcLgnAR1DLd8HGeAVow7sS
+        9bs4yvPxWS3/F5tm3FJJdf3m50Z0u5HwSjG6SZmp+NqRRYimHP0WjIwHm5H6lmVkK+OoIG
+        smPCb8uypGu5EdxdTaD/8ezGwjtZFCc=
+Received: from mail-il1-f200.google.com (mail-il1-f200.google.com
+ [209.85.166.200]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-646-ElxbnCWkOYCOHNbQiNtmnw-1; Tue, 18 Apr 2023 18:38:08 -0400
-X-MC-Unique: ElxbnCWkOYCOHNbQiNtmnw-1
-Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-760b58bcc0aso586963839f.3
-        for <kvm@vger.kernel.org>; Tue, 18 Apr 2023 15:38:07 -0700 (PDT)
+ us-mta-614-HpSxtGweMdqawxFB_SiPxg-1; Tue, 18 Apr 2023 18:38:31 -0400
+X-MC-Unique: HpSxtGweMdqawxFB_SiPxg-1
+Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-32aebb6134eso19094315ab.1
+        for <kvm@vger.kernel.org>; Tue, 18 Apr 2023 15:38:31 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681857487; x=1684449487;
+        d=1e100.net; s=20221208; t=1681857511; x=1684449511;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=oP1ijZh35veM9qQcwnSkBW41khK7UA9WgipBEl7rzDE=;
-        b=kqr3uaNMeaQhRgsHjYZkFd1d6bDWXELCQTknjq6dT7nH+/VjChWZ+GCBUwPy8YMNnB
-         uyGg/7vbchZKcmTt/qsSlJ1RUl0vOBBvtITDlOmjAno3lrDxiKFw2idFE2BNlnQSAIDm
-         dfeLez29eVDf6O/61sj9bddgLYxA2HO8ESs3tH04bQDrClXeiC4rebiDOgxDfh+jMBou
-         ECuYNduodbGXkmcvZSdkjmCQS1C+Xqoceh9ayBBAYPSGTvIFbDCN1fTV62zFn55GZSTx
-         UdxgFZY2kq9FPlqSemmRsFrbPKhPNwqr9Nm5ulge00a6QlSXr7jxmcEzlRQvWRKOIAMh
-         jrNw==
-X-Gm-Message-State: AAQBX9fFBhPjwzdOTSxPaNrRgtTwVx1P2xNK14cidmWvqEMgsGilEIYk
-        XyCSSXtJlrny1q/f7izYIg8kokwFkMpiiNmkVKrmqE6tE7yofAU0o9eKmTMkp8+uNQ8R2KRo2XI
-        4bNVKCgJSZihh
-X-Received: by 2002:a6b:7a09:0:b0:760:ea3c:7ba4 with SMTP id h9-20020a6b7a09000000b00760ea3c7ba4mr3289295iom.9.1681857487249;
-        Tue, 18 Apr 2023 15:38:07 -0700 (PDT)
-X-Google-Smtp-Source: AKy350bH4tyHOMvEPlf17dAXNU9k+K8/EPTKCj5SBEPj13WIpXZ8uMMQ+pj17m+7Itegs2At0Ir7ow==
-X-Received: by 2002:a6b:7a09:0:b0:760:ea3c:7ba4 with SMTP id h9-20020a6b7a09000000b00760ea3c7ba4mr3289280iom.9.1681857487036;
-        Tue, 18 Apr 2023 15:38:07 -0700 (PDT)
+        bh=zuW8bCnBtwfPEYcD/xLW4pmQaYGuW5H8om9ioj7wcK4=;
+        b=d1utYadryYsHDL4QEnrmMXcZUpJ+hhD19el8Hzxjx/3kXEELLgoiwGSKk3QYzGj21+
+         rf1DNx5nkRlzVEVyl3Ly658nI+puX3rRZaEUQPD/P7fdHHBHgabhcApmImBiqmFg9Pz7
+         gzshEC9ELOQMO7A1BBpy2sTeHfXC5/4BPRa6xzWhciDV4EaB0PKJspJkqlGPBVhpbaf1
+         SJ8LbV5ut0U74DO6cDoMpT3l0KRc1+Xwt0eN4eJDnAlJYz/bpiuQgVo2WDj4JkYbQNjh
+         Bprplnz4Coqkv91rK90+0XUPU5mVXIGstKF3FE0OF1xdKgQqIJBdZHn7vELX7lZt7Phj
+         BL2A==
+X-Gm-Message-State: AAQBX9e+tDNL1RTbBE9vIJKDXx7eHslIiJq1cCIl9mYhB0eIRTuvWjXD
+        9u1XC0Y+9mdLkrSCQsqYmpg2Jts+KkAz70kpW0lgzO0uMXTvUkBzpKVfrcrTam/Ukvu3/3FM/Yf
+        eNFQDmrNPKJP8
+X-Received: by 2002:a92:d64f:0:b0:328:18af:df0 with SMTP id x15-20020a92d64f000000b0032818af0df0mr16242569ilp.23.1681857510846;
+        Tue, 18 Apr 2023 15:38:30 -0700 (PDT)
+X-Google-Smtp-Source: AKy350aylA4H6hADYDO/G1wKu0cQ9FgFsSTQl1SyE79WrPgMY4mHi7eA2KYDNrDSKMOU1LsYRQLu2A==
+X-Received: by 2002:a92:d64f:0:b0:328:18af:df0 with SMTP id x15-20020a92d64f000000b0032818af0df0mr16242553ilp.23.1681857510554;
+        Tue, 18 Apr 2023 15:38:30 -0700 (PDT)
 Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id co9-20020a0566383e0900b0040bd3646d0dsm4445684jab.157.2023.04.18.15.38.06
+        by smtp.gmail.com with ESMTPSA id q6-20020a056e02096600b003244d7f2292sm4142876ilt.32.2023.04.18.15.38.29
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Apr 2023 15:38:06 -0700 (PDT)
-Date:   Tue, 18 Apr 2023 16:38:03 -0600
+        Tue, 18 Apr 2023 15:38:30 -0700 (PDT)
+Date:   Tue, 18 Apr 2023 16:38:29 -0600
 From:   Alex Williamson <alex.williamson@redhat.com>
 To:     Reinette Chatre <reinette.chatre@intel.com>
 Cc:     jgg@nvidia.com, yishaih@nvidia.com,
@@ -64,12 +64,11 @@ Cc:     jgg@nvidia.com, yishaih@nvidia.com,
         dave.jiang@intel.com, jing2.liu@intel.com, ashok.raj@intel.com,
         fenghua.yu@intel.com, tom.zanussi@linux.intel.com,
         linux-kernel@vger.kernel.org
-Subject: Re: [PATCH V3 08/10] vfio/pci: Probe and store ability to support
- dynamic MSI-X
-Message-ID: <20230418163803.46a96fdc.alex.williamson@redhat.com>
-In-Reply-To: <0da4830176e9c4a7877aac0611869f341dda831c.1681837892.git.reinette.chatre@intel.com>
+Subject: Re: [PATCH V3 09/10] vfio/pci: Support dynamic MSI-X
+Message-ID: <20230418163829.149e8881.alex.williamson@redhat.com>
+In-Reply-To: <86cda5cf2742feff3b14954284fb509863355050.1681837892.git.reinette.chatre@intel.com>
 References: <cover.1681837892.git.reinette.chatre@intel.com>
-        <0da4830176e9c4a7877aac0611869f341dda831c.1681837892.git.reinette.chatre@intel.com>
+        <86cda5cf2742feff3b14954284fb509863355050.1681837892.git.reinette.chatre@intel.com>
 X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
@@ -77,68 +76,188 @@ Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 18 Apr 2023 10:29:19 -0700
+On Tue, 18 Apr 2023 10:29:20 -0700
 Reinette Chatre <reinette.chatre@intel.com> wrote:
 
-> Not all MSI-X devices support dynamic MSI-X allocation. Whether
-> a device supports dynamic MSI-X should be queried using
-> pci_msix_can_alloc_dyn().
+> Recently introduced pci_msix_alloc_irq_at() and pci_msix_free_irq()
+> enables an individual MSI-X interrupt to be allocated and freed after
+> MSI-X enabling.
 > 
-> Instead of scattering code with pci_msix_can_alloc_dyn(),
-> probe this ability once and store it as a property of the
-> virtual device.
+> Use dynamic MSI-X (if supported by the device) to allocate an interrupt
+> after MSI-X is enabled. An MSI-X interrupt is dynamically allocated at
+> the time a valid eventfd is assigned. This is different behavior from
+> a range provided during MSI-X enabling where interrupts are allocated
+> for the entire range whether a valid eventfd is provided for each
+> interrupt or not.
 > 
-> Suggested-by: Alex Williamson <alex.williamson@redhat.com>
-> Signed-off-by: Reinette Chatre <reinette.chatre@intel.com>
-> ---
-> Changes since V2:
-> - New patch. (Alex)
-> 
->  drivers/vfio/pci/vfio_pci_core.c | 5 ++++-
->  include/linux/vfio_pci_core.h    | 1 +
->  2 files changed, 5 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
-> index ae0e161c7fc9..a3635a8e54c8 100644
-> --- a/drivers/vfio/pci/vfio_pci_core.c
-> +++ b/drivers/vfio/pci/vfio_pci_core.c
-> @@ -530,8 +530,11 @@ int vfio_pci_core_enable(struct vfio_pci_core_device *vdev)
->  		vdev->msix_bar = table & PCI_MSIX_TABLE_BIR;
->  		vdev->msix_offset = table & PCI_MSIX_TABLE_OFFSET;
->  		vdev->msix_size = ((flags & PCI_MSIX_FLAGS_QSIZE) + 1) * 16;
-> -	} else
-> +		vdev->has_dyn_msix = pci_msix_can_alloc_dyn(pdev);
-> +	} else {
->  		vdev->msix_bar = 0xFF;
-> +		vdev->has_dyn_msix = false;
-> +	}
->  
->  	if (!vfio_vga_disabled() && vfio_pci_is_vga(pdev))
->  		vdev->has_vga = true;
-> diff --git a/include/linux/vfio_pci_core.h b/include/linux/vfio_pci_core.h
-> index 148fd1ae6c1c..4f070f2d6fde 100644
-> --- a/include/linux/vfio_pci_core.h
-> +++ b/include/linux/vfio_pci_core.h
-> @@ -67,6 +67,7 @@ struct vfio_pci_core_device {
->  	u8			msix_bar;
->  	u16			msix_size;
->  	u32			msix_offset;
-> +	bool			has_dyn_msix;
->  	u32			rbar[7];
->  	bool			pci_2_3;
->  	bool			virq_disabled;
+> Do not dynamically free interrupts, leave that to when MSI-X is
+> disabled.
 
-Nit, the whole data structure probably needs to be sorted with pahole,
-but creating a hole here for locality to other msix fields should
-probably be secondary to keeping the structure well packed, which
-suggests including this new field among the bools below.  Thanks,
+But we do, sometimes, even if essentially only on the error path.  Is
+that worthwhile?  It seems like we could entirely remove
+vfio_msi_free_irq() and rely only on pci_free_irq_vectors() on MSI/X
+teardown.
+
+I'd probably also add a comment in the commit log about the theory
+behind not dynamically freeing irqs, ie. latency, reliability, and
+whatever else we used to justify it.  Thanks,
 
 Alex
+
+> Signed-off-by: Reinette Chatre <reinette.chatre@intel.com>
+> Link: https://lore.kernel.org/lkml/20230403211841.0e206b67.alex.williamson@redhat.com/
+> ---
+> The get_cached_msi_msg()/pci_write_msi_msg() behavior is kept
+> similar to the scenario when MSI-X is enabled with triggers
+> provided for new interrupts. get_cached_msi_msg()/pci_write_msi_msg()
+> follows for interrupts recently allocated with pci_msix_alloc_irq_at()
+> just like get_cached_msi_msg()/pci_write_msi_msg() is done for
+> interrupts recently allocated with pci_alloc_irq_vectors().
+> 
+> Changes since V2:
+> - Move vfio_irq_ctx_free() to earlier in series to support
+>   earlier usage. (Alex)
+> - Use consistent terms in changelog: MSI-x changed to MSI-X.
+> - Make dynamic interrupt context creation generic across all
+>   MSI/MSI-X interrupts. This resulted in code moving to earlier
+>   in series as part of xarray introduction patch. (Alex)
+> - Remove the local allow_dyn_alloc and direct calling of
+>   pci_msix_can_alloc_dyn(), use the new vdev->has_dyn_msix
+>   introduced earlier instead. (Alex)
+> - Stop tracking new allocations (remove "new_ctx"). (Alex)
+> - Introduce new wrapper that returns Linux interrupt number or
+>   dynamically allocate a new interrupt. Wrapper can be used for
+>   all interrupt cases. (Alex)
+> - Only free dynamic MSI-X interrupts on MSI-X teardown. (Alex)
+> 
+> Changes since RFC V1:
+> - Add pointer to interrupt context as function parameter to
+>   vfio_irq_ctx_free(). (Alex)
+> - Initialize new_ctx to false. (Dan Carpenter)
+> - Only support dynamic allocation if device supports it. (Alex)
+> 
+>  drivers/vfio/pci/vfio_pci_intrs.c | 73 +++++++++++++++++++++++++++----
+>  1 file changed, 65 insertions(+), 8 deletions(-)
+> 
+> diff --git a/drivers/vfio/pci/vfio_pci_intrs.c b/drivers/vfio/pci/vfio_pci_intrs.c
+> index bdda7f46c2be..c1a3e224c867 100644
+> --- a/drivers/vfio/pci/vfio_pci_intrs.c
+> +++ b/drivers/vfio/pci/vfio_pci_intrs.c
+> @@ -372,27 +372,74 @@ static int vfio_msi_enable(struct vfio_pci_core_device *vdev, int nvec, bool msi
+>  	return 0;
+>  }
+>  
+> +/*
+> + * Return Linux IRQ number of an MSI or MSI-X device interrupt vector.
+> + * If a Linux IRQ number is not available then a new interrupt will be
+> + * allocated if dynamic MSI-X is supported.
+> + */
+> +static int vfio_msi_alloc_irq(struct vfio_pci_core_device *vdev,
+> +			      unsigned int vector, bool msix)
+> +{
+> +	struct pci_dev *pdev = vdev->pdev;
+> +	struct msi_map map;
+> +	int irq;
+> +	u16 cmd;
+> +
+> +	irq = pci_irq_vector(pdev, vector);
+> +	if (irq > 0 || !msix || !vdev->has_dyn_msix)
+> +		return irq;
+> +
+> +	cmd = vfio_pci_memory_lock_and_enable(vdev);
+> +	map = pci_msix_alloc_irq_at(pdev, vector, NULL);
+> +	vfio_pci_memory_unlock_and_restore(vdev, cmd);
+> +
+> +	return map.index < 0 ? map.index : map.virq;
+> +}
+> +
+> +/*
+> + * Free interrupt if it can be re-allocated dynamically (while MSI-X
+> + * is enabled).
+> + */
+> +static void vfio_msi_free_irq(struct vfio_pci_core_device *vdev,
+> +			      unsigned int vector, bool msix)
+> +{
+> +	struct pci_dev *pdev = vdev->pdev;
+> +	struct msi_map map;
+> +	int irq;
+> +	u16 cmd;
+> +
+> +	if (!msix || !vdev->has_dyn_msix)
+> +		return;
+> +
+> +	irq = pci_irq_vector(pdev, vector);
+> +	map = (struct msi_map) { .index = vector, .virq = irq };
+> +
+> +	if (WARN_ON(irq < 0))
+> +		return;
+> +
+> +	cmd = vfio_pci_memory_lock_and_enable(vdev);
+> +	pci_msix_free_irq(pdev, map);
+> +	vfio_pci_memory_unlock_and_restore(vdev, cmd);
+> +}
+> +
+>  static int vfio_msi_set_vector_signal(struct vfio_pci_core_device *vdev,
+>  				      unsigned int vector, int fd, bool msix)
+>  {
+>  	struct pci_dev *pdev = vdev->pdev;
+>  	struct vfio_pci_irq_ctx *ctx;
+>  	struct eventfd_ctx *trigger;
+> -	int irq, ret;
+> +	int irq = -EINVAL, ret;
+>  	u16 cmd;
+>  
+> -	irq = pci_irq_vector(pdev, vector);
+> -	if (irq < 0)
+> -		return -EINVAL;
+> -
+>  	ctx = vfio_irq_ctx_get(vdev, vector);
+>  
+>  	if (ctx) {
+>  		irq_bypass_unregister_producer(&ctx->producer);
+> -
+> +		irq = pci_irq_vector(pdev, vector);
+>  		cmd = vfio_pci_memory_lock_and_enable(vdev);
+>  		free_irq(irq, ctx->trigger);
+>  		vfio_pci_memory_unlock_and_restore(vdev, cmd);
+> +		/* Interrupt stays allocated, will be freed at MSI-X disable. */
+>  		kfree(ctx->name);
+>  		eventfd_ctx_put(ctx->trigger);
+>  		vfio_irq_ctx_free(vdev, ctx, vector);
+> @@ -401,9 +448,17 @@ static int vfio_msi_set_vector_signal(struct vfio_pci_core_device *vdev,
+>  	if (fd < 0)
+>  		return 0;
+>  
+> +	if (irq == -EINVAL) {
+> +		irq = vfio_msi_alloc_irq(vdev, vector, msix);
+> +		if (irq < 0)
+> +			return irq;
+> +	}
+> +
+>  	ctx = vfio_irq_ctx_alloc(vdev, vector);
+> -	if (!ctx)
+> -		return -ENOMEM;
+> +	if (!ctx) {
+> +		ret = -ENOMEM;
+> +		goto out_free_irq;
+> +	}
+>  
+>  	ctx->name = kasprintf(GFP_KERNEL_ACCOUNT, "vfio-msi%s[%d](%s)",
+>  			      msix ? "x" : "", vector, pci_name(pdev));
+> @@ -456,6 +511,8 @@ static int vfio_msi_set_vector_signal(struct vfio_pci_core_device *vdev,
+>  	kfree(ctx->name);
+>  out_free_ctx:
+>  	vfio_irq_ctx_free(vdev, ctx, vector);
+> +out_free_irq:
+> +	vfio_msi_free_irq(vdev, vector, msix);
+>  	return ret;
+>  }
+>  
 
