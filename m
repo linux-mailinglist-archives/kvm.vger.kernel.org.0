@@ -2,114 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AF9D66E6A22
-	for <lists+kvm@lfdr.de>; Tue, 18 Apr 2023 18:50:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 759CA6E6A62
+	for <lists+kvm@lfdr.de>; Tue, 18 Apr 2023 19:01:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231635AbjDRQuo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Apr 2023 12:50:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34946 "EHLO
+        id S232204AbjDRRBb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Apr 2023 13:01:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45856 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230445AbjDRQum (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Apr 2023 12:50:42 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D57EBC0
-        for <kvm@vger.kernel.org>; Tue, 18 Apr 2023 09:49:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1681836597;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=QW4OejsqAutNiGQJiYZJkfIFG7vwNJbOHeoSgw01y+o=;
-        b=fGTF8JJCwXReaYEtOX9mTBoMQKRroGh4FHXoL2s0r4S2DbZOr5lWQgB22uZZqbTkhcuPMi
-        fPOa6MB2Sm/j+fwZqWrCCN+A4HY79KcU/I0jvg+ofM5DJ0ij22Rd5x+HER2MDg8U6RVkwM
-        idNfMZo3pII0uPKGmdYUy437usU5Kw4=
-Received: from mail-il1-f199.google.com (mail-il1-f199.google.com
- [209.85.166.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-396-5VTEJzU0NIKpQBoCaYG9eQ-1; Tue, 18 Apr 2023 12:49:56 -0400
-X-MC-Unique: 5VTEJzU0NIKpQBoCaYG9eQ-1
-Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-32addcf3a73so95183075ab.0
-        for <kvm@vger.kernel.org>; Tue, 18 Apr 2023 09:49:55 -0700 (PDT)
+        with ESMTP id S232304AbjDRRB3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Apr 2023 13:01:29 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84A6B2710
+        for <kvm@vger.kernel.org>; Tue, 18 Apr 2023 10:01:27 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id 8-20020a250f08000000b00b880000325bso2686381ybp.3
+        for <kvm@vger.kernel.org>; Tue, 18 Apr 2023 10:01:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1681837286; x=1684429286;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=Dyuu5wU7j8YU7zpj0pOZ8BO/c8tny2d3D8gekiPd7fA=;
+        b=d8/Zb9YgCa8eVlBLTpV+NJ57rdS1xsLfkqIXEKvUHW2uAls6J+FJzlZN6Ji/4uRir/
+         1zS+MdaFNxXGCzCFIaF1aqXoOXWg1iFKiZNpDvV9eSfZylaThYuxowhj3wxPLo7slf/4
+         LHgnLU2DGCVx3/24VmikxziwoDQgW6WdB6Va8iTHc1Yg6NoxaE0GSi5sFvNhfyQ8EBlj
+         Geyjaz/WvFCOZ3LFQBwGUhsO/cbtnHrGgBtiKMeYHxW+6m89BnzcmE/zONLKuZzIK3Zd
+         WwjlA2lMQP53PxLKQnfqOnLmqIoOsiRGWzjBF4baNzHxGVTgYocW6PIPjpngll6Enuy7
+         +yGw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681836595; x=1684428595;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=QW4OejsqAutNiGQJiYZJkfIFG7vwNJbOHeoSgw01y+o=;
-        b=N1KPrFZC88lWCNzN0W9L+BSu1K5XZvflakWQZ+t9oTZt4kHb3z4pEs5G4r1T9WzFuc
-         HXY2Y4GDSYUSzp5uCqmp8PTCFIpuraxlwzGoHXCwbAqkiDz2sNfpvXWIG6cY21TWAXRO
-         cEVeyOaz/fZSM+tJSUJ2YkjUTPHPeQ/ikpCkAsG8S3Teu533SNT6TMDYSQrGbdxpDQ7x
-         zt/6gJO5vyhqwsagKj8UmRSQ+N+56VcbHKeAnSNTZrmM0Ml7Bb1CDlocX3+p3ruVSFc7
-         7hLiGz5a9QGOrzdMthUrPwbMdceNhbfX8/0jZhxq4hQ6cXzu/4OugTsySeqgCzXOzJqz
-         8G2g==
-X-Gm-Message-State: AAQBX9eorqSwRuV9bBYn4ueEHygRvJl5LSw7UHEZ6TIqCK7PDEkgv7Jz
-        EAROQu/8byV6go4MFNW0hqEqVSMVfRlqDhIfBf1AgSanuVmLQBelCx9l9XV9pl4rwgDh7GqG/qX
-        elJU0q5MRSCAB
-X-Received: by 2002:a6b:1452:0:b0:760:e776:18c0 with SMTP id 79-20020a6b1452000000b00760e77618c0mr2235555iou.9.1681836595277;
-        Tue, 18 Apr 2023 09:49:55 -0700 (PDT)
-X-Google-Smtp-Source: AKy350ZVsgHFq5DkfTVjZLoX8ZDscMPn0l0IcDwaF7P4VYcMS0dy9AZqf3xGlcdGUdzNLu695Of27Q==
-X-Received: by 2002:a6b:1452:0:b0:760:e776:18c0 with SMTP id 79-20020a6b1452000000b00760e77618c0mr2235519iou.9.1681836594980;
-        Tue, 18 Apr 2023 09:49:54 -0700 (PDT)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id ay29-20020a056638411d00b003c5170ddcedsm4254803jab.110.2023.04.18.09.49.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Apr 2023 09:49:54 -0700 (PDT)
-Date:   Tue, 18 Apr 2023 10:49:53 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     "Liu, Yi L" <yi.l.liu@intel.com>
-Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
-        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
-        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "jasowang@redhat.com" <jasowang@redhat.com>,
-        "shameerali.kolothum.thodi@huawei.com" 
-        <shameerali.kolothum.thodi@huawei.com>,
-        "lulu@redhat.com" <lulu@redhat.com>,
-        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
-        "intel-gvt-dev@lists.freedesktop.org" 
-        <intel-gvt-dev@lists.freedesktop.org>,
-        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
-        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-        "Hao, Xudong" <xudong.hao@intel.com>,
-        "Zhao, Yan Y" <yan.y.zhao@intel.com>,
-        "Xu, Terrence" <terrence.xu@intel.com>,
-        "Jiang, Yanting" <yanting.jiang@intel.com>,
-        "Duan, Zhenzhong" <zhenzhong.duan@intel.com>
-Subject: Re: [PATCH v3 12/12] vfio/pci: Report dev_id in
- VFIO_DEVICE_GET_PCI_HOT_RESET_INFO
-Message-ID: <20230418104953.28cfe9cb.alex.williamson@redhat.com>
-In-Reply-To: <DS0PR11MB7529F0992BD2C5CAC1BEA088C39D9@DS0PR11MB7529.namprd11.prod.outlook.com>
-References: <20230412105045.79adc83d.alex.williamson@redhat.com>
-        <ZDcPTTPlni/Mi6p3@nvidia.com>
-        <BN9PR11MB5276782DA56670C8209470828C989@BN9PR11MB5276.namprd11.prod.outlook.com>
-        <ZDfslVwqk6JtPpyD@nvidia.com>
-        <20230413120712.3b9bf42d.alex.williamson@redhat.com>
-        <BN9PR11MB5276A160CA699933B897C8C18C999@BN9PR11MB5276.namprd11.prod.outlook.com>
-        <DS0PR11MB7529B7481AC97261E12AA116C3999@DS0PR11MB7529.namprd11.prod.outlook.com>
-        <20230414111043.40c15dde.alex.williamson@redhat.com>
-        <DS0PR11MB75290A78D6879EC2E31E21AEC39C9@DS0PR11MB7529.namprd11.prod.outlook.com>
-        <20230417130140.1b68082e.alex.williamson@redhat.com>
-        <ZD2erN3nKbnyqei9@nvidia.com>
-        <20230417140642.650fc165.alex.williamson@redhat.com>
-        <BN9PR11MB5276D93DDFE3ED97CD1B923B8C9D9@BN9PR11MB5276.namprd11.prod.outlook.com>
-        <20230417221033.778c00c9.alex.williamson@redhat.com>
-        <DS0PR11MB7529F0992BD2C5CAC1BEA088C39D9@DS0PR11MB7529.namprd11.prod.outlook.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        d=1e100.net; s=20221208; t=1681837286; x=1684429286;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Dyuu5wU7j8YU7zpj0pOZ8BO/c8tny2d3D8gekiPd7fA=;
+        b=D8LB0DaPWuTg8hH5awl3DQ1oaNxRcG9mJqKusiUUPnXSFs46uCSX6kMPpeq2lVXlYa
+         y74l3SLxBrHzTj4oL+nBkQao4gS7+Sjk8qL5Wy4s6DID06ceRswdCN0vUuOqzEkarm0D
+         hOKx4k4AhlD0NAL0qdtitotTkCUowNe7ahUbXAkuX/oxJfqaPOS8KflQ6XqoQ5/7HjKm
+         UO1VkP+13oKlsNEzpcugK9UWSGEjo26pMLrYxoSuBNd7VOcVMOxTqqxKOtq9PegB2YMv
+         GZVlT+OtUHdPP0Jse10LxG+qk2bCT4zN3TGwu+u31MCyQThb0HaNgi8x9lbrc6R3yDfT
+         CQgA==
+X-Gm-Message-State: AAQBX9fhjBlIuHi8mZqsYoaSicD9VV8hz065aYjv2Vsvkwfn8zyJcjte
+        lz/Fl5Zs8ALRyzmY6WauOZVR5rLXgH5pnmZiXA==
+X-Google-Smtp-Source: AKy350bfjObXL4Qf9+g1wZMUKUYGeLrkCLVYHghpYReFp8Cgnq9KYi/FOYW0J9unNXx/8e5Sa4DQgJWQeRCCTyyt3w==
+X-Received: from ackerleytng-cloudtop.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1f5f])
+ (user=ackerleytng job=sendgmr) by 2002:a25:d707:0:b0:b8f:578c:4e3a with SMTP
+ id o7-20020a25d707000000b00b8f578c4e3amr9653508ybg.12.1681837286764; Tue, 18
+ Apr 2023 10:01:26 -0700 (PDT)
+Date:   Tue, 18 Apr 2023 17:01:25 +0000
+In-Reply-To: <ZD12htq6dWg0tg2e@google.com> (message from Sean Christopherson
+ on Mon, 17 Apr 2023 09:40:38 -0700)
+Mime-Version: 1.0
+Message-ID: <diqz5y9t86qi.fsf@ackerleytng-cloudtop.c.googlers.com>
+Subject: Re: Rename restrictedmem => guardedmem? (was: Re: [PATCH v10 0/9]
+ KVM: mm: fd-based approach for supporting KVM)
+From:   Ackerley Tng <ackerleytng@google.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     david@redhat.com, chao.p.peng@linux.intel.com, pbonzini@redhat.com,
+        vkuznets@redhat.com, jmattson@google.com, joro@8bytes.org,
+        mail@maciej.szmigiero.name, vbabka@suse.cz, vannapurve@google.com,
+        yu.c.zhang@linux.intel.com, kirill.shutemov@linux.intel.com,
+        dhildenb@redhat.com, qperret@google.com, tabba@google.com,
+        michael.roth@amd.com, wei.w.wang@intel.com, rppt@kernel.org,
+        liam.merwick@oracle.com, isaku.yamahata@gmail.com,
+        jarkko@kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -117,38 +74,41 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 18 Apr 2023 10:34:45 +0000
-"Liu, Yi L" <yi.l.liu@intel.com> wrote:
+Sean Christopherson <seanjc@google.com> writes:
 
-> > From: Alex Williamson <alex.williamson@redhat.com>
-> > Sent: Tuesday, April 18, 2023 12:11 PM
-> >   
-> [...]
-> >
-> > We haven't discussed how it fails when called on a group-opened device
-> > in a mixed environment.  I'd propose that the INFO ioctl behaves
-> > exactly as it does today, reporting group-id and BDF for each affected
-> > device.  However, the hot-reset ioctl itself is not extended to accept
-> > devicefd because there is no proof-of-ownership model for cdevs.
-> > Therefore even if the user could map group-id to devicefd, they get
-> > -EINVAL calling HOT_RESET with a devicefd when the ioctl is called from
-> > a group-opened device.  Thanks,  
-> 
-> Will it be better to let userspace know it shall fail if invoking hot
-> reset due to no proof-of-ownership as it also has cdev devices? Maybe
-> the RESETTABLE flag should always be meaningful. Even if the calling
-> device of _INFO is group-opened device. Old user applications does not
-> need to check it as it will never have such mixed environment. But for
-> new applications or the applications that have been updated per latest
-> vfio uapi, it should strictly check this flag before going ahead to do
-> hot-reset.
+> On Mon, Apr 17, 2023, David Hildenbrand wrote:
+>> On 17.04.23 17:40, Sean Christopherson wrote:
+>> > I want to start referring to the code/patches by its  
+>> syscall/implementation name
+>> > instead of "UPM", as "UPM" is (a) very KVM centric, (b) refers to the  
+>> broader effort
+>> > and not just the non-KVM code, and (c) will likely be confusing for  
+>> future reviewers
+>> > since there's nothing in the code that mentions "UPM" in any way.
+>> >
+>> > But typing out restrictedmem is quite tedious, and git grep shows  
+>> that "rmem" is
+>> > already used to refer to "reserved memory".
+>> >
+>> > Renaming the syscall to "guardedmem"...
 
-The group-opened model cannot consistently predict whether the user can
-provide proof-of-ownership.  I don't think we should define a flag
-simply because there's a case that we can predict, the definition of
-that flag becomes problematic.  Let's not complicate the interface by
-trying to optimize a case that will likely never exist in practice and
-can be handled via the existing legacy API.  Thanks,
+>> restrictedmem, guardedmem, ... all fairly "suboptimal" if you'd ask  
+>> me ...
 
-Alex
+> I'm definitely open to other suggestions, but I suspect it's going to be  
+> difficult
+> to be more precise than something like "guarded".
 
+> E.g. we discussed "unmappable" at one point, but the memory can still be  
+> mapped,
+> just not via mmap().  And it's not just about mappings, e.g. read() and  
+> its many
+> variants are all disallowed too, despite the kernel direct map still  
+> being live
+> (modulo SNP requirements).
+
+How about "opaque"?
+
+I think opaque captures the idea of enforced information hiding from the
+user(space), and that the contents can only be manipulated via internal
+(kernel) functions.
