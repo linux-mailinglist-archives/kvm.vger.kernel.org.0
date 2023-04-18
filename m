@@ -2,263 +2,225 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C81866E565B
-	for <lists+kvm@lfdr.de>; Tue, 18 Apr 2023 03:23:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5BC936E5673
+	for <lists+kvm@lfdr.de>; Tue, 18 Apr 2023 03:29:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229714AbjDRBXT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 Apr 2023 21:23:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43988 "EHLO
+        id S230211AbjDRB3B (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 17 Apr 2023 21:29:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48204 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229499AbjDRBXR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 17 Apr 2023 21:23:17 -0400
-Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EBF5E2111;
-        Mon, 17 Apr 2023 18:23:15 -0700 (PDT)
+        with ESMTP id S230037AbjDRB26 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 17 Apr 2023 21:28:58 -0400
+Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 445F6524C;
+        Mon, 17 Apr 2023 18:28:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1681780996; x=1713316996;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=xxj4orMdwSEXYJlb7suHd8py6WoU3VU9TrspjC7QyJg=;
-  b=LEycVl/XZGccDaguaPWKnazeh8hVy4Qtr/wHPXFgRlVu0gj+asT87lfX
-   SrQmYdbH2siYSARPem4Wyz7eYTjugAT/5GKFZIt+//E8cbuxDv3bHsKDb
-   wbpL9K35u69lBoi/TKBaQwjxbrgiuToIlO1N16a7h+tH0TzIKKllYmPm2
-   ILFpgv/RBu/pYkdmxWl/Zwk07orBvC6RMovrkHgy9rKjlhxVQk9VLECcf
-   6/iOY2VU2CoQhuFqTDt/1XdB5VNNi8pJSZ5W9daNsm2jQJWrRuw13+RUe
-   AHEWC04tYLZDsn3fKJ9wtUVufJAPGNzHLrUv/PFUPIMXTz6+FvJuuIFDH
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10683"; a="410264157"
+  t=1681781326; x=1713317326;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=V0Hcu9CbAqx1VoGXPfu8pLacl8HwmCcatNlUpbK1JuE=;
+  b=nlv8maz4kjCQp22qEhIqzHKL9w7z95RwbFSeEhcl51OYT4B+4muG5zRR
+   84hxDl2DyvTjyNGhOofTMuBcXuOSsGOVas7CVGEkzlWVDsg468Wry4ClM
+   wTP/4cOUzm7rSzt9iEF9Kb8q8C8PtkBjPRrXAEMoZqTcy/2g9KEUtcHap
+   Kbdv7z+4TDabslvBndvXJhof2fbkJYhEbbVj+b9KfOF2pxH/Moo0DGII1
+   fVb6neTFECw0Na208jPaDs9oPAzNKpKB0mtPO8M+wucrjmb7fp7Kor8/M
+   UZYwSkDr4oGY94bhW1qA9d8VHVWglA8lkSjQjbQknDhtTa2uc/P0r8H0K
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10683"; a="333845359"
 X-IronPort-AV: E=Sophos;i="5.99,205,1677571200"; 
-   d="scan'208";a="410264157"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Apr 2023 18:23:15 -0700
+   d="scan'208";a="333845359"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Apr 2023 18:28:45 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10683"; a="668298836"
+X-IronPort-AV: E=McAfee;i="6600,9927,10683"; a="641173196"
 X-IronPort-AV: E=Sophos;i="5.99,205,1677571200"; 
-   d="scan'208";a="668298836"
-Received: from lkp-server01.sh.intel.com (HELO b613635ddfff) ([10.239.97.150])
-  by orsmga006.jf.intel.com with ESMTP; 17 Apr 2023 18:23:10 -0700
-Received: from kbuild by b613635ddfff with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1poa3p-000co7-26;
-        Tue, 18 Apr 2023 01:23:09 +0000
-Date:   Tue, 18 Apr 2023 09:22:18 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     "Vishal Moola (Oracle)" <vishal.moola@gmail.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Matthew Wilcox <willy@infradead.org>
-Cc:     oe-kbuild-all@lists.linux.dev,
-        Linux Memory Management List <linux-mm@kvack.org>,
-        linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-csky@vger.kernel.org, linux-hexagon@vger.kernel.org,
-        loongarch@lists.linux.dev, linux-m68k@lists.linux-m68k.org,
-        linux-mips@vger.kernel.org, linux-openrisc@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, linux-riscv@lists.infradead.org,
-        linux-s390@vger.kernel.org, linux-sh@vger.kernel.org,
-        sparclinux@vger.kernel.org, linux-um@lists.infradead.org,
-        xen-devel@lists.xenproject.org, kvm@vger.kernel.org,
-        "Vishal Moola (Oracle)" <vishal.moola@gmail.com>
-Subject: Re: [PATCH 04/33] mm: add utility functions for ptdesc
-Message-ID: <202304180913.p1BuXrBb-lkp@intel.com>
-References: <20230417205048.15870-5-vishal.moola@gmail.com>
+   d="scan'208";a="641173196"
+Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
+  by orsmga003.jf.intel.com with ESMTP; 17 Apr 2023 18:28:20 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.23; Mon, 17 Apr 2023 18:28:20 -0700
+Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.23 via Frontend Transport; Mon, 17 Apr 2023 18:28:20 -0700
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.172)
+ by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.23; Mon, 17 Apr 2023 18:28:19 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=WXN4tqSAsc1ue5xklLAMuw8FOnLfNalAf46b0jbPXmyyormGGfg4px6+fugzmOYov9hCesSTebUrU2lT+wpYqWh56wNxE3leUbYWPUKkuILdP9sHJfJR5ZdTUSitewgBtNoUvBn0lWjnfwbpzwpRpgMmLYejbPz+dj22qW2A8auNGkXfRDsGpSQa2Vu8vXbxR3A8VWMVlflOOTd9tR7pRSZhieCttaXkljy3dmUkN3y6WAh4Xtk1RCeS60DH5n9J5IzdvVrRhC/JFzmxJoJB8Mz0WQ2gaPFY2AyJWxKyYGu32eGJhz4+Qk4GDiT3WpEDNiQaD3QIFXVVh3cSEvknCw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=V0Hcu9CbAqx1VoGXPfu8pLacl8HwmCcatNlUpbK1JuE=;
+ b=f5W7vivfNn0eIWzKDRmJwBfQPbapJEv5SOn4mQN4+fnxm4xL04sJHMJKh+l9Vc8P0tdUQZbx9BVvo9V/N8p2ZJZSy9tAxjVZ8K4vtWbZmiLVF+8aqO9/iwz4/jv7nNqguT4EZNxTKqh1EmJPbW8AZ0y5/afffXrFd3Wx/YETEioNx4GSFA5h14QBLnMR8zJIXEQ17mBWjehVwOoJqK1ZHn3JfZExSxW24Pvjp1rv6XB/UbO9sr4VkyyWDflZvx8L29MEbsY5T4jU2cytVKnNCwGURFsByxrltBVboMX+DWyKlUFElEWUhkHHgTIqmPjQxd1RdrCPWrliY9MUOCRdDg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
+ by DS0PR11MB8083.namprd11.prod.outlook.com (2603:10b6:8:15e::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6298.30; Tue, 18 Apr
+ 2023 01:28:12 +0000
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::73e9:b405:2cae:9174]) by BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::73e9:b405:2cae:9174%7]) with mapi id 15.20.6298.045; Tue, 18 Apr 2023
+ 01:28:12 +0000
+From:   "Tian, Kevin" <kevin.tian@intel.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+CC:     "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "Hao, Xudong" <xudong.hao@intel.com>,
+        "Duan, Zhenzhong" <zhenzhong.duan@intel.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "Xu, Terrence" <terrence.xu@intel.com>,
+        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        "Liu, Yi L" <yi.l.liu@intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "lulu@redhat.com" <lulu@redhat.com>,
+        "Jiang, Yanting" <yanting.jiang@intel.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
+        "Zhao, Yan Y" <yan.y.zhao@intel.com>,
+        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "shameerali.kolothum.thodi@huawei.com" 
+        <shameerali.kolothum.thodi@huawei.com>,
+        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>
+Subject: RE: [PATCH v3 12/12] vfio/pci: Report dev_id in
+ VFIO_DEVICE_GET_PCI_HOT_RESET_INFO
+Thread-Topic: [PATCH v3 12/12] vfio/pci: Report dev_id in
+ VFIO_DEVICE_GET_PCI_HOT_RESET_INFO
+Thread-Index: AQHZZKiCXow33Wzeq0K314B/OZqu968cqG8AgAAdbYCAACdegIAAAyuAgAAEPICAAAjLgIAAGeKAgAAG7oCAAAf9gIAAO30AgACyrQCAAIPEgIAHkI0AgAApuICAABWEgIAAGNKAgAA3aoCAACJEAIABGhiAgAA2uYCAAMsIYIAAPMKAgABpLgCAAPe5MIAFBsSAgADFkWA=
+Date:   Tue, 18 Apr 2023 01:28:12 +0000
+Message-ID: <BN9PR11MB52764ECBAE117EE159CECC598C9D9@BN9PR11MB5276.namprd11.prod.outlook.com>
+References: <20230411111117.0766ad52.alex.williamson@redhat.com>
+ <ZDWph7g0hcbJHU1B@nvidia.com>
+ <20230411155827.3489400a.alex.williamson@redhat.com>
+ <ZDX0wtcvZuS4uxmG@nvidia.com>
+ <20230412105045.79adc83d.alex.williamson@redhat.com>
+ <ZDcPTTPlni/Mi6p3@nvidia.com>
+ <BN9PR11MB5276782DA56670C8209470828C989@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <ZDfslVwqk6JtPpyD@nvidia.com>
+ <20230413120712.3b9bf42d.alex.williamson@redhat.com>
+ <BN9PR11MB5276A160CA699933B897C8C18C999@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <ZD1MCc6fD+oisjki@nvidia.com>
+In-Reply-To: <ZD1MCc6fD+oisjki@nvidia.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BN9PR11MB5276:EE_|DS0PR11MB8083:EE_
+x-ms-office365-filtering-correlation-id: 9d5a9092-dabe-4fce-b36e-08db3fac2d19
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: ccOZ6g7zXGs1GQgIEhlUcnsQZ0CpEIXollX+VUy/snxRS3yYVaLUquNNlmKScj9sFXHxnmliOPt/6j75RLEzUjNiFCqytwoa2EhNm0i4zLSQ2TX71q2J/JIpu4nscI/koQj3FUk3peTExu4kLCa7Hjsrdrht5RVOQ1NjgQzYCFUrC747FA6E+DOdYriMG7ZC2GDCglsty0oZmAkm1QhIMxR0Ux6M+IaAYnkHH7iKVM3Ue05kjPzYOsYkN7m6pEPI8dsmyVV1e284vkVNMy/DY86H9/XgKAmjgpE4RCqdV5Vr6Ap8ocKOoJ5bq1Ja6ZuWZPUZm+qfr8d/dFftxGtObGgseRXuoRr4juOA1Kso1Fo8dmdHTDZNwh7msp3/ydtLxJcXOtaQ1E2xnWwzD1s6nOWz/ewuo3ORdZWWjEyNMjq3YID4ybLJ258ScxxN2Jd5vfWz02DyAst0EeRGDTAYHa9fOTZCrh4mLIGy6Rs2w5HgfG6NnX2HIj4DYsIelhdGgV+4VdiT/1S6WIbKPFNSqhApeA9zRyNsjweiM3Rs/bnXhsnN2hp5IoZ8rYTSuqgGehujKptDq31EEFPyxhbcNoRXPGksAk4sRjhB8jl2gObVpZyfcXa/bTAYb9IaXUKP
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(136003)(396003)(346002)(376002)(39860400002)(366004)(451199021)(5660300002)(71200400001)(7696005)(76116006)(6916009)(66556008)(66476007)(2906002)(66946007)(64756008)(66446008)(4326008)(7416002)(33656002)(86362001)(8936002)(38070700005)(122000001)(41300700001)(38100700002)(478600001)(316002)(52536014)(8676002)(82960400001)(55016003)(54906003)(9686003)(26005)(6506007)(186003)(83380400001);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?HYSRYsjtT6rW5tVq9VPSxJ3SQlq6awPCdf0aApiL8B8F8pHtRVdZr0ayZZO/?=
+ =?us-ascii?Q?rCF82FwaWZOOPwwqduJRXDjW+5U9iOkSS05EPOVvlSQpKjGkCtUj3XbgT7wX?=
+ =?us-ascii?Q?MiUPr6TPw9ioZxChmt3LsgxEJ/8NWJhgVhOg/mdeGlsf8Dze9el/Z7SqbxNx?=
+ =?us-ascii?Q?XfIM4RrdQHB7MGFiCoM54sMSPmgw3nbsfpa8AsBxewUvDjUeonYSYdXu59VI?=
+ =?us-ascii?Q?rcdLNeR83WkI8i9it8z7tGe0i9xriT0+5JrWnkeIa6PIqZ6Ylex3zcNl6ZN1?=
+ =?us-ascii?Q?qXrfEncgznTv688FRU4LK2g9cccCnYpH1EBcttqaVDfLU4YguS3peTvJlhv+?=
+ =?us-ascii?Q?UEVnUGSQRX8YGxGGwXbCQ076cYiANQL7yaPV1xwmngVEoE77vz6uaRFZDSRM?=
+ =?us-ascii?Q?GapMm2l/LhfFBq5C/6TmFdmEXbrKvPtJeiFsbGqvUmSxym409meZfjfDOmyO?=
+ =?us-ascii?Q?hyXOk19wi9toPpUT5eFRtxaoN9vnW+AwJm/PNB+E0D0/0VDcpL3WskRcsR7d?=
+ =?us-ascii?Q?MEYf/AAR8y4DP9x++jBy+XLMCZ1Z3qydWzojOk5dqhXEmaLAKUPxH00JPfEv?=
+ =?us-ascii?Q?koHGYJD1Dv0LmbUpLrtJ0Km6kstOZu/0C5XKZVMD6K9dRF/J0wEwcIcpwNf+?=
+ =?us-ascii?Q?SRhy6lxIipO6Euv3gV/pqXV3t00HeDru9iFGxVkDXYaUt8DSK2S0DLTjeXjS?=
+ =?us-ascii?Q?qio7zcdZFrsSPAzhbbVlFqJUffoBSm1PFzZ7CW8RViUajrvh94M24+gDyHIN?=
+ =?us-ascii?Q?DjVxABiCbYk5YY0dB+HkQIf+eaI5Ej7Zg3iE+H0cnwdD0pUnhKRwsF+HEfnU?=
+ =?us-ascii?Q?hUMKBsz6dBA92ad496X4U85Jp1bYW9SfjWbsNF+2SEzEfLpQvPZS4LxeH//h?=
+ =?us-ascii?Q?a8x2B+gxxNalObmbc0EHJQ2iAM/dhaVOZhSkqMAW7b+LpO0g6/uy7xMWe0CI?=
+ =?us-ascii?Q?XjUKsMrcF0HCEfrZUgpXgQ7PtGgqfEPQ+s9+xoEJ3g457UBpsAiHKPnwhWuG?=
+ =?us-ascii?Q?EynrsyhWeNlgoPeESBtJHJOcF2yzd03/Allk4SWTBYD/Kkk7/sFyQdduJpLK?=
+ =?us-ascii?Q?UAv8yHTYuWyfCBSxVCZiWp4nhIo//Tg8+Hl0kET7aZaxdESkPC+dMspNi2OB?=
+ =?us-ascii?Q?VMDGLgPm6HY7tdxggeiEvuIy/of4PKGtmTWA/jccglXf88Ih2UIEs23CGt0d?=
+ =?us-ascii?Q?Mf2a6eu4L6BwVTwzRjwrhGdVnwCqL0C8jPdP+jqulqJP4wWi96/uvmhu/jrf?=
+ =?us-ascii?Q?3Y0xX1NPlRjiJfy0TnQZEmcuAYhPOsfUpeYRaGwFHplFzfo2F7EEsAv/c7C7?=
+ =?us-ascii?Q?klmq2GonvTkIMU2nwf4Wbt/xh2j3iJ/KPqAAHE0D4ocOsG/ZkXzQApSt0LjT?=
+ =?us-ascii?Q?IOMujxvAuW09MDe3fwuT+l+vVHsBuz1PfCCcfPyJeNmLJPcFpHJJ4feSZKdY?=
+ =?us-ascii?Q?+yyNlyjm8qBLEAPfCBZsksGbxLUtYX5HqBjC8L2oziuHa62a6eYou2hLXk0/?=
+ =?us-ascii?Q?FoulASiRVnqvQRrnMN+gsw8UApn5jgt6+Mw/a08qwO4wc22hXyYRrXTnn49f?=
+ =?us-ascii?Q?Q73bcvZZwHehHYhXTnkkuUDby4rGlts4ZkTrWJ7j?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230417205048.15870-5-vishal.moola@gmail.com>
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9d5a9092-dabe-4fce-b36e-08db3fac2d19
+X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Apr 2023 01:28:12.6187
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: mJ0nvDVCI7sBbnbi0DXHI6NPFt5mGoL94fyhu/p9SMU/XcfEGcbDU82gYuzNICKPAl8l5UcQOyljSKM9SUanvg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB8083
+X-OriginatorOrg: intel.com
 X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
-        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Vishal,
+> From: Jason Gunthorpe
+> Sent: Monday, April 17, 2023 9:39 PM
+>=20
+> On Fri, Apr 14, 2023 at 09:11:30AM +0000, Tian, Kevin wrote:
+>=20
+> > The only corner case with this option is when a user mixes group
+> > and cdev usages. iirc you mentioned it's a valid usage to be supported.
+> > In that case the kernel doesn't have sufficient knowledge to judge
+> > 'resettable' as it doesn't know which groups are opened by this user.
+>=20
+> IMHO we don't need to support this combination.
+>=20
+> We can say that to use the hot reset API the user must put all their
+> devices into the same iommufd_ctx and cover 100% of the known use
+> cases for this.
 
-kernel test robot noticed the following build errors:
+Make sense.
 
-[auto build test ERROR on akpm-mm/mm-everything]
-[also build test ERROR on s390/features powerpc/next powerpc/fixes geert-m68k/for-next geert-m68k/for-linus linus/master v6.3-rc7 next-20230417]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+>=20
+> There are already other situations, like nesting, that do force users
+> to put everything into one iommufd_ctx.
+>=20
+> No reason to make things harder and more complicated.
+>=20
+> I'm coming to the feeling that we should put no-iommu devices in
+> iommufd_ctx's as well. They would be an iommufd_access like
+> mdevs. That would clean up the complications they cause here.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Vishal-Moola-Oracle/s390-Use-_pt_s390_gaddr-for-gmap-address-tracking/20230418-045832
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/akpm/mm.git mm-everything
-patch link:    https://lore.kernel.org/r/20230417205048.15870-5-vishal.moola%40gmail.com
-patch subject: [PATCH 04/33] mm: add utility functions for ptdesc
-config: sh-allmodconfig (https://download.01.org/0day-ci/archive/20230418/202304180913.p1BuXrBb-lkp@intel.com/config)
-compiler: sh4-linux-gcc (GCC) 12.1.0
-reproduce (this is a W=1 build):
-        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-        chmod +x ~/bin/make.cross
-        # https://github.com/intel-lab-lkp/linux/commit/1b6f8137ca50a543ad2937092836635ca58c78ce
-        git remote add linux-review https://github.com/intel-lab-lkp/linux
-        git fetch --no-tags linux-review Vishal-Moola-Oracle/s390-Use-_pt_s390_gaddr-for-gmap-address-tracking/20230418-045832
-        git checkout 1b6f8137ca50a543ad2937092836635ca58c78ce
-        # save the config file
-        mkdir build_dir && cp config build_dir/.config
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross W=1 O=build_dir ARCH=sh olddefconfig
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross W=1 O=build_dir ARCH=sh prepare
+This certainly simplifies the matter a lot!
 
-If you fix the issue, kindly add following tag where applicable
-| Reported-by: kernel test robot <lkp@intel.com>
-| Link: https://lore.kernel.org/oe-kbuild-all/202304180913.p1BuXrBb-lkp@intel.com/
+>=20
+> I suppose we should have done that from the beginning - no-iommu is an
+> IOMMUFD access, it just uses a crazy /proc based way to learn the
+> PFNs. Making it a proper access and making a real VFIO ioctl that
+> calls iommufd_access_pin_pages() and returns the DMA mapped addresses
+> to userspace would go a long way to making no-iommu work in a logical,
+> usable, way.
+>=20
 
-All error/warnings (new ones prefixed by >>):
-
-   In file included from arch/sh/kernel/asm-offsets.c:14:
-   include/linux/mm.h: In function 'virt_to_ptdesc':
->> include/linux/mm.h:2723:16: error: implicit declaration of function 'page_ptdesc' [-Werror=implicit-function-declaration]
-    2723 |         return page_ptdesc(virt_to_head_page(x));
-         |                ^~~~~~~~~~~
->> include/linux/mm.h:2723:16: warning: returning 'int' from a function with return type 'struct ptdesc *' makes pointer from integer without a cast [-Wint-conversion]
-    2723 |         return page_ptdesc(virt_to_head_page(x));
-         |                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   In file included from arch/sh/include/asm/thread_info.h:13,
-                    from include/linux/thread_info.h:60,
-                    from include/asm-generic/preempt.h:5,
-                    from ./arch/sh/include/generated/asm/preempt.h:1,
-                    from include/linux/preempt.h:78,
-                    from include/linux/spinlock.h:56,
-                    from include/linux/mmzone.h:8,
-                    from include/linux/gfp.h:7,
-                    from include/linux/mm.h:7:
-   include/linux/mm.h: In function 'ptdesc_to_virt':
->> include/linux/mm.h:2728:29: error: implicit declaration of function 'ptdesc_page'; did you mean 'pte_page'? [-Werror=implicit-function-declaration]
-    2728 |         return page_to_virt(ptdesc_page(pt));
-         |                             ^~~~~~~~~~~
-   arch/sh/include/asm/page.h:139:27: note: in definition of macro '___va'
-     139 | #define ___va(x)        ((x)+PAGE_OFFSET)
-         |                           ^
-   include/linux/mm.h:117:25: note: in expansion of macro '__va'
-     117 | #define page_to_virt(x) __va(PFN_PHYS(page_to_pfn(x)))
-         |                         ^~~~
-   include/linux/mm.h:117:30: note: in expansion of macro 'PFN_PHYS'
-     117 | #define page_to_virt(x) __va(PFN_PHYS(page_to_pfn(x)))
-         |                              ^~~~~~~~
-   include/asm-generic/memory_model.h:64:21: note: in expansion of macro '__page_to_pfn'
-      64 | #define page_to_pfn __page_to_pfn
-         |                     ^~~~~~~~~~~~~
-   include/linux/mm.h:2728:16: note: in expansion of macro 'page_to_virt'
-    2728 |         return page_to_virt(ptdesc_page(pt));
-         |                ^~~~~~~~~~~~
->> include/asm-generic/memory_model.h:46:35: warning: initialization of 'const struct page *' from 'int' makes pointer from integer without a cast [-Wint-conversion]
-      46 | ({      const struct page *__pg = (pg);                         \
-         |                                   ^
-   arch/sh/include/asm/page.h:139:27: note: in definition of macro '___va'
-     139 | #define ___va(x)        ((x)+PAGE_OFFSET)
-         |                           ^
-   include/linux/mm.h:117:25: note: in expansion of macro '__va'
-     117 | #define page_to_virt(x) __va(PFN_PHYS(page_to_pfn(x)))
-         |                         ^~~~
-   include/linux/mm.h:117:30: note: in expansion of macro 'PFN_PHYS'
-     117 | #define page_to_virt(x) __va(PFN_PHYS(page_to_pfn(x)))
-         |                              ^~~~~~~~
-   include/asm-generic/memory_model.h:64:21: note: in expansion of macro '__page_to_pfn'
-      64 | #define page_to_pfn __page_to_pfn
-         |                     ^~~~~~~~~~~~~
-   include/linux/mm.h:117:39: note: in expansion of macro 'page_to_pfn'
-     117 | #define page_to_virt(x) __va(PFN_PHYS(page_to_pfn(x)))
-         |                                       ^~~~~~~~~~~
-   include/linux/mm.h:2728:16: note: in expansion of macro 'page_to_virt'
-    2728 |         return page_to_virt(ptdesc_page(pt));
-         |                ^~~~~~~~~~~~
-   include/linux/mm.h: In function 'ptdesc_address':
->> include/linux/mm.h:2733:30: error: implicit declaration of function 'ptdesc_folio'; did you mean 'page_folio'? [-Werror=implicit-function-declaration]
-    2733 |         return folio_address(ptdesc_folio(pt));
-         |                              ^~~~~~~~~~~~
-         |                              page_folio
->> include/linux/mm.h:2733:30: warning: passing argument 1 of 'folio_address' makes pointer from integer without a cast [-Wint-conversion]
-    2733 |         return folio_address(ptdesc_folio(pt));
-         |                              ^~~~~~~~~~~~~~~~
-         |                              |
-         |                              int
-   include/linux/mm.h:2151:55: note: expected 'const struct folio *' but argument is of type 'int'
-    2151 | static inline void *folio_address(const struct folio *folio)
-         |                                   ~~~~~~~~~~~~~~~~~~~~^~~~~
-   include/linux/mm.h: In function 'ptdesc_is_reserved':
->> include/linux/mm.h:2738:36: warning: passing argument 1 of 'folio_test_reserved' makes pointer from integer without a cast [-Wint-conversion]
-    2738 |         return folio_test_reserved(ptdesc_folio(pt));
-         |                                    ^~~~~~~~~~~~~~~~
-         |                                    |
-         |                                    int
-   In file included from include/linux/mmzone.h:23:
-   include/linux/page-flags.h:375:62: note: expected 'struct folio *' but argument is of type 'int'
-     375 | static __always_inline bool folio_test_##lname(struct folio *folio)     \
-         |                                                ~~~~~~~~~~~~~~^~~~~
-   include/linux/page-flags.h:423:9: note: in expansion of macro 'TESTPAGEFLAG'
-     423 |         TESTPAGEFLAG(uname, lname, policy)                              \
-         |         ^~~~~~~~~~~~
-   include/linux/page-flags.h:494:1: note: in expansion of macro 'PAGEFLAG'
-     494 | PAGEFLAG(Reserved, reserved, PF_NO_COMPOUND)
-         | ^~~~~~~~
-   include/linux/mm.h: In function 'ptdesc_alloc':
-   include/linux/mm.h:2745:16: warning: returning 'int' from a function with return type 'struct ptdesc *' makes pointer from integer without a cast [-Wint-conversion]
-    2745 |         return page_ptdesc(page);
-         |                ^~~~~~~~~~~~~~~~~
-   include/linux/mm.h: In function 'ptdesc_free':
->> include/linux/mm.h:2750:29: warning: initialization of 'struct page *' from 'int' makes pointer from integer without a cast [-Wint-conversion]
-    2750 |         struct page *page = ptdesc_page(pt);
-         |                             ^~~~~~~~~~~
-   include/linux/mm.h: In function 'free_reserved_ptdesc':
->> include/linux/mm.h:2988:28: warning: passing argument 1 of 'free_reserved_page' makes pointer from integer without a cast [-Wint-conversion]
-    2988 |         free_reserved_page(ptdesc_page(pt));
-         |                            ^~~~~~~~~~~~~~~
-         |                            |
-         |                            int
-   include/linux/mm.h:2971:52: note: expected 'struct page *' but argument is of type 'int'
-    2971 | static inline void free_reserved_page(struct page *page)
-         |                                       ~~~~~~~~~~~~~^~~~
-   cc1: some warnings being treated as errors
-   make[2]: *** [scripts/Makefile.build:114: arch/sh/kernel/asm-offsets.s] Error 1
-   make[2]: Target 'prepare' not remade because of errors.
-   make[1]: *** [Makefile:1286: prepare0] Error 2
-   make[1]: Target 'prepare' not remade because of errors.
-   make: *** [Makefile:226: __sub-make] Error 2
-   make: Target 'prepare' not remade because of errors.
-
-
-vim +/page_ptdesc +2723 include/linux/mm.h
-
-  2720	
-  2721	static inline struct ptdesc *virt_to_ptdesc(const void *x)
-  2722	{
-> 2723		return page_ptdesc(virt_to_head_page(x));
-  2724	}
-  2725	
-  2726	static inline void *ptdesc_to_virt(struct ptdesc *pt)
-  2727	{
-> 2728		return page_to_virt(ptdesc_page(pt));
-  2729	}
-  2730	
-  2731	static inline void *ptdesc_address(struct ptdesc *pt)
-  2732	{
-> 2733		return folio_address(ptdesc_folio(pt));
-  2734	}
-  2735	
-  2736	static inline bool ptdesc_is_reserved(struct ptdesc *pt)
-  2737	{
-> 2738		return folio_test_reserved(ptdesc_folio(pt));
-  2739	}
-  2740	
-  2741	static inline struct ptdesc *ptdesc_alloc(gfp_t gfp, unsigned int order)
-  2742	{
-  2743		struct page *page = alloc_pages(gfp | __GFP_COMP, order);
-  2744	
-  2745		return page_ptdesc(page);
-  2746	}
-  2747	
-  2748	static inline void ptdesc_free(struct ptdesc *pt)
-  2749	{
-> 2750		struct page *page = ptdesc_page(pt);
-  2751	
-  2752		__free_pages(page, compound_order(page));
-  2753	}
-  2754	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests
+Yes. This would provide a more reliable/clean way to learn PFNs for
+noiommufd case.
