@@ -2,230 +2,155 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 16FD16E60E7
-	for <lists+kvm@lfdr.de>; Tue, 18 Apr 2023 14:13:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CCE146E621C
+	for <lists+kvm@lfdr.de>; Tue, 18 Apr 2023 14:30:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230443AbjDRMMu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Apr 2023 08:12:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42812 "EHLO
+        id S231550AbjDRMaU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Apr 2023 08:30:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41524 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231429AbjDRMMM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Apr 2023 08:12:12 -0400
-Received: from mail-lf1-x12c.google.com (mail-lf1-x12c.google.com [IPv6:2a00:1450:4864:20::12c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D71AC2;
-        Tue, 18 Apr 2023 05:12:09 -0700 (PDT)
-Received: by mail-lf1-x12c.google.com with SMTP id 2adb3069b0e04-4edc51644b6so186422e87.1;
-        Tue, 18 Apr 2023 05:12:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1681819928; x=1684411928;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mZ8h+ndNTMIUG24ZQra7ng8ybLcIsdGEtKK7j7YDL08=;
-        b=DKG7EoCL8NbIwiEwC+Lab7Xdwm2o97Neo76N3IGb26fW83u795UP5NMTO80T0ICgzN
-         ygEdvInUIeyZqpapnLOj7pNQdqbn8Y+4cAi133gWIN2yUOCADMiOp01k0dqyd8X6G4/X
-         BNExSm/Qo8XydT6ZKW6ALf+499GSWLNClo02sFM8haVtc6eRNOc6ohJ6R2TZmQ8iIemM
-         x7qOo8+aUrc7ePtnzj1Qgg/4vbnAtE0vZhNqqmSKY9A2PhEDUdHd5iLT7ItPw+gdijMC
-         cSB4rTPlr1H+mB7v/iVdrlcN02/mFrOPShKz93m71KyMBMXfes4XioT+WgSPjyOBjyri
-         Ps8A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681819928; x=1684411928;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=mZ8h+ndNTMIUG24ZQra7ng8ybLcIsdGEtKK7j7YDL08=;
-        b=l9MC7XlUzVXE+5z2wa98WB0uSH3kM9gKJFF9wMRsMcrbgJjwEpVNje2F+nf7GEA/sk
-         sndeg0CNR3oJYts7xPjiyF9Nyr7xQK3nviV3jSktrvmkP6PsM8PzGcJ1F/C9w6DkCLpb
-         RIOwHSyyYL+xHBc4ZY71N/TRp4tEWRmllSN9XjxktW4eRX0Z8piSjnoAPI4mT9xY3WUb
-         1h7+RSXwx9qK2NhtkRALGIdNgkdkVR/71VIUoTYhtw4OTVxhSLrSOb0EWIbZDhCIl3k9
-         CmcdxDMU+QmBSLvaAmTJwDvnLOkeM1hRko68Bkjfn1NpvkoHHpV9Y/6hBIo13ObUUT47
-         r10A==
-X-Gm-Message-State: AAQBX9c2yZULcwNQ3iD8bPiSu8RfMjHD/+gXjzMViMQ4qJDmmr47VXN4
-        hjcQ6RCsL4JUrxMdAX50E4IeMlgGE+Q=
-X-Google-Smtp-Source: AKy350b3PoLPnK9MS/gcU1l56xGcDit7YsnJDAt4tbpHAyV9FER72oyh/Yro8rt/I8/TwzU/wx6mEQ==
-X-Received: by 2002:ac2:55a9:0:b0:4ec:9f36:9b63 with SMTP id y9-20020ac255a9000000b004ec9f369b63mr2793811lfg.5.1681819927548;
-        Tue, 18 Apr 2023 05:12:07 -0700 (PDT)
-Received: from localhost (88-115-161-74.elisa-laajakaista.fi. [88.115.161.74])
-        by smtp.gmail.com with ESMTPSA id o10-20020a05651238aa00b004cb43c9bf9asm2365908lft.208.2023.04.18.05.12.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Apr 2023 05:12:07 -0700 (PDT)
-Date:   Tue, 18 Apr 2023 15:11:10 +0300
-From:   Zhi Wang <zhi.wang.linux@gmail.com>
-To:     Sagi Shahar <sagis@google.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org,
-        Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Isaku Yamahata <isaku.yamahata@intel.com>,
-        Erdem Aktas <erdemaktas@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Kai Huang <kai.huang@intel.com>,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>
-Subject: Re: [RFC PATCH 3/5] KVM: TDX: Add base implementation for
- tdx_vm_move_enc_context_from
-Message-ID: <20230418151110.00001354.zhi.wang.linux@gmail.com>
-In-Reply-To: <20230407201921.2703758-4-sagis@google.com>
-References: <20230407201921.2703758-1-sagis@google.com>
-        <20230407201921.2703758-4-sagis@google.com>
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
+        with ESMTP id S231582AbjDRMaQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Apr 2023 08:30:16 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35391B45F
+        for <kvm@vger.kernel.org>; Tue, 18 Apr 2023 05:29:48 -0700 (PDT)
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 33ICIMg7014050;
+        Tue, 18 Apr 2023 12:29:01 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=QpZYidjndUqVd1Mii+cFllLm07y/WYPFtXd2CK3zaZw=;
+ b=eCwfdec8W1I6BBFLDUtMMRIeGNlpnVPNJnYMkZd7JogmTgqQ3eiY3+D6FOMP2afrn8sN
+ YIw9g5CeNrT4quamdhoW7/ml+VljH5CYtT6Fha0Cl+NrNoxEW8n/xFSTlqywtoI+104c
+ ezfW4+fR+28NM+RWiT57KctoIHYHDqTjtAWYt4uUeib4uM0dW3LI0zGvHGE04r5EdUXM
+ Tktiq4oCqT1+5o/VS8mWvqhxAiHk93Y0rY0yjulKSh/8nhVYRjE+qERY6y3d1hsEI+uy
+ hkgFCDW8zsNFKBjw1CAv4X27wFvORRDPyACzBaxjynyl6/EKUvWSEEnYTSSag+o2cylC /g== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3q1psxgdu4-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 18 Apr 2023 12:29:01 +0000
+Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 33ICBeGh036397;
+        Tue, 18 Apr 2023 12:29:00 GMT
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3q1psxgdt3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 18 Apr 2023 12:29:00 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 33HLaio1026665;
+        Tue, 18 Apr 2023 12:28:58 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+        by ppma04ams.nl.ibm.com (PPS) with ESMTPS id 3pykj6a11g-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 18 Apr 2023 12:28:57 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+        by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 33ICSshw47579604
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 18 Apr 2023 12:28:54 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 51D2D2004B;
+        Tue, 18 Apr 2023 12:28:54 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D20FE20043;
+        Tue, 18 Apr 2023 12:28:52 +0000 (GMT)
+Received: from [9.171.38.31] (unknown [9.171.38.31])
+        by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+        Tue, 18 Apr 2023 12:28:52 +0000 (GMT)
+Message-ID: <de346db4-2ea2-a001-6758-bcba22b6c0c8@linux.ibm.com>
+Date:   Tue, 18 Apr 2023 14:28:52 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.8.0
+Subject: Re: [PATCH v19 01/21] s390x/cpu topology: add s390 specifics to CPU
+ topology
+Content-Language: en-US
+To:     Thomas Huth <thuth@redhat.com>,
+        Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
+        qemu-s390x@nongnu.org
+Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
+        richard.henderson@linaro.org, david@redhat.com, cohuck@redhat.com,
+        mst@redhat.com, pbonzini@redhat.com, kvm@vger.kernel.org,
+        ehabkost@redhat.com, marcel.apfelbaum@gmail.com, eblake@redhat.com,
+        armbru@redhat.com, seiden@linux.ibm.com, nrb@linux.ibm.com,
+        frankja@linux.ibm.com, berrange@redhat.com, clg@kaod.org
+References: <20230403162905.17703-1-pmorel@linux.ibm.com>
+ <20230403162905.17703-2-pmorel@linux.ibm.com>
+ <e96e60dade206cb970b55bfc9d2a77643bd14d98.camel@linux.ibm.com>
+ <d7a0263f-4b27-387d-bf6c-fde71df3feb4@linux.ibm.com>
+ <80fce082-b468-2c9b-b370-a9de349d0860@redhat.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+In-Reply-To: <80fce082-b468-2c9b-b370-a9de349d0860@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 6dBTfQeSMVsivFtR-SRrppMS9kEAT0AS
+X-Proofpoint-ORIG-GUID: RuKdpQkDXOjULX6xgWFDWUfrrPvEfh5V
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
+ definitions=2023-04-18_09,2023-04-18_01,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999
+ lowpriorityscore=0 malwarescore=0 bulkscore=0 phishscore=0 impostorscore=0
+ adultscore=0 mlxscore=0 priorityscore=1501 clxscore=1015 spamscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2303200000 definitions=main-2304180100
+X-Spam-Status: No, score=-4.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri,  7 Apr 2023 20:19:19 +0000
-Sagi Shahar <sagis@google.com> wrote:
 
-What was the status of the src VM when calling the vm_move_enc_context_from?
-Is it still active like common live migration or it has been paused?
+On 4/18/23 12:15, Thomas Huth wrote:
+> On 18/04/2023 12.01, Pierre Morel wrote:
+>>
+>> On 4/18/23 10:53, Nina Schoetterl-Glausch wrote:
+>>> On Mon, 2023-04-03 at 18:28 +0200, Pierre Morel wrote:
+>>>> S390 adds two new SMP levels, drawers and books to the CPU
+>>>> topology.
+>>>> The S390 CPU have specific topology features like dedication
+>>>> and entitlement to give to the guest indications on the host
+>>>> vCPUs scheduling and help the guest take the best decisions
+>>>> on the scheduling of threads on the vCPUs.
+>>>>
+>>>> Let us provide the SMP properties with books and drawers levels
+>>>> and S390 CPU with dedication and entitlement,
+>>>>
+>>>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+>>>> Reviewed-by: Thomas Huth <thuth@redhat.com>
+>>>> ---
+>>>>   MAINTAINERS                     |  5 ++++
+>>>>   qapi/machine-common.json        | 22 ++++++++++++++
+>>>>   qapi/machine-target.json        | 12 ++++++++
+>>>>   qapi/machine.json               | 17 +++++++++--
+>>>>   include/hw/boards.h             | 10 ++++++-
+>>>>   include/hw/s390x/cpu-topology.h | 15 ++++++++++
+>>> Is hw/s390x the right path for cpu-topology?
+>>> I haven't understood the difference between hw/s390x and target/s390x
+>>> but target/s390x feels more correct, I could be mistaken though.
+>>
+>> AFAIK target/s390 is for CPU emulation code while hw/s390 is for 
+>> other emulation.
+>>
+>> So it depends how we classify the CPU topology, it is related to CPU 
+>> but it is no emulation.
+>
+> Normally I'd say target/ is for everything what happens within a CPU 
+> chip, and hw/ is for everything that happens outside of a CPU chip, 
+> i.e. machine definitions and other devices.
+> Now CPU topology is borderline - drawers and books are rather a 
+> concept of the machine and not of the CPU, but things like dies and 
+> threads rather happen within a CPU chip.
+> So I don't mind too much either way, but I think it's certainly ok to 
+> keep it in hw/s390x/ if you prefer that.
+>
+>  Thomas
+>
+Thanks for the clarification Thomas.
 
-> This should mostly match the logic in sev_vm_move_enc_context_from.
-> 
-> Signed-off-by: Sagi Shahar <sagis@google.com>
-> ---
->  arch/x86/kvm/vmx/main.c    | 10 +++++++
->  arch/x86/kvm/vmx/tdx.c     | 56 ++++++++++++++++++++++++++++++++++++++
->  arch/x86/kvm/vmx/tdx.h     |  2 ++
->  arch/x86/kvm/vmx/x86_ops.h |  5 ++++
->  4 files changed, 73 insertions(+)
-> 
-> diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
-> index 5b64fe5404958..9d5d0ac465bf6 100644
-> --- a/arch/x86/kvm/vmx/main.c
-> +++ b/arch/x86/kvm/vmx/main.c
-> @@ -979,6 +979,14 @@ static int vt_vcpu_mem_enc_ioctl(struct kvm_vcpu *vcpu, void __user *argp)
->  	return tdx_vcpu_ioctl(vcpu, argp);
->  }
->  
-> +static int vt_move_enc_context_from(struct kvm *kvm, unsigned int source_fd)
-> +{
-> +	if (!is_td(kvm))
-> +		return -ENOTTY;
-> +
-> +	return tdx_vm_move_enc_context_from(kvm, source_fd);
-> +}
-> +
->  #define VMX_REQUIRED_APICV_INHIBITS		       \
->  (						       \
->         BIT(APICV_INHIBIT_REASON_DISABLE)|	       \
-> @@ -1141,6 +1149,8 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
->  	.dev_mem_enc_ioctl = tdx_dev_ioctl,
->  	.mem_enc_ioctl = vt_mem_enc_ioctl,
->  	.vcpu_mem_enc_ioctl = vt_vcpu_mem_enc_ioctl,
-> +
-> +	.vm_move_enc_context_from = vt_move_enc_context_from,
->  };
->  
->  struct kvm_x86_init_ops vt_init_ops __initdata = {
-> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-> index 8af7e4e81c860..0999a6d827c99 100644
-> --- a/arch/x86/kvm/vmx/tdx.c
-> +++ b/arch/x86/kvm/vmx/tdx.c
-> @@ -2826,3 +2826,59 @@ int __init tdx_init(void)
->  		INIT_LIST_HEAD(&per_cpu(associated_tdvcpus, cpu));
->  	return 0;
->  }
-> +
-> +static __always_inline bool tdx_guest(struct kvm *kvm)
-> +{
-> +	struct kvm_tdx *tdx_kvm = to_kvm_tdx(kvm);
-> +
-> +	return tdx_kvm->finalized;
-> +}
-        return is_td_finalized()?
-> +
-> +static int tdx_migrate_from(struct kvm *dst, struct kvm *src)
-> +{
-> +	return -EINVAL;
-> +}
-> +
-> +int tdx_vm_move_enc_context_from(struct kvm *kvm, unsigned int source_fd)
-> +{
-> +	struct kvm_tdx *dst_tdx = to_kvm_tdx(kvm);
-> +	struct file *src_kvm_file;
-> +	struct kvm_tdx *src_tdx;
-> +	struct kvm *src_kvm;
-> +	int ret;
-> +
-> +	src_kvm_file = fget(source_fd);
-> +	if (!file_is_kvm(src_kvm_file)) {
-> +		ret = -EBADF;
-> +		goto out_fput;
-> +	}
-> +	src_kvm = src_kvm_file->private_data;
-> +	src_tdx = to_kvm_tdx(src_kvm);
-> +
-> +	ret = pre_move_enc_context_from(kvm, src_kvm,
-> +					&dst_tdx->migration_in_progress,
-> +					&src_tdx->migration_in_progress);
-> +	if (ret)
-> +		goto out_fput;
-> +
-> +	if (tdx_guest(kvm) || !tdx_guest(src_kvm)) {
-> +		ret = -EINVAL;
-> +		goto out_post;
-> +	}
-> +
-> +	ret = tdx_migrate_from(kvm, src_kvm);
-> +	if (ret)
-> +		goto out_post;
-> +
-> +	kvm_vm_dead(src_kvm);
-> +	ret = 0;
-> +
-> +out_post:
-> +	post_move_enc_context_from(kvm, src_kvm,
-> +				 &dst_tdx->migration_in_progress,
-> +				 &src_tdx->migration_in_progress);
-> +out_fput:
-> +	if (src_kvm_file)
-> +		fput(src_kvm_file);
-> +	return ret;
-> +}
-> diff --git a/arch/x86/kvm/vmx/tdx.h b/arch/x86/kvm/vmx/tdx.h
-> index 71818c5001862..21b7e710be1fd 100644
-> --- a/arch/x86/kvm/vmx/tdx.h
-> +++ b/arch/x86/kvm/vmx/tdx.h
-> @@ -24,6 +24,8 @@ struct kvm_tdx {
->  	atomic_t tdh_mem_track;
->  
->  	u64 tsc_offset;
-> +
-> +	atomic_t migration_in_progress;
->  };
->  
->  union tdx_exit_reason {
-> diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
-> index d049e0c72ed0c..275f5d75e9bf1 100644
-> --- a/arch/x86/kvm/vmx/x86_ops.h
-> +++ b/arch/x86/kvm/vmx/x86_ops.h
-> @@ -187,6 +187,8 @@ int tdx_vcpu_ioctl(struct kvm_vcpu *vcpu, void __user *argp);
->  void tdx_flush_tlb(struct kvm_vcpu *vcpu);
->  int tdx_sept_tlb_remote_flush(struct kvm *kvm);
->  void tdx_load_mmu_pgd(struct kvm_vcpu *vcpu, hpa_t root_hpa, int root_level);
-> +
-> +int tdx_vm_move_enc_context_from(struct kvm *kvm, unsigned int source_fd);
->  #else
->  static inline int tdx_init(void) { return 0; };
->  static inline int tdx_hardware_setup(struct kvm_x86_ops *x86_ops) { return -ENOSYS; }
-> @@ -241,6 +243,9 @@ static inline int tdx_vcpu_ioctl(struct kvm_vcpu *vcpu, void __user *argp) { ret
->  static inline void tdx_flush_tlb(struct kvm_vcpu *vcpu) {}
->  static inline int tdx_sept_tlb_remote_flush(struct kvm *kvm) { return 0; }
->  static inline void tdx_load_mmu_pgd(struct kvm_vcpu *vcpu, hpa_t root_hpa, int root_level) {}
-> +
-> +static inline int tdx_vm_move_enc_context_from(struct kvm *kvm, u
-> +					       nsigned int source_fd) { return -EOPNOTSUPP; }
->  #endif
->  
->  #if defined(CONFIG_INTEL_TDX_HOST) && defined(CONFIG_KVM_SMM)
+Pierre
+
 
