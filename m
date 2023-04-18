@@ -2,81 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D42736E6F75
-	for <lists+kvm@lfdr.de>; Wed, 19 Apr 2023 00:39:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EC4F86E6FFD
+	for <lists+kvm@lfdr.de>; Wed, 19 Apr 2023 01:40:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232690AbjDRWjh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Apr 2023 18:39:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59196 "EHLO
+        id S231862AbjDRXko (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Apr 2023 19:40:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52476 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232210AbjDRWje (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Apr 2023 18:39:34 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE0329011
-        for <kvm@vger.kernel.org>; Tue, 18 Apr 2023 15:38:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1681857527;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=nt4NAlgjVn3bwVtb59HBkHnV8fhtHInS8+cCLwzW3Oo=;
-        b=eplRB4EYd/BRVjPcXlKnIAmoU8v/IJ+6xjqeul0/TKtSP1b0uErY34i3/0cPcUYw/dvhll
-        JOFBL4SyTn+1omPMUqHD1hgc60+fPXUTEU1u4VqLuYiP2EiZVkMjZ+fOPTsfCPrvUg6jgi
-        8rv7LeW1lA3uQ2eG1IxkSrUuucgqfpM=
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com
- [209.85.166.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-498-ZED_Lv90PdqVkm9MeyzG1A-1; Tue, 18 Apr 2023 18:38:45 -0400
-X-MC-Unique: ZED_Lv90PdqVkm9MeyzG1A-1
-Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-760718e6816so254948639f.2
-        for <kvm@vger.kernel.org>; Tue, 18 Apr 2023 15:38:45 -0700 (PDT)
+        with ESMTP id S231726AbjDRXk1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Apr 2023 19:40:27 -0400
+Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68D6D14447
+        for <kvm@vger.kernel.org>; Tue, 18 Apr 2023 16:38:34 -0700 (PDT)
+Received: by mail-pl1-x64a.google.com with SMTP id d9443c01a7336-1a6a6727792so12284815ad.3
+        for <kvm@vger.kernel.org>; Tue, 18 Apr 2023 16:38:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1681861114; x=1684453114;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=KZZcbhEIXep3CsDuGt1XX4NDaxpUgfaEfLEdZFPghSQ=;
+        b=hm9bDIHJQIeAjh+0Wi4XwWxk5FEWf9SU2iifaVaFm2SHEQi+MfvRomA6hNFQPypblO
+         ajskHfJ21yXbKIgYGAkYYUqP0Ygv5283TmzvvXkvGPLvNGcY8IspXO87zRQLxoMgm7+A
+         44LeeK44/TjVVWr4ejNfVV1NjMwkMAjVBZwnQccmKfvNgc/rCXeLfUDkrNJrLDo+aM/k
+         5pFpnDDsiw5EE9Dzm//Lga2qY9q3z+kEsegm3Xv/EsUZ8FyYGeSCyJOZ49dURNwlnL2q
+         Y5lq2y1JVNHacWD2DjdNMHYSACvPNhgvLrByCLzQkYOtXAP0CIMW0LotNLXFCHIJamQv
+         WJuQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681857525; x=1684449525;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=nt4NAlgjVn3bwVtb59HBkHnV8fhtHInS8+cCLwzW3Oo=;
-        b=FBU0m6eHbkYzgtm702615GQtctdNpevedwuidnjUTMtzd4rKJu+/YXtTS5FBdwlPwQ
-         19SxAi0SWpZCN/dHwl0TAnI42yQgZjIQLTaTq7CHA3tfIXqc4rA3CZkG5JOmSNiWfAZg
-         6XRZdvKzCySl/sM4VnbqduA+0H7dv6mwSYReBaASakqVe+refBKUYWJgxnps4bdU4Hq4
-         T3I21rdh2x66SmwCMZ8ciZdezb8rKrDoYjICecitxQALQnhelGEXHM/8Tb6U4Kv36UEJ
-         ss5ychc5djf+083ieksOMNp08FFFDvT3u/T9QCLJhfru+shJx6mUaAVvI5sz6ZsQcbD8
-         tIGA==
-X-Gm-Message-State: AAQBX9fwhz9k4CvVqmOz6YuRnuHeyypty482WzNIUpaWwzzYfwejFrmg
-        K8K5FqXJiSCNjNqa6DiQQ+pkbZUQvLzJC8+4B0WZb0W5s9h6ofEVJuQG5J6a7ZI0neqj7c5KxXs
-        jzrgc+xMj8fdl
-X-Received: by 2002:a5d:80d6:0:b0:760:e9b6:e6da with SMTP id h22-20020a5d80d6000000b00760e9b6e6damr3037655ior.1.1681857524999;
-        Tue, 18 Apr 2023 15:38:44 -0700 (PDT)
-X-Google-Smtp-Source: AKy350YI7seWtoBWPqYjT1RzndFBvuqrDODhMJ9id2vYXvKT4+TRs/PoewlgjvRH85jDeChhXC2tOQ==
-X-Received: by 2002:a5d:80d6:0:b0:760:e9b6:e6da with SMTP id h22-20020a5d80d6000000b00760e9b6e6damr3037642ior.1.1681857524746;
-        Tue, 18 Apr 2023 15:38:44 -0700 (PDT)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id x6-20020a5d9906000000b007079249a9d1sm4275565iol.34.2023.04.18.15.38.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Apr 2023 15:38:44 -0700 (PDT)
-Date:   Tue, 18 Apr 2023 16:38:43 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Reinette Chatre <reinette.chatre@intel.com>
-Cc:     jgg@nvidia.com, yishaih@nvidia.com,
-        shameerali.kolothum.thodi@huawei.com, kevin.tian@intel.com,
-        tglx@linutronix.de, darwi@linutronix.de, kvm@vger.kernel.org,
-        dave.jiang@intel.com, jing2.liu@intel.com, ashok.raj@intel.com,
-        fenghua.yu@intel.com, tom.zanussi@linux.intel.com,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH V3 10/10] vfio/pci: Clear VFIO_IRQ_INFO_NORESIZE for
- MSI-X
-Message-ID: <20230418163843.7b4c0366.alex.williamson@redhat.com>
-In-Reply-To: <6c057618833a180da2147bffadb98e07cb73e045.1681837892.git.reinette.chatre@intel.com>
-References: <cover.1681837892.git.reinette.chatre@intel.com>
-        <6c057618833a180da2147bffadb98e07cb73e045.1681837892.git.reinette.chatre@intel.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        d=1e100.net; s=20221208; t=1681861114; x=1684453114;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=KZZcbhEIXep3CsDuGt1XX4NDaxpUgfaEfLEdZFPghSQ=;
+        b=Y9qtwVUXJN5CkbcsnNWT4u5ZGDx33VjriQvl26kBL73wLJ4y8DxQBiSiLBE94uFgmd
+         I6Iuenps2Qe5udDfvPYt8A5sJ7dkdsX329o2rmhT3Glmxsg5ejPRjMNLdxL1CwvfcT2q
+         ZExqAd82vIaiU06DC7lbMwsmaZHOG1q/s6g3Ul7PyZCcUb2XzgfezBto9nLfqhnMAaDa
+         4gDF9Y/YfeQyWDe40TANlsrbWT/W4k+UJVyrtAwk592g9FU/ySmjTEwVXCk4wnufNJlo
+         bwt8Db6HxoQrgSmoWtUjERbfhq2J3ITcMedKZrE3aKLtAxtHAoqXdDNGbUHnJS3ZqxiY
+         6uBg==
+X-Gm-Message-State: AAQBX9fRSNMRN+GZMpChN3qid/uzFGgBWIKgudlNErY63TtWZd6IqmFz
+        cX6J3BfHCIf8nN5SJaA7rzuigq6h8l5xalKcjg==
+X-Google-Smtp-Source: AKy350Y4yrZy3jVvN3wQp7+RZBqQNJ9wdfC4ADrLjc4RYHgu0a5KoOvNA6U3D5YLtIMfO6ES8yW87Yjz2s2FcMbRug==
+X-Received: from ackerleytng-cloudtop.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1f5f])
+ (user=ackerleytng job=sendgmr) by 2002:a17:903:41c5:b0:19a:7bd4:5b0d with
+ SMTP id u5-20020a17090341c500b0019a7bd45b0dmr1394106ple.8.1681861113900; Tue,
+ 18 Apr 2023 16:38:33 -0700 (PDT)
+Date:   Tue, 18 Apr 2023 23:38:32 +0000
+In-Reply-To: <ZDnAuGKrCO2wgjlG@google.com> (message from Sean Christopherson
+ on Fri, 14 Apr 2023 14:08:08 -0700)
+Mime-Version: 1.0
+Message-ID: <diqz354w92x3.fsf@ackerleytng-cloudtop.c.googlers.com>
+Subject: Re: [PATCH v10 9/9] KVM: Enable and expose KVM_MEM_PRIVATE
+From:   Ackerley Tng <ackerleytng@google.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     chao.p.peng@linux.intel.com, xiaoyao.li@intel.com,
+        isaku.yamahata@gmail.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-fsdevel@vger.kernel.org, linux-arch@vger.kernel.org,
+        linux-api@vger.kernel.org, linux-doc@vger.kernel.org,
+        qemu-devel@nongnu.org, pbonzini@redhat.com, corbet@lwn.net,
+        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+        joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, arnd@arndb.de, naoya.horiguchi@nec.com,
+        linmiaohe@huawei.com, x86@kernel.org, hpa@zytor.com,
+        hughd@google.com, jlayton@kernel.org, bfields@fieldses.org,
+        akpm@linux-foundation.org, shuah@kernel.org, rppt@kernel.org,
+        steven.price@arm.com, mail@maciej.szmigiero.name, vbabka@suse.cz,
+        vannapurve@google.com, yu.c.zhang@linux.intel.com,
+        kirill.shutemov@linux.intel.com, luto@kernel.org,
+        jun.nakajima@intel.com, dave.hansen@intel.com, ak@linux.intel.com,
+        david@redhat.com, aarcange@redhat.com, ddutile@redhat.com,
+        dhildenb@redhat.com, qperret@google.com, tabba@google.com,
+        michael.roth@amd.com, mhocko@suse.com, wei.w.wang@intel.com
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -84,61 +83,193 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 18 Apr 2023 10:29:21 -0700
-Reinette Chatre <reinette.chatre@intel.com> wrote:
+Sean Christopherson <seanjc@google.com> writes:
 
-> Dynamic MSI-X is supported. Clear VFIO_IRQ_INFO_NORESIZE
-> to provide guidance to user space.
-> 
-> Signed-off-by: Reinette Chatre <reinette.chatre@intel.com>
-> ---
-> Changes since V2:
-> - Use new vdev->has_dyn_msix property instead of calling
->   pci_msix_can_alloc_dyn() directly. (Alex)
-> 
-> Changes since RFC V1:
-> - Only advertise VFIO_IRQ_INFO_NORESIZE for MSI-X devices that
->   can actually support dynamic allocation. (Alex)
-> 
->  drivers/vfio/pci/vfio_pci_core.c | 4 +++-
->  include/uapi/linux/vfio.h        | 3 +++
->  2 files changed, 6 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
-> index a3635a8e54c8..4050ad3388c2 100644
-> --- a/drivers/vfio/pci/vfio_pci_core.c
-> +++ b/drivers/vfio/pci/vfio_pci_core.c
-> @@ -1114,7 +1114,9 @@ static int vfio_pci_ioctl_get_irq_info(struct vfio_pci_core_device *vdev,
->  	if (info.index == VFIO_PCI_INTX_IRQ_INDEX)
->  		info.flags |=
->  			(VFIO_IRQ_INFO_MASKABLE | VFIO_IRQ_INFO_AUTOMASKED);
-> -	else
-> +	else if ((info.index != VFIO_PCI_MSIX_IRQ_INDEX) ||
-> +		 (info.index == VFIO_PCI_MSIX_IRQ_INDEX &&
-> +		  !vdev->has_dyn_msix))
+> On Tue, Mar 28, 2023, Chao Peng wrote:
+>> On Fri, Mar 24, 2023 at 10:29:25AM +0800, Xiaoyao Li wrote:
+>> > On 3/24/2023 10:10 AM, Chao Peng wrote:
+>> > > On Wed, Mar 22, 2023 at 05:41:31PM -0700, Isaku Yamahata wrote:
+>> > > > On Wed, Mar 08, 2023 at 03:40:26PM +0800,
+>> > > > Chao Peng <chao.p.peng@linux.intel.com> wrote:
+>> > > >
+>> > > > > On Wed, Mar 08, 2023 at 12:13:24AM +0000, Ackerley Tng wrote:
+>> > > > > > Chao Peng <chao.p.peng@linux.intel.com> writes:
+>> > > > > >
+>> > > > > > > On Sat, Jan 14, 2023 at 12:01:01AM +0000, Sean  
+>> Christopherson wrote:
+>> > > > > > > > On Fri, Dec 02, 2022, Chao Peng wrote:
+>> > > > > > > +static bool kvm_check_rmem_offset_alignment(u64 offset, u64  
+>> gpa)
+>> > > > > > > +{
+>> > > > > > > +	if (!offset)
+>> > > > > > > +		return true;
+>> > > > > > > +	if (!gpa)
+>> > > > > > > +		return false;
+>> > > > > > > +
+>> > > > > > > +	return !!(count_trailing_zeros(offset) >=  
+>> count_trailing_zeros(gpa));
+>> > > >
+>> > > > This check doesn't work expected. For example, offset = 2GB,  
+>> gpa=4GB
+>> > > > this check fails.
+>> > >
+>> > > This case is expected to fail as Sean initially suggested[*]:
+>> > >    I would rather reject memslot if the gfn has lesser alignment than
+>> > >    the offset. I'm totally ok with this approach _if_ there's a use  
+>> case.
+>> > >    Until such a use case presents itself, I would rather be  
+>> conservative
+>> > >    from a uAPI perspective.
+>> > >
+>> > > I understand that we put tighter restriction on this but if you see  
+>> such
+>> > > restriction is really a big issue for real usage, instead of a
+>> > > theoretical problem, then we can loosen the check here. But at that  
+>> time
+>> > > below code is kind of x86 specific and may need improve.
+>> > >
+>> > > BTW, in latest code, I replaced count_trailing_zeros() with fls64():
+>> > >    return !!(fls64(offset) >= fls64(gpa));
+>> >
+>> > wouldn't it be !!(ffs64(offset) <= ffs64(gpa)) ?
 
-Isn't this the same as:
+>> As the function document explains, here we want to return true when
+>> ALIGNMENT(offset) >= ALIGNMENT(gpa), so '>=' is what we need.
 
-	(info.index != VFIO_PCI_MSIX_IRQ_INDEX || !vdev->has_dyn_msix)
+>> It's worthy clarifying that in Sean's original suggestion he actually
+>> mentioned the opposite. He said 'reject memslot if the gfn has lesser
+>> alignment than the offset', but I wonder this is his purpose, since
+>> if ALIGNMENT(offset) < ALIGNMENT(gpa), we wouldn't be possible to map
+>> the page as largepage. Consider we have below config:
 
-Thanks,
-Alex
+>>    gpa=2M, offset=1M
 
->  		info.flags |= VFIO_IRQ_INFO_NORESIZE;
->  
->  	return copy_to_user(arg, &info, minsz) ? -EFAULT : 0;
-> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-> index 0552e8dcf0cb..1a36134cae5c 100644
-> --- a/include/uapi/linux/vfio.h
-> +++ b/include/uapi/linux/vfio.h
-> @@ -511,6 +511,9 @@ struct vfio_region_info_cap_nvlink2_lnkspd {
->   * then add and unmask vectors, it's up to userspace to make the decision
->   * whether to allocate the maximum supported number of vectors or tear
->   * down setup and incrementally increase the vectors as each is enabled.
-> + * Absence of the NORESIZE flag indicates that vectors can be enabled
-> + * and disabled dynamically without impacting other vectors within the
-> + * index.
->   */
->  struct vfio_irq_info {
->  	__u32	argsz;
+>> In this case KVM tries to map gpa at 2M as 2M hugepage but the physical
+>> page at the offset(1M) in private_fd cannot provide the 2M page due to
+>> misalignment.
 
+>> But as we discussed in the off-list thread, here we do find a real use
+>> case indicating this check is too strict. i.e. QEMU immediately fails
+>> when launch a guest > 2G memory. For this case QEMU splits guest memory
+>> space into two slots:
+
+>>    Slot#1(ram_below_4G): gpa=0x0, offset=0x0, size=2G
+>>    Slot#2(ram_above_4G): gpa=4G,  offset=2G,  size=totalsize-2G
+
+>> This strict alignment check fails for slot#2 because offset(2G) has less
+>> alignment than gpa(4G). To allow this, one solution can revert to my
+>> previous change in kvm_alloc_memslot_metadata() to disallow hugepage
+>> only when the offset/gpa are not aligned to related page size.
+
+>> Sean, How do you think?
+
+> I agree, a pure alignment check is too restrictive, and not really what I  
+> intended
+> despite past me literally saying that's what I wanted :-)  I think I may  
+> have also
+> inverted the "less alignment" statement, but luckily I believe that ends  
+> up being
+> a moot point.
+
+> The goal is to avoid having to juggle scenarios where KVM wants to create  
+> a hugepage,
+> but restrictedmem can't provide one because of a misaligned file offset.   
+> I think
+> the rule we want is that the offset must be aligned to the largest page  
+> size allowed
+> by the memslot _size_.  E.g. on x86, if the memslot size is >=1GiB then  
+> the offset
+> must be 1GiB or beter, ditto for >=2MiB and >=4KiB (ignoring that 4KiB is  
+> already a
+> requirement).
+
+> We could loosen that to say the largest size allowed by the memslot, but  
+> I don't
+> think that's worth the effort unless it's trivially easy to implement in  
+> code,
+> e.g. KVM could technically allow a 4KiB aligned offset if the memslot is  
+> 2MiB
+> sized but only 4KiB aligned on the GPA.  I doubt there's a real use case  
+> for such
+> a memslot, so I want to disallow that unless it's super easy to implement.
+
+Checking my understanding here about why we need this alignment check:
+
+When KVM requests a page from restrictedmem, KVM will provide an offset
+into the file in terms of 4K pages.
+
+When shmem is configured to use hugepages, shmem_get_folio() will round
+the requested offset down to the nearest hugepage-aligned boundary in
+shmem_alloc_hugefolio().
+
+Example of problematic configuration provided to
+KVM_SET_USER_MEMORY_REGION2:
+
++ shmem configured to use 1GB pages
++ restrictedmem_offset provided to KVM_SET_USER_MEMORY_REGION2: 0x4000
++ memory_size provided in KVM_SET_USER_MEMORY_REGION2: 1GB
++ KVM requests offset (pgoff_t) 0x8, which translates to offset 0x8000
+
+restrictedmem_get_page() and shmem_get_folio() returns the page for
+offset 0x0 in the file, since rounding down 0x8000 to the nearest 1GB is
+0x0. This is allocating outside the range that KVM is supposed to use,
+since the parameters provided in KVM_SET_USER_MEMORY_REGION2 is only
+supposed to be offset 0x4000 to (0x4000 + 1GB = 0x40004000) in the file.
+
+IIUC shmem will actually just round down (0x4000 rounded down to nearest
+1GB will be 0x0) and allocate without checking bounds, so if offset 0x0
+to 0x4000 in the file were supposed to be used by something else, there
+might be issues.
+
+Hence, this alignment check ensures that rounding down of any offsets
+provided by KVM (based on page size configured in the backing file
+provided) to restrictedmem_get_page() must not go below the offset
+provided to KVM_SET_USER_MEMORY_REGION2.
+
+Enforcing alignment of restrictedmem_offset based on the currently-set
+page size in the backing file (i.e. shmem) may not be effective, since
+the size of the pages in the backing file can be adjusted to a larger
+size after KVM_SET_USER_MEMORY_REGION2 succeeds. With that, we may still
+end up allocating outside the range that KVM was provided with.
+
+Hence, to be safe, we should check alignment to the max page size across
+all backing filesystems, so the constraint is
+
+     rounding down restrictedmem_offset to
+     min(max page size across all backing filesystems,
+         max page size that fits in memory_size) == restrictedmem_offset
+
+which is the same check as
+
+     restrictedmem_offset must be aligned to min(max page size across all
+     backing filesystems, max page size that fits in memory_size)
+
+which can safely reduce to
+
+     restrictedmem_offset must be aligned to max page size that fits in
+     memory_size
+
+since "max page size that fits in memory_size" is probably <= to "max
+page size across all backing filesystems", and if it's larger, it'll
+just be a tighter constraint.
+
+If the above understanding is correct:
+
++ We must enforce this in the KVM_SET_USER_MEMORY_REGION2 handler, since
+   IIUC shmem will just round down and allocate without checking bounds.
+
+     + I think this is okay because holes in the restrictedmem file (in
+       terms of offset) made to accommodate this constraint don't cost us
+       anything anyway(?) Are they just arbitrary offsets in a file? In
+       our case, this file is usually a new and empty file.
+
+     + In the case of migration of a restrictedmem file between two KVM
+       VMs, this constraint would cause a problem is if the largest
+       possible page size on the destination machine is larger than that
+       of the source machine. In that case, we might have to move the
+       data in the file to a different offset (a separate problem).
+
++ On this note, it seems like there is no check for when the range is
+   smaller than the allocated page? Like if the range provided is 4KB in
+   size, but shmem is then configured to use a 1GB page, will we end up
+   allocating past the end of the range?
