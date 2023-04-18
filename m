@@ -2,146 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2DDE06E5E60
-	for <lists+kvm@lfdr.de>; Tue, 18 Apr 2023 12:13:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ABA0F6E5E69
+	for <lists+kvm@lfdr.de>; Tue, 18 Apr 2023 12:16:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231259AbjDRKNk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Apr 2023 06:13:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42290 "EHLO
+        id S229963AbjDRKQa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Apr 2023 06:16:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43666 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230477AbjDRKN2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Apr 2023 06:13:28 -0400
-Received: from smtp-fw-6001.amazon.com (smtp-fw-6001.amazon.com [52.95.48.154])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30E8E76BD
-        for <kvm@vger.kernel.org>; Tue, 18 Apr 2023 03:13:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.co.uk; i=@amazon.co.uk; q=dns/txt;
-  s=amazon201209; t=1681812801; x=1713348801;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=cAjxYkkeRSCzgrpXxpzIzKMLy7MpdwgBTi50ZLdSD+w=;
-  b=TFns3aXZ/z4P7zaTapFLDsxxIEwwnzRsBABCTfW7mx0clA7lTkhrHgnx
-   CLuFRSFOqJE0lLHfkYdvDOXkJ1u7bMzfhICXghl84jPPw5iGGbf1KjdLJ
-   rG409HOX9ATbr1L7AO6ejhsoqCR7kmm34uyprcA1vxlzRXzF6h0vObtw1
-   4=;
-X-IronPort-AV: E=Sophos;i="5.99,206,1677542400"; 
-   d="scan'208";a="321637039"
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO email-inbound-relay-pdx-2b-m6i4x-ed19f671.us-west-2.amazon.com) ([10.43.8.2])
-  by smtp-border-fw-6001.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Apr 2023 10:13:14 +0000
-Received: from EX19MTAUEC001.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan3.pdx.amazon.com [10.236.137.198])
-        by email-inbound-relay-pdx-2b-m6i4x-ed19f671.us-west-2.amazon.com (Postfix) with ESMTPS id B509F80F9A;
-        Tue, 18 Apr 2023 10:13:12 +0000 (UTC)
-Received: from EX19D008UEA002.ant.amazon.com (10.252.134.125) by
- EX19MTAUEC001.ant.amazon.com (10.252.135.222) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.26; Tue, 18 Apr 2023 10:13:12 +0000
-Received: from EX19MTAUWC001.ant.amazon.com (10.250.64.145) by
- EX19D008UEA002.ant.amazon.com (10.252.134.125) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.26; Tue, 18 Apr 2023 10:13:12 +0000
-Received: from dev-dsk-metikaya-1c-d447d167.eu-west-1.amazon.com
- (10.13.250.103) by mail-relay.amazon.com (10.250.64.145) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.25 via Frontend Transport; Tue, 18 Apr 2023 10:13:09 +0000
-From:   Metin Kaya <metikaya@amazon.co.uk>
-To:     <kvm@vger.kernel.org>, <pbonzini@redhat.com>
-CC:     <x86@kernel.org>, <bp@alien8.de>, <dwmw@amazon.co.uk>,
-        <paul@xen.org>, <seanjc@google.com>, <tglx@linutronix.de>,
-        <mingo@redhat.com>, <dave.hansen@linux.intel.com>,
-        <joao.m.martins@oracle.com>, Metin Kaya <metikaya@amazon.co.uk>
-Subject: [PATCH v3] KVM: x86/xen: Implement hvm_op/HVMOP_flush_tlbs hypercall
-Date:   Tue, 18 Apr 2023 10:13:06 +0000
-Message-ID: <20230418101306.98263-1-metikaya@amazon.co.uk>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <138f584bd86fe68aa05f20db3de80bae61880e11.camel@infradead.org>
-References: <138f584bd86fe68aa05f20db3de80bae61880e11.camel@infradead.org>
+        with ESMTP id S229655AbjDRKQ3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Apr 2023 06:16:29 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73BB43580
+        for <kvm@vger.kernel.org>; Tue, 18 Apr 2023 03:15:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1681812940;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=yzOfbIO5bOqjfu9Ib99/kh3hbnxQwZKu2ebFntng39Q=;
+        b=R7PysgfvuBsQhkqKeJLZGpdkyiRZaXT9Srxbuu4QxHBUGRPS9rVZVXLTGdhA8+akennPQW
+        lNbW6C5lEhoom4Io+Sz4nTfY2lbbRTmYXITf55BaA3aFqrjDHgHxcWPc5gkRTQ/NNkPWED
+        +ZESt65O7lGNi6ld02ZQMle7aNFez3s=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-646-tAdCrEaWNHK4L4jA5Iud7Q-1; Tue, 18 Apr 2023 06:15:39 -0400
+X-MC-Unique: tAdCrEaWNHK4L4jA5Iud7Q-1
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-2f831f6e175so1102775f8f.2
+        for <kvm@vger.kernel.org>; Tue, 18 Apr 2023 03:15:39 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1681812938; x=1684404938;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=yzOfbIO5bOqjfu9Ib99/kh3hbnxQwZKu2ebFntng39Q=;
+        b=akJLaEsLI2J2ngq3Kkrg2jTuW3raZF+/Sjy1BBjyPlmvQ218AqI0/eVMlq23HLiVIE
+         AcVL7+IfZI0yI0WkzSVpUAQHLkvbnOpci1Oms/JUgrn0ASxYwZe6lUYcV+xWtcmdBm7u
+         0WSom0vMSvCGRwVd0ZlN5kd353FwrRKsLF7YFIYAIe0KWd98ZLNNp1HnGORFTQhprO+2
+         NEe1+YPWHbJ8nhEagq6tc2YFuJevxEKX/UHow33DSU/iUPxhKHGAhQe0hcVcA9iRdlDK
+         HSYYyIXC9havFj8e9oj3Hk40Go4N072qs5hRleDvqlk8t69rmwi0pLekOAgECqYGcJ69
+         nzQw==
+X-Gm-Message-State: AAQBX9chxdCzEoqwW7A/8L3pdFlYbKORmx+mEgbt9S02dtDQ7Lal0Sqs
+        kwgDvE1rp80/W5yFHDmOitMVO4tZD9vfUkyEEQLi1xgKlEKMcvBQRYFOkQAHlhU2MUume6TEVYs
+        u06+lka+sxA7X
+X-Received: by 2002:adf:eb91:0:b0:2fc:b3be:7436 with SMTP id t17-20020adfeb91000000b002fcb3be7436mr1443470wrn.25.1681812938550;
+        Tue, 18 Apr 2023 03:15:38 -0700 (PDT)
+X-Google-Smtp-Source: AKy350ZJEyY6xoKQeFhLWcqB9Jp1d7Fo8Yyu1vap0e108ePZWOzD5VVWtvbm8h8dxiw3fa78qvUVlw==
+X-Received: by 2002:adf:eb91:0:b0:2fc:b3be:7436 with SMTP id t17-20020adfeb91000000b002fcb3be7436mr1443445wrn.25.1681812938278;
+        Tue, 18 Apr 2023 03:15:38 -0700 (PDT)
+Received: from [192.168.0.3] (ip-109-43-176-59.web.vodafone.de. [109.43.176.59])
+        by smtp.gmail.com with ESMTPSA id d2-20020adffbc2000000b002fddcb73162sm909475wrs.71.2023.04.18.03.15.36
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 18 Apr 2023 03:15:37 -0700 (PDT)
+Message-ID: <80fce082-b468-2c9b-b370-a9de349d0860@redhat.com>
+Date:   Tue, 18 Apr 2023 12:15:36 +0200
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.9.0
+Subject: Re: [PATCH v19 01/21] s390x/cpu topology: add s390 specifics to CPU
+ topology
+Content-Language: en-US
+To:     Pierre Morel <pmorel@linux.ibm.com>,
+        Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
+        qemu-s390x@nongnu.org
+Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
+        richard.henderson@linaro.org, david@redhat.com, cohuck@redhat.com,
+        mst@redhat.com, pbonzini@redhat.com, kvm@vger.kernel.org,
+        ehabkost@redhat.com, marcel.apfelbaum@gmail.com, eblake@redhat.com,
+        armbru@redhat.com, seiden@linux.ibm.com, nrb@linux.ibm.com,
+        frankja@linux.ibm.com, berrange@redhat.com, clg@kaod.org
+References: <20230403162905.17703-1-pmorel@linux.ibm.com>
+ <20230403162905.17703-2-pmorel@linux.ibm.com>
+ <e96e60dade206cb970b55bfc9d2a77643bd14d98.camel@linux.ibm.com>
+ <d7a0263f-4b27-387d-bf6c-fde71df3feb4@linux.ibm.com>
+From:   Thomas Huth <thuth@redhat.com>
+In-Reply-To: <d7a0263f-4b27-387d-bf6c-fde71df3feb4@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,T_SCC_BODY_TEXT_LINE,T_SPF_PERMERROR
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-4.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Implement in-KVM support for Xen's HVMOP_flush_tlbs hypercall, which
-allows the guest to flush all vCPU's TLBs. KVM doesn't provide an
-ioctl() to precisely flush guest TLBs, and punting to userspace would
-likely negate the performance benefits of avoiding a TLB shootdown in
-the guest.
+On 18/04/2023 12.01, Pierre Morel wrote:
+> 
+> On 4/18/23 10:53, Nina Schoetterl-Glausch wrote:
+>> On Mon, 2023-04-03 at 18:28 +0200, Pierre Morel wrote:
+>>> S390 adds two new SMP levels, drawers and books to the CPU
+>>> topology.
+>>> The S390 CPU have specific topology features like dedication
+>>> and entitlement to give to the guest indications on the host
+>>> vCPUs scheduling and help the guest take the best decisions
+>>> on the scheduling of threads on the vCPUs.
+>>>
+>>> Let us provide the SMP properties with books and drawers levels
+>>> and S390 CPU with dedication and entitlement,
+>>>
+>>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+>>> Reviewed-by: Thomas Huth <thuth@redhat.com>
+>>> ---
+>>>   MAINTAINERS                     |  5 ++++
+>>>   qapi/machine-common.json        | 22 ++++++++++++++
+>>>   qapi/machine-target.json        | 12 ++++++++
+>>>   qapi/machine.json               | 17 +++++++++--
+>>>   include/hw/boards.h             | 10 ++++++-
+>>>   include/hw/s390x/cpu-topology.h | 15 ++++++++++
+>> Is hw/s390x the right path for cpu-topology?
+>> I haven't understood the difference between hw/s390x and target/s390x
+>> but target/s390x feels more correct, I could be mistaken though.
+> 
+> AFAIK target/s390 is for CPU emulation code while hw/s390 is for other 
+> emulation.
+> 
+> So it depends how we classify the CPU topology, it is related to CPU but it 
+> is no emulation.
 
-Signed-off-by: Metin Kaya <metikaya@amazon.co.uk>
+Normally I'd say target/ is for everything what happens within a CPU chip, 
+and hw/ is for everything that happens outside of a CPU chip, i.e. machine 
+definitions and other devices.
+Now CPU topology is borderline - drawers and books are rather a concept of 
+the machine and not of the CPU, but things like dies and threads rather 
+happen within a CPU chip.
+So I don't mind too much either way, but I think it's certainly ok to keep 
+it in hw/s390x/ if you prefer that.
 
----
-v3:
-  - Addressed comments for v2.
-  - Verified with XTF/invlpg test case.
-
-v2:
-  - Removed an irrelevant URL from commit message.
----
- arch/x86/kvm/xen.c                 | 15 +++++++++++++++
- include/xen/interface/hvm/hvm_op.h |  3 +++
- 2 files changed, 18 insertions(+)
-
-diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
-index 40edf4d1974c..a63c48e8d8fa 100644
---- a/arch/x86/kvm/xen.c
-+++ b/arch/x86/kvm/xen.c
-@@ -21,6 +21,7 @@
- #include <xen/interface/vcpu.h>
- #include <xen/interface/version.h>
- #include <xen/interface/event_channel.h>
-+#include <xen/interface/hvm/hvm_op.h>
- #include <xen/interface/sched.h>
- 
- #include <asm/xen/cpuid.h>
-@@ -1330,6 +1331,17 @@ static bool kvm_xen_hcall_sched_op(struct kvm_vcpu *vcpu, bool longmode,
- 	return false;
- }
- 
-+static bool kvm_xen_hcall_hvm_op(struct kvm_vcpu *vcpu, int cmd, u64 arg, u64 *r)
-+{
-+	if (cmd == HVMOP_flush_tlbs && !arg) {
-+		kvm_make_all_cpus_request(vcpu->kvm, KVM_REQ_TLB_FLUSH_GUEST);
-+		*r = 0;
-+		return true;
-+	}
-+
-+	return false;
-+}
-+
- struct compat_vcpu_set_singleshot_timer {
-     uint64_t timeout_abs_ns;
-     uint32_t flags;
-@@ -1501,6 +1513,9 @@ int kvm_xen_hypercall(struct kvm_vcpu *vcpu)
- 			timeout |= params[1] << 32;
- 		handled = kvm_xen_hcall_set_timer_op(vcpu, timeout, &r);
- 		break;
-+	case __HYPERVISOR_hvm_op:
-+		handled = kvm_xen_hcall_hvm_op(vcpu, params[0], params[1], &r);
-+		break;
- 	}
- 	default:
- 		break;
-diff --git a/include/xen/interface/hvm/hvm_op.h b/include/xen/interface/hvm/hvm_op.h
-index 03134bf3cec1..240d8149bc04 100644
---- a/include/xen/interface/hvm/hvm_op.h
-+++ b/include/xen/interface/hvm/hvm_op.h
-@@ -16,6 +16,9 @@ struct xen_hvm_param {
- };
- DEFINE_GUEST_HANDLE_STRUCT(xen_hvm_param);
- 
-+/* Flushes guest TLBs for all vCPUs: @arg must be 0. */
-+#define HVMOP_flush_tlbs            5
-+
- /* Hint from PV drivers for pagetable destruction. */
- #define HVMOP_pagetable_dying       9
- struct xen_hvm_pagetable_dying {
--- 
-2.39.2
+  Thomas
 
