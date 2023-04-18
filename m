@@ -2,76 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D3E516E6AB8
-	for <lists+kvm@lfdr.de>; Tue, 18 Apr 2023 19:15:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 09F326E6AB7
+	for <lists+kvm@lfdr.de>; Tue, 18 Apr 2023 19:14:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231895AbjDRRPU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Apr 2023 13:15:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55706 "EHLO
+        id S232170AbjDRROz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Apr 2023 13:14:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55202 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231390AbjDRRPS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Apr 2023 13:15:18 -0400
-Received: from mail-lj1-x22f.google.com (mail-lj1-x22f.google.com [IPv6:2a00:1450:4864:20::22f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5B1213C18
-        for <kvm@vger.kernel.org>; Tue, 18 Apr 2023 10:14:37 -0700 (PDT)
-Received: by mail-lj1-x22f.google.com with SMTP id a15so231082ljq.13
-        for <kvm@vger.kernel.org>; Tue, 18 Apr 2023 10:14:37 -0700 (PDT)
+        with ESMTP id S232494AbjDRROv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Apr 2023 13:14:51 -0400
+Received: from mail-wr1-x42a.google.com (mail-wr1-x42a.google.com [IPv6:2a00:1450:4864:20::42a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9ADB715478
+        for <kvm@vger.kernel.org>; Tue, 18 Apr 2023 10:14:25 -0700 (PDT)
+Received: by mail-wr1-x42a.google.com with SMTP id ffacd0b85a97d-2fa36231b1cso1258398f8f.2
+        for <kvm@vger.kernel.org>; Tue, 18 Apr 2023 10:14:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1681838075; x=1684430075;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6cf1rCGBfFsm7IF2+Dyi3Wvezc5h9U/VnOfZVSR23P0=;
-        b=gowjJ1xsZFbFsEd1QHrmKC/KvgzOkJwsqYXeITFP2diqAtzycD6P63Zdr5mLyqg4OR
-         7Lhcp5dkobsHkmtEt3bzRoI4l9skBxLBrSzPGTmYX6qDWUu/kXkGuqnzwuTkW00Mzer5
-         1ZvCW4dvhP5YH/M2NUIkHC9h1uzWDVoAxCKbXrPcC6wEc9bbfyP2zlojdsMzLqGvBfqd
-         qY76cw8NX6IxX1Q+tBT/g8Jk2o4ZIAeCC6MOEW4aT0S+sgyd4+9U6rxS23O07Z2ACzWF
-         RWAGJ8NyFVS9ArT00ogfykYlxIB92MNOOHe3gqY+3uO7QO+LwzPTv/epP0g67Lkid2oH
-         JYYw==
+        d=ventanamicro.com; s=google; t=1681838063; x=1684430063;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=WZc11MEoV1JrWm0UyoOIRAlBssx8JIBOhjzT0xozkHY=;
+        b=MBxZVc8bEWalAaspvBxNQW4D3xWeHWtSQ99yB5U0RFM9GXQHnWFIiX4LyM+0qq1rx8
+         5HrTH2/9AXhyB4LoePVjFr4Q510MjtFoIHDVS6ZbyKiHfWI0iM+5A0kxICqb0nPwZhFV
+         ZiJBF6/A7qvEhqzoVOqlgBUR4JtxGga8iB6PhTPYu2RO/wAb36nwvniq4du2khcGC/S5
+         arhWpZ3P/bQYuacT1acSa8oDlVjF7xJPWNBg5O1CJopCk4j8AtsD93W0UPY5vK+Y+Inh
+         kUS5Wg0bTogvDRaiQbkyrLtdw6w9NzXMDwZ2XJId1dmakmvkEaZ/DKh27x3oKx9vHUO9
+         4rDQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681838075; x=1684430075;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=6cf1rCGBfFsm7IF2+Dyi3Wvezc5h9U/VnOfZVSR23P0=;
-        b=QSui07Hv/xxEswHtfmgzSHVJg+elDWFxg9h2wC1ZZ2d0QKoMyYVpiRggCuNkMYd4sR
-         2ESOjDH0c0kXfuGubiKwRZkrfsSosg+rLtYjzF02BD0suW4JF97457XtdXLKbcj6VGEW
-         FXg06w1zR6NXFTbxayaonKNfMCHqbXMm52wohpbsuXz8U6uYhL/Dyq7O6ERSBeOkDCU+
-         uQsIonhY+f+H3o/MooccHTDpHMxD6uSIeDM401Sal6FYIGq919JHTy+IPSY/tB7XhSy6
-         06JSANHmpstwxtFzf8jLvWSxlz0k/LPUWUBsG/14zf9Sen07fF7etm0CBmAY7SbbPvmW
-         otkg==
-X-Gm-Message-State: AAQBX9fgY/deO9aGkxmdDTyTBwbDL9L0fQ8QeAvcJlMQaTq+VCxQl/TA
-        kv83befqkh4qL4ihxgdHxuOrA2WtmUhpoWwwMP6rjQ==
-X-Google-Smtp-Source: AKy350YANFo7McMyTwZbFijRpweMJain1zZv12KJ7Z9pVpf6BezffThdnp6xFsMVipm2gHZQCtBFkOHIKBNQ6Dx12a0=
-X-Received: by 2002:a2e:994f:0:b0:2a8:b1e3:8979 with SMTP id
- r15-20020a2e994f000000b002a8b1e38979mr1064705ljj.7.1681838075093; Tue, 18 Apr
- 2023 10:14:35 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1681838063; x=1684430063;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=WZc11MEoV1JrWm0UyoOIRAlBssx8JIBOhjzT0xozkHY=;
+        b=VafvdqQmVGuTnh1TFioUCDYoqAob6iWslIez5909BuBnSzidKiBoEDz5GC0GvCOSRm
+         j+U9WfzG/VCV8svxqOlR2wDc/BB9cc0SNxb5qch/Z6kMOjgRQ42ZqWyjjPbrzqNFWqKi
+         a/JgNwqdVQE41YK2ceIVQqJjQ7M9aKsB/6DTiVkwULvjQsM0mFrxJu3z0H3b+BwxjymG
+         Ma4BcWeqJjF+tbn4nDn7FybfYH28gAKaBeqIyo1h7Ms5o9ZLuyVx+9pS+DmJFZcqPcmv
+         nfJGxnZV2uTPQWCEZpSeaoZQCIRi8O+9UFkvWdG1+2TEqNRtaA/UpMthThSA24rxnwtK
+         hQKQ==
+X-Gm-Message-State: AAQBX9fuxnTVCsEeHbQcWTtdFG6l5qCKSNRxvgHNeRK7Un45OntwH1SJ
+        Q3RQP18RMRdvfPmFxvTyae/KMg==
+X-Google-Smtp-Source: AKy350Y5pVt7R+F04NOaFVOwnrRzSEDfSJC7MErzOl+avLnnFNmBk+XlvvRUNl2BkYVtsI8XdatgNQ==
+X-Received: by 2002:adf:f10f:0:b0:2f7:efb1:ec8c with SMTP id r15-20020adff10f000000b002f7efb1ec8cmr2230828wro.23.1681838063610;
+        Tue, 18 Apr 2023 10:14:23 -0700 (PDT)
+Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
+        by smtp.gmail.com with ESMTPSA id i13-20020a5d438d000000b002cff06039d7sm13479414wrq.39.2023.04.18.10.14.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 18 Apr 2023 10:14:23 -0700 (PDT)
+Date:   Tue, 18 Apr 2023 19:14:22 +0200
+From:   Andrew Jones <ajones@ventanamicro.com>
+To:     Ben Dooks <ben.dooks@codethink.co.uk>
+Cc:     kvm@vger.kernel.org, linux-riscv@lists.infradead.org
+Subject: Re: [PATCH kvmtool 2/2] riscv: add zicboz support
+Message-ID: <rpqhta5gr53y4rub3abgrumzgtsuucefydyhwrkgzjldv3gow2@mpp7rh23nuaa>
+References: <20230418142241.1456070-1-ben.dooks@codethink.co.uk>
+ <20230418142241.1456070-3-ben.dooks@codethink.co.uk>
+ <ub3varg6spvwh5ihma4ossabuvbuvyxst63pra7rm2lfrkychf@4olgfsvgnij2>
+ <89499b40-c64e-3c0b-8ab6-ce84e94768d1@codethink.co.uk>
 MIME-Version: 1.0
-References: <20230407201921.2703758-1-sagis@google.com> <20230407201921.2703758-2-sagis@google.com>
- <20230417223611.00004aee.zhi.wang.linux@gmail.com>
-In-Reply-To: <20230417223611.00004aee.zhi.wang.linux@gmail.com>
-From:   Sagi Shahar <sagis@google.com>
-Date:   Tue, 18 Apr 2023 10:14:22 -0700
-Message-ID: <CAAhR5DHLk2c+-ziSSHLjygFv7ceWw0+4a00FXioLfmRJe09o1w@mail.gmail.com>
-Subject: Re: [RFC PATCH 1/5] KVM: Split tdp_mmu_pages to private and shared lists
-To:     Zhi Wang <zhi.wang.linux@gmail.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org,
-        Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Isaku Yamahata <isaku.yamahata@intel.com>,
-        Erdem Aktas <erdemaktas@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Kai Huang <kai.huang@intel.com>,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <89499b40-c64e-3c0b-8ab6-ce84e94768d1@codethink.co.uk>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -79,98 +72,39 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Apr 17, 2023 at 12:37=E2=80=AFPM Zhi Wang <zhi.wang.linux@gmail.com=
-> wrote:
->
-> On Fri,  7 Apr 2023 20:19:17 +0000
-> Sagi Shahar <sagis@google.com> wrote:
->
-> This patch is actually adding a separate counter for accounting private
-> tdp mmu page not really introducing a new tdp_mmu_pages list for private
-> pages. I guess better refine the tittle to reflect what this patch
-> is doing.
+On Tue, Apr 18, 2023 at 06:05:57PM +0100, Ben Dooks wrote:
+> On 18/04/2023 16:00, Andrew Jones wrote:
+> > On Tue, Apr 18, 2023 at 03:22:41PM +0100, Ben Dooks wrote:
+> > > Like ZICBOM, the ZICBOZ extension requires passing extra information to
+> > > the guest. Add the control to pass the information to the guest, get it
+> > > from the kvm ioctl and pass into the guest via the device-tree info.
+> > > 
+> > > Signed-off-by: Ben Dooks <ben.dooks@codethink.co.uk>
+> > > ---
+> > >   riscv/fdt.c                         | 11 +++++++++++
+> > >   riscv/include/asm/kvm.h             |  2 ++
+> > >   riscv/include/kvm/kvm-config-arch.h |  3 +++
+> > >   3 files changed, 16 insertions(+)
+> > 
+> > Hi Ben,
+> > 
+> > I have a patch almost identical to this one here
+> > 
+> > https://github.com/jones-drew/kvmtool/commit/f44010451e023b204bb1ef9767de20e0f20aca1c
+> > 
+> > The differences are that I don't add the header changes in this patch
+> > (as they'll come with a proper header update after Linux patches get
+> > merged), and I forgot to add the disable-zicboz, which you have.
+> > 
+> > I was planning on posting after the Linux patches get merged so
+> > I could do the proper header update first.
+> > 
+> 
+> I thought they had been, I just cherry-picked them (although I may
+> have just used linux-next instead of linux-upstream). I've been testing
+> this under qemu so it seems to be working so far with what i've been
+> doing.
 
-Thanks for catching this. tdp_mmu_pages actually used to be a list of
-pages when I first developed this code but was replaced with a counter
-in https://lore.kernel.org/all/20221019165618.927057-6-seanjc@google.com/
+Yeah, just -next, so far. Thanks for the testing!
 
->
-> > tdp_mmu_pages holds all the active pages used by the mmu. When we
-> > transfer the state during intra-host migration we need to transfer the
-> > private pages but not the shared ones.
-> >
-> Maybe explain a little bit about how the shared one is processed. Guess
-> one sentence is enough.
-
-How about:
-tdp_mmu_pages holds all the active pages used by the mmu. When we
-transfer the state during intra-host migration we need to transfer the
-private pages but not the shared ones. The shared pages are going to
-be re-faulted as needed on the destination, but that approach doesn't
-work for private pages which stores information in the secure EPT.
-
-> > Keeping them in separate counters makes this transfer more efficient.
-> >
-> > Signed-off-by: Sagi Shahar <sagis@google.com>
-> > ---
-> >  arch/x86/include/asm/kvm_host.h |  5 ++++-
-> >  arch/x86/kvm/mmu/tdp_mmu.c      | 11 +++++++++--
-> >  2 files changed, 13 insertions(+), 3 deletions(-)
-> >
-> > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm=
-_host.h
-> > index ae377eec81987..5ed70cd9d74bf 100644
-> > --- a/arch/x86/include/asm/kvm_host.h
-> > +++ b/arch/x86/include/asm/kvm_host.h
-> > @@ -1426,9 +1426,12 @@ struct kvm_arch {
-> >       struct task_struct *nx_huge_page_recovery_thread;
-> >
-> >  #ifdef CONFIG_X86_64
-> > -     /* The number of TDP MMU pages across all roots. */
-> > +     /* The number of non-private TDP MMU pages across all roots. */
-> >       atomic64_t tdp_mmu_pages;
-> >
-> > +     /* Same as tdp_mmu_pages but only for private pages. */
-> > +     atomic64_t tdp_private_mmu_pages;
-> > +
-> >       /*
-> >        * List of struct kvm_mmu_pages being used as roots.
-> >        * All struct kvm_mmu_pages in the list should have
-> > diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> > index 58a236a69ec72..327dee4f6170e 100644
-> > --- a/arch/x86/kvm/mmu/tdp_mmu.c
-> > +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> > @@ -44,6 +44,7 @@ void kvm_mmu_uninit_tdp_mmu(struct kvm *kvm)
-> >       destroy_workqueue(kvm->arch.tdp_mmu_zap_wq);
-> >
-> >       WARN_ON(atomic64_read(&kvm->arch.tdp_mmu_pages));
-> > +     WARN_ON(atomic64_read(&kvm->arch.tdp_private_mmu_pages));
-> >       WARN_ON(!list_empty(&kvm->arch.tdp_mmu_roots));
-> >
-> >       /*
-> > @@ -373,13 +374,19 @@ static void handle_changed_spte_dirty_log(struct =
-kvm *kvm, int as_id, gfn_t gfn,
-> >  static void tdp_account_mmu_page(struct kvm *kvm, struct kvm_mmu_page =
-*sp)
-> >  {
-> >       kvm_account_pgtable_pages((void *)sp->spt, +1);
-> > -     atomic64_inc(&kvm->arch.tdp_mmu_pages);
-> > +     if (is_private_sp(sp))
-> > +             atomic64_inc(&kvm->arch.tdp_private_mmu_pages);
-> > +     else
-> > +             atomic64_inc(&kvm->arch.tdp_mmu_pages);
-> >  }
-> >
-> >  static void tdp_unaccount_mmu_page(struct kvm *kvm, struct kvm_mmu_pag=
-e *sp)
-> >  {
-> >       kvm_account_pgtable_pages((void *)sp->spt, -1);
-> > -     atomic64_dec(&kvm->arch.tdp_mmu_pages);
-> > +     if (is_private_sp(sp))
-> > +             atomic64_dec(&kvm->arch.tdp_private_mmu_pages);
-> > +     else
-> > +             atomic64_dec(&kvm->arch.tdp_mmu_pages);
-> >  }
-> >
-> >  /**
->
+drew
