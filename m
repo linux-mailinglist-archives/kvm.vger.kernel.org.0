@@ -2,110 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AF7676E6C43
-	for <lists+kvm@lfdr.de>; Tue, 18 Apr 2023 20:40:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 001386E6CB0
+	for <lists+kvm@lfdr.de>; Tue, 18 Apr 2023 21:09:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229915AbjDRSkH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Apr 2023 14:40:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34706 "EHLO
+        id S232795AbjDRTJ1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Apr 2023 15:09:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54350 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231627AbjDRSkF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Apr 2023 14:40:05 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D8DE86A1
-        for <kvm@vger.kernel.org>; Tue, 18 Apr 2023 11:39:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1681843165;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=RlhdInMDglDOKE7GpswpOzxWQD/BSn3H/Bb/VhIcGlQ=;
-        b=ULqQ3clwDqe8jmnrs3eY5pRZnN36ucu0e5RGHGF6h6Mi2Aasurt5usT+0qdHK1ByrkoOGB
-        ePzS87+GWBwyRKhcZJG2S75+QGerI8BXBdqC+8pDp2XRTzj/tiua68ViEVlOUZD31mmAaS
-        QUwh4XCvfQ/MrjHth6bnTq3NS7LHpDI=
-Received: from mail-io1-f71.google.com (mail-io1-f71.google.com
- [209.85.166.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-310-x1mO9xj8PUOuAzK480V4ZQ-1; Tue, 18 Apr 2023 14:39:24 -0400
-X-MC-Unique: x1mO9xj8PUOuAzK480V4ZQ-1
-Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-760da06b86aso173555439f.0
-        for <kvm@vger.kernel.org>; Tue, 18 Apr 2023 11:39:23 -0700 (PDT)
+        with ESMTP id S232748AbjDRTJX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Apr 2023 15:09:23 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7CB516A4E
+        for <kvm@vger.kernel.org>; Tue, 18 Apr 2023 12:09:07 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id c64-20020a254e43000000b00b92530ded91so5311489ybb.17
+        for <kvm@vger.kernel.org>; Tue, 18 Apr 2023 12:09:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1681844946; x=1684436946;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=iNinZ/xtW0ZVHNrwkVxIEbNSe13fqzLdKKr8yvRoE6Q=;
+        b=5KSRwCuwMyrWMDBBcG/2qLwTpPHtKAMowKCiYtJuWD677A0UXbzGo0q/j1L9X2nkwT
+         /hhHbfJnm7Hqc+akjWuhWRfRa9Di+SCcPtKhuNFFSh05wLVH16h4SPITGgjk/DNdCSav
+         lDRw53gtqwSId6DXnuqEewZ1QZWZ/+ev5ui6QrZ5DX3dQiis0PHO2QaM9DoOAhSFWT2n
+         97KqM+M6HutWEDT3mcSJj+RhKc+hH7HL76NKsWUUidq7mkr7yfKaWBWGKGRKm9w8lxeP
+         cYc2zt9hH+9Iug0bGJn4nX08OFaWQREGVYhcO+nHeVZenJS4Tqxuz6zoajfhTyCE7bW2
+         vwYg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681843163; x=1684435163;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=RlhdInMDglDOKE7GpswpOzxWQD/BSn3H/Bb/VhIcGlQ=;
-        b=bOvGlSDngO5jxJrgObdy0ApA2j+X/uuRWK6Dwk+aO3XHHIfu7vKOCMQeQHqp0n6d8X
-         bsCWMRbzyE2z9EBRYp85039ogOTIzP37YLKnblVfbq4epgwiZ/j1SBoMNpCN8uTzhKM6
-         zwwb10ORQqTUbKe0tNrHhzmdboNhbqyBWd40EDxT3qBb5dQNYrv2gj4msIYCymufvWcS
-         nePZVBkAoqPKFGo77QXg2qY+34pDYFAzPsJkZoQaHVbwFNy0tCZ2UK1POHbwgme89HeF
-         Qx9Zd4sd2dJnvmbD56YUh8Odro8Nf9QnIx3QxrXdg1oopvSALrxtzXaAfGUYiCgVj9CR
-         TVUg==
-X-Gm-Message-State: AAQBX9eFJsPM3q0XAl0kBE1tdgRQcp1fUfWGmmRr189HS10YkgPP2pGa
-        UUdzp2HcIxRpRx9GHtB6IBVyApEaT1kU3sbxER18bBvux+4sGQyYRTtoAnKWeS1+KWQT2N6Ovwr
-        MFjo42tOY5HPO
-X-Received: by 2002:a6b:ee0f:0:b0:760:eabc:e709 with SMTP id i15-20020a6bee0f000000b00760eabce709mr2809081ioh.5.1681843163022;
-        Tue, 18 Apr 2023 11:39:23 -0700 (PDT)
-X-Google-Smtp-Source: AKy350ZBMu2Ku+EgL+xrfqBT3olO/h3dlhwVXO3eygNQx8PsQ3dE3awxUujY3TvdRou00sMSiGZD3A==
-X-Received: by 2002:a6b:ee0f:0:b0:760:eabc:e709 with SMTP id i15-20020a6bee0f000000b00760eabce709mr2809046ioh.5.1681843162606;
-        Tue, 18 Apr 2023 11:39:22 -0700 (PDT)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id c12-20020a6bfd0c000000b00763601c4bfesm618585ioi.55.2023.04.18.11.39.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Apr 2023 11:39:22 -0700 (PDT)
-Date:   Tue, 18 Apr 2023 12:39:20 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     "Liu, Yi L" <yi.l.liu@intel.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
-        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
-        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "jasowang@redhat.com" <jasowang@redhat.com>,
-        "shameerali.kolothum.thodi@huawei.com" 
-        <shameerali.kolothum.thodi@huawei.com>,
-        "lulu@redhat.com" <lulu@redhat.com>,
-        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
-        "intel-gvt-dev@lists.freedesktop.org" 
-        <intel-gvt-dev@lists.freedesktop.org>,
-        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
-        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-        "Hao, Xudong" <xudong.hao@intel.com>,
-        "Zhao, Yan Y" <yan.y.zhao@intel.com>,
-        "Xu, Terrence" <terrence.xu@intel.com>,
-        "Jiang, Yanting" <yanting.jiang@intel.com>,
-        "Duan, Zhenzhong" <zhenzhong.duan@intel.com>
-Subject: Re: [PATCH v3 12/12] vfio/pci: Report dev_id in
- VFIO_DEVICE_GET_PCI_HOT_RESET_INFO
-Message-ID: <20230418123920.5d92f402.alex.williamson@redhat.com>
-In-Reply-To: <ZD6TvA+9oI0v4vC2@nvidia.com>
-References: <BN9PR11MB5276782DA56670C8209470828C989@BN9PR11MB5276.namprd11.prod.outlook.com>
-        <ZDfslVwqk6JtPpyD@nvidia.com>
-        <20230413120712.3b9bf42d.alex.williamson@redhat.com>
-        <BN9PR11MB5276A160CA699933B897C8C18C999@BN9PR11MB5276.namprd11.prod.outlook.com>
-        <DS0PR11MB7529B7481AC97261E12AA116C3999@DS0PR11MB7529.namprd11.prod.outlook.com>
-        <20230414111043.40c15dde.alex.williamson@redhat.com>
-        <DS0PR11MB75290A78D6879EC2E31E21AEC39C9@DS0PR11MB7529.namprd11.prod.outlook.com>
-        <20230417130140.1b68082e.alex.williamson@redhat.com>
-        <ZD2erN3nKbnyqei9@nvidia.com>
-        <20230417140642.650fc165.alex.williamson@redhat.com>
-        <ZD6TvA+9oI0v4vC2@nvidia.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        d=1e100.net; s=20221208; t=1681844946; x=1684436946;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=iNinZ/xtW0ZVHNrwkVxIEbNSe13fqzLdKKr8yvRoE6Q=;
+        b=hMI1Vb0MPwAMRXECpDk0QKdiDrmpa0R6/N6+Ya0HbvHs3ZCw1V23KL+N953Zhzf/Qg
+         o5bBADrXpziQYXCySpHCbgBnj7jXt18yhMYZLUH1c1jX4s7Jfs2ycMK40JRQKAT7k1Ts
+         qwjnQy2Bj9OVXNYFX1UscQldJneJGEwhU8EXrjmZAfBaGsqzzqYurMY7p3Rq+8ob3CAF
+         s8CYmmAhiC1im8vQX7LlvdGwgyGXspYY8QSTAVqyYHjZm+smnxf2UsFeR2W2u876eifb
+         +sxR4wZ4eFwMqES7J7n3EAG20T/QXi9TmjteQUTaoAPYnrzL9PYbxz4DFlumxzOuSAP8
+         RTUA==
+X-Gm-Message-State: AAQBX9ek10f1X9JNRwhB9QtgdtUOOcZ7tSJsfogv3GPUHhyyq5GWcph8
+        Muud7+EJRsJUxHXBVMsX6LMa+EoKae7aI5mD
+X-Google-Smtp-Source: AKy350YWGJFweuXeHcx9cUcke+9jMuVzygNWAx4ledq3nz33xrIMBM/epux3EmdAsS26KjKWBxYShjH22qlzY9nD
+X-Received: from vannapurve2.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:41f8])
+ (user=vannapurve job=sendgmr) by 2002:a25:cf4c:0:b0:b8f:47c4:58ed with SMTP
+ id f73-20020a25cf4c000000b00b8f47c458edmr12907520ybg.9.1681844946790; Tue, 18
+ Apr 2023 12:09:06 -0700 (PDT)
+Date:   Tue, 18 Apr 2023 19:09:04 +0000
+In-Reply-To: <c49aa7b7bbc016b6c8b698ac2ce3b9d866b551f9.1678643052.git.isaku.yamahata@intel.com>
+Mime-Version: 1.0
+References: <c49aa7b7bbc016b6c8b698ac2ce3b9d866b551f9.1678643052.git.isaku.yamahata@intel.com>
+X-Mailer: git-send-email 2.40.0.634.g4ca3ef3211-goog
+Message-ID: <20230418190904.1111011-1-vannapurve@google.com>
+Subject: Re: [PATCH v13 098/113] KVM: TDX: Handle TDX PV map_gpa hypercall
+From:   Vishal Annapurve <vannapurve@google.com>
+To:     isaku.yamahata@intel.com
+Cc:     dmatlack@google.com, erdemaktas@google.com,
+        isaku.yamahata@gmail.com, kai.huang@intel.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, pbonzini@redhat.com,
+        sagis@google.com, seanjc@google.com, zhi.wang.linux@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -113,65 +69,26 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 18 Apr 2023 09:57:32 -0300
-Jason Gunthorpe <jgg@nvidia.com> wrote:
+> +static int tdx_map_gpa(struct kvm_vcpu *vcpu)
+> +{
+> +	struct kvm *kvm = vcpu->kvm;
+> +	gpa_t gpa = tdvmcall_a0_read(vcpu);
+> +	gpa_t size = tdvmcall_a1_read(vcpu);
+> +	gpa_t end = gpa + size;
+> +
+> +	if (!IS_ALIGNED(gpa, PAGE_SIZE) || !IS_ALIGNED(size, PAGE_SIZE) ||
+> +	    end < gpa ||
+> +	    end > kvm_gfn_shared_mask(kvm) << (PAGE_SHIFT + 1) ||
+> +	    kvm_is_private_gpa(kvm, gpa) != kvm_is_private_gpa(kvm, end)) {
+> +		tdvmcall_set_return_code(vcpu, TDG_VP_VMCALL_INVALID_OPERAND);
+> +		return 1;
+> +	}
+> +
+> +	return tdx_vp_vmcall_to_user(vcpu);
 
-> On Mon, Apr 17, 2023 at 02:06:42PM -0600, Alex Williamson wrote:
-> > On Mon, 17 Apr 2023 16:31:56 -0300
-> > Jason Gunthorpe <jgg@nvidia.com> wrote:
-> >   
-> > > On Mon, Apr 17, 2023 at 01:01:40PM -0600, Alex Williamson wrote:  
-> > > > Yes, it's not trivial, but Jason is now proposing that we consider
-> > > > mixing groups, cdevs, and multiple iommufd_ctxs as invalid.  I think
-> > > > this means that regardless of which device calls INFO, there's only one
-> > > > answer (assuming same set of devices opened, all cdev, all within same
-> > > > iommufd_ctx).  Based on what I explained about my understanding of INFO2
-> > > > and Jason agreed to, I think the output would be:
-> > > > 
-> > > > flags: NOT_RESETABLE | DEV_ID
-> > > > {
-> > > >   { valid devA-id,  devA-BDF },
-> > > >   { valid devC-id,  devC-BDF },
-> > > >   { valid devD-id,  devD-BDF },
-> > > >   { invalid dev-id, devE-BDF },
-> > > > }
-> > > > 
-> > > > Here devB gets dropped because the kernel understands that devB is
-> > > > unopened, affected, and owned.  It's therefore not a blocker for
-> > > > hot-reset.    
-> > > 
-> > > I don't think we want to drop anything because it makes the API
-> > > ill suited for the debugging purpose.
-> > > 
-> > > devb should be returned with an invalid dev_id if I understand your
-> > > example. Maybe it should return with -1 as the dev_id instead of 0, to
-> > > make the debugging a bit better.
-> > > 
-> > > Userspace should look at only NOT_RESETTABLE to determine if it
-> > > proceeds or not, and it should use the valid dev_id list to iterate
-> > > over the devices it has open to do the config stuff.  
-> > 
-> > If an affected device is owned, not opened, and not interfering with
-> > the reset, what is it adding to the API to report it for debugging
-> > purposes?  
-> 
-> It lets it print the entire group of devices, this is the only way
-> something can learn the actual list of all BDFs affected.
+This will result into exits to userspace for MMIO regions as well. Does it make
+sense to only exit to userspace for guest physical memory regions backed by
+memslots?
 
-If we do so, userspace must be able to differentiate which devices are
-blocking, which necessitates at least a bi-modal invalid dev-id.
-
-> dev_id can just return 0, we don't need a complex bitmap. Userspace
-> looks at the flag, if !NOT_RESETABLE then it ignores dev_id=0.
-
-I'm having trouble with a succinct definition of dev-id == 0, is it "A
-device affected by the hot-reset reset, which does not directly
-contribute to the availability of the hot-reset, ex. an unopened device
-within the same IOMMU group as an opened device (ie. this is not the
-device responsible if hot-reset is unavailable).  Whereas dev-id < 0
-(== -1) is an affected device which prevents hot-reset, ex. an un-owned
-device, device configured within a different iommufd_ctx, or device
-opened outside of the vfio cdev API."  Is that about right?  Thanks,
-
-Alex
-
+> +}
+> +
