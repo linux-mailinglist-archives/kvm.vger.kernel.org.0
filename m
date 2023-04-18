@@ -2,186 +2,144 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8B29B6E5779
-	for <lists+kvm@lfdr.de>; Tue, 18 Apr 2023 04:25:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B55B46E57B9
+	for <lists+kvm@lfdr.de>; Tue, 18 Apr 2023 05:09:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229862AbjDRCZz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 Apr 2023 22:25:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59900 "EHLO
+        id S229657AbjDRDJa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 17 Apr 2023 23:09:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45170 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229524AbjDRCZy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 17 Apr 2023 22:25:54 -0400
-Received: from mail-ua1-x929.google.com (mail-ua1-x929.google.com [IPv6:2607:f8b0:4864:20::929])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 159ADE71
-        for <kvm@vger.kernel.org>; Mon, 17 Apr 2023 19:25:53 -0700 (PDT)
-Received: by mail-ua1-x929.google.com with SMTP id q10so4636017uas.2
-        for <kvm@vger.kernel.org>; Mon, 17 Apr 2023 19:25:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1681784752; x=1684376752;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xRz2vYMowRDgjT6RimOcd4wh2p5yRkq7Sh0siGa5SBw=;
-        b=TsrHj3BdWTCQ7C+lkNBsHPg8hd+oAw00LeJHzNTJV4PDZRl6XSLT3Uifp6RQPKc388
-         B5t3qZvqjUXgHiFLtc1//DxJ5U9108V9KF5x6sC04rEEKadO10WU89kYBep47wN9JoIk
-         fM1T7+sRiWdCfrGn1dqgs/VYa/TBdzD3TXFE7mati39It7rdFS8pSG4AJlQqijohXeqk
-         lJNm1MFi8NSCEdGk+YwLw7G1VQvivsctQw97IDD8hso8XGdf/2fZEkuy0QegiUYEfvXJ
-         yX1gcuPN1GMKYVfgkUHr1QlYhQ6tmtgwWPUL7tx7XvDqdkCRy6Tl93jFl//FFICnjqao
-         lVZQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681784752; x=1684376752;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xRz2vYMowRDgjT6RimOcd4wh2p5yRkq7Sh0siGa5SBw=;
-        b=k2bb0nde1QmitlsCt8Km9e126ZCL6Dp8Bi3Y7H346zcB9no8aeeh4LOwnDVM1Z0cpR
-         BB+/EnPzgewvOLZMC8oXU1bg5k9IE3zDLpfmNuOIzLVJG0VjfU+FBlsplR9rybDb7K5w
-         0YdxU8iPAP5bJj4Pv5L1Jk79hvCpNIwCjZy/8hf0pilXI8053RIWssvqwtAhcTI0cOzU
-         9zgLD95OSNpW6yqNRRkhy9j03hR/w2e0frVftcnzu2PPYAxWt8aTccUIFcD4zA651Hg/
-         LV69uko331VnYD+IDoSK7kwemU8cBQ0uic267SrwTv4pzWrbcp6n+VCrE/v+H7uJq6O6
-         7Y6Q==
-X-Gm-Message-State: AAQBX9c6KAAwPcOGBWUrWVRFhcKxhpgyE/4IKLTKsd0FfAifGMAvDh+V
-        BYOY4pN6bGoVo3GFE0+x7Lrt+NzQBQX0rQTYp5Q=
-X-Google-Smtp-Source: AKy350YhJ77w0AdtI7jhG1i02j6dfJC/k6EAlQMi+EyRM/vGouudL3KpymygWAdE1Cmog9TBSDD8T4f9HRj30EiXpBM=
-X-Received: by 2002:a1f:4387:0:b0:440:50c4:3e13 with SMTP id
- q129-20020a1f4387000000b0044050c43e13mr4660205vka.5.1681784752133; Mon, 17
- Apr 2023 19:25:52 -0700 (PDT)
+        with ESMTP id S229518AbjDRDJ2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 17 Apr 2023 23:09:28 -0400
+Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D51D4685
+        for <kvm@vger.kernel.org>; Mon, 17 Apr 2023 20:09:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1681787367; x=1713323367;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=/H6lptvS9nUT44ow2+QO5w1jV9jGyzwLoT0Qtfa5Ths=;
+  b=DsBfmpNQzE7hEVAf27UZCY+2eaNoCad4FK64diFjZwPazGCmm+O1vOlW
+   C2ii9+zGHdvuIh3vB0B/azLLxzNpUjCOKIrYRCbTsIf39KeT6jpknIqKZ
+   11s8KaIyhLC4qm33hEU02364xfuH3MJG9PQVMfUjgt5c6qtxh2o2QPHlT
+   CNCOkwrebS7nrLVUxiK8Z8rX2QM1qNaPsuqawwMF+J6qAjlQT37qqb/R0
+   WONt0JIn+MnjgO0mlR6TBsKDcCUAJQskadDCv86mQrReYnurq3rkYw4vj
+   39GEzzHhCfvwG2gJMm8d3VZlelBqoXVuH4KhZD00buUGQES3IZ/qkeYqi
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10683"; a="325401163"
+X-IronPort-AV: E=Sophos;i="5.99,205,1677571200"; 
+   d="scan'208";a="325401163"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Apr 2023 20:09:27 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10683"; a="755535612"
+X-IronPort-AV: E=Sophos;i="5.99,205,1677571200"; 
+   d="scan'208";a="755535612"
+Received: from zengguan-mobl1.ccr.corp.intel.com (HELO [10.238.0.183]) ([10.238.0.183])
+  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Apr 2023 20:09:25 -0700
+Message-ID: <d0e57964-0c93-d5da-c95f-bbb33a010961@intel.com>
+Date:   Tue, 18 Apr 2023 11:08:57 +0800
 MIME-Version: 1.0
-References: <20230417135821.609964-1-lawrence.hunter@codethink.co.uk> <20230417135821.609964-3-lawrence.hunter@codethink.co.uk>
-In-Reply-To: <20230417135821.609964-3-lawrence.hunter@codethink.co.uk>
-From:   Alistair Francis <alistair23@gmail.com>
-Date:   Tue, 18 Apr 2023 12:25:26 +1000
-Message-ID: <CAKmqyKP1akoCLyp-O3wt=Y8sZaiROzxRY2Aq9ierK+nnnzsrYg@mail.gmail.com>
-Subject: Re: [PATCH v2 02/17] target/riscv: Refactor vector-vector translation macro
-To:     Lawrence Hunter <lawrence.hunter@codethink.co.uk>
-Cc:     qemu-devel@nongnu.org, dickon.hood@codethink.co.uk,
-        nazar.kazakov@codethink.co.uk, kiran.ostrolenk@codethink.co.uk,
-        frank.chang@sifive.com, palmer@dabbelt.com,
-        alistair.francis@wdc.com, bin.meng@windriver.com,
-        pbonzini@redhat.com, philipp.tomsich@vrull.eu, kvm@vger.kernel.org,
-        qemu-riscv@nongnu.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-        FREEMAIL_FROM,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-        version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+Subject: Re: [PATCH v7 3/5] KVM: x86: Introduce untag_addr() in kvm_x86_ops
+To:     Binbin Wu <binbin.wu@linux.intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "Christopherson,, Sean" <seanjc@google.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>
+Cc:     "Huang, Kai" <kai.huang@intel.com>,
+        "Gao, Chao" <chao.gao@intel.com>,
+        "Guo, Xuelian" <Xuelian.Guo@intel.com>,
+        "robert.hu@linux.intel.com" <robert.hu@linux.intel.com>
+References: <20230404130923.27749-1-binbin.wu@linux.intel.com>
+ <20230404130923.27749-4-binbin.wu@linux.intel.com>
+Content-Language: en-US
+From:   Zeng Guang <guang.zeng@intel.com>
+In-Reply-To: <20230404130923.27749-4-binbin.wu@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-6.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
+        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Apr 18, 2023 at 12:01=E2=80=AFAM Lawrence Hunter
-<lawrence.hunter@codethink.co.uk> wrote:
->
-> From: Kiran Ostrolenk <kiran.ostrolenk@codethink.co.uk>
->
-> Factor the non SEW-specific stuff out of `GEN_OPIVV_TRANS` into
-> function `opivv_trans` (similar to `opivi_trans`). `opivv_trans` will be
-> used in proceeding vector-crypto commits.
->
-> Signed-off-by: Kiran Ostrolenk <kiran.ostrolenk@codethink.co.uk>
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-
-Alistair
-
+On 4/4/2023 9:09 PM, Binbin Wu wrote:
+> Introduce a new interface untag_addr() to kvm_x86_ops to untag the metadata
+> from linear address. Implement LAM version in VMX and dummy version in SVM.
+>
+> When enabled feature like Intel Linear Address Masking or AMD Upper
+> Address Ignore, linear address may be tagged with metadata. Linear
+> address should be checked for modified canonicality and untagged in
+> instrution emulations or vmexit handlings if LAM or UAI is applicable.
+>
+> Introduce untag_addr() to kvm_x86_ops to hide the code related to vendor
+> specific details.
+> - For VMX, LAM version is implemented.
+>    LAM has a modified canonical check when applicable:
+>    * LAM_S48                : [ 1 ][ metadata ][ 1 ]
+>                                 63               47
+>    * LAM_U48                : [ 0 ][ metadata ][ 0 ]
+>                                 63               47
+>    * LAM_S57                : [ 1 ][ metadata ][ 1 ]
+>                                 63               56
+>    * LAM_U57 + 5-lvl paging : [ 0 ][ metadata ][ 0 ]
+>                                 63               56
+>    * LAM_U57 + 4-lvl paging : [ 0 ][ metadata ][ 0...0 ]
+>                                 63               56..47
+>    If LAM is applicable to certain address, untag the metadata bits and
+>    replace them with the value of bit 47 (LAM48) or bit 56 (LAM57). Later
+>    the untagged address will do legacy canonical check. So that LAM canonical
+>    check and mask can be covered by "untag + legacy canonical check".
+>
+>    For cases LAM is not applicable, 'flags' is passed to the interface
+>    to skip untag.
+>
+> - For SVM, add a dummy version to do nothing, but return the original
+>    address.
+>
+> Signed-off-by: Binbin Wu <binbin.wu@linux.intel.com>
+> Tested-by: Xuelian Guo <xuelian.guo@intel.com>
 > ---
->  target/riscv/insn_trans/trans_rvv.c.inc | 62 +++++++++++++------------
->  1 file changed, 32 insertions(+), 30 deletions(-)
+>   arch/x86/include/asm/kvm-x86-ops.h |  1 +
+>   arch/x86/include/asm/kvm_host.h    |  5 +++
+>   arch/x86/kvm/svm/svm.c             |  7 ++++
+>   arch/x86/kvm/vmx/vmx.c             | 60 ++++++++++++++++++++++++++++++
+>   arch/x86/kvm/vmx/vmx.h             |  2 +
+>   5 files changed, 75 insertions(+)
 >
-> diff --git a/target/riscv/insn_trans/trans_rvv.c.inc b/target/riscv/insn_=
-trans/trans_rvv.c.inc
-> index f2e3d385152..4106bd69949 100644
-> --- a/target/riscv/insn_trans/trans_rvv.c.inc
-> +++ b/target/riscv/insn_trans/trans_rvv.c.inc
-> @@ -1643,38 +1643,40 @@ GEN_OPIWX_WIDEN_TRANS(vwadd_wx)
->  GEN_OPIWX_WIDEN_TRANS(vwsubu_wx)
->  GEN_OPIWX_WIDEN_TRANS(vwsub_wx)
->
-> +static bool opivv_trans(uint32_t vd, uint32_t vs1, uint32_t vs2, uint32_=
-t vm,
-> +                        gen_helper_gvec_4_ptr *fn, DisasContext *s)
-> +{
-> +    uint32_t data =3D 0;
-> +    TCGLabel *over =3D gen_new_label();
-> +    tcg_gen_brcondi_tl(TCG_COND_EQ, cpu_vl, 0, over);
-> +    tcg_gen_brcond_tl(TCG_COND_GEU, cpu_vstart, cpu_vl, over);
+> diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
+> index 8dc345cc6318..7d63d1b942ac 100644
+> --- a/arch/x86/include/asm/kvm-x86-ops.h
+> +++ b/arch/x86/include/asm/kvm-x86-ops.h
+> @@ -52,6 +52,7 @@ KVM_X86_OP(cache_reg)
+>   KVM_X86_OP(get_rflags)
+>   KVM_X86_OP(set_rflags)
+>   KVM_X86_OP(get_if_flag)
+> +KVM_X86_OP(untag_addr)
+>   KVM_X86_OP(flush_tlb_all)
+>   KVM_X86_OP(flush_tlb_current)
+>   KVM_X86_OP_OPTIONAL(tlb_remote_flush)
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 498d2b5e8dc1..cb674ec826d4 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -69,6 +69,9 @@
+>   #define KVM_X86_NOTIFY_VMEXIT_VALID_BITS	(KVM_X86_NOTIFY_VMEXIT_ENABLED | \
+>   						 KVM_X86_NOTIFY_VMEXIT_USER)
+>   
+> +/* flags for kvm_x86_ops::untag_addr() */
+> +#define KVM_X86_UNTAG_ADDR_SKIP_LAM	_BITULL(0)
 > +
-> +    data =3D FIELD_DP32(data, VDATA, VM, vm);
-> +    data =3D FIELD_DP32(data, VDATA, LMUL, s->lmul);
-> +    data =3D FIELD_DP32(data, VDATA, VTA, s->vta);
-> +    data =3D FIELD_DP32(data, VDATA, VTA_ALL_1S, s->cfg_vta_all_1s);
-> +    data =3D FIELD_DP32(data, VDATA, VMA, s->vma);
-> +    tcg_gen_gvec_4_ptr(vreg_ofs(s, vd), vreg_ofs(s, 0), vreg_ofs(s, vs1)=
-,
-> +                       vreg_ofs(s, vs2), cpu_env, s->cfg_ptr->vlen / 8,
-> +                       s->cfg_ptr->vlen / 8, data, fn);
-> +    mark_vs_dirty(s);
-> +    gen_set_label(over);
-> +    return true;
-> +}
-> +
->  /* Vector Integer Add-with-Carry / Subtract-with-Borrow Instructions */
->  /* OPIVV without GVEC IR */
-> -#define GEN_OPIVV_TRANS(NAME, CHECK)                               \
-> -static bool trans_##NAME(DisasContext *s, arg_rmrr *a)             \
-> -{                                                                  \
-> -    if (CHECK(s, a)) {                                             \
-> -        uint32_t data =3D 0;                                         \
-> -        static gen_helper_gvec_4_ptr * const fns[4] =3D {            \
-> -            gen_helper_##NAME##_b, gen_helper_##NAME##_h,          \
-> -            gen_helper_##NAME##_w, gen_helper_##NAME##_d,          \
-> -        };                                                         \
-> -        TCGLabel *over =3D gen_new_label();                          \
-> -        tcg_gen_brcondi_tl(TCG_COND_EQ, cpu_vl, 0, over);          \
-> -        tcg_gen_brcond_tl(TCG_COND_GEU, cpu_vstart, cpu_vl, over); \
-> -                                                                   \
-> -        data =3D FIELD_DP32(data, VDATA, VM, a->vm);                 \
-> -        data =3D FIELD_DP32(data, VDATA, LMUL, s->lmul);             \
-> -        data =3D FIELD_DP32(data, VDATA, VTA, s->vta);               \
-> -        data =3D                                                     \
-> -            FIELD_DP32(data, VDATA, VTA_ALL_1S, s->cfg_vta_all_1s);\
-> -        data =3D FIELD_DP32(data, VDATA, VMA, s->vma);               \
-> -        tcg_gen_gvec_4_ptr(vreg_ofs(s, a->rd), vreg_ofs(s, 0),     \
-> -                           vreg_ofs(s, a->rs1),                    \
-> -                           vreg_ofs(s, a->rs2), cpu_env,           \
-> -                           s->cfg_ptr->vlen / 8,                   \
-> -                           s->cfg_ptr->vlen / 8, data,             \
-> -                           fns[s->sew]);                           \
-> -        mark_vs_dirty(s);                                          \
-> -        gen_set_label(over);                                       \
-> -        return true;                                               \
-> -    }                                                              \
-> -    return false;                                                  \
-> +#define GEN_OPIVV_TRANS(NAME, CHECK)                                    =
- \
-> +static bool trans_##NAME(DisasContext *s, arg_rmrr *a)                  =
- \
-> +{                                                                       =
- \
-> +    if (CHECK(s, a)) {                                                  =
- \
-> +        static gen_helper_gvec_4_ptr * const fns[4] =3D {               =
-   \
-> +            gen_helper_##NAME##_b, gen_helper_##NAME##_h,               =
- \
-> +            gen_helper_##NAME##_w, gen_helper_##NAME##_d,               =
- \
-> +        };                                                              =
- \
-> +        return opivv_trans(a->rd, a->rs1, a->rs2, a->vm, fns[s->sew], s)=
-;\
-> +    }                                                                   =
- \
-> +    return false;                                                       =
- \
->  }
->
->  /*
-> --
-> 2.40.0
->
->
+
+Prefer to make definition and comments to be generic.
+How about:
+     /* x86-specific emulation flags */
+     #define KVM_X86_EMULFLAG_SKIP_LAM_UNTAG_ADDR _BITULL(0)
+
