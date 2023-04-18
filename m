@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C1BA16E6B5A
-	for <lists+kvm@lfdr.de>; Tue, 18 Apr 2023 19:48:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D50146E6B71
+	for <lists+kvm@lfdr.de>; Tue, 18 Apr 2023 19:52:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231308AbjDRRsB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Apr 2023 13:48:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56770 "EHLO
+        id S231880AbjDRRw1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Apr 2023 13:52:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33352 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230143AbjDRRr7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Apr 2023 13:47:59 -0400
-Received: from mail-lf1-x130.google.com (mail-lf1-x130.google.com [IPv6:2a00:1450:4864:20::130])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D74F6FD
-        for <kvm@vger.kernel.org>; Tue, 18 Apr 2023 10:47:57 -0700 (PDT)
-Received: by mail-lf1-x130.google.com with SMTP id 2adb3069b0e04-4ec81779f49so2280212e87.3
-        for <kvm@vger.kernel.org>; Tue, 18 Apr 2023 10:47:57 -0700 (PDT)
+        with ESMTP id S230010AbjDRRwZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Apr 2023 13:52:25 -0400
+Received: from mail-lj1-x22f.google.com (mail-lj1-x22f.google.com [IPv6:2a00:1450:4864:20::22f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8B56146E5
+        for <kvm@vger.kernel.org>; Tue, 18 Apr 2023 10:52:01 -0700 (PDT)
+Received: by mail-lj1-x22f.google.com with SMTP id z38so15215637ljq.12
+        for <kvm@vger.kernel.org>; Tue, 18 Apr 2023 10:52:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1681840076; x=1684432076;
+        d=google.com; s=20221208; t=1681840320; x=1684432320;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=v7VHOL3a4oNcSicrpU2wfqbXD01GJZHRcgPEysQrHBM=;
-        b=GNHSp2I09Zl9LB7eHbx0aGHUh6j+bHxHCQBbKwtzBWyzo2N11Jsm726VXDHHJSDn3v
-         sMONNacQwy4KU3tqw3rhhtFJKNXjYVpEtf7gUMS+KeQXJftXBOy5GAy0AYktN/IJpdeK
-         LM4zML8fpO9dG/kpJuSAvlPJRp4hEUxj1mXNktm2Eq6DZnhRZxL+K32qrnNCepTYL94K
-         c4TkDSZOe/g0QN2t5UFVVTPXDPQTiknB8OH7X0iJphWg1+M2eAyklkwuZ2KOG82ehPOq
-         lS5r9oHb9wffj9OdlbHJCSSYiqeqQe8UHRJGfLSvY4oPtYBBfqL4fYa0JdYgPLsZ05mi
-         LdLQ==
+        bh=FKNxG97GrIEEiIU9hmrlsAR8zaruxYbVfl+hgQMLqTc=;
+        b=KcvZV9tGqSgN90wGyLz2hZXBbd+x0ZUH539ReWM4VKSoOpbQMeLPmDMZ9f8mSxI14l
+         tP/3oJGjreUuKybE12anK2UlGKTgHGVZQcS1Z4nCnNvWPpxtIy7jgdIfYj7j2dPGotaa
+         QSyS3DyMZtbP+MEOWtFKTQyUlazIB54oQzqs6kQIHD9AjcuCo9/AOfFeRx+GLDbk3rFJ
+         sdUV++tLjLN8k28r+xlODHMlP0INnO/WYqSkK3aZEi2MuljVg+P0rzOaNc3g91fPAZw9
+         2iMRZGje0GoL+CYEcfYADZJ2IOE7R1hBRlMyhGazvrMPxPlEsNepUsfPzijf8FSDwwQI
+         OG3Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681840076; x=1684432076;
+        d=1e100.net; s=20221208; t=1681840320; x=1684432320;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=v7VHOL3a4oNcSicrpU2wfqbXD01GJZHRcgPEysQrHBM=;
-        b=dtItDvMZlYSUAKN4ixI/QJotpyzi48rsOmqNH25ELRFap758KLdYrqX3ter5KIzmtH
-         7hAemVJnNL4k0Js0Xcr8YtapBm7l9EqSHuK19kRwTXRrdAKxE/r4skW1yVPPOwE86sJk
-         oBjek4fQpGbL79SsVHHfDXzUE7Iw18zwGsVqGjLpRkOim0PrnXJLRd9AcdXZTsYFd2oa
-         SIcyQo9Ob7vYW73aQPIBiZTTx2mjtdANaSsEvaPWsbeZ8xjb9HeQUMfU7LCLClzTzrK8
-         YFTBHBefrWGx/L+Mh8lLGOUlqwc+sFl97Hh+4Hc1fsRm9MuWLUG3XcP9HLquCFsa83AZ
-         ewqQ==
-X-Gm-Message-State: AAQBX9drBZUDgGGwtZJvwzY8wnE4MccA2RC2JQnYjTSHuDvPccU40aow
-        v64bikzt57U6ovmrV1vEz2mGhOwJuzF8FykR7SyziA==
-X-Google-Smtp-Source: AKy350bNqaOsyaRvGcKKCm/o8W3yzMR1UZvLTRhVbBxbRfe+NIbLPArG46ZFrQ8IfE30X0M+uvZtDukKkr1LXEzQtIU=
-X-Received: by 2002:ac2:5296:0:b0:4eb:f3d:94bf with SMTP id
- q22-20020ac25296000000b004eb0f3d94bfmr3406470lfm.9.1681840075852; Tue, 18 Apr
- 2023 10:47:55 -0700 (PDT)
+        bh=FKNxG97GrIEEiIU9hmrlsAR8zaruxYbVfl+hgQMLqTc=;
+        b=bmXPmhiTmOh+udRS6e4xnmi95A0o4mSqm56y36lowECizDcdkI0NcS0s0rVrefP42W
+         7CC1GEGD764tEUd/0KHrLEIQrFoq43aWJVX0IEXJsj8Ivj4syhQ30EktNFJ75ARAyOmN
+         bBQUENkHLxLEEMwnpjsV/hjQMxyiDic4BK/jMoHdFgIuSoB9A2T7CprhBG/H6vr9VZQ0
+         QABZPgDXI9gKzaSh1xrGtz71tcyG0/hut++9ssp0xcYWf9ShMfYMBvDs7d7k6HCSyXrR
+         kEORTmXORbW8//tL3c7TZfN0bD3qCONI0nVHyOmmRSuKQEjBkgQvKDfVGXW/4Uzk/gD5
+         j3Mw==
+X-Gm-Message-State: AAQBX9cU2Vs7TVxXcZ5qnLpKteRic4wViwLcJhyWHzxSw6jEAnjgb/9+
+        cYMdMLMY3WRIJOqevGp7aYDNtvKfuSXvtA8uUlZSNw==
+X-Google-Smtp-Source: AKy350Z3ey2Whb3TRJUexHVM2ElfLev9jvmBSmFc/maYn4JiGBruRF47hsCPdID/nGmnmTen0+DbmIS6rwHvhQE9Q7c=
+X-Received: by 2002:a2e:9087:0:b0:298:b337:c11f with SMTP id
+ l7-20020a2e9087000000b00298b337c11fmr1116723ljg.7.1681840319947; Tue, 18 Apr
+ 2023 10:51:59 -0700 (PDT)
 MIME-Version: 1.0
 References: <20230407201921.2703758-1-sagis@google.com> <20230407201921.2703758-4-sagis@google.com>
- <20230418092830.00001bff.zhi.wang.linux@gmail.com>
-In-Reply-To: <20230418092830.00001bff.zhi.wang.linux@gmail.com>
+ <20230418151110.00001354.zhi.wang.linux@gmail.com>
+In-Reply-To: <20230418151110.00001354.zhi.wang.linux@gmail.com>
 From:   Sagi Shahar <sagis@google.com>
-Date:   Tue, 18 Apr 2023 10:47:44 -0700
-Message-ID: <CAAhR5DFfgyGx9H-m4LE_L3zNmQZRyvmiWMYS1_sHxJihm3f0KA@mail.gmail.com>
+Date:   Tue, 18 Apr 2023 10:51:48 -0700
+Message-ID: <CAAhR5DF4opiZQXD6T0c0BQctEDjTQDeK4Zn8kvkPy3_gRns+8Q@mail.gmail.com>
 Subject: Re: [RFC PATCH 3/5] KVM: TDX: Add base implementation for tdx_vm_move_enc_context_from
 To:     Zhi Wang <zhi.wang.linux@gmail.com>
 Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org,
@@ -72,35 +72,28 @@ X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
         T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Apr 17, 2023 at 11:28=E2=80=AFPM Zhi Wang <zhi.wang.linux@gmail.com=
-> wrote:
+On Tue, Apr 18, 2023 at 5:12=E2=80=AFAM Zhi Wang <zhi.wang.linux@gmail.com>=
+ wrote:
 >
 > On Fri,  7 Apr 2023 20:19:19 +0000
 > Sagi Shahar <sagis@google.com> wrote:
 >
-> Is there any reaon that TDX doesn't need .vm_copy_enc_context_from? Or it=
- is
-> going to be deprecated? The patch comments needs to be refined according =
-to
-> Sean's KVM x86 maintainer book.
-
-To clarify, there are 2 types of migrations. live migration (between
-different hosts) and intra-host (between kvm instances in the same
-host) migration. This patchset deals with intra-host migration and
-doesn't add support for live migration.
-
-vm_copy_enc_context_from is currently used for setting up the
-migration helper for SEV live migration and therefore it is currently
-not needed in this patcheset.
-
+> What was the status of the src VM when calling the vm_move_enc_context_fr=
+om?
+> Is it still active like common live migration or it has been paused?
 >
+
+Yes the source VM is still active like in the live migration case.
+You can also see that we check that the source VM is finalized when we
+call tdx_guest before migrating the state.
+
 > > This should mostly match the logic in sev_vm_move_enc_context_from.
 > >
 > > Signed-off-by: Sagi Shahar <sagis@google.com>
@@ -156,6 +149,7 @@ ce_fd)
 > > +
 > > +     return tdx_kvm->finalized;
 > > +}
+>         return is_td_finalized()?
 > > +
 > > +static int tdx_migrate_from(struct kvm *dst, struct kvm *src)
 > > +{
