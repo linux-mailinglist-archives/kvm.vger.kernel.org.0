@@ -2,70 +2,78 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F15EC6E5F29
-	for <lists+kvm@lfdr.de>; Tue, 18 Apr 2023 12:49:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9E9B16E5F21
+	for <lists+kvm@lfdr.de>; Tue, 18 Apr 2023 12:48:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230350AbjDRKtr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Apr 2023 06:49:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41922 "EHLO
+        id S231285AbjDRKsZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Apr 2023 06:48:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41386 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231324AbjDRKtl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Apr 2023 06:49:41 -0400
-Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91D2640EF;
-        Tue, 18 Apr 2023 03:49:39 -0700 (PDT)
-Received: by mail-pf1-x42d.google.com with SMTP id d2e1a72fcca58-63b5312bd4fso9253183b3a.0;
-        Tue, 18 Apr 2023 03:49:39 -0700 (PDT)
+        with ESMTP id S230350AbjDRKsT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Apr 2023 06:48:19 -0400
+Received: from mail-wm1-x32d.google.com (mail-wm1-x32d.google.com [IPv6:2a00:1450:4864:20::32d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3CAF6E49
+        for <kvm@vger.kernel.org>; Tue, 18 Apr 2023 03:48:18 -0700 (PDT)
+Received: by mail-wm1-x32d.google.com with SMTP id o29-20020a05600c511d00b003f1739de43cso2860028wms.4
+        for <kvm@vger.kernel.org>; Tue, 18 Apr 2023 03:48:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1681814979; x=1684406979;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ne4t7JiMf2N7K31rdXpJp0mlGHlHnFrvUNu2fRDvLr4=;
-        b=a/Mbnb8QKjZmJQtYsJu30n/UFZjrScTDmSj5Zl+/b1XAoq3xiyMAsGLs1GrgQd7TVc
-         O9yzN4Dhq+qohee4RwTms9qIfgLX8ACBXq7hWFE4cN9FEVQqxM3Id/1YsHPPLhJfdMp1
-         h7PfxFmLV/kjcdPZO1viP/2MuxtikWUrxsHY1nGVN0T8h2SgczEA4lKh7H4cGh5Nnr3G
-         fDVxCWRvmAAUGjQBQxcQZqlW2ANZlnEbjp/nKbmxVJBlM89Kq2rZzlkCuQ0/bvaIpoYp
-         kqIxYp+jgbwTsexOvC/eP6Y3vx+UZW7HGNud+egIXIA7xg/U8Qz7k1pjwIETSDd95Y3b
-         TYWA==
+        d=gmail.com; s=20221208; t=1681814896; x=1684406896;
+        h=content-transfer-encoding:in-reply-to:organization:references:cc:to
+         :content-language:subject:reply-to:user-agent:mime-version:date
+         :message-id:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=gEwR6KtNxSbU17prGLCK7vz5h7AeZ/KD54lx3zH1Yn0=;
+        b=CyRqkDHGlSZJfeiv5gznYbzxsX/+z4STQCYrBSK5fb9QLbcYECqkQ0N9UD65TZ/c71
+         dJj/EDjIYPty2Axj+eW9D0HmaCIXvODujC9/NrfVyVjPrNBeFyPxoHu/nhtebmcH+bFJ
+         a7GdKd9mVBgtmFy1S+Rw+4rcbAj8mtxSVAgzHrsCyed9M2Qig+s8UdaWLHtc/dUpZt1Y
+         kKHU3pioFZfs1/IhjoIXHgBeasdlYx6P5P13CXDxcXonQLcrBfq14Av2GeHA3+gxnnsr
+         QRo/9nCr++F8kh+Vxc2fhtcVbVJ6HwA8DAxlBXESCnzEYeYV99b+OGukhd3CmtGyuHsa
+         zj5Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681814979; x=1684406979;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ne4t7JiMf2N7K31rdXpJp0mlGHlHnFrvUNu2fRDvLr4=;
-        b=dhDF81QrNYj1kfo7OiTUQWcYl/ncKGZpy1y8rXxE6vxsE98ePwbO4LZXKgMYN+u3E4
-         RLkueumbkynb7K+SE7euqtceKt+fsH4Bu00Yb64svpdOfF1JyYM0zNDVBhpYBftiOjKO
-         314HiZFeioWJ4kr03QhoZDt6Hj1wFqlwfz2AiGKJVDBDpdlnMhp1m02X2R29wN84jcLZ
-         fIyVjMOp/3z4gHZdzpJCbzTJnwjcWVEMbEWvX1SmDRE8XT8Qm8fpzIsTNf0suEpMl2lO
-         74IeGX4jNzQdNKOe3/fafjG6tLyhXM7Mk//Yd+hTIg/TbBh7m8PLaizWEW4/4uz4UkPe
-         8pHQ==
-X-Gm-Message-State: AAQBX9cC8M0udV7ixbKdati9kwZIlwkZFx1JHAFG8pPqOGNo+jCqmmNy
-        sDguLyzLX4fRvijyfz0g904=
-X-Google-Smtp-Source: AKy350ZWy7S+tSm+v0XcGgZFxoC/P0j3rCfmmRSifXG/3fZo6/qCuS98Vs2vvGPecQUUg7fraCJ52w==
-X-Received: by 2002:a17:90b:18d:b0:246:fbf2:7e6e with SMTP id t13-20020a17090b018d00b00246fbf27e6emr1902590pjs.14.1681814979023;
-        Tue, 18 Apr 2023 03:49:39 -0700 (PDT)
-Received: from localhost.localdomain ([43.132.141.8])
-        by smtp.gmail.com with ESMTPSA id gz2-20020a17090b0ec200b002473d046e23sm6906437pjb.3.2023.04.18.03.49.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Apr 2023 03:49:38 -0700 (PDT)
-From:   alexjlzheng@gmail.com
-X-Google-Original-From: alexjlzheng@tencent.com
-To:     seanjc@google.com
-Cc:     pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
-        hpa@zytor.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jinliang Zheng <alexjlzheng@tencent.com>
-Subject: [PATCH 2/2] KVM: x86: Adjust return value of pic_poll_read()
-Date:   Tue, 18 Apr 2023 18:47:45 +0800
-Message-Id: <20230418104743.842683-3-alexjlzheng@tencent.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20230418104743.842683-1-alexjlzheng@tencent.com>
-References: <20230418104743.842683-1-alexjlzheng@tencent.com>
+        d=1e100.net; s=20221208; t=1681814896; x=1684406896;
+        h=content-transfer-encoding:in-reply-to:organization:references:cc:to
+         :content-language:subject:reply-to:user-agent:mime-version:date
+         :message-id:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=gEwR6KtNxSbU17prGLCK7vz5h7AeZ/KD54lx3zH1Yn0=;
+        b=RC0f9LV8jmHP3vEvDM2rMXaC1a7jVFdMJGTqTGfKlexCVV40a6BOgABKlX2D+Cn2ME
+         EvzoKFghU4Ms3elj01Z9802RGm8Op2twqDlMK86V+r5sBr76yHtKWwN45mdDrrFdMXXA
+         WtDwSayzS5PMGd7j5JHnPfOvDnr+2Zbx9z5Bf6A7L4OKhUkUq5i4lKgXOyY72m+lobs5
+         evV87b+uC2gASvBEH+xpQIu9xyJ/m2UWMTs0OksNLkWUPRq7clzYhmd5WJ+jOHexgevH
+         +vcyzRkOqHCnH4LUaicqogCBOlAPu2l1JEuGYnIGWJaLObuQjv2jIx+fNoseYDf8Sy6e
+         cJ1Q==
+X-Gm-Message-State: AAQBX9cvBqiWFpA+LMv7kTa+OQ7JxFGkW7fSxd6XO+4ZzDKtjfiSiJ1E
+        HtLwVA3aLqmnwFkQMhFXJKo=
+X-Google-Smtp-Source: AKy350YimcI2ukg3o641WnIr8Lr6SMemlR1orYLP3UKLv+tYLvHr8bMqo/hFDkyvHFRN+QnuIA9fgQ==
+X-Received: by 2002:a1c:7510:0:b0:3ee:289a:43a7 with SMTP id o16-20020a1c7510000000b003ee289a43a7mr14152968wmc.22.1681814896535;
+        Tue, 18 Apr 2023 03:48:16 -0700 (PDT)
+Received: from [192.168.10.76] (54-240-197-233.amazon.com. [54.240.197.233])
+        by smtp.gmail.com with ESMTPSA id l21-20020a05600c4f1500b003f080b2f9f4sm18289380wmq.27.2023.04.18.03.48.15
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 18 Apr 2023 03:48:16 -0700 (PDT)
+From:   Paul Durrant <xadimgnik@gmail.com>
+X-Google-Original-From: Paul Durrant <paul@xen.org>
+Message-ID: <3ede838b-15ef-a987-8584-cd871959797b@xen.org>
+Date:   Tue, 18 Apr 2023 11:48:15 +0100
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+Reply-To: paul@xen.org
+Subject: Re: [PATCH v3] KVM: x86/xen: Implement hvm_op/HVMOP_flush_tlbs
+ hypercall
+Content-Language: en-US
+To:     Metin Kaya <metikaya@amazon.co.uk>, kvm@vger.kernel.org,
+        pbonzini@redhat.com
+Cc:     x86@kernel.org, bp@alien8.de, dwmw@amazon.co.uk, seanjc@google.com,
+        tglx@linutronix.de, mingo@redhat.com, dave.hansen@linux.intel.com,
+        joao.m.martins@oracle.com
+References: <138f584bd86fe68aa05f20db3de80bae61880e11.camel@infradead.org>
+ <20230418101306.98263-1-metikaya@amazon.co.uk>
+Organization: Xen Project
+In-Reply-To: <20230418101306.98263-1-metikaya@amazon.co.uk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-4.7 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
         RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -74,34 +82,85 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Jinliang Zheng <alexjlzheng@tencent.com>
+On 18/04/2023 11:13, Metin Kaya wrote:
+> Implement in-KVM support for Xen's HVMOP_flush_tlbs hypercall, which
+> allows the guest to flush all vCPU's TLBs. KVM doesn't provide an
+> ioctl() to precisely flush guest TLBs, and punting to userspace would
+> likely negate the performance benefits of avoiding a TLB shootdown in
+> the guest.
+> 
+> Signed-off-by: Metin Kaya <metikaya@amazon.co.uk>
+> 
+> ---
+> v3:
+>    - Addressed comments for v2.
+>    - Verified with XTF/invlpg test case.
+> 
+> v2:
+>    - Removed an irrelevant URL from commit message.
+> ---
+>   arch/x86/kvm/xen.c                 | 15 +++++++++++++++
+>   include/xen/interface/hvm/hvm_op.h |  3 +++
+>   2 files changed, 18 insertions(+)
+> 
+> diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
+> index 40edf4d1974c..a63c48e8d8fa 100644
+> --- a/arch/x86/kvm/xen.c
+> +++ b/arch/x86/kvm/xen.c
+> @@ -21,6 +21,7 @@
+>   #include <xen/interface/vcpu.h>
+>   #include <xen/interface/version.h>
+>   #include <xen/interface/event_channel.h>
+> +#include <xen/interface/hvm/hvm_op.h>
+>   #include <xen/interface/sched.h>
+>   
+>   #include <asm/xen/cpuid.h>
+> @@ -1330,6 +1331,17 @@ static bool kvm_xen_hcall_sched_op(struct kvm_vcpu *vcpu, bool longmode,
+>   	return false;
+>   }
+>   
+> +static bool kvm_xen_hcall_hvm_op(struct kvm_vcpu *vcpu, int cmd, u64 arg, u64 *r)
+> +{
+> +	if (cmd == HVMOP_flush_tlbs && !arg) {
+> +		kvm_make_all_cpus_request(vcpu->kvm, KVM_REQ_TLB_FLUSH_GUEST);
+> +		*r = 0;
+> +		return true;
+> +	}
+> +
+> +	return false;
+> +}
 
-Returning 0x07 raises ambiguity when no interrupt is in pic_poll_read().
-Although it will not cause a functional exception (Bit 7 is 0 means no
-interrupt), it will easily make developers mistakenly think that a
-spurious interrupt (IRQ 7) has been returned.
+This code structure means that arg != NULL will result in the guest 
+seeing ENOSYS rather than EINVAL.
 
-Return 0x00 instread of 0x07.
+   Paul
 
-Signed-off-by: Jinliang Zheng <alexjlzheng@tencent.com>
----
- arch/x86/kvm/i8259.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/arch/x86/kvm/i8259.c b/arch/x86/kvm/i8259.c
-index 861872e2641a..57978ad8311c 100644
---- a/arch/x86/kvm/i8259.c
-+++ b/arch/x86/kvm/i8259.c
-@@ -414,7 +414,8 @@ static u32 pic_poll_read(struct kvm_kpic_state *s, u32 addr1)
- 		/* Bit 7 is 1, means there's an interrupt */
- 		ret |= 0x80;
- 	} else {
--		ret = 0x07;
-+		/* Bit 7 is 0, means there's no interrupt */
-+		ret = 0x00;
- 		pic_update_irq(s->pics_state);
- 	}
- 
--- 
-2.31.1
+> +
+>   struct compat_vcpu_set_singleshot_timer {
+>       uint64_t timeout_abs_ns;
+>       uint32_t flags;
+> @@ -1501,6 +1513,9 @@ int kvm_xen_hypercall(struct kvm_vcpu *vcpu)
+>   			timeout |= params[1] << 32;
+>   		handled = kvm_xen_hcall_set_timer_op(vcpu, timeout, &r);
+>   		break;
+> +	case __HYPERVISOR_hvm_op:
+> +		handled = kvm_xen_hcall_hvm_op(vcpu, params[0], params[1], &r);
+> +		break;
+>   	}
+>   	default:
+>   		break;
+> diff --git a/include/xen/interface/hvm/hvm_op.h b/include/xen/interface/hvm/hvm_op.h
+> index 03134bf3cec1..240d8149bc04 100644
+> --- a/include/xen/interface/hvm/hvm_op.h
+> +++ b/include/xen/interface/hvm/hvm_op.h
+> @@ -16,6 +16,9 @@ struct xen_hvm_param {
+>   };
+>   DEFINE_GUEST_HANDLE_STRUCT(xen_hvm_param);
+>   
+> +/* Flushes guest TLBs for all vCPUs: @arg must be 0. */
+> +#define HVMOP_flush_tlbs            5
+> +
+>   /* Hint from PV drivers for pagetable destruction. */
+>   #define HVMOP_pagetable_dying       9
+>   struct xen_hvm_pagetable_dying {
 
