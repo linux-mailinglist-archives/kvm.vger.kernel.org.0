@@ -2,66 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C4C216E57E5
-	for <lists+kvm@lfdr.de>; Tue, 18 Apr 2023 05:39:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CD9576E57FD
+	for <lists+kvm@lfdr.de>; Tue, 18 Apr 2023 06:11:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230280AbjDRDjG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 Apr 2023 23:39:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55548 "EHLO
+        id S230036AbjDREL2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Apr 2023 00:11:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34720 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230253AbjDRDjB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 17 Apr 2023 23:39:01 -0400
-Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE49D3594
-        for <kvm@vger.kernel.org>; Mon, 17 Apr 2023 20:38:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1681789138; x=1713325138;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=Uxvj23jD7k/sARpP4dCl/Dt2A122paNqEtn0lkZMlsA=;
-  b=l2ihwnA2FchD6rCspZZgzv10jWN0YFmWh0iSpBd/O+tBr0kq5Jh2lhwo
-   UMW8beYGHZjgnK7LlSbEz2tlYuDsny2ZIL1mf0uRIl3ib25f7ko2emaS3
-   ngQWSb1cFhUYJtvPzJl+cpuUcw0SN6GZ/BF9XsTaXqHPyIgMVCMysB/Cm
-   2hSB1V5+wJCMKBE3b+Wic2q06hmPwrYjcv5ftkX29iE9boApZCnarYLiC
-   Uca3/7bmjBdxldjqL7XuH12JKQglKEpe/cFNBqHwXRgXEnD6WZRnoXwSG
-   gZ4h4nVFDn55MFfU7gOr3tdpwCvV+LsuP2gm0G4xXENiQMdld2YfNheSz
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10683"; a="345064420"
-X-IronPort-AV: E=Sophos;i="5.99,206,1677571200"; 
-   d="scan'208";a="345064420"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Apr 2023 20:38:58 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10683"; a="684409584"
-X-IronPort-AV: E=Sophos;i="5.99,206,1677571200"; 
-   d="scan'208";a="684409584"
-Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.249.174.28]) ([10.249.174.28])
-  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Apr 2023 20:38:56 -0700
-Message-ID: <846d54b3-6512-1846-959b-e6489f51cc98@linux.intel.com>
-Date:   Tue, 18 Apr 2023 11:38:53 +0800
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Subject: Re: [PATCH v7 4/5] KVM: x86: Untag address when LAM applicable
-To:     Zeng Guang <guang.zeng@intel.com>,
+        with ESMTP id S229517AbjDREL1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Apr 2023 00:11:27 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 358C544B3
+        for <kvm@vger.kernel.org>; Mon, 17 Apr 2023 21:10:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1681791039;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Xh3TsCLXRD6/SzblTrxESG3WliTN/NlnShwKD7qJmCw=;
+        b=U3u2ig5ttXgiKHPNIXHMTcDabvtQWlQUsr8baFf/3+5i3n0oHNEn5sSiW5zZnz8AsXUR4/
+        saJuqM7J/aZBQB881HbjsJV6gxXqoWws/QiDje1PHq6ruSiXeJ4klgKMic/ukYMLMcwEQ/
+        ly+ZucF0UYpDPAuBI55ArmE/HoWIzEo=
+Received: from mail-il1-f200.google.com (mail-il1-f200.google.com
+ [209.85.166.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-114-Yktld3IwMmSpqB5Q9VGRlA-1; Tue, 18 Apr 2023 00:10:37 -0400
+X-MC-Unique: Yktld3IwMmSpqB5Q9VGRlA-1
+Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-32879a859d8so18859205ab.3
+        for <kvm@vger.kernel.org>; Mon, 17 Apr 2023 21:10:37 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1681791037; x=1684383037;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Xh3TsCLXRD6/SzblTrxESG3WliTN/NlnShwKD7qJmCw=;
+        b=gDRrxA7qSNQnvC5B+ki4p0XeGTIn69wTYhsiPGFmEsAtPqXeVxpXOxhmRAFBjiibYt
+         s8Kob5vEfQUBWH8WUx6aWiKMA2/Eh0MEG1mwY83OXYvV+hnO497cId3ecFlGkNpJQ8Pa
+         wdq5G8leG4oGKEtFbBMdaWH1HcIByofJb5ZL2HYFdIxG5eLjQnfi9qQmkQ/MCeOzvdgP
+         qF5f47Yc0T9u5EXIjcu6kfJemod/oP6PWNZOyuQeWL5uBTi5Xa4RPrlwoYmK6QBswlOx
+         Tk7OsajTUIhmKN5RbIlmIqPokHy7a+LSEXAJgFNToX38yXJer3FBkE0n/6GSqZDCiwnV
+         emzg==
+X-Gm-Message-State: AAQBX9cEK68Fvm7ofiykKto0Bvdt5hqsVCxoQAud6Tj1P93U2Vhtv6Zj
+        UFpiBNOWUfk0B+9x4McXXOcrMCaJdjFsuJKKwpIoItzLEA6Ty/LAjCoBq0UUhZbX6WgwePYVYrU
+        cZMnGCk4OmwMQ
+X-Received: by 2002:a92:d902:0:b0:32a:79c4:ce48 with SMTP id s2-20020a92d902000000b0032a79c4ce48mr12354966iln.23.1681791036709;
+        Mon, 17 Apr 2023 21:10:36 -0700 (PDT)
+X-Google-Smtp-Source: AKy350bdWlJiRpOSPyMXnDBV4MCo70URxAv/pP21vJfcpGLaqYd9J5vCEveva+zeAUdPVlViz88XbA==
+X-Received: by 2002:a92:d902:0:b0:32a:79c4:ce48 with SMTP id s2-20020a92d902000000b0032a79c4ce48mr12354932iln.23.1681791036329;
+        Mon, 17 Apr 2023 21:10:36 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id 7-20020a921307000000b0032732e7c25esm3585372ilt.36.2023.04.17.21.10.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 17 Apr 2023 21:10:35 -0700 (PDT)
+Date:   Mon, 17 Apr 2023 22:10:33 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     "Tian, Kevin" <kevin.tian@intel.com>
+Cc:     Jason Gunthorpe <jgg@nvidia.com>, "Liu, Yi L" <yi.l.liu@intel.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Christopherson,, Sean" <seanjc@google.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>
-Cc:     "Huang, Kai" <kai.huang@intel.com>,
-        "Gao, Chao" <chao.gao@intel.com>,
-        "Guo, Xuelian" <Xuelian.Guo@intel.com>,
-        "robert.hu@linux.intel.com" <robert.hu@linux.intel.com>
-References: <20230404130923.27749-1-binbin.wu@linux.intel.com>
- <20230404130923.27749-5-binbin.wu@linux.intel.com>
- <4d9ea8b5-1299-4b3f-9cdc-f19116ad2ef6@intel.com>
-From:   Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <4d9ea8b5-1299-4b3f-9cdc-f19116ad2ef6@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-6.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
+        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "shameerali.kolothum.thodi@huawei.com" 
+        <shameerali.kolothum.thodi@huawei.com>,
+        "lulu@redhat.com" <lulu@redhat.com>,
+        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
+        "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        "Hao, Xudong" <xudong.hao@intel.com>,
+        "Zhao, Yan Y" <yan.y.zhao@intel.com>,
+        "Xu, Terrence" <terrence.xu@intel.com>,
+        "Jiang, Yanting" <yanting.jiang@intel.com>,
+        "Duan, Zhenzhong" <zhenzhong.duan@intel.com>
+Subject: Re: [PATCH v3 12/12] vfio/pci: Report dev_id in
+ VFIO_DEVICE_GET_PCI_HOT_RESET_INFO
+Message-ID: <20230417221033.778c00c9.alex.williamson@redhat.com>
+In-Reply-To: <BN9PR11MB5276D93DDFE3ED97CD1B923B8C9D9@BN9PR11MB5276.namprd11.prod.outlook.com>
+References: <20230412105045.79adc83d.alex.williamson@redhat.com>
+        <ZDcPTTPlni/Mi6p3@nvidia.com>
+        <BN9PR11MB5276782DA56670C8209470828C989@BN9PR11MB5276.namprd11.prod.outlook.com>
+        <ZDfslVwqk6JtPpyD@nvidia.com>
+        <20230413120712.3b9bf42d.alex.williamson@redhat.com>
+        <BN9PR11MB5276A160CA699933B897C8C18C999@BN9PR11MB5276.namprd11.prod.outlook.com>
+        <DS0PR11MB7529B7481AC97261E12AA116C3999@DS0PR11MB7529.namprd11.prod.outlook.com>
+        <20230414111043.40c15dde.alex.williamson@redhat.com>
+        <DS0PR11MB75290A78D6879EC2E31E21AEC39C9@DS0PR11MB7529.namprd11.prod.outlook.com>
+        <20230417130140.1b68082e.alex.williamson@redhat.com>
+        <ZD2erN3nKbnyqei9@nvidia.com>
+        <20230417140642.650fc165.alex.williamson@redhat.com>
+        <BN9PR11MB5276D93DDFE3ED97CD1B923B8C9D9@BN9PR11MB5276.namprd11.prod.outlook.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -69,122 +114,127 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Tue, 18 Apr 2023 03:24:46 +0000
+"Tian, Kevin" <kevin.tian@intel.com> wrote:
 
-On 4/18/2023 11:28 AM, Zeng Guang wrote:
->
-> On 4/4/2023 9:09 PM, Binbin Wu wrote:
->> Untag address for 64-bit memory/mmio operand in instruction emulations
->> and vmexit handlers when LAM is applicable.
->>
->> For instruction emulation, untag address in __linearize() before
->> canonical check. LAM doesn't apply to instruction fetch and invlpg,
->> use KVM_X86_UNTAG_ADDR_SKIP_LAM to skip LAM untag.
->>
->> For vmexit handlings related to 64-bit linear address:
->> - Cases need to untag address
->>    Operand(s) of VMX instructions and INVPCID
->>    Operand(s) of SGX ENCLS
->>    Linear address in INVVPID descriptor.
->> - Cases LAM doesn't apply to (no change needed)
->>    Operand of INVLPG
->>    Linear address in INVPCID descriptor
->>
->> Co-developed-by: Robert Hoo <robert.hu@linux.intel.com>
->> Signed-off-by: Robert Hoo <robert.hu@linux.intel.com>
->> Signed-off-by: Binbin Wu <binbin.wu@linux.intel.com>
->> Tested-by: Xuelian Guo <xuelian.guo@intel.com>
->> ---
->>   arch/x86/kvm/emulate.c     | 23 ++++++++++++++++++-----
->>   arch/x86/kvm/kvm_emulate.h |  2 ++
->>   arch/x86/kvm/vmx/nested.c  |  4 ++++
->>   arch/x86/kvm/vmx/sgx.c     |  1 +
->>   arch/x86/kvm/x86.c         | 10 ++++++++++
->>   5 files changed, 35 insertions(+), 5 deletions(-)
->>
->> diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
->> index a20bec931764..b7df465eccf2 100644
->> --- a/arch/x86/kvm/emulate.c
->> +++ b/arch/x86/kvm/emulate.c
->> @@ -688,7 +688,8 @@ static __always_inline int __linearize(struct 
->> x86_emulate_ctxt *ctxt,
->>                          struct segmented_address addr,
->>                          unsigned *max_size, unsigned size,
->>                          bool write, bool fetch,
->> -                       enum x86emul_mode mode, ulong *linear)
->> +                       enum x86emul_mode mode, ulong *linear,
->> +                       u64 untag_flags)
->
-> IMO, here should be "u64 flags" instead of "u64 untag_flags". Emulator 
-> can
-> use it as flag combination for other purpose.
+> > From: Alex Williamson <alex.williamson@redhat.com>
+> > Sent: Tuesday, April 18, 2023 4:07 AM
+> > 
+> > On Mon, 17 Apr 2023 16:31:56 -0300
+> > Jason Gunthorpe <jgg@nvidia.com> wrote:
+> >   
+> > > On Mon, Apr 17, 2023 at 01:01:40PM -0600, Alex Williamson wrote:  
+> > > > Yes, it's not trivial, but Jason is now proposing that we consider
+> > > > mixing groups, cdevs, and multiple iommufd_ctxs as invalid.  I think
+> > > > this means that regardless of which device calls INFO, there's only one
+> > > > answer (assuming same set of devices opened, all cdev, all within same
+> > > > iommufd_ctx).  Based on what I explained about my understanding of  
+> > INFO2  
+> > > > and Jason agreed to, I think the output would be:
+> > > >
+> > > > flags: NOT_RESETABLE | DEV_ID
+> > > > {
+> > > >   { valid devA-id,  devA-BDF },
+> > > >   { valid devC-id,  devC-BDF },
+> > > >   { valid devD-id,  devD-BDF },
+> > > >   { invalid dev-id, devE-BDF },
+> > > > }
+> > > >
+> > > > Here devB gets dropped because the kernel understands that devB is
+> > > > unopened, affected, and owned.  It's therefore not a blocker for
+> > > > hot-reset.  
+> > >
+> > > I don't think we want to drop anything because it makes the API
+> > > ill suited for the debugging purpose.
+> > >
+> > > devb should be returned with an invalid dev_id if I understand your
+> > > example. Maybe it should return with -1 as the dev_id instead of 0, to
+> > > make the debugging a bit better.
+> > >
+> > > Userspace should look at only NOT_RESETTABLE to determine if it
+> > > proceeds or not, and it should use the valid dev_id list to iterate
+> > > over the devices it has open to do the config stuff.  
+> > 
+> > If an affected device is owned, not opened, and not interfering with
+> > the reset, what is it adding to the API to report it for debugging
+> > purposes?  I'm afraid this leads into expanding "invalid dev-id" into an  
+> 
+> consistent output before and after devB is opened.
 
-yes, make sense with the advise you suggested in patch 3.
+In the case where devB is not opened including it only provides
+useless information.  In the case where devB is opened it's necessary
+to be reported as an opened, affected device.
 
+> > errno or bitmap of error conditions that the user needs to parse.
+> >   
+> 
+> Not exactly.
+> 
+> If RESETABLE invalid dev_id doesn't matter. The user only use the
+> valid dev_id list to iterate as Jason pointed out.
 
->
->
->>   {
->>       struct desc_struct desc;
->>       bool usable;
->> @@ -701,6 +702,7 @@ static __always_inline int __linearize(struct 
->> x86_emulate_ctxt *ctxt,
->>       *max_size = 0;
->>       switch (mode) {
->>       case X86EMUL_MODE_PROT64:
->> +        la = ctxt->ops->untag_addr(ctxt, la, untag_flags);
->>           *linear = la;
->>           va_bits = ctxt_virt_addr_bits(ctxt);
->>           if (!__is_canonical_address(la, va_bits))
->> @@ -758,7 +760,7 @@ static int linearize(struct x86_emulate_ctxt *ctxt,
->>   {
->>       unsigned max_size;
->>       return __linearize(ctxt, addr, &max_size, size, write, false,
->> -               ctxt->mode, linear);
->> +               ctxt->mode, linear, 0);
->>   }
->>     static inline int assign_eip(struct x86_emulate_ctxt *ctxt, ulong 
->> dst)
->> @@ -771,7 +773,12 @@ static inline int assign_eip(struct 
->> x86_emulate_ctxt *ctxt, ulong dst)
->>         if (ctxt->op_bytes != sizeof(unsigned long))
->>           addr.ea = dst & ((1UL << (ctxt->op_bytes << 3)) - 1);
->> -    rc = __linearize(ctxt, addr, &max_size, 1, false, true, 
->> ctxt->mode, &linear);
->> +    /*
->> +     * LAM does not apply to addresses used for instruction fetches
->> +     * or to those that specify the targets of jump and call 
->> instructions
->> +     */
->
-> This api handles the target address of branch and call instructions. I 
-> think it enough to only explain the exact case.
+Yes, but...
 
+> If NOT_RESETTABLE due to devE not assigned to the VM one can
+> easily figure out the fact by simply looking at the list of affected BDFs
+> and the configuration of assigned devices of the VM. Then invalid
+> dev_id also doesn't matter.
 
-OK, will make it specific.
+Huh?
 
->
->> +    rc = __linearize(ctxt, addr, &max_size, 1, false, true, ctxt->mode,
->> +                     &linear, KVM_X86_UNTAG_ADDR_SKIP_LAM);
->>       if (rc == X86EMUL_CONTINUE)
->>           ctxt->_eip = addr.ea;
->>       return rc;
->> @@ -906,9 +913,12 @@ static int __do_insn_fetch_bytes(struct 
->> x86_emulate_ctxt *ctxt, int op_size)
->>        * __linearize is called with size 0 so that it does not do any
->>        * boundary check itself.  Instead, we use max_size to check
->>        * against op_size.
->> +     *
->> +     * LAM does not apply to addresses used for instruction fetches
->> +     * or to those that specify the targets of jump and call 
->> instructions
->
-> Ditto.
->
->>        */
->>       rc = __linearize(ctxt, addr, &max_size, 0, false, true, 
->> ctxt->mode,
->> -             &linear);
->> +             &linear, KVM_X86_UNTAG_ADDR_SKIP_LAM);
->>       if (unlikely(rc != X86EMUL_CONTINUE))
->>           return rc;
->>
+Given:
+
+flags: NOT_RESETABLE | DEV_ID
+{
+  { valid devA-id,  devA-BDF },
+  { invalid dev-id, devB-BDF },
+  { valid devC-id,  devC-BDF },
+  { valid devD-id,  devD-BDF },
+  { invalid dev-id, devE-BDF },
+}
+
+How does the user determine that devE is to blame and not devB based on
+BDF?  The user cannot rely on sysfs for help, they don't know the IOMMU
+grouping, nor do they know the BDF except as inferred by matching valid
+dev-ids in the above output.
+ 
+> If NOT_RESETTABLE while devE is already assigned to the VM then it's
+> indication of mixing groups, cdevs or multiple iommufd_ctxs. Then
+> people should debug with other means/hints to dig out the exact
+> culprit.
+
+I don't know what situation you're trying to explain here.  If devE
+were opened within the same iommufd_ctx, this becomes:
+
+flags: RESETABLE | DEV_ID
+{
+  { valid devA-id,  devA-BDF },
+  { invalid dev-id, devB-BDF },
+  { valid devC-id,  devC-BDF },
+  { valid devD-id,  devD-BDF },
+  { valid devE-id,  devE-BDF },
+}
+
+Yes, the user should only be looking at the flag to determine the
+availability of hot-reset, (here's the but) but how is it consistent to
+indicate both that hot-reset is available and include an invalid
+dev-id?  The consistency as I propose is that an invalid dev-id is only
+presented with NOT_RESETTABLE for the device blocking hot-reset.  In
+the previous case, devB is not blocking reset and reporting an invalid
+dev-id only serves to obfuscate determining the blocking device.
+
+For the cases of affected group-opened devices or separate
+iommufd_ctxs, the user gets invalid dev-ids for anything outside of
+the calling device's iommufd_ctx.
+
+We haven't discussed how it fails when called on a group-opened device
+in a mixed environment.  I'd propose that the INFO ioctl behaves
+exactly as it does today, reporting group-id and BDF for each affected
+device.  However, the hot-reset ioctl itself is not extended to accept
+devicefd because there is no proof-of-ownership model for cdevs.
+Therefore even if the user could map group-id to devicefd, they get
+-EINVAL calling HOT_RESET with a devicefd when the ioctl is called from
+a group-opened device.  Thanks,
+
+Alex
+
