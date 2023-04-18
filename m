@@ -2,269 +2,243 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 12CCA6E5D36
-	for <lists+kvm@lfdr.de>; Tue, 18 Apr 2023 11:20:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 398916E5E29
+	for <lists+kvm@lfdr.de>; Tue, 18 Apr 2023 12:03:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231204AbjDRJUK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Apr 2023 05:20:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56718 "EHLO
+        id S230053AbjDRKDj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Apr 2023 06:03:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33230 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229833AbjDRJUI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Apr 2023 05:20:08 -0400
-Received: from loongson.cn (mail.loongson.cn [114.242.206.163])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E8D88103;
-        Tue, 18 Apr 2023 02:20:04 -0700 (PDT)
-Received: from loongson.cn (unknown [10.20.42.120])
-        by gateway (Coremail) with SMTP id _____8DxAf_DYD5kL2EeAA--.47650S3;
-        Tue, 18 Apr 2023 17:20:03 +0800 (CST)
-Received: from [10.20.42.120] (unknown [10.20.42.120])
-        by localhost.localdomain (Coremail) with SMTP id AQAAf8Dxib2_YD5kJq4sAA--.51467S3;
-        Tue, 18 Apr 2023 17:20:00 +0800 (CST)
-Subject: Re: [PATCH v7 00/30] Add KVM LoongArch support
-To:     Paolo Bonzini <pbonzini@redhat.com>
-References: <20230417094649.874671-1-zhaotianrui@loongson.cn>
-Cc:     Huacai Chen <chenhuacai@kernel.org>,
-        WANG Xuerui <kernel@xen0n.name>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        loongarch@lists.linux.dev, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Mark Brown <broonie@kernel.org>,
-        Alex Deucher <alexander.deucher@amd.com>,
-        Oliver Upton <oliver.upton@linux.dev>, maobibo@loongson.cn,
-        Xi Ruoyao <xry111@xry111.site>
-From:   Tianrui Zhao <zhaotianrui@loongson.cn>
-Message-ID: <4cf93458-e5e1-d02d-4728-c2ddb4ea2088@loongson.cn>
-Date:   Tue, 18 Apr 2023 17:19:59 +0800
-User-Agent: Mozilla/5.0 (X11; Linux mips64; rv:45.0) Gecko/20100101
- Thunderbird/45.4.0
+        with ESMTP id S229597AbjDRKDi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Apr 2023 06:03:38 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E56E93AA0
+        for <kvm@vger.kernel.org>; Tue, 18 Apr 2023 03:03:35 -0700 (PDT)
+Received: from pps.filterd (m0353727.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 33I8aPOq014825;
+        Tue, 18 Apr 2023 10:03:19 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=nbsxf3kjHO1yzQ6qVB8qIZ+cJr9iVRLawC/fz0N1cGU=;
+ b=sA85iRXdbM9GqcJ+DJBNqMrFwYolbSCcOxER1UgJ5huZo6cRyFKfba8zukON7b2sXLK5
+ IbrlBPUMhsnBX5MWsLRY6euX6PeojE6wJYunyLrKRnwmLqkdAyic2B6v/YUwz7IPJOdv
+ rqvNxZ9t/iq+Xlzpen5ZFLauQX1PmMrUaz7mjhDmTIHzX9+s40gs6iZHln943SF3uNJ/
+ QHPNGL8A2ctS5opz/1IgGSmDnrqkS+V7E49u5Z7SBVDpYs28Qn6z9IojkRWsTBSbgngm
+ bmSmBMCxq7uNUz0shxyrQGVc0icLkbsNz7tH4rI3FMuKLpQXP1A+cwRAZFTHa+fmM2XY TQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3q1pm14ngx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 18 Apr 2023 10:03:18 +0000
+Received: from m0353727.ppops.net (m0353727.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 33I9MDsS010275;
+        Tue, 18 Apr 2023 10:03:15 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3q1pm14mh2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 18 Apr 2023 10:03:15 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 33I0Tvfr014470;
+        Tue, 18 Apr 2023 10:01:52 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+        by ppma03ams.nl.ibm.com (PPS) with ESMTPS id 3pykj6hx36-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 18 Apr 2023 10:01:51 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+        by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 33IA1mmU28705330
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 18 Apr 2023 10:01:48 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 7B1D62004D;
+        Tue, 18 Apr 2023 10:01:48 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 1892A2004B;
+        Tue, 18 Apr 2023 10:01:47 +0000 (GMT)
+Received: from [9.171.38.31] (unknown [9.171.38.31])
+        by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+        Tue, 18 Apr 2023 10:01:47 +0000 (GMT)
+Message-ID: <d7a0263f-4b27-387d-bf6c-fde71df3feb4@linux.ibm.com>
+Date:   Tue, 18 Apr 2023 12:01:46 +0200
 MIME-Version: 1.0
-In-Reply-To: <20230417094649.874671-1-zhaotianrui@loongson.cn>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.8.0
+Subject: Re: [PATCH v19 01/21] s390x/cpu topology: add s390 specifics to CPU
+ topology
+To:     Nina Schoetterl-Glausch <nsg@linux.ibm.com>, qemu-s390x@nongnu.org
+Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
+        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
+        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
+        kvm@vger.kernel.org, ehabkost@redhat.com,
+        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
+        seiden@linux.ibm.com, nrb@linux.ibm.com, frankja@linux.ibm.com,
+        berrange@redhat.com, clg@kaod.org
+References: <20230403162905.17703-1-pmorel@linux.ibm.com>
+ <20230403162905.17703-2-pmorel@linux.ibm.com>
+ <e96e60dade206cb970b55bfc9d2a77643bd14d98.camel@linux.ibm.com>
+Content-Language: en-US
+From:   Pierre Morel <pmorel@linux.ibm.com>
+In-Reply-To: <e96e60dade206cb970b55bfc9d2a77643bd14d98.camel@linux.ibm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: AQAAf8Dxib2_YD5kJq4sAA--.51467S3
-X-CM-SenderInfo: p2kd03xldq233l6o00pqjv00gofq/
-X-Coremail-Antispam: 1Uk129KBjvJXoW3KF47Ar4fGF1rCFykZw1fJFb_yoWDAFWxpF
-        W7urn8Gr4kGrsaqws3t34kurn8Xr1xGrWag3Wa9348CrW2qrykZFykKr9FvFZrZ3yrJr10
-        qr1rKw1ag3WUAaDanT9S1TB71UUUUjJqnTZGkaVYY2UrUUUUj1kv1TuYvTs0mT0YCTnIWj
-        qI5I8CrVACY4xI64kE6c02F40Ex7xfYxn0WfASr-VFAUDa7-sFnT9fnUUIcSsGvfJTRUUU
-        bqxYFVCjjxCrM7AC8VAFwI0_Jr0_Gr1l1xkIjI8I6I8E6xAIw20EY4v20xvaj40_Wr0E3s
-        1l1IIY67AEw4v_Jrv_JF1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xv
-        wVC0I7IYx2IY67AKxVW5JVW7JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwA2z4
-        x0Y4vEx4A2jsIE14v26r4UJVWxJr1l84ACjcxK6I8E87Iv6xkF7I0E14v26r4UJVWxJr1l
-        n4kS14v26r126r1DM2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12xvs2x26I8E6x
-        ACxx1l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r126r1DMcIj6I8E
-        87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lc7I2V7IY0V
-        AS07AlzVAYIcxG8wCY1x0262kKe7AKxVWUAVWUtwCF04k20xvY0x0EwIxGrwCFx2IqxVCF
-        s4IE7xkEbVWUJVW8JwCFI7km07C267AKxVWUAVWUtwC20s026c02F40E14v26r1j6r18MI
-        8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41l
-        IxAIcVC0I7IYx2IY67AKxVWUCVW8JwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIx
-        AIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2
-        jsIEc7CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7IU8Dl1DUUUUU==
-X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: WM54DEyMwDAF6V0_BkGk31R0316_wC_R
+X-Proofpoint-ORIG-GUID: PYPNcmML0yPmYOHSZKtwKebMknm2xb0t
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
+ definitions=2023-04-18_06,2023-04-17_01,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 mlxlogscore=999
+ malwarescore=0 mlxscore=0 priorityscore=1501 impostorscore=0
+ suspectscore=0 spamscore=0 adultscore=0 lowpriorityscore=0 clxscore=1015
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2303200000 definitions=main-2304180087
+X-Spam-Status: No, score=-4.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Please ignore this mail message, as it is not a complete patch series.  
-Please see the next V7 patches I have sent.
 
-Thanks
-Tianrui Zhao
+On 4/18/23 10:53, Nina Schoetterl-Glausch wrote:
+> On Mon, 2023-04-03 at 18:28 +0200, Pierre Morel wrote:
+>> S390 adds two new SMP levels, drawers and books to the CPU
+>> topology.
+>> The S390 CPU have specific topology features like dedication
+>> and entitlement to give to the guest indications on the host
+>> vCPUs scheduling and help the guest take the best decisions
+>> on the scheduling of threads on the vCPUs.
+>>
+>> Let us provide the SMP properties with books and drawers levels
+>> and S390 CPU with dedication and entitlement,
+>>
+>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+>> Reviewed-by: Thomas Huth <thuth@redhat.com>
+>> ---
+>>   MAINTAINERS                     |  5 ++++
+>>   qapi/machine-common.json        | 22 ++++++++++++++
+>>   qapi/machine-target.json        | 12 ++++++++
+>>   qapi/machine.json               | 17 +++++++++--
+>>   include/hw/boards.h             | 10 ++++++-
+>>   include/hw/s390x/cpu-topology.h | 15 ++++++++++
+> Is hw/s390x the right path for cpu-topology?
+> I haven't understood the difference between hw/s390x and target/s390x
+> but target/s390x feels more correct, I could be mistaken though.
 
-在 2023年04月17日 17:46, Tianrui Zhao 写道:
-> This series adds KVM LoongArch support. Loongson 3A5000 supports hardware
-> assisted virtualization. With cpu virtualization, there are separate
-> hw-supported user mode and kernel mode in guest mode. With memory
-> virtualization, there are two-level hw mmu table for guest mode and host
-> mode. Also there is separate hw cpu timer with consant frequency in
-> guest mode, so that vm can migrate between hosts with different freq.
-> Currently, we are able to boot LoongArch Linux Guests.
+AFAIK target/s390 is for CPU emulation code while hw/s390 is for other 
+emulation.
+
+So it depends how we classify the CPU topology, it is related to CPU but 
+it is no emulation.
+
+Since Thomas approved this layout I would like to keep it like this.
+
+
 >
-> Few key aspects of KVM LoongArch added by this series are:
-> 1. Enable kvm hardware function when kvm module is loaded.
-> 2. Implement VM and vcpu related ioctl interface such as vcpu create,
->     vcpu run etc. GET_ONE_REG/SET_ONE_REG ioctl commands are use to
->     get general registers one by one.
-> 3. Hardware access about MMU, timer and csr are emulated in kernel.
-> 4. Hardwares such as mmio and iocsr device are emulated in user space
->     such as APIC, IPI, pci devices etc.
+>>   target/s390x/cpu.h              |  5 ++++
+>>   hw/core/machine-smp.c           | 53 ++++++++++++++++++++++++++++-----
+>>   hw/core/machine.c               |  4 +++
+>>   hw/s390x/s390-virtio-ccw.c      |  2 ++
+>>   softmmu/vl.c                    |  6 ++++
+>>   target/s390x/cpu.c              |  7 +++++
+>>   qapi/meson.build                |  1 +
+>>   qemu-options.hx                 |  7 +++--
+>>   14 files changed, 152 insertions(+), 14 deletions(-)
+>>   create mode 100644 qapi/machine-common.json
+>>   create mode 100644 include/hw/s390x/cpu-topology.h
+>>
+> [...]
 >
-> The running environment of LoongArch virt machine:
-> 1. Cross tools to build kernel and uefi:
->     $ wget https://github.com/loongson/build-tools/releases/download/2022.09.06/loongarch64-clfs-6.3-cross-tools-gcc-glibc.tar.xz
->     tar -vxf loongarch64-clfs-6.3-cross-tools-gcc-glibc.tar.xz  -C /opt
->     export PATH=/opt/cross-tools/bin:$PATH
->     export LD_LIBRARY_PATH=/opt/cross-tools/lib:$LD_LIBRARY_PATH
->     export LD_LIBRARY_PATH=/opt/cross-tools/loongarch64-unknown-linux-gnu/lib/:$LD_LIBRARY_PATH
-> 2. This series is based on the linux source code:
->     https://github.com/loongson/linux-loongarch-kvm
->     Build command:
->     git checkout kvm-loongarch
->     make ARCH=loongarch CROSS_COMPILE=loongarch64-unknown-linux-gnu- loongson3_defconfig
->     make ARCH=loongarch CROSS_COMPILE=loongarch64-unknown-linux-gnu-
-> 3. QEMU hypervisor with LoongArch supported:
->     https://github.com/loongson/qemu
->     Build command:
->     git checkout kvm-loongarch
->     ./configure --target-list="loongarch64-softmmu"  --enable-kvm
->     make
-> 4. Uefi bios of LoongArch virt machine:
->     Link: https://github.com/tianocore/edk2-platforms/tree/master/Platform/Loongson/LoongArchQemuPkg#readme
-> 5. you can also access the binary files we have already build:
->     https://github.com/yangxiaojuan-loongson/qemu-binary
-> The command to boot loongarch virt machine:
->     $ qemu-system-loongarch64 -machine virt -m 4G -cpu la464 \
->     -smp 1 -bios QEMU_EFI.fd -kernel vmlinuz.efi -initrd ramdisk \
->     -serial stdio   -monitor telnet:localhost:4495,server,nowait \
->     -append "root=/dev/ram rdinit=/sbin/init console=ttyS0,115200" \
->     --nographic
+>> diff --git a/qapi/machine-common.json b/qapi/machine-common.json
+>> new file mode 100644
+>> index 0000000000..73ea38d976
+>> --- /dev/null
+>> +++ b/qapi/machine-common.json
+>> @@ -0,0 +1,22 @@
+>> +# -*- Mode: Python -*-
+>> +# vim: filetype=python
+>> +#
+>> +# This work is licensed under the terms of the GNU GPL, version 2 or later.
+>> +# See the COPYING file in the top-level directory.
+>> +
+>> +##
+>> +# = Machines S390 data types
+>> +##
+>> +
+>> +##
+>> +# @CpuS390Entitlement:
+>> +#
+>> +# An enumeration of cpu entitlements that can be assumed by a virtual
+>> +# S390 CPU
+>> +#
+>> +# Since: 8.1
+>> +##
+>> +{ 'enum': 'CpuS390Entitlement',
+>> +  'prefix': 'S390_CPU_ENTITLEMENT',
+>> +  'data': [ 'horizontal', 'low', 'medium', 'high' ] }
+> You can get rid of the horizontal value now that the entitlement is ignored if the
+> polarization is vertical.
+
+
+Right, horizontal is not used, but what would you like?
+
+- replace horizontal with 'none' ?
+
+- add or substract 1 when we do the conversion between enum string and 
+value ?
+
+frankly I prefer to keep horizontal here which is exactly what is given 
+in the documentation for entitlement = 0
+
+
+
 >
-> Changes for v7:
-> 1. Fix the kvm_save/restore_hw_gcsr compiling warnings reported by
-> kernel test robot. The report link is:
-> https://lore.kernel.org/oe-kbuild-all/202304131526.iXfLaVZc-lkp@intel.com/
-> 2. Fix loongarch kvm trace related compiling problems.
+> [...]
 >
-> Changes for v6:
-> 1. Fix the Documentation/virt/kvm/api.rst compile warning about
-> loongarch parts.
+>> diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
+>> index b10a8541ff..57165fa3a0 100644
+>> --- a/target/s390x/cpu.c
+>> +++ b/target/s390x/cpu.c
+>> @@ -37,6 +37,7 @@
+>>   #ifndef CONFIG_USER_ONLY
+>>   #include "sysemu/reset.h"
+>>   #endif
+>> +#include "hw/s390x/cpu-topology.h"
+>>   
+>>   #define CR0_RESET       0xE0UL
+>>   #define CR14_RESET      0xC2000000UL;
+>> @@ -259,6 +260,12 @@ static gchar *s390_gdb_arch_name(CPUState *cs)
+>>   static Property s390x_cpu_properties[] = {
+>>   #if !defined(CONFIG_USER_ONLY)
+>>       DEFINE_PROP_UINT32("core-id", S390CPU, env.core_id, 0),
+>> +    DEFINE_PROP_INT32("socket-id", S390CPU, env.socket_id, -1),
+>> +    DEFINE_PROP_INT32("book-id", S390CPU, env.book_id, -1),
+>> +    DEFINE_PROP_INT32("drawer-id", S390CPU, env.drawer_id, -1),
+>> +    DEFINE_PROP_BOOL("dedicated", S390CPU, env.dedicated, false),
+>> +    DEFINE_PROP_UINT8("entitlement", S390CPU, env.entitlement,
+>> +                      S390_CPU_ENTITLEMENT__MAX),
+> I would define an entitlement PropertyInfo in qdev-properties-system.[ch],
+> then one can use e.g.
 >
-> Changes for v5:
-> 1. Implement get/set mp_state ioctl interface, and only the
-> KVM_MP_STATE_RUNNABLE state is supported now, and other states
-> will be completed in the future. The state is also used when vcpu
-> run idle instruction, if vcpu state is changed to RUNNABLE, the
-> vcpu will have the possibility to be woken up.
-> 2. Supplement kvm document about loongarch-specific part, such as add
-> api introduction for GET/SET_ONE_REG, GET/SET_FPU, GET/SET_MP_STATE,
-> etc.
-> 3. Improve the kvm_switch_to_guest function in switch.S, remove the
-> previous tmp,tmp1 arguments and replace it with t0,t1 reg.
+> -device z14-s390x-cpu,core-id=11,entitlement=high
+
+
+Don't you think it is an enhancement we can do later?
+
+
 >
-> Changes for v4:
-> 1. Add a csr_need_update flag in _vcpu_put, as most csr registers keep
-> unchanged during process context switch, so we need not to update it
-> every time. We can do this only if the soft csr is different form hardware.
-> That is to say all of csrs should update after vcpu enter guest, as for
-> set_csr_ioctl, we have written soft csr to keep consistent with hardware.
-> 2. Improve get/set_csr_ioctl interface, we set SW or HW or INVALID flag
-> for all csrs according to it's features when kvm init. In get/set_csr_ioctl,
-> if csr is HW, we use gcsrrd/ gcsrwr instruction to access it, else if csr is
-> SW, we use software to emulate it, and others return false.
-> 3. Add set_hw_gcsr function in csr_ops.S, and it is used in set_csr_ioctl.
-> We have splited hw gcsr into three parts, so we can calculate the code offset
-> by gcsrid and jump here to run the gcsrwr instruction. We use this function to
-> make the code easier and avoid to use the previous SET_HW_GCSR(XXX) interface.
-> 4. Improve kvm mmu functions, such as flush page table and make clean page table
-> interface.
+> on the command line and cpu hotplug.
 >
-> Changes for v3:
-> 1. Remove the vpid array list in kvm_vcpu_arch and use a vpid variable here,
-> because a vpid will never be recycled if a vCPU migrates from physical CPU A
-> to B and back to A.
-> 2. Make some constant variables in kvm_context to global such as vpid_mask,
-> guest_eentry, enter_guest, etc.
-> 3. Add some new tracepoints, such as kvm_trace_idle, kvm_trace_cache,
-> kvm_trace_gspr, etc.
-> 4. There are some duplicate codes in kvm_handle_exit and kvm_vcpu_run,
-> so we move it to a new function kvm_pre_enter_guest.
-> 5. Change the RESUME_HOST, RESUME_GUEST value, return 1 for resume guest
-> and "<= 0" for resume host.
-> 6. Fcsr and fpu registers are saved/restored together.
+> I think setting the default entitlement to medium here should be fine.
 >
-> Changes for v2:
-> 1. Seprate the original patch-01 and patch-03 into small patches, and the
-> patches mainly contain kvm module init, module exit, vcpu create, vcpu run,
-> etc.
-> 2. Remove the original KVM_{GET,SET}_CSRS ioctl in the kvm uapi header,
-> and we use the common KVM_{GET,SET}_ONE_REG to access register.
-> 3. Use BIT(x) to replace the "1 << n_bits" statement.
->
-> Tianrui Zhao (30):
->    LoongArch: KVM: Add kvm related header files
->    LoongArch: KVM: Implement kvm module related interface
->    LoongArch: KVM: Implement kvm hardware enable, disable interface
->    LoongArch: KVM: Implement VM related functions
->    LoongArch: KVM: Add vcpu related header files
->    LoongArch: KVM: Implement vcpu create and destroy interface
->    LoongArch: KVM: Implement vcpu run interface
->    LoongArch: KVM: Implement vcpu handle exit interface
->    LoongArch: KVM: Implement vcpu get, vcpu set registers
->    LoongArch: KVM: Implement vcpu ENABLE_CAP ioctl interface
->    LoongArch: KVM: Implement fpu related operations for vcpu
->    LoongArch: KVM: Implement vcpu interrupt operations
->    LoongArch: KVM: Implement misc vcpu related interfaces
->    LoongArch: KVM: Implement vcpu load and vcpu put operations
->    LoongArch: KVM: Implement vcpu status description
->    LoongArch: KVM: Implement update VM id function
->    LoongArch: KVM: Implement virtual machine tlb operations
->    LoongArch: KVM: Implement vcpu timer operations
->    LoongArch: KVM: Implement kvm mmu operations
->    LoongArch: KVM: Implement handle csr excption
->    LoongArch: KVM: Implement handle iocsr exception
->    LoongArch: KVM: Implement handle idle exception
->    LoongArch: KVM: Implement handle gspr exception
->    LoongArch: KVM: Implement handle mmio exception
->    LoongArch: KVM: Implement handle fpu exception
->    LoongArch: KVM: Implement kvm exception vector
->    LoongArch: KVM: Implement vcpu world switch
->    LoongArch: KVM: Implement probe virtualization when loongarch cpu init
->    LoongArch: KVM: Enable kvm config and add the makefile
->    LoongArch: KVM: Supplement kvm document about loongarch-specific part
->
->   Documentation/virt/kvm/api.rst             |  71 +-
->   arch/loongarch/Kbuild                      |   1 +
->   arch/loongarch/Kconfig                     |   2 +
->   arch/loongarch/configs/loongson3_defconfig |   2 +
->   arch/loongarch/include/asm/cpu-features.h  |  22 +
->   arch/loongarch/include/asm/cpu-info.h      |  13 +
->   arch/loongarch/include/asm/inst.h          |  16 +
->   arch/loongarch/include/asm/kvm_csr.h       |  58 ++
->   arch/loongarch/include/asm/kvm_host.h      | 268 +++++++
->   arch/loongarch/include/asm/kvm_types.h     |  11 +
->   arch/loongarch/include/asm/kvm_vcpu.h      | 114 +++
->   arch/loongarch/include/asm/loongarch.h     | 213 ++++-
->   arch/loongarch/include/uapi/asm/kvm.h      | 107 +++
->   arch/loongarch/kernel/asm-offsets.c        |  32 +
->   arch/loongarch/kernel/cpu-probe.c          |  53 ++
->   arch/loongarch/kvm/Kconfig                 |  38 +
->   arch/loongarch/kvm/Makefile                |  22 +
->   arch/loongarch/kvm/csr_ops.S               |  76 ++
->   arch/loongarch/kvm/exit.c                  | 707 +++++++++++++++++
->   arch/loongarch/kvm/interrupt.c             | 126 +++
->   arch/loongarch/kvm/main.c                  | 340 ++++++++
->   arch/loongarch/kvm/mmu.c                   | 730 +++++++++++++++++
->   arch/loongarch/kvm/switch.S                | 301 +++++++
->   arch/loongarch/kvm/timer.c                 | 266 +++++++
->   arch/loongarch/kvm/tlb.c                   |  31 +
->   arch/loongarch/kvm/trace.h                 | 168 ++++
->   arch/loongarch/kvm/vcpu.c                  | 882 +++++++++++++++++++++
->   arch/loongarch/kvm/vm.c                    |  79 ++
->   arch/loongarch/kvm/vmid.c                  |  65 ++
->   include/uapi/linux/kvm.h                   |   9 +
->   30 files changed, 4808 insertions(+), 15 deletions(-)
->   create mode 100644 arch/loongarch/include/asm/kvm_csr.h
->   create mode 100644 arch/loongarch/include/asm/kvm_host.h
->   create mode 100644 arch/loongarch/include/asm/kvm_types.h
->   create mode 100644 arch/loongarch/include/asm/kvm_vcpu.h
->   create mode 100644 arch/loongarch/include/uapi/asm/kvm.h
->   create mode 100644 arch/loongarch/kvm/Kconfig
->   create mode 100644 arch/loongarch/kvm/Makefile
->   create mode 100644 arch/loongarch/kvm/csr_ops.S
->   create mode 100644 arch/loongarch/kvm/exit.c
->   create mode 100644 arch/loongarch/kvm/interrupt.c
->   create mode 100644 arch/loongarch/kvm/main.c
->   create mode 100644 arch/loongarch/kvm/mmu.c
->   create mode 100644 arch/loongarch/kvm/switch.S
->   create mode 100644 arch/loongarch/kvm/timer.c
->   create mode 100644 arch/loongarch/kvm/tlb.c
->   create mode 100644 arch/loongarch/kvm/trace.h
->   create mode 100644 arch/loongarch/kvm/vcpu.c
->   create mode 100644 arch/loongarch/kvm/vm.c
->   create mode 100644 arch/loongarch/kvm/vmid.c
->
+> [...]
+
+right, I had medium before and should not have change it.
+
+Anyway what ever the default is, it must be changed later depending on 
+dedication.
+
+
 
