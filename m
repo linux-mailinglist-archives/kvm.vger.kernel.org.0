@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 630596E6B02
-	for <lists+kvm@lfdr.de>; Tue, 18 Apr 2023 19:29:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6B26D6E6B01
+	for <lists+kvm@lfdr.de>; Tue, 18 Apr 2023 19:29:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232594AbjDRR3w (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Apr 2023 13:29:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39040 "EHLO
+        id S232570AbjDRR3u (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Apr 2023 13:29:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39046 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232513AbjDRR3s (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Apr 2023 13:29:48 -0400
+        with ESMTP id S232226AbjDRR3r (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Apr 2023 13:29:47 -0400
 Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28BFF9023;
-        Tue, 18 Apr 2023 10:29:47 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D96FC900D;
+        Tue, 18 Apr 2023 10:29:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1681838987; x=1713374987;
+  t=1681838986; x=1713374986;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=mvcm9I7oVMk743K1U4CKLSb1SD+72HuGUMTrE4bjIiU=;
-  b=Qcq1z/v6btmLY+arprg69itcm9V4nnp/E4U6pQFwfCrhmM+IzikxOyo2
-   vtjj7k7wuLAhwTbmlsOiBifGjeB2eBs/a3wBBquJHcsJIUKc7tmQOYP0E
-   Q8uYBDZg5+S8FVmG1YVlwZ6hhTT3/OWO/2Zxhw5oQpAwq6AURT7VYTw4R
-   UlgkQgRS9H7yBZ94NvJKiLjhzxJDy2vv2oPjBqJgNPszYlx8PisoRj4DB
-   aOrw0crkXf2iMqtOunFjfxQTdHP9j71l1Og2pN315TOCM1a6+8sQNmqfL
-   /dB8yvHldfw/neYkqR3pa7eJz6YwHtY/H6q0Cym8D79E/5D+GZ4cQVMpk
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10684"; a="410466447"
+  bh=bJYyq4Hx+wN5lbKnUKqDcpvgy5YenkrSQ22BR7rz2Xc=;
+  b=A9sI7Nf27EFz/pwrKd0E9LVMDLBq5enGm0WVz4qT0MhAkX0Rp4jp7kBj
+   kYlgc8dw5Qfd+Kcmeg25NFRNUXCQsVHEKNyG8huh/dZbHu3Xm19elTztf
+   gpT1OiZbntU6KNTQfkYzbrqpYWVCw/hr2QdASrqYMXx8zomyd866s95Z+
+   DAxw0+kFhS6ertqpju6ScL7qlA1u2CiQ/olsKQBKF0HNvtsf4wxnNztzB
+   5k3Q76oujnvY1oyI7F1WP+rq3WSVODoT9jf6YJXb/WSwb9E5d3b6A2Ea7
+   ADLqamSOFVcsuEFJ9at1JWroSdOB3Yop8dDRYaMFTdeCixi3wOwvjAj7v
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10684"; a="410466452"
 X-IronPort-AV: E=Sophos;i="5.99,207,1677571200"; 
-   d="scan'208";a="410466447"
+   d="scan'208";a="410466452"
 Received: from orsmga005.jf.intel.com ([10.7.209.41])
   by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Apr 2023 10:29:42 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10684"; a="865503470"
+X-IronPort-AV: E=McAfee;i="6600,9927,10684"; a="865503472"
 X-IronPort-AV: E=Sophos;i="5.99,207,1677571200"; 
-   d="scan'208";a="865503470"
+   d="scan'208";a="865503472"
 Received: from rchatre-ws.ostc.intel.com ([10.54.69.144])
-  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Apr 2023 10:29:41 -0700
+  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Apr 2023 10:29:42 -0700
 From:   Reinette Chatre <reinette.chatre@intel.com>
 To:     jgg@nvidia.com, yishaih@nvidia.com,
         shameerali.kolothum.thodi@huawei.com, kevin.tian@intel.com,
@@ -46,9 +46,9 @@ Cc:     tglx@linutronix.de, darwi@linutronix.de, kvm@vger.kernel.org,
         dave.jiang@intel.com, jing2.liu@intel.com, ashok.raj@intel.com,
         fenghua.yu@intel.com, tom.zanussi@linux.intel.com,
         reinette.chatre@intel.com, linux-kernel@vger.kernel.org
-Subject: [PATCH V3 01/10] vfio/pci: Consolidate irq cleanup on MSI/MSI-X disable
-Date:   Tue, 18 Apr 2023 10:29:12 -0700
-Message-Id: <aef2b60d9a3c5a2984b39919561ade5ca9786b27.1681837892.git.reinette.chatre@intel.com>
+Subject: [PATCH V3 02/10] vfio/pci: Remove negative check on unsigned vector
+Date:   Tue, 18 Apr 2023 10:29:13 -0700
+Message-Id: <5add301d11d4a566c29c487a78b4227ae383f11d.1681837892.git.reinette.chatre@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <cover.1681837892.git.reinette.chatre@intel.com>
 References: <cover.1681837892.git.reinette.chatre@intel.com>
@@ -64,42 +64,84 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-vfio_msi_disable() releases all previously allocated state
-associated with each interrupt before disabling MSI/MSI-X.
+User space provides the vector as an unsigned int that is checked
+early for validity (vfio_set_irqs_validate_and_prepare()).
 
-vfio_msi_disable() iterates twice over the interrupt state:
-first directly with a for loop to do virqfd cleanup, followed
-by another for loop within vfio_msi_set_block() that removes
-the interrupt handler and its associated state using
-vfio_msi_set_vector_signal().
+A later negative check of the provided vector is not necessary.
 
-Simplify interrupt cleanup by iterating over allocated interrupts
-once.
+Remove the negative check and ensure the type used
+for the vector is consistent as an unsigned int.
 
 Signed-off-by: Reinette Chatre <reinette.chatre@intel.com>
 ---
 Changes since V2:
-- Improve accuracy of changelog.
+- Rework unwind loop within vfio_msi_set_block() that required j
+  to be an int. Rework results in both i and j used for vector, both
+  moved to be unsigned int. (Alex)
 
- drivers/vfio/pci/vfio_pci_intrs.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ drivers/vfio/pci/vfio_pci_intrs.c | 15 ++++++++-------
+ 1 file changed, 8 insertions(+), 7 deletions(-)
 
 diff --git a/drivers/vfio/pci/vfio_pci_intrs.c b/drivers/vfio/pci/vfio_pci_intrs.c
-index bffb0741518b..6a9c6a143cc3 100644
+index 6a9c6a143cc3..258de57ef956 100644
 --- a/drivers/vfio/pci/vfio_pci_intrs.c
 +++ b/drivers/vfio/pci/vfio_pci_intrs.c
-@@ -426,10 +426,9 @@ static void vfio_msi_disable(struct vfio_pci_core_device *vdev, bool msix)
- 	for (i = 0; i < vdev->num_ctx; i++) {
- 		vfio_virqfd_disable(&vdev->ctx[i].unmask);
- 		vfio_virqfd_disable(&vdev->ctx[i].mask);
-+		vfio_msi_set_vector_signal(vdev, i, -1, msix);
+@@ -317,14 +317,14 @@ static int vfio_msi_enable(struct vfio_pci_core_device *vdev, int nvec, bool msi
+ }
+ 
+ static int vfio_msi_set_vector_signal(struct vfio_pci_core_device *vdev,
+-				      int vector, int fd, bool msix)
++				      unsigned int vector, int fd, bool msix)
+ {
+ 	struct pci_dev *pdev = vdev->pdev;
+ 	struct eventfd_ctx *trigger;
+ 	int irq, ret;
+ 	u16 cmd;
+ 
+-	if (vector < 0 || vector >= vdev->num_ctx)
++	if (vector >= vdev->num_ctx)
+ 		return -EINVAL;
+ 
+ 	irq = pci_irq_vector(pdev, vector);
+@@ -399,7 +399,8 @@ static int vfio_msi_set_vector_signal(struct vfio_pci_core_device *vdev,
+ static int vfio_msi_set_block(struct vfio_pci_core_device *vdev, unsigned start,
+ 			      unsigned count, int32_t *fds, bool msix)
+ {
+-	int i, j, ret = 0;
++	unsigned int i, j;
++	int ret = 0;
+ 
+ 	if (start >= vdev->num_ctx || start + count > vdev->num_ctx)
+ 		return -EINVAL;
+@@ -410,8 +411,8 @@ static int vfio_msi_set_block(struct vfio_pci_core_device *vdev, unsigned start,
  	}
  
--	vfio_msi_set_block(vdev, 0, vdev->num_ctx, NULL, msix);
--
- 	cmd = vfio_pci_memory_lock_and_enable(vdev);
- 	pci_free_irq_vectors(pdev);
- 	vfio_pci_memory_unlock_and_restore(vdev, cmd);
+ 	if (ret) {
+-		for (--j; j >= (int)start; j--)
+-			vfio_msi_set_vector_signal(vdev, j, -1, msix);
++		for (i = start; i < j; i++)
++			vfio_msi_set_vector_signal(vdev, i, -1, msix);
+ 	}
+ 
+ 	return ret;
+@@ -420,7 +421,7 @@ static int vfio_msi_set_block(struct vfio_pci_core_device *vdev, unsigned start,
+ static void vfio_msi_disable(struct vfio_pci_core_device *vdev, bool msix)
+ {
+ 	struct pci_dev *pdev = vdev->pdev;
+-	int i;
++	unsigned int i;
+ 	u16 cmd;
+ 
+ 	for (i = 0; i < vdev->num_ctx; i++) {
+@@ -542,7 +543,7 @@ static int vfio_pci_set_msi_trigger(struct vfio_pci_core_device *vdev,
+ 				    unsigned index, unsigned start,
+ 				    unsigned count, uint32_t flags, void *data)
+ {
+-	int i;
++	unsigned int i;
+ 	bool msix = (index == VFIO_PCI_MSIX_IRQ_INDEX) ? true : false;
+ 
+ 	if (irq_is(vdev, index) && !count && (flags & VFIO_IRQ_SET_DATA_NONE)) {
 -- 
 2.34.1
 
