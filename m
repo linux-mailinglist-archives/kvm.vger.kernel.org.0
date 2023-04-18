@@ -2,53 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 141876E5F26
-	for <lists+kvm@lfdr.de>; Tue, 18 Apr 2023 12:49:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F15EC6E5F29
+	for <lists+kvm@lfdr.de>; Tue, 18 Apr 2023 12:49:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231365AbjDRKto (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Apr 2023 06:49:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41902 "EHLO
+        id S230350AbjDRKtr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Apr 2023 06:49:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41922 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230350AbjDRKtg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Apr 2023 06:49:36 -0400
-Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51E2D5BBF;
-        Tue, 18 Apr 2023 03:49:35 -0700 (PDT)
-Received: by mail-pj1-x1031.google.com with SMTP id 98e67ed59e1d1-246eebbde1cso2153966a91.3;
-        Tue, 18 Apr 2023 03:49:35 -0700 (PDT)
+        with ESMTP id S231324AbjDRKtl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Apr 2023 06:49:41 -0400
+Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91D2640EF;
+        Tue, 18 Apr 2023 03:49:39 -0700 (PDT)
+Received: by mail-pf1-x42d.google.com with SMTP id d2e1a72fcca58-63b5312bd4fso9253183b3a.0;
+        Tue, 18 Apr 2023 03:49:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1681814975; x=1684406975;
+        d=gmail.com; s=20221208; t=1681814979; x=1684406979;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=DVrqBF397n+wyX1nXbC/nI8o17aiMQaR1hvjDl7dDXg=;
-        b=GIsmMcGJRopC8pM1uUDcw0uD8zMW/7xHmShVLsYoq7VFw4kSHC/STVQuUXu74aGAHi
-         o2RyfriUazcmr4JfOZ32skmJ5kQzW9peZMbNm3pTFZJefXDFsbVUOfaeFpCPS0FE4SAG
-         0opqk45WHWfsmFi6UplvgiCCQFMIfdbIb74oMvPnoaQz0xJy1kFy7QcSFJr3OM7Sska4
-         bPKwXEGPUB8YLpoPo/wrUK2GXMhc7QygC+E7Q0CgP4T2cNtBSSL8C7aaEJDcobqgYo3/
-         Bc9j10MP9Ocmri4sHp2Tr4fx1k07Enp/4EkwCyA8KZFnrQl98C1BJHNweQdi+DsrwrBF
-         kQiA==
+        bh=ne4t7JiMf2N7K31rdXpJp0mlGHlHnFrvUNu2fRDvLr4=;
+        b=a/Mbnb8QKjZmJQtYsJu30n/UFZjrScTDmSj5Zl+/b1XAoq3xiyMAsGLs1GrgQd7TVc
+         O9yzN4Dhq+qohee4RwTms9qIfgLX8ACBXq7hWFE4cN9FEVQqxM3Id/1YsHPPLhJfdMp1
+         h7PfxFmLV/kjcdPZO1viP/2MuxtikWUrxsHY1nGVN0T8h2SgczEA4lKh7H4cGh5Nnr3G
+         fDVxCWRvmAAUGjQBQxcQZqlW2ANZlnEbjp/nKbmxVJBlM89Kq2rZzlkCuQ0/bvaIpoYp
+         kqIxYp+jgbwTsexOvC/eP6Y3vx+UZW7HGNud+egIXIA7xg/U8Qz7k1pjwIETSDd95Y3b
+         TYWA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681814975; x=1684406975;
+        d=1e100.net; s=20221208; t=1681814979; x=1684406979;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=DVrqBF397n+wyX1nXbC/nI8o17aiMQaR1hvjDl7dDXg=;
-        b=QXksa3r5ZreO7lL2QoU63SVZCNp3G34Il6f+g5YrCiJoDaZGcssBnIAnDz89U/htPE
-         V2Q0VWkzllfiIsPuwM4iRfX8MzRKN1igt3eQYEGMEXi+8Y6gIAuVzORyzNca6QD7Uga4
-         Ow1t+MpG6IvINJZujzWrKnUo8zgzzr8nCTHWc454DldLUHTCit6lK+yk7yLNGg6mpCSp
-         QgmHbdPBNqC1SpqWUhBdTpDRTg0UAT5d24icTEexKf41Fme0nKgxEGD4YEvexerElUdr
-         StTJuePE+Z3isrNA1LRMUe62uluCSUqtbaM/zTUSMCFG/vJvKEO4BPHPrnM2kIpBeC2I
-         6nyA==
-X-Gm-Message-State: AAQBX9dX8VpLuEMZAtBHToiG+AtJVJ9H79K4udWcrIkpspoXpcMW4zX1
-        lv9RbP9UUHVf6OOV9oe7y04=
-X-Google-Smtp-Source: AKy350YMXNhm14FGlQ6oLuFJ5X/eenUtM34P1Mu1GpPalGaC/Vyg7NTb1ABjIjTxUtdHRoCXRt5Gmg==
-X-Received: by 2002:a17:90a:e144:b0:237:ae7c:15be with SMTP id ez4-20020a17090ae14400b00237ae7c15bemr1616438pjb.30.1681814974762;
-        Tue, 18 Apr 2023 03:49:34 -0700 (PDT)
+        bh=ne4t7JiMf2N7K31rdXpJp0mlGHlHnFrvUNu2fRDvLr4=;
+        b=dhDF81QrNYj1kfo7OiTUQWcYl/ncKGZpy1y8rXxE6vxsE98ePwbO4LZXKgMYN+u3E4
+         RLkueumbkynb7K+SE7euqtceKt+fsH4Bu00Yb64svpdOfF1JyYM0zNDVBhpYBftiOjKO
+         314HiZFeioWJ4kr03QhoZDt6Hj1wFqlwfz2AiGKJVDBDpdlnMhp1m02X2R29wN84jcLZ
+         fIyVjMOp/3z4gHZdzpJCbzTJnwjcWVEMbEWvX1SmDRE8XT8Qm8fpzIsTNf0suEpMl2lO
+         74IeGX4jNzQdNKOe3/fafjG6tLyhXM7Mk//Yd+hTIg/TbBh7m8PLaizWEW4/4uz4UkPe
+         8pHQ==
+X-Gm-Message-State: AAQBX9cC8M0udV7ixbKdati9kwZIlwkZFx1JHAFG8pPqOGNo+jCqmmNy
+        sDguLyzLX4fRvijyfz0g904=
+X-Google-Smtp-Source: AKy350ZWy7S+tSm+v0XcGgZFxoC/P0j3rCfmmRSifXG/3fZo6/qCuS98Vs2vvGPecQUUg7fraCJ52w==
+X-Received: by 2002:a17:90b:18d:b0:246:fbf2:7e6e with SMTP id t13-20020a17090b018d00b00246fbf27e6emr1902590pjs.14.1681814979023;
+        Tue, 18 Apr 2023 03:49:39 -0700 (PDT)
 Received: from localhost.localdomain ([43.132.141.8])
-        by smtp.gmail.com with ESMTPSA id gz2-20020a17090b0ec200b002473d046e23sm6906437pjb.3.2023.04.18.03.49.32
+        by smtp.gmail.com with ESMTPSA id gz2-20020a17090b0ec200b002473d046e23sm6906437pjb.3.2023.04.18.03.49.36
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Apr 2023 03:49:34 -0700 (PDT)
+        Tue, 18 Apr 2023 03:49:38 -0700 (PDT)
 From:   alexjlzheng@gmail.com
 X-Google-Original-From: alexjlzheng@tencent.com
 To:     seanjc@google.com
@@ -56,9 +56,9 @@ Cc:     pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com,
         bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
         hpa@zytor.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         Jinliang Zheng <alexjlzheng@tencent.com>
-Subject: [PATCH 1/2] KVM: x86: Fix poll command
-Date:   Tue, 18 Apr 2023 18:47:44 +0800
-Message-Id: <20230418104743.842683-2-alexjlzheng@tencent.com>
+Subject: [PATCH 2/2] KVM: x86: Adjust return value of pic_poll_read()
+Date:   Tue, 18 Apr 2023 18:47:45 +0800
+Message-Id: <20230418104743.842683-3-alexjlzheng@tencent.com>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20230418104743.842683-1-alexjlzheng@tencent.com>
 References: <20230418104743.842683-1-alexjlzheng@tencent.com>
@@ -76,33 +76,32 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Jinliang Zheng <alexjlzheng@tencent.com>
 
-According to the hardware manual, when the Poll command is issued, the
-byte returned by the I/O read is 1 in Bit 7 when there is an interrupt,
-and the highest priority binary code in Bits 2:0. The current pic
-simulation code is not implemented strictly according to the above
-expression.
+Returning 0x07 raises ambiguity when no interrupt is in pic_poll_read().
+Although it will not cause a functional exception (Bit 7 is 0 means no
+interrupt), it will easily make developers mistakenly think that a
+spurious interrupt (IRQ 7) has been returned.
 
-Fix the implementation of pic_poll_read(), set Bit 7 when there is an
-interrupt.
+Return 0x00 instread of 0x07.
 
 Signed-off-by: Jinliang Zheng <alexjlzheng@tencent.com>
 ---
- arch/x86/kvm/i8259.c | 2 ++
- 1 file changed, 2 insertions(+)
+ arch/x86/kvm/i8259.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/arch/x86/kvm/i8259.c b/arch/x86/kvm/i8259.c
-index 4756bcb5724f..861872e2641a 100644
+index 861872e2641a..57978ad8311c 100644
 --- a/arch/x86/kvm/i8259.c
 +++ b/arch/x86/kvm/i8259.c
-@@ -411,6 +411,8 @@ static u32 pic_poll_read(struct kvm_kpic_state *s, u32 addr1)
- 		pic_clear_isr(s, ret);
- 		if (addr1 >> 7 || ret != 2)
- 			pic_update_irq(s->pics_state);
-+		/* Bit 7 is 1, means there's an interrupt */
-+		ret |= 0x80;
+@@ -414,7 +414,8 @@ static u32 pic_poll_read(struct kvm_kpic_state *s, u32 addr1)
+ 		/* Bit 7 is 1, means there's an interrupt */
+ 		ret |= 0x80;
  	} else {
- 		ret = 0x07;
+-		ret = 0x07;
++		/* Bit 7 is 0, means there's no interrupt */
++		ret = 0x00;
  		pic_update_irq(s->pics_state);
+ 	}
+ 
 -- 
 2.31.1
 
