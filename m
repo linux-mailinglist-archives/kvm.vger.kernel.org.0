@@ -2,79 +2,77 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9E9B16E5F21
-	for <lists+kvm@lfdr.de>; Tue, 18 Apr 2023 12:48:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 150A36E5F4B
+	for <lists+kvm@lfdr.de>; Tue, 18 Apr 2023 13:05:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231285AbjDRKsZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Apr 2023 06:48:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41386 "EHLO
+        id S230467AbjDRLFN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Apr 2023 07:05:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47764 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230350AbjDRKsT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Apr 2023 06:48:19 -0400
-Received: from mail-wm1-x32d.google.com (mail-wm1-x32d.google.com [IPv6:2a00:1450:4864:20::32d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3CAF6E49
-        for <kvm@vger.kernel.org>; Tue, 18 Apr 2023 03:48:18 -0700 (PDT)
-Received: by mail-wm1-x32d.google.com with SMTP id o29-20020a05600c511d00b003f1739de43cso2860028wms.4
-        for <kvm@vger.kernel.org>; Tue, 18 Apr 2023 03:48:18 -0700 (PDT)
+        with ESMTP id S230416AbjDRLFM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Apr 2023 07:05:12 -0400
+Received: from smtp-fw-33001.amazon.com (smtp-fw-33001.amazon.com [207.171.190.10])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 253486A78
+        for <kvm@vger.kernel.org>; Tue, 18 Apr 2023 04:05:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1681814896; x=1684406896;
-        h=content-transfer-encoding:in-reply-to:organization:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=gEwR6KtNxSbU17prGLCK7vz5h7AeZ/KD54lx3zH1Yn0=;
-        b=CyRqkDHGlSZJfeiv5gznYbzxsX/+z4STQCYrBSK5fb9QLbcYECqkQ0N9UD65TZ/c71
-         dJj/EDjIYPty2Axj+eW9D0HmaCIXvODujC9/NrfVyVjPrNBeFyPxoHu/nhtebmcH+bFJ
-         a7GdKd9mVBgtmFy1S+Rw+4rcbAj8mtxSVAgzHrsCyed9M2Qig+s8UdaWLHtc/dUpZt1Y
-         kKHU3pioFZfs1/IhjoIXHgBeasdlYx6P5P13CXDxcXonQLcrBfq14Av2GeHA3+gxnnsr
-         QRo/9nCr++F8kh+Vxc2fhtcVbVJ6HwA8DAxlBXESCnzEYeYV99b+OGukhd3CmtGyuHsa
-         zj5Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681814896; x=1684406896;
-        h=content-transfer-encoding:in-reply-to:organization:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gEwR6KtNxSbU17prGLCK7vz5h7AeZ/KD54lx3zH1Yn0=;
-        b=RC0f9LV8jmHP3vEvDM2rMXaC1a7jVFdMJGTqTGfKlexCVV40a6BOgABKlX2D+Cn2ME
-         EvzoKFghU4Ms3elj01Z9802RGm8Op2twqDlMK86V+r5sBr76yHtKWwN45mdDrrFdMXXA
-         WtDwSayzS5PMGd7j5JHnPfOvDnr+2Zbx9z5Bf6A7L4OKhUkUq5i4lKgXOyY72m+lobs5
-         evV87b+uC2gASvBEH+xpQIu9xyJ/m2UWMTs0OksNLkWUPRq7clzYhmd5WJ+jOHexgevH
-         +vcyzRkOqHCnH4LUaicqogCBOlAPu2l1JEuGYnIGWJaLObuQjv2jIx+fNoseYDf8Sy6e
-         cJ1Q==
-X-Gm-Message-State: AAQBX9cvBqiWFpA+LMv7kTa+OQ7JxFGkW7fSxd6XO+4ZzDKtjfiSiJ1E
-        HtLwVA3aLqmnwFkQMhFXJKo=
-X-Google-Smtp-Source: AKy350YimcI2ukg3o641WnIr8Lr6SMemlR1orYLP3UKLv+tYLvHr8bMqo/hFDkyvHFRN+QnuIA9fgQ==
-X-Received: by 2002:a1c:7510:0:b0:3ee:289a:43a7 with SMTP id o16-20020a1c7510000000b003ee289a43a7mr14152968wmc.22.1681814896535;
-        Tue, 18 Apr 2023 03:48:16 -0700 (PDT)
-Received: from [192.168.10.76] (54-240-197-233.amazon.com. [54.240.197.233])
-        by smtp.gmail.com with ESMTPSA id l21-20020a05600c4f1500b003f080b2f9f4sm18289380wmq.27.2023.04.18.03.48.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 18 Apr 2023 03:48:16 -0700 (PDT)
-From:   Paul Durrant <xadimgnik@gmail.com>
-X-Google-Original-From: Paul Durrant <paul@xen.org>
-Message-ID: <3ede838b-15ef-a987-8584-cd871959797b@xen.org>
-Date:   Tue, 18 Apr 2023 11:48:15 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Reply-To: paul@xen.org
-Subject: Re: [PATCH v3] KVM: x86/xen: Implement hvm_op/HVMOP_flush_tlbs
- hypercall
-Content-Language: en-US
-To:     Metin Kaya <metikaya@amazon.co.uk>, kvm@vger.kernel.org,
-        pbonzini@redhat.com
-Cc:     x86@kernel.org, bp@alien8.de, dwmw@amazon.co.uk, seanjc@google.com,
-        tglx@linutronix.de, mingo@redhat.com, dave.hansen@linux.intel.com,
-        joao.m.martins@oracle.com
+  d=amazon.co.uk; i=@amazon.co.uk; q=dns/txt;
+  s=amazon201209; t=1681815911; x=1713351911;
+  h=from:to:cc:date:message-id:references:in-reply-to:
+   content-transfer-encoding:mime-version:subject;
+  bh=2HnERvBgQYUpZIa5aCFslqFi29gSxf5cZ2esDYY7GpI=;
+  b=GGl6L2ryNekPqzTsl6RFqKYi79zglaLF5GponXPky7qBLeA4HzXcnonh
+   ODKOtY9L46Hs4CWzAP60mjIeKqvSJJsafEx0Evuqu54WfecNaHyYfUNl1
+   3KGvJu5yCX+44bEsqJSgROTel5zB6k5ExIc/helnPl9kkhiZvixtlXksX
+   Q=;
+X-IronPort-AV: E=Sophos;i="5.99,207,1677542400"; 
+   d="scan'208";a="277996201"
+Subject: RE: [PATCH v3] KVM: x86/xen: Implement hvm_op/HVMOP_flush_tlbs hypercall
+Thread-Topic: [PATCH v3] KVM: x86/xen: Implement hvm_op/HVMOP_flush_tlbs hypercall
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-pdx-2a-m6i4x-3ef535ca.us-west-2.amazon.com) ([10.43.8.6])
+  by smtp-border-fw-33001.sea14.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Apr 2023 11:05:05 +0000
+Received: from EX19MTAUEA002.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan2.pdx.amazon.com [10.236.137.194])
+        by email-inbound-relay-pdx-2a-m6i4x-3ef535ca.us-west-2.amazon.com (Postfix) with ESMTPS id ACEC660F03;
+        Tue, 18 Apr 2023 11:05:02 +0000 (UTC)
+Received: from EX19D008UEA004.ant.amazon.com (10.252.134.191) by
+ EX19MTAUEA002.ant.amazon.com (10.252.134.9) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.26; Tue, 18 Apr 2023 11:04:48 +0000
+Received: from EX19D043EUB001.ant.amazon.com (10.252.61.24) by
+ EX19D008UEA004.ant.amazon.com (10.252.134.191) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.26; Tue, 18 Apr 2023 11:04:48 +0000
+Received: from EX19D043EUB001.ant.amazon.com ([fe80::e881:f31d:88bf:58d8]) by
+ EX19D043EUB001.ant.amazon.com ([fe80::e881:f31d:88bf:58d8%4]) with mapi id
+ 15.02.1118.026; Tue, 18 Apr 2023 11:04:47 +0000
+From:   "Kaya, Metin" <metikaya@amazon.co.uk>
+To:     "paul@xen.org" <paul@xen.org>
+CC:     "x86@kernel.org" <x86@kernel.org>, "bp@alien8.de" <bp@alien8.de>,
+        "Woodhouse, David" <dwmw@amazon.co.uk>,
+        "seanjc@google.com" <seanjc@google.com>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
+        "joao.m.martins@oracle.com" <joao.m.martins@oracle.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Thread-Index: AQHZcd5iZX2yQA9K00a8PYvJOdfTj68w4tGAgAACZSA=
+Date:   Tue, 18 Apr 2023 11:04:47 +0000
+Message-ID: <467e7c790c124cbcb98a764d4ae98ac2@amazon.co.uk>
 References: <138f584bd86fe68aa05f20db3de80bae61880e11.camel@infradead.org>
  <20230418101306.98263-1-metikaya@amazon.co.uk>
-Organization: Xen Project
-In-Reply-To: <20230418101306.98263-1-metikaya@amazon.co.uk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.7 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+ <3ede838b-15ef-a987-8584-cd871959797b@xen.org>
+In-Reply-To: <3ede838b-15ef-a987-8584-cd871959797b@xen.org>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.106.82.23]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,T_SCC_BODY_TEXT_LINE,T_SPF_PERMERROR
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -82,85 +80,59 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 18/04/2023 11:13, Metin Kaya wrote:
-> Implement in-KVM support for Xen's HVMOP_flush_tlbs hypercall, which
-> allows the guest to flush all vCPU's TLBs. KVM doesn't provide an
-> ioctl() to precisely flush guest TLBs, and punting to userspace would
-> likely negate the performance benefits of avoiding a TLB shootdown in
-> the guest.
-> 
-> Signed-off-by: Metin Kaya <metikaya@amazon.co.uk>
-> 
-> ---
-> v3:
->    - Addressed comments for v2.
->    - Verified with XTF/invlpg test case.
-> 
-> v2:
->    - Removed an irrelevant URL from commit message.
-> ---
->   arch/x86/kvm/xen.c                 | 15 +++++++++++++++
->   include/xen/interface/hvm/hvm_op.h |  3 +++
->   2 files changed, 18 insertions(+)
-> 
-> diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
-> index 40edf4d1974c..a63c48e8d8fa 100644
-> --- a/arch/x86/kvm/xen.c
-> +++ b/arch/x86/kvm/xen.c
-> @@ -21,6 +21,7 @@
->   #include <xen/interface/vcpu.h>
->   #include <xen/interface/version.h>
->   #include <xen/interface/event_channel.h>
-> +#include <xen/interface/hvm/hvm_op.h>
->   #include <xen/interface/sched.h>
->   
->   #include <asm/xen/cpuid.h>
-> @@ -1330,6 +1331,17 @@ static bool kvm_xen_hcall_sched_op(struct kvm_vcpu *vcpu, bool longmode,
->   	return false;
->   }
->   
-> +static bool kvm_xen_hcall_hvm_op(struct kvm_vcpu *vcpu, int cmd, u64 arg, u64 *r)
-> +{
-> +	if (cmd == HVMOP_flush_tlbs && !arg) {
-> +		kvm_make_all_cpus_request(vcpu->kvm, KVM_REQ_TLB_FLUSH_GUEST);
-> +		*r = 0;
-> +		return true;
-> +	}
-> +
-> +	return false;
-> +}
-
-This code structure means that arg != NULL will result in the guest 
-seeing ENOSYS rather than EINVAL.
-
-   Paul
-
-> +
->   struct compat_vcpu_set_singleshot_timer {
->       uint64_t timeout_abs_ns;
->       uint32_t flags;
-> @@ -1501,6 +1513,9 @@ int kvm_xen_hypercall(struct kvm_vcpu *vcpu)
->   			timeout |= params[1] << 32;
->   		handled = kvm_xen_hcall_set_timer_op(vcpu, timeout, &r);
->   		break;
-> +	case __HYPERVISOR_hvm_op:
-> +		handled = kvm_xen_hcall_hvm_op(vcpu, params[0], params[1], &r);
-> +		break;
->   	}
->   	default:
->   		break;
-> diff --git a/include/xen/interface/hvm/hvm_op.h b/include/xen/interface/hvm/hvm_op.h
-> index 03134bf3cec1..240d8149bc04 100644
-> --- a/include/xen/interface/hvm/hvm_op.h
-> +++ b/include/xen/interface/hvm/hvm_op.h
-> @@ -16,6 +16,9 @@ struct xen_hvm_param {
->   };
->   DEFINE_GUEST_HANDLE_STRUCT(xen_hvm_param);
->   
-> +/* Flushes guest TLBs for all vCPUs: @arg must be 0. */
-> +#define HVMOP_flush_tlbs            5
-> +
->   /* Hint from PV drivers for pagetable destruction. */
->   #define HVMOP_pagetable_dying       9
->   struct xen_hvm_pagetable_dying {
-
+T24gMTgvMDQvMjAyMyAxMTo0OCwgUGF1bCBEdXJyYW50IHdyb3RlOg0KPk9uIDE4LzA0LzIwMjMg
+MTE6MTMsIE1ldGluIEtheWEgd3JvdGU6DQo+PiBJbXBsZW1lbnQgaW4tS1ZNIHN1cHBvcnQgZm9y
+IFhlbidzIEhWTU9QX2ZsdXNoX3RsYnMgaHlwZXJjYWxsLCB3aGljaA0KPj4gYWxsb3dzIHRoZSBn
+dWVzdCB0byBmbHVzaCBhbGwgdkNQVSdzIFRMQnMuIEtWTSBkb2Vzbid0IHByb3ZpZGUgYW4NCj4+
+IGlvY3RsKCkgdG8gcHJlY2lzZWx5IGZsdXNoIGd1ZXN0IFRMQnMsIGFuZCBwdW50aW5nIHRvIHVz
+ZXJzcGFjZSB3b3VsZA0KPj4gbGlrZWx5IG5lZ2F0ZSB0aGUgcGVyZm9ybWFuY2UgYmVuZWZpdHMg
+b2YgYXZvaWRpbmcgYSBUTEIgc2hvb3Rkb3duIGluDQo+PiB0aGUgZ3Vlc3QuDQo+Pg0KPj4gU2ln
+bmVkLW9mZi1ieTogTWV0aW4gS2F5YSA8bWV0aWtheWFAYW1hem9uLmNvLnVrPg0KPj4NCj4+IC0t
+LQ0KPj4gdjM6DQo+PiAgICAtIEFkZHJlc3NlZCBjb21tZW50cyBmb3IgdjIuDQo+PiAgICAtIFZl
+cmlmaWVkIHdpdGggWFRGL2ludmxwZyB0ZXN0IGNhc2UuDQo+Pg0KPj4gdjI6DQo+PiAgICAtIFJl
+bW92ZWQgYW4gaXJyZWxldmFudCBVUkwgZnJvbSBjb21taXQgbWVzc2FnZS4NCj4+IC0tLQ0KPj4g
+ICBhcmNoL3g4Ni9rdm0veGVuLmMgICAgICAgICAgICAgICAgIHwgMTUgKysrKysrKysrKysrKysr
+DQo+PiAgIGluY2x1ZGUveGVuL2ludGVyZmFjZS9odm0vaHZtX29wLmggfCAgMyArKysNCj4+ICAg
+MiBmaWxlcyBjaGFuZ2VkLCAxOCBpbnNlcnRpb25zKCspDQo+Pg0KPj4gZGlmZiAtLWdpdCBhL2Fy
+Y2gveDg2L2t2bS94ZW4uYyBiL2FyY2gveDg2L2t2bS94ZW4uYyBpbmRleA0KPj4gNDBlZGY0ZDE5
+NzRjLi5hNjNjNDhlOGQ4ZmEgMTAwNjQ0DQo+PiAtLS0gYS9hcmNoL3g4Ni9rdm0veGVuLmMNCj4+
+ICsrKyBiL2FyY2gveDg2L2t2bS94ZW4uYw0KPj4gQEAgLTIxLDYgKzIxLDcgQEANCj4+ICAgI2lu
+Y2x1ZGUgPHhlbi9pbnRlcmZhY2UvdmNwdS5oPg0KPj4gICAjaW5jbHVkZSA8eGVuL2ludGVyZmFj
+ZS92ZXJzaW9uLmg+DQo+PiAgICNpbmNsdWRlIDx4ZW4vaW50ZXJmYWNlL2V2ZW50X2NoYW5uZWwu
+aD4NCj4+ICsjaW5jbHVkZSA8eGVuL2ludGVyZmFjZS9odm0vaHZtX29wLmg+DQo+PiAgICNpbmNs
+dWRlIDx4ZW4vaW50ZXJmYWNlL3NjaGVkLmg+DQo+Pg0KPj4gICAjaW5jbHVkZSA8YXNtL3hlbi9j
+cHVpZC5oPg0KPj4gQEAgLTEzMzAsNiArMTMzMSwxNyBAQCBzdGF0aWMgYm9vbCBrdm1feGVuX2hj
+YWxsX3NjaGVkX29wKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwgYm9vbCBsb25nbW9kZSwNCj4+ICAg
+ICAgIHJldHVybiBmYWxzZTsNCj4+ICAgfQ0KPj4NCj4+ICtzdGF0aWMgYm9vbCBrdm1feGVuX2hj
+YWxsX2h2bV9vcChzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsIGludCBjbWQsIHU2NA0KPj4gK2FyZywg
+dTY0ICpyKSB7DQo+PiArICAgICBpZiAoY21kID09IEhWTU9QX2ZsdXNoX3RsYnMgJiYgIWFyZykg
+ew0KPj4gKyAgICAgICAgICAgICBrdm1fbWFrZV9hbGxfY3B1c19yZXF1ZXN0KHZjcHUtPmt2bSwg
+S1ZNX1JFUV9UTEJfRkxVU0hfR1VFU1QpOw0KPj4gKyAgICAgICAgICAgICAqciA9IDA7DQo+PiAr
+ICAgICAgICAgICAgIHJldHVybiB0cnVlOw0KPj4gKyAgICAgfQ0KPj4gKw0KPj4gKyAgICAgcmV0
+dXJuIGZhbHNlOw0KPj4gK30NCj4NCj5UaGlzIGNvZGUgc3RydWN0dXJlIG1lYW5zIHRoYXQgYXJn
+ICE9IE5VTEwgd2lsbCByZXN1bHQgaW4gdGhlIGd1ZXN0IHNlZWluZyBFTk9TWVMgcmF0aGVyIHRo
+YW4gRUlOVkFMLg0KPg0KPiAgIFBhdWwNCg0KWWVzLCBiZWNhdXNlIG9mIHRoaXMgY29tbWVudCBp
+biBEYXZpZCdzIGVtYWlsOg0KIkkgZG9uJ3QgZXZlbiBrbm93IHRoYXQgd2UgY2FyZSBhYm91dCBp
+bi1rZXJuZWwgYWNjZWxlcmF0aW9uIGZvciB0aGUNCi1FSU5WQUwgY2FzZS4gV2UgY291bGQganVz
+dCByZXR1cm4gZmFsc2UgZm9yIHRoYXQsIGFuZCBsZXQgdXNlcnNwYWNlDQoocmVwb3J0IGFuZCkg
+aGFuZGxlIGl0LiINCg0KPg0KPj4gKw0KPj4gICBzdHJ1Y3QgY29tcGF0X3ZjcHVfc2V0X3Npbmds
+ZXNob3RfdGltZXIgew0KPj4gICAgICAgdWludDY0X3QgdGltZW91dF9hYnNfbnM7DQo+PiAgICAg
+ICB1aW50MzJfdCBmbGFnczsNCj4+IEBAIC0xNTAxLDYgKzE1MTMsOSBAQCBpbnQga3ZtX3hlbl9o
+eXBlcmNhbGwoc3RydWN0IGt2bV92Y3B1ICp2Y3B1KQ0KPj4gICAgICAgICAgICAgICAgICAgICAg
+IHRpbWVvdXQgfD0gcGFyYW1zWzFdIDw8IDMyOw0KPj4gICAgICAgICAgICAgICBoYW5kbGVkID0g
+a3ZtX3hlbl9oY2FsbF9zZXRfdGltZXJfb3AodmNwdSwgdGltZW91dCwgJnIpOw0KPj4gICAgICAg
+ICAgICAgICBicmVhazsNCj4+ICsgICAgIGNhc2UgX19IWVBFUlZJU09SX2h2bV9vcDoNCj4+ICsg
+ICAgICAgICAgICAgaGFuZGxlZCA9IGt2bV94ZW5faGNhbGxfaHZtX29wKHZjcHUsIHBhcmFtc1sw
+XSwgcGFyYW1zWzFdLCAmcik7DQo+PiArICAgICAgICAgICAgIGJyZWFrOw0KPj4gICAgICAgfQ0K
+Pj4gICAgICAgZGVmYXVsdDoNCj4+ICAgICAgICAgICAgICAgYnJlYWs7DQo+PiBkaWZmIC0tZ2l0
+IGEvaW5jbHVkZS94ZW4vaW50ZXJmYWNlL2h2bS9odm1fb3AuaA0KPj4gYi9pbmNsdWRlL3hlbi9p
+bnRlcmZhY2UvaHZtL2h2bV9vcC5oDQo+PiBpbmRleCAwMzEzNGJmM2NlYzEuLjI0MGQ4MTQ5YmMw
+NCAxMDA2NDQNCj4+IC0tLSBhL2luY2x1ZGUveGVuL2ludGVyZmFjZS9odm0vaHZtX29wLmgNCj4+
+ICsrKyBiL2luY2x1ZGUveGVuL2ludGVyZmFjZS9odm0vaHZtX29wLmgNCj4+IEBAIC0xNiw2ICsx
+Niw5IEBAIHN0cnVjdCB4ZW5faHZtX3BhcmFtIHsNCj4+ICAgfTsNCj4+ICAgREVGSU5FX0dVRVNU
+X0hBTkRMRV9TVFJVQ1QoeGVuX2h2bV9wYXJhbSk7DQo+Pg0KPj4gKy8qIEZsdXNoZXMgZ3Vlc3Qg
+VExCcyBmb3IgYWxsIHZDUFVzOiBAYXJnIG11c3QgYmUgMC4gKi8NCj4+ICsjZGVmaW5lIEhWTU9Q
+X2ZsdXNoX3RsYnMgICAgICAgICAgICA1DQo+PiArDQo+PiAgIC8qIEhpbnQgZnJvbSBQViBkcml2
+ZXJzIGZvciBwYWdldGFibGUgZGVzdHJ1Y3Rpb24uICovDQo+PiAgICNkZWZpbmUgSFZNT1BfcGFn
+ZXRhYmxlX2R5aW5nICAgICAgIDkNCj4+ICAgc3RydWN0IHhlbl9odm1fcGFnZXRhYmxlX2R5aW5n
+IHsNCj4NCg==
