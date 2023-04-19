@@ -2,105 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 527136E7E50
-	for <lists+kvm@lfdr.de>; Wed, 19 Apr 2023 17:31:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BA26B6E7EE6
+	for <lists+kvm@lfdr.de>; Wed, 19 Apr 2023 17:54:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233317AbjDSPbl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Apr 2023 11:31:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55770 "EHLO
+        id S232016AbjDSPyK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Apr 2023 11:54:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44804 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233366AbjDSPbi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Apr 2023 11:31:38 -0400
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 59C6BAF
-        for <kvm@vger.kernel.org>; Wed, 19 Apr 2023 08:31:32 -0700 (PDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9A68D16F8;
-        Wed, 19 Apr 2023 08:32:15 -0700 (PDT)
-Received: from donnerap.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 138C63F5A1;
-        Wed, 19 Apr 2023 08:31:30 -0700 (PDT)
-Date:   Wed, 19 Apr 2023 16:31:28 +0100
-From:   Andre Przywara <andre.przywara@arm.com>
-To:     Jean-Philippe Brucker <jean-philippe@linaro.org>
-Cc:     Will Deacon <will@kernel.org>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        kvm@vger.kernel.org, Alexandru Elisei <alexandru.elisei@arm.com>,
-        Sami Mujawar <sami.mujawar@arm.com>
-Subject: Re: [PATCH kvmtool 0/2] Fix virtio/rng handling in low entropy
- situations
-Message-ID: <20230419163128.49adc0ae@donnerap.cambridge.arm.com>
-In-Reply-To: <20230419151013.GC94027@myrica>
-References: <20230413165757.1728800-1-andre.przywara@arm.com>
-        <20230419135832.GB94027@myrica>
-        <20230419151013.GC94027@myrica>
-Organization: ARM
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.32; aarch64-unknown-linux-gnu)
+        with ESMTP id S229716AbjDSPyJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Apr 2023 11:54:09 -0400
+Received: from out-50.mta1.migadu.com (out-50.mta1.migadu.com [95.215.58.50])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 117D497
+        for <kvm@vger.kernel.org>; Wed, 19 Apr 2023 08:54:07 -0700 (PDT)
+Date:   Wed, 19 Apr 2023 08:54:00 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1681919646;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+        bh=fp8r9NiXX/VMrp288APhXd9/oxP1xKnWdF8hI7MtG2c=;
+        b=TzrX8Pn2xmTtMiXyk1Fz/Ob1MiwfQfOGQbmyTqUIIjHP/3b+nJQ96gAYGFhqqe4TeU+Svi
+        FDRbRcs870T5F7IJf2KAD5AD/eTaVJ//9FrIGoiYmlQRVNLF+e94TDBIvRAJmFUym4oXnX
+        BNYxz3aHulHIMI0pxhYYA8Bh4aBZAAE=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From:   Oliver Upton <oliver.upton@linux.dev>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Will Deacon <will@kernel.org>,
+        Mostafa Saleh <smostafa@google.com>,
+        Dan Carpenter <dan.carpenter@linaro.org>
+Subject: [GIT PULL v2] KVM/arm64 fixes for 6.3, part #4
+Message-ID: <ZEAOmK52rgcZeDXg@thinky-boi>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Migadu-Flow: FLOW_OUT
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 19 Apr 2023 16:10:13 +0100
-Jean-Philippe Brucker <jean-philippe@linaro.org> wrote:
+Hi Paolo,
 
-Hi Jean-Philippe,
+Here is v2 of the last batch of fixes for 6.3 (for real this time!)
 
-thanks for having a look!
+Details in the tag, but the noteworthy addition is Dan's fix for a
+rather obvious buffer overflow when writing to a firmware register.
 
-> On Wed, Apr 19, 2023 at 02:58:32PM +0100, Jean-Philippe Brucker wrote:
-> > On Thu, Apr 13, 2023 at 05:57:55PM +0100, Andre Przywara wrote:  
-> > > I am not sure we now really need patch 2 anymore (originally I had this
-> > > one before I switched to /dev/urandom). I *think* even a read from
-> > > /dev/urandom can return early (because of a signal, for instance), so
-> > > a return with 0 bytes read seems possible.  
-> > 
-> > Given that this should be very rare, maybe a simple loop would be better
-> > than switching the blocking mode?  It's certainly a good idea to apply the
-> > "MUST" requirements from virtio.  
+Please pull,
 
-So originally I had this patch 2/2 on its own, still using /dev/random.
-And there a read() on the O_NONBLOCKed fd would return -EAGAIN immediately
-for the next 30 seconds straight, so doing this in a loop sounds very
-wrong. After all blocking fd's are there to solve exactly that problem.
+Oliver
 
-But indeed with /dev/urandom being much nicer to us already, and with the
-below mentioned special behaviour, just a simple second try (no loop) is
-sufficient.
+The following changes since commit e81625218bf7986ba1351a98c43d346b15601d26:
 
-> Digging a bit more, the manpage [1] is helpful:
-> 
-> 	The O_NONBLOCK flag has no effect when opening /dev/urandom.
-> 	When calling read(2) for the device /dev/urandom, reads of up to
-> 	256 bytes will return as many bytes as are requested and will not
-> 	be interrupted by a signal handler. Reads with a buffer over
-> 	this limit may return less than the requested number of bytes or
-> 	fail with the error EINTR, if interrupted by a signal handler.
+  KVM: arm64: Advertise ID_AA64PFR0_EL1.CSV2/3 to protected VMs (2023-04-04 15:52:06 +0000)
 
-Right, I saw references to that behaviour on the Internet(TM), but missed
-the manpage stanza. It still feels a bit awkward since this seems to rely
-on some Linux implementation detail, but that's certainly fine for kvmtool
-(being Linux only anyway).
+are available in the Git repository at:
 
-> So I guess you can also drop the O_NONBLOCK flag in patch 1. And for the
-> second one, maybe we could fallback to a 256 bytes read if the first one
-> fails
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-6.3-4
 
-Yes, that's certainly better and simplifies that patch.
+for you to fetch changes up to a25bc8486f9c01c1af6b6c5657234b2eee2c39d6:
 
-Thanks for digging this out!
+  KVM: arm64: Fix buffer overflow in kvm_arm_set_fw_reg() (2023-04-19 15:22:37 +0000)
 
-Cheers,
-Andre
+----------------------------------------------------------------
+KVM/arm64 fixes for 6.3, part #4
 
-> 
-> [1] https://man7.org/linux/man-pages/man4/urandom.4.html
-> 
+ - Plug a buffer overflow due to the use of the user-provided register
+   width for firmware regs. Outright reject accesses where the
+   user register width does not match the kernel representation.
 
+ - Protect non-atomic RMW operations on vCPU flags against preemption,
+   as an update to the flags by an intervening preemption could be lost.
+
+----------------------------------------------------------------
+Dan Carpenter (1):
+      KVM: arm64: Fix buffer overflow in kvm_arm_set_fw_reg()
+
+Marc Zyngier (1):
+      KVM: arm64: Make vcpu flag updates non-preemptible
+
+ arch/arm64/include/asm/kvm_host.h | 19 ++++++++++++++++++-
+ arch/arm64/kvm/hypercalls.c       |  2 ++
+ 2 files changed, 20 insertions(+), 1 deletion(-)
