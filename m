@@ -2,75 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 761D36E822F
-	for <lists+kvm@lfdr.de>; Wed, 19 Apr 2023 21:56:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D354A6E826D
+	for <lists+kvm@lfdr.de>; Wed, 19 Apr 2023 22:12:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231485AbjDST4w (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Apr 2023 15:56:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55288 "EHLO
+        id S231416AbjDSUMa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Apr 2023 16:12:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36264 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229894AbjDST4u (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Apr 2023 15:56:50 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B280CE77
-        for <kvm@vger.kernel.org>; Wed, 19 Apr 2023 12:56:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1681934163;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=o3ee2UOmXmTnns8+N/DwF+uPlnF+rDLjncVrgdCTyGQ=;
-        b=IKa8VyYAb2hU+STgv6cN3nEDHcWIohMEejNp3RXb4VZrkdvwbi70d+/rEssBqvsfZVNK5S
-        pOc7ltzxt1SZBR0J0KiAZNdVagwLfGSr3B0qOJ17mZY0GLGB3fam9Ki735h/oBzIfotVlG
-        p7M47MWjTVyzoAxmbyqxPOicNopE8dI=
-Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
- [209.85.160.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-288-0RckfFqRPP-44zzswbV4AA-1; Wed, 19 Apr 2023 15:56:02 -0400
-X-MC-Unique: 0RckfFqRPP-44zzswbV4AA-1
-Received: by mail-qt1-f197.google.com with SMTP id d75a77b69052e-3ed767b30easo266381cf.1
-        for <kvm@vger.kernel.org>; Wed, 19 Apr 2023 12:56:02 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681934162; x=1684526162;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=o3ee2UOmXmTnns8+N/DwF+uPlnF+rDLjncVrgdCTyGQ=;
-        b=dGqg9EXw0K5Nwngxki2t4Ve3+AVblpP01JB5VfV7yOF7Mh/avXaOSg1SiM9gIEvp4R
-         QidVGAZ+4yHD01Dn+46Purlpf7pKTV4ZcadqTM/8hgtI1q/gG35eoFLREZAY81OQu/It
-         LsC4eUf/Y8MEr1RihlDY8NP9IG0tB/323as7rh8FAXVGZ/K8wEwUAU0X9tOPsewUCUGW
-         SdghYipGTOOvacf9Ek41wEXDVEUdsiJUlFrHptDDt+zlksivbkN2f8B7MehqVVguD4mZ
-         roP4w/llpYUb1bewuC9fNeZik9sHQdvjLUD2wE4bEEE5VRr2lhQ2644z7UeK5y/+SeWf
-         6rcg==
-X-Gm-Message-State: AAQBX9cTbcq2hRcMZaCR0Tx9U0LpUVnMYmYr0x5YjdUURYrt4L6v/DHb
-        SUG+OabJUlANEAt1C2+Psf+yEWG0pbkNydT7LbnrmSPGd1B24zjecBGxdaXH345lM45R/1T4SkK
-        c+paqc2+p1ED0
-X-Received: by 2002:a05:622a:1a9b:b0:3ea:ef5:5b8c with SMTP id s27-20020a05622a1a9b00b003ea0ef55b8cmr31879232qtc.3.1681934161887;
-        Wed, 19 Apr 2023 12:56:01 -0700 (PDT)
-X-Google-Smtp-Source: AKy350bm8Jhe6jHZDmUB9HAUPG210Lksz3mgG4SE50D2FR1z8lHa8fCITv7WyHX4P5OzneuRCtvbjQ==
-X-Received: by 2002:a05:622a:1a9b:b0:3ea:ef5:5b8c with SMTP id s27-20020a05622a1a9b00b003ea0ef55b8cmr31879193qtc.3.1681934161528;
-        Wed, 19 Apr 2023 12:56:01 -0700 (PDT)
-Received: from x1n (bras-base-aurron9127w-grc-40-70-52-229-124.dsl.bell.ca. [70.52.229.124])
-        by smtp.gmail.com with ESMTPSA id e7-20020ac84e47000000b003e3860f12f7sm822636qtw.56.2023.04.19.12.56.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Apr 2023 12:56:00 -0700 (PDT)
-Date:   Wed, 19 Apr 2023 15:55:59 -0400
-From:   Peter Xu <peterx@redhat.com>
-To:     Anish Moorthy <amoorthy@google.com>
-Cc:     pbonzini@redhat.com, maz@kernel.org, oliver.upton@linux.dev,
-        seanjc@google.com, jthoughton@google.com, bgardon@google.com,
-        dmatlack@google.com, ricarkol@google.com, axelrasmussen@google.com,
-        kvm@vger.kernel.org, kvmarm@lists.linux.dev
-Subject: Re: [PATCH v3 00/22] Improve scalability of KVM + userfaultfd live
- migration via annotated memory faults.
-Message-ID: <ZEBHTw3+DcAnPc37@x1n>
-References: <20230412213510.1220557-1-amoorthy@google.com>
+        with ESMTP id S230274AbjDSUM2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Apr 2023 16:12:28 -0400
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B93AEC
+        for <kvm@vger.kernel.org>; Wed, 19 Apr 2023 13:12:27 -0700 (PDT)
+Received: from pps.filterd (m0246617.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 33JJoW0q010120;
+        Wed, 19 Apr 2023 20:12:10 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding;
+ s=corp-2023-03-30; bh=IcRBhNzpOujf9lRsRbXp54jzNtmUxC1J7zBRJIQtbm8=;
+ b=T3MRKi0Am7fs0o+skfthGnoeSDC19VX5Cxwy47S/Uy0r/pq5UAh9/+ywlEgNHZwB+diR
+ VczTqazMwDkMpveTJ82OkknIoV22AZbdCJRA2u8S//Tno7anBKtFqtjjhQxu2JyP6rZV
+ /AahWZTSbV4Bqosx+Lbgva+50JSk7Ok0dYS7Bq9r9C74VQFciB3ry8Ac0piz7+eaHNJv
+ mZjsydlQgUQVQ9f8MX53absT9RviwOJ//pEekQ+mdnGpSfC4KyEVAyNzUx3FelYEL2Zq
+ OkcSt8q2JxoiSvyWFwVgeC4RRW5m7ultEhmWvsY4FzSdCwyCMynGZ4xPvCRzmDIkhriW Rg== 
+Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.appoci.oracle.com [138.1.114.2])
+        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3pymfuh857-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 19 Apr 2023 20:12:10 +0000
+Received: from pps.filterd (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+        by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 33JIoXq1011116;
+        Wed, 19 Apr 2023 20:12:09 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+        by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3pyjc6wx01-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 19 Apr 2023 20:12:09 +0000
+Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 33JKC8Qg016607;
+        Wed, 19 Apr 2023 20:12:08 GMT
+Received: from joaomart-mac.uk.oracle.com (dhcp-10-175-164-99.vpn.oracle.com [10.175.164.99])
+        by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 3pyjc6wwxu-1;
+        Wed, 19 Apr 2023 20:12:08 +0000
+From:   Joao Martins <joao.m.martins@oracle.com>
+To:     iommu@lists.linux.dev
+Cc:     Joerg Roedel <joro@8bytes.org>,
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        Vasant Hegde <vasant.hegde@amd.com>,
+        Will Deacon <will@kernel.org>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Alejandro Jimenez <alejandro.j.jimenez@oracle.com>,
+        kvm@vger.kernel.org, Joao Martins <joao.m.martins@oracle.com>
+Subject: [PATCH v3 0/2] iommu/amd: Fix GAM IRTEs affinity and GALog restart
+Date:   Wed, 19 Apr 2023 21:11:52 +0100
+Message-Id: <20230419201154.83880-1-joao.m.martins@oracle.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20230412213510.1220557-1-amoorthy@google.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
+ definitions=2023-04-19_14,2023-04-18_01,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 adultscore=0
+ malwarescore=0 mlxlogscore=712 mlxscore=0 bulkscore=0 phishscore=0
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2303200000 definitions=main-2304190174
+X-Proofpoint-GUID: iTDeIBDvBXc8c_vNkfJPHttZSgmXFZjD
+X-Proofpoint-ORIG-GUID: iTDeIBDvBXc8c_vNkfJPHttZSgmXFZjD
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
         RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -79,61 +75,44 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi, Anish,
+Hey,
 
-On Wed, Apr 12, 2023 at 09:34:48PM +0000, Anish Moorthy wrote:
-> KVM's demand paging self test is extended to demonstrate the performance
-> benefits of using the two new capabilities to bypass the userfaultfd
-> wait queue. The performance samples below (rates in thousands of
-> pages/s, n = 5), were generated using [2] on an x86 machine with 256
-> cores.
-> 
-> vCPUs, Average Paging Rate (w/o new caps), Average Paging Rate (w/ new caps)
-> 1       150     340
-> 2       191     477
-> 4       210     809
-> 8       155     1239
-> 16      130     1595
-> 32      108     2299
-> 64      86      3482
-> 128     62      4134
-> 256     36      4012
+This small series fixes a couple bugs:
 
-The number looks very promising.  Though..
+Patch 1) Fix affinity changes to already-in-guest-mode IRTEs which would
+         otherwise be nops.
 
-> 
-> [1] https://lore.kernel.org/linux-mm/CADrL8HVDB3u2EOhXHCrAgJNLwHkj2Lka1B_kkNb0dNwiWiAN_Q@mail.gmail.com/
-> [2] ./demand_paging_test -b 64M -u MINOR -s shmem -a -v <n> -r <n> [-w]
->     A quick rundown of the new flags (also detailed in later commits)
->         -a registers all of guest memory to a single uffd.
+Patch 2) Handle the GALog overflow condition by restarting it, similar
+         to how we do with the event log.
 
-... this is the worst case scenario.  I'd say it's slightly unfair to
-compare by first introducing a bottleneck then compare with it. :)
-
-Jokes aside: I'd think it'll make more sense if such a performance solution
-will be measured on real systems showing real benefits, because so far it's
-still not convincing enough if it's only with the test especially with only
-one uffd.
-
-I don't remember whether I used to discuss this with James before, but..
-
-I know that having multiple uffds in productions also means scattered guest
-memory and scattered VMAs all over the place.  However split the guest
-large mem into at least a few (or even tens of) VMAs may still be something
-worth trying?  Do you think that'll already solve some of the contentions
-on userfaultfd, either on the queue or else?
-
-With a bunch of VMAs and userfaultfds (paired with uffd fault handler
-threads, totally separate uffd queues), I'd expect to some extend other
-things can pop up already, e.g., the network bandwidth, without teaching
-each vcpu thread to report uffd faults themselves.
-
-These are my pure imaginations though, I think that's also why it'll be
-great if such a solution can be tested more or less on a real migration
-scenario to show its real benefits.
+Comments appreciated.
 
 Thanks,
+	Joao
+
+Changes since v2[2]:
+- Fixes commit message spelling issues  (Alexey, patch 1)
+- Consolidate the modified check into one line (Sean, patch 1)
+- Add Rb in patch 2 (Vasant Hegde)
+
+Changes since v1[1]:
+- Adjust commit message in first patch (Suravee)
+- Add Rb in the first patch (Suravee)
+- Add new patch 2 for handling GALog overflows
+
+[0] https://lore.kernel.org/linux-iommu/b39d505c-8d2b-d90b-f52d-ceabde8225cf@oracle.com/
+[1] https://lore.kernel.org/linux-iommu/20230208131938.39898-1-joao.m.martins@oracle.com/
+[2] https://lore.kernel.org/linux-iommu/20230316200219.42673-1-joao.m.martins@oracle.com/
+
+Joao Martins (2):
+  iommu/amd: Don't block updates to GATag if guest mode is on
+  iommu/amd: Handle GALog overflows
+
+ drivers/iommu/amd/amd_iommu.h |  1 +
+ drivers/iommu/amd/init.c      | 24 ++++++++++++++++++++++++
+ drivers/iommu/amd/iommu.c     | 12 +++++++++---
+ 3 files changed, 34 insertions(+), 3 deletions(-)
 
 -- 
-Peter Xu
+2.17.2
 
