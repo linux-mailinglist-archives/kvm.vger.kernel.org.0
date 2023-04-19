@@ -2,58 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 215366E75D4
-	for <lists+kvm@lfdr.de>; Wed, 19 Apr 2023 10:58:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B54D26E75D5
+	for <lists+kvm@lfdr.de>; Wed, 19 Apr 2023 10:59:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232688AbjDSI61 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Apr 2023 04:58:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35728 "EHLO
+        id S231795AbjDSI7H (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Apr 2023 04:59:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36288 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232802AbjDSI6Y (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Apr 2023 04:58:24 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 257D126A2;
-        Wed, 19 Apr 2023 01:58:22 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id B785F62BD9;
-        Wed, 19 Apr 2023 08:58:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1B7E5C433EF;
-        Wed, 19 Apr 2023 08:58:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1681894701;
-        bh=mBy7r4l2S8sicYbRnowa3lQqGGdm/51Xuq6XArqu3Zk=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=bobUFuFPQIIKHJelLDSsryC4Q5j9L7duxM1U0wdbCnHMb6jHGNVChnXC4GvQx2BlO
-         jcvYNbBVew1IC9cGV409dehjC4MHIy1bAMg/tqmpMXc/LifTPfeeuYkOiCW00IXAIY
-         00E1a+S5U6h/9VMiqHAzVfyNSNbRTXlbZim2glBIbHs/Rlh3XGTtJhC65G2IN+sNml
-         hX79mWsy9kipjJxnXvXRRuMZQXWCVo60uWcgJerMwLU9rx4gisqp/FrH6T/qGxEWtU
-         dk7H8P8obKQuR1YcCmzfkIHb4bPm/rzMe+pVN0s79Q6SGmOz3fQTL65jjQBD+U+eOV
-         WIp7eTYMOi13Q==
-Date:   Wed, 19 Apr 2023 09:58:15 +0100
-From:   Will Deacon <will@kernel.org>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Quentin Perret <qperret@google.com>,
-        Mostafa Saleh <smostafa@google.com>, stable@vger.kernel.org
-Subject: Re: [PATCH v2] KVM: arm64: Make vcpu flag updates non-preemptible
-Message-ID: <20230419085814.GA928@willie-the-truck>
-References: <20230418125737.2327972-1-maz@kernel.org>
+        with ESMTP id S232708AbjDSI7F (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Apr 2023 04:59:05 -0400
+Received: from loongson.cn (mail.loongson.cn [114.242.206.163])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4C69E19AA;
+        Wed, 19 Apr 2023 01:59:03 -0700 (PDT)
+Received: from loongson.cn (unknown [10.20.42.120])
+        by gateway (Coremail) with SMTP id _____8AxrtpWrT9k39weAA--.36323S3;
+        Wed, 19 Apr 2023 16:59:02 +0800 (CST)
+Received: from [10.20.42.120] (unknown [10.20.42.120])
+        by localhost.localdomain (Coremail) with SMTP id AQAAf8Bxbb5UrT9kp9UuAA--.15562S3;
+        Wed, 19 Apr 2023 16:59:01 +0800 (CST)
+Subject: Re: [PATCH v7 17/30] LoongArch: KVM: Implement virtual machine tlb
+ operations
+To:     Huacai Chen <chenhuacai@kernel.org>
+References: <20230417094649.874671-1-zhaotianrui@loongson.cn>
+ <20230417094649.874671-18-zhaotianrui@loongson.cn>
+ <CAAhV-H4Ca18bo-DV8gzaJeVCDT8o_dqFfX4+ruQLHL+V+HrmOg@mail.gmail.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        WANG Xuerui <kernel@xen0n.name>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        loongarch@lists.linux.dev, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Mark Brown <broonie@kernel.org>,
+        Alex Deucher <alexander.deucher@amd.com>,
+        Oliver Upton <oliver.upton@linux.dev>, maobibo@loongson.cn,
+        Xi Ruoyao <xry111@xry111.site>
+From:   Tianrui Zhao <zhaotianrui@loongson.cn>
+Message-ID: <9209324c-28c5-1305-8ff3-95e79b380f4d@loongson.cn>
+Date:   Wed, 19 Apr 2023 16:59:00 +0800
+User-Agent: Mozilla/5.0 (X11; Linux mips64; rv:45.0) Gecko/20100101
+ Thunderbird/45.4.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230418125737.2327972-1-maz@kernel.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+In-Reply-To: <CAAhV-H4Ca18bo-DV8gzaJeVCDT8o_dqFfX4+ruQLHL+V+HrmOg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: AQAAf8Bxbb5UrT9kp9UuAA--.15562S3
+X-CM-SenderInfo: p2kd03xldq233l6o00pqjv00gofq/
+X-Coremail-Antispam: 1Uk129KBjvJXoW7tw18uF1kJF43uF4rCF18Grg_yoW8Ar4fpF
+        y8uF4rtF4xXrnrJ3sIqw13WFnxZrWkKF12vFWSv34fArZFkr18Kr9akr98GFyrJ34rJr10
+        va4rtrsFgF1UJ37anT9S1TB71UUUUj7qnTZGkaVYY2UrUUUUj1kv1TuYvTs0mT0YCTnIWj
+        qI5I8CrVACY4xI64kE6c02F40Ex7xfYxn0WfASr-VFAUDa7-sFnT9fnUUIcSsGvfJTRUUU
+        bqxYFVCjjxCrM7AC8VAFwI0_Jr0_Gr1l1xkIjI8I6I8E6xAIw20EY4v20xvaj40_Wr0E3s
+        1l1IIY67AEw4v_JrI_Jryl8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xv
+        wVC0I7IYx2IY67AKxVW5JVW7JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwA2z4
+        x0Y4vEx4A2jsIE14v26r4UJVWxJr1l84ACjcxK6I8E87Iv6xkF7I0E14v26F4UJVW0owAa
+        w2AFwI0_JF0_Jw1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqjxCEc2xF0cIa020Ex4CE44
+        I27wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jw0_WrylYx0Ex4A2
+        jsIE14v26r4j6F4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwIxGrwCYjI0SjxkI62
+        AI1cAE67vIY487MxkF7I0En4kS14v26r126r1DMxAIw28IcxkI7VAKI48JMxC20s026xCa
+        FVCjc4AY6r1j6r4UMxCIbckI1I0E14v26r126r1DMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2
+        IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI
+        42IY6xIIjxv20xvE14v26ryj6F1UMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42
+        IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Gr0_Cr1lIxAIcVC2z280
+        aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU8KNt3UUUUU==
+X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -61,39 +72,65 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Apr 18, 2023 at 01:57:37PM +0100, Marc Zyngier wrote:
-> Per-vcpu flags are updated using a non-atomic RMW operation.
-> Which means it is possible to get preempted between the read and
-> write operations.
-> 
-> Another interesting thing to note is that preemption also updates
-> flags, as we have some flag manipulation in both the load and put
-> operations.
-> 
-> It is thus possible to lose information communicated by either
-> load or put, as the preempted flag update will overwrite the flags
-> when the thread is resumed. This is specially critical if either
-> load or put has stored information which depends on the physical
-> CPU the vcpu runs on.
-> 
-> This results in really elusive bugs, and kudos must be given to
-> Mostafa for the long hours of debugging, and finally spotting
-> the problem.
-> 
-> Fix it by disabling preemption during the RMW operation, which
-> ensures that the state stays consistent. Also upgrade vcpu_get_flag
-> path to use READ_ONCE() to make sure the field is always atomically
-> accessed.
-> 
-> Fixes: e87abb73e594 ("KVM: arm64: Add helpers to manipulate vcpu flags among a set")
-> Reported-by: Mostafa Saleh <smostafa@google.com>
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> Cc: stable@vger.kernel.org
-> ---
-> 
-> Notes:
->     v2: add READ_ONCE() on the read path, expand commit message
 
-Acked-by: Will Deacon <will@kernel.org>
 
-Will
+在 2023年04月19日 10:02, Huacai Chen 写道:
+> Hi, Tianrui,
+>
+> On Mon, Apr 17, 2023 at 5:47 PM Tianrui Zhao <zhaotianrui@loongson.cn> wrote:
+>> Implement loongarch virtual machine tlb operations such as flush tlb by
+>> specific gpa parameter and flush all of the virt machines tlb.
+> Use LoongArch instead of loongarch in commit messages and comments, please.
+>
+> Huacai
+Ok, I will replace loongarch with LoongArch, thanks.
+
+Thanks
+Tianrui Zhao
+>> Signed-off-by: Tianrui Zhao <zhaotianrui@loongson.cn>
+>> ---
+>>   arch/loongarch/kvm/tlb.c | 31 +++++++++++++++++++++++++++++++
+>>   1 file changed, 31 insertions(+)
+>>   create mode 100644 arch/loongarch/kvm/tlb.c
+>>
+>> diff --git a/arch/loongarch/kvm/tlb.c b/arch/loongarch/kvm/tlb.c
+>> new file mode 100644
+>> index 000000000000..66e116cf2486
+>> --- /dev/null
+>> +++ b/arch/loongarch/kvm/tlb.c
+>> @@ -0,0 +1,31 @@
+>> +// SPDX-License-Identifier: GPL-2.0
+>> +/*
+>> + * Copyright (C) 2020-2023 Loongson Technology Corporation Limited
+>> + */
+>> +
+>> +#include <linux/kvm_host.h>
+>> +#include <asm/tlb.h>
+>> +
+>> +int kvm_flush_tlb_gpa(struct kvm_vcpu *vcpu, unsigned long gpa)
+>> +{
+>> +       preempt_disable();
+>> +       gpa &= (PAGE_MASK << 1);
+>> +       invtlb(INVTLB_GID_ADDR, read_csr_gstat() & CSR_GSTAT_GID, gpa);
+>> +       preempt_enable();
+>> +       return 0;
+>> +}
+>> +
+>> +/**
+>> + * kvm_flush_tlb_all() - Flush all root TLB entries for
+>> + * guests.
+>> + *
+>> + * Invalidate all entries including GVA-->GPA and GPA-->HPA mappings.
+>> + */
+>> +void kvm_flush_tlb_all(void)
+>> +{
+>> +       unsigned long flags;
+>> +
+>> +       local_irq_save(flags);
+>> +       invtlb_all(INVTLB_ALLGID, 0, 0);
+>> +       local_irq_restore(flags);
+>> +}
+>> --
+>> 2.31.1
+>>
+
