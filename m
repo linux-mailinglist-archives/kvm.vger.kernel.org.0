@@ -2,53 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 417246E84D8
-	for <lists+kvm@lfdr.de>; Thu, 20 Apr 2023 00:23:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 868E76E84C5
+	for <lists+kvm@lfdr.de>; Thu, 20 Apr 2023 00:22:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231509AbjDSWXh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Apr 2023 18:23:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42200 "EHLO
+        id S233539AbjDSWWJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Apr 2023 18:22:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42032 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232936AbjDSWXQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Apr 2023 18:23:16 -0400
-Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com [209.85.215.173])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D54AC172
-        for <kvm@vger.kernel.org>; Wed, 19 Apr 2023 15:21:25 -0700 (PDT)
-Received: by mail-pg1-f173.google.com with SMTP id 41be03b00d2f7-5191796a483so231528a12.0
-        for <kvm@vger.kernel.org>; Wed, 19 Apr 2023 15:21:25 -0700 (PDT)
+        with ESMTP id S232596AbjDSWVc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Apr 2023 18:21:32 -0400
+Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D09137D93
+        for <kvm@vger.kernel.org>; Wed, 19 Apr 2023 15:20:05 -0700 (PDT)
+Received: by mail-pl1-x62e.google.com with SMTP id d9443c01a7336-1a6817adde4so5433275ad.0
+        for <kvm@vger.kernel.org>; Wed, 19 Apr 2023 15:20:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rivosinc-com.20221208.gappssmtp.com; s=20221208; t=1681942729; x=1684534729;
+        d=rivosinc-com.20221208.gappssmtp.com; s=20221208; t=1681942732; x=1684534732;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=XK5xUw/rzaPgA4jO4a/YwH8Byrp1ajuQRNW8VnU2lnI=;
-        b=QfXuULt6GKdZ0yIYOBu58cROq1xtd+AwU5tA9tWSYcP8puXwvEN9RX3lXVuV60tyoW
-         4Q0CSfUoxv6NDjypNOuOT4ywNhU7IYB+qeWNkXwN91wiD9TQD3HOmit1hlHNqFbWVtNJ
-         ziwh+QBq1N6MeIyCvSv5s6RR13cXyHzSqXBQKCnCZR2rrQanp3QhB3VbRYZ2jQSTPE6d
-         Vpg87adIN6SFou4dfOJ3ZLRcLAQq2ZlEUcDyGi0vckdKvSSc1nPlKdGfKGwb9h5rUo3e
-         rLKhVd1kgYj7FOEo7g+ojtFs7lAxzBaXut+YFsbxt/trii3p8w9AEE1pM3je3JF/e5ut
-         1yXA==
+        bh=3wZ38NgXR92ZnL3KCz4X1T1orXD86k7gku+jH9LYvlc=;
+        b=QmuuVYt46KpS/zYYMAaGwSu/4ogHzgebSuHz2Y3KqaXaWYNGDgVkh+TM+9F0z1UKqq
+         yLwfXsEjIj5AyyA1hGl2bhxYnaVMKxeSrJ8kwz/jbSGPSXzXJrYc1cZLmnuKcOHvK/NO
+         W+UYzU5cNYXd7iKLqbolbPZxHkvQvk9pg5qltXG2gdevWPNka1SD3vMUG51IVWwpm1Is
+         pQl00SUeHSzQxwfQfWPPzCjONURk75DuuPNE8FRa7jDR7RGmxRIpfU2bo0VrGWZ8ZwD3
+         0HsjPnYDT4F6NmAip4Qb5wSlSawzKk38AMTj8xzmlCbhjRiSI7AJ2N04QWgrNDK8/C2A
+         ee7Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681942729; x=1684534729;
+        d=1e100.net; s=20221208; t=1681942732; x=1684534732;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=XK5xUw/rzaPgA4jO4a/YwH8Byrp1ajuQRNW8VnU2lnI=;
-        b=SnXvLvYkhF2MSR/N/hfRHrEeQmn68HAJMItUvW0QxaQggFKgwEJ1nk2WIqqnC2dFOV
-         UJ/kOt9Oo7RBBwuofKV8ZVDO9j710BHoj+1421F03WiGwya7uzQmLe/wpltK38NSJ+Rb
-         ZwHtfywYkY+KQSECQy5ph2VZoZ0X9o/u2PUbXU0aQMmHyWzvRn/K6NSp4bVBshq2tIid
-         kFOF2Tokclui1nhOgq7gk+s9oQ4tJcmE6XSIFC+heFir9Rn83QdeD+i66TD0QOoZUyoH
-         A9SB9jayG6k6jbcD934mX+T6dPOsr//XDJjgGxiicWQ6lWwiMDhvLS6XesMGvNfU3qrN
-         kjjw==
-X-Gm-Message-State: AAQBX9f2JbmjiKPtMPz6u7abqjfanBJdN4sogZ8oucs2BAF99wDqy1JR
-        j5fTa2bm4QpMvj2bZV7QCSi1mA==
-X-Google-Smtp-Source: AKy350baQTNt4Vs4HHjBbXvyObvJ3IXFGZptf7h2H+OASSZVy5+7QV7+crZBWOtRSKw2ldJwBUdMWw==
-X-Received: by 2002:a17:903:784:b0:1a2:9183:a499 with SMTP id kn4-20020a170903078400b001a29183a499mr5853196plb.34.1681942729515;
-        Wed, 19 Apr 2023 15:18:49 -0700 (PDT)
+        bh=3wZ38NgXR92ZnL3KCz4X1T1orXD86k7gku+jH9LYvlc=;
+        b=jD7XVs12KHaHLVJ1F1ghRrfkgk5PrSLNZlmLHissWyxI0LQMeWkC3/ZoXcp1+hs6JA
+         rsWyWBSpb3kUTw/r10WSBZbQEjoYxAoeER9sxikw1VQRsbV8SD8bo3/9H7KR/wBzEi7R
+         EPv21YwPNGqPqC2FyfPAwFCpLl7ZRJjXE5faY420fKIaljzPYzMI7BZPUfbchG9nJoRY
+         OHgsZBqRFGdXi1WsU4x5doY4K5gPpkfYXPDIQXnxW21QqcW6Sn1FMRYQ9gEva5maUtuS
+         uSt0ejnNmQbrygwDzRGLVlT/CY7Dv3tDT4RLuDCkyhiLKNPHWZ5HCEdYsKF/eqy57KQg
+         O0HA==
+X-Gm-Message-State: AAQBX9cfdrLCMVXjntKgmf+asYx8/ERXgACxBT8Br0c4C9R0vE9O6T5e
+        DRwcl1yAp9HO7z/AZfr77JWYgw==
+X-Google-Smtp-Source: AKy350YlbYAHX3czmRaEVnTcNdf891KQxoyoTa0cHJBez0RPMbydsH+Ponf0TcKud2fsWou26F4oLw==
+X-Received: by 2002:a17:903:2281:b0:1a6:3737:750d with SMTP id b1-20020a170903228100b001a63737750dmr7538499plh.17.1681942731698;
+        Wed, 19 Apr 2023 15:18:51 -0700 (PDT)
 Received: from atishp.ba.rivosinc.com ([66.220.2.162])
-        by smtp.gmail.com with ESMTPSA id jn11-20020a170903050b00b00196807b5189sm11619190plb.292.2023.04.19.15.18.47
+        by smtp.gmail.com with ESMTPSA id jn11-20020a170903050b00b00196807b5189sm11619190plb.292.2023.04.19.15.18.49
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Apr 2023 15:18:49 -0700 (PDT)
+        Wed, 19 Apr 2023 15:18:51 -0700 (PDT)
 From:   Atish Patra <atishp@rivosinc.com>
 To:     linux-kernel@vger.kernel.org
 Cc:     Rajnesh Kanwal <rkanwal@rivosinc.com>,
@@ -76,18 +76,18 @@ Cc:     Rajnesh Kanwal <rkanwal@rivosinc.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Paul Walmsley <paul.walmsley@sifive.com>,
         Uladzislau Rezki <urezki@gmail.com>
-Subject: [RFC 36/48] RISC-V: KVM: Read/write gprs from/to shmem in case of TVM VCPU.
-Date:   Wed, 19 Apr 2023 15:17:04 -0700
-Message-Id: <20230419221716.3603068-37-atishp@rivosinc.com>
+Subject: [RFC 37/48] RISC-V: Add COVG SBI extension definitions
+Date:   Wed, 19 Apr 2023 15:17:05 -0700
+Message-Id: <20230419221716.3603068-38-atishp@rivosinc.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20230419221716.3603068-1-atishp@rivosinc.com>
 References: <20230419221716.3603068-1-atishp@rivosinc.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
@@ -96,188 +96,44 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Rajnesh Kanwal <rkanwal@rivosinc.com>
 
-For TVM vcpus, TSM uses shared memory to exposes gprs for the trusted
-VCPU. This change makes sure we use shmem when doing mmio emulation
-for trusted VMs.
+CoVE specification defines a separate SBI extension known as CoVG
+for the guest side interface. Add the definitions for that extension.
 
 Signed-off-by: Rajnesh Kanwal <rkanwal@rivosinc.com>
 Signed-off-by: Atish Patra <atishp@rivosinc.com>
 ---
- arch/riscv/kvm/vcpu_insn.c | 98 +++++++++++++++++++++++++++++++++-----
- 1 file changed, 85 insertions(+), 13 deletions(-)
+ arch/riscv/include/asm/sbi.h | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-diff --git a/arch/riscv/kvm/vcpu_insn.c b/arch/riscv/kvm/vcpu_insn.c
-index 331489f..56eeb86 100644
---- a/arch/riscv/kvm/vcpu_insn.c
-+++ b/arch/riscv/kvm/vcpu_insn.c
-@@ -7,6 +7,9 @@
- #include <linux/bitops.h>
- #include <linux/kvm_host.h>
- #include <asm/kvm_cove.h>
-+#include <asm/kvm_nacl.h>
-+#include <asm/kvm_cove_sbi.h>
-+#include <asm/asm-offsets.h>
+diff --git a/arch/riscv/include/asm/sbi.h b/arch/riscv/include/asm/sbi.h
+index bbea922..e02ee75 100644
+--- a/arch/riscv/include/asm/sbi.h
++++ b/arch/riscv/include/asm/sbi.h
+@@ -34,6 +34,7 @@ enum sbi_ext_id {
+ 	SBI_EXT_NACL = 0x4E41434C,
+ 	SBI_EXT_COVH = 0x434F5648,
+ 	SBI_EXT_COVI = 0x434F5649,
++	SBI_EXT_COVG = 0x434F5647,
  
- #define INSN_OPCODE_MASK	0x007c
- #define INSN_OPCODE_SHIFT	2
-@@ -116,6 +119,10 @@
- #define REG_OFFSET(insn, pos)		\
- 	(SHIFT_RIGHT((insn), (pos) - LOG_REGBYTES) & REG_MASK)
+ 	/* Experimentals extensions must lie within this range */
+ 	SBI_EXT_EXPERIMENTAL_START = 0x08000000,
+@@ -439,6 +440,16 @@ struct sbi_cove_tvm_aia_params {
+ 	uint32_t guests_per_hart;
+ };
  
-+#define REG_INDEX(insn, pos)                                    \
-+	((SHIFT_RIGHT((insn), (pos)-LOG_REGBYTES) & REG_MASK) / \
-+	 (__riscv_xlen / 8))
++/* SBI COVG extension data structures */
++enum sbi_ext_covg_fid {
++	SBI_EXT_COVG_ADD_MMIO_REGION,
++	SBI_EXT_COVG_REMOVE_MMIO_REGION,
++	SBI_EXT_COVG_SHARE_MEMORY,
++	SBI_EXT_COVG_UNSHARE_MEMORY,
++	SBI_EXT_COVG_ALLOW_EXT_INTERRUPT,
++	SBI_EXT_COVG_DENY_EXT_INTERRUPT,
++};
 +
- #define REG_PTR(insn, pos, regs)	\
- 	((ulong *)((ulong)(regs) + REG_OFFSET(insn, pos)))
- 
-@@ -600,6 +607,7 @@ int kvm_riscv_vcpu_mmio_store(struct kvm_vcpu *vcpu, struct kvm_run *run,
- 	int len = 0, insn_len = 0;
- 	struct kvm_cpu_trap utrap = { 0 };
- 	struct kvm_cpu_context *ct = &vcpu->arch.guest_context;
-+	void *nshmem;
- 
- 	/* Determine trapped instruction */
- 	if (htinst & 0x1) {
-@@ -627,7 +635,15 @@ int kvm_riscv_vcpu_mmio_store(struct kvm_vcpu *vcpu, struct kvm_run *run,
- 		insn_len = INSN_LEN(insn);
- 	}
- 
--	data = GET_RS2(insn, &vcpu->arch.guest_context);
-+	if (is_cove_vcpu(vcpu)) {
-+		nshmem = nacl_shmem();
-+		data = nacl_shmem_gpr_read_cove(nshmem,
-+					       REG_INDEX(insn, SH_RS2) * 8 +
-+						       KVM_ARCH_GUEST_ZERO);
-+	} else {
-+		data = GET_RS2(insn, &vcpu->arch.guest_context);
-+	}
-+
- 	data8 = data16 = data32 = data64 = data;
- 
- 	if ((insn & INSN_MASK_SW) == INSN_MATCH_SW) {
-@@ -643,19 +659,43 @@ int kvm_riscv_vcpu_mmio_store(struct kvm_vcpu *vcpu, struct kvm_run *run,
- #ifdef CONFIG_64BIT
- 	} else if ((insn & INSN_MASK_C_SD) == INSN_MATCH_C_SD) {
- 		len = 8;
--		data64 = GET_RS2S(insn, &vcpu->arch.guest_context);
-+		if (is_cove_vcpu(vcpu)) {
-+			data64 = nacl_shmem_gpr_read_cove(
-+				nshmem,
-+				RVC_RS2S(insn) * 8 + KVM_ARCH_GUEST_ZERO);
-+		} else {
-+			data64 = GET_RS2S(insn, &vcpu->arch.guest_context);
-+		}
- 	} else if ((insn & INSN_MASK_C_SDSP) == INSN_MATCH_C_SDSP &&
- 		   ((insn >> SH_RD) & 0x1f)) {
- 		len = 8;
--		data64 = GET_RS2C(insn, &vcpu->arch.guest_context);
-+		if (is_cove_vcpu(vcpu)) {
-+			data64 = nacl_shmem_gpr_read_cove(
-+				nshmem, REG_INDEX(insn, SH_RS2C) * 8 +
-+						KVM_ARCH_GUEST_ZERO);
-+		} else {
-+			data64 = GET_RS2C(insn, &vcpu->arch.guest_context);
-+		}
- #endif
- 	} else if ((insn & INSN_MASK_C_SW) == INSN_MATCH_C_SW) {
- 		len = 4;
--		data32 = GET_RS2S(insn, &vcpu->arch.guest_context);
-+		if (is_cove_vcpu(vcpu)) {
-+			data32 = nacl_shmem_gpr_read_cove(
-+				nshmem,
-+				RVC_RS2S(insn) * 8 + KVM_ARCH_GUEST_ZERO);
-+		} else {
-+			data32 = GET_RS2S(insn, &vcpu->arch.guest_context);
-+		}
- 	} else if ((insn & INSN_MASK_C_SWSP) == INSN_MATCH_C_SWSP &&
- 		   ((insn >> SH_RD) & 0x1f)) {
- 		len = 4;
--		data32 = GET_RS2C(insn, &vcpu->arch.guest_context);
-+		if (is_cove_vcpu(vcpu)) {
-+			data32 = nacl_shmem_gpr_read_cove(
-+				nshmem, REG_INDEX(insn, SH_RS2C) * 8 +
-+						KVM_ARCH_GUEST_ZERO);
-+		} else {
-+			data32 = GET_RS2C(insn, &vcpu->arch.guest_context);
-+		}
- 	} else {
- 		return -EOPNOTSUPP;
- 	}
-@@ -725,6 +765,7 @@ int kvm_riscv_vcpu_mmio_return(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 	u64 data64;
- 	ulong insn;
- 	int len, shift;
-+	void *nshmem;
- 
- 	if (vcpu->arch.mmio_decode.return_handled)
- 		return 0;
-@@ -738,26 +779,57 @@ int kvm_riscv_vcpu_mmio_return(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 	len = vcpu->arch.mmio_decode.len;
- 	shift = vcpu->arch.mmio_decode.shift;
- 
-+	if (is_cove_vcpu(vcpu))
-+		nshmem = nacl_shmem();
-+
- 	switch (len) {
- 	case 1:
- 		data8 = *((u8 *)run->mmio.data);
--		SET_RD(insn, &vcpu->arch.guest_context,
--			(ulong)data8 << shift >> shift);
-+		if (is_cove_vcpu(vcpu)) {
-+			nacl_shmem_gpr_write_cove(nshmem,
-+						 REG_INDEX(insn, SH_RD) * 8 +
-+							 KVM_ARCH_GUEST_ZERO,
-+						 (unsigned long)data8);
-+		} else {
-+			SET_RD(insn, &vcpu->arch.guest_context,
-+			       (ulong)data8 << shift >> shift);
-+		}
- 		break;
- 	case 2:
- 		data16 = *((u16 *)run->mmio.data);
--		SET_RD(insn, &vcpu->arch.guest_context,
--			(ulong)data16 << shift >> shift);
-+		if (is_cove_vcpu(vcpu)) {
-+			nacl_shmem_gpr_write_cove(nshmem,
-+						 REG_INDEX(insn, SH_RD) * 8 +
-+							 KVM_ARCH_GUEST_ZERO,
-+						 (unsigned long)data16);
-+		} else {
-+			SET_RD(insn, &vcpu->arch.guest_context,
-+			       (ulong)data16 << shift >> shift);
-+		}
- 		break;
- 	case 4:
- 		data32 = *((u32 *)run->mmio.data);
--		SET_RD(insn, &vcpu->arch.guest_context,
--			(ulong)data32 << shift >> shift);
-+		if (is_cove_vcpu(vcpu)) {
-+			nacl_shmem_gpr_write_cove(nshmem,
-+						 REG_INDEX(insn, SH_RD) * 8 +
-+							 KVM_ARCH_GUEST_ZERO,
-+						 (unsigned long)data32);
-+		} else {
-+			SET_RD(insn, &vcpu->arch.guest_context,
-+			       (ulong)data32 << shift >> shift);
-+		}
- 		break;
- 	case 8:
- 		data64 = *((u64 *)run->mmio.data);
--		SET_RD(insn, &vcpu->arch.guest_context,
--			(ulong)data64 << shift >> shift);
-+		if (is_cove_vcpu(vcpu)) {
-+			nacl_shmem_gpr_write_cove(nshmem,
-+						 REG_INDEX(insn, SH_RD) * 8 +
-+							 KVM_ARCH_GUEST_ZERO,
-+						 (unsigned long)data64);
-+		} else {
-+			SET_RD(insn, &vcpu->arch.guest_context,
-+			       (ulong)data64 << shift >> shift);
-+		}
- 		break;
- 	default:
- 		return -EOPNOTSUPP;
+ #define SBI_SPEC_VERSION_DEFAULT	0x1
+ #define SBI_SPEC_VERSION_MAJOR_SHIFT	24
+ #define SBI_SPEC_VERSION_MAJOR_MASK	0x7f
 -- 
 2.25.1
 
