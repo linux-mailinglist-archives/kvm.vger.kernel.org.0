@@ -2,58 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D05916E84F9
-	for <lists+kvm@lfdr.de>; Thu, 20 Apr 2023 00:31:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 291FB6E84CF
+	for <lists+kvm@lfdr.de>; Thu, 20 Apr 2023 00:22:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231372AbjDSWbB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Apr 2023 18:31:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57932 "EHLO
+        id S233065AbjDSWWd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Apr 2023 18:22:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42542 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232677AbjDSWa6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Apr 2023 18:30:58 -0400
-Received: from mail-oi1-x230.google.com (mail-oi1-x230.google.com [IPv6:2607:f8b0:4864:20::230])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A48E87D91
-        for <kvm@vger.kernel.org>; Wed, 19 Apr 2023 15:30:23 -0700 (PDT)
-Received: by mail-oi1-x230.google.com with SMTP id 5614622812f47-38e3a1a07c8so265101b6e.0
-        for <kvm@vger.kernel.org>; Wed, 19 Apr 2023 15:30:23 -0700 (PDT)
+        with ESMTP id S233493AbjDSWWD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Apr 2023 18:22:03 -0400
+Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B57B99EE3
+        for <kvm@vger.kernel.org>; Wed, 19 Apr 2023 15:20:29 -0700 (PDT)
+Received: by mail-pl1-x62d.google.com with SMTP id d9443c01a7336-1a9253d4551so4770515ad.0
+        for <kvm@vger.kernel.org>; Wed, 19 Apr 2023 15:20:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rivosinc-com.20221208.gappssmtp.com; s=20221208; t=1681943341; x=1684535341;
+        d=rivosinc-com.20221208.gappssmtp.com; s=20221208; t=1681942756; x=1684534756;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=8fg2apWNkO7XMTsfLYU3rTZlWorsx4wHesUuN9ZGrN4=;
-        b=oZQY1fzcQ2RYxKCwReTTWy+GmZ/PBEP3SBF0kvBeLqQOWGkjrcZR4gyuCl4RxtgVzQ
-         nwBHDOA23BM5M8iEvIVz5OvWo3hz1xbFuQ/2LM2VsYXsE7/RgRm/yDtBYZh15lSK5PSD
-         1n7THk4d3gPqDeruBTROWbrT1tsn0do38RvTDvs14fht/9EstNXJmLuqtzYH4ng6xpoz
-         usmQr5nl4eX+wZv36DeUk7p+OtUYYIut3jPir6TyJMoNO0kinVGloXgDzd8ZuBUtR1nD
-         DM7M9Hdd0xjFRV9F2lkj7WKvRGmNTwXJTOk2yJjsqnH/+rpMwKS2k1RYgO9TUsqI9A1/
-         mn+A==
+        bh=P8D5qQaAsWRyihppL8lxgNE7a17gNAwjOwZEXYQRMgE=;
+        b=KY3qeDkuqx7ojUE9edJo91m4yJkLaFWv5WBr0z1XBW37m3Ugju5gvpwIFDQff0jKms
+         +hgKcILxSjrfAbaSn/gsJas5jFwQYwJwvq++pUZKG2L4GsKhyqTPcUu6xp5ypSE2166a
+         M9MbN1bFoVVAdPgWpFhugIMpkrykve+HvKmx+0rzvYuv5b7fjLguHE92nxuCMfaazyT0
+         EjqjUkf7F7QIDOnYykXPXccd7CL3t2WBS+Rd2ML5ADa2yHIE2iBIctAwVUyHJ5XwQDtq
+         3t1dyXic09IH7MeVfo82H9l2jXFUHVEBVSeBHFYy8QxMmo1hXkdwnKJUN8t2qaLHF1ux
+         +z5w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681943341; x=1684535341;
+        d=1e100.net; s=20221208; t=1681942756; x=1684534756;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=8fg2apWNkO7XMTsfLYU3rTZlWorsx4wHesUuN9ZGrN4=;
-        b=gfWxfWQayX/uMfYUF2dyd5S75VA7LOk/akr7T8LwZsZo3GVqPzJ0Y1iWpgA32VFWuf
-         HDAGZ35qiRF7dGhiUld8mAkP5EPkrRzbcBhftDv9rmY9Kfxn5WAb6uRyuR0eIhULWdlj
-         mk44K8+7w+U07McTp0LDbmonVUcUq5bPegUUH2mDk9RFdYMgq5sJ1iiLReGsv0FfqPLx
-         sCJNzSeCp2qAWoE30lBOkpC0KDTAUIuAZwpbZlQkKR1W5dThLVXOEB6jzjjqmo7Qn5Cc
-         5RwIrA0aQqJ9oBblQep6ASJ5bzRyEb57aaGx+YFjmXErZvwTgTO5KyF2HwgGwq5Dkwoc
-         o/hg==
-X-Gm-Message-State: AAQBX9eFrQ3lgaRUjqOoQfHoqwKXZDIekjIAIFTDbdL6DDEhmXvmFi5x
-        w9U7Q/NawsKK8hW8s0sZE48i53KGPQ+936kDEaA=
-X-Google-Smtp-Source: AKy350bcbgE/EJ3Ej08OUUDHS562dStL1nY59dRLyQva3UBkO8qD2X/slMFNk57ZH7aSQKcUf51qPw==
-X-Received: by 2002:a17:902:a504:b0:1a1:be45:9857 with SMTP id s4-20020a170902a50400b001a1be459857mr6646673plq.1.1681942754165;
-        Wed, 19 Apr 2023 15:19:14 -0700 (PDT)
+        bh=P8D5qQaAsWRyihppL8lxgNE7a17gNAwjOwZEXYQRMgE=;
+        b=PvO5hTlEePzx+TkcKohogfUskVDRK6gAf2szVvMWcrRgrNW42MWB9mZxnnYhsNEWJB
+         Gn4kKMxca5IBfuGs2QOWaG+4IvIwkz3Ea73Oz4jaqC2sFcb995u8elVMzoFTyNqNjPv3
+         pflGS8qilWXPviiS1GTXM5BaJ5zdrNbvi3ZbKWea0Naj8fOP7taBST6hvk9pttW16qWi
+         EDZ1fXD6Vbunuj1QNMlbChyhUHbyRAk4f4UYoUBg667a26WsKINzfAa76hSWSUDFYLjb
+         HNwkfZ/5HdFoX8WA+obB8xDu498Y9KyZeTzIQa2kL31Y7N7JEE2irnzOSsZeidS3X6Ld
+         ZLRQ==
+X-Gm-Message-State: AAQBX9etY7TxUBLoWRMoeP1NPNTvjmYZKFcqPJpxwSsU2tFvN2bj+KJZ
+        fizW4PT6nzVT6+YL830TKFO+Rw==
+X-Google-Smtp-Source: AKy350ZigrT04ztZNfYo7vxPOIAk65YMZhdMrGeFS26zGyCIXgxICUZh5tguDmZpxCxB9++y2y9iww==
+X-Received: by 2002:a17:903:2288:b0:1a5:2db2:2bb with SMTP id b8-20020a170903228800b001a52db202bbmr8899588plh.15.1681942756356;
+        Wed, 19 Apr 2023 15:19:16 -0700 (PDT)
 Received: from atishp.ba.rivosinc.com ([66.220.2.162])
-        by smtp.gmail.com with ESMTPSA id jn11-20020a170903050b00b00196807b5189sm11619190plb.292.2023.04.19.15.19.12
+        by smtp.gmail.com with ESMTPSA id jn11-20020a170903050b00b00196807b5189sm11619190plb.292.2023.04.19.15.19.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Apr 2023 15:19:13 -0700 (PDT)
+        Wed, 19 Apr 2023 15:19:16 -0700 (PDT)
 From:   Atish Patra <atishp@rivosinc.com>
 To:     linux-kernel@vger.kernel.org
-Cc:     Rajnesh Kanwal <rkanwal@rivosinc.com>,
-        Atish Patra <atishp@rivosinc.com>,
-        Alexandre Ghiti <alex@ghiti.fr>,
+Cc:     Atish Patra <atishp@rivosinc.com>, Alexandre Ghiti <alex@ghiti.fr>,
         Andrew Jones <ajones@ventanamicro.com>,
         Andrew Morton <akpm@linux-foundation.org>,
         Anup Patel <anup@brainfault.org>,
@@ -75,10 +73,11 @@ Cc:     Rajnesh Kanwal <rkanwal@rivosinc.com>,
         Palmer Dabbelt <palmer@dabbelt.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Paul Walmsley <paul.walmsley@sifive.com>,
+        Rajnesh Kanwal <rkanwal@rivosinc.com>,
         Uladzislau Rezki <urezki@gmail.com>
-Subject: [RFC 47/48] RISC-V: Add shared bounce buffer to support DBCN for CoVE Guest.
-Date:   Wed, 19 Apr 2023 15:17:15 -0700
-Message-Id: <20230419221716.3603068-48-atishp@rivosinc.com>
+Subject: [RFC 48/48] drivers/hvc: sbi: Disable HVC console for TVMs
+Date:   Wed, 19 Apr 2023 15:17:16 -0700
+Message-Id: <20230419221716.3603068-49-atishp@rivosinc.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20230419221716.3603068-1-atishp@rivosinc.com>
 References: <20230419221716.3603068-1-atishp@rivosinc.com>
@@ -93,98 +92,50 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Rajnesh Kanwal <rkanwal@rivosinc.com>
+If two same type of console is used in command line, kernel
+picks up the first registered one instead of the preferred one.
+The fix was proposed and NACK'ed due to a possible regression
+for other users.
 
-Early console buffer needs to be shared with the host for CoVE Guest.
+https://lore.kernel.org/all/Y+tziG0Uo5ey+Ocy@alley/
 
-Signed-off-by: Rajnesh Kanwal <rkanwal@rivosinc.com>
+HVC sbi console makes it impossible to use virtio console
+which is preferred anyways. We could have disabled HVC console
+for TVMs but same kernel image must work on both host and the
+the guest. There are genuine reasons for requiring the hvc sbi
+cosnole for the host.
+
+Do not initialize the hvc console for the TVMs so that virtio
+console can be used.
+
 Signed-off-by: Atish Patra <atishp@rivosinc.com>
 ---
- drivers/tty/serial/earlycon-riscv-sbi.c | 51 ++++++++++++++++++++++++-
- 1 file changed, 49 insertions(+), 2 deletions(-)
+ drivers/tty/hvc/hvc_riscv_sbi.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/drivers/tty/serial/earlycon-riscv-sbi.c b/drivers/tty/serial/earlycon-riscv-sbi.c
-index 311a4f8..9033cca 100644
---- a/drivers/tty/serial/earlycon-riscv-sbi.c
-+++ b/drivers/tty/serial/earlycon-riscv-sbi.c
-@@ -9,6 +9,14 @@
- #include <linux/init.h>
- #include <linux/serial_core.h>
- #include <asm/sbi.h>
+diff --git a/drivers/tty/hvc/hvc_riscv_sbi.c b/drivers/tty/hvc/hvc_riscv_sbi.c
+index 83cfe00..dee96c5 100644
+--- a/drivers/tty/hvc/hvc_riscv_sbi.c
++++ b/drivers/tty/hvc/hvc_riscv_sbi.c
+@@ -11,6 +11,7 @@
+ #include <linux/moduleparam.h>
+ #include <linux/types.h>
+ 
 +#include <asm/cove.h>
-+#include <asm/covg_sbi.h>
-+#include <linux/memblock.h>
-+
-+#ifdef CONFIG_RISCV_COVE_GUEST
-+#define DBCN_BOUNCE_BUF_SIZE (PAGE_SIZE)
-+static char dbcn_buf[DBCN_BOUNCE_BUF_SIZE] __aligned(PAGE_SIZE);
-+#endif
+ #include <asm/sbi.h>
  
- #ifdef CONFIG_RISCV_SBI_V01
- static void sbi_putc(struct uart_port *port, unsigned char c)
-@@ -24,6 +32,33 @@ static void sbi_0_1_console_write(struct console *con,
- }
- #endif
- 
-+#ifdef CONFIG_RISCV_COVE_GUEST
-+static void sbi_dbcn_console_write_cove(struct console *con, const char *s,
-+					unsigned int n)
-+{
-+	phys_addr_t pa = __pa(dbcn_buf);
-+	unsigned int off = 0;
-+
-+	while (off < n) {
-+		const unsigned int rem = n - off;
-+		const unsigned int size =
-+			rem > DBCN_BOUNCE_BUF_SIZE ? DBCN_BOUNCE_BUF_SIZE : rem;
-+
-+		memcpy(dbcn_buf, &s[off], size);
-+
-+		sbi_ecall(SBI_EXT_DBCN, SBI_EXT_DBCN_CONSOLE_WRITE,
-+#ifdef CONFIG_32BIT
-+			  size, pa, (u64)pa >> 32,
-+#else
-+			  size, pa, 0,
-+#endif
-+			  0, 0, 0);
-+
-+		off += size;
-+	}
-+}
-+#endif
-+
- static void sbi_dbcn_console_write(struct console *con,
- 				   const char *s, unsigned n)
+ #include "hvc_console.h"
+@@ -103,6 +104,10 @@ static int __init hvc_sbi_init(void)
  {
-@@ -45,14 +80,26 @@ static int __init early_sbi_setup(struct earlycon_device *device,
+ 	int err;
  
- 	/* TODO: Check for SBI debug console (DBCN) extension */
- 	if ((sbi_spec_version >= sbi_mk_version(1, 0)) &&
--	    (sbi_probe_extension(SBI_EXT_DBCN) > 0))
-+	    (sbi_probe_extension(SBI_EXT_DBCN) > 0)) {
-+#ifdef CONFIG_RISCV_COVE_GUEST
-+		if (is_cove_guest()) {
-+			ret = sbi_covg_share_memory(__pa(dbcn_buf),
-+						    DBCN_BOUNCE_BUF_SIZE);
-+			if (ret)
-+				return ret;
++	/* Prefer virtio console as hvc console for guests */
++	if (is_cove_guest())
++		return 0;
 +
-+			device->con->write = sbi_dbcn_console_write_cove;
-+			return 0;
-+		}
-+#endif
- 		device->con->write = sbi_dbcn_console_write;
--	else
-+	} else {
- #ifdef CONFIG_RISCV_SBI_V01
- 		device->con->write = sbi_0_1_console_write;
- #else
- 		ret = -ENODEV;
- #endif
-+	}
- 
- 	return ret;
- }
+ 	if ((sbi_spec_version >= sbi_mk_version(1, 0)) &&
+ 	    (sbi_probe_extension(SBI_EXT_DBCN) > 0)) {
+ 		err = PTR_ERR_OR_ZERO(hvc_alloc(0, 0, &hvc_sbi_dbcn_ops, 16));
 -- 
 2.25.1
 
