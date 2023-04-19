@@ -2,303 +2,256 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4D7A46E7531
-	for <lists+kvm@lfdr.de>; Wed, 19 Apr 2023 10:30:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 648C46E757D
+	for <lists+kvm@lfdr.de>; Wed, 19 Apr 2023 10:40:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231362AbjDSIav (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Apr 2023 04:30:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40458 "EHLO
+        id S231238AbjDSIkX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Apr 2023 04:40:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49974 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231577AbjDSIau (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Apr 2023 04:30:50 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22FF012582;
-        Wed, 19 Apr 2023 01:30:18 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 23DFD63C81;
-        Wed, 19 Apr 2023 08:30:14 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 91AF2C433EF;
-        Wed, 19 Apr 2023 08:30:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1681893013;
-        bh=jcrD/MAqpsfteSxcrKJQtY6pksCSFUz4k6hypV9cW7I=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=GUlfmzAac1xNbniOW+9sTcn+D51raTUKPS47ZwRVE0bQSvC6ZMhwZyI4seWoAszOs
-         dI8qjMwileJSg0S3nHgT7At7aZ2exrs23CjAt26gaSKvr6lK+7UyJ4DYH+cTStdCdv
-         l+LJ2u8v//8RTDDiirAHC7MRuX7HNTijYtoxdRQ1UGU1utqpVcDw5PIHxqsDdqHIlC
-         zFoDv1hARCjt0NHV+1a8aPm1ch7VvJq+rJfqvWmW5BYgK3OGJpuE++V+o3oeQemMcx
-         dTkykrgRGHk1v8rIbaO0egj/zk3jR9uCB8kTaYySO+xQzHlO+iyVziqx7juWEimRjL
-         9Jrf+qrir6/Ag==
-Date:   Wed, 19 Apr 2023 10:29:59 +0200
-From:   Christian Brauner <brauner@kernel.org>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        Ackerley Tng <ackerleytng@google.com>,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        Hugh Dickins <hughd@google.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
-        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
-        linux-kselftest@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>, luto@kernel.org,
-        jun.nakajima@intel.com, dave.hansen@intel.com, ak@linux.intel.com,
-        david@redhat.com, aarcange@redhat.com, ddutile@redhat.com,
-        dhildenb@redhat.com, Quentin Perret <qperret@google.com>,
-        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
-        Muchun Song <songmuchun@bytedance.com>,
-        Pankaj Gupta <pankaj.gupta@amd.com>,
-        linux-arch@vger.kernel.org, arnd@arndb.de, linmiaohe@huawei.com,
-        naoya.horiguchi@nec.com, tabba@google.com, wei.w.wang@intel.com
-Subject: Re: [PATCH v7 00/14] KVM: mm: fd-based approach for supporting KVM
- guest private memory
-Message-ID: <20230418-anfallen-irdisch-6993a61be10b@brauner>
-References: <20220818132421.6xmjqduempmxnnu2@box>
- <diqzlej60z57.fsf@ackerleytng-cloudtop.c.googlers.com>
- <20221202061347.1070246-2-chao.p.peng@linux.intel.com>
- <20230413-anlegen-ergibt-cbefffe0b3de@brauner>
- <ZDiCG/7OgDI0SwMR@google.com>
+        with ESMTP id S232701AbjDSIkU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Apr 2023 04:40:20 -0400
+Received: from mail-ej1-x62e.google.com (mail-ej1-x62e.google.com [IPv6:2a00:1450:4864:20::62e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F2F3D334;
+        Wed, 19 Apr 2023 01:40:15 -0700 (PDT)
+Received: by mail-ej1-x62e.google.com with SMTP id u3so27614583ejj.12;
+        Wed, 19 Apr 2023 01:40:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1681893614; x=1684485614;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=11sl8AqwZce1ertKq6Ztt8iuR+fB42Oex6pJ+U7xw2I=;
+        b=DxJtLunx5h16pRRZ84LYqFPi6EJHNEhDJ/4M06dgxM2ur0kqsRc/6YtsMxfHQkzoDi
+         ylakpROJRFG1jWkLkiLWH6m6zs8oZIVmbqf6QE9Rh/UhnpnDwyUZLPXmRvssJpYoZDq4
+         dA3oUTNV0tBOII15372NBzNp9bOvYkzlTfEGJZxIKEZikoq9gVKGcJkNHYO6vsl30gna
+         Gw8nQ26WHKu+rcmyKVnUkkkfKQfl1+bOO1WVUamcinpol0p8Vo9pbY75wEeWdU0DqoDB
+         dgYTurZ1swwpQk3ZMlRno2Rs8y2I93xbBQuelN2GGxgHUd1i/SzDDEWa3kQT/R19xDwt
+         vpiQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1681893614; x=1684485614;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=11sl8AqwZce1ertKq6Ztt8iuR+fB42Oex6pJ+U7xw2I=;
+        b=VJek+dCecDi6MZ6wfuq+jTloHisdaMNTSpk7jE6lAISZIsjXpCRDhmLE2CVJ/6hteH
+         vJxi7VHmi11WB43/FVO5GdYIAbu4P4YMprPWfXnaYNio0TWr3JpCLBEvWO2J8ZhFzu8X
+         CS8xMpVakdDloJwXFJmpJPYeKK63Xcnq0ENvsjaQac49pZXl1TlDanXzsC6wg7Dd36xS
+         WMobdf8zI0BmiQ5qkGuXxQt8glx5kvRw5X/A+3eWtGUcGfX/ryg5ZbcWh4kVQJO7XewH
+         Xaynexr6BbU+Bcynee+AXC7bgIZ9lJE1yarCG8YowbeKnZHJq/C5yui9UzyM+kUTjB2f
+         s3CA==
+X-Gm-Message-State: AAQBX9fVcHT2+Vz96ZKJ3BNnFs37GKk2EAQoKyVbwtuhXsBcFAh6MNoq
+        dIyfAClgcKMWslTzTYDN3mg=
+X-Google-Smtp-Source: AKy350aFo85fWHrw1usKNUqmGwHdN9xEddgt1lB/ijvfifKCIrYYuxvdWJI7HS4UtLXKs9qddbPlAw==
+X-Received: by 2002:a17:906:9153:b0:94e:6504:d134 with SMTP id y19-20020a170906915300b0094e6504d134mr13768717ejw.42.1681893613729;
+        Wed, 19 Apr 2023 01:40:13 -0700 (PDT)
+Received: from ?IPV6:2a02:908:1256:79a0:6273:6c76:9697:9b4c? ([2a02:908:1256:79a0:6273:6c76:9697:9b4c])
+        by smtp.gmail.com with ESMTPSA id qm5-20020a170907674500b0094e3ddcf153sm8949825ejc.115.2023.04.19.01.40.12
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 19 Apr 2023 01:40:13 -0700 (PDT)
+Message-ID: <6703b9b2-539f-9a1b-82b8-244328472640@gmail.com>
+Date:   Wed, 19 Apr 2023 10:40:12 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <ZDiCG/7OgDI0SwMR@google.com>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+Subject: Re: [PATCH v4 1/6] mm/gup: remove unused vmas parameter from
+ get_user_pages()
+Content-Language: en-US
+To:     Lorenzo Stoakes <lstoakes@gmail.com>, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org,
+        Andrew Morton <akpm@linux-foundation.org>
+Cc:     Dimitri Sivanich <dimitri.sivanich@hpe.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Arnd Bergmann <arnd@arndb.de>, kvm@vger.kernel.org,
+        David Hildenbrand <david@redhat.com>,
+        Xinhui Pan <Xinhui.Pan@amd.com>, x86@kernel.org,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        dri-devel@lists.freedesktop.org, Jason Gunthorpe <jgg@nvidia.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        amd-gfx@lists.freedesktop.org, Daniel Vetter <daniel@ffwll.ch>,
+        "H . Peter Anvin" <hpa@zytor.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        David Airlie <airlied@gmail.com>, linux-sgx@vger.kernel.org
+References: <cover.1681831798.git.lstoakes@gmail.com>
+ <cd05b41d6d15ee9ff94273bc116ed3db3f5125bf.1681831798.git.lstoakes@gmail.com>
+From:   =?UTF-8?Q?Christian_K=c3=b6nig?= <ckoenig.leichtzumerken@gmail.com>
+In-Reply-To: <cd05b41d6d15ee9ff94273bc116ed3db3f5125bf.1681831798.git.lstoakes@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.7 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Apr 13, 2023 at 03:28:43PM -0700, Sean Christopherson wrote:
-> On Thu, Apr 13, 2023, Christian Brauner wrote:
-> > On Thu, Aug 18, 2022 at 04:24:21PM +0300, Kirill A . Shutemov wrote:
-> > > On Wed, Aug 17, 2022 at 10:40:12PM -0700, Hugh Dickins wrote:
-> > > > Here's what I would prefer, and imagine much easier for you to maintain;
-> > > > but I'm no system designer, and may be misunderstanding throughout.
-> > > > 
-> > > > QEMU gets fd from opening /dev/kvm_something, uses ioctls (or perhaps
-> > > > the fallocate syscall interface itself) to allocate and free the memory,
-> > > > ioctl for initializing some of it too.  KVM in control of whether that
-> > > > fd can be read or written or mmap'ed or whatever, no need to prevent it
-> > > > in shmem.c, no need for flags, seals, notifications to and fro because
-> > > > KVM is already in control and knows the history.  If shmem actually has
-> > > > value, call into it underneath - somewhat like SysV SHM, and /dev/zero
-> > > > mmap, and i915/gem make use of it underneath.  If shmem has nothing to
-> > > > add, just allocate and free kernel memory directly, recorded in your
-> > > > own xarray.
-> > > 
-> > > I guess shim layer on top of shmem *can* work. I don't see immediately why
-> > > it would not. But I'm not sure it is right direction. We risk creating yet
-> > > another parallel VM with own rules/locking/accounting that opaque to
-> > > core-mm.
-> > 
-> > Sorry for necrobumping this thread but I've been reviewing the
-> 
-> No worries, I'm just stoked someone who actually knows what they're doing is
-> chiming in :-)
+Am 18.04.23 um 17:49 schrieb Lorenzo Stoakes:
+> No invocation of get_user_pages() uses the vmas parameter, so remove
+> it.
+>
+> The GUP API is confusing and caveated. Recent changes have done much to
+> improve that, however there is more we can do. Exporting vmas is a prime
+> target as the caller has to be extremely careful to preclude their use
+> after the mmap_lock has expired or otherwise be left with dangling
+> pointers.
+>
+> Removing the vmas parameter focuses the GUP functions upon their primary
+> purpose - pinning (and outputting) pages as well as performing the actions
+> implied by the input flags.
+>
+> This is part of a patch series aiming to remove the vmas parameter
+> altogether.
 
-It's a dangerous business, going out of your subsystem. You step into
-code, and if you don't watch your hands, there is no knowing where you
-might be swept off to.
+Astonishing that there are so few users of the original get_user_pages() 
+API left.
 
-That saying goes for me here specifically...
+>
+> Suggested-by: Matthew Wilcox (Oracle) <willy@infradead.org>
+> Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> Acked-by: David Hildenbrand <david@redhat.com>
+> Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
+> Signed-off-by: Lorenzo Stoakes <lstoakes@gmail.com>
 
-> 
-> > memfd_restricted() extension that Ackerley is currently working on. I
-> > was pointed to this thread as this is what the extension is building
-> > on but I'll reply to both threads here.
-> > 
-> > From a glance at v10, memfd_restricted() is currently implemented as an
-> > in-kernel stacking filesystem. A call to memfd_restricted() creates a
-> > new restricted memfd file and a new unlinked tmpfs file and stashes the
-> > tmpfs file into the memfd file's private data member. It then uses the
-> > tmpfs file's f_ops and i_ops to perform the relevant file and inode
-> > operations. So it has the same callstack as a general stacking
-> > filesystem like overlayfs in some cases:
-> > 
-> >         memfd_restricted->getattr()
-> >         -> tmpfs->getattr()
-> 
-> ...
-> 
-> > Since you're effectively acting like a stacking filesystem you should
-> > really use the device number of your memfd restricted filesystem. IOW,
-> > sm like:
-> > 
-> >         stat->dev = memfd_restricted_dentry->d_sb->s_dev;
-> > 
-> > But then you run into trouble if you want to go forward with Ackerley's
-> > extension that allows to explicitly pass in tmpfs fds to
-> > memfd_restricted(). Afaict, two tmpfs instances might allocate the same
-> > inode number. So now the inode and device number pair isn't unique
-> > anymore.
-> > 
-> > So you might best be served by allocating and reporting your own inode
-> > numbers as well.
-> > 
-> > But if you want to preserve the inode number and device number of the
-> > relevant tmpfs instance but still report memfd restricted as your
-> > filesystem type
-> 
-> Unless I missed something along the way, reporting memfd_restricted as a distinct
-> filesystem is very much a non-goal.  AFAIK it's purely a side effect of the
-> proposed implementation.
+Acked-by: Christian König <christian.koenig@amd.com> for the radeon parts.
 
-In the current implementation you would have to put in effort to fake
-this. For example, you would need to also implement ->statfs
-super_operation where you'd need to fill in the details of the tmpfs
-instance. At that point all that memfd_restricted fs code that you've
-written is nothing but deadweight, I would reckon.
+Regards,
+Christian.
 
-> 
-> > then I think it's reasonable to ask whether a stacking implementation really
-> > makes sense here.
-> > 
-> > If you extend memfd_restricted() or even consider extending it in the
-> > future to take tmpfs file descriptors as arguments to identify the tmpfs
-> > instance in which to allocate the underlying tmpfs file for the new
-> > restricted memfd file you should really consider a tmpfs based
-> > implementation.
-> > 
-> > Because at that point it just feels like a pointless wrapper to get
-> > custom f_ops and i_ops. Plus it's wasteful because you allocate dentries
-> > and inodes that you don't really care about at all.
-> > 
-> > Just off the top of my hat you might be better served:
-> > * by a new ioctl() on tmpfs instances that
-> >   yield regular tmpfs file descriptors with restricted f_ops and i_ops.
-> >   That's not that different from btrfs subvolumes which effectively are
-> >   directories but are created through an ioctl().
-> 
-> I think this is more or less what we want to do, except via a dedicated syscall
-> instead of an ioctl() so that the primary interface isn't strictly tied to tmpfs,
-> e.g. so that it can be extended to other backing types in the future.
+> ---
+>   arch/x86/kernel/cpu/sgx/ioctl.c     | 2 +-
+>   drivers/gpu/drm/radeon/radeon_ttm.c | 2 +-
+>   drivers/misc/sgi-gru/grufault.c     | 2 +-
+>   include/linux/mm.h                  | 3 +--
+>   mm/gup.c                            | 9 +++------
+>   mm/gup_test.c                       | 5 ++---
+>   virt/kvm/kvm_main.c                 | 2 +-
+>   7 files changed, 10 insertions(+), 15 deletions(-)
+>
+> diff --git a/arch/x86/kernel/cpu/sgx/ioctl.c b/arch/x86/kernel/cpu/sgx/ioctl.c
+> index 21ca0a831b70..5d390df21440 100644
+> --- a/arch/x86/kernel/cpu/sgx/ioctl.c
+> +++ b/arch/x86/kernel/cpu/sgx/ioctl.c
+> @@ -214,7 +214,7 @@ static int __sgx_encl_add_page(struct sgx_encl *encl,
+>   	if (!(vma->vm_flags & VM_MAYEXEC))
+>   		return -EACCES;
+>   
+> -	ret = get_user_pages(src, 1, 0, &src_page, NULL);
+> +	ret = get_user_pages(src, 1, 0, &src_page);
+>   	if (ret < 1)
+>   		return -EFAULT;
+>   
+> diff --git a/drivers/gpu/drm/radeon/radeon_ttm.c b/drivers/gpu/drm/radeon/radeon_ttm.c
+> index 1e8e287e113c..0597540f0dde 100644
+> --- a/drivers/gpu/drm/radeon/radeon_ttm.c
+> +++ b/drivers/gpu/drm/radeon/radeon_ttm.c
+> @@ -362,7 +362,7 @@ static int radeon_ttm_tt_pin_userptr(struct ttm_device *bdev, struct ttm_tt *ttm
+>   		struct page **pages = ttm->pages + pinned;
+>   
+>   		r = get_user_pages(userptr, num_pages, write ? FOLL_WRITE : 0,
+> -				   pages, NULL);
+> +				   pages);
+>   		if (r < 0)
+>   			goto release_pages;
+>   
+> diff --git a/drivers/misc/sgi-gru/grufault.c b/drivers/misc/sgi-gru/grufault.c
+> index b836936e9747..378cf02a2aa1 100644
+> --- a/drivers/misc/sgi-gru/grufault.c
+> +++ b/drivers/misc/sgi-gru/grufault.c
+> @@ -185,7 +185,7 @@ static int non_atomic_pte_lookup(struct vm_area_struct *vma,
+>   #else
+>   	*pageshift = PAGE_SHIFT;
+>   #endif
+> -	if (get_user_pages(vaddr, 1, write ? FOLL_WRITE : 0, &page, NULL) <= 0)
+> +	if (get_user_pages(vaddr, 1, write ? FOLL_WRITE : 0, &page) <= 0)
+>   		return -EFAULT;
+>   	*paddr = page_to_phys(page);
+>   	put_page(page);
+> diff --git a/include/linux/mm.h b/include/linux/mm.h
+> index 37554b08bb28..b14cc4972d0b 100644
+> --- a/include/linux/mm.h
+> +++ b/include/linux/mm.h
+> @@ -2380,8 +2380,7 @@ long pin_user_pages_remote(struct mm_struct *mm,
+>   			   unsigned int gup_flags, struct page **pages,
+>   			   struct vm_area_struct **vmas, int *locked);
+>   long get_user_pages(unsigned long start, unsigned long nr_pages,
+> -			    unsigned int gup_flags, struct page **pages,
+> -			    struct vm_area_struct **vmas);
+> +		    unsigned int gup_flags, struct page **pages);
+>   long pin_user_pages(unsigned long start, unsigned long nr_pages,
+>   		    unsigned int gup_flags, struct page **pages,
+>   		    struct vm_area_struct **vmas);
+> diff --git a/mm/gup.c b/mm/gup.c
+> index 1f72a717232b..7e454d6b157e 100644
+> --- a/mm/gup.c
+> +++ b/mm/gup.c
+> @@ -2251,8 +2251,6 @@ long get_user_pages_remote(struct mm_struct *mm,
+>    * @pages:      array that receives pointers to the pages pinned.
+>    *              Should be at least nr_pages long. Or NULL, if caller
+>    *              only intends to ensure the pages are faulted in.
+> - * @vmas:       array of pointers to vmas corresponding to each page.
+> - *              Or NULL if the caller does not require them.
+>    *
+>    * This is the same as get_user_pages_remote(), just with a less-flexible
+>    * calling convention where we assume that the mm being operated on belongs to
+> @@ -2260,16 +2258,15 @@ long get_user_pages_remote(struct mm_struct *mm,
+>    * obviously don't pass FOLL_REMOTE in here.
+>    */
+>   long get_user_pages(unsigned long start, unsigned long nr_pages,
+> -		unsigned int gup_flags, struct page **pages,
+> -		struct vm_area_struct **vmas)
+> +		    unsigned int gup_flags, struct page **pages)
+>   {
+>   	int locked = 1;
+>   
+> -	if (!is_valid_gup_args(pages, vmas, NULL, &gup_flags, FOLL_TOUCH))
+> +	if (!is_valid_gup_args(pages, NULL, NULL, &gup_flags, FOLL_TOUCH))
+>   		return -EINVAL;
+>   
+>   	return __get_user_pages_locked(current->mm, start, nr_pages, pages,
+> -				       vmas, &locked, gup_flags);
+> +				       NULL, &locked, gup_flags);
+>   }
+>   EXPORT_SYMBOL(get_user_pages);
+>   
+> diff --git a/mm/gup_test.c b/mm/gup_test.c
+> index 8ae7307a1bb6..9ba8ea23f84e 100644
+> --- a/mm/gup_test.c
+> +++ b/mm/gup_test.c
+> @@ -139,8 +139,7 @@ static int __gup_test_ioctl(unsigned int cmd,
+>   						 pages + i);
+>   			break;
+>   		case GUP_BASIC_TEST:
+> -			nr = get_user_pages(addr, nr, gup->gup_flags, pages + i,
+> -					    NULL);
+> +			nr = get_user_pages(addr, nr, gup->gup_flags, pages + i);
+>   			break;
+>   		case PIN_FAST_BENCHMARK:
+>   			nr = pin_user_pages_fast(addr, nr, gup->gup_flags,
+> @@ -161,7 +160,7 @@ static int __gup_test_ioctl(unsigned int cmd,
+>   						    pages + i, NULL);
+>   			else
+>   				nr = get_user_pages(addr, nr, gup->gup_flags,
+> -						    pages + i, NULL);
+> +						    pages + i);
+>   			break;
+>   		default:
+>   			ret = -EINVAL;
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index d255964ec331..7f31e0a4adb5 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -2474,7 +2474,7 @@ static inline int check_user_page_hwpoison(unsigned long addr)
+>   {
+>   	int rc, flags = FOLL_HWPOISON | FOLL_WRITE;
+>   
+> -	rc = get_user_pages(addr, 1, flags, NULL, NULL);
+> +	rc = get_user_pages(addr, 1, flags, NULL);
+>   	return rc == -EHWPOISON;
+>   }
+>   
 
-Ok. But just to point this out, this would make memfd_restricted()
-a multiplexer on types of memory. And my wild guess is that not all
-memory types you might reasonably want to use will have a filesystem
-like interface such. So in the future you might end up with multiple
-ways of specifying the type of memory:
-
-// use tmpfs backing
-memfd_restricted(fd_tmpfs, 0);
-
-// use hugetlbfs backing
-memfd_restricted(fd_hugetlbfs, 0);
-
-// use non-fs type memory backing
-memfd_restricted(-EBADF, MEMFD_SUPER_FANCY_MEMORY_TYPE);
-
-interface wise I find an unpleasant design. But that multi-memory-open
-goal also makes it a bit hard to come up with a clean design (On
-possibility would be to use an extensible struct - versioned by size -
-similar to openat2() and clone3() such that you can specify all types of
-options on the memory in the future.).
-
-> 
-> > * by a mount option to tmpfs that makes it act
-> >   in this restricted manner then you don't need an ioctl() and can get
-> >   away with regular open calls. Such a tmpfs instance would only create
-> >   regular, restricted memfds.
-> 
-> I'd prefer to not go this route, becuase IIUC, it would require relatively invasive
-> changes to shmem code, and IIUC would require similar changes to other support
-> backings in the future, e.g. hugetlbfs?  And as above, I don't think any of the
-> potential use cases need restrictedmem to be a uniquely identifiable mount.
-
-Ok, see my comment above then.
-
-> 
-> One of the goals (hopefully not a pipe dream) is to design restrictmem in such a
-> way that extending it to support other backing types isn't terribly difficult.
-
-Not necessarily difficult, just difficult to do tastefully imho. But
-it's not that has traditionally held people back. ;)
-
-> In case it's not obvious, most of us working on this stuff aren't filesystems
-> experts, and many of us aren't mm experts either.  The more we (KVM folks for the
-> most part) can leverage existing code to do the heavy lifting, the better.
-
-Well, hopefully we can complement each other's knowledge here.
-
-> 
-> After giving myself a bit of a crash course in file systems, would something like
-> the below have any chance of (a) working, (b) getting merged, and (c) being
-> maintainable?
-> 
-> The idea is similar to a stacking filesystem, but instead of stacking, restrictedmem
-> hijacks a f_ops and a_ops to create a lightweight shim around tmpfs.  There are
-> undoubtedly issues and edge cases, I'm just looking for a quick "yes, this might
-> be doable" or a "no, that's absolutely bonkers, don't try it".
-
-Maybe, but I think it's weird. _Replacing_ f_ops isn't something that's
-unprecedented. It happens everytime a character device is opened (see
-fs/char_dev.c:chrdev_open()). And debugfs does a similar (much more
-involved) thing where it replaces it's proxy f_ops with the relevant
-subsystem's f_ops. The difference is that in both cases the replace
-happens at ->open() time; and the replace is done once. Afterwards only
-the newly added f_ops are relevant.
-
-In your case you'd be keeping two sets of {f,a}_ops; one usable by
-userspace and another only usable by in-kernel consumers. And there are
-some concerns (non-exhaustive list), I think:
-
-* {f,a}_ops weren't designed for this. IOW, one set of {f,a}_ops is
-  authoritative per @file and it is left to the individual subsystems to
-  maintain driver specific ops (see the sunrpc stuff or sockets).
-* lifetime management for the two sets of {f,a}_ops: If the ops belong
-  to a module then you need to make sure that the module can't get
-  unloaded while you're using the fops. Might not be a concern in this
-  case.
-* brittleness: Not all f_ops for example deal with userspace
-  functionality some deal with cleanup when the file is closed like
-  ->release(). So it's delicate to override that functionality with
-  custom f_ops. Restricted memfds could easily forget to cleanup
-  resources.
-* Potential for confusion why there's two sets of {f,a}_ops.
-* f_ops specifically are generic across a vast amount of consumers and
-  are subject to change. If memfd_restricted() has specific requirements
-  because of this weird double-use they won't be taken into account.
-
-I find this hard to navigate tbh and it feels like taking a shortcut to
-avoid building a proper api. If you only care about a specific set of
-operations specific to memfd restricte that needs to be available to
-in-kernel consumers, I wonder if you shouldn't just go one step further
-then your proposal below and build a dedicated minimal ops api. Idk,
-sketching like a madman on a drawning board here with no claim to
-feasibility from a mm perspective whatsoever:
-
-struct restrictedmem_ops {
-	// only contains very limited stuff you need or special stuff
-	// you nee, similar to struct proto_ops (sockets) and so on
-};
-
-struct restrictedmem {
-	const struct restrictedmem_ops ops;
-};
-
-This would avoid fuzzing with two different set of {f,a}_ops in this
-brittle way. It would force you to clarify the semantics that you need
-and the operations that you need or don't need implemented. And it would
-get rid of the ambiguity inherent to using two sets of {f,a}_ops.
