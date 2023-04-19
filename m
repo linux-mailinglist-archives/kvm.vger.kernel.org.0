@@ -2,75 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2851A6E7115
-	for <lists+kvm@lfdr.de>; Wed, 19 Apr 2023 04:19:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5553B6E7117
+	for <lists+kvm@lfdr.de>; Wed, 19 Apr 2023 04:22:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231617AbjDSCTM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Apr 2023 22:19:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51170 "EHLO
+        id S231654AbjDSCWt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Apr 2023 22:22:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52060 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231588AbjDSCTL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Apr 2023 22:19:11 -0400
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B90BC7
-        for <kvm@vger.kernel.org>; Tue, 18 Apr 2023 19:19:09 -0700 (PDT)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-54c17fb245dso335116907b3.21
-        for <kvm@vger.kernel.org>; Tue, 18 Apr 2023 19:19:09 -0700 (PDT)
+        with ESMTP id S230340AbjDSCWr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Apr 2023 22:22:47 -0400
+Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 815B9273C;
+        Tue, 18 Apr 2023 19:22:46 -0700 (PDT)
+Received: by mail-pf1-x430.google.com with SMTP id d2e1a72fcca58-63b5fca48bcso2339255b3a.0;
+        Tue, 18 Apr 2023 19:22:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1681870748; x=1684462748;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=xOVoOXEuKgQg2tBCLrjO+Ie6Feguqmtzji3r08inyQ8=;
-        b=GBpDxzuZ8iJftmRFbQ4u416CLpAaocgcZ258FLuBJdT5LXUXVoFni09Eq8Jyypgsdi
-         i3e3mWkR61bQcOBiE2Na5nyLZ9Vodg+T18Ab03ypVpChrLseDg7l+pl9A/nIiyCxU2oa
-         rXUs/G8SdfeIcRJ9MrRo96XWQfkkPzlaaoYvG8YVrySHFFhSYSJlQNXpboOcNU7QnRi2
-         N23NYdPybyffUM3dTo4131YLhg/3VGFXDfAx0oFFH9pojA5Pwdv2A7+FS+yWFrvLJImB
-         EZfnFhoF34L7GoYAEWgrIRv2pu3Dzo4nE9mWrei7GCzVdLnkXrcmMY5eeBzO40mvwy/g
-         rw+Q==
+        d=gmail.com; s=20221208; t=1681870966; x=1684462966;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=qq1wmNOq3mx/jsth4boKCBiQxJHNbyxopmmTMVawJyc=;
+        b=YDwa6vd5CVqbJasmby+yXPDe94xJtFcxrqOPai6hf7eSY4JvGA0yUBFGHYIMjafZZD
+         fv0yZE5T5ltLQmpbUKhVOVborf5gwR6HD51dSP/U3wYcu5kiME5xBiGnMgUZu5tw6LBx
+         x0cQ5q2AOaUseGFCRvhtKwZpH61tFuz+n6x1fqtmJrno/O3zjASVCiEvVaKFMWV8a2og
+         HzAV0LKCHVKREYBhOVqNgKJOgHDWrcv1qO+TYJlUoC4qyOOAAH62GA620D2JPoEy3rQL
+         I/ktaFquz0Vflpf5w1LdBFMHxpIqaGDwTgX4hEWbPjwaXyFDDUxsTUBThk7dvZ3OT08n
+         VjAg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681870748; x=1684462748;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=xOVoOXEuKgQg2tBCLrjO+Ie6Feguqmtzji3r08inyQ8=;
-        b=WrAWDfvzVlCvIRxRNys3kpqFfRiOm+RpXoyhSUCAc8Dd9zXhDNr/g3dfw7yMJNuA0l
-         dPmWS+IbQcGjYynyFbTj0UXEoEz8kDyKBDPS2MkjzV8Yxctvjsmru4u1lBBbDtpmpmZb
-         pJhEA4T52NOitkRg/swHKSy3rESL+WI7dyZ8Ux5eezLTaUuhYUHM99/FMSlp3iacl5pp
-         Ljb4K0HVlZ6PI+Uol+1hYBaujnfMsGN+WdGOn+qhX5pfg0vvWx7xZvkkAR4Pc5BspL5F
-         f2u7rFVF6Kc5NphaI5D/p4CYlvSDU6i2B+6UmGOXr1UVyVQlCxpoZy32MSJo5KL8lJTF
-         usAw==
-X-Gm-Message-State: AAQBX9cXGNe9HkByBGUTRSSM3Msu6p+bHPNbDdNAKw1nJ/LPhzFqX7JR
-        Bg/wvGHSSa14G7cebSCvpDg1Wi2vG3A=
-X-Google-Smtp-Source: AKy350ZAJNC+m10rAkRY8MhHkLcGAFWbMx7c2WWQF2YMC1seAPFdQ+q3ICVHOmnhHJFjhA4DMarFTvB+Emo=
-X-Received: from reijiw-west4.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:aa1])
- (user=reijiw job=sendgmr) by 2002:a25:d68c:0:b0:b92:25bf:a6ba with SMTP id
- n134-20020a25d68c000000b00b9225bfa6bamr7234069ybg.6.1681870748829; Tue, 18
- Apr 2023 19:19:08 -0700 (PDT)
-Date:   Tue, 18 Apr 2023 19:18:52 -0700
-In-Reply-To: <20230419021852.2981107-1-reijiw@google.com>
-Mime-Version: 1.0
-References: <20230419021852.2981107-1-reijiw@google.com>
-X-Mailer: git-send-email 2.40.0.396.gfff15efe05-goog
-Message-ID: <20230419021852.2981107-3-reijiw@google.com>
-Subject: [PATCH v1 2/2] KVM: arm64: Have kvm_psci_vcpu_on() use WRITE_ONCE()
- to update mp_state
-From:   Reiji Watanabe <reijiw@google.com>
-To:     Marc Zyngier <maz@kernel.org>,
-        Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev
-Cc:     kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Raghavendra Rao Anata <rananta@google.com>,
-        Will Deacon <will@kernel.org>,
-        Reiji Watanabe <reijiw@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        d=1e100.net; s=20221208; t=1681870966; x=1684462966;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=qq1wmNOq3mx/jsth4boKCBiQxJHNbyxopmmTMVawJyc=;
+        b=ZuzCHW0V9an+m92rsPIA3IucC/2QYiw3zBrjOc+ZuvoRPjhkiJa7Wg4SshRW09vsdv
+         aBe+SVATQiEJT6o9yQLFsEICU2kGGi6pt1zfGCj6D55uSjf70BysKh4QyhiKwWPu156C
+         cWFx5Cpy/zqgieDfn9XDh8K6dktf1Y317hPyimiA2scCDNB6O/DSj2kYcSXyZUzEom6/
+         w6Jrhv4yTcjAGM7xg7HzwedMjQblG2y6XKcoV/2I1bUUzGQ3WOclI+xL3fX+wi6ij+2N
+         jJ9A1hjYeMQmKubrSsjI68bPZUC3QOdXj7HP8OB6PH4zOnuFSu2zmOiQwlG8GFGk3Y/x
+         Xi7A==
+X-Gm-Message-State: AAQBX9d45bjl9X8b/XZfrXGu/SqdacVvNLgZUp+pz0iLljwrllVEa1EO
+        tZPA82Ii5dpidg7TpUFckkU=
+X-Google-Smtp-Source: AKy350Z/gTxAnzgrPPoCa99OlelHMIHhsiLZsfmDGFbos9SLw4w43Jvt2Lyppsg8KsOGaj8FUnfSmw==
+X-Received: by 2002:a05:6a00:b50:b0:63d:4920:c101 with SMTP id p16-20020a056a000b5000b0063d4920c101mr987750pfo.30.1681870965914;
+        Tue, 18 Apr 2023 19:22:45 -0700 (PDT)
+Received: from localhost.localdomain ([43.132.141.9])
+        by smtp.gmail.com with ESMTPSA id z16-20020aa791d0000000b0062bc045bf4fsm10324154pfa.19.2023.04.18.19.22.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 18 Apr 2023 19:22:45 -0700 (PDT)
+From:   alexjlzheng@gmail.com
+X-Google-Original-From: alexjlzheng@tencent.com
+To:     seanjc@google.com, pbonzini@redhat.com, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
+        x86@kernel.org, hpa@zytor.com
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Jinliang Zheng <alexjlzheng@tencent.com>
+Subject: [PATCH v3] KVM: x86: Fix poll command
+Date:   Wed, 19 Apr 2023 10:19:25 +0800
+Message-Id: <20230419021924.1342184-1-alexjlzheng@tencent.com>
+X-Mailer: git-send-email 2.31.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -78,29 +71,40 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-All accessors of kvm_vcpu_arch::mp_state should be {READ,WRITE}_ONCE(),
-since readers of the mp_state don't acquire the mp_state_lock.
-Nonetheless, kvm_psci_vcpu_on() updates the mp_state without using
-WRITE_ONCE(). So, fix the code to update the mp_state using WRITE_ONCE.
+From: Jinliang Zheng <alexjlzheng@tencent.com>
 
-Signed-off-by: Reiji Watanabe <reijiw@google.com>
+According to the hardware manual, when the Poll command is issued, the
+byte returned by the I/O read is 1 in Bit 7 when there is an interrupt,
+and the highest priority binary code in Bits 2:0. The current pic
+simulation code is not implemented strictly according to the above
+expression.
+
+Fix the implementation of pic_poll_read(), set Bit 7 when there is an
+interrupt.
+
+Signed-off-by: Jinliang Zheng <alexjlzheng@tencent.com>
 ---
- arch/arm64/kvm/psci.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+V2 -> V3: Keep the return value(0x07) unchanged if there's no interrupt
+V1 -> V2: Keep the logic of pic_poll_read(), only fix the return value
 
-diff --git a/arch/arm64/kvm/psci.c b/arch/arm64/kvm/psci.c
-index 5767e6baa61a..d046e82e3723 100644
---- a/arch/arm64/kvm/psci.c
-+++ b/arch/arm64/kvm/psci.c
-@@ -110,7 +110,7 @@ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
- 	 */
- 	smp_wmb();
- 
--	vcpu->arch.mp_state.mp_state = KVM_MP_STATE_RUNNABLE;
-+	WRITE_ONCE(vcpu->arch.mp_state.mp_state, KVM_MP_STATE_RUNNABLE);
- 	kvm_vcpu_wake_up(vcpu);
- 
- out_unlock:
+ arch/x86/kvm/i8259.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/arch/x86/kvm/i8259.c b/arch/x86/kvm/i8259.c
+index 4756bcb5724f..8dec646e764b 100644
+--- a/arch/x86/kvm/i8259.c
++++ b/arch/x86/kvm/i8259.c
+@@ -411,7 +411,10 @@ static u32 pic_poll_read(struct kvm_kpic_state *s, u32 addr1)
+ 		pic_clear_isr(s, ret);
+ 		if (addr1 >> 7 || ret != 2)
+ 			pic_update_irq(s->pics_state);
++		/* Bit 7 is 1, means there's an interrupt */
++		ret |= 0x80;
+ 	} else {
++		/* Bit 7 is 0, means there's no interrupt */
+ 		ret = 0x07;
+ 		pic_update_irq(s->pics_state);
+ 	}
 -- 
-2.40.0.396.gfff15efe05-goog
+2.31.1
 
