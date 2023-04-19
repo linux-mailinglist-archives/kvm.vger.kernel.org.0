@@ -2,145 +2,178 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A66FC6E7C54
-	for <lists+kvm@lfdr.de>; Wed, 19 Apr 2023 16:23:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B27E46E7D81
+	for <lists+kvm@lfdr.de>; Wed, 19 Apr 2023 16:54:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232775AbjDSOW3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Apr 2023 10:22:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50592 "EHLO
+        id S232789AbjDSOyn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Apr 2023 10:54:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52774 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232908AbjDSOW0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Apr 2023 10:22:26 -0400
-Received: from mail-pg1-x52c.google.com (mail-pg1-x52c.google.com [IPv6:2607:f8b0:4864:20::52c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6E496E85
-        for <kvm@vger.kernel.org>; Wed, 19 Apr 2023 07:22:22 -0700 (PDT)
-Received: by mail-pg1-x52c.google.com with SMTP id 41be03b00d2f7-51fcf5d1e44so1401680a12.3
-        for <kvm@vger.kernel.org>; Wed, 19 Apr 2023 07:22:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=dabbelt-com.20221208.gappssmtp.com; s=20221208; t=1681914141; x=1684506141;
-        h=content-transfer-encoding:mime-version:message-id:to:from:cc
-         :in-reply-to:subject:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=5AZVoE4cKl5QalUTwIQY3oWUmaoZBRuHIhA+cy8XC/s=;
-        b=Uf44G7eShP45n3mvQsLaHp0FYljwSoqFn6ycGUo7jd19P0ovDq0zYsO0ygVV7IKtio
-         62GMonB9A3vjZu1wyukptFhBL0UVngK7V1lKn91S6YHJ9GKWhxd2JJSCkJgX/wqWtIWq
-         vdMtgwI9BniFnWkT/DM8X4F7S0AoBst+qlNVr7aMrthHGVnBzZ8mHmYnMX/BvLizCfaf
-         Op6DDgLsT2wxXL+ei+EhK2jh9XRwQejhOSQ3f/JkW3Zr2x0MF7G9eAHbJ/+1yNMXNskk
-         Sv/hclJBzlFlROh6qKbo40F7WQvNJ2OONsVjtIzOodYF+GmVl0Ubw7jvMEEarc5i+L2h
-         Pq0w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681914141; x=1684506141;
-        h=content-transfer-encoding:mime-version:message-id:to:from:cc
-         :in-reply-to:subject:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5AZVoE4cKl5QalUTwIQY3oWUmaoZBRuHIhA+cy8XC/s=;
-        b=XTJbcWnF8zkU801YFncskmJFo5aqw+rTNzZ6Ux9HOQqfaq5wLJMuK61C4NSiLYNBfF
-         O44T9Pq/9ExGcjidkjMcHkBQaczmMRAiTp4Z4nJfcwHzJ4IgbM7ZWiI9TVwFsI3kyeBD
-         NRY9/YxR+z6DtnkhadSHNBrmLGrc6bwece7YbqvKyhGh0mQabu0ElwpvqMvJSeIZaC+Q
-         bRmk6DnkpdN1tWU4ELK+PYEuMIof7iafltc42AOKAiAiSNUclRbU+UZZOT+ZqxGjBbtu
-         VO2n/l4uIp4PHgbO5JOUioXmuT3591aUb21d8OcIkxmJ/hlwi196IizH6Ew4QSFvigTE
-         k1xw==
-X-Gm-Message-State: AAQBX9clOdpoF/7hN7IaAyAFuxzp0FnpDPLwcTxXxBrzr5mmjKFpOpu6
-        GzdyLDu/Fzc/xXUF2xpVPRNMsw==
-X-Google-Smtp-Source: AKy350ZTJwE2aWSzstOmJ0YW285PJ4i358w4phfkGLXLXpb0SQnSrIkea7QeQB4AECwuoTp9GpufSA==
-X-Received: by 2002:a17:90a:f196:b0:236:73d5:82cf with SMTP id bv22-20020a17090af19600b0023673d582cfmr3147217pjb.9.1681914141039;
-        Wed, 19 Apr 2023 07:22:21 -0700 (PDT)
-Received: from localhost ([135.180.227.0])
-        by smtp.gmail.com with ESMTPSA id x1-20020a1709029a4100b001a687c505e9sm11329933plv.237.2023.04.19.07.22.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Apr 2023 07:22:20 -0700 (PDT)
-Date:   Wed, 19 Apr 2023 07:22:20 -0700 (PDT)
-X-Google-Original-Date: Wed, 19 Apr 2023 07:22:13 PDT (-0700)
-Subject:     Re: [PATCH v4 0/9] RISC-V KVM virtualize AIA CSRs
-In-Reply-To: <20230404153452.2405681-1-apatel@ventanamicro.com>
-CC:     pbonzini@redhat.com, atishp@atishpatra.org,
+        with ESMTP id S232651AbjDSOy2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Apr 2023 10:54:28 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE425122
+        for <kvm@vger.kernel.org>; Wed, 19 Apr 2023 07:54:27 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 486DA63E73
+        for <kvm@vger.kernel.org>; Wed, 19 Apr 2023 14:54:27 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 31284C4339B;
+        Wed, 19 Apr 2023 14:54:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1681916066;
+        bh=K7L77fXIx/AW5YbmsAG7ay6yVgjlxRqJ7wqR/qYv+0Q=;
+        h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+        b=rUPaZs/8QZI8lF1os5IMYRE3kYvuns4ArF/TTmgLqKn+SBFgdJHLDbs0RqVqivXUe
+         M6Rm88B214jyRz1wb3OPcgHqjzL18xucaNApNTz1/XR7N7tiqcvW0uYz3mbwep4w2l
+         Ds728ndZU149nrHH7E9u3JkzzAoJdBFcJ9Crs+JKuXpXCigVbe0HLYMb3fZJaf4p6Q
+         OotGCZy/Uze+TnsUVGnCsrO4vz5nRjuDwNWmkNJRdnnCRA/mQEKehf5fUgY+1aP9cD
+         91m0uEuccEY5AFRgByi83HIyk7OsbPryC8OqLPo8Ulv9BkCAdX1UoYbCqqLd5Uyz7s
+         8Rx6UXBQIqhpw==
+From:   =?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>
+To:     Andy Chiu <andy.chiu@sifive.com>, linux-riscv@lists.infradead.org,
+        palmer@dabbelt.com, anup@brainfault.org, atishp@atishpatra.org,
+        kvm-riscv@lists.infradead.org, kvm@vger.kernel.org
+Cc:     vineetg@rivosinc.com, greentime.hu@sifive.com,
+        guoren@linux.alibaba.com, Andy Chiu <andy.chiu@sifive.com>,
         Paul Walmsley <paul.walmsley@sifive.com>,
-        ajones@ventanamicro.com, anup@brainfault.org, kvm@vger.kernel.org,
-        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-        linux-kernel@vger.kernel.org, apatel@ventanamicro.com
-From:   Palmer Dabbelt <palmer@dabbelt.com>
-To:     apatel@ventanamicro.com
-Message-ID: <mhng-72b96cbf-6edd-4b37-9549-200e2a3cb35d@palmer-ri-x1c9>
-Mime-Version: 1.0 (MHng)
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Tom Rix <trix@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        GNU C Library <libc-alpha@sourceware.org>,
+        Andrew Waterman <andrew@sifive.com>
+Subject: Re: [PATCH -next v18 00/20] riscv: Add vector ISA support
+In-Reply-To: <87cz4048rp.fsf@all.your.base.are.belong.to.us>
+References: <20230414155843.12963-1-andy.chiu@sifive.com>
+ <87cz4048rp.fsf@all.your.base.are.belong.to.us>
+Date:   Wed, 19 Apr 2023 16:54:23 +0200
+Message-ID: <87leinq5wg.fsf@all.your.base.are.belong.to.us>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 04 Apr 2023 08:34:43 PDT (-0700), apatel@ventanamicro.com wrote:
-> The RISC-V AIA specification is now frozen as-per the RISC-V international
-> process. The latest frozen specifcation can be found at:
-> https://github.com/riscv/riscv-aia/releases/download/1.0-RC3/riscv-interrupts-1.0-RC3.pdf
->
-> This series implements first phase of AIA virtualization which targets
-> virtualizing AIA CSRs. This also provides a foundation for the second
-> phase of AIA virtualization which will target in-kernel AIA irqchip
-> (including both IMSIC and APLIC).
->
-> The first two patches are shared with the "Linux RISC-V AIA Support"
-> series which adds AIA driver support.
->
-> To test this series, use AIA drivers from the "Linux RISC-V AIA Support"
-> series and use KVMTOOL from the riscv_aia_v1 branch at:
-> https://github.com/avpatel/kvmtool.git
->
-> These patches can also be found in the riscv_kvm_aia_csr_v4 branch at:
-> https://github.com/avpatel/linux.git
->
-> Based-on: 20230401112730.2105240-1-apatel@ventanamicro.com
-> (https://lore.kernel.org/lkml/20230401112730.2105240-1-apatel@ventanamicro.com/)
->
-> Based-on: 20230403121527.2286489-1-apatel@ventanamicro.com
-> (https://lore.kernel.org/lkml/20230403121527.2286489-1-apatel@ventanamicro.com/)
->
-> Changes since v3:
->  - Split PATCH7 into two patches
->  - Addressed comments in PATCH7, PATCH8 and PATCH9
->
-> Changes since v2:
->  - Rebased on Linux-6.3-rc5
->  - Split PATCH5 into two separate patches as suggested by Atish.
->
-> Changes since v1:
->  - Addressed from Drew and Conor in PATCH1
->  - Use alphabetical ordering for SMAIA and SSAIA enum in PATCH2
->  - Use GENMASK() in PATCH3
->
-> Anup Patel (9):
->   RISC-V: Add AIA related CSR defines
->   RISC-V: Detect AIA CSRs from ISA string
->   RISC-V: KVM: Drop the _MASK suffix from hgatp.VMID mask defines
->   RISC-V: KVM: Initial skeletal support for AIA
->   RISC-V: KVM: Implement subtype for CSR ONE_REG interface
->   RISC-V: KVM: Add ONE_REG interface for AIA CSRs
->   RISC-V: KVM: Use bitmap for irqs_pending and irqs_pending_mask
->   RISC-V: KVM: Virtualize per-HART AIA CSRs
->   RISC-V: KVM: Implement guest external interrupt line management
->
->  arch/riscv/include/asm/csr.h      | 107 ++++-
->  arch/riscv/include/asm/hwcap.h    |   8 +
->  arch/riscv/include/asm/kvm_aia.h  | 137 +++++++
->  arch/riscv/include/asm/kvm_host.h |  14 +-
->  arch/riscv/include/uapi/asm/kvm.h |  18 +-
->  arch/riscv/kernel/cpu.c           |   2 +
->  arch/riscv/kernel/cpufeature.c    |   2 +
->  arch/riscv/kvm/Makefile           |   1 +
->  arch/riscv/kvm/aia.c              | 627 ++++++++++++++++++++++++++++++
->  arch/riscv/kvm/main.c             |  23 +-
->  arch/riscv/kvm/mmu.c              |   3 +-
->  arch/riscv/kvm/vcpu.c             | 190 +++++++--
->  arch/riscv/kvm/vcpu_insn.c        |   1 +
->  arch/riscv/kvm/vm.c               |   4 +
->  arch/riscv/kvm/vmid.c             |   4 +-
->  15 files changed, 1083 insertions(+), 58 deletions(-)
->  create mode 100644 arch/riscv/include/asm/kvm_aia.h
->  create mode 100644 arch/riscv/kvm/aia.c
+Bj=C3=B6rn T=C3=B6pel <bjorn@kernel.org> writes:
 
-Acked-by: Palmer Dabbelt <palmer@rivosinc.com>
+> Andy Chiu <andy.chiu@sifive.com> writes:
+>
+>> This patchset is implemented based on vector 1.0 spec to add vector supp=
+ort
+>> in riscv Linux kernel. There are some assumptions for this implementatio=
+ns.
+>>
+>> 1. We assume all harts has the same ISA in the system.
+>> 2. We disable vector in both kernel and user space [1] by default. Only
+>>    enable an user's vector after an illegal instruction trap where it
+>>    actually starts executing vector (the first-use trap [2]).
+>> 3. We detect "riscv,isa" to determine whether vector is support or not.
+>>
+>> We defined a new structure __riscv_v_ext_state in struct thread_struct to
+>> save/restore the vector related registers. It is used for both kernel sp=
+ace
+>> and user space.
+>>  - In kernel space, the datap pointer in __riscv_v_ext_state will be
+>>    allocated to save vector registers.
+>>  - In user space,
+>> 	- In signal handler of user space, the structure is placed
+>> 	  right after __riscv_ctx_hdr, which is embedded in fp reserved
+>> 	  aera. This is required to avoid ABI break [2]. And datap points
+>> 	  to the end of __riscv_v_ext_state.
+>> 	- In ptrace, the data will be put in ubuf in which we use
+>> 	  riscv_vr_get()/riscv_vr_set() to get or set the
+>> 	  __riscv_v_ext_state data structure from/to it, datap pointer
+>> 	  would be zeroed and vector registers will be copied to the
+>> 	  address right after the __riscv_v_ext_state structure in ubuf.
+>>
+>> This patchset is rebased to v6.3-rc1 and it is tested by running several
+>> vector programs simultaneously. It delivers signals correctly in a test
+>> where we can see a valid ucontext_t in a signal handler, and a correct V
+>> context returing back from it. And the ptrace interface is tested by
+>> PTRACE_{GET,SET}REGSET. Lastly, KVM is tested by running above tests in
+>> a guest using the same kernel image. All tests are done on an rv64gcv
+>> virt QEMU.
+>>
+>> Note: please apply the patch at [4] due to a regression introduced by
+>> commit 596ff4a09b89 ("cpumask: re-introduce constant-sized cpumask
+>> optimizations") before testing the series.
+>>
+>> Source tree:
+>> https://github.com/sifive/riscv-linux/tree/riscv/for-next/vector-v18
+>
+> After some offlist discussions, we might have a identified a
+> potential libc->application ABI break.
+>
+> Given an application that does custom task scheduling via a signal
+> handler. The application binary is not vector aware, but libc is. Libc
+> is using vector registers for memcpy. It's an "old application, new
+> library, new kernel"-scenario.
+>
+>  | ...
+>  | struct context *p1_ctx;
+>  | struct context *p2_ctx;
+>  |=20
+>  | void sighandler(int sig, siginfo_t *info, void *ucontext)
+>  | {
+>  |   if (p1_running)
+>  |     switch_to(p1_ctx, p2_ctx);
+>  |   if (p2_running)
+>  |     switch_to(p2_ctx, p1_ctx);
+>  | }
+>  |=20
+>  | void p1(void)
+>  | {
+>  |   memcpy(foo, bar, 17);
+>  | }
+>  |=20
+>  | void p2(void)
+>  | {
+>  |   ...
+>  | }
+>  | ...
+>
+> The switch_to() function schedules p1() and p2(). E.g., the
+> application (assumes that it) saves the complete task state from
+> sigcontext (ucontext) to p1_ctx, and restores sigcontext to p2_ctx, so
+> when sigreturn is called, p2() is running, and p1() has been
+> interrupted.
+>
+> The "old application" which is not aware of vector, is now run on a
+> vector enabled kernel/glibc.
+>
+> Assume that the sighandler is hit, and p1() is in the middle of the
+> vector memcpy. The switch_to() function will not save the vector
+> state, and next time p2() is scheduled to run it will have incorrect
+> machine state.
+>
+> Now:
+>
+> Is this an actual or theoretical problem (i.e. are there any
+> applications in the wild)? I'd be surprised if it would not be the
+> latter...
+>
+> Regardless, a kernel knob for disabling vector (sysctl/prctl) to avoid
+> these kind of breaks is needed (right?). Could this knob be a
+> follow-up patch to the existing v18 series?
+>
+> Note that arm64 does not suffer from this with SVE, because the default
+> vector length (vl=3D=3D0/128b*32) fits in the "legacy" sigcontext.
+
+Andy, to clarify from the patchwork call; In
+Documentation/arm64/sve.rst:
+
+There's a per-process prctl (section 6), and a system runtime conf
+(section 9).
+
+
+Bj=C3=B6rn
