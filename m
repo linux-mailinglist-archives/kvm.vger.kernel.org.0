@@ -2,69 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 116536E8273
-	for <lists+kvm@lfdr.de>; Wed, 19 Apr 2023 22:16:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 36A666E82B9
+	for <lists+kvm@lfdr.de>; Wed, 19 Apr 2023 22:30:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231368AbjDSUQZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Apr 2023 16:16:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37516 "EHLO
+        id S230334AbjDSUaK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Apr 2023 16:30:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46710 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229682AbjDSUQY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Apr 2023 16:16:24 -0400
-Received: from mail-lj1-x22f.google.com (mail-lj1-x22f.google.com [IPv6:2a00:1450:4864:20::22f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB42D10CC
-        for <kvm@vger.kernel.org>; Wed, 19 Apr 2023 13:16:22 -0700 (PDT)
-Received: by mail-lj1-x22f.google.com with SMTP id bz21so265821ljb.11
-        for <kvm@vger.kernel.org>; Wed, 19 Apr 2023 13:16:22 -0700 (PDT)
+        with ESMTP id S229602AbjDSUaJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Apr 2023 16:30:09 -0400
+Received: from mail-yw1-x1129.google.com (mail-yw1-x1129.google.com [IPv6:2607:f8b0:4864:20::1129])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A9BA8A45;
+        Wed, 19 Apr 2023 13:29:29 -0700 (PDT)
+Received: by mail-yw1-x1129.google.com with SMTP id 00721157ae682-54fb615ac3dso17398657b3.2;
+        Wed, 19 Apr 2023 13:29:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1681935381; x=1684527381;
+        d=gmail.com; s=20221208; t=1681936166; x=1684528166;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=wRtalYFerwmw+OfWqRHaDlMXdJ7bPKZ2DC5Ux2SX7bk=;
-        b=ZpPTB5sEUEIXZMe6tZZo1OfRBcRYN8rWCYtnuywY4w9BEdpriIZEFQB+aBDJJEA/3O
-         /LAWUUZtLhycv74Xfnwy6aKSCUMU/PrakTiEtneG20KwCnnihflcriJ3e2aUo+ynXjP4
-         qe1W/N01rFFrNkc6VKwSAKBReovz6typFgrlAxnIuE9+qfT/fk8pwD7qFeTq+Oc8RyyV
-         Mg9a4saGfQVIH6k8lhjL3V24VUsokjsuUtsv9Mx848aW+ozSP1aY3JnmGyR9XGKcQnci
-         EGAl1+tfUotT52TnsC1cUv1lq+U96CNb/l0tzOYVFbeCr6u+T3k6x85e1wumu4sFWOom
-         i+pw==
+        bh=ri4M7wwnqfUyWg7ITQYtSCFlkjwgDD80RYs577YrqxA=;
+        b=WIB0Mw6mTuaRsirvoZFjheEp9yY5Y/q9onOHwXnfWFMdFmYyli6xaVNh9nuRkFM8Bu
+         OnXLT3OfefylOw1YM4VwkunQfq+Wm/ji1lKG5q5iuDSnqXz+pveEOmagYUHY70pV+qoa
+         KvVDM5rfvXh7k0t2ztxy0CpMZU4jrTcGpdw3ugWQ7PYvTc5DIMuci51oMb3/89hTRu18
+         ASTMyUIpSKSpdVyzVJqnIsAfKfcTX+AN3kdlEImle/BVRj8WezpdfvQGOxxtdhWDpR5M
+         v2CCX9NS0Q1nwilMdzeBzucKwgU44O+OvH3u0Wiv6qbWAvaUduq3fyhR1v2QD/zzuIcP
+         d4gg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681935381; x=1684527381;
+        d=1e100.net; s=20221208; t=1681936166; x=1684528166;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=wRtalYFerwmw+OfWqRHaDlMXdJ7bPKZ2DC5Ux2SX7bk=;
-        b=W4Dr6g4r8w1lNLNN0MyxaqmbxZ2ak5A30DPjing56mvmEKgbhGm7/O+bLUhu17RcRI
-         G1vbwgonGHSH5VFvGtbWGgGenXxkpJwPkebLrPExm9NYkwg0eL1yU0Nli+Gqg2WKzhnz
-         8E1l5m6Ay5TrkPgQLbiluIGor8dqiKpxADW/Axz4omFW8cjyDxN9QQFGeLlP0EQx7S4T
-         aOooXr7iyMot3vzq48oKxL6pUoozplvmJ6rR6bxs1UqwtUeQ9MhuUuTN6D2z80xoFUQd
-         E2iKPvhZfDtO0IGtpYokfko90sjrt9TXikJ0M6d7nWW4iLlbGWxZ01IjarlfwESv0N1M
-         yevA==
-X-Gm-Message-State: AAQBX9fm1CxEfY7Rqo6JoLvX+Y+8imoaEDlz88lhEEkyDe91PWybbTfL
-        rJ+9d0ZeT3Fbj+s/BL2bOcb2H0xb9dIZ92mqP/R95A==
-X-Google-Smtp-Source: AKy350a61cd30/1k5ScgIWz3PotN3G1jxvViqqtdGsP/m0LPV2TMsOkaGYsESWdlgcba+fmv1IJrcksdAj5636iC7/0=
-X-Received: by 2002:a05:651c:10e:b0:29d:d0b:7a78 with SMTP id
- a14-20020a05651c010e00b0029d0d0b7a78mr2460294ljb.21.1681935380656; Wed, 19
- Apr 2023 13:16:20 -0700 (PDT)
+        bh=ri4M7wwnqfUyWg7ITQYtSCFlkjwgDD80RYs577YrqxA=;
+        b=fA7oFQsGvJQ3i43IS74zb1MqMjTV0S1kZdt1hO4vfzpeVjFxxpX451Zvqx5htZ+wIN
+         s+E+2j4fL31lgSXUvDx8uX2rZ27EtOFe8/uJf2wbKzs6xeFpiHxcjOz3ENgPeQ9mvYwc
+         T+nn5liT0JubB3kNFfRVJqjn98Dk10oIdA46WWdihsonPquEYmQd6QRjwdN5xA5+v4N1
+         pupMN5BtfCAARSzzvRoeN5gAk9rF4yQJ8iPB65SQD0dOoKde99sdq0QXGWsROtxUKlRg
+         Zjg3mmViA4bdX1lcZ2IYjhBGLTQASbjCjFbz4oVgm1d6Dzfozk7dvJ1QwYe9LZxDY/aw
+         KmRg==
+X-Gm-Message-State: AAQBX9dkC3nKzMHk0XftNaIR8EqYFRKlJV/K8dzqTa2ojj33aE8GqedT
+        tql5UMZPs0+4p32GbnyNMtI0gMm/UKizSpJSqzcoV7zJYb/jtw==
+X-Google-Smtp-Source: AKy350aNDMALBM0VAdPN5cwgCAJgGmI7MyMPzfpEMhO/TACZWqeGBJUZoGoWlGr6ZHAaYh0Tzxhzwi/dxg7Fov1Ofog=
+X-Received: by 2002:a81:53c2:0:b0:54e:84f6:6669 with SMTP id
+ h185-20020a8153c2000000b0054e84f66669mr4502802ywb.49.1681936166163; Wed, 19
+ Apr 2023 13:29:26 -0700 (PDT)
 MIME-Version: 1.0
-References: <20230412213510.1220557-1-amoorthy@google.com> <ZEBHTw3+DcAnPc37@x1n>
-In-Reply-To: <ZEBHTw3+DcAnPc37@x1n>
-From:   Axel Rasmussen <axelrasmussen@google.com>
-Date:   Wed, 19 Apr 2023 13:15:44 -0700
-Message-ID: <CAJHvVchBqQ8iVHgF9cVZDusMKQM2AjtNx2z=i9ZHP2BosN4tBg@mail.gmail.com>
-Subject: Re: [PATCH v3 00/22] Improve scalability of KVM + userfaultfd live
- migration via annotated memory faults.
-To:     Peter Xu <peterx@redhat.com>
-Cc:     Anish Moorthy <amoorthy@google.com>, pbonzini@redhat.com,
-        maz@kernel.org, oliver.upton@linux.dev, seanjc@google.com,
-        jthoughton@google.com, bgardon@google.com, dmatlack@google.com,
-        ricarkol@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev
+References: <20230417205048.15870-1-vishal.moola@gmail.com>
+ <20230417205048.15870-5-vishal.moola@gmail.com> <ZD/syK8RYO9FZ6ks@vernon-pc>
+In-Reply-To: <ZD/syK8RYO9FZ6ks@vernon-pc>
+From:   Vishal Moola <vishal.moola@gmail.com>
+Date:   Wed, 19 Apr 2023 13:29:14 -0700
+Message-ID: <CAOzc2pyt8MBv7N0qizdxr0__RKXK7hMLX-Jqvsd6RPh3nyTFVw@mail.gmail.com>
+Subject: Re: [PATCH 4/33] mm: add utility functions for ptdesc
+To:     Vernon Yang <vernon2gm@gmail.com>
+Cc:     Andrew Morton <akpm@linux-foundation.org>,
+        Matthew Wilcox <willy@infradead.org>, linux-mm@kvack.org,
+        linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-csky@vger.kernel.org, linux-hexagon@vger.kernel.org,
+        loongarch@lists.linux.dev, linux-m68k@lists.linux-m68k.org,
+        linux-mips@vger.kernel.org, linux-openrisc@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, linux-riscv@lists.infradead.org,
+        linux-s390@vger.kernel.org, linux-sh@vger.kernel.org,
+        sparclinux@vger.kernel.org, linux-um@lists.infradead.org,
+        xen-devel@lists.xenproject.org, kvm@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -72,104 +77,147 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Apr 19, 2023 at 12:56=E2=80=AFPM Peter Xu <peterx@redhat.com> wrote=
-:
+On Wed, Apr 19, 2023 at 6:34=E2=80=AFAM Vernon Yang <vernon2gm@gmail.com> w=
+rote:
 >
-> Hi, Anish,
->
-> On Wed, Apr 12, 2023 at 09:34:48PM +0000, Anish Moorthy wrote:
-> > KVM's demand paging self test is extended to demonstrate the performanc=
-e
-> > benefits of using the two new capabilities to bypass the userfaultfd
-> > wait queue. The performance samples below (rates in thousands of
-> > pages/s, n =3D 5), were generated using [2] on an x86 machine with 256
-> > cores.
+> On Mon, Apr 17, 2023 at 01:50:19PM -0700, Vishal Moola wrote:
+> > Introduce utility functions setting the foundation for ptdescs. These
+> > will also assist in the splitting out of ptdesc from struct page.
 > >
-> > vCPUs, Average Paging Rate (w/o new caps), Average Paging Rate (w/ new =
-caps)
-> > 1       150     340
-> > 2       191     477
-> > 4       210     809
-> > 8       155     1239
-> > 16      130     1595
-> > 32      108     2299
-> > 64      86      3482
-> > 128     62      4134
-> > 256     36      4012
->
-> The number looks very promising.  Though..
->
+> > ptdesc_alloc() is defined to allocate new ptdesc pages as compound
+> > pages. This is to standardize ptdescs by allowing for one allocation
+> > and one free function, in contrast to 2 allocation and 2 free functions=
+.
 > >
-> > [1] https://lore.kernel.org/linux-mm/CADrL8HVDB3u2EOhXHCrAgJNLwHkj2Lka1=
-B_kkNb0dNwiWiAN_Q@mail.gmail.com/
-> > [2] ./demand_paging_test -b 64M -u MINOR -s shmem -a -v <n> -r <n> [-w]
-> >     A quick rundown of the new flags (also detailed in later commits)
-> >         -a registers all of guest memory to a single uffd.
+> > Signed-off-by: Vishal Moola (Oracle) <vishal.moola@gmail.com>
+> > ---
+> >  include/asm-generic/tlb.h | 11 ++++++++++
+> >  include/linux/mm.h        | 44 +++++++++++++++++++++++++++++++++++++++
+> >  include/linux/pgtable.h   | 13 ++++++++++++
+> >  3 files changed, 68 insertions(+)
+> >
+> > diff --git a/include/asm-generic/tlb.h b/include/asm-generic/tlb.h
+> > index b46617207c93..6bade9e0e799 100644
+> > --- a/include/asm-generic/tlb.h
+> > +++ b/include/asm-generic/tlb.h
+> > @@ -481,6 +481,17 @@ static inline void tlb_remove_page(struct mmu_gath=
+er *tlb, struct page *page)
+> >       return tlb_remove_page_size(tlb, page, PAGE_SIZE);
+> >  }
+> >
+> > +static inline void tlb_remove_ptdesc(struct mmu_gather *tlb, void *pt)
+> > +{
+> > +     tlb_remove_table(tlb, pt);
+> > +}
+> > +
+> > +/* Like tlb_remove_ptdesc, but for page-like page directories. */
+> > +static inline void tlb_remove_page_ptdesc(struct mmu_gather *tlb, stru=
+ct ptdesc *pt)
+> > +{
+> > +     tlb_remove_page(tlb, ptdesc_page(pt));
+> > +}
+> > +
+> >  static inline void tlb_change_page_size(struct mmu_gather *tlb,
+> >                                                    unsigned int page_si=
+ze)
+> >  {
+> > diff --git a/include/linux/mm.h b/include/linux/mm.h
+> > index b18848ae7e22..ec3cbe2fa665 100644
+> > --- a/include/linux/mm.h
+> > +++ b/include/linux/mm.h
+> > @@ -2744,6 +2744,45 @@ static inline pmd_t *pmd_alloc(struct mm_struct =
+*mm, pud_t *pud, unsigned long a
+> >  }
+> >  #endif /* CONFIG_MMU */
+> >
+> > +static inline struct ptdesc *virt_to_ptdesc(const void *x)
+> > +{
+> > +     return page_ptdesc(virt_to_head_page(x));
+> > +}
+> > +
+> > +static inline void *ptdesc_to_virt(struct ptdesc *pt)
+> > +{
+> > +     return page_to_virt(ptdesc_page(pt));
+> > +}
+> > +
+> > +static inline void *ptdesc_address(struct ptdesc *pt)
+> > +{
+> > +     return folio_address(ptdesc_folio(pt));
+> > +}
+> > +
+> > +static inline bool ptdesc_is_reserved(struct ptdesc *pt)
+> > +{
+> > +     return folio_test_reserved(ptdesc_folio(pt));
+> > +}
+> > +
+> > +static inline struct ptdesc *ptdesc_alloc(gfp_t gfp, unsigned int orde=
+r)
+> > +{
+> > +     struct page *page =3D alloc_pages(gfp | __GFP_COMP, order);
+> > +
+> > +     return page_ptdesc(page);
+> > +}
+> > +
+> > +static inline void ptdesc_free(struct ptdesc *pt)
+> > +{
+> > +     struct page *page =3D ptdesc_page(pt);
+> > +
+> > +     __free_pages(page, compound_order(page));
+> > +}
+> > +
+> > +static inline void ptdesc_clear(void *x)
+> > +{
+> > +     clear_page(x);
+> > +}
+> > +
+> >  #if USE_SPLIT_PTE_PTLOCKS
+> >  #if ALLOC_SPLIT_PTLOCKS
+> >  void __init ptlock_cache_init(void);
+> > @@ -2970,6 +3009,11 @@ static inline void mark_page_reserved(struct pag=
+e *page)
+> >       adjust_managed_page_count(page, -1);
+> >  }
+> >
+> > +static inline void free_reserved_ptdesc(struct ptdesc *pt)
+> > +{
+> > +     free_reserved_page(ptdesc_page(pt));
+> > +}
+> > +
+> >  /*
+> >   * Default method to free all the __init memory into the buddy system.
+> >   * The freed pages will be poisoned with pattern "poison" if it's with=
+in
+> > diff --git a/include/linux/pgtable.h b/include/linux/pgtable.h
+> > index 7cc6ea057ee9..7cd803aa38eb 100644
+> > --- a/include/linux/pgtable.h
+> > +++ b/include/linux/pgtable.h
+> > @@ -97,6 +97,19 @@ TABLE_MATCH(ptl, ptl);
+> >  #undef TABLE_MATCH
+> >  static_assert(sizeof(struct ptdesc) <=3D sizeof(struct page));
+> >
+> > +#define ptdesc_page(pt)                      (_Generic((pt),          =
+       \
+> > +     const struct ptdesc *:          (const struct page *)(pt),      \
+> > +     struct ptdesc *:                (struct page *)(pt)))
+> > +
+> > +#define ptdesc_folio(pt)             (_Generic((pt),                 \
+> > +     const struct ptdesc *:          (const struct folio *)(pt),     \
+> > +     struct ptdesc *:                (struct folio *)(pt)))
+> > +
+> > +static inline struct ptdesc *page_ptdesc(struct page *page)
+> > +{
+> > +     return (struct ptdesc *)page;
+> > +}
 >
-> ... this is the worst case scenario.  I'd say it's slightly unfair to
-> compare by first introducing a bottleneck then compare with it. :)
+> Hi Vishal,
 >
-> Jokes aside: I'd think it'll make more sense if such a performance soluti=
-on
-> will be measured on real systems showing real benefits, because so far it=
-'s
-> still not convincing enough if it's only with the test especially with on=
-ly
-> one uffd.
->
-> I don't remember whether I used to discuss this with James before, but..
->
-> I know that having multiple uffds in productions also means scattered gue=
-st
-> memory and scattered VMAs all over the place.  However split the guest
-> large mem into at least a few (or even tens of) VMAs may still be somethi=
-ng
-> worth trying?  Do you think that'll already solve some of the contentions
-> on userfaultfd, either on the queue or else?
+> I'm a little curious, why is the page_ptdesc() using inline functions ins=
+tead of macro?
+> If this is any magic, please tell me, thank you very much.
 
-We considered sharding into several UFFDs. I do think it helps, but
-also I think there are two main problems with it:
+No magic here, I was mainly basing it off Matthew's netmem
+series. I'm not too clear on when to use macros vs inlines
+myself :/.
 
-- One is, I think there's a limit to how much you'd want to do that.
-E.g. splitting guest memory in 1/2, or in 1/10, could be reasonable,
-but 1/100 or 1/1000 might become ridiculous in terms of the
-"scattering" of VMAs and so on like you mentioned. Especially for very
-large VMs (e.g. consider Google offers VMs with ~11T of RAM [1]) I'm
-not sure splitting just "slightly" is enough to get good performance.
-
-- Another is, sharding UFFDs sort of assumes accesses are randomly
-distributed across the guest physical address space. I'm not sure this
-is guaranteed for all possible VMs / customer workloads. In other
-words, even if we shard across several UFFDs, we may end up with a
-small number of them being "hot".
-
-A benefit to Anish's series is that it solves the problem more
-fundamentally, and allows demand paging with no "global" locking. So,
-it will scale better regardless of VM size, or access pattern.
-
-[1]: https://cloud.google.com/compute/docs/memory-optimized-machines
-
->
-> With a bunch of VMAs and userfaultfds (paired with uffd fault handler
-> threads, totally separate uffd queues), I'd expect to some extend other
-> things can pop up already, e.g., the network bandwidth, without teaching
-> each vcpu thread to report uffd faults themselves.
->
-> These are my pure imaginations though, I think that's also why it'll be
-> great if such a solution can be tested more or less on a real migration
-> scenario to show its real benefits.
-
-I wonder, is there an existing open source QEMU/KVM based live
-migration stress test?
-
-I think we could share numbers from some of our internal benchmarks,
-or at the very least give relative numbers (e.g. +50% increase), but
-since a lot of the software stack is proprietary (e.g. we don't use
-QEMU), it may not be that useful or reproducible for folks.
-
->
-> Thanks,
->
-> --
-> Peter Xu
->
+If there's a benefit to having it be a macro let me
+know and I can make that change in v2.
