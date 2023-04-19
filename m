@@ -2,99 +2,83 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5395D6E73E9
-	for <lists+kvm@lfdr.de>; Wed, 19 Apr 2023 09:23:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2CBF86E740D
+	for <lists+kvm@lfdr.de>; Wed, 19 Apr 2023 09:33:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232199AbjDSHW5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Apr 2023 03:22:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45950 "EHLO
+        id S232199AbjDSHdI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Apr 2023 03:33:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54966 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232178AbjDSHWy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Apr 2023 03:22:54 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D26E949E7
-        for <kvm@vger.kernel.org>; Wed, 19 Apr 2023 00:22:03 -0700 (PDT)
+        with ESMTP id S230153AbjDSHdE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Apr 2023 03:33:04 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF06219AA
+        for <kvm@vger.kernel.org>; Wed, 19 Apr 2023 00:32:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1681888922;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+        s=mimecast20190719; t=1681889536;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=FCCYf58WbiV7ZwiVXeHUCjynN8kwG+K1Gw0EryKxlNA=;
-        b=Nl5QHTX9P9UAKj1HZkOlQSvyRs06ZeY6ODC+Mlo7vuAUwkEx3np+JeY2ipTlNs3wy5mpSe
-        1zdm+N5cfrKps34CE4MKXnPWubhohPuwF/H/V6zyNi6hGdfjghsXRGNuQVp2booBLeA0bO
-        vijN2Nr6fSwVW3uils2AD+CZ46+FT7U=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=pSDycLHVzXuKr39+BCkKRfFMiS566DCSNh69j6Wm0i0=;
+        b=XHTHEiD/N0+XxY7UEzd91F5J0LILp8mxP9noCR74AwSTXpWb4rOZHwKWJeUaqGYe2fiN52
+        KIqBODhelybEzCKEYZNwPBxyYO+Zhi4DWv7m6jK+rY7DaC6F9d1pvQu7jVlurxT+Yd/vUS
+        Rmm2OXmglAFrfZvY+UIb5kKOgaTOlEw=
+Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
+ [209.85.160.197]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-66-5OfRxNMwMfOYtJtHnSHV7w-1; Wed, 19 Apr 2023 03:22:01 -0400
-X-MC-Unique: 5OfRxNMwMfOYtJtHnSHV7w-1
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-3f080f53c49so16384885e9.0
-        for <kvm@vger.kernel.org>; Wed, 19 Apr 2023 00:22:01 -0700 (PDT)
+ us-mta-553-h92vXq9nMaihU782yfqavg-1; Wed, 19 Apr 2023 03:32:14 -0400
+X-MC-Unique: h92vXq9nMaihU782yfqavg-1
+Received: by mail-qt1-f197.google.com with SMTP id l20-20020a05622a051400b003e6d92a606bso17295264qtx.14
+        for <kvm@vger.kernel.org>; Wed, 19 Apr 2023 00:32:14 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681888920; x=1684480920;
-        h=content-transfer-encoding:in-reply-to:subject:organization:from
-         :content-language:references:cc:to:user-agent:mime-version:date
+        d=1e100.net; s=20221208; t=1681889534; x=1684481534;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:reply-to:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=FCCYf58WbiV7ZwiVXeHUCjynN8kwG+K1Gw0EryKxlNA=;
-        b=jBdN6+fTL3xqANyE6anDvwYDu5eixILV0OfbPIy484/9hhuPtKH8BHgT+WVth0G7Ue
-         ek6sLhzJnegpIumXaKiaKdSBlvjiiuhiGW091qZcv/EoOlsy3i7zneSyEkLs6KX9hAWn
-         ub1JEd//e6y9iweSG2HVZ3Vh4F1GRdh3gpuyP0j17DgAxTIE0ZAwNwzjaRYu3/Lix8xw
-         9/qU9L2tg5Dnm2VH3qXyA/GOLWKcG4x7WaRk5bWmmzirpMqdLRSkUaoar3IzTDyc0nbI
-         Rgx7VdO7HETDU+OOIhlfUJDBWgl5Fmc/gMkYjlyxFMDpVQ7NwNhfUk25i0YZbUIb6uaT
-         EbjQ==
-X-Gm-Message-State: AAQBX9ePgxhTughbIeCLGaI7YcHlFw3kdohugU+3QNMYKrsv4tdZ97O6
-        FN6zcErTiB1n+bGBOQe+gsuCSJS6GJQYOAJTwiKanj9CVcsbyBApkZ0aexALHZYcvqVVHW+ruwN
-        UOI7OTL4MRawO
-X-Received: by 2002:adf:ea4f:0:b0:2da:2aa0:13e8 with SMTP id j15-20020adfea4f000000b002da2aa013e8mr3873858wrn.26.1681888920568;
-        Wed, 19 Apr 2023 00:22:00 -0700 (PDT)
-X-Google-Smtp-Source: AKy350aNwuzmpbvYRPHoSltgT3RyKQDrpmpgLNn+Tljmbr7T+NCiG+eylILlLmRgC0uK/hpojLTqCA==
-X-Received: by 2002:adf:ea4f:0:b0:2da:2aa0:13e8 with SMTP id j15-20020adfea4f000000b002da2aa013e8mr3873828wrn.26.1681888920083;
-        Wed, 19 Apr 2023 00:22:00 -0700 (PDT)
-Received: from ?IPV6:2003:cb:c70b:7b00:7c52:a5fa:8004:96fd? (p200300cbc70b7b007c52a5fa800496fd.dip0.t-ipconnect.de. [2003:cb:c70b:7b00:7c52:a5fa:8004:96fd])
-        by smtp.gmail.com with ESMTPSA id s9-20020a5d6a89000000b002cf1c435afcsm15031069wru.11.2023.04.19.00.21.58
+        bh=pSDycLHVzXuKr39+BCkKRfFMiS566DCSNh69j6Wm0i0=;
+        b=RaNOjFclyRefOi96/8D/GmysHMM1Wrj8Rl4DIqFIHiiCfeS7nDOP7MnFdSIcOKPQKH
+         KLiDQreJVFn+BB+L/v4kLWxM5bFwvV7gu4J14YIPxVwAeFO58z6imcu3UjaMdpRBOFVm
+         oADdxxFg/Si+/LyDZz4t7pjb3RDZ1GjJNFCQ8ikoJUlsW+RL60ou4x2MfrerVgkx8Hiw
+         dMB0dT4MVWX8XQgPIOQK6/IJXXVEAozhFXh56GVABu3rFfGnqH3hK7Cd7DhJ/6O3vfr+
+         OwN1opp1StmW4/e3E6M8Wc44jpVlsKBnMbji+fVyGAH3J2fLkrMQB7qhUSe4zjR2iVsv
+         /hmg==
+X-Gm-Message-State: AAQBX9dOBLA7X1kHjKo0dS3lr7VU0yPTmHKU7toON42wRzkMV7Vdx7MC
+        d9rgvFx0utctPXEdJi+kVl1GvjT0YaaURgc7EET2jH7xcqnGNxa0XgsgX+0yirPsjrZjjGSKG7M
+        Y6LDp8r3bCVEt
+X-Received: by 2002:a05:6214:1304:b0:5e8:63ae:a9a9 with SMTP id pn4-20020a056214130400b005e863aea9a9mr32369841qvb.47.1681889534443;
+        Wed, 19 Apr 2023 00:32:14 -0700 (PDT)
+X-Google-Smtp-Source: AKy350YZhttW1f54/LAe/PCUBrmJGc+p4nngjcWJyYF/6wGLEPvavC5ZLRbgu7loFEgGcGffr2z7kA==
+X-Received: by 2002:a05:6214:1304:b0:5e8:63ae:a9a9 with SMTP id pn4-20020a056214130400b005e863aea9a9mr32369817qvb.47.1681889534200;
+        Wed, 19 Apr 2023 00:32:14 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id m3-20020a0cfba3000000b005dd8b93457asm4236030qvp.18.2023.04.19.00.32.11
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 19 Apr 2023 00:21:59 -0700 (PDT)
-Message-ID: <5869f50f-0858-ab0c-9049-4345abcf5641@redhat.com>
-Date:   Wed, 19 Apr 2023 09:21:58 +0200
+        Wed, 19 Apr 2023 00:32:13 -0700 (PDT)
+Message-ID: <6d6126af-4974-0655-e817-5c5c472d5a2f@redhat.com>
+Date:   Wed, 19 Apr 2023 09:32:10 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Chao Peng <chao.p.peng@linux.intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        dhildenb@redhat.com, Quentin Perret <qperret@google.com>,
-        tabba@google.com, Michael Roth <michael.roth@amd.com>,
-        wei.w.wang@intel.com, Mike Rapoport <rppt@kernel.org>,
-        Liam Merwick <liam.merwick@oracle.com>,
-        Isaku Yamahata <isaku.yamahata@gmail.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Ackerley Tng <ackerleytng@google.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20221202061347.1070246-1-chao.p.peng@linux.intel.com>
- <ZD1oevE8iHsi66T2@google.com>
- <658018f9-581c-7786-795a-85227c712be0@redhat.com>
- <ZD12htq6dWg0tg2e@google.com>
- <1ed06a62-05a1-ebe6-7ac4-5b35ba272d13@redhat.com>
- <ZD2bBB00eKP6F8kz@google.com>
- <9efef45f-e9f4-18d1-0120-f0fc0961761c@redhat.com>
- <ZD86E23gyzF6Q7AF@google.com>
+ Thunderbird/102.5.0
+Reply-To: eric.auger@redhat.com
+Subject: Re: [kvm-unit-tests PATCH 0/6] arm: pmu: Fix random failures of
+ pmu-chain-promotion
 Content-Language: en-US
-From:   David Hildenbrand <david@redhat.com>
-Organization: Red Hat
-Subject: Re: Rename restrictedmem => guardedmem? (was: Re: [PATCH v10 0/9]
- KVM: mm: fd-based approach for supporting KVM)
-In-Reply-To: <ZD86E23gyzF6Q7AF@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+To:     Mark Rutland <mark.rutland@arm.com>,
+        Andrew Jones <andrew.jones@linux.dev>
+Cc:     eric.auger.pro@gmail.com, kvm@vger.kernel.org,
+        kvmarm@lists.linux.dev, maz@kernel.org, will@kernel.org,
+        oliver.upton@linux.dev, ricarkol@google.com, reijiw@google.com,
+        alexandru.elisei@arm.com
+References: <20230315110725.1215523-1-eric.auger@redhat.com>
+ <968a026e-066e-deea-d02f-f64133295ff1@redhat.com>
+ <xcd3kt23ffdq5qfziuyp2vgwv7ndkmh3acepbpqqhhrokv755e@wuiltddj2hj2>
+ <ZDZwIFtH8V59fE4o@FVFF77S0Q05N>
+From:   Eric Auger <eric.auger@redhat.com>
+In-Reply-To: <ZDZwIFtH8V59fE4o@FVFF77S0Q05N>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-4.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
@@ -106,107 +90,148 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 19.04.23 02:47, Sean Christopherson wrote:
-> On Tue, Apr 18, 2023, David Hildenbrand wrote:
->> On 17.04.23 21:16, Sean Christopherson wrote:
->>> Hidden/Concealed/etc - Too close to secretmem, suffers the "hidden from whom" problem,
->>> and depending on the use case, the memory may not actually be concealed from the
->>> user that controls the VMM.
+Hi,
+
+On 4/12/23 10:47, Mark Rutland wrote:
+> On Tue, Apr 04, 2023 at 02:47:47PM +0200, Andrew Jones wrote:
+>> On Tue, Apr 04, 2023 at 08:23:15AM +0200, Eric Auger wrote:
+>>> Hi,
 >>>
->>> Restricted - "rmem" collides with "reserved memory" in code.
->>>
->>> Guarded - Conflicts with s390's "guarded storage", has the "from whom" problem.
->>>
->>> Inaccessible - Many of the same problems as "hidden".
->>>
->>> Unmappable - Doesn't cover things like read/write, and is wrong in the sense that
->>> the memory is still mappable, just not via mmap().
->>>
->>> Secured - I'm not getting anywhere near this one :-)
->>
->> The think about "secretmem" that I kind-of like (a little) is that it
->> explains what it's used for: storing secrets. We don't call it "unmapped"
->> memory because we unmap it from the directmap or "unpinnable" memory or
->> "inaccessible" memory ... or even "restricted" because it has restrictions
->> ... how the secrets are protected is kind of an implementation detail.
->>
->> So instead of describing *why*/*how* restrictedmem is the weird kid
->> (restricted/guarded/hidden/restricted/inaccessible/ ...), maybe rather
->> describe what it's used for?
->>
->> I know, I know, "there are other use cases where it will be used outside of
->> VM context". I really don't care.
-> 
-> Heh, we originally proposed F_SEAL_GUEST, but that was also sub-optimal[1] ;-)
-> 
->> "memfd_vm" / "vm_mem" would be sooo (feel free to add some more o's here)
->> much easier to get. It's a special fd to be used to back VM memory. Depending
->> on the VM type (encrypted/protected/whatever), restrictions might apply (not
->> able to mmap, not able to read/write ...). For example, there really is no
->> need to disallow mmap/read/write when using that memory to back a simple VM
->> where all we want to do is avoid user-space page tables.
-> 
-> In seriousness, I do agree with Jason's very explicit objection[2] against naming
-> a non-KVM uAPI "guest", or any variation thereof.
+>>> On 3/15/23 12:07, Eric Auger wrote:
+>>>> On some HW (ThunderXv2), some random failures of
+>>>> pmu-chain-promotion test can be observed.
+>>>>
+>>>> pmu-chain-promotion is composed of several subtests
+>>>> which run 2 mem_access loops. The initial value of
+>>>> the counter is set so that no overflow is expected on
+>>>> the first loop run and overflow is expected on the second.
+>>>> However it is observed that sometimes we get an overflow
+>>>> on the first run. It looks related to some variability of
+>>>> the mem_acess count. This variability is observed on all
+>>>> HW I have access to, with different span though. On
+>>>> ThunderX2 HW it looks the margin that is currently taken
+>>>> is too small and we regularly hit failure.
+>>>>
+>>>> although the first goal of this series is to increase
+>>>> the count/margin used in those tests, it also attempts
+>>>> to improve the pmu-chain-promotion logs, add some barriers
+>>>> in the mem-access loop, clarify the chain counter
+>>>> enable/disable sequence.
+>>>>
+>>>> A new 'pmu-memaccess-reliability' is also introduced to
+>>>> detect issues with MEM_ACCESS event variability and make
+>>>> the debug easier.
+> As a minor nit, 'pmu-mem-access-reliability' would be more consistent with
+> 'pmu-mem-access'. The lack of a dash in 'memaccess' tripped me up while I was
+> trying to run those two tests.
 
-While I agree, it's all better than the naming we use right now ...
+I can easily respin with that renaming. thanks for the feedback. Waiting
+a little bit more if somebody has any other comment.
 
-
-Let me throw "tee_mem" / "memfd_tee" into the picture. That could 
-eventually catch what we want to have.
-
-Or "coco_mem" / "memfd_coco".
-
-Of course, both expect that people know the terminology (just like what 
-"vm" stands for), but it's IMHO significantly better than 
-restricted/guarded/opaque/whatsoever.
-
-Again, expresses what it's used for, not why it behaves in weird ways.
-
-
-> 
-> An alternative that we haven't considered since the very early days is making the
-> uAPI a KVM ioctl() instead of a memfd() flag or dedicated syscall.  Looking at the
-> code for "pure shim" implementation[3], that's actually not that crazy of an idea.
-
-Yes.
-
-> 
-> I don't know that I love the idea of burying this in KVM, but there are benefits
-> to coupling restrictedmem to KVM (aside from getting out from behind this bikeshed
-> that I created).
-
-Yes, it's all better than jumping through hoops to come up with a bad 
-name like "restrictedmem".
-
-> 
-> The big benefit is that the layer of indirection goes away.  That simplifies things
-> like enhancing restrictedmem to allow host userspace access for debug purposes,
-> batching TLB flushes if a PUNCH_HOLE spans multiple memslots, enforcing exclusive
-> access, likely the whole "share with a device" story if/when we get there, etc.
-> 
-> The obvious downsides are that (a) maintenance falls under the KVM umbrella, but
-> that's likely to be true in practice regardless of where the code lands, and
-
-Yes.
-
-> (b) if another use case comes along, e.g. the Gunyah hypervisor[4][5], we risk
-> someone reinventing a similar solution.
-
-I agree. But if it's as simple as providing an ioctl for that hypervisor 
-that simply wires up the existing implementation, it's not too bad.
-
-> 
-> If we can get Gunyah on board and they don't need substantial changes to the
-> restrictedmem implementation, then I'm all for continuing on the path we're on.
-> But if Gunyah wants to do their own thing, and the lightweight shim approach is
-> viable, then it's awfully tempting to put this all behind a KVM ioctl().
-
-Right. Or we still succeed in finding a name that's not as bad as what 
-we had so far.
-
--- 
-Thanks,
-
-David / dhildenb
+Eric
+>
+>>>> Obviously one can wonder if this variability is something normal
+>>>> and does not hide any other bug. I hope this series will raise
+>>>> additional discussions about this.
+>>>>
+>>>> https://github.com/eauger/kut/tree/pmu-chain-promotion-fixes-v1
+>>> Gentle ping.
+>> I'd be happy to take this, but I was hoping to see some r-b's and/or t-b's
+>> from some of the others.
+> I gave this a spin on my ThunderX2, and it seems to fix the intermittent
+> failures I was seeing.
+>
+> FWIW:
+>
+> Tested-by: Mark Rutland <mark.rutland@arm.com>
+>
+> Before (on commit 4ba7058c61e8922f9c8397cfa1095fac325f809b):
+>
+> Test results below.
+>
+> | [mark@gravadlaks:~/src/kvm-unit-tests]% TESTNAME=pmu-chain-promotion TIMEOUT=90s ACCEL= useapp qemu ./arm/run arm/pmu.flat -smp 1 -append 'pmu-chain-promotion'
+> | timeout -k 1s --foreground 90s /home/mark/.opt/apps/qemu/bin/qemu-system-aarch64 -nodefaults -machine virt,gic-version=host -accel kvm -cpu host -device virtio-serial-device -device virtconsole,chardev=ctd -chardev testdev,id=ctd -device pci-testdev -display none -serial stdio -kernel arm/pmu.flat -smp 1 -append pmu-chain-promotion # -initrd /tmp/tmp.nl1i6S0EIY
+> | INFO: PMU version: 0x4
+> | INFO: PMU implementer/ID code: 0(" ")/0
+> | INFO: Implements 6 event counters
+> | PASS: pmu: pmu-chain-promotion: 32-bit overflows: chain counter not counting if even counter is disabled
+> | PASS: pmu: pmu-chain-promotion: 32-bit overflows: odd counter did not increment on overflow if disabled
+> | INFO: pmu: pmu-chain-promotion: 32-bit overflows: MEM_ACCESS counter #0 has value 0x7
+> | INFO: pmu: pmu-chain-promotion: 32-bit overflows: CHAIN counter #1 has value 0x0
+> | INFO: pmu: pmu-chain-promotion: 32-bit overflows: overflow counter 0x1
+> | INFO: pmu: pmu-chain-promotion: 32-bit overflows: MEM_ACCESS counter #0 has value 0x4
+> | INFO: pmu: pmu-chain-promotion: 32-bit overflows: MEM_ACCESS counter #0 has value 0x1b
+> | PASS: pmu: pmu-chain-promotion: 32-bit overflows: should have triggered an overflow on #0
+> | FAIL: pmu: pmu-chain-promotion: 32-bit overflows: CHAIN counter #1 shouldn't have incremented
+> | INFO: pmu: pmu-chain-promotion: 32-bit overflows: counter #0 = 0xffffffdc, counter #1 = 0x0 overflow=0x0
+> | INFO: pmu: pmu-chain-promotion: 32-bit overflows: MEM_ACCESS counter #0 has value 0x4
+> | INFO: pmu: pmu-chain-promotion: 32-bit overflows: MEM_ACCESS counter #0 has value 0x1b
+> | FAIL: pmu: pmu-chain-promotion: 32-bit overflows: CHAIN counter enabled: CHAIN counter was incremented and overflow
+> | INFO: pmu: pmu-chain-promotion: 32-bit overflows: CHAIN counter #1 = 0x0, overflow=0x1
+> | INFO: pmu: pmu-chain-promotion: 32-bit overflows: MEM_ACCESS counter #0 has value 0x4
+> | INFO: pmu: pmu-chain-promotion: 32-bit overflows: MEM_ACCESS counter #0 has value 0x1b
+> | FAIL: pmu: pmu-chain-promotion: 32-bit overflows: 32b->64b: CHAIN counter incremented and overflow
+> | INFO: pmu: pmu-chain-promotion: 32-bit overflows: CHAIN counter #1 = 0x0, overflow=0x1
+> | INFO: pmu: pmu-chain-promotion: 32-bit overflows: counter #0=0xfffffff3, counter #1=0x0
+> | PASS: pmu: pmu-chain-promotion: 32-bit overflows: overflow is expected on counter 0
+> | INFO: pmu: pmu-chain-promotion: 32-bit overflows: counter #0=0xa, counter #1=0xf9 overflow=0x1
+> | SUMMARY: 7 tests, 3 unexpected failures
+>
+> After:
+>
+> | [mark@gravadlaks:~/src/kvm-unit-tests]% TESTNAME=pmu-chain-promotion TIMEOUT=90s ACCEL=kvm useapp qemu ./arm/run arm/pmu.flat -smp 1 -append 'pmu-chain-promotion'
+> | timeout -k 1s --foreground 90s /home/mark/.opt/apps/qemu/bin/qemu-system-aarch64 -nodefaults -machine virt,gic-version=host -accel kvm -cpu host -device virtio-serial-device -device virtconsole,chardev=ctd -chardev testdev,id=ctd -device pci-testdev -display none -serial stdio -kernel arm/pmu.flat -smp 1 -append pmu-chain-promotion # -initrd /tmp/tmp.pahLyg1F3s
+> | INFO: PMU version: 0x4
+> | INFO: PMU implementer/ID code: 0(" ")/0
+> | INFO: Implements 6 event counters
+> | INFO: pmu: pmu-chain-promotion: 32-bit overflows: subtest1: post #1=0x0 #0=0x0 overflow=0x0
+> | PASS: pmu: pmu-chain-promotion: 32-bit overflows: subtest1: chain counter not counting if even counter is disabled
+> | INFO: pmu: pmu-chain-promotion: 32-bit overflows: subtest2: post #1=0x0 #0=0xf3 overflow=0x1
+> | PASS: pmu: pmu-chain-promotion: 32-bit overflows: subtest2: odd counter did not increment on overflow if disabled
+> | INFO: pmu: pmu-chain-promotion: 32-bit overflows: subtest3: init #1=0x0 #0=0xfffffea1 overflow=0x0
+> | INFO: pmu: pmu-chain-promotion: 32-bit overflows: subtest3: After 1st loop #1=0x0 #0=0xffffffa0 overflow=0x0
+> | INFO: pmu: pmu-chain-promotion: 32-bit overflows: subtest3: After 2d loop #1=0x0 #0=0xc0 overflow=0x1
+> | PASS: pmu: pmu-chain-promotion: 32-bit overflows: subtest3: should have triggered an overflow on #0
+> | PASS: pmu: pmu-chain-promotion: 32-bit overflows: subtest3: CHAIN counter #1 shouldn't have incremented
+> | INFO: pmu: pmu-chain-promotion: 32-bit overflows: subtest4: init #1=0x0 #0=0xfffffea1 overflow=0x0
+> | INFO: pmu: pmu-chain-promotion: 32-bit overflows: subtest4: After 1st loop #1=0x0 #0=0xffffffb7 overflow=0x0
+> | INFO: pmu: pmu-chain-promotion: 32-bit overflows: subtest4: After 2d loop #1=0x1 #0=0xbc overflow=0x1
+> | PASS: pmu: pmu-chain-promotion: 32-bit overflows: subtest4: CHAIN counter enabled: CHAIN counter was incremented and overflow
+> | INFO: pmu: pmu-chain-promotion: 32-bit overflows: subtest5: init #1=0x0 #0=0xfffffea1 overflow=0x0
+> | INFO: pmu: pmu-chain-promotion: 32-bit overflows: subtest5: After 1st loop #1=0x22c #0=0xffffff9f overflow=0x0
+> | INFO: pmu: pmu-chain-promotion: 32-bit overflows: subtest5: After 2d loop #1=0x1 #0=0x9d overflow=0x1
+> | PASS: pmu: pmu-chain-promotion: 32-bit overflows: subtest5: 32b->64b: CHAIN counter incremented and overflow
+> | INFO: pmu: pmu-chain-promotion: 32-bit overflows: subtest6: init #1=0x0 #0=0xfffffea1 overflow=0x0
+> | INFO: pmu: pmu-chain-promotion: 32-bit overflows: subtest6: After 1st loop #1=0x0 #0=0xffffff9f overflow=0x0
+> | INFO: pmu: pmu-chain-promotion: 32-bit overflows: subtest6: After 2d loop #1=0x1f9 #0=0x9c overflow=0x1
+> | PASS: pmu: pmu-chain-promotion: 32-bit overflows: subtest6: overflow is expected on counter 0
+> | SUMMARY: 7 tests
+>
+> As a bonus, the mem-access and memaccess-reliability results:
+>
+> | [mark@gravadlaks:~/src/kvm-unit-tests]% TESTNAME=pmu-chain-promotion TIMEOUT=90s ACCEL=kvm useapp qemu ./arm/run arm/pmu.flat -smp 1 -append 'pmu-mem-access'     
+> | timeout -k 1s --foreground 90s /home/mark/.opt/apps/qemu/bin/qemu-system-aarch64 -nodefaults -machine virt,gic-version=host -accel kvm -cpu host -device virtio-serial-device -device virtconsole,chardev=ctd -chardev testdev,id=ctd -device pci-testdev -display none -serial stdio -kernel arm/pmu.flat -smp 1 -append pmu-mem-access # -initrd /tmp/tmp.84AeEp8Tiw
+> | INFO: PMU version: 0x4
+> | INFO: PMU implementer/ID code: 0(" ")/0
+> | INFO: Implements 6 event counters
+> | INFO: pmu: pmu-mem-access: 32-bit overflows: counter #0 is 0x15 (MEM_ACCESS)
+> | INFO: pmu: pmu-mem-access: 32-bit overflows: counter #1 is 0x15 (MEM_ACCESS)
+> | PASS: pmu: pmu-mem-access: 32-bit overflows: Ran 20 mem accesses
+> | PASS: pmu: pmu-mem-access: 32-bit overflows: Ran 20 mem accesses with expected overflows on both counters
+> | INFO: pmu: pmu-mem-access: 32-bit overflows: cnt#0=0x8 cnt#1=0x8 overflow=0x3
+> | SKIP: pmu: pmu-mem-access: 64-bit overflows: Skip test as 64 overflows need FEAT_PMUv3p5
+> | SUMMARY: 3 tests, 1 skipped
+> | [mark@gravadlaks:~/src/kvm-unit-tests]% TESTNAME=pmu-chain-promotion TIMEOUT=90s ACCEL=kvm useapp qemu ./arm/run arm/pmu.flat -smp 1 -append 'pmu-memaccess-reliability'
+> | timeout -k 1s --foreground 90s /home/mark/.opt/apps/qemu/bin/qemu-system-aarch64 -nodefaults -machine virt,gic-version=host -accel kvm -cpu host -device virtio-serial-device -device virtconsole,chardev=ctd -chardev testdev,id=ctd -device pci-testdev -display none -serial stdio -kernel arm/pmu.flat -smp 1 -append pmu-memaccess-reliability # -initrd /tmp/tmp.ZToqwencZR
+> | INFO: PMU version: 0x4
+> | INFO: PMU implementer/ID code: 0(" ")/0
+> | INFO: Implements 6 event counters
+> | INFO: pmu: pmu-memaccess-reliability: 32-bit overflows: overflow=0 min=251 max=283 COUNT=250 MARGIN=100
+> | PASS: pmu: pmu-memaccess-reliability: 32-bit overflows: memaccess is reliable
+> | SKIP: pmu: pmu-memaccess-reliability: 64-bit overflows: Skip test as 64 overflows need FEAT_PMUv3p5
+> | SUMMARY: 2 tests, 1 skipped
+>
+> Thanks,
+> Mark.
+>
 
