@@ -2,158 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2383C6E7951
-	for <lists+kvm@lfdr.de>; Wed, 19 Apr 2023 14:06:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 424F36E7AAB
+	for <lists+kvm@lfdr.de>; Wed, 19 Apr 2023 15:27:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233072AbjDSMGY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Apr 2023 08:06:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58530 "EHLO
+        id S232708AbjDSN1r (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Apr 2023 09:27:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35020 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230141AbjDSMGW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Apr 2023 08:06:22 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 583F21991;
-        Wed, 19 Apr 2023 05:06:21 -0700 (PDT)
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 33JBmiVs034942;
-        Wed, 19 Apr 2023 12:05:38 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=XxQyWGNU20y3Wnv7oBYdxQVoyeJRqhv7cvwcPncLqqk=;
- b=MaUkKBXx8iVhZnQfi2RDt8faEETMnMKAbEzNZO+lpYZA4Qzm/42cfcABcujSIwghRV0X
- 3PeqNDRd4IaTppWUkLe9WhVR7DHaK67napzSWb0/fyAY5su8TJWCvhMrkWNBKYnZzWpL
- nrZow2Y7r/vmn90Ku0+11UMeCHt4krQqymOUrwysBfKhQ3gB8XVNTfmR2AisCvruWOoC
- HGrgnECisFQCMRlF+rKjlvt0AJiiXkbKhxoPOW9SAl/j9H94nYFHqgnk9sLjyUqIjTb9
- M4kh5I4Iraa1TWc6fPCqKtgixwG8fAM688OISqzSFuM22pbbenILF8ksGHq+DRGoNVxP lg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3q2apmt6hp-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 19 Apr 2023 12:05:38 +0000
-Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 33JBoDWh003607;
-        Wed, 19 Apr 2023 12:05:37 GMT
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3q2apmt6g9-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 19 Apr 2023 12:05:37 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 33J0WAFx000870;
-        Wed, 19 Apr 2023 12:05:34 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-        by ppma03ams.nl.ibm.com (PPS) with ESMTPS id 3pykj6jqcr-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 19 Apr 2023 12:05:34 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-        by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 33JC5V2D45941078
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 19 Apr 2023 12:05:31 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4647620040;
-        Wed, 19 Apr 2023 12:05:31 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 91F6F20043;
-        Wed, 19 Apr 2023 12:05:27 +0000 (GMT)
-Received: from [9.171.27.132] (unknown [9.171.27.132])
-        by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Wed, 19 Apr 2023 12:05:27 +0000 (GMT)
-Message-ID: <ab586b59-7d62-2ea1-a617-ffbcf91f4037@linux.ibm.com>
-Date:   Wed, 19 Apr 2023 14:05:26 +0200
+        with ESMTP id S231532AbjDSN1q (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Apr 2023 09:27:46 -0400
+Received: from mail-wm1-x336.google.com (mail-wm1-x336.google.com [IPv6:2a00:1450:4864:20::336])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F028430D4
+        for <kvm@vger.kernel.org>; Wed, 19 Apr 2023 06:27:44 -0700 (PDT)
+Received: by mail-wm1-x336.google.com with SMTP id ay3-20020a05600c1e0300b003f17289710aso1428021wmb.5
+        for <kvm@vger.kernel.org>; Wed, 19 Apr 2023 06:27:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1681910863; x=1684502863;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=kkkrGlU9guI0JvyD1T54QsTpahgEat/z1jkPIGHCfN4=;
+        b=o30beV+jrmTwRJr1WMeQHULYfzQstzX18mq4baNeZpNbC4t1aFeeGw2XCvNrMwXIcg
+         GUe6PKsMKZFz+H6Ym9YQI570jngeI5sGSR6MW7FoTYlmyckrdrt5v2Y2tomrBzotIK0G
+         HepxX1bEzoYurneXhiTt+ELYg70YHNTZPtfJGahPzDh9+HPsXAxtrIoykN25J62MJVSw
+         /8sGXeO/qnmT7fPNTOLj3wsD1rHIvPs/+fCk3cl+4ylSF/1B+UWz8e9+U1x3+JHJQd6m
+         /jLJZsvg2wMMpawvYCrErb7pJExkIPL8G5mMArmwle0bbBmiVLDIhXs972a8q1W/QT8I
+         hZGA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1681910863; x=1684502863;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=kkkrGlU9guI0JvyD1T54QsTpahgEat/z1jkPIGHCfN4=;
+        b=gAviWKXrcotM0WjshsHKdBBLZS+6QQ+Jmiid8VmnVs5Ao6VFdWK7SOx7dCMyByGWBc
+         zGkYfDD1TnQrvP0J4KZe4530Qy5riCAcmSJykpQFIXXfNKvUCxrj5uo59gy4D6XgRrgO
+         e4l2aMwixqxPjQ73YSpbAPJP+WZNvO0hL5PGll5evuT/87mc/WnhZAERwZP7rUvrOKcH
+         UBOroytQr9A8lw1NK/z4/jtBvuc1qDxsX+zD+bNdQRK7qyaQpCYZFnomnxb0AXftqy+e
+         fhymgJuKM9rGnqflC1qjBDUIk14SHo5/nwEFjgyZtTIRgNn7Aq+NFFDilds0+cBXzrGx
+         ngFQ==
+X-Gm-Message-State: AAQBX9dJ22ZIs5yIXOgf4jzn5UDJH6CJcAan6oXhpCFPoEdF8mS8xkHw
+        GYZ1EgCEJ4vODRcZinOFP3nd476y7Ox87xd/3Do=
+X-Google-Smtp-Source: AKy350aH4C3Cyuv9WMEgbdNXuzWtyqCljZ03/lZj/BA5xTGEwgqGc+xqiXukC4JMEqcy1q1dPZumgw==
+X-Received: by 2002:a7b:c417:0:b0:3f1:70e8:c1ac with SMTP id k23-20020a7bc417000000b003f170e8c1acmr9664781wmi.8.1681910863290;
+        Wed, 19 Apr 2023 06:27:43 -0700 (PDT)
+Received: from localhost.localdomain (054592b0.skybroadband.com. [5.69.146.176])
+        by smtp.gmail.com with ESMTPSA id p8-20020a05600c358800b003f1738d0d13sm3497017wmq.1.2023.04.19.06.27.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 19 Apr 2023 06:27:42 -0700 (PDT)
+From:   Jean-Philippe Brucker <jean-philippe@linaro.org>
+To:     kvm@vger.kernel.org, will@kernel.org
+Cc:     suzuki.poulose@arm.com,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>
+Subject: [PATCH kvmtool 00/16] Fix vhost-net, scsi and vsock
+Date:   Wed, 19 Apr 2023 14:21:04 +0100
+Message-Id: <20230419132119.124457-1-jean-philippe@linaro.org>
+X-Mailer: git-send-email 2.40.0
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Subject: Re: [PATCH v4 3/6] mm/gup: remove vmas parameter from
- get_user_pages_remote()
-Content-Language: en-US
-To:     Lorenzo Stoakes <lstoakes@gmail.com>, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org,
-        Andrew Morton <akpm@linux-foundation.org>
-Cc:     Matthew Wilcox <willy@infradead.org>,
-        David Hildenbrand <david@redhat.com>,
-        linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-perf-users@vger.kernel.org,
-        linux-security-module@vger.kernel.org,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Eric Biederman <ebiederm@xmission.com>,
-        Kees Cook <keescook@chromium.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Christian Brauner <brauner@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Jiri Olsa <jolsa@kernel.org>,
-        Namhyung Kim <namhyung@kernel.org>,
-        Ian Rogers <irogers@google.com>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        Kentaro Takeda <takedakn@nttdata.co.jp>,
-        Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
-        Paul Moore <paul@paul-moore.com>,
-        James Morris <jmorris@namei.org>,
-        "Serge E . Hallyn" <serge@hallyn.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-References: <cover.1681831798.git.lstoakes@gmail.com>
- <7c6f1ae88320bf11d2f583178a3d9e653e06ac63.1681831798.git.lstoakes@gmail.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
-In-Reply-To: <7c6f1ae88320bf11d2f583178a3d9e653e06ac63.1681831798.git.lstoakes@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: YoUBdd5kWLHDb-6WjYvIk2NpjLH1WX8c
-X-Proofpoint-GUID: aezbm9zbIzDKmcuHzP9oULlrIcksYyaJ
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
- definitions=2023-04-19_06,2023-04-18_01,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 phishscore=0
- suspectscore=0 priorityscore=1501 mlxlogscore=566 adultscore=0
- lowpriorityscore=0 mlxscore=0 impostorscore=0 bulkscore=0 malwarescore=0
- clxscore=1011 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2303200000 definitions=main-2304190108
-X-Spam-Status: No, score=-4.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 4/18/23 17:49, Lorenzo Stoakes wrote:
-> The only instances of get_user_pages_remote() invocations which used the
-> vmas parameter were for a single page which can instead simply look up the
-> VMA directly. In particular:-
-> 
-> - __update_ref_ctr() looked up the VMA but did nothing with it so we simply
->    remove it.
-> 
-> - __access_remote_vm() was already using vma_lookup() when the original
->    lookup failed so by doing the lookup directly this also de-duplicates the
->    code.
-> 
-> We are able to perform these VMA operations as we already hold the
-> mmap_lock in order to be able to call get_user_pages_remote().
-> 
-> As part of this work we add get_user_page_vma_remote() which abstracts the
-> VMA lookup, error handling and decrementing the page reference count should
-> the VMA lookup fail.
-> 
-> This forms part of a broader set of patches intended to eliminate the vmas
-> parameter altogether.
-> 
-> Reviewed-by: Catalin Marinas <catalin.marinas@arm.com> (for arm64)
-> Acked-by: David Hildenbrand <david@redhat.com>
-> Signed-off-by: Lorenzo Stoakes <lstoakes@gmail.com>
-> ---
+Kvmtool supports the three kernel vhost devices, but since they are not
+trivial to test, that support has not followed kvmtool core changes over
+time and is now severely broken. Restore vhost support to its former glory.
 
-For the s390 part:
-Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
+Patches 1-4 introduce virtio/vhost.c to gather common operations, and
+patches 5-11 finish fixing the vhost devices.
+
+Patch 12 adds documentation about testing all virtio devices, so that
+vhost support can be kept up to date more easily in the future. 
+
+Patches 13-16 add support for vhost when the device does not use MSIs
+(virtio-mmio or virtio-pci without a MSI-capable irqchip). That's only
+nice to have, but is easy enough to implement.
+
+Patch 17 documents and fixes a possible issue which will appear when
+enabling CCA or pKVM.
+
+Jean-Philippe Brucker (16):
+  virtio: Factor vhost initialization
+  virtio/vhost: Factor vring operation
+  virtio/vhost: Factor notify_vq_eventfd()
+  virtio/vhost: Factor notify_vq_gsi()
+  virtio/scsi: Move VHOST_SCSI_SET_ENDPOINT to device start
+  virtio/scsi: Fix and simplify command-line
+  disk/core: Fix segfault on exit with SCSI
+  virtio/scsi: Initialize max_target
+  virtio/scsi: Fix feature selection
+  virtio/vsock: Fix feature selection
+  virtio/net: Fix feature selection
+  virtio: Document how to test the devices
+  virtio: Fix messages about missing Linux config
+  Factor epoll thread
+  virtio/vhost: Support line interrupt signaling
+  virtio/vhost: Clear VIRTIO_F_ACCESS_PLATFORM
+
+ Makefile                     |   2 +
+ Documentation/io-testing.txt | 141 +++++++++++++++++++++++
+ include/kvm/disk-image.h     |   7 +-
+ include/kvm/epoll.h          |  17 +++
+ include/kvm/virtio.h         |  16 +++
+ disk/core.c                  |  15 +--
+ epoll.c                      |  89 +++++++++++++++
+ ioeventfd.c                  |  94 +++-------------
+ kvm-ipc.c                    | 103 +++++------------
+ virtio/core.c                |   1 +
+ virtio/net.c                 | 120 +++-----------------
+ virtio/scsi.c                | 118 ++++++--------------
+ virtio/vhost.c               | 209 +++++++++++++++++++++++++++++++++++
+ virtio/vsock.c               | 134 +++++-----------------
+ 14 files changed, 602 insertions(+), 464 deletions(-)
+ create mode 100644 Documentation/io-testing.txt
+ create mode 100644 include/kvm/epoll.h
+ create mode 100644 epoll.c
+ create mode 100644 virtio/vhost.c
+
+-- 
+2.40.0
 
