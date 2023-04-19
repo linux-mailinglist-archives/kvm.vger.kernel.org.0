@@ -2,169 +2,171 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A9AF66E743C
-	for <lists+kvm@lfdr.de>; Wed, 19 Apr 2023 09:44:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C3F4A6E7475
+	for <lists+kvm@lfdr.de>; Wed, 19 Apr 2023 09:55:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232374AbjDSHoa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Apr 2023 03:44:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58820 "EHLO
+        id S230340AbjDSHzL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Apr 2023 03:55:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43308 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232046AbjDSHny (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Apr 2023 03:43:54 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03ED6A5D5
-        for <kvm@vger.kernel.org>; Wed, 19 Apr 2023 00:43:27 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 9364662F3B
-        for <kvm@vger.kernel.org>; Wed, 19 Apr 2023 07:43:26 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5AA24C433D2;
-        Wed, 19 Apr 2023 07:43:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1681890206;
-        bh=Ph+AAW24rYPBEnSvM4IgbKn1qjlAp05TGyLFtVPz7dE=;
-        h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-        b=OxP7OLls4SzwPY7IMv87WLFfDOQHCMYO2CpXtTAvb7oRv5oRDK6xb173pMhRPps5B
-         hmH8uzn4cABQFTr+HoheMk5wRlBLdxqixEZGurk3zbCPhg1S4bfCHokukQaukGIeMq
-         yKgJMmptnvkMv1jLo6FdctEEupRnDulN2ilAm71dMpxmFwFnaplz5RS94ywicJQIf+
-         YMreate4oQMcbCrh/U4Rt7KMsH1jOoc6I0D0j0y54WVZNaHUbIMeARC4iWTrLzvf2u
-         WVmbeKMQpLRqKQsERTy0ek6QlEYhHFg2HEegzhd3lGsdXyPuDTtbirXBgFnnn7lUrd
-         NG6SdMNWRUgHg==
-From:   =?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>
-To:     Andy Chiu <andy.chiu@sifive.com>, linux-riscv@lists.infradead.org,
-        palmer@dabbelt.com, anup@brainfault.org, atishp@atishpatra.org,
-        kvm-riscv@lists.infradead.org, kvm@vger.kernel.org
-Cc:     vineetg@rivosinc.com, greentime.hu@sifive.com,
-        guoren@linux.alibaba.com, Andy Chiu <andy.chiu@sifive.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Tom Rix <trix@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        "GNU C Library" <libc-alpha@sourceware.org>,
-        "Andrew Waterman" <andrew@sifive.com>
-Subject: Re: [PATCH -next v18 00/20] riscv: Add vector ISA support
-In-Reply-To: <20230414155843.12963-1-andy.chiu@sifive.com>
-References: <20230414155843.12963-1-andy.chiu@sifive.com>
-Date:   Wed, 19 Apr 2023 09:43:22 +0200
-Message-ID: <87cz4048rp.fsf@all.your.base.are.belong.to.us>
+        with ESMTP id S231464AbjDSHzI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Apr 2023 03:55:08 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D972AF16
+        for <kvm@vger.kernel.org>; Wed, 19 Apr 2023 00:54:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1681890851;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Ku4/Si8D6xrlYmDkiBxBM7QW/Zhm4h1GUH6h0hqbhBo=;
+        b=KEl+iPBF+usjCmxggqrsRVXnav4zRJuun8FrN9XXc+MKcjf0bERK0b1H1FCAyzVksqFg77
+        iEcyx6SxHhLMZKFKSu0kA8NOs/iFynlywZEXMJIbk9G4Rtkf34FiYn4HLI+tN9iYrZciI+
+        o7nsSzj1VMsuNi31HJqUWJTCDeJhSus=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-299-qkEZ5nYENHmGzDEib4vA8A-1; Wed, 19 Apr 2023 03:54:09 -0400
+X-MC-Unique: qkEZ5nYENHmGzDEib4vA8A-1
+Received: by mail-wm1-f71.google.com with SMTP id a19-20020a05600c349300b003f17146a8deso831891wmq.3
+        for <kvm@vger.kernel.org>; Wed, 19 Apr 2023 00:54:09 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1681890849; x=1684482849;
+        h=content-transfer-encoding:in-reply-to:subject:organization:from
+         :references:cc:to:content-language:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Ku4/Si8D6xrlYmDkiBxBM7QW/Zhm4h1GUH6h0hqbhBo=;
+        b=C+nIroZNPwGNWvmONcFdpyu9+nJd3xLTE+M/GO8wXPZ7lHOi2i4w3oGtUzQy8vgc9j
+         LwF9US1L5P+weTCeHMoE/0nfSct/QYqbr6vliY1NhIY9+h+4U0vKFhAilj74pKuHhJ7f
+         eIqKS7lqOWZEUYo/sdFrpK/zfca5KmTUgPbx8gl0JPY0f7M/ZTEiY7shiDNGJXVQ4pqu
+         tG1zfx2Jkt0wl9ONTTjBVhyKuySwNsLgQtaDnTBu3pTTEF8ntiDDny9pvbEMiP7NwKrT
+         sZuiMnSPsH2RrgsIjUz3k7Wrh3Ox3YD4QwDc46Suu4JL+bi44JIBXzQ9c6+gWf9sA6QZ
+         abHA==
+X-Gm-Message-State: AAQBX9e/tNevCFTV3ALKrMfU/cO07ed6x/FOFo6ftuZhv64vQpzElxlU
+        GFM7vrm1BuKIecVDfH79Qaxug6TRVM89kiOGsNg2lPEbaO6ZqO3svtRBIXi2IW+Q5voOfISkeSO
+        SqApzc6Rw7sa3
+X-Received: by 2002:a05:600c:2305:b0:3f1:728a:1881 with SMTP id 5-20020a05600c230500b003f1728a1881mr7565085wmo.31.1681890848810;
+        Wed, 19 Apr 2023 00:54:08 -0700 (PDT)
+X-Google-Smtp-Source: AKy350ZGeCzv8hHHPCLoBp3+kn6wkQN0cMnv6OhMvvwsxXxMwENw712YUrmrVhvIskYHJBvgTLUksw==
+X-Received: by 2002:a05:600c:2305:b0:3f1:728a:1881 with SMTP id 5-20020a05600c230500b003f1728a1881mr7565048wmo.31.1681890848428;
+        Wed, 19 Apr 2023 00:54:08 -0700 (PDT)
+Received: from ?IPV6:2003:cb:c70b:7b00:7c52:a5fa:8004:96fd? (p200300cbc70b7b007c52a5fa800496fd.dip0.t-ipconnect.de. [2003:cb:c70b:7b00:7c52:a5fa:8004:96fd])
+        by smtp.gmail.com with ESMTPSA id l26-20020a1ced1a000000b003eeb1d6a470sm1327085wmh.13.2023.04.19.00.54.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 19 Apr 2023 00:54:08 -0700 (PDT)
+Message-ID: <e0c0ad67-f23f-ff35-80bf-841dcfd43d99@redhat.com>
+Date:   Wed, 19 Apr 2023 09:54:06 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+Content-Language: en-US
+To:     Vishal Moola <vishal.moola@gmail.com>
+Cc:     Andrew Morton <akpm@linux-foundation.org>,
+        Matthew Wilcox <willy@infradead.org>, linux-mm@kvack.org,
+        linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-csky@vger.kernel.org, linux-hexagon@vger.kernel.org,
+        loongarch@lists.linux.dev, linux-m68k@lists.linux-m68k.org,
+        linux-mips@vger.kernel.org, linux-openrisc@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, linux-riscv@lists.infradead.org,
+        linux-s390@vger.kernel.org, linux-sh@vger.kernel.org,
+        sparclinux@vger.kernel.org, linux-um@lists.infradead.org,
+        xen-devel@lists.xenproject.org, kvm@vger.kernel.org
+References: <20230417205048.15870-1-vishal.moola@gmail.com>
+ <20230417205048.15870-2-vishal.moola@gmail.com>
+ <da600570-51c7-8088-b46b-7524c9e66e5d@redhat.com>
+ <CAOzc2pwpRhNoFbdzdzuvrqbZdf2OsrTvBGs40QCZJjA5fS_q1A@mail.gmail.com>
+From:   David Hildenbrand <david@redhat.com>
+Organization: Red Hat
+Subject: Re: [PATCH 01/33] s390: Use _pt_s390_gaddr for gmap address tracking
+In-Reply-To: <CAOzc2pwpRhNoFbdzdzuvrqbZdf2OsrTvBGs40QCZJjA5fS_q1A@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Andy Chiu <andy.chiu@sifive.com> writes:
+On 18.04.23 23:33, Vishal Moola wrote:
+> On Tue, Apr 18, 2023 at 8:45 AM David Hildenbrand <david@redhat.com> wrote:
+>>
+>> On 17.04.23 22:50, Vishal Moola (Oracle) wrote:
+>>> s390 uses page->index to keep track of page tables for the guest address
+>>> space. In an attempt to consolidate the usage of page fields in s390,
+>>> replace _pt_pad_2 with _pt_s390_gaddr to replace page->index in gmap.
+>>>
+>>> This will help with the splitting of struct ptdesc from struct page, as
+>>> well as allow s390 to use _pt_frag_refcount for fragmented page table
+>>> tracking.
+>>>
+>>> Since page->_pt_s390_gaddr aliases with mapping, ensure its set to NULL
+>>> before freeing the pages as well.
+>>>
+>>> Signed-off-by: Vishal Moola (Oracle) <vishal.moola@gmail.com>
+>>> ---
+>>
+>> [...]
+>>
+>>> diff --git a/include/linux/mm_types.h b/include/linux/mm_types.h
+>>> index 3fc9e680f174..2616d64c0e8c 100644
+>>> --- a/include/linux/mm_types.h
+>>> +++ b/include/linux/mm_types.h
+>>> @@ -144,7 +144,7 @@ struct page {
+>>>                struct {        /* Page table pages */
+>>>                        unsigned long _pt_pad_1;        /* compound_head */
+>>>                        pgtable_t pmd_huge_pte; /* protected by page->ptl */
+>>> -                     unsigned long _pt_pad_2;        /* mapping */
+>>> +                     unsigned long _pt_s390_gaddr;   /* mapping */
+>>>                        union {
+>>>                                struct mm_struct *pt_mm; /* x86 pgds only */
+>>>                                atomic_t pt_frag_refcount; /* powerpc */
+>>
+>> The confusing part is, that these gmap page tables are not ordinary
+>> process page tables that we would ordinarily place into this section
+>> here. That's why they are also not allocated/freed using the typical
+>> page table constructor/destructor ...
+> 
+> I initially thought the same, so I was quite confused when I saw
+> __gmap_segment_gaddr was using pmd_pgtable_page().
+> 
+> Although they are not ordinary process page tables, since we
+> eventually want to move them out of struct page, I think shifting them
+> to be in ptdescs, being a memory descriptor for page tables, makes
+> the most sense.
 
-> This patchset is implemented based on vector 1.0 spec to add vector suppo=
-rt
-> in riscv Linux kernel. There are some assumptions for this implementation=
-s.
->
-> 1. We assume all harts has the same ISA in the system.
-> 2. We disable vector in both kernel and user space [1] by default. Only
->    enable an user's vector after an illegal instruction trap where it
->    actually starts executing vector (the first-use trap [2]).
-> 3. We detect "riscv,isa" to determine whether vector is support or not.
->
-> We defined a new structure __riscv_v_ext_state in struct thread_struct to
-> save/restore the vector related registers. It is used for both kernel spa=
-ce
-> and user space.
->  - In kernel space, the datap pointer in __riscv_v_ext_state will be
->    allocated to save vector registers.
->  - In user space,
-> 	- In signal handler of user space, the structure is placed
-> 	  right after __riscv_ctx_hdr, which is embedded in fp reserved
-> 	  aera. This is required to avoid ABI break [2]. And datap points
-> 	  to the end of __riscv_v_ext_state.
-> 	- In ptrace, the data will be put in ubuf in which we use
-> 	  riscv_vr_get()/riscv_vr_set() to get or set the
-> 	  __riscv_v_ext_state data structure from/to it, datap pointer
-> 	  would be zeroed and vector registers will be copied to the
-> 	  address right after the __riscv_v_ext_state structure in ubuf.
->
-> This patchset is rebased to v6.3-rc1 and it is tested by running several
-> vector programs simultaneously. It delivers signals correctly in a test
-> where we can see a valid ucontext_t in a signal handler, and a correct V
-> context returing back from it. And the ptrace interface is tested by
-> PTRACE_{GET,SET}REGSET. Lastly, KVM is tested by running above tests in
-> a guest using the same kernel image. All tests are done on an rv64gcv
-> virt QEMU.
->
-> Note: please apply the patch at [4] due to a regression introduced by
-> commit 596ff4a09b89 ("cpumask: re-introduce constant-sized cpumask
-> optimizations") before testing the series.
->
-> Source tree:
-> https://github.com/sifive/riscv-linux/tree/riscv/for-next/vector-v18
+Seeing utilities like tlb_remove_page_ptdesc() that don't really apply 
+to such page tables, I wonder if we should much rather treat such 
+shadow/auxiliary/... page tables (just like other architectures like 
+x86, arm, ... employ as well) as a distinct type.
 
-After some offlist discussions, we might have a identified a
-potential libc->application ABI break.
+And have ptdesc be the common type for all process page tables.
 
-Given an application that does custom task scheduling via a signal
-handler. The application binary is not vector aware, but libc is. Libc
-is using vector registers for memcpy. It's an "old application, new
-library, new kernel"-scenario.
+> 
+> Another option is to leave pmd_pgtable_page() as is just for this case.
+> Or we can revert commit 7e25de77bc5ea which uses the function here
+> then figure out where these gmap pages table pages will go later.
 
- | ...
- | struct context *p1_ctx;
- | struct context *p2_ctx;
- |=20
- | void sighandler(int sig, siginfo_t *info, void *ucontext)
- | {
- |   if (p1_running)
- |     switch_to(p1_ctx, p2_ctx);
- |   if (p2_running)
- |     switch_to(p2_ctx, p1_ctx);
- | }
- |=20
- | void p1(void)
- | {
- |   memcpy(foo, bar, 17);
- | }
- |=20
- | void p2(void)
- | {
- |   ...
- | }
- | ...
+I'm always confused when reading gmap code, so let me have another look :)
 
-The switch_to() function schedules p1() and p2(). E.g., the
-application (assumes that it) saves the complete task state from
-sigcontext (ucontext) to p1_ctx, and restores sigcontext to p2_ctx, so
-when sigreturn is called, p2() is running, and p1() has been
-interrupted.
+The confusing part is that s390x shares the lowest level page tables 
+(PTE tables) between the process and gmap ("guest mapping", similar to 
+EPT on x86-64). It maps these process PTE tables (covering 1 MiB) into 
+gmap-specific PMD tables.
 
-The "old application" which is not aware of vector, is now run on a
-vector enabled kernel/glibc.
+pmd_pgtable_page() should indeed always give us a gmap-specific 
+PMD-table. In fact, something allocated via gmap_alloc_table().
 
-Assume that the sighandler is hit, and p1() is in the middle of the
-vector memcpy. The switch_to() function will not save the vector
-state, and next time p2() is scheduled to run it will have incorrect
-machine state.
+Decoupling both concepts sounds like a good idea.
 
-Now:
+-- 
+Thanks,
 
-Is this an actual or theoretical problem (i.e. are there any
-applications in the wild)? I'd be surprised if it would not be the
-latter...
+David / dhildenb
 
-Regardless, a kernel knob for disabling vector (sysctl/prctl) to avoid
-these kind of breaks is needed (right?). Could this knob be a
-follow-up patch to the existing v18 series?
-
-Note that arm64 does not suffer from this with SVE, because the default
-vector length (vl=3D=3D0/128b*32) fits in the "legacy" sigcontext.
-
-
-Bj=C3=B6rn
