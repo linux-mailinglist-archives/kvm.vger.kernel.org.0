@@ -2,75 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DC7A66E826F
-	for <lists+kvm@lfdr.de>; Wed, 19 Apr 2023 22:12:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 116536E8273
+	for <lists+kvm@lfdr.de>; Wed, 19 Apr 2023 22:16:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231165AbjDSUMd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Apr 2023 16:12:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36306 "EHLO
+        id S231368AbjDSUQZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Apr 2023 16:16:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37516 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231664AbjDSUMc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Apr 2023 16:12:32 -0400
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33787E60
-        for <kvm@vger.kernel.org>; Wed, 19 Apr 2023 13:12:31 -0700 (PDT)
-Received: from pps.filterd (m0246627.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 33JJnOd5031006;
-        Wed, 19 Apr 2023 20:12:15 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=corp-2023-03-30;
- bh=XKIy0ZBTdMOaNjP7Zjq9MLxDS1roUT1I1gMca7iGeiQ=;
- b=abGylF+Fp4mIU17T7BP5Tm76cWXdRTzzLe+p0H0CgHYbIE+1f27toCnSkbPZfW/CbHyc
- u9pocbt8bSN6PyPLa4tS3Hb31W8oZjoZrNdyZMmvM8D0KZouRt0tv1VXchllT+8n+FdE
- yX3nbbX6c2b/K8H8+l+HcVsX3YI+sind2XnEBpESbt1F4AOLu5mXr6ayv6+Bhx2+40fu
- alFb/A7P8DqUEbnF3Onv5v+eIltnjLKHxglduMpkKHH7gCKWsPmAJNr/QIoucZJun61b
- VTOScYyeGhZ8cd18vYFvjtDiuHfLtKHIOA3h5uEAKmStCfl5bDPTcXEqNMnVcG43UOOr HA== 
-Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.appoci.oracle.com [138.1.114.2])
-        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3pyjh1sach-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 19 Apr 2023 20:12:15 +0000
-Received: from pps.filterd (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-        by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 33JJOhfH011088;
-        Wed, 19 Apr 2023 20:12:14 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-        by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3pyjc6wx2a-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 19 Apr 2023 20:12:14 +0000
-Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 33JKC8Qk016607;
-        Wed, 19 Apr 2023 20:12:14 GMT
-Received: from joaomart-mac.uk.oracle.com (dhcp-10-175-164-99.vpn.oracle.com [10.175.164.99])
-        by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 3pyjc6wwxu-3;
-        Wed, 19 Apr 2023 20:12:13 +0000
-From:   Joao Martins <joao.m.martins@oracle.com>
-To:     iommu@lists.linux.dev
-Cc:     Joerg Roedel <joro@8bytes.org>,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        Vasant Hegde <vasant.hegde@amd.com>,
-        Will Deacon <will@kernel.org>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Alejandro Jimenez <alejandro.j.jimenez@oracle.com>,
-        kvm@vger.kernel.org, Joao Martins <joao.m.martins@oracle.com>
-Subject: [PATCH v3 2/2] iommu/amd: Handle GALog overflows
-Date:   Wed, 19 Apr 2023 21:11:54 +0100
-Message-Id: <20230419201154.83880-3-joao.m.martins@oracle.com>
-In-Reply-To: <20230419201154.83880-1-joao.m.martins@oracle.com>
-References: <20230419201154.83880-1-joao.m.martins@oracle.com>
+        with ESMTP id S229682AbjDSUQY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Apr 2023 16:16:24 -0400
+Received: from mail-lj1-x22f.google.com (mail-lj1-x22f.google.com [IPv6:2a00:1450:4864:20::22f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB42D10CC
+        for <kvm@vger.kernel.org>; Wed, 19 Apr 2023 13:16:22 -0700 (PDT)
+Received: by mail-lj1-x22f.google.com with SMTP id bz21so265821ljb.11
+        for <kvm@vger.kernel.org>; Wed, 19 Apr 2023 13:16:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1681935381; x=1684527381;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=wRtalYFerwmw+OfWqRHaDlMXdJ7bPKZ2DC5Ux2SX7bk=;
+        b=ZpPTB5sEUEIXZMe6tZZo1OfRBcRYN8rWCYtnuywY4w9BEdpriIZEFQB+aBDJJEA/3O
+         /LAWUUZtLhycv74Xfnwy6aKSCUMU/PrakTiEtneG20KwCnnihflcriJ3e2aUo+ynXjP4
+         qe1W/N01rFFrNkc6VKwSAKBReovz6typFgrlAxnIuE9+qfT/fk8pwD7qFeTq+Oc8RyyV
+         Mg9a4saGfQVIH6k8lhjL3V24VUsokjsuUtsv9Mx848aW+ozSP1aY3JnmGyR9XGKcQnci
+         EGAl1+tfUotT52TnsC1cUv1lq+U96CNb/l0tzOYVFbeCr6u+T3k6x85e1wumu4sFWOom
+         i+pw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1681935381; x=1684527381;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=wRtalYFerwmw+OfWqRHaDlMXdJ7bPKZ2DC5Ux2SX7bk=;
+        b=W4Dr6g4r8w1lNLNN0MyxaqmbxZ2ak5A30DPjing56mvmEKgbhGm7/O+bLUhu17RcRI
+         G1vbwgonGHSH5VFvGtbWGgGenXxkpJwPkebLrPExm9NYkwg0eL1yU0Nli+Gqg2WKzhnz
+         8E1l5m6Ay5TrkPgQLbiluIGor8dqiKpxADW/Axz4omFW8cjyDxN9QQFGeLlP0EQx7S4T
+         aOooXr7iyMot3vzq48oKxL6pUoozplvmJ6rR6bxs1UqwtUeQ9MhuUuTN6D2z80xoFUQd
+         E2iKPvhZfDtO0IGtpYokfko90sjrt9TXikJ0M6d7nWW4iLlbGWxZ01IjarlfwESv0N1M
+         yevA==
+X-Gm-Message-State: AAQBX9fm1CxEfY7Rqo6JoLvX+Y+8imoaEDlz88lhEEkyDe91PWybbTfL
+        rJ+9d0ZeT3Fbj+s/BL2bOcb2H0xb9dIZ92mqP/R95A==
+X-Google-Smtp-Source: AKy350a61cd30/1k5ScgIWz3PotN3G1jxvViqqtdGsP/m0LPV2TMsOkaGYsESWdlgcba+fmv1IJrcksdAj5636iC7/0=
+X-Received: by 2002:a05:651c:10e:b0:29d:d0b:7a78 with SMTP id
+ a14-20020a05651c010e00b0029d0d0b7a78mr2460294ljb.21.1681935380656; Wed, 19
+ Apr 2023 13:16:20 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
- definitions=2023-04-19_14,2023-04-18_01,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 adultscore=0
- malwarescore=0 mlxlogscore=826 mlxscore=0 bulkscore=0 phishscore=0
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2303200000 definitions=main-2304190174
-X-Proofpoint-GUID: JnDwv9Twbubi9AlrymirBedpNvX60kWd
-X-Proofpoint-ORIG-GUID: JnDwv9Twbubi9AlrymirBedpNvX60kWd
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+References: <20230412213510.1220557-1-amoorthy@google.com> <ZEBHTw3+DcAnPc37@x1n>
+In-Reply-To: <ZEBHTw3+DcAnPc37@x1n>
+From:   Axel Rasmussen <axelrasmussen@google.com>
+Date:   Wed, 19 Apr 2023 13:15:44 -0700
+Message-ID: <CAJHvVchBqQ8iVHgF9cVZDusMKQM2AjtNx2z=i9ZHP2BosN4tBg@mail.gmail.com>
+Subject: Re: [PATCH v3 00/22] Improve scalability of KVM + userfaultfd live
+ migration via annotated memory faults.
+To:     Peter Xu <peterx@redhat.com>
+Cc:     Anish Moorthy <amoorthy@google.com>, pbonzini@redhat.com,
+        maz@kernel.org, oliver.upton@linux.dev, seanjc@google.com,
+        jthoughton@google.com, bgardon@google.com, dmatlack@google.com,
+        ricarkol@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -78,128 +72,104 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-GALog exists to propagate interrupts into all vCPUs in the system when
-interrupts are marked as non running (e.g. when vCPUs aren't running). A
-GALog overflow happens when there's in no space in the log to record the
-GATag of the interrupt. So when the GALOverflow condition happens, the
-GALog queue is processed and the GALog is restarted, as the IOMMU
-manual indicates in section "2.7.4 Guest Virtual APIC Log Restart
-Procedure":
+On Wed, Apr 19, 2023 at 12:56=E2=80=AFPM Peter Xu <peterx@redhat.com> wrote=
+:
+>
+> Hi, Anish,
+>
+> On Wed, Apr 12, 2023 at 09:34:48PM +0000, Anish Moorthy wrote:
+> > KVM's demand paging self test is extended to demonstrate the performanc=
+e
+> > benefits of using the two new capabilities to bypass the userfaultfd
+> > wait queue. The performance samples below (rates in thousands of
+> > pages/s, n =3D 5), were generated using [2] on an x86 machine with 256
+> > cores.
+> >
+> > vCPUs, Average Paging Rate (w/o new caps), Average Paging Rate (w/ new =
+caps)
+> > 1       150     340
+> > 2       191     477
+> > 4       210     809
+> > 8       155     1239
+> > 16      130     1595
+> > 32      108     2299
+> > 64      86      3482
+> > 128     62      4134
+> > 256     36      4012
+>
+> The number looks very promising.  Though..
+>
+> >
+> > [1] https://lore.kernel.org/linux-mm/CADrL8HVDB3u2EOhXHCrAgJNLwHkj2Lka1=
+B_kkNb0dNwiWiAN_Q@mail.gmail.com/
+> > [2] ./demand_paging_test -b 64M -u MINOR -s shmem -a -v <n> -r <n> [-w]
+> >     A quick rundown of the new flags (also detailed in later commits)
+> >         -a registers all of guest memory to a single uffd.
+>
+> ... this is the worst case scenario.  I'd say it's slightly unfair to
+> compare by first introducing a bottleneck then compare with it. :)
+>
+> Jokes aside: I'd think it'll make more sense if such a performance soluti=
+on
+> will be measured on real systems showing real benefits, because so far it=
+'s
+> still not convincing enough if it's only with the test especially with on=
+ly
+> one uffd.
+>
+> I don't remember whether I used to discuss this with James before, but..
+>
+> I know that having multiple uffds in productions also means scattered gue=
+st
+> memory and scattered VMAs all over the place.  However split the guest
+> large mem into at least a few (or even tens of) VMAs may still be somethi=
+ng
+> worth trying?  Do you think that'll already solve some of the contentions
+> on userfaultfd, either on the queue or else?
 
-| * Wait until MMIO Offset 2020h[GALogRun]=0b so that all request
-|   entries are completed as circumstances allow. GALogRun must be 0b to
-|   modify the guest virtual APIC log registers safely.
-| * Write MMIO Offset 0018h[GALogEn]=0b.
-| * As necessary, change the following values (e.g., to relocate or
-| resize the guest virtual APIC event log):
-|   - the Guest Virtual APIC Log Base Address Register
-|      [MMIO Offset 00E0h],
-|   - the Guest Virtual APIC Log Head Pointer Register
-|      [MMIO Offset 2040h][GALogHead], and
-|   - the Guest Virtual APIC Log Tail Pointer Register
-|      [MMIO Offset 2048h][GALogTail].
-| * Write MMIO Offset 2020h[GALOverflow] = 1b to clear the bit (W1C).
-| * Write MMIO Offset 0018h[GALogEn] = 1b, and either set
-|   MMIO Offset 0018h[GAIntEn] to enable the GA log interrupt or clear
-|   the bit to disable it.
+We considered sharding into several UFFDs. I do think it helps, but
+also I think there are two main problems with it:
 
-Failing to handle the GALog overflow means that none of the VFs (in any
-guest) will work with IOMMU AVIC forcing the user to power cycle the
-host. When handling the event it resumes the GALog without resizing
-much like how it is done in the event handler overflow. The
-[MMIO Offset 2020h][GALOverflow] bit might be set in status register
-without the [MMIO Offset 2020h][GAInt] bit, so when deciding to poll
-for GA events (to clear space in the galog), also check the overflow
-bit.
+- One is, I think there's a limit to how much you'd want to do that.
+E.g. splitting guest memory in 1/2, or in 1/10, could be reasonable,
+but 1/100 or 1/1000 might become ridiculous in terms of the
+"scattering" of VMAs and so on like you mentioned. Especially for very
+large VMs (e.g. consider Google offers VMs with ~11T of RAM [1]) I'm
+not sure splitting just "slightly" is enough to get good performance.
 
-[suravee: Check for GAOverflow without GAInt, toggle CONTROL_GAINT_EN]
-Co-developed-by: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
-Signed-off-by: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
-Signed-off-by: Joao Martins <joao.m.martins@oracle.com>
-Reviewed-by: Vasant Hegde <vasant.hegde@amd.com>
----
- drivers/iommu/amd/amd_iommu.h |  1 +
- drivers/iommu/amd/init.c      | 24 ++++++++++++++++++++++++
- drivers/iommu/amd/iommu.c     |  9 ++++++++-
- 3 files changed, 33 insertions(+), 1 deletion(-)
+- Another is, sharding UFFDs sort of assumes accesses are randomly
+distributed across the guest physical address space. I'm not sure this
+is guaranteed for all possible VMs / customer workloads. In other
+words, even if we shard across several UFFDs, we may end up with a
+small number of them being "hot".
 
-diff --git a/drivers/iommu/amd/amd_iommu.h b/drivers/iommu/amd/amd_iommu.h
-index c160a332ce33..24c7e6c6c0de 100644
---- a/drivers/iommu/amd/amd_iommu.h
-+++ b/drivers/iommu/amd/amd_iommu.h
-@@ -15,6 +15,7 @@ extern irqreturn_t amd_iommu_int_thread(int irq, void *data);
- extern irqreturn_t amd_iommu_int_handler(int irq, void *data);
- extern void amd_iommu_apply_erratum_63(struct amd_iommu *iommu, u16 devid);
- extern void amd_iommu_restart_event_logging(struct amd_iommu *iommu);
-+extern void amd_iommu_restart_ga_log(struct amd_iommu *iommu);
- extern int amd_iommu_init_devices(void);
- extern void amd_iommu_uninit_devices(void);
- extern void amd_iommu_init_notifier(void);
-diff --git a/drivers/iommu/amd/init.c b/drivers/iommu/amd/init.c
-index 19a46b9f7357..fd487c33b28a 100644
---- a/drivers/iommu/amd/init.c
-+++ b/drivers/iommu/amd/init.c
-@@ -751,6 +751,30 @@ void amd_iommu_restart_event_logging(struct amd_iommu *iommu)
- 	iommu_feature_enable(iommu, CONTROL_EVT_LOG_EN);
- }
- 
-+/*
-+ * This function restarts event logging in case the IOMMU experienced
-+ * an GA log overflow.
-+ */
-+void amd_iommu_restart_ga_log(struct amd_iommu *iommu)
-+{
-+	u32 status;
-+
-+	status = readl(iommu->mmio_base + MMIO_STATUS_OFFSET);
-+	if (status & MMIO_STATUS_GALOG_RUN_MASK)
-+		return;
-+
-+	pr_info_ratelimited("IOMMU GA Log restarting\n");
-+
-+	iommu_feature_disable(iommu, CONTROL_GALOG_EN);
-+	iommu_feature_disable(iommu, CONTROL_GAINT_EN);
-+
-+	writel(MMIO_STATUS_GALOG_OVERFLOW_MASK,
-+	       iommu->mmio_base + MMIO_STATUS_OFFSET);
-+
-+	iommu_feature_enable(iommu, CONTROL_GAINT_EN);
-+	iommu_feature_enable(iommu, CONTROL_GALOG_EN);
-+}
-+
- /*
-  * This function resets the command buffer if the IOMMU stopped fetching
-  * commands from it.
-diff --git a/drivers/iommu/amd/iommu.c b/drivers/iommu/amd/iommu.c
-index fbe77ee2d26c..b6f52f5529eb 100644
---- a/drivers/iommu/amd/iommu.c
-+++ b/drivers/iommu/amd/iommu.c
-@@ -845,6 +845,7 @@ amd_iommu_set_pci_msi_domain(struct device *dev, struct amd_iommu *iommu) { }
- 	(MMIO_STATUS_EVT_OVERFLOW_INT_MASK | \
- 	 MMIO_STATUS_EVT_INT_MASK | \
- 	 MMIO_STATUS_PPR_INT_MASK | \
-+	 MMIO_STATUS_GALOG_OVERFLOW_MASK | \
- 	 MMIO_STATUS_GALOG_INT_MASK)
- 
- irqreturn_t amd_iommu_int_thread(int irq, void *data)
-@@ -868,10 +869,16 @@ irqreturn_t amd_iommu_int_thread(int irq, void *data)
- 		}
- 
- #ifdef CONFIG_IRQ_REMAP
--		if (status & MMIO_STATUS_GALOG_INT_MASK) {
-+		if (status & (MMIO_STATUS_GALOG_INT_MASK |
-+			      MMIO_STATUS_GALOG_OVERFLOW_MASK)) {
- 			pr_devel("Processing IOMMU GA Log\n");
- 			iommu_poll_ga_log(iommu);
- 		}
-+
-+		if (status & MMIO_STATUS_GALOG_OVERFLOW_MASK) {
-+			pr_info_ratelimited("IOMMU GA Log overflow\n");
-+			amd_iommu_restart_ga_log(iommu);
-+		}
- #endif
- 
- 		if (status & MMIO_STATUS_EVT_OVERFLOW_INT_MASK) {
--- 
-2.17.2
+A benefit to Anish's series is that it solves the problem more
+fundamentally, and allows demand paging with no "global" locking. So,
+it will scale better regardless of VM size, or access pattern.
 
+[1]: https://cloud.google.com/compute/docs/memory-optimized-machines
+
+>
+> With a bunch of VMAs and userfaultfds (paired with uffd fault handler
+> threads, totally separate uffd queues), I'd expect to some extend other
+> things can pop up already, e.g., the network bandwidth, without teaching
+> each vcpu thread to report uffd faults themselves.
+>
+> These are my pure imaginations though, I think that's also why it'll be
+> great if such a solution can be tested more or less on a real migration
+> scenario to show its real benefits.
+
+I wonder, is there an existing open source QEMU/KVM based live
+migration stress test?
+
+I think we could share numbers from some of our internal benchmarks,
+or at the very least give relative numbers (e.g. +50% increase), but
+since a lot of the software stack is proprietary (e.g. we don't use
+QEMU), it may not be that useful or reproducible for folks.
+
+>
+> Thanks,
+>
+> --
+> Peter Xu
+>
