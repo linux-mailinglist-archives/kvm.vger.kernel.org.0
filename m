@@ -2,178 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B27E46E7D81
-	for <lists+kvm@lfdr.de>; Wed, 19 Apr 2023 16:54:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A0D236E7DAB
+	for <lists+kvm@lfdr.de>; Wed, 19 Apr 2023 17:10:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232789AbjDSOyn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Apr 2023 10:54:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52774 "EHLO
+        id S232666AbjDSPKW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Apr 2023 11:10:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60672 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232651AbjDSOy2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Apr 2023 10:54:28 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE425122
-        for <kvm@vger.kernel.org>; Wed, 19 Apr 2023 07:54:27 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 486DA63E73
-        for <kvm@vger.kernel.org>; Wed, 19 Apr 2023 14:54:27 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 31284C4339B;
-        Wed, 19 Apr 2023 14:54:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1681916066;
-        bh=K7L77fXIx/AW5YbmsAG7ay6yVgjlxRqJ7wqR/qYv+0Q=;
-        h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-        b=rUPaZs/8QZI8lF1os5IMYRE3kYvuns4ArF/TTmgLqKn+SBFgdJHLDbs0RqVqivXUe
-         M6Rm88B214jyRz1wb3OPcgHqjzL18xucaNApNTz1/XR7N7tiqcvW0uYz3mbwep4w2l
-         Ds728ndZU149nrHH7E9u3JkzzAoJdBFcJ9Crs+JKuXpXCigVbe0HLYMb3fZJaf4p6Q
-         OotGCZy/Uze+TnsUVGnCsrO4vz5nRjuDwNWmkNJRdnnCRA/mQEKehf5fUgY+1aP9cD
-         91m0uEuccEY5AFRgByi83HIyk7OsbPryC8OqLPo8Ulv9BkCAdX1UoYbCqqLd5Uyz7s
-         8Rx6UXBQIqhpw==
-From:   =?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>
-To:     Andy Chiu <andy.chiu@sifive.com>, linux-riscv@lists.infradead.org,
-        palmer@dabbelt.com, anup@brainfault.org, atishp@atishpatra.org,
-        kvm-riscv@lists.infradead.org, kvm@vger.kernel.org
-Cc:     vineetg@rivosinc.com, greentime.hu@sifive.com,
-        guoren@linux.alibaba.com, Andy Chiu <andy.chiu@sifive.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Tom Rix <trix@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        GNU C Library <libc-alpha@sourceware.org>,
-        Andrew Waterman <andrew@sifive.com>
-Subject: Re: [PATCH -next v18 00/20] riscv: Add vector ISA support
-In-Reply-To: <87cz4048rp.fsf@all.your.base.are.belong.to.us>
-References: <20230414155843.12963-1-andy.chiu@sifive.com>
- <87cz4048rp.fsf@all.your.base.are.belong.to.us>
-Date:   Wed, 19 Apr 2023 16:54:23 +0200
-Message-ID: <87leinq5wg.fsf@all.your.base.are.belong.to.us>
+        with ESMTP id S233016AbjDSPKS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Apr 2023 11:10:18 -0400
+Received: from mail-wr1-x436.google.com (mail-wr1-x436.google.com [IPv6:2a00:1450:4864:20::436])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0FF317A88
+        for <kvm@vger.kernel.org>; Wed, 19 Apr 2023 08:10:14 -0700 (PDT)
+Received: by mail-wr1-x436.google.com with SMTP id ffacd0b85a97d-2f4c431f69cso2093249f8f.0
+        for <kvm@vger.kernel.org>; Wed, 19 Apr 2023 08:10:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1681917012; x=1684509012;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=RTp707aoq2VL3Qyls5q+vhYkSC8xhwbjxcwGksIlGTY=;
+        b=dZ86B+B5bMwEcC77US6b5/zYCbLxclMJHYVW5xDtcjFsJh/EgrerjrkrLev2QR5r9F
+         fpmsFERfV9fddrwYIkWRcc0g3lAtQ5I2i8sMPvQUfU+ecXjhXQVVaep/SWiiZVQz12OJ
+         lSClOWmmaIxLTE8OZwR5S5JuOPNoU3nqFOm+ucByMGxl7hfhucq8agstJCwpof9BWgjG
+         MtYIPhKD+R/a/Q4EP3qwnQrtUrfZR/odd/zMMDX18/QGYJaOTr3NM3qor9tNoedsNs7i
+         R2ozDpgb3MUZjT1UBd/L2vkqyWoJLKZQ59XdSvPvh3nlsj/Tjh33XZYK4gHZrA0mFa4z
+         ZWbA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1681917012; x=1684509012;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=RTp707aoq2VL3Qyls5q+vhYkSC8xhwbjxcwGksIlGTY=;
+        b=FPLNBaUgX0hio92UBuWsovV0RxR2s9VFBI4pjTdDcrFE/SV+H4S97Tt/4KrXnYYgwe
+         9G7AoepESTU7CZ0yFoFYWO+G3Ys4+LAYwCIKkzeEfSPbgt+eJLTlC+RnRhBhWRjOkCI4
+         98hS15Wkp1l0J7gbvPvIYI5UXRfnrRBUnrMA3BXyW2VXfeGYIZDqIwededB7LppiGIIz
+         AIUtLSr7zjmriTO3ZNRVh0d8+/qyu0fwFsEwnwNBtC2aTUDomMBh5NzqwtgNdrq8MLX2
+         9pLkBnYeEnobzkWcGbzGc7JfuZ2NoEEDN6EcZK8lcwfAgi2LmV0YcKPd9Q/oPKKudmix
+         il+Q==
+X-Gm-Message-State: AAQBX9e32ISV8iEU8lWfRawXGzLRX3Ai2zpzz0QfyIToJaktb2fZJ81R
+        4S8uD5x4MqUzNZRsEFhB1XDUJA==
+X-Google-Smtp-Source: AKy350YioTZMIEYukG65amYT6Pbt32IBNWH269Y0PdowtyZTAcEtmKnkX8eeN9uEaQWRGjCjqgMrCg==
+X-Received: by 2002:a5d:6dd0:0:b0:2f8:4e37:4eeb with SMTP id d16-20020a5d6dd0000000b002f84e374eebmr5110801wrz.17.1681917012410;
+        Wed, 19 Apr 2023 08:10:12 -0700 (PDT)
+Received: from myrica (054592b0.skybroadband.com. [5.69.146.176])
+        by smtp.gmail.com with ESMTPSA id t5-20020adfeb85000000b002e71156b0fcsm15985375wrn.6.2023.04.19.08.10.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 19 Apr 2023 08:10:12 -0700 (PDT)
+Date:   Wed, 19 Apr 2023 16:10:13 +0100
+From:   Jean-Philippe Brucker <jean-philippe@linaro.org>
+To:     Andre Przywara <andre.przywara@arm.com>
+Cc:     Will Deacon <will@kernel.org>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        kvm@vger.kernel.org, Alexandru Elisei <alexandru.elisei@arm.com>,
+        Sami Mujawar <sami.mujawar@arm.com>
+Subject: Re: [PATCH kvmtool 0/2] Fix virtio/rng handling in low entropy
+ situations
+Message-ID: <20230419151013.GC94027@myrica>
+References: <20230413165757.1728800-1-andre.przywara@arm.com>
+ <20230419135832.GB94027@myrica>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230419135832.GB94027@myrica>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Bj=C3=B6rn T=C3=B6pel <bjorn@kernel.org> writes:
+On Wed, Apr 19, 2023 at 02:58:32PM +0100, Jean-Philippe Brucker wrote:
+> On Thu, Apr 13, 2023 at 05:57:55PM +0100, Andre Przywara wrote:
+> > I am not sure we now really need patch 2 anymore (originally I had this
+> > one before I switched to /dev/urandom). I *think* even a read from
+> > /dev/urandom can return early (because of a signal, for instance), so
+> > a return with 0 bytes read seems possible.
+> 
+> Given that this should be very rare, maybe a simple loop would be better
+> than switching the blocking mode?  It's certainly a good idea to apply the
+> "MUST" requirements from virtio.
 
-> Andy Chiu <andy.chiu@sifive.com> writes:
->
->> This patchset is implemented based on vector 1.0 spec to add vector supp=
-ort
->> in riscv Linux kernel. There are some assumptions for this implementatio=
-ns.
->>
->> 1. We assume all harts has the same ISA in the system.
->> 2. We disable vector in both kernel and user space [1] by default. Only
->>    enable an user's vector after an illegal instruction trap where it
->>    actually starts executing vector (the first-use trap [2]).
->> 3. We detect "riscv,isa" to determine whether vector is support or not.
->>
->> We defined a new structure __riscv_v_ext_state in struct thread_struct to
->> save/restore the vector related registers. It is used for both kernel sp=
-ace
->> and user space.
->>  - In kernel space, the datap pointer in __riscv_v_ext_state will be
->>    allocated to save vector registers.
->>  - In user space,
->> 	- In signal handler of user space, the structure is placed
->> 	  right after __riscv_ctx_hdr, which is embedded in fp reserved
->> 	  aera. This is required to avoid ABI break [2]. And datap points
->> 	  to the end of __riscv_v_ext_state.
->> 	- In ptrace, the data will be put in ubuf in which we use
->> 	  riscv_vr_get()/riscv_vr_set() to get or set the
->> 	  __riscv_v_ext_state data structure from/to it, datap pointer
->> 	  would be zeroed and vector registers will be copied to the
->> 	  address right after the __riscv_v_ext_state structure in ubuf.
->>
->> This patchset is rebased to v6.3-rc1 and it is tested by running several
->> vector programs simultaneously. It delivers signals correctly in a test
->> where we can see a valid ucontext_t in a signal handler, and a correct V
->> context returing back from it. And the ptrace interface is tested by
->> PTRACE_{GET,SET}REGSET. Lastly, KVM is tested by running above tests in
->> a guest using the same kernel image. All tests are done on an rv64gcv
->> virt QEMU.
->>
->> Note: please apply the patch at [4] due to a regression introduced by
->> commit 596ff4a09b89 ("cpumask: re-introduce constant-sized cpumask
->> optimizations") before testing the series.
->>
->> Source tree:
->> https://github.com/sifive/riscv-linux/tree/riscv/for-next/vector-v18
->
-> After some offlist discussions, we might have a identified a
-> potential libc->application ABI break.
->
-> Given an application that does custom task scheduling via a signal
-> handler. The application binary is not vector aware, but libc is. Libc
-> is using vector registers for memcpy. It's an "old application, new
-> library, new kernel"-scenario.
->
->  | ...
->  | struct context *p1_ctx;
->  | struct context *p2_ctx;
->  |=20
->  | void sighandler(int sig, siginfo_t *info, void *ucontext)
->  | {
->  |   if (p1_running)
->  |     switch_to(p1_ctx, p2_ctx);
->  |   if (p2_running)
->  |     switch_to(p2_ctx, p1_ctx);
->  | }
->  |=20
->  | void p1(void)
->  | {
->  |   memcpy(foo, bar, 17);
->  | }
->  |=20
->  | void p2(void)
->  | {
->  |   ...
->  | }
->  | ...
->
-> The switch_to() function schedules p1() and p2(). E.g., the
-> application (assumes that it) saves the complete task state from
-> sigcontext (ucontext) to p1_ctx, and restores sigcontext to p2_ctx, so
-> when sigreturn is called, p2() is running, and p1() has been
-> interrupted.
->
-> The "old application" which is not aware of vector, is now run on a
-> vector enabled kernel/glibc.
->
-> Assume that the sighandler is hit, and p1() is in the middle of the
-> vector memcpy. The switch_to() function will not save the vector
-> state, and next time p2() is scheduled to run it will have incorrect
-> machine state.
->
-> Now:
->
-> Is this an actual or theoretical problem (i.e. are there any
-> applications in the wild)? I'd be surprised if it would not be the
-> latter...
->
-> Regardless, a kernel knob for disabling vector (sysctl/prctl) to avoid
-> these kind of breaks is needed (right?). Could this knob be a
-> follow-up patch to the existing v18 series?
->
-> Note that arm64 does not suffer from this with SVE, because the default
-> vector length (vl=3D=3D0/128b*32) fits in the "legacy" sigcontext.
+Digging a bit more, the manpage [1] is helpful:
 
-Andy, to clarify from the patchwork call; In
-Documentation/arm64/sve.rst:
+	The O_NONBLOCK flag has no effect when opening /dev/urandom.
+	When calling read(2) for the device /dev/urandom, reads of up to
+	256 bytes will return as many bytes as are requested and will not
+	be interrupted by a signal handler. Reads with a buffer over
+	this limit may return less than the requested number of bytes or
+	fail with the error EINTR, if interrupted by a signal handler.
 
-There's a per-process prctl (section 6), and a system runtime conf
-(section 9).
+So I guess you can also drop the O_NONBLOCK flag in patch 1. And for the
+second one, maybe we could fallback to a 256 bytes read if the first one
+fails
 
+Thanks,
+Jean
 
-Bj=C3=B6rn
+[1] https://man7.org/linux/man-pages/man4/urandom.4.html
+
