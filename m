@@ -2,74 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 46DF66E7E18
-	for <lists+kvm@lfdr.de>; Wed, 19 Apr 2023 17:20:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 18BAD6E7E40
+	for <lists+kvm@lfdr.de>; Wed, 19 Apr 2023 17:29:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233298AbjDSPU1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Apr 2023 11:20:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42490 "EHLO
+        id S232876AbjDSP3I (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Apr 2023 11:29:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52646 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233773AbjDSPUD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Apr 2023 11:20:03 -0400
-Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A819FB754
-        for <kvm@vger.kernel.org>; Wed, 19 Apr 2023 08:19:31 -0700 (PDT)
-Received: by mail-pf1-x42e.google.com with SMTP id d2e1a72fcca58-63b73203e0aso16868815b3a.1
-        for <kvm@vger.kernel.org>; Wed, 19 Apr 2023 08:19:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=dabbelt-com.20221208.gappssmtp.com; s=20221208; t=1681917515; x=1684509515;
-        h=content-transfer-encoding:mime-version:message-id:to:from:cc
-         :in-reply-to:subject:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=EXO4Ni/kSG0H+ktMq4uVlmS1jzHn6kSPNbg8TaaS/64=;
-        b=I4jQQN9eouwrtidT/DUB5WkdlKm7L9khwPMcUJauiyf8rJBlAame3Q6t26oPRiuSir
-         V3NyYYQfjijqMtyz4ev2S1hLM+LwD+YrOUp2rTORUxgdnYFZWTCnXzqi0qurWwdWpAJX
-         ferp2EQ10dVH3l6PH+pe0zSyJusaWqAVsodVenXc7KIql+/i8ytrAGSr+57wYwsRlH/k
-         J627seCPgxf2b+o7lKaElPnIF/3SZHvf0nQbzYndGZeaNYzcTo0aiJj+u9mxtoxu0QF1
-         YXmqCEBnVVBulUo18BOb3Uflq2ruhl3mE8lgHWtUtv48MIffji2W9NZh4wDSryamlC3T
-         5CLQ==
+        with ESMTP id S232220AbjDSP3G (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Apr 2023 11:29:06 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FB06975C
+        for <kvm@vger.kernel.org>; Wed, 19 Apr 2023 08:27:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1681918045;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=0JNpJwmiFACkqi0TsruUzwO4IifuU5oAc++33wIMhdE=;
+        b=OVYMTVcb/jqxDC2nYzWwC5kaj6sxCid6nl6Ghl2aZA1jtYsr5IMk+lzpf3C/wikoslhCRh
+        2vi2SSz+5KbWy4IQucedU8CaEt8HW7y5cX5w6XQX9gJMzEH4BiNgKIXGGRecbviO7Cb9oT
+        gzRPJgGrvOhr6yTq75WYM4FVGUtULwY=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-642-gZ2XdE70OT6iKXO46Hyduw-1; Wed, 19 Apr 2023 11:27:23 -0400
+X-MC-Unique: gZ2XdE70OT6iKXO46Hyduw-1
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-2ff4bc7a6a3so269645f8f.3
+        for <kvm@vger.kernel.org>; Wed, 19 Apr 2023 08:27:23 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681917515; x=1684509515;
-        h=content-transfer-encoding:mime-version:message-id:to:from:cc
-         :in-reply-to:subject:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=EXO4Ni/kSG0H+ktMq4uVlmS1jzHn6kSPNbg8TaaS/64=;
-        b=UJS5B3WZE7KIXyZr0b71N62/bdPjtS1l1Dk3kmPoh4C8m50bgMWuIE2zIDc0Fe01nv
-         c11I/U1A8si0bqq1uEAVL4QIJobbgdHFmdZxfaiiGiziDmZ4QxTzI454KzyF7Do/jL32
-         uFhAsLxkxBiZBcY1QkExSDN6dbWABqiYzAFL+3of5X8ChkbJnVQm+kMfDLihkZVgQ52j
-         Gy7uVXThmcDyX9547JJv5aYluOZsdeV1IuSe18S6nf1bQHF293dAwBeOzW6PeELa8xMr
-         +kimWNu/bbGcgJ5kOxejMyQV0s2ARKJBwe5ojdabhRnOJ3ptHeIBCq13hb2V+vljODbL
-         1NwA==
-X-Gm-Message-State: AAQBX9dkAXc/wsM1C1s4gRvCVt+kRY/+nL+LSLZMnw/1FBRUBmfwxDZ4
-        6ktVWl14wItWHr59A6pzi8VlBA==
-X-Google-Smtp-Source: AKy350bZnV7c2T9bRz1wthVAe/bP3QzgvRgK4ReNB5NaaqF8YhlO6cXRmlyQ+YeTPBpXOFLIQygKdQ==
-X-Received: by 2002:a17:902:e742:b0:1a1:a727:a802 with SMTP id p2-20020a170902e74200b001a1a727a802mr3393492plf.19.1681917514986;
-        Wed, 19 Apr 2023 08:18:34 -0700 (PDT)
-Received: from localhost ([135.180.227.0])
-        by smtp.gmail.com with ESMTPSA id o4-20020a655bc4000000b0051b9e82d6d6sm6299141pgr.40.2023.04.19.08.18.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Apr 2023 08:18:34 -0700 (PDT)
-Date:   Wed, 19 Apr 2023 08:18:34 -0700 (PDT)
-X-Google-Original-Date: Wed, 19 Apr 2023 08:17:54 PDT (-0700)
-Subject:     Re: [PATCH -next v18 00/20] riscv: Add vector ISA support
-In-Reply-To: <87leinq5wg.fsf@all.your.base.are.belong.to.us>
-CC:     andy.chiu@sifive.com, linux-riscv@lists.infradead.org,
-        anup@brainfault.org, atishp@atishpatra.org,
-        kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
-        Vineet Gupta <vineetg@rivosinc.com>, greentime.hu@sifive.com,
-        guoren@linux.alibaba.com, andy.chiu@sifive.com,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        aou@eecs.berkeley.edu, nathan@kernel.org, ndesaulniers@google.com,
-        trix@redhat.com, Richard Henderson <richard.henderson@linaro.org>,
-        libc-alpha@sourceware.org, Andrew Waterman <andrew@sifive.com>
-From:   Palmer Dabbelt <palmer@dabbelt.com>
-To:     bjorn@kernel.org
-Message-ID: <mhng-607b5023-8f07-4a82-b292-35078123e9e8@palmer-ri-x1c9>
-Mime-Version: 1.0 (MHng)
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        d=1e100.net; s=20221208; t=1681918043; x=1684510043;
+        h=content-transfer-encoding:in-reply-to:organization:from:references
+         :cc:to:content-language:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=0JNpJwmiFACkqi0TsruUzwO4IifuU5oAc++33wIMhdE=;
+        b=l4h1sCf5knLJcECU5tjZkn02SrfB8H8k19Y+qbxyiHWjrAZzKdVjDh1OzOgsiLd0Gc
+         zfhh6CzY5DNuY5puwl2CpZetCuMPIXoQ1m4+jyblHdU9Veqb47sa/k0GcxyFZOZRDDsq
+         72a4WddBufHgOJTHHygabX4yx+vdSAQfwevXw5JSgZhPN/7c2Y9KzJtF7ZqHaZzhfcIE
+         GvWoAWsZpX8Tc5KhasGAU1jOZlcaeLerJBZ5eMEsl4aAqcXfUcNReTk2HSuoJ9H/CUjH
+         7wKjF2+qzD6isBtgKoizln92lJB/O+VuNlly41B1CduwxbUYiTiyJVL+w0fHzL2NfqZa
+         n0Uw==
+X-Gm-Message-State: AAQBX9cSoNnVt5nRjcyqbF8ZcAgXf4r607SuwVbvv4SmXVoeMO71FVDF
+        d4uUnIEvXo3t142n+mAFV0ODLFSL4vemrKMKcdjLxE4EWPdNM7nMJ8bQBTupKlBIV8X/mB9qyiX
+        9cOfMjR2/Qmuw
+X-Received: by 2002:adf:f8d1:0:b0:2f8:c65:2966 with SMTP id f17-20020adff8d1000000b002f80c652966mr5108637wrq.32.1681918042719;
+        Wed, 19 Apr 2023 08:27:22 -0700 (PDT)
+X-Google-Smtp-Source: AKy350bQCca7TZwC/DY71GMkp8QP25n5qhAvm8+MNF70jK0dZKOeYRWfyCK5MJywgo5ohbve6IL3HA==
+X-Received: by 2002:adf:f8d1:0:b0:2f8:c65:2966 with SMTP id f17-20020adff8d1000000b002f80c652966mr5108605wrq.32.1681918042384;
+        Wed, 19 Apr 2023 08:27:22 -0700 (PDT)
+Received: from ?IPV6:2003:cb:c70b:7b00:7c52:a5fa:8004:96fd? (p200300cbc70b7b007c52a5fa800496fd.dip0.t-ipconnect.de. [2003:cb:c70b:7b00:7c52:a5fa:8004:96fd])
+        by smtp.gmail.com with ESMTPSA id y9-20020a7bcd89000000b003f173c566b5sm2527616wmj.5.2023.04.19.08.27.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 19 Apr 2023 08:27:21 -0700 (PDT)
+Message-ID: <a7dcbf5f-8ccf-1078-4bde-6cd2ed883ae6@redhat.com>
+Date:   Wed, 19 Apr 2023 17:27:20 +0200
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+Subject: Re: Rename restrictedmem => guardedmem? (was: Re: [PATCH v10 0/9]
+ KVM: mm: fd-based approach for supporting KVM)
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Chao Peng <chao.p.peng@linux.intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        dhildenb@redhat.com, Quentin Perret <qperret@google.com>,
+        tabba@google.com, Michael Roth <michael.roth@amd.com>,
+        wei.w.wang@intel.com, Mike Rapoport <rppt@kernel.org>,
+        Liam Merwick <liam.merwick@oracle.com>,
+        Isaku Yamahata <isaku.yamahata@gmail.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Ackerley Tng <ackerleytng@google.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20221202061347.1070246-1-chao.p.peng@linux.intel.com>
+ <ZD1oevE8iHsi66T2@google.com>
+ <658018f9-581c-7786-795a-85227c712be0@redhat.com>
+ <ZD12htq6dWg0tg2e@google.com>
+ <1ed06a62-05a1-ebe6-7ac4-5b35ba272d13@redhat.com>
+ <ZD2bBB00eKP6F8kz@google.com>
+ <9efef45f-e9f4-18d1-0120-f0fc0961761c@redhat.com>
+ <ZD86E23gyzF6Q7AF@google.com>
+ <5869f50f-0858-ab0c-9049-4345abcf5641@redhat.com>
+ <ZEAGIe7m4lWW5mV+@google.com>
+From:   David Hildenbrand <david@redhat.com>
+Organization: Red Hat
+In-Reply-To: <ZEAGIe7m4lWW5mV+@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-4.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,
         T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -77,125 +108,44 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 19 Apr 2023 07:54:23 PDT (-0700), bjorn@kernel.org wrote:
-> Björn Töpel <bjorn@kernel.org> writes:
->
->> Andy Chiu <andy.chiu@sifive.com> writes:
->>
->>> This patchset is implemented based on vector 1.0 spec to add vector support
->>> in riscv Linux kernel. There are some assumptions for this implementations.
+On 19.04.23 17:17, Sean Christopherson wrote:
+> On Wed, Apr 19, 2023, David Hildenbrand wrote:
+>> On 19.04.23 02:47, Sean Christopherson wrote:
+>>> On Tue, Apr 18, 2023, David Hildenbrand wrote:
+>>>> "memfd_vm" / "vm_mem" would be sooo (feel free to add some more o's here)
+>>>> much easier to get. It's a special fd to be used to back VM memory. Depending
+>>>> on the VM type (encrypted/protected/whatever), restrictions might apply (not
+>>>> able to mmap, not able to read/write ...). For example, there really is no
+>>>> need to disallow mmap/read/write when using that memory to back a simple VM
+>>>> where all we want to do is avoid user-space page tables.
 >>>
->>> 1. We assume all harts has the same ISA in the system.
->>> 2. We disable vector in both kernel and user space [1] by default. Only
->>>    enable an user's vector after an illegal instruction trap where it
->>>    actually starts executing vector (the first-use trap [2]).
->>> 3. We detect "riscv,isa" to determine whether vector is support or not.
->>>
->>> We defined a new structure __riscv_v_ext_state in struct thread_struct to
->>> save/restore the vector related registers. It is used for both kernel space
->>> and user space.
->>>  - In kernel space, the datap pointer in __riscv_v_ext_state will be
->>>    allocated to save vector registers.
->>>  - In user space,
->>> 	- In signal handler of user space, the structure is placed
->>> 	  right after __riscv_ctx_hdr, which is embedded in fp reserved
->>> 	  aera. This is required to avoid ABI break [2]. And datap points
->>> 	  to the end of __riscv_v_ext_state.
->>> 	- In ptrace, the data will be put in ubuf in which we use
->>> 	  riscv_vr_get()/riscv_vr_set() to get or set the
->>> 	  __riscv_v_ext_state data structure from/to it, datap pointer
->>> 	  would be zeroed and vector registers will be copied to the
->>> 	  address right after the __riscv_v_ext_state structure in ubuf.
->>>
->>> This patchset is rebased to v6.3-rc1 and it is tested by running several
->>> vector programs simultaneously. It delivers signals correctly in a test
->>> where we can see a valid ucontext_t in a signal handler, and a correct V
->>> context returing back from it. And the ptrace interface is tested by
->>> PTRACE_{GET,SET}REGSET. Lastly, KVM is tested by running above tests in
->>> a guest using the same kernel image. All tests are done on an rv64gcv
->>> virt QEMU.
->>>
->>> Note: please apply the patch at [4] due to a regression introduced by
->>> commit 596ff4a09b89 ("cpumask: re-introduce constant-sized cpumask
->>> optimizations") before testing the series.
->>>
->>> Source tree:
->>> https://github.com/sifive/riscv-linux/tree/riscv/for-next/vector-v18
+>>> In seriousness, I do agree with Jason's very explicit objection[2] against naming
+>>> a non-KVM uAPI "guest", or any variation thereof.
 >>
->> After some offlist discussions, we might have a identified a
->> potential libc->application ABI break.
+>> While I agree, it's all better than the naming we use right now ...
 >>
->> Given an application that does custom task scheduling via a signal
->> handler. The application binary is not vector aware, but libc is. Libc
->> is using vector registers for memcpy. It's an "old application, new
->> library, new kernel"-scenario.
 >>
->>  | ...
->>  | struct context *p1_ctx;
->>  | struct context *p2_ctx;
->>  | 
->>  | void sighandler(int sig, siginfo_t *info, void *ucontext)
->>  | {
->>  |   if (p1_running)
->>  |     switch_to(p1_ctx, p2_ctx);
->>  |   if (p2_running)
->>  |     switch_to(p2_ctx, p1_ctx);
->>  | }
->>  | 
->>  | void p1(void)
->>  | {
->>  |   memcpy(foo, bar, 17);
->>  | }
->>  | 
->>  | void p2(void)
->>  | {
->>  |   ...
->>  | }
->>  | ...
+>> Let me throw "tee_mem" / "memfd_tee" into the picture. That could eventually
+>> catch what we want to have.
 >>
->> The switch_to() function schedules p1() and p2(). E.g., the
->> application (assumes that it) saves the complete task state from
->> sigcontext (ucontext) to p1_ctx, and restores sigcontext to p2_ctx, so
->> when sigreturn is called, p2() is running, and p1() has been
->> interrupted.
+>> Or "coco_mem" / "memfd_coco".
 >>
->> The "old application" which is not aware of vector, is now run on a
->> vector enabled kernel/glibc.
+>> Of course, both expect that people know the terminology (just like what "vm"
+>> stands for), but it's IMHO significantly better than
+>> restricted/guarded/opaque/whatsoever.
 >>
->> Assume that the sighandler is hit, and p1() is in the middle of the
->> vector memcpy. The switch_to() function will not save the vector
->> state, and next time p2() is scheduled to run it will have incorrect
->> machine state.
+>> Again, expresses what it's used for, not why it behaves in weird ways.
+> 
+> I don't want to explicitly tie this to trusted execution or confidential compute,
+> as there is value in backing "normal" guests with memory that cannot be accessed
+> by the host userspace without jumping through a few extra hoops, e.g. to add a
+> layer of protection against data corruption due to host userspace bugs.
 
-Thanks for writing this up, and sorry I've dropped the ball a few times on
-describing it.
+Nothing speaks against using tee_mem for the same purpose I guess. I 
+like the sound of it after all. :)
 
->> Now:
->>
->> Is this an actual or theoretical problem (i.e. are there any
->> applications in the wild)? I'd be surprised if it would not be the
->> latter...
+-- 
+Thanks,
 
-I also have no idea.  It's kind of odd to say "nobody cares about the 
-ABI break" when we can manifest it with some fairly simple example, but 
-I'd bet that nobody cares.
+David / dhildenb
 
->> Regardless, a kernel knob for disabling vector (sysctl/prctl) to avoid
->> these kind of breaks is needed (right?). Could this knob be a
->> follow-up patch to the existing v18 series?
->>
->> Note that arm64 does not suffer from this with SVE, because the default
->> vector length (vl==0/128b*32) fits in the "legacy" sigcontext.
->
-> Andy, to clarify from the patchwork call; In
-> Documentation/arm64/sve.rst:
->
-> There's a per-process prctl (section 6), and a system runtime conf
-> (section 9).
-
-I think if we want to play it safe WRT the ABI break, then we can 
-essentially just do the same thing.  It'll be a much bigger cliff for us 
-because we have no space for the V extension, but that was just a 
-mistake and there's nothing we can do about it.
-
-> Björn
