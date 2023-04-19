@@ -2,213 +2,247 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9E9636E7AF5
-	for <lists+kvm@lfdr.de>; Wed, 19 Apr 2023 15:35:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 545786E7B06
+	for <lists+kvm@lfdr.de>; Wed, 19 Apr 2023 15:37:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233546AbjDSNfS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Apr 2023 09:35:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43654 "EHLO
+        id S233182AbjDSNhc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Apr 2023 09:37:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46324 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233494AbjDSNfO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Apr 2023 09:35:14 -0400
-Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03AC01544B;
-        Wed, 19 Apr 2023 06:34:28 -0700 (PDT)
-Received: by mail-pf1-x436.google.com with SMTP id d2e1a72fcca58-63b73203e0aso16098003b3a.1;
-        Wed, 19 Apr 2023 06:34:27 -0700 (PDT)
+        with ESMTP id S232708AbjDSNha (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Apr 2023 09:37:30 -0400
+Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E57059F0
+        for <kvm@vger.kernel.org>; Wed, 19 Apr 2023 06:36:53 -0700 (PDT)
+Received: by mail-pl1-x62e.google.com with SMTP id d9443c01a7336-1a8097c1ccfso14689805ad.1
+        for <kvm@vger.kernel.org>; Wed, 19 Apr 2023 06:36:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1681911243; x=1684503243;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=PxKBdJz6P62xw3o1oOHy6gvL/UmSXqmJ0vRsGDHfXz4=;
-        b=mzt7zUu9/LUJvSIPaNj+nC+ArFvk3Wmz36d7P4hExfQnu/+5EJ/luadmhJCFNiq8eA
-         5mamh3uH/3u0VIJzJy4W31TNXYt1DvfBn6ZHGOaQZO/LaodxyaE7yMJE8BXQrMBetDD1
-         or6ct0PxWqhNSzFTI7QUR0GNkBsKZpZ79DqaN9iIdwxdDsEv8FenNeci7+RSvuikuLAT
-         68J4r2aw28njQbzjpScT2QNoBA3X+SSSqlRvn9uiCaccB9t2Uwb/G4C4D/IZDIaojb9q
-         azW1GR2HjveVXh0qkoLiSeS/y+b+MPHfKKr5FHg+1Fk7e61fzU4VCdWEM74x3aiYuZwi
-         ZxNA==
+        d=gmail.com; s=20221208; t=1681911413; x=1684503413;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:subject:from:user-agent:mime-version:date:message-id:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=iOX9IhenPqCIJQOLNcwKs+Lj53e3MnWmvQSEeYt/aVM=;
+        b=eIw28Fwx3KFF/gqyxVXtFtBhs73dZDKFEY6zJ/fJvgwxgSZ+wJFbp0WwEI2ZHbkP3a
+         ElDs0AVTJC3iAT7Y5pUuhIE1ezLSnOOS6baKV+mY+LoQysdawl7t2hkD/KVoO7xzEaCf
+         kTiwlI+yuBs8jUwFyQf5gDb+TCy5I9CF2EDFD/EpC7a0w+pkQtt3DYDfdA9mPVNCcoIq
+         FpWKSwGXej0XtISCC5vBgq0tWMz9zOYP6sjtka//t+ETIZUxLSr3zcVnqFuOv8VmvtiE
+         LrsOWBVIbSmQIMJIFrVy6AlH39FvkBAV7twf6YsrNtyMAfyMHvkT7F4Ap0vhWeA5xsAr
+         NktQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681911243; x=1684503243;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PxKBdJz6P62xw3o1oOHy6gvL/UmSXqmJ0vRsGDHfXz4=;
-        b=RdvipdJz3SEBl3IczYrF1LxYAwgc8CSKZCcn/QNDLKKTTeIb24CwpX5QiLeAaQi5mS
-         hEH9dtGAZu7P60qI/qittUkiRlVM07/XsyZ70zRErmqe0Tn/RYny0raySZLeY2ljpZsw
-         fwOxwO9KhTl7j+6Q/quVd2tRJW5lJkj62YUOkHOX7ZEjV9fwJb8Tli8YCShh6F8OFjh4
-         c5K0BZRALzXMo7Eww10Z1ryRLJV34P6kOD+Ce1UM6+gYcQyrG3qgs/AouR+D2LPuREV0
-         G5NRxO0FZ1RWkt52OCxzHGnzhOqfMiduYoPUBg5gttMDzB+VQ+pV5bh2pI2xPkozgrFr
-         oReg==
-X-Gm-Message-State: AAQBX9cKGTXFtxL7KQUa/OmU/ZgyOaY7GZQxPcacVNGazGv2cpbJrlyf
-        649QX9c8sk2TRPr5TyEYakAuul4JVqSJ9GjO
-X-Google-Smtp-Source: AKy350YIBnQaE7WQxRLYlOkzgJwtc2fN5JwvE5Bu5492IB3LxeDfFswMVcmvTtBOzAP11iX9vi1kMA==
-X-Received: by 2002:a17:90a:c095:b0:247:4e73:cbdd with SMTP id o21-20020a17090ac09500b002474e73cbddmr2798673pjs.9.1681911242426;
-        Wed, 19 Apr 2023 06:34:02 -0700 (PDT)
-Received: from vernon-pc ([114.231.52.113])
-        by smtp.gmail.com with ESMTPSA id fv5-20020a17090b0e8500b0023b4d4ca3a9sm1392755pjb.50.2023.04.19.06.33.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Apr 2023 06:34:02 -0700 (PDT)
-Date:   Wed, 19 Apr 2023 21:33:54 +0800
-From:   Vernon Yang <vernon2gm@gmail.com>
-To:     Vishal Moola <vishal.moola@gmail.com>
-Cc:     Andrew Morton <akpm@linux-foundation.org>,
-        Matthew Wilcox <willy@infradead.org>, linux-mm@kvack.org,
-        linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-csky@vger.kernel.org, linux-hexagon@vger.kernel.org,
-        loongarch@lists.linux.dev, linux-m68k@lists.linux-m68k.org,
-        linux-mips@vger.kernel.org, linux-openrisc@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, linux-riscv@lists.infradead.org,
-        linux-s390@vger.kernel.org, linux-sh@vger.kernel.org,
-        sparclinux@vger.kernel.org, linux-um@lists.infradead.org,
-        xen-devel@lists.xenproject.org, kvm@vger.kernel.org
-Subject: Re: [PATCH 4/33] mm: add utility functions for ptdesc
-Message-ID: <ZD/syK8RYO9FZ6ks@vernon-pc>
-References: <20230417205048.15870-1-vishal.moola@gmail.com>
- <20230417205048.15870-5-vishal.moola@gmail.com>
+        d=1e100.net; s=20221208; t=1681911413; x=1684503413;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:subject:from:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=iOX9IhenPqCIJQOLNcwKs+Lj53e3MnWmvQSEeYt/aVM=;
+        b=Ev5pXdBPNuZy31toCIvMNswMCMESmg/6h0db+PHUKJOfIiG3OjL9rfIg9+/wz7FRWP
+         4Uaxl0tmIadhzr24IoV2uF3GjKDLIEyUKC67SYFT3LTN+XqAzxS9cPQ5uJtsPxU6/M73
+         SWX4AaR9NYCo71hD0ZZ6M+8fy/MRxzVcdYAiJWkHwiSuhyUna09MDxlhfq2Uls1+UrD/
+         ZS11hbAKcDfpRp8M9LtGvMEdJttJWomFXiVssFMYtq0V+28aqWbMSK/kjeiSiAzMs9+L
+         02nKuuh93Jp2xHcw3kbh2vPnDc7hncVZQJgNoikIAvCoNI8xS8A0Ex2UBxe+6rskf7p5
+         Ba9Q==
+X-Gm-Message-State: AAQBX9cC61cz/31wwdJlZdOn4CHIV9dOzfrRFV6SkqvsIVoBMLdF5hVQ
+        nhr4bG4Z/2jnV5tIwB0LcY0=
+X-Google-Smtp-Source: AKy350alXc1ONRhUA7XIa28nLbvt2XJ7sqqCYuAOmq3t7gBkrrJYXz7/rkS9YfIcmDF6ZbQaMcb/Aw==
+X-Received: by 2002:a17:903:22cc:b0:1a6:7570:5370 with SMTP id y12-20020a17090322cc00b001a675705370mr6297746plg.10.1681911412748;
+        Wed, 19 Apr 2023 06:36:52 -0700 (PDT)
+Received: from [172.27.232.10] (ec2-16-163-40-128.ap-east-1.compute.amazonaws.com. [16.163.40.128])
+        by smtp.gmail.com with ESMTPSA id b5-20020a170902bd4500b0019a8530c063sm11407873plx.102.2023.04.19.06.36.48
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 19 Apr 2023 06:36:52 -0700 (PDT)
+Message-ID: <a43e5deb-211a-c4c0-6b1d-7715c3665017@gmail.com>
+Date:   Wed, 19 Apr 2023 21:36:46 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230417205048.15870-5-vishal.moola@gmail.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+From:   Hoo Robert <robert.hoo.linux@gmail.com>
+Subject: Re: [PATCH v3 02/22] KVM: selftests: Use EPOLL in userfaultfd_util
+ reader threads and signal errors via TEST_ASSERT
+To:     Anish Moorthy <amoorthy@google.com>, pbonzini@redhat.com,
+        maz@kernel.org
+Cc:     oliver.upton@linux.dev, seanjc@google.com, jthoughton@google.com,
+        bgardon@google.com, dmatlack@google.com, ricarkol@google.com,
+        axelrasmussen@google.com, peterx@redhat.com, kvm@vger.kernel.org,
+        kvmarm@lists.linux.dev
+References: <20230412213510.1220557-1-amoorthy@google.com>
+ <20230412213510.1220557-3-amoorthy@google.com>
+Content-Language: en-US
+In-Reply-To: <20230412213510.1220557-3-amoorthy@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-4.7 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Apr 17, 2023 at 01:50:19PM -0700, Vishal Moola wrote:
-> Introduce utility functions setting the foundation for ptdescs. These
-> will also assist in the splitting out of ptdesc from struct page.
->
-> ptdesc_alloc() is defined to allocate new ptdesc pages as compound
-> pages. This is to standardize ptdescs by allowing for one allocation
-> and one free function, in contrast to 2 allocation and 2 free functions.
->
-> Signed-off-by: Vishal Moola (Oracle) <vishal.moola@gmail.com>
+On 4/13/2023 5:34 AM, Anish Moorthy wrote:
+> With multiple reader threads POLLing a single UFFD, the test suffers
+> from the thundering herd problem: performance degrades as the number of
+> reader threads is increased. Solve this issue [1] by switching the
+> the polling mechanism to EPOLL + EPOLLEXCLUSIVE.
+> 
+> Also, change the error-handling convention of uffd_handler_thread_fn.
+> Instead of just printing errors and returning early from the polling
+> loop, check for them via TEST_ASSERT. "return NULL" is reserved for a
+> successful exit from uffd_handler_thread_fn, ie one triggered by a
+> write to the exit pipe.
+> 
+> Performance samples generated by the command in [2] are given below.
+> 
+> Num Reader Threads, Paging Rate (POLL), Paging Rate (EPOLL)
+> 1      249k      185k
+> 2      201k      235k
+> 4      186k      155k
+> 16     150k      217k
+> 32     89k       198k
+> 
+> [1] Single-vCPU performance does suffer somewhat.
+> [2] ./demand_paging_test -u MINOR -s shmem -v 4 -o -r <num readers>
+> 
+> Signed-off-by: Anish Moorthy <amoorthy@google.com>
+> Acked-by: James Houghton <jthoughton@google.com>
 > ---
->  include/asm-generic/tlb.h | 11 ++++++++++
->  include/linux/mm.h        | 44 +++++++++++++++++++++++++++++++++++++++
->  include/linux/pgtable.h   | 13 ++++++++++++
->  3 files changed, 68 insertions(+)
->
-> diff --git a/include/asm-generic/tlb.h b/include/asm-generic/tlb.h
-> index b46617207c93..6bade9e0e799 100644
-> --- a/include/asm-generic/tlb.h
-> +++ b/include/asm-generic/tlb.h
-> @@ -481,6 +481,17 @@ static inline void tlb_remove_page(struct mmu_gather *tlb, struct page *page)
->  	return tlb_remove_page_size(tlb, page, PAGE_SIZE);
->  }
->
-> +static inline void tlb_remove_ptdesc(struct mmu_gather *tlb, void *pt)
-> +{
-> +	tlb_remove_table(tlb, pt);
-> +}
+>   .../selftests/kvm/demand_paging_test.c        |  1 -
+>   .../selftests/kvm/lib/userfaultfd_util.c      | 74 +++++++++----------
+>   2 files changed, 35 insertions(+), 40 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/demand_paging_test.c b/tools/testing/selftests/kvm/demand_paging_test.c
+> index 6c2253f4a64ef..c729cee4c2055 100644
+> --- a/tools/testing/selftests/kvm/demand_paging_test.c
+> +++ b/tools/testing/selftests/kvm/demand_paging_test.c
+> @@ -13,7 +13,6 @@
+>   #include <stdio.h>
+>   #include <stdlib.h>
+>   #include <time.h>
+> -#include <poll.h>
+>   #include <pthread.h>
+>   #include <linux/userfaultfd.h>
+>   #include <sys/syscall.h>
+> diff --git a/tools/testing/selftests/kvm/lib/userfaultfd_util.c b/tools/testing/selftests/kvm/lib/userfaultfd_util.c
+> index 2723ee1e3e1b2..909ad69c1cb04 100644
+> --- a/tools/testing/selftests/kvm/lib/userfaultfd_util.c
+> +++ b/tools/testing/selftests/kvm/lib/userfaultfd_util.c
+> @@ -16,6 +16,7 @@
+>   #include <poll.h>
+>   #include <pthread.h>
+>   #include <linux/userfaultfd.h>
+> +#include <sys/epoll.h>
+>   #include <sys/syscall.h>
+>   
+>   #include "kvm_util.h"
+> @@ -32,60 +33,55 @@ static void *uffd_handler_thread_fn(void *arg)
+>   	int64_t pages = 0;
+>   	struct timespec start;
+>   	struct timespec ts_diff;
+> +	int epollfd;
+> +	struct epoll_event evt;
 > +
-> +/* Like tlb_remove_ptdesc, but for page-like page directories. */
-> +static inline void tlb_remove_page_ptdesc(struct mmu_gather *tlb, struct ptdesc *pt)
-> +{
-> +	tlb_remove_page(tlb, ptdesc_page(pt));
-> +}
+> +	epollfd = epoll_create(1);
+> +	TEST_ASSERT(epollfd >= 0, "Failed to create epollfd.");
 > +
->  static inline void tlb_change_page_size(struct mmu_gather *tlb,
->  						     unsigned int page_size)
->  {
-> diff --git a/include/linux/mm.h b/include/linux/mm.h
-> index b18848ae7e22..ec3cbe2fa665 100644
-> --- a/include/linux/mm.h
-> +++ b/include/linux/mm.h
-> @@ -2744,6 +2744,45 @@ static inline pmd_t *pmd_alloc(struct mm_struct *mm, pud_t *pud, unsigned long a
->  }
->  #endif /* CONFIG_MMU */
->
-> +static inline struct ptdesc *virt_to_ptdesc(const void *x)
-> +{
-> +	return page_ptdesc(virt_to_head_page(x));
-> +}
+> +	evt.events = EPOLLIN | EPOLLEXCLUSIVE;
+> +	evt.data.u32 = 0;
+> +	TEST_ASSERT(epoll_ctl(epollfd, EPOLL_CTL_ADD, uffd, &evt) == 0,
+> +				"Failed to add uffd to epollfd");
 > +
-> +static inline void *ptdesc_to_virt(struct ptdesc *pt)
-> +{
-> +	return page_to_virt(ptdesc_page(pt));
-> +}
-> +
-> +static inline void *ptdesc_address(struct ptdesc *pt)
-> +{
-> +	return folio_address(ptdesc_folio(pt));
-> +}
-> +
-> +static inline bool ptdesc_is_reserved(struct ptdesc *pt)
-> +{
-> +	return folio_test_reserved(ptdesc_folio(pt));
-> +}
-> +
-> +static inline struct ptdesc *ptdesc_alloc(gfp_t gfp, unsigned int order)
-> +{
-> +	struct page *page = alloc_pages(gfp | __GFP_COMP, order);
-> +
-> +	return page_ptdesc(page);
-> +}
-> +
-> +static inline void ptdesc_free(struct ptdesc *pt)
-> +{
-> +	struct page *page = ptdesc_page(pt);
-> +
-> +	__free_pages(page, compound_order(page));
-> +}
-> +
-> +static inline void ptdesc_clear(void *x)
-> +{
-> +	clear_page(x);
-> +}
-> +
->  #if USE_SPLIT_PTE_PTLOCKS
->  #if ALLOC_SPLIT_PTLOCKS
->  void __init ptlock_cache_init(void);
-> @@ -2970,6 +3009,11 @@ static inline void mark_page_reserved(struct page *page)
->  	adjust_managed_page_count(page, -1);
->  }
->
-> +static inline void free_reserved_ptdesc(struct ptdesc *pt)
-> +{
-> +	free_reserved_page(ptdesc_page(pt));
-> +}
-> +
->  /*
->   * Default method to free all the __init memory into the buddy system.
->   * The freed pages will be poisoned with pattern "poison" if it's within
-> diff --git a/include/linux/pgtable.h b/include/linux/pgtable.h
-> index 7cc6ea057ee9..7cd803aa38eb 100644
-> --- a/include/linux/pgtable.h
-> +++ b/include/linux/pgtable.h
-> @@ -97,6 +97,19 @@ TABLE_MATCH(ptl, ptl);
->  #undef TABLE_MATCH
->  static_assert(sizeof(struct ptdesc) <= sizeof(struct page));
->
-> +#define ptdesc_page(pt)			(_Generic((pt),			\
-> +	const struct ptdesc *:		(const struct page *)(pt),	\
-> +	struct ptdesc *:		(struct page *)(pt)))
-> +
-> +#define ptdesc_folio(pt)		(_Generic((pt),			\
-> +	const struct ptdesc *:		(const struct folio *)(pt),	\
-> +	struct ptdesc *:		(struct folio *)(pt)))
-> +
-> +static inline struct ptdesc *page_ptdesc(struct page *page)
-> +{
-> +	return (struct ptdesc *)page;
-> +}
+> +	evt.events = EPOLLIN;
+> +	evt.data.u32 = 1;
+> +	TEST_ASSERT(epoll_ctl(epollfd, EPOLL_CTL_ADD, reader_args->pipe, &evt) == 0,
+> +				"Failed to add pipe to epollfd");
+>   
+>   	clock_gettime(CLOCK_MONOTONIC, &start);
+>   	while (1) {
+>   		struct uffd_msg msg;
+> -		struct pollfd pollfd[2];
+> -		char tmp_chr;
+>   		int r;
+>   
+> -		pollfd[0].fd = uffd;
+> -		pollfd[0].events = POLLIN;
+> -		pollfd[1].fd = reader_args->pipe;
+> -		pollfd[1].events = POLLIN;
+> -
+> -		r = poll(pollfd, 2, -1);
+> -		switch (r) {
+> -		case -1:
+> -			pr_info("poll err");
+> -			continue;
+> -		case 0:
+> -			continue;
+> -		case 1:
+> -			break;
+> -		default:
+> -			pr_info("Polling uffd returned %d", r);
+> -			return NULL;
+> -		}
+> +		r = epoll_wait(epollfd, &evt, 1, -1);
+> +		TEST_ASSERT(r == 1,
+> +					"Unexpected number of events (%d) from epoll, errno = %d",
+> +					r, errno);
+>   
+too much indentation, also seen elsewhere.
 
-Hi Vishal,
+> -		if (pollfd[0].revents & POLLERR) {
+> -			pr_info("uffd revents has POLLERR");
+> -			return NULL;
+> -		}
+> +		if (evt.data.u32 == 1) {
+> +			char tmp_chr;
+>   
+> -		if (pollfd[1].revents & POLLIN) {
+> -			r = read(pollfd[1].fd, &tmp_chr, 1);
+> +			TEST_ASSERT(!(evt.events & (EPOLLERR | EPOLLHUP)),
+> +						"Reader thread received EPOLLERR or EPOLLHUP on pipe.");
+> +			r = read(reader_args->pipe, &tmp_chr, 1);
+>   			TEST_ASSERT(r == 1,
+> -				    "Error reading pipefd in UFFD thread\n");
+> +						"Error reading pipefd in uffd reader thread");
+>   			return NULL;
 
-I'm a little curious, why is the page_ptdesc() using inline functions instead of macro?
-If this is any magic, please tell me, thank you very much.
+How about goto
+	ts_diff = timespec_elapsed(start);
+Otherwise last stats won't get chances to be calc'ed.
 
-> +
->  /*
->   * A page table page can be thought of an array like this: pXd_t[PTRS_PER_PxD]
->   *
->
-> --
-> 2.39.2
->
+>   		}
+>   
+> -		if (!(pollfd[0].revents & POLLIN))
+> -			continue;
+> +		TEST_ASSERT(!(evt.events & (EPOLLERR | EPOLLHUP)),
+> +					"Reader thread received EPOLLERR or EPOLLHUP on uffd.");
+>   
+>   		r = read(uffd, &msg, sizeof(msg));
+>   		if (r == -1) {
+> -			if (errno == EAGAIN)
+> -				continue;
+> -			pr_info("Read of uffd got errno %d\n", errno);
+> -			return NULL;
+> +			TEST_ASSERT(errno == EAGAIN,
+> +						"Error reading from UFFD: errno = %d", errno);
+> +			continue;
+>   		}
+>   
+> -		if (r != sizeof(msg)) {
+> -			pr_info("Read on uffd returned unexpected size: %d bytes", r);
+> -			return NULL;
+> -		}
+> +		TEST_ASSERT(r == sizeof(msg),
+> +					"Read on uffd returned unexpected number of bytes (%d)", r);
+>   
+>   		if (!(msg.event & UFFD_EVENT_PAGEFAULT))
+>   			continue;
+> @@ -93,8 +89,8 @@ static void *uffd_handler_thread_fn(void *arg)
+>   		if (reader_args->delay)
+>   			usleep(reader_args->delay);
+>   		r = reader_args->handler(reader_args->uffd_mode, uffd, &msg);
+> -		if (r < 0)
+> -			return NULL;
+> +		TEST_ASSERT(r >= 0,
+> +					"Reader thread handler fn returned negative value %d", r);
+>   		pages++;
+>   	}
+>   
+
