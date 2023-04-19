@@ -2,96 +2,160 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9B9C56E802B
-	for <lists+kvm@lfdr.de>; Wed, 19 Apr 2023 19:15:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AF5AE6E80FF
+	for <lists+kvm@lfdr.de>; Wed, 19 Apr 2023 20:12:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230346AbjDSRPz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Apr 2023 13:15:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35402 "EHLO
+        id S232796AbjDSSL7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Apr 2023 14:11:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32858 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229558AbjDSRPx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Apr 2023 13:15:53 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74B163580
-        for <kvm@vger.kernel.org>; Wed, 19 Apr 2023 10:15:52 -0700 (PDT)
-Received: from pps.filterd (m0353726.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 33JH50T7019706;
-        Wed, 19 Apr 2023 17:15:37 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=4gV0GoQLrJl2ZFnnMEFd9bbiphossF2Dno9N80IH9ew=;
- b=Z9wNeR8J4d6yyJeliPq2VEUrhlBACE4B+PTvZHzVXoHAhSLChQUki9Fc2OWdix6lvf6I
- ZZI8iQ2HqVmapAGcgOPHApZDT9Bi9UdDzxYjgjHJjE0Jg8XXEli8Uj/FMuZsU7MaDiaf
- IWdFuhSJr8vRfcHGldIhhB5zs/fWG93fXSHm77/gVOXEU4J0Ny6HG3IiEWmoZle5FJtl
- Forthr+9zWpYKqOabQhRPPIPnLi/HZHsQl2bGfbC8rPzLxPreqG94y5bL/CQ53Kmr88x
- TzlvNRkQxnzPiXToTrbsl37rF71/ByM8zkw9FGO8rueIlOrY4rNI7rWXF+rrJa1ZGfKp ng== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3q1pkxq6hd-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 19 Apr 2023 17:15:36 +0000
-Received: from m0353726.ppops.net (m0353726.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 33JH17BG029592;
-        Wed, 19 Apr 2023 17:15:35 GMT
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3q1pkxq6fu-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 19 Apr 2023 17:15:35 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 33J5wYPD009299;
-        Wed, 19 Apr 2023 17:15:32 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-        by ppma03ams.nl.ibm.com (PPS) with ESMTPS id 3pykj6jvn9-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 19 Apr 2023 17:15:32 +0000
-Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-        by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 33JHFR2f64356828
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 19 Apr 2023 17:15:27 GMT
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 08DC220043;
-        Wed, 19 Apr 2023 17:15:27 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A18D520040;
-        Wed, 19 Apr 2023 17:15:26 +0000 (GMT)
-Received: from li-7e0de7cc-2d9d-11b2-a85c-de26c016e5ad.ibm.com (unknown [9.152.224.238])
-        by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Wed, 19 Apr 2023 17:15:26 +0000 (GMT)
-Message-ID: <bf769e0a6dfec2869b03d81ad10070fb4d5b3946.camel@linux.ibm.com>
-Subject: Re: [PATCH v19 02/21] s390x/cpu topology: add topology entries on
- CPU hotplug
-From:   Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-To:     =?ISO-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>,
-        Pierre Morel <pmorel@linux.ibm.com>, qemu-s390x@nongnu.org
-Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
-        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
-        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
-        kvm@vger.kernel.org, ehabkost@redhat.com,
-        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
-        seiden@linux.ibm.com, nrb@linux.ibm.com, frankja@linux.ibm.com,
-        berrange@redhat.com
-Date:   Wed, 19 Apr 2023 19:15:26 +0200
-In-Reply-To: <7affffef-8d04-ac9f-0920-f765d362d60d@kaod.org>
-References: <20230403162905.17703-1-pmorel@linux.ibm.com>
-         <20230403162905.17703-3-pmorel@linux.ibm.com>
-         <7affffef-8d04-ac9f-0920-f765d362d60d@kaod.org>
+        with ESMTP id S229873AbjDSSL5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Apr 2023 14:11:57 -0400
+Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68A9961B9;
+        Wed, 19 Apr 2023 11:11:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1681927916; x=1713463916;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=CWAaNdByyfZ6931KExbZB4bROvcSJVF+47jq4bdVFi8=;
+  b=Tm+IsigY4XMdwzNlUlXQ1Yc0SQwkEW9P4K3+gaCpoJvN9OQ/HzQo/S08
+   +i6evWevkh+BWqVCbGBGxH+GbQa5nF71KMlgsP4TXKvbw91O+Jwnmc6gJ
+   qNH8QvNB4gcBh70QGvJgzqMGFdx2Xf0UYDfZdDyefu5ElvlqHw4Dar2zp
+   ikPxkbs63YvmwA9xnfARhKdIY6jsdnxYjCmT3SiPnLkumdCxRdiXmswfj
+   n6FFS8fSSZIuyhH7dP46fhAjd5v/0wSI5DjR61kBPpKrNK9Y5353m1+du
+   k9JDlYbc06RdS7gSz9R/k3UbSE43s1q6qI4k7RBgblw/9lQu2zwYc6V48
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10685"; a="408433576"
+X-IronPort-AV: E=Sophos;i="5.99,208,1677571200"; 
+   d="scan'208";a="408433576"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Apr 2023 11:11:55 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10685"; a="722025594"
+X-IronPort-AV: E=Sophos;i="5.99,208,1677571200"; 
+   d="scan'208";a="722025594"
+Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
+  by orsmga008.jf.intel.com with ESMTP; 19 Apr 2023 11:11:55 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.23; Wed, 19 Apr 2023 11:11:54 -0700
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.23 via Frontend Transport; Wed, 19 Apr 2023 11:11:54 -0700
+Received: from NAM02-BN1-obe.outbound.protection.outlook.com (104.47.51.49) by
+ edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.23; Wed, 19 Apr 2023 11:11:54 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=VQd/Ts7scOc0eieZr8zGyitm/3+iH1I9vvaAPkXnb2XIiwSXjkITxpGFl5FSpQbFtFEGgLJenlt9IrG+dmFbQhMZ0qHtjJMMB+nblT/wF7ZGT+NKEqkWoRC8PmuvMHydzXXdsh6O5B0g/d15OfY1NZxHRiiTkTIvvIe9Gy1+T78n5Jz702zI5VP9tOmkvTebl8eaHdQXMdKrejrji82FmoThWgyy4wYKOi+5J+FHsBq9Ncr5JDDhgt2lt8SaGe1B5P3uMmyTF2c3BeyvpJCUUNAkwETWiCbvDfYhaBM/JHaePRrkwLWYoJLnxof+zmMuB9GlNOA7XY6X9QeKyOm+2g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=79Ck+h9D3XLMhaf8cdcCgl0kGwXr5dHGYEHbu7aG924=;
+ b=oGMX8XQPk7oZDOoDu1VDY/tw6ssXSkAIKQbkdWlvmvraXAmAupB1saqtEg8toeQBBsQnjtiGu5pokIU+bT96odUAuvtD4tQv3ix/Gy90yl3QbPsTnuIS6MtPV/UmvQIjdutRXScp0Hx5jUKvkBymGN5qYKhyhDOvUAsyyG2I0zsgDbPoF7YKw4+tUwaM9CjMj+PK6KyAOHgKTFBer0NIj24tM6Guotlbm253CumRCMolnHy2BS0+LzpaOa5/sK0egnT26j5jPuy1bR92WMFsNY+lUDyDWDl5kug6Q6wr9KKQCfMjnrsZ+Fblhn5xZZqWob7lrPT87Rw1/coVzUMRDQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CY4PR11MB1862.namprd11.prod.outlook.com (2603:10b6:903:124::18)
+ by SA1PR11MB7109.namprd11.prod.outlook.com (2603:10b6:806:2ba::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6298.45; Wed, 19 Apr
+ 2023 18:11:52 +0000
+Received: from CY4PR11MB1862.namprd11.prod.outlook.com
+ ([fe80::4bd:cce2:58ce:cd6b]) by CY4PR11MB1862.namprd11.prod.outlook.com
+ ([fe80::4bd:cce2:58ce:cd6b%3]) with mapi id 15.20.6319.020; Wed, 19 Apr 2023
+ 18:11:52 +0000
+Message-ID: <64b99d1c-073f-cbc3-6c5a-100fa23bcb13@intel.com>
+Date:   Wed, 19 Apr 2023 11:11:48 -0700
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Firefox/102.0 Thunderbird/102.10.0
+Subject: Re: [PATCH V3 08/10] vfio/pci: Probe and store ability to support
+ dynamic MSI-X
+Content-Language: en-US
+To:     Alex Williamson <alex.williamson@redhat.com>
+CC:     <jgg@nvidia.com>, <yishaih@nvidia.com>,
+        <shameerali.kolothum.thodi@huawei.com>, <kevin.tian@intel.com>,
+        <tglx@linutronix.de>, <darwi@linutronix.de>, <kvm@vger.kernel.org>,
+        <dave.jiang@intel.com>, <jing2.liu@intel.com>,
+        <ashok.raj@intel.com>, <fenghua.yu@intel.com>,
+        <tom.zanussi@linux.intel.com>, <linux-kernel@vger.kernel.org>
+References: <cover.1681837892.git.reinette.chatre@intel.com>
+ <0da4830176e9c4a7877aac0611869f341dda831c.1681837892.git.reinette.chatre@intel.com>
+ <20230418163803.46a96fdc.alex.williamson@redhat.com>
+From:   Reinette Chatre <reinette.chatre@intel.com>
+In-Reply-To: <20230418163803.46a96fdc.alex.williamson@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: BYAPR02CA0015.namprd02.prod.outlook.com
+ (2603:10b6:a02:ee::28) To CY4PR11MB1862.namprd11.prod.outlook.com
+ (2603:10b6:903:124::18)
 MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: V1iij10uQf0Ty6gOu3ekbOZpGx3h1T7E
-X-Proofpoint-ORIG-GUID: OiPKC7Sfvd6BZaUboEAG_Ml6z92ojTeT
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
- definitions=2023-04-19_11,2023-04-18_01,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 phishscore=0
- priorityscore=1501 mlxlogscore=999 bulkscore=0 mlxscore=0 spamscore=0
- impostorscore=0 malwarescore=0 clxscore=1015 adultscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2303200000 definitions=main-2304190153
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY4PR11MB1862:EE_|SA1PR11MB7109:EE_
+X-MS-Office365-Filtering-Correlation-Id: fda95faf-8653-4560-a981-08db41018ca3
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: pTJLGA2bdTN153AAWstQzdeKNUWZTSDbALQuq3l9LeRiWOR2sAgmT2sa5Y/xk9JTwanfjetqiBPOsbpHv8TK2YcPA/MvXnLG1OtgSS3ZEmE7pmxj/LRJH1iRwu3jIsgr86R1c90y/x/RDCtsKW5nDVgJJYAklHQ4inSGnqaW0GafQQ6sE4HNtHHzr8jb1Upw7NA66/H7YgC6G2JVW+f5g2GyR5dXf896hQOf1RLDYU322DHkNeIAw/yHA3pp350Nwry/E7s/x0NLtyj53SJvouhQmZfVr7dRCpDsgiRAv3qw7IlzYeRM86SsGb7qdAIIAyzjLkhGP/A3CqzhlonJRcpS8TCiCpEGdbv+kBH9rnmI7fXwlqt/q3lPtJSEeg6tn13p7UCuHMmHo6qiWomIcQ1mShdaJQjiabHKwQ2ZldTC52OQb+b7oUEmlwm0Tbt5OGBTpo5XahvHsDAAopcQ2SG4B3Ty4S12QG+gIsRG66Yq3PKpibqKyPAoGQiRUSgEcIT8n76nPxjJOv6u+EJfdIAtLq6WrhPWjwqfJwUSKExeHQlURVWvu6a/UJ5ZJsKYjbj1UgdoTXQ+8w11R4kV9pR0631d3N6uoPh2krIhO0QcB43M0U75anpKb/V3AKT+I//iPZ3jCzzP0Vs1Bdu90Q==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY4PR11MB1862.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(366004)(39860400002)(376002)(396003)(136003)(346002)(451199021)(31686004)(316002)(6916009)(66946007)(66556008)(66476007)(4326008)(36756003)(53546011)(26005)(6506007)(38100700002)(2616005)(186003)(6512007)(83380400001)(82960400001)(5660300002)(8676002)(6666004)(478600001)(6486002)(41300700001)(8936002)(31696002)(86362001)(2906002)(44832011)(43740500002)(45980500001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?ZWRiUDJjQVNWRE0yZjNIUkxzSmRlamhTSG9STk9WeGtINGZxMnhJWUxLS0lK?=
+ =?utf-8?B?MWl4cjR4SnNTMkZXNGc1cFcxcTRLZStTUkZ3QWlGRHJsem9lQ2JBT1ZNSHhr?=
+ =?utf-8?B?YjYwMHlUNVg0UzBxTk9hc3pUenV1aXhOaTFwYkJLTGpleWkzelZYRlhNZ09D?=
+ =?utf-8?B?S0RBenB5UnhJVjQzMXFTR0dqSG1xS0hBYUgyMmRZWnJiQWxuY2Z6WlNyT1hU?=
+ =?utf-8?B?WDBpaTZoSTJxQ2VKSWpnZkpMTUhqdU9udUxIWjhQS2ozdXozNHFhWm5HZy9U?=
+ =?utf-8?B?MGkzR0FTWWFDZnZGWmZXY1ZoV2RNd1haVUVMdkZuZ3pRYXBueDdWaXZCdFAr?=
+ =?utf-8?B?YTVyZ1R1SlNFeXZoTHJOK1pGb1R0MjFNUXAzL0hyNUtsTVVwdVZidENoaFJ5?=
+ =?utf-8?B?TTZuWkFpaVk5dUhwWTdhYU9DZm5iSU1lN0I1VE5XU2VReHpQbXRwY0dUSDl4?=
+ =?utf-8?B?VnExRjhGVlVwUWN5V3BWdGpta2JRMlZqVTdxMkVTKzh1Y2MvN2J4a0g5UEZw?=
+ =?utf-8?B?RzVVQ3pFNHBlOFRRTzBBcDhIamhya0s2cTR1Z0lGc2lnNnRiWFdHNWlaZ3Jy?=
+ =?utf-8?B?OGNoTVI1bStINkRUMS9uclNYZ0Vub2dFYkhweFF2L3luYzFaQXlRV1czTkY5?=
+ =?utf-8?B?OHExN1djUkFhZUpMdnNrNzczRkZiY3V4a2dKNVhkeHVEdlJnenk2QnM5NFN2?=
+ =?utf-8?B?RGpKU2lOQVBpMFl3bHpWVVNST3pTRG5rYm1ZSFBYZm9xbXJiTHFULzNSeStQ?=
+ =?utf-8?B?c2JtR3I0ZVcrT2JUOFFDeUNXOEVKT3R4NURtR3grd2ZzSHlBTmFwdklCR0s0?=
+ =?utf-8?B?SVhwMEpiOTV6YndBV3B6YVpab2laVWt5dzJ3cUZPN21zaFlsVU0wRXZ2cnd2?=
+ =?utf-8?B?SlVCZGt6emRGOStsV3pkQTBRcW84ZkFCb25JZUoyaGF6WkVoRXllRXlyOHo1?=
+ =?utf-8?B?Qi9aUDFWUy9GSEVCOThacFVhb0xycmxMVjVlU2Y1OUdkOXlvWTQ2VXU1VmI0?=
+ =?utf-8?B?dG5sOHd1OUk0ck15bFJsU1pBcWRWOWx3Q0xzb1FLZW9yUGxzVHdoeDJBNFUx?=
+ =?utf-8?B?T3ZWNlExazlPdm9lMFliVFE3Q0NWTWdlenpqQWFHQ281a1dud05LbDBwR2lB?=
+ =?utf-8?B?c2VwUk5rbEsxNVVIWktBVVVsYTJPREJOdGRpMTBTcXhIV2lISHl2dW1DL3VT?=
+ =?utf-8?B?RlkvQWFpaTZCS3hXSGZEV3cvbUJLVnh1VkRTbWVaL1pVTGh5OWR1Tnljd1Iw?=
+ =?utf-8?B?TmZTTXJLRkFUTVlmdEpVQjlyNS85K2tpek50VjhpQmVuZVlPUUFuZlFDMTBL?=
+ =?utf-8?B?SWpKNFIvc2FDZHVZWTJibDdhL3pxbU9qWjJXdGYvczdGcGQ0c2xqdXpMU0xF?=
+ =?utf-8?B?b25hc1RsdlJiME5wNEZ2VUJIZFBPSkdCYnZPMUt6OXprMmNNZ04wZFY3RENu?=
+ =?utf-8?B?dll3dzlOLzkxK1l4b3E0SVVPUjBzSG5YMUFGY3NvWlhzWUkxWmtHbHN3aXBW?=
+ =?utf-8?B?c08xNHl4UmtENEdKV3hkV2lrcUd2dXQ4Q21JNU9RN2c3US96V2t1bkdGdzdW?=
+ =?utf-8?B?U3JoUWV3aEZFN3NFbXhkK21YQzFxRHc3SWdXUThpQkkzRnNzRlZBVWZCUG5o?=
+ =?utf-8?B?NGQxTzRpRDJGc1ZrVDZ5TVVRTVV5NFBKbkIvOFJxY3kraGQzNWxldlVJNzZD?=
+ =?utf-8?B?aDFweE8rL2J3MXNYSzVQMlFYeUN4UGoyZUxrQlkyNVZaSWNDVFZqcUY2KzZ6?=
+ =?utf-8?B?VzIySU9SbkJ3b1FJQkNFdzg1ekZWU3BwWm9YT3hqWEd4Ris2Zm1scVJJeVVP?=
+ =?utf-8?B?eWVFbVFuamhwWUlUQjVzL3B3aG53VVJLUXNUVjRydGYwMytzdTNCelNqZHl3?=
+ =?utf-8?B?Z1l6MkRudTA2WStHOGp3VXprKzhHeXBPK3hJNE5MWTIxYlNlWENkQ2N4L3Av?=
+ =?utf-8?B?QnNZL0RUbjZ1bWl2aXhGaDRyTzZjS0thYnNSNGwyd2RsNVI1bER1bnIwMFVP?=
+ =?utf-8?B?M0pQRFUxcUF3a21MU2lub0gvVlVycnc0OTBpSGs1aExSZEd3czFhemFnMmJR?=
+ =?utf-8?B?ZnU4eDVTOUphU21OeDBaOEFFU2JWSUxPWmdObWttV2xwUmVMYisyOGpYd2lv?=
+ =?utf-8?B?TnRhQXVJa2pNM3VXVlBtRnc1MDd4S3NCNzAzcUFDblZUanBKa0czMS9GSnFE?=
+ =?utf-8?B?eEE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: fda95faf-8653-4560-a981-08db41018ca3
+X-MS-Exchange-CrossTenant-AuthSource: CY4PR11MB1862.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Apr 2023 18:11:51.6627
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: ZIADQ8na3ulHjE/AZj9QjCcdqm/Fo/cqhArn+JdDRiXMHxbD/Q1uk0AG857UNYzUq4wZ7jnkjiXM9RkMsVhoi/T11h6DSaFEFRfMUAvgt6A=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR11MB7109
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-7.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
         URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -99,145 +163,70 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2023-04-04 at 09:31 +0200, C=C3=A9dric Le Goater wrote:
-> On 4/3/23 18:28, Pierre Morel wrote:
-> > The topology information are attributes of the CPU and are
-> > specified during the CPU device creation.
-> >=20
-> > On hot plug we:
-> > - calculate the default values for the topology for drawers,
-> >    books and sockets in the case they are not specified.
-> > - verify the CPU attributes
-> > - check that we have still room on the desired socket
-> >=20
-> > The possibility to insert a CPU in a mask is dependent on the
-> > number of cores allowed in a socket, a book or a drawer, the
-> > checking is done during the hot plug of the CPU to have an
-> > immediate answer.
-> >=20
-> > If the complete topology is not specified, the core is added
-> > in the physical topology based on its core ID and it gets
-> > defaults values for the modifier attributes.
-> >=20
-> > This way, starting QEMU without specifying the topology can
-> > still get some advantage of the CPU topology.
-> >=20
-> > Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
-> > ---
-> >   MAINTAINERS                        |   1 +
-> >   include/hw/s390x/cpu-topology.h    |  44 +++++
-> >   include/hw/s390x/s390-virtio-ccw.h |   1 +
-> >   hw/s390x/cpu-topology.c            | 282 ++++++++++++++++++++++++++++=
-+
-> >   hw/s390x/s390-virtio-ccw.c         |  22 ++-
-> >   hw/s390x/meson.build               |   1 +
-> >   6 files changed, 349 insertions(+), 2 deletions(-)
-> >   create mode 100644 hw/s390x/cpu-topology.c
+Hi Alex,
 
-[...]
+On 4/18/2023 3:38 PM, Alex Williamson wrote:
+> On Tue, 18 Apr 2023 10:29:19 -0700
+> Reinette Chatre <reinette.chatre@intel.com> wrote:
+> 
 
-> > +
-> > +/**
-> > + * s390_socket_nb:
-> > + * @cpu: s390x CPU
-> > + *
-> > + * Returns the socket number used inside the cores_per_socket array
-> > + * for a cpu.
-> > + */
-> > +int s390_socket_nb(S390CPU *cpu)
->=20
-> s390_socket_nb() doesn't seem to be used anywhere else than in
-> hw/s390x/cpu-topology.c. It should be static.
->=20
->=20
-> > +{
-> > +    return (cpu->env.drawer_id * s390_topology.smp->books + cpu->env.b=
-ook_id) *
-> > +           s390_topology.smp->sockets + cpu->env.socket_id;
-> > +}
+...
 
-[...]
+>> diff --git a/include/linux/vfio_pci_core.h b/include/linux/vfio_pci_core.h
+>> index 148fd1ae6c1c..4f070f2d6fde 100644
+>> --- a/include/linux/vfio_pci_core.h
+>> +++ b/include/linux/vfio_pci_core.h
+>> @@ -67,6 +67,7 @@ struct vfio_pci_core_device {
+>>  	u8			msix_bar;
+>>  	u16			msix_size;
+>>  	u32			msix_offset;
+>> +	bool			has_dyn_msix;
+>>  	u32			rbar[7];
+>>  	bool			pci_2_3;
+>>  	bool			virq_disabled;
+> 
+> Nit, the whole data structure probably needs to be sorted with pahole,
+> but creating a hole here for locality to other msix fields should
+> probably be secondary to keeping the structure well packed, which
+> suggests including this new field among the bools below.  Thanks,
 
-> > +/**
-> > + * s390_topology_add_core_to_socket:
-> > + * @cpu: the new S390CPU to insert in the topology structure
-> > + * @drawer_id: new drawer_id
-> > + * @book_id: new book_id
-> > + * @socket_id: new socket_id
-> > + * @creation: if is true the CPU is a new CPU and there is no old sock=
-et
-> > + *            to handle.
-> > + *            if is false, this is a moving the CPU and old socket cou=
-nt
-> > + *            must be decremented.
-> > + * @errp: the error pointer
-> > + *
-> > + */
-> > +static void s390_topology_add_core_to_socket(S390CPU *cpu, int drawer_=
-id,
-> > +                                             int book_id, int socket_i=
-d,
-> > +                                             bool creation, Error **er=
-rp)
-> > +{
->=20
-> Since this routine is called twice, in s390_topology_setup_cpu() for
-> creation, and in s390_change_topology() for socket migration, we could
-> duplicate the code in two distinct routines.
->=20
-> I think this would simplify a bit each code path and avoid the 'creation'
-> parameter which is confusing.
->=20
->=20
-> > +    int old_socket_entry =3D s390_socket_nb(cpu);
-> > +    int new_socket_entry;
-> > +
-> > +    if (creation) {
-> > +        new_socket_entry =3D old_socket_entry;
-> > +    } else {
-> > +        new_socket_entry =3D (drawer_id * s390_topology.smp->books + b=
-ook_id) *
-> > +                            s390_topology.smp->sockets + socket_id;
->=20
-> A helper common routine that s390_socket_nb() could use also would be a p=
-lus.
+Thanks for catching this. Moving it one field lower as shown in the
+delta patch below seems to improve the layout:
 
-An alternative to consider would be to define a
+diff --git a/include/linux/vfio_pci_core.h b/include/linux/vfio_pci_core.h
+index 4f070f2d6fde..d730d78754a2 100644
+--- a/include/linux/vfio_pci_core.h
++++ b/include/linux/vfio_pci_core.h
+@@ -67,8 +67,8 @@ struct vfio_pci_core_device {
+ 	u8			msix_bar;
+ 	u16			msix_size;
+ 	u32			msix_offset;
+-	bool			has_dyn_msix;
+ 	u32			rbar[7];
++	bool			has_dyn_msix;
+ 	bool			pci_2_3;
+ 	bool			virq_disabled;
+ 	bool			reset_works;
 
-struct topology_pos {
-    int socket;
-    int book;
-    int drawer;
-};
 
-or similar so you can do
+Combined with the other changes to this struct (new struct xarray
+for the context, and removing int num_ctx) the bools are no longer
+together on a single cache line. Placing has_dyn_msix as shown above
+keeps it on the same cache line as the other msix_* fields.
 
-old_socket_entry =3D s390_socket_nb(cpu->env.topology_pos, smp);
+After this change the layout of this struct appears to be improved.
+Before this patch series (v6.3-rc7):
+        /* size: 2496, cachelines: 39, members: 46 */
+        /* sum members: 2485, holes: 4, sum holes: 11 */
+        /* paddings: 2, sum paddings: 11 */
+        /* forced alignments: 1 */
 
-struct topology_pos topology_pos =3D { socket_id, book_id, drawer_id };
-new_socket_entry =3D s390_socket_nb(topology_pos, smp);
+After this patch series (v6.3-rc7 + V3 + delta patch):
+        /* size: 2568, cachelines: 41, members: 46 */
+        /* sum members: 2562, holes: 2, sum holes: 6 */
+        /* paddings: 2, sum paddings: 11 */
+        /* forced alignments: 1 */
+        /* last cacheline: 8 bytes */
 
-It might also make sense to pass a topology_pos around instead of three ids=
-,
-since that is quite common.
-
->=20
-> > +    }
-> > +
-> > +    /* Check for space on new socket */
-> > +    if ((new_socket_entry !=3D old_socket_entry) &&
-> > +        (s390_topology.cores_per_socket[new_socket_entry] >=3D
-> > +         s390_topology.smp->cores)) {
-> > +        error_setg(errp, "No more space on this socket");
-> > +        return;
-> > +    }
-> > +
-> > +    /* Update the count of cores in sockets */
-> > +    s390_topology.cores_per_socket[new_socket_entry] +=3D 1;
-> > +    if (!creation) {
-> > +        s390_topology.cores_per_socket[old_socket_entry] -=3D 1;
-> > +    }
-> > +}
-
-[...]
+Reinette
 
