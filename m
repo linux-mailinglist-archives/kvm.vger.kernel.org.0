@@ -2,155 +2,197 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 160766E76A1
-	for <lists+kvm@lfdr.de>; Wed, 19 Apr 2023 11:47:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CEC786E76FB
+	for <lists+kvm@lfdr.de>; Wed, 19 Apr 2023 12:01:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232254AbjDSJrW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Apr 2023 05:47:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43818 "EHLO
+        id S232041AbjDSKBT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Apr 2023 06:01:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55094 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231319AbjDSJrU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Apr 2023 05:47:20 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E19673C2A
-        for <kvm@vger.kernel.org>; Wed, 19 Apr 2023 02:47:19 -0700 (PDT)
-Received: from pps.filterd (m0353728.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 33J8nwlc003102;
-        Wed, 19 Apr 2023 09:47:11 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=RP2lDcaD428ljz65dkcYl2KlrQZcaxT4Re8ARQ3vcaI=;
- b=IkHZBmWfVK4yYHx0FHaSxZn9TJopOrilfGLet3IXt7AW3Lm9PH8nCiUGLmoLC1si2LAJ
- PfdWmQAqEdl/+axYTEE2/GsC03LCkKVpSD2x4t4I7t5jihFZI3uo8cG61h8yvJ+JPJbH
- 64pjwPSaaGEBDoB19fhu0E1SkGAsmFggTJaU612YNaGBSHEb+iLbOQSozzKLg5+yjegB
- uoUF2FnqIck2a9PGwWip/fLYV7YdXyIyMloi5yeezmp47Wl2qkDCN5jf2gBHlV2xeB99
- L1ealYtSNiKV6x9xLdAvLZAEerCeza9U267/92v8vgwqh0X+urU8AXMTLgP1fkoygVx2 Gg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3q20emdbt8-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 19 Apr 2023 09:47:10 +0000
-Received: from m0353728.ppops.net (m0353728.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 33J8Hx93002966;
-        Wed, 19 Apr 2023 09:47:09 GMT
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3q20emdbrv-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 19 Apr 2023 09:47:09 +0000
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 33J7bMQh006465;
-        Wed, 19 Apr 2023 09:47:07 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-        by ppma04ams.nl.ibm.com (PPS) with ESMTPS id 3pykj6am3e-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 19 Apr 2023 09:47:07 +0000
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-        by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 33J9l1iW13697612
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 19 Apr 2023 09:47:01 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 8066220043;
-        Wed, 19 Apr 2023 09:47:01 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 247BD20040;
-        Wed, 19 Apr 2023 09:47:00 +0000 (GMT)
-Received: from [9.171.77.152] (unknown [9.171.77.152])
-        by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-        Wed, 19 Apr 2023 09:47:00 +0000 (GMT)
-Message-ID: <268273e6-f94b-d033-fb8b-ab2acdd923b8@linux.ibm.com>
-Date:   Wed, 19 Apr 2023 11:46:59 +0200
+        with ESMTP id S232548AbjDSKBP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Apr 2023 06:01:15 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E40362D4C
+        for <kvm@vger.kernel.org>; Wed, 19 Apr 2023 03:00:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1681898427;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=XQ6sCjmuWnVFb8UpDGaTI+MOdoOd+qfctALNM5m0k+g=;
+        b=hyV+3+J5NOvASYRXZY6sjWgrk7FeoYvE6+CJOzZoFDjGnwiGxVV0k3Y0d8d11g+VL747i9
+        XvPHjJCbgG/xxvbT/7Hv4d1ntscg1J1AvE5eN+J7sssgzasev3DVDknt2vfHSX9uyU5RW9
+        tgcpXAucWBlnRf/xDCV6+ws4/JufQXY=
+Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
+ [209.85.160.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-54-7J8-nRs9P6KqHMZ0KVOPZg-1; Wed, 19 Apr 2023 06:00:25 -0400
+X-MC-Unique: 7J8-nRs9P6KqHMZ0KVOPZg-1
+Received: by mail-qt1-f199.google.com with SMTP id 13-20020ac8570d000000b003e37d3e6de2so22352976qtw.16
+        for <kvm@vger.kernel.org>; Wed, 19 Apr 2023 03:00:25 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1681898425; x=1684490425;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=XQ6sCjmuWnVFb8UpDGaTI+MOdoOd+qfctALNM5m0k+g=;
+        b=TbP5VAu048YLx6U3acLr34edIw/CMjhzlEb4GGcktJiVg3BChYzmPXQNK3uEzhMxC/
+         lFfjtrlfqvZjDovIF8xsa1rt2EcS6LcQpgHlJasGc4fl8e/3ltSYh6n+zR/hEk4P9NhE
+         6sV2CyFyMpIGeyxSgU69Zvn8yWZdAgVIhsQxs7eOmmJw9b+aY/Ph3nRDod/TBqb4ovxf
+         KeIzp91pHu53AW7IX4TMBwFMRtSdHoqXnTVgvI3B/2Je7cGMCQS3eY+/ItWf9s+tDmy5
+         UvzRnL0RzxPYWtruu5m0tMtxjoTlranxa2D+dCrH4AOPnHWCwQ7JPjPLZK4TFpKfc/S4
+         fS6w==
+X-Gm-Message-State: AAQBX9cF1O1+jMT/rNR4kLsEKvb6Z/+7ET2Tdcl8tzv4Y/mLAspeNHav
+        MrJppuRkzbcCw4WwgHFSGBNWiR4t349PI2+AaCC9LbHismL5hSpGRgsj2HjW9K3IAE2QWgB4MgR
+        kcfs6bLE866Sz
+X-Received: by 2002:a05:622a:44e:b0:3ef:437e:c828 with SMTP id o14-20020a05622a044e00b003ef437ec828mr1647525qtx.54.1681898424516;
+        Wed, 19 Apr 2023 03:00:24 -0700 (PDT)
+X-Google-Smtp-Source: AKy350bx/DlObVliHPvUfPOoqrhYKHpZuPyTlGGGIslCUKrTunefbYRtBDLkw2QCfpHp8ro/QNbCag==
+X-Received: by 2002:a05:622a:44e:b0:3ef:437e:c828 with SMTP id o14-20020a05622a044e00b003ef437ec828mr1647485qtx.54.1681898424062;
+        Wed, 19 Apr 2023 03:00:24 -0700 (PDT)
+Received: from sgarzare-redhat (host-82-53-134-157.retail.telecomitalia.it. [82.53.134.157])
+        by smtp.gmail.com with ESMTPSA id bq16-20020a05620a469000b007484d284cdasm4564029qkb.93.2023.04.19.03.00.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 19 Apr 2023 03:00:23 -0700 (PDT)
+Date:   Wed, 19 Apr 2023 12:00:17 +0200
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Bobby Eshleman <bobbyeshleman@gmail.com>
+Cc:     Bobby Eshleman <bobby.eshleman@bytedance.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        "K. Y. Srinivasan" <kys@microsoft.com>,
+        Haiyang Zhang <haiyangz@microsoft.com>,
+        Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+        Bryan Tan <bryantan@vmware.com>,
+        Vishnu Dasa <vdasa@vmware.com>,
+        VMware PV-Drivers Reviewers <pv-drivers@vmware.com>,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-hyperv@vger.kernel.org,
+        Jiang Wang <jiang.wang@bytedance.com>,
+        Cong Wang <cong.wang@bytedance.com>
+Subject: Re: [PATCH RFC net-next v2 0/4] virtio/vsock: support datagrams
+Message-ID: <r6oxanmhwlonb7lcrrowpitlgobivzp7pcwk7snqvfnzudi6pb@4rnio5wef3qu>
+References: <20230413-b4-vsock-dgram-v2-0-079cc7cee62e@bytedance.com>
+ <ZDk2kOVnUvyLMLKE@bullseye>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.8.0
-Subject: Re: [PATCH v19 01/21] s390x/cpu topology: add s390 specifics to CPU
- topology
-Content-Language: en-US
-To:     =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
-Cc:     =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
-        qemu-s390x@nongnu.org, qemu-devel@nongnu.org,
-        borntraeger@de.ibm.com, pasic@linux.ibm.com,
-        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
-        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
-        kvm@vger.kernel.org, ehabkost@redhat.com,
-        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
-        seiden@linux.ibm.com, nrb@linux.ibm.com, nsg@linux.ibm.com,
-        frankja@linux.ibm.com
-References: <20230403162905.17703-1-pmorel@linux.ibm.com>
- <20230403162905.17703-2-pmorel@linux.ibm.com>
- <4118bb4e-0505-26d3-3ffe-49245eae5364@kaod.org>
- <bd5cc488-20a7-54d1-7c3e-86136db77f84@linux.ibm.com>
- <ZD690MgTNAxcfkKp@redhat.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-In-Reply-To: <ZD690MgTNAxcfkKp@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: Hwg1ghZbUX2Erx9CSEV9xMgaE5Thngi1
-X-Proofpoint-ORIG-GUID: dpI9WRVrQ2kpNl9FroxG1XqXZgLX9iDW
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
- definitions=2023-04-19_05,2023-04-18_01,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 mlxscore=0 lowpriorityscore=0 spamscore=0 phishscore=0
- mlxlogscore=806 adultscore=0 bulkscore=0 suspectscore=0 clxscore=1015
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2303200000 definitions=main-2304190085
-X-Spam-Status: No, score=-4.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <ZDk2kOVnUvyLMLKE@bullseye>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi Bobby,
 
-On 4/18/23 17:57, Daniel P. Berrangé wrote:
-> On Tue, Apr 04, 2023 at 02:26:05PM +0200, Pierre Morel wrote:
->> On 4/4/23 09:03, Cédric Le Goater wrote:
->>> On 4/3/23 18:28, Pierre Morel wrote:
->>>> diff --git a/include/hw/s390x/cpu-topology.h
->>>> b/include/hw/s390x/cpu-topology.h
->>>> new file mode 100644
->>>> index 0000000000..83f31604cc
->>>> --- /dev/null
->>>> +++ b/include/hw/s390x/cpu-topology.h
->>>> @@ -0,0 +1,15 @@
->>>> +/*
->>>> + * CPU Topology
->>>> + *
->>>> + * Copyright IBM Corp. 2022
->>> Shouldn't we have some range : 2022-2023 ?
->> There was a discussion on this in the first spins, I think to remember that
->> Nina wanted 22 and Thomas 23,
->>
->> now we have a third opinion :) .
->>
->> I must say that all three have their reasons and I take what the majority
->> wants.
->>
->> A vote?
-> Whether or not to include a single year, or range of years in
-> the copyright statement is ultimately a policy decision for the
-> copyright holder to take (IBM in this case I presume), and not
-> subject to community vote/preferences.
+On Fri, Apr 14, 2023 at 11:18:40AM +0000, Bobby Eshleman wrote:
+>CC'ing Cong.
 >
-> I will note that some (possibly even many) organizations consider
-> the year to be largely redundant and devoid of legal benefit, so
-> are happy with basically any usage of dates (first year, most recent
-> year, a range of years, or none at all). With this in mind, QEMU is
-> willing to accept any usage wrt dates in the copyright statement.
->
-> It is possible that IBM have a specific policy their employees are
-> expected to follow. If so, follow that.
->
-> With regards,
-> Daniel
+>On Fri, Apr 14, 2023 at 12:25:56AM +0000, Bobby Eshleman wrote:
+>> Hey all!
+>>
+>> This series introduces support for datagrams to virtio/vsock.
 
+Great! Thanks for restarting this work!
 
-OK, thanks,
+>>
+>> It is a spin-off (and smaller version) of this series from the summer:
+>>   https://lore.kernel.org/all/cover.1660362668.git.bobby.eshleman@bytedance.com/
+>>
+>> Please note that this is an RFC and should not be merged until
+>> associated changes are made to the virtio specification, which will
+>> follow after discussion from this series.
+>>
+>> This series first supports datagrams in a basic form for virtio, and
+>> then optimizes the sendpath for all transports.
+>>
+>> The result is a very fast datagram communication protocol that
+>> outperforms even UDP on multi-queue virtio-net w/ vhost on a variety
+>> of multi-threaded workload samples.
+>>
+>> For those that are curious, some summary data comparing UDP and VSOCK
+>> DGRAM (N=5):
+>>
+>> 	vCPUS: 16
+>> 	virtio-net queues: 16
+>> 	payload size: 4KB
+>> 	Setup: bare metal + vm (non-nested)
+>>
+>> 	UDP: 287.59 MB/s
+>> 	VSOCK DGRAM: 509.2 MB/s
+>>
+>> Some notes about the implementation...
+>>
+>> This datagram implementation forces datagrams to self-throttle according
+>> to the threshold set by sk_sndbuf. It behaves similar to the credits
+>> used by streams in its effect on throughput and memory consumption, but
+>> it is not influenced by the receiving socket as credits are.
 
-Regards,
+So, sk_sndbuf influece the sender and sk_rcvbuf the receiver, right?
 
-Pierre
+We should check if VMCI behaves the same.
+
+>>
+>> The device drops packets silently. There is room for improvement by
+>> building into the device and driver some intelligence around how to
+>> reduce frequency of kicking the virtqueue when packet loss is high. I
+>> think there is a good discussion to be had on this.
+
+Can you elaborate a bit here?
+
+Do you mean some mechanism to report to the sender that a destination
+(cid, port) is full so the packet will be dropped?
+
+Can we adapt the credit mechanism?
+
+>>
+>> In this series I am also proposing that fairness be reexamined as an
+>> issue separate from datagrams, which differs from my previous series
+>> that coupled these issues. After further testing and reflection on the
+>> design, I do not believe that these need to be coupled and I do not
+>> believe this implementation introduces additional unfairness or
+>> exacerbates pre-existing unfairness.
+
+I see.
+
+>>
+>> I attempted to characterize vsock fairness by using a pool of processes
+>> to stress test the shared resources while measuring the performance of a
+>> lone stream socket. Given unfair preference for datagrams, we would
+>> assume that a lone stream socket would degrade much more when a pool of
+>> datagram sockets was stressing the system than when a pool of stream
+>> sockets are stressing the system. The result, however, showed no
+>> significant difference between the degradation of throughput of the lone
+>> stream socket when using a pool of datagrams to stress the queue over
+>> using a pool of streams. The absolute difference in throughput actually
+>> favored datagrams as interfering least as the mean difference was +16%
+>> compared to using streams to stress test (N=7), but it was not
+>> statistically significant. Workloads were matched for payload size and
+>> buffer size (to approximate memory consumption) and process count, and
+>> stress workloads were configured to start before and last long after the
+>> lifetime of the "lone" stream socket flow to ensure that competing flows
+>> were continuously hot.
+>>
+>> Given the above data, I propose that vsock fairness be addressed
+>> independent of datagrams and to defer its implementation to a future
+>> series.
+
+Makes sense to me.
+
+I left some preliminary comments, anyway now it seems reasonable to use
+the same virtqueues, so we can go head with the spec proposal.
+
+Thanks,
+Stefano
 
