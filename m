@@ -2,105 +2,158 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 275B66E778C
-	for <lists+kvm@lfdr.de>; Wed, 19 Apr 2023 12:39:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2383C6E7951
+	for <lists+kvm@lfdr.de>; Wed, 19 Apr 2023 14:06:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232446AbjDSKi6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Apr 2023 06:38:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47604 "EHLO
+        id S233072AbjDSMGY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Apr 2023 08:06:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58530 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232063AbjDSKi4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Apr 2023 06:38:56 -0400
-Received: from mail-lj1-x22b.google.com (mail-lj1-x22b.google.com [IPv6:2a00:1450:4864:20::22b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A58A1C2;
-        Wed, 19 Apr 2023 03:38:54 -0700 (PDT)
-Received: by mail-lj1-x22b.google.com with SMTP id 38308e7fff4ca-2a7ffe75ae4so3462461fa.0;
-        Wed, 19 Apr 2023 03:38:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1681900733; x=1684492733;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=iFeUeRReVqfmHEBFJNhWwM8mC6IxbLrqFkqgC+66KY0=;
-        b=o2j8eQePFP0WspOBIHEnCLVLE6n8IoPl76B1gSVGkYMhCtZOxc9FfY8eShIqd0A5Rs
-         Da8rcyjwOZNhbplSHKfR1wIwNG9eB6D79aeWwDAbbS2ZY/TlwaoC81czCFoPWv9YuDEE
-         4L1z4cptotUnB4O0pqIpm4zpaslaYjnJ0YD65haubOLRKgchUcSiTRTCNSnHqbg1MP+G
-         IaK8ZqkyjLCrbhQ9+VgfjNw6RhN8I3/1FjvNLSTWG1J+5QqCsi93ARP8Os/YW97JqgNJ
-         2T7QWsgXbomAjdHh1qVEy/jjzc1ODGSBNfRGDzY5CrPZIxwah12w58P4XNg6tT2wAMlm
-         eprQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681900733; x=1684492733;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=iFeUeRReVqfmHEBFJNhWwM8mC6IxbLrqFkqgC+66KY0=;
-        b=lHUrbQ5byjEXMClUSNgg8SjTSTg3kn3ioRoFxmtri66/IkqmEg3uR/w3jNEcXJeyhA
-         HS/qHukr0/80uaPhZ6KCiStfHlcH8VAoSpfzHoRizj7XIfNzjY+i3jTk5NWELCLDzbOB
-         HG29ogxTas4ePd3sb+zg/2v3YwrIlI8LCxgAz0wlbEPqTS0prQfyc07O4xkhWPglJ2Rz
-         OH53jlaqMNEd1LUXzzjeKW/InBR8wo2j9/C6HAx3dW6REv1tVjQFhmaWFhVgzTU1lmcz
-         IiPMkjIXgexVa+I4vqRhkewTUzPPo2br/GfDmvmHy6c+mhhxMnMd2QoAx9bNbRVwGbT7
-         AEFw==
-X-Gm-Message-State: AAQBX9fu4iil1IWKjhc95FcZb8mFHsYegu1E4yw51ZsJT0G0NiXZ+huk
-        1KJuvQ4LkP/hGYwnA/CzslM=
-X-Google-Smtp-Source: AKy350aMnAtct5UxyWYcOOfzUoo5NBZZ5SBvhkNojgr+2C7G2wtKfGsdhjdUh1o6IJqzgw28cDG5hw==
-X-Received: by 2002:ac2:42c5:0:b0:4e7:ed3c:68ea with SMTP id n5-20020ac242c5000000b004e7ed3c68eamr3780079lfl.5.1681900732797;
-        Wed, 19 Apr 2023 03:38:52 -0700 (PDT)
-Received: from localhost (88-115-161-74.elisa-laajakaista.fi. [88.115.161.74])
-        by smtp.gmail.com with ESMTPSA id 7-20020ac25687000000b004edc2a023ffsm1220704lfr.36.2023.04.19.03.38.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Apr 2023 03:38:52 -0700 (PDT)
-Date:   Wed, 19 Apr 2023 13:38:41 +0300
-From:   Zhi Wang <zhi.wang.linux@gmail.com>
-To:     Vishal Annapurve <vannapurve@google.com>
-Cc:     isaku.yamahata@intel.com, dmatlack@google.com,
-        erdemaktas@google.com, isaku.yamahata@gmail.com,
-        kai.huang@intel.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, pbonzini@redhat.com,
-        sagis@google.com, seanjc@google.com
-Subject: Re: [PATCH v13 098/113] KVM: TDX: Handle TDX PV map_gpa hypercall
-Message-ID: <20230419133841.00001ee8.zhi.wang.linux@gmail.com>
-In-Reply-To: <20230418190904.1111011-1-vannapurve@google.com>
-References: <c49aa7b7bbc016b6c8b698ac2ce3b9d866b551f9.1678643052.git.isaku.yamahata@intel.com>
-        <20230418190904.1111011-1-vannapurve@google.com>
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
+        with ESMTP id S230141AbjDSMGW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Apr 2023 08:06:22 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 583F21991;
+        Wed, 19 Apr 2023 05:06:21 -0700 (PDT)
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 33JBmiVs034942;
+        Wed, 19 Apr 2023 12:05:38 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=XxQyWGNU20y3Wnv7oBYdxQVoyeJRqhv7cvwcPncLqqk=;
+ b=MaUkKBXx8iVhZnQfi2RDt8faEETMnMKAbEzNZO+lpYZA4Qzm/42cfcABcujSIwghRV0X
+ 3PeqNDRd4IaTppWUkLe9WhVR7DHaK67napzSWb0/fyAY5su8TJWCvhMrkWNBKYnZzWpL
+ nrZow2Y7r/vmn90Ku0+11UMeCHt4krQqymOUrwysBfKhQ3gB8XVNTfmR2AisCvruWOoC
+ HGrgnECisFQCMRlF+rKjlvt0AJiiXkbKhxoPOW9SAl/j9H94nYFHqgnk9sLjyUqIjTb9
+ M4kh5I4Iraa1TWc6fPCqKtgixwG8fAM688OISqzSFuM22pbbenILF8ksGHq+DRGoNVxP lg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3q2apmt6hp-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 19 Apr 2023 12:05:38 +0000
+Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 33JBoDWh003607;
+        Wed, 19 Apr 2023 12:05:37 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3q2apmt6g9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 19 Apr 2023 12:05:37 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 33J0WAFx000870;
+        Wed, 19 Apr 2023 12:05:34 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+        by ppma03ams.nl.ibm.com (PPS) with ESMTPS id 3pykj6jqcr-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 19 Apr 2023 12:05:34 +0000
+Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
+        by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 33JC5V2D45941078
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 19 Apr 2023 12:05:31 GMT
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 4647620040;
+        Wed, 19 Apr 2023 12:05:31 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 91F6F20043;
+        Wed, 19 Apr 2023 12:05:27 +0000 (GMT)
+Received: from [9.171.27.132] (unknown [9.171.27.132])
+        by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Wed, 19 Apr 2023 12:05:27 +0000 (GMT)
+Message-ID: <ab586b59-7d62-2ea1-a617-ffbcf91f4037@linux.ibm.com>
+Date:   Wed, 19 Apr 2023 14:05:26 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+Subject: Re: [PATCH v4 3/6] mm/gup: remove vmas parameter from
+ get_user_pages_remote()
+Content-Language: en-US
+To:     Lorenzo Stoakes <lstoakes@gmail.com>, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org,
+        Andrew Morton <akpm@linux-foundation.org>
+Cc:     Matthew Wilcox <willy@infradead.org>,
+        David Hildenbrand <david@redhat.com>,
+        linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-perf-users@vger.kernel.org,
+        linux-security-module@vger.kernel.org,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Eric Biederman <ebiederm@xmission.com>,
+        Kees Cook <keescook@chromium.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Christian Brauner <brauner@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Jiri Olsa <jolsa@kernel.org>,
+        Namhyung Kim <namhyung@kernel.org>,
+        Ian Rogers <irogers@google.com>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        Kentaro Takeda <takedakn@nttdata.co.jp>,
+        Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
+        Paul Moore <paul@paul-moore.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E . Hallyn" <serge@hallyn.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+References: <cover.1681831798.git.lstoakes@gmail.com>
+ <7c6f1ae88320bf11d2f583178a3d9e653e06ac63.1681831798.git.lstoakes@gmail.com>
+From:   Janosch Frank <frankja@linux.ibm.com>
+In-Reply-To: <7c6f1ae88320bf11d2f583178a3d9e653e06ac63.1681831798.git.lstoakes@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: YoUBdd5kWLHDb-6WjYvIk2NpjLH1WX8c
+X-Proofpoint-GUID: aezbm9zbIzDKmcuHzP9oULlrIcksYyaJ
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
+ definitions=2023-04-19_06,2023-04-18_01,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 phishscore=0
+ suspectscore=0 priorityscore=1501 mlxlogscore=566 adultscore=0
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 bulkscore=0 malwarescore=0
+ clxscore=1011 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2303200000 definitions=main-2304190108
+X-Spam-Status: No, score=-4.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 18 Apr 2023 19:09:04 +0000
-Vishal Annapurve <vannapurve@google.com> wrote:
+On 4/18/23 17:49, Lorenzo Stoakes wrote:
+> The only instances of get_user_pages_remote() invocations which used the
+> vmas parameter were for a single page which can instead simply look up the
+> VMA directly. In particular:-
+> 
+> - __update_ref_ctr() looked up the VMA but did nothing with it so we simply
+>    remove it.
+> 
+> - __access_remote_vm() was already using vma_lookup() when the original
+>    lookup failed so by doing the lookup directly this also de-duplicates the
+>    code.
+> 
+> We are able to perform these VMA operations as we already hold the
+> mmap_lock in order to be able to call get_user_pages_remote().
+> 
+> As part of this work we add get_user_page_vma_remote() which abstracts the
+> VMA lookup, error handling and decrementing the page reference count should
+> the VMA lookup fail.
+> 
+> This forms part of a broader set of patches intended to eliminate the vmas
+> parameter altogether.
+> 
+> Reviewed-by: Catalin Marinas <catalin.marinas@arm.com> (for arm64)
+> Acked-by: David Hildenbrand <david@redhat.com>
+> Signed-off-by: Lorenzo Stoakes <lstoakes@gmail.com>
+> ---
 
-> > +static int tdx_map_gpa(struct kvm_vcpu *vcpu)
-> > +{
-> > +	struct kvm *kvm = vcpu->kvm;
-> > +	gpa_t gpa = tdvmcall_a0_read(vcpu);
-> > +	gpa_t size = tdvmcall_a1_read(vcpu);
-> > +	gpa_t end = gpa + size;
-> > +
-> > +	if (!IS_ALIGNED(gpa, PAGE_SIZE) || !IS_ALIGNED(size, PAGE_SIZE) ||
-> > +	    end < gpa ||
-> > +	    end > kvm_gfn_shared_mask(kvm) << (PAGE_SHIFT + 1) ||
-> > +	    kvm_is_private_gpa(kvm, gpa) != kvm_is_private_gpa(kvm, end)) {
-> > +		tdvmcall_set_return_code(vcpu, TDG_VP_VMCALL_INVALID_OPERAND);
-> > +		return 1;
-> > +	}
-> > +
-> > +	return tdx_vp_vmcall_to_user(vcpu);
-> 
-> This will result into exits to userspace for MMIO regions as well. Does it make
-> sense to only exit to userspace for guest physical memory regions backed by
-> memslots?
-> 
-I think this is necessary as when passing a PCI device to a TD, the guest needs to convert a MMIO region from private to shared, which is not backed by memslots.
-> > +}
-> > +
+For the s390 part:
+Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
 
