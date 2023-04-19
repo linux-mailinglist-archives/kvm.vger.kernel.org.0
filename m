@@ -2,60 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 260D06E7AAE
+	by mail.lfdr.de (Postfix) with ESMTP id CC7006E7AAF
 	for <lists+kvm@lfdr.de>; Wed, 19 Apr 2023 15:27:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233191AbjDSN1x (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Apr 2023 09:27:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35114 "EHLO
+        id S233236AbjDSN1y (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Apr 2023 09:27:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35116 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233064AbjDSN1v (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S233054AbjDSN1v (ORCPT <rfc822;kvm@vger.kernel.org>);
         Wed, 19 Apr 2023 09:27:51 -0400
-Received: from mail-wm1-x32d.google.com (mail-wm1-x32d.google.com [IPv6:2a00:1450:4864:20::32d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 456BA46BB
+Received: from mail-wm1-x32a.google.com (mail-wm1-x32a.google.com [IPv6:2a00:1450:4864:20::32a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B746A30D4
         for <kvm@vger.kernel.org>; Wed, 19 Apr 2023 06:27:46 -0700 (PDT)
-Received: by mail-wm1-x32d.google.com with SMTP id a8-20020a05600c348800b003f17ddb04e3so1370748wmq.2
+Received: by mail-wm1-x32a.google.com with SMTP id iw7-20020a05600c54c700b003f16fce55b5so1460170wmb.0
         for <kvm@vger.kernel.org>; Wed, 19 Apr 2023 06:27:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google; t=1681910865; x=1684502865;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=zXXPAPd7Lhm10tnhbD93859rtM6+xJNLXlNQi2l/X0c=;
-        b=zZt2owNkIF/em6SsvBR4V2ThQ//6hSvYcdmLofZlZpRJP1kkWk0SvBziPb3CcDKqZi
-         Sda5O9qv04fHV3XCa3iZYMmBfR7YJViUaPzy59Dn6m12n6dVZWpjqwP01y5a4LhCuF0j
-         HcYlkO5McEtRNN0+mtrskx6f6cO8p83lSSrqlmEnemgtY430c47ZfHBaIXsqHm0t81v0
-         BRC5Zr1wb3Ihr4xiC8bGtGM74NMdj05BHcmdco7h1GSn02JZ8NBhitOaP3+oE1lVoNNA
-         iPJnlMGoYDomOCGcWoHfahdUuvRHc0hXbaok8W367KPE2BpuHKPHSv4NAFvZEe3UobtB
-         krFQ==
+        bh=sf5jQ7FsskeiIkP7ak2gohZd1HhOl8Mi8w0DmpQUx7Y=;
+        b=twXb0VmsbnVwF0zIwgKqy9r2oFER1FayZMFEuxP3JdhNVOr/Ku6Z0C2+Q8u8nvOJuE
+         OSGxynG974S7fbpBk9SV1RS4eSWlN6MxdnOsaovh5iMBblSRpx/42w+KmTbmsb62FR6Z
+         sf9/O3DdVouA6a3E01oKWHW3oLpzAeZWD0JIYgfiZ7ATHrvldB1hUHNPx72lKL1WpVGF
+         szHpDFl8YM1m8yiuslt9M79TfH9uiXUx2is3SH0GpOqD0vGIqzAZxEXrsNCKE1jtHR4/
+         /2HJx6Ys/0B+VRcsOGjmyDP/Pno/id8VHOnuZjGHszuzDvBOrbphkg5q4pXTjuhwu6EC
+         wUmw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20221208; t=1681910865; x=1684502865;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=zXXPAPd7Lhm10tnhbD93859rtM6+xJNLXlNQi2l/X0c=;
-        b=Qa6x0y2ILfDpHivlbWGWlH9DBeyOzWuvpBA9SicNv2yxPAOzqwc3LpB2+s3VmvzF+5
-         e+Um6ssRtR427wbZ7AGzpYPKkyLfrhRjJf0b0xIyRVcW8w48hVHbWC/7TvdZH1MehsWP
-         ygHGeu2rM/NoeFmCv8BAUcYt5AX/TslXU05zw/5rti5rFkmcITjIdBjS00kBL4BmwOmi
-         xAfUwFhdMC5Gkf/kY0pMCEnesCPRZJtPtNlIcBJE2+7IXSceLKI+LjcHONyyIUxsIM7s
-         C8ihKqmeTFYAXFaKYIXCJvgU26DkSvKps0ctHjZ84wosrbNdz1u5pQFmW5T+uyfzbL0m
-         1yKw==
-X-Gm-Message-State: AAQBX9fEMuzMicrFLOImn0DwpecMzyxGDoOOAraIHuJkPccQe+MrNpqd
-        joaIKbWPJhnEiQTXvW4HnugkXSs3QDlTiVRPitk=
-X-Google-Smtp-Source: AKy350ZsTNOTfkGJNDgRAiMdWGQVr/Q+y7HhNQcCUcQkZvcAomHjBfYje6Zto9k4habQ3aunPzhTIg==
-X-Received: by 2002:a7b:cbd3:0:b0:3f0:a785:f0f5 with SMTP id n19-20020a7bcbd3000000b003f0a785f0f5mr15850062wmi.16.1681910864795;
-        Wed, 19 Apr 2023 06:27:44 -0700 (PDT)
+        bh=sf5jQ7FsskeiIkP7ak2gohZd1HhOl8Mi8w0DmpQUx7Y=;
+        b=JjpoAS5rYoAUDF42327pquG2dWUXXb/JtIhU4FUuBNHLhVKMWeJitmvnYwfWBYImbK
+         eAtWySZ8++6UAyWV9RUnRdv0HWHwFsDLNKm0EnhKEX1NfVvBZXuzgNa1WeAY/DQ/njkl
+         NwKHMRPRzAAGtZ+EpdmMm+S5ZyfsF7yXJkQSm/uUwQmVx/cQukiF0XzkFsg+puq5a/GL
+         fRdXAL/K1eRr2t/zzF6N0clSZ0YIDojlEa85jrR1qG73Jjscr+bIjYeZVR8m0vl5vp12
+         YTramq2r4KTUTOxuDzWVIqi3LxLPur8WlqdWLHi4sumcd032MCOhlO95FO+OZfGRsVIy
+         c+3A==
+X-Gm-Message-State: AAQBX9fsAcm/tCPOGWSlgIgK0/Vv2fXZcZYSiZW9EDApADzqCwkXBXnZ
+        wWZ2yfR8EXcHsBFb0YObE1q4Vb5Co5QTI6E5aHM=
+X-Google-Smtp-Source: AKy350aLPsCQDPiEFrCFZTq4ivfnQTP/RVndwRTujvJwYN5/otW55YKff6iZ9kyiomZ9LxbX/FzvdA==
+X-Received: by 2002:a7b:c309:0:b0:3f0:967e:2cfb with SMTP id k9-20020a7bc309000000b003f0967e2cfbmr17899956wmj.36.1681910865312;
+        Wed, 19 Apr 2023 06:27:45 -0700 (PDT)
 Received: from localhost.localdomain (054592b0.skybroadband.com. [5.69.146.176])
         by smtp.gmail.com with ESMTPSA id p8-20020a05600c358800b003f1738d0d13sm3497017wmq.1.2023.04.19.06.27.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Apr 2023 06:27:44 -0700 (PDT)
+        Wed, 19 Apr 2023 06:27:45 -0700 (PDT)
 From:   Jean-Philippe Brucker <jean-philippe@linaro.org>
 To:     kvm@vger.kernel.org, will@kernel.org
 Cc:     suzuki.poulose@arm.com,
         Jean-Philippe Brucker <jean-philippe@linaro.org>
-Subject: [PATCH kvmtool 03/16] virtio/vhost: Factor notify_vq_eventfd()
-Date:   Wed, 19 Apr 2023 14:21:07 +0100
-Message-Id: <20230419132119.124457-4-jean-philippe@linaro.org>
+Subject: [PATCH kvmtool 04/16] virtio/vhost: Factor notify_vq_gsi()
+Date:   Wed, 19 Apr 2023 14:21:08 +0100
+Message-Id: <20230419132119.124457-5-jean-philippe@linaro.org>
 X-Mailer: git-send-email 2.40.0
 In-Reply-To: <20230419132119.124457-1-jean-philippe@linaro.org>
 References: <20230419132119.124457-1-jean-philippe@linaro.org>
@@ -71,129 +71,251 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-All vhost devices perform the same operation when setting up the
-ioeventfd. Move it to virtio/vhost.c
+All vhost devices should perform the same operations when initializing
+the IRQFD. Move it to virtio/vhost.c
+
+This fixes vsock, which didn't go through the irq__add_irqfd() helper
+and couldn't be used on systems that require GSI translation (GICv2m).
 
 Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
 ---
- include/kvm/virtio.h |  2 ++
- virtio/net.c         |  9 +--------
- virtio/scsi.c        |  9 +--------
- virtio/vhost.c       | 14 ++++++++++++++
- virtio/vsock.c       | 14 ++------------
- 5 files changed, 20 insertions(+), 28 deletions(-)
+ include/kvm/virtio.h |  8 ++++++++
+ virtio/net.c         | 30 ++++--------------------------
+ virtio/scsi.c        | 15 ++-------------
+ virtio/vhost.c       | 35 +++++++++++++++++++++++++++++++++++
+ virtio/vsock.c       | 26 +++-----------------------
+ 5 files changed, 52 insertions(+), 62 deletions(-)
 
 diff --git a/include/kvm/virtio.h b/include/kvm/virtio.h
-index c8fd69e0..4a364a02 100644
+index 4a364a02..96c7b3ea 100644
 --- a/include/kvm/virtio.h
 +++ b/include/kvm/virtio.h
-@@ -250,6 +250,8 @@ void virtio_notify_status(struct kvm *kvm, struct virtio_device *vdev,
- void virtio_vhost_init(struct kvm *kvm, int vhost_fd);
- void virtio_vhost_set_vring(struct kvm *kvm, int vhost_fd, u32 index,
+@@ -77,6 +77,10 @@ struct virt_queue {
+ 	u16		endian;
+ 	bool		use_event_idx;
+ 	bool		enabled;
++
++	/* vhost IRQ handling */
++	int		gsi;
++	int		irqfd;
+ };
+ 
+ /*
+@@ -252,6 +256,10 @@ void virtio_vhost_set_vring(struct kvm *kvm, int vhost_fd, u32 index,
  			    struct virt_queue *queue);
-+void virtio_vhost_set_vring_kick(struct kvm *kvm, int vhost_fd,
-+				 u32 index, int event_fd);
+ void virtio_vhost_set_vring_kick(struct kvm *kvm, int vhost_fd,
+ 				 u32 index, int event_fd);
++void virtio_vhost_set_vring_call(struct kvm *kvm, int vhost_fd, u32 index,
++				 u32 gsi, struct virt_queue *queue);
++void virtio_vhost_reset_vring(struct kvm *kvm, int vhost_fd, u32 index,
++			      struct virt_queue *queue);
  
  int virtio_transport_parser(const struct option *opt, const char *arg, int unset);
  
 diff --git a/virtio/net.c b/virtio/net.c
-index 021c81d3..b935d24f 100644
+index b935d24f..519dcbb7 100644
 --- a/virtio/net.c
 +++ b/virtio/net.c
-@@ -701,18 +701,11 @@ static void notify_vq_gsi(struct kvm *kvm, void *dev, u32 vq, u32 gsi)
- static void notify_vq_eventfd(struct kvm *kvm, void *dev, u32 vq, u32 efd)
+@@ -4,12 +4,12 @@
+ #include "kvm/mutex.h"
+ #include "kvm/util.h"
+ #include "kvm/kvm.h"
+-#include "kvm/irq.h"
+ #include "kvm/uip.h"
+ #include "kvm/guest_compat.h"
+ #include "kvm/iovec.h"
+ #include "kvm/strbuf.h"
+ 
++#include <linux/list.h>
+ #include <linux/vhost.h>
+ #include <linux/virtio_net.h>
+ #include <linux/if_tun.h>
+@@ -25,7 +25,6 @@
+ #include <sys/ioctl.h>
+ #include <sys/types.h>
+ #include <sys/wait.h>
+-#include <sys/eventfd.h>
+ 
+ #define VIRTIO_NET_QUEUE_SIZE		256
+ #define VIRTIO_NET_NUM_QUEUES		8
+@@ -44,8 +43,6 @@ struct net_dev_queue {
+ 	pthread_t			thread;
+ 	struct mutex			lock;
+ 	pthread_cond_t			cond;
+-	int				gsi;
+-	int				irqfd;
+ };
+ 
+ struct net_dev {
+@@ -647,11 +644,7 @@ static void exit_vq(struct kvm *kvm, void *dev, u32 vq)
+ 	struct net_dev *ndev = dev;
+ 	struct net_dev_queue *queue = &ndev->queues[vq];
+ 
+-	if (!is_ctrl_vq(ndev, vq) && queue->gsi) {
+-		irq__del_irqfd(kvm, queue->gsi, queue->irqfd);
+-		close(queue->irqfd);
+-		queue->gsi = queue->irqfd = 0;
+-	}
++	virtio_vhost_reset_vring(kvm, ndev->vhost_fd, vq, &queue->vq);
+ 
+ 	/*
+ 	 * TODO: vhost reset owner. It's the only way to cleanly stop vhost, but
+@@ -675,27 +668,12 @@ static void notify_vq_gsi(struct kvm *kvm, void *dev, u32 vq, u32 gsi)
  {
  	struct net_dev *ndev = dev;
--	struct vhost_vring_file file = {
--		.index	= vq,
--		.fd	= efd,
--	};
+ 	struct net_dev_queue *queue = &ndev->queues[vq];
+-	struct vhost_vring_file file;
 -	int r;
  
- 	if (ndev->vhost_fd == 0 || is_ctrl_vq(ndev, vq))
+ 	if (ndev->vhost_fd == 0)
  		return;
  
--	r = ioctl(ndev->vhost_fd, VHOST_SET_VRING_KICK, &file);
+-	file = (struct vhost_vring_file) {
+-		.index	= vq,
+-		.fd	= eventfd(0, 0),
+-	};
+-
+-	r = irq__add_irqfd(kvm, gsi, file.fd, -1);
 -	if (r < 0)
--		die_perror("VHOST_SET_VRING_KICK failed");
-+	virtio_vhost_set_vring_kick(kvm, ndev->vhost_fd, vq, efd);
+-		die_perror("KVM_IRQFD failed");
+-
+-	queue->irqfd = file.fd;
+-	queue->gsi = gsi;
+-
+-	r = ioctl(ndev->vhost_fd, VHOST_SET_VRING_CALL, &file);
+-	if (r < 0)
+-		die_perror("VHOST_SET_VRING_CALL failed");
++	virtio_vhost_set_vring_call(kvm, ndev->vhost_fd, vq, gsi,
++				    &queue->vq);
  }
  
- static int notify_vq(struct kvm *kvm, void *dev, u32 vq)
+ static void notify_vq_eventfd(struct kvm *kvm, void *dev, u32 vq, u32 efd)
 diff --git a/virtio/scsi.c b/virtio/scsi.c
-index 674aad34..1f757404 100644
+index 1f757404..29acf57c 100644
 --- a/virtio/scsi.c
 +++ b/virtio/scsi.c
-@@ -123,18 +123,11 @@ static void notify_vq_gsi(struct kvm *kvm, void *dev, u32 vq, u32 gsi)
- static void notify_vq_eventfd(struct kvm *kvm, void *dev, u32 vq, u32 efd)
+@@ -92,25 +92,14 @@ static int init_vq(struct kvm *kvm, void *dev, u32 vq)
+ 
+ static void notify_vq_gsi(struct kvm *kvm, void *dev, u32 vq, u32 gsi)
  {
+-	struct vhost_vring_file file;
  	struct scsi_dev *sdev = dev;
--	struct vhost_vring_file file = {
--		.index	= vq,
--		.fd	= efd,
--	};
--	int r;
+ 	int r;
  
  	if (sdev->vhost_fd == 0)
  		return;
  
--	r = ioctl(sdev->vhost_fd, VHOST_SET_VRING_KICK, &file);
+-	file = (struct vhost_vring_file) {
+-		.index	= vq,
+-		.fd	= eventfd(0, 0),
+-	};
+-
+-	r = irq__add_irqfd(kvm, gsi, file.fd, -1);
 -	if (r < 0)
--		die_perror("VHOST_SET_VRING_KICK failed");
-+	virtio_vhost_set_vring_kick(kvm, sdev->vhost_fd, vq, efd);
- }
+-		die_perror("KVM_IRQFD failed");
+-
+-	r = ioctl(sdev->vhost_fd, VHOST_SET_VRING_CALL, &file);
+-	if (r < 0)
+-		die_perror("VHOST_SET_VRING_CALL failed");
++	virtio_vhost_set_vring_call(kvm, sdev->vhost_fd, vq, gsi,
++				    &sdev->vqs[vq]);
  
- static int notify_vq(struct kvm *kvm, void *dev, u32 vq)
+ 	if (vq > 0)
+ 		return;
 diff --git a/virtio/vhost.c b/virtio/vhost.c
-index afe37465..3acfd30a 100644
+index 3acfd30a..cd83645c 100644
 --- a/virtio/vhost.c
 +++ b/virtio/vhost.c
-@@ -65,3 +65,17 @@ void virtio_vhost_set_vring(struct kvm *kvm, int vhost_fd, u32 index,
+@@ -1,9 +1,12 @@
++#include "kvm/irq.h"
+ #include "kvm/virtio.h"
+ 
+ #include <linux/kvm.h>
+ #include <linux/vhost.h>
+ #include <linux/list.h>
+ 
++#include <sys/eventfd.h>
++
+ void virtio_vhost_init(struct kvm *kvm, int vhost_fd)
+ {
+ 	struct kvm_mem_bank *bank;
+@@ -79,3 +82,35 @@ void virtio_vhost_set_vring_kick(struct kvm *kvm, int vhost_fd,
  	if (r < 0)
- 		die_perror("VHOST_SET_VRING_ADDR failed");
+ 		die_perror("VHOST_SET_VRING_KICK failed");
  }
 +
-+void virtio_vhost_set_vring_kick(struct kvm *kvm, int vhost_fd,
-+				 u32 index, int event_fd)
++void virtio_vhost_set_vring_call(struct kvm *kvm, int vhost_fd, u32 index,
++				 u32 gsi, struct virt_queue *queue)
 +{
 +	int r;
 +	struct vhost_vring_file file = {
 +		.index	= index,
-+		.fd	= event_fd,
++		.fd	= eventfd(0, 0),
 +	};
 +
-+	r = ioctl(vhost_fd, VHOST_SET_VRING_KICK, &file);
++	r = irq__add_irqfd(kvm, gsi, file.fd, -1);
 +	if (r < 0)
-+		die_perror("VHOST_SET_VRING_KICK failed");
++		die_perror("KVM_IRQFD failed");
++
++	r = ioctl(vhost_fd, VHOST_SET_VRING_CALL, &file);
++	if (r < 0)
++		die_perror("VHOST_SET_VRING_CALL failed");
++
++	queue->irqfd = file.fd;
++	queue->gsi = gsi;
++}
++
++void virtio_vhost_reset_vring(struct kvm *kvm, int vhost_fd, u32 index,
++			      struct virt_queue *queue)
++
++{
++	if (queue->gsi) {
++		irq__del_irqfd(kvm, queue->gsi, queue->irqfd);
++		close(queue->irqfd);
++		queue->gsi = queue->irqfd = 0;
++	}
 +}
 diff --git a/virtio/vsock.c b/virtio/vsock.c
-index 2f7906f2..0ada9e09 100644
+index 0ada9e09..559fbaba 100644
 --- a/virtio/vsock.c
 +++ b/virtio/vsock.c
-@@ -80,21 +80,11 @@ static int init_vq(struct kvm *kvm, void *dev, u32 vq)
- static void notify_vq_eventfd(struct kvm *kvm, void *dev, u32 vq, u32 efd)
- {
- 	struct vsock_dev *vdev = dev;
--	struct vhost_vring_file file = {
--		.index	= vq,
--		.fd	= efd,
--	};
--	int r;
+@@ -131,33 +131,13 @@ static int set_size_vq(struct kvm *kvm, void *dev, u32 vq, int size)
  
--	if (is_event_vq(vq))
--		return;
+ static void notify_vq_gsi(struct kvm *kvm, void *dev, u32 vq, u32 gsi)
+ {
+-	struct vhost_vring_file file;
+ 	struct vsock_dev *vdev = dev;
+-	struct kvm_irqfd irq;
+-	int r;
 -
 -	if (vdev->vhost_fd == -1)
+-		return;
+ 
+-	if (is_event_vq(vq))
 +	if (vdev->vhost_fd == -1 || is_event_vq(vq))
  		return;
  
--	r = ioctl(vdev->vhost_fd, VHOST_SET_VRING_KICK, &file);
+-	irq = (struct kvm_irqfd) {
+-		.gsi	= gsi,
+-		.fd	= eventfd(0, 0),
+-	};
+-	file = (struct vhost_vring_file) {
+-		.index	= vq,
+-		.fd	= irq.fd,
+-	};
+-
+-	r = ioctl(kvm->vm_fd, KVM_IRQFD, &irq);
 -	if (r < 0)
--		die_perror("VHOST_SET_VRING_KICK failed");
-+	virtio_vhost_set_vring_kick(kvm, vdev->vhost_fd, vq, efd);
+-		die_perror("KVM_IRQFD failed");
+-
+-	r = ioctl(vdev->vhost_fd, VHOST_SET_VRING_CALL, &file);
+-	if (r < 0)
+-		die_perror("VHOST_SET_VRING_CALL failed");
++	virtio_vhost_set_vring_call(kvm, vdev->vhost_fd, vq, gsi,
++				    &vdev->vqs[vq]);
  }
  
- static void notify_status(struct kvm *kvm, void *dev, u32 status)
+ static unsigned int get_vq_count(struct kvm *kvm, void *dev)
 -- 
 2.40.0
 
