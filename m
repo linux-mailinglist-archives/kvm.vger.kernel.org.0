@@ -2,206 +2,155 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5ED216E7680
-	for <lists+kvm@lfdr.de>; Wed, 19 Apr 2023 11:39:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 160766E76A1
+	for <lists+kvm@lfdr.de>; Wed, 19 Apr 2023 11:47:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231660AbjDSJje (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Apr 2023 05:39:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37194 "EHLO
+        id S232254AbjDSJrW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Apr 2023 05:47:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43818 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229833AbjDSJjc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Apr 2023 05:39:32 -0400
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 60B7A2103
-        for <kvm@vger.kernel.org>; Wed, 19 Apr 2023 02:39:30 -0700 (PDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DCCF91042;
-        Wed, 19 Apr 2023 02:40:13 -0700 (PDT)
-Received: from monolith.localdoman (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 74C633F5A1;
-        Wed, 19 Apr 2023 02:39:28 -0700 (PDT)
-Date:   Wed, 19 Apr 2023 10:39:25 +0100
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-To:     Eric Auger <eric.auger@redhat.com>
-Cc:     Mark Rutland <mark.rutland@arm.com>,
-        Andrew Jones <andrew.jones@linux.dev>,
-        eric.auger.pro@gmail.com, kvm@vger.kernel.org,
-        kvmarm@lists.linux.dev, maz@kernel.org, will@kernel.org,
-        oliver.upton@linux.dev, ricarkol@google.com, reijiw@google.com
-Subject: Re: [kvm-unit-tests PATCH 0/6] arm: pmu: Fix random failures of
- pmu-chain-promotion
-Message-ID: <ZD-2zYGyAhM6q_9Q@monolith.localdoman>
-References: <20230315110725.1215523-1-eric.auger@redhat.com>
- <968a026e-066e-deea-d02f-f64133295ff1@redhat.com>
- <xcd3kt23ffdq5qfziuyp2vgwv7ndkmh3acepbpqqhhrokv755e@wuiltddj2hj2>
- <ZDZwIFtH8V59fE4o@FVFF77S0Q05N>
- <6d6126af-4974-0655-e817-5c5c472d5a2f@redhat.com>
+        with ESMTP id S231319AbjDSJrU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Apr 2023 05:47:20 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E19673C2A
+        for <kvm@vger.kernel.org>; Wed, 19 Apr 2023 02:47:19 -0700 (PDT)
+Received: from pps.filterd (m0353728.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 33J8nwlc003102;
+        Wed, 19 Apr 2023 09:47:11 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=RP2lDcaD428ljz65dkcYl2KlrQZcaxT4Re8ARQ3vcaI=;
+ b=IkHZBmWfVK4yYHx0FHaSxZn9TJopOrilfGLet3IXt7AW3Lm9PH8nCiUGLmoLC1si2LAJ
+ PfdWmQAqEdl/+axYTEE2/GsC03LCkKVpSD2x4t4I7t5jihFZI3uo8cG61h8yvJ+JPJbH
+ 64pjwPSaaGEBDoB19fhu0E1SkGAsmFggTJaU612YNaGBSHEb+iLbOQSozzKLg5+yjegB
+ uoUF2FnqIck2a9PGwWip/fLYV7YdXyIyMloi5yeezmp47Wl2qkDCN5jf2gBHlV2xeB99
+ L1ealYtSNiKV6x9xLdAvLZAEerCeza9U267/92v8vgwqh0X+urU8AXMTLgP1fkoygVx2 Gg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3q20emdbt8-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 19 Apr 2023 09:47:10 +0000
+Received: from m0353728.ppops.net (m0353728.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 33J8Hx93002966;
+        Wed, 19 Apr 2023 09:47:09 GMT
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3q20emdbrv-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 19 Apr 2023 09:47:09 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 33J7bMQh006465;
+        Wed, 19 Apr 2023 09:47:07 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+        by ppma04ams.nl.ibm.com (PPS) with ESMTPS id 3pykj6am3e-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 19 Apr 2023 09:47:07 +0000
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+        by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 33J9l1iW13697612
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 19 Apr 2023 09:47:01 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 8066220043;
+        Wed, 19 Apr 2023 09:47:01 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 247BD20040;
+        Wed, 19 Apr 2023 09:47:00 +0000 (GMT)
+Received: from [9.171.77.152] (unknown [9.171.77.152])
+        by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+        Wed, 19 Apr 2023 09:47:00 +0000 (GMT)
+Message-ID: <268273e6-f94b-d033-fb8b-ab2acdd923b8@linux.ibm.com>
+Date:   Wed, 19 Apr 2023 11:46:59 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <6d6126af-4974-0655-e817-5c5c472d5a2f@redhat.com>
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.8.0
+Subject: Re: [PATCH v19 01/21] s390x/cpu topology: add s390 specifics to CPU
+ topology
+Content-Language: en-US
+To:     =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
+Cc:     =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
+        qemu-s390x@nongnu.org, qemu-devel@nongnu.org,
+        borntraeger@de.ibm.com, pasic@linux.ibm.com,
+        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
+        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
+        kvm@vger.kernel.org, ehabkost@redhat.com,
+        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
+        seiden@linux.ibm.com, nrb@linux.ibm.com, nsg@linux.ibm.com,
+        frankja@linux.ibm.com
+References: <20230403162905.17703-1-pmorel@linux.ibm.com>
+ <20230403162905.17703-2-pmorel@linux.ibm.com>
+ <4118bb4e-0505-26d3-3ffe-49245eae5364@kaod.org>
+ <bd5cc488-20a7-54d1-7c3e-86136db77f84@linux.ibm.com>
+ <ZD690MgTNAxcfkKp@redhat.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+In-Reply-To: <ZD690MgTNAxcfkKp@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: Hwg1ghZbUX2Erx9CSEV9xMgaE5Thngi1
+X-Proofpoint-ORIG-GUID: dpI9WRVrQ2kpNl9FroxG1XqXZgLX9iDW
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
+ definitions=2023-04-19_05,2023-04-18_01,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 mlxscore=0 lowpriorityscore=0 spamscore=0 phishscore=0
+ mlxlogscore=806 adultscore=0 bulkscore=0 suspectscore=0 clxscore=1015
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2303200000 definitions=main-2304190085
+X-Spam-Status: No, score=-4.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
 
-On Wed, Apr 19, 2023 at 09:32:10AM +0200, Eric Auger wrote:
-> Hi,
-> 
-> On 4/12/23 10:47, Mark Rutland wrote:
-> > On Tue, Apr 04, 2023 at 02:47:47PM +0200, Andrew Jones wrote:
-> >> On Tue, Apr 04, 2023 at 08:23:15AM +0200, Eric Auger wrote:
-> >>> Hi,
-> >>>
-> >>> On 3/15/23 12:07, Eric Auger wrote:
-> >>>> On some HW (ThunderXv2), some random failures of
-> >>>> pmu-chain-promotion test can be observed.
-> >>>>
-> >>>> pmu-chain-promotion is composed of several subtests
-> >>>> which run 2 mem_access loops. The initial value of
-> >>>> the counter is set so that no overflow is expected on
-> >>>> the first loop run and overflow is expected on the second.
-> >>>> However it is observed that sometimes we get an overflow
-> >>>> on the first run. It looks related to some variability of
-> >>>> the mem_acess count. This variability is observed on all
-> >>>> HW I have access to, with different span though. On
-> >>>> ThunderX2 HW it looks the margin that is currently taken
-> >>>> is too small and we regularly hit failure.
-> >>>>
-> >>>> although the first goal of this series is to increase
-> >>>> the count/margin used in those tests, it also attempts
-> >>>> to improve the pmu-chain-promotion logs, add some barriers
-> >>>> in the mem-access loop, clarify the chain counter
-> >>>> enable/disable sequence.
-> >>>>
-> >>>> A new 'pmu-memaccess-reliability' is also introduced to
-> >>>> detect issues with MEM_ACCESS event variability and make
-> >>>> the debug easier.
-> > As a minor nit, 'pmu-mem-access-reliability' would be more consistent with
-> > 'pmu-mem-access'. The lack of a dash in 'memaccess' tripped me up while I was
-> > trying to run those two tests.
-> 
-> I can easily respin with that renaming. thanks for the feedback. Waiting
-> a little bit more if somebody has any other comment.
+On 4/18/23 17:57, Daniel P. Berrangé wrote:
+> On Tue, Apr 04, 2023 at 02:26:05PM +0200, Pierre Morel wrote:
+>> On 4/4/23 09:03, Cédric Le Goater wrote:
+>>> On 4/3/23 18:28, Pierre Morel wrote:
+>>>> diff --git a/include/hw/s390x/cpu-topology.h
+>>>> b/include/hw/s390x/cpu-topology.h
+>>>> new file mode 100644
+>>>> index 0000000000..83f31604cc
+>>>> --- /dev/null
+>>>> +++ b/include/hw/s390x/cpu-topology.h
+>>>> @@ -0,0 +1,15 @@
+>>>> +/*
+>>>> + * CPU Topology
+>>>> + *
+>>>> + * Copyright IBM Corp. 2022
+>>> Shouldn't we have some range : 2022-2023 ?
+>> There was a discussion on this in the first spins, I think to remember that
+>> Nina wanted 22 and Thomas 23,
+>>
+>> now we have a third opinion :) .
+>>
+>> I must say that all three have their reasons and I take what the majority
+>> wants.
+>>
+>> A vote?
+> Whether or not to include a single year, or range of years in
+> the copyright statement is ultimately a policy decision for the
+> copyright holder to take (IBM in this case I presume), and not
+> subject to community vote/preferences.
+>
+> I will note that some (possibly even many) organizations consider
+> the year to be largely redundant and devoid of legal benefit, so
+> are happy with basically any usage of dates (first year, most recent
+> year, a range of years, or none at all). With this in mind, QEMU is
+> willing to accept any usage wrt dates in the copyright statement.
+>
+> It is possible that IBM have a specific policy their employees are
+> expected to follow. If so, follow that.
+>
+> With regards,
+> Daniel
 
-Started reviewing the series last week, something came up and I had to stop
-after the first patch (very nice improvement, by the way). I will finish
-the review by the end of this week.
 
-Thanks,
-Alex
+OK, thanks,
 
-> 
-> Eric
-> >
-> >>>> Obviously one can wonder if this variability is something normal
-> >>>> and does not hide any other bug. I hope this series will raise
-> >>>> additional discussions about this.
-> >>>>
-> >>>> https://github.com/eauger/kut/tree/pmu-chain-promotion-fixes-v1
-> >>> Gentle ping.
-> >> I'd be happy to take this, but I was hoping to see some r-b's and/or t-b's
-> >> from some of the others.
-> > I gave this a spin on my ThunderX2, and it seems to fix the intermittent
-> > failures I was seeing.
-> >
-> > FWIW:
-> >
-> > Tested-by: Mark Rutland <mark.rutland@arm.com>
-> >
-> > Before (on commit 4ba7058c61e8922f9c8397cfa1095fac325f809b):
-> >
-> > Test results below.
-> >
-> > | [mark@gravadlaks:~/src/kvm-unit-tests]% TESTNAME=pmu-chain-promotion TIMEOUT=90s ACCEL= useapp qemu ./arm/run arm/pmu.flat -smp 1 -append 'pmu-chain-promotion'
-> > | timeout -k 1s --foreground 90s /home/mark/.opt/apps/qemu/bin/qemu-system-aarch64 -nodefaults -machine virt,gic-version=host -accel kvm -cpu host -device virtio-serial-device -device virtconsole,chardev=ctd -chardev testdev,id=ctd -device pci-testdev -display none -serial stdio -kernel arm/pmu.flat -smp 1 -append pmu-chain-promotion # -initrd /tmp/tmp.nl1i6S0EIY
-> > | INFO: PMU version: 0x4
-> > | INFO: PMU implementer/ID code: 0(" ")/0
-> > | INFO: Implements 6 event counters
-> > | PASS: pmu: pmu-chain-promotion: 32-bit overflows: chain counter not counting if even counter is disabled
-> > | PASS: pmu: pmu-chain-promotion: 32-bit overflows: odd counter did not increment on overflow if disabled
-> > | INFO: pmu: pmu-chain-promotion: 32-bit overflows: MEM_ACCESS counter #0 has value 0x7
-> > | INFO: pmu: pmu-chain-promotion: 32-bit overflows: CHAIN counter #1 has value 0x0
-> > | INFO: pmu: pmu-chain-promotion: 32-bit overflows: overflow counter 0x1
-> > | INFO: pmu: pmu-chain-promotion: 32-bit overflows: MEM_ACCESS counter #0 has value 0x4
-> > | INFO: pmu: pmu-chain-promotion: 32-bit overflows: MEM_ACCESS counter #0 has value 0x1b
-> > | PASS: pmu: pmu-chain-promotion: 32-bit overflows: should have triggered an overflow on #0
-> > | FAIL: pmu: pmu-chain-promotion: 32-bit overflows: CHAIN counter #1 shouldn't have incremented
-> > | INFO: pmu: pmu-chain-promotion: 32-bit overflows: counter #0 = 0xffffffdc, counter #1 = 0x0 overflow=0x0
-> > | INFO: pmu: pmu-chain-promotion: 32-bit overflows: MEM_ACCESS counter #0 has value 0x4
-> > | INFO: pmu: pmu-chain-promotion: 32-bit overflows: MEM_ACCESS counter #0 has value 0x1b
-> > | FAIL: pmu: pmu-chain-promotion: 32-bit overflows: CHAIN counter enabled: CHAIN counter was incremented and overflow
-> > | INFO: pmu: pmu-chain-promotion: 32-bit overflows: CHAIN counter #1 = 0x0, overflow=0x1
-> > | INFO: pmu: pmu-chain-promotion: 32-bit overflows: MEM_ACCESS counter #0 has value 0x4
-> > | INFO: pmu: pmu-chain-promotion: 32-bit overflows: MEM_ACCESS counter #0 has value 0x1b
-> > | FAIL: pmu: pmu-chain-promotion: 32-bit overflows: 32b->64b: CHAIN counter incremented and overflow
-> > | INFO: pmu: pmu-chain-promotion: 32-bit overflows: CHAIN counter #1 = 0x0, overflow=0x1
-> > | INFO: pmu: pmu-chain-promotion: 32-bit overflows: counter #0=0xfffffff3, counter #1=0x0
-> > | PASS: pmu: pmu-chain-promotion: 32-bit overflows: overflow is expected on counter 0
-> > | INFO: pmu: pmu-chain-promotion: 32-bit overflows: counter #0=0xa, counter #1=0xf9 overflow=0x1
-> > | SUMMARY: 7 tests, 3 unexpected failures
-> >
-> > After:
-> >
-> > | [mark@gravadlaks:~/src/kvm-unit-tests]% TESTNAME=pmu-chain-promotion TIMEOUT=90s ACCEL=kvm useapp qemu ./arm/run arm/pmu.flat -smp 1 -append 'pmu-chain-promotion'
-> > | timeout -k 1s --foreground 90s /home/mark/.opt/apps/qemu/bin/qemu-system-aarch64 -nodefaults -machine virt,gic-version=host -accel kvm -cpu host -device virtio-serial-device -device virtconsole,chardev=ctd -chardev testdev,id=ctd -device pci-testdev -display none -serial stdio -kernel arm/pmu.flat -smp 1 -append pmu-chain-promotion # -initrd /tmp/tmp.pahLyg1F3s
-> > | INFO: PMU version: 0x4
-> > | INFO: PMU implementer/ID code: 0(" ")/0
-> > | INFO: Implements 6 event counters
-> > | INFO: pmu: pmu-chain-promotion: 32-bit overflows: subtest1: post #1=0x0 #0=0x0 overflow=0x0
-> > | PASS: pmu: pmu-chain-promotion: 32-bit overflows: subtest1: chain counter not counting if even counter is disabled
-> > | INFO: pmu: pmu-chain-promotion: 32-bit overflows: subtest2: post #1=0x0 #0=0xf3 overflow=0x1
-> > | PASS: pmu: pmu-chain-promotion: 32-bit overflows: subtest2: odd counter did not increment on overflow if disabled
-> > | INFO: pmu: pmu-chain-promotion: 32-bit overflows: subtest3: init #1=0x0 #0=0xfffffea1 overflow=0x0
-> > | INFO: pmu: pmu-chain-promotion: 32-bit overflows: subtest3: After 1st loop #1=0x0 #0=0xffffffa0 overflow=0x0
-> > | INFO: pmu: pmu-chain-promotion: 32-bit overflows: subtest3: After 2d loop #1=0x0 #0=0xc0 overflow=0x1
-> > | PASS: pmu: pmu-chain-promotion: 32-bit overflows: subtest3: should have triggered an overflow on #0
-> > | PASS: pmu: pmu-chain-promotion: 32-bit overflows: subtest3: CHAIN counter #1 shouldn't have incremented
-> > | INFO: pmu: pmu-chain-promotion: 32-bit overflows: subtest4: init #1=0x0 #0=0xfffffea1 overflow=0x0
-> > | INFO: pmu: pmu-chain-promotion: 32-bit overflows: subtest4: After 1st loop #1=0x0 #0=0xffffffb7 overflow=0x0
-> > | INFO: pmu: pmu-chain-promotion: 32-bit overflows: subtest4: After 2d loop #1=0x1 #0=0xbc overflow=0x1
-> > | PASS: pmu: pmu-chain-promotion: 32-bit overflows: subtest4: CHAIN counter enabled: CHAIN counter was incremented and overflow
-> > | INFO: pmu: pmu-chain-promotion: 32-bit overflows: subtest5: init #1=0x0 #0=0xfffffea1 overflow=0x0
-> > | INFO: pmu: pmu-chain-promotion: 32-bit overflows: subtest5: After 1st loop #1=0x22c #0=0xffffff9f overflow=0x0
-> > | INFO: pmu: pmu-chain-promotion: 32-bit overflows: subtest5: After 2d loop #1=0x1 #0=0x9d overflow=0x1
-> > | PASS: pmu: pmu-chain-promotion: 32-bit overflows: subtest5: 32b->64b: CHAIN counter incremented and overflow
-> > | INFO: pmu: pmu-chain-promotion: 32-bit overflows: subtest6: init #1=0x0 #0=0xfffffea1 overflow=0x0
-> > | INFO: pmu: pmu-chain-promotion: 32-bit overflows: subtest6: After 1st loop #1=0x0 #0=0xffffff9f overflow=0x0
-> > | INFO: pmu: pmu-chain-promotion: 32-bit overflows: subtest6: After 2d loop #1=0x1f9 #0=0x9c overflow=0x1
-> > | PASS: pmu: pmu-chain-promotion: 32-bit overflows: subtest6: overflow is expected on counter 0
-> > | SUMMARY: 7 tests
-> >
-> > As a bonus, the mem-access and memaccess-reliability results:
-> >
-> > | [mark@gravadlaks:~/src/kvm-unit-tests]% TESTNAME=pmu-chain-promotion TIMEOUT=90s ACCEL=kvm useapp qemu ./arm/run arm/pmu.flat -smp 1 -append 'pmu-mem-access'     
-> > | timeout -k 1s --foreground 90s /home/mark/.opt/apps/qemu/bin/qemu-system-aarch64 -nodefaults -machine virt,gic-version=host -accel kvm -cpu host -device virtio-serial-device -device virtconsole,chardev=ctd -chardev testdev,id=ctd -device pci-testdev -display none -serial stdio -kernel arm/pmu.flat -smp 1 -append pmu-mem-access # -initrd /tmp/tmp.84AeEp8Tiw
-> > | INFO: PMU version: 0x4
-> > | INFO: PMU implementer/ID code: 0(" ")/0
-> > | INFO: Implements 6 event counters
-> > | INFO: pmu: pmu-mem-access: 32-bit overflows: counter #0 is 0x15 (MEM_ACCESS)
-> > | INFO: pmu: pmu-mem-access: 32-bit overflows: counter #1 is 0x15 (MEM_ACCESS)
-> > | PASS: pmu: pmu-mem-access: 32-bit overflows: Ran 20 mem accesses
-> > | PASS: pmu: pmu-mem-access: 32-bit overflows: Ran 20 mem accesses with expected overflows on both counters
-> > | INFO: pmu: pmu-mem-access: 32-bit overflows: cnt#0=0x8 cnt#1=0x8 overflow=0x3
-> > | SKIP: pmu: pmu-mem-access: 64-bit overflows: Skip test as 64 overflows need FEAT_PMUv3p5
-> > | SUMMARY: 3 tests, 1 skipped
-> > | [mark@gravadlaks:~/src/kvm-unit-tests]% TESTNAME=pmu-chain-promotion TIMEOUT=90s ACCEL=kvm useapp qemu ./arm/run arm/pmu.flat -smp 1 -append 'pmu-memaccess-reliability'
-> > | timeout -k 1s --foreground 90s /home/mark/.opt/apps/qemu/bin/qemu-system-aarch64 -nodefaults -machine virt,gic-version=host -accel kvm -cpu host -device virtio-serial-device -device virtconsole,chardev=ctd -chardev testdev,id=ctd -device pci-testdev -display none -serial stdio -kernel arm/pmu.flat -smp 1 -append pmu-memaccess-reliability # -initrd /tmp/tmp.ZToqwencZR
-> > | INFO: PMU version: 0x4
-> > | INFO: PMU implementer/ID code: 0(" ")/0
-> > | INFO: Implements 6 event counters
-> > | INFO: pmu: pmu-memaccess-reliability: 32-bit overflows: overflow=0 min=251 max=283 COUNT=250 MARGIN=100
-> > | PASS: pmu: pmu-memaccess-reliability: 32-bit overflows: memaccess is reliable
-> > | SKIP: pmu: pmu-memaccess-reliability: 64-bit overflows: Skip test as 64 overflows need FEAT_PMUv3p5
-> > | SUMMARY: 2 tests, 1 skipped
-> >
-> > Thanks,
-> > Mark.
-> >
-> 
+Regards,
+
+Pierre
+
