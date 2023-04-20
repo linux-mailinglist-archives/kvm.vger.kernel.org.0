@@ -2,58 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E8B966E9B4E
-	for <lists+kvm@lfdr.de>; Thu, 20 Apr 2023 20:10:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 970F36E9B8C
+	for <lists+kvm@lfdr.de>; Thu, 20 Apr 2023 20:23:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229864AbjDTSKP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 Apr 2023 14:10:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60254 "EHLO
+        id S229811AbjDTSXv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 Apr 2023 14:23:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39592 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229825AbjDTSKN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 20 Apr 2023 14:10:13 -0400
-Received: from mail-wm1-x336.google.com (mail-wm1-x336.google.com [IPv6:2a00:1450:4864:20::336])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3448344BE
-        for <kvm@vger.kernel.org>; Thu, 20 Apr 2023 11:10:09 -0700 (PDT)
-Received: by mail-wm1-x336.google.com with SMTP id 5b1f17b1804b1-3f17b967bfbso25661665e9.1
-        for <kvm@vger.kernel.org>; Thu, 20 Apr 2023 11:10:09 -0700 (PDT)
+        with ESMTP id S229704AbjDTSXu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 20 Apr 2023 14:23:50 -0400
+Received: from mail-wr1-x434.google.com (mail-wr1-x434.google.com [IPv6:2a00:1450:4864:20::434])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 722473C28
+        for <kvm@vger.kernel.org>; Thu, 20 Apr 2023 11:23:49 -0700 (PDT)
+Received: by mail-wr1-x434.google.com with SMTP id ffacd0b85a97d-2fbb99cb297so758122f8f.1
+        for <kvm@vger.kernel.org>; Thu, 20 Apr 2023 11:23:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1682014207; x=1684606207;
+        d=google.com; s=20221208; t=1682015028; x=1684607028;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=3tTimXPUFA+X0/aMlpW0bIFSfqQCXvrIyP+TzAV0QAo=;
-        b=J/1WiSoVaU2DeuE5CeLf4PUd0lFh1qEauGbEPR7HSYPZP3YI3ew9bTozKNbfEOZlW7
-         ba3rr35yW6hfetch9hQM3LPdo4yiWkc7dkvam5YpaaBhCf9fM68Jwmyost89XkXZG/j4
-         AyIOFhcWask2UqKAd2+aubHZ7VAUhSmXen18eXlFriSsccEqG+Tw3zN1avvUjF3RSgmv
-         3A5pKA3I2qREx2N2gAPFJ86R6MsvozfFglYg8e9KO/5ptyQZkQQSdAQOVaY5T9hM93pW
-         +bOz0Ypt9PoASs0/GtmuSQWBqv6gPNfJJWNeaHWQGcLItdyZWpKshWLX5g/swUCT0Qmb
-         mWFg==
+        bh=1945gIeyUKxf634eLSB+UhkKwLsC3xo7b0I4NgmBVls=;
+        b=5F9+meUbuKL3RiauX8BCJVKDSb1T6kfNGhz96hh/fWuOztbgnQQ274N6eOQiUPlvqu
+         5vW4YctMX5rfg1GtYuurir7iGQwXklNUvitEdJn93MDysY+CjCAnHxB6plosAcsrVyXX
+         FNrxtIfL+jFS+aJmc32SEmBvr0RlpccNdVvR79DN6Jf4FB0qBvPPJRmCWBH64gKY5HOM
+         an11cwhv2lE/SHJzENIjaI/qyajrLmdqRliywUAVbGbM43B5ZFwzO/PABTOzenTGaBC+
+         x3fEW2zLn7Ncs2JdM+E5UzAQ6nOgQnLzAnML0gbMMtyoci0S+wCiiherXsvw473Nolfl
+         AzKA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682014207; x=1684606207;
+        d=1e100.net; s=20221208; t=1682015028; x=1684607028;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=3tTimXPUFA+X0/aMlpW0bIFSfqQCXvrIyP+TzAV0QAo=;
-        b=K6EP8PY4gZ47M3NeShUfNq1OgbQD8N/OwHOctPW6KrtUkMRN9/s98RsbzQ4bGZHuO/
-         Cz6DTbTqBDWOkbSORSRiSF8kXBNXH6tJht63OtfBfLNP/Fa4dSbsfTJhCm1O6A32uSco
-         /ose9LXv3I8wNZ/agffq0+qJr5KDlCcp7DSlI6O1EO5HeZ5BI9BwhJOtSD3Y4shuRgj3
-         Xgm/adpTuppKgIbZtQJJu7LKtKRpA6Gl4mW8UUrCusunP5y8os6LqbzSPkdSNr3CTg2B
-         uRJIc7Kd9tWm9j1+HUmf1A+XRZujj8qKq8dW3KShHdUOfkoUSET+eUeJ2tNy0rS5OWIo
-         WhXA==
-X-Gm-Message-State: AAQBX9dWmr787KJkk5pFYDJldFLos5Bhv/LFJlXjNzk/yyQ5NnL5Oxot
-        3pgPOtBE6511bGSxgdolVhdw+cgdkxzfm0NRDHSPlw==
-X-Google-Smtp-Source: AKy350YKmxmoghfij+pf32r0TBd/PBCk7J+ihUx7vhnJEGhBVYhIkPHhwvgFKI4Fv9Wnde3u6LgsgQHuzVzSB7fXiiM=
-X-Received: by 2002:adf:f3cd:0:b0:2f5:9146:7024 with SMTP id
- g13-20020adff3cd000000b002f591467024mr5898472wrp.22.1682014207340; Thu, 20
- Apr 2023 11:10:07 -0700 (PDT)
+        bh=1945gIeyUKxf634eLSB+UhkKwLsC3xo7b0I4NgmBVls=;
+        b=GALTgbUe3WUqwqDClH9ZaZ6bI8dq5eCW/XLdJLqUzDNB0s2BbrnWSbLM66y6V6eNqi
+         +F19yN4oRbLOQ4rgLKIYWJw3r1vQT0/jC2U1LLZ6qaNKc5SW+BYWoGMo8m44+2Vs5wdE
+         SW8dH78/a1dtpFpswuyoNUkMVIgYKQTBcifW3F59huPl/nMtw0Aq+VwRGOB5P5njU01s
+         e8/ZJmfj1MUe54ofDOwtGHKXZCGJubS6iZCOUqgq1dKazxfCM2jhxczla15UVCvRV05Q
+         PPiItanG9outZcKGtypirU/AL/9L0x+t6iAyApVjeh7OCMiV+78RHrb6jQjR2GTeYBVh
+         G6xg==
+X-Gm-Message-State: AAQBX9fk+oKtGuwT7Pi37jBkuuyUuDYK/od6/eb2pjrQVHDL1OKfJyk3
+        ku7LPZyGx5JYNfopv1pIfizA6WcdKarjISFFLrqLrg==
+X-Google-Smtp-Source: AKy350aS/frzXk0mzLXwkFJVv8/EWEWXdE3KEmqrhkdHEnMgBbMXKq4FyvdmjQvx8/jHNs93jMEptZxwXOvhqztKBcQ=
+X-Received: by 2002:a5d:6585:0:b0:2f5:953a:4f59 with SMTP id
+ q5-20020a5d6585000000b002f5953a4f59mr1948320wru.5.1682015027841; Thu, 20 Apr
+ 2023 11:23:47 -0700 (PDT)
 MIME-Version: 1.0
-References: <20230412213510.1220557-1-amoorthy@google.com> <20230412213510.1220557-6-amoorthy@google.com>
- <a518e669-c758-57c8-3ba9-b4844e2cb79d@gmail.com>
-In-Reply-To: <a518e669-c758-57c8-3ba9-b4844e2cb79d@gmail.com>
+References: <20230412213510.1220557-1-amoorthy@google.com> <20230412213510.1220557-18-amoorthy@google.com>
+ <8d974125-163c-f61c-a988-5e5e6d762d73@gmail.com>
+In-Reply-To: <8d974125-163c-f61c-a988-5e5e6d762d73@gmail.com>
 From:   Anish Moorthy <amoorthy@google.com>
-Date:   Thu, 20 Apr 2023 11:09:30 -0700
-Message-ID: <CAF7b7mopmS5dQEQSC4g5NVmDpfV7UJv2UursruROrr3kb=BQHQ@mail.gmail.com>
-Subject: Re: [PATCH v3 05/22] KVM: Add KVM_CAP_MEMORY_FAULT_INFO
+Date:   Thu, 20 Apr 2023 11:23:11 -0700
+Message-ID: <CAF7b7mqqDzD0wXC__KfCdY66tz2pQaw4=xJ=g4ECgCosb+jHcg@mail.gmail.com>
+Subject: Re: [PATCH v3 17/22] KVM: Introduce KVM_CAP_ABSENT_MAPPING_FAULT
+ without implementation
 To:     Hoo Robert <robert.hoo.linux@gmail.com>
 Cc:     pbonzini@redhat.com, maz@kernel.org, oliver.upton@linux.dev,
         seanjc@google.com, jthoughton@google.com, bgardon@google.com,
@@ -72,16 +73,25 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Apr 19, 2023 at 6:57=E2=80=AFAM Hoo Robert <robert.hoo.linux@gmail.=
+On Wed, Apr 19, 2023 at 7:00=E2=80=AFAM Hoo Robert <robert.hoo.linux@gmail.=
 com> wrote:
+> > +static inline bool kvm_slot_fault_on_absent_mapping(
+> > +                                                     const struct kvm_=
+memory_slot *slot)
 >
-> kvm_populate_efault_info(), function name.
-> ...
-> Ditto
+> Strange line break.
 
-Done
+Fixed: there's now a single indent on the second line.
 
-> struct exit_reason[] string for KVM_EXIT_MEMORY_FAULT can be added as
-> well.
+> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> > index f3be5aa49829a..7cd0ad94726df 100644
+> > --- a/virt/kvm/kvm_main.c
+> > +++ b/virt/kvm/kvm_main.c
+> > @@ -1525,6 +1525,9 @@ static int check_memory_region_flags(const struct=
+ kvm_userspace_memory_region *m
+> >       valid_flags |=3D KVM_MEM_READONLY;
+>
+> Is it better to also via kvm_vm_ioctl_check_extension() rather than
+> #ifdef __KVM_HAVE_READONLY_MEM?
 
-Done, assuming you mean the exit_reasons_known definition in kvm_util.c
+Probably, that's unrelated though so I won't change it here
