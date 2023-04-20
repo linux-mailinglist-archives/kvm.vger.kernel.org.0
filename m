@@ -2,235 +2,291 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 530946E9C13
-	for <lists+kvm@lfdr.de>; Thu, 20 Apr 2023 20:52:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D7B3E6E9C51
+	for <lists+kvm@lfdr.de>; Thu, 20 Apr 2023 21:14:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231963AbjDTSwc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 Apr 2023 14:52:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56804 "EHLO
+        id S231893AbjDTTOH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 Apr 2023 15:14:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40822 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231997AbjDTSwF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 20 Apr 2023 14:52:05 -0400
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2041.outbound.protection.outlook.com [40.107.236.41])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 600B346AF;
-        Thu, 20 Apr 2023 11:51:58 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=fcRFhMyOu4OzuMocNbpBRJ/LCy7vWRYAXp6U8A6qqADZuvyRBnKAhLibYr2UJCuM/AiCEEHxlBdVTJtJJkPr2EU5Y2o6oyhYa9P/962EqNrB241MmTe6PhPMkxBaDGl8lghGUta9rh9NQTsdCdN/m+e8dqYjG2wxnkuIYd4uvlSi78dpBViTrL/qYutVEQBN9mWeBp+tgBZr9CZT59p3E38owXHU3IL2hgJZ60JlguuEuYU0gOvuHPd2zS2I8RNu1Llhnpz8qNMIi95aW5BXbgkb443mfTI+c9cIfvC4z9NLyq7TeJ5Mhfxiv9O8iK7QkdMBkN9cvZBGMmKIsZiqjQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=YolAE6BNvfYz0E6dQwvzLuefk2hk+Mt9iPrHht8Q+D8=;
- b=nmHa8SM8Cbtzg4M8oJELzlJoHXkhRr81KUz9sQR1/0Y+1xdtC5v93x7U7EPstFI8w/t/T/HKmB32CZbsIKTiRh7tvnE1MUHju/LptUCJjdACugvKxEqP3DG9/BgczzVXBLG1+JAAkQUt/0pC63q+ngoeqyu8DtFUGIy2dp3SslYwJXZfi+9MPJ8B5+hkpMoeUuXEufYo/EyP+wQsPEwb7enxg9c0CAje7q3wBx5JMmJgqkQb8ofYJmYshPEQp+iaeABX2NBf6iBT3cTPa1EvIRjPut9dnApIIENdsYS0eR1w7d5PcYQhLKNlWFUtTqL7h67zV5cAumSazQIwPQuIeA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=YolAE6BNvfYz0E6dQwvzLuefk2hk+Mt9iPrHht8Q+D8=;
- b=Ch5lRF6M8dyyjsQgyo1kSjQj+dc+idHEfIa2R6AwopeP58gf1haDfDe7K41H9g/91UoRwtLfgurbtgrvJhkhGGfuB7j/pd7F0LRYWENdJ4YThOOQgtYi8GkvK6GbNBMENuPbv1UAjxJOcBDVrtTVt/ahhoVDPPFRxs2fJH0Ua6i/iEmEPN9JXoi/F7GmwldCJNqRYr+/uifEyCBZRKxjm2uq3fJYGnLpYkmQfsH0M4JbWouQB99GImLTfqAQ0B7HLVzSMpHsjoVgh+YZGhj22ZzrdyCTyKZvGqvqE2Iy6vs+AvXiECpqLGTUYwLju54y3oxascxSuA8ayZA7F6e6kA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by MW3PR12MB4553.namprd12.prod.outlook.com (2603:10b6:303:2c::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6319.22; Thu, 20 Apr
- 2023 18:51:48 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::f7a7:a561:87e9:5fab]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::f7a7:a561:87e9:5fab%6]) with mapi id 15.20.6319.020; Thu, 20 Apr 2023
- 18:51:48 +0000
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     iommu@lists.linux.dev, linux-kselftest@vger.kernel.org
-Cc:     Lu Baolu <baolu.lu@linux.intel.com>,
-        Kevin Tian <kevin.tian@intel.com>, kvm@vger.kernel.org,
-        Lixiao Yang <lixiao.yang@intel.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Nicolin Chen <nicolinc@nvidia.com>, Yi Liu <yi.l.liu@intel.com>
-Subject: [PATCH v6 19/19] iommufd/selftest: Add a selftest for IOMMU_HWPT_ALLOC
-Date:   Thu, 20 Apr 2023 15:51:34 -0300
-Message-Id: <19-v6-fdb604df649a+369-iommufd_alloc_jgg@nvidia.com>
-In-Reply-To: <0-v6-fdb604df649a+369-iommufd_alloc_jgg@nvidia.com>
-References: 
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: BL1PR13CA0343.namprd13.prod.outlook.com
- (2603:10b6:208:2c6::18) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+        with ESMTP id S231742AbjDTTOE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 20 Apr 2023 15:14:04 -0400
+Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 240752711
+        for <kvm@vger.kernel.org>; Thu, 20 Apr 2023 12:14:01 -0700 (PDT)
+Received: by mail-pf1-x434.google.com with SMTP id d2e1a72fcca58-63b60365f53so1815492b3a.0
+        for <kvm@vger.kernel.org>; Thu, 20 Apr 2023 12:14:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=rivosinc-com.20221208.gappssmtp.com; s=20221208; t=1682018040; x=1684610040;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hiGazBo7fqmmG21SdxdzgEwUnvE1CYshJ5DRTxFcvcU=;
+        b=VPpNbcz8lUmn6XqbAF8ZKpyYp3zV26MHR66QP3yKRqpcmVdPoHTXLEyF6Tm6HEp4sd
+         I6BqSMDCI5vFX0NE5D1q7CokCl4/RoKvxQk1G13HaFvjs53+GMT1wsINZIEansmPZtBE
+         1k8Rd9FGcvKrprRZvlKXZGn5l88bbi1KjmY6066siYhLq8wcQ8X6Jf6SnA5UoPM85uEo
+         7diQrnMp6doro6jk8uOyyRDOWi4bDJDokTvU+c4NBYe1TsSjguNSflNmfNIhkY1Df2B0
+         kI05B/Wzga0pxbf0UynU69HDnh053SHp7yyj+UPOsBKA2vPkT5VaxUle0IyaTxscv/pO
+         Av8w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1682018040; x=1684610040;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=hiGazBo7fqmmG21SdxdzgEwUnvE1CYshJ5DRTxFcvcU=;
+        b=Ylu/DDItrlabl1Qi5y8MZKY3UbB78OBxBb7dtcZrGh66JZsVkZvNy+ramWZMkSmeDE
+         OFjxs8A6bYjfn6utYpUz1LUcM1dwE+K1UdNmx82joInPkNCjRK+fakaDtBZ7w1SltR3o
+         6Fjr3zxhxwyqMhqPBSk6S3JxzT5njFjQoSUBN2I1mvLKhKx9MnBQuM4TnBIFWYVMp6ep
+         cF25qq0IwYgqLWPE1+sbuXii9yhlJ0R7Q6eW0p8hi3TTV2r6UJozU3pIXpzocr6VAx7o
+         sRc00LvM6he75yArIeJgS13PfP3oDhOS9qEgDHh4mvtNhTbr92kiXh/8HaQvJqCICE2j
+         EPzw==
+X-Gm-Message-State: AAQBX9etgLVfHKKOsxa0FLAqmDT1DF3M5NXhvbw9vTZMVinzMCtApESY
+        XtPgL+0EIJyq8o0f5fBIzMvno7oy0otpRySQyiLIo8DBrmu5RFlTkom/3WxV
+X-Google-Smtp-Source: AKy350aRQ0rM7CLx1DwjTywqrVN0WjdwG2lvnHksOXDIHfuaqZi7DwTJ1XnW9z+QtTwIqGEYzeTP15HNnlsEvUBFY24=
+X-Received: by 2002:a17:90a:744c:b0:23f:962e:826b with SMTP id
+ o12-20020a17090a744c00b0023f962e826bmr2608127pjk.15.1682018040457; Thu, 20
+ Apr 2023 12:14:00 -0700 (PDT)
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|MW3PR12MB4553:EE_
-X-MS-Office365-Filtering-Correlation-Id: 9c749862-d9bc-4937-81a8-08db41d04639
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 7BOpOzR22aXWCgCkR0Qxog4gRau4uJfJM1USQJPPSxYLVTq0W31wBttsyfKWr2ari4T9YfmfLD1wZxf1nb0zSEx8CsvIt4c5qgdPzBPojIJkaCmW+dT7hzJMZwwe5+IIR7UO0UcxI1Btj0P7xyEdvPEH2/w2+BmC++SnKf1BChDx9QYASmQToa2jErL82xKYFNNgRw4Vy6vuISQEtfdV0RNSXWAgVw+CBeznN1ly+RHtnGDp76TDEdjLoDwk16p8sbCHF8bq6gKT2Qm2O/qvuVG7krtjuthORwI6ajoHHMjnG9XxNSx0Z9FJpfheOjadphY3nTsVF+wT8HJqBwMTxtEWqQboIQQrAvpfOjXo7lZbPSPKpku69EeFIne0a9FVdi6ITgq3mFhwC2Vz6PUoaChlb8PUmhMKShAFKiveHKzy0EqKXN/ekqB2r/UQG2sCNAD23oBTHu0zVqNDUQgqJ100SYxtuQRTCQ48Y0kChMTgJbjrnllDbzi3XXB46Kwf41wdC08T5G0c50qgMzb5zeAPLfYInYsOAN5ePEOzQGKXnk97IO6ZaTG2zBiem6Oz
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(366004)(396003)(39860400002)(346002)(376002)(136003)(451199021)(54906003)(4326008)(316002)(66946007)(66556008)(66476007)(478600001)(6666004)(6486002)(5660300002)(8936002)(41300700001)(8676002)(2906002)(86362001)(36756003)(38100700002)(2616005)(6512007)(186003)(6506007)(26005)(83380400001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?8vw51BuNjZarjrAfNREMC0/4i0h6nDn+r0yxD3dSOOl2hXayYLUnYJWc7E5l?=
- =?us-ascii?Q?Pp/Alf84NCJC1MBtN0nHqds5bkKNL01YNTaTMhH+TCFnKDxrpWONRMiYRR6p?=
- =?us-ascii?Q?ksVKlO6C1hPs3u2e/Csxfu1ghjRHO/L32itlGw/FC1d2rQsl39syQGgBwrPc?=
- =?us-ascii?Q?BGjC0z05eQJNMmTvx4reW/mv71yoCUUmUrowuWD/vAlIBE8vTRMPtdrMiS9R?=
- =?us-ascii?Q?hWyI5UYqa/eFtUOTloG9+zQ4L6UF48SoqZKKGUKJD5Zrnhz6W66imMx3Vdde?=
- =?us-ascii?Q?e8HvZT3H1HHonpe+A6md/9jzecui5QP+8nfDAmlRSxIYNilGTqOlXN8O6Jif?=
- =?us-ascii?Q?Gkm8iofnd7HZCnNDnFa/LjZeFyWdWkCSQwSfPPuwEtutahBzTm02h9DFSx8H?=
- =?us-ascii?Q?nOeydAudrqnSn18K9IWpTyb+MeSCUXh931ntUtSiQUMgyzzffceWH9TKH+0y?=
- =?us-ascii?Q?aiDtGyJz7ML0kUTu5E+QycsyHJ7kfo8Zp1OInd+8JrXGkXnMKZZIzzcTlEib?=
- =?us-ascii?Q?zzqyylLxUHi6E+r2ZUhg3x4UoEhw4D49VY7uO5mouzXGxrYifgevXYyJRnfd?=
- =?us-ascii?Q?wgMmpfJ82C4BO/DPFCFuw7ir9II7Lst3ION3cSUSY87BZ/R1snRpHaiGs919?=
- =?us-ascii?Q?WdYtMJa9Qkvb/64A1JoWFsv9TKEpAHP0oE/gsO+2F2E1pVfJwRFELtvHuC35?=
- =?us-ascii?Q?cxAhnhyj35B15+vA26E8ma0PTjNp/iEyIaQ2kyLd3J6POK4cUpr3TK6uhWp1?=
- =?us-ascii?Q?Kh/QWFJQ6p2TPJeCAro8UeuH0jGXtgPcKDYav8Ky1uN8jDYWC9gwquR8Kedf?=
- =?us-ascii?Q?93wDdYfSs1wij6CdNKV0A2K8dbZtfHJFYXUaTmzB/yNPUtHGlrcm+FvG00da?=
- =?us-ascii?Q?yflHKzbRM4Gnwwn4aYoei4cew3F7oA3WpHtzvzHiXq+DuSt3m5M2yGhHUpDm?=
- =?us-ascii?Q?DwDXJMRfVJ+R8HeVhOD+foFZFaa7/dizaMAWWtpQ86nBLQvpKZTzRObn2haw?=
- =?us-ascii?Q?BKWKmtVcldRx7Sf2Yc+N0nIUgGWaPiDK/iJvcbuKx6Uaz3C7vXbdGa2f9sf7?=
- =?us-ascii?Q?2nhtKbyNpn8eloRXsXxTBmgo0EdGiCv4nMObLK7UvFOnkDMu/03RbPeNWewn?=
- =?us-ascii?Q?GzI9KqW2pmjZG1i4IY68CHdcWL8fHD7AxcW4j33Z3GRtVlBKpzml+gYga3Oh?=
- =?us-ascii?Q?Pj+uldai4zpTr+pzVobLyFddvqxpGMlwh7uKeXqhY/zxA7yalvxHo3KuBSGA?=
- =?us-ascii?Q?Vj57aLw6oZRvPhOcNCQ9tlBrNe9KifYIuRft5I5SUchyNt5VFfVn4eP4kDhv?=
- =?us-ascii?Q?/VczqqEtfPIqPeVFhaTvL+jAv5ofqgOJ1ZHgFN6ey9Xqx6HROSv/2DiRaWVh?=
- =?us-ascii?Q?/rRSVsrQmVYn3GMzrLILTGgigBtm6uDmcxbO9cwLFm+eRCNFGItPsfgS4hXN?=
- =?us-ascii?Q?YRaDuV3ZOv8jyqxi4jnpeRgSg2wQs5tK39X9Z/2K2Ofkdo4MDufAEpOD9rBS?=
- =?us-ascii?Q?yJM1rFIjZeiOyxQ0+0QjFUyauex/UE1YlHrwr2j1ljVmERMQqgjHmBZXeeYT?=
- =?us-ascii?Q?CCrRRz4bPhe24dgiq+79m+0pp0E/+U0tzxB3wvw5?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9c749862-d9bc-4937-81a8-08db41d04639
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Apr 2023 18:51:39.1779
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: mjJLm7/S5+VhHI9KjWxPqie8wPiTjI0iocv1rA5aIV3gSEcZMeQ5bpID4ErK3M+/
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW3PR12MB4553
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+References: <20230419221716.3603068-1-atishp@rivosinc.com> <ZEFopfs5Ij/AIkee@google.com>
+In-Reply-To: <ZEFopfs5Ij/AIkee@google.com>
+From:   Atish Kumar Patra <atishp@rivosinc.com>
+Date:   Fri, 21 Apr 2023 00:43:49 +0530
+Message-ID: <CAHBxVyE+SkQ-jpbupmJU4fpuiXY_GufnANDBUuO5bMHDsudeYg@mail.gmail.com>
+Subject: Re: [RFC 00/48] RISC-V CoVE support
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     linux-kernel@vger.kernel.org, Alexandre Ghiti <alex@ghiti.fr>,
+        Andrew Jones <ajones@ventanamicro.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Anup Patel <anup@brainfault.org>,
+        Atish Patra <atishp@atishpatra.org>,
+        =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@rivosinc.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
+        linux-coco@lists.linux.dev, Dylan Reid <dylan@rivosinc.com>,
+        abrestic@rivosinc.com, Samuel Ortiz <sameo@rivosinc.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Conor Dooley <conor.dooley@microchip.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Guo Ren <guoren@kernel.org>, Heiko Stuebner <heiko@sntech.de>,
+        Jiri Slaby <jirislaby@kernel.org>,
+        kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
+        linux-mm@kvack.org, linux-riscv@lists.infradead.org,
+        Mayuresh Chitale <mchitale@ventanamicro.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Rajnesh Kanwal <rkanwal@rivosinc.com>,
+        Uladzislau Rezki <urezki@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Test the basic flow.
+On Thu, Apr 20, 2023 at 10:00=E2=80=AFPM Sean Christopherson <seanjc@google=
+.com> wrote:
+>
+> On Wed, Apr 19, 2023, Atish Patra wrote:
+> > 2. Lazy gstage page allocation vs upfront allocation with page pool.
+> > Currently, all gstage mappings happen at runtime during the fault. This=
+ is expensive
+> > as we need to convert that page to confidential memory as well. A page =
+pool framework
+> > may be a better choice which can hold all the confidential pages which =
+can be
+> > pre-allocated upfront. A generic page pool infrastructure may benefit o=
+ther CC solutions ?
+>
+> I'm sorry, what?  Do y'all really not pay any attention to what is happen=
+ing
+> outside of the RISC-V world?
+>
+> We, where "we" is KVM x86 and ARM, with folks contributing from 5+ compan=
+ines,
+> have been working on this problem for going on three *years*.  And that's=
+ just
+> from the first public posting[1], there have been discussions about how t=
+o approach
+> this for even longer.  There have been multiple related presentations at =
+KVM Forum,
+> something like 4 or 5 just at KVM Forum 2022 alone.
+>
 
-Reviewed-by: Kevin Tian <kevin.tian@intel.com>
-Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
----
- drivers/iommu/iommufd/io_pagetable.c          |  3 +++
- tools/testing/selftests/iommu/iommufd.c       | 15 +++++++++++++
- .../selftests/iommu/iommufd_fail_nth.c        | 11 +++++++++-
- tools/testing/selftests/iommu/iommufd_utils.h | 21 +++++++++++++++++++
- 4 files changed, 49 insertions(+), 1 deletion(-)
+Yes. We are following the restrictedmem effort and was reviewing the
+v10 this week.
+I did mention about that in the 1st item in the TODO list. We are
+planning to use the restrictedmen
+feature once it is closer to upstream (which seems to be the case
+looking at v10).
+Another reason is that this initial series is based on kvmtool only.
+We are working on qemu-kvm
+right now but have some RISC-V specific dependencies(interrupt
+controller stuff) which are not there yet.
+As the restrictedmem patches are already available in qemu-kvm too,
+our plan was to support CoVE
+in qemu-kvm first and work on restrictedmem after that.
 
-diff --git a/drivers/iommu/iommufd/io_pagetable.c b/drivers/iommu/iommufd/io_pagetable.c
-index f842768b2e250b..21052f64f95649 100644
---- a/drivers/iommu/iommufd/io_pagetable.c
-+++ b/drivers/iommu/iommufd/io_pagetable.c
-@@ -1172,6 +1172,9 @@ int iopt_table_enforce_dev_resv_regions(struct io_pagetable *iopt,
- 	unsigned int num_sw_msi = 0;
- 	int rc;
- 
-+	if (iommufd_should_fail())
-+		return -EINVAL;
-+
- 	down_write(&iopt->iova_rwsem);
- 	/* FIXME: drivers allocate memory but there is no failure propogated */
- 	iommu_get_resv_regions(dev, &resv_regions);
-diff --git a/tools/testing/selftests/iommu/iommufd.c b/tools/testing/selftests/iommu/iommufd.c
-index a6bc090d4b38a9..8b2c18ac6a2864 100644
---- a/tools/testing/selftests/iommu/iommufd.c
-+++ b/tools/testing/selftests/iommu/iommufd.c
-@@ -1304,6 +1304,21 @@ TEST_F(iommufd_mock_domain, replace)
- 	test_ioctl_destroy(ioas_id);
- }
- 
-+TEST_F(iommufd_mock_domain, alloc_hwpt)
-+{
-+	int i;
-+
-+	for (i = 0; i != variant->mock_domains; i++) {
-+		uint32_t stddev_id;
-+		uint32_t hwpt_id;
-+
-+		test_cmd_hwpt_alloc(self->idev_ids[0], self->ioas_id, &hwpt_id);
-+		test_cmd_mock_domain(hwpt_id, &stddev_id, NULL, NULL);
-+		test_ioctl_destroy(stddev_id);
-+		test_ioctl_destroy(hwpt_id);
-+	}
-+}
-+
- /* VFIO compatibility IOCTLs */
- 
- TEST_F(iommufd, simple_ioctls)
-diff --git a/tools/testing/selftests/iommu/iommufd_fail_nth.c b/tools/testing/selftests/iommu/iommufd_fail_nth.c
-index 8ab20df4edc8c7..d4c552e5694812 100644
---- a/tools/testing/selftests/iommu/iommufd_fail_nth.c
-+++ b/tools/testing/selftests/iommu/iommufd_fail_nth.c
-@@ -579,6 +579,8 @@ TEST_FAIL_NTH(basic_fail_nth, device)
- 	uint32_t ioas_id;
- 	uint32_t ioas_id2;
- 	uint32_t stdev_id;
-+	uint32_t idev_id;
-+	uint32_t hwpt_id;
- 	__u64 iova;
- 
- 	self->fd = open("/dev/iommu", O_RDWR);
-@@ -605,11 +607,18 @@ TEST_FAIL_NTH(basic_fail_nth, device)
- 
- 	fail_nth_enable();
- 
--	if (_test_cmd_mock_domain(self->fd, ioas_id, &stdev_id, NULL, NULL))
-+	if (_test_cmd_mock_domain(self->fd, ioas_id, &stdev_id, NULL,
-+				  &idev_id))
-+		return -1;
-+
-+	if (_test_cmd_hwpt_alloc(self->fd, idev_id, ioas_id, &hwpt_id))
- 		return -1;
- 
- 	if (_test_cmd_mock_domain_replace(self->fd, stdev_id, ioas_id2, NULL))
- 		return -1;
-+
-+	if (_test_cmd_mock_domain_replace(self->fd, stdev_id, hwpt_id, NULL))
-+		return -1;
- 	return 0;
- }
- 
-diff --git a/tools/testing/selftests/iommu/iommufd_utils.h b/tools/testing/selftests/iommu/iommufd_utils.h
-index 62e01412a7679e..53b4d3f2d9fc6c 100644
---- a/tools/testing/selftests/iommu/iommufd_utils.h
-+++ b/tools/testing/selftests/iommu/iommufd_utils.h
-@@ -98,6 +98,27 @@ static int _test_cmd_mock_domain_replace(int fd, __u32 stdev_id, __u32 pt_id,
- 	EXPECT_ERRNO(_errno, _test_cmd_mock_domain_replace(self->fd, stdev_id, \
- 							   pt_id, NULL))
- 
-+static int _test_cmd_hwpt_alloc(int fd, __u32 device_id, __u32 pt_id,
-+					 __u32 *hwpt_id)
-+{
-+	struct iommu_hwpt_alloc cmd = {
-+		.size = sizeof(cmd),
-+		.dev_id = device_id,
-+		.pt_id = pt_id,
-+	};
-+	int ret;
-+
-+	ret = ioctl(fd, IOMMU_HWPT_ALLOC, &cmd);
-+	if (ret)
-+		return ret;
-+	if (hwpt_id)
-+		*hwpt_id = cmd.out_hwpt_id;
-+	return 0;
-+}
-+
-+#define test_cmd_hwpt_alloc(device_id, pt_id, hwpt_id) \
-+	ASSERT_EQ(0, _test_cmd_hwpt_alloc(self->fd, device_id, pt_id, hwpt_id))
-+
- static int _test_cmd_create_access(int fd, unsigned int ioas_id,
- 				   __u32 *access_id, unsigned int flags)
- {
--- 
-2.40.0
+This item was just based on this RFC implementation which uses a lazy
+gstage page allocation.
+The idea was to check if there is any interest at all in this
+approach. I should have mentioned about
+restrictedmem plan in this section as well. Sorry for the confusion.
 
+Thanks for your suggestion. It seems we should just directly move to
+restrictedmem asap.
+
+> Patch 1 says "This patch is based on pkvm patches", so clearly you are at=
+ least
+> aware that there is other work going on in this space.
+>
+
+Yes. We have been following pkvm, tdx & CCA patches. The MMIO section
+has more details
+on TDX/pkvm related aspects.
+
+> At a very quick glance, this series is suffers from all of the same flaws=
+ that SNP,
+> TDX, and pKVM have encountered.  E.g. assuming guest memory is backed by =
+struct page
+> memory, relying on pinning to solve all problems (hint, it doesn't), and =
+so on and
+> so forth.
+>
+> And to make things worse, this series is riddled with bugs.  E.g. patch 1=
+9 alone
+> manages to squeeze in multiple fatal bugs in five new lines of code: dead=
+lock due
+> to not releasing mmap_lock on failure, failure to correcty handle MOVE, f=
+ailure to
+
+That's an oversight. Apologies for that. Thanks for pointing it out.
+
+> handle DELETE at all, failure to honor (or reject) READONLY, and probably=
+ several
+> others.
+>
+It should be rejected for READONLY as our APIs don't have any
+permission flags yet.
+I think we should add that to enable CoVE APIs to support as well ?
+
+Same goes for DELETE ops as we don't have an API to delete any
+confidential memory region
+yet. I was not very sure about the use case for MOVE though (migration
+possibly ?)
+
+kvm_riscv_cove_vm_add_memreg should have been invoked only for CREATE
+& reject others for now.
+I will revise the patch accordingly and leave a TODO comment for the
+future about API updates.
+
+> diff --git a/arch/riscv/kvm/mmu.c b/arch/riscv/kvm/mmu.c
+> index 4b0f09e..63889d9 100644
+> --- a/arch/riscv/kvm/mmu.c
+> +++ b/arch/riscv/kvm/mmu.c
+> @@ -499,6 +499,11 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
+>
+>         mmap_read_lock(current->mm);
+>
+> +       if (is_cove_vm(kvm)) {
+> +               ret =3D kvm_riscv_cove_vm_add_memreg(kvm, base_gpa, size)=
+;
+> +               if (ret)
+> +                       return ret;
+> +       }
+>         /*
+>          * A memory region could potentially cover multiple VMAs, and
+>          * any holes between them, so iterate over all of them to find
+>
+> I get that this is an RFC, but for a series of this size, operating in an=
+ area that
+> is under heavy development by multiple other architectures, to have a dif=
+fstat that
+> shows _zero_ changes to common KVM is simply unacceptable.
+>
+
+Thanks for the valuable feedback. This is pretty much pre-RFC as the
+spec is very much
+in draft state. We want to share with the larger linux community to
+gather feedback sooner
+than later so that we can incorporate that feedback into the spec if any.
+
+> Please, go look at restrictedmem[2] and work on building CoVE support on =
+top of
+> that.  If the current proposal doesn't fit CoVE's needs, then we need to =
+know _before_
+> all of that code gets merged.
+>
+
+Absolutely. That has always been the plan.
+
+> [1] https://lore.kernel.org/linux-mm/20200522125214.31348-1-kirill.shutem=
+ov@linux.intel.com
+> [2] https://lkml.kernel.org/r/20221202061347.1070246-1-chao.p.peng%40linu=
+x.intel.com
+>
+> > arch/riscv/Kbuild                       |    2 +
+> > arch/riscv/Kconfig                      |   27 +
+> > arch/riscv/cove/Makefile                |    2 +
+> > arch/riscv/cove/core.c                  |   40 +
+> > arch/riscv/cove/cove_guest_sbi.c        |  109 +++
+> > arch/riscv/include/asm/cove.h           |   27 +
+> > arch/riscv/include/asm/covg_sbi.h       |   38 +
+> > arch/riscv/include/asm/csr.h            |    2 +
+> > arch/riscv/include/asm/kvm_cove.h       |  206 +++++
+> > arch/riscv/include/asm/kvm_cove_sbi.h   |  101 +++
+> > arch/riscv/include/asm/kvm_host.h       |   10 +-
+> > arch/riscv/include/asm/kvm_vcpu_sbi.h   |    3 +
+> > arch/riscv/include/asm/mem_encrypt.h    |   26 +
+> > arch/riscv/include/asm/sbi.h            |  107 +++
+> > arch/riscv/include/uapi/asm/kvm.h       |   17 +
+> > arch/riscv/kernel/irq.c                 |   12 +
+> > arch/riscv/kernel/setup.c               |    2 +
+> > arch/riscv/kvm/Makefile                 |    1 +
+> > arch/riscv/kvm/aia.c                    |  101 ++-
+> > arch/riscv/kvm/aia_device.c             |   41 +-
+> > arch/riscv/kvm/aia_imsic.c              |  127 ++-
+> > arch/riscv/kvm/cove.c                   | 1005 +++++++++++++++++++++++
+> > arch/riscv/kvm/cove_sbi.c               |  490 +++++++++++
+> > arch/riscv/kvm/main.c                   |   30 +-
+> > arch/riscv/kvm/mmu.c                    |   45 +-
+> > arch/riscv/kvm/tlb.c                    |   11 +-
+> > arch/riscv/kvm/vcpu.c                   |   69 +-
+> > arch/riscv/kvm/vcpu_exit.c              |   34 +-
+> > arch/riscv/kvm/vcpu_insn.c              |  115 ++-
+> > arch/riscv/kvm/vcpu_sbi.c               |   16 +
+> > arch/riscv/kvm/vcpu_sbi_covg.c          |  232 ++++++
+> > arch/riscv/kvm/vcpu_timer.c             |   26 +-
+> > arch/riscv/kvm/vm.c                     |   34 +-
+> > arch/riscv/kvm/vmid.c                   |   17 +-
+> > arch/riscv/mm/Makefile                  |    3 +
+> > arch/riscv/mm/init.c                    |   17 +-
+> > arch/riscv/mm/ioremap.c                 |   45 +
+> > arch/riscv/mm/mem_encrypt.c             |   61 ++
+> > drivers/tty/hvc/hvc_riscv_sbi.c         |    5 +
+> > drivers/tty/serial/earlycon-riscv-sbi.c |   51 +-
+> > include/uapi/linux/kvm.h                |    8 +
+> > mm/vmalloc.c                            |   16 +
+> > 42 files changed, 3222 insertions(+), 109 deletions(-)
+> > create mode 100644 arch/riscv/cove/Makefile
+> > create mode 100644 arch/riscv/cove/core.c
+> > create mode 100644 arch/riscv/cove/cove_guest_sbi.c
+> > create mode 100644 arch/riscv/include/asm/cove.h
+> > create mode 100644 arch/riscv/include/asm/covg_sbi.h
+> > create mode 100644 arch/riscv/include/asm/kvm_cove.h
+> > create mode 100644 arch/riscv/include/asm/kvm_cove_sbi.h
+> > create mode 100644 arch/riscv/include/asm/mem_encrypt.h
+> > create mode 100644 arch/riscv/kvm/cove.c
+> > create mode 100644 arch/riscv/kvm/cove_sbi.c
+> > create mode 100644 arch/riscv/kvm/vcpu_sbi_covg.c
+> > create mode 100644 arch/riscv/mm/ioremap.c
+> > create mode 100644 arch/riscv/mm/mem_encrypt.c
+> >
+> > --
+> > 2.25.1
+> >
