@@ -2,167 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1402A6E8C85
-	for <lists+kvm@lfdr.de>; Thu, 20 Apr 2023 10:16:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EECBE6E8CC0
+	for <lists+kvm@lfdr.de>; Thu, 20 Apr 2023 10:28:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234384AbjDTIQt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 Apr 2023 04:16:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49712 "EHLO
+        id S233926AbjDTI2x (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 Apr 2023 04:28:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58230 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234382AbjDTIQs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 20 Apr 2023 04:16:48 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EAC382717
-        for <kvm@vger.kernel.org>; Thu, 20 Apr 2023 01:16:46 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 86196645DA
-        for <kvm@vger.kernel.org>; Thu, 20 Apr 2023 08:16:46 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D5D6BC4339B;
-        Thu, 20 Apr 2023 08:16:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1681978605;
-        bh=U+HZeh6wvku56TBypNZ3A51f1b1PWxa7cyoVhE23PM0=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=iC55ZgMwXjpkeMH1Kgbu9p2I0RjxU2IfkEdzKL9TknHBEcbGugCVRQ6u6bq/wpj86
-         Q8sk797JWGiuws9I1bKhx+5rN9dWr5cbbbFaXQiuptlQi+nmDILuEp1GikK11lkywI
-         2Xc7QrDkfcbk2BbPny8Jfr2z7mYbVPeqAGuNPhq8SYKkL1G0xIj2657VAGAtEghqmW
-         aqVbIv34h3KNbT4hQZ2uAdV9KnVz6SxOzzfMUJucQg1+rApZQ/+53DrKFlPDsmHd/b
-         8lXCkgQkDLeYhjY4Gp7JsgyP4XYiFGOm8YU7AGL0nfvoy0mI1XDRw2CtIHrzQ6QmmS
-         Z06HUcOpYa6tg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.95)
-        (envelope-from <maz@kernel.org>)
-        id 1ppPT9-009nIu-HC;
-        Thu, 20 Apr 2023 09:16:43 +0100
-Date:   Thu, 20 Apr 2023 09:16:43 +0100
-Message-ID: <86y1mnj7dg.wl-maz@kernel.org>
-From:   Marc Zyngier <maz@kernel.org>
-To:     Reiji Watanabe <reijiw@google.com>
-Cc:     Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        with ESMTP id S233817AbjDTI2w (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 20 Apr 2023 04:28:52 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C68D93AA6
+        for <kvm@vger.kernel.org>; Thu, 20 Apr 2023 01:28:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1681979290;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=KTDSYPbnwlYvYfAM1Oq9HYr46x4MyYy/YhuRhYjz+G4=;
+        b=gsp9zypevPgAyY3p2lFzL5P93bvqGOREdj2ib/w7lJA1GomVi62BNLJC6vYoHe1jvOOOGg
+        UsMKqQ4Qoh0OHAOpRajjdYvwaowxxUidAUIvLTL6EQrJeUuDDsmf18SrtUJaesXgytV3xi
+        ml86Oh6flkEM3R0cdLlodq/Tqc1+gwI=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-651-nCQAmjxaPW2BEG0k6xsq4w-1; Thu, 20 Apr 2023 04:28:08 -0400
+X-MC-Unique: nCQAmjxaPW2BEG0k6xsq4w-1
+Received: by mail-wm1-f71.google.com with SMTP id fl8-20020a05600c0b8800b003f16fe94249so1867716wmb.9
+        for <kvm@vger.kernel.org>; Thu, 20 Apr 2023 01:28:08 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1681979287; x=1684571287;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=KTDSYPbnwlYvYfAM1Oq9HYr46x4MyYy/YhuRhYjz+G4=;
+        b=agZJQwG4pyKli9R8Agx53iWr02qSM7SzV6PtHWhWDl0omgkSKjVtkL9STjlIl0TsBc
+         sDM7BKebp1DO0rsvka//fPfbXTqvzwfboqWT2Fj3ISk+LOLUyjw16JO2PffSXrBUALzM
+         g+m3Cq5zWvUu830LFucP6jfffw5dnofaQryCPZ03Yi/sXXf5AgFI+OhkfVA11gMJ+lnk
+         qRw30DNq/IxjGKduW/CENsorShMQoCtH4R8/2fK6V4RpsBiR+IpSV4frdU8iiMIYiTkr
+         wB0UOcnYcC92gct9yRDTx2Pfa5Hoge8DA9uttw7kj2X0/OXoZS7rvLIq97ryRZRZ6af7
+         Mskw==
+X-Gm-Message-State: AAQBX9deUaE5YfOJp9h03MV1wsDJ8oi8t+9z8V9fjXjN9IVvNZqZKE1D
+        kF6VAZvDNw1oIyIYrA2Itnw7VRK51bCEyVdIVVegNqBdKjvEVeY9O8nxRxHORCNFNJ6/gXxB4g7
+        7TN+oqYppsZri
+X-Received: by 2002:a1c:7414:0:b0:3f1:795d:8f00 with SMTP id p20-20020a1c7414000000b003f1795d8f00mr647875wmc.23.1681979287406;
+        Thu, 20 Apr 2023 01:28:07 -0700 (PDT)
+X-Google-Smtp-Source: AKy350a4h3rjRuVu4u2iNxa0BsKCCZtNln8D8avNEAlTJLmF42EJEmT3E33abaHmG3IOLVBQ429JJQ==
+X-Received: by 2002:a1c:7414:0:b0:3f1:795d:8f00 with SMTP id p20-20020a1c7414000000b003f1795d8f00mr647856wmc.23.1681979287098;
+        Thu, 20 Apr 2023 01:28:07 -0700 (PDT)
+Received: from [192.168.0.3] (ip-109-43-178-20.web.vodafone.de. [109.43.178.20])
+        by smtp.gmail.com with ESMTPSA id m18-20020a7bcb92000000b003f182973377sm1266750wmi.32.2023.04.20.01.28.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 20 Apr 2023 01:28:06 -0700 (PDT)
+Message-ID: <2e770feb-59d6-4b67-12ff-a2646ccc2079@redhat.com>
+Date:   Thu, 20 Apr 2023 10:28:05 +0200
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.9.0
+Subject: Re: [kvm-unit-tests PATCH v2 0/3] Improve stack pretty printing
+Content-Language: en-US
+To:     Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
+        Andrew Jones <andrew.jones@linux.dev>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Raghavendra Rao Anata <rananta@google.com>,
-        Will Deacon <will@kernel.org>
-Subject: Re: [PATCH v1 1/2] KVM: arm64: Acquire mp_state_lock in kvm_arch_vcpu_ioctl_vcpu_init()
-In-Reply-To: <20230420021302.iyl3pqo3lg6lpabv@google.com>
-References: <20230419021852.2981107-1-reijiw@google.com>
-        <20230419021852.2981107-2-reijiw@google.com>
-        <87cz405or6.wl-maz@kernel.org>
-        <20230420021302.iyl3pqo3lg6lpabv@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: reijiw@google.com, oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, alexandru.elisei@arm.com, yuzenghui@huawei.com, suzuki.poulose@arm.com, pbonzini@redhat.com, ricarkol@google.com, jingzhangos@google.com, rananta@google.com, will@kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+        Peter Feiner <pfeiner@google.com>
+Cc:     kvm@vger.kernel.org
+References: <20230404185048.2824384-1-nsg@linux.ibm.com>
+From:   Thomas Huth <thuth@redhat.com>
+In-Reply-To: <20230404185048.2824384-1-nsg@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-4.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 20 Apr 2023 03:13:02 +0100,
-Reiji Watanabe <reijiw@google.com> wrote:
+On 04/04/2023 20.50, Nina Schoetterl-Glausch wrote:
+> I noticed some bugs/deficiencies in the pretty_print_stacks script.
+> Namely, it doesn't cope with 0 addresses, which might occur on s390x
+> when backtracing through a interrupt stack frame. Since an interrupt is
+> not a function call, the calling convention doesn't apply and we cannot
+> tell where the stack is.
 > 
-> Hi Marc,
+> Additionally, the script stops printing the stack if addr2line cannot
+> determine the line number, instead of skipping the printing of the
+> source.
 > 
-> On Wed, Apr 19, 2023 at 08:12:45AM +0100, Marc Zyngier wrote:
-> > On Wed, 19 Apr 2023 03:18:51 +0100,
-> > Reiji Watanabe <reijiw@google.com> wrote:
-> > > kvm_arch_vcpu_ioctl_vcpu_init() doesn't acquire mp_state_lock
-> > > when setting the mp_state to KVM_MP_STATE_RUNNABLE. Fix the
-> > > code to acquire the lock.
-> > > 
-> > > Signed-off-by: Reiji Watanabe <reijiw@google.com>
-> > > ---
-> > >  arch/arm64/kvm/arm.c | 5 ++++-
-> > >  1 file changed, 4 insertions(+), 1 deletion(-)
-> > > 
-> > > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> > > index fbafcbbcc463..388aa4f18f21 100644
-> > > --- a/arch/arm64/kvm/arm.c
-> > > +++ b/arch/arm64/kvm/arm.c
-> > > @@ -1244,8 +1244,11 @@ static int kvm_arch_vcpu_ioctl_vcpu_init(struct kvm_vcpu *vcpu,
-> > >  	 */
-> > >  	if (test_bit(KVM_ARM_VCPU_POWER_OFF, vcpu->arch.features))
-> > >  		kvm_arm_vcpu_power_off(vcpu);
-> > > -	else
-> > > +	else {
-> > > +		spin_lock(&vcpu->arch.mp_state_lock);
-> > >  		WRITE_ONCE(vcpu->arch.mp_state.mp_state, KVM_MP_STATE_RUNNABLE);
-> > > +		spin_unlock(&vcpu->arch.mp_state_lock);
-> > > +	}
-> > >  
-> > >  	return 0;
-> > >  }
-> > 
-> > I'm not entirely convinced that this fixes anything. What does the
-> > lock hazard against given that the write is atomic? But maybe a
-> 
-> It appears that kvm_psci_vcpu_on() expects the vCPU's mp_state
-> to not be changed by holding the lock.  Although I don't think this
-> code practically causes any real issues now, I am a little concerned
-> about leaving one instance that updates mpstate without acquiring the
-> lock, in terms of future maintenance, as holding the lock won't prevent
-> mp_state from being updated.
-> 
-> What do you think ?
+> Lastly, the file path determination was broken for me because I use git
+> worktrees and there being symlinks in the paths.
+> The proposed change works for me and fixes the issue.
 
-Right, fair enough. It is probably better to take the lock and not
-have to think of this sort of things... I'm becoming more lazy by the
-minute!
+Thanks! Since there were no objections or other suggestions, I went ahead 
+and pushed the three patches now.
 
-> 
-> > slightly more readable of this would be to expand the critical section
-> > this way:
-> > 
-> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> > index 4ec888fdd4f7..bb21d0c25de7 100644
-> > --- a/arch/arm64/kvm/arm.c
-> > +++ b/arch/arm64/kvm/arm.c
-> > @@ -1246,11 +1246,15 @@ static int kvm_arch_vcpu_ioctl_vcpu_init(struct kvm_vcpu *vcpu,
-> >  	/*
-> >  	 * Handle the "start in power-off" case.
-> >  	 */
-> > +	spin_lock(&vcpu->arch.mp_state_lock);
-> > +
-> >  	if (test_bit(KVM_ARM_VCPU_POWER_OFF, vcpu->arch.features))
-> > -		kvm_arm_vcpu_power_off(vcpu);
-> > +		__kvm_arm_vcpu_power_off(vcpu);
-> >  	else
-> >  		WRITE_ONCE(vcpu->arch.mp_state.mp_state, KVM_MP_STATE_RUNNABLE);
-> >  
-> > +	spin_unlock(&vcpu->arch.mp_state_lock);
-> > +
-> >  	return 0;
-> >  }
-> > 
-> > Thoughts?
-> 
-> Yes, it looks better!
+  Thomas
 
-Cool. I've applied this change to your patch, applied the series to
-the lock inversion branch, and remerged the branch in -next.
 
-We're getting there! ;-)
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
