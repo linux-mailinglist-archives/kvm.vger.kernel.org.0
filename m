@@ -2,138 +2,209 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AA3926E85E9
-	for <lists+kvm@lfdr.de>; Thu, 20 Apr 2023 01:26:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5E3906E86FB
+	for <lists+kvm@lfdr.de>; Thu, 20 Apr 2023 02:51:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231950AbjDSX0r (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Apr 2023 19:26:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47002 "EHLO
+        id S233218AbjDTAvB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Apr 2023 20:51:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48592 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229700AbjDSX0q (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Apr 2023 19:26:46 -0400
-Received: from mail-wm1-x334.google.com (mail-wm1-x334.google.com [IPv6:2a00:1450:4864:20::334])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 338311FD3
-        for <kvm@vger.kernel.org>; Wed, 19 Apr 2023 16:26:44 -0700 (PDT)
-Received: by mail-wm1-x334.google.com with SMTP id o29-20020a05600c511d00b003f1739de43cso286082wms.4
-        for <kvm@vger.kernel.org>; Wed, 19 Apr 2023 16:26:44 -0700 (PDT)
+        with ESMTP id S232716AbjDTAub (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Apr 2023 20:50:31 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 227F97298
+        for <kvm@vger.kernel.org>; Wed, 19 Apr 2023 17:50:07 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id e6-20020a25e706000000b00b7c653a0a4aso915203ybh.23
+        for <kvm@vger.kernel.org>; Wed, 19 Apr 2023 17:50:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1681946802; x=1684538802;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tPEpl165mfYvy9T7s6K/AOw86FzBzrStc3Zob8MFFuc=;
-        b=om5ZDWcpQHhZivxtfcJiW0+S6OuX9kPpTw9FcDnas8O6UirVWJ57HimdRJaSMMsvnt
-         m5caIkfbLvFQcAadWubhwR6Ua9HJ7DbcGNK/pDXxJhFqSgNowchEUSMvHlbHiflnMGCT
-         ZjDn/kqdX2/5gf7Se9GAIQHXqf1u33EO5jo8MHiFz9TEHJsWdubdibG4FJEi4+7w0enR
-         +sNGkItAVqMKdsxrWTYwU97cTriqKit8kiNPNk7sPNzysuAzVAPESuB5Z042xhRKq/jP
-         gj6MlRWWgFBqJ1OBTkwzJXjSpsRe3H9+SbzRJFEZB6+vzz9wUGXIhriCAjvKMLpZBRU1
-         V6ow==
+        d=google.com; s=20221208; t=1681951797; x=1684543797;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=WElRL1S1A/l6yYWkPjKb60TbLP43vB7Va3vAhnMHy4o=;
+        b=0KQvDXHLR89BVxU2oI9O1ZusFid2YKHOcipULiVP6+PSDHwriZYqd2A06zVvzb+5zg
+         +1pAM1zXlSNPZvINL7u8jaguPJCIxfMpOP+rF/bo3e7YipW5A5h9Z1uQ5Ne2aQDNcW6c
+         EcQXFII0XVCoUfr19ADWbM/w1kzMojqRNFL4dpL0bA9tYUhTVMdjBXnH0ldjTdoS4rfS
+         B4qULmS58/9Ub/zlvy0EPJx+IEG/RXiTWy5ry2WStJSaH5TR16lXIzvnkE2V+5Qqr+ic
+         KCotEARF8eci5Ax95+I+ZNzK3NrfAcOPUHTnTLXEbEOQev6PRHk+rxhdkpcXFMAn0sKn
+         YqLA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681946802; x=1684538802;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=tPEpl165mfYvy9T7s6K/AOw86FzBzrStc3Zob8MFFuc=;
-        b=aSGecJ+o7K5ljievyosDy6LM3ixqGFOiXoRMl6Qkmg6IMuthsxXdk2ZktAaZQKcYiF
-         0uwd4A+rFN4ShX66hQqtdHprU9MB27cE1/TSScz5o8OuSSyU7ojDgHaV9Xz6ruaSfWHt
-         SD0qKEavvr6McYmiqBogQkc3pNS2GMrri9LqrQa8xCrvlS80wXWEyy1AAF9gaHhi9yZ4
-         QVgxf+PSlHSzuJqOvvXr5RrFJnPRczK3JxLvjOFcz/BCUHWf3pbMa8Eorb9hZMZ+fp5m
-         0LQ23tzepgLcN9KX8giamN92Z23NorlBI3d5uQ4TqxFqSiP2cYeuM6fUt8CeZJtGyjI5
-         zyvA==
-X-Gm-Message-State: AAQBX9cPMIGUGNbQW8melsF7+EI0uIoTVJKe9MwUiKnwfnhy2+AEUh1M
-        uZMLWLPB12EbTlqFCKDGZnocpt67Y70q4mDXi9yUiQ==
-X-Google-Smtp-Source: AKy350aGgjiad/WfnyK+DyOn2eUk1ngiL9OPNmn0Iw+laUeHPShxAtPDZHc9saeNfFGGYcThkWWxETPyg/vvgCqDj1U=
-X-Received: by 2002:a1c:f402:0:b0:3f0:9f44:c7ce with SMTP id
- z2-20020a1cf402000000b003f09f44c7cemr17828816wma.22.1681946802599; Wed, 19
- Apr 2023 16:26:42 -0700 (PDT)
-MIME-Version: 1.0
-References: <20230412213510.1220557-1-amoorthy@google.com> <20230412213510.1220557-3-amoorthy@google.com>
- <a43e5deb-211a-c4c0-6b1d-7715c3665017@gmail.com>
-In-Reply-To: <a43e5deb-211a-c4c0-6b1d-7715c3665017@gmail.com>
-From:   Anish Moorthy <amoorthy@google.com>
-Date:   Wed, 19 Apr 2023 16:26:05 -0700
-Message-ID: <CAF7b7mph_3gtYc=EEJ4fiVLZHRPUpSUY5eYzTsitdXG=pu_1kg@mail.gmail.com>
-Subject: Re: [PATCH v3 02/22] KVM: selftests: Use EPOLL in userfaultfd_util
- reader threads and signal errors via TEST_ASSERT
-To:     Hoo Robert <robert.hoo.linux@gmail.com>
-Cc:     pbonzini@redhat.com, maz@kernel.org, oliver.upton@linux.dev,
-        seanjc@google.com, jthoughton@google.com, bgardon@google.com,
-        dmatlack@google.com, ricarkol@google.com, axelrasmussen@google.com,
-        peterx@redhat.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL,
-        USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no version=3.4.6
+        d=1e100.net; s=20221208; t=1681951797; x=1684543797;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=WElRL1S1A/l6yYWkPjKb60TbLP43vB7Va3vAhnMHy4o=;
+        b=JEYgz98No6TQzbwEb515h9vyYZU+0khhJiiNIV8LkmdHgEJmJGVBsnudPYwfNPiG9Q
+         Li6wmegYchx2fsk4rBpJERA1+1ZiCtWwmyXJ45mEQuhIinE9bLufyuflmRTgq0piY2JW
+         cSOjJ7+YrsJ8uAuStkO56YdFPmQyt8WnT9jcjWuN5fhZmCeYjLnjpAPicaM8KI1HW+qq
+         tkEWj0xKY5kZDBAT+r6D9FkJl+9S1Dux5FEvlJTlyPcoIPRdt81dM5pWvjub25xhlvDy
+         KpI6SmE4n9Qto3NkiNdHxiPatCVY/W8iu7KWjJIt1L2t1BTcimkyoPi2bZSyRpKMjoOU
+         S6/A==
+X-Gm-Message-State: AAQBX9cm+4oEzOunxZR+diRvi1YXDEfpCsm5sRhDjTodb1uwMdGdeVzX
+        2mUubvRxBz2A41ZaAt0FVLmKTXIYohU=
+X-Google-Smtp-Source: AKy350ZW3QSDcu1b4uay718+0UKdCoR5698g0B4gA8e9kbzHBPJ0H7w91zco9M9KgDo6hSqXOcwRuk93omk=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:d24c:0:b0:b95:460c:1776 with SMTP id
+ j73-20020a25d24c000000b00b95460c1776mr766347ybg.13.1681951797267; Wed, 19 Apr
+ 2023 17:49:57 -0700 (PDT)
+Date:   Wed, 19 Apr 2023 17:49:55 -0700
+In-Reply-To: <20230418-anfallen-irdisch-6993a61be10b@brauner>
+Mime-Version: 1.0
+References: <20220818132421.6xmjqduempmxnnu2@box> <diqzlej60z57.fsf@ackerleytng-cloudtop.c.googlers.com>
+ <20221202061347.1070246-2-chao.p.peng@linux.intel.com> <20230413-anlegen-ergibt-cbefffe0b3de@brauner>
+ <ZDiCG/7OgDI0SwMR@google.com> <20230418-anfallen-irdisch-6993a61be10b@brauner>
+Message-ID: <ZECMM9bjgGRdyXRy@google.com>
+Subject: Re: [PATCH v7 00/14] KVM: mm: fd-based approach for supporting KVM
+ guest private memory
+From:   Sean Christopherson <seanjc@google.com>
+To:     Christian Brauner <brauner@kernel.org>
+Cc:     "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        Ackerley Tng <ackerleytng@google.com>,
+        Chao Peng <chao.p.peng@linux.intel.com>,
+        Hugh Dickins <hughd@google.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
+        linux-kselftest@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>, luto@kernel.org,
+        jun.nakajima@intel.com, dave.hansen@intel.com, ak@linux.intel.com,
+        david@redhat.com, aarcange@redhat.com, ddutile@redhat.com,
+        dhildenb@redhat.com, Quentin Perret <qperret@google.com>,
+        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
+        Muchun Song <songmuchun@bytedance.com>,
+        Pankaj Gupta <pankaj.gupta@amd.com>,
+        linux-arch@vger.kernel.org, arnd@arndb.de, linmiaohe@huawei.com,
+        naoya.horiguchi@nec.com, tabba@google.com, wei.w.wang@intel.com
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Apr 19, 2023 at 6:36=E2=80=AFAM Hoo Robert <robert.hoo.linux@gmail.=
-com> wrote:
->
-> How about goto
->         ts_diff =3D timespec_elapsed(start);
-> Otherwise last stats won't get chances to be calc'ed.
+On Wed, Apr 19, 2023, Christian Brauner wrote:
+> On Thu, Apr 13, 2023 at 03:28:43PM -0700, Sean Christopherson wrote:
+> > > But if you want to preserve the inode number and device number of the
+> > > relevant tmpfs instance but still report memfd restricted as your
+> > > filesystem type
+> > 
+> > Unless I missed something along the way, reporting memfd_restricted as a distinct
+> > filesystem is very much a non-goal.  AFAIK it's purely a side effect of the
+> > proposed implementation.
+> 
+> In the current implementation you would have to put in effort to fake
+> this. For example, you would need to also implement ->statfs
+> super_operation where you'd need to fill in the details of the tmpfs
+> instance. At that point all that memfd_restricted fs code that you've
+> written is nothing but deadweight, I would reckon.
 
-Good idea, done.
+After digging a bit, I suspect the main reason Kirill implemented an overlay to
+inode_operations was to prevent modifying the file size via ->setattr().  Relying
+on shmem_setattr() to unmap entries in KVM's MMU wouldn't work because, by design,
+the memory can't be mmap()'d into host userspace. 
 
-> > +             TEST_ASSERT(r =3D=3D 1,
-> > +                                     "Unexpected number of events (%d)=
- from epoll, errno =3D %d",
-> > +                                     r, errno);
-> >
-> too much indentation, also seen elsewhere.
+	if (attr->ia_valid & ATTR_SIZE) {
+		if (memfd->f_inode->i_size)
+			return -EPERM;
 
-Augh, my editor has been set to a tab width of 4 this entire time.
-That... explains a lot >:(
+		if (!PAGE_ALIGNED(attr->ia_size))
+			return -EINVAL;	
+	}
 
-> >               }
-> >
-> > -             if (!(pollfd[0].revents & POLLIN))
-> > -                     continue;
-> > +             TEST_ASSERT(!(evt.events & (EPOLLERR | EPOLLHUP)),
-> > +                                     "Reader thread received EPOLLERR =
-or EPOLLHUP on uffd.");
-> >
-> >               r =3D read(uffd, &msg, sizeof(msg));
-> >               if (r =3D=3D -1) {
-> > -                     if (errno =3D=3D EAGAIN)
-> > -                             continue;
-> > -                     pr_info("Read of uffd got errno %d\n", errno);
-> > -                     return NULL;
-> > +                     TEST_ASSERT(errno =3D=3D EAGAIN,
-> > +                                             "Error reading from UFFD:=
- errno =3D %d", errno);
-> > +                     continue;
-> >               }
-> >
-> > -             if (r !=3D sizeof(msg)) {
-> > -                     pr_info("Read on uffd returned unexpected size: %=
-d bytes", r);
-> > -                     return NULL;
-> > -             }
-> > +             TEST_ASSERT(r =3D=3D sizeof(msg),
-> > +                                     "Read on uffd returned unexpected=
- number of bytes (%d)", r);
-> >
-> >               if (!(msg.event & UFFD_EVENT_PAGEFAULT))
-> >                       continue;
-> > @@ -93,8 +89,8 @@ static void *uffd_handler_thread_fn(void *arg)
-> >               if (reader_args->delay)
-> >                       usleep(reader_args->delay);
-> >               r =3D reader_args->handler(reader_args->uffd_mode, uffd, =
-&msg);
-> > -             if (r < 0)
-> > -                     return NULL;
-> > +             TEST_ASSERT(r >=3D 0,
-> > +                                     "Reader thread handler fn returne=
-d negative value %d", r);
-> >               pages++;
-> >       }
-> >
->
+But I think we can solve this particular problem by using F_SEAL_{GROW,SHRINK} or
+SHMEM_LONGPIN.  For a variety of reasons, I'm leaning more and more toward making
+this a KVM ioctl() instead of a dedicated syscall, at which point we can be both
+more flexible and more draconian, e.g. let userspace provide the file size at the
+time of creation, but make the size immutable, at least by default.
+
+> > After giving myself a bit of a crash course in file systems, would something like
+> > the below have any chance of (a) working, (b) getting merged, and (c) being
+> > maintainable?
+> > 
+> > The idea is similar to a stacking filesystem, but instead of stacking, restrictedmem
+> > hijacks a f_ops and a_ops to create a lightweight shim around tmpfs.  There are
+> > undoubtedly issues and edge cases, I'm just looking for a quick "yes, this might
+> > be doable" or a "no, that's absolutely bonkers, don't try it".
+> 
+> Maybe, but I think it's weird.
+
+Yeah, agreed.
+
+> _Replacing_ f_ops isn't something that's unprecedented. It happens everytime
+> a character device is opened (see fs/char_dev.c:chrdev_open()). And debugfs
+> does a similar (much more involved) thing where it replaces it's proxy f_ops
+> with the relevant subsystem's f_ops. The difference is that in both cases the
+> replace happens at ->open() time; and the replace is done once. Afterwards
+> only the newly added f_ops are relevant.
+> 
+> In your case you'd be keeping two sets of {f,a}_ops; one usable by
+> userspace and another only usable by in-kernel consumers. And there are
+> some concerns (non-exhaustive list), I think:
+> 
+> * {f,a}_ops weren't designed for this. IOW, one set of {f,a}_ops is
+>   authoritative per @file and it is left to the individual subsystems to
+>   maintain driver specific ops (see the sunrpc stuff or sockets).
+> * lifetime management for the two sets of {f,a}_ops: If the ops belong
+>   to a module then you need to make sure that the module can't get
+>   unloaded while you're using the fops. Might not be a concern in this
+>   case.
+
+Ah, whereas I assume the owner of inode_operations is pinned by ??? (dentry?)
+holding a reference to the inode?
+
+> * brittleness: Not all f_ops for example deal with userspace
+>   functionality some deal with cleanup when the file is closed like
+>   ->release(). So it's delicate to override that functionality with
+>   custom f_ops. Restricted memfds could easily forget to cleanup
+>   resources.
+> * Potential for confusion why there's two sets of {f,a}_ops.
+> * f_ops specifically are generic across a vast amount of consumers and
+>   are subject to change. If memfd_restricted() has specific requirements
+>   because of this weird double-use they won't be taken into account.
+> 
+> I find this hard to navigate tbh and it feels like taking a shortcut to
+> avoid building a proper api.
+
+Agreed.  At the very least, it would be better to take an explicit dependency on
+whatever APIs are being used instead of somewhat blindly bouncing through ->fallocate().
+I think that gives us a clearer path to getting something merged too, as we'll
+need Acks on making specific functions visible, i.e. will give MM maintainers
+something concrete to react too.
+
+> If you only care about a specific set of operations specific to memfd
+> restricte that needs to be available to in-kernel consumers, I wonder if you
+> shouldn't just go one step further then your proposal below and build a
+> dedicated minimal ops api.
+
+This is actually very doable for shmem.  Unless I'm missing something, because
+our use case doesn't allow mmap(), swap, or migration, a good chunk of
+shmem_fallocate() is simply irrelevant.  The result is only ~100 lines of code,
+and quite straightforward.
+
+My biggest concern, outside of missing a detail in shmem, is adding support for
+HugeTLBFS, which is likely going to be requested/needed sooner than later.  At a
+glance, hugetlbfs_fallocate() is quite a bit more complex, i.e. not something I'm
+keen to duplicate.  But that's also a future problem to some extent, as it's
+purely kernel internals; the uAPI side of things doesn't seem like it'll be messy
+at all.
+
+Thanks again!
