@@ -2,100 +2,81 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5E8C56E8E5A
-	for <lists+kvm@lfdr.de>; Thu, 20 Apr 2023 11:40:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A1F286E8E9D
+	for <lists+kvm@lfdr.de>; Thu, 20 Apr 2023 11:51:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234419AbjDTJkR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 Apr 2023 05:40:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51444 "EHLO
+        id S234237AbjDTJvz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 Apr 2023 05:51:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34628 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234445AbjDTJjf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 20 Apr 2023 05:39:35 -0400
-Received: from loongson.cn (mail.loongson.cn [114.242.206.163])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 256297698
-        for <kvm@vger.kernel.org>; Thu, 20 Apr 2023 02:38:00 -0700 (PDT)
-Received: from loongson.cn (unknown [10.2.5.185])
-        by gateway (Coremail) with SMTP id _____8BxONmKB0Fk0XEfAA--.49106S3;
-        Thu, 20 Apr 2023 17:36:10 +0800 (CST)
-Received: from localhost.localdomain (unknown [10.2.5.185])
-        by localhost.localdomain (Coremail) with SMTP id AQAAf8DxwOSGB0FkUfEwAA--.29752S12;
-        Thu, 20 Apr 2023 17:36:10 +0800 (CST)
-From:   Tianrui Zhao <zhaotianrui@loongson.cn>
-To:     qemu-devel@nongnu.org, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>, gaosong@loongson.cn
-Cc:     "Michael S . Tsirkin" <mst@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>, maobibo@loongson.cn,
+        with ESMTP id S234047AbjDTJvd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 20 Apr 2023 05:51:33 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7EF50768E
+        for <kvm@vger.kernel.org>; Thu, 20 Apr 2023 02:49:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1681984185;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=J4d7x1cNgCskwTe9CHC2x/9xeLP77gPxzHC/FoirtyI=;
+        b=ZPiW28qR6jEflZzrWpo6Sgr4cGfShz0IU0kS9ffiMsPiApPsiF9VxvTYgIYu8UwTth0sCF
+        sPMToLNvJFFQaHkErLSdf8BiMx5zeUx6Y/tRV/kQxKIAd8hRJJgTOJ5mmJVoxQ9+QNA+7x
+        JQ6Dlb+ZXk2JDFqZsEqtuEO+KnhImT8=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-349-fdZoozD2NJe0vaZzJWZOzw-1; Thu, 20 Apr 2023 05:49:44 -0400
+X-MC-Unique: fdZoozD2NJe0vaZzJWZOzw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B8B8038237C8;
+        Thu, 20 Apr 2023 09:49:43 +0000 (UTC)
+Received: from localhost (dhcp-192-239.str.redhat.com [10.33.192.239])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 6FE0C40C2064;
+        Thu, 20 Apr 2023 09:49:43 +0000 (UTC)
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Tianrui Zhao <zhaotianrui@loongson.cn>, qemu-devel@nongnu.org,
+        kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        gaosong@loongson.cn
+Cc:     "Michael S . Tsirkin" <mst@redhat.com>, maobibo@loongson.cn,
         zhaotianrui@loongson.cn
-Subject: [PATCH RFC v1 10/10] target/loongarch: Add kvm file into meson build
-Date:   Thu, 20 Apr 2023 17:36:06 +0800
-Message-Id: <20230420093606.3366969-11-zhaotianrui@loongson.cn>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20230420093606.3366969-1-zhaotianrui@loongson.cn>
+Subject: Re: [PATCH RFC v1 01/10] linux-headers: Add KVM headers for loongarch
+In-Reply-To: <20230420093606.3366969-2-zhaotianrui@loongson.cn>
+Organization: Red Hat GmbH
 References: <20230420093606.3366969-1-zhaotianrui@loongson.cn>
+ <20230420093606.3366969-2-zhaotianrui@loongson.cn>
+User-Agent: Notmuch/0.37 (https://notmuchmail.org)
+Date:   Thu, 20 Apr 2023 11:49:41 +0200
+Message-ID: <87bkji51e2.fsf@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: AQAAf8DxwOSGB0FkUfEwAA--.29752S12
-X-CM-SenderInfo: p2kd03xldq233l6o00pqjv00gofq/
-X-Coremail-Antispam: 1Uk129KBjvJXoW7uw4kWF4xAr1fGryrAw1kXwb_yoW8GrWDp3
-        s7C3W8KF4kJFWkJ3s8C3s3XrZxtw13Gw12qay7K34fAwsxJ3y7XFZ3t3sxXF42q3W0kF1S
-        9rn3C3W5WF4UJw7anT9S1TB71UUUUUDqnTZGkaVYY2UrUUUUj1kv1TuYvTs0mT0YCTnIWj
-        qI5I8CrVACY4xI64kE6c02F40Ex7xfYxn0WfASr-VFAUDa7-sFnT9fnUUIcSsGvfJTRUUU
-        bn8Fc2x0x2IEx4CE42xK8VAvwI8IcIk0rVWrJVCq3wA2ocxC64kIII0Yj41l84x0c7CEw4
-        AK67xGY2AK021l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0I7IYx2IY6xkF
-        7I0E14v26F4j6r4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
-        0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07AIYIkI8VC2zVCF
-        FI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VCjz48v1sIEY20_WwAm72CE4IkC6x0Yz7
-        v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41l42xK82IYc2Ij64vIr41l42xK82IY6x8ErcxFaVAv
-        8VWrMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7
-        xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xII
-        jxv20xvE14v26ryj6F1UMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWxJVW8Jr1lIxAIcVCF04
-        k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26F4j6r4UJwCI42IY6I8E87Iv6xkF
-        7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvj4RC_MaUUUUU
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_PASS,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add kvm.c and kvm-stub.c into meson.build to compile
-it when kvm is configed. Meanwhile in meson.build,
-we set the kvm_targets to loongarch64-softmmu when
-the cpu is loongarch.
+On Thu, Apr 20 2023, Tianrui Zhao <zhaotianrui@loongson.cn> wrote:
 
-Signed-off-by: Tianrui Zhao <zhaotianrui@loongson.cn>
----
- meson.build                  | 2 ++
- target/loongarch/meson.build | 1 +
- 2 files changed, 3 insertions(+)
+> Add asm-loongarch/kvm.h for loongarch KVM, and update
+> the linux/kvm.h about loongarch part. The structures in
+> the header are used as kvm_ioctl arguments.
 
-diff --git a/meson.build b/meson.build
-index 29f8644d6d..9a4bce4add 100644
---- a/meson.build
-+++ b/meson.build
-@@ -114,6 +114,8 @@ elif cpu in ['mips', 'mips64']
-   kvm_targets = ['mips-softmmu', 'mipsel-softmmu', 'mips64-softmmu', 'mips64el-softmmu']
- elif cpu in ['riscv']
-   kvm_targets = ['riscv32-softmmu', 'riscv64-softmmu']
-+elif cpu in ['loongarch64']
-+  kvm_targets = ['loongarch64-softmmu']
- else
-   kvm_targets = []
- endif
-diff --git a/target/loongarch/meson.build b/target/loongarch/meson.build
-index 9293a8ab78..0c6cec81e4 100644
---- a/target/loongarch/meson.build
-+++ b/target/loongarch/meson.build
-@@ -26,6 +26,7 @@ loongarch_softmmu_ss.add(files(
- 
- common_ss.add(when: 'CONFIG_LOONGARCH_DIS', if_true: [files('disas.c'), gen])
- 
-+loongarch_ss.add(when: 'CONFIG_KVM', if_true: files('kvm.c'), if_false: files('kvm-stub.c'))
- loongarch_ss.add_all(when: 'CONFIG_TCG', if_true: [loongarch_tcg_ss])
- 
- target_arch += {'loongarch': loongarch_ss}
--- 
-2.31.1
+Just a procedural note: It's probably best to explicitly mark this as a
+placeholder patch until you can replace it with a full headers update.
+
+>
+> Signed-off-by: Tianrui Zhao <zhaotianrui@loongson.cn>
+> ---
+>  linux-headers/asm-loongarch/kvm.h | 99 +++++++++++++++++++++++++++++++
+>  linux-headers/linux/kvm.h         |  9 +++
+>  2 files changed, 108 insertions(+)
+>  create mode 100644 linux-headers/asm-loongarch/kvm.h
 
