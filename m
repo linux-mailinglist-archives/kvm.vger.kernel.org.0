@@ -2,80 +2,78 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 915C06E9DDF
-	for <lists+kvm@lfdr.de>; Thu, 20 Apr 2023 23:30:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B98E86E9E19
+	for <lists+kvm@lfdr.de>; Thu, 20 Apr 2023 23:50:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232068AbjDTVaN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 Apr 2023 17:30:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49762 "EHLO
+        id S231547AbjDTVub (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 Apr 2023 17:50:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58756 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229599AbjDTVaL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 20 Apr 2023 17:30:11 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 401C55599
-        for <kvm@vger.kernel.org>; Thu, 20 Apr 2023 14:29:11 -0700 (PDT)
+        with ESMTP id S229533AbjDTVu3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 20 Apr 2023 17:50:29 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 567721FFB
+        for <kvm@vger.kernel.org>; Thu, 20 Apr 2023 14:49:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1682026150;
+        s=mimecast20190719; t=1682027381;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=HDRlM2AxMnsdyfyV+QoAFp3KBlLJ57QTAbE5avGat94=;
-        b=VmNuTIAKIrs7YgiP6OZg2m1G3GgZ/mZkhxxJdx1NS3cp2o8qwl1mU7Zq2UVHb+hVBT9D/z
-        mbswCqajcf9dX8vYS9T4gbxqJl8q7RU3xkF+5DQ0cIwZSVdrFeIyVHo+Gt4ARcxBsafqJ9
-        vM3u/y5NODtvJOPWeXhAOcJZu9NK3DI=
-Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
- [209.85.160.198]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=Ed7BbjIgEG0nlGh5BbIuvSNi/R0nKOIS6+tkSWqjXb4=;
+        b=FWGuUOJ/x4cW4hELOXlZ9mN1+yYqM3JmImU5cyjnkrI/mmTr8UHGyj+3naJbWyD3aiNGQT
+        /ED9tIhMANb8LQ9bKZDIkZU6Hv6xTzNTgKpRCEax3LJS0J47wnpptDqSDiDCkLUZX2s1fT
+        HhH1SOqsHDqA7jZu9L+3qT1VGZRq3f0=
+Received: from mail-io1-f71.google.com (mail-io1-f71.google.com
+ [209.85.166.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-567-LHSa9jt_OVip4ggp7Tmbyw-1; Thu, 20 Apr 2023 17:29:09 -0400
-X-MC-Unique: LHSa9jt_OVip4ggp7Tmbyw-1
-Received: by mail-qt1-f198.google.com with SMTP id d75a77b69052e-3ef3116d1dcso3290371cf.1
-        for <kvm@vger.kernel.org>; Thu, 20 Apr 2023 14:29:09 -0700 (PDT)
+ us-mta-436-BEyFaaaxMaiV-iaaKu315A-1; Thu, 20 Apr 2023 17:49:38 -0400
+X-MC-Unique: BEyFaaaxMaiV-iaaKu315A-1
+Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-760eead6a4aso115856939f.3
+        for <kvm@vger.kernel.org>; Thu, 20 Apr 2023 14:49:38 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682026148; x=1684618148;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=HDRlM2AxMnsdyfyV+QoAFp3KBlLJ57QTAbE5avGat94=;
-        b=Iir487TrtPFJrFVh9+vGSMQBlEO70ysgXgPse3ilSVrEbfisZ9Cr+XExx/cHMfj+Xc
-         JYOQh2xecF3tC/jUjffkQb6ZV46Mao6xFoNi3lqs0eN84QZ2Xejyxc3JvNudNrWFAOH7
-         KrztuJZBI2A1U1eVNNDW2F+Prb6OLKhchZR4v67HwPAIU0yv4NcaKHZwb7j5YSH7fg30
-         WGHhFbp9zBM4BkSuLN3rRb6vxTrgByc1kgvId776DZzf+w6CRXMJyzqGcSwHLI5eH7Zl
-         v2tQfNFyxHwQUQEyZZrIWh5fQpzwmBjI8mkKXjl22MLs6IQm+RTb6kvLCPWfwY9V+5NA
-         3rpw==
-X-Gm-Message-State: AAQBX9dduKN0Yc+UMzXjDOnbQIZc3V+yEgI9g9fIWs9pfzsxXZ1Vi1ZJ
-        GVxtxqMyMBvoeX/Q/5DBe2UM2BrMs4iA4G/SySvf1UvPZl6YcE2njnVdQq/vSnZh8sh35spweQ/
-        bgxMluyAUZr0P
-X-Received: by 2002:a05:622a:1a12:b0:3eb:143a:746a with SMTP id f18-20020a05622a1a1200b003eb143a746amr4771038qtb.4.1682026148509;
-        Thu, 20 Apr 2023 14:29:08 -0700 (PDT)
-X-Google-Smtp-Source: AKy350YqBBUfyt4SNW81xn4TnP0axcTvbXVOiAGkFrl8Mnsl2wIQ3j6/sBnmDpyd7F+AZ8L2hzahKQ==
-X-Received: by 2002:a05:622a:1a12:b0:3eb:143a:746a with SMTP id f18-20020a05622a1a1200b003eb143a746amr4771009qtb.4.1682026148203;
-        Thu, 20 Apr 2023 14:29:08 -0700 (PDT)
-Received: from x1n (bras-base-aurron9127w-grc-40-70-52-229-124.dsl.bell.ca. [70.52.229.124])
-        by smtp.gmail.com with ESMTPSA id o8-20020a05620a228800b00746aa080eefsm745930qkh.6.2023.04.20.14.29.06
+        d=1e100.net; s=20221208; t=1682027377; x=1684619377;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Ed7BbjIgEG0nlGh5BbIuvSNi/R0nKOIS6+tkSWqjXb4=;
+        b=LxgxVh7YIQOt1Vvd9YxuOwWRIvMYfck2FIXUdXP6Lh9dOgNixgn0iMh/+cG7bN28Jm
+         Fh0iKKpXrPmFtPPEF3mKQGWa/Q1QaVrsKgOD0BvJSkqQw5Tf7Om+tEuMwwpZneX/wiT/
+         CyPlWMILD7xK2ZmBRTgaWO4finFBbQplI0BzzO9QtQwpGLZ98XYBx/OW8bDqPUMpEO9k
+         LQT9IzDZ+iPC8kgBHhrwFzpifnRSF7tBdqrf1avQnhxCrU1uQBSHcbrzqGt3ZEeklCXZ
+         N8+Y8FYi67pDFT9XujcFI6HXHAX/B2XxghqB3PKOCvU0XYmscvzeUZBvvBDMX7H/+3LW
+         zJ9g==
+X-Gm-Message-State: AAQBX9fOmUEcNQSPfvwbFDqp2rFj6K9UtxzDfycGYQGf11K4RDb7LZRB
+        AVOzLHCKBJNqr8rwjHJ16OOMvQ0zeTpWLz+SSdt47NbMoSpah6QxSHfgro7XUuGnMnbaMWJVob+
+        PEcML6ZcuZggS
+X-Received: by 2002:a5d:884c:0:b0:760:e308:107e with SMTP id t12-20020a5d884c000000b00760e308107emr2524967ios.0.1682027377384;
+        Thu, 20 Apr 2023 14:49:37 -0700 (PDT)
+X-Google-Smtp-Source: AKy350aASnaRo/ZryK2g65U9txMsvyPJLwyJ6CVMgCX11TD1+qfvyNjUh5x72FJcvybAgdncTdoxWQ==
+X-Received: by 2002:a5d:884c:0:b0:760:e308:107e with SMTP id t12-20020a5d884c000000b00760e308107emr2524954ios.0.1682027377097;
+        Thu, 20 Apr 2023 14:49:37 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id c7-20020a6b7d07000000b007046e9e138esm647115ioq.22.2023.04.20.14.49.36
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Apr 2023 14:29:07 -0700 (PDT)
-Date:   Thu, 20 Apr 2023 17:29:06 -0400
-From:   Peter Xu <peterx@redhat.com>
-To:     Anish Moorthy <amoorthy@google.com>
-Cc:     Axel Rasmussen <axelrasmussen@google.com>, pbonzini@redhat.com,
-        maz@kernel.org, oliver.upton@linux.dev, seanjc@google.com,
-        jthoughton@google.com, bgardon@google.com, dmatlack@google.com,
-        ricarkol@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev,
-        Nadav Amit <nadav.amit@gmail.com>
-Subject: Re: [PATCH v3 00/22] Improve scalability of KVM + userfaultfd live
- migration via annotated memory faults.
-Message-ID: <ZEGuogfbtxPNUq7t@x1n>
-References: <20230412213510.1220557-1-amoorthy@google.com>
- <ZEBHTw3+DcAnPc37@x1n>
- <CAJHvVchBqQ8iVHgF9cVZDusMKQM2AjtNx2z=i9ZHP2BosN4tBg@mail.gmail.com>
- <ZEBXi5tZZNxA+jRs@x1n>
- <CAF7b7mo68VLNp=QynfT7QKgdq=d1YYGv1SEVEDxF9UwHzF6YDw@mail.gmail.com>
+        Thu, 20 Apr 2023 14:49:36 -0700 (PDT)
+Date:   Thu, 20 Apr 2023 15:49:33 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Robin Murphy <robin.murphy@arm.com>
+Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+        Jason Gunthorpe <jgg@nvidia.com>
+Subject: Re: RMRR device on non-Intel platform
+Message-ID: <20230420154933.1a79de4e.alex.williamson@redhat.com>
+In-Reply-To: <fd324213-8d77-cb67-1c52-01cd0997a92c@arm.com>
+References: <BN9PR11MB5276E84229B5BD952D78E9598C639@BN9PR11MB5276.namprd11.prod.outlook.com>
+        <20230420081539.6bf301ad.alex.williamson@redhat.com>
+        <6cce1c5d-ab50-41c4-6e62-661bc369d860@arm.com>
+        <20230420084906.2e4cce42.alex.williamson@redhat.com>
+        <fd324213-8d77-cb67-1c52-01cd0997a92c@arm.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAF7b7mo68VLNp=QynfT7QKgdq=d1YYGv1SEVEDxF9UwHzF6YDw@mail.gmail.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
@@ -86,151 +84,180 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi, Anish,
+On Thu, 20 Apr 2023 17:55:22 +0100
+Robin Murphy <robin.murphy@arm.com> wrote:
 
-[Copied Nadav Amit for the last few paragraphs on userfaultfd, because
- Nadav worked on a few userfaultfd performance problems; so maybe he'll
- also have some ideas around]
-
-On Wed, Apr 19, 2023 at 02:53:46PM -0700, Anish Moorthy wrote:
-> On Wed, Apr 19, 2023 at 2:05 PM Peter Xu <peterx@redhat.com> wrote:
-> >
-> > On Wed, Apr 19, 2023 at 01:15:44PM -0700, Axel Rasmussen wrote:
-> > > We considered sharding into several UFFDs. I do think it helps, but
-> > > also I think there are two main problems with it...
-> >
-> > But I agree I can never justify that it'll always work.  If you or Anish
-> > could provide some data points to further support this issue that would be
-> > very interesting and helpful, IMHO, not required though.
+> On 20/04/2023 3:49 pm, Alex Williamson wrote:
+> > On Thu, 20 Apr 2023 15:19:55 +0100
+> > Robin Murphy <robin.murphy@arm.com> wrote:
+> >   
+> >> On 2023-04-20 15:15, Alex Williamson wrote:  
+> >>> On Thu, 20 Apr 2023 06:52:01 +0000
+> >>> "Tian, Kevin" <kevin.tian@intel.com> wrote:
+> >>>      
+> >>>> Hi, Alex,
+> >>>>
+> >>>> Happen to see that we may have inconsistent policy about RMRR devices cross
+> >>>> different vendors.
+> >>>>
+> >>>> Previously only Intel supports RMRR. Now both AMD/ARM have similar thing,
+> >>>> AMD IVMD and ARM RMR.  
+> >>>
+> >>> Any similar requirement imposed by system firmware that the operating
+> >>> system must perpetually maintain a specific IOVA mapping for the device
+> >>> should impose similar restrictions as we've implemented for VT-d
+> >>> RMMR[1].  Thanks,  
+> >>
+> >> Hmm, does that mean that vfio_iommu_resv_exclude() going to the trouble
+> >> of punching out all the reserved region holes isn't really needed?  
+> > 
+> > While "Reserved Memory Region Reporting", might suggest that the ranges
+> > are simply excluded, RMRR actually require that specific mappings are
+> > maintained for ongoing, side-band activity, which is not compatible
+> > with the ideas that userspace owns the IOVA address space for the
+> > device or separation of host vs userspace control of the device.  Such
+> > mappings suggest things like system health monitoring where the
+> > influence of a user-owned device can easily extend to a system-wide
+> > scope if the user it able to manipulate the device to deny that
+> > interaction or report bad data.
+> > 
+> > If these ARM and AMD tables impose similar requirements, we should
+> > really be restricting devices encumbered by such requirements from
+> > userspace access as well.  Thanks,  
 > 
-> Axel covered the reasons for not pursuing the sharding approach nicely
-> (thanks!). It's not something we ever prototyped, so I don't have any
-> further numbers there.
+> Indeed the primary use-case behind Arm's RMRs was certain devices like 
+> big complex RAID controllers which have already been started by UEFI 
+> firmware at boot and have live in-memory data which needs to be preserved.
 > 
-> On Wed, Apr 19, 2023 at 2:05 PM Peter Xu <peterx@redhat.com> wrote:
-> >
-> > On Wed, Apr 19, 2023 at 01:15:44PM -0700, Axel Rasmussen wrote:
-> >
-> > > I think we could share numbers from some of our internal benchmarks,
-> > > or at the very least give relative numbers (e.g. +50% increase), but
-> > > since a lot of the software stack is proprietary (e.g. we don't use
-> > > QEMU), it may not be that useful or reproducible for folks.
-> >
-> > Those numbers can still be helpful.  I was not asking for reproduceability,
-> > but some test to better justify this feature.
+> However, my point was more that if it's a VFIO policy that any device 
+> with an IOMMU_RESV_DIRECT reservation is not suitable for userspace 
+> assignment, then vfio_iommu_type1_attach_group() already has everything 
+> it would need to robustly enforce that policy itself. It seems silly to 
+> me for it to expect the IOMMU driver to fail the attach, then go ahead 
+> and dutifully punch out direct regions if it happened not to. A couple 
+> of obvious trivial tweaks and there could be no dependency on driver 
+> behaviour at all, other than correctly reporting resv_regions to begin with.
 > 
-> I do have some internal benchmarking numbers on this front, although
-> it's been a while since I've collected them so the details might be a
-> little sparse.
+> If we think this policy deserves to go beyond VFIO and userspace, and 
+> it's reasonable that such devices should never be allowed to attach to 
+> any other kind of kernel-owned unmanaged domain either, then we can 
+> still trivially enforce that in core IOMMU code. I really see no need 
+> for it to be in drivers at all.
 
-Thanks for sharing these data points.  I don't understand most of them yet,
-but I think it's better than the unit test numbers provided.
+It seems like a reasonable choice to me that any mixing of unmanaged
+domains with IOMMU_RESV_DIRECT could be restricted globally.  Do we
+even have infrastructure for a driver to honor the necessary mapping
+requirements?
 
+It looks pretty easy to do as well, something like this (untested):
+
+diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
+index 10db680acaed..521f9a731ce9 100644
+--- a/drivers/iommu/iommu.c
++++ b/drivers/iommu/iommu.c
+@@ -2012,11 +2012,29 @@ static void __iommu_group_set_core_domain(struct iommu_group *group)
+ static int __iommu_attach_device(struct iommu_domain *domain,
+ 				 struct device *dev)
+ {
+-	int ret;
++	int ret = 0;
+ 
+ 	if (unlikely(domain->ops->attach_dev == NULL))
+ 		return -ENODEV;
+ 
++	if (domain->type == IOMMU_DOMAIN_UNMANAGED) {
++		struct iommu_resv_region *region;
++		LIST_HEAD(resv_regions);
++
++		iommu_get_resv_regions(dev, &resv_regions);
++		list_for_each_entry(region, &resv_regions, list) {
++			if (region->type == IOMMU_RESV_DIRECT) {
++				ret = -EPERM;
++				break;
++			}
++		}
++		iommu_put_resv_regions(dev, &resv_regions);
++		if (ret) {
++			dev_warn(dev, "Device may not be used with an unmanaged IOMMU domain due to reserved direct mapping requirement.\n");
++			return ret;
++		}
++	}
++
+ 	ret = domain->ops->attach_dev(domain, dev);
+ 	if (ret)
+ 		return ret;
+ 
+Restrictions in either type1 or iommufd would be pretty trivial as well,
+but centralizing it in core IOMMU code would do a better job of covering
+all use cases.
+
+This effectively makes the VT-d code further down the same path
+redundant, so no new restrictions there.
+
+What sort of fall-out should we expect on ARM or AMD?  This was a pretty
+painful restriction to add on Intel.  Thanks,
+
+Alex
+
+> >>> [1]https://access.redhat.com/sites/default/files/attachments/rmrr-wp1.pdf
+> >>>      
+> >>>> RMRR identity mapping was considered unsafe (except for USB/GPU) for
+> >>>> device assignment:
+> >>>>
+> >>>> /*
+> >>>>    * There are a couple cases where we need to restrict the functionality of
+> >>>>    * devices associated with RMRRs.  The first is when evaluating a device for
+> >>>>    * identity mapping because problems exist when devices are moved in and out
+> >>>>    * of domains and their respective RMRR information is lost.  This means that
+> >>>>    * a device with associated RMRRs will never be in a "passthrough" domain.
+> >>>>    * The second is use of the device through the IOMMU API.  This interface
+> >>>>    * expects to have full control of the IOVA space for the device.  We cannot
+> >>>>    * satisfy both the requirement that RMRR access is maintained and have an
+> >>>>    * unencumbered IOVA space.  We also have no ability to quiesce the device's
+> >>>>    * use of the RMRR space or even inform the IOMMU API user of the restriction.
+> >>>>    * We therefore prevent devices associated with an RMRR from participating in
+> >>>>    * the IOMMU API, which eliminates them from device assignment.
+> >>>>    *
+> >>>>    * In both cases, devices which have relaxable RMRRs are not concerned by this
+> >>>>    * restriction. See device_rmrr_is_relaxable comment.
+> >>>>    */
+> >>>> static bool device_is_rmrr_locked(struct device *dev)
+> >>>> {
+> >>>> 	if (!device_has_rmrr(dev))
+> >>>> 		return false;
+> >>>>
+> >>>> 	if (device_rmrr_is_relaxable(dev))
+> >>>> 		return false;
+> >>>>
+> >>>> 	return true;
+> >>>> }
+> >>>>
+> >>>> Then non-relaxable RMRR device is rejected when doing attach:
+> >>>>
+> >>>> static int intel_iommu_attach_device(struct iommu_domain *domain,
+> >>>>                                        struct device *dev)
+> >>>> {
+> >>>> 	struct device_domain_info *info = dev_iommu_priv_get(dev);
+> >>>> 	int ret;
+> >>>>
+> >>>> 	if (domain->type == IOMMU_DOMAIN_UNMANAGED &&
+> >>>> 	    device_is_rmrr_locked(dev)) {
+> >>>> 		dev_warn(dev, "Device is ineligible for IOMMU domain attach due to platform RMRR requirement.  Contact your platform vendor.\n");
+> >>>> 		return -EPERM;
+> >>>> 	}
+> >>>> 	...
+> >>>> }
+> >>>>
+> >>>> But I didn't find the same check in AMD/ARM driver at a glance.
+> >>>>
+> >>>> Did I overlook some arch difference which makes RMRR device safe in
+> >>>> those platforms or is it a gap to be fixed?
+> >>>>
+> >>>> Thanks
+> >>>> Kevin
+> >>>>     
+> >>>      
+> >>  
+> >   
 > 
-> I've confirmed performance gains with "scalable userfaultfd" using two
-> workloads besides the self-test:
-> 
-> The first, cycler, spins up a VM and launches a binary which (a) maps
-> a large amount of memory and then (b) loops over it issuing writes as
-> fast as possible. It's not a very realistic guest but it at least
-> involves an actual migrating VM, and we often use it to
-> stress/performance test migration changes. The write rate which cycler
-> achieves during userfaultfd-based postcopy (without scalable uffd
-> enabled) is about 25% of what it achieves under KVM Demand Paging (the
-> internal KVM feature GCE currently uses for postcopy). With
-> userfaultfd-based postcopy and scalable uffd enabled that rate jumps
-> nearly 3x, so about 75% of what KVM Demand Paging achieves. The
-> attached "Cycler.png" illustrates this effect (though due to some
-> other details, faster demand paging actually makes the migrations
-> worse: the point is that scalable uffd performs more similarly to kvm
-> demand paging :)
-
-Yes I don't understand why vanilla uffd is so different, neither am I sure
-what does the graph mean, though. :)
-
-Is the first drop caused by starting migration/precopy?
-
-Is the 2nd (huge) drop (mostly to zero) caused by frequently accessing new
-pages during postcopy?
-
-Is the workload busy writes single thread, or NCPU threads?
-
-Is what you mentioned on the 25%-75% comparison can be shown on the graph?
-Or maybe that's part of the period where all three are very close to 0?
-
-> 
-> The second is the redis memtier benchmark [1], a more realistic
-> workflow where we migrate a VM running the redis server. With scalable
-> userfaultfd, the client VM observes significantly higher transaction
-> rates during uffd-based postcopy (see "Memtier.png"). I can pull the
-> exact numbers if needed, but just from eyeballing the graph you can
-> see that the improvement is something like 5-10x (at least) for
-> several seconds. There's still a noticeable gap with KVM demand paging
-> based-postcopy, but the improvement is definitely significant.
-> 
-> [1] https://github.com/RedisLabs/memtier_benchmark
-
-Does the "5-10x" difference rely in the "15s valley" you pointed out in the
-graph?
-
-Is it reproduceable that the blue line always has a totally different
-"valley" comparing to yellow/red?
-
-Personally I still really want to know what happens if we just split the
-vma and see how it goes with a standard workloads, but maybe I'm asking too
-much so don't yet worry.  The solution here proposed still makes sense to
-me and I agree if this can be done well it can resolve the bottleneck over
-1-userfaultfd.
-
-But after I read some of the patches I'm not sure whether it's possible it
-can be implemented in a complete way.  You mentioned here and there on that
-things can be missing probably due to random places accessing guest pages
-all over kvm.  Relying sololy on -EFAULT so far doesn't look very reliable
-to me, but it could be because I didn't yet really understand how it works.
-
-Is above a concern to the current solution?
-
-Have any of you tried to investigate the other approach to scale
-userfaultfd?
-
-It seems userfaultfd does one thing great which is to have the trapping at
-an unified place (when the page fault happens), hence it doesn't need to
-worry on random codes splat over KVM module read/write a guest page.  The
-question is whether it'll be easy to do so.
-
-Split vma definitely is still a way to scale userfaultfd, but probably not
-in a good enough way because it's scaling in memory axis, not cores.  If
-tens of cores accessing a small region that falls into the same VMA, then
-it stops working.
-
-However maybe it can be scaled in other form?  So far my understanding is
-"read" upon uffd for messages is still not a problem - the read can be done
-in chunk, and each message will be converted into a request to be send
-later.
-
-If the real problem relies in a bunch of threads queuing, is it possible
-that we can provide just more queues for the events?  The readers will just
-need to go over all the queues.
-
-Way to decide "which thread uses which queue" can be another problem, what
-comes ups quickly to me is a "hash(tid) % n_queues" but maybe it can be
-better.  Each vcpu thread will have different tids, then they can hopefully
-scale on the queues.
-
-There's at least one issue that I know with such an idea, that after we
-have >1 uffd queues it means the message order will be uncertain.  It may
-matter for some uffd users (e.g. cooperative userfaultfd, see
-UFFD_FEATURE_FORK|REMOVE|etc.)  because I believe order of messages matter
-for them (mostly CRIU).  But I think that's not a blocker either because we
-can forbid those features with multi queues.
-
-That's a wild idea that I'm just thinking about, which I have totally no
-idea whether it'll work or not.  It's more or less of a generic question on
-"whether there's chance to scale on uffd side just in case it might be a
-cleaner approach", when above concern is a real concern.
-
-Thanks,
-
--- 
-Peter Xu
 
