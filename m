@@ -2,138 +2,286 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EBF206E9244
-	for <lists+kvm@lfdr.de>; Thu, 20 Apr 2023 13:19:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CE9FD6E97B2
+	for <lists+kvm@lfdr.de>; Thu, 20 Apr 2023 16:52:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234781AbjDTLTK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 Apr 2023 07:19:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47152 "EHLO
+        id S231196AbjDTOwv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 Apr 2023 10:52:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45160 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234873AbjDTLSz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 20 Apr 2023 07:18:55 -0400
-Received: from loongson.cn (mail.loongson.cn [114.242.206.163])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 7CFE1BBB2
-        for <kvm@vger.kernel.org>; Thu, 20 Apr 2023 04:15:40 -0700 (PDT)
-Received: from loongson.cn (unknown [10.20.42.120])
-        by gateway (Coremail) with SMTP id _____8AxJFw+HkFkuXsfAA--.49016S3;
-        Thu, 20 Apr 2023 19:13:02 +0800 (CST)
-Received: from [10.20.42.120] (unknown [10.20.42.120])
-        by localhost.localdomain (Coremail) with SMTP id AQAAf8DxfbM9HkFkXQ0xAA--.909S3;
-        Thu, 20 Apr 2023 19:13:01 +0800 (CST)
-Subject: Re: [PATCH RFC v1 09/10] target/loongarch: Add kvm-stub.c
-To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>,
-        qemu-devel@nongnu.org, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>, gaosong@loongson.cn
-References: <20230420093606.3366969-1-zhaotianrui@loongson.cn>
- <20230420093606.3366969-10-zhaotianrui@loongson.cn>
- <a315b56d-a331-5e85-ff55-4dca96088bb9@linaro.org>
-Cc:     "Michael S . Tsirkin" <mst@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>, maobibo@loongson.cn
-From:   Tianrui Zhao <zhaotianrui@loongson.cn>
-Message-ID: <e1869f8c-0aaa-1125-31b3-21fe43009fb3@loongson.cn>
-Date:   Thu, 20 Apr 2023 19:13:01 +0800
-User-Agent: Mozilla/5.0 (X11; Linux mips64; rv:45.0) Gecko/20100101
- Thunderbird/45.4.0
+        with ESMTP id S231699AbjDTOws (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 20 Apr 2023 10:52:48 -0400
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 144785241
+        for <kvm@vger.kernel.org>; Thu, 20 Apr 2023 07:52:38 -0700 (PDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A6A7F1480;
+        Thu, 20 Apr 2023 07:53:21 -0700 (PDT)
+Received: from donnerap.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 341643F6C4;
+        Thu, 20 Apr 2023 07:52:37 -0700 (PDT)
+Date:   Thu, 20 Apr 2023 12:23:43 +0100
+From:   Andre Przywara <andre.przywara@arm.com>
+To:     Jean-Philippe Brucker <jean-philippe@linaro.org>
+Cc:     kvm@vger.kernel.org, will@kernel.org, suzuki.poulose@arm.com
+Subject: Re: [PATCH kvmtool 01/16] virtio: Factor vhost initialization
+Message-ID: <20230420122343.42b96261@donnerap.cambridge.arm.com>
+In-Reply-To: <20230419132119.124457-2-jean-philippe@linaro.org>
+References: <20230419132119.124457-1-jean-philippe@linaro.org>
+        <20230419132119.124457-2-jean-philippe@linaro.org>
+Organization: ARM
+X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.32; aarch64-unknown-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <a315b56d-a331-5e85-ff55-4dca96088bb9@linaro.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: AQAAf8DxfbM9HkFkXQ0xAA--.909S3
-X-CM-SenderInfo: p2kd03xldq233l6o00pqjv00gofq/
-X-Coremail-Antispam: 1Uk129KBjvJXoW7urWxKF4kCw47XFyrJw48Xrb_yoW8ur45pF
-        Z7uFs8Kr4xJrZrJ3WrZ3y5XF1DZrWSgr12va4aq34xCr4UXr18Xryvg39xWFW5C348Gr10
-        vryFkw1YqF18J37anT9S1TB71UUUUUDqnTZGkaVYY2UrUUUUj1kv1TuYvTs0mT0YCTnIWj
-        qI5I8CrVACY4xI64kE6c02F40Ex7xfYxn0WfASr-VFAUDa7-sFnT9fnUUIcSsGvfJTRUUU
-        bxkYFVCjjxCrM7AC8VAFwI0_Jr0_Gr1l1xkIjI8I6I8E6xAIw20EY4v20xvaj40_Wr0E3s
-        1l1IIY67AEw4v_JrI_Jryl8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xv
-        wVC0I7IYx2IY67AKxVW8JVW5JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwA2z4
-        x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq3wAS0I0E
-        0xvYzxvE52x082IY62kv0487Mc804VCY07AIYIkI8VC2zVCFFI0UMc02F40EFcxC0VAKzV
-        Aqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUAVWUtwAv7VC2z280aVAFwI0_Gr0_Cr1lOx8S
-        6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI48JMxk0xIA0c2IEe2xFo4CEbIxvr21l42xK82
-        IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC2
-        0s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMI
-        IF0xvE2Ix0cI8IcVAFwI0_JFI_Gr1lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF
-        0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWxJVW8Jr1lIxAIcVC2z2
-        80aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU8vD73UUUUU==
-X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DATE_IN_PAST_03_06,
+        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Wed, 19 Apr 2023 14:21:05 +0100
+Jean-Philippe Brucker <jean-philippe@linaro.org> wrote:
 
+> Move vhost owner and memory table setup to virtio/vhost.c.
+> 
+> This also fixes vsock and SCSI which did not support multiple memory
+> regions until now (vsock didn't allocate the right region size and would
+> trigger a buffer overflow).
 
-在 2023年04月20日 18:04, Philippe Mathieu-Daudé 写道:
-> On 20/4/23 11:36, Tianrui Zhao wrote:
->> Add kvm-stub.c for loongarch, there are two stub functions:
->> kvm_loongarch_reset_vcpu and kvm_loongarch_set_interrupt.
->>
->> Signed-off-by: Tianrui Zhao <zhaotianrui@loongson.cn>
->> ---
->>   target/loongarch/kvm-stub.c      | 17 +++++++++++++++++
->>   target/loongarch/kvm_loongarch.h |  1 +
->>   2 files changed, 18 insertions(+)
->>   create mode 100644 target/loongarch/kvm-stub.c
->>
->> diff --git a/target/loongarch/kvm-stub.c b/target/loongarch/kvm-stub.c
->> new file mode 100644
->> index 0000000000..e28827ee07
->> --- /dev/null
->> +++ b/target/loongarch/kvm-stub.c
->> @@ -0,0 +1,17 @@
->> +/*
->> + * QEMU KVM LoongArch specific function stubs
->> + *
->> + * Copyright (c) 2023 Loongson Technology Corporation Limited
->> + */
->> +#include "qemu/osdep.h"
->> +#include "cpu.h"
->> +
->> +void kvm_loongarch_reset_vcpu(LoongArchCPU *cpu)
->
-> Where is kvm_loongarch_reset_vcpu() called?
-Thanks and nowhere called this function, I will remove it.
+Compared the code in all the versions, and it matches what the commit
+message claims, also still compiles:
 
-Thanks
-Tianrui Zhao
->
->> +{
->> +    abort();
->> +}
->> +
->> +void kvm_loongarch_set_interrupt(LoongArchCPU *cpu, int irq, int level)
->> +{
->> +    abort();
->
-> Please use g_assert_not_reached() which display more useful informations.
-Thanks, I will use the g_assert_not_reached() to replace it.
+Reviewed-by: Andre Przywara <andre.przywara@arm.com>
 
-Thanks
-Tianrui Zhao
->
->> +}
->
-> Add this stub in the previous patch "Implement set vcpu intr for kvm".
-Thanks, I will move this stub function into previous patch "Implement 
-set vcpu intr for kvm".
+Cheers,
+Andre
 
-Thanks
-Tianrui Zhao
->
->> diff --git a/target/loongarch/kvm_loongarch.h 
->> b/target/loongarch/kvm_loongarch.h
->> index cdef980eec..c03f4bef0f 100644
->> --- a/target/loongarch/kvm_loongarch.h
->> +++ b/target/loongarch/kvm_loongarch.h
->> @@ -8,6 +8,7 @@
->>   #ifndef QEMU_KVM_LOONGARCH_H
->>   #define QEMU_KVM_LOONGARCH_H
->>   +void kvm_loongarch_reset_vcpu(LoongArchCPU *cpu);
->>   int  kvm_loongarch_set_interrupt(LoongArchCPU *cpu, int irq, int 
->> level);
->>     #endif
+> Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
+> ---
+>  Makefile             |  1 +
+>  include/kvm/virtio.h |  1 +
+>  virtio/net.c         | 29 +----------------------------
+>  virtio/scsi.c        | 21 +--------------------
+>  virtio/vhost.c       | 36 ++++++++++++++++++++++++++++++++++++
+>  virtio/vsock.c       | 29 ++---------------------------
+>  6 files changed, 42 insertions(+), 75 deletions(-)
+>  create mode 100644 virtio/vhost.c
+> 
+> diff --git a/Makefile b/Makefile
+> index ed2414bd..86e19339 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -76,6 +76,7 @@ OBJS	+= virtio/pci.o
+>  OBJS	+= virtio/vsock.o
+>  OBJS	+= virtio/pci-legacy.o
+>  OBJS	+= virtio/pci-modern.o
+> +OBJS	+= virtio/vhost.o
+>  OBJS	+= disk/blk.o
+>  OBJS	+= disk/qcow.o
+>  OBJS	+= disk/raw.o
+> diff --git a/include/kvm/virtio.h b/include/kvm/virtio.h
+> index 0e8c7a67..cd72bf11 100644
+> --- a/include/kvm/virtio.h
+> +++ b/include/kvm/virtio.h
+> @@ -247,6 +247,7 @@ void virtio_set_guest_features(struct kvm *kvm, struct virtio_device *vdev,
+>  			       void *dev, u64 features);
+>  void virtio_notify_status(struct kvm *kvm, struct virtio_device *vdev,
+>  			  void *dev, u8 status);
+> +void virtio_vhost_init(struct kvm *kvm, int vhost_fd);
+>  
+>  int virtio_transport_parser(const struct option *opt, const char *arg, int unset);
+>  
+> diff --git a/virtio/net.c b/virtio/net.c
+> index 8749ebfe..6b44754f 100644
+> --- a/virtio/net.c
+> +++ b/virtio/net.c
+> @@ -791,40 +791,13 @@ static struct virtio_ops net_dev_virtio_ops = {
+>  
+>  static void virtio_net__vhost_init(struct kvm *kvm, struct net_dev *ndev)
+>  {
+> -	struct kvm_mem_bank *bank;
+> -	struct vhost_memory *mem;
+> -	int r, i;
+> -
+>  	ndev->vhost_fd = open("/dev/vhost-net", O_RDWR);
+>  	if (ndev->vhost_fd < 0)
+>  		die_perror("Failed openning vhost-net device");
+>  
+> -	mem = calloc(1, sizeof(*mem) + kvm->mem_slots * sizeof(struct vhost_memory_region));
+> -	if (mem == NULL)
+> -		die("Failed allocating memory for vhost memory map");
+> -
+> -	i = 0;
+> -	list_for_each_entry(bank, &kvm->mem_banks, list) {
+> -		mem->regions[i] = (struct vhost_memory_region) {
+> -			.guest_phys_addr = bank->guest_phys_addr,
+> -			.memory_size	 = bank->size,
+> -			.userspace_addr	 = (unsigned long)bank->host_addr,
+> -		};
+> -		i++;
+> -	}
+> -	mem->nregions = i;
+> -
+> -	r = ioctl(ndev->vhost_fd, VHOST_SET_OWNER);
+> -	if (r != 0)
+> -		die_perror("VHOST_SET_OWNER failed");
+> -
+> -	r = ioctl(ndev->vhost_fd, VHOST_SET_MEM_TABLE, mem);
+> -	if (r != 0)
+> -		die_perror("VHOST_SET_MEM_TABLE failed");
+> +	virtio_vhost_init(kvm, ndev->vhost_fd);
+>  
+>  	ndev->vdev.use_vhost = true;
+> -
+> -	free(mem);
+>  }
+>  
+>  static inline void str_to_mac(const char *str, char *mac)
+> diff --git a/virtio/scsi.c b/virtio/scsi.c
+> index 893dfe60..4dee24a0 100644
+> --- a/virtio/scsi.c
+> +++ b/virtio/scsi.c
+> @@ -203,7 +203,6 @@ static struct virtio_ops scsi_dev_virtio_ops = {
+>  
+>  static void virtio_scsi_vhost_init(struct kvm *kvm, struct scsi_dev *sdev)
+>  {
+> -	struct vhost_memory *mem;
+>  	u64 features;
+>  	int r;
+>  
+> @@ -211,20 +210,7 @@ static void virtio_scsi_vhost_init(struct kvm *kvm, struct scsi_dev *sdev)
+>  	if (sdev->vhost_fd < 0)
+>  		die_perror("Failed openning vhost-scsi device");
+>  
+> -	mem = calloc(1, sizeof(*mem) + sizeof(struct vhost_memory_region));
+> -	if (mem == NULL)
+> -		die("Failed allocating memory for vhost memory map");
+> -
+> -	mem->nregions = 1;
+> -	mem->regions[0] = (struct vhost_memory_region) {
+> -		.guest_phys_addr	= 0,
+> -		.memory_size		= kvm->ram_size,
+> -		.userspace_addr		= (unsigned long)kvm->ram_start,
+> -	};
+> -
+> -	r = ioctl(sdev->vhost_fd, VHOST_SET_OWNER);
+> -	if (r != 0)
+> -		die_perror("VHOST_SET_OWNER failed");
+> +	virtio_vhost_init(kvm, sdev->vhost_fd);
+>  
+>  	r = ioctl(sdev->vhost_fd, VHOST_GET_FEATURES, &features);
+>  	if (r != 0)
+> @@ -233,13 +219,8 @@ static void virtio_scsi_vhost_init(struct kvm *kvm, struct scsi_dev *sdev)
+>  	r = ioctl(sdev->vhost_fd, VHOST_SET_FEATURES, &features);
+>  	if (r != 0)
+>  		die_perror("VHOST_SET_FEATURES failed");
+> -	r = ioctl(sdev->vhost_fd, VHOST_SET_MEM_TABLE, mem);
+> -	if (r != 0)
+> -		die_perror("VHOST_SET_MEM_TABLE failed");
+>  
+>  	sdev->vdev.use_vhost = true;
+> -
+> -	free(mem);
+>  }
+>  
+>  
+> diff --git a/virtio/vhost.c b/virtio/vhost.c
+> new file mode 100644
+> index 00000000..f9f72f51
+> --- /dev/null
+> +++ b/virtio/vhost.c
+> @@ -0,0 +1,36 @@
+> +#include <linux/kvm.h>
+> +#include <linux/vhost.h>
+> +#include <linux/list.h>
+> +#include "kvm/virtio.h"
+> +
+> +void virtio_vhost_init(struct kvm *kvm, int vhost_fd)
+> +{
+> +	struct kvm_mem_bank *bank;
+> +	struct vhost_memory *mem;
+> +	int i = 0, r;
+> +
+> +	mem = calloc(1, sizeof(*mem) +
+> +		     kvm->mem_slots * sizeof(struct vhost_memory_region));
+> +	if (mem == NULL)
+> +		die("Failed allocating memory for vhost memory map");
+> +
+> +	list_for_each_entry(bank, &kvm->mem_banks, list) {
+> +		mem->regions[i] = (struct vhost_memory_region) {
+> +			.guest_phys_addr = bank->guest_phys_addr,
+> +			.memory_size	 = bank->size,
+> +			.userspace_addr	 = (unsigned long)bank->host_addr,
+> +		};
+> +		i++;
+> +	}
+> +	mem->nregions = i;
+> +
+> +	r = ioctl(vhost_fd, VHOST_SET_OWNER);
+> +	if (r != 0)
+> +		die_perror("VHOST_SET_OWNER failed");
+> +
+> +	r = ioctl(vhost_fd, VHOST_SET_MEM_TABLE, mem);
+> +	if (r != 0)
+> +		die_perror("VHOST_SET_MEM_TABLE failed");
+> +
+> +	free(mem);
+> +}
+> diff --git a/virtio/vsock.c b/virtio/vsock.c
+> index a108e637..4b8be8d7 100644
+> --- a/virtio/vsock.c
+> +++ b/virtio/vsock.c
+> @@ -218,37 +218,14 @@ static struct virtio_ops vsock_dev_virtio_ops = {
+>  
+>  static void virtio_vhost_vsock_init(struct kvm *kvm, struct vsock_dev *vdev)
+>  {
+> -	struct kvm_mem_bank *bank;
+> -	struct vhost_memory *mem;
+>  	u64 features;
+> -	int r, i;
+> +	int r;
+>  
+>  	vdev->vhost_fd = open("/dev/vhost-vsock", O_RDWR);
+>  	if (vdev->vhost_fd < 0)
+>  		die_perror("Failed opening vhost-vsock device");
+>  
+> -	mem = calloc(1, sizeof(*mem) + sizeof(struct vhost_memory_region));
+> -	if (mem == NULL)
+> -		die("Failed allocating memory for vhost memory map");
+> -
+> -	i = 0;
+> -	list_for_each_entry(bank, &kvm->mem_banks, list) {
+> -		mem->regions[i] = (struct vhost_memory_region) {
+> -			.guest_phys_addr = bank->guest_phys_addr,
+> -			.memory_size	 = bank->size,
+> -			.userspace_addr	 = (unsigned long)bank->host_addr,
+> -		};
+> -		i++;
+> -	}
+> -	mem->nregions = i;
+> -
+> -	r = ioctl(vdev->vhost_fd, VHOST_SET_OWNER);
+> -	if (r != 0)
+> -		die_perror("VHOST_SET_OWNER failed");
+> -
+> -	r = ioctl(vdev->vhost_fd, VHOST_SET_MEM_TABLE, mem);
+> -	if (r != 0)
+> -		die_perror("VHOST_SET_MEM_TABLE failed");
+> +	virtio_vhost_init(kvm, vdev->vhost_fd);
+>  
+>  	r = ioctl(vdev->vhost_fd, VHOST_GET_FEATURES, &features);
+>  	if (r != 0)
+> @@ -263,8 +240,6 @@ static void virtio_vhost_vsock_init(struct kvm *kvm, struct vsock_dev *vdev)
+>  		die_perror("VHOST_VSOCK_SET_GUEST_CID failed");
+>  
+>  	vdev->vdev.use_vhost = true;
+> -
+> -	free(mem);
+>  }
+>  
+>  static int virtio_vsock_init_one(struct kvm *kvm, u64 guest_cid)
 
