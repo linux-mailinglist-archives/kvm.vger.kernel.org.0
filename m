@@ -2,45 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D19D36E9A18
-	for <lists+kvm@lfdr.de>; Thu, 20 Apr 2023 18:56:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 768E56E9B19
+	for <lists+kvm@lfdr.de>; Thu, 20 Apr 2023 19:50:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230364AbjDTQ4h (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 Apr 2023 12:56:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35124 "EHLO
+        id S231720AbjDTRuO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 Apr 2023 13:50:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49984 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231171AbjDTQ4V (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 20 Apr 2023 12:56:21 -0400
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id B797361B8
-        for <kvm@vger.kernel.org>; Thu, 20 Apr 2023 09:55:36 -0700 (PDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 064C21480;
-        Thu, 20 Apr 2023 09:56:11 -0700 (PDT)
-Received: from [10.1.196.40] (e121345-lin.cambridge.arm.com [10.1.196.40])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9FEC43F6C4;
-        Thu, 20 Apr 2023 09:55:26 -0700 (PDT)
-Message-ID: <fd324213-8d77-cb67-1c52-01cd0997a92c@arm.com>
-Date:   Thu, 20 Apr 2023 17:55:22 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.9.0
-Subject: Re: RMRR device on non-Intel platform
-Content-Language: en-GB
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "iommu@lists.linux.dev" <iommu@lists.linux.dev>
-References: <BN9PR11MB5276E84229B5BD952D78E9598C639@BN9PR11MB5276.namprd11.prod.outlook.com>
- <20230420081539.6bf301ad.alex.williamson@redhat.com>
- <6cce1c5d-ab50-41c4-6e62-661bc369d860@arm.com>
- <20230420084906.2e4cce42.alex.williamson@redhat.com>
-From:   Robin Murphy <robin.murphy@arm.com>
-In-Reply-To: <20230420084906.2e4cce42.alex.williamson@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-5.9 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        with ESMTP id S231719AbjDTRuL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 20 Apr 2023 13:50:11 -0400
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 265BE422A
+        for <kvm@vger.kernel.org>; Thu, 20 Apr 2023 10:50:10 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-54feaa94819so28294997b3.2
+        for <kvm@vger.kernel.org>; Thu, 20 Apr 2023 10:50:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1682013009; x=1684605009;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=LPQ/EijRmgVmPolh1fmtIDSbWWxx7irHxImVS52k7FE=;
+        b=pzA/YrGc4zNWVaMghW+3JW+s1I32TsRcpiBRG9QiM5H2ds8t0troYUiiQaUpX9kZ2n
+         E14LigakfVd5NOzXBF/UsiXn4VxiNYEQrtifpKSwGsDwceen1uZ/BUL+DXGwoN0OkKeR
+         KslxAwVfs11HzFFoQLJ7DOVc9wy1th7ok1uQUEuLruB3gbLkwNYHxk39wudbbRxLH0Yf
+         KUjff5qKHdlzTI8HLB84ffIIL5giqPBqcG+C5wpRHsBFcA8XfOoTEvdvWLM3kQKIinK+
+         cuVzMVwHvHofrD8ksyX1nnaDlR7z7b5wA4TFAgqu0kLVBtdq7pWcJYob4oTMxXBjn+Ja
+         Ps8g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1682013009; x=1684605009;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=LPQ/EijRmgVmPolh1fmtIDSbWWxx7irHxImVS52k7FE=;
+        b=FK10zQ7ZDbCOk1vHP49P4HS1QJkBbu7zxhnlAoEfvpztj4/9o1qC1spG2oVn9DlY9K
+         GLji0dbJCWL9fL7LpqjUw/ZvFmnUDGyDxnaQ8p/e8Vxb7XygLZARfcWI4Csa7TsVXLh7
+         AaWsDrJ0TE+02AZkeMrxEs5TOlLZCzLVxzfb9pSoHeKhCISB+a7d0Xn6r+lVuBnNDbnm
+         hale6+tFOb9hl9US/qg/x+CYtm5G9/EsbjYcdEG4E1XCxJzCu7Ai/YVOwqCMjCAn++qf
+         uUnPGJkjR2YTy6/593ErjHfONmVZCwRWIMUkfc0cHophxd06JPqv56XqmESUM9HjA5Hy
+         lNew==
+X-Gm-Message-State: AAQBX9fql5KLgIRNvUvwJJ9JBiObvpF5n5WZeWwRwWvi7hKLXH2Qg1KH
+        gDQP9moapiOZlF/L39cGKBANhGS9ybU=
+X-Google-Smtp-Source: AKy350Zy1HflyBTEKvIsbbG7RF43cU27HxpqWds9a6kY4IiDBV5A2IACNrX5p4FbjE1Uk7uw3JqbIczWsgI=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:cb42:0:b0:b98:6352:be16 with SMTP id
+ b63-20020a25cb42000000b00b986352be16mr750274ybg.5.1682013009449; Thu, 20 Apr
+ 2023 10:50:09 -0700 (PDT)
+Date:   Thu, 20 Apr 2023 10:50:07 -0700
+In-Reply-To: <mtdi6smhur5rqffvpu7qux7mptonw223y2653x2nwzvgm72nlo@zyc4w3kwl3rg>
+Mime-Version: 1.0
+References: <20230301053425.3880773-1-aaronlewis@google.com>
+ <20230301053425.3880773-5-aaronlewis@google.com> <ZBzM6M/Bm69KIGQQ@google.com>
+ <ZD1sx+G2oWchaleW@google.com> <ZD6xWYI7Uin01fA7@google.com> <mtdi6smhur5rqffvpu7qux7mptonw223y2653x2nwzvgm72nlo@zyc4w3kwl3rg>
+Message-ID: <ZEF7T/FG1hUWRRWR@google.com>
+Subject: Re: [PATCH 4/8] KVM: selftests: Copy printf.c to KVM selftests
+From:   Sean Christopherson <seanjc@google.com>
+To:     Andrew Jones <andrew.jones@linux.dev>
+Cc:     Aaron Lewis <aaronlewis@google.com>, kvm@vger.kernel.org,
+        pbonzini@redhat.com, jmattson@google.com
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -48,126 +68,65 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 20/04/2023 3:49 pm, Alex Williamson wrote:
-> On Thu, 20 Apr 2023 15:19:55 +0100
-> Robin Murphy <robin.murphy@arm.com> wrote:
+On Tue, Apr 18, 2023, Andrew Jones wrote:
+> On Tue, Apr 18, 2023 at 08:03:53AM -0700, Sean Christopherson wrote:
+> > On Mon, Apr 17, 2023, Aaron Lewis wrote:
+> > > On Thu, Mar 23, 2023, Sean Christopherson wrote:
+> > > > > +static char *number(char *str, long num, int base, int size, int precision,
+> > > > > +		    int type)
+> > > > 
+> > > > Do we actually need a custom number()?  I.e. can we sub in a libc equivalent?
+> > > > That would reduce the craziness of this file by more than a few degrees.
+> > > 
+> > > Yeah, I think we need it.  One of the biggest problems I'm trying to avoid
+> > > here is the use of LIBC in a guest.  Using it always seems to end poorly
+> > > because guests generally don't set up AVX-512 or a TLS segmet, nor should
+> > > they have to.  Calling into LIBC seems to require both of them too often,
+> > > so it seems like it's better to just avoid it.
+> > 
+> > True, we'd probably end up in a world of hurt.
+> > 
+> > I was going to suggest copy+pasting from a different source, e.g. musl, in the
+> > hopes of reducing the crazy by a degree, but after looking at the musl source,
+> > that's a terrible idea :-)
+> > 
+> > And copying from the kernel has the advantage of keeping any bugs/quirks that
+> > users may be expecting and/or relying on.
 > 
->> On 2023-04-20 15:15, Alex Williamson wrote:
->>> On Thu, 20 Apr 2023 06:52:01 +0000
->>> "Tian, Kevin" <kevin.tian@intel.com> wrote:
->>>    
->>>> Hi, Alex,
->>>>
->>>> Happen to see that we may have inconsistent policy about RMRR devices cross
->>>> different vendors.
->>>>
->>>> Previously only Intel supports RMRR. Now both AMD/ARM have similar thing,
->>>> AMD IVMD and ARM RMR.
->>>
->>> Any similar requirement imposed by system firmware that the operating
->>> system must perpetually maintain a specific IOVA mapping for the device
->>> should impose similar restrictions as we've implemented for VT-d
->>> RMMR[1].  Thanks,
->>
->> Hmm, does that mean that vfio_iommu_resv_exclude() going to the trouble
->> of punching out all the reserved region holes isn't really needed?
-> 
-> While "Reserved Memory Region Reporting", might suggest that the ranges
-> are simply excluded, RMRR actually require that specific mappings are
-> maintained for ongoing, side-band activity, which is not compatible
-> with the ideas that userspace owns the IOVA address space for the
-> device or separation of host vs userspace control of the device.  Such
-> mappings suggest things like system health monitoring where the
-> influence of a user-owned device can easily extend to a system-wide
-> scope if the user it able to manipulate the device to deny that
-> interaction or report bad data.
-> 
-> If these ARM and AMD tables impose similar requirements, we should
-> really be restricting devices encumbered by such requirements from
-> userspace access as well.  Thanks,
+> What about trying to use tools/include/nolibc/? Maybe we could provide our
+> own tools/include/nolibc/arch-*.h files where the my_syscall* macros get
+> implemented with ucalls, and then the ucalls would implement the syscalls,
+> possibly just forwarding the parameters to real syscalls. We can implement
+> copy_from/to_guest() functions to deal with pointer parameters.
 
-Indeed the primary use-case behind Arm's RMRs was certain devices like 
-big complex RAID controllers which have already been started by UEFI 
-firmware at boot and have live in-memory data which needs to be preserved.
+Hmm, I was going to say that pulling in nolibc would conflict with the host side's
+need for an actual libc, but I think we could solve that conundrum by putting
+ucall_fmt() in a dedicated file and compiling it separately, a la string_override.c.
 
-However, my point was more that if it's a VFIO policy that any device 
-with an IOMMU_RESV_DIRECT reservation is not suitable for userspace 
-assignment, then vfio_iommu_type1_attach_group() already has everything 
-it would need to robustly enforce that policy itself. It seems silly to 
-me for it to expect the IOMMU driver to fail the attach, then go ahead 
-and dutifully punch out direct regions if it happened not to. A couple 
-of obvious trivial tweaks and there could be no dependency on driver 
-behaviour at all, other than correctly reporting resv_regions to begin with.
+However, I don't think we'd want to override my_syscall to do a ucall.  If I'm
+reading the code correctly, that would trigger a ucall after every escape sequence,
+which isn't what we want, expecially for a GUEST_ASSERT.
 
-If we think this policy deserves to go beyond VFIO and userspace, and 
-it's reasonable that such devices should never be allowed to attach to 
-any other kind of kernel-owned unmanaged domain either, then we can 
-still trivially enforce that in core IOMMU code. I really see no need 
-for it to be in drivers at all.
+That's solvable by having my_syscall3() be a memcpy() to the buffer provided by
+KVM's guest-side vsprintf(), but that still leaves the question of whether or not
+taking a dependency on nolibc.h would be a net positive.
 
-Thanks,
-Robin.
+E.g. pulling in nolibc.h as-is would well and truly put ucall_fmt.c (or whatever
+it's called) into its own world, e.g. it would end up with different typedefs for
+all basic types.  Those shouldn't cause problems, but it'd be a weird setup.  And
+I don't think we can rule out the possibility of the nolibc dependency causing
+subtle problems, e.g. what will happen when linking due to both nolibc and
+string_override.c defining globally visible mem{cmp,cpy,set}() functions.
 
-> 
-> Alex
-> 
->>> [1]https://access.redhat.com/sites/default/files/attachments/rmrr-wp1.pdf
->>>    
->>>> RMRR identity mapping was considered unsafe (except for USB/GPU) for
->>>> device assignment:
->>>>
->>>> /*
->>>>    * There are a couple cases where we need to restrict the functionality of
->>>>    * devices associated with RMRRs.  The first is when evaluating a device for
->>>>    * identity mapping because problems exist when devices are moved in and out
->>>>    * of domains and their respective RMRR information is lost.  This means that
->>>>    * a device with associated RMRRs will never be in a "passthrough" domain.
->>>>    * The second is use of the device through the IOMMU API.  This interface
->>>>    * expects to have full control of the IOVA space for the device.  We cannot
->>>>    * satisfy both the requirement that RMRR access is maintained and have an
->>>>    * unencumbered IOVA space.  We also have no ability to quiesce the device's
->>>>    * use of the RMRR space or even inform the IOMMU API user of the restriction.
->>>>    * We therefore prevent devices associated with an RMRR from participating in
->>>>    * the IOMMU API, which eliminates them from device assignment.
->>>>    *
->>>>    * In both cases, devices which have relaxable RMRRs are not concerned by this
->>>>    * restriction. See device_rmrr_is_relaxable comment.
->>>>    */
->>>> static bool device_is_rmrr_locked(struct device *dev)
->>>> {
->>>> 	if (!device_has_rmrr(dev))
->>>> 		return false;
->>>>
->>>> 	if (device_rmrr_is_relaxable(dev))
->>>> 		return false;
->>>>
->>>> 	return true;
->>>> }
->>>>
->>>> Then non-relaxable RMRR device is rejected when doing attach:
->>>>
->>>> static int intel_iommu_attach_device(struct iommu_domain *domain,
->>>>                                        struct device *dev)
->>>> {
->>>> 	struct device_domain_info *info = dev_iommu_priv_get(dev);
->>>> 	int ret;
->>>>
->>>> 	if (domain->type == IOMMU_DOMAIN_UNMANAGED &&
->>>> 	    device_is_rmrr_locked(dev)) {
->>>> 		dev_warn(dev, "Device is ineligible for IOMMU domain attach due to platform RMRR requirement.  Contact your platform vendor.\n");
->>>> 		return -EPERM;
->>>> 	}
->>>> 	...
->>>> }
->>>>
->>>> But I didn't find the same check in AMD/ARM driver at a glance.
->>>>
->>>> Did I overlook some arch difference which makes RMRR device safe in
->>>> those platforms or is it a gap to be fixed?
->>>>
->>>> Thanks
->>>> Kevin
->>>>   
->>>    
->>
-> 
+Another minor issue is that nolibc's vfprintf() handles a subset of escapes compared
+to the kernel's vsprintf().  That probably won't be a big deal in practice, but it's
+again a potential maintenance concern for us in the future.
+
+I'm definitely torn.  As much as I dislike the idea of copy+pasting mode code into
+KVM selftests, I think pulling in nolibc would bring its own set of problems.
+
+My vote is probably to copy+paste, at least for the initial implementation.  Being
+able to do the equivalent of printf() in the guest would be a huge improvement for
+debugging and triaging selftests, i.e. is something I would like to see landed
+fairly quickly.  Copy+pasting seems like it gives us the fastest path forward,
+e.g. doesn't risk getting bogged down with weird linker errors and whatnot.
