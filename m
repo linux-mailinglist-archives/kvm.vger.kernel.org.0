@@ -2,69 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7CC096E8C3C
-	for <lists+kvm@lfdr.de>; Thu, 20 Apr 2023 10:08:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1402A6E8C85
+	for <lists+kvm@lfdr.de>; Thu, 20 Apr 2023 10:16:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234241AbjDTIIv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 Apr 2023 04:08:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43568 "EHLO
+        id S234384AbjDTIQt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 Apr 2023 04:16:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49712 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234179AbjDTIIs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 20 Apr 2023 04:08:48 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 340AC1700
-        for <kvm@vger.kernel.org>; Thu, 20 Apr 2023 01:08:47 -0700 (PDT)
+        with ESMTP id S234382AbjDTIQs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 20 Apr 2023 04:16:48 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EAC382717
+        for <kvm@vger.kernel.org>; Thu, 20 Apr 2023 01:16:46 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id C394C645CA
-        for <kvm@vger.kernel.org>; Thu, 20 Apr 2023 08:08:46 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2B9F4C4339B;
-        Thu, 20 Apr 2023 08:08:46 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 86196645DA
+        for <kvm@vger.kernel.org>; Thu, 20 Apr 2023 08:16:46 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D5D6BC4339B;
+        Thu, 20 Apr 2023 08:16:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1681978126;
-        bh=sNcC/4YLuv3NV1p2vjUhFdV9MKTBqvreodvPR0jwTFU=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=UNuxodsMu1W9T5KWvV+jGZLBFBPdMjp5HMnn2QlWIZmthC73SclTsmIPjVbXmP3Ro
-         cOEooQv3vMEepGHqVZmYX2ALVJJaJY7IXUPCOSF0TpeSTaMEnFPRRWjjGs15KsBlST
-         IrGaG2Ybj9T3duGlrZpKUJwJeMVAyaVGDxiaOJDSE16tAbxW6E0VmS4r2+uZTwNwWo
-         tEIUR7WM/CBd+Ue9dQeSrXKSnfirFGwvV71+EKIHRkxFLSWUiw6UtD/EStZacH69F/
-         9zELN8dM3T2dh8nMDPqnjb1gncoZmVlvU5B123dmpkeKhjmos+Iuvwch5IyGdBNG9i
-         xIMuNgrO17Yug==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+        s=k20201202; t=1681978605;
+        bh=U+HZeh6wvku56TBypNZ3A51f1b1PWxa7cyoVhE23PM0=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=iC55ZgMwXjpkeMH1Kgbu9p2I0RjxU2IfkEdzKL9TknHBEcbGugCVRQ6u6bq/wpj86
+         Q8sk797JWGiuws9I1bKhx+5rN9dWr5cbbbFaXQiuptlQi+nmDILuEp1GikK11lkywI
+         2Xc7QrDkfcbk2BbPny8Jfr2z7mYbVPeqAGuNPhq8SYKkL1G0xIj2657VAGAtEghqmW
+         aqVbIv34h3KNbT4hQZ2uAdV9KnVz6SxOzzfMUJucQg1+rApZQ/+53DrKFlPDsmHd/b
+         8lXCkgQkDLeYhjY4Gp7JsgyP4XYiFGOm8YU7AGL0nfvoy0mI1XDRw2CtIHrzQ6QmmS
+         Z06HUcOpYa6tg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1ppPLQ-009n1B-0Q;
-        Thu, 20 Apr 2023 09:08:44 +0100
+        id 1ppPT9-009nIu-HC;
+        Thu, 20 Apr 2023 09:16:43 +0100
+Date:   Thu, 20 Apr 2023 09:16:43 +0100
+Message-ID: <86y1mnj7dg.wl-maz@kernel.org>
 From:   Marc Zyngier <maz@kernel.org>
-To:     kvmarm@lists.linux.dev, Reiji Watanabe <reijiw@google.com>,
-        Oliver Upton <oliver.upton@linux.dev>
-Cc:     Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Raghavendra Rao Anata <rananta@google.com>,
+To:     Reiji Watanabe <reijiw@google.com>
+Cc:     Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev,
+        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
         James Morse <james.morse@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        linux-arm-kernel@lists.infradead.org,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Will Deacon <will@kernel.org>,
-        Ricardo Koller <ricarkol@google.com>,
         Alexandru Elisei <alexandru.elisei@arm.com>,
-        Jing Zhang <jingzhangos@google.com>, kvm@vger.kernel.org
-Subject: Re: [PATCH v1 0/2] KVM: arm64: Fix bugs related to mp_state updates
-Date:   Thu, 20 Apr 2023 09:08:40 +0100
-Message-Id: <168197811285.2978116.18354347158121769762.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230419021852.2981107-1-reijiw@google.com>
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Raghavendra Rao Anata <rananta@google.com>,
+        Will Deacon <will@kernel.org>
+Subject: Re: [PATCH v1 1/2] KVM: arm64: Acquire mp_state_lock in kvm_arch_vcpu_ioctl_vcpu_init()
+In-Reply-To: <20230420021302.iyl3pqo3lg6lpabv@google.com>
 References: <20230419021852.2981107-1-reijiw@google.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+        <20230419021852.2981107-2-reijiw@google.com>
+        <87cz405or6.wl-maz@kernel.org>
+        <20230420021302.iyl3pqo3lg6lpabv@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, reijiw@google.com, oliver.upton@linux.dev, suzuki.poulose@arm.com, rananta@google.com, james.morse@arm.com, pbonzini@redhat.com, linux-arm-kernel@lists.infradead.org, yuzenghui@huawei.com, will@kernel.org, ricarkol@google.com, alexandru.elisei@arm.com, jingzhangos@google.com, kvm@vger.kernel.org
+X-SA-Exim-Rcpt-To: reijiw@google.com, oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, alexandru.elisei@arm.com, yuzenghui@huawei.com, suzuki.poulose@arm.com, pbonzini@redhat.com, ricarkol@google.com, jingzhangos@google.com, rananta@google.com, will@kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -73,27 +77,92 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 18 Apr 2023 19:18:50 -0700, Reiji Watanabe wrote:
-> This series adds fixes that were missing in the patch [1].
+On Thu, 20 Apr 2023 03:13:02 +0100,
+Reiji Watanabe <reijiw@google.com> wrote:
 > 
-> The patch [1] added the mp_state_lock to serialize writes to
-> kvm_vcpu_arch::{mp_state, reset_state}, and promoted all
-> accessors of mp_state to {READ,WRITE}_ONCE() as readers do not
-> acquire the mp_state_lock.
+> Hi Marc,
 > 
-> [...]
+> On Wed, Apr 19, 2023 at 08:12:45AM +0100, Marc Zyngier wrote:
+> > On Wed, 19 Apr 2023 03:18:51 +0100,
+> > Reiji Watanabe <reijiw@google.com> wrote:
+> > > kvm_arch_vcpu_ioctl_vcpu_init() doesn't acquire mp_state_lock
+> > > when setting the mp_state to KVM_MP_STATE_RUNNABLE. Fix the
+> > > code to acquire the lock.
+> > > 
+> > > Signed-off-by: Reiji Watanabe <reijiw@google.com>
+> > > ---
+> > >  arch/arm64/kvm/arm.c | 5 ++++-
+> > >  1 file changed, 4 insertions(+), 1 deletion(-)
+> > > 
+> > > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> > > index fbafcbbcc463..388aa4f18f21 100644
+> > > --- a/arch/arm64/kvm/arm.c
+> > > +++ b/arch/arm64/kvm/arm.c
+> > > @@ -1244,8 +1244,11 @@ static int kvm_arch_vcpu_ioctl_vcpu_init(struct kvm_vcpu *vcpu,
+> > >  	 */
+> > >  	if (test_bit(KVM_ARM_VCPU_POWER_OFF, vcpu->arch.features))
+> > >  		kvm_arm_vcpu_power_off(vcpu);
+> > > -	else
+> > > +	else {
+> > > +		spin_lock(&vcpu->arch.mp_state_lock);
+> > >  		WRITE_ONCE(vcpu->arch.mp_state.mp_state, KVM_MP_STATE_RUNNABLE);
+> > > +		spin_unlock(&vcpu->arch.mp_state_lock);
+> > > +	}
+> > >  
+> > >  	return 0;
+> > >  }
+> > 
+> > I'm not entirely convinced that this fixes anything. What does the
+> > lock hazard against given that the write is atomic? But maybe a
+> 
+> It appears that kvm_psci_vcpu_on() expects the vCPU's mp_state
+> to not be changed by holding the lock.  Although I don't think this
+> code practically causes any real issues now, I am a little concerned
+> about leaving one instance that updates mpstate without acquiring the
+> lock, in terms of future maintenance, as holding the lock won't prevent
+> mp_state from being updated.
+> 
+> What do you think ?
 
-Applied to next, thanks!
+Right, fair enough. It is probably better to take the lock and not
+have to think of this sort of things... I'm becoming more lazy by the
+minute!
 
-[1/2] KVM: arm64: Acquire mp_state_lock in kvm_arch_vcpu_ioctl_vcpu_init()
-      commit: 4ff910be01c0ca28c2ea8b354dd47a3a17524489
-[2/2] KVM: arm64: Have kvm_psci_vcpu_on() use WRITE_ONCE() to update mp_state
-      commit: a189884bdc9238aeba941c50f02e25eb584fafed
+> 
+> > slightly more readable of this would be to expand the critical section
+> > this way:
+> > 
+> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> > index 4ec888fdd4f7..bb21d0c25de7 100644
+> > --- a/arch/arm64/kvm/arm.c
+> > +++ b/arch/arm64/kvm/arm.c
+> > @@ -1246,11 +1246,15 @@ static int kvm_arch_vcpu_ioctl_vcpu_init(struct kvm_vcpu *vcpu,
+> >  	/*
+> >  	 * Handle the "start in power-off" case.
+> >  	 */
+> > +	spin_lock(&vcpu->arch.mp_state_lock);
+> > +
+> >  	if (test_bit(KVM_ARM_VCPU_POWER_OFF, vcpu->arch.features))
+> > -		kvm_arm_vcpu_power_off(vcpu);
+> > +		__kvm_arm_vcpu_power_off(vcpu);
+> >  	else
+> >  		WRITE_ONCE(vcpu->arch.mp_state.mp_state, KVM_MP_STATE_RUNNABLE);
+> >  
+> > +	spin_unlock(&vcpu->arch.mp_state_lock);
+> > +
+> >  	return 0;
+> >  }
+> > 
+> > Thoughts?
+> 
+> Yes, it looks better!
 
-Cheers,
+Cool. I've applied this change to your patch, applied the series to
+the lock inversion branch, and remerged the branch in -next.
+
+We're getting there! ;-)
 
 	M.
+
 -- 
 Without deviation from the norm, progress is not possible.
-
-
