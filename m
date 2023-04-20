@@ -2,304 +2,209 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1E8726E97B6
-	for <lists+kvm@lfdr.de>; Thu, 20 Apr 2023 16:53:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DF4746E9825
+	for <lists+kvm@lfdr.de>; Thu, 20 Apr 2023 17:17:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232832AbjDTOxB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 Apr 2023 10:53:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45398 "EHLO
+        id S231707AbjDTPRf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 Apr 2023 11:17:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57410 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232777AbjDTOw7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 20 Apr 2023 10:52:59 -0400
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 49DF46A7A
-        for <kvm@vger.kernel.org>; Thu, 20 Apr 2023 07:52:53 -0700 (PDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DBC671480;
-        Thu, 20 Apr 2023 07:53:36 -0700 (PDT)
-Received: from donnerap.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6813E3F6C4;
-        Thu, 20 Apr 2023 07:52:52 -0700 (PDT)
-Date:   Thu, 20 Apr 2023 15:52:49 +0100
-From:   Andre Przywara <andre.przywara@arm.com>
-To:     Jean-Philippe Brucker <jean-philippe@linaro.org>
-Cc:     kvm@vger.kernel.org, will@kernel.org, suzuki.poulose@arm.com
-Subject: Re: [PATCH kvmtool 04/16] virtio/vhost: Factor notify_vq_gsi()
-Message-ID: <20230420155249.50e95126@donnerap.cambridge.arm.com>
-In-Reply-To: <20230419132119.124457-5-jean-philippe@linaro.org>
-References: <20230419132119.124457-1-jean-philippe@linaro.org>
-        <20230419132119.124457-5-jean-philippe@linaro.org>
-Organization: ARM
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.32; aarch64-unknown-linux-gnu)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+        with ESMTP id S229729AbjDTPRd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 20 Apr 2023 11:17:33 -0400
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 631B5189
+        for <kvm@vger.kernel.org>; Thu, 20 Apr 2023 08:17:31 -0700 (PDT)
+Received: by mail-pl1-x649.google.com with SMTP id d9443c01a7336-1a682ad2f8cso7745905ad.1
+        for <kvm@vger.kernel.org>; Thu, 20 Apr 2023 08:17:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1682003851; x=1684595851;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=0Fvh5Bs16xnW1weT2SPid3PSg+u8/Q14PbTNxokyuWo=;
+        b=0Lwk6zvT1sdE3h8JzGU30U5B2GAF3IGSbkbBGobwWjNzCZvLtIOzkNc+aveiepxTAs
+         WaAK/i7YbEhDG2NDLUpNX6THYw8haqXyojuWZ4wmeO7iGc3cq8HwF3oUxq8Ol92O1z2T
+         hi4MCRBBTGq2u6EMEsQiLxQDCm+QEsU263UVSRUL2PE43LmOVPxu0eFMHRPbEkDg4TfT
+         uobdLbwf2YItMZtIgpTxQ2rIfnYXNx+lpmvnNGMtHXSo0bDbtU6H888CU9MzugYu3YZg
+         DWMBre8DaUAzW3gfyRElbNJemM8dx6YakEoK9mD3yLdn1MRKe/fRStX26QgHS1FoeyUV
+         uNxg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1682003851; x=1684595851;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=0Fvh5Bs16xnW1weT2SPid3PSg+u8/Q14PbTNxokyuWo=;
+        b=P4Mj1so69Qo3SSSyz81gtXw/pQa5/4AY/hb/b4h6JIXIuWShgTwsz5WkWiqGYMDRqo
+         whNIvEi7c/9YrLQIs2mLoRKN6u8ipfumzCAqLk5T3ezfzk/L1JYZugas6doksA+ezVDg
+         3W95usY/7GDvKOMBlYd64rqvVrty93yN35Kkm1MtyfExBsslHyZ20gqy1MuqRFmxygxR
+         vXIIb8CPbys9U6RUyM1+NgT9cOY+Vo45OxdiPk53zm6LDp0+xirK2zDnYexx6Fue3mez
+         Rdh94d77HlqPaGwVcurjj0D7DwnR3w2X2r7DuPNapG9No5gLg1+/UDE6QVxoCHOLTUVN
+         DPAg==
+X-Gm-Message-State: AAQBX9fvm5xvNuZ2+NZqFrhJUWzaOoYSePFpQelP+lG/T15LwRZGIHw9
+        f2eeWO1XXubF91MPJaf3dpL13uK6REE=
+X-Google-Smtp-Source: AKy350ZBzilYp4PKzE37W4X5nKyyeFADvasG2SeZc5SDTlWjPiAdZDU+NJV1a/nzmUjYdsysw7dwNLoKUeU=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:903:50d:b0:1a6:3fb2:f52d with SMTP id
+ jn13-20020a170903050d00b001a63fb2f52dmr618731plb.3.1682003850946; Thu, 20 Apr
+ 2023 08:17:30 -0700 (PDT)
+Date:   Thu, 20 Apr 2023 08:17:29 -0700
+In-Reply-To: <20230419221716.3603068-11-atishp@rivosinc.com>
+Mime-Version: 1.0
+References: <20230419221716.3603068-1-atishp@rivosinc.com> <20230419221716.3603068-11-atishp@rivosinc.com>
+Message-ID: <ZEFXiXu+0XLSdRkQ@google.com>
+Subject: Re: [RFC 10/48] RISC-V: KVM: Implement static memory region measurement
+From:   Sean Christopherson <seanjc@google.com>
+To:     Atish Patra <atishp@rivosinc.com>
+Cc:     linux-kernel@vger.kernel.org, Alexandre Ghiti <alex@ghiti.fr>,
+        Andrew Jones <ajones@ventanamicro.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Anup Patel <anup@brainfault.org>,
+        Atish Patra <atishp@atishpatra.org>,
+        "=?iso-8859-1?Q?Bj=F6rn_T=F6pel?=" <bjorn@rivosinc.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
+        linux-coco@lists.linux.dev, Dylan Reid <dylan@rivosinc.com>,
+        abrestic@rivosinc.com, Samuel Ortiz <sameo@rivosinc.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Conor Dooley <conor.dooley@microchip.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Guo Ren <guoren@kernel.org>, Heiko Stuebner <heiko@sntech.de>,
+        Jiri Slaby <jirislaby@kernel.org>,
+        kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
+        linux-mm@kvack.org, linux-riscv@lists.infradead.org,
+        Mayuresh Chitale <mchitale@ventanamicro.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Rajnesh Kanwal <rkanwal@rivosinc.com>,
+        Uladzislau Rezki <urezki@gmail.com>
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 19 Apr 2023 14:21:08 +0100
-Jean-Philippe Brucker <jean-philippe@linaro.org> wrote:
-
-Hi,
-
-> All vhost devices should perform the same operations when initializing
-> the IRQFD. Move it to virtio/vhost.c
-> 
-> This fixes vsock, which didn't go through the irq__add_irqfd() helper
-> and couldn't be used on systems that require GSI translation (GICv2m).
-> 
-> Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
-> ---
->  include/kvm/virtio.h |  8 ++++++++
->  virtio/net.c         | 30 ++++--------------------------
->  virtio/scsi.c        | 15 ++-------------
->  virtio/vhost.c       | 35 +++++++++++++++++++++++++++++++++++
->  virtio/vsock.c       | 26 +++-----------------------
->  5 files changed, 52 insertions(+), 62 deletions(-)
-> 
-> diff --git a/include/kvm/virtio.h b/include/kvm/virtio.h
-> index 4a364a02..96c7b3ea 100644
-> --- a/include/kvm/virtio.h
-> +++ b/include/kvm/virtio.h
-> @@ -77,6 +77,10 @@ struct virt_queue {
->  	u16		endian;
->  	bool		use_event_idx;
->  	bool		enabled;
-> +
-> +	/* vhost IRQ handling */
-> +	int		gsi;
-> +	int		irqfd;
->  };
->  
->  /*
-> @@ -252,6 +256,10 @@ void virtio_vhost_set_vring(struct kvm *kvm, int vhost_fd, u32 index,
->  			    struct virt_queue *queue);
->  void virtio_vhost_set_vring_kick(struct kvm *kvm, int vhost_fd,
->  				 u32 index, int event_fd);
-> +void virtio_vhost_set_vring_call(struct kvm *kvm, int vhost_fd, u32 index,
-> +				 u32 gsi, struct virt_queue *queue);
-> +void virtio_vhost_reset_vring(struct kvm *kvm, int vhost_fd, u32 index,
-> +			      struct virt_queue *queue);
->  
->  int virtio_transport_parser(const struct option *opt, const char *arg, int unset);
->  
-> diff --git a/virtio/net.c b/virtio/net.c
-> index b935d24f..519dcbb7 100644
-> --- a/virtio/net.c
-> +++ b/virtio/net.c
-> @@ -4,12 +4,12 @@
->  #include "kvm/mutex.h"
->  #include "kvm/util.h"
->  #include "kvm/kvm.h"
-> -#include "kvm/irq.h"
->  #include "kvm/uip.h"
->  #include "kvm/guest_compat.h"
->  #include "kvm/iovec.h"
->  #include "kvm/strbuf.h"
->  
-> +#include <linux/list.h>
->  #include <linux/vhost.h>
->  #include <linux/virtio_net.h>
->  #include <linux/if_tun.h>
-> @@ -25,7 +25,6 @@
->  #include <sys/ioctl.h>
->  #include <sys/types.h>
->  #include <sys/wait.h>
-> -#include <sys/eventfd.h>
->  
->  #define VIRTIO_NET_QUEUE_SIZE		256
->  #define VIRTIO_NET_NUM_QUEUES		8
-> @@ -44,8 +43,6 @@ struct net_dev_queue {
->  	pthread_t			thread;
->  	struct mutex			lock;
->  	pthread_cond_t			cond;
-> -	int				gsi;
-> -	int				irqfd;
->  };
->  
->  struct net_dev {
-> @@ -647,11 +644,7 @@ static void exit_vq(struct kvm *kvm, void *dev, u32 vq)
->  	struct net_dev *ndev = dev;
->  	struct net_dev_queue *queue = &ndev->queues[vq];
->  
-> -	if (!is_ctrl_vq(ndev, vq) && queue->gsi) {
-
-So this first condition here seems to be lost in the transformation. Is
-or was that never needed?
-
-Apart from that the changes look fine.
-
-Cheers,
-Andre
-
-> -		irq__del_irqfd(kvm, queue->gsi, queue->irqfd);
-> -		close(queue->irqfd);
-> -		queue->gsi = queue->irqfd = 0;
-> -	}
-> +	virtio_vhost_reset_vring(kvm, ndev->vhost_fd, vq, &queue->vq);
->  
->  	/*
->  	 * TODO: vhost reset owner. It's the only way to cleanly stop vhost, but
-> @@ -675,27 +668,12 @@ static void notify_vq_gsi(struct kvm *kvm, void *dev, u32 vq, u32 gsi)
->  {
->  	struct net_dev *ndev = dev;
->  	struct net_dev_queue *queue = &ndev->queues[vq];
-> -	struct vhost_vring_file file;
-> -	int r;
->  
->  	if (ndev->vhost_fd == 0)
->  		return;
->  
-> -	file = (struct vhost_vring_file) {
-> -		.index	= vq,
-> -		.fd	= eventfd(0, 0),
-> -	};
-> -
-> -	r = irq__add_irqfd(kvm, gsi, file.fd, -1);
-> -	if (r < 0)
-> -		die_perror("KVM_IRQFD failed");
-> -
-> -	queue->irqfd = file.fd;
-> -	queue->gsi = gsi;
-> -
-> -	r = ioctl(ndev->vhost_fd, VHOST_SET_VRING_CALL, &file);
-> -	if (r < 0)
-> -		die_perror("VHOST_SET_VRING_CALL failed");
-> +	virtio_vhost_set_vring_call(kvm, ndev->vhost_fd, vq, gsi,
-> +				    &queue->vq);
->  }
->  
->  static void notify_vq_eventfd(struct kvm *kvm, void *dev, u32 vq, u32 efd)
-> diff --git a/virtio/scsi.c b/virtio/scsi.c
-> index 1f757404..29acf57c 100644
-> --- a/virtio/scsi.c
-> +++ b/virtio/scsi.c
-> @@ -92,25 +92,14 @@ static int init_vq(struct kvm *kvm, void *dev, u32 vq)
->  
->  static void notify_vq_gsi(struct kvm *kvm, void *dev, u32 vq, u32 gsi)
->  {
-> -	struct vhost_vring_file file;
->  	struct scsi_dev *sdev = dev;
->  	int r;
->  
->  	if (sdev->vhost_fd == 0)
->  		return;
->  
-> -	file = (struct vhost_vring_file) {
-> -		.index	= vq,
-> -		.fd	= eventfd(0, 0),
-> -	};
-> -
-> -	r = irq__add_irqfd(kvm, gsi, file.fd, -1);
-> -	if (r < 0)
-> -		die_perror("KVM_IRQFD failed");
-> -
-> -	r = ioctl(sdev->vhost_fd, VHOST_SET_VRING_CALL, &file);
-> -	if (r < 0)
-> -		die_perror("VHOST_SET_VRING_CALL failed");
-> +	virtio_vhost_set_vring_call(kvm, sdev->vhost_fd, vq, gsi,
-> +				    &sdev->vqs[vq]);
->  
->  	if (vq > 0)
->  		return;
-> diff --git a/virtio/vhost.c b/virtio/vhost.c
-> index 3acfd30a..cd83645c 100644
-> --- a/virtio/vhost.c
-> +++ b/virtio/vhost.c
-> @@ -1,9 +1,12 @@
-> +#include "kvm/irq.h"
->  #include "kvm/virtio.h"
->  
->  #include <linux/kvm.h>
->  #include <linux/vhost.h>
->  #include <linux/list.h>
->  
-> +#include <sys/eventfd.h>
-> +
->  void virtio_vhost_init(struct kvm *kvm, int vhost_fd)
->  {
->  	struct kvm_mem_bank *bank;
-> @@ -79,3 +82,35 @@ void virtio_vhost_set_vring_kick(struct kvm *kvm, int vhost_fd,
->  	if (r < 0)
->  		die_perror("VHOST_SET_VRING_KICK failed");
->  }
-> +
-> +void virtio_vhost_set_vring_call(struct kvm *kvm, int vhost_fd, u32 index,
-> +				 u32 gsi, struct virt_queue *queue)
+On Wed, Apr 19, 2023, Atish Patra wrote:
+> +int kvm_riscv_cove_vm_measure_pages(struct kvm *kvm, struct kvm_riscv_cove_measure_region *mr)
 > +{
-> +	int r;
-> +	struct vhost_vring_file file = {
-> +		.index	= index,
-> +		.fd	= eventfd(0, 0),
-> +	};
+> +	struct kvm_cove_tvm_context *tvmc = kvm->arch.tvmc;
+> +	int rc = 0, idx, num_pages;
+> +	struct kvm_riscv_cove_mem_region *conf;
+> +	struct page *pinned_page, *conf_page;
+> +	struct kvm_riscv_cove_page *cpage;
 > +
-> +	r = irq__add_irqfd(kvm, gsi, file.fd, -1);
-> +	if (r < 0)
-> +		die_perror("KVM_IRQFD failed");
+> +	if (!tvmc)
+> +		return -EFAULT;
 > +
-> +	r = ioctl(vhost_fd, VHOST_SET_VRING_CALL, &file);
-> +	if (r < 0)
-> +		die_perror("VHOST_SET_VRING_CALL failed");
-> +
-> +	queue->irqfd = file.fd;
-> +	queue->gsi = gsi;
-> +}
-> +
-> +void virtio_vhost_reset_vring(struct kvm *kvm, int vhost_fd, u32 index,
-> +			      struct virt_queue *queue)
-> +
-> +{
-> +	if (queue->gsi) {
-> +		irq__del_irqfd(kvm, queue->gsi, queue->irqfd);
-> +		close(queue->irqfd);
-> +		queue->gsi = queue->irqfd = 0;
+> +	if (tvmc->finalized_done) {
+> +		kvm_err("measured_mr pages can not be added after finalize\n");
+> +		return -EINVAL;
 > +	}
-> +}
-> diff --git a/virtio/vsock.c b/virtio/vsock.c
-> index 0ada9e09..559fbaba 100644
-> --- a/virtio/vsock.c
-> +++ b/virtio/vsock.c
-> @@ -131,33 +131,13 @@ static int set_size_vq(struct kvm *kvm, void *dev, u32 vq, int size)
->  
->  static void notify_vq_gsi(struct kvm *kvm, void *dev, u32 vq, u32 gsi)
->  {
-> -	struct vhost_vring_file file;
->  	struct vsock_dev *vdev = dev;
-> -	struct kvm_irqfd irq;
-> -	int r;
-> -
-> -	if (vdev->vhost_fd == -1)
-> -		return;
->  
-> -	if (is_event_vq(vq))
-> +	if (vdev->vhost_fd == -1 || is_event_vq(vq))
->  		return;
->  
-> -	irq = (struct kvm_irqfd) {
-> -		.gsi	= gsi,
-> -		.fd	= eventfd(0, 0),
-> -	};
-> -	file = (struct vhost_vring_file) {
-> -		.index	= vq,
-> -		.fd	= irq.fd,
-> -	};
-> -
-> -	r = ioctl(kvm->vm_fd, KVM_IRQFD, &irq);
-> -	if (r < 0)
-> -		die_perror("KVM_IRQFD failed");
-> -
-> -	r = ioctl(vdev->vhost_fd, VHOST_SET_VRING_CALL, &file);
-> -	if (r < 0)
-> -		die_perror("VHOST_SET_VRING_CALL failed");
-> +	virtio_vhost_set_vring_call(kvm, vdev->vhost_fd, vq, gsi,
-> +				    &vdev->vqs[vq]);
->  }
->  
->  static unsigned int get_vq_count(struct kvm *kvm, void *dev)
+> +
+> +	num_pages = bytes_to_pages(mr->size);
+> +	conf = &tvmc->confidential_region;
+> +
+> +	if (!IS_ALIGNED(mr->userspace_addr, PAGE_SIZE) ||
+> +	    !IS_ALIGNED(mr->gpa, PAGE_SIZE) || !mr->size ||
+> +	    !cove_is_within_region(conf->gpa, conf->npages << PAGE_SHIFT, mr->gpa, mr->size))
+> +		return -EINVAL;
+> +
+> +	idx = srcu_read_lock(&kvm->srcu);
+> +
+> +	/*TODO: Iterate one page at a time as pinning multiple pages fail with unmapped panic
+> +	 * with a virtual address range belonging to vmalloc region for some reason.
 
+I've no idea what code you had, but I suspect the fact that vmalloc'd memory isn't
+guaranteed to be physically contiguous is relevant to the panic.
+
+> +	 */
+> +	while (num_pages) {
+> +		if (signal_pending(current)) {
+> +			rc = -ERESTARTSYS;
+> +			break;
+> +		}
+> +
+> +		if (need_resched())
+> +			cond_resched();
+> +
+> +		rc = get_user_pages_fast(mr->userspace_addr, 1, 0, &pinned_page);
+> +		if (rc < 0) {
+> +			kvm_err("Pinning the userpsace addr %lx failed\n", mr->userspace_addr);
+> +			break;
+> +		}
+> +
+> +		/* Enough pages are not available to be pinned */
+> +		if (rc != 1) {
+> +			rc = -ENOMEM;
+> +			break;
+> +		}
+> +		conf_page = alloc_page(GFP_KERNEL | __GFP_ZERO);
+> +		if (!conf_page) {
+> +			rc = -ENOMEM;
+> +			break;
+> +		}
+> +
+> +		rc = cove_convert_pages(page_to_phys(conf_page), 1, true);
+> +		if (rc)
+> +			break;
+> +
+> +		/*TODO: Support other pages sizes */
+> +		rc = sbi_covh_add_measured_pages(tvmc->tvm_guest_id, page_to_phys(pinned_page),
+> +						 page_to_phys(conf_page), SBI_COVE_PAGE_4K,
+> +						 1, mr->gpa);
+> +		if (rc)
+> +			break;
+> +
+> +		/* Unpin the page now */
+> +		put_page(pinned_page);
+> +
+> +		cpage = kmalloc(sizeof(*cpage), GFP_KERNEL_ACCOUNT);
+> +		if (!cpage) {
+> +			rc = -ENOMEM;
+> +			break;
+> +		}
+> +
+> +		cpage->page = conf_page;
+> +		cpage->npages = 1;
+> +		cpage->gpa = mr->gpa;
+> +		cpage->hva = mr->userspace_addr;
+
+Snapshotting the userspace address for the _source_ page can't possibly be useful.
+
+> +		cpage->is_mapped = true;
+> +		INIT_LIST_HEAD(&cpage->link);
+> +		list_add(&cpage->link, &tvmc->measured_pages);
+> +
+> +		mr->userspace_addr += PAGE_SIZE;
+> +		mr->gpa += PAGE_SIZE;
+> +		num_pages--;
+> +		conf_page = NULL;
+> +
+> +		continue;
+> +	}
+> +	srcu_read_unlock(&kvm->srcu, idx);
+> +
+> +	if (rc < 0) {
+> +		/* We don't to need unpin pages as it is allocated by the hypervisor itself */
+
+This comment makes no sense.  The above code is doing all of the allocation and
+pinning, which strongly suggests that KVM is the hypervisor.  But this comment
+implies that KVM is not the hypervisor.
+
+And "pinned_page" is cleared unpinned in the loop after the page is added+measured,
+which looks to be the same model as TDX where "pinned_page" is the source and
+"conf_page" is gifted to the hypervisor.  But on failure, e.g. when allocating
+"conf_page", that reference is not put.
+
+> +		cove_delete_page_list(kvm, &tvmc->measured_pages, false);
+> +		/* Free the last allocated page for which conversion/measurement failed */
+> +		kfree(conf_page);
+
+Assuming my guesses about how the architecture works are correct, this is broken
+if sbi_covh_add_measured_pages() fails.  The page has already been gifted to the
+TSM by cove_convert_pages(), but there is no call to sbi_covh_tsm_reclaim_pages(),
+which I'm guessing is necesary to transition the page back to a state where it can
+be safely used by the host.
