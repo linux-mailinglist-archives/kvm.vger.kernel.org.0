@@ -2,712 +2,249 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8FA5B6E88C7
-	for <lists+kvm@lfdr.de>; Thu, 20 Apr 2023 05:32:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 594F36E8A38
+	for <lists+kvm@lfdr.de>; Thu, 20 Apr 2023 08:15:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232344AbjDTDcQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Apr 2023 23:32:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38854 "EHLO
+        id S233697AbjDTGP0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 Apr 2023 02:15:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60002 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229687AbjDTDcP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Apr 2023 23:32:15 -0400
-Received: from loongson.cn (mail.loongson.cn [114.242.206.163])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 92CC440D4;
-        Wed, 19 Apr 2023 20:32:11 -0700 (PDT)
-Received: from loongson.cn (unknown [10.20.42.120])
-        by gateway (Coremail) with SMTP id _____8Cxidk6skBkHUYfAA--.37329S3;
-        Thu, 20 Apr 2023 11:32:10 +0800 (CST)
-Received: from [10.20.42.120] (unknown [10.20.42.120])
-        by localhost.localdomain (Coremail) with SMTP id AQAAf8DxtrU4skBkCHgwAA--.121S3;
-        Thu, 20 Apr 2023 11:32:09 +0800 (CST)
-Subject: Re: [PATCH v7 01/30] LoongArch: KVM: Add kvm related header files
-To:     WANG Xuerui <kernel@xen0n.name>,
-        Paolo Bonzini <pbonzini@redhat.com>
-References: <20230417094649.874671-1-zhaotianrui@loongson.cn>
- <20230417094649.874671-2-zhaotianrui@loongson.cn>
- <f80d89fb-3428-a0c3-b41e-9619ed5adc8c@xen0n.name>
-Cc:     Huacai Chen <chenhuacai@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        loongarch@lists.linux.dev, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Mark Brown <broonie@kernel.org>,
-        Alex Deucher <alexander.deucher@amd.com>,
-        Oliver Upton <oliver.upton@linux.dev>, maobibo@loongson.cn,
-        Xi Ruoyao <xry111@xry111.site>
-From:   Tianrui Zhao <zhaotianrui@loongson.cn>
-Message-ID: <31de3597-91e3-90d6-2aee-88198d1fa395@loongson.cn>
-Date:   Thu, 20 Apr 2023 11:32:08 +0800
-User-Agent: Mozilla/5.0 (X11; Linux mips64; rv:45.0) Gecko/20100101
- Thunderbird/45.4.0
+        with ESMTP id S231860AbjDTGPY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 20 Apr 2023 02:15:24 -0400
+Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66F3846A4;
+        Wed, 19 Apr 2023 23:15:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1681971323; x=1713507323;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=9rpuK9dQ8EB7r8r8qqnEIq4sLGoNavRS801QuKZkTjQ=;
+  b=j8dPWLk5oEvlK4l9rtIW63R1Yqx9JaSgA/hLqe3hsEvBmCQMO9A3ZtPE
+   VMIcvIDgChO+mZ6xNLPCCB08tDOM9uH/P5cTvU4vqylJHA/CCFr18Yn/O
+   lTP6BSTEmF1D9VP4p1JE0Unz1LBAMhH8kZ9toTlsDxDhA8So13ry3i2/d
+   8lwe2B+3nX1zgbsX43Nee3lFukrwpB2vSgKHPqGa2zmwR7zWpUadIjyyk
+   +hEPDU5oShCa+wlvDuJKF4x+6Jppkgj46ePk0fH7O8Qd6XTJ3yVuT8yWa
+   xOIF+RjmN+JgCjTDcdBwe5Ki1nY96F39Bae09KuQJF4v2XAgaJCleb8sY
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10685"; a="334466720"
+X-IronPort-AV: E=Sophos;i="5.99,211,1677571200"; 
+   d="scan'208";a="334466720"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Apr 2023 23:15:22 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10685"; a="835590783"
+X-IronPort-AV: E=Sophos;i="5.99,211,1677571200"; 
+   d="scan'208";a="835590783"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by fmsmga001.fm.intel.com with ESMTP; 19 Apr 2023 23:15:20 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.23; Wed, 19 Apr 2023 23:15:20 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.23; Wed, 19 Apr 2023 23:15:20 -0700
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.23 via Frontend Transport; Wed, 19 Apr 2023 23:15:20 -0700
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.109)
+ by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.23; Wed, 19 Apr 2023 23:15:20 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=oZy9WJzt7bQrATv1Uj9UJA0k4BidoseHrPWFh3UdXrPktX8LfWxUXd6b996BrPtTJNYGvxZHo5jB6vq4QBH4LA3bipfoyYpIcck2mLY4LN76hsOmzhncwbfoGYzx6ErsqAfwwFC4gyPABLcP6e8cvzQYDO3hDbt2OteQe6DlKij+YVqV0CjlLQ7vdmOUasUpY7HD36tF/1pbGcQgkAwYW25wX6RM4gKN1jmmtXXQGTqdNZs8uhHkLnsTa5TvcsqDGLYXRUvMSvPww15MYeOCCk3QrRNlkjqUOBp/Jf2vJT5mjWRgkY/T0sXmtuxLhnQYujTMSzmXiU6+r1vIfYalMQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=9rpuK9dQ8EB7r8r8qqnEIq4sLGoNavRS801QuKZkTjQ=;
+ b=dJPvoQX6RQA/ZCY8bNjpkkACKzBfblVKa5iJLBGbHun7HoqGXCesG0UdrPTdHFPSW/jnbkP8aOsl1vmXVrumiVwMr+T6J7rv/hLTfEQSI63ooRuM+sG85i540KM70TlPZwBMlWOma8hhJG+95s9pYi2w+NIcWF3h5G39JSIGc30hFoS5seNfzw2MKSS5BuDPEk/5ZxKJyUOQE74aGgvzh4W4HUQYmkCu9fiuPbafmLjjSC9hRv9+4YuF+l7v9l2urqdSlMO9BteT8O9zxoGw4DWltg3Ih97eK8O6XMbczfy6Wfit7Y/Zu/DC4efbH0a2907RvCa9weaKwTcLB8Gbrw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
+ by IA1PR11MB7811.namprd11.prod.outlook.com (2603:10b6:208:3f9::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6319.20; Thu, 20 Apr
+ 2023 06:15:17 +0000
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::73e9:b405:2cae:9174]) by BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::73e9:b405:2cae:9174%7]) with mapi id 15.20.6298.045; Thu, 20 Apr 2023
+ 06:15:16 +0000
+From:   "Tian, Kevin" <kevin.tian@intel.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+CC:     "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Nicolin Chen <nicolinc@nvidia.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>
+Subject: RE: [PATCH v3 03/17] iommufd: Replace the hwpt->devices list with
+ iommufd_group
+Thread-Topic: [PATCH v3 03/17] iommufd: Replace the hwpt->devices list with
+ iommufd_group
+Thread-Index: AQHZXCmFXuCDj8eADEa48b1mh4jx9a8H8avggB5ahYCAAStoMIAAMPCAgAD9cwCAAkyNgIAF7dZg
+Date:   Thu, 20 Apr 2023 06:15:16 +0000
+Message-ID: <BN9PR11MB5276DA68C8318CC3433252CA8C639@BN9PR11MB5276.namprd11.prod.outlook.com>
+References: <0-v3-61d41fd9e13e+1f5-iommufd_alloc_jgg@nvidia.com>
+ <3-v3-61d41fd9e13e+1f5-iommufd_alloc_jgg@nvidia.com>
+ <BN9PR11MB5276E42B629C3E5AF019B6748C879@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <ZDVvLbSN2TR1Er1c@nvidia.com>
+ <BN9PR11MB527661A29A11AE1E7FC655018C9B9@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <ZDaTY6OX8oR5w0uV@nvidia.com>
+ <BN9PR11MB52762841AAA04A24F76A743C8C989@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <ZDlVtcwhV2G8ZKao@nvidia.com>
+In-Reply-To: <ZDlVtcwhV2G8ZKao@nvidia.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BN9PR11MB5276:EE_|IA1PR11MB7811:EE_
+x-ms-office365-filtering-correlation-id: 4712a602-2d2c-4cfd-409b-08db41669c08
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 6GdQXAPYXxbBwo4dSFW7f8Kj89d38ehO6o0JRxUyPQZqSckJuUycjqFI7Lrk2E020TR2jpB26/rvuU99kKVIkf6JLXh9uUUUlxveONh8c2h4xMbzTL+F/3TuUynsFJnsnvfaiMBL+DPn+4QNDFSr3Kj0j2vaHSGVvhMLipuArsIMjscqV5IyLNqodvVvzTNtBEPGKngBKJmbogkFl8Whl/j9ddBPt8Ea8ye94dJkVp5U+/+e+2E0XSuOe3EkVpgdPcnDjkN49NKaO5wDG62HvB7CL5CgFsoPzK/s5MMiaD9SDaC2TWDdq4XvI1JMT6QUfRvFtS24tx2IE+inH+dDvP3VUoe6I6tOoJRNlwir2Zs/gSCrtEWcXMC6fNomLyrNu1vNRn8gxp9pa7CLiMmdeMXKaFhkdDxHEoeNcxoZznC2U0+RrZbGDZbh0Z6OMvhRXdsGDuJdBFllpe4nVYSfkPqRyHc7TH3xKRhCW2YFQkCf9U44aXVsoSPx/7zpJmG+pWeQI4gd7UfGVmI64nVlnaIQQMm+FOvg1xNnGXLHf1pO96fykzU+8JX5sBFk5XXacy5Cv3qRwTjT1RWijvZ+6aMv0fFo5OKoQf94wnh1xX0=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(396003)(136003)(366004)(346002)(39860400002)(376002)(451199021)(186003)(6916009)(4326008)(54906003)(316002)(66556008)(966005)(64756008)(66476007)(76116006)(66446008)(66946007)(55016003)(478600001)(7696005)(71200400001)(8936002)(5660300002)(52536014)(41300700001)(8676002)(82960400001)(86362001)(38070700005)(2906002)(33656002)(122000001)(38100700002)(26005)(6506007)(83380400001)(9686003);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?SlZHMGl3MG9XcWNiYlhCKzdnUHZoUG0zU1FGUWd0dGZKNlUxamlPL3dFQWFY?=
+ =?utf-8?B?UlNxNHMrajlkbEJKT1E4L0RNUTVFMGlUTXlZY2U4QUJGb0taQzFKV1FsUEtv?=
+ =?utf-8?B?c0FNOUhwQ3BaUGVPNkxDU0FOWUx6OUZzQUYvUjVVbDVpbXJPeFhhaUxLZkVp?=
+ =?utf-8?B?bVlseTBEZjJFakRwNzZRRGg2bmJBdC9hWEVWMDVRekhGQnF4c1RDWjFyVy8y?=
+ =?utf-8?B?TnlNTklJS3U5RjFLN2pET0M1aUh6YjFrOWZUcDc3aThMZkRvd3I2eVlBRU5S?=
+ =?utf-8?B?Vm1tdFhZRjhZUERHUzRSdWNqZlc2d2p1NGp6TVdDOFFjWTl4NHhKZzBXU2hH?=
+ =?utf-8?B?T3gzTTdmZE1Ydm9tSkZWWG04SXBOcjlaNzYrVDJNdEZ3L0wwZ01vT1pPU2M0?=
+ =?utf-8?B?T09tZHYzT1JoN2Rjbkl5bERVRGJ2Znd6UFB4SEsvekorK3JyYWNiS2Z3TThJ?=
+ =?utf-8?B?RnFIWlExQUNzd3dYVGNsZlhBa2ZIdWNMYjc2SlZCblg5a1BRSnBBUGVYSUZ6?=
+ =?utf-8?B?TEw2SjlXUXZBak9wcHY3NXRRcFNBWkVoNnZPRGVTbFJyN093UXc0d01mS3p0?=
+ =?utf-8?B?bWRyNERiUWRydFZBaHRiUy9KZTI1QzA1VDFhQU9DbmZRUjRGd1VXV3B6WlJk?=
+ =?utf-8?B?SnA2MkpQaEVpelF0ZlkxVnJIVUNwVUpTZGZrUGc2ZlNxTVRhaHVxODdIRUFT?=
+ =?utf-8?B?NTI5eTdNakwyRE1LUmMrakVkKyswZUE1K28rUkJKV3BraDdUVUUweGVpUUJj?=
+ =?utf-8?B?Y2VjS2kxSDh1MkdPcitEaDF4Sk80ell0QVFRaHZCM1N6d3l1R0dyVk1KOSt4?=
+ =?utf-8?B?RTVQM21yNEppTDVlbm4vRDZpQUN0YktPNDhzd2pGYytSWnNyZW5JWjZBQ1hE?=
+ =?utf-8?B?VWV5b2xHV2tyQ0hWUmlib3Y0c0ExdnI3T0owVmwyR0VURjFESXBFVXFYSktP?=
+ =?utf-8?B?QUNYUm9SblpNSGRuNDlzQk1TNWtGRkgzZ0o5RW13NWN5djhEVm9qRzVXcXBK?=
+ =?utf-8?B?QlZpcFZnWDFHWitlZ3dXeHdpU00wcVRrdnhXOWlaM21ibmN1VmxxWU5aQVpK?=
+ =?utf-8?B?ay9EdnEyVU41VHVZb2tkWFBhTzdCTGxYWUhIbzBTWkgrQXcxQW1uV09kYXFu?=
+ =?utf-8?B?UWdvc2tiYjRzWWpBWXNBT1FhOEJ6Q0IxVkRwRCtkRUFZMk9IdFh1K2FkYWpx?=
+ =?utf-8?B?dE5jVVZra1lTZUIyc1pEajRyOGhSUWFEdlkzWmdEWG1aVkpBL2pjWUtOTzV4?=
+ =?utf-8?B?Ulh4NCtKQlVVR2tORFU1bk5RcGprUGwwdUxjc3NPcFBYemIxNzhhMUxFVjBV?=
+ =?utf-8?B?OWJ2V1dQK1Q0NHNHREYyYml5dWdEVWl5QjNZbkJIOFBlZk1VUFpNYkRydTNk?=
+ =?utf-8?B?akhhRXlyTEFqYVZNK1JyNXFOSC9QSkNSSkEwM0FwL1JvWFJHUUYwYXpvUHVK?=
+ =?utf-8?B?WnBuU1NpanJoWDdqMk9MVTRHa0dMRkE1OUxPUnEyMENjU2RYSzNwVlI1bzQ2?=
+ =?utf-8?B?a1ZLRnJaZi9JMlBNdzltMjZiSjhLbTFRVmRiVmR3Q0ZqTEFlNjBSQWV0bnhp?=
+ =?utf-8?B?bXp6bjFuSnZkdmVYYW1oTFBYQ3YvZEdBOFFKSThLeWlpNUcyT00zZndYWGtv?=
+ =?utf-8?B?UVA0TkRXN04xRzR5ai83SGU3REx4RWRvT2lqZWt2K1g5b1RJT0JjVWNNc0hq?=
+ =?utf-8?B?QUNpZWxvUDN2QmM5N1U1YjlEYUppK2R4d0VwNDI1Y2pFVm90UkJHRVRGdVdu?=
+ =?utf-8?B?ak1SZks3WnJIamZYb01BMDh6S05sMUdiT29GbzB0WEJtaHRIdUJvK0FhRHlR?=
+ =?utf-8?B?enJxK0xvTndtdmI0S3EwMjFhUWVmclBJVHRadXJ2SXZVb2JqZUl4KzJxWlBW?=
+ =?utf-8?B?R3JQcENyT21kWGFDWDNnOFpEdXhhdGNLL1lRWURVYjdsc29JWTVlaVJZUlFu?=
+ =?utf-8?B?Q09EZVJKcG1wbXFtc0FOUkxDZUw5ZG1QYm9XSTdJTVM0cmp1YTdGM0tmd3c3?=
+ =?utf-8?B?YkZNL2RJZzFNZVd1cGgvbGpDcXp4T1VUY3NDY0ZSQktNZXlxaVo4U0tqZmFS?=
+ =?utf-8?B?VnlmdE1TVnYvTzVIWlpwZFNHSkJDV1RKbHk3aGFZc3loRmxUZXN0Wkx0d2Nm?=
+ =?utf-8?Q?xRA2wxW54uaPTHO2AYTxP3FiW?=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <f80d89fb-3428-a0c3-b41e-9619ed5adc8c@xen0n.name>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: AQAAf8DxtrU4skBkCHgwAA--.121S3
-X-CM-SenderInfo: p2kd03xldq233l6o00pqjv00gofq/
-X-Coremail-Antispam: 1Uk129KBjvAXoW3Cw18CF1xGr4kJr4fGFy5XFb_yoW8CFW3Ao
-        W3tF4Igw48Gw1UCw4DG34jva45Z34Fkw47Aa13A3s5X3Wxtas8Gr48Kw48XF43uFn5KrW7
-        CasxX3WDZayIvwn5n29KB7ZKAUJUUUjU529EdanIXcx71UUUUU7KY7ZEXasCq-sGcSsGvf
-        J3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU0xBIdaVrnRJU
-        UUP2b4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2IYs7xG6rWj6s
-        0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2z4x0
-        Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1l84
-        ACjcxK6I8E87Iv67AKxVWxJr0_GcWl84ACjcxK6I8E87Iv6xkF7I0E14v26F4UJVW0owAa
-        w2AFwI0_Jw0_GFyle2I262IYc4CY6c8Ij28IcVAaY2xG8wAqjxCEc2xF0cIa020Ex4CE44
-        I27wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_JF0_Jw1lYx0Ex4A2
-        jsIE14v26r4j6F4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwIxGrwCYjI0SjxkI62
-        AI1cAE67vIY487MxkF7I0En4kS14v26r4a6rW5MxAIw28IcxkI7VAKI48JMxC20s026xCa
-        FVCjc4AY6r1j6r4UMxCIbckI1I0E14v26r1q6r43MI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2
-        IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI
-        42IY6xIIjxv20xvE14v26r1I6r4UMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42
-        IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Gr0_Cr1lIxAIcVC2z280
-        aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IUec6pPUUUUU==
-X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4712a602-2d2c-4cfd-409b-08db41669c08
+X-MS-Exchange-CrossTenant-originalarrivaltime: 20 Apr 2023 06:15:16.3243
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: UMbWJxeVtJq146ktdnnzQS9ybTyU1e3uLNNkm/xd+TAjhmhWEzP3S3wc1q8riJur7NxarlG7ZsSVJ/2jc5FDfA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR11MB7811
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-在 2023年04月19日 17:28, WANG Xuerui 写道:
-> On 2023/4/17 17:46, Tianrui Zhao wrote:
->> Add LoongArch KVM related header files, including kvm.h,
->> kvm_host.h, kvm_types.h. All of those are about LoongArch
->> virtualization features and kvm interfaces.
->>
->> Signed-off-by: Tianrui Zhao <zhaotianrui@loongson.cn>
->> ---
->>   arch/loongarch/include/asm/cpu-features.h |  22 ++
->>   arch/loongarch/include/asm/kvm_host.h     | 268 ++++++++++++++++++++++
->>   arch/loongarch/include/asm/kvm_types.h    |  11 +
->>   arch/loongarch/include/uapi/asm/kvm.h     | 107 +++++++++
->>   include/uapi/linux/kvm.h                  |   9 +
->>   5 files changed, 417 insertions(+)
->>   create mode 100644 arch/loongarch/include/asm/kvm_host.h
->>   create mode 100644 arch/loongarch/include/asm/kvm_types.h
->>   create mode 100644 arch/loongarch/include/uapi/asm/kvm.h
->>
->> diff --git a/arch/loongarch/include/asm/cpu-features.h 
->> b/arch/loongarch/include/asm/cpu-features.h
->> index b07974218393..345b7674a15f 100644
->> --- a/arch/loongarch/include/asm/cpu-features.h
->> +++ b/arch/loongarch/include/asm/cpu-features.h
->> @@ -64,5 +64,27 @@
->>   #define cpu_has_guestid        cpu_opt(LOONGARCH_CPU_GUESTID)
->>   #define cpu_has_hypervisor cpu_opt(LOONGARCH_CPU_HYPERVISOR)
->>   +#define cpu_has_matc_guest    (cpu_data[0].guest_cfg & BIT(0))
->> +#define cpu_has_matc_root    (cpu_data[0].guest_cfg & BIT(1))
->> +#define cpu_has_matc_nest    (cpu_data[0].guest_cfg & BIT(2))
->> +#define cpu_has_sitp        (cpu_data[0].guest_cfg & BIT(6))
->> +#define cpu_has_titp        (cpu_data[0].guest_cfg & BIT(8))
->> +#define cpu_has_toep        (cpu_data[0].guest_cfg & BIT(10))
->> +#define cpu_has_topp        (cpu_data[0].guest_cfg & BIT(12))
->> +#define cpu_has_torup        (cpu_data[0].guest_cfg & BIT(14))
->> +#define cpu_has_gcip_all    (cpu_data[0].guest_cfg & BIT(16))
->> +#define cpu_has_gcip_hit    (cpu_data[0].guest_cfg & BIT(17))
->> +#define cpu_has_gcip_secure    (cpu_data[0].guest_cfg & BIT(18))
->
-> We don't have guest_cfg yet in the cpu_data structure. You may have to 
-> re-organize a little bit to avoid referencing things from future commits.
->
-> Also you may want to make more use of the definitions already in 
-> <asm/loongarch.h>, e.g. the BIT(6) here is just CSR_GCFG_SITP, and it 
-> seems the matc_{guest,root,nest} definitions here conflict with the 
-> definitions in <asm/loongarch.h> which implies the MATC is a plain 
-> value instead of a bunch of bit flags.
->
->> +
->> +/*
->> + * Guest capabilities
->> + */
->> +#define cpu_guest_has_conf1    (cpu_data[0].guest.conf & BIT(1))
->> +#define cpu_guest_has_conf2    (cpu_data[0].guest.conf & BIT(2))
->> +#define cpu_guest_has_conf3    (cpu_data[0].guest.conf & BIT(3))
->> +#define cpu_guest_has_fpu    (cpu_data[0].guest.options & 
->> LOONGARCH_CPU_FPU)
->> +#define cpu_guest_has_perf    (cpu_data[0].guest.options & 
->> LOONGARCH_CPU_PMP)
->> +#define cpu_guest_has_watch    (cpu_data[0].guest.options & 
->> LOONGARCH_CPU_WATCH)
->> +#define cpu_guest_has_lsx    (cpu_data[0].guest.ases & 
->> LOONGARCH_ASE_LSX)
->
-> There is no LOONGARCH_ASE_LSX either.
-Thanks, I will fix the LOONGARCH_ASE_LSX macro
-
-Thanks
-Tianrui Zhao
->
->>     #endif /* __ASM_CPU_FEATURES_H */
->> diff --git a/arch/loongarch/include/asm/kvm_host.h 
->> b/arch/loongarch/include/asm/kvm_host.h
->> new file mode 100644
->> index 000000000000..bd239079b36f
->> --- /dev/null
->> +++ b/arch/loongarch/include/asm/kvm_host.h
->> @@ -0,0 +1,268 @@
->> +/* SPDX-License-Identifier: GPL-2.0 */
->> +/*
->> + * Copyright (C) 2020-2023 Loongson Technology Corporation Limited
->> + */
->> +
->> +#ifndef __ASM_LOONGARCH_KVM_HOST_H__
->> +#define __ASM_LOONGARCH_KVM_HOST_H__
->> +
->> +#include <linux/cpumask.h>
->> +#include <linux/mutex.h>
->> +#include <linux/hrtimer.h>
->> +#include <linux/interrupt.h>
->> +#include <linux/types.h>
->> +#include <linux/kvm.h>
->> +#include <linux/kvm_types.h>
->> +#include <linux/threads.h>
->> +#include <linux/spinlock.h>
->> +
->> +#include <asm/inst.h>
->> +#include <asm/loongarch.h>
->> +
->> +/* Loongarch KVM register ids */
->> +#define LOONGARCH_CSR_32(_R, _S)    \
->> +    (KVM_REG_LOONGARCH_CSR | KVM_REG_SIZE_U32 | (8 * (_R) + (_S)))
->> +
->> +#define LOONGARCH_CSR_64(_R, _S)    \
->> +    (KVM_REG_LOONGARCH_CSR | KVM_REG_SIZE_U64 | (8 * (_R) + (_S)))
->> +
->> +#define KVM_IOC_CSRID(id)        LOONGARCH_CSR_64(id, 0)
->> +#define KVM_GET_IOC_CSRIDX(id)        ((id & KVM_CSR_IDX_MASK) >> 3)
->> +
->> +#define KVM_MAX_VCPUS            256
->> +/* memory slots that does not exposed to userspace */
->> +#define KVM_PRIVATE_MEM_SLOTS        0
->> +
->> +#define KVM_HALT_POLL_NS_DEFAULT    500000
->> +
->> +struct kvm_vm_stat {
->> +    struct kvm_vm_stat_generic generic;
->> +};
->> +
->> +struct kvm_vcpu_stat {
->> +    struct kvm_vcpu_stat_generic generic;
->> +    u64 idle_exits;
->> +    u64 signal_exits;
->> +    u64 int_exits;
->> +    u64 cpucfg_exits;
->> +};
->> +
->> +struct kvm_arch_memory_slot {
->> +};
->> +
->> +struct kvm_context {
->> +    unsigned long vpid_cache;
->> +    struct kvm_vcpu *last_vcpu;
->> +};
->> +
->> +struct kvm_world_switch {
->> +    int (*guest_eentry)(void);
->> +    int (*enter_guest)(struct kvm_run *run, struct kvm_vcpu *vcpu);
->> +    unsigned long page_order;
->> +};
->> +
->> +struct kvm_arch {
->> +    /* Guest physical mm */
->> +    struct mm_struct gpa_mm;
->> +    /* Mask of CPUs needing GPA ASID flush */
->> +    cpumask_t asid_flush_mask;
->> +
->> +    unsigned char online_vcpus;
->> +    unsigned char is_migrate;
->> +    s64 time_offset;
->> +    struct kvm_context __percpu *vmcs;
->> +    unsigned long gpa_size;
->> +};
->> +
->> +
->> +#define LOONGARCH_CSRS        0x100
->> +#define CSR_UCWIN_BASE        0x100
->> +#define CSR_UCWIN_SIZE        0x10
->> +#define CSR_DMWIN_BASE        0x180
->> +#define CSR_DMWIN_SIZE        0x4 > +#define CSR_PERF_BASE        0x200
->> +#define CSR_PERF_SIZE        0x8
->> +#define CSR_DEBUG_BASE        0x500
->> +#define CSR_DEBUG_SIZE        0x3
->> +#define CSR_ALL_SIZE        0x800
->
-> Is the "SIZE"'s actually "numbers"? 16-byte or even 3-byte CSRs make 
-> absolutely no sense in LoongArch. However e.g. there are indeed 4 
-> DMWINs in total, so I think you may want to say "number of xxx" 
-> instead (in which case you should probably name them "CSR_XXX_NUM").
-Thanks, the meaning of the macro should be CSR max numbers, and I will 
-change the macro name.
-
-Thanks
-Tianrui Zhao
->
-> Also there are duplications here too.  CSR_UCWIN_BASE is just 
-> LOONGARCH_CSR_UCAWIN, CSR_DMWIN_BASE is LOONGARCH_CSR_DMWIN0, 
-> CSR_PERF_BASE is LOONGARCH_CSR_PERFCTRL0, and CSR_DEBUG_BASE is 
-> LOONGARCH_CSR_DEBUG. You should at least avoid repeating the magic 
-> numbers.
-Thanks, I will remove the duplicate definitions of CSRs.
-
-Thanks
-Tianrui Zhao
->
->> +
->> +struct loongarch_csrs {
->> +    unsigned long csrs[CSR_ALL_SIZE];
->> +};
->> +
->> +/* Resume Flags */
->> +#define RESUME_GUEST        1
->> +#define RESUME_HOST        0
->> +
->> +enum emulation_result {
->> +    EMULATE_DONE,        /* no further processing */
->> +    EMULATE_DO_MMIO,    /* kvm_run filled with MMIO request */
->> +    EMULATE_FAIL,        /* can't emulate this instruction */
->> +    EMULATE_WAIT,        /* WAIT instruction */
->> +    EMULATE_EXCEPT,        /* A guest exception has been generated */
->> +    EMULATE_DO_IOCSR,    /* handle IOCSR request */
->> +};
->> +
->> +#define KVM_NR_MEM_OBJS        4
->> +#define KVM_LARCH_FPU        (0x1 << 0)
->> +#define KVM_LARCH_CSR        (0x1 << 1)
->> +
->> +struct kvm_vcpu_arch {
->> +    /*
->> +     * Switch pointer-to-function type to unsigned long
->> +     * for loading the value into register directly.
->> +     */
->> +    unsigned long guest_eentry;
->> +    unsigned long host_eentry;
->> +
->> +    /* Pointers stored here for easy access from assembly code. */
->
-> nit: remove trailing period
-Thanks, I will remove the trailing period
-
-Thanks
-Tianrui Zhao
->
->> +    int (*handle_exit)(struct kvm_run *run, struct kvm_vcpu *vcpu);
->> +
->> +    /* Host registers preserved across guest mode execution */
->> +    unsigned long host_stack;
->> +    unsigned long host_gp;
->> +    unsigned long host_pgd;
->> +    unsigned long host_pgdhi;
->> +    unsigned long host_entryhi;
->> +
->> +    /* Host CSR registers used when handling exits from guest */
->
-> nit: "Host CSRs"
-Thanks, I will fix it.
-
-Thanks
-Tianrui Zhao
->
->> +    unsigned long badv;
->> +    unsigned long host_estat;
->> +    unsigned long badi;
->> +    unsigned long host_ecfg;
->> +    unsigned long host_percpu;
->> +
->> +    /* GPRS */
->
-> nit: "GPRs"
-Thanks, I will fix it
-
-Thanks
-Tianrui Zhao
->
->> +    unsigned long gprs[32];
->> +    unsigned long pc;
->> +
->> +    /* FPU State */
->
-> nit: "state"
-Thanks, I will fix it.
-
-Thanks
-Tianrui Zhao
->
->> +    struct loongarch_fpu fpu FPU_ALIGN;
->> +    /* Which auxiliary state is loaded (KVM_LOONGARCH_AUX_*) */
->> +    unsigned int aux_inuse;
->> +
->> +    /* CSR State */
->> +    struct loongarch_csrs *csr;
->> +
->> +    /* GPR used as IO source/target */
->> +    u32 io_gpr;
->> +
->> +    struct hrtimer swtimer;
->> +    /* Count timer control KVM register */
->
-> This doesn't make sense, how can the timer control KVM? Seems 
-> something like "KVM register to control count timer" but I'm not sure.
-Ok, I will fix this comment.
-
-Thanks
-Tianrui Zhao
->
->
->> +    u32 count_ctl;
->> +
->> +    /* Bitmask of exceptions that are pending */
->> +    unsigned long irq_pending;
->> +    /* Bitmask of pending exceptions to be cleared */
->> +    unsigned long irq_clear;
->> +
->> +    /* Cache some mmu pages needed inside spinlock regions */
->
-> "Cache for pages needed inside ..."?
->
->> +    struct kvm_mmu_memory_cache mmu_page_cache;
->> +
->> +    /* vcpu's vpid */
->> +    u64 vpid;
->> +
->> +    /* Period of stable timer tick in ns */
->> +    u64 timer_period;
->
-> Can you make it "timer_period_ns" or are you following other arches' 
-> conventions?
-Thanks, I will change the name to timer_period_ns.
-
-Thanks
-Tianrui Zhao
->
->> +    /* Frequency of stable timer in Hz */
->> +    u64 timer_mhz;
->
-> Is it really MHz or Hz?
-Yes, it is MHz.
-
-Thanks
-Tianrui Zhao
->
->> +    /* Stable bias from the raw time */
->> +    u64 timer_bias;
->> +    /* Dynamic nanosecond bias (multiple of timer_period) to avoid 
->> overflow */
->> +    s64 timer_dyn_bias;
->> +    /* Save ktime */
->
-> The comment seems redundant (code is too trivial so the comment 
-> doesn't add any information).
-Thanks I will remove this comment
-
-Thanks
-Tianrui Zhao
->
->> +    ktime_t stable_ktime_saved;
->> +
->> +    u64 core_ext_ioisr[4];
->> +
->> +    /* Last CPU the VCPU state was loaded on */
->
-> Use consistent spelling: "vCPU".
-Ok, I will fix it.
-
-Thanks
-Tianrui Zhao
->
->> +    int last_sched_cpu;
->> +    /* Last CPU the VCPU actually executed guest code on */
->> +    int last_exec_cpu;
->> +    /* mp state */
->> +    struct kvm_mp_state mp_state;
->> +};
->> +
->> +static inline unsigned long readl_sw_gcsr(struct loongarch_csrs 
->> *csr, int reg)
->> +{
->> +    return csr->csrs[reg];
->> +}
->> +
->> +static inline void writel_sw_gcsr(struct loongarch_csrs *csr, int reg,
->> +        unsigned long val)
->> +{
->> +    csr->csrs[reg] = val;
->> +}
->> +
->> +/* Helpers */
->> +static inline bool _kvm_guest_has_fpu(struct kvm_vcpu_arch *arch)
->> +{
->> +    return cpu_has_fpu;
->> +}
->> +
->> +void _kvm_init_fault(void);
->> +
->> +/* Debug: dump vcpu state */
->> +int kvm_arch_vcpu_dump_regs(struct kvm_vcpu *vcpu);
->> +
->> +/* MMU handling */
->> +int kvm_handle_mm_fault(struct kvm_vcpu *vcpu, unsigned long badv, 
->> bool write);
->> +void kvm_flush_tlb_all(void);
->> +void _kvm_destroy_mm(struct kvm *kvm);
->> +pgd_t *kvm_pgd_alloc(void);
->> +
->> +#define KVM_ARCH_WANT_MMU_NOTIFIER
->> +int kvm_unmap_hva_range(struct kvm *kvm,
->> +            unsigned long start, unsigned long end, bool blockable);
->> +void kvm_set_spte_hva(struct kvm *kvm, unsigned long hva, pte_t pte);
->> +int kvm_age_hva(struct kvm *kvm, unsigned long start, unsigned long 
->> end);
->> +int kvm_test_age_hva(struct kvm *kvm, unsigned long hva);
->> +
->> +static inline void update_pc(struct kvm_vcpu_arch *arch)
->> +{
->> +    arch->pc += 4;
->> +}
->> +
->> +/**
->> + * kvm_is_ifetch_fault() - Find whether a TLBL exception is due to 
->> ifetch fault.
->> + * @vcpu:    Virtual CPU.
->> + *
->> + * Returns:    Whether the TLBL exception was likely due to an 
->> instruction
->> + *        fetch fault rather than a data load fault.
->> + */
->> +static inline bool kvm_is_ifetch_fault(struct kvm_vcpu_arch *arch)
->> +{
->> +    if (arch->pc == arch->badv)
->> +        return true;
->> +
->> +    return false;
->
-> return arch->pc == arch->badv;
->
-> All other such occurrences should preferably be simplified too.
-Thanks, I will fix this.
-
-Thanks
-Tianrui Zhao
->
->> +}
->> +
->> +/* Misc */
->> +static inline void kvm_arch_hardware_unsetup(void) {}
->> +static inline void kvm_arch_sync_events(struct kvm *kvm) {}
->> +static inline void kvm_arch_memslots_updated(struct kvm *kvm, u64 
->> gen) {}
->> +static inline void kvm_arch_sched_in(struct kvm_vcpu *vcpu, int cpu) {}
->> +static inline void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu) {}
->> +static inline void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu) {}
->> +static inline void kvm_arch_vcpu_block_finish(struct kvm_vcpu *vcpu) {}
->> +static inline void kvm_arch_free_memslot(struct kvm *kvm,
->> +                   struct kvm_memory_slot *slot) {}
->> +void _kvm_check_vmid(struct kvm_vcpu *vcpu, int cpu);
->> +enum hrtimer_restart kvm_swtimer_wakeup(struct hrtimer *timer);
->> +int kvm_flush_tlb_gpa(struct kvm_vcpu *vcpu, unsigned long gpa);
->> +void kvm_arch_flush_remote_tlbs_memslot(struct kvm *kvm,
->> +                    const struct kvm_memory_slot *memslot);
->> +void kvm_init_vmcs(struct kvm *kvm);
->> +void kvm_vector_entry(void);
->> +int  kvm_enter_guest(struct kvm_run *run, struct kvm_vcpu *vcpu);
->> +extern const unsigned long kvm_vector_size;
->> +extern const unsigned long kvm_enter_guest_size;
->> +extern unsigned long vpid_mask;
->> +extern struct kvm_world_switch *kvm_loongarch_ops;
->> +
->> +#define SW_GCSR    (1 << 0)
->> +#define HW_GCSR    (1 << 1)
->> +int get_gcsr_flag(int csr);
->> +extern void set_hw_gcsr(int csr_id, unsigned long val);
->> +#endif /* __ASM_LOONGARCH_KVM_HOST_H__ */
->> diff --git a/arch/loongarch/include/asm/kvm_types.h 
->> b/arch/loongarch/include/asm/kvm_types.h
->> new file mode 100644
->> index 000000000000..060647b5fe2e
->> --- /dev/null
->> +++ b/arch/loongarch/include/asm/kvm_types.h
->> @@ -0,0 +1,11 @@
->> +/* SPDX-License-Identifier: GPL-2.0 */
->> +/*
->> + * Copyright (C) 2020-2023 Loongson Technology Corporation Limited
->> + */
->> +
->> +#ifndef _ASM_LOONGARCH_KVM_TYPES_H
->> +#define _ASM_LOONGARCH_KVM_TYPES_H
->> +
->> +#define KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE    4
->
-> Is there any difference with KVM_NR_MEM_OBJS in <asm/kvm_host.h> in 
-> the same commit? If they are actually the same thing you should avoid 
-> duplicating the "4".
-Yes, I will remove the KVM_NR_MEM_OBJS in <asm/kvm_host.h>.
-
-Thanks
-Tianrui Zhao
->
->> +
->> +#endif /* _ASM_LOONGARCH_KVM_TYPES_H */
->> diff --git a/arch/loongarch/include/uapi/asm/kvm.h 
->> b/arch/loongarch/include/uapi/asm/kvm.h
->> new file mode 100644
->> index 000000000000..074d86ba532c
->> --- /dev/null
->> +++ b/arch/loongarch/include/uapi/asm/kvm.h
->> @@ -0,0 +1,107 @@
->> +/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
->> +/*
->> + * Copyright (C) 2020-2023 Loongson Technology Corporation Limited
->> + */
->> +
->> +#ifndef __UAPI_ASM_LOONGARCH_KVM_H
->> +#define __UAPI_ASM_LOONGARCH_KVM_H
->> +
->> +#include <linux/types.h>
->> +
->> +/*
->> + * KVM Loongarch specific structures and definitions.
->> + *
->> + * Some parts derived from the x86 version of this file.
->> + */
->> +
->> +#define __KVM_HAVE_READONLY_MEM
->> +
->> +#define KVM_COALESCED_MMIO_PAGE_OFFSET 1
->> +
->> +/*
->> + * for KVM_GET_REGS and KVM_SET_REGS
->> + */
->> +struct kvm_regs {
->> +    /* out (KVM_GET_REGS) / in (KVM_SET_REGS) */
->> +    __u64 gpr[32];
->> +    __u64 pc;
->> +};
->> +
->> +/*
->> + * for KVM_GET_FPU and KVM_SET_FPU
->> + */
->> +struct kvm_fpu {
->> +    __u32 fcsr;
->> +    __u32 none;
->
-> Is this field an explicit padding? Probably it's better to use a more 
-> descriptive name like __pad0 if it's the case.
-No, it is not a padding but a unused reg
-
-Thanks
-Tianrui Zhao
->
->> +    __u64 fcc;    /* 8x8 */
->> +    struct kvm_fpureg {
->> +        __u64 val64[4];
->> +    } fpr[32];
->> +};
->> +
->> +/*
->> + * For LoongArch, we use KVM_SET_ONE_REG and KVM_GET_ONE_REG to 
->> access various
->> + * registers.  The id field is broken down as follows:
->> + *
->> + *  bits[63..52] - As per linux/kvm.h
->> + *  bits[51..32] - Must be zero.
->> + *  bits[31..16] - Register set.
->> + *
->> + * Register set = 0: GP registers from kvm_regs (see definitions 
->> below).
->> + *
->> + * Register set = 1: CSR registers.
->> + *
->> + * Register set = 2: KVM specific registers (see definitions below).
->> + *
->> + * Register set = 3: FPU / SIMD registers (see definitions below).
->> + *
->> + * Other sets registers may be added in the future.  Each set would
->> + * have its own identifier in bits[31..16].
->> + */
->> +
->> +#define KVM_REG_LOONGARCH_GP        (KVM_REG_LOONGARCH | 0x00000ULL)
->> +#define KVM_REG_LOONGARCH_CSR        (KVM_REG_LOONGARCH | 0x10000ULL)
->> +#define KVM_REG_LOONGARCH_KVM        (KVM_REG_LOONGARCH | 0x20000ULL)
->> +#define KVM_REG_LOONGARCH_FPU        (KVM_REG_LOONGARCH | 0x30000ULL)
->> +#define KVM_REG_LOONGARCH_MASK        (KVM_REG_LOONGARCH | 0x30000ULL)
->> +#define KVM_CSR_IDX_MASK        (0x10000 - 1)
->> +
->> +/*
->> + * KVM_REG_LOONGARCH_KVM - KVM specific control registers.
->> + */
->> +
->> +#define KVM_REG_LOONGARCH_COUNTER    (KVM_REG_LOONGARCH_KVM | 
->> KVM_REG_SIZE_U64 | 3)
->> +#define KVM_REG_LOONGARCH_VCPU_RESET    (KVM_REG_LOONGARCH_KVM | 
->> KVM_REG_SIZE_U64 | 4)
->> +
->> +struct kvm_debug_exit_arch {
->> +};
->> +
->> +/* for KVM_SET_GUEST_DEBUG */
->> +struct kvm_guest_debug_arch {
->> +};
->> +
->> +/* definition of registers in kvm_run */
->> +struct kvm_sync_regs {
->> +};
->> +
->> +/* dummy definition */
->> +struct kvm_sregs {
->> +};
->> +
->> +struct kvm_iocsr_entry {
->> +    __u32 addr;
->> +    __u32 pad;
->> +    __u64 data;
->> +};
->> +
->> +struct kvm_loongarch_interrupt {
->> +    /* in */
->> +    __u32 cpu;
->> +    __u32 irq;
->> +};
->> +
->> +#define KVM_NR_IRQCHIPS        1
->> +#define KVM_IRQCHIP_NUM_PINS    64
->> +#define KVM_MAX_CORES        256
->> +
->> +#endif /* __UAPI_ASM_LOONGARCH_KVM_H */
->> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
->> index d77aef872a0a..d14fde87ae35 100644
->> --- a/include/uapi/linux/kvm.h
->> +++ b/include/uapi/linux/kvm.h
->> @@ -264,6 +264,7 @@ struct kvm_xen_exit {
->>   #define KVM_EXIT_RISCV_SBI        35
->>   #define KVM_EXIT_RISCV_CSR        36
->>   #define KVM_EXIT_NOTIFY           37
->> +#define KVM_EXIT_LOONGARCH_IOCSR  38
->>     /* For KVM_EXIT_INTERNAL_ERROR */
->>   /* Emulate instruction failed. */
->> @@ -336,6 +337,13 @@ struct kvm_run {
->>               __u32 len;
->>               __u8  is_write;
->>           } mmio;
->> +        /* KVM_EXIT_LOONGARCH_IOCSR */
->> +        struct {
->> +            __u64 phys_addr;
->> +            __u8  data[8];
->> +            __u32 len;
->> +            __u8  is_write;
->> +        } iocsr_io;
->>           /* KVM_EXIT_HYPERCALL */
->>           struct {
->>               __u64 nr;
->> @@ -1354,6 +1362,7 @@ struct kvm_dirty_tlb {
->>   #define KVM_REG_ARM64        0x6000000000000000ULL
->>   #define KVM_REG_MIPS        0x7000000000000000ULL
->>   #define KVM_REG_RISCV        0x8000000000000000ULL
->> +#define KVM_REG_LOONGARCH    0x9000000000000000ULL
->>     #define KVM_REG_SIZE_SHIFT    52
->>   #define KVM_REG_SIZE_MASK    0x00f0000000000000ULL
->
-
+PiBGcm9tOiBKYXNvbiBHdW50aG9ycGUgPGpnZ0BudmlkaWEuY29tPg0KPiBTZW50OiBGcmlkYXks
+IEFwcmlsIDE0LCAyMDIzIDk6MzIgUE0NCj4gDQo+IE9uIFRodSwgQXByIDEzLCAyMDIzIGF0IDAy
+OjUyOjU0QU0gKzAwMDAsIFRpYW4sIEtldmluIHdyb3RlOg0KPiA+ID4gRnJvbTogSmFzb24gR3Vu
+dGhvcnBlIDxqZ2dAbnZpZGlhLmNvbT4NCj4gPiA+IFNlbnQ6IFdlZG5lc2RheSwgQXByaWwgMTIs
+IDIwMjMgNzoxOCBQTQ0KPiA+ID4NCj4gPiA+IE9uIFdlZCwgQXByIDEyLCAyMDIzIGF0IDA4OjI3
+OjM2QU0gKzAwMDAsIFRpYW4sIEtldmluIHdyb3RlOg0KPiA+ID4gPiA+IEZyb206IEphc29uIEd1
+bnRob3JwZSA8amdnQG52aWRpYS5jb20+DQo+ID4gPiA+ID4gU2VudDogVHVlc2RheSwgQXByaWwg
+MTEsIDIwMjMgMTA6MzEgUE0NCj4gPiA+ID4gPg0KPiA+ID4gPiA+IE9uIFRodSwgTWFyIDIzLCAy
+MDIzIGF0IDA3OjIxOjQyQU0gKzAwMDAsIFRpYW4sIEtldmluIHdyb3RlOg0KPiA+ID4gPiA+DQo+
+ID4gPiA+ID4gPiBJZiBubyBvdmVyc2lnaHQgdGhlbiB3ZSBjYW4gZGlyZWN0bHkgcHV0IHRoZSBs
+b2NrIGluDQo+ID4gPiA+ID4gPiBpb21tdWZkX2h3X3BhZ2V0YWJsZV9hdHRhY2gvZGV0YWNoKCkg
+d2hpY2ggY2FuIGFsc28gc2ltcGxpZnkgYQ0KPiBiaXQNCj4gPiA+IG9uDQo+ID4gPiA+ID4gPiBp
+dHMgY2FsbGVycyBpbiBkZXZpY2UuYy4NCj4gPiA+ID4gPg0KPiA+ID4gPiA+IFNvLCBJIGRpZCB0
+aGlzLCBhbmQgc3l6a2FsbGVyIGV4cGxhaW5zIHdoeSB0aGlzIGNhbid0IGJlIGRvbmU6DQo+ID4g
+PiA+ID4NCj4gPiA+ID4gPg0KPiBodHRwczovL2xvcmUua2VybmVsLm9yZy9yLzAwMDAwMDAwMDAw
+MDZlNjZkNjA1ZjgzZTA5YmNAZ29vZ2xlLmNvbQ0KPiA+ID4gPiA+DQo+ID4gPiA+ID4gV2UgY2Fu
+J3QgYWxsb3cgdGhlIGh3cHQgdG8gYmUgZGlzY292ZXJlZCBieSBhIHBhcmFsbGVsDQo+ID4gPiA+
+ID4gaW9tbXVmZF9od19wYWdldGFibGVfYXR0YWNoKCkgdW50aWwgaXQgaXMgZG9uZSBiZWluZyBz
+ZXR1cCwNCj4gb3RoZXJ3aXNlDQo+ID4gPiA+ID4gaWYgd2UgZmFpbCB0byBzZXQgaXQgdXAgd2Ug
+Y2FuJ3QgZGVzdHJveSB0aGUgaHdwdC4NCj4gPiA+ID4gPg0KPiA+ID4gPiA+IAlpZiAoaW1tZWRp
+YXRlX2F0dGFjaCkgew0KPiA+ID4gPiA+IAkJcmMgPSBpb21tdWZkX2h3X3BhZ2V0YWJsZV9hdHRh
+Y2goaHdwdCwgaWRldik7DQo+ID4gPiA+ID4gCQlpZiAocmMpDQo+ID4gPiA+ID4gCQkJZ290byBv
+dXRfYWJvcnQ7DQo+ID4gPiA+ID4gCX0NCj4gPiA+ID4gPg0KPiA+ID4gPiA+IAlyYyA9IGlvcHRf
+dGFibGVfYWRkX2RvbWFpbigmaHdwdC0+aW9hcy0+aW9wdCwgaHdwdC0+ZG9tYWluKTsNCj4gPiA+
+ID4gPiAJaWYgKHJjKQ0KPiA+ID4gPiA+IAkJZ290byBvdXRfZGV0YWNoOw0KPiA+ID4gPiA+IAls
+aXN0X2FkZF90YWlsKCZod3B0LT5od3B0X2l0ZW0sICZod3B0LT5pb2FzLT5od3B0X2xpc3QpOw0K
+PiA+ID4gPiA+IAlyZXR1cm4gaHdwdDsNCj4gPiA+ID4gPg0KPiA+ID4gPiA+IG91dF9kZXRhY2g6
+DQo+ID4gPiA+ID4gCWlmIChpbW1lZGlhdGVfYXR0YWNoKQ0KPiA+ID4gPiA+IAkJaW9tbXVmZF9o
+d19wYWdldGFibGVfZGV0YWNoKGlkZXYpOw0KPiA+ID4gPiA+IG91dF9hYm9ydDoNCj4gPiA+ID4g
+PiAJaW9tbXVmZF9vYmplY3RfYWJvcnRfYW5kX2Rlc3Ryb3koaWN0eCwgJmh3cHQtPm9iaik7DQo+
+ID4gPiA+ID4NCj4gPiA+ID4gPiBBcyBzb21lIG90aGVyIGlkZXYgY291bGQgYmUgcG9pbnRpbmcg
+YXQgaXQgdG9vIG5vdy4NCj4gPiA+ID4NCj4gPiA+ID4gSG93IGNvdWxkIHRoaXMgaGFwcGVuIGJl
+Zm9yZSB0aGlzIG9iamVjdCBpcyBmaW5hbGl6ZWQ/IGlpcmMgeW91IHBvaW50ZWQgdG8NCj4gPiA+
+ID4gbWUgdGhpcyBmYWN0IGluIHByZXZpb3VzIGRpc2N1c3Npb24uDQo+ID4gPg0KPiA+ID4gSXQg
+b25seSBpcyB1bmF2YWlsYWJsZSB0aHJvdWdoIHRoZSB4YXJyYXksIGJ1dCB3ZSd2ZSBhZGRlZCBp
+dCB0byBhdA0KPiA+ID4gbGVhc3Qgb25lIGludGVybmFsIGxpc3Qgb24gdGhlIGdyb3VwIGFscmVh
+ZHksIGl0IGlzIGtpbmQgb2Ygc2tldGNoeSB0bw0KPiA+ID4gd29yayBsaWtlIHRoaXMsIGl0IHNo
+b3VsZCBhbGwgYmUgYXRvbWljLi4NCj4gPiA+DQo+ID4NCj4gPiB3aGljaCBpbnRlcm5hbCBsaXN0
+PyBncm91cCBoYXMgYSBsaXN0IGZvciBhdHRhY2hlZCBkZXZpY2VzIGJ1dCByZWdhcmRpbmcNCj4g
+PiB0byBod3B0IGl0J3Mgc3RvcmVkIGluIGEgc2luZ2xlIGZpZWxkIGlncm91cC0+aHdwdC4NCj4g
+DQo+IEl0IGlzIGFkZGVkIHRvDQo+IA0KPiAJbGlzdF9hZGRfdGFpbCgmaHdwdC0+aHdwdF9pdGVt
+LCAmaHdwdC0+aW9hcy0+aHdwdF9saXN0KTsNCg0KdGhpcyBpcyBjYWxsZWQgdW5kZXIgaW9hcy0+
+bXV0ZXguDQoNCj4gDQo+IFdoaWNoIGNhbiBiZSBvYnNlcnZlZCBmcm9tDQo+IA0KPiAJbXV0ZXhf
+bG9jaygmaW9hcy0+bXV0ZXgpOw0KPiAJbGlzdF9mb3JfZWFjaF9lbnRyeShod3B0LCAmaW9hcy0+
+aHdwdF9saXN0LCBod3B0X2l0ZW0pIHsNCj4gCQlpZiAoIWh3cHQtPmF1dG9fZG9tYWluKQ0KPiAJ
+CQljb250aW51ZTsNCj4gDQo+IAkJaWYgKCFpb21tdWZkX2xvY2tfb2JqKCZod3B0LT5vYmopKQ0K
+PiAJCQljb250aW51ZTsNCg0KdGhpcyBpcyBjYWxsZWQgYWxzbyB1bmRlciBpb2FzLT5tdXRleC4g
+U28gbm8gcmFjZS4g8J+Yig0KDQo+IA0KPiBJZiBpb21tdWZkX2xvY2tfb2JqKCkgaGFzIGhhcHBl
+bmVkIHRoZW4NCj4gaW9tbXVmZF9vYmplY3RfYWJvcnRfYW5kX2Rlc3Ryb3koKSBpcyBpbiB0cm91
+YmxlLg0KPiANCj4gVGh1cyB3ZSBuZWVkIHRvIGhvbGQgdGhlIGlvYXMtPm11dGV4IHJpZ2h0IHVw
+IHVudGlsIHdlIGtub3cgd2UgY2FuJ3QNCj4gY2FsbCBpb21tdWZkX29iamVjdF9hYm9ydF9hbmRf
+ZGVzdHJveSgpLCBvciBsaWZ0IG91dCB0aGUgaHdwdCBsaXN0X2FkZA0KPiANCj4gVGhpcyBjb3Vs
+ZCBtYXliZSBhbHNvIGJlIGZpeGVkIGJ5IGhvbGRpbmcgdGhlIGRlc3Ryb3lfcndfc2VtIHJpZ2h0
+IHVwDQo+IHVudGlsIGZpbmFsaXplLiBUaG91Z2gsIEkgdGhpbmsgSSBsb29rZWQgYXQgdGhpcyBv
+bmNlIGFuZCBkZWNpZGVkDQo+IGFnYWluc3QgaXQgZm9yIHNvbWUgcmVhc29uLi4NCj4gDQo+ID4g
+YnR3IHJlbW92aW5nIHRoaXMgbG9jayBpbiB0aGlzIGZpbGUgYWxzbyBtYWtlcyBpdCBlYXNpZXIg
+dG8gc3VwcG9ydCBzaW92DQo+ID4gZGV2aWNlIHdoaWNoIGRvZXNuJ3QgaGF2ZSBncm91cC4gV2Ug
+Y2FuIGhhdmUgaW50ZXJuYWwgZ3JvdXAgYXR0YWNoDQo+ID4gYW5kIHBhc2lkIGF0dGFjaCB3cmFw
+cGVycyB3aXRoaW4gZGV2aWNlLmMgYW5kIGxlYXZlIGlncm91cC0+bG9jayBoZWxkDQo+ID4gaW4g
+dGhlIGdyb3VwIGF0dGFjaCBwYXRoLg0KPiANCj4gWWVhaCwgSSBleHBlY3QgdGhpcyB3aWxsIG5l
+ZWQgbW9yZSB3b3JrIHdoZW4gd2UgZ2V0IHRvIFBBU0lEIHN1cHBvcnQNCj4gDQo+IE1vc3QgbGlr
+ZWx5IHRoZSByZXNvbHV0aW9uIHdpbGwgYmUgc29tZXRoaW5nIGxpa2UgUEFTSUQgZG9tYWlucyBj
+YW4ndA0KPiBiZSB1c2VkIGFzIFBGL1ZGIGRvbWFpbnMgYmVjYXVzZSB0aGV5IGRvbid0IGhhdmUg
+dGhlIHJpZ2h0IHJlc2VydmVkDQo+IHJlZ2lvbnMsIHNvIHRoZXkgc2hvdWxkbid0IGJlIGluIHRo
+ZSBod3B0X2xpc3QgYXQgYWxsLCBzbyB3ZSBjYW4gdXNlIGENCj4gbW9yZSByZWxheGVkIGxvY2tp
+bmcuDQo+IA0KDQpZZXMgd2l0aCBwYXNpZCB0aGVyZSBpcyBubyByZXNlcnZlZCByZWdpb24gY29u
+Y2VwdHVhbGx5LiBDdXJyZW50bHkgaW4NCm91ciBpbnRlcm5hbCBpbXBsZW1lbnRhdGlvbiB3ZSBz
+dGlsbCBhZGRlZCB0aGUgcmVzZXJ2ZWQgcmVnaW9ucyBvZg0KdGhlIGRldmljZSB0byBJT0FTIHVw
+b24gcGFzaWQgYXR0YWNoIHdoaWNoIGxvb2tzIHVubmVjZXNzYXJ5Lg0KDQpCdXQgSSBkaWRuJ3Qg
+Z2V0IHdoeSBhIGRvbWFpbiBjYW5ub3QgYmUgc2hhcmVkIGJ5IFBBU0lEIGFuZCBQRi9WRi4NClVw
+b24gYXR0YWNoIHdlIGFkZCB0aGUgcmVzZXJ2ZWQgcmVnaW9ucyAoaWYgYW55KSBvZiB0aGUgZGV2
+aWNlIHRvDQpJT0FTLiBJIGRvbid0IHRoaW5rIHRoZXJlIGlzIGEgcmVxdWlyZW1lbnQgdGhhdCBy
+ZXNlcnZlZCByZWdpb25zDQptdXN0IGV4aXN0IGZvciBhIHN1Y2Nlc3NmdWwgYXR0YWNobWVudD8N
+Cg0KQSBzaW1pbGFyIGV4YW1wbGUgaXMgb24gSmFjb2IncyBETUEgQVBJIFBBU0lEIHdvcmsuIFRo
+ZSBETUENCmRvbWFpbiBpcyBmaXJzdCBhdHRhY2hlZCB0byBSSUQgYW5kIHRoZW4gdG8gYSBQQVNJ
+RC4NCg==
