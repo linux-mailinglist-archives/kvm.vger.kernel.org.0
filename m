@@ -2,221 +2,172 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 621156E99A8
-	for <lists+kvm@lfdr.de>; Thu, 20 Apr 2023 18:37:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D19D36E9A18
+	for <lists+kvm@lfdr.de>; Thu, 20 Apr 2023 18:56:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234716AbjDTQhF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 Apr 2023 12:37:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53006 "EHLO
+        id S230364AbjDTQ4h (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 Apr 2023 12:56:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35124 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231526AbjDTQhE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 20 Apr 2023 12:37:04 -0400
-Received: from mail-lj1-x236.google.com (mail-lj1-x236.google.com [IPv6:2a00:1450:4864:20::236])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5BB3192
-        for <kvm@vger.kernel.org>; Thu, 20 Apr 2023 09:37:01 -0700 (PDT)
-Received: by mail-lj1-x236.google.com with SMTP id z38so3429396ljq.12
-        for <kvm@vger.kernel.org>; Thu, 20 Apr 2023 09:37:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sifive.com; s=google; t=1682008620; x=1684600620;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=GaoOElEQ0goOV5AcB9fTNnR/4qFK40qSxrlBrcvfN5Y=;
-        b=CV7+QEiz/91/5eLG1KsECNXNMCvTFnLjPK7KbXXAMVmEiW8DYf2xWYcDmVRMvTdOAW
-         oSos0+eCkdCS6HuIjKQT3gEanvT5ABpuPIa5g8r4sTZSGahJSdO1vd16NENHnybpDtiX
-         wW2Uc/5y3RsAtVx/iI2ZajRUgCdrRBjgziesG3AZRjRXqTfA2oFBt8e7ayONkK1x1Soe
-         bGtqQPGW2w+Ek8bBkSb2b1pfvesC0F+WBWck8051pddoZhDrtH8PZBvfBoUSf4PICZsR
-         1stj+KZA66+r0K5faUYmbXktnOepv/cUBuroI5B7cmjaiit5CmIQAf7MUOsRfebX+A2J
-         4UuA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682008620; x=1684600620;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=GaoOElEQ0goOV5AcB9fTNnR/4qFK40qSxrlBrcvfN5Y=;
-        b=DdfvdkozLNi3c4rNCwOAmgWpLQUdkXTiMoY+vOV/CZ0EFmZDoYk3yiEV9LQZhsW7HL
-         4dFShq3WzZ9GdwaWfk8zwFQhdD/bR/gV1LXJB1UBqjwvcuFII6W57dSVqDvRKhyZID8z
-         JD6QVNUeA9kWag/TpUWEHcptdYDHhED55zqwtfv50JGKr9/vcMYzJYvSkMvRpbVSl9zm
-         jY2lxdAXTSrpZlhqc8tKomfUa/Hulu9L2p025eJR56TYjT1EhkqI7agOAn03eDeoMP6f
-         Lz1MxnsCkclqJrhrHxbEsbNXTozx2IO1R7wjcRHt/39eQsx/zPyNb8SZVr0GeQNozoAk
-         4GLQ==
-X-Gm-Message-State: AAQBX9eyFBFLNTqP0RNt1/Ee7iQaRLW0InWkwxR4cP7TMR/jJ88U86+s
-        n6fOaq/n0hBY8pn9JCUmibCPv1pU2dZii0GcLkuNlw==
-X-Google-Smtp-Source: AKy350Y/gCfruOP47zfXMzbSrGhfLdIMZSMEbrN+QX7vMyYfd5JW9/Vs/H3jmgt9AW7Bu0mWwJ7OZZMykmdImfvJGxg=
-X-Received: by 2002:a2e:9c4d:0:b0:2a7:8606:7448 with SMTP id
- t13-20020a2e9c4d000000b002a786067448mr569407ljj.0.1682008619777; Thu, 20 Apr
- 2023 09:36:59 -0700 (PDT)
+        with ESMTP id S231171AbjDTQ4V (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 20 Apr 2023 12:56:21 -0400
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id B797361B8
+        for <kvm@vger.kernel.org>; Thu, 20 Apr 2023 09:55:36 -0700 (PDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 064C21480;
+        Thu, 20 Apr 2023 09:56:11 -0700 (PDT)
+Received: from [10.1.196.40] (e121345-lin.cambridge.arm.com [10.1.196.40])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9FEC43F6C4;
+        Thu, 20 Apr 2023 09:55:26 -0700 (PDT)
+Message-ID: <fd324213-8d77-cb67-1c52-01cd0997a92c@arm.com>
+Date:   Thu, 20 Apr 2023 17:55:22 +0100
 MIME-Version: 1.0
-References: <87leinq5wg.fsf@all.your.base.are.belong.to.us> <mhng-607b5023-8f07-4a82-b292-35078123e9e8@palmer-ri-x1c9>
-In-Reply-To: <mhng-607b5023-8f07-4a82-b292-35078123e9e8@palmer-ri-x1c9>
-From:   Andy Chiu <andy.chiu@sifive.com>
-Date:   Fri, 21 Apr 2023 00:36:48 +0800
-Message-ID: <CABgGipWbSFnAK=DwT9X2esPBVTi0p+Oft1NyWbZ60LOwHj4dgA@mail.gmail.com>
-Subject: Re: [PATCH -next v18 00/20] riscv: Add vector ISA support
-To:     Palmer Dabbelt <palmer@dabbelt.com>
-Cc:     bjorn@kernel.org, linux-riscv@lists.infradead.org,
-        anup@brainfault.org, atishp@atishpatra.org,
-        kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
-        Vineet Gupta <vineetg@rivosinc.com>, greentime.hu@sifive.com,
-        guoren@linux.alibaba.com, Paul Walmsley <paul.walmsley@sifive.com>,
-        aou@eecs.berkeley.edu, nathan@kernel.org, ndesaulniers@google.com,
-        trix@redhat.com, Richard Henderson <richard.henderson@linaro.org>,
-        libc-alpha@sourceware.org, Andrew Waterman <andrew@sifive.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
+ Thunderbird/102.9.0
+Subject: Re: RMRR device on non-Intel platform
+Content-Language: en-GB
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "iommu@lists.linux.dev" <iommu@lists.linux.dev>
+References: <BN9PR11MB5276E84229B5BD952D78E9598C639@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <20230420081539.6bf301ad.alex.williamson@redhat.com>
+ <6cce1c5d-ab50-41c4-6e62-661bc369d860@arm.com>
+ <20230420084906.2e4cce42.alex.williamson@redhat.com>
+From:   Robin Murphy <robin.murphy@arm.com>
+In-Reply-To: <20230420084906.2e4cce42.alex.williamson@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-5.9 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Apr 19, 2023 at 11:18=E2=80=AFPM Palmer Dabbelt <palmer@dabbelt.com=
-> wrote:
->
-> On Wed, 19 Apr 2023 07:54:23 PDT (-0700), bjorn@kernel.org wrote:
-> > Bj=C3=B6rn T=C3=B6pel <bjorn@kernel.org> writes:
-> >
-> >> Andy Chiu <andy.chiu@sifive.com> writes:
-> >>
-> >>> This patchset is implemented based on vector 1.0 spec to add vector s=
-upport
-> >>> in riscv Linux kernel. There are some assumptions for this implementa=
-tions.
-> >>>
-> >>> 1. We assume all harts has the same ISA in the system.
-> >>> 2. We disable vector in both kernel and user space [1] by default. On=
-ly
-> >>>    enable an user's vector after an illegal instruction trap where it
-> >>>    actually starts executing vector (the first-use trap [2]).
-> >>> 3. We detect "riscv,isa" to determine whether vector is support or no=
-t.
-> >>>
-> >>> We defined a new structure __riscv_v_ext_state in struct thread_struc=
-t to
-> >>> save/restore the vector related registers. It is used for both kernel=
- space
-> >>> and user space.
-> >>>  - In kernel space, the datap pointer in __riscv_v_ext_state will be
-> >>>    allocated to save vector registers.
-> >>>  - In user space,
-> >>>     - In signal handler of user space, the structure is placed
-> >>>       right after __riscv_ctx_hdr, which is embedded in fp reserved
-> >>>       aera. This is required to avoid ABI break [2]. And datap points
-> >>>       to the end of __riscv_v_ext_state.
-> >>>     - In ptrace, the data will be put in ubuf in which we use
-> >>>       riscv_vr_get()/riscv_vr_set() to get or set the
-> >>>       __riscv_v_ext_state data structure from/to it, datap pointer
-> >>>       would be zeroed and vector registers will be copied to the
-> >>>       address right after the __riscv_v_ext_state structure in ubuf.
-> >>>
-> >>> This patchset is rebased to v6.3-rc1 and it is tested by running seve=
-ral
-> >>> vector programs simultaneously. It delivers signals correctly in a te=
-st
-> >>> where we can see a valid ucontext_t in a signal handler, and a correc=
-t V
-> >>> context returing back from it. And the ptrace interface is tested by
-> >>> PTRACE_{GET,SET}REGSET. Lastly, KVM is tested by running above tests =
-in
-> >>> a guest using the same kernel image. All tests are done on an rv64gcv
-> >>> virt QEMU.
-> >>>
-> >>> Note: please apply the patch at [4] due to a regression introduced by
-> >>> commit 596ff4a09b89 ("cpumask: re-introduce constant-sized cpumask
-> >>> optimizations") before testing the series.
-> >>>
-> >>> Source tree:
-> >>> https://github.com/sifive/riscv-linux/tree/riscv/for-next/vector-v18
-> >>
-> >> After some offlist discussions, we might have a identified a
-> >> potential libc->application ABI break.
-> >>
-> >> Given an application that does custom task scheduling via a signal
-> >> handler. The application binary is not vector aware, but libc is. Libc
-> >> is using vector registers for memcpy. It's an "old application, new
-> >> library, new kernel"-scenario.
-> >>
-> >>  | ...
-> >>  | struct context *p1_ctx;
-> >>  | struct context *p2_ctx;
-> >>  |
-> >>  | void sighandler(int sig, siginfo_t *info, void *ucontext)
-> >>  | {
-> >>  |   if (p1_running)
-> >>  |     switch_to(p1_ctx, p2_ctx);
-> >>  |   if (p2_running)
-> >>  |     switch_to(p2_ctx, p1_ctx);
-> >>  | }
-> >>  |
-> >>  | void p1(void)
-> >>  | {
-> >>  |   memcpy(foo, bar, 17);
-> >>  | }
-> >>  |
-> >>  | void p2(void)
-> >>  | {
-> >>  |   ...
-> >>  | }
-> >>  | ...
-> >>
-> >> The switch_to() function schedules p1() and p2(). E.g., the
-> >> application (assumes that it) saves the complete task state from
-> >> sigcontext (ucontext) to p1_ctx, and restores sigcontext to p2_ctx, so
-> >> when sigreturn is called, p2() is running, and p1() has been
-> >> interrupted.
-> >>
-> >> The "old application" which is not aware of vector, is now run on a
-> >> vector enabled kernel/glibc.
-> >>
-> >> Assume that the sighandler is hit, and p1() is in the middle of the
-> >> vector memcpy. The switch_to() function will not save the vector
-> >> state, and next time p2() is scheduled to run it will have incorrect
-> >> machine state.
->
-> Thanks for writing this up, and sorry I've dropped the ball a few times o=
-n
-> describing it.
->
-> >> Now:
-> >>
-> >> Is this an actual or theoretical problem (i.e. are there any
-> >> applications in the wild)? I'd be surprised if it would not be the
-> >> latter...
->
-> I also have no idea.  It's kind of odd to say "nobody cares about the
-> ABI break" when we can manifest it with some fairly simple example, but
-> I'd bet that nobody cares.
->
-> >> Regardless, a kernel knob for disabling vector (sysctl/prctl) to avoid
-> >> these kind of breaks is needed (right?). Could this knob be a
-> >> follow-up patch to the existing v18 series?
-> >>
-> >> Note that arm64 does not suffer from this with SVE, because the defaul=
-t
-> >> vector length (vl=3D=3D0/128b*32) fits in the "legacy" sigcontext.
-> >
-> > Andy, to clarify from the patchwork call; In
-> > Documentation/arm64/sve.rst:
-> >
-> > There's a per-process prctl (section 6), and a system runtime conf
-> > (section 9).
+On 20/04/2023 3:49 pm, Alex Williamson wrote:
+> On Thu, 20 Apr 2023 15:19:55 +0100
+> Robin Murphy <robin.murphy@arm.com> wrote:
+> 
+>> On 2023-04-20 15:15, Alex Williamson wrote:
+>>> On Thu, 20 Apr 2023 06:52:01 +0000
+>>> "Tian, Kevin" <kevin.tian@intel.com> wrote:
+>>>    
+>>>> Hi, Alex,
+>>>>
+>>>> Happen to see that we may have inconsistent policy about RMRR devices cross
+>>>> different vendors.
+>>>>
+>>>> Previously only Intel supports RMRR. Now both AMD/ARM have similar thing,
+>>>> AMD IVMD and ARM RMR.
+>>>
+>>> Any similar requirement imposed by system firmware that the operating
+>>> system must perpetually maintain a specific IOVA mapping for the device
+>>> should impose similar restrictions as we've implemented for VT-d
+>>> RMMR[1].  Thanks,
+>>
+>> Hmm, does that mean that vfio_iommu_resv_exclude() going to the trouble
+>> of punching out all the reserved region holes isn't really needed?
+> 
+> While "Reserved Memory Region Reporting", might suggest that the ranges
+> are simply excluded, RMRR actually require that specific mappings are
+> maintained for ongoing, side-band activity, which is not compatible
+> with the ideas that userspace owns the IOVA address space for the
+> device or separation of host vs userspace control of the device.  Such
+> mappings suggest things like system health monitoring where the
+> influence of a user-owned device can easily extend to a system-wide
+> scope if the user it able to manipulate the device to deny that
+> interaction or report bad data.
+> 
+> If these ARM and AMD tables impose similar requirements, we should
+> really be restricting devices encumbered by such requirements from
+> userspace access as well.  Thanks,
 
-Thanks for pointing me out!
+Indeed the primary use-case behind Arm's RMRs was certain devices like 
+big complex RAID controllers which have already been started by UEFI 
+firmware at boot and have live in-memory data which needs to be preserved.
 
->
-> I think if we want to play it safe WRT the ABI break, then we can
-> essentially just do the same thing.  It'll be a much bigger cliff for us
-> because we have no space for the V extension, but that was just a
-> mistake and there's nothing we can do about it.
+However, my point was more that if it's a VFIO policy that any device 
+with an IOMMU_RESV_DIRECT reservation is not suitable for userspace 
+assignment, then vfio_iommu_type1_attach_group() already has everything 
+it would need to robustly enforce that policy itself. It seems silly to 
+me for it to expect the IOMMU driver to fail the attach, then go ahead 
+and dutifully punch out direct regions if it happened not to. A couple 
+of obvious trivial tweaks and there could be no dependency on driver 
+behaviour at all, other than correctly reporting resv_regions to begin with.
 
-I understand the concern. It is good to provide a way to have explicit
-controls of Vector rather than do nothing if such ABI break happens.
-As for implementation details, do you think a system-wide  sysctl
-alone is enough? Or, do we also need a prctl for per-process control?
+If we think this policy deserves to go beyond VFIO and userspace, and 
+it's reasonable that such devices should never be allowed to attach to 
+any other kind of kernel-owned unmanaged domain either, then we can 
+still trivially enforce that in core IOMMU code. I really see no need 
+for it to be in drivers at all.
 
->
-> > Bj=C3=B6rn
+Thanks,
+Robin.
+
+> 
+> Alex
+> 
+>>> [1]https://access.redhat.com/sites/default/files/attachments/rmrr-wp1.pdf
+>>>    
+>>>> RMRR identity mapping was considered unsafe (except for USB/GPU) for
+>>>> device assignment:
+>>>>
+>>>> /*
+>>>>    * There are a couple cases where we need to restrict the functionality of
+>>>>    * devices associated with RMRRs.  The first is when evaluating a device for
+>>>>    * identity mapping because problems exist when devices are moved in and out
+>>>>    * of domains and their respective RMRR information is lost.  This means that
+>>>>    * a device with associated RMRRs will never be in a "passthrough" domain.
+>>>>    * The second is use of the device through the IOMMU API.  This interface
+>>>>    * expects to have full control of the IOVA space for the device.  We cannot
+>>>>    * satisfy both the requirement that RMRR access is maintained and have an
+>>>>    * unencumbered IOVA space.  We also have no ability to quiesce the device's
+>>>>    * use of the RMRR space or even inform the IOMMU API user of the restriction.
+>>>>    * We therefore prevent devices associated with an RMRR from participating in
+>>>>    * the IOMMU API, which eliminates them from device assignment.
+>>>>    *
+>>>>    * In both cases, devices which have relaxable RMRRs are not concerned by this
+>>>>    * restriction. See device_rmrr_is_relaxable comment.
+>>>>    */
+>>>> static bool device_is_rmrr_locked(struct device *dev)
+>>>> {
+>>>> 	if (!device_has_rmrr(dev))
+>>>> 		return false;
+>>>>
+>>>> 	if (device_rmrr_is_relaxable(dev))
+>>>> 		return false;
+>>>>
+>>>> 	return true;
+>>>> }
+>>>>
+>>>> Then non-relaxable RMRR device is rejected when doing attach:
+>>>>
+>>>> static int intel_iommu_attach_device(struct iommu_domain *domain,
+>>>>                                        struct device *dev)
+>>>> {
+>>>> 	struct device_domain_info *info = dev_iommu_priv_get(dev);
+>>>> 	int ret;
+>>>>
+>>>> 	if (domain->type == IOMMU_DOMAIN_UNMANAGED &&
+>>>> 	    device_is_rmrr_locked(dev)) {
+>>>> 		dev_warn(dev, "Device is ineligible for IOMMU domain attach due to platform RMRR requirement.  Contact your platform vendor.\n");
+>>>> 		return -EPERM;
+>>>> 	}
+>>>> 	...
+>>>> }
+>>>>
+>>>> But I didn't find the same check in AMD/ARM driver at a glance.
+>>>>
+>>>> Did I overlook some arch difference which makes RMRR device safe in
+>>>> those platforms or is it a gap to be fixed?
+>>>>
+>>>> Thanks
+>>>> Kevin
+>>>>   
+>>>    
+>>
+> 
