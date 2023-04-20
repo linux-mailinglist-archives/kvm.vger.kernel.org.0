@@ -2,158 +2,217 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D83916E985C
-	for <lists+kvm@lfdr.de>; Thu, 20 Apr 2023 17:34:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A9D0C6E9927
+	for <lists+kvm@lfdr.de>; Thu, 20 Apr 2023 18:06:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231839AbjDTPea (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 Apr 2023 11:34:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36268 "EHLO
+        id S234571AbjDTQGw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 Apr 2023 12:06:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60288 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230089AbjDTPe2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 20 Apr 2023 11:34:28 -0400
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2042.outbound.protection.outlook.com [40.107.92.42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 143141988;
-        Thu, 20 Apr 2023 08:34:27 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Ma417743dtsDmg2+T0tlDXCr9Lo8Oj1McB+SwxdaUe1yPAQL9yv08lsCveQcE/E32MZfqKyjKz/IymhU5ArOvEoEPxTgGRCrqvIo3jmd//M/ML3zzvlBP4tI5X/Bx30gBduaRTxxQHSOnSIIRaLRgwD1Lqs41CLM2LMYiW60ZJgOW1bEggH0PYOQ1ASRM2uhqF5vEOgHB4QDDQNEZfugzR+VISOqL58hgY6vr9DzIE+dYSW8ui+cT46Grk233fm8+2mq443iKpuQU1C7CPWGyjiQTile8pWuHLtiKWz7jeMNVEzhWzAVHohR39V6Oec2d7m5lJnOjg2JD2LQXzaWGg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=B7NY9YplT3wWg4WzfOkXA5Ow2s0RE5Vz6nxAbXENYPI=;
- b=XKPJR8JWn/mGBdupxlSnhgMhQZTYLgPKwVm5szU13DD7KH2beBYjdeczRZil/sTJ9lJI+mX4Dn9yU4WjF4aywFXZDDkhaH9xa4ZmZCWVi/4snhkm4tVg5yn62lKw32+LAAeBZruxtsmWa5k2TmiJHRh9P7DRCNIZZSC5L0tx/bdKFkCGAF1FcAKunJCq6WIvfyLuqpUhvBK2x8T4ZeF2tDR88sl4D2NG3dp6g0wQJG9Esehai9AKQaN5rqEQaFXE8er1AYW+mOwgL704LVyV0P6h0DVJlromSSLqXcE4uJkwtwQC/lHXI7IuqJgowoNJwKG39aTkNg5PolQRiF0BvQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=B7NY9YplT3wWg4WzfOkXA5Ow2s0RE5Vz6nxAbXENYPI=;
- b=nDzNY87MaLMudAl+qw9ZCo5NznN0vc7Ozune44qfAy2lljSDinEjc2WN58VKuEaieHygS/IvhFdRcMAoJE3vrbKhHZtAdoAthHrcOt49PhDR/ET0noBdfUJuRzppHMjFJRCJyy3Nk8dGDm3/cMdGzTlLzfmDEWPFeXFc9pXGCFP8YsCyw5lIbCgT4eOXKD1leW5YgpuNY1G4+K6xvsBK2qcB+pNOqgmJUK4Z9CMvaZyX6Ip1sl96IuiN8JNSUFj5cSgH/2cTeaIZVT19Vkxp1QjEyTeqwi5JU6G+pJJGvRCaOlw9sane4bbgHLquyWy1TfiF8Cffzg0YWJ6pkI0DAA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by SJ2PR12MB8010.namprd12.prod.outlook.com (2603:10b6:a03:4c7::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6298.45; Thu, 20 Apr
- 2023 15:34:23 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::f7a7:a561:87e9:5fab]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::f7a7:a561:87e9:5fab%6]) with mapi id 15.20.6319.020; Thu, 20 Apr 2023
- 15:34:23 +0000
-Date:   Thu, 20 Apr 2023 12:34:21 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     "Tian, Kevin" <kevin.tian@intel.com>
-Cc:     "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
-        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-        Lu Baolu <baolu.lu@linux.intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Nicolin Chen <nicolinc@nvidia.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>
-Subject: Re: [PATCH v3 03/17] iommufd: Replace the hwpt->devices list with
- iommufd_group
-Message-ID: <ZEFbfY/88a4PZ2Ny@nvidia.com>
-References: <0-v3-61d41fd9e13e+1f5-iommufd_alloc_jgg@nvidia.com>
- <3-v3-61d41fd9e13e+1f5-iommufd_alloc_jgg@nvidia.com>
- <BN9PR11MB5276E42B629C3E5AF019B6748C879@BN9PR11MB5276.namprd11.prod.outlook.com>
- <ZDVvLbSN2TR1Er1c@nvidia.com>
- <BN9PR11MB527661A29A11AE1E7FC655018C9B9@BN9PR11MB5276.namprd11.prod.outlook.com>
- <ZDaTY6OX8oR5w0uV@nvidia.com>
- <BN9PR11MB52762841AAA04A24F76A743C8C989@BN9PR11MB5276.namprd11.prod.outlook.com>
- <ZDlVtcwhV2G8ZKao@nvidia.com>
- <BN9PR11MB5276DA68C8318CC3433252CA8C639@BN9PR11MB5276.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <BN9PR11MB5276DA68C8318CC3433252CA8C639@BN9PR11MB5276.namprd11.prod.outlook.com>
-X-ClientProxiedBy: BL0PR02CA0015.namprd02.prod.outlook.com
- (2603:10b6:207:3c::28) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+        with ESMTP id S234545AbjDTQGs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 20 Apr 2023 12:06:48 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC08035B5;
+        Thu, 20 Apr 2023 09:06:14 -0700 (PDT)
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 33KFvETd010195;
+        Thu, 20 Apr 2023 16:06:14 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=EbpI/971aKQfwoUvmM1GD9ss9LDLGXJ1/0UKFtBMPZA=;
+ b=kspLhK0uP2SBy197aYvkKMzoaVnYrb0WZU4Trd3hhyOGBXWObCrqkzV+wuPDMOf3Qa4R
+ o4ux8SscLOumjAbjRlcpLFJ3Kr5YDe5SDb9b/FfAgvWP/VLfpPWFCR0MeSMcs1SuLvT5
+ WESEh/SSQq64Mevly/BFu2F4p9tg5KXX46rHULqZWO+tZsQv4CPiVlFlGGQSQ0F3PnS4
+ ODIGszcSQdmcBqSwzkfaeQm13PzIBoHyjYUVsjJeABUWnUKURjZCfMM3QwMYNm/0ScIv
+ cqxw++B77C6FIJuyumCf2WGjN5ndoWbWSls77SKMKRrxd6yaOBxGBh0wN1VmYWE839SZ cw== 
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3q37p2ttpj-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 20 Apr 2023 16:06:12 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 33K7hBGc018922;
+        Thu, 20 Apr 2023 16:01:56 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+        by ppma03ams.nl.ibm.com (PPS) with ESMTPS id 3pykj6kh6v-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 20 Apr 2023 16:01:56 +0000
+Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
+        by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 33KG1nd132178582
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 20 Apr 2023 16:01:50 GMT
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D19CB20049;
+        Thu, 20 Apr 2023 16:01:49 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 9EF6120040;
+        Thu, 20 Apr 2023 16:01:49 +0000 (GMT)
+Received: from p-imbrenda.boeblingen.de.ibm.com (unknown [9.152.224.56])
+        by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Thu, 20 Apr 2023 16:01:49 +0000 (GMT)
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     kvm@vger.kernel.org
+Cc:     borntraeger@de.ibm.com, nrb@linux.ibm.com, nsg@linux.ibm.com,
+        frankja@linux.ibm.com, mhartmay@linux.ibm.com,
+        kvm390-list@tuxmaker.boeblingen.de.ibm.com,
+        linux-s390@vger.kernel.org
+Subject: [PATCH v1 1/1] KVM: s390: pv: fix asynchronous teardown for small VMs
+Date:   Thu, 20 Apr 2023 18:01:49 +0200
+Message-Id: <20230420160149.51728-1-imbrenda@linux.ibm.com>
+X-Mailer: git-send-email 2.39.2
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|SJ2PR12MB8010:EE_
-X-MS-Office365-Filtering-Correlation-Id: 0d20ff24-035e-4172-73a4-08db41b4b6e2
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: un9Q0bLkNsp9qlFbF+BAX7NAoTjBbUEuHolXUi7NdgJ9lCp37fBiz6stPuMV/mx8AIwbqFtp1oVCS7Jb1yF74CZ82zDqvTXqBMZNbDIH9TXE7gHh2yZcXHIdq4Z/oIksIwja/k8jdmyGYu+lCigyRHLSSZIJGRcmJb4ilRRr0u/6ARM0YhAuTO6qujVnp8/MQuo8MLi54osnVcwZgsLRrXgVQlHyOhGadjeC6xsbRGKPgnJpNJRHS35xIPFGH29AmxAxQzrPXKqOC5WVGZLF5lQxZ/hwqc4DHgGqDVWPyYBVmEFy/pIeCSzShQxXWQ1P1LBYnhe3mSgQJMzot28ouT9UCZi76PY/keVbwSETA9yV+oz8ODhipAlAtD799teNxaHovJXgOKV6o/CnerpBrcEMb30FAAbif8fNO274XHE8RsgSBFgSpnlfBl3xHSUO37S2lY6YVFUvboQouOXLs0m+qL2Z38UaXlj+jUI1cdjloMIZn7eO5/ob/TfQIhlpcMaCFqsWlP9yHejtuE9d/LvAx3j4e46/w1vh6+FM8MLj+FNJqV5XcUhVvjrqMD4B
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(366004)(376002)(346002)(136003)(39860400002)(396003)(451199021)(26005)(6506007)(6512007)(316002)(186003)(41300700001)(478600001)(6486002)(36756003)(54906003)(86362001)(66556008)(66946007)(66476007)(6916009)(4326008)(2616005)(38100700002)(5660300002)(8936002)(8676002)(2906002)(4744005)(83380400001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?eGWw2/f75U8trl3OqhciCt2r1vnOLn45YB7/o8MiDOyiZXT0OqbFift6PMUe?=
- =?us-ascii?Q?GOTdv/8sOAtLrYtupCT4Jf+ri1l3CPszXyVxaTnINdw3JhPBXffm/C21Qdua?=
- =?us-ascii?Q?/uArocAXDhnINhqFSO6q6OIC1dNEZnwXfSzo2okm02T4BG1HpSdc6bkqzObL?=
- =?us-ascii?Q?Eoc2ocw9H9M2srii5BKhmx/o7+GNOAdYU0X6jtMA2TT3mRbXgdQ4YqIdDSSL?=
- =?us-ascii?Q?ozM+yAsq8myzK7lYEU54KV8eV/yY3ofLBizy4PVWFLibZ4SBxrNNjwPSx52r?=
- =?us-ascii?Q?XkVPV/IA0ntg3HeUVLuzJG+TmhQBbefJBBisxHBf0gKWtysbhmV6bpvGS3GA?=
- =?us-ascii?Q?fJlwnONryag+VNwdRMC03ZUotjLqaXYj9Uydc1rf9jAplVOSEWby7myqYDxv?=
- =?us-ascii?Q?/ZJaWukKLSGq3KV7GJrSz2jeVvIpL5d+IizM4x4fEo86mBkEoLgTm8sYJnkr?=
- =?us-ascii?Q?zRdwx7xgjMLth/0L+ZLYuMnkDJQ2TOpLYWfQ5/owDUPqM786O1AT8PeBUq/x?=
- =?us-ascii?Q?JjRwMObwswo8uJmIiF57z7GPNaS2/DDQgH4sKl8ME4K75AiH/J7Z8khAPuX5?=
- =?us-ascii?Q?WrUR5vh2F+xjHDHsr4AnrY2mxOK7Rpg+xaHIWtI7ba9hDytzd3jUfotbrnK1?=
- =?us-ascii?Q?uJpM16TVkqTgJD5cx0XmG2XNSCrfHH5xv/fTjo49NuacS27YHCUrS56Nh575?=
- =?us-ascii?Q?qI5z62hvswgq5i97/wFlZnO3U0xHWjoIjOJqlaJHp1Ci6Co3M8hJgk2K0oR6?=
- =?us-ascii?Q?lZURwqwF3S0C53e3MKctDpFlfQCusIg4eobOPtrhfPqzWUcriaFpEXfx2AAO?=
- =?us-ascii?Q?PMusbn6BGKqyuK4IIR0Xgx5WX3VrTLCT1IYjrIu4ga4+52OhxzYE5zrj5Xkd?=
- =?us-ascii?Q?XUM+cK+EHHYq9T18Lol6zsGS3enJxmfW1gWReTfPMnnP9x7xn3RDqN64maoz?=
- =?us-ascii?Q?1XZL/kYzLo0oLb89ltS+TqiHXToy1j3gGWcbVnx2gA9Huscqbg3nxN/3oPEY?=
- =?us-ascii?Q?iVIU44YADB34rn8dpONBkrKT++JAwmoOnzJqU9lgqgGvlyskAZW+jRcDYYcW?=
- =?us-ascii?Q?Ba1Id1/tk6ngLLZDVNhttGiIYqENZD8ZEEZkaQXCaT3hXl2+IEjr8/P1FKuS?=
- =?us-ascii?Q?RUdx3ll6BNr4YOKV3FCy73WpKuivsXbmE8fndaE3Sf1buTorFTQoIL50OrUh?=
- =?us-ascii?Q?/jZlPExtvHdtos+VYVtrPUwwH+5na7GW99BBDAtiXkPnrslLqKQj9z46xp65?=
- =?us-ascii?Q?yM94YxPUHYctK0991dYNgexiIJogYEE5i88B3DDTtjq6T14BkVrfHzXaPe/9?=
- =?us-ascii?Q?rXlsshbu7iOHuXzDaFiqF5Zei9+LlEzEsvq2Qwxxn1WnrxLDO4yWHuIBL+hL?=
- =?us-ascii?Q?fMRTQ79mqWNwUl4zmVwtv/xdocfcPGK5yzBFwuLfPBpc5Zs/az3C76KwlqqA?=
- =?us-ascii?Q?yMnrcWY5v0zrRYbBiD/MethJTN8eGRbKW2SF3G6lHIciujFZoXt57FDaoer/?=
- =?us-ascii?Q?9QSM1DtpzbRB0LCBzVkZWMIgKfJ7kTKcZcWd8PjYvQN5JHCoQfNdXLpC9dXG?=
- =?us-ascii?Q?lSUDjObbwzD6LEu7+vUiAwsADaGtEwz9q+9ZGFBi?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0d20ff24-035e-4172-73a4-08db41b4b6e2
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Apr 2023 15:34:23.1170
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 0DvFEWkCXElkIwZA77i0I3dnmtqC9QXEwP8Mr/ihb45fUy8+41HgmaN13jWc/8ub
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR12MB8010
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: -O1gnL8R0qLXRgSVmcYpN8tpJ853b4mk
+X-Proofpoint-ORIG-GUID: -O1gnL8R0qLXRgSVmcYpN8tpJ853b4mk
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
+ definitions=2023-04-20_12,2023-04-20_01,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0
+ lowpriorityscore=0 adultscore=0 impostorscore=0 spamscore=0
+ priorityscore=1501 mlxlogscore=999 malwarescore=0 mlxscore=0 clxscore=1015
+ suspectscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2303200000 definitions=main-2304200132
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Apr 20, 2023 at 06:15:16AM +0000, Tian, Kevin wrote:
-> > > which internal list? group has a list for attached devices but regarding
-> > > to hwpt it's stored in a single field igroup->hwpt.
-> > 
-> > It is added to
-> > 
-> > 	list_add_tail(&hwpt->hwpt_item, &hwpt->ioas->hwpt_list);
-> 
-> this is called under ioas->mutex.
+On machines without the Destroy Secure Configuration Fast UVC, the
+topmost level of page tables is set aside and freed asynchronously
+as last step of the asynchronous teardown.
 
-Yes.. But.. that is troubled too, we are calling destroy under the
-same mutex, there is a missing a fault point to catch it in the test,
-and hwpt_alloc doesn't have the lock wide enough :\
+Each gmap has a host_to_guest radix tree mapping host (userspace)
+addresses (with 1M granularity) to gmap segment table entries (pmds).
 
-So you want to argue that it is safe to do this:
+If a guest is smaller than 2GB, the topmost level of page tables is the
+segment table (i.e. there are only 2 levels). Replacing it means that
+the pointers in the host_to_guest mapping would become stale and cause
+all kinds of nasty issues.
 
-   mutex_lock(&ioas->mutex);
-   alloc
-   attach
-   detach
-   abort
-   mutex_unlock(&ioas->mutex);
+This patch fixes the issue by synchronously destroying all guests with
+only 2 levels of page tables in kvm_s390_pv_set_aside. This will
+speed up the process and avoid the issue altogether.
 
-Even if attach/detach lock/unlock the group mutex during their cycle?
+Update s390_replace_asce so it refuses to replace segment type ASCEs.
 
-It seems OK..
+Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+Fixes: fb491d5500a7 ("KVM: s390: pv: asynchronous destroy for reboot")
+---
+ arch/s390/kvm/pv.c  | 35 ++++++++++++++++++++---------------
+ arch/s390/mm/gmap.c |  7 +++++++
+ 2 files changed, 27 insertions(+), 15 deletions(-)
 
-I don't see any places that Though I don't much like the locking
-pattern where we succeed attach, drop all the locks and the fail and
-then relock and do error unwind.. Sketchy..
+diff --git a/arch/s390/kvm/pv.c b/arch/s390/kvm/pv.c
+index e032ebbf51b9..ceb8cb628d62 100644
+--- a/arch/s390/kvm/pv.c
++++ b/arch/s390/kvm/pv.c
+@@ -39,6 +39,7 @@ struct pv_vm_to_be_destroyed {
+ 	u64 handle;
+ 	void *stor_var;
+ 	unsigned long stor_base;
++	bool small;
+ };
+ 
+ static void kvm_s390_clear_pv_state(struct kvm *kvm)
+@@ -318,7 +319,11 @@ int kvm_s390_pv_set_aside(struct kvm *kvm, u16 *rc, u16 *rrc)
+ 	if (!priv)
+ 		return -ENOMEM;
+ 
+-	if (is_destroy_fast_available()) {
++	if ((kvm->arch.gmap->asce & _ASCE_TYPE_MASK) == _ASCE_TYPE_SEGMENT) {
++		/* No need to do things asynchronously for VMs under 2GB */
++		res = kvm_s390_pv_deinit_vm(kvm, rc, rrc);
++		priv->small = true;
++	} else if (is_destroy_fast_available()) {
+ 		res = kvm_s390_pv_deinit_vm_fast(kvm, rc, rrc);
+ 	} else {
+ 		priv->stor_var = kvm->arch.pv.stor_var;
+@@ -335,7 +340,8 @@ int kvm_s390_pv_set_aside(struct kvm *kvm, u16 *rc, u16 *rrc)
+ 		return res;
+ 	}
+ 
+-	kvm_s390_destroy_lower_2g(kvm);
++	if (!priv->small)
++		kvm_s390_destroy_lower_2g(kvm);
+ 	kvm_s390_clear_pv_state(kvm);
+ 	kvm->arch.pv.set_aside = priv;
+ 
+@@ -418,7 +424,10 @@ int kvm_s390_pv_deinit_cleanup_all(struct kvm *kvm, u16 *rc, u16 *rrc)
+ 
+ 	/* If a previous protected VM was set aside, put it in the need_cleanup list */
+ 	if (kvm->arch.pv.set_aside) {
+-		list_add(kvm->arch.pv.set_aside, &kvm->arch.pv.need_cleanup);
++		if (((struct pv_vm_to_be_destroyed *)kvm->arch.pv.set_aside)->small)
++			kfree(kvm->arch.pv.set_aside);
++		else
++			list_add(kvm->arch.pv.set_aside, &kvm->arch.pv.need_cleanup);
+ 		kvm->arch.pv.set_aside = NULL;
+ 	}
+ 
+@@ -485,26 +494,22 @@ int kvm_s390_pv_deinit_aside_vm(struct kvm *kvm, u16 *rc, u16 *rrc)
+ 	if (!p)
+ 		return -EINVAL;
+ 
+-	/* When a fatal signal is received, stop immediately */
+-	if (s390_uv_destroy_range_interruptible(kvm->mm, 0, TASK_SIZE_MAX))
++	if (p->small)
+ 		goto done;
+-	if (kvm_s390_pv_dispose_one_leftover(kvm, p, rc, rrc))
+-		ret = -EIO;
+-	kfree(p);
+-	p = NULL;
+-done:
+-	/*
+-	 * p is not NULL if we aborted because of a fatal signal, in which
+-	 * case queue the leftover for later cleanup.
+-	 */
+-	if (p) {
++	/* When a fatal signal is received, stop immediately */
++	if (s390_uv_destroy_range_interruptible(kvm->mm, 0, TASK_SIZE_MAX)) {
+ 		mutex_lock(&kvm->lock);
+ 		list_add(&p->list, &kvm->arch.pv.need_cleanup);
+ 		mutex_unlock(&kvm->lock);
+ 		/* Did not finish, but pretend things went well */
+ 		*rc = UVC_RC_EXECUTED;
+ 		*rrc = 42;
++		return 0;
+ 	}
++	if (kvm_s390_pv_dispose_one_leftover(kvm, p, rc, rrc))
++		ret = -EIO;
++done:
++	kfree(p);
+ 	return ret;
+ }
+ 
+diff --git a/arch/s390/mm/gmap.c b/arch/s390/mm/gmap.c
+index 5a716bdcba05..2267cf9819b2 100644
+--- a/arch/s390/mm/gmap.c
++++ b/arch/s390/mm/gmap.c
+@@ -2833,6 +2833,9 @@ EXPORT_SYMBOL_GPL(s390_unlist_old_asce);
+  * s390_replace_asce - Try to replace the current ASCE of a gmap with a copy
+  * @gmap: the gmap whose ASCE needs to be replaced
+  *
++ * If the ASCE is a SEGMENT type then this function will return -EINVAL,
++ * otherwise the pointers in the host_to_guest radix tree will keep pointing
++ * to the wrong pages, causing use-after-free and memory corruption.
+  * If the allocation of the new top level page table fails, the ASCE is not
+  * replaced.
+  * In any case, the old ASCE is always removed from the gmap CRST list.
+@@ -2847,6 +2850,10 @@ int s390_replace_asce(struct gmap *gmap)
+ 
+ 	s390_unlist_old_asce(gmap);
+ 
++	/* Replacing segment type ASCEs would cause serious issues */
++	if ((gmap->asce & _ASCE_TYPE_MASK) == _ASCE_TYPE_SEGMENT)
++		return -EINVAL;
++
+ 	page = alloc_pages(GFP_KERNEL_ACCOUNT, CRST_ALLOC_ORDER);
+ 	if (!page)
+ 		return -ENOMEM;
+-- 
+2.39.2
 
-Jason
