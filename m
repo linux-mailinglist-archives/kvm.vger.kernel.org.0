@@ -2,315 +2,166 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 943216EB3E3
-	for <lists+kvm@lfdr.de>; Fri, 21 Apr 2023 23:50:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6E3B36EB3EC
+	for <lists+kvm@lfdr.de>; Fri, 21 Apr 2023 23:52:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233714AbjDUVuE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Apr 2023 17:50:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41450 "EHLO
+        id S233715AbjDUVwo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Apr 2023 17:52:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42494 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233724AbjDUVtv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Apr 2023 17:49:51 -0400
+        with ESMTP id S233704AbjDUVwm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Apr 2023 17:52:42 -0400
 Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8B8DDD
-        for <kvm@vger.kernel.org>; Fri, 21 Apr 2023 14:49:49 -0700 (PDT)
-Received: by mail-pg1-x54a.google.com with SMTP id 41be03b00d2f7-5187bd3d365so2345534a12.3
-        for <kvm@vger.kernel.org>; Fri, 21 Apr 2023 14:49:49 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39C0F1BF8
+        for <kvm@vger.kernel.org>; Fri, 21 Apr 2023 14:52:40 -0700 (PDT)
+Received: by mail-pg1-x54a.google.com with SMTP id 41be03b00d2f7-51c18f5ae60so1524338a12.2
+        for <kvm@vger.kernel.org>; Fri, 21 Apr 2023 14:52:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1682113789; x=1684705789;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=p7cetrvLKSRH9Q0XivzSmZyLoL8IS5OHMZStKa6lsTY=;
-        b=cRW3iY54MsV/uSQYhCEhAWc/m9IOMhOiDrMj4LGEkUIm4U6Iyoplhs08YwS3BzxDwE
-         Orq2zrv8ASDM/5M/bgXJmzhkCsthT/cxK+agw6wnMoWSpeMSJZe+MTKTSLkwKQIgaQ9O
-         F2CpIwv+z2tp7z5fT3WgCa9Zqis9fJYgWshlK/Gk4xOz7BOEeNCUn6r4yzxYeSrStXd1
-         mUT+WZYg7eCf1Oi+XSZ9/sFcQt7kP1hgh9E90vlUEVNja7tpqzZCF5PcqdSHA+iEhf8q
-         HnvBsJMf/vQ9fvxkYdiKUKNiPDfdgC4NzZSiN4vKJQ3mgxQc2p1eNBJ4OpCAs8WZVeLo
-         qZ9Q==
+        d=google.com; s=20221208; t=1682113960; x=1684705960;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=HMsg4nmJr9Osyznf6S6bHdZ6vDeDrUhREwLX6UGd8T8=;
+        b=XvsxnBgk29sdZsc1idOkaA4saQHitnYVxiuWLfPvQYA4gJjUA0Eax8NP6eYtNqR3ee
+         4M8iRSBz8QogM+10jEopg0WJoIMroxEwWvwhMZRwvcP/9YKwEsjVGEx1aOcV3VuY1m3u
+         uB/uYY4qESrX6Z1m+VLGFlwzsogxd1ySHWqe47vhDg5k3/1sBaGMDfYD2pGKCFu9gwtt
+         Dq86ic1cx9+DkwWMjUW0JEvgSaer47uaocf45slybIAtKLOjRYw89z5uJSu1zmCzvupR
+         QfbyNrb0tff8312OlkakXbsa3/e1zQC4Nfuu1vW9A7vNuaB9WIVw1FF32p495ltI+1vA
+         ynmA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682113789; x=1684705789;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=p7cetrvLKSRH9Q0XivzSmZyLoL8IS5OHMZStKa6lsTY=;
-        b=IC3KMZuckWrqxIQgpxeuh5tv9UNQouxy4AzN9vTWaYaQQvfnqJj9Mb66njcvS2lv/z
-         W48RyMHlxEL7XpYRU47aEh6ncTF974ohZjMjAiyj0WeUsL5zxbSr64lfNKi9YWC9SCZE
-         FKAEACmPOYtcFG/xk47xBu8rzqomTyKPRgOgO86dxMjdtDBTIklF7zk6IXYZ56jvskDB
-         hOf8LIgokvc6fvP5x9Mg9/vgmGTyVhoDqv7opJW4yIuRYvjuMb1cMym+GROicgpI96jZ
-         DafnA09tQ9rPjvWAu5nMMc8kZQfO/qvysAH9cNgOc9PmDYRTLuiFxolJmnKiJUIepOrW
-         /+Qw==
-X-Gm-Message-State: AAQBX9dxntVPlqCDszSK2bXqSBj8oiJ+a2lyJj+ATXN+1VOOl7eInHTP
-        QV/Ol0aOlifj9e6SYNVEH+WC0zTCTc4=
-X-Google-Smtp-Source: AKy350bsadFZl60XlSJ7N4EJ0FmTtxReihz8/+sXFdGiaVG68qnXvx7nQ7JWbdwYHKbf2oAos1RdNXdj6TU=
+        d=1e100.net; s=20221208; t=1682113960; x=1684705960;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=HMsg4nmJr9Osyznf6S6bHdZ6vDeDrUhREwLX6UGd8T8=;
+        b=WLg4Kbk45f8Z3KFUORYtaLPPwQondgdTNlt+SO3UEB4pp6gBR1l2eP9i0Bf21AvQmi
+         5RhsntwDiXwes1rWcGSm+sW0FvTLdRBD/2mlHEgjCxW20jiWZxo4MUzvdudc+etyloAi
+         TycsSolFbpxUswmmYne3lirdfbU9LWKDP8OCXBi6WlAk2iZU/4jBuAkX/tOowzLSgNCT
+         Zb688FIlCFE+F1rDJxX3ZbcokQpr9J6REUEyDX59AMxho+ferStkqBGWZ2VU+2zSJWSy
+         J7jgymvduyQj66uwFOkvm5EvkKmoAAPS3DXabFR7r0GIUvSm9uh/BnHE7nPYHaqsRXJq
+         x/mQ==
+X-Gm-Message-State: AAQBX9c3fFuXcH9uN13EdTfyq1itQlDTWQ9L0H+uqTdJy2JYK0Y3qsga
+        REH6WHzFR7JVOPUtHlM+2+OZ8XbL2Gg=
+X-Google-Smtp-Source: AKy350bNGZ0YwNCOoK47veefne8EuX49Y7h0rsJEJN50Jsq85FTnEuNaK8IUJn8w9z2rCbRF2CTWUSGfbYs=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a65:668d:0:b0:513:a748:c7d5 with SMTP id
- b13-20020a65668d000000b00513a748c7d5mr941948pgw.3.1682113789525; Fri, 21 Apr
- 2023 14:49:49 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri, 21 Apr 2023 14:49:46 -0700
+ (user=seanjc job=sendgmr) by 2002:a63:551e:0:b0:524:e24a:df56 with SMTP id
+ j30-20020a63551e000000b00524e24adf56mr523655pgb.5.1682113959758; Fri, 21 Apr
+ 2023 14:52:39 -0700 (PDT)
+Date:   Fri, 21 Apr 2023 14:52:38 -0700
+In-Reply-To: <000000000000a0bc2b05f9dd7fab@google.com>
 Mime-Version: 1.0
-X-Mailer: git-send-email 2.40.0.634.g4ca3ef3211-goog
-Message-ID: <20230421214946.2571580-1-seanjc@google.com>
-Subject: [PATCH v2] KVM: x86: Preserve TDP MMU roots until they are explicitly invalidated
+References: <000000000000a0bc2b05f9dd7fab@google.com>
+Message-ID: <ZEMFpqxvOHd2kZiu@google.com>
+Subject: Re: [syzbot] [kvm?] WARNING in kvm_tdp_mmu_invalidate_all_roots
 From:   Sean Christopherson <seanjc@google.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>,
-        Ben Gardon <bgardon@google.com>,
-        David Matlack <dmatlack@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+To:     syzbot <syzbot+094a74444165dbcd3a54@syzkaller.appspotmail.com>
+Cc:     bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        mingo@redhat.com, pbonzini@redhat.com,
+        syzkaller-bugs@googlegroups.com, tglx@linutronix.de, x86@kernel.org
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+        URIBL_BLOCKED,USER_IN_DEF_DKIM_WL autolearn=no autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Preserve TDP MMU roots until they are explicitly invalidated by gifting
-the TDP MMU itself a reference to a root when it is allocated.  Keeping a
-reference in the TDP MMU fixes a flaw where the TDP MMU exhibits terrible
-performance, and can potentially even soft-hang a vCPU, if a vCPU
-frequently unloads its roots, e.g. when KVM is emulating SMI+RSM.
+On Fri, Apr 21, 2023, syzbot wrote:
+> Hello,
+> 
+> syzbot found the following issue on:
+> 
+> HEAD commit:    d3e1ee0e67e7 Add linux-next specific files for 20230421
+> git tree:       linux-next
+> console output: https://syzkaller.appspot.com/x/log.txt?x=16ac3de0280000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=53c789efbcc06cf6
+> dashboard link: https://syzkaller.appspot.com/bug?extid=094a74444165dbcd3a54
+> compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
+> 
+> Unfortunately, I don't have any reproducer for this issue yet.
+> 
+> Downloadable assets:
+> disk image: https://storage.googleapis.com/syzbot-assets/c558a9e1fe6a/disk-d3e1ee0e.raw.xz
+> vmlinux: https://storage.googleapis.com/syzbot-assets/2ec100a34c4c/vmlinux-d3e1ee0e.xz
+> kernel image: https://storage.googleapis.com/syzbot-assets/1afcd9936dc1/bzImage-d3e1ee0e.xz
+> 
+> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> Reported-by: syzbot+094a74444165dbcd3a54@syzkaller.appspotmail.com
+> 
+> ------------[ cut here ]------------
+> WARNING: CPU: 0 PID: 12623 at arch/x86/kvm/mmu/tdp_mmu.c:943 kvm_tdp_mmu_invalidate_all_roots+0x2bd/0x370 arch/x86/kvm/mmu/tdp_mmu.c:943
+> Modules linked in:
+> CPU: 0 PID: 12623 Comm: syz-executor.3 Not tainted 6.3.0-rc7-next-20230421-syzkaller #0
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/30/2023
+> RIP: 0010:kvm_tdp_mmu_invalidate_all_roots+0x2bd/0x370 arch/x86/kvm/mmu/tdp_mmu.c:943
+> Call Trace:
+>  <TASK>
+>  kvm_mmu_uninit_tdp_mmu+0x16/0x100 arch/x86/kvm/mmu/tdp_mmu.c:48
+>  kvm_mmu_uninit_vm+0x6a/0x70 arch/x86/kvm/mmu/mmu.c:6239
+>  kvm_arch_destroy_vm+0x369/0x490 arch/x86/kvm/x86.c:12465
+>  kvm_create_vm arch/x86/kvm/../../../virt/kvm/kvm_main.c:1245 [inline]
+>  kvm_dev_ioctl_create_vm arch/x86/kvm/../../../virt/kvm/kvm_main.c:5017 [inline]
+>  kvm_dev_ioctl+0x11be/0x1bb0 arch/x86/kvm/../../../virt/kvm/kvm_main.c:5059
+>  vfs_ioctl fs/ioctl.c:51 [inline]
+>  __do_sys_ioctl fs/ioctl.c:870 [inline]
+>  __se_sys_ioctl fs/ioctl.c:856 [inline]
+>  __x64_sys_ioctl+0x197/0x210 fs/ioctl.c:856
+>  do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+>  do_syscall_64+0x39/0xb0 arch/x86/entry/common.c:80
+>  entry_SYSCALL_64_after_hwframe+0x63/0xcd
 
-When KVM emulates something that invalidates _all_ TLB entries, e.g. SMI
-and RSM, KVM unloads all of the vCPUs roots (KVM keeps a small per-vCPU
-cache of previous roots).  Unloading roots is a simple way to ensure KVM
-flushes and synchronizes all roots for the vCPU, as KVM flushes and syncs
-when allocating a "new" root (from the vCPU's perspective).
+Gah, kvm->users_count is elevated when the VM is destroyed if creation fails,
+but mmu_lock isn't held in that case, and lockdep yells.  This particular bug is
+effectively a false positive, nothing else holds a reference to the VM.
 
-In the shadow MMU, KVM keeps track of all shadow pages, roots included, in
-a per-VM hash table.  Unloading a shadow MMU root just wipes it from the
-per-vCPU cache; the root is still tracked in the per-VM hash table.  When
-KVM loads a "new" root for the vCPU, KVM will find the old, unloaded root
-in the per-VM hash table.
+However, syzbot found another bug that _is_ a real problem (hasn't been reported
+upstream yet for whatever reason).  Not holding mmu_lock during "real" VM destruction
+is problematic because walking the list can race with the asynchronous worker
+deleting and freeing from the list.
 
-Unlike the shadow MMU, the TDP MMU doesn't track "inactive" roots in a
-per-VM structure, where "active" in this case means a root is either
-in-use or cached as a previous root by at least one vCPU.  When a TDP MMU
-root becomes inactive, i.e. the last vCPU reference to the root is put,
-KVM immediately frees the root (asterisk on "immediately" as the actual
-freeing may be done by a worker, but for all intents and purposes the root
-is gone).
+Posted a fixed version[*] that should resolve both issues by protecting the walk
+with RCU.
 
-The TDP MMU behavior is especially problematic for 1-vCPU setups, as
-unloading all roots effectively frees all roots.  The issue is mitigated
-to some degree in multi-vCPU setups as a different vCPU usually holds a
-reference to an unloaded root and thus keeps the root alive, allowing the
-vCPU to reuse its old root after unloading (with a flush+sync).
+[*] https://lore.kernel.org/all/20230421214946.2571580-1-seanjc@google.com
 
-The TDP MMU flaw has been known for some time, as until very recently,
-KVM's handling of CR0.WP also triggered unloading of all roots.  The
-CR0.WP toggling scenario was eventually addressed by not unloading roots
-when _only_ CR0.WP is toggled, but such an approach doesn't Just Work
-for emulating SMM as KVM must emulate a full TLB flush on entry and exit
-to/from SMM.  Given that the shadow MMU plays nice with unloading roots
-at will, teaching the TDP MMU to do the same is far less complex than
-modifying KVM to track which roots need to be flushed before reuse.
+==================================================================
+BUG: KASAN: slab-use-after-free in kvm_tdp_mmu_invalidate_all_roots+0x2e3/0x370 arch/x86/kvm/mmu/tdp_mmu.c:945
+Read of size 8 at addr ffff88801c8cf948 by task syz-executor.1/17012
 
-Note, preserving all possible TDP MMU roots is not a concern with respect
-to memory consumption.  Now that the role for direct MMUs doesn't include
-information about the guest, e.g. CR0.PG, CR0.WP, CR4.SMEP, etc., there
-are _at most_ six possible roots (where "guest_mode" here means L2):
-
-  1. 4-level !SMM !guest_mode
-  2. 4-level  SMM !guest_mode
-  3. 5-level !SMM !guest_mode
-  4. 5-level  SMM !guest_mode
-  5. 4-level !SMM guest_mode
-  6. 5-level !SMM guest_mode
-
-And because each vCPU can track 4 valid roots, a VM can already have all
-6 root combinations live at any given time.  Not to mention that, in
-practice, no sane VMM will advertise different guest.MAXPHYADDR values
-across vCPUs, i.e. KVM won't ever use both 4-level and 5-level roots for
-a single VM.  Furthermore, the vast majority of modern hypervisors will
-utilize EPT/NPT when available, thus the guest_mode=%true cases are also
-unlikely to be utilized.
-
-Reported-by: Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>
-Link: https://lore.kernel.org/all/959c5bce-beb5-b463-7158-33fc4a4f910c@linux.microsoft.com
-Link: https://lkml.kernel.org/r/20220209170020.1775368-1-pbonzini%40redhat.com
-Link: https://lore.kernel.org/all/20230322013731.102955-1-minipli@grsecurity.net
-Link: https://lore.kernel.org/all/000000000000a0bc2b05f9dd7fab@google.com
-Cc: Ben Gardon <bgardon@google.com>
-Cc: David Matlack <dmatlack@google.com>
-Cc: stable@vger.kernel.org
-Tested-by: Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
-
-David, I dropped your review as adding RCU protection is trivial from a code
-perspective, but at the same time quite subtle.
-
-I did keep Jeremi's tag, because protecting the walk with RCU during
-invalidation isn't really relevant to what Jeremi was testing (performance and
-core functionality).
-
- arch/x86/kvm/mmu/tdp_mmu.c | 106 ++++++++++++++-----------------------
- 1 file changed, 41 insertions(+), 65 deletions(-)
-
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index b2fca11b91ff..9925f8e39ea6 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.c
-+++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -40,7 +40,17 @@ static __always_inline bool kvm_lockdep_assert_mmu_lock_held(struct kvm *kvm,
- 
- void kvm_mmu_uninit_tdp_mmu(struct kvm *kvm)
- {
--	/* Also waits for any queued work items.  */
-+	/*
-+	 * Invalidate all roots, which besides the obvious, schedules all roots
-+	 * for zapping and thus puts the TDP MMU's reference to each root, i.e.
-+	 * ultimately frees all roots.
-+	 */
-+	kvm_tdp_mmu_invalidate_all_roots(kvm);
-+
-+	/*
-+	 * Destroying a workqueue also first flushes the workqueue, i.e. no
-+	 * need to invoke kvm_tdp_mmu_zap_invalidated_roots().
-+	 */
- 	destroy_workqueue(kvm->arch.tdp_mmu_zap_wq);
- 
- 	WARN_ON(atomic64_read(&kvm->arch.tdp_mmu_pages));
-@@ -116,16 +126,6 @@ static void tdp_mmu_schedule_zap_root(struct kvm *kvm, struct kvm_mmu_page *root
- 	queue_work(kvm->arch.tdp_mmu_zap_wq, &root->tdp_mmu_async_work);
- }
- 
--static inline bool kvm_tdp_root_mark_invalid(struct kvm_mmu_page *page)
--{
--	union kvm_mmu_page_role role = page->role;
--	role.invalid = true;
--
--	/* No need to use cmpxchg, only the invalid bit can change.  */
--	role.word = xchg(&page->role.word, role.word);
--	return role.invalid;
--}
--
- void kvm_tdp_mmu_put_root(struct kvm *kvm, struct kvm_mmu_page *root,
- 			  bool shared)
- {
-@@ -134,45 +134,12 @@ void kvm_tdp_mmu_put_root(struct kvm *kvm, struct kvm_mmu_page *root,
- 	if (!refcount_dec_and_test(&root->tdp_mmu_root_count))
- 		return;
- 
--	WARN_ON(!is_tdp_mmu_page(root));
--
- 	/*
--	 * The root now has refcount=0.  It is valid, but readers already
--	 * cannot acquire a reference to it because kvm_tdp_mmu_get_root()
--	 * rejects it.  This remains true for the rest of the execution
--	 * of this function, because readers visit valid roots only
--	 * (except for tdp_mmu_zap_root_work(), which however
--	 * does not acquire any reference itself).
--	 *
--	 * Even though there are flows that need to visit all roots for
--	 * correctness, they all take mmu_lock for write, so they cannot yet
--	 * run concurrently. The same is true after kvm_tdp_root_mark_invalid,
--	 * since the root still has refcount=0.
--	 *
--	 * However, tdp_mmu_zap_root can yield, and writers do not expect to
--	 * see refcount=0 (see for example kvm_tdp_mmu_invalidate_all_roots()).
--	 * So the root temporarily gets an extra reference, going to refcount=1
--	 * while staying invalid.  Readers still cannot acquire any reference;
--	 * but writers are now allowed to run if tdp_mmu_zap_root yields and
--	 * they might take an extra reference if they themselves yield.
--	 * Therefore, when the reference is given back by the worker,
--	 * there is no guarantee that the refcount is still 1.  If not, whoever
--	 * puts the last reference will free the page, but they will not have to
--	 * zap the root because a root cannot go from invalid to valid.
-+	 * The TDP MMU itself holds a reference to each root until the root is
-+	 * explicitly invalidated, i.e. the final reference should be never be
-+	 * put for a valid root.
- 	 */
--	if (!kvm_tdp_root_mark_invalid(root)) {
--		refcount_set(&root->tdp_mmu_root_count, 1);
--
--		/*
--		 * Zapping the root in a worker is not just "nice to have";
--		 * it is required because kvm_tdp_mmu_invalidate_all_roots()
--		 * skips already-invalid roots.  If kvm_tdp_mmu_put_root() did
--		 * not add the root to the workqueue, kvm_tdp_mmu_zap_all_fast()
--		 * might return with some roots not zapped yet.
--		 */
--		tdp_mmu_schedule_zap_root(kvm, root);
--		return;
--	}
-+	KVM_BUG_ON(!is_tdp_mmu_page(root) || !root->role.invalid, kvm);
- 
- 	spin_lock(&kvm->arch.tdp_mmu_pages_lock);
- 	list_del_rcu(&root->link);
-@@ -320,7 +287,14 @@ hpa_t kvm_tdp_mmu_get_vcpu_root_hpa(struct kvm_vcpu *vcpu)
- 	root = tdp_mmu_alloc_sp(vcpu);
- 	tdp_mmu_init_sp(root, NULL, 0, role);
- 
--	refcount_set(&root->tdp_mmu_root_count, 1);
-+	/*
-+	 * TDP MMU roots are kept until they are explicitly invalidated, either
-+	 * by a memslot update or by the destruction of the VM.  Initialize the
-+	 * refcount to two; one reference for the vCPU, and one reference for
-+	 * the TDP MMU itself, which is held until the root is invalidated and
-+	 * is ultimately put by tdp_mmu_zap_root_work().
-+	 */
-+	refcount_set(&root->tdp_mmu_root_count, 2);
- 
- 	spin_lock(&kvm->arch.tdp_mmu_pages_lock);
- 	list_add_rcu(&root->link, &kvm->arch.tdp_mmu_roots);
-@@ -946,32 +920,34 @@ void kvm_tdp_mmu_zap_invalidated_roots(struct kvm *kvm)
- /*
-  * Mark each TDP MMU root as invalid to prevent vCPUs from reusing a root that
-  * is about to be zapped, e.g. in response to a memslots update.  The actual
-- * zapping is performed asynchronously, so a reference is taken on all roots.
-- * Using a separate workqueue makes it easy to ensure that the destruction is
-- * performed before the "fast zap" completes, without keeping a separate list
-- * of invalidated roots; the list is effectively the list of work items in
-- * the workqueue.
-+ * zapping is performed asynchronously.  Using a separate workqueue makes it
-+ * easy to ensure that the destruction is performed before the "fast zap"
-+ * completes, without keeping a separate list of invalidated roots; the list is
-+ * effectively the list of work items in the workqueue.
-  *
-- * Get a reference even if the root is already invalid, the asynchronous worker
-- * assumes it was gifted a reference to the root it processes.  Because mmu_lock
-- * is held for write, it should be impossible to observe a root with zero refcount,
-- * i.e. the list of roots cannot be stale.
-- *
-- * This has essentially the same effect for the TDP MMU
-- * as updating mmu_valid_gen does for the shadow MMU.
-+ * Note, the asynchronous worker is gifted the TDP MMU's reference.
-+ * See kvm_tdp_mmu_get_vcpu_root_hpa().
-  */
- void kvm_tdp_mmu_invalidate_all_roots(struct kvm *kvm)
- {
- 	struct kvm_mmu_page *root;
- 
--	lockdep_assert_held_write(&kvm->mmu_lock);
--	list_for_each_entry(root, &kvm->arch.tdp_mmu_roots, link) {
--		if (!root->role.invalid &&
--		    !WARN_ON_ONCE(!kvm_tdp_mmu_get_root(root))) {
-+	/*
-+	 * Note!  mmu_lock isn't held when destroying the VM!  There can't be
-+	 * other references to @kvm, i.e. nothing else can invalidate roots,
-+	 * but walking the list of roots does need to be guarded against roots
-+	 * being deleted by the asynchronous zap worker.
-+	 */
-+	rcu_read_lock();
-+
-+	list_for_each_entry_rcu(root, &kvm->arch.tdp_mmu_roots, link) {
-+		if (!root->role.invalid) {
- 			root->role.invalid = true;
- 			tdp_mmu_schedule_zap_root(kvm, root);
- 		}
- 	}
-+
-+	rcu_read_unlock();
- }
- 
- /*
-
-base-commit: 62cf1e941a1169a5e8016fd8683d4d888ab51e01
--- 
-2.40.0.634.g4ca3ef3211-goog
-
+CPU: 0 PID: 17012 Comm: syz-executor.1 Not tainted 6.3.0-rc7-next-20230421-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/30/2023
+Call Trace:
+<TASK>
+__dump_stack lib/dump_stack.c:88 [inline]
+dump_stack_lvl+0xd9/0x150 lib/dump_stack.c:106
+print_address_description.constprop.0+0x2c/0x3c0 mm/kasan/report.c:351
+print_report mm/kasan/report.c:462 [inline]
+kasan_report+0x11c/0x130 mm/kasan/report.c:572
+kvm_tdp_mmu_invalidate_all_roots+0x2e3/0x370 arch/x86/kvm/mmu/tdp_mmu.c:945
+kvm_mmu_uninit_tdp_mmu+0x16/0x100 arch/x86/kvm/mmu/tdp_mmu.c:48
+kvm_mmu_uninit_vm+0x6a/0x70 arch/x86/kvm/mmu/mmu.c:6239
+kvm_arch_destroy_vm+0x369/0x490 arch/x86/kvm/x86.c:12465
+kvm_destroy_vm arch/x86/kvm/../../../virt/kvm/kvm_main.c:1313 [inline]
+kvm_put_kvm+0x4da/0xae0 arch/x86/kvm/../../../virt/kvm/kvm_main.c:1347
+kvm_vcpu_release+0x51/0x70 arch/x86/kvm/../../../virt/kvm/kvm_main.c:3846
+__fput+0x27c/0xa90 fs/file_table.c:321
+task_work_run+0x16f/0x270 kernel/task_work.c:179
+resume_user_mode_work include/linux/resume_user_mode.h:49 [inline]
+exit_to_user_mode_loop kernel/entry/common.c:171 [inline]
+exit_to_user_mode_prepare+0x210/0x240 kernel/entry/common.c:204
+__syscall_exit_to_user_mode_work kernel/entry/common.c:286 [inline]
+syscall_exit_to_user_mode+0x1d/0x50 kernel/entry/common.c:297
+do_syscall_64+0x46/0xb0 arch/x86/entry/common.c:86
+entry_SYSCALL_64_after_hwframe+0x63/0xcd
+RIP: 0033:0x7fd7a583e01b
+Code: 0f 05 48 3d 00 f0 ff ff 77 45 c3 0f 1f 40 00 48 83 ec 18 89 7c 24 0c e8 63 fc ff ff 8b 7c 24 0c 41 89 c0 b8 03 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 35 44 89 c7 89 44 24 0c e8 a1 fc ff ff 8b 44
+RSP: 002b:00007ffc821a2fb0 EFLAGS: 00000293 ORIG_RAX: 0000000000000003
+RAX: 0000000000000000 RBX: 000000000000000a RCX: 00007fd7a583e01b
+RDX: 0000000000000000 RSI: 00007fd7a5400000 RDI: 0000000000000009
+RBP: 00007fd7a59ad980 R08: 0000000000000000 R09: 0000000071612a4e
+R10: 0000000000000000 R11: 0000000000000293 R12: 000000000014ffb4
+R13: 00007ffc821a30b0 R14: 00007fd7a59ac050 R15: 0000000000000032
+</TASK>
