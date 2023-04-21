@@ -2,120 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C823E6EA3E4
-	for <lists+kvm@lfdr.de>; Fri, 21 Apr 2023 08:35:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AD64A6EA440
+	for <lists+kvm@lfdr.de>; Fri, 21 Apr 2023 09:05:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230052AbjDUGf0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Apr 2023 02:35:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38110 "EHLO
+        id S230361AbjDUHFG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Apr 2023 03:05:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49068 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229644AbjDUGfY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Apr 2023 02:35:24 -0400
-Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B14A62137
-        for <kvm@vger.kernel.org>; Thu, 20 Apr 2023 23:35:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1682058923; x=1713594923;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=5UAeF2BnuAnm42qH6pCRggxdwMM+FyZ00ll/cf3vjiM=;
-  b=Aj16XL5njX2Y+MLAZYRVlQcpvAgTY3zUcnlhC/ZT10twT8fJn65TfDgQ
-   kKP0Ed5UY8jsHKVsZlPanviBZfwAAiKBvfYHa+sChilt0AeFREcK1h4lb
-   kyqt/vCdUggNxqY+vfJHZodMdp9Be0u+8O//6HTEmEbUN19ZmjJzXF/W3
-   GHIar5Ff/VFlJq+HwfRpxCdPDc8SpHoK4/P8PUKY5Dn+Ae4+Qbyhfc0vN
-   IL2am3//2PEZwReRdgbctQAORIwO0clr/3S1gqo9LdBIkF1OQYs4++7tF
-   7mCeFAuAskwkT96oReXKqFD+o8gftdrm5iU4BbCZWiebaXGSyOdvI1mFa
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10686"; a="334802023"
-X-IronPort-AV: E=Sophos;i="5.99,214,1677571200"; 
-   d="scan'208";a="334802023"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Apr 2023 23:35:23 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10686"; a="722664190"
-X-IronPort-AV: E=Sophos;i="5.99,214,1677571200"; 
-   d="scan'208";a="722664190"
-Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.254.214.158]) ([10.254.214.158])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Apr 2023 23:35:21 -0700
-Message-ID: <5e229834-3e55-a580-d9f6-a5ffe971c567@linux.intel.com>
-Date:   Fri, 21 Apr 2023 14:35:18 +0800
+        with ESMTP id S229864AbjDUHFE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Apr 2023 03:05:04 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3D622106
+        for <kvm@vger.kernel.org>; Fri, 21 Apr 2023 00:04:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1682060658;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=sQJO95UUdAAV3qDudgkbVRn+BO9giFeNO5BoGKzmtSE=;
+        b=ULjCEbC1HHlThcDjwnDThnX6p1hLj+UvK5cpp59fReCbhct1pLkN/kXSvIwYYgpzQscL+a
+        ANp+f9KM1ryBgBNHYHJ7h5S5/At4tZFLYHe3V6icEpjJq6RVKesIMYjl/cjKXJOXqVgPCk
+        LFykfKvErKGFoB4lBi21QHFwM7+fLCk=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-577-hXcQdvBwP5e3qQuZyS6LVQ-1; Fri, 21 Apr 2023 03:04:17 -0400
+X-MC-Unique: hXcQdvBwP5e3qQuZyS6LVQ-1
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-2f40f52c604so844746f8f.0
+        for <kvm@vger.kernel.org>; Fri, 21 Apr 2023 00:04:17 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1682060656; x=1684652656;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=sQJO95UUdAAV3qDudgkbVRn+BO9giFeNO5BoGKzmtSE=;
+        b=W4Mik8QAcP3dez/lDXxUeNlK6ttDXfMyJyyudlGuG1ZnABtiQIkV6AJ4UENGdBrq6W
+         bkAuTsn/ncSGqva16Rz6VpyFUt/qGezFBUth42QXHbWMNUUOvbI5RPNs+kr/GHlD8UIs
+         HJ11vNlM9uInhyId9QiCMJXXxSc5jL/W/3w3SDaq3fJSfnqBCMM23hp3p2DbmwcgIPgx
+         HKvDLCgOPSM1P6CsyhrgJCtpcsjfZxhxwhCdpxyHW8TFpRKn4ORdRKylMw7zIVmyEj2P
+         LoY5WwRgc/kgNEdPLjvtpGuFGb/qr28G1+v7gtX5Vxb1sGlduawW5EfuAv/PFQv+03jm
+         KIBg==
+X-Gm-Message-State: AAQBX9fvlqTNiFajU8hZ5e4RSLzeTOBzJJU68+ptsaDcnX99XIMnSt5f
+        xZmVrVoW+zPF0VVs2nEqOZ0U/pd75ui4e7D0KXV9G7aHs7oXfJkeSQhPU77T8s3xR7TEasIL34w
+        mXEZpRe0Z/zcM
+X-Received: by 2002:adf:dc89:0:b0:2f7:faa0:3f19 with SMTP id r9-20020adfdc89000000b002f7faa03f19mr3151252wrj.28.1682060656347;
+        Fri, 21 Apr 2023 00:04:16 -0700 (PDT)
+X-Google-Smtp-Source: AKy350aHGati/ymbZ+DxYiF2QaRNV5Ff23Y+Nuvqn19bIrzunMC8mgm4mQ7wFV57Pwfs/5R1bDroBQ==
+X-Received: by 2002:adf:dc89:0:b0:2f7:faa0:3f19 with SMTP id r9-20020adfdc89000000b002f7faa03f19mr3151237wrj.28.1682060656055;
+        Fri, 21 Apr 2023 00:04:16 -0700 (PDT)
+Received: from redhat.com ([2.55.62.70])
+        by smtp.gmail.com with ESMTPSA id g2-20020a5d5402000000b002da75c5e143sm3732830wrv.29.2023.04.21.00.04.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 21 Apr 2023 00:04:15 -0700 (PDT)
+Date:   Fri, 21 Apr 2023 03:04:12 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     Andrey Smetanin <asmetanin@yandex-team.ru>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yc-core@yandex-team.ru
+Subject: Re: [PATCH] vhost_net: revert upend_idx only on retriable error
+Message-ID: <20230421030345-mutt-send-email-mst@kernel.org>
+References: <20221123102207.451527-1-asmetanin@yandex-team.ru>
+ <CACGkMEs3gdcQ5_PkYmz2eV-kFodZnnPPhvyRCyLXBYYdfHtNjw@mail.gmail.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Subject: Re: [PATCH v7 2/5] KVM: x86: Virtualize CR3.LAM_{U48,U57}
-To:     "Huang, Kai" <kai.huang@intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "Christopherson,, Sean" <seanjc@google.com>
-Cc:     "Guo, Xuelian" <xuelian.guo@intel.com>,
-        "robert.hu@linux.intel.com" <robert.hu@linux.intel.com>,
-        "Gao, Chao" <chao.gao@intel.com>
-References: <20230404130923.27749-1-binbin.wu@linux.intel.com>
- <20230404130923.27749-3-binbin.wu@linux.intel.com>
- <9c99eceaddccbcd72c5108f72609d0f995a0606c.camel@intel.com>
- <497514ed-db46-16b9-ca66-04985a687f2b@linux.intel.com>
- <7b296e6686bba77f81d1d8c9eaceb84bd0ef0338.camel@intel.com>
- <cc265df1-d4fc-0eb7-f6e8-494e98ece2d9@linux.intel.com>
- <BL1PR11MB5978D1FA3B572A119F5EF3A9F7989@BL1PR11MB5978.namprd11.prod.outlook.com>
-From:   Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <BL1PR11MB5978D1FA3B572A119F5EF3A9F7989@BL1PR11MB5978.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-6.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CACGkMEs3gdcQ5_PkYmz2eV-kFodZnnPPhvyRCyLXBYYdfHtNjw@mail.gmail.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Thu, Dec 01, 2022 at 05:01:58PM +0800, Jason Wang wrote:
+> On Wed, Nov 23, 2022 at 6:24 PM Andrey Smetanin
+> <asmetanin@yandex-team.ru> wrote:
+> >
+> > Fix possible virtqueue used buffers leak and corresponding stuck
+> > in case of temporary -EIO from sendmsg() which is produced by
+> > tun driver while backend device is not up.
+> >
+> > In case of no-retriable error and zcopy do not revert upend_idx
+> > to pass packet data (that is update used_idx in corresponding
+> > vhost_zerocopy_signal_used()) as if packet data has been
+> > transferred successfully.
+> 
+> Should we mark head.len as VHOST_DMA_DONE_LEN in this case?
+> 
+> Thanks
 
-On 4/13/2023 5:13 PM, Huang, Kai wrote:
->> On 4/13/2023 10:27 AM, Huang, Kai wrote:
->>> On Thu, 2023-04-13 at 09:36 +0800, Binbin Wu wrote:
->>>> On 4/12/2023 7:58 PM, Huang, Kai wrote:
->>>>
->> ...
->>>>>> +	root_gfn = (root_pgd & __PT_BASE_ADDR_MASK) >> PAGE_SHIFT;
->>>>> Or, should we explicitly mask vcpu->arch.cr3_ctrl_bits?  In this
->>>>> way, below
->>>>> mmu_check_root() may potentially catch other invalid bits, but in
->>>>> practice there should be no difference I guess.
->>>> In previous version, vcpu->arch.cr3_ctrl_bits was used as the mask.
->>>>
->>>> However, Sean pointed out that the return value of
->>>> mmu->get_guest_pgd(vcpu) could be
->>>> EPTP for nested case, so it is not rational to mask to CR3 bit(s) from EPTP.
->>> Yes, although EPTP's high bits don't contain any control bits.
->>>
->>> But perhaps we want to make it future-proof in case some more control
->>> bits are added to EPTP too.
->>>
->>>> Since the guest pgd has been check for valadity, for both CR3 and
->>>> EPTP, it is safe to mask off non-address bits to get GFN.
->>>>
->>>> Maybe I should add this CR3 VS. EPTP part to the changelog to make it
->>>> more undertandable.
->>> This isn't necessary, and can/should be done in comments if needed.
->>>
->>> But IMHO you may want to add more material to explain how nested cases
->>> are handled.
->> Do you mean about CR3 or others?
->>
-> This patch is about CR3, so CR3.
+Jason do you want to take over this work? It's been stuck
+in my inbox for a while.
 
-For nested case, I plan to add the following in the changelog:
-
-     For nested guest:
-     - If CR3 is intercepted, after CR3 handled in L1, CR3 will be 
-checked in
-       nested_vmx_load_cr3() before returning back to L2.
-     - For the shadow paging case (SPT02), LAM bits are also be handled 
-to form
-       a new shadow CR3 in vmx_load_mmu_pgd().
-
+> >
+> > Signed-off-by: Andrey Smetanin <asmetanin@yandex-team.ru>
+> > ---
+> >  drivers/vhost/net.c | 9 ++++++---
+> >  1 file changed, 6 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
+> > index 20265393aee7..93e9166039b9 100644
+> > --- a/drivers/vhost/net.c
+> > +++ b/drivers/vhost/net.c
+> > @@ -934,13 +934,16 @@ static void handle_tx_zerocopy(struct vhost_net *net, struct socket *sock)
+> >
+> >                 err = sock->ops->sendmsg(sock, &msg, len);
+> >                 if (unlikely(err < 0)) {
+> > +                       bool retry = err == -EAGAIN || err == -ENOMEM || err == -ENOBUFS;
+> > +
+> >                         if (zcopy_used) {
+> >                                 if (vq->heads[ubuf->desc].len == VHOST_DMA_IN_PROGRESS)
+> >                                         vhost_net_ubuf_put(ubufs);
+> > -                               nvq->upend_idx = ((unsigned)nvq->upend_idx - 1)
+> > -                                       % UIO_MAXIOV;
+> > +                               if (retry)
+> > +                                       nvq->upend_idx = ((unsigned)nvq->upend_idx - 1)
+> > +                                               % UIO_MAXIOV;
+> >                         }
+> > -                       if (err == -EAGAIN || err == -ENOMEM || err == -ENOBUFS) {
+> > +                       if (retry) {
+> >                                 vhost_discard_vq_desc(vq, 1);
+> >                                 vhost_net_enable_vq(net, vq);
+> >                                 break;
+> > --
+> > 2.25.1
+> >
 
