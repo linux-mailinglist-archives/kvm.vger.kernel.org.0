@@ -2,118 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F04336EB143
-	for <lists+kvm@lfdr.de>; Fri, 21 Apr 2023 19:58:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 77C596EB149
+	for <lists+kvm@lfdr.de>; Fri, 21 Apr 2023 19:59:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229591AbjDUR6H (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Apr 2023 13:58:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56706 "EHLO
+        id S233247AbjDUR74 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Apr 2023 13:59:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57824 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229476AbjDUR6G (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Apr 2023 13:58:06 -0400
+        with ESMTP id S233529AbjDUR7y (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Apr 2023 13:59:54 -0400
 Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2041.outbound.protection.outlook.com [40.107.236.41])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D800E7C
-        for <kvm@vger.kernel.org>; Fri, 21 Apr 2023 10:58:04 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 345AB19B7;
+        Fri, 21 Apr 2023 10:59:41 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=dGPDkCX9MyStpDscznW+sy49jyOeNHaKIqUi7EGAW/EJbEm2hRr9Sc70BySRfw5YQqgILIB8rEFZNTGOLdK3u+txdTMOaaVtRzR/TIrasYu9GbgxOhtZS/1yfM9Nqn6Pjy8PLG4BUu3VSK3Yj5V96oh5jgMifWK4RPfhlcsNqeukSTjArjlIYdMUSSFrNoNAU3DbxVpxXlauIAlyWf5j7TBYaQGD2nmzwqDddnV+b3kREbTTn4cvNcJQgG/q+T+blHxcD0E7qeVK1Tk9SdymRpg/IfL4crfxWdJ7jQ1DbH2I/UYHQN+oxb2z12MjmzK+KkrT/bMrzBFyjjy0jrAg3A==
+ b=BO6jWAUrORuLfdCCltLUR49i+jMSrvpR638pPEPUi35d04DO2Fc/x9HCruYB2PJxlyUMs26yBab9Avcb1H8cJgK4es/GXTkDK1LHUFi8e5UaGpG5hzOh6STYY0LJtNJpGXT9FeDEn01+32KOzVug79HyvFLdTHnzqAH/bXfzHz9mpaKqWGymaoAgM/RMLeu4H6wZbKTGjaqFs4S1+ZZs3XConZ+FShS0oFAe/cBzmjbH8djRG3I9T4hxBum018uO1ghC/gs2n3O197C2b2h2b6qSNeIMchR+6oQDJNiZmufEi8LgYJgSbJ1pZAqkf+Kn65Xj/JUmp9Hk4oau4z3zNw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=YoCrO3lAY+t8V7kdDsuC29/G3oAH8jLebAz5a6Q9NLU=;
- b=ZGCIxfeH9kMHp6nIJlRDkqRjwoQ7Qd8bCdshxpBh4xTiFjmUsERhvSzbhy/xxqK6yeGQ2FBwDzENToR/mWowfYn9CM0lhzC7Ohe4qqURY8hFzu3fW/YiUZtUbcqtIpGIE5hc1HUbZ4lfYkA87YNVQOub3kqyhkCXMlh5b4QMTsXZtFB36RHwrABHOoHWSCaTSYm8Tv7sYyPBJBeZwTTKQxHp5AaOG84z5h3D/zZkr/cpguPMVFxl76e4aaaS5nqbVT92vYFS+o+uyKJ8RSibEnZXVVskMmzHIHN5l+UjJ5PdEnIahywMmrUFc1vJDc9PZmmhgUjAX0EKYsYhYWgMgQ==
+ bh=TrF2sQhExta0LK2UsECr2eVyfC8lu+pRa6A1ZAzpThU=;
+ b=f2FE/iVekfG9ErDTd5PvOrq0fTZ1Qbasd4xVPFxpsL7GwxoSjWMR47L1T+wKk+vvhJmj5Hm2pFdam6Ukffxax8kc5feNQTbdtX8BHZj+fl+NMdMbSHg6YjwQ5IFv0vsHJs2/1TGah5Qty0/E1Z0QGTd7Q+LiZ7/OFQBYPXCdqCZtdoaSJLjKzytMvEdjRKed5Znhx/qsRYsC9JuhrYRbAe8r70Rz2gErdyk3stoo1CfCFMaX3hCJFSfQ9u1m91BBmLAp1Be86OBlOevTf8Okw3uHrIhqdgCLdo+xdXsatVi7qdg777t9rktgJu4cndtgYNAXK0yZf1inUVFcRU/NrA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
  dkim=pass header.d=nvidia.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=YoCrO3lAY+t8V7kdDsuC29/G3oAH8jLebAz5a6Q9NLU=;
- b=FD2NuV9zTA/abC6hD9zv4QiaLxCkUFu3M1w3kvY+qkSHVgUu8Hz7LJIl3HC17gFoHVuyMnK0ArKJR6QCV4yAMbFlxUOSF0IbxhX8qfy3hzPrJhlSfUbVjI2AWLfuqyDMgvhk4C463tVRP5YJjhQe8SprUH+MprTB3GR8Idp0/3WsaJKGUJSnvyoBbAraL1l/zVjQ/NSEr/O+IyGmqxlOVnqah9vqYHiHMhbp6vymsRDvChANnwo5B4ITje8CAoGmbtJxRgQj7k3Pxdl+GYlNcbPpL5IFOpY+uXj8dghhY8Il2IBiNa7WfNFpjteZ3zJGC9N1ZyrQ2DFTbdQDPWbuJw==
+ bh=TrF2sQhExta0LK2UsECr2eVyfC8lu+pRa6A1ZAzpThU=;
+ b=ST9lb6Zae+BAG2k2KeGCymcPuRKCSbbgyMuS+Y52uI9M73E44Wm89Aa5GbBCcTeExK0Kf9Wb+Ip7De0ZXa3WMRhEHKVSxko2OzfVr+G7ezFE/8fSMIDMyO9+wrXNtY9xeoyeWF03aFsPFMpxUWDOm+hEIy5aixteFMlrvjk73dzcCiFsj+5vAGRHihF3K/TnDGlcfxqvpESW5tl7HzUnb8jbg0LvE3+/paoMiuLz/J/CX6YGq2T+oHdg6z6XDg+2dR/G6Mk02rgcYjLrTgVRHQj2/mD40FbYW/ztYwljcyheDi0jTJlQsoKrOqNWLg56PICoV5KRa1j8NtZy7t7cNg==
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nvidia.com;
 Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by DM4PR12MB5246.namprd12.prod.outlook.com (2603:10b6:5:399::17) with
+ by PH7PR12MB6936.namprd12.prod.outlook.com (2603:10b6:510:1ba::7) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6319.22; Fri, 21 Apr
- 2023 17:58:02 +0000
+ 2023 17:59:38 +0000
 Received: from LV2PR12MB5869.namprd12.prod.outlook.com
  ([fe80::f7a7:a561:87e9:5fab]) by LV2PR12MB5869.namprd12.prod.outlook.com
  ([fe80::f7a7:a561:87e9:5fab%6]) with mapi id 15.20.6319.020; Fri, 21 Apr 2023
- 17:58:02 +0000
-Date:   Fri, 21 Apr 2023 14:58:01 -0300
+ 17:59:38 +0000
+Date:   Fri, 21 Apr 2023 14:59:37 -0300
 From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Robin Murphy <robin.murphy@arm.com>,
-        Nicolin Chen <nicolinc@nvidia.com>
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
+To:     Nicolin Chen <nicolinc@nvidia.com>
+Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>,
+        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
+        "will@kernel.org" <will@kernel.org>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "shameerali.kolothum.thodi@huawei.com" 
+        <shameerali.kolothum.thodi@huawei.com>,
+        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "iommu@lists.linux.dev" <iommu@lists.linux.dev>
-Subject: Re: RMRR device on non-Intel platform
-Message-ID: <ZELOqZliiwbG6l5K@nvidia.com>
-References: <BN9PR11MB5276E84229B5BD952D78E9598C639@BN9PR11MB5276.namprd11.prod.outlook.com>
- <20230420081539.6bf301ad.alex.williamson@redhat.com>
- <6cce1c5d-ab50-41c4-6e62-661bc369d860@arm.com>
- <20230420084906.2e4cce42.alex.williamson@redhat.com>
- <fd324213-8d77-cb67-1c52-01cd0997a92c@arm.com>
- <20230420154933.1a79de4e.alex.williamson@redhat.com>
- <ZEJ73s/2M4Rd5r/X@nvidia.com>
- <0aa4a107-57d0-6e5b-46e5-86dbe5b3087f@arm.com>
- <ZEKFdJ6yXoyFiHY+@nvidia.com>
- <fe7e20e5-9729-248d-ee03-c8b444a1b7c0@arm.com>
+        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH RFC v2 0/3] Add set_dev_data and unset_dev_data support
+Message-ID: <ZELPCTOEgU8XlhFh@nvidia.com>
+References: <cover.1681976394.git.nicolinc@nvidia.com>
+ <BN9PR11MB52764ED59905104D3A5A68C08C609@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <ZEI+LBkEeNZdJyTB@Asurada-Nvidia>
+ <BN9PR11MB5276C39E256CD4B922435E1C8C609@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <ZEJBldGXBNGEy9tV@Asurada-Nvidia>
+ <BN9PR11MB527693075725A13DB9EE18678C609@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <ZEJHPb1E1/eI8V6A@Asurada-Nvidia>
+ <ZEKLDzU8C2niNyOw@nvidia.com>
+ <ZELJ0uv4gGCPrDfX@Asurada-Nvidia>
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <fe7e20e5-9729-248d-ee03-c8b444a1b7c0@arm.com>
-X-ClientProxiedBy: MN2PR20CA0065.namprd20.prod.outlook.com
- (2603:10b6:208:235::34) To LV2PR12MB5869.namprd12.prod.outlook.com
+In-Reply-To: <ZELJ0uv4gGCPrDfX@Asurada-Nvidia>
+X-ClientProxiedBy: MN2PR18CA0022.namprd18.prod.outlook.com
+ (2603:10b6:208:23c::27) To LV2PR12MB5869.namprd12.prod.outlook.com
  (2603:10b6:408:176::16)
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|DM4PR12MB5246:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6f7e753c-cbf4-4c59-38d3-08db4291f337
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|PH7PR12MB6936:EE_
+X-MS-Office365-Filtering-Correlation-Id: 35056ff2-9d5f-4b98-73e2-08db42922c89
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: mgMwIybTlJABzfzl3d+hzS1ZfGdgXi31g4MBvWllmNdVhYlsjIbkhFX5xql49iRAYB5A7ZwN//TnrNcWA1smk4QYKQh8T7yLYlOvYe/LZUQW5NgI4Kr8r/Yn0hZQDl9Gr2hbVD/5H0D8IrOccTRhd/btDQCpMBRhOO04FMufby264y8m2e04CcgwO3z8QN2JfgnwBcII1FlEjw8exVeOblp09Xm/nc+kqaQpQxDgSN8D/w39b9ryBUHqv2CG/aJnz3gtEXKN6iKxYsaC//QkSIdd/1/bEDF0tbU+bE39VviKweylDDwkbazMZIuh6KHb8uvyERg+GusQN9cKiYuyWtlUCUgbTSri2HHnhIzeLnE58dzPHE7khiPZZoJGa4chi+c3OH+30bQxroiFb4e1MeVuhLF73LFYKgOcrVS/kguyR3EtQcYYreGnC2rzuPZkmenR4HBkyDak2nZSxdxoYDodTchO/uylfCbyHIiwNCBN2bkYqEjyCLC/DrLkZ7sfqEM2khzFWxqDUbk1Am405O1ztw9xoQxuTzVTWRQs4xM997t1ySAXvGqewujTG7rR
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(396003)(366004)(39860400002)(346002)(136003)(376002)(451199021)(110136005)(2616005)(6512007)(26005)(6506007)(36756003)(83380400001)(478600001)(54906003)(6486002)(86362001)(66556008)(6636002)(316002)(66946007)(66476007)(38100700002)(4326008)(66899021)(41300700001)(8936002)(8676002)(186003)(2906002)(5660300002);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: Y5oSOTQckIfa5QeqfAxoSeVXKqgiDeOuHBbl9xX6QUsEnH1A5SE/1+RdZgC20drk5zWM4PTZckNv4z3wrQyVldPUgPRnp5rh7rkkYQxAmw5fn7qtjwULUg4sr7YpGHKNAI2lOdBVTGXcv72e4XkHyKz/mTpeb9UId9aKCHT96OBgMdFP55lCCzm2355Bsu9AIaISvebIQUueGXfUNIf/63f3pOkFZikVBjw+Lo7xYzx7saydH+JFIK2pMzqJufvOpn2P5QK3NVxmL04p08X1w1J2dxJvsuaXQ0kvb+LXGDPG2kBed0pu5ymhGpGNzoUNfoXYALicjnGiLFzojjs0BPXQ+sNFXLr/BACRnY0PXK4chDl3s1Fp+CWNdUHlZFBrDh7XuRZgP89P2wDMVwhZEZqPe56ZEmCwCLqIw+iDmQHbLuPzKM3ZgLZVnih+Beb8Tr/qigYdbJMpqH2+h5xmijXhsBH7YrGEiPHkKB1C5kPiM0AZXf8th7hnqYkzGZgJkgE22Kur8YiHudKZ3pnFSNc22INGe9ReOph+1cJiTaB2b+4KMTvrPp0WCx1jB5RM
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(366004)(346002)(136003)(376002)(39860400002)(396003)(451199021)(186003)(6506007)(26005)(6512007)(4744005)(6486002)(38100700002)(6862004)(5660300002)(41300700001)(4326008)(2616005)(66476007)(6636002)(66946007)(8676002)(66556008)(7416002)(8936002)(54906003)(478600001)(37006003)(2906002)(316002)(86362001)(36756003);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?XoXHV/g+Kmc/ZT2J8hBIsDmKk04ZZi5HtdGWhnfTZQiYkjZ04nhYJp///hIf?=
- =?us-ascii?Q?sRxOPcH92SSTVA00dLBqtSr0qNs07L7IrxvSkbJzTxCUW05yVia3OyzRV+4f?=
- =?us-ascii?Q?M1yYHzke65zu3O2PO3gEVuFFtQdKdeTivvxiLLSfrQi93kr+Us4yaAFOIqJN?=
- =?us-ascii?Q?RSBDeF2Znkc2O6MoADcy2LLBpSQbs6dYD5xXzd8JwBOKE6TbINQQr9Xf2CUI?=
- =?us-ascii?Q?/UCl0PyI4VywIepUKAw2Ol1nh/rG/5ZWV9QHHWDuVXfBlx/riw4IupZE5VZx?=
- =?us-ascii?Q?k/t28ZPjJDotZXcA84YaLK5zFV/N/yY2qrkjUkGgnKO2gBrsvGVZQFDjeYpH?=
- =?us-ascii?Q?5JkJPT4kOL0Eb+6izVM7P7+VKtgRYwwYsIb9QGsr22/XcMsddW8Wa0ln2FZP?=
- =?us-ascii?Q?GP3rzdoZrlmSWfA8iNjtbwepyN4F4vPWicGRd+6g7PKpAt5arK9DqPaMUgHt?=
- =?us-ascii?Q?udXl9Ofpy0aw66jvhuvUKxK3tB9eKtjPlUIYJtETKfiByO4PMGCF5RYYSN2S?=
- =?us-ascii?Q?82962Lng9TIzo3e1OevH8roLDqc79Vwt6pXATDozPt8Aou7FISTFVWVh2Szj?=
- =?us-ascii?Q?tNDqMMYsdQwdiAK99J56SSelSXQ1XjcnuKI2dB/UEjyDhyPtpxSXvNop4QK4?=
- =?us-ascii?Q?utaaynTw2FVntrcRYc19ilSROVthEJJW4gWtQkh6wdrV1raOuNHQICzHq2qi?=
- =?us-ascii?Q?WBUNBNT6X7LejdZDSU3cs/a2GJDbbWkXQfSMW6ran31HQbgkzvjIe8fCo6UT?=
- =?us-ascii?Q?mT50eB7DXKdLgx7+kWbP8NgUsiBb10PMoDErzF59el9qslwajFKBPuwm3NUT?=
- =?us-ascii?Q?Y+cthJsucz77rVC3cJhrpONsNEDWXa46FNumygePJtHBYsinK2fg76Asvi7O?=
- =?us-ascii?Q?nI+MG63eCal2i4SCAMFwASZ6aFJHTVztr1TVvS0mI3NHvpz4+gMbeAQttPJt?=
- =?us-ascii?Q?qJoRAeF6tGh0Hx+GEpIIsm+7B6oU+tDnX8ViqiaTr5FBtZ3b7oIXmj3gsc3q?=
- =?us-ascii?Q?03QBB8VKQViqhjxRKn/SE+PxTWNiXETv524CWqqeJhkKy/EaC0qUdg9gfyv2?=
- =?us-ascii?Q?mtkH/N6HTBeoYagk9evd1NOsDD+9p3XUec3ApR1wW2CMd8TVoWywKFedZgrG?=
- =?us-ascii?Q?0cJ+8Kd4goOupsIjie8swwZzsPcNPJNXnF5vXTG9YR2Fu9WKvBONSijpRXT6?=
- =?us-ascii?Q?k5RhKHIFfa39L54vabh9zFrrsOW/JosYN8gp0NO8g5PPesiNGHa1EfdthjFj?=
- =?us-ascii?Q?q5k2/+AFdq74//dKzgUs82Vzgq4cK/BPsK/C90CjklXNSD7tWJJqfa6s5Lpl?=
- =?us-ascii?Q?esMWiBtSiUSOJmsaYCBZS1mNIhQOYI1P09+C6tShfqJ6WkdX2nExkrn8og5z?=
- =?us-ascii?Q?6g+TRGEy8wk4j8BClOkpFWbtKCPCS+kuVz0YYlymJLiOPWWGSpbLkMGkVddh?=
- =?us-ascii?Q?N0pdVmdBNaeQ/KW/RbucS1JB0E0fsttwp+ZqYD512vb4aHnwlUNR72aOjnxF?=
- =?us-ascii?Q?mbNvFRlNbf5Jqqx2oGKryI8SU3P5W5nYT5fvP4mn4WY2yHKHsc4r5eFzE4mu?=
- =?us-ascii?Q?3txztcxckTaACKAxbGVK3FIxL9d6aDcL3vOAIpPX?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?39VkWHZqd0M+Jex9jSD3e+z5YHhZvBsRJcbfZ0pDCaokOEviR4CrOoUWGCLt?=
+ =?us-ascii?Q?Jrv7HlYOD05UYw/QnbbnmykqJcLMEaZf82UMoKGArr22UnSmczXHKaM3YMzM?=
+ =?us-ascii?Q?iPV/bNsoAhYUH9/6UxFhsVNtwB1zjIi9OSWZduqUunPyVviUCsB6dmi9S4Gf?=
+ =?us-ascii?Q?4ayfwseKTvOlq00AtXtmhGRo30uAfy+doVHNgqu2UCN7DTvxo9EepFpZkg//?=
+ =?us-ascii?Q?BCGVvz45695ExCjbfn41UpOnu2uG3q06llPfHYTdTn9evovVISZclXpOQUfC?=
+ =?us-ascii?Q?azMja4p8ViOBXr4DENslmmvq+bNZaHbAoCtmD3ji3I/v9GPLpmB6XhGwOJh8?=
+ =?us-ascii?Q?gxjaye+N/2eN/XcNbIHYWQetBT/v67OLfo8QmiX1QG/RXdxJ/Lad4Pjqhy8W?=
+ =?us-ascii?Q?atItWmArcofhaolZVkR/MWHg5azHJ2LlPsX+yPvDraC5x0Y+mWdu7MYJK7kG?=
+ =?us-ascii?Q?3ZF2ShyQG1ke3G9lx1KdLJETPUJ/ahH/M3Ta0U41BVW6jzxCtORDKtNLRLq3?=
+ =?us-ascii?Q?ZTzbBOmk+keDij6Csvy4PxG1SBMnTMQtRQXpdu3zZR1yr+dG9R9LduslWxLU?=
+ =?us-ascii?Q?ocpKt/DmBoCMX/WliuoabfVWXH7vvfBeYsntJECp2+rGggc4hYA3VM9tHWnT?=
+ =?us-ascii?Q?bwAeF552HmR8+i3N//zd2Q45rkXg0yFoLCThHpg+COSCOSzUl9uOOjq6jMaS?=
+ =?us-ascii?Q?7XcSMyTzvb/ASQUO35R5sx7X8RQoEr5Y5++MdVH0NyONiyCOz4t6fVvl9TXy?=
+ =?us-ascii?Q?OhGGylfRHxPD11Lw59csQ4JIIDcYTrFKCtrb1ZKe6cTpTjhHxZUUiSBauJ4A?=
+ =?us-ascii?Q?hrHEMXfqcTmqeSStVbledGbzJiE2eBiNUkNyTai0vaor6MFyeGZ5ZM96Ki2X?=
+ =?us-ascii?Q?orcNyB01I7pqmmELUAorF/3eAwbipPeQIN+cAhIWVADmI6olB55yT9gpkaWE?=
+ =?us-ascii?Q?1h9HE/3qyLbpvW6882isMZAQn2TDvUNVuX3I+McSYoBYG5UAr3BNLbRWFtfo?=
+ =?us-ascii?Q?2CLaJHoy837yY9l40me4YhetbCof12bXIyImEjJtjq/ZUeYTRrnMoHuvt/Sv?=
+ =?us-ascii?Q?SuezugthfFogMQrpSveXLoUrz50enbaanSKyBjcPhWYiVK6n0ea40/ZljQj0?=
+ =?us-ascii?Q?9NVg88ZCWda3BneZ1xzlzHSZPha/BcSM8eAyoAOmlAfh9RQ+B2SSY94drVqa?=
+ =?us-ascii?Q?g/aRxX8OGAhnrL284BLKR9OFjwU+HaCo3JNtRk4VhZIHrkO5e0fmfhgr8yoL?=
+ =?us-ascii?Q?NK0vCE/7v5F4yLQX5osGZil4XBA9nQRSjPWY7+zukHyu5IQ/6lCjGQikHWKR?=
+ =?us-ascii?Q?zBrnNdU+K8Tf2oFoYpHr9KinTZjvbSNhe35Vvo9ZutOt23bAdogyUkjhX1Kk?=
+ =?us-ascii?Q?hT6u/+qAg+sULxT3EnWZJCnrdvnETCxMm/t2v4sFX8txEk8qLysS5JSkG/Zu?=
+ =?us-ascii?Q?/YrtQg8tzAe8dzU8pTJ3adcwGstyHFJgrcPEE+TnAylodaHSxXRwTWGPbfj0?=
+ =?us-ascii?Q?m/MQ7Q2sMH1UjkRGht2LjtdzRKZ1qcPF5uq2+nXioxZndF0SXIvDSBV7XGU1?=
+ =?us-ascii?Q?1bf3dM6nAOUdk6jJF/cB1mUqlMtXu4x6mE2G4pTj?=
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6f7e753c-cbf4-4c59-38d3-08db4291f337
+X-MS-Exchange-CrossTenant-Network-Message-Id: 35056ff2-9d5f-4b98-73e2-08db42922c89
 X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Apr 2023 17:58:02.2905
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Apr 2023 17:59:38.4328
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: uHt8LNanRML3KoU0fg1EJ11SwlPa7yzIAgagduegEIs7wK6Y8CYaQUznabxSoz4p
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB5246
+X-MS-Exchange-CrossTenant-UserPrincipalName: mebB7w/4yW5VWNr/TjLOhn9jOI9r74taliLvRtQeoQCnHnJdWaSPcNL4g3N44x9j
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB6936
 X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
         RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
@@ -125,156 +133,23 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Apr 21, 2023 at 06:22:37PM +0100, Robin Murphy wrote:
+On Fri, Apr 21, 2023 at 10:37:22AM -0700, Nicolin Chen wrote:
 
-> I think a slightly more considered and slightly less wrong version of that
-> idea is to mark it as IOMMU_RESV_MSI, and special-case direct-mapping those
-> on Arm (I believe it would technically be benign to do on x86 too, but might
-> annoy people with its pointlessness). However...
-
-I'd rather have a IOMMU_RESV_MSI_DIRECT and put the ARM special case
-in ARM code..
-
-> > On baremetal we have no idea what the platform put under that
-> > hardcoded address?
-> > 
-> > On VM we don't use the iommu_get_msi_cookie() flow because the GIC in
-> > the VM pretends it doesn't have an ITS page?  (did I get that right?)
+> How about the following piece? Needs a test with QEMU though..
 > 
-> No, that can't be right - PCIe devices have to support MSI or MSI-X, and
-> many of them won't support INTx at all, so if the guest wants to use
-> interrupts in general it must surely need to believe it has some kind of MSI
-> controller, 
+> static const size_t iommufd_device_data_size[] = {
+> 	[IOMMU_HW_INFO_TYPE_NONE] = 0,
+> 	[IOMMU_HW_INFO_TYPE_INTEL_VTD] = 0,
+> 	[IOMMU_HW_INFO_TYPE_ARM_SMMUV3] =
+> 		sizeof(struct iommu_device_data_arm_smmuv3),
+> };
 
-Yes..
+If we need more than one of these things we'll need a better
+solution..
 
-> which for practical purposes in this context means an ITS. 
+> 	rc = ops->set_dev_data_user(idev->dev, data);
 
-I haven't delved into it super detail, but.. my impression was..
+Where will the iommu driver store the vsid to sid xarray from these
+arguments?
 
-The ITS page only becomes relavent to the IOMMU layer if the actual
-IRQ driver calls iommu_dma_prepare_msi()
-
-And we have only these drivers that do so:
-
-drivers/irqchip/irq-gic-v2m.c:  err = iommu_dma_prepare_msi(info->desc,
-drivers/irqchip/irq-gic-v3-its.c:       err = iommu_dma_prepare_msi(info->desc, its->get_msi_base(its_dev));
-drivers/irqchip/irq-gic-v3-mbi.c:       err = iommu_dma_prepare_msi(info->desc,
-drivers/irqchip/irq-ls-scfg-msi.c:      err = iommu_dma_prepare_msi(info->desc, msi_data->msiir_addr);
-
-While, I *thought* that the vGIC in ARM uses
-
-drivers/irqchip/irq-gic-v4.c
-
-Which doesn't obviously call iommu_dma_prepare_msi() ?
-
-So while the SMMU driver will stick in a IOMMU_RESV_SW_MSI, and
-iommufd will call iommu_get_msi_cookie(), there is no matching call
-of iommu_dma_prepare_msi() - so it all effectively does nothing.
-
-Instead, again from what I understood, is that the IOMMU layer is
-expected to install the ITS page, not knowing it is an ITS page,
-because the ACPI creates a IOMMU_RESV_DIRECT.
-
-When the VM writes it totally-a-lie MSI address to the PCI MSI-X
-registers the hypervisor traps it and subsitutes, what it valiantly
-hopes, is the right address for the ITS in the VM's S1 IOMMU table
-based on the ACPI where it nicely asked the guest to keep this
-specific IOVA mapped.
-
-I'm not sure how the data bit works on ARM..
-
-> was the next thing I started wondering after the above - if the aim is to
-> direct-map the host's SW_MSI region to effectively pass through the S2 MSI
-> cookie, but you have the same Linux SMMU driver in the guest, isn't that
-> guest driver still going to add a conflicting SW_MSI region for the same
-> IOVA and confuse things?
-
-Oh probably yes. At least from iommufd perspective, it can resolve
-overlapping regions just fine though.
-
-> Ideally for nesting, the VMM would just tell us the IPA of where it's going
-> to claim the given device's associated MSI doorbell is, we map that to the
-> real underlying address at S2, then the guest can use its S1 cookie as
-> normal if it wants to, and the host doesn't have to rewrite addresses either
-> way. 
-
-Goodness yes, I'd love that.
-
-> that the nesting usage model inherently constrains the VMM's options for
-> emulating the IOMMU, would it be unreasonable to make our lives a lot easier
-> with some similar constraints around interrupts, and just not attempt to
-> support the full gamut of "emulate any kind of IRQ with any other kind of
-> IRQ" irqfd hilarity?
-
-Isn't that what GICv4 is?
-
-Frankly, I think something whent wrong with the GICv4 design. A purely
-virtualization focused GIC should not have continued to rely on the
-hypervisor trapping of the MSI-X writes. The guest should have had a
-real data value and a real physical ITS page.
-
-I can understand why we got here, because fixing *all* of that would
-be a big task and this is a small hack, but still... Yuk.
-
-But that is a whole other journey. There is work afoot to standardize
-some things would make MSI-X trapping impossible and more solidly
-force this issue, so I'm just hoping to keep the current mess going
-as-is right now..
-
-> > > MSI regions already represent "safe" direct mappings, either as an inherent
-> > > property of the hardware, or with an actual mapping maintained by software.
-> > > Also RELAXABLE is meant to imply that it is only needed until a driver takes
-> > > over the device, which at face value doesn't make much sense for interrupts.
-> > 
-> > I used "relxable" to suggest it is safe for userspace.
-> 
-> I know, but the subtlety is the reason *why* it's safe for userspace. Namely
-> that a VFIO driver has bound and reset (or at least taken control of) the
-> device, and thus it is assumed to no longer be doing whatever the boot
-> firmware left it doing, therefore the reserved region is assumed to no
-> longer be relevant, and from then on the requirement to preserve it can be
-> relaxed.
-
-IOMMU_RESV_MSI_DIRECT is probably the better name
-
-> >          unsigned long pg_size;
-> >          int ret = 0;
-> > -       if (!iommu_is_dma_domain(domain))
-> > -               return 0;
-> > -
-> >          BUG_ON(!domain->pgsize_bitmap);
-> >          pg_size = 1UL << __ffs(domain->pgsize_bitmap);
-> 
-> But then you realise that you also need to juggle this around since identity
-> domains aren't required to have a valid pgsize_bitmap either, give up on the
-> idea and go straight to writing a dedicated loop as the clearer and tidier
-> option because hey this is hardly a fast path anyway. At least, you do if
-> you're me :)
-
-domain->pgsize_bitmap is always valid memory, and __ffs() always
-returns [0:31], so this caclculation will be fine but garbage.
-
-> > @@ -1052,13 +1049,18 @@ static int iommu_create_device_direct_mappings(struct i>
-> >                  dma_addr_t start, end, addr;
-> >                  size_t map_size = 0;
-> > -               start = ALIGN(entry->start, pg_size);
-> > -               end   = ALIGN(entry->start + entry->length, pg_size);
-> > -
-> >                  if (entry->type != IOMMU_RESV_DIRECT &&
-> >                      entry->type != IOMMU_RESV_DIRECT_RELAXABLE)
-> >                          continue;
-> > +               if (entry->type == IOMMU_RESV_DIRECT)
-> > +                       dev->iommu->requires_direct = 1;
-> > +
-> > +               if (!iommu_is_dma_domain(domain))
-> > +                       continue;
-> > +
-> > +               start = ALIGN(entry->start, pg_size);
-> > +               end   = ALIGN(entry->start + entry->length, pg_size);
-
-Which is why I moved the only reader of pg_size after the check if it
-is valid..
-
-Thanks,
 Jason
