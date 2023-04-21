@@ -2,166 +2,206 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6E3B36EB3EC
-	for <lists+kvm@lfdr.de>; Fri, 21 Apr 2023 23:52:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 57FAA6EB3F2
+	for <lists+kvm@lfdr.de>; Fri, 21 Apr 2023 23:54:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233715AbjDUVwo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Apr 2023 17:52:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42494 "EHLO
+        id S232572AbjDUVy3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Apr 2023 17:54:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43574 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233704AbjDUVwm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Apr 2023 17:52:42 -0400
-Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39C0F1BF8
-        for <kvm@vger.kernel.org>; Fri, 21 Apr 2023 14:52:40 -0700 (PDT)
-Received: by mail-pg1-x54a.google.com with SMTP id 41be03b00d2f7-51c18f5ae60so1524338a12.2
-        for <kvm@vger.kernel.org>; Fri, 21 Apr 2023 14:52:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1682113960; x=1684705960;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=HMsg4nmJr9Osyznf6S6bHdZ6vDeDrUhREwLX6UGd8T8=;
-        b=XvsxnBgk29sdZsc1idOkaA4saQHitnYVxiuWLfPvQYA4gJjUA0Eax8NP6eYtNqR3ee
-         4M8iRSBz8QogM+10jEopg0WJoIMroxEwWvwhMZRwvcP/9YKwEsjVGEx1aOcV3VuY1m3u
-         uB/uYY4qESrX6Z1m+VLGFlwzsogxd1ySHWqe47vhDg5k3/1sBaGMDfYD2pGKCFu9gwtt
-         Dq86ic1cx9+DkwWMjUW0JEvgSaer47uaocf45slybIAtKLOjRYw89z5uJSu1zmCzvupR
-         QfbyNrb0tff8312OlkakXbsa3/e1zQC4Nfuu1vW9A7vNuaB9WIVw1FF32p495ltI+1vA
-         ynmA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682113960; x=1684705960;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=HMsg4nmJr9Osyznf6S6bHdZ6vDeDrUhREwLX6UGd8T8=;
-        b=WLg4Kbk45f8Z3KFUORYtaLPPwQondgdTNlt+SO3UEB4pp6gBR1l2eP9i0Bf21AvQmi
-         5RhsntwDiXwes1rWcGSm+sW0FvTLdRBD/2mlHEgjCxW20jiWZxo4MUzvdudc+etyloAi
-         TycsSolFbpxUswmmYne3lirdfbU9LWKDP8OCXBi6WlAk2iZU/4jBuAkX/tOowzLSgNCT
-         Zb688FIlCFE+F1rDJxX3ZbcokQpr9J6REUEyDX59AMxho+ferStkqBGWZ2VU+2zSJWSy
-         J7jgymvduyQj66uwFOkvm5EvkKmoAAPS3DXabFR7r0GIUvSm9uh/BnHE7nPYHaqsRXJq
-         x/mQ==
-X-Gm-Message-State: AAQBX9c3fFuXcH9uN13EdTfyq1itQlDTWQ9L0H+uqTdJy2JYK0Y3qsga
-        REH6WHzFR7JVOPUtHlM+2+OZ8XbL2Gg=
-X-Google-Smtp-Source: AKy350bNGZ0YwNCOoK47veefne8EuX49Y7h0rsJEJN50Jsq85FTnEuNaK8IUJn8w9z2rCbRF2CTWUSGfbYs=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a63:551e:0:b0:524:e24a:df56 with SMTP id
- j30-20020a63551e000000b00524e24adf56mr523655pgb.5.1682113959758; Fri, 21 Apr
- 2023 14:52:39 -0700 (PDT)
-Date:   Fri, 21 Apr 2023 14:52:38 -0700
-In-Reply-To: <000000000000a0bc2b05f9dd7fab@google.com>
-Mime-Version: 1.0
-References: <000000000000a0bc2b05f9dd7fab@google.com>
-Message-ID: <ZEMFpqxvOHd2kZiu@google.com>
-Subject: Re: [syzbot] [kvm?] WARNING in kvm_tdp_mmu_invalidate_all_roots
-From:   Sean Christopherson <seanjc@google.com>
-To:     syzbot <syzbot+094a74444165dbcd3a54@syzkaller.appspotmail.com>
-Cc:     bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        mingo@redhat.com, pbonzini@redhat.com,
-        syzkaller-bugs@googlegroups.com, tglx@linutronix.de, x86@kernel.org
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-        URIBL_BLOCKED,USER_IN_DEF_DKIM_WL autolearn=no autolearn_force=no
-        version=3.4.6
+        with ESMTP id S229656AbjDUVy1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Apr 2023 17:54:27 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF5DB10E6;
+        Fri, 21 Apr 2023 14:54:25 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 89EAA6533D;
+        Fri, 21 Apr 2023 21:54:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5727DC433D2;
+        Fri, 21 Apr 2023 21:54:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1682114065;
+        bh=DRON7XFtvhv8PDHCVrMA2EYaP0sAjS6fdsERTA2HI+0=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=rrBnNisH4esAY7R0aw3/67+MLWbbMD/1amiuQEb2HQnsNZm3qE0MQ/0F0DWAkgVnK
+         ew2RVa/nZktAwvWeVd+f21wRW5T5D3L6mNzqzggikKDeP0fcWP3PVU8sgT/sFv1bRz
+         KQEQHx9U75B00v1PiolM+V7C4mUzlqXPJW1zZpW9q7F0rdrp+1ImWAkeKhvLZSPb/H
+         VXJLQC+xHY2AOwoykskgCzzSg2qUAlguhXduKS9NenCogJOb3K+msyiUpkJa7xFUq5
+         to3rfhqrUUwsELyvSZQaGp5UKDZBC6bAJwUULfIFUclXTH7x/FU0ZEJGnhB0Bs3F6d
+         mv7aY+Q0LiUpg==
+Date:   Sat, 22 Apr 2023 00:54:11 +0300
+From:   Mike Rapoport <rppt@kernel.org>
+To:     Yang Weijiang <weijiang.yang@intel.com>
+Cc:     seanjc@google.com, pbonzini@redhat.com, peterz@infradead.org,
+        john.allen@amd.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, rick.p.edgecombe@intel.com
+Subject: Re: [PATCH v2 00/21] Enable CET Virtualization
+Message-ID: <ZEMGA2uUfpJL4rMH@kernel.org>
+References: <20230421134615.62539-1-weijiang.yang@intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230421134615.62539-1-weijiang.yang@intel.com>
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Apr 21, 2023, syzbot wrote:
-> Hello,
-> 
-> syzbot found the following issue on:
-> 
-> HEAD commit:    d3e1ee0e67e7 Add linux-next specific files for 20230421
-> git tree:       linux-next
-> console output: https://syzkaller.appspot.com/x/log.txt?x=16ac3de0280000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=53c789efbcc06cf6
-> dashboard link: https://syzkaller.appspot.com/bug?extid=094a74444165dbcd3a54
-> compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
-> 
-> Unfortunately, I don't have any reproducer for this issue yet.
-> 
-> Downloadable assets:
-> disk image: https://storage.googleapis.com/syzbot-assets/c558a9e1fe6a/disk-d3e1ee0e.raw.xz
-> vmlinux: https://storage.googleapis.com/syzbot-assets/2ec100a34c4c/vmlinux-d3e1ee0e.xz
-> kernel image: https://storage.googleapis.com/syzbot-assets/1afcd9936dc1/bzImage-d3e1ee0e.xz
-> 
-> IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> Reported-by: syzbot+094a74444165dbcd3a54@syzkaller.appspotmail.com
-> 
-> ------------[ cut here ]------------
-> WARNING: CPU: 0 PID: 12623 at arch/x86/kvm/mmu/tdp_mmu.c:943 kvm_tdp_mmu_invalidate_all_roots+0x2bd/0x370 arch/x86/kvm/mmu/tdp_mmu.c:943
-> Modules linked in:
-> CPU: 0 PID: 12623 Comm: syz-executor.3 Not tainted 6.3.0-rc7-next-20230421-syzkaller #0
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/30/2023
-> RIP: 0010:kvm_tdp_mmu_invalidate_all_roots+0x2bd/0x370 arch/x86/kvm/mmu/tdp_mmu.c:943
-> Call Trace:
->  <TASK>
->  kvm_mmu_uninit_tdp_mmu+0x16/0x100 arch/x86/kvm/mmu/tdp_mmu.c:48
->  kvm_mmu_uninit_vm+0x6a/0x70 arch/x86/kvm/mmu/mmu.c:6239
->  kvm_arch_destroy_vm+0x369/0x490 arch/x86/kvm/x86.c:12465
->  kvm_create_vm arch/x86/kvm/../../../virt/kvm/kvm_main.c:1245 [inline]
->  kvm_dev_ioctl_create_vm arch/x86/kvm/../../../virt/kvm/kvm_main.c:5017 [inline]
->  kvm_dev_ioctl+0x11be/0x1bb0 arch/x86/kvm/../../../virt/kvm/kvm_main.c:5059
->  vfs_ioctl fs/ioctl.c:51 [inline]
->  __do_sys_ioctl fs/ioctl.c:870 [inline]
->  __se_sys_ioctl fs/ioctl.c:856 [inline]
->  __x64_sys_ioctl+0x197/0x210 fs/ioctl.c:856
->  do_syscall_x64 arch/x86/entry/common.c:50 [inline]
->  do_syscall_64+0x39/0xb0 arch/x86/entry/common.c:80
->  entry_SYSCALL_64_after_hwframe+0x63/0xcd
+Hi,
 
-Gah, kvm->users_count is elevated when the VM is destroyed if creation fails,
-but mmu_lock isn't held in that case, and lockdep yells.  This particular bug is
-effectively a false positive, nothing else holds a reference to the VM.
+On Fri, Apr 21, 2023 at 09:45:54AM -0400, Yang Weijiang wrote:
+>
+> Tests:
+> --------------------------------------------------------------------------
+> This series passed basic CET user shadow stack test and kernel IBT test in
+> L1 and L2 guest. It also passed CET KUT test which has been merged there.
+> 
+> Executed all KUT tests and KVM selftests against this series, all test cases
+> passes except the vmx test, the failure is due to CR4_CET bit testing in
+> test_vmxon_bad_cr(). After add CR4_CET bit to skip list, the test passed.
+> I'll send a patch to fix this issue later.
+> 
+> 
+> To run user shadow stack test and kernel IBT test in VM, you need an CET
+> capable platform, e.g., Sapphire Rapids server, and follow below steps to
+> build host/guest kernel properly:
+> 
+> 1. Buld host kernel. Patch this series to kernel tree and build kernel
+> with CET capable gcc version(e.g., >=8.5.0).
+> 
+> 2. Build guest kernel. Patch CET native series to kernel tree and opt-in
+> CONFIG_X86_KERNEL_IBT and CONFIG_X86_USER_SHADOW_STACK options.
+> 
+> 3. Launch a VM with QEMU built with CET enabling patches [2].
+> 
+> Check kernel selftest test_shadow_stack_64 output:
+> [INFO]  new_ssp = 7f8c82100ff8, *new_ssp = 7f8c82101001
+> [INFO]  changing ssp from 7f8c82900ff0 to 7f8c82100ff8
+> [INFO]  ssp is now 7f8c82101000
+> [OK]    Shadow stack pivot
+> [OK]    Shadow stack faults
+> [INFO]  Corrupting shadow stack
+> [INFO]  Generated shadow stack violation successfully
+> [OK]    Shadow stack violation test
+> [INFO]  Gup read -> shstk access success
+> [INFO]  Gup write -> shstk access success
+> [INFO]  Violation from normal write
+> [INFO]  Gup read -> write access success
+> [INFO]  Violation from normal write
+> [INFO]  Gup write -> write access success
+> [INFO]  Cow gup write -> write access success
+> [OK]    Shadow gup test
+> [INFO]  Violation from shstk access
+> [OK]    mprotect() test
+> [SKIP]  Userfaultfd unavailable.
+> [OK]    32 bit test
+> 
+> Check kernel IBT with dmesg | grep CET:
+> CET detected: Indirect Branch Tracking enabled
+> 
+> --------------------------------------------------------------------------
+> Changes in v2:
+> 1. Remove excessive checks on host CET Kconfig options in v1 patchset [3].
+> 2. Make CET CPUIDs, MSRs and control flags enabling independent to host CET status.
+> 3. Introduce supervisor SHSTK support to make the patch set complete.
+> 4. Refactor patches to accommodate above changes.
+> 5. Rebase on kvm-x86/next [4].
+> 
+> 
+> [1]: linux-next: https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git/tree/?h=next-20230420
+> [2]: QEMU patch: https://lore.kernel.org/all/20230421041227.90915-1-weijiang.yang@intel.com/
+> [3]: v1 patchset: https://lore.kernel.org/all/20220616084643.19564-1-weijiang.yang@intel.com/
+> [4]: Rebase branch: https://github.com/kvm-x86/linux.git, commit: 7b632f72528d (tag: kvm-x86-next-2023.04.14)
+ 
+I played a bit with KVM support for shadow stacks on AMD machines and I
+rebased v1 patches along with John's SVM series 
 
-However, syzbot found another bug that _is_ a real problem (hasn't been reported
-upstream yet for whatever reason).  Not holding mmu_lock during "real" VM destruction
-is problematic because walking the list can race with the asynchronous worker
-deleting and freeing from the list.
+https://lore.kernel.org/kvm/20221012203910.204793-1-john.allen@amd.com/
 
-Posted a fixed version[*] that should resolve both issues by protecting the walk
-with RCU.
+on top of v6.3-rc4 and Rick's series for host shadow stack support. I've
+put this at
 
-[*] https://lore.kernel.org/all/20230421214946.2571580-1-seanjc@google.com
+https://git.kernel.org/pub/scm/linux/kernel/git/rppt/linux.git/log/?h=shstk/kvm
 
-==================================================================
-BUG: KASAN: slab-use-after-free in kvm_tdp_mmu_invalidate_all_roots+0x2e3/0x370 arch/x86/kvm/mmu/tdp_mmu.c:945
-Read of size 8 at addr ffff88801c8cf948 by task syz-executor.1/17012
+if anybody is interested. With this I could successfully run shadow stack
+self test in a guest on an AMD Zen3 machine.
 
-CPU: 0 PID: 17012 Comm: syz-executor.1 Not tainted 6.3.0-rc7-next-20230421-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/30/2023
-Call Trace:
-<TASK>
-__dump_stack lib/dump_stack.c:88 [inline]
-dump_stack_lvl+0xd9/0x150 lib/dump_stack.c:106
-print_address_description.constprop.0+0x2c/0x3c0 mm/kasan/report.c:351
-print_report mm/kasan/report.c:462 [inline]
-kasan_report+0x11c/0x130 mm/kasan/report.c:572
-kvm_tdp_mmu_invalidate_all_roots+0x2e3/0x370 arch/x86/kvm/mmu/tdp_mmu.c:945
-kvm_mmu_uninit_tdp_mmu+0x16/0x100 arch/x86/kvm/mmu/tdp_mmu.c:48
-kvm_mmu_uninit_vm+0x6a/0x70 arch/x86/kvm/mmu/mmu.c:6239
-kvm_arch_destroy_vm+0x369/0x490 arch/x86/kvm/x86.c:12465
-kvm_destroy_vm arch/x86/kvm/../../../virt/kvm/kvm_main.c:1313 [inline]
-kvm_put_kvm+0x4da/0xae0 arch/x86/kvm/../../../virt/kvm/kvm_main.c:1347
-kvm_vcpu_release+0x51/0x70 arch/x86/kvm/../../../virt/kvm/kvm_main.c:3846
-__fput+0x27c/0xa90 fs/file_table.c:321
-task_work_run+0x16f/0x270 kernel/task_work.c:179
-resume_user_mode_work include/linux/resume_user_mode.h:49 [inline]
-exit_to_user_mode_loop kernel/entry/common.c:171 [inline]
-exit_to_user_mode_prepare+0x210/0x240 kernel/entry/common.c:204
-__syscall_exit_to_user_mode_work kernel/entry/common.c:286 [inline]
-syscall_exit_to_user_mode+0x1d/0x50 kernel/entry/common.c:297
-do_syscall_64+0x46/0xb0 arch/x86/entry/common.c:86
-entry_SYSCALL_64_after_hwframe+0x63/0xcd
-RIP: 0033:0x7fd7a583e01b
-Code: 0f 05 48 3d 00 f0 ff ff 77 45 c3 0f 1f 40 00 48 83 ec 18 89 7c 24 0c e8 63 fc ff ff 8b 7c 24 0c 41 89 c0 b8 03 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 35 44 89 c7 89 44 24 0c e8 a1 fc ff ff 8b 44
-RSP: 002b:00007ffc821a2fb0 EFLAGS: 00000293 ORIG_RAX: 0000000000000003
-RAX: 0000000000000000 RBX: 000000000000000a RCX: 00007fd7a583e01b
-RDX: 0000000000000000 RSI: 00007fd7a5400000 RDI: 0000000000000009
-RBP: 00007fd7a59ad980 R08: 0000000000000000 R09: 0000000071612a4e
-R10: 0000000000000000 R11: 0000000000000293 R12: 000000000014ffb4
-R13: 00007ffc821a30b0 R14: 00007fd7a59ac050 R15: 0000000000000032
-</TASK>
+One thing I've noticed while rebasing is that John's patches move
+cet_is_msr_accessible() from vmx/ to x86.c and I also had to make such move
+for cet_is_ssp_msr_accessible().
+
+Would make sense to have them available for both VMX and SVM from the
+start.
+
+> Rick Edgecombe (5):
+>   x86/shstk: Add Kconfig option for shadow stack
+>   x86/cpufeatures: Add CPU feature flags for shadow stacks
+>   x86/cpufeatures: Enable CET CR4 bit for shadow stack
+>   x86/fpu/xstate: Introduce CET MSR and XSAVES supervisor states
+>   x86/fpu: Add helper for modifying xstate
+> 
+> Sean Christopherson (2):
+>   KVM:x86: Report XSS as to-be-saved if there are supported features
+>   KVM:x86: Load guest FPU state when accessing xsaves-managed MSRs
+> 
+> Yang Weijiang (14):
+>   KVM:x86: Refresh CPUID on write to guest MSR_IA32_XSS
+>   KVM:x86: Init kvm_caps.supported_xss with supported feature bits
+>   KVM:x86: Add #CP support in guest exception classification
+>   KVM:VMX: Introduce CET VMCS fields and control bits
+>   KVM:x86: Add fault checks for guest CR4.CET setting
+>   KVM:VMX: Emulate reads and writes to CET MSRs
+>   KVM:VMX: Add a synthetic MSR to allow userspace VMM to access
+>     GUEST_SSP
+>   KVM:x86: Report CET MSRs as to-be-saved if CET is supported
+>   KVM:x86: Save/Restore GUEST_SSP to/from SMM state save area
+>   KVM:VMX: Pass through user CET MSRs to the guest
+>   KVM:x86: Enable CET virtualization for VMX and advertise to userspace
+>   KVM:nVMX: Enable user CET support for nested VMX
+>   KVM:x86: Enable supervisor IBT support for guest
+>   KVM:x86: Support CET supervisor shadow stack MSR access
+> 
+>  arch/x86/Kconfig                         |  24 ++++
+>  arch/x86/Kconfig.assembler               |   5 +
+>  arch/x86/include/asm/cpufeatures.h       |   2 +
+>  arch/x86/include/asm/disabled-features.h |   8 +-
+>  arch/x86/include/asm/fpu/api.h           |   9 ++
+>  arch/x86/include/asm/fpu/types.h         |  16 ++-
+>  arch/x86/include/asm/fpu/xstate.h        |   6 +-
+>  arch/x86/include/asm/kvm_host.h          |   3 +-
+>  arch/x86/include/asm/vmx.h               |   8 ++
+>  arch/x86/include/uapi/asm/kvm.h          |   1 +
+>  arch/x86/include/uapi/asm/kvm_para.h     |   1 +
+>  arch/x86/kernel/cpu/common.c             |  35 ++++--
+>  arch/x86/kernel/cpu/cpuid-deps.c         |   1 +
+>  arch/x86/kernel/fpu/core.c               |  19 +++
+>  arch/x86/kernel/fpu/xstate.c             |  90 +++++++-------
+>  arch/x86/kvm/cpuid.c                     |  23 +++-
+>  arch/x86/kvm/cpuid.h                     |   6 +
+>  arch/x86/kvm/smm.c                       |  20 +++
+>  arch/x86/kvm/vmx/capabilities.h          |   4 +
+>  arch/x86/kvm/vmx/nested.c                |  29 ++++-
+>  arch/x86/kvm/vmx/vmcs12.c                |   6 +
+>  arch/x86/kvm/vmx/vmcs12.h                |  14 ++-
+>  arch/x86/kvm/vmx/vmx.c                   | 150 ++++++++++++++++++++++-
+>  arch/x86/kvm/vmx/vmx.h                   |   6 +-
+>  arch/x86/kvm/x86.c                       |  79 ++++++++++--
+>  arch/x86/kvm/x86.h                       |  46 ++++++-
+>  26 files changed, 528 insertions(+), 83 deletions(-)
+> 
+> 
+> base-commit: 7b632f72528d5fa3f0265358a393f534da47d9dd
+> -- 
+> 2.27.0
+> 
+
+-- 
+Sincerely yours,
+Mike.
