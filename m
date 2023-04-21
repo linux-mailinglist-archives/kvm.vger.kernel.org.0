@@ -2,224 +2,346 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AB60D6EA7A3
-	for <lists+kvm@lfdr.de>; Fri, 21 Apr 2023 11:56:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 914056EA83F
+	for <lists+kvm@lfdr.de>; Fri, 21 Apr 2023 12:22:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231838AbjDUJ4G (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Apr 2023 05:56:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33510 "EHLO
+        id S230151AbjDUKW0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Apr 2023 06:22:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56160 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231819AbjDUJ4E (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Apr 2023 05:56:04 -0400
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E0C789EC9
-        for <kvm@vger.kernel.org>; Fri, 21 Apr 2023 02:55:54 -0700 (PDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 84BBE1480;
-        Fri, 21 Apr 2023 02:56:38 -0700 (PDT)
-Received: from monolith.localdoman (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 017CC3F5A1;
-        Fri, 21 Apr 2023 02:55:52 -0700 (PDT)
-Date:   Fri, 21 Apr 2023 10:55:50 +0100
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-To:     Eric Auger <eric.auger@redhat.com>
-Cc:     eric.auger.pro@gmail.com, kvm@vger.kernel.org,
-        kvmarm@lists.linux.dev, andrew.jones@linux.dev, maz@kernel.org,
-        will@kernel.org, oliver.upton@linux.dev, ricarkol@google.com,
-        reijiw@google.com
-Subject: Re: [kvm-unit-tests PATCH 2/6] arm: pmu: pmu-chain-promotion:
- Introduce defines for count and margin values
-Message-ID: <ZEJdpmTSyf6sp3Yv@monolith.localdoman>
-References: <20230315110725.1215523-1-eric.auger@redhat.com>
- <20230315110725.1215523-3-eric.auger@redhat.com>
+        with ESMTP id S229712AbjDUKWX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Apr 2023 06:22:23 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12DBEAD17
+        for <kvm@vger.kernel.org>; Fri, 21 Apr 2023 03:21:26 -0700 (PDT)
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 33L9c6Dm020581;
+        Fri, 21 Apr 2023 10:20:42 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=CHyoc1nL94cwAgjwn9aRGY8k7rTNaRgymZY0um5quak=;
+ b=UAZu+6Bk5pxm5c1AyMiy1XEDBJFDHxm/GRS3ezCWfczidzJF1aB/vI307sCbBQztCOpC
+ ylBrULKg80MNgZ0kcga5qw+uWrAjbm6Lj+PILksN3WwvmB6YJUQshM3agoqkkjaPzl0E
+ xEB1AGSz3/6scK3EOPL2y7AOgY5RuStbVhce6Ovv2S419oguTAat7Hkv/uwkRXw9uapS
+ 5xTzELnpZlNkg6OZwSTe4RU+KT+z6FGsKS0oGwjXbL1pjhw/lJtgCv3UmJggL4TTvOVM
+ KEDwrKW7phjCg7TtEzYP+oN3h5zSjB1zOGzghylahmmHlQDM9cIl5zfJFKonbYCTxERG jw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3q3qussudv-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 21 Apr 2023 10:20:41 +0000
+Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 33LAJOIR010046;
+        Fri, 21 Apr 2023 10:20:41 GMT
+Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3q3qussucd-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 21 Apr 2023 10:20:40 +0000
+Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
+        by ppma01fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 33L0dMi4030533;
+        Fri, 21 Apr 2023 10:20:38 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+        by ppma01fra.de.ibm.com (PPS) with ESMTPS id 3pykj6k9mh-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 21 Apr 2023 10:20:38 +0000
+Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
+        by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 33LAKWft3867188
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 21 Apr 2023 10:20:32 GMT
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5246E20075;
+        Fri, 21 Apr 2023 10:20:32 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id ED14820076;
+        Fri, 21 Apr 2023 10:20:30 +0000 (GMT)
+Received: from [9.179.5.153] (unknown [9.179.5.153])
+        by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+        Fri, 21 Apr 2023 10:20:30 +0000 (GMT)
+Message-ID: <4ddd3177-58a8-c9f0-a9a8-ee71baf0511b@linux.ibm.com>
+Date:   Fri, 21 Apr 2023 12:20:30 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230315110725.1215523-3-eric.auger@redhat.com>
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.8.0
+Subject: Re: [PATCH v19 02/21] s390x/cpu topology: add topology entries on CPU
+ hotplug
+To:     Nina Schoetterl-Glausch <nsg@linux.ibm.com>, qemu-s390x@nongnu.org
+Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
+        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
+        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
+        kvm@vger.kernel.org, ehabkost@redhat.com,
+        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
+        seiden@linux.ibm.com, nrb@linux.ibm.com, frankja@linux.ibm.com,
+        berrange@redhat.com, clg@kaod.org
+References: <20230403162905.17703-1-pmorel@linux.ibm.com>
+ <20230403162905.17703-3-pmorel@linux.ibm.com>
+ <66d9ba0e9904f035326aca609a767976b94547cf.camel@linux.ibm.com>
+Content-Language: en-US
+From:   Pierre Morel <pmorel@linux.ibm.com>
+In-Reply-To: <66d9ba0e9904f035326aca609a767976b94547cf.camel@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: Mnk0jUmITtFWYs5ai7S1ztW7ORYff-n3
+X-Proofpoint-ORIG-GUID: m1BbpUqSc-TPXVCMBYNfIqSxvy3bs8tM
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
+ definitions=2023-04-21_04,2023-04-20_01,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 mlxlogscore=999
+ impostorscore=0 mlxscore=0 spamscore=0 adultscore=0 malwarescore=0
+ suspectscore=0 priorityscore=1501 bulkscore=0 clxscore=1015
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2303200000 definitions=main-2304210087
+X-Spam-Status: No, score=-5.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
 
-On Wed, Mar 15, 2023 at 12:07:21PM +0100, Eric Auger wrote:
-> The pmu-chain-promotion test is composed of separate subtests.
-> 
-> Some of them apply some settings on a first MEM_ACCESS loop
-> iterations, change the settings and run another MEM_ACCESS loop.
-> 
-> The PRE_OVERFLOW2 MEM_ACCESS counter init value is defined so that
-> the first loop does not overflow and the second loop overflows.
-> 
-> At the moment the MEM_ACCESS count number is hardcoded to 20 and
-> PRE_OVERFLOW2 is set to UINT32_MAX - 20 - 15 where 15 acts as a
-> margin.
-> 
-> Introduce defines for the count number and the margin so that it
-> becomes easier to change them.
-> 
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> ---
->  arm/pmu.c | 35 +++++++++++++++++++++--------------
->  1 file changed, 21 insertions(+), 14 deletions(-)
-> 
-> diff --git a/arm/pmu.c b/arm/pmu.c
-> index dad7d4b4..b88366a8 100644
-> --- a/arm/pmu.c
-> +++ b/arm/pmu.c
-> @@ -55,11 +55,18 @@
->  #define EXT_COMMON_EVENTS_LOW	0x4000
->  #define EXT_COMMON_EVENTS_HIGH	0x403F
->  
-> -#define ALL_SET_32			0x00000000FFFFFFFFULL
-> +#define ALL_SET_32		0x00000000FFFFFFFFULL
->  #define ALL_CLEAR		0x0000000000000000ULL
->  #define PRE_OVERFLOW_32		0x00000000FFFFFFF0ULL
-> -#define PRE_OVERFLOW2_32	0x00000000FFFFFFDCULL
->  #define PRE_OVERFLOW_64		0xFFFFFFFFFFFFFFF0ULL
-> +#define COUNT 20
+On 4/20/23 10:59, Nina Schoetterl-Glausch wrote:
+> On Mon, 2023-04-03 at 18:28 +0200, Pierre Morel wrote:
+>> The topology information are attributes of the CPU and are
+>> specified during the CPU device creation.
+>>
+>> On hot plug we:
+>> - calculate the default values for the topology for drawers,
+>>    books and sockets in the case they are not specified.
+>> - verify the CPU attributes
+>> - check that we have still room on the desired socket
+>>
+>> The possibility to insert a CPU in a mask is dependent on the
+>> number of cores allowed in a socket, a book or a drawer, the
+>> checking is done during the hot plug of the CPU to have an
+>> immediate answer.
+>>
+>> If the complete topology is not specified, the core is added
+>> in the physical topology based on its core ID and it gets
+>> defaults values for the modifier attributes.
+>>
+>> This way, starting QEMU without specifying the topology can
+>> still get some advantage of the CPU topology.
+>>
+>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+>> ---
+>>   MAINTAINERS                        |   1 +
+>>   include/hw/s390x/cpu-topology.h    |  44 +++++
+>>   include/hw/s390x/s390-virtio-ccw.h |   1 +
+>>   hw/s390x/cpu-topology.c            | 282 +++++++++++++++++++++++++++++
+>>   hw/s390x/s390-virtio-ccw.c         |  22 ++-
+>>   hw/s390x/meson.build               |   1 +
+>>   6 files changed, 349 insertions(+), 2 deletions(-)
+>>   create mode 100644 hw/s390x/cpu-topology.c
+> [...]
+>
+>>   #endif
+>> diff --git a/include/hw/s390x/s390-virtio-ccw.h b/include/hw/s390x/s390-virtio-ccw.h
+>> index 9bba21a916..ea10a6c6e1 100644
+>> --- a/include/hw/s390x/s390-virtio-ccw.h
+>> +++ b/include/hw/s390x/s390-virtio-ccw.h
+>> @@ -28,6 +28,7 @@ struct S390CcwMachineState {
+>>       bool dea_key_wrap;
+>>       bool pv;
+>>       uint8_t loadparm[8];
+>> +    bool vertical_polarization;
+> Why is this here and not in s390_topology?
+> This splits up the topology state somewhat.
+> I don't quite recall, did you use to have s390_topology in S390CcwMachineState at some point?
+> I think putting everything in S390CcwMachineState might make sense too.
 
-test_mem_access (from the test "pmu-mem-access") also uses 20 for
-mem_access_loop, in case you want to change the define there too.
+Hum.
 
-I realize I'm bikeshedding here, but it might also help if the define name
-held some clue to what is being counted (like ACCESS_COUNT, or something
-like that).
+This is a left over from an abandoned try.
 
-> +#define MARGIN 15
-> +/*
-> + * PRE_OVERFLOW2 is set so that 1st COUNT iterations do not
-> + * produce 32b overflow and 2d COUNT iterations do. To accommodate
+I put it back where it was, in s390_topology.
 
-2**nd** COUNT iterations?
 
-> + * for some observed variability we take into account a given @MARGIN
+>
+>>   };
+>>   
+>>   struct S390CcwMachineClass {
+>> diff --git a/hw/s390x/cpu-topology.c b/hw/s390x/cpu-topology.c
+>> new file mode 100644
+>> index 0000000000..96da67bd7e
+>> --- /dev/null
+>> +++ b/hw/s390x/cpu-topology.c
+> [...]
+>
+>> +/**
+>> + * s390_topology_cpu_default:
+>> + * @cpu: pointer to a S390CPU
+>> + * @errp: Error pointer
+>> + *
+>> + * Setup the default topology if no attributes are already set.
+>> + * Passing a CPU with some, but not all, attributes set is considered
+>> + * an error.
+>> + *
+>> + * The function calculates the (drawer_id, book_id, socket_id)
+>> + * topology by filling the cores starting from the first socket
+>> + * (0, 0, 0) up to the last (smp->drawers, smp->books, smp->sockets).
+>> + *
+>> + * CPU type and dedication have defaults values set in the
+>> + * s390x_cpu_properties, entitlement must be adjust depending on the
+>> + * dedication.
+>> + */
+>> +static void s390_topology_cpu_default(S390CPU *cpu, Error **errp)
+>> +{
+>> +    CpuTopology *smp = s390_topology.smp;
+>> +    CPUS390XState *env = &cpu->env;
+>> +
+>> +    /* All geometry topology attributes must be set or all unset */
+>> +    if ((env->socket_id < 0 || env->book_id < 0 || env->drawer_id < 0) &&
+>> +        (env->socket_id >= 0 || env->book_id >= 0 || env->drawer_id >= 0)) {
+>> +        error_setg(errp,
+>> +                   "Please define all or none of the topology geometry attributes");
+>> +        return;
+>> +    }
+>> +
+>> +    /* Check if one of the geometry topology is unset */
+>> +    if (env->socket_id < 0) {
+>> +        /* Calculate default geometry topology attributes */
+>> +        env->socket_id = s390_std_socket(env->core_id, smp);
+>> +        env->book_id = s390_std_book(env->core_id, smp);
+>> +        env->drawer_id = s390_std_drawer(env->core_id, smp);
+>> +    }
+>> +
+>> +    /*
+>> +     * Even the user can specify the entitlement as horizontal on the
+>> +     * command line, qemu will only use env->entitlement during vertical
+>> +     * polarization.
+>> +     * Medium entitlement is chosen as the default entitlement when the CPU
+>> +     * is not dedicated.
+>> +     * A dedicated CPU always receives a high entitlement.
+>> +     */
+>> +    if (env->entitlement >= S390_CPU_ENTITLEMENT__MAX ||
+>> +        env->entitlement == S390_CPU_ENTITLEMENT_HORIZONTAL) {
+>> +        if (env->dedicated) {
+>> +            env->entitlement = S390_CPU_ENTITLEMENT_HIGH;
+>> +        } else {
+>> +            env->entitlement = S390_CPU_ENTITLEMENT_MEDIUM;
+>> +        }
+>> +    }
+> As you know, in my opinion there should be not possibility for the user
+> to set the entitlement to horizontal and dedicated && != HIGH should be
+> rejected as an error.
+> If you do this, you can delete this.
 
-Some inconsistency here, this variable is referred to with @MARGIN, but
-COUNT isn't (missing "@").
+In the next version with entitlement being an enum it is right.
 
-> + */
-> +#define PRE_OVERFLOW2_32		(ALL_SET_32 - COUNT - MARGIN)
+However, deleting this means that the default value for entitlement 
+depends on dedication.
 
-This is much better, I would have been hard pressed to figure out where the
-previous value of 0x00000000FFFFFFDCULL came from.
+If we have only low, medium, high and default for entitlement is medium.
 
-The patch looks good to me (with or without the comments above):
+If the user specifies the dedication true without specifying entitlement 
+we could force entitlement to high.
 
-Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
+But we can not distinguish this from the user specifying dedication true 
+with a medium entitlement, which is wrong.
 
-Thanks,
-Alex
+So three solution:
 
->  
->  #define PRE_OVERFLOW(__overflow_at_64bits)				\
->  	(__overflow_at_64bits ? PRE_OVERFLOW_64 : PRE_OVERFLOW_32)
-> @@ -737,7 +744,7 @@ static void test_chain_promotion(bool unused)
->  	write_sysreg_s(0x2, PMCNTENSET_EL0);
->  	isb();
->  
-> -	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
-> +	mem_access_loop(addr, COUNT, pmu.pmcr_ro | PMU_PMCR_E);
->  	PRINT_REGS("post");
->  	report(!read_regn_el0(pmevcntr, 0),
->  		"chain counter not counting if even counter is disabled");
-> @@ -750,13 +757,13 @@ static void test_chain_promotion(bool unused)
->  	write_sysreg_s(0x1, PMCNTENSET_EL0);
->  	isb();
->  
-> -	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
-> +	mem_access_loop(addr, COUNT, pmu.pmcr_ro | PMU_PMCR_E);
->  	PRINT_REGS("post");
->  	report(!read_regn_el0(pmevcntr, 1) && (read_sysreg(pmovsclr_el0) == 0x1),
->  		"odd counter did not increment on overflow if disabled");
->  	report_prefix_pop();
->  
-> -	/* start at 0xFFFFFFDC, +20 with CHAIN enabled, +20 with CHAIN disabled */
-> +	/* 1st COUNT with CHAIN enabled, next COUNT with CHAIN disabled */
->  	report_prefix_push("subtest3");
->  	pmu_reset();
->  	write_sysreg_s(0x3, PMCNTENSET_EL0);
-> @@ -764,12 +771,12 @@ static void test_chain_promotion(bool unused)
->  	isb();
->  	PRINT_REGS("init");
->  
-> -	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
-> +	mem_access_loop(addr, COUNT, pmu.pmcr_ro | PMU_PMCR_E);
->  	PRINT_REGS("After 1st loop");
->  
->  	/* disable the CHAIN event */
->  	write_sysreg_s(0x2, PMCNTENCLR_EL0);
-> -	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
-> +	mem_access_loop(addr, COUNT, pmu.pmcr_ro | PMU_PMCR_E);
->  	PRINT_REGS("After 2d loop");
->  	report(read_sysreg(pmovsclr_el0) == 0x1,
->  		"should have triggered an overflow on #0");
-> @@ -777,7 +784,7 @@ static void test_chain_promotion(bool unused)
->  		"CHAIN counter #1 shouldn't have incremented");
->  	report_prefix_pop();
->  
-> -	/* start at 0xFFFFFFDC, +20 with CHAIN disabled, +20 with CHAIN enabled */
-> +	/* 1st COUNT with CHAIN disabled, next COUNT with CHAIN enabled */
->  
->  	report_prefix_push("subtest4");
->  	pmu_reset();
-> @@ -786,13 +793,13 @@ static void test_chain_promotion(bool unused)
->  	isb();
->  	PRINT_REGS("init");
->  
-> -	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
-> +	mem_access_loop(addr, COUNT, pmu.pmcr_ro | PMU_PMCR_E);
->  	PRINT_REGS("After 1st loop");
->  
->  	/* enable the CHAIN event */
->  	write_sysreg_s(0x3, PMCNTENSET_EL0);
->  	isb();
-> -	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
-> +	mem_access_loop(addr, COUNT, pmu.pmcr_ro | PMU_PMCR_E);
->  
->  	PRINT_REGS("After 2d loop");
->  
-> @@ -811,7 +818,7 @@ static void test_chain_promotion(bool unused)
->  	isb();
->  	PRINT_REGS("init");
->  
-> -	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
-> +	mem_access_loop(addr, COUNT, pmu.pmcr_ro | PMU_PMCR_E);
->  	PRINT_REGS("After 1st loop");
->  
->  	/* 0 becomes CHAINED */
-> @@ -820,7 +827,7 @@ static void test_chain_promotion(bool unused)
->  	write_sysreg_s(0x3, PMCNTENSET_EL0);
->  	write_regn_el0(pmevcntr, 1, 0x0);
->  
-> -	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
-> +	mem_access_loop(addr, COUNT, pmu.pmcr_ro | PMU_PMCR_E);
->  	PRINT_REGS("After 2d loop");
->  
->  	report((read_regn_el0(pmevcntr, 1) == 1) &&
-> @@ -837,14 +844,14 @@ static void test_chain_promotion(bool unused)
->  	write_sysreg_s(0x3, PMCNTENSET_EL0);
->  	PRINT_REGS("init");
->  
-> -	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
-> +	mem_access_loop(addr, COUNT, pmu.pmcr_ro | PMU_PMCR_E);
->  	PRINT_REGS("After 1st loop");
->  
->  	write_sysreg_s(0x0, PMCNTENSET_EL0);
->  	write_regn_el0(pmevtyper, 1, CPU_CYCLES | PMEVTYPER_EXCLUDE_EL0);
->  	write_sysreg_s(0x3, PMCNTENSET_EL0);
->  
-> -	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
-> +	mem_access_loop(addr, COUNT, pmu.pmcr_ro | PMU_PMCR_E);
->  	PRINT_REGS("After 2d loop");
->  	report(read_sysreg(pmovsclr_el0) == 1,
->  		"overflow is expected on counter 0");
-> -- 
-> 2.38.1
-> 
-> 
+1) We ignore what the user say if dedication is specified as true
+
+2) We specify that both dedication and entitlement must be specified if 
+dedication is true
+
+3) We set an impossible default to distinguish default from medium 
+entitlement
+
+
+For me the solution 3 is the best one, it is more flexible for the user.
+
+Solution 1 is obviously bad.
+
+Solution 2 forces the user to specify entitlement high and only high if 
+it specifies dedication true.
+
+AFAIU, you prefer the solution 2, forcing user to specify both 
+dedication and entitlement to suppress a default value in the enum.
+Why is it bad to have a default value in the enum that we do not use to 
+specify that the value must be calculated?
+
+
+>
+>> +}
+>> +
+>> +/**
+>> + * s390_topology_check:
+>> + * @socket_id: socket to check
+>> + * @book_id: book to check
+>> + * @drawer_id: drawer to check
+>> + * @entitlement: entitlement to check
+>> + * @dedicated: dedication to check
+>> + * @errp: Error pointer
+>> + *
+>> + * The function checks if the topology
+>> + * attributes fits inside the system topology.
+> fitS
+>
+> The function checks the validity of the provided topology arguments,
+> namely that they're in bounds and non contradictory.
+
+
+OK, thanks.
+
+
+>
+>> + */
+>> +static void s390_topology_check(uint16_t socket_id, uint16_t book_id,
+> I'd prefer if you stick to one id type. There defined as int32_t in env,
+> here you use uint16_t and below int.
+>
+> In env, you want a signed type with sufficient range, int16_t should suffice there,
+> but bigger is also fine.
+> You don't want the user to pass a negative id, so by using an unsigned type you
+> can avoid this without extra code.
+> But IMO there should be one point where a type conversion occurs.
+
+OK
+
+
+>
+>> +                                uint16_t drawer_id, uint16_t entitlement,
+>> +                                bool dedicated, Error **errp)
+>> +{
+>> +    CpuTopology *smp = s390_topology.smp;
+>> +    ERRP_GUARD();
+>> +
+>> +    if (socket_id >= smp->sockets) {
+>> +        error_setg(errp, "Unavailable socket: %d", socket_id);
+>> +        return;
+>> +    }
+>> +    if (book_id >= smp->books) {
+>> +        error_setg(errp, "Unavailable book: %d", book_id);
+>> +        return;
+>> +    }
+>> +    if (drawer_id >= smp->drawers) {
+>> +        error_setg(errp, "Unavailable drawer: %d", drawer_id);
+>> +        return;
+>> +    }
+>> +    if (entitlement >= S390_CPU_ENTITLEMENT__MAX) {
+>> +        error_setg(errp, "Unknown entitlement: %d", entitlement);
+>> +        return;
+>> +    }
+> I think you can delete this, too, there is no way that entitlement is > MAX.
+
+With entitlement being an enum in CPU properties yes.
+
+
+>
+>> +    if (dedicated && (entitlement == S390_CPU_ENTITLEMENT_LOW ||
+>> +                      entitlement == S390_CPU_ENTITLEMENT_MEDIUM)) {
+> Without HORIZONTAL you can do != HIGH and save one line, but that is
+> cosmetic only.
+
+Right, HORIZONTAL is eliminated during s390_topology_cpu_default()
+
+
+Regards,
+
+Pierre
+
