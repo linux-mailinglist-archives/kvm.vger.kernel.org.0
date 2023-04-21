@@ -2,68 +2,49 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CE4656EAA5F
-	for <lists+kvm@lfdr.de>; Fri, 21 Apr 2023 14:28:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CFF8F6EAA60
+	for <lists+kvm@lfdr.de>; Fri, 21 Apr 2023 14:29:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231890AbjDUM2k (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Apr 2023 08:28:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36358 "EHLO
+        id S231910AbjDUM35 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Apr 2023 08:29:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36664 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229543AbjDUM2i (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Apr 2023 08:28:38 -0400
-Received: from mail-qk1-x729.google.com (mail-qk1-x729.google.com [IPv6:2607:f8b0:4864:20::729])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7832A5EA
-        for <kvm@vger.kernel.org>; Fri, 21 Apr 2023 05:28:37 -0700 (PDT)
-Received: by mail-qk1-x729.google.com with SMTP id af79cd13be357-74db3642400so208347985a.2
-        for <kvm@vger.kernel.org>; Fri, 21 Apr 2023 05:28:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1682080117; x=1684672117;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=LaA2IxjFzdB4pL6Hvh4e5PWI3DFz5C3NfZLvof2RS6A=;
-        b=CfrWzaBJwLGlpq2Gqmthv22Pig8tuTHuNDHAwh+Zwb35qvZ9Tw/barFCYvaCT/GTNO
-         yD96aXapUnJ3gsbmNB0YC2mWV/gcrBeIW3Ed/6K8PeT+fekkOG9TLF/FhOCHgeMtVU65
-         nRlMSgUZkio33xAqsOGrBe/v6Lc9GIIoCKctOgoYKS5g9Voz02LdJ5BLxOPWUY7oMNMZ
-         IpppfvrtCiW651UQ7JA7LsJUpgixgczrcnBYq+0FgJDBrvkgq+tYA/R52+k3FQGMIpwM
-         ticuqGxj+QynHWT1IB3fIYdj+EHQ+wkU2xws491CPNeb+DfJVLZWflTpMv+UhKKYS9B4
-         //8A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682080117; x=1684672117;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=LaA2IxjFzdB4pL6Hvh4e5PWI3DFz5C3NfZLvof2RS6A=;
-        b=ater8kMsMc5teWIHmLrcuyX2tS7Tfg54OuXQAB6dCdx4MGcveyycM9KMSmsvRq5z4+
-         lgRujstk25Ce9wlZ6WEb5oUZHHJg6v4tuQ60CaSJxJb+tQzazm6sbJVqOFq9Vbvw5EKZ
-         XAscXkksGXpE6iNGMPfS+O6HIACZXRlW8W6dFogVza5OJE0ke8H9N4QktgliKV8sTS+0
-         gfeZ57cfqoG0vpFL5YqFQrG3D37X0hQVDYVdY1VnwGkMg6FdLEvhaI9LKFQTSaEK9U6w
-         bv67b+Vmw3H8sEOiCtbGffJSyluU+Q67OzDn80xsgaUcLMVieR6uBls0+m8dqUmTQHJd
-         yD9w==
-X-Gm-Message-State: AAQBX9d6xWJBzuT1J8Ziu0pSin2Uhm9RlAaJ0YVVNG7aYqtBulNj4kEq
-        XFn2QIQETjuF/V6oAautzOuNRLoWpT92cTqsCzI=
-X-Google-Smtp-Source: AKy350Ytf21NwN1nkXRDtNVotBxyI5dApyXftcbFhG6ouEugUyR9diFOOTcR/HxPw0BIZw53qTagDEJw9DpAtQZP5b8=
-X-Received: by 2002:ad4:5f0f:0:b0:5e9:9eb:e026 with SMTP id
- fo15-20020ad45f0f000000b005e909ebe026mr8473624qvb.29.1682080116952; Fri, 21
- Apr 2023 05:28:36 -0700 (PDT)
+        with ESMTP id S229464AbjDUM3z (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Apr 2023 08:29:55 -0400
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 5FF92A5E4
+        for <kvm@vger.kernel.org>; Fri, 21 Apr 2023 05:29:54 -0700 (PDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0414E1480;
+        Fri, 21 Apr 2023 05:30:38 -0700 (PDT)
+Received: from [10.57.23.51] (unknown [10.57.23.51])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4CE8C3F587;
+        Fri, 21 Apr 2023 05:29:53 -0700 (PDT)
+Message-ID: <0aa4a107-57d0-6e5b-46e5-86dbe5b3087f@arm.com>
+Date:   Fri, 21 Apr 2023 13:29:46 +0100
 MIME-Version: 1.0
-References: <20230412213510.1220557-1-amoorthy@google.com> <20230412213510.1220557-6-amoorthy@google.com>
- <a518e669-c758-57c8-3ba9-b4844e2cb79d@gmail.com> <CAF7b7mopmS5dQEQSC4g5NVmDpfV7UJv2UursruROrr3kb=BQHQ@mail.gmail.com>
-In-Reply-To: <CAF7b7mopmS5dQEQSC4g5NVmDpfV7UJv2UursruROrr3kb=BQHQ@mail.gmail.com>
-From:   Robert Hoo <robert.hoo.linux@gmail.com>
-Date:   Fri, 21 Apr 2023 20:28:26 +0800
-Message-ID: <CA+wubQAvt4UxvJV17hx-V-93cH7Wz0cgGyEDbu90gD0sOsCHMA@mail.gmail.com>
-Subject: Re: [PATCH v3 05/22] KVM: Add KVM_CAP_MEMORY_FAULT_INFO
-To:     Anish Moorthy <amoorthy@google.com>
-Cc:     pbonzini@redhat.com, maz@kernel.org, oliver.upton@linux.dev,
-        seanjc@google.com, jthoughton@google.com, bgardon@google.com,
-        dmatlack@google.com, ricarkol@google.com, axelrasmussen@google.com,
-        peterx@redhat.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+Subject: Re: RMRR device on non-Intel platform
+Content-Language: en-GB
+To:     Jason Gunthorpe <jgg@nvidia.com>,
+        Alex Williamson <alex.williamson@redhat.com>
+Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "iommu@lists.linux.dev" <iommu@lists.linux.dev>
+References: <BN9PR11MB5276E84229B5BD952D78E9598C639@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <20230420081539.6bf301ad.alex.williamson@redhat.com>
+ <6cce1c5d-ab50-41c4-6e62-661bc369d860@arm.com>
+ <20230420084906.2e4cce42.alex.williamson@redhat.com>
+ <fd324213-8d77-cb67-1c52-01cd0997a92c@arm.com>
+ <20230420154933.1a79de4e.alex.williamson@redhat.com>
+ <ZEJ73s/2M4Rd5r/X@nvidia.com>
+From:   Robin Murphy <robin.murphy@arm.com>
+In-Reply-To: <ZEJ73s/2M4Rd5r/X@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-7.5 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -71,11 +52,129 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Anish Moorthy <amoorthy@google.com> =E4=BA=8E2023=E5=B9=B44=E6=9C=8821=E6=
-=97=A5=E5=91=A8=E4=BA=94 02:10=E5=86=99=E9=81=93=EF=BC=9A
-> > struct exit_reason[] string for KVM_EXIT_MEMORY_FAULT can be added as
-> > well.
->
-> Done, assuming you mean the exit_reasons_known definition in kvm_util.c
+On 2023-04-21 13:04, Jason Gunthorpe wrote:
+> On Thu, Apr 20, 2023 at 03:49:33PM -0600, Alex Williamson wrote:
+>>> If we think this policy deserves to go beyond VFIO and userspace, and
+>>> it's reasonable that such devices should never be allowed to attach to
+>>> any other kind of kernel-owned unmanaged domain either, then we can
+>>> still trivially enforce that in core IOMMU code. I really see no need
+>>> for it to be in drivers at all.
+>>
+>> It seems like a reasonable choice to me that any mixing of unmanaged
+>> domains with IOMMU_RESV_DIRECT could be restricted globally.  Do we
+>> even have infrastructure for a driver to honor the necessary mapping
+>> requirements?
+> 
+> What we discussed about the definition of IOMMU_RESV_DIRECT was that
+> an identity map needs to be present at all times. This is what is
+> documented at least:
+> 
+> 	/* Memory regions which must be mapped 1:1 at all times */
+> 	IOMMU_RESV_DIRECT,
+> 
+> Notably, this also means the device can never be attached to a
+> blocking domain. I would also think that drivers asking for this
+> should ideally implement the "atomic replace" we discussed already to
+> change between identity and unmanaged without disturbing the FW doing
+> DMA to these addresses..
+> 
+> I was looking at this when we talked about it earlier and we don't
+> follow that guideline today for vfio/iommufd.
+> 
+> Since taking ownership immediately switches to a blocking domain
+> restricting the use of blocking also restricts ownership thus vfio and
+> iommufd will be prevented.
+> 
+> Other places using unmanaged domains must follow the
+> iommu_get_resv_regions() and setup IOMMU_RESV_DIRECT - we should not
+> restrict them in the core code.
+> 
+> It also slightly changes my prior remarks to Robin about error domain
+> attach handling, since blocking domains are not available for these
+> devices the "error state" for such a device should be the identity
+> domain to preserve FW access.
+> 
+> Also, we have a functional gap, ARM would really like a
+> IOMMU_RESV_DIRECT_RELAXABLE_SAFE which would have iommufd/vfio install
+> the 1:1 map and allow the device to be used. This is necessary for the
+> GIC ITS page hack to support MSI since we should enable VFIO inside a
+> VM. It is always safe for hostile VFIO userspace to DMA to the ITS
+> page.
 
-Yes.
+Can you clarify why something other than IOMMU_RESV_SW_MSI would be 
+needed? MSI regions already represent "safe" direct mappings, either as 
+an inherent property of the hardware, or with an actual mapping 
+maintained by software. Also RELAXABLE is meant to imply that it is only 
+needed until a driver takes over the device, which at face value doesn't 
+make much sense for interrupts.
+
+> So, after my domain error handling series, the core fix is pretty
+> simple and universal. We should also remove all the redundant code in
+> drivers - drivers should report the regions each devices needs
+> properly and leave enforcement to the core code.. Lu/Kevin do you want
+> to take this?
+> 
+> diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
+> index 19f8d28ff1323c..c15eb5e0ba761d 100644
+> --- a/drivers/iommu/iommu.c
+> +++ b/drivers/iommu/iommu.c
+> @@ -1059,6 +1059,9 @@ static int iommu_create_device_direct_mappings(struct iommu_domain *domain,
+>   		    entry->type != IOMMU_RESV_DIRECT_RELAXABLE)
+>   			continue;
+>   
+> +		if (entry->type == IOMMU_RESV_DIRECT)
+> +			dev->iommu->requires_direct = 1;
+
+We'll still need to set this when the default domain type is identity 
+too - see the diff I posted (the other parts below I merely implied).
+
+Thanks,
+Robin.
+
+> +
+>   		for (addr = start; addr <= end; addr += pg_size) {
+>   			phys_addr_t phys_addr;
+>   
+> @@ -2210,6 +2213,22 @@ static int __iommu_device_set_domain(struct iommu_group *group,
+>   {
+>   	int ret;
+>   
+> +	/*
+> +	 * If the driver has requested IOMMU_RESV_DIRECT then we cannot allow
+> +	 * the blocking domain to be attached as it does not contain the
+> +	 * required 1:1 mapping. This test effectively exclusive the device from
+> +	 * being used with iommu_group_claim_dma_owner() which will block vfio
+> +	 * and iommufd as well.
+> +	 */
+> +	if (dev->iommu->requires_direct &&
+> +	    (new_domain->type == IOMMU_DOMAIN_BLOCKED ||
+> +	     new_domain == group->blocking_domain)) {
+> +		dev_warn(
+> +			dev,
+> +			"Firmware has requested this device have a 1:1 IOMMU mapping, rejecting configuring the device without a 1:1 mapping. Contact your platform vendor.");
+> +		return -EINVAL;
+> +	}
+> +
+>   	if (dev->iommu->attach_deferred) {
+>   		if (new_domain == group->default_domain)
+>   			return 0;
+> diff --git a/include/linux/iommu.h b/include/linux/iommu.h
+> index 3ad14437487638..7729a07923faa6 100644
+> --- a/include/linux/iommu.h
+> +++ b/include/linux/iommu.h
+> @@ -407,6 +407,7 @@ struct iommu_fault_param {
+>    * @priv:	 IOMMU Driver private data
+>    * @max_pasids:  number of PASIDs this device can consume
+>    * @attach_deferred: the dma domain attachment is deferred
+> + * @requires_direct: The driver requested IOMMU_RESV_DIRECT
+>    *
+>    * TODO: migrate other per device data pointers under iommu_dev_data, e.g.
+>    *	struct iommu_group	*iommu_group;
+> @@ -420,6 +421,7 @@ struct dev_iommu {
+>   	void				*priv;
+>   	u32				max_pasids;
+>   	u32				attach_deferred:1;
+> +	u32				requires_direct:1;
+>   };
+>   
+>   int iommu_device_register(struct iommu_device *iommu,
