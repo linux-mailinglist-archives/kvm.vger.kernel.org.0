@@ -2,175 +2,187 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 61A726EA253
-	for <lists+kvm@lfdr.de>; Fri, 21 Apr 2023 05:27:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5D1706EA25D
+	for <lists+kvm@lfdr.de>; Fri, 21 Apr 2023 05:32:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230151AbjDUD13 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 Apr 2023 23:27:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39448 "EHLO
+        id S231739AbjDUDci (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 Apr 2023 23:32:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41144 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229451AbjDUD12 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 20 Apr 2023 23:27:28 -0400
-Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BBAFD1BD8
-        for <kvm@vger.kernel.org>; Thu, 20 Apr 2023 20:27:26 -0700 (PDT)
-Received: by mail-pl1-x636.google.com with SMTP id d9443c01a7336-1a652700c36so404465ad.0
-        for <kvm@vger.kernel.org>; Thu, 20 Apr 2023 20:27:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1682047646; x=1684639646;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=c+iWliMmJZEtXgWOh0UHnuG4gBuoaGaej7xxMmyc3O4=;
-        b=m3qK4dAlRbSQLQP8E9iBcnpbxqqk1LOFfr8sFysQIyq681Pc57ssOJHlWbQGrE79q0
-         vUPIJ3+oRAzOKPcd0CeDHWphJwY3YChSycgwy5Zi0eyrRGbOaOn/K/YjmtH8JTg6WSEC
-         88+VIvhTI23hiIFj++R7SXDpMGJkaa41FVvVwAH+jDUbvFvHC6ACR/9YGzwS6Z21qPXT
-         OmkSejU9hG0Bm4svYxDQjalMw78od203TYfcb0VxmEOGM9EFvBfQddriLVQ6GEfB310K
-         QAzuhREHhxJWQKp+MaNEcO/5rpzk+Qhl4rSLVysB1yHpBa3H+8nT/UeTQyohmU/PJWux
-         +mqA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682047646; x=1684639646;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=c+iWliMmJZEtXgWOh0UHnuG4gBuoaGaej7xxMmyc3O4=;
-        b=R2GfDXhyxsAviyzDaraHWhFpBAs6MyJvyC6zRuRC2MmriPG4nd2S15GNZWWQkJt72Q
-         Zi74q6eRl86EQXEtFKYQ9pGm3w1KAuc9UTgocOaQK5Eaek183uDNV8eoXBo5/bbjEpzL
-         XG8PR+Ppgj0IIz4EE07TBVaIb9Asa2VrAJjsEqd7XXi7FCGuCqIRm1H177AAXw/Ew9M+
-         U6hjNHQbFDtVtOWik1NKUQXgCe7+r5SozyQZtP9cPk2GzVrPED320dvhR9F33xWhpzr2
-         nUUikXWiOddbTkjJ1jb5qnG49HvVzLZXRk844zCoiejH4x5A3sX+8Cu94VZBfwOnerTJ
-         dq6Q==
-X-Gm-Message-State: AAQBX9f13mmNPngNbsaz9Z6Yx+vTqVRGGp9kvCtWQpKaBv66YhvFRWEZ
-        WTt9DNFsVSmmWiAe9nMCxpVXO8ns61uhUlfFcitntw==
-X-Google-Smtp-Source: AKy350Y0V3oR05OlOu9Ym/IEUsvWMzCAWltkwOvQWPTggbKuhXr6pJ7P/dof0FeWwGEsy6fXviKi3Rd9yRQakaBjSYg=
-X-Received: by 2002:a17:902:7205:b0:1a9:343c:76e5 with SMTP id
- ba5-20020a170902720500b001a9343c76e5mr146872plb.18.1682047645947; Thu, 20 Apr
- 2023 20:27:25 -0700 (PDT)
+        with ESMTP id S230144AbjDUDcg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 20 Apr 2023 23:32:36 -0400
+Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 201231BE7
+        for <kvm@vger.kernel.org>; Thu, 20 Apr 2023 20:32:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1682047955; x=1713583955;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=C7ysZjyyk6A43TXXb3sEBUme9jAdeVr5DTDbnqlBROw=;
+  b=ioDw0I27g3RIHosX4BmI74lL51Ec7AaMaOI1R2bohwq10UPDTvhhWbqS
+   v7exuE4/LR4lMPvdMIx0kg5zTc2N733qpZ5U4ArQ4+0lQ3B+5fUtKYv6H
+   mlEr+pCXtOn14VsChbvCEy2VRVpej+BQtIUlPnCCP2I0J4SAFWZfChi2T
+   YM08phurIE4IysVc6gBI/o91oJMMe3jbXDh0Mdc3CL8oYdnB3debsrWss
+   T5ua2yNZQvAkGANz919rgY9Z/nzg97GuKmCJ2ikIduo8I6Za4qZ7MNBH+
+   MGYL+M+eQtG4bo0OK+EQ8ZFqZGr6Vxsvq+ieDpzAYINcbzwtwDs+jLVOj
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10686"; a="373827833"
+X-IronPort-AV: E=Sophos;i="5.99,214,1677571200"; 
+   d="scan'208";a="373827833"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Apr 2023 20:32:29 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10686"; a="781454545"
+X-IronPort-AV: E=Sophos;i="5.99,214,1677571200"; 
+   d="scan'208";a="781454545"
+Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
+  by FMSMGA003.fm.intel.com with ESMTP; 20 Apr 2023 20:32:29 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.23; Thu, 20 Apr 2023 20:32:28 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.23 via Frontend Transport; Thu, 20 Apr 2023 20:32:28 -0700
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.171)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.23; Thu, 20 Apr 2023 20:32:28 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=caunadZ6din9t4lR8EcoVhw3jwaQ/WVfHeY07e628ftsgHAQ726tPqA1XRcywJENZDf51eJjI6RAZAJNWBY6ZuPuD+CjqvQbbbPamUMr1VATNrrlNUFTm+ea8lcfObTOBOnGCcytP35tpQ233hBJzc8+h2L5Kju0MIy2FABepNEhrkypHy3053XZ5aN1cyyRrHImQMRbdITAi1e0HUTE+VNz5n+8w92hhRD76qVSdENTh4Pl8lV4vdxKjPFbCLohoP2DDsLWt4EK5QqjyMUfckyqK7sinhW0TJ9dHTMubpMdaZpxveDPEqeni8Fcv5hD7+1mFRE+jMf0NBUa+76r8A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=qsV8FX25w0adZZ0swbpPmkCM+86OQM1vUxiHyYVnOxg=;
+ b=XOsAPn0l4ywGPS7UNsXj24HBcr79lyOA0Eq5YOTiy6G9ANTj3OKk9OHVr2XG2uJRMe27dhCXK3ojpdAPMDtq6h1Fu5Co8IvTYKdlXQItxr9Cs3Ldjti6OheD+NxyiMJdWJyWIzjWVmmSDbAxO6TPakrwkuLZ0vjZjY/JDRl6CMAq4XbA8quRYxJJmySEGJJ4OQc9k+60IMYAmD6/0qEpR4AKCWrv5nA8PoAfcXa7ZbPIqKWtADdMkxsQk6NloKCxjaY58qnQGKpw0C30bCJ6yyuRCiJujWTAr45gQeFmcAcIMqu1Blod/nP4fcDt8DVJLkV3EAwTQ+amxXrrafIvVQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from PH8PR11MB6780.namprd11.prod.outlook.com (2603:10b6:510:1cb::11)
+ by CYYPR11MB8387.namprd11.prod.outlook.com (2603:10b6:930:c8::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6319.22; Fri, 21 Apr
+ 2023 03:32:25 +0000
+Received: from PH8PR11MB6780.namprd11.prod.outlook.com
+ ([fe80::b4cb:1f70:7e2a:c4f5]) by PH8PR11MB6780.namprd11.prod.outlook.com
+ ([fe80::b4cb:1f70:7e2a:c4f5%9]) with mapi id 15.20.6319.022; Fri, 21 Apr 2023
+ 03:32:25 +0000
+Date:   Fri, 21 Apr 2023 11:32:14 +0800
+From:   Chao Gao <chao.gao@intel.com>
+To:     Binbin Wu <binbin.wu@linux.intel.com>
+CC:     <kvm@vger.kernel.org>, <seanjc@google.com>, <pbonzini@redhat.com>,
+        <robert.hu@linux.intel.com>
+Subject: Re: [kvm-unit-tests v3 2/4] x86: Add test case for LAM_SUP
+Message-ID: <ZEIDvnwPe5LcCVNW@chao-email>
+References: <20230412075134.21240-1-binbin.wu@linux.intel.com>
+ <20230412075134.21240-3-binbin.wu@linux.intel.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20230412075134.21240-3-binbin.wu@linux.intel.com>
+X-ClientProxiedBy: SG2P153CA0047.APCP153.PROD.OUTLOOK.COM (2603:1096:4:c6::16)
+ To PH8PR11MB6780.namprd11.prod.outlook.com (2603:10b6:510:1cb::11)
 MIME-Version: 1.0
-References: <20230419021852.2981107-1-reijiw@google.com> <20230419021852.2981107-2-reijiw@google.com>
- <87cz405or6.wl-maz@kernel.org> <20230420021302.iyl3pqo3lg6lpabv@google.com> <86y1mnj7dg.wl-maz@kernel.org>
-In-Reply-To: <86y1mnj7dg.wl-maz@kernel.org>
-From:   Reiji Watanabe <reijiw@google.com>
-Date:   Thu, 20 Apr 2023 20:27:09 -0700
-Message-ID: <CAAeT=FxAqWJ01MH748Usvhq5Js6QJnDA-4x3t=4WHTQ+7bXcDw@mail.gmail.com>
-Subject: Re: [PATCH v1 1/2] KVM: arm64: Acquire mp_state_lock in kvm_arch_vcpu_ioctl_vcpu_init()
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Raghavendra Rao Anata <rananta@google.com>,
-        Will Deacon <will@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH8PR11MB6780:EE_|CYYPR11MB8387:EE_
+X-MS-Office365-Filtering-Correlation-Id: daa5c5c7-6164-44d4-6e44-08db42190603
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: etF0B976EzuTtdeJQo+F2kT5o9dpm/WRetX+Fj1TTV2Fo82DWALVpOcbVIRkVh+OdzlTr7kyqss3MGn9NNSp8e77a6tntDzIBGf2M3dh5fBrDEC5rf9VbtBS5BAk+xEaWHYrpSzWPxAynopacc9J00uggS17yOCpXZv6C7uWzQ4dsF1W5Y3yjCibgbRiS+BS0QLbJ0iQC/T5oWl7XHT4lplIDB8P2prGipkejwGKBJ8IsaT3lStYWFIrKlDCVF8fXR/Cbv1NoXu5HlgR9SYEE5JVcU51/arCmzF1IjDdn1vVYnfmnSzyLmCYOuCzzlWL39moIAkhZj7Izsmkd+hIq048EKvMDKiJKOHdkc6enHtiw4wlYwVqK0kFfBqUUThoDcjsJz6engvQ9GgWG8lTO4f1uPXqM3uZnWm7Bg0K+W1bHdqgk3eY+3mfwp62wbMP+5jB/VAfeoRieggPYgOvaxIU0Mxae9u5B+RgktFq060h6F+YL+iRSTXg5eYRi142PjW8feJLMGIMl14vK3lDnYAfE/+IWFjr0Jvr8uAZ8vo=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH8PR11MB6780.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(7916004)(136003)(376002)(396003)(346002)(366004)(39860400002)(451199021)(4326008)(6916009)(316002)(966005)(66946007)(66476007)(66556008)(9686003)(26005)(6512007)(6506007)(82960400001)(38100700002)(186003)(83380400001)(5660300002)(8676002)(41300700001)(33716001)(8936002)(6486002)(478600001)(6666004)(86362001)(2906002)(44832011);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?F8yx1wGI7YKSm9AYHjF2/zABYnliuLrgC+fTXv+Q7yPdx5yv/GjiWLzFzEv/?=
+ =?us-ascii?Q?6SrRJwFh9eLWue1W9OnYJi1LVCTEKdKxli56Goc8UcRgUdmW3N0K1sHamCWO?=
+ =?us-ascii?Q?uvvjLQjDmDPLCjAnp26ARYUk0jHlTSY0Gih/p15EKbhPyJBK1gj9ghXQpwFY?=
+ =?us-ascii?Q?9X9V3i3NGieclGlG3z5+wYIsvA9nVN4+I5Ukc2dBoaKlS7MDx9a2ZCMq5Dyl?=
+ =?us-ascii?Q?lliAFVM8V4w2SDr17Ro+yQmBPsAzOJi9Bd4BFwt8PXdyC7baF2GYM9UGXpNL?=
+ =?us-ascii?Q?LzZhqvkqI2r2P1nrAV1orM1pjhVMObESKI6GuSWfWJ15t9wb/x5tq4kmLwhI?=
+ =?us-ascii?Q?+v4LSR6FwzgfyzxNUgIBZJg000Fs990gLjJMQ/20jNXIfYpPkCDdpJolHhpA?=
+ =?us-ascii?Q?TeQLrf/Z6KROXei3A4Ng3ihNRZnJjNolf2Q8sWN0UvQuxzIYClBlX6dBGJ5T?=
+ =?us-ascii?Q?yfJIVNsHn7DkUYibS/huSCuFRtUprD5m3TGlPJuSnFDDev+anceYpx0cY01+?=
+ =?us-ascii?Q?b3cgwSlHWWygSzyxqhCyK0778JGBlWMn8OVNIoU1N3IrWLM6cPTQv4VzLBaG?=
+ =?us-ascii?Q?AWOTTkPQ/VGU9SkvGzKprB3EtYlNmywQGfGTS7w+JU+zU0mg54Bxjyd/L53w?=
+ =?us-ascii?Q?cni9ZHVVPymTQ3mLaD7eftKCgm+/+YALeWELGz0Xtm0HeYnxSHvtMY2zgCfn?=
+ =?us-ascii?Q?Hk5XyLIyizHfDOHDL8Bso44392OH+EF9dMIMPPJ8o6nR2HOeHqWerV9ICUTw?=
+ =?us-ascii?Q?E2lM6mN1mEZG3N20INiw3EBk+ah4syHoACm7X60bWLdWCx11PkhKIMoPyFU2?=
+ =?us-ascii?Q?1SVgtwJBxqOVyxNM9NpMHziZLG+up6McuoVtq5f7EOdJWHmpD9auP0ltL6TK?=
+ =?us-ascii?Q?y0/WfJSWn2+gf30dfO11d19cTg74fxJsaVLXKn+jBrwlqDPg74Xgsfk6dA0u?=
+ =?us-ascii?Q?e32paVIKNlnI+KKM0+rTogUXPTGIoQRZluUzA1f7FWAL15TAJyItx4XJDEYl?=
+ =?us-ascii?Q?Tsw89tW7/LeJFNvIA2CUD3TfGrBAp0BOS4VwJIfI9nOHUSDpjywwoUo+5Prd?=
+ =?us-ascii?Q?9PGIw+FoEfrW6Kf3UDxx7Swbexbwz5XRcNjVwMNK3+bLikoN5GOYfbSADlsw?=
+ =?us-ascii?Q?TtJMQ8NBwRQarlNsAF+NhlqLvwMHrIhGSqPzCnicCh8+jaMW36bYtCHCx564?=
+ =?us-ascii?Q?S0aNDWsjw6ld/S7xxGsKbEYrvRKkKmzatnxB0kkGMBIgKV+tlUBVulgLlDml?=
+ =?us-ascii?Q?bur1VnkcX/APpw+V6/rY4f/SR0VBg+gK778vaCnOja46YMaLJ0BbmlIac2I7?=
+ =?us-ascii?Q?j6sIOv33MEbzIxDXxZixup6ETUAXqLgXf3VRqrIOwR08qc72MMmrr7L/aLrr?=
+ =?us-ascii?Q?XCVt/p1Lv0yROoOQpoS2dSuwoOsxT8eTT/mHi23br9ZCBmwnD112AfUh9Qnf?=
+ =?us-ascii?Q?7lwHDTwOTOP5rSuLc6E2pPmLHaYxAEqfKMGLkVjP4t7hjY/H1sVzjFHdk/aJ?=
+ =?us-ascii?Q?nBYEW2f50bpSp+U853q2LMmXYhUVawhJbVwDBZHN9qeXVaTes93yS22CWKfz?=
+ =?us-ascii?Q?78ITxRStRk5438x+4JsXqiaWMjUb0az95OFxC8NO?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: daa5c5c7-6164-44d4-6e44-08db42190603
+X-MS-Exchange-CrossTenant-AuthSource: PH8PR11MB6780.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Apr 2023 03:32:24.9548
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: JX98Z0O24HHhYjS/+t/zL5DeYKt59HeCb9ggUTANY+LI3hdWCvQcck43gGiVYuoBROhUKnlfJOnf9eNRBF0fsw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CYYPR11MB8387
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Apr 20, 2023 at 1:16=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrote=
-:
+On Wed, Apr 12, 2023 at 03:51:32PM +0800, Binbin Wu wrote:
+>From: Robert Hoo <robert.hu@linux.intel.com>
 >
-> On Thu, 20 Apr 2023 03:13:02 +0100,
-> Reiji Watanabe <reijiw@google.com> wrote:
-> >
-> > Hi Marc,
-> >
-> > On Wed, Apr 19, 2023 at 08:12:45AM +0100, Marc Zyngier wrote:
-> > > On Wed, 19 Apr 2023 03:18:51 +0100,
-> > > Reiji Watanabe <reijiw@google.com> wrote:
-> > > > kvm_arch_vcpu_ioctl_vcpu_init() doesn't acquire mp_state_lock
-> > > > when setting the mp_state to KVM_MP_STATE_RUNNABLE. Fix the
-> > > > code to acquire the lock.
-> > > >
-> > > > Signed-off-by: Reiji Watanabe <reijiw@google.com>
-> > > > ---
-> > > >  arch/arm64/kvm/arm.c | 5 ++++-
-> > > >  1 file changed, 4 insertions(+), 1 deletion(-)
-> > > >
-> > > > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> > > > index fbafcbbcc463..388aa4f18f21 100644
-> > > > --- a/arch/arm64/kvm/arm.c
-> > > > +++ b/arch/arm64/kvm/arm.c
-> > > > @@ -1244,8 +1244,11 @@ static int kvm_arch_vcpu_ioctl_vcpu_init(str=
-uct kvm_vcpu *vcpu,
-> > > >    */
-> > > >   if (test_bit(KVM_ARM_VCPU_POWER_OFF, vcpu->arch.features))
-> > > >           kvm_arm_vcpu_power_off(vcpu);
-> > > > - else
-> > > > + else {
-> > > > +         spin_lock(&vcpu->arch.mp_state_lock);
-> > > >           WRITE_ONCE(vcpu->arch.mp_state.mp_state, KVM_MP_STATE_RUN=
-NABLE);
-> > > > +         spin_unlock(&vcpu->arch.mp_state_lock);
-> > > > + }
-> > > >
-> > > >   return 0;
-> > > >  }
-> > >
-> > > I'm not entirely convinced that this fixes anything. What does the
-> > > lock hazard against given that the write is atomic? But maybe a
-> >
-> > It appears that kvm_psci_vcpu_on() expects the vCPU's mp_state
-> > to not be changed by holding the lock.  Although I don't think this
-> > code practically causes any real issues now, I am a little concerned
-> > about leaving one instance that updates mpstate without acquiring the
-> > lock, in terms of future maintenance, as holding the lock won't prevent
-> > mp_state from being updated.
-> >
-> > What do you think ?
+>This unit test covers:
+>1. CR4.LAM_SUP toggles.
+>2. Memory & MMIO access with supervisor mode address with LAM metadata.
+>3. INVLPG memory operand doesn't contain LAM meta data, if the address
+>   is non-canonical form then the INVLPG is the same as a NOP (no #GP).
+>4. INVPCID memory operand (descriptor pointer) could contain LAM meta data,
+>   however, the address in the descriptor should be canonical.
 >
-> Right, fair enough. It is probably better to take the lock and not
-> have to think of this sort of things... I'm becoming more lazy by the
-> minute!
+>In x86/unittests.cfg, add 2 test cases/guest conf, with and without LAM.
 >
-> >
-> > > slightly more readable of this would be to expand the critical sectio=
-n
-> > > this way:
-> > >
-> > > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> > > index 4ec888fdd4f7..bb21d0c25de7 100644
-> > > --- a/arch/arm64/kvm/arm.c
-> > > +++ b/arch/arm64/kvm/arm.c
-> > > @@ -1246,11 +1246,15 @@ static int kvm_arch_vcpu_ioctl_vcpu_init(stru=
-ct kvm_vcpu *vcpu,
-> > >     /*
-> > >      * Handle the "start in power-off" case.
-> > >      */
-> > > +   spin_lock(&vcpu->arch.mp_state_lock);
-> > > +
-> > >     if (test_bit(KVM_ARM_VCPU_POWER_OFF, vcpu->arch.features))
-> > > -           kvm_arm_vcpu_power_off(vcpu);
-> > > +           __kvm_arm_vcpu_power_off(vcpu);
-> > >     else
-> > >             WRITE_ONCE(vcpu->arch.mp_state.mp_state, KVM_MP_STATE_RUN=
-NABLE);
-> > >
-> > > +   spin_unlock(&vcpu->arch.mp_state_lock);
-> > > +
-> > >     return 0;
-> > >  }
-> > >
-> > > Thoughts?
-> >
-> > Yes, it looks better!
+>LAM feature spec: https://cdrdv2.intel.com/v1/dl/getContent/671368, Chap 7
+>LINEAR ADDRESS MASKING (LAM)
 >
-> Cool. I've applied this change to your patch, applied the series to
-> the lock inversion branch, and remerged the branch in -next.
->
-> We're getting there! ;-)
+>Signed-off-by: Robert Hoo <robert.hu@linux.intel.com>
+>Co-developed-by: Binbin Wu <binbin.wu@linux.intel.com>
+>Signed-off-by: Binbin Wu <binbin.wu@linux.intel.com>
 
-Thank you, Marc!
-Reiji
+Reviewed-by: Chao Gao <chao.gao@intel.com>
+
+one nit below
+
+>+static void do_invpcid(void *desc)
+>+{
+>+	unsigned long type = 0;
+
+the local variable isn't needed ...
+
+>+	struct invpcid_desc *desc_ptr = (struct invpcid_desc *)desc;
+>+
+>+	asm volatile("invpcid %0, %1" :
+>+	                              : "m" (*desc_ptr), "r" (type)
+
+You can simply use
+	"r" (0)
+.
+
+>+	                              : "memory");
+>+}
