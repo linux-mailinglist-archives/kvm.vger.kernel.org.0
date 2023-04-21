@@ -2,141 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7998D6EB23B
-	for <lists+kvm@lfdr.de>; Fri, 21 Apr 2023 21:24:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8451D6EB260
+	for <lists+kvm@lfdr.de>; Fri, 21 Apr 2023 21:43:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233533AbjDUTYz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Apr 2023 15:24:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44500 "EHLO
+        id S233582AbjDUTnd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Apr 2023 15:43:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51914 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233527AbjDUTYy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Apr 2023 15:24:54 -0400
-Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4192126A3
-        for <kvm@vger.kernel.org>; Fri, 21 Apr 2023 12:24:53 -0700 (PDT)
-Received: by mail-pl1-x633.google.com with SMTP id d9443c01a7336-1a68f2345c5so22213545ad.2
-        for <kvm@vger.kernel.org>; Fri, 21 Apr 2023 12:24:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rivosinc-com.20221208.gappssmtp.com; s=20221208; t=1682105092; x=1684697092;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lvkLA+a8YoW/wuOsjaIxJzuPVSb1YjjMK/JpWWUYlMo=;
-        b=Z1mYNDZ6AkudtVnrT3n5V/eEIts8OddUDSW9KLn74LxIddwBxxMBvHvXimDOcCpD64
-         X6WHStiU+II2uxk73igF03YyRe+mqwSuW6H9Qtdv7u/DWvtDubpnzfk1YriCRr9za8v5
-         XC2S0BuPZrz2o6+CZXODj0TbYeG2KwCM2cVe6oSpp9pVUDXxGg9olTtkau7Q+5+NsYc4
-         cPFBjLGEPHFWzzeOrmDbwFXicua/PB03j/rs7FblIcXdCvm1JDi0Tcgqxr22anUmw5R3
-         tGRsDEZo6/EsKO19A+OOzPNIS7W+AHqe2QZk6VRckV7ELyCwNp6MWsNbX2FhgYUyMfrE
-         CxsA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682105092; x=1684697092;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=lvkLA+a8YoW/wuOsjaIxJzuPVSb1YjjMK/JpWWUYlMo=;
-        b=BHBRyFazfl8IitdjEW42/DTfb8Hal1k42U7Scglhx1nl+QlvnP6Mcinf5DJQqyIafW
-         wPoajxIizfW5OLpkOKf4T23pKY6LkpYkkkvlENiq14XiCtSqnAVcN+yK3yMcciihb2U3
-         gspxGAJsiHiQRft23W4mr2zMTbF9TAeebbL1uUQR9XGCwxWFUS7vyw/6vUxAhErhqqU7
-         OIrtk3LJeYXcSRrcp0FPsNdWtRVf7IOapEHZBy3Ppz5fHbOGio/2Cp9smCMv7gYa4DjF
-         vQUHAUn3uySx9y94tNMZcBuT0lQeGmmYPMsztyW9dFCbRMtnScBH+LP1Hl5b41PBlo/2
-         2ijw==
-X-Gm-Message-State: AAQBX9dH+WhyAGR+k6881usI+wzsFJgGzSno1T+611T/9w/TG0MHMjho
-        kUfMTlfGrNXP4/AkQT8X0qrlOLH6xjqA4KQNVPB/Ag==
-X-Google-Smtp-Source: AKy350bWDl0o884sMlNpmr/NR+NvkEPHrIR9Z4zX48mWh2RO0zn4bHfGQxbBytUzrO9XtFhCP8cwpF/T0JLyArYTY9E=
-X-Received: by 2002:a17:903:22c8:b0:1a6:c12d:9036 with SMTP id
- y8-20020a17090322c800b001a6c12d9036mr7907063plg.33.1682105092516; Fri, 21 Apr
- 2023 12:24:52 -0700 (PDT)
+        with ESMTP id S232480AbjDUTnb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Apr 2023 15:43:31 -0400
+Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5DBB4198B;
+        Fri, 21 Apr 2023 12:43:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1682106210; x=1713642210;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=j/aCznEbmzY6CPJfpDgAnembGflLWzYVe2uqfonw5qE=;
+  b=bBu9kFSG4MUTd41ZNewf4Bunotdt1cJe7TqkiHht4O3SWolQsfKdSn0r
+   V0+4Vcl3rJBWbpeh+vorSkopT2JNMlYgQy399Fo0hlDAJWV3bMf+sDX5j
+   7k/XGVtOXhulcUEYXwutfAVHJqDZcT7t/W4YaK5Waq83Vry9doFzTVlV3
+   zTmZPbxXy/MmfFc9kbrmEJPq1Cqb+oLCRw3rvA+OlvyngRq96UUp5BkuR
+   qDA6SCsdZUXjIaU7BBJua2OdDXfAZzYqxiIX78+kLb+u2zqzDVfQEwz0k
+   wzTsB29Mt7OypmLj1Ikzo3soUC2TszL2nEz5az1T0kC62r+sZi+cMkHrJ
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10687"; a="348861991"
+X-IronPort-AV: E=Sophos;i="5.99,216,1677571200"; 
+   d="scan'208";a="348861991"
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Apr 2023 12:43:29 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10687"; a="866795075"
+X-IronPort-AV: E=Sophos;i="5.99,216,1677571200"; 
+   d="scan'208";a="866795075"
+Received: from lkp-server01.sh.intel.com (HELO b613635ddfff) ([10.239.97.150])
+  by orsmga005.jf.intel.com with ESMTP; 21 Apr 2023 12:43:22 -0700
+Received: from kbuild by b613635ddfff with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1ppwfB-000gla-0k;
+        Fri, 21 Apr 2023 19:43:21 +0000
+Date:   Sat, 22 Apr 2023 03:43:03 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Vipin Sharma <vipinsh@google.com>, maz@kernel.org,
+        oliver.upton@linux.dev, james.morse@arm.com,
+        suzuki.poulose@arm.com, yuzenghui@huawei.com,
+        catalin.marinas@arm.com, will@kernel.org, chenhuacai@kernel.org,
+        aleksandar.qemu.devel@gmail.com, tsbogend@alpha.franken.de,
+        anup@brainfault.org, atishp@atishpatra.org,
+        paul.walmsley@sifive.com, palmer@dabbelt.com,
+        aou@eecs.berkeley.edu, seanjc@google.com, pbonzini@redhat.com,
+        dmatlack@google.com, ricarkol@google.com
+Cc:     oe-kbuild-all@lists.linux.dev,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        linux-mips@vger.kernel.org, kvm-riscv@lists.infradead.org,
+        linux-riscv@lists.infradead.org, linux-kselftest@vger.kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Vipin Sharma <vipinsh@google.com>
+Subject: Re: [PATCH 7/9] KVM: mmu: Move mmu lock/unlock to arch code for
+ clear dirty log
+Message-ID: <202304220315.bpwbgH5n-lkp@intel.com>
+References: <20230421165305.804301-8-vipinsh@google.com>
 MIME-Version: 1.0
-References: <20230419221716.3603068-1-atishp@rivosinc.com> <20230419221716.3603068-46-atishp@rivosinc.com>
- <69ba1760-a079-fd8f-b079-fcb01e3eedec@intel.com>
-In-Reply-To: <69ba1760-a079-fd8f-b079-fcb01e3eedec@intel.com>
-From:   Atish Kumar Patra <atishp@rivosinc.com>
-Date:   Sat, 22 Apr 2023 00:54:41 +0530
-Message-ID: <CAHBxVyFhDapAeMQ8quBqWZ10jWSHw1CdE227ciyKQpULHYzffA@mail.gmail.com>
-Subject: Re: [RFC 45/48] RISC-V: ioremap: Implement for arch specific ioremap hooks
-To:     Dave Hansen <dave.hansen@intel.com>
-Cc:     linux-kernel@vger.kernel.org,
-        Rajnesh Kanwal <rkanwal@rivosinc.com>,
-        Alexandre Ghiti <alex@ghiti.fr>,
-        Andrew Jones <ajones@ventanamicro.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Anup Patel <anup@brainfault.org>,
-        Atish Patra <atishp@atishpatra.org>,
-        =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@rivosinc.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
-        Sean Christopherson <seanjc@google.com>,
-        linux-coco@lists.linux.dev, Dylan Reid <dylan@rivosinc.com>,
-        abrestic@rivosinc.com, Samuel Ortiz <sameo@rivosinc.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Conor Dooley <conor.dooley@microchip.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Guo Ren <guoren@kernel.org>, Heiko Stuebner <heiko@sntech.de>,
-        Jiri Slaby <jirislaby@kernel.org>,
-        kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
-        linux-mm@kvack.org, linux-riscv@lists.infradead.org,
-        Mayuresh Chitale <mchitale@ventanamicro.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Uladzislau Rezki <urezki@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230421165305.804301-8-vipinsh@google.com>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Apr 21, 2023 at 3:46=E2=80=AFAM Dave Hansen <dave.hansen@intel.com>=
- wrote:
->
-> On 4/19/23 15:17, Atish Patra wrote:
-> > The guests running in CoVE must notify the host about its mmio regions
-> > so that host can enable mmio emulation.
->
-> This one doesn't make a lot of sense to me.
->
-> The guest and host must agree about the guest's physical layout up
-> front.  In general, the host gets to dictate that layout.  It tells the
-> guest, up front, what is present in the guest physical address space.
->
+Hi Vipin,
 
-That is passed through DT/ACPI (which will be measured) to the guest.
+kernel test robot noticed the following build warnings:
 
-> This callback appears to say to the host:
->
->         Hey, I (the guest) am treating this guest physical area as MMIO.
->
-> But the host and guest have to agree _somewhere_ what the MMIO is used
-> for, not just that it is being used as MMIO.
->
+[auto build test WARNING on 95b9779c1758f03cf494e8550d6249a40089ed1c]
 
-Yes. The TSM (TEE Security Manager) which is equivalent to TDX also
-needs to be aware
-of the MMIO regions so that it can forward the faults accordingly.
-Most of the MMIO is emulated in the host (userspace or kernel
-emulation if present).
-The host is outside the trust boundary of the guest. Thus, guest needs
-to make sure the host
-only emulates the designated MMIO region. Otherwise, it opens an
-attack surface from a malicious host.
+url:    https://github.com/intel-lab-lkp/linux/commits/Vipin-Sharma/KVM-selftests-Allow-dirty_log_perf_test-to-clear-dirty-memory-in-chunks/20230422-005708
+base:   95b9779c1758f03cf494e8550d6249a40089ed1c
+patch link:    https://lore.kernel.org/r/20230421165305.804301-8-vipinsh%40google.com
+patch subject: [PATCH 7/9] KVM: mmu: Move mmu lock/unlock to arch code for clear dirty log
+config: riscv-allyesconfig (https://download.01.org/0day-ci/archive/20230422/202304220315.bpwbgH5n-lkp@intel.com/config)
+compiler: riscv64-linux-gcc (GCC) 12.1.0
+reproduce (this is a W=1 build):
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # https://github.com/intel-lab-lkp/linux/commit/e7505b53d53e3bb5e7f1c43233ef3644673edb75
+        git remote add linux-review https://github.com/intel-lab-lkp/linux
+        git fetch --no-tags linux-review Vipin-Sharma/KVM-selftests-Allow-dirty_log_perf_test-to-clear-dirty-memory-in-chunks/20230422-005708
+        git checkout e7505b53d53e3bb5e7f1c43233ef3644673edb75
+        # save the config file
+        mkdir build_dir && cp config build_dir/.config
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross W=1 O=build_dir ARCH=riscv olddefconfig
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross W=1 O=build_dir ARCH=riscv SHELL=/bin/bash arch/riscv/kvm/
 
-All other confidential computing solutions also depend on guest
-initiated MMIO as well. AFAIK, the TDX & SEV
-relies on #VE like exceptions to invoke that while this patch is
-similar to what pkvm does.
-This approach lets the enlightened guest control which MMIO regions it
-wants the host to emulate.
-It can be a subset of the region's host provided the layout. The guest
-device filtering solution is based on
-this idea as well [1].
+If you fix the issue, kindly add following tag where applicable
+| Reported-by: kernel test robot <lkp@intel.com>
+| Link: https://lore.kernel.org/oe-kbuild-all/202304220315.bpwbgH5n-lkp@intel.com/
 
-[1] https://lore.kernel.org/all/20210930010511.3387967-1-sathyanarayanan.ku=
-ppuswamy@linux.intel.com/
+All warnings (new ones prefixed by >>):
+
+   arch/riscv/kvm/mmu.c: In function 'kvm_arch_mmu_enable_log_dirty_pt_masked':
+>> arch/riscv/kvm/mmu.c:399:9: warning: ISO C90 forbids mixed declarations and code [-Wdeclaration-after-statement]
+     399 |         phys_addr_t base_gfn = slot->base_gfn + gfn_offset;
+         |         ^~~~~~~~~~~
 
 
->
+vim +399 arch/riscv/kvm/mmu.c
+
+c9d57373fc87a3 Anup Patel   2022-07-29  392  
+9d05c1fee83757 Anup Patel   2021-09-27  393  void kvm_arch_mmu_enable_log_dirty_pt_masked(struct kvm *kvm,
+9d05c1fee83757 Anup Patel   2021-09-27  394  					     struct kvm_memory_slot *slot,
+9d05c1fee83757 Anup Patel   2021-09-27  395  					     gfn_t gfn_offset,
+9d05c1fee83757 Anup Patel   2021-09-27  396  					     unsigned long mask)
+9d05c1fee83757 Anup Patel   2021-09-27  397  {
+e7505b53d53e3b Vipin Sharma 2023-04-21  398  	spin_lock(&kvm->mmu_lock);
+9d05c1fee83757 Anup Patel   2021-09-27 @399  	phys_addr_t base_gfn = slot->base_gfn + gfn_offset;
+9d05c1fee83757 Anup Patel   2021-09-27  400  	phys_addr_t start = (base_gfn +  __ffs(mask)) << PAGE_SHIFT;
+9d05c1fee83757 Anup Patel   2021-09-27  401  	phys_addr_t end = (base_gfn + __fls(mask) + 1) << PAGE_SHIFT;
+9d05c1fee83757 Anup Patel   2021-09-27  402  
+26708234eb12e7 Anup Patel   2022-05-09  403  	gstage_wp_range(kvm, start, end);
+e7505b53d53e3b Vipin Sharma 2023-04-21  404  	spin_unlock(&kvm->mmu_lock);
+9d05c1fee83757 Anup Patel   2021-09-27  405  }
+99cdc6c18c2d81 Anup Patel   2021-09-27  406  
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests
