@@ -2,108 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B2D086EB5CB
-	for <lists+kvm@lfdr.de>; Sat, 22 Apr 2023 01:48:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DA2AD6EB5CF
+	for <lists+kvm@lfdr.de>; Sat, 22 Apr 2023 01:49:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233804AbjDUXsF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Apr 2023 19:48:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38620 "EHLO
+        id S233819AbjDUXtl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Apr 2023 19:49:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39904 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233879AbjDUXr7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Apr 2023 19:47:59 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 533621BF5
-        for <kvm@vger.kernel.org>; Fri, 21 Apr 2023 16:47:14 -0700 (PDT)
+        with ESMTP id S233235AbjDUXtj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Apr 2023 19:49:39 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D623212F
+        for <kvm@vger.kernel.org>; Fri, 21 Apr 2023 16:48:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1682120833;
+        s=mimecast20190719; t=1682120929;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=ToPFBZRZwwcbfkNhosaQClC7SiVbXSkZAsqSyiQXGpI=;
-        b=hWZbICNL08wbX3v60ZsxOlSyKIVed7fQJMgEKXoJSryTPEcCryokAbYkZW47bY+jvV4whk
-        /XEMkVBBhrVmGCICDaWSZNvkpsLCV015GzCowlZgoMpoqqcgHlvnxsFIkWc5z2UuQmUYUx
-        wUwZEsT8b2SeVlXokiI0/g75xpndzXU=
-Received: from mail-ua1-f70.google.com (mail-ua1-f70.google.com
- [209.85.222.70]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=/ty3XjvTMJPmSzqLtzAvHrgacbo7grKCh8Eml4uSwPk=;
+        b=isI6vp3HZxozF80KIDghKeiVEM6tzM3jsQ32RPUXkSxXDzjtcwclgsp+JB+YWIJvznMadi
+        1jeklsMz+OGooLAkQ7tO7e4cPkZ2gXJC/NhCHKCdR12kgcPQdZEhBBb2HbJcznrHSSle1b
+        8ezXh3p1JJXe2z5JstlfWjJ5r6AU4ME=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-652-LtHXheM_P9WILo3bVbE_Tw-1; Fri, 21 Apr 2023 19:47:11 -0400
-X-MC-Unique: LtHXheM_P9WILo3bVbE_Tw-1
-Received: by mail-ua1-f70.google.com with SMTP id a1e0cc1a2514c-76e162e61efso665052241.3
-        for <kvm@vger.kernel.org>; Fri, 21 Apr 2023 16:47:11 -0700 (PDT)
+ us-mta-91-ZgalExy5NyWxRbHjCf5mdQ-1; Fri, 21 Apr 2023 19:48:48 -0400
+X-MC-Unique: ZgalExy5NyWxRbHjCf5mdQ-1
+Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-5067d65c251so2143448a12.2
+        for <kvm@vger.kernel.org>; Fri, 21 Apr 2023 16:48:47 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682120831; x=1684712831;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ToPFBZRZwwcbfkNhosaQClC7SiVbXSkZAsqSyiQXGpI=;
-        b=LpDo1kDUi1xUqr9FHo55Wq1bB6tWe6nJiG0ZPrYdqprY65Z6QrDVEDWz0lGGUHdbt0
-         lBcdboHh7L4JecVG02BX4fM9liglQm3jJx7ZAVNqIPNcMHcTvmpQxF/HOhpCHkEw7shh
-         fHfi4Tej4zznWt2dyPtIdelq7u4FTn5wC5GEr0MbJ2o47iKKj4pzOd0f9eqelxFaektA
-         5wEY72lpFLy6iIJSTYU0RZZdxkENXzRRIs/meU4WI5WwHAzahnsI4djW9Rg1n0UVOuUD
-         zmgs0cmK0v2ploPH0DqPGEdJnWE4FbT38sVuvxb7eqd+zWpa7g6HnX1HjaWnf4H/SJHy
-         bAoA==
-X-Gm-Message-State: AAQBX9efPN5fI6TLVWSrRq6pG7lSXOo6+XoMWsefd0/jFF1jioou8VdG
-        bjs2ZgZZOmDx+uzWOwyDjdBClLhjW4dBSQMaHovUlAIfcEAj0joidCyyEDpCaMCQZ3N48c7Luol
-        Hxg0N1MtUBNKav34KhMuvAdCXvZTN
-X-Received: by 2002:a67:e955:0:b0:42f:e9ec:9d62 with SMTP id p21-20020a67e955000000b0042fe9ec9d62mr3461694vso.29.1682120831276;
-        Fri, 21 Apr 2023 16:47:11 -0700 (PDT)
-X-Google-Smtp-Source: AKy350Yblf2VVyW6II6dJHXYr/NY8sU+y8q5t6/7PfCe+EngTirCzVpGdJ7Y1vQYsIu5F+LN1JVDdoU8FK7UOLh3KPk=
-X-Received: by 2002:a67:e955:0:b0:42f:e9ec:9d62 with SMTP id
- p21-20020a67e955000000b0042fe9ec9d62mr3461688vso.29.1682120831047; Fri, 21
- Apr 2023 16:47:11 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1682120926; x=1684712926;
+        h=content-transfer-encoding:in-reply-to:subject:from:references:cc:to
+         :content-language:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=/ty3XjvTMJPmSzqLtzAvHrgacbo7grKCh8Eml4uSwPk=;
+        b=e6NFPPA09G/cYCR+OLBZWvLCuwnQaFw6MP6YjzRCNdwdGywqbnlphML+M4vSKYcc84
+         jk5mmSoU2TsVXUyxBQT3SD353aspNsLWLbljf/5S6OdBvpPvJrhpLPrcmG9iXxwBNrk9
+         DW20rbCIcP/eIe810UO7svm3zEf0iQRZLsfDxnSvNvenFoPBjpWP9iaPfgVmALT3OJ+n
+         Br9JvlaJSk5CeacUM7yXkJkySAk/HsbE3eIn9G17hGiDDxEAtnhXAJY4pwgbABhU7bp4
+         9tnxvlNErIuK5RzVxfADPacDnsjsdwrKVndYkdwtjpU6KnZ41QS9J/ARyaJJr3XbCJt1
+         BaHg==
+X-Gm-Message-State: AAQBX9cZPbybfpHWXmEiZj5xsAev7g1n41A1s1iWkyXwp2asYJ+9VsqM
+        32YMpxpDLREAuTxgXDWaEkdqrnj55dKIXB8mV4+LualDXVwycyL7u36gJBwcimj1VylPKv3WMip
+        gtHcUimQh9D/kRBDIPPdD9nU=
+X-Received: by 2002:a05:6402:406:b0:504:9ae7:f73b with SMTP id q6-20020a056402040600b005049ae7f73bmr6320560edv.2.1682120926461;
+        Fri, 21 Apr 2023 16:48:46 -0700 (PDT)
+X-Google-Smtp-Source: AKy350bQiDrXCeb3AVQZHzRjNCYJLBEvIpaSPIfzKrEy+gmC4jF54imKHYHzGxmVxfOSU8RTdIR3pQ==
+X-Received: by 2002:a05:6402:406:b0:504:9ae7:f73b with SMTP id q6-20020a056402040600b005049ae7f73bmr6320551edv.2.1682120926126;
+        Fri, 21 Apr 2023 16:48:46 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
+        by smtp.googlemail.com with ESMTPSA id n20-20020aa7d054000000b004fc01b0aa55sm2340156edo.4.2023.04.21.16.48.45
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 21 Apr 2023 16:48:45 -0700 (PDT)
+Message-ID: <100c4e47-9d8d-8b3a-b70b-c0498febf23c@redhat.com>
+Date:   Sat, 22 Apr 2023 01:48:40 +0200
 MIME-Version: 1.0
-References: <CAAhSdy2RLinG5Gx-sfOqrYDAT=xDa3WAk8r1jTu8ReO5Jo0LVA@mail.gmail.com>
-In-Reply-To: <CAAhSdy2RLinG5Gx-sfOqrYDAT=xDa3WAk8r1jTu8ReO5Jo0LVA@mail.gmail.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.9.1
+Content-Language: en-US
+To:     Oliver Upton <oliver.upton@linux.dev>,
+        Anup Patel <anup@brainfault.org>
+Cc:     Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org
+References: <ZELftWeNUF1Dqs3f@linux.dev>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Date:   Sat, 22 Apr 2023 01:46:58 +0200
-Message-ID: <CABgObfbS7ej9pqmV05DKwq1929QD10EQ9XdkEb_Qhtbm1WrkeQ@mail.gmail.com>
-Subject: Re: [GIT PULL] KVM/riscv changes for 6.4
-To:     Anup Patel <anup@brainfault.org>
-Cc:     Palmer Dabbelt <palmer@dabbelt.com>,
-        Palmer Dabbelt <palmer@rivosinc.com>,
-        Atish Patra <atishp@atishpatra.org>,
-        Atish Patra <atishp@rivosinc.com>,
-        Andrew Jones <ajones@ventanamicro.com>,
-        KVM General <kvm@vger.kernel.org>,
-        "open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" 
-        <kvm-riscv@lists.infradead.org>,
-        linux-riscv <linux-riscv@lists.infradead.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Subject: Re: Getting the kvm-riscv tree in next
+In-Reply-To: <ZELftWeNUF1Dqs3f@linux.dev>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-5.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Apr 21, 2023 at 7:34=E2=80=AFPM Anup Patel <anup@brainfault.org> wr=
-ote:
-> Please note that the Zicboz series has been taken by
-> Palmer through the RISC-V tree which results in few
-> minor conflicts in the following files:
-> arch/riscv/include/asm/hwcap.h
-> arch/riscv/include/uapi/asm/kvm.h
-> arch/riscv/kernel/cpu.c
-> arch/riscv/kernel/cpufeature.c
-> arch/riscv/kvm/vcpu.c
->
-> I am not sure if a shared tag can make things easy for you or Palmer.
+On 4/21/23 21:10, Oliver Upton wrote:
+> I've also noticed that for the past few kernel release cycles you've
+> used an extremely late rc (i.e. -rc7 or -rc8), which I fear only
+> draws more scrutiny.
 
-It's not just making it easier, it is a requirement because I prefer
-to keep an eye on changes to uapi.h and especially to avoid that
-conflicts in KVM files reach Linus.
-
-The conflicts may be minor, but they are a symptom of overlooking
-"something" in the workflow.
-
-If I can get the shared tag from Palmer then good, otherwise I suppose
-this PR will also have to be delayed to the second week of the merge
-window.
+Heh, I just wrote the same thing to Anup.  In particular, having 
+kvm-riscv in next (either directly or by sending early pull requests to 
+me) would have helped me understand the conflicts between the core and 
+KVM trees for RISC-V, because Stephen Rothwell would have alerted me 
+about them.
 
 Paolo
 
