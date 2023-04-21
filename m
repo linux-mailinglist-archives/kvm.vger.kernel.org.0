@@ -2,49 +2,49 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 19C336EA471
-	for <lists+kvm@lfdr.de>; Fri, 21 Apr 2023 09:16:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 754D26EA475
+	for <lists+kvm@lfdr.de>; Fri, 21 Apr 2023 09:17:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230003AbjDUHQ6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Apr 2023 03:16:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56086 "EHLO
+        id S230127AbjDUHRA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Apr 2023 03:17:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56128 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229962AbjDUHQy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Apr 2023 03:16:54 -0400
+        with ESMTP id S230032AbjDUHQz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Apr 2023 03:16:55 -0400
 Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A047DC
-        for <kvm@vger.kernel.org>; Fri, 21 Apr 2023 00:16:52 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DFB00210B
+        for <kvm@vger.kernel.org>; Fri, 21 Apr 2023 00:16:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1682061412; x=1713597412;
+  t=1682061413; x=1713597413;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=kW0IwUNWx7o30RMXHoeUQZannoF+N/qSfK0aT3A6lXE=;
-  b=DkZjzGhsdrojL9vv44LzlzFqNsasigE0NTlERp6Uzb0UaKXx+f5G+Lw9
-   NU1Cpsu8XAkFFCANGCoNDnVqscViU2JE0KfVvfWUTCTyoehjs1DNPs+GU
-   1HJTuss1AYi2UbkYrZr8Ks9S7yWexmU10vF0o6OmnBDKKc7W4J3glcwd2
-   a9Bw0QtGRx45jqQff/sb44EVevFji6/SH0k17Hy3PBP2643NVG0+2SLRK
-   wI5bqdORIad6z7R/YuO7zmm1fa/CoIxDNp4Fyyg08WGaT1tZaoJlLtMgE
-   1anUdHsEJkesrMZeKQzSd+CSpZmy3A3bGtCBHQrgAgCeK9CV5JqdLIu7h
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10686"; a="326260530"
+  bh=q49+U447u2dX8OZEmGwYu4+4pk7aWYQAaNivI2RgVRk=;
+  b=j5lq+j/EtbuQk3jqmL/iDiv0g5td8S/EazJNSk5HJWr2zOBip9/BBEdw
+   yUuqCDzowHwkk4YOCfUcOrX2AiL3e+br+q7jyRDUOeoIb/tg/niyQJtRY
+   NYAfFrV7qnmW98SB/dCIoJf1+g8Rux+dg6EiyJKD3p8EhTTAxKdtat0+7
+   d2shYAkFyk6lLKuh/tiRsrF8Zz6YF8XpXziYWDeeukxJQNiXmFjGuRWT9
+   XZGHq7eM7cQ2hbEco8MHW3tq62igiYNXXHykjYuN20gZsB06di2vIHAn6
+   ER2PO6YlXlyUZ+kbMbqzul5TK5LFDO39uxf7v7oTESmHpSs3rzEa6d4tO
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10686"; a="326260545"
 X-IronPort-AV: E=Sophos;i="5.99,214,1677571200"; 
-   d="scan'208";a="326260530"
+   d="scan'208";a="326260545"
 Received: from fmsmga006.fm.intel.com ([10.253.24.20])
   by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Apr 2023 00:16:50 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10686"; a="938385324"
+X-IronPort-AV: E=McAfee;i="6600,9927,10686"; a="938385326"
 X-IronPort-AV: E=Sophos;i="5.99,214,1677571200"; 
-   d="scan'208";a="938385324"
+   d="scan'208";a="938385326"
 Received: from embargo.jf.intel.com ([10.165.9.183])
   by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Apr 2023 00:16:39 -0700
 From:   Yang Weijiang <weijiang.yang@intel.com>
 To:     pbonzini@redhat.com, mtosatti@redhat.com, seanjc@google.com,
         qemu-devel@nongnu.org
 Cc:     kvm@vger.kernel.org, weijiang.yang@intel.com
-Subject: [PATCH 1/4] target/i386: Enable XSAVES support for user mode CET states
-Date:   Fri, 21 Apr 2023 00:12:24 -0400
-Message-Id: <20230421041227.90915-2-weijiang.yang@intel.com>
+Subject: [PATCH 2/4] target/i386: Add CET MSRs access interfaces
+Date:   Fri, 21 Apr 2023 00:12:25 -0400
+Message-Id: <20230421041227.90915-3-weijiang.yang@intel.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20230421041227.90915-1-weijiang.yang@intel.com>
 References: <20230421041227.90915-1-weijiang.yang@intel.com>
@@ -60,162 +60,119 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add CET_U bit support in XSS MSR and report data size in CPUID.
-XSAVES/XRSTORS are used to boost CET states save/restore process,
-XSS[bit 11] corresponds to user mode CET states.
-CET Shadow Stack(SHSTK) and Indirect Branch Tracking(IBT) features
-are enumerated via CPUID.(EAX=07H,ECX=0H):ECX[7] and EDX[20]
-respectively, two featues share the same bit for user mode states.
+Add access interfaces for supported CET MSRs.
+These CET MSRs include:
+MSR_IA32_U_CET - store user mode CET control bits.
+MSR_IA32_S_CET - store supervisor mode CET control bits.
+MSR_IA32_PL3_SSP - strore user mode shadow stack pointer.
+MSR_KVM_GUEST_SSP - store current shadow stack pointer.
+
+Other MSRs, i.e., MSR_IA32_PL{0,1,2}_SSP and MSR_IA32_INTR_SSP_TBL
+are for non-supported supervisor mode shadow stack, are ignored now.
 
 Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
 ---
- target/i386/cpu.c | 39 +++++++++++++++++++++++++++++++--------
- target/i386/cpu.h | 13 +++++++++++++
- 2 files changed, 44 insertions(+), 8 deletions(-)
+ target/i386/cpu.h     | 10 ++++++++++
+ target/i386/kvm/kvm.c | 44 +++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 54 insertions(+)
 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index cab1e2a957..be86df8c1d 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -943,7 +943,7 @@ FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
-         .feat_names = {
-             NULL, NULL, NULL, NULL,
-             NULL, NULL, NULL, NULL,
--            NULL, NULL, NULL, NULL,
-+            NULL, NULL, NULL, "cet-u",
-             NULL, NULL, NULL, NULL,
-             NULL, NULL, NULL, NULL,
-             NULL, NULL, NULL, NULL,
-@@ -1420,7 +1420,7 @@ static const X86RegisterInfo32 x86_reg_info_32[CPU_NB_REGS32] = {
- #undef REGISTER
- 
- /* CPUID feature bits available in XSS */
--#define CPUID_XSTATE_XSS_MASK    (XSTATE_ARCH_LBR_MASK)
-+#define CPUID_XSTATE_XSS_MASK    (XSTATE_ARCH_LBR_MASK | XSTATE_CET_U_MASK)
- 
- ExtSaveArea x86_ext_save_areas[XSAVE_STATE_AREA_COUNT] = {
-     [XSTATE_FP_BIT] = {
-@@ -1438,7 +1438,7 @@ ExtSaveArea x86_ext_save_areas[XSAVE_STATE_AREA_COUNT] = {
-             .size = sizeof(XSaveAVX) },
-     [XSTATE_BNDREGS_BIT] =
-           { .feature = FEAT_7_0_EBX, .bits = CPUID_7_0_EBX_MPX,
--            .size = sizeof(XSaveBNDREG)  },
-+            .size = sizeof(XSaveBNDREG) },
-     [XSTATE_BNDCSR_BIT] =
-           { .feature = FEAT_7_0_EBX, .bits = CPUID_7_0_EBX_MPX,
-             .size = sizeof(XSaveBNDCSR)  },
-@@ -1458,14 +1458,20 @@ ExtSaveArea x86_ext_save_areas[XSAVE_STATE_AREA_COUNT] = {
-             .feature = FEAT_7_0_EDX, .bits = CPUID_7_0_EDX_ARCH_LBR,
-             .offset = 0 /*supervisor mode component, offset = 0 */,
-             .size = sizeof(XSavesArchLBR) },
-+    [XSTATE_CET_U_BIT] = {
-+        .feature = FEAT_7_0_ECX, .bits = CPUID_7_0_ECX_CET_SHSTK,
-+        /*
-+         * The features enabled in XSS MSR always use compacted format
-+         * to store the data, in this case .offset == 0.
-+         */
-+        .offset = 0,
-+        .size = sizeof(XSavesCETU) },
-     [XSTATE_XTILE_CFG_BIT] = {
-         .feature = FEAT_7_0_EDX, .bits = CPUID_7_0_EDX_AMX_TILE,
--        .size = sizeof(XSaveXTILECFG),
--    },
-+        .size = sizeof(XSaveXTILECFG) },
-     [XSTATE_XTILE_DATA_BIT] = {
-         .feature = FEAT_7_0_EDX, .bits = CPUID_7_0_EDX_AMX_TILE,
--        .size = sizeof(XSaveXTILEDATA)
--    },
-+        .size = sizeof(XSaveXTILEDATA) }
- };
- 
- uint32_t xsave_area_size(uint64_t mask, bool compacted)
-@@ -6258,9 +6264,26 @@ static void x86_cpu_enable_xsave_components(X86CPU *cpu)
-         if (env->features[esa->feature] & esa->bits) {
-             mask |= (1ULL << i);
-         }
-+
-+        /*
-+         * Both CET SHSTK and IBT feature requires XSAVES support, but two
-+         * features can be controlled independently by kernel, and we only
-+         * have one correlated bit set in x86_ext_save_areas, so if either
-+         * of two features is enabled, we set the XSAVES support bit to make
-+         * the enabled feature work.
-+         */
-+        if (i == XSTATE_CET_U_BIT) {
-+            uint64_t ecx = env->features[FEAT_7_0_ECX];
-+            uint64_t edx = env->features[FEAT_7_0_EDX];
-+
-+            if ((ecx & CPUID_7_0_ECX_CET_SHSTK) ||
-+                (edx & CPUID_7_0_EDX_CET_IBT)) {
-+                mask |= (1ULL << i);
-+            }
-+        }
-     }
- 
--    /* Only request permission for first vcpu */
-+    /* Only request permission from fisrt vcpu. */
-     if (kvm_enabled() && !request_perm) {
-         kvm_request_xsave_components(cpu, mask);
-         request_perm = true;
 diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index d243e290d3..6526a03206 100644
+index 6526a03206..b78ce8e5c4 100644
 --- a/target/i386/cpu.h
 +++ b/target/i386/cpu.h
-@@ -554,6 +554,7 @@ typedef enum X86Seg {
- #define XSTATE_ZMM_Hi256_BIT            6
- #define XSTATE_Hi16_ZMM_BIT             7
- #define XSTATE_PKRU_BIT                 9
-+#define XSTATE_CET_U_BIT                11
- #define XSTATE_ARCH_LBR_BIT             15
- #define XSTATE_XTILE_CFG_BIT            17
- #define XSTATE_XTILE_DATA_BIT           18
-@@ -567,6 +568,7 @@ typedef enum X86Seg {
- #define XSTATE_ZMM_Hi256_MASK           (1ULL << XSTATE_ZMM_Hi256_BIT)
- #define XSTATE_Hi16_ZMM_MASK            (1ULL << XSTATE_Hi16_ZMM_BIT)
- #define XSTATE_PKRU_MASK                (1ULL << XSTATE_PKRU_BIT)
-+#define XSTATE_CET_U_MASK               (1ULL << XSTATE_CET_U_BIT)
- #define XSTATE_ARCH_LBR_MASK            (1ULL << XSTATE_ARCH_LBR_BIT)
- #define XSTATE_XTILE_CFG_MASK           (1ULL << XSTATE_XTILE_CFG_BIT)
- #define XSTATE_XTILE_DATA_MASK          (1ULL << XSTATE_XTILE_DATA_BIT)
-@@ -841,6 +843,8 @@ uint64_t x86_cpu_get_supported_feature_word(FeatureWord w,
- #define CPUID_7_0_ECX_WAITPKG           (1U << 5)
- /* Additional AVX-512 Vector Byte Manipulation Instruction */
- #define CPUID_7_0_ECX_AVX512_VBMI2      (1U << 6)
-+/* CET SHSTK feature */
-+#define CPUID_7_0_ECX_CET_SHSTK         (1U << 7)
- /* Galois Field New Instructions */
- #define CPUID_7_0_ECX_GFNI              (1U << 8)
- /* Vector AES Instructions */
-@@ -884,6 +888,8 @@ uint64_t x86_cpu_get_supported_feature_word(FeatureWord w,
- #define CPUID_7_0_EDX_TSX_LDTRK         (1U << 16)
- /* Architectural LBRs */
- #define CPUID_7_0_EDX_ARCH_LBR          (1U << 19)
-+/* CET IBT feature */
-+#define CPUID_7_0_EDX_CET_IBT           (1U << 20)
- /* AMX_BF16 instruction */
- #define CPUID_7_0_EDX_AMX_BF16          (1U << 22)
- /* AVX512_FP16 instruction */
-@@ -1428,6 +1434,12 @@ typedef struct XSavePKRU {
-     uint32_t padding;
- } XSavePKRU;
+@@ -545,6 +545,11 @@ typedef enum X86Seg {
+ #define MSR_IA32_VMX_TRUE_ENTRY_CTLS     0x00000490
+ #define MSR_IA32_VMX_VMFUNC             0x00000491
  
-+/* Ext. save area 11: User mode CET state */
-+typedef struct XSavesCETU {
-+    uint64_t u_cet;
-+    uint64_t user_ssp;
-+} XSavesCETU;
++#define MSR_IA32_U_CET                  0x000006a0
++#define MSR_IA32_S_CET                  0x000006a2
++#define MSR_IA32_PL3_SSP                0x000006a7
++#define MSR_KVM_GUEST_SSP               0x4b564d09
 +
- /* Ext. save area 17: AMX XTILECFG state */
- typedef struct XSaveXTILECFG {
-     uint8_t xtilecfg[64];
-@@ -1463,6 +1475,7 @@ QEMU_BUILD_BUG_ON(sizeof(XSaveOpmask) != 0x40);
- QEMU_BUILD_BUG_ON(sizeof(XSaveZMM_Hi256) != 0x200);
- QEMU_BUILD_BUG_ON(sizeof(XSaveHi16_ZMM) != 0x400);
- QEMU_BUILD_BUG_ON(sizeof(XSavePKRU) != 0x8);
-+QEMU_BUILD_BUG_ON(sizeof(XSavesCETU) != 0x10);
- QEMU_BUILD_BUG_ON(sizeof(XSaveXTILECFG) != 0x40);
- QEMU_BUILD_BUG_ON(sizeof(XSaveXTILEDATA) != 0x2000);
- QEMU_BUILD_BUG_ON(sizeof(XSavesArchLBR) != 0x328);
+ #define XSTATE_FP_BIT                   0
+ #define XSTATE_SSE_BIT                  1
+ #define XSTATE_YMM_BIT                  2
+@@ -1756,6 +1761,11 @@ typedef struct CPUArchState {
+ 
+     uintptr_t retaddr;
+ 
++    uint64_t u_cet;
++    uint64_t s_cet;
++    uint64_t pl3_ssp;
++    uint64_t guest_ssp;
++
+     /* Fields up to this point are cleared by a CPU reset */
+     struct {} end_reset_fields;
+ 
+diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
+index de531842f6..13fae898ce 100644
+--- a/target/i386/kvm/kvm.c
++++ b/target/i386/kvm/kvm.c
+@@ -3646,6 +3646,22 @@ static int kvm_put_msrs(X86CPU *cpu, int level)
+         }
+     }
+ 
++    if (((env->features[FEAT_7_0_ECX] & CPUID_7_0_ECX_CET_SHSTK) ||
++        (env->features[FEAT_7_0_EDX] & CPUID_7_0_EDX_CET_IBT)) &&
++        (env->features[FEAT_XSAVE_XSS_LO] & XSTATE_CET_U_MASK)) {
++        kvm_msr_entry_add(cpu, MSR_IA32_U_CET, env->u_cet);
++        kvm_msr_entry_add(cpu, MSR_IA32_PL3_SSP, env->pl3_ssp);
++    }
++
++    if ((env->features[FEAT_7_0_ECX] & CPUID_7_0_ECX_CET_SHSTK) &&
++        (env->features[FEAT_XSAVE_XSS_LO] & XSTATE_CET_U_MASK)) {
++        kvm_msr_entry_add(cpu, MSR_KVM_GUEST_SSP, env->guest_ssp);
++    }
++
++    if (env->features[FEAT_7_0_EDX] & CPUID_7_0_EDX_CET_IBT) {
++        kvm_msr_entry_add(cpu, MSR_IA32_S_CET, env->s_cet);
++    }
++
+     return kvm_buf_set_msrs(cpu);
+ }
+ 
+@@ -4024,6 +4040,22 @@ static int kvm_get_msrs(X86CPU *cpu)
+         kvm_msr_entry_add(cpu, MSR_IA32_SGXLEPUBKEYHASH3, 0);
+     }
+ 
++    if (((env->features[FEAT_7_0_ECX] & CPUID_7_0_ECX_CET_SHSTK) ||
++        (env->features[FEAT_7_0_EDX] & CPUID_7_0_EDX_CET_IBT)) &&
++        (env->features[FEAT_XSAVE_XSS_LO] & XSTATE_CET_U_MASK)) {
++        kvm_msr_entry_add(cpu, MSR_IA32_U_CET, 0);
++        kvm_msr_entry_add(cpu, MSR_IA32_PL3_SSP, 0);
++    }
++
++    if ((env->features[FEAT_7_0_ECX] & CPUID_7_0_ECX_CET_SHSTK) &&
++        (env->features[FEAT_XSAVE_XSS_LO] & XSTATE_CET_U_MASK)) {
++        kvm_msr_entry_add(cpu, MSR_KVM_GUEST_SSP, 0);
++    }
++
++    if (env->features[FEAT_7_0_EDX] & CPUID_7_0_EDX_CET_IBT) {
++        kvm_msr_entry_add(cpu, MSR_IA32_S_CET, 0);
++    }
++
+     if (env->features[FEAT_XSAVE] & CPUID_D_1_EAX_XFD) {
+         kvm_msr_entry_add(cpu, MSR_IA32_XFD, 0);
+         kvm_msr_entry_add(cpu, MSR_IA32_XFD_ERR, 0);
+@@ -4346,6 +4378,18 @@ static int kvm_get_msrs(X86CPU *cpu)
+             env->msr_ia32_sgxlepubkeyhash[index - MSR_IA32_SGXLEPUBKEYHASH0] =
+                            msrs[i].data;
+             break;
++        case MSR_IA32_U_CET:
++            env->u_cet = msrs[i].data;
++            break;
++        case MSR_IA32_S_CET:
++            env->s_cet = msrs[i].data;
++            break;
++        case MSR_IA32_PL3_SSP:
++            env->pl3_ssp = msrs[i].data;
++            break;
++        case MSR_KVM_GUEST_SSP:
++            env->guest_ssp = msrs[i].data;
++            break;
+         case MSR_IA32_XFD:
+             env->msr_xfd = msrs[i].data;
+             break;
 -- 
 2.27.0
 
