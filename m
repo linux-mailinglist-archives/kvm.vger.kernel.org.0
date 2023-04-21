@@ -2,155 +2,214 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 915CD6EB09A
-	for <lists+kvm@lfdr.de>; Fri, 21 Apr 2023 19:34:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 951E86EB0B3
+	for <lists+kvm@lfdr.de>; Fri, 21 Apr 2023 19:37:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232893AbjDUReQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Apr 2023 13:34:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37772 "EHLO
+        id S232934AbjDURhk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Apr 2023 13:37:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38982 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231398AbjDUReP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Apr 2023 13:34:15 -0400
-Received: from mail-ej1-x644.google.com (mail-ej1-x644.google.com [IPv6:2a00:1450:4864:20::644])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98CFA5251
-        for <kvm@vger.kernel.org>; Fri, 21 Apr 2023 10:34:13 -0700 (PDT)
-Received: by mail-ej1-x644.google.com with SMTP id a640c23a62f3a-953343581a4so270737666b.3
-        for <kvm@vger.kernel.org>; Fri, 21 Apr 2023 10:34:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20221208.gappssmtp.com; s=20221208; t=1682098452; x=1684690452;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=gmbHaAEPuU4oEmlAG224eV0NF90p/lDU8WXg7UgBfxs=;
-        b=0Yf4QFtDYxApW8e+Npa8eclnh1VPHECPdGgPfNTV+QtqQajhKU+b5z/94b/0kjjMLO
-         9jNHHye49I5lSjPgdZmti3vLwUqQcMJnmyh/k7xXfuVJE10F2oGKWSHY2vIV+kwa8+t7
-         fAML1NpJB08gTXg/dasdPltO/cgah/Ls7Z5pUVlUFcVxGQkjmTyIr1nNUgLZZc3okHyY
-         QXECeu32BbNB0dcFw81iIE0FZynz/mP4m1+JRBODA+gM7xc7GOzGrO4ONwx0ZbG/DmM4
-         8DhlSRRP5Wfd0gAb2llDQJ61n6Bcb6dtzWtEzY/ZU5YWucTfG3tX0eGFlVl7S5AImlQn
-         aY1w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682098452; x=1684690452;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=gmbHaAEPuU4oEmlAG224eV0NF90p/lDU8WXg7UgBfxs=;
-        b=FOjFYITFnyQVfRLaE7TBys57jCNa+4CKclV145PDytfrobg5gvit5Jh6i3s7Yr0e3C
-         EwzhMofa4zGxz3Qa2Nz2lrhfJUHMDVHOOk+SzqczcHnBSWxdv169zyecE9+jTNk+WV6K
-         PTiYViVwZatrnb7NKNN04loMgHPDt8KPvmMq2UWDDockLUOuF9bTwndyYTNklxikSTLe
-         MEe8b0KhhcL2qCpUlPFVNgvz9nGSHzBdWQ3pimap/1aiqeg1/o3km91HIvOnzpXS6IeS
-         76HzBgdLzISXKnpnzWw6wKkSNXFhhu62g87fQTJSCj1sR4vmCuo6yAlNjK6yCDQbVCYX
-         Lf6w==
-X-Gm-Message-State: AAQBX9cnlplja5ZVqbdOrej7ownWkBeHBMP4tj1fVTc3ihZVyZTiMCOe
-        D3C6JxMO8jqiJU4Pi/ZI8K8onmq26oeLQwHHa9VRMw==
-X-Google-Smtp-Source: AKy350ZyHJzBdNd9Rl58RWyYWoyAjvKclDuYlwqb0MZh+iKf0jW1tajFN5kR9NWZ4LTB8iD0kOx3hQ7QlL/dJY8wNHM=
-X-Received: by 2002:a17:906:58c:b0:953:429e:fff6 with SMTP id
- 12-20020a170906058c00b00953429efff6mr3148032ejn.51.1682098451946; Fri, 21 Apr
- 2023 10:34:11 -0700 (PDT)
+        with ESMTP id S230076AbjDURhj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Apr 2023 13:37:39 -0400
+Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04on2061.outbound.protection.outlook.com [40.107.100.61])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A92D940E7;
+        Fri, 21 Apr 2023 10:37:37 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=VTAln3H8WKmyH4/fyc1s0mdjTi5petpMHtpcR8DhmpcPAoqH/ryLZqtMxW0zjAgH6Q9uNsGxhQg3GjwALNwlCfUTgRZYDIWnVVUkwi5COq6n2zoyOg9TEIR6hmFaUmFKOh9hx1pWzzkr8ckHUmWaQFumr1lOMNqR5DoUW9mG9GXc3bqhWnEsrO72pKauZSdOXQKu24nAV3/I4UvKAtWiQkJmDB7k6KmTVe0bqfhLZIjnsKqqw92G+tiI8CzTlQ7+ERUNQ3bPopGDPrvO4IY1LauFlz6vJvkVpRZEMIJefrmBHv0ELChxshEHQ/hkLJ06k/b6NdMhJ34sJUqoYbZpIA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=MOB+9ycjDK7dj5EqGIBjuF/vezbe9ZFOicmuyMSZARc=;
+ b=I/ku1ug83wCcyavHHzqV5QZgxIqWH6QgooLqEAjTjsA62zRm3N940HLVSLYk7tfWR0aTjtYLAgAfvYAWU5uPRjVcVfrIhFyJ+JphIZ/wTSrc3qlB08L/4Q1GS4d1QrkM64B4TdKRubQfNAn5IgNEElilhJu9922H4foeG+NcuR2HxvxHb1sfTudrvjVz0EzG5N1cjDq9RArrEkMcovjMoOTzivb0WRtBKmE2umyHQMXSTLuZFnwdYrotK2uFbLRZrWOzm56xpb6GY3zgIgIX6iQFa83AStRrIw20tAOHyM7Ls+YOd0vZIYmhx8BkzDcVT6Gvp76TGb684F44oQ8Ydw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=intel.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=MOB+9ycjDK7dj5EqGIBjuF/vezbe9ZFOicmuyMSZARc=;
+ b=W1VllpRWqY8o088/nxE4+dZcbVX0Lyz3u44DI1p23enF5UE+vOxIZbR+a+INfHQ/LBaNReS+1eUrAwBm9Nx5Bc/NVxNLoRN8mmng5vXjPLTJyTmnasTuMECQpczsikeVLeArLnzUSGRcJRngQL8z7hi8qhZsLJmUmfOE9ypmUcMXCvl70S+11GHmQ2t3fXNvJlb7WOuiAyg04dB3uwO2mweB4OgZ5sdwDXCSazJGO6BFBLCuVPBulZtiysGRMD/CnuGuzumQgxCtJ44egYJWKyE194LJQ8L67+YyHyByBIZ0LZmsIo0xBv5XS/IDH3+sGOKCD9ywzimE82ZJFnPwKw==
+Received: from BN9PR03CA0854.namprd03.prod.outlook.com (2603:10b6:408:13d::19)
+ by IA1PR12MB6356.namprd12.prod.outlook.com (2603:10b6:208:3e0::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6319.22; Fri, 21 Apr
+ 2023 17:37:35 +0000
+Received: from BN8NAM11FT026.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:408:13d:cafe::9f) by BN9PR03CA0854.outlook.office365.com
+ (2603:10b6:408:13d::19) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6319.25 via Frontend
+ Transport; Fri, 21 Apr 2023 17:37:35 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ BN8NAM11FT026.mail.protection.outlook.com (10.13.177.51) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6319.26 via Frontend Transport; Fri, 21 Apr 2023 17:37:34 +0000
+Received: from rnnvmail203.nvidia.com (10.129.68.9) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5; Fri, 21 Apr 2023
+ 10:37:25 -0700
+Received: from rnnvmail202.nvidia.com (10.129.68.7) by rnnvmail203.nvidia.com
+ (10.129.68.9) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.37; Fri, 21 Apr
+ 2023 10:37:25 -0700
+Received: from Asurada-Nvidia (10.127.8.13) by mail.nvidia.com (10.129.68.7)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.37 via Frontend
+ Transport; Fri, 21 Apr 2023 10:37:24 -0700
+Date:   Fri, 21 Apr 2023 10:37:22 -0700
+From:   Nicolin Chen <nicolinc@nvidia.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+CC:     "Tian, Kevin" <kevin.tian@intel.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>,
+        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
+        "will@kernel.org" <will@kernel.org>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "shameerali.kolothum.thodi@huawei.com" 
+        <shameerali.kolothum.thodi@huawei.com>,
+        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH RFC v2 0/3] Add set_dev_data and unset_dev_data support
+Message-ID: <ZELJ0uv4gGCPrDfX@Asurada-Nvidia>
+References: <cover.1681976394.git.nicolinc@nvidia.com>
+ <BN9PR11MB52764ED59905104D3A5A68C08C609@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <ZEI+LBkEeNZdJyTB@Asurada-Nvidia>
+ <BN9PR11MB5276C39E256CD4B922435E1C8C609@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <ZEJBldGXBNGEy9tV@Asurada-Nvidia>
+ <BN9PR11MB527693075725A13DB9EE18678C609@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <ZEJHPb1E1/eI8V6A@Asurada-Nvidia>
+ <ZEKLDzU8C2niNyOw@nvidia.com>
 MIME-Version: 1.0
-From:   Anup Patel <anup@brainfault.org>
-Date:   Fri, 21 Apr 2023 23:04:00 +0530
-Message-ID: <CAAhSdy2RLinG5Gx-sfOqrYDAT=xDa3WAk8r1jTu8ReO5Jo0LVA@mail.gmail.com>
-Subject: [GIT PULL] KVM/riscv changes for 6.4
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Palmer Dabbelt <palmer@dabbelt.com>,
-        Palmer Dabbelt <palmer@rivosinc.com>,
-        Atish Patra <atishp@atishpatra.org>,
-        Atish Patra <atishp@rivosinc.com>,
-        Andrew Jones <ajones@ventanamicro.com>,
-        KVM General <kvm@vger.kernel.org>,
-        "open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" 
-        <kvm-riscv@lists.infradead.org>,
-        linux-riscv <linux-riscv@lists.infradead.org>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <ZEKLDzU8C2niNyOw@nvidia.com>
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN8NAM11FT026:EE_|IA1PR12MB6356:EE_
+X-MS-Office365-Filtering-Correlation-Id: 64546c55-6cb9-49fc-a938-08db428f17e9
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 1ZZs4XpdAUWoJQnW7+aFw/yUjsr6O/B02cNa9i8TU0m9PNH1Eg9wIPRzA+T1leD+YL0ExZMZjM3IO/o1G70uKGup/cfn7ww9cVJ2ACstXD6EX8xE7YuHXyayWIagGiV8hmByCeR5e20Ed5KqVvxaCCh2LYogleBcXIWWdOJnsdPChmhlThD65AU4hQC96MpvDuD2WhOAQm3RYdwmtRqPk+M3XBB4Xres0eKRQh4M6Nc5BjZZh7juiK4IsZljqOiJgMQNbFxRsSoVjt0EKZCkzcLtfEshTYnWwoGDi3glyBEyht0CJ8kjkL3ep4DkNV2EtCu5BUSzd4+4dQt3uxARuLlXf2Kf6JbTjca2y8u0woaQG0cR71sczUhhNLp+4UVxIo0kA1NiQRvcjmAaONvXX/nSmt3IXapPLMdB08z7Ru/GdPqxGHVHny/vKnJQ8HLbbWzgrmCfGqmxzK23PP2dhmSWHTvYFHG/Cb1jmDDiPlawMbUaTyUhjjPqGgvrnhBPpXy1062P+RrxqjuYnMMQdPETsnUGpv8PkCVEojfnHLUd1mOLy+rc1KfusSNFNFeFRDOKSJmr/LQfjugRj53Y+95450DVKupknHiciJkF/vuf2xz90XtEQTeKmJfsf/RxLLxnEnKFb2OHwpyIpnlpZcQB8T/9OHH3QL7o5FRq/gJdXlqxhLtOlnd0sFTjsWJOMPym23VGNwLZ1F4zSI7bRVuuPIEvznjrNo4Vc3iVAfvHr69c4LcuqH+ecmUEeINYC1+K8JNcdWJlkYZm4C/Wnubjt037k/ugu+Y9p0QL+eA=
+X-Forefront-Antispam-Report: CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230028)(4636009)(376002)(136003)(396003)(346002)(39860400002)(451199021)(36840700001)(40470700004)(46966006)(82740400003)(36860700001)(316002)(70206006)(4326008)(47076005)(336012)(426003)(70586007)(34020700004)(478600001)(54906003)(6636002)(8676002)(6862004)(356005)(41300700001)(7636003)(8936002)(2906002)(5660300002)(7416002)(9686003)(26005)(186003)(86362001)(33716001)(82310400005)(40460700003)(55016003)(40480700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Apr 2023 17:37:34.9971
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 64546c55-6cb9-49fc-a938-08db428f17e9
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT026.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB6356
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Paolo,
+On Fri, Apr 21, 2023 at 10:09:35AM -0300, Jason Gunthorpe wrote:
+> On Fri, Apr 21, 2023 at 01:20:13AM -0700, Nicolin Chen wrote:
+> 
+> > +/**
+> > + * struct iommufd_device_set_data - ioctl(IOMMU_DEVICE_SET_DATA)
+> > + * @size: sizeof(struct iommufd_device_set_data)
+> > + * @dev_id: The device to set a device data
+> > + * @data_uptr: User pointer of the device user data.
+> > + * @data_len: Length of the device user data.
+> > + */
+> > +struct iommufd_device_set_data {
+> > +	__u32 size;
+> > +	__u32 dev_id;
+> > +	__aligned_u64   data_uptr;
+> > +	__u32 data_len;
+> > +};
+> > +#define IOMMU_DEVICE_SET_DATA _IO(IOMMUFD_TYPE, IOMMUFD_CMD_DEVICE_SET_DATA)
+> > +
+> > +/**
+> > + * struct iommufd_device_unset_data - ioctl(IOMMU_DEVICE_UNSET_DATA)
+> > + * @size: sizeof(struct iommufd_device_unset_data)
+> > + * @dev_id: The device to unset its device data
+> > + */
+> > +struct iommufd_device_unset_data {
+> > +	__u32 size;
+> > +	__u32 dev_id;
+> > +};
+> > +#define IOMMU_DEVICE_UNSET_DATA _IO(IOMMUFD_TYPE, IOMMUFD_CMD_DEVICE_UNSET_DATA)
+> > 
+> > Maybe just like this?
+> 
+> How would the iommu_ops backing this work?
 
-We have the following KVM RISC-V changes for 6.4:
-1) ONE_REG interface to enable/disable SBI extensions
-2) Zbb extension for Guest/VM
-3) AIA CSR virtualization
-4) Few minor cleanups and fixes
+How about the following piece? Needs a test with QEMU though..
 
-Please pull.
+static const size_t iommufd_device_data_size[] = {
+	[IOMMU_HW_INFO_TYPE_NONE] = 0,
+	[IOMMU_HW_INFO_TYPE_INTEL_VTD] = 0,
+	[IOMMU_HW_INFO_TYPE_ARM_SMMUV3] =
+		sizeof(struct iommu_device_data_arm_smmuv3),
+};
 
-Please note that the Zicboz series has been taken by
-Palmer through the RISC-V tree which results in few
-minor conflicts in the following files:
-arch/riscv/include/asm/hwcap.h
-arch/riscv/include/uapi/asm/kvm.h
-arch/riscv/kernel/cpu.c
-arch/riscv/kernel/cpufeature.c
-arch/riscv/kvm/vcpu.c
+int iommufd_device_set_data(struct iommufd_ucmd *ucmd)
+{
+	struct iommufd_device_set_data *cmd = ucmd->cmd;
+	struct iommufd_device *idev;
+	const struct iommu_ops *ops;
+	void *data = NULL;
+	u32 klen = 0;
+	int rc;
 
-I am not sure if a shared tag can make things easy
-for you or Palmer.
+	if (!cmd->data_uptr || !cmd->data_len)
+		return -EINVAL;
 
-Regards,
-Anup
+	idev = iommufd_get_device(ucmd, cmd->dev_id);
+	if (IS_ERR(idev))
+		return PTR_ERR(idev);
 
-The following changes since commit 6a8f57ae2eb07ab39a6f0ccad60c760743051026:
+	ops = dev_iommu_ops(idev->dev);
+	if (!ops || !ops->set_dev_data_user || !ops->unset_dev_data_user ||
+	    ops->hw_info_type >= ARRAY_SIZE(iommufd_device_data_size)) {
+		rc = -EOPNOTSUPP;
+		goto out_put_idev;
+	}
 
-  Linux 6.3-rc7 (2023-04-16 15:23:53 -0700)
+	klen = iommufd_device_data_size[ops->hw_info_type];
+	if (!klen) {
+		rc = -EOPNOTSUPP;
+		goto out_put_idev;
+	}
 
-are available in the Git repository at:
+	data = kzalloc(klen, GFP_KERNEL);
+	if (!data) {
+		rc = -ENOMEM;
+		goto out_put_idev;
+	}
 
-  https://github.com/kvm-riscv/linux.git tags/kvm-riscv-6.4-1
+	if (copy_struct_from_user(data, klen, u64_to_user_ptr(cmd->data_uptr),
+				  cmd->data_len)) {
+		rc = -EFAULT;
+		goto out_free_data;
+	}
 
-for you to fetch changes up to 2f4d58f7635aec014428e73ef6120c4d0377c430:
-
-  RISC-V: KVM: Virtualize per-HART AIA CSRs (2023-04-21 18:10:27 +0530)
-
-----------------------------------------------------------------
-KVM/riscv changes for 6.4
-
-- ONE_REG interface to enable/disable SBI extensions
-- Zbb extension for Guest/VM
-- AIA CSR virtualization
-
-----------------------------------------------------------------
-Andrew Jones (1):
-      RISC-V: KVM: Alphabetize selects
-
-Anup Patel (10):
-      RISC-V: KVM: Add ONE_REG interface to enable/disable SBI extensions
-      RISC-V: KVM: Allow Zbb extension for Guest/VM
-      RISC-V: Add AIA related CSR defines
-      RISC-V: Detect AIA CSRs from ISA string
-      RISC-V: KVM: Drop the _MASK suffix from hgatp.VMID mask defines
-      RISC-V: KVM: Initial skeletal support for AIA
-      RISC-V: KVM: Implement subtype for CSR ONE_REG interface
-      RISC-V: KVM: Add ONE_REG interface for AIA CSRs
-      RISC-V: KVM: Use bitmap for irqs_pending and irqs_pending_mask
-      RISC-V: KVM: Virtualize per-HART AIA CSRs
-
-David Matlack (1):
-      KVM: RISC-V: Retry fault if vma_lookup() results become invalid
-
- arch/riscv/include/asm/csr.h          | 107 +++++++++-
- arch/riscv/include/asm/hwcap.h        |   8 +
- arch/riscv/include/asm/kvm_aia.h      | 127 +++++++++++
- arch/riscv/include/asm/kvm_host.h     |  14 +-
- arch/riscv/include/asm/kvm_vcpu_sbi.h |   8 +-
- arch/riscv/include/uapi/asm/kvm.h     |  51 ++++-
- arch/riscv/kernel/cpu.c               |   2 +
- arch/riscv/kernel/cpufeature.c        |   2 +
- arch/riscv/kvm/Kconfig                |  10 +-
- arch/riscv/kvm/Makefile               |   1 +
- arch/riscv/kvm/aia.c                  | 388 ++++++++++++++++++++++++++++++++++
- arch/riscv/kvm/main.c                 |  22 +-
- arch/riscv/kvm/mmu.c                  |  28 ++-
- arch/riscv/kvm/vcpu.c                 | 194 +++++++++++++----
- arch/riscv/kvm/vcpu_insn.c            |   1 +
- arch/riscv/kvm/vcpu_sbi.c             | 247 ++++++++++++++++++++--
- arch/riscv/kvm/vcpu_sbi_base.c        |   2 +-
- arch/riscv/kvm/vm.c                   |   4 +
- arch/riscv/kvm/vmid.c                 |   4 +-
- 19 files changed, 1129 insertions(+), 91 deletions(-)
- create mode 100644 arch/riscv/include/asm/kvm_aia.h
- create mode 100644 arch/riscv/kvm/aia.c
+	rc = ops->set_dev_data_user(idev->dev, data);
+out_free_data:
+	kfree(data);
+out_put_idev:
+	iommufd_put_object(&idev->obj);
+	return rc;
+}
