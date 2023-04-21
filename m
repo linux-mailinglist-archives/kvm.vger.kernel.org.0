@@ -2,141 +2,266 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6C29B6EABF7
-	for <lists+kvm@lfdr.de>; Fri, 21 Apr 2023 15:45:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CAEA26EAF7B
+	for <lists+kvm@lfdr.de>; Fri, 21 Apr 2023 18:50:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231636AbjDUNot (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Apr 2023 09:44:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60872 "EHLO
+        id S233208AbjDUQur (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Apr 2023 12:50:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57130 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232628AbjDUNoa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Apr 2023 09:44:30 -0400
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2068.outbound.protection.outlook.com [40.107.244.68])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5737D10278
-        for <kvm@vger.kernel.org>; Fri, 21 Apr 2023 06:44:25 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=JzUTSZ3XAl/9Z4eeRT8qjfH4RetMSPcR6LubAqnYd5K13d+pWmlrWcpY9Wxax9T+M/xCUP+gGfa9h5laXw4fQfc5EdUKFGiQFEWJfq1jcrvqrBZ+QIa5bwnAkh1Dyw0V9k5lLja8tkwJnkQQLnr81TdJU8/gwNTqDYWk3yjpa2lryiVe9nWBoF86Hw2KGXgpJkOKD+fFnXz1Cg7osCICqt0PtbwlQHsn+RRWY33IMlEeMShQEp8JaJSDXVYsl/xKe3ZMUAYBuCdzkCP73e6oEl9rKbtpfiCktCt6fgZ37hIHuz7V3koa9DTuB83k4D5gO6QQoBaE1hHOkH5PnSD2VQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=znHZY817BMDBTG/1GV/zKGEsjdZY5xxmZX+IeTvwtGo=;
- b=HAmEAAsksa91JaqS4V2AnR7wVwFUvYkzR67jrKLN6EsMoAO3wf7056E9aIYXXy1WY9TtpCK95veJefjgWNcLsnPNfNZrTZ/f6I3M97ML04VBeWVUgKID4qbtERptk0yoN0MAaTcGpm8QIvxHkij0svwDbZCJUmJ6Adma2SHoJG8dte+4o/jq88Gr7KIvizWKR+0BUuF+8Ymh26uRLOqEZHH+lLQiB4MTa18NPtR8FPjEqIHqW1X478SPFMDHEYnvYqqnuGKofKV3BHMg5XE5Oz4hvxUnCHl0PbiXg02p3MF8RMG1vtdNTjAog3dD8kGqGt1DmcsJhB4YHlJC0nPrDg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=znHZY817BMDBTG/1GV/zKGEsjdZY5xxmZX+IeTvwtGo=;
- b=ad/pa/ZX0rQqvNrjg4Rvm2oo3/vVzqZINeSDpSILpMACWF4vtrsGW87OunoUx9SJyvHKV1gaC60OlNjlvOt2aMHc4BUacZbPayq+oz2ZKWydFlg7oSdvU9b+2rOPp5bIk/K/xZZCRllKSsPQYK1pjDc5hIghg31oYIqKAQenB/5ijbilbFqKSDuqlfQfk3OLTscuGyZo6sD1mJ4xm2g6n+BD6YnkI/Ob9BkPrwu0l6Qq9NvXKhs3kOOWfifuvGd81gVm7/qqtgMyXabE+/pIGFdzLyCMb6lTsTFmsf74onuNCsbRIj7e60jaqpYj6S1srVpRvNqd4RHMg2mx30uWVQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by CH0PR12MB5372.namprd12.prod.outlook.com (2603:10b6:610:d7::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6319.22; Fri, 21 Apr
- 2023 13:44:23 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::f7a7:a561:87e9:5fab]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::f7a7:a561:87e9:5fab%6]) with mapi id 15.20.6319.020; Fri, 21 Apr 2023
- 13:44:23 +0000
-Date:   Fri, 21 Apr 2023 10:44:21 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Yi Liu <yi.l.liu@intel.com>
-Cc:     alex.williamson@redhat.com, kevin.tian@intel.com,
-        cohuck@redhat.com, eric.auger@redhat.com, nicolinc@nvidia.com,
-        kvm@vger.kernel.org, mjrosato@linux.ibm.com,
-        chao.p.peng@linux.intel.com
-Subject: Re: [PATCH v3] docs: kvm: vfio: Suggest KVM_DEV_VFIO_GROUP_ADD vs
- VFIO_GROUP_GET_DEVICE_FD ordering
-Message-ID: <ZEKTNVhWiHb0BmWX@nvidia.com>
-References: <20230421053611.55839-1-yi.l.liu@intel.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230421053611.55839-1-yi.l.liu@intel.com>
-X-ClientProxiedBy: BL0PR02CA0002.namprd02.prod.outlook.com
- (2603:10b6:207:3c::15) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+        with ESMTP id S232445AbjDUQuq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Apr 2023 12:50:46 -0400
+Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1F6A8691;
+        Fri, 21 Apr 2023 09:50:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1682095844; x=1713631844;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=gwxpo+wRlLq+sgXMaWLO4NiSZPubB5SwUMSLYgQBk08=;
+  b=ShNcUZmGNxVMCZpMeWzeILKCM7e21k0IEKlYeaCSYBJMyj9/GAUjkB45
+   5YCs1duXEyjzg0Osi48zY7WmGdwVppnXK0ZiXdvXTjGTYRvijWW0ceuxd
+   K88hsAU93G/3b38Pc70b9wbL6RDo40CGA9VC6nbIEepERPmozIGi6KQNw
+   jWP6tYdM+z3s8Ehv3Y8Spqtb8pzX/a9JGzqS38bh5yX+fx7gdWFpU/fNk
+   foPlET74yoIeyOZDPgG+6w7GuDRGFLCSc+WN7gPF9FGdzzll8VrOhFlMK
+   e/4UvWCLIQB6RkKLpjOOL7hY7i9lKBlZlAJ7vf4IOzaxXfpJEWNY5esyM
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10687"; a="344786937"
+X-IronPort-AV: E=Sophos;i="5.99,214,1677571200"; 
+   d="scan'208";a="344786937"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Apr 2023 09:50:44 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10687"; a="722817352"
+X-IronPort-AV: E=Sophos;i="5.99,214,1677571200"; 
+   d="scan'208";a="722817352"
+Received: from embargo.jf.intel.com ([10.165.9.183])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Apr 2023 09:50:41 -0700
+From:   Yang Weijiang <weijiang.yang@intel.com>
+To:     seanjc@google.com, pbonzini@redhat.com, peterz@infradead.org,
+        john.allen@amd.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     rick.p.edgecombe@intel.com, weijiang.yang@intel.com
+Subject: [PATCH v2 00/21] Enable CET Virtualization
+Date:   Fri, 21 Apr 2023 09:45:54 -0400
+Message-Id: <20230421134615.62539-1-weijiang.yang@intel.com>
+X-Mailer: git-send-email 2.27.0
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|CH0PR12MB5372:EE_
-X-MS-Office365-Filtering-Correlation-Id: d7fcce59-fa02-4c71-f2bc-08db426e83d4
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: lkwFFR48933d8ne9NkYIM+7Dn1drBjJkk5JK9+c9BV1XkotvlahK6qp68Jw2tcYWU1N+Tl+y9rJ0V5ezFiuh6KQqB5KWl6qK2aZHsvEJnrmoxVQ/A1spIuctMaeH4OHBRtGM+8ger6tSIM9xnpeePTC8IxDw/gzqApseovJ6RN7kxt9DnPWtt5rjU8GovRKRpGIsl+UHFtet30MpJouAHLt6Kfe7DMpDN405tNUZ98X6cBaOwvckOjAgJcwb30D/dMjyYFSsqoz2aUgmoeNhvURzJ4r8XDg5Hyq4JxnQhgd9o+GNgvzPIEVoGx9c5Dw0BtPikcc++C+sJsu87q6VML1LPmwoqf9RPICXOy+hdsuJBZ1lQlBDy9Z15AhBnL0srBN7fu6MhXXVzjpUnHjf81M3tXLrof16/pf6rS82wRegUU1i0NzUYzHv2Y/gkO/B9YpAEQu4jqOkV5MFhctG7NLp+a8kXU5WLK1fgpDx/Nm+a6WWHHFs9uzqLsN9z1ixZQRxy6IThpIO9DE/BSWGX3rMkFbf9+EleeZ7Y7Rv/hZ5Dy3q7PUBr68ZXlhizc2HA339A7hcoMgl5c3Y0Nd5AN6U3i4oJheJh0wkvVfxRs46u7p8uURF4CfvZkbFzxbF81TZtZpqIskC2tcer0d4Eg==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(366004)(396003)(346002)(136003)(376002)(39860400002)(451199021)(2616005)(83380400001)(6506007)(36756003)(26005)(6512007)(966005)(478600001)(6486002)(86362001)(316002)(66556008)(8676002)(6916009)(66946007)(66476007)(38100700002)(4326008)(41300700001)(8936002)(186003)(4744005)(5660300002)(2906002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?32f4ENMitSNvhJXQG514l92UYiLFMjgtTpFeCkRNE4AU1sHs+ITFaHDci0hT?=
- =?us-ascii?Q?hQP8vlR8jDXxPyzNqgY59JNNBZRiKot2KZIdwgGoEt2q46MIfFsKTbTd3VHp?=
- =?us-ascii?Q?ZSvIrwz0pGiM4CwQysgCUXzWWHWLs0rp8zxHfp3mOq5xA+oibfizeVSAbSMu?=
- =?us-ascii?Q?N+7PyBGAdxlCdktyJVgQAqeTQK47RoejcUQeNrmR+wgqrHKDNiDLsavT0ENP?=
- =?us-ascii?Q?fVS4/M98ClQBYKWT1zMsJU1Zp8u4OQIhMvcG5dEkpALHGkeJ3uIdRqC02E8P?=
- =?us-ascii?Q?Ni3LjYTYsH46eTfxc360VampQC0vIhRycBpItABH/4xjjN61rGCeLQ1fCHSs?=
- =?us-ascii?Q?b9dALoZwmfgLXnDn1lYsdpn+tRqjzraswSJp3F3s1C7adDoogX+UIpEELQfQ?=
- =?us-ascii?Q?b6h30BgOwhrv2+ssfsd5s34GwDrb8IGn52GHyflJsepluwgB8Jq42Jgkva/o?=
- =?us-ascii?Q?ezKdw6Hnf2aGod/AaPhEpopK4b31T8wlChAVu9N59WIfbkRCgErzH0PraPbu?=
- =?us-ascii?Q?0Nh38gd8AcM8WdFfHTwcdscu+elfHIKYMlLUUBBN8SSQR/L2I4VDOPD0UWRQ?=
- =?us-ascii?Q?ik9WW5fUN3zl/7CUpp3s2tqfQCu6xWFPTdX3h3uHVu2DnwYbI2sLKcwt9emQ?=
- =?us-ascii?Q?B4vIdg8ijukB8Gh+2AQNbp40gHST9mH/BefXHKy+zLFK87ZDqL6iQJ828hyL?=
- =?us-ascii?Q?oWzdO70Yc4p3j8h71qRqHlUi0UL6uj2DC1XyBZuyAG0f5SLQxYLqsKssq1ta?=
- =?us-ascii?Q?2IIw0+Lz8OBhkwic11+vCnsHqSUdiYQIuQpq0W59SxhPPPzOunA2Mikpr+5c?=
- =?us-ascii?Q?EwO+F/85L9ZeuawqJ9UvFwQ4K9it3qDr1VOicipf0lrmnjxOiOs5PC39sYlT?=
- =?us-ascii?Q?Qv4s9PurqNghMOCmIu7FB/m88Yd8FzsTwbnilbsGnOhIzx5BEU91zjOfNsVz?=
- =?us-ascii?Q?N7OtAwzjxOyZ9PRpKO3ZcrJSXCZy0fYGbHQXJcBZGrJ8hdRetDn2HQ8AYD1R?=
- =?us-ascii?Q?8mMaS20ATcC8/AOscppzEIFk1tsAWH8i8floFrLcmMUN8Ts5GzV9k5sv2ito?=
- =?us-ascii?Q?a/pUXJMceHDzRfCYUGUC4jtWpNoEUg/WssUyqR0G5d+o0dcIIXeJCrhA82kR?=
- =?us-ascii?Q?wxkV0qIsCVWz2LrI3iSLcvpKmPlbRD6SXtjOcy75jZWaAdeNInzJIhqqjdPc?=
- =?us-ascii?Q?GYrfvVjTICDk1HCqkI0PUYWeX3Wyrmvc5Ze+nk2uZKU95gKUm1a+o4WD+qXw?=
- =?us-ascii?Q?b9jJnfk5CX++FxSMSuKw8gZBHfk6VF1S70biZMrpcxJ67RwR4xXWFG3ybwnf?=
- =?us-ascii?Q?4ntgUHYv+Iz+xRTafF0mk8Z5Mgs7q7RLFZW4N03XEgQ0hcmLje2Or6S9d8hc?=
- =?us-ascii?Q?CJ1PAK2O7MrT420TlUY0zHTdWnoKsHfQKPQqQ+naBV6Y81a/aAYMh5hRv6vq?=
- =?us-ascii?Q?6fjjRQz/7s3s6dvSnKwJSdSqSezj4KKuZvW43gtOfrIMFTRhDqnjPpHSF029?=
- =?us-ascii?Q?uavDjmAjUjLipJ/s+a+l7o3NpuFC5ufc8ZS2UwW9tMFeOXq2M8M+Jwcwmw97?=
- =?us-ascii?Q?zLplp3C36RxXUng/dK47TDap87AeCmBnouomvfZa?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d7fcce59-fa02-4c71-f2bc-08db426e83d4
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Apr 2023 13:44:23.0140
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: pBRb8sqc5t8/wgsD2yJPpVgIh1RZluWTrol8/wxi/t5n7wrt5bhTH9FZ2nvjryze
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR12MB5372
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
-        version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DATE_IN_PAST_03_06,
+        DKIMWL_WL_HIGH,DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
+        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Apr 20, 2023 at 10:36:11PM -0700, Yi Liu wrote:
-> as some vfio_device's open_device op requires kvm pointer and kvm pointer
-> set is part of GROUP_ADD.
-> 
-> Reviewed-by: Kevin Tian <kevin.tian@intel.com>
-> Signed-off-by: Yi Liu <yi.l.liu@intel.com>
-> ---
-> v3:
->  - Add r-b from Kevin
->  - Remove "::" to fix "WARNING: Literal block expected; none found."
->    "make htmldocs" looks good.
->  - Rename the subject per Alex's suggestion
-> 
-> v2: https://lore.kernel.org/kvm/20230222022231.266381-1-yi.l.liu@intel.com/
->  - Adopt Alex's suggestion
-> 
-> v1: https://lore.kernel.org/kvm/20230221034114.135386-1-yi.l.liu@intel.com/
-> ---
->  Documentation/virt/kvm/devices/vfio.rst | 5 +++++
->  1 file changed, 5 insertions(+)
+CET (Control-flow Enforcement Technology) is a CPU feature used to prevent\n
+Return/Jump-Oriented Programming (ROP/JOP) attacks. CET introduces a new\n
+exception type, Control Protection (#CP), and two sub-features(SHSTK,IBT)\n
+to defend against ROP/JOP style control-flow subversion attacks.\n
 
-Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
+Shadow Stack (SHSTK):
+  A shadow stack is a second stack used exclusively for control transfer
+  operations. The shadow stack is separate from the data/normal stack and
+  can be enabled individually in user and kernel mode. When shadow stacks
+  are enabled, CALL pushes the return address on both the data and shadow
+  stack. RET pops the return address from both stacks and compares them.
+  If the return addresses from the two stacks do not match, the processor
+  generates a #CP.
 
-Jason
+Indirect Branch Tracking (IBT):
+  IBT adds new instrutions, ENDBRANCH{32|64}, to mark valid target addresses
+  of indirect branches (CALL, JMP etc...). If an indirect branch is executed
+  and the next instruction is _not_ an ENDBRANCH, the processor generates a #CP.
+
+
+Build dependency:
+--------------------------------------------------------------------------
+The first 5 patches are took over from CET native series [1] in linux-next,
+they must be included in kernel tree when build host kernel for testing CET
+in guest. Will remove them once the native series landed in mainline kernel
+tree. It's just for build and test purpose.
+
+
+Implementation:
+--------------------------------------------------------------------------
+Historically, the early KVM patches can support both user SHSTK and IBT,
+and most of the early patches are carried forward with changes by this new
+series. Then with kernel IBT feature merged in 5.18, a new patch was added
+to support the feature for guest. The last patch is introduced to support
+supervisor SHSTK but the feature is not enabled on Intel platform for now,
+the main purpose of this patch is to facilitate AMD folks to enable the
+feature.
+
+In summary, this new series enables CET user SHSTK/IBT and kernel IBT, but
+doesn't fully support CET supervisor SHSTK, the enabling work is left for
+the future.
+
+Supported CET sub-features:
+
+                  |
+    User SHSTK    |    User IBT      (user mode)
+--------------------------------------------------
+    s-SHSTK (X)   |    Kernel IBT    (kernel mode)
+                  |
+
+The user SHSTK/IBT relies on host side XSAVES support(XSS[bit 11]) for user
+mode CET states. The kernel IBT doesn't have dependency on host XSAVES.
+The supervisor SHSTK relies on host side XSAVES support(XSS[bit 12]) for
+supervisor mode CET states.
+
+This version removed unnecessary checks for host CET enabling status before
+enabling guest CET support, making guest CET support apart from that of host.
+By doing so, it's expected to be more friendly to cloud computing scenarios.
+
+
+CET states management:
+--------------------------------------------------------------------------
+CET user mode states, MSR_IA32_{U_CET,PL3_SSP} depends on {XSAVES|XRSTORS}
+instructions to swap guest/host context when vm-exit/vm-entry happens. 
+On vm-exit, the guest CET states are stored to guest fpu area and host user
+mode states are loaded from thread/process context before vCPU returns to
+userspace, vice-versa on vm-entry. See details in kvm_{load|put}_guest_fpu().
+So the user mode state validity depends on host side U_CET bit set in MSR_XSS.
+
+CET supervisor mode states are grouped into two categories - XSAVES dependent
+and non-dependent, the former includes MSR_IA32_PL{0,1,2}_SSP, the later
+consists of MSR_IA32_S_CET and MSR_IA32_INTR_SSP_TBL. The XSAVES dependent
+MSR's save/restore depends on S_CET bit set in MSR_XSS. Since the native series
+doesn't enable S_CET support, these s-SHSTK shadow stack pointers are invalid.
+
+Moveover, new VMCS fields, {GUEST|HOST}_{S_CET,SSP,INTR_SSP_TABL}, are
+introduced for guest/host supervisor state switch. When CET entry/exit load
+bits are set, the guest/host MSR_IA32_{S_CET,INTR_SSP_TBL,SSP} are swapped
+automatically at vm-exit/entry. With these new fields, current guest kernel
+IBT enalbing doesn't depend on host {XSAVES|XRSTORS} support.
+
+
+Tests:
+--------------------------------------------------------------------------
+This series passed basic CET user shadow stack test and kernel IBT test in
+L1 and L2 guest. It also passed CET KUT test which has been merged there.
+
+Executed all KUT tests and KVM selftests against this series, all test cases
+passes except the vmx test, the failure is due to CR4_CET bit testing in
+test_vmxon_bad_cr(). After add CR4_CET bit to skip list, the test passed.
+I'll send a patch to fix this issue later.
+
+
+To run user shadow stack test and kernel IBT test in VM, you need an CET
+capable platform, e.g., Sapphire Rapids server, and follow below steps to
+build host/guest kernel properly:
+
+1. Buld host kernel. Patch this series to kernel tree and build kernel
+with CET capable gcc version(e.g., >=8.5.0).
+
+2. Build guest kernel. Patch CET native series to kernel tree and opt-in
+CONFIG_X86_KERNEL_IBT and CONFIG_X86_USER_SHADOW_STACK options.
+
+3. Launch a VM with QEMU built with CET enabling patches [2].
+
+Check kernel selftest test_shadow_stack_64 output:
+[INFO]  new_ssp = 7f8c82100ff8, *new_ssp = 7f8c82101001
+[INFO]  changing ssp from 7f8c82900ff0 to 7f8c82100ff8
+[INFO]  ssp is now 7f8c82101000
+[OK]    Shadow stack pivot
+[OK]    Shadow stack faults
+[INFO]  Corrupting shadow stack
+[INFO]  Generated shadow stack violation successfully
+[OK]    Shadow stack violation test
+[INFO]  Gup read -> shstk access success
+[INFO]  Gup write -> shstk access success
+[INFO]  Violation from normal write
+[INFO]  Gup read -> write access success
+[INFO]  Violation from normal write
+[INFO]  Gup write -> write access success
+[INFO]  Cow gup write -> write access success
+[OK]    Shadow gup test
+[INFO]  Violation from shstk access
+[OK]    mprotect() test
+[SKIP]  Userfaultfd unavailable.
+[OK]    32 bit test
+
+Check kernel IBT with dmesg | grep CET:
+CET detected: Indirect Branch Tracking enabled
+
+--------------------------------------------------------------------------
+Changes in v2:
+1. Remove excessive checks on host CET Kconfig options in v1 patchset [3].
+2. Make CET CPUIDs, MSRs and control flags enabling independent to host CET status.
+3. Introduce supervisor SHSTK support to make the patch set complete.
+4. Refactor patches to accommodate above changes.
+5. Rebase on kvm-x86/next [4].
+
+
+[1]: linux-next: https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git/tree/?h=next-20230420
+[2]: QEMU patch: https://lore.kernel.org/all/20230421041227.90915-1-weijiang.yang@intel.com/
+[3]: v1 patchset: https://lore.kernel.org/all/20220616084643.19564-1-weijiang.yang@intel.com/
+[4]: Rebase branch: https://github.com/kvm-x86/linux.git, commit: 7b632f72528d (tag: kvm-x86-next-2023.04.14)
+
+
+Rick Edgecombe (5):
+  x86/shstk: Add Kconfig option for shadow stack
+  x86/cpufeatures: Add CPU feature flags for shadow stacks
+  x86/cpufeatures: Enable CET CR4 bit for shadow stack
+  x86/fpu/xstate: Introduce CET MSR and XSAVES supervisor states
+  x86/fpu: Add helper for modifying xstate
+
+Sean Christopherson (2):
+  KVM:x86: Report XSS as to-be-saved if there are supported features
+  KVM:x86: Load guest FPU state when accessing xsaves-managed MSRs
+
+Yang Weijiang (14):
+  KVM:x86: Refresh CPUID on write to guest MSR_IA32_XSS
+  KVM:x86: Init kvm_caps.supported_xss with supported feature bits
+  KVM:x86: Add #CP support in guest exception classification
+  KVM:VMX: Introduce CET VMCS fields and control bits
+  KVM:x86: Add fault checks for guest CR4.CET setting
+  KVM:VMX: Emulate reads and writes to CET MSRs
+  KVM:VMX: Add a synthetic MSR to allow userspace VMM to access
+    GUEST_SSP
+  KVM:x86: Report CET MSRs as to-be-saved if CET is supported
+  KVM:x86: Save/Restore GUEST_SSP to/from SMM state save area
+  KVM:VMX: Pass through user CET MSRs to the guest
+  KVM:x86: Enable CET virtualization for VMX and advertise to userspace
+  KVM:nVMX: Enable user CET support for nested VMX
+  KVM:x86: Enable supervisor IBT support for guest
+  KVM:x86: Support CET supervisor shadow stack MSR access
+
+ arch/x86/Kconfig                         |  24 ++++
+ arch/x86/Kconfig.assembler               |   5 +
+ arch/x86/include/asm/cpufeatures.h       |   2 +
+ arch/x86/include/asm/disabled-features.h |   8 +-
+ arch/x86/include/asm/fpu/api.h           |   9 ++
+ arch/x86/include/asm/fpu/types.h         |  16 ++-
+ arch/x86/include/asm/fpu/xstate.h        |   6 +-
+ arch/x86/include/asm/kvm_host.h          |   3 +-
+ arch/x86/include/asm/vmx.h               |   8 ++
+ arch/x86/include/uapi/asm/kvm.h          |   1 +
+ arch/x86/include/uapi/asm/kvm_para.h     |   1 +
+ arch/x86/kernel/cpu/common.c             |  35 ++++--
+ arch/x86/kernel/cpu/cpuid-deps.c         |   1 +
+ arch/x86/kernel/fpu/core.c               |  19 +++
+ arch/x86/kernel/fpu/xstate.c             |  90 +++++++-------
+ arch/x86/kvm/cpuid.c                     |  23 +++-
+ arch/x86/kvm/cpuid.h                     |   6 +
+ arch/x86/kvm/smm.c                       |  20 +++
+ arch/x86/kvm/vmx/capabilities.h          |   4 +
+ arch/x86/kvm/vmx/nested.c                |  29 ++++-
+ arch/x86/kvm/vmx/vmcs12.c                |   6 +
+ arch/x86/kvm/vmx/vmcs12.h                |  14 ++-
+ arch/x86/kvm/vmx/vmx.c                   | 150 ++++++++++++++++++++++-
+ arch/x86/kvm/vmx/vmx.h                   |   6 +-
+ arch/x86/kvm/x86.c                       |  79 ++++++++++--
+ arch/x86/kvm/x86.h                       |  46 ++++++-
+ 26 files changed, 528 insertions(+), 83 deletions(-)
+
+
+base-commit: 7b632f72528d5fa3f0265358a393f534da47d9dd
+-- 
+2.27.0
+
