@@ -2,87 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D1FE66EA639
-	for <lists+kvm@lfdr.de>; Fri, 21 Apr 2023 10:50:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 93AD46EA63F
+	for <lists+kvm@lfdr.de>; Fri, 21 Apr 2023 10:51:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229632AbjDUIun (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Apr 2023 04:50:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40286 "EHLO
+        id S231731AbjDUIvE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Apr 2023 04:51:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41914 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231190AbjDUIuJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Apr 2023 04:50:09 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8A2DAF1A
-        for <kvm@vger.kernel.org>; Fri, 21 Apr 2023 01:48:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1682066898;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=cyh9GNwkSeiWX8VVWJet6cmrStrv1Y1BhHYKMAKCy08=;
-        b=KgpXidUXneE7dkbQEMmaUqDbchLJXxG+5n9VkNolXDj0DwL+hIbk+hc1WwqhUNq1edpjwd
-        LAHthIriVajvGAtEQsUDtUL/o6zjjJaxubT9pH34eocj26Phlgj4eRigFHn8vCBv25Z0q1
-        jHZTwiUkVmEwYwZEZzMNKf58w4y6guY=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-652-nooS6etpPy6DuERdrr4gTw-1; Fri, 21 Apr 2023 04:48:15 -0400
-X-MC-Unique: nooS6etpPy6DuERdrr4gTw-1
-Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-953429dac27so118213166b.0
-        for <kvm@vger.kernel.org>; Fri, 21 Apr 2023 01:48:15 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682066894; x=1684658894;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=cyh9GNwkSeiWX8VVWJet6cmrStrv1Y1BhHYKMAKCy08=;
-        b=Rn+B85RAY7w8G3c8nPww82kDbAIQ/OU1C/4tOFVQtfJEvudYmz7P7mQXYVTL8IDVEK
-         edUD9ZvEZiSMWDFH1WL5+FqM0Un+kIENvMf9lvBi+V4mBXp0bYLGbvzBI1qX6yGF1man
-         VJ36pGM5eSfouWz9AJ1U1RkBfQKLlEjMqgNNSrG0iQt6eD9MqXT7IWDyPjT0NwGH0oCj
-         osUp0zqUQix28kqX/6dnJJbLtBuYC2/UB1FUiS3XJSP14vEmHbxCYE2MfS8Nzx5xYsK+
-         +sj4TIr/Qj19GJiB1dAlP19DUIA2I/M/Ebd3QnZhg4RWsuXwy4oE5wO+Uh0TfF8DT7as
-         F9eQ==
-X-Gm-Message-State: AAQBX9e7H3h0n56p822IauYnNMu+TByV1fHsMQIapTZfWW6OF3W9YZaQ
-        s/3PSGdObXQBuRtnxPSVLCbgyOt9hsL9DENs/iyOrgF0RYgeyaePdfwVLNs5a1bQKgi1VEC957c
-        hViurpLFhS7nP
-X-Received: by 2002:a17:906:f295:b0:94f:1c1e:4222 with SMTP id gu21-20020a170906f29500b0094f1c1e4222mr1519210ejb.63.1682066894066;
-        Fri, 21 Apr 2023 01:48:14 -0700 (PDT)
-X-Google-Smtp-Source: AKy350aWWKuqvbOSrEETU5zSp0fBzI+nEuxYfq95fqAzazQbqcwDmQO09E32WhoCfdXpX16ZYLYARA==
-X-Received: by 2002:a17:906:f295:b0:94f:1c1e:4222 with SMTP id gu21-20020a170906f29500b0094f1c1e4222mr1519187ejb.63.1682066893730;
-        Fri, 21 Apr 2023 01:48:13 -0700 (PDT)
-Received: from [192.168.10.118] ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
-        by smtp.gmail.com with ESMTPSA id q27-20020a170906361b00b0094e1026bc66sm1812245ejb.140.2023.04.21.01.48.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Apr 2023 01:48:13 -0700 (PDT)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     Tom Lendacky <thomas.lendacky@amd.com>
-Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org,
-        Eric Blake <eblake@redhat.com>,
-        Markus Armbruster <armbru@redhat.com>,
-        =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
-        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Michael Roth <michael.roth@amd.com>
-Subject: Re: [PATCH 0/4] Qemu SEV reduced-phys-bits fixes
-Date:   Fri, 21 Apr 2023 10:48:12 +0200
-Message-Id: <20230421084812.10215-1-pbonzini@redhat.com>
+        with ESMTP id S231653AbjDUIu5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Apr 2023 04:50:57 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 383DEA249;
+        Fri, 21 Apr 2023 01:50:51 -0700 (PDT)
+Received: from pps.filterd (m0353722.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 33L8oQqV008307;
+        Fri, 21 Apr 2023 08:50:50 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=1rY0AJuzCvr4bKWKdQn+znXW9Cg6kd/HWcj8XtK6vq4=;
+ b=DBmwuzEDLIJOd6RXsEkhNbl1rxabvxBfeuffhMAUHFVBq1RGCmz9RhmmTunms2tBRM8C
+ jnq1nVDM/zlE+2vY5fea774+mTw4svHcWwNpuoPg7PNYYqWJ2aBwi57m+nYZmHJr9PmI
+ V5YSGK6pmBGHmxNaS2NvKUZ/pDV0bKYo3TMpS+HRbiDrl9cpeyUpt3tX4T99CQfNamrX
+ 2Q5hjPsppkdIkU4rR9OIdv59T6rI5oVlETQzPeEMQ5RK7VfcoVmRrqtd2vwMWss6kRZ1
+ GNmIin5B14YAGOnAT3HbbCWN5JAZGw8W/RR6iSAGSp1QMXXvBDKWdraOSVGyJkJU0eF3 kg== 
+Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3q3q7sr7xc-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 21 Apr 2023 08:50:50 +0000
+Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
+        by ppma06fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 33L07AmU024025;
+        Fri, 21 Apr 2023 08:50:48 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+        by ppma06fra.de.ibm.com (PPS) with ESMTPS id 3pyk6fk8dd-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 21 Apr 2023 08:50:48 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+        by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 33L8ogxq34669006
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 21 Apr 2023 08:50:42 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 0AA5220040;
+        Fri, 21 Apr 2023 08:50:42 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 6F36320043;
+        Fri, 21 Apr 2023 08:50:41 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.171.17.52])
+        by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Fri, 21 Apr 2023 08:50:41 +0000 (GMT)
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     kvm@vger.kernel.org
+Cc:     borntraeger@de.ibm.com, nrb@linux.ibm.com, nsg@linux.ibm.com,
+        frankja@linux.ibm.com, mhartmay@linux.ibm.com,
+        kvm390-list@tuxmaker.boeblingen.de.ibm.com,
+        linux-s390@vger.kernel.org
+Subject: [PATCH v2 0/1] KVM: s390: pv: fix asynchronous teardown for small VMs
+Date:   Fri, 21 Apr 2023 10:50:35 +0200
+Message-Id: <20230421085036.52511-1-imbrenda@linux.ibm.com>
 X-Mailer: git-send-email 2.40.0
-In-Reply-To: <cover.1664550870.git.thomas.lendacky@amd.com>
-References: 
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: -ByDAMJG2pozyBFDTK46GuUm0tjwWIEk
+X-Proofpoint-ORIG-GUID: -ByDAMJG2pozyBFDTK46GuUm0tjwWIEk
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
+ definitions=2023-04-21_02,2023-04-20_01,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ mlxlogscore=911 clxscore=1015 bulkscore=0 spamscore=0 impostorscore=0
+ suspectscore=0 malwarescore=0 priorityscore=1501 mlxscore=0 adultscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2303200000 definitions=main-2304210074
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Queued, thanks.
 
-Paolo
+On machines without the Destroy Secure Configuration Fast UVC, the
+topmost level of page tables is set aside and freed asynchronously
+as last step of the asynchronous teardown.
+
+Each gmap has a host_to_guest radix tree mapping host (userspace)
+addresses (with 1M granularity) to gmap segment table entries (pmds).
+
+If a guest is smaller than 2GB, the topmost level of page tables is the
+segment table (i.e. there are only 2 levels). Replacing it means that
+the pointers in the host_to_guest mapping would become stale and cause
+all kinds of nasty issues.
+
+This patch fixes the issue by disallowing asynchronous teardown for
+guests with only 2 levels of page tables. Userspace should (and already
+does) try using the normal destroy if the asynchronous one fails.
+
+Update s390_replace_asce so it refuses to replace segment type ASCEs.
+
+v1->v2:
+After talking with Marc, I decided to throw away most of the patch and
+instead simply refuse to prepare for asynchronous teardown if the VM has a
+segment type ASCE.
+
+
+Claudio Imbrenda (1):
+  KVM: s390: pv: fix asynchronous teardown for small VMs
+
+ arch/s390/kvm/pv.c  | 5 +++++
+ arch/s390/mm/gmap.c | 7 +++++++
+ 2 files changed, 12 insertions(+)
+
+-- 
+2.40.0
 
