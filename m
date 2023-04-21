@@ -2,231 +2,209 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2080E6EAFA8
-	for <lists+kvm@lfdr.de>; Fri, 21 Apr 2023 18:53:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6EDAD6EAE10
+	for <lists+kvm@lfdr.de>; Fri, 21 Apr 2023 17:32:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233268AbjDUQvg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Apr 2023 12:51:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57864 "EHLO
+        id S232882AbjDUPc2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Apr 2023 11:32:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32786 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233350AbjDUQvK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Apr 2023 12:51:10 -0400
-Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43C5715601;
-        Fri, 21 Apr 2023 09:50:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1682095856; x=1713631856;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=s9TExKj18DC/arpm4xWsdM/5QbQRmhV9FlvZ5+5DLbc=;
-  b=ld3h8EZzPnDXSI2ifDwxtVeZSf81XHjim2vWhAq6YG+EAqCvkAGV5Mj2
-   JUJcaLrlvXHhnrX1GmvQWUHh+6WX857FAcn2YdfxNFDUDViKTCfp5QNW8
-   nJQu6O8jTUfoNFjcLIEHiN0QHGdxinbhuRNKXW/GqFrciREtHm4+RiMC1
-   wYwJQ+MIsbJI0mYVpXz4XPsTbqN4RfFi9cP0/1anr0H1x+bAIjLMQxo69
-   rn9IQPO8hTTIDV9953MiDF3lwP2uLAP1M/tmZrzy2Of3XmT6jbtciVI2o
-   S2XAGoZUru/463Lm7PN0qMcp4pOqABrOoZgrGtV6XOP3l0MI0YB63NisG
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10687"; a="344787073"
-X-IronPort-AV: E=Sophos;i="5.99,214,1677571200"; 
-   d="scan'208";a="344787073"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Apr 2023 09:50:47 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10687"; a="722817427"
-X-IronPort-AV: E=Sophos;i="5.99,214,1677571200"; 
-   d="scan'208";a="722817427"
-Received: from embargo.jf.intel.com ([10.165.9.183])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Apr 2023 09:50:44 -0700
-From:   Yang Weijiang <weijiang.yang@intel.com>
-To:     seanjc@google.com, pbonzini@redhat.com, peterz@infradead.org,
-        john.allen@amd.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc:     rick.p.edgecombe@intel.com, weijiang.yang@intel.com
-Subject: [PATCH v2 21/21] KVM:x86: Support CET supervisor shadow stack MSR access
-Date:   Fri, 21 Apr 2023 09:46:15 -0400
-Message-Id: <20230421134615.62539-22-weijiang.yang@intel.com>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20230421134615.62539-1-weijiang.yang@intel.com>
-References: <20230421134615.62539-1-weijiang.yang@intel.com>
+        with ESMTP id S232573AbjDUPc0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Apr 2023 11:32:26 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9F1640D8;
+        Fri, 21 Apr 2023 08:32:24 -0700 (PDT)
+Received: from pps.filterd (m0353724.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 33LFSlwg006248;
+        Fri, 21 Apr 2023 15:32:24 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=DiC1uOSoqIalRhh8cK0eUsv6YesR7A6aq8qd37tdKKk=;
+ b=TSHyzeI4V/0d1hl5b1bNZFQpugq9+ih2PraWVtNu3SEkuOtu3n7J7teynWT39Pg+lXLd
+ csP8bXMJTYRD7O65Caogz4P599eNGpZ30Mun6qOTM0wQtLDTj/2YvyPCvzi53pUZX/R5
+ E7Ec7//e/nEvFPf5tVX5Qvl+IZR0WoQ+hlIhSkGiT2N2S4LJ7DzS8f1vXScDAZNCoWYk
+ gQZbCf79MZ//fPxnxcenRD+qrr5odl/P7TlEaSZlNuMuLhtxLGkSlsGEje5k/GAeg7o+
+ /wRyraPqnTw25Pz08X3n8GLTpfNRAxA3jYfyczRJpz/O8gvA28qaLxaUwLyzZE0wiuq0 Gw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3q3w5j870j-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 21 Apr 2023 15:32:23 +0000
+Received: from m0353724.ppops.net (m0353724.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 33LFSj0J006132;
+        Fri, 21 Apr 2023 15:32:23 GMT
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3q3w5j86wh-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 21 Apr 2023 15:32:23 +0000
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 33KLakhe002549;
+        Fri, 21 Apr 2023 15:32:21 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+        by ppma06ams.nl.ibm.com (PPS) with ESMTPS id 3pyk6fm53k-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 21 Apr 2023 15:32:21 +0000
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+        by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 33LFWH1C25625328
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 21 Apr 2023 15:32:17 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C674420040;
+        Fri, 21 Apr 2023 15:32:17 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 55BB42004E;
+        Fri, 21 Apr 2023 15:32:17 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.171.17.52])
+        by smtpav05.fra02v.mail.ibm.com (Postfix) with SMTP;
+        Fri, 21 Apr 2023 15:32:17 +0000 (GMT)
+Date:   Fri, 21 Apr 2023 16:10:08 +0200
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Janosch Frank <frankja@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org, thuth@redhat.com,
+        nrb@linux.ibm.com, david@redhat.com
+Subject: Re: [kvm-unit-tests PATCH v3 2/7] lib: s390x: uv: Add intercept
+ data check library function
+Message-ID: <20230421161008.529523bc@p-imbrenda>
+In-Reply-To: <20230421113647.134536-3-frankja@linux.ibm.com>
+References: <20230421113647.134536-1-frankja@linux.ibm.com>
+        <20230421113647.134536-3-frankja@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DATE_IN_PAST_03_06,
-        DKIMWL_WL_HIGH,DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
-        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: sQV6jPESeBbN6L6Sxj75FXrRT20tbGaZ
+X-Proofpoint-ORIG-GUID: vtWOSTTS4TftQXc_7dttsIJdXFG_XWKD
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
+ definitions=2023-04-21_08,2023-04-21_01,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ lowpriorityscore=0 mlxlogscore=999 impostorscore=0 mlxscore=0
+ malwarescore=0 phishscore=0 suspectscore=0 clxscore=1015 bulkscore=0
+ spamscore=0 adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2303200000 definitions=main-2304210132
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add MSR access interfaces for supervisor shadow stack, i.e.,
-MSR_IA32_PL{0,1,2} and MSR_IA32_INT_SSP_TAB, meanwhile pass through
-them to {L1,L2} guests when {L0,L1} KVM supports supervisor shadow
-stack.
+On Fri, 21 Apr 2023 11:36:42 +0000
+Janosch Frank <frankja@linux.ibm.com> wrote:
 
-Note, currently supervisor shadow stack is not supported on Intel
-platforms, i.e., VMX always clears CPUID(EAX=07H,ECX=1).EDX.[bit 18].
+> When working with guests it's essential to check the SIE intercept
+> data for the correct values. Fortunately on PV guests these values are
+> constants so we can create check functions which test for the
+> constants.
+> 
+> While we're at it let's make pv-diags.c use this new function.
+> 
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
 
-The main purpose of this patch is to facilitate AMD folks to enable
-supervisor shadow stack for their platforms.
+Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
 
-Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
----
- arch/x86/kvm/cpuid.h      |  6 +++++
- arch/x86/kvm/vmx/nested.c | 12 +++++++++
- arch/x86/kvm/vmx/vmx.c    | 51 ++++++++++++++++++++++++++++++++++-----
- 3 files changed, 63 insertions(+), 6 deletions(-)
-
-diff --git a/arch/x86/kvm/cpuid.h b/arch/x86/kvm/cpuid.h
-index b1658c0de847..019a16b25b88 100644
---- a/arch/x86/kvm/cpuid.h
-+++ b/arch/x86/kvm/cpuid.h
-@@ -232,4 +232,10 @@ static __always_inline bool guest_pv_has(struct kvm_vcpu *vcpu,
- 	return vcpu->arch.pv_cpuid.features & (1u << kvm_feature);
- }
- 
-+static __always_inline bool kvm_cet_kernel_shstk_supported(void)
-+{
-+	return !IS_ENABLED(CONFIG_KVM_INTEL) &&
-+	       kvm_cpu_cap_has(X86_FEATURE_SHSTK);
-+}
-+
- #endif
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index bf690827bfee..aaaae92dc9f6 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -670,6 +670,18 @@ static inline bool nested_vmx_prepare_msr_bitmap(struct kvm_vcpu *vcpu,
- 	nested_vmx_set_intercept_for_msr(vmx, msr_bitmap_l1, msr_bitmap_l0,
- 					 MSR_IA32_PL3_SSP, MSR_TYPE_RW);
- 
-+	nested_vmx_set_intercept_for_msr(vmx, msr_bitmap_l1, msr_bitmap_l0,
-+					 MSR_IA32_PL0_SSP, MSR_TYPE_RW);
-+
-+	nested_vmx_set_intercept_for_msr(vmx, msr_bitmap_l1, msr_bitmap_l0,
-+					 MSR_IA32_PL1_SSP, MSR_TYPE_RW);
-+
-+	nested_vmx_set_intercept_for_msr(vmx, msr_bitmap_l1, msr_bitmap_l0,
-+					 MSR_IA32_PL2_SSP, MSR_TYPE_RW);
-+
-+	nested_vmx_set_intercept_for_msr(vmx, msr_bitmap_l1, msr_bitmap_l0,
-+					 MSR_IA32_INT_SSP_TAB, MSR_TYPE_RW);
-+
- 	kvm_vcpu_unmap(vcpu, &vmx->nested.msr_bitmap_map, false);
- 
- 	vmx->nested.force_msr_bitmap_recalc = false;
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 6eab3e452bbb..074b618f1a07 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -713,6 +713,9 @@ static bool is_valid_passthrough_msr(u32 msr)
- 	case MSR_IA32_PL3_SSP:
- 	case MSR_IA32_S_CET:
- 		return true;
-+	case MSR_IA32_PL0_SSP ... MSR_IA32_PL2_SSP:
-+	case MSR_IA32_INT_SSP_TAB:
-+		return true;
- 	}
- 
- 	r = possible_passthrough_msr_slot(msr) != -ENOENT;
-@@ -1962,8 +1965,11 @@ static int vmx_get_msr_feature(struct kvm_msr_entry *msr)
- static bool cet_is_msr_accessible(struct kvm_vcpu *vcpu,
- 				  struct msr_data *msr)
- {
-+	u64 mask;
-+
- 	if (!kvm_cet_user_supported() &&
--	    !kvm_cpu_cap_has(X86_FEATURE_IBT))
-+	    !(kvm_cpu_cap_has(X86_FEATURE_IBT) ||
-+	      kvm_cpu_cap_has(X86_FEATURE_SHSTK)))
- 		return false;
- 
- 	if (msr->host_initiated)
-@@ -1973,15 +1979,27 @@ static bool cet_is_msr_accessible(struct kvm_vcpu *vcpu,
- 	    !guest_cpuid_has(vcpu, X86_FEATURE_IBT))
- 		return false;
- 
-+	if (msr->index == MSR_IA32_U_CET)
-+		return true;
-+
- 	if (msr->index == MSR_IA32_S_CET)
--		return guest_cpuid_has(vcpu, X86_FEATURE_IBT);
-+		return guest_cpuid_has(vcpu, X86_FEATURE_IBT) ||
-+		       kvm_cet_kernel_shstk_supported();
- 
--	if ((msr->index == MSR_IA32_PL3_SSP ||
--	     msr->index == MSR_KVM_GUEST_SSP) &&
-+	if (msr->index == MSR_KVM_GUEST_SSP)
-+		return guest_cpuid_has(vcpu, X86_FEATURE_SHSTK);
-+
-+	if (msr->index == MSR_IA32_INT_SSP_TAB)
-+		return guest_cpuid_has(vcpu, X86_FEATURE_SHSTK) &&
-+		       kvm_cet_kernel_shstk_supported();
-+
-+	if (msr->index == MSR_IA32_PL3_SSP &&
- 	    !guest_cpuid_has(vcpu, X86_FEATURE_SHSTK))
- 		return false;
- 
--	return true;
-+	mask = (msr->index == MSR_IA32_PL3_SSP) ? XFEATURE_MASK_CET_USER :
-+						  XFEATURE_MASK_CET_KERNEL;
-+	return !!(kvm_caps.supported_xss & mask);
- }
- 
- /*
-@@ -2135,6 +2153,12 @@ static int vmx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 		else
- 			kvm_get_xsave_msr(msr_info);
- 		break;
-+	case MSR_IA32_PL0_SSP ... MSR_IA32_PL2_SSP:
-+	case MSR_IA32_INT_SSP_TAB:
-+		if (!cet_is_msr_accessible(vcpu, msr_info))
-+			return 1;
-+		kvm_get_xsave_msr(msr_info);
-+		break;
- 	case MSR_IA32_DEBUGCTLMSR:
- 		msr_info->data = vmcs_read64(GUEST_IA32_DEBUGCTL);
- 		break;
-@@ -2471,6 +2495,12 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 		else
- 			kvm_set_xsave_msr(msr_info);
- 		break;
-+	case MSR_IA32_PL0_SSP ... MSR_IA32_PL2_SSP:
-+	case MSR_IA32_INT_SSP_TAB:
-+		if (!cet_is_msr_accessible(vcpu, msr_info))
-+			return 1;
-+		kvm_set_xsave_msr(msr_info);
-+		break;
- 	case MSR_IA32_PERF_CAPABILITIES:
- 		if (data && !vcpu_to_pmu(vcpu)->version)
- 			return 1;
-@@ -7774,6 +7804,14 @@ static void vmx_update_intercept_for_cet_msr(struct kvm_vcpu *vcpu)
- 
- 	incpt |= !guest_cpuid_has(vcpu, X86_FEATURE_IBT);
- 	vmx_set_intercept_for_msr(vcpu, MSR_IA32_S_CET, MSR_TYPE_RW, incpt);
-+
-+	incpt = !is_cet_state_supported(vcpu, XFEATURE_MASK_CET_KERNEL);
-+	incpt |= !guest_cpuid_has(vcpu, X86_FEATURE_SHSTK);
-+
-+	vmx_set_intercept_for_msr(vcpu, MSR_IA32_INT_SSP_TAB, MSR_TYPE_RW, incpt);
-+	vmx_set_intercept_for_msr(vcpu, MSR_IA32_PL0_SSP, MSR_TYPE_RW, incpt);
-+	vmx_set_intercept_for_msr(vcpu, MSR_IA32_PL1_SSP, MSR_TYPE_RW, incpt);
-+	vmx_set_intercept_for_msr(vcpu, MSR_IA32_PL2_SSP, MSR_TYPE_RW, incpt);
- }
- 
- static void vmx_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
-@@ -7844,7 +7882,8 @@ static void vmx_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
- 	/* Refresh #PF interception to account for MAXPHYADDR changes. */
- 	vmx_update_exception_bitmap(vcpu);
- 
--	if (kvm_cet_user_supported() || kvm_cpu_cap_has(X86_FEATURE_IBT))
-+	if (kvm_cet_user_supported() || kvm_cpu_cap_has(X86_FEATURE_IBT) ||
-+	    kvm_cpu_cap_has(X86_FEATURE_SHSTK))
- 		vmx_update_intercept_for_cet_msr(vcpu);
- }
- 
--- 
-2.27.0
+> ---
+>  lib/s390x/pv_icptdata.h | 42 +++++++++++++++++++++++++++++++++++++++++
+>  s390x/pv-diags.c        | 14 ++++++--------
+>  2 files changed, 48 insertions(+), 8 deletions(-)
+>  create mode 100644 lib/s390x/pv_icptdata.h
+> 
+> diff --git a/lib/s390x/pv_icptdata.h b/lib/s390x/pv_icptdata.h
+> new file mode 100644
+> index 00000000..4746117e
+> --- /dev/null
+> +++ b/lib/s390x/pv_icptdata.h
+> @@ -0,0 +1,42 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +/*
+> + * Commonly used checks for PV SIE intercept data
+> + *
+> + * Copyright IBM Corp. 2023
+> + * Author: Janosch Frank <frankja@linux.ibm.com>
+> + */
+> +
+> +#ifndef _S390X_PV_ICPTDATA_H_
+> +#define _S390X_PV_ICPTDATA_H_
+> +
+> +#include <sie.h>
+> +
+> +/*
+> + * Checks the diagnose instruction intercept data for consistency with
+> + * the constants defined by the PV SIE architecture
+> + *
+> + * Supports: 0x44, 0x9c, 0x288, 0x308, 0x500
+> + */
+> +static bool pv_icptdata_check_diag(struct vm *vm, int diag)
+> +{
+> +	int icptcode;
+> +
+> +	switch (diag) {
+> +	case 0x44:
+> +	case 0x9c:
+> +	case 0x288:
+> +	case 0x308:
+> +		icptcode = ICPT_PV_NOTIFY;
+> +		break;
+> +	case 0x500:
+> +		icptcode = ICPT_PV_INSTR;
+> +		break;
+> +	default:
+> +		/* If a new diag is introduced add it to the cases above! */
+> +		assert(0);
+> +	}
+> +
+> +	return vm->sblk->icptcode == icptcode && vm->sblk->ipa == 0x8302 &&
+> +	       vm->sblk->ipb == 0x50000000 && vm->save_area.guest.grs[5] == diag;
+> +}
+> +#endif
+> diff --git a/s390x/pv-diags.c b/s390x/pv-diags.c
+> index 5165937a..096ac61f 100644
+> --- a/s390x/pv-diags.c
+> +++ b/s390x/pv-diags.c
+> @@ -9,6 +9,7 @@
+>   */
+>  #include <libcflat.h>
+>  #include <snippet.h>
+> +#include <pv_icptdata.h>
+>  #include <sie.h>
+>  #include <sclp.h>
+>  #include <asm/facility.h>
+> @@ -31,8 +32,7 @@ static void test_diag_500(void)
+>  			size_gbin, size_hdr, SNIPPET_UNPACK_OFF);
+>  
+>  	sie(&vm);
+> -	report(vm.sblk->icptcode == ICPT_PV_INSTR && vm.sblk->ipa == 0x8302 &&
+> -	       vm.sblk->ipb == 0x50000000 && vm.save_area.guest.grs[5] == 0x500,
+> +	report(pv_icptdata_check_diag(&vm, 0x500),
+>  	       "intercept values");
+>  	report(vm.save_area.guest.grs[1] == 1 &&
+>  	       vm.save_area.guest.grs[2] == 2 &&
+> @@ -45,9 +45,8 @@ static void test_diag_500(void)
+>  	 */
+>  	vm.sblk->iictl = IICTL_CODE_OPERAND;
+>  	sie(&vm);
+> -	report(vm.sblk->icptcode == ICPT_PV_NOTIFY && vm.sblk->ipa == 0x8302 &&
+> -	       vm.sblk->ipb == 0x50000000 && vm.save_area.guest.grs[5] == 0x9c
+> -	       && vm.save_area.guest.grs[0] == PGM_INT_CODE_OPERAND,
+> +	report(pv_icptdata_check_diag(&vm, 0x9c) &&
+> +	       vm.save_area.guest.grs[0] == PGM_INT_CODE_OPERAND,
+>  	       "operand exception");
+>  
+>  	/*
+> @@ -58,9 +57,8 @@ static void test_diag_500(void)
+>  	vm.sblk->iictl = IICTL_CODE_SPECIFICATION;
+>  	/* Inject PGM, next exit should be 9c */
+>  	sie(&vm);
+> -	report(vm.sblk->icptcode == ICPT_PV_NOTIFY && vm.sblk->ipa == 0x8302 &&
+> -	       vm.sblk->ipb == 0x50000000 && vm.save_area.guest.grs[5] == 0x9c
+> -	       && vm.save_area.guest.grs[0] == PGM_INT_CODE_SPECIFICATION,
+> +	report(pv_icptdata_check_diag(&vm, 0x9c) &&
+> +	       vm.save_area.guest.grs[0] == PGM_INT_CODE_SPECIFICATION,
+>  	       "specification exception");
+>  
+>  	/* No need for cleanup, just tear down the VM */
 
