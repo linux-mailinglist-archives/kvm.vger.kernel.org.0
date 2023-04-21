@@ -2,225 +2,198 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 62FA16EB056
-	for <lists+kvm@lfdr.de>; Fri, 21 Apr 2023 19:12:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 379ED6EB080
+	for <lists+kvm@lfdr.de>; Fri, 21 Apr 2023 19:23:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233420AbjDURL4 convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Fri, 21 Apr 2023 13:11:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55504 "EHLO
+        id S233239AbjDURXF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Apr 2023 13:23:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33356 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233450AbjDURLp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Apr 2023 13:11:45 -0400
+        with ESMTP id S233384AbjDURWs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Apr 2023 13:22:48 -0400
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id BE1F09016
-        for <kvm@vger.kernel.org>; Fri, 21 Apr 2023 10:11:33 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 82BCC14450
+        for <kvm@vger.kernel.org>; Fri, 21 Apr 2023 10:22:45 -0700 (PDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 02F1115A1;
-        Fri, 21 Apr 2023 10:12:17 -0700 (PDT)
-Received: from donnerap.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7A9FA3F6C4;
-        Fri, 21 Apr 2023 10:11:32 -0700 (PDT)
-Date:   Fri, 21 Apr 2023 18:11:29 +0100
-From:   Andre Przywara <andre.przywara@arm.com>
-To:     Jean-Philippe Brucker <jean-philippe@linaro.org>
-Cc:     kvm@vger.kernel.org, will@kernel.org, suzuki.poulose@arm.com
-Subject: Re: [PATCH kvmtool 14/16] Factor epoll thread
-Message-ID: <20230421181129.182396a7@donnerap.cambridge.arm.com>
-In-Reply-To: <20230419132119.124457-15-jean-philippe@linaro.org>
-References: <20230419132119.124457-1-jean-philippe@linaro.org>
-        <20230419132119.124457-15-jean-philippe@linaro.org>
-Organization: ARM
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.32; aarch64-unknown-linux-gnu)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2259212FC;
+        Fri, 21 Apr 2023 10:23:29 -0700 (PDT)
+Received: from [10.57.23.51] (unknown [10.57.23.51])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 67B723F6C4;
+        Fri, 21 Apr 2023 10:22:44 -0700 (PDT)
+Message-ID: <fe7e20e5-9729-248d-ee03-c8b444a1b7c0@arm.com>
+Date:   Fri, 21 Apr 2023 18:22:37 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+Subject: Re: RMRR device on non-Intel platform
+Content-Language: en-GB
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "iommu@lists.linux.dev" <iommu@lists.linux.dev>
+References: <BN9PR11MB5276E84229B5BD952D78E9598C639@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <20230420081539.6bf301ad.alex.williamson@redhat.com>
+ <6cce1c5d-ab50-41c4-6e62-661bc369d860@arm.com>
+ <20230420084906.2e4cce42.alex.williamson@redhat.com>
+ <fd324213-8d77-cb67-1c52-01cd0997a92c@arm.com>
+ <20230420154933.1a79de4e.alex.williamson@redhat.com>
+ <ZEJ73s/2M4Rd5r/X@nvidia.com> <0aa4a107-57d0-6e5b-46e5-86dbe5b3087f@arm.com>
+ <ZEKFdJ6yXoyFiHY+@nvidia.com>
+From:   Robin Murphy <robin.murphy@arm.com>
+In-Reply-To: <ZEKFdJ6yXoyFiHY+@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-7.5 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 19 Apr 2023 14:21:18 +0100
-Jean-Philippe Brucker <jean-philippe@linaro.org> wrote:
-
-Hi,
-
-> Both ioeventfd and ipc use an epoll thread roughly the same way. In
-> order to add a new epoll user, factor the common bits into epoll.c
+On 2023-04-21 13:45, Jason Gunthorpe wrote:
+> On Fri, Apr 21, 2023 at 01:29:46PM +0100, Robin Murphy wrote:
 > 
-> Slight implementation changes which shouldn't affect behavior:
+>> Can you clarify why something other than IOMMU_RESV_SW_MSI would be
+>> needed?
 > 
-> * At the moment ioeventfd mixes file descriptor (for the stop event) and
->   pointers in the epoll_event.data union, which could in theory cause
->   aliasing. Use a pointer for the stop event instead. kvm-ipc uses only
->   file descriptors. It could be changed but since epoll.c compares the
->   stop event pointer first, the risk of aliasing with an fd is much
->   lower there.
+> We need iommufd to setup a 1:1 map for the reserved space.
 > 
-> * kvm-ipc uses EPOLLET, edge-triggered events, but having the stop event
->   level-triggered shouldn't make a difference.
+> So, of the reserved spaces we have these:
 > 
-> Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
-> ---
->  Makefile            |   1 +
->  include/kvm/epoll.h |  17 ++++++++
->  epoll.c             |  89 ++++++++++++++++++++++++++++++++++++++
->  ioeventfd.c         |  94 ++++++----------------------------------
->  kvm-ipc.c           | 103 +++++++++++++-------------------------------
->  5 files changed, 149 insertions(+), 155 deletions(-)
->  create mode 100644 include/kvm/epoll.h
->  create mode 100644 epoll.c
+> 	/* Memory regions which must be mapped 1:1 at all times */
+> 	IOMMU_RESV_DIRECT,
 > 
-> diff --git a/Makefile b/Makefile
-> index 86e19339..6b742369 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -80,6 +80,7 @@ OBJS	+= virtio/vhost.o
->  OBJS	+= disk/blk.o
->  OBJS	+= disk/qcow.o
->  OBJS	+= disk/raw.o
-> +OBJS	+= epoll.o
->  OBJS	+= ioeventfd.o
->  OBJS	+= net/uip/core.o
->  OBJS	+= net/uip/arp.o
-> diff --git a/include/kvm/epoll.h b/include/kvm/epoll.h
-> new file mode 100644
-> index 00000000..dbb5a8d9
-> --- /dev/null
-> +++ b/include/kvm/epoll.h
-> @@ -0,0 +1,17 @@
-> +#include <sys/epoll.h>
-> +#include "kvm/kvm.h"
-> +
-> +typedef void (*epoll__event_handler_t)(struct kvm *kvm, struct epoll_event *ev);
-> +
-> +struct kvm__epoll {
-> +	int fd;
-> +	int stop_fd;
-> +	struct kvm *kvm;
-> +	const char *name;
-> +	pthread_t thread;
-> +	epoll__event_handler_t handle_event;
-> +};
-> +
-> +int epoll__init(struct kvm *kvm, struct kvm__epoll *epoll,
-> +		const char *name, epoll__event_handler_t handle_event);
-> +int epoll__exit(struct kvm__epoll *epoll);
-> diff --git a/epoll.c b/epoll.c
-> new file mode 100644
-> index 00000000..e0725a57
-> --- /dev/null
-> +++ b/epoll.c
-> @@ -0,0 +1,89 @@
-> +#include <sys/eventfd.h>
-> +
-> +#include "kvm/epoll.h"
-> +
-> +#define EPOLLFD_MAX_EVENTS	20
-> +
-> +static void *epoll__thread(void *param)
-> +{
-> +	u64 stop;
-> +	int nfds, i;
-> +	struct kvm__epoll *epoll = param;
-> +	struct kvm *kvm = epoll->kvm;
-> +	struct epoll_event events[EPOLLFD_MAX_EVENTS];
-> +
-> +	kvm__set_thread_name(epoll->name);
-> +
-> +	for (;;) {
-> +		nfds = epoll_wait(epoll->fd, events, EPOLLFD_MAX_EVENTS, -1);
-> +		for (i = 0; i < nfds; i++) {
-> +			if (events[i].data.ptr == &epoll->stop_fd)
-> +				goto done;
-> +
-> +			epoll->handle_event(kvm, &events[i]);
-> +		}
-> +	}
-> +done:
-> +	read(epoll->stop_fd, &stop, sizeof(stop));
-> +	write(epoll->stop_fd, &stop, sizeof(stop));
+>             Block iommufd
+> 
+> 	/*
+> 	 * Memory regions which are advertised to be 1:1 but are
+> 	 * commonly considered relaxable in some conditions,
+> 	 * for instance in device assignment use case (USB, Graphics)
+> 	 */
+> 	IOMMU_RESV_DIRECT_RELAXABLE,
+> 
+>             iommufd ignores this one
+> 
+> 	/* Arbitrary "never map this or give it to a device" address ranges */
+> 	IOMMU_RESV_RESERVED,
+> 
+> 	   iommufd prevents using this IOVA range
+> 
+> 	/* Hardware MSI region (untranslated) */
+> 	IOMMU_RESV_MSI,
+> 
+> 	   iommufd treats this the same as IOMMU_RESV_RESERVED
+> 
+> 	/* Software-managed MSI translation window */
+> 	IOMMU_RESV_SW_MSI,
+> 
+> 	   iommufd treats this the same as IOMMU_RESV_RESERVED, also
+> 	   it passes the start to iommu_get_msi_cookie() which
+> 	   eventually maps something, but not 1:1.
+> 
+> I don't think it is a compatible change for IOMMU_RESV_SW_MSI to also
+> mean 1:1 map?
 
-read(2) and write(2) (sys)calls without checking the return value upsets
-Ubuntu's compiler:
+Bleh, my bad, the nested MSI stuff is right on the limit of the amount 
+of horribleness I can hold in my head at once even at the best of times, 
+let alone when my head is still half-full of PMUs.
 
-epoll.c: In function ‘epoll__thread’:
-epoll.c:27:2: error: ignoring return value of ‘read’, declared with attribute warn_unused_result [-Werror=unused-result]
-   27 |  read(epoll->stop_fd, &stop, sizeof(stop));
-      |  ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-(same for the write in the line after)
-Since we use -Werror, this is fatal.
+I think a slightly more considered and slightly less wrong version of 
+that idea is to mark it as IOMMU_RESV_MSI, and special-case 
+direct-mapping those on Arm (I believe it would technically be benign to 
+do on x86 too, but might annoy people with its pointlessness). However...
 
-I fixed it for now with:
-	if (read(epoll->stop_fd, &stop, sizeof(stop)) < 0)
-		return NULL;
+> On baremetal we have no idea what the platform put under that
+> hardcoded address?
+> 
+> On VM we don't use the iommu_get_msi_cookie() flow because the GIC in
+> the VM pretends it doesn't have an ITS page?  (did I get that right?)
 
-Not sure if there is a more meaningful way to bail out at this point.
+No, that can't be right - PCIe devices have to support MSI or MSI-X, and 
+many of them won't support INTx at all, so if the guest wants to use 
+interrupts in general it must surely need to believe it has some kind of 
+MSI controller, which for practical purposes in this context means an 
+ITS. That was the next thing I started wondering after the above - if 
+the aim is to direct-map the host's SW_MSI region to effectively pass 
+through the S2 MSI cookie, but you have the same Linux SMMU driver in 
+the guest, isn't that guest driver still going to add a conflicting 
+SW_MSI region for the same IOVA and confuse things?
+
+Ideally for nesting, the VMM would just tell us the IPA of where it's 
+going to claim the given device's associated MSI doorbell is, we map 
+that to the real underlying address at S2, then the guest can use its S1 
+cookie as normal if it wants to, and the host doesn't have to rewrite 
+addresses either way. The set_dev_data thing starts to look tempting for 
+this too... Given that the nesting usage model inherently constrains the 
+VMM's options for emulating the IOMMU, would it be unreasonable to make 
+our lives a lot easier with some similar constraints around interrupts, 
+and just not attempt to support the full gamut of "emulate any kind of 
+IRQ with any other kind of IRQ" irqfd hilarity?
+
+>> MSI regions already represent "safe" direct mappings, either as an inherent
+>> property of the hardware, or with an actual mapping maintained by software.
+>> Also RELAXABLE is meant to imply that it is only needed until a driver takes
+>> over the device, which at face value doesn't make much sense for interrupts.
+> 
+> I used "relxable" to suggest it is safe for userspace.
+
+I know, but the subtlety is the reason *why* it's safe for userspace. 
+Namely that a VFIO driver has bound and reset (or at least taken control 
+of) the device, and thus it is assumed to no longer be doing whatever 
+the boot firmware left it doing, therefore the reserved region is 
+assumed to no longer be relevant, and from then on the requirement to 
+preserve it can be relaxed.
+
+>> We'll still need to set this when the default domain type is identity too -
+>> see the diff I posted (the other parts below I merely implied).
+> 
+> Right, I missed that!
+> 
+> I suggest like this to avoid the double loop:
+> 
+> @@ -1037,9 +1037,6 @@ static int iommu_create_device_direct_mappings(struct iom>
+>          unsigned long pg_size;
+>          int ret = 0;
+>   
+> -       if (!iommu_is_dma_domain(domain))
+> -               return 0;
+> -
+>          BUG_ON(!domain->pgsize_bitmap);
+>   
+>          pg_size = 1UL << __ffs(domain->pgsize_bitmap);
+
+But then you realise that you also need to juggle this around since 
+identity domains aren't required to have a valid pgsize_bitmap either, 
+give up on the idea and go straight to writing a dedicated loop as the 
+clearer and tidier option because hey this is hardly a fast path anyway. 
+At least, you do if you're me :)
 
 Cheers,
-Andre
+Robin.
 
-> +	return NULL;
-> +}
+> @@ -1052,13 +1049,18 @@ static int iommu_create_device_direct_mappings(struct i>
+>                  dma_addr_t start, end, addr;
+>                  size_t map_size = 0;
+>   
+> -               start = ALIGN(entry->start, pg_size);
+> -               end   = ALIGN(entry->start + entry->length, pg_size);
+> -
+>                  if (entry->type != IOMMU_RESV_DIRECT &&
+>                      entry->type != IOMMU_RESV_DIRECT_RELAXABLE)
+>                          continue;
+>   
+> +               if (entry->type == IOMMU_RESV_DIRECT)
+> +                       dev->iommu->requires_direct = 1;
 > +
-> +int epoll__init(struct kvm *kvm, struct kvm__epoll *epoll,
-> +		const char *name, epoll__event_handler_t handle_event)
-> +{
-> +	int r;
-> +	struct epoll_event stop_event = {
-> +		.events = EPOLLIN,
-> +		.data.ptr = &epoll->stop_fd,
-> +	};
+> +               if (!iommu_is_dma_domain(domain))
+> +                       continue;
 > +
-> +	epoll->kvm = kvm;
-> +	epoll->name = name;
-> +	epoll->handle_event = handle_event;
-> +
-> +	epoll->fd = epoll_create(EPOLLFD_MAX_EVENTS);
-> +	if (epoll->fd < 0)
-> +		return -errno;
-> +
-> +	epoll->stop_fd = eventfd(0, 0);
-> +	if (epoll->stop_fd < 0) {
-> +		r = -errno;
-> +		goto err_close_fd;
-> +	}
-> +
-> +	r = epoll_ctl(epoll->fd, EPOLL_CTL_ADD, epoll->stop_fd, &stop_event);
-> +	if (r < 0)
-> +		goto err_close_all;
-> +
-> +	r = pthread_create(&epoll->thread, NULL, epoll__thread, epoll);
-> +	if (r < 0)
-> +		goto err_close_all;
-> +
-> +	return 0;
-> +
-> +err_close_all:
-> +	close(epoll->stop_fd);
-> +err_close_fd:
-> +	close(epoll->fd);
-> +
-> +	return r;
-> +}
-> +
-> +int epoll__exit(struct kvm__epoll *epoll)
-> +{
-> +	int r;
-> +	u64 stop = 1;
-> +
-> +	r = write(epoll->stop_fd, &stop, sizeof(stop));
-> +	if (r < 0)
-> +		return r;
-> +
-> +	r = read(epoll->stop_fd, &stop, sizeof(stop));
-> +	if (r < 0)
-> +		return r;
-> +
-> +	close(epoll->stop_fd);
-> +	close(epoll->fd);
-> +	return 0;
-> +}
+> +               start = ALIGN(entry->start, pg_size);
+> +               end   = ALIGN(entry->start + entry->length, pg_size);
+>                  for (addr = start; addr <= end; addr += pg_size) {
+>                          phys_addr_t phys_addr;
+> 
+> Jason
