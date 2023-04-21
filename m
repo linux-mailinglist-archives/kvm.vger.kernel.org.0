@@ -2,252 +2,163 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 30C776EA6DD
-	for <lists+kvm@lfdr.de>; Fri, 21 Apr 2023 11:25:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8CD4A6EA6F8
+	for <lists+kvm@lfdr.de>; Fri, 21 Apr 2023 11:30:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231657AbjDUJZd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Apr 2023 05:25:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37256 "EHLO
+        id S231877AbjDUJae (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Apr 2023 05:30:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40896 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231519AbjDUJZb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Apr 2023 05:25:31 -0400
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 8612C10D0
-        for <kvm@vger.kernel.org>; Fri, 21 Apr 2023 02:25:29 -0700 (PDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 23F0C1480;
-        Fri, 21 Apr 2023 02:26:13 -0700 (PDT)
-Received: from monolith.localdoman (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 99BDB3F5A1;
-        Fri, 21 Apr 2023 02:25:27 -0700 (PDT)
-Date:   Fri, 21 Apr 2023 10:25:24 +0100
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-To:     Eric Auger <eric.auger@redhat.com>
-Cc:     eric.auger.pro@gmail.com, kvm@vger.kernel.org,
-        kvmarm@lists.linux.dev, andrew.jones@linux.dev, maz@kernel.org,
-        will@kernel.org, oliver.upton@linux.dev, ricarkol@google.com,
-        reijiw@google.com
-Subject: Re: [kvm-unit-tests PATCH 1/6] arm: pmu: pmu-chain-promotion:
- Improve debug messages
-Message-ID: <ZEJWhPtA2xaaqV54@monolith.localdoman>
-References: <20230315110725.1215523-1-eric.auger@redhat.com>
- <20230315110725.1215523-2-eric.auger@redhat.com>
+        with ESMTP id S231833AbjDUJa2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Apr 2023 05:30:28 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65612A26E;
+        Fri, 21 Apr 2023 02:30:27 -0700 (PDT)
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 33L9Q1Ge025833;
+        Fri, 21 Apr 2023 09:30:27 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : in-reply-to : references : date : message-id : mime-version :
+ content-type; s=pp1; bh=OnaZDqGJzYOgn+jjBtWhBdkxp+OjDc8eoNZ6NLYBILY=;
+ b=fq2Lv7T9WpJGyQXJj/wiOw1HxEAEo+4JYw8r3ee0fLB+wB//kWTaBr36y3Tx4bXKVOp+
+ 6jpSpoSVS7QCiUlEwQzS5eatpeLwaikQsrjkwcEiXynJ7STvUU/COxirA3rSQzlP2Ia+
+ Ysc4kIIJLfFcrAa4J3EsNvsTJcu2Qjxj3UuL1rosTuG1NbpGShd1kYI26UVs3kS+Svo+
+ W1TlqCiOmqiRyfFwHACrBHJKpl7WdCd3nRLLh3apAia81wqBVxit7B6+fD/KDPuAmJiA
+ CQcT/vDCq3znsT2sIwVqK+k/CdDXEDocweMcvvsk7UHJ67koZnrnZRZHsa00S/AZUY4q Fw== 
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3q3qusr346-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 21 Apr 2023 09:30:26 +0000
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 33K7UVEh031974;
+        Fri, 21 Apr 2023 09:30:24 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+        by ppma06ams.nl.ibm.com (PPS) with ESMTPS id 3pyk6fkxtx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 21 Apr 2023 09:30:23 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+        by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 33L9UIFg48562610
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 21 Apr 2023 09:30:18 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E3A5920040;
+        Fri, 21 Apr 2023 09:30:17 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 4958A20043;
+        Fri, 21 Apr 2023 09:30:17 +0000 (GMT)
+Received: from li-1de7cd4c-3205-11b2-a85c-d27f97db1fe1.ibm.com (unknown [9.179.5.49])
+        by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+        Fri, 21 Apr 2023 09:30:17 +0000 (GMT)
+From:   "Marc Hartmayer" <mhartmay@linux.ibm.com>
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     borntraeger@de.ibm.com, nrb@linux.ibm.com, nsg@linux.ibm.com,
+        frankja@linux.ibm.com, kvm390-list@tuxmaker.boeblingen.de.ibm.com,
+        linux-s390@vger.kernel.org
+Subject: Re: [PATCH v2 1/1] KVM: s390: pv: fix asynchronous teardown for
+ small VMs
+In-Reply-To: <20230421085036.52511-2-imbrenda@linux.ibm.com>
+References: <20230421085036.52511-1-imbrenda@linux.ibm.com>
+ <20230421085036.52511-2-imbrenda@linux.ibm.com>
+Date:   Fri, 21 Apr 2023 11:30:16 +0200
+Message-ID: <87pm7xd1lj.fsf@li-1de7cd4c-3205-11b2-a85c-d27f97db1fe1.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230315110725.1215523-2-eric.auger@redhat.com>
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: RatK862w1Mcqm3ISPLGXP4eTykvfF1AG
+X-Proofpoint-ORIG-GUID: RatK862w1Mcqm3ISPLGXP4eTykvfF1AG
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
+ definitions=2023-04-21_03,2023-04-20_01,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 mlxlogscore=999
+ impostorscore=0 mlxscore=0 spamscore=0 adultscore=0 malwarescore=0
+ suspectscore=0 priorityscore=1501 bulkscore=0 clxscore=1015
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2303200000 definitions=main-2304210077
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+Claudio Imbrenda <imbrenda@linux.ibm.com> writes:
 
-On Wed, Mar 15, 2023 at 12:07:20PM +0100, Eric Auger wrote:
-> The pmu-chain-promotion test is composed of several subtests.
-> In case of failures, the current logs are really dificult to
-> analyze since they look very similar and sometimes duplicated
-> for each subtest. Add prefixes for each subtest and introduce
-> a macro that prints the registers we are mostly interested in,
-> namerly the 2 first counters and the overflow counter.
-
-One possible typo below.
-
-Ran pmu-chain-promotion with and without this patch applied, the
-improvement is very noticeable, it makes it very easy to match the debug
-message with the subtest being run:
-
-Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
-
-> 
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> On machines without the Destroy Secure Configuration Fast UVC, the
+> topmost level of page tables is set aside and freed asynchronously
+> as last step of the asynchronous teardown.
+>
+> Each gmap has a host_to_guest radix tree mapping host (userspace)
+> addresses (with 1M granularity) to gmap segment table entries (pmds).
+>
+> If a guest is smaller than 2GB, the topmost level of page tables is the
+> segment table (i.e. there are only 2 levels). Replacing it means that
+> the pointers in the host_to_guest mapping would become stale and cause
+> all kinds of nasty issues.
+>
+> This patch fixes the issue by disallowing asynchronous teardown for
+> guests with only 2 levels of page tables. Userspace should (and already
+> does) try using the normal destroy if the asynchronous one fails.
+>
+> Update s390_replace_asce so it refuses to replace segment type ASCEs.
+> This is still needed in case the normal destroy VM fails.
+>
+> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> Fixes: fb491d5500a7 ("KVM: s390: pv: asynchronous destroy for reboot")
 > ---
->  arm/pmu.c | 63 ++++++++++++++++++++++++++++---------------------------
->  1 file changed, 32 insertions(+), 31 deletions(-)
-> 
-> diff --git a/arm/pmu.c b/arm/pmu.c
-> index f6e95012..dad7d4b4 100644
-> --- a/arm/pmu.c
-> +++ b/arm/pmu.c
-> @@ -715,6 +715,11 @@ static void test_chained_sw_incr(bool unused)
->  	report_info("overflow=0x%lx, #0=0x%lx #1=0x%lx", read_sysreg(pmovsclr_el0),
->  		    read_regn_el0(pmevcntr, 0), read_regn_el0(pmevcntr, 1));
->  }
-> +#define PRINT_REGS(__s) \
-> +	report_info("%s #1=0x%lx #0=0x%lx overflow=0x%lx", __s, \
-> +		    read_regn_el0(pmevcntr, 1), \
-> +		    read_regn_el0(pmevcntr, 0), \
-> +		    read_sysreg(pmovsclr_el0))
->  
->  static void test_chain_promotion(bool unused)
->  {
-> @@ -725,6 +730,7 @@ static void test_chain_promotion(bool unused)
->  		return;
->  
->  	/* Only enable CHAIN counter */
-> +	report_prefix_push("subtest1");
->  	pmu_reset();
->  	write_regn_el0(pmevtyper, 0, MEM_ACCESS | PMEVTYPER_EXCLUDE_EL0);
->  	write_regn_el0(pmevtyper, 1, CHAIN | PMEVTYPER_EXCLUDE_EL0);
-> @@ -732,83 +738,81 @@ static void test_chain_promotion(bool unused)
->  	isb();
->  
->  	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
-> +	PRINT_REGS("post");
->  	report(!read_regn_el0(pmevcntr, 0),
->  		"chain counter not counting if even counter is disabled");
-> +	report_prefix_pop();
->  
->  	/* Only enable even counter */
-> +	report_prefix_push("subtest2");
->  	pmu_reset();
->  	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW_32);
->  	write_sysreg_s(0x1, PMCNTENSET_EL0);
->  	isb();
->  
->  	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
-> +	PRINT_REGS("post");
->  	report(!read_regn_el0(pmevcntr, 1) && (read_sysreg(pmovsclr_el0) == 0x1),
->  		"odd counter did not increment on overflow if disabled");
-> -	report_info("MEM_ACCESS counter #0 has value 0x%lx",
-> -		    read_regn_el0(pmevcntr, 0));
-> -	report_info("CHAIN counter #1 has value 0x%lx",
-> -		    read_regn_el0(pmevcntr, 1));
-> -	report_info("overflow counter 0x%lx", read_sysreg(pmovsclr_el0));
-> +	report_prefix_pop();
->  
->  	/* start at 0xFFFFFFDC, +20 with CHAIN enabled, +20 with CHAIN disabled */
-> +	report_prefix_push("subtest3");
->  	pmu_reset();
->  	write_sysreg_s(0x3, PMCNTENSET_EL0);
->  	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW2_32);
->  	isb();
-> +	PRINT_REGS("init");
->  
->  	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
-> -	report_info("MEM_ACCESS counter #0 has value 0x%lx",
-> -		    read_regn_el0(pmevcntr, 0));
-> +	PRINT_REGS("After 1st loop");
->  
->  	/* disable the CHAIN event */
->  	write_sysreg_s(0x2, PMCNTENCLR_EL0);
->  	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
-> -	report_info("MEM_ACCESS counter #0 has value 0x%lx",
-> -		    read_regn_el0(pmevcntr, 0));
-> +	PRINT_REGS("After 2d loop");
-
-Hmm.. was that supposed to be "after 2**n**d loop" (matches the "after 1st
-loop" message)? A few more instances below.
-
-Thanks,
-Alex
-
->  	report(read_sysreg(pmovsclr_el0) == 0x1,
->  		"should have triggered an overflow on #0");
->  	report(!read_regn_el0(pmevcntr, 1),
->  		"CHAIN counter #1 shouldn't have incremented");
-> +	report_prefix_pop();
->  
->  	/* start at 0xFFFFFFDC, +20 with CHAIN disabled, +20 with CHAIN enabled */
->  
-> +	report_prefix_push("subtest4");
->  	pmu_reset();
->  	write_sysreg_s(0x1, PMCNTENSET_EL0);
->  	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW2_32);
->  	isb();
-> -	report_info("counter #0 = 0x%lx, counter #1 = 0x%lx overflow=0x%lx",
-> -		    read_regn_el0(pmevcntr, 0), read_regn_el0(pmevcntr, 1),
-> -		    read_sysreg(pmovsclr_el0));
-> +	PRINT_REGS("init");
->  
->  	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
-> -	report_info("MEM_ACCESS counter #0 has value 0x%lx",
-> -		    read_regn_el0(pmevcntr, 0));
-> +	PRINT_REGS("After 1st loop");
->  
->  	/* enable the CHAIN event */
->  	write_sysreg_s(0x3, PMCNTENSET_EL0);
->  	isb();
->  	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
-> -	report_info("MEM_ACCESS counter #0 has value 0x%lx",
-> -		    read_regn_el0(pmevcntr, 0));
+>  arch/s390/kvm/pv.c  | 5 +++++
+>  arch/s390/mm/gmap.c | 7 +++++++
+>  2 files changed, 12 insertions(+)
+>
+> diff --git a/arch/s390/kvm/pv.c b/arch/s390/kvm/pv.c
+> index e032ebbf51b9..3ce5f4351156 100644
+> --- a/arch/s390/kvm/pv.c
+> +++ b/arch/s390/kvm/pv.c
+> @@ -314,6 +314,11 @@ int kvm_s390_pv_set_aside(struct kvm *kvm, u16 *rc, u16 *rrc)
+>  	 */
+>  	if (kvm->arch.pv.set_aside)
+>  		return -EINVAL;
 > +
-> +	PRINT_REGS("After 2d loop");
+> +	/* Guest with segment type ASCE, refuse to destroy asynchronously */
+> +	if ((kvm->arch.gmap->asce & _ASCE_TYPE_MASK) == _ASCE_TYPE_SEGMENT)
+> +		return -EINVAL;
+> +
+>  	priv = kzalloc(sizeof(*priv), GFP_KERNEL);
+>  	if (!priv)
+>  		return -ENOMEM;
+> diff --git a/arch/s390/mm/gmap.c b/arch/s390/mm/gmap.c
+> index 5a716bdcba05..2267cf9819b2 100644
+> --- a/arch/s390/mm/gmap.c
+> +++ b/arch/s390/mm/gmap.c
+> @@ -2833,6 +2833,9 @@ EXPORT_SYMBOL_GPL(s390_unlist_old_asce);
+>   * s390_replace_asce - Try to replace the current ASCE of a gmap with a copy
+>   * @gmap: the gmap whose ASCE needs to be replaced
+>   *
+> + * If the ASCE is a SEGMENT type then this function will return -EINVAL,
+> + * otherwise the pointers in the host_to_guest radix tree will keep pointing
+> + * to the wrong pages, causing use-after-free and memory corruption.
+>   * If the allocation of the new top level page table fails, the ASCE is not
+>   * replaced.
+>   * In any case, the old ASCE is always removed from the gmap CRST list.
+> @@ -2847,6 +2850,10 @@ int s390_replace_asce(struct gmap *gmap)
 >  
->  	report((read_regn_el0(pmevcntr, 1) == 1) &&
->  		(read_sysreg(pmovsclr_el0) == 0x1),
->  		"CHAIN counter enabled: CHAIN counter was incremented and overflow");
-> -
-> -	report_info("CHAIN counter #1 = 0x%lx, overflow=0x%lx",
-> -		read_regn_el0(pmevcntr, 1), read_sysreg(pmovsclr_el0));
-> +	report_prefix_pop();
+>  	s390_unlist_old_asce(gmap);
 >  
->  	/* start as MEM_ACCESS/CPU_CYCLES and move to CHAIN/MEM_ACCESS */
-> +	report_prefix_push("subtest5");
->  	pmu_reset();
->  	write_regn_el0(pmevtyper, 0, MEM_ACCESS | PMEVTYPER_EXCLUDE_EL0);
->  	write_regn_el0(pmevtyper, 1, CPU_CYCLES | PMEVTYPER_EXCLUDE_EL0);
->  	write_sysreg_s(0x3, PMCNTENSET_EL0);
->  	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW2_32);
->  	isb();
-> +	PRINT_REGS("init");
->  
->  	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
-> -	report_info("MEM_ACCESS counter #0 has value 0x%lx",
-> -		    read_regn_el0(pmevcntr, 0));
-> +	PRINT_REGS("After 1st loop");
->  
->  	/* 0 becomes CHAINED */
->  	write_sysreg_s(0x0, PMCNTENSET_EL0);
-> @@ -817,37 +821,34 @@ static void test_chain_promotion(bool unused)
->  	write_regn_el0(pmevcntr, 1, 0x0);
->  
->  	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
-> -	report_info("MEM_ACCESS counter #0 has value 0x%lx",
-> -		    read_regn_el0(pmevcntr, 0));
-> +	PRINT_REGS("After 2d loop");
->  
->  	report((read_regn_el0(pmevcntr, 1) == 1) &&
->  		(read_sysreg(pmovsclr_el0) == 0x1),
->  		"32b->64b: CHAIN counter incremented and overflow");
-> -
-> -	report_info("CHAIN counter #1 = 0x%lx, overflow=0x%lx",
-> -		read_regn_el0(pmevcntr, 1), read_sysreg(pmovsclr_el0));
-> +	report_prefix_pop();
->  
->  	/* start as CHAIN/MEM_ACCESS and move to MEM_ACCESS/CPU_CYCLES */
-> +	report_prefix_push("subtest6");
->  	pmu_reset();
->  	write_regn_el0(pmevtyper, 0, MEM_ACCESS | PMEVTYPER_EXCLUDE_EL0);
->  	write_regn_el0(pmevtyper, 1, CHAIN | PMEVTYPER_EXCLUDE_EL0);
->  	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW2_32);
->  	write_sysreg_s(0x3, PMCNTENSET_EL0);
-> +	PRINT_REGS("init");
->  
->  	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
-> -	report_info("counter #0=0x%lx, counter #1=0x%lx",
-> -			read_regn_el0(pmevcntr, 0), read_regn_el0(pmevcntr, 1));
-> +	PRINT_REGS("After 1st loop");
->  
->  	write_sysreg_s(0x0, PMCNTENSET_EL0);
->  	write_regn_el0(pmevtyper, 1, CPU_CYCLES | PMEVTYPER_EXCLUDE_EL0);
->  	write_sysreg_s(0x3, PMCNTENSET_EL0);
->  
->  	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
-> +	PRINT_REGS("After 2d loop");
->  	report(read_sysreg(pmovsclr_el0) == 1,
->  		"overflow is expected on counter 0");
-> -	report_info("counter #0=0x%lx, counter #1=0x%lx overflow=0x%lx",
-> -			read_regn_el0(pmevcntr, 0), read_regn_el0(pmevcntr, 1),
-> -			read_sysreg(pmovsclr_el0));
-> +	report_prefix_pop();
->  }
->  
->  static bool expect_interrupts(uint32_t bitmap)
+> +	/* Replacing segment type ASCEs would cause serious issues */
+> +	if ((gmap->asce & _ASCE_TYPE_MASK) == _ASCE_TYPE_SEGMENT)
+> +		return -EINVAL;
+
+As discussed... not sure if this is a valid scenario or if it can be
+considered a bug if it happens.
+
+> +
+>  	page = alloc_pages(GFP_KERNEL_ACCOUNT, CRST_ALLOC_ORDER);
+>  	if (!page)
+>  		return -ENOMEM;
 > -- 
-> 2.38.1
-> 
+> 2.40.0
+
+IMO, much better.
+
+Reviewed-by: Marc Hartmayer <mhartmay@linux.ibm.com>
