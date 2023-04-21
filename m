@@ -2,89 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 323D86EA59C
-	for <lists+kvm@lfdr.de>; Fri, 21 Apr 2023 10:12:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F23FE6EA5A9
+	for <lists+kvm@lfdr.de>; Fri, 21 Apr 2023 10:17:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230424AbjDUIM2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Apr 2023 04:12:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42990 "EHLO
+        id S229913AbjDUIR2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Apr 2023 04:17:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46248 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230306AbjDUIMZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Apr 2023 04:12:25 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1B6176A6
-        for <kvm@vger.kernel.org>; Fri, 21 Apr 2023 01:11:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1682064696;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=z6wPELACKnG6JlCbvCIIgVZmUi4+M35wxj88XoBRlAo=;
-        b=apzE4DjniVK0FkuHAdpdFk7X1ADD8lH1AxhrddWTQQY/zSJebm/CIqUnVSIFx//Pq4yHLC
-        GdYPSJKzj1CLhUM9UwUNInL3+sasNJ2eas/ofDpko9Aa6BFGWU43reY7g3L6j3kwZJxr3s
-        x+9o4ji7+QdFbeqs0K13fnTNWKX1jYU=
-Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
- [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-34-sJj0Etr3OKq2Zlbaohh5Ng-1; Fri, 21 Apr 2023 04:11:35 -0400
-X-MC-Unique: sJj0Etr3OKq2Zlbaohh5Ng-1
-Received: by mail-qv1-f69.google.com with SMTP id 6a1803df08f44-5ef41c0847cso10522856d6.1
-        for <kvm@vger.kernel.org>; Fri, 21 Apr 2023 01:11:35 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682064695; x=1684656695;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=z6wPELACKnG6JlCbvCIIgVZmUi4+M35wxj88XoBRlAo=;
-        b=OE7eJnOPOLOxlIh/Nx2Tw0amWLhvjoj5Hh81eDIy9grLM/+9lu7iwux4Gj2ag49PCb
-         JRRC2SUXO/1yre2gsiLbv7ZXhpyqbCkx/zWUJrL1x97uE2BA71HiO4U7bB6H1pncmXz3
-         tl2n00gyZHJoEX81lYOkLO7Xic60bxLd3LOxd+9CjWs/QPu4D1ekt4UtDIvGBwZZU7xe
-         jI94dNlx4qvzm6QQo763w25TVkh88oCJWUbtzlz9pbdaFSYR5ZpeikTQQ/uPRkRwvaaN
-         T4tiOzfXUhYHX71MK23wAZM0eMqmuQ/p+fFjlB6q34MVm7iPvL3ZJaWSEb1BGxnLFDVW
-         Q04g==
-X-Gm-Message-State: AAQBX9ei8687yahRSBpHuLMtkPT5nsEnBJLrtOtzKRCJqeu9p2+TFLGq
-        tAx3BYg4+f16fh7qDufjTZhdpR+ZQ+BLEvKReUYJxGh/Gnmz5HLgIq1EyP49k5T/P2UYwWrV/VL
-        C7W+GyQRxnUAT
-X-Received: by 2002:ad4:5dcd:0:b0:5ef:4435:f1cd with SMTP id m13-20020ad45dcd000000b005ef4435f1cdmr5541772qvh.27.1682064694868;
-        Fri, 21 Apr 2023 01:11:34 -0700 (PDT)
-X-Google-Smtp-Source: AKy350Z9B2WB0oUkbIsJ96q26l4amtJKgMQSnD1Mk7QR+iNWqmQrKLS2X34LNSjQyvgfUyvQocVSaA==
-X-Received: by 2002:ad4:5dcd:0:b0:5ef:4435:f1cd with SMTP id m13-20020ad45dcd000000b005ef4435f1cdmr5541758qvh.27.1682064694550;
-        Fri, 21 Apr 2023 01:11:34 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id j13-20020a0cf50d000000b005eee5c22f30sm995299qvm.139.2023.04.21.01.11.32
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 21 Apr 2023 01:11:33 -0700 (PDT)
-Message-ID: <3129695d-d587-df0e-60d8-dc9f7805e912@redhat.com>
-Date:   Fri, 21 Apr 2023 10:11:30 +0200
+        with ESMTP id S229521AbjDUIR1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Apr 2023 04:17:27 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3D722106;
+        Fri, 21 Apr 2023 01:17:25 -0700 (PDT)
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 33L8DqIa024492;
+        Fri, 21 Apr 2023 08:17:25 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=OZXAIeyDLmrCCJXE6C9KQABpNjN0W8VXtVabrdAZjOo=;
+ b=S0M22vcIF5GkD4MkWxcmKAq7Dyis0ha72+QSn/gjdMbrUi2uSaSOn9KGNRc8KvRTtdHv
+ ufbTf+av77N0p3KcA5WbT6PY6LKS8Ns5SP/PGpjgiYkbNfJdbMSD/XI5fQZwaU/2odVp
+ CcFgs6hPL0KacJFpaTTwyft1JWdoF73DwxQ69EYEPL6IgKuSykNQfKBmEL2zU+Eqna/t
+ emY/OWfSSfYuhD8BOgIq5lP2ZukxlXDULZcSOqZFoxf8XuCmR/abmkW2M4uRIujIyAaM
+ jaXik+oiqSsta7rwtLLbzh/5a4P8Y4dGiquGvCZzQXZRX/fdmGN2lsJp/V2/PPITUOcM Uw== 
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3q3pst8481-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 21 Apr 2023 08:17:24 +0000
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+        by ppma05fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 33L1o4s7015437;
+        Fri, 21 Apr 2023 08:17:22 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+        by ppma05fra.de.ibm.com (PPS) with ESMTPS id 3pykj6b87x-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 21 Apr 2023 08:17:22 +0000
+Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
+        by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 33L8HGFw29491780
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 21 Apr 2023 08:17:16 GMT
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A4D3420049;
+        Fri, 21 Apr 2023 08:17:16 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2E64420043;
+        Fri, 21 Apr 2023 08:17:16 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.171.7.117])
+        by smtpav06.fra02v.mail.ibm.com (Postfix) with SMTP;
+        Fri, 21 Apr 2023 08:17:16 +0000 (GMT)
+Date:   Fri, 21 Apr 2023 10:17:13 +0200
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Janosch Frank <frankja@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, borntraeger@de.ibm.com, nrb@linux.ibm.com,
+        nsg@linux.ibm.com, mhartmay@linux.ibm.com,
+        kvm390-list@tuxmaker.boeblingen.de.ibm.com,
+        linux-s390@vger.kernel.org
+Subject: Re: [PATCH v1 1/1] KVM: s390: pv: fix asynchronous teardown for
+ small VMs
+Message-ID: <20230421101713.34cf8c50@p-imbrenda>
+In-Reply-To: <a1ab46b3-da2b-f815-be15-1294f95d598f@linux.ibm.com>
+References: <20230420160149.51728-1-imbrenda@linux.ibm.com>
+        <a1ab46b3-da2b-f815-be15-1294f95d598f@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.0
-Reply-To: eric.auger@redhat.com
-Subject: Re: [kvm-unit-tests PATCH 0/6] arm: pmu: Fix random failures of
- pmu-chain-promotion
-Content-Language: en-US
-To:     Alexandru Elisei <alexandru.elisei@arm.com>
-Cc:     Mark Rutland <mark.rutland@arm.com>,
-        Andrew Jones <andrew.jones@linux.dev>,
-        eric.auger.pro@gmail.com, kvm@vger.kernel.org,
-        kvmarm@lists.linux.dev, maz@kernel.org, will@kernel.org,
-        oliver.upton@linux.dev, ricarkol@google.com, reijiw@google.com
-References: <20230315110725.1215523-1-eric.auger@redhat.com>
- <968a026e-066e-deea-d02f-f64133295ff1@redhat.com>
- <xcd3kt23ffdq5qfziuyp2vgwv7ndkmh3acepbpqqhhrokv755e@wuiltddj2hj2>
- <ZDZwIFtH8V59fE4o@FVFF77S0Q05N>
- <6d6126af-4974-0655-e817-5c5c472d5a2f@redhat.com>
- <ZD-2zYGyAhM6q_9Q@monolith.localdoman>
-From:   Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <ZD-2zYGyAhM6q_9Q@monolith.localdoman>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-5.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: iD9xpcNqAvXp6697G_yiS-iI2RZCYH0s
+X-Proofpoint-ORIG-GUID: iD9xpcNqAvXp6697G_yiS-iI2RZCYH0s
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
+ definitions=2023-04-21_02,2023-04-20_01,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 impostorscore=0
+ mlxscore=0 malwarescore=0 mlxlogscore=999 clxscore=1015 bulkscore=0
+ spamscore=0 suspectscore=0 priorityscore=1501 phishscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2303200000 definitions=main-2304210069
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
         T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -92,161 +88,181 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Alexandru,
-On 4/19/23 11:39, Alexandru Elisei wrote:
-> Hi,
->
-> On Wed, Apr 19, 2023 at 09:32:10AM +0200, Eric Auger wrote:
->> Hi,
->>
->> On 4/12/23 10:47, Mark Rutland wrote:
->>> On Tue, Apr 04, 2023 at 02:47:47PM +0200, Andrew Jones wrote:
->>>> On Tue, Apr 04, 2023 at 08:23:15AM +0200, Eric Auger wrote:
->>>>> Hi,
->>>>>
->>>>> On 3/15/23 12:07, Eric Auger wrote:
->>>>>> On some HW (ThunderXv2), some random failures of
->>>>>> pmu-chain-promotion test can be observed.
->>>>>>
->>>>>> pmu-chain-promotion is composed of several subtests
->>>>>> which run 2 mem_access loops. The initial value of
->>>>>> the counter is set so that no overflow is expected on
->>>>>> the first loop run and overflow is expected on the second.
->>>>>> However it is observed that sometimes we get an overflow
->>>>>> on the first run. It looks related to some variability of
->>>>>> the mem_acess count. This variability is observed on all
->>>>>> HW I have access to, with different span though. On
->>>>>> ThunderX2 HW it looks the margin that is currently taken
->>>>>> is too small and we regularly hit failure.
->>>>>>
->>>>>> although the first goal of this series is to increase
->>>>>> the count/margin used in those tests, it also attempts
->>>>>> to improve the pmu-chain-promotion logs, add some barriers
->>>>>> in the mem-access loop, clarify the chain counter
->>>>>> enable/disable sequence.
->>>>>>
->>>>>> A new 'pmu-memaccess-reliability' is also introduced to
->>>>>> detect issues with MEM_ACCESS event variability and make
->>>>>> the debug easier.
->>> As a minor nit, 'pmu-mem-access-reliability' would be more consistent with
->>> 'pmu-mem-access'. The lack of a dash in 'memaccess' tripped me up while I was
->>> trying to run those two tests.
->> I can easily respin with that renaming. thanks for the feedback. Waiting
->> a little bit more if somebody has any other comment.
-> Started reviewing the series last week, something came up and I had to stop
-> after the first patch (very nice improvement, by the way). I will finish
-> the review by the end of this week.
+On Fri, 21 Apr 2023 10:04:50 +0200
+Janosch Frank <frankja@linux.ibm.com> wrote:
 
-OK no problem. Thanks for your time.
+> On 4/20/23 18:01, Claudio Imbrenda wrote:
+> > On machines without the Destroy Secure Configuration Fast UVC, the
+> > topmost level of page tables is set aside and freed asynchronously
+> > as last step of the asynchronous teardown.
+> > 
+> > Each gmap has a host_to_guest radix tree mapping host (userspace)
+> > addresses (with 1M granularity) to gmap segment table entries (pmds).
+> > 
+> > If a guest is smaller than 2GB, the topmost level of page tables is the
+> > segment table (i.e. there are only 2 levels). Replacing it means that
+> > the pointers in the host_to_guest mapping would become stale and cause
+> > all kinds of nasty issues.  
+> 
+> Ouff
+> 
+> > 
+> > This patch fixes the issue by synchronously destroying all guests with
+> > only 2 levels of page tables in kvm_s390_pv_set_aside. This will
+> > speed up the process and avoid the issue altogether.
+> > 
+> > Update s390_replace_asce so it refuses to replace segment type ASCEs.
+> > 
+> > Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> > Fixes: fb491d5500a7 ("KVM: s390: pv: asynchronous destroy for reboot")
+> > ---
+> >   arch/s390/kvm/pv.c  | 35 ++++++++++++++++++++---------------
+> >   arch/s390/mm/gmap.c |  7 +++++++
+> >   2 files changed, 27 insertions(+), 15 deletions(-)
+> > 
+> > diff --git a/arch/s390/kvm/pv.c b/arch/s390/kvm/pv.c
+> > index e032ebbf51b9..ceb8cb628d62 100644
+> > --- a/arch/s390/kvm/pv.c
+> > +++ b/arch/s390/kvm/pv.c
+> > @@ -39,6 +39,7 @@ struct pv_vm_to_be_destroyed {
+> >   	u64 handle;
+> >   	void *stor_var;
+> >   	unsigned long stor_base;
+> > +	bool small;  
+> 
+> I second Marc's complaints :)
+> 
+> There's no way that the gmap can be manipulated to cause the 
+> use-after-free problems by adding/removing memory? I.e. changing to >2GB 
+> memory before your checks and then to < 2GB after the checks?
 
-Eric
->
-> Thanks,
-> Alex
->
->> Eric
->>>>>> Obviously one can wonder if this variability is something normal
->>>>>> and does not hide any other bug. I hope this series will raise
->>>>>> additional discussions about this.
->>>>>>
->>>>>> https://github.com/eauger/kut/tree/pmu-chain-promotion-fixes-v1
->>>>> Gentle ping.
->>>> I'd be happy to take this, but I was hoping to see some r-b's and/or t-b's
->>>> from some of the others.
->>> I gave this a spin on my ThunderX2, and it seems to fix the intermittent
->>> failures I was seeing.
->>>
->>> FWIW:
->>>
->>> Tested-by: Mark Rutland <mark.rutland@arm.com>
->>>
->>> Before (on commit 4ba7058c61e8922f9c8397cfa1095fac325f809b):
->>>
->>> Test results below.
->>>
->>> | [mark@gravadlaks:~/src/kvm-unit-tests]% TESTNAME=pmu-chain-promotion TIMEOUT=90s ACCEL= useapp qemu ./arm/run arm/pmu.flat -smp 1 -append 'pmu-chain-promotion'
->>> | timeout -k 1s --foreground 90s /home/mark/.opt/apps/qemu/bin/qemu-system-aarch64 -nodefaults -machine virt,gic-version=host -accel kvm -cpu host -device virtio-serial-device -device virtconsole,chardev=ctd -chardev testdev,id=ctd -device pci-testdev -display none -serial stdio -kernel arm/pmu.flat -smp 1 -append pmu-chain-promotion # -initrd /tmp/tmp.nl1i6S0EIY
->>> | INFO: PMU version: 0x4
->>> | INFO: PMU implementer/ID code: 0(" ")/0
->>> | INFO: Implements 6 event counters
->>> | PASS: pmu: pmu-chain-promotion: 32-bit overflows: chain counter not counting if even counter is disabled
->>> | PASS: pmu: pmu-chain-promotion: 32-bit overflows: odd counter did not increment on overflow if disabled
->>> | INFO: pmu: pmu-chain-promotion: 32-bit overflows: MEM_ACCESS counter #0 has value 0x7
->>> | INFO: pmu: pmu-chain-promotion: 32-bit overflows: CHAIN counter #1 has value 0x0
->>> | INFO: pmu: pmu-chain-promotion: 32-bit overflows: overflow counter 0x1
->>> | INFO: pmu: pmu-chain-promotion: 32-bit overflows: MEM_ACCESS counter #0 has value 0x4
->>> | INFO: pmu: pmu-chain-promotion: 32-bit overflows: MEM_ACCESS counter #0 has value 0x1b
->>> | PASS: pmu: pmu-chain-promotion: 32-bit overflows: should have triggered an overflow on #0
->>> | FAIL: pmu: pmu-chain-promotion: 32-bit overflows: CHAIN counter #1 shouldn't have incremented
->>> | INFO: pmu: pmu-chain-promotion: 32-bit overflows: counter #0 = 0xffffffdc, counter #1 = 0x0 overflow=0x0
->>> | INFO: pmu: pmu-chain-promotion: 32-bit overflows: MEM_ACCESS counter #0 has value 0x4
->>> | INFO: pmu: pmu-chain-promotion: 32-bit overflows: MEM_ACCESS counter #0 has value 0x1b
->>> | FAIL: pmu: pmu-chain-promotion: 32-bit overflows: CHAIN counter enabled: CHAIN counter was incremented and overflow
->>> | INFO: pmu: pmu-chain-promotion: 32-bit overflows: CHAIN counter #1 = 0x0, overflow=0x1
->>> | INFO: pmu: pmu-chain-promotion: 32-bit overflows: MEM_ACCESS counter #0 has value 0x4
->>> | INFO: pmu: pmu-chain-promotion: 32-bit overflows: MEM_ACCESS counter #0 has value 0x1b
->>> | FAIL: pmu: pmu-chain-promotion: 32-bit overflows: 32b->64b: CHAIN counter incremented and overflow
->>> | INFO: pmu: pmu-chain-promotion: 32-bit overflows: CHAIN counter #1 = 0x0, overflow=0x1
->>> | INFO: pmu: pmu-chain-promotion: 32-bit overflows: counter #0=0xfffffff3, counter #1=0x0
->>> | PASS: pmu: pmu-chain-promotion: 32-bit overflows: overflow is expected on counter 0
->>> | INFO: pmu: pmu-chain-promotion: 32-bit overflows: counter #0=0xa, counter #1=0xf9 overflow=0x1
->>> | SUMMARY: 7 tests, 3 unexpected failures
->>>
->>> After:
->>>
->>> | [mark@gravadlaks:~/src/kvm-unit-tests]% TESTNAME=pmu-chain-promotion TIMEOUT=90s ACCEL=kvm useapp qemu ./arm/run arm/pmu.flat -smp 1 -append 'pmu-chain-promotion'
->>> | timeout -k 1s --foreground 90s /home/mark/.opt/apps/qemu/bin/qemu-system-aarch64 -nodefaults -machine virt,gic-version=host -accel kvm -cpu host -device virtio-serial-device -device virtconsole,chardev=ctd -chardev testdev,id=ctd -device pci-testdev -display none -serial stdio -kernel arm/pmu.flat -smp 1 -append pmu-chain-promotion # -initrd /tmp/tmp.pahLyg1F3s
->>> | INFO: PMU version: 0x4
->>> | INFO: PMU implementer/ID code: 0(" ")/0
->>> | INFO: Implements 6 event counters
->>> | INFO: pmu: pmu-chain-promotion: 32-bit overflows: subtest1: post #1=0x0 #0=0x0 overflow=0x0
->>> | PASS: pmu: pmu-chain-promotion: 32-bit overflows: subtest1: chain counter not counting if even counter is disabled
->>> | INFO: pmu: pmu-chain-promotion: 32-bit overflows: subtest2: post #1=0x0 #0=0xf3 overflow=0x1
->>> | PASS: pmu: pmu-chain-promotion: 32-bit overflows: subtest2: odd counter did not increment on overflow if disabled
->>> | INFO: pmu: pmu-chain-promotion: 32-bit overflows: subtest3: init #1=0x0 #0=0xfffffea1 overflow=0x0
->>> | INFO: pmu: pmu-chain-promotion: 32-bit overflows: subtest3: After 1st loop #1=0x0 #0=0xffffffa0 overflow=0x0
->>> | INFO: pmu: pmu-chain-promotion: 32-bit overflows: subtest3: After 2d loop #1=0x0 #0=0xc0 overflow=0x1
->>> | PASS: pmu: pmu-chain-promotion: 32-bit overflows: subtest3: should have triggered an overflow on #0
->>> | PASS: pmu: pmu-chain-promotion: 32-bit overflows: subtest3: CHAIN counter #1 shouldn't have incremented
->>> | INFO: pmu: pmu-chain-promotion: 32-bit overflows: subtest4: init #1=0x0 #0=0xfffffea1 overflow=0x0
->>> | INFO: pmu: pmu-chain-promotion: 32-bit overflows: subtest4: After 1st loop #1=0x0 #0=0xffffffb7 overflow=0x0
->>> | INFO: pmu: pmu-chain-promotion: 32-bit overflows: subtest4: After 2d loop #1=0x1 #0=0xbc overflow=0x1
->>> | PASS: pmu: pmu-chain-promotion: 32-bit overflows: subtest4: CHAIN counter enabled: CHAIN counter was incremented and overflow
->>> | INFO: pmu: pmu-chain-promotion: 32-bit overflows: subtest5: init #1=0x0 #0=0xfffffea1 overflow=0x0
->>> | INFO: pmu: pmu-chain-promotion: 32-bit overflows: subtest5: After 1st loop #1=0x22c #0=0xffffff9f overflow=0x0
->>> | INFO: pmu: pmu-chain-promotion: 32-bit overflows: subtest5: After 2d loop #1=0x1 #0=0x9d overflow=0x1
->>> | PASS: pmu: pmu-chain-promotion: 32-bit overflows: subtest5: 32b->64b: CHAIN counter incremented and overflow
->>> | INFO: pmu: pmu-chain-promotion: 32-bit overflows: subtest6: init #1=0x0 #0=0xfffffea1 overflow=0x0
->>> | INFO: pmu: pmu-chain-promotion: 32-bit overflows: subtest6: After 1st loop #1=0x0 #0=0xffffff9f overflow=0x0
->>> | INFO: pmu: pmu-chain-promotion: 32-bit overflows: subtest6: After 2d loop #1=0x1f9 #0=0x9c overflow=0x1
->>> | PASS: pmu: pmu-chain-promotion: 32-bit overflows: subtest6: overflow is expected on counter 0
->>> | SUMMARY: 7 tests
->>>
->>> As a bonus, the mem-access and memaccess-reliability results:
->>>
->>> | [mark@gravadlaks:~/src/kvm-unit-tests]% TESTNAME=pmu-chain-promotion TIMEOUT=90s ACCEL=kvm useapp qemu ./arm/run arm/pmu.flat -smp 1 -append 'pmu-mem-access'     
->>> | timeout -k 1s --foreground 90s /home/mark/.opt/apps/qemu/bin/qemu-system-aarch64 -nodefaults -machine virt,gic-version=host -accel kvm -cpu host -device virtio-serial-device -device virtconsole,chardev=ctd -chardev testdev,id=ctd -device pci-testdev -display none -serial stdio -kernel arm/pmu.flat -smp 1 -append pmu-mem-access # -initrd /tmp/tmp.84AeEp8Tiw
->>> | INFO: PMU version: 0x4
->>> | INFO: PMU implementer/ID code: 0(" ")/0
->>> | INFO: Implements 6 event counters
->>> | INFO: pmu: pmu-mem-access: 32-bit overflows: counter #0 is 0x15 (MEM_ACCESS)
->>> | INFO: pmu: pmu-mem-access: 32-bit overflows: counter #1 is 0x15 (MEM_ACCESS)
->>> | PASS: pmu: pmu-mem-access: 32-bit overflows: Ran 20 mem accesses
->>> | PASS: pmu: pmu-mem-access: 32-bit overflows: Ran 20 mem accesses with expected overflows on both counters
->>> | INFO: pmu: pmu-mem-access: 32-bit overflows: cnt#0=0x8 cnt#1=0x8 overflow=0x3
->>> | SKIP: pmu: pmu-mem-access: 64-bit overflows: Skip test as 64 overflows need FEAT_PMUv3p5
->>> | SUMMARY: 3 tests, 1 skipped
->>> | [mark@gravadlaks:~/src/kvm-unit-tests]% TESTNAME=pmu-chain-promotion TIMEOUT=90s ACCEL=kvm useapp qemu ./arm/run arm/pmu.flat -smp 1 -append 'pmu-memaccess-reliability'
->>> | timeout -k 1s --foreground 90s /home/mark/.opt/apps/qemu/bin/qemu-system-aarch64 -nodefaults -machine virt,gic-version=host -accel kvm -cpu host -device virtio-serial-device -device virtconsole,chardev=ctd -chardev testdev,id=ctd -device pci-testdev -display none -serial stdio -kernel arm/pmu.flat -smp 1 -append pmu-memaccess-reliability # -initrd /tmp/tmp.ZToqwencZR
->>> | INFO: PMU version: 0x4
->>> | INFO: PMU implementer/ID code: 0(" ")/0
->>> | INFO: Implements 6 event counters
->>> | INFO: pmu: pmu-memaccess-reliability: 32-bit overflows: overflow=0 min=251 max=283 COUNT=250 MARGIN=100
->>> | PASS: pmu: pmu-memaccess-reliability: 32-bit overflows: memaccess is reliable
->>> | SKIP: pmu: pmu-memaccess-reliability: 64-bit overflows: Skip test as 64 overflows need FEAT_PMUv3p5
->>> | SUMMARY: 2 tests, 1 skipped
->>>
->>> Thanks,
->>> Mark.
->>>
+no, the gmap __limit__ cannot be changed after CPUs are created.
+
+if the gmap is smaller than 2GB but has a limit >2GB then it will have
+3 levels.
+
+this is moot, though, I have found a much smaller and simpler solution
+after talking with Marc
+
+> 
+> >   };
+> >   
+> >   static void kvm_s390_clear_pv_state(struct kvm *kvm)
+> > @@ -318,7 +319,11 @@ int kvm_s390_pv_set_aside(struct kvm *kvm, u16 *rc, u16 *rrc)
+> >   	if (!priv)
+> >   		return -ENOMEM;
+> >   
+> > -	if (is_destroy_fast_available()) {
+> > +	if ((kvm->arch.gmap->asce & _ASCE_TYPE_MASK) == _ASCE_TYPE_SEGMENT) {  
+> 
+> How about adding this to gmap.h?
+> 
+> bool gmap_asce_non_replaceable(struct gmap *gmap)
+> {
+> 	return (gmap->asce & _ASCE_TYPE_MASK) == _ASCE_TYPE_SEGMENT;
+> }
+
+do you really want a function / macro for that?
+
+> 
+> > +		/* No need to do things asynchronously for VMs under 2GB */
+> > +		res = kvm_s390_pv_deinit_vm(kvm, rc, rrc);
+> > +		priv->small = true;
+> > +	} else if (is_destroy_fast_available()) {
+> >   		res = kvm_s390_pv_deinit_vm_fast(kvm, rc, rrc);
+> >   	} else {
+> >   		priv->stor_var = kvm->arch.pv.stor_var;
+> > @@ -335,7 +340,8 @@ int kvm_s390_pv_set_aside(struct kvm *kvm, u16 *rc, u16 *rrc)
+> >   		return res;
+> >   	}
+> >   
+> > -	kvm_s390_destroy_lower_2g(kvm);
+> > +	if (!priv->small)
+> > +		kvm_s390_destroy_lower_2g(kvm);
+> >   	kvm_s390_clear_pv_state(kvm);
+> >   	kvm->arch.pv.set_aside = priv;
+> >   
+> > @@ -418,7 +424,10 @@ int kvm_s390_pv_deinit_cleanup_all(struct kvm *kvm, u16 *rc, u16 *rrc)
+> >   
+> >   	/* If a previous protected VM was set aside, put it in the need_cleanup list */
+> >   	if (kvm->arch.pv.set_aside) {
+> > -		list_add(kvm->arch.pv.set_aside, &kvm->arch.pv.need_cleanup);
+> > +		if (((struct pv_vm_to_be_destroyed *)kvm->arch.pv.set_aside)->small)  
+> 
+> cur = (struct pv_vm_to_be_destroyed *)kvm->arch.pv.set_aside;
+> 
+> if (cur->small)
+> [...]
+
+this will go
+
+> 
+> 
+> > +			kfree(kvm->arch.pv.set_aside);
+> > +		else
+> > +			list_add(kvm->arch.pv.set_aside, &kvm->arch.pv.need_cleanup);
+> >   		kvm->arch.pv.set_aside = NULL;
+> >   	}
+> >   
+> > @@ -485,26 +494,22 @@ int kvm_s390_pv_deinit_aside_vm(struct kvm *kvm, u16 *rc, u16 *rrc)
+> >   	if (!p)
+> >   		return -EINVAL;
+> >   
+> > -	/* When a fatal signal is received, stop immediately */
+> > -	if (s390_uv_destroy_range_interruptible(kvm->mm, 0, TASK_SIZE_MAX))
+> > +	if (p->small)
+> >   		goto done;
+> > -	if (kvm_s390_pv_dispose_one_leftover(kvm, p, rc, rrc))
+> > -		ret = -EIO;
+> > -	kfree(p);
+> > -	p = NULL;
+> > -done:
+> > -	/*
+> > -	 * p is not NULL if we aborted because of a fatal signal, in which
+> > -	 * case queue the leftover for later cleanup.
+> > -	 */
+> > -	if (p) {
+> > +	/* When a fatal signal is received, stop immediately */
+> > +	if (s390_uv_destroy_range_interruptible(kvm->mm, 0, TASK_SIZE_MAX)) {
+> >   		mutex_lock(&kvm->lock);
+> >   		list_add(&p->list, &kvm->arch.pv.need_cleanup);
+> >   		mutex_unlock(&kvm->lock);
+> >   		/* Did not finish, but pretend things went well */
+> >   		*rc = UVC_RC_EXECUTED;
+> >   		*rrc = 42;
+> > +		return 0;
+> >   	}
+> > +	if (kvm_s390_pv_dispose_one_leftover(kvm, p, rc, rrc))
+> > +		ret = -EIO;
+> > +done:
+> > +	kfree(p);
+> >   	return ret;
+> >   }
+> >   
+> > diff --git a/arch/s390/mm/gmap.c b/arch/s390/mm/gmap.c
+> > index 5a716bdcba05..2267cf9819b2 100644
+> > --- a/arch/s390/mm/gmap.c
+> > +++ b/arch/s390/mm/gmap.c
+> > @@ -2833,6 +2833,9 @@ EXPORT_SYMBOL_GPL(s390_unlist_old_asce);
+> >    * s390_replace_asce - Try to replace the current ASCE of a gmap with a copy
+> >    * @gmap: the gmap whose ASCE needs to be replaced
+> >    *
+> > + * If the ASCE is a SEGMENT type then this function will return -EINVAL,
+> > + * otherwise the pointers in the host_to_guest radix tree will keep pointing
+> > + * to the wrong pages, causing use-after-free and memory corruption.
+> >    * If the allocation of the new top level page table fails, the ASCE is not
+> >    * replaced.
+> >    * In any case, the old ASCE is always removed from the gmap CRST list.
+> > @@ -2847,6 +2850,10 @@ int s390_replace_asce(struct gmap *gmap)
+> >   
+> >   	s390_unlist_old_asce(gmap);
+> >   
+> > +	/* Replacing segment type ASCEs would cause serious issues */
+> > +	if ((gmap->asce & _ASCE_TYPE_MASK) == _ASCE_TYPE_SEGMENT)
+> > +		return -EINVAL;
+> > +
+> >   	page = alloc_pages(GFP_KERNEL_ACCOUNT, CRST_ALLOC_ORDER);
+> >   	if (!page)
+> >   		return -ENOMEM;  
+> 
 
