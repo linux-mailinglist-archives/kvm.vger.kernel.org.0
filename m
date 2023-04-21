@@ -2,168 +2,141 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BC7F06EABC4
-	for <lists+kvm@lfdr.de>; Fri, 21 Apr 2023 15:37:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6C29B6EABF7
+	for <lists+kvm@lfdr.de>; Fri, 21 Apr 2023 15:45:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232439AbjDUNh5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Apr 2023 09:37:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54806 "EHLO
+        id S231636AbjDUNot (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Apr 2023 09:44:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60872 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231285AbjDUNh4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Apr 2023 09:37:56 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35458900D;
-        Fri, 21 Apr 2023 06:37:55 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id C488464D73;
-        Fri, 21 Apr 2023 13:37:54 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A8C51C433D2;
-        Fri, 21 Apr 2023 13:37:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1682084274;
-        bh=ISek3mBnmrk/v8xm97ePpRSrFcxal1t9l018us4X0l0=;
-        h=From:To:Cc:Subject:Date:From;
-        b=MY8xjcw6d9YBvc53sBrvxuVcFNTnlBVTR7RY9vPoERVQpGFYzfK7hntaC43nwxw+9
-         LvNBGl/K5U5Ve9JQLsY+YuZRxYxrgL71CZE4In4w+pz29ewlQeghQ1BxwBoX++RQDY
-         lwOOfewD7VyyOThGvAQcumOhT3e1X/FTsgbS53drq3ZXeyd2Y6updhYa8HWqUh4aEN
-         FAjKS6ihzLQMz18q/JH0vzClVVneGL8Wb7it1kT4iylwgLX5YedR78v0qk02POQeaQ
-         txwu8ovInpz411UZDd9TlvQpQdQ2R/ugCZvqvRVs7YkM3doVu0rOURcTKNRYH7rHnZ
-         9cJ1NTJcVUuaQ==
-From:   Christian Brauner <brauner@kernel.org>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     Christian Brauner <brauner@kernel.org>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org
-Subject: [GIT PULL] fork: user workers & vhost
-Date:   Fri, 21 Apr 2023 15:37:12 +0200
-Message-Id: <20230421-satzglied-cybernaut-b2b652a46bfa@brauner>
-X-Mailer: git-send-email 2.34.1
+        with ESMTP id S232628AbjDUNoa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Apr 2023 09:44:30 -0400
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2068.outbound.protection.outlook.com [40.107.244.68])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5737D10278
+        for <kvm@vger.kernel.org>; Fri, 21 Apr 2023 06:44:25 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=JzUTSZ3XAl/9Z4eeRT8qjfH4RetMSPcR6LubAqnYd5K13d+pWmlrWcpY9Wxax9T+M/xCUP+gGfa9h5laXw4fQfc5EdUKFGiQFEWJfq1jcrvqrBZ+QIa5bwnAkh1Dyw0V9k5lLja8tkwJnkQQLnr81TdJU8/gwNTqDYWk3yjpa2lryiVe9nWBoF86Hw2KGXgpJkOKD+fFnXz1Cg7osCICqt0PtbwlQHsn+RRWY33IMlEeMShQEp8JaJSDXVYsl/xKe3ZMUAYBuCdzkCP73e6oEl9rKbtpfiCktCt6fgZ37hIHuz7V3koa9DTuB83k4D5gO6QQoBaE1hHOkH5PnSD2VQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=znHZY817BMDBTG/1GV/zKGEsjdZY5xxmZX+IeTvwtGo=;
+ b=HAmEAAsksa91JaqS4V2AnR7wVwFUvYkzR67jrKLN6EsMoAO3wf7056E9aIYXXy1WY9TtpCK95veJefjgWNcLsnPNfNZrTZ/f6I3M97ML04VBeWVUgKID4qbtERptk0yoN0MAaTcGpm8QIvxHkij0svwDbZCJUmJ6Adma2SHoJG8dte+4o/jq88Gr7KIvizWKR+0BUuF+8Ymh26uRLOqEZHH+lLQiB4MTa18NPtR8FPjEqIHqW1X478SPFMDHEYnvYqqnuGKofKV3BHMg5XE5Oz4hvxUnCHl0PbiXg02p3MF8RMG1vtdNTjAog3dD8kGqGt1DmcsJhB4YHlJC0nPrDg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=znHZY817BMDBTG/1GV/zKGEsjdZY5xxmZX+IeTvwtGo=;
+ b=ad/pa/ZX0rQqvNrjg4Rvm2oo3/vVzqZINeSDpSILpMACWF4vtrsGW87OunoUx9SJyvHKV1gaC60OlNjlvOt2aMHc4BUacZbPayq+oz2ZKWydFlg7oSdvU9b+2rOPp5bIk/K/xZZCRllKSsPQYK1pjDc5hIghg31oYIqKAQenB/5ijbilbFqKSDuqlfQfk3OLTscuGyZo6sD1mJ4xm2g6n+BD6YnkI/Ob9BkPrwu0l6Qq9NvXKhs3kOOWfifuvGd81gVm7/qqtgMyXabE+/pIGFdzLyCMb6lTsTFmsf74onuNCsbRIj7e60jaqpYj6S1srVpRvNqd4RHMg2mx30uWVQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by CH0PR12MB5372.namprd12.prod.outlook.com (2603:10b6:610:d7::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6319.22; Fri, 21 Apr
+ 2023 13:44:23 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::f7a7:a561:87e9:5fab]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::f7a7:a561:87e9:5fab%6]) with mapi id 15.20.6319.020; Fri, 21 Apr 2023
+ 13:44:23 +0000
+Date:   Fri, 21 Apr 2023 10:44:21 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Yi Liu <yi.l.liu@intel.com>
+Cc:     alex.williamson@redhat.com, kevin.tian@intel.com,
+        cohuck@redhat.com, eric.auger@redhat.com, nicolinc@nvidia.com,
+        kvm@vger.kernel.org, mjrosato@linux.ibm.com,
+        chao.p.peng@linux.intel.com
+Subject: Re: [PATCH v3] docs: kvm: vfio: Suggest KVM_DEV_VFIO_GROUP_ADD vs
+ VFIO_GROUP_GET_DEVICE_FD ordering
+Message-ID: <ZEKTNVhWiHb0BmWX@nvidia.com>
+References: <20230421053611.55839-1-yi.l.liu@intel.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230421053611.55839-1-yi.l.liu@intel.com>
+X-ClientProxiedBy: BL0PR02CA0002.namprd02.prod.outlook.com
+ (2603:10b6:207:3c::15) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=4973; i=brauner@kernel.org; h=from:subject:message-id; bh=3MrRKpKniv5TWBvrsE8XXXNmyDHvC5zHG1I4z4nBGAo=; b=owGbwMvMwCU28Zj0gdSKO4sYT6slMaQ4TWS+k2s7vUTK/WOAaZP7dZun4VGS81+ePnWxutT1j8Qf 0bBdHaUsDGJcDLJiiiwO7Sbhcst5KjYbZWrAzGFlAhnCwMUpABPRjWFkWHtrapLmpsXhn1oUnreL2J sGn104QbIpfnWV/MxTz9+eEWZk2Ji70deo9HB0wSQfGYka11uPJafL1esucRC1sWcSfl7GAAA=
-X-Developer-Key: i=brauner@kernel.org; a=openpgp; fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|CH0PR12MB5372:EE_
+X-MS-Office365-Filtering-Correlation-Id: d7fcce59-fa02-4c71-f2bc-08db426e83d4
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: lkwFFR48933d8ne9NkYIM+7Dn1drBjJkk5JK9+c9BV1XkotvlahK6qp68Jw2tcYWU1N+Tl+y9rJ0V5ezFiuh6KQqB5KWl6qK2aZHsvEJnrmoxVQ/A1spIuctMaeH4OHBRtGM+8ger6tSIM9xnpeePTC8IxDw/gzqApseovJ6RN7kxt9DnPWtt5rjU8GovRKRpGIsl+UHFtet30MpJouAHLt6Kfe7DMpDN405tNUZ98X6cBaOwvckOjAgJcwb30D/dMjyYFSsqoz2aUgmoeNhvURzJ4r8XDg5Hyq4JxnQhgd9o+GNgvzPIEVoGx9c5Dw0BtPikcc++C+sJsu87q6VML1LPmwoqf9RPICXOy+hdsuJBZ1lQlBDy9Z15AhBnL0srBN7fu6MhXXVzjpUnHjf81M3tXLrof16/pf6rS82wRegUU1i0NzUYzHv2Y/gkO/B9YpAEQu4jqOkV5MFhctG7NLp+a8kXU5WLK1fgpDx/Nm+a6WWHHFs9uzqLsN9z1ixZQRxy6IThpIO9DE/BSWGX3rMkFbf9+EleeZ7Y7Rv/hZ5Dy3q7PUBr68ZXlhizc2HA339A7hcoMgl5c3Y0Nd5AN6U3i4oJheJh0wkvVfxRs46u7p8uURF4CfvZkbFzxbF81TZtZpqIskC2tcer0d4Eg==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(366004)(396003)(346002)(136003)(376002)(39860400002)(451199021)(2616005)(83380400001)(6506007)(36756003)(26005)(6512007)(966005)(478600001)(6486002)(86362001)(316002)(66556008)(8676002)(6916009)(66946007)(66476007)(38100700002)(4326008)(41300700001)(8936002)(186003)(4744005)(5660300002)(2906002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?32f4ENMitSNvhJXQG514l92UYiLFMjgtTpFeCkRNE4AU1sHs+ITFaHDci0hT?=
+ =?us-ascii?Q?hQP8vlR8jDXxPyzNqgY59JNNBZRiKot2KZIdwgGoEt2q46MIfFsKTbTd3VHp?=
+ =?us-ascii?Q?ZSvIrwz0pGiM4CwQysgCUXzWWHWLs0rp8zxHfp3mOq5xA+oibfizeVSAbSMu?=
+ =?us-ascii?Q?N+7PyBGAdxlCdktyJVgQAqeTQK47RoejcUQeNrmR+wgqrHKDNiDLsavT0ENP?=
+ =?us-ascii?Q?fVS4/M98ClQBYKWT1zMsJU1Zp8u4OQIhMvcG5dEkpALHGkeJ3uIdRqC02E8P?=
+ =?us-ascii?Q?Ni3LjYTYsH46eTfxc360VampQC0vIhRycBpItABH/4xjjN61rGCeLQ1fCHSs?=
+ =?us-ascii?Q?b9dALoZwmfgLXnDn1lYsdpn+tRqjzraswSJp3F3s1C7adDoogX+UIpEELQfQ?=
+ =?us-ascii?Q?b6h30BgOwhrv2+ssfsd5s34GwDrb8IGn52GHyflJsepluwgB8Jq42Jgkva/o?=
+ =?us-ascii?Q?ezKdw6Hnf2aGod/AaPhEpopK4b31T8wlChAVu9N59WIfbkRCgErzH0PraPbu?=
+ =?us-ascii?Q?0Nh38gd8AcM8WdFfHTwcdscu+elfHIKYMlLUUBBN8SSQR/L2I4VDOPD0UWRQ?=
+ =?us-ascii?Q?ik9WW5fUN3zl/7CUpp3s2tqfQCu6xWFPTdX3h3uHVu2DnwYbI2sLKcwt9emQ?=
+ =?us-ascii?Q?B4vIdg8ijukB8Gh+2AQNbp40gHST9mH/BefXHKy+zLFK87ZDqL6iQJ828hyL?=
+ =?us-ascii?Q?oWzdO70Yc4p3j8h71qRqHlUi0UL6uj2DC1XyBZuyAG0f5SLQxYLqsKssq1ta?=
+ =?us-ascii?Q?2IIw0+Lz8OBhkwic11+vCnsHqSUdiYQIuQpq0W59SxhPPPzOunA2Mikpr+5c?=
+ =?us-ascii?Q?EwO+F/85L9ZeuawqJ9UvFwQ4K9it3qDr1VOicipf0lrmnjxOiOs5PC39sYlT?=
+ =?us-ascii?Q?Qv4s9PurqNghMOCmIu7FB/m88Yd8FzsTwbnilbsGnOhIzx5BEU91zjOfNsVz?=
+ =?us-ascii?Q?N7OtAwzjxOyZ9PRpKO3ZcrJSXCZy0fYGbHQXJcBZGrJ8hdRetDn2HQ8AYD1R?=
+ =?us-ascii?Q?8mMaS20ATcC8/AOscppzEIFk1tsAWH8i8floFrLcmMUN8Ts5GzV9k5sv2ito?=
+ =?us-ascii?Q?a/pUXJMceHDzRfCYUGUC4jtWpNoEUg/WssUyqR0G5d+o0dcIIXeJCrhA82kR?=
+ =?us-ascii?Q?wxkV0qIsCVWz2LrI3iSLcvpKmPlbRD6SXtjOcy75jZWaAdeNInzJIhqqjdPc?=
+ =?us-ascii?Q?GYrfvVjTICDk1HCqkI0PUYWeX3Wyrmvc5Ze+nk2uZKU95gKUm1a+o4WD+qXw?=
+ =?us-ascii?Q?b9jJnfk5CX++FxSMSuKw8gZBHfk6VF1S70biZMrpcxJ67RwR4xXWFG3ybwnf?=
+ =?us-ascii?Q?4ntgUHYv+Iz+xRTafF0mk8Z5Mgs7q7RLFZW4N03XEgQ0hcmLje2Or6S9d8hc?=
+ =?us-ascii?Q?CJ1PAK2O7MrT420TlUY0zHTdWnoKsHfQKPQqQ+naBV6Y81a/aAYMh5hRv6vq?=
+ =?us-ascii?Q?6fjjRQz/7s3s6dvSnKwJSdSqSezj4KKuZvW43gtOfrIMFTRhDqnjPpHSF029?=
+ =?us-ascii?Q?uavDjmAjUjLipJ/s+a+l7o3NpuFC5ufc8ZS2UwW9tMFeOXq2M8M+Jwcwmw97?=
+ =?us-ascii?Q?zLplp3C36RxXUng/dK47TDap87AeCmBnouomvfZa?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d7fcce59-fa02-4c71-f2bc-08db426e83d4
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Apr 2023 13:44:23.0140
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: pBRb8sqc5t8/wgsD2yJPpVgIh1RZluWTrol8/wxi/t5n7wrt5bhTH9FZ2nvjryze
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR12MB5372
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hey Linus,
+On Thu, Apr 20, 2023 at 10:36:11PM -0700, Yi Liu wrote:
+> as some vfio_device's open_device op requires kvm pointer and kvm pointer
+> set is part of GROUP_ADD.
+> 
+> Reviewed-by: Kevin Tian <kevin.tian@intel.com>
+> Signed-off-by: Yi Liu <yi.l.liu@intel.com>
+> ---
+> v3:
+>  - Add r-b from Kevin
+>  - Remove "::" to fix "WARNING: Literal block expected; none found."
+>    "make htmldocs" looks good.
+>  - Rename the subject per Alex's suggestion
+> 
+> v2: https://lore.kernel.org/kvm/20230222022231.266381-1-yi.l.liu@intel.com/
+>  - Adopt Alex's suggestion
+> 
+> v1: https://lore.kernel.org/kvm/20230221034114.135386-1-yi.l.liu@intel.com/
+> ---
+>  Documentation/virt/kvm/devices/vfio.rst | 5 +++++
+>  1 file changed, 5 insertions(+)
 
-/* Summary */
-This contains the work generalizing the ability to create a kernel
-worker from a userspace process. Such user workers will run with the
-same credentials as the userspace process they were created from
-providing stronger security and accounting guarantees than the
-traditional override_creds() approach ever could've hoped for.
+Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
 
-The original work was heavily based and optimzed for the needs of
-io_uring which was the first user. However, as it quickly turned out the
-ability to create user workers inherting properties from a userspace
-process is generally useful.
-
-The vhost subsystem currently creates workers using the kthread api. The
-consequences of using the kthread api are that RLIMITs don't work
-correctly as they are inherited from khtreadd. This leads to bugs
-where more workers are created than would be allowed by the RLIMITs of
-the userspace process in lieu of which workers are created.
-
-Problems like this disappear with user workers created from the
-userspace processes for which they perform the work. In addition,
-providing this api allows vhost to remove additional complexity. For
-example, cgroup and mm sharing will just work out of the box with user
-workers based on the relevant userspace process instead of manually
-ensuring the correct cgroup and mm contexts are used.
-
-So the vhost subsystem should simply be made to use the same mechanism
-as io_uring. To this end the original mechanism used for
-create_io_thread() is generalized into user workers:
-
-* Introduce PF_USER_WORKER as a generic indicator that a given task is a
-  user worker, i.e., a kernel task that was created from a userspace
-  process. Now a PF_IO_WORKER thread is just a specialized version of
-  PF_USER_WORKER. So io_uring io workers raise both flags.
-* Make copy_process() available to core kernel code.
-* Extend struct kernel_clone_args with the following bitfields allowing
-  to indicate to copy_process():
-  * to create a user worker (raise PF_USER_WORKER)
-  * to not inherit any files from the userspace process
-  * to ignore signals
-
-After all generic changes are in place the vhost subsystem implements a
-new dedicated vhost api based on user workers. Finally, vhost is
-switched to rely on the new api moving it off of kthreads.
-
-Thanks to Mike for sticking it out and making it through this rather
-arduous journey.
-
-/* Testing */
-clang: Ubuntu clang version 15.0.6
-gcc: (Ubuntu 12.2.0-3ubuntu1) 12.2.0
-
-All patches are based on 6.3-rc1 and have been sitting in linux-next.
-No build failures or warnings were observed. All old and new tests in
-fstests, selftests, and LTP pass without regressions.
-
-/* Conflicts */
-At the time of creating this PR no merge conflicts were reported from
-linux-next and no merge conflicts showed up doing a test-merge with
-current mainline.
-
-The following changes since commit fe15c26ee26efa11741a7b632e9f23b01aca4cc6:
-
-  Linux 6.3-rc1 (2023-03-05 14:52:03 -0800)
-
-are available in the Git repository at:
-
-  git@gitolite.kernel.org:pub/scm/linux/kernel/git/brauner/linux tags/v6.4/kernel.user_worker
-
-for you to fetch changes up to 6e890c5d5021ca7e69bbe203fde42447874d9a82:
-
-  vhost: use vhost_tasks for worker threads (2023-03-23 12:45:37 +0100)
-
-Please consider pulling these changes from the signed v6.4/kernel.user_worker tag.
-
-Thanks!
-Christian
-
-----------------------------------------------------------------
-v6.4/kernel.user_worker
-
-----------------------------------------------------------------
-Mike Christie (11):
-      csky: Remove kernel_thread declaration
-      kernel: Allow a kernel thread's name to be set in copy_process
-      kthread: Pass in the thread's name during creation
-      kernel: Make io_thread and kthread bit fields
-      fork/vm: Move common PF_IO_WORKER behavior to new flag
-      fork: add kernel_clone_args flag to not dup/clone files
-      fork: Add kernel_clone_args flag to ignore signals
-      fork: allow kernel code to call copy_process
-      vhost_task: Allow vhost layer to use copy_process
-      vhost: move worker thread fields to new struct
-      vhost: use vhost_tasks for worker threads
-
- MAINTAINERS                       |   2 +
- arch/csky/include/asm/processor.h |   2 -
- drivers/vhost/Kconfig             |   5 ++
- drivers/vhost/vhost.c             | 124 ++++++++++++++++++--------------------
- drivers/vhost/vhost.h             |  11 +++-
- include/linux/sched.h             |   2 +-
- include/linux/sched/task.h        |  13 +++-
- include/linux/sched/vhost_task.h  |  23 +++++++
- init/main.c                       |   2 +-
- kernel/Makefile                   |   1 +
- kernel/fork.c                     |  25 ++++++--
- kernel/kthread.c                  |  33 ++++------
- kernel/vhost_task.c               | 117 +++++++++++++++++++++++++++++++++++
- mm/vmscan.c                       |   4 +-
- 14 files changed, 263 insertions(+), 101 deletions(-)
- create mode 100644 include/linux/sched/vhost_task.h
- create mode 100644 kernel/vhost_task.c
+Jason
