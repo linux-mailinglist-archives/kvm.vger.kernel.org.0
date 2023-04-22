@@ -2,173 +2,77 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0A2356EB7F5
-	for <lists+kvm@lfdr.de>; Sat, 22 Apr 2023 10:14:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 18ADD6EB7F9
+	for <lists+kvm@lfdr.de>; Sat, 22 Apr 2023 10:18:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229583AbjDVIOK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 22 Apr 2023 04:14:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47844 "EHLO
+        id S229661AbjDVISm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 22 Apr 2023 04:18:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48878 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229451AbjDVIOJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 22 Apr 2023 04:14:09 -0400
-Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20CDA1BDC
-        for <kvm@vger.kernel.org>; Sat, 22 Apr 2023 01:14:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1682151248; x=1713687248;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=rgdN3iDhfEdeLLIYcXLbhD5RQftOHXwHn5CEqCUxtXE=;
-  b=c1Aev1bRaFDJ9TjUs1LH0WoY66Z90oYTTuVUDxL6wEIxEVJKqjcJnDHJ
-   a37CxlLIlFjKdS51TrIEw+DQZSsYKOM4iQJ1L9LmzscElt52lqTIlVePT
-   08UzIurzDp4ll5RkW8YvSI5qnuDLemBYR9CmE7Zxs8o1ZBf+3jJNSARJr
-   Bm3e6pkpu5031ccWoPAOtce3CKylCqlORojQB5TuIJZ/QR5OP3Yo9U61K
-   M/1/vbs90A8k8BTCtTV8qU+MrQv3VRg/JOwCBqmBSM/NZW52Uoeht/1Mb
-   TeUNIGjZE9IHlrxgPj2sRU5G/X+7bnW0MbCzeRgFSiM4H86vZBLmbehHm
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10687"; a="409077377"
-X-IronPort-AV: E=Sophos;i="5.99,218,1677571200"; 
-   d="scan'208";a="409077377"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Apr 2023 01:14:07 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10687"; a="836405272"
-X-IronPort-AV: E=Sophos;i="5.99,218,1677571200"; 
-   d="scan'208";a="836405272"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by fmsmga001.fm.intel.com with ESMTP; 22 Apr 2023 01:14:07 -0700
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.23; Sat, 22 Apr 2023 01:14:06 -0700
-Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
- ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.23; Sat, 22 Apr 2023 01:14:06 -0700
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.23 via Frontend Transport; Sat, 22 Apr 2023 01:14:06 -0700
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.169)
- by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.23; Sat, 22 Apr 2023 01:14:06 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=KRP0CWXXCDgUTatwFCfd9ZQF/K5SDQtIiV5pGrM9Itc9BJ/19HzDqXGviqx8OjCw443l3HQBBu5YVZqD9da4vAEm1qZ5cWP/o8KyIQavof3L+hTJXZIKO7sL62QO64cTsg0wg2O7X0CRepr+Xd85QIJy5dQ/t69jNGPQREzt2otwBFmFZ7vS4+PTPPQXkd3Kt6Qy7Hzl6eMcHDw50sjWMnm+cop98kMoi8cqpmj/fzWwAZp7LzdwGYAV1/7rSkvbBP5usQ9A26+IvRKL4c3q7VxrB+OJOaKhRmsoyI5J9nfUFlMx8J3yqzqKA5CXiS6hTTrgc8E9QuxsmMk+8/xg0w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=rgdN3iDhfEdeLLIYcXLbhD5RQftOHXwHn5CEqCUxtXE=;
- b=U8Bzvi0z119BG8/9wBbWofh3WQlv6G/fodEwYN2HwFdzESFZkj995s0dtPlpaT4lbgDdIJLTvhf9C9kr+2NkyKRggoAzgGBVwbGWhok2mLrDFu6+H6CuGncdDO3yWPpDLk0Fr5Fu5+FnLFtSsOtlzeGdXhPKCNHLVaB+hwQ6VaX+8kyJQo+nmqa7UrJd5BKafEEaX4bHa6VW4GG8ZHF4yWpbOKhBDh1VYprw2dK52hZGLCgaH+DMrTy8rOIRcb4s39rWYMd0DIgX3aRx5OmLyqCJU0aZ0u15ddZ/JJeuZARnpOIzb3inzauOG+2EEThm85Y7WXhKdhWJZrahLyGODA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from PH7PR11MB5983.namprd11.prod.outlook.com (2603:10b6:510:1e2::13)
- by PH7PR11MB6353.namprd11.prod.outlook.com (2603:10b6:510:1ff::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6298.45; Sat, 22 Apr
- 2023 08:14:04 +0000
-Received: from PH7PR11MB5983.namprd11.prod.outlook.com
- ([fe80::12c2:36ed:dccb:ca63]) by PH7PR11MB5983.namprd11.prod.outlook.com
- ([fe80::12c2:36ed:dccb:ca63%6]) with mapi id 15.20.6319.020; Sat, 22 Apr 2023
- 08:14:03 +0000
-From:   "Huang, Kai" <kai.huang@intel.com>
-To:     "Gao, Chao" <chao.gao@intel.com>
-CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "robert.hu@linux.intel.com" <robert.hu@linux.intel.com>,
-        "Christopherson,, Sean" <seanjc@google.com>,
-        "binbin.wu@linux.intel.com" <binbin.wu@linux.intel.com>,
-        "Guo, Xuelian" <xuelian.guo@intel.com>
-Subject: Re: [PATCH v7 2/5] KVM: x86: Virtualize CR3.LAM_{U48,U57}
-Thread-Topic: [PATCH v7 2/5] KVM: x86: Virtualize CR3.LAM_{U48,U57}
-Thread-Index: AQHZZva2XlM7fnwAvESmPCLhodGl668nnluAgADkdoCAAA4jgIAAJr0AgABKcWCADGbRAIAAVjKAgAA/1oCAAN85AIAAOKiA
-Date:   Sat, 22 Apr 2023 08:14:03 +0000
-Message-ID: <f0009c6071eb1a8cff3389a735c6619f56a57eda.camel@intel.com>
-References: <20230404130923.27749-1-binbin.wu@linux.intel.com>
-         <20230404130923.27749-3-binbin.wu@linux.intel.com>
-         <9c99eceaddccbcd72c5108f72609d0f995a0606c.camel@intel.com>
-         <497514ed-db46-16b9-ca66-04985a687f2b@linux.intel.com>
-         <7b296e6686bba77f81d1d8c9eaceb84bd0ef0338.camel@intel.com>
-         <cc265df1-d4fc-0eb7-f6e8-494e98ece2d9@linux.intel.com>
-         <BL1PR11MB5978D1FA3B572A119F5EF3A9F7989@BL1PR11MB5978.namprd11.prod.outlook.com>
-         <5e229834-3e55-a580-d9f6-a5ffe971c567@linux.intel.com>
-         <7895c517a84300f903cb04fbf2f05c4b8e518c91.camel@intel.com>
-         <ZEKsgceQo6MEWbB5@chao-email> <ZENnwtBzRVz14eS+@chao-email>
-In-Reply-To: <ZENnwtBzRVz14eS+@chao-email>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-user-agent: Evolution 3.46.4 (3.46.4-1.fc37) 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PH7PR11MB5983:EE_|PH7PR11MB6353:EE_
-x-ms-office365-filtering-correlation-id: b5a85406-5469-4856-9ce7-08db430988ea
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: y5y8EdEjtxrW2kfgU5mWDG6kdUhM8pF59IJWNYXXjsVfk61drTCEE3vANOCnD2b5+Ufvo7SzJ+J65R2qV60STPec90HBct3rZNhI+EjutZzCX88gSmRRWmuTLItuW+CDELszD3+2a28Niji8zdHJilH4pkSf1a1D+NQTeBXYvnmAjbB07Zzkp4Q55QnKia3lcVt5qnOCOTLyH6LfgEov5/tR0gllySMfBPnVfeFAtjC13AfoF7WwfB7cK6cwDvzw1hSUJYzFso+pdofJO2eQK/RBJJwFJifKSfJtb0qMRs/p1t2mXz2bgjJVOck49KHvn7LQyaS0Z8eR3qa3I94Q1Wyb32KRRyJ48HoO4ppyLg+UytLr3Wftr/vMzldZacNEo7UxXnycIuy33eg3dhMKfRe5zI+mMPfa0LRv4RToQjVYPOejTlNKYVDmynzleHvGdQeBn/azfkeYm9aMnzJE8Qc2pdYlKzTnkCTTVrRdRiXpOEIJscfjq0qQXU9fzlTaoSU2EaW4OwDxloYV88qkkDQSubhyc/c/8NnZAixgEwbeUhjpTsemM/Usx5F6/IR4e9F0uCRSr3C2YSMMWDUb/JL7X6lQkp8EM03cHvwsmF0Mws49hv26gRBb5nzsyjoM
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR11MB5983.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(346002)(39860400002)(366004)(396003)(376002)(136003)(451199021)(86362001)(38070700005)(36756003)(2906002)(71200400001)(2616005)(5660300002)(83380400001)(186003)(6512007)(26005)(6506007)(66476007)(91956017)(66556008)(478600001)(64756008)(6636002)(66946007)(6486002)(316002)(4326008)(66446008)(41300700001)(76116006)(122000001)(54906003)(38100700002)(82960400001)(8936002)(37006003)(6862004)(8676002);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?ZXNmM2s1aHFBN0NJT2pJYkhqRFJvVW1xQ2ZMR09hUEZERUZ0WlpoaEVzV1J3?=
- =?utf-8?B?UkowTjNSRnkrRStocjJzYm9ONy9scC9EZW1xd2U3NmVXSzZKVEpOeHVtKzF3?=
- =?utf-8?B?NlQrYnNoVU9wdlFmZzhUQ0ppaWJMVWhXZXVqUEJadVI3VDNETlBEblF6V0VV?=
- =?utf-8?B?TkMxaTlha24xRWIzdzhMMlBURGRON3VBSjg5RExqNE1EWUwwK21ZeHFsRHV0?=
- =?utf-8?B?YSs3YitjTHNCTW5CVHlhOEVhL2RTVmh1cWFVeG8xS0FHQ2Qydk5PNXpMdm9R?=
- =?utf-8?B?M3p0Mk8rUzVQbTFjdEM4cTZqelRHbkNvL1d5bkE2UWdiMWk0K3Q4NFYxOEYv?=
- =?utf-8?B?R0pOcC9jNWIyOWc3SmZpNXBPSTMwZjluR21rUkdSNzVaZFlmYU16WnpiRUlL?=
- =?utf-8?B?V2tLMFQwcGJwVjI2V2xGSlJ2Nk9LeEh3ZUFlU3MrK2VPNmJwUGJBQ1VKVURT?=
- =?utf-8?B?YkNzUnJqempYZzlmTnpNZEV1bFpqZUlvRkdjblQxRmcyVXZ1K3Q0aVc5cFNk?=
- =?utf-8?B?Mk9MWWtHWWs3blhSY00ycy9xYkpCTUNsQjdKNW5JMzNnV3lsS2tsWEE0VTB1?=
- =?utf-8?B?bkJzQTUwTXJwREhjZnduenZnT1hkUjk1Mm5NRWw2UG5qRmh5UWYrK3FiNWV1?=
- =?utf-8?B?MVM5a1hkc1pkekxmTWJmK0trUGZESmZ4Q1dnYWxHc0d5RWZoUll1VFBFbE53?=
- =?utf-8?B?N2g5N2V3YytueDRnNlZlQ242UVNnanFrbVZRYTBrSTVlQmVmcVh5RUhMcm9G?=
- =?utf-8?B?U1A4QnBWL1hKaVNNd3RWZng4NTFrQjlLdmxQVmtSR3JKNW9zclArWWE5MVh1?=
- =?utf-8?B?bU55Lys2VjM1MEQ2T3pRLzZzOEh1c0FaYWpDU1ArNmFRNXBNU01abjN2d0NC?=
- =?utf-8?B?V0U1K3UzdVhXMUs4eGQxaXZGMnJDY1FhMngwYXJQMHREbExvZzA3b1BHQ0hz?=
- =?utf-8?B?c2wvSTBaUUlwRmM4bkxrT2IyUmFkc2JMQ2RXYjFxRUQ1RThSVFVleXZ4Qk5l?=
- =?utf-8?B?a0VKME9DKzJJeEsyRmw0SzJLSElLYUE3cm92M25tK2l3UStWZEZvMithM2tY?=
- =?utf-8?B?V0dJQnY0Y2ZRV0VqNXRXVUVMQWJPOXBxdG1wVXZ1Mm9iWlhMYzBTQWhNME1V?=
- =?utf-8?B?TmM5QmpwQjJzWTZ6RFBOVWkzQUNKcGRCeDVNdk5hNVNPazVoeVhJQy9ZV1VL?=
- =?utf-8?B?ejNETldzWkpINkN2Qjg1TzdwVnJQaitKQ2NWam12Z1lGM29tMDlhK09UZ3Zo?=
- =?utf-8?B?Mi95c0RYNjVZL2h0ZEdHamhyZHlPZElZZXY3UVFiR0FIbnNvbHNGaVNvMGQz?=
- =?utf-8?B?UHcydkdvVGkvc3dSd0JDN3Z0T3dWbTRCaFB0SHZoMUJ0VjdTTm9kenBoUFdC?=
- =?utf-8?B?bGxTNHQ5L2xyV0JqNkVYamFzaGY3WHVjUnA5TjVJV1oxMDhET1FXM2pMdTc3?=
- =?utf-8?B?aHIxWDJkbTFEQzFMVkNQWHdBMzdSTDBTaUpFQi9ROW5HSW9zaWQxV0RsY0ZY?=
- =?utf-8?B?WXhvcnFKNjE1NTZMY05jVkpCV0JOajRiTDM3SFgzc2p1ZlhNalRxZDVwRnBK?=
- =?utf-8?B?bGVXc3ZVQi9QeGFBdDZsUVRIU2x6N0VpRGNlS0xWWmxTQlJ2MVBWTWt4UzVw?=
- =?utf-8?B?VjBCT1cvRFFXdEd4Y2tmTDBQbGFtT0pXdXN1OWRpbEFOc2VqOU01TWJVUHph?=
- =?utf-8?B?UTZLTmt6Wm51bVZqM1RHaEpMZXlpWXBIR05ULzZDaFo1cWE5TmIwY0NnQkg2?=
- =?utf-8?B?cEJ6Y0tpSzh4RjVWTU9wdGpiaUIvb3plVng5TlgzcGprVm9SRHJKTFdXZk9S?=
- =?utf-8?B?QXFHNFhRTHNSam5JSmpoMXd4VnNDSjZJTDd4Wm52eUgveW8zaEdHZHYzRHd5?=
- =?utf-8?B?bWpIL21vT3BGelh5R0xKTzN2TWh2TlZVbE8wdXJQaDl6ckg1WDlzMmdKaGp4?=
- =?utf-8?B?NXRabGxLSFNCNnQ5ZjhJbGZQR1hFVTBMeTlCckhTNDJ3Zy9Cd01LaDI1d1BZ?=
- =?utf-8?B?TUhHN2Y4TVhUVCtaUkdxc2RxemxyclRmTHdtWXNOM2xWYzF6cTM5WUU1Slh5?=
- =?utf-8?B?V3krVmowdlZ6eG9LbW8wRGNSK0I4Ylp6YmsrTDFXK083b1BubDFHcHZxNC83?=
- =?utf-8?Q?2lK6pJj24fX4C/VeMjhXpeZrj?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <B754EEBEED354C4D9B3AF9495B5A3568@namprd11.prod.outlook.com>
-Content-Transfer-Encoding: base64
+        with ESMTP id S229650AbjDVISk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 22 Apr 2023 04:18:40 -0400
+Received: from mail-lf1-x134.google.com (mail-lf1-x134.google.com [IPv6:2a00:1450:4864:20::134])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1B7390;
+        Sat, 22 Apr 2023 01:18:38 -0700 (PDT)
+Received: by mail-lf1-x134.google.com with SMTP id 2adb3069b0e04-4edcc712d95so244414e87.1;
+        Sat, 22 Apr 2023 01:18:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1682151517; x=1684743517;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+aQN9XLWKAMHX9ca92J9NiyyKoOt1W6QokC8Q6kDPfk=;
+        b=P7Gbw1s9Wh1EXxMAi6t59x3ZCZ2nHdjVUVp1f41BUTulLfSnzO0/fqATuYv+etsK1s
+         TjHBqVKnqQ7zIhYGofu6X/Xt252jK3Oy4Y3D2ObynuQKzZ0zXduTU5Csb3QNsgBqHudX
+         b6BTxriXFuHmtZGvKa5NTE1YvmZtjAXinlGAJwb1CMQ3j5shcfRHb/C8UIhDn6rgKckz
+         eEolHIdKfLQGLwRjueCqS869JF8W210Sfdjbtwx84GtpVklMR4L06oEuT9a+EfGlo48m
+         sf4WhogmVy8Jui2tq30yfBBS60Cp0T2wV1EQ72NGjSIeq5sW9OliadYTVGsANY2D538t
+         0oAA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1682151517; x=1684743517;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=+aQN9XLWKAMHX9ca92J9NiyyKoOt1W6QokC8Q6kDPfk=;
+        b=RcdaNN9d/eQipzUySk/ZJSECUbRcY3wX9gJscCr2izL7oPEHD2k8C8GhNVI4awbNv3
+         HZYAyX1WHHBC0C8bvo0/fZZevyDOynP3MnYhRVTlTQ6v6jSZDCbSzAe70cs0AZ/TN/Z5
+         S/QOcz1DWchSkSO8Og4u/44B1BUgmDw+17tHBHgAN72NHo5MMteHVAh0OpFP3NpACYuk
+         qn/ffLPcm+iEr5Cw+y67Sp0sotZeS5sKiGyIK0K72w0hpRAzwf3cX/0b5Qw9BleDxt1x
+         kK6dF+7ujw/uWu2FQ4JuEouVDH0sBazck8h4rCLnPUOjwE53U17oDf+/uHsBbdHnh4yM
+         A7gQ==
+X-Gm-Message-State: AAQBX9e7OBFBFuJeQ6gKjQtEWfH6XtSE4+ZYQehR7QzGfQU0jTVX9YK2
+        Y4TXa6ht4TyOc+dtCNvUATyN9C7fSlNLjA==
+X-Google-Smtp-Source: AKy350Zh/uH9TucOCQHh9DcDzSaeyDg3am6FA2brVSGB9Khg4vT0C5HnvU3MbYWhninX88PXhGlNsQ==
+X-Received: by 2002:a2e:9804:0:b0:2a9:f6f0:fc8c with SMTP id a4-20020a2e9804000000b002a9f6f0fc8cmr1660730ljj.3.1682151516726;
+        Sat, 22 Apr 2023 01:18:36 -0700 (PDT)
+Received: from localhost (88-113-32-99.elisa-laajakaista.fi. [88.113.32.99])
+        by smtp.gmail.com with ESMTPSA id m15-20020a056512014f00b004e7fa99f2b5sm818818lfo.186.2023.04.22.01.18.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 22 Apr 2023 01:18:36 -0700 (PDT)
+Date:   Sat, 22 Apr 2023 11:18:34 +0300
+From:   Zhi Wang <zhi.wang.linux@gmail.com>
+To:     isaku.yamahata@intel.com
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
+        erdemaktas@google.com, Sean Christopherson <seanjc@google.com>,
+        Sagi Shahar <sagis@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Kai Huang <kai.huang@intel.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Michael Roth <michael.roth@amd.com>
+Subject: Re: [PATCH v13 048/113] KVM: x86/mmu: Disallow dirty logging for
+ x86 TDX
+Message-ID: <20230422111834.00003689@gmail.com>
+In-Reply-To: <23cc6df6ec2ca776c3efe148e70ba290aa3de319.1678643052.git.isaku.yamahata@intel.com>
+References: <cover.1678643051.git.isaku.yamahata@intel.com>
+        <23cc6df6ec2ca776c3efe148e70ba290aa3de319.1678643052.git.isaku.yamahata@intel.com>
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PH7PR11MB5983.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b5a85406-5469-4856-9ce7-08db430988ea
-X-MS-Exchange-CrossTenant-originalarrivaltime: 22 Apr 2023 08:14:03.3811
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: Ee3ceq+ZMfyaI0PIb6/GhtrnmgNRAABpy4Ep41Eyab0rP03HRcrcmbwNZ6A71N5ceudNdyZav4Wu646hUq4nng==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB6353
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -176,25 +80,169 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-T24gU2F0LCAyMDIzLTA0LTIyIGF0IDEyOjUxICswODAwLCBDaGFvIEdhbyB3cm90ZToNCj4gT24g
-RnJpLCBBcHIgMjEsIDIwMjMgYXQgMTE6MzI6MTdQTSArMDgwMCwgQ2hhbyBHYW8gd3JvdGU6DQo+
-ID4gPiBGb3IgY2FzZSAyKSBJIF90aGlua18gd2UgbmVlZCBuZXcgY29kZSB0byBjaGVjayBib3Ro
-IFZNQ1MxMidzIEhPU1RfQ1IzIGFuZA0KPiA+ID4gR1VFU1RfQ1IzIGFnYWluc3QgYWN0aXZlIGNv
-bnRyb2wgYml0cy4gIFRoZSBrZXkgY29kZSBwYXRoIGlzwqANCj4gPiANCj4gPiAuLi4NCj4gPiAN
-Cj4gPiA+IA0KPiA+ID4gCW5lc3RlZF92bXhfcnVuKCkgLT7CoA0KPiA+ID4gCQktPiBuZXN0ZWRf
-dm14X2NoZWNrX2hvc3Rfc3RhdGUoKQ0KPiA+ID4gCQktPiBuZXN0ZWRfdm14X2VudGVyX25vbl9y
-b290X21vZGUoKQ0KPiA+ID4gCQkJLT4gcHJlcGFyZV92bWNzMDJfZWFybHkoKQ0KPiA+ID4gCQkJ
-LT4gcHJlcGFyZV92bWNzMDIoKQ0KPiA+ID4gDQo+ID4gPiBTaW5jZSBuZXN0ZWRfdm14X2xvYWRf
-Y3IzKCkgaXMgdXNlZCBpbiBib3RoIFZNRU5URVIgdXNpbmcgVk1DUzEyJ3MgSE9TVF9DUjMNCj4g
-PiA+IChWTUVYSVQgdG8gTDEpIGFuZCBHVUVTVF9DUjMgKFZNRU5URVIgdG8gTDIpLCBhbmQgaXQg
-Y3VycmVudGx5IGFscmVhZHkgY2hlY2tzDQo+ID4gPiBrdm1fdmNwdV9pc19pbGxlZ2FsX2dwYSh2
-Y3B1LCBjcjMpLCBjaGFuZ2luZyBpdCB0byBhZGRpdGlvbmFsbHkgY2hlY2sgZ3Vlc3QgQ1IzDQo+
-ID4gPiBhY3RpdmUgY29udHJvbCBiaXRzIHNlZW1zIGp1c3QgZW5vdWdoLg0KPiA+IA0KPiA+IElN
-TywgY3VycmVudCBLVk0gcmVsaWVzIG9uIGhhcmR3YXJlIHRvIGRvIGNvbnNpc3RlbmN5IGNoZWNr
-IG9uIHRoZSBHVUVTVF9DUjMNCj4gPiBkdXJpbmcgVk0gZW50cnkuDQo+IA0KPiBQbGVhc2UgZGlz
-cmVnYXJkIG15IHJlbWFyayBvbiB0aGUgY29uc2lzdGVuY3kgY2hlY2sgb24gR1VFU1RfQ1IzLiBJ
-IGp1c3QgdG9vaw0KPiBhIGNsb3NlciBsb29rIGF0IHRoZSBjb2RlLiBJdCBpcyBpbmRlZWQgZG9u
-ZSBieSBLVk0gaW4gbmVzdGVkX3ZteF9sb2FkX2NyMygpLg0KPiBTb3JyeSBmb3IgdGhlIG5vaXNl
-Lg0KDQpSaWdodC4gIFlvdSBjYW5ub3QganVzdCBzaW1wbHkgcmVseSBvbiBoYXJkd2FyZSB0byBk
-byBDUjMgY2hlY2sgaW4gVk1FTlRFUiwNCmJlY2F1c2UgYXQgbGVhc3QgdGhlcmUncyBhIG5hc3R5
-IGNhc2UgdGhhdCBMMSdzIE1BWFBIWVNBRERSIGNhbiBiZSBzbWFsbGVyIHRoYW4NCkwwLg0K
+On Sun, 12 Mar 2023 10:56:12 -0700
+isaku.yamahata@intel.com wrote:
+
+> From: Isaku Yamahata <isaku.yamahata@intel.com>
+> 
+> TDX doesn't support dirty logging.  Report dirty logging isn't supported so
+> that device model, for example qemu, can properly handle it.  Silently
+> ignore on dirty logging on private GFNs of TDX.
+> 
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> ---
+>  arch/x86/kvm/mmu/mmu.c     |  3 +++
+>  arch/x86/kvm/mmu/tdp_mmu.c | 36 +++++++++++++++++++++++++++++++++++-
+>  arch/x86/kvm/x86.c         |  8 ++++++++
+>  include/linux/kvm_host.h   |  1 +
+>  virt/kvm/kvm_main.c        | 10 +++++++++-
+>  5 files changed, 56 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 3d68da838f94..1f250fa8ce36 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -6706,6 +6706,9 @@ static bool kvm_mmu_zap_collapsible_spte(struct kvm *kvm,
+>  	for_each_rmap_spte(rmap_head, &iter, sptep) {
+>  		sp = sptep_to_sp(sptep);
+>  
+> +		/* Private page dirty logging is not supported yet. */
+> +		KVM_BUG_ON(is_private_sptep(sptep), kvm);
+> +
+>  		/*
+>  		 * We cannot do huge page mapping for indirect shadow pages,
+>  		 * which are found on the last rmap (level = 1) when not using
+> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+> index a3402b33fa5d..58a236a69ec7 100644
+> --- a/arch/x86/kvm/mmu/tdp_mmu.c
+> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
+> @@ -1474,9 +1474,27 @@ static __always_inline bool kvm_tdp_mmu_handle_gfn(struct kvm *kvm,
+>  	 * into this helper allow blocking; it'd be dead, wasteful code.
+>  	 */
+>  	for_each_tdp_mmu_root(kvm, root, range->slot->as_id) {
+> +		gfn_t start;
+> +		gfn_t end;
+> +
+> +		/*
+> +		 * For now, operation on private GPA, e.g. dirty page logging,
+> +		 * isn't supported yet.
+> +		 */
+> +		if (is_private_sp(root))
+> +			continue;
+> +
+>  		rcu_read_lock();
+>  
+> -		tdp_root_for_each_leaf_pte(iter, root, range->start, range->end)
+> +		/*
+> +		 * For TDX shared mapping, set GFN shared bit to the range,
+> +		 * so the handler() doesn't need to set it, to avoid duplicated
+> +		 * code in multiple handler()s.
+> +		 */
+> +		start = kvm_gfn_to_shared(kvm, range->start);
+> +		end = kvm_gfn_to_shared(kvm, range->end);
+> +
+> +		tdp_root_for_each_leaf_pte(iter, root, start, end)
+>  			ret |= handler(kvm, &iter, range);
+>  
+>  		rcu_read_unlock();
+> @@ -1959,6 +1977,13 @@ void kvm_tdp_mmu_clear_dirty_pt_masked(struct kvm *kvm,
+>  	struct kvm_mmu_page *root;
+>  
+>  	lockdep_assert_held_write(&kvm->mmu_lock);
+> +	/*
+> +	 * First TDX generation doesn't support clearing dirty bit,
+> +	 * since there's no secure EPT API to support it.  For now silently
+> +	 * ignore KVM_CLEAR_DIRTY_LOG.
+> +	 */
+> +	if (!kvm_arch_dirty_log_supported(kvm))
+> +		return;
+>  	for_each_tdp_mmu_root(kvm, root, slot->as_id)
+>  		clear_dirty_pt_masked(kvm, root, gfn, mask, wrprot);
+>  }
+> @@ -2078,6 +2103,15 @@ bool kvm_tdp_mmu_write_protect_gfn(struct kvm *kvm,
+>  	bool spte_set = false;
+>  
+>  	lockdep_assert_held_write(&kvm->mmu_lock);
+> +
+> +	/*
+> +	 * First TDX generation doesn't support write protecting private
+> +	 * mappings, silently ignore the request.  KVM_GET_DIRTY_LOG etc
+> +	 * can reach here, no warning.
+> +	 */
+> +	if (!kvm_arch_dirty_log_supported(kvm))
+> +		return false;
+> +
+>  	for_each_tdp_mmu_root(kvm, root, slot->as_id)
+>  		spte_set |= write_protect_gfn(kvm, root, gfn, min_level);
+>  
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index a0960b468c74..6d7ca694e1c9 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -12589,6 +12589,9 @@ static void kvm_mmu_slot_apply_flags(struct kvm *kvm,
+>  	u32 new_flags = new ? new->flags : 0;
+>  	bool log_dirty_pages = new_flags & KVM_MEM_LOG_DIRTY_PAGES;
+>  
+> +	if (!kvm_arch_dirty_log_supported(kvm) && log_dirty_pages)
+> +		return;
+> +
+>  	/*
+>  	 * Update CPU dirty logging if dirty logging is being toggled.  This
+>  	 * applies to all operations.
+> @@ -13561,6 +13564,11 @@ int kvm_sev_es_string_io(struct kvm_vcpu *vcpu, unsigned int size,
+>  }
+>  EXPORT_SYMBOL_GPL(kvm_sev_es_string_io);
+>  
+> +bool kvm_arch_dirty_log_supported(struct kvm *kvm)
+> +{
+> +	return kvm->arch.vm_type != KVM_X86_PROTECTED_VM;
+> +}
+> +
+
+Maybe introduce a new x86 ops for SNP/TDX to check this separately as SNP
+might still support it? With the current approach, I think both SNP/TDX
+will be affected. So does the later patch about page-tracking. 
+
+Michael, can you confirm this?
+
+>  EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_entry);
+>  EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_exit);
+>  EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_fast_mmio);
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index 5a144497c930..3cd537f4b38b 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -1495,6 +1495,7 @@ bool kvm_arch_dy_has_pending_interrupt(struct kvm_vcpu *vcpu);
+>  int kvm_arch_post_init_vm(struct kvm *kvm);
+>  void kvm_arch_pre_destroy_vm(struct kvm *kvm);
+>  int kvm_arch_create_vm_debugfs(struct kvm *kvm);
+> +bool kvm_arch_dirty_log_supported(struct kvm *kvm);
+>  
+>  #ifndef __KVM_HAVE_ARCH_VM_ALLOC
+>  /*
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 42f01d0d6a49..e9f8225f3406 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -1700,10 +1700,18 @@ static void kvm_replace_memslot(struct kvm *kvm,
+>  	}
+>  }
+>  
+> +bool __weak kvm_arch_dirty_log_supported(struct kvm *kvm)
+> +{
+> +	return true;
+> +}
+> +
+>  static int check_memory_region_flags(struct kvm *kvm,
+>  				     const struct kvm_userspace_memory_region2 *mem)
+>  {
+> -	u32 valid_flags = KVM_MEM_LOG_DIRTY_PAGES;
+> +	u32 valid_flags = 0;
+> +
+> +	if (kvm_arch_dirty_log_supported(kvm))
+> +		valid_flags |= KVM_MEM_LOG_DIRTY_PAGES;
+>  
+>  	if (kvm_arch_has_private_mem(kvm))
+>  		valid_flags |= KVM_MEM_PRIVATE;
+
