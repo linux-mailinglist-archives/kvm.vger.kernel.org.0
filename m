@@ -2,69 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A0AA36EB6B7
-	for <lists+kvm@lfdr.de>; Sat, 22 Apr 2023 03:56:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3004D6EB717
+	for <lists+kvm@lfdr.de>; Sat, 22 Apr 2023 05:32:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233603AbjDVB4l (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Apr 2023 21:56:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48496 "EHLO
+        id S229533AbjDVDcd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Apr 2023 23:32:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38930 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229530AbjDVB4j (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Apr 2023 21:56:39 -0400
-Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A0BBE6E
-        for <kvm@vger.kernel.org>; Fri, 21 Apr 2023 18:56:38 -0700 (PDT)
-Received: by mail-pg1-x54a.google.com with SMTP id 41be03b00d2f7-51b85b8ecc9so1615722a12.2
-        for <kvm@vger.kernel.org>; Fri, 21 Apr 2023 18:56:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1682128597; x=1684720597;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=IQdNhpWZDysF1UahR095KnSwqZZsAIRpm1aTBOeoxU0=;
-        b=WvBNdsrmV3zKyzEzVd5WJbwXsxfW67XDwZajqzJsoe5/qS8aKiZC25DdwamG22qL6P
-         pOEeHuaZK2WXX6LGpiaQNIBtapa+enyHQ3U6So6xs1wWhEwuP6g5Y87o+vFl7Ncl0FqJ
-         aYPy5R3UpftMUJ2Et77SQTLDXmIxV+NGmjW43VWWPCwUWy6VQ0sym7Y44JghDOXDlOqh
-         r0btZ4Wmj5NknxwgPJ8hD/0A5NAUUs1K3/nu4gi0FhzTZfOz9uhzg5kr+7AprgOPq1Ig
-         Qak78Ut7eio8UZFGwrEoZe02RLOwNMhl/Q2sfzgRh2JM3lFX5eEtNS6gMx0wsVKF04EG
-         uhMw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682128597; x=1684720597;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=IQdNhpWZDysF1UahR095KnSwqZZsAIRpm1aTBOeoxU0=;
-        b=NLSBr27hrM3ufsWA+yxLtct1fy69UitltoiBRIu/2IHyiAKtEDoBQcXuT3MH22IWiO
-         Wq9IaYvzMPfNWzw5LhcANuqOUxTPLd2i06Jb+Br7eAZ7GTxZ9X6k0L65wGtySVt+Fqly
-         cdad/dzYETfnaKxcC2Cw+JkDDfk4tDJgYmJTEeUyt2ytO4ZO581n7s8tNVI+JIRTzhEU
-         0wyNjZFRBcBTJlUJx0GFtlSdj87MYFWndi9Wb/W9YnPXgKa7JxqmnnJQ6tK+3zGZT9Tj
-         k3wSDf4nLTAdg+D/m6Z7zpAhNUO9sHkrfDPlg0qyoniGVqCSYCJz9C0l0d+uu+cUeWuE
-         R60Q==
-X-Gm-Message-State: AAQBX9eAuvtAuVW8zhXW+n9VV3RxO0XpM/ER6m3C+janlJvYOCs69LSi
-        OtVnT2w74fp13g8Q7pdyDTvFEnRTEB4=
-X-Google-Smtp-Source: AKy350bA8nYVy6RhXf+a8EbMVXDTb5UqBhqquCV4X8ayUrrycoEk7bjzkdzHz6OFwze4Uue09C5oGDmek/0=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a63:40c1:0:b0:50b:189d:d1a with SMTP id
- n184-20020a6340c1000000b0050b189d0d1amr1635019pga.10.1682128597618; Fri, 21
- Apr 2023 18:56:37 -0700 (PDT)
-Date:   Fri, 21 Apr 2023 18:56:35 -0700
-In-Reply-To: <CALzav=f=TFoqpR5tPDPOujoO6Gix-+zL-sZyyZK27qJvGPP9dg@mail.gmail.com>
-Mime-Version: 1.0
-References: <20230421214946.2571580-1-seanjc@google.com> <CALzav=f=TFoqpR5tPDPOujoO6Gix-+zL-sZyyZK27qJvGPP9dg@mail.gmail.com>
-Message-ID: <ZEM+09p7QBJR7DoI@google.com>
-Subject: Re: [PATCH v2] KVM: x86: Preserve TDP MMU roots until they are
- explicitly invalidated
-From:   Sean Christopherson <seanjc@google.com>
-To:     David Matlack <dmatlack@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>,
-        Ben Gardon <bgardon@google.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        with ESMTP id S229447AbjDVDcc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Apr 2023 23:32:32 -0400
+Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1498319A8
+        for <kvm@vger.kernel.org>; Fri, 21 Apr 2023 20:32:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1682134351; x=1713670351;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=yc/2dUW2r3okKm7cotGE+CAPo5gFZLlukvB/JLwPwps=;
+  b=JRRQE9iLa9b6UegC1OpeRG445CbYTJyp6yTUMivjngDQC4mMTaErwrDE
+   C5cv/jZ5odtA7G/yhjjfZz1Mjvty87cgoM4wyS2gELggZZNNP119O2DoU
+   tAoTuBslGDSS8aiCOAP8pL3I/7enBMipdx6O0mWx+/IC7idwW4qxQhGh8
+   LjYOCmBGijf1HDfEd/JZY8e0pT4gq/hzRxhNq9na4RdIUag2zsGCpzhv8
+   KV7XHdMeiFPyqxZ8caJwW0GM+buX4/TtbRqCpck4n6iI4E2SBq53uSp7U
+   AU+KOQ74l1c4ZJ+sppUT7z7zOS2Jijem/4MR1Mx6H8NllmiFeau/kcqDi
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10687"; a="344873678"
+X-IronPort-AV: E=Sophos;i="5.99,216,1677571200"; 
+   d="scan'208";a="344873678"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Apr 2023 20:32:30 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10687"; a="695139303"
+X-IronPort-AV: E=Sophos;i="5.99,216,1677571200"; 
+   d="scan'208";a="695139303"
+Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.254.215.122]) ([10.254.215.122])
+  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Apr 2023 20:32:28 -0700
+Message-ID: <612345f3-74b8-d4bc-b87d-d74c8d0aedd1@linux.intel.com>
+Date:   Sat, 22 Apr 2023 11:32:26 +0800
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+Subject: Re: [PATCH v7 2/5] KVM: x86: Virtualize CR3.LAM_{U48,U57}
+To:     "Huang, Kai" <kai.huang@intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "Christopherson,, Sean" <seanjc@google.com>
+Cc:     "Guo, Xuelian" <xuelian.guo@intel.com>,
+        "robert.hu@linux.intel.com" <robert.hu@linux.intel.com>,
+        "Gao, Chao" <chao.gao@intel.com>
+References: <20230404130923.27749-1-binbin.wu@linux.intel.com>
+ <20230404130923.27749-3-binbin.wu@linux.intel.com>
+ <9c99eceaddccbcd72c5108f72609d0f995a0606c.camel@intel.com>
+ <497514ed-db46-16b9-ca66-04985a687f2b@linux.intel.com>
+ <7b296e6686bba77f81d1d8c9eaceb84bd0ef0338.camel@intel.com>
+ <cc265df1-d4fc-0eb7-f6e8-494e98ece2d9@linux.intel.com>
+ <BL1PR11MB5978D1FA3B572A119F5EF3A9F7989@BL1PR11MB5978.namprd11.prod.outlook.com>
+ <5e229834-3e55-a580-d9f6-a5ffe971c567@linux.intel.com>
+ <7895c517a84300f903cb04fbf2f05c4b8e518c91.camel@intel.com>
+From:   Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <7895c517a84300f903cb04fbf2f05c4b8e518c91.camel@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-7.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -72,75 +74,175 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Apr 21, 2023, David Matlack wrote:
-> On Fri, Apr 21, 2023 at 2:49=E2=80=AFPM Sean Christopherson <seanjc@googl=
-e.com> wrote:
-> >
-> >  void kvm_tdp_mmu_invalidate_all_roots(struct kvm *kvm)
-> >  {
-> >         struct kvm_mmu_page *root;
-> >
-> > -       lockdep_assert_held_write(&kvm->mmu_lock);
-> > -       list_for_each_entry(root, &kvm->arch.tdp_mmu_roots, link) {
-> > -               if (!root->role.invalid &&
-> > -                   !WARN_ON_ONCE(!kvm_tdp_mmu_get_root(root))) {
-> > +       /*
-> > +        * Note!  mmu_lock isn't held when destroying the VM!  There ca=
-n't be
-> > +        * other references to @kvm, i.e. nothing else can invalidate r=
-oots,
-> > +        * but walking the list of roots does need to be guarded agains=
-t roots
-> > +        * being deleted by the asynchronous zap worker.
-> > +        */
-> > +       rcu_read_lock();
-> > +
-> > +       list_for_each_entry_rcu(root, &kvm->arch.tdp_mmu_roots, link) {
->=20
-> I see that roots are removed from the list with list_del_rcu(), so I
-> agree this should be safe.
->=20
-> KVM could, alternatively, acquire the mmu_lock in
-> kvm_mmu_uninit_tdp_mmu(), which would let us keep the lockdep
-> assertion and drop the rcu_read_lock() + comment. That might be worth
-> it in case someone accidentally adds a call to
-> kvm_tdp_mmu_invalidate_all_roots() without mmu_lock outside of VM
-> teardown. kvm_mmu_uninit_tdp_mmu() is not a particularly performance
-> sensitive path and adding the mmu_lock wouldn't add much overhead
-> anyway (it would block for at most a few milliseconds waiting for the
-> async work to reschedule).
+Kai,
 
-Heh, I actually started to ping you off-list to specifically discuss this o=
-ption,
-but then decided that not waiting those few milliseconds might be worthwhil=
-e for
-some use cases.  I also couldn't quite convince myself that it would only b=
-e a few
-milliseconds, e.g. if the worker is zapping a fully populated 5-level root,=
- there
-are no other tasks scheduled on _its_ CPU, and CONFIG_PREEMPTION=3Dn (which=
- neuters
-rwlock_needbreak()).
+Thanks for your inputs.
 
-The other reason I opted for not taking mmu_lock is that, with the persiste=
-nt roots
-approach, I don't think it's actually strictly necessary for kvm_mmu_zap_al=
-l_fast()
-to invaliate roots while holding mmu_lock for write.  Holding slots_lock en=
-sures
-that only a single task can be doing invalidations, versus the old model wh=
-ere
-putting the last reference to a root could happen just about anywhere.  And
-allocating a new root and zapping from mmu_noitifiers requires holding mmu_=
-lock for
-write, so I _think_ we could getaway with holding mmu_lock for read.  Maybe=
-.
+I rephrased the changelog as following:
 
-It's largely a moot point since kvm_mmu_zap_all_fast() needs to hold mmu_lo=
-ck for
-write anyways to play nice with the shadow MMU, i.e. I don't expect us to e=
-ver
-want to pursue a change in this area.  But at the same time I was strugglin=
-g to
-write a comment explaining why the VM destruction path "had" to take mmu_lo=
-ck.
+
+LAM uses CR3.LAM_U48 (bit 62) and CR3.LAM_U57 (bit 61) to configure LAM
+masking for user mode pointers.
+
+To support LAM in KVM, CR3 validity checks and shadow paging handling 
+need to be
+modified accordingly.
+
+== CR3 validity Check ==
+When LAM is supported, CR3 LAM bits are allowed to be set and the check 
+of CR3
+needs to be modified.
+Add a helper kvm_vcpu_is_legal_cr3() and use it instead of 
+kvm_vcpu_is_legal_gpa()
+to do the new CR3 checks in all existing CR3 checks as following:
+When userspace sets sregs, CR3 is checked in kvm_is_valid_sregs().
+Non-nested case
+- When EPT on, CR3 is fully under control of guest.
+- When EPT off, CR3 is intercepted and CR3 is checked in kvm_set_cr3() 
+during
+   CR3 VMExit handling.
+Nested case, from L0's perspective, we care about:
+- L1's CR3 register (VMCS01's GUEST_CR3), it's the same as non-nested case.
+- L1's VMCS to run L2 guest (i.e. VMCS12's HOST_CR3 and VMCS12's GUEST_CR3)
+   Two paths related:
+   1. L0 emulates a VMExit from L2 to L1 using VMCS01 to reflect VMCS12
+          nested_vm_exit()
+          -> load_vmcs12_host_state()
+                -> nested_vmx_load_cr3()     //check VMCS12's HOST_CR3
+   2. L0 to VMENTER to L2 using VMCS02
+          nested_vmx_run()
+          -> nested_vmx_check_host_state()   //check VMCS12's HOST_CR3
+          -> nested_vmx_enter_non_root_mode()
+             -> prepare_vmcs02()
+                -> nested_vmx_load_cr3()     //check VMCS12's GUEST_CR3
+   Path 2 can fail to VMENTER to L2 of course, but later this should 
+result in
+   path 1.
+
+== Shadow paging handling ==
+When EPT is off, the following changes needed to handle shadow paging:
+- LAM bits should be stripped to perform GFN calculation from guest PGD 
+when it
+   is CR3 (for nested EPT case, guest PGD is nested EPTP).
+   To be generic, extract the maximal base address mask from guest PGD 
+since the
+   validity of guest PGD has been checked already.
+- Leave LAM bits in root.pgd to force a new root for a CR3+LAM combination.
+   It could potentially increase root cache misses and MMU reload, however,
+   it's very rare to turn off EPT when performance matters.
+- Active CR3 LAM bits should be kept to form a shadow CR3.
+
+To be generic, introduce a field 'cr3_ctrl_bits' in kvm_vcpu_arch to record
+the bits used to control supported features related to CR3 (e.g. LAM).
+- Supported control bits are set to the field after set cpuid.
+- the field is used in
+   kvm_vcpu_is_legal_cr3() to check CR3.
+   kvm_get_active_cr3_ctrl_bits() to extract active control bits of CR3.
+   Also as a quick check for LAM feature support.
+
+On 4/21/2023 7:43 PM, Huang, Kai wrote:
+> On Fri, 2023-04-21 at 14:35 +0800, Binbin Wu wrote:
+>> On 4/13/2023 5:13 PM, Huang, Kai wrote:
+>>>> On 4/13/2023 10:27 AM, Huang, Kai wrote:
+>>>>> On Thu, 2023-04-13 at 09:36 +0800, Binbin Wu wrote:
+>>>>>> On 4/12/2023 7:58 PM, Huang, Kai wrote:
+>>>>>>
+>>>> ...
+>>>>>>>> +	root_gfn = (root_pgd & __PT_BASE_ADDR_MASK) >> PAGE_SHIFT;
+>>>>>>> Or, should we explicitly mask vcpu->arch.cr3_ctrl_bits?  In this
+>>>>>>> way, below
+>>>>>>> mmu_check_root() may potentially catch other invalid bits, but in
+>>>>>>> practice there should be no difference I guess.
+>>>>>> In previous version, vcpu->arch.cr3_ctrl_bits was used as the mask.
+>>>>>>
+>>>>>> However, Sean pointed out that the return value of
+>>>>>> mmu->get_guest_pgd(vcpu) could be
+>>>>>> EPTP for nested case, so it is not rational to mask to CR3 bit(s) from EPTP.
+>>>>> Yes, although EPTP's high bits don't contain any control bits.
+>>>>>
+>>>>> But perhaps we want to make it future-proof in case some more control
+>>>>> bits are added to EPTP too.
+>>>>>
+>>>>>> Since the guest pgd has been check for valadity, for both CR3 and
+>>>>>> EPTP, it is safe to mask off non-address bits to get GFN.
+>>>>>>
+>>>>>> Maybe I should add this CR3 VS. EPTP part to the changelog to make it
+>>>>>> more undertandable.
+>>>>> This isn't necessary, and can/should be done in comments if needed.
+>>>>>
+>>>>> But IMHO you may want to add more material to explain how nested cases
+>>>>> are handled.
+>>>> Do you mean about CR3 or others?
+>>>>
+>>> This patch is about CR3, so CR3.
+>> For nested case, I plan to add the following in the changelog:
+>>
+>>       For nested guest:
+>>       - If CR3 is intercepted, after CR3 handled in L1, CR3 will be
+>> checked in
+>>         nested_vmx_load_cr3() before returning back to L2.
+>>       - For the shadow paging case (SPT02), LAM bits are also be handled
+>> to form
+>>         a new shadow CR3 in vmx_load_mmu_pgd().
+>>
+>>
+> I don't know a lot of code detail of KVM nested code, but in general, since your
+> code only changes nested_vmx_load_cr3() and nested_vmx_check_host_state(), the
+> changelog should focus on explaining why modifying these two functions are good
+> enough.
+>
+> And to explain this, I think we should explain from hardware's perspective
+> rather than from shadow paging's perspective.
+>
+>  From L0's perspective, we care about:
+>
+> 	1) L1's CR3 register (VMCS01's GUEST_CR3)
+> 	2) L1's VMCS to run L2 guest
+> 		2.1) VMCS12's HOST_CR3
+> 		2.2) VMCS12's GUEST_CR3
+>
+> For 1) the current changelog has explained (that we need to catch _active_
+> control bits in guest's CR3 etc).  For nested (case 2)), L1 can choose to
+> intercept CR3 or not.  But this isn't the point because from hardware's point of
+> view we actually care about below two cases instead:
+>
+> 	1) L0 to emulate a VMExit from L2 to L1 by VMENTER using VMCS01
+> 	   to reflect VMCS12
+> 	2) L0 to VMENTER to L2 using VMCS02 directly
+>
+> The case 2) can fail due to fail to VMENTER to L2 of course but this should
+> result in L0 to VMENTER to L1 with a emulated VMEXIT from L2 to L1 which is the
+> case 1).
+>
+> For case 1) we need new code to check VMCS12's HOST_CR3 against guest's _active_
+> CR3 feature control bits.  The key code path is:
+>
+> 	vmx_handle_exit()
+> 		-> prepare_vmcs12()
+> 		-> load_vmcs12_host_state().
+>
+> For case 2) I _think_ we need new code to check both VMCS12's HOST_CR3 and
+> GUEST_CR3 against active control bits.  The key code path is
+>
+> 	nested_vmx_run() ->
+> 		-> nested_vmx_check_host_state()
+> 		-> nested_vmx_enter_non_root_mode()
+> 			-> prepare_vmcs02_early()
+> 			-> prepare_vmcs02()
+>
+> Since nested_vmx_load_cr3() is used in both VMENTER using VMCS12's HOST_CR3
+> (VMEXIT to L1) and GUEST_CR3 (VMENTER to L2), and it currently already checks
+> kvm_vcpu_is_illegal_gpa(vcpu, cr3), changing it to additionally check guest CR3
+> active control bits seems just enough.
+>
+> Also, nested_vmx_check_host_state() (i.e. it is called in nested_vmx_run() to
+> return early if any HOST state is wrong) currently checks
+> kvm_vcpu_is_illegal_gpa(vcpu, cr3) too so we should also change it.
+>
+> That being said, I do find it's not easy to come up with a "concise" changelog
+> to cover both non-nested and (especially) nested cases, but it seems we can
+> abstract some from my above typing?
+>
+> My suggestion is to focus on the hardware behaviour's perspective as typed
+> above.  But I believe Sean can easily make a "concise" changelog if he wants to
+> comment here :)
