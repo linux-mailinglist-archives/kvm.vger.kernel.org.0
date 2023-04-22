@@ -2,93 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EE8506EB824
-	for <lists+kvm@lfdr.de>; Sat, 22 Apr 2023 11:05:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E98016EB933
+	for <lists+kvm@lfdr.de>; Sat, 22 Apr 2023 14:54:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229591AbjDVJFo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 22 Apr 2023 05:05:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57256 "EHLO
+        id S229806AbjDVMyL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 22 Apr 2023 08:54:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58398 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229536AbjDVJFn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 22 Apr 2023 05:05:43 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 741031BCB
-        for <kvm@vger.kernel.org>; Sat, 22 Apr 2023 02:05:42 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        with ESMTP id S229642AbjDVMyK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 22 Apr 2023 08:54:10 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45B341713
+        for <kvm@vger.kernel.org>; Sat, 22 Apr 2023 05:53:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1682168002;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=o3yJS9XUaCtW8cWnEGnzvEvDPb32kZ0iUuU5jk5AgM4=;
+        b=Ki+ZiHz74i4dB4ImpDuUKRN0PKY/lOM8v/oRA67naPXaFnPetV/4BJ3bfHxJnO0+KuEylk
+        Pp6TZpieNH+/n64seedkl5U4Qtp5xLGBHOKp6eG/g3GJzqRzyEY48SNSUILjQzrvfZ6OcL
+        52v4i+zLLuOegQ722ej0gGrz77t9PPU=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-510-hJfRprEaOZun9TMc_NkHyw-1; Sat, 22 Apr 2023 08:53:18 -0400
+X-MC-Unique: hJfRprEaOZun9TMc_NkHyw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 024D360EFB
-        for <kvm@vger.kernel.org>; Sat, 22 Apr 2023 09:05:42 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 504C7C433EF;
-        Sat, 22 Apr 2023 09:05:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1682154341;
-        bh=VGbn/V1aNHTdvq73sdS9rOybUDMt2gl58gvTgoHnREw=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=sYzC9LUXcnvJeD7IvDzWnoYkx9DfLe/uA3CNcOwufJmnbBf+GTV+ZsMjVGti0crlN
-         TX+n/pKJQ2kijtnDzIgH5M6Pbwdq5VGrQgR58IYBpluBBoaHJecKwrp8G/HuKdylMT
-         EnLc2t4Hd99K7TDCnbZO6tePUge/kWA+Z1FKgMfnNPM3NEw0v6urK+2Qc3pcV77Vhq
-         xRMehpEQKuFmXhAQiRdONDW+Mo3TwmC3Sqz1KqWVk7adt3BdS1ICaA4+qDmi+BHZ+a
-         w/+5SCwuo9oE02EqTAT8jxipmO9ISMLbRuVjP0urqL0sjtc+G0k9zib7e1WW6EfbqU
-         Nth96uACVfLpQ==
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.95)
-        (envelope-from <maz@kernel.org>)
-        id 1pq9Ba-00ARn7-Sk;
-        Sat, 22 Apr 2023 10:05:39 +0100
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 933F388CC44;
+        Sat, 22 Apr 2023 12:53:18 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 75A12404CD80;
+        Sat, 22 Apr 2023 12:53:18 +0000 (UTC)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     torvalds@linux-foundation.org
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: [GIT PULL] Final KVM fixes for Linux 6.3
+Date:   Sat, 22 Apr 2023 08:53:17 -0400
+Message-Id: <20230422125317.2222959-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-Date:   Sat, 22 Apr 2023 10:05:38 +0100
-From:   Marc Zyngier <maz@kernel.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Oliver Upton <oliver.upton@linux.dev>, kvm@vger.kernel.org,
-        kvmarm@lists.linux.dev, James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Will Deacon <will@kernel.org>,
-        Mostafa Saleh <smostafa@google.com>,
-        Dan Carpenter <dan.carpenter@linaro.org>
-Subject: Re: [GIT PULL v2] KVM/arm64 fixes for 6.3, part #4
-In-Reply-To: <417f815d-3cf1-45ea-eba7-83e42f249424@redhat.com>
-References: <ZEAOmK52rgcZeDXg@thinky-boi>
- <417f815d-3cf1-45ea-eba7-83e42f249424@redhat.com>
-User-Agent: Roundcube Webmail/1.4.13
-Message-ID: <1023162f05aac3b460effa4a7baa0760@kernel.org>
-X-Sender: maz@kernel.org
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: pbonzini@redhat.com, oliver.upton@linux.dev, kvm@vger.kernel.org, kvmarm@lists.linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, will@kernel.org, smostafa@google.com, dan.carpenter@linaro.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2023-04-22 00:51, Paolo Bonzini wrote:
-> On 4/19/23 17:54, Oliver Upton wrote:
->> Hi Paolo,
->> 
->> Here is v2 of the last batch of fixes for 6.3 (for real this time!)
->> 
->> Details in the tag, but the noteworthy addition is Dan's fix for a
->> rather obvious buffer overflow when writing to a firmware register.
-> 
-> At least going by the Fixes tag, I think this one should have been
-> Cc'd to stable as well.  Can you send it next week or would you like
-> someone else to handle the backport?
+Linus,
 
-Indeed, that's missing. But yes, backports are definitely on
-the cards, and we'll make sure all stable versions get fixed
-as soon as the fix hits Linus' tree.
+The following changes since commit 0bf9601f8ef0703523018e975d6c1f3fdfcff4b9:
 
-         M.
--- 
-Jazz is not dead. It just smells funny...
+  Merge tag 'kvmarm-fixes-6.3-3' of git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm into HEAD (2023-04-06 13:34:19 -0400)
+
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
+
+for you to fetch changes up to 265b97cbc22e0f67f79a71443b60dc1237ca5ee6:
+
+  Merge tag 'kvmarm-fixes-6.3-4' of git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm into HEAD (2023-04-21 19:19:02 -0400)
+
+(I checked and indeed last week's mishap was due to an incorrect push
+_after_ I had generated the message and before I sent it.  I always
+use "git request-pull", or more precisely a wrapper that generates the
+mail headers and the "Linus," at the top, since I am clearly clumsy
+enough with the automation that it provides...).
+
+----------------------------------------------------------------
+Two serious ARM fixes:
+
+* Plug a buffer overflow due to the use of the user-provided register
+  width for firmware regs. Outright reject accesses where the
+  user register width does not match the kernel representation.
+
+* Protect non-atomic RMW operations on vCPU flags against preemption,
+  as an update to the flags by an intervening preemption could be lost.
+
+----------------------------------------------------------------
+Dan Carpenter (1):
+      KVM: arm64: Fix buffer overflow in kvm_arm_set_fw_reg()
+
+Marc Zyngier (1):
+      KVM: arm64: Make vcpu flag updates non-preemptible
+
+Paolo Bonzini (1):
+      Merge tag 'kvmarm-fixes-6.3-4' of git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm into HEAD
+
+ arch/arm64/include/asm/kvm_host.h | 19 ++++++++++++++++++-
+ arch/arm64/kvm/hypercalls.c       |  2 ++
+ 2 files changed, 20 insertions(+), 1 deletion(-)
+
