@@ -2,188 +2,230 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8A8146EB76A
-	for <lists+kvm@lfdr.de>; Sat, 22 Apr 2023 06:51:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 523386EB7CA
+	for <lists+kvm@lfdr.de>; Sat, 22 Apr 2023 09:27:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229616AbjDVEvg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 22 Apr 2023 00:51:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48558 "EHLO
+        id S229575AbjDVH1l (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 22 Apr 2023 03:27:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38244 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229451AbjDVEve (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 22 Apr 2023 00:51:34 -0400
-Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D55251BE4
-        for <kvm@vger.kernel.org>; Fri, 21 Apr 2023 21:51:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1682139093; x=1713675093;
-  h=date:from:to:cc:subject:message-id:references:
-   content-transfer-encoding:in-reply-to:mime-version;
-  bh=0+BM5+OJMsCgwISioqzSGipFr4klidYV1ezhaX49bvc=;
-  b=nBcNoqBAj+fWwg7yTRnW4NnpsmWjKpCwzXvMjbYIQ3PIiOP8VRmKGZ49
-   mlN7hI2X6QyNXZUNnfElDIfbS5EaKu59AjPGK1De2bKEFErWPqH3PAXwR
-   SGTBREpg8UOqQVpH71z4Ltw7dzYDIcf2GBy1Z3eMAtjRs+ZOSTRimeekS
-   xqMYaunTCQvgZ2eK/Snqq/PNLJjtkQIULfDYBKx7mcUyjp/CgsXKVE8q0
-   bmLgTc7VmNgusGhyJROavjqFG2uAey28ngtbkSsZyT0rFjD+JDtt95rOX
-   CC1k/5deeKVNIkzdbqKEF4SxiddYHYAYVEaN1tbhVFRqH1mMQO+lirDR6
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10687"; a="348038530"
-X-IronPort-AV: E=Sophos;i="5.99,216,1677571200"; 
-   d="scan'208";a="348038530"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Apr 2023 21:51:33 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10687"; a="669916335"
-X-IronPort-AV: E=Sophos;i="5.99,216,1677571200"; 
-   d="scan'208";a="669916335"
-Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
-  by orsmga006.jf.intel.com with ESMTP; 21 Apr 2023 21:51:33 -0700
-Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.23; Fri, 21 Apr 2023 21:51:32 -0700
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.23; Fri, 21 Apr 2023 21:51:32 -0700
-Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.23 via Frontend Transport; Fri, 21 Apr 2023 21:51:32 -0700
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.47) by
- edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.23; Fri, 21 Apr 2023 21:51:32 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ajFiHzgFw3vmvxMrd3gQYZVOwggu2zWgnus5OUJgrbudbd5hycTu6oiZ7kaSpXfPSz32siEh34gnxzUspTFosK7TblcN2Rg+EG9PwsPG5px23QKpNy3iQm4RVtH+h0dL1qMVNHAYm1CoZdAUlhh1cIbSbl/Mj7/YDTkVjbaOLRvRofxxx4jFGpKLa4ndfIKNa5LVV8EFi6hBfg5rae6YZRVmMHf0BhdMX9uN0jwxp1/ewe6vWpRXatq/MN8ABq+/+/BfBiQR9vV8IqtOnh0ZMajfgoUfJ1+r+p2uJzXPllqwoywxQJSWYLXieaOXbrYqXI2V8WixTkuigFn/0/VErg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=3gvDLhgbp6LG5gNyhJS4FrqCnqBuQt47Afo7CDhaiEU=;
- b=XMAtLE08dqr8DJejlL2j7XgZzAXrns5ixX8HkDwyDNN9ZB/yGRP3IhGyevhSzJhmrt0+CfPpD5pwcrmnbcR0S0R06yYmgT8nTG0gnt71WLvwlYnByY1R+qmE/7rX8N70ZL9NsdG9efyWsrejre77rWi+10uwQhkitWfiYq0Y3GQ8WXNzSpXSIGfzolFmDwg2uW1kFmvbtsIozJQgnJOkO+BVcIkNMiQcbTDVy4yHZK6HP3ftgwQwWOQvzsWEY1s6uZ1MMljpRQrrpPvMdfp0BxWPmID8cIxC2r1PlRJhm5d3UR3Grx+C0QhXFq/ihXKxmi/UWjrNk+WP9WRlGT3PtQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from PH8PR11MB6780.namprd11.prod.outlook.com (2603:10b6:510:1cb::11)
- by DS0PR11MB8206.namprd11.prod.outlook.com (2603:10b6:8:166::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6319.20; Sat, 22 Apr
- 2023 04:51:25 +0000
-Received: from PH8PR11MB6780.namprd11.prod.outlook.com
- ([fe80::b4cb:1f70:7e2a:c4f5]) by PH8PR11MB6780.namprd11.prod.outlook.com
- ([fe80::b4cb:1f70:7e2a:c4f5%9]) with mapi id 15.20.6319.029; Sat, 22 Apr 2023
- 04:51:25 +0000
-Date:   Sat, 22 Apr 2023 12:51:14 +0800
-From:   Chao Gao <chao.gao@intel.com>
-To:     "Huang, Kai" <kai.huang@intel.com>
-CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "Christopherson,, Sean" <seanjc@google.com>,
-        "binbin.wu@linux.intel.com" <binbin.wu@linux.intel.com>,
-        "Guo, Xuelian" <xuelian.guo@intel.com>,
-        "robert.hu@linux.intel.com" <robert.hu@linux.intel.com>
-Subject: Re: [PATCH v7 2/5] KVM: x86: Virtualize CR3.LAM_{U48,U57}
-Message-ID: <ZENnwtBzRVz14eS+@chao-email>
-References: <20230404130923.27749-1-binbin.wu@linux.intel.com>
- <20230404130923.27749-3-binbin.wu@linux.intel.com>
- <9c99eceaddccbcd72c5108f72609d0f995a0606c.camel@intel.com>
- <497514ed-db46-16b9-ca66-04985a687f2b@linux.intel.com>
- <7b296e6686bba77f81d1d8c9eaceb84bd0ef0338.camel@intel.com>
- <cc265df1-d4fc-0eb7-f6e8-494e98ece2d9@linux.intel.com>
- <BL1PR11MB5978D1FA3B572A119F5EF3A9F7989@BL1PR11MB5978.namprd11.prod.outlook.com>
- <5e229834-3e55-a580-d9f6-a5ffe971c567@linux.intel.com>
- <7895c517a84300f903cb04fbf2f05c4b8e518c91.camel@intel.com>
- <ZEKsgceQo6MEWbB5@chao-email>
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <ZEKsgceQo6MEWbB5@chao-email>
-X-ClientProxiedBy: SG2PR04CA0161.apcprd04.prod.outlook.com (2603:1096:4::23)
- To PH8PR11MB6780.namprd11.prod.outlook.com (2603:10b6:510:1cb::11)
+        with ESMTP id S229451AbjDVH1j (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 22 Apr 2023 03:27:39 -0400
+Received: from mail-ej1-x634.google.com (mail-ej1-x634.google.com [IPv6:2a00:1450:4864:20::634])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7F8A1BC3
+        for <kvm@vger.kernel.org>; Sat, 22 Apr 2023 00:27:37 -0700 (PDT)
+Received: by mail-ej1-x634.google.com with SMTP id a640c23a62f3a-94f7a7a3351so429793466b.2
+        for <kvm@vger.kernel.org>; Sat, 22 Apr 2023 00:27:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=brainfault-org.20221208.gappssmtp.com; s=20221208; t=1682148456; x=1684740456;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=AhkFmfxnytE5muWdXVkGlZ2Sbu4thV49OIL2hGsAGJ4=;
+        b=v/jUOM468Q3Udb2zDHspkAZ0P75nb8w6TpDFxGk4rhImYmvSHJDBcxuyZcS3+ESER/
+         THWgYBsYV0m1uuJmRjKPdF4G/wMZerD6J93QRiQ6R/Gveav2d2tLV40BYUvc/bIaPbVR
+         VswSJpUlN5dOhoYVWK2QWid8uSgXxENQdAiyVIpCP2wYJRHqQQXk9JthJLhwMr9fmoHO
+         91YXeS5yXkoNgQzg8drLIOaqMG6Uk6pNKOGerO83T5yek8vop1CQAed6zX1NUApHY1ZI
+         vn1OQh0WsElscVIQp7P87mCVunSc8mwwLSIYu8lzS3K2/Z6hmgcIA/HQf9FXDS0ypoyP
+         /Nag==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1682148456; x=1684740456;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=AhkFmfxnytE5muWdXVkGlZ2Sbu4thV49OIL2hGsAGJ4=;
+        b=LIztJlfTS4vyntx2bvQLq0cQkvfBxyAvv8P2xEhBZ8PQNMYVE93CgwIziNu5qsqTTB
+         /JbrdFUdPWF7LEU09rmrUhvZwJfC7LdZma1jT5QqEqHuXW1hNTkyRCqxlNcWPaNwvQvW
+         7yhyLqeDZ4R2QyYx4nDEOPGe8eOy7uzuOYhQPJgiSksHryeayW5b4uNkQ7dkIITVqwdW
+         m2mwIjvDq/IDQ4VPy5a/17hO0iQz2739815vSwADtf2FS3xgo9WmhzuuIwN6blT3RP24
+         9cEUyAs7Nkknn1l121JOTLd8GvMAnWjaZy0YmFLPIg7qLk7nmTXOE6pFBWW/raYZFreh
+         RlFQ==
+X-Gm-Message-State: AAQBX9fNkIFNxY1/tthgDGV0yId30264/NrDZLmGVKia18t4o6oBGmlo
+        0M9rgNWvkf+KEO3j8oA3+7d44si/RWxD4YtOZ6CTWMsMnj5p5w9vU1w=
+X-Google-Smtp-Source: AKy350bZDJGQjnrdUmB/xDz0wvEUG3fcoWed32w28NI+3771o1OkNFOccJYt49HOVd/UyLUsrwYnNBEDGF4iQOVihKo=
+X-Received: by 2002:a17:906:269b:b0:94e:4fe5:613a with SMTP id
+ t27-20020a170906269b00b0094e4fe5613amr4776175ejc.25.1682148456024; Sat, 22
+ Apr 2023 00:27:36 -0700 (PDT)
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH8PR11MB6780:EE_|DS0PR11MB8206:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6abe5e60-bef1-44ca-4122-08db42ed39d7
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: OAO28j9KQ87nCUcmL9l7hev+Qwt0xmJ9Ox705JSzVxY8n76EgrbI3mQDrIvUtwlwEek0rL+ehcFFS5niPLoQYyDPH8mlFEmsl+03w9YmEglZNH6xxG/QufQAIx13AFKHyEFLr8ADdHAHXbcIkQY3XOIItEMixuETt4lVCvZL3JneuiP3XkKKR86lMsnkCgvFzsi1og8HRA4sCBsNsdR52Ywnp6JI+TYxPL7pcf/BpWBWybXNWQ5EfpDD9F+TAObUK3xnnvW1sg0zAvrYx8k3yXveuif9NI1s/O9NWdIvHwJFhvwm61dRBjppCvI2qshJ4ZoP2l90irn9w4xvlmHxH77KUFvlvKHOGVH2Wim3UWg49g3iHYNkZrvGrJEC8NEKX0LRWAAeIDHk2sQy0OW72jQDQW38Hb/3H7IxdMNND3FwnP5upmenyKssInswQutWQKSLy7ucLcdhRLJjXHI/0detUIdjGWK4HlfnlI/l6guiScp98o0RolNUlN8bPj+3bRYw2g2qKkLS96dsnB005+evAaOOV9dypyQM3KjdxtoE7Q//Z6091/rqLHLgO5Ya
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH8PR11MB6780.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(7916004)(39860400002)(346002)(366004)(376002)(396003)(136003)(451199021)(54906003)(316002)(66556008)(66476007)(66946007)(6636002)(4326008)(186003)(6506007)(6512007)(83380400001)(38100700002)(26005)(9686003)(41300700001)(8676002)(6666004)(6862004)(33716001)(8936002)(5660300002)(6486002)(478600001)(2906002)(86362001)(4744005)(82960400001)(44832011);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?iso-8859-1?Q?xg3Rl5pcxZqn2eWj+WUgOGE1f+f5iJq63KgphX3cWiUcR+YATnDNxnefzU?=
- =?iso-8859-1?Q?u2UaSvt2LL7Y2awvfx59nSgZZyjTHPMwctcj5vaTX0aGOIwdeHB0LnUpzc?=
- =?iso-8859-1?Q?duxsBlXNakp0WmI5eE2uXtjOagVA+tS/HVCg/lJJngv0b8j3kGrykKPtyu?=
- =?iso-8859-1?Q?f8Fi65fTyP/z+SctnZpXHxC8wkMSgQu/jiwPPTKiMvyMMDzcCro85VVt1T?=
- =?iso-8859-1?Q?2lKHD23zFgiDE0o00IcF7GnN/NNlT0RTZyjKiJYF8A2DSswBDgLxeIs4lE?=
- =?iso-8859-1?Q?TpPsSWTg4a3Ao0rParwKs3c/Nd6tU60/peQklHNHvfCb+6kuw5zqiUZzX3?=
- =?iso-8859-1?Q?vJPT9jMOFrdVMijxpW7magkrf/MSWwP2uMXha4adqaKkvLQu8LwxlN+TuV?=
- =?iso-8859-1?Q?zrtVST99ioGIhyiPSEgqYVRg4CNwvuJWnm5Rdwrezp9bXaysQIKd/9vkZ+?=
- =?iso-8859-1?Q?3KvzD4oMz0lbRoaifloNj8BwstoG6SxNuMPRQIYcA7zeJB2bf75iH2La/I?=
- =?iso-8859-1?Q?m861npA5/iR2tcUeNiHjGBOiT3ZfuiRHal0RfUOG0wKecDVA+XYgCo+POA?=
- =?iso-8859-1?Q?5NXr2Zp3M5fkDgXBBXzxMQ6pPtHh9Tj2Qktye1+f1yhrxA61jVUyT/CDWh?=
- =?iso-8859-1?Q?YcZknZ6fnQMiH7RVSct08053Ho3x2x1/68Wkhr9MZ5YNhpDHK+mMkRVVjA?=
- =?iso-8859-1?Q?35eplYcAxjrpXdqyoXmJOjvNmKP6KJDbj8NOQT/GIGS95JhxuMi6S+VIRX?=
- =?iso-8859-1?Q?OM2TKINSPQtzcAxR3jwpSvB2ZW4YOXgHQ5VwlVtpwsyxhiniEN9owW6KWs?=
- =?iso-8859-1?Q?wncJj8QEefR5VdXZ8Ja6vBoc0A52NpGnGpZb7I6UAO1MtBJDrx3pDRGwMY?=
- =?iso-8859-1?Q?CJmbF5puW3zI5NWIZu/oIz6OYA6oF29mrXEeCZX4o28zdCuvT6YTDUvgLN?=
- =?iso-8859-1?Q?DRGjnzTFvWEM7NQMES44yaeOHSoFLppq/ggTJdj87t7EU9x0+Cptzo/AIP?=
- =?iso-8859-1?Q?MXdNIWfAJc3FtH08oQuHrbsQN2VRQDG1IkUniSlmXj0zA+EDI6c34R/Gzv?=
- =?iso-8859-1?Q?rORnS27SIHebUMeJzdHVZ6jLQb1yImVjClHobZm2jf/u5Vs5l5LUg/tm2v?=
- =?iso-8859-1?Q?PZuNriRNi5eOhMMB1fO9NQhjG+C9Vtd4MOHYs+O+4wrLHbZtGg60pCwIjY?=
- =?iso-8859-1?Q?PhkISbvLVjkWz1mNI70Vxyoib+xFADOqJFNeA6IGH3PRVi9rjzHTn14Zgk?=
- =?iso-8859-1?Q?EeceTIuV2sIhs5SWFIr8jhJjaRxjBAh5d/CF7urPYfOOR1/tu9HxVl45Vf?=
- =?iso-8859-1?Q?okI2ASRYdj+IDPe4hGrZC8t1eKAEXxSVb3ztthXrdXOJ3OA94l0kNGmVqY?=
- =?iso-8859-1?Q?v9mSRE2K9FiJQVb/iH78UgX6Cv2pCaO+LG16TNdxVWdbxQr3TrZ27z+Z61?=
- =?iso-8859-1?Q?Vt32ZSkfVr9rA57w1n1sJLo9MNalETQ+ljI3YRmwqKkH1+DUtJ5yw5eAyG?=
- =?iso-8859-1?Q?suJpNbvZfX4bZDrOueoL/RtRR2drkuqQf8E2UUf2yqqHLBH0ici4eWk705?=
- =?iso-8859-1?Q?hg/FrszFCS72FL3Xs1gXBjJifbmVg+dd2WXWF84U+ZTjEhxx4Vmimd+tZR?=
- =?iso-8859-1?Q?1KGf/LTDIwgAruYWJUfAym+6yLXrKz48JO?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6abe5e60-bef1-44ca-4122-08db42ed39d7
-X-MS-Exchange-CrossTenant-AuthSource: PH8PR11MB6780.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Apr 2023 04:51:25.0558
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: AGNIbSelA6SUGzqd2HYrBmcfYwgVy2ZqHaPI0Ps/r3XFi1ZRKLGzc2FM9UvJusRJ2mYfoxSvF4wR+ln5A4F25w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB8206
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-        version=3.4.6
+References: <CAAhSdy2RLinG5Gx-sfOqrYDAT=xDa3WAk8r1jTu8ReO5Jo0LVA@mail.gmail.com>
+ <CABgObfbPB2NYwDLHnQSW0gtw0AX96KbeNOQsszw0NqytObyfaQ@mail.gmail.com>
+In-Reply-To: <CABgObfbPB2NYwDLHnQSW0gtw0AX96KbeNOQsszw0NqytObyfaQ@mail.gmail.com>
+From:   Anup Patel <anup@brainfault.org>
+Date:   Sat, 22 Apr 2023 12:57:23 +0530
+Message-ID: <CAAhSdy2ywoeXG9At+9FoHmjmUM-Zjuz5L1a23fo00UxkQH_RLQ@mail.gmail.com>
+Subject: Re: [GIT PULL] KVM/riscv changes for 6.4
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Palmer Dabbelt <palmer@dabbelt.com>,
+        Palmer Dabbelt <palmer@rivosinc.com>,
+        Atish Patra <atishp@atishpatra.org>,
+        Atish Patra <atishp@rivosinc.com>,
+        Andrew Jones <ajones@ventanamicro.com>,
+        KVM General <kvm@vger.kernel.org>,
+        "open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" 
+        <kvm-riscv@lists.infradead.org>,
+        linux-riscv <linux-riscv@lists.infradead.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Apr 21, 2023 at 11:32:17PM +0800, Chao Gao wrote:
->>For case 2) I _think_ we need new code to check both VMCS12's HOST_CR3 and
->>GUEST_CR3 against active control bits.  The key code path is 
->
->...
->
->>
->>	nested_vmx_run() -> 
->>		-> nested_vmx_check_host_state()
->>		-> nested_vmx_enter_non_root_mode()
->>			-> prepare_vmcs02_early()
->>			-> prepare_vmcs02()
->>
->>Since nested_vmx_load_cr3() is used in both VMENTER using VMCS12's HOST_CR3
->>(VMEXIT to L1) and GUEST_CR3 (VMENTER to L2), and it currently already checks
->>kvm_vcpu_is_illegal_gpa(vcpu, cr3), changing it to additionally check guest CR3
->>active control bits seems just enough.
->
->IMO, current KVM relies on hardware to do consistency check on the GUEST_CR3
->during VM entry.
+Hi Paolo,
 
-Please disregard my remark on the consistency check on GUEST_CR3. I just took
-a closer look at the code. It is indeed done by KVM in nested_vmx_load_cr3().
-Sorry for the noise.
+On Sat, Apr 22, 2023 at 5:09=E2=80=AFAM Paolo Bonzini <pbonzini@redhat.com>=
+ wrote:
+>
+> Hi Anup,
+>
+> while you did fix the bug that caused the mailing list date to
+> disappear, I noticed that these patches have been _applied_ (not just
+> rebased) earlier today, just a few hours before sending the pull
+> request.
+>
+> The pull request was sent around midnight, Indian time, while the
+> patches were applied around 5-6pm. I  recognized that this is not a
+> rebase because the commit dates are grouped according to the topicsL
+>
+> 17:38:40 +0530 KVM: RISC-V: Retry fault if vma_lookup() results become in=
+valid
+> 17:38:42 +0530 RISC-V: KVM: Alphabetize selects
+> 17:38:44 +0530 RISC-V: KVM: Add ONE_REG interface to enable/disable
+> SBI extensions
+> 17:38:46 +0530 RISC-V: KVM: Allow Zbb extension for Guest/VM
+>
+> 17:45:39 +0530 RISC-V: Add AIA related CSR defines
+> 17:45:42 +0530 RISC-V: Detect AIA CSRs from ISA string
+> 17:45:44 +0530 RISC-V: KVM: Drop the _MASK suffix from hgatp.VMID mask de=
+fines
+> 17:45:48 +0530 RISC-V: KVM: Initial skeletal support for AIA
+> 17:45:51 +0530 RISC-V: KVM: Implement subtype for CSR ONE_REG interface
+> 17:45:54 +0530 RISC-V: KVM: Add ONE_REG interface for AIA CSRs
+> 17:45:58 +0530 RISC-V: KVM: Use bitmap for irqs_pending and irqs_pending_=
+mask
+>
+> 18:10:27 2023 +0530 RISC-V: KVM: Virtualize per-HART AIA CSRs
+
+This was because I was waiting for ACK in one of the AIA patches
+which I received just a few days ago.
+
+>
+> What this means, is that there is no way that these patches have been
+> tested by anyone except you. Please try to push to the kvm-riscv/next
+> branch as soon as patches are ready, since that makes it easier to
+> spot conflicts between architectures.
+
+Sure, I will push to riscv_kvm_next branch as soon as patches are
+accepted or queued.
+
+>
+> In fact, since RISC-V is still pretty small, feel free to send me pull
+> requests even early in the development period, as soon as some patches
+> are ready.
+
+Sure, this sounds good to me.
+
+Regards,
+Anup
+
+>
+> Paolo
+>
+> On Fri, Apr 21, 2023 at 7:34=E2=80=AFPM Anup Patel <anup@brainfault.org> =
+wrote:
+> >
+> > Hi Paolo,
+> >
+> > We have the following KVM RISC-V changes for 6.4:
+> > 1) ONE_REG interface to enable/disable SBI extensions
+> > 2) Zbb extension for Guest/VM
+> > 3) AIA CSR virtualization
+> > 4) Few minor cleanups and fixes
+> >
+> > Please pull.
+> >
+> > Please note that the Zicboz series has been taken by
+> > Palmer through the RISC-V tree which results in few
+> > minor conflicts in the following files:
+> > arch/riscv/include/asm/hwcap.h
+> > arch/riscv/include/uapi/asm/kvm.h
+> > arch/riscv/kernel/cpu.c
+> > arch/riscv/kernel/cpufeature.c
+> > arch/riscv/kvm/vcpu.c
+> >
+> > I am not sure if a shared tag can make things easy
+> > for you or Palmer.
+> >
+> > Regards,
+> > Anup
+> >
+> > The following changes since commit 6a8f57ae2eb07ab39a6f0ccad60c76074305=
+1026:
+> >
+> >   Linux 6.3-rc7 (2023-04-16 15:23:53 -0700)
+> >
+> > are available in the Git repository at:
+> >
+> >   https://github.com/kvm-riscv/linux.git tags/kvm-riscv-6.4-1
+> >
+> > for you to fetch changes up to 2f4d58f7635aec014428e73ef6120c4d0377c430=
+:
+> >
+> >   RISC-V: KVM: Virtualize per-HART AIA CSRs (2023-04-21 18:10:27 +0530)
+> >
+> > ----------------------------------------------------------------
+> > KVM/riscv changes for 6.4
+> >
+> > - ONE_REG interface to enable/disable SBI extensions
+> > - Zbb extension for Guest/VM
+> > - AIA CSR virtualization
+> >
+> > ----------------------------------------------------------------
+> > Andrew Jones (1):
+> >       RISC-V: KVM: Alphabetize selects
+> >
+> > Anup Patel (10):
+> >       RISC-V: KVM: Add ONE_REG interface to enable/disable SBI extensio=
+ns
+> >       RISC-V: KVM: Allow Zbb extension for Guest/VM
+> >       RISC-V: Add AIA related CSR defines
+> >       RISC-V: Detect AIA CSRs from ISA string
+> >       RISC-V: KVM: Drop the _MASK suffix from hgatp.VMID mask defines
+> >       RISC-V: KVM: Initial skeletal support for AIA
+> >       RISC-V: KVM: Implement subtype for CSR ONE_REG interface
+> >       RISC-V: KVM: Add ONE_REG interface for AIA CSRs
+> >       RISC-V: KVM: Use bitmap for irqs_pending and irqs_pending_mask
+> >       RISC-V: KVM: Virtualize per-HART AIA CSRs
+> >
+> > David Matlack (1):
+> >       KVM: RISC-V: Retry fault if vma_lookup() results become invalid
+> >
+> >  arch/riscv/include/asm/csr.h          | 107 +++++++++-
+> >  arch/riscv/include/asm/hwcap.h        |   8 +
+> >  arch/riscv/include/asm/kvm_aia.h      | 127 +++++++++++
+> >  arch/riscv/include/asm/kvm_host.h     |  14 +-
+> >  arch/riscv/include/asm/kvm_vcpu_sbi.h |   8 +-
+> >  arch/riscv/include/uapi/asm/kvm.h     |  51 ++++-
+> >  arch/riscv/kernel/cpu.c               |   2 +
+> >  arch/riscv/kernel/cpufeature.c        |   2 +
+> >  arch/riscv/kvm/Kconfig                |  10 +-
+> >  arch/riscv/kvm/Makefile               |   1 +
+> >  arch/riscv/kvm/aia.c                  | 388 ++++++++++++++++++++++++++=
+++++++++
+> >  arch/riscv/kvm/main.c                 |  22 +-
+> >  arch/riscv/kvm/mmu.c                  |  28 ++-
+> >  arch/riscv/kvm/vcpu.c                 | 194 +++++++++++++----
+> >  arch/riscv/kvm/vcpu_insn.c            |   1 +
+> >  arch/riscv/kvm/vcpu_sbi.c             | 247 ++++++++++++++++++++--
+> >  arch/riscv/kvm/vcpu_sbi_base.c        |   2 +-
+> >  arch/riscv/kvm/vm.c                   |   4 +
+> >  arch/riscv/kvm/vmid.c                 |   4 +-
+> >  19 files changed, 1129 insertions(+), 91 deletions(-)
+> >  create mode 100644 arch/riscv/include/asm/kvm_aia.h
+> >  create mode 100644 arch/riscv/kvm/aia.c
+> >
+>
