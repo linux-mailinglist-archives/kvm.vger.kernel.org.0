@@ -2,68 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 523386EB7CA
-	for <lists+kvm@lfdr.de>; Sat, 22 Apr 2023 09:27:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4313C6EB7CB
+	for <lists+kvm@lfdr.de>; Sat, 22 Apr 2023 09:30:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229575AbjDVH1l (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 22 Apr 2023 03:27:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38244 "EHLO
+        id S229576AbjDVHan (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 22 Apr 2023 03:30:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38574 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229451AbjDVH1j (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 22 Apr 2023 03:27:39 -0400
-Received: from mail-ej1-x634.google.com (mail-ej1-x634.google.com [IPv6:2a00:1450:4864:20::634])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7F8A1BC3
-        for <kvm@vger.kernel.org>; Sat, 22 Apr 2023 00:27:37 -0700 (PDT)
-Received: by mail-ej1-x634.google.com with SMTP id a640c23a62f3a-94f7a7a3351so429793466b.2
-        for <kvm@vger.kernel.org>; Sat, 22 Apr 2023 00:27:37 -0700 (PDT)
+        with ESMTP id S229451AbjDVHam (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 22 Apr 2023 03:30:42 -0400
+Received: from mail-ej1-x62e.google.com (mail-ej1-x62e.google.com [IPv6:2a00:1450:4864:20::62e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE43E1BC6
+        for <kvm@vger.kernel.org>; Sat, 22 Apr 2023 00:30:40 -0700 (PDT)
+Received: by mail-ej1-x62e.google.com with SMTP id a640c23a62f3a-94f7a7a3351so430084766b.2
+        for <kvm@vger.kernel.org>; Sat, 22 Apr 2023 00:30:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20221208.gappssmtp.com; s=20221208; t=1682148456; x=1684740456;
+        d=brainfault-org.20221208.gappssmtp.com; s=20221208; t=1682148639; x=1684740639;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=AhkFmfxnytE5muWdXVkGlZ2Sbu4thV49OIL2hGsAGJ4=;
-        b=v/jUOM468Q3Udb2zDHspkAZ0P75nb8w6TpDFxGk4rhImYmvSHJDBcxuyZcS3+ESER/
-         THWgYBsYV0m1uuJmRjKPdF4G/wMZerD6J93QRiQ6R/Gveav2d2tLV40BYUvc/bIaPbVR
-         VswSJpUlN5dOhoYVWK2QWid8uSgXxENQdAiyVIpCP2wYJRHqQQXk9JthJLhwMr9fmoHO
-         91YXeS5yXkoNgQzg8drLIOaqMG6Uk6pNKOGerO83T5yek8vop1CQAed6zX1NUApHY1ZI
-         vn1OQh0WsElscVIQp7P87mCVunSc8mwwLSIYu8lzS3K2/Z6hmgcIA/HQf9FXDS0ypoyP
-         /Nag==
+        bh=Bnbhem9cFhqB68iCoIpDzvQnT3W5aSkuuvVIymFb3Ww=;
+        b=L8oPZJAc2pg6voMstV+pRjkJXH9m+UOMujNQ8PeoGo3cN/C0tV0sHIv1mPeOCJggZg
+         8tqDdycmQkmRiisSOHkusO1Yp7zhM4rHN/VWkN9wT4o5qsFQBYvAFB3lAtZQAE8jnKxk
+         CNt7em/G2wIfu3fe81oziM3yIoNm/JwiGbr1NW8PvQrmmqwJoitIGlQUHumvOLOyGTNr
+         zFQ/0g5/e7LMfiVS7W3DHi6QgzZaOG+zaS1GcFONxjxvMO/kX5YxrdOT3GXCEmPbM8yv
+         uhbUaTyomhzn2SLhahl1XxLnzwZY77y+BAUzXrdRnu+IlmjXm/JtHnNc8FXhAIv2q3WL
+         Zw6A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682148456; x=1684740456;
+        d=1e100.net; s=20221208; t=1682148639; x=1684740639;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=AhkFmfxnytE5muWdXVkGlZ2Sbu4thV49OIL2hGsAGJ4=;
-        b=LIztJlfTS4vyntx2bvQLq0cQkvfBxyAvv8P2xEhBZ8PQNMYVE93CgwIziNu5qsqTTB
-         /JbrdFUdPWF7LEU09rmrUhvZwJfC7LdZma1jT5QqEqHuXW1hNTkyRCqxlNcWPaNwvQvW
-         7yhyLqeDZ4R2QyYx4nDEOPGe8eOy7uzuOYhQPJgiSksHryeayW5b4uNkQ7dkIITVqwdW
-         m2mwIjvDq/IDQ4VPy5a/17hO0iQz2739815vSwADtf2FS3xgo9WmhzuuIwN6blT3RP24
-         9cEUyAs7Nkknn1l121JOTLd8GvMAnWjaZy0YmFLPIg7qLk7nmTXOE6pFBWW/raYZFreh
-         RlFQ==
-X-Gm-Message-State: AAQBX9fNkIFNxY1/tthgDGV0yId30264/NrDZLmGVKia18t4o6oBGmlo
-        0M9rgNWvkf+KEO3j8oA3+7d44si/RWxD4YtOZ6CTWMsMnj5p5w9vU1w=
-X-Google-Smtp-Source: AKy350bZDJGQjnrdUmB/xDz0wvEUG3fcoWed32w28NI+3771o1OkNFOccJYt49HOVd/UyLUsrwYnNBEDGF4iQOVihKo=
-X-Received: by 2002:a17:906:269b:b0:94e:4fe5:613a with SMTP id
- t27-20020a170906269b00b0094e4fe5613amr4776175ejc.25.1682148456024; Sat, 22
- Apr 2023 00:27:36 -0700 (PDT)
+        bh=Bnbhem9cFhqB68iCoIpDzvQnT3W5aSkuuvVIymFb3Ww=;
+        b=l4M95oSKhbWCXdebqiOdiryZOKrxobYJq3OXOw8pKjDbavYE498nRDLr22ld3kU1Sd
+         2VPyY7ijamR6qYSSLd341TPrfaTvtG/vNUbgQO83ItkPjqZVvtnqnSgXQpIlTYVRr0+Q
+         ev6UjTbjWxwnv0supROYWhzQkD3UEcVxuhXY3em5WEUmbXU7c0c2TmoGnvcB/x1QcJar
+         4n6jVfWhx6wgxV1mJxUuWfdzLXjf43zdqOsUSK3PK30rDXS2tIEX5gFekb0gvOcOSLh6
+         FHweRneYYFsyhN/SV/1vxqDeluVETuRnc6Xyod3mNIE5/m+8VZEW6rons5QiykJN9U8U
+         Rntg==
+X-Gm-Message-State: AAQBX9e10QfRtQKDhX5RZCyQfcxAglCvXSu0QCzuVj4HYsbSGibv1+2S
+        ytjeJenYrP80CjTC/OHG19GNFjeOZOeW8R4BMBTrLg==
+X-Google-Smtp-Source: AKy350aiBujT8SMlUPPdZnbPxz+23d43fdy0gzPnmTSoIvo6NHSrKV0ahRpMlR1Mrj5H/aOWd6JK7y76hId53LPxRqg=
+X-Received: by 2002:a17:906:ce37:b0:94e:d97e:7a5d with SMTP id
+ sd23-20020a170906ce3700b0094ed97e7a5dmr4158790ejb.47.1682148639153; Sat, 22
+ Apr 2023 00:30:39 -0700 (PDT)
 MIME-Version: 1.0
-References: <CAAhSdy2RLinG5Gx-sfOqrYDAT=xDa3WAk8r1jTu8ReO5Jo0LVA@mail.gmail.com>
- <CABgObfbPB2NYwDLHnQSW0gtw0AX96KbeNOQsszw0NqytObyfaQ@mail.gmail.com>
-In-Reply-To: <CABgObfbPB2NYwDLHnQSW0gtw0AX96KbeNOQsszw0NqytObyfaQ@mail.gmail.com>
+References: <ZELftWeNUF1Dqs3f@linux.dev> <100c4e47-9d8d-8b3a-b70b-c0498febf23c@redhat.com>
+In-Reply-To: <100c4e47-9d8d-8b3a-b70b-c0498febf23c@redhat.com>
 From:   Anup Patel <anup@brainfault.org>
-Date:   Sat, 22 Apr 2023 12:57:23 +0530
-Message-ID: <CAAhSdy2ywoeXG9At+9FoHmjmUM-Zjuz5L1a23fo00UxkQH_RLQ@mail.gmail.com>
-Subject: Re: [GIT PULL] KVM/riscv changes for 6.4
+Date:   Sat, 22 Apr 2023 13:00:27 +0530
+Message-ID: <CAAhSdy0JNtkhCGmXQpnf8Qp2Jus7tk_sJGpbq2xj5AeC+jQppw@mail.gmail.com>
+Subject: Re: Getting the kvm-riscv tree in next
 To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Palmer Dabbelt <palmer@dabbelt.com>,
-        Palmer Dabbelt <palmer@rivosinc.com>,
-        Atish Patra <atishp@atishpatra.org>,
-        Atish Patra <atishp@rivosinc.com>,
-        Andrew Jones <ajones@ventanamicro.com>,
-        KVM General <kvm@vger.kernel.org>,
-        "open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" 
-        <kvm-riscv@lists.infradead.org>,
-        linux-riscv <linux-riscv@lists.infradead.org>
+Cc:     Oliver Upton <oliver.upton@linux.dev>,
+        Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
@@ -75,157 +67,27 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Paolo,
-
-On Sat, Apr 22, 2023 at 5:09=E2=80=AFAM Paolo Bonzini <pbonzini@redhat.com>=
+On Sat, Apr 22, 2023 at 5:18=E2=80=AFAM Paolo Bonzini <pbonzini@redhat.com>=
  wrote:
 >
-> Hi Anup,
+> On 4/21/23 21:10, Oliver Upton wrote:
+> > I've also noticed that for the past few kernel release cycles you've
+> > used an extremely late rc (i.e. -rc7 or -rc8), which I fear only
+> > draws more scrutiny.
 >
-> while you did fix the bug that caused the mailing list date to
-> disappear, I noticed that these patches have been _applied_ (not just
-> rebased) earlier today, just a few hours before sending the pull
-> request.
->
-> The pull request was sent around midnight, Indian time, while the
-> patches were applied around 5-6pm. I  recognized that this is not a
-> rebase because the commit dates are grouped according to the topicsL
->
-> 17:38:40 +0530 KVM: RISC-V: Retry fault if vma_lookup() results become in=
-valid
-> 17:38:42 +0530 RISC-V: KVM: Alphabetize selects
-> 17:38:44 +0530 RISC-V: KVM: Add ONE_REG interface to enable/disable
-> SBI extensions
-> 17:38:46 +0530 RISC-V: KVM: Allow Zbb extension for Guest/VM
->
-> 17:45:39 +0530 RISC-V: Add AIA related CSR defines
-> 17:45:42 +0530 RISC-V: Detect AIA CSRs from ISA string
-> 17:45:44 +0530 RISC-V: KVM: Drop the _MASK suffix from hgatp.VMID mask de=
-fines
-> 17:45:48 +0530 RISC-V: KVM: Initial skeletal support for AIA
-> 17:45:51 +0530 RISC-V: KVM: Implement subtype for CSR ONE_REG interface
-> 17:45:54 +0530 RISC-V: KVM: Add ONE_REG interface for AIA CSRs
-> 17:45:58 +0530 RISC-V: KVM: Use bitmap for irqs_pending and irqs_pending_=
-mask
->
-> 18:10:27 2023 +0530 RISC-V: KVM: Virtualize per-HART AIA CSRs
+> Heh, I just wrote the same thing to Anup.  In particular, having
+> kvm-riscv in next (either directly or by sending early pull requests to
+> me) would have helped me understand the conflicts between the core and
+> KVM trees for RISC-V, because Stephen Rothwell would have alerted me
+> about them.
 
-This was because I was waiting for ACK in one of the AIA patches
-which I received just a few days ago.
+I think it is better to have patches sit in linux-next for at least a week
+before sending pull requests. I will request Stephen to include KVM
+RISC-V tree in linux-next.
 
->
-> What this means, is that there is no way that these patches have been
-> tested by anyone except you. Please try to push to the kvm-riscv/next
-> branch as soon as patches are ready, since that makes it easier to
-> spot conflicts between architectures.
-
-Sure, I will push to riscv_kvm_next branch as soon as patches are
-accepted or queued.
-
->
-> In fact, since RISC-V is still pretty small, feel free to send me pull
-> requests even early in the development period, as soon as some patches
-> are ready.
-
-Sure, this sounds good to me.
-
-Regards,
+Thanks,
 Anup
 
 >
 > Paolo
->
-> On Fri, Apr 21, 2023 at 7:34=E2=80=AFPM Anup Patel <anup@brainfault.org> =
-wrote:
-> >
-> > Hi Paolo,
-> >
-> > We have the following KVM RISC-V changes for 6.4:
-> > 1) ONE_REG interface to enable/disable SBI extensions
-> > 2) Zbb extension for Guest/VM
-> > 3) AIA CSR virtualization
-> > 4) Few minor cleanups and fixes
-> >
-> > Please pull.
-> >
-> > Please note that the Zicboz series has been taken by
-> > Palmer through the RISC-V tree which results in few
-> > minor conflicts in the following files:
-> > arch/riscv/include/asm/hwcap.h
-> > arch/riscv/include/uapi/asm/kvm.h
-> > arch/riscv/kernel/cpu.c
-> > arch/riscv/kernel/cpufeature.c
-> > arch/riscv/kvm/vcpu.c
-> >
-> > I am not sure if a shared tag can make things easy
-> > for you or Palmer.
-> >
-> > Regards,
-> > Anup
-> >
-> > The following changes since commit 6a8f57ae2eb07ab39a6f0ccad60c76074305=
-1026:
-> >
-> >   Linux 6.3-rc7 (2023-04-16 15:23:53 -0700)
-> >
-> > are available in the Git repository at:
-> >
-> >   https://github.com/kvm-riscv/linux.git tags/kvm-riscv-6.4-1
-> >
-> > for you to fetch changes up to 2f4d58f7635aec014428e73ef6120c4d0377c430=
-:
-> >
-> >   RISC-V: KVM: Virtualize per-HART AIA CSRs (2023-04-21 18:10:27 +0530)
-> >
-> > ----------------------------------------------------------------
-> > KVM/riscv changes for 6.4
-> >
-> > - ONE_REG interface to enable/disable SBI extensions
-> > - Zbb extension for Guest/VM
-> > - AIA CSR virtualization
-> >
-> > ----------------------------------------------------------------
-> > Andrew Jones (1):
-> >       RISC-V: KVM: Alphabetize selects
-> >
-> > Anup Patel (10):
-> >       RISC-V: KVM: Add ONE_REG interface to enable/disable SBI extensio=
-ns
-> >       RISC-V: KVM: Allow Zbb extension for Guest/VM
-> >       RISC-V: Add AIA related CSR defines
-> >       RISC-V: Detect AIA CSRs from ISA string
-> >       RISC-V: KVM: Drop the _MASK suffix from hgatp.VMID mask defines
-> >       RISC-V: KVM: Initial skeletal support for AIA
-> >       RISC-V: KVM: Implement subtype for CSR ONE_REG interface
-> >       RISC-V: KVM: Add ONE_REG interface for AIA CSRs
-> >       RISC-V: KVM: Use bitmap for irqs_pending and irqs_pending_mask
-> >       RISC-V: KVM: Virtualize per-HART AIA CSRs
-> >
-> > David Matlack (1):
-> >       KVM: RISC-V: Retry fault if vma_lookup() results become invalid
-> >
-> >  arch/riscv/include/asm/csr.h          | 107 +++++++++-
-> >  arch/riscv/include/asm/hwcap.h        |   8 +
-> >  arch/riscv/include/asm/kvm_aia.h      | 127 +++++++++++
-> >  arch/riscv/include/asm/kvm_host.h     |  14 +-
-> >  arch/riscv/include/asm/kvm_vcpu_sbi.h |   8 +-
-> >  arch/riscv/include/uapi/asm/kvm.h     |  51 ++++-
-> >  arch/riscv/kernel/cpu.c               |   2 +
-> >  arch/riscv/kernel/cpufeature.c        |   2 +
-> >  arch/riscv/kvm/Kconfig                |  10 +-
-> >  arch/riscv/kvm/Makefile               |   1 +
-> >  arch/riscv/kvm/aia.c                  | 388 ++++++++++++++++++++++++++=
-++++++++
-> >  arch/riscv/kvm/main.c                 |  22 +-
-> >  arch/riscv/kvm/mmu.c                  |  28 ++-
-> >  arch/riscv/kvm/vcpu.c                 | 194 +++++++++++++----
-> >  arch/riscv/kvm/vcpu_insn.c            |   1 +
-> >  arch/riscv/kvm/vcpu_sbi.c             | 247 ++++++++++++++++++++--
-> >  arch/riscv/kvm/vcpu_sbi_base.c        |   2 +-
-> >  arch/riscv/kvm/vm.c                   |   4 +
-> >  arch/riscv/kvm/vmid.c                 |   4 +-
-> >  19 files changed, 1129 insertions(+), 91 deletions(-)
-> >  create mode 100644 arch/riscv/include/asm/kvm_aia.h
-> >  create mode 100644 arch/riscv/kvm/aia.c
-> >
 >
