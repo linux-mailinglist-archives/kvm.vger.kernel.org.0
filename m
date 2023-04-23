@@ -2,128 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 42B616EBB2D
-	for <lists+kvm@lfdr.de>; Sat, 22 Apr 2023 22:38:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A9C056EBC54
+	for <lists+kvm@lfdr.de>; Sun, 23 Apr 2023 03:42:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229716AbjDVUiE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 22 Apr 2023 16:38:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44336 "EHLO
+        id S230126AbjDWBmY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 22 Apr 2023 21:42:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38624 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229509AbjDVUiC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 22 Apr 2023 16:38:02 -0400
-Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F6292128
-        for <kvm@vger.kernel.org>; Sat, 22 Apr 2023 13:38:01 -0700 (PDT)
-Received: by mail-pl1-x62c.google.com with SMTP id d9443c01a7336-1a950b982d4so142015ad.0
-        for <kvm@vger.kernel.org>; Sat, 22 Apr 2023 13:38:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1682195880; x=1684787880;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=BMpyicsnV64UZ0JHKcTDU3PMlR+2xg6SffWwdhUOnrE=;
-        b=SMwl4QKO43Bho+gaOVe9PpkGvlnggq8Qn2IDZYIACTHJcSgrdvaqHz7PROmcBul3YC
-         ZD7mz+izb7ZHNSNyq/Je4fT2Hbb720aRd4f/bIZDDEhVOEc8Vu0OfVLW7z+BP7L8jw6s
-         E7ZOnee5IP+e21M2HxOF9svVJ6OiQSPc9X3rXzUKIyAL3GgaAlPTfl0rcWK9XWmKlMFw
-         NiSQPvEkbLxkyuZedN04hPlCAa2gb6seCCzLybuuGv2KhlNGGVD+sNCh9tZcF90F1omh
-         LC4K0DyZs/zKpRGHHoSPx4R2WehxrwblvvgmFR2fwrJKF6YFBXmS/CJ8uHh0X7dGkbeh
-         J4ng==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682195880; x=1684787880;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=BMpyicsnV64UZ0JHKcTDU3PMlR+2xg6SffWwdhUOnrE=;
-        b=iXDWUvAttiR9Uf283N+9hSqA6gKFKiAX7XbWLPzOrMnMUZHe2IwUuGxbCO0GdA88NC
-         QNQSBcEDm6RlbTwTTclLQj3rqrpw8nrBX8No4sxABFJ2jc+WoKXcr5ltdoU5fbUFRvMD
-         lVezgsMgR5H0V8XruF1zzwHMUF3sgZmQRkNYhZ1VROIfMQRiDcz9JVBDRvBdqcq3teBd
-         PFdkZ936z5/5waZPXh5+njh+cyzXNIL5glPOZPei48j2OJBl6qQJtHMLp6NDjOcko9H8
-         78+T3Inpx1Ho/1CdwI8H9O5qJI5OTAbIspdgJJMhYtH9zwHiiUC57ilLE+ORVpVVajNB
-         i7ZA==
-X-Gm-Message-State: AAQBX9fSmIWAcaVWvkohH1oB/eqE/sUqU+z/DSzsMvDMx3TnwwEFCJ6G
-        x99iz7nwBIgQOYtGBCw92muRBh5BrMZB5jnqCEgzRQ==
-X-Google-Smtp-Source: AKy350Zv82JB8pbXyRQM1aFbU+pPitTSNnATS+bUJAGbOHxLAstpvf7Lt002l4v9ScuqXyc8IYgNew==
-X-Received: by 2002:a17:903:6c8:b0:1a9:1ff6:1139 with SMTP id kj8-20020a17090306c800b001a91ff61139mr159785plb.19.1682195880544;
-        Sat, 22 Apr 2023 13:38:00 -0700 (PDT)
-Received: from google.com (220.181.82.34.bc.googleusercontent.com. [34.82.181.220])
-        by smtp.gmail.com with ESMTPSA id t207-20020a635fd8000000b00517f165d0a6sm4315657pgb.4.2023.04.22.13.37.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 22 Apr 2023 13:38:00 -0700 (PDT)
-Date:   Sat, 22 Apr 2023 13:37:57 -0700
-From:   Ricardo Koller <ricarkol@google.com>
-To:     Oliver Upton <oliver.upton@linux.dev>
-Cc:     Gavin Shan <gshan@redhat.com>, pbonzini@redhat.com, maz@kernel.org,
-        oupton@google.com, yuzenghui@huawei.com, dmatlack@google.com,
-        kvm@vger.kernel.org, kvmarm@lists.linux.dev, qperret@google.com,
-        catalin.marinas@arm.com, andrew.jones@linux.dev, seanjc@google.com,
-        alexandru.elisei@arm.com, suzuki.poulose@arm.com,
-        eric.auger@redhat.com, reijiw@google.com, rananta@google.com,
-        bgardon@google.com, ricarkol@gmail.com,
-        Shaoqin Huang <shahuang@redhat.com>
-Subject: Re: [PATCH v7 03/12] KVM: arm64: Add helper for creating unlinked
- stage2 subtrees
-Message-ID: <ZERFpWDUt3WkI5kp@google.com>
-References: <20230409063000.3559991-1-ricarkol@google.com>
- <20230409063000.3559991-5-ricarkol@google.com>
- <9cb621b0-7174-a7c7-1524-801b06f94e8f@redhat.com>
- <ZEQ+9kyXcQS+1i81@google.com>
- <ZEREQrqmZeLtgbPw@linux.dev>
+        with ESMTP id S229587AbjDWBmX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 22 Apr 2023 21:42:23 -0400
+Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2709A1713
+        for <kvm@vger.kernel.org>; Sat, 22 Apr 2023 18:42:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1682214142; x=1713750142;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=P6080je90lIovriavxQfpQRi4x/WMp/xCSI7yBxP4fQ=;
+  b=iOtb2dJ5Lwyg1reNjwB0f+bgZCdVtDRCvOQLGcurMxMmkAKzF/LmM6MO
+   pLIAsT/KpfByu/Ybg6AoR5Pot4A+YCTqcu84Axfr7UUsw5rpoUFJO1h4g
+   34VS0XmwBKErUQA/1xMOxqloHkw3l3F7xMcIl/8hIdLVNzSMFyD/8YpB4
+   gOtNbk/gv0ar/fLz8YXLUyLmpRR/JcW/kO+EZ1ApWwmNJSyG8l04K2Hk6
+   xFLdJ6oxILlwBPjsYw1uDxcszADDsI10dg0ztxtQMe3hQA0qz++CuxtKu
+   p0QfhslJm1U0+ZITs8ltQQAlOnAt12i4iA58OGYzK+Q8NZWwUD2ykPooo
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10688"; a="335109507"
+X-IronPort-AV: E=Sophos;i="5.99,219,1677571200"; 
+   d="scan'208";a="335109507"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Apr 2023 18:42:21 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10688"; a="816820036"
+X-IronPort-AV: E=Sophos;i="5.99,219,1677571200"; 
+   d="scan'208";a="816820036"
+Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.254.214.112]) ([10.254.214.112])
+  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Apr 2023 18:42:20 -0700
+Message-ID: <b8b94944-c69c-63a8-1cfd-2d267d2d9efe@linux.intel.com>
+Date:   Sun, 23 Apr 2023 09:42:17 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZEREQrqmZeLtgbPw@linux.dev>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,FSL_HELO_FAKE,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+Subject: Re: [kvm-unit-tests v3 1/4] x86: Allow setting of CR3 LAM bits if LAM
+ supported
+To:     Chao Gao <chao.gao@intel.com>
+Cc:     kvm@vger.kernel.org, seanjc@google.com, pbonzini@redhat.com,
+        robert.hu@linux.intel.com
+References: <20230412075134.21240-1-binbin.wu@linux.intel.com>
+ <20230412075134.21240-2-binbin.wu@linux.intel.com>
+ <ZEHuuAw39ZXopaqN@chao-email>
+From:   Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <ZEHuuAw39ZXopaqN@chao-email>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-6.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Apr 22, 2023 at 08:32:02PM +0000, Oliver Upton wrote:
-> On Sat, Apr 22, 2023 at 01:09:26PM -0700, Ricardo Koller wrote:
-> > On Mon, Apr 17, 2023 at 02:18:26PM +0800, Gavin Shan wrote:
-> > > > +	/* .addr (the IPA) is irrelevant for an unlinked table */
-> > > > +	struct kvm_pgtable_walk_data data = {
-> > > > +		.walker	= &walker,
-> > > > +		.addr	= 0,
-> > > > +		.end	= kvm_granule_size(level),
-> > > > +	};
-> > > 
-> > > The comment about '.addr' seems incorrect. The IPA address is still
-> > > used to locate the page table entry, so I think it would be something
-> > > like below:
-> > > 
-> > > 	/* The IPA address (.addr) is relative to zero */
-> > > 
-> > 
-> > Extended it to say this:
-> > 
-> >          * The IPA address (.addr) is relative to zero. The goal is to
-> >	   * map "kvm_granule_size(level) - 0" worth of pages.
-> 
-> I actually prefer the original wording, as Gavin's suggestion makes this
-> comment read as though the IPA of the walk bears some degree of
-> validity, which it does not.
-> 
-> The intent of the code is to create some *ambiguous* input address
-> range, so maybe:
-> 
-> 	/*
-> 	 * The input address (.addr) is irrelevant for walking an
-> 	 * unlinked table. Construct an ambiguous IA range to map
-> 	 * kvm_granule_size(level) worth of memory.
-> 	 */
-> 
 
-OK, this is the winner. Will go with this one in v8. Gavin, let me know
-if you are not OK with this.
+On 4/21/2023 10:02 AM, Chao Gao wrote:
+> On Wed, Apr 12, 2023 at 03:51:31PM +0800, Binbin Wu wrote:
+>> If LAM is supported, VM entry allows CR3.LAM_U48 (bit 62) and CR3.LAM_U57
+>> (bit 61) to be set in CR3 field.
+>>
+>> Change the test result expectations when setting CR3.LAM_U48 or CR3.LAM_U57
+>> on vmlaunch tests when LAM is supported.
+>>
+>> Signed-off-by: Binbin Wu <binbin.wu@linux.intel.com>
+>> Reviewed-by: Chao Gao <chao.gao@intel.com>
+>> ---
+>> lib/x86/processor.h | 3 +++
+>> x86/vmx_tests.c     | 6 +++++-
+>> 2 files changed, 8 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/lib/x86/processor.h b/lib/x86/processor.h
+>> index 3d58ef7..e00a32b 100644
+>> --- a/lib/x86/processor.h
+>> +++ b/lib/x86/processor.h
+>> @@ -55,6 +55,8 @@
+>> #define X86_CR0_PG		BIT(X86_CR0_PG_BIT)
+>>
+>> #define X86_CR3_PCID_MASK	GENMASK(11, 0)
+>> +#define X86_CR3_LAM_U57_BIT	(61)
+>> +#define X86_CR3_LAM_U48_BIT	(62)
+>>
+>> #define X86_CR4_VME_BIT		(0)
+>> #define X86_CR4_VME		BIT(X86_CR4_VME_BIT)
+>> @@ -248,6 +250,7 @@ static inline bool is_intel(void)
+>> #define	X86_FEATURE_SPEC_CTRL		(CPUID(0x7, 0, EDX, 26))
+>> #define	X86_FEATURE_ARCH_CAPABILITIES	(CPUID(0x7, 0, EDX, 29))
+>> #define	X86_FEATURE_PKS			(CPUID(0x7, 0, ECX, 31))
+>> +#define	X86_FEATURE_LAM			(CPUID(0x7, 1, EAX, 26))
+>>
+>> /*
+>>   * Extended Leafs, a.k.a. AMD defined
+>> diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
+>> index 7bba816..5ee1264 100644
+>> --- a/x86/vmx_tests.c
+>> +++ b/x86/vmx_tests.c
+>> @@ -7000,7 +7000,11 @@ static void test_host_ctl_regs(void)
+>> 		cr3 = cr3_saved | (1ul << i);
+>> 		vmcs_write(HOST_CR3, cr3);
+>> 		report_prefix_pushf("HOST_CR3 %lx", cr3);
+>> -		test_vmx_vmlaunch(VMXERR_ENTRY_INVALID_HOST_STATE_FIELD);
+>> +		if (this_cpu_has(X86_FEATURE_LAM) &&
+>> +		    ((i == X86_CR3_LAM_U57_BIT) || ( i == X86_CR3_LAM_U48_BIT)))
+> 						    ^ stray space
 
-Thank you both,
-Ricardo
 
-> -- 
-> Thanks,
-> Oliver
+Thanks, will remove it.
+
+>
+>> +			test_vmx_vmlaunch(0);
+>> +		else
+>> +			test_vmx_vmlaunch(VMXERR_ENTRY_INVALID_HOST_STATE_FIELD);
+>> 		report_prefix_pop();
+>> 	}
+>>
+>> -- 
+>> 2.25.1
+>>
