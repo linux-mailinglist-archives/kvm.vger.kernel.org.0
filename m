@@ -2,243 +2,291 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1E1166EC0BA
-	for <lists+kvm@lfdr.de>; Sun, 23 Apr 2023 17:13:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ADE1D6EC1D9
+	for <lists+kvm@lfdr.de>; Sun, 23 Apr 2023 21:31:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229749AbjDWPNE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 23 Apr 2023 11:13:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36906 "EHLO
+        id S229948AbjDWTb2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 23 Apr 2023 15:31:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56238 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229456AbjDWPND (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 23 Apr 2023 11:13:03 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DB85E7D;
-        Sun, 23 Apr 2023 08:13:01 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 09EE4611AC;
-        Sun, 23 Apr 2023 15:13:01 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4B041C433D2;
-        Sun, 23 Apr 2023 15:12:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1682262780;
-        bh=AG9DJZKb5AXH2c0az9/0UlHgvcR2b85u+6yXwdK30HQ=;
-        h=Date:Cc:Subject:From:To:References:In-Reply-To:From;
-        b=BSRWhPBhfSM03HuvQb+y4p1ndshuPczQ3mHWCR+WA4fQ5nDNHEaWh8JqgK5D3rkgS
-         2DJE+sYAWgM0a7xj8Zx4jYjguuU6825y+HjVRV1Qc9UkEnOBFaEfBcNUrWXU+y3Qgq
-         kgW7miXSbTIzjbjwUNrjqRDlfyc1qkiU8+MMAfcYBCYgiBwj9Yf/yEONL00FXIYo92
-         4lcZ6kvGY+DRGol+2jEuvIsw9daS/r8WkkToPoPvxxoLRFeoES9rlKs6l81BxYBjoe
-         ypYWeO+bidGIy58+24pHa7wGcTJLrMzULDe8M2YyuGga4evpEa62pFaO4I76LM18e+
-         By/mijx/sgvtw==
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date:   Sun, 23 Apr 2023 18:12:54 +0300
-Message-Id: <CS48DTLH7UEG.1PX2N6DVS1UDR@suppilovahvero>
-Cc:     "Matthew Wilcox" <willy@infradead.org>,
-        "David Hildenbrand" <david@redhat.com>, <x86@kernel.org>,
-        <linux-sgx@vger.kernel.org>, <amd-gfx@lists.freedesktop.org>,
-        <dri-devel@lists.freedesktop.org>, <kvm@vger.kernel.org>,
-        "Thomas Gleixner" <tglx@linutronix.de>,
-        "Ingo Molnar" <mingo@redhat.com>, "Borislav Petkov" <bp@alien8.de>,
-        "H . Peter Anvin" <hpa@zytor.com>,
-        "Xinhui Pan" <Xinhui.Pan@amd.com>,
-        "David Airlie" <airlied@gmail.com>,
-        "Daniel Vetter" <daniel@ffwll.ch>,
-        "Dimitri Sivanich" <dimitri.sivanich@hpe.com>,
-        "Arnd Bergmann" <arnd@arndb.de>,
-        "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>,
-        "Paolo Bonzini" <pbonzini@redhat.com>,
-        "Jason Gunthorpe" <jgg@nvidia.com>
-Subject: Re: [PATCH v4 1/6] mm/gup: remove unused vmas parameter from
- get_user_pages()
-From:   "Jarkko Sakkinen" <jarkko@kernel.org>
-To:     "Lorenzo Stoakes" <lstoakes@gmail.com>, <linux-mm@kvack.org>,
-        <linux-kernel@vger.kernel.org>,
-        "Andrew Morton" <akpm@linux-foundation.org>
-X-Mailer: aerc 0.14.0
-References: <cover.1681831798.git.lstoakes@gmail.com>
- <cd05b41d6d15ee9ff94273bc116ed3db3f5125bf.1681831798.git.lstoakes@gmail.com>
-In-Reply-To: <cd05b41d6d15ee9ff94273bc116ed3db3f5125bf.1681831798.git.lstoakes@gmail.com>
-X-Spam-Status: No, score=-4.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+        with ESMTP id S229701AbjDWTb0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 23 Apr 2023 15:31:26 -0400
+Received: from mx.sberdevices.ru (mx.sberdevices.ru [45.89.227.171])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD546E52;
+        Sun, 23 Apr 2023 12:31:22 -0700 (PDT)
+Received: from s-lin-edge02.sberdevices.ru (localhost [127.0.0.1])
+        by mx.sberdevices.ru (Postfix) with ESMTP id D83D55FD09;
+        Sun, 23 Apr 2023 22:31:18 +0300 (MSK)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
+        s=mail; t=1682278278;
+        bh=y4Egk/708JJqjWP2KzzQDBOfQ8z1vDmQRhJfk6cWA40=;
+        h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type;
+        b=qX3fQLxeNjQsI+3SrBDilWHgyOp/FSZYqYgK9Uq+iAqdebior5KBPt+uFaCQ36Nw6
+         SyPkfKMBNRuthlrS4ED8rtyreySIIVBjEYJ+u6bBBYcaE13+OFEnQcrxLZcyZTJjGf
+         K+m0ZVIUYcKFZMBoz0AlvtScjQOE6LQE1cxHY/tf5x0JjuDKNjeKPh061zUMa8xq9D
+         HT2pvlD88QoyXOSYK797wzHH092iPqXuEyPPrd7jTGQCvXG/mt2Egje8vaEX0ayu30
+         pRRMtcmzzt/YZ3BL5oYBFgy3Q4vcjjkrqq4EsbeSveM0NQXfSUtk042elqOfTQ0FVG
+         9qqEWTSBYY0sw==
+Received: from S-MS-EXCH01.sberdevices.ru (S-MS-EXCH01.sberdevices.ru [172.16.1.4])
+        by mx.sberdevices.ru (Postfix) with ESMTP;
+        Sun, 23 Apr 2023 22:31:13 +0300 (MSK)
+From:   Arseniy Krasnov <AVKrasnov@sberdevices.ru>
+To:     Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Bobby Eshleman <bobby.eshleman@bytedance.com>
+CC:     <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
+        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <kernel@sberdevices.ru>, <oxffffaa@gmail.com>,
+        <avkrasnov@sberdevices.ru>,
+        Arseniy Krasnov <AVKrasnov@sberdevices.ru>
+Subject: [RFC PATCH v2 00/15] vsock: MSG_ZEROCOPY flag support
+Date:   Sun, 23 Apr 2023 22:26:28 +0300
+Message-ID: <20230423192643.1537470-1-AVKrasnov@sberdevices.ru>
+X-Mailer: git-send-email 2.35.0
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [172.16.1.6]
+X-ClientProxiedBy: S-MS-EXCH01.sberdevices.ru (172.16.1.4) To
+ S-MS-EXCH01.sberdevices.ru (172.16.1.4)
+X-KSMG-Rule-ID: 4
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Status: not scanned, disabled by settings
+X-KSMG-AntiSpam-Interceptor-Info: not scanned
+X-KSMG-AntiPhishing: not scanned, disabled by settings
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 1.1.2.30, bases: 2023/04/23 16:01:00 #21150277
+X-KSMG-AntiVirus-Status: Clean, skipped
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue Apr 18, 2023 at 6:49 PM EEST, Lorenzo Stoakes wrote:
-> No invocation of get_user_pages() uses the vmas parameter, so remove
-> it.
->
-> The GUP API is confusing and caveated. Recent changes have done much to
-> improve that, however there is more we can do. Exporting vmas is a prime
-> target as the caller has to be extremely careful to preclude their use
-> after the mmap_lock has expired or otherwise be left with dangling
-> pointers.
->
-> Removing the vmas parameter focuses the GUP functions upon their primary
-> purpose - pinning (and outputting) pages as well as performing the action=
-s
-> implied by the input flags.
->
-> This is part of a patch series aiming to remove the vmas parameter
-> altogether.
->
-> Suggested-by: Matthew Wilcox (Oracle) <willy@infradead.org>
-> Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> Acked-by: David Hildenbrand <david@redhat.com>
-> Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
-> Signed-off-by: Lorenzo Stoakes <lstoakes@gmail.com>
-> ---
->  arch/x86/kernel/cpu/sgx/ioctl.c     | 2 +-
->  drivers/gpu/drm/radeon/radeon_ttm.c | 2 +-
->  drivers/misc/sgi-gru/grufault.c     | 2 +-
->  include/linux/mm.h                  | 3 +--
->  mm/gup.c                            | 9 +++------
->  mm/gup_test.c                       | 5 ++---
->  virt/kvm/kvm_main.c                 | 2 +-
->  7 files changed, 10 insertions(+), 15 deletions(-)
->
-> diff --git a/arch/x86/kernel/cpu/sgx/ioctl.c b/arch/x86/kernel/cpu/sgx/io=
-ctl.c
-> index 21ca0a831b70..5d390df21440 100644
-> --- a/arch/x86/kernel/cpu/sgx/ioctl.c
-> +++ b/arch/x86/kernel/cpu/sgx/ioctl.c
-> @@ -214,7 +214,7 @@ static int __sgx_encl_add_page(struct sgx_encl *encl,
->  	if (!(vma->vm_flags & VM_MAYEXEC))
->  		return -EACCES;
-> =20
-> -	ret =3D get_user_pages(src, 1, 0, &src_page, NULL);
-> +	ret =3D get_user_pages(src, 1, 0, &src_page);
->  	if (ret < 1)
->  		return -EFAULT;
-> =20
-> diff --git a/drivers/gpu/drm/radeon/radeon_ttm.c b/drivers/gpu/drm/radeon=
-/radeon_ttm.c
-> index 1e8e287e113c..0597540f0dde 100644
-> --- a/drivers/gpu/drm/radeon/radeon_ttm.c
-> +++ b/drivers/gpu/drm/radeon/radeon_ttm.c
-> @@ -362,7 +362,7 @@ static int radeon_ttm_tt_pin_userptr(struct ttm_devic=
-e *bdev, struct ttm_tt *ttm
->  		struct page **pages =3D ttm->pages + pinned;
-> =20
->  		r =3D get_user_pages(userptr, num_pages, write ? FOLL_WRITE : 0,
-> -				   pages, NULL);
-> +				   pages);
->  		if (r < 0)
->  			goto release_pages;
-> =20
-> diff --git a/drivers/misc/sgi-gru/grufault.c b/drivers/misc/sgi-gru/grufa=
-ult.c
-> index b836936e9747..378cf02a2aa1 100644
-> --- a/drivers/misc/sgi-gru/grufault.c
-> +++ b/drivers/misc/sgi-gru/grufault.c
-> @@ -185,7 +185,7 @@ static int non_atomic_pte_lookup(struct vm_area_struc=
-t *vma,
->  #else
->  	*pageshift =3D PAGE_SHIFT;
->  #endif
-> -	if (get_user_pages(vaddr, 1, write ? FOLL_WRITE : 0, &page, NULL) <=3D =
-0)
-> +	if (get_user_pages(vaddr, 1, write ? FOLL_WRITE : 0, &page) <=3D 0)
->  		return -EFAULT;
->  	*paddr =3D page_to_phys(page);
->  	put_page(page);
-> diff --git a/include/linux/mm.h b/include/linux/mm.h
-> index 37554b08bb28..b14cc4972d0b 100644
-> --- a/include/linux/mm.h
-> +++ b/include/linux/mm.h
-> @@ -2380,8 +2380,7 @@ long pin_user_pages_remote(struct mm_struct *mm,
->  			   unsigned int gup_flags, struct page **pages,
->  			   struct vm_area_struct **vmas, int *locked);
->  long get_user_pages(unsigned long start, unsigned long nr_pages,
-> -			    unsigned int gup_flags, struct page **pages,
-> -			    struct vm_area_struct **vmas);
-> +		    unsigned int gup_flags, struct page **pages);
->  long pin_user_pages(unsigned long start, unsigned long nr_pages,
->  		    unsigned int gup_flags, struct page **pages,
->  		    struct vm_area_struct **vmas);
-> diff --git a/mm/gup.c b/mm/gup.c
-> index 1f72a717232b..7e454d6b157e 100644
-> --- a/mm/gup.c
-> +++ b/mm/gup.c
-> @@ -2251,8 +2251,6 @@ long get_user_pages_remote(struct mm_struct *mm,
->   * @pages:      array that receives pointers to the pages pinned.
->   *              Should be at least nr_pages long. Or NULL, if caller
->   *              only intends to ensure the pages are faulted in.
-> - * @vmas:       array of pointers to vmas corresponding to each page.
-> - *              Or NULL if the caller does not require them.
->   *
->   * This is the same as get_user_pages_remote(), just with a less-flexibl=
-e
->   * calling convention where we assume that the mm being operated on belo=
-ngs to
-> @@ -2260,16 +2258,15 @@ long get_user_pages_remote(struct mm_struct *mm,
->   * obviously don't pass FOLL_REMOTE in here.
->   */
->  long get_user_pages(unsigned long start, unsigned long nr_pages,
-> -		unsigned int gup_flags, struct page **pages,
-> -		struct vm_area_struct **vmas)
-> +		    unsigned int gup_flags, struct page **pages)
->  {
->  	int locked =3D 1;
-> =20
-> -	if (!is_valid_gup_args(pages, vmas, NULL, &gup_flags, FOLL_TOUCH))
-> +	if (!is_valid_gup_args(pages, NULL, NULL, &gup_flags, FOLL_TOUCH))
->  		return -EINVAL;
-> =20
->  	return __get_user_pages_locked(current->mm, start, nr_pages, pages,
-> -				       vmas, &locked, gup_flags);
-> +				       NULL, &locked, gup_flags);
->  }
->  EXPORT_SYMBOL(get_user_pages);
-> =20
-> diff --git a/mm/gup_test.c b/mm/gup_test.c
-> index 8ae7307a1bb6..9ba8ea23f84e 100644
-> --- a/mm/gup_test.c
-> +++ b/mm/gup_test.c
-> @@ -139,8 +139,7 @@ static int __gup_test_ioctl(unsigned int cmd,
->  						 pages + i);
->  			break;
->  		case GUP_BASIC_TEST:
-> -			nr =3D get_user_pages(addr, nr, gup->gup_flags, pages + i,
-> -					    NULL);
-> +			nr =3D get_user_pages(addr, nr, gup->gup_flags, pages + i);
->  			break;
->  		case PIN_FAST_BENCHMARK:
->  			nr =3D pin_user_pages_fast(addr, nr, gup->gup_flags,
-> @@ -161,7 +160,7 @@ static int __gup_test_ioctl(unsigned int cmd,
->  						    pages + i, NULL);
->  			else
->  				nr =3D get_user_pages(addr, nr, gup->gup_flags,
-> -						    pages + i, NULL);
-> +						    pages + i);
->  			break;
->  		default:
->  			ret =3D -EINVAL;
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index d255964ec331..7f31e0a4adb5 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -2474,7 +2474,7 @@ static inline int check_user_page_hwpoison(unsigned=
- long addr)
->  {
->  	int rc, flags =3D FOLL_HWPOISON | FOLL_WRITE;
-> =20
-> -	rc =3D get_user_pages(addr, 1, flags, NULL, NULL);
-> +	rc =3D get_user_pages(addr, 1, flags, NULL);
->  	return rc =3D=3D -EHWPOISON;
->  }
-> =20
-> --=20
-> 2.40.0
+Hello,
 
+                           DESCRIPTION
 
-Acked-by: Jarkko Sakkinen <jarkko@kernel.org>
+this is MSG_ZEROCOPY feature support for virtio/vsock. I tried to follow
+current implementation for TCP as much as possible:
 
-BR, Jarkko
+1) Sender must enable SO_ZEROCOPY flag to use this feature. Without this
+   flag, data will be sent in "classic" copy manner and MSG_ZEROCOPY
+   flag will be ignored (e.g. without completion).
+
+2) Kernel uses completions from socket's error queue. Single completion
+   for single tx syscall (or it can merge several completions to single
+   one). I used already implemented logic for MSG_ZEROCOPY support:
+   'msg_zerocopy_realloc()' etc.
+
+Difference with copy way is not significant. During packet allocation,
+non-linear skb is created, then I call 'pin_user_pages()' for each page
+from user's iov iterator and add each returned page to the skb as fragment.
+There are also some updates for vhost and guest parts of transport - in
+both cases i've added handling of non-linear skb for virtio part. vhost
+copies data from such skb to the guest's rx virtio buffers. In the guest,
+virtio transport fills tx virtio queue with pages from skb.
+
+This version has several limits/problems:
+
+1) As this feature totally depends on transport, there is no way (or it
+   is difficult) to check whether transport is able to handle it or not
+   during SO_ZEROCOPY setting. Seems I need to call AF_VSOCK specific
+   setsockopt callback from setsockopt callback for SOL_SOCKET, but this
+   leads to lock problem, because both AF_VSOCK and SOL_SOCKET callback
+   are not considered to be called from each other. So in current version
+   SO_ZEROCOPY is set successfully to any type (e.g. transport) of
+   AF_VSOCK socket, but if transport does not support MSG_ZEROCOPY,
+   tx routine will fail with EOPNOTSUPP.
+
+2) When MSG_ZEROCOPY is used, for each tx system call we need to enqueue
+   one completion. In each completion there is flag which shows how tx
+   was performed: zerocopy or copy. This leads that whole message must
+   be send in zerocopy or copy way - we can't send part of message with
+   copying and rest of message with zerocopy mode (or vice versa). Now,
+   we need to account vsock credit logic, e.g. we can't send whole data
+   once - only allowed number of bytes could sent at any moment. In case
+   of copying way there is no problem as in worst case we can send single
+   bytes, but zerocopy is more complex because smallest transmission
+   unit is single page. So if there is not enough space at peer's side
+   to send integer number of pages (at least one) - we will wait, thus
+   stalling tx side. To overcome this problem i've added simple rule -
+   zerocopy is possible only when there is enough space at another side
+   for whole message (to check, that current 'msghdr' was already used
+   in previous tx iterations i use 'iov_offset' field of it's iov iter).
+
+3) loopback transport is not supported, because it requires to implement
+   non-linear skb handling in dequeue logic (as we "send" fragged skb
+   and "receive" it from the same queue). I'm going to implement it in
+   next versions.
+
+   ^^^ fixed in v2
+
+4) Current implementation sets max length of packet to 64KB. IIUC this
+   is due to 'kmalloc()' allocated data buffers. I think, in case of
+   MSG_ZEROCOPY this value could be increased, because 'kmalloc()' is
+   not touched for data - user space pages are used as buffers. Also
+   this limit trims every message which is > 64KB, thus such messages
+   will be send in copy mode due to 'iov_offset' check in 2).
+
+   ^^^ fixed in v2
+
+                         PATCHSET STRUCTURE
+
+Patchset has the following structure:
+1) Handle non-linear skbuff on receive in virtio/vhost.
+2) Handle non-linear skbuff on send in virtio/vhost.
+3) Updates for AF_VSOCK.
+4) Enable MSG_ZEROCOPY support on transports.
+5) Tests/tools/docs updates.
+
+                            PERFORMANCE
+
+Performance: it is a little bit tricky to compare performance between
+copy and zerocopy transmissions. In zerocopy way we need to wait when
+user buffers will be released by kernel, so it something like synchronous
+path (wait until device driver will process it), while in copy way we
+can feed data to kernel as many as we want, don't care about device
+driver. So I compared only time which we spend in the 'send()' syscall.
+Then if this value will be combined with total number of transmitted
+bytes, we can get Gbit/s parameter. Also to avoid tx stalls due to not
+enough credit, receiver allocates same amount of space as sender needs.
+
+Sender:
+./vsock_perf --sender <CID> --buf-size <buf size> --bytes 256M [--zc]
+
+Receiver:
+./vsock_perf --vsk-size 256M
+
+G2H transmission (values are Gbit/s):
+
+*-------------------------------*
+|          |         |          |
+| buf size |   copy  | zerocopy |
+|          |         |          |
+*-------------------------------*
+|   4KB    |    3    |    10    |
+*-------------------------------*
+|   32KB   |    9    |    45    |
+*-------------------------------*
+|   256KB  |    24   |    195   |
+*-------------------------------*
+|    1M    |    27   |    270   |
+*-------------------------------*
+|    8M    |    22   |    277   |
+*-------------------------------*
+
+H2G:
+
+*-------------------------------*
+|          |         |          |
+| buf size |   copy  | zerocopy |
+|          |         |          |
+*-------------------------------*
+|   4KB    |    17   |    11    |
+*-------------------------------*
+|   32KB   |    30   |    66    |
+*-------------------------------*
+|   256KB  |    38   |    179   |
+*-------------------------------*
+|    1M    |    38   |    234   |
+*-------------------------------*
+|    8M    |    28   |    279   |
+*-------------------------------*
+
+Loopback:
+
+*-------------------------------*
+|          |         |          |
+| buf size |   copy  | zerocopy |
+|          |         |          |
+*-------------------------------*
+|   4KB    |    8    |    7     |
+*-------------------------------*
+|   32KB   |    34   |    42    |
+*-------------------------------*
+|   256KB  |    43   |    83    |
+*-------------------------------*
+|    1M    |    40   |    109   |
+*-------------------------------*
+|    8M    |    40   |    171   |
+*-------------------------------*
+
+I suppose that huge difference above between both modes has two reasons:
+1) We don't need to copy data.
+2) We don't need to allocate buffer for data, only for header.
+
+Zerocopy is faster than classic copy mode, but of course it requires
+specific architecture of application due to user pages pinning, buffer
+size and alignment.
+
+If host fails to send data with "Cannot allocate memory", check value
+/proc/sys/net/core/optmem_max - it is accounted during completion skb
+allocation.
+
+                            TESTING
+
+This patchset includes set of tests for MSG_ZEROCOPY feature. I tried to
+cover new code as much as possible so there are different cases for
+MSG_ZEROCOPY transmissions: with disabled SO_ZEROCOPY and several io
+vector types (different sizes, alignments, with unmapped pages). I also
+run tests with loopback transport and running vsockmon.
+
+Thanks, Arseniy
+
+Link to v1:
+https://lore.kernel.org/netdev/0e7c6fc4-b4a6-a27b-36e9-359597bba2b5@sberdevices.ru/
+
+Changelog:
+v1 -> v2:
+ - Replace 'get_user_pages()' with 'pin_user_pages()'.
+ - Loopback transport support.
+
+Arseniy Krasnov (15):
+  vsock/virtio: prepare for non-linear skb support
+  vhost/vsock: non-linear skb handling support
+  vsock/virtio: non-linear skb handling support
+  vsock/virtio: non-linear skb handling for tap
+  vsock/virtio: MSG_ZEROCOPY flag support
+  vsock: check error queue to set EPOLLERR
+  vsock: read from socket's error queue
+  vsock: check for MSG_ZEROCOPY support
+  vhost/vsock: support MSG_ZEROCOPY for transport
+  vsock/virtio: support MSG_ZEROCOPY for transport
+  vsock/loopback: support MSG_ZEROCOPY for transport
+  net/sock: enable setting SO_ZEROCOPY for PF_VSOCK
+  test/vsock: MSG_ZEROCOPY flag tests
+  test/vsock: MSG_ZEROCOPY support for vsock_perf
+  docs: net: description of MSG_ZEROCOPY for AF_VSOCK
+
+ Documentation/networking/msg_zerocopy.rst |  12 +-
+ drivers/vhost/vsock.c                     |  29 +-
+ include/linux/socket.h                    |   1 +
+ include/linux/virtio_vsock.h              |   7 +
+ include/net/af_vsock.h                    |   3 +
+ net/core/sock.c                           |   4 +-
+ net/vmw_vsock/af_vsock.c                  |  16 +-
+ net/vmw_vsock/virtio_transport.c          |  39 +-
+ net/vmw_vsock/virtio_transport_common.c   | 497 ++++++++++++++++++---
+ net/vmw_vsock/vsock_loopback.c            |   8 +
+ tools/testing/vsock/Makefile              |   2 +-
+ tools/testing/vsock/util.h                |   1 +
+ tools/testing/vsock/vsock_perf.c          | 139 +++++-
+ tools/testing/vsock/vsock_test.c          |  11 +
+ tools/testing/vsock/vsock_test_zerocopy.c | 501 ++++++++++++++++++++++
+ tools/testing/vsock/vsock_test_zerocopy.h |  12 +
+ 16 files changed, 1194 insertions(+), 88 deletions(-)
+ create mode 100644 tools/testing/vsock/vsock_test_zerocopy.c
+ create mode 100644 tools/testing/vsock/vsock_test_zerocopy.h
+
+-- 
+2.25.1
+
