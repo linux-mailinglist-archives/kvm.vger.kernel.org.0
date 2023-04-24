@@ -2,143 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 567676ECF89
-	for <lists+kvm@lfdr.de>; Mon, 24 Apr 2023 15:48:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E635E6ED15C
+	for <lists+kvm@lfdr.de>; Mon, 24 Apr 2023 17:31:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231438AbjDXNsr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 Apr 2023 09:48:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54296 "EHLO
+        id S231866AbjDXPaZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 Apr 2023 11:30:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37688 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231325AbjDXNsb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 Apr 2023 09:48:31 -0400
-Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1943D83DE;
-        Mon, 24 Apr 2023 06:48:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1682344104; x=1713880104;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=oPqlnm5FAEkzjCzsM5wwOi+X/O97WzQZ5VPCNK7UoWo=;
-  b=BSlADEd7/kIe/sZ0Rqu/+ceaXxHopDQlqj4L8L3b1fx1CLJ69t6C8F2f
-   9UWAxbFOE17aKW7uhHNtmCPcRczn47PjhV3oO+orC5oToJinZtba78T9d
-   gRH/r+dgOytrFrgArMKZEB10FJSDaL61t3lktL19/mz0WkcI2mrr3+hT7
-   /6RtTCSj1nLWbP/8pmC0hK8bow+szUFT/Xvdwu8OHI7PEBSPz4vE10+qP
-   mazCBP2rUxsgfQbSL1UQXfM4JVr1SYNZ+s+xEIZw+AlfAdfbpg+AdCyW9
-   SDi3mXGaGeNfbJW62mkMNyv21wisVEQ7m4Sk7J107fUC+8HB2ZttFoJjQ
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10690"; a="346479854"
-X-IronPort-AV: E=Sophos;i="5.99,222,1677571200"; 
-   d="scan'208";a="346479854"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Apr 2023 06:48:15 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10690"; a="693087845"
-X-IronPort-AV: E=Sophos;i="5.99,222,1677571200"; 
-   d="scan'208";a="693087845"
-Received: from mkavai-mobl2.amr.corp.intel.com (HELO [10.212.196.194]) ([10.212.196.194])
-  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Apr 2023 06:48:09 -0700
-Message-ID: <81c476f4-ef62-e4a6-0033-8a46a15379fd@intel.com>
-Date:   Mon, 24 Apr 2023 06:48:09 -0700
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Subject: Re: [RFC 45/48] RISC-V: ioremap: Implement for arch specific ioremap
- hooks
-Content-Language: en-US
-To:     Atish Kumar Patra <atishp@rivosinc.com>
-Cc:     linux-kernel@vger.kernel.org,
-        Rajnesh Kanwal <rkanwal@rivosinc.com>,
-        Alexandre Ghiti <alex@ghiti.fr>,
-        Andrew Jones <ajones@ventanamicro.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Anup Patel <anup@brainfault.org>,
-        Atish Patra <atishp@atishpatra.org>,
-        =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@rivosinc.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
-        Sean Christopherson <seanjc@google.com>,
-        linux-coco@lists.linux.dev, Dylan Reid <dylan@rivosinc.com>,
-        abrestic@rivosinc.com, Samuel Ortiz <sameo@rivosinc.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Conor Dooley <conor.dooley@microchip.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Guo Ren <guoren@kernel.org>, Heiko Stuebner <heiko@sntech.de>,
-        Jiri Slaby <jirislaby@kernel.org>,
-        kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
-        linux-mm@kvack.org, linux-riscv@lists.infradead.org,
-        Mayuresh Chitale <mchitale@ventanamicro.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Uladzislau Rezki <urezki@gmail.com>
-References: <20230419221716.3603068-1-atishp@rivosinc.com>
- <20230419221716.3603068-46-atishp@rivosinc.com>
- <69ba1760-a079-fd8f-b079-fcb01e3eedec@intel.com>
- <CAHBxVyFhDapAeMQ8quBqWZ10jWSHw1CdE227ciyKQpULHYzffA@mail.gmail.com>
-From:   Dave Hansen <dave.hansen@intel.com>
-In-Reply-To: <CAHBxVyFhDapAeMQ8quBqWZ10jWSHw1CdE227ciyKQpULHYzffA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-5.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S232082AbjDXPaH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 24 Apr 2023 11:30:07 -0400
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4FAE7D83
+        for <kvm@vger.kernel.org>; Mon, 24 Apr 2023 08:29:57 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-54faf2edb18so86362827b3.0
+        for <kvm@vger.kernel.org>; Mon, 24 Apr 2023 08:29:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1682350197; x=1684942197;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=gCgpe6n+jmUxcEJH0eL6xCNrEIEiHzHCJcnHIrPBLxc=;
+        b=G7/E08havS32LLcjGJNwV3zdv/V5VR800w4qAVStO3+3tIfgUVcB6KxYQGQtSi4WxI
+         4ErYbClZWhmokdmkJsrjH5kb5HOU1ZxVpBEpRhqRk2MWG3KZ7txdL2o0K2HS2al/anqA
+         Y2KPb9ipTim4mLpv5gUC1uAuXiDakF0XzeIfRIr+DXu7m2UtkAgqW2GOJvBFoKIIxOIr
+         Z+ke4Fd9SJY1SpjzpXkq4UkZT1Y6SLpEZgpeiCeeRgZqeBsQ7WJ3rO0ygkP85sAwcMna
+         vnsbx4fJwNKg03OxbLet/+UK234+NonnH8MmZlqUkkIpHn7FZjba8DkG9YV2gi1sWvmn
+         IPEQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1682350197; x=1684942197;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=gCgpe6n+jmUxcEJH0eL6xCNrEIEiHzHCJcnHIrPBLxc=;
+        b=d+PSwI6LC2+twoOsoNiFENLTM/4yGjD/MuyVb+Ctln2I0Qp/8loErOE7lYzABWmrD8
+         /KF4vPBy2X+EKl9HHC/8SxBAt2jkayIdG8RLVUu7T+UV0UTSfbAwstbhujbASFzUiowt
+         e8Op/ldZbQMpmH54O2/dgEDEVvWa7yUw3INtQYGFxhqcBRqFedXIF5GrLN6Vay4G6FeL
+         he0qsKAjPu4vRkgvJ9NlslbaCoxI9IS+O/iatc/1Vsu46TqwQjHjzZTOQgakJUrr8AmF
+         mbPUAbveddkb5gyU0QPcTDsL10fBZQvtGD5GWHF+LWK9F3Bwd19PexKEZQXQnUEofJrS
+         Ba3w==
+X-Gm-Message-State: AAQBX9cJUIxEFehYMxvwx6HZuZGS+YITzxxzyMdC2uKW3fJVDeWVZjdK
+        zl2YRSeEpjBJnuYk8yfiRe8SICxLPqM=
+X-Google-Smtp-Source: AKy350bhQU7OcFUeFKVJtBkNM/PQxjoo0m+R/8S1X+/tHzwa23HbaHcUDw953Xii31aMUVkSQoRTzfKWBnM=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a81:4516:0:b0:552:e3fa:6756 with SMTP id
+ s22-20020a814516000000b00552e3fa6756mr6003733ywa.2.1682350197003; Mon, 24 Apr
+ 2023 08:29:57 -0700 (PDT)
+Date:   Mon, 24 Apr 2023 08:29:55 -0700
+In-Reply-To: <000000000000eca0b905fa0f7756@google.com>
+Mime-Version: 1.0
+References: <000000000000eca0b905fa0f7756@google.com>
+Message-ID: <ZEagczhTT5+dVDzE@google.com>
+Subject: Re: [syzbot] [kvm?] KASAN: slab-use-after-free Read in kvm_tdp_mmu_invalidate_all_roots
+From:   Sean Christopherson <seanjc@google.com>
+To:     syzbot <syzbot+864ac0b626794668b732@syzkaller.appspotmail.com>
+Cc:     bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        mingo@redhat.com, pbonzini@redhat.com,
+        syzkaller-bugs@googlegroups.com, tglx@linutronix.de, x86@kernel.org
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+        USER_IN_DEF_DKIM_WL autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 4/21/23 12:24, Atish Kumar Patra wrote:
-> On Fri, Apr 21, 2023 at 3:46 AM Dave Hansen <dave.hansen@intel.com> wrote:>> This callback appears to say to the host:
->>
->>         Hey, I (the guest) am treating this guest physical area as MMIO.
->>
->> But the host and guest have to agree _somewhere_ what the MMIO is used
->> for, not just that it is being used as MMIO.
+On Sun, Apr 23, 2023, syzbot wrote:
+> Hello,
 > 
-> Yes. The TSM (TEE Security Manager) which is equivalent to TDX also 
-> needs to be aware of the MMIO regions so that it can forward the
-> faults accordingly. Most of the MMIO is emulated in the host
-> (userspace or kernel emulation if present). The host is outside the
-> trust boundary of the guest. Thus, guest needs to make sure the host 
-> only emulates the designated MMIO region. Otherwise, it opens an 
-> attack surface from a malicious host.
-How does this mechanism stop the host from emulating something outside
-the designated region?
-
-On TDX, for instance, the guest page table have a shared/private bit.
-Private pages get TDX protections to (among other things) keep the page
-contents confidential from the host.  Shared pages can be used for MMIO
-and don't have those protections.
-
-If the host goes and tries to flip a page from private->shared, TDX
-protections will kick in and prevent it.
-
-None of this requires the guest to tell the host where it expects MMIO
-to be located.
-
-> All other confidential computing solutions also depend on guest 
-> initiated MMIO as well. AFAIK, the TDX & SEV relies on #VE like
-> exceptions to invoke that while this patch is similar to what pkvm
-> does. This approach lets the enlightened guest control which MMIO
-> regions it wants the host to emulate.
-
-I'm not _quite_ sure what "guest initiated" means.  But SEV and TDX
-don't require an ioremap hook like this.  So, even if they *are* "guest
-initiated", the question still remains how they work without this patch,
-or what they are missing without it.
-
-> It can be a subset of the region's host provided the layout. The
-> guest device filtering solution is based on this idea as well [1].
+> syzbot found the following issue on:
 > 
-> [1] https://lore.kernel.org/all/20210930010511.3387967-1-sathyanarayanan.kuppuswamy@linux.intel.com/
+> HEAD commit:    d3e1ee0e67e7 Add linux-next specific files for 20230421
+> git tree:       linux-next
+> console output: https://syzkaller.appspot.com/x/log.txt?x=118a0520280000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=53c789efbcc06cf6
+> dashboard link: https://syzkaller.appspot.com/bug?extid=864ac0b626794668b732
+> compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
+> 
+> Unfortunately, I don't have any reproducer for this issue yet.
+> 
+> Downloadable assets:
+> disk image: https://storage.googleapis.com/syzbot-assets/c558a9e1fe6a/disk-d3e1ee0e.raw.xz
+> vmlinux: https://storage.googleapis.com/syzbot-assets/2ec100a34c4c/vmlinux-d3e1ee0e.xz
+> kernel image: https://storage.googleapis.com/syzbot-assets/1afcd9936dc1/bzImage-d3e1ee0e.xz
+> 
+> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> Reported-by: syzbot+864ac0b626794668b732@syzkaller.appspotmail.com
+> 
+> ==================================================================
+> BUG: KASAN: slab-use-after-free in kvm_tdp_mmu_invalidate_all_roots+0x2e3/0x370 arch/x86/kvm/mmu/tdp_mmu.c:945
+> Read of size 8 at addr ffff88807c27d528 by task syz-executor.2/5817
+> 
+> CPU: 0 PID: 5817 Comm: syz-executor.2 Not tainted 6.3.0-rc7-next-20230421-syzkaller #0
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/14/2023
+> Call Trace:
+>  <TASK>
+>  __dump_stack lib/dump_stack.c:88 [inline]
+>  dump_stack_lvl+0xd9/0x150 lib/dump_stack.c:106
+>  print_address_description.constprop.0+0x2c/0x3c0 mm/kasan/report.c:351
+>  print_report mm/kasan/report.c:462 [inline]
+>  kasan_report+0x11c/0x130 mm/kasan/report.c:572
+>  kvm_tdp_mmu_invalidate_all_roots+0x2e3/0x370 arch/x86/kvm/mmu/tdp_mmu.c:945
+>  kvm_mmu_uninit_tdp_mmu+0x16/0x100 arch/x86/kvm/mmu/tdp_mmu.c:48
+>  kvm_mmu_uninit_vm+0x6a/0x70 arch/x86/kvm/mmu/mmu.c:6239
+>  kvm_arch_destroy_vm+0x369/0x490 arch/x86/kvm/x86.c:12465
+>  kvm_destroy_vm arch/x86/kvm/../../../virt/kvm/kvm_main.c:1313 [inline]
+>  kvm_put_kvm+0x4da/0xae0 arch/x86/kvm/../../../virt/kvm/kvm_main.c:1347
+>  kvm_vcpu_release+0x51/0x70 arch/x86/kvm/../../../virt/kvm/kvm_main.c:3846
+>  __fput+0x27c/0xa90 fs/file_table.c:321
+>  task_work_run+0x16f/0x270 kernel/task_work.c:179
+>  resume_user_mode_work include/linux/resume_user_mode.h:49 [inline]
+>  exit_to_user_mode_loop kernel/entry/common.c:171 [inline]
+>  exit_to_user_mode_prepare+0x210/0x240 kernel/entry/common.c:204
+>  __syscall_exit_to_user_mode_work kernel/entry/common.c:286 [inline]
+>  syscall_exit_to_user_mode+0x1d/0x50 kernel/entry/common.c:297
+>  do_syscall_64+0x46/0xb0 arch/x86/entry/common.c:86
+>  entry_SYSCALL_64_after_hwframe+0x63/0xcd
+> RIP: 0033:0x7f426b83e01b
+> Code: 0f 05 48 3d 00 f0 ff ff 77 45 c3 0f 1f 40 00 48 83 ec 18 89 7c 24 0c e8 63 fc ff ff 8b 7c 24 0c 41 89 c0 b8 03 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 35 44 89 c7 89 44 24 0c e8 a1 fc ff ff 8b 44
+> RSP: 002b:00007ffe38a35070 EFLAGS: 00000293 ORIG_RAX: 0000000000000003
+> RAX: 0000000000000000 RBX: 0000000000000008 RCX: 00007f426b83e01b
+> RDX: 0000000000000000 RSI: 0000001b32b3a7d4 RDI: 0000000000000007
+> RBP: 00007f426b9ad980 R08: 0000000000000000 R09: 0000000075ee794b
+> R10: 0000000000000000 R11: 0000000000000293 R12: 000000000003d553
+> R13: 00007ffe38a35170 R14: 00007ffe38a35190 R15: 0000000000000032
+>  </TASK>
 
-I don't really see the connection.  Even if that series was going
-forward (I'm not sure it is) there is no ioremap hook there.  There's
-also no guest->host communication in that series.  The guest doesn't
-_tell_ the host where the MMIO is, it just declines to run code for
-devices that it didn't expect to see.
-
-I'm still rather confused here.
+#syz fix: KVM: x86: Preserve TDP MMU roots until they are explicitly invalidated
