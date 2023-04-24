@@ -2,155 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D2A026ED5F7
-	for <lists+kvm@lfdr.de>; Mon, 24 Apr 2023 22:12:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A05016ED630
+	for <lists+kvm@lfdr.de>; Mon, 24 Apr 2023 22:35:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232614AbjDXUMG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 Apr 2023 16:12:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36378 "EHLO
+        id S231749AbjDXUfl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 Apr 2023 16:35:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45858 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231751AbjDXUMB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 Apr 2023 16:12:01 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C13A1AE
-        for <kvm@vger.kernel.org>; Mon, 24 Apr 2023 13:11:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1682367076;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=57+1CoIbrom/szrhzshu5SQyw+6RojrTHlQMs4SQFiA=;
-        b=Xm6F6H2v4iFbheeP2eBn5he6or4VV/bHh4fdfVkVmZmJ1fZVFVk62cQqMBJzw4/COhKkos
-        6XF90p/PfMNSCZ79E9bRLaLiywWH47Gskud286p1GqpquvXm/qQ6fsV/nbLbVSuBeTciGm
-        q4r+Z5gMuqwa0vTVCO/3nDMVPMYWHfM=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-21-wJ89NkPyP6i7O4joBJUYJA-1; Mon, 24 Apr 2023 16:11:15 -0400
-X-MC-Unique: wJ89NkPyP6i7O4joBJUYJA-1
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-3f16ef3be6eso28936625e9.3
-        for <kvm@vger.kernel.org>; Mon, 24 Apr 2023 13:11:15 -0700 (PDT)
+        with ESMTP id S232565AbjDXUfj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 24 Apr 2023 16:35:39 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C35D59D5
+        for <kvm@vger.kernel.org>; Mon, 24 Apr 2023 13:35:38 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-b92309d84c1so23344016276.1
+        for <kvm@vger.kernel.org>; Mon, 24 Apr 2023 13:35:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1682368537; x=1684960537;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=l0MSB0945IeDbGQp04rwPUWUysYiVEFGxMNvNn3R9Dk=;
+        b=qaA5kj5BLRufFr7HOEwoBj3xuBzT1MM3EqwX810KDK1PJXDmUfYJ4nLm6oNBrqzq5D
+         kejv9Yn+BLxpQduLI7gZUWw5gg/LBJYf3iyGlCxVa9XwjUZ25tQcKo5XQXlK34L7VDCT
+         e8a1tXQmghUZAYQ9+o8GJvHhq+yTaQ4YM0XuenE3DXhhq66Er3TLgg2gNW3i+21vEsNN
+         Y7V8kMT8/uufww59U8/Jw4hwCThUoOVjtCfYbwbJT0IT92HGuHwvl5gdbMD9oZslPNIp
+         hcbYSB3xiE3IY0nL4OfpglITPYjFC/j3293vJZ8dlb/JEUjXuPa3xYxVo+u2J/DS9N39
+         lCYQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682367073; x=1684959073;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=57+1CoIbrom/szrhzshu5SQyw+6RojrTHlQMs4SQFiA=;
-        b=YLJU7iIIZJYF1BzTTMcXL3O6tVtZB2KSWH0bCZu+tzod6hr07dzzjxAPrQANLDc1lA
-         TZdfRj05K0Gest1wJikhdryHLpYWMDQs10fHJ3QNI5IOKWkrTtLL3Pklxhny2zJ6y+jz
-         dI9bqUXzI9AEL241wCwE/Wz1D2PGlCMs6JM6/t6rohQmjPeZC6ZkxlRtT3bm0oJVkg6X
-         Ftc1RoFMuX04ZM13iw7gdre5PHkOUW1fvi/iNMklfKdP4CgF9JG6PyQN5Pkwq2O1glJJ
-         xf3e9smEezmEHW3Zuya9UqBNoLoBaM6M2BOWIB5fQDarJGNRUKNbbwDPaxw6I/H7FVzM
-         aWxw==
-X-Gm-Message-State: AAQBX9dzgVSQCcsSYT429IJOHqn93zLNV6Beacpn/ovBaa5LVJMdRqzY
-        YXMThAWSgI9uLTuHNE/yuOOCsOEQUjvs2aPiBvmEvSIAOj3n8NZQ/g881J4n4WH2DahFqQ5TRQR
-        P1bwV7uM4psbYywB/jVZf
-X-Received: by 2002:a5d:494e:0:b0:2f7:85e0:de75 with SMTP id r14-20020a5d494e000000b002f785e0de75mr11256920wrs.19.1682367073461;
-        Mon, 24 Apr 2023 13:11:13 -0700 (PDT)
-X-Google-Smtp-Source: AKy350b+GY5FQw1XbCO68U7WIdFpic0MlAznH0ayFhJEMTBm31qyz11+BAcGh7VOsIb+N9AaNXAWGw==
-X-Received: by 2002:a5d:494e:0:b0:2f7:85e0:de75 with SMTP id r14-20020a5d494e000000b002f785e0de75mr11256899wrs.19.1682367073137;
-        Mon, 24 Apr 2023 13:11:13 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id eo9-20020a05600c82c900b003f0ad8d1c69sm10025559wmb.25.2023.04.24.13.11.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 24 Apr 2023 13:11:12 -0700 (PDT)
-Message-ID: <48ea7b8f-8bc3-def5-3bfa-e4a1ee41971a@redhat.com>
-Date:   Mon, 24 Apr 2023 22:11:11 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.0
-Reply-To: eric.auger@redhat.com
-Subject: Re: [kvm-unit-tests PATCH 3/6] arm: pmu: Add extra DSB barriers in
- the mem_access loop
-Content-Language: en-US
-To:     Alexandru Elisei <alexandru.elisei@arm.com>
-Cc:     eric.auger.pro@gmail.com, kvm@vger.kernel.org,
-        kvmarm@lists.linux.dev, andrew.jones@linux.dev, maz@kernel.org,
-        will@kernel.org, oliver.upton@linux.dev, ricarkol@google.com,
-        reijiw@google.com
-References: <20230315110725.1215523-1-eric.auger@redhat.com>
- <20230315110725.1215523-4-eric.auger@redhat.com>
- <ZEJkozep6M4EqxPW@monolith.localdoman>
-From:   Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <ZEJkozep6M4EqxPW@monolith.localdoman>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+        d=1e100.net; s=20221208; t=1682368537; x=1684960537;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=l0MSB0945IeDbGQp04rwPUWUysYiVEFGxMNvNn3R9Dk=;
+        b=AQ68mMp9QVIuvYWAnxIA4QZ6vcnZSLCOA1HO4/i/+QV76bCVoonWwFR7oLQfJ6j4mM
+         eCUBkgyF71FkfHumE5r0Pse/SCy8tfRMCJr52AFz18I8JRTNsTnFtVRi23tOiZq7Uwv3
+         rbPW0NiN3Kebuq3WyBOVmwuKz1JA5GvuMaYAmfv+jYTV2Tn4aorTzCCcDI6KBrHtFsLp
+         q5rzmwZmWcbPGk6NHcown/bwDADFEQEtBcqkL1LNQN0yY/82tfk/DL6q8Hfa+5ICLcyK
+         tBoLYSRGirwEbaN5L/CLOnvmKDqJ1CWr/tJAnsbxTqglNoxujZhBe2hwfrbK8HQ68RlW
+         5g7Q==
+X-Gm-Message-State: AAQBX9cbgvDKvXqDa88gfIi9CC6HIJR1UK2lnIMZlP4UzqeazCA22Mal
+        YIlTz9Bd76P5WzO5FDLj+i9eGNtXKz0=
+X-Google-Smtp-Source: AKy350alWB2/sn7vnmKB09ekH2Ungj1lC+xvK8PVtElvPqniaZwd+kmU7CpSimCq0rTDwuANLLp2/iz809o=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:690c:2b88:b0:54c:15ad:11e4 with SMTP id
+ en8-20020a05690c2b8800b0054c15ad11e4mr8066797ywb.0.1682368537764; Mon, 24 Apr
+ 2023 13:35:37 -0700 (PDT)
+Date:   Mon, 24 Apr 2023 13:35:36 -0700
+In-Reply-To: <84DD9212-31FB-4AF6-80DD-9BA5AEA0EC1A@gmail.com>
+Mime-Version: 1.0
+References: <20230412213510.1220557-1-amoorthy@google.com> <ZEBHTw3+DcAnPc37@x1n>
+ <CAJHvVchBqQ8iVHgF9cVZDusMKQM2AjtNx2z=i9ZHP2BosN4tBg@mail.gmail.com>
+ <ZEBXi5tZZNxA+jRs@x1n> <CAF7b7mo68VLNp=QynfT7QKgdq=d1YYGv1SEVEDxF9UwHzF6YDw@mail.gmail.com>
+ <ZEGuogfbtxPNUq7t@x1n> <46DD705B-3A3F-438E-A5B1-929C1E43D11F@gmail.com>
+ <CAF7b7mo78e2YPHU5YrhzuORdpGXCVRxXr6kSyMa+L+guW8jKGw@mail.gmail.com> <84DD9212-31FB-4AF6-80DD-9BA5AEA0EC1A@gmail.com>
+Message-ID: <ZEboGH28IVKPZ2vo@google.com>
+Subject: Re: [PATCH v3 00/22] Improve scalability of KVM + userfaultfd live
+ migration via annotated memory faults.
+From:   Sean Christopherson <seanjc@google.com>
+To:     Nadav Amit <nadav.amit@gmail.com>
+Cc:     Anish Moorthy <amoorthy@google.com>, Peter Xu <peterx@redhat.com>,
+        Axel Rasmussen <axelrasmussen@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, maz@kernel.org,
+        oliver.upton@linux.dev, James Houghton <jthoughton@google.com>,
+        bgardon@google.com, dmatlack@google.com, ricarkol@google.com,
+        kvm <kvm@vger.kernel.org>, kvmarm@lists.linux.dev
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Alexandru,
+On Mon, Apr 24, 2023, Nadav Amit wrote:
+> 
+> > On Apr 24, 2023, at 10:54 AM, Anish Moorthy <amoorthy@google.com> wrote:
+> > Sean did mention that he wanted KVM_CAP_MEMORY_FAULT_INFO in general,
+> > so I'm guessing (some version of) that will (eventually :) be merged
+> > in any case.
+> 
+> It certainly not my call. But if you ask me, introducing a solution for
+> a concrete use-case that requires API changes/enhancements is not
+> guaranteed to be the best solution. It may be better first to fully
+> understand the existing overheads and agree that there is no alternative
+> cleaner and more general solution with similar performance.
 
-On 4/21/23 12:25, Alexandru Elisei wrote:
-> Hi,
->
-> On Wed, Mar 15, 2023 at 12:07:22PM +0100, Eric Auger wrote:
->> The mem access loop currently features ISB barriers only. However
->> the mem_access loop counts the number of accesses to memory. ISB
->> do not garantee the PE cannot reorder memory access. Let's
->> add a DSB ISH before the write to PMCR_EL0 that enables the PMU
->> and after the last iteration, before disabling the PMU.
->>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->> Suggested-by: Alexandru Elisei <alexandru.elisei@arm.com>
->>
->> ---
->>
->> This was discussed in https://lore.kernel.org/all/YzxmHpV2rpfaUdWi@monolith.localdoman/
->> ---
->>  arm/pmu.c | 2 ++
->>  1 file changed, 2 insertions(+)
->>
->> diff --git a/arm/pmu.c b/arm/pmu.c
->> index b88366a8..dde399e2 100644
->> --- a/arm/pmu.c
->> +++ b/arm/pmu.c
->> @@ -301,6 +301,7 @@ static void mem_access_loop(void *addr, long loop, uint32_t pmcr)
->>  {
->>  	uint64_t pmcr64 = pmcr;
->>  asm volatile(
->> +	"       dsb     ish\n"
-> I think it might still be possible to reorder memory accesses which are
-> part of the loop after the DSB above and before the PMU is enabled below.
-> But the DSB above is needed to make sure previous memory accesses, which
-> shouldn't be counted as part of the loop, are completed.
->
-> I would put another DSB after the ISB which enables the PMU, that way all
-> memory accesses are neatly sandwitches between two DSBs.
->
-> Having 3 DSBs might look like overdoing it, but I reason it to be correct.
-> What do you think?
-I need more time to investigate this. I will come back to you next week
-as I am OoO this week. Sorry for the inconvenience.
-Thank you for the review!
+KVM already returns -EFAULT for these situations, the change I really want to land
+is to have KVM report detailed information about why the -EFAULT occurred.  I'll be
+happy to carry the code in KVM even if userspace never does anything beyond dumping
+the extra information on failures.
 
-Eric
->
-> Thanks,
-> Alex
->
->>  	"       msr     pmcr_el0, %[pmcr]\n"
->>  	"       isb\n"
->>  	"       mov     x10, %[loop]\n"
->> @@ -308,6 +309,7 @@ asm volatile(
->>  	"       ldr	x9, [%[addr]]\n"
->>  	"       cmp     x10, #0x0\n"
->>  	"       b.gt    1b\n"
->> +	"       dsb     ish\n"
->>  	"       msr     pmcr_el0, xzr\n"
->>  	"       isb\n"
->>  	:
->> -- 
->> 2.38.1
->>
->>
+> Considering the mess that KVM async-PF introduced, I would be very careful
+> before introducing such API changes. I did not look too much on the details,
+> but some things anyhow look slightly strange (which might be since I am
+> out-of-touch with KVM). For instance, returning -EFAULT on from KVM_RUN? I
+> would have assumed -EAGAIN would be more appropriate since the invocation did
+> succeed.
 
+Yeah, returning -EFAULT is somewhat odd, but as above, that's pre-existing
+behavior that's been around for many years.
