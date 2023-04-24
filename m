@@ -2,112 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C8FBE6ED320
-	for <lists+kvm@lfdr.de>; Mon, 24 Apr 2023 19:06:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E4E7E6ED395
+	for <lists+kvm@lfdr.de>; Mon, 24 Apr 2023 19:35:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231663AbjDXRG4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 Apr 2023 13:06:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42402 "EHLO
+        id S231695AbjDXRfk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 Apr 2023 13:35:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56714 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229929AbjDXRGy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 Apr 2023 13:06:54 -0400
-Received: from mail-yb1-xb2a.google.com (mail-yb1-xb2a.google.com [IPv6:2607:f8b0:4864:20::b2a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76A414C17
-        for <kvm@vger.kernel.org>; Mon, 24 Apr 2023 10:06:53 -0700 (PDT)
-Received: by mail-yb1-xb2a.google.com with SMTP id 3f1490d57ef6-b9963a72fbfso3118492276.3
-        for <kvm@vger.kernel.org>; Mon, 24 Apr 2023 10:06:53 -0700 (PDT)
+        with ESMTP id S231681AbjDXRfg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 24 Apr 2023 13:35:36 -0400
+Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA3287D89
+        for <kvm@vger.kernel.org>; Mon, 24 Apr 2023 10:35:35 -0700 (PDT)
+Received: by mail-pg1-x54a.google.com with SMTP id 41be03b00d2f7-51f10b8b27dso2864940a12.1
+        for <kvm@vger.kernel.org>; Mon, 24 Apr 2023 10:35:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1682356012; x=1684948012;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=krNPE2dQqwX0Vq4fm7wJ0pMkyXc+ttcWhBFj1QMoyaA=;
-        b=D7rTS2vUH4qstqeKjhm3dTJUdQJ9zearxJXie4vaHsSOhe6iOyE4MuVNYs2nvAkdqh
-         YWB2XA8YznRxpQhqVXyYbmQO0l5hjbKoURaP9orwrnZJ4jLdD5gs6Riq1413LHIpnIlF
-         SmAkENgZsLal9FeCJGi5fvk/mL8PXxsRwS6v6p2OKOlzDbCRop8Q6raKFjx2mzIEA8oQ
-         L1vrymkRegx53sNtlKfCNlslx09Lxw+1ArQRKFkBfSNZh3Ii1YbSbDaaUwxeeWg7RjM/
-         KjslZ8pw+jdBXEpm17EVwmaeLKgCHmVV9c2qbMADPGOajqxA01L8FvvH2Ef3JEKOguIR
-         Wfnw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682356012; x=1684948012;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=google.com; s=20221208; t=1682357735; x=1684949735;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=krNPE2dQqwX0Vq4fm7wJ0pMkyXc+ttcWhBFj1QMoyaA=;
-        b=CUL77RYGzMY05Co6gG05aWPy6KyVlL2FmMM0zMmvPuZdiLrVm3ajn8TD9Nw/parGIW
-         6wmRMv0ftHiHagnpLP1xaHdtu5wC+Mbm8+Mj1MD5mCkQmaLahe4Nr+WoppZEc+0GQgYk
-         UQIBsJ2aXTRvaTt/HQi4OU85XYFxaSwsOAWyvhbhfTEosR7tpsBoOPHSVZSSZsLY6ATP
-         7u6TrBf8e9a6gIF7PDzDSt2X286arUHB7v7DPMesDW0OlTrFoF9wDMYFyowIju4azcQQ
-         tPglA1136/AtnWmF0cEBne4/e05+2IfQG3sBWubJzJvfGRAG8wK00r++x7r3i3X1oRGC
-         jeLQ==
-X-Gm-Message-State: AAQBX9eMXBS4ouIee0OiPgJ6kyamTmqmGvXNW0ObJMsNbWkMP2/w/76j
-        m3OrvgYbnao/92RScM6OmSGgyEkfpt9Pg97D0hER1A==
-X-Google-Smtp-Source: AKy350Z6JjDn4o4gZMOoqDt1M3eWc2C2i937mU2dIsCEho8OEIRTfS1kInWHGs5i0zOCy+k0w0BkWRW0fwbsXk0TwJQ=
-X-Received: by 2002:a25:d48e:0:b0:b8f:3fa9:40db with SMTP id
- m136-20020a25d48e000000b00b8f3fa940dbmr10938551ybf.45.1682356012532; Mon, 24
- Apr 2023 10:06:52 -0700 (PDT)
-MIME-Version: 1.0
-References: <CAAhSdy2RLinG5Gx-sfOqrYDAT=xDa3WAk8r1jTu8ReO5Jo0LVA@mail.gmail.com>
- <CABgObfbS7ej9pqmV05DKwq1929QD10EQ9XdkEb_Qhtbm1WrkeQ@mail.gmail.com>
-In-Reply-To: <CABgObfbS7ej9pqmV05DKwq1929QD10EQ9XdkEb_Qhtbm1WrkeQ@mail.gmail.com>
-From:   Anup Patel <apatel@ventanamicro.com>
-Date:   Mon, 24 Apr 2023 22:36:40 +0530
-Message-ID: <CAK9=C2XBkOh2FdY08mXXaVjOFSikbSJUULAohrq3M4qWrNWvew@mail.gmail.com>
-Subject: Re: [GIT PULL] KVM/riscv changes for 6.4
+        bh=M7itdtr9KAKg/Dp8bZQ5zB+4ZLhAmVuBRHE2wM175kU=;
+        b=oF2j7Ebpi4Wj9eQRHbbXahA7TaaYISMgGv0DAbeFRXnKiYhAjvolwhClivD4h0KaEq
+         60S49IDk45L7OnQ4tjZ66UZP1NGk0Bt9JMXW5gfmCZsTduSIzLTCgLpbWlhP0lrCmDIY
+         9rXaHnFpWW++avg9Za8pJpTajPHuZV3YotiEPSdD++GuGPSfooPq3NHKyo3HiN+v7aNr
+         ZD+Z3GesDOkhv87YmwdjFX2+Af/xRRnzBhXMLJzoyjXdQ5QlEr64mTst4tAB+mbFyphV
+         vqopzu6+K0JAtFquvtx8HrgW2sY15JbEfqmh7oPJ1kHszPa8RgZDUUJlcY8lzZIRytLS
+         4EaQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1682357735; x=1684949735;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=M7itdtr9KAKg/Dp8bZQ5zB+4ZLhAmVuBRHE2wM175kU=;
+        b=fwCEmG9jFn3wMcHWquYR8SgP6UTPOwYOJwWCYt2Y2A+9rde8p3PEKTX4eUjc8VCu5G
+         nqPWOAc97dp/yAHwjLVCltiIKfwWQXEf5TY8uihhFbT8WF5qhoCLaMIAPjJrJByOVfcQ
+         0J2MlFFH2TR515tBNpzbKJDjl5K4ZkS64Yolg5K/KXJt8770Ly8ZC0E2i4RA9rBPaqQG
+         HNir/CGFJKutB46VVl15xUzKy88o1tIORsbwr3GU1Zc9P4c3ipIyob2TnJ3r60o7fcOi
+         8yW77E3wWS/BhHAU946NynQZXZ0xuSg9mJwCbJWjpIreGLZIVSI+VeNvCVtkLfdoprfA
+         qfew==
+X-Gm-Message-State: AAQBX9e8NjFlZak8F1RJHTWMxmMpsUUGpScMewwR4CAod01+QfcRZZCo
+        HgGbmYx0hIMEbX5W02HuJX2fS/Z/MOE=
+X-Google-Smtp-Source: AKy350Z28iU4eKAM8KLGUwjx+bLyvg+xIHJOoTsMuixIsDIhfySjPrlj3WRb7hTpldtdmKjYYFgV3SzJsrA=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a63:451e:0:b0:51b:8838:48b8 with SMTP id
+ s30-20020a63451e000000b0051b883848b8mr3336591pga.0.1682357735222; Mon, 24 Apr
+ 2023 10:35:35 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Mon, 24 Apr 2023 10:35:23 -0700
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.40.0.634.g4ca3ef3211-goog
+Message-ID: <20230424173529.2648601-1-seanjc@google.com>
+Subject: [GIT PULL] KVM: Non-x86 changes for 6.4
+From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Anup Patel <anup@brainfault.org>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Palmer Dabbelt <palmer@rivosinc.com>,
-        Atish Patra <atishp@atishpatra.org>,
-        Atish Patra <atishp@rivosinc.com>,
-        Andrew Jones <ajones@ventanamicro.com>,
-        KVM General <kvm@vger.kernel.org>,
-        "open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" 
-        <kvm-riscv@lists.infradead.org>,
-        linux-riscv <linux-riscv@lists.infradead.org>
+Cc:     kvm@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Paolo,
+Non-x86, a.k.a. generic, KVM changes for 6.4.  Nothing particularly
+interesting, just a random smattering of one-off patches.
 
-On Sat, Apr 22, 2023 at 5:17=E2=80=AFAM Paolo Bonzini <pbonzini@redhat.com>=
- wrote:
->
-> On Fri, Apr 21, 2023 at 7:34=E2=80=AFPM Anup Patel <anup@brainfault.org> =
-wrote:
-> > Please note that the Zicboz series has been taken by
-> > Palmer through the RISC-V tree which results in few
-> > minor conflicts in the following files:
-> > arch/riscv/include/asm/hwcap.h
-> > arch/riscv/include/uapi/asm/kvm.h
-> > arch/riscv/kernel/cpu.c
-> > arch/riscv/kernel/cpufeature.c
-> > arch/riscv/kvm/vcpu.c
-> >
-> > I am not sure if a shared tag can make things easy for you or Palmer.
->
-> It's not just making it easier, it is a requirement because I prefer
-> to keep an eye on changes to uapi.h and especially to avoid that
-> conflicts in KVM files reach Linus.
->
-> The conflicts may be minor, but they are a symptom of overlooking
-> "something" in the workflow.
->
-> If I can get the shared tag from Palmer then good, otherwise I suppose
-> this PR will also have to be delayed to the second week of the merge
-> window.
+The following changes since commit d8708b80fa0e6e21bc0c9e7276ad0bccef73b6e7:
 
-I think it is better to delay this PR to the second week of the merge windo=
-w.
+  KVM: Change return type of kvm_arch_vm_ioctl() to "int" (2023-03-16 10:18:07 -0400)
 
-Regards,
-Anup
+are available in the Git repository at:
+
+  https://github.com/kvm-x86/linux.git tags/kvm-x86-generic-6.4
+
+for you to fetch changes up to b0d237087c674c43df76c1a0bc2737592f3038f4:
+
+  KVM: Fix comments that refer to the non-existent install_new_memslots() (2023-03-24 08:20:17 -0700)
+
+----------------------------------------------------------------
+Common KVM changes for 6.4:
+
+ - Drop unnecessary casts from "void *" throughout kvm_main.c
+
+ - Tweak the layout of "struct kvm_mmu_memory_cache" to shrink the struct
+   size by 8 bytes on 64-bit kernels by utilizing a padding hole
+
+ - Fix a documentation format goof that was introduced when the KVM docs
+   were converted to ReST
+
+ - Constify MIPS's internal callbacks (a leftover from the hardware enabling
+   rework that landed in 6.3)
+
+----------------------------------------------------------------
+Jun Miao (1):
+      KVM: Fix comments that refer to the non-existent install_new_memslots()
+
+Li kunyu (1):
+      kvm: kvm_main: Remove unnecessary (void*) conversions
+
+Mathias Krause (1):
+      KVM: Shrink struct kvm_mmu_memory_cache
+
+Sean Christopherson (1):
+      KVM: MIPS: Make kvm_mips_callbacks const
+
+Shaoqin Huang (1):
+      KVM: Add the missed title format
+
+ Documentation/virt/kvm/api.rst     |  1 +
+ Documentation/virt/kvm/locking.rst |  2 +-
+ arch/mips/include/asm/kvm_host.h   |  2 +-
+ arch/mips/kvm/vz.c                 |  2 +-
+ include/linux/kvm_host.h           |  4 ++--
+ include/linux/kvm_types.h          |  2 +-
+ virt/kvm/kvm_main.c                | 26 ++++++++++++--------------
+ 7 files changed, 19 insertions(+), 20 deletions(-)
