@@ -2,188 +2,198 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EFB5D6EC9A0
-	for <lists+kvm@lfdr.de>; Mon, 24 Apr 2023 11:59:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 327AA6ECACA
+	for <lists+kvm@lfdr.de>; Mon, 24 Apr 2023 12:58:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231635AbjDXJ7Q convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Mon, 24 Apr 2023 05:59:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58540 "EHLO
+        id S231140AbjDXK6t (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 Apr 2023 06:58:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42672 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231576AbjDXJ7P (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 Apr 2023 05:59:15 -0400
-Received: from senda.mailex.chinaunicom.cn (senda.mailex.chinaunicom.cn [123.138.59.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36749196
-        for <kvm@vger.kernel.org>; Mon, 24 Apr 2023 02:59:11 -0700 (PDT)
-Received: from M10-XA-MLCEN01.MailSrv.cnc.intra (unknown [10.236.3.197])
-        by senda.mailex.chinaunicom.cn (SkyGuard) with ESMTPS id 4Q4gcm0NXmz6RC5v
-        for <kvm@vger.kernel.org>; Mon, 24 Apr 2023 18:00:56 +0800 (CST)
-Received: from smtpbg.qq.com (10.237.2.96) by M10-XA-MLCEN01.MailSrv.cnc.intra
- (10.236.3.197) with Microsoft SMTP Server id 15.0.1497.47; Mon, 24 Apr 2023
- 17:59:02 +0800
-X-QQ-mid: Ymail-xx24b003-t1682330340tol
-Received: from localhost.localdomain (unknown [10.3.224.193])
-        by smtp.qq.com (ESMTP) with 
-        id ; Mon, 24 Apr 2023 17:58:59 +0800 (CST)
-X-QQ-SSF: 0090000000000040I520050A0000000
-X-QQ-GoodBg: 0
-From:   =?gb18030?B?yM7D9MP0KMGqzai8r83FwarNqMr919a/xry809A=?=
-         =?gb18030?B?z965q8u+sb6yvyk=?= <renmm6@chinaunicom.cn>
-To:     =?gb18030?B?a3Zt?= <kvm@vger.kernel.org>
-CC:     =?gb18030?B?cm1tMTk4NQ==?= <rmm1985@163.com>,
-        =?gb18030?B?ZHJqb25lcw==?= <drjones@redhat.com>,
-        =?gb18030?B?cGJvbnppbmk=?= <pbonzini@redhat.com>,
-        =?gb18030?B?cmtyY21hcg==?= <rkrcmar@redhat.com>
-Subject: Re: [kvm-unit-tests PATCH] arch-run: Fix run_qemu return correct error code
-Date:   Mon, 24 Apr 2023 17:58:16 +0800
-Message-ID: <20230424095816.3022644-1-renmm6@chinaunicom.cn>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <hzn5rocplnouiuemnxnvznhvvqbvwepqggymgevfwiqal24zt7@62nemxepzzqo>
-References: <hzn5rocplnouiuemnxnvznhvvqbvwepqggymgevfwiqal24zt7@62nemxepzzqo>
+        with ESMTP id S229522AbjDXK6r (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 24 Apr 2023 06:58:47 -0400
+Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AFD2A211F
+        for <kvm@vger.kernel.org>; Mon, 24 Apr 2023 03:58:46 -0700 (PDT)
+Received: by mail-pf1-x429.google.com with SMTP id d2e1a72fcca58-63b4a64c72bso3486546b3a.0
+        for <kvm@vger.kernel.org>; Mon, 24 Apr 2023 03:58:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=daynix-com.20221208.gappssmtp.com; s=20221208; t=1682333926; x=1684925926;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=rOjGvSWGj09wgZSTkQ2r2PpEFh6Mq524vF457zFZuN4=;
+        b=3nKXRoR+exIEJRB8dVhAvpwrOInr8uA+VikV6ycBzo2I6j6hPBlYoy/TZ25az3WCFa
+         Rj48szYVKP/7SJrkOAFkTcJc7G1ngVuW5u5ao00nHyElOOrH8GMoNmLBvghkR4jDERCL
+         aIarTQKjcPh0U6Nd0pqt4gguRRgxo/vcJ+xOC1tGIWABF4B0Uzhc+0lRWcT72XuXGZ6F
+         Gonrp7LewDI3DDgCd0G0cH4FA4i1lF9/fKfzAlNbMrXrcMWCf6TxRDhX2AFrt4m9XFQy
+         28HyoDAAfOXdmf8YKXl5X7W6Es4+XAvtUZBJTlONWOYQWJKxtfA92wSirdX3RDviy0/k
+         6dUQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1682333926; x=1684925926;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=rOjGvSWGj09wgZSTkQ2r2PpEFh6Mq524vF457zFZuN4=;
+        b=CNrgF/94yvmM02brjV16aR+aDMf0tq4O5KD7bUeuPqTVYxfvIw1dfJUwhvfkVn5okS
+         cQo6RbR1p+XRtq0L31KijtcEaMLnvHx+x3l+pKQG0lhqpFsy/XhdaMr+lCxFAP5qt2s0
+         6WCiLa0ZlA1yRbjmhBLP00CBE68/4pNJQAXQifWqOHaSdP+AZ7iw9t4KgElMQWyie1VJ
+         OK2dn+oaqb0kKSU4ia8B9Tinb1khoR6IHJcJSVVAxAhrYXSFObKVMiYW3xGWLprULj9j
+         S4G095Y1mdVU1hMfutvH6wPeBbz6Yo+FuWOL04DYTqIMdMnB3KKiMlnlQxRsCacW3VZf
+         hwaQ==
+X-Gm-Message-State: AAQBX9e0Pmg5KfnZNcOaWhdk6v18WIumuTG4pWIoApA0Y/TTKfxRmCaC
+        8yD7mDIAzze7XIwbuZwfE3Ha1YetMfT5gZs+6Ks=
+X-Google-Smtp-Source: AKy350YmcM4dLLZgIOM/acgLgjT5nSkzVfCXBu0dtkklxR8GQMuGJ4AuF8kRNzsINwGDMWRL49vzrw==
+X-Received: by 2002:a05:6a00:810:b0:63d:2990:deb with SMTP id m16-20020a056a00081000b0063d29900debmr16019192pfk.30.1682333926092;
+        Mon, 24 Apr 2023 03:58:46 -0700 (PDT)
+Received: from ?IPV6:2400:4050:a840:1e00:4457:c267:5e09:481b? ([2400:4050:a840:1e00:4457:c267:5e09:481b])
+        by smtp.gmail.com with ESMTPSA id p14-20020a62ab0e000000b0063a5837d9e8sm7138521pff.156.2023.04.24.03.58.44
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 24 Apr 2023 03:58:45 -0700 (PDT)
+Message-ID: <1453e91d-c630-0d95-156d-cdf97774db1b@daynix.com>
+Date:   Mon, 24 Apr 2023 19:58:43 +0900
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-X-QQ-SENDSIZE: 520
-Feedback-ID: Ymail-xx:chinaunicom.cn:mail-xx:mail-xx24b003-zhyw44w
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+Subject: Re: [PATCH] accel/kvm: Specify default IPA size for arm64
+Content-Language: en-US
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Richard Henderson <richard.henderson@linaro.org>,
+        qemu-devel@nongnu.org, qemu-arm@nongnu.org, kvm@vger.kernel.org,
+        Peter Maydell <peter.maydell@linaro.org>
+References: <20230109062259.79074-1-akihiko.odaki@daynix.com>
+ <481867e4-b019-80de-5369-9a503fa049ac@linaro.org>
+ <fb435604-1638-c4ee-efca-bdbe2a4be98b@daynix.com>
+ <CAFEAcA8dT+uvhCspUU9P-ev57UR9r5MDxkinPzwf+TieW_mUYg@mail.gmail.com>
+From:   Akihiko Odaki <akihiko.odaki@daynix.com>
+In-Reply-To: <CAFEAcA8dT+uvhCspUU9P-ev57UR9r5MDxkinPzwf+TieW_mUYg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
->On Sun, Apr 23, 2023 at 12:34:36PM +0800, 任敏敏(联通集团联通数字科技有限公司本部) wrote:
->> From: rminmin <renmm6@chinaunicom.cn>
+On 2023/01/16 20:18, Peter Maydell wrote:
+> On Sat, 14 Jan 2023 at 06:49, Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
 >>
->> run_qemu should return 0 if logs doesn't
->> contain "warning" keyword.
->
->Why? What are you trying to fix?
->
-
-I encountered a problem that the differet results when I run the same
-test case using standalone mode, "run_test.sh -t -g", "run_test.sh -g".
-When I use "run_test.sh -g", it always returns a FAIL message.
-In my env, qemu version is 6.2.
-
-e.g. runnig debug test cases.
-
-# without "-t"
-./run_tests.sh -g debug
-FAIL debug (22 tests)
-
-# "-t"
-./run_tests.sh -t -g debug
-TAP version 13
-ok 1 - debug: DR4==DR6 with CR4.DE == 0
-ok 2 - debug: DR4 read got #UD with CR4.DE == 1
-ok 3 - debug: #BP
-ok 4 - debug: hw breakpoint (test that dr6.BS is not set)
-ok 5 - debug: hw breakpoint (test that dr6.BS is not cleared)
-ok 6 - debug: Single-step #DB basic test
-ok 7 - debug: Usermode Single-step #DB basic test
-ok 8 - debug: Single-step #DB on emulated instructions
-ok 9 - debug: Usermode Single-step #DB on emulated instructions
-ok 10 - debug: Single-step #DB w/ STI blocking
-ok 11 - debug: Usermode Single-step #DB w/ STI blocking
-ok 12 - debug: Single-step #DB w/ MOVSS blocking
-ok 13 - debug: Usermode Single-step #DB w/ MOVSS blocking
-ok 14 - debug: Single-Step + ICEBP #DB w/ MOVSS blocking
-ok 15 - debug: Usermode Single-Step + ICEBP #DB w/ MOVSS blocking
-ok 16 - debug: Single-step #DB w/ MOVSS blocking and DR7.GD=1
-ok 17 - debug: hw watchpoint (test that dr6.BS is not cleared)
-ok 18 - debug: hw watchpoint (test that dr6.BS is not set)
-ok 19 - debug: icebp
-ok 20 - debug: MOV SS + watchpoint + ICEBP
-ok 21 - debug: MOV SS + watchpoint + int $1
-ok 22 - debug: MOV SS + watchpoint + INT3
-1..22
-
-# standalone
-
-tests/debug
-BUILD_HEAD=02d8befe
-timeout -k 1s --foreground 90s /usr/bin/qemu-kvm --no-reboot -nodefaults -device pc-testdev -device isa-debug-exit,iobase=0xf4,iosize=0x4 -vnc none -serial stdio -device pci-testdev -machine accel=kvm -kernel /tmp/tmp.1GdMZXhTTs -smp 1 # -initrd /tmp/tmp.LzHnmXchfO
-configure accelerator pc-i440fx-6.2 start
-machine init start
-device init start
-add qdev pc-testdev:none success
-add qdev pc-testdev:none success
-add qdev isa-debug-exit:none success
-add qdev isa-debug-exit:none success
-add qdev pci-testdev:none success
-add qdev pci-testdev:none success
-reset all devices
-qmp cont is received and vm is started
-qemu enter main_loop
-enabling apic
-smp: waiting for 0 APs
-PASS: DR4==DR6 with CR4.DE == 0
-PASS: DR4 read got #UD with CR4.DE == 1
-PASS: #BP
-PASS: hw breakpoint (test that dr6.BS is not set)
-PASS: hw breakpoint (test that dr6.BS is not cleared)
-PASS: Single-step #DB basic test
-PASS: Usermode Single-step #DB basic test
-PASS: Single-step #DB on emulated instructions
-PASS: Usermode Single-step #DB on emulated instructions
-PASS: Single-step #DB w/ STI blocking
-PASS: Usermode Single-step #DB w/ STI blocking
-PASS: Single-step #DB w/ MOVSS blocking
-PASS: Usermode Single-step #DB w/ MOVSS blocking
-PASS: Single-Step + ICEBP #DB w/ MOVSS blocking
-PASS: Usermode Single-Step + ICEBP #DB w/ MOVSS blocking
-PASS: Single-step #DB w/ MOVSS blocking and DR7.GD=1
-PASS: hw watchpoint (test that dr6.BS is not cleared)
-PASS: hw watchpoint (test that dr6.BS is not set)
-PASS: icebp
-PASS: MOV SS + watchpoint + ICEBP
-PASS: MOV SS + watchpoint + int $1
-PASS: MOV SS + watchpoint + INT3
-SUMMARY: 22 tests
-FAIL debug (22 tests)
-
-
+>> On 2023/01/14 14:23, Richard Henderson wrote:
+>>> On 1/8/23 22:22, Akihiko Odaki wrote:
+>>>> libvirt uses "none" machine type to test KVM availability. Before this
+>>>> change, QEMU used to pass 0 as machine type when calling KVM_CREATE_VM.
+>>>>
+>>>> The kernel documentation says:
+>>>>> On arm64, the physical address size for a VM (IPA Size limit) is
+>>>>> limited to 40bits by default. The limit can be configured if the host
+>>>>> supports the extension KVM_CAP_ARM_VM_IPA_SIZE. When supported, use
+>>>>> KVM_VM_TYPE_ARM_IPA_SIZE(IPA_Bits) to set the size in the machine type
+>>>>> identifier, where IPA_Bits is the maximum width of any physical
+>>>>> address used by the VM. The IPA_Bits is encoded in bits[7-0] of the
+>>>>> machine type identifier.
+>>>>>
+>>>>> e.g, to configure a guest to use 48bit physical address size::
+>>>>>
+>>>>>       vm_fd = ioctl(dev_fd, KVM_CREATE_VM, KVM_VM_TYPE_ARM_IPA_SIZE(48));
+>>>>>
+>>>>> The requested size (IPA_Bits) must be:
+>>>>>
+>>>>>    ==   =========================================================
+>>>>>     0   Implies default size, 40bits (for backward compatibility)
+>>>>>     N   Implies N bits, where N is a positive integer such that,
+>>>>>         32 <= N <= Host_IPA_Limit
+>>>>>    ==   =========================================================
+>>>>
+>>>>> Host_IPA_Limit is the maximum possible value for IPA_Bits on the host
+>>>>> and is dependent on the CPU capability and the kernel configuration.
+>>>>> The limit can be retrieved using KVM_CAP_ARM_VM_IPA_SIZE of the
+>>>>> KVM_CHECK_EXTENSION ioctl() at run-time.
+>>>>>
+>>>>> Creation of the VM will fail if the requested IPA size (whether it is
+>>>>> implicit or explicit) is unsupported on the host.
+>>>> https://docs.kernel.org/virt/kvm/api.html#kvm-create-vm
+>>>>
+>>>> So if Host_IPA_Limit < 40, such KVM_CREATE_VM will fail, and libvirt
+>>>> incorrectly thinks KVM is not available. This actually happened on M2
+>>>> MacBook Air.
+>>>>
+>>>> Fix this by specifying 32 for IPA_Bits as any arm64 system should
+>>>> support the value according to the documentation.
+>>>>
+>>>> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
+>>>> ---
+>>>>    accel/kvm/kvm-all.c | 4 ++++
+>>>>    1 file changed, 4 insertions(+)
+>>>>
+>>>> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+>>>> index e86c33e0e6..776ac7efcc 100644
+>>>> --- a/accel/kvm/kvm-all.c
+>>>> +++ b/accel/kvm/kvm-all.c
+>>>> @@ -2294,7 +2294,11 @@ static int kvm_init(MachineState *ms)
+>>>>        KVMState *s;
+>>>>        const KVMCapabilityInfo *missing_cap;
+>>>>        int ret;
+>>>> +#ifdef TARGET_AARCH64
+>>>> +    int type = 32;
+>>>> +#else
+>>>>        int type = 0;
+>>>> +#endif
+>>>
+>>> No need for an ifdef.  Down below we have,
+>>>
+>>>       if (object_property_find(OBJECT(current_machine), "kvm-type")) {
+>>>           g_autofree char *kvm_type =
+>>> object_property_get_str(OBJECT(current_machine),
+>>>                                                               "kvm-type",
+>>>                                                               &error_abort);
+>>>           type = mc->kvm_type(ms, kvm_type);
+>>>       } else if (mc->kvm_type) {
+>>>           type = mc->kvm_type(ms, NULL);
+>>>       }
+>>>
+>>> and the aarch64 -M virt machine provides virt_kvm_type as mc->kvm_type.
+>>>
+>>> How did you hit this?  Are you trying to implement your own board model?
+>>>
+>>> Looking at this, I'm surprised this is a board hook and not a cpu hook.
+>>> But I suppose the architecture specific 'type' can hide any number of
+>>> sins.  Anyway, if you are doing your own board model, I suggest
+>>> arranging to share the virt board hook -- maybe moving it to
+>>> target/arm/kvm.c in the process?
+> 
+>> I hit this problem when I used libvirt; libvirt uses "none" machine type
+>> to probe the availability of KVM and "none" machine type does not
+>> provide kvm_type hook.
 >>
->> Fixes: b2a2aa5d ("arch-run: reduce return code ambiguity")
->> Signed-off-by: rminmin <renmm6@chinaunicom.cn>
->> ---
->>  scripts/arch-run.bash | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
+>> As the implementation of "none" machine type is shared among different
+>> architectures, we cannot remove ifdef by moving it to the hook.
 >>
->> diff --git a/scripts/arch-run.bash b/scripts/arch-run.bash
->> index 51e4b97..9878d32 100644
->> --- a/scripts/arch-run.bash
->> +++ b/scripts/arch-run.bash
->> @@ -61,7 +61,7 @@ run_qemu ()
->>                 # Even when ret==1 (unittest success) if we also got stderr
->>                 # logs, then we assume a QEMU failure. Otherwise we translate
->>                 # status of 1 to 0 (SUCCESS)
->> -               if [ -z "$(echo "$errors" | grep -vi warning)" ]; then
->> +               if [ -z "$(echo "$errors" | grep -i warning)" ]; then
->
->This will now filter out all the errors, leaving only warnings or nothing.
->If you want the check to include warnings, then it should be
->
-> if [ -z "$(echo "$errors")" ]
->
+>> Although implementing the hook for "none" machine type is still
+>> possible, I  think the default type should provide the lowest common
+>> denominator and "none" machine type shouldn't try to work around when
+>> the type is wrong. Otherwise it doesn't make sense to provide the "default".
+> 
+> Yes, the problem is that the 'none' board type is all
+> architecture-independent code, and so is this kvm_init() code, so
+> there's no obvious arm-specific place to say "pick the best IPA size
+> that will work for this host".
+> 
+> Perhaps we should create somewhere in here a target-arch specific
+> hook: we already have ifdefs in this function for S390X and PPC
+> (printing some special case error strings if the ioctl fails), so
+> maybe a hook that does "take the type provided by the machine hook,
+> if any, sanitize or reject it, do the ioctl call, print arch-specific
+> help/error messages if relevant" ? Paolo, do you have an opinion?
+> 
+> thanks
+> -- PMM
 
-I found the root case is that "$(echo "$errors" | grep -vi warning)"
-is always not zero, because the $errors include qemu log(
-configure accelerator pc-i440fx-6.2 start .......) without any
-errors or warning keywords.
+Hi Paolo,
 
-Did I misunderstand something or miss some information?
+I have sent this patch a while ago but it's kind of missed so I'm about 
+to push this forward again. Can you have a look at this?
 
->>                         ret=0
->>                 fi
->>         fi
->> --
->> 2.33.0
->>
->
->Thanks,
->drew
-
-如果您错误接收了该邮件，请通过电子邮件立即通知我们。请回复邮件到 hqs-spmc@chinaunicom.cn，即可以退订此邮件。我们将立即将您的信息从我们的发送目录中删除。 If you have received this email in error please notify us immediately by e-mail. Please reply to hqs-spmc@chinaunicom.cn ,you can unsubscribe from this mail. We will immediately remove your information from send catalogue of our.
+Regards,
+Akihiko Odaki
