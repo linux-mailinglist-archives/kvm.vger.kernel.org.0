@@ -2,187 +2,170 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E37746EC6AA
-	for <lists+kvm@lfdr.de>; Mon, 24 Apr 2023 09:01:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 044CF6EC72F
+	for <lists+kvm@lfdr.de>; Mon, 24 Apr 2023 09:33:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231147AbjDXHBm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 Apr 2023 03:01:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33652 "EHLO
+        id S231165AbjDXHdE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 Apr 2023 03:33:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54242 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231131AbjDXHBj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 Apr 2023 03:01:39 -0400
-Received: from mail-lf1-x135.google.com (mail-lf1-x135.google.com [IPv6:2a00:1450:4864:20::135])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F78AE5E
-        for <kvm@vger.kernel.org>; Mon, 24 Apr 2023 00:01:37 -0700 (PDT)
-Received: by mail-lf1-x135.google.com with SMTP id 2adb3069b0e04-4edc63e066fso10505e87.1
-        for <kvm@vger.kernel.org>; Mon, 24 Apr 2023 00:01:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1682319695; x=1684911695;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=oFvdNJ5wNm8bAPrnAB1ppnXwBJiUYz1wk9PgIHRrg6A=;
-        b=pAWnwcZUzVEvGD8U5XoERz4DLnhy4gn3LtztEZ3VL06RgIBG61MWxdbxUk4sb9gvu0
-         Tjf3DMxSJv1PycRT41IDycW6QaDs87WQA/IiM5l67+p8KnxU/iKoTVtXRtQRIAlN4Jbj
-         qcFCNGu8W+URpqD4VrGmt1ttNuebJz0JmJVEkRWG+xlluGMaF1meyWF+BrSs4nzYBndq
-         oG6yMGsUdRrebpM+0xJEzp8HCRgN7GK5kM4dMAw587lHQJNCbsg03tzki7u/e4XlhgBk
-         jNbQ3L9ZEmqpsAAhos2DkIDQlOzf+86OrvHFEWxAHmsG2OwkXORDe3XUnMX2Bsuye3Xu
-         Er+A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682319695; x=1684911695;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=oFvdNJ5wNm8bAPrnAB1ppnXwBJiUYz1wk9PgIHRrg6A=;
-        b=BYQQyaDQ3qNqezuCugafXq+3PPKqQM3MFz+4GQkZkkAj0bsBu02oSNRM8LcckhBSb2
-         7Q1gbOELt1in4JmDJ3s5Io4MJbEf5itYIUjnVo1Nb3Iy0+uAeaw3fzM/Vn7E08lToKfr
-         6Qj8uH85O5K/yUNtNJzZRLV1gIx9i4EOehdgtkvnFD0Y6zzK83f/HDbSuNh+ufIZtBjm
-         ClhydKIk/gZaRt0q7C0+o9C/lsWdYIHFm85NVNpopYa0FKQDLYt5R1EsnMYtaFmZUdsm
-         pcG8sz+dZ3DkZKb3DR2i5q+8NFHwZPS38ZO4wsw5CpY8/cn3TSHDE2JoIkTJhWtHghS5
-         Bl5g==
-X-Gm-Message-State: AAQBX9cXoXY+Mo0BoEWS8Ci/Tc28xEtOzHL9H4cnK/elkW9mf0ZHCiQc
-        Bq8yRpUhC25HcMtnbylz187EfYR/Wf7zEiCZ/MKdtNGrl5ouFIIugAcf7g==
-X-Google-Smtp-Source: AKy350aJHm/Q0fOJW1kbhhAhbI3UOl65UI81G9owszShxfnRp44JjyTSsrj+CJa0nHfza3zEVvcIRnxniexN1lu756E=
-X-Received: by 2002:a05:6512:3ca2:b0:4ed:b0bd:a96c with SMTP id
- h34-20020a0565123ca200b004edb0bda96cmr213958lfv.6.1682319695161; Mon, 24 Apr
- 2023 00:01:35 -0700 (PDT)
+        with ESMTP id S230260AbjDXHdC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 24 Apr 2023 03:33:02 -0400
+Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD372E6C;
+        Mon, 24 Apr 2023 00:32:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1682321570; x=1713857570;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=RsTC2qLsOqcLl8Oq0Lv07G7/XiW+AoW7hifsb+/GmY0=;
+  b=ZH4rWaX1nAFUw0wgys8ElZ9SC+CbpCyBo8wKdOXaHBZqITnkTxhsm/Nu
+   pgslm8VorgAs71wrmOhlFym1Hg0ckdANYZTnBUBRpq7i9hMxzkH/yyTXc
+   e8T2XGlxW3yWi3dk6aObD6xywAp7wT0Qift4lLdWvV8igBBlH66atdba6
+   KjkDTZT7rb5EhDLluT8MBUX0Bg//3NM9BNwv5GVhfG1CwJkoteqVcGfbL
+   5D8n9d11+52EJ2xwRmusDRE+UFHZukodXEvx3J6/gCCZa2s3js9fgVhuU
+   mcTFJ7tu/PkTG/+8gri1P8m3YhNWgH7i0FziYHN3lStisKTCI2G5t9hqL
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10689"; a="409317560"
+X-IronPort-AV: E=Sophos;i="5.99,222,1677571200"; 
+   d="scan'208";a="409317560"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Apr 2023 00:32:50 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10689"; a="836858957"
+X-IronPort-AV: E=Sophos;i="5.99,222,1677571200"; 
+   d="scan'208";a="836858957"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by fmsmga001.fm.intel.com with ESMTP; 24 Apr 2023 00:32:49 -0700
+Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.23; Mon, 24 Apr 2023 00:32:49 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.23; Mon, 24 Apr 2023 00:32:49 -0700
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.23 via Frontend Transport; Mon, 24 Apr 2023 00:32:49 -0700
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.42) by
+ edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.23; Mon, 24 Apr 2023 00:32:48 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=DDIdhbBxYKDnRSsmV7RrQn/fEDN/bmGTmjLO4MGNXqIi46H8YXa+JMmJlfmk4+rDik0i2blGWq8gqSYka+pwzoFWXhb5XsQuhbDEaapJz/6j8VeTxmk4ZZIV/v2q1wsX5fUZVp8TcfjbTwzwmSD/T8z4uoLYbzQ3C2t7HnYb4dCaFj7a9046xd7p1gnu0kJXHt7d/kSsMYxG0YVnZ/POWkyhK+uupiGa1bwjH/l7Osg/YIFbCQx5umuAqMIpCaHenfs8DK6CsiFlZu+9sUM5yFWYnT7vIp7ENdpOBERrlxyjnc0mVeb3zzilmPYO+bdFZaWXPwqN8uUvMg606eMmrA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=RsTC2qLsOqcLl8Oq0Lv07G7/XiW+AoW7hifsb+/GmY0=;
+ b=Nr/5+PsDPEzrjFWvID5SwGL1BvhNFf1o8zarFpdvgs9j/93JOMrHRIUNHDrjnjj0pfEFslm/Z56qvaqq8XQzB/YdYuYKtE5h29TuV+K9WQRvJbJ9Fkt22CP+AQFpnBgVVGSuspydp/sRR/e+yD+RQ/R/n27qGKlKx8Pgp4CJGpdGSnHurTSujXnB4llprsJeC4NrdIqbCV2wYGgTUALCFBcdaVBcMQJa1u4ekGuc83QGRft8Rd9QXbi7wop4rXYd6RpRjL8OUkr/6g6MUKahPAsg9UC5wdP5p84vxNRe0xV6lClryL78L7TWy/CsQHtAu89nTx7yjOT+Ro78V6nJ1A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from PH8PR11MB6780.namprd11.prod.outlook.com (2603:10b6:510:1cb::11)
+ by SJ0PR11MB5645.namprd11.prod.outlook.com (2603:10b6:a03:3b9::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6319.33; Mon, 24 Apr
+ 2023 07:32:46 +0000
+Received: from PH8PR11MB6780.namprd11.prod.outlook.com
+ ([fe80::b4cb:1f70:7e2a:c4f5]) by PH8PR11MB6780.namprd11.prod.outlook.com
+ ([fe80::b4cb:1f70:7e2a:c4f5%9]) with mapi id 15.20.6319.033; Mon, 24 Apr 2023
+ 07:32:46 +0000
+Date:   Mon, 24 Apr 2023 15:32:36 +0800
+From:   Chao Gao <chao.gao@intel.com>
+To:     Zeng Guang <guang.zeng@intel.com>
+CC:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        H Peter Anvin <hpa@zytor.com>, <kvm@vger.kernel.org>,
+        <x86@kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH 1/6] KVM: x86: Virtualize CR4.LASS
+Message-ID: <ZEYwlMmzYnJjNNHq@chao-email>
+References: <20230420133724.11398-1-guang.zeng@intel.com>
+ <20230420133724.11398-2-guang.zeng@intel.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20230420133724.11398-2-guang.zeng@intel.com>
+X-ClientProxiedBy: SG2PR01CA0114.apcprd01.prod.exchangelabs.com
+ (2603:1096:4:40::18) To PH8PR11MB6780.namprd11.prod.outlook.com
+ (2603:10b6:510:1cb::11)
 MIME-Version: 1.0
-References: <000000000000a0bc2b05f9dd7fab@google.com> <ZEMFpqxvOHd2kZiu@google.com>
-In-Reply-To: <ZEMFpqxvOHd2kZiu@google.com>
-From:   Dmitry Vyukov <dvyukov@google.com>
-Date:   Mon, 24 Apr 2023 09:01:22 +0200
-Message-ID: <CACT4Y+Ytpc8zqcyV7xnOJsdz5qoT0mpOE1yZrPZ53D5ZwUrMwA@mail.gmail.com>
-Subject: Re: [syzbot] [kvm?] WARNING in kvm_tdp_mmu_invalidate_all_roots
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     syzbot <syzbot+094a74444165dbcd3a54@syzkaller.appspotmail.com>,
-        bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        mingo@redhat.com, pbonzini@redhat.com,
-        syzkaller-bugs@googlegroups.com, tglx@linutronix.de, x86@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH8PR11MB6780:EE_|SJ0PR11MB5645:EE_
+X-MS-Office365-Filtering-Correlation-Id: 982a6008-7a35-4e39-1f76-08db44961953
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: H0bSKg4Y78xWdJLfnQ0N0uhzLDWIZITnl0tcJ838rBg3G1lM4xYBNQXfQXgH1Cup4YS4xb4KxJz4hJCbopZ7Xjduo2YSMI378X5EOp44UfMdwTKqFHEqA898SG44D36RGX8xloqVjtkj74+ddeFzygQOuCpqeBspIHXQeKtCB9XCWujLc3i/EoXH2PHX+QwFyz8OevIWlAedD3SSDRqN73I0B+XAsd9hEjwlaasS8RAQZp2CNI/SGC0iizkQXETgbpTnqk1IKn0M/VmofTiW26I7vg439m5WMLMEO2sBIL3W6ZZPQTCTv23yxjn0AEal3m3SruMS+XaBQ7Az2Ego1RRpoCDlxYXK5ouQad1iqFbifW7SNMNpBiFGKU3FQtYQzEZeIJCdP/XYV8soi8Dpt+QSB//oAumUB2rX8yH6kJL6niwejQxGzV4H6Z7EZSNnUkcYaqygL1Qv6pZmKlh4aKDqRVmJCPL6tdewkndsIOqxWXhh+JEDr8nuA2pSl8PydxFKZtqg42qHZ26uhv0kJbiHGEZvSqPDdpzWlgnSZpLnjJii4hrqAB350jsAGR85
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH8PR11MB6780.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(7916004)(366004)(376002)(346002)(39860400002)(136003)(396003)(451199021)(478600001)(54906003)(6636002)(86362001)(186003)(6486002)(26005)(9686003)(6506007)(6512007)(33716001)(6666004)(4326008)(66476007)(66556008)(316002)(82960400001)(44832011)(83380400001)(66946007)(2906002)(4744005)(38100700002)(41300700001)(8676002)(6862004)(8936002)(5660300002)(7416002);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?ZqltEdXtD0vJtswM8UWb4d07UJKpIPlZey2wvszaAGEkz6G6CLVQTUuxnVqm?=
+ =?us-ascii?Q?Jw6EPH/PKtHois4qwA/hWKVcNw20fXt/EIGY1JCj4i4ny86b2IAq1NkG2L86?=
+ =?us-ascii?Q?/L+jkBlXCPEa7Mh1sATNw3R0ycllfJsg+1jq4bi4exy9G0z7rpTOpgbZepV3?=
+ =?us-ascii?Q?8JNb8dMNtwyo9wmnrI7b+SeT20Mt7/2dsCP7LuW25DPVlhvLc9FW0JadulA7?=
+ =?us-ascii?Q?7Y+UlHkRdNsbIqrjGP5BQ6feEXSMgdk2Jxb8o8Eig7fhNmOmCJiLJQ/HQ9pQ?=
+ =?us-ascii?Q?4GtErFCBtqOmqqlz+etMxJ0yqhBNbTRAg65qerb4g1b34f7HjA79rZjsB7Ws?=
+ =?us-ascii?Q?9IyHMpoMtJ+8pTwk5wT7w63O0vTRizBloBRP9SnVXb3dq6GsBq1rUz0H0aWQ?=
+ =?us-ascii?Q?it4vvJkUVMHMMC4KVBuPlyTjWJ099MC2e+i1Ejta9HbpuP6JiKMje4Gnybe+?=
+ =?us-ascii?Q?DaDIJCE/JO3NU5qzKNnhw2PYiU3qe0gF2kuMtAn63aqFL1W8rVEYGjavqlhw?=
+ =?us-ascii?Q?7gSYs09Lz3f8u1D/wMzd7PVI+NeZees8qATjvdFSdnXeX6ZiWLkQ1lekIliE?=
+ =?us-ascii?Q?9Wr/O+W84Qjp4rMwxDb7d4JamDLF4IBacYpR11AOyBT+FU95sZclnjz5zfWh?=
+ =?us-ascii?Q?V8vyF+fjNxHdKG6M7a1q1E9/6LPxG2ItT+At4NXpTzf3i/r0RGasLip2R/Tc?=
+ =?us-ascii?Q?c2oKcsiiKAuz4gn4WKK5xTBRyjfFGXX6o+lc3oVgYIVFwqfWnWC1GNH9fuqn?=
+ =?us-ascii?Q?iZPQ7pRw48WhsatM60SGBS6/S+CDCfdSaqm8xlzJwYWJazkY3kegdG9ENQCj?=
+ =?us-ascii?Q?pCftItB72KssL0C0piDIir0xGAxQeFijg2WCh4GCPV+fBTvkN2kCLUE43kXP?=
+ =?us-ascii?Q?ibvCK4GEYo6w0ygp/O4YN06c+IEu3ZdSkYmvka+KWkvPN5pubzQq7UvG440V?=
+ =?us-ascii?Q?XrlPQWl37vjlSaLC1vht7Dxhs9LOqxZd+YRLgPpktpmUghIqKO15Q8mUP09F?=
+ =?us-ascii?Q?459VUrSt+Pvnc0IW8BKXZ3wtooB5zCA/9gfNQVNUcHNS6mmUSjI5daE7Hv5m?=
+ =?us-ascii?Q?hrq4d4Wn8WwiEcEQuW3Z5vYnjKSie1b4W7vsVc2E85ldRQqTfhVB4ukEmpPG?=
+ =?us-ascii?Q?ZR8h5Y86/nXlJa9OjfqwAx56s9CoFnv6B3OElglm8AEnCGMXCZXDW91xwm0y?=
+ =?us-ascii?Q?myHseZ5dpVEY7hjwjx7sWI5uPFjQcQyYg3LgL+Zjyh6ac+6ibzvkmwSehqpo?=
+ =?us-ascii?Q?Z0x82UKTpVLJmDEkS9zfOh2uOu/yS2/zMyhtk19eceGREx3n2F46TyrLSJ6R?=
+ =?us-ascii?Q?CFPHKwfXJunhkt7KVi+z59DNl4OSwUzYNm45pt9KCjdks0KjOhRdEjAmwsBI?=
+ =?us-ascii?Q?CUAYHT5om8MIVMMOVxM+2d8JLj1ny+v4KC7QeEHzm/yS9ay+QoWxWNL9diaF?=
+ =?us-ascii?Q?OVwTMKg/xVCs8JHc/IXwT2iU+5wiMvInubRG3z7bdlQSaeUqnPf5PbP6noXZ?=
+ =?us-ascii?Q?15acBGOddrqKzDHdWAyMFg4uYmDfY7u+EOMN7fw+7ICwIeLC/BuVSvGswkg3?=
+ =?us-ascii?Q?8d0ziC+WpWAOuBtcfEVfOoPT5EUQeW2WcN32wiNz?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 982a6008-7a35-4e39-1f76-08db44961953
+X-MS-Exchange-CrossTenant-AuthSource: PH8PR11MB6780.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Apr 2023 07:32:46.6790
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: S8gSL+m6pgly7snN871PUQIIW8OwKzWiZmXHN2pZGSWXqxb/4/vchN3JducpvwUdtI9iBwoE7eptKi6v9HERAQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR11MB5645
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 21 Apr 2023 at 23:52, 'Sean Christopherson' via syzkaller-bugs
-<syzkaller-bugs@googlegroups.com> wrote:
->
-> On Fri, Apr 21, 2023, syzbot wrote:
-> > Hello,
-> >
-> > syzbot found the following issue on:
-> >
-> > HEAD commit:    d3e1ee0e67e7 Add linux-next specific files for 20230421
-> > git tree:       linux-next
-> > console output: https://syzkaller.appspot.com/x/log.txt?x=16ac3de0280000
-> > kernel config:  https://syzkaller.appspot.com/x/.config?x=53c789efbcc06cf6
-> > dashboard link: https://syzkaller.appspot.com/bug?extid=094a74444165dbcd3a54
-> > compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
-> >
-> > Unfortunately, I don't have any reproducer for this issue yet.
-> >
-> > Downloadable assets:
-> > disk image: https://storage.googleapis.com/syzbot-assets/c558a9e1fe6a/disk-d3e1ee0e.raw.xz
-> > vmlinux: https://storage.googleapis.com/syzbot-assets/2ec100a34c4c/vmlinux-d3e1ee0e.xz
-> > kernel image: https://storage.googleapis.com/syzbot-assets/1afcd9936dc1/bzImage-d3e1ee0e.xz
-> >
-> > IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> > Reported-by: syzbot+094a74444165dbcd3a54@syzkaller.appspotmail.com
-> >
-> > ------------[ cut here ]------------
-> > WARNING: CPU: 0 PID: 12623 at arch/x86/kvm/mmu/tdp_mmu.c:943 kvm_tdp_mmu_invalidate_all_roots+0x2bd/0x370 arch/x86/kvm/mmu/tdp_mmu.c:943
-> > Modules linked in:
-> > CPU: 0 PID: 12623 Comm: syz-executor.3 Not tainted 6.3.0-rc7-next-20230421-syzkaller #0
-> > Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/30/2023
-> > RIP: 0010:kvm_tdp_mmu_invalidate_all_roots+0x2bd/0x370 arch/x86/kvm/mmu/tdp_mmu.c:943
-> > Call Trace:
-> >  <TASK>
-> >  kvm_mmu_uninit_tdp_mmu+0x16/0x100 arch/x86/kvm/mmu/tdp_mmu.c:48
-> >  kvm_mmu_uninit_vm+0x6a/0x70 arch/x86/kvm/mmu/mmu.c:6239
-> >  kvm_arch_destroy_vm+0x369/0x490 arch/x86/kvm/x86.c:12465
-> >  kvm_create_vm arch/x86/kvm/../../../virt/kvm/kvm_main.c:1245 [inline]
-> >  kvm_dev_ioctl_create_vm arch/x86/kvm/../../../virt/kvm/kvm_main.c:5017 [inline]
-> >  kvm_dev_ioctl+0x11be/0x1bb0 arch/x86/kvm/../../../virt/kvm/kvm_main.c:5059
-> >  vfs_ioctl fs/ioctl.c:51 [inline]
-> >  __do_sys_ioctl fs/ioctl.c:870 [inline]
-> >  __se_sys_ioctl fs/ioctl.c:856 [inline]
-> >  __x64_sys_ioctl+0x197/0x210 fs/ioctl.c:856
-> >  do_syscall_x64 arch/x86/entry/common.c:50 [inline]
-> >  do_syscall_64+0x39/0xb0 arch/x86/entry/common.c:80
-> >  entry_SYSCALL_64_after_hwframe+0x63/0xcd
->
-> Gah, kvm->users_count is elevated when the VM is destroyed if creation fails,
-> but mmu_lock isn't held in that case, and lockdep yells.  This particular bug is
-> effectively a false positive, nothing else holds a reference to the VM.
->
-> However, syzbot found another bug that _is_ a real problem (hasn't been reported
-> upstream yet for whatever reason).
+On Thu, Apr 20, 2023 at 09:37:19PM +0800, Zeng Guang wrote:
+>Virtualize CR4.LASS[bit 27] under KVM control instead of being guest-owned
+>as CR4.LASS generally set once for each vCPU at boot time and won't be
+>toggled at runtime. Besides, only if VM has LASS capability enumerated with
+>CPUID.(EAX=07H.ECX=1):EAX.LASS[bit 6], KVM allows guest software to be able
+>to set CR4.LASS.
 
-It was staged in the moderation queue for manual moderation:
-https://github.com/google/syzkaller/blob/master/docs/syzbot.md#moderation-queue
+>By design CR4.LASS can be manipulated by nested guest as
+>well.
 
-here:
-https://groups.google.com/g/syzkaller-upstream-moderation/c/pTGA87FeSIE
+This is inaccurate. The change in nested_vmx_cr_fixed1_bits_update() is
+to allow L1 guests to set CR4.LASS in VMX operation. I would say:
 
-I've pushed it upstream since you say it's worth fixing.
-
-
-
->  Not holding mmu_lock during "real" VM destruction
-> is problematic because walking the list can race with the asynchronous worker
-> deleting and freeing from the list.
->
-> Posted a fixed version[*] that should resolve both issues by protecting the walk
-> with RCU.
->
-> [*] https://lore.kernel.org/all/20230421214946.2571580-1-seanjc@google.com
->
-> ==================================================================
-> BUG: KASAN: slab-use-after-free in kvm_tdp_mmu_invalidate_all_roots+0x2e3/0x370 arch/x86/kvm/mmu/tdp_mmu.c:945
-> Read of size 8 at addr ffff88801c8cf948 by task syz-executor.1/17012
->
-> CPU: 0 PID: 17012 Comm: syz-executor.1 Not tainted 6.3.0-rc7-next-20230421-syzkaller #0
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/30/2023
-> Call Trace:
-> <TASK>
-> __dump_stack lib/dump_stack.c:88 [inline]
-> dump_stack_lvl+0xd9/0x150 lib/dump_stack.c:106
-> print_address_description.constprop.0+0x2c/0x3c0 mm/kasan/report.c:351
-> print_report mm/kasan/report.c:462 [inline]
-> kasan_report+0x11c/0x130 mm/kasan/report.c:572
-> kvm_tdp_mmu_invalidate_all_roots+0x2e3/0x370 arch/x86/kvm/mmu/tdp_mmu.c:945
-> kvm_mmu_uninit_tdp_mmu+0x16/0x100 arch/x86/kvm/mmu/tdp_mmu.c:48
-> kvm_mmu_uninit_vm+0x6a/0x70 arch/x86/kvm/mmu/mmu.c:6239
-> kvm_arch_destroy_vm+0x369/0x490 arch/x86/kvm/x86.c:12465
-> kvm_destroy_vm arch/x86/kvm/../../../virt/kvm/kvm_main.c:1313 [inline]
-> kvm_put_kvm+0x4da/0xae0 arch/x86/kvm/../../../virt/kvm/kvm_main.c:1347
-> kvm_vcpu_release+0x51/0x70 arch/x86/kvm/../../../virt/kvm/kvm_main.c:3846
-> __fput+0x27c/0xa90 fs/file_table.c:321
-> task_work_run+0x16f/0x270 kernel/task_work.c:179
-> resume_user_mode_work include/linux/resume_user_mode.h:49 [inline]
-> exit_to_user_mode_loop kernel/entry/common.c:171 [inline]
-> exit_to_user_mode_prepare+0x210/0x240 kernel/entry/common.c:204
-> __syscall_exit_to_user_mode_work kernel/entry/common.c:286 [inline]
-> syscall_exit_to_user_mode+0x1d/0x50 kernel/entry/common.c:297
-> do_syscall_64+0x46/0xb0 arch/x86/entry/common.c:86
-> entry_SYSCALL_64_after_hwframe+0x63/0xcd
-> RIP: 0033:0x7fd7a583e01b
-> Code: 0f 05 48 3d 00 f0 ff ff 77 45 c3 0f 1f 40 00 48 83 ec 18 89 7c 24 0c e8 63 fc ff ff 8b 7c 24 0c 41 89 c0 b8 03 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 35 44 89 c7 89 44 24 0c e8 a1 fc ff ff 8b 44
-> RSP: 002b:00007ffc821a2fb0 EFLAGS: 00000293 ORIG_RAX: 0000000000000003
-> RAX: 0000000000000000 RBX: 000000000000000a RCX: 00007fd7a583e01b
-> RDX: 0000000000000000 RSI: 00007fd7a5400000 RDI: 0000000000000009
-> RBP: 00007fd7a59ad980 R08: 0000000000000000 R09: 0000000071612a4e
-> R10: 0000000000000000 R11: 0000000000000293 R12: 000000000014ffb4
-> R13: 00007ffc821a30b0 R14: 00007fd7a59ac050 R15: 0000000000000032
-> </TASK>
->
-> --
-> You received this message because you are subscribed to the Google Groups "syzkaller-bugs" group.
-> To unsubscribe from this group and stop receiving emails from it, send an email to syzkaller-bugs+unsubscribe@googlegroups.com.
-> To view this discussion on the web visit https://groups.google.com/d/msgid/syzkaller-bugs/ZEMFpqxvOHd2kZiu%40google.com.
+Set the CR4.LASS bit in the emulated IA32_VMX_CR4_FIXED1 MSR for guests
+to allow guests to enable LASS in nested VMX operation.
