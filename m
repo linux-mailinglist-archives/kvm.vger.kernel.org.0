@@ -2,131 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B7DCE6ED186
-	for <lists+kvm@lfdr.de>; Mon, 24 Apr 2023 17:37:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A93796ED1C0
+	for <lists+kvm@lfdr.de>; Mon, 24 Apr 2023 17:51:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230205AbjDXPhq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 Apr 2023 11:37:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42652 "EHLO
+        id S231932AbjDXPvy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 Apr 2023 11:51:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54144 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231584AbjDXPhp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 Apr 2023 11:37:45 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A1FB7A9C
-        for <kvm@vger.kernel.org>; Mon, 24 Apr 2023 08:37:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1682350620;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=/CAo7ajv8NQ/2ztFNCQQbDdpRXuWVRxNmzbnC6f9fp4=;
-        b=ecVZsdyDcQvYp/7hw9H5YpG/OGpt1phLusW0b7i4hhFxrwkWXrW6OgzGn6zRZJzcof0iE0
-        jWFQfN14PWi9kAANji3LeGT/ICwD9w0mYFHZWU+N358TnEqyJgaCKp6g20qht2lqItktBg
-        PNuDSSBUYPey+P8mzEA9y+2EwzuHPJY=
-Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
- [209.85.160.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-578-OkG7ivJDNwWb-YVJ_15HkA-1; Mon, 24 Apr 2023 11:36:58 -0400
-X-MC-Unique: OkG7ivJDNwWb-YVJ_15HkA-1
-Received: by mail-qt1-f199.google.com with SMTP id d75a77b69052e-3f0a12ab268so6924911cf.1
-        for <kvm@vger.kernel.org>; Mon, 24 Apr 2023 08:36:58 -0700 (PDT)
+        with ESMTP id S230500AbjDXPvw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 24 Apr 2023 11:51:52 -0400
+Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67A75114
+        for <kvm@vger.kernel.org>; Mon, 24 Apr 2023 08:51:50 -0700 (PDT)
+Received: by mail-pj1-x1049.google.com with SMTP id 98e67ed59e1d1-2473f8329f7so4578672a91.1
+        for <kvm@vger.kernel.org>; Mon, 24 Apr 2023 08:51:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1682351510; x=1684943510;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=jtSUeuCkwFR5o9I94yYcCoz20ACvzd68ye5sBnm4VyI=;
+        b=H1ijR7UE/3KIVe/zpESfqf8ex9Yh+rK/GGtg6nGEheB0BmipgBSBTp7H6p2VnibeMd
+         H0iWfBu7ZV24ETrjrSSNaNavlJOjqTR9RIx281EJZej6/mlOcy3Wmtz038RtymvYqmmw
+         rZPl5BNouEtiW4Xq8kqyRr2HSeNV2IA286Rtta5JkRlDMHoeTyE8WynK8TaSs1wYMLPn
+         fjO3wScNWdGBu6Yno8qNZPc9cWhDU+tJoGTAO7v6GCZYj+Aq7qA95KhqUcqSHLXidx4H
+         IUs/RqX80xXkdkaqTd+vX0H3Q2MkhExajcheg9Nn2td+mUPlKpc/OezTlJK3tFY2tl+D
+         zKhQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682350618; x=1684942618;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/CAo7ajv8NQ/2ztFNCQQbDdpRXuWVRxNmzbnC6f9fp4=;
-        b=ipLrOYLH77hAlonCbGnk9dVcmdGIiQXDELqgVbVi0LmH1ZkmWOdW9ILJ4S75IdoKQ+
-         CxBnImBzE/TI0OqRQSHU7kZ9M3xiYLglCg8D7h/oG4iIhi4VIrQ36H/iMf7H5/yubnem
-         39e3hV8/LOm8XEzNGEGlyFPOdsB4wa5TbGGxFnGrD75ZBZyorKzuWXpHA2NqnQRosoIw
-         qMYnsNIiF7/PsD+wUQ4GwvVn/XjDNlIhJ4qzD9UfgJOiNq+U8R2a/bHW5IZTp7wF7QRj
-         Sj1ufwVXLKnzWj6XR129vRIFes7i6kcPgEtRXOgX/oaNia7GXW1fvLIvzyaL8mjQYB+J
-         rgMg==
-X-Gm-Message-State: AAQBX9drFecpqciJH6ZlX+Xvp9Qt6hw40hIF/nfykBzsoerRjSPo+WXE
-        nWh/edtO67sNXSuk3Twuo8B+yqbqzZM5yMtQEYu0kekqMu+uQgqf+p6lj4mb6Td6Xwx3RknCXH/
-        SfQsiIA+bpDmF
-X-Received: by 2002:a05:622a:1a09:b0:3ef:3af7:1c4a with SMTP id f9-20020a05622a1a0900b003ef3af71c4amr23814706qtb.5.1682350618334;
-        Mon, 24 Apr 2023 08:36:58 -0700 (PDT)
-X-Google-Smtp-Source: AKy350Z1sU41bm37KXgY1/iSYPLEpQ6S3VAy+8sj8XhWZFOdj93XffQuOAs3sNYAX2qXESHEnyg80g==
-X-Received: by 2002:a05:622a:1a09:b0:3ef:3af7:1c4a with SMTP id f9-20020a05622a1a0900b003ef3af71c4amr23814661qtb.5.1682350618008;
-        Mon, 24 Apr 2023 08:36:58 -0700 (PDT)
-Received: from [192.168.149.117] (58.254.164.109.static.wline.lns.sme.cust.swisscom.ch. [109.164.254.58])
-        by smtp.gmail.com with ESMTPSA id x15-20020ac84d4f000000b003ef28a76a11sm3697374qtv.68.2023.04.24.08.36.56
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 24 Apr 2023 08:36:57 -0700 (PDT)
-Message-ID: <f7e2495d-56d1-158e-b898-d3869e4e4a89@redhat.com>
-Date:   Mon, 24 Apr 2023 17:36:53 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Subject: Re: [kvm:queue] [kvm] c7ed946b95: kvm-unit-tests.msr.fail
-Content-Language: de-CH
-To:     kernel test robot <yujie.liu@intel.com>
-Cc:     oe-lkp@lists.linux.dev, lkp@intel.com, kvm@vger.kernel.org,
-        Robert Hu <robert.hu@intel.com>,
-        Farrah Chen <farrah.chen@intel.com>,
-        Danmei Wei <danmei.wei@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jim Mattson <jmattson@google.com>
-References: <202304241320.ab1eea12-yujie.liu@intel.com>
-From:   Emanuele Giuseppe Esposito <eesposit@redhat.com>
-In-Reply-To: <202304241320.ab1eea12-yujie.liu@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+        d=1e100.net; s=20221208; t=1682351510; x=1684943510;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=jtSUeuCkwFR5o9I94yYcCoz20ACvzd68ye5sBnm4VyI=;
+        b=c94rfN99F9e0KJBTwSmHKMwdQJyv3zLjccC03RKkZCwtTkNs7dHz6NWJRqO4rkGP58
+         iGAr+n4tTLMKO6diHOBQQ3POonQ9/rZeEzllAdKV4Ru3vVM4ieudyc1bwPRH29EBINwa
+         AIA8VeyJJcgEfzCCc60Xli7A1YXYCEMcPMqAY7ObaB35ec1XoBSoJ0MGWw+sx1/P8Y6k
+         v4Jp3rRMHbks7BXj1V7kU2j9cM4CsEPkSN5WesNfC+pjrCPiO08FSGtC6klztCaNf17G
+         dQYqWhAIYsq/2iZSdIQ21qV5EZpeNaJP1gtmAXC7lhbwFpW7qdSWJ6USLJd3zdQGMPdI
+         Lxnw==
+X-Gm-Message-State: AAQBX9eSFWcKG/eT9Y2o0/fRFHqfZly+Y50TimxOB7ukdrFwwWD+sl0l
+        EYOEcfwQFCyj/exIQugUxm5u0Ul8kyk=
+X-Google-Smtp-Source: AKy350bbdh+Ihp0N09viUjEVVR+Tbs0JLwUQngZeZz2fNHKtuBjHMV6nOn75eC0gw6MmjsvH87TBadNjEm4=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:90a:410d:b0:246:a74f:fd73 with SMTP id
+ u13-20020a17090a410d00b00246a74ffd73mr3408751pjf.6.1682351509797; Mon, 24 Apr
+ 2023 08:51:49 -0700 (PDT)
+Date:   Mon, 24 Apr 2023 08:51:48 -0700
+In-Reply-To: <20230422111834.00003689@gmail.com>
+Mime-Version: 1.0
+References: <cover.1678643051.git.isaku.yamahata@intel.com>
+ <23cc6df6ec2ca776c3efe148e70ba290aa3de319.1678643052.git.isaku.yamahata@intel.com>
+ <20230422111834.00003689@gmail.com>
+Message-ID: <ZEallJHJnG9HJDNy@google.com>
+Subject: Re: [PATCH v13 048/113] KVM: x86/mmu: Disallow dirty logging for x86 TDX
+From:   Sean Christopherson <seanjc@google.com>
+To:     Zhi Wang <zhi.wang.linux@gmail.com>
+Cc:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com,
+        Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com,
+        Sagi Shahar <sagis@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Kai Huang <kai.huang@intel.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Michael Roth <michael.roth@amd.com>
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Sat, Apr 22, 2023, Zhi Wang wrote:
+> On Sun, 12 Mar 2023 10:56:12 -0700
+> isaku.yamahata@intel.com wrote:
+> 
+> > From: Isaku Yamahata <isaku.yamahata@intel.com>
+> > 
+> > TDX doesn't support dirty logging.  Report dirty logging isn't supported so
+> > that device model, for example qemu, can properly handle it.  Silently
+> > ignore on dirty logging on private GFNs of TDX.
 
+...
 
-Am 24/04/2023 um 08:19 schrieb kernel test robot:
-> Hello,
+> > +bool kvm_arch_dirty_log_supported(struct kvm *kvm)
+> > +{
+> > +	return kvm->arch.vm_type != KVM_X86_PROTECTED_VM;
+> > +}
+> > +
 > 
-> kernel test robot noticed "kvm-unit-tests.msr.fail" on:
-> 
-> commit: c7ed946b95cbd4c0e37479df320daf6af7e86906 ("kvm: vmx: Add IA32_FLUSH_CMD guest support")
-> https://git.kernel.org/cgit/virt/kvm/kvm.git queue
-> 
-> in testcase: kvm-unit-tests
-> version: kvm-unit-tests-x86_64-02d8bef-1_20230421
-> 
-> compiler: gcc-11
-> test machine: 8 threads 1 sockets Intel(R) Core(TM) i7-4770K CPU @ 3.50GHz (Haswell) with 8G memory
-> 
-> 
-> If you fix the issue, kindly add following tag
-> | Reported-by: kernel test robot <yujie.liu@intel.com>
-> | Link: https://lore.kernel.org/oe-lkp/202304241320.ab1eea12-yujie.liu@intel.com
-> 
-> 
-> $ ./run_tests.sh -v msr
-> TESTNAME=msr TIMEOUT=90s ACCEL= ./x86/run x86/msr.flat -smp 1 -cpu max,vendor=GenuineIntel
-> FAIL msr (1899 tests, 2 unexpected failures)
-> 
-> # msr.log
-> timeout -k 1s --foreground 90s /usr/bin/qemu-system-x86_64 --no-reboot -nodefaults -device pc-testdev -device isa-debug-exit,iobase=0xf4,iosize=0x4 -vnc none -serial stdio -device pci-testdev -machine accel=kvm -kernel x86/msr.flat -smp 1 -cpu max,vendor=GenuineIntel # -initrd /tmp/tmp.BZGuoMxiVP
-> enabling apic
-> smp: waiting for 0 APs
-> ...
-> FAIL: Expected success on WRSMR(PRED_CMD, 0x0), got vector 13
-> FAIL: Expected success on WRSMR(PRED_CMD, 0x1), got vector 13
-> ...
-> 
-> 
+> Maybe introduce a new x86 ops for SNP/TDX to check this separately as SNP
+> might still support it? With the current approach, I think both SNP/TDX
+> will be affected. So does the later patch about page-tracking.
 
-FYI this failure is fixed with
-https://patchwork.kernel.org/project/kvm/cover/20230322011440.2195485-1-seanjc@google.com/
-which is currently on the 'kvm/next' branch. I tested it just to be sure.
-The 'kvm/queue' branch doesn't contain that patch yet, and that's why
-this unit test failed.
+This patch is unnecessary, the plan is to disallow dirty logging on memslots that
+support private mapping, e.g. we'll end up with something like this:
 
-Thank you,
-Emanuele
+static int check_memory_region_flags(struct kvm *kvm,
+				     const struct kvm_userspace_memory_region2 *mem)
+{
+	u32 valid_flags = KVM_MEM_LOG_DIRTY_PAGES;
 
+	if (kvm_arch_has_private_mem(kvm))
+		valid_flags |= KVM_MEM_PRIVATE;
+
+	/* Dirty logging private memory is not currently supported. */
+	if (mem->flags & KVM_MEM_PRIVATE)
+		valid_flags &= ~KVM_MEM_LOG_DIRTY_PAGES;
+
+#ifdef __KVM_HAVE_READONLY_MEM
+	valid_flags |= KVM_MEM_READONLY;
+#endif
+
+	if (mem->flags & ~valid_flags)
+		return -EINVAL;
+
+	return 0;
+}
+
+> Michael, can you confirm this?
+
+No need to confirm (or deny) at this point, enabling dirty logging for private
+memory is not something I want to merge in the initial TDX/SNP series, regardless
+of whether or not it's supported by "hardware", a.k.a. trusted firmware.
