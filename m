@@ -2,58 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EC3D16ED39A
-	for <lists+kvm@lfdr.de>; Mon, 24 Apr 2023 19:35:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 520686ED39B
+	for <lists+kvm@lfdr.de>; Mon, 24 Apr 2023 19:36:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232059AbjDXRf4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 Apr 2023 13:35:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57274 "EHLO
+        id S231351AbjDXRgC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 Apr 2023 13:36:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57526 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231748AbjDXRfz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 Apr 2023 13:35:55 -0400
-Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69D067ECF
-        for <kvm@vger.kernel.org>; Mon, 24 Apr 2023 10:35:45 -0700 (PDT)
-Received: by mail-pf1-x449.google.com with SMTP id d2e1a72fcca58-63b66a3275eso3243187b3a.2
-        for <kvm@vger.kernel.org>; Mon, 24 Apr 2023 10:35:45 -0700 (PDT)
+        with ESMTP id S232013AbjDXRgA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 24 Apr 2023 13:36:00 -0400
+Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61C9C83DB
+        for <kvm@vger.kernel.org>; Mon, 24 Apr 2023 10:35:47 -0700 (PDT)
+Received: by mail-pg1-x549.google.com with SMTP id 41be03b00d2f7-517bfcfe83fso2922941a12.2
+        for <kvm@vger.kernel.org>; Mon, 24 Apr 2023 10:35:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1682357745; x=1684949745;
+        d=google.com; s=20221208; t=1682357747; x=1684949747;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=76M1veUu2ZcIvuewJM5+N+OX38tjJzW1eVYteDYm0tg=;
-        b=SC0HejOb0FN0TL0qbH++zenxR1wt0qhcwWqh+FqeVG7e2PMKDuu/aVMiqerbJfPHaA
-         cmGco+1sZ96skukcFb/u4UjOsX8QF3hCPlDZYCcJiuQm2Hwf7OXXkwWkjUw9r5UvT7rH
-         4MTRZl31eatqQ3ggac/tcDyW4cDhIJADelM4elRBi4G+v2e4ptuus6hZ+7b5eKq8gMzu
-         p8xyyvaklQ6VAckLCUMe2N8z7P+i7ztqpzSV8ks/FUJMsCm9pMXBUaeunCFK5E57xNxq
-         iezIlyyQ9LDhTTN6aJYrOroTp3vbfgVaTW8P10XIevoc5n1I3o+QjkGmMmDMUkOQe3ud
-         zoYw==
+        bh=7Y620C6tuXXPtb1+MLs9fmkWun+dPz1etWdoE7yAuNs=;
+        b=m8VbZJwiMz4RiDhDBkNntFnMDCbS3QwMJCK6wE1x1J02gEv0g7KdshwEobVBWwGGJy
+         9GRCg6afTSF7pwpS9UIyFpfPBjb+BDk3y8H80Y2X0Zjs/oTOG+oGpX3XGkxpadRTFvvc
+         yb/9/TQ7ctZaH3/D0YLMsDtru52LsN3o3nDp8Y7CDA8gI36icJvz5ganKIFKFmeehHos
+         mi9VuSUDhGoHuElm2Nl6GK87ZomloWG5ZUyOmnfhdwo/qRc43rxkJKJHjYFZYJvmPgS7
+         gMzi2fU38T28YXgTGCsuQG+UY1vxj0i5kZH/W7B2HmHWUWLTDEn1xIVLUh8KZ2yfrVgl
+         QynQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682357745; x=1684949745;
+        d=1e100.net; s=20221208; t=1682357747; x=1684949747;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=76M1veUu2ZcIvuewJM5+N+OX38tjJzW1eVYteDYm0tg=;
-        b=CRqi6mm9jOXnPVJ1rojj/aNG7FH/3g8aic7CwGwnRSzNBmio6CNDZb5NgHi7TVfZSd
-         Fz/O9lg4cryoggAOZUIGjGDSxyskWubcdTo8lxRHF4aGe4uS1uHugez4N4WV5dJCuZi6
-         ITg1xMWS3EZEPsFB6lACVQ4pepB2K4REwSDZa6AsOm2kJJVQAfH2tUw9RTMtUu6EOVaM
-         KhPdf3NG8XgxTI9gDxdnyE12+rMuAJONXOoCe1uFtNIT6EKO1mgXiVqG+zlmNvl56h2F
-         p5tc+Fu5GE/gSM3ddqcabKASKyQa6n+tdvcnLXxKCxXSTX3L3owxHJEItUrsP7xZgQex
-         0Fzg==
-X-Gm-Message-State: AAQBX9fXwSTZLMhTam1JedsbgJMVDyUY8Z7q72FDcE2KHKghVcj8ZWWp
-        BEDQ1PC0RKvOm1ady509awzDqwYa4Rw=
-X-Google-Smtp-Source: AKy350bYA2Ton8Iy0s00YutnymPh/V+vMsPInJUom0q6FMnxsLzaQiaMaZDSveyJo/tP2vsojx5MjzcyvSo=
+        bh=7Y620C6tuXXPtb1+MLs9fmkWun+dPz1etWdoE7yAuNs=;
+        b=bTXePTZeHmwSBVhoWdEMnA2FtP1HQLd53fIRjOiW0AQrJ2hFwY4OHzw/b8CbtpHUOz
+         GV+fYwhMCDbxUax776kksSH8weXd3+pvgF0eL4CFJGhRxxNKiZJBo5e5EsJEDDmh5L6A
+         JWDXGJhrF8f+ohsa4Z2fehmApTFRtsbk2XLocNwTJ4R51BThIJRngJ+QC7z9miLdm4pM
+         TKS2X1Mr/4bV1FwW52SRHUbJnhGYxSh0FU+5aCGu1AkHomEvAX79HjhG/SU4ZlxRC0Kp
+         SIBhXcmxKLP5MoUwh9M+5XYlhJm7loHm2Y5BIiCkI73gh8YVYO5M2V5yCIbrnPP66nQx
+         SWQw==
+X-Gm-Message-State: AAQBX9dnHvbauDSz2dZulBgCYL6kEnmDoiy+ooYhoGYXJv/f79O5FJ4Z
+        auDTMDG4b/XDKnAJur8wptZfBoiOhUk=
+X-Google-Smtp-Source: AKy350auYRjlO8SrWDR2U973UPHvzTlkeSmTtrDuSCl2vWxMnbVaT41iUJpQxlV/dKxxESZK3wK5XbjmwOI=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:2d02:b0:63b:234e:d641 with SMTP id
- fa2-20020a056a002d0200b0063b234ed641mr5817511pfb.4.1682357744922; Mon, 24 Apr
- 2023 10:35:44 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a17:90a:684f:b0:247:8d04:81ba with SMTP id
+ e15-20020a17090a684f00b002478d0481bamr3408810pjm.8.1682357746764; Mon, 24 Apr
+ 2023 10:35:46 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Mon, 24 Apr 2023 10:35:28 -0700
+Date:   Mon, 24 Apr 2023 10:35:29 -0700
 In-Reply-To: <20230424173529.2648601-1-seanjc@google.com>
 Mime-Version: 1.0
 References: <20230424173529.2648601-1-seanjc@google.com>
 X-Mailer: git-send-email 2.40.0.634.g4ca3ef3211-goog
-Message-ID: <20230424173529.2648601-6-seanjc@google.com>
-Subject: [GIT PULL] KVM: x86: SVM changes for 6.4
+Message-ID: <20230424173529.2648601-7-seanjc@google.com>
+Subject: [GIT PULL] KVM: x86: VMX changes for 6.4
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     kvm@vger.kernel.org
@@ -68,8 +68,9 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-KVM SVM changes for 6.4.  The highlight, by a country mile, is support for
-virtual NMIs.
+KVM VMX changes for 6.4.  A few cleanups and a few fixes, nothing super
+interesting or urgent.  IMO, the most notable part of this pull request is
+that ENCLS is actually allowed in compatibility mode. :-)
 
 The following changes since commit d8708b80fa0e6e21bc0c9e7276ad0bccef73b6e7:
 
@@ -77,47 +78,33 @@ The following changes since commit d8708b80fa0e6e21bc0c9e7276ad0bccef73b6e7:
 
 are available in the Git repository at:
 
-  https://github.com/kvm-x86/linux.git tags/kvm-x86-svm-6.4
+  https://github.com/kvm-x86/linux.git tags/kvm-x86-vmx-6.4
 
-for you to fetch changes up to c0d0ce9b5a851895f34fd401c9dddc70616711a4:
+for you to fetch changes up to 4984563823f0034d3533854c1b50e729f5191089:
 
-  KVM: SVM: Remove a duplicate definition of VMCB_AVIC_APIC_BAR_MASK (2023-04-04 11:08:12 -0700)
-
-----------------------------------------------------------------
-KVM SVM changes for 6.4:
-
- - Add support for virtual NMIs
-
- - Fixes for edge cases related to virtual interrupts
+  KVM: nVMX: Emulate NOPs in L2, and PAUSE if it's not intercepted (2023-04-11 09:35:49 -0700)
 
 ----------------------------------------------------------------
-Maxim Levitsky (2):
-      KVM: nSVM: Raise event on nested VM exit if L1 doesn't intercept IRQs
-      KVM: SVM: add wrappers to enable/disable IRET interception
+KVM VMX changes for 6.4:
 
-Santosh Shukla (5):
-      KVM: nSVM: Don't sync vmcb02 V_IRQ back to vmcb12 if KVM (L0) is intercepting VINTR
-      KVM: nSVM: Disable intercept of VINTR if saved L1 host RFLAGS.IF is 0
-      KVM: SVM: Add definitions for new bits in VMCB::int_ctrl related to vNMI
-      KVM: x86: Add support for SVM's Virtual NMI
-      KVM: nSVM: Implement support for nested VNMI
+ - Fix a bug in emulation of ENCLS in compatibility mode
 
-Sean Christopherson (5):
-      KVM: x86: Raise an event request when processing NMIs if an NMI is pending
-      KVM: x86: Tweak the code and comment related to handling concurrent NMIs
-      KVM: x86: Save/restore all NMIs when multiple NMIs are pending
-      x86/cpufeatures: Redefine synthetic virtual NMI bit as AMD's "real" vNMI
-      KVM: x86: Route pending NMIs from userspace through process_nmi()
+ - Allow emulation of NOP and PAUSE for L2
 
-Xinghui Li (1):
-      KVM: SVM: Remove a duplicate definition of VMCB_AVIC_APIC_BAR_MASK
+ - Misc cleanups
 
- arch/x86/include/asm/cpufeatures.h |   8 +-
- arch/x86/include/asm/kvm-x86-ops.h |   2 +
- arch/x86/include/asm/kvm_host.h    |  11 ++-
- arch/x86/include/asm/svm.h         |  10 ++-
- arch/x86/kvm/svm/nested.c          |  91 ++++++++++++++++++----
- arch/x86/kvm/svm/svm.c             | 153 ++++++++++++++++++++++++++++++-------
- arch/x86/kvm/svm/svm.h             |  29 +++++++
- arch/x86/kvm/x86.c                 |  46 +++++++++--
- 8 files changed, 292 insertions(+), 58 deletions(-)
+----------------------------------------------------------------
+Binbin Wu (1):
+      KVM: VMX: Use is_64_bit_mode() to check 64-bit mode in SGX handler
+
+Sean Christopherson (1):
+      KVM: nVMX: Emulate NOPs in L2, and PAUSE if it's not intercepted
+
+Yu Zhang (2):
+      KVM: nVMX: Remove outdated comments in nested_vmx_setup_ctls_msrs()
+      KVM: nVMX: Add helpers to setup VMX control msr configs
+
+ arch/x86/kvm/vmx/nested.c | 112 ++++++++++++++++++++++++++++++----------------
+ arch/x86/kvm/vmx/sgx.c    |   4 +-
+ arch/x86/kvm/vmx/vmx.c    |  15 +++++++
+ 3 files changed, 91 insertions(+), 40 deletions(-)
