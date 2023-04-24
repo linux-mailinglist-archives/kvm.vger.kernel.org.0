@@ -2,317 +2,165 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D643E6ED840
-	for <lists+kvm@lfdr.de>; Tue, 25 Apr 2023 00:59:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AF9786ED8CA
+	for <lists+kvm@lfdr.de>; Tue, 25 Apr 2023 01:28:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233150AbjDXW7M (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 Apr 2023 18:59:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59490 "EHLO
+        id S232222AbjDXX2W (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 Apr 2023 19:28:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50592 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233015AbjDXW7K (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 Apr 2023 18:59:10 -0400
-Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E0A093C1
-        for <kvm@vger.kernel.org>; Mon, 24 Apr 2023 15:59:08 -0700 (PDT)
-Received: by mail-pj1-x1049.google.com with SMTP id 98e67ed59e1d1-24763adb145so4951959a91.2
-        for <kvm@vger.kernel.org>; Mon, 24 Apr 2023 15:59:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1682377148; x=1684969148;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZuwyeqJU2ec2RnXFc6oVuANOVQcHu6d+sHkMhDN9j9E=;
-        b=Wb2urpN/5j7jJtUVBrNfy+U2bPKKCkuLnZrQBBb88jPHXgUC2NQlh+33DbJiMzT5i7
-         xAGZDsydldLCELgwg54aD7uDUa5oKAD6eUWc1Vcr1Gr0hSyeOETBwzIYxhTHNbDuiMnO
-         jOAqJP/bpDeeFomcz/Ifo+IBnuX46iS8/fOm7s5GrX8mopaUVP+2fZ3tfOM1NSJTJWmM
-         yjvOfhtQPhNHb10Fxzm8dRYCm2g8FF3Cy+VXgqi4enfUT0MsSnz0etiGU+1uRizqozeD
-         HanOGzf54gTYsxC8Xt7UZzQolBjm3zDfnORbezyb/wG2PXcpcxaIxIJ5RX1KcF3baPdI
-         uYtg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682377148; x=1684969148;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZuwyeqJU2ec2RnXFc6oVuANOVQcHu6d+sHkMhDN9j9E=;
-        b=GvHlgxSH694qPI6wrFwqE4NwMOVTQo91JWWO3Se334gC0FMnDax7hLLPqh+b/55MzS
-         3vVvkJw1n+EWHrobvw3/RVSWk3T2ueqgPmSnd2H2X/fLCcdV/nzElFymlX7/WG9grBpv
-         dRDEitWn4qIi4Zg1qT65Mo4EmMn22TrtAPu3INr3WZlR7FLGu/iB/Pai4w+s0T55FHrd
-         GRv8qwHQyRDo0tTgVs2QjbdSbDdX06hvZN7A6h/mzxmvGq43knDNyVREVvZmEC12Et8d
-         fvwl0zKNZRxki3+CCtLmR486qoXFNja7eBH7S0TkLvRo+daN7oZ8yEyIIs9vGcypzqHA
-         z2OQ==
-X-Gm-Message-State: AAQBX9dQW6pjz0EbJIxXVp19RnzRc9fUzdw0OoE4eEuvLKYkg7ogUrlA
-        7JmR3HDvxMShpcqrD1WHwovLRrCs/cyQVXTrEp+u5fDaGkXoywsWHOOpFz6S1bO/2UYaLI6Zcsg
-        jGa+Qa1Z7SpLURdt4NzaMn0irZQQ8anouOCBO6OvbRHMnjRRYaX/w6GqnmlunS39eD6r2
-X-Google-Smtp-Source: AKy350Yy/Ppyj3DYTKUlNH28a4PB95v78vuIxkSV3S96Nb40A3gbVAjw7w66sASo3wtSCFhFQrEQHue7zmw/Cpu/
-X-Received: from aaronlewis-2.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:519c])
- (user=aaronlewis job=sendgmr) by 2002:a17:90a:4ecc:b0:246:66d6:f24e with SMTP
- id v12-20020a17090a4ecc00b0024666d6f24emr3787625pjl.2.1682377148361; Mon, 24
- Apr 2023 15:59:08 -0700 (PDT)
-Date:   Mon, 24 Apr 2023 22:58:54 +0000
-In-Reply-To: <20230424225854.4023978-1-aaronlewis@google.com>
-Mime-Version: 1.0
-References: <20230424225854.4023978-1-aaronlewis@google.com>
-X-Mailer: git-send-email 2.40.0.634.g4ca3ef3211-goog
-Message-ID: <20230424225854.4023978-7-aaronlewis@google.com>
-Subject: [PATCH v2 6/6] KVM: selftests: Add a selftest for guest prints and
- formatted asserts
-From:   Aaron Lewis <aaronlewis@google.com>
-To:     kvm@vger.kernel.org
-Cc:     pbonzini@redhat.com, jmattson@google.com, seanjc@google.com,
-        Aaron Lewis <aaronlewis@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S231351AbjDXX2V (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 24 Apr 2023 19:28:21 -0400
+Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8479BD;
+        Mon, 24 Apr 2023 16:28:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1682378895; x=1713914895;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=tuP9B5Hr7Z651Gr0S6ft3FGq8Z8Th3WtYREYd69oDRo=;
+  b=YIGgeRbM7lOhA4cb+wLgFezQRtwcwWD6is2LRSi9RjtvPEOzKdfIW57h
+   iXP65nTbscNL+8CDFXAG5uVqYdVq9678dMJoWvQ7kBUPNgrpRoCLp1tpd
+   bAy3FEEIhN6MfA6CQK9GeS+sXgqPKtlS1FGv3qk8IqBbq+4CQXYYZSBOk
+   KDNfk4SGVUr7H+evHEa+Zbzc9o9dW3gyOvM4ptBk7BOxtzcxNBYL0lzrl
+   OAzUls0OZar4/9bGue+dffVfyV/oz7Uplcs59gNfE5fKEArNZ62fWNGRp
+   LzecYsAa/QalycSm/Ynt/N5SAiB7MJGVQC+vXt5TrNgJ5Ng9UiX+BXIuI
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10690"; a="344074761"
+X-IronPort-AV: E=Sophos;i="5.99,223,1677571200"; 
+   d="scan'208";a="344074761"
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Apr 2023 16:27:08 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10690"; a="939522185"
+X-IronPort-AV: E=Sophos;i="5.99,223,1677571200"; 
+   d="scan'208";a="939522185"
+Received: from lkp-server01.sh.intel.com (HELO b613635ddfff) ([10.239.97.150])
+  by fmsmga006.fm.intel.com with ESMTP; 24 Apr 2023 16:27:04 -0700
+Received: from kbuild by b613635ddfff with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1pr5aJ-000iiS-2A;
+        Mon, 24 Apr 2023 23:27:03 +0000
+Date:   Tue, 25 Apr 2023 07:26:49 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Grzegorz Jaszczyk <jaz@semihalf.com>, linux-kernel@vger.kernel.org,
+        alex.williamson@redhat.com
+Cc:     llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+        dmy@semihalf.com, tn@semihalf.com, dbehr@google.com,
+        dbehr@chromium.org, upstream@semihalf.com, dtor@google.com,
+        jgg@ziepe.ca, kevin.tian@intel.com, cohuck@redhat.com,
+        abhsahu@nvidia.com, yishaih@nvidia.com, yi.l.liu@intel.com,
+        kvm@vger.kernel.org, libvir-list@redhat.com,
+        Grzegorz Jaszczyk <jaz@semihalf.com>
+Subject: Re: [PATCH v2] vfio/pci: Propagate ACPI notifications to user-space
+ via eventfd
+Message-ID: <202304250702.Jn8hOwUl-lkp@intel.com>
+References: <20230424162748.2711945-1-jaz@semihalf.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230424162748.2711945-1-jaz@semihalf.com>
+X-Spam-Status: No, score=-4.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The purpose of this test is to exercise the various features in KVM's
-local snprintf() and compare them to LIBC's snprintf() to ensure they
-behave the same.
+Hi Grzegorz,
 
-This is not an exhaustive test.  KVM's local snprintf() does not
-implement all the features LIBC does, e.g. KVM's local snprintf() does
-not support floats or doubles, so testing for those features were
-excluded.
+kernel test robot noticed the following build warnings:
 
-Testing was added for the features that are expected to work to
-support a minimal version of printf() in the guest.
+[auto build test WARNING on awilliam-vfio/for-linus]
+[also build test WARNING on linus/master v6.3 next-20230424]
+[cannot apply to awilliam-vfio/next]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-Signed-off-by: Aaron Lewis <aaronlewis@google.com>
----
- tools/testing/selftests/kvm/Makefile          |   1 +
- .../testing/selftests/kvm/guest_print_test.c  | 207 ++++++++++++++++++
- 2 files changed, 208 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/guest_print_test.c
+url:    https://github.com/intel-lab-lkp/linux/commits/Grzegorz-Jaszczyk/vfio-pci-Propagate-ACPI-notifications-to-user-space-via-eventfd/20230425-002935
+base:   https://github.com/awilliam/linux-vfio.git for-linus
+patch link:    https://lore.kernel.org/r/20230424162748.2711945-1-jaz%40semihalf.com
+patch subject: [PATCH v2] vfio/pci: Propagate ACPI notifications to user-space via eventfd
+config: x86_64-randconfig-a012 (https://download.01.org/0day-ci/archive/20230425/202304250702.Jn8hOwUl-lkp@intel.com/config)
+compiler: clang version 14.0.6 (https://github.com/llvm/llvm-project f28c006a5895fc0e329fe15fead81e37457cb1d1)
+reproduce (this is a W=1 build):
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # https://github.com/intel-lab-lkp/linux/commit/62d759059cd5e6dab70052027e1b69c5d5cdc0f2
+        git remote add linux-review https://github.com/intel-lab-lkp/linux
+        git fetch --no-tags linux-review Grzegorz-Jaszczyk/vfio-pci-Propagate-ACPI-notifications-to-user-space-via-eventfd/20230425-002935
+        git checkout 62d759059cd5e6dab70052027e1b69c5d5cdc0f2
+        # save the config file
+        mkdir build_dir && cp config build_dir/.config
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=x86_64 olddefconfig
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=x86_64 SHELL=/bin/bash drivers/vfio/pci/
 
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index 84b126398729..31587a0e2efb 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -121,6 +121,7 @@ TEST_GEN_PROGS_x86_64 += access_tracking_perf_test
- TEST_GEN_PROGS_x86_64 += demand_paging_test
- TEST_GEN_PROGS_x86_64 += dirty_log_test
- TEST_GEN_PROGS_x86_64 += dirty_log_perf_test
-+TEST_GEN_PROGS_x86_64 += guest_print_test
- TEST_GEN_PROGS_x86_64 += hardware_disable_test
- TEST_GEN_PROGS_x86_64 += kvm_create_max_vcpus
- TEST_GEN_PROGS_x86_64 += kvm_page_table_test
-diff --git a/tools/testing/selftests/kvm/guest_print_test.c b/tools/testing/selftests/kvm/guest_print_test.c
-new file mode 100644
-index 000000000000..57489055e5cb
---- /dev/null
-+++ b/tools/testing/selftests/kvm/guest_print_test.c
-@@ -0,0 +1,207 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * A test for GUEST_PRINTF
-+ *
-+ * Copyright 2022, Google, Inc. and/or its affiliates.
-+ */
-+
-+#include <fcntl.h>
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <string.h>
-+#include <sys/ioctl.h>
-+
-+#include "test_util.h"
-+#include "kvm_util.h"
-+#include "processor.h"
-+
-+/* GUEST_PRINTF()/GUEST_ASSERT_FMT() does not support float or double. */
-+#define TYPE_LIST					\
-+TYPE(test_type_i64,  I64,  "%ld",   int64_t)		\
-+TYPE(test_type_u64,  U64u, "%lu",   uint64_t)		\
-+TYPE(test_type_x64,  U64x, "0x%lx", uint64_t)		\
-+TYPE(test_type_X64,  U64X, "0x%lX", uint64_t)		\
-+TYPE(test_type_u32,  U32u, "%u",    uint32_t)		\
-+TYPE(test_type_x32,  U32x, "0x%x",  uint32_t)		\
-+TYPE(test_type_X32,  U32X, "0x%X",  uint32_t)		\
-+TYPE(test_type_int,  INT,  "%d",    int)		\
-+TYPE(test_type_char, CHAR, "%c",    char)		\
-+TYPE(test_type_str,  STR,  "'%s'",  const char *)	\
-+TYPE(test_type_ptr,  PTR,  "%p",    uintptr_t)
-+
-+enum args_type {
-+#define TYPE(fn, ext, fmt_t, T) TYPE_##ext,
-+	TYPE_LIST
-+#undef TYPE
-+};
-+
-+static void run_test(struct kvm_vcpu *vcpu, const char *expected_printf,
-+		     const char *expected_assert);
-+
-+#define BUILD_TYPE_STRINGS_AND_HELPER(fn, ext, fmt_t, T)		     \
-+const char *PRINTF_FMT_##ext = "Got params a = " fmt_t " and b = " fmt_t;    \
-+const char *ASSERT_FMT_##ext = "Expected " fmt_t ", got " fmt_t " instead";  \
-+static void fn(struct kvm_vcpu *vcpu, T a, T b)				     \
-+{									     \
-+	char expected_printf[UCALL_BUFFER_LEN];				     \
-+	char expected_assert[UCALL_BUFFER_LEN];				     \
-+									     \
-+	snprintf(expected_printf, UCALL_BUFFER_LEN, PRINTF_FMT_##ext, a, b); \
-+	snprintf(expected_assert, UCALL_BUFFER_LEN, ASSERT_FMT_##ext, a, b); \
-+	vcpu_args_set(vcpu, 3, a, b, TYPE_##ext);			     \
-+	run_test(vcpu, expected_printf, expected_assert);		     \
-+}
-+
-+#define TYPE(fn, ext, fmt_t, T) \
-+		BUILD_TYPE_STRINGS_AND_HELPER(fn, ext, fmt_t, T)
-+	TYPE_LIST
-+#undef TYPE
-+
-+static void guest_code(uint64_t a, uint64_t b, uint64_t type)
-+{
-+	switch (type) {
-+#define TYPE(fn, ext, fmt_t, T) case TYPE_##ext:			\
-+		GUEST_PRINTF(PRINTF_FMT_##ext, a, b);			\
-+		GUEST_ASSERT_FMT(a == b, ASSERT_FMT_##ext, a, b);	\
-+		break;
-+	TYPE_LIST
-+#undef TYPE
-+	default:
-+		GUEST_SYNC(type);
-+	}
-+
-+	GUEST_DONE();
-+}
-+
-+/*
-+ * Unfortunately this gets a little messy because 'assert_msg' doesn't
-+ * just contains the matching string, it also contains additional assert
-+ * info.  Fortunately the part that matches should be at the very end of
-+ * 'assert_msg'.
-+ */
-+static void ucall_abort(const char *assert_msg, const char *expected_assert_msg)
-+{
-+	int len_str = strlen(assert_msg);
-+	int len_substr = strlen(expected_assert_msg);
-+	int offset = len_str - len_substr;
-+
-+	TEST_ASSERT(len_substr <= len_str,
-+		    "Expected to find a substring, len_str: %d, len_substr: %d",
-+		    len_str, len_substr);
-+
-+	TEST_ASSERT(strcmp(&assert_msg[offset], expected_assert_msg) == 0,
-+		    "Unexpected mismatch. Expected: '%s', got: '%s'",
-+		    expected_assert_msg, &assert_msg[offset]);
-+}
-+
-+static void run_test(struct kvm_vcpu *vcpu, const char *expected_printf,
-+		     const char *expected_assert)
-+{
-+	struct kvm_run *run = vcpu->run;
-+	struct kvm_regs regs;
-+	struct ucall uc;
-+
-+	/*
-+	 * The guest takes 3 parameters (T val1, T val2, TYPE) which are set
-+	 * in the parent call to allow run_tests() to be type-agnostic.
-+	 */
-+
-+	vcpu_regs_get(vcpu, &regs);
-+	regs.rip = (uintptr_t)guest_code;
-+	vcpu_regs_set(vcpu, &regs);
-+
-+	while (1) {
-+		vcpu_run(vcpu);
-+
-+		TEST_ASSERT(run->exit_reason == KVM_EXIT_IO,
-+			    "Unexpected exit reason: %u (%s),\n",
-+			    run->exit_reason,
-+			    exit_reason_str(run->exit_reason));
-+
-+		switch (get_ucall(vcpu, &uc)) {
-+		case UCALL_SYNC:
-+			TEST_FAIL("Unknown 'args_type' = %lu", uc.args[1]);
-+			break;
-+		case UCALL_PRINTF:
-+			TEST_ASSERT(strcmp(uc.buffer, expected_printf) == 0,
-+				    "Unexpected mismatch. Expected: '%s', got: '%s'",
-+				    expected_printf, uc.buffer);
-+			break;
-+		case UCALL_ABORT:
-+			ucall_abort(uc.buffer, expected_assert);
-+			break;
-+		case UCALL_DONE:
-+			return;
-+		default:
-+			TEST_FAIL("Unknown ucall %lu", uc.cmd);
-+		}
-+	}
-+}
-+
-+static void test_limits(void)
-+{
-+	const int buffer_len = UCALL_BUFFER_LEN + 10;
-+	char test_str[buffer_len];
-+	char test_res[buffer_len];
-+	int r;
-+
-+	memset(test_str, 'a', buffer_len);
-+	test_str[buffer_len - 1] = 0;
-+
-+	r = kvm_snprintf(test_res, UCALL_BUFFER_LEN, "%s", test_str);
-+	TEST_ASSERT(r == (buffer_len - 1),
-+		    "Unexpected kvm_snprintf() length.  Expected: %d, got: %d",
-+		    buffer_len - 1, r);
-+
-+	r = strlen(test_res);
-+	TEST_ASSERT(r == (UCALL_BUFFER_LEN - 1),
-+		    "Unexpected strlen() length.  Expected: %d, got: %d",
-+		    UCALL_BUFFER_LEN - 1, r);
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_vm *vm;
-+
-+	vm = vm_create_with_one_vcpu(&vcpu, NULL);
-+
-+	test_type_i64(vcpu, -1, -1);
-+	test_type_i64(vcpu, -1,  1);
-+	test_type_i64(vcpu, 0x1234567890abcdef, 0x1234567890abcdef);
-+	test_type_i64(vcpu, 0x1234567890abcdef, 0x1234567890abcdee);
-+
-+	test_type_u64(vcpu, 0x1234567890abcdef, 0x1234567890abcdef);
-+	test_type_u64(vcpu, 0x1234567890abcdef, 0x1234567890abcdee);
-+	test_type_x64(vcpu, 0x1234567890abcdef, 0x1234567890abcdef);
-+	test_type_x64(vcpu, 0x1234567890abcdef, 0x1234567890abcdee);
-+	test_type_X64(vcpu, 0x1234567890abcdef, 0x1234567890abcdef);
-+	test_type_X64(vcpu, 0x1234567890abcdef, 0x1234567890abcdee);
-+
-+	test_type_u32(vcpu, 0x90abcdef, 0x90abcdef);
-+	test_type_u32(vcpu, 0x90abcdef, 0x90abcdee);
-+	test_type_x32(vcpu, 0x90abcdef, 0x90abcdef);
-+	test_type_x32(vcpu, 0x90abcdef, 0x90abcdee);
-+	test_type_X32(vcpu, 0x90abcdef, 0x90abcdef);
-+	test_type_X32(vcpu, 0x90abcdef, 0x90abcdee);
-+
-+	test_type_int(vcpu, -1, -1);
-+	test_type_int(vcpu, -1,  1);
-+	test_type_int(vcpu,  1,  1);
-+
-+	test_type_char(vcpu, 'a', 'a');
-+	test_type_char(vcpu, 'a', 'A');
-+	test_type_char(vcpu, 'a', 'b');
-+
-+	test_type_str(vcpu, "foo", "foo");
-+	test_type_str(vcpu, "foo", "bar");
-+
-+	test_type_ptr(vcpu, 0x1234567890abcdef, 0x1234567890abcdef);
-+	test_type_ptr(vcpu, 0x1234567890abcdef, 0x1234567890abcdee);
-+
-+	kvm_vm_free(vm);
-+
-+	test_limits();
-+
-+	return 0;
-+}
+If you fix the issue, kindly add following tag where applicable
+| Reported-by: kernel test robot <lkp@intel.com>
+| Link: https://lore.kernel.org/oe-kbuild-all/202304250702.Jn8hOwUl-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+>> drivers/vfio/pci/vfio_pci_core.c:709:6: warning: no previous prototype for function 'vfio_pci_acpi_notify_close_device' [-Wmissing-prototypes]
+   void vfio_pci_acpi_notify_close_device(struct vfio_pci_core_device *vdev)
+        ^
+   drivers/vfio/pci/vfio_pci_core.c:709:1: note: declare 'static' if the function is not intended to be used outside of this translation unit
+   void vfio_pci_acpi_notify_close_device(struct vfio_pci_core_device *vdev)
+   ^
+   static 
+>> drivers/vfio/pci/vfio_pci_core.c:1029:11: warning: variable 'events' set but not used [-Wunused-but-set-variable]
+           __poll_t events;
+                    ^
+   2 warnings generated.
+
+
+vim +/vfio_pci_acpi_notify_close_device +709 drivers/vfio/pci/vfio_pci_core.c
+
+   708	
+ > 709	void vfio_pci_acpi_notify_close_device(struct vfio_pci_core_device *vdev)
+   710	{
+   711		struct vfio_acpi_notification *acpi_notify = vdev->acpi_notification;
+   712		struct pci_dev *pdev = vdev->pdev;
+   713		struct acpi_device *adev = ACPI_COMPANION(&pdev->dev);
+   714		struct notification_queue *entry, *entry_tmp;
+   715		u64 cnt;
+   716	
+   717		if (!acpi_notify || !acpi_notify->acpi_notify_trigger)
+   718			return;
+   719	
+   720		acpi_remove_notify_handler(adev->handle, ACPI_DEVICE_NOTIFY,
+   721					   vfio_pci_core_acpi_notify);
+   722	
+   723		eventfd_ctx_remove_wait_queue(acpi_notify->acpi_notify_trigger,
+   724					      &acpi_notify->wait, &cnt);
+   725	
+   726		flush_work(&acpi_notify->acpi_notification_work);
+   727	
+   728		mutex_lock(&acpi_notify->notification_list_lock);
+   729		list_for_each_entry_safe(entry, entry_tmp,
+   730					 &acpi_notify->notification_list,
+   731					 notify_val_next) {
+   732			list_del(&entry->notify_val_next);
+   733			kfree(entry);
+   734		}
+   735		mutex_unlock(&acpi_notify->notification_list_lock);
+   736	
+   737		eventfd_ctx_put(acpi_notify->acpi_notify_trigger);
+   738	
+   739		kfree(acpi_notify);
+   740	
+   741		vdev->acpi_notification = NULL;
+   742	}
+   743	#else
+   744	void vfio_pci_acpi_notify_close_device(struct vfio_pci_core_device *vdev) {}
+   745	#endif /* CONFIG_ACPI */
+   746	
+
 -- 
-2.40.0.634.g4ca3ef3211-goog
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests
