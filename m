@@ -2,68 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A05016ED630
-	for <lists+kvm@lfdr.de>; Mon, 24 Apr 2023 22:35:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7A17B6ED67B
+	for <lists+kvm@lfdr.de>; Mon, 24 Apr 2023 23:02:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231749AbjDXUfl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 Apr 2023 16:35:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45858 "EHLO
+        id S232262AbjDXVCx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 Apr 2023 17:02:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56120 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232565AbjDXUfj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 Apr 2023 16:35:39 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C35D59D5
-        for <kvm@vger.kernel.org>; Mon, 24 Apr 2023 13:35:38 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-b92309d84c1so23344016276.1
-        for <kvm@vger.kernel.org>; Mon, 24 Apr 2023 13:35:38 -0700 (PDT)
+        with ESMTP id S229634AbjDXVCw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 24 Apr 2023 17:02:52 -0400
+Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42FCC6184
+        for <kvm@vger.kernel.org>; Mon, 24 Apr 2023 14:02:51 -0700 (PDT)
+Received: by mail-pl1-x64a.google.com with SMTP id d9443c01a7336-1a6a6727792so34080515ad.3
+        for <kvm@vger.kernel.org>; Mon, 24 Apr 2023 14:02:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1682368537; x=1684960537;
+        d=google.com; s=20221208; t=1682370171; x=1684962171;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=l0MSB0945IeDbGQp04rwPUWUysYiVEFGxMNvNn3R9Dk=;
-        b=qaA5kj5BLRufFr7HOEwoBj3xuBzT1MM3EqwX810KDK1PJXDmUfYJ4nLm6oNBrqzq5D
-         kejv9Yn+BLxpQduLI7gZUWw5gg/LBJYf3iyGlCxVa9XwjUZ25tQcKo5XQXlK34L7VDCT
-         e8a1tXQmghUZAYQ9+o8GJvHhq+yTaQ4YM0XuenE3DXhhq66Er3TLgg2gNW3i+21vEsNN
-         Y7V8kMT8/uufww59U8/Jw4hwCThUoOVjtCfYbwbJT0IT92HGuHwvl5gdbMD9oZslPNIp
-         hcbYSB3xiE3IY0nL4OfpglITPYjFC/j3293vJZ8dlb/JEUjXuPa3xYxVo+u2J/DS9N39
-         lCYQ==
+        bh=1uQH+wYaaizJExDZ1lotMDM9eIvQ+68rMtzBLQSleuw=;
+        b=JneI2OA1E1OdqMOTyHcP8Y4VRO/M9RnrlgeSCeKHVB/FO2c1RrSNkRY+pwhBQSagr9
+         CG0AaAJpky4z/4V7+t/RIIm80pjtl/IqdteWNQmgaoC+MOd/d6rZ1b24CKGJyTvHyaGo
+         AV0Xw1Acxxm7AJCajRLwNYES6xPwR9kmnhi1aUhi69yfSewYM0mA4TFl8z+Y1eFNLszv
+         IXMuxLbTgs8s+MX6S41BCw/c9/u/4V5a5U2OpYp6Ry6mBQqI3TlvBeqaG5KYh12Sa3UT
+         XvTaYOE3cLoAOU9mf8evSTQ4tohh44X8ZEk537Gpl1aQym7ARKB6YEc8RnyBPGvwLQhu
+         2krg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682368537; x=1684960537;
+        d=1e100.net; s=20221208; t=1682370171; x=1684962171;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=l0MSB0945IeDbGQp04rwPUWUysYiVEFGxMNvNn3R9Dk=;
-        b=AQ68mMp9QVIuvYWAnxIA4QZ6vcnZSLCOA1HO4/i/+QV76bCVoonWwFR7oLQfJ6j4mM
-         eCUBkgyF71FkfHumE5r0Pse/SCy8tfRMCJr52AFz18I8JRTNsTnFtVRi23tOiZq7Uwv3
-         rbPW0NiN3Kebuq3WyBOVmwuKz1JA5GvuMaYAmfv+jYTV2Tn4aorTzCCcDI6KBrHtFsLp
-         q5rzmwZmWcbPGk6NHcown/bwDADFEQEtBcqkL1LNQN0yY/82tfk/DL6q8Hfa+5ICLcyK
-         tBoLYSRGirwEbaN5L/CLOnvmKDqJ1CWr/tJAnsbxTqglNoxujZhBe2hwfrbK8HQ68RlW
-         5g7Q==
-X-Gm-Message-State: AAQBX9cbgvDKvXqDa88gfIi9CC6HIJR1UK2lnIMZlP4UzqeazCA22Mal
-        YIlTz9Bd76P5WzO5FDLj+i9eGNtXKz0=
-X-Google-Smtp-Source: AKy350alWB2/sn7vnmKB09ekH2Ungj1lC+xvK8PVtElvPqniaZwd+kmU7CpSimCq0rTDwuANLLp2/iz809o=
+        bh=1uQH+wYaaizJExDZ1lotMDM9eIvQ+68rMtzBLQSleuw=;
+        b=HeFLY4Un54FeYEiDScOVehOL/DMuK5QJzTxTQhiy84RaK9s8jLturfPwt4cUkDALTl
+         XKozmTA+tMKzBO4FBG9T+CLUOlWWpQi3rVApDStvvXEu8KKd0LIHMgXWjq9TfkERJILI
+         +oWGwNwVzlcdiX1//NgHK3y5211zbl1LS/ni/SH9XgzKKjN0RO/7uECWiW+0G1yrdizX
+         dlT20AjKJ9p1vvxjrVhbzW8VSgMHyaYQo7sZ89nE/r90ZCq6/zkCflyXiC+ZRsCWzeBb
+         2xvD+sqegF2Y7EFIvP5SnwSJN6I7vD8jgNIHK3WM1klrzVzVBC+Dl4HIuVYYFOWQ18bf
+         skvw==
+X-Gm-Message-State: AAQBX9ecr6yunmWfFb+lfk4Boma5GPMzTc3YJh79mNkROaUVvmlfL4j+
+        vi6qZYeCBF1Sx1izAN6k6lX12yf1maw=
+X-Google-Smtp-Source: AKy350ZVpddszBRkUO90RIV24p1F+ndg4m9IYyTcWuFgHIzNl/wA4ph7nNO9wTPMyU14d/M6m8Ee39OmARo=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:690c:2b88:b0:54c:15ad:11e4 with SMTP id
- en8-20020a05690c2b8800b0054c15ad11e4mr8066797ywb.0.1682368537764; Mon, 24 Apr
- 2023 13:35:37 -0700 (PDT)
-Date:   Mon, 24 Apr 2023 13:35:36 -0700
-In-Reply-To: <84DD9212-31FB-4AF6-80DD-9BA5AEA0EC1A@gmail.com>
+ (user=seanjc job=sendgmr) by 2002:a17:903:214d:b0:1a9:62fb:7b06 with SMTP id
+ s13-20020a170903214d00b001a962fb7b06mr2252373ple.7.1682370170756; Mon, 24 Apr
+ 2023 14:02:50 -0700 (PDT)
+Date:   Mon, 24 Apr 2023 14:02:49 -0700
+In-Reply-To: <20230412213510.1220557-18-amoorthy@google.com>
 Mime-Version: 1.0
-References: <20230412213510.1220557-1-amoorthy@google.com> <ZEBHTw3+DcAnPc37@x1n>
- <CAJHvVchBqQ8iVHgF9cVZDusMKQM2AjtNx2z=i9ZHP2BosN4tBg@mail.gmail.com>
- <ZEBXi5tZZNxA+jRs@x1n> <CAF7b7mo68VLNp=QynfT7QKgdq=d1YYGv1SEVEDxF9UwHzF6YDw@mail.gmail.com>
- <ZEGuogfbtxPNUq7t@x1n> <46DD705B-3A3F-438E-A5B1-929C1E43D11F@gmail.com>
- <CAF7b7mo78e2YPHU5YrhzuORdpGXCVRxXr6kSyMa+L+guW8jKGw@mail.gmail.com> <84DD9212-31FB-4AF6-80DD-9BA5AEA0EC1A@gmail.com>
-Message-ID: <ZEboGH28IVKPZ2vo@google.com>
-Subject: Re: [PATCH v3 00/22] Improve scalability of KVM + userfaultfd live
- migration via annotated memory faults.
+References: <20230412213510.1220557-1-amoorthy@google.com> <20230412213510.1220557-18-amoorthy@google.com>
+Message-ID: <ZEbueTfeJugSl31X@google.com>
+Subject: Re: [PATCH v3 17/22] KVM: Introduce KVM_CAP_ABSENT_MAPPING_FAULT
+ without implementation
 From:   Sean Christopherson <seanjc@google.com>
-To:     Nadav Amit <nadav.amit@gmail.com>
-Cc:     Anish Moorthy <amoorthy@google.com>, Peter Xu <peterx@redhat.com>,
-        Axel Rasmussen <axelrasmussen@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, maz@kernel.org,
-        oliver.upton@linux.dev, James Houghton <jthoughton@google.com>,
-        bgardon@google.com, dmatlack@google.com, ricarkol@google.com,
-        kvm <kvm@vger.kernel.org>, kvmarm@lists.linux.dev
+To:     Anish Moorthy <amoorthy@google.com>
+Cc:     pbonzini@redhat.com, maz@kernel.org, oliver.upton@linux.dev,
+        jthoughton@google.com, bgardon@google.com, dmatlack@google.com,
+        ricarkol@google.com, axelrasmussen@google.com, peterx@redhat.com,
+        kvm@vger.kernel.org, kvmarm@lists.linux.dev
 Content-Type: text/plain; charset="us-ascii"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
@@ -75,30 +69,46 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Apr 24, 2023, Nadav Amit wrote:
+On Wed, Apr 12, 2023, Anish Moorthy wrote:
+> Add documentation, memslot flags, useful helper functions, and the
+> actual new capability itself.
 > 
-> > On Apr 24, 2023, at 10:54 AM, Anish Moorthy <amoorthy@google.com> wrote:
-> > Sean did mention that he wanted KVM_CAP_MEMORY_FAULT_INFO in general,
-> > so I'm guessing (some version of) that will (eventually :) be merged
-> > in any case.
+> Memory fault exits on absent mappings are particularly useful for
+> userfaultfd-based postcopy live migration. When many vCPUs fault on a
+> single userfaultfd the faults can take a while to surface to userspace
+> due to having to contend for uffd wait queue locks. Bypassing the uffd
+> entirely by returning information directly to the vCPU exit avoids this
+> contention and improves the fault rate.
 > 
-> It certainly not my call. But if you ask me, introducing a solution for
-> a concrete use-case that requires API changes/enhancements is not
-> guaranteed to be the best solution. It may be better first to fully
-> understand the existing overheads and agree that there is no alternative
-> cleaner and more general solution with similar performance.
+> Suggested-by: James Houghton <jthoughton@google.com>
+> Signed-off-by: Anish Moorthy <amoorthy@google.com>
+> ---
+>  Documentation/virt/kvm/api.rst | 31 ++++++++++++++++++++++++++++---
+>  include/linux/kvm_host.h       |  7 +++++++
+>  include/uapi/linux/kvm.h       |  2 ++
+>  tools/include/uapi/linux/kvm.h |  1 +
+>  virt/kvm/kvm_main.c            |  3 +++
+>  5 files changed, 41 insertions(+), 3 deletions(-)
+> 
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index f174f43c38d45..7967b9909e28b 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -1312,6 +1312,7 @@ yet and must be cleared on entry.
+>    /* for kvm_userspace_memory_region::flags */
+>    #define KVM_MEM_LOG_DIRTY_PAGES	(1UL << 0)
+>    #define KVM_MEM_READONLY	(1UL << 1)
+> +  #define KVM_MEM_ABSENT_MAPPING_FAULT (1UL << 2)
 
-KVM already returns -EFAULT for these situations, the change I really want to land
-is to have KVM report detailed information about why the -EFAULT occurred.  I'll be
-happy to carry the code in KVM even if userspace never does anything beyond dumping
-the extra information on failures.
+This name is both too specific and too vague.  It's too specific because it affects
+more than just "absent" mappings, it will affect any page fault that can't be
+resolved by fast GUP, i.e. I'm objecting for all the same reasons I objected to
+the exit reason being name KVM_MEMFAULT_REASON_ABSENT_MAPPING.  It's too vague
+because it doesn't describe what behavior the flag actually enables in any way.
 
-> Considering the mess that KVM async-PF introduced, I would be very careful
-> before introducing such API changes. I did not look too much on the details,
-> but some things anyhow look slightly strange (which might be since I am
-> out-of-touch with KVM). For instance, returning -EFAULT on from KVM_RUN? I
-> would have assumed -EAGAIN would be more appropriate since the invocation did
-> succeed.
+I liked the "nowait" verbiage from the RFC.  "fast_only" is an ok alternative,
+but that's much more of a kernel-internal name.
 
-Yeah, returning -EFAULT is somewhat odd, but as above, that's pre-existing
-behavior that's been around for many years.
+Oliver, you had concerns with using "fault" in the name, is something like
+KVM_MEM_NOWAIT_ON_PAGE_FAULT or KVM_MEM_NOWAIT_ON_FAULT palatable?  IMO, "fault"
+is perfectly ok, we just need to ensure it's unlikely to be ambiguous for userspace.
