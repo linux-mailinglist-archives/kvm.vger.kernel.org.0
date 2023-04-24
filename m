@@ -2,165 +2,169 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AF9786ED8CA
-	for <lists+kvm@lfdr.de>; Tue, 25 Apr 2023 01:28:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0BD8A6ED8EB
+	for <lists+kvm@lfdr.de>; Tue, 25 Apr 2023 01:47:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232222AbjDXX2W (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 Apr 2023 19:28:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50592 "EHLO
+        id S232290AbjDXXrM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 Apr 2023 19:47:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56610 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231351AbjDXX2V (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 Apr 2023 19:28:21 -0400
-Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8479BD;
-        Mon, 24 Apr 2023 16:28:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1682378895; x=1713914895;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=tuP9B5Hr7Z651Gr0S6ft3FGq8Z8Th3WtYREYd69oDRo=;
-  b=YIGgeRbM7lOhA4cb+wLgFezQRtwcwWD6is2LRSi9RjtvPEOzKdfIW57h
-   iXP65nTbscNL+8CDFXAG5uVqYdVq9678dMJoWvQ7kBUPNgrpRoCLp1tpd
-   bAy3FEEIhN6MfA6CQK9GeS+sXgqPKtlS1FGv3qk8IqBbq+4CQXYYZSBOk
-   KDNfk4SGVUr7H+evHEa+Zbzc9o9dW3gyOvM4ptBk7BOxtzcxNBYL0lzrl
-   OAzUls0OZar4/9bGue+dffVfyV/oz7Uplcs59gNfE5fKEArNZ62fWNGRp
-   LzecYsAa/QalycSm/Ynt/N5SAiB7MJGVQC+vXt5TrNgJ5Ng9UiX+BXIuI
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10690"; a="344074761"
-X-IronPort-AV: E=Sophos;i="5.99,223,1677571200"; 
-   d="scan'208";a="344074761"
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Apr 2023 16:27:08 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10690"; a="939522185"
-X-IronPort-AV: E=Sophos;i="5.99,223,1677571200"; 
-   d="scan'208";a="939522185"
-Received: from lkp-server01.sh.intel.com (HELO b613635ddfff) ([10.239.97.150])
-  by fmsmga006.fm.intel.com with ESMTP; 24 Apr 2023 16:27:04 -0700
-Received: from kbuild by b613635ddfff with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1pr5aJ-000iiS-2A;
-        Mon, 24 Apr 2023 23:27:03 +0000
-Date:   Tue, 25 Apr 2023 07:26:49 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Grzegorz Jaszczyk <jaz@semihalf.com>, linux-kernel@vger.kernel.org,
-        alex.williamson@redhat.com
-Cc:     llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-        dmy@semihalf.com, tn@semihalf.com, dbehr@google.com,
-        dbehr@chromium.org, upstream@semihalf.com, dtor@google.com,
-        jgg@ziepe.ca, kevin.tian@intel.com, cohuck@redhat.com,
-        abhsahu@nvidia.com, yishaih@nvidia.com, yi.l.liu@intel.com,
-        kvm@vger.kernel.org, libvir-list@redhat.com,
-        Grzegorz Jaszczyk <jaz@semihalf.com>
-Subject: Re: [PATCH v2] vfio/pci: Propagate ACPI notifications to user-space
- via eventfd
-Message-ID: <202304250702.Jn8hOwUl-lkp@intel.com>
-References: <20230424162748.2711945-1-jaz@semihalf.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230424162748.2711945-1-jaz@semihalf.com>
-X-Spam-Status: No, score=-4.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+        with ESMTP id S231438AbjDXXrL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 24 Apr 2023 19:47:11 -0400
+Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ADAFB49F3
+        for <kvm@vger.kernel.org>; Mon, 24 Apr 2023 16:47:08 -0700 (PDT)
+Received: by mail-pf1-x449.google.com with SMTP id d2e1a72fcca58-63d30b08700so26372962b3a.1
+        for <kvm@vger.kernel.org>; Mon, 24 Apr 2023 16:47:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1682380028; x=1684972028;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=6Ot+Rlnm7hn0ij7rFbhHCvuqwiEfbByzG62dXdUvoFM=;
+        b=C7G+CTI+zTaYdXEebMpoh3NA7eElM3eZcBitcG3FWy623s36A3AFCzEkoqO+5X70zG
+         Hn4qOxvU+H8ktV/dvTpDC8F8e4kCT/kkmmvjUFwN43rBcc29BjM3raapLyCM+c47OcQZ
+         ZKxas7fxqwOTLFnkvlKa1SBh2gqw9e4KWfQA9xRq56L8tvTXPELZOdaF/BzpbizVNSwW
+         CiLoltdtJWNpdyrFK3XLwwAZA2hk4q3LFtd8/wrndrSyx9RwcHvmE25PlBCSCQS4Tjlz
+         TRTA2nvnLqel0piqWvuxKJpkrXPz3JtdQegjNrmCuK08YwnFUP96Bv/HlJIr9767SsL9
+         uETw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1682380028; x=1684972028;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=6Ot+Rlnm7hn0ij7rFbhHCvuqwiEfbByzG62dXdUvoFM=;
+        b=E+XLTFyZXeGf1LKOmkg7S0y9tApMYf8WeKIB/L9yCFC04yHz+3BSjpjatIQc2WcNys
+         cO4GI+QsOu8HmVkfJYEFbRKwwbTTtHJRxJDeHtfJeMKZDO8LyShwNd09FcGEil0h9Lus
+         G2uevz9hjKDjZ3HR0NFb59fxWddXo+nRivsZW9TfE9xmdj/NlTr7NOxE7SUt7gvObxTS
+         ar3reETD8TiLOvr99Gur1zgW1YDRQJXITjZmCMr426B4rQxvPswwp2nBqjv4EGXnFkKj
+         W/h7ZNTpC0dzfcldaxNwxxF7pahuUpQ4ZeDQ2NTUbQECVfGFMVQoxBZUA0P8LIFQNs7a
+         tgQA==
+X-Gm-Message-State: AAQBX9c9LMfivHm2F5A1Vevd/CHaBpo7lPPBGTxPD0Gt3epnt+TujwaQ
+        MV2oUtXnYl9/JW0DLMB04ik7cRfH/3s5VDOQfAHmMqO1zVKpfrpzoRwVXGAyRaRHgNQpaA745Wo
+        cEvxyziI1DW+XiUhTx3kXNC5oJioJIa9Svkji+hNcNaE8z8NEnlBww42hEK7/7qCLarlia1Y=
+X-Google-Smtp-Source: AKy350YA2bOuxPuU0rjoWOaZFXNoIaerjZaOX9j0+SAeMzgaYiYyYu3xvNxbQC5ZlX/uH0ik+Rf1lqGSKK19ZJ/R6g==
+X-Received: from jgzg.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1acf])
+ (user=jingzhangos job=sendgmr) by 2002:a17:90a:3481:b0:246:ac5c:ba3f with
+ SMTP id p1-20020a17090a348100b00246ac5cba3fmr3352874pjb.0.1682380028103; Mon,
+ 24 Apr 2023 16:47:08 -0700 (PDT)
+Date:   Mon, 24 Apr 2023 23:46:58 +0000
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.40.0.634.g4ca3ef3211-goog
+Message-ID: <20230424234704.2571444-1-jingzhangos@google.com>
+Subject: [PATCH v7 0/6] Support writable CPU ID registers from userspace
+From:   Jing Zhang <jingzhangos@google.com>
+To:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>,
+        ARMLinux <linux-arm-kernel@lists.infradead.org>,
+        Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@google.com>
+Cc:     Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Fuad Tabba <tabba@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Raghavendra Rao Ananta <rananta@google.com>,
+        Jing Zhang <jingzhangos@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Grzegorz,
+This patchset refactors/adds code to support writable per guest CPU ID feature
+registers. Part of the code/ideas are from
+https://lore.kernel.org/all/20220419065544.3616948-1-reijiw@google.com .
+No functional change is intended in this patchset. With the new CPU ID feature
+registers infrastructure, only writtings of ID_AA64PFR0_EL1.[CSV2|CSV3],
+ID_AA64DFR0_EL1.PMUVer and ID_DFR0_ELF.PerfMon are allowed as KVM does before.
 
-kernel test robot noticed the following build warnings:
+Writable (Configurable) per guest CPU ID feature registers are useful for
+creating/migrating guest on ARM CPUs with different kinds of features.
 
-[auto build test WARNING on awilliam-vfio/for-linus]
-[also build test WARNING on linus/master v6.3 next-20230424]
-[cannot apply to awilliam-vfio/next]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+This patchset uses kvm->arch.config_lock from Oliver's lock inversion fixes at
+https://lore.kernel.org/linux-arm-kernel/20230327164747.2466958-1-oliver.upton@linux.dev/
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Grzegorz-Jaszczyk/vfio-pci-Propagate-ACPI-notifications-to-user-space-via-eventfd/20230425-002935
-base:   https://github.com/awilliam/linux-vfio.git for-linus
-patch link:    https://lore.kernel.org/r/20230424162748.2711945-1-jaz%40semihalf.com
-patch subject: [PATCH v2] vfio/pci: Propagate ACPI notifications to user-space via eventfd
-config: x86_64-randconfig-a012 (https://download.01.org/0day-ci/archive/20230425/202304250702.Jn8hOwUl-lkp@intel.com/config)
-compiler: clang version 14.0.6 (https://github.com/llvm/llvm-project f28c006a5895fc0e329fe15fead81e37457cb1d1)
-reproduce (this is a W=1 build):
-        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-        chmod +x ~/bin/make.cross
-        # https://github.com/intel-lab-lkp/linux/commit/62d759059cd5e6dab70052027e1b69c5d5cdc0f2
-        git remote add linux-review https://github.com/intel-lab-lkp/linux
-        git fetch --no-tags linux-review Grzegorz-Jaszczyk/vfio-pci-Propagate-ACPI-notifications-to-user-space-via-eventfd/20230425-002935
-        git checkout 62d759059cd5e6dab70052027e1b69c5d5cdc0f2
-        # save the config file
-        mkdir build_dir && cp config build_dir/.config
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=x86_64 olddefconfig
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=x86_64 SHELL=/bin/bash drivers/vfio/pci/
+---
 
-If you fix the issue, kindly add following tag where applicable
-| Reported-by: kernel test robot <lkp@intel.com>
-| Link: https://lore.kernel.org/oe-kbuild-all/202304250702.Jn8hOwUl-lkp@intel.com/
+* v6 -> v7
+  - Rebased to v6.3-rc7.
+  - Add helpers for idregs read/write.
+  - Guard all idregs reads/writes.
+  - Add code to fix features' safe value type which is different for KVM than
+    for the host.
 
-All warnings (new ones prefixed by >>):
+* v5 -> v6
+  - Rebased to v6.3-rc5.
+  - Reuse struct sys_reg_desc's reset() callback and field val for KVM.
+    sanitisation function and writable mask instead of creating a new data
+    structure for idregs.
+  - Use get_arm64_ftr_reg() instead of exposing idregs ftr_bits array.
 
->> drivers/vfio/pci/vfio_pci_core.c:709:6: warning: no previous prototype for function 'vfio_pci_acpi_notify_close_device' [-Wmissing-prototypes]
-   void vfio_pci_acpi_notify_close_device(struct vfio_pci_core_device *vdev)
-        ^
-   drivers/vfio/pci/vfio_pci_core.c:709:1: note: declare 'static' if the function is not intended to be used outside of this translation unit
-   void vfio_pci_acpi_notify_close_device(struct vfio_pci_core_device *vdev)
-   ^
-   static 
->> drivers/vfio/pci/vfio_pci_core.c:1029:11: warning: variable 'events' set but not used [-Wunused-but-set-variable]
-           __poll_t events;
-                    ^
-   2 warnings generated.
+* v4 -> v5
+  - Rebased to 2fad20ae05cb (kvmarm/next)
+    Merge branch kvm-arm64/selftest/misc-6,4 into kvmarm-master/next
+  - Use kvm->arch.config_lock to guard update to multiple VM scope idregs
+    to avoid lock inversion
+  - Add back IDREG() macro for idregs access
+  - Refactor struct id_reg_desc by using existing infrastructure.
+  - Addressed many other comments from Marc.
+
+* v3 -> v4
+  - Remove IDREG() macro for ID reg access, use simple array access instead
+  - Rename kvm_arm_read_id_reg_with_encoding() to kvm_arm_read_id_reg()
+  - Save perfmon value in ID_DFR0_EL1 instead of pmuver
+  - Update perfmon in ID_DFR0_EL1 and pmuver in ID_AA64DFR0_EL1 atomically
+  - Remove kvm_vcpu_has_pmu() in macro kvm_pmu_is_3p5()
+  - Improve ID register sanity checking in kvm_arm_check_idreg_table()
+
+* v2 -> v3
+  - Rebased to 96a4627dbbd4 (kvmarm/next)
+    Merge tag ' https://github.com/oupton/linux tags/kvmarm-6.3' from into kvmarm-master/next
+  - Add id registere emulation entry point function emulate_id_reg
+  - Fix consistency for ID_AA64DFR0_EL1.PMUVer and ID_DFR0_EL1.PerfMon
+  - Improve the checking for id register table by ensuring that every entry has
+    the correct id register encoding.
+  - Addressed other comments from Reiji and Marc.
+
+* v1 -> v2
+  - Rebase to 7121a2e1d107 (kvmarm/next) Merge branch kvm-arm64/nv-prefix into kvmarm/next
+  - Address writing issue for PMUVer
+
+[1] https://lore.kernel.org/all/20230201025048.205820-1-jingzhangos@google.com
+[2] https://lore.kernel.org/all/20230212215830.2975485-1-jingzhangos@google.com
+[3] https://lore.kernel.org/all/20230228062246.1222387-1-jingzhangos@google.com
+[4] https://lore.kernel.org/all/20230317050637.766317-1-jingzhangos@google.com
+[5] https://lore.kernel.org/all/20230402183735.3011540-1-jingzhangos@google.com
+[6] https://lore.kernel.org/all/20230404035344.4043856-1-jingzhangos@google.com
+
+---
+
+Jing Zhang (6):
+  KVM: arm64: Move CPU ID feature registers emulation into a separate
+    file
+  KVM: arm64: Save ID registers' sanitized value per guest
+  KVM: arm64: Use per guest ID register for ID_AA64PFR0_EL1.[CSV2|CSV3]
+  KVM: arm64: Use per guest ID register for ID_AA64DFR0_EL1.PMUVer
+  KVM: arm64: Reuse fields of sys_reg_desc for idreg
+  KVM: arm64: Refactor writings for PMUVer/CSV2/CSV3
+
+ arch/arm64/include/asm/cpufeature.h |   1 +
+ arch/arm64/include/asm/kvm_host.h   |  60 ++-
+ arch/arm64/kernel/cpufeature.c      |   2 +-
+ arch/arm64/kvm/Makefile             |   2 +-
+ arch/arm64/kvm/arm.c                |  24 +-
+ arch/arm64/kvm/id_regs.c            | 692 ++++++++++++++++++++++++++++
+ arch/arm64/kvm/sys_regs.c           | 525 ++++-----------------
+ arch/arm64/kvm/sys_regs.h           |  28 +-
+ include/kvm/arm_pmu.h               |   5 +-
+ 9 files changed, 857 insertions(+), 482 deletions(-)
+ create mode 100644 arch/arm64/kvm/id_regs.c
 
 
-vim +/vfio_pci_acpi_notify_close_device +709 drivers/vfio/pci/vfio_pci_core.c
-
-   708	
- > 709	void vfio_pci_acpi_notify_close_device(struct vfio_pci_core_device *vdev)
-   710	{
-   711		struct vfio_acpi_notification *acpi_notify = vdev->acpi_notification;
-   712		struct pci_dev *pdev = vdev->pdev;
-   713		struct acpi_device *adev = ACPI_COMPANION(&pdev->dev);
-   714		struct notification_queue *entry, *entry_tmp;
-   715		u64 cnt;
-   716	
-   717		if (!acpi_notify || !acpi_notify->acpi_notify_trigger)
-   718			return;
-   719	
-   720		acpi_remove_notify_handler(adev->handle, ACPI_DEVICE_NOTIFY,
-   721					   vfio_pci_core_acpi_notify);
-   722	
-   723		eventfd_ctx_remove_wait_queue(acpi_notify->acpi_notify_trigger,
-   724					      &acpi_notify->wait, &cnt);
-   725	
-   726		flush_work(&acpi_notify->acpi_notification_work);
-   727	
-   728		mutex_lock(&acpi_notify->notification_list_lock);
-   729		list_for_each_entry_safe(entry, entry_tmp,
-   730					 &acpi_notify->notification_list,
-   731					 notify_val_next) {
-   732			list_del(&entry->notify_val_next);
-   733			kfree(entry);
-   734		}
-   735		mutex_unlock(&acpi_notify->notification_list_lock);
-   736	
-   737		eventfd_ctx_put(acpi_notify->acpi_notify_trigger);
-   738	
-   739		kfree(acpi_notify);
-   740	
-   741		vdev->acpi_notification = NULL;
-   742	}
-   743	#else
-   744	void vfio_pci_acpi_notify_close_device(struct vfio_pci_core_device *vdev) {}
-   745	#endif /* CONFIG_ACPI */
-   746	
-
+base-commit: 6a8f57ae2eb07ab39a6f0ccad60c760743051026
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests
+2.40.0.634.g4ca3ef3211-goog
+
