@@ -2,280 +2,160 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2F7D36ED9FF
-	for <lists+kvm@lfdr.de>; Tue, 25 Apr 2023 03:46:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CAB456EDA06
+	for <lists+kvm@lfdr.de>; Tue, 25 Apr 2023 03:49:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232965AbjDYBpr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 Apr 2023 21:45:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44456 "EHLO
+        id S232950AbjDYBtO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 Apr 2023 21:49:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47508 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233105AbjDYBpS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 Apr 2023 21:45:18 -0400
-Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80498AF0A
-        for <kvm@vger.kernel.org>; Mon, 24 Apr 2023 18:45:17 -0700 (PDT)
-Received: by mail-pl1-x629.google.com with SMTP id d9443c01a7336-1a9290a6f96so578765ad.1
-        for <kvm@vger.kernel.org>; Mon, 24 Apr 2023 18:45:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1682387117; x=1684979117;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=fNs0pUTvP1d4kW6KiccRdby8kAtqOyOOnmaY53ILjo4=;
-        b=gKEa1LL3o2+xw+wePXTydV+rcr9Ex4hicbcKO/7xjFyHSfGvPjJkL9Bzgp5PvDHBrk
-         KNEvdVuAemDTCbscp0Lu15YTOm76I7i6+ZYX30CHnxULuvxF0x74QALRry4nAeZz5Y4N
-         SR4d0pv8w60kskieQZLMZ/nJB+hhcJwxFpCuM5sF8O3e0vFM22oYFB6RzmUiuoR2G2jn
-         QEMkjen0i2vAD9ull9M4gXsvTI3SZ43mxcBnw+uHSCne/2QdQ2gBMts+yytY8FBE7MAA
-         5Al0jPgoIkp27/4XqIZJ9GMZjNX3wUEM6k4QA+MAWcINfGc6pEIVAZA406QzWiue9Kpa
-         v+Bw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682387117; x=1684979117;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=fNs0pUTvP1d4kW6KiccRdby8kAtqOyOOnmaY53ILjo4=;
-        b=JSgLvB5NUKMKTzI5YBdkB/uiI4x5nP+qJxaFvyhcmsyKOyouqqITN9g3fS2NdGeCx6
-         i9SoCXUS6ZErDPt1VXIDeAEmKiBapo97FVk92rMRG6HjEF4OJf5vs2pOq+PyYJtJec5s
-         8giCKxaL8LCA1B2BsC6g59EFtcmzSdScwejxYe8ChytQzMMP+Gpfu2NjeI5DYclqfnh3
-         qIcDB7SDF3Ltk4qzkd8WKJKT1UxhwieSsIwf/JcEeO41bmcsUXDtntUPr/MFHfQXjVbs
-         GMIRcQj1Rbwv3NOUSih8kxuqGcdfi6T5XMPqVd5zWobtxVf7CqrOb8piPFUDSO/64jJs
-         ugkQ==
-X-Gm-Message-State: AC+VfDycPWvhSlzrlHoSrrW/QThgGPNP6Utk3mXg+LQEYLEyCEXVfOWl
-        3fUe17QMlKTq1rliRUA2FODz2w==
-X-Google-Smtp-Source: ACHHUZ6yMuR0KL6S7F8pQVQGZbspyS4K1EVM25hPSv5iLwSvlUGa5nXvVfgPYjXfCNKZ+2YFiYQejw==
-X-Received: by 2002:a17:902:f691:b0:1a1:c3bf:810b with SMTP id l17-20020a170902f69100b001a1c3bf810bmr136917plg.6.1682387116794;
-        Mon, 24 Apr 2023 18:45:16 -0700 (PDT)
-Received: from google.com (223.103.125.34.bc.googleusercontent.com. [34.125.103.223])
-        by smtp.gmail.com with ESMTPSA id i12-20020a62870c000000b0063b7f3250e9sm7960372pfe.7.2023.04.24.18.45.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 Apr 2023 18:45:15 -0700 (PDT)
-Date:   Mon, 24 Apr 2023 18:45:11 -0700
-From:   Reiji Watanabe <reijiw@google.com>
-To:     Jing Zhang <jingzhangos@google.com>
-Cc:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>,
-        ARMLinux <linux-arm-kernel@lists.infradead.org>,
-        Marc Zyngier <maz@kernel.org>,
-        Oliver Upton <oupton@google.com>,
-        Will Deacon <will@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Fuad Tabba <tabba@google.com>,
-        Raghavendra Rao Ananta <rananta@google.com>
-Subject: Re: [PATCH v6 4/6] KVM: arm64: Use per guest ID register for
- ID_AA64DFR0_EL1.PMUVer
-Message-ID: <20230425014511.ipwj7gr4d4ai5als@google.com>
-References: <20230404035344.4043856-1-jingzhangos@google.com>
- <20230404035344.4043856-5-jingzhangos@google.com>
- <20230419034042.r56jdectha4asyqi@google.com>
- <CAAdAUtgpHCnoAJoVOW51C=_=7Hs9dJGUw1cjZAKMPuV-8eyLJw@mail.gmail.com>
+        with ESMTP id S229872AbjDYBtN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 24 Apr 2023 21:49:13 -0400
+Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B8DB19BF;
+        Mon, 24 Apr 2023 18:49:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1682387352; x=1713923352;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=RB7MLCszjLdl8wX7HNrdA2L4B19aRn4tLeyPvTGxnqA=;
+  b=M9FPGRK55kG5r/f7tduDmTXFOM1VMchk2lRdkA5pEMG5YleLRN4Veqse
+   6BRfEbvwzZwuBaLUw/JdwVBsE0T2vxw4TVVDdeA/MjFNcETzt1xRrIkc/
+   rGRphXNmp7n8TlDJ4cgQKB8mu00skUDmWkX2MfoPk4pogjAeQ4CJb2xpv
+   4OqfYmHv3JHYiFjwbVVwm/e2jEiFuYeJuiQQ/nQD3ol5zfoPgW/xtcJ9v
+   S6sHKpyehulXZ8Adl+TtNTgtPIVAHMFP50PxajKolE9+1QCHEoOYteIOl
+   qmqd/1L1i33cihjXMlAKMxDSHCX/l1rUywzsTJy5XT0TM1DJuSrh0amIM
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10690"; a="326929330"
+X-IronPort-AV: E=Sophos;i="5.99,224,1677571200"; 
+   d="scan'208";a="326929330"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Apr 2023 18:49:10 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10690"; a="817488512"
+X-IronPort-AV: E=Sophos;i="5.99,224,1677571200"; 
+   d="scan'208";a="817488512"
+Received: from zengguan-mobl1.ccr.corp.intel.com (HELO [10.238.0.183]) ([10.238.0.183])
+  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Apr 2023 18:49:06 -0700
+Message-ID: <1b0db39e-2591-1af9-06d8-8e65c8a0e1eb@intel.com>
+Date:   Tue, 25 Apr 2023 09:49:00 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+Subject: Re: [PATCH 0/6] LASS KVM virtualization support
+To:     Binbin Wu <binbin.wu@linux.intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "Christopherson,, Sean" <seanjc@google.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        H Peter Anvin <hpa@zytor.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Cc:     "x86@kernel.org" <x86@kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Gao, Chao" <chao.gao@intel.com>
+References: <20230420133724.11398-1-guang.zeng@intel.com>
+ <99fd6359-bc5d-b633-9b16-711f16063da8@linux.intel.com>
+Content-Language: en-US
+From:   Zeng Guang <guang.zeng@intel.com>
+In-Reply-To: <99fd6359-bc5d-b633-9b16-711f16063da8@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAAdAUtgpHCnoAJoVOW51C=_=7Hs9dJGUw1cjZAKMPuV-8eyLJw@mail.gmail.com>
-X-Spam-Status: No, score=-14.5 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,FSL_HELO_FAKE,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-5.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
+        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Jing,
 
-On Mon, Apr 24, 2023 at 12:07:31PM -0700, Jing Zhang wrote:
-> Hi Reiji,
-> 
-> On Tue, Apr 18, 2023 at 8:40 PM Reiji Watanabe <reijiw@google.com> wrote:
-> >
-> > Hi Jing,
-> >
-> > On Tue, Apr 04, 2023 at 03:53:42AM +0000, Jing Zhang wrote:
-> > > With per guest ID registers, PMUver settings from userspace
-> > > can be stored in its corresponding ID register.
-> > >
-> > > No functional change intended.
-> > >
-> > > Signed-off-by: Jing Zhang <jingzhangos@google.com>
-> > > ---
-> > >  arch/arm64/include/asm/kvm_host.h | 11 +++----
-> > >  arch/arm64/kvm/arm.c              |  6 ----
-> > >  arch/arm64/kvm/id_regs.c          | 50 ++++++++++++++++++++++++-------
-> > >  include/kvm/arm_pmu.h             |  5 ++--
-> > >  4 files changed, 49 insertions(+), 23 deletions(-)
-> > >
-> > > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> > > index 67a55177fd83..da46a2729581 100644
-> > > --- a/arch/arm64/include/asm/kvm_host.h
-> > > +++ b/arch/arm64/include/asm/kvm_host.h
-> > > @@ -237,6 +237,12 @@ struct kvm_arch {
-> > >  #define KVM_ARCH_FLAG_EL1_32BIT                              4
-> > >       /* PSCI SYSTEM_SUSPEND enabled for the guest */
-> > >  #define KVM_ARCH_FLAG_SYSTEM_SUSPEND_ENABLED         5
-> > > +     /*
-> > > +      * AA64DFR0_EL1.PMUver was set as ID_AA64DFR0_EL1_PMUVer_IMP_DEF
-> > > +      * or DFR0_EL1.PerfMon was set as ID_DFR0_EL1_PerfMon_IMPDEF from
-> > > +      * userspace for VCPUs without PMU.
-> > > +      */
-> > > +#define KVM_ARCH_FLAG_VCPU_HAS_IMP_DEF_PMU           6
-> > >
-> > >       unsigned long flags;
-> > >
-> > > @@ -249,11 +255,6 @@ struct kvm_arch {
-> > >
-> > >       cpumask_var_t supported_cpus;
-> > >
-> > > -     struct {
-> > > -             u8 imp:4;
-> > > -             u8 unimp:4;
-> > > -     } dfr0_pmuver;
-> > > -
-> > >       /* Hypercall features firmware registers' descriptor */
-> > >       struct kvm_smccc_features smccc_feat;
-> > >
-> > > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> > > index 64e1c19e5a9b..3fe28d545b54 100644
-> > > --- a/arch/arm64/kvm/arm.c
-> > > +++ b/arch/arm64/kvm/arm.c
-> > > @@ -138,12 +138,6 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
-> > >       kvm_arm_init_hypercalls(kvm);
-> > >       kvm_arm_init_id_regs(kvm);
-> > >
-> > > -     /*
-> > > -      * Initialise the default PMUver before there is a chance to
-> > > -      * create an actual PMU.
-> > > -      */
-> > > -     kvm->arch.dfr0_pmuver.imp = kvm_arm_pmu_get_pmuver_limit();
-> > > -
-> > >       return 0;
-> > >
-> > >  err_free_cpumask:
-> > > diff --git a/arch/arm64/kvm/id_regs.c b/arch/arm64/kvm/id_regs.c
-> > > index 291311b1ecca..6f65d30693fe 100644
-> > > --- a/arch/arm64/kvm/id_regs.c
-> > > +++ b/arch/arm64/kvm/id_regs.c
-> > > @@ -21,9 +21,12 @@
-> > >  static u8 vcpu_pmuver(const struct kvm_vcpu *vcpu)
-> > >  {
-> > >       if (kvm_vcpu_has_pmu(vcpu))
-> > > -             return vcpu->kvm->arch.dfr0_pmuver.imp;
-> > > +             return FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer),
-> > > +                              IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1));
-> > > +     else if (test_bit(KVM_ARCH_FLAG_VCPU_HAS_IMP_DEF_PMU, &vcpu->kvm->arch.flags))
-> > > +             return ID_AA64DFR0_EL1_PMUVer_IMP_DEF;
-> > >
-> > > -     return vcpu->kvm->arch.dfr0_pmuver.unimp;
-> > > +     return 0;
-> > >  }
-> > >
-> > >  static u8 perfmon_to_pmuver(u8 perfmon)
-> > > @@ -254,10 +257,20 @@ static int set_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
-> > >       if (val)
-> > >               return -EINVAL;
-> > >
-> > > -     if (valid_pmu)
-> > > -             vcpu->kvm->arch.dfr0_pmuver.imp = pmuver;
-> > > -     else
-> > > -             vcpu->kvm->arch.dfr0_pmuver.unimp = pmuver;
-> > > +     if (valid_pmu) {
-> > > +             mutex_lock(&vcpu->kvm->arch.config_lock);
-> > > +             IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1) &= ~ID_AA64DFR0_EL1_PMUVer_MASK;
-> > > +             IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1) |= FIELD_PREP(ID_AA64DFR0_EL1_PMUVer_MASK,
-> > > +                                                                 pmuver);
-> > > +
-> > > +             IDREG(vcpu->kvm, SYS_ID_DFR0_EL1) &= ~ID_DFR0_EL1_PerfMon_MASK;
-> > > +             IDREG(vcpu->kvm, SYS_ID_DFR0_EL1) |= FIELD_PREP(ID_DFR0_EL1_PerfMon_MASK,
-> > > +                                                             pmuver_to_perfmon(pmuver));
-> >
-> > As those could be read without acquiring the lock, I don't think
-> > we should expose the intermediate state of the register values.
-> I will protect all reads/writes to KVM scope emulated ID registers
-> with the lock.
+On 4/24/2023 9:20 AM, Binbin Wu wrote:
+> On 4/20/2023 9:37 PM, Zeng Guang wrote:
+>> Linear Address Space Separation (LASS)[1] is a new mechanism that
+>> enforces the same mode-based protections as paging, i.e. SMAP/SMEP but
+>> without traversing the paging structures. Because the protections
+>> enforced by LASS are applied before paging, "probes" by malicious
+>> software will provide no paging-based timing information.
+>>
+>> LASS works in long mode and partitions the 64-bit canonical linear
+>> address space into two halves:
+>>       1. Lower half (LA[63]=0) --> user space
+>>       2. Upper half (LA[63]=1) --> kernel space
+>>
+>> When LASS is enabled, a general protection #GP fault or a stack fault
+>> #SS will be generated if software accesses the address from the half
+>> in which it resides to another half,
+> The accessor's mode is based on CPL, not the address range,
+> so it feels a bit inaccurate of descripton "in which it resides".
+>
+This is alternative description to implicitly signify the privilege level,
+i.e. code running in upper half means it is in supervisor mode,
+otherwise it's in user mode.  :)
 
-Or I think we could resolve it by writing the new value atomically
-(copy the value to a local variable, set the local variable to the
-new value, and update the ID_REG value with WRITE_ONCE).
-
-Thank you,
-Reiji
-
-
-> >
-> >
-> > > +             mutex_unlock(&vcpu->kvm->arch.config_lock);
-> > > +     } else {
-> > > +             assign_bit(KVM_ARCH_FLAG_VCPU_HAS_IMP_DEF_PMU, &vcpu->kvm->arch.flags,
-> > > +                        pmuver == ID_AA64DFR0_EL1_PMUVer_IMP_DEF);
-> > > +     }
-> > >
-> > >       return 0;
-> > >  }
-> > > @@ -294,10 +307,19 @@ static int set_id_dfr0_el1(struct kvm_vcpu *vcpu,
-> > >       if (val)
-> > >               return -EINVAL;
-> > >
-> > > -     if (valid_pmu)
-> > > -             vcpu->kvm->arch.dfr0_pmuver.imp = perfmon_to_pmuver(perfmon);
-> > > -     else
-> > > -             vcpu->kvm->arch.dfr0_pmuver.unimp = perfmon_to_pmuver(perfmon);
-> > > +     if (valid_pmu) {
-> > > +             mutex_lock(&vcpu->kvm->arch.config_lock);
-> > > +             IDREG(vcpu->kvm, SYS_ID_DFR0_EL1) &= ~ID_DFR0_EL1_PerfMon_MASK;
-> > > +             IDREG(vcpu->kvm, SYS_ID_DFR0_EL1) |= FIELD_PREP(ID_DFR0_EL1_PerfMon_MASK, perfmon);
-> > > +
-> > > +             IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1) &= ~ID_AA64DFR0_EL1_PMUVer_MASK;
-> > > +             IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1) |= FIELD_PREP(ID_AA64DFR0_EL1_PMUVer_MASK,
-> > > +                                                                 perfmon_to_pmuver(perfmon));
-> >
-> > I have the same comment as set_id_aa64dfr0_el1().
-> >
-> > Thank you,
-> > Reiji
-> >
-> > > +             mutex_unlock(&vcpu->kvm->arch.config_lock);
-> > > +     } else {
-> > > +             assign_bit(KVM_ARCH_FLAG_VCPU_HAS_IMP_DEF_PMU, &vcpu->kvm->arch.flags,
-> > > +                        perfmon == ID_DFR0_EL1_PerfMon_IMPDEF);
-> > > +     }
-> > >
-> > >       return 0;
-> > >  }
-> > > @@ -503,4 +525,12 @@ void kvm_arm_init_id_regs(struct kvm *kvm)
-> > >       }
-> > >
-> > >       IDREG(kvm, SYS_ID_AA64PFR0_EL1) = val;
-> > > +
-> > > +     /*
-> > > +      * Initialise the default PMUver before there is a chance to
-> > > +      * create an actual PMU.
-> > > +      */
-> > > +     IDREG(kvm, SYS_ID_AA64DFR0_EL1) &= ~ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer);
-> > > +     IDREG(kvm, SYS_ID_AA64DFR0_EL1) |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer),
-> > > +                                                   kvm_arm_pmu_get_pmuver_limit());
-> > >  }
-> > > diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
-> > > index 628775334d5e..856ac59b6821 100644
-> > > --- a/include/kvm/arm_pmu.h
-> > > +++ b/include/kvm/arm_pmu.h
-> > > @@ -92,8 +92,9 @@ void kvm_vcpu_pmu_restore_host(struct kvm_vcpu *vcpu);
-> > >  /*
-> > >   * Evaluates as true when emulating PMUv3p5, and false otherwise.
-> > >   */
-> > > -#define kvm_pmu_is_3p5(vcpu)                                         \
-> > > -     (vcpu->kvm->arch.dfr0_pmuver.imp >= ID_AA64DFR0_EL1_PMUVer_V3P5)
-> > > +#define kvm_pmu_is_3p5(vcpu)                                                                 \
-> > > +      (FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer),                                 \
-> > > +              IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1)) >= ID_AA64DFR0_EL1_PMUVer_V3P5)
-> > >
-> > >  u8 kvm_arm_pmu_get_pmuver_limit(void);
-> > >
-> > > --
-> > > 2.40.0.348.gf938b09366-goog
-> > >
-> Thanks,
-> Jing
+>> e.g., either from user space to
+>> upper half, or from kernel space to lower half. This protection applies
+>> to data access, code execution.
+>>
+>> This series add KVM LASS virtualization support.
+>>
+>> When platform has LASS capability, KVM requires to expose this feature
+>> to guest VM enumerated by CPUID.(EAX=07H.ECX=1):EAX.LASS[bit 6], and
+>> allow guest to enable it via CR4.LASS[bit 27] on demand. For instruction
+>> executed in the guest directly, hardware will perform the LASS violation
+>> check, while KVM also needs to apply LASS to instructions emulated by
+>> software and injects #GP or #SS fault to the guest.
+>>
+>> Following LASS voilations check will be taken on KVM emulation path.
+> /s/voilations/violations
+>
+>
+>> User-mode access to supervisor space address:
+>>           LA[bit 63] && (CPL == 3)
+>> Supervisor-mode access to user space address:
+>>           Instruction fetch: !LA[bit 63] && (CPL < 3)
+>>           Data access: !LA[bit 63] && (CR4.SMAP==1) && ((RFLAGS.AC == 0 &&
+>>                        CPL < 3) || Implicit supervisor access)
+>>
+>> We tested the basic function of LASS virtualization including LASS
+>> enumeration and enabling in non-root and nested environment. As current
+>> KVM unittest framework is not compatible to LASS rule that kernel should
+>> run in the upper half, we use kernel module and application test to verify
+>> LASS functionalities in guest instead. The data access related x86 emulator
+>> code is verified with forced emulation prefix (FEP) mechanism. Other test
+>> cases are working in progress.
+>>
+>> How to add tests for LASS in KUT or kselftest is still under investigation.
+>>
+>> [1] Intel Architecutre Instruction Set Extensions and Future Features
+> /s/Architecutre/Architecture
+>
+Sorry for typos above. Thanks.
+>> Programming Reference: Chapter Linear Address Space Separation (LASS)
+>> https://cdrdv2.intel.com/v1/dl/getContent/671368
+>>
+>> Zeng Guang (6):
+>>     KVM: x86: Virtualize CR4.LASS
+>>     KVM: VMX: Add new ops in kvm_x86_ops for LASS violation check
+>>     KVM: x86: Add emulator helper for LASS violation check
+>>     KVM: x86: LASS protection on KVM emulation when LASS enabled
+>>     KVM: x86: Advertise LASS CPUID to user space
+>>     KVM: x86: Set KVM LASS based on hardware capability
+>>
+>>    arch/x86/include/asm/cpuid.h       | 36 +++++++++++++++++++
+>>    arch/x86/include/asm/kvm-x86-ops.h |  1 +
+>>    arch/x86/include/asm/kvm_host.h    |  7 +++-
+>>    arch/x86/kvm/cpuid.c               |  8 +++--
+>>    arch/x86/kvm/emulate.c             | 36 ++++++++++++++++---
+>>    arch/x86/kvm/kvm_emulate.h         |  1 +
+>>    arch/x86/kvm/vmx/nested.c          |  3 ++
+>>    arch/x86/kvm/vmx/sgx.c             |  2 ++
+>>    arch/x86/kvm/vmx/vmx.c             | 58 ++++++++++++++++++++++++++++++
+>>    arch/x86/kvm/vmx/vmx.h             |  2 ++
+>>    arch/x86/kvm/x86.c                 |  9 +++++
+>>    arch/x86/kvm/x86.h                 |  2 ++
+>>    12 files changed, 157 insertions(+), 8 deletions(-)
+>>
