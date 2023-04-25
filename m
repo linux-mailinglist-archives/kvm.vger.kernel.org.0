@@ -2,80 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A67716ED95F
-	for <lists+kvm@lfdr.de>; Tue, 25 Apr 2023 02:37:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 236BF6ED96C
+	for <lists+kvm@lfdr.de>; Tue, 25 Apr 2023 02:54:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232569AbjDYAhS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 Apr 2023 20:37:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44620 "EHLO
+        id S230254AbjDYAyr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 Apr 2023 20:54:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48402 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232491AbjDYAhQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 Apr 2023 20:37:16 -0400
-Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC6EA11C
-        for <kvm@vger.kernel.org>; Mon, 24 Apr 2023 17:37:14 -0700 (PDT)
-Received: by mail-pf1-x432.google.com with SMTP id d2e1a72fcca58-63b87d23729so4197614b3a.0
-        for <kvm@vger.kernel.org>; Mon, 24 Apr 2023 17:37:14 -0700 (PDT)
+        with ESMTP id S229756AbjDYAyp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 24 Apr 2023 20:54:45 -0400
+Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B74FAD19
+        for <kvm@vger.kernel.org>; Mon, 24 Apr 2023 17:54:44 -0700 (PDT)
+Received: by mail-pf1-x436.google.com with SMTP id d2e1a72fcca58-63b5fca48bcso4400257b3a.0
+        for <kvm@vger.kernel.org>; Mon, 24 Apr 2023 17:54:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1682383034; x=1684975034;
+        d=gmail.com; s=20221208; t=1682384084; x=1684976084;
         h=to:references:message-id:content-transfer-encoding:cc:date
          :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=fHR3/LN2j1zsFd+vHZpilKnpPMmVBsE4NTdgmjY6waM=;
-        b=mbsdt0OhKWkJAFwZLAa0Hxblc5IB4blY+u4h2FFObzYzmEJ86IEablzUUQr4q+SMbF
-         DasXtsz853hCizMWFholuum6/8w4kDfj8Oc+DcAmcnqUAfPTUtaa4RogX81Acy27opUN
-         F4v8K1nhuWy4Ad6xYFk8gmiy5JrfTE+ptEBNoMXMriLHF9O1cJFYgjY/OtlHo0I/2eo+
-         zuhfjiz7btJ1XjQE1EQBgfl2ssvWjMDUs8rL4p0y91IZ9NycjEjnQi84CKBMes7AhYLi
-         WSazC9Xhpx2+iyS4N3j+aii0bYWTy4/+xvUzJtO9K6ZrLo04c25HIjD0mbluC4hQqgtU
-         QhGw==
+        bh=TvC05ourDb/+RUYOByG9ySrV1Ngi2eY5g+3zE7Tf+nM=;
+        b=asdFIRONALlkoBpiH3qHNZl6Er6plYAVOFybVacPKhNsz6YTtO5vT44uu5E4SmUtKw
+         5gbA1Wilb96HOar5xMDrQnm1swfyNOHs9RZkVOEupfsz9h9qCpd6TpIihK98c2HHhxXj
+         Ph+zUC9gVVFQSmhCdl5ppNXGEb/Mzc0Vdtje590oVVaA/tbPpV+4jGXBschtimnb0eUg
+         V+m7VeaskReeS64KrVtZxWenhG4DwM/DTPw4Cll4LpJUy/WRH4okOYt+/jhdr8Glc1HC
+         hods9UkzE791IpXlorsOiwRBSoWgNC5kWpWaHr83WR1Uis8Wpu1mTXTBkFTRen8bPDgM
+         oOIA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682383034; x=1684975034;
+        d=1e100.net; s=20221208; t=1682384084; x=1684976084;
         h=to:references:message-id:content-transfer-encoding:cc:date
          :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=fHR3/LN2j1zsFd+vHZpilKnpPMmVBsE4NTdgmjY6waM=;
-        b=dr8XDdq2tC7J/civp7HUe71vmo26GHc/sokeO7gbTMlBR5YYhpPTHWOJBd1vSmp8u5
-         nTcoQGW5fSfT5yW+1NFtAVn6dmvr+D04g90m8b9f/xqJ5iRHqIAV/MK1QJFv3rnWX536
-         njRkbas9bkUOzrZHTeAyVifFF2ydj24eLSZHZdDruhg4eqsZxhISjeVgdc5q72u/Ie70
-         S2tsBgknLzd2q1ghRY/kIqpOls7YGQtcPN03Yj2GY3oHtOd6trU29At/72NY1vExgSf8
-         4CH+67oj8ECTGP3WZNNJOgoSDDUWOVZd3IWhy5+uHHTUPUJLpIGWNpbuz7B+d26cJwao
-         7NQA==
-X-Gm-Message-State: AAQBX9e9hhSSnVinbjWV9kesp2qmSKejXmjlve30umPugckDPLLISB2+
-        WelaZcaKo+S/6W/ucsgfeSU=
-X-Google-Smtp-Source: AKy350b0m5/VBh+CSnw71qkmiWZtBD8z5PKu+OgUDeP0AQYb5QJd3Ri5eHles4ikwJ028doy0BWAVw==
-X-Received: by 2002:a05:6a20:7da4:b0:f0:dedb:83b7 with SMTP id v36-20020a056a207da400b000f0dedb83b7mr19473521pzj.60.1682383033831;
-        Mon, 24 Apr 2023 17:37:13 -0700 (PDT)
+        bh=TvC05ourDb/+RUYOByG9ySrV1Ngi2eY5g+3zE7Tf+nM=;
+        b=ciWaHLD7ivHsdLkShz552bInuKA6F/jyZyxb/Ee9YpmYThVHSeoEbc0hvTkCYhjFO3
+         2S3mt8pgtur9H9nTQ/V1v2wMxRszhYCQaSR5KtNtT7bFxuN+FTTsSPp6wSruNQ189I63
+         gGlGkZem9Kws6apjc7j9wWgVZpewvUAHHK3A78H+0h/RTlvV0oS/oPnvWrAdE/xR8LiX
+         yK6P4VF7a3FZ8JrFZpveObq3sLV/JfihXXnPld4+/Mn/POjQtYzM9nCwvWzET2aD79kt
+         AwOidZ+LUVvDMvBWA8UWAymehvHVzklncL5k2n2fsnC+pjZewNRmXZJKMpJpvlB4+NjQ
+         G1Vg==
+X-Gm-Message-State: AAQBX9eehPN/5FSPnVqPjqgL12weAJ+YanpPLWXRYB/5LXBfwCjT7KYY
+        n5GxRoA+5+BciTyIJrV7J8T0W2H0V+FuUA==
+X-Google-Smtp-Source: AKy350aSyH3YhqmD53aiAH71E3BbzLDAuKTQPSESJBaOwVS4DnTIKqlin7/LKOAc5uLmrPP75dU7fg==
+X-Received: by 2002:a05:6a00:2e0c:b0:63d:4920:c101 with SMTP id fc12-20020a056a002e0c00b0063d4920c101mr21392456pfb.30.1682384083786;
+        Mon, 24 Apr 2023 17:54:43 -0700 (PDT)
 Received: from smtpclient.apple ([66.170.99.2])
-        by smtp.gmail.com with ESMTPSA id o1-20020a654581000000b0051fa7704c1asm6944624pgq.47.2023.04.24.17.37.12
+        by smtp.gmail.com with ESMTPSA id i189-20020a62c1c6000000b005a8b28c644esm7983952pfg.4.2023.04.24.17.54.42
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 24 Apr 2023 17:37:13 -0700 (PDT)
+        Mon, 24 Apr 2023 17:54:43 -0700 (PDT)
 Content-Type: text/plain;
-        charset=us-ascii
+        charset=utf-8
 Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3731.500.231\))
 Subject: Re: [PATCH v3 00/22] Improve scalability of KVM + userfaultfd live
  migration via annotated memory faults.
 From:   Nadav Amit <nadav.amit@gmail.com>
-In-Reply-To: <ZEceTNvdaLKJPTZ5@google.com>
-Date:   Mon, 24 Apr 2023 17:37:01 -0700
-Cc:     Anish Moorthy <amoorthy@google.com>, Peter Xu <peterx@redhat.com>,
+In-Reply-To: <CAF7b7mr-_U6vU1iOwukdmOoaT0G1ttyxD62cv=vebnQeXL3R0w@mail.gmail.com>
+Date:   Mon, 24 Apr 2023 17:54:31 -0700
+Cc:     Peter Xu <peterx@redhat.com>,
         Axel Rasmussen <axelrasmussen@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>, maz@kernel.org,
-        oliver.upton@linux.dev, James Houghton <jthoughton@google.com>,
-        bgardon@google.com, dmatlack@google.com, ricarkol@google.com,
+        oliver.upton@linux.dev, Sean Christopherson <seanjc@google.com>,
+        James Houghton <jthoughton@google.com>, bgardon@google.com,
+        dmatlack@google.com, ricarkol@google.com,
         kvm <kvm@vger.kernel.org>, kvmarm@lists.linux.dev
 Content-Transfer-Encoding: quoted-printable
-Message-Id: <5B22E759-8ED3-453E-84E1-2E6A69BE5D74@gmail.com>
-References: <ZEBHTw3+DcAnPc37@x1n>
+Message-Id: <307D798E-9135-41F7-80C7-1E0758259F95@gmail.com>
+References: <20230412213510.1220557-1-amoorthy@google.com>
+ <ZEBHTw3+DcAnPc37@x1n>
  <CAJHvVchBqQ8iVHgF9cVZDusMKQM2AjtNx2z=i9ZHP2BosN4tBg@mail.gmail.com>
  <ZEBXi5tZZNxA+jRs@x1n>
  <CAF7b7mo68VLNp=QynfT7QKgdq=d1YYGv1SEVEDxF9UwHzF6YDw@mail.gmail.com>
  <ZEGuogfbtxPNUq7t@x1n> <46DD705B-3A3F-438E-A5B1-929C1E43D11F@gmail.com>
  <CAF7b7mo78e2YPHU5YrhzuORdpGXCVRxXr6kSyMa+L+guW8jKGw@mail.gmail.com>
  <84DD9212-31FB-4AF6-80DD-9BA5AEA0EC1A@gmail.com>
- <ZEboGH28IVKPZ2vo@google.com>
- <B6EEF84A-CCEA-44D7-B5AA-EA40073C81D4@gmail.com>
- <ZEceTNvdaLKJPTZ5@google.com>
-To:     Sean Christopherson <seanjc@google.com>
+ <CAF7b7mr-_U6vU1iOwukdmOoaT0G1ttyxD62cv=vebnQeXL3R0w@mail.gmail.com>
+To:     Anish Moorthy <amoorthy@google.com>
 X-Mailer: Apple Mail (2.3731.500.231)
 X-Spam-Status: No, score=1.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
@@ -90,81 +90,75 @@ X-Mailing-List: kvm@vger.kernel.org
 
 
 
-> On Apr 24, 2023, at 5:26 PM, Sean Christopherson <seanjc@google.com> =
+> On Apr 24, 2023, at 5:15 PM, Anish Moorthy <amoorthy@google.com> =
 wrote:
 >=20
-> On Mon, Apr 24, 2023, Nadav Amit wrote:
->> Feel free to tell me to shut up, as it is none of my business, and I =
-might be
->> missing a lot of context. Yet, it never stopped me before. :)
+> On Mon, Apr 24, 2023 at 12:44=E2=80=AFPM Nadav Amit =
+<nadav.amit@gmail.com> wrote:
 >>=20
->>> On Apr 24, 2023, at 1:35 PM, Sean Christopherson <seanjc@google.com> =
+>>=20
+>>=20
+>>> On Apr 24, 2023, at 10:54 AM, Anish Moorthy <amoorthy@google.com> =
 wrote:
 >>>=20
->>> On Mon, Apr 24, 2023, Nadav Amit wrote:
+>>> On Fri, Apr 21, 2023 at 10:40=E2=80=AFAM Nadav Amit =
+<nadav.amit@gmail.com> wrote:
 >>>>=20
->>>>> On Apr 24, 2023, at 10:54 AM, Anish Moorthy <amoorthy@google.com> =
-wrote:
->>>>> Sean did mention that he wanted KVM_CAP_MEMORY_FAULT_INFO in =
-general,
->>>>> so I'm guessing (some version of) that will (eventually :) be =
-merged
->>>>> in any case.
->>>>=20
->>>> It certainly not my call. But if you ask me, introducing a solution =
-for
->>>> a concrete use-case that requires API changes/enhancements is not
->>>> guaranteed to be the best solution. It may be better first to fully
->>>> understand the existing overheads and agree that there is no =
-alternative
->>>> cleaner and more general solution with similar performance.
+>>>> If I understand the problem correctly, it sounds as if the proper =
+solution
+>>>> should be some kind of a range-locks. If it is too heavy or the =
+interface can
+>>>> be changed/extended to wake a single address (instead of a range),
+>>>> simpler hashed-locks can be used.
 >>>=20
->>> KVM already returns -EFAULT for these situations, the change I =
-really want to land
->>> is to have KVM report detailed information about why the -EFAULT =
-occurred.  I'll be
->>> happy to carry the code in KVM even if userspace never does anything =
-beyond dumping
->>> the extra information on failures.
+>>> Some sort of range-based locking system does seem relevant, although =
+I
+>>> don't see how that would necessarily speed up the delivery of faults
+>>> to UFFD readers: I'll have to think about it more.
 >>=20
->> I thought that the change is to inform on page-faults through a new =
-interface
->> instead of the existing uffd-file-based one. There is already another =
-interface
->> (signals) and I thought (but did not upstream) io-uring. You now =
-suggest yet
->> another one.
+>> Perhaps I misread your issue. Based on the scalability issues you =
+raised,
+>> I assumed that the problem you encountered is related to lock =
+contention.
+>> I do not know whether your profiled it, but some information would be
+>> useful.
 >=20
-> There are two capabilities proposed in this series: one to provide =
-more information
-> when KVM encounters a fault it can't resolve, and another to tell KVM =
-to kick out
-> to userspace instead of attempting to resolve a fault when a given =
-address couldn't
-> be resolved with fast gup.  I'm talking purely about the first one: =
-providing more
-> information when KVM exits.
+> No, you had it right: the issue at hand is contention on the uffd wait
+> queues. I'm just not sure what the range-based locking would really be
+> doing. Events would still have to be delivered to userspace in an
+> ordered manner, so it seems to me that each uffd would still need to
+> maintain a queue (and the associated contention).
+
+There are 2 queues. One for the pending faults that were still not =
+reported
+to userspace, and one for the faults that we might need to wake up. The =
+second
+one can have range locks.
+
+Perhaps some hybrid approach would be best: do not block on page-faults =
+that
+KVM runs into, which would prevent you from the need to enqueue on =
+fault_wqh.
+
+But I do not know whether the reporting through KVM instead of=20
+userfaultfd-based mechanism is very clean. I think that an IO-uring =
+based
+solution, such as the one I proposed before, would be more generic. =
+Actually,
+now that I understand better your use-case, you do not need a core to =
+poll
+and you would just be able to read the page-fault information from the =
+IO-uring.
+
+Then, you can report whether the page-fault blocked or not in a flag.
+
 >=20
-> As for the second, my plan is to try and stay out of the way and let =
-people that
-> actually deal with the userspace side of things settle on an approach. =
- =46rom the
-> KVM side, supporting the "don't wait to resolve faults" flag is quite =
-simple so
-> long as KVM punts the heavy lifting to userspace, e.g. identifying =
-_why_ the address
-> isn't mapped with the appropriate permissions.
+> With respect to the "sharding" idea, I collected some more runs of the
+> self test (full command in [1]). This time I omitted the "-a" flag, so
+> that every vCPU accesses a different range of guest memory with its
+> own UFFD, and set the number of reader threads per UFFD to 1.
 
-Thanks for your kind and detailed reply. I removed the parts that I =
-understand.
-
-As you might guess, I focus on the second part, which you leave for =
-others. The
-interactions between two page-fault reporting mechanisms is not trivial, =
-and it
-is already not fully correct.
-
-I understand the approach that Anish prefers is to do something that is =
-tailored
-for KVM, but I am not sure it is the best thing.
+Just wondering, did you run the benchmark with DONTWAKE? Sounds as if =
+the
+wake is not needed.
 
