@@ -2,359 +2,361 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7DFD06EDEC7
-	for <lists+kvm@lfdr.de>; Tue, 25 Apr 2023 11:09:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 34B516EDF49
+	for <lists+kvm@lfdr.de>; Tue, 25 Apr 2023 11:32:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233590AbjDYJJ5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Apr 2023 05:09:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53886 "EHLO
+        id S233300AbjDYJcA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Apr 2023 05:32:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36966 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233581AbjDYJJ4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Apr 2023 05:09:56 -0400
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2530C185
-        for <kvm@vger.kernel.org>; Tue, 25 Apr 2023 02:09:54 -0700 (PDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id AFCF34B3;
-        Tue, 25 Apr 2023 02:10:37 -0700 (PDT)
-Received: from [10.57.56.254] (unknown [10.57.56.254])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BF4053F587;
-        Tue, 25 Apr 2023 02:09:52 -0700 (PDT)
-Message-ID: <6e2e50a5-13a1-c783-12dc-692901e35aa5@arm.com>
-Date:   Tue, 25 Apr 2023 10:09:51 +0100
+        with ESMTP id S232854AbjDYJb7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Apr 2023 05:31:59 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 947B346B0
+        for <kvm@vger.kernel.org>; Tue, 25 Apr 2023 02:31:57 -0700 (PDT)
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 33P9VYLp007483;
+        Tue, 25 Apr 2023 09:31:49 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=yiWGhxS/cgXVl9G3omsaGmF+kN2Fj4x5nFZbOJlqUKg=;
+ b=A/RLztxU8INDUC0adzoOPt8GP9Jwwhx5112QQqTNzbgo+4LQ4Mb+6xIdmGwAQhg5QoEl
+ DPsMEjRUaeIP1SHFyjNqC43bqPuie0MJ1bjXmdFAXRfhZEAZlZ/6qEmtDxvk6r375VeO
+ nMpAbWU9lNDDQa1tu/zEDrBRzyOIE4avhaB2ZjcePatRe7uoUapU/TmjBGTKPJmcjAOh
+ TM2yafwsUZwr3H5mPNl/qb69HZHDyqCkSjypVvjNi1AiTjDmbEB1ukWkh8MIxXv40+aK
+ F/UfZ3Ov6eWiRMQyP/3wVBaXgnSeEqUMaEveh0gU5h9tscGn5qehNKqOPZZbe7x1jAQk Tw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3q6axgb2xt-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 25 Apr 2023 09:31:49 +0000
+Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 33P9Vmpn009117;
+        Tue, 25 Apr 2023 09:31:48 GMT
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3q6axgb2t6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 25 Apr 2023 09:31:47 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 33ONbbff026564;
+        Tue, 25 Apr 2023 09:27:18 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+        by ppma04ams.nl.ibm.com (PPS) with ESMTPS id 3q47771n3p-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 25 Apr 2023 09:27:18 +0000
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+        by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 33P9RCr420185720
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 25 Apr 2023 09:27:12 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5C8B22004B;
+        Tue, 25 Apr 2023 09:27:12 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id EE24E20043;
+        Tue, 25 Apr 2023 09:27:11 +0000 (GMT)
+Received: from li-7e0de7cc-2d9d-11b2-a85c-de26c016e5ad.ibm.com (unknown [9.152.224.238])
+        by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Tue, 25 Apr 2023 09:27:11 +0000 (GMT)
+Message-ID: <92a76767620a8e4bb12b7164b271d7172545cd0b.camel@linux.ibm.com>
+Subject: Re: [PATCH v19 02/21] s390x/cpu topology: add topology entries on
+ CPU hotplug
+From:   Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+To:     Pierre Morel <pmorel@linux.ibm.com>, qemu-s390x@nongnu.org
+Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
+        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
+        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
+        kvm@vger.kernel.org, ehabkost@redhat.com,
+        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
+        seiden@linux.ibm.com, nrb@linux.ibm.com, frankja@linux.ibm.com,
+        berrange@redhat.com, clg@kaod.org
+Date:   Tue, 25 Apr 2023 11:27:11 +0200
+In-Reply-To: <9c2cb730-d307-f344-35e8-82017681816a@linux.ibm.com>
+References: <20230403162905.17703-1-pmorel@linux.ibm.com>
+         <20230403162905.17703-3-pmorel@linux.ibm.com>
+         <66d9ba0e9904f035326aca609a767976b94547cf.camel@linux.ibm.com>
+         <4ddd3177-58a8-c9f0-a9a8-ee71baf0511b@linux.ibm.com>
+         <60aafc95dd0293ba8d5b4dbdc59fcda5e6c64f3e.camel@linux.ibm.com>
+         <9c2cb730-d307-f344-35e8-82017681816a@linux.ibm.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.10.0
-Subject: Re: [PATCH v4 23/30] arm64: Add a setup sequence for systems that
- boot through EFI
-Content-Language: en-GB
-To:     Shaoqin Huang <shahuang@redhat.com>, kvm@vger.kernel.org,
-        kvmarm@lists.linux.dev, andrew.jones@linux.dev
-Cc:     pbonzini@redhat.com, alexandru.elisei@arm.com, ricarkol@google.com
-References: <20230213101759.2577077-1-nikos.nikoleris@arm.com>
- <20230213101759.2577077-24-nikos.nikoleris@arm.com>
- <cf161112-ba2c-0dfb-9bcd-ffd288f2ae0b@redhat.com>
-From:   Nikos Nikoleris <nikos.nikoleris@arm.com>
-In-Reply-To: <cf161112-ba2c-0dfb-9bcd-ffd288f2ae0b@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-5.6 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: K1pdCph8v8QayANu9f555rHaUMH8Acps
+X-Proofpoint-ORIG-GUID: fLbNm37JvOCwELOJGZILaZBncHPRGdj-
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
+ definitions=2023-04-25_03,2023-04-21_01,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 bulkscore=0
+ spamscore=0 suspectscore=0 lowpriorityscore=0 phishscore=0 clxscore=1015
+ mlxscore=0 priorityscore=1501 mlxlogscore=999 impostorscore=0 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2303200000
+ definitions=main-2304250068
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Shaoqin,
+On Tue, 2023-04-25 at 10:45 +0200, Pierre Morel wrote:
+> On 4/24/23 17:32, Nina Schoetterl-Glausch wrote:
+> > On Fri, 2023-04-21 at 12:20 +0200, Pierre Morel wrote:
+> > > > On 4/20/23 10:59, Nina Schoetterl-Glausch wrote:
+> > > > > > On Mon, 2023-04-03 at 18:28 +0200, Pierre Morel wrote:
+> [..]
+> > > > In the next version with entitlement being an enum it is right.
+> > > >=20
+> > > > However, deleting this means that the default value for entitlement
+> > > > depends on dedication.
+> > > >=20
+> > > > If we have only low, medium, high and default for entitlement is me=
+dium.
+> > > >=20
+> > > > If the user specifies the dedication true without specifying entitl=
+ement
+> > > > we could force entitlement to high.
+> > > >=20
+> > > > But we can not distinguish this from the user specifying dedication=
+ true
+> > > > with a medium entitlement, which is wrong.
+> > > >=20
+> > > > So three solution:
+> > > >=20
+> > > > 1) We ignore what the user say if dedication is specified as true
+> > > >=20
+> > > > 2) We specify that both dedication and entitlement must be specifie=
+d if
+> > > > dedication is true
+> > > >=20
+> > > > 3) We set an impossible default to distinguish default from medium
+> > > > entitlement
+> > > >=20
+> > > >=20
+> > > > For me the solution 3 is the best one, it is more flexible for the =
+user.
+> > > >=20
+> > > > Solution 1 is obviously bad.
+> > > >=20
+> > > > Solution 2 forces the user to specify entitlement high and only hig=
+h if
+> > > > it specifies dedication true.
+> > > >=20
+> > > > AFAIU, you prefer the solution 2, forcing user to specify both
+> > > > dedication and entitlement to suppress a default value in the enum.
+> > > > Why is it bad to have a default value in the enum that we do not us=
+e to
+> > > > specify that the value must be calculated?
+> > Yes, I'd prefer solution 2. I don't like adapting the internal state wh=
+ere only
+> > the three values make sense for the user interface.
+> > It also keeps things simple and requires less code.
+> > I also don't think it's a bad thing for the user, as it's not a thing d=
+one manually often.
+> > I'm also not a fan of a value being implicitly being changed even thoug=
+h it doesn't look
+> > like it from the command.
+> >=20
+> > However, what I really don't like is the additional state and naming it=
+ "horizontal",
+>=20
+>=20
+> No problem to use another name like "auto" as you propose later.
+>=20
+>=20
+> > not so much the adjustment if dedication is switched to true without an=
+ entitlement given.
+> > For the monitor command there is no problem, you currently have:
+>=20
+>=20
+> That is clear, the has_xxx does the job.
+>=20
+> [..]
+>=20
+>=20
+> > So you can just set it if (!has_entitlement).
+> > There is also ways to set the value for cpus defined on the command lin=
+e, e.g.:
+>=20
+>=20
+> Yes, thanks, I already said I find your proposition to use a=20
+> DEFINE_PROP_CPUS390ENTITLEMENT good and will use it.
+>=20
+>=20
+> >=20
+> > diff --git a/include/hw/qdev-properties-system.h b/include/hw/qdev-prop=
+erties-system.h
+> > index 0ac327ae60..41a605c5a7 100644
+> > --- a/include/hw/qdev-properties-system.h
+> > +++ b/include/hw/qdev-properties-system.h
+> > @@ -22,6 +22,7 @@ extern const PropertyInfo qdev_prop_audiodev;
+> >   extern const PropertyInfo qdev_prop_off_auto_pcibar;
+> >   extern const PropertyInfo qdev_prop_pcie_link_speed;
+> >   extern const PropertyInfo qdev_prop_pcie_link_width;
+> > +extern const PropertyInfo qdev_prop_cpus390entitlement;
+> >  =20
+> >   #define DEFINE_PROP_PCI_DEVFN(_n, _s, _f, _d)                   \
+> >       DEFINE_PROP_SIGNED(_n, _s, _f, _d, qdev_prop_pci_devfn, int32_t)
+> > @@ -73,5 +74,8 @@ extern const PropertyInfo qdev_prop_pcie_link_width;
+> >   #define DEFINE_PROP_UUID_NODEFAULT(_name, _state, _field) \
+> >       DEFINE_PROP(_name, _state, _field, qdev_prop_uuid, QemuUUID)
+> >  =20
+> > +#define DEFINE_PROP_CPUS390ENTITLEMENT(_n, _s, _f) \
+> > +    DEFINE_PROP(_n, _s, _f, qdev_prop_cpus390entitlement, int)
+> > +
+> >  =20
+> >   #endif
+> > diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
+> > index 54541d2230..01308e0b94 100644
+> > --- a/target/s390x/cpu.h
+> > +++ b/target/s390x/cpu.h
+> > @@ -135,7 +135,7 @@ struct CPUArchState {
+> >       int32_t book_id;
+> >       int32_t drawer_id;
+> >       bool dedicated;
+> > -    uint8_t entitlement;        /* Used only for vertical polarization=
+ */
+> > +    int entitlement;        /* Used only for vertical polarization */
+>=20
+>=20
+> Isn't it better to use:
+>=20
+> +=C2=A0=C2=A0=C2=A0 CpuS390Entitlement entitlement; /* Used only for vert=
+ical=20
+> polarization */
+>=20
+>=20
+> >       uint64_t cpuid;
+> >   #endif
+> >  =20
+> > diff --git a/hw/core/qdev-properties-system.c b/hw/core/qdev-properties=
+-system.c
+> > index d42493f630..db5c3d4fe6 100644
+> > --- a/hw/core/qdev-properties-system.c
+> > +++ b/hw/core/qdev-properties-system.c
+> > @@ -1143,3 +1143,14 @@ const PropertyInfo qdev_prop_uuid =3D {
+> >       .set   =3D set_uuid,
+> >       .set_default_value =3D set_default_uuid_auto,
+> >   };
+> > +
+> > +/* --- s390x cpu topology entitlement --- */
+> > +
+> > +QEMU_BUILD_BUG_ON(sizeof(CpuS390Entitlement) !=3D sizeof(int));
+> > +
+> > +const PropertyInfo qdev_prop_cpus390entitlement =3D {
+> > +    .name =3D "CpuS390Entitlement",
+> > +    .enum_table =3D &CpuS390Entitlement_lookup,
+> > +    .get   =3D qdev_propinfo_get_enum,
+> > +    .set   =3D qdev_propinfo_set_enum,
+> > +};
+> > diff --git a/hw/s390x/cpu-topology.c b/hw/s390x/cpu-topology.c
+> > index b8a292340c..1b3f5c61ae 100644
+> > --- a/hw/s390x/cpu-topology.c
+> > +++ b/hw/s390x/cpu-topology.c
+> > @@ -199,8 +199,7 @@ static void s390_topology_cpu_default(S390CPU *cpu,=
+ Error **errp)
+> >        * is not dedicated.
+> >        * A dedicated CPU always receives a high entitlement.
+> >        */
+> > -    if (env->entitlement >=3D S390_CPU_ENTITLEMENT__MAX ||
+> > -        env->entitlement =3D=3D S390_CPU_ENTITLEMENT_HORIZONTAL) {
+> > +    if (env->entitlement < 0) {
+>=20
+>=20
+> Here we can have:
+>=20
+> +    if (env->entitlement =3D=3D S390_CPU_ENTITLEMENT_AUTO) {
+> ...
+>=20
+> >           if (env->dedicated) {
+> >               env->entitlement =3D S390_CPU_ENTITLEMENT_HIGH;
+> >           } else {
+> > diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
+> > index 57165fa3a0..dea50a3e06 100644
+> > --- a/target/s390x/cpu.c
+> > +++ b/target/s390x/cpu.c
+> > @@ -31,6 +31,7 @@
+> >   #include "qapi/qapi-types-machine.h"
+> >   #include "sysemu/hw_accel.h"
+> >   #include "hw/qdev-properties.h"
+> > +#include "hw/qdev-properties-system.h"
+> >   #include "fpu/softfloat-helpers.h"
+> >   #include "disas/capstone.h"
+> >   #include "sysemu/tcg.h"
+> > @@ -248,6 +249,7 @@ static void s390_cpu_initfn(Object *obj)
+> >       cs->exception_index =3D EXCP_HLT;
+> >  =20
+> >   #if !defined(CONFIG_USER_ONLY)
+> > +    cpu->env.entitlement =3D -1;
+>=20
+>=20
+> Then we do not need this initialization if here under we define=20
+> DEFINE_PROP_CPUS390ENTITLEMENT differently
+>=20
+>=20
+> >       s390_cpu_init_sysemu(obj);
+> >   #endif
+> >   }
+> > @@ -264,8 +266,7 @@ static Property s390x_cpu_properties[] =3D {
+> >       DEFINE_PROP_INT32("book-id", S390CPU, env.book_id, -1),
+> >       DEFINE_PROP_INT32("drawer-id", S390CPU, env.drawer_id, -1),
+> >       DEFINE_PROP_BOOL("dedicated", S390CPU, env.dedicated, false),
+> > -    DEFINE_PROP_UINT8("entitlement", S390CPU, env.entitlement,
+> > -                      S390_CPU_ENTITLEMENT__MAX),
+> > +    DEFINE_PROP_CPUS390ENTITLEMENT("entitlement", S390CPU, env.entitle=
+ment),
+>=20
+>=20
+> +=C2=A0=C2=A0=C2=A0 DEFINE_PROP_CPUS390ENTITLEMENT("entitlement", S390CPU=
+, env.entitlement,
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 S390_CPU_ENTITLEM=
+ENT_AUTO),
+>=20
+> >   #endif
+> >       DEFINE_PROP_END_OF_LIST()
+> >   };
+> >=20
+> > There are other ways to achieve the same, you could also
+> > implement get, set and set_default_value so that there is an additional
+> > "auto"/"uninitialized" value that is not in the enum.
+> > If you insist on having an additional state in the enum, name it "auto"=
+.
+>=20
+> Yes, I think it is a better name.
 
-On 25/04/2023 08:04, Shaoqin Huang wrote:
-> Hi Nikos,
-> 
-> For that DABT_EL1 error, I have some clues about how it happens. It's
-> mainly because this patch includes a memory overflow. I will explain in
-> the code body.
-> 
+IMO using entitlement=3Dauto doesn't make too much sense with the set-cpu-t=
+opology command,
+because you can just leave if off or specify the entitlement you want direc=
+tly.
+So there is no actual need to have a user visible auto value and no need to=
+ have it in the enum.
+Then the only problem is adjusting the entitlement when doing dedicated=3Do=
+n on the command line.
+(If you want that)
+So with my proposal there are only the low, medium and high values in the e=
+num.
+In order to set the entitlement automatically when using the command line I=
+ initialize
+the entitlement to -1, so we later know if it has been set via the command =
+line or not.
+But you cannot set -1 via the property because qdev_propinfo_get_enum expec=
+ts a string,
+which is why I do it in s390_cpu_initfn.
 
-Many thanks for this. This is the 2nd time I get caught by this :(
+I'm not sure if you can define entitlement as CpuS390Entitlement.
+I think I changed it to int when I was exploring different solutions
+and had to change it because of a type check. But what I proposed above doe=
+sn't cause the same issue.
+DEFINE_PROP_CPUS390ENTITLEMENT could then also use CpuS390Entitlement.
 
-> On 2/13/23 18:17, Nikos Nikoleris wrote:
->> This change implements an alternative setup sequence for the system
->> when we are booting through EFI. The memory map is discovered through
->> EFI boot services and devices through ACPI.
->>
->> This change is based on a change initially proposed by
->> Andrew Jones <drjones@redhat.com>
->>
->> Signed-off-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
->> ---
->>    arm/cstart.S        |   1 +
->>    arm/cstart64.S      |   1 +
->>    lib/arm/asm/setup.h |   8 ++
->>    lib/arm/setup.c     | 181 +++++++++++++++++++++++++++++++++++++++++++-
->>    lib/linux/efi.h     |   1 +
->>    5 files changed, 190 insertions(+), 2 deletions(-)
->>
->> diff --git a/arm/cstart.S b/arm/cstart.S
->> index 7036e67f..3dd71ed9 100644
->> --- a/arm/cstart.S
->> +++ b/arm/cstart.S
->> @@ -242,6 +242,7 @@ asm_mmu_disable:
->>     *
->>     * Input r0 is the stack top, which is the exception stacks base
->>     */
->> +.globl exceptions_init
->>    exceptions_init:
->>    	mrc	p15, 0, r2, c1, c0, 0	@ read SCTLR
->>    	bic	r2, #CR_V		@ SCTLR.V := 0
->> diff --git a/arm/cstart64.S b/arm/cstart64.S
->> index e4ab7d06..223c1092 100644
->> --- a/arm/cstart64.S
->> +++ b/arm/cstart64.S
->> @@ -265,6 +265,7 @@ asm_mmu_disable:
->>     * Vectors
->>     */
->>    
->> +.globl exceptions_init
->>    exceptions_init:
->>    	adrp	x4, vector_table
->>    	add	x4, x4, :lo12:vector_table
->> diff --git a/lib/arm/asm/setup.h b/lib/arm/asm/setup.h
->> index 64cd379b..06069116 100644
->> --- a/lib/arm/asm/setup.h
->> +++ b/lib/arm/asm/setup.h
->> @@ -38,4 +38,12 @@ extern unsigned int mem_region_get_flags(phys_addr_t paddr);
->>    
->>    void setup(const void *fdt, phys_addr_t freemem_start);
->>    
->> +#ifdef CONFIG_EFI
->> +
->> +#include <efi.h>
->> +
->> +efi_status_t setup_efi(efi_bootinfo_t *efi_bootinfo);
->> +
->> +#endif
->> +
->>    #endif /* _ASMARM_SETUP_H_ */
->> diff --git a/lib/arm/setup.c b/lib/arm/setup.c
->> index 03a4098e..cab19b1e 100644
->> --- a/lib/arm/setup.c
->> +++ b/lib/arm/setup.c
->> @@ -33,7 +33,7 @@
->>    #define NR_EXTRA_MEM_REGIONS	16
->>    #define NR_INITIAL_MEM_REGIONS	(MAX_DT_MEM_REGIONS + NR_EXTRA_MEM_REGIONS)
->>    
->> -extern unsigned long _etext;
->> +extern unsigned long _text, _etext, _data, _edata;
->>    
->>    char *initrd;
->>    u32 initrd_size;
->> @@ -43,7 +43,10 @@ int nr_cpus;
->>    
->>    static struct mem_region __initial_mem_regions[NR_INITIAL_MEM_REGIONS + 1];
->>    struct mem_region *mem_regions = __initial_mem_regions;
->> -phys_addr_t __phys_offset, __phys_end;
->> +phys_addr_t __phys_offset = (phys_addr_t)-1, __phys_end = 0;
->> +
->> +extern void exceptions_init(void);
->> +extern void asm_mmu_disable(void);
->>    
->>    int mpidr_to_cpu(uint64_t mpidr)
->>    {
->> @@ -289,3 +292,177 @@ void setup(const void *fdt, phys_addr_t freemem_start)
->>    	if (!(auxinfo.flags & AUXINFO_MMU_OFF))
->>    		setup_vm();
->>    }
->> +
->> +#ifdef CONFIG_EFI
->> +
->> +#include <efi.h>
->> +
->> +static efi_status_t setup_rsdp(efi_bootinfo_t *efi_bootinfo)
->> +{
->> +	efi_status_t status;
->> +	struct acpi_table_rsdp *rsdp;
->> +
->> +	/*
->> +	 * RSDP resides in an EFI_ACPI_RECLAIM_MEMORY region, which is not used
->> +	 * by kvm-unit-tests arm64 memory allocator. So it is not necessary to
->> +	 * copy the data structure to another memory region to prevent
->> +	 * unintentional overwrite.
->> +	 */
->> +	status = efi_get_system_config_table(ACPI_20_TABLE_GUID, (void **)&rsdp);
->> +	if (status != EFI_SUCCESS)
->> +		return status;
->> +
->> +	set_efi_rsdp(rsdp);
->> +
->> +	return EFI_SUCCESS;
->> +}
->> +
->> +static efi_status_t efi_mem_init(efi_bootinfo_t *efi_bootinfo)
->> +{
->> +	int i;
->> +	unsigned long free_mem_pages = 0;
->> +	unsigned long free_mem_start = 0;
->> +	struct efi_boot_memmap *map = &(efi_bootinfo->mem_map);
->> +	efi_memory_desc_t *buffer = *map->map;
->> +	efi_memory_desc_t *d = NULL;
->> +	phys_addr_t base, top;
->> +	struct mem_region *r;
->> +	uintptr_t text = (uintptr_t)&_text, etext = __ALIGN((uintptr_t)&_etext, 4096);
->> +	uintptr_t data = (uintptr_t)&_data, edata = __ALIGN((uintptr_t)&_edata, 4096);
->> +
->> +	/*
->> +	 * Record the largest free EFI_CONVENTIONAL_MEMORY region
->> +	 * which will be used to set up the memory allocator, so that
->> +	 * the memory allocator can work in the largest free
->> +	 * continuous memory region.
->> +	 */
->> +	for (i = 0, r = &mem_regions[0]; i < *(map->map_size); i += *(map->desc_size), ++r) {
-> 
-> At here, we can see here use the mem_regions to record the
-> efi_boot_memmap information, so we will iterate the efi_boot_memmap
-> which has (*map->map_size)/(*map->desc_size) number of the structure.
-> Obviously, here didn't check if the mem_regions is fulled, so when the
-> efi_boot_memmap is bigger than the mem_regions, the memory overflow happens.
-> 
-> And when memory overflow happens, Coincidentally, the mmu_idmap is just
-> follow the memory of the mem_regions, so this iteration will write to
-> mmu_idmap memory, which cause the mmu_idmap not NULL, so when the first
-> time the __ioremap being called, which the call trace is:
-> 
-> efi_main->
->     setup_efi->
->       io_init->
->         uart0_init_acpi->
->           ioremap->
-> 	  __ioremap
-> 
-> 	   if (mmu_enabled()) {
->                      pgtable = current_thread_info()->pgtable;
->              } else {
->                      if (!mmu_idmap)
->                              mmu_idmap = alloc_page();
->                      pgtable = mmu_idmap;
->              }
-> 
-> When it first arrive at here, the mmu_idmap should be NULL, and a new
-> mmu_idmap will be allocated, but unfortunately, the mmu_idmap has been
-> write to a value, so it is not NULL, so the dirty mmu_idmap will be used
-> as a pgtable. Which cause the DABT_EL1 error when continue build the
-> page table.
-> 
-> And the solution is very easy, just make the mem_regions bigger, for
-> example:
-> 
-> static struct mem_region __initial_mem_regions[NR_INITIAL_MEM_REGIONS + 20];
-> struct mem_region *mem_regions = __initial_mem_regions;
-> 
-> After make it bigger, the DABT_EL1 error will not happen on my machine.
-> Hope it works for you.
-> 
+So there are three possible solutions now:
+1. My proposal above, which as automatic adjustment, but only the three req=
+uired values in the enum.
+2. Don't do automatic adjustment, three enum values.
+3. Automatic adjustment with auto value in the enum.
 
-Indeed, I can confirm that this is the issue I run into. It would be 
-nice if Drew can confirm as well. Just to be on the safe side in the v5 
-I will apply these changes.
-
-Thanks,
-
-Nikos
-
- From a836dc91706cc9e9aee5ce6b8b659d74d98c7bd7 Mon Sep 17 00:00:00 2001
-From: Nikos Nikoleris <nikos.nikoleris@arm.com>
-Date: Wed, 3 Aug 2022 13:47:56 +0100
-Subject: [kvm-unit-tests PATCH] fixup! arm/arm64: Add a setup sequence 
-for systems that boot through EFI
-X-ARM-No-Footer: FoSSMail
-
----
-  lib/arm/setup.c | 45 ++++++++++++++++++++++++---------------------
-  1 file changed, 24 insertions(+), 21 deletions(-)
-
-diff --git a/lib/arm/setup.c b/lib/arm/setup.c
-index cab19b1e..c4f495a9 100644
---- a/lib/arm/setup.c
-+++ b/lib/arm/setup.c
-@@ -30,7 +30,7 @@
-  #include "io.h"
-
-  #define MAX_DT_MEM_REGIONS	16
--#define NR_EXTRA_MEM_REGIONS	16
-+#define NR_EXTRA_MEM_REGIONS	64
-  #define NR_INITIAL_MEM_REGIONS	(MAX_DT_MEM_REGIONS + NR_EXTRA_MEM_REGIONS)
-
-  extern unsigned long _text, _etext, _data, _edata;
-@@ -326,7 +326,7 @@ static efi_status_t efi_mem_init(efi_bootinfo_t 
-*efi_bootinfo)
-  	efi_memory_desc_t *buffer = *map->map;
-  	efi_memory_desc_t *d = NULL;
-  	phys_addr_t base, top;
--	struct mem_region *r;
-+	struct mem_region r;
-  	uintptr_t text = (uintptr_t)&_text, etext = 
-__ALIGN((uintptr_t)&_etext, 4096);
-  	uintptr_t data = (uintptr_t)&_data, edata = 
-__ALIGN((uintptr_t)&_edata, 4096);
-
-@@ -336,11 +336,12 @@ static efi_status_t efi_mem_init(efi_bootinfo_t 
-*efi_bootinfo)
-  	 * the memory allocator can work in the largest free
-  	 * continuous memory region.
-  	 */
--	for (i = 0, r = &mem_regions[0]; i < *(map->map_size); i += 
-*(map->desc_size), ++r) {
-+	for (i = 0; i < *(map->map_size); i += *(map->desc_size)) {
-  		d = (efi_memory_desc_t *)(&((u8 *)buffer)[i]);
-
--		r->start = d->phys_addr;
--		r->end = d->phys_addr + d->num_pages * EFI_PAGE_SIZE;
-+		r.start = d->phys_addr;
-+		r.end = d->phys_addr + d->num_pages * EFI_PAGE_SIZE;
-+		r.flags = 0;
-
-  		switch (d->type) {
-  		case EFI_RESERVED_TYPE:
-@@ -353,26 +354,27 @@ static efi_status_t efi_mem_init(efi_bootinfo_t 
-*efi_bootinfo)
-  		case EFI_ACPI_RECLAIM_MEMORY:
-  		case EFI_ACPI_MEMORY_NVS:
-  		case EFI_PAL_CODE:
--			r->flags = MR_F_RESERVED;
-+			r.flags = MR_F_RESERVED;
-  			break;
-  		case EFI_MEMORY_MAPPED_IO:
-  		case EFI_MEMORY_MAPPED_IO_PORT_SPACE:
--			r->flags = MR_F_IO;
-+			r.flags = MR_F_IO;
-  			break;
-  		case EFI_LOADER_CODE:
--			if (r->start <= text && r->end > text) {
-+			if (r.start <= text && r.end > text) {
-  				/* This is the unit test region. Flag the code separately. */
--				phys_addr_t tmp = r->end;
-+				phys_addr_t tmp = r.end;
-
-  				assert(etext <= data);
--				assert(edata <= r->end);
--				r->flags = MR_F_CODE;
--				r->end = data;
--				++r;
--				r->start = data;
--				r->end = tmp;
-+				assert(edata <= r.end);
-+				r.flags = MR_F_CODE;
-+				r.end = data;
-+				mem_region_add(&r);
-+				r.start = data;
-+				r.end = tmp;
-+				r.flags = 0;
-  			} else {
--				r->flags = MR_F_RESERVED;
-+				r.flags = MR_F_RESERVED;
-  			}
-  			break;
-  		case EFI_CONVENTIONAL_MEMORY:
-@@ -383,12 +385,13 @@ static efi_status_t efi_mem_init(efi_bootinfo_t 
-*efi_bootinfo)
-  			break;
-  		}
-
--		if (!(r->flags & MR_F_IO)) {
--			if (r->start < __phys_offset)
--				__phys_offset = r->start;
--			if (r->end > __phys_end)
--				__phys_end = r->end;
-+		if (!(r.flags & MR_F_IO)) {
-+			if (r.start < __phys_offset)
-+				__phys_offset = r.start;
-+			if (r.end > __phys_end)
-+				__phys_end = r.end;
-  		}
-+		mem_region_add(&r);
-  	}
-  	__phys_end &= PHYS_MASK;
-  	asm_mmu_disable();
---
-2.25.1
+I still favor 2. but the other ones aren't terrible.
