@@ -2,189 +2,360 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8FC636EE448
-	for <lists+kvm@lfdr.de>; Tue, 25 Apr 2023 16:52:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BAB566EE46F
+	for <lists+kvm@lfdr.de>; Tue, 25 Apr 2023 17:07:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234387AbjDYOwH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Apr 2023 10:52:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59992 "EHLO
+        id S234278AbjDYPGy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Apr 2023 11:06:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38676 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233617AbjDYOwD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Apr 2023 10:52:03 -0400
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2041.outbound.protection.outlook.com [40.107.236.41])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6558E7DB0;
-        Tue, 25 Apr 2023 07:51:57 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=eTy60Hlv8umpiHMA9zZUAMrNaM9vyrvw0pGddD0OrOcCFmEbHjZvoPCodcLbbXaIxJ7DsFJx4haYDiilwwVuTkGEd+hkmdgH999Hp3/XrCh3fq0te8bnrnzAkee6zSiAkadZskwV4fB1LXr2iNtYUlPl/mAvAl5tY7qBrG0ysqRl7JA9M8lKYF9IWYXd/X+yTHuEcEfpJbVUvpReONj1YdKqbSmPl8Be6JTL1fD2Wjyvpf/89Hi03L603o568txQ4zkl1OBJWA02lkYNSFMXoKPIlqZJUEcmFKbBAX28UaK6RTDQZvM8DhGyPzfffE/1QhXQfbcjeyGcIBDCkSrZ6Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=hNS+mLFLSufWqHJ7Nih0A0wK5eAK7F+tJGXYfT6LgN4=;
- b=LK+jv8I0DTXhEHXwlE/zbgxYwVT2GS71N0783+WNAwS635I27Pdqk56YP/rvBUGyNz151eNC/yivq5eaF8srIXm+R1yhldHlxzswuw3UhZu3XVQyvjARSfpI/Omb7d9I/Psf4MCf0Di8k0rXXkFQgEeSocwbwt9jWGEYh3TRzgOKq69FEToOf5cTwjU3w0G00PhscMVvF8WIsRkp/eWchbi3dkZabdmOnz8KU8gwZM6+EuQ+kTSexqqRDXi0tYIknBz3MsgXBRvBH/QgydlYnNDShc4ohFFc9JlUq3Qc6f721b1edb2E0F1nR7t4WGrn3aXtl9xy5OGWMWiz2QP5yw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=hNS+mLFLSufWqHJ7Nih0A0wK5eAK7F+tJGXYfT6LgN4=;
- b=ZdCDxiC4DZ3C7rTRqfy90q5bp5gPhgO7A0UpZnZd0LnbftgfDxBYgaqB9RIBCFRijc/l32rY/DgJnb4NR5xCTcHJL9SEnLOKpWAenHwtPRii3U1/2Ts5d8sYljPxsCv3+ReBiUHuYZxipx0zvarzb2emUZS0XtFX5zbQZRytlLhTlAP0Bn6GI8TccTAjr6C2kIWb+9K0ewH7U0d6Cg3E2W/1JAdceXEPSylifanBphVtWhuYCoTHg350anhLWAgCHtOomBUbIUrpwt5wc4Gq0z2rWNPdfKTfink7xu4vh3D6Lx5i+ncBtEKb74/4azX/n/0mKT26+LJqz5+6C+Y/+A==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by DS7PR12MB6007.namprd12.prod.outlook.com (2603:10b6:8:7e::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6319.34; Tue, 25 Apr
- 2023 14:51:54 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::f7a7:a561:87e9:5fab]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::f7a7:a561:87e9:5fab%5]) with mapi id 15.20.6319.033; Tue, 25 Apr 2023
- 14:51:54 +0000
-Date:   Tue, 25 Apr 2023 11:51:51 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Reinette Chatre <reinette.chatre@intel.com>
-Cc:     Alex Williamson <alex.williamson@redhat.com>, yishaih@nvidia.com,
-        shameerali.kolothum.thodi@huawei.com, kevin.tian@intel.com,
-        tglx@linutronix.de, darwi@linutronix.de, kvm@vger.kernel.org,
-        dave.jiang@intel.com, jing2.liu@intel.com, ashok.raj@intel.com,
-        fenghua.yu@intel.com, tom.zanussi@linux.intel.com,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH V3 08/10] vfio/pci: Probe and store ability to support
- dynamic MSI-X
-Message-ID: <ZEfpB7m3bWr1bPlv@nvidia.com>
-References: <cover.1681837892.git.reinette.chatre@intel.com>
- <0da4830176e9c4a7877aac0611869f341dda831c.1681837892.git.reinette.chatre@intel.com>
- <20230418163803.46a96fdc.alex.williamson@redhat.com>
- <64b99d1c-073f-cbc3-6c5a-100fa23bcb13@intel.com>
- <ZEa/rTKja3Xpy/j5@nvidia.com>
- <5167f01d-fcfd-d821-40fd-c53f4fc135ff@intel.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5167f01d-fcfd-d821-40fd-c53f4fc135ff@intel.com>
-X-ClientProxiedBy: SJ0PR03CA0169.namprd03.prod.outlook.com
- (2603:10b6:a03:338::24) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+        with ESMTP id S234244AbjDYPGx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Apr 2023 11:06:53 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A599525A
+        for <kvm@vger.kernel.org>; Tue, 25 Apr 2023 08:06:50 -0700 (PDT)
+Received: from pps.filterd (m0353728.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 33PF2BXc029558;
+        Tue, 25 Apr 2023 15:06:39 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ subject : to : cc : references : from : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=VQrWtkUM8IEawT0BDmMzsnqJ6hU9BWI3LFBiwAUy3dM=;
+ b=d9cx9Y5DnPGJId0EwWIGC5drEySFfPxi9roDh1cbf6VLnwkls01a9ZQfhctw3UXyBM2t
+ Bf3GZcajYxwBJ1EnlXEB16LAffndBXql1RqwH82e/IDbtyFuzahs6jOKilbvybu3LIqM
+ Ynvlv+0vijlxrt6R3QYQXFe4efuRX0bImaVmRsDB4cSFW9djQVUume+5GqHOAxvBymnK
+ bARXIf4qx4gWqtCKq+6d27tWl+YQbdbmCEe8x5JZJaFSXQcI6hqHJIJJhODmYY/8oFW4
+ r3RA/r1PyOoAczuzyJ6U6T+FzjzFlhc/HYgxVDGAcyXaENlycFkhFTBs2VxaI/x36XJI nw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3q6gdr2kx7-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 25 Apr 2023 15:06:37 +0000
+Received: from m0353728.ppops.net (m0353728.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 33PF2rjv001201;
+        Tue, 25 Apr 2023 15:04:32 GMT
+Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3q6gdr2g2v-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 25 Apr 2023 15:04:32 +0000
+Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
+        by ppma04fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 33P5NXb6011243;
+        Tue, 25 Apr 2023 15:03:07 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+        by ppma04fra.de.ibm.com (PPS) with ESMTPS id 3q47771ghp-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 25 Apr 2023 15:03:07 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+        by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 33PF31CR14156400
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 25 Apr 2023 15:03:01 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 894AA20040;
+        Tue, 25 Apr 2023 15:03:01 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id F073F2004B;
+        Tue, 25 Apr 2023 15:03:00 +0000 (GMT)
+Received: from [9.152.222.242] (unknown [9.152.222.242])
+        by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+        Tue, 25 Apr 2023 15:03:00 +0000 (GMT)
+Message-ID: <61fd03cd-0fdd-7c39-0219-7fd2d969b0ca@linux.ibm.com>
+Date:   Tue, 25 Apr 2023 17:03:00 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.8.0
+Subject: Re: [PATCH v19 14/21] tests/avocado: s390x cpu topology core
+To:     =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
+        qemu-s390x@nongnu.org
+Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
+        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
+        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
+        kvm@vger.kernel.org, ehabkost@redhat.com,
+        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
+        seiden@linux.ibm.com, nrb@linux.ibm.com, nsg@linux.ibm.com,
+        frankja@linux.ibm.com, berrange@redhat.com
+References: <20230403162905.17703-1-pmorel@linux.ibm.com>
+ <20230403162905.17703-15-pmorel@linux.ibm.com>
+ <2b678e7d-488d-0072-2b27-cd54a43a77b2@kaod.org>
+Content-Language: en-US
+From:   Pierre Morel <pmorel@linux.ibm.com>
+In-Reply-To: <2b678e7d-488d-0072-2b27-cd54a43a77b2@kaod.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: omSwceIBOkNiXQTcJT4SCgjTlzDUi1Wz
+X-Proofpoint-GUID: jKwnxgYZkGby4TBpJi5zfa8TmUtJnyjx
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|DS7PR12MB6007:EE_
-X-MS-Office365-Filtering-Correlation-Id: 949baca7-d766-4489-dbe3-08db459c9c29
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: mTEmiwW9LKzdg/bKaI1s1x6RG6uGXMAdw1WG/pu5ARbwz9XvaFu9t3jyt5n3dMdtPBODwMtNxo8TX5KTh892n2z5RMp4iK7bOYM6iSExis7dGwCfssxHFTgyH3qmxWJEU41sH8PE9z9DTBSxoPN29IoknzeKyze0G/qn9R67cCsQs/MUW4WR1si0X4MQT8IEzsqUJRGLjgm2O1JhNUXMiEDNKj+aiwAhV7Aer1y2h/6gXMlX6JIEwWV046zGFkNECLcI6spNabEETsYOO32Ji4fiBkwAHkG4ajVhJwyi4LXalR880mLj1eAQNdNKkvcLuQ19oBXLbbHbtFfoKeyMvxL8HOVtn0h5mQ/5kDzcAW9V7t7z8BEjgk07K5VyCUKnHUZjb1H43JhYhZcNwHpDvhKJwiNBqey1ETLiLEx8QMAzLX2WoDF5wyFzHLrLcdSgt+fqzrJmLfOM7E/b3SpG/61nfcVn/KNdeBkibqkLBYzWq2Wm0CwF5clLSbHh5x3xtp6Cy5mm147CtnGYTrneyiVG9oxKLXXDos/YDseSCL5tjbmdw4jYDNfKfcgYN0HiqDwpd2g2lFqWyp2gQ8k4JOtckaUVNR2eKk8ykGG4YNA=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(376002)(346002)(136003)(366004)(396003)(39860400002)(451199021)(83380400001)(966005)(478600001)(6486002)(6666004)(2616005)(6512007)(6506007)(26005)(186003)(53546011)(2906002)(7416002)(5660300002)(36756003)(38100700002)(66946007)(6916009)(66476007)(66556008)(4326008)(41300700001)(86362001)(8936002)(316002)(8676002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?LTDiz3y6ktC1LgCvuP8aOVdlnJE3kOQYeqGdiqNt31+dgIKzTb0MijE0BAZB?=
- =?us-ascii?Q?bm/2otIF8JzI+cmNB6sllWnV7QW6BKJEkSQLqJcj2LR3oWOfCIcodT+xmmuo?=
- =?us-ascii?Q?nihSHFAcWMBdlRNDMBSajYa9deOhh9Z6wR6Jm33CzycaeoLbfmLd42wadiZi?=
- =?us-ascii?Q?+qEnBvhjsgFoUxuOvehhJkJhuY7MWcQDqBwqN4CF+CvOX0NECwuIkrntoXR8?=
- =?us-ascii?Q?94wOAUfw3kG0Fp7Zdo+Cx1/cy640qD5ZtzNvnh/nvga1/BXVITbrkT+0n06p?=
- =?us-ascii?Q?ru5TS5JeTELDznRIy8xq9/6Z487WqdSWpO+qxFHre37AnRju/EDnp7G85I/S?=
- =?us-ascii?Q?qf5j2ZSdfiBRi4o+BQ98D5Qm0FwXeFB5PEF0JGMlbU0FVxhrLj8wqDBl9g0s?=
- =?us-ascii?Q?LOga+OZKLsHI4Dcj66KJy1G6e03Rtg6WqHlf9APnPzBeqyHP0JTP5XIzHjfc?=
- =?us-ascii?Q?R5ROl2S9nMVx1YNQ8w0I2Q7t5H1OUlpzbsDbvZXFDSJFuwpwcP0fO7Ei26cj?=
- =?us-ascii?Q?qFKp/jFZQKckxhuFgGDjTDivUgIvsp5TQhZfjBrsT7QziCNu5CfsounL/FcZ?=
- =?us-ascii?Q?Y85su5gOAvAKn3dhEn/DIXdVdUusbrN6Pjv7Hbl5VKQ/R+jded8B81HhOrvP?=
- =?us-ascii?Q?E2Ioq/VoBvgVpYDud0wwbnVMU5zJpDK4/B/FtLU9UBJFpj6phpGuR7F4RJ4d?=
- =?us-ascii?Q?gqbTZESxbgU6wpSmoCQ+yfmyjjQklH0wRlkQje26tJ9djOMQZ3VanbLV7tXQ?=
- =?us-ascii?Q?7px8L3QNt0hsEoUsXIxlTwNNWmHJkXM9otTqLfQGMR90CezcYzQdZtgoDPVU?=
- =?us-ascii?Q?T/5PDgFmtFi1lHYV8WLWg5YJ1snWI+wdOEFhoBkIYLwqE1kDGWCHa7GyLeHH?=
- =?us-ascii?Q?jtna5yi7H7d3/6ptamAo8So6kvZ+ssN+RnZWJPYxK9+9ilwiixXNsnGbNWvg?=
- =?us-ascii?Q?oo9mdadCBi2m1UlOeTBdnSoYukgzeDVlF86cqxqBJwsUbJZ36YqfXhDs2i0s?=
- =?us-ascii?Q?Uco4q6Fyb9jU6RBeiPhdC0xkP7P6OE3QIJFd1lYZBz59r3XwloZ+sMj3omAc?=
- =?us-ascii?Q?jOk8B/clOxnHIDOgQu7x3bHqkPejKre9ITy4lZzV2CaqkfW6j1vM53LKOZX1?=
- =?us-ascii?Q?+RFzoJryLAQg7yDrhDRWxLMsVCES0eEpyQ06Bvk/FCwtySyDmpJTPt6RuA6s?=
- =?us-ascii?Q?1/9YPblAky/3qLIimOSGhHfuABjwSZOqZNMaBZyCl7zTADsud499gUywP8Ob?=
- =?us-ascii?Q?ErQxMXfVEVybXiwuTouPr9PKifjspGSQALv3l/qMT3aLENJiCwCVlgnYMFiB?=
- =?us-ascii?Q?jz5R2fDWiyc0Mk9m+yrwMMpeJW0Aq5msIqEt2zlbaVJqPA3+/uzu/7SeVA3B?=
- =?us-ascii?Q?xT3NUUmscCn7QV8NvOmgZHPMMRJp4vuLX2lkmv+cHVBobCQIi/JPqmuG8TC6?=
- =?us-ascii?Q?A6yozLGW6dQixe7wNuKOcH24+4inkBgz6eVwZU4v6ErVq34QAne9hXm/oeoX?=
- =?us-ascii?Q?PIPY/JQaBH0+bf0K9nRDrXd+S8zEvw434UYWTExBwcuZnrS7rGy7Sp8OB1We?=
- =?us-ascii?Q?IKfU+Sz0xbqeT5OjxLnsuuIh4Q2odWhhh/O43aLn?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 949baca7-d766-4489-dbe3-08db459c9c29
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Apr 2023 14:51:54.2004
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: rg8XzlSRhxjNYA2VLji8ujsGmXJqq4SKEXg5A3ctQWeFZJTsSFhZ6nElPiOyMN0+
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB6007
-X-Spam-Status: No, score=-1.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
-        version=3.4.6
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
+ definitions=2023-04-25_07,2023-04-25_01,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 spamscore=0
+ priorityscore=1501 mlxscore=0 impostorscore=0 phishscore=0 bulkscore=0
+ suspectscore=0 clxscore=1015 lowpriorityscore=0 adultscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2303200000 definitions=main-2304250127
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Apr 24, 2023 at 04:52:08PM -0700, Reinette Chatre wrote:
-> Hi Jason,
-> 
-> On 4/24/2023 10:43 AM, Jason Gunthorpe wrote:
-> > On Wed, Apr 19, 2023 at 11:11:48AM -0700, Reinette Chatre wrote:
-> >> On 4/18/2023 3:38 PM, Alex Williamson wrote:
-> >>> On Tue, 18 Apr 2023 10:29:19 -0700
-> >>> Reinette Chatre <reinette.chatre@intel.com> wrote:
-> 
-> ...
-> 
-> >> diff --git a/include/linux/vfio_pci_core.h b/include/linux/vfio_pci_core.h
-> >> index 4f070f2d6fde..d730d78754a2 100644
-> >> --- a/include/linux/vfio_pci_core.h
-> >> +++ b/include/linux/vfio_pci_core.h
-> >> @@ -67,8 +67,8 @@ struct vfio_pci_core_device {
-> >>  	u8			msix_bar;
-> >>  	u16			msix_size;
-> >>  	u32			msix_offset;
-> >> -	bool			has_dyn_msix;
-> >>  	u32			rbar[7];
-> >> +	bool			has_dyn_msix;
-> >>  	bool			pci_2_3;
-> >>  	bool			virq_disabled;
-> >>  	bool			reset_works;
-> > 
-> > Also, Linus on record as strongly disliking these lists of bools
-> 
-> This looks like an example:
-> https://lkml.org/lkml/2017/11/21/384
-> 
-> > 
-> > If they don't need read_once/etc stuff then use a list of bitfields
-> 
-> I do not see any direct usage of read_once in the driver, but it is not
-> clear to me what falls under the "etc" umbrella.
 
-Anything that might assume atomicity, smp_store_release, set_bit, and others
+On 4/4/23 11:21, Cédric Le Goater wrote:
+> On 4/3/23 18:28, Pierre Morel wrote:
+>> Introduction of the s390x cpu topology core functions and
+>> basic tests.
+>>
+>> We test the corelation between the command line and
+>> the QMP results in query-cpus-fast for various CPU topology.
+>>
+>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+>
+> I gave the tests a run on a z LPAR. Nice job !
 
->  Do you consider all the bools in struct vfio_pci_core_device to be
-> candidates for transition?
 
-Yes, group them ito into a bitfield.
+:) Thanks
 
-> I think a base type of unsigned int since it appears to be the custom
-> and (if I understand correctly) was preferred at the time Linus wrote
-> the message I found.
+Pierre
 
-It doesn't matter a lot, using "bool" means the compiler adds extra
-code to ensure "foo = 4" stores true, and the underyling size is not
-well defined (but we don't care here)
- 
-> Looking ahead there seems be be a bigger task here. A quick search
-> revealed a few other instances of vfio using "bool" in a struct. It
-> does not all qualify for your "lists of bools" comment, but they
-> may need a closer look because of the "please don't use "bool" in
-> structures at all" comment made by Linus in the email I found.
 
-IMHO bool is helpful for clarity, it says it is a flag. In these cases
-we won't gain anything by using u8 instead
-
-Lists of bools however start to get a little silly when we use maybe 4
-bytes per bool (though x86-64 is using 1 byte in structs)
-
-Jason
+>
+> I hope we can maintain the avocado framework to the level of
+> expectations. I find it very useful for such test cases.
+>
+> Thanks,
+>
+> C.
+>
+>
+>> ---
+>>   MAINTAINERS                    |   1 +
+>>   tests/avocado/s390_topology.py | 196 +++++++++++++++++++++++++++++++++
+>>   2 files changed, 197 insertions(+)
+>>   create mode 100644 tests/avocado/s390_topology.py
+>>
+>> diff --git a/MAINTAINERS b/MAINTAINERS
+>> index fe5638e31d..41419840b0 100644
+>> --- a/MAINTAINERS
+>> +++ b/MAINTAINERS
+>> @@ -1662,6 +1662,7 @@ F: hw/s390x/cpu-topology.c
+>>   F: target/s390x/kvm/cpu_topology.c
+>>   F: docs/devel/s390-cpu-topology.rst
+>>   F: docs/system/s390x/cpu-topology.rst
+>> +F: tests/avocado/s390_topology.py
+>>     X86 Machines
+>>   ------------
+>> diff --git a/tests/avocado/s390_topology.py 
+>> b/tests/avocado/s390_topology.py
+>> new file mode 100644
+>> index 0000000000..38e9cc4f16
+>> --- /dev/null
+>> +++ b/tests/avocado/s390_topology.py
+>> @@ -0,0 +1,196 @@
+>> +# Functional test that boots a Linux kernel and checks the console
+>> +#
+>> +# Copyright (c) 2023 IBM Corp.
+>> +#
+>> +# Author:
+>> +#  Pierre Morel <pmorel@linux.ibm.com>
+>> +#
+>> +# This work is licensed under the terms of the GNU GPL, version 2 or
+>> +# later.  See the COPYING file in the top-level directory.
+>> +
+>> +import os
+>> +import shutil
+>> +import time
+>> +
+>> +from avocado import skip
+>> +from avocado import skipUnless
+>> +from avocado import skipIf
+>> +from avocado_qemu import QemuSystemTest
+>> +from avocado_qemu import exec_command
+>> +from avocado_qemu import exec_command_and_wait_for_pattern
+>> +from avocado_qemu import interrupt_interactive_console_until_pattern
+>> +from avocado_qemu import wait_for_console_pattern
+>> +from avocado.utils import process
+>> +from avocado.utils import archive
+>> +
+>> +
+>> +class LinuxKernelTest(QemuSystemTest):
+>> +    KERNEL_COMMON_COMMAND_LINE = 'printk.time=0 '
+>> +
+>> +    def wait_for_console_pattern(self, success_message, vm=None):
+>> +        wait_for_console_pattern(self, success_message,
+>> +                                 failure_message='Kernel panic - not 
+>> syncing',
+>> +                                 vm=vm)
+>> +
+>> +
+>> +class S390CPUTopology(LinuxKernelTest):
+>> +    """
+>> +    S390x CPU topology consist of 4 topology layers, from bottom to 
+>> top,
+>> +    the cores, sockets, books and drawers and 2 modifiers attributes,
+>> +    the entitlement and the dedication.
+>> +    See: docs/system/s390x/cpu-topology.rst.
+>> +
+>> +    S390x CPU topology is setup in different ways:
+>> +    - implicitely from the '-smp' argument by completing each topology
+>> +      level one after the other begining with drawer 0, book 0 and 
+>> socket 0.
+>> +    - explicitely from the '-device' argument on the QEMU command line
+>> +    - explicitely by hotplug of a new CPU using QMP or HMP
+>> +    - it is modified by using QMP 'set-cpu-topology'
+>> +
+>> +    The S390x modifier attribute entitlement depends on the machine
+>> +    polarization, which can be horizontal or vertical.
+>> +    The polarization is changed on a request from the guest.
+>> +    """
+>> +    timeout = 90
+>> +
+>> +
+>> +    def check_topology(self, c, s, b, d, e, t):
+>> +        res = self.vm.qmp('query-cpus-fast')
+>> +        line =  res['return']
+>> +        for x in line:
+>> +            core = x['props']['core-id']
+>> +            socket = x['props']['socket-id']
+>> +            book = x['props']['book-id']
+>> +            drawer = x['props']['drawer-id']
+>> +            entitlement = x['entitlement']
+>> +            dedicated = x['dedicated']
+>> +            if core == c:
+>> +                self.assertEqual(drawer, d)
+>> +                self.assertEqual(book, b)
+>> +                self.assertEqual(socket, s)
+>> +                self.assertEqual(entitlement, e)
+>> +                self.assertEqual(dedicated, t)
+>> +
+>> +    def kernel_init(self):
+>> +        """
+>> +        We need a kernel supporting the CPU topology.
+>> +        We need a minimal root filesystem with a shell.
+>> +        """
+>> +        kernel_url = ('https://archives.fedoraproject.org/pub/archive'
+>> + '/fedora-secondary/releases/35/Server/s390x/os'
+>> +                      '/images/kernel.img')
+>> +        kernel_hash = '0d1aaaf303f07cf0160c8c48e56fe638'
+>> +        kernel_path = self.fetch_asset(kernel_url, algorithm='md5',
+>> +                                       asset_hash=kernel_hash)
+>> +
+>> +        initrd_url = ('https://archives.fedoraproject.org/pub/archive'
+>> + '/fedora-secondary/releases/35/Server/s390x/os'
+>> +                      '/images/initrd.img')
+>> +        initrd_hash = 'a122057d95725ac030e2ec51df46e172'
+>> +        initrd_path_xz = self.fetch_asset(initrd_url, algorithm='md5',
+>> + asset_hash=initrd_hash)
+>> +        initrd_path = os.path.join(self.workdir, 'initrd-raw.img')
+>> +        archive.lzma_uncompress(initrd_path_xz, initrd_path)
+>> +
+>> +        self.vm.set_console()
+>> +        kernel_command_line = (self.KERNEL_COMMON_COMMAND_LINE +
+>> +                              'root=/dev/ram '
+>> +                              'selinux=0 '
+>> +                              'rdinit=/bin/sh')
+>> +        self.vm.add_args('-nographic',
+>> +                         '-enable-kvm',
+>> +                         '-cpu', 'z14,ctop=on',
+>> +                         '-m', '512',
+>> +                         '-name', 'Some Guest Name',
+>> +                         '-uuid', 
+>> '30de4fd9-b4d5-409e-86a5-09b387f70bfa',
+>> +                         '-kernel', kernel_path,
+>> +                         '-initrd', initrd_path,
+>> +                         '-append', kernel_command_line)
+>> +
+>> +    def test_single(self):
+>> +        self.kernel_init()
+>> +        self.vm.launch()
+>> +        self.wait_for_console_pattern('no job control')
+>> +        self.check_topology(0, 0, 0, 0, 'medium', False)
+>> +
+>> +    def test_default(self):
+>> +        """
+>> +        This test checks the implicite topology.
+>> +
+>> +        :avocado: tags=arch:s390x
+>> +        :avocado: tags=machine:s390-ccw-virtio
+>> +        """
+>> +        self.kernel_init()
+>> +        self.vm.add_args('-smp',
+>> + '13,drawers=2,books=2,sockets=3,cores=2,maxcpus=24')
+>> +        self.vm.launch()
+>> +        self.wait_for_console_pattern('no job control')
+>> +        self.check_topology(0, 0, 0, 0, 'medium', False)
+>> +        self.check_topology(1, 0, 0, 0, 'medium', False)
+>> +        self.check_topology(2, 1, 0, 0, 'medium', False)
+>> +        self.check_topology(3, 1, 0, 0, 'medium', False)
+>> +        self.check_topology(4, 2, 0, 0, 'medium', False)
+>> +        self.check_topology(5, 2, 0, 0, 'medium', False)
+>> +        self.check_topology(6, 0, 1, 0, 'medium', False)
+>> +        self.check_topology(7, 0, 1, 0, 'medium', False)
+>> +        self.check_topology(8, 1, 1, 0, 'medium', False)
+>> +        self.check_topology(9, 1, 1, 0, 'medium', False)
+>> +        self.check_topology(10, 2, 1, 0, 'medium', False)
+>> +        self.check_topology(11, 2, 1, 0, 'medium', False)
+>> +        self.check_topology(12, 0, 0, 1, 'medium', False)
+>> +
+>> +    def test_move(self):
+>> +        """
+>> +        This test checks the topology modification by moving a CPU
+>> +        to another socket: CPU 0 is moved from socket 0 to socket 2.
+>> +
+>> +        :avocado: tags=arch:s390x
+>> +        :avocado: tags=machine:s390-ccw-virtio
+>> +        """
+>> +        self.kernel_init()
+>> +        self.vm.add_args('-smp',
+>> + '1,drawers=2,books=2,sockets=3,cores=2,maxcpus=24')
+>> +        self.vm.launch()
+>> +        self.wait_for_console_pattern('no job control')
+>> +
+>> +        self.check_topology(0, 0, 0, 0, 'medium', False)
+>> +        res = self.vm.qmp('set-cpu-topology',
+>> +                          {'core-id': 0, 'socket-id': 2, 
+>> 'entitlement': 'low'})
+>> +        self.assertEqual(res['return'], {})
+>> +        self.check_topology(0, 2, 0, 0, 'low', False)
+>> +
+>> +    def test_hotplug(self):
+>> +        """
+>> +        This test verifies that a CPU defined with '-device' command 
+>> line
+>> +        argument finds its right place inside the topology.
+>> +
+>> +        :avocado: tags=arch:s390x
+>> +        :avocado: tags=machine:s390-ccw-virtio
+>> +        """
+>> +        self.kernel_init()
+>> +        self.vm.add_args('-smp',
+>> + '1,drawers=2,books=2,sockets=3,cores=2,maxcpus=24')
+>> +        self.vm.add_args('-device', 'z14-s390x-cpu,core-id=10')
+>> +        self.vm.launch()
+>> +        self.wait_for_console_pattern('no job control')
+>> +
+>> +        self.check_topology(10, 2, 1, 0, 'medium', False)
+>> +
+>> +    def test_hotplug_full(self):
+>> +        """
+>> +        This test verifies that a hotplugged fully defined with 
+>> '-device'
+>> +        command line argument finds its right place inside the 
+>> topology.
+>> +
+>> +        :avocado: tags=arch:s390x
+>> +        :avocado: tags=machine:s390-ccw-virtio
+>> +        """
+>> +        self.kernel_init()
+>> +        self.vm.add_args('-smp',
+>> + '1,drawers=2,books=2,sockets=3,cores=2,maxcpus=24')
+>> +        self.vm.add_args('-device',
+>> +                         'z14-s390x-cpu,'
+>> + 'core-id=1,socket-id=1,book-id=1,drawer-id=1')
+>> +        self.vm.launch()
+>> +        self.wait_for_console_pattern('no job control')
+>> +        self.check_topology(1, 1, 1, 1, 'medium', False)
+>> +
+>
