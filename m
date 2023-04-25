@@ -2,137 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A63EF6EDDE7
-	for <lists+kvm@lfdr.de>; Tue, 25 Apr 2023 10:26:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1C8C16EDE5B
+	for <lists+kvm@lfdr.de>; Tue, 25 Apr 2023 10:41:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233595AbjDYI0T (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Apr 2023 04:26:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47144 "EHLO
+        id S233848AbjDYIli (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Apr 2023 04:41:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33676 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233238AbjDYI0S (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Apr 2023 04:26:18 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54C174EC0;
-        Tue, 25 Apr 2023 01:26:17 -0700 (PDT)
-Received: from pps.filterd (m0353726.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 33P7e7Fs021737;
-        Tue, 25 Apr 2023 08:26:17 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=RJFXEGVmg0QaBKy3GTk7Nqs3lrEDArK2nAc10KMzMB4=;
- b=ebnAQyySW34BQYjBb9+e1RPRbUtodDq/n5U7BevTisq3yH6pMW5x3i9a0dWnT9rseMwV
- pFlUmJzNLCQCfS+YnDsN3s8P+DBmgFCQIujBPmJkxE6s4sVcYDHAATqVl2gbgVbJYilX
- mE5/RZIE+g5KwLbYYuev2cpZ8TBuPH9FyMtoxzdkKmrRtZxB2vb44v9/L3w+JneoOuZC
- knY+Pnlx1dMwPZVaBEIm4kM4kDaEjwIVXt22zt20YdrGqkdwi7xMSZgDjNLUrmFFtJby
- c3NwhXLjBTLvqsQviQfehSdln5ZAmH8RYz3PTeUSq8sXamQdPZupbBqBfepP/pwTM0L2 6A== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3q6ad81wws-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 25 Apr 2023 08:26:15 +0000
-Received: from m0353726.ppops.net (m0353726.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 33P7qhY7015688;
-        Tue, 25 Apr 2023 08:26:15 GMT
-Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3q6ad81wv4-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 25 Apr 2023 08:26:15 +0000
-Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
-        by ppma04fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 33P5MsqD010774;
-        Tue, 25 Apr 2023 08:26:12 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-        by ppma04fra.de.ibm.com (PPS) with ESMTPS id 3q47771av6-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 25 Apr 2023 08:26:12 +0000
-Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-        by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 33P8Q8pR8979092
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 25 Apr 2023 08:26:09 GMT
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D71DA20043;
-        Tue, 25 Apr 2023 08:26:08 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7BEBD20040;
-        Tue, 25 Apr 2023 08:26:08 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.152.224.56])
-        by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Tue, 25 Apr 2023 08:26:08 +0000 (GMT)
-Date:   Tue, 25 Apr 2023 10:26:06 +0200
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Pierre Morel <pmorel@linux.ibm.com>
-Cc:     linux-s390@vger.kernel.org, frankja@linux.ibm.com,
-        thuth@redhat.com, kvm@vger.kernel.org, david@redhat.com,
-        nrb@linux.ibm.com, nsg@linux.ibm.com, cohuck@redhat.com
-Subject: Re: [kvm-unit-tests PATCH 1/1] s390x: sclp: consider monoprocessor
- on read_info error
-Message-ID: <20230425102606.4e9bc606@p-imbrenda>
-In-Reply-To: <20230424174218.64145-2-pmorel@linux.ibm.com>
-References: <20230424174218.64145-1-pmorel@linux.ibm.com>
-        <20230424174218.64145-2-pmorel@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
+        with ESMTP id S233842AbjDYIlK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Apr 2023 04:41:10 -0400
+Received: from out-39.mta1.migadu.com (out-39.mta1.migadu.com [95.215.58.39])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B4CB146CC
+        for <kvm@vger.kernel.org>; Tue, 25 Apr 2023 01:38:58 -0700 (PDT)
+Date:   Tue, 25 Apr 2023 10:38:10 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1682411897;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=xYq7TmbvdNQ3HLBoWC5d8iyDLFK/F41KmKqUpMgTt4U=;
+        b=JLUnaR1ovZa5YYyiN2KWTIDel48gVulI9d5qygCevKBgsTQw6j0ciibVMs5zUTMk1iK/RJ
+        byEV8ySIKFWyRUK5Ha2D/vDv600KlirhFy4mn+HVURvrrfGhle6oe8QMveM+c4lJ/a9lQb
+        fzcrO8RDEz3iuviez/RO326v+oF+us4=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From:   Andrew Jones <andrew.jones@linux.dev>
+To:     =?utf-8?B?5Lu75pWP5pWPKOiBlOmAmumbhuWbouiBlOmAmuaVsOWtl+enkeaKgOaciQ==?=
+         =?utf-8?B?6ZmQ5YWs5Y+45pys6YOoKQ==?= <renmm6@chinaunicom.cn>
+Cc:     kvm <kvm@vger.kernel.org>, rmm1985 <rmm1985@163.com>,
+        bonzini <pbonzini@redhat.com>
+Subject: Re: [kvm-unit-tests PATCH] arch-run: Fix run_qemu return correct
+ error code
+Message-ID: <27vn2dxrikahvhw7bw4d77jnhlqpt724j6xjpqi6adqbi7hoct@p74pzrweypkn>
+References: <hzn5rocplnouiuemnxnvznhvvqbvwepqggymgevfwiqal24zt7@62nemxepzzqo>
+ <20230424095816.3022644-1-renmm6@chinaunicom.cn>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: wokmxvjtEi9D1VcES3s22bOcxs_GnW1K
-X-Proofpoint-GUID: O6F0X3EjBUDq2b3Z7CZIX0m2KO42ZaCz
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
- definitions=2023-04-25_03,2023-04-21_01,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- phishscore=0 malwarescore=0 suspectscore=0 mlxlogscore=999
- priorityscore=1501 adultscore=0 mlxscore=0 bulkscore=0 spamscore=0
- impostorscore=0 clxscore=1015 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2303200000 definitions=main-2304250068
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20230424095816.3022644-1-renmm6@chinaunicom.cn>
+X-Migadu-Flow: FLOW_OUT
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 24 Apr 2023 19:42:18 +0200
-Pierre Morel <pmorel@linux.ibm.com> wrote:
-
-> When we can not read SCP information we can not abort during
-> sclp_get_cpu_num() because this function is called during exit
-> and calling it will lead to an infnite loop.
+On Mon, Apr 24, 2023 at 05:58:16PM +0800, 任敏敏(联通集团联通数字科技有限公司本部) wrote:
+> >On Sun, Apr 23, 2023 at 12:34:36PM +0800, 任敏敏(联通集团联通数字科技有限公司本部) wrote:
+> >> From: rminmin <renmm6@chinaunicom.cn>
+> >>
+> >> run_qemu should return 0 if logs doesn't
+> >> contain "warning" keyword.
+> >
+> >Why? What are you trying to fix?
+> >
 > 
-> The loop is:
-> abort() -> exit() -> smp_teardown() -> smp_query_num_cpus() ->
-> sclp_get_cpu_num() -> assert() -> abort()
+> I encountered a problem that the differet results when I run the same
+> test case using standalone mode, "run_test.sh -t -g", "run_test.sh -g".
+> When I use "run_test.sh -g", it always returns a FAIL message.
+> In my env, qemu version is 6.2.
 > 
-> Since smp_setup() is done after sclp_read_info() inside setup() this
-> loop happens when only the start processor is running.
-> Let sclp_get_cpu_num() return 1 in this case.
-
-looks good to me, but please add a comment to explain that this is only
-supposed to happen in exceptional circumstances
-
+> e.g. runnig debug test cases.
 > 
-> Fixes: 52076a63d569 ("s390x: Consolidate sclp read info")
-> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
-> ---
->  lib/s390x/sclp.c | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
+> # without "-t"
+> ./run_tests.sh -g debug
+> FAIL debug (22 tests)
 > 
-> diff --git a/lib/s390x/sclp.c b/lib/s390x/sclp.c
-> index acdc8a9..c09360d 100644
-> --- a/lib/s390x/sclp.c
-> +++ b/lib/s390x/sclp.c
-> @@ -119,8 +119,9 @@ void sclp_read_info(void)
->  
->  int sclp_get_cpu_num(void)
->  {
-> -	assert(read_info);
-> -	return read_info->entries_cpu;
-> +    if (read_info)
-> +	    return read_info->entries_cpu;
-> +    return 1;
->  }
->  
->  CPUEntry *sclp_get_cpu_entries(void)
+> # "-t"
+> ./run_tests.sh -t -g debug
+> TAP version 13
+> ok 1 - debug: DR4==DR6 with CR4.DE == 0
+> ok 2 - debug: DR4 read got #UD with CR4.DE == 1
+> ok 3 - debug: #BP
+> ok 4 - debug: hw breakpoint (test that dr6.BS is not set)
+> ok 5 - debug: hw breakpoint (test that dr6.BS is not cleared)
+> ok 6 - debug: Single-step #DB basic test
+> ok 7 - debug: Usermode Single-step #DB basic test
+> ok 8 - debug: Single-step #DB on emulated instructions
+> ok 9 - debug: Usermode Single-step #DB on emulated instructions
+> ok 10 - debug: Single-step #DB w/ STI blocking
+> ok 11 - debug: Usermode Single-step #DB w/ STI blocking
+> ok 12 - debug: Single-step #DB w/ MOVSS blocking
+> ok 13 - debug: Usermode Single-step #DB w/ MOVSS blocking
+> ok 14 - debug: Single-Step + ICEBP #DB w/ MOVSS blocking
+> ok 15 - debug: Usermode Single-Step + ICEBP #DB w/ MOVSS blocking
+> ok 16 - debug: Single-step #DB w/ MOVSS blocking and DR7.GD=1
+> ok 17 - debug: hw watchpoint (test that dr6.BS is not cleared)
+> ok 18 - debug: hw watchpoint (test that dr6.BS is not set)
+> ok 19 - debug: icebp
+> ok 20 - debug: MOV SS + watchpoint + ICEBP
+> ok 21 - debug: MOV SS + watchpoint + int $1
+> ok 22 - debug: MOV SS + watchpoint + INT3
+> 1..22
+> 
+> # standalone
+> 
+> tests/debug
+> BUILD_HEAD=02d8befe
+> timeout -k 1s --foreground 90s /usr/bin/qemu-kvm --no-reboot -nodefaults -device pc-testdev -device isa-debug-exit,iobase=0xf4,iosize=0x4 -vnc none -serial stdio -device pci-testdev -machine accel=kvm -kernel /tmp/tmp.1GdMZXhTTs -smp 1 # -initrd /tmp/tmp.LzHnmXchfO
+> configure accelerator pc-i440fx-6.2 start
+> machine init start
+> device init start
+> add qdev pc-testdev:none success
+> add qdev pc-testdev:none success
+> add qdev isa-debug-exit:none success
+> add qdev isa-debug-exit:none success
+> add qdev pci-testdev:none success
+> add qdev pci-testdev:none success
+> reset all devices
+> qmp cont is received and vm is started
+> qemu enter main_loop
 
+All the above messages are debug messages that QEMU doesn't output. So
+you're running your own QEMU build with extra messages which
+kvm-unit-tests has to assume are errors.
+
+Please don't try to debug test frameworks without using known-good
+software-under-test.
+
+It also appears you modified kvm-unit-tests, because there is no 'debug'
+group.
+
+Thanks,
+drew
