@@ -2,73 +2,44 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7CA486EDE88
-	for <lists+kvm@lfdr.de>; Tue, 25 Apr 2023 10:51:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7DFD06EDEC7
+	for <lists+kvm@lfdr.de>; Tue, 25 Apr 2023 11:09:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233081AbjDYIvr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Apr 2023 04:51:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44470 "EHLO
+        id S233590AbjDYJJ5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Apr 2023 05:09:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53886 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233355AbjDYIvp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Apr 2023 04:51:45 -0400
-Received: from mail-wm1-x335.google.com (mail-wm1-x335.google.com [IPv6:2a00:1450:4864:20::335])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD0761700
-        for <kvm@vger.kernel.org>; Tue, 25 Apr 2023 01:51:43 -0700 (PDT)
-Received: by mail-wm1-x335.google.com with SMTP id 5b1f17b1804b1-3f1763ee8f8so36809935e9.1
-        for <kvm@vger.kernel.org>; Tue, 25 Apr 2023 01:51:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1682412702; x=1685004702;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Y0uWY7brqmRcXtVhZrcEFbqRw/mI47vo48/ZwQf8LM0=;
-        b=CVPdtHcb6/onOq1WIDibJiKW2+L8E5SE0fW3D5KFSkyvX17mEzrLHIIexwecFFX2HW
-         z64w2n2+/SDqzwua8AggwNS0fR933cVzmRApXoofVnU3whAPgdliqjXXKKt1+xrkD1v+
-         kZHJUCOuNGuUXAsos4N12QDYZfs+1rKo5l7b5r57U7plsOOkf784rUyh/tWUx/ABh6zy
-         l8YvQuI4PK4Gydz+GY7ap5t6UUoO0LKuD9SizmskuuWPblecgDY9e5pG2iBRcuPW/rye
-         FrIOLS79bCG+pU+d53Gecq98625XmbOt8qEpGryu1l1p9J19RzpdujRomvhrsvks2gNe
-         ok4g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682412702; x=1685004702;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Y0uWY7brqmRcXtVhZrcEFbqRw/mI47vo48/ZwQf8LM0=;
-        b=Br8v4MMzV4pDmQCoM0oYMZYl6QkG05RsMovpmjXIidClQaZCO2K7hu1DMmjAKzE70i
-         88tby4CJ1ivr8RbnWfZBN4R7afbPkGOs0IxXWI5Ua0kQklKtLZ6/1s7NrBCy9akn3cLa
-         P6ahogqiYOBQw7OFMTCv/hByuFgEJsf0nnkj+NQItPENuAFr+F42DAtk76cUuZ0pQdhE
-         +RWMReawaBDo/oKbAD0CQVjFLRYBQ72+fGB3FVlQDRvltkWvbvyMTyAUASXNgMXTzfso
-         ZRwUsaWgenmRC8O9pEToUzdM0MnoK+kup4Y4YvDBf+CZ2IBlMWl1EsIV/QHTJzHkOM8Z
-         VqwA==
-X-Gm-Message-State: AAQBX9fysKIpK1SKAnvPqbLXmoszQP9wa79DiJURQeYUz1VJ33TD1FEe
-        KRonXt7XlwfJ/uVGKwjnsaUbzA==
-X-Google-Smtp-Source: AKy350ZUDANoRxBtQ9SFoMrQs3nNPESbgqKXUBOzf9AWOosDfWWewz5EhFWtDHxGnGlu3xM/k7MiWQ==
-X-Received: by 2002:a1c:7912:0:b0:3f1:94e2:e5cf with SMTP id l18-20020a1c7912000000b003f194e2e5cfmr9189741wme.34.1682412702184;
-        Tue, 25 Apr 2023 01:51:42 -0700 (PDT)
-Received: from myrica (054592b0.skybroadband.com. [5.69.146.176])
-        by smtp.gmail.com with ESMTPSA id i40-20020a05600c4b2800b003ee6aa4e6a9sm17589228wmp.5.2023.04.25.01.51.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 Apr 2023 01:51:41 -0700 (PDT)
-Date:   Tue, 25 Apr 2023 09:51:42 +0100
-From:   Jean-Philippe Brucker <jean-philippe@linaro.org>
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     kvm@vger.kernel.org, qemu-devel@nongnu.org, qemu-ppc@nongnu.org,
-        qemu-arm@nongnu.org, qemu-s390x@nongnu.org, pbonzini@redhat.com,
-        mtosatti@redhat.com, danielhb413@gmail.com, clg@kaod.org,
-        david@gibson.dropbear.id.au, groug@kaod.org,
-        peter.maydell@linaro.org, chenhuacai@kernel.org,
-        pasic@linux.ibm.com, borntraeger@linux.ibm.com
-Subject: Re: [PATCH] kvm: Merge kvm_check_extension() and
- kvm_vm_check_extension()
-Message-ID: <20230425085142.GA976713@myrica>
-References: <20230421163822.839167-1-jean-philippe@linaro.org>
- <87jzy1v3gd.fsf@redhat.com>
+        with ESMTP id S233581AbjDYJJ4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Apr 2023 05:09:56 -0400
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2530C185
+        for <kvm@vger.kernel.org>; Tue, 25 Apr 2023 02:09:54 -0700 (PDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id AFCF34B3;
+        Tue, 25 Apr 2023 02:10:37 -0700 (PDT)
+Received: from [10.57.56.254] (unknown [10.57.56.254])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BF4053F587;
+        Tue, 25 Apr 2023 02:09:52 -0700 (PDT)
+Message-ID: <6e2e50a5-13a1-c783-12dc-692901e35aa5@arm.com>
+Date:   Tue, 25 Apr 2023 10:09:51 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87jzy1v3gd.fsf@redhat.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.10.0
+Subject: Re: [PATCH v4 23/30] arm64: Add a setup sequence for systems that
+ boot through EFI
+Content-Language: en-GB
+To:     Shaoqin Huang <shahuang@redhat.com>, kvm@vger.kernel.org,
+        kvmarm@lists.linux.dev, andrew.jones@linux.dev
+Cc:     pbonzini@redhat.com, alexandru.elisei@arm.com, ricarkol@google.com
+References: <20230213101759.2577077-1-nikos.nikoleris@arm.com>
+ <20230213101759.2577077-24-nikos.nikoleris@arm.com>
+ <cf161112-ba2c-0dfb-9bcd-ffd288f2ae0b@redhat.com>
+From:   Nikos Nikoleris <nikos.nikoleris@arm.com>
+In-Reply-To: <cf161112-ba2c-0dfb-9bcd-ffd288f2ae0b@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-5.6 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -76,25 +47,314 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Apr 24, 2023 at 03:01:54PM +0200, Cornelia Huck wrote:
-> > @@ -2480,6 +2471,7 @@ static int kvm_init(MachineState *ms)
-> >      }
-> >  
-> >      s->vmfd = ret;
-> > +    s->check_extension_vm = kvm_check_extension(s, KVM_CAP_CHECK_EXTENSION_VM);
-> 
-> Hm, it's a bit strange to set s->check_extension_vm by calling a
-> function that already checks for the value of
-> s->check_extension_vm... would it be better to call kvm_ioctl() directly
-> on this line?
+Hi Shaoqin,
 
-Yes that's probably best. I'll use kvm_vm_ioctl() since the doc suggests
-to check KVM_CAP_CHECK_EXTENSION_VM on the vm fd.
+On 25/04/2023 08:04, Shaoqin Huang wrote:
+> Hi Nikos,
+> 
+> For that DABT_EL1 error, I have some clues about how it happens. It's
+> mainly because this patch includes a memory overflow. I will explain in
+> the code body.
+> 
+
+Many thanks for this. This is the 2nd time I get caught by this :(
+
+> On 2/13/23 18:17, Nikos Nikoleris wrote:
+>> This change implements an alternative setup sequence for the system
+>> when we are booting through EFI. The memory map is discovered through
+>> EFI boot services and devices through ACPI.
+>>
+>> This change is based on a change initially proposed by
+>> Andrew Jones <drjones@redhat.com>
+>>
+>> Signed-off-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
+>> ---
+>>    arm/cstart.S        |   1 +
+>>    arm/cstart64.S      |   1 +
+>>    lib/arm/asm/setup.h |   8 ++
+>>    lib/arm/setup.c     | 181 +++++++++++++++++++++++++++++++++++++++++++-
+>>    lib/linux/efi.h     |   1 +
+>>    5 files changed, 190 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/arm/cstart.S b/arm/cstart.S
+>> index 7036e67f..3dd71ed9 100644
+>> --- a/arm/cstart.S
+>> +++ b/arm/cstart.S
+>> @@ -242,6 +242,7 @@ asm_mmu_disable:
+>>     *
+>>     * Input r0 is the stack top, which is the exception stacks base
+>>     */
+>> +.globl exceptions_init
+>>    exceptions_init:
+>>    	mrc	p15, 0, r2, c1, c0, 0	@ read SCTLR
+>>    	bic	r2, #CR_V		@ SCTLR.V := 0
+>> diff --git a/arm/cstart64.S b/arm/cstart64.S
+>> index e4ab7d06..223c1092 100644
+>> --- a/arm/cstart64.S
+>> +++ b/arm/cstart64.S
+>> @@ -265,6 +265,7 @@ asm_mmu_disable:
+>>     * Vectors
+>>     */
+>>    
+>> +.globl exceptions_init
+>>    exceptions_init:
+>>    	adrp	x4, vector_table
+>>    	add	x4, x4, :lo12:vector_table
+>> diff --git a/lib/arm/asm/setup.h b/lib/arm/asm/setup.h
+>> index 64cd379b..06069116 100644
+>> --- a/lib/arm/asm/setup.h
+>> +++ b/lib/arm/asm/setup.h
+>> @@ -38,4 +38,12 @@ extern unsigned int mem_region_get_flags(phys_addr_t paddr);
+>>    
+>>    void setup(const void *fdt, phys_addr_t freemem_start);
+>>    
+>> +#ifdef CONFIG_EFI
+>> +
+>> +#include <efi.h>
+>> +
+>> +efi_status_t setup_efi(efi_bootinfo_t *efi_bootinfo);
+>> +
+>> +#endif
+>> +
+>>    #endif /* _ASMARM_SETUP_H_ */
+>> diff --git a/lib/arm/setup.c b/lib/arm/setup.c
+>> index 03a4098e..cab19b1e 100644
+>> --- a/lib/arm/setup.c
+>> +++ b/lib/arm/setup.c
+>> @@ -33,7 +33,7 @@
+>>    #define NR_EXTRA_MEM_REGIONS	16
+>>    #define NR_INITIAL_MEM_REGIONS	(MAX_DT_MEM_REGIONS + NR_EXTRA_MEM_REGIONS)
+>>    
+>> -extern unsigned long _etext;
+>> +extern unsigned long _text, _etext, _data, _edata;
+>>    
+>>    char *initrd;
+>>    u32 initrd_size;
+>> @@ -43,7 +43,10 @@ int nr_cpus;
+>>    
+>>    static struct mem_region __initial_mem_regions[NR_INITIAL_MEM_REGIONS + 1];
+>>    struct mem_region *mem_regions = __initial_mem_regions;
+>> -phys_addr_t __phys_offset, __phys_end;
+>> +phys_addr_t __phys_offset = (phys_addr_t)-1, __phys_end = 0;
+>> +
+>> +extern void exceptions_init(void);
+>> +extern void asm_mmu_disable(void);
+>>    
+>>    int mpidr_to_cpu(uint64_t mpidr)
+>>    {
+>> @@ -289,3 +292,177 @@ void setup(const void *fdt, phys_addr_t freemem_start)
+>>    	if (!(auxinfo.flags & AUXINFO_MMU_OFF))
+>>    		setup_vm();
+>>    }
+>> +
+>> +#ifdef CONFIG_EFI
+>> +
+>> +#include <efi.h>
+>> +
+>> +static efi_status_t setup_rsdp(efi_bootinfo_t *efi_bootinfo)
+>> +{
+>> +	efi_status_t status;
+>> +	struct acpi_table_rsdp *rsdp;
+>> +
+>> +	/*
+>> +	 * RSDP resides in an EFI_ACPI_RECLAIM_MEMORY region, which is not used
+>> +	 * by kvm-unit-tests arm64 memory allocator. So it is not necessary to
+>> +	 * copy the data structure to another memory region to prevent
+>> +	 * unintentional overwrite.
+>> +	 */
+>> +	status = efi_get_system_config_table(ACPI_20_TABLE_GUID, (void **)&rsdp);
+>> +	if (status != EFI_SUCCESS)
+>> +		return status;
+>> +
+>> +	set_efi_rsdp(rsdp);
+>> +
+>> +	return EFI_SUCCESS;
+>> +}
+>> +
+>> +static efi_status_t efi_mem_init(efi_bootinfo_t *efi_bootinfo)
+>> +{
+>> +	int i;
+>> +	unsigned long free_mem_pages = 0;
+>> +	unsigned long free_mem_start = 0;
+>> +	struct efi_boot_memmap *map = &(efi_bootinfo->mem_map);
+>> +	efi_memory_desc_t *buffer = *map->map;
+>> +	efi_memory_desc_t *d = NULL;
+>> +	phys_addr_t base, top;
+>> +	struct mem_region *r;
+>> +	uintptr_t text = (uintptr_t)&_text, etext = __ALIGN((uintptr_t)&_etext, 4096);
+>> +	uintptr_t data = (uintptr_t)&_data, edata = __ALIGN((uintptr_t)&_edata, 4096);
+>> +
+>> +	/*
+>> +	 * Record the largest free EFI_CONVENTIONAL_MEMORY region
+>> +	 * which will be used to set up the memory allocator, so that
+>> +	 * the memory allocator can work in the largest free
+>> +	 * continuous memory region.
+>> +	 */
+>> +	for (i = 0, r = &mem_regions[0]; i < *(map->map_size); i += *(map->desc_size), ++r) {
+> 
+> At here, we can see here use the mem_regions to record the
+> efi_boot_memmap information, so we will iterate the efi_boot_memmap
+> which has (*map->map_size)/(*map->desc_size) number of the structure.
+> Obviously, here didn't check if the mem_regions is fulled, so when the
+> efi_boot_memmap is bigger than the mem_regions, the memory overflow happens.
+> 
+> And when memory overflow happens, Coincidentally, the mmu_idmap is just
+> follow the memory of the mem_regions, so this iteration will write to
+> mmu_idmap memory, which cause the mmu_idmap not NULL, so when the first
+> time the __ioremap being called, which the call trace is:
+> 
+> efi_main->
+>     setup_efi->
+>       io_init->
+>         uart0_init_acpi->
+>           ioremap->
+> 	  __ioremap
+> 
+> 	   if (mmu_enabled()) {
+>                      pgtable = current_thread_info()->pgtable;
+>              } else {
+>                      if (!mmu_idmap)
+>                              mmu_idmap = alloc_page();
+>                      pgtable = mmu_idmap;
+>              }
+> 
+> When it first arrive at here, the mmu_idmap should be NULL, and a new
+> mmu_idmap will be allocated, but unfortunately, the mmu_idmap has been
+> write to a value, so it is not NULL, so the dirty mmu_idmap will be used
+> as a pgtable. Which cause the DABT_EL1 error when continue build the
+> page table.
+> 
+> And the solution is very easy, just make the mem_regions bigger, for
+> example:
+> 
+> static struct mem_region __initial_mem_regions[NR_INITIAL_MEM_REGIONS + 20];
+> struct mem_region *mem_regions = __initial_mem_regions;
+> 
+> After make it bigger, the DABT_EL1 error will not happen on my machine.
+> Hope it works for you.
+> 
+
+Indeed, I can confirm that this is the issue I run into. It would be 
+nice if Drew can confirm as well. Just to be on the safe side in the v5 
+I will apply these changes.
 
 Thanks,
-Jean
 
-> 
-> I think it would be good if some ppc folks could give this a look, but
-> in general, it looks fine to me.
-> 
+Nikos
+
+ From a836dc91706cc9e9aee5ce6b8b659d74d98c7bd7 Mon Sep 17 00:00:00 2001
+From: Nikos Nikoleris <nikos.nikoleris@arm.com>
+Date: Wed, 3 Aug 2022 13:47:56 +0100
+Subject: [kvm-unit-tests PATCH] fixup! arm/arm64: Add a setup sequence 
+for systems that boot through EFI
+X-ARM-No-Footer: FoSSMail
+
+---
+  lib/arm/setup.c | 45 ++++++++++++++++++++++++---------------------
+  1 file changed, 24 insertions(+), 21 deletions(-)
+
+diff --git a/lib/arm/setup.c b/lib/arm/setup.c
+index cab19b1e..c4f495a9 100644
+--- a/lib/arm/setup.c
++++ b/lib/arm/setup.c
+@@ -30,7 +30,7 @@
+  #include "io.h"
+
+  #define MAX_DT_MEM_REGIONS	16
+-#define NR_EXTRA_MEM_REGIONS	16
++#define NR_EXTRA_MEM_REGIONS	64
+  #define NR_INITIAL_MEM_REGIONS	(MAX_DT_MEM_REGIONS + NR_EXTRA_MEM_REGIONS)
+
+  extern unsigned long _text, _etext, _data, _edata;
+@@ -326,7 +326,7 @@ static efi_status_t efi_mem_init(efi_bootinfo_t 
+*efi_bootinfo)
+  	efi_memory_desc_t *buffer = *map->map;
+  	efi_memory_desc_t *d = NULL;
+  	phys_addr_t base, top;
+-	struct mem_region *r;
++	struct mem_region r;
+  	uintptr_t text = (uintptr_t)&_text, etext = 
+__ALIGN((uintptr_t)&_etext, 4096);
+  	uintptr_t data = (uintptr_t)&_data, edata = 
+__ALIGN((uintptr_t)&_edata, 4096);
+
+@@ -336,11 +336,12 @@ static efi_status_t efi_mem_init(efi_bootinfo_t 
+*efi_bootinfo)
+  	 * the memory allocator can work in the largest free
+  	 * continuous memory region.
+  	 */
+-	for (i = 0, r = &mem_regions[0]; i < *(map->map_size); i += 
+*(map->desc_size), ++r) {
++	for (i = 0; i < *(map->map_size); i += *(map->desc_size)) {
+  		d = (efi_memory_desc_t *)(&((u8 *)buffer)[i]);
+
+-		r->start = d->phys_addr;
+-		r->end = d->phys_addr + d->num_pages * EFI_PAGE_SIZE;
++		r.start = d->phys_addr;
++		r.end = d->phys_addr + d->num_pages * EFI_PAGE_SIZE;
++		r.flags = 0;
+
+  		switch (d->type) {
+  		case EFI_RESERVED_TYPE:
+@@ -353,26 +354,27 @@ static efi_status_t efi_mem_init(efi_bootinfo_t 
+*efi_bootinfo)
+  		case EFI_ACPI_RECLAIM_MEMORY:
+  		case EFI_ACPI_MEMORY_NVS:
+  		case EFI_PAL_CODE:
+-			r->flags = MR_F_RESERVED;
++			r.flags = MR_F_RESERVED;
+  			break;
+  		case EFI_MEMORY_MAPPED_IO:
+  		case EFI_MEMORY_MAPPED_IO_PORT_SPACE:
+-			r->flags = MR_F_IO;
++			r.flags = MR_F_IO;
+  			break;
+  		case EFI_LOADER_CODE:
+-			if (r->start <= text && r->end > text) {
++			if (r.start <= text && r.end > text) {
+  				/* This is the unit test region. Flag the code separately. */
+-				phys_addr_t tmp = r->end;
++				phys_addr_t tmp = r.end;
+
+  				assert(etext <= data);
+-				assert(edata <= r->end);
+-				r->flags = MR_F_CODE;
+-				r->end = data;
+-				++r;
+-				r->start = data;
+-				r->end = tmp;
++				assert(edata <= r.end);
++				r.flags = MR_F_CODE;
++				r.end = data;
++				mem_region_add(&r);
++				r.start = data;
++				r.end = tmp;
++				r.flags = 0;
+  			} else {
+-				r->flags = MR_F_RESERVED;
++				r.flags = MR_F_RESERVED;
+  			}
+  			break;
+  		case EFI_CONVENTIONAL_MEMORY:
+@@ -383,12 +385,13 @@ static efi_status_t efi_mem_init(efi_bootinfo_t 
+*efi_bootinfo)
+  			break;
+  		}
+
+-		if (!(r->flags & MR_F_IO)) {
+-			if (r->start < __phys_offset)
+-				__phys_offset = r->start;
+-			if (r->end > __phys_end)
+-				__phys_end = r->end;
++		if (!(r.flags & MR_F_IO)) {
++			if (r.start < __phys_offset)
++				__phys_offset = r.start;
++			if (r.end > __phys_end)
++				__phys_end = r.end;
+  		}
++		mem_region_add(&r);
+  	}
+  	__phys_end &= PHYS_MASK;
+  	asm_mmu_disable();
+--
+2.25.1
