@@ -2,242 +2,189 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E13AC6EE439
-	for <lists+kvm@lfdr.de>; Tue, 25 Apr 2023 16:48:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8FC636EE448
+	for <lists+kvm@lfdr.de>; Tue, 25 Apr 2023 16:52:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234220AbjDYOs3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Apr 2023 10:48:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58066 "EHLO
+        id S234387AbjDYOwH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Apr 2023 10:52:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59992 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231912AbjDYOs2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Apr 2023 10:48:28 -0400
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D1DF87EE1
-        for <kvm@vger.kernel.org>; Tue, 25 Apr 2023 07:48:18 -0700 (PDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9646A4B3;
-        Tue, 25 Apr 2023 07:49:02 -0700 (PDT)
-Received: from [10.1.39.54] (010265703453.arm.com [10.1.39.54])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B756F3F587;
-        Tue, 25 Apr 2023 07:48:17 -0700 (PDT)
-Message-ID: <a2616348-3517-27a7-17a0-6628b56f6fad@arm.com>
-Date:   Tue, 25 Apr 2023 15:48:11 +0100
+        with ESMTP id S233617AbjDYOwD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Apr 2023 10:52:03 -0400
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2041.outbound.protection.outlook.com [40.107.236.41])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6558E7DB0;
+        Tue, 25 Apr 2023 07:51:57 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=eTy60Hlv8umpiHMA9zZUAMrNaM9vyrvw0pGddD0OrOcCFmEbHjZvoPCodcLbbXaIxJ7DsFJx4haYDiilwwVuTkGEd+hkmdgH999Hp3/XrCh3fq0te8bnrnzAkee6zSiAkadZskwV4fB1LXr2iNtYUlPl/mAvAl5tY7qBrG0ysqRl7JA9M8lKYF9IWYXd/X+yTHuEcEfpJbVUvpReONj1YdKqbSmPl8Be6JTL1fD2Wjyvpf/89Hi03L603o568txQ4zkl1OBJWA02lkYNSFMXoKPIlqZJUEcmFKbBAX28UaK6RTDQZvM8DhGyPzfffE/1QhXQfbcjeyGcIBDCkSrZ6Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=hNS+mLFLSufWqHJ7Nih0A0wK5eAK7F+tJGXYfT6LgN4=;
+ b=LK+jv8I0DTXhEHXwlE/zbgxYwVT2GS71N0783+WNAwS635I27Pdqk56YP/rvBUGyNz151eNC/yivq5eaF8srIXm+R1yhldHlxzswuw3UhZu3XVQyvjARSfpI/Omb7d9I/Psf4MCf0Di8k0rXXkFQgEeSocwbwt9jWGEYh3TRzgOKq69FEToOf5cTwjU3w0G00PhscMVvF8WIsRkp/eWchbi3dkZabdmOnz8KU8gwZM6+EuQ+kTSexqqRDXi0tYIknBz3MsgXBRvBH/QgydlYnNDShc4ohFFc9JlUq3Qc6f721b1edb2E0F1nR7t4WGrn3aXtl9xy5OGWMWiz2QP5yw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=hNS+mLFLSufWqHJ7Nih0A0wK5eAK7F+tJGXYfT6LgN4=;
+ b=ZdCDxiC4DZ3C7rTRqfy90q5bp5gPhgO7A0UpZnZd0LnbftgfDxBYgaqB9RIBCFRijc/l32rY/DgJnb4NR5xCTcHJL9SEnLOKpWAenHwtPRii3U1/2Ts5d8sYljPxsCv3+ReBiUHuYZxipx0zvarzb2emUZS0XtFX5zbQZRytlLhTlAP0Bn6GI8TccTAjr6C2kIWb+9K0ewH7U0d6Cg3E2W/1JAdceXEPSylifanBphVtWhuYCoTHg350anhLWAgCHtOomBUbIUrpwt5wc4Gq0z2rWNPdfKTfink7xu4vh3D6Lx5i+ncBtEKb74/4azX/n/0mKT26+LJqz5+6C+Y/+A==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by DS7PR12MB6007.namprd12.prod.outlook.com (2603:10b6:8:7e::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6319.34; Tue, 25 Apr
+ 2023 14:51:54 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::f7a7:a561:87e9:5fab]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::f7a7:a561:87e9:5fab%5]) with mapi id 15.20.6319.033; Tue, 25 Apr 2023
+ 14:51:54 +0000
+Date:   Tue, 25 Apr 2023 11:51:51 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Reinette Chatre <reinette.chatre@intel.com>
+Cc:     Alex Williamson <alex.williamson@redhat.com>, yishaih@nvidia.com,
+        shameerali.kolothum.thodi@huawei.com, kevin.tian@intel.com,
+        tglx@linutronix.de, darwi@linutronix.de, kvm@vger.kernel.org,
+        dave.jiang@intel.com, jing2.liu@intel.com, ashok.raj@intel.com,
+        fenghua.yu@intel.com, tom.zanussi@linux.intel.com,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH V3 08/10] vfio/pci: Probe and store ability to support
+ dynamic MSI-X
+Message-ID: <ZEfpB7m3bWr1bPlv@nvidia.com>
+References: <cover.1681837892.git.reinette.chatre@intel.com>
+ <0da4830176e9c4a7877aac0611869f341dda831c.1681837892.git.reinette.chatre@intel.com>
+ <20230418163803.46a96fdc.alex.williamson@redhat.com>
+ <64b99d1c-073f-cbc3-6c5a-100fa23bcb13@intel.com>
+ <ZEa/rTKja3Xpy/j5@nvidia.com>
+ <5167f01d-fcfd-d821-40fd-c53f4fc135ff@intel.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5167f01d-fcfd-d821-40fd-c53f4fc135ff@intel.com>
+X-ClientProxiedBy: SJ0PR03CA0169.namprd03.prod.outlook.com
+ (2603:10b6:a03:338::24) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-From:   Robin Murphy <robin.murphy@arm.com>
-Subject: Re: RMRR device on non-Intel platform
-To:     Jason Gunthorpe <jgg@nvidia.com>,
-        Nicolin Chen <nicolinc@nvidia.com>
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "iommu@lists.linux.dev" <iommu@lists.linux.dev>
-References: <BN9PR11MB5276E84229B5BD952D78E9598C639@BN9PR11MB5276.namprd11.prod.outlook.com>
- <20230420081539.6bf301ad.alex.williamson@redhat.com>
- <6cce1c5d-ab50-41c4-6e62-661bc369d860@arm.com>
- <20230420084906.2e4cce42.alex.williamson@redhat.com>
- <fd324213-8d77-cb67-1c52-01cd0997a92c@arm.com>
- <20230420154933.1a79de4e.alex.williamson@redhat.com>
- <ZEJ73s/2M4Rd5r/X@nvidia.com> <0aa4a107-57d0-6e5b-46e5-86dbe5b3087f@arm.com>
- <ZEKFdJ6yXoyFiHY+@nvidia.com> <fe7e20e5-9729-248d-ee03-c8b444a1b7c0@arm.com>
- <ZELOqZliiwbG6l5K@nvidia.com>
-Content-Language: en-GB
-In-Reply-To: <ZELOqZliiwbG6l5K@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-5.6 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|DS7PR12MB6007:EE_
+X-MS-Office365-Filtering-Correlation-Id: 949baca7-d766-4489-dbe3-08db459c9c29
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: mTEmiwW9LKzdg/bKaI1s1x6RG6uGXMAdw1WG/pu5ARbwz9XvaFu9t3jyt5n3dMdtPBODwMtNxo8TX5KTh892n2z5RMp4iK7bOYM6iSExis7dGwCfssxHFTgyH3qmxWJEU41sH8PE9z9DTBSxoPN29IoknzeKyze0G/qn9R67cCsQs/MUW4WR1si0X4MQT8IEzsqUJRGLjgm2O1JhNUXMiEDNKj+aiwAhV7Aer1y2h/6gXMlX6JIEwWV046zGFkNECLcI6spNabEETsYOO32Ji4fiBkwAHkG4ajVhJwyi4LXalR880mLj1eAQNdNKkvcLuQ19oBXLbbHbtFfoKeyMvxL8HOVtn0h5mQ/5kDzcAW9V7t7z8BEjgk07K5VyCUKnHUZjb1H43JhYhZcNwHpDvhKJwiNBqey1ETLiLEx8QMAzLX2WoDF5wyFzHLrLcdSgt+fqzrJmLfOM7E/b3SpG/61nfcVn/KNdeBkibqkLBYzWq2Wm0CwF5clLSbHh5x3xtp6Cy5mm147CtnGYTrneyiVG9oxKLXXDos/YDseSCL5tjbmdw4jYDNfKfcgYN0HiqDwpd2g2lFqWyp2gQ8k4JOtckaUVNR2eKk8ykGG4YNA=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(376002)(346002)(136003)(366004)(396003)(39860400002)(451199021)(83380400001)(966005)(478600001)(6486002)(6666004)(2616005)(6512007)(6506007)(26005)(186003)(53546011)(2906002)(7416002)(5660300002)(36756003)(38100700002)(66946007)(6916009)(66476007)(66556008)(4326008)(41300700001)(86362001)(8936002)(316002)(8676002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?LTDiz3y6ktC1LgCvuP8aOVdlnJE3kOQYeqGdiqNt31+dgIKzTb0MijE0BAZB?=
+ =?us-ascii?Q?bm/2otIF8JzI+cmNB6sllWnV7QW6BKJEkSQLqJcj2LR3oWOfCIcodT+xmmuo?=
+ =?us-ascii?Q?nihSHFAcWMBdlRNDMBSajYa9deOhh9Z6wR6Jm33CzycaeoLbfmLd42wadiZi?=
+ =?us-ascii?Q?+qEnBvhjsgFoUxuOvehhJkJhuY7MWcQDqBwqN4CF+CvOX0NECwuIkrntoXR8?=
+ =?us-ascii?Q?94wOAUfw3kG0Fp7Zdo+Cx1/cy640qD5ZtzNvnh/nvga1/BXVITbrkT+0n06p?=
+ =?us-ascii?Q?ru5TS5JeTELDznRIy8xq9/6Z487WqdSWpO+qxFHre37AnRju/EDnp7G85I/S?=
+ =?us-ascii?Q?qf5j2ZSdfiBRi4o+BQ98D5Qm0FwXeFB5PEF0JGMlbU0FVxhrLj8wqDBl9g0s?=
+ =?us-ascii?Q?LOga+OZKLsHI4Dcj66KJy1G6e03Rtg6WqHlf9APnPzBeqyHP0JTP5XIzHjfc?=
+ =?us-ascii?Q?R5ROl2S9nMVx1YNQ8w0I2Q7t5H1OUlpzbsDbvZXFDSJFuwpwcP0fO7Ei26cj?=
+ =?us-ascii?Q?qFKp/jFZQKckxhuFgGDjTDivUgIvsp5TQhZfjBrsT7QziCNu5CfsounL/FcZ?=
+ =?us-ascii?Q?Y85su5gOAvAKn3dhEn/DIXdVdUusbrN6Pjv7Hbl5VKQ/R+jded8B81HhOrvP?=
+ =?us-ascii?Q?E2Ioq/VoBvgVpYDud0wwbnVMU5zJpDK4/B/FtLU9UBJFpj6phpGuR7F4RJ4d?=
+ =?us-ascii?Q?gqbTZESxbgU6wpSmoCQ+yfmyjjQklH0wRlkQje26tJ9djOMQZ3VanbLV7tXQ?=
+ =?us-ascii?Q?7px8L3QNt0hsEoUsXIxlTwNNWmHJkXM9otTqLfQGMR90CezcYzQdZtgoDPVU?=
+ =?us-ascii?Q?T/5PDgFmtFi1lHYV8WLWg5YJ1snWI+wdOEFhoBkIYLwqE1kDGWCHa7GyLeHH?=
+ =?us-ascii?Q?jtna5yi7H7d3/6ptamAo8So6kvZ+ssN+RnZWJPYxK9+9ilwiixXNsnGbNWvg?=
+ =?us-ascii?Q?oo9mdadCBi2m1UlOeTBdnSoYukgzeDVlF86cqxqBJwsUbJZ36YqfXhDs2i0s?=
+ =?us-ascii?Q?Uco4q6Fyb9jU6RBeiPhdC0xkP7P6OE3QIJFd1lYZBz59r3XwloZ+sMj3omAc?=
+ =?us-ascii?Q?jOk8B/clOxnHIDOgQu7x3bHqkPejKre9ITy4lZzV2CaqkfW6j1vM53LKOZX1?=
+ =?us-ascii?Q?+RFzoJryLAQg7yDrhDRWxLMsVCES0eEpyQ06Bvk/FCwtySyDmpJTPt6RuA6s?=
+ =?us-ascii?Q?1/9YPblAky/3qLIimOSGhHfuABjwSZOqZNMaBZyCl7zTADsud499gUywP8Ob?=
+ =?us-ascii?Q?ErQxMXfVEVybXiwuTouPr9PKifjspGSQALv3l/qMT3aLENJiCwCVlgnYMFiB?=
+ =?us-ascii?Q?jz5R2fDWiyc0Mk9m+yrwMMpeJW0Aq5msIqEt2zlbaVJqPA3+/uzu/7SeVA3B?=
+ =?us-ascii?Q?xT3NUUmscCn7QV8NvOmgZHPMMRJp4vuLX2lkmv+cHVBobCQIi/JPqmuG8TC6?=
+ =?us-ascii?Q?A6yozLGW6dQixe7wNuKOcH24+4inkBgz6eVwZU4v6ErVq34QAne9hXm/oeoX?=
+ =?us-ascii?Q?PIPY/JQaBH0+bf0K9nRDrXd+S8zEvw434UYWTExBwcuZnrS7rGy7Sp8OB1We?=
+ =?us-ascii?Q?IKfU+Sz0xbqeT5OjxLnsuuIh4Q2odWhhh/O43aLn?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 949baca7-d766-4489-dbe3-08db459c9c29
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Apr 2023 14:51:54.2004
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: rg8XzlSRhxjNYA2VLji8ujsGmXJqq4SKEXg5A3ctQWeFZJTsSFhZ6nElPiOyMN0+
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB6007
+X-Spam-Status: No, score=-1.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2023-04-21 18:58, Jason Gunthorpe wrote:
-> On Fri, Apr 21, 2023 at 06:22:37PM +0100, Robin Murphy wrote:
+On Mon, Apr 24, 2023 at 04:52:08PM -0700, Reinette Chatre wrote:
+> Hi Jason,
 > 
->> I think a slightly more considered and slightly less wrong version of that
->> idea is to mark it as IOMMU_RESV_MSI, and special-case direct-mapping those
->> on Arm (I believe it would technically be benign to do on x86 too, but might
->> annoy people with its pointlessness). However...
+> On 4/24/2023 10:43 AM, Jason Gunthorpe wrote:
+> > On Wed, Apr 19, 2023 at 11:11:48AM -0700, Reinette Chatre wrote:
+> >> On 4/18/2023 3:38 PM, Alex Williamson wrote:
+> >>> On Tue, 18 Apr 2023 10:29:19 -0700
+> >>> Reinette Chatre <reinette.chatre@intel.com> wrote:
 > 
-> I'd rather have a IOMMU_RESV_MSI_DIRECT and put the ARM special case
-> in ARM code..
+> ...
+> 
+> >> diff --git a/include/linux/vfio_pci_core.h b/include/linux/vfio_pci_core.h
+> >> index 4f070f2d6fde..d730d78754a2 100644
+> >> --- a/include/linux/vfio_pci_core.h
+> >> +++ b/include/linux/vfio_pci_core.h
+> >> @@ -67,8 +67,8 @@ struct vfio_pci_core_device {
+> >>  	u8			msix_bar;
+> >>  	u16			msix_size;
+> >>  	u32			msix_offset;
+> >> -	bool			has_dyn_msix;
+> >>  	u32			rbar[7];
+> >> +	bool			has_dyn_msix;
+> >>  	bool			pci_2_3;
+> >>  	bool			virq_disabled;
+> >>  	bool			reset_works;
+> > 
+> > Also, Linus on record as strongly disliking these lists of bools
+> 
+> This looks like an example:
+> https://lkml.org/lkml/2017/11/21/384
+> 
+> > 
+> > If they don't need read_once/etc stuff then use a list of bitfields
+> 
+> I do not see any direct usage of read_once in the driver, but it is not
+> clear to me what falls under the "etc" umbrella.
 
-Maybe, but it's still actually broken either way, because how do you get 
-that type into the VM? Firmware can't encode that a particular RMR 
-represents the special magic hack for IOMMUFD, so now the SMMU driver 
-needs to somehow be aware when it's running in a VM offering nested 
-translation and do some more magic to inject the appropriate region, and 
-it's all just... no.
+Anything that might assume atomicity, smp_store_release, set_bit, and others
 
->>> On baremetal we have no idea what the platform put under that
->>> hardcoded address?
->>>
->>> On VM we don't use the iommu_get_msi_cookie() flow because the GIC in
->>> the VM pretends it doesn't have an ITS page?  (did I get that right?)
->>
->> No, that can't be right - PCIe devices have to support MSI or MSI-X, and
->> many of them won't support INTx at all, so if the guest wants to use
->> interrupts in general it must surely need to believe it has some kind of MSI
->> controller,
-> 
-> Yes..
-> 
->> which for practical purposes in this context means an ITS.
-> 
-> I haven't delved into it super detail, but.. my impression was..
-> 
-> The ITS page only becomes relavent to the IOMMU layer if the actual
-> IRQ driver calls iommu_dma_prepare_msi()
-> 
-> And we have only these drivers that do so:
-> 
-> drivers/irqchip/irq-gic-v2m.c:  err = iommu_dma_prepare_msi(info->desc,
-> drivers/irqchip/irq-gic-v3-its.c:       err = iommu_dma_prepare_msi(info->desc, its->get_msi_base(its_dev));
-> drivers/irqchip/irq-gic-v3-mbi.c:       err = iommu_dma_prepare_msi(info->desc,
-> drivers/irqchip/irq-ls-scfg-msi.c:      err = iommu_dma_prepare_msi(info->desc, msi_data->msiir_addr);
-> 
-> While, I *thought* that the vGIC in ARM uses
-> 
-> drivers/irqchip/irq-gic-v4.c
-> 
-> Which doesn't obviously call iommu_dma_prepare_msi() ?
-> 
-> So while the SMMU driver will stick in a IOMMU_RESV_SW_MSI, and
-> iommufd will call iommu_get_msi_cookie(), there is no matching call
-> of iommu_dma_prepare_msi() - so it all effectively does nothing.
-> 
-> Instead, again from what I understood, is that the IOMMU layer is
-> expected to install the ITS page, not knowing it is an ITS page,
-> because the ACPI creates a IOMMU_RESV_DIRECT.
-> 
-> When the VM writes it totally-a-lie MSI address to the PCI MSI-X
-> registers the hypervisor traps it and subsitutes, what it valiantly
-> hopes, is the right address for the ITS in the VM's S1 IOMMU table
-> based on the ACPI where it nicely asked the guest to keep this
-> specific IOVA mapped.
-> 
-> I'm not sure how the data bit works on ARM..
-> 
->> was the next thing I started wondering after the above - if the aim is to
->> direct-map the host's SW_MSI region to effectively pass through the S2 MSI
->> cookie, but you have the same Linux SMMU driver in the guest, isn't that
->> guest driver still going to add a conflicting SW_MSI region for the same
->> IOVA and confuse things?
-> 
-> Oh probably yes. At least from iommufd perspective, it can resolve
-> overlapping regions just fine though.
-> 
->> Ideally for nesting, the VMM would just tell us the IPA of where it's going
->> to claim the given device's associated MSI doorbell is, we map that to the
->> real underlying address at S2, then the guest can use its S1 cookie as
->> normal if it wants to, and the host doesn't have to rewrite addresses either
->> way.
-> 
-> Goodness yes, I'd love that.
-> 
->> that the nesting usage model inherently constrains the VMM's options for
->> emulating the IOMMU, would it be unreasonable to make our lives a lot easier
->> with some similar constraints around interrupts, and just not attempt to
->> support the full gamut of "emulate any kind of IRQ with any other kind of
->> IRQ" irqfd hilarity?
-> 
-> Isn't that what GICv4 is?
+>  Do you consider all the bools in struct vfio_pci_core_device to be
+> candidates for transition?
 
-That would fit *part* of the GICv4 usage model...
+Yes, group them ito into a bitfield.
 
-> Frankly, I think something whent wrong with the GICv4 design. A purely
-> virtualization focused GIC should not have continued to rely on the
-> hypervisor trapping of the MSI-X writes. The guest should have had a
-> real data value and a real physical ITS page.
+> I think a base type of unsigned int since it appears to be the custom
+> and (if I understand correctly) was preferred at the time Linus wrote
+> the message I found.
 
-...I believe the remaining missing part is a UAPI for the VMM to ask the 
-host kernel to configure a "physical" vLPI for a given device and 
-EventID, at the point when its vITS emulation is handling the guest's 
-configuration command. With that we would no longer have to rewrite the 
-MSI payload either, so can avoid trapping the device's MSI-X capability 
-at all, and the VM could actually have non-terrible interrupt performance.
+It doesn't matter a lot, using "bool" means the compiler adds extra
+code to ensure "foo = 4" stores true, and the underyling size is not
+well defined (but we don't care here)
+ 
+> Looking ahead there seems be be a bigger task here. A quick search
+> revealed a few other instances of vfio using "bool" in a struct. It
+> does not all qualify for your "lists of bools" comment, but they
+> may need a closer look because of the "please don't use "bool" in
+> structures at all" comment made by Linus in the email I found.
 
-> I can understand why we got here, because fixing *all* of that would
-> be a big task and this is a small hack, but still... Yuk.
-> 
-> But that is a whole other journey. There is work afoot to standardize
-> some things would make MSI-X trapping impossible and more solidly
-> force this issue, so I'm just hoping to keep the current mess going
-> as-is right now..
+IMHO bool is helpful for clarity, it says it is a flag. In these cases
+we won't gain anything by using u8 instead
 
-The thing is, though, this small hack is in fact just the tip of a large 
-pile of small hacks across Linux and QEMU that probably add up to a 
-similar amount of work overall as just implementing the interface that 
-we'd ultimately want to have anyway.
+Lists of bools however start to get a little silly when we use maybe 4
+bytes per bool (though x86-64 is using 1 byte in structs)
 
->>>> MSI regions already represent "safe" direct mappings, either as an inherent
->>>> property of the hardware, or with an actual mapping maintained by software.
->>>> Also RELAXABLE is meant to imply that it is only needed until a driver takes
->>>> over the device, which at face value doesn't make much sense for interrupts.
->>>
->>> I used "relxable" to suggest it is safe for userspace.
->>
->> I know, but the subtlety is the reason *why* it's safe for userspace. Namely
->> that a VFIO driver has bound and reset (or at least taken control of) the
->> device, and thus it is assumed to no longer be doing whatever the boot
->> firmware left it doing, therefore the reserved region is assumed to no
->> longer be relevant, and from then on the requirement to preserve it can be
->> relaxed.
-> 
-> IOMMU_RESV_MSI_DIRECT is probably the better name
-> 
->>>           unsigned long pg_size;
->>>           int ret = 0;
->>> -       if (!iommu_is_dma_domain(domain))
->>> -               return 0;
->>> -
->>>           BUG_ON(!domain->pgsize_bitmap);
->>>           pg_size = 1UL << __ffs(domain->pgsize_bitmap);
->>
->> But then you realise that you also need to juggle this around since identity
->> domains aren't required to have a valid pgsize_bitmap either, give up on the
->> idea and go straight to writing a dedicated loop as the clearer and tidier
->> option because hey this is hardly a fast path anyway. At least, you do if
->> you're me :)
-> 
-> domain->pgsize_bitmap is always valid memory, and __ffs() always
-> returns [0:31], so this caclculation will be fine but garbage.
-> 
->>> @@ -1052,13 +1049,18 @@ static int iommu_create_device_direct_mappings(struct i>
->>>                   dma_addr_t start, end, addr;
->>>                   size_t map_size = 0;
->>> -               start = ALIGN(entry->start, pg_size);
->>> -               end   = ALIGN(entry->start + entry->length, pg_size);
->>> -
->>>                   if (entry->type != IOMMU_RESV_DIRECT &&
->>>                       entry->type != IOMMU_RESV_DIRECT_RELAXABLE)
->>>                           continue;
->>> +               if (entry->type == IOMMU_RESV_DIRECT)
->>> +                       dev->iommu->requires_direct = 1;
->>> +
->>> +               if (!iommu_is_dma_domain(domain))
->>> +                       continue;
->>> +
->>> +               start = ALIGN(entry->start, pg_size);
->>> +               end   = ALIGN(entry->start + entry->length, pg_size);
-> 
-> Which is why I moved the only reader of pg_size after the check if it
-> is valid..
-
-Except GCC says __builtin_ctzl(0) is undefined, so although I'd concur 
-that the chances of nasal demons at the point of invoking __ffs() are 
-realistically quite low, I don't fancy arguing that with the static 
-checker brigade. So by the time we've appeased them with additional 
-checks, initialisations, etc., we'd have basically the same overhead as 
-running 0 iterations of another for loop (the overwhelmingly common case 
-anyway), but in more lines of code, with a more convoluted flow. All of 
-which leads me to conclude that "number of times we walk a usually-empty 
-list in a one-off slow path" is not in fact the most worthwhile thing to 
-optimise for ;)
-
-Cheers,
-Robin.
+Jason
