@@ -2,130 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 53F136EE4D7
-	for <lists+kvm@lfdr.de>; Tue, 25 Apr 2023 17:36:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0B9DD6EE51C
+	for <lists+kvm@lfdr.de>; Tue, 25 Apr 2023 17:58:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234452AbjDYPgC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Apr 2023 11:36:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54032 "EHLO
+        id S234620AbjDYP6h (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Apr 2023 11:58:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38392 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233442AbjDYPgA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Apr 2023 11:36:00 -0400
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2041.outbound.protection.outlook.com [40.107.236.41])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13F671444F
-        for <kvm@vger.kernel.org>; Tue, 25 Apr 2023 08:35:58 -0700 (PDT)
+        with ESMTP id S234615AbjDYP6e (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Apr 2023 11:58:34 -0400
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2040.outbound.protection.outlook.com [40.107.236.40])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9332CC17
+        for <kvm@vger.kernel.org>; Tue, 25 Apr 2023 08:58:29 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Bj2VvWZj8FSrh4Lx3UY/gJGKzWeYqqhxyzpyvRqN5n4VPO3O8JIVkw2gK9w39djWWeMvub+Q34A9cYW/PviLZ+4VSYUtMVY7X8UUegVoy9seLThAD9UDZLPDVKoM20uB0YlXmsfTbEkri4RT6DgjTvPKyk0HUFhwiH5v01tT0ctFvos3FW9lZPTeFM2qG9MQJOsp4VJgVZbfK6nKTkpkl0Z6k/+9SFsOBrdSg9WQrAgz/c4IYdJ4xWSJ1vzMuAxKrf2BiHRmJe+HwrW7fOZ/2ALddZrBra2Qf+sqqSUqyhImFmrw9J5teEiwuP7cA3vu2Rc5EOXrpDRtx3SmwIpasw==
+ b=ZF7ZabL/EnEVU2HZuVf1DW8ww4yHn5mbHkrGING1sTyQTLnnrwjR0234iVYh8lDAWFAatEXRfVXz8nfCCj0005kAtD0pQkzblK7TJJcqaN0AYxFZCfJL4fX/78Z9JYN17ZQAOapo5ggrOGwt7K2UPdRYLgEylzoo5jJxYh5FZRKTl+b6hQ8YXrwlXmlpYJtDOdgRAQ7U2TvzqeIkmwbTNKF5vP8cO0T3KKo4lVLSxnCJv6Pxm1Qc1li6hH0HjXV3i6tY3nx/T2q2nJmLXq5tbZbNPg4L0KLljf1qcaB2+gWvR9z1ax/BSKSAc3EbCXI9M9msbG4v66VyjNIJMmLaXA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=NLnmXrc3bDPRMWPrHM8lwLBbuZ65L8iKgOk0YEdTG8E=;
- b=ZaEClV5Ll/WEqagiBe0e7jPelHiTwVdYvmX8n2TmH2NvOUKXkEn9HMnUZhyqbwRBeEwm4G4aW78gaC1HOnddDUMXwcf8B9ZP8T4MBcqVyoy4Xazc/UEQ9c3JYkRtSuKZjHmYXX2CEeyuwpT7Bp7Y85PG2L2PNGL7e5xAg1OIkKoA5e7AcObEGSfuwpmIGVpbxaSJOOdGV+RMgga6cBfTXXg2wGEBAVsA5CUwXXxxgVZy3MjhKCYQIb9mYObsgM0CzqGhW78YgEFgq4d82KZKD8Urv42SH5JC6jOB9G3Ep1MMw4gOGtOq2SY+8huqU+URWsBZ4Q3ICBItqDNxH5ah2w==
+ bh=clWst3b6Qmd+kqrUTHpsw/cWdyeioO+m7YXA72/XEm0=;
+ b=li9xUU9q5pf+/H+HUMdai30Zcrj4lOtpAyw2gJLUgadQctl9hVQ1K9anFGsv+/nTLHH8xcYO3vd9LsAJ8HX96VJTXajb0Pd8CUeT32PJ8Y9GTVrfnaXEmn0xppIz53puZ6dIP2BSuQDa4WkCNgIX/vMe2g3oyb/bfGHaXI0cwF6xxbRGfQbzHsjNV0bzFQalgHiatf3rlyBPt4WUtqi+CfeJXhlaySyBw/9jpbkcgYRQwxc56hBwoJE8VylVDsMA6g65QgeqTttNpnSsu0jjS74qgqU1bBl7TwDXuUo1xnbIwXbEN0pXA/lazLwXM90MJ89iesPbtZ+mALwJD9dQNw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=NLnmXrc3bDPRMWPrHM8lwLBbuZ65L8iKgOk0YEdTG8E=;
- b=PH0MU/aABsr58NrdpgZHNchX4UBAugXCSo8fzrQUga1DyFfdGhVMZLiU5+LwQB1U80MGm3zmjOEvCoh2xtdIdFdU4QIKVqc/B7/xXCouOmAOZh5Y5yvnXBPly3Zp1Y+BOQKDmur8nffm2hq2lR53MqRnmp5+TsnD9AkjGbHj+ro=
+ bh=clWst3b6Qmd+kqrUTHpsw/cWdyeioO+m7YXA72/XEm0=;
+ b=JFbv0iVCtgjt2PV3pTVTr7FpZJTFYYfJc2O6jRln0XkBs/bJQIXhZcsBeEIumvoWk1G9Q7E++HVjOK86UpuNN+6auL6av4TfYbPDLFUK1Z9Z+TBwi/+PNcyBIo+fKjWAtkrDwIJLdYm87k20G3I2Dm66YkS4wRG5UOWPWtV767E7G/Fwu3Hwj4whPtZNdT0JAI58Fv+1umr1HFIPPkB450bKHpY7PiO2l8xkDBD7LAxnxsXFtumoiJCIBdZ5F2ItbsZ0dGVJoOxkJCYbUryr+Sec9f3pUtI93aBDGDuhPv5R0TXMlyLWQfG2gS5teaDdJPV3dXg6PaEpJ35NuRdy1g==
 Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from MW3PR12MB4553.namprd12.prod.outlook.com (2603:10b6:303:2c::19)
- by CO6PR12MB5490.namprd12.prod.outlook.com (2603:10b6:303:13d::9) with
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by CY8PR12MB7610.namprd12.prod.outlook.com (2603:10b6:930:9a::11) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6319.34; Tue, 25 Apr
- 2023 15:35:56 +0000
-Received: from MW3PR12MB4553.namprd12.prod.outlook.com
- ([fe80::57ca:ec64:35da:a5b1]) by MW3PR12MB4553.namprd12.prod.outlook.com
- ([fe80::57ca:ec64:35da:a5b1%7]) with mapi id 15.20.6319.033; Tue, 25 Apr 2023
- 15:35:55 +0000
-Message-ID: <87b874ed-d6d6-4232-3214-b577ea929811@amd.com>
-Date:   Tue, 25 Apr 2023 10:35:51 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Reply-To: babu.moger@amd.com
-Subject: Re: [PATCH v3 2/7] target/i386: Add new EPYC CPU versions with
- updated cache_info
-Content-Language: en-US
-To:     Maksim Davydov <davydov-max@yandex-team.ru>
-Cc:     weijiang.yang@intel.com, philmd@linaro.org, dwmw@amazon.co.uk,
-        paul@xen.org, joao.m.martins@oracle.com, qemu-devel@nongnu.org,
-        mtosatti@redhat.com, kvm@vger.kernel.org, mst@redhat.com,
-        marcel.apfelbaum@gmail.com, yang.zhong@intel.com,
-        jing2.liu@intel.com, vkuznets@redhat.com, michael.roth@amd.com,
-        wei.huang2@amd.com, berrange@redhat.com, pbonzini@redhat.com,
-        richard.henderson@linaro.org
-References: <20230424163401.23018-1-babu.moger@amd.com>
- <20230424163401.23018-3-babu.moger@amd.com>
- <2d5b21cb-7b09-f4e8-576f-31d9977aa70c@yandex-team.ru>
-From:   "Moger, Babu" <babu.moger@amd.com>
-In-Reply-To: <2d5b21cb-7b09-f4e8-576f-31d9977aa70c@yandex-team.ru>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: CH2PR02CA0027.namprd02.prod.outlook.com
- (2603:10b6:610:4e::37) To MW3PR12MB4553.namprd12.prod.outlook.com
- (2603:10b6:303:2c::19)
+ 2023 15:58:27 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::f7a7:a561:87e9:5fab]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::f7a7:a561:87e9:5fab%5]) with mapi id 15.20.6319.033; Tue, 25 Apr 2023
+ 15:58:27 +0000
+Date:   Tue, 25 Apr 2023 12:58:25 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Robin Murphy <robin.murphy@arm.com>,
+        Eric Auger <eric.auger@redhat.com>
+Cc:     Nicolin Chen <nicolinc@nvidia.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "iommu@lists.linux.dev" <iommu@lists.linux.dev>
+Subject: Re: RMRR device on non-Intel platform
+Message-ID: <ZEf4oef6gMevtl7w@nvidia.com>
+References: <6cce1c5d-ab50-41c4-6e62-661bc369d860@arm.com>
+ <20230420084906.2e4cce42.alex.williamson@redhat.com>
+ <fd324213-8d77-cb67-1c52-01cd0997a92c@arm.com>
+ <20230420154933.1a79de4e.alex.williamson@redhat.com>
+ <ZEJ73s/2M4Rd5r/X@nvidia.com>
+ <0aa4a107-57d0-6e5b-46e5-86dbe5b3087f@arm.com>
+ <ZEKFdJ6yXoyFiHY+@nvidia.com>
+ <fe7e20e5-9729-248d-ee03-c8b444a1b7c0@arm.com>
+ <ZELOqZliiwbG6l5K@nvidia.com>
+ <a2616348-3517-27a7-17a0-6628b56f6fad@arm.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a2616348-3517-27a7-17a0-6628b56f6fad@arm.com>
+X-ClientProxiedBy: YT4PR01CA0420.CANPRD01.PROD.OUTLOOK.COM
+ (2603:10b6:b01:10b::17) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MW3PR12MB4553:EE_|CO6PR12MB5490:EE_
-X-MS-Office365-Filtering-Correlation-Id: 242f81b9-7383-440a-3470-08db45a2c2b5
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|CY8PR12MB7610:EE_
+X-MS-Office365-Filtering-Correlation-Id: f4080f44-a9d0-4935-d0da-08db45a5e856
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: yQ+sF1LHT9ucqhCn0SHM42ZXp4ozkRgeMwZ/4zPaFJXRHAjFr+rpZJTgUx/ldUBWzcapM06nU3MBvzv91mJ2N+eED6zM5QzE3/SWzTwsnXE1TUrH285xhKVI7FTbLjBmvcRKo0PuktJsVqbsHLmnQJV5Za+JA4EjrqnIaI+6hPQV22Y14EKcdLdiw/qnMM1wbHOB/uQcHIg7jzuGKoycmWXkOzOONFac2ixrHxvzx3711I4Cbvt2VA+GRwr44v8LFOp3AasBOuYjAxsO6GwgnXMWjB+VcDeAVI0txaJ1tNl/5XVy5Ar3zcTGXMguGEB978x2tbWOhQmLzSQIUdXpeWpohg0K/9Bo/SHNdRCij9T5MiWfBzeznrzooFrOliBFaLt9VeMJyw3Oy9xKkimjQ0JDAMWDC6kwO0NghIDkTb4BDf4yGcWOrFmPWbTfYKdzZQ1V80J0P9IS+HzgK98I7IRjFKipajowxGmYFikV0Kn5m5hWXAUSEqRiTg2qEoZZSplY6+8HHG7bf+z9A1x+n9SrxbAAxNGJVDL7+i3IHwoXnoGV3yqdKn8GSHNdQv3KMGIsX5fvTG8XFVywPGRb/TBXyF+sAQ+MsHQFayUNGjcz3/VRkM6QnwUjg/IuvsWkdhO4+Fh9CRH3+bLSeREUUw==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW3PR12MB4553.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(366004)(376002)(136003)(346002)(39860400002)(396003)(451199021)(31686004)(15650500001)(2906002)(3450700001)(86362001)(26005)(186003)(6506007)(6512007)(83380400001)(66556008)(7416002)(36756003)(478600001)(66476007)(66946007)(6486002)(6666004)(38100700002)(53546011)(31696002)(2616005)(41300700001)(4326008)(6916009)(316002)(5660300002)(8676002)(8936002)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: 7ggGPvvlbGglHb/ij7ECL39eRLVU74uO+MqCu6uduSVmV5/Hvy7Wr/m/VMEymI98MLksZ1uiGBkuLo4XUPS+ME5je6JY5h8SKZg6zJBuJEWL1+7dIcQnuq5SDdyN5VmlEJh/0cGCywS6rscxMZ5l3I85i04z/1uNVN2izdcMuwpWxJ5ifrkjowan83F7MYQtP14AIJcmkvb1Rp5Z9hmLnAU9xDp1i1u0sBO84X9FRQdW+EZHowso90FIX9AQngiffsWm1hBGcug2seXhLjL0X6lzJ3PLB6QRkYeiy1pBgv4Fx29+/LYlEMOo1AOfAshPOfQyA2i2hzy3cIaXgyK/r4y1FYr1eRThdW6lxVQGxjMFjD2o5L7uOH9OTjrjgJ+mIXp5fb8z9IyC0m6A9BN53ZW16fdf2FImwPkbFzlQQzt2EBypBAZ3OGq9LinCu9nMHLLoDJTlKNKm6z8PEOlGdwCWLcIlWqh/EWb1wnBIBevtZirR4wxg5lRrNbcBbWLNv9FCeoFjf8jRZWb4n2jb622DGAa90oXzUNepSlJYZa3op0suJuz2gu74FHwKXVPu
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(346002)(136003)(376002)(366004)(396003)(39860400002)(451199021)(83380400001)(478600001)(6486002)(110136005)(2616005)(6512007)(54906003)(26005)(6506007)(186003)(53546011)(5660300002)(36756003)(38100700002)(66946007)(66556008)(4326008)(66476007)(41300700001)(86362001)(2906002)(8936002)(316002)(8676002)(66899021);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?MlN0S3ZxQTZWbmYrQk5Ncmo0cnNYQk9zZEFwYmRSU1RKRk1neFU3T1RZWStB?=
- =?utf-8?B?K05xaHAvTDNwQU5yWjA5d1gzK05NM09uY3p2dmhYNUhTT3dvRklWK3UzaHJP?=
- =?utf-8?B?aXNvdGdsWndaeXBZNnB6ZURtZUNLaVlENy9NRUViZ2NiMzBpRGhUM0VxQWVX?=
- =?utf-8?B?bEZkVFFWNUY5TTllR0VvNW16TlBIeWxNQ0o3WGlNb01rK3AweXlmUjdkZjFu?=
- =?utf-8?B?dzNlZUpnemhQN1ZuVVIxZFpWTCtlYWJOOThHbGxOUXNvY0VWdEUzaExTRUlh?=
- =?utf-8?B?YWxJWlY4dmVEckNpQzQwNXlQSk5LZVVOeGlTMFlZbUVtTUFmYlZ5MmxMc29p?=
- =?utf-8?B?a0k3aXVnWEVkU3QybmFyR2RDS24rY0ZRelRRZmV3bndQWDBPdVZRUzgzVFFH?=
- =?utf-8?B?aUFNQ1E0UTB5Si8rNkdudU1BbGZFTFJXb2s2QXE3Ymc5dnh0MkEzYUU2dTdo?=
- =?utf-8?B?c2ZLMzcvYXkrdWE1UElqU2xvZlJPNGxlNjk5NU5WWi9wejFtQm5iUytWWk9m?=
- =?utf-8?B?aGc2Y2FKRjVTKzlxS05DbW9QZWFWUzNFRWJ5WVZzSUdILzByZ0xZV3gwbFdS?=
- =?utf-8?B?TWtjUjc4RW5zcWNkeG83VHBuQkt4a1lOcXZEcHI3Vml3T0JwbUVxWWYrekZV?=
- =?utf-8?B?dGdjMnV6MUdQcm5OYzRicFFKUnByVEhWTXBLcURCNk1kTlg4SEdHaFB0NENY?=
- =?utf-8?B?eGJma2FPejZtV2J2Y05TU2EwdEFCUXFCWmtKcWQwSVowZmhabVdaK0RJUmpP?=
- =?utf-8?B?RWZPTVRvbDV6WFFqTU1HYUJ3WEtXZVRmWFkwQ0V3STVUQ0cxZW5hcmtVQXpT?=
- =?utf-8?B?TGNvUVVLT2FDTEZKMWlpZnF1L0hNZVpOZG9UcWZqZnJhZ1g1YVMxWDJxZ2Z4?=
- =?utf-8?B?RjFYV3VSQVlUU1lrSDlQSG9HKy9zMGJReHh3ZDFjU0ZsNldOV2crR2U0bWFv?=
- =?utf-8?B?R2hiZTZpeGlrYm5Dd1RlUHJJbmxFNnRmM3RHSDFMdmJDYm5QRXVjTUs0TldO?=
- =?utf-8?B?NExDS2FaSXJoZGp6aHdnSXRjTWhRT3VxdlZzaTVqSExPVE1QeVJ2L3hLNS9X?=
- =?utf-8?B?QkVjb09FL2Fwa2pUZWFXTHJNMVFNZmI4VnZFSjY4SFBsN1Z6U2ZVMzcrNUUx?=
- =?utf-8?B?eU9wdlpZRWxwaXVLMmNNa0tQUTV3SmVRK1NtVHhDWGduaTMrTUljcnc0cG0v?=
- =?utf-8?B?RU01N3pndjlpSGxWcExlR3V3aUhFaDFESVJwdGJtblkzTk1td1BNUkdrTENK?=
- =?utf-8?B?YWRpTjVodW51aVZ4cGdoWGJEdXFXU0p1OUJ4K3FLaldGaTJNZ0pTa2VjbnFr?=
- =?utf-8?B?d1h2dFRZQkhDeHFGaHFadm9oSFR1eE0yM1ExbWdjblVEVjJXWkV4MkpQK2dO?=
- =?utf-8?B?Y2N6RmNvWERiQ2VEWm5kKzNuTW9xRWd6V1VGR3plUWxqdFZEOU1zR2wxTEtY?=
- =?utf-8?B?VDRRNWY0aGk4ZjROZGlGNFFpUmNJQ3YxRHArT2hwTDRyZ2RoYm1Gdm1PZnZZ?=
- =?utf-8?B?YmlwR3NkbXNoNmU5bUVUemRkSmtlVzRBRzdpbzhQSTdWMUlINXl0RGNBSm9k?=
- =?utf-8?B?bXhreTVaanFIN3pmaHg3Ykw3dndGaEJxRkRyQ1gzM044TkM2Q1JkanhDendK?=
- =?utf-8?B?di9KdkVuZ3JNd3duYjJUM3hndTYrVlZqbUlYaHNuMHIySTBTcnlRVmJTeXpH?=
- =?utf-8?B?ZUlZMEluUFEraGZNUXRpZGk0dnBtOVh3OWN2bHk5SU5GekMrcmdnTXF3Sm1F?=
- =?utf-8?B?UEdQNUxoMWZnamhrZStBb3FBTndNay9Fb3hPaS90VCs4MHN2WDN3Q1liYlBn?=
- =?utf-8?B?dldmRVl1R2ZWT1JEM0JRL1FyNlRDNGREVmR4T2FTSWl3OENuYnNucWFMMXBm?=
- =?utf-8?B?eWVUbThqQ01RMXYxcExxYnBoSnRQVy85WisydzYvNmErdWgrcmFCSllWa0Fl?=
- =?utf-8?B?clprcncxbmJaK3hEYkg5NUVUZUFYODJuNlFBS3hTdGg5L2JpclAxWkp0cVpw?=
- =?utf-8?B?dXdNbDRsMWFiL0dTd29mOTlGQXEzUkRQN0MrdXFVdGY2Um43bFNNTXVrSmhp?=
- =?utf-8?B?aXdpTUtNZUZra1FpZ054SFR4MlJJMW1laStoVzhDLzQ1YzJVQmxQRUFBNm1k?=
- =?utf-8?Q?0ljw=3D?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 242f81b9-7383-440a-3470-08db45a2c2b5
-X-MS-Exchange-CrossTenant-AuthSource: MW3PR12MB4553.namprd12.prod.outlook.com
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?C+PG6eV+LFJWEXRhlwXxUOPxJ0Te+NZo5Xc4DquDXyXq82MZzfqRXiqesesz?=
+ =?us-ascii?Q?2sYf2cjo6QqBZxTGV2O55491QlGXUEHtwgagEhIT+9ff6MVAsN6tXDLctnUL?=
+ =?us-ascii?Q?ACCZNKyrHTF/WslxMGXiDQmtp3BnNFY0RWjSxLdpK9xYe9kL+HCUSTkrKEL7?=
+ =?us-ascii?Q?B1mqXXdTh9+eM5pdfdF7i47AsBsXUv9CV3PRNN1FdyZqbSBnb0TAlgDMiaJ3?=
+ =?us-ascii?Q?NaggDsbZdZyJy05ptJ3UPh0koZEN7tMOMYGj7G1c/lIVHMqK/DWJWkmsxDl6?=
+ =?us-ascii?Q?UMogDgd11wopGVLx6G/OQP/66yZ7P1gdLOueIU50owOzmItHw+JmpS+CxI0w?=
+ =?us-ascii?Q?tAVP8StijvI0NM6a1uVGieuW572IW9ByHsQmbynodcOKaEdz13s1yzf/elDn?=
+ =?us-ascii?Q?OKYbB8My0njzsaLp7J8c+DCxLfmVdhChGEXeB1IuCqqRTjiqZhe3D3HYdK7y?=
+ =?us-ascii?Q?tw5vrhOD6O5gFzd7AvfgDkouKqy06x7GXnMX7RwJ1DHb0V46BMIVRsbb0qM8?=
+ =?us-ascii?Q?nMFz1lmYaWmMA6E8zpTtwAFKtuFrAN7ZoAZR0aw2NaNtOih7KncCbW8YwedM?=
+ =?us-ascii?Q?oDffJsIB1lqkqbpCppA3ACFssgSAp+mtDJV+dLu5UknPDnIbenKWIa93aocr?=
+ =?us-ascii?Q?KSTUTEyPyhSSFkULkvTfet9rgUAdHk9BGxnLNpLWb64k2Cxx0X19VgR3JZL5?=
+ =?us-ascii?Q?ccQGTwKaschfKa1ToMuK8FaC/uBR7ULbO3QjNmpLFlaFRu0H9ak2cO5YeFjm?=
+ =?us-ascii?Q?4xRZGrjD6KlJGdMeNY4UGOP2PhvCiblnD3FX1UYVC05irGkCDG3MfpfcQn3q?=
+ =?us-ascii?Q?zoFFBMkekg2Okjj4ADWG4KfM/csdBM9t+6FTdMbMAzBRubK6SJmMY7iqdrjR?=
+ =?us-ascii?Q?XZN+F/VsXr4NeAv2jqVLYEtMvJTwXpAuXJQpMmoOoL+SZEMNs8zAxHZyDGzE?=
+ =?us-ascii?Q?jXnDuVxsuQ04bwOi6s5h+vyka7XkUWuvp9205HaH936cbJpdXf+27sAC4vhH?=
+ =?us-ascii?Q?9FUyau0WN0szKjtMB9CUO2eFghkm9Peq9ZzCVhMHtvQYjMWARkhA2Fd5VWjX?=
+ =?us-ascii?Q?q+V5c4YICaS0WInY/e78uu5m25I0syTr7zu3EE/R6MSSi21jnoGpxoYpHItN?=
+ =?us-ascii?Q?+Yzn7NTDbbNgm5BEceSYuhr97WlPjXZj8SISoL2rraxk8axoHbUNu0reYNoL?=
+ =?us-ascii?Q?bPywWspEqYMoA9WxalAievPnWVBplDpEF+xywGcsPqnVNOYhJz9xQ9waJCnn?=
+ =?us-ascii?Q?Hi3TJyHZl+XWFlXe2hyYeWP+uCdSnhvJYpFlPH4JVNqrvviWLP8f+bAyL9Di?=
+ =?us-ascii?Q?du4PQEaMSn9GXkBQr8H7AEEzXJC7KwktA07Y5w65jVawI9p2qI7YmHJISbSl?=
+ =?us-ascii?Q?Q1OioWzNyw0OStnu/XyL4A4PwEV44PHH9cAg3hd6Nlg0deyOqEwZVjMg1QzA?=
+ =?us-ascii?Q?C2AIJnCxmdp0iW+khiLgGdWkqjshsFT9zzFDKviWAQ1YPHdvNLIg7Z9Ddald?=
+ =?us-ascii?Q?v/VAZlUYcyBb32lSHgZ19AALYzbvBCmnzW23ROtXq13thlHo90p+obvCznN+?=
+ =?us-ascii?Q?SEk8bzfsWFplQXJi8aEzX7Qyi3VqumrXYNZT3Hsf?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f4080f44-a9d0-4935-d0da-08db45a5e856
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Apr 2023 15:35:55.8680
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Apr 2023 15:58:27.4967
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: eE+UXpYISPOPcnx1Mccbyn8VQRcnMMB80XlM9wDc4HzZVP7Za8k8H5AVSrLNv+Xf
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO6PR12MB5490
-X-Spam-Status: No, score=-2.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,NICE_REPLY_A,
+X-MS-Exchange-CrossTenant-UserPrincipalName: b3TzxEmf2il1iYOnSCDRMrnpk0hFPuAtBn+2isC9s444Av9Pv5VS9waU7N8708Xb
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB7610
+X-Spam-Status: No, score=-1.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
         RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
         version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -133,188 +126,74 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Maksim,
-
-On 4/25/23 07:51, Maksim Davydov wrote:
+On Tue, Apr 25, 2023 at 03:48:11PM +0100, Robin Murphy wrote:
+> On 2023-04-21 18:58, Jason Gunthorpe wrote:
+> > On Fri, Apr 21, 2023 at 06:22:37PM +0100, Robin Murphy wrote:
+> > 
+> > > I think a slightly more considered and slightly less wrong version of that
+> > > idea is to mark it as IOMMU_RESV_MSI, and special-case direct-mapping those
+> > > on Arm (I believe it would technically be benign to do on x86 too, but might
+> > > annoy people with its pointlessness). However...
+> > 
+> > I'd rather have a IOMMU_RESV_MSI_DIRECT and put the ARM special case
+> > in ARM code..
 > 
-> On 4/24/23 19:33, Babu Moger wrote:
->> From: Michael Roth <michael.roth@amd.com>
->>
->> Introduce new EPYC cpu versions: EPYC-v4 and EPYC-Rome-v3.
->> The only difference vs. older models is an updated cache_info with
->> the 'complex_indexing' bit unset, since this bit is not currently
->> defined for AMD and may cause problems should it be used for
->> something else in the future. Setting this bit will also cause
->> CPUID validation failures when running SEV-SNP guests.
->>
->> Signed-off-by: Michael Roth <michael.roth@amd.com>
->> Signed-off-by: Babu Moger <babu.moger@amd.com>
->> Acked-by: Michael S. Tsirkin <mst@redhat.com>
->> ---
->>   target/i386/cpu.c | 118 ++++++++++++++++++++++++++++++++++++++++++++++
->>   1 file changed, 118 insertions(+)
->>
->> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
->> index e3d9eaa307..c1bc47661d 100644
->> --- a/target/i386/cpu.c
->> +++ b/target/i386/cpu.c
->> @@ -1707,6 +1707,56 @@ static const CPUCaches epyc_cache_info = {
->>       },
->>   };
->>   +static CPUCaches epyc_v4_cache_info = {
->> +    .l1d_cache = &(CPUCacheInfo) {
->> +        .type = DATA_CACHE,
->> +        .level = 1,
->> +        .size = 32 * KiB,
->> +        .line_size = 64,
->> +        .associativity = 8,
->> +        .partitions = 1,
->> +        .sets = 64,
->> +        .lines_per_tag = 1,
->> +        .self_init = 1,
->> +        .no_invd_sharing = true,
->> +    },
->> +    .l1i_cache = &(CPUCacheInfo) {
->> +        .type = INSTRUCTION_CACHE,
->> +        .level = 1,
->> +        .size = 64 * KiB,
->> +        .line_size = 64,
->> +        .associativity = 4,
->> +        .partitions = 1,
->> +        .sets = 256,
->> +        .lines_per_tag = 1,
->> +        .self_init = 1,
->> +        .no_invd_sharing = true,
->> +    },
->> +    .l2_cache = &(CPUCacheInfo) {
->> +        .type = UNIFIED_CACHE,
->> +        .level = 2,
->> +        .size = 512 * KiB,
->> +        .line_size = 64,
->> +        .associativity = 8,
->> +        .partitions = 1,
->> +        .sets = 1024,
->> +        .lines_per_tag = 1,
->> +    },
->> +    .l3_cache = &(CPUCacheInfo) {
->> +        .type = UNIFIED_CACHE,
->> +        .level = 3,
->> +        .size = 8 * MiB,
->> +        .line_size = 64,
->> +        .associativity = 16,
->> +        .partitions = 1,
->> +        .sets = 8192,
->> +        .lines_per_tag = 1,
->> +        .self_init = true,
->> +        .inclusive = true,
->> +        .complex_indexing = false,
->> +    },
->> +};
->> +
->>   static const CPUCaches epyc_rome_cache_info = {
->>       .l1d_cache = &(CPUCacheInfo) {
->>           .type = DATA_CACHE,
->> @@ -1757,6 +1807,56 @@ static const CPUCaches epyc_rome_cache_info = {
->>       },
->>   };
->>   +static const CPUCaches epyc_rome_v3_cache_info = {
->> +    .l1d_cache = &(CPUCacheInfo) {
->> +        .type = DATA_CACHE,
->> +        .level = 1,
->> +        .size = 32 * KiB,
->> +        .line_size = 64,
->> +        .associativity = 8,
->> +        .partitions = 1,
->> +        .sets = 64,
->> +        .lines_per_tag = 1,
->> +        .self_init = 1,
->> +        .no_invd_sharing = true,
->> +    },
->> +    .l1i_cache = &(CPUCacheInfo) {
->> +        .type = INSTRUCTION_CACHE,
->> +        .level = 1,
->> +        .size = 32 * KiB,
->> +        .line_size = 64,
->> +        .associativity = 8,
->> +        .partitions = 1,
->> +        .sets = 64,
->> +        .lines_per_tag = 1,
->> +        .self_init = 1,
->> +        .no_invd_sharing = true,
->> +    },
->> +    .l2_cache = &(CPUCacheInfo) {
->> +        .type = UNIFIED_CACHE,
->> +        .level = 2,
->> +        .size = 512 * KiB,
->> +        .line_size = 64,
->> +        .associativity = 8,
->> +        .partitions = 1,
->> +        .sets = 1024,
->> +        .lines_per_tag = 1,
->> +    },
->> +    .l3_cache = &(CPUCacheInfo) {
->> +        .type = UNIFIED_CACHE,
->> +        .level = 3,
->> +        .size = 16 * MiB,
->> +        .line_size = 64,
->> +        .associativity = 16,
->> +        .partitions = 1,
->> +        .sets = 16384,
->> +        .lines_per_tag = 1,
->> +        .self_init = true,
->> +        .inclusive = true,
->> +        .complex_indexing = false,
->> +    },
->> +};
->> +
->>   static const CPUCaches epyc_milan_cache_info = {
->>       .l1d_cache = &(CPUCacheInfo) {
->>           .type = DATA_CACHE,
->> @@ -4091,6 +4191,15 @@ static const X86CPUDefinition builtin_x86_defs[] = {
->>                       { /* end of list */ }
->>                   }
->>               },
->> +            {
->> +                .version = 4,
->> +                .props = (PropValue[]) {
->> +                    { "model-id",
->> +                      "AMD EPYC-v4 Processor" },
->> +                    { /* end of list */ }
->> +                },
->> +                .cache_info = &epyc_v4_cache_info
->> +            },
->>               { /* end of list */ }
->>           }
->>       },
->> @@ -4210,6 +4319,15 @@ static const X86CPUDefinition builtin_x86_defs[] = {
->>                       { /* end of list */ }
->>                   }
->>               },
->> +            {
->> +                .version = 3,
->> +                .props = (PropValue[]) {
->> +                    { "model-id",
->> +                      "AMD EPYC-Rome-v3 Processor" },
-> What do you think about adding more information to the model name to reveal
-> its key feature? For instance, model-id can be "EPYC-Rome-v3 (NO INDEXING)",
-> because only cache info was affected. Or alias can be used to achieve
-> the same effect. It works well in
+> Maybe, but it's still actually broken either way, because how do you get
+> that type into the VM? Firmware can't encode that a particular RMR
+> represents the special magic hack for IOMMUFD, so now the SMMU driver needs
+> to somehow be aware when it's running in a VM offering nested translation
+> and do some more magic to inject the appropriate region, and it's all
+> just... no.
 
-Actually, we already thought about it. But decided against it. Reason is,
-when we add "(NO INDEXING)" to v3, we need to keep text in all the future
-revisions v4 etc and other cpu models. Otherwise it will give the
-impression that newer versions does not support "NO indexing". Hope it helps.
+Er, I figured ARM had sorted this out somehow :(
 
-> "EPYC-v2 <-> AMD EPYC Processor (with IBPB) <-> EPYC-IBPB"
->> +                    { /* end of list */ }
->> +                },
->> +                .cache_info = &epyc_rome_v3_cache_info
->> +            },
->>               { /* end of list */ }
->>           }
->>       },
+Eric, do you know anything about this? Where did you setup the 1:1 map
+in the VM in your series?
+
+So you are saying, the basic problem statement, is that the ACPI table
+that describes the ITS direct mapping in the VM is supposed to be
+interpreted by the SMMU driver as "memory must be iommu mapped 1:1 at
+all times and is possibly dangerous enough to block userspace access
+to the device, like Intel does" ?
+
+This isn't end of the world bad, it just means that VFIO will not work
+in ARM guests under this interrupt model. Sad, and something to fix,
+but we can still cover alot of ground..
+
+Maybe a GICv5 can correct it..
+
+> > Frankly, I think something whent wrong with the GICv4 design. A purely
+> > virtualization focused GIC should not have continued to rely on the
+> > hypervisor trapping of the MSI-X writes. The guest should have had a
+> > real data value and a real physical ITS page.
 > 
+> ...I believe the remaining missing part is a UAPI for the VMM to ask the
+> host kernel to configure a "physical" vLPI for a given device and EventID,
+> at the point when its vITS emulation is handling the guest's configuration
+> command. With that we would no longer have to rewrite the MSI payload
+> either, so can avoid trapping the device's MSI-X capability at all, and the
+> VM could actually have non-terrible interrupt performance.
 
--- 
-Thanks
-Babu Moger
+Yes.. More broadly I think we'd need to allow the vGIC code to
+understand that it has complete control over a SID, and like we are
+talking about for SMMU a vSID mapping as well.
+
+This would have to replace the eventfd based hookup we have now.
+
+I really want to avoid opening this can of worms because it is
+basically iommufd all over again just irq focused :(
+
+> Except GCC says __builtin_ctzl(0) is undefined, so although I'd concur that
+> the chances of nasal demons at the point of invoking __ffs() are
+> realistically quite low, I don't fancy arguing that with the static checker
+> brigade. So by the time we've appeased them with additional checks,
+> initialisations, etc., we'd have basically the same overhead as running 0
+> iterations of another for loop (the overwhelmingly common case anyway), but
+> in more lines of code, with a more convoluted flow. All of which leads me to
+> conclude that "number of times we walk a usually-empty list in a one-off
+> slow path" is not in fact the most worthwhile thing to optimise for ;)
+
+Heh, well fair enough, we do have a UBSAN that might trip on this. Lu
+can correct it
+
+Jason
