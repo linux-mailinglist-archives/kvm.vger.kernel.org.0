@@ -2,257 +2,167 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 89B726EDAA1
-	for <lists+kvm@lfdr.de>; Tue, 25 Apr 2023 05:27:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C5DFE6EDB44
+	for <lists+kvm@lfdr.de>; Tue, 25 Apr 2023 07:42:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233264AbjDYD1V (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 Apr 2023 23:27:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50636 "EHLO
+        id S233306AbjDYFm5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Apr 2023 01:42:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55106 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233263AbjDYD1B (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 Apr 2023 23:27:01 -0400
-Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52D22AF17;
-        Mon, 24 Apr 2023 20:26:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1682393211; x=1713929211;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=MykIHyOnFBYvjtTNVdllwAiFmLXXR+pbIjotFGUpHJg=;
-  b=STY44/0tER/dmOvP3H/XaGjIEqGGIAmHIYlaFxDRGnzZBdZZnykEJ9ju
-   YD0d9nFVITvjPxoXw5QnlRFnPEO4su409Tyomq2gRuiMxkgN78odi/C0Q
-   CeRpkNeGFHWH2Pvjup8jHYYdxx62EW6imOCvnNR6yzFzlNVQqUK8+++FW
-   Z5V3l1CyOZ9x6N20RrxZdmCb2V+JhUroBxiUw1x5m303l9eUE5S5SheyT
-   DKz/2UKeWKvIx7txPbF1WIweFwNG7sJtYgOfZnaVpBzxTnnmkF5fkRT+K
-   MkLfko4X5vvWCROwQzGEvS8dM9DpoAD57FtJviBx4vWjZl4BmvFaxQ3ey
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10690"; a="346656800"
-X-IronPort-AV: E=Sophos;i="5.99,224,1677571200"; 
-   d="scan'208";a="346656800"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Apr 2023 20:26:50 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10690"; a="837253766"
-X-IronPort-AV: E=Sophos;i="5.99,224,1677571200"; 
-   d="scan'208";a="837253766"
-Received: from zengguan-mobl1.ccr.corp.intel.com (HELO [10.238.0.183]) ([10.238.0.183])
-  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Apr 2023 20:26:47 -0700
-Message-ID: <040a4d50-d25b-c6b9-960a-a85dda30b857@intel.com>
-Date:   Tue, 25 Apr 2023 11:26:34 +0800
+        with ESMTP id S231351AbjDYFm4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Apr 2023 01:42:56 -0400
+Received: from mail-qt1-x835.google.com (mail-qt1-x835.google.com [IPv6:2607:f8b0:4864:20::835])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 310D97AA8
+        for <kvm@vger.kernel.org>; Mon, 24 Apr 2023 22:42:51 -0700 (PDT)
+Received: by mail-qt1-x835.google.com with SMTP id d75a77b69052e-3ef6e8493ebso11328281cf.2
+        for <kvm@vger.kernel.org>; Mon, 24 Apr 2023 22:42:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1682401370; x=1684993370;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZqOIjUQas8Rx1/5sAHd8nDe5JfxJxpYrGJ2aW1S7/QE=;
+        b=FBq0wSQZHFhDmAXJRtxc/cteLPhGBUqYaKY4zqT63wqEVsVXk7rqp7CpgtfyIu6gSD
+         udOyk8v0wGFB+CVpkRCnnPbGB2GvhQIQHDFAsUpiRagIFEXWAyK3EmDIBnYTVqnWm1o2
+         GMQM78qvzSLYO4EdyjzmOI8lt7uEchuf6nrzBzZLjts+CfO3cHrpQCe3tKIxoHzUve9f
+         NYQHVsjLsloE70BlqCuNtEWnDdhl+iDhyaLrtFOFbYu2a1UFWPKzIyCL3uKRFq59lxF1
+         Mf6m6iiXNgXeFroxFVzWN+Q73d5hXPMX/csrrsJeBTEI5TFc+82Y1DNF21hM2ls92zAh
+         cgjQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1682401370; x=1684993370;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ZqOIjUQas8Rx1/5sAHd8nDe5JfxJxpYrGJ2aW1S7/QE=;
+        b=RJ1LVC7CFVmOvM9ubd2dp6CbRVfdyTNn8SCIj3VPxJCqVlGhPhlLwGebUbohQOGRLK
+         s/RINZRUfjWJkEgDwkRC1QRRnaIuhEy67xwafXuICLPNy4FFFTVTnckczbqOAeJgPCjZ
+         a2P7H5Ijwi50eisRaZLMknlVubVbpDZD9m6QYCXViNsHJd5Dlrzb0Z+9AWM5+YBA57SO
+         +nIAEqPPVKJ0JjOGdEPNqQvMCHt/I/J7lB9IVHWe7PSc+vGGTVPiSSZuAikM5K5fRfo+
+         HcCQ2DdxmkHgctf25jjfVIZ9haxbyKzOX9/QLTw+3DYkjhOK3RYcdcIJ2zuQIjbdAkQJ
+         kOcw==
+X-Gm-Message-State: AAQBX9dWWCblUMO08C+EiWRVoZwtD8c2od1QLXp3zi+Ma0G5KpJjzzTH
+        CCcfUDedOZUqbk0UFVO6eZelC5DF5//1VsBhbDkYdlZKGUq5lA==
+X-Google-Smtp-Source: AKy350YNhM9vliZvFdaghRH04BWbcCfd9ESSD8DXYLJEnsZ7/gtC/Wrot6ju3hxldLyczOrK6tmEF0ll4WNq9TVV65w=
+X-Received: by 2002:ac8:5c8c:0:b0:3d7:960e:5387 with SMTP id
+ r12-20020ac85c8c000000b003d7960e5387mr23905537qta.35.1682401370265; Mon, 24
+ Apr 2023 22:42:50 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Subject: Re: [PATCH 2/6] KVM: VMX: Add new ops in kvm_x86_ops for LASS
- violation check
-Content-Language: en-US
-To:     Binbin Wu <binbin.wu@linux.intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "Christopherson,, Sean" <seanjc@google.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        H Peter Anvin <hpa@zytor.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Cc:     "x86@kernel.org" <x86@kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Gao, Chao" <chao.gao@intel.com>
-References: <20230420133724.11398-1-guang.zeng@intel.com>
- <20230420133724.11398-3-guang.zeng@intel.com>
- <735e3259-26d4-33f1-0e59-8171d1e832e9@linux.intel.com>
-From:   Zeng Guang <guang.zeng@intel.com>
-In-Reply-To: <735e3259-26d4-33f1-0e59-8171d1e832e9@linux.intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-5.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
-        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+References: <20230424163401.23018-1-babu.moger@amd.com> <20230424163401.23018-2-babu.moger@amd.com>
+In-Reply-To: <20230424163401.23018-2-babu.moger@amd.com>
+From:   Robert Hoo <robert.hoo.linux@gmail.com>
+Date:   Tue, 25 Apr 2023 13:42:39 +0800
+Message-ID: <CA+wubQCGyXujRJvREaWX97KhT0sw8o9bf_+qa6C0gYkcbrqr9A@mail.gmail.com>
+Subject: Re: [PATCH v3 1/7] target/i386: allow versioned CPUs to specify new cache_info
+To:     Babu Moger <babu.moger@amd.com>
+Cc:     pbonzini@redhat.com, richard.henderson@linaro.org,
+        weijiang.yang@intel.com, philmd@linaro.org, dwmw@amazon.co.uk,
+        paul@xen.org, joao.m.martins@oracle.com, qemu-devel@nongnu.org,
+        mtosatti@redhat.com, kvm@vger.kernel.org, mst@redhat.com,
+        marcel.apfelbaum@gmail.com, yang.zhong@intel.com,
+        jing2.liu@intel.com, vkuznets@redhat.com, michael.roth@amd.com,
+        wei.huang2@amd.com, berrange@redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-On 4/24/2023 3:43 PM, Binbin Wu wrote:
+Babu Moger <babu.moger@amd.com> =E4=BA=8E2023=E5=B9=B44=E6=9C=8825=E6=97=A5=
+=E5=91=A8=E4=BA=8C 00:42=E5=86=99=E9=81=93=EF=BC=9A
 >
-> On 4/20/2023 9:37 PM, Zeng Guang wrote:
->> Intel introduce LASS (Linear Address Separation) feature providing
-> /s/introduce/introduces
-OK.
+> From: Michael Roth <michael.roth@amd.com>
 >
->> an independent mechanism to achieve the mode-based protection.
->>
->> LASS partitions 64-bit linear address space into two halves, user-mode
->> address (LA[bit 63]=0) and supervisor-mode address (LA[bit 63]=1). It
->> stops any code execution or data access
->>       1. from user mode to supervisor-mode address space
->>       2. from supervisor mode to user-mode address space
->> and generates LASS violation fault accordingly.
-> IMO, the description of the point 2 may be misleading that LASS stops
-> any data access from supervisor mode to user mode address space,
-> although the description following adds the conditions.
+> New EPYC CPUs versions require small changes to their cache_info's.
 
-May change to " It stops any code execution or conditional data access". 
-The condition
-is illustrated in next paragraph.
+Do you mean, for the real HW of EPYC CPU, each given model, e.g. Rome,
+has HW version updates periodically?
 
+> Because current QEMU x86 CPU definition does not support cache
+> versions,
+
+cache version --> versioned cache info
+
+> we would have to declare a new CPU type for each such case.
+
+My understanding was, for new HW CPU model, we should define a new
+vCPU model mapping it. But if answer to my above question is yes, i.e.
+new HW version of same CPU model, looks like it makes sense to some
+extent.
+
+> To avoid this duplication, the patch allows new cache_info pointers
+> to be specified for a new CPU version.
+
+"To avoid the dup work, the patch adds "cache_info" in X86CPUVersionDefinit=
+ion"
 >
->> A supervisor mode data access causes a LASS violation only if supervisor
->> mode access protection is enabled (CR4.SMAP = 1) and either RFLAGS.AC = 0
->> or the access implicitly accesses a system data structure.
->>
->> Following are the rule of LASS violation check on the linear address(LA).
-> /s/rule/rules
-OK.
->> User access to supervisor-mode address space:
->>       LA[bit 63] && (CPL == 3)
->> Supervisor access to user-mode address space:
->>       Instruction fetch: !LA[bit 63] && (CPL < 3)
->>       Data access: !LA[bit 63] && (CR4.SMAP==1) && ((RFLAGS.AC == 0 &&
->> 		 CPL < 3) || Implicit supervisor access)
->>
->> Add new ops in kvm_x86_ops to do LASS violation check.
->>
->> Signed-off-by: Zeng Guang <guang.zeng@intel.com>
->> ---
->>    arch/x86/include/asm/kvm-x86-ops.h |  1 +
->>    arch/x86/include/asm/kvm_host.h    |  5 +++
->>    arch/x86/kvm/vmx/vmx.c             | 55 ++++++++++++++++++++++++++++++
->>    arch/x86/kvm/vmx/vmx.h             |  2 ++
->>    4 files changed, 63 insertions(+)
->>
->> diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
->> index abccd51dcfca..f76c07f2674b 100644
->> --- a/arch/x86/include/asm/kvm-x86-ops.h
->> +++ b/arch/x86/include/asm/kvm-x86-ops.h
->> @@ -131,6 +131,7 @@ KVM_X86_OP(msr_filter_changed)
->>    KVM_X86_OP(complete_emulated_msr)
->>    KVM_X86_OP(vcpu_deliver_sipi_vector)
->>    KVM_X86_OP_OPTIONAL_RET0(vcpu_get_apicv_inhibit_reasons);
->> +KVM_X86_OP_OPTIONAL_RET0(check_lass);
->>    
->>    #undef KVM_X86_OP
->>    #undef KVM_X86_OP_OPTIONAL
->> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
->> index 8ff89a52ef66..31fb8699a1ff 100644
->> --- a/arch/x86/include/asm/kvm_host.h
->> +++ b/arch/x86/include/asm/kvm_host.h
->> @@ -69,6 +69,9 @@
->>    #define KVM_X86_NOTIFY_VMEXIT_VALID_BITS	(KVM_X86_NOTIFY_VMEXIT_ENABLED | \
->>    						 KVM_X86_NOTIFY_VMEXIT_USER)
->>    
->> +/* x86-specific emulation flags */
->> +#define KVM_X86_EMULFLAG_SKIP_LASS	_BITULL(1)
-> Do you use the flag outside of emulator?
-> For LAM patch, it's planned to move the flags inside emulator.
-IMO, the detailed flag is implementation specific. Is it necessary to 
-bind with emulator
-though it's only used inside emulator ?
->> +
->>    /* x86-specific vcpu->requests bit members */
->>    #define KVM_REQ_MIGRATE_TIMER		KVM_ARCH_REQ(0)
->>    #define KVM_REQ_REPORT_TPR_ACCESS	KVM_ARCH_REQ(1)
->> @@ -1706,6 +1709,8 @@ struct kvm_x86_ops {
->>    	 * Returns vCPU specific APICv inhibit reasons
->>    	 */
->>    	unsigned long (*vcpu_get_apicv_inhibit_reasons)(struct kvm_vcpu *vcpu);
->> +
->> +	bool (*check_lass)(struct kvm_vcpu *vcpu, u64 access, u64 la, u64 flags);
-> The flags may be dropped if the caller knows to skip it or not.
-Probably I don't get you right. Do you mean it need define another 
-function without flags ?
+> Co-developed-by: Wei Huang <wei.huang2@amd.com>
+> Signed-off-by: Wei Huang <wei.huang2@amd.com>
+> Signed-off-by: Michael Roth <michael.roth@amd.com>
+> Signed-off-by: Babu Moger <babu.moger@amd.com>
+> Acked-by: Michael S. Tsirkin <mst@redhat.com>
+> ---
+>  target/i386/cpu.c | 36 +++++++++++++++++++++++++++++++++---
+>  1 file changed, 33 insertions(+), 3 deletions(-)
+>
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> index 6576287e5b..e3d9eaa307 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -1598,6 +1598,7 @@ typedef struct X86CPUVersionDefinition {
+>      const char *alias;
+>      const char *note;
+>      PropValue *props;
+> +    const CPUCaches *const cache_info;
+>  } X86CPUVersionDefinition;
+>
+>  /* Base definition for a CPU model */
+> @@ -5192,6 +5193,32 @@ static void x86_cpu_apply_version_props(X86CPU *cp=
+u, X86CPUModel *model)
+>      assert(vdef->version =3D=3D version);
+>  }
+>
+> +/* Apply properties for the CPU model version specified in model */
 
->>    };
->>    
->>    struct kvm_x86_nested_ops {
->> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
->> index c923d7599d71..581327ede66a 100644
->> --- a/arch/x86/kvm/vmx/vmx.c
->> +++ b/arch/x86/kvm/vmx/vmx.c
->> @@ -8070,6 +8070,59 @@ static void vmx_vm_destroy(struct kvm *kvm)
->>    	free_pages((unsigned long)kvm_vmx->pid_table, vmx_get_pid_table_order(kvm));
->>    }
->>    
->> +/*
->> + * Determine whether an access to the linear address causes a LASS violation.
->> + * LASS protection is only effective in long mode. As a prerequisite, caller
->> + * should make sure VM
-> Should be vCPU？
-Similar meaning, I think. :)
->> running in long mode and invoke this api to do LASS
->> + * violation check.
->> + */
->> +bool __vmx_check_lass(struct kvm_vcpu *vcpu, u64 access, u64 la, u64 flags)
->> +{
->> +	bool user_mode, user_as, rflags_ac;
->> +
->> +	if (!!(flags & KVM_X86_EMULFLAG_SKIP_LASS) ||
->> +	    !kvm_is_cr4_bit_set(vcpu, X86_CR4_LASS))
->> +		return false;
->> +
->> +	WARN_ON_ONCE(!is_long_mode(vcpu));
->> +
->> +	user_as = !(la >> 63);
->> +
->> +	/*
->> +	 * An access is a supervisor-mode access if CPL < 3 or if it implicitly
->> +	 * accesses a system data structure. For implicit accesses to system
->> +	 * data structure, the processor acts as if RFLAGS.AC is clear.
->> +	 */
->> +	if (access & PFERR_IMPLICIT_ACCESS) {
->> +		user_mode = false;
->> +		rflags_ac = false;
->> +	} else {
->> +		user_mode = vmx_get_cpl(vcpu) == 3;
->> +		if (!user_mode)
->> +			rflags_ac = !!(kvm_get_rflags(vcpu) & X86_EFLAGS_AC);
->> +	}
->> +
->> +	if (user_mode != user_as) {
->> +		/*
->> +		 * Supervisor-mode _data_ accesses to user address space
->> +		 * cause LASS violations only if SMAP is enabled.
->> +		 */
->> +		if (!user_mode && !(access & PFERR_FETCH_MASK)) {
->> +			return kvm_is_cr4_bit_set(vcpu, X86_CR4_SMAP) &&
->> +			       !rflags_ac;
->> +		} else {
->> +			return true;
->> +		}
->> +	}
->> +
->> +	return false;
->> +}
->> +
->> +static bool vmx_check_lass(struct kvm_vcpu *vcpu, u64 access, u64 la, u64 flags)
->> +{
->> +	return is_long_mode(vcpu) && __vmx_check_lass(vcpu, access, la, flags);
->> +}
->> +
->>    static struct kvm_x86_ops vmx_x86_ops __initdata = {
->>    	.name = "kvm_intel",
->>    
->> @@ -8207,6 +8260,8 @@ static struct kvm_x86_ops vmx_x86_ops __initdata = {
->>    	.complete_emulated_msr = kvm_complete_insn_gp,
->>    
->>    	.vcpu_deliver_sipi_vector = kvm_vcpu_deliver_sipi_vector,
->> +
->> +	.check_lass = vmx_check_lass,
->>    };
->>    
->>    static unsigned int vmx_handle_intel_pt_intr(void)
->> diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
->> index a3da84f4ea45..6569385a5978 100644
->> --- a/arch/x86/kvm/vmx/vmx.h
->> +++ b/arch/x86/kvm/vmx/vmx.h
->> @@ -433,6 +433,8 @@ void vmx_enable_intercept_for_msr(struct kvm_vcpu *vcpu, u32 msr, int type);
->>    u64 vmx_get_l2_tsc_offset(struct kvm_vcpu *vcpu);
->>    u64 vmx_get_l2_tsc_multiplier(struct kvm_vcpu *vcpu);
->>    
->> +bool __vmx_check_lass(struct kvm_vcpu *vcpu, u64 access, u64 la, u64 flags);
->> +
->>    static inline void vmx_set_intercept_for_msr(struct kvm_vcpu *vcpu, u32 msr,
->>    					     int type, bool value)
->>    {
+I don't think this comment matches below function.
+
+> +static const CPUCaches *x86_cpu_get_version_cache_info(X86CPU *cpu,
+> +                                                       X86CPUModel *mode=
+l)
+
+Will "version" --> "versioned" be better?
+
+> +{
+> +    const X86CPUVersionDefinition *vdef;
+> +    X86CPUVersion version =3D x86_cpu_model_resolve_version(model);
+> +    const CPUCaches *cache_info =3D model->cpudef->cache_info;
+> +
+> +    if (version =3D=3D CPU_VERSION_LEGACY) {
+> +        return cache_info;
+> +    }
+> +
+> +    for (vdef =3D x86_cpu_def_get_versions(model->cpudef); vdef->version=
+; vdef++) {
+> +        if (vdef->cache_info) {
+> +            cache_info =3D vdef->cache_info;
+> +        }
+
+No need to assign "cache_info" when traverse the vdef list, but in
+below version matching block, do the assignment. Or, do you mean to
+have last valid cache info (during the traverse) returned? e.g. v2 has
+valid cache info, but v3 doesn't.
+> +
+> +        if (vdef->version =3D=3D version) {
+> +            break;
+> +        }
+> +    }
+> +
+> +    assert(vdef->version =3D=3D version);
+> +    return cache_info;
+> +}
+> +
