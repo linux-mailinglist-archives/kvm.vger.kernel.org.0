@@ -2,123 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0B9DD6EE51C
-	for <lists+kvm@lfdr.de>; Tue, 25 Apr 2023 17:58:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D10216EE55D
+	for <lists+kvm@lfdr.de>; Tue, 25 Apr 2023 18:15:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234620AbjDYP6h (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Apr 2023 11:58:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38392 "EHLO
+        id S234709AbjDYQPY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Apr 2023 12:15:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49496 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234615AbjDYP6e (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Apr 2023 11:58:34 -0400
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2040.outbound.protection.outlook.com [40.107.236.40])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9332CC17
-        for <kvm@vger.kernel.org>; Tue, 25 Apr 2023 08:58:29 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ZF7ZabL/EnEVU2HZuVf1DW8ww4yHn5mbHkrGING1sTyQTLnnrwjR0234iVYh8lDAWFAatEXRfVXz8nfCCj0005kAtD0pQkzblK7TJJcqaN0AYxFZCfJL4fX/78Z9JYN17ZQAOapo5ggrOGwt7K2UPdRYLgEylzoo5jJxYh5FZRKTl+b6hQ8YXrwlXmlpYJtDOdgRAQ7U2TvzqeIkmwbTNKF5vP8cO0T3KKo4lVLSxnCJv6Pxm1Qc1li6hH0HjXV3i6tY3nx/T2q2nJmLXq5tbZbNPg4L0KLljf1qcaB2+gWvR9z1ax/BSKSAc3EbCXI9M9msbG4v66VyjNIJMmLaXA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=clWst3b6Qmd+kqrUTHpsw/cWdyeioO+m7YXA72/XEm0=;
- b=li9xUU9q5pf+/H+HUMdai30Zcrj4lOtpAyw2gJLUgadQctl9hVQ1K9anFGsv+/nTLHH8xcYO3vd9LsAJ8HX96VJTXajb0Pd8CUeT32PJ8Y9GTVrfnaXEmn0xppIz53puZ6dIP2BSuQDa4WkCNgIX/vMe2g3oyb/bfGHaXI0cwF6xxbRGfQbzHsjNV0bzFQalgHiatf3rlyBPt4WUtqi+CfeJXhlaySyBw/9jpbkcgYRQwxc56hBwoJE8VylVDsMA6g65QgeqTttNpnSsu0jjS74qgqU1bBl7TwDXuUo1xnbIwXbEN0pXA/lazLwXM90MJ89iesPbtZ+mALwJD9dQNw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=clWst3b6Qmd+kqrUTHpsw/cWdyeioO+m7YXA72/XEm0=;
- b=JFbv0iVCtgjt2PV3pTVTr7FpZJTFYYfJc2O6jRln0XkBs/bJQIXhZcsBeEIumvoWk1G9Q7E++HVjOK86UpuNN+6auL6av4TfYbPDLFUK1Z9Z+TBwi/+PNcyBIo+fKjWAtkrDwIJLdYm87k20G3I2Dm66YkS4wRG5UOWPWtV767E7G/Fwu3Hwj4whPtZNdT0JAI58Fv+1umr1HFIPPkB450bKHpY7PiO2l8xkDBD7LAxnxsXFtumoiJCIBdZ5F2ItbsZ0dGVJoOxkJCYbUryr+Sec9f3pUtI93aBDGDuhPv5R0TXMlyLWQfG2gS5teaDdJPV3dXg6PaEpJ35NuRdy1g==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by CY8PR12MB7610.namprd12.prod.outlook.com (2603:10b6:930:9a::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6319.34; Tue, 25 Apr
- 2023 15:58:27 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::f7a7:a561:87e9:5fab]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::f7a7:a561:87e9:5fab%5]) with mapi id 15.20.6319.033; Tue, 25 Apr 2023
- 15:58:27 +0000
-Date:   Tue, 25 Apr 2023 12:58:25 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Robin Murphy <robin.murphy@arm.com>,
-        Eric Auger <eric.auger@redhat.com>
-Cc:     Nicolin Chen <nicolinc@nvidia.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "iommu@lists.linux.dev" <iommu@lists.linux.dev>
-Subject: Re: RMRR device on non-Intel platform
-Message-ID: <ZEf4oef6gMevtl7w@nvidia.com>
-References: <6cce1c5d-ab50-41c4-6e62-661bc369d860@arm.com>
- <20230420084906.2e4cce42.alex.williamson@redhat.com>
- <fd324213-8d77-cb67-1c52-01cd0997a92c@arm.com>
- <20230420154933.1a79de4e.alex.williamson@redhat.com>
- <ZEJ73s/2M4Rd5r/X@nvidia.com>
- <0aa4a107-57d0-6e5b-46e5-86dbe5b3087f@arm.com>
- <ZEKFdJ6yXoyFiHY+@nvidia.com>
- <fe7e20e5-9729-248d-ee03-c8b444a1b7c0@arm.com>
- <ZELOqZliiwbG6l5K@nvidia.com>
- <a2616348-3517-27a7-17a0-6628b56f6fad@arm.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a2616348-3517-27a7-17a0-6628b56f6fad@arm.com>
-X-ClientProxiedBy: YT4PR01CA0420.CANPRD01.PROD.OUTLOOK.COM
- (2603:10b6:b01:10b::17) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+        with ESMTP id S234600AbjDYQPV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Apr 2023 12:15:21 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDBE39022
+        for <kvm@vger.kernel.org>; Tue, 25 Apr 2023 09:15:19 -0700 (PDT)
+Received: from pps.filterd (m0353726.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 33PG6d3F001536;
+        Tue, 25 Apr 2023 16:15:07 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=iPnXMUGXzuE0v9jyI8knFHGdGucZ8mfX7dSbi3Jl8Mc=;
+ b=WR3AEq7pDc2d1TbtDDExEWLo07wrTiOAoK7/jy3/sUHyg0lkARBWYpbt6OHpS8IrcL/a
+ BYkw6+pqAVhLkDNa7DI8Br6CDp6cb60O1LLVbd0+8/X4VMiwdC2PwobuDuEQ8e0T2V5Q
+ mK2rAe08O47t4bNFdm1ZEmLr9cs7Vg7J3eCqNv1vm4T/p2MHwO+lPlAAUMfargtQhrtG
+ I7bIIspxpTODCbIsRz3GlA0LeK338kr36cjtqnYcAVWrZRJzwFqj1R5eKD6zvwhM5RJp
+ C/4hXQhay5wfiwz0Mw9eYi065pylaisFxEshc4jlJ/b4XBvO3Cuia/UFEmxcIP4pQ+VG 0w== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3q6hpa9gyx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 25 Apr 2023 16:15:06 +0000
+Received: from m0353726.ppops.net (m0353726.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 33PG6w4c002677;
+        Tue, 25 Apr 2023 16:15:06 GMT
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3q6hpa9gvg-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 25 Apr 2023 16:15:06 +0000
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 33P4dF7P012831;
+        Tue, 25 Apr 2023 16:15:03 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+        by ppma06ams.nl.ibm.com (PPS) with ESMTPS id 3q46ug1uvu-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 25 Apr 2023 16:15:02 +0000
+Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
+        by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 33PGEv9O22938230
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 25 Apr 2023 16:14:57 GMT
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 0C6F820077;
+        Tue, 25 Apr 2023 16:14:57 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 4C73A20071;
+        Tue, 25 Apr 2023 16:14:56 +0000 (GMT)
+Received: from li-c6ac47cc-293c-11b2-a85c-d421c8e4747b.ibm.com (unknown [9.152.222.242])
+        by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Tue, 25 Apr 2023 16:14:56 +0000 (GMT)
+From:   Pierre Morel <pmorel@linux.ibm.com>
+To:     qemu-s390x@nongnu.org
+Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
+        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
+        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
+        kvm@vger.kernel.org, ehabkost@redhat.com,
+        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
+        seiden@linux.ibm.com, nrb@linux.ibm.com, nsg@linux.ibm.com,
+        frankja@linux.ibm.com, berrange@redhat.com, clg@kaod.org
+Subject: [PATCH v20 00/21] s390x: CPU Topology
+Date:   Tue, 25 Apr 2023 18:14:35 +0200
+Message-Id: <20230425161456.21031-1-pmorel@linux.ibm.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|CY8PR12MB7610:EE_
-X-MS-Office365-Filtering-Correlation-Id: f4080f44-a9d0-4935-d0da-08db45a5e856
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 7ggGPvvlbGglHb/ij7ECL39eRLVU74uO+MqCu6uduSVmV5/Hvy7Wr/m/VMEymI98MLksZ1uiGBkuLo4XUPS+ME5je6JY5h8SKZg6zJBuJEWL1+7dIcQnuq5SDdyN5VmlEJh/0cGCywS6rscxMZ5l3I85i04z/1uNVN2izdcMuwpWxJ5ifrkjowan83F7MYQtP14AIJcmkvb1Rp5Z9hmLnAU9xDp1i1u0sBO84X9FRQdW+EZHowso90FIX9AQngiffsWm1hBGcug2seXhLjL0X6lzJ3PLB6QRkYeiy1pBgv4Fx29+/LYlEMOo1AOfAshPOfQyA2i2hzy3cIaXgyK/r4y1FYr1eRThdW6lxVQGxjMFjD2o5L7uOH9OTjrjgJ+mIXp5fb8z9IyC0m6A9BN53ZW16fdf2FImwPkbFzlQQzt2EBypBAZ3OGq9LinCu9nMHLLoDJTlKNKm6z8PEOlGdwCWLcIlWqh/EWb1wnBIBevtZirR4wxg5lRrNbcBbWLNv9FCeoFjf8jRZWb4n2jb622DGAa90oXzUNepSlJYZa3op0suJuz2gu74FHwKXVPu
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(346002)(136003)(376002)(366004)(396003)(39860400002)(451199021)(83380400001)(478600001)(6486002)(110136005)(2616005)(6512007)(54906003)(26005)(6506007)(186003)(53546011)(5660300002)(36756003)(38100700002)(66946007)(66556008)(4326008)(66476007)(41300700001)(86362001)(2906002)(8936002)(316002)(8676002)(66899021);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?C+PG6eV+LFJWEXRhlwXxUOPxJ0Te+NZo5Xc4DquDXyXq82MZzfqRXiqesesz?=
- =?us-ascii?Q?2sYf2cjo6QqBZxTGV2O55491QlGXUEHtwgagEhIT+9ff6MVAsN6tXDLctnUL?=
- =?us-ascii?Q?ACCZNKyrHTF/WslxMGXiDQmtp3BnNFY0RWjSxLdpK9xYe9kL+HCUSTkrKEL7?=
- =?us-ascii?Q?B1mqXXdTh9+eM5pdfdF7i47AsBsXUv9CV3PRNN1FdyZqbSBnb0TAlgDMiaJ3?=
- =?us-ascii?Q?NaggDsbZdZyJy05ptJ3UPh0koZEN7tMOMYGj7G1c/lIVHMqK/DWJWkmsxDl6?=
- =?us-ascii?Q?UMogDgd11wopGVLx6G/OQP/66yZ7P1gdLOueIU50owOzmItHw+JmpS+CxI0w?=
- =?us-ascii?Q?tAVP8StijvI0NM6a1uVGieuW572IW9ByHsQmbynodcOKaEdz13s1yzf/elDn?=
- =?us-ascii?Q?OKYbB8My0njzsaLp7J8c+DCxLfmVdhChGEXeB1IuCqqRTjiqZhe3D3HYdK7y?=
- =?us-ascii?Q?tw5vrhOD6O5gFzd7AvfgDkouKqy06x7GXnMX7RwJ1DHb0V46BMIVRsbb0qM8?=
- =?us-ascii?Q?nMFz1lmYaWmMA6E8zpTtwAFKtuFrAN7ZoAZR0aw2NaNtOih7KncCbW8YwedM?=
- =?us-ascii?Q?oDffJsIB1lqkqbpCppA3ACFssgSAp+mtDJV+dLu5UknPDnIbenKWIa93aocr?=
- =?us-ascii?Q?KSTUTEyPyhSSFkULkvTfet9rgUAdHk9BGxnLNpLWb64k2Cxx0X19VgR3JZL5?=
- =?us-ascii?Q?ccQGTwKaschfKa1ToMuK8FaC/uBR7ULbO3QjNmpLFlaFRu0H9ak2cO5YeFjm?=
- =?us-ascii?Q?4xRZGrjD6KlJGdMeNY4UGOP2PhvCiblnD3FX1UYVC05irGkCDG3MfpfcQn3q?=
- =?us-ascii?Q?zoFFBMkekg2Okjj4ADWG4KfM/csdBM9t+6FTdMbMAzBRubK6SJmMY7iqdrjR?=
- =?us-ascii?Q?XZN+F/VsXr4NeAv2jqVLYEtMvJTwXpAuXJQpMmoOoL+SZEMNs8zAxHZyDGzE?=
- =?us-ascii?Q?jXnDuVxsuQ04bwOi6s5h+vyka7XkUWuvp9205HaH936cbJpdXf+27sAC4vhH?=
- =?us-ascii?Q?9FUyau0WN0szKjtMB9CUO2eFghkm9Peq9ZzCVhMHtvQYjMWARkhA2Fd5VWjX?=
- =?us-ascii?Q?q+V5c4YICaS0WInY/e78uu5m25I0syTr7zu3EE/R6MSSi21jnoGpxoYpHItN?=
- =?us-ascii?Q?+Yzn7NTDbbNgm5BEceSYuhr97WlPjXZj8SISoL2rraxk8axoHbUNu0reYNoL?=
- =?us-ascii?Q?bPywWspEqYMoA9WxalAievPnWVBplDpEF+xywGcsPqnVNOYhJz9xQ9waJCnn?=
- =?us-ascii?Q?Hi3TJyHZl+XWFlXe2hyYeWP+uCdSnhvJYpFlPH4JVNqrvviWLP8f+bAyL9Di?=
- =?us-ascii?Q?du4PQEaMSn9GXkBQr8H7AEEzXJC7KwktA07Y5w65jVawI9p2qI7YmHJISbSl?=
- =?us-ascii?Q?Q1OioWzNyw0OStnu/XyL4A4PwEV44PHH9cAg3hd6Nlg0deyOqEwZVjMg1QzA?=
- =?us-ascii?Q?C2AIJnCxmdp0iW+khiLgGdWkqjshsFT9zzFDKviWAQ1YPHdvNLIg7Z9Ddald?=
- =?us-ascii?Q?v/VAZlUYcyBb32lSHgZ19AALYzbvBCmnzW23ROtXq13thlHo90p+obvCznN+?=
- =?us-ascii?Q?SEk8bzfsWFplQXJi8aEzX7Qyi3VqumrXYNZT3Hsf?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f4080f44-a9d0-4935-d0da-08db45a5e856
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Apr 2023 15:58:27.4967
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: b3TzxEmf2il1iYOnSCDRMrnpk0hFPuAtBn+2isC9s444Av9Pv5VS9waU7N8708Xb
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB7610
-X-Spam-Status: No, score=-1.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: Cc0S87C5zj9-6StZls7v7q_BDPnS5C_z
+X-Proofpoint-ORIG-GUID: c-KmvHiuJXy4__TBIbfbculkBH3AYbq9
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
+ definitions=2023-04-25_07,2023-04-25_01,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 adultscore=0
+ malwarescore=0 bulkscore=0 mlxlogscore=999 spamscore=0 clxscore=1015
+ impostorscore=0 phishscore=0 suspectscore=0 lowpriorityscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2303200000 definitions=main-2304250144
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
         version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -126,74 +92,451 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Apr 25, 2023 at 03:48:11PM +0100, Robin Murphy wrote:
-> On 2023-04-21 18:58, Jason Gunthorpe wrote:
-> > On Fri, Apr 21, 2023 at 06:22:37PM +0100, Robin Murphy wrote:
-> > 
-> > > I think a slightly more considered and slightly less wrong version of that
-> > > idea is to mark it as IOMMU_RESV_MSI, and special-case direct-mapping those
-> > > on Arm (I believe it would technically be benign to do on x86 too, but might
-> > > annoy people with its pointlessness). However...
-> > 
-> > I'd rather have a IOMMU_RESV_MSI_DIRECT and put the ARM special case
-> > in ARM code..
-> 
-> Maybe, but it's still actually broken either way, because how do you get
-> that type into the VM? Firmware can't encode that a particular RMR
-> represents the special magic hack for IOMMUFD, so now the SMMU driver needs
-> to somehow be aware when it's running in a VM offering nested translation
-> and do some more magic to inject the appropriate region, and it's all
-> just... no.
+Hi,
 
-Er, I figured ARM had sorted this out somehow :(
+What is new:
 
-Eric, do you know anything about this? Where did you setup the 1:1 map
-in the VM in your series?
+- Entitlement is now an enum and the default is "auto"
 
-So you are saying, the basic problem statement, is that the ACPI table
-that describes the ITS direct mapping in the VM is supposed to be
-interpreted by the SMMU driver as "memory must be iommu mapped 1:1 at
-all times and is possibly dangerous enough to block userspace access
-to the device, like Intel does" ?
+Implementation discussions
+==========================
 
-This isn't end of the world bad, it just means that VFIO will not work
-in ARM guests under this interrupt model. Sad, and something to fix,
-but we can still cover alot of ground..
+CPU models
+----------
 
-Maybe a GICv5 can correct it..
+Since the facility 11, S390_FEAT_CONFIGURATION_TOPOLOGY is already
+in the CPU model for old QEMU we could not activate it as usual from
+KVM but needed a KVM capability: KVM_CAP_S390_CPU_TOPOLOGY.
+Checking and enabling this capability enables facility 11,
+S390_FEAT_CONFIGURATION_TOPOLOGY.
 
-> > Frankly, I think something whent wrong with the GICv4 design. A purely
-> > virtualization focused GIC should not have continued to rely on the
-> > hypervisor trapping of the MSI-X writes. The guest should have had a
-> > real data value and a real physical ITS page.
-> 
-> ...I believe the remaining missing part is a UAPI for the VMM to ask the
-> host kernel to configure a "physical" vLPI for a given device and EventID,
-> at the point when its vITS emulation is handling the guest's configuration
-> command. With that we would no longer have to rewrite the MSI payload
-> either, so can avoid trapping the device's MSI-X capability at all, and the
-> VM could actually have non-terrible interrupt performance.
+It is the responsibility of the admin to ensure the same CPU
+model for source and target host in a migration.
 
-Yes.. More broadly I think we'd need to allow the vGIC code to
-understand that it has complete control over a SID, and like we are
-talking about for SMMU a vSID mapping as well.
+Migration
+---------
 
-This would have to replace the eventfd based hookup we have now.
+When the target guest is started, the Multi-processor Topology Change
+Report (MTCR) bit is set during the creation of the vCPU by KVM.
+We do not need to migrate its state, in the worst case, the target
+guest will see the MTCR and actualize its view of the topology
+without necessity, but this will be done only one time.
 
-I really want to avoid opening this can of worms because it is
-basically iommufd all over again just irq focused :(
+Reset
+-----
 
-> Except GCC says __builtin_ctzl(0) is undefined, so although I'd concur that
-> the chances of nasal demons at the point of invoking __ffs() are
-> realistically quite low, I don't fancy arguing that with the static checker
-> brigade. So by the time we've appeased them with additional checks,
-> initialisations, etc., we'd have basically the same overhead as running 0
-> iterations of another for loop (the overwhelmingly common case anyway), but
-> in more lines of code, with a more convoluted flow. All of which leads me to
-> conclude that "number of times we walk a usually-empty list in a one-off
-> slow path" is not in fact the most worthwhile thing to optimise for ;)
+Reseting the topology is done during subsystem reset, the
+polarization is reset to horizontal polarization.
 
-Heh, well fair enough, we do have a UBSAN that might trip on this. Lu
-can correct it
+Topology attributes
+-------------------
 
-Jason
+The topology attributes are carried by the CPU object and defined
+on object creation.
+In the case the new attributes, socket, book, drawer, dedicated,
+entitlement are not provided QEMU provides defaults values.
+
+- Geometry defaults
+  The geometry default are based on the core-id of the core to 
+  fill the geometry in a monotone way starting with drawer 0,
+  book 0, and filling socket 0 with the number of cores per socket,
+  then filling socket 1, socket 2 ... etc until the book is complete
+  and all books until the first drawer is complete before starting with
+  the next drawer.
+
+  This allows to keep existing start scripts and Libvirt existing
+  interface until it is extended.
+
+- Modifiers defaults
+  Default entitlement is medium
+  Default dedication is not dedicated.
+
+- Machine polarization default to horizontal
+
+Dynamic topology modification
+-----------------------------
+
+QAPI interface is extended with:
+- a command: 'set-cpu-topology'
+- a query: 'query-cpu-polarization'
+- a query: extension of qmp 'query-cpus-fast'
+- a query: extension of hmp 'hotpluggable-cpus'
+- an event: 'CPU_POLARITY_CHANGE'
+
+New command and interface are specified as unstable.
+
+The admin may use query-cpus-fast to verify the topology provided
+to the guest and set-cpu-topology to modify it.
+
+The event CPU_POLARITY_CHANGE is sent when the guest successfuly 
+uses the PTF(2) instruction to request a polarization change.
+In that case, the admin is supposed to modify the CPU provisioning
+accordingly.
+
+Testing
+=======
+
+To use the QEMU patches, you will need Linux V6-rc1 or newer,
+or use the following Linux mainline patches:
+
+f5ecfee94493 2022-07-20 KVM: s390: resetting the Topology-Change-Report    
+24fe0195bc19 2022-07-20 KVM: s390: guest support for topology function     
+0130337ec45b 2022-07-20 KVM: s390: Cleanup ipte lock access and SIIF fac.. 
+
+Currently this code is for KVM only, I have no idea if it is interesting
+to provide a TCG patch. If ever it will be done in another series.
+
+This series provide 12 avocado tests using Fedora-35 kernel and initrd
+image.
+
+Documentation
+=============
+
+To have a better understanding of the S390x CPU Topology and its
+implementation in QEMU you can have a look at the documentation in the
+last patch of this series.
+
+The admin will want to match the host and the guest topology, taking
+into account that the guest does not recognize multithreading.
+Consequently, two vCPU assigned to threads of the same real CPU should
+preferably be assigned to the same socket of the guest machine.
+
+
+Regards,
+Pierre
+
+Pierre Morel (21):
+  s390x/cpu topology: add s390 specifics to CPU topology
+  s390x/cpu topology: add topology entries on CPU hotplug
+  target/s390x/cpu topology: handle STSI(15) and build the SYSIB
+  s390x/sclp: reporting the maximum nested topology entries
+  s390x/cpu topology: resetting the Topology-Change-Report
+  s390x/cpu topology: interception of PTF instruction
+  target/s390x/cpu topology: activate CPU topology
+  qapi/s390x/cpu topology: set-cpu-topology qmp command
+  machine: adding s390 topology to query-cpu-fast
+  machine: adding s390 topology to info hotpluggable-cpus
+  qapi/s390x/cpu topology: CPU_POLARIZATION_CHANGE qapi event
+  qapi/s390x/cpu topology: query-cpu-polarization qmp command
+  docs/s390x/cpu topology: document s390x cpu topology
+  tests/avocado: s390x cpu topology core
+  tests/avocado: s390x cpu topology polarisation
+  tests/avocado: s390x cpu topology entitlement tests
+  tests/avocado: s390x cpu topology test dedicated CPU
+  tests/avocado: s390x cpu topology test socket full
+  tests/avocado: s390x cpu topology dedicated errors
+  tests/avocado: s390x cpu topology bad move
+  tests/avocado: s390x cpu topology query-cpu-polarization
+
+ MAINTAINERS                         |  10 +
+ docs/devel/index-internals.rst      |   1 +
+ docs/devel/s390-cpu-topology.rst    | 162 ++++++++++
+ docs/system/s390x/cpu-topology.rst  | 240 ++++++++++++++
+ docs/system/target-s390x.rst        |   1 +
+ qapi/machine-common.json            |  22 ++
+ qapi/machine-target.json            | 112 +++++++
+ qapi/machine.json                   |  26 +-
+ include/hw/boards.h                 |  10 +-
+ include/hw/qdev-properties-system.h |   4 +
+ include/hw/s390x/cpu-topology.h     |  80 +++++
+ include/hw/s390x/s390-virtio-ccw.h  |   6 +
+ include/hw/s390x/sclp.h             |   4 +-
+ target/s390x/cpu.h                  |  79 +++++
+ target/s390x/kvm/kvm_s390x.h        |   1 +
+ hw/core/machine-hmp-cmds.c          |   6 +
+ hw/core/machine-qmp-cmds.c          |   2 +
+ hw/core/machine-smp.c               |  53 ++-
+ hw/core/machine.c                   |   4 +
+ hw/core/qdev-properties-system.c    |  13 +
+ hw/s390x/cpu-topology.c             | 484 ++++++++++++++++++++++++++++
+ hw/s390x/s390-virtio-ccw.c          |  27 +-
+ hw/s390x/sclp.c                     |   5 +
+ softmmu/vl.c                        |   6 +
+ target/s390x/cpu-sysemu.c           |  13 +
+ target/s390x/cpu.c                  |   7 +
+ target/s390x/cpu_models.c           |   1 +
+ target/s390x/kvm/cpu_topology.c     | 308 ++++++++++++++++++
+ target/s390x/kvm/kvm.c              |  42 ++-
+ hw/s390x/meson.build                |   1 +
+ qapi/meson.build                    |   1 +
+ qemu-options.hx                     |   7 +-
+ target/s390x/kvm/meson.build        |   3 +-
+ tests/avocado/s390_topology.py      | 472 +++++++++++++++++++++++++++
+ 34 files changed, 2193 insertions(+), 20 deletions(-)
+ create mode 100644 docs/devel/s390-cpu-topology.rst
+ create mode 100644 docs/system/s390x/cpu-topology.rst
+ create mode 100644 qapi/machine-common.json
+ create mode 100644 include/hw/s390x/cpu-topology.h
+ create mode 100644 hw/s390x/cpu-topology.c
+ create mode 100644 target/s390x/kvm/cpu_topology.c
+ create mode 100644 tests/avocado/s390_topology.py
+
+-- 
+2.31.1
+
+Since v19:
+
+- use enum to specify the entitlement
+  (Nina)
+
+- Change default entitlement to "auto"
+
+- suppress skip_basis in avocado tests
+  (after comment from Cedric)
+
+- Correction of the documentation
+  (Cedric)
+
+- better code organization for s390_topology_add_core_to_socket
+  and s390_socket_nb
+  (Cedric)
+
+- Changed Copyright to respect IBM policy
+  (Nina)
+
+- set vertical_polarization back into s390_topology
+  (Nina)
+
+Since v18:
+
+- Changed default entitlement to S390_CPU_ENTITLEMENT__MAX
+  because no default can be correct.
+
+- added polarization entry to the S390CcwMachineState
+  which allow to suppress shadow entitlement
+
+- Suppress shadow entitlement
+  (Nina)
+
+- Added query-cpu-polarization
+
+- Added more avocado tests
+
+- modified cpu_hierarchy_to_string to look better
+  (Nina)
+
+Since v17:
+
+- bug correction in handling PTF
+
+- added avocado tests
+  (Thomas)
+
+- Change comments on QEMU machine to 8.1
+
+Since v16:
+
+- documentation, split, bug correction and rephrasing
+  (Nina, Thomas)
+
+- create machine-common.json
+
+- use of entitlement_shadow to keep track of the entitlement
+
+- adding drawers and books to query-hotpluggable-cpus
+
+- keep hmp interface for set-cpu-topology for a future series
+
+Since v15:
+
+- Use Enum for polarity and entitlement
+  (Nina)
+
+- move kvm_vm_enable_cap(KVM_CAP_S390_CPU_TOPOLOGY) to
+  kvm_arch_init()
+  (Thomas)
+
+- Make all CPU attributes optional for set-cpu-topology monitor
+  command
+  (Thomas, Nina)
+
+- Change use of the prefix "x-" to the use of feature unstable
+  to declare set-cpu-topology as unstable.
+  (Nina)
+
+- Make CPU_POLARITY_CHANGE even as unstable
+  (Nina)
+
+- Documentation update
+  (Thomas, Nina)
+
+Since v14:
+
+- move the ordering of TLE to just before filling the SYSIB,
+  optimize TLE ordering to be done on need only.
+  (Cedric in previous series)
+
+- remove 'query-topology' and instead extend 'query-cpus-fast'
+  (Daniel)
+
+- rename POLARITY_CHANGE to CPU_POLARITY_CHANGE
+  (Thomas)
+
+- Divers bugs correction and doc changes
+  (Thomas, Nina)
+
+- Separate topology and entitlement, simplify pft handling
+  (Nina)
+
+- add the resetting of all CPU to horizontal polarity
+  once implementing PTF interpretation
+
+Since v13:
+
+- Suppress the topology device to simplify the code
+  (Cedric)
+
+- moved reset of MTCR from device reset into subsystem
+  reset and removed previous reviewed-by from Nico and
+  Janis
+
+- No need for Migration
+
+- No need for machine dependencies
+  (Christian, Thomas)
+
+- Adding all features, drawer/book and dynamic
+  (Cedric)
+
+
+- since v12
+
+- suppress new CPU flag "disable-topology" just use ctop
+
+- no use of special fields in CCW machine or in CPU
+
+- modifications in documentation
+
+- insert documentation in tree
+  (Cedric)
+
+- moved cpu-topology.c from target/s390 to target/s390/kvm
+  to compile smoothly (without topology) for TCG
+  (Cedric)
+
+- since v11
+
+- new CPU flag "disable-topology"
+  I would have take "topology" if I was able to have
+  it false on default.
+  (Christian, Thomas)
+
+- Build the topology during the interception of the
+  STSI instruction.
+  (Cedric)
+
+- return CC3 in case the calculated SYSIB length is
+  greater than 4096.
+  (Janis)
+
+- minor corections on documentation
+
+- since v10
+
+- change machine attribute "topology-disable" to "topology"
+  (Cedric)
+- Add preliminary patch for machine properties
+  (Cedric)
+- Use next machine as 7.2
+  (Cedric / Connie)
+- Remove unecessary mutex
+  (Thomas)
+- use ENOTSUP return value for kvm_s390_topology_set_mtcr()
+  (Cedric)
+- Add explanation on container and cpu TLEs
+  (Thomas)
+- use again cpu and socket count in topology structure
+  (Cedric)
+- Suppress the S390TopoTLE structure and integrate
+  the TLE masks to the socket structure.
+  (-)
+- the STSI instruction now finds the topology from the machine
+  (Cedric)
+
+- since v9
+
+- remove books and drawers
+
+- remove thread denying and replace with a merge
+  of cores * threads to specify the CPUs available
+  to the guest
+
+- add a class option to avoid topology on older
+  machines
+  (Cedric)
+
+- Allocate a SYSIB buffer of the maximal length to
+  avoid overflow.
+  (Nico, Janis)
+
+- suppress redundancy of smp parameters in topology
+  and use directly the machine smp structure
+
+- Early check for topology support
+  (Cedric)
+
+- since v8
+
+- Linux patches are now mainline
+
+- simplification of the implementation
+  (Janis)
+
+- Migration, new machine definition
+  (Thomas)
+
+- Documentation
+
+- since v7
+
+- Coherence with the Linux patch series changes for MTCR get
+  (Pierre)
+
+- check return values during new CPU creation
+  (Thomas)
+
+- Improving codding style and argument usages
+  (Thomas)
+
+- since v6
+
+- Changes on smp args in qemu-options
+  (Daniel)
+  
+- changed comments in machine.jason
+  (Daniel)
+ 
+- Added reset
+  (Janosch)
+
+- since v5
+
+- rebasing on newer QEMU version
+
+- reworked most lines above 80 characters.
+
+- since v4
+
+- Added drawer and books to topology
+
+- Added numa topology
+
+- Added documentation
+
+- since v3
+
+- Added migration
+  (Thomas)
+
+- Separated STSI instruction from KVM to prepare TCG
+  (Thomas)
+
+- Take care of endianess to prepare TCG
+  (Thomas)
+
+- Added comments on STSI CPU container and PFT instruction
+  (Thomas)
+
+- Moved enabling the instructions as the last patch
+  (Thomas)
+
