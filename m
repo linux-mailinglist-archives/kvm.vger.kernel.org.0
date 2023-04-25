@@ -2,70 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C5DFE6EDB44
-	for <lists+kvm@lfdr.de>; Tue, 25 Apr 2023 07:42:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 22CEB6EDBA1
+	for <lists+kvm@lfdr.de>; Tue, 25 Apr 2023 08:32:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233306AbjDYFm5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Apr 2023 01:42:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55106 "EHLO
+        id S233407AbjDYGc2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Apr 2023 02:32:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45502 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231351AbjDYFm4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Apr 2023 01:42:56 -0400
-Received: from mail-qt1-x835.google.com (mail-qt1-x835.google.com [IPv6:2607:f8b0:4864:20::835])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 310D97AA8
-        for <kvm@vger.kernel.org>; Mon, 24 Apr 2023 22:42:51 -0700 (PDT)
-Received: by mail-qt1-x835.google.com with SMTP id d75a77b69052e-3ef6e8493ebso11328281cf.2
-        for <kvm@vger.kernel.org>; Mon, 24 Apr 2023 22:42:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1682401370; x=1684993370;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZqOIjUQas8Rx1/5sAHd8nDe5JfxJxpYrGJ2aW1S7/QE=;
-        b=FBq0wSQZHFhDmAXJRtxc/cteLPhGBUqYaKY4zqT63wqEVsVXk7rqp7CpgtfyIu6gSD
-         udOyk8v0wGFB+CVpkRCnnPbGB2GvhQIQHDFAsUpiRagIFEXWAyK3EmDIBnYTVqnWm1o2
-         GMQM78qvzSLYO4EdyjzmOI8lt7uEchuf6nrzBzZLjts+CfO3cHrpQCe3tKIxoHzUve9f
-         NYQHVsjLsloE70BlqCuNtEWnDdhl+iDhyaLrtFOFbYu2a1UFWPKzIyCL3uKRFq59lxF1
-         Mf6m6iiXNgXeFroxFVzWN+Q73d5hXPMX/csrrsJeBTEI5TFc+82Y1DNF21hM2ls92zAh
-         cgjQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682401370; x=1684993370;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ZqOIjUQas8Rx1/5sAHd8nDe5JfxJxpYrGJ2aW1S7/QE=;
-        b=RJ1LVC7CFVmOvM9ubd2dp6CbRVfdyTNn8SCIj3VPxJCqVlGhPhlLwGebUbohQOGRLK
-         s/RINZRUfjWJkEgDwkRC1QRRnaIuhEy67xwafXuICLPNy4FFFTVTnckczbqOAeJgPCjZ
-         a2P7H5Ijwi50eisRaZLMknlVubVbpDZD9m6QYCXViNsHJd5Dlrzb0Z+9AWM5+YBA57SO
-         +nIAEqPPVKJ0JjOGdEPNqQvMCHt/I/J7lB9IVHWe7PSc+vGGTVPiSSZuAikM5K5fRfo+
-         HcCQ2DdxmkHgctf25jjfVIZ9haxbyKzOX9/QLTw+3DYkjhOK3RYcdcIJ2zuQIjbdAkQJ
-         kOcw==
-X-Gm-Message-State: AAQBX9dWWCblUMO08C+EiWRVoZwtD8c2od1QLXp3zi+Ma0G5KpJjzzTH
-        CCcfUDedOZUqbk0UFVO6eZelC5DF5//1VsBhbDkYdlZKGUq5lA==
-X-Google-Smtp-Source: AKy350YNhM9vliZvFdaghRH04BWbcCfd9ESSD8DXYLJEnsZ7/gtC/Wrot6ju3hxldLyczOrK6tmEF0ll4WNq9TVV65w=
-X-Received: by 2002:ac8:5c8c:0:b0:3d7:960e:5387 with SMTP id
- r12-20020ac85c8c000000b003d7960e5387mr23905537qta.35.1682401370265; Mon, 24
- Apr 2023 22:42:50 -0700 (PDT)
+        with ESMTP id S232430AbjDYGc0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Apr 2023 02:32:26 -0400
+Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AED9C359C;
+        Mon, 24 Apr 2023 23:32:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1682404345; x=1713940345;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=ewRnyN7g2P6ZwWl0nhwSgtmxbilVWfDk8RAWBRdlT2Q=;
+  b=Kc3j2YYn1gvNw5DsjpKgEF0ipOqsL3oaykruyeJLZ9aYuJ5Ce4IN1AgJ
+   pqTK8/kecm6vgVyVslrt/pQ32Ha/aAejqiYN5R8EfmXw9fr60Dp6Y5E3i
+   e3jhiJtHcZq3m5b64VoAH6TCzS2KLCuWxSjB6P8PmbpXCkWX/3VPNDQSw
+   vOIqfxlxnqu5YMqZyrr27qxVi6NAgWaNcrtFE7GINVZM9uzzi2DLEQUf3
+   lj4yutx84X38XJ6GAfv02tHmMJjnJGTXviTB5eMK+CAGwD4X6UkhWFo3Z
+   pRmOLFsVU2Gt8VDeDPptyxYzF4lHOcWCtHqgLzrHoUDCf+8B75SDyjhdv
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10690"; a="345428180"
+X-IronPort-AV: E=Sophos;i="5.99,224,1677571200"; 
+   d="scan'208";a="345428180"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Apr 2023 23:32:25 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10690"; a="696055458"
+X-IronPort-AV: E=Sophos;i="5.99,224,1677571200"; 
+   d="scan'208";a="696055458"
+Received: from lkp-server01.sh.intel.com (HELO b613635ddfff) ([10.239.97.150])
+  by fmsmga007.fm.intel.com with ESMTP; 24 Apr 2023 23:32:21 -0700
+Received: from kbuild by b613635ddfff with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1prCDs-000j5u-1M;
+        Tue, 25 Apr 2023 06:32:20 +0000
+Date:   Tue, 25 Apr 2023 14:31:28 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Grzegorz Jaszczyk <jaz@semihalf.com>, linux-kernel@vger.kernel.org,
+        alex.williamson@redhat.com
+Cc:     oe-kbuild-all@lists.linux.dev, dmy@semihalf.com, tn@semihalf.com,
+        dbehr@google.com, dbehr@chromium.org, upstream@semihalf.com,
+        dtor@google.com, jgg@ziepe.ca, kevin.tian@intel.com,
+        cohuck@redhat.com, abhsahu@nvidia.com, yishaih@nvidia.com,
+        yi.l.liu@intel.com, kvm@vger.kernel.org, libvir-list@redhat.com,
+        Grzegorz Jaszczyk <jaz@semihalf.com>
+Subject: Re: [PATCH v2] vfio/pci: Propagate ACPI notifications to user-space
+ via eventfd
+Message-ID: <202304251437.hZVFw4GS-lkp@intel.com>
+References: <20230424162748.2711945-1-jaz@semihalf.com>
 MIME-Version: 1.0
-References: <20230424163401.23018-1-babu.moger@amd.com> <20230424163401.23018-2-babu.moger@amd.com>
-In-Reply-To: <20230424163401.23018-2-babu.moger@amd.com>
-From:   Robert Hoo <robert.hoo.linux@gmail.com>
-Date:   Tue, 25 Apr 2023 13:42:39 +0800
-Message-ID: <CA+wubQCGyXujRJvREaWX97KhT0sw8o9bf_+qa6C0gYkcbrqr9A@mail.gmail.com>
-Subject: Re: [PATCH v3 1/7] target/i386: allow versioned CPUs to specify new cache_info
-To:     Babu Moger <babu.moger@amd.com>
-Cc:     pbonzini@redhat.com, richard.henderson@linaro.org,
-        weijiang.yang@intel.com, philmd@linaro.org, dwmw@amazon.co.uk,
-        paul@xen.org, joao.m.martins@oracle.com, qemu-devel@nongnu.org,
-        mtosatti@redhat.com, kvm@vger.kernel.org, mst@redhat.com,
-        marcel.apfelbaum@gmail.com, yang.zhong@intel.com,
-        jing2.liu@intel.com, vkuznets@redhat.com, michael.roth@amd.com,
-        wei.huang2@amd.com, berrange@redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230424162748.2711945-1-jaz@semihalf.com>
+X-Spam-Status: No, score=-4.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -73,96 +70,54 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Babu Moger <babu.moger@amd.com> =E4=BA=8E2023=E5=B9=B44=E6=9C=8825=E6=97=A5=
-=E5=91=A8=E4=BA=8C 00:42=E5=86=99=E9=81=93=EF=BC=9A
->
-> From: Michael Roth <michael.roth@amd.com>
->
-> New EPYC CPUs versions require small changes to their cache_info's.
+Hi Grzegorz,
 
-Do you mean, for the real HW of EPYC CPU, each given model, e.g. Rome,
-has HW version updates periodically?
+kernel test robot noticed the following build warnings:
 
-> Because current QEMU x86 CPU definition does not support cache
-> versions,
+[auto build test WARNING on awilliam-vfio/for-linus]
+[also build test WARNING on linus/master v6.3 next-20230424]
+[cannot apply to awilliam-vfio/next]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-cache version --> versioned cache info
+url:    https://github.com/intel-lab-lkp/linux/commits/Grzegorz-Jaszczyk/vfio-pci-Propagate-ACPI-notifications-to-user-space-via-eventfd/20230425-002935
+base:   https://github.com/awilliam/linux-vfio.git for-linus
+patch link:    https://lore.kernel.org/r/20230424162748.2711945-1-jaz%40semihalf.com
+patch subject: [PATCH v2] vfio/pci: Propagate ACPI notifications to user-space via eventfd
+config: i386-randconfig-s001 (https://download.01.org/0day-ci/archive/20230425/202304251437.hZVFw4GS-lkp@intel.com/config)
+compiler: gcc-11 (Debian 11.3.0-8) 11.3.0
+reproduce:
+        # apt-get install sparse
+        # sparse version: v0.6.4-39-gce1a6720-dirty
+        # https://github.com/intel-lab-lkp/linux/commit/62d759059cd5e6dab70052027e1b69c5d5cdc0f2
+        git remote add linux-review https://github.com/intel-lab-lkp/linux
+        git fetch --no-tags linux-review Grzegorz-Jaszczyk/vfio-pci-Propagate-ACPI-notifications-to-user-space-via-eventfd/20230425-002935
+        git checkout 62d759059cd5e6dab70052027e1b69c5d5cdc0f2
+        # save the config file
+        mkdir build_dir && cp config build_dir/.config
+        make W=1 C=1 CF='-fdiagnostic-prefix -D__CHECK_ENDIAN__' O=build_dir ARCH=i386 olddefconfig
+        make W=1 C=1 CF='-fdiagnostic-prefix -D__CHECK_ENDIAN__' O=build_dir ARCH=i386 SHELL=/bin/bash drivers/vfio/pci/
 
-> we would have to declare a new CPU type for each such case.
+If you fix the issue, kindly add following tag where applicable
+| Reported-by: kernel test robot <lkp@intel.com>
+| Link: https://lore.kernel.org/oe-kbuild-all/202304251437.hZVFw4GS-lkp@intel.com/
 
-My understanding was, for new HW CPU model, we should define a new
-vCPU model mapping it. But if answer to my above question is yes, i.e.
-new HW version of same CPU model, looks like it makes sense to some
-extent.
+sparse warnings: (new ones prefixed by >>)
+   drivers/vfio/pci/vfio_pci_core.c:244:33: sparse: sparse: restricted pci_power_t degrades to integer
+   drivers/vfio/pci/vfio_pci_core.c:244:41: sparse: sparse: restricted pci_power_t degrades to integer
+   drivers/vfio/pci/vfio_pci_core.c:248:25: sparse: sparse: restricted pci_power_t degrades to integer
+   drivers/vfio/pci/vfio_pci_core.c:248:43: sparse: sparse: restricted pci_power_t degrades to integer
+   drivers/vfio/pci/vfio_pci_core.c:248:56: sparse: sparse: restricted pci_power_t degrades to integer
+   drivers/vfio/pci/vfio_pci_core.c:248:65: sparse: sparse: restricted pci_power_t degrades to integer
+   drivers/vfio/pci/vfio_pci_core.c:253:25: sparse: sparse: restricted pci_power_t degrades to integer
+   drivers/vfio/pci/vfio_pci_core.c:253:44: sparse: sparse: restricted pci_power_t degrades to integer
+   drivers/vfio/pci/vfio_pci_core.c:253:57: sparse: sparse: restricted pci_power_t degrades to integer
+   drivers/vfio/pci/vfio_pci_core.c:253:66: sparse: sparse: restricted pci_power_t degrades to integer
+   drivers/vfio/pci/vfio_pci_core.c:261:39: sparse: sparse: restricted pci_power_t degrades to integer
+   drivers/vfio/pci/vfio_pci_core.c:261:58: sparse: sparse: restricted pci_power_t degrades to integer
+>> drivers/vfio/pci/vfio_pci_core.c:709:6: sparse: sparse: symbol 'vfio_pci_acpi_notify_close_device' was not declared. Should it be static?
 
-> To avoid this duplication, the patch allows new cache_info pointers
-> to be specified for a new CPU version.
-
-"To avoid the dup work, the patch adds "cache_info" in X86CPUVersionDefinit=
-ion"
->
-> Co-developed-by: Wei Huang <wei.huang2@amd.com>
-> Signed-off-by: Wei Huang <wei.huang2@amd.com>
-> Signed-off-by: Michael Roth <michael.roth@amd.com>
-> Signed-off-by: Babu Moger <babu.moger@amd.com>
-> Acked-by: Michael S. Tsirkin <mst@redhat.com>
-> ---
->  target/i386/cpu.c | 36 +++++++++++++++++++++++++++++++++---
->  1 file changed, 33 insertions(+), 3 deletions(-)
->
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index 6576287e5b..e3d9eaa307 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -1598,6 +1598,7 @@ typedef struct X86CPUVersionDefinition {
->      const char *alias;
->      const char *note;
->      PropValue *props;
-> +    const CPUCaches *const cache_info;
->  } X86CPUVersionDefinition;
->
->  /* Base definition for a CPU model */
-> @@ -5192,6 +5193,32 @@ static void x86_cpu_apply_version_props(X86CPU *cp=
-u, X86CPUModel *model)
->      assert(vdef->version =3D=3D version);
->  }
->
-> +/* Apply properties for the CPU model version specified in model */
-
-I don't think this comment matches below function.
-
-> +static const CPUCaches *x86_cpu_get_version_cache_info(X86CPU *cpu,
-> +                                                       X86CPUModel *mode=
-l)
-
-Will "version" --> "versioned" be better?
-
-> +{
-> +    const X86CPUVersionDefinition *vdef;
-> +    X86CPUVersion version =3D x86_cpu_model_resolve_version(model);
-> +    const CPUCaches *cache_info =3D model->cpudef->cache_info;
-> +
-> +    if (version =3D=3D CPU_VERSION_LEGACY) {
-> +        return cache_info;
-> +    }
-> +
-> +    for (vdef =3D x86_cpu_def_get_versions(model->cpudef); vdef->version=
-; vdef++) {
-> +        if (vdef->cache_info) {
-> +            cache_info =3D vdef->cache_info;
-> +        }
-
-No need to assign "cache_info" when traverse the vdef list, but in
-below version matching block, do the assignment. Or, do you mean to
-have last valid cache info (during the traverse) returned? e.g. v2 has
-valid cache info, but v3 doesn't.
-> +
-> +        if (vdef->version =3D=3D version) {
-> +            break;
-> +        }
-> +    }
-> +
-> +    assert(vdef->version =3D=3D version);
-> +    return cache_info;
-> +}
-> +
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests
