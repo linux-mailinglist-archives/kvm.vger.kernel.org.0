@@ -2,110 +2,147 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C27506EE127
-	for <lists+kvm@lfdr.de>; Tue, 25 Apr 2023 13:39:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AB44A6EE133
+	for <lists+kvm@lfdr.de>; Tue, 25 Apr 2023 13:45:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233819AbjDYLjx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Apr 2023 07:39:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43822 "EHLO
+        id S233809AbjDYLpc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Apr 2023 07:45:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46524 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232851AbjDYLjv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Apr 2023 07:39:51 -0400
-Received: from mail-ej1-x62c.google.com (mail-ej1-x62c.google.com [IPv6:2a00:1450:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9018A468A;
-        Tue, 25 Apr 2023 04:39:50 -0700 (PDT)
-Received: by mail-ej1-x62c.google.com with SMTP id a640c23a62f3a-9505214c47fso1051246566b.1;
-        Tue, 25 Apr 2023 04:39:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1682422789; x=1685014789;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Uhlme4gt9b2fIoSYooiRDG3nPCx1SJPD3Moq8dts520=;
-        b=fbWcdU0NnREyJWMw07Co+ZsxBZbKAj1Cx9JfSqAwf3b2I48vKE9GJQXbX8wPUe4teX
-         frAT8e9R7SVXOsR2Jw++gkW+IgJZOjxKHBemFCK5GtgfkPhBzm7rTqSHUa2LRj/EmVJH
-         SnkIdWk/hQCSxGdr1Kq5L1/hU0i/kHh/d+Q/h02KMIAwSuZr5GQn2GCvNPLDRhUFdtr8
-         cKywu+/X3WHqyjnPUgNL8UzYy0WEOxe91zBQqCrabLYL2I3qTUNRW7phU8BPcgYNo0qL
-         M4wa9wkN6nA9pK3CKNqzkCQXZuMYHKS2QMCTMCvmRTDBj2GQkr0NYhEkNNFjgc+UsOkO
-         IUgQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682422789; x=1685014789;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Uhlme4gt9b2fIoSYooiRDG3nPCx1SJPD3Moq8dts520=;
-        b=V3ypEVbEejzmp/FgSll7IqtBXnYViZQVIyQKQXf4QNHC12NTaPLr357f2cI6r/mQdL
-         UFD3Otq7ND2yNqBdSZrzXBgUcZETMAmLNrmkJjp2gePaFH26cNhmu0ttbAdgxDMlIY+a
-         9JZE820ThBgfA/N5YlU/6vS5AbNtEMHA4TjWsA2a7xQkZi0xGdlVB3G2wJdMCjflGXVQ
-         82xeZm4QFQf4rM+bldx654RApB1YF7PGMhQ/lfPELJWTwiU+nXZaHqdD81MA9ST9WTFe
-         CFJnD0kHbEVgoNDr8yiTFNir2iLqFzlSy95vV+IWz0yZYIVgp7ychkrAYZW4S3MHYXkq
-         IMqw==
-X-Gm-Message-State: AAQBX9f2q9aRCb0lEKnr6slw3rTLsujW6JJ2/c4+4E+V7nfXM2NuNooj
-        sE7CDqQcgSkbhVqlDfXID2RCaKiOo6rp5g==
-X-Google-Smtp-Source: AKy350YEc8MxPrvdXklvc0+f/36x5cuiax3Yc3EXcEg6VE1CFp59poyc100VNtaRzdDsb7fpGfMt9Q==
-X-Received: by 2002:a17:906:b314:b0:94f:3521:396 with SMTP id n20-20020a170906b31400b0094f35210396mr12750769ejz.23.1682422788691;
-        Tue, 25 Apr 2023 04:39:48 -0700 (PDT)
-Received: from localhost.localdomain ([46.248.82.114])
-        by smtp.gmail.com with ESMTPSA id q27-20020a170906361b00b0094e1026bc66sm6703216ejb.140.2023.04.25.04.39.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 Apr 2023 04:39:47 -0700 (PDT)
-From:   Uros Bizjak <ubizjak@gmail.com>
-To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     Uros Bizjak <ubizjak@gmail.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        David Matlack <dmatlack@google.com>
-Subject: [PATCH] KVM: x86/mmu: Add comment on try_cmpxchg64 usage in tdp_mmu_set_spte_atomic
-Date:   Tue, 25 Apr 2023 13:39:32 +0200
-Message-Id: <20230425113932.3148-1-ubizjak@gmail.com>
-X-Mailer: git-send-email 2.40.0
+        with ESMTP id S233451AbjDYLpb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Apr 2023 07:45:31 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69EBBA24C;
+        Tue, 25 Apr 2023 04:45:21 -0700 (PDT)
+Received: from pps.filterd (m0353724.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 33PBcOQi021562;
+        Tue, 25 Apr 2023 11:45:20 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=41hE+Q6pTHrRxzQqogU5oefxPwrJsaadBudBCLe/AhI=;
+ b=bp3RzwB8GuPmqTT5z2d1+PPnU/04Kpa9xVc6EWpJNV4bseg3v7d0Oj2vvX2cUnN6KYvK
+ xblxnlcKFeED4mUMMxkEbABMQOzlIaWGujilps4oTFRe50KUhYZOLjSHULsGqCST3XIj
+ xGPHQhK2MeKdVHDCbO9rYWgByJrsq2cxLhHW/hsqpc5O1GNAQfXqRcmLLpkP6+wY3PP4
+ lKxlANC+X2tRhI2bsnHIbJ/p+QXbxRJ53WjrT+8e9kn55MjPtihMvL/9nV5hAQmEipYe
+ dhYHXq5SCulaSJWGNUnpnnvg0oOLHtt2XgjkcW1PTafVRt9cCU+1Ve1AT4dv+Z0JsnzE 0Q== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3q6dfnhhuk-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 25 Apr 2023 11:45:20 +0000
+Received: from m0353724.ppops.net (m0353724.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 33PBcSUF022135;
+        Tue, 25 Apr 2023 11:45:19 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3q6dfnhhtf-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 25 Apr 2023 11:45:19 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 33P0X0A4017663;
+        Tue, 25 Apr 2023 11:45:17 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+        by ppma03ams.nl.ibm.com (PPS) with ESMTPS id 3q47771pvq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 25 Apr 2023 11:45:17 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+        by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 33PBjERw27984150
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 25 Apr 2023 11:45:14 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 10F0C20043;
+        Tue, 25 Apr 2023 11:45:14 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C14EE20040;
+        Tue, 25 Apr 2023 11:45:13 +0000 (GMT)
+Received: from [9.152.222.242] (unknown [9.152.222.242])
+        by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+        Tue, 25 Apr 2023 11:45:13 +0000 (GMT)
+Message-ID: <bc3cf8c5-1aa9-0db3-c212-9c09554d4ab2@linux.ibm.com>
+Date:   Tue, 25 Apr 2023 13:45:13 +0200
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.8.0
+Subject: Re: [kvm-unit-tests PATCH 1/1] s390x: sclp: consider monoprocessor on
+ read_info error
+Content-Language: en-US
+To:     Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc:     linux-s390@vger.kernel.org, thuth@redhat.com, kvm@vger.kernel.org,
+        david@redhat.com, nrb@linux.ibm.com, nsg@linux.ibm.com,
+        cohuck@redhat.com
+References: <20230424174218.64145-1-pmorel@linux.ibm.com>
+ <20230424174218.64145-2-pmorel@linux.ibm.com>
+ <20230425102606.4e9bc606@p-imbrenda>
+ <5572f655-4cc8-500f-97fd-068c9f06a90b@linux.ibm.com>
+ <738a8001-a651-8e69-7985-511c28fb0485@linux.ibm.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+In-Reply-To: <738a8001-a651-8e69-7985-511c28fb0485@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: zSB2rbGKxChJctmTYOmn5OiG2Cs8M8HI
+X-Proofpoint-GUID: CWkiiBxc5FRjav33VrxuMMXbn3Uvkqbd
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
+ definitions=2023-04-25_04,2023-04-25_01,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ bulkscore=0 priorityscore=1501 phishscore=0 spamscore=0 clxscore=1015
+ impostorscore=0 malwarescore=0 mlxscore=0 suspectscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2303200000 definitions=main-2304250103
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Commit aee98a6838d5 ("KVM: x86/mmu: Use try_cmpxchg64 in
-tdp_mmu_set_spte_atomic") removed the comment that iter->old_spte is
-updated when different logical CPU modifies the page table entry.
-Although this is what try_cmpxchg does implicitly, it won't hurt
-if this fact is explicitly mentioned in a restored comment.
 
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Sean Christopherson <seanjc@google.com>
-Cc: David Matlack <dmatlack@google.com>
-Signed-off-by: Uros Bizjak <ubizjak@gmail.com>
----
- arch/x86/kvm/mmu/tdp_mmu.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+On 4/25/23 13:33, Janosch Frank wrote:
+> On 4/25/23 12:53, Pierre Morel wrote:
+>>
+>> On 4/25/23 10:26, Claudio Imbrenda wrote:
+>>> On Mon, 24 Apr 2023 19:42:18 +0200
+>>> Pierre Morel <pmorel@linux.ibm.com> wrote:
+>>>
+>
+> How is this considered to be a fix and not a workaround?
+>
+>
+> Set the variable response bit in the control mask and vary the length 
+> based on stfle 140. See __init sclp_early_read_info() in 
+> drivers/s390/char/sclp_early_core.c
 
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index 7c25dbf32ecc..5d126b015086 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.c
-+++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -655,8 +655,16 @@ static inline int tdp_mmu_set_spte_atomic(struct kvm *kvm,
- 	 * Note, fast_pf_fix_direct_spte() can also modify TDP MMU SPTEs and
- 	 * does not hold the mmu_lock.
- 	 */
--	if (!try_cmpxchg64(sptep, &iter->old_spte, new_spte))
-+	if (!try_cmpxchg64(sptep, &iter->old_spte, new_spte)) {
-+		/*
-+		 * The page table entry was modified by a different logical
-+		 * CPU. In this case the above try_cmpxchg updates
-+		 * iter->old_spte with the current value, so the caller
-+		 * operates on fresh data, e.g. if it retries
-+		 * tdp_mmu_set_spte_atomic().
-+		 */
- 		return -EBUSY;
-+	}
- 
- 	__handle_changed_spte(kvm, iter->as_id, iter->gfn, iter->old_spte,
- 			      new_spte, iter->level, true);
--- 
-2.40.0
 
+Yes it is something to do anyway.
+
+Still in case of error we will need this fix or workaround.
+
+
+>
+>
+>>>
+>>>> Fixes: 52076a63d569 ("s390x: Consolidate sclp read info")
+>>>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+>>>> ---
+>>>>    lib/s390x/sclp.c | 5 +++--
+>>>>    1 file changed, 3 insertions(+), 2 deletions(-)
+>>>>
+>>>> diff --git a/lib/s390x/sclp.c b/lib/s390x/sclp.c
+>>>> index acdc8a9..c09360d 100644
+>>>> --- a/lib/s390x/sclp.c
+>>>> +++ b/lib/s390x/sclp.c
+>>>> @@ -119,8 +119,9 @@ void sclp_read_info(void)
+>>>>       int sclp_get_cpu_num(void)
+>>>>    {
+>>>> -    assert(read_info);
+>>>> -    return read_info->entries_cpu;
+>>>> +    if (read_info)
+>>>> +        return read_info->entries_cpu;
+>>>> +    return 1;
+>>>>    }
+>>>>       CPUEntry *sclp_get_cpu_entries(void)
+>
