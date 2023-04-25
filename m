@@ -2,201 +2,284 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E087C6EDCAE
-	for <lists+kvm@lfdr.de>; Tue, 25 Apr 2023 09:33:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C35966EDD38
+	for <lists+kvm@lfdr.de>; Tue, 25 Apr 2023 09:52:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233656AbjDYHdB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Apr 2023 03:33:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44936 "EHLO
+        id S233252AbjDYHwK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Apr 2023 03:52:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57396 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233181AbjDYHc1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Apr 2023 03:32:27 -0400
-Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9CD7EC15E;
-        Tue, 25 Apr 2023 00:31:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1682407897; x=1713943897;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=y/RZvHBERPsLIxfsgLVfCS8XF5HdzYTULcEBpzqy1jo=;
-  b=Huy4ajQ3vFQLXlr6JVVjjqFFSoOZfxWFpz4uqAMJr4BWR3p3JQuOpVPx
-   VtEXB7FKobYY51kwqUYK3XAiYLL7DILqwC8G9Btl7OOtdryjZH9h1qEML
-   lE8qIeb0EKjpwTSKir4A1CaUMxke32JzyoralpN8qA9BhT6nuq4T8BT4X
-   O8rAlkGnG3uNSifP5SASexWYP9zxZhHArGmL1PGNgh1n7CxKBfn/+o+Dd
-   Hr4a2PY3m2iC2cUoJxurWsNDh5at6CUrYIW7K8z+H4USseIlWUK3px6Lf
-   yE1Q49JNuXgMciJGx/RrkNbqDbaWIYdcREULTYou+tsLUzZKTrP7yuFH0
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10690"; a="432951773"
-X-IronPort-AV: E=Sophos;i="5.99,224,1677571200"; 
-   d="scan'208";a="432951773"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Apr 2023 00:31:37 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10690"; a="670784623"
-X-IronPort-AV: E=Sophos;i="5.99,224,1677571200"; 
-   d="scan'208";a="670784623"
-Received: from zengguan-mobl1.ccr.corp.intel.com (HELO [10.238.0.183]) ([10.238.0.183])
-  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Apr 2023 00:31:34 -0700
-Message-ID: <1a66053c-8ece-8ffd-1e33-c301c53c4d45@intel.com>
-Date:   Tue, 25 Apr 2023 15:31:28 +0800
+        with ESMTP id S231189AbjDYHwJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Apr 2023 03:52:09 -0400
+Received: from out-58.mta0.migadu.com (out-58.mta0.migadu.com [IPv6:2001:41d0:1004:224b::3a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22F36128
+        for <kvm@vger.kernel.org>; Tue, 25 Apr 2023 00:52:06 -0700 (PDT)
+Date:   Tue, 25 Apr 2023 07:51:59 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1682409124;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=350TgBQILY/jaNRX4gCbyRdsDrtoFKzlurfJ1IuUeII=;
+        b=m3qg++2Tq8TSmJog+me6km0pxuTxJNGC9a5rVIWbEutjgvRF6HGPacMCkrrIVFT1de5V/G
+        Fsi3KI3g5qzBVqxnO5VzJG481eoEqASTwYHRv/WeVpn7yfJakDyjgOTanmQNztiYMmEb7p
+        OIpFuJ0TBhwM9lbNlNB453eboADI6+0=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From:   Oliver Upton <oliver.upton@linux.dev>
+To:     Jing Zhang <jingzhangos@google.com>
+Cc:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>,
+        ARMLinux <linux-arm-kernel@lists.infradead.org>,
+        Marc Zyngier <maz@kernel.org>,
+        Oliver Upton <oupton@google.com>,
+        Will Deacon <will@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Fuad Tabba <tabba@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Raghavendra Rao Ananta <rananta@google.com>
+Subject: Re: [PATCH v7 2/6] KVM: arm64: Save ID registers' sanitized value
+ per guest
+Message-ID: <ZEeGnwVxytVuZejC@linux.dev>
+References: <20230424234704.2571444-1-jingzhangos@google.com>
+ <20230424234704.2571444-3-jingzhangos@google.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Subject: Re: [PATCH 2/6] KVM: VMX: Add new ops in kvm_x86_ops for LASS
- violation check
-Content-Language: en-US
-To:     "Gao, Chao" <chao.gao@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        "Christopherson,, Sean" <seanjc@google.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        H Peter Anvin <hpa@zytor.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-References: <20230420133724.11398-1-guang.zeng@intel.com>
- <20230420133724.11398-3-guang.zeng@intel.com> <ZEdEmHFgHut2tDwf@chao-email>
-From:   Zeng Guang <guang.zeng@intel.com>
-In-Reply-To: <ZEdEmHFgHut2tDwf@chao-email>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-5.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
-        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230424234704.2571444-3-jingzhangos@google.com>
+X-Migadu-Flow: FLOW_OUT
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi Jing,
 
-On 4/25/2023 11:10 AM, Gao, Chao wrote:
-> On Thu, Apr 20, 2023 at 09:37:20PM +0800, Zeng Guang wrote:
->> +/*
->> + * Determine whether an access to the linear address causes a LASS violation.
->> + * LASS protection is only effective in long mode. As a prerequisite, caller
->> + * should make sure VM running in long mode and invoke this api to do LASS
->> + * violation check.
-> Could you place the comment above vmx_check_lass()?
->
-> And for __vmx_check_lass(), just add:
->
-> A variant of vmx_check_lass() without the check for long mode.
->
->> + */
->> +bool __vmx_check_lass(struct kvm_vcpu *vcpu, u64 access, u64 la, u64 flags)
->> +{
->> +	bool user_mode, user_as, rflags_ac;
->> +
->> +	if (!!(flags & KVM_X86_EMULFLAG_SKIP_LASS) ||
->> +	    !kvm_is_cr4_bit_set(vcpu, X86_CR4_LASS))
->> +		return false;
->> +
->> +	WARN_ON_ONCE(!is_long_mode(vcpu));
->> +
->> +	user_as = !(la >> 63);
->> +
->
->> +	/*
->> +	 * An access is a supervisor-mode access if CPL < 3 or if it implicitly
->> +	 * accesses a system data structure. For implicit accesses to system
->> +	 * data structure, the processor acts as if RFLAGS.AC is clear.
->> +	 */
->> +	if (access & PFERR_IMPLICIT_ACCESS) {
->> +		user_mode = false;
->> +		rflags_ac = false;
->> +	} else {
->> +		user_mode = vmx_get_cpl(vcpu) == 3;
->> +		if (!user_mode)
->> +			rflags_ac = !!(kvm_get_rflags(vcpu) & X86_EFLAGS_AC);
->> +	}
->> +
->> +	if (user_mode != user_as) {
-> to reduce one level of indentation, how about:
->
-> 	if (user_mode == user_as)
-> 		return false;
->
-> 	/*
-> 	 * Supervisor-mode _data_ accesses to user address space
-> 	 * cause LASS violations only if SMAP is enabled.
-> 	 */
-> 	if (!user_mode && !(access & PFERR_FETCH_MASK)) {
-> 		return kvm_is_cr4_bit_set(vcpu, X86_CR4_SMAP) && !rflags_ac;
->
-> 	return true;
->
-Looks better.
+On Mon, Apr 24, 2023 at 11:47:00PM +0000, Jing Zhang wrote:
+> Introduce id_regs[] in kvm_arch as a storage of guest's ID registers,
+> and save ID registers' sanitized value in the array at KVM_CREATE_VM.
+> Use the saved ones when ID registers are read by the guest or
+> userspace (via KVM_GET_ONE_REG).
+> 
+> No functional change intended.
+> 
+> Co-developed-by: Reiji Watanabe <reijiw@google.com>
+> Signed-off-by: Reiji Watanabe <reijiw@google.com>
+> Signed-off-by: Jing Zhang <jingzhangos@google.com>
+> ---
+>  arch/arm64/include/asm/kvm_host.h | 47 +++++++++++++++++++++++++++++
+>  arch/arm64/kvm/arm.c              |  1 +
+>  arch/arm64/kvm/id_regs.c          | 49 +++++++++++++++++++++++++------
+>  arch/arm64/kvm/sys_regs.c         |  2 +-
+>  arch/arm64/kvm/sys_regs.h         |  3 +-
+>  5 files changed, 90 insertions(+), 12 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index bcd774d74f34..2b1fe90a1790 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -177,6 +177,20 @@ struct kvm_smccc_features {
+>  	unsigned long vendor_hyp_bmap;
+>  };
+>  
+> +/*
+> + * Emualted CPU ID registers per VM
 
+typo: emulated
 
->> +		/*
->> +		 * Supervisor-mode _data_ accesses to user address space
->> +		 * cause LASS violations only if SMAP is enabled.
->> +		 */
->> +		if (!user_mode && !(access & PFERR_FETCH_MASK)) {
->> +			return kvm_is_cr4_bit_set(vcpu, X86_CR4_SMAP) &&
->> +			       !rflags_ac;
->> +		} else {
->> +			return true;
->> +		}
->> +	}
->> +
->> +	return false;
->> +}
->> +
->> +static bool vmx_check_lass(struct kvm_vcpu *vcpu, u64 access, u64 la, u64 flags)
->> +{
->> +	return is_long_mode(vcpu) && __vmx_check_lass(vcpu, access, la, flags);
-> Why not request all callers to check if vcpu is in long mode?
->
-> e.g.,
-> 	return is_long_mode(vcpu) && static_call(kvm_x86_check_lass)(...);
->
-> then you can rename __vmx_check_lass() to vmx_check_lass() and drop the
-> original one.
-By design, __vmx_check_lass() is standalone to be used for checking LASS
-violation only. In some cases, cpu mode is already identified prior to 
-performing
-LASS protection. please refer to patch 4. So we provide two interfaces,
-vmx_check_lass() with cpu mode check wrapped for other modules usage, e.g.
-kvm emulator and __vmx_check_lass() dedicated for VMX.
+> + * (Op0, Op1, CRn, CRm, Op2) of the ID registers to be saved in it
+> + * is (3, 0, 0, crm, op2), where 1<=crm<8, 0<=op2<8.
+> + *
+> + * These emulated idregs are VM-wide, but accessed from the context of a vCPU.
+> + * Access to id regs are guarded by kvm_arch.config_lock.
+> + */
+> +#define KVM_ARM_ID_REG_NUM	56
+> +#define IDREG_IDX(id)		(((sys_reg_CRm(id) - 1) << 3) | sys_reg_Op2(id))
+> +struct kvm_idregs {
+> +	u64 regs[KVM_ARM_ID_REG_NUM];
+> +};
 
-I would check the feasibility to re-organize code to be more optimal.
+What is the purpose of declaring the register array as a separate
+structure? It has no meaning (nor use) outside of the context of a VM.
 
-Thanks.
->> +}
->> +
->> static struct kvm_x86_ops vmx_x86_ops __initdata = {
->> 	.name = "kvm_intel",
->>
->> @@ -8207,6 +8260,8 @@ static struct kvm_x86_ops vmx_x86_ops __initdata = {
->> 	.complete_emulated_msr = kvm_complete_insn_gp,
->>
->> 	.vcpu_deliver_sipi_vector = kvm_vcpu_deliver_sipi_vector,
->> +
->> +	.check_lass = vmx_check_lass,
->> };
->>
->> static unsigned int vmx_handle_intel_pt_intr(void)
->> diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
->> index a3da84f4ea45..6569385a5978 100644
->> --- a/arch/x86/kvm/vmx/vmx.h
->> +++ b/arch/x86/kvm/vmx/vmx.h
->> @@ -433,6 +433,8 @@ void vmx_enable_intercept_for_msr(struct kvm_vcpu *vcpu, u32 msr, int type);
->> u64 vmx_get_l2_tsc_offset(struct kvm_vcpu *vcpu);
->> u64 vmx_get_l2_tsc_multiplier(struct kvm_vcpu *vcpu);
->>
->> +bool __vmx_check_lass(struct kvm_vcpu *vcpu, u64 access, u64 la, u64 flags);
->> +
-> no one uses this function. You can defer exporting it to when the first
-> external caller is added.
->
->> static inline void vmx_set_intercept_for_msr(struct kvm_vcpu *vcpu, u32 msr,
->> 					     int type, bool value)
->> {
->> -- 
->> 2.27.0
->>
+I'd prefer the 'regs' array be embedded directly in kvm_arch, and just
+name it 'idregs'. You can move your macro definitions there as well to
+immediately precede the field.
+
+>  typedef unsigned int pkvm_handle_t;
+>  
+>  struct kvm_protected_vm {
+> @@ -243,6 +257,9 @@ struct kvm_arch {
+>  	/* Hypercall features firmware registers' descriptor */
+>  	struct kvm_smccc_features smccc_feat;
+>  
+> +	/* Emulated CPU ID registers */
+> +	struct kvm_idregs idregs;
+> +
+>  	/*
+>  	 * For an untrusted host VM, 'pkvm.handle' is used to lookup
+>  	 * the associated pKVM instance in the hypervisor.
+> @@ -1008,6 +1025,8 @@ int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
+>  long kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
+>  				struct kvm_arm_copy_mte_tags *copy_tags);
+>  
+> +void kvm_arm_init_id_regs(struct kvm *kvm);
+> +
+>  /* Guest/host FPSIMD coordination helpers */
+>  int kvm_arch_vcpu_run_map_fp(struct kvm_vcpu *vcpu);
+>  void kvm_arch_vcpu_load_fp(struct kvm_vcpu *vcpu);
+> @@ -1073,4 +1092,32 @@ static inline void kvm_hyp_reserve(void) { }
+>  void kvm_arm_vcpu_power_off(struct kvm_vcpu *vcpu);
+>  bool kvm_arm_vcpu_stopped(struct kvm_vcpu *vcpu);
+>  
+> +static inline u64 _idreg_read(struct kvm_arch *arch, u32 id)
+
+<bikeshed>
+
+Personally, I find passing 'kvm_arch' around to be a bit clunky. Almost
+all functions in KVM take 'struct kvm' as an argument, even if it only
+accesses the data in 'kvm_arch'.
+
+So, I'd prefer if all these helpers took 'struct kvm *'.
+
+</bikeshed>
+
+> +{
+> +	return arch->idregs.regs[IDREG_IDX(id)];
+> +}
+> +
+> +static inline void _idreg_write(struct kvm_arch *arch, u32 id, u64 val)
+> +{
+> +	arch->idregs.regs[IDREG_IDX(id)] = val;
+> +}
+> +
+> +static inline u64 idreg_read(struct kvm_arch *arch, u32 id)
+> +{
+> +	u64 val;
+> +
+> +	mutex_lock(&arch->config_lock);
+> +	val = _idreg_read(arch, id);
+> +	mutex_unlock(&arch->config_lock);
+
+What exactly are we protecting against by taking the config_lock here?
+
+While I do believe there is value in serializing writers to the shared
+data, there isn't a need to serialize reads from the guest.
+
+What about implementing the following:
+
+ - Acquire the config_lock for handling writes. Only allow the value to
+   change if !kvm_vm_has_ran_once(). Otherwise, permit identical writes
+   (useful for hotplug, I imagine) or return EBUSY if userspace tried to
+   change something after running the VM.
+
+ - Acquire the config_lock for handling reads *from userspace*
+
+ - Handle reads from the guest with a plain old load, avoiding the need
+   to acquire any locks.
+
+This has the benefit of avoiding lock contention for guest reads w/o
+requiring the use of atomic loads/stores (i.e. {READ,WRITE}_ONCE()) to
+protect said readers.
+
+> +	return val;
+> +}
+> +
+> +static inline void idreg_write(struct kvm_arch *arch, u32 id, u64 val)
+> +{
+> +	mutex_lock(&arch->config_lock);
+> +	_idreg_write(arch, id, val);
+> +	mutex_unlock(&arch->config_lock);
+> +}
+> +
+>  #endif /* __ARM64_KVM_HOST_H__ */
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 4b2e16e696a8..e34744c36406 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -153,6 +153,7 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+>  
+>  	set_default_spectre(kvm);
+>  	kvm_arm_init_hypercalls(kvm);
+> +	kvm_arm_init_id_regs(kvm);
+>  
+>  	/*
+>  	 * Initialise the default PMUver before there is a chance to
+> diff --git a/arch/arm64/kvm/id_regs.c b/arch/arm64/kvm/id_regs.c
+> index 96b4c43a5100..d2fba2fde01c 100644
+> --- a/arch/arm64/kvm/id_regs.c
+> +++ b/arch/arm64/kvm/id_regs.c
+> @@ -52,16 +52,9 @@ static u8 pmuver_to_perfmon(u8 pmuver)
+>  	}
+>  }
+>  
+> -/* Read a sanitised cpufeature ID register by sys_reg_desc */
+> -static u64 read_id_reg(const struct kvm_vcpu *vcpu, struct sys_reg_desc const *r)
+> +u64 kvm_arm_read_id_reg(const struct kvm_vcpu *vcpu, u32 id)
+>  {
+> -	u32 id = reg_to_encoding(r);
+> -	u64 val;
+> -
+> -	if (sysreg_visible_as_raz(vcpu, r))
+> -		return 0;
+> -
+> -	val = read_sanitised_ftr_reg(id);
+> +	u64 val = idreg_read(&vcpu->kvm->arch, id);
+>  
+>  	switch (id) {
+>  	case SYS_ID_AA64PFR0_EL1:
+> @@ -126,6 +119,14 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu, struct sys_reg_desc const *r
+>  	return val;
+>  }
+>  
+> +static u64 read_id_reg(const struct kvm_vcpu *vcpu, struct sys_reg_desc const *r)
+> +{
+> +	if (sysreg_visible_as_raz(vcpu, r))
+> +		return 0;
+> +
+> +	return kvm_arm_read_id_reg(vcpu, reg_to_encoding(r));
+> +}
+> +
+>  /* cpufeature ID register access trap handlers */
+>  
+>  static bool access_id_reg(struct kvm_vcpu *vcpu,
+> @@ -458,3 +459,33 @@ int emulate_id_reg(struct kvm_vcpu *vcpu, struct sys_reg_params *params)
+>  
+>  	return 1;
+>  }
+> +
+> +/*
+> + * Set the guest's ID registers that are defined in id_reg_descs[]
+> + * with ID_SANITISED() to the host's sanitized value.
+> + */
+> +void kvm_arm_init_id_regs(struct kvm *kvm)
+> +{
+> +	int i;
+> +	u32 id;
+> +	u64 val;
+
+nit: use reverse christmas/fir tree ordering for locals.
+
+> +	for (i = 0; i < ARRAY_SIZE(id_reg_descs); i++) {
+> +		id = reg_to_encoding(&id_reg_descs[i]);
+> +		if (WARN_ON_ONCE(!is_id_reg(id)))
+> +			/* Shouldn't happen */
+> +			continue;
+
+I'll make the suggestion once more.
+
+Please do not implement these sort of sanity checks on static data
+structures at the point userspace has gotten involved. Sanity checking
+on id_reg_descs[] should happen at the time KVM is initialized. If
+anything is wrong at that point we should return an error and outright
+refuse to run KVM.
+
+-- 
+Thanks,
+Oliver
