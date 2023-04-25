@@ -2,257 +2,242 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 44D146EE427
-	for <lists+kvm@lfdr.de>; Tue, 25 Apr 2023 16:46:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E13AC6EE439
+	for <lists+kvm@lfdr.de>; Tue, 25 Apr 2023 16:48:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234344AbjDYOq3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Apr 2023 10:46:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55614 "EHLO
+        id S234220AbjDYOs3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Apr 2023 10:48:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58066 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233842AbjDYOq1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Apr 2023 10:46:27 -0400
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2060.outbound.protection.outlook.com [40.107.220.60])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31ABA3A87;
-        Tue, 25 Apr 2023 07:46:23 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=FndvxulKoGqrhdNMlvSFjp5PQOfdyNgXbVwm8jxhyQGq1TmUMYgK5qmEzLAw/gZ6u0RihnkZezuzDUiARcHUbSs1aGI/D2Fz7/rbVjeyqiBBGDYNZct7ZBC6ihxKmKu0oalYBvRGQm5BcLLeY4Bd09a2a6LoGDqNoMDUfEye/MBa+nABY4DHASVTJg/EpLKi1IiP72skYPUiOENZYDUylupaT0fHQ3zWtDl4Tjd4zU5hLY4T2CPWCN593WnznyfQA/TxTTQjjaJWOLqnvlNlED4/hVCfxVf/rd9L1NT2iFKXWoGIzIoavLvoVUU5lNF0NGbWXzmR3IysH8bAEiFcVA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=UX5z0Fad3Met5akmfjPp3Zvut3tZRC9Pj/xj0VBJCI4=;
- b=g8KKi80FTM7LrWrCrDI1yikgzi+D0TwS7jkL20hfnCzP69DDKUp080nN3juhTNZYZk6SZG5H7Is6eJb0v6WOJXuxLxc+uKXEr8kGWVsiB8zdJFuyR0YcmXyxeUopkn8RNoI1Dpn5AfD/OA85KIwk67R+jiJBtF3Q3k/meWZBFyT5RBu0P/8CNfAW1Gvowg1vSTJxO6Yi9xafMEEsOC5G+23HeqyLH8LFtrlu2e8LMoQeR8SYOBV0OmAfkw6K+IlRKAasdSInPJf8Ab5W0Qf3+aVMeI0w44PcZsYirb5uZtfBRaJl2gCpeMF9DLXpvxuonjWd+i3AFiSmsNtNVYBUXQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=UX5z0Fad3Met5akmfjPp3Zvut3tZRC9Pj/xj0VBJCI4=;
- b=QE4lgZDOMOYSJhyAm9eZMzO87PwDeQXXk5Kg2flvnLpkD11xsMP0vkz80UgvkXHGnSdzy54+OYvFO1gO87ZGjluPkZtAjGU5oG7TFF/6CxYIsIZ+J+BCEqU5KxSrufKcZ/6Qwf8v/8QxS14TeZALTyivmMk4ay/pOWtUkvXSf5fzrpXj2KL27zJY4sxp6scuJCIUQIaV1pcRwDSIiPYdlz0rsm468rx49FscS1TgSZ4tX/rXAydeHspgHWAW8Y4Im3m6ta8f/32OESDS8MbtmzhFEvbcIImkvkW9mbtweD46hdKFt1S4BsE4tvgnDfUU6OAB9gnsYHeOXQ+HWezxAg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by MW4PR12MB7237.namprd12.prod.outlook.com (2603:10b6:303:22a::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6319.33; Tue, 25 Apr
- 2023 14:46:21 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::f7a7:a561:87e9:5fab]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::f7a7:a561:87e9:5fab%5]) with mapi id 15.20.6319.033; Tue, 25 Apr 2023
- 14:46:20 +0000
-Date:   Tue, 25 Apr 2023 11:46:17 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     iommu@lists.linux.dev, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Kevin Tian <kevin.tian@intel.com>
-Subject: [GIT PULL] Please pull IOMMUFD subsystem changes
-Message-ID: <ZEfnucryav8vI+og@nvidia.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="Tc5hITz70x7gRxTt"
-Content-Disposition: inline
-X-ClientProxiedBy: BY3PR10CA0023.namprd10.prod.outlook.com
- (2603:10b6:a03:255::28) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+        with ESMTP id S231912AbjDYOs2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Apr 2023 10:48:28 -0400
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D1DF87EE1
+        for <kvm@vger.kernel.org>; Tue, 25 Apr 2023 07:48:18 -0700 (PDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9646A4B3;
+        Tue, 25 Apr 2023 07:49:02 -0700 (PDT)
+Received: from [10.1.39.54] (010265703453.arm.com [10.1.39.54])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B756F3F587;
+        Tue, 25 Apr 2023 07:48:17 -0700 (PDT)
+Message-ID: <a2616348-3517-27a7-17a0-6628b56f6fad@arm.com>
+Date:   Tue, 25 Apr 2023 15:48:11 +0100
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|MW4PR12MB7237:EE_
-X-MS-Office365-Filtering-Correlation-Id: b7a49b40-0123-47ed-e2c5-08db459bd579
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: BGqKk71htrR20QPz9yW7uuNMH4rDEIwfN6pLhuuoS9qSelAttQLNgJzD70RITDOoYwckAfPyuC89jMCiA7TR14QMdbpwOjTmAyZQrC9q4OSasrHZLoxiHUOSyAibYmlvKqve4NUuWxKO4ExXlaW2SmgE3AUwYdMjwce1kJiTH4gdnnfGwq98w/lsYOv6BzIjokdy2MRfvQ0+3tYevcxlVmXicvuv7dNek4WlEs31aHsJmltj0pDwfy8mOr3uWFwheilmk6kNfnNR83b8U3Tf8BJa0MlsfZGj+15Zrl+4FQOdOzvZvNtcfom6RNDlD4NFt7Wtes8iS8CtUQKJBcc30bnpSC0Q85DDFA36lYab2l3l8iPIvSjG0KnoaTP2V924kN5MDTUK9O2EQiBNUsnaPa6R8AWAJg/pJtui9P83fJA2U5bMrP5amV/yeoEQRmtLyNUnLdJuRlEB467NX/BpvFwC+lJzfxFbAigdA3Cvv+Q7yp8KetVU+imjx/mgQN2dDBS9CruJRGoAB7OOA4N00pWkf1GUVX4R2MIFMUM05bYFcYEUzD5wm3Ak5SAw5qkMR03EqdFr8OgcEExYimhZxwGST5Nx2jjNxPu4HD96GCm4Z4kS3AoxsF5giEzE5JlHEsNqGtk2xCCczgZmMTy+gjFsKVA61NbcojYVnnK55PtR8dUfGX3P2/5SnHXCrdc0Pf/zWySPCoCe49j9MFZEoE0KGv82frUrBOW2IeIcGf3Zgyut8qjex6xZmFxIOdhy
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(136003)(396003)(39860400002)(366004)(346002)(376002)(451199021)(2906002)(66476007)(66556008)(66946007)(6916009)(4326008)(316002)(5660300002)(8936002)(8676002)(41300700001)(36756003)(86362001)(186003)(26005)(6512007)(21480400003)(38100700002)(478600001)(44144004)(6666004)(966005)(6486002)(83380400001)(2616005)(6506007)(2700100001)(67856001)(266184004);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?NFdoq0/OSWNmZYyrvo7y4ZkaKnh9OyDcv/3s3kapR3NTN8+pqPIzaHTSdGzt?=
- =?us-ascii?Q?ll1VHfS4jlEwZeWd/+fnreA6Rl2U9E1qTbfO+UNjQpTjT+I9FXCUp7QP+qSr?=
- =?us-ascii?Q?fZ3/kx8I/5doBGuncwPcHk2wJug62riZ+Z9/ISFg+J/ttXdIYlOXGrcECdAa?=
- =?us-ascii?Q?9+EgRHDKNQAWkA6Qbdto5k7TY8EklDHDxvsJ/KLmAoDtfmXMvI/sUfuT2uyi?=
- =?us-ascii?Q?6VOGRmNlab/GisWMtWZ4JCx1AVNG2Hca1GRabGSEtdIlN7K/vwUbE6zlN+7P?=
- =?us-ascii?Q?E3rfCZbDvzRNg135UuvDqtDOIobBGD4Tr+mWg5vEkHlxXKh+RgstObNLZgIy?=
- =?us-ascii?Q?+6aPcdges4GNOUk5ispxkXTqDH68H1YAmy5CyR91Z7DqaVgfAY/YOwD/TuKm?=
- =?us-ascii?Q?lgko2OK/pKp1dPbVh1xxc4G43EHaakrIsssVh1JAJ7bj6kHsiCKudfp2iUkX?=
- =?us-ascii?Q?fORW5svfGpRYVWnwTySAYr5FClq4/tl/Vue9w6CVNXttKA0sW9lkuMz5VY/b?=
- =?us-ascii?Q?c96NPf1WjTgp9mxBkhzWvQacThfRLaLOSmQ7BbI0PdZGIxmQV2RwtpBHYVdS?=
- =?us-ascii?Q?blTuu1AK8dB0EEy82fgHpAH55i0hmzUvKRifJBg9HBMEP3yFZFhYJTMtiG8R?=
- =?us-ascii?Q?Okt6qDIlNFxLMawc7fyp89To9zashcK1Hxx42mJt8bl2ORlAcRLe8Moy4IL6?=
- =?us-ascii?Q?AH3I4bXQ08DIpoJZ8AGKP1wyjq0VT3FrSQ7VCcM8g1kMffja/f8cShT49ndz?=
- =?us-ascii?Q?1YgnOU2XrG/1lUbrpxcjDKxLgNXkoooI/AxLIBd62fQkDe1NMWtK0PHie/hR?=
- =?us-ascii?Q?SwRTPuqtyIuKoCyBUD6R4NMUC1fNfMF5nLZZz/kj1FLOe+8AAhIgxePj6LCe?=
- =?us-ascii?Q?T58RSc2yxfawOfnF8dpaUtWywE8XO3wpKaCPIcSapj13t8Ixgz8cyCF3raU0?=
- =?us-ascii?Q?cQeqVo/nP+cnvuBE8cK9Nzt6vbKblzoiIezM1zW+trFpOeFX2+vgC0pm1xR5?=
- =?us-ascii?Q?YGBNVXoFifsAqJwK/vsQP9ZspXf3dRI1ouWV7VnhMwvuxOguDS1pBhueOVED?=
- =?us-ascii?Q?9Z5qELIarCXgX5sPoNwGn2y2Xc4Bvb5M72HuRna+G/ifKJfyxssNxgTg4CRL?=
- =?us-ascii?Q?ICcv5jqNbGISsmXHSAlXgsMJkAhX3KGr+kgSuh4CwTgCJDci3S/eSwAUYSgp?=
- =?us-ascii?Q?ifjCiTqGHM4Y/njMi2THz/rOYhLoJJ69SJ20IwH5pfoBF6nDErLya8sEVCDO?=
- =?us-ascii?Q?eY6Xv5hAotqNd3MFFIim51JubnXi5kaEDIA6IIi2pe/MWLs6kAmbY2iD8vKO?=
- =?us-ascii?Q?ctbi3j6le7aGytUtB7u8AbUqtXht9ySXBn/5aClkip/GF1/xPQW7cktZGA6e?=
- =?us-ascii?Q?x81jc3Kxc4EvhNsasyDUnXA4VopG80yk4jv2Z3drfeXDS61r1/6gY+GsoPYT?=
- =?us-ascii?Q?3URIA7SQPnNgKEqaciwMO0BBhlIOnM4JPlfDjWrv8xh3+HjTTri2SL7mmYoM?=
- =?us-ascii?Q?Qcp+1t+dPuPab/UpxCcovw6jlh0dYUFcN+NC0Pi8JS1vzO5G07uzmtkzDxZQ?=
- =?us-ascii?Q?v6uS1gYU0vrICV9n8aQTiy2v0gABlqEwBdg3dcw2?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b7a49b40-0123-47ed-e2c5-08db459bd579
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Apr 2023 14:46:20.8807
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: QSny2pUXZ5+KZH+iQ8UxBqGrzB7ZB2z7HWXjUMDCbcCfTc36yCFGHsOBGwybljqk
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB7237
-X-Spam-Status: No, score=-1.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
-        version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+From:   Robin Murphy <robin.murphy@arm.com>
+Subject: Re: RMRR device on non-Intel platform
+To:     Jason Gunthorpe <jgg@nvidia.com>,
+        Nicolin Chen <nicolinc@nvidia.com>
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "iommu@lists.linux.dev" <iommu@lists.linux.dev>
+References: <BN9PR11MB5276E84229B5BD952D78E9598C639@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <20230420081539.6bf301ad.alex.williamson@redhat.com>
+ <6cce1c5d-ab50-41c4-6e62-661bc369d860@arm.com>
+ <20230420084906.2e4cce42.alex.williamson@redhat.com>
+ <fd324213-8d77-cb67-1c52-01cd0997a92c@arm.com>
+ <20230420154933.1a79de4e.alex.williamson@redhat.com>
+ <ZEJ73s/2M4Rd5r/X@nvidia.com> <0aa4a107-57d0-6e5b-46e5-86dbe5b3087f@arm.com>
+ <ZEKFdJ6yXoyFiHY+@nvidia.com> <fe7e20e5-9729-248d-ee03-c8b444a1b7c0@arm.com>
+ <ZELOqZliiwbG6l5K@nvidia.com>
+Content-Language: en-GB
+In-Reply-To: <ZELOqZliiwbG6l5K@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-5.6 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
---Tc5hITz70x7gRxTt
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+On 2023-04-21 18:58, Jason Gunthorpe wrote:
+> On Fri, Apr 21, 2023 at 06:22:37PM +0100, Robin Murphy wrote:
+> 
+>> I think a slightly more considered and slightly less wrong version of that
+>> idea is to mark it as IOMMU_RESV_MSI, and special-case direct-mapping those
+>> on Arm (I believe it would technically be benign to do on x86 too, but might
+>> annoy people with its pointlessness). However...
+> 
+> I'd rather have a IOMMU_RESV_MSI_DIRECT and put the ARM special case
+> in ARM code..
 
-Hi Linus,
+Maybe, but it's still actually broken either way, because how do you get 
+that type into the VM? Firmware can't encode that a particular RMR 
+represents the special magic hack for IOMMUFD, so now the SMMU driver 
+needs to somehow be aware when it's running in a VM offering nested 
+translation and do some more magic to inject the appropriate region, and 
+it's all just... no.
 
-We did not manage to get the VFIO parts ready for this cycle, but it
-looks really close now. Here is the stuff still in progress:
+>>> On baremetal we have no idea what the platform put under that
+>>> hardcoded address?
+>>>
+>>> On VM we don't use the iommu_get_msi_cookie() flow because the GIC in
+>>> the VM pretends it doesn't have an ITS page?  (did I get that right?)
+>>
+>> No, that can't be right - PCIe devices have to support MSI or MSI-X, and
+>> many of them won't support INTx at all, so if the guest wants to use
+>> interrupts in general it must surely need to believe it has some kind of MSI
+>> controller,
+> 
+> Yes..
+> 
+>> which for practical purposes in this context means an ITS.
+> 
+> I haven't delved into it super detail, but.. my impression was..
+> 
+> The ITS page only becomes relavent to the IOMMU layer if the actual
+> IRQ driver calls iommu_dma_prepare_msi()
+> 
+> And we have only these drivers that do so:
+> 
+> drivers/irqchip/irq-gic-v2m.c:  err = iommu_dma_prepare_msi(info->desc,
+> drivers/irqchip/irq-gic-v3-its.c:       err = iommu_dma_prepare_msi(info->desc, its->get_msi_base(its_dev));
+> drivers/irqchip/irq-gic-v3-mbi.c:       err = iommu_dma_prepare_msi(info->desc,
+> drivers/irqchip/irq-ls-scfg-msi.c:      err = iommu_dma_prepare_msi(info->desc, msi_data->msiir_addr);
+> 
+> While, I *thought* that the vGIC in ARM uses
+> 
+> drivers/irqchip/irq-gic-v4.c
+> 
+> Which doesn't obviously call iommu_dma_prepare_msi() ?
+> 
+> So while the SMMU driver will stick in a IOMMU_RESV_SW_MSI, and
+> iommufd will call iommu_get_msi_cookie(), there is no matching call
+> of iommu_dma_prepare_msi() - so it all effectively does nothing.
+> 
+> Instead, again from what I understood, is that the IOMMU layer is
+> expected to install the ITS page, not knowing it is an ITS page,
+> because the ACPI creates a IOMMU_RESV_DIRECT.
+> 
+> When the VM writes it totally-a-lie MSI address to the PCI MSI-X
+> registers the hypervisor traps it and subsitutes, what it valiantly
+> hopes, is the right address for the ITS in the VM's S1 IOMMU table
+> based on the ACPI where it nicely asked the guest to keep this
+> specific IOVA mapped.
+> 
+> I'm not sure how the data bit works on ARM..
+> 
+>> was the next thing I started wondering after the above - if the aim is to
+>> direct-map the host's SW_MSI region to effectively pass through the S2 MSI
+>> cookie, but you have the same Linux SMMU driver in the guest, isn't that
+>> guest driver still going to add a conflicting SW_MSI region for the same
+>> IOVA and confuse things?
+> 
+> Oh probably yes. At least from iommufd perspective, it can resolve
+> overlapping regions just fine though.
+> 
+>> Ideally for nesting, the VMM would just tell us the IPA of where it's going
+>> to claim the given device's associated MSI doorbell is, we map that to the
+>> real underlying address at S2, then the guest can use its S1 cookie as
+>> normal if it wants to, and the host doesn't have to rewrite addresses either
+>> way.
+> 
+> Goodness yes, I'd love that.
+> 
+>> that the nesting usage model inherently constrains the VMM's options for
+>> emulating the IOMMU, would it be unreasonable to make our lives a lot easier
+>> with some similar constraints around interrupts, and just not attempt to
+>> support the full gamut of "emulate any kind of IRQ with any other kind of
+>> IRQ" irqfd hilarity?
+> 
+> Isn't that what GICv4 is?
 
-- VFIO PCI hot reset support for iommufd:
-  https://lore.kernel.org/kvm/20230401144429.88673-1-yi.l.liu@intel.com/
+That would fit *part* of the GICv4 usage model...
 
-- VFIO device cdev support to allow exposing all the iommufd features:
-  https://lore.kernel.org/kvm/20230401151833.124749-1-yi.l.liu@intel.com/
+> Frankly, I think something whent wrong with the GICv4 design. A purely
+> virtualization focused GIC should not have continued to rely on the
+> hypervisor trapping of the MSI-X writes. The guest should have had a
+> real data value and a real physical ITS page.
 
-- iommufd page table replace operation:
-  https://lore.kernel.org/kvm/0-v6-fdb604df649a+369-iommufd_alloc_jgg@nvidia.com/
+...I believe the remaining missing part is a UAPI for the VMM to ask the 
+host kernel to configure a "physical" vLPI for a given device and 
+EventID, at the point when its vITS emulation is handling the guest's 
+configuration command. With that we would no longer have to rewrite the 
+MSI payload either, so can avoid trapping the device's MSI-X capability 
+at all, and the VM could actually have non-terrible interrupt performance.
 
-- IOMMU driver information query:
-  https://lore.kernel.org/kvm/20230309075358.571567-1-yi.l.liu@intel.com/
+> I can understand why we got here, because fixing *all* of that would
+> be a big task and this is a small hack, but still... Yuk.
+> 
+> But that is a whole other journey. There is work afoot to standardize
+> some things would make MSI-X trapping impossible and more solidly
+> force this issue, so I'm just hoping to keep the current mess going
+> as-is right now..
 
-- Intel VT-d nested translation:
-  https://lore.kernel.org/kvm/20230309082207.612346-1-yi.l.liu@intel.com/
+The thing is, though, this small hack is in fact just the tip of a large 
+pile of small hacks across Linux and QEMU that probably add up to a 
+similar amount of work overall as just implementing the interface that 
+we'd ultimately want to have anyway.
 
-- ARM SMMUv3 nested translation:
-  https://lore.kernel.org/linux-iommu/cover.1678348754.git.nicolinc@nvidia.com/
+>>>> MSI regions already represent "safe" direct mappings, either as an inherent
+>>>> property of the hardware, or with an actual mapping maintained by software.
+>>>> Also RELAXABLE is meant to imply that it is only needed until a driver takes
+>>>> over the device, which at face value doesn't make much sense for interrupts.
+>>>
+>>> I used "relxable" to suggest it is safe for userspace.
+>>
+>> I know, but the subtlety is the reason *why* it's safe for userspace. Namely
+>> that a VFIO driver has bound and reset (or at least taken control of) the
+>> device, and thus it is assumed to no longer be doing whatever the boot
+>> firmware left it doing, therefore the reserved region is assumed to no
+>> longer be relevant, and from then on the requirement to preserve it can be
+>> relaxed.
+> 
+> IOMMU_RESV_MSI_DIRECT is probably the better name
+> 
+>>>           unsigned long pg_size;
+>>>           int ret = 0;
+>>> -       if (!iommu_is_dma_domain(domain))
+>>> -               return 0;
+>>> -
+>>>           BUG_ON(!domain->pgsize_bitmap);
+>>>           pg_size = 1UL << __ffs(domain->pgsize_bitmap);
+>>
+>> But then you realise that you also need to juggle this around since identity
+>> domains aren't required to have a valid pgsize_bitmap either, give up on the
+>> idea and go straight to writing a dedicated loop as the clearer and tidier
+>> option because hey this is hardly a fast path anyway. At least, you do if
+>> you're me :)
+> 
+> domain->pgsize_bitmap is always valid memory, and __ffs() always
+> returns [0:31], so this caclculation will be fine but garbage.
+> 
+>>> @@ -1052,13 +1049,18 @@ static int iommu_create_device_direct_mappings(struct i>
+>>>                   dma_addr_t start, end, addr;
+>>>                   size_t map_size = 0;
+>>> -               start = ALIGN(entry->start, pg_size);
+>>> -               end   = ALIGN(entry->start + entry->length, pg_size);
+>>> -
+>>>                   if (entry->type != IOMMU_RESV_DIRECT &&
+>>>                       entry->type != IOMMU_RESV_DIRECT_RELAXABLE)
+>>>                           continue;
+>>> +               if (entry->type == IOMMU_RESV_DIRECT)
+>>> +                       dev->iommu->requires_direct = 1;
+>>> +
+>>> +               if (!iommu_is_dma_domain(domain))
+>>> +                       continue;
+>>> +
+>>> +               start = ALIGN(entry->start, pg_size);
+>>> +               end   = ALIGN(entry->start + entry->length, pg_size);
+> 
+> Which is why I moved the only reader of pg_size after the check if it
+> is valid..
 
-Along with qemu patches implementing iommufd:
-https://lore.kernel.org/qemu-devel/20230131205305.2726330-1-eric.auger@redhat.com/
+Except GCC says __builtin_ctzl(0) is undefined, so although I'd concur 
+that the chances of nasal demons at the point of invoking __ffs() are 
+realistically quite low, I don't fancy arguing that with the static 
+checker brigade. So by the time we've appeased them with additional 
+checks, initialisations, etc., we'd have basically the same overhead as 
+running 0 iterations of another for loop (the overwhelmingly common case 
+anyway), but in more lines of code, with a more convoluted flow. All of 
+which leads me to conclude that "number of times we walk a usually-empty 
+list in a one-off slow path" is not in fact the most worthwhile thing to 
+optimise for ;)
 
-And draft patches for the qemu side support for nested translation.
-
-This PR is some small fixes and two preperatory reworks for the above
-series.
-
-Thanks,
-Jason
-
-The following changes since commit 13a0d1ae7ee6b438f5537711a8c60cba00554943:
-
-  iommufd: Do not corrupt the pfn list when doing batch carry (2023-04-04 09:10:55 -0300)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/jgg/iommufd.git tags/for-linus-iommufd
-
-for you to fetch changes up to 62e37c86bf0718e1ec0156c7a88a43ced6cdf201:
-
-  iommufd/selftest: Cover domain unmap with huge pages and access (2023-04-04 13:11:24 -0300)
-
-----------------------------------------------------------------
-iommufd for 6.4
-
-Two series:
-
- - Reorganize how the hardware page table objects are managed,
-   particularly their destruction flow. Increase the selftest
-   test coverage in this area by creating a more complete mock
-   iommu driver.
-
-   This is preparation to add a replace operation for HWPT binding,
-   which is done but waiting for the VFIO parts to complete so there
-   is a user.
-
- - Split the iommufd support for "access" to make it two step - allocate
-   an access then link it to an IOAS. Update VFIO and have VFIO always
-   create an access even for the VFIO mdevs that never do DMA.
-
-   This is also preperation for the replace VFIO series that will allow
-   replace to work on access types as well.
-
-Three minor fixes:
-
- - Sykzaller found the selftest code didn't check for overflow when
-   processing user VAs
-
- - smatch noted a .data item should have been static
-
- - Add a selftest that reproduces a syzkaller bug for batch carry already
-   fixed in rc
-
-----------------------------------------------------------------
-Jason Gunthorpe (16):
-      iommufd: Assert devices_lock for iommufd_hw_pagetable_has_group()
-      iommufd: Add iommufd_lock_obj() around the auto-domains hwpts
-      iommufd: Consistently manage hwpt_item
-      iommufd: Move ioas related HWPT destruction into iommufd_hw_pagetable_destroy()
-      iommufd: Move iommufd_device to iommufd_private.h
-      iommufd: Make iommufd_hw_pagetable_alloc() do iopt_table_add_domain()
-      iommufd/selftest: Rename the sefltest 'device_id' to 'stdev_id'
-      iommufd/selftest: Rename domain_id to stdev_id for FIXTURE iommufd_ioas
-      iommufd/selftest: Rename domain_id to hwpt_id for FIXTURE iommufd_mock_domain
-      iommufd/selftest: Rename the remaining mock device_id's to stdev_id
-      iommufd/selftest: Make selftest create a more complete mock device
-      iommufd/selftest: Add a selftest for iommufd_device_attach() with a hwpt argument
-      iommufd/selftest: Catch overflow of uptr and length
-      Merge branch 'vfio_mdev_ops' into iommufd.git for-next
-      Merge branch 'iommufd/for-rc' into for-next
-      iommufd/selftest: Cover domain unmap with huge pages and access
-
-Nicolin Chen (1):
-      iommufd: Create access in vfio_iommufd_emulated_bind()
-
-Tom Rix (1):
-      iommufd/selftest: Set varaiable mock_iommu_device storage-class-specifier to static
-
-Yi Liu (5):
-      iommu/iommufd: Pass iommufd_ctx pointer in iommufd_get_ioas()
-      vfio-iommufd: No need to record iommufd_ctx in vfio_device
-      vfio-iommufd: Make vfio_iommufd_emulated_bind() return iommufd_access ID
-      vfio/mdev: Uses the vfio emulated iommufd ops set in the mdev sample drivers
-      vfio: Check the presence for iommufd callbacks in __vfio_register_dev()
-
- drivers/iommu/iommufd/device.c                   | 205 +++++++++------------
- drivers/iommu/iommufd/hw_pagetable.c             |  70 ++++++--
- drivers/iommu/iommufd/ioas.c                     |  14 +-
- drivers/iommu/iommufd/iommufd_private.h          |  39 +++-
- drivers/iommu/iommufd/iommufd_test.h             |   2 +-
- drivers/iommu/iommufd/selftest.c                 | 219 +++++++++++++++++++----
- drivers/iommu/iommufd/vfio_compat.c              |   2 +-
- drivers/vfio/iommufd.c                           |  37 ++--
- drivers/vfio/vfio_main.c                         |   5 +-
- include/linux/iommufd.h                          |   5 +-
- include/linux/vfio.h                             |   1 -
- samples/vfio-mdev/mbochs.c                       |   3 +
- samples/vfio-mdev/mdpy.c                         |   3 +
- samples/vfio-mdev/mtty.c                         |   3 +
- tools/testing/selftests/iommu/iommufd.c          | 104 +++++++----
- tools/testing/selftests/iommu/iommufd_fail_nth.c |  38 ++--
- tools/testing/selftests/iommu/iommufd_utils.h    |  16 +-
- 17 files changed, 494 insertions(+), 272 deletions(-)
-
---Tc5hITz70x7gRxTt
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRRRCHOFoQz/8F5bUaFwuHvBreFYQUCZEfntwAKCRCFwuHvBreF
-YW52AQC/FEaSk5DclfIGxjJcuS54dzWDxGIq/F9DVDMEUYM08QD+PxmJV6c/pTsP
-4de/B6ZDr2MLB7zP9HNibmilZDdk3QA=
-=b7Uz
------END PGP SIGNATURE-----
-
---Tc5hITz70x7gRxTt--
+Cheers,
+Robin.
