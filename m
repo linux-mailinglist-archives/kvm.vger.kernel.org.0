@@ -2,152 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6F1E16EF5C8
-	for <lists+kvm@lfdr.de>; Wed, 26 Apr 2023 15:48:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A66726EF5DA
+	for <lists+kvm@lfdr.de>; Wed, 26 Apr 2023 15:54:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241226AbjDZNsx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 Apr 2023 09:48:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41544 "EHLO
+        id S241175AbjDZNyD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 Apr 2023 09:54:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44288 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241084AbjDZNst (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 Apr 2023 09:48:49 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7A765586;
-        Wed, 26 Apr 2023 06:48:45 -0700 (PDT)
-Received: from pps.filterd (m0353727.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 33QDb5aS006964;
-        Wed, 26 Apr 2023 13:48:44 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=haMxrfNCcZsNWCFNARsj7f0YXA0WezkWwKNzmYY7JKA=;
- b=ocEB6I71njLSFw4H8v4riWhXayMCnmBjL+kHG2cu3Y+m+UvT0Ok5gjyR6O5PioTWB6i9
- JO2L6X+/yVyh00bmFXjVNFGRrCJRr3ZYLVo3vYTkebeDtIkupi1uk3vFrtiG/UQ9AFR1
- cK6NTWQCsxWT0lKUE6WxX8pJeqGsp9Z00tw6MnZPpND6lFN0iE118s26a/1OSVGmS7AX
- 9kCy/F9x73P8YnQCO6hBgpYkM8qmIkRXxsUdd/QEkZ/NxWBrYgopvOH+pI2OullRMjMh
- RzRrz/L60XoKXsSX4ZR+Nyht6CK615YAuw8s5xzdPxxyjniDkkcXGuX1ra0OSBpv8hfZ Rg== 
-Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3q74usgkf6-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 26 Apr 2023 13:48:43 +0000
-Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
-        by ppma01fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 33QCTjnn017020;
-        Wed, 26 Apr 2023 13:48:40 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-        by ppma01fra.de.ibm.com (PPS) with ESMTPS id 3q47771yum-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 26 Apr 2023 13:48:40 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-        by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 33QDmYoY46072202
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 26 Apr 2023 13:48:35 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id DC2E920040;
-        Wed, 26 Apr 2023 13:48:34 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 97A452004B;
-        Wed, 26 Apr 2023 13:48:34 +0000 (GMT)
-Received: from p-imbrenda.boeblingen.de.ibm.com (unknown [9.152.224.56])
-        by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Wed, 26 Apr 2023 13:48:34 +0000 (GMT)
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     kvm@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
-        frankja@linux.ibm.com, borntraeger@de.ibm.com, nrb@linux.ibm.com,
-        nsg@linux.ibm.com, seiden@linux.ibm.com, jgg@nvidia.com
-Subject: [PATCH v2 1/1] KVM: s390: fix race in gmap_make_secure
-Date:   Wed, 26 Apr 2023 15:48:34 +0200
-Message-Id: <20230426134834.35199-2-imbrenda@linux.ibm.com>
-X-Mailer: git-send-email 2.40.0
-In-Reply-To: <20230426134834.35199-1-imbrenda@linux.ibm.com>
-References: <20230426134834.35199-1-imbrenda@linux.ibm.com>
+        with ESMTP id S240750AbjDZNyA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 Apr 2023 09:54:00 -0400
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id B308E618E
+        for <kvm@vger.kernel.org>; Wed, 26 Apr 2023 06:53:59 -0700 (PDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5F0A9C14;
+        Wed, 26 Apr 2023 06:54:43 -0700 (PDT)
+Received: from [10.57.22.9] (unknown [10.57.22.9])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5E4643F587;
+        Wed, 26 Apr 2023 06:53:58 -0700 (PDT)
+Message-ID: <5ff0d72b-a7b8-c8a9-60e5-396e7a1ef363@arm.com>
+Date:   Wed, 26 Apr 2023 14:53:53 +0100
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: H5ChbVY5Mlg6xUB7uQRnAt0mWqOJEbU7
-X-Proofpoint-ORIG-GUID: H5ChbVY5Mlg6xUB7uQRnAt0mWqOJEbU7
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
- definitions=2023-04-26_06,2023-04-26_03,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 phishscore=0
- impostorscore=0 malwarescore=0 suspectscore=0 adultscore=0 spamscore=0
- bulkscore=0 lowpriorityscore=0 mlxlogscore=787 clxscore=1015
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2303200000 definitions=main-2304260121
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+Subject: Re: RMRR device on non-Intel platform
+Content-Language: en-GB
+To:     Jason Gunthorpe <jgg@nvidia.com>,
+        Nicolin Chen <nicolinc@nvidia.com>
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "iommu@lists.linux.dev" <iommu@lists.linux.dev>
+References: <20230420081539.6bf301ad.alex.williamson@redhat.com>
+ <6cce1c5d-ab50-41c4-6e62-661bc369d860@arm.com>
+ <20230420084906.2e4cce42.alex.williamson@redhat.com>
+ <fd324213-8d77-cb67-1c52-01cd0997a92c@arm.com>
+ <20230420154933.1a79de4e.alex.williamson@redhat.com>
+ <ZEJ73s/2M4Rd5r/X@nvidia.com> <0aa4a107-57d0-6e5b-46e5-86dbe5b3087f@arm.com>
+ <ZEKFdJ6yXoyFiHY+@nvidia.com> <fe7e20e5-9729-248d-ee03-c8b444a1b7c0@arm.com>
+ <ZELOqZliiwbG6l5K@nvidia.com> <ZEkRnIPjeLNxbkj8@nvidia.com>
+From:   Robin Murphy <robin.murphy@arm.com>
+In-Reply-To: <ZEkRnIPjeLNxbkj8@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-5.6 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This patch fixes a potential race in gmap_make_secure and removes the
-last user of follow_page without FOLL_GET.
+On 2023-04-26 12:57, Jason Gunthorpe wrote:
+> On Fri, Apr 21, 2023 at 02:58:01PM -0300, Jason Gunthorpe wrote:
+> 
+>>> which for practical purposes in this context means an ITS.
+>>
+>> I haven't delved into it super detail, but.. my impression was..
+>>
+>> The ITS page only becomes relavent to the IOMMU layer if the actual
+>> IRQ driver calls iommu_dma_prepare_msi()
+> 
+> Nicolin and I sat down and traced this through, this explanation is
+> almost right...
+> 
+> irq-gic-v4.c is some sub module of irq-gic-v3-its.c so it does end up
+> calling iommu_dma_prepare_msi() however..
 
-Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-Suggested-by: Jason Gunthorpe <jgg@nvidia.com>
-Fixes: 214d9bbcd3a6 ("s390/mm: provide memory management functions for protected KVM guests")
----
- arch/s390/kernel/uv.c | 32 +++++++++++---------------------
- 1 file changed, 11 insertions(+), 21 deletions(-)
+Ignore GICv4; that basically only makes a difference to what happens 
+after the CPU receives an interrupt.
 
-diff --git a/arch/s390/kernel/uv.c b/arch/s390/kernel/uv.c
-index 9f18a4af9c13..cb2ee06df286 100644
---- a/arch/s390/kernel/uv.c
-+++ b/arch/s390/kernel/uv.c
-@@ -192,21 +192,10 @@ static int expected_page_refs(struct page *page)
- 	return res;
- }
- 
--static int make_secure_pte(pte_t *ptep, unsigned long addr,
--			   struct page *exp_page, struct uv_cb_header *uvcb)
-+static int make_page_secure(struct page *page, struct uv_cb_header *uvcb)
- {
--	pte_t entry = READ_ONCE(*ptep);
--	struct page *page;
- 	int expected, cc = 0;
- 
--	if (!pte_present(entry))
--		return -ENXIO;
--	if (pte_val(entry) & _PAGE_INVALID)
--		return -ENXIO;
--
--	page = pte_page(entry);
--	if (page != exp_page)
--		return -ENXIO;
- 	if (PageWriteback(page))
- 		return -EAGAIN;
- 	expected = expected_page_refs(page);
-@@ -304,17 +293,18 @@ int gmap_make_secure(struct gmap *gmap, unsigned long gaddr, void *uvcb)
- 		goto out;
- 
- 	rc = -ENXIO;
--	page = follow_page(vma, uaddr, FOLL_WRITE);
--	if (IS_ERR_OR_NULL(page))
--		goto out;
--
--	lock_page(page);
- 	ptep = get_locked_pte(gmap->mm, uaddr, &ptelock);
--	if (should_export_before_import(uvcb, gmap->mm))
--		uv_convert_from_secure(page_to_phys(page));
--	rc = make_secure_pte(ptep, uaddr, page, uvcb);
-+	if (pte_present(*ptep) && !(pte_val(*ptep) & _PAGE_INVALID) && pte_write(*ptep)) {
-+		page = pte_page(*ptep);
-+		rc = -EAGAIN;
-+		if (trylock_page(page)) {
-+			if (should_export_before_import(uvcb, gmap->mm))
-+				uv_convert_from_secure(page_to_phys(page));
-+			rc = make_page_secure(page, uvcb);
-+			unlock_page(page);
-+		}
-+	}
- 	pte_unmap_unlock(ptep, ptelock);
--	unlock_page(page);
- out:
- 	mmap_read_unlock(gmap->mm);
- 
--- 
-2.40.0
+> qemu will setup the ACPI so that VM thinks the ITS page is at
+> 0x08080000. I think it maps some dummy CPU memory to this address.
+> 
+> iommufd will map the real ITS page at MSI_IOVA_BASE = 0x8000000 (!!)
+> and only into the IOMMU
+> 
+> qemu will setup some RMRR thing to make 0x8000000 1:1 at the VM's
+> IOMMU
+> 
+> When DMA API is used iommu_dma_prepare_msi() is called which will
+> select a MSI page address that avoids the reserved region, so it is
+> some random value != 0x8000000 and maps the dummy CPU page to it.
+> The VM will then do a MSI-X programming cycle with the S1 IOVA of the
+> CPU page and the data. qemu traps this and throws away the address
+> from the VM. The kernel sets up the interrupt and assumes 0x8000000
+> is the right IOVA.
+> 
+> When VFIO is used iommufd in the VM will force the MSI window to
+> 0x8000000 and instead of putting a 1:1 mapping we map the dummy CPU
+> page and then everything is broken. Adding the reserved check is an
+> improvement.
+> 
+> The only way to properly fix this is to have qemu stop throwing away
+> the address during the MSI-X programming. This needs to be programmed
+> into the device instead.
+> 
+> I have no idea how best to get there with the ARM GIC setup.. It feels
+> really hard.
 
+Give QEMU a way to tell IOMMUFD to associate that 0x08080000 address 
+with a given device as an MSI target. IOMMUFD then ensures that the S2 
+mapping exists from that IPA to the device's real ITS (I vaguely 
+remember Eric had a patch to pre-populate an MSI cookie with specific 
+pages, which may have been heading along those lines). In the worst case 
+this might mean having to subdivide the per-SMMU copies of the S2 domain 
+into per-ITS copies as well, so we'd probably want to detect and compare 
+devices' ITS parents up-front.
+
+QEMU will presumably also need a way to pass the VA down to IOMMUFD when 
+it sees the guest programming the MSI (possibly it could pass the IPA at 
+the same time so we don't need a distinct step to set up S2 beforehand?) 
+- once the underlying physical MSI configuration comes back from the PCI 
+layer, that VA just needs to be dropped in to replace the original 
+msi_msg address.
+
+TBH at that point it may be easier to just not have a cookie in the S2 
+domain at all when nesting is enabled, and just let IOMMUFD make the ITS 
+mappings directly for itself.
+
+Thanks,
+Robin.
