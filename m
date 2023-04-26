@@ -2,96 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 231486EFDBC
-	for <lists+kvm@lfdr.de>; Thu, 27 Apr 2023 00:58:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2EBE26EFE1E
+	for <lists+kvm@lfdr.de>; Thu, 27 Apr 2023 01:57:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240495AbjDZW6E (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 Apr 2023 18:58:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33820 "EHLO
+        id S240955AbjDZX5g (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 Apr 2023 19:57:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32840 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234977AbjDZW6A (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 Apr 2023 18:58:00 -0400
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0DCB3C1E
-        for <kvm@vger.kernel.org>; Wed, 26 Apr 2023 15:57:58 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-54f6dd3b329so128742797b3.0
-        for <kvm@vger.kernel.org>; Wed, 26 Apr 2023 15:57:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1682549878; x=1685141878;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=JXazE9kznOdLCB9IeWlM55cXnSgWMuYpYcAW4/dwtc8=;
-        b=lnqIcCm010Tlqy2bg4sivFq6oYIiNkB3yshTFdOJoFm+HqZrUaHKuHIHLDJT4UgpVs
-         W6TcIkf3vwwSATn8a7/OYjeas8snENrzIDQipjL/Mo7zl46Cnkp9UOpWVcsc5PQkzeNW
-         7VK0v0TUwmYIwZqob98Tf+hioDA+xicFw7HyIcc8y1nqZ7Axtuj1x/FMNRszDJaIol4Y
-         ZilTZLhixn1wiTlhJkN2so7Zu08a+CuaIWx9TJdXhdt7gL3FVd5+EB5rd8nWLjZURsQm
-         94OPss2dXdHYUum5vpaklCkVDeHBlhNJgLSf8RkqKFiByJvwewvRXaL3By9vJrTC5uUu
-         McMg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682549878; x=1685141878;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=JXazE9kznOdLCB9IeWlM55cXnSgWMuYpYcAW4/dwtc8=;
-        b=iyoSb427a3xenELcNsFe23LlcQWHwUZHQL7eiak9AtioLl41suVEhsYmU3eitAsAtb
-         uqx5lg8I2J+sBWFxt91O9NFzr1iJSA+jlvo66oEHxF6b+qamlPCEf/udaitzsd/ldSol
-         DWWNLIHRp5Qc80osYWg4qkyT5P7mZJFGyKd3ENGTcEgoR2c9OtJyFSbUfSyYy4E22gDh
-         6WWJajxMWi30rq8pYrD8XqBx779CwSA4nYIBdtV9rClSvUZaR4yFqo9MKOyBriUZaup2
-         veHHTaFTyjFtBi6JQmYA+JQQ/tgmylwaieoifvCEOQ5X1jBYituvLN7PS/UqQ63fqg2E
-         dcfw==
-X-Gm-Message-State: AAQBX9dQQesQa4KJYfAi3HhNoC9nmNxgNSUlr0UHhSlNEgrlG5M4yThz
-        t8DutSTLkGlK2YHU30SwV6rlOpgSZbw=
-X-Google-Smtp-Source: AKy350YrwnCmeOGJE8g1QPZJYanEcWEZPdP6IoP6s2Nltq+2YKtIhHZigpbemZCUfeoGrwRJYpYSJ8PyIh8=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:ef06:0:b0:54d:3afc:d503 with SMTP id
- o6-20020a81ef06000000b0054d3afcd503mr11139415ywm.8.1682549878047; Wed, 26 Apr
- 2023 15:57:58 -0700 (PDT)
-Date:   Wed, 26 Apr 2023 15:57:45 -0700
-In-Reply-To: <20230426220323.3079789-1-seanjc@google.com>
-Mime-Version: 1.0
-References: <20230426220323.3079789-1-seanjc@google.com>
-X-Mailer: git-send-email 2.40.1.495.gc816e09b53d-goog
-Message-ID: <168254947739.3087722.95836523643262635.b4-ty@google.com>
-Subject: Re: [PATCH v3] KVM: x86: Preserve TDP MMU roots until they are
- explicitly invalidated
-From:   Sean Christopherson <seanjc@google.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>,
-        Ben Gardon <bgardon@google.com>,
-        David Matlack <dmatlack@google.com>
-Content-Type: text/plain; charset="utf-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S242555AbjDZX5e (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 Apr 2023 19:57:34 -0400
+Received: from mail.heimpalkorhaz.hu (mail.heimpalkorhaz.hu [193.224.51.23])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 203B2269F
+        for <kvm@vger.kernel.org>; Wed, 26 Apr 2023 16:57:31 -0700 (PDT)
+Received: from mail.heimpalkorhaz.hu (localhost [127.0.0.1])
+        (Authenticated sender: alexandra.nagy@heimpalkorhaz.hu)
+        by mail.heimpalkorhaz.hu (Postfix) with ESMTPA id B40B9381E35A1F;
+        Thu, 27 Apr 2023 01:40:36 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.heimpalkorhaz.hu B40B9381E35A1F
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=heimpalkorhaz.hu;
+        s=default; t=1682552437;
+        bh=W6ZSce0cCVgkn0l95t889AY595zUPLw5BzNOdwdHQs8=;
+        h=Date:From:To:Subject:Reply-To:From;
+        b=Xb0QxSOTColJkb1gd5JdDkhAE52H7J93511IX9qtO43nqE/7raeuB03/VozOCo92i
+         d8A+Oe5SHpOhrI9gAEDDCLldlDMJTXciy4TDJxJewCgT8F+vFiP3NBDw7styPw7pjW
+         CFvl/6jSv/RVaXFK7GvD9D+EkiXItOw49riooySc4i6JXDvC4MRfa5I8XnMAKzwurm
+         Et9pRx9yPiRfibsJW7SF9qya2wv535O17v2I7jA+5YbfOmVB9+sUjhMfkldX1WCpYv
+         TlzdO1/tALZfLq8doMBFZzxjacuc/6Mm/yoDffYI8SaNKhkkmZRPmfSqfW9q6GmTdW
+         hrQREA++65hCQ==
+MIME-Version: 1.0
+Date:   Thu, 27 Apr 2023 07:40:36 +0800
+From:   "M.K" <mk@heimpalkorhaz.hu>
+To:     undisclosed-recipients:;
+Subject: =?UTF-8?Q?=E4=BD=A0=E5=A5=BD=E9=99=BD=E5=85=89?=
+Reply-To: kmarion709@gmail.com
+User-Agent: Roundcube Webmail/1.4.13
+Message-ID: <da83b6ea00f23f93dc5824a58504c3d5@heimpalkorhaz.hu>
+X-Sender: mk@heimpalkorhaz.hu
+Content-Type: text/plain; charset=UTF-8;
+ format=flowed
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: B40B9381E35A1F
+X-Spamd-Result: default: False [4.31 / 20.00];
+        R_UNDISC_RCPT(3.00)[];
+        FORGED_RECIPIENTS(2.00)[m:,s:kovmihser@yandex.ru,s:kovofbm981138582@sohu.com,s:kovrikleo@mail.ru,s:kovyi@seznam.cz,s:kovyin@centrum.cz,s:kowallis_5423@163.com,s:kowny@tom.com,s:kowomba@yahoo.com,s:kowsalyabalaji@gmail.com,s:kowtgu@yahoo.com,s:kox20m42y@sohu.com,s:kox64m84y@sohu.com,s:koxik@centrum.cz,s:koxln51lpf5x@sohu.com,s:koxt4a2h@sohu.com,s:koy-goodxiaosong@163.com,s:koy9104@163.com,s:koyard@yahoo.cn,s:koyo168@163.com,s:koyoni@gmail.com,s:koyozl@sohu.com,s:koys60@hotmail.com,s:kozachenko174@mail.ru,s:kozence@gmail.com,s:kozerog1121@mail.ru,s:kozl20gris@gmail.com,s:kozlovdmutrui2001@mail.ru,s:kozubilya@mail.ru,s:kozy430@yahoo.co.jp,s:kp1003b@gmail.com,s:kp3r82zx@sohu.com,s:kp504@sohu.com,s:kp601824@sohu.com,s:kp791w1pk@sohu.com,s:kp@kyonproducts.com,s:kp_wu@163.com,s:kpadams@ihug.co.nz,s:kpaliy.airshot@mail.ru,s:kpathana@mail.med.cmu.ac.th,s:kpatterson@dadeschools.net,s:kpattersonrocks@aol.com,s:kpavonncm@gmail.com,s:kpb26@cam.ac.uk,s:kpbagley@hotmail.com,s:kpc826-921@sohu.com,s
+ :kpc@theia.ocn.ne.jp,s:kpcorb@aol.com,s:kpcrxg@sohu.com,s:kpe8166@sohu.com,s:kpeggs@gmail.com,s:kperkins@dadeschools.net,s:kpfraind@gmail.com,s:kpg082885@sohu.com,s:kpgqhjyrz@yahoo.cn,s:kphbdnc30@qq.com,s:kphitn62@sohu.com,s:kphumiao@sina.com,s:kphw23k@sohu.com,s:kphxbobh@sohu.com,s:kpj2013@sohu.com,s:kpk564@sohu.com,s:kpkant@hotmail.com,s:kpking@126.com,s:kplee@iaeperth.com,s:kpli@bjtu.edu.cn,s:kplim1616@gmail.com,s:kpm0093@163.com,s:kpm1961@gmail.com,s:kpmail2@163.com,s:kpmpalanivel@gmail.com,s:kpnoehou@qq.com,s:kpob9lk@tut.by,s:kpodar_e@yahoo.com,s:kpogkr@yahoo.com,s:kpogod@yahoo.com,s:kpoohs19@yahoo.com,s:kpouridas458@gmail.com,s:kpowell@old-cutler.com,s:kpqcrypto@gmail.com,s:kpqsbjfyj@163.com,s:kpt1619@163.com,s:kptaylor@xtra.co.nz,s:kpysxtz@hotmail.com,s:kq101924@163.com,s:kq147258@163.com,s:kq5052@163.com,s:kqdengxuliang@bjmu.edu.cn,s:kqds_md@yahoo.com,s:kqgszym@163.com,s:kql655@163.com,s:kqqkqqqi@126.com,s:kqstxu@yahoo.cn,s:kquinalty@hotmail.com,s:kquintin@uoregon.edu,s:kqw@
+ ere.com.my,s:kqxyyh@163.com,s:kqykqy413@sohu.com,s:kqyuzhen@163.com,s:kqzl222626@yahoo.cn];
+        GENERIC_REPUTATION(-0.59)[-0.58799365293623];
+        MIME_GOOD(-0.10)[text/plain];
+        TAGGED_RCPT(0.00)[];
+        FROM_EQ_ENVFROM(0.00)[];
+        RCVD_COUNT_ZERO(0.00)[0];
+        MIME_TRACE(0.00)[0:+];
+        FROM_HAS_DN(0.00)[];
+        FREEMAIL_ENVRCPT(0.00)[yandex.ru,sohu.com,mail.ru,seznam.cz,centrum.cz,163.com,tom.com,yahoo.com,gmail.com,yahoo.cn,hotmail.com,yahoo.co.jp,aol.com,qq.com,sina.com,126.com,tut.by,xtra.co.nz,me.com,web.de,rediff.com,op.pl,yahoo.it,rambler.ru,hotmail.it,comcast.net,ymail.com,live.com.au,live.com,rocketmail.com,verizon.net,icloud.com,msn.com,hotmail.fr,interia.pl,wp.pl,naver.com,aim.com,hotmail.co.uk,inbox.ru,bellsouth.net,hanmail.net,yahoo.com.cn,21cn.com,cox.net,vip.163.com,yeah.net,arcor.de,yahoo.ca,china.com,live.dk,bk.ru,yahoo.co.in,rediffmail.com,gmx.net,freenet.de,yahoo.co.nz,freemail.hu,list.ru,singnet.com.sg,ozemail.com.au,optusnet.com.au,inwind.it,vip.qq.com];
+        TO_DN_ALL(0.00)[];
+        MID_RHS_MATCH_FROM(0.00)[];
+        RCPT_COUNT_ONE(0.00)[1];
+        FREEMAIL_REPLYTO(0.00)[gmail.com];
+        REPLYTO_DOM_NEQ_FROM_DOM(0.00)[];
+        HAS_REPLYTO(0.00)[kmarion709@gmail.com]
+X-Rspamd-Server: mail.heimpalkorhaz.hu
+X-Spam-Status: No, score=0.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FORGED_REPLYTO,
+        FREEMAIL_REPLYTO_END_DIGIT,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 26 Apr 2023 15:03:23 -0700, Sean Christopherson wrote:
-> Preserve TDP MMU roots until they are explicitly invalidated by gifting
-> the TDP MMU itself a reference to a root when it is allocated.  Keeping a
-> reference in the TDP MMU fixes a flaw where the TDP MMU exhibits terrible
-> performance, and can potentially even soft-hang a vCPU, if a vCPU
-> frequently unloads its roots, e.g. when KVM is emulating SMI+RSM.
-> 
-> When KVM emulates something that invalidates _all_ TLB entries, e.g. SMI
-> and RSM, KVM unloads all of the vCPUs roots (KVM keeps a small per-vCPU
-> cache of previous roots).  Unloading roots is a simple way to ensure KVM
-> flushes and synchronizes all roots for the vCPU, as KVM flushes and syncs
-> when allocating a "new" root (from the vCPU's perspective).
-> 
-> [...]
+你好呀，
 
-Applied to kvm-x86 mmu to replace v2.  Same spiel as v2: pushed immediately to get
-testing in -next, will squash trivialities as needed.
+很抱歉打擾您並侵犯您的隱私。 我是單身，孤獨，需要一個關懷，愛心和浪漫的伴侶。
 
-[1/1] KVM: x86: Preserve TDP MMU roots until they are explicitly invalidated
-      https://github.com/kvm-x86/linux/commit/edbdb43fc96b
+我是一個暗戀者，想探索更多了解彼此的機會。 我知道這樣聯繫你很奇怪，希望你能原諒我。 我是一個害羞的人，這是我知道我能引起你注意的唯一方式。 
+我只是想知道你的想法，我的本意不是要冒犯你。 我希望我們能成為朋友，如果那是你想要的，儘管我希望不僅僅是朋友。 
+我知道你有幾個問題要問，我希望我能用一些答案來滿足你的一些好奇心。
 
---
-https://github.com/kvm-x86/linux/tree/next
-https://github.com/kvm-x86/linux/tree/fixes
+我相信“對於世界來說，你只是一個人，但對於特別的人來說，你就是全世界”這句話。 我想要的只是來自一個特殊伴侶的愛、浪漫的關懷和關注，我希望是你。
+
+我希望這條消息將成為我們之間長期溝通的開始。 感謝您回复此消息，因為這會讓我很高興。
+
+
+擁抱，
+
+你的秘密崇拜者。
