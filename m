@@ -2,140 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 932876EF887
-	for <lists+kvm@lfdr.de>; Wed, 26 Apr 2023 18:36:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E7F796EF8CF
+	for <lists+kvm@lfdr.de>; Wed, 26 Apr 2023 18:56:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233416AbjDZQgA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 Apr 2023 12:36:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45766 "EHLO
+        id S233311AbjDZQ4G (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 Apr 2023 12:56:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53508 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229379AbjDZQf6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 Apr 2023 12:35:58 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B01476A5
-        for <kvm@vger.kernel.org>; Wed, 26 Apr 2023 09:35:57 -0700 (PDT)
-Received: from pps.filterd (m0353726.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 33QGZX7A021147;
-        Wed, 26 Apr 2023 16:35:54 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=xdrAX7ksQg1V64IDWbv3tRy51Bpyo7uneyqy7PGWkxI=;
- b=RWNJW8KHq8rMHYEqyFUhEz+WWugQKK7pQlPVrRzz/pq0G0Y9obXAwZMhFCM+3gaymU68
- B1gk9aGr1hKdRrsls9vPIypfqiaX7P6BFm1lijIqqfaz1A3AvQR7iblj8GSXNsa+mdVw
- Ts7AWYCNa1OAuW/uYQmoxPodPGGZmfnWJhM9cMsknS3F4QhEOxFqS323Ud1+7FGT+xV2
- JcigwnREXP3WeZGp/mNp2IfrTE1sAYEZQXrRALZMBFt8Kr5HmPaSC4dXHY4FCbWr538c
- WkkqZmi/kaM2xcKHTqsa1G4/EFnyo5G72EJUcrX2zvDG/AozNmwq9EECiuSuRbre06Zp NA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3q766btjj6-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 26 Apr 2023 16:35:54 +0000
-Received: from m0353726.ppops.net (m0353726.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 33QGZs21022598;
-        Wed, 26 Apr 2023 16:35:54 GMT
-Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com [169.55.91.170])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3q766bth41-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 26 Apr 2023 16:35:51 +0000
-Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
-        by ppma02wdc.us.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 33QGKj72019488;
-        Wed, 26 Apr 2023 16:31:20 GMT
-Received: from smtprelay03.dal12v.mail.ibm.com ([9.208.130.98])
-        by ppma02wdc.us.ibm.com (PPS) with ESMTPS id 3q4778p927-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 26 Apr 2023 16:31:19 +0000
-Received: from smtpav03.wdc07v.mail.ibm.com (smtpav03.wdc07v.mail.ibm.com [10.39.53.230])
-        by smtprelay03.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 33QGVI0843909514
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 26 Apr 2023 16:31:19 GMT
-Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D8EE458064;
-        Wed, 26 Apr 2023 16:31:18 +0000 (GMT)
-Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id F0D595805F;
-        Wed, 26 Apr 2023 16:31:17 +0000 (GMT)
-Received: from [9.152.224.253] (unknown [9.152.224.253])
-        by smtpav03.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-        Wed, 26 Apr 2023 16:31:17 +0000 (GMT)
-Message-ID: <4e4b227c-e8f1-d959-20a3-e1f4b38521a2@linux.ibm.com>
-Date:   Wed, 26 Apr 2023 18:31:17 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Subject: Re: [kvm-unit-tests PATCH] clang-format: add project-wide
- configuration file
-Content-Language: en-US
-To:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Andrew Jones <andrew.jones@linux.dev>
-References: <20230426140805.704491-1-seiden@linux.ibm.com>
- <243608a7-484c-4844-9274-0b02dc32ec25@redhat.com>
-From:   Steffen Eiden <seiden@linux.ibm.com>
-In-Reply-To: <243608a7-484c-4844-9274-0b02dc32ec25@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: npL8-SxTeSYazv5RpTONRFRA12mmWQVP
-X-Proofpoint-ORIG-GUID: beqZTERBBhlhN2hB4C_z0vU_A792fFBk
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
- definitions=2023-04-26_08,2023-04-26_03,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- malwarescore=0 suspectscore=0 impostorscore=0 priorityscore=1501
- mlxscore=0 clxscore=1015 adultscore=0 bulkscore=0 spamscore=0
- mlxlogscore=999 phishscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2303200000 definitions=main-2304260146
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+        with ESMTP id S229605AbjDZQ4E (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 Apr 2023 12:56:04 -0400
+Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C25A73599
+        for <kvm@vger.kernel.org>; Wed, 26 Apr 2023 09:56:02 -0700 (PDT)
+Received: by mail-pf1-x449.google.com with SMTP id d2e1a72fcca58-63d3b5c334eso4984108b3a.3
+        for <kvm@vger.kernel.org>; Wed, 26 Apr 2023 09:56:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1682528162; x=1685120162;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=TLtDRjMjMhUauQTfVjTwks2U9xARAIB2c32l6X3FD+Q=;
+        b=7dZxd0/7JHac0T+Cv2Wf4Z85eHRXtIHuNqAfzRAkmZf7OX37ouxMWyfnKNy0LQfCbv
+         NhNDooT3eprDgzDK67IrumTU+QVW4ntQfUjZTCbtn0bhQPcsBP09aPjTsPZwlWs4rog+
+         Zy0hP1AGcKh2rzywN1xwvChzFornLI3vdqGQ8iDZjpSd8IWObZJ12pVwAs+w5ABNTJlv
+         pDbd7YSEEjrziDQ6+1rGAgZHgXb34776GLqnHM9rLPt0B+I8nRDVHnOrtrMVjrQBci1l
+         bAyWOIh7Ll5dG2mpmfMPV+7Zyht9hESvhlEGk/FWqn+meWW7RLus8qqnP7n8TvZNETwg
+         F24A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1682528162; x=1685120162;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=TLtDRjMjMhUauQTfVjTwks2U9xARAIB2c32l6X3FD+Q=;
+        b=QF5NGbXFqInTCsqyTIlbq/laYui9ui/J3FY9Y80AxpjqJXH2mhpxDigZaDXD1lFB/u
+         3Un+e2bjRwiA69fgrs917Y/vp16l+Hl45TuMnk/HAlpvrB50wxfZkB57r2qQOyXa+vrT
+         YmTDO5pJ1kSpHbVsyOzX+gyR0ClUaivvrhnMEaZYCwxD3KYkpk9bLAb7cVd0NL0r9EFc
+         qj9b0/9B2NDOtLJTeovUsa85YQYqOWZtC5lrQ9u6sZJz8hPO3J8go3vFHAQLpdICFxv2
+         d/lS3V//l6MQ7ymzwTQcLbSvHRt/ZOm2AFbvCGIDJu5rUQsAknJLpywqY1CUCmiE29yI
+         utbQ==
+X-Gm-Message-State: AAQBX9dgfQbh/a8taWBAXE9STO6VkPx2z2XHeQlyH2AiC9l4yC1x+5z3
+        Lbm2eCzGExRsGtDkVRjG+5r1POah558=
+X-Google-Smtp-Source: AKy350Y3mlmjd1pqRsrZI2x6e/W959s9/299pvAYOMxJOnQ1S5fmSFYRp5P+DHpNT1clQpfA3W+fc7MQUo8=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:aa7:8890:0:b0:625:5949:6dc0 with SMTP id
+ z16-20020aa78890000000b0062559496dc0mr8750261pfe.4.1682528162349; Wed, 26 Apr
+ 2023 09:56:02 -0700 (PDT)
+Date:   Wed, 26 Apr 2023 09:56:00 -0700
+In-Reply-To: <20230426082601.85372-1-abusse@amazon.com>
+Mime-Version: 1.0
+References: <20230426082601.85372-1-abusse@amazon.com>
+Message-ID: <ZElXchs9iGMtS6vm@google.com>
+Subject: Re: [PATCH] KVM: x86: Add a vCPU stat for #AC exceptions
+From:   Sean Christopherson <seanjc@google.com>
+To:     Anselm Busse <abusse@amazon.com>
+Cc:     dwmw@amazon.co.uk, hborghor@amazon.de, sironi@amazon.de,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Wed, Apr 26, 2023, Anselm Busse wrote:
+> This patch adds a KVM vCPU stat that reflects the number of #AC
+> exceptions caused by a guest. This improves the identification and
+> debugging of issues that are possibly caused by guests triggering
+> split-locks and allows more insides compared to the current situation
+> of having only a warning printed when an #AC exception is raised.
 
+Irrespective of the inaccuracy Xiaoyao pointed out, I don't want to add a one-off
+stat for _any_ exception.  I agree with what Marc said[*] when we (Google / GCP)
+tried to push our pile o' stats upstream:
 
-On 4/26/23 16:41, Thomas Huth wrote:
->> +# Taken from:
->> +#   git grep -h '^#define [^[:space:]]*for_each[^[:space:]]*(' 
->> include/ tools/ \
->> +#   | sed "s,^#define \([^[:space:]]*for_each[^[:space:]]*\)(.*$,  - 
->> '\1'," \
->> +#   | LC_ALL=C sort -u
->> +ForEachMacros:
->> +  - '__ata_qc_for_each'
->> +  - '__bio_for_each_bvec'
->> +  - '__bio_for_each_segment'
->> +  - '__evlist__for_each_entry'
->> +  - '__evlist__for_each_entry_continue'
->> +  - '__evlist__for_each_entry_from'
->> +  - '__evlist__for_each_entry_reverse'
->> +  - '__evlist__for_each_entry_safe'
->> +  - '__for_each_mem_range'
->> +  - '__for_each_mem_range_rev'
->> +  - '__for_each_thread'
->> +  - '__hlist_for_each_rcu'
->> +  - '__map__for_each_symbol_by_name'
->> +  - '__perf_evlist__for_each_entry'
->> +  - '__perf_evlist__for_each_entry_reverse'
->> +  - '__perf_evlist__for_each_entry_safe'
->> +  - '__rq_for_each_bio'
->> +  - '__shost_for_each_device'
-> ...
-> 
-> I think this ForEachMacros list should be adapted for the k-u-ts.
-> The "git grep" statement results in this list for the k-u-ts:
-> 
->    - 'dt_for_each_subnode'
->    - 'fdt_for_each_property_offset'
->    - 'fdt_for_each_subnode'
->    - 'for_each_cpu'
->    - 'for_each_online_cpu'
->    - 'for_each_present_cpu'
-> 
-> which is definitely much shorter 😄
-> 
->   Thomas
-Makes sense. I'll do that.
+ : Because I'm pretty sure that whatever stat we expose, every cloud
+ : vendor will want their own variant, so we may just as well put the
+ : matter in their own hands.
+
+That doesn't mean I don't want a massive pile of stats about all things KVM, quite
+the opposite, but I don't think they belong in upstream where KVM has to maintain
+them in perpetuity.  E.g. at some point in the (distant) future, split-lock #AC will
+be completely uninteresting because all software will have been updated/fixed.
+
+FWIW, we looked at using eBPF for our out-of-tree stats and ultimately decided that
+carrying patches to add our stats would be significantly easier to maintain than an
+eBPF-based approach, e.g. rebasing this patch is trivial.  But the challenges we
+anticipated with switching to eBPF were largely specific to running at scale.  eBPF
+is a very viable approach for gathering information for debug, development,
+individual users, etc.
+
+On idea I had for easing the pain of out-of-tree stats was to clean up KVM x86's
+tracepoints, e.g. to give eBPF programs more stable and useful hooks, but also to
+allow CSPs like us to play macro games to "inject" stats at key points, e.g. add
+infrastructure to #define overload tracepoints to make KVM trampoline through
+out-of-tree stats code.  But we haven't pursued that idea because (a) as above,
+carrying patches for out-of-tree stats requires minimal effort and (b) it wouldn't
+eliminate "invasive" code because we'd (GCP) inevitably want stats in places where
+a KVM tracepoint makes no sense.
+
+So as much as I advocate for pushing code upstream, this is one of the few areas
+where I think it's better to carry code out-of-tree.
+
+[*] https://lore.kernel.org/all/875yusv3vm.wl-maz@kernel.org
