@@ -2,141 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4DE936EF2D8
-	for <lists+kvm@lfdr.de>; Wed, 26 Apr 2023 12:53:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5E9066EF360
+	for <lists+kvm@lfdr.de>; Wed, 26 Apr 2023 13:23:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240659AbjDZKxx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 Apr 2023 06:53:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47810 "EHLO
+        id S240530AbjDZLXH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 Apr 2023 07:23:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34324 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240611AbjDZKxo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 Apr 2023 06:53:44 -0400
-Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A41CB558E
-        for <kvm@vger.kernel.org>; Wed, 26 Apr 2023 03:53:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1682506384; x=1714042384;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=xZHZsS1xR5Kv6vFlwA7RpEinV5UJVIPRfIrlZL0CzQQ=;
-  b=Z/inAPfgH5yRbd1rWb9l41WIxMae+MsDGgyv77JzpsPKxa12bdXc8wcI
-   zvbP5JM+m/pL7n6Hm/g4+NF4asX4VqrqHMp+2PPx4zJgQoiI5jCxl9PYG
-   cHMK4XUslj67nt5AZUxl0kaQypuNvQnk5z1YvUUEOcAW8VZZlMtwMbBrl
-   6iZXO4L4el66RXU4rY3w0UXEkj3iVW6Q5rEBFKhFh8lXqBQW20tPYW6V5
-   ZJNLrO73JJl34mrzl3qV6WgzQ2JEoswEr3mkKmY+hnJSqm6G7lUaA4WTg
-   CpCebr4KkogOps09bjj7iY2nBglc2nh/a0dgLz98MacNkcFD61ix8+fET
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10691"; a="345824898"
-X-IronPort-AV: E=Sophos;i="5.99,227,1677571200"; 
-   d="scan'208";a="345824898"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Apr 2023 03:52:09 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10691"; a="837877155"
-X-IronPort-AV: E=Sophos;i="5.99,227,1677571200"; 
-   d="scan'208";a="837877155"
-Received: from lutongxi-mobl.ccr.corp.intel.com (HELO [10.249.168.124]) ([10.249.168.124])
-  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Apr 2023 03:52:04 -0700
-Message-ID: <3efd2b9b-bfea-1c33-d78d-30078f0c967c@linux.intel.com>
-Date:   Wed, 26 Apr 2023 18:52:02 +0800
+        with ESMTP id S240108AbjDZLXE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 Apr 2023 07:23:04 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 247791737;
+        Wed, 26 Apr 2023 04:23:03 -0700 (PDT)
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 33QBKulm016375;
+        Wed, 26 Apr 2023 11:23:02 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
+ mime-version : content-transfer-encoding : in-reply-to : references : cc :
+ from : subject : to : message-id : date; s=pp1;
+ bh=zrLhspNE92i+xZ355NeJcAoz5stMISrGduglnBH3rb8=;
+ b=FvbJJ1mIBwE3ENwu0GsXFN/uQrhe14tfh0BmCTpvwD+dIVuevTMJt7rkeQdvOIMzou8K
+ mp+67oKjqAPf5Uq9vOyllyewij0um5/PhgoLvGZCaXXrxCK2xy81CYel2ARDwdoekpnT
+ ZaaREVbWD19sZ2kXVMrR11bAafnQ9qYkuqZwoHeci9KHpEHThGeil+FQxHaumQ4EN2o/
+ lmOOrv2jMmw2oSljZIANP02qU493Zbs54UdUVtHZASbvythDdA6WCW1TCZpIobLK0J+Q
+ Nix1Yaz7TF4uF0+a83CFf46txhW2bJ1L9IQ5o6FaBBCY+qzk1VhQAc8dkqUa6xj27xEn Ug== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3q730n01nn-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 26 Apr 2023 11:23:02 +0000
+Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 33QBKtGc016349;
+        Wed, 26 Apr 2023 11:23:01 GMT
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3q730n01n1-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 26 Apr 2023 11:23:01 +0000
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+        by ppma02fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 33Q286xr008237;
+        Wed, 26 Apr 2023 11:22:59 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+        by ppma02fra.de.ibm.com (PPS) with ESMTPS id 3q47771wr7-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 26 Apr 2023 11:22:59 +0000
+Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
+        by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 33QBMtge2097830
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 26 Apr 2023 11:22:55 GMT
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 6C07B20040;
+        Wed, 26 Apr 2023 11:22:55 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3B4AC2004B;
+        Wed, 26 Apr 2023 11:22:55 +0000 (GMT)
+Received: from t14-nrb (unknown [9.155.203.253])
+        by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Wed, 26 Apr 2023 11:22:55 +0000 (GMT)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Subject: Re: [PATCH v7 2/5] KVM: x86: Virtualize CR3.LAM_{U48,U57}
-To:     "Huang, Kai" <kai.huang@intel.com>,
-        "Gao, Chao" <chao.gao@intel.com>,
-        "Christopherson,, Sean" <seanjc@google.com>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "robert.hu@linux.intel.com" <robert.hu@linux.intel.com>,
-        "Guo, Xuelian" <xuelian.guo@intel.com>
-References: <20230404130923.27749-3-binbin.wu@linux.intel.com>
- <9c99eceaddccbcd72c5108f72609d0f995a0606c.camel@intel.com>
- <497514ed-db46-16b9-ca66-04985a687f2b@linux.intel.com>
- <7b296e6686bba77f81d1d8c9eaceb84bd0ef0338.camel@intel.com>
- <cc265df1-d4fc-0eb7-f6e8-494e98ece2d9@linux.intel.com>
- <BL1PR11MB5978D1FA3B572A119F5EF3A9F7989@BL1PR11MB5978.namprd11.prod.outlook.com>
- <5e229834-3e55-a580-d9f6-a5ffe971c567@linux.intel.com>
- <7895c517a84300f903cb04fbf2f05c4b8e518c91.camel@intel.com>
- <612345f3-74b8-d4bc-b87d-d74c8d0aedd1@linux.intel.com>
- <14e019dff4537cfcffe522750a10778b4e0f1690.camel@intel.com>
- <ZEiU5Rln4uztr1bz@chao-email>
- <b7d4d662d82ad1503d971a8716ff11edbfd33b14.camel@intel.com>
-From:   Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <b7d4d662d82ad1503d971a8716ff11edbfd33b14.camel@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-5.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20230421113647.134536-3-frankja@linux.ibm.com>
+References: <20230421113647.134536-1-frankja@linux.ibm.com> <20230421113647.134536-3-frankja@linux.ibm.com>
+Cc:     linux-s390@vger.kernel.org, imbrenda@linux.ibm.com,
+        thuth@redhat.com, david@redhat.com
+From:   Nico Boehr <nrb@linux.ibm.com>
+Subject: Re: [kvm-unit-tests PATCH v3 2/7] lib: s390x: uv: Add intercept data check library function
+To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
+Message-ID: <168250817495.44728.6509550513181442670@t14-nrb>
+User-Agent: alot/0.8.1
+Date:   Wed, 26 Apr 2023 13:22:54 +0200
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 5gZv-95ji2pxvoGJlIWUqu5Cr4Q0fcxZ
+X-Proofpoint-ORIG-GUID: fs9GrNpJZWYxhw6vS0pA7z9DfEdBNuiW
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
+ definitions=2023-04-26_04,2023-04-26_03,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 mlxscore=0
+ malwarescore=0 phishscore=0 suspectscore=0 bulkscore=0 mlxlogscore=926
+ adultscore=0 impostorscore=0 priorityscore=1501 lowpriorityscore=0
+ clxscore=1011 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2303200000 definitions=main-2304260098
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Quoting Janosch Frank (2023-04-21 13:36:42)
+> When working with guests it's essential to check the SIE intercept
+> data for the correct values. Fortunately on PV guests these values are
+> constants so we can create check functions which test for the
+> constants.
+>=20
+> While we're at it let's make pv-diags.c use this new function.
+>=20
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
 
-
-On 4/26/2023 4:43 PM, Huang, Kai wrote:
-> On Wed, 2023-04-26 at 11:05 +0800, Gao, Chao wrote:
->> On Wed, Apr 26, 2023 at 06:48:21AM +0800, Huang, Kai wrote:
->>> ... when EPT is on, as you mentioned guest can update CR3 w/o causing VMEXIT to
->>> KVM.
->>>
->>> Is there any global enabling bit in any of CR to turn on/off LAM globally?  It
->>> seems there isn't because AFAICT the bits in CR4 are used to control super mode
->>> linear address but not LAM in global?
->> Right.
->>
->>> So if it is true, then it appears hardware depends on CPUID purely to decide
->>> whether to perform LAM or not.
->>>
->>> Which means, IIRC, when EPT is on, if we don't expose LAM to the guest on the
->>> hardware that supports LAM, I think guest can still enable LAM in CR3 w/o
->>> causing any trouble (because the hardware actually supports this feature)?
->> Yes. But I think it is a non-issue ...
->>
->>> If it's true, it seems we should trap CR3 (at least loading) when hardware
->>> supports LAM but it's not exposed to the guest, so that KVM can correctly reject
->>> any LAM control bits when guest illegally does so?
->>>
->> Other features which need no explicit enablement (like AVX and other
->> new instructions) have the same problem.
-> OK.
->
->> The impact is some guests can use features which they are not supposed
->> to use. Then they might be broken after migration or kvm's instruction
->> emulation. But they put themselves at stake, KVM shouldn't be blamed.
->>
->> The downside of intercepting CR3 is the performance impact on existing
->> VMs (all with old CPU models and thus all have no LAM). If they are
->> migrated to LAM-capable parts in the future, they will suffer
->> performance drop even though they are good tenents (i.e., won't try to
->> use LAM).
->>
->> IMO, the value of preventing some guests from setting LAM_U48/U57 in CR3
->> when EPT=on cannot outweigh the performance impact. So, I vote to
->> document in changelog or comments that:
->> A guest can enable LAM for userspace pointers when EPT=on even if LAM
->> isn't exposed to it. KVM doens't prevent this out of performance
->> consideration
-> Yeah performance impact is the concern.  I agree we can just call out this in
-> changelog and/or comments.  Just want to make sure this is mentioned/discussed.
->
-> My main concern is, as (any) VMEXIT saves guest's CR3 to VMCS's GUEST_CR3, KVM
-> may see GUEST_CR3 containing invalid control bits (because KVM believes the
-> guest doesn't support those feature bits), and if KVM code carelessly uses
-> WARN() around those code, a malicious guest may be able to attack host, which
-> means we need to pay more attention to code review around GUEST_CR3 in the
-> future.
-
-How about do guest CR3 LAM bits check based on the capability of 
-physical processor instead of vCPU?
-That is KVM doesn't prevent guest from setting CR3 LAM bits if the 
-processor supports LAM.
->
-> Anyway not intercepting CR3 is fine to me, and will leave this to others.
->
-
+Reviewed-by: Nico Boehr <nrb@linux.ibm.com>
