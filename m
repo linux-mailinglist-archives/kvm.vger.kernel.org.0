@@ -2,214 +2,280 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8E6706EEF46
-	for <lists+kvm@lfdr.de>; Wed, 26 Apr 2023 09:23:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E71126EEFC2
+	for <lists+kvm@lfdr.de>; Wed, 26 Apr 2023 10:02:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239688AbjDZHXL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 Apr 2023 03:23:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35244 "EHLO
+        id S239877AbjDZICz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 Apr 2023 04:02:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57112 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239597AbjDZHXI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 Apr 2023 03:23:08 -0400
-Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4AEED30EB;
-        Wed, 26 Apr 2023 00:22:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1682493760; x=1714029760;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=yi1a9EsM7a/1yw+tvFfhhmzxMOz5qxjfooQGpdza1zU=;
-  b=EQK68MgRJqEsu1jqwhpUBCz9VwbVIeniVChe+vQru2EKwDOaHfJ5ga6r
-   ImJr0l+t0AAZFXlBXKIA32Ocsw3LG/7cL5SERpLTaQzHhIPxE76J1nV+L
-   6BdrrsgN0KURG4S9utBaQepY+1HlD20oLAx6xspyXaQA8JcOFrmwvGN7w
-   8hMFuiOe9SYNxHVTq02gnzvoyY6MGiJYW8MrD9E/ZcwqKSBJXm1eWWQ+t
-   9MStAO/6or2C/hCHNDXpEReSCuSeH+tuHvfUG6dmgGcUWj5QRxFw9UJcq
-   GdNTrsHsZfEGMyRg+1b8yxfG90DZaMsZV9xf4nXe99U/cClHACEemupyO
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10691"; a="412331754"
-X-IronPort-AV: E=Sophos;i="5.99,227,1677571200"; 
-   d="scan'208";a="412331754"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Apr 2023 00:22:26 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10691"; a="696497868"
-X-IronPort-AV: E=Sophos;i="5.99,227,1677571200"; 
-   d="scan'208";a="696497868"
-Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
-  by fmsmga007.fm.intel.com with ESMTP; 26 Apr 2023 00:22:26 -0700
-Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.23; Wed, 26 Apr 2023 00:22:25 -0700
-Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
- fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.23 via Frontend Transport; Wed, 26 Apr 2023 00:22:25 -0700
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.174)
- by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.23; Wed, 26 Apr 2023 00:22:25 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=RyrHcNToNIqqEc4OKsjKn+ln271ey1g3kkg5V+EFmJAUXrlAaEcN8vHBuiB/M68A5IyvEfz0wcWRKCvFgzw/P6MACi9RyhpHd8SDZwefcwEHhb/Uf9YTfTwaRIHCKtEf9Fjnm4Kn40pVraTcu6T/4xsPFjnDoqvH/kcJ5Hcdj3lm8FSEk2hlPwWSUmR0SQ/PY+RHKDPY+DQ8IndkBAtmMsaP3a9/WU2K29Cms0nBlAtW8Mh3YfzHhupCvBJQYizeR/hqSJQ+K3xnufXNSFhbIRqqRrCLdOyXSpM/8WUzEk/juUeeZZu3nSjeRMlcsAKfK/REmvrgxZg7EEwG4O5yzA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=CiyIQiUvHCcJ5rnSrtNPp8sKX/1629lnWjQ96g+g91o=;
- b=lEwe3++NCjTJ6EU1HhT8WUy/L2s3UPaYZn5fJTBnfwcMUYxYr4yve0W1hu9LKkSdQO7cSvjMWzeu1dJltr15ZODftC/o5ufu2oUys8d10i2cSchAzXSyngjesMNDCreChptod/S8GJDz3VALF9eob3kpweDI3yQI+sqbRUMSocdKb/3MXpHrS/2R1Mfi6PT/xD6dEL5K7n/EkdLBZf8AFORMeMljb19uGILTfZZSNgei194HHv0JDcknFdlJAQor2hCWQ4JO3DRfMaFIKX88jxiZSYE7OPiB5zVJFD1e0UxHfmx3egVtyAPePrbXzyFiD+pEycbp/ACNrkM8NybLCg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from DS0PR11MB7529.namprd11.prod.outlook.com (2603:10b6:8:141::20)
- by CY5PR11MB6317.namprd11.prod.outlook.com (2603:10b6:930:3f::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6319.32; Wed, 26 Apr
- 2023 07:22:18 +0000
-Received: from DS0PR11MB7529.namprd11.prod.outlook.com
- ([fe80::5b44:8f52:dbeb:18e5]) by DS0PR11MB7529.namprd11.prod.outlook.com
- ([fe80::5b44:8f52:dbeb:18e5%5]) with mapi id 15.20.6319.033; Wed, 26 Apr 2023
- 07:22:18 +0000
-From:   "Liu, Yi L" <yi.l.liu@intel.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-CC:     Jason Gunthorpe <jgg@nvidia.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
-        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
-        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "jasowang@redhat.com" <jasowang@redhat.com>,
-        "shameerali.kolothum.thodi@huawei.com" 
-        <shameerali.kolothum.thodi@huawei.com>,
-        "lulu@redhat.com" <lulu@redhat.com>,
-        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
-        "intel-gvt-dev@lists.freedesktop.org" 
-        <intel-gvt-dev@lists.freedesktop.org>,
-        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
-        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-        "Hao, Xudong" <xudong.hao@intel.com>,
-        "Zhao, Yan Y" <yan.y.zhao@intel.com>,
-        "Xu, Terrence" <terrence.xu@intel.com>,
-        "Jiang, Yanting" <yanting.jiang@intel.com>,
-        "Duan, Zhenzhong" <zhenzhong.duan@intel.com>
-Subject: RE: [PATCH v3 12/12] vfio/pci: Report dev_id in
- VFIO_DEVICE_GET_PCI_HOT_RESET_INFO
-Thread-Topic: [PATCH v3 12/12] vfio/pci: Report dev_id in
- VFIO_DEVICE_GET_PCI_HOT_RESET_INFO
-Thread-Index: AQHZZKiCMJJkpNrujkKpjX0h05Zqwa8cqG8AgAAcMGCAACibgIAAAyuAgAAEPICAAAjLgIAAGeKAgAAG7oCAAAf9gIAAO30AgACaIeCAAJxQgIAHkI0AgAApuICAABWEgIAAGNKAgAA3aoCAACJEAIABGhiAgAA2uYCAAM6MAIAAOT6AgABpLgCAAPyoAIAAA7kQgACCLICAA9TGQIABATgAgAAIdQCAAAm2AIABGm0AgABffwCAArUGYIAAJAOAgAj7bjA=
-Date:   Wed, 26 Apr 2023 07:22:17 +0000
-Message-ID: <DS0PR11MB75298CDC8108BA213243DBB8C3659@DS0PR11MB7529.namprd11.prod.outlook.com>
-References: <BN9PR11MB5276782DA56670C8209470828C989@BN9PR11MB5276.namprd11.prod.outlook.com>
-        <ZDfslVwqk6JtPpyD@nvidia.com>
-        <20230413120712.3b9bf42d.alex.williamson@redhat.com>
-        <BN9PR11MB5276A160CA699933B897C8C18C999@BN9PR11MB5276.namprd11.prod.outlook.com>
-        <DS0PR11MB7529B7481AC97261E12AA116C3999@DS0PR11MB7529.namprd11.prod.outlook.com>
-        <20230414111043.40c15dde.alex.williamson@redhat.com>
-        <DS0PR11MB75290A78D6879EC2E31E21AEC39C9@DS0PR11MB7529.namprd11.prod.outlook.com>
-        <20230417130140.1b68082e.alex.williamson@redhat.com>
-        <ZD2erN3nKbnyqei9@nvidia.com>
-        <20230417140642.650fc165.alex.williamson@redhat.com>
-        <ZD6TvA+9oI0v4vC2@nvidia.com>
-        <20230418123920.5d92f402.alex.williamson@redhat.com>
-        <DS0PR11MB7529C11E11F187D7BD88C18AC3639@DS0PR11MB7529.namprd11.prod.outlook.com>
- <20230420080839.652732dc.alex.williamson@redhat.com>
-In-Reply-To: <20230420080839.652732dc.alex.williamson@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DS0PR11MB7529:EE_|CY5PR11MB6317:EE_
-x-ms-office365-filtering-correlation-id: d1aa4def-ef46-4faf-1074-08db4626f769
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: u3KrnVfSQVLuppNeKVzkZO2EyxRg8cXgWmsDrPaUczCEY66nF1I/OIUtVdCBiXGmL4Kfy6oKzxZF5r3o75w+3gsb/SsdopgkyP1GGtq399gyzDLZlltQmlRVZL0zuoxDs5YPAF0dUt5E/EX/TvTPOx34TRGn2IO5EXXtTkgMsBWx3Unu7VtYlOBbDOfdZJ32kUofFTXAwXDelPq0iCn9Z9Kg053s/mMUAOZ3FujsGwfxRWTS8nnHgYeoQxEatQcB3p3rF2ELplTrzlhXHQY6yW8bAbyY80HPRz3QF8Th3iCectnLSyCr11BPPYzu3XKFYyWHIMc5eAurgmY3IqFoW5VWlRLt0VHKJemWzxd3tmMDtE5wtGGS3QygqBtSAbd7OVXcYshKF08wnLWbmUzq+iTEbBVXEhBk05bwSqHWlg6Pv8s9P++xGN2hzMi4SfrlHL4ImNntDniLBVifB/drKxEh7MhEcQlU/vXIjYILSSoERA13p2dmaWwbttyeB37Fiqc2uAfhOyk0qFDku80fCbRmsPJEhEjLat/jRX7djBY+qget9KWQa6cIi9FcyA4vYC3nCJkNduKb01bGNkXFK2Ud3EZ8JH8Oe6rvIQNWMFDaig1ygijTYVlmnECmza2m
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB7529.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(366004)(396003)(376002)(136003)(39860400002)(346002)(451199021)(86362001)(186003)(9686003)(6506007)(26005)(38100700002)(5660300002)(52536014)(7696005)(33656002)(83380400001)(71200400001)(478600001)(54906003)(38070700005)(7416002)(41300700001)(2906002)(8936002)(8676002)(82960400001)(316002)(66446008)(66946007)(64756008)(55016003)(66476007)(122000001)(76116006)(6916009)(66556008)(4326008);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?pU7H86DDSRz3n8BKNlYgt+Il1fNQFaLH+tsDdJ2UEZ+olBwjhCi71+vU6AF3?=
- =?us-ascii?Q?QDXUVxm43mA25pisxg7Lwa5bF6iN6pXXee6hd/kuLeFuKBFFPWSz3tSoZQRV?=
- =?us-ascii?Q?zOdbNN73CJBwdxTz2StJeD/EQ+uVBDBrZZtzKhsLiPulXQumsOrUgbN0AmXy?=
- =?us-ascii?Q?PjyM/Da46FAYnWR2oIt6zzjI1eVDWjk4PWrSIhK9dpBDpKgBdtUJM9mMcKmU?=
- =?us-ascii?Q?ZbECz6Gt4g3EcAy30Ztsl5C/pe4Oj7dDqw7JXUNpYfqDgIBV9KYBJF7OC+w4?=
- =?us-ascii?Q?iRVcSsEOz0+OGVxPGpCroG8Tb3m5RoYQJpzOd5/uDqjB1EqqUUdMmKKItE+E?=
- =?us-ascii?Q?Ow92aN3wCxlThcLTcL00oEE9bwubxyb4ceKH1Wcquk66n1JKglvb7u8OEWOg?=
- =?us-ascii?Q?U7tiH0JtjUsebSQQqTBJHHLZxR0AXW54sBqZvKSq26axcx1wW4xya55U/6h6?=
- =?us-ascii?Q?uNo4wKN6/M1nRfWC/WiBq2KbHZsMDOw/Mm3WwFYDXIOTAqUJxdMCzSCJKYgF?=
- =?us-ascii?Q?QztBJjHK33ghIBncbgHcCzIFXC47vKkoD/K5wtYQnn2l5TUjVaGvlLdoc6y5?=
- =?us-ascii?Q?9ghFaR3ITFqezk8zRUAcN26ckLB/kupV1Q7i2qErZa03Cg1ro4vb0jN9QR6k?=
- =?us-ascii?Q?NRLfGfJwPrYrwkINBWnqHYekgtzfHZjLDj6xJ46DEgUBALxvFNZ+GQzVVR6x?=
- =?us-ascii?Q?/XA6EMg7G31LlG9+J+x7hdkDtFEuWQC6zRg+C5tI342OOk+BlBf+LTwjuvSg?=
- =?us-ascii?Q?kWExloHQdsUtfbdAMcYfJq+7OJgWaa2rzFs6DTrVmFZ8d/kspTxXD2znZ5mD?=
- =?us-ascii?Q?IgrfbMWdOY3ZmypLsPBBzdPzoicXqakbnzGubOzCx3FSCnFbjVE9QmveCkjd?=
- =?us-ascii?Q?nJQTlnOuGUm7ji9Up5a3X79gSUxNJhEph4FcTgQRXBXYtbsPguwwplwKtGYP?=
- =?us-ascii?Q?y/hoMjJEq3bH9wI6tnmR0BTcp1itG9JJ3DBqE8aal/W5oLLdkvfCIfN4zm0L?=
- =?us-ascii?Q?GVYZ3eXS/vlH+sjrdHcU0Gf+tLVDDYR2whi/Eq0s8Q8yrCCUem2Qc+IJotU0?=
- =?us-ascii?Q?eLoPWLZjL4n8nKetaTsQLmmOiZSqABsRDEMCGLj+Iveegg71mr61YIVrVSMv?=
- =?us-ascii?Q?wMXqbqe4Hu8ohSae2zpOjy186HE+HhcfeYJN8iMxbgCAzvKqN7xJn9AryKeM?=
- =?us-ascii?Q?ruQBn9bS9vpdZ5k5Be+gTUaWGczcdkrPOY6X8Ed3WTN1lfpzRZiFa+q1cEyN?=
- =?us-ascii?Q?g51D+coREN/g57BHzVb1ag65ozcDfv9htGXRhHNl+Tam2P+T4RWF7hBTDFAR?=
- =?us-ascii?Q?RTesEkMwzkVl6IhUOtyx86uKzpKiTlvoicteG3lP5dOCab7jjjc8pWnzN0Kn?=
- =?us-ascii?Q?EQCC5B/4AB5M0bKEncjhuS9ldlRKsfIgterCpA5iGvtP3mXz2JyGNUyZFW8N?=
- =?us-ascii?Q?v6jzuXrB1ycUQvIGrf9hKT0Y9SWi5mmTuCMTcRYUF9Tprm+jmRBFUc4zkYCr?=
- =?us-ascii?Q?iUCysBC3nd4L2TNFys8eGlftQH+TOe5GqgVM4t7B/Wm4F/f6zEk2flPcxBs+?=
- =?us-ascii?Q?UwiOtPHC8mf1bBrNkHlds73fqx7TE26ziJJMfBX2?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        with ESMTP id S239446AbjDZICy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 Apr 2023 04:02:54 -0400
+Received: from mail-lj1-x230.google.com (mail-lj1-x230.google.com [IPv6:2a00:1450:4864:20::230])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA6ADDC
+        for <kvm@vger.kernel.org>; Wed, 26 Apr 2023 01:02:51 -0700 (PDT)
+Received: by mail-lj1-x230.google.com with SMTP id 38308e7fff4ca-2a8aea2a654so65958131fa.1
+        for <kvm@vger.kernel.org>; Wed, 26 Apr 2023 01:02:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=rivosinc-com.20221208.gappssmtp.com; s=20221208; t=1682496170; x=1685088170;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=c6VqCfb1kZ/+ni6WW1VeBoVtLPJZGHHpNASSaglTaKY=;
+        b=Hp3aE02HRO0m3EBKxD02RPwATf5ceTDh/i9USme207oxn1diekd5bTeXtZQSKuJrxc
+         lqxuBO0dtGbO01nQ1KD4vl/RkVBN0QnvLtUu7Y6aZDFdB7OiGGLCXEmGM6h6YHIWwtBU
+         HxyaJiWfbNR6Zuemq5kBjaycfIlDoYxHVaVH4FxsN9o0Est2c0n5wikAMnmtFiXX9PgM
+         X9mbBgGkR1aQGsADNvNuE/7vP4qPCdq71Cq7Eyt/io68aRAjbtbK6b4fMCrAjZwWkK3/
+         k44hCbUubgZlGOX/Wn/x/Ris46x7S735iq4yyoAI4E97YMPF+plb+C8uS1LYmylluBR2
+         UcIA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1682496170; x=1685088170;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=c6VqCfb1kZ/+ni6WW1VeBoVtLPJZGHHpNASSaglTaKY=;
+        b=DzHit/8X1NPP3pRZTQ/J2ohQNxlmNvn9VJmz+e/V0TcmmcDLWOtO1KKtTbwggPv3Z+
+         HQbDBPfnKFAdGyMdlLbv/RAOrnlryMKJnI9v9wGyCllw5goYgNu2rtTJEB+pzOsAPphi
+         8qqBDc0S/aFLEESztckiWL0nysG5oR3vaIdTjz8tkNOXU2HE6lAyGQQYfNFkyX5IU/k0
+         /Si733RiZHZD9e9oRFW6Zu+iFLKdW3Pbc4r76F6hVngOmP1ldLiVrr6+OeDlQtUMZZH8
+         PBucQK8JSBcip2l06D5nBq3pkh3zG1vXdCi4E5slA3IXNVa3l17R3+OGjT2H2vy0VUxr
+         GDxA==
+X-Gm-Message-State: AAQBX9ep6Z7PKIqqtqPs3ceehQCacpw8Ajw7YOZIZwTgah/2wlJPe3nf
+        eiIMHAq3t9Z4ZP2gpVz0aT49CYcTA9wjx8lp7BksPA==
+X-Google-Smtp-Source: AKy350bhUHsJEvcsW8iSEylieDylog00SNfNj0iBGM6TzFGJ4p1/0j/5I8WnT45BTziCTTQzCFmf2MYWcO8/ALW7viU=
+X-Received: by 2002:a2e:a41a:0:b0:2a1:ab4a:153d with SMTP id
+ p26-20020a2ea41a000000b002a1ab4a153dmr4970025ljn.29.1682496169872; Wed, 26
+ Apr 2023 01:02:49 -0700 (PDT)
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB7529.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d1aa4def-ef46-4faf-1074-08db4626f769
-X-MS-Exchange-CrossTenant-originalarrivaltime: 26 Apr 2023 07:22:17.6604
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: vQ05H6ZuX1WpLORv573iJMb7SiFBtfHbwWE5997Geoj+mzht96psdMq1hxhdnJRbpa1RTiMBq4DCLPNehDOgBw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR11MB6317
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-4.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
-        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+References: <20230419221716.3603068-1-atishp@rivosinc.com> <20230419221716.3603068-46-atishp@rivosinc.com>
+ <69ba1760-a079-fd8f-b079-fcb01e3eedec@intel.com> <CAHBxVyFhDapAeMQ8quBqWZ10jWSHw1CdE227ciyKQpULHYzffA@mail.gmail.com>
+ <81c476f4-ef62-e4a6-0033-8a46a15379fd@intel.com> <CAHBxVyHg7vTaQJWKoVSD8budVZEYSo1eDOyZyZK7gcJApR7SbA@mail.gmail.com>
+ <fe1a849a-3276-5fad-869b-bad54bc918f6@intel.com>
+In-Reply-To: <fe1a849a-3276-5fad-869b-bad54bc918f6@intel.com>
+From:   Atish Kumar Patra <atishp@rivosinc.com>
+Date:   Wed, 26 Apr 2023 13:32:38 +0530
+Message-ID: <CAHBxVyEkcGwcxB+oDWywJuAwkC-k-_0gMC-mXqSEHy_MyTcN4A@mail.gmail.com>
+Subject: Re: [RFC 45/48] RISC-V: ioremap: Implement for arch specific ioremap hooks
+To:     Dave Hansen <dave.hansen@intel.com>
+Cc:     linux-kernel@vger.kernel.org,
+        Rajnesh Kanwal <rkanwal@rivosinc.com>,
+        Alexandre Ghiti <alex@ghiti.fr>,
+        Andrew Jones <ajones@ventanamicro.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Anup Patel <anup@brainfault.org>,
+        Atish Patra <atishp@atishpatra.org>,
+        =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@rivosinc.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
+        Sean Christopherson <seanjc@google.com>,
+        linux-coco@lists.linux.dev, Dylan Reid <dylan@rivosinc.com>,
+        abrestic@rivosinc.com, Samuel Ortiz <sameo@rivosinc.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Conor Dooley <conor.dooley@microchip.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Guo Ren <guoren@kernel.org>, Heiko Stuebner <heiko@sntech.de>,
+        Jiri Slaby <jirislaby@kernel.org>,
+        kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
+        linux-mm@kvack.org, linux-riscv@lists.infradead.org,
+        Mayuresh Chitale <mchitale@ventanamicro.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Uladzislau Rezki <urezki@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> From: Alex Williamson <alex.williamson@redhat.com>
-> Sent: Thursday, April 20, 2023 10:09 PM
-[...]
-> > > Whereas dev-id < 0
-> > > (=3D=3D -1) is an affected device which prevents hot-reset, ex. an un=
--owned
-> > > device, device configured within a different iommufd_ctx, or device
-> > > opened outside of the vfio cdev API."  Is that about right?  Thanks,
+On Tue, Apr 25, 2023 at 6:40=E2=80=AFPM Dave Hansen <dave.hansen@intel.com>=
+ wrote:
+>
+> On 4/25/23 01:00, Atish Kumar Patra wrote:
+> > On Mon, Apr 24, 2023 at 7:18=E2=80=AFPM Dave Hansen <dave.hansen@intel.=
+com> wrote:
+> >> On 4/21/23 12:24, Atish Kumar Patra wrote:
+> >> I'm not _quite_ sure what "guest initiated" means.  But SEV and TDX
+> >> don't require an ioremap hook like this.  So, even if they *are* "gues=
+t
+> >> initiated", the question still remains how they work without this patc=
+h,
+> >> or what they are missing without it.
 > >
-> > Do you mean to have separate err-code for the three possibilities? As
-> > the devid is generated by iommufd and it is u32. I'm not sure if we can
-> > have such err-code definition without reserving some ids in iommufd.
->=20
-> Yes, if we're going to report the full dev-set, I think we need at
-> least two unique error codes or else the user has no way to determine
-> the subset of invalid dev-ids which block the reset.  I think Jason is
-> proposing the set of valid dev-ids are >0, a dev-id of zero indicates
-> some form of non-blocking, while <0 (or maybe specifically -1)
-> indicates a blocking device.  I was trying to get consensus on a formal
-> definition of each of those error codes in my previous reply.  Thanks,
+> > Maybe I misunderstood your question earlier. Are you concerned about gu=
+ests
+> > invoking any MMIO region specific calls in the ioremap path or passing
+> > that information to the host ?
+>
+> My concern is that I don't know why this patch is here.  There should be
+> a very simple answer to the question: Why does RISC-V need this patch
+> but x86 does not?
+>
+> > Earlier, I assumed the former but it seems you are also concerned
+> > about the latter as well. Sorry for the confusion in that case.
+> > The guest initiation is necessary while the host notification can be
+> > made optional.
+> > The "guest initiated" means the guest tells the TSM (equivalent of TDX
+> > module in RISC-V) the MMIO region details.
+> > The TSM keeps a track of this and any page faults that happen in that
+> > region are forwarded
+> > to the host by the TSM after the instruction decoding. Thus TSM can
+> > make sure that only ioremapped regions are
+> > considered MMIO regions. Otherwise, all memory outside the guest
+> > physical region will be considered as the MMIO region.
+>
+> Ahh, OK, that's a familiar problem.  I see the connection to device
+> filtering now.
+>
+> Is this functionality in the current set?  I went looking for it and all
+> I found was the host notification side.
+>
 
-Seems like RESETTABLE flag is not needed if we report -1 for the devices
-that block hotreset. Userspace can deduce if the calling device is resettab=
-le
-or not by checking if there is any -1 in the affected device list.
+The current series doesn't have the guest filtering feature enabled.
+However, we implemented guest filtering and is maintained in a separate tre=
+e
 
-Regards,
-Yi Liu
+https://github.com/rivosinc/linux/tree/cove-integration-device-filtering
+
+We did not include those in this series because the tdx patches are
+still undergoing
+development. We are planning to rebase our changes once the revised
+patches are available.
+
+> Is this the only mechanism by which the guest tells the TSM which parts
+> of the guest physical address space can be exposed to the host?
+>
+
+This is the current approach defined in CoVE spec. Guest informs about both
+shared memory & mmio regions via dedicated SBI calls (
+e.g sbi_covg_[add/remove]_mmio_region and
+sbi_covg_[share/unshare]_memory_region)
+
+> For TDX and SEV, that information is inferred from a bit in the page
+> tables.  Essentially, there are dedicated guest physical addresses that
+> tell the hardware how to treat the mappings: should the secure page
+> tables or the host's EPT/NPT be consulted?
+>
+
+Yes. We don't have such a mechanism defined in CoVE yet.
+Having said that, there is nothing in ISA to prevent that and it is doable.
+Some specific bits in the PTE entry can also be used to encode for
+shared & mmio physical memory addresses.
+The TSM implementation will probably need to implement a software page
+walker in that case.
+
+Are there any performance advantages between the two approaches ?
+As per my understanding, we are saving some boot time privilege
+transitions & less ABIs but
+adds the cost of software walk at runtime faults.
+
+> If that mechanism is different for RISC-V, it would go a long way to
+> explaining why RISC-V needs this patch.
+>
+> > In the current CoVE implementation, that MMIO region information is als=
+o
+> > passed to the host to provide additional flexibility. The host may
+> > choose to do additional
+> > sanity check and bail if the fault address does not belong to
+> > requested MMIO regions without
+> > going to the userspace. This is purely an optimization and may not be m=
+andatory.
+>
+> Makes sense, thanks for the explanation.
+>
+> >>> It can be a subset of the region's host provided the layout. The
+> >>> guest device filtering solution is based on this idea as well [1].
+> >>>
+> >>> [1] https://lore.kernel.org/all/20210930010511.3387967-1-sathyanaraya=
+nan.kuppuswamy@linux.intel.com/
+> >>
+> >> I don't really see the connection.  Even if that series was going
+> >> forward (I'm not sure it is) there is no ioremap hook there.  There's
+> >> also no guest->host communication in that series.  The guest doesn't
+> >> _tell_ the host where the MMIO is, it just declines to run code for
+> >> devices that it didn't expect to see.
+> >
+> > This is a recent version of the above series from tdx github. This is
+> > a WIP as well and has not been posted to
+> > the mailing list. Thus, it may be going under revisions as well.
+> > As per my understanding the above ioremap changes for TDX mark the
+> > ioremapped pages as shared.
+> > The guest->host communication happen in the #VE exception handler
+> > where the guest converts this to a hypercall by invoking TDG.VP.VMCALL
+> > with an EPT violation set. The host would emulate an MMIO address if
+> > it gets an VMCALL with EPT violation.
+> > Please correct me if I am wrong.
+>
+> Yeah, TDX does:
+>
+> 1. Guest MMIO access
+> 2. Guest #VE handler (if the access faults)
+> 3. Guest hypercall->host
+> 4. Host fixes the fault
+> 5. Hypercall returns, guest returns from #VE via IRET
+> 6. Guest retries MMIO instruction
+>
+> From what you said, RISC-V appears to do:
+>
+> 1. Guest MMIO access
+> 2. Host MMIO handler
+> 3. Host handles the fault, returns
+> 4. Guest retries MMIO instruction
+>
+> In other words, this mechanism does the same thing but short-circuits
+> the trip through #VE and the hypercall.
+>
+
+Yes. Thanks for summarizing the tdx approach.
+
+> What happens if this ioremap() hook is not in place?  Does the hardware
+> (or TSM) generate an exception like TDX gets?  If so, it's probably
+> possible to move this "notify the TSM" code to that exception handler
+> instead of needing an ioremap() hook.
+>
+
+We don't have a #VE like exception mechanism in RISC-V.
+
+> I'm not saying that it's _better_ to do that, but it would allow you to
+> get rid of this patch for now and get me to shut up. :)
+>
+> > As I said above, the objective here is to notify the TSM where the
+> > MMIO is. Notifying the host is just an optimization that we choose to
+> > add. In fact, in this series the KVM code doesn't do anything with
+> > that information. The commit text probably can be improved to clarify
+> > that.
+>
+> Just to close the loop here, please go take a look at
+> pgprot_decrypted().  That's where the x86 guest page table bit gets to
+> tell the hardware that the mapping might cause a #VE and is under the
+> control of the host.  That's the extent of what x86 does at ioremap() tim=
+e.
+>
+> So, to summarize, we have:
+>
+> x86:
+> 1. Guest page table bit to mark shared (host) vs. private (guest)
+>    control
+> 2. #VE if there is a fault on a shared mapping to call into the host
+>
+> RISC-V:
+> 1. Guest->TSM call to mark MMIO vs. private
+> 2. Faults in the MMIO area are then transparent to the guest
+>
+
+Yup. This discussion raised a very valid design aspect of the CoVE spec.
+To summarize, we need to investigate whether using PTE bits instead of
+additional ABI
+for managing shared/confidential/ioremapped pages makes more sense.
+
+Thanks for putting up with my answers and the feedback :).
+
+> That design difference would, indeed, help explain why this patch is
+> here.  I'm still not 100% convinced that the patch is *required*, but I
+> at least understand how we arrived here.
