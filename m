@@ -2,63 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9E6C76EFB64
-	for <lists+kvm@lfdr.de>; Wed, 26 Apr 2023 21:57:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6FBEC6EFB65
+	for <lists+kvm@lfdr.de>; Wed, 26 Apr 2023 21:58:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234754AbjDZT5H (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 Apr 2023 15:57:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40834 "EHLO
+        id S234761AbjDZT6R (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 Apr 2023 15:58:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41540 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231610AbjDZT5G (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 Apr 2023 15:57:06 -0400
+        with ESMTP id S231610AbjDZT6Q (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 Apr 2023 15:58:16 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6AB4919B9
-        for <kvm@vger.kernel.org>; Wed, 26 Apr 2023 12:56:25 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EBFECD2
+        for <kvm@vger.kernel.org>; Wed, 26 Apr 2023 12:57:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1682538984;
+        s=mimecast20190719; t=1682539048;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Zw21Yr3ggXAcUufyzwCuaJsOabWd2wq00JsLEU9ouJI=;
-        b=I6GkysOJcBJlLNggJRPXsHxneks4tb7xRcqeWzSLRrgA389WAU6iNgY/poOUqOUX+g6vhc
-        vCO+QaroVDL/+xDW2hX0NbH76V6IfDc5yHKDKf/qebNajb1DBnvXxK71DR7t/93eC0tz9F
-        aTZ5tUtIrRrtoo0bd4paqtMMEpG8wek=
-Received: from mail-vk1-f200.google.com (mail-vk1-f200.google.com
- [209.85.221.200]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=B8Xh5WSnnf9Gc9BX2PFh/bbA5JFb7APsYGklshAUxH4=;
+        b=Zm7RdigIYsK7/9EVWm2b7OLvEXQVOwJGD/ztLAtJrccHJATItkX2/I57rwi+4cCX6On3Ai
+        fNf/+RZmr+cQcj4dAclEHlL0GNNpUNxMnR+uX30dkQ4JELa43WG6UR7oSndMSxfpi1mTgL
+        dPRbgfHXeOyuuJ9BBaOf5i9MQZ2Hd6k=
+Received: from mail-ua1-f72.google.com (mail-ua1-f72.google.com
+ [209.85.222.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-251-S_pMPLguPCazNyNGtUWQxw-1; Wed, 26 Apr 2023 15:56:23 -0400
-X-MC-Unique: S_pMPLguPCazNyNGtUWQxw-1
-Received: by mail-vk1-f200.google.com with SMTP id 71dfb90a1353d-443b6a0fb20so2255382e0c.3
-        for <kvm@vger.kernel.org>; Wed, 26 Apr 2023 12:56:23 -0700 (PDT)
+ us-mta-7-zXlir0BQNmCzih6cMqSlkA-1; Wed, 26 Apr 2023 15:57:25 -0400
+X-MC-Unique: zXlir0BQNmCzih6cMqSlkA-1
+Received: by mail-ua1-f72.google.com with SMTP id a1e0cc1a2514c-7714f81211aso2472816241.3
+        for <kvm@vger.kernel.org>; Wed, 26 Apr 2023 12:57:25 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682538982; x=1685130982;
+        d=1e100.net; s=20221208; t=1682539045; x=1685131045;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Zw21Yr3ggXAcUufyzwCuaJsOabWd2wq00JsLEU9ouJI=;
-        b=LXLMzvevbK0NBQ+H7xtXJOhTmu4omCGTRm0XFNHjVgQqDI5AupNxRg3bVQU0boMmU5
-         30/NYY9jSof64qXPpiQQnev+V6NBdrZILo7H8LzfDWmY5eiQK58paGChJI9EVN7Hdnco
-         ck5IPGZVR8uPOUys+7j/K802Dic8mHeBU8fzIzYYGH5PCxRNwNwL3fL8Q24mQl7aGKwq
-         uzgB2IO41ytGtYytiPdUe8Gimwm22ft5QRAKxMNCxid7+JHoxVkLEsYvIgISkHffrhFF
-         8REzvXMMahq9mIzmMBgyg6LWxHluUsRA7Bf+oUhtrWos8fhW2I6S4kPc4aaiT7pLN5Ad
-         ImqA==
-X-Gm-Message-State: AAQBX9fg7nTADLgtEhSMuYr8H1KTmlkKuXau02/BM7gOyk8zoTJwe0uK
-        e6sCh5eJd2fVVw3m6gJYALhRbSWEKPLf+D/6OfPqGwu6YwSdFuvmSQsIQ/sKe4jEcxpgExSwV3f
-        vwu+0U3oPQZdAch1tAUIgIBkRQwkgZ5BhEV4Wlg+gag==
-X-Received: by 2002:a67:fdc1:0:b0:42c:77da:5d05 with SMTP id l1-20020a67fdc1000000b0042c77da5d05mr9395097vsq.32.1682538982434;
-        Wed, 26 Apr 2023 12:56:22 -0700 (PDT)
-X-Google-Smtp-Source: AKy350avWADS6wf7krW/BTfvRMNhg7uAbHfe0GeCHgEOs4Z/SC/lQbVKnud8Dg7Z0RlimVHhVeGbA4nLVgX5KVsOQxw=
-X-Received: by 2002:a67:fdc1:0:b0:42c:77da:5d05 with SMTP id
- l1-20020a67fdc1000000b0042c77da5d05mr9395091vsq.32.1682538982142; Wed, 26 Apr
- 2023 12:56:22 -0700 (PDT)
+        bh=B8Xh5WSnnf9Gc9BX2PFh/bbA5JFb7APsYGklshAUxH4=;
+        b=Pj5iwGpabLGgrQyz/eVTOu+2sVFDMtFlc7X+4g6O11nGJjbWm72TK/LkRMrqtbbvbF
+         NR35GnPPOsP25a13jr/R3+p27wkpTQbPK0ZPGwvTegMRRebEQ0D2gbrIHfohDsO4X58I
+         6LBpRpYKvNdu9V8kWeMXdTjn0kFT+mhHMnfpybh+aV80vnU+5qYGP9t+4cpIIWUbHAgC
+         0obFGT0EaNVUTvwAIbz8klO1fwXZ6c8Lc6ioutOoGRerbGGyZRC9dsveDV0B6j5U8Wxt
+         mERWSjkZs20LEY32CkO8Wk3hz5JkSJNks4+SESFPOPcOx4f6mm/PdYYm8+HPhU2HnBg8
+         F2HA==
+X-Gm-Message-State: AAQBX9eiGlOExsVfJ3XkhegyyXR+1UC+ieeraufctKVSqN049Q3nlOVn
+        NCMxJg+6sewfog9yHdZevovEBfnEu84PQ3t9QmSgvb2VYjnX2U8utPXwa14wpRr0jMZIetFRaIW
+        ybQMdJteyezoCzGYvx+M9eDpqGF/F+OQUUqWjTss=
+X-Received: by 2002:a67:fd55:0:b0:426:2a37:4a6b with SMTP id g21-20020a67fd55000000b004262a374a6bmr9751799vsr.25.1682539044879;
+        Wed, 26 Apr 2023 12:57:24 -0700 (PDT)
+X-Google-Smtp-Source: AKy350a77YLGsVUF4DnO7UeE7LbQwM9vHQ9Qskb2xsJ4hqvUQNyt4D1gehqD3JWCkoQKQk4ps6kAgSghwI7ZMJYq79E=
+X-Received: by 2002:a67:fd55:0:b0:426:2a37:4a6b with SMTP id
+ g21-20020a67fd55000000b004262a374a6bmr9751792vsr.25.1682539044580; Wed, 26
+ Apr 2023 12:57:24 -0700 (PDT)
 MIME-Version: 1.0
-References: <20230424173529.2648601-1-seanjc@google.com> <20230424173529.2648601-5-seanjc@google.com>
-In-Reply-To: <20230424173529.2648601-5-seanjc@google.com>
+References: <20230424173529.2648601-1-seanjc@google.com> <20230424173529.2648601-7-seanjc@google.com>
+In-Reply-To: <20230424173529.2648601-7-seanjc@google.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Date:   Wed, 26 Apr 2023 21:56:11 +0200
-Message-ID: <CABgObfbBqbFhQxOT+UTO6WBDFxk+HMoDTpXdW18GBJGqAjbspA@mail.gmail.com>
-Subject: Re: [GIT PULL] KVM: x86: Selftests changes for 6.4
+Date:   Wed, 26 Apr 2023 21:57:13 +0200
+Message-ID: <CABgObfYHrBf=NM4+ay8zd1BzkQtgM-WcbkZwdAb2TnrwoEXP0A@mail.gmail.com>
+Subject: Re: [GIT PULL] KVM: x86: VMX changes for 6.4
 To:     Sean Christopherson <seanjc@google.com>
 Cc:     kvm@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
@@ -76,11 +76,10 @@ X-Mailing-List: kvm@vger.kernel.org
 On Mon, Apr 24, 2023 at 7:35=E2=80=AFPM Sean Christopherson <seanjc@google.=
 com> wrote:
 >
-> KVM x86 selftests change for 6.4.  And an AMX+XCR0 bugfix that I landed h=
-ere
-> to avoid creating a mess of unnecessary conflicts between the series to
-> overhaul the AMX test and the related selftests changes to verify the fix=
-.
+> KVM VMX changes for 6.4.  A few cleanups and a few fixes, nothing super
+> interesting or urgent.  IMO, the most notable part of this pull request i=
+s
+> that ENCLS is actually allowed in compatibility mode. :-)
 >
 > The following changes since commit d8708b80fa0e6e21bc0c9e7276ad0bccef73b6=
 e7:
@@ -90,93 +89,41 @@ e7:
 >
 > are available in the Git repository at:
 >
->   https://github.com/kvm-x86/linux.git tags/kvm-x86-selftests-6.4
+>   https://github.com/kvm-x86/linux.git tags/kvm-x86-vmx-6.4
 >
-> for you to fetch changes up to 20aef201dafba6a1ffe9daa145c7f2c525b74aae:
+> for you to fetch changes up to 4984563823f0034d3533854c1b50e729f5191089:
 >
->   KVM: selftests: Fix spelling mistake "perrmited" -> "permitted" (2023-0=
-4-14 10:04:51 -0700)
+>   KVM: nVMX: Emulate NOPs in L2, and PAUSE if it's not intercepted (2023-=
+04-11 09:35:49 -0700)
 
-Pulled (put not pushed yet), thanks.
+Pulled (but not pushed yet), thanks.
 
 Paolo
 
 > ----------------------------------------------------------------
-> KVM selftests, and an AMX/XCR0 bugfix, for 6.4:
+> KVM VMX changes for 6.4:
 >
->  - Don't advertisze XTILE_CFG in KVM_GET_SUPPORTED_CPUID if XTILE_DATA is
->    not being reported due to userspace not opting in via prctl()
+>  - Fix a bug in emulation of ENCLS in compatibility mode
 >
->  - Overhaul the AMX selftests to improve coverage and cleanup the test
+>  - Allow emulation of NOP and PAUSE for L2
 >
 >  - Misc cleanups
 >
 > ----------------------------------------------------------------
-> Aaron Lewis (9):
->       KVM: selftests: Assert that XTILE is XSAVE-enabled
->       KVM: selftests: Assert that both XTILE{CFG,DATA} are XSAVE-enabled
->       KVM: selftests: Move XSAVE and OSXSAVE CPUID checks into AMX's init=
-_regs()
->       KVM: selftests: Check that the palette table exists before using it
->       KVM: selftests: Check that XTILEDATA supports XFD
->       KVM: x86: Add a helper to handle filtering of unpermitted XCR0 feat=
-ures
->       KVM: selftests: Move XGETBV and XSETBV helpers to common code
->       KVM: selftests: Add all known XFEATURE masks to common code
->       KVM: selftests: Add test to verify KVM's supported XCR0
+> Binbin Wu (1):
+>       KVM: VMX: Use is_64_bit_mode() to check 64-bit mode in SGX handler
 >
-> Ackerley Tng (1):
->       KVM: selftests: Adjust VM's initial stack address to align with Sys=
-V ABI spec
+> Sean Christopherson (1):
+>       KVM: nVMX: Emulate NOPs in L2, and PAUSE if it's not intercepted
 >
-> Anish Moorthy (1):
->       KVM: selftests: Fix nsec to sec conversion in demand_paging_test
+> Yu Zhang (2):
+>       KVM: nVMX: Remove outdated comments in nested_vmx_setup_ctls_msrs()
+>       KVM: nVMX: Add helpers to setup VMX control msr configs
 >
-> Colin Ian King (1):
->       KVM: selftests: Fix spelling mistake "perrmited" -> "permitted"
->
-> Hao Ge (1):
->       KVM: selftests: Close opened file descriptor in stable_tsc_check_su=
-pported()
->
-> Ivan Orlov (1):
->       KVM: selftests: Add 'malloc' failure check in vcpu_save_state
->
-> Like Xu (2):
->       KVM: selftests: Add a helper to read kvm boolean module parameters
->       KVM: selftests: Report enable_pmu module value when test is skipped
->
-> Mingwei Zhang (6):
->       KVM: selftests: Add a fully functional "struct xstate" for x86
->       KVM: selftests: Fix an error in comment of amx_test
->       KVM: selftests: Enable checking on xcomp_bv in amx_test
->       KVM: selftests: Add check of CR0.TS in the #NM handler in amx_test
->       KVM: selftests: Assert that XTILE_DATA is set in IA32_XFD on #NM
->       KVM: selftests: Verify XTILE_DATA in XSTATE isn't affected by IA32_=
-XFD
->
-> Sean Christopherson (2):
->       KVM: x86: Filter out XTILE_CFG if XTILE_DATA isn't permitted
->       KVM: selftests: Rework dynamic XFeature helper to take mask, not bi=
-t
->
->  arch/x86/kvm/cpuid.c                               |   2 +-
->  arch/x86/kvm/x86.c                                 |   4 +-
->  arch/x86/kvm/x86.h                                 |  29 +++++
->  tools/testing/selftests/kvm/Makefile               |   1 +
->  tools/testing/selftests/kvm/demand_paging_test.c   |   2 +-
->  .../testing/selftests/kvm/include/kvm_util_base.h  |   1 +
->  .../selftests/kvm/include/x86_64/processor.h       |  83 +++++++++++--
->  tools/testing/selftests/kvm/lib/kvm_util.c         |   5 +
->  tools/testing/selftests/kvm/lib/x86_64/processor.c |  36 ++++--
->  tools/testing/selftests/kvm/x86_64/amx_test.c      | 118 ++++++++-------=
----
->  .../selftests/kvm/x86_64/pmu_event_filter_test.c   |   1 +
->  .../kvm/x86_64/vmx_nested_tsc_scaling_test.c       |   8 +-
->  .../selftests/kvm/x86_64/vmx_pmu_caps_test.c       |   1 +
->  .../testing/selftests/kvm/x86_64/xcr0_cpuid_test.c | 132 +++++++++++++++=
-++++++
->  14 files changed, 326 insertions(+), 97 deletions(-)
->  create mode 100644 tools/testing/selftests/kvm/x86_64/xcr0_cpuid_test.c
+>  arch/x86/kvm/vmx/nested.c | 112 ++++++++++++++++++++++++++++++----------=
+------
+>  arch/x86/kvm/vmx/sgx.c    |   4 +-
+>  arch/x86/kvm/vmx/vmx.c    |  15 +++++++
+>  3 files changed, 91 insertions(+), 40 deletions(-)
 >
 
