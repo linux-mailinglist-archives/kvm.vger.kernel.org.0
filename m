@@ -2,73 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B1D346EEE16
-	for <lists+kvm@lfdr.de>; Wed, 26 Apr 2023 08:11:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E98AD6EEE52
+	for <lists+kvm@lfdr.de>; Wed, 26 Apr 2023 08:26:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239490AbjDZGLE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 Apr 2023 02:11:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39788 "EHLO
+        id S239603AbjDZG0l (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 Apr 2023 02:26:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45860 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239409AbjDZGLC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 Apr 2023 02:11:02 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F32F1FE2
-        for <kvm@vger.kernel.org>; Tue, 25 Apr 2023 23:10:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1682489415;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=kxyjFnjkq7aSfRW8/bstsMm10LqeieUGuk8at7t8UME=;
-        b=S/gfhtMVhiLinqINBMd4XwedywmLn8JR0gkL4SaPQ7fKH3RjfhawYM1gDe69qvAvjl5Mpe
-        NztHNIEsvIAkIuv6pOOFxxeoZMn9ajsJYvdAbvtN99TFbG3TCjdqHgFV41p/l9c/KcTalk
-        FDivFAkoH6mhlDwtGAhVDyq5sYwvqFw=
-Received: from mail-lj1-f197.google.com (mail-lj1-f197.google.com
- [209.85.208.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-53-p4tzgTJhMxSf4O0iInTYVw-1; Wed, 26 Apr 2023 02:10:13 -0400
-X-MC-Unique: p4tzgTJhMxSf4O0iInTYVw-1
-Received: by mail-lj1-f197.google.com with SMTP id 38308e7fff4ca-2a8bca8b2efso27807551fa.0
-        for <kvm@vger.kernel.org>; Tue, 25 Apr 2023 23:10:13 -0700 (PDT)
+        with ESMTP id S238586AbjDZG0Z (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 Apr 2023 02:26:25 -0400
+Received: from mail-pg1-x533.google.com (mail-pg1-x533.google.com [IPv6:2607:f8b0:4864:20::533])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3387E35A1;
+        Tue, 25 Apr 2023 23:26:03 -0700 (PDT)
+Received: by mail-pg1-x533.google.com with SMTP id 41be03b00d2f7-51efefe7814so6780176a12.3;
+        Tue, 25 Apr 2023 23:26:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1682490362; x=1685082362;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ZHn9sTXEzMs5ji4aB0cw2xEtdZV2Wc90msMFQpQNypo=;
+        b=R0M+kyYTCMVB+3lxhcSwBtYOjt0JotGWCJKJXXWAQhLq6Bjtn8CObXI7IkuESeMcTb
+         lx320puUayJvTNeIo1hwCPEPWSE5BWejYyYHaRj0G190VY/V4QvJLgj3XXpqDL0y/TX/
+         RkgVzxMYOmUdKbjGFKbuXqSxkPvh8GSkFeYdXTN5oG7YttmR14BJrOHxMtJq2riXjzPV
+         FOXf+zWHDGSsrdWVdjdwOZpN2CqwdQTaxE0hF0rvh+GIWSZcSChBNJTZLsKahupcaz9U
+         nNaychYm0w78JpMk4NU1mYaVd47ETtRr4TGbvxb2ldCE9DHRnLmCAj33nDf0BrdK0oGR
+         6pHQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682489411; x=1685081411;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=kxyjFnjkq7aSfRW8/bstsMm10LqeieUGuk8at7t8UME=;
-        b=H6sCbEs3rj6DuztvIma5YRiYSpkWyGOALTvM6Ab/1A+9cO4kc3e6aA/ln1SaQL8miH
-         wDLbz3p0taIh05SymTlU89jDIjF5UtrAba5Fu/xP5AxFKaOpXBVdLtPHucU0w9+vAsGd
-         wiqAxg4AvENMZTIRhR/bA/5BLohK0rq6LEp69ywxNmc+Rdxq0S+1FFGUzG0CCAkAj0/f
-         objnAPvvGMAFk20k7iLvo3xtUOVNuMf0rah6ZxTUbq/C6juA59SwRmi2rhi2W4Ru403H
-         D7Vp3eO5HINdmcffUIXkXA9oAGcrdDuylhR4Qt0URCqJ6G6zVnqSvMWouJn+MIxIRxQM
-         bBnA==
-X-Gm-Message-State: AAQBX9epNoEwGSlJd1Hsn46oVpo1nd9KZJfhD3veKNOo879lnu5KhKp7
-        TYEjmilXa+4Zju2VndceUkXKjbanMtJ7JtXx0Ai5tONZxtCEVbPAYTS0Q2LZWBniaOJ7l1WA1If
-        XvV0MdScV+E1YB9ax6Ut55mYi9JND
-X-Received: by 2002:a2e:9357:0:b0:2a8:bd1f:a377 with SMTP id m23-20020a2e9357000000b002a8bd1fa377mr3560571ljh.20.1682489411504;
-        Tue, 25 Apr 2023 23:10:11 -0700 (PDT)
-X-Google-Smtp-Source: AKy350aVnZTEsQyZXycQdCZAWCO8jAdgqYmWukEebnOcWJrst48VToqw0DfcOhzfmlBBNsuu0UBhEIv5nxguqeIZLC0=
-X-Received: by 2002:a2e:9357:0:b0:2a8:bd1f:a377 with SMTP id
- m23-20020a2e9357000000b002a8bd1fa377mr3560563ljh.20.1682489411154; Tue, 25
- Apr 2023 23:10:11 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1682490362; x=1685082362;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZHn9sTXEzMs5ji4aB0cw2xEtdZV2Wc90msMFQpQNypo=;
+        b=kZgLJpzn4QbzB3ysWLU4m5RRs+JW05eyJVov36PKNRetTQRcn/TztxZWrDKf0eG8eK
+         w4xEqt2USrHGFiC9eEExqKsZ01AMAO6gVnCNqwTZ9b41/ZJ5Wg46hcV+AXHUPYnKs50Z
+         7BVjXPv+eeaKvgAbumoeo9EsGX5z22B51q0/fPrfNfMPkl4jBP3WAfj3gd0qdq3EPaMO
+         K5POAGvcNBoJCEubdD8FuoMssq4ekj4I3YRrOgmGAfqkY4nkU9f8aQc8BJ9U7sqyjYUt
+         SDCjgTaaYUgTHlAynRW+nKjXq8zdEjD1/+es9Ks5tzegHvyulrastNkBZ0wHJWpcYnYH
+         uZtA==
+X-Gm-Message-State: AAQBX9cVXc7fu2UaZNN4WiWhzDfTPyBwOhG/l8QhqwFXy+geTnqlY92e
+        d8NkXU1okNdiRU7oHlzlEtQ=
+X-Google-Smtp-Source: AKy350a03z1aaD7fJpGumg3AOFY1jix0f4yuQp+5pPOq4mLIVggmhKL81EhyiyDNd/VOxTLnqNhRPw==
+X-Received: by 2002:a05:6a20:3d93:b0:f3:6746:ba37 with SMTP id s19-20020a056a203d9300b000f36746ba37mr15940657pzi.13.1682490362481;
+        Tue, 25 Apr 2023 23:26:02 -0700 (PDT)
+Received: from [192.168.255.10] ([103.7.29.32])
+        by smtp.gmail.com with ESMTPSA id k10-20020a65464a000000b0050336b0b08csm8906630pgr.19.2023.04.25.23.25.59
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 25 Apr 2023 23:26:01 -0700 (PDT)
+Message-ID: <aa1d858f-ad45-150c-2bbb-97523ce78e22@gmail.com>
+Date:   Wed, 26 Apr 2023 14:25:53 +0800
 MIME-Version: 1.0
-References: <20230425102250.3847395-1-mie@igel.co.jp>
-In-Reply-To: <20230425102250.3847395-1-mie@igel.co.jp>
-From:   Jason Wang <jasowang@redhat.com>
-Date:   Wed, 26 Apr 2023 14:10:00 +0800
-Message-ID: <CACGkMEumt4p7jU+H+T-b9My0buhdS8a-1GCSnWjnCwMAM=wo1Q@mail.gmail.com>
-Subject: Re: [PATCH v3] vringh: IOMEM support
-To:     Shunsuke Mie <mie@igel.co.jp>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
-        Rusty Russell <rusty@rustcorp.com.au>, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.10.0
+Subject: Re: [PATCH 5/5] KVM: x86/pmu: Hide guest counter updates from the
+ VMRUN instruction
+To:     Sandipan Das <sandipan.das@amd.com>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Ravi Bangoria <ravi.bangoria@amd.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Santosh Shukla <santosh.shukla@amd.com>,
+        "Tom Lendacky (AMD)" <thomas.lendacky@amd.com>,
+        Ananth Narayan <ananth.narayan@amd.com>
+References: <20230310105346.12302-1-likexu@tencent.com>
+ <20230310105346.12302-6-likexu@tencent.com> <ZC99f+AO1tZguu1I@google.com>
+ <509b697f-4e60-94e5-f785-95f7f0a14006@gmail.com>
+ <ZDAvDhV/bpPyt3oX@google.com>
+ <34b5dd08-edac-e32f-1884-c8f2b85f7971@gmail.com>
+ <59ef9af0-9528-e220-625a-ff16e6971f23@amd.com>
+Content-Language: en-US
+From:   Like Xu <like.xu.linux@gmail.com>
+In-Reply-To: <59ef9af0-9528-e220-625a-ff16e6971f23@amd.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -76,109 +85,85 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Apr 25, 2023 at 6:23=E2=80=AFPM Shunsuke Mie <mie@igel.co.jp> wrote=
-:
->
-> Introduce a new memory accessor for vringh. It is able to use vringh to
-> virtio rings located on io-memory region.
+On 26/4/2023 1:25 pm, Sandipan Das wrote:
+> Hi Sean, Like,
+> 
+> On 4/19/2023 7:11 PM, Like Xu wrote:
+>> On 7/4/2023 10:56 pm, Sean Christopherson wrote:
+>>> On Fri, Apr 07, 2023, Like Xu wrote:
+>>>> On 7/4/2023 10:18 am, Sean Christopherson wrote:
+>>>>> Wait, really?  VMRUN is counted if and only if it enters to a CPL0 guest?  Can
+>>>>> someone from AMD confirm this?  I was going to say we should just treat this as
+>>>>> "normal" behavior, but counting CPL0 but not CPL>0 is definitely quirky.
+>>>>
+>>>> VMRUN is only counted on a CPL0-target (branch) instruction counter.
+>>>
+>>> Yes or no question: if KVM does VMRUN and a PMC is programmed to count _all_ taken
+>>> branches, will the PMC count VMRUN as a branch if guest CPL>0 according to the VMCB?
+>>
+>> YES, my quick tests (based on run_in_user() from KUT on Zen4) show:
+>>
+>> EVENTSEL_GUESTONLY + EVENTSEL_ALL + VMRUN_to_USR -> AMD_ZEN_BR_RETIRED + 1
+>> EVENTSEL_GUESTONLY + EVENTSEL_ALL + VMRUN_to_OS -> AMD_ZEN_BR_RETIRED + 1
+>>
+>> EVENTSEL_GUESTONLY + EVENTSEL_USR + VMRUN_to_USR -> AMD_ZEN_BR_RETIRED + 1
+>> EVENTSEL_GUESTONLY + EVENTSEL_OS + VMRUN_to_OS -> AMD_ZEN_BR_RETIRED + 1
+>>
+>> VENTSEL_GUESTONLY + EVENTSEL_OS + VMRUN_to_USR -> No change
+>> VENTSEL_GUESTONLY + EVENTSEL_USR + VMRUN_to_OS -> No change
+>>
+>> I'm actually not surprised and related test would be posted later.
+>>
+>>>
+>>>> This issue makes a guest CPL0-target instruction counter inexplicably
+>>>> increase, as if it would have been under-counted before the virtualization
+>>>> instructions were counted.
+>>>
+>>> Heh, it's very much explicable, it's just not desirable, and you and I would argue
+>>> that it's also incorrect.
+>>
+>> This is completely inaccurate from the end guest pmu user's perspective.
+>>
+>> I have a toy that looks like virtio-pmu, through which guest users can get hypervisor performance data.
+>> But the side effect of letting the guest see the VMRUN instruction by default is unacceptable, isn't it ?
+>>
+>>>
+>>> AMD folks, are there plans to document this as an erratum?  I agree with Like that
+>>> counting VMRUN as a taken branch in guest context is a CPU bug, even if the behavior
+>>> is known/expected.
+>>
+> 
+> This behaviour is architectural and an erratum will not be issued. However, for clarity, a future
+> release of the APM will include additional details like the following:
+> 
+>    1) From the perspective of performance monitoring counters, VMRUNs are considered as far control
+>       transfers and VMEXITs as exceptions.
+> 
+>    2) When the performance monitoring counters are set up to count events only in certain modes
+>       through the "OsUserMode" and "HostGuestOnly" bits, instructions and events that change the
+>       mode are counted in the target mode. For example, a SYSCALL from CPL 3 to CPL 0 with a
+>       counter set to count retired instructions with USR=1 and OS=0 will not cause an increment of
+>       the counter. However, the SYSRET back from CPL 0 to CPL 3 will cause an increment of the
+>       counter and the total count will end up correct. Similarly, when counting PMCx0C6 (retired
+>       far control transfers, including exceptions and interrupts) with Guest=1 and Host=0, a VMRUN
+>       instruction will cause an increment of the counter. However, the subsequent VMEXIT that occurs,
+>       since the target is in the host, will not cause an increment of the counter and so the total
+>       count will end up correct.
+> 
 
-Is there a user for this? It would be better if you can describe the
-use cases for this. Maybe you can post the user or at least a link to
-the git as a reference.
+Thanks for the clarification, that fits my understanding.
 
->
-> Signed-off-by: Shunsuke Mie <mie@igel.co.jp>
-> ---
->
-> Changes from v2: https://lore.kernel.org/virtualization/20230202090934.54=
-9556-1-mie@igel.co.jp/
-> - Focus on an adding io memory APIs
-> Remove vringh API unification and some fixes.
-> - Rebase on next-20230414
->
->  drivers/vhost/Kconfig  |   6 ++
->  drivers/vhost/vringh.c | 129 +++++++++++++++++++++++++++++++++++++++++
->  include/linux/vringh.h |  33 +++++++++++
->  3 files changed, 168 insertions(+)
->
-> diff --git a/drivers/vhost/Kconfig b/drivers/vhost/Kconfig
-> index b455d9ab6f3d..4b0dbb4a8ab3 100644
-> --- a/drivers/vhost/Kconfig
-> +++ b/drivers/vhost/Kconfig
-> @@ -6,6 +6,12 @@ config VHOST_IOTLB
->           This option is selected by any driver which needs to support
->           an IOMMU in software.
->
-> +config VHOST_RING_IOMEM
-> +       tristate
-> +       select VHOST_IOMEM
-> +       help
-> +         This option enables vringh APIs to supports io memory space.
+"Calculated in target mode" and "correct total count" are architectural choices,
+which is not a problem if the consumers of PMU data are on the same side.
 
-There's no specific Kconfig for all the existing accessors. Any reason
-I/O memory is special or do you care about the size of the module?
+But for a VM user, seeing SYSRET in the user mode is completely and functionally
+different from seeing VMRUN in the guest context. Since the host user and
+the guest user are two separate pmu data consumers, and they do not aggregate
+or share the so-called "total" PMU data.
 
-> +
->  config VHOST_RING
->         tristate
->         select VHOST_IOTLB
-> diff --git a/drivers/vhost/vringh.c b/drivers/vhost/vringh.c
-> index 955d938eb663..ce5a88eecc05 100644
-> --- a/drivers/vhost/vringh.c
-> +++ b/drivers/vhost/vringh.c
-> @@ -1604,4 +1604,133 @@ EXPORT_SYMBOL(vringh_need_notify_iotlb);
->
->  #endif
->
+This situation is even worse for nested SVM guests and SEV-SNP guests.
 
-[...]
-
->
-> base-commit: d3f2cd24819158bb70701c3549e586f9df9cee67
-> prerequisite-patch-id: 760abbe8c981c52ccc421b8139e8999ab71619aa
-> prerequisite-patch-id: 99d8679ab4569545c8af401e84142c66312e953e
-> prerequisite-patch-id: aca81516aba75b58c8422d37c2dc7db2f61ffe92
-> prerequisite-patch-id: 3d76136200c4e55ba2c41681325f242859dd6dbd
-> prerequisite-patch-id: 47a994feb68d95412d81b0fd1fa27bc7ba05ae18
-> prerequisite-patch-id: a2f7fc3f35358f70b6dad4c919ce293b10295c4f
-> prerequisite-patch-id: 70e2ee32b945be96a0388f0ff564651ac9335220
-> prerequisite-patch-id: 2023690f9c47017b56d7f036332a5ca3ece6bde8
-> prerequisite-patch-id: 211e113fec6c450d13fbdb437ecfad67dec0a157
-> prerequisite-patch-id: f2bcd3168933886e4cd4c39e47446d1bd7cb2691
-> prerequisite-patch-id: 37b131560808733a0b8878e85a3d2a46d6ab02ca
-> prerequisite-patch-id: 79b0219a715cb5ace227d55666d62fdb2dcc6ffe
-> prerequisite-patch-id: 30f1740cd48a19aa1c3c93e625c740cae2845478
-> prerequisite-patch-id: 31989e4a521f2fc6f68c4ccdb6960035e87666a7
-> prerequisite-patch-id: 3948bb3e0c045e2ffff06a714d17bab16c94775d
-> prerequisite-patch-id: cf28e0115b9111bcb77aa9c710d98b2be93c7e89
-> prerequisite-patch-id: ebf2349c0ae1296663854eee2da0b43fe8972f9b
-> prerequisite-patch-id: fc570921d885a2a6000800b4022321e63f1650a5
-> prerequisite-patch-id: 1fd5219fef17c2bf2d76000207b25aae58c368f3
-> prerequisite-patch-id: 34e5f078202762fe69df471e97b51b1341cbdfa9
-> prerequisite-patch-id: 7fa5151b9e0488b48c2b9d1219152cfb047d6586
-> prerequisite-patch-id: 33cca272767af04ae9abe7af2f6cbb9972cc0b77
-> prerequisite-patch-id: bb1a6befc899dd97bcd946c2d76ce73675a1fa45
-> prerequisite-patch-id: 10be04dd92fa451d13676e91d9094b63cd7fbcf8
-> prerequisite-patch-id: 87b86eb4ce9501bba9c04ec81094ac9202392431
-> prerequisite-patch-id: a5ced28762bf6bd6419dae0e4413d02ccafd72c2
-> prerequisite-patch-id: 2db4c9603e00d69bb0184dabcc319e7f74f30305
-> prerequisite-patch-id: 41933f9d53e5e9e02efd6157b68ee7d92b10cfa2
-> prerequisite-patch-id: df3295b4cdde3a45eaf4c40047179698a4224d05
-> prerequisite-patch-id: 9e2fca9ab0ba2b935daa96f1745ff4c909792231
-> prerequisite-patch-id: 8948378099ba4d61e10a87e617d69ed2fc4104ae
-> prerequisite-patch-id: 5e7466f3f0d74880d1a574a1bd91b12091dcf3f5
-> prerequisite-patch-id: 902899e1cd53b7fcc7971f630aed103830fc3e3d
-> prerequisite-patch-id: 42126b180500f9ff123db78748972c6ece18ac57
-> prerequisite-patch-id: 5236a03ef574074f3c1009a52612051862b31eff
-> prerequisite-patch-id: adae1aa80df65bd02a9e3f4db490cf801c1c6119
-> prerequisite-patch-id: 22806fcabb973ee5f04ee6212db6161aab5bcbfc
-> prerequisite-patch-id: 6eb14cfdc2cf31e90556f6afe7361427a332e8dc
-
-These seem meaningless?
-
-Thanks
-
-> --
-> 2.25.1
->
-
+I'm not urging that AMD hardware should change, but it is entirely necessary
+for our software layer to take this step, as it is part of the hypervisor's 
+responsibility
+to hide itself by default.
