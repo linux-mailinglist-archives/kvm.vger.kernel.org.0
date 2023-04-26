@@ -2,162 +2,223 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 98A8F6EF626
-	for <lists+kvm@lfdr.de>; Wed, 26 Apr 2023 16:17:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6974D6EF666
+	for <lists+kvm@lfdr.de>; Wed, 26 Apr 2023 16:27:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241242AbjDZORx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 Apr 2023 10:17:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55598 "EHLO
+        id S241390AbjDZO16 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 Apr 2023 10:27:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37104 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229889AbjDZORw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 Apr 2023 10:17:52 -0400
-Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1nam02on2046.outbound.protection.outlook.com [40.107.96.46])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0627423C
-        for <kvm@vger.kernel.org>; Wed, 26 Apr 2023 07:17:50 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=bRpZ/zqVqE5JYil9JA0rgjocM3Sxpc6rCELKPHh/AuYKC9VwrcaSqRoRNb4SfQCP583YvRtFatNfF/njwqZP2/VY07l4kxUTGJetg/ZER+ZAh48G5AW7oy+BrlnhkjvNMGcYVnmnh5g2gcySS3ZfGUXq2HIMR0r/+NvmtrLXDfaF4IeVTvd4i3XSabP90vDXpSZYJSkA1mfxMo/XVNLwkjQRMGygHgN9sPLK82JvP0wbTvuTfU7w11FKO4M1g0CokCJ9Hi2OpLQiT67UMIVsNbAgBvDo4u4Sq2eoAM8ZNTKIUIwLDCoUL4pYjL38ZRXEFJoyaWxdhUunN+aZBkE+8A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=jKMLIYDPbRAaJdN7Re+GZsAaSyThne81KloxG3WFJ00=;
- b=RqmRRSRFSCUSPytg8NgqEEiZMNxaVnYxYFVuE/IDJm5DsTBy0lhtUnmQtmK0a8h5jmSDbReQhirVzoLkWVJR36S+jbiUx62zsS1q4NwSArcNgcJ/UA9d2qemIqfYxHe+mPU0aRmHwdBMD9yE+ZcyU0uN7c9R5FlnsoNaJs3B3pf/VRpo+sxRlot7S+8IowpvNs9fMeJA+WuMABna+gQJ/0/NCSwDzqYsHW0urD6TOUuWcW/spw4yOPUzf9/GGhncC9Fv3CXWJqKtUXJQyVbhABIaV+tRgtn93t6mhP0AD9o7+JqLDGroAlnoIl5XU2RpqATN/0gLvKgx0L48uFBS/g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=jKMLIYDPbRAaJdN7Re+GZsAaSyThne81KloxG3WFJ00=;
- b=URKYCZWfItJmR/Odc6P+3MABo0uq+/63B+ZcRJyHjKyKdjXOeK5/ssmjpH10qz5b/Fjv/tsZ2YcwqwqtbbtCZV+bnHmXK0GsrTa36C5zlORgHpL038htZILX8m1/c5io+MimZLuniV6fRtpuR9NTBCwuOLmYYmyZHTnoyk2l8M78xloZColuBEnBgqCOXZzER2+wEfYP0DWEeSlCmaKk2gPEaqPG4F8lPtzN2gVbpWOYprLHgGbThzhJStFjhprgEMVYf+aYNwI37GdVPPQNGAFvfl+UV9833mAi7lZRjnm7q8vtG4Slt5Oc2AxqdE+PhD7/YKRA7Ua3bP9iFfOLMw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by CH2PR12MB4279.namprd12.prod.outlook.com (2603:10b6:610:af::24) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6340.21; Wed, 26 Apr
- 2023 14:17:48 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::f7a7:a561:87e9:5fab]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::f7a7:a561:87e9:5fab%6]) with mapi id 15.20.6340.021; Wed, 26 Apr 2023
- 14:17:48 +0000
-Date:   Wed, 26 Apr 2023 11:17:45 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Robin Murphy <robin.murphy@arm.com>
-Cc:     Nicolin Chen <nicolinc@nvidia.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "iommu@lists.linux.dev" <iommu@lists.linux.dev>
-Subject: Re: RMRR device on non-Intel platform
-Message-ID: <ZEkyicpaAJJ+pIXg@nvidia.com>
-References: <20230420084906.2e4cce42.alex.williamson@redhat.com>
- <fd324213-8d77-cb67-1c52-01cd0997a92c@arm.com>
- <20230420154933.1a79de4e.alex.williamson@redhat.com>
- <ZEJ73s/2M4Rd5r/X@nvidia.com>
- <0aa4a107-57d0-6e5b-46e5-86dbe5b3087f@arm.com>
- <ZEKFdJ6yXoyFiHY+@nvidia.com>
- <fe7e20e5-9729-248d-ee03-c8b444a1b7c0@arm.com>
- <ZELOqZliiwbG6l5K@nvidia.com>
- <ZEkRnIPjeLNxbkj8@nvidia.com>
- <5ff0d72b-a7b8-c8a9-60e5-396e7a1ef363@arm.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5ff0d72b-a7b8-c8a9-60e5-396e7a1ef363@arm.com>
-X-ClientProxiedBy: BYAPR07CA0064.namprd07.prod.outlook.com
- (2603:10b6:a03:60::41) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|CH2PR12MB4279:EE_
-X-MS-Office365-Filtering-Correlation-Id: df8ca7dd-bcff-48fa-a4db-08db4661031a
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: CsgiEj03w6yuMEKWbYuW8BOH8hS6jad/uMUxc22IJR0fOSGjNQ2RB7sNs+0lU4ztvzKL5q0FTa+0VJa5X1SzOVZ47+saLtfM9UW0PtTe4rRylFOOmchPka5vkuLGkNzOTl51MGCLQNn8W4+pKV/ncd7g4E+F6mQod49sRhc9aRULuvy1NTX0+9jlfX8cnDv1Qt2X++wgL1nd72LQhKw3vLZlLY1UehkKCafDGoiiUd2wKVLX2vwQjgf/dyC5ZTtrs0CLuIrz/oXZrsmyTwbxHTaIiaqy8HszYU+I6dEoR3k/T+ZFgkxshHqL3JjszdzxIasP1lcAibrjxrE4gwTUQbBgZvNkvml/oaOwYCqAMHm62yoZQr4s7b7kG3Y5KBHbEGSSXdOAl27VZkhOAqvylV7Q2GfhcTqEgXtMWtCQIs4xHLqtIv6zM1L8+vfDasB7aa6MpeYl8PYaFBiM/ngJXtBC/8XOOLfAQaDGy/dmn8n4JI7Cz0O/OBtRWdMZjBDRmPbPMU8EwLUkRlVfiaiNItHcxUWPyhaT0Hm6AIVLFXCXROkhUvJegSUWHViedx5nMv0PHCJ4tH7MYlqQvEHy/2EJgbxZ/2X+bLO0Lyt9oVQ=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(39860400002)(136003)(366004)(376002)(346002)(396003)(451199021)(2616005)(4326008)(66556008)(66946007)(316002)(6916009)(186003)(66476007)(83380400001)(6666004)(6486002)(54906003)(478600001)(41300700001)(8676002)(8936002)(38100700002)(5660300002)(26005)(6512007)(6506007)(2906002)(86362001)(36756003)(67856001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?dgLh7L5jwadnR9q1qaimbQjxrTAg3UU4Lc9c6h3FSRy/MANh3ryUiwGkfFqi?=
- =?us-ascii?Q?L+ZHLMVBH+t3IXL4+SL0KP3hiSTVe+cCPsfxnxyLmKpHF1JLCPKXUCEGxo9E?=
- =?us-ascii?Q?oZBvm3HfO0QTFbepUPF3WkBMQznOPwUTdM93wtMVYopypILavEBUZACh1r7/?=
- =?us-ascii?Q?5dG0Iwxi1dXTVpTQ22rtt0YCMOQSWszxCTBBZOuB2RazOUqXShIOd1CkGrs9?=
- =?us-ascii?Q?5wZCJmdyZmr76Onexa3PXB+V6T7Q91jXvWTo5gGPyWZzHiNnuO4pQQ5BiyNx?=
- =?us-ascii?Q?aqG7cvzCmsQkaCKy/U/mnCxmphZxstq5AXhVgxn/MLqEiavST+8GCLrV5Zo1?=
- =?us-ascii?Q?Z0F80QMGuvOGI1rSImxO7I10XrMCP+woEnM7gtO1ddpjVqM6RK8LpUIN4Y0x?=
- =?us-ascii?Q?CODQH1q0XfuJwi3i/WhSvkXXwViqEHKawM/ufmiv2XbAUyy37fb52fxTrySO?=
- =?us-ascii?Q?+Vne/6RgoOlaa99qnPw190PPbSLx8FE+9gSXDcp9KhCUHSaeT9etmcPBcs45?=
- =?us-ascii?Q?sAUCGCp6MQ03Pt0+ELT+XQqG5VKZSKXNgjgKXirET7hS1BqhF4t18mGiq9dw?=
- =?us-ascii?Q?PQX9lmc8x0/6qHL98CF0R76A31H1MCvLs9QEQnS3Nr6FlTgUg095+mexDzRH?=
- =?us-ascii?Q?DL5arhnEs+pimx1mnRW9DiHCQkvY4g9EW4TMrL3kBPI7VR5xo9U1jfIqQK+X?=
- =?us-ascii?Q?ayy+1AMCasi5TJ4VAhOz0C31YroeqUxQhym+JGkQpXVRt+Zf0wXMb9FZ4xIQ?=
- =?us-ascii?Q?TzoJxOplHh3rF1R0RmPIaztaX+3qpvlW4pAXoZB0DpCoKd9RvbnATH/J8R3J?=
- =?us-ascii?Q?xvJhyVQVmXWRFXefqrsxUV0bqu+h5rB0gSW5ekIzhwAkPgUYrL24Dkpb7AqS?=
- =?us-ascii?Q?QmW5Aqtph9n4ImL9em7LZEdFAW8xh7kS++XDDz3rPFDggESCgfbVEIfA3xP/?=
- =?us-ascii?Q?gV/SWmPxthlE+8iDGTazhAA0RLTggJwpanvo5GOLcvEbXFVJ00r9skILWSaB?=
- =?us-ascii?Q?Voj5b0ECpRkvlBcDf7q142qG1uAlARMojmpbEhRMwhMHglDmewOrwkTJPMKG?=
- =?us-ascii?Q?70p2u8XTrxTFxwhPJDh14E8D2Q+RWH27Q+ANVqjqns362HXFddbL1vSu2ih8?=
- =?us-ascii?Q?lX+buqWGpIGOoTOJtbyRDt7yiyKdJg2NKB2icXMZqW/FTkpEROSdlPBA5kx0?=
- =?us-ascii?Q?EbIsOSZv6Njg0rw0uQbuOBmToPQYnx8rl12IaDE6wq26G+SIeNHuVyohWUwc?=
- =?us-ascii?Q?CB0k1iTdMhKZJ7JG4SpB6PpE50+pO8CFPXKwmA19UcFmJ1LbPjVE4VIzbkK3?=
- =?us-ascii?Q?jxmcdsBxiw6YPzwh8BjQgXnhkjV11MvWy57v2CFIrzDSwO5+9Bps0jzsEpyG?=
- =?us-ascii?Q?hS/FDEJVxpenkBP/dX5ai1z0Bvz5Ru/utyRii2460lwtf2Hjnk+jSoaSSkea?=
- =?us-ascii?Q?xULX3U6kJynSKCNphB5rWzzSWcjldg1K6poAWifn+deO/Sey3HdHbrjQRI21?=
- =?us-ascii?Q?tEQqhMttp6i95lwZGgWVY71HZW6JwhMwyBmMuN+I086rYGeypqmq0YWvHB19?=
- =?us-ascii?Q?hO3jeivyHaIjCQrvGUwaHi4Lk2W8EKVwD0KPQ1U1?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: df8ca7dd-bcff-48fa-a4db-08db4661031a
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Apr 2023 14:17:48.2841
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: CvLS4x2sHRzlBzI/8b3dcXKF/EQpF3zzU0FUi4oUDF3jrLOcM2j6j5Q0KmQJm9RO
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB4279
-X-Spam-Status: No, score=-1.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
-        version=3.4.6
+        with ESMTP id S241085AbjDZO1x (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 Apr 2023 10:27:53 -0400
+Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F36C729B
+        for <kvm@vger.kernel.org>; Wed, 26 Apr 2023 07:27:51 -0700 (PDT)
+Received: by mail-pf1-x429.google.com with SMTP id d2e1a72fcca58-63b4dfead1bso5980580b3a.3
+        for <kvm@vger.kernel.org>; Wed, 26 Apr 2023 07:27:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=dabbelt-com.20221208.gappssmtp.com; s=20221208; t=1682519271; x=1685111271;
+        h=content-transfer-encoding:mime-version:message-id:to:from:cc
+         :in-reply-to:subject:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=NnfrgNZHQvPmGsQGCQ2h4V9BhDAlSy+A6A7k8SbgA24=;
+        b=eOpmq+GDGamx4114B5EpekL4Oyi6BpGcYrLG1ZLSFRd4iz8TxkNUVd5310VpiQN8so
+         n2FRk0eoE22cOOzY42nRIC0Ls2ePljs55GZZX6ZpVEFGXiU6aLZbWi08I2s/h+3sxJbu
+         zU1S20zF71gDp+Vl44usUB7GoiVTUOXjRsRkbbTxz8EEpUBJHT3csZJMD6sUxPYrvrpN
+         tPh10UXow658hfYWRzpaBI7LZW+ANBIOhmPR5ItdcdeeqtH6d9bc1j5X+aCxGzr3WYBQ
+         8HsiUQw9f8lAHIIq/a7Q5+DaYHiuDYnWgcQ4mCoXBFWei2RhShL9Do8AK88Mvz/rBW4V
+         1gCw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1682519271; x=1685111271;
+        h=content-transfer-encoding:mime-version:message-id:to:from:cc
+         :in-reply-to:subject:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=NnfrgNZHQvPmGsQGCQ2h4V9BhDAlSy+A6A7k8SbgA24=;
+        b=aSECKwsHzsdeYWz9+h5hIlFxWYx0zrNDgQNW3u64bXbQvfCwnnyQSIwHcAAuHuTbNS
+         vQJakLNwn9xGGUj5gC4Q9V1mwIiK0HfaS+Po5P/OaLsoRn+zsdTnyI3AhM+4buCynt+b
+         eutzfP6ojN7i9d6Ej9lYsEBWNBZCXMVfg1PiN+rr6Y6NvUKr6nFPs+lFbRicrqGVpFnj
+         CyakY3Wmjaxy6sTO2lSi2CW8ACXuOxqwpQt+zKyDuHkjjQqVQsTUw6hO00xkaeSKocX+
+         38au77AmTww3xpzZOAW7vOO5+XkY3ZqgjRfGdA+Fj8td1V9jl6GyP/Tx3lhqxe7gjt/0
+         fzIw==
+X-Gm-Message-State: AAQBX9d+Qb4VvqGjkgXmiZhrBN1QD53j2Qm06Oqo9lGuUpeFNWgbgh3j
+        xzbPaxTIhF4nWRzcKCePcHyJvQJJRZ9uMOmOMmA=
+X-Google-Smtp-Source: AKy350ZzkeDiV+RuULlH10ymkq/hl2JydbrghBEvMXstloracVB3tARE2D82tPElpB2dnMeA0GpyZw==
+X-Received: by 2002:a05:6a00:1a86:b0:63b:62d1:d868 with SMTP id e6-20020a056a001a8600b0063b62d1d868mr27658451pfv.8.1682519270628;
+        Wed, 26 Apr 2023 07:27:50 -0700 (PDT)
+Received: from localhost ([135.180.227.0])
+        by smtp.gmail.com with ESMTPSA id k16-20020aa788d0000000b00625616f59a1sm10964994pff.73.2023.04.26.07.27.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 26 Apr 2023 07:27:50 -0700 (PDT)
+Date:   Wed, 26 Apr 2023 07:27:50 -0700 (PDT)
+X-Google-Original-Date: Wed, 26 Apr 2023 07:27:45 PDT (-0700)
+Subject:     Re: [PATCH -next v18 00/20] riscv: Add vector ISA support
+In-Reply-To: <CABgGipWbSFnAK=DwT9X2esPBVTi0p+Oft1NyWbZ60LOwHj4dgA@mail.gmail.com>
+CC:     bjorn@kernel.org, linux-riscv@lists.infradead.org,
+        anup@brainfault.org, atishp@atishpatra.org,
+        kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
+        Vineet Gupta <vineetg@rivosinc.com>, greentime.hu@sifive.com,
+        guoren@linux.alibaba.com, Paul Walmsley <paul.walmsley@sifive.com>,
+        aou@eecs.berkeley.edu, nathan@kernel.org, ndesaulniers@google.com,
+        trix@redhat.com, Richard Henderson <richard.henderson@linaro.org>,
+        libc-alpha@sourceware.org, Andrew Waterman <andrew@sifive.com>
+From:   Palmer Dabbelt <palmer@dabbelt.com>
+To:     andy.chiu@sifive.com
+Message-ID: <mhng-47aa965a-2b25-4ac0-984a-c2e6f3a051ee@palmer-ri-x1c9>
+Mime-Version: 1.0 (MHng)
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Apr 26, 2023 at 02:53:53PM +0100, Robin Murphy wrote:
+On Thu, 20 Apr 2023 09:36:48 PDT (-0700), andy.chiu@sifive.com wrote:
+> On Wed, Apr 19, 2023 at 11:18 PM Palmer Dabbelt <palmer@dabbelt.com> wrote:
+>>
+>> On Wed, 19 Apr 2023 07:54:23 PDT (-0700), bjorn@kernel.org wrote:
+>> > Björn Töpel <bjorn@kernel.org> writes:
+>> >
+>> >> Andy Chiu <andy.chiu@sifive.com> writes:
+>> >>
+>> >>> This patchset is implemented based on vector 1.0 spec to add vector support
+>> >>> in riscv Linux kernel. There are some assumptions for this implementations.
+>> >>>
+>> >>> 1. We assume all harts has the same ISA in the system.
+>> >>> 2. We disable vector in both kernel and user space [1] by default. Only
+>> >>>    enable an user's vector after an illegal instruction trap where it
+>> >>>    actually starts executing vector (the first-use trap [2]).
+>> >>> 3. We detect "riscv,isa" to determine whether vector is support or not.
+>> >>>
+>> >>> We defined a new structure __riscv_v_ext_state in struct thread_struct to
+>> >>> save/restore the vector related registers. It is used for both kernel space
+>> >>> and user space.
+>> >>>  - In kernel space, the datap pointer in __riscv_v_ext_state will be
+>> >>>    allocated to save vector registers.
+>> >>>  - In user space,
+>> >>>     - In signal handler of user space, the structure is placed
+>> >>>       right after __riscv_ctx_hdr, which is embedded in fp reserved
+>> >>>       aera. This is required to avoid ABI break [2]. And datap points
+>> >>>       to the end of __riscv_v_ext_state.
+>> >>>     - In ptrace, the data will be put in ubuf in which we use
+>> >>>       riscv_vr_get()/riscv_vr_set() to get or set the
+>> >>>       __riscv_v_ext_state data structure from/to it, datap pointer
+>> >>>       would be zeroed and vector registers will be copied to the
+>> >>>       address right after the __riscv_v_ext_state structure in ubuf.
+>> >>>
+>> >>> This patchset is rebased to v6.3-rc1 and it is tested by running several
+>> >>> vector programs simultaneously. It delivers signals correctly in a test
+>> >>> where we can see a valid ucontext_t in a signal handler, and a correct V
+>> >>> context returing back from it. And the ptrace interface is tested by
+>> >>> PTRACE_{GET,SET}REGSET. Lastly, KVM is tested by running above tests in
+>> >>> a guest using the same kernel image. All tests are done on an rv64gcv
+>> >>> virt QEMU.
+>> >>>
+>> >>> Note: please apply the patch at [4] due to a regression introduced by
+>> >>> commit 596ff4a09b89 ("cpumask: re-introduce constant-sized cpumask
+>> >>> optimizations") before testing the series.
+>> >>>
+>> >>> Source tree:
+>> >>> https://github.com/sifive/riscv-linux/tree/riscv/for-next/vector-v18
+>> >>
+>> >> After some offlist discussions, we might have a identified a
+>> >> potential libc->application ABI break.
+>> >>
+>> >> Given an application that does custom task scheduling via a signal
+>> >> handler. The application binary is not vector aware, but libc is. Libc
+>> >> is using vector registers for memcpy. It's an "old application, new
+>> >> library, new kernel"-scenario.
+>> >>
+>> >>  | ...
+>> >>  | struct context *p1_ctx;
+>> >>  | struct context *p2_ctx;
+>> >>  |
+>> >>  | void sighandler(int sig, siginfo_t *info, void *ucontext)
+>> >>  | {
+>> >>  |   if (p1_running)
+>> >>  |     switch_to(p1_ctx, p2_ctx);
+>> >>  |   if (p2_running)
+>> >>  |     switch_to(p2_ctx, p1_ctx);
+>> >>  | }
+>> >>  |
+>> >>  | void p1(void)
+>> >>  | {
+>> >>  |   memcpy(foo, bar, 17);
+>> >>  | }
+>> >>  |
+>> >>  | void p2(void)
+>> >>  | {
+>> >>  |   ...
+>> >>  | }
+>> >>  | ...
+>> >>
+>> >> The switch_to() function schedules p1() and p2(). E.g., the
+>> >> application (assumes that it) saves the complete task state from
+>> >> sigcontext (ucontext) to p1_ctx, and restores sigcontext to p2_ctx, so
+>> >> when sigreturn is called, p2() is running, and p1() has been
+>> >> interrupted.
+>> >>
+>> >> The "old application" which is not aware of vector, is now run on a
+>> >> vector enabled kernel/glibc.
+>> >>
+>> >> Assume that the sighandler is hit, and p1() is in the middle of the
+>> >> vector memcpy. The switch_to() function will not save the vector
+>> >> state, and next time p2() is scheduled to run it will have incorrect
+>> >> machine state.
+>>
+>> Thanks for writing this up, and sorry I've dropped the ball a few times on
+>> describing it.
+>>
+>> >> Now:
+>> >>
+>> >> Is this an actual or theoretical problem (i.e. are there any
+>> >> applications in the wild)? I'd be surprised if it would not be the
+>> >> latter...
+>>
+>> I also have no idea.  It's kind of odd to say "nobody cares about the
+>> ABI break" when we can manifest it with some fairly simple example, but
+>> I'd bet that nobody cares.
+>>
+>> >> Regardless, a kernel knob for disabling vector (sysctl/prctl) to avoid
+>> >> these kind of breaks is needed (right?). Could this knob be a
+>> >> follow-up patch to the existing v18 series?
+>> >>
+>> >> Note that arm64 does not suffer from this with SVE, because the default
+>> >> vector length (vl==0/128b*32) fits in the "legacy" sigcontext.
+>> >
+>> > Andy, to clarify from the patchwork call; In
+>> > Documentation/arm64/sve.rst:
+>> >
+>> > There's a per-process prctl (section 6), and a system runtime conf
+>> > (section 9).
+>
+> Thanks for pointing me out!
+>
+>>
+>> I think if we want to play it safe WRT the ABI break, then we can
+>> essentially just do the same thing.  It'll be a much bigger cliff for us
+>> because we have no space for the V extension, but that was just a
+>> mistake and there's nothing we can do about it.
+>
+> I understand the concern. It is good to provide a way to have explicit
+> controls of Vector rather than do nothing if such ABI break happens.
+> As for implementation details, do you think a system-wide  sysctl
+> alone is enough? Or, do we also need a prctl for per-process control?
 
-> Give QEMU a way to tell IOMMUFD to associate that 0x08080000 address with a
-> given device as an MSI target. IOMMUFD then ensures that the S2 mapping
-> exists from that IPA to the device's real ITS (I vaguely remember Eric had a
-> patch to pre-populate an MSI cookie with specific pages, which may have been
-> heading along those lines). 
+A few of us were talking in the patchwork meeting.  It's kind of a grey 
+area here, but we're just going to play it safe and wait for the 
+prctl and sys interfaces to show up before merging this.
 
-This isn't the main problem - already for most cases iommufd makes it
-so the ITS page is at 0x8000000. We can fix qemu to also use
-0x8000000 in the ACPI - it already hardwires this for the RMRR part.
+I know it's a pain to have to wait another release, but there's still no 
+publicly availiable V hardware yet so waiting isn't concretely impacting 
+users right now.  If we flip on V now we probably won't get a ton of 
+testing, so we risk the ABI break sticking around for a few release 
+which would be a huge headache.
 
-We can even make the kernel return the value so it isn't hardwired,
-easy stuff..
+Andy said he'd be able to do the prtcl and sys interfaces pretty 
+quickly, so hopfully everything's lined up for the next release.
 
-> QEMU will presumably also need a way to pass the VA down to IOMMUFD when it
-> sees the guest programming the MSI (possibly it could pass the IPA at the
-> same time so we don't need a distinct step to set up S2 beforehand?) - once
-> the underlying physical MSI configuration comes back from the PCI layer,
-> that VA just needs to be dropped in to replace the original msi_msg address.
-
-This is the main problem. What ioctl passes the VA, and how does it plumb
-down into the irq_chip..
-
-This is where everyone gets scared, I think. There is a thick mass of
-IRQ plumbing and locking between those two points
-
-And then it only solves MSI, not the bigger picture..
-
-> TBH at that point it may be easier to just not have a cookie in the S2
-> domain at all when nesting is enabled, and just let IOMMUFD make the ITS
-> mappings directly for itself.
-
-Yes, I'd like to get there so replace can work.
-
-Jason
+>> > Björn
