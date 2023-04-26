@@ -2,132 +2,181 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 47AF16EF4BB
-	for <lists+kvm@lfdr.de>; Wed, 26 Apr 2023 14:52:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E6B556EF4CF
+	for <lists+kvm@lfdr.de>; Wed, 26 Apr 2023 14:58:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240957AbjDZMwt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 Apr 2023 08:52:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32820 "EHLO
+        id S240675AbjDZM6z (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 Apr 2023 08:58:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36492 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240947AbjDZMwq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 Apr 2023 08:52:46 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E0953AA2;
-        Wed, 26 Apr 2023 05:52:38 -0700 (PDT)
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 33QCbAso008214;
-        Wed, 26 Apr 2023 12:52:37 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : content-transfer-encoding
- : mime-version; s=pp1; bh=hJmXLPxY1riaGxYRO6ymmQakDznPtTUmJ4xGcePiU5w=;
- b=GAPDzlRZ7/miovpZiWHlU41BmZY/Fz2dEUI+1MuqBN9CLbkBr6efuQaY9XcgPt+UEV5/
- +2TJwp6lpsO0uueSGs04oBLbZCZCeUgT9emeUFZbC9DiHghiKjlfqyZkaMFZ70Q1Poga
- pqMoioSvoFUlXedVV582wmc365W3na3D8R+Z13yHUP2kYnq9lWghuKcMgbCRUM+t6mge
- EhBMhCBX7UcHSHO1upN7YP6lRdUHfXbf75Ez3kGsFyjGZTK5hNjnvTh7hCwi3x5dKkOK
- acnqXqM+j7JvlXJs0Yes1e5cNkymdvC14TPqbP+yXvgz1uxsG6FkNYK2I6jNxqzsnfe8 NA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3q74448hty-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 26 Apr 2023 12:52:37 +0000
-Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 33QCjHS2011269;
-        Wed, 26 Apr 2023 12:52:36 GMT
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3q74448hsj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 26 Apr 2023 12:52:36 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 33QCTaFc023207;
-        Wed, 26 Apr 2023 12:52:34 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-        by ppma03ams.nl.ibm.com (PPS) with ESMTPS id 3q47772bp5-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 26 Apr 2023 12:52:34 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-        by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 33QCqVQo26280582
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 26 Apr 2023 12:52:31 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 43C1420043;
-        Wed, 26 Apr 2023 12:52:31 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 961D420040;
-        Wed, 26 Apr 2023 12:52:30 +0000 (GMT)
-Received: from li-9fd7f64c-3205-11b2-a85c-df942b00d78d.ibm.com.com (unknown [9.171.39.26])
-        by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Wed, 26 Apr 2023 12:52:30 +0000 (GMT)
-From:   Janosch Frank <frankja@linux.ibm.com>
-To:     pbonzini@redhat.com
-Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com, david@redhat.com,
-        borntraeger@linux.ibm.com, cohuck@redhat.com,
-        linux-s390@vger.kernel.org, imbrenda@linux.ibm.com,
-        Nico Boehr <nrb@linux.ibm.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>
-Subject: [GIT PULL 3/3] KVM: s390: pci: fix virtual-physical confusion on module unload/load
-Date:   Wed, 26 Apr 2023 14:51:19 +0200
-Message-Id: <20230426125119.11472-4-frankja@linux.ibm.com>
-X-Mailer: git-send-email 2.40.0
-In-Reply-To: <20230426125119.11472-1-frankja@linux.ibm.com>
-References: <20230426125119.11472-1-frankja@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: JpQVacR7eeYqZpwSxCCG7-Fs0KxzJBwL
-X-Proofpoint-GUID: RLlTB5LDLCVydoVLnIWz2S9fN9WhobWU
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+        with ESMTP id S240237AbjDZM6x (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 Apr 2023 08:58:53 -0400
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2087.outbound.protection.outlook.com [40.107.223.87])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 568AE1FC4
+        for <kvm@vger.kernel.org>; Wed, 26 Apr 2023 05:58:51 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Jnzzxvd4RZUragIQOwA5IyzKck1QQqZZURlMEg9rikAVLkJhWrx0sjYDlby+JfO8Pd119QuXg5Wji7EhZx/Nz7ZaSh+SZuf5H/wANmRBkN78yMcphu3XrugGkjoerfuzi6wGm9Z73Jd3/jYMXar6iQUf3A3CuugIDPeuXNmHIyVGnaN0geHc4TJbnTfVmOPvkfr6dkE7CtFKC55vp2pAV124y6YaP5aaYCf2ZM+pY9UekEgWHl62kjyQPXr2ywbEYLdcJ1AFWnUMBgpNVe4BV+9W/+Yo6iIgZpn3edbLTZ988fctp3lnBpr0x426OZBHImkofrN/LHiL3ecytVSOIg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=hDYqniTU+PiwIaQVv0w9L8YA/fhf4JwAJqwAC61L8UM=;
+ b=K1P+fKkeGvEbJ9A7Xou2rSdWXuNcuzaGbKttokanhARilZeUlsH6SpjuHbKZ/txdfinBC62znkctgmUOGauR/HBj0zpVJww+ZSu+8MI+wrAhV1AyctSSMbq3DzWuXipf52efM55lTse3KBWcp/dQXxZih9lOLropufyU/rZaKw++byq+AnGgFmR1kSfwDD9AzQZ6f/XadaV9wktLEcAlym/xG1Q85UkfGM/YZA9EgfNQjFIEh0Hwx7jibcV0kg3NVpZEJAfbE8HWbeYe3wdjsGNn+kYR4pkxujAsgej3MLJhcHxMRSnJH9Ffb/3984cWSAACUYkcwaukAzE/6wYVKQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=hDYqniTU+PiwIaQVv0w9L8YA/fhf4JwAJqwAC61L8UM=;
+ b=lLt6dJYFdRBr5vx7NVxi2hAjx+ogEGxM1+2tU7SS3S8d/6b/qKMdILuIsn1UhFqhUXQzy9+rE7BFo2uY3xb8YS8a5Wae2bSk7cErcvvaj6pEyhL8g0wYb8Wtt4ThLWmLs2v/udoQO5tPt0dYWJq5eeS2VrjKpMki6evMX1SMQXZLhb97EnJZUe9CBpK3/0WNp4MdoEaL7almmCNHswk4SMHx2JH5y8QyjESm19oEU2chVRpiZ1wRZl2hsga6RvbW+L5Wh2GzfXaO9XYArGFL44cbJFMpuO6ScY4VEUfnrqh0BCCOUMcBwd6gx9ZKrzg8MQp+LsG9fDUOsJulgoyqAQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by BY5PR12MB4114.namprd12.prod.outlook.com (2603:10b6:a03:20c::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6340.21; Wed, 26 Apr
+ 2023 12:58:49 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::f7a7:a561:87e9:5fab]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::f7a7:a561:87e9:5fab%6]) with mapi id 15.20.6340.021; Wed, 26 Apr 2023
+ 12:58:48 +0000
+Date:   Wed, 26 Apr 2023 09:58:46 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Robin Murphy <robin.murphy@arm.com>
+Cc:     Eric Auger <eric.auger@redhat.com>,
+        Nicolin Chen <nicolinc@nvidia.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+        Marc Zyngier <maz@kernel.org>
+Subject: Re: RMRR device on non-Intel platform
+Message-ID: <ZEkgBgAjhW+bWytg@nvidia.com>
+References: <fd324213-8d77-cb67-1c52-01cd0997a92c@arm.com>
+ <20230420154933.1a79de4e.alex.williamson@redhat.com>
+ <ZEJ73s/2M4Rd5r/X@nvidia.com>
+ <0aa4a107-57d0-6e5b-46e5-86dbe5b3087f@arm.com>
+ <ZEKFdJ6yXoyFiHY+@nvidia.com>
+ <fe7e20e5-9729-248d-ee03-c8b444a1b7c0@arm.com>
+ <ZELOqZliiwbG6l5K@nvidia.com>
+ <a2616348-3517-27a7-17a0-6628b56f6fad@arm.com>
+ <ZEf4oef6gMevtl7w@nvidia.com>
+ <59354284-fd24-6e80-7ce7-87432d016842@arm.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <59354284-fd24-6e80-7ce7-87432d016842@arm.com>
+X-ClientProxiedBy: BYAPR02CA0058.namprd02.prod.outlook.com
+ (2603:10b6:a03:54::35) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
- definitions=2023-04-26_05,2023-04-26_03,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 mlxscore=0
- impostorscore=0 spamscore=0 suspectscore=0 phishscore=0 adultscore=0
- clxscore=1015 malwarescore=0 priorityscore=1501 mlxlogscore=999
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2303200000 definitions=main-2304260112
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|BY5PR12MB4114:EE_
+X-MS-Office365-Filtering-Correlation-Id: 5b6a6633-2f5b-4495-c625-08db4655fa36
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 4LT4m1od5aCcHdTw7Y6BkG/aMsPQtlN6GaFsK+Tdg4hFLDuxkeOFUbBzUD1Eek2v4d3hUffjoj1KNfpKTTQnkQmiK8SOLKTnsGlbQzDuu5ETz8+OEqX6qIrXLN+4S10UZxD/+8VxN56my9Siic2SuaB3MCoTn47lhmvERiZJG6pqg+k5DMIyIcQKy0MvH7MSEOdAX0OUleuRaJZ63AVFYreD3NVd9v03KgJXn1yIObRdiXWDbCF50NQeQzcJzjWlB7QgP5jwWRUTKl+oTa59wWPQ7o7mqNHdobUX0XQFla+cDH7MS7smguiB49JaKiTg9JnVcjcSoHXRCwCobsJOTjuwulBOiEzoMNxmQ/+Nc3+Eqx66U3vCMs36gJrYL9knPtxNm7CDemxmoFbbRNkufPy/nRmQ7Z33QH43pnCHI9rlOqOgBGjiqcGi09zYgRnjja4T4guK/5JaXRI/Ofeq+mymXRkBJev0uu/Fn4SqE9XVtl+R8F2mJyZhzPnL4/2jfnpyb0XG8N5Ztgj+HbnuwrJLPHJhc6ie2rgND42Zna7jZaFLrC4dNEWt/tpvidjuSIGKzz3f8ghKtSrWmn778htmWr2VnupW/jWJb99MRKw=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(136003)(366004)(346002)(376002)(39860400002)(396003)(451199021)(66899021)(186003)(26005)(6506007)(41300700001)(6512007)(5660300002)(6486002)(8676002)(8936002)(2906002)(66556008)(66476007)(66946007)(86362001)(38100700002)(478600001)(83380400001)(54906003)(4326008)(316002)(6916009)(2616005)(36756003)(67856001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?hu1scGYjAKcYLFrowIYWP6/L6usFH+iD/oxLP4NPUFJNCRufAcE7Kt8kJQJc?=
+ =?us-ascii?Q?GmerQsGTDsebwfuRZANyxU87uH8Tqeci14XmXYo0kv058PEZPQVacJks0nQP?=
+ =?us-ascii?Q?UFMhOpv39DcXCOoRuknZ7d3S+7yCZcDt7u3z3N5PV9ehzkd6pOQjyCRtKC7G?=
+ =?us-ascii?Q?WjWPvICmufcQYpY5h1pid3+2Zp6VKU+QIresKyfqde9T9+bOs+GyaA5CN6ru?=
+ =?us-ascii?Q?YaogrtFUx467qH0xQjjDuRj3e9UnF5O283XaRuEOgh1WYPwvwaKnWsbJ0Cc8?=
+ =?us-ascii?Q?d9tLvh4hm9H/v4/6wbSDnR/XBR+6RxPBMvMmyYZEDcbLp4TVxas+vQfOewAD?=
+ =?us-ascii?Q?s1ZQZKO8lV9DO3C7YtO0OYJFsMSkuwXv06pvn+4a50vJfJTXLDtz1SMpfRsO?=
+ =?us-ascii?Q?hTntHhm5ALXtZ//witIwgq5HTWIfowcwOrGq2RkDka1ZB/Y45U+8mQVguJ5E?=
+ =?us-ascii?Q?tAzAzS3mV739sZ/b/sQ47n3gIzVgjgpPpc3l6bOduPw5z7BcnCaNXQ9jjbcw?=
+ =?us-ascii?Q?VwrNL6Pr4d9Q2tDxffI0DXfIUBy6Px2z5tzZ6RRaBHS3Tq4ajk7UhOVW/+5O?=
+ =?us-ascii?Q?gRNJkBdVXPfy/QcAUvUmdDgOxD0hqE+IvisLnTniO0gfi7h9vyIlGVAVlpZb?=
+ =?us-ascii?Q?mFle15x7aiIdvPNbfHC86NLU+xV6Is+GpostvcOZCnvcPz8WCTbW9KQlS8/m?=
+ =?us-ascii?Q?zNtp+eDzUe6Y0OdjclqIgqQbv0ooJX/c++Xth0g33uggtcyQPosovEeRYZ5H?=
+ =?us-ascii?Q?EM2NeYQK0/xtgLkNkxHSi27RjLFFy77Zw4aVw+QaDIkbfn/l1K47BW7T9G6J?=
+ =?us-ascii?Q?imD2Je+k2/ObWK/JwtmBxMXxkyC2g+FjjjCtEfyN23bHElvGHfO5xUZmCO8G?=
+ =?us-ascii?Q?xUXNGnjJTR9g1BNtU1cZY7Kxzz2oVHfxxm7xFSVeSmkzMEEaQ2ChX5JQuCF3?=
+ =?us-ascii?Q?rk4GcpCu8WLGJ/4NeQd3/BhIHcBhOFN2L21Y/o8/JnlifevRL3Wk4YtrSsgL?=
+ =?us-ascii?Q?NdfBTiORR0orF3/7/VEftMChCgahKfcv9kCH8KJN3tMSVC0fFRxBugwjpKa6?=
+ =?us-ascii?Q?CqNNbA20OdmaPkjFPwc0+wGPFBq/FLca3u1NrS+Y4yfrkRGm1w28GZfzx3yp?=
+ =?us-ascii?Q?TCqDN+0QpJc4+89RPrFRDU5dePEh5skMDzlzPCFcT1CrP9hy4UpF3M7eu3BG?=
+ =?us-ascii?Q?n/0TgBzYvf4gDJ0jv2YgFhhZUcZsMpMdIXuKfCc8rUwzWK8PAsQAV0R9lR+Y?=
+ =?us-ascii?Q?4eVZiqEoFKcWQX2sPV14MhcOQ6rganJeFfCQX3X6/gd3os3GV15u8Puo0XGn?=
+ =?us-ascii?Q?0cqZEOb2qwvF54e8YumWp58011lIDIzXNmUOO0W2avYofjZ3whS1OM7CJFSD?=
+ =?us-ascii?Q?Wpg6ejxSQEdihnCeFAYNbJZ5QA/rlqUGcsJpEHa4BPZjtHxyZpVC9KGXDbBb?=
+ =?us-ascii?Q?ov3ODmPuyBYnOKV/+J0p/CYF6Ig84SkWV/MTie0DfGNybR2Ht4KWGUEy0B8K?=
+ =?us-ascii?Q?r13PXDjSxlenc8BADlx6GFR3Ji+EnYs2mMIpybyIqu4gM/IT+F6JfDyvp13D?=
+ =?us-ascii?Q?RG+Fj9SZPkqn81ZjPEVue8J8I81Vt2j/ZsJN38ic?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5b6a6633-2f5b-4495-c625-08db4655fa36
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Apr 2023 12:58:48.8719
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: b2Liu3+V2e3ou2TV3eFgC2aQY+GeH958vFPnyjLvjXPyjfWSQKSYdvuS0shWXbvg
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB4114
+X-Spam-Status: No, score=-1.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Nico Boehr <nrb@linux.ibm.com>
+On Wed, Apr 26, 2023 at 01:24:21PM +0100, Robin Murphy wrote:
 
-When the kvm module is unloaded, zpci_setup_aipb() perists some data in the
-zpci_aipb structure in s390 pci code. Note that this struct is also passed
-to firmware in the zpci_set_irq_ctrl() call and thus the GAIT must be a
-physical address.
+> A real *virtual* ITS page (IPA/GPA, not PA) as above, because the Arm system
+> architecture does not define a fixed address map thus that is free to be
+> virtualised as well, but otherwise, yes, indeed it should, and it could, on
+> both GICv3 and AMD/Intel IRQ remapping. Why isn't Linux letting VMMs do
+> that?
 
-On module re-insertion, the GAIT is restored from this structure in
-zpci_reset_aipb(). But it is a physical address, hence this may cause
-issues when the kvm module is unloaded and loaded again.
+At the root, we don't have an interface out of VFIO for setting up
+interrupts in such a sophisticated way.
 
-Fix virtual vs physical address confusion (which currently are the same) by
-adding the necessary physical-to-virtual-conversion in zpci_reset_aipb().
+> Fair enough for VFIO, since that existed long before any architectural MSI
+> support on Arm, and has crusty PCI/X legacy on x86 to deal with too, but
+> IOMMUFD is a new thing for modern use-cases on modern hardware. 
 
-Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
-Reviewed-by: Matthew Rosato <mjrosato@linux.ibm.com>
-Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-Link: https://lore.kernel.org/r/20230222155503.43399-1-nrb@linux.ibm.com
-Message-Id: <20230222155503.43399-1-nrb@linux.ibm.com>
----
- arch/s390/kvm/pci.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Ah but iommufd isn't touching interrupts :)
 
-diff --git a/arch/s390/kvm/pci.c b/arch/s390/kvm/pci.c
-index b124d586db55..7dab00f1e833 100644
---- a/arch/s390/kvm/pci.c
-+++ b/arch/s390/kvm/pci.c
-@@ -112,7 +112,7 @@ static int zpci_reset_aipb(u8 nisc)
- 		return -EINVAL;
- 
- 	aift->sbv = zpci_aif_sbv;
--	aift->gait = (struct zpci_gaite *)zpci_aipb->aipb.gait;
-+	aift->gait = phys_to_virt(zpci_aipb->aipb.gait);
- 
- 	return 0;
- }
--- 
-2.40.0
+I'm scared we need a irqfd kind of idea to expose all this
+acclerated IRQ hardware to the VMM as well.
 
+> > > ...I believe the remaining missing part is a UAPI for the VMM to ask the
+> > > host kernel to configure a "physical" vLPI for a given device and EventID,
+> > > at the point when its vITS emulation is handling the guest's configuration
+> > > command. With that we would no longer have to rewrite the MSI payload
+> > > either, so can avoid trapping the device's MSI-X capability at all, and the
+> > > VM could actually have non-terrible interrupt performance.
+> > 
+> > Yes.. More broadly I think we'd need to allow the vGIC code to
+> > understand that it has complete control over a SID, and like we are
+> > talking about for SMMU a vSID mapping as well.
+> 
+> Marc, any thoughts on how much of this is actually missing from the MSI
+> domain infrastructure today? I'm guessing the main thing is needing some
+> sort of msi_domain_alloc_virq() API so that the caller can provide the
+> predetermined message data to replace the normal compose/write flow
+
+We don't want the VMM to write the MSI-X data. This isn't going to get
+us far enough. Talk to ARM's rep on the OCP SIOVr2 workgroup to get
+some sense what is being proposed for next-generation interrupt
+handling.
+
+There will likely be no standard MSI-X table or equivalent and no
+place to put a hypertrap.
+
+If we are fixing things we need to fix it fully - the VM programs the
+MSI-X registers directly. The VM's irq_chip does any hypertraps using
+the GIC programming model, NOT PCI, to get the VMM to setup the IRQ
+remapping HW.
+
+This suits ARM better anyhow since the VM is in control of the IOVA
+for the ITS page.
+
+Jason
