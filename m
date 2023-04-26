@@ -2,63 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E23E36EFB63
-	for <lists+kvm@lfdr.de>; Wed, 26 Apr 2023 21:56:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9E6C76EFB64
+	for <lists+kvm@lfdr.de>; Wed, 26 Apr 2023 21:57:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234747AbjDZT41 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 Apr 2023 15:56:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40450 "EHLO
+        id S234754AbjDZT5H (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 Apr 2023 15:57:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40834 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234679AbjDZT4Z (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 Apr 2023 15:56:25 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C7D31707
-        for <kvm@vger.kernel.org>; Wed, 26 Apr 2023 12:55:40 -0700 (PDT)
+        with ESMTP id S231610AbjDZT5G (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 Apr 2023 15:57:06 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6AB4919B9
+        for <kvm@vger.kernel.org>; Wed, 26 Apr 2023 12:56:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1682538939;
+        s=mimecast20190719; t=1682538984;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=x4GvcwkE/5d9RFaKVtYC75FJAN+7qjz3FyAzkuwVc0s=;
-        b=gluk3NH80T7+R48iIMARcbVBf17ZU3+NAkv/VY23aH+9K7AJkM+Cih9MVejik2b/lJVuzv
-        uPDj6fGWrrxkOXEvO2MFZB/tTwbBpjFFKAJdMNFgUASX6s0lKE33E27oOAzPIeDT3qLOW5
-        sBIYN1208mH7bkYGHEcWGaG6v21ok3s=
-Received: from mail-vs1-f71.google.com (mail-vs1-f71.google.com
- [209.85.217.71]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=Zw21Yr3ggXAcUufyzwCuaJsOabWd2wq00JsLEU9ouJI=;
+        b=I6GkysOJcBJlLNggJRPXsHxneks4tb7xRcqeWzSLRrgA389WAU6iNgY/poOUqOUX+g6vhc
+        vCO+QaroVDL/+xDW2hX0NbH76V6IfDc5yHKDKf/qebNajb1DBnvXxK71DR7t/93eC0tz9F
+        aTZ5tUtIrRrtoo0bd4paqtMMEpG8wek=
+Received: from mail-vk1-f200.google.com (mail-vk1-f200.google.com
+ [209.85.221.200]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-182-tK7ZDT3JP9mc3J1MjtaN6g-1; Wed, 26 Apr 2023 15:55:38 -0400
-X-MC-Unique: tK7ZDT3JP9mc3J1MjtaN6g-1
-Received: by mail-vs1-f71.google.com with SMTP id ada2fe7eead31-42e38b93668so1911683137.0
-        for <kvm@vger.kernel.org>; Wed, 26 Apr 2023 12:55:37 -0700 (PDT)
+ us-mta-251-S_pMPLguPCazNyNGtUWQxw-1; Wed, 26 Apr 2023 15:56:23 -0400
+X-MC-Unique: S_pMPLguPCazNyNGtUWQxw-1
+Received: by mail-vk1-f200.google.com with SMTP id 71dfb90a1353d-443b6a0fb20so2255382e0c.3
+        for <kvm@vger.kernel.org>; Wed, 26 Apr 2023 12:56:23 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682538937; x=1685130937;
+        d=1e100.net; s=20221208; t=1682538982; x=1685130982;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=x4GvcwkE/5d9RFaKVtYC75FJAN+7qjz3FyAzkuwVc0s=;
-        b=TDpPvP5HZSHpPWpUzV5XT9vNywLMsS89Zt3c4wAi0d//YHkJivFf3eFhnUSGUPvtg5
-         2VqJFjc2E48CEQXW8troHfG1cque27ZnjF4/WMzIaadUvtOCcI12k8Q6z8t5ofgz/cFk
-         t38lJBgeNmeoTIX181aSty2KE8y3D37XYN73aBd3YA/ydVqxJi/1kxWV30q2f+gNcHYT
-         9JxtuUXxHvDhE+aBjNkegM+QPx1w838yPVuXhsoBIBrFPn+c3SjyBB8ocIdfKe0ZhC3V
-         l/JSPF6oQCNGI9IqGsM4BlxSiERCWNwJ8Lbrmv4kO4eE+6jJPuIIhru3C6CVt5lwjQnm
-         ThHw==
-X-Gm-Message-State: AAQBX9ckcFEtFuJVglry6O9RBajPPx2LgKsa8eDP2JlQWInTinZfrjlf
-        UV6LI/Iu4gH6vRfEZLzQWFpESWU9MLlt1C3PNZ+/5zxAiBDUMfxxHZ36wAOy/SfXA5VkXkfdOPu
-        opZz+MC/MbhWbOEmN+yWzTEOxp85UdLYudZi6tS0=
-X-Received: by 2002:a05:6102:356a:b0:42f:fae5:3b98 with SMTP id bh10-20020a056102356a00b0042ffae53b98mr8971226vsb.14.1682538937071;
-        Wed, 26 Apr 2023 12:55:37 -0700 (PDT)
-X-Google-Smtp-Source: AKy350Yy58fwCXXJorxUx7s57UGjFOozgAk73AUxphwB9YDU1Mp6tX4I4R98piOwNDR9E3Hc0ilQyiQhECaM/0tACrg=
-X-Received: by 2002:a05:6102:356a:b0:42f:fae5:3b98 with SMTP id
- bh10-20020a056102356a00b0042ffae53b98mr8971210vsb.14.1682538936712; Wed, 26
- Apr 2023 12:55:36 -0700 (PDT)
+        bh=Zw21Yr3ggXAcUufyzwCuaJsOabWd2wq00JsLEU9ouJI=;
+        b=LXLMzvevbK0NBQ+H7xtXJOhTmu4omCGTRm0XFNHjVgQqDI5AupNxRg3bVQU0boMmU5
+         30/NYY9jSof64qXPpiQQnev+V6NBdrZILo7H8LzfDWmY5eiQK58paGChJI9EVN7Hdnco
+         ck5IPGZVR8uPOUys+7j/K802Dic8mHeBU8fzIzYYGH5PCxRNwNwL3fL8Q24mQl7aGKwq
+         uzgB2IO41ytGtYytiPdUe8Gimwm22ft5QRAKxMNCxid7+JHoxVkLEsYvIgISkHffrhFF
+         8REzvXMMahq9mIzmMBgyg6LWxHluUsRA7Bf+oUhtrWos8fhW2I6S4kPc4aaiT7pLN5Ad
+         ImqA==
+X-Gm-Message-State: AAQBX9fg7nTADLgtEhSMuYr8H1KTmlkKuXau02/BM7gOyk8zoTJwe0uK
+        e6sCh5eJd2fVVw3m6gJYALhRbSWEKPLf+D/6OfPqGwu6YwSdFuvmSQsIQ/sKe4jEcxpgExSwV3f
+        vwu+0U3oPQZdAch1tAUIgIBkRQwkgZ5BhEV4Wlg+gag==
+X-Received: by 2002:a67:fdc1:0:b0:42c:77da:5d05 with SMTP id l1-20020a67fdc1000000b0042c77da5d05mr9395097vsq.32.1682538982434;
+        Wed, 26 Apr 2023 12:56:22 -0700 (PDT)
+X-Google-Smtp-Source: AKy350avWADS6wf7krW/BTfvRMNhg7uAbHfe0GeCHgEOs4Z/SC/lQbVKnud8Dg7Z0RlimVHhVeGbA4nLVgX5KVsOQxw=
+X-Received: by 2002:a67:fdc1:0:b0:42c:77da:5d05 with SMTP id
+ l1-20020a67fdc1000000b0042c77da5d05mr9395091vsq.32.1682538982142; Wed, 26 Apr
+ 2023 12:56:22 -0700 (PDT)
 MIME-Version: 1.0
-References: <20230424173529.2648601-1-seanjc@google.com> <20230424173529.2648601-4-seanjc@google.com>
-In-Reply-To: <20230424173529.2648601-4-seanjc@google.com>
+References: <20230424173529.2648601-1-seanjc@google.com> <20230424173529.2648601-5-seanjc@google.com>
+In-Reply-To: <20230424173529.2648601-5-seanjc@google.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Date:   Wed, 26 Apr 2023 21:55:25 +0200
-Message-ID: <CABgObfbh-ZQvnSfP9XNc2pGud9xP2vvDSVj7MTgCxk_CeNHHaw@mail.gmail.com>
-Subject: Re: [GIT PULL] KVM: x86: PMU changes for 6.4
+Date:   Wed, 26 Apr 2023 21:56:11 +0200
+Message-ID: <CABgObfbBqbFhQxOT+UTO6WBDFxk+HMoDTpXdW18GBJGqAjbspA@mail.gmail.com>
+Subject: Re: [GIT PULL] KVM: x86: Selftests changes for 6.4
 To:     Sean Christopherson <seanjc@google.com>
 Cc:     kvm@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
@@ -76,20 +76,12 @@ X-Mailing-List: kvm@vger.kernel.org
 On Mon, Apr 24, 2023 at 7:35=E2=80=AFPM Sean Christopherson <seanjc@google.=
 com> wrote:
 >
-> KVM x86/pmu changes for 6.4.  Hiding in the pile of selftests changes are=
- a
-> a handful of small-but-important fixes.
+> KVM x86 selftests change for 6.4.  And an AMX+XCR0 bugfix that I landed h=
+ere
+> to avoid creating a mess of unnecessary conflicts between the series to
+> overhaul the AMX test and the related selftests changes to verify the fix=
+.
 >
-> Note, this superficially conflicts with the PRED_CMD/FLUSH_CMD changes
-> sitting in kvm/next due to "KVM: VMX: Refactor intel_pmu_{g,}set_msr() to
-> align with other helpers".  The resolution I have been using when prepari=
-ng
-> kvm-x86/next for linux-next is to replace a "return 0" with a "break".
-
-Yup, figured out the same. Pulled (put not pushed yet), thanks.
-
-Paolo
-
 > The following changes since commit d8708b80fa0e6e21bc0c9e7276ad0bccef73b6=
 e7:
 >
@@ -98,107 +90,93 @@ e7:
 >
 > are available in the Git repository at:
 >
->   https://github.com/kvm-x86/linux.git tags/kvm-x86-pmu-6.4
+>   https://github.com/kvm-x86/linux.git tags/kvm-x86-selftests-6.4
 >
-> for you to fetch changes up to 457bd7af1a17182e7f1f97eeb5d9107f8699e99d:
+> for you to fetch changes up to 20aef201dafba6a1ffe9daa145c7f2c525b74aae:
 >
->   KVM: selftests: Test the PMU event "Instructions retired" (2023-04-14 1=
-3:21:38 -0700)
+>   KVM: selftests: Fix spelling mistake "perrmited" -> "permitted" (2023-0=
+4-14 10:04:51 -0700)
+
+Pulled (put not pushed yet), thanks.
+
+Paolo
+
+> ----------------------------------------------------------------
+> KVM selftests, and an AMX/XCR0 bugfix, for 6.4:
+>
+>  - Don't advertisze XTILE_CFG in KVM_GET_SUPPORTED_CPUID if XTILE_DATA is
+>    not being reported due to userspace not opting in via prctl()
+>
+>  - Overhaul the AMX selftests to improve coverage and cleanup the test
+>
+>  - Misc cleanups
 >
 > ----------------------------------------------------------------
-> KVM x86 PMU changes for 6.4:
+> Aaron Lewis (9):
+>       KVM: selftests: Assert that XTILE is XSAVE-enabled
+>       KVM: selftests: Assert that both XTILE{CFG,DATA} are XSAVE-enabled
+>       KVM: selftests: Move XSAVE and OSXSAVE CPUID checks into AMX's init=
+_regs()
+>       KVM: selftests: Check that the palette table exists before using it
+>       KVM: selftests: Check that XTILEDATA supports XFD
+>       KVM: x86: Add a helper to handle filtering of unpermitted XCR0 feat=
+ures
+>       KVM: selftests: Move XGETBV and XSETBV helpers to common code
+>       KVM: selftests: Add all known XFEATURE masks to common code
+>       KVM: selftests: Add test to verify KVM's supported XCR0
 >
->  - Disallow virtualizing legacy LBRs if architectural LBRs are available,
->    the two are mutually exclusive in hardware
+> Ackerley Tng (1):
+>       KVM: selftests: Adjust VM's initial stack address to align with Sys=
+V ABI spec
 >
->  - Disallow writes to immutable feature MSRs (notably PERF_CAPABILITIES)
->    after KVM_RUN, and overhaul the vmx_pmu_caps selftest to better
->    validate PERF_CAPABILITIES
+> Anish Moorthy (1):
+>       KVM: selftests: Fix nsec to sec conversion in demand_paging_test
 >
->  - Apply PMU filters to emulated events and add test coverage to the
->    pmu_event_filter selftest
+> Colin Ian King (1):
+>       KVM: selftests: Fix spelling mistake "perrmited" -> "permitted"
 >
->  - Misc cleanups and fixes
+> Hao Ge (1):
+>       KVM: selftests: Close opened file descriptor in stable_tsc_check_su=
+pported()
 >
-> ----------------------------------------------------------------
-> Aaron Lewis (5):
->       KVM: x86/pmu: Prevent the PMU from counting disallowed events
->       KVM: selftests: Add a common helper for the PMU event filter guest =
-code
->       KVM: selftests: Add helpers for PMC asserts in PMU event filter tes=
+> Ivan Orlov (1):
+>       KVM: selftests: Add 'malloc' failure check in vcpu_save_state
+>
+> Like Xu (2):
+>       KVM: selftests: Add a helper to read kvm boolean module parameters
+>       KVM: selftests: Report enable_pmu module value when test is skipped
+>
+> Mingwei Zhang (6):
+>       KVM: selftests: Add a fully functional "struct xstate" for x86
+>       KVM: selftests: Fix an error in comment of amx_test
+>       KVM: selftests: Enable checking on xcomp_bv in amx_test
+>       KVM: selftests: Add check of CR0.TS in the #NM handler in amx_test
+>       KVM: selftests: Assert that XTILE_DATA is set in IA32_XFD on #NM
+>       KVM: selftests: Verify XTILE_DATA in XSTATE isn't affected by IA32_=
+XFD
+>
+> Sean Christopherson (2):
+>       KVM: x86: Filter out XTILE_CFG if XTILE_DATA isn't permitted
+>       KVM: selftests: Rework dynamic XFeature helper to take mask, not bi=
 t
->       KVM: selftests: Print detailed info in PMU event filter asserts
->       KVM: selftests: Test the PMU event "Instructions retired"
 >
-> Like Xu (4):
->       KVM: x86/pmu: Zero out pmu->all_valid_pmc_idx each time it's refres=
-hed
->       KVM: x86/pmu: Rename pmc_is_enabled() to pmc_is_globally_enabled()
->       KVM: x86/pmu: Rewrite reprogram_counters() to improve performance
->       KVM: x86/pmu: Fix a typo in kvm_pmu_request_counter_reprogam()
->
-> Mathias Krause (1):
->       KVM: x86: Shrink struct kvm_pmu
->
-> Sean Christopherson (25):
->       KVM: x86/pmu: Disallow legacy LBRs if architectural LBRs are availa=
-ble
->       KVM: x86: Rename kvm_init_msr_list() to clarify it inits multiple l=
-ists
->       KVM: x86: Add a helper to query whether or not a vCPU has ever run
->       KVM: x86: Add macros to track first...last VMX feature MSRs
->       KVM: x86: Generate set of VMX feature MSRs using first/last definit=
-ions
->       KVM: selftests: Split PMU caps sub-tests to avoid writing MSR after=
- KVM_RUN
->       KVM: x86: Disallow writes to immutable feature MSRs after KVM_RUN
->       KVM: x86/pmu: WARN and bug the VM if PMU is refreshed after vCPU ha=
-s run
->       KVM: x86/pmu: Zero out LBR capabilities during PMU refresh
->       KVM: selftests: Move 0/initial value PERF_CAPS checks to dedicated =
-sub-test
->       KVM: selftests: Assert that full-width PMC writes are supported if =
-PDCM=3D1
->       KVM: selftests: Print out failing MSR and value in vcpu_set_msr()
->       KVM: selftests: Verify KVM preserves userspace writes to "durable" =
-MSRs
->       KVM: selftests: Drop now-redundant checks on PERF_CAPABILITIES writ=
-es
->       KVM: selftests: Test all fungible features in PERF_CAPABILITIES
->       KVM: selftests: Test all immutable non-format bits in PERF_CAPABILI=
-TIES
->       KVM: selftests: Expand negative testing of guest writes to PERF_CAP=
-ABILITIES
->       KVM: selftests: Test post-KVM_RUN writes to PERF_CAPABILITIES
->       KVM: selftests: Drop "all done!" printf() from PERF_CAPABILITIES te=
-st
->       KVM: selftests: Refactor LBR_FMT test to avoid use of separate macr=
-o
->       KVM: selftests: Add negative testcase for PEBS format in PERF_CAPAB=
-ILITIES
->       KVM: selftests: Verify LBRs are disabled if vPMU is disabled
->       KVM: VMX: Refactor intel_pmu_{g,}set_msr() to align with other help=
-ers
->       KVM: selftests: Use error codes to signal errors in PMU event filte=
-r test
->       KVM: selftests: Copy full counter values from guest in PMU event fi=
-lter test
->
->  arch/x86/include/asm/kvm_host.h                    |   2 +-
 >  arch/x86/kvm/cpuid.c                               |   2 +-
->  arch/x86/kvm/mmu/mmu.c                             |   2 +-
->  arch/x86/kvm/pmu.c                                 |  21 +-
->  arch/x86/kvm/pmu.h                                 |   2 +-
->  arch/x86/kvm/svm/pmu.c                             |   2 +-
->  arch/x86/kvm/svm/svm.c                             |   2 +-
->  arch/x86/kvm/vmx/pmu_intel.c                       | 135 ++++++-----
->  arch/x86/kvm/vmx/vmx.c                             |  16 +-
->  arch/x86/kvm/x86.c                                 | 102 ++++++---
->  arch/x86/kvm/x86.h                                 |  13 ++
->  .../selftests/kvm/include/x86_64/processor.h       |  41 +++-
->  .../selftests/kvm/x86_64/pmu_event_filter_test.c   | 252 ++++++++++++---=
-------
->  .../selftests/kvm/x86_64/vmx_pmu_caps_test.c       | 248 +++++++++++++++=
-+----
->  14 files changed, 565 insertions(+), 275 deletions(-)
+>  arch/x86/kvm/x86.c                                 |   4 +-
+>  arch/x86/kvm/x86.h                                 |  29 +++++
+>  tools/testing/selftests/kvm/Makefile               |   1 +
+>  tools/testing/selftests/kvm/demand_paging_test.c   |   2 +-
+>  .../testing/selftests/kvm/include/kvm_util_base.h  |   1 +
+>  .../selftests/kvm/include/x86_64/processor.h       |  83 +++++++++++--
+>  tools/testing/selftests/kvm/lib/kvm_util.c         |   5 +
+>  tools/testing/selftests/kvm/lib/x86_64/processor.c |  36 ++++--
+>  tools/testing/selftests/kvm/x86_64/amx_test.c      | 118 ++++++++-------=
+---
+>  .../selftests/kvm/x86_64/pmu_event_filter_test.c   |   1 +
+>  .../kvm/x86_64/vmx_nested_tsc_scaling_test.c       |   8 +-
+>  .../selftests/kvm/x86_64/vmx_pmu_caps_test.c       |   1 +
+>  .../testing/selftests/kvm/x86_64/xcr0_cpuid_test.c | 132 +++++++++++++++=
+++++++
+>  14 files changed, 326 insertions(+), 97 deletions(-)
+>  create mode 100644 tools/testing/selftests/kvm/x86_64/xcr0_cpuid_test.c
+>
 
