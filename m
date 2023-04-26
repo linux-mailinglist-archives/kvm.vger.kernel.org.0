@@ -2,104 +2,171 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DD59E6EF369
-	for <lists+kvm@lfdr.de>; Wed, 26 Apr 2023 13:28:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 48E9F6EF3D5
+	for <lists+kvm@lfdr.de>; Wed, 26 Apr 2023 13:57:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240433AbjDZL16 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 Apr 2023 07:27:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35894 "EHLO
+        id S240652AbjDZL5Y (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 Apr 2023 07:57:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50988 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240010AbjDZL15 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 Apr 2023 07:27:57 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 93D21270E;
-        Wed, 26 Apr 2023 04:27:52 -0700 (PDT)
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 33QB8U2w030819;
-        Wed, 26 Apr 2023 11:27:51 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
- mime-version : content-transfer-encoding : in-reply-to : references : cc :
- from : subject : to : message-id : date; s=pp1;
- bh=D2O5DH4oHHzOuUR7aMcJ5sugmRXJpjzkp8m4v8QtT1k=;
- b=fNny3NwkNk1f24XiKQZpQ4apNT/MiVhtbeRrI5nJT+dY783eIYxAImJQVndG3mhrBERd
- hKOc7x9duRSRETtAhE60zXJxOpyA680CtRc18poWDrYVno9vycHvOG+Awq+/E2iUtvEH
- dowb1HNkEwPJa9i2kc2pnOGGly5pDnRkTEBWmhrfZH/ORPLqQj00jggjhD7pF8v6UVpi
- kFU/BVcoRV/kWbppOSK+BzPD8QZzTa0R6pJANZ/UtRe9yjsqKEzqZS5Yqu+dnghIFtmo
- ULklyl1KAEC8kpyANF4a54bDknd4VSF0DtxreSB0dM8sdwcNhOtpfxKgC+9SZLjCc0g8 wA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3q72ksh0x1-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 26 Apr 2023 11:27:51 +0000
-Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 33QB977i005342;
-        Wed, 26 Apr 2023 11:27:51 GMT
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3q72ksh0w4-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 26 Apr 2023 11:27:51 +0000
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 33Q27aUQ001411;
-        Wed, 26 Apr 2023 11:27:48 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-        by ppma04ams.nl.ibm.com (PPS) with ESMTPS id 3q47772ay8-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 26 Apr 2023 11:27:48 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-        by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 33QBRinc51970410
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 26 Apr 2023 11:27:44 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A62F02004B;
-        Wed, 26 Apr 2023 11:27:44 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 8CCF620049;
-        Wed, 26 Apr 2023 11:27:44 +0000 (GMT)
-Received: from t14-nrb (unknown [9.155.203.253])
-        by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Wed, 26 Apr 2023 11:27:44 +0000 (GMT)
-Content-Type: text/plain; charset="utf-8"
+        with ESMTP id S240143AbjDZL5X (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 Apr 2023 07:57:23 -0400
+Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2042.outbound.protection.outlook.com [40.107.102.42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4AF6D4C12
+        for <kvm@vger.kernel.org>; Wed, 26 Apr 2023 04:57:22 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Gq0dzoIMypoWUnTQ1+xcGcyae5g2yoZFTe6RKTurUG6imMH/UrrAcqxDfjqlhK2Beqq5GkLfh7WeXl75l06PPY3T1d2t1VkrbyyJio2A9MdOcydzglxnNoD2BTpwndX9kM2/yckO+p28IndyfKj0vG5n8vH2a6jKnDxsI1iPUp6Bv4nSnWf3470iPWvA35xA0t7i07LB0f+h6UUiprE6QQ64Bce+DK+7yXDEMDK7C0GqpMIfEa1xTQUFrAfFt/9tWxSN6hnnELeW/H4vtRq3Ix6/IUgQOadBGsYQmFYB9bXJlamv7nBC5ZIYzEYZFIKZrFox1EwIZilcFKkJR/x92Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=bK9nv3dAOWMbeO1ZQGl2C557v6ODnrIVIm6qDMKQyh0=;
+ b=CQAxlI0itW8MlIqE6O5Jg6TtnVp617/vh9Cf/LEkkrfX8p/2ZAphukA6xHTdJ09GxzokkBVAZ5YmAuBoiEt3Y/zr8pC6luP8j4WC+zJ/MeWoNik4T3k9DodvfvcwL3W5TZqlMcTs9G6W1CYjWmsWff7ILr92BQD+cu/6F0qDwf/wnZDbTCfUxdx5Jg3tYcOrlskdcIcUhP2IPmP1lnSgHbSgnm52o8sfiV01qncSjOKtGSabXkd5LnFSC0gNSarM/dNULEYaCUOy9urY2EVLZla7QOHoJoxDHNque2KarOfnOBqKxoGT9V83v047jyCWJn/H+jauN5B7eRVPg+ZBGQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=bK9nv3dAOWMbeO1ZQGl2C557v6ODnrIVIm6qDMKQyh0=;
+ b=W42AU7WlpB30O3Lf+1Mn5PmuQhw0GwoAvU7huPjlAAuFsFe+M/k476E+hCx8rkq8zpsw416XFSjp7nROsJQBnTRwRQS/5kMXoBVL4K54qr752z+p5hIDvKsOKBiWr2s6jZVzTSlFDuof+o3ZpvcubDrdLehgb2uTJA47Q8FPh/xEI6RGEapszuZMnGUm2Gk6e3FWrv7X+ePiUsyfXXpn4ik/8h6BZYMUO+VHg7LthUprrJCo0Qsb0CmLhm6BQ/RR8+wLOFNyWLAB3edY88KxT71V4wm/KbMM4qeAKOFqwKqjQAdbdo6/Sl+lkFBC8PdDtP8LEOdT1DjyutQVyZZOnw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by SA1PR12MB6920.namprd12.prod.outlook.com (2603:10b6:806:258::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6319.34; Wed, 26 Apr
+ 2023 11:57:20 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::f7a7:a561:87e9:5fab]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::f7a7:a561:87e9:5fab%6]) with mapi id 15.20.6340.021; Wed, 26 Apr 2023
+ 11:57:19 +0000
+Date:   Wed, 26 Apr 2023 08:57:16 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Robin Murphy <robin.murphy@arm.com>,
+        Nicolin Chen <nicolinc@nvidia.com>
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "iommu@lists.linux.dev" <iommu@lists.linux.dev>
+Subject: Re: RMRR device on non-Intel platform
+Message-ID: <ZEkRnIPjeLNxbkj8@nvidia.com>
+References: <20230420081539.6bf301ad.alex.williamson@redhat.com>
+ <6cce1c5d-ab50-41c4-6e62-661bc369d860@arm.com>
+ <20230420084906.2e4cce42.alex.williamson@redhat.com>
+ <fd324213-8d77-cb67-1c52-01cd0997a92c@arm.com>
+ <20230420154933.1a79de4e.alex.williamson@redhat.com>
+ <ZEJ73s/2M4Rd5r/X@nvidia.com>
+ <0aa4a107-57d0-6e5b-46e5-86dbe5b3087f@arm.com>
+ <ZEKFdJ6yXoyFiHY+@nvidia.com>
+ <fe7e20e5-9729-248d-ee03-c8b444a1b7c0@arm.com>
+ <ZELOqZliiwbG6l5K@nvidia.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZELOqZliiwbG6l5K@nvidia.com>
+X-ClientProxiedBy: SJ0PR03CA0293.namprd03.prod.outlook.com
+ (2603:10b6:a03:39e::28) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20230421113647.134536-5-frankja@linux.ibm.com>
-References: <20230421113647.134536-1-frankja@linux.ibm.com> <20230421113647.134536-5-frankja@linux.ibm.com>
-Cc:     linux-s390@vger.kernel.org, imbrenda@linux.ibm.com,
-        thuth@redhat.com, david@redhat.com
-From:   Nico Boehr <nrb@linux.ibm.com>
-Subject: Re: [kvm-unit-tests PATCH v3 4/7] lib: s390x: uv: Add pv guest requirement check function
-To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
-Message-ID: <168250846430.44728.17876956405267130513@t14-nrb>
-User-Agent: alot/0.8.1
-Date:   Wed, 26 Apr 2023 13:27:44 +0200
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: _gebL08kgjC4DmpwZtYx0vEsisZIncB0
-X-Proofpoint-ORIG-GUID: 6lhxy98BwHCUbGyVISvXdMNb-DDWUpSk
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
- definitions=2023-04-26_04,2023-04-26_03,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 malwarescore=0
- lowpriorityscore=0 adultscore=0 mlxscore=0 spamscore=0 priorityscore=1501
- mlxlogscore=999 clxscore=1015 suspectscore=0 impostorscore=0 phishscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2303200000
- definitions=main-2304260098
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|SA1PR12MB6920:EE_
+X-MS-Office365-Filtering-Correlation-Id: bc01e943-9622-4ec0-df2d-08db464d6360
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: coP/umzxnkGK3ProffeLGzXgMsZP+MkM5Rl4rKYopBS4QeMdHvIUPmAq32Xy429LGafkXzhX6a/jxZvn17+6mHiaRTlr65iGDQ1ErVXbKVDJTJ3rCYIuNb2O2D+5YABrIPR9AFcWTp0jjCnBLxHyRJejvXo+MR/Ou5jRO/sHZSMTHlbph0T1nrdOvTuohPnZWoigC8mxTPDnOBIajUdIRiPInRbHJhDkfCqgXDO17Znc2K0dA0qI8KaZUG/w7CITwox52jDTjbf3YlE+M9Olpcq6LTChI7tf9gD7HLkduEX2EL9lf0IrO5hbwoyYCU8gNYooPRPIyXgIsvC8gJVPY5aByj89Vo/HcgMNmuEpg3C+mo3pv1juYni0gSGafXbX+WSQBJoLwKnWchD6wmZFe85rmL0+UU0MkI9ZVFt3mQ8T3nY8Xu+KKCESDg1Qtjrsl5vq0nSb2ogzUWfE3AaYu8bevlKB8E3JHZylgApvjiigDsg+shBvKwfp7e0sFEOY0DQ9pCLwpHSUv818OpJSHja8MIe9+dgcHc3AX/Nncg6/EbW4T6TyKKJb6+BcOtZw
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(346002)(39860400002)(396003)(376002)(136003)(366004)(451199021)(6486002)(478600001)(2616005)(6666004)(110136005)(54906003)(26005)(6506007)(186003)(6512007)(5660300002)(36756003)(66946007)(38100700002)(2906002)(66556008)(66476007)(4326008)(41300700001)(6636002)(86362001)(8676002)(8936002)(316002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?MUupoUVGhriJ3/JaSxRGgTiBYO8dHYXj6H4S5IAmDJBdkNK6wYNZQSbMOvw3?=
+ =?us-ascii?Q?cd7IWV9ChESwZxHHWryTdYo0HbWoBeBSpcdcQmAOrZOcSP2iGoGTHwKWr+oe?=
+ =?us-ascii?Q?roaWYLCM4Oyf2ARMJR6lpSirwruUnpZZtjULXf1wr0Wlai6D+TLbojl7X9fY?=
+ =?us-ascii?Q?2gKSvps0aHIKG9wO7O9Uus0bBDr0K3n4X2XkFadIcUrwWBrKc1X53GckSFKh?=
+ =?us-ascii?Q?SZ7NC/1pdLW3ga1Abz5Cxpm8VnQEyA0tJazR5oDTp6hJUjem6i7Ny1fAAs8D?=
+ =?us-ascii?Q?wrG3oavtYquyGbb5cumn7m7vsiOWKUAmW5eO5zIl/kZoBiHjX0z6rKfp5NND?=
+ =?us-ascii?Q?qSqJXTZgGgmg8ZSqkJHOh4TpeFuZR3aOysMiM5K0wPmoC0G8bVbdubyKq8xe?=
+ =?us-ascii?Q?Kz6MVIDJElTQ9IzXUno3C7iAoe0jy9NXmdI5J2CpEBtdV/d8GhMgEKxysdoM?=
+ =?us-ascii?Q?ARVzuijxMAFzIDMVd35qalpo+ysvqxcqFCNW5hgjUxKt54yiDpg48Fkzd/qf?=
+ =?us-ascii?Q?o2B1DT0qW4re/fUhPBlfVTsiQ5azRxg/+VprpI5S0abIP3UFjSYrxGr0J+WV?=
+ =?us-ascii?Q?ObNrAMkRzzjAjN4nxdM4QKijdq3LNxbQ8u9xiHurYE7J5GrgcFChyzcNmZ2A?=
+ =?us-ascii?Q?0NcPqyNianmDGXjRXXUzD9Fvfkf71E5MrtW5pWFyxVBf5OIWf9ZLsfdmL95s?=
+ =?us-ascii?Q?Ft5tOSMwtuwxgRViJL3EC8tfdLugao8u0wnhRSkFSR+gwCnRM7kmRc9fWVpJ?=
+ =?us-ascii?Q?FCMCmLp2IVQhdRyLqTn5ekmuoLb6Ff4QAUH2Kdo3l+yvXpa0cJuBYvGON+D+?=
+ =?us-ascii?Q?Vn22aO8k481rsNPKiKE14I8KUge52AbXPcu+FYU4rGWnRcIHFGUJP01WyB3C?=
+ =?us-ascii?Q?rzjdv5SlRnID3bA/w4wXPiA60T4cG74uvnuV5dVRn1/M+iiECwsiV+V0CmQZ?=
+ =?us-ascii?Q?gi2T2u8hb//xfB+/dvevzAH/7oD0eQNnd7zJpdSlHf6NB+zGOLS5egiX8zRb?=
+ =?us-ascii?Q?OF4P66TH6G0hS4/5u1wuv01L6Jbwbd+l9ruNqo7NJ7w906fL5wtovbOyc3Cb?=
+ =?us-ascii?Q?laz2AzskEvSduEbd402R1x66qTrMwK2p8xK5PAcDB2CqMktgavtC7KeDeuDT?=
+ =?us-ascii?Q?d6wS/lJ/k9rys8RJDQ1BXqLjRjpP9FITPlMCRqcP2rAFFaG+MJ2zojM3SIYv?=
+ =?us-ascii?Q?qYMa/X3ovkEsmCvVp6owTIMmB9SD3DmXL+aFVQrKq4u1G/Cdprnxf9MgCcVL?=
+ =?us-ascii?Q?VsKsqv2+3rPwleNsS9o1x5r5vsSYP+ACvd1wn5IG8RkGuimweA+PP1mX/n63?=
+ =?us-ascii?Q?PC+HKoRR64B0Oz+Ld2CDeqPM9acrwWotoZUbBv+cn8cJyH/yYmdNP5hyxOPJ?=
+ =?us-ascii?Q?jbZRR9syAd5yUTKt4urhC+mfFV7+SeLIle0+Zl2MryOA2HVWh4l+Yl7ywKmm?=
+ =?us-ascii?Q?3jf5Y1mZd8JhbeoZD7wrWuJs34p7/8L3GYP/z7ynGGlMI1UYZC856u2biMO3?=
+ =?us-ascii?Q?optIB2UqlkzwP+mUKNGlCZTw/x255lh4oTCAYIpYxVLlH/s+N7ABdvKZaDm8?=
+ =?us-ascii?Q?UivgRPsZzwoUPLpJW5Hdj1yBvKg2FHV9Zd3KfeUs?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: bc01e943-9622-4ec0-df2d-08db464d6360
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Apr 2023 11:57:19.8573
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: ELy9DkcR37Vzhl/XvXupIahlXXGPIPGBV5iFBf6AXyGxIMyIVN+5ckh3DA1H+aks
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB6920
+X-Spam-Status: No, score=-1.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Quoting Janosch Frank (2023-04-21 13:36:44)
-> When running PV guests some of the UV memory needs to be allocated
-> with > 31 bit addresses which means tests with PV guests will always
-> need a lot more memory than other tests.
-> Additionally facilities nr 158 and sclp.sief2 need to be available.
->=20
-> Let's add a function that checks for these requirements and prints a
-> helpful skip message.
->=20
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+On Fri, Apr 21, 2023 at 02:58:01PM -0300, Jason Gunthorpe wrote:
 
-with Claudios renaming suggestion:
-Reviewed-by: Nico Boehr <nrb@linux.ibm.com>
+> > which for practical purposes in this context means an ITS. 
+> 
+> I haven't delved into it super detail, but.. my impression was..
+> 
+> The ITS page only becomes relavent to the IOMMU layer if the actual
+> IRQ driver calls iommu_dma_prepare_msi()
+
+Nicolin and I sat down and traced this through, this explanation is
+almost right...
+
+irq-gic-v4.c is some sub module of irq-gic-v3-its.c so it does end up
+calling iommu_dma_prepare_msi() however..
+
+qemu will setup the ACPI so that VM thinks the ITS page is at
+0x08080000. I think it maps some dummy CPU memory to this address.
+
+iommufd will map the real ITS page at MSI_IOVA_BASE = 0x8000000 (!!)
+and only into the IOMMU
+
+qemu will setup some RMRR thing to make 0x8000000 1:1 at the VM's
+IOMMU
+
+When DMA API is used iommu_dma_prepare_msi() is called which will
+select a MSI page address that avoids the reserved region, so it is
+some random value != 0x8000000 and maps the dummy CPU page to it.
+The VM will then do a MSI-X programming cycle with the S1 IOVA of the
+CPU page and the data. qemu traps this and throws away the address
+from the VM. The kernel sets up the interrupt and assumes 0x8000000
+is the right IOVA.
+
+When VFIO is used iommufd in the VM will force the MSI window to
+0x8000000 and instead of putting a 1:1 mapping we map the dummy CPU
+page and then everything is broken. Adding the reserved check is an
+improvement.
+
+The only way to properly fix this is to have qemu stop throwing away
+the address during the MSI-X programming. This needs to be programmed
+into the device instead.
+
+I have no idea how best to get there with the ARM GIC setup.. It feels
+really hard.
+
+Jason
