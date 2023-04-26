@@ -2,99 +2,317 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 315536EF930
-	for <lists+kvm@lfdr.de>; Wed, 26 Apr 2023 19:22:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0BE5C6EF93E
+	for <lists+kvm@lfdr.de>; Wed, 26 Apr 2023 19:23:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232457AbjDZRWN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 Apr 2023 13:22:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45376 "EHLO
+        id S235129AbjDZRXu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 Apr 2023 13:23:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47212 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231331AbjDZRWM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 Apr 2023 13:22:12 -0400
-Received: from out-58.mta1.migadu.com (out-58.mta1.migadu.com [IPv6:2001:41d0:203:375::3a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13AC32701
-        for <kvm@vger.kernel.org>; Wed, 26 Apr 2023 10:22:08 -0700 (PDT)
-Date:   Wed, 26 Apr 2023 17:21:58 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1682529725;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=yLWhzFr0IaFOP7oGWZVxeoPyLpaGebSmTPqngfIpZG0=;
-        b=fX1xUvV2g81JM+0ABsdRcIjDsB/4E25/qjtfu0mosg0PvfMF9EHtEmDRZTz3iFWTYkK0dA
-        19FAfDwYGMolyePLVnuvhqZX1xWo1FbUgjHuNPt4/BF+tVLHSMDVjtXDd0o5kYB6/qHrji
-        BF94HvG+MfWGhmnvQOaFbIcWpIUF+yQ=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Oliver Upton <oliver.upton@linux.dev>
-To:     David Matlack <dmatlack@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Anup Patel <anup@brainfault.org>,
-        Atish Patra <atishp@atishpatra.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Eric Farman <farman@linux.ibm.com>,
-        Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>,
-        Sathvika Vasireddy <sv@linux.ibm.com>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
-        linux-riscv@lists.infradead.org
-Subject: Re: [PATCH v2 0/4] KVM: Refactor KVM stats macros and enable custom
- stat names
-Message-ID: <ZEldtrUVBgmlrFOl@linux.dev>
-References: <20230306190156.434452-1-dmatlack@google.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230306190156.434452-1-dmatlack@google.com>
-X-Migadu-Flow: FLOW_OUT
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-        version=3.4.6
+        with ESMTP id S234745AbjDZRXs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 Apr 2023 13:23:48 -0400
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E3A187AA4
+        for <kvm@vger.kernel.org>; Wed, 26 Apr 2023 10:23:34 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-54f95c79522so111257607b3.3
+        for <kvm@vger.kernel.org>; Wed, 26 Apr 2023 10:23:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1682529814; x=1685121814;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=siP5bc/Iw1ex+/+Hkg2b3Fy5c+CirNV7mJw9NFlWIdY=;
+        b=PXGzJehjEX+WEQXhyruZz3aOLkQ7UHhYqMNWW4gOcF1A9xTCGp755+lUvmWxwTfywe
+         YxrJ9U2hctPF89TSzXmf9tdowV8AgwJwtFZw+z9uKEqNmZINWKoyLPHHOc+R2KiXh0JT
+         /oHnMadTwfW421hwciAbUeTR4824yVy/PN2Xl5RtuIfYMs5GSqP7NBD8IL5sxQN6eWe7
+         FfZ9oSzLEYBLCyJJMOsZ1pozlIHOFpotMIYHWg9tBhpMLtBVJC7acGle6Ecdv5mWGsX7
+         CF2X68dFujXjD4uQ5yB33IodLxFBHuSQMuJAjSUaGDhjCR/sdWNeN/yjAZ1YWZN9GZgq
+         Dg8w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1682529814; x=1685121814;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=siP5bc/Iw1ex+/+Hkg2b3Fy5c+CirNV7mJw9NFlWIdY=;
+        b=Y5qt5SwzJq9BIMvKGXQnm9Hmw/W7rJxx1xfBbxU7m9N8r9CnROprBZ2fu7GZkazMJ2
+         Cnm4+qyfkgiEXl/4xFAb3oP2i0ht7nZDppHmZrSLaZiuBtRj5R+gZNhWZ43hXwOHWGtK
+         At0E6XBNezYGm0UtgeMmx4m1aXobGBsefW104kTunGIevgTes2LnDKMNs/YoYHgW4e6y
+         HklUlryA4+MXF68DrMyjmKajbO80Ta5mWMh7BG4uMlJOc+kl4qybLWWjhKinE4qZdZXN
+         8vsty8cJncSryX0MX/1cieiD6ZniV9p8oP1IyuYv8p5n9hsvQMechv+XxqoeZMQbq4i8
+         MRIQ==
+X-Gm-Message-State: AAQBX9cV6l3srQl5CEhHtoaTY21UPTRm+3gqOET9vOCDwgvIfU33esNN
+        aRTzTPRJsmgzj6zGz1BaErwOql/kiBEzxA==
+X-Google-Smtp-Source: AKy350adpfBznaIQLpP082zoZAmYaws2EoACTh79LDGdyBJDkdtjJ3kUXE4Wx76V76UbDlCxEKT/81vCVqeFAg==
+X-Received: from ricarkol4.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:1248])
+ (user=ricarkol job=sendgmr) by 2002:a81:aa4b:0:b0:54f:b95f:8999 with SMTP id
+ z11-20020a81aa4b000000b0054fb95f8999mr10026939ywk.6.1682529814203; Wed, 26
+ Apr 2023 10:23:34 -0700 (PDT)
+Date:   Wed, 26 Apr 2023 17:23:18 +0000
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.40.1.495.gc816e09b53d-goog
+Message-ID: <20230426172330.1439644-1-ricarkol@google.com>
+Subject: [PATCH v8 00/12] Implement Eager Page Splitting for ARM
+From:   Ricardo Koller <ricarkol@google.com>
+To:     pbonzini@redhat.com, maz@kernel.org, oupton@google.com,
+        yuzenghui@huawei.com, dmatlack@google.com
+Cc:     kvm@vger.kernel.org, kvmarm@lists.linux.dev, qperret@google.com,
+        catalin.marinas@arm.com, andrew.jones@linux.dev, seanjc@google.com,
+        alexandru.elisei@arm.com, suzuki.poulose@arm.com,
+        eric.auger@redhat.com, gshan@redhat.com, reijiw@google.com,
+        rananta@google.com, bgardon@google.com, ricarkol@gmail.com,
+        Ricardo Koller <ricarkol@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Mar 06, 2023 at 11:01:52AM -0800, David Matlack wrote:
-> This series refactors the KVM stats macros to reduce duplication and
-> adds the support for choosing custom names for stats.
-> 
-> Custom name makes it possible to decouple the userspace-visible stat
-> names from their internal representation in C. This can allow future
-> commits to refactor the various stats structs without impacting
-> userspace tools that read KVM stats.
-> 
-> This also allows stats to be stored in data structures such as arrays,
-> without needing unions to access specific stats. Case in point, the last
-> patch in this series removes the pages_{4k,2m,1g} union, which is a
-> useful cleanup to prepare for sharing paging code across architectures
-> [1].
-> 
-> And for full transparency, another motivation for this series it that at
-> Google we have several out-of-tree stats that use arrays. Custom name
-> support is something we added internally and it reduces our technical
-> debt to get the support merged upstream.
+Eager Page Splitting improves the performance of dirty-logging (used
+in live migrations) when guest memory is backed by huge-pages.  It's
+an optimization used in Google Cloud since 2016 on x86, and for the
+last couple of months on ARM.
 
-For the series:
+Background and motivation
+=========================
+Dirty logging is typically used for live-migration iterative copying.
+KVM implements dirty-logging at the PAGE_SIZE granularity (will refer
+to 4K pages from now on).  It does it by faulting on write-protected
+4K pages.  Therefore, enabling dirty-logging on a huge-page requires
+breaking it into 4K pages in the first place.  KVM does this breaking
+on fault, and because it's in the critical path it only maps the 4K
+page that faulted; every other 4K page is left unmapped.  This is not
+great for performance on ARM for a couple of reasons:
 
-Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
+- Splitting on fault can halt vcpus for milliseconds in some
+  implementations. Splitting a block PTE requires using a broadcasted
+  TLB invalidation (TLBI) for every huge-page (due to the
+  break-before-make requirement). Note that x86 doesn't need this. We
+  observed some implementations that take millliseconds to complete
+  broadcasted TLBIs when done in parallel from multiple vcpus.  And
+  that's exactly what happens when doing it on fault: multiple vcpus
+  fault at the same time triggering TLBIs in parallel.
+
+- Read intensive guest workloads end up paying for dirty-logging.
+  Only mapping the faulting 4K page means that all the other pages
+  that were part of the huge-page will now be unmapped. The effect is
+  that any access, including reads, now has to fault.
+
+Eager Page Splitting (on ARM)
+=============================
+Eager Page Splitting fixes the above two issues by eagerly splitting
+huge-pages when enabling dirty logging. The goal is to avoid doing it
+while faulting on write-protected pages. This is what the TDP MMU does
+for x86 [0], except that x86 does it for different reasons: to avoid
+grabbing the MMU lock on fault. Note that taking care of
+write-protection faults still requires grabbing the MMU lock on ARM,
+but not on x86 (with the fast_page_fault path).
+
+An additional benefit of eagerly splitting huge-pages is that it can
+be done in a controlled way (e.g., via an IOCTL). This series provides
+two knobs for doing it, just like its x86 counterpart: when enabling
+dirty logging, and when using the KVM_CLEAR_DIRTY_LOG ioctl. The
+benefit of doing it on KVM_CLEAR_DIRTY_LOG is that this ioctl takes
+ranges, and not complete memslots like when enabling dirty logging.
+This means that the cost of splitting (mainly broadcasted TLBIs) can
+be throttled: split a range, wait for a bit, split another range, etc.
+The benefits of this approach were presented by Oliver Upton at KVM
+Forum 2022 [1].
+
+Implementation
+==============
+Patches 3-4 add a pgtable utility function for splitting huge block
+PTEs: kvm_pgtable_stage2_split(). Patches 5-9 add support for eagerly
+splitting huge-pages when enabling dirty-logging and when using the
+KVM_CLEAR_DIRTY_LOG ioctl. Note that this is just like what x86 does,
+and the code is actually based on it.  And finally, patch 9:
+
+	KVM: arm64: Use local TLBI on permission relaxation
+
+adds support for using local TLBIs instead of broadcasts when doing
+permission relaxation. This last patch is key to achieving good
+performance during dirty-logging, as eagerly breaking huge-pages
+replaces mapping new pages with permission relaxation. Got this patch
+(indirectly) from Marc Z.  and took the liberty of adding a commit
+message.
+
+Note: this applies on top of 6.3-rc2.
+
+Performance evaluation
+======================
+The performance benefits were tested using the dirty_log_perf_test
+selftest with 2M huge-pages.
+
+The first test uses a write-only sequential workload where the stride
+is 2M instead of 4K [2]. The idea with this experiment is to emulate a
+random access pattern writing a different huge-page at every access.
+Observe that the benefit increases with the number of vcpus: up to
+5.76x for 152 vcpus. This table shows the guest dirtying time when
+using the CLEAR ioctl (and KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2):
+
+/dirty_log_perf_test_sparse -s anonymous_hugetlb_2mb -b 1G -v $i -i 3 -m 2
+
+	+-------+----------+------------------+
+	| vCPUs | 6.2-rc3  | 6.2-rc3 + series |
+	|       |    (ms)  |             (ms) |
+	+-------+----------+------------------+
+	|    1  |    2.63  |          1.66    |
+	|    2  |    2.95  |          1.70    |
+	|    4  |    3.21  |          1.71    |
+	|    8  |    4.97  |          1.78    |
+	|   16  |    9.51  |          1.82    |
+	|   32  |   20.15  |          3.03    |
+	|   64  |   40.09  |          5.80    |
+	|  128  |   80.08  |         12.24    |
+	|  152  |  109.81  |         15.14    |
+	+-------+----------+------------------+
+
+This secondv test measures the benefit of eager page splitting on read
+intensive workloads (1 write for every 10 reads). As in the other
+test, the benefit increases with the number of vcpus, up to 8.82x for
+152 vcpus. This table shows the guest dirtying time when using the
+CLEAR ioctl (and KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2):
+
+./dirty_log_perf_test -s anonymous_hugetlb_2mb -b 1G -v $i -i 3 -m 2 -w 10
+
+	+-------+----------+------------------+
+	| vCPUs | 6.2-rc3  | 6.2-rc3 + series |
+	|       |   (sec)  |            (sec) |
+	+-------+----------+------------------+
+	|    1  |    0.65  |          0.07    |
+	|    2  |    0.70  |          0.08    |
+	|    4  |    0.71  |          0.08    |
+	|    8  |    0.72  |          0.08    |
+	|   16  |    0.76  |          0.08    |
+	|   32  |    1.61  |          0.14    |
+	|   64  |    3.46  |          0.30    |
+	|  128  |    5.49  |          0.64    |
+	|  152  |    6.44  |          0.63    |
+	+-------+----------+------------------+
+
+Changes from v7:
+https://lore.kernel.org/kvmarm/20230409063000.3559991-1-ricarkol@google.com/
+- Fixed errors in comments: 64bit, EAGER_PAGE_SPLIT_CHUNK_SIZE. (Gavin)
+- Extended some comments in: kvm_pgtable_stage2_create_unlinked(),
+  kvm_arch_commit_memory_region(), kvm_init_stage2_mmu(). (Gavin)
+- Added: EXPORT_SYMBOL_GPL(kvm_are_all_memslots_empty). (Gavin)
+- Implemented is_power_of_two(s) as IS_ALIGNED(s, s). (Gavin)
+- Removed lock(kvm->lock) from kvm_vm_ioctl_enable_cap(). (Reiji)
+- kvm_supported_block_sizes() returns u32 instead of u64. (Gavin)
+- Collected r-b's from Gavin.
+
+Changes from v6. All based on Marc comments:
+https://lore.kernel.org/kvmarm/20230307034555.39733-1-ricarkol@google.com/
+- Don't enable eager-splitting by default
+- Only accept block sizes as valid CHUNK_SIZE's.
+- Export the acceptable block sizes (as a bitmap) in a new capability.
+- KVM_PGTABLE_WALK_SKIP_BBM to KVM_PGTABLE_WALK_SKIP_BBM_TLBI
+- Moved kvm_pgtable_walk_skip_*() from kvm_pgtable.h to pgtable.c.
+- Add unlikely() to kvm_pgtable_walk_skip_*().
+- Add check for alignment in kvm_pgtable_stage2_create_unlinked().
+- kvm_pgtable_stage2_split() does not take a void *mc anymore, and takes
+  a kvm_mmu_memory_cache struct instead.
+- kvm_pgtable_stage2_split() does not take an mc_capacity argument anymore.
+- Renamed need_topup_split_page_cache_or_resched().
+- Moved lockdep_assert_held_write() to the begginning of their respective
+  functions in mmu.c.
+- Removed the cache_capacity arg from need_split_memcache_topup_or_resched()
+- Rewording for:
+	- Replaced all instances of PMD and PUD
+	- KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE description in api.rst
+	- multiple function descriptions and comments in mmu.c
+	- description of kvm_pgtable_stage2_split() and create_unlinked().
+	- removed "no functional change expected" from all commits.
+	- improved commit messages for the first 2 and last one
+	  (Marc's commit).
+
+Changes from v5:
+https://lore.kernel.org/kvmarm/20230301210928.565562-1-ricarkol@google.com/
+- fixed message in "Use local TLBI on permission relaxation". (Vladimir)
+- s/removed/unlinked in first commit message. (Shaoqin)
+- rebased series
+- collected r-b's from Shaoqin
+
+Changes from v4:
+https://lore.kernel.org/kvmarm/20230218032314.635829-1-ricarkol@google.com/
+- nits on some comments (s/removed/unlinked and remove @new).
+  (Shaoqin)
+
+Changes from v3:
+https://lore.kernel.org/kvmarm/20230215174046.2201432-1-ricarkol@google.com/
+- KVM_PGTABLE_WALK_SKIP_CMO to use BIT(5). (Shaoqin)
+- Rewritten commit message for "Rename free_unlinked to free_removed"
+  using Oliver's suggestion. (Oliver)
+- "un" -> "an" typo. (Shaoqin)
+- kvm_pgtable_stage2_create_unlinked() to return a "kvm_pte_t *". (Oliver)
+- refactored stage2_block_get_nr_page_tables(). (Oliver)
+- /s/bock/block. (Shaoqin)
+
+Changes from v2:
+https://lore.kernel.org/kvmarm/20230206165851.3106338-1-ricarkol@google.com/
+- removed redundant kvm_pte_table() check from split walker function. (Gavin)
+- fix compilation of patch 8 by moving some definitions from path 9. (Gavin)
+- add comment for kvm_mmu_split_nr_page_tables(). (Gavin)
+
+Changes from v1:
+https://lore.kernel.org/kvmarm/20230113035000.480021-1-ricarkol@google.com/
+- added a capability to set the eager splitting chunk size. This
+  indirectly sets the number of pages in the cache. It also allows for
+  opting out of this feature. (Oliver, Marc)
+- changed kvm_pgtable_stage2_split() to split 1g huge-pages
+  using either 513 or 1 at a time (with a cache of 1). (Oliver, Marc)
+- added force_pte arg to kvm_pgtable_stage2_create_removed().
+- renamed free_removed to free_unlinked. (Ben and Oliver)
+- added KVM_PGTABLE_WALK ctx->flags for skipping BBM and CMO, instead
+  of KVM_PGTABLE_WALK_REMOVED. (Oliver)
+
+Changes from the RFC:
+https://lore.kernel.org/kvmarm/20221112081714.2169495-1-ricarkol@google.com/
+- dropped the changes to split on POST visits. No visible perf
+  benefit.
+- changed the kvm_pgtable_stage2_free_removed() implementation to
+  reuse the stage2 mapper.
+- dropped the FEAT_BBM changes and optimization. Will send this on a
+  different series.
+
+Thanks,
+Ricardo
+
+Marc Zyngier (1):
+  KVM: arm64: Use local TLBI on permission relaxation
+
+Ricardo Koller (11):
+  KVM: arm64: Rename free_removed to free_unlinked
+  KVM: arm64: Add KVM_PGTABLE_WALK flags for skipping CMOs and BBM TLBIs
+  KVM: arm64: Add helper for creating unlinked stage2 subtrees
+  KVM: arm64: Export kvm_are_all_memslots_empty()
+  KVM: arm64: Add KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE
+  KVM: arm64: Add kvm_pgtable_stage2_split()
+  KVM: arm64: Refactor kvm_arch_commit_memory_region()
+  KVM: arm64: Add kvm_uninit_stage2_mmu()
+  KVM: arm64: Split huge pages when dirty logging is enabled
+  KVM: arm64: Open-code kvm_mmu_write_protect_pt_masked()
+  KVM: arm64: Split huge pages during KVM_CLEAR_DIRTY_LOG
+
+ Documentation/virt/kvm/api.rst        |  27 ++++
+ arch/arm64/include/asm/kvm_asm.h      |   4 +
+ arch/arm64/include/asm/kvm_host.h     |  15 ++
+ arch/arm64/include/asm/kvm_mmu.h      |   1 +
+ arch/arm64/include/asm/kvm_pgtable.h  |  79 +++++++++-
+ arch/arm64/kvm/arm.c                  |  28 ++++
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c    |  10 ++
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c |   6 +-
+ arch/arm64/kvm/hyp/nvhe/tlb.c         |  52 +++++++
+ arch/arm64/kvm/hyp/pgtable.c          | 201 +++++++++++++++++++++++--
+ arch/arm64/kvm/hyp/vhe/tlb.c          |  32 ++++
+ arch/arm64/kvm/mmu.c                  | 207 +++++++++++++++++++++-----
+ include/linux/kvm_host.h              |   2 +
+ include/uapi/linux/kvm.h              |   2 +
+ virt/kvm/kvm_main.c                   |   3 +-
+ 15 files changed, 612 insertions(+), 57 deletions(-)
 
 -- 
-Thanks,
-Oliver
+2.40.1.495.gc816e09b53d-goog
+
