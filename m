@@ -2,140 +2,160 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6D9656EFFB9
-	for <lists+kvm@lfdr.de>; Thu, 27 Apr 2023 05:14:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 527CE6EFFEE
+	for <lists+kvm@lfdr.de>; Thu, 27 Apr 2023 05:46:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241612AbjD0DOQ convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Wed, 26 Apr 2023 23:14:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47954 "EHLO
+        id S242937AbjD0Dq0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 Apr 2023 23:46:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55836 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232094AbjD0DON (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 Apr 2023 23:14:13 -0400
-Received: from sendb.mailex.chinaunicom.cn (sendb.mailex.chinaunicom.cn [123.138.59.137])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BFBF730F4
-        for <kvm@vger.kernel.org>; Wed, 26 Apr 2023 20:14:06 -0700 (PDT)
-Received: from M10-XA-MLCEN04.MailSrv.cnc.intra (unknown [10.236.3.200])
-        by sendb.mailex.chinaunicom.cn (SkyGuard) with ESMTPS id 4Q6LTg1sH1z6R8gq
-        for <kvm@vger.kernel.org>; Thu, 27 Apr 2023 11:15:35 +0800 (CST)
-Received: from smtpbg.qq.com (10.237.2.95) by M10-XA-MLCEN04.MailSrv.cnc.intra
- (10.236.3.200) with Microsoft SMTP Server id 15.0.1497.47; Thu, 27 Apr 2023
- 11:13:55 +0800
-X-QQ-mid: Ymail-xx24b003-t1682565232trw
-Received: from localhost.localdomain (unknown [10.2.207.217])
-        by smtp.qq.com (ESMTP) with 
-        id ; Thu, 27 Apr 2023 11:13:51 +0800 (CST)
-X-QQ-SSF: 0090000000000040I520000A0000000
-X-QQ-GoodBg: 0
-From:   =?gb18030?B?yM7D9MP0KMGqzai8r83FwarNqMr919a/xry809A=?=
-         =?gb18030?B?z965q8u+sb6yvyk=?= <renmm6@chinaunicom.cn>
-To:     =?gb18030?B?YW5kcmV3LmpvbmVz?= <andrew.jones@linux.dev>
-CC:     =?gb18030?B?a3Zt?= <kvm@vger.kernel.org>,
-        =?gb18030?B?cGJvbnppbmk=?= <pbonzini@redhat.com>,
-        =?gb18030?B?yM7D9MP0KMGqzai8r83FwarNqMr919a/xry809A=?= 
-        <renmm6@chinaunicom.cn>,
-        =?gb18030?B?cm1tMTk4NQ==?= <rmm1985@163.com>
-Subject: Re: [kvm-unit-tests PATCH] arch-run: Fix run_qemu return correct error code
-Date:   Thu, 27 Apr 2023 11:13:13 +0800
-Message-ID: <20230427031313.3393116-1-renmm6@chinaunicom.cn>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <27vn2dxrikahvhw7bw4d77jnhlqpt724j6xjpqi6adqbi7hoct@p74pzrweypkn>
-References: <27vn2dxrikahvhw7bw4d77jnhlqpt724j6xjpqi6adqbi7hoct@p74pzrweypkn>
+        with ESMTP id S242825AbjD0DqQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 Apr 2023 23:46:16 -0400
+Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A5E0420E;
+        Wed, 26 Apr 2023 20:46:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1682567175; x=1714103175;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=vxDIREfs/gWOTr6RZRuTNYwYFcISY67IkdEr84O8tCQ=;
+  b=TC3r27VlFwBaIBn/KKWGomfmiSTab+7ZVyMkCtakCeVYs8JbChUoRA8/
+   VS6+unOVz0gcWFHm4picxktevtKE3vjC2kuHqYCaQhbq+S4hClzzyFn1v
+   7+H2jQXK5Tmo3SMTvywLibMX0vFSZYV1KE/rnlz0pXkrX0OyBFNH4iwmY
+   VL2fH34Q0tRl221wtyIg2eYe55XyiWt09Uvyose26PVmcUKm66S626pl8
+   lpcTZiqrEJbmHryhyRSVEp+bxQjRE0xj/zxb69f2PtcHpgbMfldvfvSGJ
+   949paqPTWQA3V+Oe0iqCvic4/7dMSBSJGGRf8c+qS8PU+8yojlzFRhjbk
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10692"; a="326916673"
+X-IronPort-AV: E=Sophos;i="5.99,230,1677571200"; 
+   d="scan'208";a="326916673"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Apr 2023 20:46:14 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10692"; a="726856647"
+X-IronPort-AV: E=Sophos;i="5.99,230,1677571200"; 
+   d="scan'208";a="726856647"
+Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.238.10.34]) ([10.238.10.34])
+  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Apr 2023 20:46:12 -0700
+Message-ID: <a46895fa-3ffa-e2d8-2841-625a1f791ece@linux.intel.com>
+Date:   Thu, 27 Apr 2023 11:46:08 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-X-QQ-SENDSIZE: 520
-Feedback-ID: Ymail-xx:chinaunicom.cn:mail-xx:mail-xx24b003-zhyw43w
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+Subject: Re: [PATCH v2 09/21] KVM:x86: Load guest FPU state when accessing
+ xsaves-managed MSRs
+To:     Yang Weijiang <weijiang.yang@intel.com>, seanjc@google.com,
+        pbonzini@redhat.com, peterz@infradead.org, john.allen@amd.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     rick.p.edgecombe@intel.com,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+References: <20230421134615.62539-1-weijiang.yang@intel.com>
+ <20230421134615.62539-10-weijiang.yang@intel.com>
+From:   Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <20230421134615.62539-10-weijiang.yang@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-5.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
+        SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: rminmin <renmm6@chinaunicom.cn>
 
-> On Mon, Apr 24, 2023 at 05:58:16PM +0800, 任敏敏(联通集团联通数字科技有限公司本部) wrote:
-> > >On Sun, Apr 23, 2023 at 12:34:36PM +0800, 任敏敏(联通集团联通数字科技有限公司本部) wrote:
-> > >> From: rminmin <renmm6@chinaunicom.cn>
-> > >>
-> > >> run_qemu should return 0 if logs doesn't
-> > >> contain "warning" keyword.
-> > >
-> > >Why? What are you trying to fix?
-> > >
-> >
-> > I encountered a problem that the differet results when I run the same
-> > test case using standalone mode, "run_test.sh -t -g", "run_test.sh -g".
-> > When I use "run_test.sh -g", it always returns a FAIL message.
-> > In my env, qemu version is 6.2.
-> >
-> > e.g. runnig debug test cases.
-> >
-> > # without "-t"
-> > ./run_tests.sh -g debug
-> > FAIL debug (22 tests)
-> >
-> > # "-t"
-> > ./run_tests.sh -t -g debug
-> > TAP version 13
-> > ok 1 - debug: DR4==DR6 with CR4.DE == 0
-> > ok 2 - debug: DR4 read got #UD with CR4.DE == 1
-> > ok 3 - debug: #BP
-> > ok 4 - debug: hw breakpoint (test that dr6.BS is not set)
-> > ok 5 - debug: hw breakpoint (test that dr6.BS is not cleared)
-> > ok 6 - debug: Single-step #DB basic test
-> > ok 7 - debug: Usermode Single-step #DB basic test
-> > ok 8 - debug: Single-step #DB on emulated instructions
-> > ok 9 - debug: Usermode Single-step #DB on emulated instructions
-> > ok 10 - debug: Single-step #DB w/ STI blocking
-> > ok 11 - debug: Usermode Single-step #DB w/ STI blocking
-> > ok 12 - debug: Single-step #DB w/ MOVSS blocking
-> > ok 13 - debug: Usermode Single-step #DB w/ MOVSS blocking
-> > ok 14 - debug: Single-Step + ICEBP #DB w/ MOVSS blocking
-> > ok 15 - debug: Usermode Single-Step + ICEBP #DB w/ MOVSS blocking
-> > ok 16 - debug: Single-step #DB w/ MOVSS blocking and DR7.GD=1
-> > ok 17 - debug: hw watchpoint (test that dr6.BS is not cleared)
-> > ok 18 - debug: hw watchpoint (test that dr6.BS is not set)
-> > ok 19 - debug: icebp
-> > ok 20 - debug: MOV SS + watchpoint + ICEBP
-> > ok 21 - debug: MOV SS + watchpoint + int $1
-> > ok 22 - debug: MOV SS + watchpoint + INT3
-> > 1..22
-> >
-> > # standalone
-> >
-> > tests/debug
-> > BUILD_HEAD=02d8befe
-> > timeout -k 1s --foreground 90s /usr/bin/qemu-kvm --no-reboot -nodefaults -device pc-testdev -device isa-debug-exit,iobase=0xf4,iosize=0x4 -vnc none -serial stdio -device pci-testdev -machine accel=kvm -kernel /tmp/tmp.1GdMZXhTTs -smp 1 # -initrd /tmp/tmp.LzHnmXchfO
-> > configure accelerator pc-i440fx-6.2 start
-> > machine init start
-> > device init start
-> > add qdev pc-testdev:none success
-> > add qdev pc-testdev:none success
-> > add qdev isa-debug-exit:none success
-> > add qdev isa-debug-exit:none success
-> > add qdev pci-testdev:none success
-> > add qdev pci-testdev:none success
-> > reset all devices
-> > qmp cont is received and vm is started
-> > qemu enter main_loop
->
-> All the above messages are debug messages that QEMU doesn't output. So
-> you're running your own QEMU build with extra messages which
-> kvm-unit-tests has to assume are errors.
->
-> Please don't try to debug test frameworks without using known-good
-> software-under-test.
->
-> It also appears you modified kvm-unit-tests, because there is no 'debug'
-> group.
->
-> Thanks,
-> drew
 
-Thanks for your help. You're right. The qemu in my env is from Openeuler repo
-and I found some patch files adding the extra qemu log info in src rpm.
+On 4/21/2023 9:46 PM, Yang Weijiang wrote:
+> From: Sean Christopherson <sean.j.christopherson@intel.com>
+>
+> Load the guest's FPU state if userspace is accessing MSRs whose values are
+> managed by XSAVES so that the MSR helpers, e.g. kvm_{get,set}_xsave_msr(),
+So far, kvm_{get,set}_xsave_msr() is not introduced yet.
+IMO, it is a bit confusing to understand the whole picture without the 
+following patches.
+May be add some description or adjust the order?
 
-如果您错误接收了该邮件，请通过电子邮件立即通知我们。请回复邮件到 hqs-spmc@chinaunicom.cn，即可以退订此邮件。我们将立即将您的信息从我们的发送目录中删除。 If you have received this email in error please notify us immediately by e-mail. Please reply to hqs-spmc@chinaunicom.cn ,you can unsubscribe from this mail. We will immediately remove your information from send catalogue of our.
+
+> can simply do {RD,WR}MSR to access the guest's value.
+>
+> If new feature MSRs supported in XSS are passed through to the guest they
+> are saved and restored by XSAVES/XRSTORS, i.e. in the guest's FPU state.
+>
+> Because is also used for the KVM_GET_MSRS device ioctl(), explicitly check
+> @vcpu is non-null before attempting to load guest state. The XSS supporting
+> MSRs cannot be retrieved via the device ioctl() without loading guest FPU
+> state (which doesn't exist).
+>
+> Note that guest_cpuid_has() is not queried as host userspace is allowed
+> to access MSRs that have not been exposed to the guest, e.g. it might do
+> KVM_SET_MSRS prior to KVM_SET_CPUID2.
+>
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> Co-developed-by: Yang Weijiang <weijiang.yang@intel.com>
+> Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
+> ---
+>   arch/x86/kvm/x86.c | 29 ++++++++++++++++++++++++++++-
+>   1 file changed, 28 insertions(+), 1 deletion(-)
+>
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index d2975ca96ac5..7788646bbf1f 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -130,6 +130,9 @@ static int __set_sregs2(struct kvm_vcpu *vcpu, struct kvm_sregs2 *sregs2);
+>   static void __get_sregs2(struct kvm_vcpu *vcpu, struct kvm_sregs2 *sregs2);
+>   
+>   static DEFINE_MUTEX(vendor_module_lock);
+> +static void kvm_load_guest_fpu(struct kvm_vcpu *vcpu);
+> +static void kvm_put_guest_fpu(struct kvm_vcpu *vcpu);
+> +
+>   struct kvm_x86_ops kvm_x86_ops __read_mostly;
+>   
+>   #define KVM_X86_OP(func)					     \
+> @@ -4336,6 +4339,21 @@ int kvm_get_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>   }
+>   EXPORT_SYMBOL_GPL(kvm_get_msr_common);
+>   
+> +static const u32 xsave_msrs[] = {
+> +	MSR_IA32_U_CET, MSR_IA32_PL3_SSP,
+> +};
+> +
+> +static bool is_xsaves_msr(u32 index)
+> +{
+> +	int i;
+> +
+> +	for (i = 0; i < ARRAY_SIZE(xsave_msrs); i++) {
+> +		if (index == xsave_msrs[i])
+> +			return true;
+> +	}
+> +	return false;
+> +}
+> +
+>   /*
+>    * Read or write a bunch of msrs. All parameters are kernel addresses.
+>    *
+> @@ -4346,11 +4364,20 @@ static int __msr_io(struct kvm_vcpu *vcpu, struct kvm_msrs *msrs,
+>   		    int (*do_msr)(struct kvm_vcpu *vcpu,
+>   				  unsigned index, u64 *data))
+>   {
+> +	bool fpu_loaded = false;
+>   	int i;
+>   
+> -	for (i = 0; i < msrs->nmsrs; ++i)
+> +	for (i = 0; i < msrs->nmsrs; ++i) {
+> +		if (vcpu && !fpu_loaded && kvm_caps.supported_xss &&
+> +		    is_xsaves_msr(entries[i].index)) {
+> +			kvm_load_guest_fpu(vcpu);
+> +			fpu_loaded = true;
+> +		}
+>   		if (do_msr(vcpu, entries[i].index, &entries[i].data))
+>   			break;
+> +	}
+> +	if (fpu_loaded)
+> +		kvm_put_guest_fpu(vcpu);
+>   
+>   	return i;
+>   }
+
