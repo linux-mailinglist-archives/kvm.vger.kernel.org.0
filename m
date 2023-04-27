@@ -2,120 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 43B556EFF46
-	for <lists+kvm@lfdr.de>; Thu, 27 Apr 2023 04:16:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6D9656EFFB9
+	for <lists+kvm@lfdr.de>; Thu, 27 Apr 2023 05:14:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242905AbjD0CQJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 Apr 2023 22:16:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59818 "EHLO
+        id S241612AbjD0DOQ convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Wed, 26 Apr 2023 23:14:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47954 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242709AbjD0CQG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 Apr 2023 22:16:06 -0400
-Received: from mail-ed1-x531.google.com (mail-ed1-x531.google.com [IPv6:2a00:1450:4864:20::531])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 235B344B6
-        for <kvm@vger.kernel.org>; Wed, 26 Apr 2023 19:15:44 -0700 (PDT)
-Received: by mail-ed1-x531.google.com with SMTP id 4fb4d7f45d1cf-504e232fe47so14487527a12.2
-        for <kvm@vger.kernel.org>; Wed, 26 Apr 2023 19:15:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1682561742; x=1685153742;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=02EB8lWmRXBMg/YSPs91annKeQmHvtgYDrDPc10O4eo=;
-        b=tueVR2BvSg7sc3EnvgmCuorRpTDplKVQgXOZQPd/BGX04Z8PAkSH3rn0a+m5W0lpGi
-         dwyk77pFLUILnbJI9PZrrm0rjvpud9WZQ5UgjBmpSM7Uq1I3aLPdJU5BM/lh0XCIgjN5
-         dsVBRjIwZUzlM5O3Trbidpa/edNAORa6l1OK3ml2ZwVAUD70iHZ0HvyoJPpS4aP1RbyI
-         agxxkhV4TGWb868qLy8OfYqyEYQRV9AWGdyg7QjdbPz/f5GByoYJdISrhX1qxwGF0IE3
-         YaEzw+Sg00tEqgbA8Jd1m8C9NsjqNxbXLf+M3r56MVzP6+kQyFZ95uX6UTxMsf00iXmb
-         Hw2Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682561742; x=1685153742;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=02EB8lWmRXBMg/YSPs91annKeQmHvtgYDrDPc10O4eo=;
-        b=f3R+70Ws3PJTnSWkg7w8xeToEE6WxW6ngyDYQ9j1Rgia2BvvcC3iIAsb8Xte7lU0me
-         Lui12xC1SKqanUOlu5yRERdr1hMgcUEwbSLu95HW6BG7+dO3/hNjVnb6nRd9RzyjdxDd
-         9ETmHDVjitWte4T6dpyXwpT/B1WEbLBZgWgJH0YA7VYA2cl3aXeqrDD2M6JoFDaOT+9C
-         gHfLpUmSsqT9nBmGILR/gZK8zJkaKfmKYry4CctVMQqhAIUGjzLESWI1vAje7quEN13J
-         /3aklnFzT3RjTyfypBUCvZ+w/FVY96xUVAu0IFUSSf3yrC6h/MxNd3uR4usCqMGW2i3D
-         QSIQ==
-X-Gm-Message-State: AC+VfDwjKskr/UqUZulnEJb8D/C80GNmoHJ9JH2tglXqtZevdoIyzJdJ
-        Qob9jdoMBmKwNDs6WIcubObVR0nbfXyQJs9TARo4uA==
-X-Google-Smtp-Source: ACHHUZ5RXP7XWa4tSJ3clLjTixGZnD02rJ3RQg2AaLUChumN7wKktDgIWVMKzVu+U1EPZbDpzEj+Yc6ywFvTeJFwLfk=
-X-Received: by 2002:a17:907:2cc6:b0:94e:c867:683d with SMTP id
- hg6-20020a1709072cc600b0094ec867683dmr55794ejc.54.1682561741832; Wed, 26 Apr
- 2023 19:15:41 -0700 (PDT)
+        with ESMTP id S232094AbjD0DON (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 Apr 2023 23:14:13 -0400
+Received: from sendb.mailex.chinaunicom.cn (sendb.mailex.chinaunicom.cn [123.138.59.137])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BFBF730F4
+        for <kvm@vger.kernel.org>; Wed, 26 Apr 2023 20:14:06 -0700 (PDT)
+Received: from M10-XA-MLCEN04.MailSrv.cnc.intra (unknown [10.236.3.200])
+        by sendb.mailex.chinaunicom.cn (SkyGuard) with ESMTPS id 4Q6LTg1sH1z6R8gq
+        for <kvm@vger.kernel.org>; Thu, 27 Apr 2023 11:15:35 +0800 (CST)
+Received: from smtpbg.qq.com (10.237.2.95) by M10-XA-MLCEN04.MailSrv.cnc.intra
+ (10.236.3.200) with Microsoft SMTP Server id 15.0.1497.47; Thu, 27 Apr 2023
+ 11:13:55 +0800
+X-QQ-mid: Ymail-xx24b003-t1682565232trw
+Received: from localhost.localdomain (unknown [10.2.207.217])
+        by smtp.qq.com (ESMTP) with 
+        id ; Thu, 27 Apr 2023 11:13:51 +0800 (CST)
+X-QQ-SSF: 0090000000000040I520000A0000000
+X-QQ-GoodBg: 0
+From:   =?gb18030?B?yM7D9MP0KMGqzai8r83FwarNqMr919a/xry809A=?=
+         =?gb18030?B?z965q8u+sb6yvyk=?= <renmm6@chinaunicom.cn>
+To:     =?gb18030?B?YW5kcmV3LmpvbmVz?= <andrew.jones@linux.dev>
+CC:     =?gb18030?B?a3Zt?= <kvm@vger.kernel.org>,
+        =?gb18030?B?cGJvbnppbmk=?= <pbonzini@redhat.com>,
+        =?gb18030?B?yM7D9MP0KMGqzai8r83FwarNqMr919a/xry809A=?= 
+        <renmm6@chinaunicom.cn>,
+        =?gb18030?B?cm1tMTk4NQ==?= <rmm1985@163.com>
+Subject: Re: [kvm-unit-tests PATCH] arch-run: Fix run_qemu return correct error code
+Date:   Thu, 27 Apr 2023 11:13:13 +0800
+Message-ID: <20230427031313.3393116-1-renmm6@chinaunicom.cn>
+X-Mailer: git-send-email 2.33.0
+In-Reply-To: <27vn2dxrikahvhw7bw4d77jnhlqpt724j6xjpqi6adqbi7hoct@p74pzrweypkn>
+References: <27vn2dxrikahvhw7bw4d77jnhlqpt724j6xjpqi6adqbi7hoct@p74pzrweypkn>
 MIME-Version: 1.0
-References: <c49aa7b7bbc016b6c8b698ac2ce3b9d866b551f9.1678643052.git.isaku.yamahata@intel.com>
- <20230418190904.1111011-1-vannapurve@google.com> <20230419133841.00001ee8.zhi.wang.linux@gmail.com>
-In-Reply-To: <20230419133841.00001ee8.zhi.wang.linux@gmail.com>
-From:   Vishal Annapurve <vannapurve@google.com>
-Date:   Wed, 26 Apr 2023 19:15:30 -0700
-Message-ID: <CAGtprH_-i15UpM-f3p_g-+GgnK87kUbMa1RpvwGDBRr34XzTuQ@mail.gmail.com>
-Subject: Re: [PATCH v13 098/113] KVM: TDX: Handle TDX PV map_gpa hypercall
-To:     Zhi Wang <zhi.wang.linux@gmail.com>
-Cc:     isaku.yamahata@intel.com, dmatlack@google.com,
-        erdemaktas@google.com, isaku.yamahata@gmail.com,
-        kai.huang@intel.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, pbonzini@redhat.com,
-        sagis@google.com, seanjc@google.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8BIT
+X-QQ-SENDSIZE: 520
+Feedback-ID: Ymail-xx:chinaunicom.cn:mail-xx:mail-xx24b003-zhyw43w
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Apr 19, 2023 at 3:38=E2=80=AFAM Zhi Wang <zhi.wang.linux@gmail.com>=
- wrote:
->
-> On Tue, 18 Apr 2023 19:09:04 +0000
-> Vishal Annapurve <vannapurve@google.com> wrote:
->
-> > > +static int tdx_map_gpa(struct kvm_vcpu *vcpu)
-> > > +{
-> > > +   struct kvm *kvm =3D vcpu->kvm;
-> > > +   gpa_t gpa =3D tdvmcall_a0_read(vcpu);
-> > > +   gpa_t size =3D tdvmcall_a1_read(vcpu);
-> > > +   gpa_t end =3D gpa + size;
-> > > +
-> > > +   if (!IS_ALIGNED(gpa, PAGE_SIZE) || !IS_ALIGNED(size, PAGE_SIZE) |=
-|
-> > > +       end < gpa ||
-> > > +       end > kvm_gfn_shared_mask(kvm) << (PAGE_SHIFT + 1) ||
-> > > +       kvm_is_private_gpa(kvm, gpa) !=3D kvm_is_private_gpa(kvm, end=
-)) {
-> > > +           tdvmcall_set_return_code(vcpu, TDG_VP_VMCALL_INVALID_OPER=
-AND);
-> > > +           return 1;
-> > > +   }
-> > > +
-> > > +   return tdx_vp_vmcall_to_user(vcpu);
+From: rminmin <renmm6@chinaunicom.cn>
+
+> On Mon, Apr 24, 2023 at 05:58:16PM +0800, 任敏敏(联通集团联通数字科技有限公司本部) wrote:
+> > >On Sun, Apr 23, 2023 at 12:34:36PM +0800, 任敏敏(联通集团联通数字科技有限公司本部) wrote:
+> > >> From: rminmin <renmm6@chinaunicom.cn>
+> > >>
+> > >> run_qemu should return 0 if logs doesn't
+> > >> contain "warning" keyword.
+> > >
+> > >Why? What are you trying to fix?
+> > >
 > >
-> > This will result into exits to userspace for MMIO regions as well. Does=
- it make
-> > sense to only exit to userspace for guest physical memory regions backe=
-d by
-> > memslots?
+> > I encountered a problem that the differet results when I run the same
+> > test case using standalone mode, "run_test.sh -t -g", "run_test.sh -g".
+> > When I use "run_test.sh -g", it always returns a FAIL message.
+> > In my env, qemu version is 6.2.
 > >
-> I think this is necessary as when passing a PCI device to a TD, the guest=
- needs to convert a MMIO region from private to shared, which is not backed=
- by memslots.
-
-KVM could internally handle conversion of regions not backed by
-private memslots instead of exiting to userspace. This could save time
-during guest boot process.
-
-What would be the expectations from userspace for handling mapgpa
-operations on MMIO regions? Is it to just convert memory attributes?
-
-> > > +}
-> > > +
+> > e.g. runnig debug test cases.
+> >
+> > # without "-t"
+> > ./run_tests.sh -g debug
+> > FAIL debug (22 tests)
+> >
+> > # "-t"
+> > ./run_tests.sh -t -g debug
+> > TAP version 13
+> > ok 1 - debug: DR4==DR6 with CR4.DE == 0
+> > ok 2 - debug: DR4 read got #UD with CR4.DE == 1
+> > ok 3 - debug: #BP
+> > ok 4 - debug: hw breakpoint (test that dr6.BS is not set)
+> > ok 5 - debug: hw breakpoint (test that dr6.BS is not cleared)
+> > ok 6 - debug: Single-step #DB basic test
+> > ok 7 - debug: Usermode Single-step #DB basic test
+> > ok 8 - debug: Single-step #DB on emulated instructions
+> > ok 9 - debug: Usermode Single-step #DB on emulated instructions
+> > ok 10 - debug: Single-step #DB w/ STI blocking
+> > ok 11 - debug: Usermode Single-step #DB w/ STI blocking
+> > ok 12 - debug: Single-step #DB w/ MOVSS blocking
+> > ok 13 - debug: Usermode Single-step #DB w/ MOVSS blocking
+> > ok 14 - debug: Single-Step + ICEBP #DB w/ MOVSS blocking
+> > ok 15 - debug: Usermode Single-Step + ICEBP #DB w/ MOVSS blocking
+> > ok 16 - debug: Single-step #DB w/ MOVSS blocking and DR7.GD=1
+> > ok 17 - debug: hw watchpoint (test that dr6.BS is not cleared)
+> > ok 18 - debug: hw watchpoint (test that dr6.BS is not set)
+> > ok 19 - debug: icebp
+> > ok 20 - debug: MOV SS + watchpoint + ICEBP
+> > ok 21 - debug: MOV SS + watchpoint + int $1
+> > ok 22 - debug: MOV SS + watchpoint + INT3
+> > 1..22
+> >
+> > # standalone
+> >
+> > tests/debug
+> > BUILD_HEAD=02d8befe
+> > timeout -k 1s --foreground 90s /usr/bin/qemu-kvm --no-reboot -nodefaults -device pc-testdev -device isa-debug-exit,iobase=0xf4,iosize=0x4 -vnc none -serial stdio -device pci-testdev -machine accel=kvm -kernel /tmp/tmp.1GdMZXhTTs -smp 1 # -initrd /tmp/tmp.LzHnmXchfO
+> > configure accelerator pc-i440fx-6.2 start
+> > machine init start
+> > device init start
+> > add qdev pc-testdev:none success
+> > add qdev pc-testdev:none success
+> > add qdev isa-debug-exit:none success
+> > add qdev isa-debug-exit:none success
+> > add qdev pci-testdev:none success
+> > add qdev pci-testdev:none success
+> > reset all devices
+> > qmp cont is received and vm is started
+> > qemu enter main_loop
 >
+> All the above messages are debug messages that QEMU doesn't output. So
+> you're running your own QEMU build with extra messages which
+> kvm-unit-tests has to assume are errors.
+>
+> Please don't try to debug test frameworks without using known-good
+> software-under-test.
+>
+> It also appears you modified kvm-unit-tests, because there is no 'debug'
+> group.
+>
+> Thanks,
+> drew
+
+Thanks for your help. You're right. The qemu in my env is from Openeuler repo
+and I found some patch files adding the extra qemu log info in src rpm.
+
+如果您错误接收了该邮件，请通过电子邮件立即通知我们。请回复邮件到 hqs-spmc@chinaunicom.cn，即可以退订此邮件。我们将立即将您的信息从我们的发送目录中删除。 If you have received this email in error please notify us immediately by e-mail. Please reply to hqs-spmc@chinaunicom.cn ,you can unsubscribe from this mail. We will immediately remove your information from send catalogue of our.
