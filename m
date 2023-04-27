@@ -2,23 +2,23 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7D9A66F01AB
-	for <lists+kvm@lfdr.de>; Thu, 27 Apr 2023 09:27:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2D4626F01AD
+	for <lists+kvm@lfdr.de>; Thu, 27 Apr 2023 09:27:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243008AbjD0H1N (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Apr 2023 03:27:13 -0400
+        id S242942AbjD0H1G (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Apr 2023 03:27:06 -0400
 Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42786 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242972AbjD0H0z (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 Apr 2023 03:26:55 -0400
+        with ESMTP id S242821AbjD0H0y (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 Apr 2023 03:26:54 -0400
 Received: from loongson.cn (mail.loongson.cn [114.242.206.163])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id B66B32735
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D2E093583
         for <kvm@vger.kernel.org>; Thu, 27 Apr 2023 00:26:52 -0700 (PDT)
 Received: from loongson.cn (unknown [10.2.5.185])
-        by gateway (Coremail) with SMTP id _____8AxNPC7I0pk7HcBAA--.2489S3;
+        by gateway (Coremail) with SMTP id _____8Bxb+u7I0pk7XcBAA--.2485S3;
         Thu, 27 Apr 2023 15:26:51 +0800 (CST)
 Received: from localhost.localdomain (unknown [10.2.5.185])
-        by localhost.localdomain (Coremail) with SMTP id AQAAf8Axy7K1I0pk9Ec+AA--.18880S6;
+        by localhost.localdomain (Coremail) with SMTP id AQAAf8Axy7K1I0pk9Ec+AA--.18880S7;
         Thu, 27 Apr 2023 15:26:51 +0800 (CST)
 From:   Tianrui Zhao <zhaotianrui@loongson.cn>
 To:     qemu-devel@nongnu.org
@@ -27,32 +27,32 @@ Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
         Cornelia Huck <cohuck@redhat.com>, maobibo@loongson.cn,
         zhaotianrui@loongson.cn, philmd@linaro.org,
         richard.henderson@linaro.org, peter.maydell@linaro.org
-Subject: [PATCH RFC v2 4/9] target/loongarch: Implement kvm get/set registers
-Date:   Thu, 27 Apr 2023 15:26:40 +0800
-Message-Id: <20230427072645.3368102-5-zhaotianrui@loongson.cn>
+Subject: [PATCH RFC v2 5/9] target/loongarch: Implement kvm_arch_init function
+Date:   Thu, 27 Apr 2023 15:26:41 +0800
+Message-Id: <20230427072645.3368102-6-zhaotianrui@loongson.cn>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20230427072645.3368102-1-zhaotianrui@loongson.cn>
 References: <20230427072645.3368102-1-zhaotianrui@loongson.cn>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: AQAAf8Axy7K1I0pk9Ec+AA--.18880S6
+X-CM-TRANSID: AQAAf8Axy7K1I0pk9Ec+AA--.18880S7
 X-CM-SenderInfo: p2kd03xldq233l6o00pqjv00gofq/
-X-Coremail-Antispam: 1Uk129KBjvAXoW3KFW7trWfKr17uw1DWryrtFb_yoW8Wr43Ko
-        Z8C3Wfua45Jw4FkFsru3ZFqFyjqr9Y9an3Krn8XF4F93W7JrW5JryxG343tw42qF95XFy8
-        A3WIqFn7XaykGrnxn29KB7ZKAUJUUUUr529EdanIXcx71UUUUU7KY7ZEXasCq-sGcSsGvf
-        J3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU0xBIdaVrnRJU
-        UUkG1xkIjI8I6I8E6xAIw20EY4v20xvaj40_Wr0E3s1l8cAvFVAK0II2c7xJM28CjxkF64
-        kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW5JVW7JwA2z4x0Y4vE2Ix0cI8IcVCY
-        1x0267AKxVWxJVW8Jr1l84ACjcxK6I8E87Iv67AKxVWxJr0_GcWl84ACjcxK6I8E87Iv6x
-        kF7I0E14v26F4UJVW0owAaw2AFwI0_Jrv_JF1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAq
-        jxCEc2xF0cIa020Ex4CE44I27wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E74AGY7Cv6c
-        x26rWlOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JMxkF7I0En4kS14v26r12
-        6r1DMxAIw28IcxkI7VAKI48JMxAIw28IcVCjz48v1sIEY20_WwCFx2IqxVCFs4IE7xkEbV
-        WUJVW8JwCFI7km07C267AKxVWUXVWUAwC20s026c02F40E14v26r1j6r18MI8I3I0E7480
-        Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7
-        IYx2IY67AKxVW5JVW7JwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k2
-        6cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r4UJVWxJr1lIxAIcVC2z280aVCY1x
-        0267AKxVW8Jr0_Cr1UYxBIdaVFxhVjvjDU0xZFpf9x0zRXo7NUUUUU=
+X-Coremail-Antispam: 1Uk129KBjvdXoWrAF4fJry3Zr4kJr15GF4xCrg_yoWxGwb_u3
+        W7Jw4kGw40ga1jy3Z0934rJr1Sga18GanxZFsIqF4I9ry8Jw1rZrsxK3WDCryj9rW8JFWY
+        yrnrAFyYyF17tjkaLaAFLSUrUUUU1b8apTn2vfkv8UJUUUU8wcxFpf9Il3svdxBIdaVrn0
+        xqx4xG64xvF2IEw4CE5I8CrVC2j2Jv73VFW2AGmfu7bjvjm3AaLaJ3UjIYCTnIWjp_UUUY
+        F7CY07I20VC2zVCF04k26cxKx2IYs7xG6rWj6s0DM28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+        vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7Cj
+        xVAFwI0_Cr0_Gr1UM28EF7xvwVC2z280aVAFwI0_Cr1j6rxdM28EF7xvwVC2z280aVCY1x
+        0267AKxVWxJr0_GcWln4kS14v26r1Y6r17M2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF
+        6xkI12xvs2x26I8E6xACxx1l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6x8ErcxFaVAv8V
+        WrMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwCY1x0262kKe7AKxVWUAVWU
+        twCF04k20xvY0x0EwIxGrwCF04k20xvE74AGY7Cv6cx26rWl4I8I3I0E4IkC6x0Yz7v_Jr
+        0_Gr1l4IxYO2xFxVAFwI0_Jrv_JF1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK
+        67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI
+        8IcVAFwI0_Xr0_Ar1lIxAIcVC0I7IYx2IY6xkF7I0E14v26F4j6r4UJwCI42IY6xAIw20E
+        Y4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Gr1j6F4UJwCI42IY6I8E87Iv6xkF7I
+        0E14v26r4UJVWxJrUvcSsGvfC2KfnxnUUI43ZEXa7xRR5l1PUUUUU==
 X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_PASS,
         SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
         version=3.4.6
@@ -62,434 +62,26 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Implement kvm_arch_get/set_registers interfaces, many regs
-can be get/set in the function, such as core regs, csr regs,
-fpu regs, mp state, etc.
+Implement the kvm_arch_init of loongarch, in the function, the
+KVM_CAP_MP_STATE cap is checked by kvm ioctl.
 
 Signed-off-by: Tianrui Zhao <zhaotianrui@loongson.cn>
 ---
- meson.build                   |   1 +
- target/loongarch/kvm.c        | 356 +++++++++++++++++++++++++++++++++-
- target/loongarch/trace-events |  11 ++
- target/loongarch/trace.h      |   1 +
- 4 files changed, 367 insertions(+), 2 deletions(-)
- create mode 100644 target/loongarch/trace-events
- create mode 100644 target/loongarch/trace.h
+ target/loongarch/kvm.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/meson.build b/meson.build
-index 29f8644d6d..b1b29299da 100644
---- a/meson.build
-+++ b/meson.build
-@@ -3039,6 +3039,7 @@ if have_system or have_user
-     'target/s390x',
-     'target/s390x/kvm',
-     'target/sparc',
-+    'target/loongarch',
-   ]
- endif
- 
 diff --git a/target/loongarch/kvm.c b/target/loongarch/kvm.c
-index 24327aaf71..50662fd3fb 100644
+index 50662fd3fb..8dea294930 100644
 --- a/target/loongarch/kvm.c
 +++ b/target/loongarch/kvm.c
-@@ -26,19 +26,371 @@
- #include "sysemu/runstate.h"
- #include "cpu-csr.h"
- #include "kvm_loongarch.h"
-+#include "trace.h"
+@@ -436,6 +436,7 @@ void kvm_arch_init_irq_routing(KVMState *s)
  
- static bool cap_has_mp_state;
- const KVMCapabilityInfo kvm_arch_required_capabilities[] = {
-     KVM_CAP_LAST_INFO
- };
- 
-+static int kvm_loongarch_get_regs_core(CPUState *cs)
-+{
-+    int ret = 0;
-+    int i;
-+    struct kvm_regs regs;
-+    LoongArchCPU *cpu = LOONGARCH_CPU(cs);
-+    CPULoongArchState *env = &cpu->env;
-+
-+    /* Get the current register set as KVM seems it */
-+    ret = kvm_vcpu_ioctl(cs, KVM_GET_REGS, &regs);
-+    if (ret < 0) {
-+        trace_kvm_failed_get_regs_core(strerror(errno));
-+        return ret;
-+    }
-+
-+    for (i = 0; i < 32; i++) {
-+        env->gpr[i] = regs.gpr[i];
-+    }
-+
-+    env->pc = regs.pc;
-+    return ret;
-+}
-+
-+static int kvm_loongarch_put_regs_core(CPUState *cs)
-+{
-+    int ret = 0;
-+    int i;
-+    struct kvm_regs regs;
-+    LoongArchCPU *cpu = LOONGARCH_CPU(cs);
-+    CPULoongArchState *env = &cpu->env;
-+
-+    /* Set the registers based on QEMU's view of things */
-+    for (i = 0; i < 32; i++) {
-+        regs.gpr[i] = env->gpr[i];
-+    }
-+
-+    regs.pc = env->pc;
-+    ret = kvm_vcpu_ioctl(cs, KVM_SET_REGS, &regs);
-+    if (ret < 0) {
-+        trace_kvm_failed_put_regs_core(strerror(errno));
-+    }
-+
-+    return ret;
-+}
-+
-+static inline int kvm_larch_getq(CPUState *cs, uint64_t reg_id,
-+                                 uint64_t *addr)
-+{
-+    struct kvm_one_reg csrreg = {
-+        .id = reg_id,
-+        .addr = (uintptr_t)addr
-+    };
-+
-+    return kvm_vcpu_ioctl(cs, KVM_GET_ONE_REG, &csrreg);
-+}
-+static inline int kvm_larch_putq(CPUState *cs, uint64_t reg_id,
-+                                 uint64_t *addr)
-+{
-+    struct kvm_one_reg csrreg = {
-+        .id = reg_id,
-+        .addr = (uintptr_t)addr
-+    };
-+
-+    return kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &csrreg);
-+}
-+
-+#define LOONGARCH_CSR_64(_R, _S)  \
-+        (KVM_REG_LOONGARCH_CSR | KVM_REG_SIZE_U64 | (8 * (_R) + (_S)))
-+
-+#define KVM_IOC_CSRID(id) LOONGARCH_CSR_64(id, 0)
-+
-+#define KVM_GET_ONE_UREG64(cs, ret, regidx, addr)                 \
-+    ({                                                            \
-+        err = kvm_larch_getq(cs, KVM_IOC_CSRID(regidx), addr);    \
-+        if (err < 0) {                                            \
-+            ret = err;                                            \
-+            trace_kvm_failed_get_csr(regidx, strerror(errno));    \
-+        }                                                         \
-+    })
-+
-+#define KVM_PUT_ONE_UREG64(cs, ret, regidx, addr)                 \
-+    ({                                                            \
-+        err = kvm_larch_putq(cs, KVM_IOC_CSRID(regidx), addr);    \
-+        if (err < 0) {                                            \
-+            ret = err;                                            \
-+            trace_kvm_failed_put_csr(regidx, strerror(errno));    \
-+        }                                                         \
-+    })
-+
-+static int kvm_loongarch_get_csr(CPUState *cs)
-+{
-+    int err, ret = 0;
-+    LoongArchCPU *cpu = LOONGARCH_CPU(cs);
-+    CPULoongArchState *env = &cpu->env;
-+
-+    KVM_GET_ONE_UREG64(cs, ret, LOONGARCH_CSR_CRMD, &env->CSR_CRMD);
-+    KVM_GET_ONE_UREG64(cs, ret, LOONGARCH_CSR_PRMD, &env->CSR_PRMD);
-+    KVM_GET_ONE_UREG64(cs, ret, LOONGARCH_CSR_EUEN, &env->CSR_EUEN);
-+    KVM_GET_ONE_UREG64(cs, ret, LOONGARCH_CSR_MISC, &env->CSR_MISC);
-+    KVM_GET_ONE_UREG64(cs, ret, LOONGARCH_CSR_ECFG, &env->CSR_ECFG);
-+    KVM_GET_ONE_UREG64(cs, ret, LOONGARCH_CSR_ESTAT, &env->CSR_ESTAT);
-+    KVM_GET_ONE_UREG64(cs, ret, LOONGARCH_CSR_ERA, &env->CSR_ERA);
-+    KVM_GET_ONE_UREG64(cs, ret, LOONGARCH_CSR_BADV, &env->CSR_BADV);
-+    KVM_GET_ONE_UREG64(cs, ret, LOONGARCH_CSR_BADI, &env->CSR_BADI);
-+    KVM_GET_ONE_UREG64(cs, ret, LOONGARCH_CSR_EENTRY, &env->CSR_EENTRY);
-+    KVM_GET_ONE_UREG64(cs, ret, LOONGARCH_CSR_TLBIDX, &env->CSR_TLBIDX);
-+    KVM_GET_ONE_UREG64(cs, ret, LOONGARCH_CSR_TLBEHI, &env->CSR_TLBEHI);
-+    KVM_GET_ONE_UREG64(cs, ret, LOONGARCH_CSR_TLBELO0, &env->CSR_TLBELO0);
-+    KVM_GET_ONE_UREG64(cs, ret, LOONGARCH_CSR_TLBELO1, &env->CSR_TLBELO1);
-+    KVM_GET_ONE_UREG64(cs, ret, LOONGARCH_CSR_ASID, &env->CSR_ASID);
-+    KVM_GET_ONE_UREG64(cs, ret, LOONGARCH_CSR_PGDL, &env->CSR_PGDL);
-+    KVM_GET_ONE_UREG64(cs, ret, LOONGARCH_CSR_PGDH, &env->CSR_PGDH);
-+    KVM_GET_ONE_UREG64(cs, ret, LOONGARCH_CSR_PGD, &env->CSR_PGD);
-+    KVM_GET_ONE_UREG64(cs, ret, LOONGARCH_CSR_PWCL, &env->CSR_PWCL);
-+    KVM_GET_ONE_UREG64(cs, ret, LOONGARCH_CSR_PWCH, &env->CSR_PWCH);
-+    KVM_GET_ONE_UREG64(cs, ret, LOONGARCH_CSR_STLBPS, &env->CSR_STLBPS);
-+    KVM_GET_ONE_UREG64(cs, ret, LOONGARCH_CSR_RVACFG, &env->CSR_RVACFG);
-+    KVM_GET_ONE_UREG64(cs, ret, LOONGARCH_CSR_CPUID, &env->CSR_CPUID);
-+    KVM_GET_ONE_UREG64(cs, ret, LOONGARCH_CSR_PRCFG1, &env->CSR_PRCFG1);
-+    KVM_GET_ONE_UREG64(cs, ret, LOONGARCH_CSR_PRCFG2, &env->CSR_PRCFG2);
-+    KVM_GET_ONE_UREG64(cs, ret, LOONGARCH_CSR_PRCFG3, &env->CSR_PRCFG3);
-+    KVM_GET_ONE_UREG64(cs, ret, LOONGARCH_CSR_SAVE(0), &env->CSR_SAVE[0]);
-+    KVM_GET_ONE_UREG64(cs, ret, LOONGARCH_CSR_SAVE(1), &env->CSR_SAVE[1]);
-+    KVM_GET_ONE_UREG64(cs, ret, LOONGARCH_CSR_SAVE(2), &env->CSR_SAVE[2]);
-+    KVM_GET_ONE_UREG64(cs, ret, LOONGARCH_CSR_SAVE(3), &env->CSR_SAVE[3]);
-+    KVM_GET_ONE_UREG64(cs, ret, LOONGARCH_CSR_SAVE(4), &env->CSR_SAVE[4]);
-+    KVM_GET_ONE_UREG64(cs, ret, LOONGARCH_CSR_SAVE(5), &env->CSR_SAVE[5]);
-+    KVM_GET_ONE_UREG64(cs, ret, LOONGARCH_CSR_SAVE(6), &env->CSR_SAVE[6]);
-+    KVM_GET_ONE_UREG64(cs, ret, LOONGARCH_CSR_SAVE(7), &env->CSR_SAVE[7]);
-+    KVM_GET_ONE_UREG64(cs, ret, LOONGARCH_CSR_TID, &env->CSR_TID);
-+    KVM_GET_ONE_UREG64(cs, ret, LOONGARCH_CSR_CNTC, &env->CSR_CNTC);
-+    KVM_GET_ONE_UREG64(cs, ret, LOONGARCH_CSR_TICLR, &env->CSR_TICLR);
-+    KVM_GET_ONE_UREG64(cs, ret, LOONGARCH_CSR_LLBCTL, &env->CSR_LLBCTL);
-+    KVM_GET_ONE_UREG64(cs, ret, LOONGARCH_CSR_IMPCTL1, &env->CSR_IMPCTL1);
-+    KVM_GET_ONE_UREG64(cs, ret, LOONGARCH_CSR_IMPCTL2, &env->CSR_IMPCTL2);
-+    KVM_GET_ONE_UREG64(cs, ret, LOONGARCH_CSR_TLBRENTRY, &env->CSR_TLBRENTRY);
-+    KVM_GET_ONE_UREG64(cs, ret, LOONGARCH_CSR_TLBRBADV, &env->CSR_TLBRBADV);
-+    KVM_GET_ONE_UREG64(cs, ret, LOONGARCH_CSR_TLBRERA, &env->CSR_TLBRERA);
-+    KVM_GET_ONE_UREG64(cs, ret, LOONGARCH_CSR_TLBRSAVE, &env->CSR_TLBRSAVE);
-+    KVM_GET_ONE_UREG64(cs, ret, LOONGARCH_CSR_TLBRELO0, &env->CSR_TLBRELO0);
-+    KVM_GET_ONE_UREG64(cs, ret, LOONGARCH_CSR_TLBRELO1, &env->CSR_TLBRELO1);
-+    KVM_GET_ONE_UREG64(cs, ret, LOONGARCH_CSR_TLBREHI, &env->CSR_TLBREHI);
-+    KVM_GET_ONE_UREG64(cs, ret, LOONGARCH_CSR_TLBRPRMD, &env->CSR_TLBRPRMD);
-+    KVM_GET_ONE_UREG64(cs, ret, LOONGARCH_CSR_DMW(0), &env->CSR_DMW[0]);
-+    KVM_GET_ONE_UREG64(cs, ret, LOONGARCH_CSR_DMW(1), &env->CSR_DMW[1]);
-+    KVM_GET_ONE_UREG64(cs, ret, LOONGARCH_CSR_DMW(2), &env->CSR_DMW[2]);
-+    KVM_GET_ONE_UREG64(cs, ret, LOONGARCH_CSR_DMW(3), &env->CSR_DMW[3]);
-+    KVM_GET_ONE_UREG64(cs, ret, LOONGARCH_CSR_TVAL, &env->CSR_TVAL);
-+    KVM_GET_ONE_UREG64(cs, ret, LOONGARCH_CSR_TCFG, &env->CSR_TCFG);
-+
-+    return ret;
-+}
-+
-+static int kvm_loongarch_put_csr(CPUState *cs)
-+{
-+    int err, ret = 0;
-+    LoongArchCPU *cpu = LOONGARCH_CPU(cs);
-+    CPULoongArchState *env = &cpu->env;
-+
-+    KVM_PUT_ONE_UREG64(cs, ret, LOONGARCH_CSR_CRMD, &env->CSR_CRMD);
-+    KVM_PUT_ONE_UREG64(cs, ret, LOONGARCH_CSR_PRMD, &env->CSR_PRMD);
-+    KVM_PUT_ONE_UREG64(cs, ret, LOONGARCH_CSR_EUEN, &env->CSR_EUEN);
-+    KVM_PUT_ONE_UREG64(cs, ret, LOONGARCH_CSR_MISC, &env->CSR_MISC);
-+    KVM_PUT_ONE_UREG64(cs, ret, LOONGARCH_CSR_ECFG, &env->CSR_ECFG);
-+    KVM_PUT_ONE_UREG64(cs, ret, LOONGARCH_CSR_ESTAT, &env->CSR_ESTAT);
-+    KVM_PUT_ONE_UREG64(cs, ret, LOONGARCH_CSR_ERA, &env->CSR_ERA);
-+    KVM_PUT_ONE_UREG64(cs, ret, LOONGARCH_CSR_BADV, &env->CSR_BADV);
-+    KVM_PUT_ONE_UREG64(cs, ret, LOONGARCH_CSR_BADI, &env->CSR_BADI);
-+    KVM_PUT_ONE_UREG64(cs, ret, LOONGARCH_CSR_EENTRY, &env->CSR_EENTRY);
-+    KVM_PUT_ONE_UREG64(cs, ret, LOONGARCH_CSR_TLBIDX, &env->CSR_TLBIDX);
-+    KVM_PUT_ONE_UREG64(cs, ret, LOONGARCH_CSR_TLBEHI, &env->CSR_TLBEHI);
-+    KVM_PUT_ONE_UREG64(cs, ret, LOONGARCH_CSR_TLBELO0, &env->CSR_TLBELO0);
-+    KVM_PUT_ONE_UREG64(cs, ret, LOONGARCH_CSR_TLBELO1, &env->CSR_TLBELO1);
-+    KVM_PUT_ONE_UREG64(cs, ret, LOONGARCH_CSR_ASID, &env->CSR_ASID);
-+    KVM_PUT_ONE_UREG64(cs, ret, LOONGARCH_CSR_PGDL, &env->CSR_PGDL);
-+    KVM_PUT_ONE_UREG64(cs, ret, LOONGARCH_CSR_PGDH, &env->CSR_PGDH);
-+    KVM_PUT_ONE_UREG64(cs, ret, LOONGARCH_CSR_PGD, &env->CSR_PGD);
-+    KVM_PUT_ONE_UREG64(cs, ret, LOONGARCH_CSR_PWCL, &env->CSR_PWCL);
-+    KVM_PUT_ONE_UREG64(cs, ret, LOONGARCH_CSR_PWCH, &env->CSR_PWCH);
-+    KVM_PUT_ONE_UREG64(cs, ret, LOONGARCH_CSR_STLBPS, &env->CSR_STLBPS);
-+    KVM_PUT_ONE_UREG64(cs, ret, LOONGARCH_CSR_RVACFG, &env->CSR_RVACFG);
-+    KVM_PUT_ONE_UREG64(cs, ret, LOONGARCH_CSR_CPUID, &env->CSR_CPUID);
-+    KVM_PUT_ONE_UREG64(cs, ret, LOONGARCH_CSR_PRCFG1, &env->CSR_PRCFG1);
-+    KVM_PUT_ONE_UREG64(cs, ret, LOONGARCH_CSR_PRCFG2, &env->CSR_PRCFG2);
-+    KVM_PUT_ONE_UREG64(cs, ret, LOONGARCH_CSR_PRCFG3, &env->CSR_PRCFG3);
-+    KVM_PUT_ONE_UREG64(cs, ret, LOONGARCH_CSR_SAVE(0), &env->CSR_SAVE[0]);
-+    KVM_PUT_ONE_UREG64(cs, ret, LOONGARCH_CSR_SAVE(1), &env->CSR_SAVE[1]);
-+    KVM_PUT_ONE_UREG64(cs, ret, LOONGARCH_CSR_SAVE(2), &env->CSR_SAVE[2]);
-+    KVM_PUT_ONE_UREG64(cs, ret, LOONGARCH_CSR_SAVE(3), &env->CSR_SAVE[3]);
-+    KVM_PUT_ONE_UREG64(cs, ret, LOONGARCH_CSR_SAVE(4), &env->CSR_SAVE[4]);
-+    KVM_PUT_ONE_UREG64(cs, ret, LOONGARCH_CSR_SAVE(5), &env->CSR_SAVE[5]);
-+    KVM_PUT_ONE_UREG64(cs, ret, LOONGARCH_CSR_SAVE(6), &env->CSR_SAVE[6]);
-+    KVM_PUT_ONE_UREG64(cs, ret, LOONGARCH_CSR_SAVE(7), &env->CSR_SAVE[7]);
-+    KVM_PUT_ONE_UREG64(cs, ret, LOONGARCH_CSR_TID, &env->CSR_TID);
-+    KVM_PUT_ONE_UREG64(cs, ret, LOONGARCH_CSR_CNTC, &env->CSR_CNTC);
-+    KVM_PUT_ONE_UREG64(cs, ret, LOONGARCH_CSR_TICLR, &env->CSR_TICLR);
-+    KVM_PUT_ONE_UREG64(cs, ret, LOONGARCH_CSR_LLBCTL, &env->CSR_LLBCTL);
-+    KVM_PUT_ONE_UREG64(cs, ret, LOONGARCH_CSR_IMPCTL1, &env->CSR_IMPCTL1);
-+    KVM_PUT_ONE_UREG64(cs, ret, LOONGARCH_CSR_IMPCTL2, &env->CSR_IMPCTL2);
-+    KVM_PUT_ONE_UREG64(cs, ret, LOONGARCH_CSR_TLBRENTRY, &env->CSR_TLBRENTRY);
-+    KVM_PUT_ONE_UREG64(cs, ret, LOONGARCH_CSR_TLBRBADV, &env->CSR_TLBRBADV);
-+    KVM_PUT_ONE_UREG64(cs, ret, LOONGARCH_CSR_TLBRERA, &env->CSR_TLBRERA);
-+    KVM_PUT_ONE_UREG64(cs, ret, LOONGARCH_CSR_TLBRSAVE, &env->CSR_TLBRSAVE);
-+    KVM_PUT_ONE_UREG64(cs, ret, LOONGARCH_CSR_TLBRELO0, &env->CSR_TLBRELO0);
-+    KVM_PUT_ONE_UREG64(cs, ret, LOONGARCH_CSR_TLBRELO1, &env->CSR_TLBRELO1);
-+    KVM_PUT_ONE_UREG64(cs, ret, LOONGARCH_CSR_TLBREHI, &env->CSR_TLBREHI);
-+    KVM_PUT_ONE_UREG64(cs, ret, LOONGARCH_CSR_TLBRPRMD, &env->CSR_TLBRPRMD);
-+    KVM_PUT_ONE_UREG64(cs, ret, LOONGARCH_CSR_DMW(0), &env->CSR_DMW[0]);
-+    KVM_PUT_ONE_UREG64(cs, ret, LOONGARCH_CSR_DMW(1), &env->CSR_DMW[1]);
-+    KVM_PUT_ONE_UREG64(cs, ret, LOONGARCH_CSR_DMW(2), &env->CSR_DMW[2]);
-+    KVM_PUT_ONE_UREG64(cs, ret, LOONGARCH_CSR_DMW(3), &env->CSR_DMW[3]);
-+    /*
-+     * timer cfg must be put at last since it is used to enable
-+     * guest timer
-+     */
-+    KVM_PUT_ONE_UREG64(cs, ret, LOONGARCH_CSR_TVAL, &env->CSR_TVAL);
-+    KVM_PUT_ONE_UREG64(cs, ret, LOONGARCH_CSR_TCFG, &env->CSR_TCFG);
-+    return ret;
-+}
-+
-+static int kvm_loongarch_get_regs_fp(CPUState *cs)
-+{
-+    int ret, i;
-+    struct kvm_fpu fpu;
-+
-+    LoongArchCPU *cpu = LOONGARCH_CPU(cs);
-+    CPULoongArchState *env = &cpu->env;
-+
-+    ret = kvm_vcpu_ioctl(cs, KVM_GET_FPU, &fpu);
-+    if (ret < 0) {
-+        trace_kvm_failed_get_fpu(strerror(errno));
-+        return ret;
-+    }
-+
-+    env->fcsr0 = fpu.fcsr;
-+    for (i = 0; i < 32; i++) {
-+        env->fpr[i] = fpu.fpr[i].val64[0];
-+    }
-+    for (i = 0; i < 8; i++) {
-+        env->cf[i] = fpu.fcc & 0xFF;
-+        fpu.fcc = fpu.fcc >> 8;
-+    }
-+
-+    return ret;
-+}
-+
-+static int kvm_loongarch_put_regs_fp(CPUState *cs)
-+{
-+    int ret, i;
-+    struct kvm_fpu fpu;
-+
-+    LoongArchCPU *cpu = LOONGARCH_CPU(cs);
-+    CPULoongArchState *env = &cpu->env;
-+
-+    fpu.fcsr = env->fcsr0;
-+    fpu.fcc = 0;
-+    for (i = 0; i < 32; i++) {
-+        fpu.fpr[i].val64[0] = env->fpr[i];
-+    }
-+
-+    for (i = 0; i < 8; i++) {
-+        fpu.fcc |= env->cf[i] << (8 * i);
-+    }
-+
-+    ret = kvm_vcpu_ioctl(cs, KVM_SET_FPU, &fpu);
-+    if (ret < 0) {
-+        trace_kvm_failed_put_fpu(strerror(errno));
-+    }
-+
-+    return ret;
-+}
-+
-+static int kvm_loongarch_get_mpstate(CPUState *cs)
-+{
-+    int ret = 0;
-+    struct kvm_mp_state mp_state;
-+    LoongArchCPU *cpu = LOONGARCH_CPU(cs);
-+    CPULoongArchState *env = &cpu->env;
-+
-+    if (cap_has_mp_state) {
-+        ret = kvm_vcpu_ioctl(cs, KVM_GET_MP_STATE, &mp_state);
-+        if (ret) {
-+            trace_kvm_failed_get_mpstate(strerror(errno));
-+            return ret;
-+        }
-+        env->mp_state = mp_state.mp_state;
-+    }
-+
-+    return ret;
-+}
-+
-+static int kvm_loongarch_put_mpstate(CPUState *cs)
-+{
-+    int ret = 0;
-+
-+    LoongArchCPU *cpu = LOONGARCH_CPU(cs);
-+    CPULoongArchState *env = &cpu->env;
-+
-+    struct kvm_mp_state mp_state = {
-+        .mp_state = env->mp_state
-+    };
-+
-+    if (cap_has_mp_state) {
-+        ret = kvm_vcpu_ioctl(cs, KVM_SET_MP_STATE, &mp_state);
-+        if (ret) {
-+            trace_kvm_failed_put_mpstate(strerror(errno));
-+        }
-+    }
-+
-+    return ret;
-+}
-+
- int kvm_arch_get_registers(CPUState *cs)
+ int kvm_arch_init(MachineState *ms, KVMState *s)
  {
--    return 0;
-+    int ret;
-+
-+    ret = kvm_loongarch_get_regs_core(cs);
-+    if (ret) {
-+        return ret;
-+    }
-+
-+    ret = kvm_loongarch_get_csr(cs);
-+    if (ret) {
-+        return ret;
-+    }
-+
-+    ret = kvm_loongarch_get_regs_fp(cs);
-+    if (ret) {
-+        return ret;
-+    }
-+
-+    ret = kvm_loongarch_get_mpstate(cs);
-+
-+    return ret;
- }
-+
- int kvm_arch_put_registers(CPUState *cs, int level)
- {
--    return 0;
-+    int ret;
-+
-+    ret = kvm_loongarch_put_regs_core(cs);
-+    if (ret) {
-+        return ret;
-+    }
-+
-+    ret = kvm_loongarch_put_csr(cs);
-+    if (ret) {
-+        return ret;
-+    }
-+
-+    ret = kvm_loongarch_put_regs_fp(cs);
-+    if (ret) {
-+        return ret;
-+    }
-+
-+    ret = kvm_loongarch_put_mpstate(cs);
-+
-+    return ret;
++    cap_has_mp_state = kvm_check_extension(s, KVM_CAP_MP_STATE);
+     return 0;
  }
  
- int kvm_arch_init_vcpu(CPUState *cs)
-diff --git a/target/loongarch/trace-events b/target/loongarch/trace-events
-new file mode 100644
-index 0000000000..67817fee67
---- /dev/null
-+++ b/target/loongarch/trace-events
-@@ -0,0 +1,11 @@
-+# See docs/devel/tracing.rst for syntax documentation.
-+
-+#kvm.c
-+kvm_failed_get_regs_core(const char *msg) "Failed to get core regs from KVM: %s"
-+kvm_failed_put_regs_core(const char *msg) "Failed to put core regs into KVM: %s"
-+kvm_failed_get_csr(int csr, const char *msg) "Failed to get csr 0x%x from KVM: %s"
-+kvm_failed_put_csr(int csr, const char *msg) "Failed to put csr 0x%x into KVM: %s"
-+kvm_failed_get_fpu(const char *msg) "Failed to get fpu from KVM: %s"
-+kvm_failed_put_fpu(const char *msg) "Failed to put fpu into KVM: %s"
-+kvm_failed_get_mpstate(const char *msg) "Failed to get mp_state from KVM: %s"
-+kvm_failed_put_mpstate(const char *msg) "Failed to put mp_state into KVM: %s"
-diff --git a/target/loongarch/trace.h b/target/loongarch/trace.h
-new file mode 100644
-index 0000000000..c2ecb78f08
---- /dev/null
-+++ b/target/loongarch/trace.h
-@@ -0,0 +1 @@
-+#include "trace/trace-target_loongarch.h"
 -- 
 2.31.1
 
