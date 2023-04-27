@@ -2,115 +2,159 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A2C826F0AF0
-	for <lists+kvm@lfdr.de>; Thu, 27 Apr 2023 19:36:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2CFAF6F0BFE
+	for <lists+kvm@lfdr.de>; Thu, 27 Apr 2023 20:33:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244446AbjD0Rgo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Apr 2023 13:36:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41102 "EHLO
+        id S244571AbjD0Sc6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Apr 2023 14:32:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51360 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244439AbjD0Rg2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 Apr 2023 13:36:28 -0400
-Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 773773AB1;
-        Thu, 27 Apr 2023 10:36:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1682616987; x=1714152987;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=uWriv/HW8rBdAww/p0pd10UnWNQnafdmDWtqvgZfv90=;
-  b=JD3Ff0xxIRtx/3+es2oE8szYBgehF9eGe44xPaAquzkrCxr2Rzc6UZb9
-   IFNV9RfWgIUvHVA0SXYjJiqCfxPMv5NeFhKCkm4mNVvzrs8k0a55EAE59
-   Iq80C4mCMOna2CokpWJ5r3NVvPs39NFQ3NyZ3qWI8MEda7Uma1wZpoN9x
-   e+nXQGlUnlf3q6jM1qlImUNIQv8Z/bvDpGeUq4H0E2qC+Fz1RCw2fLTYj
-   4gFsY3/pBsOZZ/nnHZ+WsNK0ZG4OX4vq/PHkoZJR4iM+qKkHj0GVv4SnL
-   usoXJy7z6AsoE95pJD0hT4aE1396Yyoh+cT/MD9Weoi0aRRT8ZuUloen2
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10693"; a="349496947"
-X-IronPort-AV: E=Sophos;i="5.99,232,1677571200"; 
-   d="scan'208";a="349496947"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Apr 2023 10:36:22 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10693"; a="697173004"
-X-IronPort-AV: E=Sophos;i="5.99,232,1677571200"; 
-   d="scan'208";a="697173004"
-Received: from rchatre-ws.ostc.intel.com ([10.54.69.144])
-  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Apr 2023 10:36:22 -0700
-From:   Reinette Chatre <reinette.chatre@intel.com>
-To:     jgg@nvidia.com, yishaih@nvidia.com,
-        shameerali.kolothum.thodi@huawei.com, kevin.tian@intel.com,
-        alex.williamson@redhat.com
-Cc:     tglx@linutronix.de, darwi@linutronix.de, kvm@vger.kernel.org,
-        dave.jiang@intel.com, jing2.liu@intel.com, ashok.raj@intel.com,
-        fenghua.yu@intel.com, tom.zanussi@linux.intel.com,
-        reinette.chatre@intel.com, linux-kernel@vger.kernel.org
-Subject: [PATCH V4 11/11] vfio/pci: Clear VFIO_IRQ_INFO_NORESIZE for MSI-X
-Date:   Thu, 27 Apr 2023 10:36:08 -0700
-Message-Id: <2370aaabd9c006747233df6678eed1b51ccca426.1682615447.git.reinette.chatre@intel.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <cover.1682615447.git.reinette.chatre@intel.com>
-References: <cover.1682615447.git.reinette.chatre@intel.com>
+        with ESMTP id S244561AbjD0Sc5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 Apr 2023 14:32:57 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7092A19C
+        for <kvm@vger.kernel.org>; Thu, 27 Apr 2023 11:32:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1682620331;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=p6LZTxbqMNSlOAcpVGltFAX5rwaxLlFX1/1eyhmddg0=;
+        b=bPQfNoVOd4XbxBPsYNQ4d8p3n8ir32eJe2qSay3uzi4bvZBQ+k7ZwoWzES+4i35IOaNCZc
+        BnQy5+FQD1GQctc4WkmG7FNzrHuhxANawRaiWGtuHauEcaHKPVqFMGSTR1AgqZvx5E33Wv
+        pkmvUeI77cBS/1WEQZgwRlI7XAdXTjk=
+Received: from mail-il1-f198.google.com (mail-il1-f198.google.com
+ [209.85.166.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-340-XfmisnipONmFeYDwcmlVmg-1; Thu, 27 Apr 2023 14:32:07 -0400
+X-MC-Unique: XfmisnipONmFeYDwcmlVmg-1
+Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-32959198653so138735045ab.3
+        for <kvm@vger.kernel.org>; Thu, 27 Apr 2023 11:32:07 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1682620326; x=1685212326;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=p6LZTxbqMNSlOAcpVGltFAX5rwaxLlFX1/1eyhmddg0=;
+        b=Dl9OE+U7UIBP4ipLHa/tc2Rc+yADGl2fhhJAW74sc0UcmehmfT/mz8zbj+BG+Qpj1U
+         4aNAfOpQADy2ck9CbcGb8q13sk696APewwURqAISNbR3jzcufjl2Xh9jiD9SM4NJfvcJ
+         noclmSzpMaHGWtJn8cCKFDEScdWX+BaGunJQCts42SShQrq2FH7tWWm/GZI/eBZau2Xk
+         I9coR2IjpeM1yfQej4j9BQe4zxPucBnPYX4zhgduOZc35EGvwbdKqLu3tD3wwZSZz7aK
+         mi+Qv5LKVfGbGL/+8GwT82CtrWj+RKQCZNkcetnRvP522eOXiYKPVAk7Vv1lUOU5CmiU
+         FtqQ==
+X-Gm-Message-State: AC+VfDwMuCAY6dbkVH9oO3sh4zE+g8z1mfI66IjeA+NpKCwq/YPYaGYp
+        iSVS/ik0DTT7zKv1LB94Z1TIvqpgnI57f8J9CAlMe9+ivd3HdZlkgXJYDfU7ThkAf9pwJAT4W2x
+        Phi9nB3GGH51tw6yu1/q0
+X-Received: by 2002:a92:d3c3:0:b0:329:43f0:1570 with SMTP id c3-20020a92d3c3000000b0032943f01570mr1980502ilh.23.1682620326429;
+        Thu, 27 Apr 2023 11:32:06 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ5ZjtNj+NU5UefOIsxARLgAXnZyiFoLNkWt/mynkGIjXDEBZIDUWBFQOZkzcIK9k2Lxdx+w+g==
+X-Received: by 2002:a92:d3c3:0:b0:329:43f0:1570 with SMTP id c3-20020a92d3c3000000b0032943f01570mr1980473ilh.23.1682620326188;
+        Thu, 27 Apr 2023 11:32:06 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id a20-20020a027354000000b004090c67f155sm5693305jae.91.2023.04.27.11.32.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 27 Apr 2023 11:32:05 -0700 (PDT)
+Date:   Thu, 27 Apr 2023 12:32:03 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     "Liu, Yi L" <yi.l.liu@intel.com>
+Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
+        "jgg@nvidia.com" <jgg@nvidia.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
+        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "shameerali.kolothum.thodi@huawei.com" 
+        <shameerali.kolothum.thodi@huawei.com>,
+        "lulu@redhat.com" <lulu@redhat.com>,
+        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
+        "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        "Hao, Xudong" <xudong.hao@intel.com>,
+        "Zhao, Yan Y" <yan.y.zhao@intel.com>,
+        "Xu, Terrence" <terrence.xu@intel.com>,
+        "Jiang, Yanting" <yanting.jiang@intel.com>,
+        "Duan, Zhenzhong" <zhenzhong.duan@intel.com>
+Subject: Re: [PATCH v4 2/9] vfio-iommufd: Create iommufd_access for noiommu
+ devices
+Message-ID: <20230427123203.22307c4f.alex.williamson@redhat.com>
+In-Reply-To: <DS0PR11MB752972AC1A6030CB442ACF3FC36A9@DS0PR11MB7529.namprd11.prod.outlook.com>
+References: <20230426145419.450922-1-yi.l.liu@intel.com>
+        <20230426145419.450922-3-yi.l.liu@intel.com>
+        <BN9PR11MB52768AF474FAB2AF36AC00508C6A9@BN9PR11MB5276.namprd11.prod.outlook.com>
+        <DS0PR11MB752972AC1A6030CB442ACF3FC36A9@DS0PR11MB7529.namprd11.prod.outlook.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Dynamic MSI-X is supported. Clear VFIO_IRQ_INFO_NORESIZE
-to provide guidance to user space.
+On Thu, 27 Apr 2023 06:59:17 +0000
+"Liu, Yi L" <yi.l.liu@intel.com> wrote:
 
-Signed-off-by: Reinette Chatre <reinette.chatre@intel.com>
----
-Changes since V3:
-- Remove unnecessary test from condition. (Alex)
+> > From: Tian, Kevin <kevin.tian@intel.com>
+> > Sent: Thursday, April 27, 2023 2:39 PM
+> >   
+> > > From: Liu, Yi L <yi.l.liu@intel.com>
+> > > Sent: Wednesday, April 26, 2023 10:54 PM
+> > > @@ -121,7 +128,8 @@ static void vfio_emulated_unmap(void *data,
+> > > unsigned long iova,
+> > >  {
+> > >  	struct vfio_device *vdev = data;
+> > >
+> > > -	if (vdev->ops->dma_unmap)
+> > > +	/* noiommu devices cannot do map/unmap */
+> > > +	if (vdev->noiommu && vdev->ops->dma_unmap)
+> > >  		vdev->ops->dma_unmap(vdev, iova, length);  
+> > 
+> > Is it necessary? All mdev devices implementing @dma_unmap won't
+> > set noiommu flag.  
+> 
+> Hmmm. Yes, and all the devices set noiommu is not implementing @dma_unmap
+> as far as I see. Maybe this noiommu check can be removed.
 
-Changes since V2:
-- Use new vdev->has_dyn_msix property instead of calling
-  pci_msix_can_alloc_dyn() directly. (Alex)
-
-Changes since RFC V1:
-- Only advertise VFIO_IRQ_INFO_NORESIZE for MSI-X devices that
-  can actually support dynamic allocation. (Alex)
-
- drivers/vfio/pci/vfio_pci_core.c | 2 +-
- include/uapi/linux/vfio.h        | 3 +++
- 2 files changed, 4 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
-index a3635a8e54c8..ec7e662de033 100644
---- a/drivers/vfio/pci/vfio_pci_core.c
-+++ b/drivers/vfio/pci/vfio_pci_core.c
-@@ -1114,7 +1114,7 @@ static int vfio_pci_ioctl_get_irq_info(struct vfio_pci_core_device *vdev,
- 	if (info.index == VFIO_PCI_INTX_IRQ_INDEX)
- 		info.flags |=
- 			(VFIO_IRQ_INFO_MASKABLE | VFIO_IRQ_INFO_AUTOMASKED);
--	else
-+	else if (info.index != VFIO_PCI_MSIX_IRQ_INDEX || !vdev->has_dyn_msix)
- 		info.flags |= VFIO_IRQ_INFO_NORESIZE;
+Not to mention that the polarity of the noiommu test is backwards here!
+This also seems to be the only performance path where noiommu is tested
+and therefore I believe the only actual justification of the previous
+patch.
  
- 	return copy_to_user(arg, &info, minsz) ? -EFAULT : 0;
-diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-index 0552e8dcf0cb..1a36134cae5c 100644
---- a/include/uapi/linux/vfio.h
-+++ b/include/uapi/linux/vfio.h
-@@ -511,6 +511,9 @@ struct vfio_region_info_cap_nvlink2_lnkspd {
-  * then add and unmask vectors, it's up to userspace to make the decision
-  * whether to allocate the maximum supported number of vectors or tear
-  * down setup and incrementally increase the vectors as each is enabled.
-+ * Absence of the NORESIZE flag indicates that vectors can be enabled
-+ * and disabled dynamically without impacting other vectors within the
-+ * index.
-  */
- struct vfio_irq_info {
- 	__u32	argsz;
--- 
-2.34.1
+> > Instead in the future if we allow noiommu userspace to pin pages
+> > we'd need similar logic too.  
+> 
+> I'm not quite sure about it so far. For mdev devices, the device driver
+> may use vfio_pin_pages/vfio_dma_rw () to pin page. Hence such drivers
+> need to listen to dma_unmap() event. But for noiommu users, does the
+> device driver also participate in the page pin? At least for vfio-pci driver,
+> it does not, or maybe it will in the future when enabling noiommu
+> userspace to pin pages. It looks to me such userspace should order
+> the DMA before calling ioctl to unpin page instead of letting device
+> driver listen to unmap.
+
+Whoa, noiommu is inherently unsafe an only meant to expose the vfio
+device interface for userspace drivers that are going to do unsafe
+things regardless.  Enabling noiommu to work with mdev, pin pages, or
+anything else should not be on our agenda.  Userspaces relying on niommu
+get the minimum viable interface and must impose a minuscule
+incremental maintenance burden.  The only reason we're spending so much
+effort on it here is to make iommufd noiommu support equivalent to
+group/container noiommu support.  We should stop at that.  Thanks,
+
+Alex
 
