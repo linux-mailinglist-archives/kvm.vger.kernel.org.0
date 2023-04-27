@@ -2,87 +2,84 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A16F16F022C
-	for <lists+kvm@lfdr.de>; Thu, 27 Apr 2023 09:55:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CAD6F6F024D
+	for <lists+kvm@lfdr.de>; Thu, 27 Apr 2023 10:05:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243175AbjD0HzG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Apr 2023 03:55:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58958 "EHLO
+        id S242777AbjD0IF0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Apr 2023 04:05:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34778 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243092AbjD0HzB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 Apr 2023 03:55:01 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2647F1FCE;
-        Thu, 27 Apr 2023 00:55:00 -0700 (PDT)
-Received: from pps.filterd (m0353726.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 33R7RsKg011910;
-        Thu, 27 Apr 2023 07:55:00 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=7KDMLRcP7EMv4sR5rEIDfakZszXyox4OQYrWkzK77q0=;
- b=N/jBIsmAuENvMGX0rJpXu4jpovXtNJSbXGBZRKII+Am6AmumGAQA3mqgLMkD5O+7IWQd
- DE+WP2LD+UUC8HfVAOQG65L55ElPuuBpMKtWKuYozBQuz6/UlWrrGnjTXl6PmaDOI4/i
- SbE3UD8ROPnF9h2baUtn5HidELbeWTqEasD+jdo+JCr+431G2RjoaKa9wpD0KHKnNfFJ
- M09i1EC4f+aqRCVrvndN1jwjxDvgPGdSCktWGuvEbdJslyr4zxvGC8LQB54yNb8rfkuL
- zpWSps88yUN1cTVSiE+LWSUzwod9Qn+gcQPdV7aw61v6SnE3k9fQo0Fwqf6kdHZ7nNwd QQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3q7mp58umb-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 27 Apr 2023 07:54:59 +0000
-Received: from m0353726.ppops.net (m0353726.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 33R7klKG001659;
-        Thu, 27 Apr 2023 07:54:59 GMT
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3q7mp58ukv-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 27 Apr 2023 07:54:59 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 33R47hQM019378;
-        Thu, 27 Apr 2023 07:54:56 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-        by ppma03ams.nl.ibm.com (PPS) with ESMTPS id 3q47772t6p-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 27 Apr 2023 07:54:56 +0000
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-        by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 33R7srS35309064
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 27 Apr 2023 07:54:53 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 40C592004B;
-        Thu, 27 Apr 2023 07:54:53 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 8899520040;
-        Thu, 27 Apr 2023 07:54:52 +0000 (GMT)
-Received: from li-c6ac47cc-293c-11b2-a85c-d421c8e4747b.ibm.com.com (unknown [9.171.19.188])
-        by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Thu, 27 Apr 2023 07:54:52 +0000 (GMT)
-From:   Pierre Morel <pmorel@linux.ibm.com>
-To:     linux-s390@vger.kernel.org
-Cc:     frankja@linux.ibm.com, thuth@redhat.com, kvm@vger.kernel.org,
-        imbrenda@linux.ibm.com, david@redhat.com, nrb@linux.ibm.com,
-        nsg@linux.ibm.com, cohuck@redhat.com
-Subject: [kvm-unit-tests PATCH v2 1/1] s390x: sclp: consider monoprocessor on read_info error
-Date:   Thu, 27 Apr 2023 09:54:50 +0200
-Message-Id: <20230427075450.6146-2-pmorel@linux.ibm.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20230427075450.6146-1-pmorel@linux.ibm.com>
-References: <20230427075450.6146-1-pmorel@linux.ibm.com>
+        with ESMTP id S242675AbjD0IFY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 Apr 2023 04:05:24 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3EA54684
+        for <kvm@vger.kernel.org>; Thu, 27 Apr 2023 01:04:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1682582659;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=R36dlmlB7mS4Q+5i4QZDZFJ2WCUffsynJFMD103cOFM=;
+        b=D6cUeqbnyGKWIY1AXs+6PkCRMpJsLG/npJ/3/5P6UiCjojAfCtkLouv76CT+DADfHpUupf
+        JPgSyF0mXow6KSU3eSNUZEWReVRHBZ0ZF1J/r/xeqLDulkWI8Zc+Ys1McK+LNvlKDR3Uf0
+        5MP1VGTHGkz0miFLrm8i8ADT22WhN38=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-479-KUIpq8RgMCWrGrOc59Icaw-1; Thu, 27 Apr 2023 04:04:17 -0400
+X-MC-Unique: KUIpq8RgMCWrGrOc59Icaw-1
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-301110f1756so2988516f8f.0
+        for <kvm@vger.kernel.org>; Thu, 27 Apr 2023 01:04:17 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1682582656; x=1685174656;
+        h=content-transfer-encoding:in-reply-to:subject:from:references:cc:to
+         :content-language:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=R36dlmlB7mS4Q+5i4QZDZFJ2WCUffsynJFMD103cOFM=;
+        b=XYYyP7MrLdwt4N8EQcQknSReX1IVfcYf1GamJwu7Y642FdFnfb61SgpsIbCbaKjoct
+         ISDmkhs65hEwnI9LmEi9Ih2+jK/gSvFWh8XWxszyNsSrxF5VFZOkY2vrPkCnLol7qLdX
+         CEgFSf+6NyrEvjA1WEmnaYbdOJlIeTOBCofxsmSGdEv+GT5VxkpozJTTmRIwAi6dqhb1
+         mSdIZ2sb/PYtjpV2viWHZbBbMIZKV+zXY88v7dcERfEFJ3+PTHn2UUiZw2A1U7qkXvj2
+         y+WA8FlHqI4F7nd3xKOQ8b1eS1Jnkfpu5pe+0i++hEE+a+gORozWKxHHOrQ/gitpaJH9
+         JkpA==
+X-Gm-Message-State: AC+VfDwFD5Ai1yMmPr2GJn8n63cNLVxkcnrjuZ4JUQBbSt4X7nqynarw
+        Zvc9WF203iU8uL0VGeUdyampy7J18bQb0BiuB8KRtC+5q37bKVlwBAicroX4Sk4haGvtjaZw/Eg
+        pjtTgCc0NCLe/65nPNdER
+X-Received: by 2002:a5d:474a:0:b0:2cf:efc7:19ad with SMTP id o10-20020a5d474a000000b002cfefc719admr575919wrs.53.1682582656434;
+        Thu, 27 Apr 2023 01:04:16 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ4nVcazw8m5wVRp5FQUk5kfDzYaCyFFT7YJ2VExk+yhU598C2ZQJMln+TwZ9wHCxJsfS15UqA==
+X-Received: by 2002:a5d:474a:0:b0:2cf:efc7:19ad with SMTP id o10-20020a5d474a000000b002cfefc719admr575892wrs.53.1682582656101;
+        Thu, 27 Apr 2023 01:04:16 -0700 (PDT)
+Received: from [10.33.192.205] (nat-pool-str-t.redhat.com. [149.14.88.106])
+        by smtp.gmail.com with ESMTPSA id i3-20020adff303000000b002f4cf72fce6sm17882206wro.46.2023.04.27.01.04.14
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 27 Apr 2023 01:04:15 -0700 (PDT)
+Message-ID: <45e09800-6a47-0372-5244-16e2dc72370d@redhat.com>
+Date:   Thu, 27 Apr 2023 10:04:13 +0200
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: CLlohtwUvNMOL9yJEv1ajRB7QzcM9U8y
-X-Proofpoint-ORIG-GUID: u44x42simNgcbbNjAyaQBfTFLCyzTCOL
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
- definitions=2023-04-27_05,2023-04-26_03,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 impostorscore=0
- mlxlogscore=962 lowpriorityscore=0 suspectscore=0 priorityscore=1501
- clxscore=1015 spamscore=0 adultscore=0 phishscore=0 mlxscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2303200000 definitions=main-2304270064
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.9.0
+Content-Language: en-US
+To:     Pierre Morel <pmorel@linux.ibm.com>, qemu-s390x@nongnu.org
+Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
+        richard.henderson@linaro.org, david@redhat.com, cohuck@redhat.com,
+        mst@redhat.com, pbonzini@redhat.com, kvm@vger.kernel.org,
+        ehabkost@redhat.com, marcel.apfelbaum@gmail.com, eblake@redhat.com,
+        armbru@redhat.com, seiden@linux.ibm.com, nrb@linux.ibm.com,
+        nsg@linux.ibm.com, frankja@linux.ibm.com, berrange@redhat.com,
+        clg@kaod.org
+References: <20230425161456.21031-1-pmorel@linux.ibm.com>
+ <20230425161456.21031-2-pmorel@linux.ibm.com>
+From:   Thomas Huth <thuth@redhat.com>
+Subject: Re: [PATCH v20 01/21] s390x/cpu topology: add s390 specifics to CPU
+ topology
+In-Reply-To: <20230425161456.21031-2-pmorel@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,
         T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -90,30 +87,155 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-A test would hang if an abort happens before SCLP Read SCP
-Information has completed.
+On 25/04/2023 18.14, Pierre Morel wrote:
+> S390 adds two new SMP levels, drawers and books to the CPU
+> topology.
+> The S390 CPU have specific topology features like dedication
+> and entitlement to give to the guest indications on the host
+> vCPUs scheduling and help the guest take the best decisions
+> on the scheduling of threads on the vCPUs.
+> 
+> Let us provide the SMP properties with books and drawers levels
+> and S390 CPU with dedication and entitlement,
+> 
+> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+> ---
+...> diff --git a/qapi/machine-target.json b/qapi/machine-target.json
+> index 2e267fa458..42a6a40333 100644
+> --- a/qapi/machine-target.json
+> +++ b/qapi/machine-target.json
+> @@ -342,3 +342,15 @@
+>                      'TARGET_S390X',
+>                      'TARGET_MIPS',
+>                      'TARGET_LOONGARCH64' ] } }
+> +
+> +##
+> +# @CpuS390Polarization:
+> +#
+> +# An enumeration of cpu polarization that can be assumed by a virtual
+> +# S390 CPU
+> +#
+> +# Since: 8.1
+> +##
+> +{ 'enum': 'CpuS390Polarization',
+> +  'prefix': 'S390_CPU_POLARIZATION',
+> +  'data': [ 'horizontal', 'vertical' ] }
 
-Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
----
- lib/s390x/sclp.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+It seems like you don't need this here yet ... I think you likely could also 
+introduce it in a later patch instead (patch 11 seems the first one that 
+needs this?)
 
-diff --git a/lib/s390x/sclp.c b/lib/s390x/sclp.c
-index 390fde7..07523dc 100644
---- a/lib/s390x/sclp.c
-+++ b/lib/s390x/sclp.c
-@@ -119,8 +119,9 @@ void sclp_read_info(void)
- 
- int sclp_get_cpu_num(void)
- {
--	assert(read_info);
--	return read_info->entries_cpu;
-+    if (read_info)
-+	    return read_info->entries_cpu;
-+    return 1;
- }
- 
- CPUEntry *sclp_get_cpu_entries(void)
--- 
-2.31.1
+Also, would a " 'if': 'TARGET_S390X' " be possible here, too?
+
+> diff --git a/hw/core/machine-smp.c b/hw/core/machine-smp.c
+> index c3dab007da..77bee06304 100644
+> --- a/hw/core/machine-smp.c
+> +++ b/hw/core/machine-smp.c
+> @@ -30,8 +30,19 @@ static char *cpu_hierarchy_to_string(MachineState *ms)
+>   {
+>       MachineClass *mc = MACHINE_GET_CLASS(ms);
+>       GString *s = g_string_new(NULL);
+> +    const char *multiply = " * ", *prefix = "";
+>   
+> -    g_string_append_printf(s, "sockets (%u)", ms->smp.sockets);
+> +    if (mc->smp_props.drawers_supported) {
+> +        g_string_append_printf(s, "drawers (%u)", ms->smp.drawers);
+> +        prefix = multiply;
+
+That "prefix" stuff looks complicated ... why don't you simply add the "*" 
+at the end of the strings:
+
+     g_string_append_printf(s, "drawers (%u) * ",
+                            ms->smp.drawers);
+
+?
+
+> +    }
+> +
+> +    if (mc->smp_props.books_supported) {
+> +        g_string_append_printf(s, "%sbooks (%u)", prefix, ms->smp.books);
+> +        prefix = multiply;
+> +    }
+> +
+> +    g_string_append_printf(s, "%ssockets (%u)", prefix, ms->smp.sockets);
+
+... it's followed by "sockets" here anyway, so adding the " * " at the end 
+of the strings above should be fine.
+
+>   {
+>       MachineClass *mc = MACHINE_GET_CLASS(ms);
+>       unsigned cpus    = config->has_cpus ? config->cpus : 0;
+> +    unsigned drawers = config->has_drawers ? config->drawers : 0;
+> +    unsigned books   = config->has_books ? config->books : 0;
+>       unsigned sockets = config->has_sockets ? config->sockets : 0;
+>       unsigned dies    = config->has_dies ? config->dies : 0;
+>       unsigned clusters = config->has_clusters ? config->clusters : 0;
+> @@ -85,6 +98,8 @@ void machine_parse_smp_config(MachineState *ms,
+>        * explicit configuration like "cpus=0" is not allowed.
+>        */
+>       if ((config->has_cpus && config->cpus == 0) ||
+> +        (config->has_drawers && config->drawers == 0) ||
+> +        (config->has_books && config->books == 0) ||
+>           (config->has_sockets && config->sockets == 0) ||
+>           (config->has_dies && config->dies == 0) ||
+>           (config->has_clusters && config->clusters == 0) ||
+> @@ -111,6 +126,19 @@ void machine_parse_smp_config(MachineState *ms,
+>       dies = dies > 0 ? dies : 1;
+>       clusters = clusters > 0 ? clusters : 1;
+>   
+> +    if (!mc->smp_props.books_supported && books > 1) {
+> +        error_setg(errp, "books not supported by this machine's CPU topology");
+> +        return;
+> +    }
+> +    books = books > 0 ? books : 1;
+
+Could be shortened to:  book = books ?: 1;
+
+> +    if (!mc->smp_props.drawers_supported && drawers > 1) {
+> +        error_setg(errp,
+> +                   "drawers not supported by this machine's CPU topology");
+> +        return;
+> +    }
+> +    drawers = drawers > 0 ? drawers : 1;
+
+Could be shortened to:  drawers = drawers ?: 1;
+
+>       /* compute missing values based on the provided ones */
+>       if (cpus == 0 && maxcpus == 0) {
+>           sockets = sockets > 0 ? sockets : 1;
+> @@ -124,33 +152,41 @@ void machine_parse_smp_config(MachineState *ms,
+>               if (sockets == 0) {
+>                   cores = cores > 0 ? cores : 1;
+>                   threads = threads > 0 ? threads : 1;
+> -                sockets = maxcpus / (dies * clusters * cores * threads);
+> +                sockets = maxcpus /
+> +                          (drawers * books * dies * clusters * cores * threads);
+>               } else if (cores == 0) {
+>                   threads = threads > 0 ? threads : 1;
+> -                cores = maxcpus / (sockets * dies * clusters * threads);
+> +                cores = maxcpus /
+> +                        (drawers * books * sockets * dies * clusters * threads);
+>               }
+
+(not very important, but I wonder whether we should maybe disallow 
+"prefer_sockets" with drawers and books instead of updating the calculation 
+here - since prefer_sockets should only occur on old machine types)
+
+>           } else {
+>               /* prefer cores over sockets since 6.2 */
+>               if (cores == 0) {
+>                   sockets = sockets > 0 ? sockets : 1;
+>                   threads = threads > 0 ? threads : 1;
+> -                cores = maxcpus / (sockets * dies * clusters * threads);
+> +                cores = maxcpus /
+> +                        (drawers * books * sockets * dies * clusters * threads);
+>               } else if (sockets == 0) {
+>                   threads = threads > 0 ? threads : 1;
+> -                sockets = maxcpus / (dies * clusters * cores * threads);
+> +                sockets = maxcpus /
+> +                          (drawers * books * dies * clusters * cores * threads);
+>               }
+>           }
+
+  Thomas
 
