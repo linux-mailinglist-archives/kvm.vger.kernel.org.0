@@ -2,193 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6A8296F0D1D
-	for <lists+kvm@lfdr.de>; Thu, 27 Apr 2023 22:27:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7DA026F0D3F
+	for <lists+kvm@lfdr.de>; Thu, 27 Apr 2023 22:35:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344238AbjD0U1b (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Apr 2023 16:27:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58726 "EHLO
+        id S1344280AbjD0UfB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Apr 2023 16:35:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34268 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229824AbjD0U1a (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 Apr 2023 16:27:30 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 087AF1993
-        for <kvm@vger.kernel.org>; Thu, 27 Apr 2023 13:26:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1682627211;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=sXYRHEqpsXervQOffemoFcDYMS9fKv62JnpEB8Yl5zQ=;
-        b=DyHu6/B6uwkWIqokmab/WhKpZ12wseP1ElP+qxWeMU1Hb2P4SytFcNC5egCrAK7cbgsY3R
-        zd3TuxQHkBwph0X8noZ8Z1SwjrQEeqUCSTD42uv9dHO/OhMjFvU4ed0yh25NXnMG7/frUb
-        T3Eg7om8etTNMAwC+bZfvBZE5uCxrBk=
-Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
- [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-177-Xr9GVg9bORqj0R7Hh7lISA-1; Thu, 27 Apr 2023 16:26:48 -0400
-X-MC-Unique: Xr9GVg9bORqj0R7Hh7lISA-1
-Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-74deffa28efso73153885a.1
-        for <kvm@vger.kernel.org>; Thu, 27 Apr 2023 13:26:47 -0700 (PDT)
+        with ESMTP id S1344036AbjD0Uey (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 Apr 2023 16:34:54 -0400
+Received: from mail-qt1-x830.google.com (mail-qt1-x830.google.com [IPv6:2607:f8b0:4864:20::830])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC9B83ABC
+        for <kvm@vger.kernel.org>; Thu, 27 Apr 2023 13:34:52 -0700 (PDT)
+Received: by mail-qt1-x830.google.com with SMTP id d75a77b69052e-3ef36d814a5so822851cf.0
+        for <kvm@vger.kernel.org>; Thu, 27 Apr 2023 13:34:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1682627692; x=1685219692;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=P1yyV2YzfH7rOLyHSf8GhXQSsNeJYF/6E6RCMyqSCyg=;
+        b=xWHYdie28I+Dez+Z3Rys12aHD1WWeZJoHzaHoIa7wcXOPIBcUJrSIuADWRfc0FdzxP
+         8e3l+bJ0YjkOB7WyI1b8J+NETOkP3kmkPs9FH1uEkMUSahlgQMCzLw7FUo6VwDEcAOH+
+         KwKw2xODiy/cUdO8T3O70ZcZ+cOoKsspZOqObuLm9JKxeqRkRgaJ/Dj4jPYu34hBtIfw
+         OesBLyuY6cCeCLFVB70JAVF0/PrWrbBH8zSa8RoScKsj/jSSeMgKmoe+4mDNk347ANPi
+         j7dZ+HIdnJGOx1H1aiH8QrWDYrHtXaKTqFJc7lYOyU3ysXPKDXYB+SWBbYpWApHo8paB
+         7j0A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682627207; x=1685219207;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=sXYRHEqpsXervQOffemoFcDYMS9fKv62JnpEB8Yl5zQ=;
-        b=YwGl9BJSZ9xdUyPIcBTuPR0iVG1GvszViVY4cud/oj5m5W7Wis4/Vd45rQQJjuplhQ
-         y7nmHgHaotoj4irQS+jBgE7TLTNYEOaAH4dQm4KB+HwOGgdzPWTZV/FHByO/Ig9hFEDU
-         KN3WNEWsk04FxLGu7pxohsakn4Q7qzJ9CKRpfcN6ZH4bV6iu2t+PUsw/GDkieEoT7fjs
-         XdK53+epLh2EnQiwnVE8Y9tBomto7YupBlaIel9LwuWZd+R3uv1CudG+5vADNi4EYh0L
-         orCLQmAmbhmnzZhMkhrQZRapogIUl1hWZH8YI+nOshA/2edN86vSPSrHlv7eLNbJgefh
-         y82w==
-X-Gm-Message-State: AC+VfDxHwm+NVW0KHGUKuuZGDg8maEpZ7tQfLiIrU3YwapZRt2PW31OH
-        o5xDms5JLer42xPegZUbQsWHzeNYClYIjkC20aY93LMZv8QsaofzQvhjRCD0kGtdXUn9hc4d6uC
-        /1fZwJRWNn3qM
-X-Received: by 2002:ac8:574c:0:b0:3f1:fdc3:1c34 with SMTP id 12-20020ac8574c000000b003f1fdc31c34mr3980301qtx.5.1682627206998;
-        Thu, 27 Apr 2023 13:26:46 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ71aAD+A9H07MKf/xnE7ljf+f7zYn5h9Th4ZXffSsHzzF+MxPtCESt/xfcjgxPd2cLPDDS/aA==
-X-Received: by 2002:ac8:574c:0:b0:3f1:fdc3:1c34 with SMTP id 12-20020ac8574c000000b003f1fdc31c34mr3980277qtx.5.1682627206757;
-        Thu, 27 Apr 2023 13:26:46 -0700 (PDT)
-Received: from x1n (bras-base-aurron9127w-grc-40-70-52-229-124.dsl.bell.ca. [70.52.229.124])
-        by smtp.gmail.com with ESMTPSA id l11-20020a05620a210b00b0074df8eefe2dsm6175293qkl.98.2023.04.27.13.26.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 27 Apr 2023 13:26:45 -0700 (PDT)
-Date:   Thu, 27 Apr 2023 16:26:44 -0400
-From:   Peter Xu <peterx@redhat.com>
-To:     Anish Moorthy <amoorthy@google.com>
-Cc:     Nadav Amit <nadav.amit@gmail.com>,
-        Axel Rasmussen <axelrasmussen@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, maz@kernel.org,
-        oliver.upton@linux.dev, Sean Christopherson <seanjc@google.com>,
-        James Houghton <jthoughton@google.com>, bgardon@google.com,
-        dmatlack@google.com, ricarkol@google.com,
-        kvm <kvm@vger.kernel.org>, kvmarm@lists.linux.dev
-Subject: Re: [PATCH v3 00/22] Improve scalability of KVM + userfaultfd live
- migration via annotated memory faults.
-Message-ID: <ZErahL/7DKimG+46@x1n>
-References: <20230412213510.1220557-1-amoorthy@google.com>
- <ZEBHTw3+DcAnPc37@x1n>
- <CAJHvVchBqQ8iVHgF9cVZDusMKQM2AjtNx2z=i9ZHP2BosN4tBg@mail.gmail.com>
- <ZEBXi5tZZNxA+jRs@x1n>
- <CAF7b7mo68VLNp=QynfT7QKgdq=d1YYGv1SEVEDxF9UwHzF6YDw@mail.gmail.com>
- <ZEGuogfbtxPNUq7t@x1n>
- <46DD705B-3A3F-438E-A5B1-929C1E43D11F@gmail.com>
- <CAF7b7mo78e2YPHU5YrhzuORdpGXCVRxXr6kSyMa+L+guW8jKGw@mail.gmail.com>
- <84DD9212-31FB-4AF6-80DD-9BA5AEA0EC1A@gmail.com>
- <CAF7b7mr-_U6vU1iOwukdmOoaT0G1ttyxD62cv=vebnQeXL3R0w@mail.gmail.com>
+        d=1e100.net; s=20221208; t=1682627692; x=1685219692;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=P1yyV2YzfH7rOLyHSf8GhXQSsNeJYF/6E6RCMyqSCyg=;
+        b=eni+3wrgNT/U1FDnovZhjZ0xismlNRgPeJNVBiskDM0e2QczDVEvbu+tpX9XAIPJqe
+         KeOCwAXfJO40/yvICbP3ZV7b8fOZu3F/XR6cWB8uASuqlgYy49IGdWJ589clEJ4sGuuW
+         1UwINmJVS23nJd4Wwh+eY25Lp5ReozPvjhKeoFfqZI/de4emNCxFfooTpSVXwzfCLLtk
+         tdoHAapUwHDRxyjABmSSCwN9u36ApVZaIXvl8HAnIyYpmPHcdnIlsGHxO0LZp54LV1hl
+         ezABTx8HsrH5LmVxSt9cJotVREHR5gcPboJ9iXfErynHYzn1DoBO13DgLjopA8ygbnF+
+         7SEQ==
+X-Gm-Message-State: AC+VfDzXRp0KSTS7caITtfA6KSSdHBSz3P5dC3T+NCO33CzaTIG1fHsM
+        /8xRZ1LxcyusqER4m9PX02RsgFN6tPoFHSRqklZ8hg==
+X-Google-Smtp-Source: ACHHUZ4UPSDWGdGeDyVcwUFiL8hMkoisHo6Rmqr+2so+fTP3z2DsM7cV0c+3kFYv5gQRh8jeVS7NjJKQsn0vWDjJbIY=
+X-Received: by 2002:ac8:5710:0:b0:3ef:5008:336f with SMTP id
+ 16-20020ac85710000000b003ef5008336fmr99178qtw.1.1682627691911; Thu, 27 Apr
+ 2023 13:34:51 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAF7b7mr-_U6vU1iOwukdmOoaT0G1ttyxD62cv=vebnQeXL3R0w@mail.gmail.com>
-X-Spam-Status: No, score=-2.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+References: <20230427201112.2164776-1-peterx@redhat.com> <20230427201112.2164776-3-peterx@redhat.com>
+In-Reply-To: <20230427201112.2164776-3-peterx@redhat.com>
+From:   James Houghton <jthoughton@google.com>
+Date:   Thu, 27 Apr 2023 13:34:16 -0700
+Message-ID: <CADrL8HUAY62FX_TYqU9ro4wfhJhcCAC-aDW=zUS5eYQTbWx3oA@mail.gmail.com>
+Subject: Re: [PATCH 2/2] selftests/kvm: Allow dump per-vcpu info for uffd threads
+To:     Peter Xu <peterx@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Anish Moorthy <amoorthy@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi, Anish,
+On Thu, Apr 27, 2023 at 1:11=E2=80=AFPM Peter Xu <peterx@redhat.com> wrote:
+>
+> There's one PER_VCPU_DEBUG in per-vcpu uffd threads but it's never hit.
+>
+> Trigger that when quit in normal ways (kick pollfd[1]), meanwhile fix the
+> number of nanosec calculation.
+>
+> Signed-off-by: Peter Xu <peterx@redhat.com>
 
-On Mon, Apr 24, 2023 at 05:15:49PM -0700, Anish Moorthy wrote:
-> On Mon, Apr 24, 2023 at 12:44 PM Nadav Amit <nadav.amit@gmail.com> wrote:
-> >
-> >
-> >
-> > > On Apr 24, 2023, at 10:54 AM, Anish Moorthy <amoorthy@google.com> wrote:
-> > >
-> > > On Fri, Apr 21, 2023 at 10:40 AM Nadav Amit <nadav.amit@gmail.com> wrote:
-> > >>
-> > >> If I understand the problem correctly, it sounds as if the proper solution
-> > >> should be some kind of a range-locks. If it is too heavy or the interface can
-> > >> be changed/extended to wake a single address (instead of a range),
-> > >> simpler hashed-locks can be used.
-> > >
-> > > Some sort of range-based locking system does seem relevant, although I
-> > > don't see how that would necessarily speed up the delivery of faults
-> > > to UFFD readers: I'll have to think about it more.
-> >
-> > Perhaps I misread your issue. Based on the scalability issues you raised,
-> > I assumed that the problem you encountered is related to lock contention.
-> > I do not know whether your profiled it, but some information would be
-> > useful.
-> 
-> No, you had it right: the issue at hand is contention on the uffd wait
-> queues. I'm just not sure what the range-based locking would really be
-> doing. Events would still have to be delivered to userspace in an
-> ordered manner, so it seems to me that each uffd would still need to
-> maintain a queue (and the associated contention).
-> 
-> With respect to the "sharding" idea, I collected some more runs of the
-> self test (full command in [1]). This time I omitted the "-a" flag, so
-> that every vCPU accesses a different range of guest memory with its
-> own UFFD, and set the number of reader threads per UFFD to 1.
-> 
-> vCPUs, Average Paging Rate (w/o new caps), Average Paging Rate (w/ new caps)
-> 1      180     307
-> 2       85      220
-> 4       80      206
-> 8       39     163
-> 16     18     104
-> 32      8      73
-> 64      4      57
-> 128    1      37
-> 256    1      16
-> 
-> I'm reporting paging rate on a per-vcpu rather than total basis, which
-> is why the numbers look so different than the ones in the cover
-> letter. I'm actually not sure why the demand paging rate falls off
-> with the number of vCPUs (maybe a prioritization issue on my side?),
-> but even when UFFDs aren't being contended for it's clear that demand
-> paging via memory fault exits is significantly faster.
-> 
-> I'll try to get some perf traces as well: that will take a little bit
-> of time though, as to do it for cycler will involve patching our VMM
-> first.
-> 
-> [1] ./demand_paging_test -b 64M -u MINOR -s shmem -v <n> -r 1 [-w]
+Reviewed-by: James Houghton <jthoughton@google.com>
 
-Thanks (for doing this test, and also to Nadav for all his inputs), and
-sorry for a late response.
+> ---
+>  tools/testing/selftests/kvm/lib/userfaultfd_util.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/tools/testing/selftests/kvm/lib/userfaultfd_util.c b/tools/t=
+esting/selftests/kvm/lib/userfaultfd_util.c
+> index 92cef20902f1..271f63891581 100644
+> --- a/tools/testing/selftests/kvm/lib/userfaultfd_util.c
+> +++ b/tools/testing/selftests/kvm/lib/userfaultfd_util.c
+> @@ -70,7 +70,7 @@ static void *uffd_handler_thread_fn(void *arg)
+>                         r =3D read(pollfd[1].fd, &tmp_chr, 1);
+>                         TEST_ASSERT(r =3D=3D 1,
+>                                     "Error reading pipefd in UFFD thread\=
+n");
+> -                       return NULL;
+> +                       break;
+>                 }
+>
+>                 if (!(pollfd[0].revents & POLLIN))
+> @@ -103,7 +103,7 @@ static void *uffd_handler_thread_fn(void *arg)
+>         ts_diff =3D timespec_elapsed(start);
+>         PER_VCPU_DEBUG("userfaulted %ld pages over %ld.%.9lds. (%f/sec)\n=
+",
+>                        pages, ts_diff.tv_sec, ts_diff.tv_nsec,
+> -                      pages / ((double)ts_diff.tv_sec + (double)ts_diff.=
+tv_nsec / 100000000.0));
+> +                      pages / ((double)ts_diff.tv_sec + (double)ts_diff.=
+tv_nsec / NSEC_PER_SEC));
 
-These numbers caught my eye, and I'm very curious why even 2 vcpus can
-scale that bad.
+I almost confused this fix for [1]. Thanks for catching this!
 
-I gave it a shot on a test machine and I got something slightly different:
+[1]: https://lore.kernel.org/kvm/20230223001805.2971237-1-amoorthy@google.c=
+om/
 
-  Intel(R) Xeon(R) CPU E5-2630 v4 @ 2.20GHz (20 cores, 40 threads)
-  $ ./demand_paging_test -b 512M -u MINOR -s shmem -v N
-  |-------+----------+--------|
-  | n_thr | per-vcpu | total  |
-  |-------+----------+--------|
-  |     1 | 39.5K    | 39.5K  |
-  |     2 | 33.8K    | 67.6K  |
-  |     4 | 31.8K    | 127.2K |
-  |     8 | 30.8K    | 246.1K |
-  |    16 | 21.9K    | 351.0K |
-  |-------+----------+--------|
-
-I used larger ram due to less cores.  I didn't try 32+ vcpus to make sure I
-don't have two threads content on a core/thread already since I only got 40
-hardware threads there, but still we can compare with your lower half.
-
-When I was testing I noticed bad numbers and another bug on not using
-NSEC_PER_SEC properly, so I did this before the test:
-
-https://lore.kernel.org/all/20230427201112.2164776-1-peterx@redhat.com/
-
-I think it means it still doesn't scale that good, however not so bad
-either - no obvious 1/2 drop on using 2vcpus.  There're still a bunch of
-paths triggered in the test so I also don't expect it to fully scale
-linearly.  From my numbers I just didn't see as drastic as yours. I'm not
-sure whether it's simply broken test number, parameter differences
-(e.g. you used 64M only per-vcpu), or hardware differences.
-
--- 
-Peter Xu
-
+>
+>         return NULL;
+>  }
+> --
+> 2.39.1
+>
