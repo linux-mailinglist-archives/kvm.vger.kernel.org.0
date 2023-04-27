@@ -2,87 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3A1E56F0598
-	for <lists+kvm@lfdr.de>; Thu, 27 Apr 2023 14:17:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 892F26F05ED
+	for <lists+kvm@lfdr.de>; Thu, 27 Apr 2023 14:38:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243863AbjD0MRb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Apr 2023 08:17:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36442 "EHLO
+        id S243747AbjD0Mis (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Apr 2023 08:38:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52726 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243386AbjD0MR1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 Apr 2023 08:17:27 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0115B4C37;
-        Thu, 27 Apr 2023 05:17:24 -0700 (PDT)
-Received: from pps.filterd (m0353723.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 33RBvAHQ017905;
-        Thu, 27 Apr 2023 12:17:23 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=ClN6svg5Zbke6G0BMK6b7HlcsiI44LgCgTwEaaJW9M8=;
- b=kmSFr1CXti/kglDD+dZes7LK7kKGp0PyHYZLwbiT0O8M9xPvLsSm/5ri/XmtVaGod4go
- iVTZ16zLXQ+KZklahXs/L12B/bId+43ZrnZ8w0yk3AMh/2XrXCVxdzX9KBS9bzdEl00b
- HvOhd7jUUN8g66nfOWV5qmUrsQWSTPL2K2zA0K5rRZp8+yCc6LLBTBKF1eyzyPcoHH5e
- 1dVWH9fydVTFrJVNjFhX3qe/N0zEg6CR1lTZxzXfwk55qsOv1dRnSIEI7nSnXTgUw2zV
- 1niAXiEjrNmMKHljbGfESfBBZ4mT5lIoMGlvTZQhfJ/g3tQomUwUIyvKlEywS5FZHvH5 AQ== 
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3q7nru5nkw-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 27 Apr 2023 12:17:22 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 33QLrcxP007999;
-        Thu, 27 Apr 2023 12:17:19 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-        by ppma03ams.nl.ibm.com (PPS) with ESMTPS id 3q47772xnn-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 27 Apr 2023 12:17:19 +0000
-Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-        by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 33RCHECT21299536
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 27 Apr 2023 12:17:14 GMT
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 320C52004D;
-        Thu, 27 Apr 2023 12:17:14 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C70FB20040;
-        Thu, 27 Apr 2023 12:17:13 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.152.224.56])
-        by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Thu, 27 Apr 2023 12:17:13 +0000 (GMT)
-Date:   Thu, 27 Apr 2023 14:17:11 +0200
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Heiko Carstens <hca@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-s390@vger.kernel.org, frankja@linux.ibm.com,
-        borntraeger@de.ibm.com, nrb@linux.ibm.com, nsg@linux.ibm.com,
-        seiden@linux.ibm.com, jgg@nvidia.com
-Subject: Re: [PATCH v2 1/1] KVM: s390: fix race in gmap_make_secure
-Message-ID: <20230427141711.6b071148@p-imbrenda>
-In-Reply-To: <ZEpkFzFFEpqa9zMv@osiris>
-References: <20230426134834.35199-1-imbrenda@linux.ibm.com>
-        <20230426134834.35199-2-imbrenda@linux.ibm.com>
-        <ZEpUEF7H86E9vVfS@osiris>
-        <20230427134649.1e482d91@p-imbrenda>
-        <ZEpkFzFFEpqa9zMv@osiris>
-Organization: IBM
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
+        with ESMTP id S243513AbjD0Mir (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 Apr 2023 08:38:47 -0400
+Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9751DC2
+        for <kvm@vger.kernel.org>; Thu, 27 Apr 2023 05:38:45 -0700 (PDT)
+Received: by mail-pf1-x433.google.com with SMTP id d2e1a72fcca58-64115eef620so4573672b3a.1
+        for <kvm@vger.kernel.org>; Thu, 27 Apr 2023 05:38:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1682599125; x=1685191125;
+        h=content-transfer-encoding:to:subject:message-id:date:from
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=lveTZ5JeoD/bLSzQdM3ZOxUdvr2aGEOFivaadln6H74=;
+        b=AAlO74sHsj0bkipg8Q2VyWtY31LXgdhfzaJEjVUwIFrvyWwKDHO5A5S8C29NF7M2nd
+         8Nk4NQSkXo9TGwmQv/+A7DF+R1ulUqLDCtXHXxxhSBSw8jHljVwf4i1WUTOauye46/A/
+         yflFoAhrd8QFIU9X9zNUeN07aAdMViM5Ub4zaWE3/t7YjrKl0EEcqmSjkQkDdkqK5X1K
+         AaiQDwICA2X9MGQXuz2kbpoI7UOPe5Rg4AyHqyArpp8THP3E3GXeZqb+h1ypby7zcoVD
+         eLcIOAnrie8CkSwTteUZ/0AxPCeaZyGs7+lRoB0UdZhjE/2nVgflpxLDBz3bLOOCPY2W
+         1HiA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1682599125; x=1685191125;
+        h=content-transfer-encoding:to:subject:message-id:date:from
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=lveTZ5JeoD/bLSzQdM3ZOxUdvr2aGEOFivaadln6H74=;
+        b=MxIGz1HKQRkatLyHl26Orey8xEHQIpKO7n8R0MJuStsKrpLi+Y37s9UFDDQ8QSJ3xY
+         Rhbw6I191lKx2RILcdQ9mzrogbFn4nrvxcPy2UhSd/2QnHZFJkSkg0IIBEbqn3h8YWk0
+         a9ibM53ZAN4NLPRtw7RglhZkwX9xKBlOZHZRR4ca0UZRIeRuZdJFn8CD7mNWIV/qQDMl
+         8sq6ZdjsD7k2BzI/7z1qEs9WjbmjsMPVdcge8l4jorUR2rzUKs6+th0Iqbgt4F/U74RC
+         ATND+wT9Q2xbJ9KYGsvMQF12jLJJd4tjL5ZOcHfiIGB0a857hoo9rQKOBqVqGHyVuDSB
+         a7Ww==
+X-Gm-Message-State: AC+VfDxJBDJPUGhZCLIhmEaZeTKCch2b3QIMW3ZRNtRQW9DsDz4DcIuZ
+        tvts8Z+JRStc6/ZrYLdJrcNuoHIUQBhexHQYdZ3xBEoZxaSNQI9R
+X-Google-Smtp-Source: ACHHUZ5zRHa/okc+ncOo0uRJ4SpfYcOHIsZTbD4c1vQz3SFXaL69W9XtuRh/YoNqV7M+zyDrb4rlPwzZ24Q5Mnd02gQ=
+X-Received: by 2002:a17:90a:dc18:b0:247:e54:2ca4 with SMTP id
+ i24-20020a17090adc1800b002470e542ca4mr2145245pjv.19.1682599124790; Thu, 27
+ Apr 2023 05:38:44 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: PDs8fp8EefkxdtV-yjHqzbCTSpNMHlzc
-X-Proofpoint-ORIG-GUID: PDs8fp8EefkxdtV-yjHqzbCTSpNMHlzc
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
- definitions=2023-04-27_07,2023-04-27_01,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 clxscore=1015
- bulkscore=0 mlxlogscore=732 impostorscore=0 adultscore=0 malwarescore=0
- lowpriorityscore=0 suspectscore=0 mlxscore=0 spamscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2303200000 definitions=main-2304270106
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+From:   zhuangel570 <zhuangel570@gmail.com>
+Date:   Thu, 27 Apr 2023 20:38:32 +0800
+Message-ID: <CANZk6aSv5ta3emitOfWKxaB-JvURBVu-sXqFnCz9PKXhqjbV9w@mail.gmail.com>
+Subject: Latency issues inside KVM.
+To:     kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
+        FREEMAIL_FROM,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
         T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -90,47 +63,65 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 27 Apr 2023 14:01:27 +0200
-Heiko Carstens <hca@linux.ibm.com> wrote:
+Hi
 
-> On Thu, Apr 27, 2023 at 01:46:49PM +0200, Claudio Imbrenda wrote:
-> > On Thu, 27 Apr 2023 12:53:04 +0200
-> > Heiko Carstens <hca@linux.ibm.com> wrote:
-> >   
-> > > On Wed, Apr 26, 2023 at 03:48:34PM +0200, Claudio Imbrenda wrote:  
-> > > > This patch fixes a potential race in gmap_make_secure and removes the
-> > > > last user of follow_page without FOLL_GET.
-> > > > 
-> > > > Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-> > > > Suggested-by: Jason Gunthorpe <jgg@nvidia.com>
-> > > > Fixes: 214d9bbcd3a6 ("s390/mm: provide memory management functions for protected KVM guests")
-> > > > ---
-> > > >  arch/s390/kernel/uv.c | 32 +++++++++++---------------------
-> > > >  1 file changed, 11 insertions(+), 21 deletions(-)    
-> > > 
-> > > It would be helpful if this would be a bit more descriptive. "Fix
-> > > race" is not very helpful :)
-> > > 
-> > > What race does this fix?
-> > > When can this happen?
-> > > What are the consequences if the race window is being hit?  
-> > 
-> > We are locking something we don't have a reference to, and as explained
-> > by Jason and David in this thread <Y9J4P/RNvY1Ztn0Q@nvidia.com> it can
-> > lead to all kind of bad things, including the page getting
-> > unmapped (MADV_DONTNEED), freed, reallocated as a larger folio and the
-> > unlock_page() would target the wrong bit.
-> > 
-> > Also there is another race with the FOLL_WRITE, which could race
-> > between the follow_page and the get_locked_pte.
-> > 
-> > The main point of the patch is to remove the last follow_page without
-> > FOLL_GET or FOLL_PIN, removing the races can be considered a nice bonus.  
-> 
-> I've seen that discussion. What I'm actually asking for is that all of
-> this information should be added to the commit description. Nobody
-> will remember any of the details in one year.
+We found some latency issue in high-density and high-concurrency scenarios,=
+ we
+are using cloud hypervisor as vmm for lightweight VM, using VIRTIO net and
+block for VM. In our test, we got about 50ms to 100ms+ latency in creating =
+VM
+and register irqfd, after trace with funclatency (a tool of bcc-tools,
+https://github.com/iovisor/bcc), we found the latency introduced by followi=
+ng
+functions:
 
-I will put it in the patch description.
+- irq_bypass_register_consumer introduce more than 60ms per VM.
+  This function was called when registering irqfd, the function will regist=
+er
+  irqfd as consumer to irqbypass, wait for connecting from irqbypass produc=
+ers,
+  like VFIO or VDPA. In our test, one irqfd register will get about 4ms
+  latency, and 5 devices with total 16 irqfd will introduce more than 60ms
+  latency.
 
-do you think the text above is enough?
+- kvm_vm_create_worker_thread introduce tail latency more than 100ms.
+  This function was called when create "kvm-nx-lpage-recovery" kthread when
+  create a new VM, this patch was introduced to recovery large page to reli=
+ef
+  performance loss caused by software mitigation of ITLB_MULTIHIT, see
+  b8e8c8303ff2 ("kvm: mmu: ITLB_MULTIHIT mitigation") and 1aa9b9572b10
+  ("kvm: x86: mmu: Recovery of shattered NX large pages").
+
+Here is a simple case, which can emulate the latency issue (the real latenc=
+y
+is lager). The case create 800 VM as background do nothing, then repeatedly
+create 20 VM then destroy them after 400ms, every VM will do simple thing,
+create in kernel irq chip, and register 15 riqfd (emulate 5 devices and eve=
+ry
+device has 3 irqfd), just trace the two function latency, you will reproduc=
+e
+such kind latency issue. Here is a trace log on Xeon(R) Platinum 8255C serv=
+er
+(96C, 2 sockets) with linux 6.2.20.
+
+Reproduce Case
+https://github.com/zhuangel/misc/blob/main/test/kvm_irqfd_fork/kvm_irqfd_fo=
+rk.c
+Reproduce log
+https://github.com/zhuangel/misc/blob/main/test/kvm_irqfd_fork/test.log
+
+To fix these latencies, I didn't have a graceful method, just simple ideas
+is give user a chance to avoid these latencies, like a module parameter to
+disable "kvm-nx-lpage-recovery" kthread and new flag to disable irqbypass
+for each irqfd.
+
+Any suggestion to fix the issue if welcomed.
+
+Thanks!
+
+--=20
+=E2=80=94=E2=80=94=E2=80=94=E2=80=94=E2=80=94=E2=80=94=E2=80=94=E2=80=94=E2=
+=80=94=E2=80=94
+   zhuangel570
+=E2=80=94=E2=80=94=E2=80=94=E2=80=94=E2=80=94=E2=80=94=E2=80=94=E2=80=94=E2=
+=80=94=E2=80=94
