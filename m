@@ -2,240 +2,163 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CAD6F6F024D
-	for <lists+kvm@lfdr.de>; Thu, 27 Apr 2023 10:05:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C8A296F026B
+	for <lists+kvm@lfdr.de>; Thu, 27 Apr 2023 10:18:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242777AbjD0IF0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Apr 2023 04:05:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34778 "EHLO
+        id S243009AbjD0IST (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Apr 2023 04:18:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40656 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242675AbjD0IFY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 Apr 2023 04:05:24 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3EA54684
-        for <kvm@vger.kernel.org>; Thu, 27 Apr 2023 01:04:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1682582659;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=R36dlmlB7mS4Q+5i4QZDZFJ2WCUffsynJFMD103cOFM=;
-        b=D6cUeqbnyGKWIY1AXs+6PkCRMpJsLG/npJ/3/5P6UiCjojAfCtkLouv76CT+DADfHpUupf
-        JPgSyF0mXow6KSU3eSNUZEWReVRHBZ0ZF1J/r/xeqLDulkWI8Zc+Ys1McK+LNvlKDR3Uf0
-        5MP1VGTHGkz0miFLrm8i8ADT22WhN38=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-479-KUIpq8RgMCWrGrOc59Icaw-1; Thu, 27 Apr 2023 04:04:17 -0400
-X-MC-Unique: KUIpq8RgMCWrGrOc59Icaw-1
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-301110f1756so2988516f8f.0
-        for <kvm@vger.kernel.org>; Thu, 27 Apr 2023 01:04:17 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682582656; x=1685174656;
-        h=content-transfer-encoding:in-reply-to:subject:from:references:cc:to
-         :content-language:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=R36dlmlB7mS4Q+5i4QZDZFJ2WCUffsynJFMD103cOFM=;
-        b=XYYyP7MrLdwt4N8EQcQknSReX1IVfcYf1GamJwu7Y642FdFnfb61SgpsIbCbaKjoct
-         ISDmkhs65hEwnI9LmEi9Ih2+jK/gSvFWh8XWxszyNsSrxF5VFZOkY2vrPkCnLol7qLdX
-         CEgFSf+6NyrEvjA1WEmnaYbdOJlIeTOBCofxsmSGdEv+GT5VxkpozJTTmRIwAi6dqhb1
-         mSdIZ2sb/PYtjpV2viWHZbBbMIZKV+zXY88v7dcERfEFJ3+PTHn2UUiZw2A1U7qkXvj2
-         y+WA8FlHqI4F7nd3xKOQ8b1eS1Jnkfpu5pe+0i++hEE+a+gORozWKxHHOrQ/gitpaJH9
-         JkpA==
-X-Gm-Message-State: AC+VfDwFD5Ai1yMmPr2GJn8n63cNLVxkcnrjuZ4JUQBbSt4X7nqynarw
-        Zvc9WF203iU8uL0VGeUdyampy7J18bQb0BiuB8KRtC+5q37bKVlwBAicroX4Sk4haGvtjaZw/Eg
-        pjtTgCc0NCLe/65nPNdER
-X-Received: by 2002:a5d:474a:0:b0:2cf:efc7:19ad with SMTP id o10-20020a5d474a000000b002cfefc719admr575919wrs.53.1682582656434;
-        Thu, 27 Apr 2023 01:04:16 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ4nVcazw8m5wVRp5FQUk5kfDzYaCyFFT7YJ2VExk+yhU598C2ZQJMln+TwZ9wHCxJsfS15UqA==
-X-Received: by 2002:a5d:474a:0:b0:2cf:efc7:19ad with SMTP id o10-20020a5d474a000000b002cfefc719admr575892wrs.53.1682582656101;
-        Thu, 27 Apr 2023 01:04:16 -0700 (PDT)
-Received: from [10.33.192.205] (nat-pool-str-t.redhat.com. [149.14.88.106])
-        by smtp.gmail.com with ESMTPSA id i3-20020adff303000000b002f4cf72fce6sm17882206wro.46.2023.04.27.01.04.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 27 Apr 2023 01:04:15 -0700 (PDT)
-Message-ID: <45e09800-6a47-0372-5244-16e2dc72370d@redhat.com>
-Date:   Thu, 27 Apr 2023 10:04:13 +0200
+        with ESMTP id S242972AbjD0ISR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 Apr 2023 04:18:17 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E726F4209;
+        Thu, 27 Apr 2023 01:18:16 -0700 (PDT)
+Received: from pps.filterd (m0353726.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 33R8Bdcf026752;
+        Thu, 27 Apr 2023 08:18:16 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=C2nC8yJYn3KBTd9V+RRBEnruNGtjUcQ7I+qfOytYPS0=;
+ b=UWXQZryltefJR2FZVT87kXbCOZNJ9QTdhmktOg5VlLiKxNW5KqvsipkG+VOS99n4LnnV
+ myvXx2tnT0/ad6UyPqX/qobjCVIGOF0BRAtC4BUd0rgFhw4UflkvkLQGBQUiMebMiOd7
+ L/xE2WRkwJTX3Zyw+iWzZaRRLA+iZ2da9WxMDSHjyRdavK3N10CVQwAElccMWiFANE2e
+ wz5L3PTMYQ/sWQFSIBUG6ufoMoaTNbEAOLfw/4nxkSB9V5vzvpHQqHpweRFhOIdkxVnP
+ BgdhLX/V/jfldqfD93b0xrElmCyLTusOhiNXVkIBYY62CRJb3hFDD2LCusS8D67f1Wfm Dg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3q7mp59hy5-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 27 Apr 2023 08:18:16 +0000
+Received: from m0353726.ppops.net (m0353726.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 33R86agg000994;
+        Thu, 27 Apr 2023 08:18:15 GMT
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3q7mp59hx6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 27 Apr 2023 08:18:15 +0000
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 33R86T8M026654;
+        Thu, 27 Apr 2023 08:18:13 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+        by ppma06ams.nl.ibm.com (PPS) with ESMTPS id 3q46ug2tfr-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 27 Apr 2023 08:18:13 +0000
+Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
+        by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 33R8IAtK55312698
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 27 Apr 2023 08:18:10 GMT
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 057AC20043;
+        Thu, 27 Apr 2023 08:18:10 +0000 (GMT)
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 8191620040;
+        Thu, 27 Apr 2023 08:18:09 +0000 (GMT)
+Received: from [9.171.19.188] (unknown [9.171.19.188])
+        by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+        Thu, 27 Apr 2023 08:18:09 +0000 (GMT)
+Message-ID: <2a792249-c6b1-ea85-7084-41412d2c7512@linux.ibm.com>
+Date:   Thu, 27 Apr 2023 10:18:08 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.9.0
+ Thunderbird/102.8.0
+Subject: Re: [kvm-unit-tests PATCH v8 1/2] s390x: topology: Check the Perform
+ Topology Function
+To:     Nico Boehr <nrb@linux.ibm.com>, linux-s390@vger.kernel.org
+Cc:     frankja@linux.ibm.com, thuth@redhat.com, kvm@vger.kernel.org,
+        imbrenda@linux.ibm.com, david@redhat.com, nsg@linux.ibm.com
+References: <20230426083426.6806-1-pmorel@linux.ibm.com>
+ <20230426083426.6806-2-pmorel@linux.ibm.com>
+ <168257865594.44728.1799002877053720751@t14-nrb>
 Content-Language: en-US
-To:     Pierre Morel <pmorel@linux.ibm.com>, qemu-s390x@nongnu.org
-Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
-        richard.henderson@linaro.org, david@redhat.com, cohuck@redhat.com,
-        mst@redhat.com, pbonzini@redhat.com, kvm@vger.kernel.org,
-        ehabkost@redhat.com, marcel.apfelbaum@gmail.com, eblake@redhat.com,
-        armbru@redhat.com, seiden@linux.ibm.com, nrb@linux.ibm.com,
-        nsg@linux.ibm.com, frankja@linux.ibm.com, berrange@redhat.com,
-        clg@kaod.org
-References: <20230425161456.21031-1-pmorel@linux.ibm.com>
- <20230425161456.21031-2-pmorel@linux.ibm.com>
-From:   Thomas Huth <thuth@redhat.com>
-Subject: Re: [PATCH v20 01/21] s390x/cpu topology: add s390 specifics to CPU
- topology
-In-Reply-To: <20230425161456.21031-2-pmorel@linux.ibm.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+In-Reply-To: <168257865594.44728.1799002877053720751@t14-nrb>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: W-2rsIpVLFvslpixrKMh9ARQWHT7pxdP
+X-Proofpoint-ORIG-GUID: 2SKhQFSRCbhwU3Z9V9Mu52CqeVfYyEbf
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
+ definitions=2023-04-27_05,2023-04-26_03,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 impostorscore=0
+ mlxlogscore=870 lowpriorityscore=0 suspectscore=0 priorityscore=1501
+ clxscore=1015 spamscore=0 adultscore=0 phishscore=0 mlxscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2303200000 definitions=main-2304270069
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 25/04/2023 18.14, Pierre Morel wrote:
-> S390 adds two new SMP levels, drawers and books to the CPU
-> topology.
-> The S390 CPU have specific topology features like dedication
-> and entitlement to give to the guest indications on the host
-> vCPUs scheduling and help the guest take the best decisions
-> on the scheduling of threads on the vCPUs.
-> 
-> Let us provide the SMP properties with books and drawers levels
-> and S390 CPU with dedication and entitlement,
-> 
-> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
-> ---
-...> diff --git a/qapi/machine-target.json b/qapi/machine-target.json
-> index 2e267fa458..42a6a40333 100644
-> --- a/qapi/machine-target.json
-> +++ b/qapi/machine-target.json
-> @@ -342,3 +342,15 @@
->                      'TARGET_S390X',
->                      'TARGET_MIPS',
->                      'TARGET_LOONGARCH64' ] } }
-> +
-> +##
-> +# @CpuS390Polarization:
-> +#
-> +# An enumeration of cpu polarization that can be assumed by a virtual
-> +# S390 CPU
-> +#
-> +# Since: 8.1
-> +##
-> +{ 'enum': 'CpuS390Polarization',
-> +  'prefix': 'S390_CPU_POLARIZATION',
-> +  'data': [ 'horizontal', 'vertical' ] }
 
-It seems like you don't need this here yet ... I think you likely could also 
-introduce it in a later patch instead (patch 11 seems the first one that 
-needs this?)
+On 4/27/23 08:57, Nico Boehr wrote:
+> Quoting Pierre Morel (2023-04-26 10:34:25)
+> [...]
+>> diff --git a/s390x/topology.c b/s390x/topology.c
+>> new file mode 100644
+>> index 0000000..07f1650
+>> --- /dev/null
+>> +++ b/s390x/topology.c
+>> @@ -0,0 +1,191 @@
+> [...]
+>> +#define PTF_INVALID_FUNCTION   0xff
+> No longer used?
 
-Also, would a " 'if': 'TARGET_S390X' " be possible here, too?
 
-> diff --git a/hw/core/machine-smp.c b/hw/core/machine-smp.c
-> index c3dab007da..77bee06304 100644
-> --- a/hw/core/machine-smp.c
-> +++ b/hw/core/machine-smp.c
-> @@ -30,8 +30,19 @@ static char *cpu_hierarchy_to_string(MachineState *ms)
->   {
->       MachineClass *mc = MACHINE_GET_CLASS(ms);
->       GString *s = g_string_new(NULL);
-> +    const char *multiply = " * ", *prefix = "";
->   
-> -    g_string_append_printf(s, "sockets (%u)", ms->smp.sockets);
-> +    if (mc->smp_props.drawers_supported) {
-> +        g_string_append_printf(s, "drawers (%u)", ms->smp.drawers);
-> +        prefix = multiply;
+right
 
-That "prefix" stuff looks complicated ... why don't you simply add the "*" 
-at the end of the strings:
 
-     g_string_append_printf(s, "drawers (%u) * ",
-                            ms->smp.drawers);
+>
+> [...]
+>> +static void check_specifications(void)
+>> +{
+>> +       unsigned long wrong_bits = 0;
+>> +       unsigned long ptf_bits;
+>> +       unsigned long rc;
+>> +       int i;
+>> +
+>> +       report_prefix_push("Specifications");
+>> +
+>> +       /* Function codes above 3 are undefined */
+>> +       for (i = 4; i < 255; i++) {
+>> +               expect_pgm_int();
+>> +               ptf(i, &rc);
+>> +               mb();
+>> +               if (lowcore.pgm_int_code != PGM_INT_CODE_SPECIFICATION) {
+> Please use clear_pgm_int(), the return value will be the interruption code. You can also get rid of the barrier then.
+>
+> Also, using wrong_bits is confusing here since it serves a completely different purpose below.
+>
+> Maybe just:
+>
+> if (clear_pgm_int() != PGM_INT_CODE_SPECIFICATION)
+>      report_fail("FC %d did not yield specification exception", i);
 
-?
+OK, thanks,
 
-> +    }
-> +
-> +    if (mc->smp_props.books_supported) {
-> +        g_string_append_printf(s, "%sbooks (%u)", prefix, ms->smp.books);
-> +        prefix = multiply;
-> +    }
-> +
-> +    g_string_append_printf(s, "%ssockets (%u)", prefix, ms->smp.sockets);
 
-... it's followed by "sockets" here anyway, so adding the " * " at the end 
-of the strings above should be fine.
+>
+> [...]
+>> +       /* Reserved bits must be 0 */
+>> +       for (i = 8, wrong_bits = 0; i < 64; i++) {
+>> +               ptf_bits = 0x01UL << i;
+>> +               expect_pgm_int();
+>> +               ptf(ptf_bits, &rc);
+>> +               mb();
+>> +               if (lowcore.pgm_int_code != PGM_INT_CODE_SPECIFICATION)
+> Also use clear_pgm_int() here.
 
->   {
->       MachineClass *mc = MACHINE_GET_CLASS(ms);
->       unsigned cpus    = config->has_cpus ? config->cpus : 0;
-> +    unsigned drawers = config->has_drawers ? config->drawers : 0;
-> +    unsigned books   = config->has_books ? config->books : 0;
->       unsigned sockets = config->has_sockets ? config->sockets : 0;
->       unsigned dies    = config->has_dies ? config->dies : 0;
->       unsigned clusters = config->has_clusters ? config->clusters : 0;
-> @@ -85,6 +98,8 @@ void machine_parse_smp_config(MachineState *ms,
->        * explicit configuration like "cpus=0" is not allowed.
->        */
->       if ((config->has_cpus && config->cpus == 0) ||
-> +        (config->has_drawers && config->drawers == 0) ||
-> +        (config->has_books && config->books == 0) ||
->           (config->has_sockets && config->sockets == 0) ||
->           (config->has_dies && config->dies == 0) ||
->           (config->has_clusters && config->clusters == 0) ||
-> @@ -111,6 +126,19 @@ void machine_parse_smp_config(MachineState *ms,
->       dies = dies > 0 ? dies : 1;
->       clusters = clusters > 0 ? clusters : 1;
->   
-> +    if (!mc->smp_props.books_supported && books > 1) {
-> +        error_setg(errp, "books not supported by this machine's CPU topology");
-> +        return;
-> +    }
-> +    books = books > 0 ? books : 1;
 
-Could be shortened to:  book = books ?: 1;
+OK, too, thanks
 
-> +    if (!mc->smp_props.drawers_supported && drawers > 1) {
-> +        error_setg(errp,
-> +                   "drawers not supported by this machine's CPU topology");
-> +        return;
-> +    }
-> +    drawers = drawers > 0 ? drawers : 1;
 
-Could be shortened to:  drawers = drawers ?: 1;
+Regards,
 
->       /* compute missing values based on the provided ones */
->       if (cpus == 0 && maxcpus == 0) {
->           sockets = sockets > 0 ? sockets : 1;
-> @@ -124,33 +152,41 @@ void machine_parse_smp_config(MachineState *ms,
->               if (sockets == 0) {
->                   cores = cores > 0 ? cores : 1;
->                   threads = threads > 0 ? threads : 1;
-> -                sockets = maxcpus / (dies * clusters * cores * threads);
-> +                sockets = maxcpus /
-> +                          (drawers * books * dies * clusters * cores * threads);
->               } else if (cores == 0) {
->                   threads = threads > 0 ? threads : 1;
-> -                cores = maxcpus / (sockets * dies * clusters * threads);
-> +                cores = maxcpus /
-> +                        (drawers * books * sockets * dies * clusters * threads);
->               }
-
-(not very important, but I wonder whether we should maybe disallow 
-"prefer_sockets" with drawers and books instead of updating the calculation 
-here - since prefer_sockets should only occur on old machine types)
-
->           } else {
->               /* prefer cores over sockets since 6.2 */
->               if (cores == 0) {
->                   sockets = sockets > 0 ? sockets : 1;
->                   threads = threads > 0 ? threads : 1;
-> -                cores = maxcpus / (sockets * dies * clusters * threads);
-> +                cores = maxcpus /
-> +                        (drawers * books * sockets * dies * clusters * threads);
->               } else if (sockets == 0) {
->                   threads = threads > 0 ? threads : 1;
-> -                sockets = maxcpus / (dies * clusters * cores * threads);
-> +                sockets = maxcpus /
-> +                          (drawers * books * dies * clusters * cores * threads);
->               }
->           }
-
-  Thomas
+Pierre
 
