@@ -2,117 +2,174 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1F0A86F1028
-	for <lists+kvm@lfdr.de>; Fri, 28 Apr 2023 04:00:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 499086F119F
+	for <lists+kvm@lfdr.de>; Fri, 28 Apr 2023 08:10:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344802AbjD1CAd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Apr 2023 22:00:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60380 "EHLO
+        id S1345356AbjD1GJy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 Apr 2023 02:09:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33672 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344784AbjD1CA3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 Apr 2023 22:00:29 -0400
-Received: from mail-vk1-xa2e.google.com (mail-vk1-xa2e.google.com [IPv6:2607:f8b0:4864:20::a2e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 410EB4680
-        for <kvm@vger.kernel.org>; Thu, 27 Apr 2023 19:00:28 -0700 (PDT)
-Received: by mail-vk1-xa2e.google.com with SMTP id 71dfb90a1353d-440364c90d6so3123266e0c.0
-        for <kvm@vger.kernel.org>; Thu, 27 Apr 2023 19:00:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=igel-co-jp.20221208.gappssmtp.com; s=20221208; t=1682647227; x=1685239227;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gl4UcZhexIohjefd4ELF83XHOyhrEBsBVG6iR4uVgNM=;
-        b=ABdw2dWYlDukm9J5D/DtEXqh1ZkOJzYRX/FH3TiKebIZ/Knwom7xTvnBcM6RBDtyBv
-         /o+AGSG3yYgkFJohuBV0zBLSCW5wVo4W4ABLqmMLaj7npr2oeW7zXXDTNnmQtW1zW97c
-         Xy7n3edElkqWMvaiYaCXQFZ0GwX7I55GYirDnbpn/u4FF1oBrUtk+VPn7xh0xlk2Si0Z
-         +XDaJBe1wKBcAOkXuW8yvtyYdvYNaJCTqICXqUTnIxh9c8hXe+G4aDeTWYJif2kXaLYX
-         622PYWOoA0S1Z1jyQ9xHyjU1Ru4af3D3Hd8TyEgTObKCimt9ltptfWqv+jCe0BTHxVZ0
-         SgRA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682647227; x=1685239227;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=gl4UcZhexIohjefd4ELF83XHOyhrEBsBVG6iR4uVgNM=;
-        b=UigWkxZ3GNQ6BsBoKJ/jOoQx7A1e8OqJgNSJ4btMYGwPMWZfVqg3m1u9hKe7enjFt5
-         7ZaEry8l9KbIHWIcQEz/BULLjdAPHV4J3nr1aiLHK6NeY6WBkpYA1ib6hYTmyZ1DcCWx
-         C1O8xCPFYf/qet8tKe9B1ewltJrQaY1zA1kJfoSnfhvXE5KA35GyluV1ivcFp/5QumFz
-         qxKEmnrXfDMRUi+l3DeRfrCrH1VqTMy6KM9aqJU15CNYtTzM1pwKW5g4bplgMqX6mWFn
-         9WOAJggBNv7edALmf04VtZJIYEoY4pFm7o6xEC0ryyl5UsywDAQqQ9KbJBf1M2EH9lCW
-         phtQ==
-X-Gm-Message-State: AC+VfDzDWqIafIHlG7eO0+U0jsxZGi3eSChpnFLaeSl9jjR33OdmuWr9
-        AYsI1CI+5NH0Q6yibzDc+TqtPNTOpNEGvBxt2Ffsy5dt+SGOLiWQ
-X-Google-Smtp-Source: ACHHUZ6bXAHX3os0g+edZnDMBXePIfbnxThJdyz0sgMrCWX55u39Ow0FXGJjamRkioyW0WH1Feggfua5iFpnPLCBbuM=
-X-Received: by 2002:a1f:3f43:0:b0:443:9b17:72e9 with SMTP id
- m64-20020a1f3f43000000b004439b1772e9mr1396826vka.12.1682647227075; Thu, 27
- Apr 2023 19:00:27 -0700 (PDT)
+        with ESMTP id S1345357AbjD1GJt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 28 Apr 2023 02:09:49 -0400
+Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E9ED2735;
+        Thu, 27 Apr 2023 23:09:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1682662188; x=1714198188;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=ZHxkrpzwTBdGO4RoIArFt2sZX/Zj8/L1F9atRiy0s5g=;
+  b=AmJ0Orj/pZpDGNZAlRNx/iivFqAu4QLEEg2cTFaAAX53k+LZTDGeRubf
+   DY0mv2TC5VQ3LSVtZlE7Bq3uc54MGFVVPaqL7D9aQ/amOTJaibQtJFUro
+   4qaTvnS67S/CN8sOJclAKfhQ1KrJnZa4HfPNFnW4583GL6m5E3EP0uz0V
+   +Yn3VzpBsRdaBQBSMMb9IcdGFnFhyx6KJ8cSl5oo0miDFEd/yK+q4d0+j
+   2WCQ3WNZAYCmw+p2GRQm+2uWmfMbcC2vKxhxz0eikqPhJYSIFZxP15L/e
+   Xmp6Nq9uFi565L955fHqguRCehuF5JqqD3FqFwEZ2wA6Ia8wg3YGHSX78
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10693"; a="327281390"
+X-IronPort-AV: E=Sophos;i="5.99,233,1677571200"; 
+   d="scan'208";a="327281390"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Apr 2023 23:09:47 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10693"; a="838740252"
+X-IronPort-AV: E=Sophos;i="5.99,233,1677571200"; 
+   d="scan'208";a="838740252"
+Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.254.211.34]) ([10.254.211.34])
+  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Apr 2023 23:09:45 -0700
+Message-ID: <d923f839-7505-21fc-2976-673c9e698b6f@linux.intel.com>
+Date:   Fri, 28 Apr 2023 14:09:43 +0800
 MIME-Version: 1.0
-References: <20230425102250.3847395-1-mie@igel.co.jp> <ZEl5yKYzsw/g+tQh@corigine.com>
-In-Reply-To: <ZEl5yKYzsw/g+tQh@corigine.com>
-From:   Shunsuke Mie <mie@igel.co.jp>
-Date:   Fri, 28 Apr 2023 11:00:16 +0900
-Message-ID: <CANXvt5pjEau8_h7x_2kx9E79Dsc4g1ohnof5fo5QHL=KR261AA@mail.gmail.com>
-Subject: Re: [PATCH v3] vringh: IOMEM support
-To:     Simon Horman <simon.horman@corigine.com>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Rusty Russell <rusty@rustcorp.com.au>, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+Subject: Re: [PATCH v2 10/21] KVM:x86: Add #CP support in guest exception
+ classification
+To:     Yang Weijiang <weijiang.yang@intel.com>, seanjc@google.com,
+        pbonzini@redhat.com, peterz@infradead.org, john.allen@amd.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     rick.p.edgecombe@intel.com
+References: <20230421134615.62539-1-weijiang.yang@intel.com>
+ <20230421134615.62539-11-weijiang.yang@intel.com>
+From:   Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <20230421134615.62539-11-weijiang.yang@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-5.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
+        SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Simon-san,
 
-2023=E5=B9=B44=E6=9C=8827=E6=97=A5(=E6=9C=A8) 4:21 Simon Horman <simon.horm=
-an@corigine.com>:
+
+On 4/21/2023 9:46 PM, Yang Weijiang wrote:
+> Add handling for Control Protection (#CP) exceptions(vector 21).
+> The new vector is introduced for Intel's Control-Flow Enforcement
+> Technology (CET) relevant violation cases.
+> See Intel's SDM for details.
 >
-> On Tue, Apr 25, 2023 at 07:22:50PM +0900, Shunsuke Mie wrote:
-> > Introduce a new memory accessor for vringh. It is able to use vringh to
-> > virtio rings located on io-memory region.
-> >
-> > Signed-off-by: Shunsuke Mie <mie@igel.co.jp>
+> Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
+> ---
+>   arch/x86/include/uapi/asm/kvm.h |  1 +
+>   arch/x86/kvm/vmx/nested.c       |  2 +-
+>   arch/x86/kvm/x86.c              | 10 +++++++---
+>   arch/x86/kvm/x86.h              | 13 ++++++++++---
+>   4 files changed, 19 insertions(+), 7 deletions(-)
 >
-> ...
->
-> Hi Mie-san,
->
-> thanks for your patch.
-> One small nit from me below.
->
-> > diff --git a/include/linux/vringh.h b/include/linux/vringh.h
-> > index c3a8117dabe8..c03d045f7f3f 100644
-> > --- a/include/linux/vringh.h
-> > +++ b/include/linux/vringh.h
-> > @@ -330,4 +330,37 @@ int vringh_need_notify_iotlb(struct vringh *vrh);
-> >
-> >  #endif /* CONFIG_VHOST_IOTLB */
-> >
-> > +#if IS_REACHABLE(CONFIG_VHOST_RING_IOMEM)
-> > +
-> > +int vringh_init_iomem(struct vringh *vrh, u64 features,
-> > +                   unsigned int num, bool weak_barriers,
-> > +                   struct vring_desc *desc,
-> > +                   struct vring_avail *avail,
-> > +                   struct vring_used *used);
-> > +
-> > +
->
-> nit: one blank line is enough.
-It should not have included this patch. Thanks.
-> > +int vringh_getdesc_iomem(struct vringh *vrh,
-> > +                      struct vringh_kiov *riov,
-> > +                      struct vringh_kiov *wiov,
-> > +                      u16 *head,
-> > +                      gfp_t gfp);
->
-> ...
+> diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
+> index 7f467fe05d42..1c002abe2be8 100644
+> --- a/arch/x86/include/uapi/asm/kvm.h
+> +++ b/arch/x86/include/uapi/asm/kvm.h
+> @@ -33,6 +33,7 @@
+>   #define MC_VECTOR 18
+>   #define XM_VECTOR 19
+>   #define VE_VECTOR 20
+> +#define CP_VECTOR 21
+>   
+>   /* Select x86 specific features in <linux/kvm.h> */
+>   #define __KVM_HAVE_PIT
+> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> index 96ede74a6067..7bc62cd72748 100644
+> --- a/arch/x86/kvm/vmx/nested.c
+> +++ b/arch/x86/kvm/vmx/nested.c
+> @@ -2850,7 +2850,7 @@ static int nested_check_vm_entry_controls(struct kvm_vcpu *vcpu,
+>   		/* VM-entry interruption-info field: deliver error code */
+>   		should_have_error_code =
+>   			intr_type == INTR_TYPE_HARD_EXCEPTION && prot_mode &&
+> -			x86_exception_has_error_code(vector);
+> +			x86_exception_has_error_code(vcpu, vector);
+>   		if (CC(has_error_code != should_have_error_code))
+>   			return -EINVAL;
+>   
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 7788646bbf1f..a768cbf3fbb7 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -520,11 +520,15 @@ EXPORT_SYMBOL_GPL(kvm_spurious_fault);
+>   #define EXCPT_CONTRIBUTORY	1
+>   #define EXCPT_PF		2
+>   
+> -static int exception_class(int vector)
+> +static int exception_class(struct kvm_vcpu *vcpu, int vector)
+>   {
+>   	switch (vector) {
+>   	case PF_VECTOR:
+>   		return EXCPT_PF;
+> +	case CP_VECTOR:
+> +		if (vcpu->arch.cr4_guest_rsvd_bits & X86_CR4_CET)
+> +			return EXCPT_BENIGN;
+> +		return EXCPT_CONTRIBUTORY;
+By definition, #CP is Contributory.
+Can you explain more about this change here which treats #CP as 
+EXCPT_BENIGN when CET is not enabled in guest?
+
+In current KVM code, there is suppose no #CP triggered in guest if CET 
+is not enalbed in guest, right?
+>   	case DE_VECTOR:
+>   	case TS_VECTOR:
+>   	case NP_VECTOR:
+> @@ -707,8 +711,8 @@ static void kvm_multiple_exception(struct kvm_vcpu *vcpu,
+>   		kvm_make_request(KVM_REQ_TRIPLE_FAULT, vcpu);
+>   		return;
+>   	}
+> -	class1 = exception_class(prev_nr);
+> -	class2 = exception_class(nr);
+> +	class1 = exception_class(vcpu, prev_nr);
+> +	class2 = exception_class(vcpu, nr);
+>   	if ((class1 == EXCPT_CONTRIBUTORY && class2 == EXCPT_CONTRIBUTORY) ||
+>   	    (class1 == EXCPT_PF && class2 != EXCPT_BENIGN)) {
+>   		/*
+> diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
+> index c544602d07a3..2ba7c7fc4846 100644
+> --- a/arch/x86/kvm/x86.h
+> +++ b/arch/x86/kvm/x86.h
+> @@ -171,13 +171,20 @@ static inline bool is_64_bit_hypercall(struct kvm_vcpu *vcpu)
+>   	return vcpu->arch.guest_state_protected || is_64_bit_mode(vcpu);
+>   }
+>   
+> -static inline bool x86_exception_has_error_code(unsigned int vector)
+> +static inline bool x86_exception_has_error_code(struct kvm_vcpu *vcpu,
+> +						unsigned int vector)
+>   {
+>   	static u32 exception_has_error_code = BIT(DF_VECTOR) | BIT(TS_VECTOR) |
+>   			BIT(NP_VECTOR) | BIT(SS_VECTOR) | BIT(GP_VECTOR) |
+> -			BIT(PF_VECTOR) | BIT(AC_VECTOR);
+> +			BIT(PF_VECTOR) | BIT(AC_VECTOR) | BIT(CP_VECTOR);
+>   
+> -	return (1U << vector) & exception_has_error_code;
+> +	if (!((1U << vector) & exception_has_error_code))
+> +		return false;
+> +
+> +	if (vector == CP_VECTOR)
+> +		return !(vcpu->arch.cr4_guest_rsvd_bits & X86_CR4_CET);
+> +
+> +	return true;
+>   }
+>   
+>   static inline bool mmu_is_nested(struct kvm_vcpu *vcpu)
+
