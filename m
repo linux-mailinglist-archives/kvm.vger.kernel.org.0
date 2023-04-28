@@ -2,135 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BF5166F125E
-	for <lists+kvm@lfdr.de>; Fri, 28 Apr 2023 09:30:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4CE696F12DB
+	for <lists+kvm@lfdr.de>; Fri, 28 Apr 2023 09:53:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345528AbjD1HaU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Apr 2023 03:30:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40734 "EHLO
+        id S1345390AbjD1HxY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 Apr 2023 03:53:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35368 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345508AbjD1HaR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 28 Apr 2023 03:30:17 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC5A5469E
-        for <kvm@vger.kernel.org>; Fri, 28 Apr 2023 00:30:15 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 5885B64167
-        for <kvm@vger.kernel.org>; Fri, 28 Apr 2023 07:30:15 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id BDAB4C4339C
-        for <kvm@vger.kernel.org>; Fri, 28 Apr 2023 07:30:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1682667014;
-        bh=4UPL+R512sDXg3F8cpovsU7C/T4sWCKyZG/hxe4T4FQ=;
-        h=From:To:Subject:Date:From;
-        b=QggVcZFE+yAlRUkIi3pw1GvLX+s2CZfIIoXWHOqUplePpbZ3IUTyJzFiMx/P4i5xi
-         FjzHgKqXFjhjMfTHL3BA0hUmXaCpH7vDaDggFyXeR2z3N6AsFOOIbGAmxVMuLdl2oQ
-         tiOV3tAC8/PwQ0Dhlwn3KtBaKGrHMibRianJcfpZt9QjOv97x/KLp5h/MU7xTYnJBO
-         ZNPjTxuXB6Tn6dWqzXPXxK8wdrehfz+80KtWX6UDG5ekRhVzPHuybvwzCYR0m/ClfR
-         XXFV7pEVvjtqYAE6TdNeswNcj+FCOO+Ib0nOrjqAqbj+QpEJj3VNM6v8vKE2pnieSb
-         VJQonRi6eFaDA==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id ACD5BC43144; Fri, 28 Apr 2023 07:30:14 +0000 (UTC)
-From:   bugzilla-daemon@kernel.org
-To:     kvm@vger.kernel.org
-Subject: [Bug 217380] New: Latency issues in creating kvm-nx-lpage-recovery
- kthread
-Date:   Fri, 28 Apr 2023 07:30:14 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: new
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: zhuangel570@gmail.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_id short_desc product version rep_platform
- op_sys bug_status bug_severity priority component assigned_to reporter
- cf_regression
-Message-ID: <bug-217380-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        with ESMTP id S1345270AbjD1HxU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 28 Apr 2023 03:53:20 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C0D24ED8;
+        Fri, 28 Apr 2023 00:52:52 -0700 (PDT)
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 33S7kCW5005865;
+        Fri, 28 Apr 2023 07:52:26 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
+ mime-version : content-transfer-encoding : in-reply-to : references : from
+ : to : cc : subject : message-id : date; s=pp1;
+ bh=6D2b6aDe9MMFLR2IaBOmrejmGqGp+K+dvneE3KpcB9E=;
+ b=WUHB/sSCYa1h5O50153E9+f1ER9CbQvAnNuRAY7quVH/GIZdt5UXsgdxS9WFuhN8Lu1v
+ kSo27Dr6Zg/1Qv1Kxa74bDL483epFs7lpWFG+xNOeUV5MSs403JSRMoc4hB74Wqzodm1
+ ESqS/Kos6NwTlU9tqjSMYSpzbt/PvcO28zl7FCMyNOpSlW8iLM5FOv7874mRJHnsOyyf
+ 3Q/apOZLUUwEe+36dVv2whJLX1VCGEKQ/rbSCyXwHchUsdaD1LckokYPb8ajAL408L21
+ ARoHhEAIhV6N3/OJMm2nB/+yhcPo+aBZJvHPtoiOiV2c0rpo+24hzGH6c4qvmV6vxJ2Y Zg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3q88te2b4c-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 28 Apr 2023 07:52:25 +0000
+Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 33S7Sv9a027541;
+        Fri, 28 Apr 2023 07:52:24 GMT
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3q88te2b3d-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 28 Apr 2023 07:52:24 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 33S7c6kA018753;
+        Fri, 28 Apr 2023 07:52:21 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+        by ppma04ams.nl.ibm.com (PPS) with ESMTPS id 3q47773dx1-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 28 Apr 2023 07:52:21 +0000
+Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
+        by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 33S7qHAV27394734
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 28 Apr 2023 07:52:17 GMT
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id CA3E520040;
+        Fri, 28 Apr 2023 07:52:17 +0000 (GMT)
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 98C1F2004E;
+        Fri, 28 Apr 2023 07:52:17 +0000 (GMT)
+Received: from t14-nrb (unknown [9.171.67.100])
+        by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Fri, 28 Apr 2023 07:52:17 +0000 (GMT)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-X-Spam-Status: No, score=-7.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <25a9c3d6-43be-6a08-a32e-5abc520e8c62@linux.ibm.com>
+References: <20230426083426.6806-1-pmorel@linux.ibm.com> <20230426083426.6806-3-pmorel@linux.ibm.com> <168258524358.99032.14388431972069131423@t14-nrb> <25a9c3d6-43be-6a08-a32e-5abc520e8c62@linux.ibm.com>
+From:   Nico Boehr <nrb@linux.ibm.com>
+To:     Pierre Morel <pmorel@linux.ibm.com>, linux-s390@vger.kernel.org
+Cc:     frankja@linux.ibm.com, thuth@redhat.com, kvm@vger.kernel.org,
+        imbrenda@linux.ibm.com, david@redhat.com, nsg@linux.ibm.com
+Subject: Re: [kvm-unit-tests PATCH v8 2/2] s390x: topology: Checking Configuration Topology Information
+Message-ID: <168266833708.15302.621201335459420614@t14-nrb>
+User-Agent: alot/0.8.1
+Date:   Fri, 28 Apr 2023 09:52:17 +0200
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: acp3ZtwCttx-0wGg9dtsEqPLqZO5KfF7
+X-Proofpoint-ORIG-GUID: tjYJGoySvK1WCM-CcKSjzboD0bV-Yz0_
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
+ definitions=2023-04-28_02,2023-04-27_01,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 mlxscore=0
+ bulkscore=0 lowpriorityscore=0 clxscore=1015 spamscore=0 impostorscore=0
+ priorityscore=1501 adultscore=0 malwarescore=0 phishscore=0 suspectscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2303200000
+ definitions=main-2304280061
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D217380
+Quoting Pierre Morel (2023-04-27 16:50:16)
+[...]
+> >> diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
+> >> index fc3666b..375e6ce 100644
+> >> --- a/s390x/unittests.cfg
+> >> +++ b/s390x/unittests.cfg
+> >> @@ -221,3 +221,6 @@ file =3D ex.elf
+> >>  =20
+> >>   [topology]
+> >>   file =3D topology.elf
+> >> +# 3 CPUs on socket 0 with different CPU TLE (standard, dedicated, ori=
+gin)
+> >> +# 1 CPU on socket 2
+> >> +extra_params =3D -smp 1,drawers=3D3,books=3D3,sockets=3D4,cores=3D4,m=
+axcpus=3D144 -cpu z14,ctop=3Don -device z14-s390x-cpu,core-id=3D1,entitleme=
+nt=3Dlow -device z14-s390x-cpu,core-id=3D2,dedicated=3Don -device z14-s390x=
+-cpu,core-id=3D10 -device z14-s390x-cpu,core-id=3D20 -device z14-s390x-cpu,=
+core-id=3D130,socket-id=3D0,book-id=3D0,drawer-id=3D0 -append '-drawers 3 -=
+books 3 -sockets 4 -cores 4'
+> > If I got the command line right, all CPUs are on the same drawer with t=
+his command line, aren't they? If so, does it make sense to run with differ=
+ent combinations, i.e. CPUs on different drawers, books etc?
+>=20
+> OK, I will add some CPU on different drawers and books.
 
-            Bug ID: 217380
-           Summary: Latency issues in creating kvm-nx-lpage-recovery
-                    kthread
-           Product: Virtualization
-           Version: unspecified
-          Hardware: All
-                OS: Linux
-            Status: NEW
-          Severity: normal
-          Priority: P3
-         Component: kvm
-          Assignee: virtualization_kvm@kernel-bugs.osdl.org
-          Reporter: zhuangel570@gmail.com
-        Regression: No
-
-Hi
-
-We found some latency issue in high-density and high-concurrency scenarios,=
- we
-are using cloud hypervisor as vmm for lightweight VM, using VIRTIO net and
-block for VM. In our test, we got about 50ms to 100ms+ latency in creating =
-VM
-and register irqfd, after trace with funclatency (a tool of bcc-tools,
-https://github.com/iovisor/bcc), we found the latency introduced by followi=
-ng
-functions:
-
-- kvm_vm_create_worker_thread introduce tail latency more than 100ms.
-  This function was called when create "kvm-nx-lpage-recovery" kthread when
-  create a new VM, this patch was introduced to recovery large page to reli=
-ef
-  performance loss caused by software mitigation of ITLB_MULTIHIT, see
-  b8e8c8303ff2 ("kvm: mmu: ITLB_MULTIHIT mitigation") and 1aa9b9572b10
-  ("kvm: x86: mmu: Recovery of shattered NX large pages").
-
-Here is a simple case, which can emulate the latency issue (the real latency
-is lager). The case create 800 VM as background do nothing, then repeatedly
-create 20 VM then destroy them after 400ms, just trace the two function
-latency,=20
-you will reproduce such kind latency issue. Here is a trace log on Xeon(R)
-Platinum 8255C server (96C, 2 sockets) with linux 6.2.20.
-
-Reproduce Case
-https://github.com/zhuangel/misc/blob/main/test/kvm_irqfd_fork/kvm_irqfd_fo=
-rk.c
-Reproduce log
-https://github.com/zhuangel/misc/blob/main/test/kvm_irqfd_fork/test.log
-
-To fix these latencies, I didn't have a graceful method, just simple ideas
-is give user a chance to avoid these latencies, like a module parameter to
-disable "kvm-nx-lpage-recovery" kthread.
-
-Any suggestion to fix the issue if welcomed.
-
-Thanks!
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are watching the assignee of the bug.=
+just to clarify: What I meant is adding an *additional* entry to unittests.=
+cfg. Does it make sense in your opinion? I just want more coverage for diff=
+erent scenarios we may have.
