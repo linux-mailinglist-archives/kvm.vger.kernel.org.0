@@ -2,21 +2,21 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 186276F1B7D
-	for <lists+kvm@lfdr.de>; Fri, 28 Apr 2023 17:27:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4D30A6F1B7B
+	for <lists+kvm@lfdr.de>; Fri, 28 Apr 2023 17:26:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346404AbjD1P1B (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Apr 2023 11:27:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42834 "EHLO
+        id S1346064AbjD1P0y (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 Apr 2023 11:26:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42574 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346075AbjD1P1A (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 28 Apr 2023 11:27:00 -0400
+        with ESMTP id S1346153AbjD1P0x (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 28 Apr 2023 11:26:53 -0400
 Received: from imap4.hz.codethink.co.uk (imap4.hz.codethink.co.uk [188.40.203.114])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C48583
-        for <kvm@vger.kernel.org>; Fri, 28 Apr 2023 08:26:56 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC16D1BDC
+        for <kvm@vger.kernel.org>; Fri, 28 Apr 2023 08:26:51 -0700 (PDT)
 Received: from [167.98.27.226] (helo=lawrence-thinkpad.guest.codethink.co.uk)
         by imap4.hz.codethink.co.uk with esmtpsa  (Exim 4.94.2 #2 (Debian))
-        id 1psPOQ-005zz5-SO; Fri, 28 Apr 2023 15:48:15 +0100
+        id 1psPOR-005zz5-Io; Fri, 28 Apr 2023 15:48:15 +0100
 From:   Lawrence Hunter <lawrence.hunter@codethink.co.uk>
 To:     qemu-devel@nongnu.org
 Cc:     dickon.hood@codethink.co.uk, nazar.kazakov@codethink.co.uk,
@@ -26,9 +26,9 @@ Cc:     dickon.hood@codethink.co.uk, nazar.kazakov@codethink.co.uk,
         philipp.tomsich@vrull.eu, kvm@vger.kernel.org,
         qemu-riscv@nongnu.org, richard.henderson@linaro.org,
         Lawrence Hunter <lawrence.hunter@codethink.co.uk>
-Subject: [PATCH v3 14/19] target/riscv: Add Zvksh ISA extension support
-Date:   Fri, 28 Apr 2023 15:47:52 +0100
-Message-Id: <20230428144757.57530-15-lawrence.hunter@codethink.co.uk>
+Subject: [PATCH v3 15/19] target/riscv: Add Zvkg ISA extension support
+Date:   Fri, 28 Apr 2023 15:47:53 +0100
+Message-Id: <20230428144757.57530-16-lawrence.hunter@codethink.co.uk>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20230428144757.57530-1-lawrence.hunter@codethink.co.uk>
 References: <20230428144757.57530-1-lawrence.hunter@codethink.co.uk>
@@ -43,265 +43,206 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This commit adds support for the Zvksh vector-crypto extension, which
+From: Nazar Kazakov <nazar.kazakov@codethink.co.uk>
+
+This commit adds support for the Zvkg vector-crypto extension, which
 consists of the following instructions:
 
-* vsm3me.vv
-* vsm3c.vi
+* vgmul.vv
+* vghsh.vv
 
 Translation functions are defined in
 `target/riscv/insn_trans/trans_rvvk.c.inc` and helpers are defined in
 `target/riscv/vcrypto_helper.c`.
 
-Co-authored-by: Kiran Ostrolenk <kiran.ostrolenk@codethink.co.uk>
-Signed-off-by: Kiran Ostrolenk <kiran.ostrolenk@codethink.co.uk>
+Co-authored-by: Lawrence Hunter <lawrence.hunter@codethink.co.uk>
 Signed-off-by: Lawrence Hunter <lawrence.hunter@codethink.co.uk>
+Signed-off-by: Nazar Kazakov <nazar.kazakov@codethink.co.uk>
 ---
- target/riscv/cpu.c                       |   4 +-
- target/riscv/cpu.h                       |   1 +
- target/riscv/helper.h                    |   3 +
- target/riscv/insn32.decode               |   4 +
- target/riscv/insn_trans/trans_rvvk.c.inc |  32 ++++++
- target/riscv/vcrypto_helper.c            | 134 +++++++++++++++++++++++
- 6 files changed, 177 insertions(+), 1 deletion(-)
+ target/riscv/cpu.c                       |  5 +-
+ target/riscv/cpu.h                       |  1 +
+ target/riscv/helper.h                    |  3 +
+ target/riscv/insn32.decode               |  4 ++
+ target/riscv/insn_trans/trans_rvvk.c.inc | 32 +++++++++++
+ target/riscv/vcrypto_helper.c            | 72 ++++++++++++++++++++++++
+ 6 files changed, 115 insertions(+), 2 deletions(-)
 
 diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
-index dd8573bb02f..3da7a9392bc 100644
+index 3da7a9392bc..7902e894655 100644
 --- a/target/riscv/cpu.c
 +++ b/target/riscv/cpu.c
-@@ -114,6 +114,7 @@ static const struct isa_ext_data isa_edata_arr[] = {
+@@ -111,6 +111,7 @@ static const struct isa_ext_data isa_edata_arr[] = {
+     ISA_EXT_DATA_ENTRY(zvfhmin, true, PRIV_VERSION_1_12_0, ext_zvfhmin),
+     ISA_EXT_DATA_ENTRY(zvbb, true, PRIV_VERSION_1_12_0, ext_zvbb),
+     ISA_EXT_DATA_ENTRY(zvbc, true, PRIV_VERSION_1_12_0, ext_zvbc),
++    ISA_EXT_DATA_ENTRY(zvkg, true, PRIV_VERSION_1_12_0, ext_zvkg),
      ISA_EXT_DATA_ENTRY(zvkned, true, PRIV_VERSION_1_12_0, ext_zvkned),
      ISA_EXT_DATA_ENTRY(zvknha, true, PRIV_VERSION_1_12_0, ext_zvknha),
      ISA_EXT_DATA_ENTRY(zvknhb, true, PRIV_VERSION_1_12_0, ext_zvknhb),
-+    ISA_EXT_DATA_ENTRY(zvksh, true, PRIV_VERSION_1_12_0, ext_zvksh),
-     ISA_EXT_DATA_ENTRY(zhinx, true, PRIV_VERSION_1_12_0, ext_zhinx),
-     ISA_EXT_DATA_ENTRY(zhinxmin, true, PRIV_VERSION_1_12_0, ext_zhinxmin),
-     ISA_EXT_DATA_ENTRY(smaia, true, PRIV_VERSION_1_12_0, ext_smaia),
-@@ -1220,7 +1221,8 @@ static void riscv_cpu_realize(DeviceState *dev, Error **errp)
+@@ -1221,8 +1222,8 @@ static void riscv_cpu_realize(DeviceState *dev, Error **errp)
       * In principle Zve*x would also suffice here, were they supported
       * in qemu
       */
--    if ((cpu->cfg.ext_zvbb || cpu->cfg.ext_zvkned || cpu->cfg.ext_zvknha) &&
-+    if ((cpu->cfg.ext_zvbb || cpu->cfg.ext_zvkned || cpu->cfg.ext_zvknha ||
-+         cpu->cfg.ext_zvksh) &&
+-    if ((cpu->cfg.ext_zvbb || cpu->cfg.ext_zvkned || cpu->cfg.ext_zvknha ||
+-         cpu->cfg.ext_zvksh) &&
++    if ((cpu->cfg.ext_zvbb || cpu->cfg.ext_zvkg || cpu->cfg.ext_zvkned ||
++         cpu->cfg.ext_zvknha || cpu->cfg.ext_zvksh) &&
          !(cpu->cfg.ext_zve32f || cpu->cfg.ext_zve64f || cpu->cfg.ext_zve64d ||
            cpu->cfg.ext_v)) {
          error_setg(errp,
 diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
-index 4c44088c28b..749a799ed1f 100644
+index 749a799ed1f..613c0b03c0d 100644
 --- a/target/riscv/cpu.h
 +++ b/target/riscv/cpu.h
-@@ -475,6 +475,7 @@ struct RISCVCPUConfig {
+@@ -472,6 +472,7 @@ struct RISCVCPUConfig {
+     bool ext_zve64d;
+     bool ext_zvbb;
+     bool ext_zvbc;
++    bool ext_zvkg;
      bool ext_zvkned;
      bool ext_zvknha;
      bool ext_zvknhb;
-+    bool ext_zvksh;
-     bool ext_zmmul;
-     bool ext_zvfh;
-     bool ext_zvfhmin;
 diff --git a/target/riscv/helper.h b/target/riscv/helper.h
-index a60129983be..d8a1b0c8d73 100644
+index d8a1b0c8d73..87fabf90c86 100644
 --- a/target/riscv/helper.h
 +++ b/target/riscv/helper.h
-@@ -1227,3 +1227,6 @@ DEF_HELPER_5(vaeskf2_vi, void, ptr, ptr, i32, env, i32)
- DEF_HELPER_5(vsha2ms_vv, void, ptr, ptr, ptr, env, i32)
- DEF_HELPER_5(vsha2ch_vv, void, ptr, ptr, ptr, env, i32)
- DEF_HELPER_5(vsha2cl_vv, void, ptr, ptr, ptr, env, i32)
+@@ -1230,3 +1230,6 @@ DEF_HELPER_5(vsha2cl_vv, void, ptr, ptr, ptr, env, i32)
+ 
+ DEF_HELPER_5(vsm3me_vv, void, ptr, ptr, ptr, env, i32)
+ DEF_HELPER_5(vsm3c_vi, void, ptr, ptr, i32, env, i32)
 +
-+DEF_HELPER_5(vsm3me_vv, void, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_5(vsm3c_vi, void, ptr, ptr, i32, env, i32)
++DEF_HELPER_5(vghsh_vv, void, ptr, ptr, ptr, env, i32)
++DEF_HELPER_4(vgmul_vv, void, ptr, ptr, env, i32)
 diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-index d2cfb2729c2..5ca83e8462b 100644
+index 5ca83e8462b..b10497afd32 100644
 --- a/target/riscv/insn32.decode
 +++ b/target/riscv/insn32.decode
-@@ -953,3 +953,7 @@ vaeskf2_vi  101010 1 ..... ..... 010 ..... 1110111 @r_vm_1
- vsha2ms_vv  101101 1 ..... ..... 010 ..... 1110111 @r_vm_1
- vsha2ch_vv  101110 1 ..... ..... 010 ..... 1110111 @r_vm_1
- vsha2cl_vv  101111 1 ..... ..... 010 ..... 1110111 @r_vm_1
+@@ -957,3 +957,7 @@ vsha2cl_vv  101111 1 ..... ..... 010 ..... 1110111 @r_vm_1
+ # *** Zvksh vector crypto extension ***
+ vsm3me_vv   100000 1 ..... ..... 010 ..... 1110111 @r_vm_1
+ vsm3c_vi    101011 1 ..... ..... 010 ..... 1110111 @r_vm_1
 +
-+# *** Zvksh vector crypto extension ***
-+vsm3me_vv   100000 1 ..... ..... 010 ..... 1110111 @r_vm_1
-+vsm3c_vi    101011 1 ..... ..... 010 ..... 1110111 @r_vm_1
++# *** Zvkg vector crypto extension ***
++vghsh_vv    101100 1 ..... ..... 010 ..... 1110111 @r_vm_1
++vgmul_vv    101000 1 ..... 10001 010 ..... 1110111 @r2_vm_1
 diff --git a/target/riscv/insn_trans/trans_rvvk.c.inc b/target/riscv/insn_trans/trans_rvvk.c.inc
-index 6f0f9e5800f..c2b599ee194 100644
+index c2b599ee194..18a47bbcb26 100644
 --- a/target/riscv/insn_trans/trans_rvvk.c.inc
 +++ b/target/riscv/insn_trans/trans_rvvk.c.inc
-@@ -483,3 +483,35 @@ static bool vsha_check(DisasContext *s, arg_rmrr *a)
- GEN_VV_UNMASKED_TRANS(vsha2ms_vv, vsha_check, ZVKNH_EGS)
- GEN_VV_UNMASKED_TRANS(vsha2cl_vv, vsha_check, ZVKNH_EGS)
- GEN_VV_UNMASKED_TRANS(vsha2ch_vv, vsha_check, ZVKNH_EGS)
+@@ -515,3 +515,35 @@ static inline bool vsm3c_check(DisasContext *s, arg_rmrr *a)
+ 
+ GEN_VV_UNMASKED_TRANS(vsm3me_vv, vsm3me_check, ZVKSH_EGS)
+ GEN_VI_UNMASKED_TRANS(vsm3c_vi, vsm3c_check, ZVKSH_EGS)
 +
 +/*
-+ * Zvksh
++ * Zvkg
 + */
 +
-+#define ZVKSH_EGS 8
++#define ZVKG_EGS 4
 +
-+static inline bool vsm3_check(DisasContext *s, arg_rmrr *a)
++static bool vgmul_check(DisasContext *s, arg_rmr *a)
 +{
-+    int egw_bytes = ZVKSH_EGS << s->sew;
-+    int mult = 1 << MAX(s->lmul, 0);
-+    return s->cfg_ptr->ext_zvksh == true &&
-+           require_rvv(s) &&
++    int egw_bytes = ZVKG_EGS << s->sew;
++    return s->cfg_ptr->ext_zvkg == true &&
 +           vext_check_isa_ill(s) &&
-+           !is_overlapped(a->rd, mult, a->rs2, mult) &&
++           require_rvv(s) &&
 +           MAXSZ(s) >= egw_bytes &&
-+           s->vstart % ZVKSH_EGS == 0 &&
++           vext_check_ss(s, a->rd, a->rs2, a->vm) &&
++           s->vstart % ZVKG_EGS == 0 &&
 +           s->sew == MO_32;
 +}
 +
-+static inline bool vsm3me_check(DisasContext *s, arg_rmrr *a)
++GEN_V_UNMASKED_TRANS(vgmul_vv, vgmul_check)
++
++static bool vghsh_check(DisasContext *s, arg_rmrr *a)
 +{
-+    return vsm3_check(s, a) && vext_check_sss(s, a->rd, a->rs1, a->rs2, a->vm);
++    int egw_bytes = ZVKG_EGS << s->sew;
++    return s->cfg_ptr->ext_zvkg == true &&
++           opivv_check(s, a) &&
++           MAXSZ(s) >= egw_bytes &&
++           s->vstart % ZVKG_EGS == 0 &&
++           s->sew == MO_32;
 +}
 +
-+static inline bool vsm3c_check(DisasContext *s, arg_rmrr *a)
-+{
-+    return vsm3_check(s, a) && vext_check_ss(s, a->rd, a->rs2, a->vm);
-+}
-+
-+GEN_VV_UNMASKED_TRANS(vsm3me_vv, vsm3me_check, ZVKSH_EGS)
-+GEN_VI_UNMASKED_TRANS(vsm3c_vi, vsm3c_check, ZVKSH_EGS)
++GEN_VV_UNMASKED_TRANS(vghsh_vv, vghsh_check, ZVKG_EGS)
 diff --git a/target/riscv/vcrypto_helper.c b/target/riscv/vcrypto_helper.c
-index ca09062c6c1..06c8f4adc76 100644
+index 06c8f4adc76..04e6374211d 100644
 --- a/target/riscv/vcrypto_helper.c
 +++ b/target/riscv/vcrypto_helper.c
-@@ -717,3 +717,137 @@ void HELPER(vsha2cl_vv)(void *vd, void *vs1, void *vs2, CPURISCVState *env,
-     vext_set_elems_1s(vd, vta, env->vl * esz, total_elems * esz);
+@@ -851,3 +851,75 @@ void HELPER(vsm3c_vi)(void *vd_vptr, void *vs2_vptr, uint32_t uimm,
+     vext_set_elems_1s(vd_vptr, vta, env->vl * esz, total_elems * esz);
      env->vstart = 0;
  }
 +
-+static inline uint32_t p1(uint32_t x)
++void HELPER(vghsh_vv)(void *vd_vptr, void *vs1_vptr, void *vs2_vptr,
++                      CPURISCVState *env, uint32_t desc)
 +{
-+    return x ^ rol32(x, 15) ^ rol32(x, 23);
-+}
-+
-+static inline uint32_t zvksh_w(uint32_t m16, uint32_t m9, uint32_t m3,
-+                               uint32_t m13, uint32_t m6)
-+{
-+    return p1(m16 ^ m9 ^ rol32(m3, 15)) ^ rol32(m13, 7) ^ m6;
-+}
-+
-+void HELPER(vsm3me_vv)(void *vd_vptr, void *vs1_vptr, void *vs2_vptr,
-+                       CPURISCVState *env, uint32_t desc)
-+{
-+    uint32_t esz = memop_size(FIELD_EX64(env->vtype, VTYPE, VSEW));
-+    uint32_t total_elems = vext_get_total_elems(env, desc, esz);
++    uint64_t *vd = vd_vptr;
++    uint64_t *vs1 = vs1_vptr;
++    uint64_t *vs2 = vs2_vptr;
 +    uint32_t vta = vext_vta(desc);
-+    uint32_t *vd = vd_vptr;
-+    uint32_t *vs1 = vs1_vptr;
-+    uint32_t *vs2 = vs2_vptr;
++    uint32_t total_elems = vext_get_total_elems(env, desc, 4);
 +
-+    for (int i = env->vstart / 8; i < env->vl / 8; i++) {
-+        uint32_t w[24];
-+        for (int j = 0; j < 8; j++) {
-+            w[j] = bswap32(vs1[H4((i * 8) + j)]);
-+            w[j + 8] = bswap32(vs2[H4((i * 8) + j)]);
++    for (uint32_t i = env->vstart / 4; i < env->vl / 4; i++) {
++        uint64_t Y[2] = {vd[i * 2 + 0], vd[i * 2 + 1]};
++        uint64_t H[2] = {brev8(vs2[i * 2 + 0]), brev8(vs2[i * 2 + 1])};
++        uint64_t X[2] = {vs1[i * 2 + 0], vs1[i * 2 + 1]};
++        uint64_t Z[2] = {0, 0};
++
++        uint64_t S[2] = {brev8(Y[0] ^ X[0]), brev8(Y[1] ^ X[1])};
++
++        for (uint j = 0; j < 128; j++) {
++            if ((S[j / 64] >> (j % 64)) & 1) {
++                Z[0] ^= H[0];
++                Z[1] ^= H[1];
++            }
++            bool reduce = ((H[1] >> 63) & 1);
++            H[1] = H[1] << 1 | H[0] >> 63;
++            H[0] = H[0] << 1;
++            if (reduce) {
++                H[0] ^= 0x87;
++            }
 +        }
-+        for (int j = 0; j < 8; j++) {
-+            w[j + 16] =
-+                zvksh_w(w[j], w[j + 7], w[j + 13], w[j + 3], w[j + 10]);
-+        }
-+        for (int j = 0; j < 8; j++) {
-+            vd[(i * 8) + j] = bswap32(w[H4(j + 16)]);
-+        }
++
++        vd[i * 2 + 0] = brev8(Z[0]);
++        vd[i * 2 + 1] = brev8(Z[1]);
 +    }
-+    vext_set_elems_1s(vd_vptr, vta, env->vl * esz, total_elems * esz);
++    /* set tail elements to 1s */
++    vext_set_elems_1s(vd, vta, env->vl * 4, total_elems * 4);
 +    env->vstart = 0;
 +}
 +
-+static inline uint32_t ff1(uint32_t x, uint32_t y, uint32_t z)
++void HELPER(vgmul_vv)(void *vd_vptr, void *vs2_vptr, CPURISCVState *env,
++                      uint32_t desc)
 +{
-+    return x ^ y ^ z;
-+}
-+
-+static inline uint32_t ff2(uint32_t x, uint32_t y, uint32_t z)
-+{
-+    return (x & y) | (x & z) | (y & z);
-+}
-+
-+static inline uint32_t ff_j(uint32_t x, uint32_t y, uint32_t z, uint32_t j)
-+{
-+    return (j <= 15) ? ff1(x, y, z) : ff2(x, y, z);
-+}
-+
-+static inline uint32_t gg1(uint32_t x, uint32_t y, uint32_t z)
-+{
-+    return x ^ y ^ z;
-+}
-+
-+static inline uint32_t gg2(uint32_t x, uint32_t y, uint32_t z)
-+{
-+    return (x & y) | (~x & z);
-+}
-+
-+static inline uint32_t gg_j(uint32_t x, uint32_t y, uint32_t z, uint32_t j)
-+{
-+    return (j <= 15) ? gg1(x, y, z) : gg2(x, y, z);
-+}
-+
-+static inline uint32_t t_j(uint32_t j)
-+{
-+    return (j <= 15) ? 0x79cc4519 : 0x7a879d8a;
-+}
-+
-+static inline uint32_t p_0(uint32_t x)
-+{
-+    return x ^ rol32(x, 9) ^ rol32(x, 17);
-+}
-+
-+static void sm3c(uint32_t *vd, uint32_t *vs1, uint32_t *vs2, uint32_t uimm)
-+{
-+    uint32_t x0, x1;
-+    uint32_t j;
-+    uint32_t ss1, ss2, tt1, tt2;
-+    x0 = vs2[0] ^ vs2[4];
-+    x1 = vs2[1] ^ vs2[5];
-+    j = 2 * uimm;
-+    ss1 = rol32(rol32(vs1[0], 12) + vs1[4] + rol32(t_j(j), j % 32), 7);
-+    ss2 = ss1 ^ rol32(vs1[0], 12);
-+    tt1 = ff_j(vs1[0], vs1[1], vs1[2], j) + vs1[3] + ss2 + x0;
-+    tt2 = gg_j(vs1[4], vs1[5], vs1[6], j) + vs1[7] + ss1 + vs2[0];
-+    vs1[3] = vs1[2];
-+    vd[3] = rol32(vs1[1], 9);
-+    vs1[1] = vs1[0];
-+    vd[1] = tt1;
-+    vs1[7] = vs1[6];
-+    vd[7] = rol32(vs1[5], 19);
-+    vs1[5] = vs1[4];
-+    vd[5] = p_0(tt2);
-+    j = 2 * uimm + 1;
-+    ss1 = rol32(rol32(vd[1], 12) + vd[5] + rol32(t_j(j), j % 32), 7);
-+    ss2 = ss1 ^ rol32(vd[1], 12);
-+    tt1 = ff_j(vd[1], vs1[1], vd[3], j) + vs1[3] + ss2 + x1;
-+    tt2 = gg_j(vd[5], vs1[5], vd[7], j) + vs1[7] + ss1 + vs2[1];
-+    vd[2] = rol32(vs1[1], 9);
-+    vd[0] = tt1;
-+    vd[6] = rol32(vs1[5], 19);
-+    vd[4] = p_0(tt2);
-+}
-+
-+void HELPER(vsm3c_vi)(void *vd_vptr, void *vs2_vptr, uint32_t uimm,
-+                      CPURISCVState *env, uint32_t desc)
-+{
-+    uint32_t esz = memop_size(FIELD_EX64(env->vtype, VTYPE, VSEW));
-+    uint32_t total_elems = vext_get_total_elems(env, desc, esz);
++    uint64_t *vd = vd_vptr;
++    uint64_t *vs2 = vs2_vptr;
 +    uint32_t vta = vext_vta(desc);
-+    uint32_t *vd = vd_vptr;
-+    uint32_t *vs2 = vs2_vptr;
-+    uint32_t v1[8], v2[8], v3[8];
++    uint32_t total_elems = vext_get_total_elems(env, desc, 4);
 +
-+    for (int i = env->vstart / 8; i < env->vl / 8; i++) {
-+        for (int k = 0; k < 8; k++) {
-+            v2[k] = bswap32(vd[H4(i * 8 + k)]);
-+            v3[k] = bswap32(vs2[H4(i * 8 + k)]);
++    for (uint32_t i = env->vstart / 4; i < env->vl / 4; i++) {
++        uint64_t Y[2] = {brev8(vd[i * 2 + 0]), brev8(vd[i * 2 + 1])};
++        uint64_t H[2] = {brev8(vs2[i * 2 + 0]), brev8(vs2[i * 2 + 1])};
++        uint64_t Z[2] = {0, 0};
++
++        for (uint j = 0; j < 128; j++) {
++            if ((Y[j / 64] >> (j % 64)) & 1) {
++                Z[0] ^= H[0];
++                Z[1] ^= H[1];
++            }
++            bool reduce = ((H[1] >> 63) & 1);
++            H[1] = H[1] << 1 | H[0] >> 63;
++            H[0] = H[0] << 1;
++            if (reduce) {
++                H[0] ^= 0x87;
++            }
 +        }
-+        sm3c(v1, v2, v3, uimm);
-+        for (int k = 0; k < 8; k++) {
-+            vd[i * 8 + k] = bswap32(v1[H4(k)]);
-+        }
++
++        vd[i * 2 + 0] = brev8(Z[0]);
++        vd[i * 2 + 1] = brev8(Z[1]);
 +    }
-+    vext_set_elems_1s(vd_vptr, vta, env->vl * esz, total_elems * esz);
++    /* set tail elements to 1s */
++    vext_set_elems_1s(vd, vta, env->vl * 4, total_elems * 4);
 +    env->vstart = 0;
 +}
 -- 
