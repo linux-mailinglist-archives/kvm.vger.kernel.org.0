@@ -2,30 +2,31 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3E00F6F1731
-	for <lists+kvm@lfdr.de>; Fri, 28 Apr 2023 14:05:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A4F006F173B
+	for <lists+kvm@lfdr.de>; Fri, 28 Apr 2023 14:05:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346038AbjD1MFb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Apr 2023 08:05:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46946 "EHLO
+        id S1346051AbjD1MFd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 Apr 2023 08:05:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47388 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345504AbjD1MFP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 28 Apr 2023 08:05:15 -0400
+        with ESMTP id S1346009AbjD1MFW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 28 Apr 2023 08:05:22 -0400
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id BC2295B8C
-        for <kvm@vger.kernel.org>; Fri, 28 Apr 2023 05:05:09 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id EB45F4EF6
+        for <kvm@vger.kernel.org>; Fri, 28 Apr 2023 05:05:10 -0700 (PDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8C7DE1480;
-        Fri, 28 Apr 2023 05:05:53 -0700 (PDT)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BD5381516;
+        Fri, 28 Apr 2023 05:05:54 -0700 (PDT)
 Received: from godel.lab.cambridge.arm.com (godel.lab.cambridge.arm.com [10.7.66.42])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9AE2C3F5A1;
-        Fri, 28 Apr 2023 05:05:08 -0700 (PDT)
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B150B3F5A1;
+        Fri, 28 Apr 2023 05:05:09 -0700 (PDT)
 From:   Nikos Nikoleris <nikos.nikoleris@arm.com>
 To:     kvm@vger.kernel.org, kvmarm@lists.linux.dev, andrew.jones@linux.dev
-Cc:     pbonzini@redhat.com, alexandru.elisei@arm.com, ricarkol@google.com
-Subject: [kvm-unit-tests PATCH v5 18/29] lib/efi: Add support for getting the cmdline
-Date:   Fri, 28 Apr 2023 13:03:54 +0100
-Message-Id: <20230428120405.3770496-19-nikos.nikoleris@arm.com>
+Cc:     Andrew Jones <drjones@redhat.com>, pbonzini@redhat.com,
+        alexandru.elisei@arm.com, ricarkol@google.com
+Subject: [kvm-unit-tests PATCH v5 19/29] arm/arm64: Rename etext to _etext
+Date:   Fri, 28 Apr 2023 13:03:55 +0100
+Message-Id: <20230428120405.3770496-20-nikos.nikoleris@arm.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20230428120405.3770496-1-nikos.nikoleris@arm.com>
 References: <20230428120405.3770496-1-nikos.nikoleris@arm.com>
@@ -33,216 +34,62 @@ MIME-Version: 1.0
 X-ARM-No-Footer: FoSSMail
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This change adds support for discovering the command line arguments,
-as a string. Then, we parse this string to populate __argc and __argv
-for EFI tests.
+From: Andrew Jones <drjones@redhat.com>
 
+Rename etext to the more popular _etext allowing different linker
+scripts to more easily be used.
+
+Signed-off-by: Andrew Jones <drjones@redhat.com>
 Signed-off-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
+Reviewed-by: Ricardo Koller <ricarkol@google.com>
 ---
- lib/linux/efi.h |  20 ++++++++++
- lib/argv.h      |   1 +
- lib/argv.c      |   2 +-
- lib/efi.c       | 102 ++++++++++++++++++++++++++++++++++++++++++++++++
- 4 files changed, 124 insertions(+), 1 deletion(-)
+ lib/arm/setup.c | 4 ++--
+ arm/flat.lds    | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/lib/linux/efi.h b/lib/linux/efi.h
-index 455625aa..9a1cf87b 100644
---- a/lib/linux/efi.h
-+++ b/lib/linux/efi.h
-@@ -60,6 +60,8 @@ typedef guid_t efi_guid_t;
+diff --git a/lib/arm/setup.c b/lib/arm/setup.c
+index 59b0aedd..03a4098e 100644
+--- a/lib/arm/setup.c
++++ b/lib/arm/setup.c
+@@ -33,7 +33,7 @@
+ #define NR_EXTRA_MEM_REGIONS	16
+ #define NR_INITIAL_MEM_REGIONS	(MAX_DT_MEM_REGIONS + NR_EXTRA_MEM_REGIONS)
  
- #define ACPI_TABLE_GUID EFI_GUID(0xeb9d2d30, 0x2d88, 0x11d3, 0x9a, 0x16, 0x00, 0x90, 0x27, 0x3f, 0xc1, 0x4d)
+-extern unsigned long etext;
++extern unsigned long _etext;
  
-+#define LOADED_IMAGE_PROTOCOL_GUID EFI_GUID(0x5b1b31a1, 0x9562, 0x11d2,  0x8e, 0x3f, 0x00, 0xa0, 0xc9, 0x69, 0x72, 0x3b)
-+
- typedef struct {
- 	efi_guid_t guid;
- 	void *table;
-@@ -416,6 +418,24 @@ struct efi_boot_memmap {
- 	unsigned long           *buff_size;
- };
+ char *initrd;
+ u32 initrd_size;
+@@ -157,7 +157,7 @@ unsigned int mem_region_get_flags(phys_addr_t paddr)
  
-+#define __aligned_u64 u64 __attribute__((aligned(8)))
-+
-+struct efi_loaded_image_64 {
-+	u32			revision;
-+	efi_handle_t		parent_handle;
-+	efi_system_table_t	*system_table;
-+	efi_handle_t		device_handle;
-+	void			*file_path;
-+	void			*reserved;
-+	u32			load_options_size;
-+	void			*load_options;
-+	void			*image_base;
-+	__aligned_u64		image_size;
-+	unsigned int		image_code_type;
-+	unsigned int		image_data_type;
-+	efi_status_t		(__efiapi * unload)(efi_handle_t image_handle);
-+};
-+
- #define efi_bs_call(func, ...) efi_system_table->boottime->func(__VA_ARGS__)
- #define efi_rs_call(func, ...) efi_system_table->runtime->func(__VA_ARGS__)
- 
-diff --git a/lib/argv.h b/lib/argv.h
-index 1fd746dc..0fa77725 100644
---- a/lib/argv.h
-+++ b/lib/argv.h
-@@ -9,6 +9,7 @@
- #define _ARGV_H_
- 
- extern void __setup_args(void);
-+extern void setup_args(const char *args);
- extern void setup_args_progname(const char *args);
- extern void setup_env(char *env, int size);
- extern void add_setup_arg(const char *arg);
-diff --git a/lib/argv.c b/lib/argv.c
-index 9ffa673e..fa5ff9ae 100644
---- a/lib/argv.c
-+++ b/lib/argv.c
-@@ -41,7 +41,7 @@ void __setup_args(void)
- 	__argc = argv - __argv;
- }
- 
--static void setup_args(const char *args)
-+void setup_args(const char *args)
+ static void mem_regions_add_assumed(void)
  {
- 	if (!args)
- 		return;
-diff --git a/lib/efi.c b/lib/efi.c
-index 64cc9789..f524ec9b 100644
---- a/lib/efi.c
-+++ b/lib/efi.c
-@@ -8,6 +8,9 @@
-  */
+-	phys_addr_t code_end = (phys_addr_t)(unsigned long)&etext;
++	phys_addr_t code_end = (phys_addr_t)(unsigned long)&_etext;
+ 	struct mem_region *r;
  
- #include "efi.h"
-+#include <argv.h>
-+#include <stdlib.h>
-+#include <ctype.h>
- #include <libcflat.h>
- #include <asm/setup.h>
+ 	r = mem_region_find(code_end - 1);
+diff --git a/arm/flat.lds b/arm/flat.lds
+index 47fcb649..9016ac9f 100644
+--- a/arm/flat.lds
++++ b/arm/flat.lds
+@@ -27,7 +27,7 @@ SECTIONS
+     PROVIDE(_text = .);
+     .text : { *(.init) *(.text) *(.text.*) }
+     . = ALIGN(64K);
+-    PROVIDE(etext = .);
++    PROVIDE(_etext = .);
  
-@@ -96,6 +99,80 @@ static void efi_exit(efi_status_t code)
- 	efi_rs_call(reset_system, EFI_RESET_SHUTDOWN, code, 0, NULL);
- }
- 
-+/* Adapted from drivers/firmware/efi/libstub/efi-stub.c */
-+static char *efi_convert_cmdline(struct efi_loaded_image_64 *image, int *cmd_line_len)
-+{
-+	const u16 *s2;
-+	unsigned long cmdline_addr = 0;
-+	int options_chars = image->load_options_size;
-+	const u16 *options = image->load_options;
-+	int options_bytes = 0, safe_options_bytes = 0;  /* UTF-8 bytes */
-+	bool in_quote = false;
-+	efi_status_t status;
-+	const int COMMAND_LINE_SIZE = 2048;
-+
-+	if (options) {
-+		s2 = options;
-+		while (options_bytes < COMMAND_LINE_SIZE && options_chars--) {
-+			u16 c = *s2++;
-+
-+			if (c < 0x80) {
-+				if (c == L'\0' || c == L'\n')
-+					break;
-+				if (c == L'"')
-+					in_quote = !in_quote;
-+				else if (!in_quote && isspace((char)c))
-+					safe_options_bytes = options_bytes;
-+
-+				options_bytes++;
-+				continue;
-+			}
-+
-+			/*
-+			 * Get the number of UTF-8 bytes corresponding to a
-+			 * UTF-16 character.
-+			 * The first part handles everything in the BMP.
-+			 */
-+			options_bytes += 2 + (c >= 0x800);
-+			/*
-+			 * Add one more byte for valid surrogate pairs. Invalid
-+			 * surrogates will be replaced with 0xfffd and take up
-+			 * only 3 bytes.
-+			 */
-+			if ((c & 0xfc00) == 0xd800) {
-+				/*
-+				 * If the very last word is a high surrogate,
-+				 * we must ignore it since we can't access the
-+				 * low surrogate.
-+				 */
-+				if (!options_chars) {
-+					options_bytes -= 3;
-+				} else if ((*s2 & 0xfc00) == 0xdc00) {
-+					options_bytes++;
-+					options_chars--;
-+					s2++;
-+				}
-+			}
-+		}
-+		if (options_bytes >= COMMAND_LINE_SIZE) {
-+			options_bytes = safe_options_bytes;
-+			printf("Command line is too long: truncated to %d bytes\n",
-+			       options_bytes);
-+		}
-+	}
-+
-+	options_bytes++;        /* NUL termination */
-+
-+	status = efi_bs_call(allocate_pool, EFI_LOADER_DATA, options_bytes, (void **)&cmdline_addr);
-+	if (status != EFI_SUCCESS)
-+		return NULL;
-+
-+	snprintf((char *)cmdline_addr, options_bytes, "%.*ls", options_bytes - 1, options);
-+
-+	*cmd_line_len = options_bytes;
-+	return (char *)cmdline_addr;
-+}
-+
- efi_status_t efi_main(efi_handle_t handle, efi_system_table_t *sys_tab)
- {
- 	int ret;
-@@ -109,6 +186,31 @@ efi_status_t efi_main(efi_handle_t handle, efi_system_table_t *sys_tab)
- 	unsigned long map_size = 0, desc_size = 0, key = 0, buff_size = 0;
- 	u32 desc_ver;
- 
-+	/* Helper variables needed to get the cmdline */
-+	struct efi_loaded_image_64 *image;
-+	efi_guid_t loaded_image_proto = LOADED_IMAGE_PROTOCOL_GUID;
-+	char *cmdline_ptr = NULL;
-+	int cmdline_size = 0;
-+
-+	/*
-+	 * Get a handle to the loaded image protocol.  This is used to get
-+	 * information about the running image, such as size and the command
-+	 * line.
-+	 */
-+	status = efi_bs_call(handle_protocol, handle, &loaded_image_proto, (void *)&image);
-+	if (status != EFI_SUCCESS) {
-+		printf("Failed to get loaded image protocol\n");
-+		goto efi_main_error;
-+	}
-+
-+	cmdline_ptr = efi_convert_cmdline(image, &cmdline_size);
-+	if (!cmdline_ptr) {
-+		printf("getting command line via LOADED_IMAGE_PROTOCOL\n");
-+		status = EFI_OUT_OF_RESOURCES;
-+		goto efi_main_error;
-+	}
-+	setup_args(cmdline_ptr);
-+
- 	/* Set up efi_bootinfo */
- 	efi_bootinfo.mem_map.map = &map;
- 	efi_bootinfo.mem_map.map_size = &map_size;
+     PROVIDE(reloc_start = .);
+     .rela.dyn : { *(.rela.dyn) }
 -- 
 2.25.1
 
