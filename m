@@ -2,95 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5D9316F1906
-	for <lists+kvm@lfdr.de>; Fri, 28 Apr 2023 15:12:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8483B6F1938
+	for <lists+kvm@lfdr.de>; Fri, 28 Apr 2023 15:20:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346183AbjD1NMX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Apr 2023 09:12:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58072 "EHLO
+        id S1346159AbjD1NUa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 Apr 2023 09:20:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33926 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346152AbjD1NMM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 28 Apr 2023 09:12:12 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E3C236182;
-        Fri, 28 Apr 2023 06:11:44 -0700 (PDT)
-Received: from pps.filterd (m0353726.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 33SD7Zdn032522;
-        Fri, 28 Apr 2023 13:11:44 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=kulgARyI9rEQ2/6zpqmMTLHlA8mJvVKXysWRrfyqMV4=;
- b=E1E5alZJMNRi3zEsPMG5pWYjGsVYN8Bsg4XL+GFNyYLt1OTFfHxHINlHod5Kv+eSd8wV
- 1NmMZoB6qtA1AZX59cKM45sn8hN+OqBSK+awsgnfU1Jd87PtPiWExf63tQLah551h59r
- efecyYaMWqTACJ5cmBn0ReKMWKsTdSyqo/qq3Nq16cpmOG1dVj2J98ZBJepC0nVDtE0g
- wBnrJcqkEHxmo+LDzHy0rUFLDOHPLOVMC+mpnsD/2XndsJ61b19ZBLRgMJ6WHNBoDjyL
- LYjIthhjz19XiBpW4P5IBPypwyWM6T7OoPyuQPpcsn42bSIxUYcR2g1aFJ38PRx3jpAe vw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3q8e681hq1-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 28 Apr 2023 13:11:43 +0000
-Received: from m0353726.ppops.net (m0353726.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 33SD9NvD015028;
-        Fri, 28 Apr 2023 13:11:03 GMT
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3q8e681g82-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 28 Apr 2023 13:11:02 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 33S2lkwG025183;
-        Fri, 28 Apr 2023 13:10:12 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-        by ppma06ams.nl.ibm.com (PPS) with ESMTPS id 3q46ug3jnd-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 28 Apr 2023 13:10:12 +0000
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-        by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 33SDA8ru49807738
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 28 Apr 2023 13:10:08 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 929742004B;
-        Fri, 28 Apr 2023 13:10:08 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1C61920040;
-        Fri, 28 Apr 2023 13:10:08 +0000 (GMT)
-Received: from [9.171.23.33] (unknown [9.171.23.33])
-        by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-        Fri, 28 Apr 2023 13:10:08 +0000 (GMT)
-Message-ID: <8122e0de-7cbb-83f2-4c3a-7a50f0d5b205@linux.ibm.com>
-Date:   Fri, 28 Apr 2023 15:10:07 +0200
+        with ESMTP id S231555AbjD1NU2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 28 Apr 2023 09:20:28 -0400
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2084.outbound.protection.outlook.com [40.107.220.84])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5F191BE7;
+        Fri, 28 Apr 2023 06:20:26 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=gBEt4UpXL+qaBw785wcRTbz8Q36SYFpAa6w+yHQchSanMLTkojp7FXy32i4W/G5cnOdTKBAeSjy/IjCsQBhDmzbWhvazeFWlZfRqM8354ne9kxC+zumfMoovg52nR75iydzW+MArrFNrGUpifQ2PP3FkN47drI0jUuVAAWjtI7ndmkVtQcFI3wtT9fFlyuVUkWdiZd6pGScwv3nCJV6GPodSgnfp5+2WHKtVZoHc15dp2rS09RglG0qjcTnSb0GAXZ5vorTdOGaiJ8+FVI4k9UuW5ahcNELIql6qDRSPFzDF1LRPBJgRrnIarpAGJRsdhlcRDy7VUzahAXgGxGlF+w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=JXYjzdeCg2oN9+H98o454ytFgA7kLTpg8GptV7P9aw0=;
+ b=PsmfK9JUZvwJ1Ob1sBos5E5rvx3bWfB1BLX+N5K0h7NbO4h8RZq39CwyiHHpKkyXP7+6ZAtE+Gnja/hMcp4Vj6B3JAWtVjHAzMrFGPwfCdzzgBPCh7wokjUEI2FOGCupAUkg5FpZjApVCNfbXIjKgKqxHREYgsCsgYfEkFItXGoUSoVxIm8JER19y//wAEmEVvlqABuO18UR9wBtmw+fZzgIs0F7RIcYSEKqyR3LE103UBpfC4RCjEAg8apMXpCUR1Ht2bHioxXdjbNspf1nZGqn1jt2NwAIOwTHMJOxDwdRXwTGRx39ffT4YCdm3oTAOUBWK4OW0KSyr+yVsr5QJQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=JXYjzdeCg2oN9+H98o454ytFgA7kLTpg8GptV7P9aw0=;
+ b=UlE06VqNdJnyoP/PvuuN/cYDg7KK3ygq0XiKZ7SpUPTbu7+6OZNvyqUfuTwhJu/I+/bIsgmMTLuNQU4NOoyiWopPXczdTodCgU0Zpd4aBPUBAFYyFwBPznaVpILwbDzhMieyFHWaYDVpI+RHMoXxduqeYSqK3y4cGiHdhpftwIXQTj8Avb98e7XU5tJECvtOP8kBc+etN4VEVdXIa5gVcPQGh0k0ylTGjgSUXPsgqz2SeKTBvkyS+POl6NSj6WDGvyD9/22SAjDmQ60rOfEzEE873PPS2zL//XCsTV02uTtVtMa+VSj68aeFBlInL0Me7Bjwv5q1bKyrW0XSyEDmnw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by DM4PR12MB5962.namprd12.prod.outlook.com (2603:10b6:8:69::7) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6340.20; Fri, 28 Apr 2023 13:20:21 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::f7a7:a561:87e9:5fab]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::f7a7:a561:87e9:5fab%6]) with mapi id 15.20.6340.024; Fri, 28 Apr 2023
+ 13:20:21 +0000
+Date:   Fri, 28 Apr 2023 10:20:19 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-s390@vger.kernel.org, frankja@linux.ibm.com,
+        borntraeger@de.ibm.com, nrb@linux.ibm.com, nsg@linux.ibm.com,
+        seiden@linux.ibm.com, hca@linux.ibm.com
+Subject: Re: [PATCH v3 1/1] KVM: s390: fix race in gmap_make_secure()
+Message-ID: <ZEvIE9eqfRKrpZyt@nvidia.com>
+References: <20230428092753.27913-1-imbrenda@linux.ibm.com>
+ <20230428092753.27913-2-imbrenda@linux.ibm.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230428092753.27913-2-imbrenda@linux.ibm.com>
+X-ClientProxiedBy: MN2PR05CA0052.namprd05.prod.outlook.com
+ (2603:10b6:208:236::21) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.8.0
-Subject: Re: [kvm-unit-tests PATCH v8 2/2] s390x: topology: Checking
- Configuration Topology Information
-Content-Language: en-US
-To:     Nico Boehr <nrb@linux.ibm.com>, linux-s390@vger.kernel.org
-Cc:     frankja@linux.ibm.com, thuth@redhat.com, kvm@vger.kernel.org,
-        imbrenda@linux.ibm.com, david@redhat.com, nsg@linux.ibm.com
-References: <20230426083426.6806-1-pmorel@linux.ibm.com>
- <20230426083426.6806-3-pmorel@linux.ibm.com>
- <168258524358.99032.14388431972069131423@t14-nrb>
- <25a9c3d6-43be-6a08-a32e-5abc520e8c62@linux.ibm.com>
- <168266833708.15302.621201335459420614@t14-nrb>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-In-Reply-To: <168266833708.15302.621201335459420614@t14-nrb>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 810AKfQT2mjr7TawDHFsdzsqDOp8H6HK
-X-Proofpoint-ORIG-GUID: 8enFklzDtoL_29nG7gWWo24HMQApMmDi
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
- definitions=2023-04-28_04,2023-04-27_01,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 phishscore=0
- impostorscore=0 mlxscore=0 mlxlogscore=999 bulkscore=0 spamscore=0
- lowpriorityscore=0 priorityscore=1501 clxscore=1015 adultscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2303200000 definitions=main-2304280107
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|DM4PR12MB5962:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0608923a-0e36-493b-1b8f-08db47eb5158
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: SBR23rPli36O0oK8asEIXf1TidRNORIc9ow+tDQb8rAhF7PPJplbNiTfRTv+bGyHmNnby43T6Mk3CKq45hGCeQ8cz/oMxgXV1aTiTK4Ui80o6AKK6H/ZmHTAm0y+wc5cISVQdQUKS+mRMREvspe/xhgXEhFkcFi+wjHr7bF798ttGpATm7AOc55GApYSEQK1Iky21lZ9Ub8GtUEQCm/i8Wq3EqWogYijW3OifuKVOl8ka5Cr4UF7g5X8PlpXgS9VCrxCSXGzUry5XW40DbYLgjPMChkom0O5SYdtEI+eb0aYGmruwxEoCRzQ0AywJw498P0PdbRWsG42572TVB5VxZet5jmmwX6lY2W8d9BPLFjmI9RB6XXzDkSvVmikhx5hohZacwRd3GCaCmUakId74uT0k4vQuPsZ7yLrqjlCpoyl15tYRuUscadpxpaGkyf2RuGej1eLGfNizjXn9/agsT3FFcRtpYvv+9mMvjZwv/7FfX7M5kel5fVMwLbuOznes66t2MT4qUvyCOvnqCHVaEE5rBzB0CTt6age2HFJKf/4L3zQ535eAbChWYaVq5ZIVz4n1BEl27669q4fE3tTUtnm1/npndhxNjUGXFT5rfw=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(39860400002)(376002)(396003)(366004)(346002)(136003)(451199021)(86362001)(186003)(66476007)(6916009)(66946007)(4326008)(41300700001)(6512007)(6506007)(66556008)(26005)(316002)(966005)(83380400001)(6486002)(2616005)(478600001)(36756003)(38100700002)(5660300002)(2906002)(8676002)(8936002)(7416002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?O/V6xhXEkBne2uFqdJZBxs68be+ppx8AqOW7E82XwxyUErptvR77Kl35vFJq?=
+ =?us-ascii?Q?uV8lfDIbYr6gKgNk3beRXijc6qYUdGVbFA3YZpIcJB2QH+QP/pfN/phEYpeU?=
+ =?us-ascii?Q?D02P7ykq9QXnlaUdwqPqhNGrMXaUpcXOS7qGmtfXC8Vzn4DTkUVL5agMb0ya?=
+ =?us-ascii?Q?LdZDMKkaWlmznbqGz0l0TvUYiKZ7GxW+6PjWrCRS3QBTrYo0h9Gj040BIO5f?=
+ =?us-ascii?Q?XjKQytjYnvjof42NqfNRgzL/W9A6uxP4nTNC7oxUEOYSR2UPsShkJ3Nx5odV?=
+ =?us-ascii?Q?0ZUkDgtR8aKXCRNG5TfKNP9RgIhlazVNPBFQcNTwyxBaPJ5XXciU7Im4yZ80?=
+ =?us-ascii?Q?x8Hxb91Ely9s2JeiASSe+eXQb832dRYgXXtzO1rtF9KfLtBf1AHcWOMVnIQw?=
+ =?us-ascii?Q?hycWobqDl7danRa+3nnRy4Ez8gcaGTkA6h7P7XVI+Rq0R5O8YuqlPdiaGl6Z?=
+ =?us-ascii?Q?0WyI/fvnUO8h28Rz57qCE1K4ncS1eLgA0MolnCBDPc41ebiZ5pJnwBKqiYMw?=
+ =?us-ascii?Q?fHN6opgb2+JUy+Erb/Elbhyc9xaVK7Zw+0SBrx7Y8IMKICVLNHrFi02oAiH6?=
+ =?us-ascii?Q?duuAWJvShI4YUJsm0Mx5++kudPBAxtvzPc3Zc36ZwKoS02CFsPg6J19PcUEp?=
+ =?us-ascii?Q?EItDs0XNZ9Ny0v7HCqdb4OzeYiRCmGQP/knWhurACNIlt4nMvGtGPd60J7vr?=
+ =?us-ascii?Q?NhJ64X3ZKa8r7G8DmokrWDpCt5h9uZk6LKPdhmqC1ktYKb37mbEkkQHY2/uJ?=
+ =?us-ascii?Q?/G86tiPguVXo/D7/jD4xvc+HXAf2J11/L+KqDfE9Wk7LR7x1IT/APXrWaJn+?=
+ =?us-ascii?Q?XpZcEJua8BgQqjP0V4E5IdkB/tr+L5vTpLl2THzMrOk8RZaTM/6MYH1FVpSA?=
+ =?us-ascii?Q?4Q9PUd7zDKpzsxPnRZp8g+TdpYAjZXTFEgETQOS39ArsMOLEAs5n9xbiSdnz?=
+ =?us-ascii?Q?6cM3iiL5pvB6mzgrVz19HRPVdZdP5xkRnmMeQgsrPHeUQuTWq/HU7FC30yKy?=
+ =?us-ascii?Q?qMXRpxXEnEtDEbcXHR9e3WGEj71Ag57AdvR1l2ARkK4pteCy/SlegsFPL2xV?=
+ =?us-ascii?Q?jkNSMK3+gnFDmoVsceRBSqlOcPzaKj1wqQqQuNBbWldr2Q9fzp/sOoOB44W+?=
+ =?us-ascii?Q?AonA0NKQETkYPDXXMdCDIgkzDVkNko/mHzJEhooWTKRVF+pjYdI1gUwWewzv?=
+ =?us-ascii?Q?2SOcLPr5qYWZfgwmj3vO09L7k7BHl/nELbvWCyetQ4KUnSFjalnWqPmNHRIC?=
+ =?us-ascii?Q?aTFLp+WeCXfF27XXftlsPt1UY3akHjFjD8I88VvTwyvsJG7D2T8mD8cuWurr?=
+ =?us-ascii?Q?QWjio18lILx9h6vYlwa0IqHTx0sBR12cjoI6tAcGKcQqxTH3JCEi10054sKm?=
+ =?us-ascii?Q?P2CjQh6p4K/bE8zS+VTTJZzeYc/RpsZFXF9sxN1XXtsXiFjesmmsJhsPsrJa?=
+ =?us-ascii?Q?c/PbzBUVO7ch2nE7rUTb7p7HQWbH7J3R4PKa3LI95JZDWtBVlSvsipiXFjip?=
+ =?us-ascii?Q?JjEsuyZmy6YXmjABA6OyJP83NS06trQz0cSkboG71l2h/Wmhy46bKb2HaStK?=
+ =?us-ascii?Q?y5MkjTXjmFiYE1stP9X0qP2LUzwie83WLRooicMG?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0608923a-0e36-493b-1b8f-08db47eb5158
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Apr 2023 13:20:21.2194
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 2rO+UtAzkJWXQvBe8tpTCCjLuG8qC535HM4tfSIg6dXAMyUQw3teq8W0GzkMddkC
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB5962
+X-Spam-Status: No, score=-1.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
         version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -98,70 +115,31 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Fri, Apr 28, 2023 at 11:27:53AM +0200, Claudio Imbrenda wrote:
+> Fix a potential race in gmap_make_secure() and remove the last user of
+> follow_page() without FOLL_GET.
+> 
+> The old code is locking something it doesn't have a reference to, and
+> as explained by Jason and David in this discussion:
+> https://lore.kernel.org/linux-mm/Y9J4P%2FRNvY1Ztn0Q@nvidia.com/
+> it can lead to all kind of bad things, including the page getting
+> unmapped (MADV_DONTNEED), freed, reallocated as a larger folio and the
+> unlock_page() would target the wrong bit.
+> There is also another race with the FOLL_WRITE, which could race
+> between the follow_page() and the get_locked_pte().
+> 
+> The main point is to remove the last use of follow_page() without
+> FOLL_GET or FOLL_PIN, removing the races can be considered a nice
+> bonus.
+> 
+> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> Link: https://lore.kernel.org/linux-mm/Y9J4P%2FRNvY1Ztn0Q@nvidia.com/
+> Suggested-by: Jason Gunthorpe <jgg@nvidia.com>
+> Fixes: 214d9bbcd3a6 ("s390/mm: provide memory management functions for protected KVM guests")
+> ---
+>  arch/s390/kernel/uv.c | 32 +++++++++++---------------------
+>  1 file changed, 11 insertions(+), 21 deletions(-)
 
-On 4/28/23 09:52, Nico Boehr wrote:
-> Quoting Pierre Morel (2023-04-27 16:50:16)
-> [...]
->>>> diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
->>>> index fc3666b..375e6ce 100644
->>>> --- a/s390x/unittests.cfg
->>>> +++ b/s390x/unittests.cfg
->>>> @@ -221,3 +221,6 @@ file = ex.elf
->>>>    
->>>>    [topology]
->>>>    file = topology.elf
->>>> +# 3 CPUs on socket 0 with different CPU TLE (standard, dedicated, origin)
->>>> +# 1 CPU on socket 2
->>>> +extra_params = -smp 1,drawers=3,books=3,sockets=4,cores=4,maxcpus=144 -cpu z14,ctop=on -device z14-s390x-cpu,core-id=1,entitlement=low -device z14-s390x-cpu,core-id=2,dedicated=on -device z14-s390x-cpu,core-id=10 -device z14-s390x-cpu,core-id=20 -device z14-s390x-cpu,core-id=130,socket-id=0,book-id=0,drawer-id=0 -append '-drawers 3 -books 3 -sockets 4 -cores 4'
->>> If I got the command line right, all CPUs are on the same drawer with this command line, aren't they? If so, does it make sense to run with different combinations, i.e. CPUs on different drawers, books etc?
->> OK, I will add some CPU on different drawers and books.
-> just to clarify: What I meant is adding an *additional* entry to unittests.cfg. Does it make sense in your opinion? I just want more coverage for different scenarios we may have.
+Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
 
-Ah OK, yes even better.
-
-In this test I chose the values randomly, I can add 2 other tests like
-
-- once with the maximum of CPUs like:
-
-[topology-2]
-file = topology.elf
-extra_params = -smp drawers=3,books=4,sockets=5,cores=4,maxcpus=240  
--append '-drawers 3 -books 4 -sockets 5 -cores 4'
-
-
-or having 8 different TLE on the same socket
-
-[topology-2]
-
-file = topology.elf
-extra_params = -smp 1,drawers=2,books=2,sockets=2,cores=30,maxcpus=240  
--append '-drawers 2 -books 2 -sockets 2 -cores 30' -cpu z14,ctop=on 
--device 
-z14-s390x-cpu,drawer-id=1,book-id=0,socket-id=0,core-id=2,entitlement=low 
--device 
-z14-s390x-cpu,drawer-id=1,book-id=0,socket-id=0,core-id=3,entitlement=medium 
--device 
-z14-s390x-cpu,drawer-id=1,book-id=0,socket-id=0,core-id=4,entitlement=high 
--device 
-z14-s390x-cpu,drawer-id=1,book-id=0,socket-id=0,core-id=5,entitlement=high,dedicated=on 
--device 
-z14-s390x-cpu,drawer-id=1,book-id=0,socket-id=0,core-id=65,entitlement=low 
--device 
-z14-s390x-cpu,drawer-id=1,book-id=0,socket-id=0,core-id=66,entitlement=medium 
--device 
-z14-s390x-cpu,drawer-id=1,book-id=0,socket-id=0,core-id=67,entitlement=high 
--device 
-z14-s390x-cpu,drawer-id=1,book-id=0,socket-id=0,core-id=68,entitlement=high,dedicated=on
-
-
-What do you think is the best ?
-
-Regards,
-
-Pierre
-
-
-
-
-
-
+Jason
