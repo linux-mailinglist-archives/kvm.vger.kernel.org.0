@@ -2,91 +2,36 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E94206F15F8
-	for <lists+kvm@lfdr.de>; Fri, 28 Apr 2023 12:44:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EC9AF6F171D
+	for <lists+kvm@lfdr.de>; Fri, 28 Apr 2023 14:04:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230106AbjD1Ko0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Apr 2023 06:44:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40456 "EHLO
+        id S229942AbjD1MEw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 Apr 2023 08:04:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46496 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345296AbjD1KoV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 28 Apr 2023 06:44:21 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9A444EF6
-        for <kvm@vger.kernel.org>; Fri, 28 Apr 2023 03:43:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1682678607;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=IQVmdT90OhXDpcSpwDoh82Tvt4g5mLAfat632QKI2HE=;
-        b=BJjxc5poX3mksIh8Uc9lJDhdTFJDmnst20r3PpFq1T5iPEMnHmt+hHCvGPO2szRzxbr5lg
-        792Bf1TyFPHpJBKm+gWj63aNF8yzkcQnkzPiJw8Mx/tdArSvQFJ9pvYMrLWh8J66RROY7a
-        eq4wkgYDXcPY0dZh1O7whViTg/E/E20=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-404-Lmig-39CPe2UcHDpbc8yIw-1; Fri, 28 Apr 2023 06:43:26 -0400
-X-MC-Unique: Lmig-39CPe2UcHDpbc8yIw-1
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-3f173bd0d1bso62244485e9.3
-        for <kvm@vger.kernel.org>; Fri, 28 Apr 2023 03:43:26 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682678604; x=1685270604;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=IQVmdT90OhXDpcSpwDoh82Tvt4g5mLAfat632QKI2HE=;
-        b=BfPv+1Kb1PKK5cYYxYTonGCJLpZthmdrt8q6HTEt1CKnSh3PGlZ4z5mr2VNjKdVrHr
-         Gl0vQX4rPcdSut87Fz7yOXZe3jGfBZe04kAuNOxunyDSOrAseNfOT4NkScn2riYVYEhO
-         jk4uRTqbJjPYMAzVZVCCxz2RZ4ZRZuGzDDPp2Arkqmm9Pa2CKmR6WyrlgyQh3fPLbb5y
-         0n9rO9MygfZX2cDqI//ZcThWY3Nk2MwQZRuBRAKn0hNOws28dtGhi+WkNBmvv6KIYTzk
-         vj++GFETCXP3QhidmOBzKQTFZZJ+4c9+3vEYjX+DxbL8AS3b100mkdBeIvxE3GEd/5D7
-         vG7g==
-X-Gm-Message-State: AC+VfDwtxQhYH7Uossd31nE6iMLd0C/UZBrMs0j92zREOLAb5T4r8feg
-        tMeMmr07MyQ/XEYBlCBMgvq5RjOBDY88R6TwLg0iR4W824foNCXv6mBlbz/Y6tgaR4PLJYXELzp
-        V9/b9g5Wpd+Ig
-X-Received: by 2002:a5d:63cd:0:b0:2f4:e580:a72f with SMTP id c13-20020a5d63cd000000b002f4e580a72fmr3575466wrw.45.1682678604404;
-        Fri, 28 Apr 2023 03:43:24 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ6sbbM9Zn4cTetz42fXKk9Z9F040Hk4rnRdGv4o6qnjbgUiSUoCwpa/D62xpuyoNmY1khznig==
-X-Received: by 2002:a5d:63cd:0:b0:2f4:e580:a72f with SMTP id c13-20020a5d63cd000000b002f4e580a72fmr3575451wrw.45.1682678604022;
-        Fri, 28 Apr 2023 03:43:24 -0700 (PDT)
-Received: from sgarzare-redhat ([217.171.71.231])
-        by smtp.gmail.com with ESMTPSA id s4-20020adfeb04000000b003047f7a7ad1sm11442270wrn.71.2023.04.28.03.43.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 28 Apr 2023 03:43:23 -0700 (PDT)
-Date:   Fri, 28 Apr 2023 12:43:09 +0200
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Bobby Eshleman <bobbyeshleman@gmail.com>
-Cc:     linux-hyperv@vger.kernel.org, Cong Wang <cong.wang@bytedance.com>,
-        Bobby Eshleman <bobby.eshleman@bytedance.com>,
-        kvm@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>,
-        VMware PV-Drivers Reviewers <pv-drivers@vmware.com>,
-        virtualization@lists.linux-foundation.org,
-        Eric Dumazet <edumazet@google.com>,
-        Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-        Bryan Tan <bryantan@vmware.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Haiyang Zhang <haiyangz@microsoft.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Vishnu Dasa <vdasa@vmware.com>,
-        Jiang Wang <jiang.wang@bytedance.com>, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>,
-        virtio-dev@lists.oasis-open.org
-Subject: Re: [PATCH RFC net-next v2 0/4] virtio/vsock: support datagrams
-Message-ID: <yeu57zqwzcx33sylp565xgw7yv72qyczohkmukyex27rcdh6mr@w4x6t4enx6iu>
-References: <20230413-b4-vsock-dgram-v2-0-079cc7cee62e@bytedance.com>
- <ZDk2kOVnUvyLMLKE@bullseye>
- <r6oxanmhwlonb7lcrrowpitlgobivzp7pcwk7snqvfnzudi6pb@4rnio5wef3qu>
- <ZDpOq0ACuMYIUbb1@bullseye>
+        with ESMTP id S229692AbjD1MEu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 28 Apr 2023 08:04:50 -0400
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4F0681FEA
+        for <kvm@vger.kernel.org>; Fri, 28 Apr 2023 05:04:49 -0700 (PDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 257ADC14;
+        Fri, 28 Apr 2023 05:05:33 -0700 (PDT)
+Received: from godel.lab.cambridge.arm.com (godel.lab.cambridge.arm.com [10.7.66.42])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2F1553F5A1;
+        Fri, 28 Apr 2023 05:04:48 -0700 (PDT)
+From:   Nikos Nikoleris <nikos.nikoleris@arm.com>
+To:     kvm@vger.kernel.org, kvmarm@lists.linux.dev, andrew.jones@linux.dev
+Cc:     pbonzini@redhat.com, alexandru.elisei@arm.com, ricarkol@google.com
+Subject: [kvm-unit-tests PATCH v5 00/29] EFI and ACPI support for arm64
+Date:   Fri, 28 Apr 2023 13:03:36 +0100
+Message-Id: <20230428120405.3770496-1-nikos.nikoleris@arm.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <ZDpOq0ACuMYIUbb1@bullseye>
-X-Spam-Status: No, score=-2.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+X-ARM-No-Footer: FoSSMail
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -94,219 +39,176 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Apr 15, 2023 at 07:13:47AM +0000, Bobby Eshleman wrote:
->CC'ing virtio-dev@lists.oasis-open.org because this thread is starting
->to touch the spec.
->
->On Wed, Apr 19, 2023 at 12:00:17PM +0200, Stefano Garzarella wrote:
->> Hi Bobby,
->>
->> On Fri, Apr 14, 2023 at 11:18:40AM +0000, Bobby Eshleman wrote:
->> > CC'ing Cong.
->> >
->> > On Fri, Apr 14, 2023 at 12:25:56AM +0000, Bobby Eshleman wrote:
->> > > Hey all!
->> > >
->> > > This series introduces support for datagrams to virtio/vsock.
->>
->> Great! Thanks for restarting this work!
->>
->
->No problem!
->
->> > >
->> > > It is a spin-off (and smaller version) of this series from the summer:
->> > >   https://lore.kernel.org/all/cover.1660362668.git.bobby.eshleman@bytedance.com/
->> > >
->> > > Please note that this is an RFC and should not be merged until
->> > > associated changes are made to the virtio specification, which will
->> > > follow after discussion from this series.
->> > >
->> > > This series first supports datagrams in a basic form for virtio, and
->> > > then optimizes the sendpath for all transports.
->> > >
->> > > The result is a very fast datagram communication protocol that
->> > > outperforms even UDP on multi-queue virtio-net w/ vhost on a variety
->> > > of multi-threaded workload samples.
->> > >
->> > > For those that are curious, some summary data comparing UDP and VSOCK
->> > > DGRAM (N=5):
->> > >
->> > > 	vCPUS: 16
->> > > 	virtio-net queues: 16
->> > > 	payload size: 4KB
->> > > 	Setup: bare metal + vm (non-nested)
->> > >
->> > > 	UDP: 287.59 MB/s
->> > > 	VSOCK DGRAM: 509.2 MB/s
->> > >
->> > > Some notes about the implementation...
->> > >
->> > > This datagram implementation forces datagrams to self-throttle according
->> > > to the threshold set by sk_sndbuf. It behaves similar to the credits
->> > > used by streams in its effect on throughput and memory consumption, but
->> > > it is not influenced by the receiving socket as credits are.
->>
->> So, sk_sndbuf influece the sender and sk_rcvbuf the receiver, right?
->>
->
->Correct.
->
->> We should check if VMCI behaves the same.
->>
->> > >
->> > > The device drops packets silently. There is room for improvement by
->> > > building into the device and driver some intelligence around how to
->> > > reduce frequency of kicking the virtqueue when packet loss is high. I
->> > > think there is a good discussion to be had on this.
->>
->> Can you elaborate a bit here?
->>
->> Do you mean some mechanism to report to the sender that a destination
->> (cid, port) is full so the packet will be dropped?
->>
->
->Correct. There is also the case of there being no receiver at all for
->this address since this case isn't rejected upon connect(). Ideally,
->such a socket (which will have 100% packet loss) will be throttled
->aggressively.
->
->Before we go down too far on this path, I also want to clarify that
->using UDP over vhost/virtio-net also has this property... this can be
->observed by using tcpdump to dump the UDP packets on the bridge network
->your VM is using. UDP packets sent to a garbage address can be seen on
->the host bridge (this is the nature of UDP, how is the host supposed to
->know the address eventually goes nowhere). I mention the above because I
->think it is possible for vsock to avoid this cost, given that it
->benefits from being point-to-point and g2h/h2g.
->
->If we're okay with vsock being on par, then the current series does
->that. I propose something below that can be added later and maybe
->negotiated as a feature bit too.
+Hello,
 
-I see and I agree on that, let's do it step by step.
-If we can do it in the first phase is great, but I think is fine to add
-this feature later.
+This series adds initial support for building arm64 tests as EFI
+apps and running them under QEMU. Much like x86_64, we import external
+dependencies from gnu-efi and adapt them to work with types and other
+assumptions from kvm-unit-tests. In addition, this series adds support
+for enumerating parts of the system using ACPI.
 
->
->> Can we adapt the credit mechanism?
->>
->
->I've thought about this a lot because the attraction of the approach for
->me would be that we could get the wait/buffer-limiting logic for free
->and without big changes to the protocol, but the problem is that the
->unreliable nature of datagrams means that the source's free-running
->tx_cnt will become out-of-sync with the destination's fwd_cnt upon
->packet loss.
+The first set of patches, moves the existing ACPI code to the common
+lib path. Then, it extends definitions and functions to allow for more
+robust discovery of ACPI tables. We add support for setting up the PSCI
+conduit, discovering the UART, timers, GIC and cpus via ACPI. The code
+retains existing behavior and gives priority to discovery through DT
+when one has been provided.
 
-We need to understand where the packet can be lost.
-If the packet always reaches the destination (vsock driver or device),
-we can discard it, but also update the counters.
+In the second set of patches, we add support for getting the command
+line from the EFI shell. This is a requirement for many of the
+existing arm64 tests.
 
->
->Imagine a source that initializes and starts sending packets before a
->destination socket even is created, the source's self-throttling will be
->dysfunctional because its tx_cnt will always far exceed the
->destination's fwd_cnt.
+In the third set of patches, we import code from gnu-efi, make minor
+changes and add an alternative setup sequence from arm64 systems that
+boot through EFI. Finally, we add support in the build system and a
+run script which is used to run an EFI app.
 
-Right, the other problem I see is that the socket aren't connected, so
-we have 1-N relationship.
+After this set of patches one can build arm64 EFI tests:
 
->
->We could play tricks with the meaning of the CREDIT_UPDATE message and
->fwd_cnt/buf_alloc fields, but I don't think we want to go down that
->path.
->
->I think that the best and simplest approach introduces a congestion
->notification (VIRTIO_VSOCK_OP_CN?). When a packet is dropped, the
->destination sends this notification. At a given repeated time period T,
->the source can check if it has received any notifications in the last T.
->If so, it halves its buffer allocation. If not, it doubles its buffer
->allocation unless it is already at its max or original value.
->
->An "invalid" socket which never has any receiver will converge towards a
->rate limit of one packet per time T * log2(average pkt size). That is, a
->socket with 100% packet loss will only be able to send 16 bytes every
->4T. A default send buffer of MAX_UINT32 and T=5ms would hit zero within
->160ms given at least one packet sent per 5ms. I have no idea if that is
->a reasonable default T for vsock, I just pulled it out of a hat for the
->sake of the example.
->
->"Normal" sockets will be responsive to high loss and rebalance during
->low loss. The source is trying to guess and converge on the actual
->buffer state of the destination.
->
->This would reuse the already-existing throttling mechanisms that
->throttle based upon buffer allocation. The usage of sk_sndbuf would have
->to be re-worked. The application using sendmsg() will see EAGAIN when
->throttled, or just sleep if !MSG_DONTWAIT.
+$> ./configure --enable-efi
+$> make
 
-I see, it looks interesting, but I think we need to share that
-information between multiple sockets, since the same destination
-(cid, port), can be reached by multiple sockets.
+And use the run script to run an EFI tests:
 
-Another approach could be to have both congestion notification and
-decongestion, but maybe it produces double traffic.
+$> ./arm/efi/run ./arm/selftest.efi -smp 2 -m 256 -append "setup smp=2 mem=256"
 
->
->I looked at alternative schemes (like the Datagram Congestion Control
->Protocol), but I do not think the added complexity is necessary in the
->case of vsock (DCCP requires congestion windows, sequence numbers, batch
->acknowledgements, etc...). I also looked at UDP-based application
->protocols like TFTP, DHCP, and SIP over UDP which use a delay-based
->backoff mechanism, but seem to require acknowledgement for those packet
->types, which trigger the retries and backoffs. I think we can get away
->with the simpler approach and not have to potentially kill performance
->with per-packet acknowledgements.
+Or all tests:
 
-Yep I agree. I think our advantage is that the channel (virtqueues),
-can't lose packets.
+$> ./run_tests.sh
 
->
->> > >
->> > > In this series I am also proposing that fairness be reexamined as an
->> > > issue separate from datagrams, which differs from my previous series
->> > > that coupled these issues. After further testing and reflection on the
->> > > design, I do not believe that these need to be coupled and I do not
->> > > believe this implementation introduces additional unfairness or
->> > > exacerbates pre-existing unfairness.
->>
->> I see.
->>
->> > >
->> > > I attempted to characterize vsock fairness by using a pool of processes
->> > > to stress test the shared resources while measuring the performance of a
->> > > lone stream socket. Given unfair preference for datagrams, we would
->> > > assume that a lone stream socket would degrade much more when a pool of
->> > > datagram sockets was stressing the system than when a pool of stream
->> > > sockets are stressing the system. The result, however, showed no
->> > > significant difference between the degradation of throughput of the lone
->> > > stream socket when using a pool of datagrams to stress the queue over
->> > > using a pool of streams. The absolute difference in throughput actually
->> > > favored datagrams as interfering least as the mean difference was +16%
->> > > compared to using streams to stress test (N=7), but it was not
->> > > statistically significant. Workloads were matched for payload size and
->> > > buffer size (to approximate memory consumption) and process count, and
->> > > stress workloads were configured to start before and last long after the
->> > > lifetime of the "lone" stream socket flow to ensure that competing flows
->> > > were continuously hot.
->> > >
->> > > Given the above data, I propose that vsock fairness be addressed
->> > > independent of datagrams and to defer its implementation to a future
->> > > series.
->>
->> Makes sense to me.
->>
->> I left some preliminary comments, anyway now it seems reasonable to use
->> the same virtqueues, so we can go head with the spec proposal.
->>
->> Thanks,
->> Stefano
->>
->
->Thanks for the review!
+There are a few items that this series does not address but they would
+be useful to have:
+ - Support for booting the system from EL2. Currently, we assume that a
+   test starts EL1. This will be required to run EFI tests on sytems
+   that implement EL2.
+ - Support for reading environment variables and populating __envp.
+ - Support for discovering the PCI subsystem using ACPI.
+ - Get rid of other assumptions (e.g., vmalloc area) that don't hold on
+   real HW.
+ - Various fixes related to cache maintaince to better support turn the
+   MMU off.
+ - Switch to a new stack and avoid relying on the one provided by EFI.
 
-You're welcome!
+git branch: https://github.com/relokin/kvm-unit-tests/pull/new/target-efi-upstream-v5
 
-Stefano
+v4: https://lore.kernel.org/kvmarm/20230213101759.2577077-1-nikos.nikoleris@arm.com/
+v3: https://lore.kernel.org/all/20220630100324.3153655-1-nikos.nikoleris@arm.com/
+v2: https://lore.kernel.org/kvm/20220506205605.359830-1-nikos.nikoleris@arm.com/
+
+Changes in v5:
+ - Minor style changes (thanks Shaoqin).
+ - Avoid including lib/acpi.o to cflatobjs twice (thanks Drew).
+ - Increase NR_INITIAL_MEM_REGIONS to avoid overflows and add check when
+   we run out of space (thanks Shaoqin).
+
+Changes in v4:
+ - Removed patch that reworks cache maintenance when turning the MMU
+   off. This is not strictly required for EFI tests running with tcg and
+   will be addressed in a separate series by Alex.
+ - Fix compilation for arm (Alex).
+ - Convert ACPI tables to Linux style (Alex).
+
+Changes in v3:
+ - Addressed feedback from Drew, Alex and Ricardo. Many thanks for the reviews!
+ - Added support for discovering the GIC through ACPI
+ - Added a missing header file (<elf.h>)
+ - Added support for correctly parsing the outcome of tests (./run_tests)
+
+Thanks,
+
+Nikos
+
+Alexandru Elisei (2):
+  lib/acpi: Convert table names to Linux style
+  lib: arm: Print test exit status
+
+Andrew Jones (2):
+  arm/arm64: Rename etext to _etext
+  arm64: Add a new type of memory type flag MR_F_RESERVED
+
+Nikos Nikoleris (25):
+  lib: Move acpi header and implementation to lib
+  x86: Move x86_64-specific EFI CFLAGS to x86_64 Makefile
+  lib: Apply Lindent to acpi.{c,h}
+  lib: Fix style for acpi.{c,h}
+  x86: Avoid references to fields of ACPI tables
+  lib/acpi: Ensure all struct definition for ACPI tables are packed
+  lib/acpi: Add support for the XSDT table
+  lib/acpi: Extend the definition of the FADT table
+  devicetree: Check that fdt is not NULL in dt_available()
+  arm64: Add support for setting up the PSCI conduit through ACPI
+  arm64: Add support for discovering the UART through ACPI
+  arm64: Add support for timer initialization through ACPI
+  arm64: Add support for cpu initialization through ACPI
+  arm64: Add support for gic initialization through ACPI
+  lib/printf: Support for precision modifier in printf
+  lib/printf: Add support for printing wide strings
+  lib/efi: Add support for getting the cmdline
+  lib: Avoid ms_abi for calls related to EFI on arm64
+  arm64: Add a setup sequence for systems that boot through EFI
+  arm64: Copy code from GNU-EFI
+  arm64: Change GNU-EFI imported code to use defined types
+  arm64: Use code from the gnu-efi when booting with EFI
+  lib: Avoid external dependency in libelf
+  arm64: Add support for efi in Makefile
+  arm64: Add an efi/run script
+
+ scripts/runtime.bash        |  13 +-
+ arm/efi/run                 |  61 ++++++++
+ arm/run                     |  14 +-
+ configure                   |  17 +-
+ Makefile                    |   4 -
+ arm/Makefile.arm            |   6 +
+ arm/Makefile.arm64          |  22 ++-
+ arm/Makefile.common         |  47 ++++--
+ x86/Makefile.common         |   2 +-
+ x86/Makefile.x86_64         |   4 +
+ lib/linux/efi.h             |  25 +++
+ lib/arm/asm/setup.h         |   9 ++
+ lib/arm/asm/timer.h         |   2 +
+ lib/x86/asm/setup.h         |   2 +-
+ lib/acpi.h                  | 301 ++++++++++++++++++++++++++++++++++++
+ lib/argv.h                  |   1 +
+ lib/elf.h                   |  57 +++++++
+ lib/libcflat.h              |   1 +
+ lib/x86/acpi.h              | 112 --------------
+ lib/acpi.c                  | 129 ++++++++++++++++
+ lib/argv.c                  |   2 +-
+ lib/arm/gic.c               | 139 ++++++++++++++++-
+ lib/arm/io.c                |  41 ++++-
+ lib/arm/mmu.c               |   4 +
+ lib/arm/psci.c              |  37 ++++-
+ lib/arm/setup.c             | 269 ++++++++++++++++++++++++++------
+ lib/arm/timer.c             |  92 +++++++++++
+ lib/devicetree.c            |   2 +-
+ lib/efi.c                   | 102 ++++++++++++
+ lib/printf.c                | 194 +++++++++++++++++++++--
+ lib/x86/acpi.c              |  82 ----------
+ lib/x86/setup.c             |   2 +-
+ arm/efi/elf_aarch64_efi.lds |  63 ++++++++
+ arm/flat.lds                |   2 +-
+ arm/cstart.S                |   1 +
+ arm/cstart64.S              |   7 +
+ arm/efi/crt0-efi-aarch64.S  | 141 +++++++++++++++++
+ arm/dummy.c                 |  12 ++
+ arm/efi/reloc_aarch64.c     |  94 +++++++++++
+ arm/micro-bench.c           |   4 +-
+ arm/timer.c                 |  10 +-
+ x86/s3.c                    |  21 +--
+ x86/vmexit.c                |   4 +-
+ 43 files changed, 1831 insertions(+), 323 deletions(-)
+ create mode 100755 arm/efi/run
+ create mode 100644 lib/acpi.h
+ create mode 100644 lib/elf.h
+ delete mode 100644 lib/x86/acpi.h
+ create mode 100644 lib/acpi.c
+ create mode 100644 lib/arm/timer.c
+ delete mode 100644 lib/x86/acpi.c
+ create mode 100644 arm/efi/elf_aarch64_efi.lds
+ create mode 100644 arm/efi/crt0-efi-aarch64.S
+ create mode 100644 arm/dummy.c
+ create mode 100644 arm/efi/reloc_aarch64.c
+
+-- 
+2.25.1
 
