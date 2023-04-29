@@ -2,69 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F26A16F22AF
-	for <lists+kvm@lfdr.de>; Sat, 29 Apr 2023 05:28:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 905E16F22FD
+	for <lists+kvm@lfdr.de>; Sat, 29 Apr 2023 06:56:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230328AbjD2D2Y (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Apr 2023 23:28:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44472 "EHLO
+        id S230304AbjD2E4r (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 29 Apr 2023 00:56:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60478 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229598AbjD2D2W (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 28 Apr 2023 23:28:22 -0400
-Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F75A1FEA
-        for <kvm@vger.kernel.org>; Fri, 28 Apr 2023 20:28:21 -0700 (PDT)
-Received: by mail-pf1-x431.google.com with SMTP id d2e1a72fcca58-63b733fd00bso547604b3a.0
-        for <kvm@vger.kernel.org>; Fri, 28 Apr 2023 20:28:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1682738901; x=1685330901;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=OWGwac+SXzvlLnjehyPUtCsPkIj23kaKMRkgE6dwy/w=;
-        b=DaKNRP3LNYkQKS+9UsE5F/Mx49srp7YQmcZPThP6exlkVjsPTucCTUX/Pt5V74ZJtl
-         oNKj/nqrMM7M3qU6U0HFneLpLrq9kiM26kymnYLRvVqSCfDFXK0lR1Yg9QJyWP8hqtgr
-         wn22fG+dXzfy0OcADCmvMr9c5d62rQ4XO2LqYz/PXvfz3KqomO2Q9eKRzz+hnyFbs8pG
-         AbyeZrBJ3U5gf3HUrspXyj/Ix9l4UZSV8eYGyN2LYk8RWM6qKkLf/vG+SuHHlk5nNnT2
-         wJnHpaotpmq53JYLiYvLc+O+QfVBadgFuS97Fd3E7K/JrpPeFeahbksvDJGM30bpzp6W
-         OAzA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682738901; x=1685330901;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=OWGwac+SXzvlLnjehyPUtCsPkIj23kaKMRkgE6dwy/w=;
-        b=RmDuNuASJbIzJhbVh4wrZ72nqu40ijNKUoQrSjTOrZfRQGF/SVEimlP4Z9Nlv6AXyf
-         bvuYYhKhJrIs819EWY2378jaV1uMWl3Lz9eylPP0xU+cKEPJHhqPgnPI2DMHyqj/a60g
-         mDbioVZUeUD9gXnC9+VBEoKjcB1Ai8yfYoTrJa6K1125kmF0PRItvsPMRnSh5vyHsBJx
-         uf/Sdj/4LtxIJMTLTqPMpGmPwua9EYyWNVps45fUe1G0Tx+3Y2O37HzRgN1VW8kmPbvX
-         vjF4tsFG5X4ke4JMDyFHKw4hgM6RsKsPC9HmpaLSZ6NihK5X0SJlj5bIPiSxwY6ZWe0S
-         BJdQ==
-X-Gm-Message-State: AC+VfDwuawB5IwiHFqlw887zr/eEIAhXfhrf4H+MeayjTEnIUcd37qht
-        Dwyl0aTJnS8nfty4jWiE8ZnLMjnJeeQ00w==
-X-Google-Smtp-Source: ACHHUZ696++ydJYsPEEwUSfC7ag7YxXIVG2VLyDrYBb7bveVj1/6rU4pet2+S84utjp5iXbJn6EsqQ==
-X-Received: by 2002:a05:6a00:2451:b0:627:f0e1:4fbf with SMTP id d17-20020a056a00245100b00627f0e14fbfmr10205476pfj.33.1682738900554;
-        Fri, 28 Apr 2023 20:28:20 -0700 (PDT)
-Received: from [172.27.232.27] (ec2-16-163-40-128.ap-east-1.compute.amazonaws.com. [16.163.40.128])
-        by smtp.gmail.com with ESMTPSA id h4-20020a056a00170400b00640f01e130fsm7502928pfc.124.2023.04.28.20.28.19
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 28 Apr 2023 20:28:20 -0700 (PDT)
-Message-ID: <a9f97d08-8a2f-668b-201a-87c152b3d6e0@gmail.com>
-Date:   Sat, 29 Apr 2023 11:28:16 +0800
+        with ESMTP id S229978AbjD2E4p (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 29 Apr 2023 00:56:45 -0400
+Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A7FA268A
+        for <kvm@vger.kernel.org>; Fri, 28 Apr 2023 21:56:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1682744202; x=1714280202;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=nfFCfg3kPJdoPLIutQ72kVJYEJcJKaGdbgjoK6AaExQ=;
+  b=KRV93cJQrBRz/mdxF0h+m25PU+7ErYcDMqaoazy5fJ7Vzx+HEZW6FTve
+   ejUBGbIPi7az5SPMpsVJyF5qnuGlbKUu2OwZcGPfgnntPAIBMSOhyUl+a
+   pR/ozSAh3XD8aVliYVulqZcQgZvbdmBEoc6aMrHVP8/vodPsErD3iWF2N
+   duFEdRroweXpZKLJlieLgNKuX0P7bWrcu59VllrHUAsGsYj56kL1UIsIU
+   C4UpxsGkiande7lMGoDeZ6/F5pxFJ8YcOfhTt+s1lvNQFhXUbHllhmj5Y
+   B8sDCz37d9/JZ5CAPcI6s68YGnkaYKeAKGnfXPEC2rXCvaRIjcMJA7loj
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10694"; a="434199411"
+X-IronPort-AV: E=Sophos;i="5.99,236,1677571200"; 
+   d="scan'208";a="434199411"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Apr 2023 21:56:41 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10694"; a="697806337"
+X-IronPort-AV: E=Sophos;i="5.99,236,1677571200"; 
+   d="scan'208";a="697806337"
+Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.255.28.239]) ([10.255.28.239])
+  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Apr 2023 21:56:39 -0700
+Message-ID: <dc5cdf92-aacc-4e68-2a94-9d1da929ecbd@linux.intel.com>
+Date:   Sat, 29 Apr 2023 12:56:37 +0800
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
  Thunderbird/102.10.0
-Subject: Re: Latency issues inside KVM.
-To:     zhuangel570 <zhuangel570@gmail.com>, kvm@vger.kernel.org
-References: <CANZk6aSv5ta3emitOfWKxaB-JvURBVu-sXqFnCz9PKXhqjbV9w@mail.gmail.com>
-Content-Language: en-US
-From:   Robert Hoo <robert.hoo.linux@gmail.com>
-In-Reply-To: <CANZk6aSv5ta3emitOfWKxaB-JvURBVu-sXqFnCz9PKXhqjbV9w@mail.gmail.com>
+Subject: Re: [PATCH v7 2/5] KVM: x86: Virtualize CR3.LAM_{U48,U57}
+To:     "Huang, Kai" <kai.huang@intel.com>,
+        "Gao, Chao" <chao.gao@intel.com>
+Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "robert.hu@linux.intel.com" <robert.hu@linux.intel.com>,
+        "Christopherson,, Sean" <seanjc@google.com>,
+        "Guo, Xuelian" <xuelian.guo@intel.com>
+References: <20230404130923.27749-1-binbin.wu@linux.intel.com>
+ <20230404130923.27749-3-binbin.wu@linux.intel.com>
+ <9c99eceaddccbcd72c5108f72609d0f995a0606c.camel@intel.com>
+ <497514ed-db46-16b9-ca66-04985a687f2b@linux.intel.com>
+ <7b296e6686bba77f81d1d8c9eaceb84bd0ef0338.camel@intel.com>
+ <cc265df1-d4fc-0eb7-f6e8-494e98ece2d9@linux.intel.com>
+ <BL1PR11MB5978D1FA3B572A119F5EF3A9F7989@BL1PR11MB5978.namprd11.prod.outlook.com>
+ <5e229834-3e55-a580-d9f6-a5ffe971c567@linux.intel.com>
+ <7895c517a84300f903cb04fbf2f05c4b8e518c91.camel@intel.com>
+ <612345f3-74b8-d4bc-b87d-d74c8d0aedd1@linux.intel.com>
+ <ZENl3oGrLXvVaI1O@chao-email>
+ <262ed94998cf104c5fefcb290a81d60d10342173.camel@intel.com>
+From:   Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <262ed94998cf104c5fefcb290a81d60d10342173.camel@intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-5.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -72,41 +77,115 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 4/27/2023 8:38 PM, zhuangel570 wrote:
-> Hi
-> 
-> We found some latency issue in high-density and high-concurrency scenarios, we
-> are using cloud hypervisor as vmm for lightweight VM, using VIRTIO net and
-> block for VM. In our test, we got about 50ms to 100ms+ latency in creating VM
-> and register irqfd, after trace with funclatency (a tool of bcc-tools,
-> https://github.com/iovisor/bcc), we found the latency introduced by following
-> functions:
-> 
-> - irq_bypass_register_consumer introduce more than 60ms per VM.
->    This function was called when registering irqfd, the function will register
->    irqfd as consumer to irqbypass, wait for connecting from irqbypass producers,
->    like VFIO or VDPA. In our test, one irqfd register will get about 4ms
->    latency, and 5 devices with total 16 irqfd will introduce more than 60ms
->    latency.
-> 
-> - kvm_vm_create_worker_thread introduce tail latency more than 100ms.
->    This function was called when create "kvm-nx-lpage-recovery" kthread when
->    create a new VM, this patch was introduced to recovery large page to relief
->    performance loss caused by software mitigation of ITLB_MULTIHIT, see
->    b8e8c8303ff2 ("kvm: mmu: ITLB_MULTIHIT mitigation") and 1aa9b9572b10
->    ("kvm: x86: mmu: Recovery of shattered NX large pages").
-> 
-Yes, this kthread is for NX-HugePage feature and NX-HugePage in turn is to 
-SW mitigate itlb-multihit issue.
-However, HW level mitigation has been available for quite a while, you can 
-check "/sys/devices/system/cpu/vulnerabilities/itlb_multihit" for your 
-system's mitigation status.
-I believe most recent Intel CPUs have this HW mitigated (check 
-MSR_ARCH_CAPABILITIES::IF_PSCHANGE_MC_NO), let alone non-Intel CPUs.
-But, the kvm_vm_create_worker_thread is still created anyway, nonsense I 
-think. I previously had a internal patch getting rid of it but didn't get a 
-chance to send out.
 
-As more and more old CPUs retires, I think NX-HugePage code will become 
-more and more minority code path/situation, and be refactored out 
-eventually one day.
+
+On 4/27/2023 9:19 PM, Huang, Kai wrote:
+> On Sat, 2023-04-22 at 12:43 +0800, Gao, Chao wrote:
+>> On Sat, Apr 22, 2023 at 11:32:26AM +0800, Binbin Wu wrote:
+>>> Kai,
+>>>
+>>> Thanks for your inputs.
+>>>
+>>> I rephrased the changelog as following:
+>>>
+>>>
+>>> LAM uses CR3.LAM_U48 (bit 62) and CR3.LAM_U57 (bit 61) to configure LAM
+>>> masking for user mode pointers.
+>>>
+>>> To support LAM in KVM, CR3 validity checks and shadow paging handling need to
+>>> be
+>>> modified accordingly.
+>>>
+>>> == CR3 validity Check ==
+>>> When LAM is supported, CR3 LAM bits are allowed to be set and the check of
+>>> CR3
+>>> needs to be modified.
+>> it is better to describe the hardware change here:
+>>
+>> On processors that enumerate support for LAM, CR3 register allows
+>> LAM_U48/U57 to be set and VM entry allows LAM_U48/U57 to be set in both
+>> GUEST_CR3 and HOST_CR3 fields.
+>>
+>> To emulate LAM hardware behavior, KVM needs to
+>> 1. allow LAM_U48/U57 to be set to the CR3 register by guest or userspace
+>> 2. allow LAM_U48/U57 to be set to the GUES_CR3/HOST_CR3 fields in vmcs12
+> Agreed.  This is more clearer.
+>
+>>> Add a helper kvm_vcpu_is_legal_cr3() and use it instead of
+>>> kvm_vcpu_is_legal_gpa()
+>>> to do the new CR3 checks in all existing CR3 checks as following:
+>>> When userspace sets sregs, CR3 is checked in kvm_is_valid_sregs().
+>>> Non-nested case
+>>> - When EPT on, CR3 is fully under control of guest.
+>>> - When EPT off, CR3 is intercepted and CR3 is checked in kvm_set_cr3() during
+>>>    CR3 VMExit handling.
+>>> Nested case, from L0's perspective, we care about:
+>>> - L1's CR3 register (VMCS01's GUEST_CR3), it's the same as non-nested case.
+>>> - L1's VMCS to run L2 guest (i.e. VMCS12's HOST_CR3 and VMCS12's GUEST_CR3)
+>>>    Two paths related:
+>>>    1. L0 emulates a VMExit from L2 to L1 using VMCS01 to reflect VMCS12
+>>>           nested_vm_exit()
+>>>           -> load_vmcs12_host_state()
+>>>                 -> nested_vmx_load_cr3()     //check VMCS12's HOST_CR3
+>> This is just a byproduct of using a unified function, i.e.,
+>> nested_vmx_load_cr3() to load CR3 for both nested VM entry and VM exit.
+>>
+>> LAM spec says:
+>>
+>> VM entry checks the values of the CR3 and CR4 fields in the guest-area
+>> and host-state area of the VMCS. In particular, the bits in these fields
+>> that correspond to bits reserved in the corresponding register are
+>> checked and must be 0.
+>>
+>> It doesn't mention any check on VM exit. So, it looks to me that VM exit
+>> doesn't do consistency checks. Then, I think there is no need to call
+>> out this path.
+> But this isn't a true VMEXIT -- it is indeed a VMENTER from L0 to L1 using
+> VMCS01 but with an environment that allows L1 to run its VMEXIT handler just
+> like it received a VMEXIT from L2.
+>
+> However I fully agree those code paths are details and shouldn't be changelog
+> material.
+>
+> How about below changelog?
+>
+> Add support to allow guest to set two new CR3 non-address control bits to allow
+> guest to enable the new Intel CPU feature Linear Address Masking (LAM).
+>
+> LAM modifies the checking that is applied to 64-bit linear addresses, allowing
+> software to use of the untranslated address bits for metadata.  For user mode
+> linear address, LAM uses two new CR3 non-address bits LAM_U48 (bit 62) and
+> LAM_U57 (bit 61) to configure the metadata bits for 4-level paging and 5-level
+> paging respectively.  LAM also changes VMENTER to allow both bits to be set in
+> VMCS's HOST_CR3 and GUEST_CR3 to support virtualization.
+>
+> When EPT is on, CR3 is not trapped by KVM and it's up to the guest to set any of
+> the two LAM control bits.  However when EPT is off, the actual CR3 used by the
+> guest is generated from the shadow MMU root which is different from the CR3 that
+> is *set* by the guest, and KVM needs to manually apply any active control bits
+> to VMCS's GUEST_CR3 based on the cached CR3 *seen* by the guest.
+>
+> KVM manually checks guest's CR3 to make sure it points to a valid guest physical
+> address (i.e. to support smaller MAXPHYSADDR in the guest).  Extend this check
+> to allow the two LAM control bits to be set.  And to make such check generic,
+> introduce a new field 'cr3_ctrl_bits' to vcpu to record all feature control bits
+> that are allowed to be set by the guest.
+>
+> In case of nested, for a guest which supports LAM, both VMCS12's HOST_CR3 and
+> GUEST_CR3 are allowed to have the new LAM control bits set, i.e. when L0 enters
+> L1 to emulate a VMEXIT from L2 to L1 or when L0 enters L2 directly.  KVM also
+> manually checks VMCS12's HOST_CR3 and GUEST_CR3 being valid physical address.
+> Extend such check to allow the new LAM control bits too.
+>
+> Note, LAM doesn't have a global enable bit in any control register to turn
+> on/off LAM completely, but purely depends on hardware's CPUID to determine
+> whether to perform LAM check or not.  That means, when EPT is on, even when KVM
+> doesn't expose LAM to guest, the guest can still set LAM control bits in CR3 w/o
+> causing problem.  This is an unfortunate virtualization hole.  KVM could choose
+> to intercept CR3 in this case and inject fault but this would hurt performance
+> when running a normal VM w/o LAM support.  This is undesirable.  Just choose to
+> let the guest do such illegal thing as the worst case is guest being killed when
+> KVM eventually find out such illegal behaviour and that is the guest to blame.
+Thanks for the advice.
+
+
