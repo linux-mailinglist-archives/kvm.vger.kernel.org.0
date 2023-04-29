@@ -2,190 +2,171 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 905E16F22FD
-	for <lists+kvm@lfdr.de>; Sat, 29 Apr 2023 06:56:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 21DD26F2557
+	for <lists+kvm@lfdr.de>; Sat, 29 Apr 2023 18:18:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230304AbjD2E4r (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 29 Apr 2023 00:56:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60478 "EHLO
+        id S230027AbjD2QSd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 29 Apr 2023 12:18:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54364 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229978AbjD2E4p (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 29 Apr 2023 00:56:45 -0400
-Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A7FA268A
-        for <kvm@vger.kernel.org>; Fri, 28 Apr 2023 21:56:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1682744202; x=1714280202;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=nfFCfg3kPJdoPLIutQ72kVJYEJcJKaGdbgjoK6AaExQ=;
-  b=KRV93cJQrBRz/mdxF0h+m25PU+7ErYcDMqaoazy5fJ7Vzx+HEZW6FTve
-   ejUBGbIPi7az5SPMpsVJyF5qnuGlbKUu2OwZcGPfgnntPAIBMSOhyUl+a
-   pR/ozSAh3XD8aVliYVulqZcQgZvbdmBEoc6aMrHVP8/vodPsErD3iWF2N
-   duFEdRroweXpZKLJlieLgNKuX0P7bWrcu59VllrHUAsGsYj56kL1UIsIU
-   C4UpxsGkiande7lMGoDeZ6/F5pxFJ8YcOfhTt+s1lvNQFhXUbHllhmj5Y
-   B8sDCz37d9/JZ5CAPcI6s68YGnkaYKeAKGnfXPEC2rXCvaRIjcMJA7loj
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10694"; a="434199411"
-X-IronPort-AV: E=Sophos;i="5.99,236,1677571200"; 
-   d="scan'208";a="434199411"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Apr 2023 21:56:41 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10694"; a="697806337"
-X-IronPort-AV: E=Sophos;i="5.99,236,1677571200"; 
-   d="scan'208";a="697806337"
-Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.255.28.239]) ([10.255.28.239])
-  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Apr 2023 21:56:39 -0700
-Message-ID: <dc5cdf92-aacc-4e68-2a94-9d1da929ecbd@linux.intel.com>
-Date:   Sat, 29 Apr 2023 12:56:37 +0800
+        with ESMTP id S229441AbjD2QSc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 29 Apr 2023 12:18:32 -0400
+Received: from out-12.mta0.migadu.com (out-12.mta0.migadu.com [91.218.175.12])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D5D71BD4
+        for <kvm@vger.kernel.org>; Sat, 29 Apr 2023 09:18:27 -0700 (PDT)
+Date:   Sat, 29 Apr 2023 18:18:23 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1682785104;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=nOodE+NXdu8b0gfIigjUrjTxNTkmlVBWN72aSNWy07k=;
+        b=lrdP7MIuqZFb1efY28d37vQTEsU9bEFJgPojLmGCgvN8JajBxuC0bMAqo6V+OYdFyJyGpm
+        a1L/YPsaGy2WglghppkotSf0AggNP6HzFYyYH2O62vBdfWsG4n5g6rKtoG7CyXYN2GpCtt
+        znMmhmhRCYP/f0F3HoKVhGELKtbIBWI=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From:   Andrew Jones <andrew.jones@linux.dev>
+To:     Nikos Nikoleris <nikos.nikoleris@arm.com>
+Cc:     kvm@vger.kernel.org, kvmarm@lists.linux.dev, pbonzini@redhat.com,
+        alexandru.elisei@arm.com, ricarkol@google.com, seanjc@google.com
+Subject: Re: [kvm-unit-tests PATCH v5 00/29] EFI and ACPI support for arm64
+Message-ID: <20230429-6da987552a8d15281f8444c9@orel>
+References: <20230428120405.3770496-1-nikos.nikoleris@arm.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Subject: Re: [PATCH v7 2/5] KVM: x86: Virtualize CR3.LAM_{U48,U57}
-To:     "Huang, Kai" <kai.huang@intel.com>,
-        "Gao, Chao" <chao.gao@intel.com>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "robert.hu@linux.intel.com" <robert.hu@linux.intel.com>,
-        "Christopherson,, Sean" <seanjc@google.com>,
-        "Guo, Xuelian" <xuelian.guo@intel.com>
-References: <20230404130923.27749-1-binbin.wu@linux.intel.com>
- <20230404130923.27749-3-binbin.wu@linux.intel.com>
- <9c99eceaddccbcd72c5108f72609d0f995a0606c.camel@intel.com>
- <497514ed-db46-16b9-ca66-04985a687f2b@linux.intel.com>
- <7b296e6686bba77f81d1d8c9eaceb84bd0ef0338.camel@intel.com>
- <cc265df1-d4fc-0eb7-f6e8-494e98ece2d9@linux.intel.com>
- <BL1PR11MB5978D1FA3B572A119F5EF3A9F7989@BL1PR11MB5978.namprd11.prod.outlook.com>
- <5e229834-3e55-a580-d9f6-a5ffe971c567@linux.intel.com>
- <7895c517a84300f903cb04fbf2f05c4b8e518c91.camel@intel.com>
- <612345f3-74b8-d4bc-b87d-d74c8d0aedd1@linux.intel.com>
- <ZENl3oGrLXvVaI1O@chao-email>
- <262ed94998cf104c5fefcb290a81d60d10342173.camel@intel.com>
-From:   Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <262ed94998cf104c5fefcb290a81d60d10342173.camel@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-5.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230428120405.3770496-1-nikos.nikoleris@arm.com>
+X-Migadu-Flow: FLOW_OUT
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Fri, Apr 28, 2023 at 01:03:36PM +0100, Nikos Nikoleris wrote:
+> Hello,
+> 
+> This series adds initial support for building arm64 tests as EFI
+> apps and running them under QEMU. Much like x86_64, we import external
+> dependencies from gnu-efi and adapt them to work with types and other
+> assumptions from kvm-unit-tests. In addition, this series adds support
+> for enumerating parts of the system using ACPI.
+> 
+> The first set of patches, moves the existing ACPI code to the common
+> lib path. Then, it extends definitions and functions to allow for more
+> robust discovery of ACPI tables. We add support for setting up the PSCI
+> conduit, discovering the UART, timers, GIC and cpus via ACPI. The code
+> retains existing behavior and gives priority to discovery through DT
+> when one has been provided.
+> 
+> In the second set of patches, we add support for getting the command
+> line from the EFI shell. This is a requirement for many of the
+> existing arm64 tests.
+> 
+> In the third set of patches, we import code from gnu-efi, make minor
+> changes and add an alternative setup sequence from arm64 systems that
+> boot through EFI. Finally, we add support in the build system and a
+> run script which is used to run an EFI app.
+> 
+> After this set of patches one can build arm64 EFI tests:
+> 
+> $> ./configure --enable-efi
+> $> make
+> 
+> And use the run script to run an EFI tests:
+> 
+> $> ./arm/efi/run ./arm/selftest.efi -smp 2 -m 256 -append "setup smp=2 mem=256"
+> 
+> Or all tests:
+> 
+> $> ./run_tests.sh
+> 
+> There are a few items that this series does not address but they would
+> be useful to have:
+>  - Support for booting the system from EL2. Currently, we assume that a
+>    test starts EL1. This will be required to run EFI tests on sytems
+>    that implement EL2.
+>  - Support for reading environment variables and populating __envp.
+>  - Support for discovering the PCI subsystem using ACPI.
+>  - Get rid of other assumptions (e.g., vmalloc area) that don't hold on
+>    real HW.
+>  - Various fixes related to cache maintaince to better support turn the
+>    MMU off.
+>  - Switch to a new stack and avoid relying on the one provided by EFI.
+> 
+> git branch: https://github.com/relokin/kvm-unit-tests/pull/new/target-efi-upstream-v5
+> 
+> v4: https://lore.kernel.org/kvmarm/20230213101759.2577077-1-nikos.nikoleris@arm.com/
+> v3: https://lore.kernel.org/all/20220630100324.3153655-1-nikos.nikoleris@arm.com/
+> v2: https://lore.kernel.org/kvm/20220506205605.359830-1-nikos.nikoleris@arm.com/
+> 
+> Changes in v5:
+>  - Minor style changes (thanks Shaoqin).
+>  - Avoid including lib/acpi.o to cflatobjs twice (thanks Drew).
+>  - Increase NR_INITIAL_MEM_REGIONS to avoid overflows and add check when
+>    we run out of space (thanks Shaoqin).
+> 
+> Changes in v4:
+>  - Removed patch that reworks cache maintenance when turning the MMU
+>    off. This is not strictly required for EFI tests running with tcg and
+>    will be addressed in a separate series by Alex.
+>  - Fix compilation for arm (Alex).
+>  - Convert ACPI tables to Linux style (Alex).
+> 
+> Changes in v3:
+>  - Addressed feedback from Drew, Alex and Ricardo. Many thanks for the reviews!
+>  - Added support for discovering the GIC through ACPI
+>  - Added a missing header file (<elf.h>)
+>  - Added support for correctly parsing the outcome of tests (./run_tests)
+>
 
+Thanks, Nikos!
 
-On 4/27/2023 9:19 PM, Huang, Kai wrote:
-> On Sat, 2023-04-22 at 12:43 +0800, Gao, Chao wrote:
->> On Sat, Apr 22, 2023 at 11:32:26AM +0800, Binbin Wu wrote:
->>> Kai,
->>>
->>> Thanks for your inputs.
->>>
->>> I rephrased the changelog as following:
->>>
->>>
->>> LAM uses CR3.LAM_U48 (bit 62) and CR3.LAM_U57 (bit 61) to configure LAM
->>> masking for user mode pointers.
->>>
->>> To support LAM in KVM, CR3 validity checks and shadow paging handling need to
->>> be
->>> modified accordingly.
->>>
->>> == CR3 validity Check ==
->>> When LAM is supported, CR3 LAM bits are allowed to be set and the check of
->>> CR3
->>> needs to be modified.
->> it is better to describe the hardware change here:
->>
->> On processors that enumerate support for LAM, CR3 register allows
->> LAM_U48/U57 to be set and VM entry allows LAM_U48/U57 to be set in both
->> GUEST_CR3 and HOST_CR3 fields.
->>
->> To emulate LAM hardware behavior, KVM needs to
->> 1. allow LAM_U48/U57 to be set to the CR3 register by guest or userspace
->> 2. allow LAM_U48/U57 to be set to the GUES_CR3/HOST_CR3 fields in vmcs12
-> Agreed.  This is more clearer.
->
->>> Add a helper kvm_vcpu_is_legal_cr3() and use it instead of
->>> kvm_vcpu_is_legal_gpa()
->>> to do the new CR3 checks in all existing CR3 checks as following:
->>> When userspace sets sregs, CR3 is checked in kvm_is_valid_sregs().
->>> Non-nested case
->>> - When EPT on, CR3 is fully under control of guest.
->>> - When EPT off, CR3 is intercepted and CR3 is checked in kvm_set_cr3() during
->>>    CR3 VMExit handling.
->>> Nested case, from L0's perspective, we care about:
->>> - L1's CR3 register (VMCS01's GUEST_CR3), it's the same as non-nested case.
->>> - L1's VMCS to run L2 guest (i.e. VMCS12's HOST_CR3 and VMCS12's GUEST_CR3)
->>>    Two paths related:
->>>    1. L0 emulates a VMExit from L2 to L1 using VMCS01 to reflect VMCS12
->>>           nested_vm_exit()
->>>           -> load_vmcs12_host_state()
->>>                 -> nested_vmx_load_cr3()     //check VMCS12's HOST_CR3
->> This is just a byproduct of using a unified function, i.e.,
->> nested_vmx_load_cr3() to load CR3 for both nested VM entry and VM exit.
->>
->> LAM spec says:
->>
->> VM entry checks the values of the CR3 and CR4 fields in the guest-area
->> and host-state area of the VMCS. In particular, the bits in these fields
->> that correspond to bits reserved in the corresponding register are
->> checked and must be 0.
->>
->> It doesn't mention any check on VM exit. So, it looks to me that VM exit
->> doesn't do consistency checks. Then, I think there is no need to call
->> out this path.
-> But this isn't a true VMEXIT -- it is indeed a VMENTER from L0 to L1 using
-> VMCS01 but with an environment that allows L1 to run its VMEXIT handler just
-> like it received a VMEXIT from L2.
->
-> However I fully agree those code paths are details and shouldn't be changelog
-> material.
->
-> How about below changelog?
->
-> Add support to allow guest to set two new CR3 non-address control bits to allow
-> guest to enable the new Intel CPU feature Linear Address Masking (LAM).
->
-> LAM modifies the checking that is applied to 64-bit linear addresses, allowing
-> software to use of the untranslated address bits for metadata.  For user mode
-> linear address, LAM uses two new CR3 non-address bits LAM_U48 (bit 62) and
-> LAM_U57 (bit 61) to configure the metadata bits for 4-level paging and 5-level
-> paging respectively.  LAM also changes VMENTER to allow both bits to be set in
-> VMCS's HOST_CR3 and GUEST_CR3 to support virtualization.
->
-> When EPT is on, CR3 is not trapped by KVM and it's up to the guest to set any of
-> the two LAM control bits.  However when EPT is off, the actual CR3 used by the
-> guest is generated from the shadow MMU root which is different from the CR3 that
-> is *set* by the guest, and KVM needs to manually apply any active control bits
-> to VMCS's GUEST_CR3 based on the cached CR3 *seen* by the guest.
->
-> KVM manually checks guest's CR3 to make sure it points to a valid guest physical
-> address (i.e. to support smaller MAXPHYSADDR in the guest).  Extend this check
-> to allow the two LAM control bits to be set.  And to make such check generic,
-> introduce a new field 'cr3_ctrl_bits' to vcpu to record all feature control bits
-> that are allowed to be set by the guest.
->
-> In case of nested, for a guest which supports LAM, both VMCS12's HOST_CR3 and
-> GUEST_CR3 are allowed to have the new LAM control bits set, i.e. when L0 enters
-> L1 to emulate a VMEXIT from L2 to L1 or when L0 enters L2 directly.  KVM also
-> manually checks VMCS12's HOST_CR3 and GUEST_CR3 being valid physical address.
-> Extend such check to allow the new LAM control bits too.
->
-> Note, LAM doesn't have a global enable bit in any control register to turn
-> on/off LAM completely, but purely depends on hardware's CPUID to determine
-> whether to perform LAM check or not.  That means, when EPT is on, even when KVM
-> doesn't expose LAM to guest, the guest can still set LAM control bits in CR3 w/o
-> causing problem.  This is an unfortunate virtualization hole.  KVM could choose
-> to intercept CR3 in this case and inject fault but this would hurt performance
-> when running a normal VM w/o LAM support.  This is undesirable.  Just choose to
-> let the guest do such illegal thing as the worst case is guest being killed when
-> KVM eventually find out such illegal behaviour and that is the guest to blame.
-Thanks for the advice.
+I'd like to get an ack from either Paolo or Sean on the changes to ACPI,
+as they're shared with x86, and there are also some x86 code changes.
 
+Also,
 
+  1) It'd be nice if this worked with DT, too. We can use UEFI with DT
+     when adding '-no-acpi' to the QEMU command line. setup_efi() needs
+     to learn how to find the dtb and most the '#ifdef CONFIG_EFI's
+     would need to change to a new CONFIG_ACPI guard.
+
+  2) The debug bp and ss tests fail with EFI, but not without, for me.
+
+  3) The timer test runs (and succeeds) when run with
+     './arm/efi/run ./arm/timer.efi', but not when run with
+     './run_tests.sh -g timer'. This is because UEFI takes
+     up all the given timeout time (10s), and then the test times out.
+     The hackyish fix below resolves it for me. I'll consider posting it
+     as a real patch
+
+Thanks,
+drew
+
+diff --git a/scripts/arch-run.bash b/scripts/arch-run.bash
+index 51e4b97b27d1..72ce718b1170 100644
+--- a/scripts/arch-run.bash
++++ b/scripts/arch-run.bash
+@@ -94,7 +94,17 @@ run_qemu_status ()
+ 
+ timeout_cmd ()
+ {
++	local s
++
+ 	if [ "$TIMEOUT" ] && [ "$TIMEOUT" != "0" ]; then
++		if [ "$CONFIG_EFI" = 'y' ]; then
++			s=${TIMEOUT: -1}
++			if [ "$s" = 's' ]; then
++				TIMEOUT=${TIMEOUT:0:-1}
++				((TIMEOUT += 10)) # Add 10 seconds for booting UEFI
++				TIMEOUT="${TIMEOUT}s"
++			fi
++		fi
+ 		echo "timeout -k 1s --foreground $TIMEOUT"
+ 	fi
+ }
