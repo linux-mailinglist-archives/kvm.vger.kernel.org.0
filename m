@@ -2,296 +2,141 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AB3006F2F84
-	for <lists+kvm@lfdr.de>; Mon,  1 May 2023 11:00:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5547D6F2FEC
+	for <lists+kvm@lfdr.de>; Mon,  1 May 2023 11:37:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232476AbjEAI7w (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 1 May 2023 04:59:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54408 "EHLO
+        id S232169AbjEAJhI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 1 May 2023 05:37:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44150 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232070AbjEAI7L (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 1 May 2023 04:59:11 -0400
-Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E585410D8;
-        Mon,  1 May 2023 01:57:55 -0700 (PDT)
-Received: by mail-pl1-x634.google.com with SMTP id d9443c01a7336-1aaebed5bd6so8315655ad.1;
-        Mon, 01 May 2023 01:57:55 -0700 (PDT)
+        with ESMTP id S229482AbjEAJhH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 1 May 2023 05:37:07 -0400
+Received: from mail-wr1-x433.google.com (mail-wr1-x433.google.com [IPv6:2a00:1450:4864:20::433])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5624CDB
+        for <kvm@vger.kernel.org>; Mon,  1 May 2023 02:37:06 -0700 (PDT)
+Received: by mail-wr1-x433.google.com with SMTP id ffacd0b85a97d-2fc3f1d6f8cso1268318f8f.3
+        for <kvm@vger.kernel.org>; Mon, 01 May 2023 02:37:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1682931471; x=1685523471;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=85FbKOIGeJKFvrZkC+4B4Gx5bHvgxBGU0hkt5+QsJqk=;
-        b=CYmVFe1ZSITuLQYsYizoY0KSUhYRoc3Md2T3+Zn3YfBMhN96TjlaesKr0AHYkxYL3v
-         xf6KqM2vo4FHnlA9N+jobMd2j0rw9GmXaOyD0ksuq3xqSRXWNriRp1dywc02INgHtJOa
-         7ZQiLnu7ypHI1/DM3yog6Eq+UrjNGY43okh2hO6Y+VBY2FRliX/lYTQpHj9uYd/JjXh0
-         oTwSNOq7l/uXXvImVuBOg82rf4w0t0Wof18L+NUlLzWO5uEtCCvQPS7xzdWD9jG7qNqH
-         nXXnq0yTNRHWetCQV7B+OgXJqrIfjSTNe2n4NCfq29mDprN2kOaC6zvS2JvyHgi1LXLT
-         Xs9A==
+        d=linaro.org; s=google; t=1682933825; x=1685525825;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=2Ulfu//JSlmd4ioDoRY8oEQyfdEQ+vz2PWQIyipab1c=;
+        b=yEBwc2uGTktjSACyb4T4mb8fQDr6Y8u9PE9Zo6OruZw7o5BPBE588xDJYg/IgHVU9e
+         qbNUi537t9o1aUHwYpwiPNFtQrNbIuQ0dsbXTiIelszCjpZwrN+tAIXm/qV8UggtPNaN
+         FlGV6N5knWTRH5oVtuozbhwOTXmPsqxnwk1z/XarHv3SVKzn0ifhp0Hnm0R/Hbqk9mqX
+         /aLE/x0DEpnpjFx5iNO+PirxxQjBr+gQCXi5ymjgHMQwoSi4UaeauBWB+/0ql51e5u5S
+         0N+Fmeag56qD7pcYKB1qQtJrf8qturPydybLKMAdSkW1tHcP++/HQkvSr23oGURbwH7o
+         bGLw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682931471; x=1685523471;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=85FbKOIGeJKFvrZkC+4B4Gx5bHvgxBGU0hkt5+QsJqk=;
-        b=EHi6CD/KDOYL8kMfViFr+rsD1X/LaCYXjAeq6z/n3O5NrAKXvVLgxVRnwvdLnZfW78
-         h9LZsRYvH6QJwv4lncgjjTVmI/Tk3EJkMbK0v7dDz51kP1Rw0R2OSc6SenCF9KtBOeeK
-         pT0tbAlu0mOUb9rc/jH925fW13B+x3Yj2vSXcLFHKCz+voT6Dmg6ul+72I4ZKghs4z8E
-         8vxL8zn8lUlPXqivMP4gmSbI7SGRSMhr8xyhPTCeOO47dC3Wgm+wWey5VQ6t/hBoP32a
-         ZlH31tk01ofH5rXkxsvn5LPjvfCG0NskuAggnbs/XBeM1DT7f4fr1K2umixQU7oGaHb6
-         aAAw==
-X-Gm-Message-State: AC+VfDyvodnaMuZ2NmRZI5wCTVLXhQaEvET97aBtMc0rZQMmpG/7H0sF
-        zctloVaj/9wIrmcnl7xlEGA=
-X-Google-Smtp-Source: ACHHUZ4pSFG50Yn3+YjfnFZIYk4iayAIyRl4ulCUswwf5cB7fb2dNgoNDk/UK/mdNoBXMvkT5zvNHA==
-X-Received: by 2002:a17:903:2310:b0:1a6:54ce:4311 with SMTP id d16-20020a170903231000b001a654ce4311mr16387616plh.43.1682931471101;
-        Mon, 01 May 2023 01:57:51 -0700 (PDT)
-Received: from ubuntu-Virtual-Machine.corp.microsoft.com ([2001:4898:80e8:b:e11b:15ea:ad44:bde7])
-        by smtp.gmail.com with ESMTPSA id t13-20020a1709028c8d00b001a4fe00a8d4sm17407070plo.90.2023.05.01.01.57.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 01 May 2023 01:57:50 -0700 (PDT)
-From:   Tianyu Lan <ltykernel@gmail.com>
-To:     luto@kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
-        hpa@zytor.com, seanjc@google.com, pbonzini@redhat.com,
-        jgross@suse.com, tiala@microsoft.com, kirill@shutemov.name,
-        jiangshan.ljs@antgroup.com, peterz@infradead.org,
-        ashish.kalra@amd.com, srutherford@google.com,
-        akpm@linux-foundation.org, anshuman.khandual@arm.com,
-        pawan.kumar.gupta@linux.intel.com, adrian.hunter@intel.com,
-        daniel.sneddon@linux.intel.com, alexander.shishkin@linux.intel.com,
-        sandipan.das@amd.com, ray.huang@amd.com, brijesh.singh@amd.com,
-        michael.roth@amd.com, thomas.lendacky@amd.com,
-        venu.busireddy@oracle.com, sterritt@google.com,
-        tony.luck@intel.com, samitolvanen@google.com, fenghua.yu@intel.com
-Cc:     pangupta@amd.com, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, linux-hyperv@vger.kernel.org,
-        linux-arch@vger.kernel.org
-Subject: [RFC PATCH V5 15/15] x86/sev: Fix interrupt exit code paths from #HV exception
-Date:   Mon,  1 May 2023 04:57:25 -0400
-Message-Id: <20230501085726.544209-16-ltykernel@gmail.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20230501085726.544209-1-ltykernel@gmail.com>
-References: <20230501085726.544209-1-ltykernel@gmail.com>
+        d=1e100.net; s=20221208; t=1682933825; x=1685525825;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=2Ulfu//JSlmd4ioDoRY8oEQyfdEQ+vz2PWQIyipab1c=;
+        b=ENvdUz0TMm4OsCiwkjEEb3epSwS1L+k6kYCLMttZpVKWwBrytokYHKflVwG2AzqhPU
+         MdBv3SqqTJB4njmlHltJ9aXGRp624n+WDJzlOyVT21dR8Ttt5uNkX85ZvA1Z5hrgl6Kj
+         uW744RfxzVBOeabTFnnk2HT0Cb9XgR6fNRDdjRFB84wmyUhxCR5pqSt9ryfLzK748s+o
+         jDILcwdPICWI5KTlrzxN6GEk17n/Qo2QBOhlqNU/gA8K/FCBPVdqg173Rkf1qJG/OqhG
+         cwP+j45kstrqo20AvfMsjbzredPs9ESLqKTJEn0CQ56UCuhKZ87QlyooxxGx5jCQ0nyo
+         Mn0g==
+X-Gm-Message-State: AC+VfDy8Z0l1B3HThaYH64KAoaN8HAciaXIu3PvQ7IWZp4rASjSaFF+2
+        18nnjHPxKNI7yWYYCz+Z10kc3Q==
+X-Google-Smtp-Source: ACHHUZ5GNhz6WQRMF564ntncCOo25bwRq7XMtiVWPJBvDQm2K6Vo17sLKjKEzX3NucIdGZr943ALFg==
+X-Received: by 2002:adf:ed12:0:b0:2ce:9d06:58c6 with SMTP id a18-20020adfed12000000b002ce9d0658c6mr9482991wro.53.1682933824721;
+        Mon, 01 May 2023 02:37:04 -0700 (PDT)
+Received: from [10.175.90.180] ([86.111.162.250])
+        by smtp.gmail.com with ESMTPSA id p7-20020a5d48c7000000b00306315583ccsm831073wrs.41.2023.05.01.02.37.03
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 01 May 2023 02:37:04 -0700 (PDT)
+Message-ID: <64915da6-4276-1603-1454-9350a44561d8@linaro.org>
+Date:   Mon, 1 May 2023 10:37:02 +0100
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+Subject: Re: [PATCH v7 1/1] arm/kvm: add support for MTE
+Content-Language: en-US
+To:     quintela@redhat.com, Cornelia Huck <cohuck@redhat.com>
+Cc:     Peter Maydell <peter.maydell@linaro.org>,
+        Paolo Bonzini <pbonzini@redhat.com>, qemu-arm@nongnu.org,
+        qemu-devel@nongnu.org, kvm@vger.kernel.org,
+        Eric Auger <eauger@redhat.com>, Gavin Shan <gshan@redhat.com>,
+        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>,
+        Andrea Bolognani <abologna@redhat.com>
+References: <20230428095533.21747-1-cohuck@redhat.com>
+ <20230428095533.21747-2-cohuck@redhat.com> <87sfcj99rn.fsf@secure.mitica>
+From:   Richard Henderson <richard.henderson@linaro.org>
+In-Reply-To: <87sfcj99rn.fsf@secure.mitica>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Ashish Kalra <ashish.kalra@amd.com>
+On 4/28/23 18:50, Juan Quintela wrote:
+> Pardon my ignorance here, but to try to help with migration.  How is
+> this mte tag stored?
+> - 1 array of 8bits per page of memory
+> - 1 array of 64bits per page of memory
+> - whatever
+> 
+> Lets asume that it is 1 byte per page. For the explanation it don't
+> matter, only matters that it is an array of things that are one for each
+> page.
 
-Add checks in interrupt exit code paths in case of returns
-to user mode to check if currently executing the #HV handler
-then don't follow the irqentry_exit_to_user_mode path as
-that can potentially cause the #HV handler to be
-preempted and rescheduled on another CPU. Rescheduled #HV
-handler on another cpu will cause interrupts to be handled
-on a different cpu than the injected one, causing
-invalid EOIs and missed/lost guest interrupts and
-corresponding hangs and/or per-cpu IRQs handled on
-non-intended cpu.
+Not that it matters, as you say, but for concreteness, 1 4-bit tag per 16 bytes, packed, 
+so 128 bytes per 4k page.
 
-Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
----
-Change since RFC v3:
-       * Add check of hv_handling_events in the do_exc_hv()
-       	 to avoid nested entry.
----
- arch/x86/include/asm/idtentry.h | 66 +++++++++++++++++++++++++++++++++
- arch/x86/kernel/sev.c           | 37 +++++++++++++++++-
- 2 files changed, 102 insertions(+), 1 deletion(-)
+> So my suggestion is just to send another array:
+> 
+> - 1 array of page addresses
+> - 1 array of page tags that correspond to the previous one
+> - 1 array of pages that correspond to the previous addresses
+> 
+> You put compatiblity marks here and there checking that you are using
+> mte (and the same version) in both sides and you call that a day.
 
-diff --git a/arch/x86/include/asm/idtentry.h b/arch/x86/include/asm/idtentry.h
-index b0f3501b2767..415b7e14c227 100644
---- a/arch/x86/include/asm/idtentry.h
-+++ b/arch/x86/include/asm/idtentry.h
-@@ -13,6 +13,10 @@
- 
- #include <asm/irq_stack.h>
- 
-+#ifdef CONFIG_AMD_MEM_ENCRYPT
-+noinstr void irqentry_exit_hv_cond(struct pt_regs *regs, irqentry_state_t state);
-+#endif
-+
- /**
-  * DECLARE_IDTENTRY - Declare functions for simple IDT entry points
-  *		      No error code pushed by hardware
-@@ -176,6 +180,7 @@ __visible noinstr void func(struct pt_regs *regs, unsigned long error_code)
- #define DECLARE_IDTENTRY_IRQ(vector, func)				\
- 	DECLARE_IDTENTRY_ERRORCODE(vector, func)
- 
-+#ifndef CONFIG_AMD_MEM_ENCRYPT
- /**
-  * DEFINE_IDTENTRY_IRQ - Emit code for device interrupt IDT entry points
-  * @func:	Function name of the entry point
-@@ -205,6 +210,26 @@ __visible noinstr void func(struct pt_regs *regs,			\
- }									\
- 									\
- static noinline void __##func(struct pt_regs *regs, u32 vector)
-+#else
-+
-+#define DEFINE_IDTENTRY_IRQ(func)					\
-+static void __##func(struct pt_regs *regs, u32 vector);		\
-+									\
-+__visible noinstr void func(struct pt_regs *regs,			\
-+			    unsigned long error_code)			\
-+{									\
-+	irqentry_state_t state = irqentry_enter(regs);			\
-+	u32 vector = (u32)(u8)error_code;				\
-+									\
-+	instrumentation_begin();					\
-+	kvm_set_cpu_l1tf_flush_l1d();					\
-+	run_irq_on_irqstack_cond(__##func, regs, vector);		\
-+	instrumentation_end();						\
-+	irqentry_exit_hv_cond(regs, state);				\
-+}									\
-+									\
-+static noinline void __##func(struct pt_regs *regs, u32 vector)
-+#endif
- 
- /**
-  * DECLARE_IDTENTRY_SYSVEC - Declare functions for system vector entry points
-@@ -221,6 +246,7 @@ static noinline void __##func(struct pt_regs *regs, u32 vector)
- #define DECLARE_IDTENTRY_SYSVEC(vector, func)				\
- 	DECLARE_IDTENTRY(vector, func)
- 
-+#ifndef CONFIG_AMD_MEM_ENCRYPT
- /**
-  * DEFINE_IDTENTRY_SYSVEC - Emit code for system vector IDT entry points
-  * @func:	Function name of the entry point
-@@ -245,6 +271,26 @@ __visible noinstr void func(struct pt_regs *regs)			\
- }									\
- 									\
- static noinline void __##func(struct pt_regs *regs)
-+#else
-+
-+#define DEFINE_IDTENTRY_SYSVEC(func)					\
-+static void __##func(struct pt_regs *regs);				\
-+									\
-+__visible noinstr void func(struct pt_regs *regs)			\
-+{									\
-+	irqentry_state_t state = irqentry_enter(regs);			\
-+									\
-+	instrumentation_begin();					\
-+	kvm_set_cpu_l1tf_flush_l1d();					\
-+	run_sysvec_on_irqstack_cond(__##func, regs);			\
-+	instrumentation_end();						\
-+	irqentry_exit_hv_cond(regs, state);				\
-+}									\
-+									\
-+static noinline void __##func(struct pt_regs *regs)
-+#endif
-+
-+#ifndef CONFIG_AMD_MEM_ENCRYPT
- 
- /**
-  * DEFINE_IDTENTRY_SYSVEC_SIMPLE - Emit code for simple system vector IDT
-@@ -274,6 +320,26 @@ __visible noinstr void func(struct pt_regs *regs)			\
- }									\
- 									\
- static __always_inline void __##func(struct pt_regs *regs)
-+#else
-+
-+#define DEFINE_IDTENTRY_SYSVEC_SIMPLE(func)				\
-+static __always_inline void __##func(struct pt_regs *regs);		\
-+									\
-+__visible noinstr void func(struct pt_regs *regs)			\
-+{									\
-+	irqentry_state_t state = irqentry_enter(regs);			\
-+									\
-+	instrumentation_begin();					\
-+	__irq_enter_raw();						\
-+	kvm_set_cpu_l1tf_flush_l1d();					\
-+	__##func(regs);						\
-+	__irq_exit_raw();						\
-+	instrumentation_end();						\
-+	irqentry_exit_hv_cond(regs, state);				\
-+}									\
-+									\
-+static __always_inline void __##func(struct pt_regs *regs)
-+#endif
- 
- /**
-  * DECLARE_IDTENTRY_XENCB - Declare functions for XEN HV callback entry point
-diff --git a/arch/x86/kernel/sev.c b/arch/x86/kernel/sev.c
-index b6becf158598..69b55075ddfe 100644
---- a/arch/x86/kernel/sev.c
-+++ b/arch/x86/kernel/sev.c
-@@ -149,6 +149,10 @@ struct sev_hv_doorbell_page {
- 
- struct sev_snp_runtime_data {
- 	struct sev_hv_doorbell_page hv_doorbell_page;
-+	/*
-+	 * Indication that we are currently handling #HV events.
-+	 */
-+	bool hv_handling_events;
- };
- 
- static DEFINE_PER_CPU(struct sev_snp_runtime_data*, snp_runtime_data);
-@@ -204,6 +208,12 @@ static void do_exc_hv(struct pt_regs *regs)
- {
- 	union hv_pending_events pending_events;
- 
-+	/* Avoid nested entry. */
-+	if (this_cpu_read(snp_runtime_data)->hv_handling_events)
-+		return;
-+
-+	this_cpu_read(snp_runtime_data)->hv_handling_events = true;
-+
- 	while (sev_hv_pending()) {
- 		pending_events.events = xchg(
- 			&sev_snp_current_doorbell_page()->pending_events.events,
-@@ -218,7 +228,7 @@ static void do_exc_hv(struct pt_regs *regs)
- #endif
- 
- 		if (!pending_events.vector)
--			return;
-+			goto out;
- 
- 		if (pending_events.vector < FIRST_EXTERNAL_VECTOR) {
- 			/* Exception vectors */
-@@ -238,6 +248,9 @@ static void do_exc_hv(struct pt_regs *regs)
- 			common_interrupt(regs, pending_events.vector);
- 		}
- 	}
-+
-+out:
-+	this_cpu_read(snp_runtime_data)->hv_handling_events = false;
- }
- 
- static __always_inline bool on_vc_stack(struct pt_regs *regs)
-@@ -2542,3 +2555,25 @@ static int __init snp_init_platform_device(void)
- 	return 0;
- }
- device_initcall(snp_init_platform_device);
-+
-+noinstr void irqentry_exit_hv_cond(struct pt_regs *regs, irqentry_state_t state)
-+{
-+	/*
-+	 * Check whether this returns to user mode, if so and if
-+	 * we are currently executing the #HV handler then we don't
-+	 * want to follow the irqentry_exit_to_user_mode path as
-+	 * that can potentially cause the #HV handler to be
-+	 * preempted and rescheduled on another CPU. Rescheduled #HV
-+	 * handler on another cpu will cause interrupts to be handled
-+	 * on a different cpu than the injected one, causing
-+	 * invalid EOIs and missed/lost guest interrupts and
-+	 * corresponding hangs and/or per-cpu IRQs handled on
-+	 * non-intended cpu.
-+	 */
-+	if (user_mode(regs) &&
-+	    this_cpu_read(snp_runtime_data)->hv_handling_events)
-+		return;
-+
-+	/* follow normal interrupt return/exit path */
-+	irqentry_exit(regs, state);
-+}
--- 
-2.25.1
+Sounds reasonable.
 
+> Notice that this requires the series (still not upstream but already on
+> the list) that move the zero page detection to the multifd thread,
+> because I am assuming that zero pages also have tags (yes, it was not a
+> very impressive guess).
+
+Correct.  "Proper" zero detection would include checking the tags as well.
+Zero tags are what you get from the kernel on a new allocation.
+
+> Now you need to tell me if I should do this for each page, or use some
+> kind of scatter-gather function that allows me to receive the mte tags
+> from an array of pages.
+
+That is going to depend on if KVM exposes an interface with which to bulk-set tags (STGM, 
+"store tag multiple", is only available to kernel mode for some reason), a-la 
+arch/arm64/mm/copypage.c (which copies the page data then the page tags separately).
+
+For the moment, KVM believes that memcpy from userspace is sufficient, which means we'll 
+want a custom memcpy using STGP to store 16 bytes along with its tag.
+
+> You could pass this information when we are searching for dirty pages,
+> but it is going to be complicated doing that (basically we only pass the
+> dirty page id, nothing else).
+
+A page can be dirtied by changing nothing but a tag.
+So we cannot of course send tags "early", they must come with the data.
+I'm not 100% sure I understood your question here.
+
+> Another question, if you are using MTE, all pages have MTE, right?
+> Or there are other exceptions?
+
+No such systems are built yet, so we won't know what corner cases the host system will 
+have to cope with, but I believe as written so far all pages must have tags when MTE is 
+enabled by KVM.
+
+
+r~
