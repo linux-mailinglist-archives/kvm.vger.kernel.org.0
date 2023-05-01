@@ -2,73 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5613E6F3124
-	for <lists+kvm@lfdr.de>; Mon,  1 May 2023 14:45:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C2ABC6F312C
+	for <lists+kvm@lfdr.de>; Mon,  1 May 2023 14:49:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232498AbjEAMpe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 1 May 2023 08:45:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38532 "EHLO
+        id S232411AbjEAMto (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 1 May 2023 08:49:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41564 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232628AbjEAMpc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 1 May 2023 08:45:32 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F54A1986
-        for <kvm@vger.kernel.org>; Mon,  1 May 2023 05:44:18 -0700 (PDT)
+        with ESMTP id S229556AbjEAMtn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 1 May 2023 08:49:43 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF51F10D5
+        for <kvm@vger.kernel.org>; Mon,  1 May 2023 05:48:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1682945048;
+        s=mimecast20190719; t=1682945337;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=E/XpFUk6MEULg1fIO9TK+7Ab6RwwTGIJ5nuTSEsiTSs=;
-        b=KhMVoNy7gHVW0Lo+2yZMZB2bMIB1JuGvDbDqmylQCLRCIFSoIszxVeMB2azIPLfay0B1EC
-        ebx90KVaXK4wFPccxh4lTTufqUz+Akqg3KJvQ2yWq7pTCgvUlkeAo5pK44S13H3KT+LY0b
-        DUGIfxc299CiCeshThL8i7H3hJPXtOQ=
-Received: from mail-pg1-f198.google.com (mail-pg1-f198.google.com
- [209.85.215.198]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=PWad9w4sdvrJZTVU5kOVCYkO3f9hEPYY7626pqbBzYk=;
+        b=JVXezp1BejYs8CZioCWY8FY+CHiDoq1SGHYviVkn7asxInOZ3rrlFHvFs6CR0lWQWKKUPR
+        u+QFJBbmO15gWerr9s1nQMV06np7Zfv+CAy93Ht2w/NErdlcfk9U9kAbgYAjb6wJpmJE+z
+        sxS8huvVudTDGEeXJ+EtCU2RvvsTCdE=
+Received: from mail-pf1-f199.google.com (mail-pf1-f199.google.com
+ [209.85.210.199]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-656-JYigfXADP7evlN3gyBgztQ-1; Mon, 01 May 2023 08:44:05 -0400
-X-MC-Unique: JYigfXADP7evlN3gyBgztQ-1
-Received: by mail-pg1-f198.google.com with SMTP id 41be03b00d2f7-517f0c08dfaso387029a12.0
-        for <kvm@vger.kernel.org>; Mon, 01 May 2023 05:44:04 -0700 (PDT)
+ us-mta-67-fF9fq2CYPHeH-bvjpmXC8w-1; Mon, 01 May 2023 08:48:56 -0400
+X-MC-Unique: fF9fq2CYPHeH-bvjpmXC8w-1
+Received: by mail-pf1-f199.google.com with SMTP id d2e1a72fcca58-63b653f5cb4so466379b3a.0
+        for <kvm@vger.kernel.org>; Mon, 01 May 2023 05:48:56 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682945044; x=1685537044;
+        d=1e100.net; s=20221208; t=1682945336; x=1685537336;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=E/XpFUk6MEULg1fIO9TK+7Ab6RwwTGIJ5nuTSEsiTSs=;
-        b=l5dfHWkQSmls+D00yKORbFs2df2uuDfYSZi8QuSyVns1xhmghGj7VcVCd/ThQR7Tuj
-         bOleb2yoiLXDGFX3dQBqPFLcnCBNqM8l9QW2rjbAg39pXc82pz/lfI7jDlxuM/6uYjAl
-         e+N+WQMaxaoRT0jD91vwGJSoQ3E08EMXsAeBOa0tNBKZOospu7pleM8umglvvHAdeaoG
-         iZyg2LXCvf4Y6nbb9aW/n2mCKd4DG8XAe0Kz5e0RjsLfU1XBVQD1o6kSeHZNJwb3kHTr
-         NoO/o4qjBqzF5j+zzOzuNCILjmbwZdbHGbUfWEettsxZumXi6wZ35o45zIgScBas1Nxf
-         vWVQ==
-X-Gm-Message-State: AC+VfDxibc8dIyqEkoFc3otWUZPfqcTj8aMT6+amC2CAK7X8b4j8jwUI
-        rJcuxhiM0XD9jo4oM7yqxf053xg/FHkgherYJpijCe0ayPl6+Sdi1ANN6KHPMC5MC4nOyY9G+a4
-        Re6Pw7jpOMUnI
-X-Received: by 2002:a05:6a21:32a2:b0:f3:d92:a209 with SMTP id yt34-20020a056a2132a200b000f30d92a209mr18151449pzb.0.1682945043956;
-        Mon, 01 May 2023 05:44:03 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ7/DVSzvgACLO8Z00Gujg4Ra4TbWHw7QXPiNmoQFb5u0JKKNWIRCc1qrVjOZ5oT8oBgxVOL/g==
-X-Received: by 2002:a05:6a21:32a2:b0:f3:d92:a209 with SMTP id yt34-20020a056a2132a200b000f30d92a209mr18151427pzb.0.1682945043641;
-        Mon, 01 May 2023 05:44:03 -0700 (PDT)
+        bh=PWad9w4sdvrJZTVU5kOVCYkO3f9hEPYY7626pqbBzYk=;
+        b=YErhWD8q/dnmoSdzSOX7dKJ5wmg87rhSYmyDj4f65CfirGpRL1nUPXYE51C6FPUwaf
+         FipTWksdMD8ydGGr5v/tnpQi2i/A+XBvHpb7yXSEYRprgs6/SS5SIkJK8IU0JJqkd5ch
+         yhJSSH19EsIsOksoOcDXVCbAbDRF7a5RJDuvQpC5yiR5PRtJ03v7ndyI4LEcvLHZ8lwK
+         nXNVDsKSiREZPZssMvv/S/GIjbYBujBy/xoDKCyIxRR4BdE/ajrcL30lGOgsTF6ribjS
+         X0XLHcP+z4YyRTtFhw0pX9nBQwfvX7wtChX3nJtS2ti7xuBcLtcCte9Aud+Ommvnfdpb
+         fB0g==
+X-Gm-Message-State: AC+VfDwrHSRAfNcyMfzhRpmvwr+dVNmt17svXJcih+IYFe3peMF0OXac
+        PtiWfwsytXd6oIvOCsziAaZcZjHo0FM6gHoP6rKxjkbkOe+KgDefWZh9PhmlKIP76Fg/rzq4ACQ
+        Hcvrlls2RXoIF
+X-Received: by 2002:a05:6a00:1a0f:b0:63d:3a18:49fd with SMTP id g15-20020a056a001a0f00b0063d3a1849fdmr16231021pfv.2.1682945335786;
+        Mon, 01 May 2023 05:48:55 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ7R+XW5yARMhCaNUz3uZ8bssisrRfx/1EEjNh9s5GOPg9cqVC6Y6nxghRp3CFktVri7o4ur4A==
+X-Received: by 2002:a05:6a00:1a0f:b0:63d:3a18:49fd with SMTP id g15-20020a056a001a0f00b0063d3a1849fdmr16231011pfv.2.1682945335443;
+        Mon, 01 May 2023 05:48:55 -0700 (PDT)
 Received: from [10.66.61.39] ([209.132.188.80])
-        by smtp.gmail.com with ESMTPSA id m8-20020a654388000000b0051303d3e3c5sm16987907pgp.42.2023.05.01.05.44.01
+        by smtp.gmail.com with ESMTPSA id t1-20020a62d141000000b0063b8ce0e860sm19801872pfl.21.2023.05.01.05.48.53
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 01 May 2023 05:44:03 -0700 (PDT)
-Message-ID: <7c03c78d-8e8c-b2c4-6682-4a24061e01a3@redhat.com>
-Date:   Mon, 1 May 2023 20:44:00 +0800
+        Mon, 01 May 2023 05:48:55 -0700 (PDT)
+Message-ID: <bd151928-c94b-73aa-dbd9-289e4213db7a@redhat.com>
+Date:   Mon, 1 May 2023 20:48:51 +0800
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.8.0
-Subject: Re: [kvm-unit-tests PATCH v5 03/29] lib: Apply Lindent to acpi.{c,h}
+Subject: Re: [kvm-unit-tests PATCH v5 29/29] arm64: Add an efi/run script
 Content-Language: en-US
 To:     Nikos Nikoleris <nikos.nikoleris@arm.com>, kvm@vger.kernel.org,
         kvmarm@lists.linux.dev, andrew.jones@linux.dev
 Cc:     pbonzini@redhat.com, alexandru.elisei@arm.com, ricarkol@google.com
 References: <20230428120405.3770496-1-nikos.nikoleris@arm.com>
- <20230428120405.3770496-4-nikos.nikoleris@arm.com>
+ <20230428120405.3770496-30-nikos.nikoleris@arm.com>
 From:   Shaoqin Huang <shahuang@redhat.com>
-In-Reply-To: <20230428120405.3770496-4-nikos.nikoleris@arm.com>
+In-Reply-To: <20230428120405.3770496-30-nikos.nikoleris@arm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-3.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
@@ -81,297 +81,194 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Currently, it seems not support:
 
+./run_test.sh -j8
 
-On 4/28/23 20:03, Nikos Nikoleris wrote:
-> The change was done by modifying Linux's scripts/Lindent to use 100
-> columns instead of 80.
+Since different test will write the startup.nsh to the same directory, 
+which will make something wrong.
+
+But that's fine right now. We can improve it later.
+
+On 4/28/23 20:04, Nikos Nikoleris wrote:
+> This change adds a efi/run script inspired by the one in x86. This
+> script will setup a folder with the test compiled as an EFI app and a
+> startup.nsh script. The script launches QEMU providing an image with
+> EDKII and the path to the folder with the test which is executed
+> automatically.
+> 
+> For example:
+> 
+> $> ./arm/efi/run ./arm/selftest.efi -append "setup smp=2 mem=256" -smp 2 -m 256
 > 
 > Signed-off-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
+> Reviewed-by: Ricardo Koller <ricarkol@google.com>
 Reviewed-by: Shaoqin Huang <shahuang@redhat.com>
+
 > ---
->   lib/acpi.h | 157 ++++++++++++++++++++++++++---------------------------
->   lib/acpi.c |  70 ++++++++++++------------
->   2 files changed, 111 insertions(+), 116 deletions(-)
+>   scripts/runtime.bash | 13 +++++++---
+>   arm/efi/run          | 61 ++++++++++++++++++++++++++++++++++++++++++++
+>   arm/run              | 14 +++++++---
+>   arm/Makefile.common  |  1 +
+>   arm/dummy.c          | 12 +++++++++
+>   5 files changed, 94 insertions(+), 7 deletions(-)
+>   create mode 100755 arm/efi/run
+>   create mode 100644 arm/dummy.c
 > 
-> diff --git a/lib/acpi.h b/lib/acpi.h
-> index 1e89840c..b67bbe19 100644
-> --- a/lib/acpi.h
-> +++ b/lib/acpi.h
-> @@ -3,7 +3,7 @@
+> diff --git a/scripts/runtime.bash b/scripts/runtime.bash
+> index 07b62b0e..785a7b62 100644
+> --- a/scripts/runtime.bash
+> +++ b/scripts/runtime.bash
+> @@ -130,11 +130,18 @@ function run()
+>           done
+>       fi
 >   
->   #include "libcflat.h"
->   
-> -#define ACPI_SIGNATURE(c1, c2, c3, c4) \
-> +#define ACPI_SIGNATURE(c1, c2, c3, c4)				\
->   	((c1) | ((c2) << 8) | ((c3) << 16) | ((c4) << 24))
->   
->   #define RSDP_SIGNATURE ACPI_SIGNATURE('R','S','D','P')
-> @@ -11,102 +11,99 @@
->   #define FACP_SIGNATURE ACPI_SIGNATURE('F','A','C','P')
->   #define FACS_SIGNATURE ACPI_SIGNATURE('F','A','C','S')
->   
-> -
-> -#define ACPI_SIGNATURE_8BYTE(c1, c2, c3, c4, c5, c6, c7, c8) \
-> -	((uint64_t)(ACPI_SIGNATURE(c1, c2, c3, c4))) |       \
-> +#define ACPI_SIGNATURE_8BYTE(c1, c2, c3, c4, c5, c6, c7, c8)	\
-> +	((uint64_t)(ACPI_SIGNATURE(c1, c2, c3, c4))) |		\
->   	((uint64_t)(ACPI_SIGNATURE(c5, c6, c7, c8)) << 32)
->   
->   #define RSDP_SIGNATURE_8BYTE (ACPI_SIGNATURE_8BYTE('R', 'S', 'D', ' ', 'P', 'T', 'R', ' '))
->   
-> -struct rsdp_descriptor {        /* Root System Descriptor Pointer */
-> -    u64 signature;              /* ACPI signature, contains "RSD PTR " */
-> -    u8  checksum;               /* To make sum of struct == 0 */
-> -    u8  oem_id [6];             /* OEM identification */
-> -    u8  revision;               /* Must be 0 for 1.0, 2 for 2.0 */
-> -    u32 rsdt_physical_address;  /* 32-bit physical address of RSDT */
-> -    u32 length;                 /* XSDT Length in bytes including hdr */
-> -    u64 xsdt_physical_address;  /* 64-bit physical address of XSDT */
-> -    u8  extended_checksum;      /* Checksum of entire table */
-> -    u8  reserved [3];           /* Reserved field must be 0 */
-> +struct rsdp_descriptor {	/* Root System Descriptor Pointer */
-> +	u64 signature;		/* ACPI signature, contains "RSD PTR " */
-> +	u8 checksum;		/* To make sum of struct == 0 */
-> +	u8 oem_id[6];		/* OEM identification */
-> +	u8 revision;		/* Must be 0 for 1.0, 2 for 2.0 */
-> +	u32 rsdt_physical_address;	/* 32-bit physical address of RSDT */
-> +	u32 length;		/* XSDT Length in bytes including hdr */
-> +	u64 xsdt_physical_address;	/* 64-bit physical address of XSDT */
-> +	u8 extended_checksum;	/* Checksum of entire table */
-> +	u8 reserved[3];		/* Reserved field must be 0 */
->   };
->   
-> -#define ACPI_TABLE_HEADER_DEF   /* ACPI common table header */ \
-> -    u32 signature;          /* ACPI signature (4 ASCII characters) */ \
-> -    u32 length;                 /* Length of table, in bytes, including header */ \
-> -    u8  revision;               /* ACPI Specification minor version # */ \
-> -    u8  checksum;               /* To make sum of entire table == 0 */ \
-> -    u8  oem_id [6];             /* OEM identification */ \
-> -    u8  oem_table_id [8];       /* OEM table identification */ \
-> -    u32 oem_revision;           /* OEM revision number */ \
-> -    u8  asl_compiler_id [4];    /* ASL compiler vendor ID */ \
-> -    u32 asl_compiler_revision;  /* ASL compiler revision number */
-> +#define ACPI_TABLE_HEADER_DEF		/* ACPI common table header */			\
-> +	u32 signature;			/* ACPI signature (4 ASCII characters) */	\
-> +	u32 length;			/* Length of table, in bytes, including header */ \
-> +	u8  revision;			/* ACPI Specification minor version # */	\
-> +	u8  checksum;			/* To make sum of entire table == 0 */		\
-> +	u8  oem_id [6];			/* OEM identification */			\
-> +	u8  oem_table_id [8];		/* OEM table identification */			\
-> +	u32 oem_revision;		/* OEM revision number */			\
-> +	u8  asl_compiler_id [4];	/* ASL compiler vendor ID */			\
-> +	u32 asl_compiler_revision;	/* ASL compiler revision number */
->   
->   struct acpi_table {
-> -    ACPI_TABLE_HEADER_DEF
-> -    char data[0];
-> +	ACPI_TABLE_HEADER_DEF
-> +	char data[0];
->   };
->   
->   struct rsdt_descriptor_rev1 {
-> -    ACPI_TABLE_HEADER_DEF
-> -    u32 table_offset_entry[0];
-> +	ACPI_TABLE_HEADER_DEF
-> +	u32 table_offset_entry[1];
->   };
->   
-> -struct fadt_descriptor_rev1
-> -{
-> -    ACPI_TABLE_HEADER_DEF     /* ACPI common table header */
-> -    u32 firmware_ctrl;          /* Physical address of FACS */
-> -    u32 dsdt;                   /* Physical address of DSDT */
-> -    u8  model;                  /* System Interrupt Model */
-> -    u8  reserved1;              /* Reserved */
-> -    u16 sci_int;                /* System vector of SCI interrupt */
-> -    u32 smi_cmd;                /* Port address of SMI command port */
-> -    u8  acpi_enable;            /* Value to write to smi_cmd to enable ACPI */
-> -    u8  acpi_disable;           /* Value to write to smi_cmd to disable ACPI */
-> -    u8  S4bios_req;             /* Value to write to SMI CMD to enter S4BIOS state */
-> -    u8  reserved2;              /* Reserved - must be zero */
-> -    u32 pm1a_evt_blk;           /* Port address of Power Mgt 1a acpi_event Reg Blk */
-> -    u32 pm1b_evt_blk;           /* Port address of Power Mgt 1b acpi_event Reg Blk */
-> -    u32 pm1a_cnt_blk;           /* Port address of Power Mgt 1a Control Reg Blk */
-> -    u32 pm1b_cnt_blk;           /* Port address of Power Mgt 1b Control Reg Blk */
-> -    u32 pm2_cnt_blk;            /* Port address of Power Mgt 2 Control Reg Blk */
-> -    u32 pm_tmr_blk;             /* Port address of Power Mgt Timer Ctrl Reg Blk */
-> -    u32 gpe0_blk;               /* Port addr of General Purpose acpi_event 0 Reg Blk */
-> -    u32 gpe1_blk;               /* Port addr of General Purpose acpi_event 1 Reg Blk */
-> -    u8  pm1_evt_len;            /* Byte length of ports at pm1_x_evt_blk */
-> -    u8  pm1_cnt_len;            /* Byte length of ports at pm1_x_cnt_blk */
-> -    u8  pm2_cnt_len;            /* Byte Length of ports at pm2_cnt_blk */
-> -    u8  pm_tmr_len;             /* Byte Length of ports at pm_tm_blk */
-> -    u8  gpe0_blk_len;           /* Byte Length of ports at gpe0_blk */
-> -    u8  gpe1_blk_len;           /* Byte Length of ports at gpe1_blk */
-> -    u8  gpe1_base;              /* Offset in gpe model where gpe1 events start */
-> -    u8  reserved3;              /* Reserved */
-> -    u16 plvl2_lat;              /* Worst case HW latency to enter/exit C2 state */
-> -    u16 plvl3_lat;              /* Worst case HW latency to enter/exit C3 state */
-> -    u16 flush_size;             /* Size of area read to flush caches */
-> -    u16 flush_stride;           /* Stride used in flushing caches */
-> -    u8  duty_offset;            /* Bit location of duty cycle field in p_cnt reg */
-> -    u8  duty_width;             /* Bit width of duty cycle field in p_cnt reg */
-> -    u8  day_alrm;               /* Index to day-of-month alarm in RTC CMOS RAM */
-> -    u8  mon_alrm;               /* Index to month-of-year alarm in RTC CMOS RAM */
-> -    u8  century;                /* Index to century in RTC CMOS RAM */
-> -    u8  reserved4;              /* Reserved */
-> -    u8  reserved4a;             /* Reserved */
-> -    u8  reserved4b;             /* Reserved */
-> +struct fadt_descriptor_rev1 {
-> +	ACPI_TABLE_HEADER_DEF	/* ACPI common table header */
-> +	u32 firmware_ctrl;	/* Physical address of FACS */
-> +	u32 dsdt;		/* Physical address of DSDT */
-> +	u8 model;		/* System Interrupt Model */
-> +	u8 reserved1;		/* Reserved */
-> +	u16 sci_int;		/* System vector of SCI interrupt */
-> +	u32 smi_cmd;		/* Port address of SMI command port */
-> +	u8 acpi_enable;		/* Value to write to smi_cmd to enable ACPI */
-> +	u8 acpi_disable;	/* Value to write to smi_cmd to disable ACPI */
-> +	u8 S4bios_req;		/* Value to write to SMI CMD to enter S4BIOS state */
-> +	u8 reserved2;		/* Reserved - must be zero */
-> +	u32 pm1a_evt_blk;	/* Port address of Power Mgt 1a acpi_event Reg Blk */
-> +	u32 pm1b_evt_blk;	/* Port address of Power Mgt 1b acpi_event Reg Blk */
-> +	u32 pm1a_cnt_blk;	/* Port address of Power Mgt 1a Control Reg Blk */
-> +	u32 pm1b_cnt_blk;	/* Port address of Power Mgt 1b Control Reg Blk */
-> +	u32 pm2_cnt_blk;	/* Port address of Power Mgt 2 Control Reg Blk */
-> +	u32 pm_tmr_blk;		/* Port address of Power Mgt Timer Ctrl Reg Blk */
-> +	u32 gpe0_blk;		/* Port addr of General Purpose acpi_event 0 Reg Blk */
-> +	u32 gpe1_blk;		/* Port addr of General Purpose acpi_event 1 Reg Blk */
-> +	u8 pm1_evt_len;		/* Byte length of ports at pm1_x_evt_blk */
-> +	u8 pm1_cnt_len;		/* Byte length of ports at pm1_x_cnt_blk */
-> +	u8 pm2_cnt_len;		/* Byte Length of ports at pm2_cnt_blk */
-> +	u8 pm_tmr_len;		/* Byte Length of ports at pm_tm_blk */
-> +	u8 gpe0_blk_len;	/* Byte Length of ports at gpe0_blk */
-> +	u8 gpe1_blk_len;	/* Byte Length of ports at gpe1_blk */
-> +	u8 gpe1_base;		/* Offset in gpe model where gpe1 events start */
-> +	u8 reserved3;		/* Reserved */
-> +	u16 plvl2_lat;		/* Worst case HW latency to enter/exit C2 state */
-> +	u16 plvl3_lat;		/* Worst case HW latency to enter/exit C3 state */
-> +	u16 flush_size;		/* Size of area read to flush caches */
-> +	u16 flush_stride;	/* Stride used in flushing caches */
-> +	u8 duty_offset;		/* Bit location of duty cycle field in p_cnt reg */
-> +	u8 duty_width;		/* Bit width of duty cycle field in p_cnt reg */
-> +	u8 day_alrm;		/* Index to day-of-month alarm in RTC CMOS RAM */
-> +	u8 mon_alrm;		/* Index to month-of-year alarm in RTC CMOS RAM */
-> +	u8 century;		/* Index to century in RTC CMOS RAM */
-> +	u8 reserved4;		/* Reserved */
-> +	u8 reserved4a;		/* Reserved */
-> +	u8 reserved4b;		/* Reserved */
->   };
->   
-> -struct facs_descriptor_rev1
-> -{
-> -    u32 signature;           /* ACPI Signature */
-> -    u32 length;                 /* Length of structure, in bytes */
-> -    u32 hardware_signature;     /* Hardware configuration signature */
-> -    u32 firmware_waking_vector; /* ACPI OS waking vector */
-> -    u32 global_lock;            /* Global Lock */
-> -    u32 S4bios_f        : 1;    /* Indicates if S4BIOS support is present */
-> -    u32 reserved1       : 31;   /* Must be 0 */
-> -    u8  reserved3 [40];         /* Reserved - must be zero */
-> +struct facs_descriptor_rev1 {
-> +	u32 signature;		/* ACPI Signature */
-> +	u32 length;		/* Length of structure, in bytes */
-> +	u32 hardware_signature;	/* Hardware configuration signature */
-> +	u32 firmware_waking_vector;	/* ACPI OS waking vector */
-> +	u32 global_lock;	/* Global Lock */
-> +	u32 S4bios_f:1;		/* Indicates if S4BIOS support is present */
-> +	u32 reserved1:31;	/* Must be 0 */
-> +	u8 reserved3[40];	/* Reserved - must be zero */
->   };
->   
->   void set_efi_rsdp(struct rsdp_descriptor *rsdp);
-> -void* find_acpi_table_addr(u32 sig);
-> +void *find_acpi_table_addr(u32 sig);
->   
->   #endif
-> diff --git a/lib/acpi.c b/lib/acpi.c
-> index de275caf..836156a1 100644
-> --- a/lib/acpi.c
-> +++ b/lib/acpi.c
-> @@ -36,47 +36,45 @@ static struct rsdp_descriptor *get_rsdp(void)
->   }
->   #endif /* CONFIG_EFI */
->   
-> -void* find_acpi_table_addr(u32 sig)
-> +void *find_acpi_table_addr(u32 sig)
->   {
-> -    struct rsdp_descriptor *rsdp;
-> -    struct rsdt_descriptor_rev1 *rsdt;
-> -    void *end;
-> -    int i;
-> +	struct rsdp_descriptor *rsdp;
-> +	struct rsdt_descriptor_rev1 *rsdt;
-> +	void *end;
-> +	int i;
->   
-> -    /* FACS is special... */
-> -    if (sig == FACS_SIGNATURE) {
-> -        struct fadt_descriptor_rev1 *fadt;
-> -        fadt = find_acpi_table_addr(FACP_SIGNATURE);
-> -        if (!fadt) {
-> -            return NULL;
-> -        }
-> -        return (void*)(ulong)fadt->firmware_ctrl;
-> -    }
-> +	/* FACS is special... */
-> +	if (sig == FACS_SIGNATURE) {
-> +		struct fadt_descriptor_rev1 *fadt;
-> +		fadt = find_acpi_table_addr(FACP_SIGNATURE);
-> +		if (!fadt)
-> +			return NULL;
->   
-> -    rsdp = get_rsdp();
-> -    if (rsdp == NULL) {
-> -        printf("Can't find RSDP\n");
-> -        return 0;
-> -    }
-> +		return (void *)(ulong) fadt->firmware_ctrl;
-> +	}
->   
-> -    if (sig == RSDP_SIGNATURE) {
-> -        return rsdp;
-> -    }
-> +	rsdp = get_rsdp();
-> +	if (rsdp == NULL) {
-> +		printf("Can't find RSDP\n");
-> +		return NULL;
-> +	}
->   
-> -    rsdt = (void*)(ulong)rsdp->rsdt_physical_address;
-> -    if (!rsdt || rsdt->signature != RSDT_SIGNATURE)
-> -        return 0;
-> +	if (sig == RSDP_SIGNATURE)
-> +		return rsdp;
->   
-> -    if (sig == RSDT_SIGNATURE) {
-> -        return rsdt;
-> -    }
-> +	rsdt = (void *)(ulong) rsdp->rsdt_physical_address;
-> +	if (!rsdt || rsdt->signature != RSDT_SIGNATURE)
-> +		return NULL;
+> -    last_line=$(premature_failure > >(tail -1)) && {
+> +    log=$(premature_failure) && {
+>           skip=true
+> -        if [ "${CONFIG_EFI}" == "y" ] && [[ "${last_line}" =~ "Dummy Hello World!" ]]; then
+> -            skip=false
+> +        if [ "${CONFIG_EFI}" == "y" ]; then
+> +            if [ "$ARCH" == "x86_64" ] &&
+> +               [[ "$(tail -1 <<<"$log")" =~ "Dummy Hello World!" ]]; then
+> +                   skip=false
+> +            elif [ "$ARCH" == "arm64" ] &&
+> +               [[ "$(tail -2 <<<"$log" | head -1)" =~ "Dummy Hello World!" ]]; then
+> +                   skip=false
+> +            fi
+>           fi
 > +
-> +	if (sig == RSDT_SIGNATURE)
-> +		return rsdt;
+>           if [ ${skip} == true ]; then
+>               print_result "SKIP" $testname "" "$last_line"
+>               return 77
+> diff --git a/arm/efi/run b/arm/efi/run
+> new file mode 100755
+> index 00000000..dfff717a
+> --- /dev/null
+> +++ b/arm/efi/run
+> @@ -0,0 +1,61 @@
+> +#!/bin/bash
+> +
+> +set -e
+> +
+> +if [ $# -eq 0 ]; then
+> +	echo "Usage $0 TEST_CASE [QEMU_ARGS]"
+> +	exit 2
+> +fi
+> +
+> +if [ ! -f config.mak ]; then
+> +	echo "run './configure --enable-efi && make' first. See ./configure -h"
+> +	exit 2
+> +fi
+> +source config.mak
+> +source scripts/arch-run.bash
+> +source scripts/common.bash
+> +
+> +: "${EFI_SRC:=$(realpath "$(dirname "$0")/../")}"
+> +: "${EFI_UEFI:=/usr/share/qemu-efi-aarch64/QEMU_EFI.fd}"
+> +: "${EFI_TEST:=efi-tests}"
+> +: "${EFI_CASE:=$(basename $1 .efi)}"
+> +
+> +if [ ! -f "$EFI_UEFI" ]; then
+> +	echo "UEFI firmware not found: $EFI_UEFI"
+> +	echo "Please install the UEFI firmware to this path"
+> +	echo "Or specify the correct path with the env variable EFI_UEFI"
+> +	exit 2
+> +fi
+> +
+> +# Remove the TEST_CASE from $@
+> +shift 1
+> +
+> +# Fish out the arguments for the test, they should be the next string
+> +# after the "-append" option
+> +qemu_args=()
+> +cmd_args=()
+> +while (( "$#" )); do
+> +	if [ "$1" = "-append" ]; then
+> +		cmd_args=$2
+> +		shift 2
+> +	else
+> +		qemu_args+=("$1")
+> +		shift 1
+> +	fi
+> +done
+> +
+> +if [ "$EFI_CASE" = "_NO_FILE_4Uhere_" ]; then
+> +	EFI_CASE=dummy
+> +fi
+> +
+> +: "${EFI_CASE_DIR:="$EFI_TEST/$EFI_CASE"}"
+> +mkdir -p "$EFI_CASE_DIR"
+> +
+> +cp "$EFI_SRC/$EFI_CASE.efi" "$EFI_TEST/$EFI_CASE/"
+> +echo "@echo -off" > "$EFI_TEST/$EFI_CASE/startup.nsh"
+> +echo "$EFI_CASE.efi" "${cmd_args[@]}" >> "$EFI_TEST/$EFI_CASE/startup.nsh"
+> +
+> +EFI_RUN=y $TEST_DIR/run \
+> +       -bios "$EFI_UEFI" \
+> +       -drive file.dir="$EFI_TEST/$EFI_CASE/",file.driver=vvfat,file.rw=on,format=raw,if=virtio \
+> +       "${qemu_args[@]}"
+> diff --git a/arm/run b/arm/run
+> index c6f25b8c..de520c11 100755
+> --- a/arm/run
+> +++ b/arm/run
+> @@ -64,8 +64,10 @@ if ! $qemu $M -chardev '?' | grep -q testdev; then
+>   	exit 2
+>   fi
 >   
-> -    end = (void*)rsdt + rsdt->length;
-> -    for (i=0; (void*)&rsdt->table_offset_entry[i] < end; i++) {
-> -        struct acpi_table *t = (void*)(ulong)rsdt->table_offset_entry[i];
-> -        if (t && t->signature == sig) {
-> -            return t;
-> -        }
-> -    }
-> -   return NULL;
-> +	end = (void *)rsdt + rsdt->length;
-> +	for (i = 0; (void *)&rsdt->table_offset_entry[i] < end; i++) {
-> +		struct acpi_table *t = (void *)(ulong) rsdt->table_offset_entry[i];
-> +		if (t && t->signature == sig) {
-> +			return t;
-> +		}
-> +	}
-> +	return NULL;
->   }
+> -chr_testdev='-device virtio-serial-device'
+> -chr_testdev+=' -device virtconsole,chardev=ctd -chardev testdev,id=ctd'
+> +if [ "$EFI_RUN" != "y" ]; then
+> +	chr_testdev='-device virtio-serial-device'
+> +	chr_testdev+=' -device virtconsole,chardev=ctd -chardev testdev,id=ctd'
+> +fi
+>   
+>   pci_testdev=
+>   if $qemu $M -device '?' | grep -q pci-testdev; then
+> @@ -74,7 +76,11 @@ fi
+>   
+>   A="-accel $ACCEL"
+>   command="$qemu -nodefaults $M $A -cpu $processor $chr_testdev $pci_testdev"
+> -command+=" -display none -serial stdio -kernel"
+> +command+=" -display none -serial stdio"
+>   command="$(migration_cmd) $(timeout_cmd) $command"
+>   
+> -run_qemu $command "$@"
+> +if [ "$EFI_RUN" = "y" ]; then
+> +	ENVIRON_DEFAULT=n run_qemu_status $command "$@"
+> +else
+> +	run_qemu $command -kernel "$@"
+> +fi
+> diff --git a/arm/Makefile.common b/arm/Makefile.common
+> index a133309d..d60cf8cd 100644
+> --- a/arm/Makefile.common
+> +++ b/arm/Makefile.common
+> @@ -12,6 +12,7 @@ tests-common += $(TEST_DIR)/gic.$(exe)
+>   tests-common += $(TEST_DIR)/psci.$(exe)
+>   tests-common += $(TEST_DIR)/sieve.$(exe)
+>   tests-common += $(TEST_DIR)/pl031.$(exe)
+> +tests-common += $(TEST_DIR)/dummy.$(exe)
+>   
+>   tests-all = $(tests-common) $(tests)
+>   all: directories $(tests-all)
+> diff --git a/arm/dummy.c b/arm/dummy.c
+> new file mode 100644
+> index 00000000..7033bb7c
+> --- /dev/null
+> +++ b/arm/dummy.c
+> @@ -0,0 +1,12 @@
+> +#include "libcflat.h"
+> +
+> +int main(int argc, char **argv)
+> +{
+> +	/*
+> +	 * scripts/runtime.bash uses this test as a canary to determine if the
+> +	 * basic setup is functional.  Print a magic string to let runtime.bash
+> +	 * know that all is well.
+> +	 */
+> +	printf("Dummy Hello World!");
+> +	return 0;
+> +}
 
 -- 
 Shaoqin
