@@ -2,75 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BCA046F314B
-	for <lists+kvm@lfdr.de>; Mon,  1 May 2023 14:57:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7E16B6F3159
+	for <lists+kvm@lfdr.de>; Mon,  1 May 2023 15:00:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232676AbjEAM5W (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 1 May 2023 08:57:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45640 "EHLO
+        id S232255AbjEANA0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 1 May 2023 09:00:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48208 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232588AbjEAM5U (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 1 May 2023 08:57:20 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62F5A1719
-        for <kvm@vger.kernel.org>; Mon,  1 May 2023 05:56:34 -0700 (PDT)
+        with ESMTP id S230139AbjEANAZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 1 May 2023 09:00:25 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AFBE3FD
+        for <kvm@vger.kernel.org>; Mon,  1 May 2023 05:59:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1682945793;
+        s=mimecast20190719; t=1682945976;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=kuMXQ1oTFDse+TOeXYPyubhb/2KQJ1FQpoh96k+T9K8=;
-        b=HdwGcfxNCG+whkbuBI2/6eCyzyhmR7hwJC9YUE/tuAS2itpreB5XOWC9No/wGWrNBJmMU4
-        JgpArkoYdV4f+3djquiQqb7qTFPvnog0IT13i87FPI3iy37KJeaW2yQPx+Ca5NGPT0D8uH
-        T4v+Xem9hRDrApvYGQeDti5WCHmT3dY=
-Received: from mail-pf1-f198.google.com (mail-pf1-f198.google.com
- [209.85.210.198]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=GlTIAVlYDvWGUgcAI69vPMhiBOoC9FH4wrN3XCSq6aw=;
+        b=L8+Dc4Kn47uioflNZGvIrEmHPXfMsqG7U/4h+0Oof5HeoDISThK5/TQVZOSbKXukxeUhTk
+        VCMelPMYf1S+Dtyk47SiCPkqJtPK8HYfFQ7kJrEhcW7YE+5qsiG3JZUQmeKMNqwjGKKUQE
+        SfZ150jEzdN0m4MAugl3YiGcX8if3rY=
+Received: from mail-pl1-f197.google.com (mail-pl1-f197.google.com
+ [209.85.214.197]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-584-VRtcteB2O3e7J9LZor9BUQ-1; Mon, 01 May 2023 08:56:32 -0400
-X-MC-Unique: VRtcteB2O3e7J9LZor9BUQ-1
-Received: by mail-pf1-f198.google.com with SMTP id d2e1a72fcca58-63b653f5cb4so467296b3a.0
-        for <kvm@vger.kernel.org>; Mon, 01 May 2023 05:56:31 -0700 (PDT)
+ us-mta-127-MXpm384UMJCToDsdNS0NkQ-1; Mon, 01 May 2023 08:59:35 -0400
+X-MC-Unique: MXpm384UMJCToDsdNS0NkQ-1
+Received: by mail-pl1-f197.google.com with SMTP id d9443c01a7336-1a687e3de0aso2746205ad.1
+        for <kvm@vger.kernel.org>; Mon, 01 May 2023 05:59:35 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682945791; x=1685537791;
+        d=1e100.net; s=20221208; t=1682945974; x=1685537974;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=kuMXQ1oTFDse+TOeXYPyubhb/2KQJ1FQpoh96k+T9K8=;
-        b=AwCP9TwH/37T5zu5L0Rii1ES3GLX8nD/gAA7X30gBn2tL5HXJet+uHg81ioRsIYatl
-         HBJF8xw8Gn6uuLszithdFZe+90A9XAIpPjm6CkkPj26Ut5jksg/DTDzCPpi3/vwydgNE
-         AazQiu+HsSm7V3J+zozHIwwc/NyZhbc7wH+2smK66w/SCC94AgeLlVvVwA/xwup48GNO
-         Cxam8nb+3KWgcCXFrpYgC8l4pkfEw+BsuCZQzsAFNenUqkypDBMNuuUxhp8+4VGpX1A1
-         9wOZx8CV2i7JpUQDcsm1u91fPe+9KWbnLySfmBZnB35kKpIpklX7ES4SycR7+5orfPAi
-         343w==
-X-Gm-Message-State: AC+VfDzE2r/8y2uOovDW+Jg3o9hnDBPb/7AyByZ//7s0gsHG/SH8O9zm
-        y273D3Ilv5HuzwkEVnXI+pqwoGkBzBsU/aYs0cDMGNj5r70SfeGEBVjHLW4KmfyHATfg7bHSjDF
-        SLUkSnFqRHLEU
-X-Received: by 2002:a05:6a21:33a0:b0:e8:dcca:d9cb with SMTP id yy32-20020a056a2133a000b000e8dccad9cbmr17261062pzb.5.1682945791094;
-        Mon, 01 May 2023 05:56:31 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ5ZwCAl1DrTuQmjl3laGfbrtvDbJ99ZPOdsEXRTAKapaIY/ruPUej6+rtE2TEbIoTRZ4Uuitw==
-X-Received: by 2002:a05:6a21:33a0:b0:e8:dcca:d9cb with SMTP id yy32-20020a056a2133a000b000e8dccad9cbmr17261042pzb.5.1682945790775;
-        Mon, 01 May 2023 05:56:30 -0700 (PDT)
+        bh=GlTIAVlYDvWGUgcAI69vPMhiBOoC9FH4wrN3XCSq6aw=;
+        b=MwqY6+1jMeBIPS23OH/lGU8WjBuez8HDt0Y6xyvzkLyKst7DoeFtPdS5tfbK4t0I++
+         KYmxsjrkS3WwLNvBtMCtr+Lj/WWTD7oQ5YWYMzJyZ+cn25GpUn6DE+uk0MIee+eldkKn
+         1ev4b1DFxzkt/Mg7THYJP8vyAnx4t0aUF3nsN29UfOgHFWR02W4xU+Dc+0vp68/Ovxmm
+         P6y8+xTbdKNpqv0Tn8C/NhI5AeJDuicouti6umwZkrTShMVcCjHdctAhBruoR4H3dFYX
+         t5rMQ8WXTTdZQGBKx3/gcPpC7Ku7m4TY+crFl+QDfAe4+PB2zdBTTfnXm4U2Ob4IZdnt
+         zg1A==
+X-Gm-Message-State: AC+VfDy9XPjouTCbmTDRm10+eedjl9Kpwtg9baB7C6rExeinR9IXYtqi
+        +BaUs3OlQ7z9q3DuV1e2StFo2Ho2mzTV842Qv1/rhpVMhwFbaVI7Ga+WbJB2ULqizR5RxM9IIgQ
+        x/PSiiVSWOraf
+X-Received: by 2002:a17:902:ea02:b0:1a9:83c8:f7f2 with SMTP id s2-20020a170902ea0200b001a983c8f7f2mr16897929plg.2.1682945974496;
+        Mon, 01 May 2023 05:59:34 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ5Qz7Bmoywxk2GaR3M8fWqBoVGB8ZWZZPY6jTFmDn7kS21rp5U77lM0Pf0McMsew5yQcvMpbg==
+X-Received: by 2002:a17:902:ea02:b0:1a9:83c8:f7f2 with SMTP id s2-20020a170902ea0200b001a983c8f7f2mr16897911plg.2.1682945974176;
+        Mon, 01 May 2023 05:59:34 -0700 (PDT)
 Received: from [10.66.61.39] ([209.132.188.80])
-        by smtp.gmail.com with ESMTPSA id q6-20020a654946000000b00528b78ddbcesm5259069pgs.70.2023.05.01.05.56.28
+        by smtp.gmail.com with ESMTPSA id s2-20020a170902988200b001994fc55998sm17674219plp.217.2023.05.01.05.59.31
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 01 May 2023 05:56:30 -0700 (PDT)
-Message-ID: <0c5b43a6-34d0-c15b-c30e-d7a9be66bd90@redhat.com>
-Date:   Mon, 1 May 2023 20:56:26 +0800
+        Mon, 01 May 2023 05:59:33 -0700 (PDT)
+Message-ID: <9476af3f-b61b-9134-8b6a-a255a07dcc82@redhat.com>
+Date:   Mon, 1 May 2023 20:59:30 +0800
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.8.0
-Subject: Re: [kvm-unit-tests PATCH v5 14/29] arm64: Add support for cpu
- initialization through ACPI
+Subject: Re: [kvm-unit-tests PATCH v5 22/29] arm64: Add a setup sequence for
+ systems that boot through EFI
 Content-Language: en-US
 To:     Nikos Nikoleris <nikos.nikoleris@arm.com>, kvm@vger.kernel.org,
         kvmarm@lists.linux.dev, andrew.jones@linux.dev
-Cc:     pbonzini@redhat.com, alexandru.elisei@arm.com, ricarkol@google.com,
-        Andrew Jones <drjones@redhat.com>
+Cc:     pbonzini@redhat.com, alexandru.elisei@arm.com, ricarkol@google.com
 References: <20230428120405.3770496-1-nikos.nikoleris@arm.com>
- <20230428120405.3770496-15-nikos.nikoleris@arm.com>
+ <20230428120405.3770496-23-nikos.nikoleris@arm.com>
 From:   Shaoqin Huang <shahuang@redhat.com>
-In-Reply-To: <20230428120405.3770496-15-nikos.nikoleris@arm.com>
+In-Reply-To: <20230428120405.3770496-23-nikos.nikoleris@arm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-3.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
@@ -86,201 +85,286 @@ X-Mailing-List: kvm@vger.kernel.org
 
 
 On 4/28/23 20:03, Nikos Nikoleris wrote:
-> In systems with ACPI support and when a DT is not provided, we can use
-> the MADTs to discover the number of CPUs and their corresponding MIDR.
-> This change implements this but retains the default behavior; we check
-> if a valid DT is provided, if not, we try to discover the cores in the
-> system using ACPI.
+> This change implements an alternative setup sequence for the system
+> when we are booting through EFI. The memory map is discovered through
+> EFI boot services and devices through ACPI.
+> 
+> This change is based on a change initially proposed by
+> Andrew Jones <drjones@redhat.com>
 > 
 > Signed-off-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
-> Reviewed-by: Andrew Jones <drjones@redhat.com>
 Reviewed-by: Shaoqin Huang <shahuang@redhat.com>
 > ---
->   lib/acpi.h      | 63 +++++++++++++++++++++++++++++++++++++++++++++++++
->   lib/acpi.c      | 20 ++++++++++++++++
->   lib/arm/setup.c | 42 ++++++++++++++++++++++++++++++---
->   3 files changed, 122 insertions(+), 3 deletions(-)
+>   lib/linux/efi.h     |   1 +
+>   lib/arm/asm/setup.h |   8 ++
+>   lib/arm/setup.c     | 186 +++++++++++++++++++++++++++++++++++++++++++-
+>   arm/cstart.S        |   1 +
+>   arm/cstart64.S      |   1 +
+>   5 files changed, 194 insertions(+), 3 deletions(-)
 > 
-> diff --git a/lib/acpi.h b/lib/acpi.h
-> index 04e4d1c3..4a59f543 100644
-> --- a/lib/acpi.h
-> +++ b/lib/acpi.h
-> @@ -17,6 +17,7 @@
->   #define XSDT_SIGNATURE ACPI_SIGNATURE('X','S','D','T')
->   #define FACP_SIGNATURE ACPI_SIGNATURE('F','A','C','P')
->   #define FACS_SIGNATURE ACPI_SIGNATURE('F','A','C','S')
-> +#define MADT_SIGNATURE ACPI_SIGNATURE('A','P','I','C')
->   #define SPCR_SIGNATURE ACPI_SIGNATURE('S','P','C','R')
->   #define GTDT_SIGNATURE ACPI_SIGNATURE('G','T','D','T')
+> diff --git a/lib/linux/efi.h b/lib/linux/efi.h
+> index 53748dd4..89f9a9e0 100644
+> --- a/lib/linux/efi.h
+> +++ b/lib/linux/efi.h
+> @@ -63,6 +63,7 @@ typedef guid_t efi_guid_t;
+>   	(c) & 0xff, ((c) >> 8) & 0xff, d } }
 >   
-> @@ -147,6 +148,67 @@ struct acpi_table_facs_rev1 {
->   	u8 reserved3[40];	/* Reserved - must be zero */
->   };
+>   #define ACPI_TABLE_GUID EFI_GUID(0xeb9d2d30, 0x2d88, 0x11d3, 0x9a, 0x16, 0x00, 0x90, 0x27, 0x3f, 0xc1, 0x4d)
+> +#define ACPI_20_TABLE_GUID EFI_GUID(0x8868e871, 0xe4f1, 0x11d3,  0xbc, 0x22, 0x00, 0x80, 0xc7, 0x3c, 0x88, 0x81)
 >   
-> +struct acpi_table_madt {
-> +	ACPI_TABLE_HEADER_DEF	/* ACPI common table header */
-> +	u32 address;		/* Physical address of local APIC */
-> +	u32 flags;
-> +};
-> +
-> +struct acpi_subtable_header {
-> +	u8 type;
-> +	u8 length;
-> +};
-> +
-> +typedef int (*acpi_table_handler)(struct acpi_subtable_header *header);
-> +
-> +/* 11: Generic interrupt - GICC (ACPI 5.0 + ACPI 6.0 + ACPI 6.3 changes) */
-> +
-> +struct acpi_madt_generic_interrupt {
-> +	u8 type;
-> +	u8 length;
-> +	u16 reserved;		/* reserved - must be zero */
-> +	u32 cpu_interface_number;
-> +	u32 uid;
-> +	u32 flags;
-> +	u32 parking_version;
-> +	u32 performance_interrupt;
-> +	u64 parked_address;
-> +	u64 base_address;
-> +	u64 gicv_base_address;
-> +	u64 gich_base_address;
-> +	u32 vgic_interrupt;
-> +	u64 gicr_base_address;
-> +	u64 arm_mpidr;
-> +	u8 efficiency_class;
-> +	u8 reserved2[1];
-> +	u16 spe_interrupt;	/* ACPI 6.3 */
-> +};
-> +
-> +/* Values for MADT subtable type in struct acpi_subtable_header */
-> +
-> +enum acpi_madt_type {
-> +	ACPI_MADT_TYPE_LOCAL_APIC = 0,
-> +	ACPI_MADT_TYPE_IO_APIC = 1,
-> +	ACPI_MADT_TYPE_INTERRUPT_OVERRIDE = 2,
-> +	ACPI_MADT_TYPE_NMI_SOURCE = 3,
-> +	ACPI_MADT_TYPE_LOCAL_APIC_NMI = 4,
-> +	ACPI_MADT_TYPE_LOCAL_APIC_OVERRIDE = 5,
-> +	ACPI_MADT_TYPE_IO_SAPIC = 6,
-> +	ACPI_MADT_TYPE_LOCAL_SAPIC = 7,
-> +	ACPI_MADT_TYPE_INTERRUPT_SOURCE = 8,
-> +	ACPI_MADT_TYPE_LOCAL_X2APIC = 9,
-> +	ACPI_MADT_TYPE_LOCAL_X2APIC_NMI = 10,
-> +	ACPI_MADT_TYPE_GENERIC_INTERRUPT = 11,
-> +	ACPI_MADT_TYPE_GENERIC_DISTRIBUTOR = 12,
-> +	ACPI_MADT_TYPE_GENERIC_MSI_FRAME = 13,
-> +	ACPI_MADT_TYPE_GENERIC_REDISTRIBUTOR = 14,
-> +	ACPI_MADT_TYPE_GENERIC_TRANSLATOR = 15,
-> +	ACPI_MADT_TYPE_RESERVED = 16	/* 16 and greater are reserved */
-> +};
-> +
-> +/* MADT Local APIC flags */
-> +#define ACPI_MADT_ENABLED		(1)	/* 00: Processor is usable if set */
-> +
->   struct spcr_descriptor {
->   	ACPI_TABLE_HEADER_DEF	/* ACPI common table header */
->   	u8 interface_type;	/* 0=full 16550, 1=subset of 16550 */
-> @@ -192,5 +254,6 @@ struct acpi_table_gtdt {
+>   #define LOADED_IMAGE_PROTOCOL_GUID EFI_GUID(0x5b1b31a1, 0x9562, 0x11d2,  0x8e, 0x3f, 0x00, 0xa0, 0xc9, 0x69, 0x72, 0x3b)
 >   
->   void set_efi_rsdp(struct acpi_table_rsdp *rsdp);
->   void *find_acpi_table_addr(u32 sig);
-> +void acpi_table_parse_madt(enum acpi_madt_type mtype, acpi_table_handler handler);
+> diff --git a/lib/arm/asm/setup.h b/lib/arm/asm/setup.h
+> index 64cd379b..06069116 100644
+> --- a/lib/arm/asm/setup.h
+> +++ b/lib/arm/asm/setup.h
+> @@ -38,4 +38,12 @@ extern unsigned int mem_region_get_flags(phys_addr_t paddr);
 >   
->   #endif
-> diff --git a/lib/acpi.c b/lib/acpi.c
-> index a197f3dd..bbe33d08 100644
-> --- a/lib/acpi.c
-> +++ b/lib/acpi.c
-> @@ -102,3 +102,23 @@ void *find_acpi_table_addr(u32 sig)
->   
->   	return NULL;
->   }
-> +
-> +void acpi_table_parse_madt(enum acpi_madt_type mtype, acpi_table_handler handler)
-> +{
-> +	struct acpi_table_madt *madt;
-> +	struct acpi_subtable_header *header;
-> +	void *end;
-> +
-> +	madt = find_acpi_table_addr(MADT_SIGNATURE);
-> +	assert(madt);
-> +
-> +	header = (void *)(ulong) madt + sizeof(struct acpi_table_madt);
-> +	end = (void *)((ulong) madt + madt->length);
-> +
-> +	while ((void *)header < end) {
-> +		if (header->type == mtype)
-> +			handler(header);
-> +
-> +		header = (void *)(ulong) header + header->length;
-> +	}
-> +}
-> diff --git a/lib/arm/setup.c b/lib/arm/setup.c
-> index 1572c64e..59b0aedd 100644
-> --- a/lib/arm/setup.c
-> +++ b/lib/arm/setup.c
-> @@ -55,7 +55,7 @@ int mpidr_to_cpu(uint64_t mpidr)
->   	return -1;
->   }
->   
-> -static void cpu_set(int fdtnode __unused, u64 regval, void *info __unused)
-> +static void cpu_set_fdt(int fdtnode __unused, u64 regval, void *info __unused)
->   {
->   	int cpu = nr_cpus++;
->   
-> @@ -65,13 +65,49 @@ static void cpu_set(int fdtnode __unused, u64 regval, void *info __unused)
->   	set_cpu_present(cpu, true);
->   }
+>   void setup(const void *fdt, phys_addr_t freemem_start);
 >   
 > +#ifdef CONFIG_EFI
 > +
-> +#include <acpi.h>
+> +#include <efi.h>
 > +
-> +static int cpu_set_acpi(struct acpi_subtable_header *header)
-> +{
-> +	int cpu = nr_cpus++;
-> +	struct acpi_madt_generic_interrupt *gicc = (void *)header;
-> +
-> +	assert_msg(cpu < NR_CPUS, "Number cpus exceeds maximum supported (%d).", NR_CPUS);
-> +
-> +	cpus[cpu] = gicc->arm_mpidr;
-> +	set_cpu_present(cpu, true);
-> +
-> +	return 0;
-> +}
-> +
-> +static void cpu_init_acpi(void)
-> +{
-> +	acpi_table_parse_madt(ACPI_MADT_TYPE_GENERIC_INTERRUPT, cpu_set_acpi);
-> +}
-> +
-> +#else
-> +
-> +static void cpu_init_acpi(void)
-> +{
-> +	assert_msg(false, "ACPI not available");
-> +}
+> +efi_status_t setup_efi(efi_bootinfo_t *efi_bootinfo);
 > +
 > +#endif
 > +
->   static void cpu_init(void)
->   {
->   	int ret;
+>   #endif /* _ASMARM_SETUP_H_ */
+> diff --git a/lib/arm/setup.c b/lib/arm/setup.c
+> index 03a4098e..c4f495a9 100644
+> --- a/lib/arm/setup.c
+> +++ b/lib/arm/setup.c
+> @@ -30,10 +30,10 @@
+>   #include "io.h"
 >   
->   	nr_cpus = 0;
-> -	ret = dt_for_each_cpu_node(cpu_set, NULL);
-> -	assert(ret == 0);
-> +	if (dt_available()) {
-> +		ret = dt_for_each_cpu_node(cpu_set_fdt, NULL);
-> +		assert(ret == 0);
-> +	} else {
-> +		cpu_init_acpi();
+>   #define MAX_DT_MEM_REGIONS	16
+> -#define NR_EXTRA_MEM_REGIONS	16
+> +#define NR_EXTRA_MEM_REGIONS	64
+>   #define NR_INITIAL_MEM_REGIONS	(MAX_DT_MEM_REGIONS + NR_EXTRA_MEM_REGIONS)
+>   
+> -extern unsigned long _etext;
+> +extern unsigned long _text, _etext, _data, _edata;
+>   
+>   char *initrd;
+>   u32 initrd_size;
+> @@ -43,7 +43,10 @@ int nr_cpus;
+>   
+>   static struct mem_region __initial_mem_regions[NR_INITIAL_MEM_REGIONS + 1];
+>   struct mem_region *mem_regions = __initial_mem_regions;
+> -phys_addr_t __phys_offset, __phys_end;
+> +phys_addr_t __phys_offset = (phys_addr_t)-1, __phys_end = 0;
+> +
+> +extern void exceptions_init(void);
+> +extern void asm_mmu_disable(void);
+>   
+>   int mpidr_to_cpu(uint64_t mpidr)
+>   {
+> @@ -289,3 +292,180 @@ void setup(const void *fdt, phys_addr_t freemem_start)
+>   	if (!(auxinfo.flags & AUXINFO_MMU_OFF))
+>   		setup_vm();
+>   }
+> +
+> +#ifdef CONFIG_EFI
+> +
+> +#include <efi.h>
+> +
+> +static efi_status_t setup_rsdp(efi_bootinfo_t *efi_bootinfo)
+> +{
+> +	efi_status_t status;
+> +	struct acpi_table_rsdp *rsdp;
+> +
+> +	/*
+> +	 * RSDP resides in an EFI_ACPI_RECLAIM_MEMORY region, which is not used
+> +	 * by kvm-unit-tests arm64 memory allocator. So it is not necessary to
+> +	 * copy the data structure to another memory region to prevent
+> +	 * unintentional overwrite.
+> +	 */
+> +	status = efi_get_system_config_table(ACPI_20_TABLE_GUID, (void **)&rsdp);
+> +	if (status != EFI_SUCCESS)
+> +		return status;
+> +
+> +	set_efi_rsdp(rsdp);
+> +
+> +	return EFI_SUCCESS;
+> +}
+> +
+> +static efi_status_t efi_mem_init(efi_bootinfo_t *efi_bootinfo)
+> +{
+> +	int i;
+> +	unsigned long free_mem_pages = 0;
+> +	unsigned long free_mem_start = 0;
+> +	struct efi_boot_memmap *map = &(efi_bootinfo->mem_map);
+> +	efi_memory_desc_t *buffer = *map->map;
+> +	efi_memory_desc_t *d = NULL;
+> +	phys_addr_t base, top;
+> +	struct mem_region r;
+> +	uintptr_t text = (uintptr_t)&_text, etext = __ALIGN((uintptr_t)&_etext, 4096);
+> +	uintptr_t data = (uintptr_t)&_data, edata = __ALIGN((uintptr_t)&_edata, 4096);
+> +
+> +	/*
+> +	 * Record the largest free EFI_CONVENTIONAL_MEMORY region
+> +	 * which will be used to set up the memory allocator, so that
+> +	 * the memory allocator can work in the largest free
+> +	 * continuous memory region.
+> +	 */
+> +	for (i = 0; i < *(map->map_size); i += *(map->desc_size)) {
+> +		d = (efi_memory_desc_t *)(&((u8 *)buffer)[i]);
+> +
+> +		r.start = d->phys_addr;
+> +		r.end = d->phys_addr + d->num_pages * EFI_PAGE_SIZE;
+> +		r.flags = 0;
+> +
+> +		switch (d->type) {
+> +		case EFI_RESERVED_TYPE:
+> +		case EFI_LOADER_DATA:
+> +		case EFI_BOOT_SERVICES_CODE:
+> +		case EFI_BOOT_SERVICES_DATA:
+> +		case EFI_RUNTIME_SERVICES_CODE:
+> +		case EFI_RUNTIME_SERVICES_DATA:
+> +		case EFI_UNUSABLE_MEMORY:
+> +		case EFI_ACPI_RECLAIM_MEMORY:
+> +		case EFI_ACPI_MEMORY_NVS:
+> +		case EFI_PAL_CODE:
+> +			r.flags = MR_F_RESERVED;
+> +			break;
+> +		case EFI_MEMORY_MAPPED_IO:
+> +		case EFI_MEMORY_MAPPED_IO_PORT_SPACE:
+> +			r.flags = MR_F_IO;
+> +			break;
+> +		case EFI_LOADER_CODE:
+> +			if (r.start <= text && r.end > text) {
+> +				/* This is the unit test region. Flag the code separately. */
+> +				phys_addr_t tmp = r.end;
+> +
+> +				assert(etext <= data);
+> +				assert(edata <= r.end);
+> +				r.flags = MR_F_CODE;
+> +				r.end = data;
+> +				mem_region_add(&r);
+> +				r.start = data;
+> +				r.end = tmp;
+> +				r.flags = 0;
+> +			} else {
+> +				r.flags = MR_F_RESERVED;
+> +			}
+> +			break;
+> +		case EFI_CONVENTIONAL_MEMORY:
+> +			if (free_mem_pages < d->num_pages) {
+> +				free_mem_pages = d->num_pages;
+> +				free_mem_start = d->phys_addr;
+> +			}
+> +			break;
+> +		}
+> +
+> +		if (!(r.flags & MR_F_IO)) {
+> +			if (r.start < __phys_offset)
+> +				__phys_offset = r.start;
+> +			if (r.end > __phys_end)
+> +				__phys_end = r.end;
+> +		}
+> +		mem_region_add(&r);
+> +	}
+> +	__phys_end &= PHYS_MASK;
+> +	asm_mmu_disable();
+> +
+> +	if (free_mem_pages == 0)
+> +		return EFI_OUT_OF_RESOURCES;
+> +
+> +	assert(sizeof(long) == 8 || free_mem_start < (3ul << 30));
+> +
+> +	phys_alloc_init(free_mem_start, free_mem_pages << EFI_PAGE_SHIFT);
+> +	phys_alloc_set_minimum_alignment(SMP_CACHE_BYTES);
+> +
+> +	phys_alloc_get_unused(&base, &top);
+> +	base = PAGE_ALIGN(base);
+> +	top = top & PAGE_MASK;
+> +	assert(sizeof(long) == 8 || !(base >> 32));
+> +	if (sizeof(long) != 8 && (top >> 32) != 0)
+> +		top = ((uint64_t)1 << 32);
+> +	page_alloc_init_area(0, base >> PAGE_SHIFT, top >> PAGE_SHIFT);
+> +	page_alloc_ops_enable();
+> +
+> +	return EFI_SUCCESS;
+> +}
+> +
+> +efi_status_t setup_efi(efi_bootinfo_t *efi_bootinfo)
+> +{
+> +	efi_status_t status;
+> +
+> +	struct thread_info *ti = current_thread_info();
+> +
+> +	memset(ti, 0, sizeof(*ti));
+> +
+> +	exceptions_init();
+> +
+> +	status = efi_mem_init(efi_bootinfo);
+> +	if (status != EFI_SUCCESS) {
+> +		printf("Failed to initialize memory: ");
+> +		switch (status) {
+> +		case EFI_OUT_OF_RESOURCES:
+> +			printf("No free memory region\n");
+> +			break;
+> +		default:
+> +			printf("Unknown error\n");
+> +			break;
+> +		}
+> +		return status;
 > +	}
 > +
->   	set_cpu_online(0, true);
->   }
+> +	status = setup_rsdp(efi_bootinfo);
+> +	if (status != EFI_SUCCESS) {
+> +		printf("Cannot find RSDP in EFI system table\n");
+> +		return status;
+> +	}
+> +
+> +	psci_set_conduit();
+> +	cpu_init();
+> +	/* cpu_init must be called before thread_info_init */
+> +	thread_info_init(current_thread_info(), 0);
+> +	/* mem_init must be called before io_init */
+> +	io_init();
+> +
+> +	timer_save_state();
+> +	if (initrd) {
+> +		/* environ is currently the only file in the initrd */
+> +		char *env = malloc(initrd_size);
+> +
+> +		memcpy(env, initrd, initrd_size);
+> +		setup_env(env, initrd_size);
+> +	}
+> +
+> +	if (!(auxinfo.flags & AUXINFO_MMU_OFF))
+> +		setup_vm();
+> +
+> +	return EFI_SUCCESS;
+> +}
+> +
+> +#endif
+> diff --git a/arm/cstart.S b/arm/cstart.S
+> index 7036e67f..3dd71ed9 100644
+> --- a/arm/cstart.S
+> +++ b/arm/cstart.S
+> @@ -242,6 +242,7 @@ asm_mmu_disable:
+>    *
+>    * Input r0 is the stack top, which is the exception stacks base
+>    */
+> +.globl exceptions_init
+>   exceptions_init:
+>   	mrc	p15, 0, r2, c1, c0, 0	@ read SCTLR
+>   	bic	r2, #CR_V		@ SCTLR.V := 0
+> diff --git a/arm/cstart64.S b/arm/cstart64.S
+> index e4ab7d06..223c1092 100644
+> --- a/arm/cstart64.S
+> +++ b/arm/cstart64.S
+> @@ -265,6 +265,7 @@ asm_mmu_disable:
+>    * Vectors
+>    */
 >   
+> +.globl exceptions_init
+>   exceptions_init:
+>   	adrp	x4, vector_table
+>   	add	x4, x4, :lo12:vector_table
 
 -- 
 Shaoqin
