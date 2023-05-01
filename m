@@ -2,127 +2,151 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C5C386F3915
-	for <lists+kvm@lfdr.de>; Mon,  1 May 2023 22:20:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6ABD86F3983
+	for <lists+kvm@lfdr.de>; Mon,  1 May 2023 22:59:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232579AbjEAUUN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 1 May 2023 16:20:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56032 "EHLO
+        id S232532AbjEAU7c (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 1 May 2023 16:59:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38474 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232754AbjEAUUL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 1 May 2023 16:20:11 -0400
-Received: from mail-wm1-x335.google.com (mail-wm1-x335.google.com [IPv6:2a00:1450:4864:20::335])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5853D30F4
-        for <kvm@vger.kernel.org>; Mon,  1 May 2023 13:20:06 -0700 (PDT)
-Received: by mail-wm1-x335.google.com with SMTP id 5b1f17b1804b1-3f1cfed93e2so28534585e9.3
-        for <kvm@vger.kernel.org>; Mon, 01 May 2023 13:20:06 -0700 (PDT)
+        with ESMTP id S232693AbjEAU7a (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 1 May 2023 16:59:30 -0400
+Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 549661FC4
+        for <kvm@vger.kernel.org>; Mon,  1 May 2023 13:59:26 -0700 (PDT)
+Received: by mail-pf1-x42f.google.com with SMTP id d2e1a72fcca58-63b5c48ea09so2232416b3a.1
+        for <kvm@vger.kernel.org>; Mon, 01 May 2023 13:59:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1682972405; x=1685564405;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=lDI/20T1uPRoTlQGz3PG7IVp1dlrzIcikclK+BNrn4I=;
-        b=sIfdTpfepArE8sU+4NTcy7xOvbZSf/dKemW7L8ciqw+ADmIAIdfVY09A5gWMdcAqIa
-         f8rGwdhE+yELNnHDBZinJXVwAhyeZ00UJYIDJWdY113pLL27ph3TlpNIgVyb9EGPymiL
-         uxMKe7WOwAc13vtMHss0uV5JMzgU2d+zn5g/Olu0rdbxdkYfwYe7RSiuRfeNUDAdxTiL
-         8GonL3qL1Cmm7tBPpGdY0F9ZE8YcRntMFjMPS545gKIx9R5GlwBWbcsvz/cWkAf/aF/w
-         9lgfW1ABFrSPSLQQJsnHuhaxOtRal6i2Q7Zi3YxlcUodG59RlYDzpf6Nd8VOXQjAvOeR
-         G40g==
+        d=dabbelt-com.20221208.gappssmtp.com; s=20221208; t=1682974766; x=1685566766;
+        h=content-transfer-encoding:mime-version:message-id:to:from:cc
+         :in-reply-to:subject:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=56zwdsQPzBA4Fq57F7zZq8xm3cbpRSpnOmcnA0Dh+zY=;
+        b=dhuoKYDmXvVL9rcvID9l7RqV772Z8lTC+U0WXQUi0tYJbLE9a48GrmSzQs7bEghGbC
+         JAz8rXoL1w4B9KKuEwX7POjH3Ox3r6V4zpIxvsvZpSsylQJD8ptmZ7+Vz+V8jAHJj04w
+         T6FV37TSFDDCD7el69cwAEuuEXi6g8EgNvIcALlfkGBQgAio2kQ2a6bJAUGpYJRLsZzz
+         ZNQyL545JSX++O1LCUyCJsybjwMgrDioUAedrjXfVSqEM2lGIt3XAkC5ujMjWrYDbKAU
+         lx6fFu18ULaY/km5rliSpJC6ISEyi513He8uKlna726VX+0Zf3a2zrJJ6SJgvgEWorgq
+         velw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682972405; x=1685564405;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=lDI/20T1uPRoTlQGz3PG7IVp1dlrzIcikclK+BNrn4I=;
-        b=E0xggL0d9DQdgc3ucZrvlNHDwD5nHo01S+Ik0Zse3N0ghYga+hzX8k5kQMOTAS/A4R
-         Bu1+CG2aDNlPuLcrEhyhU+thHAOwT/IsBxSVdrgDi4r24BaN2FHAXZHPAb/iu38+38GW
-         7MjaK1EWBU2AoTnx1kf9mYNgrdzYF5Bo/kgy0gxY72PhKYRExRrF1Mbbt7+V2kYUYSN5
-         G4UA8aMRf9/1Bu/kp89k4vjbWdKToWdiGUqfXpSheH/vgMlaGfQa6lHP/ekdWxos4Zao
-         sCKidp3EzS10wjbGaIOdrEwqEFjQYW3UyjXvlmtaNv0hHzulerJmjbGyj3WnNDauU3h0
-         L3CQ==
-X-Gm-Message-State: AC+VfDy+y2vEsgtOBxZf7K9B9MU/yGurdkEaEFWDLzgMaJSjO06Q0L67
-        gatE4X4jS+VhHmeeO0yOZARpYD3fdjMmOkBsDSoE8g==
-X-Google-Smtp-Source: ACHHUZ7GIF5nTiYKf2V07/in+UGAFPHkWwL0e1/1SwgFp/N3K/G6yGN5/97rm7s/+Dk8kHs3SY1QsA==
-X-Received: by 2002:a1c:7502:0:b0:3ee:36f:3485 with SMTP id o2-20020a1c7502000000b003ee036f3485mr11398394wmc.8.1682972404738;
-        Mon, 01 May 2023 13:20:04 -0700 (PDT)
-Received: from ?IPV6:2a02:c7c:74db:8d00:eca5:8bcb:58d9:c940? ([2a02:c7c:74db:8d00:eca5:8bcb:58d9:c940])
-        by smtp.gmail.com with ESMTPSA id bi26-20020a05600c3d9a00b003eddc6aa5fasm32890364wmb.39.2023.05.01.13.20.03
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 01 May 2023 13:20:04 -0700 (PDT)
-Message-ID: <e9d647a3-c98e-7ab8-9378-74ac2d867a28@linaro.org>
-Date:   Mon, 1 May 2023 21:20:02 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Subject: Re: [PATCH v3 09/19] tcg: Add andcs and rotrs tcg gvec ops
-Content-Language: en-US
-To:     Lawrence Hunter <lawrence.hunter@codethink.co.uk>,
-        qemu-devel@nongnu.org
-Cc:     dickon.hood@codethink.co.uk, nazar.kazakov@codethink.co.uk,
-        kiran.ostrolenk@codethink.co.uk, frank.chang@sifive.com,
-        palmer@dabbelt.com, alistair.francis@wdc.com,
-        bin.meng@windriver.com, pbonzini@redhat.com,
-        philipp.tomsich@vrull.eu, kvm@vger.kernel.org,
-        qemu-riscv@nongnu.org
-References: <20230428144757.57530-1-lawrence.hunter@codethink.co.uk>
- <20230428144757.57530-10-lawrence.hunter@codethink.co.uk>
-From:   Richard Henderson <richard.henderson@linaro.org>
-In-Reply-To: <20230428144757.57530-10-lawrence.hunter@codethink.co.uk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+        d=1e100.net; s=20221208; t=1682974766; x=1685566766;
+        h=content-transfer-encoding:mime-version:message-id:to:from:cc
+         :in-reply-to:subject:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=56zwdsQPzBA4Fq57F7zZq8xm3cbpRSpnOmcnA0Dh+zY=;
+        b=ZaaoqCyAicm4mnLL+eEYCFFIEcj3OKm8Gvry3/Ij8AMqmawmp3eB5JUJLC5pP5TWAS
+         nUUfeYYRFQtjVkJ2c0U/U/0ke/GMUpenYYrNNH66Xt1GvJFg1bApf7FCaPuSJ/Rj9Yn8
+         954i+TlOUP3GGeencJGgSAqjNBYFi4Woj1XbRQAkuLzSMU65cFA+lGYtkiWkhn18l3D7
+         TMJ8CGBjQb7NQuDjp/mc/mthdjWOng0cbSjRMahee3HFThiulpBCtcRYjz7cRYqU7+CQ
+         /89hOChJ1LNvn035AuMBXs6OtLJjP1cNILyQiCsuEZejI+ASsQZP7faW+sZUwDcb+NH0
+         zd0w==
+X-Gm-Message-State: AC+VfDw32fRe46b3eLTRR5JuGJfPJaTbWv24fTNwFiPvn/KoTl4goebn
+        BdM9Y4xUHzM1fR+j6eW/NByMQA==
+X-Google-Smtp-Source: ACHHUZ7NRh0XptQx7EX4B/2U8oMa1VyQthNvjC4nK5qetnlZ9yiAEbyNISqPVXEejwWKpBkEgu1KUQ==
+X-Received: by 2002:a05:6a00:1301:b0:63d:27a1:d578 with SMTP id j1-20020a056a00130100b0063d27a1d578mr19620776pfu.20.1682974765524;
+        Mon, 01 May 2023 13:59:25 -0700 (PDT)
+Received: from localhost ([50.221.140.188])
+        by smtp.gmail.com with ESMTPSA id x3-20020a628603000000b0063d666566d1sm20322681pfd.72.2023.05.01.13.59.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 01 May 2023 13:59:24 -0700 (PDT)
+Date:   Mon, 01 May 2023 13:59:24 -0700 (PDT)
+X-Google-Original-Date: Mon, 01 May 2023 13:59:09 PDT (-0700)
+Subject:     Re: [PATCH v2 29/34] riscv: Convert alloc_{pmd, pte}_late() to use ptdescs
+In-Reply-To: <20230501192829.17086-30-vishal.moola@gmail.com>
+CC:     akpm@linux-foundation.org, willy@infradead.org, linux-mm@kvack.org,
+        linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-csky@vger.kernel.org, linux-hexagon@vger.kernel.org,
+        loongarch@lists.linux.dev, linux-m68k@lists.linux-m68k.org,
+        linux-mips@vger.kernel.org, linux-openrisc@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, linux-riscv@lists.infradead.org,
+        linux-s390@vger.kernel.org, linux-sh@vger.kernel.org,
+        sparclinux@vger.kernel.org, linux-um@lists.infradead.org,
+        xen-devel@lists.xenproject.org, kvm@vger.kernel.org,
+        vishal.moola@gmail.com, Paul Walmsley <paul.walmsley@sifive.com>
+From:   Palmer Dabbelt <palmer@dabbelt.com>
+To:     vishal.moola@gmail.com
+Message-ID: <mhng-e6f12727-9abe-4a93-a361-15a6cd333f51@palmer-ri-x1c9a>
+Mime-Version: 1.0 (MHng)
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 4/28/23 15:47, Lawrence Hunter wrote:
-> From: Nazar Kazakov <nazar.kazakov@codethink.co.uk>
-> 
-> This commit adds helper functions and tcg operation definitions for the andcs and rotrs instructions
-> 
-> Signed-off-by: Nazar Kazakov <nazar.kazakov@codethink.co.uk>
+On Mon, 01 May 2023 12:28:24 PDT (-0700), vishal.moola@gmail.com wrote:
+> As part of the conversions to replace pgtable constructor/destructors with
+> ptdesc equivalents, convert various page table functions to use ptdescs.
+>
+> Some of the functions use the *get*page*() helper functions. Convert
+> these to use ptdesc_alloc() and ptdesc_address() instead to help
+> standardize page tables further.
+>
+> Signed-off-by: Vishal Moola (Oracle) <vishal.moola@gmail.com>
 > ---
->   accel/tcg/tcg-runtime-gvec.c | 11 +++++++++++
->   accel/tcg/tcg-runtime.h      |  1 +
->   include/tcg/tcg-op-gvec.h    |  4 ++++
->   tcg/tcg-op-gvec.c            | 23 +++++++++++++++++++++++
->   4 files changed, 39 insertions(+)
+>  arch/riscv/include/asm/pgalloc.h |  8 ++++----
+>  arch/riscv/mm/init.c             | 16 ++++++----------
+>  2 files changed, 10 insertions(+), 14 deletions(-)
+>
+> diff --git a/arch/riscv/include/asm/pgalloc.h b/arch/riscv/include/asm/pgalloc.h
+> index 59dc12b5b7e8..cb5536403bd8 100644
+> --- a/arch/riscv/include/asm/pgalloc.h
+> +++ b/arch/riscv/include/asm/pgalloc.h
+> @@ -153,10 +153,10 @@ static inline pgd_t *pgd_alloc(struct mm_struct *mm)
+>
+>  #endif /* __PAGETABLE_PMD_FOLDED */
+>
+> -#define __pte_free_tlb(tlb, pte, buf)   \
+> -do {                                    \
+> -	pgtable_pte_page_dtor(pte);     \
+> -	tlb_remove_page((tlb), pte);    \
+> +#define __pte_free_tlb(tlb, pte, buf)			\
+> +do {							\
+> +	ptdesc_pte_dtor(page_ptdesc(pte));		\
+> +	tlb_remove_page_ptdesc((tlb), page_ptdesc(pte));\
+>  } while (0)
+>  #endif /* CONFIG_MMU */
+>
+> diff --git a/arch/riscv/mm/init.c b/arch/riscv/mm/init.c
+> index eb8173a91ce3..8f1982664687 100644
+> --- a/arch/riscv/mm/init.c
+> +++ b/arch/riscv/mm/init.c
+> @@ -353,12 +353,10 @@ static inline phys_addr_t __init alloc_pte_fixmap(uintptr_t va)
+>
+>  static phys_addr_t __init alloc_pte_late(uintptr_t va)
+>  {
+> -	unsigned long vaddr;
+> -
+> -	vaddr = __get_free_page(GFP_KERNEL);
+> -	BUG_ON(!vaddr || !pgtable_pte_page_ctor(virt_to_page(vaddr)));
+> +	struct ptdesc *ptdesc = ptdesc_alloc(GFP_KERNEL, 0);
+>
+> -	return __pa(vaddr);
+> +	BUG_ON(!ptdesc || !ptdesc_pte_ctor(ptdesc));
+> +	return __pa((pte_t *)ptdesc_address(ptdesc));
+>  }
+>
+>  static void __init create_pte_mapping(pte_t *ptep,
+> @@ -436,12 +434,10 @@ static phys_addr_t __init alloc_pmd_fixmap(uintptr_t va)
+>
+>  static phys_addr_t __init alloc_pmd_late(uintptr_t va)
+>  {
+> -	unsigned long vaddr;
+> -
+> -	vaddr = __get_free_page(GFP_KERNEL);
+> -	BUG_ON(!vaddr || !pgtable_pmd_page_ctor(virt_to_page(vaddr)));
+> +	struct ptdesc *ptdesc = ptdesc_alloc(GFP_KERNEL, 0);
+>
+> -	return __pa(vaddr);
+> +	BUG_ON(!ptdesc || !ptdesc_pmd_ctor(ptdesc));
+> +	return __pa((pmd_t *)ptdesc_address(ptdesc));
+>  }
+>
+>  static void __init create_pmd_mapping(pmd_t *pmdp,
 
-Queued to tcg-next as two patches, and with alterations:
-
-> +void tcg_gen_gvec_andcs(unsigned vece, uint32_t dofs, uint32_t aofs,
-> +                        TCGv_i64 c, uint32_t oprsz, uint32_t maxsz)
-> +{
-> +    static GVecGen2s g = {
-> +        .fni8 = tcg_gen_andc_i64,
-> +        .fniv = tcg_gen_andc_vec,
-> +        .fno = gen_helper_gvec_andcs,
-> +        .prefer_i64 = TCG_TARGET_REG_BITS == 64,
-> +        .vece = MO_64
-> +    };
-> +
-> +    tcg_gen_dup_i64(vece, c, c);
-> +    tcg_gen_gvec_2s(dofs, aofs, oprsz, maxsz, c, &g);
-> +}
-
-This needed a temporary.
-
-> +void tcg_gen_gvec_rotrs(unsigned vece, uint32_t dofs, uint32_t aofs,
-> +                        TCGv_i32 shift, uint32_t oprsz, uint32_t maxsz)
-> +{
-> +    TCGv_i32 tmp = tcg_temp_new_i32();
-> +    tcg_gen_sub_i32(tmp, tcg_constant_i32(1 << (vece + 3)), shift);
-> +    tcg_gen_gvec_rotls(vece, dofs, aofs, tmp, oprsz, maxsz);
-> +}
-
-This needed the rotation count to be masked (32 - 0 == 32 is illegal).
-Simplified as (-shift & mask).
-
-
-r~
-
+Acked-by: Palmer Dabbelt <palmer@rivosinc.com>
