@@ -2,68 +2,45 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id ACA8C6F3991
-	for <lists+kvm@lfdr.de>; Mon,  1 May 2023 23:12:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 38F016F3A6C
+	for <lists+kvm@lfdr.de>; Tue,  2 May 2023 00:27:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231995AbjEAVMA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 1 May 2023 17:12:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40832 "EHLO
+        id S230469AbjEAW1i (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 1 May 2023 18:27:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57278 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229379AbjEAVL7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 1 May 2023 17:11:59 -0400
-Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9AE14E4E
-        for <kvm@vger.kernel.org>; Mon,  1 May 2023 14:11:57 -0700 (PDT)
-Received: by mail-pf1-x449.google.com with SMTP id d2e1a72fcca58-63b54cd223dso3513965b3a.1
-        for <kvm@vger.kernel.org>; Mon, 01 May 2023 14:11:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1682975517; x=1685567517;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=4NYDhcVDTHLb54GnmbrT1cEeobyIv0/mON5sblk9zXo=;
-        b=aLuTmJAomhq39XOO8ThaFuZcJVLT6R4H3DtxDoGspBPmJgaPK8YYQWFnm9FMNOhIfK
-         LZXcDO3Tq2X++f9p98Wx54Q8x4uLu72EncED6U8r2RXDPvU4MdcgzEEJ1rEPOASravV9
-         J6ZFRHjY312N7W/1a7GHoiYeY0sytfb1V48/ziLJvArwg5RGEXhNjlDXg3QsCoVtIz8C
-         TCZXHbz+4qtO5dVSqs9j0pZpoYXyRhVNqprtyGI1tv/O7+YjEozIm/N8IryMZar9a3Td
-         u7DUIdYzGVhnG0QwAZQLS4qFcabKwKd3V0XzvPJoi6x5P2d2RVFI5qb9NbvR9fvcGBOy
-         lffA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682975517; x=1685567517;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=4NYDhcVDTHLb54GnmbrT1cEeobyIv0/mON5sblk9zXo=;
-        b=Ow5YWM+5AqQ6cLCUyCPL9oKs5VBPweR+t6LLBONo34P1gaV+PuQoHDy9I77Jw7vOX/
-         opK3mdO60Vx6FqbKJHj+CgGNFLQQEomIaHZ9DC3pWGZpePbp/oZ8lNdKz5V2WebE+J1m
-         3xms3QZHLt42tRpVOMqBjQ7P3sXHip+kTzMpzD+wz18S4Dy8M8xoH8+Oep/9/Y+dYCk+
-         zpolzxLFXsbfmPzb+2+AxNv/AWbfre8BtW2SS29aMdtc/jMWW4C3eqjYvEDQdUF6pZLZ
-         syjSJkpCoDlkN62maORR+3A5bVvdFEDpMn4wC8Hnkul6/dEAG9jg3gp97l6ACgZoWOI0
-         m+zw==
-X-Gm-Message-State: AC+VfDw1rFZm58RNjVV3dC57pOm5Lx+m+++arBXjXyGlG9GJnmp8r/4A
-        h3JfND6Yi3GYv8ibhJUdjg17t8Gw108=
-X-Google-Smtp-Source: ACHHUZ7Hd8CMbbRi2Zv713yGh1cWPToaI5AWN4TSrUPlUzd3x920u2wbvO9DboNiqhdUvgtELnzLLc6go2s=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:2dc:b0:641:31b1:e78b with SMTP id
- b28-20020a056a0002dc00b0064131b1e78bmr2828834pft.6.1682975517090; Mon, 01 May
- 2023 14:11:57 -0700 (PDT)
-Date:   Mon, 1 May 2023 14:11:55 -0700
-In-Reply-To: <CALMp9eTa3OpmMY5_9fezDfBb4gjne2yrHxBnnkD4xG7AzWmw+A@mail.gmail.com>
-Mime-Version: 1.0
-References: <CANZk6aSv5ta3emitOfWKxaB-JvURBVu-sXqFnCz9PKXhqjbV9w@mail.gmail.com>
- <a9f97d08-8a2f-668b-201a-87c152b3d6e0@gmail.com> <ZE/R1/hvbuWmD8mw@google.com>
- <CALMp9eTa3OpmMY5_9fezDfBb4gjne2yrHxBnnkD4xG7AzWmw+A@mail.gmail.com>
-Message-ID: <ZFArG0WsL0e/bM+m@google.com>
-Subject: Re: Latency issues inside KVM.
-From:   Sean Christopherson <seanjc@google.com>
-To:     Jim Mattson <jmattson@google.com>
-Cc:     Robert Hoo <robert.hoo.linux@gmail.com>,
-        zhuangel570 <zhuangel570@gmail.com>, kvm@vger.kernel.org
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        with ESMTP id S229627AbjEAW1h (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 1 May 2023 18:27:37 -0400
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 8E7742123
+        for <kvm@vger.kernel.org>; Mon,  1 May 2023 15:27:34 -0700 (PDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 572104B3;
+        Mon,  1 May 2023 15:28:18 -0700 (PDT)
+Received: from [192.168.5.23] (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 34AA33F5A1;
+        Mon,  1 May 2023 15:27:33 -0700 (PDT)
+Message-ID: <658590ba-1c73-87cd-b1b1-bcbf3e556f29@arm.com>
+Date:   Mon, 1 May 2023 23:27:23 +0100
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.10.1
+Subject: Re: [kvm-unit-tests PATCH v5 00/29] EFI and ACPI support for arm64
+To:     Andrew Jones <andrew.jones@linux.dev>
+Cc:     kvm@vger.kernel.org, kvmarm@lists.linux.dev, pbonzini@redhat.com,
+        alexandru.elisei@arm.com, ricarkol@google.com, seanjc@google.com
+References: <20230428120405.3770496-1-nikos.nikoleris@arm.com>
+ <20230429-6da987552a8d15281f8444c9@orel>
+ <20230429-342c8a26e5db45474631a307@orel>
+ <6857da77-8d1e-ebcb-1571-6419d463fa53@arm.com>
+ <20230501-85b5dca6ed2d86d8bb0e55b6@orel>
+Content-Language: en-GB
+From:   Nikos Nikoleris <nikos.nikoleris@arm.com>
+In-Reply-To: <20230501-85b5dca6ed2d86d8bb0e55b6@orel>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-5.6 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -71,59 +48,274 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, May 01, 2023, Jim Mattson wrote:
-> On Mon, May 1, 2023 at 7:51=E2=80=AFAM Sean Christopherson <seanjc@google=
-.com> wrote:
-> >
-> > On Sat, Apr 29, 2023, Robert Hoo wrote:
-> > > On 4/27/2023 8:38 PM, zhuangel570 wrote:
-> > > > - kvm_vm_create_worker_thread introduce tail latency more than 100m=
-s.
-> > > >    This function was called when create "kvm-nx-lpage-recovery" kth=
-read when
-> > > >    create a new VM, this patch was introduced to recovery large pag=
-e to relief
-> > > >    performance loss caused by software mitigation of ITLB_MULTIHIT,=
- see
-> > > >    b8e8c8303ff2 ("kvm: mmu: ITLB_MULTIHIT mitigation") and 1aa9b957=
-2b10
-> > > >    ("kvm: x86: mmu: Recovery of shattered NX large pages").
-> > > >
-> > > Yes, this kthread is for NX-HugePage feature and NX-HugePage in turn =
-is to
-> > > SW mitigate itlb-multihit issue.
-> > > However, HW level mitigation has been available for quite a while, yo=
-u can
-> > > check "/sys/devices/system/cpu/vulnerabilities/itlb_multihit" for you=
-r
-> > > system's mitigation status.
-> > > I believe most recent Intel CPUs have this HW mitigated (check
-> > > MSR_ARCH_CAPABILITIES::IF_PSCHANGE_MC_NO), let alone non-Intel CPUs.
-> > > But, the kvm_vm_create_worker_thread is still created anyway, nonsens=
-e I
-> > > think. I previously had a internal patch getting rid of it but didn't=
- get a
-> > > chance to send out.
-> >
-> > For the NX hugepage mitation, I think it makes sense to restart the dis=
-cussion
-> > in the context of this thread: https://lore.kernel.org/all/ZBxf+ewCimtH=
-Y2XO@google.com
-> >
-> > TL;DR: I am open to providng an option to hard disable the mitigation, =
-but there
-> > needs to be sufficient justification, e.g. that the above 100ms latency=
- is a
-> > problem for real world deployments.
->=20
-> Whatever became of
-> https://lore.kernel.org/kvm/20220613212523.3436117-1-bgardon@google.com/?
+On 01/05/2023 12:21, Andrew Jones wrote:
+> On Sun, Apr 30, 2023 at 01:02:42AM +0100, Nikos Nikoleris wrote:
+>> On 29/04/2023 17:21, Andrew Jones wrote:
+>>> On Sat, Apr 29, 2023 at 06:18:25PM +0200, Andrew Jones wrote:
+>>>> On Fri, Apr 28, 2023 at 01:03:36PM +0100, Nikos Nikoleris wrote:
+>>>>> Hello,
+>>>>>
+>>>>> This series adds initial support for building arm64 tests as EFI
+>>>>> apps and running them under QEMU. Much like x86_64, we import external
+>>>>> dependencies from gnu-efi and adapt them to work with types and other
+>>>>> assumptions from kvm-unit-tests. In addition, this series adds support
+>>>>> for enumerating parts of the system using ACPI.
+>>>>>
+>>>>> The first set of patches, moves the existing ACPI code to the common
+>>>>> lib path. Then, it extends definitions and functions to allow for more
+>>>>> robust discovery of ACPI tables. We add support for setting up the PSCI
+>>>>> conduit, discovering the UART, timers, GIC and cpus via ACPI. The code
+>>>>> retains existing behavior and gives priority to discovery through DT
+>>>>> when one has been provided.
+>>>>>
+>>>>> In the second set of patches, we add support for getting the command
+>>>>> line from the EFI shell. This is a requirement for many of the
+>>>>> existing arm64 tests.
+>>>>>
+>>>>> In the third set of patches, we import code from gnu-efi, make minor
+>>>>> changes and add an alternative setup sequence from arm64 systems that
+>>>>> boot through EFI. Finally, we add support in the build system and a
+>>>>> run script which is used to run an EFI app.
+>>>>>
+>>>>> After this set of patches one can build arm64 EFI tests:
+>>>>>
+>>>>> $> ./configure --enable-efi
+>>>>> $> make
+>>>>>
+>>>>> And use the run script to run an EFI tests:
+>>>>>
+>>>>> $> ./arm/efi/run ./arm/selftest.efi -smp 2 -m 256 -append "setup smp=2 mem=256"
+>>>>>
+>>>>> Or all tests:
+>>>>>
+>>>>> $> ./run_tests.sh
+>>>>>
+>>>>> There are a few items that this series does not address but they would
+>>>>> be useful to have:
+>>>>>    - Support for booting the system from EL2. Currently, we assume that a
+>>>>>      test starts EL1. This will be required to run EFI tests on sytems
+>>>>>      that implement EL2.
+>>>>>    - Support for reading environment variables and populating __envp.
+>>>>>    - Support for discovering the PCI subsystem using ACPI.
+>>>>>    - Get rid of other assumptions (e.g., vmalloc area) that don't hold on
+>>>>>      real HW.
+>>>>>    - Various fixes related to cache maintaince to better support turn the
+>>>>>      MMU off.
+>>>>>    - Switch to a new stack and avoid relying on the one provided by EFI.
+>>>>>
+>>>>> git branch: https://github.com/relokin/kvm-unit-tests/pull/new/target-efi-upstream-v5
+>>>>>
+>>>>> v4: https://lore.kernel.org/kvmarm/20230213101759.2577077-1-nikos.nikoleris@arm.com/
+>>>>> v3: https://lore.kernel.org/all/20220630100324.3153655-1-nikos.nikoleris@arm.com/
+>>>>> v2: https://lore.kernel.org/kvm/20220506205605.359830-1-nikos.nikoleris@arm.com/
+>>>>>
+>>>>> Changes in v5:
+>>>>>    - Minor style changes (thanks Shaoqin).
+>>>>>    - Avoid including lib/acpi.o to cflatobjs twice (thanks Drew).
+>>>>>    - Increase NR_INITIAL_MEM_REGIONS to avoid overflows and add check when
+>>>>>      we run out of space (thanks Shaoqin).
+>>>>>
+>>>>> Changes in v4:
+>>>>>    - Removed patch that reworks cache maintenance when turning the MMU
+>>>>>      off. This is not strictly required for EFI tests running with tcg and
+>>>>>      will be addressed in a separate series by Alex.
+>>>>>    - Fix compilation for arm (Alex).
+>>>>>    - Convert ACPI tables to Linux style (Alex).
+>>>>>
+>>>>> Changes in v3:
+>>>>>    - Addressed feedback from Drew, Alex and Ricardo. Many thanks for the reviews!
+>>>>>    - Added support for discovering the GIC through ACPI
+>>>>>    - Added a missing header file (<elf.h>)
+>>>>>    - Added support for correctly parsing the outcome of tests (./run_tests)
+>>>>>
+>>>>
+>>>> Thanks, Nikos!
+>>>>
+>>>> I'd like to get an ack from either Paolo or Sean on the changes to ACPI,
+>>>> as they're shared with x86, and there are also some x86 code changes.
+>>>
+>>> Actually, there are two build pipeline failures with the new ACPI code.
+>>> Please take a look at
+>>>
+>>> https://gitlab.com/jones-drew/kvm-unit-tests/-/pipelines/852864569
+>>>
+>>
+>> Thanks for reviewing the series!
+>>
+>> I think this fixes the compilation issues:
+>>
+>> diff --git a/lib/acpi.h b/lib/acpi.h
+>> index 202d832e..c330c877 100644
+>> --- a/lib/acpi.h
+>> +++ b/lib/acpi.h
+>> @@ -292,7 +292,8 @@ struct acpi_table_gtdt {
+>>          u32 platform_timer_offset;
+>>   };
+>>
+>> -#pragma pack(0)
+>> +/* Reset to default packing */
+>> +#pragma pack()
+>>
+>>   void set_efi_rsdp(struct acpi_table_rsdp *rsdp);
+>>   void *find_acpi_table_addr(u32 sig);
+>> diff --git a/lib/acpi.c b/lib/acpi.c
+>> index 760cd8b2..0440cddb 100644
+>> --- a/lib/acpi.c
+>> +++ b/lib/acpi.c
+>> @@ -70,7 +70,7 @@ void *find_acpi_table_addr(u32 sig)
+>>                  return rsdt;
+>>
+>>          if (rsdp->revision >= 2) {
+>> -               xsdt = (void *)rsdp->xsdt_physical_address;
+>> +               xsdt = (void *)(ulong) rsdp->xsdt_physical_address;
+>>                  if (xsdt && xsdt->signature != XSDT_SIGNATURE)
+>>                          xsdt = NULL;
+>>          }
+>>
+>>> Thanks,
+>>> drew
+>>>
+>>>>
+>>>> Also,
+>>>>
+>>>>     1) It'd be nice if this worked with DT, too. We can use UEFI with DT
+>>>>        when adding '-no-acpi' to the QEMU command line. setup_efi() needs
+>>>>        to learn how to find the dtb and most the '#ifdef CONFIG_EFI's
+>>>>        would need to change to a new CONFIG_ACPI guard.
+>>>>
+>>
+>> I had a quick look at it at some point and it didn't look straightforward
+>> but I'll check again.
+>>
+>>>>     2) The debug bp and ss tests fail with EFI, but not without, for me.
+>>>>
+>>
+>> I think, I've found the problem, the patch below fixes it for me.
+>>
+>> diff --git a/arm/debug.c b/arm/debug.c
+>> index b3e9749c..126fa267 100644
+>> --- a/arm/debug.c
+>> +++ b/arm/debug.c
+>> @@ -292,11 +292,14 @@ static noinline void test_hw_bp(bool migrate)
+>>          hw_bp_idx = 0;
+>>
+>>          /* Trap on up to 16 debug exception unmask instructions. */
+>> -       asm volatile("hw_bp0:\n"
+>> -            "msr daifclr, #8; msr daifclr, #8; msr daifclr, #8; msr
+>> daifclr, #8\n"
+>> -            "msr daifclr, #8; msr daifclr, #8; msr daifclr, #8; msr
+>> daifclr, #8\n"
+>> -            "msr daifclr, #8; msr daifclr, #8; msr daifclr, #8; msr
+>> daifclr, #8\n"
+>> -            "msr daifclr, #8; msr daifclr, #8; msr daifclr, #8; msr
+>> daifclr, #8\n");
+>> +       asm volatile(
+>> +               ".globl hw_bp0\n"
+>> +               "hw_bp0:\n"
+>> +                       "msr daifclr, #8; msr daifclr, #8; msr daifclr, #8;
+>> msr daifclr, #8\n"
+>> +                       "msr daifclr, #8; msr daifclr, #8; msr daifclr, #8;
+>> msr daifclr, #8\n"
+>> +                       "msr daifclr, #8; msr daifclr, #8; msr daifclr, #8;
+>> msr daifclr, #8\n"
+>> +                       "msr daifclr, #8; msr daifclr, #8; msr daifclr, #8;
+>> msr daifclr, #8\n"
+>> +               );
+>>
+>>          for (i = 0, addr = (uint64_t)&hw_bp0; i < num_bp; i++, addr += 4)
+>>                  report(hw_bp_addr[i] == addr, "hw breakpoint: %d", i);
+>> @@ -367,11 +370,14 @@ static noinline void test_ss(bool migrate)
+>>
+>>          asm volatile("msr daifclr, #8");
+>>
+>> -       asm volatile("ss_start:\n"
+>> +       asm volatile(
+>> +               ".globl ss_start\n"
+>> +               "ss_start:\n"
+>>                          "mrs x0, esr_el1\n"
+>>                          "add x0, x0, #1\n"
+>>                          "msr daifset, #8\n"
+>> -                       : : : "x0");
+>> +                       : : : "x0"
+>> +               );
+>>
+>>          report(ss_addr[0] == (uint64_t)&ss_start, "single step");
+>>   }
+>>
+>>>>     3) The timer test runs (and succeeds) when run with
+>>>>        './arm/efi/run ./arm/timer.efi', but not when run with
+>>>>        './run_tests.sh -g timer'. This is because UEFI takes
+>>>>        up all the given timeout time (10s), and then the test times out.
+>>>>        The hackyish fix below resolves it for me. I'll consider posting it
+>>>>        as a real patch
+>>>>
+>>
+>> I see. I didn't hit the timeout on my test machine but I tried on a slower
+>> machine and I did.
+>>
+>> New branch with the fixups here:
+>>
+>> https://github.com/relokin/kvm-unit-tests/pull/new/target-efi-upstream-v5
+> 
+> Thanks for the quick fixes. Can you update your tree and make an MR? I
+> no longer use github.com/rhdrjones/kvm-unit-tests. I use
+> 
+> https://gitlab.com/jones-drew/kvm-unit-tests.git
+> 
 
-That's merged, but disabling the mitigation for a single VM doesn't stop th=
-e
-worker thread (arguably that's a bug), let alone prevent creation of the wo=
-rker
-in the first place as KVM spawns the worker before the VM is exposed to
-userspace.  I.e. there's no way for userspace to say "don't spawn workers, =
-the
-NX hugepage mitigation will *never* be enabled".
+You mean a MR into your repo and to the branch arm/queue, don't you? 
+I've tried doing that but I get an error: "Target branch "arm/queue" 
+does not exist", but it allows me to create a MR into other repos. Am I 
+doing something wrong?
+
+My branch on gitlab:
+
+https://gitlab.com/nnikoleris/kvm-unit-tests/-/tree/target-efi-upstream-v6-pre
+
+Has the new fixups squashed and I've added Shaoqin's Reviewed-by tags. 
+And the branch with the fixups separately lives here:
+
+https://gitlab.com/nnikoleris/kvm-unit-tests/-/tree/target-efi-upstream-v5-fixups
+
+Do you want me to add your patch as well? Or are you going to add it 
+afterwards? Meanwhile, I've tried adding support for booting using a 
+fdt. I think it's not too hard, but I wouldn't mind merging this series 
+first and looking at the patches for the fdt support later.
+
+Thanks,
+
+Nikos
+
+
+> Thanks,
+> drew
+> 
+>>
+>> Many thanks,
+>>
+>> Nikos
+>>
+>>>> Thanks,
+>>>> drew
+>>>>
+>>>> diff --git a/scripts/arch-run.bash b/scripts/arch-run.bash
+>>>> index 51e4b97b27d1..72ce718b1170 100644
+>>>> --- a/scripts/arch-run.bash
+>>>> +++ b/scripts/arch-run.bash
+>>>> @@ -94,7 +94,17 @@ run_qemu_status ()
+>>>>    timeout_cmd ()
+>>>>    {
+>>>> +	local s
+>>>> +
+>>>>    	if [ "$TIMEOUT" ] && [ "$TIMEOUT" != "0" ]; then
+>>>> +		if [ "$CONFIG_EFI" = 'y' ]; then
+>>>> +			s=${TIMEOUT: -1}
+>>>> +			if [ "$s" = 's' ]; then
+>>>> +				TIMEOUT=${TIMEOUT:0:-1}
+>>>> +				((TIMEOUT += 10)) # Add 10 seconds for booting UEFI
+>>>> +				TIMEOUT="${TIMEOUT}s"
+>>>> +			fi
+>>>> +		fi
+>>>>    		echo "timeout -k 1s --foreground $TIMEOUT"
+>>>>    	fi
+>>>>    }
