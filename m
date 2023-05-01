@@ -2,301 +2,295 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C90276F3039
-	for <lists+kvm@lfdr.de>; Mon,  1 May 2023 12:32:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 591E96F3068
+	for <lists+kvm@lfdr.de>; Mon,  1 May 2023 13:21:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232409AbjEAKcs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 1 May 2023 06:32:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56598 "EHLO
+        id S232255AbjEALVP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 1 May 2023 07:21:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35722 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232385AbjEAKck (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 1 May 2023 06:32:40 -0400
-Received: from HK2P15301CU002.outbound.protection.outlook.com (mail-eastasiaazon11020023.outbound.protection.outlook.com [52.101.128.23])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C60910DB;
-        Mon,  1 May 2023 03:32:32 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=aFgvfnU9RBIO/uBzVLZ6NeHvtnaJgOkyrlOLPOy9S14lNwi+BrM/NIAlrfPSCXG5kfb3E/bfCvbzqPifcAXFXACsg1foK3VsTuEI18OmyzWTt0ODfT7riz+qgJRoPCca3HbDdjEOHtCk85IJmSMTWgyjYGt2TVmIpv7EZL8Hmjk9mv7Pz8JQJ9DjWY1stA+wBp5fPFKUXHA6OmtV6cYCtuzMc9RHSyP0fEG4WMpzp8Yabaua4I6+syhRI2Aww0TIF3llUZDetpiXjtFAiTVtbzeep2qSWS4I5wPo9TYFBrz4ez/xWv0gtPaZMCPmr7wSYGLBA/Vohx0qNDc56vcQsQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=eI/qKiulEsF4wZsAt8Jk3bpYjtahhxJ68XiL45gRZzI=;
- b=jHdXJiojpnxXCkKR5OCMcS0jMhumYMVIv/NBsEc4hLAbKJ+nPYSgNFqVR42DiWXPsSK4eQrEIbBzBhEUvs/A7klGytjaS0atqZc2MGcmNhu8Jk6wJkcEUv+KagUTOc6m7l15Iy5dLfFrg70YkDE4kdnGA4ZDucPAljGlaF5so+jg/VP0B6uLAmkzCoP8bd78X1TLo/oKuc3fRpdeNFiFfXwNeW9wR413esiBjN1ukQz48bgWIfcA240rBbs1qDVf5MQ3q2NCBtXMwrh688hOrhw2vFgAW6wkhe693EPhDpY3rPqJA7tDw0SfYM0Co0ExvOsKZjGLopRNNEBEsoiQ9g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microsoft.com; dmarc=pass action=none
- header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=eI/qKiulEsF4wZsAt8Jk3bpYjtahhxJ68XiL45gRZzI=;
- b=NiBUe/LHtWvCVtcdfA1NS1QULRgtNDCUwxd5SsmsaIPuf0VEqlMrQamZunyS6C1QD690ePR4JrSitsB2YdRum58hX/SjO30NHleSg1dZOhJrNgbU0+KafeGG2QdkMHEvRnFeFJ0RECZg16Ka+h+/rshXgSKhskKJDAFkQMDhULc=
-Received: from PUZP153MB0749.APCP153.PROD.OUTLOOK.COM (2603:1096:301:e6::8) by
- SI2P153MB0672.APCP153.PROD.OUTLOOK.COM (2603:1096:4:1ff::5) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6387.5; Mon, 1 May 2023 10:32:26 +0000
-Received: from PUZP153MB0749.APCP153.PROD.OUTLOOK.COM
- ([fe80::1cc2:aa38:1d02:9a11]) by PUZP153MB0749.APCP153.PROD.OUTLOOK.COM
- ([fe80::1cc2:aa38:1d02:9a11%2]) with mapi id 15.20.6387.005; Mon, 1 May 2023
- 10:32:26 +0000
-From:   Saurabh Singh Sengar <ssengar@microsoft.com>
-To:     Tianyu Lan <ltykernel@gmail.com>,
-        "luto@kernel.org" <luto@kernel.org>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "bp@alien8.de" <bp@alien8.de>,
-        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
-        "x86@kernel.org" <x86@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>,
-        "seanjc@google.com" <seanjc@google.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "jgross@suse.com" <jgross@suse.com>,
-        Tianyu Lan <Tianyu.Lan@microsoft.com>,
-        "kirill@shutemov.name" <kirill@shutemov.name>,
-        "jiangshan.ljs@antgroup.com" <jiangshan.ljs@antgroup.com>,
-        "peterz@infradead.org" <peterz@infradead.org>,
-        "ashish.kalra@amd.com" <ashish.kalra@amd.com>,
-        "srutherford@google.com" <srutherford@google.com>,
-        "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
-        "anshuman.khandual@arm.com" <anshuman.khandual@arm.com>,
-        "pawan.kumar.gupta@linux.intel.com" 
-        <pawan.kumar.gupta@linux.intel.com>,
-        "adrian.hunter@intel.com" <adrian.hunter@intel.com>,
-        "daniel.sneddon@linux.intel.com" <daniel.sneddon@linux.intel.com>,
-        "alexander.shishkin@linux.intel.com" 
-        <alexander.shishkin@linux.intel.com>,
-        "sandipan.das@amd.com" <sandipan.das@amd.com>,
-        "ray.huang@amd.com" <ray.huang@amd.com>,
-        "brijesh.singh@amd.com" <brijesh.singh@amd.com>,
-        "michael.roth@amd.com" <michael.roth@amd.com>,
-        "thomas.lendacky@amd.com" <thomas.lendacky@amd.com>,
-        "venu.busireddy@oracle.com" <venu.busireddy@oracle.com>,
-        "sterritt@google.com" <sterritt@google.com>,
-        "tony.luck@intel.com" <tony.luck@intel.com>,
-        "samitolvanen@google.com" <samitolvanen@google.com>,
-        "fenghua.yu@intel.com" <fenghua.yu@intel.com>
-CC:     "pangupta@amd.com" <pangupta@amd.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
-        "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>
-Subject: RE: [EXTERNAL] [RFC PATCH V5 09/15] x86/hyperv: Add smp support for
- sev-snp guest
-Thread-Topic: [EXTERNAL] [RFC PATCH V5 09/15] x86/hyperv: Add smp support for
- sev-snp guest
-Thread-Index: AQHZfAsx7OPEtGqXGkOTjZ7IFQQyZK9FN+7A
-Date:   Mon, 1 May 2023 10:32:26 +0000
-Message-ID: <PUZP153MB07496A03FF7B1FDEEEBE0520BE6E9@PUZP153MB0749.APCP153.PROD.OUTLOOK.COM>
-References: <20230501085726.544209-1-ltykernel@gmail.com>
- <20230501085726.544209-10-ltykernel@gmail.com>
-In-Reply-To: <20230501085726.544209-10-ltykernel@gmail.com>
-Accept-Language: en-IN, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-msip_labels: MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=dc827253-69ca-42f6-a0ff-e1e4081a7d57;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ContentBits=0;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=true;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Method=Standard;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=Internal;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2023-05-01T10:30:54Z;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=microsoft.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PUZP153MB0749:EE_|SI2P153MB0672:EE_
-x-ms-office365-filtering-correlation-id: 79cfc65a-87a1-4d29-1ec4-08db4a2f5b70
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: rM+Y3LPMABvyWHB19OIgDWlzLI4oY/vLwnc9JVDf2VpfokhA7UWWfjJ59jOmw96MZCd+4IpuZ9XYVuMizRA53a4Tb1SWwx7QxXcCDapY9uY1Y7a32nfk/QAmQ3O832o6nCMttgL5+HTg35mLwDHKpoXJr79V7DDqGPdj4E11n2aVLnZ7WZ+LqRszgMi0ioG8YNFBqPg/pp2qBBc06omavgJ/Oc3DeS9gxSn+a/zpzovVtEg+DQoNvaLkWIEaNzUSyhltkvz5bSjNqnB+lQwaTc7u5OFE538Io38N9yReIwgBYn6e+n5xQxFAwJMVK5gTHOpXW8UHahztxa6AKBQeHeih2oku3HmHoBtDIK8zHB8tQYADF4PPaGjuafLD2Aj7cDHQ1j7nFWm3fhZEZArfrRrBB+LTMLDmRt24CtvhFn5b0xF51NVQNvNilPu24R5huBbGD9HWpgtcAmDBCCsNV/6EuODoAgwuMIlCiYQPKlBvkoud9Y8FL9exVvwVoKLcLfp2UWNQway+29rgGiJ20mNCS0lugs5ESUCHLFGiVtAZlfxnMzxscRvO/CVQkGGLHSBshz4QYFauqA9uGgOWVNEvxnhIqsXrlI7gjx+fHIhPehVNv53fpXeD4SG0Yb+GkH9VGqbq8qGQP9AssnzanqTAimTUF+1MYZvKpdV/9kf4gJKV2lQP0LFuyZEysveY
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PUZP153MB0749.APCP153.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230028)(4636009)(136003)(346002)(376002)(366004)(39860400002)(396003)(451199021)(86362001)(33656002)(38100700002)(82960400001)(38070700005)(122000001)(82950400001)(921005)(7406005)(8676002)(52536014)(7416002)(5660300002)(66946007)(66476007)(66556008)(786003)(76116006)(4326008)(8936002)(66446008)(316002)(41300700001)(64756008)(55016003)(8990500004)(2906002)(83380400001)(71200400001)(110136005)(7696005)(54906003)(10290500003)(478600001)(6506007)(186003)(53546011)(9686003);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?PbViEGN14CRFSqRAkiaENdBzToodDC2T5W1CSvVWASd98WExRr2+8ByI5C3b?=
- =?us-ascii?Q?lsoJV6y2D/zFDbIvKTX42IhggVg1chum5RSmNFvVB0xJ6F+6WK6/5DJ0Wjzc?=
- =?us-ascii?Q?q+AMxcQ/YATb1WPzzKPTbRkyOlTyvYi3HA2ELICOF0qybdsKPxJGcUpMIe38?=
- =?us-ascii?Q?uaINRDb/ioINqjd/NE2b4RZKIbl+8kaGfKjURLoVS2sZLN5pCRol3EObBwbi?=
- =?us-ascii?Q?xXS5fQl2A5cCoHsDdRndlaucK8VP9tjYPRiTL36C4JPP0S8bmim1eRmBQX2P?=
- =?us-ascii?Q?3iOgTl5rXxKA+2/2tp3ULEozUFncUBf+g6GX7xLBpcEew8oUNHM9krJ8FW4Z?=
- =?us-ascii?Q?W9Gsp9zHJmQu0jMbbZhfAswo8BqSng+l281xlmOsKj80ZkHije9GvqsluPkP?=
- =?us-ascii?Q?KRROfCBAuhE/zGfl5XJFk3mfBzvKbDBSXxa0wkIWKcr4rulSCJTIywnG8KgX?=
- =?us-ascii?Q?YPVhtXEjv97EFIQVMZiH3hRGpBtZfG2dHlEY5/6DLHFuyBSKV2O5QdCDRAHl?=
- =?us-ascii?Q?gOe6LvEFsqbdnF49TKh1taHIt9ivRf2NiTQVRuOPzr/tNhMLh1NkQMBY6VlO?=
- =?us-ascii?Q?1grydfVY3WRKnFo3itxqQyM8yeOACPHwNeg6gnOzq9vEiChTNR6+p6XnsT0O?=
- =?us-ascii?Q?5UDaDziUExPwsrrRmlbJ69IK1sjJw07Nb18jYylakibYMMVjApazF1tfjdwz?=
- =?us-ascii?Q?QhHVtOd3qhoYntRy0cnifmHnFOm1Zs6ZyZjxPhsge6p4yizL+r1od1dWJ60y?=
- =?us-ascii?Q?WSe29Tx8f2e5r0QH4WUc1JkGSRUPs8jILmTBEnKqr01MMhs+2aehsn4pEeVg?=
- =?us-ascii?Q?L62IZavXjt/V4TtqwO1CezNG2A/lVrWzJFL5vE57F1WCiRXinE7AmOApAsya?=
- =?us-ascii?Q?3tc7xyNdiAfQOjMS0bZAwDrT8wyBTsUhzwHeKu9QzKZC1BguGFTjWHsON7qL?=
- =?us-ascii?Q?OqmaEkE/Gm3utdKuM0QyPXp0MmLrjcPyqOfZCv3MW8gya1upJDPB6RZEazxe?=
- =?us-ascii?Q?rGvTTh4tgH6eMEwIJ/tV+c/zCxXyGeIhkEXMHadlierirKZxKPCUJKNu3Q43?=
- =?us-ascii?Q?lNXIAGiSuMMgHu9U9eZ3igjyRnD7SX0lXNmy6AgOjbuslXQdZY2W0E11uSJr?=
- =?us-ascii?Q?3e3F3dQ7TNwGG1Cvah/u5ZxlOM2syETZ3biVqaaYJXh+f3JezS6MjhNgoJ/C?=
- =?us-ascii?Q?QuRDBmoFJTkgCubP3PTd2nARg3ogroooYGruJ4QD59jV1AVeoTFFT2ejP0yW?=
- =?us-ascii?Q?RhegX8ecGz6tCuaBANxB4qck5SDYbhvKW6As76YImFbRG46omh1FODbR7x9R?=
- =?us-ascii?Q?rXJGI2g3Ac5OeYjABW15k2VpXn1dgdzTilCikMEK7HAJ9gI+R+ZGr0PJAUnb?=
- =?us-ascii?Q?pzn9/2VTevoVuDO8dR/SCIkjqQiLUZxN6k5Vi30i14tOVq3ZpSEt1DEiRE/k?=
- =?us-ascii?Q?NdHhDOHLYZU1Vj9EKoshhFWzi0Bxs1hE90EiPzDM2SBRmXL81zHBgKQaqT3x?=
- =?us-ascii?Q?ENZO+Y3M3zGt7CsbxrvEOZc4SsbR1ZwnQlNUeVc1VZ5qAvJedApj5wZkcULT?=
- =?us-ascii?Q?TLJpKJAwRWxie49Nu5iu3Nd6NqgzfUz6ql9ERbxY?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        with ESMTP id S232159AbjEALVO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 1 May 2023 07:21:14 -0400
+Received: from out-61.mta1.migadu.com (out-61.mta1.migadu.com [95.215.58.61])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E55781BF
+        for <kvm@vger.kernel.org>; Mon,  1 May 2023 04:21:11 -0700 (PDT)
+Date:   Mon, 1 May 2023 13:21:07 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1682940069;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=+aWXSMwkgiKfw+pcf1/6r+FqTgxXAv12reD0CJvo8Gs=;
+        b=lsmLovQxlUzECHWXBfF/RNqCErfebLCQGKWtHnwBLENlDaDtT4nBn8LD2rJNY6xX8CSdct
+        /ALWWte2pyxK+ffOBw7fegpHeLmH6i2HgbmU7ch1ArRJIgYsj0nyyjlXyKWE5MxYRKlt2c
+        rXhK2Btjlqu+DNJlRnAJpmsSzTb+DyY=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From:   Andrew Jones <andrew.jones@linux.dev>
+To:     Nikos Nikoleris <nikos.nikoleris@arm.com>
+Cc:     kvm@vger.kernel.org, kvmarm@lists.linux.dev, pbonzini@redhat.com,
+        alexandru.elisei@arm.com, ricarkol@google.com, seanjc@google.com
+Subject: Re: [kvm-unit-tests PATCH v5 00/29] EFI and ACPI support for arm64
+Message-ID: <20230501-85b5dca6ed2d86d8bb0e55b6@orel>
+References: <20230428120405.3770496-1-nikos.nikoleris@arm.com>
+ <20230429-6da987552a8d15281f8444c9@orel>
+ <20230429-342c8a26e5db45474631a307@orel>
+ <6857da77-8d1e-ebcb-1571-6419d463fa53@arm.com>
 MIME-Version: 1.0
-X-OriginatorOrg: microsoft.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PUZP153MB0749.APCP153.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-Network-Message-Id: 79cfc65a-87a1-4d29-1ec4-08db4a2f5b70
-X-MS-Exchange-CrossTenant-originalarrivaltime: 01 May 2023 10:32:26.0704
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: B5Yb/4QHGAvuvIOfjDvzaW4wdZoIszAAS++nIwg7uc2fEHQg1+qTBdXiznl7grkjXMZ9KpW1GhiLpayhgOOgkA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SI2P153MB0672
-X-Spam-Status: No, score=-2.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6857da77-8d1e-ebcb-1571-6419d463fa53@arm.com>
+X-Migadu-Flow: FLOW_OUT
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-> -----Original Message-----
-> From: Tianyu Lan <ltykernel@gmail.com>
-> Sent: Monday, May 1, 2023 2:27 PM
-> To: luto@kernel.org; tglx@linutronix.de; mingo@redhat.com; bp@alien8.de;
-> dave.hansen@linux.intel.com; x86@kernel.org; hpa@zytor.com;
-> seanjc@google.com; pbonzini@redhat.com; jgross@suse.com; Tianyu Lan
-> <Tianyu.Lan@microsoft.com>; kirill@shutemov.name;
-> jiangshan.ljs@antgroup.com; peterz@infradead.org; ashish.kalra@amd.com;
-> srutherford@google.com; akpm@linux-foundation.org;
-> anshuman.khandual@arm.com; pawan.kumar.gupta@linux.intel.com;
-> adrian.hunter@intel.com; daniel.sneddon@linux.intel.com;
-> alexander.shishkin@linux.intel.com; sandipan.das@amd.com;
-> ray.huang@amd.com; brijesh.singh@amd.com; michael.roth@amd.com;
-> thomas.lendacky@amd.com; venu.busireddy@oracle.com;
-> sterritt@google.com; tony.luck@intel.com; samitolvanen@google.com;
-> fenghua.yu@intel.com
-> Cc: pangupta@amd.com; linux-kernel@vger.kernel.org; kvm@vger.kernel.org;
-> linux-hyperv@vger.kernel.org; linux-arch@vger.kernel.org
-> Subject: [EXTERNAL] [RFC PATCH V5 09/15] x86/hyperv: Add smp support for
-> sev-snp guest
->=20
-> From: Tianyu Lan <tiala@microsoft.com>
->=20
-> The wakeup_secondary_cpu callback was populated with wakeup_
-> cpu_via_vmgexit() which doesn't work for Hyper-V and Hyper-V requires to
-> call Hyper-V specific hvcall to start APs. So override it with Hyper-V sp=
-ecific
-> hook to start AP sev_es_save_area data structure.
->=20
-> Signed-off-by: Tianyu Lan <tiala@microsoft.com>
-> ---
-> Change sicne RFC v3:
->        * Replace struct sev_es_save_area with struct
->          vmcb_save_area
->        * Move code from mshyperv.c to ivm.c
->=20
-> Change since RFC v2:
->        * Add helper function to initialize segment
->        * Fix some coding style
-> ---
->  arch/x86/hyperv/ivm.c             | 89 +++++++++++++++++++++++++++++++
->  arch/x86/include/asm/mshyperv.h   | 18 +++++++
->  arch/x86/include/asm/sev.h        | 13 +++++
->  arch/x86/include/asm/svm.h        | 15 +++++-
->  arch/x86/kernel/cpu/mshyperv.c    | 13 ++++-
->  arch/x86/kernel/sev.c             |  4 +-
->  include/asm-generic/hyperv-tlfs.h | 19 +++++++
->  7 files changed, 166 insertions(+), 5 deletions(-)
->=20
-> diff --git a/arch/x86/hyperv/ivm.c b/arch/x86/hyperv/ivm.c index
-> 522eab55c0dd..0ef46f1874e6 100644
-> --- a/arch/x86/hyperv/ivm.c
-> +++ b/arch/x86/hyperv/ivm.c
-> @@ -22,11 +22,15 @@
->  #include <asm/sev.h>
->  #include <asm/realmode.h>
->  #include <asm/e820/api.h>
-> +#include <asm/desc.h>
->=20
->  #ifdef CONFIG_AMD_MEM_ENCRYPT
->=20
->  #define GHCB_USAGE_HYPERV_CALL	1
->=20
-> +static u8 ap_start_input_arg[PAGE_SIZE] __bss_decrypted
-> +__aligned(PAGE_SIZE); static u8 ap_start_stack[PAGE_SIZE]
-> +__aligned(PAGE_SIZE);
-> +
->  union hv_ghcb {
->  	struct ghcb ghcb;
->  	struct {
-> @@ -442,6 +446,91 @@ __init void hv_sev_init_mem_and_cpu(void)
->  	}
+On Sun, Apr 30, 2023 at 01:02:42AM +0100, Nikos Nikoleris wrote:
+> On 29/04/2023 17:21, Andrew Jones wrote:
+> > On Sat, Apr 29, 2023 at 06:18:25PM +0200, Andrew Jones wrote:
+> > > On Fri, Apr 28, 2023 at 01:03:36PM +0100, Nikos Nikoleris wrote:
+> > > > Hello,
+> > > > 
+> > > > This series adds initial support for building arm64 tests as EFI
+> > > > apps and running them under QEMU. Much like x86_64, we import external
+> > > > dependencies from gnu-efi and adapt them to work with types and other
+> > > > assumptions from kvm-unit-tests. In addition, this series adds support
+> > > > for enumerating parts of the system using ACPI.
+> > > > 
+> > > > The first set of patches, moves the existing ACPI code to the common
+> > > > lib path. Then, it extends definitions and functions to allow for more
+> > > > robust discovery of ACPI tables. We add support for setting up the PSCI
+> > > > conduit, discovering the UART, timers, GIC and cpus via ACPI. The code
+> > > > retains existing behavior and gives priority to discovery through DT
+> > > > when one has been provided.
+> > > > 
+> > > > In the second set of patches, we add support for getting the command
+> > > > line from the EFI shell. This is a requirement for many of the
+> > > > existing arm64 tests.
+> > > > 
+> > > > In the third set of patches, we import code from gnu-efi, make minor
+> > > > changes and add an alternative setup sequence from arm64 systems that
+> > > > boot through EFI. Finally, we add support in the build system and a
+> > > > run script which is used to run an EFI app.
+> > > > 
+> > > > After this set of patches one can build arm64 EFI tests:
+> > > > 
+> > > > $> ./configure --enable-efi
+> > > > $> make
+> > > > 
+> > > > And use the run script to run an EFI tests:
+> > > > 
+> > > > $> ./arm/efi/run ./arm/selftest.efi -smp 2 -m 256 -append "setup smp=2 mem=256"
+> > > > 
+> > > > Or all tests:
+> > > > 
+> > > > $> ./run_tests.sh
+> > > > 
+> > > > There are a few items that this series does not address but they would
+> > > > be useful to have:
+> > > >   - Support for booting the system from EL2. Currently, we assume that a
+> > > >     test starts EL1. This will be required to run EFI tests on sytems
+> > > >     that implement EL2.
+> > > >   - Support for reading environment variables and populating __envp.
+> > > >   - Support for discovering the PCI subsystem using ACPI.
+> > > >   - Get rid of other assumptions (e.g., vmalloc area) that don't hold on
+> > > >     real HW.
+> > > >   - Various fixes related to cache maintaince to better support turn the
+> > > >     MMU off.
+> > > >   - Switch to a new stack and avoid relying on the one provided by EFI.
+> > > > 
+> > > > git branch: https://github.com/relokin/kvm-unit-tests/pull/new/target-efi-upstream-v5
+> > > > 
+> > > > v4: https://lore.kernel.org/kvmarm/20230213101759.2577077-1-nikos.nikoleris@arm.com/
+> > > > v3: https://lore.kernel.org/all/20220630100324.3153655-1-nikos.nikoleris@arm.com/
+> > > > v2: https://lore.kernel.org/kvm/20220506205605.359830-1-nikos.nikoleris@arm.com/
+> > > > 
+> > > > Changes in v5:
+> > > >   - Minor style changes (thanks Shaoqin).
+> > > >   - Avoid including lib/acpi.o to cflatobjs twice (thanks Drew).
+> > > >   - Increase NR_INITIAL_MEM_REGIONS to avoid overflows and add check when
+> > > >     we run out of space (thanks Shaoqin).
+> > > > 
+> > > > Changes in v4:
+> > > >   - Removed patch that reworks cache maintenance when turning the MMU
+> > > >     off. This is not strictly required for EFI tests running with tcg and
+> > > >     will be addressed in a separate series by Alex.
+> > > >   - Fix compilation for arm (Alex).
+> > > >   - Convert ACPI tables to Linux style (Alex).
+> > > > 
+> > > > Changes in v3:
+> > > >   - Addressed feedback from Drew, Alex and Ricardo. Many thanks for the reviews!
+> > > >   - Added support for discovering the GIC through ACPI
+> > > >   - Added a missing header file (<elf.h>)
+> > > >   - Added support for correctly parsing the outcome of tests (./run_tests)
+> > > > 
+> > > 
+> > > Thanks, Nikos!
+> > > 
+> > > I'd like to get an ack from either Paolo or Sean on the changes to ACPI,
+> > > as they're shared with x86, and there are also some x86 code changes.
+> > 
+> > Actually, there are two build pipeline failures with the new ACPI code.
+> > Please take a look at
+> > 
+> > https://gitlab.com/jones-drew/kvm-unit-tests/-/pipelines/852864569
+> > 
+> 
+> Thanks for reviewing the series!
+> 
+> I think this fixes the compilation issues:
+> 
+> diff --git a/lib/acpi.h b/lib/acpi.h
+> index 202d832e..c330c877 100644
+> --- a/lib/acpi.h
+> +++ b/lib/acpi.h
+> @@ -292,7 +292,8 @@ struct acpi_table_gtdt {
+>         u32 platform_timer_offset;
+>  };
+> 
+> -#pragma pack(0)
+> +/* Reset to default packing */
+> +#pragma pack()
+> 
+>  void set_efi_rsdp(struct acpi_table_rsdp *rsdp);
+>  void *find_acpi_table_addr(u32 sig);
+> diff --git a/lib/acpi.c b/lib/acpi.c
+> index 760cd8b2..0440cddb 100644
+> --- a/lib/acpi.c
+> +++ b/lib/acpi.c
+> @@ -70,7 +70,7 @@ void *find_acpi_table_addr(u32 sig)
+>                 return rsdt;
+> 
+>         if (rsdp->revision >= 2) {
+> -               xsdt = (void *)rsdp->xsdt_physical_address;
+> +               xsdt = (void *)(ulong) rsdp->xsdt_physical_address;
+>                 if (xsdt && xsdt->signature != XSDT_SIGNATURE)
+>                         xsdt = NULL;
+>         }
+> 
+> > Thanks,
+> > drew
+> > 
+> > > 
+> > > Also,
+> > > 
+> > >    1) It'd be nice if this worked with DT, too. We can use UEFI with DT
+> > >       when adding '-no-acpi' to the QEMU command line. setup_efi() needs
+> > >       to learn how to find the dtb and most the '#ifdef CONFIG_EFI's
+> > >       would need to change to a new CONFIG_ACPI guard.
+> > > 
+> 
+> I had a quick look at it at some point and it didn't look straightforward
+> but I'll check again.
+> 
+> > >    2) The debug bp and ss tests fail with EFI, but not without, for me.
+> > > 
+> 
+> I think, I've found the problem, the patch below fixes it for me.
+> 
+> diff --git a/arm/debug.c b/arm/debug.c
+> index b3e9749c..126fa267 100644
+> --- a/arm/debug.c
+> +++ b/arm/debug.c
+> @@ -292,11 +292,14 @@ static noinline void test_hw_bp(bool migrate)
+>         hw_bp_idx = 0;
+> 
+>         /* Trap on up to 16 debug exception unmask instructions. */
+> -       asm volatile("hw_bp0:\n"
+> -            "msr daifclr, #8; msr daifclr, #8; msr daifclr, #8; msr
+> daifclr, #8\n"
+> -            "msr daifclr, #8; msr daifclr, #8; msr daifclr, #8; msr
+> daifclr, #8\n"
+> -            "msr daifclr, #8; msr daifclr, #8; msr daifclr, #8; msr
+> daifclr, #8\n"
+> -            "msr daifclr, #8; msr daifclr, #8; msr daifclr, #8; msr
+> daifclr, #8\n");
+> +       asm volatile(
+> +               ".globl hw_bp0\n"
+> +               "hw_bp0:\n"
+> +                       "msr daifclr, #8; msr daifclr, #8; msr daifclr, #8;
+> msr daifclr, #8\n"
+> +                       "msr daifclr, #8; msr daifclr, #8; msr daifclr, #8;
+> msr daifclr, #8\n"
+> +                       "msr daifclr, #8; msr daifclr, #8; msr daifclr, #8;
+> msr daifclr, #8\n"
+> +                       "msr daifclr, #8; msr daifclr, #8; msr daifclr, #8;
+> msr daifclr, #8\n"
+> +               );
+> 
+>         for (i = 0, addr = (uint64_t)&hw_bp0; i < num_bp; i++, addr += 4)
+>                 report(hw_bp_addr[i] == addr, "hw breakpoint: %d", i);
+> @@ -367,11 +370,14 @@ static noinline void test_ss(bool migrate)
+> 
+>         asm volatile("msr daifclr, #8");
+> 
+> -       asm volatile("ss_start:\n"
+> +       asm volatile(
+> +               ".globl ss_start\n"
+> +               "ss_start:\n"
+>                         "mrs x0, esr_el1\n"
+>                         "add x0, x0, #1\n"
+>                         "msr daifset, #8\n"
+> -                       : : : "x0");
+> +                       : : : "x0"
+> +               );
+> 
+>         report(ss_addr[0] == (uint64_t)&ss_start, "single step");
 >  }
->=20
-> +#define hv_populate_vmcb_seg(seg, gdtr_base)			\
-> +do {								\
-> +	if (seg.selector) {					\
-> +		seg.base =3D 0;					\
-> +		seg.limit =3D HV_AP_SEGMENT_LIMIT;		\
-> +		seg.attrib =3D *(u16 *)(gdtr_base + seg.selector + 5);	\
+> 
+> > >    3) The timer test runs (and succeeds) when run with
+> > >       './arm/efi/run ./arm/timer.efi', but not when run with
+> > >       './run_tests.sh -g timer'. This is because UEFI takes
+> > >       up all the given timeout time (10s), and then the test times out.
+> > >       The hackyish fix below resolves it for me. I'll consider posting it
+> > >       as a real patch
+> > > 
+> 
+> I see. I didn't hit the timeout on my test machine but I tried on a slower
+> machine and I did.
+> 
+> New branch with the fixups here:
+> 
+> https://github.com/relokin/kvm-unit-tests/pull/new/target-efi-upstream-v5
 
-<snip>
+Thanks for the quick fixes. Can you update your tree and make an MR? I
+no longer use github.com/rhdrjones/kvm-unit-tests. I use
 
-> generic/hyperv-tlfs.h b/include/asm-generic/hyperv-tlfs.h
-> index f4e4cc4f965f..959b075591b2 100644
-> --- a/include/asm-generic/hyperv-tlfs.h
-> +++ b/include/asm-generic/hyperv-tlfs.h
-> @@ -149,6 +149,7 @@ union hv_reference_tsc_msr {
->  #define HVCALL_ENABLE_VP_VTL			0x000f
->  #define HVCALL_NOTIFY_LONG_SPIN_WAIT		0x0008
->  #define HVCALL_SEND_IPI				0x000b
-> +#define HVCALL_ENABLE_VP_VTL			0x000f
+https://gitlab.com/jones-drew/kvm-unit-tests.git
 
-HVCALL_ENABLE_VP_VTL is already defined.
+Thanks,
+drew
 
->  #define HVCALL_FLUSH_VIRTUAL_ADDRESS_SPACE_EX	0x0013
->  #define HVCALL_FLUSH_VIRTUAL_ADDRESS_LIST_EX	0x0014
->  #define HVCALL_SEND_IPI_EX			0x0015
-> @@ -168,6 +169,7 @@ union hv_reference_tsc_msr {
->  #define HVCALL_RETARGET_INTERRUPT		0x007e
->  #define HVCALL_START_VP				0x0099
->  #define HVCALL_GET_VP_ID_FROM_APIC_ID		0x009a
-> +#define HVCALL_START_VIRTUAL_PROCESSOR		0x0099
-
-We already have HVCALL_START_VP no need of defining HVCALL_START_VIRTUAL_PR=
-OCESSOR.
-- Saurabh
-
->  #define HVCALL_FLUSH_GUEST_PHYSICAL_ADDRESS_SPACE 0x00af  #define
-> HVCALL_FLUSH_GUEST_PHYSICAL_ADDRESS_LIST 0x00b0  #define
-> HVCALL_MODIFY_SPARSE_GPA_PAGE_HOST_VISIBILITY 0x00db @@ -223,6
-> +225,7 @@ enum HV_GENERIC_SET_FORMAT {
->  #define HV_STATUS_INVALID_PORT_ID		17
->  #define HV_STATUS_INVALID_CONNECTION_ID		18
->  #define HV_STATUS_INSUFFICIENT_BUFFERS		19
-> +#define HV_STATUS_TIME_OUT                      120
->  #define HV_STATUS_VTL_ALREADY_ENABLED		134
->=20
->  /*
-> @@ -783,6 +786,22 @@ struct hv_input_unmap_device_interrupt {
->  	struct hv_interrupt_entry interrupt_entry;  } __packed;
->=20
-> +struct hv_enable_vp_vtl_input {
-> +	u64 partitionid;
-> +	u32 vpindex;
-> +	u8 targetvtl;
-> +	u8 padding[3];
-> +	u8 context[0xe0];
-> +} __packed;
-> +
-> +struct hv_start_virtual_processor_input {
-> +	u64 partitionid;
-> +	u32 vpindex;
-> +	u8 targetvtl;
-> +	u8 padding[3];
-> +	u8 context[0xe0];
-> +} __packed;
-> +
->  #define HV_SOURCE_SHADOW_NONE               0x0
->  #define HV_SOURCE_SHADOW_BRIDGE_BUS_RANGE   0x1
->=20
-> --
-> 2.25.1
-
+> 
+> Many thanks,
+> 
+> Nikos
+> 
+> > > Thanks,
+> > > drew
+> > > 
+> > > diff --git a/scripts/arch-run.bash b/scripts/arch-run.bash
+> > > index 51e4b97b27d1..72ce718b1170 100644
+> > > --- a/scripts/arch-run.bash
+> > > +++ b/scripts/arch-run.bash
+> > > @@ -94,7 +94,17 @@ run_qemu_status ()
+> > >   timeout_cmd ()
+> > >   {
+> > > +	local s
+> > > +
+> > >   	if [ "$TIMEOUT" ] && [ "$TIMEOUT" != "0" ]; then
+> > > +		if [ "$CONFIG_EFI" = 'y' ]; then
+> > > +			s=${TIMEOUT: -1}
+> > > +			if [ "$s" = 's' ]; then
+> > > +				TIMEOUT=${TIMEOUT:0:-1}
+> > > +				((TIMEOUT += 10)) # Add 10 seconds for booting UEFI
+> > > +				TIMEOUT="${TIMEOUT}s"
+> > > +			fi
+> > > +		fi
+> > >   		echo "timeout -k 1s --foreground $TIMEOUT"
+> > >   	fi
+> > >   }
