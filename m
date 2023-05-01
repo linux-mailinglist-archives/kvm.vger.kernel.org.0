@@ -2,151 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6ABD86F3983
-	for <lists+kvm@lfdr.de>; Mon,  1 May 2023 22:59:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ACA8C6F3991
+	for <lists+kvm@lfdr.de>; Mon,  1 May 2023 23:12:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232532AbjEAU7c (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 1 May 2023 16:59:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38474 "EHLO
+        id S231995AbjEAVMA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 1 May 2023 17:12:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40832 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232693AbjEAU7a (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 1 May 2023 16:59:30 -0400
-Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 549661FC4
-        for <kvm@vger.kernel.org>; Mon,  1 May 2023 13:59:26 -0700 (PDT)
-Received: by mail-pf1-x42f.google.com with SMTP id d2e1a72fcca58-63b5c48ea09so2232416b3a.1
-        for <kvm@vger.kernel.org>; Mon, 01 May 2023 13:59:26 -0700 (PDT)
+        with ESMTP id S229379AbjEAVL7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 1 May 2023 17:11:59 -0400
+Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9AE14E4E
+        for <kvm@vger.kernel.org>; Mon,  1 May 2023 14:11:57 -0700 (PDT)
+Received: by mail-pf1-x449.google.com with SMTP id d2e1a72fcca58-63b54cd223dso3513965b3a.1
+        for <kvm@vger.kernel.org>; Mon, 01 May 2023 14:11:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=dabbelt-com.20221208.gappssmtp.com; s=20221208; t=1682974766; x=1685566766;
-        h=content-transfer-encoding:mime-version:message-id:to:from:cc
-         :in-reply-to:subject:date:from:to:cc:subject:date:message-id
+        d=google.com; s=20221208; t=1682975517; x=1685567517;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=56zwdsQPzBA4Fq57F7zZq8xm3cbpRSpnOmcnA0Dh+zY=;
-        b=dhuoKYDmXvVL9rcvID9l7RqV772Z8lTC+U0WXQUi0tYJbLE9a48GrmSzQs7bEghGbC
-         JAz8rXoL1w4B9KKuEwX7POjH3Ox3r6V4zpIxvsvZpSsylQJD8ptmZ7+Vz+V8jAHJj04w
-         T6FV37TSFDDCD7el69cwAEuuEXi6g8EgNvIcALlfkGBQgAio2kQ2a6bJAUGpYJRLsZzz
-         ZNQyL545JSX++O1LCUyCJsybjwMgrDioUAedrjXfVSqEM2lGIt3XAkC5ujMjWrYDbKAU
-         lx6fFu18ULaY/km5rliSpJC6ISEyi513He8uKlna726VX+0Zf3a2zrJJ6SJgvgEWorgq
-         velw==
+        bh=4NYDhcVDTHLb54GnmbrT1cEeobyIv0/mON5sblk9zXo=;
+        b=aLuTmJAomhq39XOO8ThaFuZcJVLT6R4H3DtxDoGspBPmJgaPK8YYQWFnm9FMNOhIfK
+         LZXcDO3Tq2X++f9p98Wx54Q8x4uLu72EncED6U8r2RXDPvU4MdcgzEEJ1rEPOASravV9
+         J6ZFRHjY312N7W/1a7GHoiYeY0sytfb1V48/ziLJvArwg5RGEXhNjlDXg3QsCoVtIz8C
+         TCZXHbz+4qtO5dVSqs9j0pZpoYXyRhVNqprtyGI1tv/O7+YjEozIm/N8IryMZar9a3Td
+         u7DUIdYzGVhnG0QwAZQLS4qFcabKwKd3V0XzvPJoi6x5P2d2RVFI5qb9NbvR9fvcGBOy
+         lffA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682974766; x=1685566766;
-        h=content-transfer-encoding:mime-version:message-id:to:from:cc
-         :in-reply-to:subject:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=56zwdsQPzBA4Fq57F7zZq8xm3cbpRSpnOmcnA0Dh+zY=;
-        b=ZaaoqCyAicm4mnLL+eEYCFFIEcj3OKm8Gvry3/Ij8AMqmawmp3eB5JUJLC5pP5TWAS
-         nUUfeYYRFQtjVkJ2c0U/U/0ke/GMUpenYYrNNH66Xt1GvJFg1bApf7FCaPuSJ/Rj9Yn8
-         954i+TlOUP3GGeencJGgSAqjNBYFi4Woj1XbRQAkuLzSMU65cFA+lGYtkiWkhn18l3D7
-         TMJ8CGBjQb7NQuDjp/mc/mthdjWOng0cbSjRMahee3HFThiulpBCtcRYjz7cRYqU7+CQ
-         /89hOChJ1LNvn035AuMBXs6OtLJjP1cNILyQiCsuEZejI+ASsQZP7faW+sZUwDcb+NH0
-         zd0w==
-X-Gm-Message-State: AC+VfDw32fRe46b3eLTRR5JuGJfPJaTbWv24fTNwFiPvn/KoTl4goebn
-        BdM9Y4xUHzM1fR+j6eW/NByMQA==
-X-Google-Smtp-Source: ACHHUZ7NRh0XptQx7EX4B/2U8oMa1VyQthNvjC4nK5qetnlZ9yiAEbyNISqPVXEejwWKpBkEgu1KUQ==
-X-Received: by 2002:a05:6a00:1301:b0:63d:27a1:d578 with SMTP id j1-20020a056a00130100b0063d27a1d578mr19620776pfu.20.1682974765524;
-        Mon, 01 May 2023 13:59:25 -0700 (PDT)
-Received: from localhost ([50.221.140.188])
-        by smtp.gmail.com with ESMTPSA id x3-20020a628603000000b0063d666566d1sm20322681pfd.72.2023.05.01.13.59.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 01 May 2023 13:59:24 -0700 (PDT)
-Date:   Mon, 01 May 2023 13:59:24 -0700 (PDT)
-X-Google-Original-Date: Mon, 01 May 2023 13:59:09 PDT (-0700)
-Subject:     Re: [PATCH v2 29/34] riscv: Convert alloc_{pmd, pte}_late() to use ptdescs
-In-Reply-To: <20230501192829.17086-30-vishal.moola@gmail.com>
-CC:     akpm@linux-foundation.org, willy@infradead.org, linux-mm@kvack.org,
-        linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-csky@vger.kernel.org, linux-hexagon@vger.kernel.org,
-        loongarch@lists.linux.dev, linux-m68k@lists.linux-m68k.org,
-        linux-mips@vger.kernel.org, linux-openrisc@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, linux-riscv@lists.infradead.org,
-        linux-s390@vger.kernel.org, linux-sh@vger.kernel.org,
-        sparclinux@vger.kernel.org, linux-um@lists.infradead.org,
-        xen-devel@lists.xenproject.org, kvm@vger.kernel.org,
-        vishal.moola@gmail.com, Paul Walmsley <paul.walmsley@sifive.com>
-From:   Palmer Dabbelt <palmer@dabbelt.com>
-To:     vishal.moola@gmail.com
-Message-ID: <mhng-e6f12727-9abe-4a93-a361-15a6cd333f51@palmer-ri-x1c9a>
-Mime-Version: 1.0 (MHng)
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+        d=1e100.net; s=20221208; t=1682975517; x=1685567517;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=4NYDhcVDTHLb54GnmbrT1cEeobyIv0/mON5sblk9zXo=;
+        b=Ow5YWM+5AqQ6cLCUyCPL9oKs5VBPweR+t6LLBONo34P1gaV+PuQoHDy9I77Jw7vOX/
+         opK3mdO60Vx6FqbKJHj+CgGNFLQQEomIaHZ9DC3pWGZpePbp/oZ8lNdKz5V2WebE+J1m
+         3xms3QZHLt42tRpVOMqBjQ7P3sXHip+kTzMpzD+wz18S4Dy8M8xoH8+Oep/9/Y+dYCk+
+         zpolzxLFXsbfmPzb+2+AxNv/AWbfre8BtW2SS29aMdtc/jMWW4C3eqjYvEDQdUF6pZLZ
+         syjSJkpCoDlkN62maORR+3A5bVvdFEDpMn4wC8Hnkul6/dEAG9jg3gp97l6ACgZoWOI0
+         m+zw==
+X-Gm-Message-State: AC+VfDw1rFZm58RNjVV3dC57pOm5Lx+m+++arBXjXyGlG9GJnmp8r/4A
+        h3JfND6Yi3GYv8ibhJUdjg17t8Gw108=
+X-Google-Smtp-Source: ACHHUZ7Hd8CMbbRi2Zv713yGh1cWPToaI5AWN4TSrUPlUzd3x920u2wbvO9DboNiqhdUvgtELnzLLc6go2s=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:2dc:b0:641:31b1:e78b with SMTP id
+ b28-20020a056a0002dc00b0064131b1e78bmr2828834pft.6.1682975517090; Mon, 01 May
+ 2023 14:11:57 -0700 (PDT)
+Date:   Mon, 1 May 2023 14:11:55 -0700
+In-Reply-To: <CALMp9eTa3OpmMY5_9fezDfBb4gjne2yrHxBnnkD4xG7AzWmw+A@mail.gmail.com>
+Mime-Version: 1.0
+References: <CANZk6aSv5ta3emitOfWKxaB-JvURBVu-sXqFnCz9PKXhqjbV9w@mail.gmail.com>
+ <a9f97d08-8a2f-668b-201a-87c152b3d6e0@gmail.com> <ZE/R1/hvbuWmD8mw@google.com>
+ <CALMp9eTa3OpmMY5_9fezDfBb4gjne2yrHxBnnkD4xG7AzWmw+A@mail.gmail.com>
+Message-ID: <ZFArG0WsL0e/bM+m@google.com>
+Subject: Re: Latency issues inside KVM.
+From:   Sean Christopherson <seanjc@google.com>
+To:     Jim Mattson <jmattson@google.com>
+Cc:     Robert Hoo <robert.hoo.linux@gmail.com>,
+        zhuangel570 <zhuangel570@gmail.com>, kvm@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 01 May 2023 12:28:24 PDT (-0700), vishal.moola@gmail.com wrote:
-> As part of the conversions to replace pgtable constructor/destructors with
-> ptdesc equivalents, convert various page table functions to use ptdescs.
->
-> Some of the functions use the *get*page*() helper functions. Convert
-> these to use ptdesc_alloc() and ptdesc_address() instead to help
-> standardize page tables further.
->
-> Signed-off-by: Vishal Moola (Oracle) <vishal.moola@gmail.com>
-> ---
->  arch/riscv/include/asm/pgalloc.h |  8 ++++----
->  arch/riscv/mm/init.c             | 16 ++++++----------
->  2 files changed, 10 insertions(+), 14 deletions(-)
->
-> diff --git a/arch/riscv/include/asm/pgalloc.h b/arch/riscv/include/asm/pgalloc.h
-> index 59dc12b5b7e8..cb5536403bd8 100644
-> --- a/arch/riscv/include/asm/pgalloc.h
-> +++ b/arch/riscv/include/asm/pgalloc.h
-> @@ -153,10 +153,10 @@ static inline pgd_t *pgd_alloc(struct mm_struct *mm)
->
->  #endif /* __PAGETABLE_PMD_FOLDED */
->
-> -#define __pte_free_tlb(tlb, pte, buf)   \
-> -do {                                    \
-> -	pgtable_pte_page_dtor(pte);     \
-> -	tlb_remove_page((tlb), pte);    \
-> +#define __pte_free_tlb(tlb, pte, buf)			\
-> +do {							\
-> +	ptdesc_pte_dtor(page_ptdesc(pte));		\
-> +	tlb_remove_page_ptdesc((tlb), page_ptdesc(pte));\
->  } while (0)
->  #endif /* CONFIG_MMU */
->
-> diff --git a/arch/riscv/mm/init.c b/arch/riscv/mm/init.c
-> index eb8173a91ce3..8f1982664687 100644
-> --- a/arch/riscv/mm/init.c
-> +++ b/arch/riscv/mm/init.c
-> @@ -353,12 +353,10 @@ static inline phys_addr_t __init alloc_pte_fixmap(uintptr_t va)
->
->  static phys_addr_t __init alloc_pte_late(uintptr_t va)
->  {
-> -	unsigned long vaddr;
-> -
-> -	vaddr = __get_free_page(GFP_KERNEL);
-> -	BUG_ON(!vaddr || !pgtable_pte_page_ctor(virt_to_page(vaddr)));
-> +	struct ptdesc *ptdesc = ptdesc_alloc(GFP_KERNEL, 0);
->
-> -	return __pa(vaddr);
-> +	BUG_ON(!ptdesc || !ptdesc_pte_ctor(ptdesc));
-> +	return __pa((pte_t *)ptdesc_address(ptdesc));
->  }
->
->  static void __init create_pte_mapping(pte_t *ptep,
-> @@ -436,12 +434,10 @@ static phys_addr_t __init alloc_pmd_fixmap(uintptr_t va)
->
->  static phys_addr_t __init alloc_pmd_late(uintptr_t va)
->  {
-> -	unsigned long vaddr;
-> -
-> -	vaddr = __get_free_page(GFP_KERNEL);
-> -	BUG_ON(!vaddr || !pgtable_pmd_page_ctor(virt_to_page(vaddr)));
-> +	struct ptdesc *ptdesc = ptdesc_alloc(GFP_KERNEL, 0);
->
-> -	return __pa(vaddr);
-> +	BUG_ON(!ptdesc || !ptdesc_pmd_ctor(ptdesc));
-> +	return __pa((pmd_t *)ptdesc_address(ptdesc));
->  }
->
->  static void __init create_pmd_mapping(pmd_t *pmdp,
+On Mon, May 01, 2023, Jim Mattson wrote:
+> On Mon, May 1, 2023 at 7:51=E2=80=AFAM Sean Christopherson <seanjc@google=
+.com> wrote:
+> >
+> > On Sat, Apr 29, 2023, Robert Hoo wrote:
+> > > On 4/27/2023 8:38 PM, zhuangel570 wrote:
+> > > > - kvm_vm_create_worker_thread introduce tail latency more than 100m=
+s.
+> > > >    This function was called when create "kvm-nx-lpage-recovery" kth=
+read when
+> > > >    create a new VM, this patch was introduced to recovery large pag=
+e to relief
+> > > >    performance loss caused by software mitigation of ITLB_MULTIHIT,=
+ see
+> > > >    b8e8c8303ff2 ("kvm: mmu: ITLB_MULTIHIT mitigation") and 1aa9b957=
+2b10
+> > > >    ("kvm: x86: mmu: Recovery of shattered NX large pages").
+> > > >
+> > > Yes, this kthread is for NX-HugePage feature and NX-HugePage in turn =
+is to
+> > > SW mitigate itlb-multihit issue.
+> > > However, HW level mitigation has been available for quite a while, yo=
+u can
+> > > check "/sys/devices/system/cpu/vulnerabilities/itlb_multihit" for you=
+r
+> > > system's mitigation status.
+> > > I believe most recent Intel CPUs have this HW mitigated (check
+> > > MSR_ARCH_CAPABILITIES::IF_PSCHANGE_MC_NO), let alone non-Intel CPUs.
+> > > But, the kvm_vm_create_worker_thread is still created anyway, nonsens=
+e I
+> > > think. I previously had a internal patch getting rid of it but didn't=
+ get a
+> > > chance to send out.
+> >
+> > For the NX hugepage mitation, I think it makes sense to restart the dis=
+cussion
+> > in the context of this thread: https://lore.kernel.org/all/ZBxf+ewCimtH=
+Y2XO@google.com
+> >
+> > TL;DR: I am open to providng an option to hard disable the mitigation, =
+but there
+> > needs to be sufficient justification, e.g. that the above 100ms latency=
+ is a
+> > problem for real world deployments.
+>=20
+> Whatever became of
+> https://lore.kernel.org/kvm/20220613212523.3436117-1-bgardon@google.com/?
 
-Acked-by: Palmer Dabbelt <palmer@rivosinc.com>
+That's merged, but disabling the mitigation for a single VM doesn't stop th=
+e
+worker thread (arguably that's a bug), let alone prevent creation of the wo=
+rker
+in the first place as KVM spawns the worker before the VM is exposed to
+userspace.  I.e. there's no way for userspace to say "don't spawn workers, =
+the
+NX hugepage mitigation will *never* be enabled".
