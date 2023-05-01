@@ -2,129 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5A5226F38F7
-	for <lists+kvm@lfdr.de>; Mon,  1 May 2023 22:03:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C5C386F3915
+	for <lists+kvm@lfdr.de>; Mon,  1 May 2023 22:20:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232717AbjEAUDb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 1 May 2023 16:03:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49992 "EHLO
+        id S232579AbjEAUUN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 1 May 2023 16:20:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56032 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232434AbjEAUDa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 1 May 2023 16:03:30 -0400
-Received: from mail-il1-x135.google.com (mail-il1-x135.google.com [IPv6:2607:f8b0:4864:20::135])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2425C30D7
-        for <kvm@vger.kernel.org>; Mon,  1 May 2023 13:03:15 -0700 (PDT)
-Received: by mail-il1-x135.google.com with SMTP id e9e14a558f8ab-3311833ba3dso27855ab.0
-        for <kvm@vger.kernel.org>; Mon, 01 May 2023 13:03:15 -0700 (PDT)
+        with ESMTP id S232754AbjEAUUL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 1 May 2023 16:20:11 -0400
+Received: from mail-wm1-x335.google.com (mail-wm1-x335.google.com [IPv6:2a00:1450:4864:20::335])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5853D30F4
+        for <kvm@vger.kernel.org>; Mon,  1 May 2023 13:20:06 -0700 (PDT)
+Received: by mail-wm1-x335.google.com with SMTP id 5b1f17b1804b1-3f1cfed93e2so28534585e9.3
+        for <kvm@vger.kernel.org>; Mon, 01 May 2023 13:20:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1682971394; x=1685563394;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ncPMFJWjxPt+XbGukABrG3rR4raTB5TkPwvXjaUh97c=;
-        b=fC7ZmFxc2EKJlzzMsV56h/dvO6y94huqT2qDLKhJoJjuRtX+/qtvuQ44KIK5VaADUn
-         4mSXUr0pi1ML4st+7xGGAebQYKRKXqyMDhIFOlu02Qyt6hcXNIJzzW1Q9aCGIFReMhjA
-         A3aa5A6kludMdgiiK+fSszenZxm7e5XV9kOejxTycETkR1gddOv2BTCc7CuavRaTTlDX
-         rxKmBTYqZZ750vLY64AIX1y6LJ3ue8zyJCW2fTbBO5QqYQD/yE6Jso26W3mXDbDcaASj
-         d5o/Bp0aSquML+CKJBe3x7BpfDNfaqg5FO5laGpPOGKIcU4ivMdUehhEuU52kG6+igf+
-         BHiQ==
+        d=linaro.org; s=google; t=1682972405; x=1685564405;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=lDI/20T1uPRoTlQGz3PG7IVp1dlrzIcikclK+BNrn4I=;
+        b=sIfdTpfepArE8sU+4NTcy7xOvbZSf/dKemW7L8ciqw+ADmIAIdfVY09A5gWMdcAqIa
+         f8rGwdhE+yELNnHDBZinJXVwAhyeZ00UJYIDJWdY113pLL27ph3TlpNIgVyb9EGPymiL
+         uxMKe7WOwAc13vtMHss0uV5JMzgU2d+zn5g/Olu0rdbxdkYfwYe7RSiuRfeNUDAdxTiL
+         8GonL3qL1Cmm7tBPpGdY0F9ZE8YcRntMFjMPS545gKIx9R5GlwBWbcsvz/cWkAf/aF/w
+         9lgfW1ABFrSPSLQQJsnHuhaxOtRal6i2Q7Zi3YxlcUodG59RlYDzpf6Nd8VOXQjAvOeR
+         G40g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682971394; x=1685563394;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ncPMFJWjxPt+XbGukABrG3rR4raTB5TkPwvXjaUh97c=;
-        b=F9EioZ7pLzS2zG/flc6z9cF91dpmuNQrGdmKMZbitgFirBv3P0BaUUvwBVCcUaADxD
-         u+snSGtLEJaIt2EJJBQP66PruMPW/XCGGFI4UeP1OxOm4Z8dN/HhcGNrFGD++iuUINel
-         f/mz1Imnmx5YQ+EZu/kEwrlmKd8QG393Bpnozn47QIvd5f5cmDmRDRTjS3Oeanp910At
-         9Smeiakp27ru0gf9DA3w1zjwyUScM1nXhJ1AQEbmZjHbuXNiw3WbqP77V51wGMX4oL+9
-         ltV5HwrhPBpTXXLKaYtZZtz5CkjjQD6pv8Ql0p+9b1LXnMFbzMLuUI10z0ukJC77QVd3
-         GRuQ==
-X-Gm-Message-State: AC+VfDypoCs+I9cdm3kqnpqeTa7zJOVR3KAsTy0rftgI8jotgYSciefp
-        jE/fumvQ1rcg+NODVMYPPVXv8ivFVSh7psKPEoRs4OwBJ9uKqb9JgF/a9A==
-X-Google-Smtp-Source: ACHHUZ4mOqcBol9a7aUL2HJGF7iZNuBowzpznKYi1PO/4N4drhq8I1dQU7FdeKP2s2kAyv8awgW1LE9L/UdnmhHiUsQ=
-X-Received: by 2002:a05:6e02:1648:b0:330:eb79:91ad with SMTP id
- v8-20020a056e02164800b00330eb7991admr50231ilu.9.1682971394269; Mon, 01 May
- 2023 13:03:14 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1682972405; x=1685564405;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=lDI/20T1uPRoTlQGz3PG7IVp1dlrzIcikclK+BNrn4I=;
+        b=E0xggL0d9DQdgc3ucZrvlNHDwD5nHo01S+Ik0Zse3N0ghYga+hzX8k5kQMOTAS/A4R
+         Bu1+CG2aDNlPuLcrEhyhU+thHAOwT/IsBxSVdrgDi4r24BaN2FHAXZHPAb/iu38+38GW
+         7MjaK1EWBU2AoTnx1kf9mYNgrdzYF5Bo/kgy0gxY72PhKYRExRrF1Mbbt7+V2kYUYSN5
+         G4UA8aMRf9/1Bu/kp89k4vjbWdKToWdiGUqfXpSheH/vgMlaGfQa6lHP/ekdWxos4Zao
+         sCKidp3EzS10wjbGaIOdrEwqEFjQYW3UyjXvlmtaNv0hHzulerJmjbGyj3WnNDauU3h0
+         L3CQ==
+X-Gm-Message-State: AC+VfDy+y2vEsgtOBxZf7K9B9MU/yGurdkEaEFWDLzgMaJSjO06Q0L67
+        gatE4X4jS+VhHmeeO0yOZARpYD3fdjMmOkBsDSoE8g==
+X-Google-Smtp-Source: ACHHUZ7GIF5nTiYKf2V07/in+UGAFPHkWwL0e1/1SwgFp/N3K/G6yGN5/97rm7s/+Dk8kHs3SY1QsA==
+X-Received: by 2002:a1c:7502:0:b0:3ee:36f:3485 with SMTP id o2-20020a1c7502000000b003ee036f3485mr11398394wmc.8.1682972404738;
+        Mon, 01 May 2023 13:20:04 -0700 (PDT)
+Received: from ?IPV6:2a02:c7c:74db:8d00:eca5:8bcb:58d9:c940? ([2a02:c7c:74db:8d00:eca5:8bcb:58d9:c940])
+        by smtp.gmail.com with ESMTPSA id bi26-20020a05600c3d9a00b003eddc6aa5fasm32890364wmb.39.2023.05.01.13.20.03
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 01 May 2023 13:20:04 -0700 (PDT)
+Message-ID: <e9d647a3-c98e-7ab8-9378-74ac2d867a28@linaro.org>
+Date:   Mon, 1 May 2023 21:20:02 +0100
 MIME-Version: 1.0
-References: <CANZk6aSv5ta3emitOfWKxaB-JvURBVu-sXqFnCz9PKXhqjbV9w@mail.gmail.com>
- <a9f97d08-8a2f-668b-201a-87c152b3d6e0@gmail.com> <ZE/R1/hvbuWmD8mw@google.com>
-In-Reply-To: <ZE/R1/hvbuWmD8mw@google.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Mon, 1 May 2023 13:03:03 -0700
-Message-ID: <CALMp9eTa3OpmMY5_9fezDfBb4gjne2yrHxBnnkD4xG7AzWmw+A@mail.gmail.com>
-Subject: Re: Latency issues inside KVM.
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Robert Hoo <robert.hoo.linux@gmail.com>,
-        zhuangel570 <zhuangel570@gmail.com>, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+Subject: Re: [PATCH v3 09/19] tcg: Add andcs and rotrs tcg gvec ops
+Content-Language: en-US
+To:     Lawrence Hunter <lawrence.hunter@codethink.co.uk>,
+        qemu-devel@nongnu.org
+Cc:     dickon.hood@codethink.co.uk, nazar.kazakov@codethink.co.uk,
+        kiran.ostrolenk@codethink.co.uk, frank.chang@sifive.com,
+        palmer@dabbelt.com, alistair.francis@wdc.com,
+        bin.meng@windriver.com, pbonzini@redhat.com,
+        philipp.tomsich@vrull.eu, kvm@vger.kernel.org,
+        qemu-riscv@nongnu.org
+References: <20230428144757.57530-1-lawrence.hunter@codethink.co.uk>
+ <20230428144757.57530-10-lawrence.hunter@codethink.co.uk>
+From:   Richard Henderson <richard.henderson@linaro.org>
+In-Reply-To: <20230428144757.57530-10-lawrence.hunter@codethink.co.uk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, May 1, 2023 at 7:51=E2=80=AFAM Sean Christopherson <seanjc@google.c=
-om> wrote:
->
-> On Sat, Apr 29, 2023, Robert Hoo wrote:
-> > On 4/27/2023 8:38 PM, zhuangel570 wrote:
-> > > - kvm_vm_create_worker_thread introduce tail latency more than 100ms.
-> > >    This function was called when create "kvm-nx-lpage-recovery" kthre=
-ad when
-> > >    create a new VM, this patch was introduced to recovery large page =
-to relief
-> > >    performance loss caused by software mitigation of ITLB_MULTIHIT, s=
-ee
-> > >    b8e8c8303ff2 ("kvm: mmu: ITLB_MULTIHIT mitigation") and 1aa9b9572b=
-10
-> > >    ("kvm: x86: mmu: Recovery of shattered NX large pages").
-> > >
-> > Yes, this kthread is for NX-HugePage feature and NX-HugePage in turn is=
- to
-> > SW mitigate itlb-multihit issue.
-> > However, HW level mitigation has been available for quite a while, you =
-can
-> > check "/sys/devices/system/cpu/vulnerabilities/itlb_multihit" for your
-> > system's mitigation status.
-> > I believe most recent Intel CPUs have this HW mitigated (check
-> > MSR_ARCH_CAPABILITIES::IF_PSCHANGE_MC_NO), let alone non-Intel CPUs.
-> > But, the kvm_vm_create_worker_thread is still created anyway, nonsense =
-I
-> > think. I previously had a internal patch getting rid of it but didn't g=
-et a
-> > chance to send out.
->
-> For the NX hugepage mitation, I think it makes sense to restart the discu=
-ssion
-> in the context of this thread: https://lore.kernel.org/all/ZBxf+ewCimtHY2=
-XO@google.com
->
-> TL;DR: I am open to providng an option to hard disable the mitigation, bu=
-t there
-> needs to be sufficient justification, e.g. that the above 100ms latency i=
-s a
-> problem for real world deployments.
+On 4/28/23 15:47, Lawrence Hunter wrote:
+> From: Nazar Kazakov <nazar.kazakov@codethink.co.uk>
+> 
+> This commit adds helper functions and tcg operation definitions for the andcs and rotrs instructions
+> 
+> Signed-off-by: Nazar Kazakov <nazar.kazakov@codethink.co.uk>
+> ---
+>   accel/tcg/tcg-runtime-gvec.c | 11 +++++++++++
+>   accel/tcg/tcg-runtime.h      |  1 +
+>   include/tcg/tcg-op-gvec.h    |  4 ++++
+>   tcg/tcg-op-gvec.c            | 23 +++++++++++++++++++++++
+>   4 files changed, 39 insertions(+)
 
-Whatever became of
-https://lore.kernel.org/kvm/20220613212523.3436117-1-bgardon@google.com/?
+Queued to tcg-next as two patches, and with alterations:
 
-> > As more and more old CPUs retires, I think NX-HugePage code will become=
- more
-> > and more minority code path/situation, and be refactored out eventually=
- one
-> > day.
->
-> Heh, yeah, one day.  But "one day" is likely 10+ years away.  Intel disco=
-ntinuing
-> a CPU has practically zero relevance to KVM removing support a CPU, e.g. =
-KVM still
-> supports the original Core CPUs from ~2006, which were launched in 2006 a=
-nd
-> discontinued in 2008.
+> +void tcg_gen_gvec_andcs(unsigned vece, uint32_t dofs, uint32_t aofs,
+> +                        TCGv_i64 c, uint32_t oprsz, uint32_t maxsz)
+> +{
+> +    static GVecGen2s g = {
+> +        .fni8 = tcg_gen_andc_i64,
+> +        .fniv = tcg_gen_andc_vec,
+> +        .fno = gen_helper_gvec_andcs,
+> +        .prefer_i64 = TCG_TARGET_REG_BITS == 64,
+> +        .vece = MO_64
+> +    };
+> +
+> +    tcg_gen_dup_i64(vece, c, c);
+> +    tcg_gen_gvec_2s(dofs, aofs, oprsz, maxsz, c, &g);
+> +}
+
+This needed a temporary.
+
+> +void tcg_gen_gvec_rotrs(unsigned vece, uint32_t dofs, uint32_t aofs,
+> +                        TCGv_i32 shift, uint32_t oprsz, uint32_t maxsz)
+> +{
+> +    TCGv_i32 tmp = tcg_temp_new_i32();
+> +    tcg_gen_sub_i32(tmp, tcg_constant_i32(1 << (vece + 3)), shift);
+> +    tcg_gen_gvec_rotls(vece, dofs, aofs, tmp, oprsz, maxsz);
+> +}
+
+This needed the rotation count to be masked (32 - 0 == 32 is illegal).
+Simplified as (-shift & mask).
+
+
+r~
+
