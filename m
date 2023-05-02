@@ -2,117 +2,167 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A7F7C6F49E4
-	for <lists+kvm@lfdr.de>; Tue,  2 May 2023 20:47:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F04706F49EC
+	for <lists+kvm@lfdr.de>; Tue,  2 May 2023 20:51:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229497AbjEBSrU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 May 2023 14:47:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36978 "EHLO
+        id S229538AbjEBSvt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 May 2023 14:51:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38814 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229492AbjEBSrT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 2 May 2023 14:47:19 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F296173C
-        for <kvm@vger.kernel.org>; Tue,  2 May 2023 11:46:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1683053190;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=m2VDNN7GX+FeD3QyzU7peSzD1fbVt8nTpAgV/GryMXg=;
-        b=CDtZli7qNaUyvSitZJlNZjTBUBVOVxsyY3jI6/qBTL+0h4DY8Q9tnnrDPfrFWW/xSXxoq1
-        Qx6W9uqiwWEAnVD8QHSxUUO26372NYyg+Igotoaud6Z/TyYx7TOoS4JpTIy7cgSUuhqob5
-        rQcj1Wzi8J3imlvTTywekWIHRKv/2Hc=
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com
- [209.85.166.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-503-tmzo8nJYNLijOhyDSJo8lQ-1; Tue, 02 May 2023 14:46:29 -0400
-X-MC-Unique: tmzo8nJYNLijOhyDSJo8lQ-1
-Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-76359b8d29dso621026839f.1
-        for <kvm@vger.kernel.org>; Tue, 02 May 2023 11:46:29 -0700 (PDT)
+        with ESMTP id S229532AbjEBSvs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 2 May 2023 14:51:48 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE787E7B
+        for <kvm@vger.kernel.org>; Tue,  2 May 2023 11:51:46 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-b9a7e65b34aso7428306276.0
+        for <kvm@vger.kernel.org>; Tue, 02 May 2023 11:51:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1683053506; x=1685645506;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=hkbn6HF/azjC3hqgYfJo0k/s9Wz6c8/SBfQlRZ/p7n8=;
+        b=R7lwly+9ExnHydnRSuaxye6/E5YwQWRRtLjklyRzqQQuFgpVQzhFSuLko4XkeXNT1c
+         MDftcjk6ACDpCc5tI0lsIlNza4AlQF89uyA7OGH/a+8uDGg/OQgj5EY0tmDaAEqURUtp
+         GkeCh9tfaNYn9v3wvOpnYOVQwTznB4iWNgYeJW0PZ5kLvmtl/07Blf8fwBHrnaRLG71B
+         Gyf/4DUYFh5JNUEXFMOPwi6mtItCsxeNjma8ehwsUjeHCtXmk50SBY1tDs30WWyAKq0f
+         WbFaxkAui+aG7DgCEiIG4z+AZVFqsbK7zTtRIlZ2l/t/dsx2aykAd4ZVJiu+XuIXIS5b
+         GRjw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683053188; x=1685645188;
-        h=content-transfer-encoding:mime-version:message-id:subject:cc:to
-         :from:date:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=m2VDNN7GX+FeD3QyzU7peSzD1fbVt8nTpAgV/GryMXg=;
-        b=L+4e5MQcZSuOscwQdgPDsV24b7J/UGk9aW2VEvibFxj9BaIB3qtNHAHhcMvRoj2RKm
-         S3wIXUUfvdMcemuBsrk/FeBXNh8L7dQJ0g48pM5uyQrQOXu/wbSxtS86l8AJbjzYW3Kh
-         q/EBR9S0am1rynVFS78LBVY27NNjaNB7yXkLJ1Z5Z4DOCFW1xYJVNhiZU77ArMeWa3YW
-         85FHwLvVe9UOPGZCHhhMZ9HDzZe7xQjQloXxVPPMzH7xLmg3MOy4K7jwPYnJC8MUELax
-         MAsaN6Q5WNyhkmgN6w/5rtPrfLzESBUjoZlEdzGltaCbnpOJNoVxf64CKjr2S5kmGqwa
-         HJJg==
-X-Gm-Message-State: AC+VfDx/Fww4dRkyf9bu9JVs0Y+Om/p6VSJXP8AWrHgLJHflU9vn9Pfq
-        ZFNosnxfDy1ZvLyRtWXS7t9Tz26hx6IkTZfOY8XHzTqAta4UmhMRY4KLBdKCGTNP4np9ISatFJP
-        9yf6zfjfwLfVkHs5/DKC/
-X-Received: by 2002:a5d:924e:0:b0:766:59fe:11f3 with SMTP id e14-20020a5d924e000000b0076659fe11f3mr11617137iol.14.1683053188190;
-        Tue, 02 May 2023 11:46:28 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ7dq4rSAg8BfqQuD4Y3U0R8u3tH8wzcOS0ObF5dTvXP+f6FdH9JDWt6Gm2UyiVtwUWCGfaU7Q==
-X-Received: by 2002:a5d:924e:0:b0:766:59fe:11f3 with SMTP id e14-20020a5d924e000000b0076659fe11f3mr11617124iol.14.1683053187890;
-        Tue, 02 May 2023 11:46:27 -0700 (PDT)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id a25-20020a6b6c19000000b0075c37601b5csm8625436ioh.4.2023.05.02.11.46.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 May 2023 11:46:27 -0700 (PDT)
-Date:   Tue, 2 May 2023 12:46:25 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: [GIT PULL] VFIO updates for v6.4-rc1
-Message-ID: <20230502124625.355ec05e.alex.williamson@redhat.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        d=1e100.net; s=20221208; t=1683053506; x=1685645506;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=hkbn6HF/azjC3hqgYfJo0k/s9Wz6c8/SBfQlRZ/p7n8=;
+        b=Fm4c6WIwki67dKwPn8xzZNlCdONVKTAWUrecFhUoCqjRwUEXrc2ibO4gyyw+hdOEmO
+         7hnmEtMquBoB/+b9e4iRPv3uvPnNXIio+1uAiKImbjqimL9wgAxr3dnhFkGnkeWMG2Gz
+         +EHvyDoBOA2S1Pf9M3044gEX7xRAFDwFUKffdTfAKgRMBlEU0B0jHnMntNQU04fg6bG0
+         MwFuUTXVkvZ5XRJ5jGSYq0pvQbAeGSYwQHiQ968GQEoXRn5D/69vgdmndsUFkodXaGm6
+         +nN1T5OmxtfDFjE5zb4KBezBo0KZK0NthxP+g35sL5RvJDSNX0PBiVz9HUA88feKG5th
+         kufQ==
+X-Gm-Message-State: AC+VfDyPfOStnrxhBb0K2fv13M27xO/FHIUXnx02xJrKiIyG/QFwC0rh
+        LYyDomf7O1naPmbtlKgq2Ql1DTtitOY=
+X-Google-Smtp-Source: ACHHUZ5LlbcSh/2UOPKizan0t+OqQOybGVQmWjGZNcHYVZjRkM3ADux9Em34nt3QwYn1EAo7oP2OsoCcDns=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:e796:0:b0:b99:4473:ed93 with SMTP id
+ e144-20020a25e796000000b00b994473ed93mr7121031ybh.4.1683053505921; Tue, 02
+ May 2023 11:51:45 -0700 (PDT)
+Date:   Tue, 2 May 2023 11:51:44 -0700
+In-Reply-To: <CAF7b7mqq3UMeO3M-Fy8SqyL=mjxY4-TyA_PjgGsdVWZrsU2LLQ@mail.gmail.com>
+Mime-Version: 1.0
+References: <20230412213510.1220557-1-amoorthy@google.com> <20230412213510.1220557-5-amoorthy@google.com>
+ <CAF7b7mqq3UMeO3M-Fy8SqyL=mjxY4-TyA_PjgGsdVWZrsU2LLQ@mail.gmail.com>
+Message-ID: <ZFFbwOXZ5uI/gdaf@google.com>
+Subject: Re: [PATCH v3 04/22] KVM: x86: Set vCPU exit reason to
+ KVM_EXIT_UNKNOWN at the start of KVM_RUN
+From:   Sean Christopherson <seanjc@google.com>
+To:     Anish Moorthy <amoorthy@google.com>
+Cc:     pbonzini@redhat.com, maz@kernel.org, oliver.upton@linux.dev,
+        jthoughton@google.com, bgardon@google.com, dmatlack@google.com,
+        ricarkol@google.com, axelrasmussen@google.com, peterx@redhat.com,
+        kvm@vger.kernel.org, kvmarm@lists.linux.dev
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Linus,
+On Tue, May 02, 2023, Anish Moorthy wrote:
+> During some testing yesterday I realized that this patch actually
+> breaks the self test, causing an error which the later self test
+> changes cover up.
+> 
+> Running "./demand_paging_test -b 512M -u MINOR -s shmem -v 1" from
+> kvm/next (b3c98052d469) with just this patch applies gives the
+> following output
+> 
+> > # ./demand_paging_test -b 512M -u MINOR -s shmem -v 1
+> > Testing guest mode: PA-bits:ANY, VA-bits:48,  4K pages
+> > guest physical test memory: [0x7fcdfffe000, 0x7fcffffe000)
+> > Finished creating vCPUs and starting uffd threads
+> > Started all vCPUs
+> > ==== Test Assertion Failure ====
+> >  demand_paging_test.c:50: false
+> >  pid=13293 tid=13297 errno=4 - Interrupted system call
+> >  // Some stack trace stuff
+> >  Invalid guest sync status: exit_reason=UNKNOWN, ucall=0
+> 
+> The problem is the get_ucall() part of the following block in the self
+> test's vcpu_worker()
+> 
+> > ret = _vcpu_run(vcpu);
+> > TEST_ASSERT(ret == 0, "vcpu_run failed: %d\n", ret);
+> > if (get_ucall(vcpu, NULL) != UCALL_SYNC) {
+> >    TEST_ASSERT(false,
+> >                               "Invalid guest sync status: exit_reason=%s\n",
+> >                               exit_reason_str(run->exit_reason));
+> > }
+> 
+> I took a look and, while get_ucall() does depend on the value of
+> exit_reason, the error's root cause isn't clear to me yet.
 
-The following changes since commit 09a9639e56c01c7a00d6c0ca63f4c7c41abe075d:
+Stating what you likely already know... On x86, the UCALL is performed via port
+I/O, and so the selftests framework zeros out the ucall struct if the userspace
+exit reason isn't KVM_EXIT_IO.
 
-  Linux 6.3-rc6 (2023-04-09 11:15:57 -0700)
+> Moving the "exit_reason = kvm_exit_unknown" line to later in the
+> function, right above the vcpu_run() call "fixes" the problem. I've
+> done that for now and will bisect later to investigate: if anyone
+> has any clues please let me know.
 
-are available in the Git repository at:
+Clobbering vcpu->run->exit_reason before this code block is a bug:
 
-  https://github.com/awilliam/linux-vfio.git tags/vfio-v6.4-rc1
+	if (unlikely(vcpu->arch.complete_userspace_io)) {
+		int (*cui)(struct kvm_vcpu *) = vcpu->arch.complete_userspace_io;
+		vcpu->arch.complete_userspace_io = NULL;
+		r = cui(vcpu);
+		if (r <= 0)
+			goto out;
+	} else {
+		WARN_ON_ONCE(vcpu->arch.pio.count);
+		WARN_ON_ONCE(vcpu->mmio_needed);
+	}
 
-for you to fetch changes up to 705b004ee377b789e39ae237519bab714297ac83:
+	if (kvm_run->immediate_exit) {
+		r = -EINTR;
+		goto out;
+	}
 
-  docs: kvm: vfio: Suggest KVM_DEV_VFIO_GROUP_ADD vs VFIO_GROUP_GET_DEVICE_FD ordering (2023-04-21 13:48:44 -0600)
+For userspace I/O and MMIO, KVM requires userspace to "complete" the instruction
+that triggered the exit to userspace, e.g. write memory/registers and skip the
+instruction as needed.  The immediate_exit flag is set by userspace when userspace
+wants to retain control and is doing KVM_RUN purely to placate KVM.  In selftests,
+this is done by vcpu_run_complete_io().
 
-----------------------------------------------------------------
-VFIO updates for v6.4-rc1
+The one part I'm a bit surprised by is that this caused ucall problems.  The ucall
+framework invokes vcpu_run_complete_io() _after_ it grabs the information. 
 
- - Expose and allow R/W access to the PCIe DVSEC capability through
-   vfio-pci, as we already do with the legacy vendor capability.
-   (K V P Satyanarayana)
+	addr = ucall_arch_get_ucall(vcpu);
+	if (addr) {
+		TEST_ASSERT(addr != (void *)GUEST_UCALL_FAILED,
+			    "Guest failed to allocate ucall struct");
 
- - Fix kernel-doc issues with structure definitions. (Simon Horman)
+		memcpy(uc, addr, sizeof(*uc));
+		vcpu_run_complete_io(vcpu);
+	} else {
+		memset(uc, 0, sizeof(*uc));
+	}
 
- - Clarify ordering of operations relative to the kvm-vfio device for
-   driver dependencies against the kvm pointer. (Yi Liu)
+Making multiple calls to get_ucall() after a single guest ucall would explain
+everything as only the first get_ucall() would succeed, but AFAICT the test doesn't
+invoke get_ucall() multiple times.
 
-----------------------------------------------------------------
-K V P, Satyanarayana (1):
-      vfio/pci: Add DVSEC PCI Extended Config Capability to user visible list.
+Aha!  Found it.  _vcpu_run() invokes assert_on_unhandled_exception(), which does
 
-Simon Horman (1):
-      vfio: correct kdoc for ops structures
+	if (get_ucall(vcpu, &uc) == UCALL_UNHANDLED) {
+		uint64_t vector = uc.args[0];
 
-Yi Liu (1):
-      docs: kvm: vfio: Suggest KVM_DEV_VFIO_GROUP_ADD vs VFIO_GROUP_GET_DEVICE_FD ordering
+		TEST_FAIL("Unexpected vectored event in guest (vector:0x%lx)",
+			  vector);
+	}
 
- Documentation/virt/kvm/devices/vfio.rst | 5 +++++
- drivers/vfio/pci/vfio_pci_config.c      | 7 +++++++
- include/linux/vfio.h                    | 5 +++++
- 3 files changed, 17 insertions(+)
-
+and thus triggers vcpu_run_complete_io() before demand_paging_test's vcpu_worker()
+gets control and does _its_ get_ucall().
