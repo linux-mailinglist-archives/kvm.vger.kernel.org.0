@@ -2,183 +2,164 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1CBDA6F3BFA
-	for <lists+kvm@lfdr.de>; Tue,  2 May 2023 04:07:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E60A36F3C1A
+	for <lists+kvm@lfdr.de>; Tue,  2 May 2023 04:22:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233311AbjEBCHt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 1 May 2023 22:07:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41454 "EHLO
+        id S233394AbjEBCWW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 1 May 2023 22:22:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48296 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231222AbjEBCHs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 1 May 2023 22:07:48 -0400
-Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 521D410F4
-        for <kvm@vger.kernel.org>; Mon,  1 May 2023 19:07:47 -0700 (PDT)
-Received: by mail-pl1-x633.google.com with SMTP id d9443c01a7336-1aad5245632so19329665ad.3
-        for <kvm@vger.kernel.org>; Mon, 01 May 2023 19:07:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1682993267; x=1685585267;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=COdD/3QMWHnibqBcf92Ik+G8mHJB/QgTMMMz/yGls1s=;
-        b=Xa6H8YPKEwDyxC6jHLnd2e11XfblYc5C5wldoTi7ZPBj9vDe7LTRiQ1K8NVfFn9CaT
-         iMPhFoYjNST1PsqBgWkiwqE2Z2XF126h9X4XYwlZiQZ+GNSeNXWC8X1ZFGDW+dyUmVlq
-         WTQFeCus0qGPt01lWPEB1k63doYd4GQJLNp2W2ulYsuzJEQxvPWvPqc568bVB9XFMZ+V
-         4zWLLIygxnhn+y1EeS9t+OSN49QvTirL0hgC0mgGwkc5AEhVJGHPuECAWPNfML08IGJf
-         CW5PGH2uLVVuciQl2+JaYo7hRm/NWYy3HyWQZuJe/YfmsAgrro0Y8xwj/YzqfRLj98S/
-         D5Dg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682993267; x=1685585267;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=COdD/3QMWHnibqBcf92Ik+G8mHJB/QgTMMMz/yGls1s=;
-        b=UFY3ULGoDj/tft24AkUSfIEaze/yRIzCQUvsqxKK+zJZTOXg+t9TcUDetvEL0usqrT
-         /ATMpuuvzLK6iBuxcgVLNZi3nHwHpDajB65DHN1afRJ4YBsm2CSkPxJ8WHv1ngmnEKUt
-         yPxVkImslBiH3JRRrtqumStfuCQjYBx6ptZStNRCS/dm8r110Jh1qIRsiRWbEsA1XkRy
-         1OnkYsrk1Pg0AtKgv9+VM/+oOkkyP9J9+KVco7bNw5WkS+V0cd+yYAGmnKvijeH9zaHs
-         Ic418zHfqa8DDHP4EUYIeuqtnZAY9cF2X9eprFiD2G+3vx/70x2h19EbPwzDVvLGtp5g
-         BZ2A==
-X-Gm-Message-State: AC+VfDyqkMNvp3NQtZNo5IeQfAl0OJY86dYL/o3vGMfOkOrDVXbfZfQ2
-        w0Y+j1yFaf/+Ih4MaFz+yrM=
-X-Google-Smtp-Source: ACHHUZ41bBIfzAi6DWXmhWZvC2wA9iGg2NbeAtV3zJoKqp5BpGVQzOtQNiiy98uORdxEhHh/KkJsKA==
-X-Received: by 2002:a17:902:db07:b0:1aa:f203:781c with SMTP id m7-20020a170902db0700b001aaf203781cmr6901873plx.44.1682993266692;
-        Mon, 01 May 2023 19:07:46 -0700 (PDT)
-Received: from [172.27.224.2] (ec2-16-163-40-128.ap-east-1.compute.amazonaws.com. [16.163.40.128])
-        by smtp.gmail.com with ESMTPSA id w4-20020a170902e88400b001a6ed2d0ef8sm3310182plg.273.2023.05.01.19.07.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 01 May 2023 19:07:46 -0700 (PDT)
-Message-ID: <b8facaa4-7dc3-7f2c-e25b-16503c4bfae7@gmail.com>
-Date:   Tue, 2 May 2023 10:07:40 +0800
+        with ESMTP id S232653AbjEBCWT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 1 May 2023 22:22:19 -0400
+Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 468F93AB8;
+        Mon,  1 May 2023 19:22:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1682994127; x=1714530127;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=85LkbDK+KApuWepVvTrNKkbkOtRXRZZHLuh2xgotSTc=;
+  b=SWG2C9mkUi9n7rSt0nciLqhoZZlIgS1cK0m1feX/w1nZ77bfRr6lra8p
+   nAvGgMzUYK3HkUVtkYKeXZgeNURAhOhf6M/AwuVJzvSPOOysfRUgrHk+V
+   3sfvl7u47s005rzV98welPZTZw3zziuKtzFvzkY3DbG+PcNPsNHR9TXvG
+   tQQzG4/IxK9BoZMn/ESTVdIEwj+mgIY/0pP2FtXbnPlfh0chOzBJKms6T
+   34UnUQ3n84LUH6pMRzyPdfu4+r9086uFzMaTllREGcvV4tKNlVOgD3c+N
+   6BavtjK6PDWhF9S57Dy8A2REq3O4vhVwTUmzmKpbvKauKfnK3cPltzr7f
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10697"; a="376342293"
+X-IronPort-AV: E=Sophos;i="5.99,242,1677571200"; 
+   d="scan'208";a="376342293"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 May 2023 19:22:06 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10697"; a="646346632"
+X-IronPort-AV: E=Sophos;i="5.99,242,1677571200"; 
+   d="scan'208";a="646346632"
+Received: from lkp-server01.sh.intel.com (HELO e3434d64424d) ([10.239.97.150])
+  by orsmga003.jf.intel.com with ESMTP; 01 May 2023 19:22:01 -0700
+Received: from kbuild by e3434d64424d with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1ptfeS-0000m8-1s;
+        Tue, 02 May 2023 02:22:00 +0000
+Date:   Tue, 2 May 2023 10:21:30 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     "Vishal Moola (Oracle)" <vishal.moola@gmail.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Matthew Wilcox <willy@infradead.org>
+Cc:     llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+        Linux Memory Management List <linux-mm@kvack.org>,
+        linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-csky@vger.kernel.org, linux-hexagon@vger.kernel.org,
+        loongarch@lists.linux.dev, linux-m68k@lists.linux-m68k.org,
+        linux-mips@vger.kernel.org, linux-openrisc@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, linux-riscv@lists.infradead.org,
+        linux-s390@vger.kernel.org, linux-sh@vger.kernel.org,
+        sparclinux@vger.kernel.org, linux-um@lists.infradead.org,
+        xen-devel@lists.xenproject.org, kvm@vger.kernel.org,
+        "Vishal Moola (Oracle)" <vishal.moola@gmail.com>,
+        Catalin Marinas <catalin.marinas@arm.com>
+Subject: Re: [PATCH v2 21/34] arm64: Convert various functions to use ptdescs
+Message-ID: <202305021038.c9jfVDsv-lkp@intel.com>
+References: <20230501192829.17086-22-vishal.moola@gmail.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Subject: Re: [PATCH] KVM: x86/mmu: Don't create kvm-nx-lpage-re kthread if not
- itlb_multihit
-Content-Language: en-US
-To:     lirongqing@baidu.com, seanjc@google.com, pbonzini@redhat.com,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, kvm@vger.kernel.org, x86@kernel.org
-References: <1679555884-32544-1-git-send-email-lirongqing@baidu.com>
-From:   Robert Hoo <robert.hoo.linux@gmail.com>
-In-Reply-To: <1679555884-32544-1-git-send-email-lirongqing@baidu.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230501192829.17086-22-vishal.moola@gmail.com>
+X-Spam-Status: No, score=-4.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 3/23/2023 3:18 PM, lirongqing@baidu.com wrote:
-> From: Li RongQing <lirongqing@baidu.com>
-> 
-> if CPU has not X86_BUG_ITLB_MULTIHIT bug, kvm-nx-lpage-re kthread
-> is not needed to create
+Hi Vishal,
 
-(directed by Sean from 
-https://lore.kernel.org/kvm/ZE%2FR1%2FhvbuWmD8mw@google.com/ here.)
+kernel test robot noticed the following build errors:
 
-No, I think it should tie to "nx_huge_pages" value rather than 
-directly/partially tie to boot_cpu_has_bug(X86_BUG_ITLB_MULTIHIT).
-> 
-> Signed-off-by: Li RongQing <lirongqing@baidu.com>
-> ---
->   arch/x86/kvm/mmu/mmu.c | 19 +++++++++++++++++++
->   1 file changed, 19 insertions(+)
-> 
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 8354262..be98c69 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -6667,6 +6667,11 @@ static bool get_nx_auto_mode(void)
->   	return boot_cpu_has_bug(X86_BUG_ITLB_MULTIHIT) && !cpu_mitigations_off();
->   }
->   
-> +static bool cpu_has_itlb_multihit(void)
-> +{
-> +	return boot_cpu_has_bug(X86_BUG_ITLB_MULTIHIT);
-> +}
-> +
->   static void __set_nx_huge_pages(bool val)
->   {
->   	nx_huge_pages = itlb_multihit_kvm_mitigation = val;
-> @@ -6677,6 +6682,11 @@ static int set_nx_huge_pages(const char *val, const struct kernel_param *kp)
->   	bool old_val = nx_huge_pages;
->   	bool new_val;
->   
-> +	if (!cpu_has_itlb_multihit()) {
-> +		__set_nx_huge_pages(false);
-> +		return 0;
-> +	}
-> +
-It's rude simply return here just because 
-!boot_cpu_has_bug(X86_BUG_ITLB_MULTIHIT), leaving all else behind, i.e. 
-leaving below sysfs node useless.
-If you meant to do this, you should clear these sysfs APIs because of 
-!boot_cpu_has_bug(X86_BUG_ITLB_MULTIHIT).
+[auto build test ERROR on akpm-mm/mm-everything]
+[also build test ERROR on linus/master next-20230428]
+[cannot apply to s390/features powerpc/next powerpc/fixes geert-m68k/for-next geert-m68k/for-linus v6.3]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
->   	/* In "auto" mode deploy workaround only if CPU has the bug. */
->   	if (sysfs_streq(val, "off"))
->   		new_val = 0;
-> @@ -6816,6 +6826,9 @@ static int set_nx_huge_pages_recovery_param(const char *val, const struct kernel
->   	uint old_period, new_period;
->   	int err;
->   
-> +	if (!cpu_has_itlb_multihit())
-> +		return 0;
-> +
->   	was_recovery_enabled = calc_nx_huge_pages_recovery_period(&old_period);
->   
->   	err = param_set_uint(val, kp);
-> @@ -6971,6 +6984,9 @@ int kvm_mmu_post_init_vm(struct kvm *kvm)
->   {
->   	int err;
->   
-> +	if (!cpu_has_itlb_multihit())
-> +		return 0;
-> +
-It's rude to simply return. kvm_mmu_post_init_vm() by name is far more than 
-nx_hugepage stuff, though at present only this stuff in.
-I would rather
+url:    https://github.com/intel-lab-lkp/linux/commits/Vishal-Moola-Oracle/mm-Add-PAGE_TYPE_OP-folio-functions/20230502-033042
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/akpm/mm.git mm-everything
+patch link:    https://lore.kernel.org/r/20230501192829.17086-22-vishal.moola%40gmail.com
+patch subject: [PATCH v2 21/34] arm64: Convert various functions to use ptdescs
+config: arm64-randconfig-r023-20230430 (https://download.01.org/0day-ci/archive/20230502/202305021038.c9jfVDsv-lkp@intel.com/config)
+compiler: clang version 17.0.0 (https://github.com/llvm/llvm-project b1465cd49efcbc114a75220b153f5a055ce7911f)
+reproduce (this is a W=1 build):
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # install arm64 cross compiling tool for clang build
+        # apt-get install binutils-aarch64-linux-gnu
+        # https://github.com/intel-lab-lkp/linux/commit/8e9481b63b5773d7c914836dcd7fbec2449902bc
+        git remote add linux-review https://github.com/intel-lab-lkp/linux
+        git fetch --no-tags linux-review Vishal-Moola-Oracle/mm-Add-PAGE_TYPE_OP-folio-functions/20230502-033042
+        git checkout 8e9481b63b5773d7c914836dcd7fbec2449902bc
+        # save the config file
+        mkdir build_dir && cp config build_dir/.config
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=arm64 olddefconfig
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=arm64 SHELL=/bin/bash arch/arm64/
 
-	if (cpu_has_itlb_multihit()) {
-		...
-	}
+If you fix the issue, kindly add following tag where applicable
+| Reported-by: kernel test robot <lkp@intel.com>
+| Link: https://lore.kernel.org/oe-kbuild-all/202305021038.c9jfVDsv-lkp@intel.com/
 
-Consider people in the future when they do modifications on this function.
->   	err = kvm_vm_create_worker_thread(kvm, kvm_nx_huge_page_recovery_worker, 0,
->   					  "kvm-nx-lpage-recovery",
->   					  &kvm->arch.nx_huge_page_recovery_thread);
-> @@ -6982,6 +6998,9 @@ int kvm_mmu_post_init_vm(struct kvm *kvm)
->   
->   void kvm_mmu_pre_destroy_vm(struct kvm *kvm)
->   {
-> +	if (!cpu_has_itlb_multihit())
-> +		return;
-> Ditto. It looks (wrongly) like: if !cpu_has_itlb_multihit(), no need to do 
-anything about pre_destroy_vm.
+All errors (new ones prefixed by >>):
 
->   	if (kvm->arch.nx_huge_page_recovery_thread)
->   		kthread_stop(kvm->arch.nx_huge_page_recovery_thread);
->   }
+>> arch/arm64/mm/mmu.c:440:10: error: invalid argument type 'void' to unary expression
+                   BUG_ON(!ptdesc_pte_dtor(ptdesc));
+                          ^~~~~~~~~~~~~~~~~~~~~~~~
+   include/asm-generic/bug.h:71:45: note: expanded from macro 'BUG_ON'
+   #define BUG_ON(condition) do { if (unlikely(condition)) BUG(); } while (0)
+                                               ^~~~~~~~~
+   include/linux/compiler.h:78:42: note: expanded from macro 'unlikely'
+   # define unlikely(x)    __builtin_expect(!!(x), 0)
+                                               ^
+   arch/arm64/mm/mmu.c:442:10: error: invalid argument type 'void' to unary expression
+                   BUG_ON(!ptdesc_pte_dtor(ptdesc));
+                          ^~~~~~~~~~~~~~~~~~~~~~~~
+   include/asm-generic/bug.h:71:45: note: expanded from macro 'BUG_ON'
+   #define BUG_ON(condition) do { if (unlikely(condition)) BUG(); } while (0)
+                                               ^~~~~~~~~
+   include/linux/compiler.h:78:42: note: expanded from macro 'unlikely'
+   # define unlikely(x)    __builtin_expect(!!(x), 0)
+                                               ^
+   2 errors generated.
 
-To summary, regardless of the concrete patch/implementation, what Sean more 
-urgently needs is real world justification to mitigate NX_hugepage; which I 
-believe you have at hand: why would you like to do this, what real world 
-issue caused by this bothers you. You could have more descriptions.
 
-With regards to NX_hugepage, I see people dislike it [1][2][3], but on HW 
-with itlb_multihit, they've no choice but to use it to mitigate.
+vim +/void +440 arch/arm64/mm/mmu.c
 
-[1] this patch
-[2] 
-https://lore.kernel.org/kvm/CANZk6aSv5ta3emitOfWKxaB-JvURBVu-sXqFnCz9PKXhqjbV9w@mail.gmail.com/
-[3] 
-https://lore.kernel.org/kvm/20220613212523.3436117-1-bgardon@google.com/ 
-(merged)
+   425	
+   426	static phys_addr_t pgd_pgtable_alloc(int shift)
+   427	{
+   428		phys_addr_t pa = __pgd_pgtable_alloc(shift);
+   429		struct ptdesc *ptdesc = page_ptdesc(phys_to_page(pa));
+   430	
+   431		/*
+   432		 * Call proper page table ctor in case later we need to
+   433		 * call core mm functions like apply_to_page_range() on
+   434		 * this pre-allocated page table.
+   435		 *
+   436		 * We don't select ARCH_ENABLE_SPLIT_PMD_PTLOCK if pmd is
+   437		 * folded, and if so ptdesc_pte_dtor() becomes nop.
+   438		 */
+   439		if (shift == PAGE_SHIFT)
+ > 440			BUG_ON(!ptdesc_pte_dtor(ptdesc));
+   441		else if (shift == PMD_SHIFT)
+   442			BUG_ON(!ptdesc_pte_dtor(ptdesc));
+   443	
+   444		return pa;
+   445	}
+   446	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests
