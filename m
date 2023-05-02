@@ -2,108 +2,210 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 07EF26F490F
-	for <lists+kvm@lfdr.de>; Tue,  2 May 2023 19:18:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2C1096F4915
+	for <lists+kvm@lfdr.de>; Tue,  2 May 2023 19:22:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234389AbjEBRSb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 May 2023 13:18:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55966 "EHLO
+        id S233930AbjEBRWg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 May 2023 13:22:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57258 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234409AbjEBRSZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 2 May 2023 13:18:25 -0400
-Received: from mail-wm1-x332.google.com (mail-wm1-x332.google.com [IPv6:2a00:1450:4864:20::332])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97794171C
-        for <kvm@vger.kernel.org>; Tue,  2 May 2023 10:18:17 -0700 (PDT)
-Received: by mail-wm1-x332.google.com with SMTP id 5b1f17b1804b1-3f19a80a330so25442145e9.2
-        for <kvm@vger.kernel.org>; Tue, 02 May 2023 10:18:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1683047897; x=1685639897;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=UC4a8f6Gne9pM4hFXpNmDoLhQCLeKV3rAUXB78ueUnI=;
-        b=uiELwNIBB9aR1aczpkjeXKkVoU2sLftqcWZlOdh5bi3PsoclPZ+ARRrJEbVKVVYuBh
-         JCs47I70fqOk3pqKhSLL2RDkCD5933AHaLa6R0r/E0Bgn3mq8YuUVdX08CXNf7Vk6H8T
-         WyIprujAXbYHjFtDDUV8Z7bQQ+xRB67Y+3/f7T1LDvghhbovyzufVkCyYzCEfywzCBU7
-         TfP2WIioZQjlDyzk1ry9mc+IldDP5CH0OCMzdKR4ndbdzmbc0kKK+Ie/FzO3W1VfJSkO
-         TKHMkrY7B769c1/QGNBIYe71toXQSQHCzEGsqLISVargDPsmEFfpI6qSKf4jO2YP4uLF
-         RyDw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683047897; x=1685639897;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=UC4a8f6Gne9pM4hFXpNmDoLhQCLeKV3rAUXB78ueUnI=;
-        b=GjqfgTzWTzcop9GYtyd/Jbj2ydmnQ57DeThBQC8DjPM+mifpvUhQbf0CLqrSoipPko
-         8LgAy5gU2vTy5oe0Zibju/MNZ75Xi1Rcfuf5XkH89YpJ57fHFr33j5aMSrbbJH20WmOV
-         YoonIbAJMxMcr+cthtRz3ucEr2Od2mqDH4TwIuOH71dJCLece7Uzf+RatTDUYL0NWd2d
-         IMbTX4Dia6rTfSoAayFSS3Hw0IBaJwZYfrpqawg+51ftUIqHk0OBnxD0BeAYGsCYkrjc
-         tRnG1/DoD4g5x8oMXZVlQg20drDOgU4ow5ZQ5dMWBT6Op+aJJY82fzyn3MBRBoEhZBfp
-         KLNg==
-X-Gm-Message-State: AC+VfDxiGDJyztHU3xXgWGLpeXgubZz4Z2o9r+3Xv61zmcUwqUv67PVL
-        aGnIFjh0p2Qyzo2bxjJadbhi9bm1caA8dDOgbikY2g==
-X-Google-Smtp-Source: ACHHUZ6iyEsL7ZSIW0wVeXdbh79sKok0v4A3gQDG0iCZ6EAs2k7GXApQ4djHsSyVEvFt9ZPZRbTQYFvosV1Su6fKRME=
-X-Received: by 2002:a1c:f203:0:b0:3f1:72dc:8bae with SMTP id
- s3-20020a1cf203000000b003f172dc8baemr12412266wmc.21.1683047897016; Tue, 02
- May 2023 10:18:17 -0700 (PDT)
-MIME-Version: 1.0
-References: <20230412213510.1220557-1-amoorthy@google.com> <20230412213510.1220557-5-amoorthy@google.com>
-In-Reply-To: <20230412213510.1220557-5-amoorthy@google.com>
-From:   Anish Moorthy <amoorthy@google.com>
-Date:   Tue, 2 May 2023 10:17:40 -0700
-Message-ID: <CAF7b7mqq3UMeO3M-Fy8SqyL=mjxY4-TyA_PjgGsdVWZrsU2LLQ@mail.gmail.com>
-Subject: Re: [PATCH v3 04/22] KVM: x86: Set vCPU exit reason to
- KVM_EXIT_UNKNOWN at the start of KVM_RUN
-To:     pbonzini@redhat.com, maz@kernel.org
-Cc:     oliver.upton@linux.dev, seanjc@google.com, jthoughton@google.com,
-        bgardon@google.com, dmatlack@google.com, ricarkol@google.com,
-        axelrasmussen@google.com, peterx@redhat.com, kvm@vger.kernel.org,
-        kvmarm@lists.linux.dev
+        with ESMTP id S233167AbjEBRWf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 2 May 2023 13:22:35 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4979AE43
+        for <kvm@vger.kernel.org>; Tue,  2 May 2023 10:22:33 -0700 (PDT)
+Received: from pps.filterd (m0353723.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 342HLTfL011588;
+        Tue, 2 May 2023 17:22:26 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=0Vp9RhcuRtqSZ7grQzXnBkV9Fwe82wsnWbzsb/SU6nk=;
+ b=M+JNCsoGkDlXKxjWRDbcIl56u3Bb6E2Fabo6p+d6ZLxoCUz6FPM1sSW8YrDcvCEL/FuV
+ RqIjVb/zGMkmMVcfEtl5q1n2tgSqUZ0qvO1Cp524TFzUONdds8gnLqA0EkVBB+T2Qwly
+ KyVJ2T4uXyoAdR8uiBkg/3bnG2nLgoysoNZWnTjN4WgndR+oiruKTmi4XuYsgLrWCVx8
+ 5B/GsU4aZJFaZ5OF/yeUH+uN+9Q1TDsFbhzwKD4GKN90F+/9CpaFKFAM23FbgeTnPAXK
+ z+yTbfFxjg26Vu75Lvs/tFwXPf49nsbmjp5lG1c3p1FF25uxG+C/vsQhgafoyd8kvfaG Kg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qb6qv0bbe-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 02 May 2023 17:22:25 +0000
+Received: from m0353723.ppops.net (m0353723.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 342HE1Qh008234;
+        Tue, 2 May 2023 17:22:25 GMT
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qb6qv0baa-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 02 May 2023 17:22:25 +0000
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3424iEtg021182;
+        Tue, 2 May 2023 17:22:22 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+        by ppma06ams.nl.ibm.com (PPS) with ESMTPS id 3q8tgg1r51-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 02 May 2023 17:22:22 +0000
+Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
+        by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 342HMGTo30867856
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 2 May 2023 17:22:16 GMT
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B526720043;
+        Tue,  2 May 2023 17:22:16 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 776CE20040;
+        Tue,  2 May 2023 17:22:15 +0000 (GMT)
+Received: from li-7e0de7cc-2d9d-11b2-a85c-de26c016e5ad.ibm.com (unknown [9.171.2.121])
+        by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Tue,  2 May 2023 17:22:15 +0000 (GMT)
+Message-ID: <5f4fa29eaec7269350403b2d1b2b051e6aa59a39.camel@linux.ibm.com>
+Subject: Re: [PATCH v20 03/21] target/s390x/cpu topology: handle STSI(15)
+ and build the SYSIB
+From:   Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+To:     Pierre Morel <pmorel@linux.ibm.com>, qemu-s390x@nongnu.org
+Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
+        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
+        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
+        kvm@vger.kernel.org, ehabkost@redhat.com,
+        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
+        seiden@linux.ibm.com, nrb@linux.ibm.com, frankja@linux.ibm.com,
+        berrange@redhat.com, clg@kaod.org
+Date:   Tue, 02 May 2023 19:22:15 +0200
+In-Reply-To: <20230425161456.21031-4-pmorel@linux.ibm.com>
+References: <20230425161456.21031-1-pmorel@linux.ibm.com>
+         <20230425161456.21031-4-pmorel@linux.ibm.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
+MIME-Version: 1.0
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: _CNOp6IbdHxRBq2u0uGyvpHrFjJqLlYW
+X-Proofpoint-ORIG-GUID: hAV8-OrR6W8Efiz8qINWpsnHx1ycu-pD
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
+ definitions=2023-05-02_10,2023-04-27_01,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ lowpriorityscore=0 clxscore=1015 malwarescore=0 bulkscore=0
+ priorityscore=1501 adultscore=0 phishscore=0 spamscore=0 suspectscore=0
+ mlxlogscore=999 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2303200000 definitions=main-2305020146
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-During some testing yesterday I realized that this patch actually
-breaks the self test, causing an error which the later self test
-changes cover up.
+On Tue, 2023-04-25 at 18:14 +0200, Pierre Morel wrote:
+> On interception of STSI(15.1.x) the System Information Block
+> (SYSIB) is built from the list of pre-ordered topology entries.
+>=20
+> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+> ---
+>  MAINTAINERS                     |   1 +
+>  include/hw/s390x/cpu-topology.h |  24 +++
+>  include/hw/s390x/sclp.h         |   1 +
+>  target/s390x/cpu.h              |  72 ++++++++
+>  hw/s390x/cpu-topology.c         |  13 +-
+>  target/s390x/kvm/cpu_topology.c | 308 ++++++++++++++++++++++++++++++++
+>  target/s390x/kvm/kvm.c          |   5 +-
+>  target/s390x/kvm/meson.build    |   3 +-
+>  8 files changed, 424 insertions(+), 3 deletions(-)
+>  create mode 100644 target/s390x/kvm/cpu_topology.c
+>=20
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index bb7b34d0d8..de9052f753 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -1659,6 +1659,7 @@ M: Pierre Morel <pmorel@linux.ibm.com>
+>  S: Supported
+>  F: include/hw/s390x/cpu-topology.h
+>  F: hw/s390x/cpu-topology.c
+> +F: target/s390x/kvm/cpu_topology.c
+> =20
+>  X86 Machines
+>  ------------
+> diff --git a/include/hw/s390x/cpu-topology.h b/include/hw/s390x/cpu-topol=
+ogy.h
+> index af36f634e0..87bfeb631e 100644
+> --- a/include/hw/s390x/cpu-topology.h
+> +++ b/include/hw/s390x/cpu-topology.h
+> @@ -15,9 +15,33 @@
+>=20
+[...]
 
-Running "./demand_paging_test -b 512M -u MINOR -s shmem -v 1" from
-kvm/next (b3c98052d469) with just this patch applies gives the
-following output
+> +typedef struct S390TopologyEntry {
+> +    QTAILQ_ENTRY(S390TopologyEntry) next;
+> +    s390_topology_id id;
+> +    uint64_t mask;
+> +} S390TopologyEntry;
+> +
+>  typedef struct S390Topology {
+>      uint8_t *cores_per_socket;
+> +    QTAILQ_HEAD(, S390TopologyEntry) list;
 
-> # ./demand_paging_test -b 512M -u MINOR -s shmem -v 1
-> Testing guest mode: PA-bits:ANY, VA-bits:48,  4K pages
-> guest physical test memory: [0x7fcdfffe000, 0x7fcffffe000)
-> Finished creating vCPUs and starting uffd threads
-> Started all vCPUs
-> ==== Test Assertion Failure ====
->  demand_paging_test.c:50: false
->  pid=13293 tid=13297 errno=4 - Interrupted system call
->  // Some stack trace stuff
->  Invalid guest sync status: exit_reason=UNKNOWN, ucall=0
+Since you recompute the list on every STSI, you no longer need this in here=
+.
+You can create it in insert_stsi_15_1_x.
 
-The problem is the get_ucall() part of the following block in the self
-test's vcpu_worker()
+>      CpuTopology *smp;
+> +    bool vertical_polarization;
+>  } S390Topology;
 
-> ret = _vcpu_run(vcpu);
-> TEST_ASSERT(ret == 0, "vcpu_run failed: %d\n", ret);
-> if (get_ucall(vcpu, NULL) != UCALL_SYNC) {
->    TEST_ASSERT(false,
->                               "Invalid guest sync status: exit_reason=%s\n",
->                               exit_reason_str(run->exit_reason));
-> }
+[...]
 
-I took a look and, while get_ucall() does depend on the value of
-exit_reason, the error's root cause isn't clear to me yet.
+> +/*
+> + * Macro to check that the size of data after increment
+> + * will not get bigger than the size of the SysIB.
+> + */
+> +#define SYSIB_GUARD(data, x) do {       \
+> +        data +=3D x;                      \
+> +        if (data  > sizeof(SysIB)) {    \
+                    ^ two spaces
 
-Moving the "exit_reason = kvm_exit_unknown" line to later in the
-function, right above the vcpu_run() call "fixes" the problem. I've
-done that for now and will bisect later to investigate: if anyone
-has any clues please let me know.
+> +            return 0;                   \
+> +        }                               \
+> +    } while (0)
+> +
+
+[...]
+
+> +/**
+> + * s390_topology_from_cpu:
+> + * @cpu: The S390CPU
+> + *
+> + * Initialize the topology id from the CPU environment.
+> + */
+> +static s390_topology_id s390_topology_from_cpu(S390CPU *cpu)
+> +{
+> +    s390_topology_id topology_id =3D {0};
+> +
+> +    topology_id.drawer =3D cpu->env.drawer_id;
+> +    topology_id.book =3D cpu->env.book_id;
+> +    topology_id.socket =3D cpu->env.socket_id;
+> +    topology_id.origin =3D cpu->env.core_id / 64;
+> +    topology_id.type =3D S390_TOPOLOGY_CPU_IFL;
+> +    topology_id.dedicated =3D cpu->env.dedicated;
+> +
+> +    if (s390_topology.vertical_polarization) {
+> +        /*
+> +         * Vertical polarization with dedicated CPU implies
+> +         * vertical high entitlement.
+> +         */
+
+This has already been adjusted or rejected when the entitlement was set.
+
+> +        if (topology_id.dedicated) {
+> +            topology_id.entitlement =3D S390_CPU_ENTITLEMENT_HIGH;
+> +        } else {
+> +            topology_id.entitlement =3D cpu->env.entitlement;
+
+You only need this assignment.
+> +        }
+> +    }
+> +
+> +    return topology_id;
+
+[...]
+
