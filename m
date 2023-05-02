@@ -2,150 +2,154 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 64DE86F42A8
-	for <lists+kvm@lfdr.de>; Tue,  2 May 2023 13:24:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AE0F36F42B9
+	for <lists+kvm@lfdr.de>; Tue,  2 May 2023 13:26:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233930AbjEBLYM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 May 2023 07:24:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37464 "EHLO
+        id S233120AbjEBL0B (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 May 2023 07:26:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39622 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233957AbjEBLYI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 2 May 2023 07:24:08 -0400
-Received: from mail-wm1-x32f.google.com (mail-wm1-x32f.google.com [IPv6:2a00:1450:4864:20::32f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6197D59F9
-        for <kvm@vger.kernel.org>; Tue,  2 May 2023 04:24:05 -0700 (PDT)
-Received: by mail-wm1-x32f.google.com with SMTP id 5b1f17b1804b1-3f1728c2a57so36391925e9.0
-        for <kvm@vger.kernel.org>; Tue, 02 May 2023 04:24:05 -0700 (PDT)
+        with ESMTP id S233158AbjEBLZ6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 2 May 2023 07:25:58 -0400
+Received: from mail-pg1-x532.google.com (mail-pg1-x532.google.com [IPv6:2607:f8b0:4864:20::532])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F558100;
+        Tue,  2 May 2023 04:25:24 -0700 (PDT)
+Received: by mail-pg1-x532.google.com with SMTP id 41be03b00d2f7-5286344e1d4so3331754a12.3;
+        Tue, 02 May 2023 04:25:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1683026644; x=1685618644;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=a5MA3rQRemK8vwB863cSKTIFHdK8lYr1gYMNYZeBKeI=;
-        b=Bcbs8ecD/s8OWC21qQHCXgtIOtsz+e9N2pEuihhlSmtvkG35bJz9rt3nEdqA/AtGjk
-         utncNU76BTjlSaS2PZUAxKc4rgDIoetgH+uJ78vG76+tMs4flN3NEUeUPHQohOkzqVrF
-         QY46VQ95P1tdDKnjzJtzgYtjQwDwsZiAPjoL5pSYCeUTka2hvlf4xfa2M6GAseTV45Tw
-         lFNBODkjg3LMdbtliqpXu6v40kWJwep2aRzm+bljEzEpw7Z7Kl0AsaZ8j/xeQbJpLpxI
-         1poX83LTnlPRA/vlUlLjTIpPb7g6cbmpLP+sJvY3GbZLhv/aqOzQMem+iiNFvk18ffbL
-         BN5g==
+        d=gmail.com; s=20221208; t=1683026708; x=1685618708;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=5+7ReMNdnROs/Fh8JrLZGt15/0ISu5r890dI+IDPkSo=;
+        b=nVSTUXTp708ovqdxJ7PlaLUG8coc1+sI98n7oe1tLEJq5P4aX3dqLgu/HG4kLSPv4P
+         VyxPfyXzhzi9TiGruAkLlLy+TX71FTFbneCYb4s4u22XgP6qrgNMY3CAKFVw2X7EfeDP
+         6uWq3jlYM5CfnK4KzQs+M6/I1VR6llOk5dImu8+tMLRBdn+bhPifG3M8QK9Gty6vcUG6
+         ENykAGheoQurnGZwHLI3ZbQQo2Rg3QfL8/u9TGusciYsryT1r3ZLpMCyEglHY65fMwvb
+         HoyizLO6fPonNtRmcahPEkSG9TSTceKC/FufmWsQH+X9kaiaXqNanm1GWlTMD6hCOjID
+         7esg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683026644; x=1685618644;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=a5MA3rQRemK8vwB863cSKTIFHdK8lYr1gYMNYZeBKeI=;
-        b=D0JTCuzc3WhVcVvqeCxgvfPcs0xYWBkpH4N8W8b7dGN7L3oHo2XQIFEa7wt/TF6cud
-         1Wc3Dyfr3klv6L8RADkNMNMWURFp1kVlEi3RA9Hh2wqRU8fYrNy/dGwQaxHWVC1QAKrI
-         sVLsMd7Y99EjZkclN1gN+QyLPY5tBZK1v0PEysXppl3JRy4IS1mi6BRBOrxWB6zGoD5c
-         HTHB4kiLFyx/SDG2syMDb9ft9tH40hBL3iqpRzxaC7RgeI3VaHxQOkAEq421r5UqCSFg
-         SwjNGdSYpU2+n/hy9g3hdHdpAsW276Akgw+8mZCBnpUxCJd+1v6r1gMGIC3R+1sVWrX3
-         vD2A==
-X-Gm-Message-State: AC+VfDyd8gbq+ZrP5lzfJhVi6usSNVm5cCgr4ItSiUc5zqrC2BN3Dvox
-        81FZlir/w99PRnAuaxXp6DbCVQ==
-X-Google-Smtp-Source: ACHHUZ7IUxz2XiSXh2Z7OVd+ZpYhhnpq0k/iIvRAzjGD5j9n/5HiUZGXvd1IXj2MvorQhMZXMD70QA==
-X-Received: by 2002:a1c:7203:0:b0:3f1:7b8d:38ec with SMTP id n3-20020a1c7203000000b003f17b8d38ecmr11402774wmc.35.1683026643674;
-        Tue, 02 May 2023 04:24:03 -0700 (PDT)
-Received: from ?IPV6:2a02:c7c:74db:8d00:ad29:f02c:48a2:269c? ([2a02:c7c:74db:8d00:ad29:f02c:48a2:269c])
-        by smtp.gmail.com with ESMTPSA id f12-20020a5d4dcc000000b0030630de6fbdsm3889044wru.13.2023.05.02.04.24.02
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 02 May 2023 04:24:03 -0700 (PDT)
-Message-ID: <f56a6f93-c3ae-5d61-f6ab-bb1eee265197@linaro.org>
-Date:   Tue, 2 May 2023 12:24:01 +0100
+        d=1e100.net; s=20221208; t=1683026708; x=1685618708;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=5+7ReMNdnROs/Fh8JrLZGt15/0ISu5r890dI+IDPkSo=;
+        b=POp2oCnqAQGjZOnKASahyVWLjsWQsiSqL4P9OrJ+q47QNBebnA8suu9BuFYhFq1t5D
+         EM+eYmoT6E+EjEBJZhepsvJVWxuGulJAirCvTG7SSzjCUpu9h7637AG+mal1yIHTnRar
+         Y4eK/mnrd20KAEXQa6aDhGUH6Baunk81kMZzIVndNPgciL3+DwTTh0L51/GMJYxSQV4s
+         qrlRN4MZ0YgvMw6Ng5nbb7K+0/p5pVPkDRwdx7VBBZYE79hMhIEjAlY9ppCfq+jHPg7Q
+         eMAondl/5fMC9estVl1vuOuUZ3cAW+/8lKuUD0joIEsU0cKKJTfXw6UxEdBzlXImONwH
+         JgTQ==
+X-Gm-Message-State: AC+VfDwFSroglc28Avk4/k2D0KqO1vvGiuADS6mgFOiBgU0UhdUx4ISd
+        uh8SI+U5P1/6XY5N3PSuf/VQyrsTYDvqRg==
+X-Google-Smtp-Source: ACHHUZ7mpkh5ODjxKBcwTlpkc1Xeiu3oirFBlWTpTtu9Stq/9nXPentJn5HrEpfVgRuEY3GIlvu06w==
+X-Received: by 2002:a17:90b:4c8d:b0:246:61ae:2fbb with SMTP id my13-20020a17090b4c8d00b0024661ae2fbbmr18306648pjb.41.1683026708455;
+        Tue, 02 May 2023 04:25:08 -0700 (PDT)
+Received: from Dommie-Laptop.. (111-248-114-205.dynamic-ip.hinet.net. [111.248.114.205])
+        by smtp.gmail.com with ESMTPSA id jh19-20020a170903329300b001a239325f1csm19590017plb.100.2023.05.02.04.25.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 02 May 2023 04:25:08 -0700 (PDT)
+From:   Yan-Jie Wang <yanjiewtw@gmail.com>
+To:     linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     Jonathan Corbet <corbet@lwn.net>,
+        Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Andre Przywara <andre.przywara@arm.com>,
+        Avi Kivity <avi@redhat.com>,
+        Yan-Jie Wang <yanjiewtw@gmail.com>,
+        Ching-Chun Huang <jserv@ccns.ncku.edu.tw>, trivial@kernel.org,
+        kvm@vger.kernel.org
+Subject: [PATCH] docs: clarify KVM related kernel parameters' descriptions
+Date:   Tue,  2 May 2023 19:25:02 +0800
+Message-Id: <20230502112502.14859-1-yanjiewtw@gmail.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Subject: Re: [PATCH RFC v2 4/9] target/loongarch: Implement kvm get/set
- registers
-Content-Language: en-US
-To:     Tianrui Zhao <zhaotianrui@loongson.cn>, qemu-devel@nongnu.org
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        gaosong@loongson.cn, "Michael S . Tsirkin" <mst@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>, maobibo@loongson.cn,
-        philmd@linaro.org, peter.maydell@linaro.org
-References: <20230427072645.3368102-1-zhaotianrui@loongson.cn>
- <20230427072645.3368102-5-zhaotianrui@loongson.cn>
-From:   Richard Henderson <richard.henderson@linaro.org>
-In-Reply-To: <20230427072645.3368102-5-zhaotianrui@loongson.cn>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 4/27/23 08:26, Tianrui Zhao wrote:
-> Implement kvm_arch_get/set_registers interfaces, many regs
-> can be get/set in the function, such as core regs, csr regs,
-> fpu regs, mp state, etc.
-> 
-> Signed-off-by: Tianrui Zhao <zhaotianrui@loongson.cn>
-> ---
->   meson.build                   |   1 +
->   target/loongarch/kvm.c        | 356 +++++++++++++++++++++++++++++++++-
->   target/loongarch/trace-events |  11 ++
->   target/loongarch/trace.h      |   1 +
->   4 files changed, 367 insertions(+), 2 deletions(-)
->   create mode 100644 target/loongarch/trace-events
->   create mode 100644 target/loongarch/trace.h
-> 
-> diff --git a/meson.build b/meson.build
-> index 29f8644d6d..b1b29299da 100644
-> --- a/meson.build
-> +++ b/meson.build
-> @@ -3039,6 +3039,7 @@ if have_system or have_user
->       'target/s390x',
->       'target/s390x/kvm',
->       'target/sparc',
-> +    'target/loongarch',
->     ]
+The descriptions of certain KVM related kernel parameters can be
+ambiguous and confusing. They state 'Disable ...,' which implies that
+setting them to 1 would disable the associated features or options,
+when in fact the opposite is true.
 
-Sort before mips to keep alphabetic ordering.
+This commit addresses this issue by revising the descriptions of these
+parameters to make their intended behavior clear.
 
-> +static int kvm_loongarch_get_regs_core(CPUState *cs)
-> +{
-> +    int ret = 0;
-> +    int i;
-> +    struct kvm_regs regs;
-> +    LoongArchCPU *cpu = LOONGARCH_CPU(cs);
-> +    CPULoongArchState *env = &cpu->env;
-> +
-> +    /* Get the current register set as KVM seems it */
-> +    ret = kvm_vcpu_ioctl(cs, KVM_GET_REGS, &regs);
-> +    if (ret < 0) {
-> +        trace_kvm_failed_get_regs_core(strerror(errno));
-> +        return ret;
-> +    }
-> +
-> +    for (i = 0; i < 32; i++) {
-> +        env->gpr[i] = regs.gpr[i];
+Signed-off-by: Yan-Jie Wang <yanjiewtw@gmail.com>
+---
+ Documentation/admin-guide/kernel-parameters.txt | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
-For i = 1; register 0 is 0...
+diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
+index 9e5bab29685f..cc5abb3d54b9 100644
+--- a/Documentation/admin-guide/kernel-parameters.txt
++++ b/Documentation/admin-guide/kernel-parameters.txt
+@@ -2552,10 +2552,10 @@
+ 			on the ratio, such that a page is zapped after 1 hour on average.
+ 
+ 	kvm-amd.nested=	[KVM,AMD] Allow nested virtualization in KVM/SVM.
+-			Default is 1 (enabled)
++			Default is 1 (allow)
+ 
+-	kvm-amd.npt=	[KVM,AMD] Disable nested paging (virtualized MMU)
+-			for all guests.
++	kvm-amd.npt=	[KVM,AMD] Enable nested paging (virtualized MMU)
++			for all guests on capable AMD chips.
+ 			Default is 1 (enabled) if in 64-bit or 32-bit PAE mode.
+ 
+ 	kvm-arm.mode=
+@@ -2602,12 +2602,12 @@
+ 			Format: <integer>
+ 			Default: 5
+ 
+-	kvm-intel.ept=	[KVM,Intel] Disable extended page tables
++	kvm-intel.ept=	[KVM,Intel] Enable extended page tables
+ 			(virtualized MMU) support on capable Intel chips.
+ 			Default is 1 (enabled)
+ 
+ 	kvm-intel.emulate_invalid_guest_state=
+-			[KVM,Intel] Disable emulation of invalid guest state.
++			[KVM,Intel] Enable emulation of invalid guest state.
+ 			Ignored if kvm-intel.enable_unrestricted_guest=1, as
+ 			guest state is never invalid for unrestricted guests.
+ 			This param doesn't apply to nested guests (L2), as KVM
+@@ -2615,7 +2615,7 @@
+ 			Default is 1 (enabled)
+ 
+ 	kvm-intel.flexpriority=
+-			[KVM,Intel] Disable FlexPriority feature (TPR shadow).
++			[KVM,Intel] Enable FlexPriority feature (TPR shadow).
+ 			Default is 1 (enabled)
+ 
+ 	kvm-intel.nested=
+@@ -2623,7 +2623,7 @@
+ 			Default is 0 (disabled)
+ 
+ 	kvm-intel.unrestricted_guest=
+-			[KVM,Intel] Disable unrestricted guest feature
++			[KVM,Intel] Enable unrestricted guest feature
+ 			(virtualized real and unpaged mode) on capable
+ 			Intel chips. Default is 1 (enabled)
+ 
+@@ -2639,7 +2639,7 @@
+ 
+ 			Default is cond (do L1 cache flush in specific instances)
+ 
+-	kvm-intel.vpid=	[KVM,Intel] Disable Virtual Processor Identification
++	kvm-intel.vpid=	[KVM,Intel] Enable Virtual Processor Identification
+ 			feature (tagged TLBs) on capable Intel chips.
+ 			Default is 1 (enabled)
+ 
 
-> +static inline int kvm_larch_getq(CPUState *cs, uint64_t reg_id,
-> +                                 uint64_t *addr)
-> +{
-> +    struct kvm_one_reg csrreg = {
-> +        .id = reg_id,
-> +        .addr = (uintptr_t)addr
-> +    };
-> +
-> +    return kvm_vcpu_ioctl(cs, KVM_GET_ONE_REG, &csrreg);
-> +}
+base-commit: 865fdb08197e657c59e74a35fa32362b12397f58
+-- 
+2.34.1
 
-Drop inline marker and let the compiler choose.
-
-> +static inline int kvm_larch_putq(CPUState *cs, uint64_t reg_id,
-> +                                 uint64_t *addr)
-
-Likewise.
-
-Otherwise,
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-
-
-r~
