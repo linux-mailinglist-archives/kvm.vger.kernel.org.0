@@ -2,69 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 959DD6F48F3
-	for <lists+kvm@lfdr.de>; Tue,  2 May 2023 19:12:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 07EF26F490F
+	for <lists+kvm@lfdr.de>; Tue,  2 May 2023 19:18:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233767AbjEBRMm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 May 2023 13:12:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52126 "EHLO
+        id S234389AbjEBRSb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 May 2023 13:18:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55966 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233846AbjEBRMk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 2 May 2023 13:12:40 -0400
-Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB816E5B
-        for <kvm@vger.kernel.org>; Tue,  2 May 2023 10:12:36 -0700 (PDT)
-Received: by mail-pg1-x54a.google.com with SMTP id 41be03b00d2f7-51f10bda596so1824124a12.1
-        for <kvm@vger.kernel.org>; Tue, 02 May 2023 10:12:36 -0700 (PDT)
+        with ESMTP id S234409AbjEBRSZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 2 May 2023 13:18:25 -0400
+Received: from mail-wm1-x332.google.com (mail-wm1-x332.google.com [IPv6:2a00:1450:4864:20::332])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97794171C
+        for <kvm@vger.kernel.org>; Tue,  2 May 2023 10:18:17 -0700 (PDT)
+Received: by mail-wm1-x332.google.com with SMTP id 5b1f17b1804b1-3f19a80a330so25442145e9.2
+        for <kvm@vger.kernel.org>; Tue, 02 May 2023 10:18:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1683047556; x=1685639556;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=LQpsXa7PF6SfkNDRVYWe/pXw7LrZqwM+ndclXY8TsRA=;
-        b=C43MRsCeJjlHRny0ujP2/WrWk7SuBq+T0iec7sTyuUJCtuy2gOVBMk6xF+njks3r8b
-         iaHC8zvlhYdXVfFEIlS64AfFZlAUKc6V/+XV73g1rO1YWbs/QjNlnR8c8rbd9OZwbsav
-         ucmm0mYAIA7SDeYN87XmItw5hU1/H8cwITnbs9dhYLmJvTRVsHacVPu4GfjyC0sriUS3
-         Zmg0KEofgoQYlmUEer4zXwgoOD8bgHAGREE+tAkj2GsCjbCFvNxxyWSj1kYhtCl/kBhW
-         mrH8bwK5YOTLcXEfFBmIjwOCnYPUI9AtmywcgEtYj7PQ79gI0bzLCRNxRbMZosi3SgXQ
-         rO/A==
+        d=google.com; s=20221208; t=1683047897; x=1685639897;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=UC4a8f6Gne9pM4hFXpNmDoLhQCLeKV3rAUXB78ueUnI=;
+        b=uiELwNIBB9aR1aczpkjeXKkVoU2sLftqcWZlOdh5bi3PsoclPZ+ARRrJEbVKVVYuBh
+         JCs47I70fqOk3pqKhSLL2RDkCD5933AHaLa6R0r/E0Bgn3mq8YuUVdX08CXNf7Vk6H8T
+         WyIprujAXbYHjFtDDUV8Z7bQQ+xRB67Y+3/f7T1LDvghhbovyzufVkCyYzCEfywzCBU7
+         TfP2WIioZQjlDyzk1ry9mc+IldDP5CH0OCMzdKR4ndbdzmbc0kKK+Ie/FzO3W1VfJSkO
+         TKHMkrY7B769c1/QGNBIYe71toXQSQHCzEGsqLISVargDPsmEFfpI6qSKf4jO2YP4uLF
+         RyDw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683047556; x=1685639556;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=LQpsXa7PF6SfkNDRVYWe/pXw7LrZqwM+ndclXY8TsRA=;
-        b=VNT5xN/oiBAJnTiv3QBrHk2vylJAvqnkKZM9pnSD+TwpdTOhf9lKs4drudAfGIm6Qx
-         1mv3PY3kHR2H7TazuS+A2U8JNxb8pKRRgfZp/mTR6ZSgCwzOBCHSfLnT/Il2cn4uL4iU
-         z+RBI/B0VaPmDDoKzzJjWRLzAD434VZZqtbBFsfVFV2scswBKt53E9WJqkR0/L7tKhR3
-         z8jcjjAT/OrVynnuEUdzNEi/F62dUtYWeL9Oocu3ivxaT9BYbp9xmidNFaFDiwNwH08t
-         LGzxM+eDi8guv0eWxmB1DTOoagkqCWFQPIQT/0trvWSIz2RU6cG3TMa0+JWCVTtiR5vP
-         Kkiw==
-X-Gm-Message-State: AC+VfDyrwRQuiY1kPeOe9j57F8P0LJX5Udz04NDLWfhMaiwVYxzTVkXI
-        B9BmBbpFxCnEqAt4oTWYg+f4SAZBYlw=
-X-Google-Smtp-Source: ACHHUZ6OGEbCDRyibiyEFmgXDoP74gBZmGkJmylBe5G97Pc5W9DviG/PDug9EqNO9adU8DJr2OhNI5d1W8M=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a63:8741:0:b0:513:e029:d172 with SMTP id
- i62-20020a638741000000b00513e029d172mr4555521pge.12.1683047556207; Tue, 02
- May 2023 10:12:36 -0700 (PDT)
-Date:   Tue, 2 May 2023 10:12:34 -0700
-In-Reply-To: <20230502112502.14859-1-yanjiewtw@gmail.com>
-Mime-Version: 1.0
-References: <20230502112502.14859-1-yanjiewtw@gmail.com>
-Message-ID: <ZFFEgptZg1P367F7@google.com>
-Subject: Re: [PATCH] docs: clarify KVM related kernel parameters' descriptions
-From:   Sean Christopherson <seanjc@google.com>
-To:     Yan-Jie Wang <yanjiewtw@gmail.com>
-Cc:     linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jonathan Corbet <corbet@lwn.net>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Andre Przywara <andre.przywara@arm.com>,
-        Avi Kivity <avi@redhat.com>,
-        Ching-Chun Huang <jserv@ccns.ncku.edu.tw>, trivial@kernel.org,
-        kvm@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        d=1e100.net; s=20221208; t=1683047897; x=1685639897;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=UC4a8f6Gne9pM4hFXpNmDoLhQCLeKV3rAUXB78ueUnI=;
+        b=GjqfgTzWTzcop9GYtyd/Jbj2ydmnQ57DeThBQC8DjPM+mifpvUhQbf0CLqrSoipPko
+         8LgAy5gU2vTy5oe0Zibju/MNZ75Xi1Rcfuf5XkH89YpJ57fHFr33j5aMSrbbJH20WmOV
+         YoonIbAJMxMcr+cthtRz3ucEr2Od2mqDH4TwIuOH71dJCLece7Uzf+RatTDUYL0NWd2d
+         IMbTX4Dia6rTfSoAayFSS3Hw0IBaJwZYfrpqawg+51ftUIqHk0OBnxD0BeAYGsCYkrjc
+         tRnG1/DoD4g5x8oMXZVlQg20drDOgU4ow5ZQ5dMWBT6Op+aJJY82fzyn3MBRBoEhZBfp
+         KLNg==
+X-Gm-Message-State: AC+VfDxiGDJyztHU3xXgWGLpeXgubZz4Z2o9r+3Xv61zmcUwqUv67PVL
+        aGnIFjh0p2Qyzo2bxjJadbhi9bm1caA8dDOgbikY2g==
+X-Google-Smtp-Source: ACHHUZ6iyEsL7ZSIW0wVeXdbh79sKok0v4A3gQDG0iCZ6EAs2k7GXApQ4djHsSyVEvFt9ZPZRbTQYFvosV1Su6fKRME=
+X-Received: by 2002:a1c:f203:0:b0:3f1:72dc:8bae with SMTP id
+ s3-20020a1cf203000000b003f172dc8baemr12412266wmc.21.1683047897016; Tue, 02
+ May 2023 10:18:17 -0700 (PDT)
+MIME-Version: 1.0
+References: <20230412213510.1220557-1-amoorthy@google.com> <20230412213510.1220557-5-amoorthy@google.com>
+In-Reply-To: <20230412213510.1220557-5-amoorthy@google.com>
+From:   Anish Moorthy <amoorthy@google.com>
+Date:   Tue, 2 May 2023 10:17:40 -0700
+Message-ID: <CAF7b7mqq3UMeO3M-Fy8SqyL=mjxY4-TyA_PjgGsdVWZrsU2LLQ@mail.gmail.com>
+Subject: Re: [PATCH v3 04/22] KVM: x86: Set vCPU exit reason to
+ KVM_EXIT_UNKNOWN at the start of KVM_RUN
+To:     pbonzini@redhat.com, maz@kernel.org
+Cc:     oliver.upton@linux.dev, seanjc@google.com, jthoughton@google.com,
+        bgardon@google.com, dmatlack@google.com, ricarkol@google.com,
+        axelrasmussen@google.com, peterx@redhat.com, kvm@vger.kernel.org,
+        kvmarm@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -72,105 +70,40 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, May 02, 2023, Yan-Jie Wang wrote:
-> The descriptions of certain KVM related kernel parameters can be
-> ambiguous and confusing. They state 'Disable ...,' which implies that
-> setting them to 1 would disable the associated features or options,
-> when in fact the opposite is true.
-> 
-> This commit addresses this issue by revising the descriptions of these
-> parameters to make their intended behavior clear.
+During some testing yesterday I realized that this patch actually
+breaks the self test, causing an error which the later self test
+changes cover up.
 
-Less wrong perhaps, but IMO the actual behavior is still not captured, and from
-a certain perspective the existing "Disable" verbiage better reflects how/when
-most users would actually want to explicitly set a param.
+Running "./demand_paging_test -b 512M -u MINOR -s shmem -v 1" from
+kvm/next (b3c98052d469) with just this patch applies gives the
+following output
 
-Rather than commit one way or the other, what about reworking the descriptions
-using this as a template?  E.g. state that the param controls something, state
-the default and use that to communicate that 1==enabled, and then, when appropriate,
-clarify that KVM disables (or in some cases ignores) params if hardware doesn't
-support the related feature(s).
+> # ./demand_paging_test -b 512M -u MINOR -s shmem -v 1
+> Testing guest mode: PA-bits:ANY, VA-bits:48,  4K pages
+> guest physical test memory: [0x7fcdfffe000, 0x7fcffffe000)
+> Finished creating vCPUs and starting uffd threads
+> Started all vCPUs
+> ==== Test Assertion Failure ====
+>  demand_paging_test.c:50: false
+>  pid=13293 tid=13297 errno=4 - Interrupted system call
+>  // Some stack trace stuff
+>  Invalid guest sync status: exit_reason=UNKNOWN, ucall=0
 
-	kvm-intel.ept=	[KVM,Intel] Control KVM's use of Extended Page Tables,
-			a.k.a. Two-Dimensional Page Tables.  Default is 1
-			(enabled).  Disabled by KVM if hardware lacks support
-			for EPT.
+The problem is the get_ucall() part of the following block in the self
+test's vcpu_worker()
 
-> 
-> Signed-off-by: Yan-Jie Wang <yanjiewtw@gmail.com>
-> ---
->  Documentation/admin-guide/kernel-parameters.txt | 16 ++++++++--------
->  1 file changed, 8 insertions(+), 8 deletions(-)
-> 
-> diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
-> index 9e5bab29685f..cc5abb3d54b9 100644
-> --- a/Documentation/admin-guide/kernel-parameters.txt
-> +++ b/Documentation/admin-guide/kernel-parameters.txt
-> @@ -2552,10 +2552,10 @@
->  			on the ratio, such that a page is zapped after 1 hour on average.
->  
->  	kvm-amd.nested=	[KVM,AMD] Allow nested virtualization in KVM/SVM.
+> ret = _vcpu_run(vcpu);
+> TEST_ASSERT(ret == 0, "vcpu_run failed: %d\n", ret);
+> if (get_ucall(vcpu, NULL) != UCALL_SYNC) {
+>    TEST_ASSERT(false,
+>                               "Invalid guest sync status: exit_reason=%s\n",
+>                               exit_reason_str(run->exit_reason));
+> }
 
-Eh, I don't see any reason to have this one say "allow" instead of "enable/disable".
+I took a look and, while get_ucall() does depend on the value of
+exit_reason, the error's root cause isn't clear to me yet.
 
-> -			Default is 1 (enabled)
-> +			Default is 1 (allow)
->  
-> -	kvm-amd.npt=	[KVM,AMD] Disable nested paging (virtualized MMU)
-> -			for all guests.
-> +	kvm-amd.npt=	[KVM,AMD] Enable nested paging (virtualized MMU)
-> +			for all guests on capable AMD chips.
->  			Default is 1 (enabled) if in 64-bit or 32-bit PAE mode.
->  
->  	kvm-arm.mode=
-> @@ -2602,12 +2602,12 @@
->  			Format: <integer>
->  			Default: 5
->  
-> -	kvm-intel.ept=	[KVM,Intel] Disable extended page tables
-> +	kvm-intel.ept=	[KVM,Intel] Enable extended page tables
->  			(virtualized MMU) support on capable Intel chips.
->  			Default is 1 (enabled)
->  
->  	kvm-intel.emulate_invalid_guest_state=
-> -			[KVM,Intel] Disable emulation of invalid guest state.
-> +			[KVM,Intel] Enable emulation of invalid guest state.
->  			Ignored if kvm-intel.enable_unrestricted_guest=1, as
->  			guest state is never invalid for unrestricted guests.
->  			This param doesn't apply to nested guests (L2), as KVM
-> @@ -2615,7 +2615,7 @@
->  			Default is 1 (enabled)
->  
->  	kvm-intel.flexpriority=
-> -			[KVM,Intel] Disable FlexPriority feature (TPR shadow).
-> +			[KVM,Intel] Enable FlexPriority feature (TPR shadow).
->  			Default is 1 (enabled)
->  
->  	kvm-intel.nested=
-> @@ -2623,7 +2623,7 @@
->  			Default is 0 (disabled)
-
-Heh, kvm-intel.nested has been enabled by default for quite some time.  Can you
-fix that up too?
-
->  
->  	kvm-intel.unrestricted_guest=
-> -			[KVM,Intel] Disable unrestricted guest feature
-> +			[KVM,Intel] Enable unrestricted guest feature
->  			(virtualized real and unpaged mode) on capable
->  			Intel chips. Default is 1 (enabled)
->  
-> @@ -2639,7 +2639,7 @@
->  
->  			Default is cond (do L1 cache flush in specific instances)
->  
-> -	kvm-intel.vpid=	[KVM,Intel] Disable Virtual Processor Identification
-> +	kvm-intel.vpid=	[KVM,Intel] Enable Virtual Processor Identification
->  			feature (tagged TLBs) on capable Intel chips.
->  			Default is 1 (enabled)
->  
-> 
-> base-commit: 865fdb08197e657c59e74a35fa32362b12397f58
-> -- 
-> 2.34.1
-> 
+Moving the "exit_reason = kvm_exit_unknown" line to later in the
+function, right above the vcpu_run() call "fixes" the problem. I've
+done that for now and will bisect later to investigate: if anyone
+has any clues please let me know.
