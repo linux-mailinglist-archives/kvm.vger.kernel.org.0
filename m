@@ -2,193 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AE4786F49A2
-	for <lists+kvm@lfdr.de>; Tue,  2 May 2023 20:22:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A7F7C6F49E4
+	for <lists+kvm@lfdr.de>; Tue,  2 May 2023 20:47:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233271AbjEBSWM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 May 2023 14:22:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55950 "EHLO
+        id S229497AbjEBSrU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 May 2023 14:47:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36978 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229586AbjEBSWK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 2 May 2023 14:22:10 -0400
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2075.outbound.protection.outlook.com [40.107.92.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AAD9F129;
-        Tue,  2 May 2023 11:22:07 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=k+vNyNjIbs2mfKLss3+oDrKyBZ/Hj4AWmF8WdM6BIP7lpFa6h7QzHDIHMFftWZAZqr0jD+dJw2BXDFnPbvrrqtfISWr4hafy8MaffFri0blEF8fonok1PFvHvlDMx/durjtXFtjTwhLo13YbHR0CXz5YDaxiXcXjc4nQ4jRHY98UcdD0BcpO6rS4I9xxJBROLWrpLYdhp7vQ5n9sBLtCbnN7CMAKITwMT8THXwlIkjax78oatzBwmdCtoMIqbqpp3o63t2XW4I3AAOax9W8vimo39VL5iGjs6mE4IotymPYQFeH/dMyPlHidw5RuU7Bgf7tJ1u7hoE7J0qCFM1dYKA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=7bAwkeqVJWmMdHCilcQtUPKdVLV/3t1pv9kHNji3qvg=;
- b=cQ1cCWc5agJm/Cl3e/7ngz45psVcM3YkJDAu0Y4nD84W/5aLcAYmEk/PPJuLU+YgzgvOWdV/CaQcgnXLuXG/a097ShCNFpW2HEyGZ4JsneOfHuhtRGOR0fBBok+FcWaI7QFgaWZ9LS1tcy7AMURrZl3am+qSTLa03UMOFJA0uHCfU8vCvX2ciqmIsA9a/CGPHoO5xd9meEx370iyTtwjwJA3g22uYd/dcQGLYwu0oo2tInV3Yy7yeKpyK2xMDE+cwUWbgSRu8tarBY3EZX9Fc1aOEVXsU8V0lsMMYAkqizu/1FQ7b5gRICouLbnzk9n8X82br+s2PvX/lNE60M6ztQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=7bAwkeqVJWmMdHCilcQtUPKdVLV/3t1pv9kHNji3qvg=;
- b=g0aYZlTtOWTuLG8+XRpVNVnU28e09NCNdy7/9n9L1qiYyWfNFtCR1ocTuEFC/VgPYtHjSAGlXzE7kLefRUVIS4KKeGEMLGtaSdxBAWgnCXnaHDL72nOoXsLhZmmKJ5gom5dCRxIS2fqOEPDQ4QKPDKhxLqUGhIRj7ei8loubCQIshvoX8vp11TKeXeXpX9vwsmQngxQ6ke9Izn8rTSRY+qKihMixint5A9lbSQ/qAXTcOXNUu023LDSgpmcEXKLbxqatrknQev+CEk6ep7nR8LMU0ad/GPqajgCn/QNlyJ21O51WqWTJzNWWaN+hHJs5Qi7Mx5jb0rkEFbW590yEjQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by DM4PR12MB5391.namprd12.prod.outlook.com (2603:10b6:5:39a::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6340.30; Tue, 2 May
- 2023 18:22:04 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::f7a7:a561:87e9:5fab]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::f7a7:a561:87e9:5fab%6]) with mapi id 15.20.6340.030; Tue, 2 May 2023
- 18:22:04 +0000
-Date:   Tue, 2 May 2023 15:22:02 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Yi Liu <yi.l.liu@intel.com>
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
-        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
-        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "jasowang@redhat.com" <jasowang@redhat.com>,
-        "shameerali.kolothum.thodi@huawei.com" 
-        <shameerali.kolothum.thodi@huawei.com>,
-        "lulu@redhat.com" <lulu@redhat.com>,
-        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
-        "intel-gvt-dev@lists.freedesktop.org" 
-        <intel-gvt-dev@lists.freedesktop.org>,
-        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
-        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-        "Hao, Xudong" <xudong.hao@intel.com>,
-        "Zhao, Yan Y" <yan.y.zhao@intel.com>,
-        "Xu, Terrence" <terrence.xu@intel.com>,
-        "Jiang, Yanting" <yanting.jiang@intel.com>,
-        "Duan, Zhenzhong" <zhenzhong.duan@intel.com>
-Subject: Re: [PATCH v4 2/9] vfio-iommufd: Create iommufd_access for noiommu
- devices
-Message-ID: <ZFFUyhqID+LtUB/D@nvidia.com>
-References: <20230426145419.450922-1-yi.l.liu@intel.com>
- <20230426145419.450922-3-yi.l.liu@intel.com>
- <BN9PR11MB52768AF474FAB2AF36AC00508C6A9@BN9PR11MB5276.namprd11.prod.outlook.com>
- <DS0PR11MB752972AC1A6030CB442ACF3FC36A9@DS0PR11MB7529.namprd11.prod.outlook.com>
- <20230427123203.22307c4f.alex.williamson@redhat.com>
- <c203f11f-4d9f-cf43-03ab-e41a858bdd92@intel.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c203f11f-4d9f-cf43-03ab-e41a858bdd92@intel.com>
-X-ClientProxiedBy: MN2PR16CA0063.namprd16.prod.outlook.com
- (2603:10b6:208:234::32) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+        with ESMTP id S229492AbjEBSrT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 2 May 2023 14:47:19 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F296173C
+        for <kvm@vger.kernel.org>; Tue,  2 May 2023 11:46:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1683053190;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=m2VDNN7GX+FeD3QyzU7peSzD1fbVt8nTpAgV/GryMXg=;
+        b=CDtZli7qNaUyvSitZJlNZjTBUBVOVxsyY3jI6/qBTL+0h4DY8Q9tnnrDPfrFWW/xSXxoq1
+        Qx6W9uqiwWEAnVD8QHSxUUO26372NYyg+Igotoaud6Z/TyYx7TOoS4JpTIy7cgSUuhqob5
+        rQcj1Wzi8J3imlvTTywekWIHRKv/2Hc=
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com
+ [209.85.166.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-503-tmzo8nJYNLijOhyDSJo8lQ-1; Tue, 02 May 2023 14:46:29 -0400
+X-MC-Unique: tmzo8nJYNLijOhyDSJo8lQ-1
+Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-76359b8d29dso621026839f.1
+        for <kvm@vger.kernel.org>; Tue, 02 May 2023 11:46:29 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1683053188; x=1685645188;
+        h=content-transfer-encoding:mime-version:message-id:subject:cc:to
+         :from:date:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=m2VDNN7GX+FeD3QyzU7peSzD1fbVt8nTpAgV/GryMXg=;
+        b=L+4e5MQcZSuOscwQdgPDsV24b7J/UGk9aW2VEvibFxj9BaIB3qtNHAHhcMvRoj2RKm
+         S3wIXUUfvdMcemuBsrk/FeBXNh8L7dQJ0g48pM5uyQrQOXu/wbSxtS86l8AJbjzYW3Kh
+         q/EBR9S0am1rynVFS78LBVY27NNjaNB7yXkLJ1Z5Z4DOCFW1xYJVNhiZU77ArMeWa3YW
+         85FHwLvVe9UOPGZCHhhMZ9HDzZe7xQjQloXxVPPMzH7xLmg3MOy4K7jwPYnJC8MUELax
+         MAsaN6Q5WNyhkmgN6w/5rtPrfLzESBUjoZlEdzGltaCbnpOJNoVxf64CKjr2S5kmGqwa
+         HJJg==
+X-Gm-Message-State: AC+VfDx/Fww4dRkyf9bu9JVs0Y+Om/p6VSJXP8AWrHgLJHflU9vn9Pfq
+        ZFNosnxfDy1ZvLyRtWXS7t9Tz26hx6IkTZfOY8XHzTqAta4UmhMRY4KLBdKCGTNP4np9ISatFJP
+        9yf6zfjfwLfVkHs5/DKC/
+X-Received: by 2002:a5d:924e:0:b0:766:59fe:11f3 with SMTP id e14-20020a5d924e000000b0076659fe11f3mr11617137iol.14.1683053188190;
+        Tue, 02 May 2023 11:46:28 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ7dq4rSAg8BfqQuD4Y3U0R8u3tH8wzcOS0ObF5dTvXP+f6FdH9JDWt6Gm2UyiVtwUWCGfaU7Q==
+X-Received: by 2002:a5d:924e:0:b0:766:59fe:11f3 with SMTP id e14-20020a5d924e000000b0076659fe11f3mr11617124iol.14.1683053187890;
+        Tue, 02 May 2023 11:46:27 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id a25-20020a6b6c19000000b0075c37601b5csm8625436ioh.4.2023.05.02.11.46.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 02 May 2023 11:46:27 -0700 (PDT)
+Date:   Tue, 2 May 2023 12:46:25 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: [GIT PULL] VFIO updates for v6.4-rc1
+Message-ID: <20230502124625.355ec05e.alex.williamson@redhat.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|DM4PR12MB5391:EE_
-X-MS-Office365-Filtering-Correlation-Id: c07b167c-c1a0-43da-dadb-08db4b3a2151
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: reKGePkC37v3AB4G/WFcg18oQf9gMxt3D3PeeJ284eAaLke32PU9NdDgn890ezC9ejmTZ471FKVYJ5YHjzMK+sazlEriWw0GJdfiNiGYYifPxOBTTRY0yLBl8+EopmQKZR3hItkA1zHpfnJyPjCkxDEBNWm13vm1DYzR2qiptqL07E3MEPs3LnC+saday+95Z/EzJJ6vihwlOltY2okNl/E3iLSMA/+afE18LA1mlfhrQAZVsSUwgicSeLgd+cGHPQgSAtcS7bkXd7QKF8IM5TrMNHBltwNNPmoajErtSmK4KwaxTa80SSCRqOLQnGXEEiUaE20gIUKz6JmjIs/kSXaJD3US0HO44C11edwv0eX0OsKJYCHF0TNLXNcn6QtPT0CF0eR1N5PSV9XVyrt8KNBRX9+PWbPk7Qd33G2MNujHHs9PR/8PgdmJ7znCst+EWbO8tKuVLE5rrq2UA1TOOJmTZlsM2KU45tv9tefiGc1aZ8s99MPz5aGQt3fvk32x32y+g3gkD8h928inMRfSl4z57g6eXCOvDLsU+2WFkgst/nZvfwH4JEVNajJExGl/9eZgQ9ME8Tamg9tIA3sOg61T5rfO/yYfOpg75PLqaKyMicAxxIUFNGkt6UqkFm8MPZEYl3utqqj0jJtDk7WPww==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(39860400002)(366004)(346002)(396003)(376002)(136003)(451199021)(8676002)(8936002)(26005)(2616005)(38100700002)(6506007)(6512007)(478600001)(5660300002)(7416002)(36756003)(316002)(2906002)(54906003)(186003)(86362001)(6486002)(83380400001)(66556008)(66476007)(6916009)(4326008)(66946007)(41300700001)(966005);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?JCc3NtZVoIu8DTlQ3PT02227w0+mdbC4vLzmDmnXDym3s/QXE5dzbNz4J3rp?=
- =?us-ascii?Q?wcOMYaKmNp3G08cea0sM6WzMgeh8gcUdhKsJpFzy4/BvZE2q0xP+/I/3xSRe?=
- =?us-ascii?Q?AF6LJwvTUAIoD9yWOGQdNDlzDvIEe6PYeCi7WBCIsjxc4J0L2x54b4GdDsZJ?=
- =?us-ascii?Q?4X7p7NuM/tKmh5duRjGuyBF5cVducbUUwjFiu8uiiXUkRSGU8WG2U8MnjY53?=
- =?us-ascii?Q?6FNYdhld9yPFNDF+6Pw+9TZNjc8hEw4cAPabNvDn3iLivox2Q3rNvCY7MmT3?=
- =?us-ascii?Q?Injlu+hYUew8/MdkPyHlVOqPrszED0RyMQOMKrd70+WpCaQhcavy3r9YpvOM?=
- =?us-ascii?Q?KXfMzHrzjHcMs6fMeEtVefKyz0E2zyhQcWPGnVx2hqTOh19U6R4hRLRi4KRB?=
- =?us-ascii?Q?vAAyV8RL6UclosdwYt1cAO2Nq/BKRZbOB5QlOqoDj/Ck0DR0hYSn9Khg/0FL?=
- =?us-ascii?Q?jLpqTVNWq+IJ05Jz2Z4CGtulZJYim0h2ipOsg5TcNS+ll1JihyxZS3PbLoO2?=
- =?us-ascii?Q?MeVcQQBBjgA9Xvize5vxvmf/ewzOLFIQXxwOt7UEccrFiGyIdoX3wNvkjVfs?=
- =?us-ascii?Q?dGBLEcEpEPvgrl6gOYKRyoEGD6rGjtaYOKjy3Nq2g/JexXqIsz037hiNUSmO?=
- =?us-ascii?Q?t0itkHky2GDQAMJvvMyqZK45SZcP4DfbfikEh8+IcNX5Geu0LTvwIOBBvu71?=
- =?us-ascii?Q?6a541uy8gCKKz63T+cdlQuuhk7r1VHZ0NpNuqsTr/uBXL6fcvFOnnDZSKlzG?=
- =?us-ascii?Q?BWJ4278RJp/Kz6o5TPL2RCo+J/3MfnyKV5IZy5HAaig0odY0rTp17SWNWUbX?=
- =?us-ascii?Q?TUgC7L43fkNDBfCgoFHH3Q/zLcEpizT9sMQCsjBBhPuLTHm0moFCkXSRV8Dg?=
- =?us-ascii?Q?2j+3QF590+7y/MB8r9X7rUeYOr2kgQ3mrNQeztdrbyF50xZZFPJTey2lsjx6?=
- =?us-ascii?Q?+go+R/vd6Jghl5kp1h7stp3Eb8STOmyLDEYmlc3ESO7126ZWWiCpvnt9/TFq?=
- =?us-ascii?Q?q1k+gNOuMY+b/d756j/+YYTCy9MNGdhhqehYOLlxtj2KzW7F4nZcxhqlnSon?=
- =?us-ascii?Q?Y+Na6G9wzWggAo2yCkFUpYgBhHqnpJwWaCfGCi5YxzWRJEv787GMYmfe4nvo?=
- =?us-ascii?Q?YCa20HwwrevcnVZyB4hRfptqsCWFKZfQQ6BF45ULGxm/Bu2hXmvwfBpGV8F+?=
- =?us-ascii?Q?TokM3VxRCHnoukL0JT9pkk+funh1P1bJhujXMNK+Ti67djHS19LBb4bJPkMp?=
- =?us-ascii?Q?dIhux+nRXTO19pt61N/UHEhG1jyHX62AHzODfoFd4gH6TpcAiPVqX3FUec4y?=
- =?us-ascii?Q?uI4hDXBAWVWmLHTcbeApc7lHd4ybRXi+PhZvJaQ94zCB2G1ONes2RfFfO2rJ?=
- =?us-ascii?Q?61iE0h5KdBVb0pItnITircRGssjXzayUkHSmQ/sN8IzoqJBwfA95nHKddxcS?=
- =?us-ascii?Q?QVrDYwp1MhyXqgn2LBteLbCNh0XSBc8ThVx9OLJUKINNYBEYR9rjSC+S/uKv?=
- =?us-ascii?Q?4z+5kO3O192hPKcvLGCzjyuK/DsDSyZNwxXa6beDJ9AIG5rYjYsb6gjH475h?=
- =?us-ascii?Q?Tit2hzpr1NHKCxQ7nKUooSlLyTwCuWPcLcZvhFRz?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c07b167c-c1a0-43da-dadb-08db4b3a2151
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 May 2023 18:22:04.4512
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Xu6tnyuKl+TSiVVMQNgH+eLYvROvut9vFBpAk7NAg4r/Tu56xWmCCnzSHUTe0/vM
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB5391
-X-Spam-Status: No, score=-1.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Apr 29, 2023 at 12:13:39AM +0800, Yi Liu wrote:
+Hi Linus,
 
-> > Whoa, noiommu is inherently unsafe an only meant to expose the vfio
-> > device interface for userspace drivers that are going to do unsafe
-> > things regardless.  Enabling noiommu to work with mdev, pin pages, or
-> > anything else should not be on our agenda.  Userspaces relying on niommu
-> > get the minimum viable interface and must impose a minuscule
-> > incremental maintenance burden.  The only reason we're spending so much
-> > effort on it here is to make iommufd noiommu support equivalent to
-> > group/container noiommu support.  We should stop at that.  Thanks,
-> 
-> btw. I asked a question in [1] to check if we should allow attach/detach
-> on noiommu devices. Jason has replied it. If in future noiommu userspace
-> can pin page, then such userspace will need to attach/detach ioas. So I
-> made cdev series[2] to allow attach ioas on noiommu devices. Supporting
-> it from cdev day-1 may avoid probing if attach/detach is supported or
-> not for specific devices when adding pin page for noiommu userspace.
-> 
-> But now, I think such a support will not in plan, is it? If so, will it
-> be better to disallow attach/detach on noiommu devices in patch [2]?
-> 
-> [1] https://lore.kernel.org/kvm/ZEa+khH0tUFStRMW@nvidia.com/
-> [2] https://lore.kernel.org/kvm/20230426150321.454465-21-yi.l.liu@intel.com/
+The following changes since commit 09a9639e56c01c7a00d6c0ca63f4c7c41abe075d:
 
-If we block it then userspace has to act quite differently, I think we
-should keep it.
+  Linux 6.3-rc6 (2023-04-09 11:15:57 -0700)
 
-My general idea to complete the no-iommu feature is to add a new IOCTL
-to VFIO that is 'pin iova and return dma addr' that no-iommu userspace
-would call instead of trying to abuse mlock and /proc/ to do it. That
-ioctl would use the IOAS attached to the access just like a mdev would
-do, so it has a real IOVA, but it is not a mdev.
+are available in the Git repository at:
 
-unmap callback just does nothing, as Alex says it is all still totally
-unsafe.
+  https://github.com/awilliam/linux-vfio.git tags/vfio-v6.4-rc1
 
-This just allows it use the mm a little more properly and safely (eg
-mlock() doesn't set things like page_maybe_dma_pinned(), proc doesn't
-reject things like DAX and it currently doesn't make an adjustment for
-the PCI offset stuff..) So it would make DPDK a little more robust,
-portable and make the whole VFIO no-iommu feature much easier to use.
+for you to fetch changes up to 705b004ee377b789e39ae237519bab714297ac83:
 
-To do that we need an iommufd access, an access ID and we need to link
-the current IOAS to the special access, like mdev, but in any mdev
-code paths.
+  docs: kvm: vfio: Suggest KVM_DEV_VFIO_GROUP_ADD vs VFIO_GROUP_GET_DEVICE_FD ordering (2023-04-21 13:48:44 -0600)
 
-That creating the access ID solves the reset problem as well is a nice
-side effect and is the only part of this you should focus on for now..
+----------------------------------------------------------------
+VFIO updates for v6.4-rc1
 
-Jason
+ - Expose and allow R/W access to the PCIe DVSEC capability through
+   vfio-pci, as we already do with the legacy vendor capability.
+   (K V P Satyanarayana)
+
+ - Fix kernel-doc issues with structure definitions. (Simon Horman)
+
+ - Clarify ordering of operations relative to the kvm-vfio device for
+   driver dependencies against the kvm pointer. (Yi Liu)
+
+----------------------------------------------------------------
+K V P, Satyanarayana (1):
+      vfio/pci: Add DVSEC PCI Extended Config Capability to user visible list.
+
+Simon Horman (1):
+      vfio: correct kdoc for ops structures
+
+Yi Liu (1):
+      docs: kvm: vfio: Suggest KVM_DEV_VFIO_GROUP_ADD vs VFIO_GROUP_GET_DEVICE_FD ordering
+
+ Documentation/virt/kvm/devices/vfio.rst | 5 +++++
+ drivers/vfio/pci/vfio_pci_config.c      | 7 +++++++
+ include/linux/vfio.h                    | 5 +++++
+ 3 files changed, 17 insertions(+)
+
