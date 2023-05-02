@@ -2,35 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BD27A6F43BA
-	for <lists+kvm@lfdr.de>; Tue,  2 May 2023 14:23:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 45E566F43F7
+	for <lists+kvm@lfdr.de>; Tue,  2 May 2023 14:40:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233973AbjEBMXo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 May 2023 08:23:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48512 "EHLO
+        id S233724AbjEBMkO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 May 2023 08:40:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56246 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233823AbjEBMXm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 2 May 2023 08:23:42 -0400
-Received: from 3.mo548.mail-out.ovh.net (3.mo548.mail-out.ovh.net [188.165.32.156])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 754421992
-        for <kvm@vger.kernel.org>; Tue,  2 May 2023 05:23:37 -0700 (PDT)
-Received: from mxplan5.mail.ovh.net (unknown [10.108.4.108])
-        by mo548.mail-out.ovh.net (Postfix) with ESMTPS id BD3F3216A4;
-        Tue,  2 May 2023 12:05:04 +0000 (UTC)
-Received: from kaod.org (37.59.142.101) by DAG4EX2.mxp5.local (172.16.2.32)
+        with ESMTP id S229703AbjEBMkN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 2 May 2023 08:40:13 -0400
+X-Greylist: delayed 600 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 02 May 2023 05:40:10 PDT
+Received: from smtpout3.mo529.mail-out.ovh.net (smtpout3.mo529.mail-out.ovh.net [46.105.54.81])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E55B59CF
+        for <kvm@vger.kernel.org>; Tue,  2 May 2023 05:40:10 -0700 (PDT)
+Received: from mxplan5.mail.ovh.net (unknown [10.109.143.128])
+        by mo529.mail-out.ovh.net (Postfix) with ESMTPS id 289DF204B0;
+        Tue,  2 May 2023 12:30:08 +0000 (UTC)
+Received: from kaod.org (37.59.142.109) by DAG4EX2.mxp5.local (172.16.2.32)
  with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.23; Tue, 2 May
- 2023 14:05:03 +0200
-Authentication-Results: garm.ovh; auth=pass (GARM-101G004b2203f63-873e-4689-8c2e-25fe424d644d,
+ 2023 14:30:06 +0200
+Authentication-Results: garm.ovh; auth=pass (GARM-109S00366b78b0a-27e0-4a41-96fb-e948b135a5d0,
                     E090D36E4DC625C434D5D892E9869795142AB5A1) smtp.auth=clg@kaod.org
 X-OVh-ClientIp: 82.64.250.170
-Message-ID: <0e575143-573f-9363-d8dc-103bb819d15b@kaod.org>
-Date:   Tue, 2 May 2023 14:05:02 +0200
+Message-ID: <7940b2d6-8b72-18e8-83a6-de3f122e416e@kaod.org>
+Date:   Tue, 2 May 2023 14:30:05 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.10.0
-Subject: Re: [PATCH v20 01/21] s390x/cpu topology: add s390 specifics to CPU
- topology
+Subject: Re: [PATCH v20 02/21] s390x/cpu topology: add topology entries on CPU
+ hotplug
+Content-Language: en-US
 To:     Pierre Morel <pmorel@linux.ibm.com>, <qemu-s390x@nongnu.org>
 CC:     <qemu-devel@nongnu.org>, <borntraeger@de.ibm.com>,
         <pasic@linux.ibm.com>, <richard.henderson@linaro.org>,
@@ -41,24 +43,23 @@ CC:     <qemu-devel@nongnu.org>, <borntraeger@de.ibm.com>,
         <nrb@linux.ibm.com>, <nsg@linux.ibm.com>, <frankja@linux.ibm.com>,
         <berrange@redhat.com>
 References: <20230425161456.21031-1-pmorel@linux.ibm.com>
- <20230425161456.21031-2-pmorel@linux.ibm.com>
-Content-Language: en-US
+ <20230425161456.21031-3-pmorel@linux.ibm.com>
 From:   =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-In-Reply-To: <20230425161456.21031-2-pmorel@linux.ibm.com>
+In-Reply-To: <20230425161456.21031-3-pmorel@linux.ibm.com>
 Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [37.59.142.101]
-X-ClientProxiedBy: DAG2EX1.mxp5.local (172.16.2.11) To DAG4EX2.mxp5.local
+X-Originating-IP: [37.59.142.109]
+X-ClientProxiedBy: DAG3EX1.mxp5.local (172.16.2.21) To DAG4EX2.mxp5.local
  (172.16.2.32)
-X-Ovh-Tracer-GUID: 55cdda68-7b3a-499e-8654-3ea4d17452fa
-X-Ovh-Tracer-Id: 18190038896215690195
+X-Ovh-Tracer-GUID: dea70006-99a5-4826-a619-161abf994892
+X-Ovh-Tracer-Id: 166351712654887891
 X-VR-SPAMSTATE: OK
 X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedvhedrfedviedggeejucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepkfffgggfuffvvehfhfgjtgfgihesthejredttdefjeenucfhrhhomhepveorughrihgtucfnvgcuifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpeeuuddtteelgeejhfeikeegffekhfelvefgfeejveffjeeiveegfeehgfdtgfeitdenucfkphepuddvjedrtddrtddruddpfeejrdehledrudegvddruddtuddpkedvrdeigedrvdehtddrudejtdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpeduvdejrddtrddtrddupdhmrghilhhfrhhomhepoegtlhhgsehkrghougdrohhrgheqpdhnsggprhgtphhtthhopedupdhrtghpthhtohepphhmohhrvghlsehlihhnuhigrdhisghmrdgtohhmpdhnshhgsehlihhnuhigrdhisghmrdgtohhmpdhnrhgssehlihhnuhigrdhisghmrdgtohhmpdhsvghiuggvnheslhhinhhugidrihgsmhdrtghomhdprghrmhgsrhhusehrvgguhhgrthdrtghomhdpvggslhgrkhgvsehrvgguhhgrthdrtghomhdpmhgrrhgtvghlrdgrphhfvghlsggruhhmsehgmhgrihhlrdgtohhmpdgvhhgrsghkohhsthesrhgvughhrghtrdgtohhmpdhkvhhmsehvgh
- gvrhdrkhgvrhhnvghlrdhorhhgpdhfrhgrnhhkjhgrsehlihhnuhigrdhisghmrdgtohhmpdhpsghonhiiihhnihesrhgvughhrghtrdgtohhmpdgtohhhuhgtkhesrhgvughhrghtrdgtohhmpdhthhhuthhhsehrvgguhhgrthdrtghomhdpuggrvhhiugesrhgvughhrghtrdgtohhmpdhrihgthhgrrhgurdhhvghnuggvrhhsohhnsehlihhnrghrohdrohhrghdpphgrshhitgeslhhinhhugidrihgsmhdrtghomhdpsghorhhnthhrrggvghgvrhesuggvrdhisghmrdgtohhmpdhqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhgpdhqvghmuhdqshefledtgiesnhhonhhgnhhurdhorhhgpdhmshhtsehrvgguhhgrthdrtghomhdpsggvrhhrrghnghgvsehrvgguhhgrthdrtghomhdpoffvtefjohhsthepmhhoheegkedpmhhouggvpehsmhhtphhouhht
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedvhedrfedviedghedvucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepkfffgggfuffvvehfhfgjtgfgihesthejredttdefjeenucfhrhhomhepveorughrihgtucfnvgcuifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpeeuuddtteelgeejhfeikeegffekhfelvefgfeejveffjeeiveegfeehgfdtgfeitdenucfkphepuddvjedrtddrtddruddpfeejrdehledrudegvddruddtledpkedvrdeigedrvdehtddrudejtdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpeduvdejrddtrddtrddupdhmrghilhhfrhhomhepoegtlhhgsehkrghougdrohhrgheqpdhnsggprhgtphhtthhopedupdhrtghpthhtohepphhmohhrvghlsehlihhnuhigrdhisghmrdgtohhmpdhnshhgsehlihhnuhigrdhisghmrdgtohhmpdhnrhgssehlihhnuhigrdhisghmrdgtohhmpdhsvghiuggvnheslhhinhhugidrihgsmhdrtghomhdprghrmhgsrhhusehrvgguhhgrthdrtghomhdpvggslhgrkhgvsehrvgguhhgrthdrtghomhdpmhgrrhgtvghlrdgrphhfvghlsggruhhmsehgmhgrihhlrdgtohhmpdgvhhgrsghkohhsthesrhgvughhrghtrdgtohhmpdhkvhhmsehvgh
+ gvrhdrkhgvrhhnvghlrdhorhhgpdhfrhgrnhhkjhgrsehlihhnuhigrdhisghmrdgtohhmpdhpsghonhiiihhnihesrhgvughhrghtrdgtohhmpdgtohhhuhgtkhesrhgvughhrghtrdgtohhmpdhthhhuthhhsehrvgguhhgrthdrtghomhdpuggrvhhiugesrhgvughhrghtrdgtohhmpdhrihgthhgrrhgurdhhvghnuggvrhhsohhnsehlihhnrghrohdrohhrghdpphgrshhitgeslhhinhhugidrihgsmhdrtghomhdpsghorhhnthhrrggvghgvrhesuggvrdhisghmrdgtohhmpdhqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhgpdhqvghmuhdqshefledtgiesnhhonhhgnhhurdhorhhgpdhmshhtsehrvgguhhgrthdrtghomhdpsggvrhhrrghnghgvsehrvgguhhgrthdrtghomhdpoffvtefjohhsthepmhhohedvledpmhhouggvpehsmhhtphhouhht
 X-Spam-Status: No, score=-3.3 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
@@ -66,516 +67,455 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 4/25/23 18:14, Pierre Morel wrote:
-> S390 adds two new SMP levels, drawers and books to the CPU
-> topology.
-> The S390 CPU have specific topology features like dedication
-> and entitlement to give to the guest indications on the host
-> vCPUs scheduling and help the guest take the best decisions
-> on the scheduling of threads on the vCPUs.
+> The topology information are attributes of the CPU and are
+> specified during the CPU device creation.
 > 
-> Let us provide the SMP properties with books and drawers levels
-> and S390 CPU with dedication and entitlement,
+> On hot plug we:
+> - calculate the default values for the topology for drawers,
+>    books and sockets in the case they are not specified.
+> - verify the CPU attributes
+> - check that we have still room on the desired socket
+> 
+> The possibility to insert a CPU in a mask is dependent on the
+> number of cores allowed in a socket, a book or a drawer, the
+> checking is done during the hot plug of the CPU to have an
+> immediate answer.
+> 
+> If the complete topology is not specified, the core is added
+> in the physical topology based on its core ID and it gets
+> defaults values for the modifier attributes.
+> 
+> This way, starting QEMU without specifying the topology can
+> still get some advantage of the CPU topology.
+> 
+> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+> ---
+>   MAINTAINERS                     |   6 +
+>   include/hw/s390x/cpu-topology.h |  55 +++++++
+>   hw/s390x/cpu-topology.c         | 259 ++++++++++++++++++++++++++++++++
+>   hw/s390x/s390-virtio-ccw.c      |  22 ++-
+>   hw/s390x/meson.build            |   1 +
+>   5 files changed, 341 insertions(+), 2 deletions(-)
+>   create mode 100644 include/hw/s390x/cpu-topology.h
+>   create mode 100644 hw/s390x/cpu-topology.c
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 5340de0515..bb7b34d0d8 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -1654,6 +1654,12 @@ F: hw/s390x/event-facility.c
+>   F: hw/s390x/sclp*.c
+>   L: qemu-s390x@nongnu.org
+>   
+> +S390 CPU topology
+> +M: Pierre Morel <pmorel@linux.ibm.com>
+> +S: Supported
+> +F: include/hw/s390x/cpu-topology.h
+> +F: hw/s390x/cpu-topology.c
+> +
+>   X86 Machines
+>   ------------
+>   PC
+> diff --git a/include/hw/s390x/cpu-topology.h b/include/hw/s390x/cpu-topology.h
+> new file mode 100644
+> index 0000000000..af36f634e0
+> --- /dev/null
+> +++ b/include/hw/s390x/cpu-topology.h
+> @@ -0,0 +1,55 @@
+> +/* SPDX-License-Identifier: GPL-2.0-or-later */
+> +/*
+> + * CPU Topology
+> + *
+> + * Copyright IBM Corp. 2022,2023
+> + * Author(s): Pierre Morel <pmorel@linux.ibm.com>
+> + *
+> + */
+> +#ifndef HW_S390X_CPU_TOPOLOGY_H
+> +#define HW_S390X_CPU_TOPOLOGY_H
+> +
+> +#ifndef CONFIG_USER_ONLY
+> +
+> +#include "qemu/queue.h"
+> +#include "hw/boards.h"
+> +#include "qapi/qapi-types-machine-target.h"
+> +
+> +typedef struct S390Topology {
+> +    uint8_t *cores_per_socket;
+> +    CpuTopology *smp;
+> +} S390Topology;
+> +
+> +#ifdef CONFIG_KVM
+> +bool s390_has_topology(void);
+> +void s390_topology_setup_cpu(MachineState *ms, S390CPU *cpu, Error **errp);
+> +#else
+> +static inline bool s390_has_topology(void)
+> +{
+> +       return false;
+> +}
+> +static inline void s390_topology_setup_cpu(MachineState *ms,
+> +                                           S390CPU *cpu,
+> +                                           Error **errp) {}
+> +#endif
+> +
+> +extern S390Topology s390_topology;
+> +
+> +static inline int s390_std_socket(int n, CpuTopology *smp)
+> +{
+> +    return (n / smp->cores) % smp->sockets;
+> +}
+> +
+> +static inline int s390_std_book(int n, CpuTopology *smp)
+> +{
+> +    return (n / (smp->cores * smp->sockets)) % smp->books;
+> +}
+> +
+> +static inline int s390_std_drawer(int n, CpuTopology *smp)
+> +{
+> +    return (n / (smp->cores * smp->sockets * smp->books)) % smp->drawers;
+> +}
+> +
+> +#endif /* CONFIG_USER_ONLY */
+> +
+> +#endif
+> diff --git a/hw/s390x/cpu-topology.c b/hw/s390x/cpu-topology.c
+> new file mode 100644
+> index 0000000000..471e0e7292
+> --- /dev/null
+> +++ b/hw/s390x/cpu-topology.c
+> @@ -0,0 +1,259 @@
+> +/* SPDX-License-Identifier: GPL-2.0-or-later */
+> +/*
+> + * CPU Topology
+> + *
+> + * Copyright IBM Corp. 2022,2023
+> + * Author(s): Pierre Morel <pmorel@linux.ibm.com>
+> + *
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "qapi/error.h"
+> +#include "qemu/error-report.h"
+> +#include "hw/qdev-properties.h"
+> +#include "hw/boards.h"
+> +#include "qemu/typedefs.h"
+> +#include "target/s390x/cpu.h"
+> +#include "hw/s390x/s390-virtio-ccw.h"
+> +#include "hw/s390x/cpu-topology.h"
+> +
+> +/*
+> + * s390_topology is used to keep the topology information.
+> + * .cores_per_socket: tracks information on the count of cores
+> + *                    per socket.
+> + * .smp: keeps track of the machine topology.
+> + *
+> + */
+> +S390Topology s390_topology = {
+> +    /* will be initialized after the cpu model is realized */
+> +    .cores_per_socket = NULL,
+> +    .smp = NULL,
+> +};
+> +
+> +/**
+> + * s390_socket_nb:
+> + * @cpu: s390x CPU
+> + *
+> + * Returns the socket number used inside the cores_per_socket array
+> + * for a topology tree entry
+> + */
+> +static int __s390_socket_nb(int drawer_id, int book_id, int socket_id)
+> +{
+> +    return (drawer_id * s390_topology.smp->books + book_id) *
+> +           s390_topology.smp->sockets + socket_id;
+> +}
+> +
+> +/**
+> + * s390_socket_nb:
+> + * @cpu: s390x CPU
+> + *
+> + * Returns the socket number used inside the cores_per_socket array
+> + * for a cpu.
+> + */
+> +static int s390_socket_nb(S390CPU *cpu)
+> +{
+> +    return __s390_socket_nb(cpu->env.drawer_id, cpu->env.book_id,
+> +                            cpu->env.socket_id);
+> +}
+> +
+> +/**
+> + * s390_has_topology:
+> + *
+> + * Return value: if the topology is supported by the machine.
+> + */
+> +bool s390_has_topology(void)
+> +{
+> +    return false;
+> +}
+> +
+> +/**
+> + * s390_topology_init:
+> + * @ms: the machine state where the machine topology is defined
+> + *
+> + * Keep track of the machine topology.
+> + *
+> + * Allocate an array to keep the count of cores per socket.
+> + * The index of the array starts at socket 0 from book 0 and
+> + * drawer 0 up to the maximum allowed by the machine topology.
+> + */
+> +static void s390_topology_init(MachineState *ms)
+> +{
+> +    CpuTopology *smp = &ms->smp;
+> +
+> +    s390_topology.smp = smp;
 
-I think CpuS390Entitlement should be introduced in a separate patch and
-only under target/s390x/cpu.c. It is machine specific and doesn't belong
-to the machine common definitions.
-
-'books' and 'drawers' could also be considered z-specific but High End
-POWER systems (16s) have similar topology concepts, at least for drawers :
-a group of 4 sockets. So let's keep it that way.
-
-
-This problably means you will have to rework the get/set property handlers
-with strcmp() or simply copy the generated lookup struct :
-
-const QEnumLookup CpuS390Entitlement_lookup = {
-     .array = (const char *const[]) {
-         [S390_CPU_ENTITLEMENT_AUTO] = "auto",
-         [S390_CPU_ENTITLEMENT_LOW] = "low",
-         [S390_CPU_ENTITLEMENT_MEDIUM] = "medium",
-         [S390_CPU_ENTITLEMENT_HIGH] = "high",
-     },
-     .size = S390_CPU_ENTITLEMENT__MAX
-};
-
-It should be fine.
+I am not sure the 'smp' shortcut is necessary. 'MachineState *ms' is
+always available where 'CpuTopology *smp' is used. so it could be
+computed from a local variable AFAICT. It would reduce the risk of
+'smp' being NULL in some (future) code path.
 
 Thanks,
 
 C.
 
-> 
-> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
-> ---
->   qapi/machine-common.json            | 22 ++++++++++++
->   qapi/machine-target.json            | 12 +++++++
->   qapi/machine.json                   | 17 +++++++--
->   include/hw/boards.h                 | 10 +++++-
->   include/hw/qdev-properties-system.h |  4 +++
->   target/s390x/cpu.h                  |  6 ++++
->   hw/core/machine-smp.c               | 53 ++++++++++++++++++++++++-----
->   hw/core/machine.c                   |  4 +++
->   hw/core/qdev-properties-system.c    | 13 +++++++
->   hw/s390x/s390-virtio-ccw.c          |  2 ++
->   softmmu/vl.c                        |  6 ++++
->   target/s390x/cpu.c                  |  7 ++++
->   qapi/meson.build                    |  1 +
->   qemu-options.hx                     |  7 ++--
->   14 files changed, 150 insertions(+), 14 deletions(-)
->   create mode 100644 qapi/machine-common.json
-> 
-> diff --git a/qapi/machine-common.json b/qapi/machine-common.json
-> new file mode 100644
-> index 0000000000..bc0d76829c
-> --- /dev/null
-> +++ b/qapi/machine-common.json
-> @@ -0,0 +1,22 @@
-> +# -*- Mode: Python -*-
-> +# vim: filetype=python
-> +#
-> +# This work is licensed under the terms of the GNU GPL, version 2 or later.
-> +# See the COPYING file in the top-level directory.
+> +    s390_topology.cores_per_socket = g_new0(uint8_t, smp->sockets *
+> +                                            smp->books * smp->drawers);
+> +}
 > +
-> +##
-> +# = Machines S390 data types
-> +##
+> +/**
+> + * s390_topology_cpu_default:
+> + * @cpu: pointer to a S390CPU
+> + * @errp: Error pointer
+> + *
+> + * Setup the default topology if no attributes are already set.
+> + * Passing a CPU with some, but not all, attributes set is considered
+> + * an error.
+> + *
+> + * The function calculates the (drawer_id, book_id, socket_id)
+> + * topology by filling the cores starting from the first socket
+> + * (0, 0, 0) up to the last (smp->drawers, smp->books, smp->sockets).
+> + *
+> + * CPU type and dedication have defaults values set in the
+> + * s390x_cpu_properties, entitlement must be adjust depending on the
+> + * dedication.
+> + *
+> + * Returns false if it is impossible to setup a default topology
+> + * true otherwise.
+> + */
+> +static bool s390_topology_cpu_default(S390CPU *cpu, Error **errp)
+> +{
+> +    CpuTopology *smp = s390_topology.smp;
+> +    CPUS390XState *env = &cpu->env;
 > +
-> +##
-> +# @CpuS390Entitlement:
-> +#
-> +# An enumeration of cpu entitlements that can be assumed by a virtual
-> +# S390 CPU
-> +#
-> +# Since: 8.1
-> +##
-> +{ 'enum': 'CpuS390Entitlement',
-> +  'prefix': 'S390_CPU_ENTITLEMENT',
-> +  'data': [ 'auto', 'low', 'medium', 'high' ] }
-> +
-> diff --git a/qapi/machine-target.json b/qapi/machine-target.json
-> index 2e267fa458..42a6a40333 100644
-> --- a/qapi/machine-target.json
-> +++ b/qapi/machine-target.json
-> @@ -342,3 +342,15 @@
->                      'TARGET_S390X',
->                      'TARGET_MIPS',
->                      'TARGET_LOONGARCH64' ] } }
-> +
-> +##
-> +# @CpuS390Polarization:
-> +#
-> +# An enumeration of cpu polarization that can be assumed by a virtual
-> +# S390 CPU
-> +#
-> +# Since: 8.1
-> +##
-> +{ 'enum': 'CpuS390Polarization',
-> +  'prefix': 'S390_CPU_POLARIZATION',
-> +  'data': [ 'horizontal', 'vertical' ] }
-> diff --git a/qapi/machine.json b/qapi/machine.json
-> index 604b686e59..1cdd83f3fd 100644
-> --- a/qapi/machine.json
-> +++ b/qapi/machine.json
-> @@ -9,6 +9,7 @@
->   ##
->   
->   { 'include': 'common.json' }
-> +{ 'include': 'machine-common.json' }
->   
->   ##
->   # @SysEmuTarget:
-> @@ -70,7 +71,7 @@
->   #
->   # @thread-id: ID of the underlying host thread
->   #
-> -# @props: properties describing to which node/socket/core/thread
-> +# @props: properties describing to which node/drawer/book/socket/core/thread
->   #         virtual CPU belongs to, provided if supported by board
->   #
->   # @target: the QEMU system emulation target, which determines which
-> @@ -902,13 +903,15 @@
->   # a CPU is being hotplugged.
->   #
->   # @node-id: NUMA node ID the CPU belongs to
-> -# @socket-id: socket number within node/board the CPU belongs to
-> +# @drawer-id: drawer number within node/board the CPU belongs to (since 8.1)
-> +# @book-id: book number within drawer/node/board the CPU belongs to (since 8.1)
-> +# @socket-id: socket number within book/node/board the CPU belongs to
->   # @die-id: die number within socket the CPU belongs to (since 4.1)
->   # @cluster-id: cluster number within die the CPU belongs to (since 7.1)
->   # @core-id: core number within cluster the CPU belongs to
->   # @thread-id: thread number within core the CPU belongs to
->   #
-> -# Note: currently there are 6 properties that could be present
-> +# Note: currently there are 8 properties that could be present
->   #       but management should be prepared to pass through other
->   #       properties with device_add command to allow for future
->   #       interface extension. This also requires the filed names to be kept in
-> @@ -918,6 +921,8 @@
->   ##
->   { 'struct': 'CpuInstanceProperties',
->     'data': { '*node-id': 'int',
-> +            '*drawer-id': 'int',
-> +            '*book-id': 'int',
->               '*socket-id': 'int',
->               '*die-id': 'int',
->               '*cluster-id': 'int',
-> @@ -1467,6 +1472,10 @@
->   #
->   # @cpus: number of virtual CPUs in the virtual machine
->   #
-> +# @drawers: number of drawers in the CPU topology (since 8.1)
-> +#
-> +# @books: number of books in the CPU topology (since 8.1)
-> +#
->   # @sockets: number of sockets in the CPU topology
->   #
->   # @dies: number of dies per socket in the CPU topology
-> @@ -1483,6 +1492,8 @@
->   ##
->   { 'struct': 'SMPConfiguration', 'data': {
->        '*cpus': 'int',
-> +     '*drawers': 'int',
-> +     '*books': 'int',
->        '*sockets': 'int',
->        '*dies': 'int',
->        '*clusters': 'int',
-> diff --git a/include/hw/boards.h b/include/hw/boards.h
-> index 6fbbfd56c8..9ef0bb76cf 100644
-> --- a/include/hw/boards.h
-> +++ b/include/hw/boards.h
-> @@ -131,12 +131,16 @@ typedef struct {
->    * @clusters_supported - whether clusters are supported by the machine
->    * @has_clusters - whether clusters are explicitly specified in the user
->    *                 provided SMP configuration
-> + * @books_supported - whether books are supported by the machine
-> + * @drawers_supported - whether drawers are supported by the machine
->    */
->   typedef struct {
->       bool prefer_sockets;
->       bool dies_supported;
->       bool clusters_supported;
->       bool has_clusters;
-> +    bool books_supported;
-> +    bool drawers_supported;
->   } SMPCompatProps;
->   
->   /**
-> @@ -301,7 +305,9 @@ typedef struct DeviceMemoryState {
->   /**
->    * CpuTopology:
->    * @cpus: the number of present logical processors on the machine
-> - * @sockets: the number of sockets on the machine
-> + * @drawers: the number of drawers on the machine
-> + * @books: the number of books in one drawer
-> + * @sockets: the number of sockets in one book
->    * @dies: the number of dies in one socket
->    * @clusters: the number of clusters in one die
->    * @cores: the number of cores in one cluster
-> @@ -310,6 +316,8 @@ typedef struct DeviceMemoryState {
->    */
->   typedef struct CpuTopology {
->       unsigned int cpus;
-> +    unsigned int drawers;
-> +    unsigned int books;
->       unsigned int sockets;
->       unsigned int dies;
->       unsigned int clusters;
-> diff --git a/include/hw/qdev-properties-system.h b/include/hw/qdev-properties-system.h
-> index 0ac327ae60..e4f8a13afc 100644
-> --- a/include/hw/qdev-properties-system.h
-> +++ b/include/hw/qdev-properties-system.h
-> @@ -22,6 +22,7 @@ extern const PropertyInfo qdev_prop_audiodev;
->   extern const PropertyInfo qdev_prop_off_auto_pcibar;
->   extern const PropertyInfo qdev_prop_pcie_link_speed;
->   extern const PropertyInfo qdev_prop_pcie_link_width;
-> +extern const PropertyInfo qdev_prop_cpus390entitlement;
->   
->   #define DEFINE_PROP_PCI_DEVFN(_n, _s, _f, _d)                   \
->       DEFINE_PROP_SIGNED(_n, _s, _f, _d, qdev_prop_pci_devfn, int32_t)
-> @@ -73,5 +74,8 @@ extern const PropertyInfo qdev_prop_pcie_link_width;
->   #define DEFINE_PROP_UUID_NODEFAULT(_name, _state, _field) \
->       DEFINE_PROP(_name, _state, _field, qdev_prop_uuid, QemuUUID)
->   
-> +#define DEFINE_PROP_CPUS390ENTITLEMENT(_n, _s, _f, _d) \
-> +    DEFINE_PROP_SIGNED(_n, _s, _f, _d, qdev_prop_cpus390entitlement, \
-> +                       CpuS390Entitlement)
->   
->   #endif
-> diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
-> index 7d6d01325b..bb7cfb0cab 100644
-> --- a/target/s390x/cpu.h
-> +++ b/target/s390x/cpu.h
-> @@ -29,6 +29,7 @@
->   #include "cpu_models.h"
->   #include "exec/cpu-defs.h"
->   #include "qemu/cpu-float.h"
-> +#include "qapi/qapi-types-machine-common.h"
->   
->   #define ELF_MACHINE_UNAME "S390X"
->   
-> @@ -131,6 +132,11 @@ struct CPUArchState {
->   
->   #if !defined(CONFIG_USER_ONLY)
->       uint32_t core_id; /* PoP "CPU address", same as cpu_index */
-> +    int32_t socket_id;
-> +    int32_t book_id;
-> +    int32_t drawer_id;
-> +    bool dedicated;
-> +    CpuS390Entitlement entitlement; /* Used only for vertical polarization */
->       uint64_t cpuid;
->   #endif
->   
-> diff --git a/hw/core/machine-smp.c b/hw/core/machine-smp.c
-> index c3dab007da..77bee06304 100644
-> --- a/hw/core/machine-smp.c
-> +++ b/hw/core/machine-smp.c
-> @@ -30,8 +30,19 @@ static char *cpu_hierarchy_to_string(MachineState *ms)
->   {
->       MachineClass *mc = MACHINE_GET_CLASS(ms);
->       GString *s = g_string_new(NULL);
-> +    const char *multiply = " * ", *prefix = "";
->   
-> -    g_string_append_printf(s, "sockets (%u)", ms->smp.sockets);
-> +    if (mc->smp_props.drawers_supported) {
-> +        g_string_append_printf(s, "drawers (%u)", ms->smp.drawers);
-> +        prefix = multiply;
-> +    }
-> +
-> +    if (mc->smp_props.books_supported) {
-> +        g_string_append_printf(s, "%sbooks (%u)", prefix, ms->smp.books);
-> +        prefix = multiply;
-> +    }
-> +
-> +    g_string_append_printf(s, "%ssockets (%u)", prefix, ms->smp.sockets);
->   
->       if (mc->smp_props.dies_supported) {
->           g_string_append_printf(s, " * dies (%u)", ms->smp.dies);
-> @@ -73,6 +84,8 @@ void machine_parse_smp_config(MachineState *ms,
->   {
->       MachineClass *mc = MACHINE_GET_CLASS(ms);
->       unsigned cpus    = config->has_cpus ? config->cpus : 0;
-> +    unsigned drawers = config->has_drawers ? config->drawers : 0;
-> +    unsigned books   = config->has_books ? config->books : 0;
->       unsigned sockets = config->has_sockets ? config->sockets : 0;
->       unsigned dies    = config->has_dies ? config->dies : 0;
->       unsigned clusters = config->has_clusters ? config->clusters : 0;
-> @@ -85,6 +98,8 @@ void machine_parse_smp_config(MachineState *ms,
->        * explicit configuration like "cpus=0" is not allowed.
->        */
->       if ((config->has_cpus && config->cpus == 0) ||
-> +        (config->has_drawers && config->drawers == 0) ||
-> +        (config->has_books && config->books == 0) ||
->           (config->has_sockets && config->sockets == 0) ||
->           (config->has_dies && config->dies == 0) ||
->           (config->has_clusters && config->clusters == 0) ||
-> @@ -111,6 +126,19 @@ void machine_parse_smp_config(MachineState *ms,
->       dies = dies > 0 ? dies : 1;
->       clusters = clusters > 0 ? clusters : 1;
->   
-> +    if (!mc->smp_props.books_supported && books > 1) {
-> +        error_setg(errp, "books not supported by this machine's CPU topology");
-> +        return;
-> +    }
-> +    books = books > 0 ? books : 1;
-> +
-> +    if (!mc->smp_props.drawers_supported && drawers > 1) {
+> +    /* All geometry topology attributes must be set or all unset */
+> +    if ((env->socket_id < 0 || env->book_id < 0 || env->drawer_id < 0) &&
+> +        (env->socket_id >= 0 || env->book_id >= 0 || env->drawer_id >= 0)) {
 > +        error_setg(errp,
-> +                   "drawers not supported by this machine's CPU topology");
+> +                   "Please define all or none of the topology geometry attributes");
+> +        return false;
+> +    }
+> +
+> +    /* Check if one of the geometry topology is unset */
+> +    if (env->socket_id < 0) {
+> +        /* Calculate default geometry topology attributes */
+> +        env->socket_id = s390_std_socket(env->core_id, smp);
+> +        env->book_id = s390_std_book(env->core_id, smp);
+> +        env->drawer_id = s390_std_drawer(env->core_id, smp);
+> +    }
+> +
+> +    /*
+> +     * When the user specifies the entitlement as 'auto' on the command line,
+> +     * qemu will set the entitlement as:
+> +     * Medium when the CPU is not dedicated.
+> +     * High when dedicated is true.
+> +     */
+> +    if (env->entitlement == S390_CPU_ENTITLEMENT_AUTO) {
+> +        if (env->dedicated) {
+> +            env->entitlement = S390_CPU_ENTITLEMENT_HIGH;
+> +        } else {
+> +            env->entitlement = S390_CPU_ENTITLEMENT_MEDIUM;
+> +        }
+> +    }
+> +    return true;
+> +}
+> +
+> +/**
+> + * s390_topology_check:
+> + * @socket_id: socket to check
+> + * @book_id: book to check
+> + * @drawer_id: drawer to check
+> + * @entitlement: entitlement to check
+> + * @dedicated: dedication to check
+> + * @errp: Error pointer
+> + *
+> + * The function checks if the topology
+> + * attributes fits inside the system topology.
+> + *
+> + * Returns false if the specified topology does not match with
+> + * the machine topology.
+> + */
+> +static bool s390_topology_check(uint16_t socket_id, uint16_t book_id,
+> +                                uint16_t drawer_id, uint16_t entitlement,
+> +                                bool dedicated, Error **errp)
+> +{
+> +    CpuTopology *smp = s390_topology.smp;
+> +    ERRP_GUARD();
+> +
+> +    if (socket_id >= smp->sockets) {
+> +        error_setg(errp, "Unavailable socket: %d", socket_id);
+> +        return false;
+> +    }
+> +    if (book_id >= smp->books) {
+> +        error_setg(errp, "Unavailable book: %d", book_id);
+> +        return false;
+> +    }
+> +    if (drawer_id >= smp->drawers) {
+> +        error_setg(errp, "Unavailable drawer: %d", drawer_id);
+> +        return false;
+> +    }
+> +    if (entitlement >= S390_CPU_ENTITLEMENT__MAX) {
+> +        error_setg(errp, "Unknown entitlement: %d", entitlement);
+> +        return false;
+> +    }
+> +    if (dedicated && (entitlement == S390_CPU_ENTITLEMENT_LOW ||
+> +                      entitlement == S390_CPU_ENTITLEMENT_MEDIUM)) {
+> +        error_setg(errp, "A dedicated cpu implies high entitlement");
+> +        return false;
+> +    }
+> +    return true;
+> +}
+> +
+> +/**
+> + * s390_update_cpu_props:
+> + * @ms: the machine state
+> + * @cpu: the CPU for which to update the properties from the environment.
+> + *
+> + */
+> +static void s390_update_cpu_props(MachineState *ms, S390CPU *cpu)
+> +{
+> +    CpuInstanceProperties *props;
+> +
+> +    props = &ms->possible_cpus->cpus[cpu->env.core_id].props;
+> +
+> +    props->socket_id = cpu->env.socket_id;
+> +    props->book_id = cpu->env.book_id;
+> +    props->drawer_id = cpu->env.drawer_id;
+> +}
+> +
+> +/**
+> + * s390_topology_setup_cpu:
+> + * @ms: MachineState used to initialize the topology structure on
+> + *      first call.
+> + * @cpu: the new S390CPU to insert in the topology structure
+> + * @errp: the error pointer
+> + *
+> + * Called from CPU Hotplug to check and setup the CPU attributes
+> + * before the CPU is inserted in the topology.
+> + * There is no need to update the MTCR explicitely here because it
+> + * will be updated by KVM on creation of the new CPU.
+> + */
+> +void s390_topology_setup_cpu(MachineState *ms, S390CPU *cpu, Error **errp)
+> +{
+> +    ERRP_GUARD();
+> +    int entry;
+> +
+> +    /*
+> +     * We do not want to initialize the topology if the cpu model
+> +     * does not support topology, consequently, we have to wait for
+> +     * the first CPU to be realized, which realizes the CPU model
+> +     * to initialize the topology structures.
+> +     *
+> +     * s390_topology_setup_cpu() is called from the cpu hotplug.
+> +     */
+> +    if (!s390_topology.cores_per_socket) {
+> +        s390_topology_init(ms);
+> +    }
+> +
+> +    if (!s390_topology_cpu_default(cpu, errp)) {
 > +        return;
 > +    }
-> +    drawers = drawers > 0 ? drawers : 1;
 > +
->       /* compute missing values based on the provided ones */
->       if (cpus == 0 && maxcpus == 0) {
->           sockets = sockets > 0 ? sockets : 1;
-> @@ -124,33 +152,41 @@ void machine_parse_smp_config(MachineState *ms,
->               if (sockets == 0) {
->                   cores = cores > 0 ? cores : 1;
->                   threads = threads > 0 ? threads : 1;
-> -                sockets = maxcpus / (dies * clusters * cores * threads);
-> +                sockets = maxcpus /
-> +                          (drawers * books * dies * clusters * cores * threads);
->               } else if (cores == 0) {
->                   threads = threads > 0 ? threads : 1;
-> -                cores = maxcpus / (sockets * dies * clusters * threads);
-> +                cores = maxcpus /
-> +                        (drawers * books * sockets * dies * clusters * threads);
->               }
->           } else {
->               /* prefer cores over sockets since 6.2 */
->               if (cores == 0) {
->                   sockets = sockets > 0 ? sockets : 1;
->                   threads = threads > 0 ? threads : 1;
-> -                cores = maxcpus / (sockets * dies * clusters * threads);
-> +                cores = maxcpus /
-> +                        (drawers * books * sockets * dies * clusters * threads);
->               } else if (sockets == 0) {
->                   threads = threads > 0 ? threads : 1;
-> -                sockets = maxcpus / (dies * clusters * cores * threads);
-> +                sockets = maxcpus /
-> +                          (drawers * books * dies * clusters * cores * threads);
->               }
->           }
->   
->           /* try to calculate omitted threads at last */
->           if (threads == 0) {
-> -            threads = maxcpus / (sockets * dies * clusters * cores);
-> +            threads = maxcpus /
-> +                      (drawers * books * sockets * dies * clusters * cores);
->           }
->       }
->   
-> -    maxcpus = maxcpus > 0 ? maxcpus : sockets * dies * clusters * cores * threads;
-> +    maxcpus = maxcpus > 0 ? maxcpus : drawers * books * sockets * dies *
-> +                                      clusters * cores * threads;
->       cpus = cpus > 0 ? cpus : maxcpus;
->   
->       ms->smp.cpus = cpus;
-> +    ms->smp.drawers = drawers;
-> +    ms->smp.books = books;
->       ms->smp.sockets = sockets;
->       ms->smp.dies = dies;
->       ms->smp.clusters = clusters;
-> @@ -161,7 +197,8 @@ void machine_parse_smp_config(MachineState *ms,
->       mc->smp_props.has_clusters = config->has_clusters;
->   
->       /* sanity-check of the computed topology */
-> -    if (sockets * dies * clusters * cores * threads != maxcpus) {
-> +    if (drawers * books * sockets * dies * clusters * cores * threads !=
-> +        maxcpus) {
->           g_autofree char *topo_msg = cpu_hierarchy_to_string(ms);
->           error_setg(errp, "Invalid CPU topology: "
->                      "product of the hierarchy must match maxcpus: "
-> diff --git a/hw/core/machine.c b/hw/core/machine.c
-> index 1cf6822e06..41c7ba7027 100644
-> --- a/hw/core/machine.c
-> +++ b/hw/core/machine.c
-> @@ -831,6 +831,8 @@ static void machine_get_smp(Object *obj, Visitor *v, const char *name,
->       MachineState *ms = MACHINE(obj);
->       SMPConfiguration *config = &(SMPConfiguration){
->           .has_cpus = true, .cpus = ms->smp.cpus,
-> +        .has_drawers = true, .drawers = ms->smp.drawers,
-> +        .has_books = true, .books = ms->smp.books,
->           .has_sockets = true, .sockets = ms->smp.sockets,
->           .has_dies = true, .dies = ms->smp.dies,
->           .has_clusters = true, .clusters = ms->smp.clusters,
-> @@ -1096,6 +1098,8 @@ static void machine_initfn(Object *obj)
->       /* default to mc->default_cpus */
->       ms->smp.cpus = mc->default_cpus;
->       ms->smp.max_cpus = mc->default_cpus;
-> +    ms->smp.drawers = 1;
-> +    ms->smp.books = 1;
->       ms->smp.sockets = 1;
->       ms->smp.dies = 1;
->       ms->smp.clusters = 1;
-> diff --git a/hw/core/qdev-properties-system.c b/hw/core/qdev-properties-system.c
-> index d42493f630..873fc62f50 100644
-> --- a/hw/core/qdev-properties-system.c
-> +++ b/hw/core/qdev-properties-system.c
-> @@ -1143,3 +1143,16 @@ const PropertyInfo qdev_prop_uuid = {
->       .set   = set_uuid,
->       .set_default_value = set_default_uuid_auto,
->   };
+> +    if (!s390_topology_check(cpu->env.socket_id, cpu->env.book_id,
+> +                             cpu->env.drawer_id, cpu->env.entitlement,
+> +                             cpu->env.dedicated, errp)) {
+> +        return;
+> +    }
 > +
-> +/* --- s390 cpu entitlement policy --- */
+> +    /* Do we still have space in the socket */
+> +    entry = s390_socket_nb(cpu);
+> +    if (s390_topology.cores_per_socket[entry] >= s390_topology.smp->cores) {
+> +        error_setg(errp, "No more space on this socket");
+> +        return;
+> +    }
 > +
-> +QEMU_BUILD_BUG_ON(sizeof(CpuS390Entitlement) != sizeof(int));
+> +    /* Update the count of cores in sockets */
+> +    s390_topology.cores_per_socket[entry] += 1;
 > +
-> +const PropertyInfo qdev_prop_cpus390entitlement = {
-> +    .name  = "CpuS390Entitlement",
-> +    .description = "low/medium (default)/high",
-> +    .enum_table  = &CpuS390Entitlement_lookup,
-> +    .get   = qdev_propinfo_get_enum,
-> +    .set   = qdev_propinfo_set_enum,
-> +    .set_default_value = qdev_propinfo_set_default_value_enum,
-> +};
+> +    /* topology tree is reflected in props */
+> +    s390_update_cpu_props(ms, cpu);
+> +}
 > diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-> index 503f212a31..1a9bcda8b6 100644
+> index 1a9bcda8b6..9df60ac447 100644
 > --- a/hw/s390x/s390-virtio-ccw.c
 > +++ b/hw/s390x/s390-virtio-ccw.c
-> @@ -736,6 +736,8 @@ static void ccw_machine_class_init(ObjectClass *oc, void *data)
->       mc->no_sdcard = 1;
->       mc->max_cpus = S390_MAX_CPUS;
->       mc->has_hotpluggable_cpus = true;
-> +    mc->smp_props.books_supported = true;
-> +    mc->smp_props.drawers_supported = true;
->       assert(!mc->get_hotplug_handler);
->       mc->get_hotplug_handler = s390_get_hotplug_handler;
->       mc->cpu_index_to_instance_props = s390_cpu_index_to_props;
-> diff --git a/softmmu/vl.c b/softmmu/vl.c
-> index 3340f63c37..bc293f8100 100644
-> --- a/softmmu/vl.c
-> +++ b/softmmu/vl.c
-> @@ -724,6 +724,12 @@ static QemuOptsList qemu_smp_opts = {
->           {
->               .name = "cpus",
->               .type = QEMU_OPT_NUMBER,
-> +        }, {
-> +            .name = "drawers",
-> +            .type = QEMU_OPT_NUMBER,
-> +        }, {
-> +            .name = "books",
-> +            .type = QEMU_OPT_NUMBER,
->           }, {
->               .name = "sockets",
->               .type = QEMU_OPT_NUMBER,
-> diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
-> index b10a8541ff..33afa1074a 100644
-> --- a/target/s390x/cpu.c
-> +++ b/target/s390x/cpu.c
-> @@ -31,6 +31,7 @@
->   #include "qapi/qapi-types-machine.h"
->   #include "sysemu/hw_accel.h"
->   #include "hw/qdev-properties.h"
-> +#include "hw/qdev-properties-system.h"
->   #include "fpu/softfloat-helpers.h"
->   #include "disas/capstone.h"
->   #include "sysemu/tcg.h"
-> @@ -259,6 +260,12 @@ static gchar *s390_gdb_arch_name(CPUState *cs)
->   static Property s390x_cpu_properties[] = {
->   #if !defined(CONFIG_USER_ONLY)
->       DEFINE_PROP_UINT32("core-id", S390CPU, env.core_id, 0),
-> +    DEFINE_PROP_INT32("socket-id", S390CPU, env.socket_id, -1),
-> +    DEFINE_PROP_INT32("book-id", S390CPU, env.book_id, -1),
-> +    DEFINE_PROP_INT32("drawer-id", S390CPU, env.drawer_id, -1),
-> +    DEFINE_PROP_BOOL("dedicated", S390CPU, env.dedicated, false),
-> +    DEFINE_PROP_CPUS390ENTITLEMENT("entitlement", S390CPU, env.entitlement,
-> +                                   S390_CPU_ENTITLEMENT_AUTO),
->   #endif
->       DEFINE_PROP_END_OF_LIST()
->   };
-> diff --git a/qapi/meson.build b/qapi/meson.build
-> index fbdb442fdf..b5b01fb7b5 100644
-> --- a/qapi/meson.build
-> +++ b/qapi/meson.build
-> @@ -35,6 +35,7 @@ qapi_all_modules = [
->     'error',
->     'introspect',
->     'job',
-> +  'machine-common',
->     'machine',
->     'machine-target',
->     'migration',
-> diff --git a/qemu-options.hx b/qemu-options.hx
-> index d42f60fb91..4c79e153fb 100644
-> --- a/qemu-options.hx
-> +++ b/qemu-options.hx
-> @@ -250,11 +250,14 @@ SRST
->   ERST
+> @@ -45,6 +45,7 @@
+>   #include "hw/s390x/pv.h"
+>   #include "migration/blocker.h"
+>   #include "qapi/visitor.h"
+> +#include "hw/s390x/cpu-topology.h"
 >   
->   DEF("smp", HAS_ARG, QEMU_OPTION_smp,
-> -    "-smp [[cpus=]n][,maxcpus=maxcpus][,sockets=sockets][,dies=dies][,clusters=clusters][,cores=cores][,threads=threads]\n"
-> +    "-smp [[cpus=]n][,maxcpus=maxcpus][,drawers=drawers][,books=books][,sockets=sockets]\n"
-> +    "               [,dies=dies][,clusters=clusters][,cores=cores][,threads=threads]\n"
->       "                set the number of initial CPUs to 'n' [default=1]\n"
->       "                maxcpus= maximum number of total CPUs, including\n"
->       "                offline CPUs for hotplug, etc\n"
-> -    "                sockets= number of sockets on the machine board\n"
-> +    "                drawers= number of drawers on the machine board\n"
-> +    "                books= number of books in one drawer\n"
-> +    "                sockets= number of sockets in one book\n"
->       "                dies= number of dies in one socket\n"
->       "                clusters= number of clusters in one die\n"
->       "                cores= number of cores in one cluster\n"
+>   static Error *pv_mig_blocker;
+>   
+> @@ -311,10 +312,18 @@ static void s390_cpu_plug(HotplugHandler *hotplug_dev,
+>   {
+>       MachineState *ms = MACHINE(hotplug_dev);
+>       S390CPU *cpu = S390_CPU(dev);
+> +    ERRP_GUARD();
+>   
+>       g_assert(!ms->possible_cpus->cpus[cpu->env.core_id].cpu);
+>       ms->possible_cpus->cpus[cpu->env.core_id].cpu = OBJECT(dev);
+>   
+> +    if (s390_has_topology()) {
+> +        s390_topology_setup_cpu(ms, cpu, errp);
+> +        if (*errp) {
+> +            return;
+> +        }
+> +    }
+> +
+>       if (dev->hotplugged) {
+>           raise_irq_cpu_hotplug();
+>       }
+> @@ -554,11 +563,20 @@ static const CPUArchIdList *s390_possible_cpu_arch_ids(MachineState *ms)
+>                                     sizeof(CPUArchId) * max_cpus);
+>       ms->possible_cpus->len = max_cpus;
+>       for (i = 0; i < ms->possible_cpus->len; i++) {
+> +        CpuInstanceProperties *props = &ms->possible_cpus->cpus[i].props;
+> +
+>           ms->possible_cpus->cpus[i].type = ms->cpu_type;
+>           ms->possible_cpus->cpus[i].vcpus_count = 1;
+>           ms->possible_cpus->cpus[i].arch_id = i;
+> -        ms->possible_cpus->cpus[i].props.has_core_id = true;
+> -        ms->possible_cpus->cpus[i].props.core_id = i;
+> +
+> +        props->has_core_id = true;
+> +        props->core_id = i;
+> +        props->has_socket_id = true;
+> +        props->socket_id = s390_std_socket(i, &ms->smp);
+> +        props->has_book_id = true;
+> +        props->book_id = s390_std_book(i, &ms->smp);
+> +        props->has_drawer_id = true;
+> +        props->drawer_id = s390_std_drawer(i, &ms->smp);
+>       }
+>   
+>       return ms->possible_cpus;
+> diff --git a/hw/s390x/meson.build b/hw/s390x/meson.build
+> index f291016fee..58dfbdff4f 100644
+> --- a/hw/s390x/meson.build
+> +++ b/hw/s390x/meson.build
+> @@ -24,6 +24,7 @@ s390x_ss.add(when: 'CONFIG_KVM', if_true: files(
+>     's390-stattrib-kvm.c',
+>     'pv.c',
+>     's390-pci-kvm.c',
+> +  'cpu-topology.c',
+>   ))
+>   s390x_ss.add(when: 'CONFIG_TCG', if_true: files(
+>     'tod-tcg.c',
 
