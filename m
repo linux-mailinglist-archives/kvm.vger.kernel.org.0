@@ -2,119 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3E4156F4B20
-	for <lists+kvm@lfdr.de>; Tue,  2 May 2023 22:15:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6DA926F4B80
+	for <lists+kvm@lfdr.de>; Tue,  2 May 2023 22:41:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229871AbjEBUPw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 May 2023 16:15:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48520 "EHLO
+        id S229847AbjEBUlu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 May 2023 16:41:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34000 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229924AbjEBUPm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 2 May 2023 16:15:42 -0400
-Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 476E719B3
-        for <kvm@vger.kernel.org>; Tue,  2 May 2023 13:15:19 -0700 (PDT)
-Received: by mail-pg1-x549.google.com with SMTP id 41be03b00d2f7-52057b3d776so2202248a12.2
-        for <kvm@vger.kernel.org>; Tue, 02 May 2023 13:15:19 -0700 (PDT)
+        with ESMTP id S229536AbjEBUlt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 2 May 2023 16:41:49 -0400
+Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E839510D9
+        for <kvm@vger.kernel.org>; Tue,  2 May 2023 13:41:47 -0700 (PDT)
+Received: by mail-pf1-x449.google.com with SMTP id d2e1a72fcca58-64115e69e1eso82514b3a.0
+        for <kvm@vger.kernel.org>; Tue, 02 May 2023 13:41:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1683058519; x=1685650519;
+        d=google.com; s=20221208; t=1683060107; x=1685652107;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=z9wYmb61AJq/t/dK34/IZzNXoE4VD6rl22PB6n6jMeY=;
-        b=gcsGiuf/S6OuDUr8Od48tj8Ivy2DjLGoO0/dyF3QZd7rkh8mhqN/ovUHeDqR4GQn7/
-         pnmcaVNjTrz9bMdMxSm1X8STAYooDLQe0RQ6hT5Sm0tjsfp7gEW9xKi5C1FmX8tHhqDQ
-         w2Y93qPy9N2eBmcq6BmnnsM0LSKrly3WCYw6ZclzcDQs50WpOfSOPPWsFBxS0aRZSH1B
-         d3yfjQ1uE61JIabCTxO4B+0L2FulkACw/0IGcKPK28dMHiX+7EEGscHy2zHkksUxvgNV
-         gVmuBZj1N+HMIvlY19PPIdQD1gJEHS7NKf6PSnmAttVM8ACBZw7DNLAGJzVFpKSaHD9q
-         OXzg==
+        bh=W1xT6Cy3XHsLOOGIfij/aWoeXWzYY5kDVhaeCmtEpLI=;
+        b=CU9m786t178y6G9yo7NRnuVonUA1T6tCM09qzkEymu2841t5iWyn9Ud3NuErkylfMB
+         zOL0ts72Klrj4WlWCV7DHlnjUwbBCelkrgDk6DHOcWMjdsfgt9cRWidRn9nG0719CB9I
+         x+8TCWtv8l2UUPWrfwmMApfMpsDwc7Wt5ahbpYaZvZSqKqTTN2yMDPLKmOwkzVFVEw8m
+         gbiGNR7hY5xH7ZTCuM7j8+kivyRoZvwyRjVClo3ICe6Mt9WCbl19ASmcXw0QMy38B2/6
+         r4Pg/iviE73KarQYUzXev7KozZcfVRrtj2wxISVDVXh8GHka8nwkUSxp+PXDaGy6bVFH
+         idtA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683058519; x=1685650519;
+        d=1e100.net; s=20221208; t=1683060107; x=1685652107;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=z9wYmb61AJq/t/dK34/IZzNXoE4VD6rl22PB6n6jMeY=;
-        b=MuxOpiWAfPRMrdyDXNbw4niQMeDShycap8lJCUlHjerDqoLuZ9LnphTHgZcvbMduaf
-         Nm0wm49W4kLdi8C5JJPGuiQLgRaQHvXcpNWYtQbYCk3QrTr5277rspu1/AeeEw3Q0poS
-         a4h3D+1f3ijIxGAO7L5Owu1yAjk0fXETVHWD+8dYfRbQwI9Q1uD5jOAcvIM5Bia0Ximg
-         4eqAXm24lVu6MMZkEcQenC3Ax9yDB+LpFt5AULpY3Mgu0LJCXN7utE76yfRfsQDBtBsy
-         x+ykRL6nqFyg0TWmn+EOPvPKxE+X7m1pavCwssoCZqSTHBglau9sWyw2684VXQLgn9lR
-         kjzQ==
-X-Gm-Message-State: AC+VfDwW3Qy7+enwYZpX2g0gWzC9zRXTZyCuMTytwo4nLkm77tf7Xx2y
-        CjlEiLQ/lMG59YHC8EmRL7O6KuD+RGQ=
-X-Google-Smtp-Source: ACHHUZ5S+IjxqSZd8Ji0qyauzBmf29G1+Ebdz/7FhLvvYLKttlaIV2l27XCCK8KHBed3JoKvAZpUzrWE/B8=
+        bh=W1xT6Cy3XHsLOOGIfij/aWoeXWzYY5kDVhaeCmtEpLI=;
+        b=TCJhhdeo1bFmLSeox//oIrVZ86iqsVe02qykz/eaGOkrxv10UPRBLJIXCdLYoU+c+x
+         BwPIWGhwfc3MAChHo5FkQO+92doBLoXW1Ywi4pvYy2muq5b5d9YnVGoaPi8hIUSV1KtT
+         tgJEpWx2X3oqejbhgESawZ/IdTHq6m/poUhK39dpxZJgltIts4IThF2uLhBd8ITQbG5I
+         72yL+PI4V2p4bZzFyJbzc6PTzNz2dbu1Dy0UXFbkD5P0Qv15wUeafVKixh19b0e+KD4k
+         4kj+/Uyu+SQPRYkEDajkhAyGahTkdsoNcUiDFLaq7Enu/GOvB6et6AQPrQln/bZl6iIA
+         Uhnw==
+X-Gm-Message-State: AC+VfDyLScEi146MoAS3S2jQqiIRu2eT+pXOJ0m383OdR35VF2BdQvqq
+        82bg8LthoM93FVkONlNvQuYb+3ETfqY=
+X-Google-Smtp-Source: ACHHUZ7Z2F3qdn8usjq2NWZcWjfwltlLS38Glt0+jjWUNErXARTzv1Y9FNS6hwgz0tmajg5no5fMFCf7UMg=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a63:8bc1:0:b0:528:7198:21c7 with SMTP id
- j184-20020a638bc1000000b00528719821c7mr4653168pge.10.1683058518761; Tue, 02
- May 2023 13:15:18 -0700 (PDT)
-Date:   Tue, 2 May 2023 13:15:17 -0700
-In-Reply-To: <20230419071711.GA493399@google.com>
+ (user=seanjc job=sendgmr) by 2002:a63:4c15:0:b0:524:fba4:fd51 with SMTP id
+ z21-20020a634c15000000b00524fba4fd51mr5673227pga.3.1683060107406; Tue, 02 May
+ 2023 13:41:47 -0700 (PDT)
+Date:   Tue, 2 May 2023 13:41:45 -0700
+In-Reply-To: <CAF7b7moqW41QRNowSnz3E-T+VQMrkeJthDVxM2tuNHtJ5TTjjQ@mail.gmail.com>
 Mime-Version: 1.0
-References: <20220909185557.21255-1-risbhat@amazon.com> <A0B41A72-984A-4984-81F3-B512DFF92F59@amazon.com>
- <YynoDtKjvDx0vlOR@kroah.com> <YyrSKtN2VqnAuevk@kroah.com> <20230419071711.GA493399@google.com>
-Message-ID: <ZFFt/ZMqQ1RHnY4e@google.com>
-Subject: Re: [PATCH 0/9] KVM backports to 5.10
+References: <20230412213510.1220557-1-amoorthy@google.com> <20230412213510.1220557-5-amoorthy@google.com>
+ <CAF7b7mqq3UMeO3M-Fy8SqyL=mjxY4-TyA_PjgGsdVWZrsU2LLQ@mail.gmail.com>
+ <ZFFbwOXZ5uI/gdaf@google.com> <CAF7b7moqW41QRNowSnz3E-T+VQMrkeJthDVxM2tuNHtJ5TTjjQ@mail.gmail.com>
+Message-ID: <ZFF1ibyPZHKYzEuY@google.com>
+Subject: Re: [PATCH v3 04/22] KVM: x86: Set vCPU exit reason to
+ KVM_EXIT_UNKNOWN at the start of KVM_RUN
 From:   Sean Christopherson <seanjc@google.com>
-To:     Lee Jones <lee@kernel.org>
-Cc:     "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
-        Rishabh Bhatnagar <risbhat@amazon.com>,
-        "stable@vger.kernel.org" <stable@vger.kernel.org>,
-        Suraj Jitindar Singh <surajjs@amazon.com>,
-        Mike Bacco <mbacco@amazon.com>, "bp@alien8.de" <bp@alien8.de>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,
-        "wanpengli@tencent.com" <wanpengli@tencent.com>,
-        "jmattson@google.com" <jmattson@google.com>,
-        "joro@8bytes.org" <joro@8bytes.org>, kvm@vger.kernel.org
+To:     Anish Moorthy <amoorthy@google.com>
+Cc:     pbonzini@redhat.com, maz@kernel.org, oliver.upton@linux.dev,
+        jthoughton@google.com, bgardon@google.com, dmatlack@google.com,
+        ricarkol@google.com, axelrasmussen@google.com, peterx@redhat.com,
+        kvm@vger.kernel.org, kvmarm@lists.linux.dev
 Content-Type: text/plain; charset="us-ascii"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Apr 19, 2023, Lee Jones wrote:
-> On Wed, 21 Sep 2022, gregkh@linuxfoundation.org wrote:
+On Tue, May 02, 2023, Anish Moorthy wrote:
+> Thanks for nailing this down for me! One more question: should we be
+> concerned about any guest memory accesses occurring in the preamble to
+> that vcpu_run() call in kvm_arch_vcpu_ioctl_run()?
 > 
-> > On Tue, Sep 20, 2022 at 06:19:26PM +0200, gregkh@linuxfoundation.org wrote:
-> > > On Tue, Sep 20, 2022 at 03:34:04PM +0000, Bhatnagar, Rishabh wrote:
-> > > > Gentle reminder to review this patch series.
-> > > 
-> > > Gentle reminder to never top-post :)
-> > > 
-> > > Also, it's up to the KVM maintainers if they wish to review this or not.
-> > > I can't make them care about old and obsolete kernels like 5.10.y.  Why
-> > > not just use 5.15.y or newer?
-> > 
-> > Given the lack of responses here from the KVM developers, I'll drop this
-> > from my mbox and wait for them to be properly reviewed and resend before
-> > considering them for a stable release.
-> 
-> KVM maintainers,
-> 
-> Would someone be kind enough to take a look at this for Greg please?
-> 
-> Note that at least one of the patches in this set has been identified as
-> a fix for a serious security issue regarding the compromise of guest
-> kernels due to the mishandling of flush operations.
+> I only see two spots from which an EFAULT could make it to userspace,
+> those being the sync_regs() and cui() calls. The former looks clean
 
-A minor note, the security issue is serious _if_ the bug can be exploited, which
-as is often the case for KVM, is a fairly big "if".  Jann's PoC relied on collusion
-between host userspace and the guest kernel, and as Jann called out, triggering
-the bug on a !PREEMPT host kernel would be quite difficult in practice.
+Ya, sync_regs() is a non-issue, that doesn't touch guest memory unless userspace
+is doing something truly bizarre.
 
-I don't want to downplay the seriousness of compromising guest security, but CVSS
-scores for KVM CVEs almost always fail to account for the multitude of factors in
-play.  E.g. CVE-2023-30456 also had a score of 7.8, and that bug required disabling
-EPT, which pretty much no one does when running untrusted guest code.
+> but I'm not sure about the latter. As written it's not an issue per se
+> if the cui() call tries a vCPU memory access- the
+> kvm_populate_efault_info() helper will just not populate the run
+> struct and WARN_ON_ONCE(). But it would be good to know about.
 
-In other words, take the purported severity with a grain of salt.
+If KVM triggers a WARN_ON_ONCE(), then that's an issue.  Though looking at the
+code, the cui() aspect is a moot point.  As I stated in the previous discussion,
+the WARN_ON_ONCE() in question needs to be off-by-default.
 
-> Please could someone confirm or otherwise that this is relevant for
-> v5.10.y and older?
-
-Acked-by: Sean Christopherson <seanjc@google.com>
+ : Hmm, one idea would be to have the initial -EFAULT detection fill kvm_run.memory_fault,
+ : but set kvm_run.exit_reason to some magic number, e.g. zero it out.  Then KVM could
+ : WARN if something tries to overwrite kvm_run.exit_reason.  The WARN would need to
+ : be buried by a Kconfig or something since kvm_run can be modified by userspace,
+ : but other than that I think it would work.
