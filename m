@@ -2,203 +2,176 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 79A8C6F57DE
-	for <lists+kvm@lfdr.de>; Wed,  3 May 2023 14:27:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 081DB6F5842
+	for <lists+kvm@lfdr.de>; Wed,  3 May 2023 14:54:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229688AbjECM07 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 May 2023 08:26:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42832 "EHLO
+        id S230053AbjECMyk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 May 2023 08:54:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54716 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229554AbjECM06 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 May 2023 08:26:58 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 681895597
-        for <kvm@vger.kernel.org>; Wed,  3 May 2023 05:26:57 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 1073620338;
-        Wed,  3 May 2023 12:26:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1683116816; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=d730ov4NL1F3ERD4Dx+gWT7pT1JP4HjltOIN4DpqNdo=;
-        b=ubJsLU/LNuy/0wAWYZgIFVyKZ03iTheu7JkJNA0/sInqG+4Q5lKL7bmHph5ny8dVjFwckF
-        IEJm44hgIFppretpz/X58BQsJ/ngoDQVDH73r3pEUbaEawFYLv9dUenq1LhZ976NAFkkfH
-        CMndOV1y6VXdhj010qV37qo9pArlzoc=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1683116816;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=d730ov4NL1F3ERD4Dx+gWT7pT1JP4HjltOIN4DpqNdo=;
-        b=oVbTnGUSGUnGFdIimM0LGhz6Bnwr//a/Tx0264fN4+fe0EXnwszhb7yLdJRDJIMkwoPLcU
-        ERy+OQ5umQNJgtCw==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id C8CAA1331F;
-        Wed,  3 May 2023 12:26:55 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id wIWfLw9TUmQJfAAAMHmgww
-        (envelope-from <jroedel@suse.de>); Wed, 03 May 2023 12:26:55 +0000
-Date:   Wed, 3 May 2023 14:26:54 +0200
-From:   =?iso-8859-1?Q?J=F6rg_R=F6del?= <jroedel@suse.de>
-To:     Tom Lendacky <thomas.lendacky@amd.com>
-Cc:     amd-sev-snp@lists.suse.com, linux-coco@lists.linux.dev,
-        kvm@vger.kernel.org, Carlos Bilbao <carlos.bilbao@amd.com>,
-        Klaus Kiwi <kkiwi@redhat.com>
-Subject: Re: [ANNOUNCEMENT] COCONUT Secure VM Service Module for SEV-SNP
-Message-ID: <ZFJTDtMK0QqXK5+E@suse.de>
-References: <ZBl4592947wC7WKI@suse.de>
- <4420d7e5-d05f-8c31-a0f2-587ebb7eaa20@amd.com>
+        with ESMTP id S229953AbjECMy0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 May 2023 08:54:26 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA5E85FC6;
+        Wed,  3 May 2023 05:54:17 -0700 (PDT)
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 343CsAxw032116;
+        Wed, 3 May 2023 12:54:17 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=OdSBNL0rhlJgQI1Pz50BBgSkLWOJFO6nfzapJux5ses=;
+ b=ZHun1Z/9gby50irMk4jF/AGrFVdvvzDoRDmNF14wBMp0UNqv7ZRaJMGZlCphm/lEyPZk
+ CYi/WUXhR2aVpzKezAi7T6heNcuYbNXje4YKie+fguAPdSUlJHqdeA7UIk4LiNit4JFY
+ yTGOAmP1ZR56SKcJ5/SRJGT2enbf8uFwBtjMNrWUXqCnUS80rbasO7ymk7sSFkH4i1rG
+ E45Q9c+bx0Fe/AUmDYA3z8nhVn2JaNZ2nRZ3BGWj2RtmQNQqn/z/yY8XrpjfMBuNhOLU
+ vtqmhptVfIaIWZcCiePQseSNbIQ0Ss9+KP5haCz+LXTunLHtofhONYXvpe2EvQnzKSMb 3w== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qbqmwgwv2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 03 May 2023 12:54:16 +0000
+Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 343CrL6g029005;
+        Wed, 3 May 2023 12:53:26 GMT
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qbqmwgw0x-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 03 May 2023 12:53:25 +0000
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+        by ppma02fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3434TI1l014099;
+        Wed, 3 May 2023 12:52:24 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+        by ppma02fra.de.ibm.com (PPS) with ESMTPS id 3q8tv6sue3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 03 May 2023 12:52:24 +0000
+Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
+        by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 343CqKct15139226
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 3 May 2023 12:52:20 GMT
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id CFAB92004B;
+        Wed,  3 May 2023 12:52:20 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 7AD7820040;
+        Wed,  3 May 2023 12:52:20 +0000 (GMT)
+Received: from [9.152.222.242] (unknown [9.152.222.242])
+        by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+        Wed,  3 May 2023 12:52:20 +0000 (GMT)
+Message-ID: <af6e9b44-ac14-904e-6d37-043a5c8a9357@linux.ibm.com>
+Date:   Wed, 3 May 2023 14:52:20 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <4420d7e5-d05f-8c31-a0f2-587ebb7eaa20@amd.com>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.8.0
+Subject: Re: [kvm-unit-tests PATCH v8 2/2] s390x: topology: Checking
+ Configuration Topology Information
+Content-Language: en-US
+To:     Nico Boehr <nrb@linux.ibm.com>, linux-s390@vger.kernel.org
+Cc:     frankja@linux.ibm.com, thuth@redhat.com, kvm@vger.kernel.org,
+        imbrenda@linux.ibm.com, david@redhat.com, nsg@linux.ibm.com
+References: <20230426083426.6806-1-pmorel@linux.ibm.com>
+ <20230426083426.6806-3-pmorel@linux.ibm.com>
+ <168258524358.99032.14388431972069131423@t14-nrb>
+ <25a9c3d6-43be-6a08-a32e-5abc520e8c62@linux.ibm.com>
+ <168266833708.15302.621201335459420614@t14-nrb>
+ <8122e0de-7cbb-83f2-4c3a-7a50f0d5b205@linux.ibm.com>
+ <168311498507.14421.10981394117035080962@t14-nrb>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+In-Reply-To: <168311498507.14421.10981394117035080962@t14-nrb>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: H7nqEhuvLLrAa-QgSU0zky6FAZOWS_L-
+X-Proofpoint-ORIG-GUID: nZ9UcLINrI82faCR9rB_Kmd7oFr8xirg
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
+ definitions=2023-05-03_08,2023-05-03_01,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 mlxlogscore=999
+ lowpriorityscore=0 bulkscore=0 clxscore=1015 impostorscore=0
+ suspectscore=0 phishscore=0 malwarescore=0 priorityscore=1501 spamscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2303200000 definitions=main-2305030106
+X-Spam-Status: No, score=-6.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Tom,
 
-thanks for that comparision!
+On 5/3/23 13:56, Nico Boehr wrote:
+> Quoting Pierre Morel (2023-04-28 15:10:07)
+>> On 4/28/23 09:52, Nico Boehr wrote:
+>>> Quoting Pierre Morel (2023-04-27 16:50:16)
+>>> [...]
+>>>>>> diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
+>>>>>> index fc3666b..375e6ce 100644
+>>>>>> --- a/s390x/unittests.cfg
+>>>>>> +++ b/s390x/unittests.cfg
+>>>>>> @@ -221,3 +221,6 @@ file = ex.elf
+>>>>>>     
+>>>>>>     [topology]
+>>>>>>     file = topology.elf
+>>>>>> +# 3 CPUs on socket 0 with different CPU TLE (standard, dedicated, origin)
+>>>>>> +# 1 CPU on socket 2
+>>>>>> +extra_params = -smp 1,drawers=3,books=3,sockets=4,cores=4,maxcpus=144 -cpu z14,ctop=on -device z14-s390x-cpu,core-id=1,entitlement=low -device z14-s390x-cpu,core-id=2,dedicated=on -device z14-s390x-cpu,core-id=10 -device z14-s390x-cpu,core-id=20 -device z14-s390x-cpu,core-id=130,socket-id=0,book-id=0,drawer-id=0 -append '-drawers 3 -books 3 -sockets 4 -cores 4'
+>>>>> If I got the command line right, all CPUs are on the same drawer with this command line, aren't they? If so, does it make sense to run with different combinations, i.e. CPUs on different drawers, books etc?
+>>>> OK, I will add some CPU on different drawers and books.
+>>> just to clarify: What I meant is adding an *additional* entry to unittests.cfg. Does it make sense in your opinion? I just want more coverage for different scenarios we may have.
+>> Ah OK, yes even better.
+>>
+>> In this test I chose the values randomly, I can add 2 other tests like
+>>
+>> - once with the maximum of CPUs like:
+>>
+>> [topology-2]
+>> file = topology.elf
+>> extra_params = -smp drawers=3,books=4,sockets=5,cores=4,maxcpus=240
+>> -append '-drawers 3 -books 4 -sockets 5 -cores 4'
+>>
+>>
+>> or having 8 different TLE on the same socket
+>>
+>> [topology-2]
+>>
+>> file = topology.elf
+>> extra_params = -smp 1,drawers=2,books=2,sockets=2,cores=30,maxcpus=240
+>> -append '-drawers 2 -books 2 -sockets 2 -cores 30' -cpu z14,ctop=on
+>> -device
+>> z14-s390x-cpu,drawer-id=1,book-id=0,socket-id=0,core-id=2,entitlement=low
+>> -device
+>> z14-s390x-cpu,drawer-id=1,book-id=0,socket-id=0,core-id=3,entitlement=medium
+>> -device
+>> z14-s390x-cpu,drawer-id=1,book-id=0,socket-id=0,core-id=4,entitlement=high
+>> -device
+>> z14-s390x-cpu,drawer-id=1,book-id=0,socket-id=0,core-id=5,entitlement=high,dedicated=on
+>> -device
+>> z14-s390x-cpu,drawer-id=1,book-id=0,socket-id=0,core-id=65,entitlement=low
+>> -device
+>> z14-s390x-cpu,drawer-id=1,book-id=0,socket-id=0,core-id=66,entitlement=medium
+>> -device
+>> z14-s390x-cpu,drawer-id=1,book-id=0,socket-id=0,core-id=67,entitlement=high
+>> -device
+>> z14-s390x-cpu,drawer-id=1,book-id=0,socket-id=0,core-id=68,entitlement=high,dedicated=on
+>>
+>>
+>> What do you think is the best ?
+> I think both do make sense, since they cover differenct scenarios, don't they?
 
-On Tue, May 02, 2023 at 06:03:55PM -0500, Tom Lendacky wrote:
-> While both SVSM implementations use the Qemu Firmware Configuration
-> (fw_cfg) interface, the coconut-svsm relies on it a bit more than
-> linux-svsm. In either case, other interfaces may need to be supported in
-> order for an SVSM to work with a VMM other than Qemu.
 
-Right, that is something I have been thinking about. After I talked to a
-few others about it, I came to the conclusion that neither COCONUT nor
-linux-svsm use an optimal interface to request information from the HV.
-I think it would be best if we move to a model where the MADT and E820
-tables from QEMU (or any other HV) are part of the measured initial
-memory image, to make that data trusted. But we can discuss that
-separately.
+Yes,
 
-> - Both SVSMs end up located in a memory slot outside of memory that is
->   reported to the guest. Coconut-svsm gets the location and size from
->   fwcfg, which is customizable via the Qemu command line. Linux-svsm gets
->   the location and size from the build process and validates that location
->   and size.
+also
 
-Correct, COCONUT also has a fall-back where it just uses the last 16MB
-of guest RAM if the fw_cfg file is not there. That needs OVMF support,
-though.
+[topology-2]
+file = topology.elf
+extra_params = -smp books=2,sockets=31,cores=4,maxcpus=248
+-append '-drawers 1 -books 2 -sockets 31 -cores 4'
 
->   - Pagetables:
->     Page table support can be tricky with the x86_64 crate. But in general
->     I believe it could still be used. Coconut-svsm uses a dynamic offset-
->     based approach for pagetables based on the final physical address
->     location. This offset could be utilized in the x86_64 crate
->     implementation. When CPL3 support comes around, that would require
->     further investigation.
+Could make sense too, it is the way I found the sclp problem, but it will fail until sclp is fixed using facility 140.
 
-Yeah, COCONUT does not only use an offset mapping, it also has specific
-mappings for the per-cpu areas. Those are mapped at a fixed location,
-same with stacks, so the needs already go beyond an offset mapping.
 
-> - Coconut-svsm copies the original Secrets Page and the "frees" the memory
->   for it. I couldn't tell if the memory is zeroed out or not, but
->   something that should be looked at to ensure the VMPCK0 key is not
->   leaked.
 
-Thanks, that is a real issue. I just wrote a fix for that.
-
-> Some questions for coconut-svsm:
->   - Are there any concerns with using existing code/projects as submodules
->     within coconut-svsm (e.g. OpenSSL or a software TPM implementation)?
->     One of our design goals for linux-svsm was desirability to easily
->     allow downstream users or products to, e.g., use their own crypto
->     (e.g. company preferred)
-
-No concerns from my side to run any code you want in a CPL-3 module.
-This includes code which uses external libraries such as openssl or
-libtpm. The modules will be in an archive file packaged with the SVSM
-binary, so that everything that runs is measured at launch time.
-
->   - Are you open to having maintainers outside of SUSE? There is some
->     linux-svsm community concern about project governance and project
->     priorities and release schedules. This wouldn't have to be AMD even,
->     but we'd volunteer to help here if desired, but we'd like to foster a
->     true community model for governance regardless. We'd love to hear
->     thoughts on this from coconut-svsm folks.
-
-Yes, I am definitely willing to make the project more open and move to a
-maintainer-group model, no intention from my side to become a BDFL for
-the project. I just have no clear picture yet how the model should look
-like and how to get there. I will send a separate email to kick-start a
-discussion about that.
-
->   - On the subject of priorities, the number one priority for the
->     linux-svsm project has been to quickly achieve production quality vTPM
->     support. The support for this is being actively worked on by
->     linux-svsm contributors and we'd want to find fastest path towards
->     getting that redirected into coconut-svsm (possibly starting with CPL0
->     implementation until CPL3 support is available) and the project
->     hardened for a release.  I imagine there will be some competing
->     priorities from coconut-svsm project currently, so wanted to get this
->     out on the table from the beginning.
-
-That has been under discussion for some time, and honestly I think
-the approach taken is the main difference between linux-svsm and
-COCONUT. My position here is, and that comes with a big 'BUT', that I am
-not fundamentally opposed to having a temporary solution for the TPM
-until CPL-3 support is at a point where it can run a TPM module.
-
-And here come the 'BUT': Since the goal of having one project is to
-bundle community efforts, I think that the joint efforts are better
-targeted at getting CPL-3 support to a point where it can run modules.
-On that side some input and help is needed, especially to define the
-syscall interface so that it suits the needs of a TPM implementation.
-
-It is also not the case that CPL-3 support is out more than a year or
-so. The RamFS is almost ready, as is the archive file inclusion[1]. We
-will move to task management next, the goal is still to have basic
-support ready in 2H2023.
-
-[1] https://github.com/coconut-svsm/svsm/pull/27
-
-If there is still a strong desire to have COCONUT with a TPM (running at
-CPL-0) before CPL-3 support is usable, then I can live with including
-code for that as a temporary solution. But linking huge amounts of C
-code (like openssl or a tpm lib) into the SVSM rust binary kind of
-contradicts the goals which made us using Rust for project in the first
-place. That is why I only see this as a temporary solution.
-
-> Since we don't want to split resources or have competing projects, we are
-> leaning towards moving our development resources over to the coconut-svsm
-> project.
-
-Great move, much appreciated, thanks a lot for that! Let's work together
-to make that happen.
-
-Regards,
-
--- 
-Jörg Rödel
-jroedel@suse.de
-
-SUSE Software Solutions Germany GmbH
-Frankenstraße 146
-90461 Nürnberg
-Germany
-
-(HRB 36809, AG Nürnberg)
-Geschäftsführer: Ivo Totev, Andrew Myers, Andrew McDonald, Boudien Moerman
 
