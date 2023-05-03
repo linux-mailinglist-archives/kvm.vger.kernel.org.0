@@ -2,212 +2,150 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 315116F50FA
-	for <lists+kvm@lfdr.de>; Wed,  3 May 2023 09:16:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 37C826F512D
+	for <lists+kvm@lfdr.de>; Wed,  3 May 2023 09:21:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229676AbjECHQH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 May 2023 03:16:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59738 "EHLO
+        id S229575AbjECHVo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 May 2023 03:21:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34370 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229622AbjECHQF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 May 2023 03:16:05 -0400
-Received: from mail-oa1-x34.google.com (mail-oa1-x34.google.com [IPv6:2001:4860:4864:20::34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B54035B0;
-        Wed,  3 May 2023 00:16:02 -0700 (PDT)
-Received: by mail-oa1-x34.google.com with SMTP id 586e51a60fabf-1928860f63eso984941fac.0;
-        Wed, 03 May 2023 00:16:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1683098161; x=1685690161;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nlNv/F2pCSwWbexWZ5JR+V38LaHDUWBt53s7CUexmGA=;
-        b=ovKuIJlCtQLxpA1qPNder/rFAq3YErdm0kDt3aYHjNYsKAaO1onRL+QOyIWR6UuBzZ
-         0/qng6/4ZsCXc2btT/2t3T//F9EK4ebxBNCoVbfYFq06+vwVZVjtIuRt6ciVc1YyK7oK
-         lfChm+YSlHIsGL+T67udLNJhKsb+6u9rrrZP6k2xAWb9DRxRWRceUzUyKNiAGOhomV5p
-         GFnXnq00I+FNCrPcKfF4nwyyNO/eN7puqGTNogJu7QE6/SdJJSgCQoEcf1RBu8yA8Snm
-         IFEONcKddHEFUpovi2YGJy+p2YU2NqF18PEuLnZZcatNcn+Rv3+as3otSFF+HI3L/gUo
-         Yahw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683098161; x=1685690161;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=nlNv/F2pCSwWbexWZ5JR+V38LaHDUWBt53s7CUexmGA=;
-        b=d2gbldjQFR6gBZAOVMMQrtJUGdgiXVCdzRb37d+Ffn8SfkE8xdDXwa706FAxzxDIdZ
-         lnkivvl2W+7vpDfM/sPE/3UPUgqujapKx8UkmotLlfTpH/SZ5d6pL4npDmWVjsLxEAPD
-         1MxsKXP3gu5dCtKMTnFoHpKA+RWy4qXMATQ/SeH0Y9HGW9pDyc13Lvd8UPRlgOl89K2p
-         HOG1O/CGYJq5jSrShRX7qBOMGkquVwAXcEqzjKMRwRKYwnjwMMkvIlMx5YPoimyhCRqF
-         2E/UmYR4TgHG67UtBiYzUAcVt0eBvgkrVff88RVOSjrHPN7KO2zetDd2tlhleAhhsuym
-         nUvQ==
-X-Gm-Message-State: AC+VfDy7egTsNZ6oqccl+pdfo/OlOxwaalb6W/5moJ6lleUlEsU0mxIL
-        06n3JGY39UmMVF9725lUyTdq1medQslKub9rZfM=
-X-Google-Smtp-Source: ACHHUZ5frZJz6/JDagRgAf6f8HQ7KkaW2AVcePOplDlQJ8kqBupFAFLwS1odqZCAvx1T4kZWKyl79GVw7YYUzvNeAGs=
-X-Received: by 2002:a05:6870:9890:b0:18e:7c5e:b58c with SMTP id
- eg16-20020a056870989000b0018e7c5eb58cmr9395162oab.9.1683098161344; Wed, 03
- May 2023 00:16:01 -0700 (PDT)
+        with ESMTP id S229455AbjECHVm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 May 2023 03:21:42 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F92D10E7
+        for <kvm@vger.kernel.org>; Wed,  3 May 2023 00:21:41 -0700 (PDT)
+Received: from pps.filterd (m0353723.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3437AYck008498;
+        Wed, 3 May 2023 07:21:28 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=KicJbVmbJ8ewX6kRY7wabsR8Esn8XErVu5CUOm+ghMc=;
+ b=nB+LbqPBxFAOtSyl/gVXR0zcHsoWXeqxAy/wjsxPG82IPDOOmL9NJT9IGL+65ucTuDqN
+ dM/UwGgb07jfTDzRffuaamjrXP9vr23yX0iIKEeLBzscP7cTQWcNVlYU+vcYFkXMr8DS
+ VJM613FQ2zIOWal2ekaBY0KGnJD9dJVyatssiSrv7nPw9kH+RIA9chK5Z8yfkyGu/GRI
+ aWTzaxpaqqzHPr1jC+B5+irhMB6qmyDrat/0ZmXsnRyZFWdNygOAKIO8CRMPndRBeLnD
+ snsnLVZxEEH+NRd3E8B4nqSGzeQlsGVNti5CNkHASBc24izDaqkNRtXUtUSOqPMrqQca sA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qbhjbaba2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 03 May 2023 07:21:28 +0000
+Received: from m0353723.ppops.net (m0353723.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3437KOpK025105;
+        Wed, 3 May 2023 07:21:27 GMT
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qbhjbab9e-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 03 May 2023 07:21:27 +0000
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+        by ppma02fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3434TIoq014099;
+        Wed, 3 May 2023 07:21:25 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+        by ppma02fra.de.ibm.com (PPS) with ESMTPS id 3q8tv6speg-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 03 May 2023 07:21:24 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+        by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3437LJY860555632
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 3 May 2023 07:21:19 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 4E70B20040;
+        Wed,  3 May 2023 07:21:19 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E694220043;
+        Wed,  3 May 2023 07:21:18 +0000 (GMT)
+Received: from [9.152.222.242] (unknown [9.152.222.242])
+        by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+        Wed,  3 May 2023 07:21:18 +0000 (GMT)
+Message-ID: <76ae6b1c-9195-b63a-ba90-6a0ce3718990@linux.ibm.com>
+Date:   Wed, 3 May 2023 09:21:18 +0200
 MIME-Version: 1.0
-References: <20230502112502.14859-1-yanjiewtw@gmail.com> <ZFFEgptZg1P367F7@google.com>
-In-Reply-To: <ZFFEgptZg1P367F7@google.com>
-From:   Yan-Jie Wang <yanjiewtw@gmail.com>
-Date:   Wed, 3 May 2023 15:15:50 +0800
-Message-ID: <CAAM15DyHiCiA=hFHANi+Z0h5aqbs3Lb2tEg1+BA6=LiYgQ7Agw@mail.gmail.com>
-Subject: Re: [PATCH] docs: clarify KVM related kernel parameters' descriptions
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jonathan Corbet <corbet@lwn.net>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Andre Przywara <andre.przywara@arm.com>,
-        Avi Kivity <avi@redhat.com>,
-        Ching-Chun Huang <jserv@ccns.ncku.edu.tw>, trivial@kernel.org,
-        kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.8.0
+Subject: Re: [PATCH v20 02/21] s390x/cpu topology: add topology entries on CPU
+ hotplug
+Content-Language: en-US
+To:     =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
+        qemu-s390x@nongnu.org
+Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
+        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
+        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
+        kvm@vger.kernel.org, ehabkost@redhat.com,
+        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
+        seiden@linux.ibm.com, nrb@linux.ibm.com, nsg@linux.ibm.com,
+        frankja@linux.ibm.com, berrange@redhat.com
+References: <20230425161456.21031-1-pmorel@linux.ibm.com>
+ <20230425161456.21031-3-pmorel@linux.ibm.com>
+ <7940b2d6-8b72-18e8-83a6-de3f122e416e@kaod.org>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+In-Reply-To: <7940b2d6-8b72-18e8-83a6-de3f122e416e@kaod.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: PyWMHuKIsbQvyunKGywJYTFsdksYiFSY
+X-Proofpoint-GUID: dktC1ih92ocnmchZYJs5S00A5hjNmbYB
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
+ definitions=2023-05-03_04,2023-04-27_01,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 malwarescore=0
+ bulkscore=0 adultscore=0 mlxlogscore=929 suspectscore=0 clxscore=1015
+ mlxscore=0 lowpriorityscore=0 impostorscore=0 priorityscore=1501
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2303200000 definitions=main-2305030057
+X-Spam-Status: No, score=-6.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Thank you, Sean.
 
-I will revise the patch accordingly and submit a new version as well
-as update the description of kvm-intel.nested to reflect that it is
-enabled by default.
+On 5/2/23 14:30, Cédric Le Goater wrote:
+> On 4/25/23 18:14, Pierre Morel wrote:
+>> The topology information are attributes of the CPU and are
+>> specified during the CPU device creation.
+>>
+>>
+[...]
+>> +
+>> +/**
+>> + * s390_topology_init:
+>> + * @ms: the machine state where the machine topology is defined
+>> + *
+>> + * Keep track of the machine topology.
+>> + *
+>> + * Allocate an array to keep the count of cores per socket.
+>> + * The index of the array starts at socket 0 from book 0 and
+>> + * drawer 0 up to the maximum allowed by the machine topology.
+>> + */
+>> +static void s390_topology_init(MachineState *ms)
+>> +{
+>> +    CpuTopology *smp = &ms->smp;
+>> +
+>> +    s390_topology.smp = smp;
+>
+> I am not sure the 'smp' shortcut is necessary. 'MachineState *ms' is
+> always available where 'CpuTopology *smp' is used. so it could be
+> computed from a local variable AFAICT. It would reduce the risk of
+> 'smp' being NULL in some (future) code path.
+>
+> Thanks,
+>
+> C.
 
-On Wed, May 3, 2023 at 1:12=E2=80=AFAM Sean Christopherson <seanjc@google.c=
-om> wrote:
->
-> On Tue, May 02, 2023, Yan-Jie Wang wrote:
-> > The descriptions of certain KVM related kernel parameters can be
-> > ambiguous and confusing. They state 'Disable ...,' which implies that
-> > setting them to 1 would disable the associated features or options,
-> > when in fact the opposite is true.
-> >
-> > This commit addresses this issue by revising the descriptions of these
-> > parameters to make their intended behavior clear.
->
-> Less wrong perhaps, but IMO the actual behavior is still not captured, an=
-d from
-> a certain perspective the existing "Disable" verbiage better reflects how=
-/when
-> most users would actually want to explicitly set a param.
->
-> Rather than commit one way or the other, what about reworking the descrip=
-tions
-> using this as a template?  E.g. state that the param controls something, =
-state
-> the default and use that to communicate that 1=3D=3Denabled, and then, wh=
-en appropriate,
-> clarify that KVM disables (or in some cases ignores) params if hardware d=
-oesn't
-> support the related feature(s).
->
->         kvm-intel.ept=3D  [KVM,Intel] Control KVM's use of Extended Page =
-Tables,
->                         a.k.a. Two-Dimensional Page Tables.  Default is 1
->                         (enabled).  Disabled by KVM if hardware lacks sup=
-port
->                         for EPT.
->
-> >
-> > Signed-off-by: Yan-Jie Wang <yanjiewtw@gmail.com>
-> > ---
-> >  Documentation/admin-guide/kernel-parameters.txt | 16 ++++++++--------
-> >  1 file changed, 8 insertions(+), 8 deletions(-)
-> >
-> > diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Document=
-ation/admin-guide/kernel-parameters.txt
-> > index 9e5bab29685f..cc5abb3d54b9 100644
-> > --- a/Documentation/admin-guide/kernel-parameters.txt
-> > +++ b/Documentation/admin-guide/kernel-parameters.txt
-> > @@ -2552,10 +2552,10 @@
-> >                       on the ratio, such that a page is zapped after 1 =
-hour on average.
-> >
-> >       kvm-amd.nested=3D [KVM,AMD] Allow nested virtualization in KVM/SV=
-M.
->
-> Eh, I don't see any reason to have this one say "allow" instead of "enabl=
-e/disable".
->
-> > -                     Default is 1 (enabled)
-> > +                     Default is 1 (allow)
-> >
-> > -     kvm-amd.npt=3D    [KVM,AMD] Disable nested paging (virtualized MM=
-U)
-> > -                     for all guests.
-> > +     kvm-amd.npt=3D    [KVM,AMD] Enable nested paging (virtualized MMU=
-)
-> > +                     for all guests on capable AMD chips.
-> >                       Default is 1 (enabled) if in 64-bit or 32-bit PAE=
- mode.
-> >
-> >       kvm-arm.mode=3D
-> > @@ -2602,12 +2602,12 @@
-> >                       Format: <integer>
-> >                       Default: 5
-> >
-> > -     kvm-intel.ept=3D  [KVM,Intel] Disable extended page tables
-> > +     kvm-intel.ept=3D  [KVM,Intel] Enable extended page tables
-> >                       (virtualized MMU) support on capable Intel chips.
-> >                       Default is 1 (enabled)
-> >
-> >       kvm-intel.emulate_invalid_guest_state=3D
-> > -                     [KVM,Intel] Disable emulation of invalid guest st=
-ate.
-> > +                     [KVM,Intel] Enable emulation of invalid guest sta=
-te.
-> >                       Ignored if kvm-intel.enable_unrestricted_guest=3D=
-1, as
-> >                       guest state is never invalid for unrestricted gue=
-sts.
-> >                       This param doesn't apply to nested guests (L2), a=
-s KVM
-> > @@ -2615,7 +2615,7 @@
-> >                       Default is 1 (enabled)
-> >
-> >       kvm-intel.flexpriority=3D
-> > -                     [KVM,Intel] Disable FlexPriority feature (TPR sha=
-dow).
-> > +                     [KVM,Intel] Enable FlexPriority feature (TPR shad=
-ow).
-> >                       Default is 1 (enabled)
-> >
-> >       kvm-intel.nested=3D
-> > @@ -2623,7 +2623,7 @@
-> >                       Default is 0 (disabled)
->
-> Heh, kvm-intel.nested has been enabled by default for quite some time.  C=
-an you
-> fix that up too?
->
-> >
-> >       kvm-intel.unrestricted_guest=3D
-> > -                     [KVM,Intel] Disable unrestricted guest feature
-> > +                     [KVM,Intel] Enable unrestricted guest feature
-> >                       (virtualized real and unpaged mode) on capable
-> >                       Intel chips. Default is 1 (enabled)
-> >
-> > @@ -2639,7 +2639,7 @@
-> >
-> >                       Default is cond (do L1 cache flush in specific in=
-stances)
-> >
-> > -     kvm-intel.vpid=3D [KVM,Intel] Disable Virtual Processor Identific=
-ation
-> > +     kvm-intel.vpid=3D [KVM,Intel] Enable Virtual Processor Identifica=
-tion
-> >                       feature (tagged TLBs) on capable Intel chips.
-> >                       Default is 1 (enabled)
-> >
-> >
-> > base-commit: 865fdb08197e657c59e74a35fa32362b12397f58
-> > --
-> > 2.34.1
-> >
+
+So I will use directly current_machine->smp
+
+You are right it is more homogeneous, there is no need to keep a pointer 
+here.
+
+Thanks
+
+Pierre
+
+
+[...]
+
