@@ -2,172 +2,188 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3EC396F577A
-	for <lists+kvm@lfdr.de>; Wed,  3 May 2023 13:56:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 767386F579B
+	for <lists+kvm@lfdr.de>; Wed,  3 May 2023 14:10:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229554AbjECL4h (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 May 2023 07:56:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59346 "EHLO
+        id S229770AbjECMKg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 May 2023 08:10:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34098 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229528AbjECL4f (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 May 2023 07:56:35 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9A861BFC;
-        Wed,  3 May 2023 04:56:32 -0700 (PDT)
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 343BsCAR012111;
-        Wed, 3 May 2023 11:56:31 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
- mime-version : content-transfer-encoding : in-reply-to : references : from
- : to : subject : cc : message-id : date; s=pp1;
- bh=S33JR8bjL3PKZ1TbqVK0DIYgv5GWbyTkRR4cOAd1xuQ=;
- b=X77YAlLYextwmuOTrBNAiOvkIqHriLJCJkf3vzn0kQ02s9qxCEparZeTN2piiPMaDrDQ
- DriJ49CMB8izAKBiuKZTjjHj3ianiaTT/Z7pRlFFr9I7fYgdPYE6iCNDNIWmChCrjalD
- dMZc5nM/Epp7hGTC4uR/zkotP9zvCIOyp1yNpWScRZ5gXh/FrhKVAS3Q2C/MdKNJgDDD
- 1pafhuWQFsCl675IEi1xIMya4p14nq6/RA3qxPqnV2x2DVT4Od4xZZ8KF6FqawgXGLiB
- AXEgENwbItHTXGJyhROj4HNbx1O9rBKqGH2K8JxaBTJmYaUoYTbShERKfWCpTGh6JdMq Jw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qbq51g1j2-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 03 May 2023 11:56:31 +0000
-Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 343BtJTs015345;
-        Wed, 3 May 2023 11:56:31 GMT
-Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qbq51g1hp-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 03 May 2023 11:56:30 +0000
-Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
-        by ppma06fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 34377rPj024369;
-        Wed, 3 May 2023 11:56:29 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-        by ppma06fra.de.ibm.com (PPS) with ESMTPS id 3q8tgfst5x-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 03 May 2023 11:56:29 +0000
-Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-        by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 343BuPM421496546
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 3 May 2023 11:56:25 GMT
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 953332004B;
-        Wed,  3 May 2023 11:56:25 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6C03320040;
-        Wed,  3 May 2023 11:56:25 +0000 (GMT)
-Received: from t14-nrb (unknown [9.171.43.83])
-        by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Wed,  3 May 2023 11:56:25 +0000 (GMT)
-Content-Type: text/plain; charset="utf-8"
+        with ESMTP id S229484AbjECMKe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 May 2023 08:10:34 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94D0459FB
+        for <kvm@vger.kernel.org>; Wed,  3 May 2023 05:09:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1683115788;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=RkjEggx5doDuLSwR8ZjUhb7IBiYs0z5W7yuB+yUHCuk=;
+        b=h6H2SNzm0pR45sOSvTm9MuUN3xAxyh+rx/ASq4DVtH9OsMs+J6T7ntsFQ3bg7LRJ90y1h0
+        B4XPxV3uEKhW5WDfjO7NJ4LJ8wSFUonTtoxs8LPCJzfHL+xDiNeRI4afu/Wy7gvHFSRU8E
+        DE6ZO18y0+bVLpTCVOh2MXpQB9tZWso=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-300-VyhtPHbsPPmd0-fv9SDCKQ-1; Wed, 03 May 2023 08:09:47 -0400
+X-MC-Unique: VyhtPHbsPPmd0-fv9SDCKQ-1
+Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-94f271ebbc2so617669366b.2
+        for <kvm@vger.kernel.org>; Wed, 03 May 2023 05:09:47 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1683115786; x=1685707786;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=RkjEggx5doDuLSwR8ZjUhb7IBiYs0z5W7yuB+yUHCuk=;
+        b=NbCofWDGT2gfM/EIM9YaLNZuGBOYLmoqMz7fdKftMG6gKbBv3+IFYymzXvhUsBZtsd
+         Wgf1BrMbudLavlDaTBmVZLIj6o3rJWIaLJxB4Q9VWkQr30OJRtGPt17p8NMGXUmf8QRw
+         q6kOe/g57XnCnRvGuDswzIihW00ntSGHsTvvgs7W93xpPIkooSoqs2/FUZtzfyrH79cg
+         FVwav15zMI7FfNtubGCrwda7KT/csOCTKPFhWOIy13oSxPXfCwiExVIbcSVbt9S7qR0/
+         eweWa7ROAD6DnzTI2vfJxiIto75nn9ks7g46npi0X1vvs0lLyfaSr9rvdDXgMTNa9+Ea
+         5ihw==
+X-Gm-Message-State: AC+VfDwQ1b5zazoPIRHu4yxWNIYmDDRb6Plx/8U24Ohsme3XbMMCWNCS
+        4mjFhXNQWP5Gh0eY6n0ViSgA2bbIVLK520mO48xYa59RwbMqcvsXCfitdZadDNW4DQV1cMskxE0
+        C5F3ZG02BWNGi
+X-Received: by 2002:a17:907:3684:b0:94e:547b:6301 with SMTP id bi4-20020a170907368400b0094e547b6301mr2777484ejc.8.1683115786380;
+        Wed, 03 May 2023 05:09:46 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ6SuQbXI5bAnd45tZOFasAVvd6rklyRosKoF3BB7Xuzo6B77CAdECRGvlWYq0kYBrlTvQht1w==
+X-Received: by 2002:a17:907:3684:b0:94e:547b:6301 with SMTP id bi4-20020a170907368400b0094e547b6301mr2777459ejc.8.1683115786077;
+        Wed, 03 May 2023 05:09:46 -0700 (PDT)
+Received: from sgarzare-redhat ([185.29.96.107])
+        by smtp.gmail.com with ESMTPSA id y15-20020a170906070f00b0094f54279f13sm17256035ejb.157.2023.05.03.05.09.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 03 May 2023 05:09:45 -0700 (PDT)
+Date:   Wed, 3 May 2023 14:09:38 +0200
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Bobby Eshleman <bobbyeshleman@gmail.com>
+Cc:     Vishnu Dasa <vdasa@vmware.com>, Wei Liu <wei.liu@kernel.org>,
+        Bobby Eshleman <bobby.eshleman@bytedance.com>,
+        kvm@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>,
+        VMware PV-Drivers Reviewers <pv-drivers@vmware.com>,
+        Dexuan Cui <decui@microsoft.com>,
+        Haiyang Zhang <haiyangz@microsoft.com>,
+        linux-kernel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        Bryan Tan <bryantan@vmware.com>,
+        Eric Dumazet <edumazet@google.com>,
+        linux-hyperv@vger.kernel.org,
+        Stefan Hajnoczi <stefanha@redhat.com>, netdev@vger.kernel.org,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>
+Subject: Re: [PATCH RFC net-next v2 3/4] vsock: Add lockless sendmsg() support
+Message-ID: <lc2v5porgyzx6neimlyrpeg3d5l7trnorbs7xubqgcrlp7bbi7@yxs25wx67tm7>
+References: <20230413-b4-vsock-dgram-v2-0-079cc7cee62e@bytedance.com>
+ <20230413-b4-vsock-dgram-v2-3-079cc7cee62e@bytedance.com>
+ <bs3elc4lwvvq22y2vq27ewo23qibei2neys4txszi6wybxpuzu@czyq5hb7iv5t>
+ <ZDp837+YDvAfoNLc@bullseye>
+ <se4wymgrmiihkoq4kpnlo2uwklxhfreyzrqjuc7qcqz3c3l7l3@dlxostl5y6q2>
+ <ZDre6Mqh9+HA8wuN@bullseye>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <8122e0de-7cbb-83f2-4c3a-7a50f0d5b205@linux.ibm.com>
-References: <20230426083426.6806-1-pmorel@linux.ibm.com> <20230426083426.6806-3-pmorel@linux.ibm.com> <168258524358.99032.14388431972069131423@t14-nrb> <25a9c3d6-43be-6a08-a32e-5abc520e8c62@linux.ibm.com> <168266833708.15302.621201335459420614@t14-nrb> <8122e0de-7cbb-83f2-4c3a-7a50f0d5b205@linux.ibm.com>
-From:   Nico Boehr <nrb@linux.ibm.com>
-To:     Pierre Morel <pmorel@linux.ibm.com>, linux-s390@vger.kernel.org
-Subject: Re: [kvm-unit-tests PATCH v8 2/2] s390x: topology: Checking Configuration Topology Information
-Cc:     frankja@linux.ibm.com, thuth@redhat.com, kvm@vger.kernel.org,
-        imbrenda@linux.ibm.com, david@redhat.com, nsg@linux.ibm.com
-Message-ID: <168311498507.14421.10981394117035080962@t14-nrb>
-User-Agent: alot/0.8.1
-Date:   Wed, 03 May 2023 13:56:25 +0200
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: KGnR3WsasNTSebOvQ6p410S3faFN46WY
-X-Proofpoint-GUID: xnOPxg4V0sFYFXXkoNq62tn7sm6zDEXJ
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
- definitions=2023-05-03_07,2023-05-03_01,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 impostorscore=0
- adultscore=0 spamscore=0 clxscore=1015 bulkscore=0 mlxlogscore=999
- lowpriorityscore=0 malwarescore=0 priorityscore=1501 phishscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2303200000 definitions=main-2305030097
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <ZDre6Mqh9+HA8wuN@bullseye>
+X-Spam-Status: No, score=-2.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Quoting Pierre Morel (2023-04-28 15:10:07)
->=20
-> On 4/28/23 09:52, Nico Boehr wrote:
-> > Quoting Pierre Morel (2023-04-27 16:50:16)
-> > [...]
-> >>>> diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
-> >>>> index fc3666b..375e6ce 100644
-> >>>> --- a/s390x/unittests.cfg
-> >>>> +++ b/s390x/unittests.cfg
-> >>>> @@ -221,3 +221,6 @@ file =3D ex.elf
-> >>>>   =20
-> >>>>    [topology]
-> >>>>    file =3D topology.elf
-> >>>> +# 3 CPUs on socket 0 with different CPU TLE (standard, dedicated, o=
-rigin)
-> >>>> +# 1 CPU on socket 2
-> >>>> +extra_params =3D -smp 1,drawers=3D3,books=3D3,sockets=3D4,cores=3D4=
-,maxcpus=3D144 -cpu z14,ctop=3Don -device z14-s390x-cpu,core-id=3D1,entitle=
-ment=3Dlow -device z14-s390x-cpu,core-id=3D2,dedicated=3Don -device z14-s39=
-0x-cpu,core-id=3D10 -device z14-s390x-cpu,core-id=3D20 -device z14-s390x-cp=
-u,core-id=3D130,socket-id=3D0,book-id=3D0,drawer-id=3D0 -append '-drawers 3=
- -books 3 -sockets 4 -cores 4'
-> >>> If I got the command line right, all CPUs are on the same drawer with=
- this command line, aren't they? If so, does it make sense to run with diff=
-erent combinations, i.e. CPUs on different drawers, books etc?
-> >> OK, I will add some CPU on different drawers and books.
-> > just to clarify: What I meant is adding an *additional* entry to unitte=
-sts.cfg. Does it make sense in your opinion? I just want more coverage for =
-different scenarios we may have.
->=20
-> Ah OK, yes even better.
->=20
-> In this test I chose the values randomly, I can add 2 other tests like
->=20
-> - once with the maximum of CPUs like:
->=20
-> [topology-2]
-> file =3D topology.elf
-> extra_params =3D -smp drawers=3D3,books=3D4,sockets=3D5,cores=3D4,maxcpus=
-=3D240=C2=A0=20
-> -append '-drawers 3 -books 4 -sockets 5 -cores 4'
->=20
->=20
-> or having 8 different TLE on the same socket
->=20
-> [topology-2]
->=20
-> file =3D topology.elf
-> extra_params =3D -smp 1,drawers=3D2,books=3D2,sockets=3D2,cores=3D30,maxc=
-pus=3D240=C2=A0=20
-> -append '-drawers 2 -books 2 -sockets 2 -cores 30' -cpu z14,ctop=3Don=20
-> -device=20
-> z14-s390x-cpu,drawer-id=3D1,book-id=3D0,socket-id=3D0,core-id=3D2,entitle=
-ment=3Dlow=20
-> -device=20
-> z14-s390x-cpu,drawer-id=3D1,book-id=3D0,socket-id=3D0,core-id=3D3,entitle=
-ment=3Dmedium=20
-> -device=20
-> z14-s390x-cpu,drawer-id=3D1,book-id=3D0,socket-id=3D0,core-id=3D4,entitle=
-ment=3Dhigh=20
-> -device=20
-> z14-s390x-cpu,drawer-id=3D1,book-id=3D0,socket-id=3D0,core-id=3D5,entitle=
-ment=3Dhigh,dedicated=3Don=20
-> -device=20
-> z14-s390x-cpu,drawer-id=3D1,book-id=3D0,socket-id=3D0,core-id=3D65,entitl=
-ement=3Dlow=20
-> -device=20
-> z14-s390x-cpu,drawer-id=3D1,book-id=3D0,socket-id=3D0,core-id=3D66,entitl=
-ement=3Dmedium=20
-> -device=20
-> z14-s390x-cpu,drawer-id=3D1,book-id=3D0,socket-id=3D0,core-id=3D67,entitl=
-ement=3Dhigh=20
-> -device=20
-> z14-s390x-cpu,drawer-id=3D1,book-id=3D0,socket-id=3D0,core-id=3D68,entitl=
-ement=3Dhigh,dedicated=3Don
->=20
->=20
-> What do you think is the best ?
+On Sat, Apr 15, 2023 at 05:29:12PM +0000, Bobby Eshleman wrote:
+>On Fri, Apr 28, 2023 at 12:29:50PM +0200, Stefano Garzarella wrote:
+>> On Sat, Apr 15, 2023 at 10:30:55AM +0000, Bobby Eshleman wrote:
+>> > On Wed, Apr 19, 2023 at 11:30:53AM +0200, Stefano Garzarella wrote:
+>> > > On Fri, Apr 14, 2023 at 12:25:59AM +0000, Bobby Eshleman wrote:
+>> > > > Because the dgram sendmsg() path for AF_VSOCK acquires the socket lock
+>> > > > it does not scale when many senders share a socket.
+>> > > >
+>> > > > Prior to this patch the socket lock is used to protect the local_addr,
+>> > > > remote_addr, transport, and buffer size variables. What follows are the
+>> > > > new protection schemes for the various protected fields that ensure a
+>> > > > race-free multi-sender sendmsg() path for vsock dgrams.
+>> > > >
+>> > > > - local_addr
+>> > > >    local_addr changes as a result of binding a socket. The write path
+>> > > >    for local_addr is bind() and various vsock_auto_bind() call sites.
+>> > > >    After a socket has been bound via vsock_auto_bind() or bind(), subsequent
+>> > > >    calls to bind()/vsock_auto_bind() do not write to local_addr again. bind()
+>> > > >    rejects the user request and vsock_auto_bind() early exits.
+>> > > >    Therefore, the local addr can not change while a parallel thread is
+>> > > >    in sendmsg() and lock-free reads of local addr in sendmsg() are safe.
+>> > > >    Change: only acquire lock for auto-binding as-needed in sendmsg().
+>> > > >
+>> > > > - vsk->transport
+>> > > >    Updated upon socket creation and it doesn't change again until the
+>> > >
+>> > > This is true only for dgram, right?
+>> > >
+>> >
+>> > Yes.
+>> >
+>> > > How do we decide which transport to assign for dgram?
+>> > >
+>> >
+>> > The transport is assigned in proto->create() [vsock_create()]. It is
+>> > assigned there *only* for dgrams, whereas for streams/seqpackets it is
+>> > assigned in connect(). vsock_create() sets transport to
+>> > 'transport_dgram' if sock->type == SOCK_DGRAM.
+>> >
+>> > vsock_sk_destruct() then eventually sets vsk->transport to NULL.
+>> >
+>> > Neither destruct nor create can occur in parallel with sendmsg().
+>> > create() hasn't yet returned the sockfd for the user to call upon it
+>> > sendmsg(), and AFAICT destruct is only called after the final socket
+>> > reference is released, which only happens after the socket no longer
+>> > exists in the fd lookup table and so sendmsg() will fail before it ever
+>> > has the chance to race.
+>>
+>> This is okay if a socket can be assigned to a single transport, but with
+>> dgrams I'm not sure we can do that.
+>>
+>> Since it is not connected, a socket can send or receive packets from
+>> different transports, so maybe we can't assign it to a specific one,
+>> but do a lookup for every packets to understand which transport to use.
+>>
+>
+>Yes this is true, this lookup needs to be implemented... currently
+>sendmsg() doesn't do this at all. It grabs the remote_addr when passed
+>in from sendto(), but then just uses the same old transport from vsk.
+>You are right that sendto() should be a per-packet lookup, not a
+>vsk->transport read. Perhaps I should add that as another patch in this
+>series, and make it precede this one?
 
-I think both do make sense, since they cover differenct scenarios, don't th=
-ey?
+Yep, I think so, we need to implement it before adding a new transport
+that can support dgram.
+
+>
+>For the send() / sendto(NULL) case where vsk->transport is being read, I
+>do believe this is still race-free, but...
+>
+>If we later support dynamic transports for datagram, such that
+>connect(VMADDR_LOCAL_CID) sets vsk->transport to transport_loopback,
+>connect(VMADDR_CID_HOST) sets vsk->transport to something like
+>transport_datagram_g2h, etc..., then vsk->transport will need to be
+>bundled into the RCU-protected pointer too, since it may change when
+>remote_addr changes.
+
+Yep, I think so. Although in vsock_dgram_connect we call lock_sock(), so 
+maybe that could be enough to protect us.
+
+In general I think we should use vsk->transport if vsock_dgram_connect()
+is called, or we need to do per-packet lookup.
+
+Another think I would change, is the dgram_dequeue() callback.
+I would remove it, and move in the core the code in 
+vmci_transport_dgram_dequeue() since it seems pretty generic.
+
+This should work well if every transport uses sk_receive_skb() to 
+enqueue sk_buffs in the socket buffer.
+
+Thanks,
+Stefano
+
