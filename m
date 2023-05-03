@@ -2,187 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CCCBD6F5C42
-	for <lists+kvm@lfdr.de>; Wed,  3 May 2023 18:52:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D77166F5C4B
+	for <lists+kvm@lfdr.de>; Wed,  3 May 2023 19:01:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229784AbjECQwg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 May 2023 12:52:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37710 "EHLO
+        id S229805AbjECRBe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 May 2023 13:01:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40688 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229526AbjECQwe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 May 2023 12:52:34 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B857B7292
-        for <kvm@vger.kernel.org>; Wed,  3 May 2023 09:52:31 -0700 (PDT)
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 343GodBv026998;
-        Wed, 3 May 2023 16:52:21 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=dQ884//3MIN5TZFslQ5hPzbr/FOPMz2sIzKYatfvBhU=;
- b=lE1Sn5NkN5+/Qxvl8e+kky8ZwGTWAVnqgYJq1GwwSj1uSRaScY9oymdfY7XQwuXLlGpU
- 08mBevZLFKowR+jq1DXBaZzyU/Nek+vUfni10OygHirWjBJizW4LUXOQ0L1xJpg8BevN
- fC0zyfzA65VVwgzCI/z+aNwuZFO88l7Pnq9/ZZamIsYJfr3wPl9UeIMtfF8eATMQYEUI
- 4tSutka3fohSXcdhUVel9rQtLjeOTFEwg/mPgrwLMTM+czHrpbdxEdB1CinqLpIHT/vR
- g8C7m0zFYaMo9jyHU5Gr8SkAaU+Sz7sTHKUHrs2Rc8M0dCkxEJSbSLry5PoGltA4OlUC 2g== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qbug702hc-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 03 May 2023 16:52:20 +0000
-Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 343GonNj027788;
-        Wed, 3 May 2023 16:52:19 GMT
-Received: from ppma03wdc.us.ibm.com (ba.79.3fa9.ip4.static.sl-reverse.com [169.63.121.186])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qbug702e3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 03 May 2023 16:52:19 +0000
-Received: from pps.filterd (ppma03wdc.us.ibm.com [127.0.0.1])
-        by ppma03wdc.us.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 343F8lFL023724;
-        Wed, 3 May 2023 16:51:18 GMT
-Received: from smtprelay04.dal12v.mail.ibm.com ([9.208.130.102])
-        by ppma03wdc.us.ibm.com (PPS) with ESMTPS id 3q8tv7nd5t-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 03 May 2023 16:51:18 +0000
-Received: from smtpav04.dal12v.mail.ibm.com (smtpav04.dal12v.mail.ibm.com [10.241.53.103])
-        by smtprelay04.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 343GpIqg11338432
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 3 May 2023 16:51:18 GMT
-Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1DB9F58052;
-        Wed,  3 May 2023 16:51:18 +0000 (GMT)
-Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 8C5C85805E;
-        Wed,  3 May 2023 16:51:17 +0000 (GMT)
-Received: from li-a300cfcc-3261-11b2-a85c-fa2d52d0d140.ibm.com (unknown [9.160.23.254])
-        by smtpav04.dal12v.mail.ibm.com (Postfix) with ESMTP;
-        Wed,  3 May 2023 16:51:17 +0000 (GMT)
-Message-ID: <cc22183359d107dc0be58b4f9509c8d785313879.camel@linux.ibm.com>
-Subject: Re: [ANNOUNCEMENT] COCONUT Secure VM Service Module for SEV-SNP
-From:   Claudio Carvalho <cclaudio@linux.ibm.com>
-To:     =?ISO-8859-1?Q?J=F6rg_R=F6del?= <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>
-Cc:     amd-sev-snp@lists.suse.com, linux-coco@lists.linux.dev,
-        kvm@vger.kernel.org, Carlos Bilbao <carlos.bilbao@amd.com>,
-        Klaus Kiwi <kkiwi@redhat.com>
-Date:   Wed, 03 May 2023 12:51:17 -0400
-In-Reply-To: <ZFJTDtMK0QqXK5+E@suse.de>
-References: <ZBl4592947wC7WKI@suse.de>
-         <4420d7e5-d05f-8c31-a0f2-587ebb7eaa20@amd.com> <ZFJTDtMK0QqXK5+E@suse.de>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: sj8sxnOtRrj090Qt4mIqkCXtAcVQqs7d
-X-Proofpoint-GUID: Wa0JeZMFVsoh0Zf-drserLKROW-Ly5nl
-Content-Transfer-Encoding: quoted-printable
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+        with ESMTP id S229650AbjECRBd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 May 2023 13:01:33 -0400
+Received: from mail-il1-x135.google.com (mail-il1-x135.google.com [IPv6:2607:f8b0:4864:20::135])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DDD410E6
+        for <kvm@vger.kernel.org>; Wed,  3 May 2023 10:01:31 -0700 (PDT)
+Received: by mail-il1-x135.google.com with SMTP id e9e14a558f8ab-32f4e0f42a7so318315ab.1
+        for <kvm@vger.kernel.org>; Wed, 03 May 2023 10:01:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1683133291; x=1685725291;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=RokHpL7gEp+8bwACyg0TzjSMRwicpwkJBeyqxLUEb4o=;
+        b=C9ZElJzmsw61SsIyXABDNWMxysHFG08kMIvwUFvHd2crTxZ2R14V7yBi++c3+DjDyD
+         btXJZnhpip28GxNDW+/G8quk340mCEW336XufwWmrvsRs6BVzbU0kbqqhlpRUCyF6Egd
+         l18ATr06FuRmLdWiS/RLueXT5U4Fn2h1V9LHNKdHG/YAhdqnPqBzLXhYv0kcra3RvAgi
+         f4MsIuR8xUWwUdhrSpCOwhU1JjVpP36OQw6KZxQhCrPzq0uFHQa48L4w0pytChUsPAJn
+         5/ralPci7bWZPkOR2O+EwHllsI3btnNzJ55kXCCPNDg9XCAJNLcaUC0y0zPtEvDhv6Ga
+         FjBg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1683133291; x=1685725291;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=RokHpL7gEp+8bwACyg0TzjSMRwicpwkJBeyqxLUEb4o=;
+        b=LpHvIeG0iyefWrPfd/Gn/lGsumSkrQEO2uaYU45EdhaOKszLhLoCew4BOOkjq91PGM
+         KXwX1mi2Bj+XIZNBiIYKTlPgxRP0O9rvPhvbBGV447tffHzxsFadxEyZy53gT/9NiInN
+         PtG59ET7GpSWF5DGy3/BiyaniFR4v55KZGFbGR8YxGCxVj5uRsNCExJSBOUaq8n8CI/I
+         lj0hyUPor27WzCZgqLIMVjzmkQPmVopgpbHVIr0TapkIIIK3KsWZamqZKpyu56eTqHaH
+         iLY7CuAzfibVZAtI1MclGuGsoBTtT2JRXvq6m7z8CDwZUe7C7MXf1BpGNLXleNRjJwNu
+         WFHw==
+X-Gm-Message-State: AC+VfDyaGW0C73HQdOCk4N39KRjlAZOO3bcjtjNN1q4hYTfEEcgb9OZ+
+        UfmFSMkbJQmaBqTUNMjhSk25Zjb8uGB+ikH/JvZXVw==
+X-Google-Smtp-Source: ACHHUZ6C18aijFG98Dx4qPcWT5i4cZpKAKxoDk+NuIteU03P3f/4RpgCadZMImG5Wu2d6cz7bBpFNmv2I6v8J60C1PY=
+X-Received: by 2002:a05:6e02:1cad:b0:325:d0d8:2ddb with SMTP id
+ x13-20020a056e021cad00b00325d0d82ddbmr289785ill.15.1683133290706; Wed, 03 May
+ 2023 10:01:30 -0700 (PDT)
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
- definitions=2023-05-03_11,2023-05-03_01,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 impostorscore=0
- lowpriorityscore=0 phishscore=0 suspectscore=0 clxscore=1011
- priorityscore=1501 bulkscore=0 adultscore=0 mlxscore=0 mlxlogscore=881
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2303200000 definitions=main-2305030141
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+References: <20230503041631.3368796-1-mizhang@google.com> <ZFKLB1C+v6HKcy0o@google.com>
+In-Reply-To: <ZFKLB1C+v6HKcy0o@google.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Wed, 3 May 2023 10:01:19 -0700
+Message-ID: <CALMp9eTHsS2PwVu38QtOa7JkUvBuR7Znz5wjsNuWBfyjT1O8ow@mail.gmail.com>
+Subject: Re: [PATCH] KVM: VMX: add MSR_IA32_TSX_CTRL into msrs_to_save
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Mingwei Zhang <mizhang@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Jorg,
+On Wed, May 3, 2023 at 9:25=E2=80=AFAM Sean Christopherson <seanjc@google.c=
+om> wrote:
+>
+> On Wed, May 03, 2023, Mingwei Zhang wrote:
+> > Add MSR_IA32_TSX_CTRL into msrs_to_save[] to explicitly tell userspace =
+to
+> > save/restore the register value during migration. Missing this may caus=
+e
+> > userspace that relies on KVM ioctl(KVM_GET_MSR_INDEX_LIST) fail to port=
+ the
+> > value to the target VM.
+> >
+> > Fixes: b07a5c53d42a ("KVM: vmx: use MSR_IA32_TSX_CTRL to hard-disable T=
+SX on guest that lack it")
+> > Reported-by: Jim Mattson <jmattson@google.com>
+> > Signed-off-by: Mingwei Zhang <mizhang@google.com>
+> > ---
+> >  arch/x86/kvm/x86.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >
+> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> > index 237c483b1230..2236cfee4b7a 100644
+> > --- a/arch/x86/kvm/x86.c
+> > +++ b/arch/x86/kvm/x86.c
+> > @@ -1431,7 +1431,7 @@ static const u32 msrs_to_save_base[] =3D {
+> >  #endif
+> >       MSR_IA32_TSC, MSR_IA32_CR_PAT, MSR_VM_HSAVE_PA,
+> >       MSR_IA32_FEAT_CTL, MSR_IA32_BNDCFGS, MSR_TSC_AUX,
+> > -     MSR_IA32_SPEC_CTRL,
+> > +     MSR_IA32_SPEC_CTRL, MSR_IA32_TSX_CTRL,
+> >       MSR_IA32_RTIT_CTL, MSR_IA32_RTIT_STATUS, MSR_IA32_RTIT_CR3_MATCH,
+> >       MSR_IA32_RTIT_OUTPUT_BASE, MSR_IA32_RTIT_OUTPUT_MASK,
+> >       MSR_IA32_RTIT_ADDR0_A, MSR_IA32_RTIT_ADDR0_B,
+> > --
+>
+> Hmm, KVM shouldn't report the MSR if it can't be written by the guest.  O=
+ver-
 
-On Wed, 2023-05-03 at 14:26 +0200, J=C3=B6rg R=C3=B6del wrote:
->=20
-> > =C2=A0 - Are you open to having maintainers outside of SUSE? There is s=
-ome
-> > =C2=A0=C2=A0=C2=A0 linux-svsm community concern about project governanc=
-e and project
-> > =C2=A0=C2=A0=C2=A0 priorities and release schedules. This wouldn't have=
- to be AMD even,
-> > =C2=A0=C2=A0=C2=A0 but we'd volunteer to help here if desired, but we'd=
- like to foster a
-> > =C2=A0=C2=A0=C2=A0 true community model for governance regardless. We'd=
- love to hear
-> > =C2=A0=C2=A0=C2=A0 thoughts on this from coconut-svsm folks.
->=20
-> Yes, I am definitely willing to make the project more open and move to a
-> maintainer-group model, no intention from my side to become a BDFL for
-> the project. I just have no clear picture yet how the model should look
-> like and how to get there. I will send a separate email to kick-start a
-> discussion about that.
->=20
+I think you mean to say that KVM shouldn't report the MSR if it can't
+be written by *any* guest. KVM_GET_MSR_INDEX_LIST is a device ioctl,
+so it isn't capable of filtering out MSRs that can't be written by
+*the* guest, for some occurrence of "the."
 
-Thanks. I would be happy to collaborate in that discussion.
-
-> > =C2=A0 - On the subject of priorities, the number one priority for the
-> > =C2=A0=C2=A0=C2=A0 linux-svsm project has been to quickly achieve produ=
-ction quality vTPM
-> > =C2=A0=C2=A0=C2=A0 support. The support for this is being actively work=
-ed on by
-> > =C2=A0=C2=A0=C2=A0 linux-svsm contributors and we'd want to find fastes=
-t path towards
-> > =C2=A0=C2=A0=C2=A0 getting that redirected into coconut-svsm (possibly =
-starting with CPL0
-> > =C2=A0=C2=A0=C2=A0 implementation until CPL3 support is available) and =
-the project
-> > =C2=A0=C2=A0=C2=A0 hardened for a release.=C2=A0 I imagine there will b=
-e some competing
-> > =C2=A0=C2=A0=C2=A0 priorities from coconut-svsm project currently, so w=
-anted to get this
-> > =C2=A0=C2=A0=C2=A0 out on the table from the beginning.
->=20
-> That has been under discussion for some time, and honestly I think
-> the approach taken is the main difference between linux-svsm and
-> COCONUT. My position here is, and that comes with a big 'BUT', that I am
-> not fundamentally opposed to having a temporary solution for the TPM
-> until CPL-3 support is at a point where it can run a TPM module.
->=20
-> And here come the 'BUT': Since the goal of having one project is to
-> bundle community efforts, I think that the joint efforts are better
-> targeted at getting CPL-3 support to a point where it can run modules.
-> On that side some input and help is needed, especially to define the
-> syscall interface so that it suits the needs of a TPM implementation.
->=20
-> It is also not the case that CPL-3 support is out more than a year or
-> so. The RamFS is almost ready, as is the archive file inclusion[1]. We
-> will move to task management next, the goal is still to have basic
-> support ready in 2H2023.
->=20
-> [1] https://github.com/coconut-svsm/svsm/pull/27
->=20
-> If there is still a strong desire to have COCONUT with a TPM (running at
-> CPL-0) before CPL-3 support is usable, then I can live with including
-> code for that as a temporary solution. But linking huge amounts of C
-> code (like openssl or a tpm lib) into the SVSM rust binary kind of
-> contradicts the goals which made us using Rust for project in the first
-> place. That is why I only see this as a temporary solution.
->=20
->=20
-
-I think the crypto support requires more design discussion since it is requ=
-ired
-in multiple places.
-
-The experience I've had adding SVSM-vTPM support is that the SVSM needs cry=
-pto
-for requesting an attestation report (SNP_GUEST_REQUEST messages sent to the
-security processor PSP have to be encrypted with AES_GCM) and the vTPM also
-needs crypto for the TPM crypto operations. We could just duplicate the cry=
-pto
-library, or find a way to share it (e.g. vdso approach).
-
-For the SVSM, it would be rust code talking to the crypto library; for the =
-vTPM
-it would be the vTPM (most likely an existing C implementation) talking to =
-the
-crypto library.
-
-Regards,
-
-Claudio
-
+> reporting won't cause functional issues, and the odds of the MSR existing=
+ but not
+> being reported in ARCH_CAPILIBITES are basically zilch, but IMO it's wort=
+h adding
+> the check if only to document when the MSRs is fully supported.
+>
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index e7f78fe79b32..d8608c6753ff 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -7152,6 +7152,10 @@ static void kvm_probe_msr_to_save(u32 msr_index)
+>                 if (!kvm_cpu_cap_has(X86_FEATURE_XFD))
+>                         return;
+>                 break;
+> +       case MSR_IA32_TSX_CTRL:
+> +               if (!(kvm_get_arch_capabilities() & ARCH_CAP_TSX_CTRL_MSR=
+))
+> +                       return;
+> +               break;
+>         default:
+>                 break;
+>         }
