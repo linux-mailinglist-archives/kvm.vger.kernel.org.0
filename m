@@ -2,269 +2,230 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 169236F607B
-	for <lists+kvm@lfdr.de>; Wed,  3 May 2023 23:19:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F3AC06F6087
+	for <lists+kvm@lfdr.de>; Wed,  3 May 2023 23:27:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229619AbjECVTF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 May 2023 17:19:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39782 "EHLO
+        id S229628AbjECV1x (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 May 2023 17:27:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42022 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229441AbjECVTD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 May 2023 17:19:03 -0400
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id B99F983E6
-        for <kvm@vger.kernel.org>; Wed,  3 May 2023 14:18:49 -0700 (PDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 958BE2F4;
-        Wed,  3 May 2023 14:19:33 -0700 (PDT)
-Received: from [10.57.58.91] (unknown [10.57.58.91])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 602513F5A1;
-        Wed,  3 May 2023 14:18:48 -0700 (PDT)
-Message-ID: <f41bb1d0-d3d3-0f5e-f7a0-ec605a6762db@arm.com>
-Date:   Wed, 3 May 2023 22:18:47 +0100
+        with ESMTP id S229449AbjECV1w (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 May 2023 17:27:52 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6BE9530EF
+        for <kvm@vger.kernel.org>; Wed,  3 May 2023 14:27:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1683149226;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=zRYrSNgpiPMEPps9ye4BB/zP/sPgUUxNWzkYkCFCxII=;
+        b=DhFz0ukhkxCOPuYegi0DweW2MucACxAxr9yjU4Lv8xyINe0nYu2uNmPkd/kT+6aJ0KcoOu
+        kJgK7SJWAPaRN7okff4zNYPJcu+qL8eq0LFbLwo1cZSXD3BNz1mikpvrFHciG9EywpWdqf
+        YpBehY3XEEhLsmUYSLccjwlQIlJT0kU=
+Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
+ [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-352-aPnZ1fSYOFmtw3KirF6Frw-1; Wed, 03 May 2023 17:27:05 -0400
+X-MC-Unique: aPnZ1fSYOFmtw3KirF6Frw-1
+Received: by mail-qv1-f70.google.com with SMTP id 6a1803df08f44-61b6f717b6eso2848786d6.0
+        for <kvm@vger.kernel.org>; Wed, 03 May 2023 14:27:05 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1683149225; x=1685741225;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=zRYrSNgpiPMEPps9ye4BB/zP/sPgUUxNWzkYkCFCxII=;
+        b=CYuFwt2QqwhItXQPW5LFj6+fWgKLsmoxzcoCCg9L2bTLXlanWo+6ZPBrpIp0L7Uy0i
+         AIKiQk2mhE90h6ZERaTs6qx6w6NtkTH/zQtkYcP5j1bD+4TxQXux7yonwAz8A/DHc3L5
+         8TK0sK6WkIWVr9ZogStPqCCbU7jdCLeww7HXcF6x85YQr8MolWhPSMiaSrvJQGOkPMfZ
+         sYqC4o1I6zwDliiJP6SFLzng6Yi/RsLWoZ/D1czMcnCRid+MYriOrc8cck2u1uipizHq
+         SYIT/YUac1thPQ/rG7m0qSE6CZBJAXdGrzMqLbgArf/AfNSsNpUqEyhuIQLVlbm8qVAL
+         O+tA==
+X-Gm-Message-State: AC+VfDy0IT2kFtT/xUNeIh/0lEZ5lBaLywclluz6gpPKEu9c9IvoxueT
+        O7H/S0SQCixDa27tfv29uCkWNUADSODYU8WYNENIrQ1w5Gae/cj5dNSChQiE+Okinlb2zsE7UGs
+        ld4rhWoePa2cC
+X-Received: by 2002:a05:6214:518e:b0:5f1:31eb:1f0e with SMTP id kl14-20020a056214518e00b005f131eb1f0emr10702945qvb.4.1683149225087;
+        Wed, 03 May 2023 14:27:05 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ6VUszU2qmNVmjgb3iB/r4TqNmXOCMS3jwnE85/9bghI4vJMO7j2bpn5Ctu6Cbn3rd9JqWgag==
+X-Received: by 2002:a05:6214:518e:b0:5f1:31eb:1f0e with SMTP id kl14-20020a056214518e00b005f131eb1f0emr10702920qvb.4.1683149224741;
+        Wed, 03 May 2023 14:27:04 -0700 (PDT)
+Received: from x1n (bras-base-aurron9127w-grc-40-70-52-229-124.dsl.bell.ca. [70.52.229.124])
+        by smtp.gmail.com with ESMTPSA id az12-20020a05620a170c00b0074fb15e2319sm8267844qkb.122.2023.05.03.14.27.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 03 May 2023 14:27:03 -0700 (PDT)
+Date:   Wed, 3 May 2023 17:27:00 -0400
+From:   Peter Xu <peterx@redhat.com>
+To:     Anish Moorthy <amoorthy@google.com>
+Cc:     Nadav Amit <nadav.amit@gmail.com>,
+        Axel Rasmussen <axelrasmussen@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, maz@kernel.org,
+        oliver.upton@linux.dev, Sean Christopherson <seanjc@google.com>,
+        James Houghton <jthoughton@google.com>, bgardon@google.com,
+        dmatlack@google.com, ricarkol@google.com,
+        kvm <kvm@vger.kernel.org>, kvmarm@lists.linux.dev
+Subject: Re: [PATCH v3 00/22] Improve scalability of KVM + userfaultfd live
+ migration via annotated memory faults.
+Message-ID: <ZFLRpEV09lrpJqua@x1n>
+References: <ZEBXi5tZZNxA+jRs@x1n>
+ <CAF7b7mo68VLNp=QynfT7QKgdq=d1YYGv1SEVEDxF9UwHzF6YDw@mail.gmail.com>
+ <ZEGuogfbtxPNUq7t@x1n>
+ <46DD705B-3A3F-438E-A5B1-929C1E43D11F@gmail.com>
+ <CAF7b7mo78e2YPHU5YrhzuORdpGXCVRxXr6kSyMa+L+guW8jKGw@mail.gmail.com>
+ <84DD9212-31FB-4AF6-80DD-9BA5AEA0EC1A@gmail.com>
+ <CAF7b7mr-_U6vU1iOwukdmOoaT0G1ttyxD62cv=vebnQeXL3R0w@mail.gmail.com>
+ <ZErahL/7DKimG+46@x1n>
+ <CAF7b7mqaxk6w90+9+5UkEAE13vDTmBMmCO_ZdAEo6pD8_--fZA@mail.gmail.com>
+ <ZFLPlRReglM/Vgfu@x1n>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.10.1
-Subject: Re: [kvm-unit-tests PATCH v5 00/29] EFI and ACPI support for arm64
-Content-Language: en-GB
-To:     Shaoqin Huang <shahuang@redhat.com>, kvm@vger.kernel.org,
-        kvmarm@lists.linux.dev, andrew.jones@linux.dev
-Cc:     pbonzini@redhat.com, alexandru.elisei@arm.com, ricarkol@google.com
-References: <20230428120405.3770496-1-nikos.nikoleris@arm.com>
- <b6e3bc3f-d409-00ae-df0f-4bcea9ec0330@redhat.com>
-From:   Nikos Nikoleris <nikos.nikoleris@arm.com>
-In-Reply-To: <b6e3bc3f-d409-00ae-df0f-4bcea9ec0330@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-8.5 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
-        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <ZFLPlRReglM/Vgfu@x1n>
+X-Spam-Status: No, score=-2.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Shaoqin,
+Oops, bounced back from the list..
 
-On 01/05/2023 13:09, Shaoqin Huang wrote:
-> Hi Nikos,
-> 
-> When I test this series by simply run ./run_tests.sh, some migration
-> test will hang up forever, like the `its-migration` test.
-> 
-> After have a quick look, when do the migration test, the guest can't be
-> migrated due to:
-> 
-> {"return": {"blocked-reasons": ["The qcow format used by node
-> '#block389' does not support live migration", "The vvfat (rw) format
-> used by node '#block085' does not support live migration"]}}
-> 
-> Although the guest will be timeout, but the script itself will not be
-> timeout. The infinite loop happened at here:
-> 
-> // script/arch-run.bash
->     151         # Wait for the migration to complete
->     152         migstatus=`qmp ${qmp1} '"query-migrate"' | grep return`
->     153         while ! grep -q '"completed"' <<<"$migstatus" ; do
->     154                 sleep 1
->     155                 migstatus=`qmp ${qmp1} '"query-migrate"' | grep
-> return`
->     156                 if grep -q '"failed"' <<<"$migstatus" ; then
->     157                         echo "ERROR: Migration failed." >&2
->     158                         qmp ${qmp1} '"quit"'> ${qmpout1} 2>/dev/null
->     159                         qmp ${qmp2} '"quit"'> ${qmpout2} 2>/dev/null
->     160                         return 2
->     161                 fi
->     162         done
-> 
-> Since the "query-migrate" here will never get "completed" or "failed",
-> so it will never exit.
-> > Have you ever meet this problem?
+Forward with no attachment this time - I assume the information is still
+enough in the paragraphs even without the flamegraphs.  Sorry for the
+noise.
 
-I haven't encountered any problems on Linux but I think I am running 
-into something like this when I run on a MacOS. Unfortunately, I don't 
-know much about the migration tests and I don't know how they are 
-supposed to work in this case. Maybe the problem is that when we can 
-run_tests.sh for each test we first run dummy.efi?
-
-Thanks,
-
-Nikos
-
+On Wed, May 03, 2023 at 05:18:13PM -0400, Peter Xu wrote:
+> On Wed, May 03, 2023 at 12:45:07PM -0700, Anish Moorthy wrote:
+> > On Thu, Apr 27, 2023 at 1:26 PM Peter Xu <peterx@redhat.com> wrote:
+> > >
+> > > Thanks (for doing this test, and also to Nadav for all his inputs), and
+> > > sorry for a late response.
+> > 
+> > No need to apologize: anyways, I've got you comfortably beat on being
+> > late at this point :)
+> > 
+> > > These numbers caught my eye, and I'm very curious why even 2 vcpus can
+> > > scale that bad.
+> > >
+> > > I gave it a shot on a test machine and I got something slightly different:
+> > >
+> > >   Intel(R) Xeon(R) CPU E5-2630 v4 @ 2.20GHz (20 cores, 40 threads)
+> > >   $ ./demand_paging_test -b 512M -u MINOR -s shmem -v N
+> > >   |-------+----------+--------|
+> > >   | n_thr | per-vcpu | total  |
+> > >   |-------+----------+--------|
+> > >   |     1 | 39.5K    | 39.5K  |
+> > >   |     2 | 33.8K    | 67.6K  |
+> > >   |     4 | 31.8K    | 127.2K |
+> > >   |     8 | 30.8K    | 246.1K |
+> > >   |    16 | 21.9K    | 351.0K |
+> > >   |-------+----------+--------|
+> > >
+> > > I used larger ram due to less cores.  I didn't try 32+ vcpus to make sure I
+> > > don't have two threads content on a core/thread already since I only got 40
+> > > hardware threads there, but still we can compare with your lower half.
+> > >
+> > > When I was testing I noticed bad numbers and another bug on not using
+> > > NSEC_PER_SEC properly, so I did this before the test:
+> > >
+> > > https://lore.kernel.org/all/20230427201112.2164776-1-peterx@redhat.com/
+> > >
+> > > I think it means it still doesn't scale that good, however not so bad
+> > > either - no obvious 1/2 drop on using 2vcpus.  There're still a bunch of
+> > > paths triggered in the test so I also don't expect it to fully scale
+> > > linearly.  From my numbers I just didn't see as drastic as yours. I'm not
+> > > sure whether it's simply broken test number, parameter differences
+> > > (e.g. you used 64M only per-vcpu), or hardware differences.
+> > 
+> > Hmm, I suspect we're dealing with  hardware differences here. I
+> > rebased my changes onto those two patches you sent up, taking care not
+> > to clobber them, but even with the repro command you provided my
+> > results look very different than yours (at least on 1-4 vcpus) on the
+> > machine I've been testing on (4x AMD EPYC 7B13 64-Core, 2.2GHz).
+> > 
+> > (n=20)
+> > n_thr      per_vcpu       total
+> > 1            154K              154K
+> > 2             92k                184K
+> > 4             71K                285K
+> > 8             36K                291K
+> > 16           19K                310K
+> > 
+> > Out of interested I tested on another machine (Intel(R) Xeon(R)
+> > Platinum 8273CL CPU @ 2.20GHz) as well, and results are a bit
+> > different again
+> > 
+> > (n=20)
+> > n_thr      per_vcpu       total
+> > 1            115K              115K
+> > 2             103k              206K
+> > 4             65K                262K
+> > 8             39K                319K
+> > 16           19K                398K
 > 
-> Thanks,
-> Shaoqin
+> Interesting.
 > 
-> On 4/28/23 20:03, Nikos Nikoleris wrote:
->> Hello,
->>
->> This series adds initial support for building arm64 tests as EFI
->> apps and running them under QEMU. Much like x86_64, we import external
->> dependencies from gnu-efi and adapt them to work with types and other
->> assumptions from kvm-unit-tests. In addition, this series adds support
->> for enumerating parts of the system using ACPI.
->>
->> The first set of patches, moves the existing ACPI code to the common
->> lib path. Then, it extends definitions and functions to allow for more
->> robust discovery of ACPI tables. We add support for setting up the PSCI
->> conduit, discovering the UART, timers, GIC and cpus via ACPI. The code
->> retains existing behavior and gives priority to discovery through DT
->> when one has been provided.
->>
->> In the second set of patches, we add support for getting the command
->> line from the EFI shell. This is a requirement for many of the
->> existing arm64 tests.
->>
->> In the third set of patches, we import code from gnu-efi, make minor
->> changes and add an alternative setup sequence from arm64 systems that
->> boot through EFI. Finally, we add support in the build system and a
->> run script which is used to run an EFI app.
->>
->> After this set of patches one can build arm64 EFI tests:
->>
->> $> ./configure --enable-efi
->> $> make
->>
->> And use the run script to run an EFI tests:
->>
->> $> ./arm/efi/run ./arm/selftest.efi -smp 2 -m 256 -append "setup smp=2 mem=256"
->>
->> Or all tests:
->>
->> $> ./run_tests.sh
->>
->> There are a few items that this series does not address but they would
->> be useful to have:
->>    - Support for booting the system from EL2. Currently, we assume that a
->>      test starts EL1. This will be required to run EFI tests on sytems
->>      that implement EL2.
->>    - Support for reading environment variables and populating __envp.
->>    - Support for discovering the PCI subsystem using ACPI.
->>    - Get rid of other assumptions (e.g., vmalloc area) that don't hold on
->>      real HW.
->>    - Various fixes related to cache maintaince to better support turn the
->>      MMU off.
->>    - Switch to a new stack and avoid relying on the one provided by EFI.
->>
->> git branch: https://github.com/relokin/kvm-unit-tests/pull/new/target-efi-upstream-v5
->>
->> v4: https://lore.kernel.org/kvmarm/20230213101759.2577077-1-nikos.nikoleris@arm.com/
->> v3: https://lore.kernel.org/all/20220630100324.3153655-1-nikos.nikoleris@arm.com/
->> v2: https://lore.kernel.org/kvm/20220506205605.359830-1-nikos.nikoleris@arm.com/
->>
->> Changes in v5:
->>    - Minor style changes (thanks Shaoqin).
->>    - Avoid including lib/acpi.o to cflatobjs twice (thanks Drew).
->>    - Increase NR_INITIAL_MEM_REGIONS to avoid overflows and add check when
->>      we run out of space (thanks Shaoqin).
->>
->> Changes in v4:
->>    - Removed patch that reworks cache maintenance when turning the MMU
->>      off. This is not strictly required for EFI tests running with tcg and
->>      will be addressed in a separate series by Alex.
->>    - Fix compilation for arm (Alex).
->>    - Convert ACPI tables to Linux style (Alex).
->>
->> Changes in v3:
->>    - Addressed feedback from Drew, Alex and Ricardo. Many thanks for the reviews!
->>    - Added support for discovering the GIC through ACPI
->>    - Added a missing header file (<elf.h>)
->>    - Added support for correctly parsing the outcome of tests (./run_tests)
->>
->> Thanks,
->>
->> Nikos
->>
->> Alexandru Elisei (2):
->>     lib/acpi: Convert table names to Linux style
->>     lib: arm: Print test exit status
->>
->> Andrew Jones (2):
->>     arm/arm64: Rename etext to _etext
->>     arm64: Add a new type of memory type flag MR_F_RESERVED
->>
->> Nikos Nikoleris (25):
->>     lib: Move acpi header and implementation to lib
->>     x86: Move x86_64-specific EFI CFLAGS to x86_64 Makefile
->>     lib: Apply Lindent to acpi.{c,h}
->>     lib: Fix style for acpi.{c,h}
->>     x86: Avoid references to fields of ACPI tables
->>     lib/acpi: Ensure all struct definition for ACPI tables are packed
->>     lib/acpi: Add support for the XSDT table
->>     lib/acpi: Extend the definition of the FADT table
->>     devicetree: Check that fdt is not NULL in dt_available()
->>     arm64: Add support for setting up the PSCI conduit through ACPI
->>     arm64: Add support for discovering the UART through ACPI
->>     arm64: Add support for timer initialization through ACPI
->>     arm64: Add support for cpu initialization through ACPI
->>     arm64: Add support for gic initialization through ACPI
->>     lib/printf: Support for precision modifier in printf
->>     lib/printf: Add support for printing wide strings
->>     lib/efi: Add support for getting the cmdline
->>     lib: Avoid ms_abi for calls related to EFI on arm64
->>     arm64: Add a setup sequence for systems that boot through EFI
->>     arm64: Copy code from GNU-EFI
->>     arm64: Change GNU-EFI imported code to use defined types
->>     arm64: Use code from the gnu-efi when booting with EFI
->>     lib: Avoid external dependency in libelf
->>     arm64: Add support for efi in Makefile
->>     arm64: Add an efi/run script
->>
->>    scripts/runtime.bash        |  13 +-
->>    arm/efi/run                 |  61 ++++++++
->>    arm/run                     |  14 +-
->>    configure                   |  17 +-
->>    Makefile                    |   4 -
->>    arm/Makefile.arm            |   6 +
->>    arm/Makefile.arm64          |  22 ++-
->>    arm/Makefile.common         |  47 ++++--
->>    x86/Makefile.common         |   2 +-
->>    x86/Makefile.x86_64         |   4 +
->>    lib/linux/efi.h             |  25 +++
->>    lib/arm/asm/setup.h         |   9 ++
->>    lib/arm/asm/timer.h         |   2 +
->>    lib/x86/asm/setup.h         |   2 +-
->>    lib/acpi.h                  | 301 ++++++++++++++++++++++++++++++++++++
->>    lib/argv.h                  |   1 +
->>    lib/elf.h                   |  57 +++++++
->>    lib/libcflat.h              |   1 +
->>    lib/x86/acpi.h              | 112 --------------
->>    lib/acpi.c                  | 129 ++++++++++++++++
->>    lib/argv.c                  |   2 +-
->>    lib/arm/gic.c               | 139 ++++++++++++++++-
->>    lib/arm/io.c                |  41 ++++-
->>    lib/arm/mmu.c               |   4 +
->>    lib/arm/psci.c              |  37 ++++-
->>    lib/arm/setup.c             | 269 ++++++++++++++++++++++++++------
->>    lib/arm/timer.c             |  92 +++++++++++
->>    lib/devicetree.c            |   2 +-
->>    lib/efi.c                   | 102 ++++++++++++
->>    lib/printf.c                | 194 +++++++++++++++++++++--
->>    lib/x86/acpi.c              |  82 ----------
->>    lib/x86/setup.c             |   2 +-
->>    arm/efi/elf_aarch64_efi.lds |  63 ++++++++
->>    arm/flat.lds                |   2 +-
->>    arm/cstart.S                |   1 +
->>    arm/cstart64.S              |   7 +
->>    arm/efi/crt0-efi-aarch64.S  | 141 +++++++++++++++++
->>    arm/dummy.c                 |  12 ++
->>    arm/efi/reloc_aarch64.c     |  94 +++++++++++
->>    arm/micro-bench.c           |   4 +-
->>    arm/timer.c                 |  10 +-
->>    x86/s3.c                    |  21 +--
->>    x86/vmexit.c                |   4 +-
->>    43 files changed, 1831 insertions(+), 323 deletions(-)
->>    create mode 100755 arm/efi/run
->>    create mode 100644 lib/acpi.h
->>    create mode 100644 lib/elf.h
->>    delete mode 100644 lib/x86/acpi.h
->>    create mode 100644 lib/acpi.c
->>    create mode 100644 lib/arm/timer.c
->>    delete mode 100644 lib/x86/acpi.c
->>    create mode 100644 arm/efi/elf_aarch64_efi.lds
->>    create mode 100644 arm/efi/crt0-efi-aarch64.S
->>    create mode 100644 arm/dummy.c
->>    create mode 100644 arm/efi/reloc_aarch64.c
->>
+> > 
+> > It is interesting how all three sets of numbers start off different
+> > but seem to converge around 16 vCPUs. I did check to make sure the
+> > memory fault exits sped things up in all cases, and that at least
+> > stays true.
+> > 
+> > By the way, I've got a little helper script that I've been using to
+> > run/average the selftest results (which can vary quite a bit). I've
+> > attached it below- hopefully it doesn't bounce from the mailing list.
+> > Just for reference, the invocation to test the command you provided is
+> > 
+> > > python dp_runner.py --num_runs 20 --max_cores 16 --percpu_mem 512M
 > 
+> I found that indeed I shouldn't have stopped at 16 vcpus since that's
+> exactly where it starts to bottleneck. :)
+> 
+> So out of my curiosity I tried to profile 32 vcpus case on my system with
+> this test case, meanwhile I tried it both with:
+> 
+>   - 1 uffd + 8 readers
+>   - 32 uffds (so 32 readers)
+> 
+> I've got the flamegraphs attached for both.
+> 
+> It seems that when using >1 uffds the bottleneck is not the spinlock
+> anymore but something else.
+> 
+> From what I got there, vmx_vcpu_load() gets more highlights than the
+> spinlocks. I think that's the tlb flush broadcast.
+> 
+> While OTOH indeed when using 1 uffd we can see obviously the overhead of
+> spinlock contention on either the fault() path or read()/poll() as you and
+> James rightfully pointed out.
+> 
+> I'm not sure whether my number is caused by special setup, though. After
+> all I only had 40 threads and I started 32 vcpus + 8 readers and there'll
+> be contention already between the workloads.
+> 
+> IMHO this means that there's still chance to provide a more generic
+> userfaultfd scaling solution as long as we can remove the single spinlock
+> contention on the fault/fault_pending queues.  I'll see whether I can still
+> explore a bit on the possibility of this and keep you guys updated.  The
+> general idea here to me is still to make multi-queue out of 1 uffd.
+> 
+> I _think_ this might also be a positive result to your work, because if the
+> bottleneck is not userfaultfd (as we scale it with creating multiple;
+> ignoring the split vma effect), then it cannot be resolved by scaling
+> userfaultfd alone anyway, anymore.  So a general solution, even if existed,
+> may not work here for kvm, because we'll get stuck somewhere else already.
+> 
+> -- 
+> Peter Xu
+
+
+
+
+-- 
+Peter Xu
+
