@@ -2,59 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 73D136F5BBC
-	for <lists+kvm@lfdr.de>; Wed,  3 May 2023 18:08:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8ADCA6F5BBE
+	for <lists+kvm@lfdr.de>; Wed,  3 May 2023 18:08:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230444AbjECQIu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 May 2023 12:08:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42886 "EHLO
+        id S230466AbjECQIx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 May 2023 12:08:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42974 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230103AbjECQIr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 May 2023 12:08:47 -0400
-Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D89E85598
-        for <kvm@vger.kernel.org>; Wed,  3 May 2023 09:08:45 -0700 (PDT)
-Received: by mail-pj1-x104a.google.com with SMTP id 98e67ed59e1d1-24e3f2bff83so827652a91.2
-        for <kvm@vger.kernel.org>; Wed, 03 May 2023 09:08:45 -0700 (PDT)
+        with ESMTP id S230431AbjECQIu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 May 2023 12:08:50 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FE2F6EB9
+        for <kvm@vger.kernel.org>; Wed,  3 May 2023 09:08:48 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-b9a7553f95dso10691474276.2
+        for <kvm@vger.kernel.org>; Wed, 03 May 2023 09:08:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1683130125; x=1685722125;
+        d=google.com; s=20221208; t=1683130127; x=1685722127;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=F144eoCeyA3mGp/9QFbuPwEidkOEdjSbu5w6lAyh6tg=;
-        b=bzRemaUOhe4C2ko7GCOlJLuq4pAEvX1VHd29wjyOtd4yYZaBvIwoy/d+o1waEdMyJj
-         BCgAibDdiUHQbECs2na1CLXIDKB8pKhbMPaifjHkxl7PwyoJCRUPb+XXAXe1VpCyvZzF
-         7IACK9zyJZOsu5REQr/z65uvP+RIC6+GaVIzmT33T0r6LS6sCDP1yzEacksdwPT0L582
-         KR3RWa86mAFLWYWQeAI8NOF/HxqdxLv82FA5TYSmGjd3xBpRz6FZPe4oVDKGDUeRjbfj
-         YXPEkHv31IlyuPYpResgGE3Yqrn4AenSHyAqfRwZVDh+C/2NM49WlnJ0lIhaxEhlK6ap
-         lcvQ==
+        bh=UpESMHY3dXiGunARd4Ma9HdMNvInCBKyCNCSaFRW6Ms=;
+        b=wWTeQSe9JCCJ9pUvrrbudQKOTYO/i38kVcvsNhjPCCSRQyOR13ZqBKkCsMKvJO8ipA
+         AUAokED4NY2vc/H9pYe41Pg+X5hIPEcIQpIJWr5NnqmigGPerJ3MtUKWbPYztN+VUJrr
+         mnJUA/qxNDAR0r0LekD481sPNikHnSVY+cqmYJvxgd6hKMwNbcrUoOTlCKNA6uNMWSbE
+         Q0BCvmEIiP24OXh3p2PhMIKcMV4Y4BqTZdm9ZSzMqEMhkrrlKNqVwXQ+sHqtsetsvlRc
+         TZQdxlteiV2+NmkMidg9DbvStomj13XW9N1RgcA+4728Emo1iRtpcSbPxqfI6jxMZRnW
+         JSqw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683130125; x=1685722125;
+        d=1e100.net; s=20221208; t=1683130127; x=1685722127;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=F144eoCeyA3mGp/9QFbuPwEidkOEdjSbu5w6lAyh6tg=;
-        b=QzcvstQKX3tP3+3CDq5ked7mTTDt9JX3GYthMrAFTse0G96KIRXsrQO6GRwfIhcVg3
-         k2+T1VHERpan9ul6qLmCCmSiv4I4oIb8wadEs5euDxB6Ptb4gfC0bZigs3kYGi6xKoNG
-         5k9Gi4K8A5EPWF2w6MBmLp5Pl9CqZsG7DQwd+Ui2DiBM62HGJMJ0N8j19aU9A+UhpkPo
-         FXVqDRn1FBhtxVyIOH4SQo9bHbCem74w42BRPpWbg5sn2vyfXcEYIjJDBhxsd9e6ADXq
-         hiI5AmJnbb9Nnjo8AnhOQqC758nowGh4InOwJhZYxExx+JpA9OogKqnS7wCrI58j3ilp
-         +00g==
-X-Gm-Message-State: AC+VfDwbxaQI/kBv+Qn8XxGQH0q/1Wv4CDYHcT+Ltkd53PiJ3PNIb5K3
-        8UOgVuGAX05Ll9/Bhm0LOm0dWf5QUQ8=
-X-Google-Smtp-Source: ACHHUZ6MHMBXR1R7NPeyJnsAeK9YlOAQkFyod6bpbvy1HtIkhwmS+KE19Sd2GwwHAaNjKX7GnvENM5ocE3c=
+        bh=UpESMHY3dXiGunARd4Ma9HdMNvInCBKyCNCSaFRW6Ms=;
+        b=XuDcws23rPTBfdmCFl2PxeWYDQqEXZExfQY7+2LskkOOqzYvxXdv/42Xu4tQFH3WT/
+         84nlS60fGDWq615DBSTfGckzuntTgaSF1YejgyC5AZgSkGubyQGyNVDiBzO6HefnY8GB
+         5G4Iobbi1x3zHPuVqyPHZQ/tFQmYIDYIGdpNHdc/qq03bRJx1Yx+7lexly/B8zcaoDbY
+         l0fjnoq63j2hDuFSuPITB1GHFr/+WW00cYlPYlEzmcU4kqQQ745Gp92i9fCttnh6MXwG
+         dAAwIDnaxyfQ/dA98tKQVxqQVPWuss51lz5xoHuOOuvefxiAUDwIsJ2EfEk/LozokGs5
+         dhHg==
+X-Gm-Message-State: AC+VfDycfidptBtUF04uBNL1p4EJZN0PSzOsbQki6w4F9VX3DGvgmlwo
+        8wQZ+nVlAWzX+iQTzfyOsuxEJrHAPEQ=
+X-Google-Smtp-Source: ACHHUZ7j5zBqK9ftbtMARRCXZsD6o77fHe+mRNhKP0knX56m2HlOhQ0cuPXd09xE5zp2sQBZS4Mv7o9IH9U=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:b616:b0:1a9:baa9:e573 with SMTP id
- b22-20020a170902b61600b001a9baa9e573mr178574pls.5.1683130125382; Wed, 03 May
- 2023 09:08:45 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a25:5e03:0:b0:b9e:91e0:ea0a with SMTP id
+ s3-20020a255e03000000b00b9e91e0ea0amr2705234ybb.13.1683130127369; Wed, 03 May
+ 2023 09:08:47 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Wed,  3 May 2023 09:08:37 -0700
+Date:   Wed,  3 May 2023 09:08:38 -0700
 In-Reply-To: <20230503160838.3412617-1-seanjc@google.com>
 Mime-Version: 1.0
 References: <20230503160838.3412617-1-seanjc@google.com>
 X-Mailer: git-send-email 2.40.1.495.gc816e09b53d-goog
-Message-ID: <20230503160838.3412617-3-seanjc@google.com>
-Subject: [PATCH v2 2/3] KVM: x86: Don't adjust guest's CPUID.0x12.1 (allowed
- SGX enclave XFRM)
+Message-ID: <20230503160838.3412617-4-seanjc@google.com>
+Subject: [PATCH v2 3/3] KVM: x86: Open code supported XCR0 calculation in kvm_vcpu_after_set_cpuid()
 From:   Sean Christopherson <seanjc@google.com>
 To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>
@@ -71,56 +70,64 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Drop KVM's manipulation of guest's CPUID.0x12.1 ECX and EDX, i.e. the
-allowed XFRM of SGX enclaves, now that KVM explicitly checks the guest's
-allowed XCR0 when emulating ECREATE.
+Drop cpuid_get_supported_xcr0() now that its bastardized usage in
+__kvm_update_cpuid_runtime() is gone, and open code the logic in its sole
+caller, kvm_vcpu_after_set_cpuid().
 
-Note, this could theoretically break a setup where userspace advertises
-a "bad" XFRM and relies on KVM to provide a sane CPUID model, but QEMU
-is the only known user of KVM SGX, and QEMU explicitly sets the SGX CPUID
-XFRM subleaf based on the guest's XCR0.
+No functional change intended.
 
 Reviewed-by: Kai Huang <kai.huang@intel.com>
 Tested-by: Kai Huang <kai.huang@intel.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/cpuid.c | 16 ----------------
- 1 file changed, 16 deletions(-)
+ arch/x86/kvm/cpuid.c | 27 ++++++++++-----------------
+ 1 file changed, 10 insertions(+), 17 deletions(-)
 
 diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index 123bf8b97a4b..0c9660a07b23 100644
+index 0c9660a07b23..491c88e196c1 100644
 --- a/arch/x86/kvm/cpuid.c
 +++ b/arch/x86/kvm/cpuid.c
-@@ -253,7 +253,6 @@ static void __kvm_update_cpuid_runtime(struct kvm_vcpu *vcpu, struct kvm_cpuid_e
- 				       int nent)
- {
- 	struct kvm_cpuid_entry2 *best;
--	u64 guest_supported_xcr0 = cpuid_get_supported_xcr0(entries, nent);
- 
- 	best = cpuid_entry2_find(entries, nent, 1, KVM_CPUID_INDEX_NOT_SIGNIFICANT);
- 	if (best) {
-@@ -292,21 +291,6 @@ static void __kvm_update_cpuid_runtime(struct kvm_vcpu *vcpu, struct kvm_cpuid_e
- 					   vcpu->arch.ia32_misc_enable_msr &
- 					   MSR_IA32_MISC_ENABLE_MWAIT);
- 	}
--
--	/*
--	 * Bits 127:0 of the allowed SECS.ATTRIBUTES (CPUID.0x12.0x1) enumerate
--	 * the supported XSAVE Feature Request Mask (XFRM), i.e. the enclave's
--	 * requested XCR0 value.  The enclave's XFRM must be a subset of XCRO
--	 * at the time of EENTER, thus adjust the allowed XFRM by the guest's
--	 * supported XCR0.  Similar to XCR0 handling, FP and SSE are forced to
--	 * '1' even on CPUs that don't support XSAVE.
--	 */
--	best = cpuid_entry2_find(entries, nent, 0x12, 0x1);
--	if (best) {
--		best->ecx &= guest_supported_xcr0 & 0xffffffff;
--		best->edx &= guest_supported_xcr0 >> 32;
--		best->ecx |= XFEATURE_MASK_FPSSE;
--	}
+@@ -234,21 +234,6 @@ void kvm_update_pv_runtime(struct kvm_vcpu *vcpu)
+ 		vcpu->arch.pv_cpuid.features = best->eax;
  }
  
- void kvm_update_cpuid_runtime(struct kvm_vcpu *vcpu)
+-/*
+- * Calculate guest's supported XCR0 taking into account guest CPUID data and
+- * KVM's supported XCR0 (comprised of host's XCR0 and KVM_SUPPORTED_XCR0).
+- */
+-static u64 cpuid_get_supported_xcr0(struct kvm_cpuid_entry2 *entries, int nent)
+-{
+-	struct kvm_cpuid_entry2 *best;
+-
+-	best = cpuid_entry2_find(entries, nent, 0xd, 0);
+-	if (!best)
+-		return 0;
+-
+-	return (best->eax | ((u64)best->edx << 32)) & kvm_caps.supported_xcr0;
+-}
+-
+ static void __kvm_update_cpuid_runtime(struct kvm_vcpu *vcpu, struct kvm_cpuid_entry2 *entries,
+ 				       int nent)
+ {
+@@ -323,8 +308,16 @@ static void kvm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
+ 		kvm_apic_set_version(vcpu);
+ 	}
+ 
+-	vcpu->arch.guest_supported_xcr0 =
+-		cpuid_get_supported_xcr0(vcpu->arch.cpuid_entries, vcpu->arch.cpuid_nent);
++	/*
++	 * Calculate guest's supported XCR0 taking into account guest CPUID data and
++	 * KVM's supported XCR0 (comprised of host's XCR0 and KVM_SUPPORTED_XCR0).
++	 */
++	best = kvm_find_cpuid_entry_index(vcpu, 0xd, 0);
++	if (!best)
++		vcpu->arch.guest_supported_xcr0 = 0;
++	else
++		vcpu->arch.guest_supported_xcr0 = (best->eax | ((u64)best->edx << 32)) &
++						  kvm_caps.supported_xcr0;
+ 
+ 	/*
+ 	 * FP+SSE can always be saved/restored via KVM_{G,S}ET_XSAVE, even if
 -- 
 2.40.1.495.gc816e09b53d-goog
 
