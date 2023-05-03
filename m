@@ -2,55 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 145216F5DE6
+	by mail.lfdr.de (Postfix) with ESMTP id E2D2F6F5DE8
 	for <lists+kvm@lfdr.de>; Wed,  3 May 2023 20:29:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229892AbjECS3B (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 May 2023 14:29:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60926 "EHLO
+        id S229965AbjECS3D (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 May 2023 14:29:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60942 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229632AbjECS27 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 May 2023 14:28:59 -0400
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40B4340FD
-        for <kvm@vger.kernel.org>; Wed,  3 May 2023 11:28:58 -0700 (PDT)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-559f142fce7so90459427b3.3
-        for <kvm@vger.kernel.org>; Wed, 03 May 2023 11:28:58 -0700 (PDT)
+        with ESMTP id S229782AbjECS3B (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 May 2023 14:29:01 -0400
+Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23BE32680
+        for <kvm@vger.kernel.org>; Wed,  3 May 2023 11:29:00 -0700 (PDT)
+Received: by mail-pf1-x44a.google.com with SMTP id d2e1a72fcca58-64115e69e1eso4794751b3a.0
+        for <kvm@vger.kernel.org>; Wed, 03 May 2023 11:29:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1683138537; x=1685730537;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=s5LULsV/BdFLkiwudhTGLsFbr5fms2w2Tnl9u44tzu4=;
-        b=tvndxQi8cncEOtLXgaJJX/Ao77CjcBg/UcnSTaI9xh8loBUrJhtEH8926QK+yV9xDN
-         ER80a71OG1AJJPGq12QVYHSwAZOMio8WkoahoJ43G4BQBjO8fsQKESDJx7jBBYOj6CEy
-         Vp83tbu+6e5JF7jnGyjIfrpjFL4BOieaGcljpnGgybT1P4TTMzKzOF52zYvpu5mHWqmN
-         mhB3T0DTI00KSU0fk4uegpCwYBIzWzXEjFs6rqyO/McKLpOIAdCHPATxNr0kkHCAuFs0
-         K/mEtSFWS9HSl147y+GPRSWPGADkChdAADfihxnc/ZSoVSzUanT1J0xi22KBk1dXG0cw
-         rCxQ==
+        d=google.com; s=20221208; t=1683138539; x=1685730539;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
+        bh=HR9sDhe1dBWwYsQO66isTNLen+QloTOYlqac4Dib2S0=;
+        b=RpPim3urdDOUWuJ3wzy0utodCmxX0rjPl4mUUzwsMX1hw3s9PCKBeD92U/Flg1VcXo
+         BMbqTLLdj3Gx+nc7TzpBr5JLhosnACTWbU/0TivFrLub70MDUpfAHs0InFAoISRRSUp5
+         4NlW5AgbyWlxTr1gGf8HlzJWL6KgxFkdynlz8+tHNMBJJlw7ATdALt5US3SEahkdNYd1
+         dIwiZLYlUblywLajLjSm/9axWRGxsCEhBzqFau67BCzEzwvURmB17++fg+byQc22wiYq
+         iMsyTypPoYLBkHF5sXZ4TQC3Zsjq1YTb/kirR7uPmKL81tsozyRZG93BvGjGArcBuy/8
+         xDtQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683138537; x=1685730537;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=s5LULsV/BdFLkiwudhTGLsFbr5fms2w2Tnl9u44tzu4=;
-        b=GdlAQRu0RWzP7HjkCPkpTNMmzhjv3egnqOClgxcQbbMHGWZINtxvGcV8sw8KZSZ8QL
-         ASKKCwJIYyjVx5wWo1jawN0bCY17XInvw5oqOcvaS8P1YkDv5ZlnsVicpgQr3LK9tsTl
-         sTh/00hRWoDlnFKDAoscXI8gKtdtxqv2w3cscNxpthbkOhTnwj9DsJAYRCFT1rArzzfo
-         fhXXwV9SmKWuoMBZ1tGRZ1t07ElR5RfOOTFT2UedDVWSNpjdfmYHUdjXhPipLQWT9nUN
-         2lKly+JW0aGFsrAbHU6LBUjz1O/8TrGTLHsveCe+c7Ywg9FiPKtl7E+PDLRzawPd7/wx
-         g/Wg==
-X-Gm-Message-State: AC+VfDzQoIaXbMf95pr81p9HJ0WDKniBohsfBuCn0wdmmVYGEzNMfjPH
-        qGwZZ3MedC9ypRza58SO8T32ZLPBnX8=
-X-Google-Smtp-Source: ACHHUZ6yET+gdVz04kU+dzAlp3RTSVPYl+F1ACJt8J69qSC3JYUa1SgwomnQ2cwXY/Dn4hK3Enn0fmSLc5w=
+        d=1e100.net; s=20221208; t=1683138539; x=1685730539;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=HR9sDhe1dBWwYsQO66isTNLen+QloTOYlqac4Dib2S0=;
+        b=jpqBC1tKS8LiDRZmbe6svIEFGjr+u77otfi+76gp6qvCV10OMUB9WfUVyPMsrf9yLw
+         FwdHSznLyQ8g2OT3EWcg7zZM9EYlUkl7/Anm2YCiJfrGx1glHeUGCJMaDwB+B64WtmIf
+         Cd1EJemNI3x0QmAmWn71CaJkmy3I0az6XzjqKUUkbjo+aoBzOP4xqUKMLuLvXJ91DRGR
+         Cov5Uggb3aCqNEfMX8uJH7QLF9VeNMeq3Xbm9XWJnxj9AaYeA5M+5HjA5Ct8fkxuRlgv
+         vwtlekqDRVC0AE8ymn5fvecDFY/lDCvyxpRyAFb7UKOnBuVIl0l1qXmXkafe8ip8VVOZ
+         SwuA==
+X-Gm-Message-State: AC+VfDyaVmIRNlsvYvsv++bKINlUzQYjPzNy9sU+TdvTp+84Yc0YoWcW
+        SPjFFwAgVN8msiqNW578PVyrDtnIrVY=
+X-Google-Smtp-Source: ACHHUZ5vnASrY3rkukhJSdTxihZ9oIFdZd4vjgC2U7Dd72NAC5HyWufuYAK64L7jBvjgUGjqegNa8gPOV8U=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:ec05:0:b0:54c:bdc:ef18 with SMTP id
- j5-20020a81ec05000000b0054c0bdcef18mr13467659ywm.5.1683138537542; Wed, 03 May
- 2023 11:28:57 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a63:2c14:0:b0:51a:7d6a:65c9 with SMTP id
+ s20-20020a632c14000000b0051a7d6a65c9mr714454pgs.6.1683138539464; Wed, 03 May
+ 2023 11:28:59 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Wed,  3 May 2023 11:28:47 -0700
+Date:   Wed,  3 May 2023 11:28:48 -0700
+In-Reply-To: <20230503182852.3431281-1-seanjc@google.com>
 Mime-Version: 1.0
+References: <20230503182852.3431281-1-seanjc@google.com>
 X-Mailer: git-send-email 2.40.1.495.gc816e09b53d-goog
-Message-ID: <20230503182852.3431281-1-seanjc@google.com>
-Subject: [PATCH 0/5] KVM: x86: Clean up MSR PAT handling
+Message-ID: <20230503182852.3431281-2-seanjc@google.com>
+Subject: [PATCH 1/5] KVM: VMX: Open code writing vCPU's PAT in VMX's MSR handler
 From:   Sean Christopherson <seanjc@google.com>
 To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>
@@ -68,35 +71,44 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Clean up KVM's handling of MSR PAT.  The PAT is currently lumped in with
-MTRRs, and while the PAT does affect memtypes, it's not an MTRR and is even
-exempted from KVM's kludgy attempts to play nice with UC memory for guests
-with passthrough devices that have non-coherent DMA.
+From: Wenyao Hai <haiwenyao@uniontech.com>
 
-Note, this includes two previously posted patches:
+Open code setting "vcpu->arch.pat" in vmx_set_msr() instead of bouncing
+through kvm_set_msr_common() to get to the same code in kvm_mtrr_set_msr().
 
-  https://lore.kernel.org/all/20230329081859.2571698-1-guoke@uniontech.com
-  https://lore.kernel.org/all/20230331071929.102070-1-haiwenyao@uniontech.com
+Note, MSR_IA32_CR_PAT is 0x277, and is very subtly handled by
 
-Ke Guo (1):
-  KVM: SVM: Use kvm_pat_valid() directly instead of kvm_mtrr_valid()
+	case 0x200 ... MSR_IA32_MC0_CTL2 - 1:
 
-Sean Christopherson (3):
-  KVM: x86: Use MTRR macros to define possible MTRR MSR ranges
-  KVM: x86: WARN if writes to PAT MSR are handled by common KVM code
-  KVM: x86: Move PAT MSR handling out of mtrr.c
+in kvm_set_msr_common().
 
-Wenyao Hai (1):
-  KVM: VMX: Open code writing vCPU's PAT in VMX's MSR handler
+Signed-off-by: Wenyao Hai <haiwenyao@uniontech.com>
+[sean: massage changelog]
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kvm/vmx/vmx.c | 8 +++-----
+ 1 file changed, 3 insertions(+), 5 deletions(-)
 
- arch/x86/kvm/mtrr.c    | 20 ++++++--------------
- arch/x86/kvm/svm/svm.c |  2 +-
- arch/x86/kvm/vmx/vmx.c |  8 +++-----
- arch/x86/kvm/x86.c     | 18 ++++++++++++++----
- 4 files changed, 24 insertions(+), 24 deletions(-)
-
-
-base-commit: 5c291b93e5d665380dbecc6944973583f9565ee5
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 44fb619803b8..53e249109483 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -2294,12 +2294,10 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 		    get_vmcs12(vcpu)->vm_exit_controls & VM_EXIT_SAVE_IA32_PAT)
+ 			get_vmcs12(vcpu)->guest_ia32_pat = data;
+ 
+-		if (vmcs_config.vmentry_ctrl & VM_ENTRY_LOAD_IA32_PAT) {
++		if (vmcs_config.vmentry_ctrl & VM_ENTRY_LOAD_IA32_PAT)
+ 			vmcs_write64(GUEST_IA32_PAT, data);
+-			vcpu->arch.pat = data;
+-			break;
+-		}
+-		ret = kvm_set_msr_common(vcpu, msr_info);
++
++		vcpu->arch.pat = data;
+ 		break;
+ 	case MSR_IA32_MCG_EXT_CTL:
+ 		if ((!msr_info->host_initiated &&
 -- 
 2.40.1.495.gc816e09b53d-goog
 
