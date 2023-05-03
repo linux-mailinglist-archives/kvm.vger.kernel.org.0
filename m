@@ -2,280 +2,203 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E6C006F57B6
-	for <lists+kvm@lfdr.de>; Wed,  3 May 2023 14:14:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 79A8C6F57DE
+	for <lists+kvm@lfdr.de>; Wed,  3 May 2023 14:27:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229938AbjECMOJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 May 2023 08:14:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35946 "EHLO
+        id S229688AbjECM07 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 May 2023 08:26:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42832 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229934AbjECMOG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 May 2023 08:14:06 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2010F5598
-        for <kvm@vger.kernel.org>; Wed,  3 May 2023 05:13:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1683115999;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+        with ESMTP id S229554AbjECM06 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 May 2023 08:26:58 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 681895597
+        for <kvm@vger.kernel.org>; Wed,  3 May 2023 05:26:57 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 1073620338;
+        Wed,  3 May 2023 12:26:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1683116816; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=QoebIRsfYnkRE4a4+0vvaV8EtKm1li2acPw6aTCsw8w=;
-        b=DmluM73iZn7ySTDusVAuEd1vl+59M7gudkMPL9owqMDUc4l0SIx7ZD9XMSMJW/+WPiRiuM
-        UyijbJkw8Gb2PDrtEdhcTYaKnKpOUU+soryj4FP1iX7RfCCjGeWGNu6axSR9ou1NWFeJxg
-        36KnSfBhnqCbEpxuwpKFVA72/voL6v0=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-311-PbT3b3chPgiqH9vf93Eb_A-1; Wed, 03 May 2023 08:13:18 -0400
-X-MC-Unique: PbT3b3chPgiqH9vf93Eb_A-1
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-3f32b3835e9so17229905e9.1
-        for <kvm@vger.kernel.org>; Wed, 03 May 2023 05:13:18 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683115995; x=1685707995;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QoebIRsfYnkRE4a4+0vvaV8EtKm1li2acPw6aTCsw8w=;
-        b=gv5modWeSCMT4jjQ5PZNSmUNF/PGWIzeUViaMTr1q9wgtToB5ImE5lm6/eym3gHIBN
-         KNI2OFRW18If7pWcrH5k6Cwe1mPXdpVixbGHsnaGDwdtwOLxGYNpmgHKsgaqv3bgBXdI
-         sM42oSYp8RjvW1S/QDb1kLhVGJi7pHprfkhCyy36cCOsaEf6DkBKj2cF3UBwXQm9GJr2
-         hfwuP14JV8fxU8ogXexiVvcibhn7RoAaPwsAeJ5bKBbALvkpC9xbwMlVHNVO7DiEIh+A
-         kGfwy5eNvHP26FK54iVIYP/LR0YabTf8FsELtyTR4nPp6ISUo7cRtMHRsdtE4gaM+ALK
-         eR2w==
-X-Gm-Message-State: AC+VfDx9hGHOUCL6ZwcvSSTI2aLdBSc+9APpWVNNQYsNkL80qFLuxe/k
-        zJYn0UQqM1t+hdyUp+B9UojUAzKCeI8DumtDG/mNCquJpXaPdlNarGnb2uKExP6GxyKV2nH6oqg
-        cA6pCD4JSlRQG
-X-Received: by 2002:a7b:c408:0:b0:3f1:75b6:8c7 with SMTP id k8-20020a7bc408000000b003f175b608c7mr14043834wmi.37.1683115995245;
-        Wed, 03 May 2023 05:13:15 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ67lm3NwTO03hE2PmJip283wLLIfqmiPdSnznYPeWJRfBG58fEWJZMqmPER/CfifMqoJCwIlw==
-X-Received: by 2002:a7b:c408:0:b0:3f1:75b6:8c7 with SMTP id k8-20020a7bc408000000b003f175b608c7mr14043812wmi.37.1683115994929;
-        Wed, 03 May 2023 05:13:14 -0700 (PDT)
-Received: from sgarzare-redhat ([185.29.96.107])
-        by smtp.gmail.com with ESMTPSA id b12-20020a5d4d8c000000b003063408dd62sm5638329wru.65.2023.05.03.05.13.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 May 2023 05:13:14 -0700 (PDT)
-Date:   Wed, 3 May 2023 14:13:10 +0200
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Bobby Eshleman <bobbyeshleman@gmail.com>
-Cc:     Vishnu Dasa <vdasa@vmware.com>, virtio-dev@lists.oasis-open.org,
-        linux-hyperv@vger.kernel.org, Cong Wang <cong.wang@bytedance.com>,
-        Bobby Eshleman <bobby.eshleman@bytedance.com>,
-        kvm@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>,
-        VMware PV-Drivers Reviewers <pv-drivers@vmware.com>,
-        netdev@vger.kernel.org, Haiyang Zhang <haiyangz@microsoft.com>,
-        Dexuan Cui <decui@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
-        virtualization@lists.linux-foundation.org,
-        Bryan Tan <bryantan@vmware.com>,
-        Eric Dumazet <edumazet@google.com>,
-        Jiang Wang <jiang.wang@bytedance.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH RFC net-next v2 0/4] virtio/vsock: support datagrams
-Message-ID: <4ikawh4kks22iqjdkhbvkak7spoja6zr3g22pke2r3jsqgpddp@bx6purfp4f6a>
-References: <20230413-b4-vsock-dgram-v2-0-079cc7cee62e@bytedance.com>
- <ZDk2kOVnUvyLMLKE@bullseye>
- <r6oxanmhwlonb7lcrrowpitlgobivzp7pcwk7snqvfnzudi6pb@4rnio5wef3qu>
- <ZDpOq0ACuMYIUbb1@bullseye>
- <yeu57zqwzcx33sylp565xgw7yv72qyczohkmukyex27rcdh6mr@w4x6t4enx6iu>
- <ZDrI2bBhiamYBKUB@bullseye>
+        bh=d730ov4NL1F3ERD4Dx+gWT7pT1JP4HjltOIN4DpqNdo=;
+        b=ubJsLU/LNuy/0wAWYZgIFVyKZ03iTheu7JkJNA0/sInqG+4Q5lKL7bmHph5ny8dVjFwckF
+        IEJm44hgIFppretpz/X58BQsJ/ngoDQVDH73r3pEUbaEawFYLv9dUenq1LhZ976NAFkkfH
+        CMndOV1y6VXdhj010qV37qo9pArlzoc=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1683116816;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=d730ov4NL1F3ERD4Dx+gWT7pT1JP4HjltOIN4DpqNdo=;
+        b=oVbTnGUSGUnGFdIimM0LGhz6Bnwr//a/Tx0264fN4+fe0EXnwszhb7yLdJRDJIMkwoPLcU
+        ERy+OQ5umQNJgtCw==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id C8CAA1331F;
+        Wed,  3 May 2023 12:26:55 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id wIWfLw9TUmQJfAAAMHmgww
+        (envelope-from <jroedel@suse.de>); Wed, 03 May 2023 12:26:55 +0000
+Date:   Wed, 3 May 2023 14:26:54 +0200
+From:   =?iso-8859-1?Q?J=F6rg_R=F6del?= <jroedel@suse.de>
+To:     Tom Lendacky <thomas.lendacky@amd.com>
+Cc:     amd-sev-snp@lists.suse.com, linux-coco@lists.linux.dev,
+        kvm@vger.kernel.org, Carlos Bilbao <carlos.bilbao@amd.com>,
+        Klaus Kiwi <kkiwi@redhat.com>
+Subject: Re: [ANNOUNCEMENT] COCONUT Secure VM Service Module for SEV-SNP
+Message-ID: <ZFJTDtMK0QqXK5+E@suse.de>
+References: <ZBl4592947wC7WKI@suse.de>
+ <4420d7e5-d05f-8c31-a0f2-587ebb7eaa20@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <ZDrI2bBhiamYBKUB@bullseye>
-X-Spam-Status: No, score=-2.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <4420d7e5-d05f-8c31-a0f2-587ebb7eaa20@amd.com>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Apr 15, 2023 at 03:55:05PM +0000, Bobby Eshleman wrote:
->On Fri, Apr 28, 2023 at 12:43:09PM +0200, Stefano Garzarella wrote:
->> On Sat, Apr 15, 2023 at 07:13:47AM +0000, Bobby Eshleman wrote:
->> > CC'ing virtio-dev@lists.oasis-open.org because this thread is starting
->> > to touch the spec.
->> >
->> > On Wed, Apr 19, 2023 at 12:00:17PM +0200, Stefano Garzarella wrote:
->> > > Hi Bobby,
->> > >
->> > > On Fri, Apr 14, 2023 at 11:18:40AM +0000, Bobby Eshleman wrote:
->> > > > CC'ing Cong.
->> > > >
->> > > > On Fri, Apr 14, 2023 at 12:25:56AM +0000, Bobby Eshleman wrote:
->> > > > > Hey all!
->> > > > >
->> > > > > This series introduces support for datagrams to virtio/vsock.
->> > >
->> > > Great! Thanks for restarting this work!
->> > >
->> >
->> > No problem!
->> >
->> > > > >
->> > > > > It is a spin-off (and smaller version) of this series from the summer:
->> > > > >   https://lore.kernel.org/all/cover.1660362668.git.bobby.eshleman@bytedance.com/
->> > > > >
->> > > > > Please note that this is an RFC and should not be merged until
->> > > > > associated changes are made to the virtio specification, which will
->> > > > > follow after discussion from this series.
->> > > > >
->> > > > > This series first supports datagrams in a basic form for virtio, and
->> > > > > then optimizes the sendpath for all transports.
->> > > > >
->> > > > > The result is a very fast datagram communication protocol that
->> > > > > outperforms even UDP on multi-queue virtio-net w/ vhost on a variety
->> > > > > of multi-threaded workload samples.
->> > > > >
->> > > > > For those that are curious, some summary data comparing UDP and VSOCK
->> > > > > DGRAM (N=5):
->> > > > >
->> > > > > 	vCPUS: 16
->> > > > > 	virtio-net queues: 16
->> > > > > 	payload size: 4KB
->> > > > > 	Setup: bare metal + vm (non-nested)
->> > > > >
->> > > > > 	UDP: 287.59 MB/s
->> > > > > 	VSOCK DGRAM: 509.2 MB/s
->> > > > >
->> > > > > Some notes about the implementation...
->> > > > >
->> > > > > This datagram implementation forces datagrams to self-throttle according
->> > > > > to the threshold set by sk_sndbuf. It behaves similar to the credits
->> > > > > used by streams in its effect on throughput and memory consumption, but
->> > > > > it is not influenced by the receiving socket as credits are.
->> > >
->> > > So, sk_sndbuf influece the sender and sk_rcvbuf the receiver, right?
->> > >
->> >
->> > Correct.
->> >
->> > > We should check if VMCI behaves the same.
->> > >
->> > > > >
->> > > > > The device drops packets silently. There is room for improvement by
->> > > > > building into the device and driver some intelligence around how to
->> > > > > reduce frequency of kicking the virtqueue when packet loss is high. I
->> > > > > think there is a good discussion to be had on this.
->> > >
->> > > Can you elaborate a bit here?
->> > >
->> > > Do you mean some mechanism to report to the sender that a destination
->> > > (cid, port) is full so the packet will be dropped?
->> > >
->> >
->> > Correct. There is also the case of there being no receiver at all for
->> > this address since this case isn't rejected upon connect(). Ideally,
->> > such a socket (which will have 100% packet loss) will be throttled
->> > aggressively.
->> >
->> > Before we go down too far on this path, I also want to clarify that
->> > using UDP over vhost/virtio-net also has this property... this can be
->> > observed by using tcpdump to dump the UDP packets on the bridge network
->> > your VM is using. UDP packets sent to a garbage address can be seen on
->> > the host bridge (this is the nature of UDP, how is the host supposed to
->> > know the address eventually goes nowhere). I mention the above because I
->> > think it is possible for vsock to avoid this cost, given that it
->> > benefits from being point-to-point and g2h/h2g.
->> >
->> > If we're okay with vsock being on par, then the current series does
->> > that. I propose something below that can be added later and maybe
->> > negotiated as a feature bit too.
->>
->> I see and I agree on that, let's do it step by step.
->> If we can do it in the first phase is great, but I think is fine to add
->> this feature later.
->>
->> >
->> > > Can we adapt the credit mechanism?
->> > >
->> >
->> > I've thought about this a lot because the attraction of the approach for
->> > me would be that we could get the wait/buffer-limiting logic for free
->> > and without big changes to the protocol, but the problem is that the
->> > unreliable nature of datagrams means that the source's free-running
->> > tx_cnt will become out-of-sync with the destination's fwd_cnt upon
->> > packet loss.
->>
->> We need to understand where the packet can be lost.
->> If the packet always reaches the destination (vsock driver or device),
->> we can discard it, but also update the counters.
->>
->> >
->> > Imagine a source that initializes and starts sending packets before a
->> > destination socket even is created, the source's self-throttling will be
->> > dysfunctional because its tx_cnt will always far exceed the
->> > destination's fwd_cnt.
->>
->> Right, the other problem I see is that the socket aren't connected, so
->> we have 1-N relationship.
->>
->
->Oh yeah, good point.
->
->> >
->> > We could play tricks with the meaning of the CREDIT_UPDATE message and
->> > fwd_cnt/buf_alloc fields, but I don't think we want to go down that
->> > path.
->> >
->> > I think that the best and simplest approach introduces a congestion
->> > notification (VIRTIO_VSOCK_OP_CN?). When a packet is dropped, the
->> > destination sends this notification. At a given repeated time period T,
->> > the source can check if it has received any notifications in the last T.
->> > If so, it halves its buffer allocation. If not, it doubles its buffer
->> > allocation unless it is already at its max or original value.
->> >
->> > An "invalid" socket which never has any receiver will converge towards a
->> > rate limit of one packet per time T * log2(average pkt size). That is, a
->> > socket with 100% packet loss will only be able to send 16 bytes every
->> > 4T. A default send buffer of MAX_UINT32 and T=5ms would hit zero within
->> > 160ms given at least one packet sent per 5ms. I have no idea if that is
->> > a reasonable default T for vsock, I just pulled it out of a hat for the
->> > sake of the example.
->> >
->> > "Normal" sockets will be responsive to high loss and rebalance during
->> > low loss. The source is trying to guess and converge on the actual
->> > buffer state of the destination.
->> >
->> > This would reuse the already-existing throttling mechanisms that
->> > throttle based upon buffer allocation. The usage of sk_sndbuf would have
->> > to be re-worked. The application using sendmsg() will see EAGAIN when
->> > throttled, or just sleep if !MSG_DONTWAIT.
->>
->> I see, it looks interesting, but I think we need to share that
->> information between multiple sockets, since the same destination
->> (cid, port), can be reached by multiple sockets.
->>
->
->Good point, that is true.
->
->> Another approach could be to have both congestion notification and
->> decongestion, but maybe it produces double traffic.
->>
->
->I think this could simplify things and could reduce noise. It is also
->probably sufficient for the source to simply halt upon congestion
->notification and resume upon decongestion notification, instead of
->scaling up and down like I suggested above. It also avoids the
->burstiness that would occur with a "congestion notification"-only
->approach where the source guesses when to resume and guesses wrong.
->
->The congestion notification may want to have an expiration period after
->which the sender can resume without receiving a decongestion
->notification? If it receives congestion again, then it can halt again.
+Hi Tom,
 
-Yep, I agree.
+thanks for that comparision!
 
-Anyway the congestion/decongestion messages should be just a hint, 
-because the other peer has to keep the state and a malicious host/guest 
-could use it for DoS, so the peer could discard these packets if it has 
-no more space to save the state.
+On Tue, May 02, 2023 at 06:03:55PM -0500, Tom Lendacky wrote:
+> While both SVSM implementations use the Qemu Firmware Configuration
+> (fw_cfg) interface, the coconut-svsm relies on it a bit more than
+> linux-svsm. In either case, other interfaces may need to be supported in
+> order for an SVSM to work with a VMM other than Qemu.
 
-Thanks,
-Stefano
+Right, that is something I have been thinking about. After I talked to a
+few others about it, I came to the conclusion that neither COCONUT nor
+linux-svsm use an optimal interface to request information from the HV.
+I think it would be best if we move to a model where the MADT and E820
+tables from QEMU (or any other HV) are part of the measured initial
+memory image, to make that data trusted. But we can discuss that
+separately.
+
+> - Both SVSMs end up located in a memory slot outside of memory that is
+>   reported to the guest. Coconut-svsm gets the location and size from
+>   fwcfg, which is customizable via the Qemu command line. Linux-svsm gets
+>   the location and size from the build process and validates that location
+>   and size.
+
+Correct, COCONUT also has a fall-back where it just uses the last 16MB
+of guest RAM if the fw_cfg file is not there. That needs OVMF support,
+though.
+
+>   - Pagetables:
+>     Page table support can be tricky with the x86_64 crate. But in general
+>     I believe it could still be used. Coconut-svsm uses a dynamic offset-
+>     based approach for pagetables based on the final physical address
+>     location. This offset could be utilized in the x86_64 crate
+>     implementation. When CPL3 support comes around, that would require
+>     further investigation.
+
+Yeah, COCONUT does not only use an offset mapping, it also has specific
+mappings for the per-cpu areas. Those are mapped at a fixed location,
+same with stacks, so the needs already go beyond an offset mapping.
+
+> - Coconut-svsm copies the original Secrets Page and the "frees" the memory
+>   for it. I couldn't tell if the memory is zeroed out or not, but
+>   something that should be looked at to ensure the VMPCK0 key is not
+>   leaked.
+
+Thanks, that is a real issue. I just wrote a fix for that.
+
+> Some questions for coconut-svsm:
+>   - Are there any concerns with using existing code/projects as submodules
+>     within coconut-svsm (e.g. OpenSSL or a software TPM implementation)?
+>     One of our design goals for linux-svsm was desirability to easily
+>     allow downstream users or products to, e.g., use their own crypto
+>     (e.g. company preferred)
+
+No concerns from my side to run any code you want in a CPL-3 module.
+This includes code which uses external libraries such as openssl or
+libtpm. The modules will be in an archive file packaged with the SVSM
+binary, so that everything that runs is measured at launch time.
+
+>   - Are you open to having maintainers outside of SUSE? There is some
+>     linux-svsm community concern about project governance and project
+>     priorities and release schedules. This wouldn't have to be AMD even,
+>     but we'd volunteer to help here if desired, but we'd like to foster a
+>     true community model for governance regardless. We'd love to hear
+>     thoughts on this from coconut-svsm folks.
+
+Yes, I am definitely willing to make the project more open and move to a
+maintainer-group model, no intention from my side to become a BDFL for
+the project. I just have no clear picture yet how the model should look
+like and how to get there. I will send a separate email to kick-start a
+discussion about that.
+
+>   - On the subject of priorities, the number one priority for the
+>     linux-svsm project has been to quickly achieve production quality vTPM
+>     support. The support for this is being actively worked on by
+>     linux-svsm contributors and we'd want to find fastest path towards
+>     getting that redirected into coconut-svsm (possibly starting with CPL0
+>     implementation until CPL3 support is available) and the project
+>     hardened for a release.  I imagine there will be some competing
+>     priorities from coconut-svsm project currently, so wanted to get this
+>     out on the table from the beginning.
+
+That has been under discussion for some time, and honestly I think
+the approach taken is the main difference between linux-svsm and
+COCONUT. My position here is, and that comes with a big 'BUT', that I am
+not fundamentally opposed to having a temporary solution for the TPM
+until CPL-3 support is at a point where it can run a TPM module.
+
+And here come the 'BUT': Since the goal of having one project is to
+bundle community efforts, I think that the joint efforts are better
+targeted at getting CPL-3 support to a point where it can run modules.
+On that side some input and help is needed, especially to define the
+syscall interface so that it suits the needs of a TPM implementation.
+
+It is also not the case that CPL-3 support is out more than a year or
+so. The RamFS is almost ready, as is the archive file inclusion[1]. We
+will move to task management next, the goal is still to have basic
+support ready in 2H2023.
+
+[1] https://github.com/coconut-svsm/svsm/pull/27
+
+If there is still a strong desire to have COCONUT with a TPM (running at
+CPL-0) before CPL-3 support is usable, then I can live with including
+code for that as a temporary solution. But linking huge amounts of C
+code (like openssl or a tpm lib) into the SVSM rust binary kind of
+contradicts the goals which made us using Rust for project in the first
+place. That is why I only see this as a temporary solution.
+
+> Since we don't want to split resources or have competing projects, we are
+> leaning towards moving our development resources over to the coconut-svsm
+> project.
+
+Great move, much appreciated, thanks a lot for that! Let's work together
+to make that happen.
+
+Regards,
+
+-- 
+Jörg Rödel
+jroedel@suse.de
+
+SUSE Software Solutions Germany GmbH
+Frankenstraße 146
+90461 Nürnberg
+Germany
+
+(HRB 36809, AG Nürnberg)
+Geschäftsführer: Ivo Totev, Andrew Myers, Andrew McDonald, Boudien Moerman
 
