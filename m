@@ -2,83 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E96B26F596D
-	for <lists+kvm@lfdr.de>; Wed,  3 May 2023 15:56:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 613436F5AEE
+	for <lists+kvm@lfdr.de>; Wed,  3 May 2023 17:24:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230111AbjECNz7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 May 2023 09:55:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60284 "EHLO
+        id S230225AbjECPY1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 May 2023 11:24:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50212 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229650AbjECNz5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 May 2023 09:55:57 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3D5A6589
-        for <kvm@vger.kernel.org>; Wed,  3 May 2023 06:55:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1683122102;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=kWLFrth5fSALbwonCRmuwo7go9iLbMbkb+uUwrAcVfM=;
-        b=PHN40yYKK+HPU05n/kcGtWDdjHb6Pf0qD9k40rC+MYWZQEaKTzfkNsVXp4fKVrb0a+1YLt
-        ntMI+sSzuFBW61Jj9KFCr/TXaLBKPGpl2aVh9IdOb/zcXoiTtt8kcR4oM6mXxfJdnDtVut
-        9auTeA/64pwmJW6vQppN8C9O3258giU=
-Received: from mail-yb1-f198.google.com (mail-yb1-f198.google.com
- [209.85.219.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-299-qxLoSap-OwS8vJSpt0Bt4A-1; Wed, 03 May 2023 09:55:01 -0400
-X-MC-Unique: qxLoSap-OwS8vJSpt0Bt4A-1
-Received: by mail-yb1-f198.google.com with SMTP id 3f1490d57ef6-b9a6f15287eso4362337276.1
-        for <kvm@vger.kernel.org>; Wed, 03 May 2023 06:55:01 -0700 (PDT)
+        with ESMTP id S230208AbjECPYZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 May 2023 11:24:25 -0400
+Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF3535593
+        for <kvm@vger.kernel.org>; Wed,  3 May 2023 08:24:22 -0700 (PDT)
+Received: by mail-pl1-x633.google.com with SMTP id d9443c01a7336-1aaf702c3ccso229325ad.1
+        for <kvm@vger.kernel.org>; Wed, 03 May 2023 08:24:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1683127462; x=1685719462;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ppzeMdhiV7rhaW44wktBcr2kF59czLwUT+cf4/SlfII=;
+        b=JM6XxGM2nLdy1CXx3NMururjPfM+NYvY2A/W6DbkkvzpaVslRIcN4gyzM8bhiFyfXz
+         wEUcc69EoSheXuwpisXmO0eG9oxusnAVtZXIKRjo0Vc/kOK3WodESJlebo2vsR7JmoKA
+         Uzn8VVLZ0B/NnoBbsIaDVYjk5FRNxm+pU9E3rDFbKLe8El6F5uTEOSxc93t91cC7MyJJ
+         CBPQG8Qg0j2suHDDzeEVA+JlLViMLwd5PSpWtkzSw3lupF/HPBuRLf8iMCOFnujQfFAf
+         lptCBvWFjQTD4PwgaylpwdpYaTObNGLZ3LJ7CqBSqKIrLSvbj4yxJ9yyBQ6Ut0beZR1x
+         uNFw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683122101; x=1685714101;
+        d=1e100.net; s=20221208; t=1683127462; x=1685719462;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=kWLFrth5fSALbwonCRmuwo7go9iLbMbkb+uUwrAcVfM=;
-        b=Zj+zaE7nPOCEL2a4zMNmnB3mJtT4oZ7GHLMkx2dEAXhsUzvqQwIuUacbFePvSgtUwD
-         0O2WGtwMs8bGZG4p0bb5qmc1dy3IBYlVx0rqwS+g8yln0Djct/1cHvOQTA3gTRGNZf5o
-         GzPUDia2qNTKIzwXasNfPISKwA2Rxw2I5M0nHfpfzKQoe4QXq6TaNPFItFzahn3m2Ur1
-         XMZewNBOwfGu7siqMHoJwBjQyTOgeXk1wsTL49TAQgKas/3Gb2FZxfcVmZj5HtG4KSzd
-         yCno1q0OaklA31NFLq4fIJ+larIRdXNKijm8bGLpCnoYvMtqBfL5KX06VOfnVS0vWVs7
-         q+/g==
-X-Gm-Message-State: AC+VfDwJrYVGTd8j4eg8y0EILUAFYEdGwwt8xUKyMCCPg78+yCrsNz1W
-        HqT/gnEttv1GQU4wvthjRyDbdgt2Nms8PVPf6UL5pAdwPhk1VYoXW8P8BSQwNS0u86tx5GiPjuP
-        YWRgMc5FKjkEUi7KPF2i94UOmBkQS
-X-Received: by 2002:a25:25d2:0:b0:b8f:722b:3570 with SMTP id l201-20020a2525d2000000b00b8f722b3570mr2223268ybl.3.1683122100617;
-        Wed, 03 May 2023 06:55:00 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ7D1M4hXsG3LFiKMmrAvYm/BdXI8iJBBg+2O1IdzrNEikBSpnuMr7HRJnj24fNJmbw7wVQJ7H/L1j7R2j3SB4Q=
-X-Received: by 2002:a25:25d2:0:b0:b8f:722b:3570 with SMTP id
- l201-20020a2525d2000000b00b8f722b3570mr2223244ybl.3.1683122100262; Wed, 03
- May 2023 06:55:00 -0700 (PDT)
+        bh=ppzeMdhiV7rhaW44wktBcr2kF59czLwUT+cf4/SlfII=;
+        b=LBv9z6McXJXhq+HbHD9AWvVUf7/ZhXYRSceIabqdAbAB8YnDTmGxelJlM23QiD/Fkq
+         0w7u8Mqu652LuaUhjE1Cn4YWBHDPpLthc2O0PTdhPqNUxljowFufMXiyveToUh0u3m3P
+         6TBJGvV3Rjhk+PjjzZ6l1OA2LDaX7ePSV66HqF/1/S3cUoZvGX8chcVcvR32yN/UNVcq
+         yFc2bDoIDdyfPVHueeDo/9VcigQH+U/4nHextSyWUdNLI5wjQXfm7WkoRRHmLhGIIEZo
+         g2Bk6/wyM7sAXtnaiHbkMIpw01cufi3aTg6lvPlTyDvmqgTco7VyVmWWhfJHYnLPIgqK
+         7SNg==
+X-Gm-Message-State: AC+VfDw5uWEzu379p2DYQLKhxAihcNxs7/pSDvRGKI2/shQQ1tr3+z8V
+        s5Z6bvvCTJUHwJYbL9v9hcVzrbWrI9ozgewZMyQmHIFEtC51dm/bx3k=
+X-Google-Smtp-Source: ACHHUZ4OJRDdOPFrpeAtv6Hp1BYOCyh6YTmP4rDtZYgKcR60wIT7RhBalh0CGiIWBM4HRIev2+idJfohuYpn1BfCmEc=
+X-Received: by 2002:a17:902:ce8b:b0:1a6:760c:af3d with SMTP id
+ f11-20020a170902ce8b00b001a6760caf3dmr286590plg.16.1683127462101; Wed, 03 May
+ 2023 08:24:22 -0700 (PDT)
 MIME-Version: 1.0
-References: <20230423192643.1537470-1-AVKrasnov@sberdevices.ru>
- <i6swadylt57hrtxhpl5ag7s3dks536wg3vxoa7nuu2x37gxsbi@uj7od5ueq6yp>
- <a9ee9ef5-e707-65ff-3128-41d09fbe8655@sberdevices.ru> <23guh3txkghxpgcrcjx7h62qsoj3xgjhfzgtbmqp2slrz3rxr4@zya2z7kwt75l>
- <ba8c5cbf-a19d-134e-c6c4-845b072a490b@sberdevices.ru>
-In-Reply-To: <ba8c5cbf-a19d-134e-c6c4-845b072a490b@sberdevices.ru>
-From:   Stefano Garzarella <sgarzare@redhat.com>
-Date:   Wed, 3 May 2023 15:54:48 +0200
-Message-ID: <CAGxU2F41wtvE7ZjZmR6DwTiSOoO5XU6Ei9+EX6ca_w6JnspCQQ@mail.gmail.com>
-Subject: Re: [RFC PATCH v2 00/15] vsock: MSG_ZEROCOPY flag support
-To:     Arseniy Krasnov <avkrasnov@sberdevices.ru>
-Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Bobby Eshleman <bobby.eshleman@bytedance.com>,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kernel@sberdevices.ru, oxffffaa@gmail.com
+References: <ZBl4592947wC7WKI@suse.de> <4420d7e5-d05f-8c31-a0f2-587ebb7eaa20@amd.com>
+ <ZFJTDtMK0QqXK5+E@suse.de>
+In-Reply-To: <ZFJTDtMK0QqXK5+E@suse.de>
+From:   Dionna Amalie Glaze <dionnaglaze@google.com>
+Date:   Wed, 3 May 2023 08:24:10 -0700
+Message-ID: <CAAH4kHa_mWSVrOdp-XvV9kd0fULQ_OOf4j8TMWJy6GhoZD5SEg@mail.gmail.com>
+Subject: Re: [ANNOUNCEMENT] COCONUT Secure VM Service Module for SEV-SNP
+To:     =?UTF-8?B?SsO2cmcgUsO2ZGVs?= <jroedel@suse.de>
+Cc:     Tom Lendacky <thomas.lendacky@amd.com>,
+        Klaus Kiwi <kkiwi@redhat.com>, linux-coco@lists.linux.dev,
+        kvm@vger.kernel.org, amd-sev-snp@lists.suse.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -86,327 +71,165 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, May 3, 2023 at 3:50=E2=80=AFPM Arseniy Krasnov <avkrasnov@sberdevic=
-es.ru> wrote:
+On Wed, May 3, 2023 at 5:27=E2=80=AFAM J=C3=B6rg R=C3=B6del <jroedel@suse.d=
+e> wrote:
 >
+> Hi Tom,
 >
+> thanks for that comparision!
 >
-> On 03.05.2023 16:47, Stefano Garzarella wrote:
-> > On Wed, May 03, 2023 at 04:11:59PM +0300, Arseniy Krasnov wrote:
-> >>
-> >>
-> >> On 03.05.2023 15:52, Stefano Garzarella wrote:
-> >>> Hi Arseniy,
-> >>> Sorry for the delay, but I have been very busy.
-> >>
-> >> Hello, no problem!
-> >>
-> >>>
-> >>> I can't apply this series on master or net-next, can you share with m=
-e
-> >>> the base commit?
-> >>
-> >> Here is my base:
-> >> https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/co=
-mmit/?id=3Db103bab0944be030954e5de23851b37980218f54
-> >>
-> >
-> > Thanks, it worked!
-> >
-> >>>
-> >>> On Sun, Apr 23, 2023 at 10:26:28PM +0300, Arseniy Krasnov wrote:
-> >>>> Hello,
-> >>>>
-> >>>>                           DESCRIPTION
-> >>>>
-> >>>> this is MSG_ZEROCOPY feature support for virtio/vsock. I tried to fo=
-llow
-> >>>> current implementation for TCP as much as possible:
-> >>>>
-> >>>> 1) Sender must enable SO_ZEROCOPY flag to use this feature. Without =
-this
-> >>>>   flag, data will be sent in "classic" copy manner and MSG_ZEROCOPY
-> >>>>   flag will be ignored (e.g. without completion).
-> >>>>
-> >>>> 2) Kernel uses completions from socket's error queue. Single complet=
+> On Tue, May 02, 2023 at 06:03:55PM -0500, Tom Lendacky wrote:
+> > While both SVSM implementations use the Qemu Firmware Configuration
+> > (fw_cfg) interface, the coconut-svsm relies on it a bit more than
+> > linux-svsm. In either case, other interfaces may need to be supported i=
+n
+> > order for an SVSM to work with a VMM other than Qemu.
+>
+> Right, that is something I have been thinking about. After I talked to a
+> few others about it, I came to the conclusion that neither COCONUT nor
+> linux-svsm use an optimal interface to request information from the HV.
+> I think it would be best if we move to a model where the MADT and E820
+> tables from QEMU (or any other HV) are part of the measured initial
+> memory image, to make that data trusted. But we can discuss that
+> separately.
+>
+> > - Both SVSMs end up located in a memory slot outside of memory that is
+> >   reported to the guest. Coconut-svsm gets the location and size from
+> >   fwcfg, which is customizable via the Qemu command line. Linux-svsm ge=
+ts
+> >   the location and size from the build process and validates that locat=
 ion
-> >>>>   for single tx syscall (or it can merge several completions to sing=
-le
-> >>>>   one). I used already implemented logic for MSG_ZEROCOPY support:
-> >>>>   'msg_zerocopy_realloc()' etc.
-> >>>>
-> >>>> Difference with copy way is not significant. During packet allocatio=
-n,
-> >>>> non-linear skb is created, then I call 'pin_user_pages()' for each p=
-age
-> >>>> from user's iov iterator and add each returned page to the skb as fr=
-agment.
-> >>>> There are also some updates for vhost and guest parts of transport -=
- in
-> >>>> both cases i've added handling of non-linear skb for virtio part. vh=
-ost
-> >>>> copies data from such skb to the guest's rx virtio buffers. In the g=
-uest,
-> >>>> virtio transport fills tx virtio queue with pages from skb.
-> >>>>
-> >>>> This version has several limits/problems:
-> >>>>
-> >>>> 1) As this feature totally depends on transport, there is no way (or=
- it
-> >>>>   is difficult) to check whether transport is able to handle it or n=
-ot
-> >>>>   during SO_ZEROCOPY setting. Seems I need to call AF_VSOCK specific
-> >>>>   setsockopt callback from setsockopt callback for SOL_SOCKET, but t=
-his
-> >>>>   leads to lock problem, because both AF_VSOCK and SOL_SOCKET callba=
-ck
-> >>>>   are not considered to be called from each other. So in current ver=
-sion
-> >>>>   SO_ZEROCOPY is set successfully to any type (e.g. transport) of
-> >>>>   AF_VSOCK socket, but if transport does not support MSG_ZEROCOPY,
-> >>>>   tx routine will fail with EOPNOTSUPP.
-> >>>
-> >>> Do you plan to fix this in the next versions?
-> >>>
-> >>> If it is too complicated, I think we can have this limitation until w=
-e
-> >>> find a good solution.
-> >>>
-> >>
-> >> I'll try to fix it again, but just didn't pay attention on it in v2.
-> >>
-> >>>>
-> >>>> 2) When MSG_ZEROCOPY is used, for each tx system call we need to enq=
-ueue
-> >>>>   one completion. In each completion there is flag which shows how t=
-x
-> >>>>   was performed: zerocopy or copy. This leads that whole message mus=
-t
-> >>>>   be send in zerocopy or copy way - we can't send part of message wi=
-th
-> >>>>   copying and rest of message with zerocopy mode (or vice versa). No=
-w,
-> >>>>   we need to account vsock credit logic, e.g. we can't send whole da=
-ta
-> >>>>   once - only allowed number of bytes could sent at any moment. In c=
-ase
-> >>>>   of copying way there is no problem as in worst case we can send si=
-ngle
-> >>>>   bytes, but zerocopy is more complex because smallest transmission
-> >>>>   unit is single page. So if there is not enough space at peer's sid=
-e
-> >>>>   to send integer number of pages (at least one) - we will wait, thu=
-s
-> >>>>   stalling tx side. To overcome this problem i've added simple rule =
--
-> >>>>   zerocopy is possible only when there is enough space at another si=
-de
-> >>>>   for whole message (to check, that current 'msghdr' was already use=
-d
-> >>>>   in previous tx iterations i use 'iov_offset' field of it's iov ite=
-r).
-> >>>
-> >>> So, IIUC if MSG_ZEROCOPY is set, but there isn't enough space in the
-> >>> destination we temporarily disable zerocopy, also if MSG_ZEROCOPY is =
-set.
-> >>> Right?
-> >>
-> >> Exactly, user still needs to get completion (because SO_ZEROCOPY is en=
-abled and
-> >> MSG_ZEROCOPY flag as used). But completion structure contains informat=
-ion that
-> >> there was copying instead of zerocopying.
-> >
-> > Got it.
-> >
-> >>
-> >>>
-> >>> If it is the case it seems reasonable to me.
-> >>>
-> >>>>
-> >>>> 3) loopback transport is not supported, because it requires to imple=
-ment
-> >>>>   non-linear skb handling in dequeue logic (as we "send" fragged skb
-> >>>>   and "receive" it from the same queue). I'm going to implement it i=
-n
-> >>>>   next versions.
-> >>>>
-> >>>>   ^^^ fixed in v2
-> >>>>
-> >>>> 4) Current implementation sets max length of packet to 64KB. IIUC th=
-is
-> >>>>   is due to 'kmalloc()' allocated data buffers. I think, in case of
-> >>>>   MSG_ZEROCOPY this value could be increased, because 'kmalloc()' is
-> >>>>   not touched for data - user space pages are used as buffers. Also
-> >>>>   this limit trims every message which is > 64KB, thus such messages
-> >>>>   will be send in copy mode due to 'iov_offset' check in 2).
-> >>>>
-> >>>>   ^^^ fixed in v2
-> >>>>
-> >>>>                         PATCHSET STRUCTURE
-> >>>>
-> >>>> Patchset has the following structure:
-> >>>> 1) Handle non-linear skbuff on receive in virtio/vhost.
-> >>>> 2) Handle non-linear skbuff on send in virtio/vhost.
-> >>>> 3) Updates for AF_VSOCK.
-> >>>> 4) Enable MSG_ZEROCOPY support on transports.
-> >>>> 5) Tests/tools/docs updates.
-> >>>>
-> >>>>                            PERFORMANCE
-> >>>>
-> >>>> Performance: it is a little bit tricky to compare performance betwee=
-n
-> >>>> copy and zerocopy transmissions. In zerocopy way we need to wait whe=
-n
-> >>>> user buffers will be released by kernel, so it something like synchr=
-onous
-> >>>> path (wait until device driver will process it), while in copy way w=
-e
-> >>>> can feed data to kernel as many as we want, don't care about device
-> >>>> driver. So I compared only time which we spend in the 'send()' sysca=
-ll.
-> >>>> Then if this value will be combined with total number of transmitted
-> >>>> bytes, we can get Gbit/s parameter. Also to avoid tx stalls due to n=
-ot
-> >>>> enough credit, receiver allocates same amount of space as sender nee=
-ds.
-> >>>>
-> >>>> Sender:
-> >>>> ./vsock_perf --sender <CID> --buf-size <buf size> --bytes 256M [--zc=
-]
-> >>>>
-> >>>> Receiver:
-> >>>> ./vsock_perf --vsk-size 256M
-> >>>>
-> >>>> G2H transmission (values are Gbit/s):
-> >>>>
-> >>>> *-------------------------------*
-> >>>> |          |         |          |
-> >>>> | buf size |   copy  | zerocopy |
-> >>>> |          |         |          |
-> >>>> *-------------------------------*
-> >>>> |   4KB    |    3    |    10    |
-> >>>> *-------------------------------*
-> >>>> |   32KB   |    9    |    45    |
-> >>>> *-------------------------------*
-> >>>> |   256KB  |    24   |    195   |
-> >>>> *-------------------------------*
-> >>>> |    1M    |    27   |    270   |
-> >>>> *-------------------------------*
-> >>>> |    8M    |    22   |    277   |
-> >>>> *-------------------------------*
-> >>>>
-> >>>> H2G:
-> >>>>
-> >>>> *-------------------------------*
-> >>>> |          |         |          |
-> >>>> | buf size |   copy  | zerocopy |
-> >>>> |          |         |          |
-> >>>> *-------------------------------*
-> >>>> |   4KB    |    17   |    11    |
-> >>>
-> >>> Do you know why in this case zerocopy is slower in this case?
-> >>> Could be the cost of pin/unpin pages?
-> >> May be, i think i need to analyze such enormous difference more. Also =
-about
-> >> pin/unpin: i found that there is already implemented function to fill =
-non-linear
-> >> skb with pages from user's iov: __zerocopy_sg_from_iter() in net/core/=
-datagram.c.
-> >> It uses 'get_user_pages()' instead of 'pin_user_pages()'. May be in my=
- case it
-> >> is also valid to user 'get_XXX()' instead of 'pin_XXX()', because it i=
-s used by
-> >> TCP MSG_ZEROCOPY and iouring MSG_ZEROCOPY.
-> >
-> > If we can reuse them, it will be great!
-> >
-> >>
-> >>>
-> >>>> *-------------------------------*
-> >>>> |   32KB   |    30   |    66    |
-> >>>> *-------------------------------*
-> >>>> |   256KB  |    38   |    179   |
-> >>>> *-------------------------------*
-> >>>> |    1M    |    38   |    234   |
-> >>>> *-------------------------------*
-> >>>> |    8M    |    28   |    279   |
-> >>>> *-------------------------------*
-> >>>>
-> >>>> Loopback:
-> >>>>
-> >>>> *-------------------------------*
-> >>>> |          |         |          |
-> >>>> | buf size |   copy  | zerocopy |
-> >>>> |          |         |          |
-> >>>> *-------------------------------*
-> >>>> |   4KB    |    8    |    7     |
-> >>>> *-------------------------------*
-> >>>> |   32KB   |    34   |    42    |
-> >>>> *-------------------------------*
-> >>>> |   256KB  |    43   |    83    |
-> >>>> *-------------------------------*
-> >>>> |    1M    |    40   |    109   |
-> >>>> *-------------------------------*
-> >>>> |    8M    |    40   |    171   |
-> >>>> *-------------------------------*
-> >>>>
-> >>>> I suppose that huge difference above between both modes has two reas=
-ons:
-> >>>> 1) We don't need to copy data.
-> >>>> 2) We don't need to allocate buffer for data, only for header.
-> >>>>
-> >>>> Zerocopy is faster than classic copy mode, but of course it requires
-> >>>> specific architecture of application due to user pages pinning, buff=
-er
-> >>>> size and alignment.
-> >>>>
-> >>>> If host fails to send data with "Cannot allocate memory", check valu=
-e
-> >>>> /proc/sys/net/core/optmem_max - it is accounted during completion sk=
-b
-> >>>> allocation.
-> >>>
-> >>> What the user needs to do? Increase it?
-> >>>
-> >> Yes, i'll update it.
-> >>>>
-> >>>>                            TESTING
-> >>>>
-> >>>> This patchset includes set of tests for MSG_ZEROCOPY feature. I trie=
-d to
-> >>>> cover new code as much as possible so there are different cases for
-> >>>> MSG_ZEROCOPY transmissions: with disabled SO_ZEROCOPY and several io
-> >>>> vector types (different sizes, alignments, with unmapped pages). I a=
-lso
-> >>>> run tests with loopback transport and running vsockmon.
-> >>>
-> >>> Thanks for the test again :-)
-> >>>
-> >>> This cover letter is very good, with a lot of details, but please add
-> >>> more details in each single patch, explaining the reason of the chang=
-es,
-> >>> otherwise it is very difficult to review, because it is a very big
-> >>> change.
-> >>>
-> >>> I'll do a per-patch review in the next days.
-> >>
-> >> Sure, thanks! In v3 i'm also working on io_uring test, because this th=
-ing also
-> >> supports MSG_ZEROCOPY, so we can do virtio/vsock + MSG_ZEROCOPY + io_u=
-ring.
-> >
-> > That would be cool!
-> >
-> > Do you want to me to review these patches or it is better to wait for v=
-3?
+> >   and size.
 >
-> I think it is ok to wait for v3, as i'm going to reduce size of new kerne=
-l source code,
-> especially by reusing already implemented functions instead of my own.
+> Correct, COCONUT also has a fall-back where it just uses the last 16MB
+> of guest RAM if the fw_cfg file is not there. That needs OVMF support,
+> though.
+>
+> >   - Pagetables:
+> >     Page table support can be tricky with the x86_64 crate. But in gene=
+ral
+> >     I believe it could still be used. Coconut-svsm uses a dynamic offse=
+t-
+> >     based approach for pagetables based on the final physical address
+> >     location. This offset could be utilized in the x86_64 crate
+> >     implementation. When CPL3 support comes around, that would require
+> >     further investigation.
+>
+> Yeah, COCONUT does not only use an offset mapping, it also has specific
+> mappings for the per-cpu areas. Those are mapped at a fixed location,
+> same with stacks, so the needs already go beyond an offset mapping.
+>
+> > - Coconut-svsm copies the original Secrets Page and the "frees" the mem=
+ory
+> >   for it. I couldn't tell if the memory is zeroed out or not, but
+> >   something that should be looked at to ensure the VMPCK0 key is not
+> >   leaked.
+>
+> Thanks, that is a real issue. I just wrote a fix for that.
+>
+> > Some questions for coconut-svsm:
+> >   - Are there any concerns with using existing code/projects as submodu=
+les
+> >     within coconut-svsm (e.g. OpenSSL or a software TPM implementation)=
+?
+> >     One of our design goals for linux-svsm was desirability to easily
+> >     allow downstream users or products to, e.g., use their own crypto
+> >     (e.g. company preferred)
+>
+> No concerns from my side to run any code you want in a CPL-3 module.
+> This includes code which uses external libraries such as openssl or
+> libtpm. The modules will be in an archive file packaged with the SVSM
+> binary, so that everything that runs is measured at launch time.
+>
+> >   - Are you open to having maintainers outside of SUSE? There is some
+> >     linux-svsm community concern about project governance and project
+> >     priorities and release schedules. This wouldn't have to be AMD even=
+,
+> >     but we'd volunteer to help here if desired, but we'd like to foster=
+ a
+> >     true community model for governance regardless. We'd love to hear
+> >     thoughts on this from coconut-svsm folks.
+>
+> Yes, I am definitely willing to make the project more open and move to a
+> maintainer-group model, no intention from my side to become a BDFL for
+> the project. I just have no clear picture yet how the model should look
+> like and how to get there. I will send a separate email to kick-start a
+> discussion about that.
+>
+> >   - On the subject of priorities, the number one priority for the
+> >     linux-svsm project has been to quickly achieve production quality v=
+TPM
+> >     support. The support for this is being actively worked on by
+> >     linux-svsm contributors and we'd want to find fastest path towards
+> >     getting that redirected into coconut-svsm (possibly starting with C=
+PL0
+> >     implementation until CPL3 support is available) and the project
+> >     hardened for a release.  I imagine there will be some competing
+> >     priorities from coconut-svsm project currently, so wanted to get th=
+is
+> >     out on the table from the beginning.
+>
+> That has been under discussion for some time, and honestly I think
+> the approach taken is the main difference between linux-svsm and
+> COCONUT. My position here is, and that comes with a big 'BUT', that I am
+> not fundamentally opposed to having a temporary solution for the TPM
+> until CPL-3 support is at a point where it can run a TPM module.
+>
+> And here come the 'BUT': Since the goal of having one project is to
+> bundle community efforts, I think that the joint efforts are better
+> targeted at getting CPL-3 support to a point where it can run modules.
+> On that side some input and help is needed, especially to define the
+> syscall interface so that it suits the needs of a TPM implementation.
+>
+> It is also not the case that CPL-3 support is out more than a year or
+> so. The RamFS is almost ready, as is the archive file inclusion[1]. We
+> will move to task management next, the goal is still to have basic
+> support ready in 2H2023.
+>
+> [1] https://github.com/coconut-svsm/svsm/pull/27
+>
+> If there is still a strong desire to have COCONUT with a TPM (running at
+> CPL-0) before CPL-3 support is usable, then I can live with including
+> code for that as a temporary solution. But linking huge amounts of C
+> code (like openssl or a tpm lib) into the SVSM rust binary kind of
+> contradicts the goals which made us using Rust for project in the first
+> place. That is why I only see this as a temporary solution.
+>
+> > Since we don't want to split resources or have competing projects, we a=
+re
+> > leaning towards moving our development resources over to the coconut-sv=
+sm
+> > project.
+>
 
-Okay, great! I'll wait for it ;-)
+Not to throw a wrench in the works, but is it possible for us to have
+an RTMR protocol as a stop-gap between a fully paravirtualized vTPM
+and a fully internalized vTPM? The EFI protocol
+CC_MEASUREMENT_PROTOCOL is already standardized, and it can serve as a
+hardware-rooted integrity measure for a paravirtualized vTPM. This
+solution would further allow a TDX measured boot solution to be more
+thoroughly supported earlier, given that we'd need to have the RTMR
+event log replay logic implemented.
 
-Thanks,
-Stefano
+> Great move, much appreciated, thanks a lot for that! Let's work together
+> to make that happen.
+>
+> Regards,
+>
+> --
+> J=C3=B6rg R=C3=B6del
+> jroedel@suse.de
+>
+> SUSE Software Solutions Germany GmbH
+> Frankenstra=C3=9Fe 146
+> 90461 N=C3=BCrnberg
+> Germany
+>
+> (HRB 36809, AG N=C3=BCrnberg)
+> Gesch=C3=A4ftsf=C3=BChrer: Ivo Totev, Andrew Myers, Andrew McDonald, Boud=
+ien Moerman
+>
 
+
+--=20
+-Dionna Glaze, PhD (she/her)
