@@ -2,65 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EFDEE6F4F67
-	for <lists+kvm@lfdr.de>; Wed,  3 May 2023 06:16:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0211C6F5004
+	for <lists+kvm@lfdr.de>; Wed,  3 May 2023 08:22:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229577AbjECEQj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 May 2023 00:16:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41490 "EHLO
+        id S229610AbjECGWb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 May 2023 02:22:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37358 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229541AbjECEQh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 May 2023 00:16:37 -0400
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 498DC1FCF
-        for <kvm@vger.kernel.org>; Tue,  2 May 2023 21:16:36 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-559d30ec7fcso97460817b3.2
-        for <kvm@vger.kernel.org>; Tue, 02 May 2023 21:16:36 -0700 (PDT)
+        with ESMTP id S229486AbjECGW3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 May 2023 02:22:29 -0400
+Received: from mail-wr1-x434.google.com (mail-wr1-x434.google.com [IPv6:2a00:1450:4864:20::434])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B0D42680
+        for <kvm@vger.kernel.org>; Tue,  2 May 2023 23:22:27 -0700 (PDT)
+Received: by mail-wr1-x434.google.com with SMTP id ffacd0b85a97d-2f55ffdbaedso2854132f8f.2
+        for <kvm@vger.kernel.org>; Tue, 02 May 2023 23:22:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1683087395; x=1685679395;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=3YJtw62GtGvLodxqlrImmwkb/DnaRXZEiakmDP1KOF8=;
-        b=o0hLaITSqsgzFYxltV5RMId55xRCG7Tk7YDz8q1/OPDSGMvILQefICkgC4ZdxBqB5J
-         MjLh+sCmNZ/i4oT6P32JokhR9S9qC2/MKjtHdKTuKxzkXSNBAbjhBRq0E/+wDTsfICmf
-         QPnSYSpFQGfgPh9SoetmTsBGucvMVaYAmUMEavxgR2YWDVf6noAnJ89JuBro7gMQGiaw
-         46+qLbWVjPzPWWnT54vf6Q78PH7/VeL+0L1rdJR/T3nSdmKeYD7tQoYXhZ5QylK8X6/B
-         G9ars/m9dekJeHaxs+6U0IcwtX6U4wqxu8SGm4tm5PQMv+kIkL5tmwiBfhlNHnMSuy1e
-         8WyQ==
+        d=linaro.org; s=google; t=1683094946; x=1685686946;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=URVvd6LZkHtxztE8g0C8uujiBA12o3uEcBI+tRbKwIY=;
+        b=HfADeA4Cotj+FkkvsK1OIGGVbNc+9gNdoGznpOL2zY7guFQETLuLPykVhzqxknojGG
+         +o2SQYsePV59rozQgiWYDaqR3UcyJQmyFX8jt6h5xQCXRbkF/GrR1pntnRff9vRTXSwU
+         iWY2A1usDvOpi9wC2G7yNhtSyXADakRblVHe5ZU3uaKLUoWD9PnT9ZnElom321S4CPJh
+         0Xbb9/63admqUw4REGeWVcIrgGwTVd6Jg0Ofcefg08umkvICV3VEoNMAo04POz1MO4y9
+         JLid3Isn8UJwT/KzoouMcktg8LZoVUmEM8KNAYH6BGeRDK9/XXxKe1qNqSwX5BAH3yQd
+         Y35w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683087395; x=1685679395;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+        d=1e100.net; s=20221208; t=1683094946; x=1685686946;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=3YJtw62GtGvLodxqlrImmwkb/DnaRXZEiakmDP1KOF8=;
-        b=kcSn2FvqQ4z6jcFWd9lYuZjXOjJ3/hRkwAc8/qy0QfUItehKt2cCxKjA8aY07s9UUB
-         8X9WLdHeZdKjCFvKk0GGu7HDKMWpg4PdSP0+Ers7GzOeM9L+vMPKbdrb9C+O8EonkQRB
-         yt4qqLWH0CF1ygmkCMG4aKw2fFq9G+r2oBQK/Cv9Ztvmr3WGL33aqjsAA8NJr0LNNNnT
-         wdSlJVcUsafQwp5V5zp813nMzJbfbQu/sPD82r0iaA+MGLciftZ21xEnuCoTFqlJA3cK
-         go/auS2eyPdgFMc5MDtUGrwRTUltuZ7x0PAG8Sk3yqZpmRDdzPouC2YoJWb5vgZ8+ikq
-         cY8g==
-X-Gm-Message-State: AC+VfDzvD1cpdaZcJ1k5gEG37VxC5h/MbagBoxZ7NvYE2SoM+UN2UhbZ
-        YkapdDslPJbCql0o/xGZjDtgmi+Ir+Hn
-X-Google-Smtp-Source: ACHHUZ7+2ASkPEkBngTb5kF2Pga79bea/NaDa0+puZhbsdGsdaq/QBqPR8/RdIFb+ghPhxLGJrN07edkfjw0
-X-Received: from mizhang-super.c.googlers.com ([34.105.13.176]) (user=mizhang
- job=sendgmr) by 2002:a81:b145:0:b0:552:f777:88ce with SMTP id
- p66-20020a81b145000000b00552f77788cemr11660614ywh.3.1683087395559; Tue, 02
- May 2023 21:16:35 -0700 (PDT)
-Reply-To: Mingwei Zhang <mizhang@google.com>
-Date:   Wed,  3 May 2023 04:16:31 +0000
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.40.1.495.gc816e09b53d-goog
-Message-ID: <20230503041631.3368796-1-mizhang@google.com>
-Subject: [PATCH] KVM: VMX: add MSR_IA32_TSX_CTRL into msrs_to_save
-From:   Mingwei Zhang <mizhang@google.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Jim Mattson <jmattson@google.com>,
-        Mingwei Zhang <mizhang@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        bh=URVvd6LZkHtxztE8g0C8uujiBA12o3uEcBI+tRbKwIY=;
+        b=lE+XLG7jhtYt6Ryrb3dYa5kTgAaA8xomUA25KioW3z7NPOaqGg4cZU0H6d1x8QUk83
+         ZQxSA+7sH6T341Iwwx6IRK/VjadWMWzod0W8hpsE0aoTerOFqzUQ6k0/EkNBUHyGCFNl
+         OCCknyYgjWzJYEY9xPNDtc0xpIHQzdmaYshmymPw1l2bIMLVzVZWsux5neh7iiFBUOgJ
+         SrABNUPB9lNEYeLBmU181eua3fHvGubzWmIA6yUfWarB15X5Ymd6TIOpQHHRGc2Sxrpd
+         Y/rXvULeJPn7HTDUCKKioFd0MMLhinApLq8UJGMqgd5MUBuEy9ukU2F7hkL7XNDBOn5q
+         xAag==
+X-Gm-Message-State: AC+VfDwa+dDR0bf5y9EkTtU10t/R0/Wg2disFxJHSS9Kvgdj3uScXn4h
+        4yw4iz1EekdXs0drmFrEHs0aeg==
+X-Google-Smtp-Source: ACHHUZ5O6gAZXLMAlS3k1qLFGo4ahPMocavK5zggVezCtd3vD0bUxF7NCwl4tQcQ3yu4P9ENosihxA==
+X-Received: by 2002:a5d:6dca:0:b0:306:29b6:b389 with SMTP id d10-20020a5d6dca000000b0030629b6b389mr6906507wrz.64.1683094945971;
+        Tue, 02 May 2023 23:22:25 -0700 (PDT)
+Received: from ?IPV6:2a02:c7c:74db:8d00:c01d:9d74:b630:9087? ([2a02:c7c:74db:8d00:c01d:9d74:b630:9087])
+        by smtp.gmail.com with ESMTPSA id y4-20020adffa44000000b002f013fb708fsm33188926wrr.4.2023.05.02.23.22.25
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 02 May 2023 23:22:25 -0700 (PDT)
+Message-ID: <20e8f2ee-5612-251f-62b2-20ab75345d59@linaro.org>
+Date:   Wed, 3 May 2023 07:22:22 +0100
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+Subject: Re: [PATCH RFC v2 7/9] target/loongarch: Implement
+ kvm_arch_handle_exit
+Content-Language: en-US
+To:     Tianrui Zhao <zhaotianrui@loongson.cn>, qemu-devel@nongnu.org
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        gaosong@loongson.cn, "Michael S . Tsirkin" <mst@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>, maobibo@loongson.cn,
+        philmd@linaro.org, peter.maydell@linaro.org
+References: <20230427072645.3368102-1-zhaotianrui@loongson.cn>
+ <20230427072645.3368102-8-zhaotianrui@loongson.cn>
+From:   Richard Henderson <richard.henderson@linaro.org>
+In-Reply-To: <20230427072645.3368102-8-zhaotianrui@loongson.cn>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -68,31 +78,18 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add MSR_IA32_TSX_CTRL into msrs_to_save[] to explicitly tell userspace to
-save/restore the register value during migration. Missing this may cause
-userspace that relies on KVM ioctl(KVM_GET_MSR_INDEX_LIST) fail to port the
-value to the target VM.
+On 4/27/23 08:26, Tianrui Zhao wrote:
+> Implement kvm_arch_handle_exit for loongarch. In this
+> function, the KVM_EXIT_LOONGARCH_IOCSR is handled,
+> we read or write the iocsr address space by the addr,
+> length and is_write argument in kvm_run.
+> 
+> Signed-off-by: Tianrui Zhao<zhaotianrui@loongson.cn>
+> ---
+>   target/loongarch/kvm.c        | 24 +++++++++++++++++++++++-
+>   target/loongarch/trace-events |  1 +
+>   2 files changed, 24 insertions(+), 1 deletion(-)
 
-Fixes: b07a5c53d42a ("KVM: vmx: use MSR_IA32_TSX_CTRL to hard-disable TSX on guest that lack it")
-Reported-by: Jim Mattson <jmattson@google.com>
-Signed-off-by: Mingwei Zhang <mizhang@google.com>
----
- arch/x86/kvm/x86.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 237c483b1230..2236cfee4b7a 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -1431,7 +1431,7 @@ static const u32 msrs_to_save_base[] = {
- #endif
- 	MSR_IA32_TSC, MSR_IA32_CR_PAT, MSR_VM_HSAVE_PA,
- 	MSR_IA32_FEAT_CTL, MSR_IA32_BNDCFGS, MSR_TSC_AUX,
--	MSR_IA32_SPEC_CTRL,
-+	MSR_IA32_SPEC_CTRL, MSR_IA32_TSX_CTRL,
- 	MSR_IA32_RTIT_CTL, MSR_IA32_RTIT_STATUS, MSR_IA32_RTIT_CR3_MATCH,
- 	MSR_IA32_RTIT_OUTPUT_BASE, MSR_IA32_RTIT_OUTPUT_MASK,
- 	MSR_IA32_RTIT_ADDR0_A, MSR_IA32_RTIT_ADDR0_B,
--- 
-2.40.1.495.gc816e09b53d-goog
-
+r~
