@@ -2,176 +2,294 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 081DB6F5842
-	for <lists+kvm@lfdr.de>; Wed,  3 May 2023 14:54:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 676EC6F5834
+	for <lists+kvm@lfdr.de>; Wed,  3 May 2023 14:53:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230053AbjECMyk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 May 2023 08:54:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54716 "EHLO
+        id S229824AbjECMxn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 May 2023 08:53:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53912 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229953AbjECMy0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 May 2023 08:54:26 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA5E85FC6;
-        Wed,  3 May 2023 05:54:17 -0700 (PDT)
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 343CsAxw032116;
-        Wed, 3 May 2023 12:54:17 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=OdSBNL0rhlJgQI1Pz50BBgSkLWOJFO6nfzapJux5ses=;
- b=ZHun1Z/9gby50irMk4jF/AGrFVdvvzDoRDmNF14wBMp0UNqv7ZRaJMGZlCphm/lEyPZk
- CYi/WUXhR2aVpzKezAi7T6heNcuYbNXje4YKie+fguAPdSUlJHqdeA7UIk4LiNit4JFY
- yTGOAmP1ZR56SKcJ5/SRJGT2enbf8uFwBtjMNrWUXqCnUS80rbasO7ymk7sSFkH4i1rG
- E45Q9c+bx0Fe/AUmDYA3z8nhVn2JaNZ2nRZ3BGWj2RtmQNQqn/z/yY8XrpjfMBuNhOLU
- vtqmhptVfIaIWZcCiePQseSNbIQ0Ss9+KP5haCz+LXTunLHtofhONYXvpe2EvQnzKSMb 3w== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qbqmwgwv2-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 03 May 2023 12:54:16 +0000
-Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 343CrL6g029005;
-        Wed, 3 May 2023 12:53:26 GMT
-Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qbqmwgw0x-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 03 May 2023 12:53:25 +0000
-Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
-        by ppma02fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3434TI1l014099;
-        Wed, 3 May 2023 12:52:24 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-        by ppma02fra.de.ibm.com (PPS) with ESMTPS id 3q8tv6sue3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 03 May 2023 12:52:24 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-        by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 343CqKct15139226
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 3 May 2023 12:52:20 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id CFAB92004B;
-        Wed,  3 May 2023 12:52:20 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7AD7820040;
-        Wed,  3 May 2023 12:52:20 +0000 (GMT)
-Received: from [9.152.222.242] (unknown [9.152.222.242])
-        by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-        Wed,  3 May 2023 12:52:20 +0000 (GMT)
-Message-ID: <af6e9b44-ac14-904e-6d37-043a5c8a9357@linux.ibm.com>
-Date:   Wed, 3 May 2023 14:52:20 +0200
+        with ESMTP id S229734AbjECMxl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 May 2023 08:53:41 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78B715263
+        for <kvm@vger.kernel.org>; Wed,  3 May 2023 05:52:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1683118368;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=LNd8A4raflq8+zrsoLkAbucJm9t+51+2qlFUdBGjsEY=;
+        b=GzXEa3z7a5+4GtOpuHR/bCbzed2q9lZvQ/IChtvdF0/KfCErlWiET3ZE7NPpOys/5VVz2y
+        sliSSYbFy2nPbhelCQu7A1hHqP5g0VtVL3cK2j3jwGzdLfwqjpsIGgY1bR45vSu+TuO/Gg
+        aPjSJHz7tpEmAT842VaibuLNBRxp04c=
+Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
+ [209.85.160.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-502-TqixcQGcOR2cBeW4bklpBQ-1; Wed, 03 May 2023 08:52:47 -0400
+X-MC-Unique: TqixcQGcOR2cBeW4bklpBQ-1
+Received: by mail-qt1-f200.google.com with SMTP id d75a77b69052e-3ed2ac02709so27581591cf.2
+        for <kvm@vger.kernel.org>; Wed, 03 May 2023 05:52:47 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1683118366; x=1685710366;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=LNd8A4raflq8+zrsoLkAbucJm9t+51+2qlFUdBGjsEY=;
+        b=eSKxPZ5Kwyf7vbOLfbfi1LlB75jf3JG8yKQa4Rj1Mz/tv6wkIHHW/6Ms24xdqrHj6T
+         D94JQOecS/zwktQpcnezu5/fIu6yKF86oTUDTCsX36ZsPMTOu6AwYlCA8x5hu31zKAMb
+         P95Rc1c4W60QlHd81VRdzejK4F2T24+le+UW6rKEVbAQ9oawdjWUXTmfr6acZmh4fUWX
+         eH+nIQ3NBIyGq8y8ESMyKaTVU+e0qbG5/ui1U/irqzy+4B3Lrk32WqJYDHAITIuDeuaL
+         aFJLIMTp9j+N+hWOqt7N0Lm1JRW0dxhhCTPFei9FxCbNlnz7TvJJBXtVFkjUSslQ8/TZ
+         tjPg==
+X-Gm-Message-State: AC+VfDwLX9sep61eoDvXy5oC03I+2MDRboCvUZIbOw+Xwq5KCm6PAmjT
+        ROPsOXZ0HXHGiaf5R1ISZeCOm6+zXdJ64TB9ziwjnvawdjj1wA4QX8/0mpHXGyAjwD1zxriD9m/
+        jmv8JEsEvXgFK
+X-Received: by 2002:ac8:7fca:0:b0:3e4:df94:34fa with SMTP id b10-20020ac87fca000000b003e4df9434famr33038277qtk.37.1683118366608;
+        Wed, 03 May 2023 05:52:46 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ5Hwjqhg4ApArDnu7YxuS1xrHnrqrBaWciP0xeNo0p91H+MTSlfSPQ2esF0rfgbIR/lMzqdwA==
+X-Received: by 2002:ac8:7fca:0:b0:3e4:df94:34fa with SMTP id b10-20020ac87fca000000b003e4df9434famr33038243qtk.37.1683118366311;
+        Wed, 03 May 2023 05:52:46 -0700 (PDT)
+Received: from sgarzare-redhat ([185.29.96.107])
+        by smtp.gmail.com with ESMTPSA id dz16-20020a05620a2b9000b0074df16f36f1sm10501546qkb.108.2023.05.03.05.52.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 03 May 2023 05:52:45 -0700 (PDT)
+Date:   Wed, 3 May 2023 14:52:35 +0200
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Arseniy Krasnov <AVKrasnov@sberdevices.ru>
+Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Bobby Eshleman <bobby.eshleman@bytedance.com>,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kernel@sberdevices.ru, oxffffaa@gmail.com
+Subject: Re: [RFC PATCH v2 00/15] vsock: MSG_ZEROCOPY flag support
+Message-ID: <i6swadylt57hrtxhpl5ag7s3dks536wg3vxoa7nuu2x37gxsbi@uj7od5ueq6yp>
+References: <20230423192643.1537470-1-AVKrasnov@sberdevices.ru>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.8.0
-Subject: Re: [kvm-unit-tests PATCH v8 2/2] s390x: topology: Checking
- Configuration Topology Information
-Content-Language: en-US
-To:     Nico Boehr <nrb@linux.ibm.com>, linux-s390@vger.kernel.org
-Cc:     frankja@linux.ibm.com, thuth@redhat.com, kvm@vger.kernel.org,
-        imbrenda@linux.ibm.com, david@redhat.com, nsg@linux.ibm.com
-References: <20230426083426.6806-1-pmorel@linux.ibm.com>
- <20230426083426.6806-3-pmorel@linux.ibm.com>
- <168258524358.99032.14388431972069131423@t14-nrb>
- <25a9c3d6-43be-6a08-a32e-5abc520e8c62@linux.ibm.com>
- <168266833708.15302.621201335459420614@t14-nrb>
- <8122e0de-7cbb-83f2-4c3a-7a50f0d5b205@linux.ibm.com>
- <168311498507.14421.10981394117035080962@t14-nrb>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-In-Reply-To: <168311498507.14421.10981394117035080962@t14-nrb>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: H7nqEhuvLLrAa-QgSU0zky6FAZOWS_L-
-X-Proofpoint-ORIG-GUID: nZ9UcLINrI82faCR9rB_Kmd7oFr8xirg
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
- definitions=2023-05-03_08,2023-05-03_01,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 mlxlogscore=999
- lowpriorityscore=0 bulkscore=0 clxscore=1015 impostorscore=0
- suspectscore=0 phishscore=0 malwarescore=0 priorityscore=1501 spamscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2303200000 definitions=main-2305030106
-X-Spam-Status: No, score=-6.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20230423192643.1537470-1-AVKrasnov@sberdevices.ru>
+X-Spam-Status: No, score=-2.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi Arseniy,
+Sorry for the delay, but I have been very busy.
 
-On 5/3/23 13:56, Nico Boehr wrote:
-> Quoting Pierre Morel (2023-04-28 15:10:07)
->> On 4/28/23 09:52, Nico Boehr wrote:
->>> Quoting Pierre Morel (2023-04-27 16:50:16)
->>> [...]
->>>>>> diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
->>>>>> index fc3666b..375e6ce 100644
->>>>>> --- a/s390x/unittests.cfg
->>>>>> +++ b/s390x/unittests.cfg
->>>>>> @@ -221,3 +221,6 @@ file = ex.elf
->>>>>>     
->>>>>>     [topology]
->>>>>>     file = topology.elf
->>>>>> +# 3 CPUs on socket 0 with different CPU TLE (standard, dedicated, origin)
->>>>>> +# 1 CPU on socket 2
->>>>>> +extra_params = -smp 1,drawers=3,books=3,sockets=4,cores=4,maxcpus=144 -cpu z14,ctop=on -device z14-s390x-cpu,core-id=1,entitlement=low -device z14-s390x-cpu,core-id=2,dedicated=on -device z14-s390x-cpu,core-id=10 -device z14-s390x-cpu,core-id=20 -device z14-s390x-cpu,core-id=130,socket-id=0,book-id=0,drawer-id=0 -append '-drawers 3 -books 3 -sockets 4 -cores 4'
->>>>> If I got the command line right, all CPUs are on the same drawer with this command line, aren't they? If so, does it make sense to run with different combinations, i.e. CPUs on different drawers, books etc?
->>>> OK, I will add some CPU on different drawers and books.
->>> just to clarify: What I meant is adding an *additional* entry to unittests.cfg. Does it make sense in your opinion? I just want more coverage for different scenarios we may have.
->> Ah OK, yes even better.
->>
->> In this test I chose the values randomly, I can add 2 other tests like
->>
->> - once with the maximum of CPUs like:
->>
->> [topology-2]
->> file = topology.elf
->> extra_params = -smp drawers=3,books=4,sockets=5,cores=4,maxcpus=240
->> -append '-drawers 3 -books 4 -sockets 5 -cores 4'
->>
->>
->> or having 8 different TLE on the same socket
->>
->> [topology-2]
->>
->> file = topology.elf
->> extra_params = -smp 1,drawers=2,books=2,sockets=2,cores=30,maxcpus=240
->> -append '-drawers 2 -books 2 -sockets 2 -cores 30' -cpu z14,ctop=on
->> -device
->> z14-s390x-cpu,drawer-id=1,book-id=0,socket-id=0,core-id=2,entitlement=low
->> -device
->> z14-s390x-cpu,drawer-id=1,book-id=0,socket-id=0,core-id=3,entitlement=medium
->> -device
->> z14-s390x-cpu,drawer-id=1,book-id=0,socket-id=0,core-id=4,entitlement=high
->> -device
->> z14-s390x-cpu,drawer-id=1,book-id=0,socket-id=0,core-id=5,entitlement=high,dedicated=on
->> -device
->> z14-s390x-cpu,drawer-id=1,book-id=0,socket-id=0,core-id=65,entitlement=low
->> -device
->> z14-s390x-cpu,drawer-id=1,book-id=0,socket-id=0,core-id=66,entitlement=medium
->> -device
->> z14-s390x-cpu,drawer-id=1,book-id=0,socket-id=0,core-id=67,entitlement=high
->> -device
->> z14-s390x-cpu,drawer-id=1,book-id=0,socket-id=0,core-id=68,entitlement=high,dedicated=on
->>
->>
->> What do you think is the best ?
-> I think both do make sense, since they cover differenct scenarios, don't they?
+I can't apply this series on master or net-next, can you share with me
+the base commit?
 
+On Sun, Apr 23, 2023 at 10:26:28PM +0300, Arseniy Krasnov wrote:
+>Hello,
+>
+>                           DESCRIPTION
+>
+>this is MSG_ZEROCOPY feature support for virtio/vsock. I tried to follow
+>current implementation for TCP as much as possible:
+>
+>1) Sender must enable SO_ZEROCOPY flag to use this feature. Without this
+>   flag, data will be sent in "classic" copy manner and MSG_ZEROCOPY
+>   flag will be ignored (e.g. without completion).
+>
+>2) Kernel uses completions from socket's error queue. Single completion
+>   for single tx syscall (or it can merge several completions to single
+>   one). I used already implemented logic for MSG_ZEROCOPY support:
+>   'msg_zerocopy_realloc()' etc.
+>
+>Difference with copy way is not significant. During packet allocation,
+>non-linear skb is created, then I call 'pin_user_pages()' for each page
+>from user's iov iterator and add each returned page to the skb as fragment.
+>There are also some updates for vhost and guest parts of transport - in
+>both cases i've added handling of non-linear skb for virtio part. vhost
+>copies data from such skb to the guest's rx virtio buffers. In the guest,
+>virtio transport fills tx virtio queue with pages from skb.
+>
+>This version has several limits/problems:
+>
+>1) As this feature totally depends on transport, there is no way (or it
+>   is difficult) to check whether transport is able to handle it or not
+>   during SO_ZEROCOPY setting. Seems I need to call AF_VSOCK specific
+>   setsockopt callback from setsockopt callback for SOL_SOCKET, but this
+>   leads to lock problem, because both AF_VSOCK and SOL_SOCKET callback
+>   are not considered to be called from each other. So in current version
+>   SO_ZEROCOPY is set successfully to any type (e.g. transport) of
+>   AF_VSOCK socket, but if transport does not support MSG_ZEROCOPY,
+>   tx routine will fail with EOPNOTSUPP.
 
-Yes,
+Do you plan to fix this in the next versions?
 
-also
+If it is too complicated, I think we can have this limitation until we
+find a good solution.
 
-[topology-2]
-file = topology.elf
-extra_params = -smp books=2,sockets=31,cores=4,maxcpus=248
--append '-drawers 1 -books 2 -sockets 31 -cores 4'
+>
+>2) When MSG_ZEROCOPY is used, for each tx system call we need to enqueue
+>   one completion. In each completion there is flag which shows how tx
+>   was performed: zerocopy or copy. This leads that whole message must
+>   be send in zerocopy or copy way - we can't send part of message with
+>   copying and rest of message with zerocopy mode (or vice versa). Now,
+>   we need to account vsock credit logic, e.g. we can't send whole data
+>   once - only allowed number of bytes could sent at any moment. In case
+>   of copying way there is no problem as in worst case we can send single
+>   bytes, but zerocopy is more complex because smallest transmission
+>   unit is single page. So if there is not enough space at peer's side
+>   to send integer number of pages (at least one) - we will wait, thus
+>   stalling tx side. To overcome this problem i've added simple rule -
+>   zerocopy is possible only when there is enough space at another side
+>   for whole message (to check, that current 'msghdr' was already used
+>   in previous tx iterations i use 'iov_offset' field of it's iov iter).
 
-Could make sense too, it is the way I found the sclp problem, but it will fail until sclp is fixed using facility 140.
+So, IIUC if MSG_ZEROCOPY is set, but there isn't enough space in the
+destination we temporarily disable zerocopy, also if MSG_ZEROCOPY is set.
+Right?
 
+If it is the case it seems reasonable to me.
 
+>
+>3) loopback transport is not supported, because it requires to implement
+>   non-linear skb handling in dequeue logic (as we "send" fragged skb
+>   and "receive" it from the same queue). I'm going to implement it in
+>   next versions.
+>
+>   ^^^ fixed in v2
+>
+>4) Current implementation sets max length of packet to 64KB. IIUC this
+>   is due to 'kmalloc()' allocated data buffers. I think, in case of
+>   MSG_ZEROCOPY this value could be increased, because 'kmalloc()' is
+>   not touched for data - user space pages are used as buffers. Also
+>   this limit trims every message which is > 64KB, thus such messages
+>   will be send in copy mode due to 'iov_offset' check in 2).
+>
+>   ^^^ fixed in v2
+>
+>                         PATCHSET STRUCTURE
+>
+>Patchset has the following structure:
+>1) Handle non-linear skbuff on receive in virtio/vhost.
+>2) Handle non-linear skbuff on send in virtio/vhost.
+>3) Updates for AF_VSOCK.
+>4) Enable MSG_ZEROCOPY support on transports.
+>5) Tests/tools/docs updates.
+>
+>                            PERFORMANCE
+>
+>Performance: it is a little bit tricky to compare performance between
+>copy and zerocopy transmissions. In zerocopy way we need to wait when
+>user buffers will be released by kernel, so it something like synchronous
+>path (wait until device driver will process it), while in copy way we
+>can feed data to kernel as many as we want, don't care about device
+>driver. So I compared only time which we spend in the 'send()' syscall.
+>Then if this value will be combined with total number of transmitted
+>bytes, we can get Gbit/s parameter. Also to avoid tx stalls due to not
+>enough credit, receiver allocates same amount of space as sender needs.
+>
+>Sender:
+>./vsock_perf --sender <CID> --buf-size <buf size> --bytes 256M [--zc]
+>
+>Receiver:
+>./vsock_perf --vsk-size 256M
+>
+>G2H transmission (values are Gbit/s):
+>
+>*-------------------------------*
+>|          |         |          |
+>| buf size |   copy  | zerocopy |
+>|          |         |          |
+>*-------------------------------*
+>|   4KB    |    3    |    10    |
+>*-------------------------------*
+>|   32KB   |    9    |    45    |
+>*-------------------------------*
+>|   256KB  |    24   |    195   |
+>*-------------------------------*
+>|    1M    |    27   |    270   |
+>*-------------------------------*
+>|    8M    |    22   |    277   |
+>*-------------------------------*
+>
+>H2G:
+>
+>*-------------------------------*
+>|          |         |          |
+>| buf size |   copy  | zerocopy |
+>|          |         |          |
+>*-------------------------------*
+>|   4KB    |    17   |    11    |
 
+Do you know why in this case zerocopy is slower in this case?
+Could be the cost of pin/unpin pages?
+
+>*-------------------------------*
+>|   32KB   |    30   |    66    |
+>*-------------------------------*
+>|   256KB  |    38   |    179   |
+>*-------------------------------*
+>|    1M    |    38   |    234   |
+>*-------------------------------*
+>|    8M    |    28   |    279   |
+>*-------------------------------*
+>
+>Loopback:
+>
+>*-------------------------------*
+>|          |         |          |
+>| buf size |   copy  | zerocopy |
+>|          |         |          |
+>*-------------------------------*
+>|   4KB    |    8    |    7     |
+>*-------------------------------*
+>|   32KB   |    34   |    42    |
+>*-------------------------------*
+>|   256KB  |    43   |    83    |
+>*-------------------------------*
+>|    1M    |    40   |    109   |
+>*-------------------------------*
+>|    8M    |    40   |    171   |
+>*-------------------------------*
+>
+>I suppose that huge difference above between both modes has two reasons:
+>1) We don't need to copy data.
+>2) We don't need to allocate buffer for data, only for header.
+>
+>Zerocopy is faster than classic copy mode, but of course it requires
+>specific architecture of application due to user pages pinning, buffer
+>size and alignment.
+>
+>If host fails to send data with "Cannot allocate memory", check value
+>/proc/sys/net/core/optmem_max - it is accounted during completion skb
+>allocation.
+
+What the user needs to do? Increase it?
+
+>
+>                            TESTING
+>
+>This patchset includes set of tests for MSG_ZEROCOPY feature. I tried to
+>cover new code as much as possible so there are different cases for
+>MSG_ZEROCOPY transmissions: with disabled SO_ZEROCOPY and several io
+>vector types (different sizes, alignments, with unmapped pages). I also
+>run tests with loopback transport and running vsockmon.
+
+Thanks for the test again :-)
+
+This cover letter is very good, with a lot of details, but please add
+more details in each single patch, explaining the reason of the changes,
+otherwise it is very difficult to review, because it is a very big
+change.
+
+I'll do a per-patch review in the next days.
+
+Thanks,
+Stefano
 
