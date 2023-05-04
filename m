@@ -2,132 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 27FB96F70CC
-	for <lists+kvm@lfdr.de>; Thu,  4 May 2023 19:24:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3928C6F70D4
+	for <lists+kvm@lfdr.de>; Thu,  4 May 2023 19:26:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229788AbjEDRYC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 May 2023 13:24:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55044 "EHLO
+        id S229754AbjEDR0v (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 May 2023 13:26:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57278 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229678AbjEDRYA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 4 May 2023 13:24:00 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2C1B448A
-        for <kvm@vger.kernel.org>; Thu,  4 May 2023 10:23:59 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-ba1b052e53dso1147702276.1
-        for <kvm@vger.kernel.org>; Thu, 04 May 2023 10:23:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1683221039; x=1685813039;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ONB00+6Q69z3/h03ZXeAoDFdXXdOjEaMLtfkrHED77E=;
-        b=a19ly5QJ1Q1N22wDXhgi9csT1yq+d14FzfsBWgUtF4wbUqyCVwSYl75NVDF+a4VtDE
-         Ii9TlZsiACL2LTTI08ua87HBuUovZFuBkxtAs65RU+NYy+LOeL81Yx25IxhPkStxvE4a
-         puKgvwWz8lVMfccj9E41YPBeKftkVqVLBUUOm8MaEYjLyhmqBwWKsChhLCXouqxxIb0V
-         ZxHq+oddfmEkNiR82cqG4X6vidPMoanq8BFAbBQA+v97hN4fxCRmNe8QoTf169a64ul8
-         +l0aISINsGVg9egilXnwsORqMbtmn6H6Vr9fiRayC/WofHyGLboRtxmtxwXGO5i2CIIe
-         IROA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683221039; x=1685813039;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ONB00+6Q69z3/h03ZXeAoDFdXXdOjEaMLtfkrHED77E=;
-        b=kzxFTUCEYLFK3wGEPwwfTBTXxLxq0aaPaeSaKY8B43rWiDgeLCC/yXnz6n0KKkE/kW
-         VxFtvRp9NlE0DMZejfVGYgSqtPg9GXn9tZvwdkbwnEBokZRHQzAjHC+0fUC/p42JN15R
-         6V3WQugykXHdgaXvuZlZ7dlsCh6aTnjC+1LnaYXo+9iWTWqGZcxnVGZXKaP5tqkdn2dF
-         Y1VIeSCwvDiYYt4rXwSV2gCiIbqVBzdEjggyABHE+pjvSw+Ih8fA8im1vmspVz8KN+22
-         E2p997kYNNBfFlwS9xi/3PmhTBaOZKHLMOtspqT9lWTwYsxLIoHJtiALU2zj/tjkvZLV
-         riTw==
-X-Gm-Message-State: AC+VfDwHf+blDHXKdaofvE7EMVMZC+iGmmkvRLRn6yFcFTTC6ZBQ7Ddf
-        4/4F8VSqNQgmb35z6jiB1eufy+HklPc=
-X-Google-Smtp-Source: ACHHUZ6nT2T395WRubeB3aSWGrfqRKKIgCUhsMtSEWpYYWZrkznq+sx7rqITmcWPGdxyYiBgCtn8mm8/UAQ=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:8b03:0:b0:b9d:f5b9:3d58 with SMTP id
- i3-20020a258b03000000b00b9df5b93d58mr281680ybl.3.1683221039062; Thu, 04 May
- 2023 10:23:59 -0700 (PDT)
-Date:   Thu, 4 May 2023 10:23:57 -0700
-In-Reply-To: <34f44b2748ad1365907c7927a3cbee794b986243.camel@intel.com>
-Mime-Version: 1.0
-References: <20230503182852.3431281-1-seanjc@google.com> <20230503182852.3431281-2-seanjc@google.com>
- <56fa0da83203b20c9945e7c82a0eed11f3d31ea5.camel@intel.com>
- <ZFLtfFjAvuL0JSQj@google.com> <34f44b2748ad1365907c7927a3cbee794b986243.camel@intel.com>
-Message-ID: <ZFPqLS08b0xT/PLa@google.com>
-Subject: Re: [PATCH 1/5] KVM: VMX: Open code writing vCPU's PAT in VMX's MSR handler
-From:   Sean Christopherson <seanjc@google.com>
-To:     Kai Huang <kai.huang@intel.com>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "guoke@uniontech.com" <guoke@uniontech.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "haiwenyao@uniontech.com" <haiwenyao@uniontech.com>
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S229751AbjEDR0u (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 4 May 2023 13:26:50 -0400
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2048.outbound.protection.outlook.com [40.107.237.48])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC5BD46A3;
+        Thu,  4 May 2023 10:26:46 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=SQk3WJ8walmP/st5ACbG1AJx20W89JayLqOBmPGWMOsyG8b8O7ub77q/ptmOb6vPfZDmDtrbQUqmcTx9yciXTrNFAjd19IRYzkxM3Q0L3vcsieqGvsS5E/F7W6YRspT4ycTtIp+IH16lU1iYDS1sL9+LLYe+b3XR+s7Pe4kIRWmfDJHBz2BKrRORq63nbQ6zw8EESvtQaFWLIcJZ9v1vEbk3LoGzzcLEZHRNYUoAoGbSh5zi0Ou5yFqcRMs78TBHBjXe3fMlb61Sr2zAo0TARvAHGplvIbfEq7QMSBMbYeNzELP94Pwnb5grji7w9tT1eTplXaLJw5z/xlz3EITssg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=U9xit8uNlz+4rJLv7AbJDsV+F6P79oOtTKl/snhvAhg=;
+ b=BoZCIb9Dilc11xT5P/vTZpwu/jhhHpy7elE5IAboBaB4JnTVnKJPo+ZUYU5e4j267xAbf3LydeBeWczeeR66KX8x52xHKdANRk+H0FTUljxpwKZfwHZpoEX4PlDcMaAm/Y5/djQ7n2q0ZnnVo98OdRs9fJ1ldtJWC9WEFUsRCXnMCJMquEqqOCcqFtKP51n7ISgMLGNQ9vRTS6EpZ+ehlZHtbhxIi3dqeDSNHlQENTAbSH4gaOXULTBgjAeLHjEYE7dwfXreYgycHVMTw0WAj9PbTx/PvQRPslYRxEOCiT8JPs3EEYwYYs67LVsQ1NKfcbS4n1IfFoQpnwEEuuJC1Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=U9xit8uNlz+4rJLv7AbJDsV+F6P79oOtTKl/snhvAhg=;
+ b=bspT4ZsZ8BMYvvdue2ZROQPe0yBfbhFde4gIKHv7HPNZAiJz+daiKYyrCARXa5IzYTysTu8KWxB24/N5lRCNMKpgj7P9XifXdE1jiQ81m5mZ7cUyN+ngcLLaoPIGS6GNEK1pFLsKmDi+53Nfo21DzhbgvoeF1Rbfb3mlADZ/cjXoK8dtflMtDlZW9Y5/QwwgcGumimizMK4wYALqY7KdpmeNkMDWnWIDoEe3/VSv/2UaEh2xKFJTsJwVWq9PsS4eSCbxq0jb12e2RdThz4UHY5dAfi56D2hn4qsm+7uW41Z3nTEOXSza2LS+0mKbLAXVNEV+OQdCKp4Hm3b4kJgUkA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by SJ2PR12MB8182.namprd12.prod.outlook.com (2603:10b6:a03:4fd::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6363.22; Thu, 4 May
+ 2023 17:26:44 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::f7a7:a561:87e9:5fab]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::f7a7:a561:87e9:5fab%6]) with mapi id 15.20.6363.022; Thu, 4 May 2023
+ 17:26:44 +0000
+Date:   Thu, 4 May 2023 14:26:43 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Brett Creeley <brett.creeley@amd.com>
+Cc:     kvm@vger.kernel.org, netdev@vger.kernel.org,
+        alex.williamson@redhat.com, yishaih@nvidia.com,
+        shameerali.kolothum.thodi@huawei.com, kevin.tian@intel.com,
+        shannon.nelson@amd.com, drivers@pensando.io
+Subject: Re: [PATCH v9 vfio 2/7] vfio/pds: Initial support for pds_vfio VFIO
+ driver
+Message-ID: <ZFPq0xdDWKYFDcTz@nvidia.com>
+References: <20230422010642.60720-1-brett.creeley@amd.com>
+ <20230422010642.60720-3-brett.creeley@amd.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230422010642.60720-3-brett.creeley@amd.com>
+X-ClientProxiedBy: MN2PR05CA0005.namprd05.prod.outlook.com
+ (2603:10b6:208:c0::18) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|SJ2PR12MB8182:EE_
+X-MS-Office365-Filtering-Correlation-Id: 54c4a52d-5ef5-4174-9185-08db4cc4bb4d
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: YlwwGf6EpruDgW0sDrAorxB25vw4A23JdrfH1oPlbhU13i489l/vwBHEUWuLbZeAsrtByjNaVYVq28GJZiqE8jwwpFhzRUXCvjSMS1owMzhrQ2VOZpiK1eF+ZjgODpzouVDaOM6xoX2Sj/D4qVL2grQtELGjduMWX2xNidVSoZVY6pru9ppyC5hwMfsfAu7DFERf+1NjZ8C3LSTABKZlWGcAjQVTVpaSpXxCJSPDIOQewY4vtxrwJBtYH6f8Cts7aIWcgN+ARb0nznHygHiHoCBvEhWkGfda9dwWj4F/GuyJ6m13fvVwgabUmRiL20N9h2POzNnbSFxUcRjlXNvka6zx7px2MPCaJu+KkoXh91a1ytwlVkUfu9GLs8S8RP3hHELKrNv5Re5wNmWDcAnaHeY3B2PFe27TeSGpbkKAGt6aR59jNpBAfq0A1buJYIcN8TcX9B2zv90jqXOCMuzpO6f6pbu3RRsJvR6Tj6Hx/SAudBcC/u6lcULzP0NfYYd8+7GRCwHOa4SayLSqT267omacH0jlDP37aflNpeu5DzY1L9+qcgNPI2/936Bdan3U1XFJ0J4dzC0ihvLUE0uWqyKW66aWK/+bb19EVyUR+QI=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(376002)(346002)(136003)(366004)(39860400002)(396003)(451199021)(6506007)(5660300002)(8936002)(4744005)(8676002)(186003)(2616005)(2906002)(36756003)(26005)(38100700002)(86362001)(6512007)(41300700001)(4326008)(66556008)(66476007)(6916009)(478600001)(66946007)(316002)(6486002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?o/PBE7KIrQRD/YJJMrqsKoY/KXYd5P01Xr0sn47bopZpjBhf9BQfrok1wLIk?=
+ =?us-ascii?Q?sYG84nbDxtG60esMkfEgM+i19QUbB/y77VQdVU4que3qFhAfW09+0VqK+Wf6?=
+ =?us-ascii?Q?l8powcz0asJg1zTtbB9ve39M56qQ8g5YfcfqnHM0+1nPE+eExokKM1ZcQs0H?=
+ =?us-ascii?Q?AbfNnku2PmxTC1OxRENgOA/31CtpWAEbM6Y2Y39BB+4PPgVSo7ZoGpIqjWlB?=
+ =?us-ascii?Q?/0RyEAV9m2phyLfs2n7V4N9tGzxAXzlPjEujb7Aci2OGbNaZjUqIZd3Nyh8P?=
+ =?us-ascii?Q?hw0CELaXxu41PSNFrpdwth3+/z8XS4bjRoHdVJ0ez18wwQkrUrBwFk9kzSKT?=
+ =?us-ascii?Q?wR+SSRqayi3tmY8rCMyrB2EBr+hiqx2T7j3agcp3ftiWJmZUDLhBlFVqTc1N?=
+ =?us-ascii?Q?851lYuvl7KkC87WSu9SeMgshJQjdad5pbG+zYgiEDonS8nwqn3l8YuoRJ/Rn?=
+ =?us-ascii?Q?gziQEonNosSYqw1sk1BRgK/NWKpaaxKLgR74c7f8k0T28LNzlkoXfNgsfy6n?=
+ =?us-ascii?Q?7J+Liat0Juec2pm0gemjlwGYj6kfPStO4PZQXBtFa2ONQN8UmCXDTROfHC7s?=
+ =?us-ascii?Q?jKyp51AbfDjZic+wXFir8bLYOHXQvdCrseGaq1CnBYdTLAgkVdMMnnZdFTBe?=
+ =?us-ascii?Q?u+fwCSPqhQHGqps8cwZcbuFxBmtC/GdVrxrMDNkayxTByTVdsHMIcLkof9dh?=
+ =?us-ascii?Q?mGOmy67o2RX23uW1rIIAG32wLVfereWqHqFGrd+0PzJ3OlG0rJNhkIMu5VSL?=
+ =?us-ascii?Q?/togDjF12ERD0B2WPqApAhUVUFcmH+k8nltvhVfjmeyVMYAYef6YUG1Duosl?=
+ =?us-ascii?Q?bF2omvBZVB54W+hlgwWBixCZa6PKz9Eqs/fIZueawyR4qVMwCQXC8nZp43X3?=
+ =?us-ascii?Q?OJgfhykOp+tJlS2CtUxJnNJZysTnj2Dvro4BHfADjiKG5pYoE9x1GVmRTIWR?=
+ =?us-ascii?Q?HnTgXs5t00doO3xxFGUklg1XgsQJS0SQjtv2mC+/BkVWgjJf5ep9RwhCYw/k?=
+ =?us-ascii?Q?Tz30fMVtC2K1Ols8Gjw4wWXY6ObBA26khA86reM+839HzB5GLC18xgDvsRup?=
+ =?us-ascii?Q?oEp6gmqLmOWUmjZG23wBLwP9Dp7i/4v/T/EdOVxDNNd90dR2Sruy6XkgbiqB?=
+ =?us-ascii?Q?SmD1ViSKNGRGjxgvdL1OEx/Te5cNHwitDSf382MjslK4j3S8erszQVz/iO68?=
+ =?us-ascii?Q?eCj9eiT05+5V7ubvM+ElMsqSIcOIWLTNTUS9wuso0muBRNLYEGVm02Bu1tTD?=
+ =?us-ascii?Q?HUKx9csMny54fazG7qlht+IwXpCWpH2+M1P3esSLC1/4kDCW7zTzYfXLghLl?=
+ =?us-ascii?Q?JapltqkCURwvilIEMVPThJRI+HGj//sqjwymLJrBR9nGVVW9jXcoUA+gH87y?=
+ =?us-ascii?Q?vnj/ubEZNO0EB9eRKIcVR2W5f/obSVlECCCZfsi1xgWDNED5UwTKSb9zhrfu?=
+ =?us-ascii?Q?zSype6ICm2EfpQIWCe835mglt+nIyrqTZ0byAYRqeAX4dcNdGitcWLTX3YNp?=
+ =?us-ascii?Q?bRtoJsnUkuX6wZpdkepMx9uGu864iRRZZNR/bJU895F/kg6UtsN4ywhlFtx6?=
+ =?us-ascii?Q?wnjfyQeNzcAcVZzXkfPaMKzJsRM37gTuH3Zlwi2y?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 54c4a52d-5ef5-4174-9185-08db4cc4bb4d
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 May 2023 17:26:44.4869
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: q33X3qGc+LxuqW/92fu6YIJ+zHz9VH3RdfaDRHqrrqfE4TxNutYMTOWvZjnKinJg
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR12MB8182
+X-Spam-Status: No, score=-1.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, May 03, 2023, Kai Huang wrote:
-> On Wed, 2023-05-03 at 16:25 -0700, Sean Christopherson wrote:
-> > On Wed, May 03, 2023, Kai Huang wrote:
-> > > On Wed, 2023-05-03 at 11:28 -0700, Sean Christopherson wrote:
-> > > > From: Wenyao Hai <haiwenyao@uniontech.com>
-> > > > 
-> > > > Open code setting "vcpu->arch.pat" in vmx_set_msr() instead of bouncing
-> > > > through kvm_set_msr_common() to get to the same code in kvm_mtrr_set_msr().
-> > > 
-> > > What's the value of doing so, besides saving a function of kvm_set_msr_common()?
-> > 
-> > To avoid complicating a very simple operation (writing vcpu->arch.pat), and to
-> > align with SVM.
-> > 
-> > > PAT change shouldn't be something frequent so shouldn't in a performance
-> > > critical path.  Given the PAT logic on Intel and AMD are basically the same ,
-> > > isn't it better to do in kvm_set_msr_common()?
-> > 
-> > I could go either way on calling into kvm_set_msr_common().  I agree that
-> > performance isn't a concern.  Hmm, and kvm_set_msr_common() still has a case
-> > statement for MSR_IA32_CR_PAT, so handling the write fully in vendor code won't
-> > impact the code generation for other MSRs.
-> > 
-> > Though I am leaning towards saying we should either handle loads and stores to
-> > vcpu->arch.pat in common code _or_ vendor code, i.e. either teach VMX and SVM to
-> > handle reads of PAT, or have their write paths call kvm_set_msr_common().  A mix
-> > of both is definitely odd.
-> 
-> Agreed.  Alternatively we can move SVM's setting vcpu->arch.pat to common code.
-> 
-> > 
-> > I don't have strong preference on which of those two we choose.  I dislike duplicating
-> > logic across VMX and SVM, but on the other hands it's so little code.  I think
-> > I'd vote for handling everything in vendor code, mostly because this gives the
-> > appearance that the write can fail, which is silly and misleading.
-> > 
-> > 		ret = kvm_set_msr_common(vcpu, msr_info);
-> 
-> No opinion either.  First glance is having 
-> 
-> 	case MSR_IA32_CR_PAT:
-> 		vcpu->arch.pat = data;
-> 
-> in kvm_set_msr_common() is clearer because it is symmetrical to the read path.
-> 
-> Anyway your decision :)
+On Fri, Apr 21, 2023 at 06:06:37PM -0700, Brett Creeley wrote:
 
-Duh, the obvious answer is to do 
+> +static int
+> +pds_vfio_pci_probe(struct pci_dev *pdev,
+> +		   const struct pci_device_id *id)
+> +{
 
-	ret = kvm_set_msr_common(vcpu, msr_info);
-	if (ret)
-		break;
+This indenting scheme is not kernel style. I generally suggest people
+run their code through clang-format and go through and take most of
+the changes. Most of what it sugges for this series is good
 
-	<vendor code here>
+This GNU style of left aligning the function name should not be
+in the kernel.
 
-That's an established pattern for other MSRs, and addresses my main concern of
-not unwinding the VMCS updates in the should-be-impossible scenario of
-kvm_set_msr_common() failing after the kvm_pat_valid() check.
-
-Thanks Kai!
+Jason
