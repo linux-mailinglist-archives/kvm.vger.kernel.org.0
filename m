@@ -2,156 +2,181 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D44CB6F731E
-	for <lists+kvm@lfdr.de>; Thu,  4 May 2023 21:16:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 327EF6F76DA
+	for <lists+kvm@lfdr.de>; Thu,  4 May 2023 22:20:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229499AbjEDTQd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 May 2023 15:16:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38816 "EHLO
+        id S229954AbjEDUUA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 May 2023 16:20:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54362 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229609AbjEDTQa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 4 May 2023 15:16:30 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 929517ECB
-        for <kvm@vger.kernel.org>; Thu,  4 May 2023 12:15:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1683227736;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=eu4smx04I1AOShAcSlKxzRKnKb94GOmquYwLELDKb4c=;
-        b=Dcb3Cfc7OkQU98kDRhu6vaYDvf8bOBr/BDGaryuiN5QYwqyOJEGFqn+jvxwF7HlRa73j7A
-        G2QPTi/YcGW7QijLxeHM/p2kBd9Lu3KrsDlztzq3Fz3nmg0WYu5z7329adb8G+9fpkrlc3
-        /i9xBI8XII4rp2J3gNgNijqO0zMlXxE=
-Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
- [209.85.160.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-386-7_VA9uN9Ne-4l_ask89zog-1; Thu, 04 May 2023 15:09:32 -0400
-X-MC-Unique: 7_VA9uN9Ne-4l_ask89zog-1
-Received: by mail-qt1-f197.google.com with SMTP id d75a77b69052e-3ed767b30easo1341991cf.1
-        for <kvm@vger.kernel.org>; Thu, 04 May 2023 12:09:32 -0700 (PDT)
+        with ESMTP id S230183AbjEDUTZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 4 May 2023 16:19:25 -0400
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6993D18FC4
+        for <kvm@vger.kernel.org>; Thu,  4 May 2023 13:05:22 -0700 (PDT)
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-559d359a7f8so7615057b3.0
+        for <kvm@vger.kernel.org>; Thu, 04 May 2023 13:05:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1683230591; x=1685822591;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=6d3N2trVvF/0SP9aYKkzozOiaqRgiMUEtCybqqCwYC4=;
+        b=nSt06goC2EesMw51N0ovK0I5GoG2O8RRMiZd97+/QV3gTGlHOQ/YlocZxIKdFrCpDq
+         xlMu5W80BEbbwTuK25jEybNR7E1NWok2AtRJ4Lghz4ll3c763axF5nNlCagzrqlnXBQo
+         OsMw6+5s/60AQLRSJTr4q4r3Y68l8R8wgve6zjYz4rBFZHSpXh9uQoytpYpRgc1O4Jdw
+         B9PHr/ZesgS8grOLiJehoJzYvo+FKS6GFjqopm/tuYyB7xoxpSRqwaqOGP21TzDnP0BB
+         uXcDQG0E2HfsIkBDlXXooTTVcO4NOH/ETRXLaTrhUSiblqF5B/cgFrDiHeBGUv4cZDzw
+         3fyw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683227367; x=1685819367;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=eu4smx04I1AOShAcSlKxzRKnKb94GOmquYwLELDKb4c=;
-        b=jxBYkkUdy4griZwlS+U6Y6PkrvgV8ftxxnFXiaPbVUyhpWHm27pKcrjupqTfazhfIN
-         nA+PokSeW7cXQRJCYw3gl/XMtfj4Q6e4dvs+kOi1QYW7n100hV+PPIodfCmalL4nGQZw
-         M9XhPNAu67UK+eeqBAbhvy+bH2ced4tIROTK1a6oSXtOy+Q76Jc8bK8ukA0WYyCqrZI3
-         35s+TpF36wSp78tZwh/PrNflVay6Papog23P6QjQ25nCHb7akcpBL3o6fd6iBAd6zbtH
-         j5zrTwvPU05lSMlIBvuKgBLxsXPom/uy1JqdR1TZ5sWNMe7vFfx7xYCtv+wvHveUl8rC
-         iWGA==
-X-Gm-Message-State: AC+VfDyKHMlSamySnq39ppIx+90kxMHvlKl+WhMIDhQ10O7B9QcJs5SP
-        3jl8xQxLH0RS0sUxxVe97EhozvlPKORIZyLzzUR1WdYvH6cSEJ3EnI4pTod5RdIOa+TfcFz5eh2
-        UQyI/lbq6rMMo
-X-Received: by 2002:a05:622a:1999:b0:3ef:3204:5148 with SMTP id u25-20020a05622a199900b003ef32045148mr16093001qtc.1.1683227367529;
-        Thu, 04 May 2023 12:09:27 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ6QNqm7XccS4dHnALMbPxn5A0zXinogoQpNb6AmeNNL6KcjUqhZFOjqDRxXi8Tuj51+zuEF2Q==
-X-Received: by 2002:a05:622a:1999:b0:3ef:3204:5148 with SMTP id u25-20020a05622a199900b003ef32045148mr16092953qtc.1.1683227367219;
-        Thu, 04 May 2023 12:09:27 -0700 (PDT)
-Received: from x1n (bras-base-aurron9127w-grc-40-70-52-229-124.dsl.bell.ca. [70.52.229.124])
-        by smtp.gmail.com with ESMTPSA id i3-20020a37c203000000b0074e0e6aae1csm12050qkm.36.2023.05.04.12.09.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 May 2023 12:09:26 -0700 (PDT)
-Date:   Thu, 4 May 2023 15:09:25 -0400
-From:   Peter Xu <peterx@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Anish Moorthy <amoorthy@google.com>,
-        Nadav Amit <nadav.amit@gmail.com>,
-        Axel Rasmussen <axelrasmussen@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, maz@kernel.org,
-        oliver.upton@linux.dev, James Houghton <jthoughton@google.com>,
-        bgardon@google.com, dmatlack@google.com, ricarkol@google.com,
-        kvm <kvm@vger.kernel.org>, kvmarm@lists.linux.dev
-Subject: Re: [PATCH v3 00/22] Improve scalability of KVM + userfaultfd live
- migration via annotated memory faults.
-Message-ID: <ZFQC5TZ9tVSvxFWt@x1n>
-References: <46DD705B-3A3F-438E-A5B1-929C1E43D11F@gmail.com>
- <CAF7b7mo78e2YPHU5YrhzuORdpGXCVRxXr6kSyMa+L+guW8jKGw@mail.gmail.com>
- <84DD9212-31FB-4AF6-80DD-9BA5AEA0EC1A@gmail.com>
- <CAF7b7mr-_U6vU1iOwukdmOoaT0G1ttyxD62cv=vebnQeXL3R0w@mail.gmail.com>
- <ZErahL/7DKimG+46@x1n>
- <CAF7b7mqaxk6w90+9+5UkEAE13vDTmBMmCO_ZdAEo6pD8_--fZA@mail.gmail.com>
- <ZFLPlRReglM/Vgfu@x1n>
- <ZFLRpEV09lrpJqua@x1n>
- <ZFLVS+UvpG5w747u@google.com>
- <ZFLyGDoXHQrN1CCD@x1n>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <ZFLyGDoXHQrN1CCD@x1n>
-X-Spam-Status: No, score=-2.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        d=1e100.net; s=20221208; t=1683230591; x=1685822591;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=6d3N2trVvF/0SP9aYKkzozOiaqRgiMUEtCybqqCwYC4=;
+        b=GpUCEYHgDrwQkrzAJhMQaVun2i1Kcs5RDv0RUBNRt41KfrezN5YbTKu1S2KfUDeaoQ
+         Gar9b33lAOfu9PX4uSy0ZJrKkq0iOYB2NyUncEptni/EelYW7GUGS638J0qJ6X9KVZYI
+         SKVriKTyz8rJiZorgHN7VbOenmPKJp228STT2eOGJRJo15HE4V36w5eewzghgsYQUXyc
+         ta5rrIwK+PcaaWKzSB0iUay4g4eUsyWJsDw00oZVX3/gthaZaFkYoNQxDrKNT/oXvyuP
+         dy6q3jdGMwSFl9kG63LJChzRzBMAIibJhaqAErOkbOCGJFTaQpSnSzIsEkjpHmHcbfdw
+         7Ffg==
+X-Gm-Message-State: AC+VfDwrMQPfFCjBRwU/WLBVjMGzURt9HyblpHn8DCIYEtdtrc5nBCvt
+        V70qReT/jIlaGSg3Mb6isYOJsUcZTLQ=
+X-Google-Smtp-Source: ACHHUZ6PuvZPi6zDMylo7QfkM96x9IBh58YDyqmz4u9ST0E5CBqQ++ARqtoyXc3r/vmAbveuvG4IuNYS3I8=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:90b:4a52:b0:247:b82f:b42 with SMTP id
+ lb18-20020a17090b4a5200b00247b82f0b42mr19846pjb.4.1683230082371; Thu, 04 May
+ 2023 12:54:42 -0700 (PDT)
+Date:   Thu, 4 May 2023 12:54:40 -0700
+In-Reply-To: <ZBH4RizqdigXeYte@google.com>
+Mime-Version: 1.0
+References: <20230311002258.852397-1-seanjc@google.com> <20230311002258.852397-21-seanjc@google.com>
+ <ZBGfmLuORj+ZBziv@yzhao56-desk.sh.intel.com> <ZBH4RizqdigXeYte@google.com>
+Message-ID: <ZFQNgKGcexo0nQ4S@google.com>
+Subject: Re: [PATCH v2 20/27] KVM: x86/mmu: Use page-track notifiers iff there
+ are external users
+From:   Sean Christopherson <seanjc@google.com>
+To:     Yan Zhao <yan.y.zhao@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Zhi Wang <zhi.a.wang@intel.com>, kvm@vger.kernel.org,
+        intel-gvt-dev@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org, linux-kernel@vger.kernel.org,
+        Ben Gardon <bgardon@google.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+        USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, May 03, 2023 at 07:45:28PM -0400, Peter Xu wrote:
-> On Wed, May 03, 2023 at 02:42:35PM -0700, Sean Christopherson wrote:
-> > On Wed, May 03, 2023, Peter Xu wrote:
-> > > Oops, bounced back from the list..
-> > > 
-> > > Forward with no attachment this time - I assume the information is still
-> > > enough in the paragraphs even without the flamegraphs.
-> > 
-> > The flamegraphs are definitely useful beyond what is captured here.  Not sure
-> > how to get them accepted on the list though.
-> 
-> Trying again with google drive:
-> 
-> single uffd:
-> https://drive.google.com/file/d/1bYVYefIRRkW8oViRbYv_HyX5Zf81p3Jl/view
-> 
-> 32 uffds:
-> https://drive.google.com/file/d/1T19yTEKKhbjU9G2FpANIvArSC61mqqtp/view
-> 
-> > 
-> > > > From what I got there, vmx_vcpu_load() gets more highlights than the
-> > > > spinlocks. I think that's the tlb flush broadcast.
-> > 
-> > No, it's KVM dealing with the vCPU being migrated to a different pCPU.  The
-> > smp_call_function_single() that shows up is from loaded_vmcs_clear() and is
-> > triggered when KVM needs to VMCLEAR the VMCS on the _previous_ pCPU (yay for the
-> > VMCS caches not being coherent).
-> > 
-> > Task migration can also trigger IBPB (if mitigations are enabled), and also does
-> > an "all contexts" INVEPT, i.e. flushes all TLB entries for KVM's MMU.
-> > 
-> > Can you trying 1:1 pinning of vCPUs to pCPUs?  That _should_ eliminate the
-> > vmx_vcpu_load_vmcs() hotspot, and for large VMs is likely represenative of a real
-> > world configuration.
-> 
-> Yes it does went away:
-> 
-> https://drive.google.com/file/d/1ZFhWnWjoU33Lxy43jTYnKFuluo4zZArm/view
-> 
-> With pinning vcpu threads only (again, over 40 hard cores/threads):
-> 
-> ./demand_paging_test -b 512M -u MINOR -s shmem -v 32 -c 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32
-> 
-> It seems to me for some reason the scheduler ate more than I expected..
-> Maybe tomorrow I can try two more things:
-> 
->   - Do cpu isolations, and
->   - pin reader threads too (or just leave the readers on housekeeping cores)
+On Wed, Mar 15, 2023, Sean Christopherson wrote:
+> On Wed, Mar 15, 2023, Yan Zhao wrote:
+> > On Fri, Mar 10, 2023 at 04:22:51PM -0800, Sean Christopherson wrote:
+> > > Disable the page-track notifier code at compile time if there are no
+> > > external users, i.e. if CONFIG_KVM_EXTERNAL_WRITE_TRACKING=3Dn.  KVM =
+itself
+> > > now hooks emulated writes directly instead of relying on the page-tra=
+ck
+> > > mechanism.
+> > >=20
+> > > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> > > ---
+> > >  arch/x86/include/asm/kvm_host.h       |  2 ++
+> > >  arch/x86/include/asm/kvm_page_track.h |  2 ++
+> > >  arch/x86/kvm/mmu/page_track.c         |  9 ++++-----
+> > >  arch/x86/kvm/mmu/page_track.h         | 29 +++++++++++++++++++++++--=
+--
+> > >  4 files changed, 33 insertions(+), 9 deletions(-)
+> > >=20
+> > > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/k=
+vm_host.h
+> > > index 1a4225237564..a3423711e403 100644
+> > > --- a/arch/x86/include/asm/kvm_host.h
+> > > +++ b/arch/x86/include/asm/kvm_host.h
+> > > @@ -1265,7 +1265,9 @@ struct kvm_arch {
+> > >  	 * create an NX huge page (without hanging the guest).
+> > >  	 */
+> > >  	struct list_head possible_nx_huge_pages;
+> > > +#ifdef CONFIG_KVM_EXTERNAL_WRITE_TRACKING
+> > >  	struct kvm_page_track_notifier_head track_notifier_head;
+> > > +#endif
+> > >  	/*
+> > >  	 * Protects marking pages unsync during page faults, as TDP MMU pag=
+e
+> > >  	 * faults only take mmu_lock for read.  For simplicity, the unsync
+> > > diff --git a/arch/x86/include/asm/kvm_page_track.h b/arch/x86/include=
+/asm/kvm_page_track.h
+> > > index deece45936a5..53c2adb25a07 100644
+> > > --- a/arch/x86/include/asm/kvm_page_track.h
+> > > +++ b/arch/x86/include/asm/kvm_page_track.h
+> > The "#ifdef CONFIG_KVM_EXTERNAL_WRITE_TRACKING" can be moved to the
+> > front of this file?
+> > All the structures are only exposed for external users now.
+>=20
+> Huh.  I've no idea why I didn't do that.  IIRC, the entire reason past me=
+ wrapped
+> track_notifier_head in an #ifdef was to allow this change in kvm_page_tra=
+ck.h.
+>=20
+> I'll do this in the next version unless I discover an edge case I'm overl=
+ooking.
 
-I gave it a shot by isolating 32 cores and split into two groups, 16 for
-uffd threads and 16 for vcpu threads.  I got similiar results and I don't
-see much changed.
+Ah, deja vu.  I tried this first time around, and got yelled at by the kern=
+el test
+robot.  Unsuprisingly, my second attempt yielded the same result :-)
 
-I think it's possible it's just reaching the limit of my host since it only
-got 40 cores anyway.  Throughput never hits over 350K faults/sec overall.
+  HDRTEST drivers/gpu/drm/i915/gvt/gvt.h
+In file included from <command-line>:
+gpu/drivers/gpu/drm/i915/gvt/gvt.h:236:45: error: field =E2=80=98track_node=
+=E2=80=99 has incomplete type
+  236 |         struct kvm_page_track_notifier_node track_node;
+      |                                             ^~~~~~~~~~
 
-I assume this might not be the case for Anish if he has a much larger host.
-So we can have similar test carried out and see how that goes.  I think the
-idea is making sure vcpu load overhead during sched-in is ruled out, then
-see whether it can keep scaling with more cores.
+The problem is direct header inclusion.  Nothing in the kernel includes gvt=
+.h
+when CONFIG_DRM_I915_GVT=3Dn, but the header include guard tests include he=
+aders
+directly on the command line.  I think I'll define a "stub" specifically to=
+ play
+nice with this sort of testing.  Guarding the guts of gvt.h with CONFIG_DRM=
+_I915_GVT
+would just propagate the problem, and guarding the node definition in "stru=
+ct
+intel_vgpu" would be confusing since the guard would be dead code for all i=
+ntents
+and purposes.
 
--- 
-Peter Xu
+The obvious alternative would be to leave kvm_page_track_notifier_node outs=
+ide of
+the #ifdef, but I really want to bury kvm_page_track_notifier_head for KVM'=
+s sake,
+and having "head" buried but not "node" would also be weird and confusing.
+
+diff --git a/arch/x86/include/asm/kvm_page_track.h b/arch/x86/include/asm/k=
+vm_page_track.h
+index 33f087437209..3d040741044b 100644
+--- a/arch/x86/include/asm/kvm_page_track.h
++++ b/arch/x86/include/asm/kvm_page_track.h
+@@ -51,6 +51,12 @@ void kvm_page_track_unregister_notifier(struct kvm *kvm,
+=20
+ int kvm_write_track_add_gfn(struct kvm *kvm, gfn_t gfn);
+ int kvm_write_track_remove_gfn(struct kvm *kvm, gfn_t gfn);
++#else
++/*
++ * Allow defining a node in a structure even if page tracking is disabled,=
+ e.g.
++ * to play nice with testing headers via direct inclusion from the command=
+ line.
++ */
++struct kvm_page_track_notifier_node {};
+ #endif /* CONFIG_KVM_EXTERNAL_WRITE_TRACKING */
+=20
+ #endif
 
