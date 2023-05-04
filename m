@@ -2,42 +2,43 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1FCEF6F7780
-	for <lists+kvm@lfdr.de>; Thu,  4 May 2023 22:54:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9BFF16F7781
+	for <lists+kvm@lfdr.de>; Thu,  4 May 2023 22:54:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230270AbjEDUya (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 May 2023 16:54:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47990 "EHLO
+        id S230208AbjEDUyb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 May 2023 16:54:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47876 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230163AbjEDUy1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 4 May 2023 16:54:27 -0400
-Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04on2072.outbound.protection.outlook.com [40.107.100.72])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC6C7A270
-        for <kvm@vger.kernel.org>; Thu,  4 May 2023 13:54:06 -0700 (PDT)
+        with ESMTP id S229805AbjEDUy3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 4 May 2023 16:54:29 -0400
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2089.outbound.protection.outlook.com [40.107.92.89])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A77F11DA2
+        for <kvm@vger.kernel.org>; Thu,  4 May 2023 13:54:11 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ErqjifAuANbJsZEVJ6QoqzkxjKYDvihSnkuMt8FIi0H/GA1szp62hDvioevQhdRcv3lsFLhLBe7bZnG/1uyp7vtvWb5T3PrJemliWwq3IDuOaZihOZQB7dJyt1hwNQ8veqzx6zThSw+TY5qw9sSul7JEnnk+YfhGuVkQM8PVaWMc7wlRVUK2lm9Hw9gKLI7N4AL4rCNsouWhzjCb+AhdHzVtkdQ7wP/103EAoXtnBJrbkRQXhrHYwIj5TpAJ6/YFj5yGN2Z+W8ICIB33ecF3lm3xhUWfjZ4GVtnJB2JKswhpjpc9lH2ucuDI42JjoUnUftadh8hFXj8xWkLFdN1pMw==
+ b=jw7duSI1ksf2PS8CvH7lXPwmhKFUd5oT2WuKm42XHF9YQ6c0WcZTLG7kuKMQcWGY3n64oOq3XqM1y3BaR+RqWp2PxXpN89F/zMH3+8HM8VE/rs9WHQ/cc3o5dnwK1no36/AFVuFTcbbTJI6Iw4mpxNcYdSa94S2C7JprTTzQHZhp7OxPopFNNYa4FNCK6hgE3rnyJD0DuSrz7huMI67fzQFcipfbS8N0kfNyM/BfIxjIRSpK8YaOtiPjKKhEEi0F38VwZ7JF1JxNvORribpZwS3KbxkBBc+BW2ix3UltUmTi14Dq0DX9ULOELymBGXETdH9vFR9JtKQ1UHQiwkdjtA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=QYcnc4H9ARvb3HyRAdSp8NVzqXsbscxUazPWWvlYKzo=;
- b=Wa1MGN1eo8DtB0YKAVcejkptc/JBU1dogPAAtBzI9QZJtpp+GO0lLvWzZVJsoR6q0ffmcDgnNKuIKuoC/0L4ouwA9/6IqxJUh5qn6czOVzJtR2F8FssZDUgzMw+UPOg3RjIMTPwgLiya/DCpp6jLzip2JqNfNoVXL+CL51GwJmCYSOKtg/a60IQ9OamiWJq7TsuIOKgx1TaEiN28xlrxJBsqVxKH92mQh4to5Z69OTyTAa1HzjxqPVkgk4r+3nfN6G+cVCXNSoq3oAg+S0BW9bNLCBXKbL3TtaDipzVeXAhV+Wpa0oxu1L8ve43Ii3Lh9oq+OVPS4uZgjqk+LCPVhg==
+ bh=kVKaQfSRr/cnJ8adibRf57IBypTIAIUZWNHemCMo5Qs=;
+ b=aCNW0CeDdqlBbHrCgKbL90+Phjm5MkJyggK9YskHYb5QtDZqwGuNRIwWrB+SEUV68EDFd2HZ9+bpf91hGXSYUPF4b6LGexM971p3GRO/6oTgOPzdeQvtYg5Fwsut4ldUFu/DAY4n82TnrPJDJkHba0uF7IPnUH17K8NX314NBDxWr0aoadFJYkRuin4LPeE2Ss4rR7t3uzVVWOXEF1WVNgrQ8pauKAr+RZkmeB2qvco/J6GLu7XuL4Nxvp4TL3M5j7/jjN+O/i9lYiqUO2KZUEVhWLw9XsJCuKS/zmzq3JkdMLxJjhlH7IGCbMo/pY94ILF41SObhaVJt+EOPPwf6g==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=redhat.com smtp.mailfrom=amd.com; dmarc=pass
  (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
  dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=QYcnc4H9ARvb3HyRAdSp8NVzqXsbscxUazPWWvlYKzo=;
- b=3OO7Z1f6DOBUMGM36b02j8WmCrXHwgwsii5yC0djtaooGuigGkr8tN3TWkF/kf8CjCPyGx0WsAomPHFenoDH8F23XwgKN4r1KKTwPi3aebDGiS9A9D0oQrWpMyWR3WwyRD6W43Yb16HKByq25mxVif2orX+c27/ksJSWOdnI1D4=
-Received: from MW4PR04CA0192.namprd04.prod.outlook.com (2603:10b6:303:86::17)
- by DS7PR12MB8204.namprd12.prod.outlook.com (2603:10b6:8:e1::9) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6363.22; Thu, 4 May 2023 20:53:30 +0000
-Received: from CO1NAM11FT046.eop-nam11.prod.protection.outlook.com
- (2603:10b6:303:86:cafe::48) by MW4PR04CA0192.outlook.office365.com
- (2603:10b6:303:86::17) with Microsoft SMTP Server (version=TLS1_2,
+ bh=kVKaQfSRr/cnJ8adibRf57IBypTIAIUZWNHemCMo5Qs=;
+ b=lJhoJW1QTNykjnX75orUl8i2mm45+ViBYMiQf2NglSLvMPCRQd8XBfeBZIf9lkUZyBGivKHgBrc+nfxhm3R6MyLfE0YNo80Tu1WTxFDz148RqfDVfHpPNNTRI8mrRL/LjL/JcadzRTCy9oorV8ksjzQ37cPRtpsn9ZAnqwlrpQ8=
+Received: from MW4P222CA0028.NAMP222.PROD.OUTLOOK.COM (2603:10b6:303:114::33)
+ by BL1PR12MB5729.namprd12.prod.outlook.com (2603:10b6:208:384::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6363.22; Thu, 4 May
+ 2023 20:53:29 +0000
+Received: from CO1NAM11FT098.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:303:114:cafe::22) by MW4P222CA0028.outlook.office365.com
+ (2603:10b6:303:114::33) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6363.26 via Frontend
- Transport; Thu, 4 May 2023 20:53:30 +0000
+ Transport; Thu, 4 May 2023 20:53:28 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -45,13 +46,13 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
- CO1NAM11FT046.mail.protection.outlook.com (10.13.174.203) with Microsoft SMTP
+ CO1NAM11FT098.mail.protection.outlook.com (10.13.174.207) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.6363.27 via Frontend Transport; Thu, 4 May 2023 20:53:30 +0000
+ 15.20.6363.26 via Frontend Transport; Thu, 4 May 2023 20:53:28 +0000
 Received: from bmoger-ubuntu.amd.com (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Thu, 4 May
- 2023 15:53:23 -0500
+ 2023 15:53:24 -0500
 From:   Babu Moger <babu.moger@amd.com>
 To:     <pbonzini@redhat.com>, <richard.henderson@linaro.org>
 CC:     <weijiang.yang@intel.com>, <philmd@linaro.org>,
@@ -62,9 +63,9 @@ CC:     <weijiang.yang@intel.com>, <philmd@linaro.org>,
         <jing2.liu@intel.com>, <vkuznets@redhat.com>,
         <michael.roth@amd.com>, <wei.huang2@amd.com>,
         <berrange@redhat.com>, <babu.moger@amd.com>, <bdas@redhat.com>
-Subject: [PATCH v4 1/7] target/i386: allow versioned CPUs to specify new cache_info
-Date:   Thu, 4 May 2023 15:53:06 -0500
-Message-ID: <20230504205313.225073-2-babu.moger@amd.com>
+Subject: [PATCH v4 2/7] target/i386: Add new EPYC CPU versions with updated  cache_info
+Date:   Thu, 4 May 2023 15:53:07 -0500
+Message-ID: <20230504205313.225073-3-babu.moger@amd.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230504205313.225073-1-babu.moger@amd.com>
 References: <20230504205313.225073-1-babu.moger@amd.com>
@@ -76,23 +77,23 @@ X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1NAM11FT046:EE_|DS7PR12MB8204:EE_
-X-MS-Office365-Filtering-Correlation-Id: ac4a66cc-2100-4f0b-60dc-08db4ce19e05
+X-MS-TrafficTypeDiagnostic: CO1NAM11FT098:EE_|BL1PR12MB5729:EE_
+X-MS-Office365-Filtering-Correlation-Id: 15a7d20b-f5b3-42c3-de76-08db4ce19d15
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: F6GG0c9rqeXrA2n9ltWtHpWenRMvOfIQmAae5Y05yCdh3QTADOjbG/dc/Rt55TJ5p11Wj7ZIw17a9/WCImoesVNhMjMphM1b4lglQ34abte0XusaiVi0FwxJixw04f9qPF+AGD5BjWnLAAly96EVgC9FoHfgADKY2WUIaamaj7hViXVak5+h6aSVGgcAzIZOHEkW9pgNONzY2TgOlbH7+9j8S7cGYnJHd2mzPtnq0qinGtGJL0mv4SWD/jP8rkfoPH61DFIdSrNGkz88rju2upWJRbhHZpOrgPKHc8rtx4xgxpDd5Z1XaoofffQbkxsbdJZA8cCYEDotzAHQ2yS6wvzbuzGrXzOQTWu7VVY5QR+o4vXD6Kgx5h7oZrUlS5OmKsn1ZhSx2/l1JcVhOexA2NITJ+O0tnk8igDLjLZsPsxybrdb3o81nDtAiH609JGllCX6DiKWHrjxPg2IZoHZWzI+qrjNDvGjtKbdmFZln33S0c3VdYArAT2bGpa0PQ/Gh93zZpbSm7lkTL4BaLCw4KoKNz0medSNrb73Jkry7tR7MtiMnATFdwBtzeYpejFQTbeUhNf4xXuPq/hM1FamrvSsPx4+E4feVrPT7aW6PBB+JkEdeE0S9uZIgi0+53wP0woM9Dbunff7i5wTqmImc1Mh6vyR7IAavTWtxpY4jNgYCksmb3dPm7WXobo1QqKg6nhrtijJLGPFz1Va6fvmIgGCnf3hMpVyTmxLZEo3Tkc=
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230028)(4636009)(376002)(136003)(346002)(39860400002)(396003)(451199021)(46966006)(40470700004)(36840700001)(40460700003)(478600001)(4326008)(70206006)(7696005)(70586007)(6666004)(54906003)(316002)(110136005)(86362001)(36756003)(426003)(47076005)(336012)(26005)(36860700001)(1076003)(8676002)(8936002)(7416002)(5660300002)(44832011)(41300700001)(2906002)(82310400005)(40480700001)(356005)(81166007)(16526019)(186003)(83380400001)(2616005)(82740400003)(36900700001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: zWT4KbQiojcR2l+Sl1w/EHfb3r4u6qoorZRQPWZDJxUeawx8OndMHKN6+AGCUoUZyHzvCRq++P/MIX0ccAbfbewl/5Mw8EuBrFSqW9OBBkzAT4u0/CZiMFhqN/6dYHqGb5y3opw8Xb8VFwj4R5XR9/TVUd0JsGjpBaf2zGPnKigSi5OXYyqSJXGmaWe10OPL+I0SF9BFHZR/6FEvUMZBTrPpNBr68Iq/D+e4hCFUCwVBzXmuPE4CUEsWv3q5f4lPIqoGeEgsaA6jhCMVnMfS5A/cu1v2/QqkLDgKHcCeWflcGAkXpqDSrFMKm2cRJrVVYu2h7Nw9azWD83lt7G/cD2Cxn6RGGzI2syIuteia+WfNDN65oEVGl/scri1Th42odVsviaVVQFO4HP6SLoQGs600vtY+fTrBXWaLhjjPg36tGc0KQtBDcC+ZQwQ0QtYR2wbdBZguZFreV5oI8nFkHcRzl1ZCd5Y1aPDolULjbC5+4QghD9kTmlQ4kjCGKfGvx3FXzYBykzS3gJJfIjm953UhqJXPtMNgUvjevu0g0vq0nh4ANmGhtvg9Is4k7uUfcDtUYTFer+9pOjsk0qc0jVbmCzsfGeg83mSDYiEUO1gI5UmUnekgxQvUJsvrZbAmES8TC/kD/XgZ3Bq/uO7UuKkFnV+51WIkkjy7sm5WWmX1SVdjf+wnMrtuZsD8wKAhAnh+xqCCOxn8NVvyOCFIFQ1REvnCGxv9piBLpN22Nhs=
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230028)(4636009)(396003)(346002)(136003)(376002)(39860400002)(451199021)(40470700004)(46966006)(36840700001)(8676002)(8936002)(36860700001)(40480700001)(36756003)(356005)(41300700001)(82310400005)(82740400003)(6666004)(70206006)(81166007)(70586007)(4326008)(316002)(86362001)(478600001)(110136005)(54906003)(40460700003)(7696005)(2906002)(2616005)(5660300002)(336012)(15650500001)(426003)(1076003)(16526019)(26005)(186003)(7416002)(47076005)(83380400001)(44832011)(36900700001);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 May 2023 20:53:30.3843
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 May 2023 20:53:28.7522
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: ac4a66cc-2100-4f0b-60dc-08db4ce19e05
+X-MS-Exchange-CrossTenant-Network-Message-Id: 15a7d20b-f5b3-42c3-de76-08db4ce19d15
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT046.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT098.eop-nam11.prod.protection.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB8204
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5729
 X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
         RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
@@ -106,94 +107,170 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Michael Roth <michael.roth@amd.com>
 
-New EPYC CPUs versions require small changes to their cache_info's.
-Because current QEMU x86 CPU definition does not support versioned
-cach_info, we would have to declare a new CPU type for each such case.
-To avoid the dup work, add "cache_info" in X86CPUVersionDefinition",
-to allow new cache_info pointers to be specified for a new CPU version.
+Introduce new EPYC cpu versions: EPYC-v4 and EPYC-Rome-v3.
+The only difference vs. older models is an updated cache_info with
+the 'complex_indexing' bit unset, since this bit is not currently
+defined for AMD and may cause problems should it be used for
+something else in the future. Setting this bit will also cause
+CPUID validation failures when running SEV-SNP guests.
 
-Co-developed-by: Wei Huang <wei.huang2@amd.com>
-Signed-off-by: Wei Huang <wei.huang2@amd.com>
 Signed-off-by: Michael Roth <michael.roth@amd.com>
 Signed-off-by: Babu Moger <babu.moger@amd.com>
 Acked-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- target/i386/cpu.c | 35 ++++++++++++++++++++++++++++++++---
- 1 file changed, 32 insertions(+), 3 deletions(-)
+ target/i386/cpu.c | 118 ++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 118 insertions(+)
 
 diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 6576287e5b..6e5d2779c9 100644
+index 6e5d2779c9..6c20ce86d1 100644
 --- a/target/i386/cpu.c
 +++ b/target/i386/cpu.c
-@@ -1598,6 +1598,7 @@ typedef struct X86CPUVersionDefinition {
-     const char *alias;
-     const char *note;
-     PropValue *props;
-+    const CPUCaches *const cache_info;
- } X86CPUVersionDefinition;
+@@ -1707,6 +1707,56 @@ static const CPUCaches epyc_cache_info = {
+     },
+ };
  
- /* Base definition for a CPU model */
-@@ -5192,6 +5193,31 @@ static void x86_cpu_apply_version_props(X86CPU *cpu, X86CPUModel *model)
-     assert(vdef->version == version);
- }
++static CPUCaches epyc_v4_cache_info = {
++    .l1d_cache = &(CPUCacheInfo) {
++        .type = DATA_CACHE,
++        .level = 1,
++        .size = 32 * KiB,
++        .line_size = 64,
++        .associativity = 8,
++        .partitions = 1,
++        .sets = 64,
++        .lines_per_tag = 1,
++        .self_init = 1,
++        .no_invd_sharing = true,
++    },
++    .l1i_cache = &(CPUCacheInfo) {
++        .type = INSTRUCTION_CACHE,
++        .level = 1,
++        .size = 64 * KiB,
++        .line_size = 64,
++        .associativity = 4,
++        .partitions = 1,
++        .sets = 256,
++        .lines_per_tag = 1,
++        .self_init = 1,
++        .no_invd_sharing = true,
++    },
++    .l2_cache = &(CPUCacheInfo) {
++        .type = UNIFIED_CACHE,
++        .level = 2,
++        .size = 512 * KiB,
++        .line_size = 64,
++        .associativity = 8,
++        .partitions = 1,
++        .sets = 1024,
++        .lines_per_tag = 1,
++    },
++    .l3_cache = &(CPUCacheInfo) {
++        .type = UNIFIED_CACHE,
++        .level = 3,
++        .size = 8 * MiB,
++        .line_size = 64,
++        .associativity = 16,
++        .partitions = 1,
++        .sets = 8192,
++        .lines_per_tag = 1,
++        .self_init = true,
++        .inclusive = true,
++        .complex_indexing = false,
++    },
++};
++
+ static const CPUCaches epyc_rome_cache_info = {
+     .l1d_cache = &(CPUCacheInfo) {
+         .type = DATA_CACHE,
+@@ -1757,6 +1807,56 @@ static const CPUCaches epyc_rome_cache_info = {
+     },
+ };
  
-+static const CPUCaches *x86_cpu_get_versioned_cache_info(X86CPU *cpu,
-+                                                         X86CPUModel *model)
-+{
-+    const X86CPUVersionDefinition *vdef;
-+    X86CPUVersion version = x86_cpu_model_resolve_version(model);
-+    const CPUCaches *cache_info = model->cpudef->cache_info;
++static const CPUCaches epyc_rome_v3_cache_info = {
++    .l1d_cache = &(CPUCacheInfo) {
++        .type = DATA_CACHE,
++        .level = 1,
++        .size = 32 * KiB,
++        .line_size = 64,
++        .associativity = 8,
++        .partitions = 1,
++        .sets = 64,
++        .lines_per_tag = 1,
++        .self_init = 1,
++        .no_invd_sharing = true,
++    },
++    .l1i_cache = &(CPUCacheInfo) {
++        .type = INSTRUCTION_CACHE,
++        .level = 1,
++        .size = 32 * KiB,
++        .line_size = 64,
++        .associativity = 8,
++        .partitions = 1,
++        .sets = 64,
++        .lines_per_tag = 1,
++        .self_init = 1,
++        .no_invd_sharing = true,
++    },
++    .l2_cache = &(CPUCacheInfo) {
++        .type = UNIFIED_CACHE,
++        .level = 2,
++        .size = 512 * KiB,
++        .line_size = 64,
++        .associativity = 8,
++        .partitions = 1,
++        .sets = 1024,
++        .lines_per_tag = 1,
++    },
++    .l3_cache = &(CPUCacheInfo) {
++        .type = UNIFIED_CACHE,
++        .level = 3,
++        .size = 16 * MiB,
++        .line_size = 64,
++        .associativity = 16,
++        .partitions = 1,
++        .sets = 16384,
++        .lines_per_tag = 1,
++        .self_init = true,
++        .inclusive = true,
++        .complex_indexing = false,
++    },
++};
 +
-+    if (version == CPU_VERSION_LEGACY) {
-+        return cache_info;
-+    }
-+
-+    for (vdef = x86_cpu_def_get_versions(model->cpudef); vdef->version; vdef++) {
-+        if (vdef->cache_info) {
-+            cache_info = vdef->cache_info;
-+        }
-+
-+        if (vdef->version == version) {
-+            break;
-+        }
-+    }
-+
-+    assert(vdef->version == version);
-+    return cache_info;
-+}
-+
- /*
-  * Load data from X86CPUDefinition into a X86CPU object.
-  * Only for builtin_x86_defs models initialized with x86_register_cpudef_types.
-@@ -5224,7 +5250,7 @@ static void x86_cpu_load_model(X86CPU *cpu, X86CPUModel *model)
-     }
- 
-     /* legacy-cache defaults to 'off' if CPU model provides cache info */
--    cpu->legacy_cache = !def->cache_info;
-+    cpu->legacy_cache = !x86_cpu_get_versioned_cache_info(cpu, model);
- 
-     env->features[FEAT_1_ECX] |= CPUID_EXT_HYPERVISOR;
- 
-@@ -6703,14 +6729,17 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
- 
-     /* Cache information initialization */
-     if (!cpu->legacy_cache) {
--        if (!xcc->model || !xcc->model->cpudef->cache_info) {
-+        const CPUCaches *cache_info =
-+            x86_cpu_get_versioned_cache_info(cpu, xcc->model);
-+
-+        if (!xcc->model || !cache_info) {
-             g_autofree char *name = x86_cpu_class_get_model_name(xcc);
-             error_setg(errp,
-                        "CPU model '%s' doesn't support legacy-cache=off", name);
-             return;
+ static const CPUCaches epyc_milan_cache_info = {
+     .l1d_cache = &(CPUCacheInfo) {
+         .type = DATA_CACHE,
+@@ -4091,6 +4191,15 @@ static const X86CPUDefinition builtin_x86_defs[] = {
+                     { /* end of list */ }
+                 }
+             },
++            {
++                .version = 4,
++                .props = (PropValue[]) {
++                    { "model-id",
++                      "AMD EPYC-v4 Processor" },
++                    { /* end of list */ }
++                },
++                .cache_info = &epyc_v4_cache_info
++            },
+             { /* end of list */ }
          }
-         env->cache_info_cpuid2 = env->cache_info_cpuid4 = env->cache_info_amd =
--            *xcc->model->cpudef->cache_info;
-+            *cache_info;
-     } else {
-         /* Build legacy cache information */
-         env->cache_info_cpuid2.l1d_cache = &legacy_l1d_cache;
+     },
+@@ -4210,6 +4319,15 @@ static const X86CPUDefinition builtin_x86_defs[] = {
+                     { /* end of list */ }
+                 }
+             },
++            {
++                .version = 3,
++                .props = (PropValue[]) {
++                    { "model-id",
++                      "AMD EPYC-Rome-v3 Processor" },
++                    { /* end of list */ }
++                },
++                .cache_info = &epyc_rome_v3_cache_info
++            },
+             { /* end of list */ }
+         }
+     },
 -- 
 2.34.1
 
