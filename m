@@ -2,283 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 886BD6F7787
-	for <lists+kvm@lfdr.de>; Thu,  4 May 2023 22:55:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DABEB6F7940
+	for <lists+kvm@lfdr.de>; Fri,  5 May 2023 00:41:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230319AbjEDUzJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 May 2023 16:55:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48372 "EHLO
+        id S229797AbjEDWl2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 May 2023 18:41:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37454 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230233AbjEDUyt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 4 May 2023 16:54:49 -0400
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2061b.outbound.protection.outlook.com [IPv6:2a01:111:f400:7e89::61b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6DE35B1
-        for <kvm@vger.kernel.org>; Thu,  4 May 2023 13:54:29 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=VLDyMtfSC09kGEieg1uRm9VYIOphjR923sXkpLRGPUuM0Lw0ZYhCaVixeNMARjTaeyKY8Yzwvtd/xDsHywk3lvSwEcjU5ZM7n2W5jLwV3JnZBaZLBJhQS4B8k9hvUBjZQSJLhNdTY6aqcjwmqC3sAEEPU44D+pm3fA4q4azIsOaw4wwyG4OHb4DP4LyWOZhFEpEi99z2N0TsY9zo4apDbr1xRovNfKrUTD9yPsy9Psh8sGQ4rqZ8C5BRsdbmpC0DWdVYA/9NDc2KCk62U7aakhjWnIpogSPHk0rXjhhcDceEX7Bikf4RMX8G5Z7Pckh7YBe3wH8slEpVZx6B4qiVfQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=YlHpPkuppVHlDMATPAqeYcJ2Kr09C0OxfBnDZdoE/ew=;
- b=f6soLSczfvcFRZpIg8gSdoJkYOadMs2M5OhytuXEcuwtvavhz9pjILzMRy0h5EYM287AD6N9fJ1ikJkm94u8X97CwaW2Ho5lIWzRNUAFXQv7eZIlzw8OOHlrisMMpRI3oEqTR/LCC+6wcoOWfhneYe/XaC2BrSUkOmf1hOxuV0dRs8TeSdnuhoA9U5o7L8hP6ULGS3znbVxCZ2vGSwhTtZ4W+k2o4PiUnGTO+bHt+Lu/V3jNOWaqzfbiTiSZ/tQsPLjZeAHtC024MaVIQc8JkjtHaIvP7t6D33kez11OD5K1moQL/d3TADwm/FgbBtmoxpGunD/bssvzlQ0oWxEnHg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=redhat.com smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=YlHpPkuppVHlDMATPAqeYcJ2Kr09C0OxfBnDZdoE/ew=;
- b=SwWC9RE65gPxuXsxMxx5Kwtd8tyqYkTQpKjbdyyokPLeLEUrkJaCbNYI8Ak5fU1F9vCbYf3vumSMFxAFVFobVI0Y9+bwkcslLr7G7UdGRiqKLCzuLxbWw3rkJIEwN9FmJOtnhAujDRJef64cJVFsS+WRyTyedUW8vfIpUp5WWVA=
-Received: from MW4PR04CA0198.namprd04.prod.outlook.com (2603:10b6:303:86::23)
- by MN2PR12MB4423.namprd12.prod.outlook.com (2603:10b6:208:24f::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6363.22; Thu, 4 May
- 2023 20:53:32 +0000
-Received: from CO1NAM11FT046.eop-nam11.prod.protection.outlook.com
- (2603:10b6:303:86:cafe::7a) by MW4PR04CA0198.outlook.office365.com
- (2603:10b6:303:86::23) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6363.26 via Frontend
- Transport; Thu, 4 May 2023 20:53:31 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- CO1NAM11FT046.mail.protection.outlook.com (10.13.174.203) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.6363.27 via Frontend Transport; Thu, 4 May 2023 20:53:31 +0000
-Received: from bmoger-ubuntu.amd.com (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Thu, 4 May
- 2023 15:53:30 -0500
-From:   Babu Moger <babu.moger@amd.com>
-To:     <pbonzini@redhat.com>, <richard.henderson@linaro.org>
-CC:     <weijiang.yang@intel.com>, <philmd@linaro.org>,
-        <dwmw@amazon.co.uk>, <paul@xen.org>, <joao.m.martins@oracle.com>,
-        <qemu-devel@nongnu.org>, <mtosatti@redhat.com>,
-        <kvm@vger.kernel.org>, <mst@redhat.com>,
-        <marcel.apfelbaum@gmail.com>, <yang.zhong@intel.com>,
-        <jing2.liu@intel.com>, <vkuznets@redhat.com>,
-        <michael.roth@amd.com>, <wei.huang2@amd.com>,
-        <berrange@redhat.com>, <babu.moger@amd.com>, <bdas@redhat.com>
-Subject: [PATCH v4 7/7] target/i386: Add EPYC-Genoa model to support Zen 4 processor series
-Date:   Thu, 4 May 2023 15:53:12 -0500
-Message-ID: <20230504205313.225073-8-babu.moger@amd.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230504205313.225073-1-babu.moger@amd.com>
-References: <20230504205313.225073-1-babu.moger@amd.com>
+        with ESMTP id S229684AbjEDWl1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 4 May 2023 18:41:27 -0400
+Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90B8086AD;
+        Thu,  4 May 2023 15:41:26 -0700 (PDT)
+Received: by mail-pf1-x42f.google.com with SMTP id d2e1a72fcca58-64115e652eeso15908253b3a.0;
+        Thu, 04 May 2023 15:41:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1683240086; x=1685832086;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=iuR5Nn17jNx3hsu5wtmqgX3ulS4giwJ61q7gFIqEyfQ=;
+        b=lKI3pfgrV+/x+0UIm+839VzQtOaWFfJDJQTUbgTy/Nl77X2aJAG7DgKZzZDFfgCyxe
+         Us3UptKxw6DfJihFm2/yAJ9A1DbMsSiOpHEkdEPRYV65wLK6GzCydjiOdPmlN4baWhMq
+         eVNP7kzRmZStDeh+neeplvdI19iFgKNomUdfE/p3VlHs7FfEVcJQU37oH4kvWnQcgh/U
+         1V0AmfOSdfA7iAT0c1ZIBjgNMWYmJ9gbEwaNDrcHhp7XRIAkL4ijvDfyP6dGwhKOS1Dw
+         b3l+hEHQ74QV39k+7DXeG4TQUi3R7x30YDJqsUbMfUVUCq2S57YMDJf/5fBGLSqwPmta
+         sf4A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1683240086; x=1685832086;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=iuR5Nn17jNx3hsu5wtmqgX3ulS4giwJ61q7gFIqEyfQ=;
+        b=FcxmXs3/0W8UsoMxiij2FXP5DGyYT9s12HydTzS5PosiJwi4np1I84GafTDXIr/YpH
+         gB1YIVWOtMQ7T0zuzvNDYpauEN/TKRcvMhYaghqqTkIIGjSRybOqYoYs9dP+L+QMYLLM
+         LrxvpvyjhWbHm3z2BdAmL3AIZo0nKtHp3LQGEwMyOvW9+jHyt8WnJwXWRP9jVxWjqVKW
+         v+e71obwFF7T7KMl3l6nUb4E4jFjXdt9YD1FrLMZejf/IoxSbm6XWh0a53tWxh1pfES9
+         jrk0bZ9oUjhQspvuUERbo8yy9KDP5bKM+YOF2qNFP838uirvXyYeaSWMnjk2eyhZ6wYd
+         dE4w==
+X-Gm-Message-State: AC+VfDwEfsbsL0eDZYQQKwveyvIXmKsKdF4/+13BUhi4zjwUB7xlBlB4
+        fBPyZcAPa1g5VSH1RLk3TEc=
+X-Google-Smtp-Source: ACHHUZ5BKfeQ9wBTyrFRg5e6QEIj76WiIyPay+ndAQjIGQ0SMLB/6tqtD5yksIl8IIDJFWWKCqrvhQ==
+X-Received: by 2002:a17:902:f546:b0:1a3:dcc1:307d with SMTP id h6-20020a170902f54600b001a3dcc1307dmr6387044plf.23.1683240085993;
+        Thu, 04 May 2023 15:41:25 -0700 (PDT)
+Received: from ?IPV6:2404:f801:10:102::36? ([2404:f801:8050:3:80be::36])
+        by smtp.gmail.com with ESMTPSA id c22-20020a170902b69600b001a6f6638595sm48874pls.92.2023.05.04.15.41.14
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 04 May 2023 15:41:25 -0700 (PDT)
+Message-ID: <6e9b5b99-04eb-9b6a-5218-6cfa696a08ee@gmail.com>
+Date:   Thu, 4 May 2023 15:41:13 -0700
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.180.168.240]
-X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1NAM11FT046:EE_|MN2PR12MB4423:EE_
-X-MS-Office365-Filtering-Correlation-Id: 24e24c36-ed0c-4fbd-c9b9-08db4ce19ed4
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: GJ/4yIdlH21nkrVVDVEF/+gh/krLJzajldqimztiLDagtamb5A9dgboh4vM4Oqbtt2fH6J55j+v7qNkiDoI1MUVXcJt3n/Pj4oq+cHcfRcWUUL3ROJ+/lsuIS/GmtYdhMGxqwcVkfMkJXfcOOYDeWMgTRT7aQcg6oi6bHYLOl89qvVNnBGV2S8njh5G9XClju67QEB06caE8RgWdhGhn6VpIRlWTgQ3I3RJhYPwleHhM1CbgC9y9MUS1BLcPPuqAjEPZNqAzzSeO9NRNbUvj84Ex0jH0rXXKwrX/so9yJFWo4eFuKSOTxOImoBDB/6DySgk7xR7lpcgxAPQeTuht1tw6KnqQlHVTsosV/PIOE7QM1Dhinl+zxx1/WDC60rdevD8e55Ord6Za4r4P8a9BiqJpHF4xmufsyLIXmGU3y56uVkMbLlyyedDEFmz7vlQgVcFZ6sEdVT1WRKWZQ/RnpKJNiEFydahR9pve1+bNMwlwa6QttUHPvJU8dYQbsYY1IoOeJI5CLmMazeq5xs4pL2oXDe6JS8UBMJc9cdnO11z18dLuJSk5khT+37IJ47sexVodN+IL08URK0TfKBAKJ9JdKuJ89Hj0IRkXkHu5DaxmDW5k0pZyburHde8EvkyZq9xIW0vThExjJrdAMBOMUFJy374zKIxm9vO5kZqoTsmMqJ9zsA6jvHWfV6pRAb+SJxHuJWew4bgpivTCujfSXrkrenInjepNAJfJxayxysg=
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230028)(4636009)(39860400002)(346002)(396003)(136003)(376002)(451199021)(40470700004)(46966006)(36840700001)(36756003)(47076005)(86362001)(70586007)(54906003)(7696005)(70206006)(6666004)(110136005)(4326008)(478600001)(316002)(82310400005)(40480700001)(5660300002)(2906002)(44832011)(8936002)(7416002)(16526019)(82740400003)(8676002)(356005)(81166007)(186003)(2616005)(1076003)(26005)(41300700001)(36860700001)(426003)(336012)(83380400001)(40460700003)(36900700001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 May 2023 20:53:31.7436
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 24e24c36-ed0c-4fbd-c9b9-08db4ce19ed4
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT046.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB4423
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,SPF_HELO_PASS,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.1
+Subject: Re: [RFC PATCH V5 15/15] x86/sev: Fix interrupt exit code paths from
+ #HV exception
+Content-Language: en-US
+To:     Tom Lendacky <thomas.lendacky@amd.com>, luto@kernel.org,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+        seanjc@google.com, pbonzini@redhat.com, jgross@suse.com,
+        tiala@microsoft.com, kirill@shutemov.name,
+        jiangshan.ljs@antgroup.com, peterz@infradead.org,
+        ashish.kalra@amd.com, srutherford@google.com,
+        akpm@linux-foundation.org, anshuman.khandual@arm.com,
+        pawan.kumar.gupta@linux.intel.com, adrian.hunter@intel.com,
+        daniel.sneddon@linux.intel.com, alexander.shishkin@linux.intel.com,
+        sandipan.das@amd.com, ray.huang@amd.com, brijesh.singh@amd.com,
+        michael.roth@amd.com, venu.busireddy@oracle.com,
+        sterritt@google.com, tony.luck@intel.com, samitolvanen@google.com,
+        fenghua.yu@intel.com
+Cc:     pangupta@amd.com, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, linux-hyperv@vger.kernel.org,
+        linux-arch@vger.kernel.org
+References: <20230501085726.544209-1-ltykernel@gmail.com>
+ <20230501085726.544209-16-ltykernel@gmail.com>
+ <3c91e1ab-29f4-09cb-1268-52fd9c3e34f4@amd.com>
+From:   Tianyu Lan <ltykernel@gmail.com>
+In-Reply-To: <3c91e1ab-29f4-09cb-1268-52fd9c3e34f4@amd.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-6.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Adds the support for AMD EPYC Genoa generation processors. The model
-display for the new processor will be EPYC-Genoa.
+On 5/1/2023 9:02 AM, Tom Lendacky wrote:
+>> From: Ashish Kalra <ashish.kalra@amd.com>
+>>
+>> Add checks in interrupt exit code paths in case of returns
+>> to user mode to check if currently executing the #HV handler
+>> then don't follow the irqentry_exit_to_user_mode path as
+>> that can potentially cause the #HV handler to be
+>> preempted and rescheduled on another CPU. Rescheduled #HV
+>> handler on another cpu will cause interrupts to be handled
+>> on a different cpu than the injected one, causing
+>> invalid EOIs and missed/lost guest interrupts and
+>> corresponding hangs and/or per-cpu IRQs handled on
+>> non-intended cpu.
+>>
+>> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+> 
+> This should be merged into one of the appropriate #HV patches and just 
+> add Ashish with a Co-developed-by: tag where appropriate. This would be 
+> appropriate as a separate only if discovered after the series was merged.
 
-Adds the following new feature bits on top of the feature bits from
-the previous generation EPYC models.
-
-avx512f         : AVX-512 Foundation instruction
-avx512dq        : AVX-512 Doubleword & Quadword Instruction
-avx512ifma      : AVX-512 Integer Fused Multiply Add instruction
-avx512cd        : AVX-512 Conflict Detection instruction
-avx512bw        : AVX-512 Byte and Word Instructions
-avx512vl        : AVX-512 Vector Length Extension Instructions
-avx512vbmi      : AVX-512 Vector Byte Manipulation Instruction
-avx512_vbmi2    : AVX-512 Additional Vector Byte Manipulation Instruction
-gfni            : AVX-512 Galois Field New Instructions
-avx512_vnni     : AVX-512 Vector Neural Network Instructions
-avx512_bitalg   : AVX-512 Bit Algorithms, add bit algorithms Instructions
-avx512_vpopcntdq: AVX-512 AVX-512 Vector Population Count Doubleword and
-                  Quadword Instructions
-avx512_bf16	: AVX-512 BFLOAT16 instructions
-la57            : 57-bit virtual address support (5-level Page Tables)
-vnmi            : Virtual NMI (VNMI) allows the hypervisor to inject the NMI
-                  into the guest without using Event Injection mechanism
-                  meaning not required to track the guest NMI and intercepting
-                  the IRET.
-auto-ibrs       : The AMD Zen4 core supports a new feature called Automatic IBRS.
-                  It is a "set-and-forget" feature that means that, unlike e.g.,
-                  s/w-toggled SPEC_CTRL.IBRS, h/w manages its IBRS mitigation
-                  resources automatically across CPL transitions.
-
-Signed-off-by: Babu Moger <babu.moger@amd.com>
----
- target/i386/cpu.c | 122 ++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 122 insertions(+)
-
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index d50ace84bf..71fe1e02ee 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -1973,6 +1973,56 @@ static const CPUCaches epyc_milan_v2_cache_info = {
-     },
- };
- 
-+static const CPUCaches epyc_genoa_cache_info = {
-+    .l1d_cache = &(CPUCacheInfo) {
-+        .type = DATA_CACHE,
-+        .level = 1,
-+        .size = 32 * KiB,
-+        .line_size = 64,
-+        .associativity = 8,
-+        .partitions = 1,
-+        .sets = 64,
-+        .lines_per_tag = 1,
-+        .self_init = 1,
-+        .no_invd_sharing = true,
-+    },
-+    .l1i_cache = &(CPUCacheInfo) {
-+        .type = INSTRUCTION_CACHE,
-+        .level = 1,
-+        .size = 32 * KiB,
-+        .line_size = 64,
-+        .associativity = 8,
-+        .partitions = 1,
-+        .sets = 64,
-+        .lines_per_tag = 1,
-+        .self_init = 1,
-+        .no_invd_sharing = true,
-+    },
-+    .l2_cache = &(CPUCacheInfo) {
-+        .type = UNIFIED_CACHE,
-+        .level = 2,
-+        .size = 1 * MiB,
-+        .line_size = 64,
-+        .associativity = 8,
-+        .partitions = 1,
-+        .sets = 2048,
-+        .lines_per_tag = 1,
-+    },
-+    .l3_cache = &(CPUCacheInfo) {
-+        .type = UNIFIED_CACHE,
-+        .level = 3,
-+        .size = 32 * MiB,
-+        .line_size = 64,
-+        .associativity = 16,
-+        .partitions = 1,
-+        .sets = 32768,
-+        .lines_per_tag = 1,
-+        .self_init = true,
-+        .inclusive = true,
-+        .complex_indexing = false,
-+    },
-+};
-+
- /* The following VMX features are not supported by KVM and are left out in the
-  * CPU definitions:
-  *
-@@ -4472,6 +4522,78 @@ static const X86CPUDefinition builtin_x86_defs[] = {
-             { /* end of list */ }
-         }
-     },
-+    {
-+        .name = "EPYC-Genoa",
-+        .level = 0xd,
-+        .vendor = CPUID_VENDOR_AMD,
-+        .family = 25,
-+        .model = 17,
-+        .stepping = 0,
-+        .features[FEAT_1_EDX] =
-+            CPUID_SSE2 | CPUID_SSE | CPUID_FXSR | CPUID_MMX | CPUID_CLFLUSH |
-+            CPUID_PSE36 | CPUID_PAT | CPUID_CMOV | CPUID_MCA | CPUID_PGE |
-+            CPUID_MTRR | CPUID_SEP | CPUID_APIC | CPUID_CX8 | CPUID_MCE |
-+            CPUID_PAE | CPUID_MSR | CPUID_TSC | CPUID_PSE | CPUID_DE |
-+            CPUID_VME | CPUID_FP87,
-+        .features[FEAT_1_ECX] =
-+            CPUID_EXT_RDRAND | CPUID_EXT_F16C | CPUID_EXT_AVX |
-+            CPUID_EXT_XSAVE | CPUID_EXT_AES |  CPUID_EXT_POPCNT |
-+            CPUID_EXT_MOVBE | CPUID_EXT_SSE42 | CPUID_EXT_SSE41 |
-+            CPUID_EXT_PCID | CPUID_EXT_CX16 | CPUID_EXT_FMA |
-+            CPUID_EXT_SSSE3 | CPUID_EXT_MONITOR | CPUID_EXT_PCLMULQDQ |
-+            CPUID_EXT_SSE3,
-+        .features[FEAT_8000_0001_EDX] =
-+            CPUID_EXT2_LM | CPUID_EXT2_RDTSCP | CPUID_EXT2_PDPE1GB |
-+            CPUID_EXT2_FFXSR | CPUID_EXT2_MMXEXT | CPUID_EXT2_NX |
-+            CPUID_EXT2_SYSCALL,
-+        .features[FEAT_8000_0001_ECX] =
-+            CPUID_EXT3_OSVW | CPUID_EXT3_3DNOWPREFETCH |
-+            CPUID_EXT3_MISALIGNSSE | CPUID_EXT3_SSE4A | CPUID_EXT3_ABM |
-+            CPUID_EXT3_CR8LEG | CPUID_EXT3_SVM | CPUID_EXT3_LAHF_LM |
-+            CPUID_EXT3_TOPOEXT | CPUID_EXT3_PERFCORE,
-+        .features[FEAT_8000_0008_EBX] =
-+            CPUID_8000_0008_EBX_CLZERO | CPUID_8000_0008_EBX_XSAVEERPTR |
-+            CPUID_8000_0008_EBX_WBNOINVD | CPUID_8000_0008_EBX_IBPB |
-+            CPUID_8000_0008_EBX_IBRS | CPUID_8000_0008_EBX_STIBP |
-+            CPUID_8000_0008_EBX_STIBP_ALWAYS_ON |
-+            CPUID_8000_0008_EBX_AMD_SSBD | CPUID_8000_0008_EBX_AMD_PSFD,
-+        .features[FEAT_8000_0021_EAX] =
-+            CPUID_8000_0021_EAX_No_NESTED_DATA_BP |
-+            CPUID_8000_0021_EAX_LFENCE_ALWAYS_SERIALIZING |
-+            CPUID_8000_0021_EAX_NULL_SEL_CLR_BASE |
-+            CPUID_8000_0021_EAX_AUTO_IBRS,
-+        .features[FEAT_7_0_EBX] =
-+            CPUID_7_0_EBX_FSGSBASE | CPUID_7_0_EBX_BMI1 | CPUID_7_0_EBX_AVX2 |
-+            CPUID_7_0_EBX_SMEP | CPUID_7_0_EBX_BMI2 | CPUID_7_0_EBX_ERMS |
-+            CPUID_7_0_EBX_INVPCID | CPUID_7_0_EBX_AVX512F |
-+            CPUID_7_0_EBX_AVX512DQ | CPUID_7_0_EBX_RDSEED | CPUID_7_0_EBX_ADX |
-+            CPUID_7_0_EBX_SMAP | CPUID_7_0_EBX_AVX512IFMA |
-+            CPUID_7_0_EBX_CLFLUSHOPT | CPUID_7_0_EBX_CLWB |
-+            CPUID_7_0_EBX_AVX512CD | CPUID_7_0_EBX_SHA_NI |
-+            CPUID_7_0_EBX_AVX512BW | CPUID_7_0_EBX_AVX512VL,
-+        .features[FEAT_7_0_ECX] =
-+            CPUID_7_0_ECX_AVX512_VBMI | CPUID_7_0_ECX_UMIP | CPUID_7_0_ECX_PKU |
-+            CPUID_7_0_ECX_AVX512_VBMI2 | CPUID_7_0_ECX_GFNI |
-+            CPUID_7_0_ECX_VAES | CPUID_7_0_ECX_VPCLMULQDQ |
-+            CPUID_7_0_ECX_AVX512VNNI | CPUID_7_0_ECX_AVX512BITALG |
-+            CPUID_7_0_ECX_AVX512_VPOPCNTDQ | CPUID_7_0_ECX_LA57 |
-+            CPUID_7_0_ECX_RDPID,
-+        .features[FEAT_7_0_EDX] =
-+            CPUID_7_0_EDX_FSRM,
-+        .features[FEAT_7_1_EAX] =
-+            CPUID_7_1_EAX_AVX512_BF16,
-+        .features[FEAT_XSAVE] =
-+            CPUID_XSAVE_XSAVEOPT | CPUID_XSAVE_XSAVEC |
-+            CPUID_XSAVE_XGETBV1 | CPUID_XSAVE_XSAVES,
-+        .features[FEAT_6_EAX] =
-+            CPUID_6_EAX_ARAT,
-+        .features[FEAT_SVM] =
-+            CPUID_SVM_NPT | CPUID_SVM_NRIPSAVE | CPUID_SVM_VNMI |
-+            CPUID_SVM_SVME_ADDR_CHK,
-+        .xlevel = 0x80000022,
-+        .model_id = "AMD EPYC-Genoa Processor",
-+        .cache_info = &epyc_genoa_cache_info,
-+    },
- };
- 
- /*
--- 
-2.34.1
-
+Sure. Will update in the next version.
