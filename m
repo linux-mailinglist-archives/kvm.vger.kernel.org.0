@@ -2,175 +2,148 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B05006F6F7A
-	for <lists+kvm@lfdr.de>; Thu,  4 May 2023 17:58:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 85C9A6F6FDE
+	for <lists+kvm@lfdr.de>; Thu,  4 May 2023 18:23:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231365AbjEDP6n (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 May 2023 11:58:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35210 "EHLO
+        id S229598AbjEDQXC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 May 2023 12:23:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48506 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230039AbjEDP6k (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 4 May 2023 11:58:40 -0400
-Received: from mail-lj1-x235.google.com (mail-lj1-x235.google.com [IPv6:2a00:1450:4864:20::235])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E6ED468B;
-        Thu,  4 May 2023 08:58:39 -0700 (PDT)
-Received: by mail-lj1-x235.google.com with SMTP id 38308e7fff4ca-2a8dc09e884so1372171fa.1;
-        Thu, 04 May 2023 08:58:39 -0700 (PDT)
+        with ESMTP id S229446AbjEDQXB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 4 May 2023 12:23:01 -0400
+Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5CE3118;
+        Thu,  4 May 2023 09:23:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1683215918; x=1685807918;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wYBoD42fi0Qo48RQvnR/5/xNrxWUbWiP9dXKPNjnGZc=;
-        b=bXqQqAH97aZqNoW6tYHPqjwasg8isVEvVzYfRdDnYi4bHmmJhsUuyRBPiS2DzfvxXD
-         OkKoXvNDeUw28Ry1YuZw4XZPfa7wUHL/CgMgF3Kimqe5+qtPFYQmumgVSK98O899FiVH
-         v/P9iNpcNC/SOB9HpRDQ5orjOCJWxgCPr/JegUbpxIaZmi3qZxzFbCd+L1clGiNGUzWx
-         EGyp6pvCTGbrOx70ztLvOpmxkwCCVEt+Emo1fDgdZqjlkA4+L6/y9IZykRvAXchVlDQY
-         tc6RpHqPRrxJXZgK5zRcDV3FR7A0J5jqmFY1oFkkDKXqxImmafAVTg0lh1wzdKap+IVS
-         p6rA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683215918; x=1685807918;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=wYBoD42fi0Qo48RQvnR/5/xNrxWUbWiP9dXKPNjnGZc=;
-        b=HsJe6qFg2u/O8pJZTWL0MxFlvrSogGxxkEDPeZkv6nKnyTLsZ3QwgIrs7UJ6LRNrML
-         bBDaRmtlhg8MQUD0sHERzhV1aF+aLWHGffH+G45BhawNXxFZgO7hKfTYg7y4I366q7gM
-         xb/aAeNVEqex8QQHX5aDSd/1BAQTxvX1qgZw21RgoSYpDPmNNZkit7HVrSzUJ+im32QI
-         uyvn0SNDABPOOQDXmtRsE4CYZq/pZC2nTk7mFKp+1SmiP5xrCZtfFiTrO/lZMK4xWwuM
-         dG7ahO+/u4efx55t0mWW3k/Z7mUahL36a5bK0A5cqNZGstEbmDMLWsfNqBrgVobNAHnb
-         8dIg==
-X-Gm-Message-State: AC+VfDz99NtXESOTB9SKAzRMOLecJAzPfjYDCThxo12BWS8WSEiqoy8W
-        2Fx7HCnw0IglO5jZ8mJ80p8=
-X-Google-Smtp-Source: ACHHUZ7lf9SJwpLxOd9zE09fOQJ6fYIObPElS6/ynR+3eECh6A5+PBp3kvB9rprdiMPydNUiRBzNvA==
-X-Received: by 2002:a2e:a261:0:b0:2ac:7237:d5bf with SMTP id k1-20020a2ea261000000b002ac7237d5bfmr1342238ljm.2.1683215917713;
-        Thu, 04 May 2023 08:58:37 -0700 (PDT)
-Received: from localhost (88-115-161-74.elisa-laajakaista.fi. [88.115.161.74])
-        by smtp.gmail.com with ESMTPSA id v5-20020a2e9245000000b002a8ecae9567sm6629014ljg.84.2023.05.04.08.58.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 May 2023 08:58:37 -0700 (PDT)
-Date:   Thu, 4 May 2023 18:58:14 +0300
-From:   Zhi Wang <zhi.wang.linux@gmail.com>
-To:     Tianyu Lan <ltykernel@gmail.com>
-Cc:     luto@kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
-        hpa@zytor.com, seanjc@google.com, pbonzini@redhat.com,
-        jgross@suse.com, tiala@microsoft.com, kirill@shutemov.name,
-        jiangshan.ljs@antgroup.com, peterz@infradead.org,
-        ashish.kalra@amd.com, srutherford@google.com,
-        akpm@linux-foundation.org, anshuman.khandual@arm.com,
-        pawan.kumar.gupta@linux.intel.com, adrian.hunter@intel.com,
-        daniel.sneddon@linux.intel.com, alexander.shishkin@linux.intel.com,
-        sandipan.das@amd.com, ray.huang@amd.com, brijesh.singh@amd.com,
-        michael.roth@amd.com, thomas.lendacky@amd.com,
-        venu.busireddy@oracle.com, sterritt@google.com,
-        tony.luck@intel.com, samitolvanen@google.com, fenghua.yu@intel.com,
-        pangupta@amd.com, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, linux-hyperv@vger.kernel.org,
-        linux-arch@vger.kernel.org
-Subject: Re: [RFC PATCH V5 03/15] x86/hyperv: Set Virtual Trust Level in
- VMBus init message
-Message-ID: <20230504185814.00005792.zhi.wang.linux@gmail.com>
-In-Reply-To: <4db13429-ffb0-debc-cec4-e37d0e526934@gmail.com>
-References: <20230501085726.544209-1-ltykernel@gmail.com>
-        <20230501085726.544209-4-ltykernel@gmail.com>
-        <20230502223041.00000240.zhi.wang.linux@gmail.com>
-        <4db13429-ffb0-debc-cec4-e37d0e526934@gmail.com>
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1683217380; x=1714753380;
+  h=message-id:date:mime-version:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:subject;
+  bh=OHZM3IjlEx2Y7gvAnJLm0b8ngkDus8a8QUl4V1D7ODQ=;
+  b=pUqx7f1QlBObv2zJEYDosfLaGg4toa4Yz+KDNFaL54YbwgOOBjLrDttj
+   7aWYEZuXGr5+3eW0567Y1x72JG3C1ks3o776XV1wcOD/rUvJ/gIsR1j07
+   ajClhXGwHE5e09FHG2zwt0drnLxIsqk/pxcVEcF4eyBJsXkhORY250wMi
+   4=;
+X-IronPort-AV: E=Sophos;i="5.99,249,1677542400"; 
+   d="scan'208";a="1092620"
+Subject: Re: [PATCH 0/9] KVM backports to 5.10
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-pdx-1box-2bm6-32cf6363.us-west-2.amazon.com) ([10.25.36.210])
+  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 May 2023 16:23:00 +0000
+Received: from EX19MTAUWB002.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan2.pdx.amazon.com [10.236.137.194])
+        by email-inbound-relay-pdx-1box-2bm6-32cf6363.us-west-2.amazon.com (Postfix) with ESMTPS id 787D481BD3;
+        Thu,  4 May 2023 16:22:59 +0000 (UTC)
+Received: from EX19D002UWC004.ant.amazon.com (10.13.138.186) by
+ EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.25; Thu, 4 May 2023 16:22:57 +0000
+Received: from [10.88.145.215] (10.88.145.215) by
+ EX19D002UWC004.ant.amazon.com (10.13.138.186) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1118.26;
+ Thu, 4 May 2023 16:22:56 +0000
+Message-ID: <d34e0096-7f9e-528e-cbdd-786491fad518@amazon.com>
+Date:   Thu, 4 May 2023 09:22:54 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.6.1
+To:     "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
+        Lee Jones <lee@kernel.org>
+CC:     Sean Christopherson <seanjc@google.com>,
+        "stable@vger.kernel.org" <stable@vger.kernel.org>,
+        Suraj Jitindar Singh <surajjs@amazon.com>,
+        "Mike Bacco" <mbacco@amazon.com>, "bp@alien8.de" <bp@alien8.de>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        "wanpengli@tencent.com" <wanpengli@tencent.com>,
+        "jmattson@google.com" <jmattson@google.com>,
+        "joro@8bytes.org" <joro@8bytes.org>, <kvm@vger.kernel.org>
+References: <20220909185557.21255-1-risbhat@amazon.com>
+ <A0B41A72-984A-4984-81F3-B512DFF92F59@amazon.com>
+ <YynoDtKjvDx0vlOR@kroah.com> <YyrSKtN2VqnAuevk@kroah.com>
+ <20230419071711.GA493399@google.com> <ZFFt/ZMqQ1RHnY4e@google.com>
+ <20230503073433.GM620451@google.com>
+ <2023050446-bulginess-skinny-dd06@gregkh>
+Content-Language: en-US
+From:   "Bhatnagar, Rishabh" <risbhat@amazon.com>
+In-Reply-To: <2023050446-bulginess-skinny-dd06@gregkh>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Originating-IP: [10.88.145.215]
+X-ClientProxiedBy: EX19D035UWB001.ant.amazon.com (10.13.138.33) To
+ EX19D002UWC004.ant.amazon.com (10.13.138.186)
+X-Spam-Status: No, score=-6.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 4 May 2023 08:38:46 -0700
-Tianyu Lan <ltykernel@gmail.com> wrote:
 
-> On 5/2/2023 12:30 PM, Zhi Wang wrote:
-> > On Mon,  1 May 2023 04:57:13 -0400
-> > Tianyu Lan <ltykernel@gmail.com> wrote:
-> > 
-> >> From: Tianyu Lan <tiala@microsoft.com>
-> >>
-> >> sev-snp guest provides vtl(Virtual Trust Level) and
-> >> get it from hyperv hvcall via HVCALL_GET_VP_REGISTERS.
-> >> Set target vtl in the VMBus init message.
-> >>
-> >> Signed-off-by: Tianyu Lan <tiala@microsoft.com>
-> >> ---
-> >> Change since RFC v4:
-> >>         * Use struct_size to calculate array size.
-> >>         * Fix some coding style
-> >>
-> >> Change since RFC v3:
-> >>         * Use the standard helper functions to check hypercall result
-> >>         * Fix coding style
-> >>
-> >> Change since RFC v2:
-> >>         * Rename get_current_vtl() to get_vtl()
-> >>         * Fix some coding style issues
-> >> ---
-> >>   arch/x86/hyperv/hv_init.c          | 36 ++++++++++++++++++++++++++++++
-> >>   arch/x86/include/asm/hyperv-tlfs.h |  7 ++++++
-> >>   drivers/hv/connection.c            |  1 +
-> >>   include/asm-generic/mshyperv.h     |  1 +
-> >>   include/linux/hyperv.h             |  4 ++--
-> >>   5 files changed, 47 insertions(+), 2 deletions(-)
-> >>
-> >> diff --git a/arch/x86/hyperv/hv_init.c b/arch/x86/hyperv/hv_init.c
-> >> index 9f3e2d71d015..331b855314b7 100644
-> >> --- a/arch/x86/hyperv/hv_init.c
-> >> +++ b/arch/x86/hyperv/hv_init.c
-> >> @@ -384,6 +384,40 @@ static void __init hv_get_partition_id(void)
-> >>   	local_irq_restore(flags);
-> >>   }
-> >>   
-> >> +static u8 __init get_vtl(void)
-> >> +{
-> >> +	u64 control = HV_HYPERCALL_REP_COMP_1 | HVCALL_GET_VP_REGISTERS;
-> >> +	struct hv_get_vp_registers_input *input;
-> >> +	struct hv_get_vp_registers_output *output;
-> >> +	u64 vtl = 0;
-> >> +	u64 ret;
-> >> +	unsigned long flags;
-> >> +
-> >> +	local_irq_save(flags);
-> >> +	input = *this_cpu_ptr(hyperv_pcpu_input_arg);
-> >> +	output = (struct hv_get_vp_registers_output *)input;
-> > 
-> > ===
-> >> +	if (!input) {
-> >> +		local_irq_restore(flags);
-> >> +		goto done;
-> >> +	}
-> >> +
-> > ===
-> > Is this really necessary?
-> > 
-> > drivers/hv/hv_common.c:
-> > 
-> >          hyperv_pcpu_input_arg = alloc_percpu(void  *);
-> >          BUG_ON(!hyperv_pcpu_input_arg);
-> > 
-> > 
-> 
-> Hi Zhi:
-> 	The hyperv_pcpu_input_arg is a point to address of input arg
-> pages and these pages are allocated in the hv_common_cpu_init(). If
-> it failed to allocate these pages, the value pointed by 
-> hyperv_pcpu_input_arg will be NULL.
-> 	
+On 5/3/23 6:10 PM, gregkh@linuxfoundation.org wrote:
+> CAUTION: This email originated from outside of the organization. Do not click links or open attachments unless you can confirm the sender and know the content is safe.
+>
+>
+>
+> On Wed, May 03, 2023 at 08:34:33AM +0100, Lee Jones wrote:
+>> On Tue, 02 May 2023, Sean Christopherson wrote:
+>>
+>>> On Wed, Apr 19, 2023, Lee Jones wrote:
+>>>> On Wed, 21 Sep 2022, gregkh@linuxfoundation.org wrote:
+>>>>
+>>>>> On Tue, Sep 20, 2022 at 06:19:26PM +0200, gregkh@linuxfoundation.org wrote:
+>>>>>> On Tue, Sep 20, 2022 at 03:34:04PM +0000, Bhatnagar, Rishabh wrote:
+>>>>>>> Gentle reminder to review this patch series.
+>>>>>> Gentle reminder to never top-post :)
+>>>>>>
+>>>>>> Also, it's up to the KVM maintainers if they wish to review this or not.
+>>>>>> I can't make them care about old and obsolete kernels like 5.10.y.  Why
+>>>>>> not just use 5.15.y or newer?
+>>>>> Given the lack of responses here from the KVM developers, I'll drop this
+>>>>> from my mbox and wait for them to be properly reviewed and resend before
+>>>>> considering them for a stable release.
+>>>> KVM maintainers,
+>>>>
+>>>> Would someone be kind enough to take a look at this for Greg please?
+>>>>
+>>>> Note that at least one of the patches in this set has been identified as
+>>>> a fix for a serious security issue regarding the compromise of guest
+>>>> kernels due to the mishandling of flush operations.
+>>> A minor note, the security issue is serious _if_ the bug can be exploited, which
+>>> as is often the case for KVM, is a fairly big "if".  Jann's PoC relied on collusion
+>>> between host userspace and the guest kernel, and as Jann called out, triggering
+>>> the bug on a !PREEMPT host kernel would be quite difficult in practice.
+>>>
+>>> I don't want to downplay the seriousness of compromising guest security, but CVSS
+>>> scores for KVM CVEs almost always fail to account for the multitude of factors in
+>>> play.  E.g. CVE-2023-30456 also had a score of 7.8, and that bug required disabling
+>>> EPT, which pretty much no one does when running untrusted guest code.
+>>>
+>>> In other words, take the purported severity with a grain of salt.
+>>>
+>>>> Please could someone confirm or otherwise that this is relevant for
+>>>> v5.10.y and older?
+>>> Acked-by: Sean Christopherson <seanjc@google.com>
+>> Thanks for taking the time to provide some background information and
+>> for the Ack Sean, much appreciated.
+>>
+>> For anyone taking notice, I expect a little lag on this still whilst
+>> Greg is AFK.  I'll follow-up in a few days.
+> What am I supposed to do here?  The thread is long-gone from my stable
+> review queue, is there some patch I'm supposed to apply?  If so, can I
+> get a resend with the proper acks added?
+>
+> thanks,
+>
+> greg k-h
 
-Sorry, it seems my email editor dropped some text. I was wondering that
-if the check above is necessary as there is a BUG_ON() when allocating
-hyperv_pcpu_input_arg.
+Yeah its been half a year since i sent this series and i had mostly 
+forgotten about this.
+Sure i can resend a new version with acks/tested-by added.
 
-So when coming to get_vtl(), the hyperv_pcpu_input_arg should not be NULL.
-(Guarded by the BUG_ON() in the allocation)?
+Thanks
+Rishabh
+
