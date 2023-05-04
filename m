@@ -2,140 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0D4A66F7943
-	for <lists+kvm@lfdr.de>; Fri,  5 May 2023 00:42:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E175A6F7988
+	for <lists+kvm@lfdr.de>; Fri,  5 May 2023 01:02:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229830AbjEDWmC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 May 2023 18:42:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38294 "EHLO
+        id S229689AbjEDXCF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 May 2023 19:02:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47016 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229460AbjEDWl7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 4 May 2023 18:41:59 -0400
-Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2051.outbound.protection.outlook.com [40.107.95.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A0A82122;
-        Thu,  4 May 2023 15:41:58 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=iUBRVlwy02AXbtzEGTEaWaKXJb5/e/Rt11oORWn8zC+03doH+awubZHOd4WGAQXVpIwdKHdpF5y8ToWCRNnDyf4WI9r8Te56A5EbDIRZzk1+gRrktrVh6Q6k6uTWROF0BsJ2U7PgkzjZpKcDSPcw8gmpncAs2gWVqvBmJoscfIuY//VC5gjOMYO9ZrfVcYHnbLVlboq+hvGaTNAE7JG0sGJf8rxkwFW174B4Nk+QFv1tsKOcFdwQHdMwyii+9kcE8IAMzqrDT5br1SSrfNBqd1nzvjh0KZf/Nq82tqVtztgIh2TbH5Gre60W4j6Ei4mZNG9w6lF+MudYymkke2QC6Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=kVepyrpiRFTyzAnuz9rT+Cba+6QBGPRokq8gET8kYlA=;
- b=GKr93xzeS53tBEz5Ddfyh+/5OA/IVd1yKdUl6imatH9XFlENs64rLDvD7HTJOtSAgVWvfxkuIU+Bu1ejICMqGAgjjr15m6rPwXMulC2l2oqG5e/zpoEqui0u1EUarChR3xaeQA82uH/mk8T9Uw0slxiLzZnu7jKWExcMtrVscHKl1v9ZhBXbhruQY7NcbBjKDSTOBvQl9f8uRam2jv2hD3bnrkx09qRPSm11cAR5PYe7Yfn/oOhEDPvtjYLmqYueLZr7EpyUu1W4qlCTFHU/gdSL8rTqiqFuLfbwQu8wJ83kGUta65lZKDb16B0KvItrfC+gKyJqFpQ9z7WyoCj4mQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=kVepyrpiRFTyzAnuz9rT+Cba+6QBGPRokq8gET8kYlA=;
- b=TeUShmAeJTu7DZ7ndzx2ASUqMywmRCYAiRm+A8v3aJ68b+vEh7AoKey7kjrP10TeIVOysFneSYsh/dWi/VkVSQTa63umUB1P4UELOOGxtXetSWOlqeQRMVarYWOLtnqAHxZhpC2MWOsGa1kO9yTgudtZxfhDIhFTJ/TOWVa21N5cxep/aYgzE9pTCEF5rGt3Zo6r4BK0ozobGTAWrpzxINU/i0yIR7xb1jDmeMgHQeprzTfPpd14LEstCLdJiFlcFWK2XlCKHHwOWMM3ZHVrhYJp69No5kGOfp75yCCXxrsxqvswDiJLCCU8riJSUscuO8qm8c+hc1JZd5WyebakYw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by DM6PR12MB4863.namprd12.prod.outlook.com (2603:10b6:5:1b9::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6363.26; Thu, 4 May
- 2023 22:41:56 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::f7a7:a561:87e9:5fab]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::f7a7:a561:87e9:5fab%6]) with mapi id 15.20.6363.022; Thu, 4 May 2023
- 22:41:55 +0000
-Date:   Thu, 4 May 2023 19:41:54 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Jakub Kicinski <kuba@kernel.org>
-Cc:     Brett Creeley <brett.creeley@amd.com>, kvm@vger.kernel.org,
-        netdev@vger.kernel.org, alex.williamson@redhat.com,
-        yishaih@nvidia.com, shameerali.kolothum.thodi@huawei.com,
-        kevin.tian@intel.com, shannon.nelson@amd.com, drivers@pensando.io
-Subject: Re: [PATCH v9 vfio 2/7] vfio/pds: Initial support for pds_vfio VFIO
- driver
-Message-ID: <ZFQ0sqSmJuzLXLbu@nvidia.com>
-References: <20230422010642.60720-1-brett.creeley@amd.com>
- <20230422010642.60720-3-brett.creeley@amd.com>
- <ZFPq0xdDWKYFDcTz@nvidia.com>
- <20230504132001.32b72926@kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230504132001.32b72926@kernel.org>
-X-ClientProxiedBy: BLAPR05CA0017.namprd05.prod.outlook.com
- (2603:10b6:208:36e::29) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+        with ESMTP id S229460AbjEDXCD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 4 May 2023 19:02:03 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E978211D80
+        for <kvm@vger.kernel.org>; Thu,  4 May 2023 16:01:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1683241277;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=lkwlQPMGMIxAlMZp1ec5I95UHcrfctVyRuyNlrEK4fQ=;
+        b=LXla+pIW4PwV0VeYWzLbfjf6JXM4OlRyR3gTGsJd+ylCv0DC0g75xEwcN3A7OCS+1nQP86
+        bSad2wsROYyT0htg3qUc0Qt07cGXr2PKpBN4eBZlxVbiLK8+BfjaJwM3V7MeG8Ypkr45rV
+        hgorbI7nwUCOSFBELJlaJ0hW+N77n94=
+Received: from mail-il1-f200.google.com (mail-il1-f200.google.com
+ [209.85.166.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-47-AHKeJlluO2W5TuFSt0nqBA-1; Thu, 04 May 2023 19:01:15 -0400
+X-MC-Unique: AHKeJlluO2W5TuFSt0nqBA-1
+Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-33159dbb32aso15678925ab.2
+        for <kvm@vger.kernel.org>; Thu, 04 May 2023 16:01:15 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1683241274; x=1685833274;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=lkwlQPMGMIxAlMZp1ec5I95UHcrfctVyRuyNlrEK4fQ=;
+        b=konNv6wu1bDMyDqEaiKn4gt0PH1KB9x6qS7WNG3BD24LVEMkMeJ3GdDQ4Lu+BWb6C3
+         NtzPkY1dO64f2Y3KUR7iCXvtaLutmlrxzihbq0XWR06HMcA5CRqwjzIDt90O2eSKHOg9
+         Q1GVGpsvR4WUDaT2L6qDgoRKf8ELE+EA/2fnvgldU+K2XGr0knVNCevFiveSBGWol4Ik
+         JgHTxCq9Roeutcmz8xzYZ9mYFc0RuXq4pvyflxs+Gg0r5rI6BcPePa6hZgclrRI3267O
+         9o4DY1eU4ZFIzNwaT41/be1kiAGvucSZQF89BHf+Y+4Ah33+Gzg7+BSJEGncqLnDfgzx
+         zduw==
+X-Gm-Message-State: AC+VfDwARqQJtxczrRbWxlbVYjWZpDLhoqb7iK+X9fTbSJKwVZ/HCzu3
+        KElEZFjgxfYanBP6mkX6Tol4sFN7Cvb5NeMMF1TrMNXD8n94QhGhy3kYLlWU6867A0qHsRGK9pr
+        LKPEtjdV2oL80
+X-Received: by 2002:a05:6e02:146:b0:331:3564:7834 with SMTP id j6-20020a056e02014600b0033135647834mr315427ilr.18.1683241274344;
+        Thu, 04 May 2023 16:01:14 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ7joMrRtHf14hwBbCTLXHwHP/1+v9CBqB712KbTwQW+NU3pHYjDHXwtRYc/cTXA3sw36Qzx2Q==
+X-Received: by 2002:a05:6e02:146:b0:331:3564:7834 with SMTP id j6-20020a056e02014600b0033135647834mr315410ilr.18.1683241274089;
+        Thu, 04 May 2023 16:01:14 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id y9-20020a92c749000000b00325de773339sm68010ilp.64.2023.05.04.16.01.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 04 May 2023 16:01:13 -0700 (PDT)
+Date:   Thu, 4 May 2023 17:01:11 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Oleksandr Natalenko <oleksandr@natalenko.name>
+Cc:     linux-kernel@vger.kernel.org, Eric Auger <eric.auger@redhat.com>,
+        =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@redhat.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Abhishek Sahu <abhsahu@nvidia.com>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Cornelia Huck <cohuck@redhat.com>, Bo Liu <liubo03@inspur.com>,
+        "K V P, Satyanarayana" <satyanarayana.k.v.p@intel.com>,
+        kvm@vger.kernel.org
+Subject: Re: [PATCH] vfio/pci: demote hiding ecap messages to debug level
+Message-ID: <20230504170111.70a7f639.alex.williamson@redhat.com>
+In-Reply-To: <20230504131654.24922-1-oleksandr@natalenko.name>
+References: <20230504131654.24922-1-oleksandr@natalenko.name>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|DM6PR12MB4863:EE_
-X-MS-Office365-Filtering-Correlation-Id: a936ac82-cd0c-4204-c004-08db4cf0c356
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: R6yA2/JIavd34vzQ7Rg4W8ArfB0QYYuC3CntJ8ohKqFJ3Ku0yFQi6nTdNUYmvy43wivZJPRC9EfUTO5DcMi/xkxLJBDdLtRCYTp+1SGAIA/de04uVpkbQFHwJKmoW1iq10FKmVU1kl5vjSrcG+JoBtwJ/PIhiWYs0knxkYj1+o2t0i3+4GVGXqDtq/lmilFZqOGOgqZUeUh5BgksHhCeqc5wTrf5fZzHGWdKfnAL/9XUqfb6PKm3GDDyvCVy/uwoIK2G6gY+fslN3vQlGTYAcyVjGwv31Z7rTbTfFHtzXxDA1BoxiRcW3nkB/MPl9EGKYE53HEGdrlZP8koZRUU4NBlIClPWNNI4FOLhdzZHGOrnuwP5Lwqm0a/wKrljtuSlkQF6U8PZfzXosWigq3qN7zA7l0XLHs4Nk4he7kd09vDruct/hw+rrb4teZTndW/kYcOh2NTPCfBsinhapFhT5MkesmG6/6xcAbxNSYXkU2BokpZ0URDgJaBTIaD1zmxlZJnNMt/G4TWZ3GV6mm0/QNVZiX8Kg0tiCK5gLJsT/nQpzHVuHD4QFjJAoXubfPvs
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(39860400002)(376002)(366004)(346002)(136003)(396003)(451199021)(86362001)(36756003)(316002)(6916009)(4326008)(66946007)(66556008)(66476007)(6486002)(478600001)(4744005)(5660300002)(8936002)(8676002)(41300700001)(2906002)(38100700002)(186003)(2616005)(6506007)(6512007)(26005);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?7VHlmnsJf3uPoR5jKnxWOVuwInmhtC03U9wx27xm6B51nqXxdIZVyh9/sm7I?=
- =?us-ascii?Q?wVLy1eFNgHcbejSVKyzbrpq6RrxUrYk6JvGZjq2rrK9hE//qTKEt0gOdIMqs?=
- =?us-ascii?Q?zbGBemRgRl0Acpsuf5I7gKxsQex/SyklKlt99Rx/ditf3goVu97In+asGExJ?=
- =?us-ascii?Q?t5MqEkPp9H0rvCbJhlqv2VgwU9Ms1QTqV2FgcGhu0AlTLOxIcXI9YCGghNot?=
- =?us-ascii?Q?OOx4WZLJT/tIRPdzx/xZbyLUIP1s+IlsGermi5aqOUvra1LkuAYA+Rww15gc?=
- =?us-ascii?Q?yobqLIH6GjSKxVDg8x7h7VfCUNmAvqwLiPr7bedlJtJMAGuCDaFqcbil6Oq+?=
- =?us-ascii?Q?QlizwpX+r0tQl8+JhEqK4h/tWjZxedzQAh+ykxEzJHdK0Gemv96NZjqZqufj?=
- =?us-ascii?Q?OFO1zq4c7wp+J0spgRballLz66nA/rtC0geTJgxMmeE927PjMw2g9aCg7Hf8?=
- =?us-ascii?Q?b4VYWtji+PoD7DOw+awgpVUsGq4KOEsUqsuHcdVyz33Ppz9ncZ4hRvSeYQ2Z?=
- =?us-ascii?Q?ZVBPACoeoQJ7hoYSl2pEQ3qwGtJLSm0Fv29rGPaqxPFmuSBqSbqjbU1uIsvy?=
- =?us-ascii?Q?pI5PQ1f1lLFl03/PS64pvJu3X5o+amXOpO9La08nXwZSocX4mvLehV6OQSfT?=
- =?us-ascii?Q?8bTM4XNwWn4By51rIVfogYGbYzP3R3ZhNYj4LK3B7lzMdwtTymtnX6gi0JAq?=
- =?us-ascii?Q?qhguX/AOnUUCdRwNzfPrTdgP6/gn01FlF6DnZBM3c8Fw6/ebIrqmbMeV+lqd?=
- =?us-ascii?Q?7HDIDxsozNP8yf2MAf+6tP7BNxYRIWosqwFCL3rRaGJ4PHIVDmeRkZux6iL4?=
- =?us-ascii?Q?hyvoC7SriUJJHu1fH3nIDMI2GT078t94kGmEM66npTkKd+OnsRHz8upMJNLM?=
- =?us-ascii?Q?GzXO3eMXn/w9n6CsVvSHE/UWWPlmbCuTwymmfz2knGuBTq1kxa0PH4euiLt6?=
- =?us-ascii?Q?2dXXjwvtkbKz7nYpKoTTZFKaBJ91l6YQU08KvVDQILVwIFb5iv3O70I4ZUAl?=
- =?us-ascii?Q?YOCnXs3OoXhMi/Xtlq2NeBoGfI6s9YX+9tQbRW1SWuxFcglC12yOH4yU5sHz?=
- =?us-ascii?Q?oyHxfLfuK9bGWWQwEF+fh6Dbe4hngy7fZfBJcQx5Gkey2zgTpmgA8tdDhug8?=
- =?us-ascii?Q?a9uvXcxmp6YjVC+TEz+yoT8EKc3qtaBpj64di9L6BzZH8dO9TbO/mnh8Siax?=
- =?us-ascii?Q?L9t0ug0j1DbUqqBnzwwxpOhlHx0kIbmsSLhLOFHBKO5g2a+idlPoSm6G+afm?=
- =?us-ascii?Q?IOHIBi/+0fdgS0bj83Hoh2fuYksb4H4HLeue070YKWIYR+WPCNE7OFQUE1Ri?=
- =?us-ascii?Q?eghb4d9XuBTxYvX4OWCpzaK5M18BXYYxZMqdp1M/MBwWhIZ+FhdwgIywV+/k?=
- =?us-ascii?Q?M+OryrauhNGUijENU7v96arzkVgRNeVUwI2RPl9twzaY1y8P5U2j/aw5fVzQ?=
- =?us-ascii?Q?QJsUJpmS6ADZbknIO4hg8fTVSx7hRG7Z5sTEi9z8SxqfktpZxkUbWAxFtWUZ?=
- =?us-ascii?Q?412Yqw42FfiL5NhRlNCCwsERwMkJAn8cfJH+6udZykNfU8adP9JlYqGGEUAT?=
- =?us-ascii?Q?HJi1Y6eKE4oaMIqCtfC8EnjyBYdA3RiSJH2fF6tl?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a936ac82-cd0c-4204-c004-08db4cf0c356
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 May 2023 22:41:55.7866
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: SsMYn4lEU0JazYGn9bkho9VtkKvYS0tZokLXUT4C2L3WftcvSErDZa9IL/xS6vQr
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4863
-X-Spam-Status: No, score=-1.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, May 04, 2023 at 01:20:01PM -0700, Jakub Kicinski wrote:
-> On Thu, 4 May 2023 14:26:43 -0300 Jason Gunthorpe wrote:
-> > This indenting scheme is not kernel style. I generally suggest people
-> > run their code through clang-format and go through and take most of
-> > the changes. Most of what it sugges for this series is good
-> > 
-> > This GNU style of left aligning the function name should not be
-> > in the kernel.
+On Thu,  4 May 2023 15:16:54 +0200
+Oleksandr Natalenko <oleksandr@natalenko.name> wrote:
+
+> Seeing a burst of messages like this:
 > 
-> FTR that's not a kernel-wide rule. Please scope your coding style
-> suggestions to your subsystem, you may confuse people.
+>     vfio-pci 0000:98:00.0: vfio_ecap_init: hiding ecap 0x19@0x1d0
+>     vfio-pci 0000:98:00.0: vfio_ecap_init: hiding ecap 0x25@0x200
+>     vfio-pci 0000:98:00.0: vfio_ecap_init: hiding ecap 0x26@0x210
+>     vfio-pci 0000:98:00.0: vfio_ecap_init: hiding ecap 0x27@0x250
+>     vfio-pci 0000:98:00.1: vfio_ecap_init: hiding ecap 0x25@0x200
+>     vfio-pci 0000:b1:00.0: vfio_ecap_init: hiding ecap 0x19@0x1d0
+>     vfio-pci 0000:b1:00.0: vfio_ecap_init: hiding ecap 0x25@0x200
+>     vfio-pci 0000:b1:00.0: vfio_ecap_init: hiding ecap 0x26@0x210
+>     vfio-pci 0000:b1:00.0: vfio_ecap_init: hiding ecap 0x27@0x250
+>     vfio-pci 0000:b1:00.1: vfio_ecap_init: hiding ecap 0x25@0x200
+> 
+> is of little to no value for an ordinary user.
+> 
+> Hence, use pci_dbg() instead of pci_info().
+> 
+> Signed-off-by: Oleksandr Natalenko <oleksandr@natalenko.name>
+> ---
+>  drivers/vfio/pci/vfio_pci_config.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/vfio/pci/vfio_pci_config.c b/drivers/vfio/pci/vfio_pci_config.c
+> index 948cdd464f4e..dd8dda14e701 100644
+> --- a/drivers/vfio/pci/vfio_pci_config.c
+> +++ b/drivers/vfio/pci/vfio_pci_config.c
+> @@ -1643,7 +1643,7 @@ static int vfio_ecap_init(struct vfio_pci_core_device *vdev)
+>  		}
+>  
+>  		if (!len) {
+> -			pci_info(pdev, "%s: hiding ecap %#x@%#x\n",
+> +			pci_dbg(pdev, "%s: hiding ecap %#x@%#x\n",
+>  				 __func__, ecap, epos);
+>  
+>  			/* If not the first in the chain, we can skip over it */
 
-It is what Documentation/process/coding-style.rst expects.
+Looks fine to me, though I might adjust that next line to keep the
+previous alignment.  In general this has certainly caused more
+confusion than insightful information, so demoting it to debug is a
+good idea.  Thanks,
 
-It is good advice for new submitters to follow the common style guide
-consistently. The places that want different can ask for their
-differences during the first review, we don't need to confuse people
-with the reality that everything is an exception to someone somewhere.
+Alex
 
-Jason
