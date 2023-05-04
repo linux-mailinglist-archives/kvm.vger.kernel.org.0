@@ -2,85 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 62FBB6F70A8
-	for <lists+kvm@lfdr.de>; Thu,  4 May 2023 19:16:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 029016F70A9
+	for <lists+kvm@lfdr.de>; Thu,  4 May 2023 19:16:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229963AbjEDRQ0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 May 2023 13:16:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48926 "EHLO
+        id S229449AbjEDRQ1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 May 2023 13:16:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48936 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229951AbjEDRQX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 4 May 2023 13:16:23 -0400
+        with ESMTP id S229524AbjEDRQY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 4 May 2023 13:16:24 -0400
 Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A1B13AA7;
-        Thu,  4 May 2023 10:16:19 -0700 (PDT)
-Received: from pps.filterd (m0353728.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 344HBt36021891;
-        Thu, 4 May 2023 17:16:18 GMT
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5ED491722;
+        Thu,  4 May 2023 10:16:20 -0700 (PDT)
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 344H3Frr003980;
+        Thu, 4 May 2023 17:16:19 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=pyxaYapYcZEivzBtGPXFRczFbtxpavtsVETyLuedCDo=;
- b=TZB/AXz2fmnW0tCHwt9d/rbHrxc0h9qBtBGUJbKp1GEhP4zNNoLzEuOiObiY/SG8ncwN
- fS7mnJRC+vHB1jBmCdtU9u2XJhoNzhdfRfNRmBPEE40WLReI9wU/m2kcYeQQA5llv4LA
- GrghALEo2KQSwVBSdbrfbxGG1njR4R28iVrbaKyzbfNwCv2ehMpeUDhPwY6Qu0GfmqsG
- D9dhQNwZENYe2npFDAg9eDnoSdSgBNiXhWteAtP9kL0NwUh4PJ1vrbIdnb5MXRLI/uVM
- pI/dvyuDy3ZZcFdjE2Gd5Bf+9qQkNgN3RDh089uGirS1N+IPqLQUVPSCyELPWmHBCS6G 3g== 
+ : date : message-id : in-reply-to : references : content-transfer-encoding
+ : mime-version; s=pp1; bh=Weim4K1qAi2gFEeahU0800tJPcGwDPeC/I8GxwWY/1c=;
+ b=c5n7LX8JHZYeNPaeb0mBhGQD9Ri7R67YlxvR3F6fojPt99lwWhCwhYFRlXYr2fini5am
+ dmb4HgMp1CHypW6mC39jDU6fKZQez5ZJAh0ty0e+702KATd3ReSXtadPF1fBKlZsJDFE
+ FlBMkLMpVvo3B6ZOPQJHY2U0FY7RcP2AFF8qpgQdnrh8UwjejGdkx9iVoN5yFAzbs5l7
+ TI9aOTXMtTANST4jdSMet8rP8S7fILe10eWlwqF5eOSlB19074WwIMmIxGu3id+7HGGm
+ 2bTX2rYyO4/r25hNq5B7vviSqQyFzbDQdaQv4w+IZTZHGAh/G21Bww1OlCNWniAtI5Fk MQ== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qcgw1g6ev-1
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qcgs00sqw-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Thu, 04 May 2023 17:16:18 +0000
-Received: from m0353728.ppops.net (m0353728.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 344HC6RI023855;
+Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 344H3H70004193;
         Thu, 4 May 2023 17:16:18 GMT
-Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qcgw1g6du-1
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qcgs00spn-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 04 May 2023 17:16:17 +0000
-Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
-        by ppma01fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 344GdNd3008425;
-        Thu, 4 May 2023 17:16:15 GMT
+        Thu, 04 May 2023 17:16:18 +0000
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+        by ppma05fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 344H7uut009335;
+        Thu, 4 May 2023 17:16:16 GMT
 Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-        by ppma01fra.de.ibm.com (PPS) with ESMTPS id 3q8tv6tfwr-1
+        by ppma05fra.de.ibm.com (PPS) with ESMTPS id 3q8tv6jg0e-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Thu, 04 May 2023 17:16:15 +0000
 Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-        by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 344HGCG940305090
+        by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 344HGCC540305092
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
         Thu, 4 May 2023 17:16:12 GMT
 Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0884020043;
+        by IMSVA (Postfix) with ESMTP id 337732004B;
         Thu,  4 May 2023 17:16:12 +0000 (GMT)
 Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D78F720040;
-        Thu,  4 May 2023 17:16:11 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 0E9E42004F;
+        Thu,  4 May 2023 17:16:12 +0000 (GMT)
 Received: from p-imbrenda.boeblingen.de.ibm.com (unknown [9.152.224.56])
         by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Thu,  4 May 2023 17:16:11 +0000 (GMT)
+        Thu,  4 May 2023 17:16:12 +0000 (GMT)
 From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
 To:     pbonzini@redhat.com
 Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
         frankja@linux.ibm.com, borntraeger@linux.ibm.com,
         hca@linux.ibm.com, david@redhat.com,
-        Marc Hartmayer <mhartmay@linux.ibm.com>
-Subject: [GIT PULL 1/2] KVM: s390: pv: fix asynchronous teardown for small VMs
-Date:   Thu,  4 May 2023 19:16:10 +0200
-Message-Id: <20230504171611.54844-2-imbrenda@linux.ibm.com>
+        Jason Gunthorpe <jgg@nvidia.com>
+Subject: [GIT PULL 2/2] KVM: s390: fix race in gmap_make_secure()
+Date:   Thu,  4 May 2023 19:16:11 +0200
+Message-Id: <20230504171611.54844-3-imbrenda@linux.ibm.com>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20230504171611.54844-1-imbrenda@linux.ibm.com>
 References: <20230504171611.54844-1-imbrenda@linux.ibm.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: A5vM-mnyYt9gfAvmjLGJ9CKCB_k8gx3D
-X-Proofpoint-ORIG-GUID: ynYwaZhsT5OUQZ0N8iPzredNhrkzG6Wl
+X-Proofpoint-GUID: OlW6XJ_X3AdFiS-YJBBFQRMIRfMhJuTs
+X-Proofpoint-ORIG-GUID: flXtqTNvEIa-SvNF74GFIvmfQaCB_i4D
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+MIME-Version: 1.0
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
  definitions=2023-05-04_10,2023-05-04_01,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- bulkscore=0 priorityscore=1501 phishscore=0 impostorscore=0 suspectscore=0
- spamscore=0 adultscore=0 malwarescore=0 clxscore=1015 mlxlogscore=999
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 malwarescore=0
+ adultscore=0 mlxlogscore=983 spamscore=0 bulkscore=0 phishscore=0
+ clxscore=1015 impostorscore=0 suspectscore=0 lowpriorityscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2303200000 definitions=main-2305040139
 X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
@@ -91,76 +91,87 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On machines without the Destroy Secure Configuration Fast UVC, the
-topmost level of page tables is set aside and freed asynchronously
-as last step of the asynchronous teardown.
+Fix a potential race in gmap_make_secure() and remove the last user of
+follow_page() without FOLL_GET.
 
-Each gmap has a host_to_guest radix tree mapping host (userspace)
-addresses (with 1M granularity) to gmap segment table entries (pmds).
+The old code is locking something it doesn't have a reference to, and
+as explained by Jason and David in this discussion:
+https://lore.kernel.org/linux-mm/Y9J4P%2FRNvY1Ztn0Q@nvidia.com/
+it can lead to all kind of bad things, including the page getting
+unmapped (MADV_DONTNEED), freed, reallocated as a larger folio and the
+unlock_page() would target the wrong bit.
+There is also another race with the FOLL_WRITE, which could race
+between the follow_page() and the get_locked_pte().
 
-If a guest is smaller than 2GB, the topmost level of page tables is the
-segment table (i.e. there are only 2 levels). Replacing it means that
-the pointers in the host_to_guest mapping would become stale and cause
-all kinds of nasty issues.
+The main point is to remove the last use of follow_page() without
+FOLL_GET or FOLL_PIN, removing the races can be considered a nice
+bonus.
 
-This patch fixes the issue by disallowing asynchronous teardown for
-guests with only 2 levels of page tables. Userspace should (and already
-does) try using the normal destroy if the asynchronous one fails.
-
-Update s390_replace_asce so it refuses to replace segment type ASCEs.
-This is still needed in case the normal destroy VM fails.
-
-Fixes: fb491d5500a7 ("KVM: s390: pv: asynchronous destroy for reboot")
-Reviewed-by: Marc Hartmayer <mhartmay@linux.ibm.com>
-Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
+Link: https://lore.kernel.org/linux-mm/Y9J4P%2FRNvY1Ztn0Q@nvidia.com/
+Suggested-by: Jason Gunthorpe <jgg@nvidia.com>
+Fixes: 214d9bbcd3a6 ("s390/mm: provide memory management functions for protected KVM guests")
+Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
 Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-Message-Id: <20230421085036.52511-2-imbrenda@linux.ibm.com>
+Message-Id: <20230428092753.27913-2-imbrenda@linux.ibm.com>
 ---
- arch/s390/kvm/pv.c  | 5 +++++
- arch/s390/mm/gmap.c | 7 +++++++
- 2 files changed, 12 insertions(+)
+ arch/s390/kernel/uv.c | 32 +++++++++++---------------------
+ 1 file changed, 11 insertions(+), 21 deletions(-)
 
-diff --git a/arch/s390/kvm/pv.c b/arch/s390/kvm/pv.c
-index e032ebbf51b9..3ce5f4351156 100644
---- a/arch/s390/kvm/pv.c
-+++ b/arch/s390/kvm/pv.c
-@@ -314,6 +314,11 @@ int kvm_s390_pv_set_aside(struct kvm *kvm, u16 *rc, u16 *rrc)
- 	 */
- 	if (kvm->arch.pv.set_aside)
- 		return -EINVAL;
-+
-+	/* Guest with segment type ASCE, refuse to destroy asynchronously */
-+	if ((kvm->arch.gmap->asce & _ASCE_TYPE_MASK) == _ASCE_TYPE_SEGMENT)
-+		return -EINVAL;
-+
- 	priv = kzalloc(sizeof(*priv), GFP_KERNEL);
- 	if (!priv)
- 		return -ENOMEM;
-diff --git a/arch/s390/mm/gmap.c b/arch/s390/mm/gmap.c
-index 5a716bdcba05..2267cf9819b2 100644
---- a/arch/s390/mm/gmap.c
-+++ b/arch/s390/mm/gmap.c
-@@ -2833,6 +2833,9 @@ EXPORT_SYMBOL_GPL(s390_unlist_old_asce);
-  * s390_replace_asce - Try to replace the current ASCE of a gmap with a copy
-  * @gmap: the gmap whose ASCE needs to be replaced
-  *
-+ * If the ASCE is a SEGMENT type then this function will return -EINVAL,
-+ * otherwise the pointers in the host_to_guest radix tree will keep pointing
-+ * to the wrong pages, causing use-after-free and memory corruption.
-  * If the allocation of the new top level page table fails, the ASCE is not
-  * replaced.
-  * In any case, the old ASCE is always removed from the gmap CRST list.
-@@ -2847,6 +2850,10 @@ int s390_replace_asce(struct gmap *gmap)
+diff --git a/arch/s390/kernel/uv.c b/arch/s390/kernel/uv.c
+index 9f18a4af9c13..cb2ee06df286 100644
+--- a/arch/s390/kernel/uv.c
++++ b/arch/s390/kernel/uv.c
+@@ -192,21 +192,10 @@ static int expected_page_refs(struct page *page)
+ 	return res;
+ }
  
- 	s390_unlist_old_asce(gmap);
+-static int make_secure_pte(pte_t *ptep, unsigned long addr,
+-			   struct page *exp_page, struct uv_cb_header *uvcb)
++static int make_page_secure(struct page *page, struct uv_cb_header *uvcb)
+ {
+-	pte_t entry = READ_ONCE(*ptep);
+-	struct page *page;
+ 	int expected, cc = 0;
  
-+	/* Replacing segment type ASCEs would cause serious issues */
-+	if ((gmap->asce & _ASCE_TYPE_MASK) == _ASCE_TYPE_SEGMENT)
-+		return -EINVAL;
-+
- 	page = alloc_pages(GFP_KERNEL_ACCOUNT, CRST_ALLOC_ORDER);
- 	if (!page)
- 		return -ENOMEM;
+-	if (!pte_present(entry))
+-		return -ENXIO;
+-	if (pte_val(entry) & _PAGE_INVALID)
+-		return -ENXIO;
+-
+-	page = pte_page(entry);
+-	if (page != exp_page)
+-		return -ENXIO;
+ 	if (PageWriteback(page))
+ 		return -EAGAIN;
+ 	expected = expected_page_refs(page);
+@@ -304,17 +293,18 @@ int gmap_make_secure(struct gmap *gmap, unsigned long gaddr, void *uvcb)
+ 		goto out;
+ 
+ 	rc = -ENXIO;
+-	page = follow_page(vma, uaddr, FOLL_WRITE);
+-	if (IS_ERR_OR_NULL(page))
+-		goto out;
+-
+-	lock_page(page);
+ 	ptep = get_locked_pte(gmap->mm, uaddr, &ptelock);
+-	if (should_export_before_import(uvcb, gmap->mm))
+-		uv_convert_from_secure(page_to_phys(page));
+-	rc = make_secure_pte(ptep, uaddr, page, uvcb);
++	if (pte_present(*ptep) && !(pte_val(*ptep) & _PAGE_INVALID) && pte_write(*ptep)) {
++		page = pte_page(*ptep);
++		rc = -EAGAIN;
++		if (trylock_page(page)) {
++			if (should_export_before_import(uvcb, gmap->mm))
++				uv_convert_from_secure(page_to_phys(page));
++			rc = make_page_secure(page, uvcb);
++			unlock_page(page);
++		}
++	}
+ 	pte_unmap_unlock(ptep, ptelock);
+-	unlock_page(page);
+ out:
+ 	mmap_read_unlock(gmap->mm);
+ 
 -- 
 2.40.1
 
