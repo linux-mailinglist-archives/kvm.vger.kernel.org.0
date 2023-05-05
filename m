@@ -2,114 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 693056F8407
-	for <lists+kvm@lfdr.de>; Fri,  5 May 2023 15:29:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 825196F850E
+	for <lists+kvm@lfdr.de>; Fri,  5 May 2023 16:50:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232240AbjEEN3J (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 5 May 2023 09:29:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53696 "EHLO
+        id S232406AbjEEOuI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 5 May 2023 10:50:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38078 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232059AbjEEN3H (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 5 May 2023 09:29:07 -0400
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2074.outbound.protection.outlook.com [40.107.220.74])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3CE831C0DA;
-        Fri,  5 May 2023 06:29:06 -0700 (PDT)
+        with ESMTP id S229591AbjEEOuH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 5 May 2023 10:50:07 -0400
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2049.outbound.protection.outlook.com [40.107.243.49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3072E16353;
+        Fri,  5 May 2023 07:50:05 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=OHGAI4k1O6GwuqQ+tgMDZBmH6G+wOieKD39RS+A8Q6BkncVufNZNZuEdOK8JXbKyJcdUKHxMCH4ml9hErE70YizqCCnoRRcmGifB5a3libd+mlxeTXC+q5V/HQM7mgRi6Xal8aSy+TU7xClbVcV/2xerB5btJOFZTsx/p/rCTifqpdBeo/1B2bWvlQ75vXd4bAd09wGy6Hws9Vf/+j9utxM9w4AVQkzZndUkzppzTvw+umCmnLJCGj/8Ga6xxgLzMEY8Qwm6aepCBgxYDZ7R1tiMLCu3F1ZboeuFbcmi62C3MZ2rkSEr/OXopmzx0+js1NPK/Kq+dAn2Bma9qM7OYw==
+ b=VwHCVuGhKzqTdWQqgbFj5QBnhcoUEkUWvY2wSKBKjXD0xIUyR8VzYTeLaX9QMBE3SJgjiznqoOa37gWlRYsr5iBuTsDAkw+zmHGR5ZU/rW+Rgo9DpAGMcM6sFf8lVaAbUQpn7fiIyl48RiHFLoeKf/e/2H5kvLYV4GNYawCI/GBrq1+Nx4i0MY5SWalJ0rlKtkAnvQ3aNZv9yTpDyUJH9ce0NpzcpKyY0RPZYJfHMhrl38a1C4FiK7Nr9b7ZVOywZRHunuVjHhaZyRAp77Dfoftm0REiPdMWBgZ1w1fSglUSSC4/CAWpoaG1sKnkJw7OE6rLBG7s5kMLEBhzNCwYZg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=wnG3M32av9R70Qt39G1elqB1ccsFRaF9Lkp0oRUs/ZY=;
- b=JILTdSMQD72exbn7BsqGJGFEDsqLaHP/J5pTu7r/rz6eWAakYgSq4teVTZVKP50lOkqKuthQdYFaeqUCQESE4n5T6QanPYC0vOEhDeaccHCt4CsDXwt328zW5y+jIFPd+CB2Pi3DphL0hB0neAknHRhaCLktS+jjy4xc0D6Im2r3vrjYPohA8KLTllgbJJgr/rvTH4gC5Sx8Gm0FyWL5LExipngiaZqfYVGFPxiuEXedOJm59VDz1oRzbVTfvKveSR2JNIfZrF0x8qqVAfs5PxzYMlegOEj2CdeJWM5t4wSeKDD3fwrlXZo31gg9n15igivo5JaZr0gZ/Z4FRbw/uw==
+ bh=StB404ipoKvQFQnnQRUfSUpCAqVpr9cKy6yQLiMs0MM=;
+ b=BYCnw8p3jcI3eRUOEXaE2VbTJ23qOiovhQFs8fWku3ZUJHYxGb1KUZ4VDX89xw42VDBR02UaOt/nmH5b59OkCNMobNA826nnP8kaPuKo9Ka4QcJR0QciEiC3lu7YW+orA9uwfERbuiSyYNr43zD3IvTZHv/PUadt8R5gjGozRwQddSKWS/XzY+gXl/fyv4RYvWrbETkef9kAloG01hTut5Tuc9kehuVOJQ/nJtHrtFWg+/+l58QwG9vvkTgzcvU56vXiKCjFWAi+y4v5DLEvZNHEplXLI9ditEyCSPGfNRMVUw6/3ZfCCbVTK+5oNg3ZmGev04gFrxGJqYld9hO2lQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
  dkim=pass header.d=nvidia.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=wnG3M32av9R70Qt39G1elqB1ccsFRaF9Lkp0oRUs/ZY=;
- b=GlqHvwz7N22vtxsAHl21lvh/bMkpksUnFqlIvfjdZib3tz/q+4BSuO6Ucod8ZDiIvTEbIUK0EwQizinln3pOSvjg72T6+x0YznAucOQ+k+zr7klyGhSHWFXNXAq28sP1Iearp2+3yJE+IuFj94qeevj0zmDOz5ZWmc/cLy/isjk/TNJdK51ql0fqfM8g15w9ZUovtogKKK+DqWIfW2r16MYBtdi7ZM+UbXkcIEB+2mqrpF8ZV6uCXpyBA+XEBfq3joVpAq7q7csmx6DckE5CbOifqYDD9PO4HL9r6IpjeX2c3vyuFdTJOO5ABV8Cvnm+IxEKVkngJQ9qFT/qu3irsQ==
+ bh=StB404ipoKvQFQnnQRUfSUpCAqVpr9cKy6yQLiMs0MM=;
+ b=W45vXgMWDPoiwkw3ytztDieciY+8j16bO/ItmtjrnQCCH/R0Dww8KLWLfNVY68JBHpSHPrEcz2TZ17f+flXKU+TnS3w5o4Zo57wZbc9OP5Fo9e/A/DqSXJn8snTq/E0dK2tBs5ygsq9N52Zt3H80jFXok5VggGGRCD65hoUQhCfg4iClW5ETgeUzENY3Ciw3T/+kt0WAPLjz5DCPmlYnkFk25eYDUs2TfeOs62KpBD9Ur4z1o3DgqThXu1liyz02JbcieFt7H5fxIaqVbd/1E3xzs7w0Eqg30EWjTnfZ5RwdGWhi0B5sRBGiW/dizRS2w7hFN35XSTf3w1AKFnvqdw==
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nvidia.com;
 Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by PH7PR12MB8154.namprd12.prod.outlook.com (2603:10b6:510:2b9::14) with
+ by BL1PR12MB5093.namprd12.prod.outlook.com (2603:10b6:208:309::22) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6363.26; Fri, 5 May
- 2023 13:29:03 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6363.27; Fri, 5 May
+ 2023 14:50:02 +0000
 Received: from LV2PR12MB5869.namprd12.prod.outlook.com
  ([fe80::f7a7:a561:87e9:5fab]) by LV2PR12MB5869.namprd12.prod.outlook.com
  ([fe80::f7a7:a561:87e9:5fab%6]) with mapi id 15.20.6363.027; Fri, 5 May 2023
- 13:29:03 +0000
-Date:   Fri, 5 May 2023 10:29:02 -0300
+ 14:50:02 +0000
+Date:   Fri, 5 May 2023 11:50:00 -0300
 From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Jakub Kicinski <kuba@kernel.org>
-Cc:     Brett Creeley <brett.creeley@amd.com>, kvm@vger.kernel.org,
-        netdev@vger.kernel.org, alex.williamson@redhat.com,
-        yishaih@nvidia.com, shameerali.kolothum.thodi@huawei.com,
-        kevin.tian@intel.com, shannon.nelson@amd.com, drivers@pensando.io
-Subject: Re: [PATCH v9 vfio 2/7] vfio/pds: Initial support for pds_vfio VFIO
- driver
-Message-ID: <ZFUEnvDYZVJnPwQa@nvidia.com>
-References: <20230422010642.60720-1-brett.creeley@amd.com>
- <20230422010642.60720-3-brett.creeley@amd.com>
- <ZFPq0xdDWKYFDcTz@nvidia.com>
- <20230504132001.32b72926@kernel.org>
- <ZFQ0sqSmJuzLXLbu@nvidia.com>
- <20230504164005.16fb3deb@kernel.org>
+To:     Robin Murphy <robin.murphy@arm.com>
+Cc:     joro@8bytes.org, will@kernel.org, catalin.marinas@arm.com,
+        jean-philippe@linaro.org, inki.dae@samsung.com,
+        sw0312.kim@samsung.com, kyungmin.park@samsung.com,
+        tglx@linutronix.de, maz@kernel.org, alex.williamson@redhat.com,
+        cohuck@redhat.com, iommu@lists.linux.dev,
+        linux-arm-kernel@lists.infradead.org, linux-acpi@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Subject: Re: [PATCH 1/3] iommu/dma: Clean up Kconfig
+Message-ID: <ZFUXmH9vndGZFuPr@nvidia.com>
+References: <cover.1660668998.git.robin.murphy@arm.com>
+ <2e33c8bc2b1bb478157b7964bfed976cb7466139.1660668998.git.robin.murphy@arm.com>
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230504164005.16fb3deb@kernel.org>
-X-ClientProxiedBy: MN2PR15CA0041.namprd15.prod.outlook.com
- (2603:10b6:208:237::10) To LV2PR12MB5869.namprd12.prod.outlook.com
+In-Reply-To: <2e33c8bc2b1bb478157b7964bfed976cb7466139.1660668998.git.robin.murphy@arm.com>
+X-ClientProxiedBy: MN2PR20CA0054.namprd20.prod.outlook.com
+ (2603:10b6:208:235::23) To LV2PR12MB5869.namprd12.prod.outlook.com
  (2603:10b6:408:176::16)
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|PH7PR12MB8154:EE_
-X-MS-Office365-Filtering-Correlation-Id: 8d09b628-158f-4079-9bbf-08db4d6cb194
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|BL1PR12MB5093:EE_
+X-MS-Office365-Filtering-Correlation-Id: 70233aa9-8375-422a-77c6-08db4d78017d
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: /xoBn3eI7n5hFIoVkbs6BbQYneuCGjYXhkRpMh+CEEYXPWrIKC2yxVb4KwGkz4azdHpPLwKFP/yB8rfRVT+QcwugcJQBRwTpfeRGl+iPnc98C+oYOM5kCFyeGWPYFqLrV23skorPuYWXXDDNPWxToNK5Hgkwgj8IVi2RsLhZzFvYZ2Cx7FDYhLmR4yaUDqrxN4Aaq/Ca2tnD+9kqQMbh5LavVLtSIqp5Nttb8cwayzchWRq8q0HmNbBm8VHXIBJLeKK0wE4PEMqlr1FK7DdOae4rehOJldGZjPdv44IF7IVWS616XyowRiRev3uSTORKzL2BGWV1sIUWDSSOTvcH5V2PkwlpPRxybWdDB5ARbnruex4QytYaQNlfrJbcWW6gcFExokKBjgZvPhmM3Yo5pkQGG7oGgj5gClrbbyB+CtxKF+BsXOBFty2xaZZSasDQFPat/bk9RcheRELXTWRrmwiZ23FJK5YVYiQ657qwhrdelC8B1+haJuDFnRslSUVsWKdABj+FMhpMsLLjixXPqH8g3WwdXtLyFerZPmOFS9AxwnqThyJmvjeQwhxldPoC
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(376002)(366004)(136003)(396003)(39860400002)(346002)(451199021)(6512007)(26005)(6506007)(186003)(478600001)(38100700002)(41300700001)(6486002)(36756003)(5660300002)(8936002)(8676002)(2616005)(316002)(66556008)(6916009)(66476007)(66946007)(4326008)(2906002)(86362001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: /pQC/nviKjCL0YwYjNFQu67EzB5mbJrqLoxFH3EPXBN9+oC/oTc3e2g+ixmsObLAjg4TqgzTToqbneE+fFuQCCrlCfg0lBcJ9tzxBPhSzksYmz5wi7SVyzWYZhLhgJ6KXX7HpSDi3Kg5trOElTO/96odI4tVgIeoyPHr8L96VRJSjsg6TED9tkfLAYJtU++OmyqgWMEEnWimZDE+CLwAzsrUtOXA6xKrLn4G20trNR7sT6Swe/OFeC/nyurMtg8yhAwEm5peU57DvrcYLpGIZ+SZZlMpGUAC/J+C1usfMh5vKPGET/1RVp6UijWNOR8GCZoiGeK+otHRHeiOqvQAJNX2adaR2Wd262Ct2wBJzSPJBkEsUsqUYTzUV1qBbMbQqQ6MR3BbZIPbSOommsHkAEvtwjOvfzLtLGnSnlnS+8MRYiDcsRFo/mrDgaEeVxAfzWurURlDkOWY0XkPGKE4j0UcuJdax5LTEFcLqC/1GOeWjZR62AM7goGrq8ylSS+csV0rhSj9pAb5Tp5AKw7AZNg7+s2wXGc5zjbO9hyzyp/rT7DgxWFtu+ILvu9F2LKD
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(396003)(39860400002)(136003)(366004)(346002)(376002)(451199021)(4326008)(66946007)(66556008)(66476007)(6916009)(478600001)(6486002)(316002)(86362001)(36756003)(83380400001)(2616005)(6512007)(6506007)(26005)(5660300002)(8676002)(8936002)(7416002)(2906002)(41300700001)(186003)(38100700002);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?Gw/drR9UHCI6fiMtez6TTBsJ69tt3uXINesSTP+X1Tucvkx6LaTVjz98upvW?=
- =?us-ascii?Q?LEuTa2NXQg5duM+/G/8zOZWxK5vMez9zhyJswHQlq9DtIjT0kRWWQgvyouVd?=
- =?us-ascii?Q?gy9NqsUNzpvYFKtW0hhXjpsBP63iWZejKJJAkbcwRy1z9gPtdzb+l4/0qR0f?=
- =?us-ascii?Q?6ZEg+vIf6yqzNYGIFihXFnuMx2xl6dzHUTyABCeOUX11L/prLBNnwdT7CQeb?=
- =?us-ascii?Q?QWw+tFrvKk+Jguv9vyc1H5BDGVRX3imJS7PZuSbOYephgxcPDFkf4VOntxdo?=
- =?us-ascii?Q?hYPIuIV+wca713/6HtkNluTNuxwawVF8mc61Nz5XWwtLFTANx2hcGGnUsRq9?=
- =?us-ascii?Q?ULEPyRHhihdnVQyErnKo8zDty/iob4dnE1ZEYvwWtmG7FsSz1bmyhIOXY5U3?=
- =?us-ascii?Q?CmT7QE2ERDRgeFuZObAJP6wIPZBXDN7mZo6HSN+FdL7vJToLxtHZhMuP1yPg?=
- =?us-ascii?Q?J80bX0Oq8/YPhAEkCh3W7t23zTjT3qYv6qyekFvyLGygXNpftz1yWBP+o6Az?=
- =?us-ascii?Q?YmE3G8+h/egKtPZmzwVfUXD6UiBq0TQB6HtGPSd9kYIj8vY2j2TIgWDv6uMH?=
- =?us-ascii?Q?DV58AhAH9QAsUbuAUHhKL0JBbW5IOUljoCRBehda6UTloa/anO93A896UOy1?=
- =?us-ascii?Q?b9LBxjZ8SJIdsFIKwB2hQDFCzuVDbxl6DO3qn0tKLhcP98Fa2hnKspTQ5Kpu?=
- =?us-ascii?Q?UpOZkLUIvQnoj2ojMPt+mvxmPzJ6NroT9bODLfaB+n0Jq1LsJ8r/2tEJ16x5?=
- =?us-ascii?Q?Sk/9J+4beYARH9YuTvpBRg6xWAcNa6nkh9S0faoxbKKiyoNIiNR8Wvpr7Snt?=
- =?us-ascii?Q?jN7mWozvem/qTL84ibPlw34acN2UD8jYlUamIuMUUQlwM3q5JRQX82lQlg8b?=
- =?us-ascii?Q?oCfIr2UrRGcNZRI61TDRo7zvmq3wo+m3k1oMEYXQbx4v1tzSP7pKdVjCG8cN?=
- =?us-ascii?Q?SLcECFaXCVdRRT7uyrtuXjRoZ8JWD78wqFdzWpuLY3R1LI09Z/MkEdjTG2QO?=
- =?us-ascii?Q?6QUZH8s3ZYSTXDW2Qn51MP5QmaqIdcOUnXLM7YMp7bC4YLJfrEKx8KiFqePv?=
- =?us-ascii?Q?8ZbJ2aLCWKENfoJLev4KkMJSEpTW8alsyqshceatkxwqGo3+pzFY5d03mQir?=
- =?us-ascii?Q?wxrFAGG52xdEW4w4ETYpFD/I/25h78d5Sxuj0JcuYYkR9J6lD65575rEdHlH?=
- =?us-ascii?Q?TBfWQu2kXQQVov2KsAPDDU5ST54CrwLQDPCwS4vZNYyNYu8JgnZKi7i2VhZa?=
- =?us-ascii?Q?5b4EpBuYipSzj2ZZ2W0rtaVU/FSeyuviZB3ZWXvp4+TeHDySugFCOpa+Z1tq?=
- =?us-ascii?Q?aSWxfcrkV0KdCAgGid0l62JlRr90Wk0O0R2CH6wKGxHWvcXejnn7HxuMNs93?=
- =?us-ascii?Q?OhDaMDNfo2TK/TlHzOWWbPL5vLeMm9slDkoE/kg+RuyT6WUTUUULxecWk7r8?=
- =?us-ascii?Q?U5B7LFLud7ADNvwt6nwrcdtZINZO648xIAMKlDBRrFTo1W5F9DE5UUs9b2+X?=
- =?us-ascii?Q?y2JeFZAqP7rto1TaVR5oo0qx8ryLyl2eEYBy2ATmR6Y2k87VYnpQHCzLLIqp?=
- =?us-ascii?Q?SPpY4/5j43S8w0ztq+CreYFgQud6cQxVlzL6GVmW?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?KqXejIFUoiMbnXCxxsieP8/yBgZQ7XVPWsSz3i1aJv88j3VPrnmOF/0SM82C?=
+ =?us-ascii?Q?Z0d/T2kI9InyMqj80AuKnbi5CSSe+wPZAnFHYwfd/6a1K5fXAvugbllFFGkm?=
+ =?us-ascii?Q?cv4O4MAOPyAyV13MOgidKfVgXmyUC3PWNQOOt+oWQbs5s1f1TrJz9BcrrUo4?=
+ =?us-ascii?Q?xaK9c8hpwx162a/cOD5UkU0tfAOf2kzy03hJfUJDqZUgFPb0U/BS3rhTKA9E?=
+ =?us-ascii?Q?xLVl3XXtRR54gUUZqLhCxSi4asSJnc41qWBRReNn4NYSNxSmtzBDgeFDH93F?=
+ =?us-ascii?Q?92f+T6F3aFa3QCAVajoskdgMQxhUfnKDw4k26fZd9lnZPwKRCqsDgcf4IjVG?=
+ =?us-ascii?Q?Po4th1dVpwQnjERdMPF2+lakkMCDWcdg5dd+xuuzfbdJdmAqtJxCRerwogqV?=
+ =?us-ascii?Q?DcJW4uB1CE/+yNfS4y2ESlGtzjVh1TDbVxVqNAyELkHLeiuNjhyylfhjTdTo?=
+ =?us-ascii?Q?yfSrQbU/HEhRQlA++G5lhGc6BzJ3JSsuOafvdljKw7zGS44WlkbZtg8er9JZ?=
+ =?us-ascii?Q?pF5axM7wmqgylZogADSYvMObqig0JJE9F7/ZEKPgOcEV1MxCQoBVovdHN/Ot?=
+ =?us-ascii?Q?+zWGmUIhCIISAWfcr5ajfNUGy6wVQDkORAFQHi6i3XPGiCo4wzHq12Ias0eH?=
+ =?us-ascii?Q?MVWaDsqZamxtHv0NRECaDfia+nwRPVABOE+L9zoONbhyqxCswa1VljdVUXcz?=
+ =?us-ascii?Q?P/CfQ8YPxTEJTlUoOQ3u3D6UVKnD4wJ79clQTOJ3O2e0USVktP+m44oVuePi?=
+ =?us-ascii?Q?UXi1FFB1TwBbUt0UbPcNv8j+K22WiTqc452kM5RL6mpplGWZPXenb8at36Vo?=
+ =?us-ascii?Q?UZc1DWt7pm450ZqSycfaIizpjM9Q7wl5+ErcSd1C3MXww2C+MJK+6HlOqpva?=
+ =?us-ascii?Q?ap49Qh/fqesURvyFkFc6QSEA2XeASGmCDa6c2KV2USWrDCfxrSCx6h1WfciZ?=
+ =?us-ascii?Q?CDtCxXx7T0WH95rJ7BHWhuUm2g7m2e1lRXhZl8Gmy24wGqAdf8mLnZMKiFEj?=
+ =?us-ascii?Q?Dut8sSPqu7GmnVOd26m+xj6uJBmYfAPE3G+bpHNsk+Nou4nKREajzknU7lpP?=
+ =?us-ascii?Q?IXTHu7WE63Vcuee3CS1dQtwoBP7TYBYym61noc44lWZXosXsZFNpsVl8Xh9t?=
+ =?us-ascii?Q?LyAEn8IqAZUfYpxN2zAUmJwurfl6SxsSPKGOS8lbTCBskpW1AwASJcN+bQCx?=
+ =?us-ascii?Q?ux69LIoxdNFX0t7Pg8wTj3nR60xTBMBhjoOIz1ImYB2hTTwXSI64+4Oh3EOR?=
+ =?us-ascii?Q?yL1UudI6CK3DZ13bm4xeVVwLrjkrJuDrjttIHOzf/haMXob/kcDNvZyGtjDN?=
+ =?us-ascii?Q?tIyFEFqIGrvKhq8vuhUCq5zK9BrCym3Q6Bh0C/HGiZzOiG5Lez0S9FiDnN0j?=
+ =?us-ascii?Q?slqExbmIQBupWe2TrU6ZE7piQugnaEiJDkrqTRWA2eATabLxmOVYyXl6TlKF?=
+ =?us-ascii?Q?cBnS8pDImbtOI/BHMF7jJzXKVB0ui3Ou1vKVzRk7Pv+DHP6dghuZm+BDMWF9?=
+ =?us-ascii?Q?PTtZXq6Y88YtuTgAoPs6ZX1gpM78l3a8cHjV5GqWWFwCidsk3dJi8jz22n4g?=
+ =?us-ascii?Q?m7bA1Pnhd2TSAF6FFC5QMvpNwqV92ibUOcebroEv?=
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8d09b628-158f-4079-9bbf-08db4d6cb194
+X-MS-Exchange-CrossTenant-Network-Message-Id: 70233aa9-8375-422a-77c6-08db4d78017d
 X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 May 2023 13:29:03.5938
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 May 2023 14:50:02.1643
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: fq/vym8rsIYPWr27Ld+aehtBsbEeR1JYF19IhQrHOPtS2+LM82piyRvrchwslRBS
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB8154
+X-MS-Exchange-CrossTenant-UserPrincipalName: jkIa8VkhUz2NobbGxMlyNV+nRiFVBCmTnloB/5YTUXlbaoKGEuXYzfeEiv23wbFb
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5093
 X-Spam-Status: No, score=-1.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
         RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
@@ -120,53 +119,48 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, May 04, 2023 at 04:40:05PM -0700, Jakub Kicinski wrote:
-> On Thu, 4 May 2023 19:41:54 -0300 Jason Gunthorpe wrote:
-> > On Thu, May 04, 2023 at 01:20:01PM -0700, Jakub Kicinski wrote:
-> > > On Thu, 4 May 2023 14:26:43 -0300 Jason Gunthorpe wrote:  
-> > > > This GNU style of left aligning the function name should not be
-> > > > in the kernel.  
-> > > 
-> > > FTR that's not a kernel-wide rule. Please scope your coding style
-> > > suggestions to your subsystem, you may confuse people.  
-> > 
-> > It is what Documentation/process/coding-style.rst expects.
+On Tue, Aug 16, 2022 at 06:28:03PM +0100, Robin Murphy wrote:
+> Although iommu-dma is a per-architecture chonce, that is currently
+> implemented in a rather haphazard way. Selecting from the arch Kconfig
+> was the original logical approach, but is complicated by having to
+> manage dependencies; conversely, selecting from drivers ends up hiding
+> the architecture dependency *too* well. Instead, let's just have it
+> enable itself automatically when IOMMU API support is enabled for the
+> relevant architectures. It can't get much clearer than that.
 > 
-> A reference to the section? You mean the vague mentions of the GNU
-> coding style? 
+> Signed-off-by: Robin Murphy <robin.murphy@arm.com>
+> ---
+>  arch/arm64/Kconfig          | 1 -
+>  drivers/iommu/Kconfig       | 3 +--
+>  drivers/iommu/amd/Kconfig   | 1 -
+>  drivers/iommu/intel/Kconfig | 1 -
+>  4 files changed, 1 insertion(+), 5 deletions(-)
+> 
+> diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
+> index 571cc234d0b3..59af600445c2 100644
+> --- a/arch/arm64/Kconfig
+> +++ b/arch/arm64/Kconfig
+> @@ -209,7 +209,6 @@ config ARM64
+>  	select HAVE_KPROBES
+>  	select HAVE_KRETPROBES
+>  	select HAVE_GENERIC_VDSO
+> -	select IOMMU_DMA if IOMMU_SUPPORT
+>  	select IRQ_DOMAIN
+>  	select IRQ_FORCED_THREADING
+>  	select KASAN_VMALLOC if KASAN
+> diff --git a/drivers/iommu/Kconfig b/drivers/iommu/Kconfig
+> index 5c5cb5bee8b6..1d99c2d984fb 100644
+> --- a/drivers/iommu/Kconfig
+> +++ b/drivers/iommu/Kconfig
+> @@ -137,7 +137,7 @@ config OF_IOMMU
+>  
+>  # IOMMU-agnostic DMA-mapping layer
+>  config IOMMU_DMA
+> -	bool
+> +	def_bool ARM64 || IA64 || X86
 
-Here I was looking at the "left indent the function name" - that is a
-GNUism. IIRC the justification is it makes it easy to find the
-function with 'grep "^func"'
+Robin, do you remember why you added IA64 here? What is the Itanimum
+IOMMU driver?
 
-Coding style says:
-
-  Descendants are always substantially shorter than the parent and
-  are placed substantially to the right.  A very commonly used style
-  is to align descendants to a function open parenthesis.
-
-So this patch had things like this:
-
- +static void
- +pds_vfio_pci_remove(struct pci_dev *pdev)
-
-The first line is shorter than the second and the second is left not
-right placed. It doesn't even need wrapping.
-
-I know some people like to do this in some parts of the tree
-regardless of coding-style. The GNU idea is sort of reasonable after
-all.
-
-> If the function declaration does not fit in 80 chars breaking the type
-> off as a separate line is often a very reasonable choice.
-
-Reasonable yes, but not "common" :)
-
-> Anyway, I shouldn't complain, networking still has its odd rules.
-> Probably why people making up rules for no strong reason is on my mind.
-
-I usually try to ignore most of the style details, but this one stood
-out. When I checked the series against clang-format it was pretty good
-otherwise. A few minor fine tunings on some line wrapping :)
-
+Thanks,
 Jason
