@@ -2,136 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BD4986F853B
-	for <lists+kvm@lfdr.de>; Fri,  5 May 2023 17:03:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C62496F8555
+	for <lists+kvm@lfdr.de>; Fri,  5 May 2023 17:14:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232425AbjEEPDJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 5 May 2023 11:03:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44330 "EHLO
+        id S232033AbjEEPOO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 5 May 2023 11:14:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48660 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232317AbjEEPDG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 5 May 2023 11:03:06 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B98517DDF
-        for <kvm@vger.kernel.org>; Fri,  5 May 2023 08:03:00 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 9C20D20161;
-        Fri,  5 May 2023 15:02:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1683298979; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=cazz3fWUIPev4x3qnlhZI4nTSlnGcYjwyxYCH5Sp+0k=;
-        b=HUBUzJLn9QVxYWn9XBnEnzGWIKM3BNdsLK4YmOxSoFEjWbG6xMOp8DTIYfOZylmG6/wn1d
-        CFvKx0TLiiW56BE14vMMlf+uhgjq78LLPWLfqTrfr/iSr/AE2s1AW/Lc9s41+5hx42edH5
-        wmgETVSEyB5Wd1o/vbzPWfv2KUVepzY=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1683298979;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=cazz3fWUIPev4x3qnlhZI4nTSlnGcYjwyxYCH5Sp+0k=;
-        b=9eZYPpsGjjKNhhUsqWRlbn4QExQ7FNu7MiEZ9eStsdNWr4pvy+UkLbMghrLBtD2XDwVbFb
-        p/+ozzNNjsRHqCBA==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 6CB3113513;
-        Fri,  5 May 2023 15:02:59 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id 2kE7GaMaVWTTBAAAMHmgww
-        (envelope-from <jroedel@suse.de>); Fri, 05 May 2023 15:02:59 +0000
-Date:   Fri, 5 May 2023 17:02:58 +0200
-From:   =?iso-8859-1?Q?J=F6rg_R=F6del?= <jroedel@suse.de>
-To:     James Bottomley <jejb@linux.ibm.com>
-Cc:     Tom Lendacky <thomas.lendacky@amd.com>,
-        Klaus Kiwi <kkiwi@redhat.com>, linux-coco@lists.linux.dev,
-        kvm@vger.kernel.org, amd-sev-snp@lists.suse.com
-Subject: Re: [ANNOUNCEMENT] COCONUT Secure VM Service Module for SEV-SNP
-Message-ID: <ZFUaou1Ts5cwheHg@suse.de>
-References: <ZBl4592947wC7WKI@suse.de>
- <4420d7e5-d05f-8c31-a0f2-587ebb7eaa20@amd.com>
- <ZFJTDtMK0QqXK5+E@suse.de>
- <614e66054c58048f2f43104cf1c9dcbc8745f292.camel@linux.ibm.com>
+        with ESMTP id S231987AbjEEPON (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 5 May 2023 11:14:13 -0400
+Received: from mail-wr1-x42f.google.com (mail-wr1-x42f.google.com [IPv6:2a00:1450:4864:20::42f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 795F01BCA
+        for <kvm@vger.kernel.org>; Fri,  5 May 2023 08:14:12 -0700 (PDT)
+Received: by mail-wr1-x42f.google.com with SMTP id ffacd0b85a97d-306f9df5269so1316716f8f.3
+        for <kvm@vger.kernel.org>; Fri, 05 May 2023 08:14:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1683299651; x=1685891651;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=N3NPH94Yx/QPAffV0bad+mAebajq5nDGGYextPZCJzI=;
+        b=PFxgc7wS3mou3oxYaYSGVDmBfkufWROuoQNrXG+QvM2cXI7j/whlwVbYqtLYavSBIp
+         6DnC0aLKBBu8/wIcU2I09EFBiz5/wnFWjyJLK7CiT3TYulwRAJuP26BoqKozYl0+k6JH
+         ZLHLWNjMLuOzvxVhnHoN3DajX5mndn4nhJyULRKkESUfP8Qo/+57APb+flrC3H/C34t9
+         BPtMOQHRROaaJ9qqj04aYjzBNjgLF5uhBeG+2UjZl6XU4JAezWRduqmrCmwqt/5yebVJ
+         a9H+alvwgBu2iYP61f3onYbrkrXqDc+XwMnaDC/icxcuU00qt/HcJicJAbNpoXK3wkPN
+         ypmA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1683299651; x=1685891651;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=N3NPH94Yx/QPAffV0bad+mAebajq5nDGGYextPZCJzI=;
+        b=VtcKYFLMY7EMtbdFF8NkBSYxSw5QjmIvmLO5SLEmez9pdOfJVTOgItkt72sj/l4x9/
+         CGYuN29Hm4YXAKu4O9VZTPSlgeYIsMjTlWwNoDIqQiFtSw3Ty85T5NSWfWO514//AXL6
+         I/tyJFXmv4V7UbMSXsH25efk4c5vgC1Nh9VaWdPYXMMiX7aZLbC5XT97sfAGQEQUdfu0
+         myphguiaTzt7ol0NBIiJE5S46X5wKZ9RYFocg/Vsd2Ovr4yuBwIN19wj2KhxOU7yAo6h
+         Tsr2rwdNVP4K11NBOhCMXU/EXzmivKod6SaBCjcoFVvkauqKbcDzex4FcaFeDV1XB6en
+         Z3YQ==
+X-Gm-Message-State: AC+VfDzNS+OXm4IOaJwdldqD+7wcqvSg5I0H9HjdAb3rCw3JJPwBFyGG
+        1buUNoO8rXcmZArHraDwoa04ZQ==
+X-Google-Smtp-Source: ACHHUZ4YGH1z0rJ5fkXsOhmOw4x5Iw8YJXBi/jPB3DyHWHSgwqO3EAsGAhjgUrFM17WwJIoXcnTBkw==
+X-Received: by 2002:a1c:721a:0:b0:3f1:7277:eaa with SMTP id n26-20020a1c721a000000b003f172770eaamr1381890wmc.31.1683299650978;
+        Fri, 05 May 2023 08:14:10 -0700 (PDT)
+Received: from [192.168.20.44] ([212.241.182.8])
+        by smtp.gmail.com with ESMTPSA id e12-20020adfe7cc000000b002c54c9bd71fsm2645318wrn.93.2023.05.05.08.14.10
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 05 May 2023 08:14:10 -0700 (PDT)
+Message-ID: <c46fdc5b-8145-c87f-5976-d5c7dae79695@linaro.org>
+Date:   Fri, 5 May 2023 16:14:08 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <614e66054c58048f2f43104cf1c9dcbc8745f292.camel@linux.ibm.com>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+Subject: Re: [PATCH v7 1/1] arm/kvm: add support for MTE
+Content-Language: en-US
+To:     Cornelia Huck <cohuck@redhat.com>, quintela@redhat.com
+Cc:     Peter Maydell <peter.maydell@linaro.org>,
+        Paolo Bonzini <pbonzini@redhat.com>, qemu-arm@nongnu.org,
+        qemu-devel@nongnu.org, kvm@vger.kernel.org,
+        Eric Auger <eauger@redhat.com>, Gavin Shan <gshan@redhat.com>,
+        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>,
+        Andrea Bolognani <abologna@redhat.com>
+References: <20230428095533.21747-1-cohuck@redhat.com>
+ <20230428095533.21747-2-cohuck@redhat.com> <87sfcj99rn.fsf@secure.mitica>
+ <64915da6-4276-1603-1454-9350a44561d8@linaro.org> <871qjzcdgi.fsf@redhat.com>
+ <2c70f6a6-9e13-3412-8e65-43675fda4d95@linaro.org> <87sfcc16ot.fsf@redhat.com>
+From:   Richard Henderson <richard.henderson@linaro.org>
+In-Reply-To: <87sfcc16ot.fsf@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-6.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, May 04, 2023 at 01:04:09PM -0400, James Bottomley wrote:
-> Crypto support in ring-0 is unavoidable if we want to retain control of
-> the VMPCK0 key in ring-0.  I can't see us giving it to ring-3 because
-> that would give up control of the SVSM identity and basically make the
-> ring-0 separation useless because you can compromise ring-3 and get the
-> key and then communicate with the PSP as the SVSM.
+On 5/4/23 16:01, Cornelia Huck wrote:
+> I'm wondering whether we should block migration with MTE enabled in
+> general... OTOH, people probably don't commonly try to migrate with tcg,
+> unless they are testing something?
 
-It all depends on what the SVSM allows ring-3 to do, or in other
-words, how the security model is implemented which locks down the ring-3
-services. For example, I can see an attestation service implemented in
-ring-3 as the exclusive owner of the VMPCK0 key (enforced by SVSM ring-0
-code).
+Yes, savevm/loadvm is an extremely useful tcg debugging tool.
 
-> I think the above problem also indicates no-one really has a fully
-> thought out security model that shows practically how ring-3 improves
-> the security posture.
 
-The security model is certainly not fully designed in all details, but
-when comparing an all-ring-0 (with everything in one address space)
-approach to a split-code model which moves functionality into separate
-address spaces and less privileged execution contexts, my bet is that
-the latter will always win. This is something we know already, so there
-is no need to re-learn that by evolution.
-
-> The next question that's going to arise is *where* the crypto libraries
-> should reside.  Given they're somewhat large, duplicating them for
-> every cpl-3 application plus cpl-3 seems wasteful, so some type of vdso
-> model sounds better (and might work instead of a syscall interfaces for
-> cpl-0 services that are pure code).
-
-That, in contrast, is something I would leave to evolution. We can build
-the services (attestation, TPM, ...) and see if they benefit from a
-shared-lib for crypto. The dynamic linking for that is certainly not
-trivial, but can also be fully done in ring-3.
-
-> I'm not sure it will be.  If some cloud or distro wants to shoot for
-> FIPS compliance of the SVSM, for instance, a requirement will likely be
-> to use a FIPS certified crypto library ... and they're all currently in
-> C.  That's not to say we shouldn't aim for minimizing the C
-> dependencies, but I don't see a "pure rust or else" approach
-> facilitating the initial utility of the project.
-
-Another reason to move all of this to ring-3. Ring-3 services can be
-written in C and use C libraries as needed without lowering the security
-of the ring-0 rust code.
-
-Regards,
-
--- 
-Jörg Rödel
-jroedel@suse.de
-
-SUSE Software Solutions Germany GmbH
-Frankenstraße 146
-90461 Nürnberg
-Germany
-
-(HRB 36809, AG Nürnberg)
-Geschäftsführer: Ivo Totev, Andrew Myers, Andrew McDonald, Boudien Moerman
-
+r~
