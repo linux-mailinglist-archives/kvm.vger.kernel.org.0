@@ -2,63 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 446F76F7AD8
-	for <lists+kvm@lfdr.de>; Fri,  5 May 2023 04:20:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 179CF6F7ADB
+	for <lists+kvm@lfdr.de>; Fri,  5 May 2023 04:23:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229823AbjEECUx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 May 2023 22:20:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33736 "EHLO
+        id S230001AbjEECXa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 May 2023 22:23:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34730 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229524AbjEECUv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 4 May 2023 22:20:51 -0400
-Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49EF0AD3F;
-        Thu,  4 May 2023 19:20:50 -0700 (PDT)
+        with ESMTP id S229501AbjEECX3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 4 May 2023 22:23:29 -0400
+Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 063BB11638;
+        Thu,  4 May 2023 19:23:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1683253250; x=1714789250;
+  t=1683253407; x=1714789407;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=3cB8FCltPb4XWCTQOTTNGU/NtPGFR9grO1Z1GyYNzXQ=;
-  b=dffgtO/rUrlY4TUhEWWGvB3SIRa2Y81W7MFABgT8hEEL3lwmKlcDHTab
-   WHagGDlMYmys5DroopGjEoZh4wlRV/F3ZLssoHk3So3HAAjgT/uEIem0o
-   OYEvQJm4WIxJjd5qyBYYaNlp7K6sq05obsBrnv3Ou1Eg5RPZeTKJEgzTQ
-   QtMVztXshcNlWQCKZJQq8+/Z2p7p2TqaMAf/kw3M1njxsHA1i/IVs4P/0
-   T+wX0d4xg4tXXMD3Wt3amKnDUgP6NdJQaEJkLyz+grusqjrVAZyhMkgZ9
-   ZNvNqBU1ePg+VG+ikfbVRTLF163phAg7yi1Jx4Fcy5iz/2g/Ct2QdxYja
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10700"; a="333526403"
+  bh=9qXWAh7qGjkOOeTp9fwUba4lPO1AOjZU8zBnNPwIU/M=;
+  b=O2r5ZbUBPXye7v2gv4VEXa+7WE6CY2mWxLtLTA08+nSvgaBoinPZVhmD
+   ILCGteFMi6uzK6Zb2uNTpwZhtKDvPxIp6pRndPfU6U3OfqIjYshoT97Kk
+   q2VGTfJIYfRDInxv/EpV18SHBcdgSmpdgERzizs9zBkMAyr6kuxE8o8Bj
+   w8t4Nn4r79aGoU6FVax1uWx6TqvfiT79FtOKNDW2TwU6w2tCkL2N/2Vmm
+   IwTzQgvU00bk2k4I5wpOkaa1JntrFnPb8BrV3sHrcFZrXFOlrTrp8Uay7
+   cuSxXaq4mwxJTNP9R9TX00megW79mGvJhNrzpgv6TIhfdNs0atPyhFcVS
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10700"; a="338292466"
 X-IronPort-AV: E=Sophos;i="5.99,250,1677571200"; 
-   d="scan'208";a="333526403"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 May 2023 19:18:38 -0700
+   d="scan'208";a="338292466"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 May 2023 19:22:47 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10700"; a="674816299"
+X-IronPort-AV: E=McAfee;i="6600,9927,10700"; a="691409296"
 X-IronPort-AV: E=Sophos;i="5.99,250,1677571200"; 
-   d="scan'208";a="674816299"
+   d="scan'208";a="691409296"
 Received: from yuzhongq-mobl.ccr.corp.intel.com (HELO [10.255.29.220]) ([10.255.29.220])
-  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 May 2023 19:18:34 -0700
-Message-ID: <600c42ab-44a8-d2cd-57c4-d423a8516d0a@linux.intel.com>
-Date:   Fri, 5 May 2023 10:18:32 +0800
+  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 May 2023 19:22:44 -0700
+Message-ID: <32dbc22a-421f-d513-c605-88d9c7538b0a@linux.intel.com>
+Date:   Fri, 5 May 2023 10:22:42 +0800
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
  Thunderbird/102.10.1
 Subject: Re: [PATCH v2 11/21] KVM:VMX: Introduce CET VMCS fields and control
  bits
-To:     Yang Weijiang <weijiang.yang@intel.com>, seanjc@google.com,
+To:     Yang Weijiang <weijiang.yang@intel.com>
+Cc:     rick.p.edgecombe@intel.com,
+        Zhang Yi Z <yi.z.zhang@linux.intel.com>, seanjc@google.com,
         pbonzini@redhat.com, peterz@infradead.org, john.allen@amd.com,
         kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     rick.p.edgecombe@intel.com, Zhang Yi Z <yi.z.zhang@linux.intel.com>
 References: <20230421134615.62539-1-weijiang.yang@intel.com>
  <20230421134615.62539-12-weijiang.yang@intel.com>
 From:   Binbin Wu <binbin.wu@linux.intel.com>
 In-Reply-To: <20230421134615.62539-12-weijiang.yang@intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-6.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+X-Spam-Status: No, score=-8.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
@@ -101,7 +102,6 @@ On 4/21/2023 9:46 PM, Yang Weijiang wrote:
 According to the name of the MSR, it is interrupt related, right?
 It's better to describe the MSR more precisely.
 
-
 >
 > Two XSAVES state bits are introduced for CET:
 >    IA32_XSS:[bit 11]: Control saving/restoring user mode CET states
@@ -111,7 +111,6 @@ It's better to describe the MSR more precisely.
 >    {HOST,GUEST}_S_CET: Stores CET settings for kernel mode.
 >    {HOST,GUEST}_SSP: Stores shadow stack pointer of current active task/thread.
 >    {HOST,GUEST}_INTR_SSP_TABLE: Stores base address of shadow stack pointer table.
-
 ditto
 
 >
