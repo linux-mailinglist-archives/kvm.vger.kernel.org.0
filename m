@@ -2,105 +2,87 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 292096F7F1E
-	for <lists+kvm@lfdr.de>; Fri,  5 May 2023 10:31:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B40636F7F26
+	for <lists+kvm@lfdr.de>; Fri,  5 May 2023 10:33:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231497AbjEEIbl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 5 May 2023 04:31:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57248 "EHLO
+        id S230459AbjEEIdB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 5 May 2023 04:33:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57732 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231293AbjEEIbY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 5 May 2023 04:31:24 -0400
+        with ESMTP id S231157AbjEEIc7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 5 May 2023 04:32:59 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 239A614939
-        for <kvm@vger.kernel.org>; Fri,  5 May 2023 01:29:44 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E25A18DD8
+        for <kvm@vger.kernel.org>; Fri,  5 May 2023 01:31:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1683275363;
+        s=mimecast20190719; t=1683275480;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=LdGQ5Iff4ofU4lB9I6Mk/AZfuvu30ar3dTp7kzkc4Ho=;
-        b=L2kOuTwf1GchblZUorjH3afkuWOknK6Gw3QyipIH4dOlpJeJymMON6Yb5uP4DnRSyHWgbc
-        z4WuiBhZrGxsKXsEOjkJQDV5w9fd+kF2nKBKZDKFB27T4qZ9+A4xO9T9PVWFetBlM9lAdI
-        c7pgZ7cyMJgkeOa0Yzl8cNPg4RywCwo=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=cyh9GNwkSeiWX8VVWJet6cmrStrv1Y1BhHYKMAKCy08=;
+        b=YNt/vTXhUWiJM7nukOOb6d/wZea7+zZe5F9nM074ahuxLk0BA7TXi7UvbZRW6xxg3WFdls
+        E79b0l78g5sVjPud0EygryclRJPra8snUZrHQBm4qDCZt283ZThWkHHIdxrelMLwDhEX+5
+        SpKYXFjNrmpSpnpHYBTG6jJtNoPDRJg=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-294-WZmb7Wa-O8-tJa0Yjro3lg-1; Fri, 05 May 2023 04:29:22 -0400
-X-MC-Unique: WZmb7Wa-O8-tJa0Yjro3lg-1
-Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-50bc95a5051so1662218a12.1
-        for <kvm@vger.kernel.org>; Fri, 05 May 2023 01:29:22 -0700 (PDT)
+ us-mta-264-mGseqgjQMcGN3LIBVwhAEw-1; Fri, 05 May 2023 04:31:19 -0400
+X-MC-Unique: mGseqgjQMcGN3LIBVwhAEw-1
+Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-965c6f849b9so121840466b.2
+        for <kvm@vger.kernel.org>; Fri, 05 May 2023 01:31:19 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683275361; x=1685867361;
-        h=content-transfer-encoding:in-reply-to:subject:from:references:cc:to
-         :content-language:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=LdGQ5Iff4ofU4lB9I6Mk/AZfuvu30ar3dTp7kzkc4Ho=;
-        b=Qtbv9htIBIzCgzBoE4v/REXnsVnD1ikQqPpmzW82gtVTrQr4kce8R4OHWudGDp5l6T
-         yVx6EZRyGubIJEQtIebTprCQ0JQoUV5sBY9GCevIjRCKxfiqfTCoGJX2ENpZCxvq7WQa
-         9PC+LOic/TWbLmseTZhIZosWzx4V0a5a7aOyTfUrC+6LQa6Zq5OGBWs7PHcX31xYT1Hl
-         WZZxwpfyULDr8b8Y+RQml2s1MULK8YypbwmBj6jlVr2ruaJE0EIWyiDu7PQ4HHJyXo41
-         /duMWxCo7tPcMdBng+V0qTFJO1kBogjfQtcQ9oEK388HjNC4BFjSR62o2IzGCIiKMSLe
-         gMhw==
-X-Gm-Message-State: AC+VfDy6lvhxn1KpZSEM//C2xCGH74lrWJYDUWZt8UphiQtKVuRZFr0s
-        fMpxtZKp5yfqHw5SgRzt7SuIR9W4BQEyD0oCxva32tQ66H48dwx20MSvSsS2rb0MKC9Cb1BAHbh
-        N2vAgDQLGSg/V
-X-Received: by 2002:a17:906:ee84:b0:94a:549c:4731 with SMTP id wt4-20020a170906ee8400b0094a549c4731mr420877ejb.57.1683275361396;
-        Fri, 05 May 2023 01:29:21 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ5U+UCVItL90FHF+zyfg8PN1bCH3TUFIlIH9StNOC6NT9eBmlQEUHqwEbrzfLrxbt8GDpe2Pg==
-X-Received: by 2002:a17:906:ee84:b0:94a:549c:4731 with SMTP id wt4-20020a170906ee8400b0094a549c4731mr420858ejb.57.1683275361113;
-        Fri, 05 May 2023 01:29:21 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
-        by smtp.googlemail.com with ESMTPSA id ig2-20020a1709072e0200b00959b810efcbsm647109ejc.36.2023.05.05.01.29.19
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 05 May 2023 01:29:20 -0700 (PDT)
-Message-ID: <4ac6c060-8655-c5df-e27b-3dfb520ad388@redhat.com>
-Date:   Fri, 5 May 2023 10:29:19 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.9.1
-Content-Language: en-US
-To:     Babu Moger <babu.moger@amd.com>, richard.henderson@linaro.org
-Cc:     weijiang.yang@intel.com, philmd@linaro.org, dwmw@amazon.co.uk,
+        d=1e100.net; s=20221208; t=1683275478; x=1685867478;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=cyh9GNwkSeiWX8VVWJet6cmrStrv1Y1BhHYKMAKCy08=;
+        b=DHBjqs3cEdpyi3ypGIzGOmjTiIfwwMe3ny2HorY+tRyCxTghoglSGZSo17pCm9FQ4T
+         gZ5gjurBokXycKkJJ11knz7Y0RsDQmkg28jYJk36JbY341h7GvuFu/ZeluzQremEdbdp
+         j9hxA/u0+gXrQU5CTO6faFLJXw18KWJZdBWdmUptial+FRghQCGWYvpycDF2wC5tD5mb
+         3kk376Nv9DOZCW48jmbviHUr0B8UiqCehSARpStl2K5HT41gSflYqm597fU68WpkjAe7
+         VlubEjaFG3NldYwInBr88tnnWYtAsvM3SlSo+l+7lHgEDReaJ+tpjJMQ+k/i0GTgka/p
+         S/aQ==
+X-Gm-Message-State: AC+VfDwcJIen2DgFAmOnMGiUjlUJ7WajIGVvnCeeuYiUwFq4SqO4IUZC
+        Z1TZgWFwC9tzb7RP+v8XUCW2f8fdFB/6dba7c0mpSDeObjfdEmIeqVMjKzkb9lrobo21i0dxPz5
+        fe3vX2mNJRt33
+X-Received: by 2002:a17:907:320a:b0:88a:1ea9:a5ea with SMTP id xg10-20020a170907320a00b0088a1ea9a5eamr393853ejb.65.1683275478235;
+        Fri, 05 May 2023 01:31:18 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ47UpNCtDUMm+GtsuZ12J5zXngGazIrJDUL717pYZDeruU5J1EfBTnknDT9k0Mqqvc5kkvltQ==
+X-Received: by 2002:a17:907:320a:b0:88a:1ea9:a5ea with SMTP id xg10-20020a170907320a00b0088a1ea9a5eamr393833ejb.65.1683275477852;
+        Fri, 05 May 2023 01:31:17 -0700 (PDT)
+Received: from [192.168.10.118] ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
+        by smtp.gmail.com with ESMTPSA id bz6-20020a1709070aa600b0095850aef138sm642491ejc.6.2023.05.05.01.31.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 05 May 2023 01:31:17 -0700 (PDT)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     Babu Moger <babu.moger@amd.com>
+Cc:     pbonzini@redhat.com, richard.henderson@linaro.org,
+        weijiang.yang@intel.com, philmd@linaro.org, dwmw@amazon.co.uk,
         paul@xen.org, joao.m.martins@oracle.com, qemu-devel@nongnu.org,
         mtosatti@redhat.com, kvm@vger.kernel.org, mst@redhat.com,
         marcel.apfelbaum@gmail.com, yang.zhong@intel.com,
         jing2.liu@intel.com, vkuznets@redhat.com, michael.roth@amd.com,
         wei.huang2@amd.com, berrange@redhat.com, bdas@redhat.com
-References: <20230504205313.225073-1-babu.moger@amd.com>
- <20230504205313.225073-5-babu.moger@amd.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v4 4/7] target/i386: Add feature bits for
- CPUID_Fn80000021_EAX
-In-Reply-To: <20230504205313.225073-5-babu.moger@amd.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-6.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Subject: Re: [PATCH v4 0/7] Add EPYC-Genoa model and update previous EPYC Models
+Date:   Fri,  5 May 2023 10:31:16 +0200
+Message-Id: <20230505083116.82505-1-pbonzini@redhat.com>
+X-Mailer: git-send-email 2.40.0
+In-Reply-To: <20230504205313.225073-1-babu.moger@amd.com>
+References: 
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/4/23 22:53, Babu Moger wrote:
-> Add the following feature bits.
-> no-nested-data-bp	  : Processor ignores nested data breakpoints.
-
-This bit is useless, unfortunately.  Another similar bit include the one 
-about availability of FCS/FDS in the x87 save state.
-
-They say that something is _not_ available, so a strict interpretation 
-would prevent migrating from any old processor to Genoa, because in 
-theory you never know if guests are using nested data breakpoints.
-
-In practice, this does not really matter because no one used 
-them---that's why AMD could get away with removing them---but please 
-tell the architects that while they're free to deprecate and remove old 
-features, adding CPUID is basically pointless.
+Queued, thanks.
 
 Paolo
 
