@@ -2,124 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 578466F807A
-	for <lists+kvm@lfdr.de>; Fri,  5 May 2023 12:02:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CEB3F6F80A2
+	for <lists+kvm@lfdr.de>; Fri,  5 May 2023 12:14:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231666AbjEEKCG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 5 May 2023 06:02:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58848 "EHLO
+        id S231704AbjEEKOd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 5 May 2023 06:14:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35374 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231685AbjEEKCC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 5 May 2023 06:02:02 -0400
-Received: from vulcan.natalenko.name (vulcan.natalenko.name [104.207.131.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF5DF1161C;
-        Fri,  5 May 2023 03:01:59 -0700 (PDT)
-Received: from spock.localnet (unknown [83.148.33.151])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        by vulcan.natalenko.name (Postfix) with ESMTPSA id 9C7DD12FA060;
-        Fri,  5 May 2023 12:01:52 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=natalenko.name;
-        s=dkim-20170712; t=1683280913;
+        with ESMTP id S231406AbjEEKOb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 5 May 2023 06:14:31 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F13D150DE
+        for <kvm@vger.kernel.org>; Fri,  5 May 2023 03:13:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1683281622;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=2U8Eyv9nlZnFEQ8LEuDy/nhAeBfgve9KkqjGss4tmqU=;
-        b=oxOU7q3BEN1zLMIqYfCJqAmwPBRg+HQJ6RDIO+mpq9nrSjS/Vakss/QZ9YVIY5CEjQan4R
-        rQj0RKBx6PVnqPMNs+g9G3gf5MHHqHh/oBDle2jQXoEreSS+7G30UUyq/97BJVXkDIePg8
-        pr4EPL2LkMeKwL09YhQVRy98D1SjeIY=
-From:   Oleksandr Natalenko <oleksandr@natalenko.name>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, Eric Auger <eric.auger@redhat.com>,
-        =?ISO-8859-1?Q?C=E9dric?= Le Goater <clg@redhat.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Abhishek Sahu <abhsahu@nvidia.com>,
-        Kevin Tian <kevin.tian@intel.com>,
-        Cornelia Huck <cohuck@redhat.com>, Bo Liu <liubo03@inspur.com>,
-        "K V P, Satyanarayana" <satyanarayana.k.v.p@intel.com>,
-        kvm@vger.kernel.org
-Subject: Re: [PATCH] vfio/pci: demote hiding ecap messages to debug level
-Date:   Fri, 05 May 2023 12:01:51 +0200
-Message-ID: <2680715.mvXUDI8C0e@natalenko.name>
-In-Reply-To: <20230504170111.70a7f639.alex.williamson@redhat.com>
-References: <20230504131654.24922-1-oleksandr@natalenko.name>
- <20230504170111.70a7f639.alex.williamson@redhat.com>
+        bh=oZ+W0+aJdMtjJzmRiw6PVDgzOh3temaFbWrH/wCIxiU=;
+        b=H0qt/oRmfeFEm9QhCCcynQeKgfKRdHdkZZ1gddw8TQ3y5Ei5JNL+7gWFOcBupVw3OkDdxt
+        vWQB9xoJJcTWe2wHvBwNLMOMZttuSjbAk0enD1RI6JMTpxPqDGW9XHH7izX6N2p80DTez0
+        rY7zGWiqPGmGKliY31rXm7DaAjaMigY=
+Received: from mail-vs1-f70.google.com (mail-vs1-f70.google.com
+ [209.85.217.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-646-sa603cTpOwq-sGRtWY-YiQ-1; Fri, 05 May 2023 06:13:41 -0400
+X-MC-Unique: sa603cTpOwq-sGRtWY-YiQ-1
+Received: by mail-vs1-f70.google.com with SMTP id ada2fe7eead31-4346a3bc2c6so297571137.3
+        for <kvm@vger.kernel.org>; Fri, 05 May 2023 03:13:41 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1683281621; x=1685873621;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=oZ+W0+aJdMtjJzmRiw6PVDgzOh3temaFbWrH/wCIxiU=;
+        b=HqmPm5mVix3pQhUnpmqasgSQPrdMrpJMS8dVB4qeYan6OjZ1nQTaEa5w3Oax3O0q/b
+         E7QH13EX90Ers3I0aFRKkmOrY3yI3kp/wLvqrQuI0uRI5xh6z+L6viPoDpr2pl0IaRu9
+         gpakw1ASumnWpmjqPVeJWKTqqlXJJXqvMWMoipyNsknj4decSI1+HP/s0T3/DJfa4SzR
+         KWzowdKE//2Zt7RUI/SL5FAJintyZLxAvFYRBOY9PkrUzZlgbFJ/te1ujDbz5ZBZfSDA
+         i3kiTGwEPbTFNtcG0gXN78XP3DGP2Sh1sNeteqGKNQOnFH3mzx+Q9FP36Xe+ykdx5DYH
+         XiYQ==
+X-Gm-Message-State: AC+VfDz39IZ2/soZozT2p0YteV7Wvdsis/ZIKs67Gl3W1XZ3Q5oI8U9r
+        z7jR3l+8pDOahCTiiXaOzb5h+ikRvDVGZEN8vEFPriHNyuj/Xl2ARDXNnMgkmAUICJzHkpZFx6H
+        8kf77CPiCl8n//B+iIEz/63nDxcAM
+X-Received: by 2002:a05:6102:3cd:b0:430:ce0:ae90 with SMTP id n13-20020a05610203cd00b004300ce0ae90mr264081vsq.14.1683281620932;
+        Fri, 05 May 2023 03:13:40 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ6OtXedp3osVnwEX33Yc8OMv+0d9M5ynEvZuqvO8k8HixdHSob0k1+rsHIZA+Ep6fL44O5RFoq3hvilcahA2KI=
+X-Received: by 2002:a05:6102:3cd:b0:430:ce0:ae90 with SMTP id
+ n13-20020a05610203cd00b004300ce0ae90mr264077vsq.14.1683281620688; Fri, 05 May
+ 2023 03:13:40 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+References: <20230504171611.54844-1-imbrenda@linux.ibm.com>
+In-Reply-To: <20230504171611.54844-1-imbrenda@linux.ibm.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Date:   Fri, 5 May 2023 12:13:29 +0200
+Message-ID: <CABgObfZdsv3BBTOsPCf=YYOuDifGamLivEjiMfvZ7df+Yt208A@mail.gmail.com>
+Subject: Re: [GIT PULL 0/2] KVM: s390: Some fixes for 6.4
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        frankja@linux.ibm.com, borntraeger@linux.ibm.com,
+        hca@linux.ibm.com, david@redhat.com
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello.
+On Thu, May 4, 2023 at 7:16=E2=80=AFPM Claudio Imbrenda <imbrenda@linux.ibm=
+.com> wrote:
+>
+> Hi Paolo,
+>
+> just a couple of bugfixes, nothing too exceptional here.
+>
+>
+> please pull, thanks!
+>
+> Claudio
 
-On p=C3=A1tek 5. kv=C4=9Btna 2023 1:01:11 CEST Alex Williamson wrote:
-> On Thu,  4 May 2023 15:16:54 +0200
-> Oleksandr Natalenko <oleksandr@natalenko.name> wrote:
->=20
-> > Seeing a burst of messages like this:
-> >=20
-> >     vfio-pci 0000:98:00.0: vfio_ecap_init: hiding ecap 0x19@0x1d0
-> >     vfio-pci 0000:98:00.0: vfio_ecap_init: hiding ecap 0x25@0x200
-> >     vfio-pci 0000:98:00.0: vfio_ecap_init: hiding ecap 0x26@0x210
-> >     vfio-pci 0000:98:00.0: vfio_ecap_init: hiding ecap 0x27@0x250
-> >     vfio-pci 0000:98:00.1: vfio_ecap_init: hiding ecap 0x25@0x200
-> >     vfio-pci 0000:b1:00.0: vfio_ecap_init: hiding ecap 0x19@0x1d0
-> >     vfio-pci 0000:b1:00.0: vfio_ecap_init: hiding ecap 0x25@0x200
-> >     vfio-pci 0000:b1:00.0: vfio_ecap_init: hiding ecap 0x26@0x210
-> >     vfio-pci 0000:b1:00.0: vfio_ecap_init: hiding ecap 0x27@0x250
-> >     vfio-pci 0000:b1:00.1: vfio_ecap_init: hiding ecap 0x25@0x200
-> >=20
-> > is of little to no value for an ordinary user.
-> >=20
-> > Hence, use pci_dbg() instead of pci_info().
-> >=20
-> > Signed-off-by: Oleksandr Natalenko <oleksandr@natalenko.name>
-> > ---
-> >  drivers/vfio/pci/vfio_pci_config.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> >=20
-> > diff --git a/drivers/vfio/pci/vfio_pci_config.c b/drivers/vfio/pci/vfio=
-_pci_config.c
-> > index 948cdd464f4e..dd8dda14e701 100644
-> > --- a/drivers/vfio/pci/vfio_pci_config.c
-> > +++ b/drivers/vfio/pci/vfio_pci_config.c
-> > @@ -1643,7 +1643,7 @@ static int vfio_ecap_init(struct vfio_pci_core_de=
-vice *vdev)
-> >  		}
-> > =20
-> >  		if (!len) {
-> > -			pci_info(pdev, "%s: hiding ecap %#x@%#x\n",
-> > +			pci_dbg(pdev, "%s: hiding ecap %#x@%#x\n",
-> >  				 __func__, ecap, epos);
-> > =20
-> >  			/* If not the first in the chain, we can skip over it */
->=20
-> Looks fine to me, though I might adjust that next line to keep the
-> previous alignment.
+Done, thank you.
 
-Sure, but if you want me to send v2 with this, please let me know.
+Paolo
 
-Thanks.
-
-> In general this has certainly caused more
-> confusion than insightful information, so demoting it to debug is a
-> good idea.  Thanks,
->=20
-> Alex
->=20
->=20
-
-
-=2D-=20
-Oleksandr Natalenko (post-factum)
-
+>
+>
+> The following changes since commit 8a46df7cd135fe576c18efa418cd1549e51f27=
+32:
+>
+>   KVM: s390: pci: fix virtual-physical confusion on module unload/load (2=
+023-04-20 16:30:35 +0200)
+>
+> are available in the Git repository at:
+>
+>   ssh://git@gitolite.kernel.org/pub/scm/linux/kernel/git/kvms390/linux.gi=
+t tags/kvm-s390-next-6.4-2
+>
+> for you to fetch changes up to c148dc8e2fa403be501612ee409db866eeed35c0:
+>
+>   KVM: s390: fix race in gmap_make_secure() (2023-05-04 18:26:27 +0200)
+>
+> ----------------------------------------------------------------
+> For 6.4
+>
+> ----------------------------------------------------------------
+> Claudio Imbrenda (2):
+>       KVM: s390: pv: fix asynchronous teardown for small VMs
+>       KVM: s390: fix race in gmap_make_secure()
+>
+>  arch/s390/kernel/uv.c | 32 +++++++++++---------------------
+>  arch/s390/kvm/pv.c    |  5 +++++
+>  arch/s390/mm/gmap.c   |  7 +++++++
+>  3 files changed, 23 insertions(+), 21 deletions(-)
+>
 
