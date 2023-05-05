@@ -2,200 +2,208 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C1D896F822F
-	for <lists+kvm@lfdr.de>; Fri,  5 May 2023 13:41:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EFBBC6F832B
+	for <lists+kvm@lfdr.de>; Fri,  5 May 2023 14:43:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231882AbjEELl4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 5 May 2023 07:41:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43776 "EHLO
+        id S232024AbjEEMnL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 5 May 2023 08:43:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52594 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231773AbjEELly (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 5 May 2023 07:41:54 -0400
-Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B675A4C0B
-        for <kvm@vger.kernel.org>; Fri,  5 May 2023 04:41:51 -0700 (PDT)
-Received: by mail-pf1-x429.google.com with SMTP id d2e1a72fcca58-643990c5319so975280b3a.2
-        for <kvm@vger.kernel.org>; Fri, 05 May 2023 04:41:51 -0700 (PDT)
+        with ESMTP id S229570AbjEEMnJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 5 May 2023 08:43:09 -0400
+Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED1CA17FC3
+        for <kvm@vger.kernel.org>; Fri,  5 May 2023 05:43:08 -0700 (PDT)
+Received: by mail-pj1-x1032.google.com with SMTP id 98e67ed59e1d1-24df6bbf765so1595886a91.0
+        for <kvm@vger.kernel.org>; Fri, 05 May 2023 05:43:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sifive.com; s=google; t=1683286911; x=1685878911;
-        h=references:in-reply-to:message-id:date:subject:cc:to:from:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=ii4ZYV8PSGVNKvQbfyi9k0H3xqXUg9ceJFhgnCWDfu8=;
-        b=kP4U2BDawzzsCWyma8vDOUIzhNWCXy990Pc+gcvUHx1ErGR4FYUu/DXy6XQpT3k+b1
-         MMWBPGAHFZaRRrhIrRHb12LA/WMlfQdoiSqUqISlhEyb3cU5ijXD3hv9Ny1Piy71CZ0u
-         DN2KBIz8kUkvRSGARkBh8SVVz6ef6QNBRapPWUA1Bd1B5ybudxQm3A4wQQHgofudP6qH
-         pfLN/6sZOUyS8S5VeP8Q4L2K3gG+dm9f29tsxECIJhMxeoNb9tfHUDulBp2nasnJYnF2
-         SUkBLkQ5R4oK/A8xT5dL7PnRwC+7KSGlCFrhxFYWSLOje9VWEZTibTSbRzDKz7KNS0EA
-         kPmg==
+        d=gmail.com; s=20221208; t=1683290588; x=1685882588;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=GStTkfOoiU+0hr7MDdtqXSTUxV8ZSA6iP9d3CFL1FGo=;
+        b=pmEWFc/ew8zSposLiGEZ90/j1VPeDhssFdSIbByKXdc2fkS+yE8qSC1JpQS07KI/Kg
+         kPidQBtTG60ddFFwnguLI1Z2xULeRa5aBq1y32dTdBZ9vlyrzvFPZrwiNqMF35vcyjsy
+         grj/yETluR+Q+F+h7Y97+pyKUVq7Kpn2Qh+1MUz56l2CuQep5hTPCTc8/n0pZ4bQldjP
+         VSCB7T3jJbCSc1y1iPt1LACdqDBS1A+KTCftGAk/o4Qx0GIJzislM7imcQfVQQ9fq8kO
+         GOkwbxutmtQkNNP9EsjBd6K76xY2SKnHnmA0h+J69cZwrSVbfv6H4hk8fAQxa5c3fxh/
+         vVjg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683286911; x=1685878911;
-        h=references:in-reply-to:message-id:date:subject:cc:to:from
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ii4ZYV8PSGVNKvQbfyi9k0H3xqXUg9ceJFhgnCWDfu8=;
-        b=auX42JtXFhdh6yM1OcEh/vlXTeP63YgI+8Uw1Zz5ThbBCzLKdMe5GvTGEqT3Hiwgpw
-         Oq0kjLwghlzCSYFVRSsahY+KK94xfCqfmZZpp+ftk3hiKmAG+navOxFUYplH91M1C1aQ
-         Nos9Tl+OUDNG7BuCYBJf5Bso/rejsGsNOlRZLAZicVsAby3HEFlddyO9Q/CrtuzTJfMG
-         IXVoa4OkSnoVaOqxeptruZl1L9AN5pEp5uJUiSlQPmHOPkhf3XJmzB+hELh7F037laVI
-         HsnNhGsR+om2xv+Mj/v3E9IjPYodlAldQWQD65idBGw6V9TnUqF3qYdXpoDW7RAKai3c
-         9pqg==
-X-Gm-Message-State: AC+VfDzVsw5ITqxn/3AqmSlpP1ODPOSTQvREISeMTJJ89KwwONahf2Sn
-        /5RUi1w3rN0KHlrDLUrw85eGMg==
-X-Google-Smtp-Source: ACHHUZ7w5YAODgkHtiWJ6WQ7avqu2+IyoPIbUxhNad9l14c8UtVKUvuStCDAshrfsUYteH1mASV8XA==
-X-Received: by 2002:a05:6a00:992:b0:63b:89ba:fc9c with SMTP id u18-20020a056a00099200b0063b89bafc9cmr2095385pfg.27.1683286911179;
-        Fri, 05 May 2023 04:41:51 -0700 (PDT)
-Received: from hsinchu25.internal.sifive.com (59-124-168-89.hinet-ip.hinet.net. [59.124.168.89])
-        by smtp.gmail.com with ESMTPSA id y17-20020aa78051000000b0062d859a33d1sm1448171pfm.84.2023.05.05.04.41.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 May 2023 04:41:50 -0700 (PDT)
-From:   Yong-Xuan Wang <yongxuan.wang@sifive.com>
-To:     qemu-devel@nongnu.org, qemu-riscv@nongnu.org
-Cc:     rkanwal@rivosinc.com, anup@brainfault.org,
-        dbarboza@ventanamicro.com, atishp@atishpatra.org,
-        vincent.chen@sifive.com, greentime.hu@sifive.com,
-        frank.chang@sifive.com, jim.shu@sifive.com,
-        Yong-Xuan Wang <yongxuan.wang@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Alistair Francis <alistair.francis@wdc.com>,
-        Bin Meng <bin.meng@windriver.com>,
-        Weiwei Li <liweiwei@iscas.ac.cn>,
-        Liu Zhiwei <zhiwei_liu@linux.alibaba.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Subject: [PTACH v2 4/6] target/riscv: Create an KVM AIA irqchip
-Date:   Fri,  5 May 2023 11:39:39 +0000
-Message-Id: <20230505113946.23433-5-yongxuan.wang@sifive.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20230505113946.23433-1-yongxuan.wang@sifive.com>
-References: <20230505113946.23433-1-yongxuan.wang@sifive.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+        d=1e100.net; s=20221208; t=1683290588; x=1685882588;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=GStTkfOoiU+0hr7MDdtqXSTUxV8ZSA6iP9d3CFL1FGo=;
+        b=dNNwDSECxwUJ+zmxdHMdWA4RrlwSW4SGzAmBm4swzFG2z7RhUpL0zBdOVTGSbyHIsv
+         oFXVkVM4T5/aeFquOirBfrV3YaecQNYrScNXMgbS0HEZ0aRZj1iLXr9Ts5RLeStb2Dy6
+         RKTyHXGDjPrBG4ZP/kEgsLpDnd00mH+dOTGJy83GxySLH100dExLaenpHYGG7fDn3mma
+         lT0rJBpkrjjYTnKPQkbviltVWhI365BdQFTEcnu7twXut0eDljkn9mBddqZar60fVnWa
+         ZcCuGmlD5gbiqPLIqHJPWVNVSQAzw588J00yvwjrYLHjcDVWtscd5Cmbtg2uJDGXz8BT
+         0bfg==
+X-Gm-Message-State: AC+VfDz0DwIlehX3ORYY6Vw1/aJvn8BzIJjIqG+PMmvcDjg7+ZM/VHKX
+        9TBLTe4CtHtjtvGmi0R3SpnuqWju1fSe6yu7uCJOW3XwlpyLpJe/
+X-Google-Smtp-Source: ACHHUZ5teUgO1Lm0yqQ6Lyi3wZWasNapmOMABzH8ycEs1GsFZg+rmNkygD4B+fDOt1tfFDZeXVynXrK9dwvlxuhNkBE=
+X-Received: by 2002:a17:90b:713:b0:250:5f4:5652 with SMTP id
+ s19-20020a17090b071300b0025005f45652mr1275135pjz.39.1683290588284; Fri, 05
+ May 2023 05:43:08 -0700 (PDT)
+MIME-Version: 1.0
+References: <1679555884-32544-1-git-send-email-lirongqing@baidu.com> <b8facaa4-7dc3-7f2c-e25b-16503c4bfae7@gmail.com>
+In-Reply-To: <b8facaa4-7dc3-7f2c-e25b-16503c4bfae7@gmail.com>
+From:   zhuangel570 <zhuangel570@gmail.com>
+Date:   Fri, 5 May 2023 20:42:56 +0800
+Message-ID: <CANZk6aTqiOtJiriSUtZ3myod5hcbV8fb7NA8O2YmUo5PrFyTYw@mail.gmail.com>
+Subject: Re: [PATCH] KVM: x86/mmu: Don't create kvm-nx-lpage-re kthread if not itlb_multihit
+To:     Robert Hoo <robert.hoo.linux@gmail.com>
+Cc:     lirongqing@baidu.com, seanjc@google.com, pbonzini@redhat.com,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com, kvm@vger.kernel.org, x86@kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
+        FREEMAIL_FROM,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-implement a function to create an KVM AIA chip
+FYI, this is our test scenario, simulating the FaaS business, every VM assi=
+gn
+0.1 core, starting lots VMs run in backgroud (such as 800 VM on a machine
+with 80 cores), then burst create 10 VMs, then got 100ms+ latency in creati=
+ng
+"kvm-nx-lpage-recovery".
 
-Signed-off-by: Yong-Xuan Wang <yongxuan.wang@sifive.com>
-Reviewed-by: Jim Shu <jim.shu@sifive.com>
----
- target/riscv/kvm.c       | 83 ++++++++++++++++++++++++++++++++++++++++
- target/riscv/kvm_riscv.h |  3 ++
- 2 files changed, 86 insertions(+)
+On Tue, May 2, 2023 at 10:20=E2=80=AFAM Robert Hoo <robert.hoo.linux@gmail.=
+com> wrote:
+>
+> On 3/23/2023 3:18 PM, lirongqing@baidu.com wrote:
+> > From: Li RongQing <lirongqing@baidu.com>
+> >
+> > if CPU has not X86_BUG_ITLB_MULTIHIT bug, kvm-nx-lpage-re kthread
+> > is not needed to create
+>
+> (directed by Sean from
+> https://lore.kernel.org/kvm/ZE%2FR1%2FhvbuWmD8mw@google.com/ here.)
+>
+> No, I think it should tie to "nx_huge_pages" value rather than
+> directly/partially tie to boot_cpu_has_bug(X86_BUG_ITLB_MULTIHIT).
+> >
+> > Signed-off-by: Li RongQing <lirongqing@baidu.com>
+> > ---
+> >   arch/x86/kvm/mmu/mmu.c | 19 +++++++++++++++++++
+> >   1 file changed, 19 insertions(+)
+> >
+> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> > index 8354262..be98c69 100644
+> > --- a/arch/x86/kvm/mmu/mmu.c
+> > +++ b/arch/x86/kvm/mmu/mmu.c
+> > @@ -6667,6 +6667,11 @@ static bool get_nx_auto_mode(void)
+> >       return boot_cpu_has_bug(X86_BUG_ITLB_MULTIHIT) && !cpu_mitigation=
+s_off();
+> >   }
+> >
+> > +static bool cpu_has_itlb_multihit(void)
+> > +{
+> > +     return boot_cpu_has_bug(X86_BUG_ITLB_MULTIHIT);
+> > +}
+> > +
+> >   static void __set_nx_huge_pages(bool val)
+> >   {
+> >       nx_huge_pages =3D itlb_multihit_kvm_mitigation =3D val;
+> > @@ -6677,6 +6682,11 @@ static int set_nx_huge_pages(const char *val, co=
+nst struct kernel_param *kp)
+> >       bool old_val =3D nx_huge_pages;
+> >       bool new_val;
+> >
+> > +     if (!cpu_has_itlb_multihit()) {
+> > +             __set_nx_huge_pages(false);
+> > +             return 0;
+> > +     }
+> > +
+> It's rude simply return here just because
+> !boot_cpu_has_bug(X86_BUG_ITLB_MULTIHIT), leaving all else behind, i.e.
+> leaving below sysfs node useless.
+> If you meant to do this, you should clear these sysfs APIs because of
+> !boot_cpu_has_bug(X86_BUG_ITLB_MULTIHIT).
+>
+> >       /* In "auto" mode deploy workaround only if CPU has the bug. */
+> >       if (sysfs_streq(val, "off"))
+> >               new_val =3D 0;
+> > @@ -6816,6 +6826,9 @@ static int set_nx_huge_pages_recovery_param(const=
+ char *val, const struct kernel
+> >       uint old_period, new_period;
+> >       int err;
+> >
+> > +     if (!cpu_has_itlb_multihit())
+> > +             return 0;
+> > +
+> >       was_recovery_enabled =3D calc_nx_huge_pages_recovery_period(&old_=
+period);
+> >
+> >       err =3D param_set_uint(val, kp);
+> > @@ -6971,6 +6984,9 @@ int kvm_mmu_post_init_vm(struct kvm *kvm)
+> >   {
+> >       int err;
+> >
+> > +     if (!cpu_has_itlb_multihit())
+> > +             return 0;
+> > +
+> It's rude to simply return. kvm_mmu_post_init_vm() by name is far more th=
+an
+> nx_hugepage stuff, though at present only this stuff in.
+> I would rather
+>
+>         if (cpu_has_itlb_multihit()) {
+>                 ...
+>         }
+>
+> Consider people in the future when they do modifications on this function=
+.
+> >       err =3D kvm_vm_create_worker_thread(kvm, kvm_nx_huge_page_recover=
+y_worker, 0,
+> >                                         "kvm-nx-lpage-recovery",
+> >                                         &kvm->arch.nx_huge_page_recover=
+y_thread);
+> > @@ -6982,6 +6998,9 @@ int kvm_mmu_post_init_vm(struct kvm *kvm)
+> >
+> >   void kvm_mmu_pre_destroy_vm(struct kvm *kvm)
+> >   {
+> > +     if (!cpu_has_itlb_multihit())
+> > +             return;
+> > Ditto. It looks (wrongly) like: if !cpu_has_itlb_multihit(), no need to=
+ do
+> anything about pre_destroy_vm.
+>
+> >       if (kvm->arch.nx_huge_page_recovery_thread)
+> >               kthread_stop(kvm->arch.nx_huge_page_recovery_thread);
+> >   }
+>
+> To summary, regardless of the concrete patch/implementation, what Sean mo=
+re
+> urgently needs is real world justification to mitigate NX_hugepage; which=
+ I
+> believe you have at hand: why would you like to do this, what real world
+> issue caused by this bothers you. You could have more descriptions.
+>
+> With regards to NX_hugepage, I see people dislike it [1][2][3], but on HW
+> with itlb_multihit, they've no choice but to use it to mitigate.
+>
+> [1] this patch
+> [2]
+> https://lore.kernel.org/kvm/CANZk6aSv5ta3emitOfWKxaB-JvURBVu-sXqFnCz9PKXh=
+qjbV9w@mail.gmail.com/
+> [3]
+> https://lore.kernel.org/kvm/20220613212523.3436117-1-bgardon@google.com/
+> (merged)
 
-diff --git a/target/riscv/kvm.c b/target/riscv/kvm.c
-index eb469e8ca5..ead121154f 100644
---- a/target/riscv/kvm.c
-+++ b/target/riscv/kvm.c
-@@ -34,6 +34,7 @@
- #include "exec/address-spaces.h"
- #include "hw/boards.h"
- #include "hw/irq.h"
-+#include "hw/intc/riscv_imsic.h"
- #include "qemu/log.h"
- #include "hw/loader.h"
- #include "kvm_riscv.h"
-@@ -548,3 +549,85 @@ bool kvm_arch_cpu_check_are_resettable(void)
- void kvm_arch_accel_class_init(ObjectClass *oc)
- {
- }
-+
-+void kvm_riscv_aia_create(DeviceState *aplic_s, bool msimode, int socket,
-+                          uint64_t aia_irq_num, uint64_t hart_count,
-+                          uint64_t aplic_base, uint64_t imsic_base)
-+{
-+    int ret;
-+    int aia_fd = -1;
-+    uint64_t aia_mode;
-+    uint64_t aia_nr_ids;
-+    uint64_t aia_hart_bits = find_last_bit(&hart_count, BITS_PER_LONG) + 1;
-+
-+    if (!msimode) {
-+        error_report("Currently KVM AIA only supports aplic_imsic mode");
-+        exit(1);
-+    }
-+
-+    aia_fd = kvm_create_device(kvm_state, KVM_DEV_TYPE_RISCV_AIA, false);
-+
-+    if (aia_fd < 0) {
-+        error_report("Unable to create in-kernel irqchip");
-+        exit(1);
-+    }
-+
-+    ret = kvm_device_access(aia_fd, KVM_DEV_RISCV_AIA_GRP_CONFIG,
-+                            KVM_DEV_RISCV_AIA_CONFIG_MODE,
-+                            &aia_mode, false, NULL);
-+
-+    ret = kvm_device_access(aia_fd, KVM_DEV_RISCV_AIA_GRP_CONFIG,
-+                            KVM_DEV_RISCV_AIA_CONFIG_IDS,
-+                            &aia_nr_ids, false, NULL);
-+
-+    ret = kvm_device_access(aia_fd, KVM_DEV_RISCV_AIA_GRP_CONFIG,
-+                            KVM_DEV_RISCV_AIA_CONFIG_SRCS,
-+                            &aia_irq_num, true, NULL);
-+    if (ret < 0) {
-+        error_report("KVM AIA: fail to set number input irq lines");
-+        exit(1);
-+    }
-+
-+    ret = kvm_device_access(aia_fd, KVM_DEV_RISCV_AIA_GRP_CONFIG,
-+                            KVM_DEV_RISCV_AIA_CONFIG_HART_BITS,
-+                            &aia_hart_bits, true, NULL);
-+    if (ret < 0) {
-+        error_report("KVM AIA: fail to set number of harts");
-+        exit(1);
-+    }
-+
-+    ret = kvm_device_access(aia_fd, KVM_DEV_RISCV_AIA_GRP_ADDR,
-+                            KVM_DEV_RISCV_AIA_ADDR_APLIC,
-+                            &aplic_base, true, NULL);
-+    if (ret < 0) {
-+        error_report("KVM AIA: fail to set the base address of APLIC");
-+        exit(1);
-+    }
-+
-+    for (int i = 0; i < hart_count; i++) {
-+        uint64_t imsic_addr = imsic_base + i * IMSIC_HART_SIZE(0);
-+        ret = kvm_device_access(aia_fd, KVM_DEV_RISCV_AIA_GRP_ADDR,
-+                                KVM_DEV_RISCV_AIA_ADDR_IMSIC(i),
-+                                &imsic_addr, true, NULL);
-+        if (ret < 0) {
-+            error_report("KVM AIA: fail to set the base address of IMSICs");
-+            exit(1);
-+        }
-+    }
-+
-+    if (kvm_has_gsi_routing()) {
-+        for (uint64_t idx = 0; idx < aia_irq_num + 1; ++idx) {
-+            kvm_irqchip_add_irq_route(kvm_state, idx, socket, idx);
-+        }
-+        kvm_gsi_routing_allowed = true;
-+        kvm_irqchip_commit_routes(kvm_state);
-+    }
-+
-+    ret = kvm_device_access(aia_fd, KVM_DEV_RISCV_AIA_GRP_CTRL,
-+                            KVM_DEV_RISCV_AIA_CTRL_INIT,
-+                            NULL, true, NULL);
-+    if (ret < 0) {
-+        error_report("KVM AIA: initialized fail");
-+        exit(1);
-+    }
-+}
-diff --git a/target/riscv/kvm_riscv.h b/target/riscv/kvm_riscv.h
-index ed281bdce0..d8d7256852 100644
---- a/target/riscv/kvm_riscv.h
-+++ b/target/riscv/kvm_riscv.h
-@@ -21,5 +21,8 @@
- 
- void kvm_riscv_reset_vcpu(RISCVCPU *cpu);
- void kvm_riscv_set_irq(RISCVCPU *cpu, int irq, int level);
-+void kvm_riscv_aia_create(DeviceState *aplic_s, bool msimode, int socket,
-+                          uint64_t aia_irq_num, uint64_t hart_count,
-+                          uint64_t aplic_base, uint64_t imsic_base);
- 
- #endif
--- 
-2.17.1
 
+
+--=20
+=E2=80=94=E2=80=94=E2=80=94=E2=80=94=E2=80=94=E2=80=94=E2=80=94=E2=80=94=E2=
+=80=94=E2=80=94
+   zhuangel570
+=E2=80=94=E2=80=94=E2=80=94=E2=80=94=E2=80=94=E2=80=94=E2=80=94=E2=80=94=E2=
+=80=94=E2=80=94
