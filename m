@@ -2,173 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F17A96F85AB
-	for <lists+kvm@lfdr.de>; Fri,  5 May 2023 17:29:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 542F36F85E2
+	for <lists+kvm@lfdr.de>; Fri,  5 May 2023 17:34:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232778AbjEEP3I (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 5 May 2023 11:29:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59334 "EHLO
+        id S232971AbjEEPe0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 5 May 2023 11:34:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35760 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232033AbjEEP3D (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 5 May 2023 11:29:03 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE2592D7C
-        for <kvm@vger.kernel.org>; Fri,  5 May 2023 08:28:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1683300497;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+        with ESMTP id S232791AbjEEPeY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 5 May 2023 11:34:24 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69CB811A
+        for <kvm@vger.kernel.org>; Fri,  5 May 2023 08:34:23 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 0E99F22874;
+        Fri,  5 May 2023 15:34:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1683300862; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=j9OUu/Zp5pTyzfVNholQKc+bsN1aJ2Nzh0OYi9UsbYY=;
-        b=YMWdyuqlYbxesaMq3w2xkutiU8ZLcR5KJl8i+GedIyEud2GDKdBRuZs5Lw5B4TdARwFTy3
-        ZAxfe2zWfiLYBs9jEuZlVi0AsQZmIO1dTmsY+EhtkIE6KMg9KJiN4Z10rj8C05mTggyi50
-        gSvezuY00ISSDm7hCeUTGzSXqYk02HY=
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com
- [209.85.166.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-120-728gL7rvP7K3t-QryS8eSQ-1; Fri, 05 May 2023 11:28:14 -0400
-X-MC-Unique: 728gL7rvP7K3t-QryS8eSQ-1
-Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-331195f31acso25474705ab.3
-        for <kvm@vger.kernel.org>; Fri, 05 May 2023 08:28:14 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683300494; x=1685892494;
-        h=content-transfer-encoding:mime-version:organization:references
-         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=j9OUu/Zp5pTyzfVNholQKc+bsN1aJ2Nzh0OYi9UsbYY=;
-        b=JtNW6kcPKoiXkrPOj5q6bLFcQtWdDDiZcnmthJ5KmM2ANhLN7xx+OwjR0Y47n+6+5I
-         +U63iPOl9JYPbZF3wE8cqkI1MwF/vEk5hykBicnOh5evPdMy6rVlUQamHer0gCN2JKf/
-         7uFIs/QV+1xg8imOc/Sj5KGRqLxJV73Q5F2wwgdF4bCP5/dHbyKI0osaxlz5696C1OnW
-         7R4n3KaUFkJsolO2ayqVF+v4Wd7CtAE4doHVi4WywrFG1S07IXicHQEnv4bcSbp4Ousi
-         IHVFaBghjF2alIuUoF8DvbmkFGq1YyT7f+5WFp8NLaJRoY844l5DMFbP7AFnFcHF8COu
-         Qotw==
-X-Gm-Message-State: AC+VfDzud6JNkXa0jtEKE+gWa3hAAz6HLjYexjC0T7kfN91ZWJzpk9r3
-        pLTXNLIcO8dQWmbkSzraKoKtlYhohB54cIA+pCa39/sSJKajFEzFLTTUzgD5ob4N2szx3df1Iu6
-        UxHcuuCVfUasW
-X-Received: by 2002:a92:de0f:0:b0:331:7203:b8b0 with SMTP id x15-20020a92de0f000000b003317203b8b0mr1429707ilm.3.1683300493938;
-        Fri, 05 May 2023 08:28:13 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ64AzOZHOg/VekzzXWzlouLhgPMhFMfyoILAE3GX07RWSfkRW/Ym2lIe+qRLe9JTSGGpXtYww==
-X-Received: by 2002:a92:de0f:0:b0:331:7203:b8b0 with SMTP id x15-20020a92de0f000000b003317203b8b0mr1429686ilm.3.1683300493688;
-        Fri, 05 May 2023 08:28:13 -0700 (PDT)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id e26-20020a0566380cda00b0040f9c6ffb6fsm18536jak.76.2023.05.05.08.28.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 May 2023 08:28:13 -0700 (PDT)
-Date:   Fri, 5 May 2023 09:28:08 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     "Tian, Kevin" <kevin.tian@intel.com>
-Cc:     "Chatre, Reinette" <reinette.chatre@intel.com>,
-        "jgg@nvidia.com" <jgg@nvidia.com>,
-        "yishaih@nvidia.com" <yishaih@nvidia.com>,
-        "shameerali.kolothum.thodi@huawei.com" 
-        <shameerali.kolothum.thodi@huawei.com>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "darwi@linutronix.de" <darwi@linutronix.de>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Jiang, Dave" <dave.jiang@intel.com>,
-        "Liu, Jing2" <jing2.liu@intel.com>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "Yu, Fenghua" <fenghua.yu@intel.com>,
-        "tom.zanussi@linux.intel.com" <tom.zanussi@linux.intel.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH V4 10/11] vfio/pci: Support dynamic MSI-X
-Message-ID: <20230505092808.5c36e1f6.alex.williamson@redhat.com>
-In-Reply-To: <BN9PR11MB5276ED7B47909222093E92438C729@BN9PR11MB5276.namprd11.prod.outlook.com>
-References: <cover.1682615447.git.reinette.chatre@intel.com>
-        <c4c582970fbeaf4b6000845c400aa4c6b7bb2f13.1682615447.git.reinette.chatre@intel.com>
-        <BN9PR11MB5276B67702AACB0B5BF1EC0A8C6B9@BN9PR11MB5276.namprd11.prod.outlook.com>
-        <296ec21f-fc7d-eaf2-484c-27ae8815c5a8@intel.com>
-        <BN9PR11MB5276ED7B47909222093E92438C729@BN9PR11MB5276.namprd11.prod.outlook.com>
-Organization: Red Hat
+        bh=amgb/S45FvJcm5JMcL1KEBjpNVbGpOR+FYQgsdablTM=;
+        b=Vi4Jh1NAnwil3SZTzfCuv01DlU2Sft7MMDCFeNeKQntflE/JoOjWE5UBsPimzTZZ5DYHod
+        nR47hPLkPId1V5Ntr/A9HvQuwIZHr2MwL6mghnUe2ynTQZMzdNkHNhaRgt+9V317X8p7kj
+        hSM+9yX6tbL8ljZExA737veIY3pjhGY=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1683300862;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=amgb/S45FvJcm5JMcL1KEBjpNVbGpOR+FYQgsdablTM=;
+        b=4mLoQ1+UkJJfwzR7TBe2GY8fU5plF9Q3dtscZbuRWivSlV4lqF6QR8sXojqxIwRW5qeNuf
+        5K2S2wxNu0uAc7Ag==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id CADD113488;
+        Fri,  5 May 2023 15:34:21 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id HZ0kMP0hVWRqEwAAMHmgww
+        (envelope-from <jroedel@suse.de>); Fri, 05 May 2023 15:34:21 +0000
+Date:   Fri, 5 May 2023 17:34:20 +0200
+From:   =?iso-8859-1?Q?J=F6rg_R=F6del?= <jroedel@suse.de>
+To:     Claudio Carvalho <cclaudio@linux.ibm.com>
+Cc:     Tom Lendacky <thomas.lendacky@amd.com>, amd-sev-snp@lists.suse.com,
+        linux-coco@lists.linux.dev, kvm@vger.kernel.org,
+        Carlos Bilbao <carlos.bilbao@amd.com>,
+        Klaus Kiwi <kkiwi@redhat.com>
+Subject: Re: [ANNOUNCEMENT] COCONUT Secure VM Service Module for SEV-SNP
+Message-ID: <ZFUh/KlLXJF+2hoJ@suse.de>
+References: <ZBl4592947wC7WKI@suse.de>
+ <4420d7e5-d05f-8c31-a0f2-587ebb7eaa20@amd.com>
+ <ZFJTDtMK0QqXK5+E@suse.de>
+ <cc22183359d107dc0be58b4f9509c8d785313879.camel@linux.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <cc22183359d107dc0be58b4f9509c8d785313879.camel@linux.ibm.com>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 5 May 2023 08:10:33 +0000
-"Tian, Kevin" <kevin.tian@intel.com> wrote:
+Hi Claudio,
 
-> > From: Chatre, Reinette <reinette.chatre@intel.com>
-> > Sent: Saturday, April 29, 2023 2:35 AM
-> > 
-> > Hi Kevin,
-> > 
-> > On 4/27/2023 11:50 PM, Tian, Kevin wrote:  
-> > >> From: Chatre, Reinette <reinette.chatre@intel.com>
-> > >> Sent: Friday, April 28, 2023 1:36 AM
-> > >>
-> > >> pci_msix_alloc_irq_at() enables an individual MSI-X interrupt to be
-> > >> allocated after MSI-X enabling.
-> > >>
-> > >> Use dynamic MSI-X (if supported by the device) to allocate an interrupt
-> > >> after MSI-X is enabled. An MSI-X interrupt is dynamically allocated at
-> > >> the time a valid eventfd is assigned. This is different behavior from
-> > >> a range provided during MSI-X enabling where interrupts are allocated
-> > >> for the entire range whether a valid eventfd is provided for each
-> > >> interrupt or not.
-> > >>
-> > >> The PCI-MSIX API requires that some number of irqs are allocated for
-> > >> an initial set of vectors when enabling MSI-X on the device. When
-> > >> dynamic MSIX allocation is not supported, the vector table, and thus
-> > >> the allocated irq set can only be resized by disabling and re-enabling
-> > >> MSI-X with a different range. In that case the irq allocation is
-> > >> essentially a cache for configuring vectors within the previously
-> > >> allocated vector range. When dynamic MSI-X allocation is supported,
-> > >> the API still requires some initial set of irqs to be allocated, but
-> > >> also supports allocating and freeing specific irq vectors both
-> > >> within and beyond the initially allocated range.
-> > >>
-> > >> For consistency between modes, as well as to reduce latency and improve
-> > >> reliability of allocations, and also simplicity, this implementation
-> > >> only releases irqs via pci_free_irq_vectors() when either the interrupt
-> > >> mode changes or the device is released.  
-> > >
-> > > It improves the reliability of allocations from the calling device p.o.v.
-> > >
-> > > But system-wide this is not efficient use of irqs and not releasing them
-> > > timely may affect the reliability of allocations for other devices.  
-> > 
-> > Could you please elaborate how other devices may be impacted?  
-> 
-> the more this devices reserves the less remains for others, e.g. irte entries.
-> 
-> >   
-> > > Should this behavior be something configurable?  
-> > 
-> > This is not clear to me and I look to you for guidance here. From practical
-> > side it looks like configuration via module parameters is supported but
-> > whether it should be done is not clear to me.
-> > 
-> > When considering this we need to think about what the user may expect
-> > when
-> > turning on/off the configuration. For example, MSI-X continues to allocate a
-> > range of interrupts during enabling. These have always been treated as a
-> > "cache" (interrupts remain allocated, whether they have an associated
-> > trigger
-> > or not). If there is new configurable behavior, do you expect that the
-> > driver needs to distinguish between the original "cache" that the user is
-> > used to and the new dynamic allocations? That is, should a dynamic MSI-X
-> > capable device always free interrupts when user space removes an eventfd
-> > or should only interrupts that were allocated dynamically be freed
-> > dynamically?  
-> 
-> That looks tricky. Probably that is why Alex suggested doing this simple
-> scheme and it is on par with the old logic anyway. So I'll withdraw this
-> comment.
+On Wed, May 03, 2023 at 12:51:17PM -0400, Claudio Carvalho wrote:
+> Thanks. I would be happy to collaborate in that discussion.
 
-Don't forget we're also releasing the irq reservations when the guest
-changes interrupt mode, ex. reboot, so the "caching" is really only
-within a session of the guest/userspace driver where it would be
-unusual to have an unused reservation for an extended period.  Thanks,
+Great, I will send out that email early next week to get the discussion
+rolling.
 
-Alex
+> I think the crypto support requires more design discussion since it is required
+> in multiple places.
+> 
+> The experience I've had adding SVSM-vTPM support is that the SVSM needs crypto
+> for requesting an attestation report (SNP_GUEST_REQUEST messages sent to the
+> security processor PSP have to be encrypted with AES_GCM) and the vTPM also
+> needs crypto for the TPM crypto operations. We could just duplicate the crypto
+> library, or find a way to share it (e.g. vdso approach).
+> 
+> For the SVSM, it would be rust code talking to the crypto library; for the vTPM
+> it would be the vTPM (most likely an existing C implementation) talking to the
+> crypto library.
+
+Right, where to place and how to share the crypto code needs more
+discussion, there are multiple possible approaches. I have seen that you
+have a talk at KVM Forum, so we can meet there in a larger group and
+discuss those and other questions in person.
+
+I think from this thread and other discussions happening it became clear
+that there are currently a lot of different opinions on what the SVSM
+should do and how it should look like. It would be great if we as a
+community can get closer together on those questions (which is certainly
+helpful for combining efforts).
+
+Regards,
+
+-- 
+Jörg Rödel
+jroedel@suse.de
+
+SUSE Software Solutions Germany GmbH
+Frankenstraße 146
+90461 Nürnberg
+Germany
+
+(HRB 36809, AG Nürnberg)
+Geschäftsführer: Ivo Totev, Andrew Myers, Andrew McDonald, Boudien Moerman
 
