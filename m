@@ -2,208 +2,171 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EFBBC6F832B
-	for <lists+kvm@lfdr.de>; Fri,  5 May 2023 14:43:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 693056F8407
+	for <lists+kvm@lfdr.de>; Fri,  5 May 2023 15:29:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232024AbjEEMnL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 5 May 2023 08:43:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52594 "EHLO
+        id S232240AbjEEN3J (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 5 May 2023 09:29:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53696 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229570AbjEEMnJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 5 May 2023 08:43:09 -0400
-Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED1CA17FC3
-        for <kvm@vger.kernel.org>; Fri,  5 May 2023 05:43:08 -0700 (PDT)
-Received: by mail-pj1-x1032.google.com with SMTP id 98e67ed59e1d1-24df6bbf765so1595886a91.0
-        for <kvm@vger.kernel.org>; Fri, 05 May 2023 05:43:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1683290588; x=1685882588;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=GStTkfOoiU+0hr7MDdtqXSTUxV8ZSA6iP9d3CFL1FGo=;
-        b=pmEWFc/ew8zSposLiGEZ90/j1VPeDhssFdSIbByKXdc2fkS+yE8qSC1JpQS07KI/Kg
-         kPidQBtTG60ddFFwnguLI1Z2xULeRa5aBq1y32dTdBZ9vlyrzvFPZrwiNqMF35vcyjsy
-         grj/yETluR+Q+F+h7Y97+pyKUVq7Kpn2Qh+1MUz56l2CuQep5hTPCTc8/n0pZ4bQldjP
-         VSCB7T3jJbCSc1y1iPt1LACdqDBS1A+KTCftGAk/o4Qx0GIJzislM7imcQfVQQ9fq8kO
-         GOkwbxutmtQkNNP9EsjBd6K76xY2SKnHnmA0h+J69cZwrSVbfv6H4hk8fAQxa5c3fxh/
-         vVjg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683290588; x=1685882588;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=GStTkfOoiU+0hr7MDdtqXSTUxV8ZSA6iP9d3CFL1FGo=;
-        b=dNNwDSECxwUJ+zmxdHMdWA4RrlwSW4SGzAmBm4swzFG2z7RhUpL0zBdOVTGSbyHIsv
-         oFXVkVM4T5/aeFquOirBfrV3YaecQNYrScNXMgbS0HEZ0aRZj1iLXr9Ts5RLeStb2Dy6
-         RKTyHXGDjPrBG4ZP/kEgsLpDnd00mH+dOTGJy83GxySLH100dExLaenpHYGG7fDn3mma
-         lT0rJBpkrjjYTnKPQkbviltVWhI365BdQFTEcnu7twXut0eDljkn9mBddqZar60fVnWa
-         ZcCuGmlD5gbiqPLIqHJPWVNVSQAzw588J00yvwjrYLHjcDVWtscd5Cmbtg2uJDGXz8BT
-         0bfg==
-X-Gm-Message-State: AC+VfDz0DwIlehX3ORYY6Vw1/aJvn8BzIJjIqG+PMmvcDjg7+ZM/VHKX
-        9TBLTe4CtHtjtvGmi0R3SpnuqWju1fSe6yu7uCJOW3XwlpyLpJe/
-X-Google-Smtp-Source: ACHHUZ5teUgO1Lm0yqQ6Lyi3wZWasNapmOMABzH8ycEs1GsFZg+rmNkygD4B+fDOt1tfFDZeXVynXrK9dwvlxuhNkBE=
-X-Received: by 2002:a17:90b:713:b0:250:5f4:5652 with SMTP id
- s19-20020a17090b071300b0025005f45652mr1275135pjz.39.1683290588284; Fri, 05
- May 2023 05:43:08 -0700 (PDT)
+        with ESMTP id S232059AbjEEN3H (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 5 May 2023 09:29:07 -0400
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2074.outbound.protection.outlook.com [40.107.220.74])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3CE831C0DA;
+        Fri,  5 May 2023 06:29:06 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=OHGAI4k1O6GwuqQ+tgMDZBmH6G+wOieKD39RS+A8Q6BkncVufNZNZuEdOK8JXbKyJcdUKHxMCH4ml9hErE70YizqCCnoRRcmGifB5a3libd+mlxeTXC+q5V/HQM7mgRi6Xal8aSy+TU7xClbVcV/2xerB5btJOFZTsx/p/rCTifqpdBeo/1B2bWvlQ75vXd4bAd09wGy6Hws9Vf/+j9utxM9w4AVQkzZndUkzppzTvw+umCmnLJCGj/8Ga6xxgLzMEY8Qwm6aepCBgxYDZ7R1tiMLCu3F1ZboeuFbcmi62C3MZ2rkSEr/OXopmzx0+js1NPK/Kq+dAn2Bma9qM7OYw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=wnG3M32av9R70Qt39G1elqB1ccsFRaF9Lkp0oRUs/ZY=;
+ b=JILTdSMQD72exbn7BsqGJGFEDsqLaHP/J5pTu7r/rz6eWAakYgSq4teVTZVKP50lOkqKuthQdYFaeqUCQESE4n5T6QanPYC0vOEhDeaccHCt4CsDXwt328zW5y+jIFPd+CB2Pi3DphL0hB0neAknHRhaCLktS+jjy4xc0D6Im2r3vrjYPohA8KLTllgbJJgr/rvTH4gC5Sx8Gm0FyWL5LExipngiaZqfYVGFPxiuEXedOJm59VDz1oRzbVTfvKveSR2JNIfZrF0x8qqVAfs5PxzYMlegOEj2CdeJWM5t4wSeKDD3fwrlXZo31gg9n15igivo5JaZr0gZ/Z4FRbw/uw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=wnG3M32av9R70Qt39G1elqB1ccsFRaF9Lkp0oRUs/ZY=;
+ b=GlqHvwz7N22vtxsAHl21lvh/bMkpksUnFqlIvfjdZib3tz/q+4BSuO6Ucod8ZDiIvTEbIUK0EwQizinln3pOSvjg72T6+x0YznAucOQ+k+zr7klyGhSHWFXNXAq28sP1Iearp2+3yJE+IuFj94qeevj0zmDOz5ZWmc/cLy/isjk/TNJdK51ql0fqfM8g15w9ZUovtogKKK+DqWIfW2r16MYBtdi7ZM+UbXkcIEB+2mqrpF8ZV6uCXpyBA+XEBfq3joVpAq7q7csmx6DckE5CbOifqYDD9PO4HL9r6IpjeX2c3vyuFdTJOO5ABV8Cvnm+IxEKVkngJQ9qFT/qu3irsQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by PH7PR12MB8154.namprd12.prod.outlook.com (2603:10b6:510:2b9::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6363.26; Fri, 5 May
+ 2023 13:29:03 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::f7a7:a561:87e9:5fab]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::f7a7:a561:87e9:5fab%6]) with mapi id 15.20.6363.027; Fri, 5 May 2023
+ 13:29:03 +0000
+Date:   Fri, 5 May 2023 10:29:02 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Jakub Kicinski <kuba@kernel.org>
+Cc:     Brett Creeley <brett.creeley@amd.com>, kvm@vger.kernel.org,
+        netdev@vger.kernel.org, alex.williamson@redhat.com,
+        yishaih@nvidia.com, shameerali.kolothum.thodi@huawei.com,
+        kevin.tian@intel.com, shannon.nelson@amd.com, drivers@pensando.io
+Subject: Re: [PATCH v9 vfio 2/7] vfio/pds: Initial support for pds_vfio VFIO
+ driver
+Message-ID: <ZFUEnvDYZVJnPwQa@nvidia.com>
+References: <20230422010642.60720-1-brett.creeley@amd.com>
+ <20230422010642.60720-3-brett.creeley@amd.com>
+ <ZFPq0xdDWKYFDcTz@nvidia.com>
+ <20230504132001.32b72926@kernel.org>
+ <ZFQ0sqSmJuzLXLbu@nvidia.com>
+ <20230504164005.16fb3deb@kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230504164005.16fb3deb@kernel.org>
+X-ClientProxiedBy: MN2PR15CA0041.namprd15.prod.outlook.com
+ (2603:10b6:208:237::10) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
 MIME-Version: 1.0
-References: <1679555884-32544-1-git-send-email-lirongqing@baidu.com> <b8facaa4-7dc3-7f2c-e25b-16503c4bfae7@gmail.com>
-In-Reply-To: <b8facaa4-7dc3-7f2c-e25b-16503c4bfae7@gmail.com>
-From:   zhuangel570 <zhuangel570@gmail.com>
-Date:   Fri, 5 May 2023 20:42:56 +0800
-Message-ID: <CANZk6aTqiOtJiriSUtZ3myod5hcbV8fb7NA8O2YmUo5PrFyTYw@mail.gmail.com>
-Subject: Re: [PATCH] KVM: x86/mmu: Don't create kvm-nx-lpage-re kthread if not itlb_multihit
-To:     Robert Hoo <robert.hoo.linux@gmail.com>
-Cc:     lirongqing@baidu.com, seanjc@google.com, pbonzini@redhat.com,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, kvm@vger.kernel.org, x86@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-        FREEMAIL_FROM,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|PH7PR12MB8154:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8d09b628-158f-4079-9bbf-08db4d6cb194
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: /xoBn3eI7n5hFIoVkbs6BbQYneuCGjYXhkRpMh+CEEYXPWrIKC2yxVb4KwGkz4azdHpPLwKFP/yB8rfRVT+QcwugcJQBRwTpfeRGl+iPnc98C+oYOM5kCFyeGWPYFqLrV23skorPuYWXXDDNPWxToNK5Hgkwgj8IVi2RsLhZzFvYZ2Cx7FDYhLmR4yaUDqrxN4Aaq/Ca2tnD+9kqQMbh5LavVLtSIqp5Nttb8cwayzchWRq8q0HmNbBm8VHXIBJLeKK0wE4PEMqlr1FK7DdOae4rehOJldGZjPdv44IF7IVWS616XyowRiRev3uSTORKzL2BGWV1sIUWDSSOTvcH5V2PkwlpPRxybWdDB5ARbnruex4QytYaQNlfrJbcWW6gcFExokKBjgZvPhmM3Yo5pkQGG7oGgj5gClrbbyB+CtxKF+BsXOBFty2xaZZSasDQFPat/bk9RcheRELXTWRrmwiZ23FJK5YVYiQ657qwhrdelC8B1+haJuDFnRslSUVsWKdABj+FMhpMsLLjixXPqH8g3WwdXtLyFerZPmOFS9AxwnqThyJmvjeQwhxldPoC
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(376002)(366004)(136003)(396003)(39860400002)(346002)(451199021)(6512007)(26005)(6506007)(186003)(478600001)(38100700002)(41300700001)(6486002)(36756003)(5660300002)(8936002)(8676002)(2616005)(316002)(66556008)(6916009)(66476007)(66946007)(4326008)(2906002)(86362001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?Gw/drR9UHCI6fiMtez6TTBsJ69tt3uXINesSTP+X1Tucvkx6LaTVjz98upvW?=
+ =?us-ascii?Q?LEuTa2NXQg5duM+/G/8zOZWxK5vMez9zhyJswHQlq9DtIjT0kRWWQgvyouVd?=
+ =?us-ascii?Q?gy9NqsUNzpvYFKtW0hhXjpsBP63iWZejKJJAkbcwRy1z9gPtdzb+l4/0qR0f?=
+ =?us-ascii?Q?6ZEg+vIf6yqzNYGIFihXFnuMx2xl6dzHUTyABCeOUX11L/prLBNnwdT7CQeb?=
+ =?us-ascii?Q?QWw+tFrvKk+Jguv9vyc1H5BDGVRX3imJS7PZuSbOYephgxcPDFkf4VOntxdo?=
+ =?us-ascii?Q?hYPIuIV+wca713/6HtkNluTNuxwawVF8mc61Nz5XWwtLFTANx2hcGGnUsRq9?=
+ =?us-ascii?Q?ULEPyRHhihdnVQyErnKo8zDty/iob4dnE1ZEYvwWtmG7FsSz1bmyhIOXY5U3?=
+ =?us-ascii?Q?CmT7QE2ERDRgeFuZObAJP6wIPZBXDN7mZo6HSN+FdL7vJToLxtHZhMuP1yPg?=
+ =?us-ascii?Q?J80bX0Oq8/YPhAEkCh3W7t23zTjT3qYv6qyekFvyLGygXNpftz1yWBP+o6Az?=
+ =?us-ascii?Q?YmE3G8+h/egKtPZmzwVfUXD6UiBq0TQB6HtGPSd9kYIj8vY2j2TIgWDv6uMH?=
+ =?us-ascii?Q?DV58AhAH9QAsUbuAUHhKL0JBbW5IOUljoCRBehda6UTloa/anO93A896UOy1?=
+ =?us-ascii?Q?b9LBxjZ8SJIdsFIKwB2hQDFCzuVDbxl6DO3qn0tKLhcP98Fa2hnKspTQ5Kpu?=
+ =?us-ascii?Q?UpOZkLUIvQnoj2ojMPt+mvxmPzJ6NroT9bODLfaB+n0Jq1LsJ8r/2tEJ16x5?=
+ =?us-ascii?Q?Sk/9J+4beYARH9YuTvpBRg6xWAcNa6nkh9S0faoxbKKiyoNIiNR8Wvpr7Snt?=
+ =?us-ascii?Q?jN7mWozvem/qTL84ibPlw34acN2UD8jYlUamIuMUUQlwM3q5JRQX82lQlg8b?=
+ =?us-ascii?Q?oCfIr2UrRGcNZRI61TDRo7zvmq3wo+m3k1oMEYXQbx4v1tzSP7pKdVjCG8cN?=
+ =?us-ascii?Q?SLcECFaXCVdRRT7uyrtuXjRoZ8JWD78wqFdzWpuLY3R1LI09Z/MkEdjTG2QO?=
+ =?us-ascii?Q?6QUZH8s3ZYSTXDW2Qn51MP5QmaqIdcOUnXLM7YMp7bC4YLJfrEKx8KiFqePv?=
+ =?us-ascii?Q?8ZbJ2aLCWKENfoJLev4KkMJSEpTW8alsyqshceatkxwqGo3+pzFY5d03mQir?=
+ =?us-ascii?Q?wxrFAGG52xdEW4w4ETYpFD/I/25h78d5Sxuj0JcuYYkR9J6lD65575rEdHlH?=
+ =?us-ascii?Q?TBfWQu2kXQQVov2KsAPDDU5ST54CrwLQDPCwS4vZNYyNYu8JgnZKi7i2VhZa?=
+ =?us-ascii?Q?5b4EpBuYipSzj2ZZ2W0rtaVU/FSeyuviZB3ZWXvp4+TeHDySugFCOpa+Z1tq?=
+ =?us-ascii?Q?aSWxfcrkV0KdCAgGid0l62JlRr90Wk0O0R2CH6wKGxHWvcXejnn7HxuMNs93?=
+ =?us-ascii?Q?OhDaMDNfo2TK/TlHzOWWbPL5vLeMm9slDkoE/kg+RuyT6WUTUUULxecWk7r8?=
+ =?us-ascii?Q?U5B7LFLud7ADNvwt6nwrcdtZINZO648xIAMKlDBRrFTo1W5F9DE5UUs9b2+X?=
+ =?us-ascii?Q?y2JeFZAqP7rto1TaVR5oo0qx8ryLyl2eEYBy2ATmR6Y2k87VYnpQHCzLLIqp?=
+ =?us-ascii?Q?SPpY4/5j43S8w0ztq+CreYFgQud6cQxVlzL6GVmW?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8d09b628-158f-4079-9bbf-08db4d6cb194
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 May 2023 13:29:03.5938
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: fq/vym8rsIYPWr27Ld+aehtBsbEeR1JYF19IhQrHOPtS2+LM82piyRvrchwslRBS
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB8154
+X-Spam-Status: No, score=-1.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-FYI, this is our test scenario, simulating the FaaS business, every VM assi=
-gn
-0.1 core, starting lots VMs run in backgroud (such as 800 VM on a machine
-with 80 cores), then burst create 10 VMs, then got 100ms+ latency in creati=
-ng
-"kvm-nx-lpage-recovery".
+On Thu, May 04, 2023 at 04:40:05PM -0700, Jakub Kicinski wrote:
+> On Thu, 4 May 2023 19:41:54 -0300 Jason Gunthorpe wrote:
+> > On Thu, May 04, 2023 at 01:20:01PM -0700, Jakub Kicinski wrote:
+> > > On Thu, 4 May 2023 14:26:43 -0300 Jason Gunthorpe wrote:  
+> > > > This GNU style of left aligning the function name should not be
+> > > > in the kernel.  
+> > > 
+> > > FTR that's not a kernel-wide rule. Please scope your coding style
+> > > suggestions to your subsystem, you may confuse people.  
+> > 
+> > It is what Documentation/process/coding-style.rst expects.
+> 
+> A reference to the section? You mean the vague mentions of the GNU
+> coding style? 
 
-On Tue, May 2, 2023 at 10:20=E2=80=AFAM Robert Hoo <robert.hoo.linux@gmail.=
-com> wrote:
->
-> On 3/23/2023 3:18 PM, lirongqing@baidu.com wrote:
-> > From: Li RongQing <lirongqing@baidu.com>
-> >
-> > if CPU has not X86_BUG_ITLB_MULTIHIT bug, kvm-nx-lpage-re kthread
-> > is not needed to create
->
-> (directed by Sean from
-> https://lore.kernel.org/kvm/ZE%2FR1%2FhvbuWmD8mw@google.com/ here.)
->
-> No, I think it should tie to "nx_huge_pages" value rather than
-> directly/partially tie to boot_cpu_has_bug(X86_BUG_ITLB_MULTIHIT).
-> >
-> > Signed-off-by: Li RongQing <lirongqing@baidu.com>
-> > ---
-> >   arch/x86/kvm/mmu/mmu.c | 19 +++++++++++++++++++
-> >   1 file changed, 19 insertions(+)
-> >
-> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> > index 8354262..be98c69 100644
-> > --- a/arch/x86/kvm/mmu/mmu.c
-> > +++ b/arch/x86/kvm/mmu/mmu.c
-> > @@ -6667,6 +6667,11 @@ static bool get_nx_auto_mode(void)
-> >       return boot_cpu_has_bug(X86_BUG_ITLB_MULTIHIT) && !cpu_mitigation=
-s_off();
-> >   }
-> >
-> > +static bool cpu_has_itlb_multihit(void)
-> > +{
-> > +     return boot_cpu_has_bug(X86_BUG_ITLB_MULTIHIT);
-> > +}
-> > +
-> >   static void __set_nx_huge_pages(bool val)
-> >   {
-> >       nx_huge_pages =3D itlb_multihit_kvm_mitigation =3D val;
-> > @@ -6677,6 +6682,11 @@ static int set_nx_huge_pages(const char *val, co=
-nst struct kernel_param *kp)
-> >       bool old_val =3D nx_huge_pages;
-> >       bool new_val;
-> >
-> > +     if (!cpu_has_itlb_multihit()) {
-> > +             __set_nx_huge_pages(false);
-> > +             return 0;
-> > +     }
-> > +
-> It's rude simply return here just because
-> !boot_cpu_has_bug(X86_BUG_ITLB_MULTIHIT), leaving all else behind, i.e.
-> leaving below sysfs node useless.
-> If you meant to do this, you should clear these sysfs APIs because of
-> !boot_cpu_has_bug(X86_BUG_ITLB_MULTIHIT).
->
-> >       /* In "auto" mode deploy workaround only if CPU has the bug. */
-> >       if (sysfs_streq(val, "off"))
-> >               new_val =3D 0;
-> > @@ -6816,6 +6826,9 @@ static int set_nx_huge_pages_recovery_param(const=
- char *val, const struct kernel
-> >       uint old_period, new_period;
-> >       int err;
-> >
-> > +     if (!cpu_has_itlb_multihit())
-> > +             return 0;
-> > +
-> >       was_recovery_enabled =3D calc_nx_huge_pages_recovery_period(&old_=
-period);
-> >
-> >       err =3D param_set_uint(val, kp);
-> > @@ -6971,6 +6984,9 @@ int kvm_mmu_post_init_vm(struct kvm *kvm)
-> >   {
-> >       int err;
-> >
-> > +     if (!cpu_has_itlb_multihit())
-> > +             return 0;
-> > +
-> It's rude to simply return. kvm_mmu_post_init_vm() by name is far more th=
-an
-> nx_hugepage stuff, though at present only this stuff in.
-> I would rather
->
->         if (cpu_has_itlb_multihit()) {
->                 ...
->         }
->
-> Consider people in the future when they do modifications on this function=
-.
-> >       err =3D kvm_vm_create_worker_thread(kvm, kvm_nx_huge_page_recover=
-y_worker, 0,
-> >                                         "kvm-nx-lpage-recovery",
-> >                                         &kvm->arch.nx_huge_page_recover=
-y_thread);
-> > @@ -6982,6 +6998,9 @@ int kvm_mmu_post_init_vm(struct kvm *kvm)
-> >
-> >   void kvm_mmu_pre_destroy_vm(struct kvm *kvm)
-> >   {
-> > +     if (!cpu_has_itlb_multihit())
-> > +             return;
-> > Ditto. It looks (wrongly) like: if !cpu_has_itlb_multihit(), no need to=
- do
-> anything about pre_destroy_vm.
->
-> >       if (kvm->arch.nx_huge_page_recovery_thread)
-> >               kthread_stop(kvm->arch.nx_huge_page_recovery_thread);
-> >   }
->
-> To summary, regardless of the concrete patch/implementation, what Sean mo=
-re
-> urgently needs is real world justification to mitigate NX_hugepage; which=
- I
-> believe you have at hand: why would you like to do this, what real world
-> issue caused by this bothers you. You could have more descriptions.
->
-> With regards to NX_hugepage, I see people dislike it [1][2][3], but on HW
-> with itlb_multihit, they've no choice but to use it to mitigate.
->
-> [1] this patch
-> [2]
-> https://lore.kernel.org/kvm/CANZk6aSv5ta3emitOfWKxaB-JvURBVu-sXqFnCz9PKXh=
-qjbV9w@mail.gmail.com/
-> [3]
-> https://lore.kernel.org/kvm/20220613212523.3436117-1-bgardon@google.com/
-> (merged)
+Here I was looking at the "left indent the function name" - that is a
+GNUism. IIRC the justification is it makes it easy to find the
+function with 'grep "^func"'
 
+Coding style says:
 
+  Descendants are always substantially shorter than the parent and
+  are placed substantially to the right.  A very commonly used style
+  is to align descendants to a function open parenthesis.
 
---=20
-=E2=80=94=E2=80=94=E2=80=94=E2=80=94=E2=80=94=E2=80=94=E2=80=94=E2=80=94=E2=
-=80=94=E2=80=94
-   zhuangel570
-=E2=80=94=E2=80=94=E2=80=94=E2=80=94=E2=80=94=E2=80=94=E2=80=94=E2=80=94=E2=
-=80=94=E2=80=94
+So this patch had things like this:
+
+ +static void
+ +pds_vfio_pci_remove(struct pci_dev *pdev)
+
+The first line is shorter than the second and the second is left not
+right placed. It doesn't even need wrapping.
+
+I know some people like to do this in some parts of the tree
+regardless of coding-style. The GNU idea is sort of reasonable after
+all.
+
+> If the function declaration does not fit in 80 chars breaking the type
+> off as a separate line is often a very reasonable choice.
+
+Reasonable yes, but not "common" :)
+
+> Anyway, I shouldn't complain, networking still has its odd rules.
+> Probably why people making up rules for no strong reason is on my mind.
+
+I usually try to ignore most of the style details, but this one stood
+out. When I checked the series against clang-format it was pretty good
+otherwise. A few minor fine tunings on some line wrapping :)
+
+Jason
