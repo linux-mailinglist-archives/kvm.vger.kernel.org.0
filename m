@@ -2,128 +2,221 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AA81B6F7F4A
-	for <lists+kvm@lfdr.de>; Fri,  5 May 2023 10:42:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1B8E16F8010
+	for <lists+kvm@lfdr.de>; Fri,  5 May 2023 11:35:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231308AbjEEImH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 5 May 2023 04:42:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41620 "EHLO
+        id S231756AbjEEJfO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 5 May 2023 05:35:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42392 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231553AbjEEImC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 5 May 2023 04:42:02 -0400
-Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 744F214922;
-        Fri,  5 May 2023 01:42:00 -0700 (PDT)
-Received: by mail-pf1-x42d.google.com with SMTP id d2e1a72fcca58-6436e075166so1172330b3a.0;
-        Fri, 05 May 2023 01:42:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1683276120; x=1685868120;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NXc+JQG7sjSWV4KJri3HwwYNBJnjv1LP700li+2vJpk=;
-        b=liAzfXMgF8QV+ZOFlitv2hJtS68QoDWaYGNh8NoIcx36fuuhim2DdXllAO4i7tEPzc
-         dS6LxplAUdKdNLxG525Wbs+S6KLYjoBo2J2BolqUDiI0AHnwcBUnXpr/lux1hDLVyqyf
-         X+dUKTPgND7Ei8YAs5tNaASMCWmpgFzeUkhiXFo8MEGSpsEpDHYhrOBOtmrWDGBsN/4J
-         BuweeYGvlgT6402JsCy17TPqGjUTSZTwrgkrx4ou0XkYUSFBtVQyuyj3ihYF5QxboB2h
-         dZ/+rQULLigILUvmKTapkmK/JviuRUy/z2s3dO7C0dZErKlEzGCQi42U8A/1FHsIQWp7
-         v4ew==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683276120; x=1685868120;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=NXc+JQG7sjSWV4KJri3HwwYNBJnjv1LP700li+2vJpk=;
-        b=foW7aRTpIEXD9oYr8V3GvKrEY0prsYJfPUb5+hTXWkn79gACxA3NGDZLpSOI/3fsM1
-         k1HFPcQEMt/0mh60kWYZKiMRQdGPnjD2FNKVxPVLLjaIlSexoTJbo0Dy/fNsbfnR/9hZ
-         OfAb5eZsA33hoP6flfxecPd5+BGnHvxXV5MAbgXVzP4Zv27s9oRZhs5jFTV5woht8peq
-         Pgw4iksIOqL7bcsNq9eQ2WxJHGehQ6STN6hUzWEugnMNTUv4eWymqoHgVcQQCO4ewh+H
-         6rC6JVL58fEs3+F7ze4yt4DlsYGS6W7ii4rfCRjJ8e3wqxv1R9DC/ludm4271BRW695x
-         D7cA==
-X-Gm-Message-State: AC+VfDzIH+Mfw4J7DEjTIjg8Q96KCR71yMkH7WLlSxHu6DWvCleHhADR
-        xD4kpUvmoppTz3IRVKF171E=
-X-Google-Smtp-Source: ACHHUZ4/wnSluHbwWlNwnWEKLOGHEaewPuO5q/mtk1Z+g2fuh0VDKyDR6T7ExAUfLM9Me7+dgr5fTg==
-X-Received: by 2002:a05:6a00:240b:b0:639:28de:a91e with SMTP id z11-20020a056a00240b00b0063928dea91emr1419883pfh.17.1683276119558;
-        Fri, 05 May 2023 01:41:59 -0700 (PDT)
-Received: from localhost.localdomain ([193.203.214.57])
-        by smtp.gmail.com with ESMTPSA id g13-20020aa7874d000000b0063b6bc2be16sm1119416pfo.141.2023.05.05.01.41.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 May 2023 01:41:59 -0700 (PDT)
-From:   ye xingchen <yexingchen116@gmail.com>
-X-Google-Original-From: ye xingchen <ye.xingchen@zte.com.cn>
-To:     jasowang@redhat.com
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org, mst@redhat.com,
-        netdev@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        ye.xingchen@zte.com.cn
-Subject: Re: [PATCH] vhost_net: Use fdget() and fdput()
-Date:   Fri,  5 May 2023 16:41:55 +0800
-Message-Id: <20230505084155.63839-1-ye.xingchen@zte.com.cn>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <CACGkMEsmf3PgxmhgRCsPZe7fRWHDXQ=TtYu5Tgx1=_Ymyvi-pA@mail.gmail.com>
-References: <CACGkMEsmf3PgxmhgRCsPZe7fRWHDXQ=TtYu5Tgx1=_Ymyvi-pA@mail.gmail.com>
+        with ESMTP id S229717AbjEEJfM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 5 May 2023 05:35:12 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4DB1310F3
+        for <kvm@vger.kernel.org>; Fri,  5 May 2023 02:35:11 -0700 (PDT)
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3459TsNL003180;
+        Fri, 5 May 2023 09:34:56 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=s748wXFJcGFtSdTg9Z6/xOU8Wcx0M0o2gF1qGxb2Mtw=;
+ b=L4mf86yGp75qcJMx69qcJvveLAliIkTPmcyq9tCsd1wghOdLWSo4t2PMeO72KAiqYyyq
+ 5ul1PQCdCnFOdkdbXGQQMcfGvDic4XVpYTg8eInfCuSZT3E+xH5Oeb+HPVDgvu4WUYcb
+ JfdFTqwaIQ8PbQtbhx/7avr7j4/I3byEdNJAB+e/LQwASoQBVL48FvDloA9CdwJoXCrM
+ i17C55Tk9X8JxP1ChD8FzUOSJ/6l3KQ+9/2SKpOkLyvqqg8A0DlGH3NIQb3aR8FvurQq
+ tEYSOQvPrEaaehmrRxIQiW2n9kvJzMv4jn1uVLTmts2ohLnHhVsYCAaafvZ0f6hgg15R FA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qcxhshbbe-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 05 May 2023 09:34:55 +0000
+Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3459XR7I017856;
+        Fri, 5 May 2023 09:34:55 GMT
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qcxhshbap-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 05 May 2023 09:34:55 +0000
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3455mjgF013667;
+        Fri, 5 May 2023 09:34:53 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+        by ppma03fra.de.ibm.com (PPS) with ESMTPS id 3q8tv6tsem-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 05 May 2023 09:34:52 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+        by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3459Ylew29098290
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 5 May 2023 09:34:47 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 091562004B;
+        Fri,  5 May 2023 09:34:47 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D99852004F;
+        Fri,  5 May 2023 09:34:45 +0000 (GMT)
+Received: from [9.171.52.9] (unknown [9.171.52.9])
+        by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+        Fri,  5 May 2023 09:34:45 +0000 (GMT)
+Message-ID: <dc7ddef2-8932-406f-7786-b9f6f87a0a71@linux.ibm.com>
+Date:   Fri, 5 May 2023 11:34:45 +0200
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=0.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-        FREEMAIL_FROM,RCVD_IN_DNSWL_NONE,SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.8.0
+Subject: Re: [PATCH v20 06/21] s390x/cpu topology: interception of PTF
+ instruction
+Content-Language: en-US
+To:     Nina Schoetterl-Glausch <nsg@linux.ibm.com>, qemu-s390x@nongnu.org
+Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
+        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
+        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
+        kvm@vger.kernel.org, ehabkost@redhat.com,
+        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
+        seiden@linux.ibm.com, nrb@linux.ibm.com, frankja@linux.ibm.com,
+        berrange@redhat.com, clg@kaod.org
+References: <20230425161456.21031-1-pmorel@linux.ibm.com>
+ <20230425161456.21031-7-pmorel@linux.ibm.com>
+ <ffc6bf647f1d7238f15b9d08ae20683bdb116eb4.camel@linux.ibm.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+In-Reply-To: <ffc6bf647f1d7238f15b9d08ae20683bdb116eb4.camel@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: 0BiuVKWzA4V5oh-pMW4YkrO8S2DBb1LP
+X-Proofpoint-GUID: tWpoBSPQkGQXq-XYicfsWw02WIURLg6F
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
+ definitions=2023-05-05_15,2023-05-04_01,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ clxscore=1015 priorityscore=1501 malwarescore=0 mlxlogscore=999
+ spamscore=0 suspectscore=0 mlxscore=0 impostorscore=0 bulkscore=0
+ adultscore=0 phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2303200000 definitions=main-2305050074
+X-Spam-Status: No, score=-6.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+
+On 5/4/23 13:03, Nina Schoetterl-Glausch wrote:
+> On Tue, 2023-04-25 at 18:14 +0200, Pierre Morel wrote:
+>> When the host supports the CPU topology facility, the PTF
+>> instruction with function code 2 is interpreted by the SIE,
+>> provided that the userland hypervisor activates the interpretation
+>> by using the KVM_CAP_S390_CPU_TOPOLOGY KVM extension.
 >>
->> From: Ye Xingchen <ye.xingchen@zte.com.cn>
+>> The PTF instructions with function code 0 and 1 are intercepted
+>> and must be emulated by the userland hypervisor.
 >>
->> convert the fget()/fput() uses to fdget()/fdput().
->What's the advantages of this?
+>> During RESET all CPU of the configuration are placed in
+>> horizontal polarity.
+>>
+>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+> Reviewed-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+
+Thanks
+
+
 >
->Thanks
->>
->> Signed-off-by: Ye Xingchen <ye.xingchen@zte.com.cn>
+> See nit below.
 >> ---
->>  drivers/vhost/net.c | 10 +++++-----
->>  1 file changed, 5 insertions(+), 5 deletions(-)
+>>   include/hw/s390x/s390-virtio-ccw.h |  6 ++++
+>>   hw/s390x/cpu-topology.c            | 51 ++++++++++++++++++++++++++++++
+>>   target/s390x/kvm/kvm.c             | 11 +++++++
+>>   3 files changed, 68 insertions(+)
 >>
->> diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
->> index ae2273196b0c..5b3fe4805182 100644
->> --- a/drivers/vhost/net.c
->> +++ b/drivers/vhost/net.c
->> @@ -1466,17 +1466,17 @@ static struct ptr_ring *get_tap_ptr_ring(struct file *file)
->>
->>  static struct socket *get_tap_socket(int fd)
->>  {
->> -       struct file *file = fget(fd);
->> +       struct fd f = fdget(fd);
->>         struct socket *sock;
->>
->> -       if (!file)
->> +       if (!f.file)
->>                 return ERR_PTR(-EBADF);
->> -       sock = tun_get_socket(file);
->> +       sock = tun_get_socket(f.file);
->>         if (!IS_ERR(sock))
->>                 return sock;
->> -       sock = tap_get_socket(file);
->> +       sock = tap_get_socket(f.file);
->>         if (IS_ERR(sock))
->> -               fput(file);
->> +               fdput(f);
->>         return sock;
->>  }
->>
->> --
->> 2.25.1
->>
-fdget requires an integer type file descriptor as its parameter, 
-and fget requires a pointer to the file structure as its parameter.
+>> diff --git a/include/hw/s390x/s390-virtio-ccw.h b/include/hw/s390x/s390-virtio-ccw.h
+>> index 9bba21a916..c1d46e78af 100644
+>> --- a/include/hw/s390x/s390-virtio-ccw.h
+>> +++ b/include/hw/s390x/s390-virtio-ccw.h
+>> @@ -30,6 +30,12 @@ struct S390CcwMachineState {
+>>       uint8_t loadparm[8];
+>>   };
+>>   
+>> +#define S390_PTF_REASON_NONE (0x00 << 8)
+>> +#define S390_PTF_REASON_DONE (0x01 << 8)
+>> +#define S390_PTF_REASON_BUSY (0x02 << 8)
+>> +#define S390_TOPO_FC_MASK 0xffUL
+>> +void s390_handle_ptf(S390CPU *cpu, uint8_t r1, uintptr_t ra);
+>> +
+>>   struct S390CcwMachineClass {
+>>       /*< private >*/
+>>       MachineClass parent_class;
+>> diff --git a/hw/s390x/cpu-topology.c b/hw/s390x/cpu-topology.c
+>> index c98439ff7a..3c7bbff4bc 100644
+>> --- a/hw/s390x/cpu-topology.c
+>> +++ b/hw/s390x/cpu-topology.c
+>> @@ -96,6 +96,56 @@ static void s390_topology_init(MachineState *ms)
+>>       QTAILQ_INSERT_HEAD(&s390_topology.list, entry, next);
+>>   }
+>>   
+>> +/*
+>> + * s390_handle_ptf:
+>> + *
+>> + * @register 1: contains the function code
+>> + *
+>> + * Function codes 0 (horizontal) and 1 (vertical) define the CPU
+>> + * polarization requested by the guest.
+>> + *
+>> + * Function code 2 is handling topology changes and is interpreted
+>> + * by the SIE.
+>> + */
+>> +void s390_handle_ptf(S390CPU *cpu, uint8_t r1, uintptr_t ra)
+>> +{
+>> +    CPUS390XState *env = &cpu->env;
+>> +    uint64_t reg = env->regs[r1];
+>> +    int fc = reg & S390_TOPO_FC_MASK;
+>> +
+>> +    if (!s390_has_feat(S390_FEAT_CONFIGURATION_TOPOLOGY)) {
+>> +        s390_program_interrupt(env, PGM_OPERATION, ra);
+>> +        return;
+>> +    }
+>> +
+>> +    if (env->psw.mask & PSW_MASK_PSTATE) {
+>> +        s390_program_interrupt(env, PGM_PRIVILEGED, ra);
+>> +        return;
+>> +    }
+>> +
+>> +    if (reg & ~S390_TOPO_FC_MASK) {
+>> +        s390_program_interrupt(env, PGM_SPECIFICATION, ra);
+>> +        return;
+>> +    }
+>> +
+>> +    switch (fc) {
+>> +    case S390_CPU_POLARIZATION_VERTICAL:
+>> +    case S390_CPU_POLARIZATION_HORIZONTAL:
+> I'd give this a name.
+> bool requested_vertical = !!fc;
 
-By using the fdget function, the socket object, can be quickly 
-obtained from the process's file descriptor table without 
-the need to obtain the file descriptor first before passing it 
-as a parameter to the fget function. This reduces unnecessary 
-operations, improves system efficiency and performance.
 
-Best Regards
-Ye
+OK, looks good, I change this
+
+
+Thanks.
+
+Regards,
+
+Pierre
+
+>
+>> +        if (s390_topology.vertical_polarization == !!fc) {
+>> +            env->regs[r1] |= S390_PTF_REASON_DONE;
+>> +            setcc(cpu, 2);
+>> +        } else {
+>> +            s390_topology.vertical_polarization = !!fc;
+>> +            s390_cpu_topology_set_changed(true);
+>> +            setcc(cpu, 0);
+>> +        }
+>> +        break;
+>> +    default:
+>> +        /* Note that fc == 2 is interpreted by the SIE */
+>> +        s390_program_interrupt(env, PGM_SPECIFICATION, ra);
+>> +    }
+>> +}
+>> +
+> [...]
+>
