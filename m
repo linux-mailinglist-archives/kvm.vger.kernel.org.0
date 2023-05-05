@@ -2,30 +2,31 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5AEDB6F85B8
-	for <lists+kvm@lfdr.de>; Fri,  5 May 2023 17:29:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A6A1F6F85BE
+	for <lists+kvm@lfdr.de>; Fri,  5 May 2023 17:30:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232944AbjEEP3p (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 5 May 2023 11:29:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59848 "EHLO
+        id S232973AbjEEPaI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 5 May 2023 11:30:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60320 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232906AbjEEP3j (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 5 May 2023 11:29:39 -0400
-Received: from smtp-8fa8.mail.infomaniak.ch (smtp-8fa8.mail.infomaniak.ch [83.166.143.168])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D36AC150F8
-        for <kvm@vger.kernel.org>; Fri,  5 May 2023 08:29:30 -0700 (PDT)
-Received: from smtp-3-0001.mail.infomaniak.ch (unknown [10.4.36.108])
-        by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4QCZD938BPzMq1NC;
+        with ESMTP id S232932AbjEEP3l (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 5 May 2023 11:29:41 -0400
+X-Greylist: delayed 451 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 05 May 2023 08:29:33 PDT
+Received: from smtp-190b.mail.infomaniak.ch (smtp-190b.mail.infomaniak.ch [185.125.25.11])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67EDD65A0
+        for <kvm@vger.kernel.org>; Fri,  5 May 2023 08:29:33 -0700 (PDT)
+Received: from smtp-3-0000.mail.infomaniak.ch (unknown [10.4.36.107])
+        by smtp-2-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4QCZDB3g0SzMqb46;
+        Fri,  5 May 2023 17:22:02 +0200 (CEST)
+Received: from unknown by smtp-3-0000.mail.infomaniak.ch (Postfix) with ESMTPA id 4QCZD96vnsz1jJ;
         Fri,  5 May 2023 17:22:01 +0200 (CEST)
-Received: from unknown by smtp-3-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4QCZD85V0tzMpt9P;
-        Fri,  5 May 2023 17:22:00 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=digikod.net;
-        s=20191114; t=1683300121;
-        bh=dkHjbqpuvSBmD/ZCnBFFFKsFtN1g9PxpijWtwL2weO4=;
+        s=20191114; t=1683300122;
+        bh=ZzOynGNQaPpNtiJ0zd91Lcwn9zW2+9ulyf1drBQ/Prg=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=FR+pYomIgtrTj0WI3JRDUSbHVrdlibfnwQU30RKu6bstMqwIWNnbYH/f3efnA/++Y
-         PVW9ePmH83Lzuo5sF3eA8Zxiu6x5s8zasun6j41FzXtbI7LfAbR7ieVBarIcdhpBG1
-         xrxpuSnVobX97umCLQuu/zofOq0RUrhcLMOWIHuk=
+        b=vaA3xKDBfcFF3nZ5ibwAf9TNvpVjn95vBk3M+IQ75Zbj+yeoIWJoXq+IK2rjSvz6J
+         Ek6QJhVl0QOgjeidTZl8FeFQNrpxRWC0pFUxavnSrBqF5C1GDY1DYBVA7I141lj7uP
+         nCrFgP2JPKXF3ssC9wKq84oe+CDtv4db+Lpg7rcs=
 From:   =?UTF-8?q?Micka=C3=ABl=20Sala=C3=BCn?= <mic@digikod.net>
 To:     Borislav Petkov <bp@alien8.de>,
         Dave Hansen <dave.hansen@linux.intel.com>,
@@ -57,9 +58,9 @@ Cc:     =?UTF-8?q?Micka=C3=ABl=20Sala=C3=BCn?= <mic@digikod.net>,
         linux-security-module@vger.kernel.org, qemu-devel@nongnu.org,
         virtualization@lists.linux-foundation.org, x86@kernel.org,
         xen-devel@lists.xenproject.org
-Subject: [PATCH v1 4/9] KVM: x86: Add new hypercall to set EPT permissions
-Date:   Fri,  5 May 2023 17:20:41 +0200
-Message-Id: <20230505152046.6575-5-mic@digikod.net>
+Subject: [PATCH v1 5/9] KVM: x86: Add new hypercall to lock control registers
+Date:   Fri,  5 May 2023 17:20:42 +0200
+Message-Id: <20230505152046.6575-6-mic@digikod.net>
 In-Reply-To: <20230505152046.6575-1-mic@digikod.net>
 References: <20230505152046.6575-1-mic@digikod.net>
 MIME-Version: 1.0
@@ -76,33 +77,17 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add a new KVM_HC_LOCK_MEM_PAGE_RANGES hypercall that enables a guest to
-set EPT permissions on a set of page ranges.
+This enables guests to lock their CR0 and CR4 registers with a subset of
+X86_CR0_WP, X86_CR4_SMEP, X86_CR4_SMAP, X86_CR4_UMIP, X86_CR4_FSGSBASE
+and X86_CR4_CET flags.
 
-This hypercall takes three arguments.  The first contains the GPA
-pointing to an array of struct heki_pa_range.  The second argument is
-the size of the array, not the number of elements.  The third argument
-is for future proofness and is designed to contains optional flags (e.g.
-to change the array type), but must be zero for now.
+The new KVM_HC_LOCK_CR_UPDATE hypercall takes two arguments.  The first
+is to identify the control register, and the second is a bit mask to
+pin (i.e. mark as read-only).
 
-The struct heki_pa_range contains a GFN that starts the range and
-another that is the indicate the last (included) page.  A bit field of
-attributes are tied to this range.
-
-The HEKI_ATTR_MEM_NOWRITE attribute is interpreted as a removal of the
-EPT write permission to deny any write access from the guest through its
-lifetime.  We choose "nowrite" because "read-only" exclude
-execution, it follows a deny-list approach, and most importantly because
-it is an incremental addition to the status quo (i.e., everything is
-allowed from the TDP point of view).  This is implemented thanks to the
-KVM_PAGE_TRACK_PREWRITE mode previously introduced.
-
-The page ranges recording is currently implemented with a static array
-of 16 elements to make it simple, but this mechanism will be dynamic in
-a follow-up.
-
-Define a kernel command line parameter "heki" to turn the feature on or
-off.  By default, Heki is turned on.
+These register flags should already be pinned by Linux guests, but once
+compromised, this self-protection mechanism could be disabled, which is
+not the case with this dedicated hypercall.
 
 Cc: Borislav Petkov <bp@alien8.de>
 Cc: Dave Hansen <dave.hansen@linux.intel.com>
@@ -116,299 +101,229 @@ Cc: Thomas Gleixner <tglx@linutronix.de>
 Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
 Cc: Wanpeng Li <wanpengli@tencent.com>
 Signed-off-by: Mickaël Salaün <mic@digikod.net>
-Link: https://lore.kernel.org/r/20230505152046.6575-5-mic@digikod.net
+Link: https://lore.kernel.org/r/20230505152046.6575-6-mic@digikod.net
 ---
- Documentation/virt/kvm/x86/hypercalls.rst |  17 +++
- arch/x86/kvm/x86.c                        | 169 ++++++++++++++++++++++
- include/linux/kvm_host.h                  |  13 ++
- include/uapi/linux/kvm_para.h             |   1 +
- virt/kvm/kvm_main.c                       |   4 +
- 5 files changed, 204 insertions(+)
+ Documentation/virt/kvm/x86/hypercalls.rst | 15 +++++
+ arch/x86/kernel/cpu/common.c              |  2 +-
+ arch/x86/kvm/vmx/vmx.c                    | 10 ++++
+ arch/x86/kvm/x86.c                        | 72 +++++++++++++++++++++++
+ arch/x86/kvm/x86.h                        | 16 +++++
+ include/linux/kvm_host.h                  |  3 +
+ include/uapi/linux/kvm_para.h             |  1 +
+ 7 files changed, 118 insertions(+), 1 deletion(-)
 
 diff --git a/Documentation/virt/kvm/x86/hypercalls.rst b/Documentation/virt/kvm/x86/hypercalls.rst
-index 10db7924720f..0ec79cc77f53 100644
+index 0ec79cc77f53..8aa5d28986e3 100644
 --- a/Documentation/virt/kvm/x86/hypercalls.rst
 +++ b/Documentation/virt/kvm/x86/hypercalls.rst
-@@ -190,3 +190,20 @@ the KVM_CAP_EXIT_HYPERCALL capability. Userspace must enable that capability
- before advertising KVM_FEATURE_HC_MAP_GPA_RANGE in the guest CPUID.  In
- addition, if the guest supports KVM_FEATURE_MIGRATION_CONTROL, userspace
- must also set up an MSR filter to process writes to MSR_KVM_MIGRATION_CONTROL.
+@@ -207,3 +207,18 @@ identified with set of physical page ranges (GFNs).  The HEKI_ATTR_MEM_NOWRITE
+ memory page range attribute forbids related modification to the guest.
+ 
+ Returns 0 on success or a KVM error code otherwise.
 +
-+9. KVM_HC_LOCK_MEM_PAGE_RANGES
-+------------------------------
++10. KVM_HC_LOCK_CR_UPDATE
++-------------------------
 +
 +:Architecture: x86
 +:Status: active
-+:Purpose: Request memory page ranges to be restricted.
++:Purpose: Request some control registers to be restricted.
 +
-+- a0: physical address of a struct heki_pa_range array
-+- a1: size of the array
-+- a2: optional flags, must be 0 for now
++- a0: identify a control register
++- a1: bit mask to make some flags read-only
 +
-+The hypercall lets a guest request memory permissions to be removed for itself,
-+identified with set of physical page ranges (GFNs).  The HEKI_ATTR_MEM_NOWRITE
-+memory page range attribute forbids related modification to the guest.
++The hypercall lets a guest request control register flags to be pinned for
++itself.
 +
 +Returns 0 on success or a KVM error code otherwise.
+diff --git a/arch/x86/kernel/cpu/common.c b/arch/x86/kernel/cpu/common.c
+index f3cc7699e1e1..dd89379fe5ac 100644
+--- a/arch/x86/kernel/cpu/common.c
++++ b/arch/x86/kernel/cpu/common.c
+@@ -413,7 +413,7 @@ static __always_inline void setup_umip(struct cpuinfo_x86 *c)
+ }
+ 
+ /* These bits should not change their value after CPU init is finished. */
+-static const unsigned long cr4_pinned_mask =
++const unsigned long cr4_pinned_mask =
+ 	X86_CR4_SMEP | X86_CR4_SMAP | X86_CR4_UMIP |
+ 	X86_CR4_FSGSBASE | X86_CR4_CET;
+ static DEFINE_STATIC_KEY_FALSE_RO(cr_pinning);
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 9870db887a62..931688edc8eb 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -3162,6 +3162,11 @@ void vmx_set_cr0(struct kvm_vcpu *vcpu, unsigned long cr0)
+ 	struct vcpu_vmx *vmx = to_vmx(vcpu);
+ 	unsigned long hw_cr0, old_cr0_pg;
+ 	u32 tmp;
++	int res;
++
++	res = heki_check_cr(vcpu->kvm, 0, cr0);
++	if (res)
++		return;
+ 
+ 	old_cr0_pg = kvm_read_cr0_bits(vcpu, X86_CR0_PG);
+ 
+@@ -3323,6 +3328,11 @@ void vmx_set_cr4(struct kvm_vcpu *vcpu, unsigned long cr4)
+ 	 * this bit, even if host CR4.MCE == 0.
+ 	 */
+ 	unsigned long hw_cr4;
++	int res;
++
++	res = heki_check_cr(vcpu->kvm, 4, cr4);
++	if (res)
++		return;
+ 
+ 	hw_cr4 = (cr4_read_shadow() & X86_CR4_MCE) | (cr4 & ~X86_CR4_MCE);
+ 	if (is_unrestricted_guest(vcpu))
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index fd05f42c9913..ffab64d08de3 100644
+index ffab64d08de3..a529455359ac 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -59,6 +59,7 @@
- #include <linux/mem_encrypt.h>
- #include <linux/entry-kvm.h>
- #include <linux/suspend.h>
-+#include <linux/heki.h>
- 
- #include <trace/events/kvm.h>
- 
-@@ -9596,6 +9597,161 @@ static void kvm_sched_yield(struct kvm_vcpu *vcpu, unsigned long dest_id)
- 	return;
+@@ -7927,11 +7927,77 @@ static unsigned long emulator_get_cr(struct x86_emulate_ctxt *ctxt, int cr)
+ 	return value;
  }
  
 +#ifdef CONFIG_HEKI
 +
-+static int heki_page_track_add(struct kvm *const kvm, const gfn_t gfn,
-+			       const enum kvm_page_track_mode mode)
++extern unsigned long cr4_pinned_mask;
++
++static int heki_lock_cr(struct kvm *const kvm, const unsigned long cr,
++			unsigned long pin)
 +{
-+	struct kvm_memory_slot *slot;
-+	int idx;
-+
-+	BUILD_BUG_ON(!IS_ENABLED(CONFIG_KVM_EXTERNAL_WRITE_TRACKING));
-+
-+	idx = srcu_read_lock(&kvm->srcu);
-+	slot = gfn_to_memslot(kvm, gfn);
-+	if (!slot) {
-+		srcu_read_unlock(&kvm->srcu, idx);
-+		return -EINVAL;
-+	}
-+
-+	write_lock(&kvm->mmu_lock);
-+	kvm_slot_page_track_add_page(kvm, slot, gfn, mode);
-+	write_unlock(&kvm->mmu_lock);
-+	srcu_read_unlock(&kvm->srcu, idx);
-+	return 0;
-+}
-+
-+static bool
-+heki_page_track_prewrite(struct kvm_vcpu *const vcpu, const gpa_t gpa,
-+			 struct kvm_page_track_notifier_node *const node)
-+{
-+	const gfn_t gfn = gpa_to_gfn(gpa);
-+	const struct kvm *const kvm = vcpu->kvm;
-+	size_t i;
-+
-+	/* Checks if it is our own tracked pages, or those of someone else. */
-+	for (i = 0; i < HEKI_GFN_MAX; i++) {
-+		if (gfn >= kvm->heki_gfn_no_write[i].start &&
-+		    gfn <= kvm->heki_gfn_no_write[i].end)
-+			return false;
-+	}
-+
-+	return true;
-+}
-+
-+static int kvm_heki_init_vm(struct kvm *const kvm)
-+{
-+	struct kvm_page_track_notifier_node *const node =
-+		kzalloc(sizeof(*node), GFP_KERNEL);
-+
-+	if (!node)
-+		return -ENOMEM;
-+
-+	node->track_prewrite = heki_page_track_prewrite;
-+	kvm_page_track_register_notifier(kvm, node);
-+	return 0;
-+}
-+
-+static bool is_gfn_overflow(unsigned long val)
-+{
-+	const gfn_t gfn_mask = gpa_to_gfn(~0);
-+
-+	return (val | gfn_mask) != gfn_mask;
-+}
-+
-+#define HEKI_PA_RANGE_MAX_SIZE	(sizeof(struct heki_pa_range) * HEKI_GFN_MAX)
-+
-+static int heki_lock_mem_page_ranges(struct kvm *const kvm, gpa_t mem_ranges,
-+				     unsigned long mem_ranges_size)
-+{
-+	int err;
-+	size_t i, ranges_num;
-+	struct heki_pa_range *ranges;
-+
-+	if (mem_ranges_size > HEKI_PA_RANGE_MAX_SIZE)
-+		return -KVM_E2BIG;
-+
-+	if ((mem_ranges_size % sizeof(struct heki_pa_range)) != 0)
++	if (!pin)
 +		return -KVM_EINVAL;
 +
-+	ranges = kzalloc(mem_ranges_size, GFP_KERNEL);
-+	if (!ranges)
-+		return -KVM_E2BIG;
++	switch (cr) {
++	case 0:
++		/* Cf. arch/x86/kernel/cpu/common.c */
++		if (!(pin & X86_CR0_WP))
++			return -KVM_EINVAL;
 +
-+	err = kvm_read_guest(kvm, mem_ranges, ranges, mem_ranges_size);
-+	if (err) {
-+		err = -KVM_EFAULT;
-+		goto out_free_ranges;
++		if ((read_cr0() & pin) != pin)
++			return -KVM_EINVAL;
++
++		atomic_long_or(pin, &kvm->heki_pinned_cr0);
++		return 0;
++	case 4:
++		/* Checks for irrelevant bits. */
++		if ((pin & cr4_pinned_mask) != pin)
++			return -KVM_EINVAL;
++
++		/* Ignores bits not present in host. */
++		pin &= __read_cr4();
++		atomic_long_or(pin, &kvm->heki_pinned_cr4);
++		return 0;
 +	}
-+
-+	ranges_num = mem_ranges_size / sizeof(struct heki_pa_range);
-+	for (i = 0; i < ranges_num; i++) {
-+		const u64 attributes_mask = HEKI_ATTR_MEM_NOWRITE;
-+		const gfn_t gfn_start = ranges[i].gfn_start;
-+		const gfn_t gfn_end = ranges[i].gfn_end;
-+		const u64 attributes = ranges[i].attributes;
-+
-+		if (is_gfn_overflow(ranges[i].gfn_start)) {
-+			err = -KVM_EINVAL;
-+			goto out_free_ranges;
-+		}
-+		if (is_gfn_overflow(ranges[i].gfn_end)) {
-+			err = -KVM_EINVAL;
-+			goto out_free_ranges;
-+		}
-+		if (ranges[i].gfn_start > ranges[i].gfn_end) {
-+			err = -KVM_EINVAL;
-+			goto out_free_ranges;
-+		}
-+		if (!ranges[i].attributes) {
-+			err = -KVM_EINVAL;
-+			goto out_free_ranges;
-+		}
-+		if ((ranges[i].attributes | attributes_mask) !=
-+		    attributes_mask) {
-+			err = -KVM_EINVAL;
-+			goto out_free_ranges;
-+		}
-+
-+		if (attributes & HEKI_ATTR_MEM_NOWRITE) {
-+			unsigned long gfn;
-+			size_t gfn_i;
-+
-+			gfn_i = atomic_dec_if_positive(
-+				&kvm->heki_gfn_no_write_num);
-+			if (gfn_i == 0) {
-+				err = -KVM_E2BIG;
-+				goto out_free_ranges;
-+			}
-+
-+			gfn_i--;
-+			kvm->heki_gfn_no_write[gfn_i].start = gfn_start;
-+			kvm->heki_gfn_no_write[gfn_i].end = gfn_end;
-+
-+			for (gfn = gfn_start; gfn <= gfn_end; gfn++)
-+				WARN_ON_ONCE(heki_page_track_add(
-+					kvm, gfn, KVM_PAGE_TRACK_PREWRITE));
-+		}
-+
-+		pr_warn("heki-kvm: Locking GFN 0x%llx-0x%llx with %s\n",
-+			gfn_start, gfn_end,
-+			(attributes & HEKI_ATTR_MEM_NOWRITE) ? "[nowrite]" : "");
-+	}
-+
-+out_free_ranges:
-+	kfree(ranges);
-+	return err;
++	return -KVM_EINVAL;
 +}
++
++int heki_check_cr(const struct kvm *const kvm, const unsigned long cr,
++		  const unsigned long val)
++{
++	unsigned long pinned;
++
++	switch (cr) {
++	case 0:
++		pinned = atomic_long_read(&kvm->heki_pinned_cr0);
++		if ((val & pinned) != pinned) {
++			pr_warn_ratelimited(
++				"heki-kvm: Blocked CR0 update: 0x%lx\n", val);
++			return -KVM_EPERM;
++		}
++		return 0;
++	case 4:
++		pinned = atomic_long_read(&kvm->heki_pinned_cr4);
++		if ((val & pinned) != pinned) {
++			pr_warn_ratelimited(
++				"heki-kvm: Blocked CR4 update: 0x%lx\n", val);
++			return -KVM_EPERM;
++		}
++		return 0;
++	}
++	return 0;
++}
++
++#endif /* CONFIG_HEKI */
++
+ static int emulator_set_cr(struct x86_emulate_ctxt *ctxt, int cr, ulong val)
+ {
+ 	struct kvm_vcpu *vcpu = emul_to_vcpu(ctxt);
+ 	int res = 0;
+ 
++	res = heki_check_cr(vcpu->kvm, cr, val);
++	if (res)
++		return res;
++
+ 	switch (cr) {
+ 	case 0:
+ 		res = kvm_set_cr0(vcpu, mk_cr_64(kvm_read_cr0(vcpu), val));
+@@ -9858,6 +9924,12 @@ int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
+ 		else
+ 			ret = heki_lock_mem_page_ranges(vcpu->kvm, a0, a1);
+ 		break;
++	case KVM_HC_LOCK_CR_UPDATE:
++		if (a0 > U32_MAX)
++			ret = -KVM_EINVAL;
++		else
++			ret = heki_lock_cr(vcpu->kvm, a0, a1);
++		break;
+ #endif /* CONFIG_HEKI */
+ 	default:
+ 		ret = -KVM_ENOSYS;
+diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
+index 9de72586f406..3e80a60ecbd8 100644
+--- a/arch/x86/kvm/x86.h
++++ b/arch/x86/kvm/x86.h
+@@ -276,6 +276,22 @@ static inline bool kvm_check_has_quirk(struct kvm *kvm, u64 quirk)
+ 	return !(kvm->arch.disabled_quirks & quirk);
+ }
+ 
++#ifdef CONFIG_HEKI
++
++int heki_check_cr(const struct kvm *kvm, unsigned long cr, unsigned long val);
++
++bool kvm_heki_is_exec_allowed(struct kvm_vcpu *vcpu, gpa_t gpa);
 +
 +#else /* CONFIG_HEKI */
 +
-+static int kvm_heki_init_vm(struct kvm *const kvm)
++static inline int heki_check_cr(const struct kvm *const kvm,
++				const unsigned long cr, const unsigned long val)
 +{
 +	return 0;
 +}
 +
 +#endif /* CONFIG_HEKI */
 +
- static int complete_hypercall_exit(struct kvm_vcpu *vcpu)
- {
- 	u64 ret = vcpu->run->hypercall.ret;
-@@ -9694,6 +9850,15 @@ int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
- 		vcpu->arch.complete_userspace_io = complete_hypercall_exit;
- 		return 0;
- 	}
-+#ifdef CONFIG_HEKI
-+	case KVM_HC_LOCK_MEM_PAGE_RANGES:
-+		/* No flags for now. */
-+		if (a2)
-+			ret = -KVM_EINVAL;
-+		else
-+			ret = heki_lock_mem_page_ranges(vcpu->kvm, a0, a1);
-+		break;
-+#endif /* CONFIG_HEKI */
- 	default:
- 		ret = -KVM_ENOSYS;
- 		break;
-@@ -12126,6 +12291,10 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
- 	if (ret)
- 		goto out_page_track;
+ void kvm_inject_realmode_interrupt(struct kvm_vcpu *vcpu, int irq, int inc_eip);
  
-+	ret = kvm_heki_init_vm(kvm);
-+	if (ret)
-+		goto out_page_track;
-+
- 	ret = static_call(kvm_x86_vm_init)(kvm);
- 	if (ret)
- 		goto out_uninit_mmu;
+ u64 get_kvmclock_ns(struct kvm *kvm);
 diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 4f26b244f6d0..39a1bdc2ba42 100644
+index 39a1bdc2ba42..ab9dc723bc89 100644
 --- a/include/linux/kvm_host.h
 +++ b/include/linux/kvm_host.h
-@@ -699,6 +699,13 @@ struct kvm_memslots {
- 	int node_idx;
- };
- 
-+#ifdef CONFIG_HEKI
-+struct heki_gfn_range {
-+	gfn_t start;
-+	gfn_t end;
-+};
-+#endif /* CONFIG_HEKI */
+@@ -812,6 +812,9 @@ struct kvm {
+ #define HEKI_GFN_MAX 16
+ 	atomic_t heki_gfn_no_write_num;
+ 	struct heki_gfn_range heki_gfn_no_write[HEKI_GFN_MAX];
 +
- struct kvm {
- #ifdef KVM_HAVE_MMU_RWLOCK
- 	rwlock_t mmu_lock;
-@@ -801,6 +808,12 @@ struct kvm {
- 	bool vm_bugged;
- 	bool vm_dead;
++	atomic_long_t heki_pinned_cr0;
++	atomic_long_t heki_pinned_cr4;
+ #endif /* CONFIG_HEKI */
  
-+#ifdef CONFIG_HEKI
-+#define HEKI_GFN_MAX 16
-+	atomic_t heki_gfn_no_write_num;
-+	struct heki_gfn_range heki_gfn_no_write[HEKI_GFN_MAX];
-+#endif /* CONFIG_HEKI */
-+
  #ifdef CONFIG_HAVE_KVM_PM_NOTIFIER
- 	struct notifier_block pm_notifier;
- #endif
 diff --git a/include/uapi/linux/kvm_para.h b/include/uapi/linux/kvm_para.h
-index 960c7e93d1a9..d7512a10880e 100644
+index d7512a10880e..9f68d4ba646b 100644
 --- a/include/uapi/linux/kvm_para.h
 +++ b/include/uapi/linux/kvm_para.h
-@@ -30,6 +30,7 @@
- #define KVM_HC_SEND_IPI		10
+@@ -31,6 +31,7 @@
  #define KVM_HC_SCHED_YIELD		11
  #define KVM_HC_MAP_GPA_RANGE		12
-+#define KVM_HC_LOCK_MEM_PAGE_RANGES	13
+ #define KVM_HC_LOCK_MEM_PAGE_RANGES	13
++#define KVM_HC_LOCK_CR_UPDATE		14
  
  /*
   * hypercalls use architecture specific
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 9c60384b5ae0..4aea936dfe73 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -1230,6 +1230,10 @@ static struct kvm *kvm_create_vm(unsigned long type, const char *fdname)
- 	list_add(&kvm->vm_list, &vm_list);
- 	mutex_unlock(&kvm_lock);
- 
-+#ifdef CONFIG_HEKI
-+	atomic_set(&kvm->heki_gfn_no_write_num, HEKI_GFN_MAX + 1);
-+#endif /* CONFIG_HEKI */
-+
- 	preempt_notifier_inc();
- 	kvm_init_pm_notifier(kvm);
- 
 -- 
 2.40.1
 
