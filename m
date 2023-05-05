@@ -2,214 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 526E06F8609
-	for <lists+kvm@lfdr.de>; Fri,  5 May 2023 17:42:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5EEFC6F8626
+	for <lists+kvm@lfdr.de>; Fri,  5 May 2023 17:48:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233020AbjEEPmv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 5 May 2023 11:42:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41196 "EHLO
+        id S232803AbjEEPsl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 5 May 2023 11:48:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44618 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233001AbjEEPmt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 5 May 2023 11:42:49 -0400
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2042.outbound.protection.outlook.com [40.107.244.42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E672156B8;
-        Fri,  5 May 2023 08:42:48 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Cqyxw918tJscn1fEnksBX6Q48fhVsp4zRBAqaU1AnJ2L3rYjZibdduCAj9old7Ip/8e2NMivJa74yX0yvVL+gpu/p1SHe0vPSg3USyaVUvpDKArNxF1C53Wcsdb2PTtlAtOHlsTUTBSfSJhgy5CS2vhMGjoLML9lv9Dx5ZdRZPO3zDUfJYiAX1gzB27fDkoO0h+GzNJbr443iqmgTGmrMAZMCHRE1PjqB4RK6KS2vSezzrTJ9NEwBRpTSpZvRHih8pQOK+AxlQRjKV3hrriUfjrO0sq9CqWEQ29HR+dduhCsEnitLvM5IBMmTus8hgFb9wWvnYLwE28pUaS17M/rag==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=5gu7VvpG3MxwaonVUNHEZ9iLNBA/aP9kl6WEbVQK6NU=;
- b=S96PRenWKdclQg1IdT6nM+HsrOoGx6bGKfvM+duZOxYhefXeR597T3zq/iXhdcfyQI9VfdTZtAX0Wam9J8O2U/bUCTzmCBWxDucGHM3PErvSIXYej/MbHPceQml4DINb/DlJazPSUDS6dxiYctJa0JlYmM5hveb+mISWZb3jLsAqpO/mCtGMOsWtHXVxBvSEjWAvZ56Q4INfHR5VbunQfJPy6xoetcwNTgaEWKtUmvWB7cT48CZx2nmmmVqLYanavS8zDtSOSlzFNJ99GSOhu+VAwaj7zO5dl3LwMdZu78LaV8zS51VlXhY6Ig23o2rb/3vTXksODq+OAR+eIDTiIg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=5gu7VvpG3MxwaonVUNHEZ9iLNBA/aP9kl6WEbVQK6NU=;
- b=gW6C5sy4YjhkL9ORSgwfjwqj4nhqCDUSRbSWAXAfPBgT7iPGAU9ef+wv9CBbQy7FIxCnPoEnwTUAJG87VQYUrPMMgM1rqGxiR9j+YglB6p3QtRMYX2SSeVWBGljvrgR1+st9wm1PW5nFt+o/8wRBOXdLK8cc21u4K4XBo4N7Re4=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from PH0PR12MB7982.namprd12.prod.outlook.com (2603:10b6:510:28d::5)
- by SA3PR12MB7782.namprd12.prod.outlook.com (2603:10b6:806:31c::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6363.27; Fri, 5 May
- 2023 15:42:46 +0000
-Received: from PH0PR12MB7982.namprd12.prod.outlook.com
- ([fe80::e19e:fb58:51b2:447f]) by PH0PR12MB7982.namprd12.prod.outlook.com
- ([fe80::e19e:fb58:51b2:447f%5]) with mapi id 15.20.6363.026; Fri, 5 May 2023
- 15:42:46 +0000
-Message-ID: <07abb13c-b60e-f35c-8e26-13857a97866f@amd.com>
-Date:   Fri, 5 May 2023 08:42:44 -0700
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.1
-Subject: Re: [PATCH v9 vfio 4/7] vfio/pds: Add VFIO live migration support
-Content-Language: en-US
-To:     Jason Gunthorpe <jgg@nvidia.com>,
-        Brett Creeley <brett.creeley@amd.com>
-Cc:     kvm@vger.kernel.org, netdev@vger.kernel.org,
-        alex.williamson@redhat.com, yishaih@nvidia.com,
-        shameerali.kolothum.thodi@huawei.com, kevin.tian@intel.com,
-        shannon.nelson@amd.com, drivers@pensando.io
-References: <20230422010642.60720-1-brett.creeley@amd.com>
- <20230422010642.60720-5-brett.creeley@amd.com> <ZFPwaa40glVrms02@nvidia.com>
-From:   Brett Creeley <bcreeley@amd.com>
-In-Reply-To: <ZFPwaa40glVrms02@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SJ0PR13CA0101.namprd13.prod.outlook.com
- (2603:10b6:a03:2c5::16) To PH0PR12MB7982.namprd12.prod.outlook.com
- (2603:10b6:510:28d::5)
+        with ESMTP id S232012AbjEEPsi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 5 May 2023 11:48:38 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D67959D8
+        for <kvm@vger.kernel.org>; Fri,  5 May 2023 08:47:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1683301675;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=hQobjkXCgk5uy3vBplD0U6FyzeEdp0Sx4RLjpDbb7I8=;
+        b=at2z/3IbRTFkvHKsRxE0QEqD8MvdHu2yrmFqe9mDN7v/xYRDqlizKed0hGjvaUoLjz803N
+        o/nAnP06keNnvAmpZTB2Fvh4/xsdi377sB+XZK+0AAUBV/2oKdN3TP/nGHX0goLd7UMQyB
+        MgoCzap9su7khKjFe/aLHnLN8AaHZyU=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-584-l-v661S2Ooy26swHv9Pw_g-1; Fri, 05 May 2023 11:47:52 -0400
+X-MC-Unique: l-v661S2Ooy26swHv9Pw_g-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 0A3A53815EED;
+        Fri,  5 May 2023 15:47:52 +0000 (UTC)
+Received: from redhat.com (unknown [10.42.28.42])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id AA78E1121331;
+        Fri,  5 May 2023 15:47:50 +0000 (UTC)
+Date:   Fri, 5 May 2023 16:47:48 +0100
+From:   Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To:     =?utf-8?B?SsO2cmcgUsO2ZGVs?= <jroedel@suse.de>
+Cc:     Claudio Carvalho <cclaudio@linux.ibm.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        amd-sev-snp@lists.suse.com, linux-coco@lists.linux.dev,
+        kvm@vger.kernel.org, Carlos Bilbao <carlos.bilbao@amd.com>,
+        Klaus Kiwi <kkiwi@redhat.com>
+Subject: Re: [ANNOUNCEMENT] COCONUT Secure VM Service Module for SEV-SNP
+Message-ID: <ZFUlJOFZvrNEjV1N@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <ZBl4592947wC7WKI@suse.de>
+ <4420d7e5-d05f-8c31-a0f2-587ebb7eaa20@amd.com>
+ <ZFJTDtMK0QqXK5+E@suse.de>
+ <cc22183359d107dc0be58b4f9509c8d785313879.camel@linux.ibm.com>
+ <ZFUh/KlLXJF+2hoJ@suse.de>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR12MB7982:EE_|SA3PR12MB7782:EE_
-X-MS-Office365-Filtering-Correlation-Id: 39793590-2800-47f1-4e21-08db4d7f5f85
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 4WFX+alg8a7IGzKyq9zSq7BFpTEkAx3Jjhnf36UhVncv+rz95wCXcA42F5YokBJFVum6uEDK7ehAK+AKjx1oD0i5yLm8SFHWxqhItoxwM/m2H7GVFhW3xXRrrCDetu2/A7xOMQveHBkP8GNxLi5EvmTC56kyO8E5/TMeGDxC/+EVUrQ4EmDYtX7f1pKp2miHPMRBFJaRKv8uwp4wF4gNxSX49yNF5UfTNdmPHY+y5LR05CVgosQuvIDSEP9bN+auPGKvirXVTuo5H7Z/ZhpTYvy9CJqY8Unlaab2LDdlnMwqC3q97Xlku29Kd5/Mytm6t/dia8BeZnoX6Pzfhr2JOhUzjYk/3eXZYC64rjlWAW74dQd/50InBd+l0mFRo3gxjkZbUETipI68Mldja6TFcpvY9huzWltlffg6uxZFcoEtM2WUEX5F8QhJWmmptpTDrhGzk8GiZs+yJZKRm+FcJMWe5kKfUk9/o5o6eVPYHWW1W0jPrhVm1SMEF0MQeLObwLAadT7c1WlL4hlXjrPeZ/GADIXK15VXTyC4XH1xTostZwOciU00gdxnITq8DTxr8rLZQ3YnCl54sDfYAqa9hm/8qZq1Yuuru/026lhmn4NDJBl1Q8TSgUI1IBJV4CWSkcMMN+3eP4rdUdlw8k/9Ow==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR12MB7982.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(376002)(396003)(346002)(39860400002)(136003)(366004)(451199021)(6636002)(4326008)(41300700001)(66556008)(66476007)(66946007)(8936002)(5660300002)(8676002)(110136005)(6506007)(26005)(53546011)(6512007)(31686004)(316002)(478600001)(6486002)(2906002)(83380400001)(186003)(2616005)(36756003)(31696002)(38100700002)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?RjFPNmZrUXlzMk5hS05YWndZcC94bnZhT3YvWXBMWnF1WEt3dWhEVzdPeGEz?=
- =?utf-8?B?SGZGc3E5c0RKQzhkMml0eWJwQWZ4b3NkUWV3T0g2NTJWdWpDOWJoRTByZUxs?=
- =?utf-8?B?ZElEcnFQWHhzU2ZmVGZzbnNVcnZQL1hWbEd4djdpT3VTVUx1ZURvdmNhZHU0?=
- =?utf-8?B?MU94YWtIamx4V1ErcWZZTi9hMVFqTHhPMG1ZK29CeG9La1psUnJCT05JT09L?=
- =?utf-8?B?MWd3dzhMbUtJT3k4N3ZkeFVtdDhySE1jNGR5MzlDd0J1QTg2WFpDVTBIZ3NO?=
- =?utf-8?B?MFNpV2lRT2ZUZ3lFcVRSV0phYUszVWJza3NESlhDTjdNZnBVM2pudy9ucElF?=
- =?utf-8?B?RnNFV1JxODVvOS9ITndkVlNiR1JvclVXc243bGtkSEZGS3Vxd0JyZ0YzVDVR?=
- =?utf-8?B?NUhqblF1cEI4b010cFZycmgxV3gwdWx5YjJKNFNrdXhOdXYvQXFTbzJsTDI2?=
- =?utf-8?B?VTdtQkl6VTVHcHFRRi9aaDk4OTNDblhESW8yN2NJSUhLMGRJYkFLVEd1R3Fq?=
- =?utf-8?B?ZS9OYmdPWk1XdHd6eE51eG54TENNeW5OUEpZeHVOL0swREhBY0pZa0ZXWWFx?=
- =?utf-8?B?YWk4SnJWRHYrUkd6TTNTd1p1eGhDVzJSek43blEyZkpWZ3d6VFpIQUJ2NnVV?=
- =?utf-8?B?dGNxM2RmTjRZUFg1ZVBMa04wYjFhZ2hRVTRFdHJQU3VlNWpvYWFtNElFdnJJ?=
- =?utf-8?B?cW9sREwwTXhDU2hFVjhUcXRDMFNaQ3h6cWd6SklVVGN3VWwyWW04MUFkUU9J?=
- =?utf-8?B?UzFrM2hhV1hKSHRoT0xXNXQrd3dvQk9WNUpLV081c0E5RFB0bGhZM3I5OVBZ?=
- =?utf-8?B?WU44cmdpU09rTTVHaW9DTDd4VXJEd0FKODIrYnZwQUxTU3hmNHJoT0NwZEo0?=
- =?utf-8?B?QXRmaTgrZFJEdkRkUW5Md3lVeGIrWnlrZk9tMHpPdmtURGVadHlOZ0pZcjRh?=
- =?utf-8?B?L3VzMWhPSDc1Z1pyTVIzKzd4cHhsejN1V0kyVzZUQVExRnJRTm1BY2RKUGVi?=
- =?utf-8?B?WVZDMlVvSm1HalJZVkQ0OVFjMUh5SDRZT2EyRFh5VkQ0KzBjWkhoNHkwWUI2?=
- =?utf-8?B?MGljMWdJdmd0dGYxcDZjM3BCUHdhdVgwM2hYTTlJcEZPZ3dyckNqcnNSbFpG?=
- =?utf-8?B?U09aTEhPb2J0d2NOV0FXK0ZSRDNxM3hubkJTM29WM1JReGtjNjdUeERjYVZh?=
- =?utf-8?B?S202enU3ZXRodFczb3RIZjQzbGh1c0hYT254d09OaTA1d1NqUTFHb2h5eDNZ?=
- =?utf-8?B?UGs2eHJSNFZONGZQT0lwODh1M1pzR096VHhaUkRyRWFrQ1BkK00xbzllSWlY?=
- =?utf-8?B?V3RCS1NzdDg3ajhaSFlmWTVRTkFieHNVMVpYWW9VVktxcGNyMkN6VU0rek5M?=
- =?utf-8?B?RWhnVndYSU9ra2I4SU9FVnFNN0F3bDdXZkg0ZmpvQ0V4bG1kejR5Yzc3Rnl5?=
- =?utf-8?B?QXQwbm5DajNtejZ0THRYdkk0U29nR2pIbUF6eW1JYkI2M3R1UThxWlRpNmdN?=
- =?utf-8?B?NGFjYkFqeFd4ZUlUdEpTc1BXNURMTGdtNm93NEF2ajI2eVpPYlZucnZPWERM?=
- =?utf-8?B?N0J2SGJxajNBZ3lkVXlFVVVWZjFkY0x0S1kxeDNVQjhrSGVOYk1oRGhKdm9V?=
- =?utf-8?B?TEZoL1dPQy9DWjcyV2xsMW5mZDF2TkFkZmRHTGFvZXo3U0FCblFrNElzYzNR?=
- =?utf-8?B?bzBuaURiR2VNV05sWlhTL0E4UVM0VFlUandXUkhhSTk5S3llQU5lQVNwU1U1?=
- =?utf-8?B?dWcxaTUrdzlvTUl6VzFYWUNJWXBLUkx1YWlnZ1d6VFEyY3M1cmdQaEFZbGJL?=
- =?utf-8?B?OHZNb1VESmo1VFpWb0phYWwzV3VqaTJBWGtVU0tIK3lWdW1pa2dTMXNpaG80?=
- =?utf-8?B?czc1cUlYUDNwQTh5ekE2Q2lpVXoycS9pQ1ludytCMnVRZzNYSWNqSEZuNVpo?=
- =?utf-8?B?cGFzVnN4dXRwbVRJQ3Y3OVh1a1lyM0hIcHA1VVcxZ21NbmlreEJZR1hnZ3h1?=
- =?utf-8?B?Y2oxYnM0Ujg5L2FpRnI3d0JlNGlXVVdVM1Jmbmx4eW4wakdtWnR3NWdEVklU?=
- =?utf-8?B?Z0hTNitYcEZnRTNEN0puVGtGY2xrdnlMck5GYnNOcVlUenRITittN0MxWkov?=
- =?utf-8?Q?a1aLQslQhN7PhllMEhJ31pjNt?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 39793590-2800-47f1-4e21-08db4d7f5f85
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR12MB7982.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 May 2023 15:42:46.2724
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: N05Lcxee1FcFdxSeoHDT0iTJuNf89og9LEM37NDjuhpvQDb7RPImuoMcvO0kYd67kwvjBCt2X23Ph6q7swKK/g==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA3PR12MB7782
-X-Spam-Status: No, score=-5.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <ZFUh/KlLXJF+2hoJ@suse.de>
+User-Agent: Mutt/2.2.9 (2022-11-12)
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
+X-Spam-Status: No, score=-2.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 5/4/2023 10:50 AM, Jason Gunthorpe wrote:
-> Caution: This message originated from an External Source. Use proper caution when opening attachments, clicking links, or responding.
+On Fri, May 05, 2023 at 05:34:20PM +0200, Jörg Rödel wrote:
+> Hi Claudio,
 > 
+> On Wed, May 03, 2023 at 12:51:17PM -0400, Claudio Carvalho wrote:
+> > Thanks. I would be happy to collaborate in that discussion.
 > 
-> On Fri, Apr 21, 2023 at 06:06:39PM -0700, Brett Creeley wrote:
+> Great, I will send out that email early next week to get the discussion
+> rolling.
 > 
->> +static int
->> +pds_vfio_dma_map_lm_file(struct device *dev, enum dma_data_direction dir,
->> +                      struct pds_vfio_lm_file *lm_file)
->> +{
->> +     struct pds_lm_sg_elem *sgl, *sge;
->> +     struct scatterlist *sg;
->> +     dma_addr_t sgl_addr;
->> +     size_t sgl_size;
->> +     int err;
->> +     int i;
->> +
->> +     if (!lm_file)
->> +             return -EINVAL;
->> +
->> +     /* dma map file pages */
->> +     err = dma_map_sgtable(dev, &lm_file->sg_table, dir, 0);
->> +     if (err)
->> +             return err;
->> +
->> +     lm_file->num_sge = lm_file->sg_table.nents;
->> +
->> +     /* alloc sgl */
->> +     sgl_size = lm_file->num_sge * sizeof(struct pds_lm_sg_elem);
->> +     sgl = kzalloc(sgl_size, GFP_KERNEL);
->> +     if (!sgl) {
->> +             err = -ENOMEM;
->> +             goto err_alloc_sgl;
->> +     }
->> +
->> +     sgl_addr = dma_map_single(dev, sgl, sgl_size, DMA_TO_DEVICE);
->> +     if (dma_mapping_error(dev, sgl_addr)) {
->> +             err = -EIO;
->> +             goto err_map_sgl;
->> +     }
->> +
->> +     lm_file->sgl = sgl;
->> +     lm_file->sgl_addr = sgl_addr;
->> +
->> +     /* fill sgl */
->> +     sge = sgl;
->> +     for_each_sgtable_dma_sg(&lm_file->sg_table, sg, i) {
->> +             sge->addr = cpu_to_le64(sg_dma_address(sg));
->> +             sge->len  = cpu_to_le32(sg_dma_len(sg));
->> +             dev_dbg(dev, "addr = %llx, len = %u\n", sge->addr, sge->len);
->> +             sge++;
->> +     }
+> > I think the crypto support requires more design discussion since it is required
+> > in multiple places.
+> > 
+> > The experience I've had adding SVSM-vTPM support is that the SVSM needs crypto
+> > for requesting an attestation report (SNP_GUEST_REQUEST messages sent to the
+> > security processor PSP have to be encrypted with AES_GCM) and the vTPM also
+> > needs crypto for the TPM crypto operations. We could just duplicate the crypto
+> > library, or find a way to share it (e.g. vdso approach).
+> > 
+> > For the SVSM, it would be rust code talking to the crypto library; for the vTPM
+> > it would be the vTPM (most likely an existing C implementation) talking to the
+> > crypto library.
 > 
-> This sequence is in the wrong order, the dma_map_single() has to be
-> after the data is written to the memory as it synchronizes the caches
-> on some arches
+> Right, where to place and how to share the crypto code needs more
+> discussion, there are multiple possible approaches. I have seen that you
+> have a talk at KVM Forum, so we can meet there in a larger group and
+> discuss those and other questions in person.
 
-This is an easy enough fix and I'll keep this in mind moving forward. 
-Thanks for pointing it out.
+Yep, we should probably do a BoF session on the topic of SVSM
+for anyone interested who's attending KVM Forum.
 
-> 
->> +
->> +     return 0;
->> +
->> +err_map_sgl:
->> +     kfree(sgl);
->> +err_alloc_sgl:
->> +     dma_unmap_sgtable(dev, &lm_file->sg_table, dir, 0);
->> +     return err;
-> 
-> And why is the goto error unwind in a messed up order? Error unwinds
-> should always be strictly in the opposite order of the success
-> path. Check them all when you are fixing the "come from" notation
-> 
-> Jason
+With regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
-Yeah, this wasn't on purpose. Thanks again for pointing things like this 
-out. As you noted I will go through the entire series to make sure the 
-goto labels are named by what they are freeing/clearing and also that 
-they are in the correct opposite order.
-
-Thanks again for the review.
-
-Brett
