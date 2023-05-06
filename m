@@ -2,119 +2,197 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8BDE66F8D46
-	for <lists+kvm@lfdr.de>; Sat,  6 May 2023 02:56:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7EE446F8D42
+	for <lists+kvm@lfdr.de>; Sat,  6 May 2023 02:55:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232788AbjEFA4N (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 5 May 2023 20:56:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40406 "EHLO
+        id S232646AbjEFAzp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 5 May 2023 20:55:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39926 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232505AbjEFA4L (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 5 May 2023 20:56:11 -0400
-Received: from mail-yw1-x1136.google.com (mail-yw1-x1136.google.com [IPv6:2607:f8b0:4864:20::1136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A662B7297
-        for <kvm@vger.kernel.org>; Fri,  5 May 2023 17:56:03 -0700 (PDT)
-Received: by mail-yw1-x1136.google.com with SMTP id 00721157ae682-55a5e0f5b1aso23320027b3.0
-        for <kvm@vger.kernel.org>; Fri, 05 May 2023 17:56:03 -0700 (PDT)
+        with ESMTP id S231578AbjEFAzo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 5 May 2023 20:55:44 -0400
+Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 19B075FD6
+        for <kvm@vger.kernel.org>; Fri,  5 May 2023 17:55:41 -0700 (PDT)
+Received: by mail-pf1-x449.google.com with SMTP id d2e1a72fcca58-643b490e744so399139b3a.3
+        for <kvm@vger.kernel.org>; Fri, 05 May 2023 17:55:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1683334563; x=1685926563;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=uKg9ooWeNyIkgIgwiRq1E2syoa7nncxzMKLzyswsRsc=;
-        b=oEYCubX2MVaZ3lIzvYofKvwQIDmS/lXvTaPe+nx4JYIouIEOq7/VZNJBz/955TtNWl
-         rYZHJ+9qECqeg4RDvNtvrHP7Ui0lGMPDX2ubGmDW8gNEBQ4HBdjErLbRCtIQE4/ErBRb
-         UlUMiTVsTHoQ8RelA4t0FXBYWpOlPMnSpnz4cQsoVWkXnKmP9FEXp+ofhhYThW6YyuE1
-         IHUvMHy+BC8pzZGtWZNz6yAWNfS98wy2U8g8HBZK4UcJlfQuJKNgMLKe1XbotZB+DRQJ
-         E6hjwHB7/x0k7bAxrYPgZylFDAG4hiLFoxg569IPVzorgRuRk9NqLc9+2y4ttTt5sYY5
-         aecQ==
+        d=google.com; s=20221208; t=1683334540; x=1685926540;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=zRRGoezVjrIJz5N+FioPcqJbdxQwzqiRfGJICB0gSl0=;
+        b=UpYChMPZgxXrJfH4l23tzDktWdIvotKB1GRwqdFqf1JDxIi4hdLP0ldcQ3FF1NGMm9
+         +/7uxZwEgtPYCovDakapcgTqrnMQzFHr1QDL9SrQrcj/2MpwGWyL1PAKFtpdP551l+ce
+         QDy6oQs+dcn96UWmheECM7So3pZG7H16crEQpkCq8iDvMEMqdNXbsf1iVtl/ue3iWn8i
+         RqWmSxKcnhpvWPeN/mpjYZu+xPxp7B57d0RzKnI7WuVpP7HlnLPG+m5vl1H9OY+0ugOf
+         ppaxx7+Buq7V7Q6W2pnmVI9t3ROgDdkQhChQu8oyDuqgeY4UArPb39lI1P392oDmLKmO
+         FnOw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683334563; x=1685926563;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=uKg9ooWeNyIkgIgwiRq1E2syoa7nncxzMKLzyswsRsc=;
-        b=LJ026DFh7lw4x5Jjw5RB/M4ewPhyPhWLa5lOqiZEgey20S4YdZc1jOKOsAEOHWICU7
-         4KsPmEKdx+HLy8/I8jVjd20IWHQp7vcKNf9OxuX35UCJkqB7ulft22MS8tJ7rQvWt5G0
-         CiaNx8T6OMkgoWNT3fFpUdf0F6yGcEte8Wd8lc9Evk1ibb1yIDq/6tl2TN2NjIx05ltI
-         T3fJnwG0jdjM0TX012v0NzHKYPMxgBmBg2FECR2l06v/PrSFpxEHemBzI9CGuZSeXgLW
-         u4ksg0i9T4queWrlNijOMKBV4eZ5YqyrFswqPZOKTZnrS/D6qH6n4XAG2AN5AVd0Map1
-         x0AA==
-X-Gm-Message-State: AC+VfDwDI78yayWIM6gqWeAUM0PgIE9glRKQq8htKaZh8ONddjCrrLhU
-        NNAWYmoBLgrzQfIL+bQ2ij3di31ycSq/4lnzuLQihQ==
-X-Google-Smtp-Source: ACHHUZ7wTUegv3WyR7/Hq6e7DeiGJOrweEWBdXtRxu9dBQrh9sKO2r4H3TUs5GZtQPSXUUdXPbUlcJtY7oipXngdTpg=
-X-Received: by 2002:a0d:cb44:0:b0:556:b029:e101 with SMTP id
- n65-20020a0dcb44000000b00556b029e101mr3457366ywd.19.1683334562650; Fri, 05
- May 2023 17:56:02 -0700 (PDT)
-MIME-Version: 1.0
-References: <20230421165305.804301-1-vipinsh@google.com> <20230421165305.804301-10-vipinsh@google.com>
- <86pm7xjh3y.wl-maz@kernel.org>
-In-Reply-To: <86pm7xjh3y.wl-maz@kernel.org>
-From:   Vipin Sharma <vipinsh@google.com>
-Date:   Fri, 5 May 2023 17:55:26 -0700
-Message-ID: <CAHVum0d4W0emmyS0G8_nCXQuvgZN-8utDiT6TMYrOq7dF60aAw@mail.gmail.com>
-Subject: Re: [PATCH 9/9] KVM: arm64: Run clear-dirty-log under MMU read lock
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     oliver.upton@linux.dev, james.morse@arm.com,
-        suzuki.poulose@arm.com, yuzenghui@huawei.com,
-        catalin.marinas@arm.com, will@kernel.org, chenhuacai@kernel.org,
-        aleksandar.qemu.devel@gmail.com, tsbogend@alpha.franken.de,
-        anup@brainfault.org, atishp@atishpatra.org,
-        paul.walmsley@sifive.com, palmer@dabbelt.com,
-        aou@eecs.berkeley.edu, seanjc@google.com, pbonzini@redhat.com,
-        dmatlack@google.com, ricarkol@google.com,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        linux-mips@vger.kernel.org, kvm-riscv@lists.infradead.org,
-        linux-riscv@lists.infradead.org, linux-kselftest@vger.kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+        d=1e100.net; s=20221208; t=1683334540; x=1685926540;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=zRRGoezVjrIJz5N+FioPcqJbdxQwzqiRfGJICB0gSl0=;
+        b=MafI+ifi8OouOUGsE6jIIoQgEuzV0XjxNCGiwTlQGc209CsW/t7xd4EjePUwnqftuk
+         WCAWG83+HLKUAj63Jpox2beTfkoTiOfM3aLU8P9H5oet9n1YbshD2ZcAElARueilq2A/
+         h5lE7Id7gie0mZScs+EBnXKj/lWpGiCzWArVI/yxy0J5JoLY9pgbCaZUTF7hYcNmCajD
+         r8dyQENKZg+DdCNCISKY6WylfwibT3srfWE3I5WM4sKT8+Yy1/5lOYMVtd4exMbwVcjr
+         +E9K0C5KsRroPHvzikkOvgO8YVSbo5YThQwA43iiF6i2/3lbRx2GVnuRK+S+/a1GdGkQ
+         4MBg==
+X-Gm-Message-State: AC+VfDwXrWHl8q0gAQ06QP5K79P06wQ8oF7sr7OWqI01ivoR0NPJKad3
+        5KS2K5qrr+u35MfwM1RPbjpvKLIe+Zw=
+X-Google-Smtp-Source: ACHHUZ5t1L56HilEp1RyedgEx7HTDhX3hmEqxAK4trb2yBcM7c0Gmtr2ABkxUAvvOv8dHcwHX/8vCAiPVuE=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:d68:b0:643:6fa8:e7f4 with SMTP id
+ n40-20020a056a000d6800b006436fa8e7f4mr981901pfv.0.1683334540635; Fri, 05 May
+ 2023 17:55:40 -0700 (PDT)
+Date:   Fri, 5 May 2023 17:55:39 -0700
+In-Reply-To: <diqz8re2ftzb.fsf@ackerleytng-ctop.c.googlers.com>
+Mime-Version: 1.0
+References: <ZEM5Zq8oo+xnApW9@google.com> <diqz8re2ftzb.fsf@ackerleytng-ctop.c.googlers.com>
+Message-ID: <ZFWli2/H5M8MZRiY@google.com>
+Subject: Re: Rename restrictedmem => guardedmem? (was: Re: [PATCH v10 0/9]
+ KVM: mm: fd-based approach for supporting KVM)
+From:   Sean Christopherson <seanjc@google.com>
+To:     Ackerley Tng <ackerleytng@google.com>
+Cc:     david@redhat.com, chao.p.peng@linux.intel.com, pbonzini@redhat.com,
+        vkuznets@redhat.com, jmattson@google.com, joro@8bytes.org,
+        mail@maciej.szmigiero.name, vbabka@suse.cz, vannapurve@google.com,
+        yu.c.zhang@linux.intel.com, kirill.shutemov@linux.intel.com,
+        dhildenb@redhat.com, qperret@google.com, tabba@google.com,
+        michael.roth@amd.com, wei.w.wang@intel.com, rppt@kernel.org,
+        liam.merwick@oracle.com, isaku.yamahata@gmail.com,
+        jarkko@kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, hughd@google.com, brauner@kernel.org
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Apr 21, 2023 at 10:11=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrot=
-e:
->
-> On Fri, 21 Apr 2023 17:53:05 +0100,
-> Vipin Sharma <vipinsh@google.com> wrote:
-> >
-> > Take MMU read lock for write protecting PTEs and use shared page table
-> > walker for clearing dirty logs.
-> >
-> > Clearing dirty logs are currently performed under MMU write locks. This
-> > means vCPUs write protection fault, which also take MMU read lock,  wil=
-l
-> > be blocked during this operation. This causes guest degradation and
-> > especially noticeable on VMs with lot of vCPUs.
-> >
-> > Taking MMU read lock will allow vCPUs to execute parallelly and reduces
-> > the impact on vCPUs performance.
->
-> Sure. Taking no lock whatsoever would be even better.
->
-> What I don't see is the detailed explanation that gives me the warm
-> feeling that this is safe and correct. Such an explanation is the
-> minimum condition for me to even read the patch.
->
+On Fri, May 05, 2023, Ackerley Tng wrote:
+>=20
+> Hi Sean,
+>=20
+> Thanks for implementing this POC!
+>=20
+> I=E2=80=99ve started porting the selftests (both Chao=E2=80=99s and those=
+ I added [1]).
+>=20
+> guest mem seems to cover the use cases that have been discussed and
+> proposed so far, but I still need to figure out how gmem can work with
+>=20
+> + hugetlbfs
+> + specification of/storing memory policy (for NUMA node bindings)
+> + memory accounting - we may need to account for memory used separately,
+>   so that guest mem shows up separately on /proc/meminfo and similar
+>   places.
+>=20
+> One issue I=E2=80=99ve found so far is that the pointer to kvm (gmem->kvm=
+) is
+> not cleaned up, and hence it is possible to crash the host kernel in the
+> following way
+>=20
+> 1. Create a KVM VM
+> 2. Create a guest mem fd on that VM
+> 3. Create a memslot with the guest mem fd (hence binding the fd to the
+>    VM)
+> 4. Close/destroy the KVM VM
+> 5. Call fallocate(PUNCH_HOLE) on the guest mem fd, which uses gmem->kvm
+>    when it tries to do invalidation.
+>=20
+> I then tried to clean up the gmem->kvm pointer during unbinding when the
+> KVM VM is destroyed.
+>=20
+> That works, but then I realized there=E2=80=99s a simpler way to use the =
+pointer
+> after freeing:
+>=20
+> 1. Create a KVM VM
+> 2. Create a guest mem fd on that VM
+> 3. Close/destroy the KVM VM
+> 4. Call fallocate(PUNCH_HOLE) on the guest mem fd, which uses gmem->kvm
+>    when it tries to do invalidation.
+>=20
+> Perhaps binding should mean setting the gmem->kvm pointer in addition to
+> gmem->bindings. This makes binding and unbinding symmetric and avoids
+> the use-after-frees described above.
 
-Thanks for freaking me out. Your not getting warm feeling hunch was
-right, stage2_attr_walker() and stage2_update_leaf_attrs() combo do
-not retry if cmpxchg fails for write protection. Write protection
-callers don't check what the return status of the API is and just
-ignores cmpxchg failure. This means a vCPU (MMU read lock user) can
-cause cmpxchg to fail for write protection operation (under read lock,
-which this patch does) and clear ioctl will happily return as if
-everything is good.
+Hrm, that would work, though it's a bit convoluted, e.g. would require dete=
+cting
+when the last binding is being removed.  A similar (also ugly) solution wou=
+ld be
+to nullify gmem->kvm when KVM dies.
 
-I will update the series and also work on validating the correctness
-to instill more confidence.
+I don't love either approach idea because it means a file created in the co=
+ntext
+of a VM can outlive the VM itself, and then userspace ends up with a file d=
+escriptor
+that it can't do anything with except close().  I doubt that matters in pra=
+ctice
+though, e.g. when the VM dies, all memory can be freed so that the file end=
+s up
+being little more than a shell.  And if we go that route, there's no need t=
+o grab
+a reference to the file during bind, KVM can just grab a longterm reference=
+ when
+the file is initially created and then drop it when KVM dies (and nullifies=
+ gmem->kvm).
 
-Thanks
+Blech, another wart is that I believe gmem would need to do __module_get() =
+during
+file creation to prevent kvm.ko from being unloaded after the last VM dies.=
+  Ah,
+but that'd also be true if we went with a system-scoped KVM ioctl(), so I s=
+uppose
+it's not _that_ ugly.
+
+Exchanging references (at binding or at creation) doesn't work, because tha=
+t
+creates a circular dependency, i.e. gmem and KVM would pin each other.=20
+
+A "proper" refcounting approach, where the file pins KVM and not vice versa=
+, gets
+nasty because of how KVM's memslots work.  The least awful approach I can t=
+hink of
+would be to delete the associated memslot(s) when the file is released, pos=
+sibly
+via deferred work to avoid deadlock issues.  Not the prettiest thing ever a=
+nd in
+some ways that'd yield an even worse ABI.
+
+Side topic, there's a second bug (and probably more lurking): kvm_swap_acti=
+ve_memslots()'s
+call to synchronize_srcu_expedited() is done _before_ the call to kvm_gmem_=
+unbind(),
+i.e. doesn't wait for readers in kvm_gmem_invalidate_begin() to go away.  T=
+he easy
+solution for that one is to add another synchronize_srcu_expedited() after =
+unbinding.
+
+> This also means that creating a guest mem fd is no longer dependent on
+> the VM. Perhaps we can make creating a gmem fd a system ioctl (like
+> KVM_GET_API_VERSION and KVM_CREATE_VM) instead of a vm ioctl?
+
+My preference is to make it a VM-scoped ioctl(), if it ends up being a KVM =
+ioctl()
+and not a common syscall.  If the file isn't tightly coupled to a single VM=
+, then
+punching a hole is further complicated by needing to deal with invalidating=
+ multiple
+regions that are bound to different @kvm instances.  It's not super complex=
+, but
+AFAICT having the ioctl() be system-scoped doesn't add value, e.g. I don't =
+think
+having one VM own the memory will complicate even if/when we get to the poi=
+nt where
+VMs can share "private" memory, and the gmem code would still need to deal =
+with
+grabbing a module reference.
