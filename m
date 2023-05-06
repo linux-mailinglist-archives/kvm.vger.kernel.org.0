@@ -2,186 +2,194 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 34A006F9086
-	for <lists+kvm@lfdr.de>; Sat,  6 May 2023 10:21:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BDD296F9077
+	for <lists+kvm@lfdr.de>; Sat,  6 May 2023 10:13:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231705AbjEFIVc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 6 May 2023 04:21:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59716 "EHLO
+        id S231567AbjEFINz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 6 May 2023 04:13:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57236 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231638AbjEFIV0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 6 May 2023 04:21:26 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90ADD9EF9
-        for <kvm@vger.kernel.org>; Sat,  6 May 2023 01:20:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1683361241;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=W+cU6hTxnO9+qbS4HZrZOmgB68CTHmsF8DCfihRTe+M=;
-        b=KTW0r2HhoHkuk+jK1DyS2gZQbsgyaS8qVAGoAAvNBIQmwZt/EuiPPF9k5FisyUNTz+Gnff
-        ESt+Fw5Yd0X8FIB9u67B7aVONBlvv9f0zatLX3u7rV6SwBwo9p6yif8T3uliQGZcdMqJaB
-        FkyctEadoR2PWul/FrOjKqOEAIEBMq0=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-319-fcyq1iJ_NPuaaE_FUQvT5A-1; Sat, 06 May 2023 04:20:36 -0400
-X-MC-Unique: fcyq1iJ_NPuaaE_FUQvT5A-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B88DE1C05AF3;
-        Sat,  6 May 2023 08:20:35 +0000 (UTC)
-Received: from ptitbras (unknown [10.39.192.69])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 104AC1121314;
-        Sat,  6 May 2023 08:20:33 +0000 (UTC)
-References: <ZBl4592947wC7WKI@suse.de>
- <4420d7e5-d05f-8c31-a0f2-587ebb7eaa20@amd.com> <ZFJTDtMK0QqXK5+E@suse.de>
- <614e66054c58048f2f43104cf1c9dcbc8745f292.camel@linux.ibm.com>
-User-agent: mu4e 1.10.0; emacs 28.2
-From:   Christophe de Dinechin <dinechin@redhat.com>
-To:     jejb@linux.ibm.com
-Cc:     =?utf-8?B?SsO2cmcgUsO2ZGVs?= <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Klaus Kiwi <kkiwi@redhat.com>, linux-coco@lists.linux.dev,
-        kvm@vger.kernel.org, amd-sev-snp@lists.suse.com
-Subject: Re: [ANNOUNCEMENT] COCONUT Secure VM Service Module for SEV-SNP
-Date:   Fri, 05 May 2023 14:35:29 +0200
-In-reply-to: <614e66054c58048f2f43104cf1c9dcbc8745f292.camel@linux.ibm.com>
-Message-ID: <m25y95j2gg.fsf@redhat.com>
+        with ESMTP id S229527AbjEFINy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 6 May 2023 04:13:54 -0400
+Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56BB09EF9;
+        Sat,  6 May 2023 01:13:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1683360833; x=1714896833;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=zOHC+tFXpfzeAR4cwluAHkDA8fpWAYvLS1mC0DlYVx8=;
+  b=Bj8vNgHDMnjUrNIrtQsamvkdPSh6FjDASHJZ2L3raLs2N3h0RZZ6LBAG
+   2sY1z204cM7kvv2FcW9KedzUVgvR6Ic7I6HEtXhMo2TTlYZkz+NKwHsLd
+   6bVpKRA34c3DYpmKRyESDR5zOyLpFpSTkZE5UiNH8pwSWTgztife18bAS
+   DhtVwu58uGN7UXMHjdUkOtEDdiWS+PJI5qpdpSrpdKR9d4rCWfRjqz1WF
+   MjoEX5h/H4UM04i/tHZI+zMU5/IqJ7svxZqekR7uOSEO54ppROa8KN/3j
+   LeqjV5OSImhx7/nfY4cZ0LvWUfb87td6neyoShckbWcGmKxs42xmHv8bK
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10701"; a="352414598"
+X-IronPort-AV: E=Sophos;i="5.99,254,1677571200"; 
+   d="scan'208";a="352414598"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 May 2023 01:13:52 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10701"; a="700771129"
+X-IronPort-AV: E=Sophos;i="5.99,254,1677571200"; 
+   d="scan'208";a="700771129"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by fmsmga007.fm.intel.com with ESMTP; 06 May 2023 01:13:52 -0700
+Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.23; Sat, 6 May 2023 01:13:52 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.23; Sat, 6 May 2023 01:13:51 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.23 via Frontend Transport; Sat, 6 May 2023 01:13:51 -0700
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.175)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.23; Sat, 6 May 2023 01:13:51 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=cWc62PuaVkU/upWRjz0YvV0iQFKT0AeLRgShbfJnlZi3Y/wm5vAPeE5+P3fhuHdOyZu8u72HCY+2UVwC8UZ+hB8yVQafuaV/QxDKiXX+jku8UhljZsH+Hd5ZL59dzR1Z9HuQuYOAYDbPSywWeBcgVy7jHUPAAk32dYdq9/Bafbm2ibMBf6JFx7rzURcrDxjdABsalirCbBxXE29zteQX/vRfQ1t/qjdXlyXLIkFzmInYLg/6b4EiD2G+XAzg+Xi+WmX/jnM973nYmplZ6/fmnC7Nk0RPJ6YaPoqV9Go7UlLBOl/Op72Ely5HhdJ2KVRh3WUAbutw4Q5FUFD8AguNfw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=zOHC+tFXpfzeAR4cwluAHkDA8fpWAYvLS1mC0DlYVx8=;
+ b=ONt6QQKUDPfZCE3aU0q4BPZtzvGqZnUgzgt5C0mQNJA2bC3sIWfFYlXVLcLnjWVnHHfcKVmSQyxBJWMRJnwPnuc/c7LjbqmOWalh7F24XM/nyHLdaaxY9Xoc7tUs7dDvhfXAOZnwmmQAtnsa1fYhUjGHISuCe7RYlJULY6WY6uYfJUjJksnBmHm9UuTJlNanbqmsASQwaNWbWMj3wLa5DUnW/hQDj7Ds9fpkQvR8Sx/7ZPEN38gGHRFttr/LkwUfOECreklEEQNhpOCW5NeSoTv0bArjVknO+S3bBdrs0mH73viBbaYJhuYiJUL6Hw5IrMaDGwL5CGTS3ruCkFIGqg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
+ by CH0PR11MB5562.namprd11.prod.outlook.com (2603:10b6:610:d5::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6363.29; Sat, 6 May
+ 2023 08:13:50 +0000
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::73e9:b405:2cae:9174]) by BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::73e9:b405:2cae:9174%8]) with mapi id 15.20.6363.029; Sat, 6 May 2023
+ 08:13:50 +0000
+From:   "Tian, Kevin" <kevin.tian@intel.com>
+To:     "Chatre, Reinette" <reinette.chatre@intel.com>,
+        "jgg@nvidia.com" <jgg@nvidia.com>,
+        "yishaih@nvidia.com" <yishaih@nvidia.com>,
+        "shameerali.kolothum.thodi@huawei.com" 
+        <shameerali.kolothum.thodi@huawei.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>
+CC:     "tglx@linutronix.de" <tglx@linutronix.de>,
+        "darwi@linutronix.de" <darwi@linutronix.de>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "Jiang, Dave" <dave.jiang@intel.com>,
+        "Liu, Jing2" <jing2.liu@intel.com>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "Yu, Fenghua" <fenghua.yu@intel.com>,
+        "tom.zanussi@linux.intel.com" <tom.zanussi@linux.intel.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: RE: [PATCH V4 10/11] vfio/pci: Support dynamic MSI-X
+Thread-Topic: [PATCH V4 10/11] vfio/pci: Support dynamic MSI-X
+Thread-Index: AQHZeS7NjeBSeWLT50GaZQKxGXZCA69ARxSQgADG4ICACkQGoIAAp64AgAD5QSA=
+Date:   Sat, 6 May 2023 08:13:49 +0000
+Message-ID: <BN9PR11MB5276FB14B00352802562C6308C739@BN9PR11MB5276.namprd11.prod.outlook.com>
+References: <cover.1682615447.git.reinette.chatre@intel.com>
+ <c4c582970fbeaf4b6000845c400aa4c6b7bb2f13.1682615447.git.reinette.chatre@intel.com>
+ <BN9PR11MB5276B67702AACB0B5BF1EC0A8C6B9@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <296ec21f-fc7d-eaf2-484c-27ae8815c5a8@intel.com>
+ <BN9PR11MB5276ED7B47909222093E92438C729@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <ca71f97e-ce0b-945e-4e86-49f485fa7d5b@intel.com>
+In-Reply-To: <ca71f97e-ce0b-945e-4e86-49f485fa7d5b@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BN9PR11MB5276:EE_|CH0PR11MB5562:EE_
+x-ms-office365-filtering-correlation-id: 9fe6ee36-7117-4c18-8453-08db4e09d27f
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: Fhaph2PzkwTZ4qTz7PJh0r5u0bzsqJzgevQg7fN3XS440pv/VIhN/ojr8HeuqlL/B/uOlgL6cEgRUvBSag/O87JOAW7Zc9mqY0EzgOsYUs5HTDms6kHsBbhJvNPgf1xm4TuGFJ26SDdj6c8KrJs2pMjsbZEVyfp6keb85po+LAzYNBLiyFbIQtu9bF6zSQ0X8XJnRl6yFGqh7J8l3l6lPm01ezLgju+xUGybRNhwTxLPuXLpcO2nGzVIiDPx9dhsmDmOPYhbO+tQrikFiSL9e15aNHOR1Ai5KdBut+EnG2PAYGMMEbbopThLUOAaI1Px680RdSGyBA9zdSrs2TmjFTYJu9KbNiIWJvt5pBAWWs1NfIwuiRTX3/W//NFTVe24F+3czK2zlO+PMdPjqCeEMN2pGyEgJl1kwWJ4cc9xoBVmj1uLP37j7+cV0X5RjbYFiFLN/oT3lvG9z3ffrhXbHZa1th9XUSjf6AgbY0f6FLFif3F39WqgrOs9Wpfb440kT2F95gOtfxi7nwkQKJXvrGFKpqQeCSI2m/knbv2OgEb+49jifeK62eZEf06okRWPWecV1zVEJ4BBb01Om9CfIBy6JvUaXDGvtsTEg+VGyZ1XmvhBNUvVeQMAgHVW5VP9
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(136003)(39860400002)(366004)(376002)(396003)(346002)(451199021)(71200400001)(7696005)(83380400001)(55016003)(186003)(122000001)(38100700002)(86362001)(38070700005)(33656002)(82960400001)(6506007)(9686003)(64756008)(66446008)(66476007)(66556008)(66946007)(4326008)(4744005)(2906002)(76116006)(54906003)(110136005)(41300700001)(52536014)(5660300002)(316002)(8676002)(8936002)(478600001);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?SnhzTEpYZVVCUGRjVUR2WE9OMTJyS1dWY25ncnFKbkNWb0Z5Q3BQMzBKWG15?=
+ =?utf-8?B?SWE3cGtCb1p0WEY1NWljZk84V3N3NHkxdllLZ0g4ZnAxaXlrS0wyMmtBVko5?=
+ =?utf-8?B?WE04RTBMTndETER6L0piSkNlcm8yWVFSdzNUOVZTdFlRbGFFREVRMWw2VEtl?=
+ =?utf-8?B?ejdyTGdTbWMwWmthUUdvUTByTEFMQkd6NE02U01tQ2hTR2Nic0h5dGlPWlBw?=
+ =?utf-8?B?VGFyaW44L2c3K21iNmhSL0tsVWloa2plNVRUd0R4c0lFa2hxbHhUQ2dkaHF3?=
+ =?utf-8?B?ZGtWMjQ0MTY4cG9Bc3JzSnppNlpLS0RpS1d3MWNkcEZkdnY3UG1PTXUzZkcw?=
+ =?utf-8?B?MlE5bkhENjR6V1R4U3NRYnJxcUNDcmZvVmZqNlJDeHV6Y3R0bTN0a2lZQ2ll?=
+ =?utf-8?B?SHRFUGJEc3VsTlVLSklpckJvckk2WHl4WWhQdDE1U0NEZm1GMThVRGg3M2l1?=
+ =?utf-8?B?NDduVVVyVEo1QTQzQXJVeG40OUlvTFRCcTEySTEzWXV3djBNRWw5VDNBQ3Zr?=
+ =?utf-8?B?eVo2M0JqeFBwTlhnVlFmRktHLzVFV2xxbExibVRpYUVRcEpuWldmbmozdEh0?=
+ =?utf-8?B?MVFNUlpnZGRsMllHQ3Rxekg4R1FOOVBNeTJ0dFA1emNpSWQvV0szT1NrMFhu?=
+ =?utf-8?B?OGQrclNQVDBRTVNxOG1QU3o5OGdOUjcwU3RNT0g5b2NBU2xXYTdXSmUrdFNu?=
+ =?utf-8?B?MTFuR1pMc3g2OGQydWdrR2lxNjM1STZva2tOelNHaitHTGIxaWU1aTJpV2N5?=
+ =?utf-8?B?eG90ay8zT2pZUG9VbjZkRjRaVUdRY3NRV2x6RXRPOEE3L21MSG93KzlsQk5I?=
+ =?utf-8?B?bVVrWHlMdmkrZmt0RzlVOVlDaEhFYXQ5dW9nNnFPOHRVSnZpaWFocW1UTVpw?=
+ =?utf-8?B?aXlxVGdtUE14NU5JTERYL1NMWDF0TzRwaUNtREFQS25ITE9KL2NEYXJhSEkw?=
+ =?utf-8?B?a2pXREJJZnRweFMzSGRRWm5DUXhQUmlQbWhjeU1yS0hrWlozSnB0dVhzZzZH?=
+ =?utf-8?B?SFJzRXRzM1c5TVVZRWNMNThBSXFGdXFCOWt4Ti9WWG9CQi83ZTI1SnlxeFdp?=
+ =?utf-8?B?VS9LWm40OEZDQy9xaXc5WCtyQW5UZkE0NWNWUXByMGxVbm1lbWxXMFc3M3JS?=
+ =?utf-8?B?NWxRQ1NkNVl3ZWhBaFdPdmxzM3YweEsrNWtFdmV0ZnkvZ2U2SGNndTNGN1Ry?=
+ =?utf-8?B?TWVudzk3Uy9ydnQvamlvWmZOcEFsMXN3WmF2c2ZnWXZ2NXFlenNxY01NSG5v?=
+ =?utf-8?B?dXhvU1N6WFJGUnJMa05BTE9ZTmcvTEVEYUVhOUk0TVFkVytnQjd0VlVvblFs?=
+ =?utf-8?B?L1JEdHlTY2x6UWlDTXhTQU5OTHd6MnNGOFBsMlFCZjhxejJyc0dWR0QvUDRZ?=
+ =?utf-8?B?TmdGRzhUUng1bHJaQklURzQ2WHROT1k1QnJTS3pIWGtWaWRUMXdEdE5Lcmp5?=
+ =?utf-8?B?UmNPRXppeXBYODUxKzNNTEZQNzMrRnBVU0tyWU94TkFrV2dFWDAwaHQvdWla?=
+ =?utf-8?B?Wi9ORlY1VTFWL2htdG5kQVBCNVYxWUdEWjJoUzNYQXBDMkE2OVBkUlZuMEVi?=
+ =?utf-8?B?aUtBUUlNUVd0U2ZqNlY0V1NXSFdmTUhvajV2S0pVR2NEZ3NFTUhzMTNwUk5D?=
+ =?utf-8?B?VVdFWnlQNTVYV0dFcHVyajgyMUdvK3RNR1pOY1JaemVENEhuTHVtT29GRUF5?=
+ =?utf-8?B?NGZOTCtzYUh5Zm41dnN6TDBjQXVqcUx4UlNaazRoSHJQY2dnU2MzY1dPa2lv?=
+ =?utf-8?B?bWRjOVJMRmJyVWxManZhNk45SGc3YVpFT002WHlzRUhCRzNYd2wxdkcydWVq?=
+ =?utf-8?B?OTB2WVpJa0djUmJaUHhsSittK3dCUFB5ZTBLTHFPZFRoVis3RTAwWTV0ZVBy?=
+ =?utf-8?B?a2ZFVFpOWVVhQnB1MjB0aW5mMDR3cHhYbjhtaml0TUxwVjR6M1dEODl6SHRS?=
+ =?utf-8?B?S1hGRlc2QTIrMDZzRXk1NnRNWDRxemliQWY1aCtXb1NzeWdzenB3MGZHWDh0?=
+ =?utf-8?B?VnA5U01tdit3L0ZXb2k5L0ZGbDRWRHNTRjk2RjNPZ2RkYmRTbkZLZG5NVmxZ?=
+ =?utf-8?B?TWZaVDVOZ05tNW9lWERZYUV4WkhIYnI3S1JDWUxhT2JaQkhRMHdzczFFeXFq?=
+ =?utf-8?Q?4Dy8=3D?=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
-X-Spam-Status: No, score=-1.2 required=5.0 tests=BAYES_00,DATE_IN_PAST_12_24,
-        DKIMWL_WL_HIGH,DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
-        version=3.4.6
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9fe6ee36-7117-4c18-8453-08db4e09d27f
+X-MS-Exchange-CrossTenant-originalarrivaltime: 06 May 2023 08:13:49.6115
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: u70CqjyACgyHgWlMmLes0CfUEeVNtKV1cdQXgiIjgcGAUE7JHYYOCprXQxeg+sE69xMM5uowqJ+WDufQP+RpmA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR11MB5562
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-On 2023-05-04 at 13:04 -04, James Bottomley <jejb@linux.ibm.com> wrote...
-> On Wed, 2023-05-03 at 14:26 +0200, J=C3=B6rg R=C3=B6del wrote:
->> On Tue, May 02, 2023 at 06:03:55PM -0500, Tom Lendacky wrote:
-> [...]
->> > =C2=A0 - On the subject of priorities, the number one priority for the
->> > =C2=A0=C2=A0=C2=A0 linux-svsm project has been to quickly achieve prod=
-uction
->> > quality vTPM support. The support for this is being actively worked
->> > on by linux-svsm contributors and we'd want to find fastest path
->> > towards getting that redirected into coconut-svsm (possibly
->> > starting with CPL0
->> > =C2=A0=C2=A0=C2=A0 implementation until CPL3 support is available) and=
- the project
->> > =C2=A0=C2=A0=C2=A0 hardened for a release.=C2=A0 I imagine there will =
-be some competing
->> > =C2=A0=C2=A0=C2=A0 priorities from coconut-svsm project currently, so =
-wanted to
->> > get this out on the table from the beginning.
->>
->> That has been under discussion for some time, and honestly I think
->> the approach taken is the main difference between linux-svsm and
->> COCONUT. My position here is, and that comes with a big 'BUT', that I
->> am not fundamentally opposed to having a temporary solution for the
->> TPM until CPL-3 support is at a point where it can run a TPM module.
->
-> OK, so this, for IBM, is directly necessary.  We have the vTPM pull
-> request about ready to go and we'll probably send it still to the AMD
-> SVSM.  Given that the AMD SVSM already has the openssl library and the
-> attestation report support, do you want to pull them into coconut
-> directly so we can base a coconut vTPM pull request on that?
->
->> And here come the 'BUT': Since the goal of having one project is to
->> bundle community efforts, I think that the joint efforts are better
->> targeted at getting CPL-3 support to a point where it can run
->> modules. On that side some input and help is needed, especially to
->> define the syscall interface so that it suits the needs of a TPM
->> implementation.
->
-> Crypto support in ring-0 is unavoidable if we want to retain control of
-> the VMPCK0 key in ring-0.  I can't see us giving it to ring-3 because
-> that would give up control of the SVSM identity and basically make the
-> ring-0 separation useless because you can compromise ring-3 and get the
-> key and then communicate with the PSP as the SVSM.
-
-I'm a but confused regarding the roles that VMPL vs rings is in the security
-model here. In particular, I assume that any attack on ring3 would still
-have to cross either the VMPL boundary (if coming from the guest) or the TEE
-boundary (if coming from the host).
-
->
-> I think the above problem also indicates no-one really has a fully
-> thought out security model that shows practically how ring-3 improves
-> the security posture.  So I really think starting in ring-0 and then
-> moving pieces to ring-3 and discussing whether this materially improves
-> the security posture based on the code and how it operates gets us
-> around the lack of understanding of the security model because we
-> proceed by evolution.
-
-And there is definitely a lot of complexity added by supporting ring3. You
-are essentially getting the complexity of a "real" operating system. By
-contrast, TDX is providing the same kind of isolation with secure enclaves,
-but at least the base OS kernel is shared.
-
-The expected benefit is to be able to run more complex code from ring3 with
-a better way to handle malfunctions, faults, whatever. At least that's the
-way I read it. So it's a way to write software in a more modular way.
-
-IIUC, the ring-3 modules of the SVSM would still be at VMPL0, so presumably,
-not accesible from host or guest. If we consider this property as strong,
-then do we really care entrusting ring3 with sensitive data?
-
->
-> The next question that's going to arise is *where* the crypto libraries
-> should reside.  Given they're somewhat large, duplicating them for
-> every cpl-3 application plus cpl-3 seems wasteful, so some type of vdso
-> model sounds better (and might work instead of a syscall interfaces for
-> cpl-0 services that are pure code).
-
-I don't understand what you call "pure code". I presume you mean "code that
-does not need to access ring0 data"?
-
->
->> It is also not the case that CPL-3 support is out more than a year or
->> so. The RamFS is almost ready, as is the archive file inclusion[1].
->> We will move to task management next, the goal is still to have basic
->> support ready in 2H2023.
->>
->> [1] https://github.com/coconut-svsm/svsm/pull/27
->
-> Well, depending on how you order them, possibly.  The vTPM has a simple
-> request/response model, so it really doesn't have much need of a
-> scheduler for instance.  And we could obviously bring up cpl-3 before a
-> module loader/ram filesystem and move to that later.
->
->> If there is still a strong desire to have COCONUT with a TPM (running
->> at CPL-0) before CPL-3 support is usable, then I can live with
->> including code for that as a temporary solution. But linking huge
->> amounts of C code (like openssl or a tpm lib) into the SVSM rust
->> binary kind of contradicts the goals which made us using Rust for
->> project in the first place. That is why I only see this as a
->> temporary solution.
->
-> I'm not sure it will be.  If some cloud or distro wants to shoot for
-> FIPS compliance of the SVSM, for instance, a requirement will likely be
-> to use a FIPS certified crypto library ... and they're all currently in
-> C.  That's not to say we shouldn't aim for minimizing the C
-> dependencies, but I don't see a "pure rust or else" approach
-> facilitating the initial utility of the project.
->
-> James
-
-
---
-Cheers,
-Christophe de Dinechin (https://c3d.github.io)
-Freedom Covenant (https://github.com/c3d/freedom-covenant)
-Theory of Incomplete Measurements (https://c3d.github.io/TIM)
-
+PiBGcm9tOiBDaGF0cmUsIFJlaW5ldHRlIDxyZWluZXR0ZS5jaGF0cmVAaW50ZWwuY29tPg0KPiBT
+ZW50OiBTYXR1cmRheSwgTWF5IDYsIDIwMjMgMToyMSBBTQ0KPiANCj4gV291bGQgeW91IGJlIG9r
+IHdpdGggc29tZXRoaW5nIGxpa2UgYmVsb3c/DQo+IA0KPiBkaWZmIC0tZ2l0IGEvZHJpdmVycy92
+ZmlvL3BjaS92ZmlvX3BjaV9pbnRycy5jIGIvZHJpdmVycy92ZmlvL3BjaS92ZmlvX3BjaV9pbnRy
+cy5jDQo+IGluZGV4IGI1NDlmNWM5N2NiOC4uYThlOTYyNTRmOTUzIDEwMDY0NA0KPiAtLS0gYS9k
+cml2ZXJzL3ZmaW8vcGNpL3ZmaW9fcGNpX2ludHJzLmMNCj4gKysrIGIvZHJpdmVycy92ZmlvL3Bj
+aS92ZmlvX3BjaV9pbnRycy5jDQo+IEBAIC0zOTMsNiArMzkzLDggQEAgc3RhdGljIGludCB2Zmlv
+X21zaV9hbGxvY19pcnEoc3RydWN0DQo+IHZmaW9fcGNpX2NvcmVfZGV2aWNlICp2ZGV2LA0KPiAg
+CXUxNiBjbWQ7DQo+IA0KPiAgCWlycSA9IHBjaV9pcnFfdmVjdG9yKHBkZXYsIHZlY3Rvcik7DQo+
+ICsJaWYgKFdBUk5fT05fT05DRShpcnEgPT0gMCkpDQo+ICsJCXJldHVybiAtRUlOVkFMOw0KPiAg
+CWlmIChpcnEgPiAwIHx8ICFtc2l4IHx8ICF2ZGV2LT5oYXNfZHluX21zaXgpDQo+ICAJCXJldHVy
+biBpcnE7DQo+IA0KPiBJIHdvdWxkIHByZWZlciB0aGF0IHZmaW9fbXNpX2FsbG9jX2lycSgpIHJl
+dHVybnMgbmVnYXRpdmUgZXJyb3JzLiBUaGlzIGVuYWJsZXMNCj4gY2FsbGVycyB0byBpbiB0dXJu
+IGp1c3QgcmV0dXJuIHRoZSBlcnJvciBjb2RlIG9uIGZhaWx1cmUgKG5vdGUgdGhhdCBkeW5hbWlj
+DQo+IGFsbG9jYXRpb24gY2FuIHJldHVybiBkaWZmZXJlbnQgZXJyb3IgY29kZXMpLCBub3QgbmVl
+ZGluZyB0byB0cmFuc2xhdGUgMCBpbnRvDQo+IGFuIGVycm9yLg0KPiANCg0KVGhpcyBsb29rcyBn
+b29kIHRvIG1lLiBUaGFua3MuDQo=
