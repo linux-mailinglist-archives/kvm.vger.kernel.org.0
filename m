@@ -2,73 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5FF756F8A34
-	for <lists+kvm@lfdr.de>; Fri,  5 May 2023 22:33:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8BDE66F8D46
+	for <lists+kvm@lfdr.de>; Sat,  6 May 2023 02:56:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233466AbjEEUdH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 5 May 2023 16:33:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60544 "EHLO
+        id S232788AbjEFA4N (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 5 May 2023 20:56:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40406 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233456AbjEEUdG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 5 May 2023 16:33:06 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4DE0D49D2;
-        Fri,  5 May 2023 13:33:05 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id DEA2C62F81;
-        Fri,  5 May 2023 20:33:04 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 4CE7DC433D2;
-        Fri,  5 May 2023 20:33:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1683318784;
-        bh=NdnK+bhqBm23Svz0A0viCXMCQ9i9M8JqT1rUxpcHwGY=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=tCmhvZyw3MXC7KRrO7rkSeHuAdBmNx4gNtCnF7q7IsQ+4E5qzfZWgTGrqS0rLRnOW
-         w0DBKRVUDLALgpy/ho1zYwNRvvNdBUnReyPuukW9Yr/zTmUKFRR/ajUCdEHlri6+pc
-         Kz3uBG24rWJbmqKhniDBUKSvsLJrO8ha1+w9B5Hl0RDrQHUM6P3q+kr9/7tuLD/Jp+
-         G7akRqqSmVvFPBud3W/wgnYpbxIzeDhhnsFGFiQEgWm6uSJMzR9/GecSb00UCgDd4E
-         c/TnYZm8qNQK+n5lVWJUlwZwESyQHZJUjWUJqcgvyYgjwsSklXQy9ayeTi1uCQyPtP
-         z8JhPZC9p41Pg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 3B240E5FFFA;
-        Fri,  5 May 2023 20:33:04 +0000 (UTC)
-Subject: Re: [GIT PULL] Second batch of KVM patches for Linux 6.4
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <20230505103912.3270597-1-pbonzini@redhat.com>
-References: <20230505103912.3270597-1-pbonzini@redhat.com>
-X-PR-Tracked-List-Id: <kvm.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20230505103912.3270597-1-pbonzini@redhat.com>
-X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
-X-PR-Tracked-Commit-Id: 7a8016d95651fecce5708ed93a24a03a9ad91c80
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 493804a6895d63240fe45d087cd14c4b77d8488b
-Message-Id: <168331878423.21250.14699972065852420276.pr-tracker-bot@kernel.org>
-Date:   Fri, 05 May 2023 20:33:04 +0000
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     torvalds@linux-foundation.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-X-Spam-Status: No, score=-7.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+        with ESMTP id S232505AbjEFA4L (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 5 May 2023 20:56:11 -0400
+Received: from mail-yw1-x1136.google.com (mail-yw1-x1136.google.com [IPv6:2607:f8b0:4864:20::1136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A662B7297
+        for <kvm@vger.kernel.org>; Fri,  5 May 2023 17:56:03 -0700 (PDT)
+Received: by mail-yw1-x1136.google.com with SMTP id 00721157ae682-55a5e0f5b1aso23320027b3.0
+        for <kvm@vger.kernel.org>; Fri, 05 May 2023 17:56:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1683334563; x=1685926563;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=uKg9ooWeNyIkgIgwiRq1E2syoa7nncxzMKLzyswsRsc=;
+        b=oEYCubX2MVaZ3lIzvYofKvwQIDmS/lXvTaPe+nx4JYIouIEOq7/VZNJBz/955TtNWl
+         rYZHJ+9qECqeg4RDvNtvrHP7Ui0lGMPDX2ubGmDW8gNEBQ4HBdjErLbRCtIQE4/ErBRb
+         UlUMiTVsTHoQ8RelA4t0FXBYWpOlPMnSpnz4cQsoVWkXnKmP9FEXp+ofhhYThW6YyuE1
+         IHUvMHy+BC8pzZGtWZNz6yAWNfS98wy2U8g8HBZK4UcJlfQuJKNgMLKe1XbotZB+DRQJ
+         E6hjwHB7/x0k7bAxrYPgZylFDAG4hiLFoxg569IPVzorgRuRk9NqLc9+2y4ttTt5sYY5
+         aecQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1683334563; x=1685926563;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=uKg9ooWeNyIkgIgwiRq1E2syoa7nncxzMKLzyswsRsc=;
+        b=LJ026DFh7lw4x5Jjw5RB/M4ewPhyPhWLa5lOqiZEgey20S4YdZc1jOKOsAEOHWICU7
+         4KsPmEKdx+HLy8/I8jVjd20IWHQp7vcKNf9OxuX35UCJkqB7ulft22MS8tJ7rQvWt5G0
+         CiaNx8T6OMkgoWNT3fFpUdf0F6yGcEte8Wd8lc9Evk1ibb1yIDq/6tl2TN2NjIx05ltI
+         T3fJnwG0jdjM0TX012v0NzHKYPMxgBmBg2FECR2l06v/PrSFpxEHemBzI9CGuZSeXgLW
+         u4ksg0i9T4queWrlNijOMKBV4eZ5YqyrFswqPZOKTZnrS/D6qH6n4XAG2AN5AVd0Map1
+         x0AA==
+X-Gm-Message-State: AC+VfDwDI78yayWIM6gqWeAUM0PgIE9glRKQq8htKaZh8ONddjCrrLhU
+        NNAWYmoBLgrzQfIL+bQ2ij3di31ycSq/4lnzuLQihQ==
+X-Google-Smtp-Source: ACHHUZ7wTUegv3WyR7/Hq6e7DeiGJOrweEWBdXtRxu9dBQrh9sKO2r4H3TUs5GZtQPSXUUdXPbUlcJtY7oipXngdTpg=
+X-Received: by 2002:a0d:cb44:0:b0:556:b029:e101 with SMTP id
+ n65-20020a0dcb44000000b00556b029e101mr3457366ywd.19.1683334562650; Fri, 05
+ May 2023 17:56:02 -0700 (PDT)
+MIME-Version: 1.0
+References: <20230421165305.804301-1-vipinsh@google.com> <20230421165305.804301-10-vipinsh@google.com>
+ <86pm7xjh3y.wl-maz@kernel.org>
+In-Reply-To: <86pm7xjh3y.wl-maz@kernel.org>
+From:   Vipin Sharma <vipinsh@google.com>
+Date:   Fri, 5 May 2023 17:55:26 -0700
+Message-ID: <CAHVum0d4W0emmyS0G8_nCXQuvgZN-8utDiT6TMYrOq7dF60aAw@mail.gmail.com>
+Subject: Re: [PATCH 9/9] KVM: arm64: Run clear-dirty-log under MMU read lock
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     oliver.upton@linux.dev, james.morse@arm.com,
+        suzuki.poulose@arm.com, yuzenghui@huawei.com,
+        catalin.marinas@arm.com, will@kernel.org, chenhuacai@kernel.org,
+        aleksandar.qemu.devel@gmail.com, tsbogend@alpha.franken.de,
+        anup@brainfault.org, atishp@atishpatra.org,
+        paul.walmsley@sifive.com, palmer@dabbelt.com,
+        aou@eecs.berkeley.edu, seanjc@google.com, pbonzini@redhat.com,
+        dmatlack@google.com, ricarkol@google.com,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        linux-mips@vger.kernel.org, kvm-riscv@lists.infradead.org,
+        linux-riscv@lists.infradead.org, linux-kselftest@vger.kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The pull request you sent on Fri,  5 May 2023 06:39:12 -0400:
+On Fri, Apr 21, 2023 at 10:11=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrot=
+e:
+>
+> On Fri, 21 Apr 2023 17:53:05 +0100,
+> Vipin Sharma <vipinsh@google.com> wrote:
+> >
+> > Take MMU read lock for write protecting PTEs and use shared page table
+> > walker for clearing dirty logs.
+> >
+> > Clearing dirty logs are currently performed under MMU write locks. This
+> > means vCPUs write protection fault, which also take MMU read lock,  wil=
+l
+> > be blocked during this operation. This causes guest degradation and
+> > especially noticeable on VMs with lot of vCPUs.
+> >
+> > Taking MMU read lock will allow vCPUs to execute parallelly and reduces
+> > the impact on vCPUs performance.
+>
+> Sure. Taking no lock whatsoever would be even better.
+>
+> What I don't see is the detailed explanation that gives me the warm
+> feeling that this is safe and correct. Such an explanation is the
+> minimum condition for me to even read the patch.
+>
 
-> https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
+Thanks for freaking me out. Your not getting warm feeling hunch was
+right, stage2_attr_walker() and stage2_update_leaf_attrs() combo do
+not retry if cmpxchg fails for write protection. Write protection
+callers don't check what the return status of the API is and just
+ignores cmpxchg failure. This means a vCPU (MMU read lock user) can
+cause cmpxchg to fail for write protection operation (under read lock,
+which this patch does) and clear ioctl will happily return as if
+everything is good.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/493804a6895d63240fe45d087cd14c4b77d8488b
+I will update the series and also work on validating the correctness
+to instill more confidence.
 
-Thank you!
-
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+Thanks
