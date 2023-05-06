@@ -2,244 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6580D6F8FB6
-	for <lists+kvm@lfdr.de>; Sat,  6 May 2023 09:13:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 177FB6F904F
+	for <lists+kvm@lfdr.de>; Sat,  6 May 2023 09:44:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230329AbjEFHNL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 6 May 2023 03:13:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60322 "EHLO
+        id S231354AbjEFHo4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 6 May 2023 03:44:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49042 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230136AbjEFHNJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 6 May 2023 03:13:09 -0400
-Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69A444C1E
-        for <kvm@vger.kernel.org>; Sat,  6 May 2023 00:13:08 -0700 (PDT)
-Received: by mail-pg1-x535.google.com with SMTP id 41be03b00d2f7-51f597c975fso2448421a12.0
-        for <kvm@vger.kernel.org>; Sat, 06 May 2023 00:13:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1683357188; x=1685949188;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mu3qZ0AvedwLeTUsw/OD/GuswR849znk2PpNGzIPK5I=;
-        b=rJje/fCy7njvxtPWu2F6BvNsr6p/kuZHDGXE/Nv1kXHqUf/qm78bokFm4CizeJTxaa
-         OBQG9pXA213OzGbsyZL79eX1RRIx7L3ubUAK4nYNj8jpVoj6SbsHFods+cJUkETKkIC8
-         37pWDws55tRKGT9UWxPtccLhlOEEf5DgKlt9I6IWpulnNztL9CbuD28OzJ0I9dGQ7v51
-         cDGk3WAh6vxLk0URZJzyBX2efpfuAWSZqGG0KcGws5jVJl0Hlt370ylQXEP8jCd9NkTv
-         rd1uPaWYpFA3XeHo0mEdjsLZwPiEoAq5O0LfXV3JjWFd8SEneqXZF63+AZMbEGCpgzDr
-         ycjg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683357188; x=1685949188;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=mu3qZ0AvedwLeTUsw/OD/GuswR849znk2PpNGzIPK5I=;
-        b=HKnRemf2HwFUmW5kTdpRcq5UmURNbhXu6B267Bm84aHtpwQC7aG/zUxOHY9JNJERK8
-         LmkANaITHjogyZCKIvhlv/Yv5qlc9gYmXTQSkV3E3pfDy8bRENgr1BcRolvkxKms2cRx
-         F6NdLfbX94IDdzoJ/PAnMarlhLklvF3HC9F0Nz/Yllzc1seZp6hmezkd/czvITw6XKuY
-         n7L3sWJ92oc+bXSZTGccdgI7Wq4IWuAYCoqLWOWZ8XAZId/KaaeR5lOWPughXYEv7QIN
-         ipp9vhylQ5SVAFHJjWBdTOhNAoCfESruaDtytJtz1X37vlP6U18HDmnHILrCIOgBLfPf
-         78kw==
-X-Gm-Message-State: AC+VfDwJT6uR3f159tkXkCjB5OA/YfG70cDNTr2P+00P8erxJ6/0MKen
-        hOmkVtHmYjbXHHYsx2ScKk1VvE9EWOT8JaBqp5k=
-X-Google-Smtp-Source: ACHHUZ6AAmpvGf+t2ALHLZYH08juVwhY9wxkolKLCeI6ZBoVG75KETkBoWrDt+ZOIrUkzIW3cmkRV0vnpdCdjciOnto=
-X-Received: by 2002:a17:902:7295:b0:1a2:6257:36b9 with SMTP id
- d21-20020a170902729500b001a2625736b9mr3627220pll.31.1683357187782; Sat, 06
- May 2023 00:13:07 -0700 (PDT)
+        with ESMTP id S231444AbjEFHoy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 6 May 2023 03:44:54 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3551E46;
+        Sat,  6 May 2023 00:44:52 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 5B82A22316;
+        Sat,  6 May 2023 07:44:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1683359091; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=fIDvcIp0irJ9nejo79mAMo8eZX7vhyfnB/9sV4I6BVc=;
+        b=UZV+c3hiyyOkfV/XezlgAfmyyo/QUMnJEhP4WzWXfiaKANzoCNt5LA/dQb5h/oPNdB+r0r
+        0+6pGoMUr5MZYrNQL4dHdFXmTco0B5rROt1idt3GO+qquSE4iH/ByLsUIbjKHjlIMmJ27m
+        rjTkGLuTXK8Zg03go7YkM99O+IvuUiY=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1683359091;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=fIDvcIp0irJ9nejo79mAMo8eZX7vhyfnB/9sV4I6BVc=;
+        b=dQGIBY9s2MYs2o/JzZcBaikk819IihoO+S/GdXDCBW824SyAsNLgrFKK+HdzfcAnGbZOBO
+        OR27gVT3dPS8+WCg==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 0C252134FB;
+        Sat,  6 May 2023 07:44:51 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id KSY+AnMFVmRHXgAAMHmgww
+        (envelope-from <vbabka@suse.cz>); Sat, 06 May 2023 07:44:51 +0000
+Message-ID: <3b0ec3da-ba18-7b9f-4e84-1cc30e78aed7@suse.cz>
+Date:   Sat, 6 May 2023 09:44:50 +0200
 MIME-Version: 1.0
-References: <1679555884-32544-1-git-send-email-lirongqing@baidu.com>
- <b8facaa4-7dc3-7f2c-e25b-16503c4bfae7@gmail.com> <CANZk6aTqiOtJiriSUtZ3myod5hcbV8fb7NA8O2YmUo5PrFyTYw@mail.gmail.com>
- <ZFVAd+SRpnEkw5tx@google.com>
-In-Reply-To: <ZFVAd+SRpnEkw5tx@google.com>
-From:   zhuangel570 <zhuangel570@gmail.com>
-Date:   Sat, 6 May 2023 15:12:55 +0800
-Message-ID: <CANZk6aTQoYn5g2ELucjg16yTjo13xUeprOMfgJtZVY+psxHTCQ@mail.gmail.com>
-Subject: Re: [PATCH] KVM: x86/mmu: Don't create kvm-nx-lpage-re kthread if not itlb_multihit
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Robert Hoo <robert.hoo.linux@gmail.com>, lirongqing@baidu.com,
-        pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, dave.hansen@linux.intel.com, kvm@vger.kernel.org,
-        x86@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-        FREEMAIL_FROM,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.1
+Subject: Re: Rename restrictedmem => guardedmem? (was: Re: [PATCH v10 0/9]
+ KVM: mm: fd-based approach for supporting KVM)
+To:     David Hildenbrand <david@redhat.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Sean Christopherson <seanjc@google.com>,
+        Chao Peng <chao.p.peng@linux.intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        dhildenb@redhat.com, Quentin Perret <qperret@google.com>,
+        tabba@google.com, Michael Roth <michael.roth@amd.com>,
+        wei.w.wang@intel.com, Mike Rapoport <rppt@kernel.org>,
+        Liam Merwick <liam.merwick@oracle.com>,
+        Isaku Yamahata <isaku.yamahata@gmail.com>,
+        Ackerley Tng <ackerleytng@google.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20221202061347.1070246-1-chao.p.peng@linux.intel.com>
+ <ZD1oevE8iHsi66T2@google.com>
+ <658018f9-581c-7786-795a-85227c712be0@redhat.com>
+ <CS465PQZS77J.J1RP6AJX1CWZ@suppilovahvero>
+ <6db68140-0612-a7a3-2cec-c583b2ed3a61@redhat.com>
+Content-Language: en-US
+From:   Vlastimil Babka <vbabka@suse.cz>
+In-Reply-To: <6db68140-0612-a7a3-2cec-c583b2ed3a61@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-8.7 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The "never" parameter works for environments without ITLB MULTIHIT issue. B=
-ut
-for vulnerable environments, should we prohibit users from turning off
-software mitigations?
+On 5/5/23 22:00, David Hildenbrand wrote:
+> On 23.04.23 15:28, Jarkko Sakkinen wrote:
+>> On Mon Apr 17, 2023 at 6:48 PM EEST, David Hildenbrand wrote:
+>>> On 17.04.23 17:40, Sean Christopherson wrote:
+>>>> What do y'all think about renaming "restrictedmem" to "guardedmem"?
+>>>
+>>> Yeay, let's add more confusion :D
+>>>
+>>> If we're at renaming, I'd appreciate if we could find a terminology that
+>>> does look/sound less horrible.
+>>>
+>>>>
+>>>> I want to start referring to the code/patches by its syscall/implementation name
+>>>> instead of "UPM", as "UPM" is (a) very KVM centric, (b) refers to the broader effort
+>>>> and not just the non-KVM code, and (c) will likely be confusing for future reviewers
+>>>> since there's nothing in the code that mentions "UPM" in any way.
+>>>>
+>>>> But typing out restrictedmem is quite tedious, and git grep shows that "rmem" is
+>>>> already used to refer to "reserved memory".
+>>>>
+>>>> Renaming the syscall to "guardedmem"...
+>>>
+>>> restrictedmem, guardedmem, ... all fairly "suboptimal" if you'd ask me ...
+>> 
+>> In the world of TEE's and confidential computing it is fairly common to
+>> call memory areas enclaves, even outside SGX context. So in that sense
+>> enclave memory would be the most correct terminology.
+> 
+> I was also thinking along the lines of isolated_mem or imem ... 
+> essentially, isolated from (unprivileged) user space.
+> 
+> ... if we still want to have a common syscall for it.
 
-As for the nx_huge_page_recovery_thread worker thread, this is a solution t=
-o
-optimize software mitigation, maybe not needed in all cases.
-For example, on a vulnerable machine, software mitigations need to be enabl=
-ed,
-but worker threads may not be needed when the VM determines that huge pages
-are not in use (not sure).
+I'm fan of the ioctl, if it has a chance of working out.
 
-Do you think it is possible to introduce a new parameter to disable worker
-threads?
-
-On Sat, May 6, 2023 at 1:44=E2=80=AFAM Sean Christopherson <seanjc@google.c=
-om> wrote:
->
-> On Fri, May 05, 2023, zhuangel570 wrote:
-> > FYI, this is our test scenario, simulating the FaaS business, every VM =
-assign
-> > 0.1 core, starting lots VMs run in backgroud (such as 800 VM on a machi=
-ne
-> > with 80 cores), then burst create 10 VMs, then got 100ms+ latency in cr=
-eating
-> > "kvm-nx-lpage-recovery".
-> >
-> > On Tue, May 2, 2023 at 10:20=E2=80=AFAM Robert Hoo <robert.hoo.linux@gm=
-ail.com> wrote:
-> > >
-> > > On 3/23/2023 3:18 PM, lirongqing@baidu.com wrote:
-> > > > From: Li RongQing <lirongqing@baidu.com>
-> > > >
-> > > > if CPU has not X86_BUG_ITLB_MULTIHIT bug, kvm-nx-lpage-re kthread
-> > > > is not needed to create
-> > >
-> > > (directed by Sean from
-> > > https://lore.kernel.org/kvm/ZE%2FR1%2FhvbuWmD8mw@google.com/ here.)
-> > >
-> > > No, I think it should tie to "nx_huge_pages" value rather than
-> > > directly/partially tie to boot_cpu_has_bug(X86_BUG_ITLB_MULTIHIT).
->
-> Lightly tested.  This is what I'm thinking for a "never" param.  Unless s=
-omeone
-> has an alternative idea, I'll post a formal patch after more testing.
->
-> ---
->  arch/x86/kvm/mmu/mmu.c | 41 ++++++++++++++++++++++++++++++++++++-----
->  1 file changed, 36 insertions(+), 5 deletions(-)
->
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index c8961f45e3b1..14713c050196 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -58,6 +58,8 @@
->
->  extern bool itlb_multihit_kvm_mitigation;
->
-> +static bool nx_hugepage_mitigation_hard_disabled;
-> +
->  int __read_mostly nx_huge_pages =3D -1;
->  static uint __read_mostly nx_huge_pages_recovery_period_ms;
->  #ifdef CONFIG_PREEMPT_RT
-> @@ -67,12 +69,13 @@ static uint __read_mostly nx_huge_pages_recovery_rati=
-o =3D 0;
->  static uint __read_mostly nx_huge_pages_recovery_ratio =3D 60;
->  #endif
->
-> +static int get_nx_huge_pages(char *buffer, const struct kernel_param *kp=
-);
->  static int set_nx_huge_pages(const char *val, const struct kernel_param =
-*kp);
->  static int set_nx_huge_pages_recovery_param(const char *val, const struc=
-t kernel_param *kp);
->
->  static const struct kernel_param_ops nx_huge_pages_ops =3D {
->         .set =3D set_nx_huge_pages,
-> -       .get =3D param_get_bool,
-> +       .get =3D get_nx_huge_pages,
->  };
->
->  static const struct kernel_param_ops nx_huge_pages_recovery_param_ops =
-=3D {
-> @@ -6844,6 +6847,14 @@ static void mmu_destroy_caches(void)
->         kmem_cache_destroy(mmu_page_header_cache);
->  }
->
-> +static int get_nx_huge_pages(char *buffer, const struct kernel_param *kp=
-)
-> +{
-> +       if (nx_hugepage_mitigation_hard_disabled)
-> +               return sprintf(buffer, "never\n");
-> +
-> +       return param_get_bool(buffer, kp);
-> +}
-> +
->  static bool get_nx_auto_mode(void)
->  {
->         /* Return true when CPU has the bug, and mitigations are ON */
-> @@ -6860,15 +6871,29 @@ static int set_nx_huge_pages(const char *val, con=
-st struct kernel_param *kp)
->         bool old_val =3D nx_huge_pages;
->         bool new_val;
->
-> +       if (nx_hugepage_mitigation_hard_disabled)
-> +               return -EPERM;
-> +
->         /* In "auto" mode deploy workaround only if CPU has the bug. */
-> -       if (sysfs_streq(val, "off"))
-> +       if (sysfs_streq(val, "off")) {
->                 new_val =3D 0;
-> -       else if (sysfs_streq(val, "force"))
-> +       } else if (sysfs_streq(val, "force")) {
->                 new_val =3D 1;
-> -       else if (sysfs_streq(val, "auto"))
-> +       } else if (sysfs_streq(val, "auto")) {
->                 new_val =3D get_nx_auto_mode();
-> -       else if (kstrtobool(val, &new_val) < 0)
-> +       } if (sysfs_streq(val, "never")) {
-> +               new_val =3D 0;
-> +
-> +               mutex_lock(&kvm_lock);
-> +               if (!list_empty(&vm_list)) {
-> +                       mutex_unlock(&kvm_lock);
-> +                       return -EBUSY;
-> +               }
-> +               nx_hugepage_mitigation_hard_disabled =3D true;
-> +               mutex_unlock(&kvm_lock);
-> +       } else if (kstrtobool(val, &new_val) < 0) {
->                 return -EINVAL;
-> +       }
->
->         __set_nx_huge_pages(new_val);
->
-> @@ -7006,6 +7031,9 @@ static int set_nx_huge_pages_recovery_param(const c=
-har *val, const struct kernel
->         uint old_period, new_period;
->         int err;
->
-> +       if (nx_hugepage_mitigation_hard_disabled)
-> +               return -EPERM;
-> +
->         was_recovery_enabled =3D calc_nx_huge_pages_recovery_period(&old_=
-period);
->
->         err =3D param_set_uint(val, kp);
-> @@ -7161,6 +7189,9 @@ int kvm_mmu_post_init_vm(struct kvm *kvm)
->  {
->         int err;
->
-> +       if (nx_hugepage_mitigation_hard_disabled)
-> +               return 0;
-> +
->         err =3D kvm_vm_create_worker_thread(kvm, kvm_nx_huge_page_recover=
-y_worker, 0,
->                                           "kvm-nx-lpage-recovery",
->                                           &kvm->arch.nx_huge_page_recover=
-y_thread);
->
-> base-commit: b3c98052d46948a8d65d2778c7f306ff38366aac
-> --
->
-
-
---=20
-=E2=80=94=E2=80=94=E2=80=94=E2=80=94=E2=80=94=E2=80=94=E2=80=94=E2=80=94=E2=
-=80=94=E2=80=94
-   zhuangel570
-=E2=80=94=E2=80=94=E2=80=94=E2=80=94=E2=80=94=E2=80=94=E2=80=94=E2=80=94=E2=
-=80=94=E2=80=94
