@@ -2,83 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F05236F936F
-	for <lists+kvm@lfdr.de>; Sat,  6 May 2023 19:50:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4B6496F966F
+	for <lists+kvm@lfdr.de>; Sun,  7 May 2023 03:18:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229736AbjEFRub (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 6 May 2023 13:50:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56072 "EHLO
+        id S230218AbjEGBSx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 6 May 2023 21:18:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43832 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229441AbjEFRua (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 6 May 2023 13:50:30 -0400
-Received: from mail-oo1-xc2e.google.com (mail-oo1-xc2e.google.com [IPv6:2607:f8b0:4864:20::c2e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 194851816D
-        for <kvm@vger.kernel.org>; Sat,  6 May 2023 10:50:29 -0700 (PDT)
-Received: by mail-oo1-xc2e.google.com with SMTP id 006d021491bc7-54c96cef24aso1507836eaf.1
-        for <kvm@vger.kernel.org>; Sat, 06 May 2023 10:50:29 -0700 (PDT)
+        with ESMTP id S229712AbjEGBSv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 6 May 2023 21:18:51 -0400
+Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E39B61435F
+        for <kvm@vger.kernel.org>; Sat,  6 May 2023 18:18:50 -0700 (PDT)
+Received: by mail-pj1-x1031.google.com with SMTP id 98e67ed59e1d1-24e2b2a27ebso3087118a91.3
+        for <kvm@vger.kernel.org>; Sat, 06 May 2023 18:18:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1683395428; x=1685987428;
-        h=content-transfer-encoding:to:subject:message-id:date:from:sender
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=BXZd/Ira+adnXziXnGW6M5sQnvyHtw9vcvOhDf0qCyY=;
-        b=gE7NrRKaE+KheuKviAHx/8Ik6Me+uiDlbsvyPnm/4csW6viWddYXSfGUQy2E5flqmV
-         CSa1qcXhaTE/XPz38Y/3b3DAg7vKOj8QME5FEIsZ8nMbkODuhWGzt05+ZZsKjpu6e4tw
-         ZhV473D7DHwUD5hsqfrGKjgP+8ipS7Vonro0c5iUnQJIR2NUCAs559DloWz5omp1TdHA
-         DpRj4lPzN/Y2NfPe54fjaFFRgN7hovak3dWF/HbU0KcY0z2RxFkemzmo+sPyL8ld0zGl
-         FmqiQijv+5ZtFekKXKyzE7wAo04oGpCluWuKYH3ofRDhBCk+1CH0XBx5NnFCxECoOx43
-         PCMg==
+        d=gmail.com; s=20221208; t=1683422330; x=1686014330;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=SaJ3H7b41kfDY9IIs2ipVZrhE60mI19aWaLVFj/W8oM=;
+        b=Z8XRGLj+rPkKJTCilNcN9cTw8uxzTvYGEptFHuAg5GkLCm3uvzkT/mNsgN2o4P/365
+         Q/aar7RKSVJHnNtjJ1C9Qtky/3ZMaiROAr3vVJgoCSWU+YbOLbjoMAJrfDVR2hUF/VaE
+         0gUNFyjQSjHW/73M2oI/2KP8IImIv+R9cmVvsGtao35IsBndQ97Bby9as5I21Ei9Yxht
+         ZYRTuczM6NCS0YbyZMLSS+Bafwl/DSMY1leHiiCnhEt04k5PBGQZI1m5t5RIEK6xWcMW
+         6JbhfP2xEDfC2qxOi3rEroPcbgb1JF+xL0v+dYUvlk6s4Kgya30tDtLN5NoXYlB3oeqj
+         YwEA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683395428; x=1685987428;
-        h=content-transfer-encoding:to:subject:message-id:date:from:sender
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=BXZd/Ira+adnXziXnGW6M5sQnvyHtw9vcvOhDf0qCyY=;
-        b=ExeIoU8a1lbtSnFBYuASS7I8z/WGhetx/CdGfr833OnA3U2vVD3TKBLBMUg08kLLoR
-         +ZMeS07uvwg/9UwOZ8ayGUGZ5YoKpM0ZCduM2zxbcy+kVIBS8NwIrUU/onIB3+wHPhD7
-         AJXQ4ez1y4RWi8/ahwyvNUElCeuctDcRVI6FPn4c9Z9h5nb5zb5HIeft6d9RSxPhWpkx
-         yZQIUmg07ZETM2jCebQ8WpcndNNubxQkmfdBon67jeaKl6TvpuBImcaQtgG/MjpUGf3X
-         MVBOTKWNIYZPAhfBWSnFJj/iht7Mzf4dv+uJmfucY0JqKo6+5O49BAu3M0mPHVI6MujA
-         2VzQ==
-X-Gm-Message-State: AC+VfDyArRElm41SpjjfaboMYT5r9DXa6evhG6h4JgaZ5V0PBxxn0KbG
-        YKLamZPWqFyfd8mvxScgK/V1RRReP0wGiR4GdTU=
-X-Google-Smtp-Source: ACHHUZ7j7zeq6kTfL2Zkq5Asq6LQBatZr44e6Q/BJRFM9d+DAPF/F3svrYjmMdOqSwOs1BwNPSWyym3515TYDiyKaYE=
-X-Received: by 2002:a4a:92de:0:b0:54f:49ad:1c91 with SMTP id
- j30-20020a4a92de000000b0054f49ad1c91mr876166ooh.9.1683395428407; Sat, 06 May
- 2023 10:50:28 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1683422330; x=1686014330;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:from:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=SaJ3H7b41kfDY9IIs2ipVZrhE60mI19aWaLVFj/W8oM=;
+        b=Kn3U3DrpSEOO6rkP0vBfmgnWlCwIDJtmd9Usfd2cG6ld05CD+N3Xr36HA6NA1nyNuw
+         ikDJkTb1OV9CUDMMgqBgEx666A14rFZASNpoRgOpxPRJXqwOsy6E4T2ebz/8M8qlVAJg
+         8eyvEcI7a6GD1OtZH2kDdXjhsl2sWODMhpcCwskipClN0BARlYf2AXD0/PtVKIxgBwtE
+         kQ7F2N3BnFL98cTKMHERwyP3m740wwQNOBwZMhZ1uBrlUb7cwvaeGkUYeZwN05Ady5a7
+         b9MvERBs/55voPJtzhtlWd3emtvQLjE0ZNrabDus9W/R7xHBr6v9nyx+r3wHOnc4gxrh
+         DXbQ==
+X-Gm-Message-State: AC+VfDx32viGHmfFn2zdMnCWf63LWFaVh53VhzdvfAUYQ2Hw6IwwKsFK
+        edU3MeM5oQJaJmODOi7GWXk=
+X-Google-Smtp-Source: ACHHUZ5UXiC6JqQhI5+TJkTFtYJ7dPBesnABOGQx6rNfHZvUBXj/16P4eFpu0QNQkocmL98R1wyWCA==
+X-Received: by 2002:a17:90a:d681:b0:250:7347:39eb with SMTP id x1-20020a17090ad68100b00250734739ebmr342319pju.20.1683422330276;
+        Sat, 06 May 2023 18:18:50 -0700 (PDT)
+Received: from [172.27.232.43] (ec2-16-163-40-128.ap-east-1.compute.amazonaws.com. [16.163.40.128])
+        by smtp.gmail.com with ESMTPSA id g3-20020a655943000000b00528b78ddbcesm3541650pgu.70.2023.05.06.18.18.46
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 06 May 2023 18:18:49 -0700 (PDT)
+Message-ID: <cc3f5744-e7b5-4202-a429-baf40a6b1667@gmail.com>
+Date:   Sun, 7 May 2023 09:18:44 +0800
 MIME-Version: 1.0
-Sender: issoufd295@gmail.com
-Received: by 2002:a8a:54e:0:b0:4d7:2d9c:8f96 with HTTP; Sat, 6 May 2023
- 10:50:28 -0700 (PDT)
-From:   Miss Reacheal <Reacheal4u@gmail.com>
-Date:   Sat, 6 May 2023 17:50:28 +0000
-X-Google-Sender-Auth: XAT8La-vIiD8yoY6cUO1gaRzNyM
-Message-ID: <CAOzFqiObpz=MfxgfV97P93GECE+5WvUWY6C2NHhu2sCx=HUzrg@mail.gmail.com>
-Subject: RE: HELLO DEAR
-To:     undisclosed-recipients:;
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-1.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-        FREEMAIL_FROM,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,SUBJ_ALL_CAPS,
-        T_HK_NAME_FM_MR_MRS,T_SCC_BODY_TEXT_LINE autolearn=no
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+Subject: Re: [PATCH] KVM: x86/mmu: Don't create kvm-nx-lpage-re kthread if not
+ itlb_multihit
+From:   Robert Hoo <robert.hoo.linux@gmail.com>
+To:     Sean Christopherson <seanjc@google.com>,
+        zhuangel570 <zhuangel570@gmail.com>
+Cc:     lirongqing@baidu.com, pbonzini@redhat.com, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
+        kvm@vger.kernel.org, x86@kernel.org
+References: <1679555884-32544-1-git-send-email-lirongqing@baidu.com>
+ <b8facaa4-7dc3-7f2c-e25b-16503c4bfae7@gmail.com>
+ <CANZk6aTqiOtJiriSUtZ3myod5hcbV8fb7NA8O2YmUo5PrFyTYw@mail.gmail.com>
+ <ZFVAd+SRpnEkw5tx@google.com>
+ <7e8ab4a6-ace9-c284-972c-b818f569cfbf@gmail.com>
+Content-Language: en-US
+In-Reply-To: <7e8ab4a6-ace9-c284-972c-b818f569cfbf@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-6.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hell=C3=B3,
+On 5/6/2023 10:49 PM, Robert Hoo wrote:
+> 
+> And, what's the difference between "off" and "never"?
+> 
+Ah, after a night's sleep, my cognitive abilities are restored.
+"never" intends to block any other settings if there's VM created.
 
-Megkaptad az el=C5=91z=C5=91 =C3=BCzenetem? M=C3=A1r kor=C3=A1bban felvette=
-m =C3=96nnel a
-kapcsolatot, de az =C3=BCzenet nem siker=C3=BClt visszak=C3=BCldeni, ez=C3=
-=A9rt =C3=BAgy
-d=C3=B6nt=C3=B6ttem, hogy =C3=BAjra =C3=ADrok. K=C3=A9rem, er=C5=91s=C3=ADt=
-se meg, ha megkapja ezt, hogy
-folytathassam.
 
-V=C3=A1rok a v=C3=A1laszodra.
-
-=C3=9Cdv=C3=B6zlettel,
-Reacheal kisasszony
